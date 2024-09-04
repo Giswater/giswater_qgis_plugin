@@ -234,3 +234,20 @@ UPDATE config_function
 	SET "style"='{"style":{"point":{"style":"qml", "id":"104"}, "line":{"style":"qml", "id":"104"}}}'::json
 	WHERE id=2858;
 
+
+-- 04/09/2024
+DELETE FROM config_form_fields WHERE formname='visit_arc_leak' AND formtype='form_visit' AND columnname='acceptbutton' AND tabname='tab_data';
+DELETE FROM config_form_fields WHERE formname='visit_arc_leak' AND formtype='form_visit' AND columnname='backbutton' AND tabname='tab_file';
+DELETE FROM config_form_fields WHERE formname='visit_connec_leak' AND formtype='form_visit' AND columnname='acceptbutton' AND tabname='tab_data';
+DELETE FROM config_form_fields WHERE formname='visit_connec_leak' AND formtype='form_visit' AND columnname='backbutton' AND tabname='tab_file';
+DELETE FROM config_form_fields WHERE formname='visit_node_insp' AND formtype='form_visit' AND columnname='acceptbutton' AND tabname='tab_data';
+DELETE FROM config_form_fields WHERE formname='visit_node_insp' AND formtype='form_visit' AND columnname='backbutton' AND tabname='tab_file';
+DELETE FROM config_form_fields WHERE formname='incident_node' AND formtype='form_visit' AND columnname='acceptbutton' AND tabname='tab_data';
+DELETE FROM config_form_fields WHERE formname='incident_node' AND formtype='form_visit' AND columnname='backbutton' AND tabname='tab_file';
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+    VALUES('generic', 'form_visit', 'tab_file', 'btn_apply', 'lyt_buttons', NULL, NULL, 'button', '', NULL, NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline": false,"text": "Apply"}'::json, '{"functionName": "apply"}'::json, NULL, false, 1);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+    VALUES('generic', 'form_visit', 'tab_data', 'btn_accept', 'lyt_buttons', NULL, NULL, 'button', '', NULL, NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false, "text":"Accept"}'::json, '{"functionName": "accept"}'::json, NULL, false, 0);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+    VALUES('generic', 'form_visit', 'tab_file', 'btn_cancel', 'lyt_buttons', NULL, NULL, 'button', '', NULL, NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false, "text":"Cancel"}'::json, '{"functionName": "cancel"}'::json, NULL, false, 2);
