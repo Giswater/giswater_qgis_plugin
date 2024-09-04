@@ -15,3 +15,5 @@ ALTER TABLE drainzone ADD CONSTRAINT drainzone_sector_id_fkey FOREIGN KEY (secto
 ALTER TABLE dma ADD CONSTRAINT dma_muni_id_fkey FOREIGN KEY (sector_id) REFERENCES sector(sector_id);
 
 ALTER TABLE raingage ADD CONSTRAINT raingage_muni_id FOREIGN KEY (muni_id) REFERENCES ext_municipality(muni_id);
+
+CREATE INDEX gully_muni ON gully USING btree (muni_id);
