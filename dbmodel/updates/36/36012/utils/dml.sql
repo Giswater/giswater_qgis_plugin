@@ -411,4 +411,4 @@ UPDATE config_form_list SET query_text='SELECT value as url, tstamp FROM om_visi
 
 -- 04/09/2024
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source")
-VALUES(3322, 'gw_fct_getfeaturereplace', 'utils', 'function', 'json', 'json', 'Function to get Widgets from gw_fct_getformfields', 'role_edit', NULL, 'core');
+VALUES(3324, 'gw_fct_getfeaturereplace', 'utils', 'function', 'json', 'json', 'Function to get feature type change dialog', 'role_edit', NULL, 'core');
