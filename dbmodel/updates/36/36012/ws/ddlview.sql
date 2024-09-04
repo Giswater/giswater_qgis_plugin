@@ -38,7 +38,6 @@ CREATE OR REPLACE VIEW vu_dma
 AS SELECT d.dma_id,
 	d.name,
 	d.macrodma_id,
-	d.sector_id,
 	d.expl_id,
 	et.idval as dma_type,
 	d.descript,
@@ -62,7 +61,6 @@ AS SELECT d.dma_id,
 CREATE OR REPLACE VIEW vu_presszone
 AS SELECT p.presszone_id,
 	p.name,
-	p.sector_id,
 	p.expl_id,
 	et.idval as presszone_type,
 	p.descript,
@@ -86,7 +84,6 @@ AS SELECT d.dqa_id,
 	d.name,
 	d.macrodqa_id,
 	d.descript,
-	d.sector_id,
 	d.expl_id,
 	et.idval as dqa_type,
 	d.pattern_id,
@@ -106,25 +103,23 @@ AS SELECT d.dqa_id,
 
 
 DROP VIEW IF EXISTS v_edit_sector;
-CREATE OR REPLACE VIEW v_edit_sector as select vu_sector.* from vu_sector, selector_sector
+CREATE OR REPLACE VIEW v_edit_sector as 
+select vu_sector.* from vu_sector, selector_sector
 WHERE (vu_sector.sector_id = selector_sector.sector_id) AND selector_sector.cur_user = "current_user"()::text;
 
 CREATE OR REPLACE VIEW v_edit_dma as 
-select vu_dma.* from vu_dma LEFT JOIN selector_sector using (sector_id), selector_expl
-WHERE (selector_sector.cur_user = "current_user"()::text OR vu_dma.sector_id is null)
-AND ((vu_dma.expl_id = selector_expl.expl_id) AND selector_expl.cur_user = "current_user"()::text) OR vu_dma.expl_id is null
+select vu_dma.* from vu_dma, selector_expl
+WHERE ((vu_dma.expl_id = selector_expl.expl_id) AND selector_expl.cur_user = "current_user"()::text) OR vu_dma.expl_id is null
 order by 1 asc;
 
 CREATE OR REPLACE VIEW v_edit_presszone as 
-select vu_presszone.* from vu_presszone LEFT JOIN selector_sector using (sector_id), selector_expl
-WHERE (selector_sector.cur_user = "current_user"()::text OR vu_presszone.sector_id is null)
-AND ((vu_presszone.expl_id = selector_expl.expl_id) AND selector_expl.cur_user = "current_user"()::text) OR vu_presszone.expl_id is null
+select vu_presszone.* from vu_presszone, selector_expl
+WHERE ((vu_presszone.expl_id = selector_expl.expl_id) AND selector_expl.cur_user = "current_user"()::text) OR vu_presszone.expl_id is null
 order by 1 asc;
 
 CREATE OR REPLACE VIEW v_edit_dqa as 
-select vu_dqa.* from vu_dqa LEFT JOIN selector_sector using (sector_id), selector_expl
-WHERE (selector_sector.cur_user = "current_user"()::text OR vu_dqa.sector_id is null)
-AND ((vu_dqa.expl_id = selector_expl.expl_id) AND selector_expl.cur_user = "current_user"()::text) OR vu_dqa.expl_id is null
+select vu_dqa.* from vu_dqa, selector_expl
+WHERE ((vu_dqa.expl_id = selector_expl.expl_id) AND selector_expl.cur_user = "current_user"()::text) OR vu_dqa.expl_id is null
 order by 1 asc;
 
 

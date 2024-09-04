@@ -35,15 +35,6 @@ BEGIN
 			END IF;
 		END IF;
 
-		-- Sector
-		IF (NEW.sector_id IS NULL) THEN
-			NEW.sector_id := (SELECT sector_id FROM sector WHERE ST_intersects(NEW.the_geom, sector.the_geom) AND active IS TRUE limit 1);
-
-			IF (NEW.sector_id IS NULL) THEN
-				NEW.sector_id := 0;
-			END IF;
-		END IF;
-
 		-- active
 		IF NEW.active IS NULL THEN
 			NEW.active = TRUE;
@@ -62,9 +53,9 @@ BEGIN
 			ON CONFLICT (pattern_id) DO NOTHING;
 		END IF;
 			
-		INSERT INTO dma (dma_id, name, descript,  macrodma_id, the_geom, undelete, expl_id, pattern_id, link, effc, graphconfig, stylesheet, active, avg_press, dma_type, sector_id)
+		INSERT INTO dma (dma_id, name, descript,  macrodma_id, the_geom, undelete, expl_id, pattern_id, link, effc, graphconfig, stylesheet, active, avg_press, dma_type)
 		VALUES (NEW.dma_id, NEW.name, NEW.descript, NEW.macrodma_id, NEW.the_geom, NEW.undelete, NEW.expl_id, NEW.pattern_id, NEW.link, 
-		NEW.effc, NEW.graphconfig::json, NEW.stylesheet::json, NEW.active, NEW.avg_press, NEW.dma_type, NEW.sector_id);
+		NEW.effc, NEW.graphconfig::json, NEW.stylesheet::json, NEW.active, NEW.avg_press, NEW.dma_type);
 
 		RETURN NEW;
 		
@@ -73,7 +64,7 @@ BEGIN
 		UPDATE dma 
 		SET dma_id=NEW.dma_id, name=NEW.name, descript=NEW.descript, the_geom=NEW.the_geom, undelete=NEW.undelete, expl_id=NEW.expl_id, 
 		pattern_id=NEW.pattern_id, link=NEW.link, effc=NEW.effc, graphconfig=NEW.graphconfig::json, dma_type=NEW.dma_type, 
-		stylesheet = NEW.stylesheet::json, active=NEW.active, avg_press=NEW.avg_press, macrodma_id = NEW.macrodma_id, lastupdate=now(), lastupdate_user = current_user, sector_id=NEW.sector_id
+		stylesheet = NEW.stylesheet::json, active=NEW.active, avg_press=NEW.avg_press, macrodma_id = NEW.macrodma_id, lastupdate=now(), lastupdate_user = current_user
 		WHERE dma_id=OLD.dma_id;
 		
 		RETURN NEW;

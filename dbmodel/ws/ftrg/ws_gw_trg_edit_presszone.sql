@@ -27,24 +27,14 @@ BEGIN
 			END IF;
 		END IF;
 
-		-- Sector
-		IF (NEW.sector_id IS NULL) THEN
-			NEW.sector_id := (SELECT sector_id FROM sector WHERE ST_intersects(NEW.the_geom, sector.the_geom) AND active IS TRUE limit 1);
-
-			IF (NEW.sector_id IS NULL) THEN
-				NEW.sector_id := 0;
-			END IF;
-		END IF;
-
-	
 		-- active
 		IF NEW.active IS NULL THEN
 			NEW.active = TRUE;
 		END IF;
 
-		INSERT INTO presszone (presszone_id, name, expl_id, the_geom, graphconfig, head, stylesheet, active, descript, avg_press, presszone_type, sector_id)
+		INSERT INTO presszone (presszone_id, name, expl_id, the_geom, graphconfig, head, stylesheet, active, descript, avg_press, presszone_type)
 		VALUES (NEW.presszone_id, NEW.name, NEW.expl_id, NEW.the_geom, NEW.graphconfig::json, NEW.head, NEW.stylesheet::json, NEW.active, NEW.descript, 
-		NEW.avg_press, NEW.presszone_type, NEW.sector_id);
+		NEW.avg_press, NEW.presszone_type);
 
 		RETURN NEW;
 		
@@ -53,7 +43,7 @@ BEGIN
 		UPDATE presszone
 		SET presszone_id=NEW.presszone_id, name=NEW.name, expl_id=NEW.expl_id, the_geom=NEW.the_geom, graphconfig=NEW.graphconfig::json,
 		head = NEW.head, stylesheet=NEW.stylesheet::json, active=NEW.active, descript=NEW.descript, lastupdate=now(), lastupdate_user = current_user, 
-		avg_press = NEW.avg_press, presszone_type = NEW.presszone_type, sector_id=NEW.sector_id
+		avg_press = NEW.avg_press, presszone_type = NEW.presszone_type
 		WHERE presszone_id=OLD.presszone_id;
 		
 		RETURN NEW;

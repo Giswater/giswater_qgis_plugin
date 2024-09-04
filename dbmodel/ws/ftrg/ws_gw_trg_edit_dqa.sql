@@ -27,24 +27,14 @@ BEGIN
 			END IF;
 		END IF;
 
-		-- Sector
-		IF (NEW.sector_id IS NULL) THEN
-			NEW.sector_id := (SELECT sector_id FROM sector WHERE ST_intersects(NEW.the_geom, sector.the_geom) AND active IS TRUE limit 1);
-
-			IF (NEW.sector_id IS NULL) THEN
-				NEW.sector_id := 0;
-			END IF;
-		END IF;
-
-
 		-- active
 		IF NEW.active IS NULL THEN
 			NEW.active = TRUE;
 		END IF;
 			
-		INSERT INTO dqa (dqa_id, name, expl_id, macrodqa_id, descript, undelete, the_geom, pattern_id, dqa_type, link, graphconfig, stylesheet,active, sector_id)
+		INSERT INTO dqa (dqa_id, name, expl_id, macrodqa_id, descript, undelete, the_geom, pattern_id, dqa_type, link, graphconfig, stylesheet,active)
 		VALUES (NEW.dqa_id, NEW.name, NEW.expl_id, NEW.macrodqa_id, NEW.descript, NEW.undelete, NEW.the_geom, NEW.pattern_id, NEW.dqa_type,
-		NEW.link, NEW.graphconfig::json, NEW.stylesheet::json, NEW.active, NEW.sector_id);
+		NEW.link, NEW.graphconfig::json, NEW.stylesheet::json, NEW.active);
 
 		RETURN NEW;
 		
@@ -53,7 +43,7 @@ BEGIN
 		UPDATE dqa 
 		SET dqa_id=NEW.dqa_id, name=NEW.name, expl_id=NEW.expl_id, macrodqa_id=NEW.macrodqa_id, descript=NEW.descript, undelete=NEW.undelete, 
 		the_geom=NEW.the_geom, pattern_id=NEW.pattern_id, dqa_type=NEW.dqa_type, link=NEW.link, graphconfig=NEW.graphconfig::json, 
-		stylesheet = NEW.stylesheet::json, active=NEW.active, lastupdate=now(), lastupdate_user = current_user, sector_id=NEW.sector_id
+		stylesheet = NEW.stylesheet::json, active=NEW.active, lastupdate=now(), lastupdate_user = current_user
 		WHERE dqa_id=OLD.dqa_id;
 		
 		RETURN NEW;

@@ -190,16 +190,6 @@ delete from sys_table where id = 'v_edit_field_valve';
 INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, hidden)
 VALUES ('v_edit_dma', 'form_feature', 'tab_none', 'dma_type', 'lyt_data_1', 18, 'string', 'combo', 'dma_type', 'dma_type', false, false, true, false, 'SELECT id, idval FROM edit_typevalue WHERE typevalue=''dma_type''', false);
 
-INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, dv_orderby_id, widgetcontrols, hidden)
-VALUES ('v_edit_dma', 'form_feature', 'tab_none', 'sector_id', 'lyt_data_1', 19, 'string', 'combo', 'sector_id', 'sector_id', false, false, true, false, 'SELECT sector_id as id, name as idval FROM sector WHERE sector_id>=0', true, '{"setMultiline": false, "valueRelation":{"nullValue":false, "layer": "v_edit_sector", "activated": true, "keyColumn": "sector_id", "valueColumn": "name", "filterExpression": null}}', false);
-
-INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, dv_orderby_id, widgetcontrols, hidden)
-VALUES ('v_edit_dqa', 'form_feature', 'tab_none', 'sector_id', 'lyt_data_1', 15, 'string', 'combo', 'sector_id', 'sector_id', false, false, true, false, 'SELECT sector_id as id, name as idval FROM sector WHERE sector_id>=0', true, '{"setMultiline": false, "valueRelation":{"nullValue":false, "layer": "v_edit_sector", "activated": true, "keyColumn": "sector_id", "valueColumn": "name", "filterExpression": null}}', false);
-
-INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, dv_orderby_id, widgetcontrols, hidden)
-VALUES ('v_edit_presszone', 'form_feature', 'tab_none', 'sector_id', 'lyt_data_1', 11, 'string', 'combo', 'sector_id', 'sector_id', false, false, true, false, 'SELECT sector_id as id, name as idval FROM sector WHERE sector_id>=0', true, '{"setMultiline": false, "valueRelation":{"nullValue":false, "layer": "v_edit_sector", "activated": true, "keyColumn": "sector_id", "valueColumn": "name", "filterExpression": null}}', false);
-
-
 INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, layoutorder, datatype, widgettype, label, tooltip, ismandatory, isparent, iseditable, isautoupdate, dv_querytext, hidden)
 VALUES ('ve_epa_inlet', 'form_feature', 'tab_epa', 'demand', 'lyt_epa_data_1', 17, 'string', 'text', 'Demand:', 'Demand', false, false, true, false, NULL, false);
 
@@ -294,47 +284,44 @@ VALUES ('v_edit_inp_pipe', 'form_feature', 'tab_none', 'cat_roughness', 'lyt_dat
 
 -- 23/08/2024
 UPDATE config_form_fields SET layoutorder=1 WHERE formname='v_edit_presszone' AND formtype='form_feature' AND columnname='presszone_id' AND tabname='tab_none';
-UPDATE config_form_fields SET layoutorder=2 WHERE formname='v_edit_presszone' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_none';
-UPDATE config_form_fields SET layoutorder=3 WHERE formname='v_edit_presszone' AND formtype='form_feature' AND columnname='name' AND tabname='tab_none';
-UPDATE config_form_fields SET layoutorder=4 WHERE formname='v_edit_presszone' AND formtype='form_feature' AND columnname='expl_id' AND tabname='tab_none';
-UPDATE config_form_fields SET layoutorder=5 WHERE formname='v_edit_presszone' AND formtype='form_feature' AND columnname='graphconfig' AND tabname='tab_none';
-UPDATE config_form_fields SET layoutorder=6 WHERE formname='v_edit_presszone' AND formtype='form_feature' AND columnname='head' AND tabname='tab_none';
-UPDATE config_form_fields SET layoutorder=7 WHERE formname='v_edit_presszone' AND formtype='form_feature' AND columnname='stylesheet' AND tabname='tab_none';
-UPDATE config_form_fields SET layoutorder=8 WHERE formname='v_edit_presszone' AND formtype='form_feature' AND columnname='active' AND tabname='tab_none';
-UPDATE config_form_fields SET layoutorder=9 WHERE formname='v_edit_presszone' AND formtype='form_feature' AND columnname='descript' AND tabname='tab_none';
-UPDATE config_form_fields SET layoutorder=10, tabname='tab_none' WHERE formname='v_edit_presszone' AND formtype='form_feature' AND columnname='presszone_type';
+UPDATE config_form_fields SET layoutorder=2 WHERE formname='v_edit_presszone' AND formtype='form_feature' AND columnname='name' AND tabname='tab_none';
+UPDATE config_form_fields SET layoutorder=3 WHERE formname='v_edit_presszone' AND formtype='form_feature' AND columnname='expl_id' AND tabname='tab_none';
+UPDATE config_form_fields SET layoutorder=4 WHERE formname='v_edit_presszone' AND formtype='form_feature' AND columnname='graphconfig' AND tabname='tab_none';
+UPDATE config_form_fields SET layoutorder=5 WHERE formname='v_edit_presszone' AND formtype='form_feature' AND columnname='head' AND tabname='tab_none';
+UPDATE config_form_fields SET layoutorder=6 WHERE formname='v_edit_presszone' AND formtype='form_feature' AND columnname='stylesheet' AND tabname='tab_none';
+UPDATE config_form_fields SET layoutorder=7 WHERE formname='v_edit_presszone' AND formtype='form_feature' AND columnname='active' AND tabname='tab_none';
+UPDATE config_form_fields SET layoutorder=8 WHERE formname='v_edit_presszone' AND formtype='form_feature' AND columnname='descript' AND tabname='tab_none';
+UPDATE config_form_fields SET layoutorder=9, tabname='tab_none' WHERE formname='v_edit_presszone' AND formtype='form_feature' AND columnname='presszone_type';
 DELETE FROM config_form_fields WHERE formname='v_edit_presszone' AND formtype='form_feature' AND columnname='expl_id2';
 
 UPDATE config_form_fields SET layoutorder=1 WHERE formname='v_edit_dqa' AND formtype='form_feature' AND columnname='dqa_id' AND tabname='tab_none';
-UPDATE config_form_fields SET layoutorder=2 WHERE formname='v_edit_dqa' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_none';
-UPDATE config_form_fields SET layoutorder=3 WHERE formname='v_edit_dqa' AND formtype='form_feature' AND columnname='name' AND tabname='tab_none';
-UPDATE config_form_fields SET layoutorder=4 WHERE formname='v_edit_dqa' AND formtype='form_feature' AND columnname='expl_id' AND tabname='tab_none';
-UPDATE config_form_fields SET layoutorder=5 WHERE formname='v_edit_dqa' AND formtype='form_feature' AND columnname='macrodqa_id' AND tabname='tab_none';
-UPDATE config_form_fields SET layoutorder=6 WHERE formname='v_edit_dqa' AND formtype='form_feature' AND columnname='descript' AND tabname='tab_none';
-UPDATE config_form_fields SET layoutorder=7 WHERE formname='v_edit_dqa' AND formtype='form_feature' AND columnname='undelete' AND tabname='tab_none';
-UPDATE config_form_fields SET layoutorder=8 WHERE formname='v_edit_dqa' AND formtype='form_feature' AND columnname='pattern_id' AND tabname='tab_none';
-UPDATE config_form_fields SET layoutorder=9 WHERE formname='v_edit_dqa' AND formtype='form_feature' AND columnname='dqa_type' AND tabname='tab_none';
-UPDATE config_form_fields SET layoutorder=10 WHERE formname='v_edit_dqa' AND formtype='form_feature' AND columnname='link' AND tabname='tab_none';
-UPDATE config_form_fields SET layoutorder=11 WHERE formname='v_edit_dqa' AND formtype='form_feature' AND columnname='graphconfig' AND tabname='tab_none';
-UPDATE config_form_fields SET layoutorder=12 WHERE formname='v_edit_dqa' AND formtype='form_feature' AND columnname='stylesheet' AND tabname='tab_none';
-UPDATE config_form_fields SET layoutorder=13 WHERE formname='v_edit_dqa' AND formtype='form_feature' AND columnname='active' AND tabname='tab_none';
-UPDATE config_form_fields SET layoutorder=14 WHERE formname='v_edit_dqa' AND formtype='form_feature' AND columnname='expl_id2' AND tabname='tab_data';
-UPDATE config_form_fields SET layoutorder=15 WHERE formname='v_edit_dqa' AND formtype='form_feature' AND columnname='avg_press' AND tabname='tab_data';
+UPDATE config_form_fields SET layoutorder=2 WHERE formname='v_edit_dqa' AND formtype='form_feature' AND columnname='name' AND tabname='tab_none';
+UPDATE config_form_fields SET layoutorder=3 WHERE formname='v_edit_dqa' AND formtype='form_feature' AND columnname='expl_id' AND tabname='tab_none';
+UPDATE config_form_fields SET layoutorder=4 WHERE formname='v_edit_dqa' AND formtype='form_feature' AND columnname='macrodqa_id' AND tabname='tab_none';
+UPDATE config_form_fields SET layoutorder=5 WHERE formname='v_edit_dqa' AND formtype='form_feature' AND columnname='descript' AND tabname='tab_none';
+UPDATE config_form_fields SET layoutorder=6 WHERE formname='v_edit_dqa' AND formtype='form_feature' AND columnname='undelete' AND tabname='tab_none';
+UPDATE config_form_fields SET layoutorder=7 WHERE formname='v_edit_dqa' AND formtype='form_feature' AND columnname='pattern_id' AND tabname='tab_none';
+UPDATE config_form_fields SET layoutorder=8 WHERE formname='v_edit_dqa' AND formtype='form_feature' AND columnname='dqa_type' AND tabname='tab_none';
+UPDATE config_form_fields SET layoutorder=9 WHERE formname='v_edit_dqa' AND formtype='form_feature' AND columnname='link' AND tabname='tab_none';
+UPDATE config_form_fields SET layoutorder=10 WHERE formname='v_edit_dqa' AND formtype='form_feature' AND columnname='graphconfig' AND tabname='tab_none';
+UPDATE config_form_fields SET layoutorder=11 WHERE formname='v_edit_dqa' AND formtype='form_feature' AND columnname='stylesheet' AND tabname='tab_none';
+UPDATE config_form_fields SET layoutorder=12 WHERE formname='v_edit_dqa' AND formtype='form_feature' AND columnname='active' AND tabname='tab_none';
+UPDATE config_form_fields SET layoutorder=13 WHERE formname='v_edit_dqa' AND formtype='form_feature' AND columnname='expl_id2' AND tabname='tab_data';
+UPDATE config_form_fields SET layoutorder=14 WHERE formname='v_edit_dqa' AND formtype='form_feature' AND columnname='avg_press' AND tabname='tab_data';
 DELETE FROM config_form_fields WHERE formname='v_edit_dqa' AND formtype='form_feature' AND columnname='expl_id2';
 
 UPDATE config_form_fields SET layoutorder=1 WHERE formname='v_edit_dma' AND formtype='form_feature' AND columnname='dma_id' AND tabname='tab_none';
-UPDATE config_form_fields SET layoutorder=2 WHERE formname='v_edit_dma' AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_none';
-UPDATE config_form_fields SET layoutorder=3 WHERE formname='v_edit_dma' AND formtype='form_feature' AND columnname='name' AND tabname='tab_none';
-UPDATE config_form_fields SET layoutorder=4 WHERE formname='v_edit_dma' AND formtype='form_feature' AND columnname='macrodma_id' AND tabname='tab_none';
-UPDATE config_form_fields SET layoutorder=5 WHERE formname='v_edit_dma' AND formtype='form_feature' AND columnname='descript' AND tabname='tab_none';
-UPDATE config_form_fields SET layoutorder=6 WHERE formname='v_edit_dma' AND formtype='form_feature' AND columnname='undelete' AND tabname='tab_none';
-UPDATE config_form_fields SET layoutorder=7 WHERE formname='v_edit_dma' AND formtype='form_feature' AND columnname='expl_id' AND tabname='tab_none';
-UPDATE config_form_fields SET layoutorder=8 WHERE formname='v_edit_dma' AND formtype='form_feature' AND columnname='pattern_id' AND tabname='tab_none';
-UPDATE config_form_fields SET layoutorder=9 WHERE formname='v_edit_dma' AND formtype='form_feature' AND columnname='link' AND tabname='tab_none';
+UPDATE config_form_fields SET layoutorder=2 WHERE formname='v_edit_dma' AND formtype='form_feature' AND columnname='name' AND tabname='tab_none';
+UPDATE config_form_fields SET layoutorder=3 WHERE formname='v_edit_dma' AND formtype='form_feature' AND columnname='macrodma_id' AND tabname='tab_none';
+UPDATE config_form_fields SET layoutorder=4 WHERE formname='v_edit_dma' AND formtype='form_feature' AND columnname='descript' AND tabname='tab_none';
+UPDATE config_form_fields SET layoutorder=5 WHERE formname='v_edit_dma' AND formtype='form_feature' AND columnname='undelete' AND tabname='tab_none';
+UPDATE config_form_fields SET layoutorder=6 WHERE formname='v_edit_dma' AND formtype='form_feature' AND columnname='expl_id' AND tabname='tab_none';
+UPDATE config_form_fields SET layoutorder=7 WHERE formname='v_edit_dma' AND formtype='form_feature' AND columnname='pattern_id' AND tabname='tab_none';
+UPDATE config_form_fields SET layoutorder=8 WHERE formname='v_edit_dma' AND formtype='form_feature' AND columnname='link' AND tabname='tab_none';
 DELETE FROM config_form_fields WHERE formname='v_edit_dma' AND formtype='form_feature' AND columnname='minc';
 DELETE FROM config_form_fields WHERE formname='v_edit_dma' AND formtype='form_feature' AND columnname='maxc';
 DELETE FROM config_form_fields WHERE formname='v_edit_dma' AND formtype='form_feature' AND columnname='expl_id2';
-UPDATE config_form_fields SET layoutorder=12 WHERE formname='v_edit_dma' AND formtype='form_feature' AND columnname='effc' AND tabname='tab_none';
+UPDATE config_form_fields SET layoutorder=11 WHERE formname='v_edit_dma' AND formtype='form_feature' AND columnname='effc' AND tabname='tab_none';
 
 UPDATE config_form_fields SET web_layoutorder=1 WHERE formname='mincut' AND formtype='form_mincut' AND columnname='btn_valve_status' AND tabname='tab_mincut';
 UPDATE config_form_fields SET web_layoutorder=2 WHERE formname='mincut' AND formtype='form_mincut' AND columnname='btn_refresh_mincut' AND tabname='tab_mincut';
@@ -386,12 +373,4 @@ select p.pool_id, m.muni_id from pool p
 	left join exploitation e using (expl_id)
 	left join ext_municipality m on st_intersects(m.the_geom, e.the_geom)
 )a where p.pool_id = a.pool_id;
-
-
-
-update presszone p set sector_id = a.sector_id from sector a where st_intersects(a.the_geom, p.the_geom) and a.sector_id is null;
-
-update dma p set sector_id = a.sector_id from sector a where st_intersects(a.the_geom, p.the_geom) and a.sector_id is null;
-
-update dqa p set sector_id = a.sector_id from sector a where st_intersects(a.the_geom, p.the_geom) and a.sector_id is null;
 

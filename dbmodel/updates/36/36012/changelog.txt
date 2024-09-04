@@ -20,10 +20,8 @@
 	- dimensions (muni_id, sector_id)
 	WS
 	- pond & pool (muni_id)
-	- presszone, dma, dqa (sector_id)
 - New columns for WS mapzones: presszone_type, dma_type, dqa_type
 - New views unfiltered (vu) for WS mapzones
 - Remove expl_id2 for mapzones
-- Various bugs fixed
 - New approximation to manage styles: config_style table and styleconfig_id field on sys_style. Different contexts could be used
 - Add default style configurations to sample project mapzones

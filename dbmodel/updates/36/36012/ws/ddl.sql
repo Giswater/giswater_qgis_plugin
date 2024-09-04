@@ -354,9 +354,6 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dma", "colu
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sector", "column":"link", "dataType":"text"}}$$);
 
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"presszone", "column":"sector_id", "dataType":"integer"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dma", "column":"sector_id", "dataType":"integer"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dqa", "column":"sector_id", "dataType":"integer"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"minsector", "column":"sector_id", "dataType":"integer"}}$$);
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"minsector", "column":"muni_id", "dataType":"integer"}}$$);

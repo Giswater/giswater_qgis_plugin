@@ -18,8 +18,3 @@ ALTER TABLE element ADD CONSTRAINT element_model_id FOREIGN KEY (model_id) refer
 ALTER TABLE pond ADD CONSTRAINT pond_muni_id FOREIGN KEY (muni_id) REFERENCES ext_municipality(muni_id);
 ALTER TABLE "pool" ADD CONSTRAINT pool_muni_id FOREIGN KEY (muni_id) REFERENCES ext_municipality(muni_id);
 
-
-ALTER TABLE presszone ADD CONSTRAINT presszone_sector_id FOREIGN KEY (sector_id) REFERENCES sector(sector_id);
-ALTER TABLE dma ADD CONSTRAINT dma_sector_id FOREIGN KEY (sector_id) REFERENCES sector(sector_id);
-ALTER TABLE dqa ADD CONSTRAINT dqa_sector_id FOREIGN KEY (sector_id) REFERENCES sector(sector_id);
-
