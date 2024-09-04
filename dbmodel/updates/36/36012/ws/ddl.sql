@@ -392,13 +392,13 @@ begin
 	 
 		-- create fk 
 		ALTER TABLE SCHEMA_NAME.minsector ADD CONSTRAINT minsectormuni_id_fkey FOREIGN KEY (muni_id) 
-		REFERENCES utils.ext_municipality (muni_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+		REFERENCES utils.municipality (muni_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 		
 		ALTER TABLE SCHEMA_NAME.pond ADD CONSTRAINT pond_muni_id_fkey FOREIGN KEY (muni_id) 
-		REFERENCES utils.ext_municipality (muni_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+		REFERENCES utils.municipality (muni_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 	 
 	 	ALTER TABLE SCHEMA_NAME.pool ADD CONSTRAINT pool_muni_id_fkey FOREIGN KEY (muni_id) 
-		REFERENCES utils.ext_municipality (muni_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+		REFERENCES utils.municipality (muni_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 		
      else
 	 
