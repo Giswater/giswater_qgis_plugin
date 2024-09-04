@@ -331,7 +331,7 @@ select feature_id, c.sector_id, c.muni_id from link l
 
 
 update dimensions d set sector_id = a.sector_id, muni_id = a.muni_id from (
-select d.id, s.sector_id, e.muni_id from dimensions d 
+select d.id, s.sector_id, e.muni_id from dimensions d
 	left join sector s on st_dwithin(s.the_geom, d.the_geom, 0.01)
 	left join ext_municipality e on st_dwithin(e.the_geom, d.the_geom, 0.01)
 )a where d.id = a.id;
@@ -370,7 +370,8 @@ INSERT INTO config_typevalue
 (typevalue, id, idval, camelstyle, addparam)
 VALUES('layout_name_typevalue', 'lyt_main_3', 'lyt_main_3', 'layoutMain3', NULL);
 
-
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam)
+VALUES('formtype_typevalue', 'form_edit', 'form_edit', 'formEdit', NULL);
 
 -- feature_type
 INSERT INTO config_form_fields
