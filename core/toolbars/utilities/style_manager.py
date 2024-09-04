@@ -180,7 +180,7 @@ class GwStyleManager:
         if selected_stylegroup_name:
             if filter_str:
                 filter_str += " AND "
-            filter_str += f"idval = '{selected_stylegroup_name}'"
+            filter_str += f"category = '{selected_stylegroup_name}'"
 
         model = self.style_mng_dlg.tbl_style.model()
         model.setFilter(filter_str)
@@ -197,7 +197,7 @@ class GwStyleManager:
 
         if selected_stylegroup_name:
             # Apply filter based on the selected style group
-            model.setFilter(f"idval = '{selected_stylegroup_name}'")
+            model.setFilter(f"category = '{selected_stylegroup_name}'")
         model.select()
 
         # Check for any errors
@@ -250,7 +250,7 @@ class GwStyleManager:
 
             if row_idval:
                 dialog_create.idval.setStyleSheet(color)
-                dialog_create.idval.setToolTip("Idval already exists")
+                dialog_create.idval.setToolTip("Category already exists")
                 has_error = True
             else:
                 dialog_create.idval.setStyleSheet("")
