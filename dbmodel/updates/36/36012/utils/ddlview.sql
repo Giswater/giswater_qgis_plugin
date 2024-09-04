@@ -276,7 +276,7 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"ext_
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"ext_cat_raster", "column":"code", "dataType":"text"}}$$);
 
 
-CREATE OR REPLACE VIEW v_ext_address AS 
+CREATE OR REPLACE VIEW v_ext_address AS
 	SELECT ext_address.id,
     ext_address.muni_id,
     ext_address.postcode,
@@ -291,7 +291,7 @@ CREATE OR REPLACE VIEW v_ext_address AS
 	WHERE ext_address.muni_id = s.muni_id AND s.cur_user = "current_user"()::text;
 
 
-CREATE OR REPLACE VIEW v_ext_plot AS 
+CREATE OR REPLACE VIEW v_ext_plot AS
 	SELECT ext_plot.id,
     ext_plot.plot_code,
     ext_plot.muni_id,
@@ -309,7 +309,7 @@ CREATE OR REPLACE VIEW v_ext_plot AS
 	WHERE ext_plot.muni_id = s.muni_id AND s.cur_user = "current_user"()::text;
 
 
-CREATE OR REPLACE VIEW v_edit_dimensions AS 
+CREATE OR REPLACE VIEW v_edit_dimensions AS
  SELECT dimensions.id,
     dimensions.distance,
     dimensions.depth,
@@ -333,12 +333,12 @@ CREATE OR REPLACE VIEW v_edit_dimensions AS
     JOIN v_state_dimensions ON dimensions.id = v_state_dimensions.id
 	right join selector_municipality m using (muni_id)
 	join selector_sector s using (sector_id)
-	where (m.cur_user = current_user or dimensions.muni_id is null) and 
-	s.cur_user = current_user and dimensions.expl_id = selector_expl.expl_id 
+	where (m.cur_user = current_user or dimensions.muni_id is null) and
+	s.cur_user = current_user and dimensions.expl_id = selector_expl.expl_id
 	AND selector_expl.cur_user = "current_user"()::text;
-	
 
-CREATE OR REPLACE VIEW v_sector_node AS 
+
+CREATE OR REPLACE VIEW v_sector_node AS
 SELECT node_id, sum(sector_id)::integer as sector_id FROM(
  SELECT node.node_id, node.sector_id FROM selector_sector, node
  WHERE selector_sector.cur_user = "current_user"()::text AND node.sector_id = selector_sector.sector_id
@@ -351,9 +351,8 @@ UNION SELECT node_border_sector.node_id, node_border_sector.sector_id
 CREATE OR REPLACE VIEW v_ui_sys_style AS
 SELECT
     sys_style.layername,
-    config_style.idval,
+    config_style.idval as category,
     sys_style.styletype,
-    sys_style.stylevalue,
     sys_style.active
 FROM sys_style
 JOIN config_style
