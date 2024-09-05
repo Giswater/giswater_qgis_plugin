@@ -13,10 +13,14 @@ RETURNS json AS
 $BODY$
 
 /*
-DELETE FROM SCHEMA_NAME.inp_flwreg_weir where to_arc = '242'
 
-SELECT SCHEMA_NAME.gw_fct_setarcfusion('{"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":[250]},
-"data":{"workcatId":"work1","enddate":"2020-02-05", "state_type":2, "state":1, "psectorId":null, "arccat_id":"RC200", "arc_type":"CONDUIT"}}'::json)
+-- MODE 1: individual
+SELECT SCHEMA_NAME.gw_fct_setarcfusion($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":7800}, "form":{}, "feature":{"id":["3470"]}, "data":{"filterFields":{}, "pageInfo":{}, "enddate":"2024-09-05", "action_mode": 2}}$$);
+
+-- MODE 2: massive usign pure SQL
+SELECT SCHEMA_NAME.gw_fct_setarcfusion(concat('
+{"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":7800}, "form":{},
+"feature":{"id":["',node_id,'"]}, "data":{"filterFields":{}, "pageInfo":{}, "enddate":"2024-09-05", "action_mode": 2}}')::json) FROM ... WHERE...;
 
 -- fid: 214
 
