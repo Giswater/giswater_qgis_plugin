@@ -329,3 +329,15 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_feature
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sector", "column":"graphconfig", "dataType":"json"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dma", "column":"graphconfig", "dataType":"json"}}$$);
+
+CREATE TABLE minsector (
+	minsector_id serial4 NOT NULL,
+	the_geom public.geometry(multipolygon, SRID_VALUE) NULL,
+	CONSTRAINT minsector_pkey PRIMARY KEY (minsector_id)
+);
+
+CREATE TABLE macrominsector (
+	macrominsector_id serial4 NOT NULL,
+	the_geom public.geometry(multipolygon, SRID_VALUE) NULL,
+	CONSTRAINT macrominsector_pkey PRIMARY KEY (macrominsector_id)
+);

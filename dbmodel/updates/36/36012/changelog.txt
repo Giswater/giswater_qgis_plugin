@@ -9,6 +9,7 @@
 - Change all columns `code` from varchar(30) to text
 - New mapzone for WS: macrominsector with new colums for arc, node, connec, link
 - New mapzone for UD: minsector and macrominsector with new colums for arc, node, connec
+- New tables for UD: minsector and macrominsector
 - New strategy for dynamic filter by joined use of sector-expl-muni
 - New mapzone columns for:
 	UD

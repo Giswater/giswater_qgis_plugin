@@ -196,8 +196,6 @@ VALUES('gully', 'form_feature', 'tab_none', 'btn_cancel', 'lyt_buttons', 0, NULL
 INSERT INTO inp_typevalue (typevalue, id, idval, descript, addparam) VALUES('inp_result_status', '3', 'ARCHIVED', NULL, NULL);
 
 -- get values by intersection
-update drainzone d set sector_id = s.sector_id from sector s where st_intersects(s.the_geom, d.the_geom);
-
 update raingage r set muni_id = a.muni_id from (
 select r.rg_id, m.muni_id from raingage r left join ext_municipality m on st_dwithin (m.the_geom, r.the_geom, 0.01)
 )a where r.rg_id = a.rg_id;
@@ -281,3 +279,8 @@ INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, targe
 VALUES('edit_typevalue', 'dma_type', 'dma', 'dma_type', true)
 ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field) DO NOTHING;
 
+INSERT INTO sys_table (id, descript, sys_role, criticity, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam)
+VALUES('minsector', 'Table of minsectors', 'role_edit', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'core', NULL);
+
+INSERT INTO sys_table (id, descript, sys_role, criticity, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam)
+VALUES('macrominsector', 'Table of macrominsectors', 'role_edit', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'core', NULL);
