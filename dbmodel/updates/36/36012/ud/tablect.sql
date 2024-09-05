@@ -17,3 +17,6 @@ ALTER TABLE dma ADD CONSTRAINT dma_muni_id_fkey FOREIGN KEY (sector_id) REFERENC
 ALTER TABLE raingage ADD CONSTRAINT raingage_muni_id FOREIGN KEY (muni_id) REFERENCES ext_municipality(muni_id);
 
 CREATE INDEX gully_muni ON gully USING btree (muni_id);
+
+ALTER TABLE sector ALTER COLUMN graphconfig SET DEFAULT '{"use":[{"nodeParent":"", "toArc":[]}], "ignore":[], "forceClosed":[]}'::JSON;
+ALTER TABLE dma ALTER COLUMN graphconfig SET DEFAULT '{"use":[{"nodeParent":"", "toArc":[]}], "ignore":[], "forceClosed":[]}'::JSON;

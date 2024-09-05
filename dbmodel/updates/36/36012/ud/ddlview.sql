@@ -45,6 +45,7 @@ AS SELECT doc_x_gully.id,
      JOIN doc ON doc.id::text = doc_x_gully.doc_id::text;
 
 --06/08/2024
+DROP VIEW IF EXISTS vu_drainzone;
 CREATE OR REPLACE VIEW vu_drainzone
 AS SELECT d.drainzone_id,
     d.name,
@@ -52,6 +53,7 @@ AS SELECT d.drainzone_id,
     e.name as exploitation_name,
     d.sector_id,
     s.name as sector_name,
+    et.idval as drainzone_type,
     d.descript,
     d.active,
     d.undelete,
@@ -66,6 +68,7 @@ AS SELECT d.drainzone_id,
     FROM drainzone d
     LEFT JOIN exploitation e USING (expl_id)
     LEFT JOIN sector s USING (sector_id)
+    LEFT JOIN edit_typevalue et ON et.id::text = d.drainzone_type::text AND et.typevalue::text = 'drainzone_type'::text
     ORDER BY d.drainzone_id;
 
 CREATE OR REPLACE VIEW vu_dma
@@ -73,6 +76,7 @@ AS SELECT
     dma.dma_id,
     dma.name,
     dma.macrodma_id,
+    dma.dma_type,
     dma.expl_id,
     e.name as expl_name,
     dma.sector_id,
@@ -80,6 +84,7 @@ AS SELECT
     dma.descript,
     dma.undelete,
     dma.link,
+    dma.graphconfig::text,
     dma.active,
     dma.stylesheet,
     dma.the_geom
@@ -93,6 +98,23 @@ select vu_dma.* from vu_dma LEFT JOIN selector_sector using (sector_id), selecto
 WHERE (selector_sector.cur_user = "current_user"()::text OR vu_dma.sector_id is null)
 AND ((vu_dma.expl_id = selector_expl.expl_id) AND selector_expl.cur_user = "current_user"()::text) OR vu_dma.expl_id is null
 order by 1 asc;
+
+DROP VIEW IF EXISTS v_edit_sector;
+CREATE OR REPLACE VIEW v_edit_sector
+AS SELECT sector.sector_id,
+    sector.name,
+    sector.descript,
+    sector.macrosector_id,
+    sector.sector_type,
+    sector.the_geom,
+    sector.undelete,
+    sector.active,
+    sector.parent_id,
+    sector.graphconfig::text,
+    sector.stylesheet
+   FROM selector_sector,
+    sector
+  WHERE sector.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
 
 -- 07/08/2024
 -- drop depedency views from gully
@@ -283,9 +305,11 @@ AS SELECT DISTINCT ON (link_id)
     l.expl_id,
 	e.macroexpl_id,
     l.sector_id,
+    s.sector_type,
 	s.macrosector_id,
 	l.muni_id,
 	l.drainzone_id,
+    drainzone.drainzone_type,
     l.dma_id,
 	d.macrodma_id,
     l.exit_topelev,
@@ -310,7 +334,8 @@ AS SELECT DISTINCT ON (link_id)
 	 LEFT JOIN exploitation e USING (expl_id)
      LEFT JOIN sector s USING (sector_id)
      LEFT JOIN dma d USING (dma_id)
-	 LEFT JOIN ext_municipality m USING (muni_id);
+	 LEFT JOIN ext_municipality m USING (muni_id)
+     LEFT JOIN drainzone USING (drainzone_id);
 
 CREATE OR REPLACE VIEW vu_link_connec AS 
 	SELECT l.*
@@ -348,12 +373,15 @@ CREATE OR REPLACE VIEW v_edit_link_gully AS
 	LEFT JOIN selector_municipality m using (muni_id)
 	where s.cur_user = current_user and (m.cur_user = current_user or l.muni_id is null);
 
+drop view if exists v_edit_drainzone;
+
 CREATE OR REPLACE VIEW v_edit_drainzone
 AS SELECT drainzone.drainzone_id,
     drainzone.name,
     drainzone.expl_id,
     drainzone.descript,
     drainzone.undelete,
+    et.idval as drainzone_type,
     drainzone.link,
     drainzone.graphconfig::text AS graphconfig,
     drainzone.stylesheet::text AS stylesheet,
@@ -362,6 +390,7 @@ AS SELECT drainzone.drainzone_id,
     drainzone.sector_id
    FROM selector_expl,
     drainzone
+    LEFT JOIN edit_typevalue et ON et.id::text = drainzone.drainzone_type::text AND et.typevalue::text = 'drainzone_type'::text
   WHERE drainzone.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
 
 	
@@ -452,8 +481,10 @@ SELECT arc.arc_id,
     arc.expl_id,
     e.macroexpl_id,
     arc.sector_id,
+    s.sector_type,
     s.macrosector_id,
     arc.drainzone_id,
+    drainzone.drainzone_type,
     arc.annotation,
     st_length(arc.the_geom)::numeric(12,2) AS gis_length,
     arc.custom_length,
@@ -462,6 +493,7 @@ SELECT arc.arc_id,
     arc.comment,
     arc.dma_id,
     m.macrodma_id,
+    m.dma_type,
     arc.soilcat_id,
     arc.function_type,
     arc.category_type,
@@ -503,10 +535,11 @@ SELECT arc.arc_id,
     arc.parent_id,
     arc.expl_id2,
     vst.is_operative,
+    arc.minsector_id,
+    arc.macrominsector_id,
     arc.adate,
     arc.adescript,
     arc.visitability,
-    arc.placement_type,
 	date_trunc('second'::text, arc.tstamp) AS tstamp,
     arc.insert_user,
     date_trunc('second'::text, arc.lastupdate) AS lastupdate,
@@ -522,7 +555,8 @@ SELECT arc.arc_id,
      LEFT JOIN streetaxis c ON c.id::text = arc.streetaxis_id::text
      LEFT JOIN streetaxis d ON d.id::text = arc.streetaxis2_id::text
      LEFT JOIN value_state_type vst ON vst.id = arc.state_type
-     LEFT JOIN ext_municipality mu ON arc.muni_id = mu.muni_id;
+     LEFT JOIN ext_municipality mu ON arc.muni_id = mu.muni_id
+     LEFT JOIN drainzone USING (drainzone_id);
 
 create or replace view v_edit_arc as
 select a.* FROM (
@@ -568,6 +602,7 @@ WITH vu_node AS (SELECT node.node_id,
             node.expl_id,
             exploitation.macroexpl_id,
             node.sector_id,
+            sector.sector_type,
             sector.macrosector_id,
             node.state,
             node.state_type,
@@ -576,6 +611,7 @@ WITH vu_node AS (SELECT node.node_id,
             node.comment,
             node.dma_id,
             dma.macrodma_id,
+            dma.dma_type,
             node.soilcat_id,
             node.function_type,
             node.category_type,
@@ -618,13 +654,17 @@ WITH vu_node AS (SELECT node.node_id,
             node.num_value,
             node.asset_id,
             node.drainzone_id,
+            drainzone.drainzone_type,
             node.parent_id,
             node.arc_id,
             node.expl_id2,
             vst.is_operative,
+            node.minsector_id,
+            node.macrominsector_id,
             node.adate,
             node.adescript,
             node.placement_type,
+            node.access_type,
 			date_trunc('second'::text, node.tstamp) AS tstamp,
             node.insert_user,
             date_trunc('second'::text, node.lastupdate) AS lastupdate,
@@ -640,6 +680,7 @@ WITH vu_node AS (SELECT node.node_id,
              LEFT JOIN v_ext_streetaxis d ON d.id::text = node.streetaxis2_id::text
              LEFT JOIN value_state_type vst ON vst.id = node.state_type
              LEFT JOIN ext_municipality mu ON node.muni_id = mu.muni_id
+             LEFT JOIN drainzone USING (drainzone_id)
         ),
  streetaxis as (SELECT id, descript FROM v_ext_streetaxis)
  SELECT vu_node.node_id,
@@ -669,8 +710,10 @@ WITH vu_node AS (SELECT node.node_id,
     vu_node.expl_id,
     vu_node.macroexpl_id,
     vu_node.sector_id,
+    vu_node.sector_type,
     vu_node.macrosector_id,
     vu_node.drainzone_id,
+    vu_node.drainzone_type,
     vu_node.annotation,
     vu_node.observ,
     vu_node.comment,
@@ -726,9 +769,12 @@ WITH vu_node AS (SELECT node.node_id,
     vu_node.arc_id,
     vu_node.expl_id2,
     vu_node.is_operative,
+    vu_node.minsector_id,
+    vu_node.macrominsector_id,
     vu_node.adate,
     vu_node.adescript,
-    vu_node.placement_type
+    vu_node.placement_type,
+    vu_node.access_type
    FROM vu_node;
 
 create or replace view v_edit_node as
@@ -761,10 +807,13 @@ SELECT connec.connec_id,
     connec.expl_id,
     exploitation.macroexpl_id,
     connec.sector_id,
+    sector.sector_type,
     sector.macrosector_id,
 	connec.drainzone_id,
+    drainzone.drainzone_type,
 	connec.dma_id,
     dma.macrodma_id,
+    dma.dma_type,
     connec.demand,
         CASE
             WHEN ((connec.y1 + connec.y2) / 2::numeric) IS NOT NULL THEN ((connec.y1 + connec.y2) / 2::numeric)::numeric(12,3)
@@ -820,10 +869,13 @@ SELECT connec.connec_id,
     connec.asset_id,
     connec.expl_id2,
     vst.is_operative,
+    connec.minsector_id,
+    connec.macrominsector_id,
     connec.adate,
     connec.adescript,
     connec.plot_code,
     connec.placement_type,
+    connec.access_type,
     date_trunc('second'::text, connec.tstamp) AS tstamp,
     connec.insert_user,
     date_trunc('second'::text, connec.lastupdate) AS lastupdate,
@@ -839,7 +891,8 @@ SELECT connec.connec_id,
      LEFT JOIN streetaxis c ON c.id::text = connec.streetaxis_id::text
      LEFT JOIN streetaxis d ON d.id::text = connec.streetaxis2_id::text
      LEFT JOIN value_state_type vst ON vst.id = connec.state_type
-     LEFT JOIN ext_municipality mu ON connec.muni_id = mu.muni_id;
+     LEFT JOIN ext_municipality mu ON connec.muni_id = mu.muni_id
+     LEFT JOIN drainzone USING (drainzone_id);
 
 CREATE OR REPLACE VIEW v_edit_connec AS 
 SELECT  c.* FROM (
@@ -867,11 +920,13 @@ WITH s AS (
             WHEN a.sector_id IS NULL THEN vu_connec.sector_id
             ELSE a.sector_id
         END AS sector_id,
+    vu_connec.sector_type,
         CASE
             WHEN a.macrosector_id IS NULL THEN vu_connec.macrosector_id
             ELSE a.macrosector_id
         END AS macrosector_id,
     vu_connec.drainzone_id,
+    vu_connec.drainzone_type,
     vu_connec.demand,
     vu_connec.connec_depth,
     vu_connec.connec_length,
@@ -887,6 +942,7 @@ WITH s AS (
             WHEN a.macrodma_id IS NULL THEN vu_connec.macrodma_id
             ELSE a.macrodma_id
         END AS macrodma_id,
+    vu_connec.dma_type,
     vu_connec.soilcat_id,
     vu_connec.function_type,
     vu_connec.category_type,
@@ -943,10 +999,13 @@ WITH s AS (
     vu_connec.asset_id,
     vu_connec.expl_id2,
     vu_connec.is_operative,
+    vu_connec.minsector_id,
+    vu_connec.macrominsector_id,
     vu_connec.adate,
     vu_connec.adescript,
     vu_connec.plot_code,
-    vu_connec.placement_type
+    vu_connec.placement_type,
+    vu_connec.access_type
    FROM s,
     vu_connec
      JOIN v_state_connec USING (connec_id)
@@ -1009,7 +1068,9 @@ SELECT gully.gully_id,
     exploitation.macroexpl_id,
     gully.sector_id,
     sector.macrosector_id,
+    sector.sector_type,
     gully.drainzone_id,
+    drainzone.drainzone_type,
     gully.state,
     gully.state_type,
     gully.annotation,
@@ -1017,6 +1078,7 @@ SELECT gully.gully_id,
     gully.comment,
     gully.dma_id,
     dma.macrodma_id,
+    dma.dma_type,
     gully.soilcat_id,
     gully.function_type,
     gully.category_type,
@@ -1066,11 +1128,14 @@ SELECT gully.gully_id,
     gully.units_placement,
     gully.expl_id2,
     vst.is_operative,
+    gully.minsector_id,
+    gully.macrominsector_id,
     gully.adate,
     gully.adescript,
     gully.siphon_type,
     gully.odorflap,
     gully.placement_type,
+    gully.access_type,
 	date_trunc('second'::text, gully.tstamp) AS tstamp,
     gully.insert_user,
     date_trunc('second'::text, gully.lastupdate) AS lastupdate,
@@ -1087,7 +1152,8 @@ SELECT gully.gully_id,
      LEFT JOIN streetaxis d ON d.id::text = gully.streetaxis2_id::text
      LEFT JOIN cat_connec cc ON cc.id::text = gully.connec_arccat_id::text
      LEFT JOIN value_state_type vst ON vst.id = gully.state_type
-     LEFT JOIN ext_municipality mu ON gully.muni_id = mu.muni_id;
+     LEFT JOIN ext_municipality mu ON gully.muni_id = mu.muni_id
+     LEFT JOIN drainzone USING (drainzone_id);
 
 CREATE OR REPLACE VIEW v_edit_gully AS 
 SELECT g.* FROM (
@@ -1130,11 +1196,13 @@ WITH s AS (
             WHEN a.sector_id IS NULL THEN vu_gully.sector_id
             ELSE a.sector_id
         END AS sector_id,
+    vu_gully.sector_type,
         CASE
             WHEN a.macrosector_id IS NULL THEN vu_gully.macrosector_id
             ELSE a.macrosector_id
         END AS macrosector_id,
 	vu_gully.drainzone_id,
+    vu_gully.drainzone_type,
 	CASE
 		WHEN a.dma_id IS NULL THEN vu_gully.dma_id
 		ELSE a.dma_id
@@ -1197,11 +1265,14 @@ WITH s AS (
 	vu_gully.units_placement,
     vu_gully.expl_id2,
     vu_gully.is_operative,
+    vu_gully.minsector_id,
+    vu_gully.macrominsector_id,
     vu_gully.adate,
     vu_gully.adescript,
     vu_gully.siphon_type,
     vu_gully.odorflap,
     vu_gully.placement_type,
+    vu_gully.access_type,
 	vu_gully.tstamp,
     vu_gully.insert_user,
     vu_gully.lastupdate,

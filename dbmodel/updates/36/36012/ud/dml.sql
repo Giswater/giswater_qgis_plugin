@@ -255,3 +255,29 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 UPDATE config_form_list
 SET addparam='{"enableGlobalFilter": false,"enableStickyHeader": true,"positionToolbarAlertBanner": "bottom","enableGrouping": false,"enablePinning": true,"enableColumnOrdering": true,"enableColumnFilterModes": true,"enableFullScreenToggle": false,"enablePagination": true,"enableExporting": true,"muiTablePaginationProps": {"rowsPerPageOptions": [5,10,15,20,50,100],"showFirstButton": true,"showLastButton": true},"enableRowSelection": true,"multipleRowSelection": true,"initialState": {"showColumnFilters": false,"pagination": {"pageSize": 10,"pageIndex": 0},"density": "compact","columnFilters": [],"sorting": [{"id": "id","desc": true}]},"modifyTopToolBar": true,"renderTopToolbarCustomActions": [{"widgetfunction": {"functionName": "open","params": {}},"color": "success","text": "Open","disableOnSelect": true,"moreThanOneDisable": true},{"widgetfunction": {"functionName": "delete","params": {}},"color": "error","text": "Delete","disableOnSelect": true},{"widgetfunction": {"functionName": "refresh","params": {}},"color": "info","text": "Refresh"}],"enableRowActions": false,"renderRowActionMenuItems": [{"widgetfunction": {"functionName": "open","params": {}},"icon": "OpenInBrowser","text": "Open"},{"widgetfunction": {"functionName": "delete","params": {}},"icon": "Delete","text": "Delete"}]}'::json
 WHERE listname='tbl_visit_manager' AND device=5;
+
+INSERT INTO edit_typevalue (typevalue, id, idval) 
+VALUES('drainzone_type', 'UNDEFINED', 'UNDEFINED')
+ON CONFLICT(typevalue, id) DO NOTHING;
+
+INSERT INTO edit_typevalue (typevalue, id, idval) 
+VALUES('sector_type', 'UNDEFINED', 'UNDEFINED'), ('sector_type', 'URBAN DRAINAGE', 'URBAN DRAINAGE'), ('sector_type', 'MAIN SEWER NETWORK', 'MAIN SEWER NETWORK')
+ON CONFLICT(typevalue, id) DO NOTHING;
+
+INSERT INTO edit_typevalue (typevalue, id, idval) 
+VALUES('dma_type', 'UNDEFINED', 'UNDEFINED')
+ON CONFLICT(typevalue, id) DO NOTHING;
+
+
+INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, active) 
+VALUES('edit_typevalue', 'drainzone_type', 'drainzone', 'drainzone_type', true) 
+ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field) DO NOTHING;
+
+INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, active) 
+VALUES('edit_typevalue', 'sector_type', 'sector', 'sector_type', true)
+ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field) DO NOTHING;
+
+INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, active) 
+VALUES('edit_typevalue', 'dma_type', 'dma', 'dma_type', true)
+ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field) DO NOTHING;
+

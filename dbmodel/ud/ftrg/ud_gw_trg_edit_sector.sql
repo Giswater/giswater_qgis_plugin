@@ -23,15 +23,16 @@ BEGIN
 
 		NEW.active = TRUE;
 
-		INSERT INTO sector (sector_id, name, descript, macrosector_id, the_geom, undelete, active, parent_id, stylesheet)
+		INSERT INTO sector (sector_id, name, descript, macrosector_id, the_geom, undelete, active, parent_id, stylesheet, sector_type, graphconfig)
 		VALUES (NEW.sector_id, NEW.name, NEW.descript, NEW.macrosector_id, NEW.the_geom, NEW.undelete, NEW.active, NEW.parent_id,
-		NEW.stylesheet);
+		NEW.stylesheet, NEW.sector_type, NEW.graphconfig::json);
 
 	ELSIF TG_OP = 'UPDATE' THEN
 
 		UPDATE sector
 		SET sector_id=NEW.sector_id, name=NEW.name, descript=NEW.descript, macrosector_id=NEW.macrosector_id, the_geom=NEW.the_geom,
-		undelete=NEW.undelete, active=NEW.active, lastupdate=now(), lastupdate_user = current_user, stylesheet=NEW.stylesheet
+		undelete=NEW.undelete, active=NEW.active, lastupdate=now(), lastupdate_user = current_user, stylesheet=NEW.stylesheet, sector_type=NEW.sector_type, 
+		graphconfig=NEW.graphconfig::json
 		WHERE sector_id=OLD.sector_id;
 
 	ELSIF TG_OP = 'DELETE' THEN

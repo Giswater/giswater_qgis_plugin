@@ -42,9 +42,9 @@ BEGIN
 			NEW.active = TRUE;
 		END IF;
 	
-		INSERT INTO drainzone (drainzone_id, "name", expl_id, descript, undelete, the_geom, link, graphconfig, stylesheet, active, sector_id)
+		INSERT INTO drainzone (drainzone_id, "name", expl_id, descript, undelete, the_geom, link, graphconfig, stylesheet, active, sector_id, drainzone_type)
 		VALUES (NEW.drainzone_id, NEW.name, NEW.expl_id, NEW.descript, NEW.undelete, NEW.the_geom, 
-		NEW.link, NEW.graphconfig::json, NEW.stylesheet::json, NEW.active, NEW.sector_id);
+		NEW.link, NEW.graphconfig::json, NEW.stylesheet::json, NEW.active, NEW.sector_id, NEW.drainzone_type);
 
 		RETURN NEW;
 		
@@ -53,7 +53,7 @@ BEGIN
 		UPDATE drainzone 
 		SET drainzone_id=NEW.drainzone_id, name=NEW.name, expl_id=NEW.expl_id, descript=NEW.descript, undelete=NEW.undelete, the_geom=NEW.the_geom, 
 		link=NEW.link, graphconfig=NEW.graphconfig::json, stylesheet=NEW.stylesheet::json,
-		active=NEW.active, lastupdate=now(), lastupdate_user = current_user, sector_id = NEW.sector_id
+		active=NEW.active, lastupdate=now(), lastupdate_user = current_user, sector_id = NEW.sector_id, drainzone_type=NEW.drainzone_type
 		WHERE drainzone_id=OLD.drainzone_id;
 		
 		RETURN NEW;

@@ -141,3 +141,9 @@ FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_link();
 
 CREATE TRIGGER gw_trg_edit_dma INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_dma
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_dma('dma');
+
+CREATE trigger gw_trg_edit_drainzone INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_drainzone
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_drainzone();
+
+CREATE trigger gw_trg_edit_sector INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_sector 
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_sector('sector');

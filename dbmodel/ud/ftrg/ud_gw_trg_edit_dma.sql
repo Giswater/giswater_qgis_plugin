@@ -46,8 +46,9 @@ BEGIN
 			NEW.active = TRUE;
 		END IF;
 			
-		INSERT INTO dma (dma_id, name, descript, macrodma_id, the_geom, undelete, expl_id, link, active, stylesheet, sector_id)
-		VALUES (NEW.dma_id, NEW.name, NEW.descript, NEW.macrodma_id, NEW.the_geom, NEW.undelete, NEW.expl_id, NEW.link, NEW.active, NEW.stylesheet,  NEW.sector_id);
+		INSERT INTO dma (dma_id, name, descript, macrodma_id, the_geom, undelete, expl_id, link, active, stylesheet, sector_id, dma_type, graphconfig)
+		VALUES (NEW.dma_id, NEW.name, NEW.descript, NEW.macrodma_id, NEW.the_geom, NEW.undelete, NEW.expl_id, NEW.link, NEW.active, NEW.stylesheet,  NEW.sector_id, 
+		NEW.dma_type, NEW.graphconfig::json);
 
 		RETURN NEW;
 		
@@ -55,8 +56,8 @@ BEGIN
    	
 		UPDATE dma 
 		SET dma_id=NEW.dma_id, name=NEW.name, descript=NEW.descript, the_geom=NEW.the_geom, undelete=NEW.undelete, expl_id=NEW.expl_id, 
-		link=NEW.link, active=NEW.active, lastupdate=now(), 
-		lastupdate_user = current_user, macrodma_id = NEW.macrodma_id, stylesheet=NEW.stylesheet, sector=NEW.sector_id
+		link=NEW.link, active=NEW.active, lastupdate=now(), lastupdate_user = current_user, macrodma_id = NEW.macrodma_id, stylesheet=NEW.stylesheet, 
+		sector_id=NEW.sector_id, dma_type=NEW.dma_type, graphconfig=NEW.graphconfig::json
 		WHERE dma_id=OLD.dma_id;
 		
 		RETURN NEW;
