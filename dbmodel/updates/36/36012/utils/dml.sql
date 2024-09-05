@@ -358,45 +358,8 @@ update om_visit set sector_id = 0 where sector_id is null;
 INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device)
 VALUES ('visit_arc_leak', 'tab_data', 'Data', 'Data', 'role_om', '{"name":"gwGetVisit", "parameters":{"form":{"tabData":{"active":true}, "tabFiles":{"active":false}}}}'::json, '[{"actionName":"actionAddFile", "actionFunction":"gwSetFileInsert", "actionTooltip":"Add file", "disabled":false}]'::json, 1, '{5}');
 
-INSERT INTO config_typevalue
-(typevalue, id, idval, camelstyle, addparam)
-VALUES('layout_name_typevalue', 'lyt_main_1', 'lyt_main_1', 'layoutMain1', NULL);
-
-INSERT INTO config_typevalue
-(typevalue, id, idval, camelstyle, addparam)
-VALUES('layout_name_typevalue', 'lyt_main_2', 'lyt_main_2', 'layoutMain2', NULL);
-
-INSERT INTO config_typevalue
-(typevalue, id, idval, camelstyle, addparam)
-VALUES('layout_name_typevalue', 'lyt_main_3', 'lyt_main_3', 'layoutMain3', NULL);
-
-INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam)
-VALUES('formtype_typevalue', 'form_edit', 'form_edit', 'formEdit', NULL);
-
-INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
-VALUES('featuretype_change', 'form_edit', 'tab_none', 'btn_accept', 'lyt_buttons', 3, NULL, 'button', NULL, NULL, NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"text": "Accept"}'::json, NULL, NULL, false, NULL);
-
-INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
-VALUES('featuretype_change', 'form_edit', 'tab_none', 'btn_cancel', 'lyt_buttons', 2, NULL, 'button', NULL, NULL, NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"text": "Cancel"}'::json, NULL, NULL, false, NULL);
-
-INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
-VALUES('featuretype_change', 'form_edit', 'tab_none', 'btn_catalog', 'lyt_main_3', 3, NULL, 'button', NULL, NULL, NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"icon": "195", "size": "20x20"}'::json, NULL, NULL, NULL, false, NULL);
-
-INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
-VALUES('featuretype_change', 'form_edit', 'tab_none', 'feature_type', 'lyt_main_1', 1, 'string', 'text', 'Current feature type', 'Current feature type', NULL, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL);
-
-INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
-VALUES('featuretype_change', 'form_edit', 'tab_none', 'feature_type_new', 'lyt_main_2', 1, 'string', 'combo', 'New feature type', 'New feature type', NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL);
-
-INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
-VALUES('featuretype_change', 'form_edit', 'tab_none', 'featurecat_id', 'lyt_main_3', 1, 'string', 'combo', 'Catalog id', 'Catalog id', NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL);
-
 delete from sys_table where id='v_ui_document';
 
 -- 03/09/2024
 UPDATE config_form_list SET query_text='SELECT value as url, tstamp FROM om_visit_event_photo WHERE id IS NOT NULL', addparam='{"displayField":"tstamp"}'::json WHERE listname='om_visit_event_photo' AND device=5;
 
-
--- 04/09/2024
-INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source")
-VALUES(3324, 'gw_fct_getfeaturereplace', 'utils', 'function', 'json', 'json', 'Function to get feature type change dialog', 'role_edit', NULL, 'core');
