@@ -30,12 +30,21 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"audit_psec
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"audit_psector_connec_traceability", "column":"placement_type", "dataType":"varchar(50)"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"audit_psector_gully_traceability", "column":"placement_type", "dataType":"varchar(50)"}}$$);
 
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"audit_psector_node_traceability", "column":"access_type", "dataType":"text"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"audit_psector_connec_traceability", "column":"access_type", "dataType":"text"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"audit_psector_gully_traceability", "column":"access_type", "dataType":"text"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_psector_node_traceability", "column":"label_quadrant", "dataType":"varchar(12)"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_psector_arc_traceability", "column":"label_quadrant", "dataType":"varchar(12)"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_psector_connec_traceability", "column":"label_quadrant", "dataType":"varchar(12)"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_psector_gully_traceability", "column":"label_quadrant", "dataType":"varchar(12)"}}$$);
+
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"raingage", "column":"muni_id", "dataType":"integer"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"rpt_inp_raingage", "column":"muni_id", "dataType":"integer"}}$$);
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"connec", "column":"n_hydrometer", "dataType":"integer"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"drainzone", "column":"sector_id", "dataType":"integer"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"dma", "column":"sector_id", "dataType":"integer"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_psector_connec_traceability", "column":"n_hydrometer", "dataType":"integer"}}$$);
 
 -- 13/08/24
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"rpt_cat_result", "column":"iscorporate", "dataType":"boolean"}}$$);
@@ -324,6 +333,16 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node", "col
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"macrominsector_id", "dataType":"integer"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"macrominsector_id", "dataType":"integer"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"gully", "column":"macrominsector_id", "dataType":"integer"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_psector_node_traceability", "column":"minsector_id", "dataType":"integer"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_psector_arc_traceability", "column":"minsector_id", "dataType":"integer"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_psector_connec_traceability", "column":"minsector_id", "dataType":"integer"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_psector_gully_traceability", "column":"minsector_id", "dataType":"integer"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_psector_node_traceability", "column":"macrominsector_id", "dataType":"integer"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_psector_arc_traceability", "column":"macrominsector_id", "dataType":"integer"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_psector_connec_traceability", "column":"macrominsector_id", "dataType":"integer"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_psector_gully_traceability", "column":"macrominsector_id", "dataType":"integer"}}$$);
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_feature_node", "column":"graph_delimiter", "dataType":"text[]"}}$$);
 
