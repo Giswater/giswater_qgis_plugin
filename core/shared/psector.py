@@ -16,7 +16,7 @@ from functools import partial
 from sip import isdeleted
 
 from qgis.PyQt.QtCore import Qt
-from qgis.PyQt.QtGui import QDoubleValidator, QIntValidator, QKeySequence, QColor
+from qgis.PyQt.QtGui import QDoubleValidator, QIntValidator, QKeySequence, QColor, QCursor
 from qgis.PyQt.QtSql import QSqlQueryModel, QSqlTableModel, QSqlError
 from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCheckBox, QComboBox, QDateEdit, QLabel, \
     QLineEdit, QTableView, QWidget, QDoubleSpinBox, QTextEdit, QPushButton, QGridLayout, QMenu
@@ -26,7 +26,7 @@ from qgis.gui import QgsMapToolEmitPoint
 from .document import GwDocument, global_vars
 from ..toolbars.utilities.toolbox_btn import GwToolBoxButton
 from ..shared.psector_duplicate import GwPsectorDuplicate
-from ..ui.ui_manager import GwPsectorUi, GwPsectorRapportUi, GwPsectorManagerUi, GwPriceManagerUi, GwReplaceArc, GwPsectorRepairUi
+from ..ui.ui_manager import GwPsectorUi, GwPsectorRapportUi, GwPsectorManagerUi, GwReplaceArc, GwPsectorRepairUi
 from ..utils import tools_gw
 from ...libs import lib_vars, tools_db, tools_qgis, tools_qt, tools_log, tools_os
 from ..utils.snap_manager import GwSnapManager
@@ -375,9 +375,9 @@ class GwPsector:
                 if not canvas_rec.intersects(psector_rec) or (psector_rec.width() < (canvas_width * 10) / 100 or psector_rec.height() < (canvas_height * 10) / 100):
                     max_x, max_y, min_x, min_y = tools_qgis.get_max_rectangle_from_coords(list_coord)
                     tools_qgis.zoom_to_rectangle(max_x, max_y, min_x, min_y, margin=50)
-
-            filter_ = "psector_id = '" + str(psector_id) + "'"
-            message = tools_qt.fill_table(self.tbl_document, f"v_ui_doc_x_psector", filter_)
+            self.psector_name = self.dlg_plan_psector.findChild(QLineEdit, "name").text()
+            filter_ = f"psector_name = '{self.psector_name}'"
+            message = tools_qt.fill_table(self.tbl_document, "v_ui_doc_x_psector", filter_)
             if message:
                 tools_qgis.show_warning(message, dialog=self.dlg_plan_psector)
             self.tbl_document.doubleClicked.connect(partial(tools_qt.document_open, self.tbl_document, 'path'))
@@ -459,13 +459,13 @@ class GwPsector:
         self.dlg_plan_psector.other.editingFinished.connect(partial(self.calculate_percents, 'plan_psector', 'other'))
 
         self.dlg_plan_psector.btn_doc_insert.clicked.connect(self.document_insert)
-        self.dlg_plan_psector.btn_doc_delete.clicked.connect(partial(tools_qt.delete_rows_tableview, self.tbl_document))
+        self.dlg_plan_psector.btn_doc_delete.clicked.connect(partial(tools_gw.delete_selected_rows, self.tbl_document, 'doc_x_psector'))
         self.dlg_plan_psector.btn_doc_new.clicked.connect(partial(self.manage_document, self.tbl_document))
         self.dlg_plan_psector.btn_open_doc.clicked.connect(partial(tools_qt.document_open, self.tbl_document, 'path'))
         self.cmb_status.currentIndexChanged.connect(partial(self.show_status_warning))
 
         # Create list for completer QLineEdit
-        sql = "SELECT DISTINCT(id) FROM v_ui_document ORDER BY id"
+        sql = "SELECT DISTINCT(name) FROM v_ui_doc ORDER BY name"
         list_items = tools_db.create_list_for_completer(sql)
         tools_qt.set_completer_lineedit(self.dlg_plan_psector.doc_id, list_items)
 
@@ -870,7 +870,7 @@ class GwPsector:
     def enable_relation_tab(self, tablename):
 
         psector_name = f"{tools_qt.get_text(self.dlg_plan_psector, self.dlg_plan_psector.name)}"
-        sql = f"SELECT name FROM {tablename} WHERE LOWER(name) = '{psector_name}'"
+        sql = f"SELECT name FROM {tablename} WHERE name = '{psector_name}'"
         rows = tools_db.get_rows(sql)
         if not rows:
             if self.dlg_plan_psector.name.text() != '':
@@ -894,7 +894,8 @@ class GwPsector:
         elif self.dlg_plan_psector.tabWidget.currentIndex() == 4:
             self.populate_budget(self.dlg_plan_psector, psector_id)
         elif self.dlg_plan_psector.tabWidget.currentIndex() == 5:
-            expr = f"psector_id = '{psector_id}'"
+            self.psector_name = self.dlg_plan_psector.findChild(QLineEdit, "name").text()
+            expr = f"psector_name = '{self.psector_name}'"
             message = tools_qt.fill_table(self.tbl_document, f"{self.schema_name}.v_ui_doc_x_psector", expr)
             tools_gw.set_tablemodel_config(self.dlg_plan_psector, self.tbl_document, "v_ui_doc_x_psector")
             if message:
@@ -1584,16 +1585,26 @@ class GwPsector:
     def document_insert(self):
         """ Insert a document related to the current visit """
 
-        doc_id = self.doc_id.text()
+        doc_name = self.doc_id.text()
         psector_id = self.psector_id.text()
-        if not doc_id:
-            message = "You need to insert doc_id"
+        if not doc_name:
+            message = "You need to insert a document name"
             tools_qgis.show_warning(message, dialog=self.dlg_plan_psector)
             return
         if not psector_id:
             message = "You need to insert psector_id"
             tools_qgis.show_warning(message, dialog=self.dlg_plan_psector)
             return
+
+        # Get doc_id using doc_name
+        sql = f"SELECT id FROM doc WHERE name = '{doc_name}'"
+        row = tools_db.get_row(sql)
+        if not row:
+            message = "Document name not found"
+            tools_qgis.show_warning(message, dialog=self.dlg_plan_psector)
+            return
+
+        doc_id = row['id']
 
         # Check if document already exist
         sql = (f"SELECT doc_id"
@@ -1613,6 +1624,7 @@ class GwPsector:
             message = "Document inserted successfully"
             tools_qgis.show_info(message, dialog=self.dlg_plan_psector)
 
+        self.doc_id.clear()
         self.dlg_plan_psector.tbl_document.model().select()
 
 
@@ -1925,39 +1937,19 @@ class GwPsector:
                 tools_db.execute_sql(sql)
         widget.model().select()
 
+    def _show_context_menu(self, pos):
+        """ Show custom context menu """
+        menu = QMenu(self.tbl_om_result_cat)
 
-    def manage_prices(self):
-        """ Button 50: Plan estimate result manager """
+        action_set_current = QAction("Current Result", self.tbl_om_result_cat)
+        action_set_current.triggered.connect(partial(self.update_price_vdefault))
+        menu.addAction(action_set_current)
 
-        # Create the dialog and signals
-        self.dlg_merm = GwPriceManagerUi(self)
-        tools_gw.load_settings(self.dlg_merm)
+        action_delete = QAction("Delete", self.tbl_om_result_cat)
+        action_delete.triggered.connect(partial(self.delete_merm, self.dlg_merm))
+        menu.addAction(action_delete)
 
-        # Set current value
-        sql = (f"SELECT name FROM plan_result_cat WHERE result_id IN (SELECT result_id FROM selector_plan_result "
-               f"WHERE cur_user = current_user)")
-        row = tools_db.get_row(sql)
-        if row:
-            tools_qt.set_widget_text(self.dlg_merm, 'lbl_vdefault_price', str(row[0]))
-
-        # Tables
-        tablename = 'plan_result_cat'
-        self.tbl_om_result_cat = self.dlg_merm.findChild(QTableView, "tbl_om_result_cat")
-        tools_qt.set_tableview_config(self.tbl_om_result_cat)
-
-        # Set signals
-        self.dlg_merm.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_merm))
-        self.dlg_merm.rejected.connect(partial(tools_gw.close_dialog, self.dlg_merm))
-        self.dlg_merm.btn_delete.clicked.connect(partial(self.delete_merm, self.dlg_merm))
-        self.dlg_merm.btn_update_result.clicked.connect(partial(self.update_price_vdefault))
-        self.dlg_merm.txt_name.textChanged.connect(partial(self.filter_merm, self.dlg_merm, tablename))
-
-        self.fill_table(self.dlg_merm, self.tbl_om_result_cat, tablename)
-        tools_gw.set_tablemodel_config(self.tbl_om_result_cat, self.dlg_merm.tbl_om_result_cat, tablename)
-
-        # Open form
-        self.dlg_merm.setWindowFlags(Qt.WindowStaysOnTopHint)
-        tools_gw.open_dialog(self.dlg_merm, dlg_name="price_manager")
+        menu.exec(QCursor.pos())
 
 
     def update_price_vdefault(self):
@@ -2184,15 +2176,11 @@ class GwPsector:
         tools_gw.load_tableview_psector(self.dlg_plan_psector, 'connec')
         if self.project_type.upper() == 'UD':
             tools_gw.load_tableview_psector(self.dlg_plan_psector, 'gully')
-        tools_gw.set_tablemodel_config(self.dlg_plan_psector, "tbl_psector_x_arc", self.tablename_psector_x_arc,
-                                       isQStandardItemModel=True)
-        tools_gw.set_tablemodel_config(self.dlg_plan_psector, "tbl_psector_x_node", self.tablename_psector_x_node,
-                                       isQStandardItemModel=True)
-        tools_gw.set_tablemodel_config(self.dlg_plan_psector, "tbl_psector_x_connec", self.tablename_psector_x_connec,
-                                       isQStandardItemModel=True)
+        tools_gw.set_tablemodel_config(self.dlg_plan_psector, "tbl_psector_x_arc", self.tablename_psector_x_arc)
+        tools_gw.set_tablemodel_config(self.dlg_plan_psector, "tbl_psector_x_node", self.tablename_psector_x_node)
+        tools_gw.set_tablemodel_config(self.dlg_plan_psector, "tbl_psector_x_connec", self.tablename_psector_x_connec)
         if self.project_type.upper() == 'UD':
-            tools_gw.set_tablemodel_config(self.dlg_plan_psector, "tbl_psector_x_gully", self.tablename_psector_x_gully,
-                                           isQStandardItemModel=True)
+            tools_gw.set_tablemodel_config(self.dlg_plan_psector, "tbl_psector_x_gully", self.tablename_psector_x_gully)
 
 
     def _check_layers_visible(self, layer_name, the_geom, field_id):
@@ -2373,7 +2361,7 @@ class GwPsector:
 
     def _open_arc_replace_form(self, point):
 
-        self.dlg_replace_arc = GwReplaceArc()
+        self.dlg_replace_arc = GwReplaceArc(self)
         tools_gw.load_settings(self.dlg_replace_arc)
 
         event_point = self.snapper_manager.get_event_point(point=point)

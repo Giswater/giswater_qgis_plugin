@@ -412,8 +412,8 @@ class GwSelector:
                 search_class = docker_search.property('class')
                 search_class.refresh_tab()
         elif tab_name == 'tab_sector':
-            # Reload epa world filters if sector changed
-            tools_gw.set_epa_world(selector_change=True)
+            """# TODO: Reload epa world filters if sector changed"""
+            # tools_gw.set_epa_world(selector_change=True)
 
         widget_filter = tools_qt.get_widget(dialog, f"txt_filter_{tab_name}")
         if widget_filter and tools_qt.get_text(dialog, widget_filter, False, False) not in (None, ''):

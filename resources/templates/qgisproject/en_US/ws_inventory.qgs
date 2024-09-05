@@ -522,8 +522,8 @@
       <layerDependencies/>
       <dataDependencies/>
       <expressionfields/>
-      <map-layer-style-manager current="predeterminado">
-        <map-layer-style name="predeterminado"/>
+      <map-layer-style-manager current="GwBasic">
+        <map-layer-style name="GwBasic"/>
       </map-layer-style-manager>
       <auxiliaryLayer/>
       <metadataUrls/>
@@ -1255,8 +1255,8 @@ def my_form_open(dialog, layer, feature):
       <layerDependencies/>
       <dataDependencies/>
       <expressionfields/>
-      <map-layer-style-manager current="predeterminado">
-        <map-layer-style name="predeterminado"/>
+      <map-layer-style-manager current="GwBasic">
+        <map-layer-style name="GwBasic"/>
       </map-layer-style-manager>
       <auxiliaryLayer/>
       <metadataUrls/>
@@ -1769,8 +1769,8 @@ def my_form_open(dialog, layer, feature):
       <layerDependencies/>
       <dataDependencies/>
       <expressionfields/>
-      <map-layer-style-manager current="predeterminado">
-        <map-layer-style name="predeterminado"/>
+      <map-layer-style-manager current="GwBasic">
+        <map-layer-style name="GwBasic"/>
       </map-layer-style-manager>
       <auxiliaryLayer/>
       <metadataUrls/>
@@ -2082,8 +2082,8 @@ def my_form_open(dialog, layer, feature):
       <layerDependencies/>
       <dataDependencies/>
       <expressionfields/>
-      <map-layer-style-manager current="predeterminado">
-        <map-layer-style name="predeterminado"/>
+      <map-layer-style-manager current="GwBasic">
+        <map-layer-style name="GwBasic"/>
       </map-layer-style-manager>
       <auxiliaryLayer/>
       <metadataUrls/>
@@ -2412,8 +2412,8 @@ def my_form_open(dialog, layer, feature):
       <layerDependencies/>
       <dataDependencies/>
       <expressionfields/>
-      <map-layer-style-manager current="predeterminado">
-        <map-layer-style name="predeterminado"/>
+      <map-layer-style-manager current="GwBasic">
+        <map-layer-style name="GwBasic"/>
       </map-layer-style-manager>
       <auxiliaryLayer/>
       <metadataUrls/>
@@ -3086,8 +3086,8 @@ def my_form_open(dialog, layer, feature):
       <layerDependencies/>
       <dataDependencies/>
       <expressionfields/>
-      <map-layer-style-manager current="predeterminado">
-        <map-layer-style name="predeterminado"/>
+      <map-layer-style-manager current="GwBasic">
+        <map-layer-style name="GwBasic"/>
       </map-layer-style-manager>
       <auxiliaryLayer/>
       <metadataUrls/>
@@ -3592,8 +3592,8 @@ def my_form_open(dialog, layer, feature):
       <layerDependencies/>
       <dataDependencies/>
       <expressionfields/>
-      <map-layer-style-manager current="predeterminado">
-        <map-layer-style name="predeterminado"/>
+      <map-layer-style-manager current="GwBasic">
+        <map-layer-style name="GwBasic"/>
       </map-layer-style-manager>
       <auxiliaryLayer/>
       <metadataUrls/>
@@ -5904,8 +5904,8 @@ def my_form_open(dialog, layer, feature):
       <layerDependencies/>
       <dataDependencies/>
       <expressionfields/>
-      <map-layer-style-manager current="predeterminado">
-        <map-layer-style name="predeterminado"/>
+      <map-layer-style-manager current="GwBasic">
+        <map-layer-style name="GwBasic"/>
       </map-layer-style-manager>
       <auxiliaryLayer/>
       <metadataUrls/>
@@ -6239,8 +6239,8 @@ def my_form_open(dialog, layer, feature):
       <layerDependencies/>
       <dataDependencies/>
       <expressionfields/>
-      <map-layer-style-manager current="predeterminado">
-        <map-layer-style name="predeterminado"/>
+      <map-layer-style-manager current="GwBasic">
+        <map-layer-style name="GwBasic"/>
       </map-layer-style-manager>
       <auxiliaryLayer/>
       <metadataUrls/>
@@ -6574,8 +6574,8 @@ def my_form_open(dialog, layer, feature):
       <layerDependencies/>
       <dataDependencies/>
       <expressionfields/>
-      <map-layer-style-manager current="predeterminado">
-        <map-layer-style name="predeterminado"/>
+      <map-layer-style-manager current="GwBasic">
+        <map-layer-style name="GwBasic"/>
       </map-layer-style-manager>
       <auxiliaryLayer/>
       <metadataUrls/>
@@ -7004,8 +7004,8 @@ def my_form_open(dialog, layer, feature):
       <layerDependencies/>
       <dataDependencies/>
       <expressionfields/>
-      <map-layer-style-manager current="predeterminado">
-        <map-layer-style name="predeterminado"/>
+      <map-layer-style-manager current="GwBasic">
+        <map-layer-style name="GwBasic"/>
       </map-layer-style-manager>
       <auxiliaryLayer/>
       <metadataUrls/>
@@ -9378,8 +9378,8 @@ def my_form_open(dialog, layer, feature):
       <layerDependencies/>
       <dataDependencies/>
       <expressionfields/>
-      <map-layer-style-manager current="predeterminado">
-        <map-layer-style name="predeterminado"/>
+      <map-layer-style-manager current="GwBasic">
+        <map-layer-style name="GwBasic"/>
       </map-layer-style-manager>
       <auxiliaryLayer/>
       <metadataUrls/>
@@ -11847,8 +11847,8 @@ def my_form_open(dialog, layer, feature):
       <layerDependencies/>
       <dataDependencies/>
       <expressionfields/>
-      <map-layer-style-manager current="predeterminado">
-        <map-layer-style name="predeterminado"/>
+      <map-layer-style-manager current="GwBasic">
+        <map-layer-style name="GwBasic"/>
       </map-layer-style-manager>
       <auxiliaryLayer/>
       <metadataUrls/>
@@ -12521,8 +12521,8 @@ def my_form_open(dialog, layer, feature):
       <layerDependencies/>
       <dataDependencies/>
       <expressionfields/>
-      <map-layer-style-manager current="predeterminado">
-        <map-layer-style name="predeterminado"/>
+      <map-layer-style-manager current="GwBasic">
+        <map-layer-style name="GwBasic"/>
       </map-layer-style-manager>
       <auxiliaryLayer/>
       <metadataUrls/>
@@ -13147,8 +13147,8 @@ def my_form_open(dialog, layer, feature):
       <layerDependencies/>
       <dataDependencies/>
       <expressionfields/>
-      <map-layer-style-manager current="predeterminado">
-        <map-layer-style name="predeterminado"/>
+      <map-layer-style-manager current="GwBasic">
+        <map-layer-style name="GwBasic"/>
       </map-layer-style-manager>
       <auxiliaryLayer/>
       <metadataUrls/>
@@ -14150,8 +14150,8 @@ def my_form_open(dialog, layer, feature):
       <layerDependencies/>
       <dataDependencies/>
       <expressionfields/>
-      <map-layer-style-manager current="predeterminado">
-        <map-layer-style name="predeterminado"/>
+      <map-layer-style-manager current="GwBasic">
+        <map-layer-style name="GwBasic"/>
       </map-layer-style-manager>
       <auxiliaryLayer/>
       <metadataUrls/>
@@ -14680,8 +14680,8 @@ def my_form_open(dialog, layer, feature):
       <layerDependencies/>
       <dataDependencies/>
       <expressionfields/>
-      <map-layer-style-manager current="predeterminado">
-        <map-layer-style name="predeterminado"/>
+      <map-layer-style-manager current="GwBasic">
+        <map-layer-style name="GwBasic"/>
       </map-layer-style-manager>
       <auxiliaryLayer/>
       <metadataUrls/>
@@ -15852,8 +15852,8 @@ def my_form_open(dialog, layer, feature):
       <layerDependencies/>
       <dataDependencies/>
       <expressionfields/>
-      <map-layer-style-manager current="predeterminado">
-        <map-layer-style name="predeterminado"/>
+      <map-layer-style-manager current="GwBasic">
+        <map-layer-style name="GwBasic"/>
       </map-layer-style-manager>
       <auxiliaryLayer/>
       <metadataUrls/>
@@ -19819,8 +19819,8 @@ def my_form_open(dialog, layer, feature):
       <layerDependencies/>
       <dataDependencies/>
       <expressionfields/>
-      <map-layer-style-manager current="predeterminado">
-        <map-layer-style name="predeterminado"/>
+      <map-layer-style-manager current="GwBasic">
+        <map-layer-style name="GwBasic"/>
       </map-layer-style-manager>
       <auxiliaryLayer/>
       <metadataUrls/>
@@ -20380,8 +20380,8 @@ def my_form_open(dialog, layer, feature):
       <layerDependencies/>
       <dataDependencies/>
       <expressionfields/>
-      <map-layer-style-manager current="predeterminado">
-        <map-layer-style name="predeterminado"/>
+      <map-layer-style-manager current="GwBasic">
+        <map-layer-style name="GwBasic"/>
       </map-layer-style-manager>
       <auxiliaryLayer/>
       <metadataUrls/>
@@ -20950,8 +20950,8 @@ def my_form_open(dialog, layer, feature):
       <layerDependencies/>
       <dataDependencies/>
       <expressionfields/>
-      <map-layer-style-manager current="predeterminado">
-        <map-layer-style name="predeterminado"/>
+      <map-layer-style-manager current="GwBasic">
+        <map-layer-style name="GwBasic"/>
       </map-layer-style-manager>
       <auxiliaryLayer/>
       <metadataUrls/>
@@ -21618,8 +21618,8 @@ def my_form_open(dialog, layer, feature):
       <layerDependencies/>
       <dataDependencies/>
       <expressionfields/>
-      <map-layer-style-manager current="predeterminado">
-        <map-layer-style name="predeterminado"/>
+      <map-layer-style-manager current="GwBasic">
+        <map-layer-style name="GwBasic"/>
       </map-layer-style-manager>
       <auxiliaryLayer/>
       <metadataUrls/>
@@ -22229,8 +22229,8 @@ def my_form_open(dialog, layer, feature):
       <layerDependencies/>
       <dataDependencies/>
       <expressionfields/>
-      <map-layer-style-manager current="default">
-        <map-layer-style name="default"/>
+      <map-layer-style-manager current="GwBasic">
+        <map-layer-style name="GwBasic"/>
       </map-layer-style-manager>
       <auxiliaryLayer/>
       <metadataUrls/>
@@ -22931,8 +22931,8 @@ def my_form_open(dialog, layer, feature):
       <layerDependencies/>
       <dataDependencies/>
       <expressionfields/>
-      <map-layer-style-manager current="predeterminado">
-        <map-layer-style name="predeterminado"/>
+      <map-layer-style-manager current="GwBasic">
+        <map-layer-style name="GwBasic"/>
       </map-layer-style-manager>
       <auxiliaryLayer/>
       <metadataUrls/>
@@ -23452,8 +23452,8 @@ def my_form_open(dialog, layer, feature):
       <layerDependencies/>
       <dataDependencies/>
       <expressionfields/>
-      <map-layer-style-manager current="predeterminado">
-        <map-layer-style name="predeterminado"/>
+      <map-layer-style-manager current="GwBasic">
+        <map-layer-style name="GwBasic"/>
       </map-layer-style-manager>
       <auxiliaryLayer/>
       <metadataUrls/>

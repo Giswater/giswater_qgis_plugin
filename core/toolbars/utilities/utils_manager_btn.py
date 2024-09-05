@@ -12,10 +12,13 @@ from functools import partial
 from qgis.PyQt.QtCore import QPoint
 from qgis.PyQt.QtWidgets import QAction, QMenu
 
+from .style_manager import GwStyleManager
+from .... import global_vars
 from ..dialog import GwAction
 from .mapzone_manager import GwMapzoneManager
 from ...shared.info import GwInfo
 from ...shared.psector import GwPsector
+from ...shared.workcat import GwWorkcat
 
 
 class GwUtilsManagerButton(GwAction):
@@ -69,7 +72,7 @@ class GwUtilsManagerButton(GwAction):
             del action
         action_group = self.action.property('action_group')
 
-        buttons = [['Mapzones manager', '_mapzones_manager'], ['Prices manager', '_prices_manager']]
+        buttons = [['Mapzones manager', '_mapzones_manager'], ['Workcat manager', '_workcat_manager'], ['Style manager', '_style_manager']]
 
         for button in buttons:
             button_name = button[0]
@@ -87,15 +90,25 @@ class GwUtilsManagerButton(GwAction):
             obj_action.triggered.connect(partial(getattr(self, button_function)))
             obj_action.triggered.connect(partial(self._save_last_selection, self.menu, button_function))
 
-
-    def _prices_manager(self):
-        self.psector = GwPsector()
-        self.psector.manage_prices()
-
     # region mapzone manager functions
 
     def _mapzones_manager(self):
 
         self.mapzones_manager = GwMapzoneManager()
         self.mapzones_manager.manage_mapzones()
+    # endregion
+
+    # region workcat manager functions
+
+    def _workcat_manager(self):
+        self.workcat = GwWorkcat(global_vars.iface, global_vars.canvas)
+        self.workcat.manage_workcats()
+    # endregion
+
+    # region style manager functions
+
+    def _style_manager(self):
+        self.style = GwStyleManager()
+        self.style.manage_styles()
+
     # endregion

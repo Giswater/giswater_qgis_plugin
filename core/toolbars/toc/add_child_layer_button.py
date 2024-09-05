@@ -123,13 +123,12 @@ class GwAddChildLayerButton(GwAction):
                 if not geom_field:
                     continue
                 geom_field = geom_field.replace(" ", "")
-                style_id = field['style_id']
                 group = context['level_1']
                 sub_group = context['level_2']
                 sub_sub_group = context.get('level_3')
                 widgetAction.defaultWidget().stateChanged.connect(
                     partial(self._check_action_ischecked, layer_name, the_geom, geom_field, group, sub_group,
-                            sub_sub_group, style_id, alias.strip()))
+                            sub_sub_group, alias.strip()))
 
         main_menu.exec_(click_point)
 
@@ -143,20 +142,19 @@ class GwAddChildLayerButton(GwAction):
 
 
     def _check_action_ischecked(self, tablename, the_geom=None, field_id=None, group=None,
-                                sub_group=None, sub_sub_group=None, style_id=None, alias=None, state=None):
+                                sub_group=None, sub_sub_group=None, alias=None, state=None):
         """ Control if user check or uncheck action menu, then add or remove layer from toc
         :param tablename: Postgres table name (String)
         :param the_geom: Geometry field of the table (String)
         :param field_id: Field id of the table (String)
         :param child_layers: List of layers (StringList)
         :param group: Name of the group that will be created in the toc (String)
-        :param style_id: Id of the style we want to load (integer or String)
         :param is_checked: This parameter is sent by the action itself with the trigger (Bool)
         """
         if state == 2:
             layer = tools_qgis.get_layer_by_tablename(tablename)
             if layer is None:
-                tools_gw.add_layer_database(tablename, the_geom, field_id, group, sub_group, style_id, alias, sub_sub_group=sub_sub_group)
+                tools_gw.add_layer_database(tablename, the_geom, field_id, group, sub_group, alias=alias, sub_sub_group=sub_sub_group)
         elif state == 0:
             layer = tools_qgis.get_layer_by_tablename(tablename)
             if layer is not None:

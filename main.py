@@ -322,20 +322,21 @@ class Giswater(QObject):
         """
 
         # Create instance class and add button into QGIS toolbar
-        main_toolbutton = QToolButton()
-        self.action_info = self.iface.addToolBarWidget(main_toolbutton)
+        if not hasattr(self, 'action_info') or self.action_info is None:
+            main_toolbutton = QToolButton()
+            self.action_info = self.iface.addToolBarWidget(main_toolbutton)
 
-        # Set icon button if exists
-        icon_path = self.icon_folder + '36.png'
-        if os.path.exists(icon_path):
-            icon = QIcon(icon_path)
-            self.action = QAction(icon, "Show info", self.iface.mainWindow())
-        else:
-            self.action = QAction("Show info", self.iface.mainWindow())
+            # Set icon button if exists
+            icon_path = self.icon_folder + '36.png'
+            if os.path.exists(icon_path):
+                icon = QIcon(icon_path)
+                self.action = QAction(icon, "Show info", self.iface.mainWindow())
+            else:
+                self.action = QAction("Show info", self.iface.mainWindow())
 
-        main_toolbutton.setDefaultAction(self.action)
-        admin_button = GwAdminButton()
-        self.action.triggered.connect(partial(admin_button.init_sql, True))
+            main_toolbutton.setDefaultAction(self.action)
+            admin_button = GwAdminButton()
+            self.action.triggered.connect(partial(admin_button.init_sql, True))
 
 
     def _unset_info_button(self):
@@ -359,7 +360,7 @@ class Giswater(QObject):
 
         toolbar = self.iface.mainWindow().findChild(QDockWidget, 'Layers').findChildren(QToolBar)[-1]
         for action in toolbar.actions():
-            if action.objectName() not in ('GwAddChildLayerButton', 'GwEpaWorldButton'):
+            if action.objectName() not in ('GwAddChildLayerButton', 'GwLayerStyleChangeButton'):
                 continue
             toolbar.removeAction(action)  # Remove from toolbar
             action.deleteLater()  # Schedule for deletion
@@ -384,7 +385,11 @@ class Giswater(QObject):
 
         # Create class to manage code that performs project configuration
         self.load_project = GwLoadProject()
-        self.load_project.project_read(show_warning, self)
+
+        # If it is not a Giswater project, display admin button
+        is_gw_project = self.load_project.project_read(show_warning, self)
+        if is_gw_project is False:
+            self._set_info_button()
 
 
     def save_project(self):

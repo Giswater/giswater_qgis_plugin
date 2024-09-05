@@ -51,7 +51,6 @@ from .epa.nonvisual_manager_button import GwNonVisualManagerButton
 # Plan
 from .plan.psector_button import GwPsectorButton
 from .plan.psector_manager_button import GwPsectorManagerButton
-from .plan.price_manager_button import GwPriceManagerButton
 from .plan.netscenario_manager_btn import GwNetscenarioManagerButton
 
 # Utilities
@@ -65,4 +64,4 @@ from .utilities.utils_manager_btn import GwUtilsManagerButton
 
 # ToC
 from .toc.add_child_layer_button import GwAddChildLayerButton
-from .toc.epa_world_button import GwEpaWorldButton
+from .toc.layerstyle_change_button import GwLayerStyleChangeButton

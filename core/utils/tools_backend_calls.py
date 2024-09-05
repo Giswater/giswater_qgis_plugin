@@ -56,6 +56,17 @@ def add_object(**kwargs):
         tools_qgis.show_warning(message, parameter=func_params['sourcewidget'])
         return
 
+    # Special case for documents: get the document ID using the name
+    print(tab_name)
+    if qtable_name == 'tbl_document' or 'doc' in tab_name:
+        sql = f"SELECT id FROM doc WHERE name = '{object_id}'"
+        row = tools_db.get_row(sql, log_sql=True)
+        if not row:
+            tools_qgis.show_warning("Document name not found", parameter=object_id)
+            return
+        # Use the found document ID
+        object_id = row['id']
+
     # Check if this object exists
     view_object = f"v_ui_{func_params['sourceview']}"
     sql = ("SELECT * FROM " + view_object + ""
@@ -398,7 +409,7 @@ def filter_table(**kwargs):
             model.clear()
             tools_gw.add_tableview_header(qtable, field)
             tools_gw.fill_tableview_rows(qtable, field)
-            tools_gw.set_tablemodel_config(dialog, qtable, linkedobject, 1, True)
+            tools_gw.set_tablemodel_config(dialog, qtable, linkedobject, 1)
             tools_qt.set_tableview_config(qtable)
 
     return complet_list
@@ -437,7 +448,7 @@ def filter_table_mincut(**kwargs):
             model.clear()
             tools_gw.add_tableview_header(qtable, field)
             tools_gw.fill_tableview_rows(qtable, field)
-            tools_gw.set_tablemodel_config(dialog, qtable, field['widgetname'], 1, True)
+            tools_gw.set_tablemodel_config(dialog, qtable, field['widgetname'], 1)
             tools_qt.set_tableview_config(qtable)
 
     return complet_list
@@ -559,7 +570,7 @@ def add_query_layer(**kwargs):
     vlayer = QgsVectorLayer(uri.uri(False), f'{layer_name}', "postgres")
 
     if vlayer.isValid():
-        tools_qt.add_layer_to_toc(vlayer, group)
+        tools_qgis.add_layer_to_toc(vlayer, group)
 
 
 def refresh_attribute_table(**kwargs):
@@ -796,7 +807,7 @@ def fill_tbl(complet_result, dialog, widgetname, linkedobject, filter_fields):
         if widget is None: continue
         widget = tools_gw.add_tableview_header(widget, field)
         widget = tools_gw.fill_tableview_rows(widget, field)
-        widget = tools_gw.set_tablemodel_config(dialog, widget, field['widgetname'], 1, True)
+        widget = tools_gw.set_tablemodel_config(dialog, widget, field['widgetname'], 1)
         tools_qt.set_tableview_config(widget)
 
     widget_list = []

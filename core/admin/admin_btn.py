@@ -465,7 +465,7 @@ class GwAdminButton:
         """"""
         for folder in dict_folders.keys():
             status = self._execute_files(folder, set_progress_bar=True)
-            if not status and self.dev_commit is False:
+            if not tools_os.set_boolean(status, False) and tools_os.set_boolean(self.dev_commit, False) is False:
                 return False
 
         return True
@@ -479,11 +479,11 @@ class GwAdminButton:
                 return False
             else:
                 status = self._execute_files(folder_locale, True, set_progress_bar=True)
-                if status is False and self.dev_commit is False:
+                if tools_os.set_boolean(status, False) is False and tools_os.set_boolean(self.dev_commit, False) is False:
                     return False
         else:
             status = self._execute_files(self.folder_locale, True, set_progress_bar=True)
-            if status is False and self.dev_commit is False:
+            if tools_os.set_boolean(status, False) is False and tools_os.set_boolean(self.dev_commit, False) is False:
                 return False
 
         return True
@@ -494,7 +494,7 @@ class GwAdminButton:
         folder_utils = os.path.join(folder_update, 'utils')
         if self._process_folder(folder_utils) is True:
             status = self._load_sql(folder_utils, no_ct, set_progress_bar=True)
-            if status is False:
+            if tools_os.set_boolean(status, False) is False:
                 return False
 
         if new_project:
@@ -504,13 +504,13 @@ class GwAdminButton:
         folder_project_type = os.path.join(folder_update, folder_project)
         if self._process_folder(folder_project_type):
             status = self._load_sql(folder_project_type, no_ct, set_progress_bar=True)
-            if status is False:
+            if tools_os.set_boolean(status, False) is False:
                 return False
 
         folder_locale = os.path.join(folder_update, 'i18n', self.locale)
         if self._process_folder(folder_locale) is True:
             status = self._execute_files(folder_locale, True, set_progress_bar=True)
-            if status is False:
+            if tools_os.set_boolean(status, False) is False:
                 return False
 
         return True
@@ -529,27 +529,15 @@ class GwAdminButton:
             for sub_folder in sub_folders:
                 folder_update = os.path.join(self.folder_updates, folder, sub_folder)
                 if new_project:
-                    if self.dev_commit is True:
-                        if str(sub_folder) > '31100':
-                            status = self.update_minor_dict_folders(folder_update, new_project, project_type, no_ct)
-                            if status is False:
-                                return False
-                    else:
-                        if str(sub_folder) > '31100' and str(sub_folder) <= str(self.plugin_version).replace('.', ''):
-                            status = self.update_minor_dict_folders(folder_update, new_project, project_type, no_ct)
-                            if status is False:
-                                return False
+                    if str(sub_folder) > '31100' and str(sub_folder) <= str(self.plugin_version).replace('.', ''):
+                        status = self.update_minor_dict_folders(folder_update, new_project, project_type, no_ct)
+                        if tools_os.set_boolean(status, False) is False:
+                            return False
                 else:
-                    if self.dev_commit is True:
-                        if str(sub_folder) > str(self.project_version).replace('.', '') and str(sub_folder) > '31100':
-                            status = self.update_minor_dict_folders(folder_update, new_project, project_type, no_ct)
-                            if status is False:
-                                return False
-                    else:
-                        if str(sub_folder) > str(self.project_version).replace('.', '') and str(sub_folder) > '31100' and str(sub_folder) <= str(self.plugin_version).replace('.', ''):
-                            status = self.update_minor_dict_folders(folder_update, new_project, project_type, no_ct)
-                            if status is False:
-                                return False
+                    if str(sub_folder) > str(self.project_version).replace('.', '') and str(sub_folder) > '31100' and str(sub_folder) <= str(self.plugin_version).replace('.', ''):
+                        status = self.update_minor_dict_folders(folder_update, new_project, project_type, no_ct)
+                        if tools_os.set_boolean(status, False) is False:
+                            return False
         return True
 
     def load_childviews(self):
@@ -559,11 +547,11 @@ class GwAdminButton:
                 return False
             else:
                 status = self._execute_files(folder_childviews, True, set_progress_bar=True)
-                if status is False and self.dev_commit is False:
+                if tools_os.set_boolean(status, False) is False and tools_os.set_boolean(self.dev_commit, False) is False:
                     return False
         else:
             status = self._execute_files(self.folder_childviews, True, set_progress_bar=True)
-            if status is False and self.dev_commit is False:
+            if tools_os.set_boolean(status, False) is False and tools_os.set_boolean(self.dev_commit, False) is False:
                 return False
 
         return True
@@ -573,7 +561,7 @@ class GwAdminButton:
         tools_db.dao.commit()
         folder = os.path.join(self.folder_example, 'user', project_type)
         status = self._execute_files(folder, set_progress_bar=True)
-        if not status and self.dev_commit is False:
+        if not tools_os.set_boolean(status, False) and tools_os.set_boolean(self.dev_commit, False) is False:
             return False
 
         return True
@@ -583,7 +571,7 @@ class GwAdminButton:
         tools_db.dao.commit()
         folder = os.path.join(self.folder_example, 'inv', project_type)
         status = self._execute_files(folder, set_progress_bar=True)
-        if not status and self.dev_commit is False:
+        if not tools_os.set_boolean(status, False) and tools_os.set_boolean(self.dev_commit, False) is False:
             return False
 
         return True
@@ -594,7 +582,7 @@ class GwAdminButton:
 
         folder = os.path.join(self.folder_example, 'dev', project_type)
         status = self._execute_files(folder, set_progress_bar=True)
-        if not status and self.dev_commit is False:
+        if not tools_os.set_boolean(status, False) and tools_os.set_boolean(self.dev_commit, False) is False:
             return False
 
         return True
@@ -678,7 +666,7 @@ class GwAdminButton:
         self.folder_example = os.path.join(self.sql_dir, 'example')
 
         # Variable to commit changes even if schema creation fails
-        self.dev_commit = global_vars.gw_dev_mode
+        self.dev_commit = tools_gw.get_config_parser('system', 'force_commit', "user", "init", prefix=True)
 
         # Create dialog object
         self.dlg_readsql = GwAdminUi(self)
@@ -1082,7 +1070,7 @@ class GwAdminButton:
         for (path, ficheros, archivos) in os.walk(path_folder):
             status = self._execute_files(path, no_ct=no_ct, utils_schema_name=utils_schema_name,
                                          set_progress_bar=set_progress_bar)
-            if not status:
+            if not tools_os.set_boolean(status, False):
                 return False
 
         return True
@@ -1170,7 +1158,7 @@ class GwAdminButton:
 
         # Check if the new project name already exists
         sql = "SELECT schema_name, schema_name FROM information_schema.schemata"
-        rows = tools_db.get_rows(sql)
+        rows = tools_db.get_rows(sql, commit=self.dev_commit)
         for row in rows:
             if str(self.schema) == str(row[0]):
                 msg = "This project name alredy exist."
@@ -1248,22 +1236,22 @@ class GwAdminButton:
         folder = os.path.join(self.folder_utils, self.file_pattern_fct)
 
         status = self._execute_files(folder)
-        if not status and self.dev_commit is False:
+        if not tools_os.set_boolean(status, False) and tools_os.set_boolean(self.dev_commit, False) is False:
             return False
 
         folder = os.path.join(self.folder_utils, self.file_pattern_ftrg)
         status = self._execute_files(folder)
-        if not status and self.dev_commit is False:
+        if not tools_os.set_boolean(status, False) and tools_os.set_boolean(self.dev_commit, False) is False:
             return False
 
         folder = os.path.join(self.folder_software, self.file_pattern_fct)
         status = self._execute_files(folder)
-        if not status and self.dev_commit is False:
+        if not tools_os.set_boolean(status, False) and tools_os.set_boolean(self.dev_commit, False) is False:
             return False
 
         folder = os.path.join(self.folder_software, self.file_pattern_ftrg)
         status = self._execute_files(folder)
-        if not status and self.dev_commit is False:
+        if not tools_os.set_boolean(status, False) and tools_os.set_boolean(self.dev_commit, False) is False:
             return False
 
         return True
@@ -1514,7 +1502,7 @@ class GwAdminButton:
             return
         # Populate Project data schema Name
         sql = "SELECT schema_name FROM information_schema.schemata"
-        rows = tools_db.get_rows(sql)
+        rows = tools_db.get_rows(sql, commit=self.dev_commit)
         if rows is None:
             return
 
@@ -1568,7 +1556,7 @@ class GwAdminButton:
                "FROM public.spatial_ref_sys "
                "WHERE CAST(srid AS TEXT) LIKE '" + str(filter_value))
         sql += "%'  AND  srtext ILIKE 'PROJCS%' ORDER BY substr(srtext, 1, 6), srid"
-        self.last_srids = tools_db.get_rows(sql)
+        self.last_srids = tools_db.get_rows(sql, commit=self.dev_commit)
 
         # Populate Table
         self.model_srid = QSqlQueryModel()
@@ -1685,7 +1673,13 @@ class GwAdminButton:
         self.task1.setProgress(100)
 
         status = (self.error_count == 0)
-        self._manage_result_message(status, parameter="Reload")
+        if status:
+            tools_qt.show_info_box("Reload completed successfully", title="Success")
+            tools_db.dao.commit()
+        else:
+            tools_qt.show_info_box("Reload failed", title="Error")
+            tools_db.dao.rollback()
+
         if status:
             tools_db.dao.commit()
         else:
@@ -1797,7 +1791,7 @@ class GwAdminButton:
                     tools_log.log_info(os.path.join(filedir, file))
                     self.current_sql_file += 1
                     status = self._read_execute_file(filedir, file, schema_name, self.project_epsg, set_progress_bar)
-                if not status and self.dev_commit is False:
+                if not tools_os.set_boolean(status, False) and tools_os.set_boolean(self.dev_commit, False) is False:
                     return False
 
         else:
@@ -1807,7 +1801,7 @@ class GwAdminButton:
                         tools_log.log_info(os.path.join(filedir, file))
                         self.current_sql_file += 1
                         status = self._read_execute_file(filedir, file, schema_name, self.project_epsg, set_progress_bar)
-                        if not status and self.dev_commit is False:
+                        if not tools_os.set_boolean(status, False) and not tools_os.set_boolean(self.dev_commit, False):
                             return False
 
         return status
@@ -1835,13 +1829,12 @@ class GwAdminButton:
             if f:
                 f_to_read = str(f.read().replace("SCHEMA_NAME", schema_name).replace("SRID_VALUE", project_epsg))
                 status = tools_db.execute_sql(str(f_to_read), filepath=filepath, commit=self.dev_commit, is_thread=True)
-
-                if status is False:
+                if tools_os.set_boolean(status, False) is False:
                     self.error_count = self.error_count + 1
                     tools_log.log_info(f"_read_execute_file error {filepath}")
                     tools_log.log_info(f"Message: {lib_vars.session_vars['last_error']}")
                     self.message_infolog = f"_read_execute_file error {filepath}\nMessage: {lib_vars.session_vars['last_error']}"
-                    if self.dev_commit is False:
+                    if tools_os.set_boolean(self.dev_commit, False) is False:
                         tools_db.dao.rollback()
 
                     if hasattr(self, 'task_create_schema') and not isdeleted(self.task_create_schema):
@@ -1855,7 +1848,7 @@ class GwAdminButton:
             tools_log.log_info(f"_read_execute_file exception: {file}")
             tools_log.log_info(str(e))
             self.message_infolog = f"_read_execute_file exception: {file}\n {str(e)}"
-            if self.dev_commit is False:
+            if tools_os.set_boolean(self.dev_commit, False) is False:
                 tools_db.dao.rollback()
             if hasattr(self, 'task_create_schema') and not isdeleted(self.task_create_schema):
                 self.task_create_schema.cancel()
@@ -1919,7 +1912,7 @@ class GwAdminButton:
 
         new_schema_name = tools_qt.get_text(self.dlg_readsql_copy, self.dlg_readsql_copy.schema_rename_copy)
         sql = "SELECT schema_name, schema_name FROM information_schema.schemata"
-        rows = tools_db.get_rows(sql)
+        rows = tools_db.get_rows(sql, commit=self.dev_commit)
 
         for row in rows:
             if str(new_schema_name) == str(row[0]):
@@ -2303,7 +2296,7 @@ class GwAdminButton:
             sql = (f"SELECT cat_feature.id, cat_feature.id "
                    f"FROM {schema_name}.cat_feature WHERE id <> 'LINK' "
                    f"AND active IS TRUE ORDER BY id")
-            rows = tools_db.get_rows(sql)
+            rows = tools_db.get_rows(sql, commit=self.dev_commit)
 
             tools_qt.fill_combo_values(self.dlg_readsql.cmb_formname_fields, rows)
 
@@ -2432,19 +2425,19 @@ class GwAdminButton:
         # Populate widgettype combo
         sql = (f"SELECT DISTINCT(id), idval FROM {schema_name}.config_typevalue "
                f"WHERE typevalue = 'widgettype_typevalue' AND addparam->>'createAddfield' = 'TRUE'")
-        rows = tools_db.get_rows(sql)        
+        rows = tools_db.get_rows(sql, commit=self.dev_commit)
         tools_qt.fill_combo_values(self.dlg_manage_fields.widgettype, rows)
 
         # Populate datatype combo
         sql = (f"SELECT id, idval FROM {schema_name}.config_typevalue "
                f"WHERE typevalue = 'datatype_typevalue' AND addparam->>'createAddfield' = 'TRUE'")
-        rows = tools_db.get_rows(sql)
+        rows = tools_db.get_rows(sql, commit=self.dev_commit)
         tools_qt.fill_combo_values(self.dlg_manage_fields.datatype, rows)
 
         # Populate layoutname combo
         sql = (f"SELECT id, idval FROM {schema_name}.config_typevalue "
                f"WHERE typevalue = 'layout_name_typevalue' AND addparam->>'createAddfield' = 'TRUE'")
-        rows = tools_db.get_rows(sql)
+        rows = tools_db.get_rows(sql, commit=self.dev_commit)
         tools_qt.fill_combo_values(self.dlg_manage_fields.layoutname, rows)
 
         # Set default value for formtype widget
@@ -2497,7 +2490,7 @@ class GwAdminButton:
                     f"FROM {schema_name}.ve_config_addfields "
                     f"WHERE cat_feature_id = '{form_name}'")
 
-        rows = tools_db.get_rows(sql)
+        rows = tools_db.get_rows(sql, commit=self.dev_commit)
         tools_qt.fill_combo_values(self.dlg_manage_fields.cmb_fields, rows)
 
 
@@ -2521,7 +2514,7 @@ class GwAdminButton:
         sql = (f"UPDATE {schema_name}.config_param_system "
                f"SET value = 'TRUE'"
                f"WHERE parameter = 'admin_config_control_trigger'")
-        tools_db.execute_sql(sql)
+        tools_db.execute_sql(sql, commit=self.dev_commit)
 
 
         # Execute manage add fields function
@@ -2591,13 +2584,13 @@ class GwAdminButton:
             body = body.replace('""', 'null')
 
             # Execute manage add fields function
-            json_result = tools_gw.execute_procedure('gw_fct_admin_manage_addfields', body, schema_name)
+            json_result = tools_gw.execute_procedure('gw_fct_admin_manage_addfields', body, schema_name, commit=self.dev_commit)
             if not json_result or json_result['status'] == 'Failed':
                 # set admin_config_control_trigger with prev user value
                 sql = (f"UPDATE {schema_name}.config_param_system "
                     f"SET value = '{config_trg_user_value}'"
                     f"WHERE parameter = 'admin_config_control_trigger'")
-                tools_db.execute_sql(sql)
+                tools_db.execute_sql(sql, commit=self.dev_commit)
                 return
             self._manage_json_message(json_result, parameter="Field configured in 'config_form_fields'")
 
@@ -2669,7 +2662,7 @@ class GwAdminButton:
         sql = (f"UPDATE {schema_name}.config_param_system "
                f"SET value = '{config_trg_user_value}'"
                f"WHERE parameter = 'admin_config_control_trigger'")
-        tools_db.execute_sql(sql)
+        tools_db.execute_sql(sql, commit=self.dev_commit)
 
     def _change_project_type(self, widget):
         """ Take current project type changed """
@@ -2788,12 +2781,10 @@ class GwAdminButton:
                 sql += values
 
             if progress % 500 == 0:
-                # TODO:: Use dev_commit or dev_user?
                 tools_db.execute_sql(sql, commit=self.dev_commit)
                 sql = ""
 
         if sql != "":
-            # TODO:: Use dev_commit or dev_user?
             tools_db.execute_sql(sql, commit=self.dev_commit)
 
         _file.close()
@@ -2928,7 +2919,7 @@ class GwAdminButton:
         sql = (f"UPDATE {self.schema_name}.config_param_user "
                f"SET value = '{composers_path_vdef}' "
                f"WHERE parameter = 'qgis_composers_folderpath' AND cur_user = current_user")
-        tools_db.execute_sql(sql)
+        tools_db.execute_sql(sql, commit=self.dev_commit)
 
 
     def _select_active_locales(self, sqlite_cursor):
@@ -3068,19 +3059,19 @@ class GwAdminButton:
 
         folder = os.path.join(self.sql_dir, 'corporate', 'utils', 'utils')
         status = self._execute_files(folder, utils_schema_name='utils')
-        if not status and self.dev_commit is False:
+        if not tools_os.set_boolean(status, False) and tools_os.set_boolean(self.dev_commit, False) is False:
             return False
         folder = os.path.join(self.sql_dir, 'corporate', 'utils', 'utils', 'fct')
         status = self._execute_files(folder, utils_schema_name='utils')
-        if not status and self.dev_commit is False:
+        if not tools_os.set_boolean(status, False) and tools_os.set_boolean(self.dev_commit, False) is False:
             return False
         folder = os.path.join(self.sql_dir, 'corporate', 'utils', 'ws')
         status = self._execute_files(folder, utils_schema_name=self.ws_project_name)
-        if not status and self.dev_commit is False:
+        if not tools_os.set_boolean(status, False) and tools_os.set_boolean(self.dev_commit, False) is False:
             return False
         folder = os.path.join(self.sql_dir, 'corporate', 'utils', 'ud')
         status = self._execute_files(folder, utils_schema_name=self.ud_project_name)
-        if not status and self.dev_commit is False:
+        if not tools_os.set_boolean(status, False) and tools_os.set_boolean(self.dev_commit, False) is False:
             return False
 
         return True
@@ -3105,7 +3096,7 @@ class GwAdminButton:
                     folder_update = os.path.join(folder_utils_updates, folder, sub_folder, 'utils')
                     if self._process_folder(folder_update):
                         status = self._load_sql(folder_update, utils_schema_name='utils')
-                        if status is False:
+                        if tools_os.set_boolean(status, False) is False:
                             return False
                     if self.project_type_selected == 'ws':
                         folder_update = os.path.join(folder_utils_updates, folder, sub_folder, 'ws')
@@ -3113,7 +3104,7 @@ class GwAdminButton:
                             if schema_name is None:
                                 schema_name = self.ws_project_name
                             status = self._load_sql(folder_update, utils_schema_name=schema_name)
-                            if status is False:
+                            if tools_os.set_boolean(status, False) is False:
                                 return False
                     if self.project_type_selected == 'ud':
                         folder_update = os.path.join(folder_utils_updates, folder, sub_folder, 'ud')
@@ -3121,12 +3112,12 @@ class GwAdminButton:
                             if schema_name is None:
                                 schema_name = self.ud_project_name
                             status = self._load_sql(folder_update, utils_schema_name=schema_name)
-                            if status is False:
+                            if tools_os.set_boolean(status, False) is False:
                                 return False
                     folder_update = os.path.join(folder_utils_updates, folder, sub_folder, 'i18n', self.locale)
                     if self._process_folder(folder_update) is True:
                         status = self._execute_files(folder_update, True)
-                        if status is False:
+                        if tools_os.set_boolean(status, False) is False:
                             return False
 
         return True

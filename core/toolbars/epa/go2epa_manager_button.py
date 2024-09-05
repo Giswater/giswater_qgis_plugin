@@ -10,13 +10,14 @@ import json
 from functools import partial
 
 from qgis.PyQt.QtCore import Qt, QRegExp
-from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView
+from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QDialog
 from qgis.PyQt.QtGui import QRegExpValidator, QStandardItemModel
 
 from ..dialog import GwAction
 from ...ui.ui_manager import GwEpaManagerUi
 from ...utils import tools_gw
-from ....libs import tools_qt, tools_db, tools_qgis, tools_os
+from ....libs import tools_qt, tools_db, tools_qgis, tools_os, lib_vars
+from ....libs.tools_qt import GwEditDialog
 
 
 class GwGo2EpaManagerButton(GwAction):
@@ -48,18 +49,16 @@ class GwGo2EpaManagerButton(GwAction):
         self.dlg_manager.btn_archive.setEnabled(False)
         if self.project_type != 'ws':
             self.dlg_manager.btn_set_corporate.setVisible(False)
-            self.dlg_manager.btn_archive.setVisible(False)
 
         # Fill combo box and table view
         # self._fill_combo_result_id()
         self.dlg_manager.tbl_rpt_cat_result.setSelectionBehavior(QAbstractItemView.SelectRows)
         self._fill_manager_table()
-        model = self.dlg_manager.tbl_rpt_cat_result.model()
-        model.itemChanged.connect(partial(self._update_data))
-        model.flags = lambda index: self.flags(index, model)
 
         # Set signals
-        self.dlg_manager.btn_archive.clicked.connect(partial(self._set_rpt_archived, self.dlg_manager.tbl_rpt_cat_result,
+        self.dlg_manager.btn_edit.clicked.connect(partial(self._manage_edit_row, self.dlg_manager, self.dlg_manager.tbl_rpt_cat_result))
+        self.dlg_manager.btn_show_inp_data.clicked.connect(partial(self._show_inp_data, self.dlg_manager, self.dlg_manager.tbl_rpt_cat_result))
+        self.dlg_manager.btn_archive.clicked.connect(partial(self._toggle_rpt_archived, self.dlg_manager.tbl_rpt_cat_result,
                                                               'result_id'))
         self.dlg_manager.btn_set_corporate.clicked.connect(partial(self._epa2data, self.dlg_manager.tbl_rpt_cat_result,
                                                               'result_id'))
@@ -68,7 +67,6 @@ class GwGo2EpaManagerButton(GwAction):
         selection_model = self.dlg_manager.tbl_rpt_cat_result.selectionModel()
         selection_model.selectionChanged.connect(partial(self._fill_txt_infolog))
         selection_model.selectionChanged.connect(partial(self._enable_buttons))
-        self.dlg_manager.tbl_rpt_cat_result.doubleClicked.connect(partial(self._set_result_id, self.dlg_manager, self.dlg_manager.tbl_rpt_cat_result))
         self.dlg_manager.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_manager))
         self.dlg_manager.rejected.connect(partial(tools_gw.close_dialog, self.dlg_manager))
         self.dlg_manager.txt_result_id.textChanged.connect(partial(self._fill_manager_table))
@@ -85,7 +83,8 @@ class GwGo2EpaManagerButton(GwAction):
         if complet_list is False:
             return False, False
         for field in complet_list['body']['data']['fields']:
-            if field.get('hidden'): continue
+            if field.get('hidden'):
+                continue
             model = self.dlg_manager.tbl_rpt_cat_result.model()
             if model is None:
                 model = QStandardItemModel()
@@ -96,8 +95,8 @@ class GwGo2EpaManagerButton(GwAction):
                 self.dlg_manager.tbl_rpt_cat_result = tools_gw.add_tableview_header(self.dlg_manager.tbl_rpt_cat_result, field)
                 self.dlg_manager.tbl_rpt_cat_result = tools_gw.fill_tableview_rows(self.dlg_manager.tbl_rpt_cat_result, field)
 
-        tools_gw.set_tablemodel_config(self.dlg_manager, self.dlg_manager.tbl_rpt_cat_result, 'v_ui_rpt_cat_result', isQStandardItemModel=True)
-        tools_qt.set_tableview_config(self.dlg_manager.tbl_rpt_cat_result, edit_triggers=QTableView.DoubleClicked)
+        tools_gw.set_tablemodel_config(self.dlg_manager, self.dlg_manager.tbl_rpt_cat_result, 'v_ui_rpt_cat_result')
+        tools_qt.set_tableview_config(self.dlg_manager.tbl_rpt_cat_result, edit_triggers=QTableView.NoEditTriggers)
 
         return complet_list
 
@@ -120,24 +119,10 @@ class GwGo2EpaManagerButton(GwAction):
         return complet_list
 
 
-    def flags(self, index, model):
+    def _update_data(self, result_id, columnname, value):
 
-        # print(index.column())
-        if index.column() != 1:
-            flags = Qt.ItemIsSelectable | Qt.ItemIsEnabled
-            return flags
-
-        return QStandardItemModel.flags(model, index)
-
-
-    def _update_data(self, item):
-
-        index = item.index()
-        result_id = index.sibling(index.row(), 0).data()
-        value = index.sibling(index.row(), index.column()).data()
-
-        sql = f"UPDATE v_ui_rpt_cat_result SET expl_id = {value} WHERE result_id = '{result_id}';"
-        result = tools_db.execute_sql(sql)
+        sql = f"""UPDATE v_ui_rpt_cat_result SET "{columnname}" = $${value}$$ WHERE result_id = '{result_id}';"""
+        result = tools_db.execute_sql(sql, log_sql = True)
         if result:
             self._fill_manager_table(tools_qt.get_text(self.dlg_manager, 'txt_result_id'))
 
@@ -159,12 +144,38 @@ class GwGo2EpaManagerButton(GwAction):
         msg = ""
 
         try:
+            # Get column index for column addparam
+            col_ind = tools_qt.get_col_index_by_col_name(self.dlg_manager.tbl_rpt_cat_result, 'addparam')
+            addparam = json.loads(f'{row[col_ind].data()}')
+
+            # Construct custom message with addparam keys
+            if not addparam:
+                raise
+
+            msg += "<b>Properties: </b> <br>"
+            corporate_last_dates = addparam['corporateLastDates']
+            if corporate_last_dates:
+                corporate_start = corporate_last_dates.get('start')
+                corporate_end = corporate_last_dates.get('end')
+                if corporate_start and corporate_end:
+                    msg += f"Corporate from {corporate_start} to {corporate_end}"
+                elif corporate_start and not corporate_end:
+                    msg += f"Corporate since {corporate_start}"
+                elif not corporate_start and corporate_end:
+                    msg += f"Corporate until {corporate_end}"
+                msg += " <br>"
+        except Exception:
+            pass
+
+        try:
             # Get column index for column export_options
             col_ind = tools_qt.get_col_index_by_col_name(self.dlg_manager.tbl_rpt_cat_result, 'export_options')
             export_options = json.loads(f'{row[col_ind].data()}')
 
             # Construct message with all data rows
-            msg += f"<b>Export Options: </b> <br>"
+            if msg:
+                msg += " <br> "
+            msg += "<b>Export Options: </b> <br>"
             for text in export_options:
                 msg += f"{text} : {export_options[text]} <br>"
         except Exception:
@@ -174,8 +185,9 @@ class GwGo2EpaManagerButton(GwAction):
             # Get column index for column network_stats
             col_ind = tools_qt.get_col_index_by_col_name(self.dlg_manager.tbl_rpt_cat_result, 'network_stats')
             network_stats = json.loads(f'{row[col_ind].data()}')
-
-            msg += f" <br> <b>Network Status: </b> <br>"
+            if msg:
+                msg += " <br> "
+            msg += "<b>Network Status: </b> <br>"
             for text in network_stats:
                 msg += f"{text} : {network_stats[text]} <br>"
         except Exception:
@@ -185,8 +197,9 @@ class GwGo2EpaManagerButton(GwAction):
             # Get column index for column inp_options
             col_ind = tools_qt.get_col_index_by_col_name(self.dlg_manager.tbl_rpt_cat_result, 'inp_options')
             inp_options = json.loads(f'{row[col_ind].data()}')
-
-            msg += f" <br> <b>Inp Options: </b> <br>"
+            if msg:
+                msg += " <br> "
+            msg += "<b>Inp Options: </b> <br>"
             for text in inp_options:
                 msg += f"{text} : {inp_options[text]} <br>"
         except Exception:
@@ -199,16 +212,30 @@ class GwGo2EpaManagerButton(GwAction):
     def _enable_buttons(self, selected):
         set_corporate_enabled, archive_enabled = True, True
         selected_rows = self.dlg_manager.tbl_rpt_cat_result.selectionModel().selectedRows()
+        last_status = None
         for idx, index in enumerate(selected_rows):
+            is_corporate = None
+            # set corporate
             col_idx = tools_qt.get_col_index_by_col_name(self.dlg_manager.tbl_rpt_cat_result, 'rpt_stats')
             row = index.row()
             status = index.sibling(row, col_idx).data()
             if not status:
                 set_corporate_enabled = False
+
+            col_idx = tools_qt.get_col_index_by_col_name(self.dlg_manager.tbl_rpt_cat_result, 'iscorporate')
+            if col_idx is None:
+                row = index.row()
+                is_corporate = index.sibling(row, col_idx).data()
+
+            # toggle archive
             col_idx = tools_qt.get_col_index_by_col_name(self.dlg_manager.tbl_rpt_cat_result, 'status')
             status = index.sibling(row, col_idx).data()
-            if status != 'COMPLETED':
-                archive_enabled = False
+            if last_status is None:
+                last_status = status
+            if is_corporate is None:
+                if status == 'PARTIAL' or status != last_status or tools_os.set_boolean(is_corporate, False):
+                    archive_enabled = False
+            last_status = status
 
         if not selected_rows:
             set_corporate_enabled, archive_enabled = False, False
@@ -274,7 +301,7 @@ class GwGo2EpaManagerButton(GwAction):
             self._fill_manager_table(tools_qt.get_text(self.dlg_manager, 'txt_result_id'))
 
 
-    def _set_rpt_archived(self, widget, column_id):
+    def _toggle_rpt_archived(self, widget, column_id):
         """ Call gw_fct_set_rpt_archived with selected result_id
                 :param QTableView widget: origin
                 :param table_name: table origin
@@ -291,9 +318,12 @@ class GwGo2EpaManagerButton(GwAction):
         row = selected_list[0].row()
         col = tools_qt.get_col_index_by_col_name(widget, str(column_id))
         result_id = widget.model().index(row, col).data()
+        col = tools_qt.get_col_index_by_col_name(widget, "status")
+        status = widget.model().index(row, col).data()
 
         # check corporate
-        extras = f'"result_id":"{result_id}"'
+        action = 'RESTORE' if status == 'ARCHIVED' else 'ARCHIVE'
+        extras = f'"result_id":"{result_id}", "action": "{action}"'
         body = tools_gw.create_body(extras=extras)
         result = tools_gw.execute_procedure('gw_fct_set_rpt_archived', body)
 
@@ -368,17 +398,67 @@ class GwGo2EpaManagerButton(GwAction):
         # Refresh table
         self._fill_manager_table()
 
-    def _set_result_id(self, dialog, widget):
+
+    def _manage_edit_row(self, dialog, widget):
+
+        # Get selected rows
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_qgis.show_warning(message, dialog=dialog)
+            tools_qgis.show_warning(message, dialog=self.dlg_manager)
+            return
+        index = selected_list[0]
+
+        columnname = "descript"
+        column = tools_qt.get_col_index_by_col_name(widget, columnname)
+        row = index.row()
+        model = widget.model()
+        value = model.item(row, column).text()
+        header = model.headerData(column, Qt.Horizontal)
+        result_id = model.data(model.index(row, 0))
+
+        edit_dialog = GwEditDialog(dialog, title=f"Edit {header}", label_text=f"Set new '{header}' value for result '{result_id}':",
+                                widget_type="QTextEdit", initial_value=value)
+        if edit_dialog.exec_() == QDialog.Accepted:
+            new_value = edit_dialog.get_value()
+            self._update_data(result_id, columnname, new_value)
+
+
+    def _show_inp_data(self, dialog, widget):
+        # Get selected rows
+        selected_list = widget.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            tools_qgis.show_warning(message, dialog=self.dlg_manager)
             return
 
-        row = selected_list[0].row()
-        table_model = widget.model()
-        result_id = table_model.data(table_model.index(row, 0))
-        sql = f"DELETE FROM selector_rpt_main WHERE cur_user = current_user;" \
-              f"INSERT INTO selector_rpt_main (result_id, cur_user) VALUES ('{result_id}', current_user);"
-        tools_db.execute_sql(sql)
+        result_ids = []
+        for index in selected_list:
+            result_id = widget.model().data(widget.model().index(index.row(), 0))
+            result_ids.append(result_id)
+
+        if not result_ids:
+            return
+
+        result_ids_json = "ARRAY[" + ",".join(f"'{result_id}'" for result_id in result_ids) + "]"
+        json_result = tools_gw.execute_procedure(
+            function_name="gw_fct_getinpdata",
+            parameters=result_ids_json,
+            schema_name=f"{lib_vars.schema_name}",
+            commit=False
+        )
+
+        if not json_result or 'status' not in json_result or json_result['status'] == 'Failed':
+            message = "Failed to retrieve GeoJSON data."
+            tools_qgis.show_warning(message, dialog=self.dlg_manager)
+            return
+
+        # Zoom layer arc if exists
+        arc_layer = tools_qgis.get_layer_by_layername("Rpt INP Arc")
+        if arc_layer:
+            tools_qgis.zoom_to_layer(arc_layer)
+
+        message = "Data retrieved and displayed successfully."
+        tools_qgis.show_info(message, dialog=self.dlg_manager)
+
     # endregion

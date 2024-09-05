@@ -45,7 +45,7 @@ from ..ui.ui_manager import GwSelectorUi
 from . import tools_backend_calls
 from ..load_project_menu import GwMenuLoad
 from ..utils.select_manager import GwSelectManager
-from ..toolbars.toc import epa_world_button
+from ..toolbars.toc import layerstyle_change_button
 from ... import global_vars
 from ...libs import lib_vars, tools_qgis, tools_qt, tools_log, tools_os, tools_db
 from ...libs.tools_qt import GwHyperLinkLabel, GwHyperLinkLineEdit
@@ -542,10 +542,10 @@ def draw_wkt_geometry(wkt_string, rubber_band, color, width):
         tools_qgis.show_warning('Unsuported geometry type', parameter=geometry_type)
 
 
-def enable_feature_type(dialog, widget_name='tbl_relation', ids=None):
-
+def enable_feature_type(dialog, widget_name='tbl_relation', ids=None, widget_table=None):
     feature_type = tools_qt.get_widget(dialog, 'feature_type')
-    widget_table = tools_qt.get_widget(dialog, widget_name)
+    if widget_table is None:
+        widget_table = tools_qt.get_widget(dialog, widget_name)
     if feature_type is not None and widget_table is not None:
         if len(ids) > 0:
             feature_type.setEnabled(False)
@@ -613,7 +613,7 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
         :param group: Name of the group that will be created in the toc (String)
         :param style_id: Id of the style we want to load (integer or String)
     """
-    style_id_epa = "-1"
+
     tablename_og = tablename
     schema_name = tools_db.dao_db_credentials['schema'].replace('"', '')
     field_id = field_id.replace(" ", "")
@@ -622,7 +622,7 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
     if the_geom:
         try:
             uri.setSrid(f"{lib_vars.data_epsg}")
-        except:
+        except Exception:
             pass
     create_groups = get_config_parser("system", "force_create_qgis_group_layer", "user", "init", prefix=False)
     create_groups = tools_os.set_boolean(create_groups, default=False)
@@ -636,43 +636,20 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
                      f"user={tools_db.dao_db_credentials['user']} password={tools_db.dao_db_credentials['password']} " \
                      f"port={tools_db.dao_db_credentials['port']} mode=2 schema={tools_db.dao_db_credentials['schema']} " \
                      f"column={the_geom} table={tablename}"
-        if alias: tablename = alias
+        if alias:
+            tablename = alias
         layer = QgsRasterLayer(connString, tablename)
-        tools_qt.add_layer_to_toc(layer, group, sub_group, create_groups=create_groups)
+        tools_qgis.add_layer_to_toc(layer, group, sub_group, create_groups=create_groups)
 
     else:
-        if alias: tablename = alias
+        if alias:
+            tablename = alias
         layer = QgsVectorLayer(uri.uri(), f'{tablename}', 'postgres')
-        tools_qt.add_layer_to_toc(layer, group, sub_group, create_groups=create_groups, sub_sub_group=sub_sub_group)
+        tools_qgis.add_layer_to_toc(layer, group, sub_group, create_groups=create_groups, sub_sub_group=sub_sub_group)
 
-        # The triggered function (action.triggered.connect(partial(...)) as the last parameter sends a boolean,
-        # if we define style_id = None, style_id will take the boolean of the triggered action as a fault,
-        # therefore, we define it with "-1"
+        # Apply styles to layer
         if style_id in (None, "-1"):
-            # Get style_id from tablename
-            sql = f"SELECT id FROM sys_style WHERE idval = '{tablename_og}'"
-            row = tools_db.get_row(sql)
-            if row:
-                style_id = row[0]
-
-            # Get style_id for Gw Epa Style
-            sql = f"SELECT id FROM sys_style WHERE idval = '{tablename_og} SWMM point of view'"
-            row = tools_db.get_row(sql)
-            if row:
-                style_id_epa = row[0]
-            else:
-                sql = f"SELECT id FROM sys_style WHERE idval = '{tablename_og} EPANET point of view'"
-                row = tools_db.get_row(sql)
-                if row:
-                    style_id_epa = row[0]
-
-        # Apply style to layer if it has one configured
-        if style_id not in (None, "-1"):
-            set_layer_style(style_id, layer)
-
-        # Apply Gw EPA style to layer if it has one configured
-        if style_id_epa not in (None, "-1"):
-            set_layer_style(style_id_epa, layer, True)
+            set_layer_styles(tablename_og, layer)
 
         if tablename:
             # Set layer config
@@ -713,6 +690,8 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
     global_vars.iface.mapCanvas().refresh()
 
 def validate_qml(qml_content):
+    if not qml_content:
+        return False, "QML is empty!"
     qml_content_no_spaces = qml_content.replace("\n", "").replace("\t", "")
     try:
         root = ET.fromstring(qml_content_no_spaces)
@@ -721,14 +700,16 @@ def validate_qml(qml_content):
         return False, str(e)
 
 
-def set_layer_style(style_id, layer, is_epa=False):
-    body = f'$${{"data":{{"style_id":"{style_id}"}}}}$$'
-    style = execute_procedure('gw_fct_getstyle', body)
-    if style is None or style['status'] == 'Failed':
+def set_layer_styles(tablename, layer):
+    body = f'$${{"data":{{"layername":"{tablename}"}}}}$$'
+    json_return = execute_procedure('gw_fct_getstyle', body)
+    if json_return is None or json_return['status'] == 'Failed':
         return
-    if 'styles' in style['body']:
-        if 'style' in style['body']['styles']:
-            qml = style['body']['styles']['style']
+    if 'styles' in json_return['body']:
+        for style_name, qml in json_return['body']['styles'].items():
+
+            if qml is None:
+                continue
 
             valid_qml, error_message = validate_qml(qml)
             if not valid_qml:
@@ -737,18 +718,13 @@ def set_layer_style(style_id, layer, is_epa=False):
             else:
                 style_manager = layer.styleManager()
 
-                # read valid style from layer
-                style = QgsMapLayerStyle()
-                style.readFromLayer(layer)
-
-                style_name = "GwEpaStyle" if is_epa else "GwStyle"
+                default_style_name = tools_qt.tr('default', context_name='QgsMapLayerStyleManager')
                 # add style with new name
-                style_manager.addStyle(style_name, style)
+                style_manager.renameStyle(default_style_name, style_name)
                 # set new style as current
                 style_manager.setCurrentStyle(style_name)
-
                 tools_qgis.create_qml(layer, qml)
-                style_manager.setCurrentStyle("GwStyle")
+
 
 def add_layer_temp(dialog, data, layer_name, force_tab=True, reset_text=True, tab_idx=1, del_old_layers=True,
                    group='GW Temporal Layers', call_set_tabs_enabled=True, close=True):
@@ -1169,7 +1145,10 @@ def delete_selected_rows(widget, table_object):
 
     for i in range(0, len(selected_list)):
         row = selected_list[i].row()
-        id_ = widget.model().record(row).value(str(field_object_id))
+        if isinstance(widget.model(), QStandardItemModel):
+            id_ = widget.model().item(row, 0).text()
+        else:
+            id_ = widget.model().record(row).value(str(field_object_id))
         inf_text += f"{id_}, "
         list_id += f"'{id_}', "
     inf_text = inf_text[:-2]
@@ -1181,7 +1160,8 @@ def delete_selected_rows(widget, table_object):
         sql = (f"DELETE FROM {table_object} "
                f"WHERE {field_object_id} IN ({list_id})")
         tools_db.execute_sql(sql)
-        widget.model().select()
+        if hasattr(widget.model(), 'select'):
+            widget.model().select()  # Refresh if it's a QSqlTableModel
 
 
 def set_tabs_enabled(dialog):
@@ -1948,6 +1928,29 @@ def fill_typeahead(completer, model, field, dialog, widget, feature_id=None):
 
     if not widget:
         return
+
+    # Detect the active tab
+    active_tab_name = ""
+    tab_widget = dialog.findChild(QTabWidget)
+    if tab_widget:
+        active_tab_name = tab_widget.tabText(tab_widget.currentIndex())
+
+    # Custom logic for the "Doc" tab
+    if active_tab_name == "Doc":
+        search_text = tools_qt.get_text(dialog, widget)
+        query = f"SELECT name as idval FROM doc WHERE name ILIKE '%{search_text}%'"
+        rows = tools_db.get_rows(query)
+
+        if not rows:
+            # Handle the case when no matching documents are found
+            print("No matching documents found.")
+            list_items = []
+        else:
+            list_items = [row['idval'] for row in rows]
+
+        tools_qt.set_completer_object(completer, model, widget, list_items)
+        return
+
     parent_id = ""
     if 'parentId' in field:
         parent_id = field["parentId"]
@@ -2210,9 +2213,10 @@ def get_expression_filter(feature_type, list_ids=None, layers=None):
     """
 
     list_ids = list_ids[feature_type]
-    field_id = feature_type + "_id"
     if len(list_ids) == 0:
         return None
+
+    field_id = feature_type + "_id"
 
     # Set expression filter with features in the list
     expr_filter = field_id + " IN ("
@@ -2575,15 +2579,29 @@ def manage_json_return(json_result, sql, rubber_band=None, i=None):
 
                     elif style_type[key]['style'] == 'qml':
                         style_id = style_type[key]['id']
-                        extras = f'"style_id":"{style_id}"'
+                        extras = f'"style_id":"{style_id}", "layername":"{key}"'
                         body = create_body(extras=extras)
                         style = execute_procedure('gw_fct_getstyle', body)
                         if style is None or style.get('status') == 'Failed':
                             return
                         if 'styles' in style['body']:
-                            if 'style' in style['body']['styles']:
-                                qml = style['body']['styles']['style']
-                                tools_qgis.create_qml(v_layer, qml)
+                            for style_name, qml in style['body']['styles'].items():
+                                if qml is None:
+                                    continue
+
+                                valid_qml, error_message = validate_qml(qml)
+                                if not valid_qml:
+                                    msg = "The QML file is invalid."
+                                    tools_qgis.show_warning(msg, parameter=error_message)
+                                else:
+                                    style_manager = v_layer.styleManager()
+
+                                    default_style_name = tools_qt.tr('default', context_name='QgsMapLayerStyleManager')
+                                    # add style with new name
+                                    style_manager.renameStyle(default_style_name, style_name)
+                                    # set new style as current
+                                    style_manager.setCurrentStyle(style_name)
+                                    tools_qgis.create_qml(v_layer, qml)
 
                     elif style_type[key]['style'] == 'unique':
                         color = style_type[key]['values']['color']
@@ -2607,10 +2625,15 @@ def manage_json_return(json_result, sql, rubber_band=None, i=None):
         tools_qgis.clean_layer_group_from_toc('GW Temporal Layers')
 
 
-def get_rows_by_feature_type(class_object, dialog, table_object, feature_type):
+def get_rows_by_feature_type(class_object, dialog, table_object, feature_type, feature_id=None, feature_idname=None):
     """ Get records of @feature_type associated to selected @table_object """
 
-    object_id = tools_qt.get_text(dialog, table_object + "_id")
+    if feature_id is None:
+        feature_id = tools_qt.get_text(dialog, table_object + "_id")
+
+    if feature_idname is None:
+        feature_idname = f"{table_object}_id"
+
     table_relation = table_object + "_x_" + feature_type
     widget_name = "tbl_" + table_relation
 
@@ -2621,7 +2644,7 @@ def get_rows_by_feature_type(class_object, dialog, table_object, feature_type):
 
     sql = (f"SELECT {feature_type}_id "
            f"FROM {table_relation} "
-           f"WHERE {table_object}_id = '{object_id}'")
+           f"WHERE {feature_idname} = '{feature_id}'")
     rows = tools_db.get_rows(sql, log_info=False)
     if rows:
         for row in rows:
@@ -2629,7 +2652,7 @@ def get_rows_by_feature_type(class_object, dialog, table_object, feature_type):
             class_object.ids.append(str(row[0]))
 
         expr_filter = get_expression_filter(feature_type, class_object.list_ids, class_object.layers)
-        table_name = f"v_edit_{feature_type}"
+        table_name = f"{class_object.schema_name}.v_edit_{feature_type}"
         tools_qt.set_table_model(dialog, widget_name, table_name, expr_filter)
 
 
@@ -2708,23 +2731,26 @@ def get_layers_from_feature_type(feature_type):
 
 def get_role_permissions(qgis_project_role):
 
+    role_admin = False
     role_master = False
     role_edit = False
     role_om = False
     role_epa = False
     role_basic = False
 
-    role_admin = tools_db.check_role_user("role_admin")
-    if not role_admin:
-        role_master = tools_db.check_role_user("role_master")
-        if not role_master:
-            role_epa = tools_db.check_role_user("role_epa")
-            if not role_epa:
-                role_edit = tools_db.check_role_user("role_edit")
-                if not role_edit:
-                    role_om = tools_db.check_role_user("role_om")
-                    if not role_om:
-                        role_basic = tools_db.check_role_user("role_basic")
+    role_system = tools_db.check_role_user("role_system")
+    if not role_system:
+        role_admin = tools_db.check_role_user("role_admin")
+        if not role_admin:
+            role_master = tools_db.check_role_user("role_master")
+            if not role_master:
+                role_epa = tools_db.check_role_user("role_epa")
+                if not role_epa:
+                    role_edit = tools_db.check_role_user("role_edit")
+                    if not role_edit:
+                        role_om = tools_db.check_role_user("role_om")
+                        if not role_om:
+                            role_basic = tools_db.check_role_user("role_basic")
 
     if role_basic or qgis_project_role == 'role_basic':
         return 'role_basic'
@@ -2738,6 +2764,8 @@ def get_role_permissions(qgis_project_role):
         return 'role_master'
     elif role_admin or qgis_project_role == 'role_admin':
         return 'role_admin'
+    elif role_system or qgis_project_role == 'role_system':
+        return 'role_system'
     else:
         return 'role_basic'
 
@@ -2886,7 +2914,7 @@ def selection_changed(class_object, dialog, table_object, query=False, lazy_widg
         load_tablename(dialog, table_object, class_object.feature_type, expr_filter)
         tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
 
-    enable_feature_type(dialog, table_object, ids=ids)
+    enable_feature_type(dialog, widget_table=table_object, ids=ids)
     class_object.ids = ids
 
 
@@ -2935,7 +2963,7 @@ def set_model_signals(class_object):
             class_object._manage_tab_feature_buttons
         ))
 
-def insert_feature(class_object, dialog, table_object, query=False, remove_ids=True, lazy_widget=None,
+def insert_feature(class_object, dialog, table_object, is_psector=False, remove_ids=True, lazy_widget=None,
                    lazy_init_function=None):
     """ Select feature with entered id. Set a model with selected filter.
         Attach that model to selected table
@@ -2943,7 +2971,12 @@ def insert_feature(class_object, dialog, table_object, query=False, remove_ids=T
 
     tools_qgis.disconnect_signal_selection_changed()
     feature_type = get_signal_change_tab(dialog)
-    # Clear list of ids
+
+    # Initialize the list for the specific feature type if it doesn't exist
+    if feature_type not in class_object.list_ids:
+        class_object.list_ids[feature_type] = []
+
+    # Clear the temporary ids list when switching tabs or as needed
     if remove_ids:
         class_object.ids = []
 
@@ -2961,10 +2994,12 @@ def insert_feature(class_object, dialog, table_object, query=False, remove_ids=T
 
     if feature_id == 'null':
         message = "You need to enter a feature id"
-        tools_qt.show_info_box(message)
+        tools_qt.tools_qgis.show_warning(message, dialog=dialog)
         return
 
-    # Iterate over all layers of the group
+    # Temporarily store IDs to be added for this feature type
+    selected_ids = []
+
     for layer in class_object.layers[feature_type]:
         if layer.selectedFeatureCount() > 0:
             # Get selected features of the layer
@@ -2972,17 +3007,23 @@ def insert_feature(class_object, dialog, table_object, query=False, remove_ids=T
             for feature in features:
                 # Append 'feature_id' into the list
                 selected_id = feature.attribute(field_id)
-                if selected_id not in class_object.ids:
-                    class_object.ids.append(selected_id)
-        if feature_id not in class_object.ids:
-            # If feature id doesn't exist in list -> add
-            class_object.ids.append(str(feature_id))
+                if selected_id not in selected_ids:
+                    selected_ids.append(selected_id)
 
-    # Set expression filter with features in the list
-    expr_filter = f'"{field_id}" IN (  '
-    for i in range(len(class_object.ids)):
-        expr_filter += f"'{class_object.ids[i]}', "
-    expr_filter = expr_filter[:-2] + ")"
+    if feature_id not in selected_ids:
+        selected_ids.append(str(feature_id))
+
+    # Append the new IDs to the existing list, ensuring no duplicates
+    class_object.list_ids[feature_type] = list(set(class_object.list_ids[feature_type] + selected_ids))
+
+    # Generate expression filter for the IDs
+    if class_object.list_ids[feature_type]:
+        expr_filter = f'"{field_id}" IN ('
+        for i in range(len(class_object.list_ids[feature_type])):
+            expr_filter += f"'{class_object.list_ids[feature_type][i]}', "
+        expr_filter = expr_filter[:-2] + ")"
+    else:
+        expr_filter = f'"{field_id}" IN (NULL)'
 
     # Check expression
     (is_valid, expr) = tools_qt.check_expression_filter(expr_filter)
@@ -2998,18 +3039,18 @@ def insert_feature(class_object, dialog, table_object, query=False, remove_ids=T
             layer.selectByIds(id_list)
 
     # Reload contents of table 'tbl_xxx_xxx_@feature_type'
-    if query:
-        _insert_feature_psector(dialog, feature_type, ids=class_object.ids)
+    if is_psector:
+        _insert_feature_psector(dialog, feature_type, ids=selected_ids)
         layers = remove_selection(True, class_object.layers)
         class_object.layers = layers
     else:
         load_tablename(dialog, table_object, feature_type, expr_filter)
         tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
 
-    # Update list
-    class_object.list_ids[feature_type] = class_object.ids
-    enable_feature_type(dialog, table_object, ids=class_object.ids)
-    connect_signal_selection_changed(class_object, dialog, table_object, feature_type)
+    enable_feature_type(dialog, table_object, ids=class_object.list_ids[feature_type])
+
+    # Clear the feature_id text field
+    tools_qt.set_widget_text(dialog, "feature_id", "")
 
 
 def remove_selection(remove_groups=True, layers=None):
@@ -3129,7 +3170,7 @@ def manage_docker_options(option_name='position'):
         lib_vars.session_vars['dialog_docker'].position = 2
 
 
-def set_tablemodel_config(dialog, widget, table_name, sort_order=0, isQStandardItemModel=False, schema_name=None):
+def set_tablemodel_config(dialog, widget, table_name, sort_order=0, schema_name=None):
     """ Configuration of tables. Set visibility and width of columns """
 
     widget = tools_qt.get_widget(dialog, widget)
@@ -3143,7 +3184,7 @@ def set_tablemodel_config(dialog, widget, table_name, sort_order=0, isQStandardI
 
     # Set width and alias of visible columns
     columns_to_delete = []
-    sql = (f"SELECT columnindex, width, alias, visible, style"
+    sql = (f"SELECT columnname, columnindex, width, alias, visible, style"
            f" FROM {config_table}"
            f" WHERE objectname = '{table_name}'"
            f" ORDER BY columnindex")
@@ -3152,32 +3193,51 @@ def set_tablemodel_config(dialog, widget, table_name, sort_order=0, isQStandardI
     if not rows:
         return widget
 
+    # Create a dictionary to store the desired column positions
+    column_order = {}
     for row in rows:
+        column_order[row['columnname']] = row['columnindex']
+
+    # Clear columns_dict
+    widget.setProperty('columns', None)
+
+    # Reorder columns in the widget according to columnindex
+    header = widget.horizontalHeader()
+    for column_name, column_index in sorted(column_order.items(), key=lambda item: item[1]):
+        col_idx = tools_qt.get_col_index_by_col_name(widget, column_name)
+        if col_idx is not None:
+            header.moveSection(header.visualIndex(col_idx), column_index)
+
+    columns_dict: Dict[str, str] = {}
+    for row in rows:
+        col_idx = tools_qt.get_col_index_by_col_name(widget, row['columnname'])
+        if col_idx is None:
+            continue
+        columns_dict[str(row['alias'] if row['alias'] else row['columnname'])] = str(row['columnname'])
         if not row['visible']:
-            columns_to_delete.append(row['columnindex'])
+            columns_to_delete.append(col_idx)
         else:
             style = row.get('style')
             if style:
                 stretch = style.get('stretch')
                 if stretch is not None:
                     stretch = 1 if stretch else 0
-                    widget.horizontalHeader().setSectionResizeMode(row['columnindex'], stretch)
+                    widget.horizontalHeader().setSectionResizeMode(col_idx, stretch)
             width = row['width']
             if width is None:
                 width = 100
-            widget.setColumnWidth(row['columnindex'], width)
+            widget.setColumnWidth(col_idx, width)
             if row['alias'] is not None:
-                widget.model().setHeaderData(row['columnindex'], Qt.Horizontal, row['alias'])
-
+                widget.model().setHeaderData(col_idx, Qt.Horizontal, row['alias'])
+    widget.setProperty('columns', columns_dict)
     # Set order
-    if isQStandardItemModel:
-        widget.model().sort(0, sort_order)
-    else:
+    if isinstance(widget.model(), QStandardItemModel) is False:
         widget.model().setSort(0, sort_order)
         widget.model().select()
     # Delete columns
     for column in columns_to_delete:
-        widget.hideColumn(column)
+        if column:
+            widget.hideColumn(column)
 
     return widget
 
@@ -3287,6 +3347,7 @@ def load_tablename(dialog, table_object, feature_type, expr_filter):
         return None
 
     table_name = f"v_edit_{feature_type}"
+
     expr = tools_qt.set_table_model(dialog, widget, table_name, expr_filter)
     if widget_name is not None:
         set_tablemodel_config(dialog, widget_name, table_name)
@@ -3429,7 +3490,7 @@ def manage_close(dialog, table_object, cur_active_layer=None, single_tool_mode=N
     return layers
 
 
-def delete_records(class_object, dialog, table_object, query=False, lazy_widget=None, lazy_init_function=None, extra_field=None):
+def delete_records(class_object, dialog, table_object, is_psector=False, lazy_widget=None, lazy_init_function=None, extra_field=None):
     """ Delete selected elements of the table """
 
     tools_qgis.disconnect_signal_selection_changed()
@@ -3457,10 +3518,10 @@ def delete_records(class_object, dialog, table_object, query=False, lazy_widget=
 
     if len(selected_list) == 0:
         message = "Any record selected"
-        tools_qt.show_info_box(message)
+        tools_qt.tools_qgis.show_warning(message, dialog=dialog)
         return
 
-    if query:
+    if is_psector:
         full_list = widget.model()
         for x in range(0, full_list.rowCount()):
             class_object.ids.append(widget.model().record(x).value(f"{feature_type}_id"))
@@ -3505,7 +3566,7 @@ def delete_records(class_object, dialog, table_object, query=False, lazy_widget=
             return
 
     # Update model of the widget with selected expr_filter
-    if query:
+    if is_psector:
         state = None
         if extra_field is not None and len(selected_list) == 1:
             state = widget.model().record(selected_list[0].row()).value(extra_field)
@@ -3519,13 +3580,12 @@ def delete_records(class_object, dialog, table_object, query=False, lazy_widget=
     # Build a list of feature id's and select them
     tools_qgis.select_features_by_ids(feature_type, expr, layers=class_object.layers)
 
-    if query:
+    if is_psector:
         class_object.layers = remove_selection(layers=class_object.layers)
 
     # Update list
     class_object.list_ids[feature_type] = class_object.ids
     enable_feature_type(dialog, table_object, ids=class_object.ids)
-    connect_signal_selection_changed(class_object, dialog, table_object, query)
 
 
 def get_parent_layers_visibility():
@@ -3616,16 +3676,6 @@ def execute_class_function(dlg_class, func_name: str, kwargs: dict = None):
             getattr(class_obj, func_name)(**kwargs)
         except Exception as e:
             tools_log.log_debug(f"Exception in tools_gw.execute_class_function (executing {func_name} from {dlg_class.__name__}): {e}")
-
-
-def is_epa_world_active(default=False):
-    return epa_world_button.is_epa_world_active(default)
-
-
-def set_epa_world(_set_epa_world=None, selector_change=False, is_init=False):
-    """ Activate or deactivate EPA world. If @_set_epa_world is None it will just refresh the filters """
-
-    epa_world_button.set_epa_world(_set_epa_world, selector_change, is_init)
 
 
 def open_dlg_help():
@@ -4185,7 +4235,7 @@ def fill_tbl(complet_result, dialog, widgetname, linkedobject, filter_fields):
         if widget is None: continue
         widget = add_tableview_header(widget, field)
         widget = fill_tableview_rows(widget, field)
-        widget = set_tablemodel_config(dialog, widget, short_name, 1, True)
+        widget = set_tablemodel_config(dialog, widget, short_name, 1)
         tools_qt.set_tableview_config(widget, edit_triggers=QTableView.DoubleClicked)
 
     widget_list = []
@@ -4215,6 +4265,33 @@ def _get_list(complet_result, form_name='', filter_fields='', widgetname='', for
         return False
 
     return complet_list
+
+
+def get_list(table_name, filter_name="", filter_id=None, filter_active=None, id_field=None):
+    if id_field is None:
+        id_field = "id_val"
+
+    feature = f'"tableName":"{table_name}"'
+    filter_fields = f'"limit": -1, "{id_field}": {{"filterSign":"ILIKE", "value":"{filter_name}"}}'
+
+    if filter_id is not None:
+        filter_fields += f', "{id_field}": {{"filterSign":"=", "value":"{filter_id}"}}'
+
+    if filter_active is not None:
+        filter_fields += f', "active": {{"filterSign":"=", "value":"{filter_active}"}}'
+
+    body = create_body(feature=feature, filter_fields=filter_fields)
+    json_result = execute_procedure('gw_fct_getlist', body)
+
+    if json_result is None or json_result['status'] == 'Failed':
+        return False
+
+    complet_list = json_result
+    if not complet_list:
+        return False
+
+    return complet_list
+
 
 # startregion
 # Info buttons

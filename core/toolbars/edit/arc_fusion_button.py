@@ -153,7 +153,7 @@ class GwArcFusionButton(GwMaptool):
         # Fill ComboBox cmb_statetype
         sql = "SELECT id, name as idval FROM value_state_type WHERE id IS NOT NULL AND state = 0"
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.dlg_fusion.cmb_statetype, rows, add_empty=True)
+        tools_qt.fill_combo_values(self.dlg_fusion.cmb_statetype, rows)
         state_type = tools_gw.get_config_parser("btn_arc_fusion", "cmb_statetype", "user", "session")
         if state_type not in (None, 'None', ''):
             tools_qt.set_widget_text(self.dlg_fusion, "cmb_statetype", state_type)

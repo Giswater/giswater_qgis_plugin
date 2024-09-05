@@ -14,10 +14,14 @@
    <string>Visit</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_6">
-   <item row="0" column="0">
-    <widget class="QStatusBar" name="statusbar"/>
-   </item>
    <item row="1" column="0">
+    <widget class="QDialogButtonBox" name="button_box">
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0">
     <widget class="QWidget" name="centralwidget" native="true">
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>
@@ -318,9 +322,6 @@
             </property>
            </widget>
           </item>
-          <item row="11" column="0" colspan="4">
-           <widget class="QTextEdit" name="descript"/>
-          </item>
           <item row="0" column="0">
            <widget class="QLabel" name="lbl_id">
             <property name="font">
@@ -395,6 +396,9 @@
           </item>
           <item row="9" column="3">
            <widget class="QComboBox" name="expl_id"/>
+          </item>
+          <item row="10" column="3">
+           <widget class="QTextEdit" name="descript"/>
           </item>
          </layout>
         </widget>
@@ -677,18 +681,10 @@
      </layout>
     </widget>
    </item>
-   <item row="2" column="0">
-    <widget class="QDialogButtonBox" name="button_box">
-     <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-     </property>
-    </widget>
-   </item>
   </layout>
  </widget>
  <tabstops>
   <tabstop>tab_widget</tabstop>
-  <tabstop>descript</tabstop>
   <tabstop>btn_add_geom</tabstop>
   <tabstop>button_box</tabstop>
   <tabstop>feature_id</tabstop>
