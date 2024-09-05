@@ -23,7 +23,7 @@
 	- dimensions (muni_id, sector_id)
 	WS
 	- pond & pool (muni_id)
-- New columns for WS mapzones: presszone_type, dma_type, dqa_type
+- New columns for WS mapzones: dma_type, dqa_type
 - New columns for UD mapzones: drainzone_type, dma_type, sector_type
 - New column for UD dma and sector: graphconfig
 - New column for UD cat_feature_node: graph_delimiter
