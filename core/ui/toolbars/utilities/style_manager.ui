@@ -21,7 +21,7 @@
      </property>
      <layout class="QGridLayout" name="verticalLayout_3">
       <item row="3" column="11">
-       <widget class="QPushButton" name="btn_cancel">
+       <widget class="QPushButton" name="btn_close">
         <property name="text">
          <string>Close</string>
         </property>

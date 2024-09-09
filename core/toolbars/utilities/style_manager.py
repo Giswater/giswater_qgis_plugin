@@ -59,6 +59,8 @@ class GwStyleManager:
         self.style_mng_dlg.btn_update_style.clicked.connect(self._update_selected_style)
         self.style_mng_dlg.btn_refresh_all.clicked.connect(self._refresh_all_styles)
 
+        self.style_mng_dlg.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.style_mng_dlg, True, 'core'))
+
         # Open the style management dialog
         tools_gw.open_dialog(self.style_mng_dlg, 'style_manager')
 
