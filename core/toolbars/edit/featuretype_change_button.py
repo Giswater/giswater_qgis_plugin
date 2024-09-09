@@ -18,7 +18,9 @@ from ...ui.ui_manager import GwFeatureTypeChangeUi
 from ...utils import tools_gw
 from ....libs import tools_qgis, tools_qt, tools_db
 from .... import global_vars
-
+from qgis.PyQt.QtWidgets import QAction, QAbstractItemView, QCheckBox, QComboBox, QCompleter, QDoubleSpinBox, \
+    QDateEdit, QGridLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QPushButton, QSizePolicy, \
+    QSpinBox, QSpacerItem, QTableView, QTabWidget, QWidget, QTextEdit, QRadioButton, QToolBox
 
 class GwFeatureTypeChangeButton(GwMaptool):
     """ Button 28: Change feature type
@@ -153,79 +155,6 @@ class GwFeatureTypeChangeButton(GwMaptool):
         self.current_layer = tools_qgis.get_layer_by_tablename(tablename)
         self.iface.setActiveLayer(self.current_layer)
 
-
-    def _open_catalog(self, feature_type):
-
-        # Get feature_type
-        child_type = tools_qt.get_text(self.dlg_change, self.dlg_change.feature_type_new)
-        if child_type == 'null':
-            msg = "New feature type is null. Please, select a valid value"
-            tools_qt.show_info_box(msg, "Info")
-            return
-
-        self.catalog = GwCatalog()
-        self.catalog.open_catalog(self.dlg_change, 'featurecat_id', feature_type, child_type)
-
-
-    def _edit_change_elem_type_accept(self):
-        """ Update current type of feature and save changes in database """
-
-        project_type = tools_gw.get_project_type()
-        feature_type_new = tools_qt.get_text(self.dlg_change, self.dlg_change.feature_type_new)
-        featurecat_id = tools_qt.get_text(self.dlg_change, self.dlg_change.featurecat_id)
-
-        if feature_type_new != "null":
-
-            if (featurecat_id != "null" and featurecat_id is not None and project_type == 'ws') or (
-                    project_type == 'ud'):
-
-                # Get function input parameters
-                feature = f'"type":"{self.feature_type}"'
-                extras = f'"feature_id":"{self.feature_id}"'
-                extras += f', "feature_type_new":"{feature_type_new}"'
-                extras += f', "featurecat_id":"{featurecat_id}"'
-                body = tools_gw.create_body(feature=feature, extras=extras)
-
-                # Execute SQL function and show result to the user
-                complet_result = tools_gw.execute_procedure('gw_fct_setchangefeaturetype', body)
-                if not complet_result:
-                    message = "Error replacing feature"
-                    tools_qgis.show_warning(message)
-                    # Check in init config file if user wants to keep map tool active or not
-                    self.manage_active_maptool()
-                    tools_gw.close_dialog(self.dlg_change)
-                    return
-
-                tools_gw.set_config_parser("btn_featuretype_change", "feature_type_new", feature_type_new)
-                tools_gw.set_config_parser("btn_featuretype_change", "featurecat_id", featurecat_id)
-                message = "Values has been updated"
-                tools_qgis.show_info(message)
-
-            else:
-                message = "Field catalog_id required!"
-                tools_qgis.show_warning(message, dialog=self.dlg_change)
-                return
-
-        else:
-            message = "Feature has not been updated because no catalog has been selected"
-            tools_qgis.show_warning(message)
-
-        # Close form
-        tools_gw.close_dialog(self.dlg_change)
-
-        # Refresh map canvas
-        self.refresh_map_canvas()
-
-        # Check if the expression is valid
-        expr_filter = f"{self.feature_type}_id = '{self.feature_id}'"
-        (is_valid, expr) = tools_qt.check_expression_filter(expr_filter)  # @UnusedVariable
-        if not is_valid:
-            return
-
-        # Check in init config file if user wants to keep map tool active or not
-        self.manage_active_maptool()
-
-
     def _open_custom_form(self, layer, expr):
         """ Open custom from selected layer """
 
@@ -242,76 +171,97 @@ class GwFeatureTypeChangeButton(GwMaptool):
             dialog.dlg_closed.connect(partial(tools_qgis.restore_user_layer, self.tablename))
 
 
-    def _change_elem_type(self, feature):
+    def _open_dialog(self):
+        """ Open Feature Change Dialog dynamic """
 
-        # Create the dialog, fill feature_type and define its signals
+        feature = f'"tableName":"{self.tablename}", "id":"{self.feature_id}"'
+        body = tools_gw.create_body(feature = feature)
+        json_result = tools_gw.execute_procedure('gw_fct_getfeaturereplace', body)
         self.dlg_change = GwFeatureTypeChangeUi(self)
         tools_gw.load_settings(self.dlg_change)
-        tools_gw.add_icon(self.dlg_change.btn_catalog, "195")
-
-        # Get featuretype_id from current feature
-        project_type = tools_gw.get_project_type()
-        if project_type == 'ws':
-            self.dlg_change.feature_type_new.currentIndexChanged.connect(partial(self._filter_catalog))
-        elif project_type == 'ud':
-            sql = (f"SELECT DISTINCT(id), id as idval "
-                   f"FROM {self.cat_table} "
-                   f"WHERE active IS TRUE OR active IS NULL "
-                   f"ORDER BY id")
-            rows = tools_db.get_rows(sql, log_sql=True)
-            tools_qt.fill_combo_values(self.dlg_change.featurecat_id, rows)
-
-            # Set default value
-            featurecat_id = tools_gw.get_config_parser("btn_featuretype_change", "featurecat_id", "user", "session")
-            if featurecat_id not in (None, "None"):
-                tools_qt.set_combo_value(self.dlg_change.featurecat_id, featurecat_id, 1, add_new=False)
-            tools_qt.set_autocompleter(self.dlg_change.featurecat_id)
-
-        # Get feature type from current feature
-        feature_type = feature.attribute(self.feature_edit_type)
-        self.dlg_change.feature_type.setText(feature_type)
-
-        # Fill 1st combo boxes-new system feature type
-        sql = (f"SELECT DISTINCT(id), id as idval "
-               f"FROM cat_feature "
-               f"WHERE lower(feature_type) = '{self.feature_type}' AND active is True "
-               f"ORDER BY id")
-        rows = tools_db.get_rows(sql)
-        rows.insert(0, ['', ''])
-        feature_type_new = tools_gw.get_config_parser("btn_featuretype_change", "feature_type_new", "user", "session")
-        tools_qt.fill_combo_values(self.dlg_change.feature_type_new, rows)
-        if feature_type_new in (None, "None"):
-            feature_type_new = feature_type
-        in_combo = tools_qt.set_combo_value(self.dlg_change.feature_type_new, feature_type_new, 0, add_new=False)
-        if not in_combo:
-            tools_qt.set_combo_value(self.dlg_change.feature_type_new, feature_type, 0)
-
-        # Set buttons signals
-        self.dlg_change.btn_catalog.clicked.connect(partial(self._open_catalog, self.feature_type))
-        self.dlg_change.btn_accept.clicked.connect(self._edit_change_elem_type_accept)
-        self.dlg_change.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_change))
-
-        # Open dialog
+        self._manage_dlg_widgets(self.dlg_change, json_result)
         tools_gw.open_dialog(self.dlg_change, 'featuretype_change')
 
 
-    def _filter_catalog(self):
+    def _manage_dlg_widgets(self, dialog,complet_result):
+        """ Creates and populates all the widgets """
 
-        feature_type_new = tools_qt.get_text(self.dlg_change, self.dlg_change.feature_type_new)
-        if feature_type_new == "null":
-            return
+        layout_list = []
+        widget_offset = 0
+        prev_layout = ""
+        for field in complet_result['body']['data']['fields']:
+            if field.get('hidden'):
+                continue
 
-        # Populate catalog_id
-        sql = (f"SELECT DISTINCT(id), id as idval "
-               f"FROM {self.cat_table} "
-               f"WHERE {self.feature_type}type_id = '{feature_type_new}' AND (active IS TRUE OR active IS NULL) "
-               f"ORDER BY id")
-        rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.dlg_change.featurecat_id, rows)
-        featurecat_id = tools_gw.get_config_parser("btn_featuretype_change", "featurecat_id", "user", "session")
-        if featurecat_id not in (None, "None"):
-            tools_qt.set_combo_value(self.dlg_change.featurecat_id, featurecat_id, 1, add_new=False)
-        tools_qt.set_autocompleter(self.dlg_change.featurecat_id)
+            if field['widgettype'] is "button":
+                continue
+
+            if field.get('widgetcontrols') and field['widgetcontrols'].get('hiddenWhenNull') \
+                    and field.get('value') in (None, ''):
+                continue
+            label, widget = tools_gw.set_widgets(dialog, complet_result, field, self.tablename, self)
+            if widget is None:
+                continue
+
+            layout = dialog.findChild(QGridLayout, field['layoutname'])
+            if layout is not None:
+                if layout.objectName() != prev_layout:
+                    widget_offset = 0
+                    prev_layout = layout.objectName()
+                # Take the QGridLayout with the intention of adding a QSpacerItem later
+                if layout not in layout_list and layout.objectName() in ('lyt_main_1', 'lyt_main_2', 'lyt_main_3','lyt_buttons'):
+                    layout_list.append(layout)
+
+                if field['layoutorder'] is None:
+                    message = "The field layoutorder is not configured for"
+                    msg = f"formname:{self.tablename}, columnname:{field['columnname']}"
+                    tools_qgis.show_message(message, 2, parameter=msg, dialog=dialog)
+                    continue
+
+                # Manage widget and label positions
+                label_pos = field['widgetcontrols']['labelPosition'] if (
+                            'widgetcontrols' in field and field['widgetcontrols'] and 'labelPosition' in field[
+                             'widgetcontrols']) else None
+                widget_pos = field['layoutorder'] + widget_offset
+
+                # The data tab is somewhat special (it has 2 columns)
+                if 'lyt_data' in layout.objectName() or 'lyt_epa_data' in layout.objectName():
+                    tools_gw.add_widget(dialog, field, label, widget)
+                # If the widget has a label
+                elif label:
+                    # If it has a labelPosition configured
+                    if label_pos is not None:
+                        if label_pos == 'top':
+                            layout.addWidget(label, 0, widget_pos)
+                            if type(widget) is QSpacerItem:
+                                layout.addItem(widget, 1, widget_pos)
+                            else:
+                                layout.addWidget(widget, 1, widget_pos)
+                        elif label_pos == 'left':
+                            layout.addWidget(label, 0, widget_pos)
+                            if type(widget) is QSpacerItem:
+                                layout.addItem(widget, 0, widget_pos + 1)
+                            else:
+                                layout.addWidget(widget, 0, widget_pos + 1)
+                            widget_offset += 1
+                        else:
+                            if type(widget) is QSpacerItem:
+                                layout.addItem(widget, 0, widget_pos)
+                            else:
+                                layout.addWidget(widget, 0, widget_pos)
+                    # If widget has label but labelPosition is not configured (put it on the left by default)
+                    else:
+                        layout.addWidget(label, 0, widget_pos)
+                        if type(widget) is QSpacerItem:
+                            layout.addItem(widget, 0, widget_pos + 1)
+                        else:
+                            layout.addWidget(widget, 0, widget_pos + 1)
+                # If the widget has no label
+                else:
+                    if type(widget) is QSpacerItem:
+                        layout.addItem(widget, 0, widget_pos)
+                    else:
+                        layout.addWidget(widget, 0, widget_pos)
 
 
     def _featuretype_change(self, event):
@@ -349,6 +299,109 @@ class GwFeatureTypeChangeButton(GwMaptool):
         self.feature_edit_type = f'{self.feature_type}_type'
         self.feature_type_cat = f'{self.feature_type}type_id'
         self.feature_id = snapped_feat.attribute(f'{self.feature_type}_id')
-        self._change_elem_type(snapped_feat)
-
+        self._open_dialog()
     # endregion
+
+
+def btn_cancel_featuretype_change(**kwargs):
+    """ Close form """
+
+    dialog = kwargs["dialog"]
+    tools_gw.close_dialog(dialog)
+
+
+def btn_accept_featuretype_change(**kwargs):
+    """ Update current type of feature and save changes in database """
+
+    this = kwargs["class"]
+    dialog = kwargs["dialog"]
+
+    project_type = tools_gw.get_project_type()
+    feature_type_new = tools_qt.get_widget_value(dialog, "tab_none_feature_type_new")
+    featurecat_id = tools_qt.get_widget_value(dialog, "tab_none_featurecat_id")
+
+    if feature_type_new != "null":
+
+        if (featurecat_id != "null" and featurecat_id is not None and project_type == 'ws') or (
+                project_type == 'ud'):
+
+            # Get function input parameters
+            feature = f'"type":"{this.feature_type}"'
+            extras = f'"feature_id":"{this.feature_id}"'
+            extras += f', "feature_type_new":"{feature_type_new}"'
+            extras += f', "featurecat_id":"{featurecat_id}"'
+            body = tools_gw.create_body(feature=feature, extras=extras)
+
+            # Execute SQL function and show result to the user
+            complet_result = tools_gw.execute_procedure('gw_fct_setchangefeaturetype', body)
+            if not complet_result:
+                message = "Error replacing feature"
+                tools_qgis.show_warning(message)
+                # Check in init config file if user wants to keep map tool active or not
+                this.manage_active_maptool()
+                tools_gw.close_dialog(dialog)
+                return
+
+            tools_gw.set_config_parser("btn_featuretype_change", "feature_type_new", feature_type_new)
+            tools_gw.set_config_parser("btn_featuretype_change", "featurecat_id", featurecat_id)
+            message = "Values has been updated"
+            tools_qgis.show_info(message)
+
+        else:
+            message = "Field catalog_id required!"
+            tools_qgis.show_warning(message, dialog=dialog)
+            return
+
+    else:
+        message = "Feature has not been updated because no catalog has been selected"
+        tools_qgis.show_warning(message)
+
+    # Close form
+    tools_gw.close_dialog(dialog)
+
+    # Refresh map canvas
+    this.refresh_map_canvas()
+
+    # Check if the expression is valid
+    expr_filter = f"{this.feature_type}_id = '{this.feature_id}'"
+    (is_valid, expr) = tools_qt.check_expression_filter(expr_filter)  # @UnusedVariable
+    if not is_valid:
+        return
+
+    # Check in init config file if user wants to keep map tool active or not
+    this.manage_active_maptool()
+
+
+def btn_catalog_featuretype_change(**kwargs):
+    """ Open Catalog form """
+
+    dialog = kwargs["dialog"]
+    this = kwargs["class"]
+
+    # Get feature_type
+    child_type = tools_qt.get_text(dialog, "tab_none_feature_type_new")
+    if child_type == 'null':
+        msg = "New feature type is null. Please, select a valid value"
+        tools_qt.show_info_box(msg, "Info")
+        return
+
+    this.catalog = GwCatalog()
+    this.catalog.open_catalog(dialog, 'tab_none_featurecat_id', this.feature_type, child_type)
+
+
+def cmb_new_featuretype_selection_changed(**kwargs):
+    """ When new featuretype change, catalog_id changes as well """
+
+    dialog = kwargs["dialog"]
+    cmb_new_feature_type = kwargs["widget"]
+    this = kwargs["class"]
+    cmb_catalog_id = tools_qt.get_widget(dialog,"tab_none_featurecat_id")
+
+    # Populate catalog_id
+    feature_type_new = tools_qt.get_widget_value(dialog, cmb_new_feature_type)
+    sql = (f"SELECT DISTINCT(id), id as idval "
+            f"FROM {this.cat_table} "
+            f"WHERE {this.feature_type}type_id = '{feature_type_new}' AND (active IS TRUE OR active IS NULL) "
+            f"ORDER BY id")
+    rows = tools_db.get_rows(sql)
+    tools_qt.fill_combo_values(cmb_catalog_id, rows)

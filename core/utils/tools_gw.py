@@ -53,6 +53,7 @@ from ...libs.tools_qt import GwHyperLinkLabel, GwHyperLinkLineEdit
 # These imports are for the add_{widget} functions (modules need to be imported in order to find it by its name)
 # noinspection PyUnresolvedReferences
 from ..shared import info, mincut_tools
+from ..toolbars.edit import featuretype_change_button
 
 QgsGeometryType = Literal['line', 'point', 'polygon']
 
@@ -1576,6 +1577,7 @@ def add_button(**kwargs):
         module = tools_backend_calls -> def manage_document(doc_id, **kwargs):
         module = tools_backend_calls -> def manage_element(element_id, **kwargs):
         module = tools_backend_calls -> def open_selected_element(**kwargs):
+        module = featuretype_change_button -> def btn_accept_featuretype_change(**kwargs):
     """
 
     field = kwargs['field']
