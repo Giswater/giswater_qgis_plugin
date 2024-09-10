@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 3324
 
-CREATE OR REPLACE FUNCTION gw_fct_getfeaturereplace(p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getfeaturereplace(p_data json)
 RETURNS json AS
 $BODY$
 
@@ -24,14 +24,22 @@ fid = 216
 
 DECLARE
     v_device integer;
-	v_current_feature_type text;
-	v_feature text;
-	v_new_feature_type_default text;
+	v_current_featurecat_id text;
+	v_feature_type text;
+	v_new_featurecat_id_default text;
 	v_feature_id text;
 	v_table_name text;
-	v_feature_types text[];
+	v_form text;
+	v_addparam json;
+	v_featurecat_ids text[];
 	v_catalogs_ids text[];
+	v_fluids text[];
+	v_locations text[];
+	v_categories text[];
+	v_functions text[];
 	v_sql text;
+	v_layouts text[];
+	v_layout text;
 	v_tiled boolean=false;
 	v_version json;
 	v_fields_array json[];
@@ -56,7 +64,7 @@ DECLARE
 
 BEGIN
     -- Set search path to local schema
-    SET search_path = "ws_06_09_2024", public;
+    SET search_path = "SCHEMA_NAME", public;
 
     -- Get input data
     v_device := p_data -> 'client' ->> 'device';
@@ -66,8 +74,7 @@ BEGIN
     v_feature_id := ((p_data ->>'feature')::json->>'id')::text;
 	v_table_name := ((p_data ->>'feature')::json->>'tableName')::text;
 
-	SELECT SUBSTRING(v_table FROM POSITION('_' IN v_table) + POSITION('_' IN SUBSTRING(v_table FROM POSITION('_' IN v_table) + 1)) + 1) AS tipo
-	into v_feature from (values ('v_edit_node'), ('v_edit_arc'), ('v_edit_connec')) AS t(v_table) where v_table = v_table_name;
+	SELECT DISTINCT LOWER(feature_type) INTO v_feature_type FROM cat_feature WHERE parent_layer = v_table_name;
 
     -- Get api version
     v_version := row_to_json(row) FROM (
@@ -75,8 +82,8 @@ BEGIN
     ) row;
 
     SELECT gw_fct_getformfields(
-    'featuretype_change',
-    'form_edit',
+    'generic',
+    'form_featuretype_change',
     NULL,
     NULL,
     NULL,
@@ -87,13 +94,31 @@ BEGIN
     v_device,
     NULL
     ) INTO v_fields_array;
-
 		-- get current feature type
-		v_sql := concat('SELECT ', v_feature, '_type FROM v_edit_', v_feature, ' WHERE ', v_feature, '_id = ''', v_feature_id, '''');
-		EXECUTE v_sql INTO v_current_feature_type;
+		v_sql := concat('SELECT ', v_feature_type, '_type FROM v_edit_', v_feature_type, ' WHERE ', v_feature_type, '_id = ''', v_feature_id, '''');
+		EXECUTE v_sql INTO v_current_featurecat_id;
 
 		-- get default new feature type
-		SELECT id into v_new_feature_type_default FROM cat_feature WHERE parent_layer = v_table_name AND active is True AND id != v_current_feature_type  order by 1 limit 1;
+		SELECT id into v_new_featurecat_id_default FROM cat_feature WHERE parent_layer = v_table_name AND active is True AND id != v_current_featurecat_id  order by 1 limit 1;
+
+		-- SELECT array_agg( layoutname) into v_layouts FROM config_form_fields  WHERE formtype = 'form_featuretype_change';
+		SELECT array_agg(distinct layoutname) into v_layouts FROM config_form_fields  WHERE formtype = 'form_featuretype_change';
+
+		v_form:= '"layouts": {';
+
+		FOREACH v_layout IN ARRAY v_layouts
+		LOOP
+			select addparam into v_addparam from config_typevalue where id = v_layout;
+			if v_layout = 'lyt_main_4' then
+				v_form:= concat(v_form,  '"', v_layout, '":',v_addparam);
+			else
+				v_form:= concat(v_form,  '"', v_layout, '":',v_addparam,',');
+			end if;
+
+		END LOOP;
+
+		v_form:= concat(v_form,'}' );
+
 
         FOREACH aux_json IN ARRAY v_fields_array
         LOOP
@@ -101,25 +126,57 @@ BEGIN
 
             field_value := (v_values_array->>(aux_json->>'columnname'));
             IF (aux_json->>'columnname') = 'feature_type' THEN
-				field_value := v_current_feature_type;
+				field_value := v_current_featurecat_id;
             END IF;
 
             IF (aux_json->>'columnname') = 'feature_type_new' THEN
-				SELECT array_agg(id) into v_feature_types FROM cat_feature WHERE parent_layer = v_table_name AND active is True group by parent_layer order by 1;
+				SELECT array_agg(id) into v_featurecat_ids FROM cat_feature WHERE parent_layer = v_table_name AND active is True group by parent_layer order by 1;
 				-- fill combo values
-				v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'comboIds', COALESCE(v_feature_types, '{}'));
-				v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'comboNames', COALESCE(v_feature_types, '{}'));
+				v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'comboIds', COALESCE(v_featurecat_ids, '{}'));
+				v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'comboNames', COALESCE(v_featurecat_ids, '{}'));
 
 				-- set selectedId in combo box
-				field_value = v_new_feature_type_default;
+				field_value = v_new_featurecat_id_default;
             END IF;
 
             IF (aux_json->>'columnname') = 'featurecat_id' THEN
-		       v_sql := concat('SELECT array_agg(id) FROM cat_', v_feature, ' WHERE ', v_feature, 'type_id = ''', v_new_feature_type_default, ''' AND active is True OR active is null ORDER BY 1');
+		       v_sql := concat('SELECT array_agg(id) FROM cat_', v_feature_type, ' WHERE ', v_feature_type, 'type_id = ''', v_new_featurecat_id_default, ''' AND active is True OR active is null ORDER BY 1');
 			   EXECUTE v_sql INTO v_catalogs_ids;
 
                v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'comboIds', COALESCE(v_catalogs_ids, '{}'));
                v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'comboNames', COALESCE(v_catalogs_ids, '{}'));
+            END IF;
+
+			IF (aux_json->>'columnname') = 'fluid' THEN
+
+				 select array_agg(fluid_type) into v_fluids from man_type_fluid where lower(feature_type) = v_feature_type;
+                 v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'comboIds', COALESCE(v_fluids, '{}'));
+               	 v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'comboNames', COALESCE(v_fluids, '{}'));
+
+            END IF;
+
+			IF (aux_json->>'columnname') = 'location' THEN
+
+				 select array_agg(location_type) into v_locations from man_type_location where lower(feature_type) = v_feature_type;
+                 v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'comboIds', COALESCE(v_locations, '{}'));
+               	 v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'comboNames', COALESCE(v_locations, '{}'));
+
+            END IF;
+
+			IF (aux_json->>'columnname') = 'category' THEN
+
+				 select array_agg(category_type) into v_categories from man_type_category where lower(feature_type) = v_feature_type;
+                 v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'comboIds', COALESCE(v_categories, '{}'));
+               	 v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'comboNames', COALESCE(v_categories, '{}'));
+
+            END IF;
+
+			IF (aux_json->>'columnname') = 'function' THEN
+
+				 select array_agg(function_type) into v_functions from man_type_function where lower(feature_type) = v_feature_type;
+                 v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'comboIds', COALESCE(v_functions, '{}'));
+               	 v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'comboNames', COALESCE(v_functions, '{}'));
+
             END IF;
 
             IF (aux_json->>'widgettype')='combo' THEN
@@ -190,7 +247,8 @@ BEGIN
     "status": "Accepted",
     "version": ' || v_version || ',
     "body": {
-        "form": {},
+        "form": {' || v_form || '
+		},
         "feature": {},
         "data": {
             "fields": ' || v_fieldsjson || '
@@ -208,3 +266,9 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
+
+
+SELECT gw_fct_getfeaturereplace($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831},
+"form":{},
+"feature":{"tableName":"v_edit_node", "id":"1058"},
+"data":{"filterFields":{}, "pageInfo":{}, "addSchema":""}}$$);
