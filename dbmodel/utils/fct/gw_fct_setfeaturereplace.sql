@@ -133,31 +133,26 @@ BEGIN
 
 
 	-- update only the not null-man_type_new values 
-	v_sql := 'WITH json_man_type AS (
-    SELECT json_build_object(
-        ''location_type'', ' || coalesce(quote_literal(v_location_new), 'null') || ',
-        ''function_type'', ' || coalesce(quote_literal(v_function_new), 'null') || ',
-        ''fluid_type'', ' || coalesce(quote_literal(v_fluid_new), 'null') || ',
-        ''category_type'', ' || coalesce(quote_literal(v_category_new), 'null') || '
-    ) AS json_values
+	
+	for v_rec in execute 
+	'WITH json_man_type AS (
+	SELECT json_build_object(
+    ''location_type'', ' || coalesce(quote_literal(v_location_new), 'null') || ',
+    ''function_type'', ' || coalesce(quote_literal(v_function_new), 'null') || ',
+    ''fluid_type'', ' || coalesce(quote_literal(v_fluid_new), 'null') || ',
+    ''category_type'', ' || coalesce(quote_literal(v_category_new), 'null') || '
+	) AS json_values
 	)
 	SELECT key AS man_type, value AS man_value
 	FROM json_man_type,
-    json_each_text(json_man_type.json_values) where value is not null';
-
-	execute 'select count(*) from ('||v_sql||')a' into v_count;
-
-	if v_count > 0 then
-	
-		for v_rec in execute v_sql
-		loop	
+	json_each_text(json_man_type.json_values) where value is not null'
+	loop	
 		
-			EXECUTE 'UPDATE "' || v_feature_layer || '" SET '||v_rec.man_type||'=' || quote_literal(v_rec.man_value) || ' 
-			WHERE ' || v_feature_type || '_id=' || quote_literal(v_feature_id) || ';';
-			
-		end loop;
+		EXECUTE 'UPDATE "' || v_feature_layer || '" SET '||v_rec.man_type||'=' || quote_literal(v_rec.man_value) || ' 
+		WHERE ' || v_feature_type || '_id=' || quote_literal(v_feature_id) || ';';
+		
+	end loop;
 	
-	end if;
 
 	IF v_project_type = 'WS' THEN
 		EXECUTE 'UPDATE '||v_feature_layer||' SET '||v_cat_column||'='||quote_literal(v_featurecat_id_new)||'
