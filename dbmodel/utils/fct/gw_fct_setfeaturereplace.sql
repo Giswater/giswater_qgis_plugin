@@ -51,6 +51,9 @@ v_audit_result text;
 v_level integer;
 v_status text;
 v_message text;
+v_sql text;
+v_count integer;
+v_rec record;
 
 BEGIN
 
@@ -68,7 +71,6 @@ BEGIN
 	-- get input parameters
 
 	v_feature_type = lower(((p_data ->>'feature')::json->>'type'))::text;
-	v_feature_id = ((p_data ->>'data')::json->>'feature_id')::text; -- en vez de old_feature_id
 	v_feature_type_new = ((p_data ->>'data')::json->>'feature_type_new')::text;
 	v_featurecat_id_new = ((p_data ->>'data')::json->>'featurecat_id')::text;
 
@@ -76,6 +78,12 @@ BEGIN
 	v_fluid_new = ((p_data ->>'data')::json->>'fluid_type')::text;
 	v_location_new = ((p_data ->>'data')::json->>'location_type')::text;
 	v_category_new = ((p_data ->>'data')::json->>'category_type')::text;
+
+	if ((p_data ->>'data')::json->>'old_feature_id')::text is null then
+		v_feature_id = ((p_data ->>'data')::json->>'feature_id')::text;
+	else
+		v_feature_id = ((p_data ->>'data')::json->>'old_feature_id')::text;
+	end if;
 
 	--define columns used for feature_cat
 	v_feature_layer = concat('v_edit_',v_feature_type);
@@ -123,11 +131,33 @@ BEGIN
 		EXECUTE 'UPDATE '||v_feature_layer||' SET location_type=NULL WHERE '||v_feature_type||'_id='||quote_literal(v_feature_id)||';';
 	END IF;
 
-	EXECUTE 'UPDATE "' || v_feature_layer || '" SET location_type=' || quote_literal(v_location_new) || ' WHERE ' || v_feature_type || '_id=' || quote_literal(v_feature_id) || ';';
-	EXECUTE 'UPDATE "' || v_feature_layer || '" SET function_type=' || quote_literal(v_function_new) || ' WHERE ' || v_feature_type || '_id=' || quote_literal(v_feature_id) || ';';
-	EXECUTE 'UPDATE "' || v_feature_layer || '" SET fluid_type=' || quote_literal(v_fluid_new) || ' WHERE ' || v_feature_type || '_id=' || quote_literal(v_feature_id) || ';';
-	EXECUTE 'UPDATE "' || v_feature_layer || '" SET category_type=' || quote_literal(v_category_new) || ' WHERE ' || v_feature_type || '_id=' || quote_literal(v_feature_id) || ';';
 
+	-- update only the not null-man_type_new values 
+	v_sql := 'WITH json_man_type AS (
+    SELECT json_build_object(
+        ''location_type'', ' || coalesce(quote_literal(v_location_new), 'null') || ',
+        ''function_type'', ' || coalesce(quote_literal(v_function_new), 'null') || ',
+        ''fluid_type'', ' || coalesce(quote_literal(v_fluid_new), 'null') || ',
+        ''category_type'', ' || coalesce(quote_literal(v_category_new), 'null') || '
+    ) AS json_values
+	)
+	SELECT key AS man_type, value AS man_value
+	FROM json_man_type,
+    json_each_text(json_man_type.json_values) where value is not null';
+
+	execute 'select count(*) from ('||v_sql||')a' into v_count;
+
+	if v_count > 0 then
+	
+		for v_rec in execute v_sql
+		loop	
+		
+			EXECUTE 'UPDATE "' || v_feature_layer || '" SET '||v_rec.man_type||'=' || quote_literal(v_rec.man_value) || ' 
+			WHERE ' || v_feature_type || '_id=' || quote_literal(v_feature_id) || ';';
+			
+		end loop;
+	
+	end if;
 
 	IF v_project_type = 'WS' THEN
 		EXECUTE 'UPDATE '||v_feature_layer||' SET '||v_cat_column||'='||quote_literal(v_featurecat_id_new)||'
