@@ -5,3 +5,6 @@ This version of Giswater is provided by Giswater Association
 */
 
 alter table doc_x_workcat add constraint unique_doc_id_workcat_id unique (doc_id, workcat_id);
+
+ALTER TABLE om_mincut ADD CONSTRAINT om_mincut_expl_id_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE om_mincut ADD CONSTRAINT om_mincut_muni_id_fkey FOREIGN KEY (muni_id) REFERENCES ext_municipality(muni_id) ON UPDATE CASCADE ON DELETE RESTRICT;
