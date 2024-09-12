@@ -110,7 +110,7 @@ BEGIN
 				--update nodeParent value with newly created node
 				EXECUTE 'UPDATE drainzone set graphconfig = replace(graphconfig::text,a.nodeparent,'||v_node_id_new||'::text)::json FROM (
 				select json_array_elements_text((elem->>''toArc'')::json) as toarc, elem->>''nodeParent'' as nodeparent
-				from '||v_zone||'
+				from drainzone
 				cross join json_array_elements((graphconfig->>''use'')::json) elem
 				where elem->>''nodeParent'' = '||quote_literal(v_node_id_old)||')a';		
 		END IF;
