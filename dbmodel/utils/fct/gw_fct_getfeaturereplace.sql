@@ -266,9 +266,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-
-
-SELECT gw_fct_getfeaturereplace($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831},
-"form":{},
-"feature":{"tableName":"v_edit_node", "id":"1058"},
-"data":{"filterFields":{}, "pageInfo":{}, "addSchema":""}}$$);
