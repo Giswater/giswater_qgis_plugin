@@ -6,10 +6,10 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 3310
 
-DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_getinpdata(TEXT[]);
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_getinpdata(result_ids TEXT[])
-RETURNS json
-LANGUAGE plpgsql
+DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_getinpdata(JSON);
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_getinpdata(input_param json)
+ RETURNS json
+ LANGUAGE plpgsql
 AS $function$
 DECLARE
     v_status TEXT := 'Accepted';
@@ -18,11 +18,18 @@ DECLARE
     v_result_point JSON;
     v_result_line JSON;
     v_result_polygon JSON := '{"geometryType":"Polygon","features":[]}'; -- Without polygon, empty
+    result_ids text[];  -- Declare result_ids to store extracted array of text
 
 BEGIN
 
 	-- Set search path to local schema
     SET search_path = "SCHEMA_NAME", public;
+
+    -- Extract result_ids from the input JSON
+    -- We assume the input JSON has a key "result_ids" containing an array of text
+    SELECT array_agg(value::text)
+    INTO result_ids
+    FROM json_array_elements_text(input_param->'result_ids');
 
     -- Check if result_ids is NULL or has an invalid value
     IF result_ids IS NULL OR array_length(result_ids, 1) IS NULL THEN
