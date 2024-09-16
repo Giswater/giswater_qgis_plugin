@@ -57,7 +57,7 @@ class GwStyleManager:
         # Connect signals to the style buttons
         self.style_mng_dlg.btn_delete_style.clicked.connect(self._delete_selected_styles)
         self.style_mng_dlg.btn_update_style.clicked.connect(self._update_selected_style)
-        self.style_mng_dlg.btn_refresh_all.clicked.connect(self._refresh_all_styles)
+        self.style_mng_dlg.btn_refresh_all.clicked.connect(partial(self._refresh_all_styles, self.style_mng_dlg))
 
         self.style_mng_dlg.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.style_mng_dlg, True, 'core'))
 
@@ -550,7 +550,7 @@ class GwStyleManager:
             tools_qgis.show_warning(f"Failed to update styles: {e}", dialog=self.style_mng_dlg)
 
 
-    def _refresh_all_styles(self):
+    def _refresh_all_styles(self, dialog):
         """Refresh all styles in the database based on the current QGIS layer styles."""
         try:
             # Get all loaded layers in the project
@@ -578,7 +578,7 @@ class GwStyleManager:
                 # tools_qgis.show_warning(f"Style '{style}' not found in database.", dialog=self.style_mng_dlg)
 
             msg = "All layers have been successfully refreshed."
-            tools_qgis.show_success(msg)
+            tools_qgis.show_success(msg, dialog=dialog)
             self._load_styles()
 
         except Exception as e:
