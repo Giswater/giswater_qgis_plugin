@@ -35,3 +35,85 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES ('generic', 'form_featuretype_change', 'tab_none', 'function_type', 'lyt_main_3', 4, 'string', 'combo', 'Function', 'Function', NULL, FALSE, FALSE, TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"labelPosition": "top"}'::json, NULL, NULL, FALSE, NULL);
 
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source") VALUES (3324, 'gw_fct_getfeaturereplace', 'utils', 'function', 'json', 'json', 'Function to get feature type change dialog', 'role_edit', NULL, 'core');
+
+--17/09/2024
+UPDATE config_form_fields
+	SET widgetfunction='{
+  "functionName": "add_object",
+  "parameters": {
+    "sourcewidget": "tab_documents_doc_name",
+    "targetwidget": "tab_documents_tbl_documents",
+    "sourceview": "doc"
+  }
+}'::json
+	WHERE formname='arc' AND formtype='form_feature' AND columnname='btn_doc_insert' AND tabname='tab_documents';
+UPDATE config_form_fields
+	SET widgetfunction='{
+  "functionName": "add_object",
+  "parameters": {
+    "sourcewidget": "tab_documents_doc_name",
+    "targetwidget": "tab_documents_tbl_documents",
+    "sourceview": "doc"
+  }
+}'::json
+	WHERE formname='node' AND formtype='form_feature' AND columnname='btn_doc_insert' AND tabname='tab_documents';
+UPDATE config_form_fields
+	SET widgetfunction='{
+  "functionName": "add_object",
+  "parameters": {
+    "sourcewidget": "tab_documents_doc_name",
+    "targetwidget": "tab_documents_tbl_documents",
+    "sourceview": "doc"
+  }
+}'::json
+	WHERE formname='connec' AND formtype='form_feature' AND columnname='btn_doc_insert' AND tabname='tab_documents';
+UPDATE config_form_fields
+	SET widgetfunction='{
+  "functionName": "manage_document",
+  "parameters": {
+    "sourcewidget": "tab_documents_doc_name",
+    "targetwidget": "tab_documents_tbl_documents",
+    "sourceview": "doc"
+  }
+}'::json
+	WHERE formname='arc' AND formtype='form_feature' AND columnname='btn_doc_new' AND tabname='tab_documents';
+UPDATE config_form_fields
+	SET widgetfunction='{
+  "functionName": "manage_document",
+  "parameters": {
+    "sourcewidget": "tab_documents_doc_name",
+    "targetwidget": "tab_documents_tbl_documents",
+    "sourceview": "doc"
+  }
+}'::json
+	WHERE formname='node' AND formtype='form_feature' AND columnname='btn_doc_new' AND tabname='tab_documents';
+UPDATE config_form_fields
+	SET widgetfunction='{
+  "functionName": "manage_document",
+  "parameters": {
+    "sourcewidget": "tab_documents_doc_name",
+    "targetwidget": "tab_documents_tbl_documents",
+    "sourceview": "doc"
+  }
+}'::json
+	WHERE formname='connec' AND formtype='form_feature' AND columnname='btn_doc_new' AND tabname='tab_documents';
+
+UPDATE config_form_fields
+	SET columnname='doc_name'
+	WHERE formname='arc' AND formtype='form_feature' AND columnname='doc_id' AND tabname='tab_documents';
+UPDATE config_form_fields
+	SET columnname='doc_name'
+	WHERE formname='node' AND formtype='form_feature' AND columnname='doc_id' AND tabname='tab_documents';
+UPDATE config_form_fields
+	SET columnname='doc_name'
+	WHERE formname='connec' AND formtype='form_feature' AND columnname='doc_id' AND tabname='tab_documents';
+
+UPDATE config_form_fields
+	SET dv_querytext='SELECT name as id, name as idval FROM doc WHERE name IS NOT NULL'
+	WHERE formname='arc' AND formtype='form_feature' AND columnname='doc_name' AND tabname='tab_documents';
+UPDATE config_form_fields
+	SET dv_querytext='SELECT name as id, name as idval FROM doc WHERE name IS NOT NULL'
+	WHERE formname='node' AND formtype='form_feature' AND columnname='doc_name' AND tabname='tab_documents';
+UPDATE config_form_fields
+	SET dv_querytext='SELECT name as id, name as idval FROM doc WHERE name IS NOT NULL'
+	WHERE formname='connec' AND formtype='form_feature' AND columnname='doc_name' AND tabname='tab_documents';
