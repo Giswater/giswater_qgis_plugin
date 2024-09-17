@@ -6438,7 +6438,7 @@
 		</message>
 		<message>
 			<source>lbl_doc_id</source>
-			<translation>Id doc:</translation>
+			<translation>Nom doc:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_doc_id</source>

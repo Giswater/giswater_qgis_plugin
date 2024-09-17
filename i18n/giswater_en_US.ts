@@ -6439,7 +6439,7 @@
 		</message>
 		<message>
 			<source>lbl_doc_id</source>
-			<translation>Doc id:</translation>
+			<translation>Doc name:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_doc_id</source>
