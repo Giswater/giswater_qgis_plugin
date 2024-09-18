@@ -269,10 +269,22 @@ CREATE OR REPLACE VIEW v_edit_inp_pipe AS
    FROM v_edit_arc a
      JOIN inp_pipe USING (arc_id)
   WHERE a.is_operative IS TRUE;
+
+
+CREATE OR REPLACE VIEW v_edit_minsector AS 
+ SELECT m.minsector_id,
+    m.code,
+    m.dma_id,
+    m.dqa_id,
+    m.presszone_id,
+    m.expl_id,
+    m.num_border,
+    m.num_connec,
+    m.num_hydro,
+    m.length,
+    m.descript,
+    m.addparam::text AS addparam,
+    m.the_geom
+   FROM selector_expl, minsector m
+  WHERE (m.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text);
   
-  
-CREATE TRIGGER gw_trg_edit_inp_arc_pipe
-  INSTEAD OF INSERT OR UPDATE OR DELETE
-  ON v_edit_inp_pipe
-  FOR EACH ROW
-  EXECUTE PROCEDURE gw_trg_edit_inp_arc('inp_pipe');

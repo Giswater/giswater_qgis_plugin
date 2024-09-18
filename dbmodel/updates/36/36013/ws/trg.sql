@@ -8,3 +8,6 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 CREATE TRIGGER gw_trg_edit_sector INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_sector
 FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_sector('sector');
+
+CREATE TRIGGER gw_trg_edit_inp_arc_pipe INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_inp_pipe
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_arc('inp_pipe');
