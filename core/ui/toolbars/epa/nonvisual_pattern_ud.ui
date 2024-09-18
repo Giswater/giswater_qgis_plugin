@@ -14,12 +14,19 @@
    <string>Pattern Editor</string>
   </property>
   <layout class="QGridLayout" name="verticalLayout_4">
-   <item row="2" column="0" colspan="2">
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <property name="sizeConstraint">
-      <enum>QLayout::SetDefaultConstraint</enum>
+   <item row="2" column="0">
+    <layout class="QGridLayout" name="lyt_buttons">
+     <property name="topMargin">
+      <number>0</number>
      </property>
-     <item>
+     <item row="0" column="1">
+      <widget class="QPushButton" name="btn_accept">
+       <property name="text">
+        <string>OK</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0">
       <spacer name="horizontalSpacer">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -32,14 +39,7 @@
        </property>
       </spacer>
      </item>
-     <item>
-      <widget class="QPushButton" name="btn_accept">
-       <property name="text">
-        <string>OK</string>
-       </property>
-      </widget>
-     </item>
-     <item>
+     <item row="0" column="2">
       <widget class="QPushButton" name="btn_cancel">
        <property name="text">
         <string>Cancel</string>

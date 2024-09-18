@@ -26,7 +26,7 @@
          <x>0</x>
          <y>0</y>
          <width>317</width>
-         <height>403</height>
+         <height>394</height>
         </rect>
        </property>
        <layout class="QGridLayout" name="gridLayout">
@@ -145,6 +145,9 @@
        <string>Draw profile</string>
       </property>
      </widget>
+    </item>
+    <item>
+     <layout class="QGridLayout" name="lyt_buttons"/>
     </item>
    </layout>
   </widget>

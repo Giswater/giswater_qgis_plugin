@@ -92,19 +92,6 @@
         </property>
        </widget>
       </item>
-      <item row="3" column="0">
-       <spacer name="horizontalSpacer">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
       <item row="1" column="11">
        <widget class="QPushButton" name="btn_duplicate">
         <property name="sizePolicy">
@@ -148,13 +135,6 @@
         </property>
        </widget>
       </item>
-      <item row="3" column="13">
-       <widget class="QPushButton" name="btn_cancel">
-        <property name="text">
-         <string>Close</string>
-        </property>
-       </widget>
-      </item>
       <item row="1" column="4">
        <widget class="QComboBox" name="cmb_timser_type"/>
       </item>
@@ -187,13 +167,39 @@
      </layout>
     </widget>
    </item>
+   <item row="1" column="0">
+    <layout class="QGridLayout" name="lyt_buttons">
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <item row="0" column="0">
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item row="0" column="1">
+      <widget class="QPushButton" name="btn_cancel">
+       <property name="text">
+        <string>Close</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
   </layout>
  </widget>
  <tabstops>
   <tabstop>txt_filter</tabstop>
   <tabstop>btn_duplicate</tabstop>
   <tabstop>btn_delete</tabstop>
-  <tabstop>btn_cancel</tabstop>
  </tabstops>
  <resources/>
  <connections/>
