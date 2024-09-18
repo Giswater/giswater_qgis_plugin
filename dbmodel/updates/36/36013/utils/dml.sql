@@ -16,7 +16,6 @@ UPDATE config_form_fields SET web_layoutorder=2 WHERE formname='incident_node' A
 UPDATE config_form_fields SET web_layoutorder=2 WHERE formname='visit_arc_leak' AND formtype='form_visit' AND columnname='class_id' AND tabname='tab_data';
 UPDATE config_form_fields SET web_layoutorder=2 WHERE formname='visit_node_insp' AND formtype='form_visit' AND columnname='class_id' AND tabname='tab_data';
 
-
 INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES ('layout_name_typevalue', 'lyt_main_1', 'lyt_main_1', 'layoutMain1', '{"lytOrientation":"vertical"}');
 INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES ('layout_name_typevalue', 'lyt_main_2', 'lyt_main_2', 'layoutMain2', NULL);
 INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES ('layout_name_typevalue', 'lyt_main_3', 'lyt_main_3', 'layoutMain3', NULL);
@@ -117,3 +116,6 @@ UPDATE config_form_fields
 UPDATE config_form_fields
 	SET dv_querytext='SELECT name as id, name as idval FROM doc WHERE name IS NOT NULL'
 	WHERE formname='connec' AND formtype='form_feature' AND columnname='doc_name' AND tabname='tab_documents';
+
+-- 2024/09/18
+UPDATE config_param_system SET isenabled=true where parameter = 'basic_selector_tab_municipality';

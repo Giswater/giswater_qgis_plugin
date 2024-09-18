@@ -25,3 +25,7 @@ CREATE TABLE selector_period(
       ON UPDATE CASCADE ON DELETE CASCADE);
       
 ALTER TABLE anl_node ALTER COLUMN node_id DROP DEFAULT;
+
+--18/09/24
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"link", "column":"uncertain", "dataType":"boolean"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"link", "column":"muni_id", "dataType":"integer"}}$$);

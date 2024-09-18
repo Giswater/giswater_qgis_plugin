@@ -199,11 +199,6 @@ DROP VIEW IF EXISTS v_edit_man_fountain_pol;
 DROP VIEW IF EXISTS v_edit_man_register_pol;
 DROP VIEW IF EXISTS v_edit_man_tank_pol;
 
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_register", "column":"_pol_id_", "dataType":"integer"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_fountain", "column":"_pol_id_", "dataType":"integer"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_tank", "column":"_pol_id_", "dataType":"integer"}}$$);
-
-
 CREATE TABLE IF NOT EXISTS rtc_hydrometer_x_node
 (
     hydrometer_id character varying(16) COLLATE pg_catalog."default" NOT NULL,
