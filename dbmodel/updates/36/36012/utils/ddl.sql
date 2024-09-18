@@ -58,7 +58,7 @@ ALTER TABLE om_visit ALTER COLUMN sector_id set default 0;
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dimensions", "column":"muni_id", "dataType":"integer"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dimensions", "column":"sector_id", "dataType":"integer"}}$$);
 ALTER TABLE dimensions ALTER COLUMN sector_id set default 0;
-
+UPDATE dimensions SET sector_id = 0;
 
 
 CREATE INDEX arc_muni ON arc USING btree (muni_id);

@@ -242,3 +242,37 @@ CREATE OR REPLACE VIEW v_edit_link AS
 	join selector_sector s using (sector_id)
 	LEFT JOIN selector_municipality m using (muni_id)
 	where s.cur_user = current_user and (m.cur_user = current_user or l.muni_id is null);
+	
+	
+DROP view v_edit_inp_pipe ;
+CREATE OR REPLACE VIEW v_edit_inp_pipe AS 
+ SELECT a.arc_id,
+    a.node_1,
+    a.node_2,
+    a.arccat_id,
+    a.expl_id,
+    a.sector_id,
+    a.dma_id,
+    a.state,
+    a.state_type,
+    a.custom_length,
+    a.annotation,
+    inp_pipe.minorloss,
+    inp_pipe.status,
+    a.cat_matcat_id,
+    inp_pipe.custom_roughness,
+    a.cat_dint,
+    inp_pipe.custom_dint,
+    inp_pipe.bulk_coeff,
+    inp_pipe.wall_coeff,
+    a.the_geom
+   FROM v_edit_arc a
+     JOIN inp_pipe USING (arc_id)
+  WHERE a.is_operative IS TRUE;
+  
+  
+CREATE TRIGGER gw_trg_edit_inp_arc_pipe
+  INSTEAD OF INSERT OR UPDATE OR DELETE
+  ON v_edit_inp_pipe
+  FOR EACH ROW
+  EXECUTE PROCEDURE gw_trg_edit_inp_arc('inp_pipe');
