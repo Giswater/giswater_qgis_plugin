@@ -14,26 +14,6 @@
    <string>Add category</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="1" column="2">
-    <widget class="QPushButton" name="btn_cancel">
-     <property name="text">
-      <string>Cancel</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0">
-    <spacer name="horizontalSpacer">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>40</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
    <item row="0" column="0" colspan="4">
     <widget class="QTabWidget" name="mainTab">
      <property name="currentIndex">
@@ -168,12 +148,39 @@
      </widget>
     </widget>
    </item>
-   <item row="1" column="1">
-    <widget class="QPushButton" name="btn_add">
-     <property name="text">
-      <string>Accept</string>
+   <item row="2" column="0">
+    <layout class="QGridLayout" name="lyt_buttons">
+     <property name="topMargin">
+      <number>0</number>
      </property>
-    </widget>
+     <item row="0" column="1">
+      <widget class="QPushButton" name="btn_add">
+       <property name="text">
+        <string>Accept</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item row="0" column="2">
+      <widget class="QPushButton" name="btn_cancel">
+       <property name="text">
+        <string>Cancel</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>
@@ -183,8 +190,6 @@
   <tabstop>idval</tabstop>
   <tabstop>descript</tabstop>
   <tabstop>sys_role</tabstop>
-  <tabstop>btn_add</tabstop>
-  <tabstop>btn_cancel</tabstop>
  </tabstops>
  <resources/>
  <connections/>

@@ -115,7 +115,7 @@
     </layout>
    </item>
    <item row="2" column="0" colspan="2">
-    <layout class="QGridLayout" name="gridLayout_4">
+    <layout class="QGridLayout" name="lyt_buttons">
      <item row="0" column="2">
       <widget class="QPushButton" name="btn_cancel">
        <property name="text">

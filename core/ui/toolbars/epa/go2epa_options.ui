@@ -34,8 +34,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>396</width>
-            <height>336</height>
+            <width>404</width>
+            <height>349</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout_4">
@@ -124,8 +124,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>396</width>
-            <height>336</height>
+            <width>404</width>
+            <height>349</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout_8">
@@ -187,11 +187,11 @@
     </widget>
    </item>
    <item row="1" column="0">
-    <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0">
-     <property name="sizeConstraint">
-      <enum>QLayout::SetDefaultConstraint</enum>
+    <layout class="QGridLayout" name="lyt_buttons">
+     <property name="topMargin">
+      <number>0</number>
      </property>
-     <item>
+     <item row="0" column="0">
       <spacer name="horizontalSpacer">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -204,7 +204,7 @@
        </property>
       </spacer>
      </item>
-     <item>
+     <item row="0" column="1">
       <widget class="QPushButton" name="btn_accept">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -217,7 +217,7 @@
        </property>
       </widget>
      </item>
-     <item>
+     <item row="0" column="2">
       <widget class="QPushButton" name="btn_cancel">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
