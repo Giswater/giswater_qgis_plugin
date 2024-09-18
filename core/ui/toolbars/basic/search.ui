@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>349</width>
-    <height>282</height>
+    <width>395</width>
+    <height>278</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -32,6 +32,9 @@
        <string>No results found</string>
       </property>
      </widget>
+    </item>
+    <item row="2" column="0">
+     <layout class="QGridLayout" name="lyt_buttons"/>
     </item>
    </layout>
   </widget>
