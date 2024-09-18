@@ -373,7 +373,8 @@ BEGIN
 
 	-- manage cross-reference tables
 	select count(*) into v_count from node;
-	if v_count > 0 then
+
+	if v_count > 0 and (v_value::boolean is true or v_checkall is true or v_checkall is false) then
 
 		-- inserting sector & muni from selected exploitaiton
 		IF v_tabname IN ('tab_exploitation', 'tab_macroexploitation') THEN
