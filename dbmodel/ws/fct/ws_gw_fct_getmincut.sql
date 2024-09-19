@@ -366,28 +366,22 @@ BEGIN
         v_result_node = COALESCE(v_result_node, '{}');
         v_result_connec = COALESCE(v_result_connec, '{}');
         v_result_arc = COALESCE(v_result_arc, '{}');
-        v_response := '{
-        "status": "Accepted",
-        "version": '|| v_version ||',
-        "body": {
-          "form": {},
-          "feature": {},
-          "data": {
-            "info": '||v_result_info||',
-            "mincutId": '|| v_mincutid ||',
-            "fields": '|| v_fieldsjson ||','||
-            '"mincutState":'||(v_values_array->>'mincut_state')||','||
-              '"mincutInit":'||v_result_init||','||
-              '"mincutProposedValve":'||v_result_valve_proposed||','||
-              '"mincutNotProposedValve":'||v_result_valve_not_proposed||','||
-              '"mincutNode":'||v_result_node||','||
-              '"mincutConnec":'||v_result_connec||','||
-              '"mincutArc":'||v_result_arc||','||
-			  '"tiled":'||v_tiled||','||
-			  '"geometry":' ||v_bbox::text||'
-          }
-        }
-        }';
+        v_response := concat('{"status":"Accepted", "version":',v_version::text,',"body":{"form":{}',
+            ',"feature":{}',
+            ',"data":{ "info":',v_result_info::text,
+              ',"mincutId":',v_mincutid::text,
+              ',"fields":',v_fieldsjson::text,
+              ',"mincutState":',(v_values_array->>'mincut_state')::text,
+              ',"mincutInit":',v_result_init::text,
+              ',"mincutProposedValve":',v_result_valve_proposed::text,
+              ',"mincutNotProposedValve":',v_result_valve_not_proposed::text,
+              ',"mincutNode":',v_result_node::text,
+              ',"mincutConnec":',v_result_connec::text,
+              ',"mincutArc":',v_result_arc::text,
+              ',"tiled":',v_tiled::text,
+              ',"geometry":',COALESCE(v_bbox::text, 'null'),
+            '}}}'
+        );
 
         RETURN v_response;
 
