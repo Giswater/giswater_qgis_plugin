@@ -268,6 +268,7 @@ class GwMapzoneManager:
         tools_gw.add_icon(self.config_dlg.btn_snapping_nodeParent, "137")
         tools_gw.add_icon(self.config_dlg.btn_snapping_toArc, "137")
         tools_gw.add_icon(self.config_dlg.btn_snapping_forceClosed, "137")
+        tools_gw.add_icon(self.config_dlg.btn_snapping_ignore, "137")
 
         # Set variables
         self._reset_config_vars()
@@ -305,6 +306,16 @@ class GwMapzoneManager:
         )
         self.config_dlg.btn_remove_forceClosed.clicked.connect(
             partial(self._remove_force_closed, self.config_dlg)
+        )
+        # Ignore
+        self.config_dlg.btn_snapping_ignore.clicked.connect(
+            partial(self.get_snapped_feature_id, self.config_dlg, self.config_dlg.btn_snapping_ignore,
+                    'v_edit_node', 'ignore', None, self.child_type))
+        self.config_dlg.btn_add_ignore.clicked.connect(
+            partial(self._add_ignore, self.config_dlg)
+        )
+        self.config_dlg.btn_remove_ignore.clicked.connect(
+            partial(self._remove_ignore, self.config_dlg)
         )
         # Preview
         self.config_dlg.btn_clear_preview.clicked.connect(partial(self._clear_preview, self.config_dlg))
@@ -366,6 +377,11 @@ class GwMapzoneManager:
             tools_qt.set_widget_text(self.config_dlg, 'txt_forceClosed', '')
             tools_qt.set_widget_enabled(self.config_dlg, 'btn_add_forceClosed', False)
             tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_remove_forceClosed, False)
+        if mode in (0, 4):
+            self.ignore_list = set()
+            tools_qt.set_widget_text(self.config_dlg, 'txt_ignore', '')
+            tools_qt.set_widget_enabled(self.config_dlg, 'btn_add_ignore', False)
+            tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_remove_ignore, False)
 
     def get_snapped_feature_id(self, dialog, action, layer_name, option, widget_name, child_type):
         """ Snap feature and set a value into dialog """
@@ -440,7 +456,7 @@ class GwMapzoneManager:
 
         # @options{'key':['att to get from snapped feature', 'function to call']}
         options = {'nodeParent': ['node_id', '_set_node_parent'], 'toArc': ['arc_id', '_set_to_arc'],
-                   'forceClosed': ['node_id', '_set_force_closed']}
+                   'forceClosed': ['node_id', '_set_force_closed'], 'ignore': ['node_id', '_set_ignore']}
 
         if event == Qt.RightButton:
             self._cancel_snapping_tool(dialog, action)
@@ -520,6 +536,20 @@ class GwMapzoneManager:
         tools_qt.set_widget_text(self.config_dlg, 'txt_forceClosed', f"{force_closed_list_aux}")
         tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_add_forceClosed, True)
         tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_remove_forceClosed, True)
+
+    def _set_ignore(self, feat_id):
+        """
+        Function called in def _get_id(self, dialog, action, option, point, event):
+            getattr(self, options[option][1])(feat_id)
+
+            :param feat_id: Id of the snapped feature
+        """
+        # Set variable, set widget text and enable add button
+        self.ignore_list.add(feat_id)
+        ignore_list_aux = [int(ignore) for ignore in self.ignore_list]
+        tools_qt.set_widget_text(self.config_dlg, 'txt_ignore', f"{ignore_list_aux}")
+        tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_add_ignore, True)
+        tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_remove_ignore, True)
 
     def _add_node_parent(self, dialog):
         """ ADD button for nodeParent """
@@ -648,6 +678,70 @@ class GwMapzoneManager:
 
             self._cancel_snapping_tool(dialog, dialog.btn_add_forceClosed)
             self._reset_config_vars(3)
+
+    def _add_ignore(self, dialog):
+        """ ADD button for ignore """
+
+        ignore_list = json.dumps(list(self.ignore_list))
+        preview = tools_qt.get_text(dialog, 'txt_preview')
+
+        parameters = f'"action": "ADD", "configZone": "{self.mapzone_type}", "mapzoneId": "{self.mapzone_id}", ' \
+                     f'"ignore": {ignore_list}'
+        if self.netscenario_id is not None:
+            parameters += f', "netscenarioId": {self.netscenario_id}'
+        if preview:
+            parameters += f', "config": {preview}'
+        extras = f'"parameters": {{{parameters}}}'
+        body = tools_gw.create_body(extras=extras)
+        json_result = tools_gw.execute_procedure('gw_fct_config_mapzones', body)
+        if json_result is None:
+            return
+
+        if 'status' in json_result and json_result['status'] == 'Accepted':
+            if json_result['message']:
+                level = 1
+                if 'level' in json_result['message']:
+                    level = int(json_result['message']['level'])
+                tools_qgis.show_message(json_result['message']['text'], level, dialog=dialog)
+
+            preview = json_result['body']['data'].get('preview')
+            if preview:
+                tools_qt.set_widget_text(dialog, 'txt_preview', json.dumps(preview))
+
+            self._cancel_snapping_tool(dialog, dialog.btn_add_ignore)
+            self._reset_config_vars(4)
+
+    def _remove_ignore(self, dialog):
+        """ REMOVE button for ignore """
+
+        ignore_list = json.dumps(list(self.ignore_list))
+        preview = tools_qt.get_text(dialog, 'txt_preview')
+
+        parameters = f'"action": "REMOVE", "configZone": "{self.mapzone_type}", "mapzoneId": "{self.mapzone_id}", ' \
+                     f'"ignore": {ignore_list}'
+        if self.netscenario_id is not None:
+            parameters += f', "netscenarioId": {self.netscenario_id}'
+        if preview:
+            parameters += f', "config": {preview}'
+        extras = f'"parameters": {{{parameters}}}'
+        body = tools_gw.create_body(extras=extras)
+        json_result = tools_gw.execute_procedure('gw_fct_config_mapzones', body)
+        if json_result is None:
+            return
+
+        if 'status' in json_result and json_result['status'] == 'Accepted':
+            if json_result['message']:
+                level = 1
+                if 'level' in json_result['message']:
+                    level = int(json_result['message']['level'])
+                tools_qgis.show_message(json_result['message']['text'], level, dialog=dialog)
+
+            preview = json_result['body']['data'].get('preview')
+            if preview:
+                tools_qt.set_widget_text(dialog, 'txt_preview', json.dumps(preview))
+
+            self._cancel_snapping_tool(dialog, dialog.btn_remove_ignore)
+            self._reset_config_vars(4)
 
     def _clear_preview(self, dialog):
         """ Set preview textbox to '' """
