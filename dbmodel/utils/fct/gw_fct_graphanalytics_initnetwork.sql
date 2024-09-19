@@ -60,9 +60,9 @@ BEGIN
         WHERE n.state = 1 AND s.is_operative = TRUE
     );
 
-    INSERT INTO temp_pgr_arc (pgr_arc_id, arc_id, pgr_node_1, pgr_node_2, node_1, node_2, cost, reverse_cost)
+    INSERT INTO temp_pgr_arc (pgr_arc_id, arc_id, pgr_node_1, pgr_node_2, node_1, node_2, cost, reverse_cost, the_geom)
     (
-        SELECT a.arc_id::INT, a.arc_id, a.node_1::INT, a.node_2::INT, a.node_1, a.node_2, v_cost, v_reverse_cost
+        SELECT a.arc_id::INT, a.arc_id, a.node_1::INT, a.node_2::INT, a.node_1, a.node_2, v_cost, v_reverse_cost, a.the_geom
         FROM arc a
         JOIN value_state_type s ON s.id = a.state_type
         WHERE a.state = 1 AND s.is_operative = TRUE

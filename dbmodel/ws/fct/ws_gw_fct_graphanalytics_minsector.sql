@@ -65,12 +65,8 @@ BEGIN
     -- Create additional temporary tables
 	CREATE TEMP TABLE temp_audit_check_data (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
  	CREATE TEMP TABLE temp_minsector (LIKE SCHEMA_NAME.minsector INCLUDING ALL);
-	CREATE TEMP TABLE temp_t_node (LIKE SCHEMA_NAME.node INCLUDING ALL);
 	CREATE TEMP TABLE temp_t_connec (LIKE SCHEMA_NAME.connec INCLUDING ALL);
 	CREATE TEMP TABLE temp_t_link (LIKE SCHEMA_NAME.link INCLUDING ALL);
-	CREATE TEMP TABLE temp_t_arc (LIKE SCHEMA_NAME.arc INCLUDING ALL);
-	CREATE TEMP TABLE temp_anl_arc (LIKE SCHEMA_NAME.anl_arc INCLUDING ALL);
-	CREATE TEMP TABLE IF NOT EXISTS temp_t_anlgraph (LIKE SCHEMA_NAME.temp_anlgraph INCLUDING ALL);
 
 	-- Starting process
 	INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat('MINSECTOR DYNAMIC SECTORITZATION'));
@@ -81,10 +77,9 @@ BEGIN
 	perform gw_fct_graphanalytics_initnetwork();
 
     -- Insert values into temporary tables (only propagating features belonging to the selected exploitations)
-    INSERT INTO temp_t_arc SELECT * FROM arc WHERE state = 1;  -- Should be refined to include only operative features
-    INSERT INTO temp_t_node SELECT * FROM node WHERE state = 1;  -- Should be refined to include only operative features
-    INSERT INTO temp_t_connec SELECT * FROM connec WHERE state = 1;  -- Should be refined to include only operative features
-    INSERT INTO temp_t_link SELECT * FROM link WHERE state = 1;  -- Should be refined to include only operative features
+	INSERT INTO temp_t_connec SELECT * FROM connec c JOIN value_state_type s ON s.id = c.state_type WHERE c.state = 1 AND s.is_operative = TRUE
+    INSERT INTO temp_t_link SELECT * FROM link WHERE state = 1 AND is_operative = TRUE;
+
 
     -- Nodes at the limits of minsectors: nodes with "graph_delimiter" = 'MINSECTOR'
     -- Also, nodes that appear as starts in the "sector" table and have "graph_delimiter" = 'SECTOR'
@@ -187,8 +182,6 @@ BEGIN
     WHERE n.node_id = s.node_id;
 
     -- Update feature temporary tables
-    UPDATE temp_t_arc a SET minsector_id = zone_id FROM temp_pgr_arc t WHERE t.arc_id = a.arc_id AND graph_delimiter IS NULL;
-    UPDATE temp_t_node a SET minsector_id = zone_id FROM temp_pgr_node t WHERE t.node_id = a.node_id;
     UPDATE temp_t_connec c SET minsector_id = a.minsector_id FROM arc a WHERE c.arc_id = a.arc_id;
     UPDATE temp_t_link l SET minsector_id = c.minsector_id FROM connec c WHERE c.connec_id = l.feature_id;
 
@@ -245,40 +238,41 @@ BEGIN
 
  	-- Update minsector temporary geometry
     IF v_updatemapzgeom = 0 OR v_updatemapzgeom IS NULL THEN
-        EXECUTE 'UPDATE temp_minsector m SET the_geom = NULL FROM temp_t_arc a WHERE a.minsector_id = m.minsector_id';
+		EXECUTE 'UPDATE temp_minsector m SET the_geom = NULL FROM temp_pgr_arc t WHERE t.zone_id = m.minsector_id';
+
     ELSIF v_updatemapzgeom = 1 THEN
         -- Concave polygon
-        v_querytext := 'UPDATE temp_minsector SET the_geom = ST_Multi(b.the_geom) 
+		v_querytext := 'UPDATE temp_minsector SET the_geom = ST_Multi(b.the_geom) 
             FROM (
                 WITH polygon AS (
-                    SELECT ST_Collect(the_geom) AS g, minsector_id FROM temp_t_arc a GROUP BY minsector_id
+                    SELECT ST_Collect(the_geom) AS g, zone_id FROM temp_pgr_arc a GROUP BY zone_id
                 )
-                SELECT minsector_id, CASE WHEN ST_GeometryType(ST_ConcaveHull(g, '||v_geomparamupdate||')) = ''ST_Polygon''::TEXT THEN
+                SELECT zone_id, CASE WHEN ST_GeometryType(ST_ConcaveHull(g, '||v_geomparamupdate||')) = ''ST_Polygon''::TEXT THEN
                     ST_Buffer(ST_ConcaveHull(g, '||v_concavehull||'), 3)::geometry(Polygon, '||v_srid||')
                 ELSE
                     ST_Expand(ST_Buffer(g, 3::DOUBLE PRECISION), 1::DOUBLE PRECISION)::geometry(Polygon, '||v_srid||')
                 END AS the_geom FROM polygon
-            ) b WHERE b.minsector_id = temp_minsector.minsector_id';
+            ) b WHERE b.zone_id = temp_minsector.minsector_id';
         EXECUTE v_querytext;
     ELSIF v_updatemapzgeom = 2 THEN
         -- Pipe buffer
-        v_querytext := 'UPDATE temp_minsector SET the_geom = ST_Multi(geom) FROM (
-                SELECT minsector_id, ST_Buffer(ST_Collect(the_geom), '||v_geomparamupdate||') AS geom FROM temp_t_arc a WHERE minsector_id > 0 GROUP BY minsector_id
-            ) b WHERE b.minsector_id = temp_minsector.minsector_id';
+		v_querytext := 'UPDATE temp_minsector SET the_geom = ST_Multi(geom) FROM (
+                SELECT zone_id, ST_Buffer(ST_Collect(the_geom), '||v_geomparamupdate||') AS geom FROM temp_pgr_arc a WHERE zone_id > 0 GROUP BY zone_id
+            ) b WHERE b.zone_id = temp_minsector.minsector_id';
         EXECUTE v_querytext;
 
         RAISE NOTICE ' %', v_querytext;
     ELSIF v_updatemapzgeom = 3 THEN
         -- Use plot and pipe buffer
-        v_querytext := 'UPDATE temp_minsector SET the_geom = geom FROM (
-                SELECT minsector_id, ST_Multi(ST_Buffer(ST_Collect(geom), 0.01)) AS geom FROM (
-                    SELECT minsector_id, ST_Buffer(ST_Collect(the_geom), '||v_geomparamupdate||') AS geom FROM temp_t_arc a
-                    WHERE minsector_id::INTEGER > 0 GROUP BY minsector_id
+		v_querytext := 'UPDATE temp_minsector SET the_geom = geom FROM (
+                SELECT zone_id, ST_Multi(ST_Buffer(ST_Collect(geom), 0.01)) AS geom FROM (
+                    SELECT zone_id, ST_Buffer(ST_Collect(the_geom), '||v_geomparamupdate||') AS geom FROM temp_pgr_arc a
+                    WHERE zone_id::INTEGER > 0 GROUP BY zone_id
                     UNION
-                    SELECT minsector_id, ST_Collect(ext_plot.the_geom) AS geom FROM temp_t_connec a, ext_plot
-                    WHERE minsector_id::INTEGER > 0 AND ST_DWithin(a.the_geom, ext_plot.the_geom, 0.001) GROUP BY minsector_id
-                ) c GROUP BY minsector_id
-            ) b WHERE b.minsector_id = temp_minsector.minsector_id';
+                    SELECT zone_id, ST_Collect(ext_plot.the_geom) AS geom FROM temp_t_connec a, ext_plot
+                    WHERE zone_id::INTEGER > 0 AND ST_DWithin(a.the_geom, ext_plot.the_geom, 0.001) GROUP BY zone_id
+                ) c GROUP BY zone_id
+            ) b WHERE b.zone_id = temp_minsector.minsector_id';
         EXECUTE v_querytext;
     END IF;
 
@@ -312,8 +306,9 @@ BEGIN
         SELECT DISTINCT ON (node_id) node_id, minsector_id_1, minsector_id_2 FROM temp_pgr_minsector;
 
         -- Update values (only for objects belonging to the selected exploitations)
-        EXECUTE 'UPDATE arc a SET minsector_id = t.minsector_id FROM temp_t_arc t WHERE a.arc_id = t.arc_id AND a.expl_id IN ('||v_expl||')';
-        EXECUTE 'UPDATE node n SET minsector_id = t.minsector_id FROM temp_t_node t WHERE n.node_id = t.node_id AND n.expl_id IN ('||v_expl||')';
+        EXECUTE 'UPDATE arc a SET minsector_id = t.zone_id FROM temp_pgr_arc t WHERE a.arc_id = t.arc_id AND a.expl_id IN ('||v_expl||')';
+        EXECUTE 'UPDATE node n SET minsector_id = t.zone_id FROM temp_pgr_node t WHERE n.node_id = t.node_id AND n.expl_id IN ('||v_expl||')';
+
         EXECUTE 'UPDATE connec c SET minsector_id = t.minsector_id FROM temp_t_connec t WHERE c.connec_id = t.connec_id AND t.expl_id IN ('||v_expl||')';
         EXECUTE 'UPDATE link l SET minsector_id = t.minsector_id FROM temp_t_link t WHERE l.link_id = t.link_id AND l.expl_id IN ('||v_expl||')';
 
@@ -360,16 +355,10 @@ BEGIN
     DROP TABLE IF EXISTS temp_pgr_drivingdistance;
 
     -- Drop temporary layers (old)
-    DROP VIEW IF EXISTS v_temp_anlgraph;
-    DROP VIEW IF EXISTS v_t_process;
-    DROP TABLE IF EXISTS temp_t_anlgraph;
     DROP TABLE IF EXISTS temp_minsector;
-    DROP TABLE IF EXISTS temp_t_node;
-    DROP TABLE IF EXISTS temp_t_link;
     DROP TABLE IF EXISTS temp_t_connec;
-    DROP TABLE IF EXISTS temp_anl_arc;
+    DROP TABLE IF EXISTS temp_t_link;
     DROP TABLE IF EXISTS temp_audit_check_data;
-    DROP TABLE IF EXISTS temp_t_arc;
 
     -- Return
     RETURN gw_fct_json_create_return(
