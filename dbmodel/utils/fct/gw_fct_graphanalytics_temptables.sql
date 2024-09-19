@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 The code of this inundation function has been provided by Claudia Dragoste (Aigues de Manresa, S.A.)
 */
 
--- FUNCTION CODE: XXXX
+-- FUNCTION CODE: 3330
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_graphanalytics_temptables();
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_graphanalytics_temptables()
