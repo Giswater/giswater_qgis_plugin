@@ -127,20 +127,13 @@ BEGIN
 		END IF;
 
 		IF v_forceclosed IS NOT NULL THEN
-				EXECUTE 'SELECT json_agg(a::integer) FROM json_array_elements_text('''||v_forceclosed||'''::json) a WHERE a IN (SELECT node_id FROM node WHERE state > 0) AND a NOT IN
-				(select json_array_elements_text('''||v_preview||'''::json -> ''forceClosed''))'
-			into v_forceclosed;
-
-
-			IF v_forceclosed IS NOT NULL THEN
-			    v_forceClosed_value = json_extract_path_text(v_preview::json, 'forceClosed');
-			    IF v_forceClosed_value::text = '[]' THEN
-			        v_combined_forceClosed_value = v_forceclosed::text;
-			    ELSE
-			        v_combined_forceClosed_value = trim(both '[]' from v_forceClosed_value::text) || ',' || v_forceclosed::text;
-			    END IF;
-			    v_preview = gw_fct_json_object_set_key(v_preview, 'forceClosed', ('[' || v_combined_forceClosed_value || ']')::json);
-			END IF;
+		    v_forceClosed_value = COALESCE(json_extract_path(v_preview::json, 'forceClosed'), '[]'::json);
+		    IF json_array_length(v_forceClosed_value) = 0 THEN
+		        v_preview = gw_fct_json_object_set_key(v_preview, 'forceClosed', v_forceclosed::json);
+		    ELSE
+		        v_combined_forceClosed_value = jsonb_concat(v_forceClosed_value::jsonb, v_forceclosed::jsonb);
+		        v_preview = gw_fct_json_object_set_key(v_preview, 'forceClosed', v_combined_forceClosed_value::json);
+		    END IF;
 		END IF;
 	ELSIF v_action = 'REMOVE' THEN
 		IF v_nodeparent IS NOT NULL THEN
