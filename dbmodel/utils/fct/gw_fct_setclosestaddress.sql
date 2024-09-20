@@ -42,6 +42,7 @@ v_polygonlayer text;
 v_expl text;
 v_state text;
 v_geom_column text;
+v_count integer;
 
 BEGIN
 
@@ -63,6 +64,21 @@ BEGIN
 	v_searchbuffer := ((p_data ->>'data')::json->>'parameters')::json->>'searchBuffer';
 	v_feature_type := lower(((p_data ->>'feature')::json->>'featureType'))::text;
 	v_polygonlayer := ((p_data ->>'data')::json->>'parameters')::json->>'insersectPolygonLayer';
+	Select count(*)
+	into v_count From ext_address
+	Where postnumber NOT SIMILAR TO '[0-9]*';
+	
+	
+	
+	if v_count > 0 and v_fieldtoupdate='postnumber' THEN
+		
+		execute 'SELECT gw_fct_getmessage($${
+		"client":{"device":4, "infoType":1, "lang":"ES"},
+		"feature":{},
+		"data":{"message":"3268", "function":"3198","debug_msg":null, "variables":"value", "is_process":true}}$$);';
+	
+
+	end if;
 
 	-- Reset values
 	DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=486;
