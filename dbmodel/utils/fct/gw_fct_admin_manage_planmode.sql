@@ -156,11 +156,11 @@ BEGIN
 		p AS (SELECT connec_id, psector_id, state, arc_id FROM plan_psector_x_connec WHERE active), 
 		s AS (SELECT * FROM selector_psector WHERE cur_user = current_user), 
 		c as (SELECT connec_id, state, arc_id FROM connec)
-		SELECT c.connec_id, c.arc_id, state as flag FROM selector_state,c WHERE c.state = selector_state.state_id AND selector_state.cur_user = "current_user"()::text
+		SELECT c.connec_id::varchar(30), c.arc_id, state as flag FROM selector_state,c WHERE c.state = selector_state.state_id AND selector_state.cur_user = "current_user"()::text
 			EXCEPT
-		SELECT p.connec_id, p.arc_id, p.state FROM selector_psector, p WHERE p.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text AND p.state = 0
+		SELECT p.connec_id::varchar(30), p.arc_id, p.state FROM selector_psector, p WHERE p.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text AND p.state = 0
 			UNION
-		SELECT p.connec_id, p.arc_id, p.state FROM selector_psector, p WHERE p.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text AND p.state = 1;
+		SELECT p.connec_id::varchar(30), p.arc_id, p.state FROM selector_psector, p WHERE p.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text AND p.state = 1;
 
 
 		IF v_project_type ='WS' THEN
