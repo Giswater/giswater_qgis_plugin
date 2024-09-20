@@ -207,7 +207,7 @@ BEGIN
             LEFT JOIN ext_rtc_hydrometer ON ext_rtc_hydrometer.id::TEXT = rtc_hydrometer.hydrometer_id::TEXT
             JOIN ext_rtc_hydrometer_state ON ext_rtc_hydrometer_state.id = ext_rtc_hydrometer.state_id
             JOIN connec a ON a.customer_code::TEXT = ext_rtc_hydrometer.connec_id::TEXT
-            -- WHERE ext_rtc_hydrometer.state_id ANY (v_hydrometer_service)
+            WHERE ext_rtc_hydrometer.state_id IN (v_hydrometer_service)
             UNION
             SELECT hydrometer_id, minsector_id
             FROM selector_hydrometer, rtc_hydrometer
@@ -215,7 +215,7 @@ BEGIN
             JOIN ext_rtc_hydrometer_state ON ext_rtc_hydrometer_state.id = ext_rtc_hydrometer.state_id
             JOIN man_netwjoin ON man_netwjoin.customer_code::TEXT = ext_rtc_hydrometer.connec_id::TEXT
             JOIN node a ON a.node_id::TEXT = man_netwjoin.node_id::TEXT
-            -- WHERE ext_rtc_hydrometer.state_id ANY (v_hydrometer_service)
+            WHERE ext_rtc_hydrometer.state_id IN (v_hydrometer_service)
         ) a GROUP BY minsector_id
     ) a WHERE a.minsector_id = temp_minsector.minsector_id;
     UPDATE minsector a SET num_hydro = 0 WHERE num_hydro IS NULL;
