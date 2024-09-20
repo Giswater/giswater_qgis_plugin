@@ -2085,7 +2085,7 @@ class GwMincut:
         self.dlg_mincut.btn_accept.setEnabled(True)
 
 
-    def _refresh_mincut(self, triggered=None, action="mincutNetwork"):
+    def _refresh_mincut(self, triggered=None, action="mincutNetwork", zoom=True):
         """ B2-125: Refresh current mincut """
 
         # Manage if task is already running
@@ -2125,10 +2125,10 @@ class GwMincut:
             self.mincut_task = GwAutoMincutTask("Mincut execute", self, element_id, action=action, timer=self.timer)
             QgsApplication.taskManager().addTask(self.mincut_task)
             QgsApplication.taskManager().triggerTask(self.mincut_task)
-            self.mincut_task.task_finished.connect(partial(self._refresh_mincut_finished))
+            self.mincut_task.task_finished.connect(partial(self._refresh_mincut_finished, zoom))
 
 
-    def _refresh_mincut_finished(self, signal):
+    def _refresh_mincut_finished(self, zoom, signal):
 
         try:
             self.dlg_mincut.btn_cancel_task.hide()
@@ -2155,7 +2155,7 @@ class GwMincut:
 
             # Zoom to rectangle (zoom to mincut)
             polygon = complet_result['body']['data'].get('geometry')
-            if polygon:
+            if polygon and zoom:
                 polygon = polygon[9:len(polygon) - 2]
                 polygon = polygon.split(',')
                 if polygon[0] == '':
@@ -2246,6 +2246,7 @@ class GwMincut:
                 self._custom_mincut_execute(element_id)
             elif action.objectName() == "actionChangeValveStatus":
                 self._change_valve_status_execute(element_id)
+                self._refresh_mincut(zoom=False)
             tools_qgis.refresh_map_canvas(True)
             self.set_visible_mincut_layers()
             self._remove_selection()
