@@ -29,9 +29,8 @@ DECLARE
 BEGIN
 
     SET search_path = "SCHEMA_NAME", public;
-	
-	EXECUTE 'select lower(project_type) from sys_version order by "date" desc limit 1'
-	INTO v_project_type;
+
+	EXECUTE 'SELECT lower(project_type) FROM sys_version ORDER BY "date" DESC LIMIT 1' INTO v_project_type;
 	IF v_project_type='ud' THEN v_reverse_cost=-1; END IF;
 
     EXECUTE 'SELECT MAX(pgr_node_id) FROM temp_pgr_node' INTO v_node_id;
