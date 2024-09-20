@@ -60,13 +60,7 @@ BEGIN
 
     -- Create temporary tables
 	-- =======================
-	PERFORM gw_fct_graphanalytics_temptables();
-
-    -- Create additional temporary tables
-	CREATE TEMP TABLE temp_audit_check_data (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
- 	CREATE TEMP TABLE temp_minsector (LIKE SCHEMA_NAME.minsector INCLUDING ALL);
-	CREATE TEMP TABLE temp_t_connec (LIKE SCHEMA_NAME.connec INCLUDING ALL);
-	CREATE TEMP TABLE temp_t_link (LIKE SCHEMA_NAME.link INCLUDING ALL);
+	PERFORM gw_fct_graphanalytics_temptables('{"data":{"fct_name":"MINSECTOR"}}');
 
 	-- Starting process
 	INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat('MINSECTOR DYNAMIC SECTORITZATION'));
@@ -235,46 +229,9 @@ BEGIN
 	-- Update minsector temporary exploitation
     UPDATE temp_minsector t SET expl_id = n.expl_id FROM node n WHERE n.node_id::INTEGER = t.minsector_id;
 
-
- 	-- Update minsector temporary geometry
-    IF v_updatemapzgeom = 0 OR v_updatemapzgeom IS NULL THEN
-		EXECUTE 'UPDATE temp_minsector m SET the_geom = NULL FROM temp_pgr_arc t WHERE t.zone_id = m.minsector_id';
-
-    ELSIF v_updatemapzgeom = 1 THEN
-        -- Concave polygon
-		v_querytext := 'UPDATE temp_minsector SET the_geom = ST_Multi(b.the_geom) 
-            FROM (
-                WITH polygon AS (
-                    SELECT ST_Collect(the_geom) AS g, zone_id FROM temp_pgr_arc a GROUP BY zone_id
-                )
-                SELECT zone_id, CASE WHEN ST_GeometryType(ST_ConcaveHull(g, '||v_geomparamupdate||')) = ''ST_Polygon''::TEXT THEN
-                    ST_Buffer(ST_ConcaveHull(g, '||v_concavehull||'), 3)::geometry(Polygon, '||v_srid||')
-                ELSE
-                    ST_Expand(ST_Buffer(g, 3::DOUBLE PRECISION), 1::DOUBLE PRECISION)::geometry(Polygon, '||v_srid||')
-                END AS the_geom FROM polygon
-            ) b WHERE b.zone_id = temp_minsector.minsector_id';
-        EXECUTE v_querytext;
-    ELSIF v_updatemapzgeom = 2 THEN
-        -- Pipe buffer
-		v_querytext := 'UPDATE temp_minsector SET the_geom = ST_Multi(geom) FROM (
-                SELECT zone_id, ST_Buffer(ST_Collect(the_geom), '||v_geomparamupdate||') AS geom FROM temp_pgr_arc a WHERE zone_id > 0 GROUP BY zone_id
-            ) b WHERE b.zone_id = temp_minsector.minsector_id';
-        EXECUTE v_querytext;
-
-        RAISE NOTICE ' %', v_querytext;
-    ELSIF v_updatemapzgeom = 3 THEN
-        -- Use plot and pipe buffer
-		v_querytext := 'UPDATE temp_minsector SET the_geom = geom FROM (
-                SELECT zone_id, ST_Multi(ST_Buffer(ST_Collect(geom), 0.01)) AS geom FROM (
-                    SELECT zone_id, ST_Buffer(ST_Collect(the_geom), '||v_geomparamupdate||') AS geom FROM temp_pgr_arc a
-                    WHERE zone_id::INTEGER > 0 GROUP BY zone_id
-                    UNION
-                    SELECT zone_id, ST_Collect(ext_plot.the_geom) AS geom FROM temp_t_connec a, ext_plot
-                    WHERE zone_id::INTEGER > 0 AND ST_DWithin(a.the_geom, ext_plot.the_geom, 0.001) GROUP BY zone_id
-                ) c GROUP BY zone_id
-            ) b WHERE b.zone_id = temp_minsector.minsector_id';
-        EXECUTE v_querytext;
-    END IF;
+    -- Update minsector temporary geometry
+	-- =======================
+    PERFORM gw_fct_graphanalytics_settempgeom('{"data":{"updatemapzgeom":'||v_updatemapzgeom||'}}');
 
 	IF v_commitchanges IS FALSE THEN
         -- Polygons

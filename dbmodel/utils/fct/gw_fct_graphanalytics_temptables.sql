@@ -8,18 +8,26 @@ The code of this inundation function has been provided by Claudia Dragoste (Aigu
 
 -- FUNCTION CODE: 3330
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_graphanalytics_temptables();
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_graphanalytics_temptables()
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_graphanalytics_temptables(json);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_graphanalytics_temptables(p_data json)
 RETURNS json
 LANGUAGE plpgsql
 AS $function$
 
+
+/*
+SELECT gw_fct_graphanalytics_temptables('{"data":{"fct_name":"MINSECTOR"}}');
+*/
+
 DECLARE
-    v_return_text TEXT;
+    v_fct_name TEXT;
 
 BEGIN
 
     SET search_path = "SCHEMA_NAME", public;
+
+    v_fct_name = (SELECT (p_data::json->>'data')::json->>'fct_name');
+
 
     CREATE TEMP TABLE temp_pgr_node (
         pgr_node_id INT NOT NULL,
@@ -94,6 +102,16 @@ BEGIN
     CREATE INDEX temp_pgr_drivingdistance_node ON temp_pgr_drivingdistance USING btree (node);
     CREATE INDEX temp_pgr_drivingdistance_edge ON temp_pgr_drivingdistance USING btree (edge);
     GRANT UPDATE, INSERT, REFERENCES, SELECT, DELETE, TRUNCATE, TRIGGER ON TABLE temp_pgr_drivingdistance TO role_basic;
+
+    -- Create other additional temporary tables
+	CREATE TEMP TABLE temp_audit_check_data (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
+	CREATE TEMP TABLE temp_t_connec (LIKE SCHEMA_NAME.connec INCLUDING ALL);
+	CREATE TEMP TABLE temp_t_link (LIKE SCHEMA_NAME.link INCLUDING ALL);
+
+    -- For specific functions
+    IF v_fct_name == 'MINSECTOR' THEN
+ 	    CREATE TEMP TABLE temp_minsector (LIKE SCHEMA_NAME.minsector INCLUDING ALL);
+    END IF;
 
 	RETURN ('{"status":"Accepted"}')::json;
 
