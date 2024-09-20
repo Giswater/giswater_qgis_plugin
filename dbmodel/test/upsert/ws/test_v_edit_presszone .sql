@@ -18,7 +18,7 @@ VALUES('-901', 'pzone1-1s', 1, NULL, NULL, 103.85, '{"use":[{"nodeParent":"1105"
 SELECT is((SELECT count(*)::integer FROM v_edit_presszone WHERE presszone_id = '-901'), 1, 'INSERT: v_edit_presszone -901 was inserted');
 
 UPDATE v_edit_presszone SET descript = 'updated descript' WHERE presszone_id = '-901';
-SELECT is((SELECT descript FROM v_edit_dma WHERE presszone_id = '-901'), 'updated descript', 'UPDATE: v_edit_presszone -901 was updated');
+SELECT is((SELECT descript FROM v_edit_presszone WHERE presszone_id = '-901'), 'updated descript', 'UPDATE: v_edit_presszone -901 was updated');
 
 DELETE FROM v_edit_presszone WHERE presszone_id = '-901';
 SELECT is((SELECT count(*)::integer FROM v_edit_presszone WHERE presszone_id = '-901'), 0, 'DELETE: v_edit_presszone -901 was deleted');
