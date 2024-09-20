@@ -86,9 +86,12 @@ BEGIN
                 END IF;
 
                 IF v_toarc IS NULL AND v_project_type = 'WS' THEN
-                    EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{"message":"3244", "function":"3270","debug_msg": "'||v_nodeparent||'"}}$$);' INTO v_audit_result;
-                ELSE
-                    v_preview = concat('{"nodeParent":"', v_nodeparent, '", "toArc":', v_toarc, '}');
+                    EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                        "data":{"message":"3244", "function":"3270","debug_msg": "'||v_nodeparent||'"}}$$);'  INTO v_audit_result;
+                ELSIF v_project_type = 'WS' THEN
+                        v_preview = concat('{"nodeParent":"',v_nodeparent,'", "toArc":',v_toarc,'}');
+                ELSIF v_project_type = 'UD' THEN
+                        v_preview = concat('{"nodeParent":"',v_nodeparent,'"}');
                 END IF;
 
                 IF v_config IS NULL THEN
