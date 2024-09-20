@@ -19,3 +19,12 @@ ON CONFLICT (id) DO NOTHING;
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source")
 VALUES (3332, 'gw_fct_graphanalytics_settempgeom', 'utils', 'function', NULL, 'json', 'Function to update the geometry of the mapzones in the temp_minsector table for graphanalytics', 'role_basic', NULL, 'core')
 ON CONFLICT (id) DO NOTHING;
+
+-- update graphanalytic_minsector description to include explotation id description
+UPDATE sys_function SET descript='Dynamic analisys to sectorize network using the flow traceability function and establish Minimum Sectors. 
+Before start you need to configure:
+- Field graph_delimiter on [cat_feature_node] table to establish which elements will be used to sectorize. 
+- Enable status for minsector on utils_graphanalytics_status variable from [config_param_system] table.
+
+In explotation id you can use ''-9'' to select all explotations, or a list of explotations separated by comma.'
+WHERE id=2706;
