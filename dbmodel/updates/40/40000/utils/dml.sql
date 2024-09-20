@@ -9,19 +9,19 @@ VALUES (3326, 'gw_fct_graphanalytics_arrangenetwork', 'utils', 'function', NULL,
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source")
-VALUES (3328, 'gw_fct_graphanalytics_initnetwork', 'utils', 'function', NULL, 'json', 'Function to init the network in graphanalytics', 'role_basic', NULL, 'core')
+VALUES (3328, 'gw_fct_graphanalytics_initnetwork', 'utils', 'function', 'json', 'json', 'Function to init the network in graphanalytics', 'role_basic', NULL, 'core')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source")
-VALUES (3330, 'gw_fct_graphanalytics_temptables', 'utils', 'function', NULL, 'json', 'Function to create temporal tables for graphanalytics', 'role_basic', NULL, 'core')
+VALUES (3330, 'gw_fct_graphanalytics_temptables', 'utils', 'function', 'json', 'json', 'Function to create temporal tables for graphanalytics', 'role_basic', NULL, 'core')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source")
-VALUES (3332, 'gw_fct_graphanalytics_settempgeom', 'utils', 'function', NULL, 'json', 'Function to update the geometry of the mapzones in the temp_minsector table for graphanalytics', 'role_basic', NULL, 'core')
+VALUES (3332, 'gw_fct_graphanalytics_settempgeom', 'utils', 'function', 'json', 'json', 'Function to update the geometry of the mapzones in the temp_minsector table for graphanalytics', 'role_basic', NULL, 'core')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source")
-VALUES (3334, 'gw_fct_graphanalytics_macrominsector', 'utils', 'function', NULL, 'json', 'Function to create macrominsectors', 'role_basic', NULL, 'core')
+VALUES (3334, 'gw_fct_graphanalytics_macrominsector', 'utils', 'function', 'json', 'json', 'Function to create macrominsectors', 'role_basic', NULL, 'core')
 ON CONFLICT (id) DO NOTHING;
 
 -- update graphanalytic_minsector description to include explotation id description
