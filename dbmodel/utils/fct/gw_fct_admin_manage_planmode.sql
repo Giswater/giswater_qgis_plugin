@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 3304
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_manage_planmode(p_data json)
+CREATE OR REPLACE FUNCTION ws36013_2.gw_fct_admin_manage_planmode(p_data json)
   RETURNS json AS
 $BODY$
 
@@ -69,7 +69,7 @@ BEGIN
 		  WHERE arc.state = selector_state.state_id AND selector_state.cur_user = "current_user"()::text;
 
 		CREATE OR REPLACE VIEW v_state_connec AS 
-		  SELECT connec.connec_id, connec.arc_id,state AS flag
+		  SELECT connec.connec_id, connec.arc_id, state AS flag
 		  FROM selector_state, selector_expl, connec
 		  WHERE connec.state = selector_state.state_id AND (connec.expl_id = selector_expl.expl_id OR connec.expl_id2 = selector_expl.expl_id)
 		  AND selector_state.cur_user = "current_user"()::text AND selector_expl.cur_user = "current_user"()::text;
@@ -156,11 +156,11 @@ BEGIN
 		p AS (SELECT connec_id, psector_id, state, arc_id FROM plan_psector_x_connec WHERE active), 
 		s AS (SELECT * FROM selector_psector WHERE cur_user = current_user), 
 		c as (SELECT connec_id, state, arc_id FROM connec)
-		SELECT c.connec_id, c.arc_id FROM selector_state,c WHERE c.state = selector_state.state_id AND selector_state.cur_user = "current_user"()::text
+		SELECT c.connec_id, c.arc_id, state as flag FROM selector_state,c WHERE c.state = selector_state.state_id AND selector_state.cur_user = "current_user"()::text
 			EXCEPT
-		SELECT p.connec_id, p.arc_id FROM selector_psector, p WHERE p.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text AND p.state = 0
+		SELECT p.connec_id, p.arc_id, p.state FROM selector_psector, p WHERE p.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text AND p.state = 0
 			UNION
-		SELECT p.connec_id, p.arc_id FROM selector_psector, p WHERE p.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text AND p.state = 1;
+		SELECT p.connec_id, p.arc_id, p.state FROM selector_psector, p WHERE p.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text AND p.state = 1;
 
 
 		IF v_project_type ='WS' THEN
@@ -175,7 +175,7 @@ BEGIN
 				EXCEPT
 			SELECT p.link_id FROM sp, se, p JOIN l USING (link_id) WHERE p.psector_id = sp.psector_id AND sp.cur_user = "current_user"()::text AND p.state = 0 AND l.expl_id = se.expl_id AND se.cur_user = CURRENT_USER::text
 				UNION
-			SELECT p.link_id FROM sp, se, p JOIN l USING (link_id) WHERE p.psector_id = sp.psector_id AND sp.cur_user = "current_user"()::text AND p.state = 1 AND l.expl_id = se.expl_id AND se.cur_user = CURRENT_USER::text
+			SELECT p.link_id FROM sp, se, p JOIN l USING (link_id) WHERE p.psector_id = sp.psector_id AND sp.cur_user = "current_user"()::text AND p.state = 1 AND l.expl_id = se.expl_id AND se.cur_user = CURRENT_USER::text;
 
 		ELSIF v_project_type ='UD' THEN
 		
@@ -220,11 +220,10 @@ BEGIN
 			CREATE OR REPLACE VIEW v_state_link AS
 			SELECT * FROM v_state_link_connec
 			UNION
-			SELECT * FROM v_state_link_gully;
-
-			v_message = 'PLAN MODE SUCESSFULLY RECOVERED';
-			
+			SELECT * FROM v_state_link_gully;			
 		END IF;
+
+		v_message = 'PLAN MODE SUCESSFULLY RECOVERED';
 
 	END IF;
 	
