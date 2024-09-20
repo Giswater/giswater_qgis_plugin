@@ -10,9 +10,8 @@ The code of this inundation function has been provided by Claudia Dragoste (Aigu
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_graphanalytics_settempgeom(json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_graphanalytics_settempgeom(p_data json)
-RETURNS json
-LANGUAGE plpgsql
-AS $function$
+RETURNS json AS
+$BODY$
 
 /* Example:
 SELECT gw_fct_graphanalytics_settempgeom('{"data":{"updatemapzgeom":0}}');

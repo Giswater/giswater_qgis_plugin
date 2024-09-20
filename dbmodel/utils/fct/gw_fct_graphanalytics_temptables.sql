@@ -10,16 +10,15 @@ The code of this inundation function has been provided by Claudia Dragoste (Aigu
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_graphanalytics_temptables(json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_graphanalytics_temptables(p_data json)
-RETURNS json
-LANGUAGE plpgsql
-AS $function$
-
+RETURNS json AS
+$BODY$
 
 /*
 SELECT gw_fct_graphanalytics_temptables('{"data":{"fct_name":"MINSECTOR"}}');
 */
 
 DECLARE
+
     v_fct_name TEXT;
 
 BEGIN

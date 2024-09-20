@@ -12,14 +12,16 @@ DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_grafanalytics_macrominsector(json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_graphanalytics_macrominsector(p_data json)
 RETURNS json AS
 $BODY$
-DECLARE
 
 /*
 SELECT SCHEMA_NAME.gw_fct_grafanalytics_macrominsector('{"data":{"parameters":{"commitChanges":true}}}');
 */
 
-v_version text;
-v_project_type text;
+DECLARE
+
+    v_version text;
+    v_project_type text;
+    v_commitchanges boolean;
 
 BEGIN
 
@@ -40,14 +42,14 @@ BEGIN
         SELECT seq, component, node
         FROM pgr_connectedcomponents('
             SELECT arc_id::int AS id, node_1::int AS source, node_2::int AS target, 1 AS cost 
-            FROM arc WHERE node_1 IS NOT NULL and node_2 IS NOT NULL
+            FROM arc WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND state = 1
         ')
     ) c
     WHERE n.node_id::int = c.node;
 
     UPDATE arc a SET macrominsector_id = n.macrominsector_id
     FROM (SELECT node_id, macrominsector_id FROM node) n
-    WHERE a.node_2 = n.node_id AND n.macrominsector_id <> 0;
+    WHERE a.node_2 = n.node_id AND n.macrominsector_id <> 0 AND a.state = 1;
 
     UPDATE connec c SET macrominsector_id = a.macrominsector_id
     FROM (SELECT arc_id, macrominsector_id FROM arc) a
