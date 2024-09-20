@@ -8,27 +8,17 @@ The code of this inundation function has been provided by Claudia Dragoste (Aigu
 
 -- FUNCTION CODE: 3328
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_graphanalytics_initnetwork();
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_graphanalytics_initnetwork()
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_graphanalytics_initnetwork(json);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_graphanalytics_initnetwork(p_data json)
 RETURNS json
 LANGUAGE plpgsql
 AS $function$
 
 /* Example:
 
-SELECT SCHEMA_NAME.gw_fct_graphanalytics_minsector('{"data":{"parameters":{"exploitation":"[1,2]", "MaxMinsectors":0, "checkData": false, "usePsectors":"TRUE", "updateFeature":"TRUE", "updateMinsectorGeom":2 ,"geomParamUpdate":10}}}');
-
-SELECT * FROM temp_pgr_node;
-SELECT * FROM temp_pgr_arc;
-SELECT * FROM temp_pgr_minsector;
-SELECT * FROM temp_pgr_connectedcomponents;
-SELECT * FROM temp_pgr_drivingdistance;
-
-DROP TABLE IF EXISTS temp_pgr_node;
-DROP TABLE IF EXISTS temp_pgr_arc;
-DROP TABLE IF EXISTS temp_pgr_minsector;
-DROP TABLE IF EXISTS temp_pgr_connectedcomponents;
-DROP TABLE IF EXISTS temp_pgr_drivingdistance;
+SELECT SCHEMA_NAME.gw_fct_graphanalytics_initnetwork('{"data":{"expl_id":"-9"}}'); -- For all explotations
+SELECT SCHEMA_NAME.gw_fct_graphanalytics_initnetwork('{"data":{"expl_id":"1,2"}}'); -- For explotations 1 and 2
+SELECT SCHEMA_NAME.gw_fct_graphanalytics_initnetwork('{"data":{"expl_id":"2"}}'); -- For explotation 2
 
 It is an auxiliary process used by macro_minsector, minsector, or mapzone that generates the tables temp_pgr_node and temp_pgr_arc.
 */
@@ -36,6 +26,7 @@ It is an auxiliary process used by macro_minsector, minsector, or mapzone that g
 DECLARE
 
     v_project_type TEXT;
+    v_expl_id TEXT; -- -9 for all explotations
     v_cost INTEGER = 1;
     v_reverse_cost INTEGER = 1;
 
@@ -45,8 +36,14 @@ BEGIN
 
     EXECUTE 'SELECT LOWER(project_type) FROM sys_version ORDER BY "date" DESC LIMIT 1' INTO v_project_type;
 
+    v_expl = (SELECT (p_data::json->>'data')::json->>'expl_id');
+
     IF v_project_type = 'ud' THEN
         v_reverse_cost = -1;
+    END IF;
+
+    IF v_expl = '-9' THEN
+        v_expl = (SELECT string_agg(expl_id::TEXT, ',') FROM exploitation);
     END IF;
 
     INSERT INTO temp_pgr_node (pgr_node_id, node_id)
@@ -58,6 +55,7 @@ BEGIN
         ) n
         JOIN value_state_type s ON s.id = n.state_type
         WHERE n.state = 1 AND s.is_operative = TRUE
+        AND n.expl_id IN (v_expl)
     );
 
     INSERT INTO temp_pgr_arc (pgr_arc_id, arc_id, pgr_node_1, pgr_node_2, node_1, node_2, cost, reverse_cost, the_geom)
@@ -67,6 +65,7 @@ BEGIN
         JOIN value_state_type s ON s.id = a.state_type
         WHERE a.state = 1 AND s.is_operative = TRUE
         AND a.node_1 IS NOT NULL AND a.node_2 IS NOT NULL -- Avoids the crash of pgrouting functions
+        AND a.expl_id IN (v_expl)
     );
 
 	RETURN ('{"status":"Accepted"}')::json;

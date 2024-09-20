@@ -68,7 +68,7 @@ BEGIN
 
     -- Initialize process
 	-- =======================
-	perform gw_fct_graphanalytics_initnetwork();
+    PERFORM gw_fct_graphanalytics_initnetwork('{"data":{"expl_id":"'||v_expl||'"}}');
 
     -- Insert values into temporary tables (only propagating features belonging to the selected exploitations)
 	INSERT INTO temp_t_connec SELECT * FROM connec c JOIN value_state_type s ON s.id = c.state_type WHERE c.state = 1 AND s.is_operative = TRUE
