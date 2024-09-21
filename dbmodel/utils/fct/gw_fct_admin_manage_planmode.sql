@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 3304
 
-CREATE OR REPLACE FUNCTION ws36013_2.gw_fct_admin_manage_planmode(p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_manage_planmode(p_data json)
   RETURNS json AS
 $BODY$
 
@@ -151,19 +151,19 @@ BEGIN
 		SELECT p.node_id FROM s,p WHERE p.psector_id = s.psector_id AND p.state = 1;
 
 
-		CREATE OR REPLACE VIEW v_state_connec AS 
-		WITH 
-		p AS (SELECT connec_id, psector_id, state, arc_id FROM plan_psector_x_connec WHERE active), 
-		s AS (SELECT * FROM selector_psector WHERE cur_user = current_user), 
-		c as (SELECT connec_id, state, arc_id FROM connec)
-		SELECT c.connec_id::varchar(30), c.arc_id, state as flag FROM selector_state,c WHERE c.state = selector_state.state_id AND selector_state.cur_user = "current_user"()::text
-			EXCEPT
-		SELECT p.connec_id::varchar(30), p.arc_id, p.state FROM selector_psector, p WHERE p.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text AND p.state = 0
-			UNION
-		SELECT p.connec_id::varchar(30), p.arc_id, p.state FROM selector_psector, p WHERE p.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text AND p.state = 1;
-
-
 		IF v_project_type ='WS' THEN
+
+			CREATE OR REPLACE VIEW v_state_connec AS 
+			WITH 
+			p AS (SELECT connec_id, psector_id, state, arc_id FROM plan_psector_x_connec WHERE active), 
+			s AS (SELECT * FROM selector_psector WHERE cur_user = current_user), 
+			c as (SELECT connec_id, state, arc_id FROM connec)
+			SELECT c.connec_id, c.arc_id, 1::int2 flag FROM selector_state,c WHERE c.state = selector_state.state_id AND selector_state.cur_user = "current_user"()::text
+				EXCEPT
+			SELECT p.connec_id, p.arc_id, 1::int2 FROM s, p WHERE p.psector_id = s.psector_id AND s.cur_user = "current_user"()::text AND p.state = 0
+				UNION
+			SELECT DISTINCT ON (p.connec_id) p.connec_id, p.arc_id, 2::int2 FROM s, p WHERE p.psector_id = s.psector_id AND s.cur_user = "current_user"()::text AND p.state = 1;
+
 		
 			CREATE OR REPLACE VIEW v_state_link AS 
 			WITH 
@@ -179,6 +179,19 @@ BEGIN
 
 		ELSIF v_project_type ='UD' THEN
 		
+
+			CREATE OR REPLACE VIEW v_state_connec AS 
+			WITH 
+			p AS (SELECT connec_id, psector_id, state, arc_id FROM plan_psector_x_connec WHERE active), 
+			s AS (SELECT * FROM selector_psector WHERE cur_user = current_user), 
+			c as (SELECT connec_id, state, arc_id FROM connec)
+			SELECT c.connec_id::varchar(30), c.arc_id FROM selector_state,c WHERE c.state = selector_state.state_id AND selector_state.cur_user = "current_user"()::text
+				EXCEPT
+			SELECT p.connec_id::varchar(30), p.arc_id FROM s, p WHERE p.psector_id = s.psector_id AND s.cur_user = "current_user"()::text AND p.state = 0
+				UNION
+			SELECT DISTINCT ON (p.connec_id) p.connec_id::varchar(30), p.arc_id FROM s, p WHERE p.psector_id = s.psector_id AND s.cur_user = "current_user"()::text AND p.state = 1;
+
+
 			CREATE OR REPLACE VIEW v_state_gully AS 
 			WITH 
 			p AS (SELECT gully_id, psector_id, state, arc_id FROM plan_psector_x_gully WHERE active), 
@@ -186,11 +199,11 @@ BEGIN
 			c as (SELECT gully_id, state, arc_id FROM gully)
 			SELECT c.gully_id, c.arc_id FROM selector_state,c WHERE c.state = selector_state.state_id AND selector_state.cur_user = "current_user"()::text
 				EXCEPT
-			SELECT p.gully_id, p.arc_id FROM selector_psector, p WHERE p.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text AND p.state = 0
+			SELECT p.gully_id, p.arc_id FROM s, p WHERE p.psector_id = s.psector_id AND s.cur_user = "current_user"()::text AND p.state = 0
 				UNION
-			SELECT p.gully_id, p.arc_id FROM selector_psector, p WHERE p.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text AND p.state = 1;
-						
-		
+			SELECT DISTINCT ON (p.gully_id) p.gully_id, p.arc_id FROM s, p WHERE p.psector_id = s.psector_id AND s.cur_user = "current_user"()::text AND p.state = 1;
+
+
 			CREATE OR REPLACE VIEW v_state_link_connec AS 
 			WITH 
 			p AS (SELECT connec_id, psector_id, state, link_id FROM plan_psector_x_connec WHERE active), 
@@ -218,9 +231,22 @@ BEGIN
 
 
 			CREATE OR REPLACE VIEW v_state_link AS
-			SELECT * FROM v_state_link_connec
-			UNION
-			SELECT * FROM v_state_link_gully;			
+			WITH 
+			c AS (SELECT connec_id, psector_id, state, link_id FROM plan_psector_x_connec WHERE active), 
+			g AS (SELECT gully_id, psector_id, state, link_id FROM plan_psector_x_gully WHERE active), 
+			sp AS (SELECT * FROM selector_psector WHERE cur_user = current_user), 
+			se AS (SELECT * FROM selector_expl WHERE cur_user = current_user), 
+			l AS (SELECT link_id, state, expl_id, expl_id2 FROM link)
+			SELECT l.link_id  FROM selector_state, se, l WHERE l.state = selector_state.state_id AND (l.expl_id = se.expl_id OR l.expl_id2 = se.expl_id) AND selector_state.cur_user = "current_user"()::text AND se.cur_user = "current_user"()::text
+				EXCEPT
+			SELECT c.link_id FROM sp, se, c JOIN l USING (link_id) WHERE c.psector_id = sp.psector_id AND sp.cur_user = "current_user"()::text AND c.state = 0 AND l.expl_id = se.expl_id AND se.cur_user = CURRENT_USER::text
+				EXCEPT
+			SELECT g.link_id FROM sp, se, g JOIN l USING (link_id) WHERE g.psector_id = sp.psector_id AND sp.cur_user = "current_user"()::text AND g.state = 0 AND l.expl_id = se.expl_id AND se.cur_user = CURRENT_USER::text
+				UNION
+			SELECT c.link_id FROM sp, se, c JOIN l USING (link_id) WHERE c.psector_id = sp.psector_id AND sp.cur_user = "current_user"()::text AND c.state = 1 AND l.expl_id = se.expl_id AND se.cur_user = CURRENT_USER::text
+				UNION
+			SELECT g.link_id FROM sp, se, g JOIN l USING (link_id) WHERE g.psector_id = sp.psector_id AND sp.cur_user = "current_user"()::text AND g.state = 1 AND l.expl_id = se.expl_id AND se.cur_user = CURRENT_USER::text;
+
 		END IF;
 
 		v_message = 'PLAN MODE SUCESSFULLY RECOVERED';
