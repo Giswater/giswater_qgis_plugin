@@ -158,11 +158,11 @@ BEGIN
 			p AS (SELECT connec_id, psector_id, state, arc_id FROM plan_psector_x_connec WHERE active), 
 			s AS (SELECT * FROM selector_psector WHERE cur_user = current_user), 
 			c as (SELECT connec_id, state, arc_id FROM connec)
-			SELECT c.connec_id, c.arc_id, 1::int2 flag FROM selector_state,c WHERE c.state = selector_state.state_id AND selector_state.cur_user = "current_user"()::text
+			SELECT c.connec_id, c.arc_id FROM selector_state,c WHERE c.state = selector_state.state_id AND selector_state.cur_user = "current_user"()::text
 				EXCEPT
-			SELECT p.connec_id, p.arc_id, 1::int2 FROM s, p WHERE p.psector_id = s.psector_id AND s.cur_user = "current_user"()::text AND p.state = 0
+			SELECT p.connec_id, p.arc_id FROM s, p WHERE p.psector_id = s.psector_id AND s.cur_user = "current_user"()::text AND p.state = 0
 				UNION
-			SELECT DISTINCT ON (p.connec_id) p.connec_id, p.arc_id, 2::int2 FROM s, p WHERE p.psector_id = s.psector_id AND s.cur_user = "current_user"()::text AND p.state = 1;
+			SELECT DISTINCT ON (p.connec_id) p.connec_id, p.arc_id FROM s, p WHERE p.psector_id = s.psector_id AND s.cur_user = "current_user"()::text AND p.state = 1;
 
 		
 			CREATE OR REPLACE VIEW v_state_link AS 

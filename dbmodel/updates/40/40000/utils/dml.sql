@@ -39,3 +39,6 @@ INSERT INTO config_toolbox (id, alias, functionparams, inputparams, observ, acti
 VALUES(3334, 'Macrominsector analysis', '{"featureType":[]}'::json,
 '[{"widgetname":"commitChanges", "label":"Commit changes:","widgettype":"check","datatype":"boolean","layoutname":"grl_option_parameters","layoutorder":1, "value":"", "tooltip": "Commit changes"}]'::json,
 NULL, true, '{4}');
+
+INSERT INTO sys_param_user VALUES ('utils_psector_strategy', 'config', 'Psector strategy', 'role_master', null, 'Value for psector_strategy', null, null, TRUE,
+20, 'utils', FALSE, null, null, null, FALSE, 'text', 'check', TRUE, null, 'true', 'lyt_other', TRUE, null, null, null, null, 'core') ON CONFLICT (id) DO NOTHING;

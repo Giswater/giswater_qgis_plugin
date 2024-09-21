@@ -1,0 +1,39 @@
+/*
+This file is part of Giswater 3
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+This version of Giswater is provided by Giswater Association
+*/
+
+
+plan mode strategy
+--------------------
+
+-- add code on function of init giswater
+IF role < master then
+	-- for role_master or higher variable is automatic inserted with value true but for roles less than master need to be forced inserted by doing this
+	INSERT INTO config_param_user VALUES ('utils_psector_strategy', 'false', current_user) ON CONFLICT (parameter, cur_user) DO NOTHING;
+END IF;
+
+
+-- logics to be developed for triger on config_param_user:
+IF NEW.utils_psector_strategy != OLD.utils_psector_strategy THEN
+	IF NEW.utils_psector_strategy = TRUE then
+		- remove state =2 on state_selector
+		- add psector_selector
+	ELSIF NEW.utils_psector_strategy = FALSE
+		- add state =2 on state_selector
+		- remove psector_selector
+	END IF;
+END IF;
+
+-- logics to be developed en els triggers que controlen topologia de psectors
+IF no psector, no control topologic
+
+
+-- logics to be developed on python
+IF utils_psector_strategy =  true THEN
+	enable psector buttons (new psector and psector manager)
+ELSE  
+	disable psector buttons (new psector and psector manager). Missatge: has d'habilitar estrategia per treballar els psectors
+	no pots insertar o updatejar objectes a state=2 perque no tens cap psector actiu
+END IF;
