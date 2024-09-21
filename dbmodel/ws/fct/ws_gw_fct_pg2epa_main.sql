@@ -304,6 +304,8 @@ BEGIN
 		UPDATE temp_t_arc SET result_id  = v_result;
 		UPDATE temp_t_node SET result_id  = v_result;
 
+		PERFORM gw_fct_pg2epa_dscenario(v_result);
+
 		-- move patterns used
 		INSERT INTO temp_rpt_inp_pattern_value (result_id, pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8,
 			factor_9, factor_10, factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18)
@@ -314,8 +316,6 @@ BEGIN
 			pattern_id IN (SELECT distinct (pattern_id) FROM inp_dscenario_demand d, selector_inp_dscenario s WHERE cur_user = current_user AND d.dscenario_id = s.dscenario_id
 						   AND pattern_id IS NOT NULL UNION SELECT distinct (pattern_id) FROM temp_t_node WHERE pattern_id IS NOT NULL)
 			order by pattern_id, id;
-
-		PERFORM gw_fct_pg2epa_dscenario(v_result);
 
 		v_return = '{"status": "Accepted", "message":{"level":1, "text":"Export INP file 4/7 - Structure data...... done succesfully"}}'::json;
 		RETURN v_return;

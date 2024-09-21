@@ -40,11 +40,15 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 	v_schemaname = 'SCHEMA_NAME';
 
-    SELECT project_type, giswater, epsg INTO v_project_type, v_version, v_epsg FROM sys_version order by id desc limit 1;
+	SELECT project_type, giswater, epsg INTO v_project_type, v_version, v_epsg FROM sys_version order by id desc limit 1;
 
 	-- Get input parameters
    	v_user := (p_data ->> 'client')::json->> 'cur_user';
-    v_isaudit := (p_data ->> 'data')::json->> 'isAudit';
+	v_isaudit := (p_data ->> 'data')::json->> 'isAudit';
+
+	if v_user is null then 
+		v_user = current_user;
+	end if;
 
     -- check if role name exists
     IF v_user IS NOT NULL THEN
