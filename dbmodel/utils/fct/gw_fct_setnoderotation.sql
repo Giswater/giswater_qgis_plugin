@@ -11,7 +11,11 @@ $BODY$
 
 /*EXAMPLE
 
-SELECT gw_fct_setnoderotation($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{}$$);
+-- Mode chossing node_type
+SELECT gw_fct_setnoderotation($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"parameters":{"nodeType": "'TANK'"}}}$$);
+
+-- Mode all
+SELECT gw_fct_setnoderotation($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{}}$$);
 
 
 -- fid: 516
@@ -24,6 +28,8 @@ v_result_info json;
 v_error_context text;
 v_affectedrow integer = 0;
 v_curval boolean = false;
+v_nodetype text;
+v_querytext text;
 
 BEGIN 
 
@@ -34,6 +40,9 @@ BEGIN
 
 	-- getting current value for user
 	v_curval = (SELECT value FROM config_param_user where parameter = 'edit_noderotation_update_dsbl' and cur_user = current_user);
+
+	-- getting cat_node_feature
+	v_nodetype := (((p_data ->>'data')::json->>'parameters')::json->>'nodeType')::text;
 
 	-- reset tables
 	DELETE FROM audit_check_data WHERE fid = 516 and cur_user = current_user;
@@ -52,9 +61,16 @@ BEGIN
 	update config_param_user set value ='true' where parameter = 'edit_disable_arctopocontrol' and cur_user = current_user; -- topocontrol
 	update config_param_user set value ='true' where parameter = 'edit_typevalue_fk_disable' and cur_user = current_user; -- typevalue
 	update config_param_user set value ='true' where parameter = 'edit_disable_update_nodevalues' and cur_user = current_user; -- node_values
-	
-	-- update process
-	UPDATE arc SET the_geom = arc.the_geom FROM v_edit_arc e WHERE e.arc_id = arc.arc_id; 
+
+	IF v_nodetype = '' OR v_nodetype IS NULL THEN	
+		v_querytext = 'UPDATE arc SET the_geom = arc.the_geom FROM (SELECT arc_id FROM v_edit_arc) v WHERE v.arc_id = arc.arc_id';
+	ELSE
+		v_querytext = 'UPDATE arc SET the_geom = arc.the_geom FROM (
+		SELECT arc_id FROM v_edit_arc WHERE (node_1 IN (SELECT node_id FROM v_edit_node WHERE node_type IN ('||v_nodetype||')) OR  (node_2 IN (SELECT node_id FROM v_edit_node WHERE node_type IN ('||v_nodetype||'))))
+		) v WHERE v.arc_id = arc.arc_id';
+	END IF;
+	EXECUTE v_querytext;
+
 	GET DIAGNOSTICS v_affectedrow = row_count;
 
 	-- insert log message

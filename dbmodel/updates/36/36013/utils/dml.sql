@@ -128,3 +128,6 @@ INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, 
 INSERT INTO config_param_system VALUES
 ('epa_autorepair','TRUE','Force when export go2epa to autorepair inp columns','Autorepair epa:','','',TRUE,null,'utils',null,null,'boolean','text');
 
+UPDATE config_toolbox SET inputparams =
+'[{"widgetname":"nodeType", "label":"NodeType(s):","placeholder":"''T'',''TANK''", "tooltip": "Concat values of node type with '',''. Null values will execute all defined node types", "widgettype":"text","datatype":"text","value":"","layoutname":"grl_option_parameters","layoutorder":1}]'
+WHERE id = 3280;
