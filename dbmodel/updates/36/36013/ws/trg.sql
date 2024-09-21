@@ -12,6 +12,10 @@ FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_sector('sector');
 CREATE TRIGGER gw_trg_edit_inp_arc_pipe INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_inp_pipe
 FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_arc('inp_pipe');
 
+CREATE TRIGGER gw_trg_edit_ve_epa_pipe INSTEAD OF INSERT OR UPDATE OR DELETE ON ve_epa_pipe
+FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_ve_epa('pipe');
+
+
 -- 20/09/2024
 drop trigger if exists gw_trg_typevalue_fk on arc;
 create trigger gw_trg_typevalue_fk after insert or update of verified

@@ -121,3 +121,10 @@ UPDATE config_form_fields
 
 -- 2024/09/18
 UPDATE config_param_system SET isenabled=true where parameter = 'basic_selector_tab_municipality';
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source") VALUES(3268, 'You can not insert text values into an integer column.', 'Please select the postcomplement column.', 1, true, 'utils', NULL);
+
+-- 2024/09/21
+INSERT INTO config_param_system VALUES
+('epa_autorepair','TRUE','Force when export go2epa to autorepair inp columns','Autorepair epa:','','',TRUE,null,'utils',null,null,'boolean','text');
+

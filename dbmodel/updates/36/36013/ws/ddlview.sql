@@ -244,6 +244,7 @@ CREATE OR REPLACE VIEW v_edit_link AS
 	where s.cur_user = current_user and (m.cur_user = current_user or l.muni_id is null);
 	
 	
+
 DROP view v_edit_inp_pipe ;
 CREATE OR REPLACE VIEW v_edit_inp_pipe AS 
  SELECT a.arc_id,
@@ -260,6 +261,7 @@ CREATE OR REPLACE VIEW v_edit_inp_pipe AS
     inp_pipe.minorloss,
     inp_pipe.status,
     a.cat_matcat_id,
+    a.builtdate,
     inp_pipe.custom_roughness,
     a.cat_dint,
     inp_pipe.custom_dint,
@@ -270,6 +272,50 @@ CREATE OR REPLACE VIEW v_edit_inp_pipe AS
      JOIN inp_pipe USING (arc_id)
   WHERE a.is_operative IS TRUE;
 
+
+DROP view ve_epa_pipe ;
+CREATE OR REPLACE VIEW ve_epa_pipe AS 
+ SELECT inp_pipe.arc_id,
+    inp_pipe.minorloss,
+    inp_pipe.status,
+    a.cat_matcat_id,
+    a.builtdate,
+    r.roughness AS cat_roughness,
+    inp_pipe.custom_roughness,
+	a.cat_dint,
+    inp_pipe.custom_dint,
+    inp_pipe.reactionparam,
+    inp_pipe.reactionvalue,
+    inp_pipe.bulk_coeff,
+    inp_pipe.wall_coeff,
+    v_rpt_arc.result_id,
+    v_rpt_arc.flow_max,
+    v_rpt_arc.flow_min,
+    v_rpt_arc.flow_avg,
+    v_rpt_arc.vel_max,
+    v_rpt_arc.vel_min,
+    v_rpt_arc.vel_avg,
+    v_rpt_arc.headloss_max,
+    v_rpt_arc.headloss_min,
+    v_rpt_arc.setting_max,
+    v_rpt_arc.setting_min,
+    v_rpt_arc.reaction_max,
+    v_rpt_arc.reaction_min,
+    v_rpt_arc.ffactor_max,
+    v_rpt_arc.ffactor_min
+   FROM vu_arc a
+     JOIN inp_pipe USING (arc_id)
+     LEFT JOIN v_rpt_arc ON split_part(v_rpt_arc.arc_id::text, 'P'::text, 1) = inp_pipe.arc_id::text
+  LEFT JOIN cat_mat_roughness r ON a.cat_matcat_id::text = r.matcat_id::text
+  WHERE ((now()::date -
+        CASE
+            WHEN a.builtdate IS NULL THEN '1900-01-01'::date
+            ELSE a.builtdate
+        END) / 365) >= r.init_age AND ((now()::date -
+        CASE
+            WHEN a.builtdate IS NULL THEN '1900-01-01'::date
+            ELSE a.builtdate
+        END) / 365) < r.end_age AND r.active IS TRUE;
 
 CREATE OR REPLACE VIEW v_edit_minsector AS 
  SELECT m.minsector_id,
