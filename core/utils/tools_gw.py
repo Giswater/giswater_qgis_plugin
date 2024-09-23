@@ -1510,12 +1510,12 @@ def add_widget(dialog, field, lbl, widget):
     if layout in (None, 'null', 'NULL', 'Null'):
         return
     orientation = layout.property('lytOrientation')
-    if orientation == 'vertical':
-        row = int(field['layoutorder'])
-        col = 0
-    else:  # default
+    if orientation == 'horizontal':
         row = 0
         col = int(field['layoutorder'])
+    else:  # default vertical
+        row = int(field['layoutorder'])
+        col = 0
     if lbl is None:
         col = row
         row = 0
