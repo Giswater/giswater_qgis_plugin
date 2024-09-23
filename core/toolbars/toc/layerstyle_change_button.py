@@ -15,7 +15,7 @@ from qgis.PyQt.QtGui import QCursor
 from qgis.core import QgsMapLayerStyle
 from ..dialog import GwAction
 from ...utils import tools_gw
-from ....libs import tools_qgis, tools_db
+from ....libs import tools_qgis, tools_db, lib_vars
 
 
 def get_contexts_params() -> List[Tuple[int, str]]:
@@ -115,4 +115,6 @@ class GwLayerStyleChangeButton(GwAction):
         """Apply styles for the selected context."""
 
         apply_styles_to_layers(styleconfig_id, style_name)
+        lib_vars.project_vars['current_style'] = f"{styleconfig_id}"
+        tools_qgis.set_project_variable('gwCurrentStyle', f"{styleconfig_id}")
         tools_qgis.show_info(f"Applied styles for context: {style_name}")
