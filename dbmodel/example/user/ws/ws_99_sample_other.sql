@@ -69,100 +69,100 @@ INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('shtvalve_param_1','3','
 INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('shtvalve_param_1','4','combo4');
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"OUTFALL_VALVE"},
-"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"outfallvalve_param_1", "datatype":"text", 
+"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"outfallvalve_param_1", "datatype":"text",
 "widgettype":"text", "label":"Outvalve param_1","ismandatory":"False",
 "active":"True", "iseditable":"True","layoutname":"lyt_data_1"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"OUTFALL_VALVE"},
-"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"outfallvalve_param_2", "datatype":"boolean", 
+"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"outfallvalve_param_2", "datatype":"boolean",
 "widgettype":"check", "label":"Outvalve param_2","ismandatory":"False",
 "active":"True", "iseditable":"True","layoutname":"lyt_data_1"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"SHUTOFF_VALVE"},
-"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"shtvalve_param_1", "datatype":"text", 
+"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"shtvalve_param_1", "datatype":"text",
 "widgettype":"combo", "label":"Shtvalve param_1","ismandatory":"False",
 "active":"True", "iseditable":"True", "dv_isnullvalue":"True","layoutname":"lyt_data_1",
 "dv_querytext":"SELECT id as id, idval as idval  FROM edit_typevalue WHERE typevalue='shtvalve_param_1'"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"SHUTOFF_VALVE"},
-"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"shtvalve_param_2", "datatype":"text", 
+"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"shtvalve_param_2", "datatype":"text",
 "widgettype":"text", "label":"Shtvalve param_2","ismandatory":"False",
 "active":"True", "iseditable":"True","layoutname":"lyt_data_1"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"GREEN_VALVE"},
-"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"greenvalve_param_1", "datatype":"boolean", 
+"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"greenvalve_param_1", "datatype":"boolean",
 "widgettype":"check", "label":"Gvalve param_1","ismandatory":"False",
 "active":"True", "iseditable":"True","layoutname":"lyt_data_1"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"GREEN_VALVE"},
-"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"greenvalve_param_2", "datatype":"text", 
+"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"greenvalve_param_2", "datatype":"text",
 "widgettype":"text", "label":"Gvalve param_2","ismandatory":"False",
 "active":"True", "iseditable":"True","layoutname":"lyt_data_1"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"AIR_VALVE"},
-"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"airvalve_param_1", "datatype":"text", 
+"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"airvalve_param_1", "datatype":"text",
 "widgettype":"text", "label":"Airvalve param_1","ismandatory":"False",
 "active":"True", "iseditable":"True","layoutname":"lyt_data_1"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"AIR_VALVE"},
-"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"airvalve_param_2", "datatype":"integer", 
+"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"airvalve_param_2", "datatype":"integer",
 "widgettype":"text", "label":"Airvalve param_2","ismandatory":"False",
 "active":"True", "iseditable":"True","layoutname":"lyt_data_1"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"CHECK_VALVE"},
-"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"checkvalve_param_1", "datatype":"integer", 
+"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"checkvalve_param_1", "datatype":"integer",
 "widgettype":"text", "label":"Check param_1","ismandatory":"False",
 "active":"True", "iseditable":"True","layoutname":"lyt_data_1"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"CHECK_VALVE"},
-"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"checkvalve_param_2", "datatype":"text", 
+"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"checkvalve_param_2", "datatype":"text",
 "widgettype":"text", "label":"Check param_2","ismandatory":"False",
 "active":"True", "iseditable":"True","layoutname":"lyt_data_1"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"PIPE"},
-"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"pipe_param_1", "datatype":"text", 
+"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"pipe_param_1", "datatype":"text",
 "widgettype":"text", "label":"Pipe param_1","ismandatory":"False",
 "active":"True", "iseditable":"True","layoutname":"lyt_data_1"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"PRESSURE_METER"},
-"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"pressmeter_param_1", "datatype":"text", 
+"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"pressmeter_param_1", "datatype":"text",
 "widgettype":"combo", "label":"Pressmeter param_1","ismandatory":"False",
 "active":"True", "iseditable":"True", "dv_isnullvalue":"True","layoutname":"lyt_data_1",
 "dv_querytext":"SELECT id as id, idval as idval  FROM edit_typevalue WHERE typevalue='pressmeter_param_1'"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"PRESSURE_METER"},
-"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"pressmeter_param_2", "datatype":"date", 
+"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"pressmeter_param_2", "datatype":"date",
 "widgettype":"datetime", "label":"Pressmeter param_2","ismandatory":"False",
 "active":"True", "iseditable":"True","layoutname":"lyt_data_1"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"FILTER"},
-"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"filter_param_1", "datatype":"integer", 
+"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"filter_param_1", "datatype":"integer",
 "widgettype":"text", "label":"Filter param_1","ismandatory":"False",
 "active":"True", "iseditable":"True","layoutname":"lyt_data_1"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"FILTER"},
-"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"filter_param_2", "datatype":"text", 
+"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"filter_param_2", "datatype":"text",
 "widgettype":"text", "label":"Filter param_2","ismandatory":"False",
 "active":"True", "iseditable":"True","layoutname":"lyt_data_1"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"TANK"},
-"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"tank_param_1", "datatype":"integer", 
+"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"tank_param_1", "datatype":"integer",
 "widgettype":"text", "label":"Tank param_1","ismandatory":"False",
 "active":"True", "iseditable":"True","layoutname":"lyt_data_1"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"TANK"},
-"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"tank_param_2", "datatype":"date", 
+"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"tank_param_2", "datatype":"date",
 "widgettype":"datetime", "label":"Tank param_2","ismandatory":"False",
 "active":"True", "iseditable":"True","layoutname":"lyt_data_1"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"HYDRANT"},
-"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"hydrant_param_1", "datatype":"text", 
+"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"hydrant_param_1", "datatype":"text",
 "widgettype":"combo", "label":"Hydrant param_1","ismandatory":"False",
 "active":"True", "iseditable":"True", "dv_isnullvalue":"True","layoutname":"lyt_data_1",
 "dv_querytext":"SELECT id as id, idval as idval  FROM edit_typevalue WHERE typevalue='hydrant_param_1'"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"HYDRANT"},
-"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"hydrant_param_2", "datatype":"integer", 
+"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"hydrant_param_2", "datatype":"integer",
 "widgettype":"text", "label":"Hydrant param_2","ismandatory":"False",
 "active":"True", "iseditable":"True","layoutname":"lyt_data_1"}}}$$);
 
@@ -198,7 +198,7 @@ UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=20 WHERE colu
 UPDATE config_form_fields SET layoutname='lyt_data_2', layoutorder=21 WHERE columnname = 'inventory' AND formname like '%_valve';
 
 -- hidden
-UPDATE config_form_fields SET hidden = true WHERE columnname 
+UPDATE config_form_fields SET hidden = true WHERE columnname
 IN ('undelete', 'publish', 'buildercat_id', 'comment', 'num_value', 'svg', 'macrodqa_id', 'macrosector_id',
 'macroexpl_id', 'custom_length', 'staticpressure1', 'staticpressure2', 'pipe_param_1') and (formname ILIKE 've_arc%' or formname ILIKE 've_node%' or formname ILIKE 've_connec%');
 
@@ -342,7 +342,7 @@ UPDATE v_edit_arc SET arccat_id = 'VIRTUAL' WHERE arc_type = 'VARC';
 UPDATE cat_mat_roughness set roughness  = 0.003;
 DELETE FROM cat_arc WHERE arctype_id = 'VARC' AND id !='VIRTUAL';
 
-UPDATE config_form_fields SET dv_querytext_filterc  = ' AND id ' 
+UPDATE config_form_fields SET dv_querytext_filterc  = ' AND id '
 WHERE formname IN ('upsert_catalog_node', 'upsert_catalog_arc', 'upsert_catalog_connec') AND columnname ='matcat_id' AND dv_parent_id IS NOT NULL;
 
 UPDATE config_param_system SET value='TRUE' WHERE parameter='sys_raster_dem';
@@ -365,7 +365,7 @@ UPDATE config_form_fields SET layoutorder = 20 where columnname ='minsector_id'a
 UPDATE config_form_fields SET layoutorder = 23 where columnname ='rotation'and formname like '%_connec_%';
 UPDATE config_form_fields SET layoutorder = 24 where columnname ='svg' and formname like '%_connec_%';
 
-UPDATE config_form_fields set layoutorder = layoutorder+1 WHERE (formname ilike 've_arc_%' or 
+UPDATE config_form_fields set layoutorder = layoutorder+1 WHERE (formname ilike 've_arc_%' or
  formname ilike 've_node_%' or  formname ilike  've_connec_%')
 AND columnname in ('streetname','streetname2', 'postnumber','postnumber2','postcomplement','postcomplement2');
 
@@ -373,7 +373,7 @@ UPDATE config_form_fields set hidden = false  WHERE (formname in ('ve_arc', 've_
 or (formname ilike 've_arc_%' or  formname ilike 've_node_%' or  formname ilike  've_connec_%'))
 AND columnname = 'district_id';
 
-UPDATE config_form_fields set layoutorder = 2 WHERE (formname in ('ve_node', 've_connec') 
+UPDATE config_form_fields set layoutorder = 2 WHERE (formname in ('ve_node', 've_connec')
 or  (formname ilike 've_node_%' or  formname ilike  've_connec_%')) AND columnname = 'district_id';
 
 UPDATE config_form_fields set layoutorder = 3 WHERE (formname in ('ve_arc') or (formname ilike 've_arc_%')) AND columnname = 'district_id';
