@@ -16,6 +16,7 @@ import sqlite3
 from typing import Literal, Dict
 import webbrowser
 import xml.etree.ElementTree as ET
+from sip import isdeleted
 
 if 'nt' in sys.builtin_module_names:
     import ctypes
@@ -3176,7 +3177,7 @@ def set_tablemodel_config(dialog, widget, table_name, sort_order=0, schema_name=
     """ Configuration of tables. Set visibility and width of columns """
 
     widget = tools_qt.get_widget(dialog, widget)
-    if not widget:
+    if not widget or isdeleted(widget):
         return widget
 
     if schema_name is not None:
