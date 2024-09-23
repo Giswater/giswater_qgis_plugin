@@ -35,7 +35,7 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES ('generic', 'form_featuretype_change', 'tab_none', 'category_type', 'lyt_main_3', 3, 'string', 'combo', 'Category', 'Category', NULL, FALSE, FALSE, TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"labelPosition": "top"}'::json, NULL, NULL, FALSE, NULL);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES ('generic', 'form_featuretype_change', 'tab_none', 'function_type', 'lyt_main_3', 4, 'string', 'combo', 'Function', 'Function', NULL, FALSE, FALSE, TRUE, FALSE, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"labelPosition": "top"}'::json, NULL, NULL, FALSE, NULL);
 
-INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source") VALUES (3324, 'gw_fct_getfeaturereplace', 'utils', 'function', 'json', 'json', 'Function to get feature type change dialog', 'role_edit', NULL, 'core');
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source") VALUES (3324, 'gw_fct_getchangefeaturetype', 'utils', 'function', 'json', 'json', 'Function to get feature type change dialog', 'role_edit', NULL, 'core');
 
 --17/09/2024
 UPDATE config_form_fields
@@ -131,3 +131,43 @@ INSERT INTO config_param_system VALUES
 UPDATE config_toolbox SET inputparams =
 '[{"widgetname":"nodeType", "label":"NodeType(s):","placeholder":"''T'',''TANK''", "tooltip": "Concat values of node type with '',''. Null values will execute all defined node types", "widgettype":"text","datatype":"text","value":"","layoutname":"grl_option_parameters","layoutorder":1}]'
 WHERE id = 3280;
+
+-- 2024/09/23
+UPDATE config_form_fields
+	SET hidden=false
+	WHERE formname='generic' AND formtype='form_featuretype_change' AND columnname='featurecat_id' AND tabname='tab_none';
+UPDATE config_form_fields
+	SET widgetcontrols=NULL
+	WHERE formname='generic' AND formtype='form_featuretype_change' AND columnname='fluid_type' AND tabname='tab_none';
+UPDATE config_form_fields
+	SET widgetcontrols=NULL
+	WHERE formname='generic' AND formtype='form_featuretype_change' AND columnname='location_type' AND tabname='tab_none';
+UPDATE config_form_fields
+	SET widgetcontrols=NULL
+	WHERE formname='generic' AND formtype='form_featuretype_change' AND columnname='category_type' AND tabname='tab_none';
+UPDATE config_form_fields
+	SET widgetcontrols=NULL
+	WHERE formname='generic' AND formtype='form_featuretype_change' AND columnname='function_type' AND tabname='tab_none';
+UPDATE config_form_fields
+	SET layoutorder=2
+	WHERE formname='generic' AND formtype='form_featuretype_change' AND columnname='feature_type_new' AND tabname='tab_none';
+UPDATE config_form_fields
+	SET layoutorder=2
+	WHERE formname='generic' AND formtype='form_featuretype_change' AND columnname='btn_catalog' AND tabname='tab_none';
+UPDATE config_form_fields
+	SET layoutorder=3
+	WHERE formname='generic' AND formtype='form_featuretype_change' AND columnname='btn_catalog' AND tabname='tab_none';
+UPDATE config_form_fields
+	SET hidden=false
+	WHERE formname='generic' AND formtype='form_featuretype_change' AND columnname='featurecat_id' AND tabname='tab_none';
+
+UPDATE config_typevalue
+	SET addparam='{
+  "lytOrientation": "horizontal"
+}'::json
+	WHERE typevalue='layout_name_typevalue' AND id='lyt_buttons';
+UPDATE config_typevalue
+	SET addparam='{
+  "lytOrientation": "horizontal"
+}'::json
+	WHERE typevalue='layout_name_typevalue' AND id='lyt_main_2';
