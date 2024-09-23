@@ -396,3 +396,7 @@ def cmb_new_featuretype_selection_changed(**kwargs):
                f"ORDER BY id")
     rows = tools_db.get_rows(sql)
     tools_qt.fill_combo_values(cmb_catalog_id, rows)
+
+    if not rows or len(rows) == 0:
+        msg = "There is no catalog for this feature type. Please add one in the corresponding table."
+        tools_qgis.show_critical(msg, dialog=dialog)
