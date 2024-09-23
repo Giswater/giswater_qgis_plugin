@@ -16,7 +16,7 @@ from qgis.PyQt.QtGui import QCursor
 
 from ..dialog import GwAction
 from ...utils import tools_gw
-from ....libs import tools_qgis, tools_qt
+from ....libs import tools_qgis, tools_qt, lib_vars
 
 
 class GwAddChildLayerButton(GwAction):
@@ -151,10 +151,14 @@ class GwAddChildLayerButton(GwAction):
         :param group: Name of the group that will be created in the toc (String)
         :param is_checked: This parameter is sent by the action itself with the trigger (Bool)
         """
+
+        style_id: str = "-1"
         if state == 2:
             layer = tools_qgis.get_layer_by_tablename(tablename)
             if layer is None:
-                tools_gw.add_layer_database(tablename, the_geom, field_id, group, sub_group, alias=alias, sub_sub_group=sub_sub_group)
+                if lib_vars.project_vars['current_style'] is not None:
+                    style_id = lib_vars.project_vars['current_style']
+                tools_gw.add_layer_database(tablename, the_geom, field_id, group, sub_group, style_id=style_id, alias=alias, sub_sub_group=sub_sub_group)
         elif state == 0:
             layer = tools_qgis.get_layer_by_tablename(tablename)
             if layer is not None:

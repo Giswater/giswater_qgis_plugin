@@ -67,6 +67,8 @@ class Giswater(QObject):
             lib_vars.project_vars['main_schema'] = None
             lib_vars.project_vars['project_role'] = None
             lib_vars.project_vars['project_type'] = None
+            lib_vars.project_vars['store_credentials'] = None
+            lib_vars.project_vars['current_style'] = None
         except Exception as e:
             tools_log.log_info(f"Exception in unload when reset values for lib_vars.project_vars: {e}")
 
