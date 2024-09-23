@@ -22,17 +22,16 @@ Function to update the geometry of the mapzones in the temp_minsector table.
 
 DECLARE
 
+    v_querytext text;
     v_fid integer;
     v_updatemapzgeom integer;
     v_geomparamupdate float;
+    v_concavehull float;
     v_geomparamupdate_divide float;
     v_table text; -- minsector | mapzone
     v_field text; -- zone_id
     v_fieldmp text; -- minisector_id
     v_srid integer; -- 25831
-
-
-
 
 BEGIN
 
@@ -40,6 +39,7 @@ BEGIN
 
     v_fid = (SELECT (p_data::json->>'data')::json->>'fid')::integer;
     v_updatemapzgeom = (SELECT (p_data::json->>'data')::json->>'updatemapzgeom')::integer;
+    v_concavehull = (SELECT (p_data::json->>'data')::json->>'concavehull')::float;
     v_geomparamupdate = (SELECT (p_data::json->>'data')::json->>'geomparamupdate')::float;
     v_table = (SELECT (p_data::json->>'data')::json->>'table')::text;
     v_field = (SELECT (p_data::json->>'data')::json->>'field')::text;
