@@ -500,7 +500,7 @@ SELECT gw_fct_fill_doc_tables();
 SELECT gw_fct_fill_om_tables();  -- 6 segons
 
 INSERT INTO doc_x_visit (doc_id, visit_id)
-SELECT 
+SELECT
 doc.id,
 om_visit.id
 FROM doc, om_visit;
@@ -516,95 +516,95 @@ UPDATE config_form_fields set layoutorder = 2 WHERE formname in ('ve_arc', 've_n
 UPDATE config_form_fields set layoutorder = 3 WHERE formname in ('ve_connec') AND columnname = 'district_id';
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"CHAMBER"},
-"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"chamber_param_1", "datatype":"text", 
+"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"chamber_param_1", "datatype":"text",
 "widgettype":"combo", "label":"Chamber param_1","ismandatory":"False",
 "active":"True", "iseditable":"True",  "dv_isnullvalue":"True","layoutname":"lyt_data_1",
 "dv_querytext":"SELECT id as id, idval as idval  FROM edit_typevalue WHERE typevalue='chamber_param_1'"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"CHAMBER"},
-"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"chamber_param_2", "datatype":"date", 
+"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"chamber_param_2", "datatype":"date",
 "widgettype":"datetime", "label":"Chamber param_2","ismandatory":"False",
 "active":"True", "iseditable":"True", "layoutname":"lyt_data_1"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"CIRC_MANHOLE"},
-"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"cirmanhole_param_1", "datatype":"integer", 
+"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"cirmanhole_param_1", "datatype":"integer",
 "widgettype":"text", "label":"Cmanhole param_1","ismandatory":"False",
 "fieldLength":"10", "numDecimals" :null,"active":"True", "iseditable":"True", "layoutname":"lyt_data_1"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"CIRC_MANHOLE"},
-"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"cirmanhole_param_2", "datatype":"text", 
+"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"cirmanhole_param_2", "datatype":"text",
 "widgettype":"text", "label":"Cmanhole param_2","ismandatory":"False",
 "active":"True", "iseditable":"True", "layoutname":"lyt_data_1"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"PGULLY"},
-"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"grate_param_1", "datatype":"text", 
+"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"grate_param_1", "datatype":"text",
 "widgettype":"combo", "label":"Grate param_1","ismandatory":"False",
 "active":"True", "iseditable":"True",  "dv_isnullvalue":"True","layoutname":"lyt_data_1",
 "dv_querytext":"SELECT id as id, idval as idval  FROM edit_typevalue WHERE typevalue='grate_param_1'"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"PGULLY"},
-"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"grate_param_2", "datatype":"boolean", 
+"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"grate_param_2", "datatype":"boolean",
 "widgettype":"check", "label":"Grate param_2","ismandatory":"False",
 "active":"True", "iseditable":"True", "layoutname":"lyt_data_1"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"OVERFLOW_STORAGE"},
-"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"ovestorage_param_1", "datatype":"integer", 
+"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"ovestorage_param_1", "datatype":"integer",
 "widgettype":"text", "label":"Owstorage param_1","ismandatory":"False",
 "fieldLength":"10", "numDecimals" :null,"active":"True", "iseditable":"True", "layoutname":"lyt_data_1"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"OVERFLOW_STORAGE"},
-"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"ovestorage_param_2", "datatype":"text", 
+"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"ovestorage_param_2", "datatype":"text",
 "widgettype":"text", "label":"Owstorage param_2","ismandatory":"False",
 "active":"True", "iseditable":"True", "layoutname":"lyt_data_1"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"PUMP_PIPE"},
-"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"pumpipe_param_1", "datatype":"boolean", 
+"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"pumpipe_param_1", "datatype":"boolean",
 "widgettype":"check", "label":"Ppipe param_1","ismandatory":"False",
 "active":"True", "iseditable":"True", "layoutname":"lyt_data_1"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"PUMP_PIPE"},
-"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"pumpipe_param_2", "datatype":"text", 
+"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"pumpipe_param_2", "datatype":"text",
 "widgettype":"text", "label":"Ppipe param_2","ismandatory":"False",
 "active":"True", "iseditable":"True", "layoutname":"lyt_data_1"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"RECT_MANHOLE"},
-"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"recmanhole_param_1", "datatype":"text", 
+"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"recmanhole_param_1", "datatype":"text",
 "widgettype":"text", "label":"Rect. mhole param_1","ismandatory":"False",
 "fieldLength":"500", "numDecimals" :null,"active":"True", "iseditable":"True", "layoutname":"lyt_data_1"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"RECT_MANHOLE"},
-"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"recmanhole_param_2", "datatype":"text", 
+"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"recmanhole_param_2", "datatype":"text",
 "widgettype":"text", "label":"Rect. mhole param_2","ismandatory":"False",
 "active":"True", "iseditable":"True", "layoutname":"lyt_data_1"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"REGISTER"},
-"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"register_param_1", "datatype":"text", 
+"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"register_param_1", "datatype":"text",
 "widgettype":"text", "label":"Register param_1","ismandatory":"False",
 "fieldLength":"500", "numDecimals" :null,"active":"True", "iseditable":"True", "layoutname":"lyt_data_1"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"REGISTER"},
-"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"register_param_2", "datatype":"text", 
+"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"register_param_2", "datatype":"text",
 "widgettype":"text", "label":"Register param_2","ismandatory":"False",
 "active":"True", "iseditable":"True", "layoutname":"lyt_data_1"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"SEWER_STORAGE"},
-"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"sewstorage_param_1", "datatype":"text", 
+"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"sewstorage_param_1", "datatype":"text",
 "widgettype":"combo", "label":"Sstorage param_1","ismandatory":"False",
 "active":"True", "iseditable":"True",  "dv_isnullvalue":"True","layoutname":"lyt_data_1",
 "dv_querytext":"SELECT id as id, idval as idval  FROM edit_typevalue WHERE typevalue='sewstorage_param_1'"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"SEWER_STORAGE"},
-"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"sewstorage_param_2", "datatype":"text", 
+"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"sewstorage_param_2", "datatype":"text",
 "widgettype":"text", "label":"Sstorage param_1","ismandatory":"False",
 "active":"True", "iseditable":"True", "layoutname":"lyt_data_1"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"WEIR"},
-"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"weir_param_1", "datatype":"integer", 
+"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"weir_param_1", "datatype":"integer",
 "widgettype":"text", "label":"Weir param_1","ismandatory":"False",
 "active":"True", "iseditable":"True", "layoutname":"lyt_data_1"}}}$$);
 
 SELECT gw_fct_admin_manage_addfields($${"client":{"lang":"ES"}, "feature":{"catFeature":"WEIR"},
-"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"weir_param_2", "datatype":"text", 
+"data":{"action":"CREATE", "multiCreate":"false", "parameters":{"columnname":"weir_param_2", "datatype":"text",
 "widgettype":"text", "label":"Weir param_2","ismandatory":"False",
 "active":"True", "iseditable":"True", "layoutname":"lyt_data_1"}}}$$);
 
@@ -630,7 +630,7 @@ INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target
 UPDATE config_param_user SET value = 'TRUE' WHERE parameter = 'audit_project_user_control';
 
 -- hidden
-UPDATE config_form_fields SET hidden = true WHERE columnname 
+UPDATE config_form_fields SET hidden = true WHERE columnname
 IN ('undelete', 'publish', 'buildercat_id', 'comment', 'num_value', 'svg', 'macrodqa_id', 'macrosector_id',
 'macroexpl_id', 'custom_length', 'staticpressure1', 'staticpressure2', 'pipe_param_1');
 
@@ -731,13 +731,13 @@ ON CONFLICT (parameter, cur_user) DO NOTHING;
 UPDATE config_param_user SET value = 'TRUE' WHERE parameter = 'qgis_form_docker' AND cur_user = current_user;
 
 -- updates to manage matcat_id separately from catalog
-UPDATE config_form_fields SET iseditable=TRUE, widgettype='combo', dv_isnullvalue=TRUE, dv_querytext='SELECT id, id AS idval FROM cat_mat_node' 
+UPDATE config_form_fields SET iseditable=TRUE, widgettype='combo', dv_isnullvalue=TRUE, dv_querytext='SELECT id, id AS idval FROM cat_mat_node'
 WHERE columnname='matcat_id' AND formname LIKE 've_node%';
 
-UPDATE config_form_fields SET iseditable=TRUE, widgettype='combo', dv_isnullvalue=TRUE, dv_querytext='SELECT id, id AS idval FROM cat_mat_arc' 
+UPDATE config_form_fields SET iseditable=TRUE, widgettype='combo', dv_isnullvalue=TRUE, dv_querytext='SELECT id, id AS idval FROM cat_mat_arc'
 WHERE columnname='matcat_id' AND formname LIKE 've_connec%';
 
-UPDATE config_form_fields SET iseditable=TRUE, widgettype='combo', dv_isnullvalue=TRUE, dv_querytext='SELECT id, id AS idval FROM cat_mat_arc' 
+UPDATE config_form_fields SET iseditable=TRUE, widgettype='combo', dv_isnullvalue=TRUE, dv_querytext='SELECT id, id AS idval FROM cat_mat_arc'
 WHERE columnname='matcat_id' AND formname LIKE 've_arc%';
 
 UPDATE config_form_fields SET dv_querytext = replace (dv_querytext, ' arc_type', ' cat_feature_arc') WHERE dv_querytext like'% arc_type%';
@@ -755,7 +755,7 @@ UPDATE config_form_fields SET layoutname = 'lyt_none' where columnname = 'arc_id
 UPDATE config_form_fields SET layoutname = 'lyt_none' where columnname = 'arc_id' and formname like '%v_edit_arc%';
 UPDATE config_form_fields SET placeholder = NULL where formname like '%v_edit_arc%';
 UPDATE config_form_fields SET placeholder = NULL where formname like '%ve_arc%';
-UPDATE config_form_fields SET layoutorder = layoutorder +1  where (formname ilike 've_arc%' or formname='v_edit_arc') AND 
+UPDATE config_form_fields SET layoutorder = layoutorder +1  where (formname ilike 've_arc%' or formname='v_edit_arc') AND
 layoutname='lyt_data_2' and layoutorder > 12 and columnname!='fluid_type';
 
 --node
@@ -785,7 +785,7 @@ UPDATE config_form_fields SET placeholder = NULL where formname like '%v_edit_gu
 UPDATE config_form_fields SET placeholder = NULL where formname like '%ve_gully%';
 
 UPDATE config_form_fields SET widgettype = 'typeahead',
-dv_querytext = 'SELECT id, id as idval FROM cat_grate WHERE id IS NOT NULL' FROM cat_feature WHERE 
+dv_querytext = 'SELECT id, id as idval FROM cat_grate WHERE id IS NOT NULL' FROM cat_feature WHERE
 system_id = 'NETGULLY' AND formname = child_layer and columnname = 'gratecat_id';
 
 --placeholder
