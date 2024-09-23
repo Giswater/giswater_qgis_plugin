@@ -668,3 +668,4 @@ INSERT INTO sys_style (layername, styleconfig_id, styletype) VALUES ('v_edit_arc
 INSERT INTO sys_style (layername, styleconfig_id, styletype) VALUES ('v_edit_arc', 107, 'qml');
 INSERT INTO sys_style (layername, styleconfig_id, styletype) VALUES ('v_edit_arc', 108, 'qml');
 
+UPDATE config_form_fields SET hidden=false WHERE formtype='form_featuretype_change' AND columnname='featurecat_id';

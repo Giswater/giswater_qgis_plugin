@@ -145,9 +145,6 @@ WHERE id = 3280;
 
 -- 2024/09/23
 UPDATE config_form_fields
-	SET hidden=false
-	WHERE formname='generic' AND formtype='form_featuretype_change' AND columnname='featurecat_id' AND tabname='tab_none';
-UPDATE config_form_fields
 	SET widgetcontrols=NULL
 	WHERE formname='generic' AND formtype='form_featuretype_change' AND columnname='fluid_type' AND tabname='tab_none';
 UPDATE config_form_fields
@@ -168,9 +165,7 @@ UPDATE config_form_fields
 UPDATE config_form_fields
 	SET layoutorder=3
 	WHERE formname='generic' AND formtype='form_featuretype_change' AND columnname='btn_catalog' AND tabname='tab_none';
-UPDATE config_form_fields
-	SET hidden=false
-	WHERE formname='generic' AND formtype='form_featuretype_change' AND columnname='featurecat_id' AND tabname='tab_none';
+
 
 UPDATE config_typevalue
 	SET addparam='{
