@@ -18,9 +18,9 @@ SELECT is((SELECT count(*)::integer FROM v_edit_link WHERE link_id = -901), 1, '
 SELECT is((SELECT count(*)::integer FROM link WHERE link_id = -901), 1, 'INSERT: link -901 was inserted');
 
 
-UPDATE v_edit_link SET feature_type = 'updated feature_type' WHERE link_id = -901;
-SELECT is((SELECT feature_type FROM v_edit_link WHERE link_id = -901), 'updated feature_type', 'UPDATE: v_edit_link -901 was updated');
-SELECT is((SELECT feature_type FROM link WHERE link_id = -901), 'updated feature_type', 'UPDATE: link -901 was updated');
+UPDATE v_edit_link SET feature_type = 'updated text' WHERE link_id = -901;
+SELECT is((SELECT feature_type FROM v_edit_link WHERE link_id = -901), 'updated text', 'UPDATE: v_edit_link -901 was updated');
+SELECT is((SELECT feature_type FROM link WHERE link_id = -901), 'updated text', 'UPDATE: link -901 was updated');
 
 
 DELETE FROM v_edit_link WHERE link_id = -901;
