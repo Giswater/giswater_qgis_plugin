@@ -8,6 +8,11 @@ version=3.6.013
 author=David Erill, Barbara Rzepka, Sergi Muñoz, Josep Lluís Sala, Edgar Fusté, Albert Bofill, Sergi Maspons, Elies Bertran, Abel García Juanes, Maria Guzmán, Jordi Blanch, Xavier Torret, Daniel Marín, Ferran Martínez
 
 Changelog=Version 3.6.013
+    - Configure 'Change feature type' form in config_form_fields and add 4 new widgets: Fluid, Location, Category & Function.
+    - Fix valves symbology.
+    - Add 'ignore' to mapzone config.
+    - Remove toolbars_shortcuts from user config files (it wasn't used).
+    - Add project variable 'gwCurrentStyle'
 
 
 tags= giswater, water networks, sewerage, urban drainage, EPANET, SWMM
