@@ -6,14 +6,14 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 3324
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getfeaturereplace(p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getchangefeaturetype(p_data json)
 RETURNS json AS
 $BODY$
 
 /*
 -- Button GwFeatureTypeChangeButton
 
-SELECT gw_fct_getfeaturereplace($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831},
+SELECT gw_fct_getchangefeaturetype($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831},
 "form":{},
 "feature":{"tableName":"v_edit_node", "id":"1058"},
 "data":{"filterFields":{}, "pageInfo":{}, "addSchema":""}}$$);
@@ -41,7 +41,7 @@ DECLARE
 	v_layouts text[];
 	v_layout text;
 	v_tiled boolean=false;
-	v_version json;
+	v_version text;
 	v_fields_array json[];
 	v_querystring text;
 	array_index integer DEFAULT 0;
@@ -61,6 +61,7 @@ DECLARE
     v_widgetcontrols json;
     v_values_array json;
 	v_error_context text;
+	v_project_type text;
 
 BEGIN
     -- Set search path to local schema
@@ -74,12 +75,11 @@ BEGIN
     v_feature_id := ((p_data ->>'feature')::json->>'id')::text;
 	v_table_name := ((p_data ->>'feature')::json->>'tableName')::text;
 
-	SELECT DISTINCT LOWER(feature_type) INTO v_feature_type FROM cat_feature WHERE parent_layer = v_table_name;
 
     -- Get api version
-    v_version := row_to_json(row) FROM (
-    SELECT value FROM config_param_system WHERE parameter='admin_version'
-    ) row;
+    SELECT giswater, project_type INTO v_version, v_project_type FROM sys_version;
+
+   	SELECT DISTINCT LOWER(feature_type) INTO v_feature_type FROM cat_feature WHERE parent_layer = v_table_name;
 
     SELECT gw_fct_getformfields(
     'generic',
@@ -109,14 +109,10 @@ BEGIN
 		FOREACH v_layout IN ARRAY v_layouts
 		LOOP
 			select addparam into v_addparam from config_typevalue where id = v_layout;
-			if v_layout = 'lyt_main_4' then
-				v_form:= concat(v_form,  '"', v_layout, '":',v_addparam);
-			else
-				v_form:= concat(v_form,  '"', v_layout, '":',v_addparam,',');
-			end if;
-
+			v_form:= concat(v_form,  '"', v_layout, '":',coalesce(v_addparam, '{}'),',');
 		END LOOP;
 
+		v_form := left(v_form, length(v_form) - 1);
 		v_form:= concat(v_form,'}' );
 
 
@@ -140,14 +136,23 @@ BEGIN
             END IF;
 
             IF (aux_json->>'columnname') = 'featurecat_id' THEN
-		       v_sql := concat('SELECT array_agg(id) FROM cat_', v_feature_type, ' WHERE ', v_feature_type, 'type_id = ''', v_new_featurecat_id_default, ''' AND active is True OR active is null ORDER BY 1');
-			   EXECUTE v_sql INTO v_catalogs_ids;
+		       IF(v_project_type = 'WS') THEN
+		       	v_sql := concat('SELECT array_agg(id) FROM cat_', v_feature_type, ' WHERE ', v_feature_type, 'type_id = ''', v_new_featurecat_id_default, ''' AND active is True OR active is null ORDER BY 1');
+			   else
+			   	if(v_feature_type = 'gully')then
+			   		v_sql := concat('SELECT array_agg(id) FROM cat_grate WHERE ', v_feature_type, '_type = ''', v_new_featurecat_id_default, ''' AND active is True OR active is null ORDER BY 1');
+				else
+			   		v_sql := concat('SELECT array_agg(id) FROM cat_', v_feature_type, ' WHERE ', v_feature_type, '_type = ''', v_new_featurecat_id_default, ''' AND active is True OR active is null ORDER BY 1');
+
+			   	END IF;
+			   end if;
+		       EXECUTE v_sql INTO v_catalogs_ids;
 
                v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'comboIds', COALESCE(v_catalogs_ids, '{}'));
                v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'comboNames', COALESCE(v_catalogs_ids, '{}'));
             END IF;
 
-			IF (aux_json->>'columnname') = 'fluid' THEN
+			IF (aux_json->>'columnname') = 'fluid_type' THEN
 
 				 select array_agg(fluid_type) into v_fluids from man_type_fluid where lower(feature_type) = v_feature_type;
                  v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'comboIds', COALESCE(v_fluids, '{}'));
@@ -155,7 +160,7 @@ BEGIN
 
             END IF;
 
-			IF (aux_json->>'columnname') = 'location' THEN
+			IF (aux_json->>'columnname') = 'location_type' THEN
 
 				 select array_agg(location_type) into v_locations from man_type_location where lower(feature_type) = v_feature_type;
                  v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'comboIds', COALESCE(v_locations, '{}'));
@@ -163,15 +168,14 @@ BEGIN
 
             END IF;
 
-			IF (aux_json->>'columnname') = 'category' THEN
-
+			IF (aux_json->>'columnname') = 'category_type' THEN
 				 select array_agg(category_type) into v_categories from man_type_category where lower(feature_type) = v_feature_type;
                  v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'comboIds', COALESCE(v_categories, '{}'));
                	 v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'comboNames', COALESCE(v_categories, '{}'));
 
             END IF;
 
-			IF (aux_json->>'columnname') = 'function' THEN
+			IF (aux_json->>'columnname') = 'function_type' THEN
 
 				 select array_agg(function_type) into v_functions from man_type_function where lower(feature_type) = v_feature_type;
                  v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'comboIds', COALESCE(v_functions, '{}'));
@@ -245,7 +249,7 @@ BEGIN
 
     v_response := '{
     "status": "Accepted",
-    "version": ' || v_version || ',
+    "version": "' || v_version || '",
     "body": {
         "form": {' || v_form || '
 		},
