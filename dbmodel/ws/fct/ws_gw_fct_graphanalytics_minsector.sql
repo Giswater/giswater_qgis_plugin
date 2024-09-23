@@ -234,6 +234,7 @@ BEGIN
     PERFORM gw_fct_graphanalytics_settempgeom('{"data":{
         "fid":'||v_fid||',
         "updatemapzgeom":'||v_updatemapzgeom||',
+        "concavehull":'||v_concavehull||',
         "geomparamupdate":'||v_geomparamupdate||',
         "table":"minsector",
         "field":"zone_id",
