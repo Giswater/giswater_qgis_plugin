@@ -19,8 +19,8 @@ SELECT is((SELECT count(*)::integer FROM link WHERE link_id = -901), 1, 'INSERT:
 
 
 UPDATE v_edit_link SET exit_elev = -901 WHERE link_id = -901;
-SELECT is((SELECT exit_elev FROM v_edit_link WHERE link_id = -901), -901, 'UPDATE: v_edit_link -901 was updated');
-SELECT is((SELECT exit_elev FROM link WHERE link_id = -901), -901, 'UPDATE: link -901 was updated');
+SELECT is((SELECT exit_elev::integer FROM v_edit_link WHERE link_id = -901), -901, 'UPDATE: v_edit_link -901 was updated');
+SELECT is((SELECT exit_elev::integer FROM link WHERE link_id = -901), -901, 'UPDATE: link -901 was updated');
 
 
 DELETE FROM v_edit_link WHERE link_id = -901;
