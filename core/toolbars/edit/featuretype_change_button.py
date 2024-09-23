@@ -382,6 +382,8 @@ def cmb_new_featuretype_selection_changed(**kwargs):
     cmb_catalog_id = tools_qt.get_widget(dialog,"tab_none_featurecat_id")
     project_type = tools_gw.get_project_type()
 
+    tools_qt.set_stylesheet(cmb_catalog_id, style="")
+
     # Populate catalog_id
     feature_type_new = tools_qt.get_widget_value(dialog, cmb_new_feature_type)
     if project_type == 'ws':
@@ -397,6 +399,8 @@ def cmb_new_featuretype_selection_changed(**kwargs):
     rows = tools_db.get_rows(sql)
     tools_qt.fill_combo_values(cmb_catalog_id, rows)
 
+    # Manage if there is no catalog for the selected feature type
     if not rows or len(rows) == 0:
-        msg = "There is no catalog for this feature type. Please add one in the corresponding table."
+        tools_qt.set_stylesheet(cmb_catalog_id, style="background-color: #ff8080")
+        msg = "There is no catalog for this feature type. Please add one in the corresponding cat table."
         tools_qgis.show_critical(msg, dialog=dialog)
