@@ -988,8 +988,6 @@ def my_form_open(dialog, layer, feature):
 </qgis>
 ' WHERE styleconfig_id=102 and layername='v_edit_link';
 
-
-
 INSERT INTO sys_style (layername, styleconfig_id, styletype, active, stylevalue) VALUES
 ('v_edit_gully', 102, 'qml', true,
 '<!DOCTYPE qgis PUBLIC ''http://mrcc.com/qgis.dtd'' ''SYSTEM''>
@@ -6348,9 +6346,3 @@ def my_form_open(dialog, layer, feature):
  <layerGeometryType>1</layerGeometryType>
 </qgis>
 ' where layername = 'v_edit_arc' and styleconfig_id = 102;
-
-
-
-
-
-
