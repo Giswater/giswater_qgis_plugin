@@ -231,7 +231,15 @@ BEGIN
 
     -- Update minsector temporary geometry
 	-- =======================
-    PERFORM gw_fct_graphanalytics_settempgeom('{"data":{"updatemapzgeom":'||v_updatemapzgeom||'}}');
+    PERFORM gw_fct_graphanalytics_settempgeom('{"data":{
+        "fid":'||v_fid||',
+        "updatemapzgeom":'||v_updatemapzgeom||',
+        "geomparamupdate":'||v_geomparamupdate||',
+        "table":"minsector",
+        "field":"zone_id",
+        "fieldmp":"minsector_id",
+        "srid":'||v_srid||'
+    }}');
 
 	IF v_commitchanges IS FALSE THEN
         -- Polygons
