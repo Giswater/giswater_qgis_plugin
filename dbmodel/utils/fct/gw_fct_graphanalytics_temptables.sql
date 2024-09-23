@@ -108,7 +108,7 @@ BEGIN
 	CREATE TEMP TABLE temp_t_link (LIKE SCHEMA_NAME.link INCLUDING ALL);
 
     -- For specific functions
-    IF v_fct_name == 'MINSECTOR' THEN
+    IF v_fct_name = 'MINSECTOR' THEN
  	    CREATE TEMP TABLE temp_minsector (LIKE SCHEMA_NAME.minsector INCLUDING ALL);
     END IF;
 
