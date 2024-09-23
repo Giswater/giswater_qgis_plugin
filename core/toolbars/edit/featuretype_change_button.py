@@ -176,92 +176,76 @@ class GwFeatureTypeChangeButton(GwMaptool):
 
         feature = f'"tableName":"{self.tablename}", "id":"{self.feature_id}"'
         body = tools_gw.create_body(feature = feature)
-        json_result = tools_gw.execute_procedure('gw_fct_getfeaturereplace', body)
+        json_result = tools_gw.execute_procedure('gw_fct_getchangefeaturetype', body)
         self.dlg_change = GwFeatureTypeChangeUi(self)
         tools_gw.load_settings(self.dlg_change)
         self._manage_dlg_widgets(self.dlg_change, json_result)
         tools_gw.open_dialog(self.dlg_change, 'featuretype_change')
 
 
-    def _manage_dlg_widgets(self, dialog,complet_result):
+    def _manage_dlg_widgets(self, dialog, complet_result):
         """ Creates and populates all the widgets """
 
         layout_list = []
         widget_offset = 0
         prev_layout = ""
+        layout_orientations = {}
+
+
+        for layout_name, layout_info in complet_result['body']['form']['layouts'].items():
+            orientation = layout_info.get('lytOrientation')
+            if orientation:
+                layout_orientations[layout_name] = orientation
+
         for field in complet_result['body']['data']['fields']:
-            if field.get('hidden'):
-                continue
 
-            if field['widgettype'] is "button":
+            if field['columnname'] == 'btn_catalog' and self.feature_type == 'gully':
                 continue
-
-            if field.get('widgetcontrols') and field['widgetcontrols'].get('hiddenWhenNull') \
-                    and field.get('value') in (None, ''):
-                continue
-            label, widget = tools_gw.set_widgets(dialog, complet_result, field, self.tablename, self)
-            if widget is None:
-                continue
-
-            layout = dialog.findChild(QGridLayout, field['layoutname'])
-            if layout is not None:
-                if layout.objectName() != prev_layout:
-                    widget_offset = 0
-                    prev_layout = layout.objectName()
-                # Take the QGridLayout with the intention of adding a QSpacerItem later
-                if layout not in layout_list and layout.objectName() in ('lyt_main_1', 'lyt_main_2', 'lyt_main_3','lyt_buttons'):
-                    layout_list.append(layout)
-
-                if field['layoutorder'] is None:
-                    message = "The field layoutorder is not configured for"
-                    msg = f"formname:{self.tablename}, columnname:{field['columnname']}"
-                    tools_qgis.show_message(message, 2, parameter=msg, dialog=dialog)
+            else:
+                if field.get('hidden'):
                     continue
 
-                # Manage widget and label positions
-                label_pos = field['widgetcontrols']['labelPosition'] if (
-                            'widgetcontrols' in field and field['widgetcontrols'] and 'labelPosition' in field[
-                             'widgetcontrols']) else None
-                widget_pos = field['layoutorder'] + widget_offset
+                if field['widgettype'] is "button":
+                    continue
 
-                # The data tab is somewhat special (it has 2 columns)
-                if 'lyt_data' in layout.objectName() or 'lyt_epa_data' in layout.objectName():
-                    tools_gw.add_widget(dialog, field, label, widget)
-                # If the widget has a label
-                elif label:
-                    # If it has a labelPosition configured
-                    if label_pos is not None:
-                        if label_pos == 'top':
-                            layout.addWidget(label, 0, widget_pos)
-                            if type(widget) is QSpacerItem:
-                                layout.addItem(widget, 1, widget_pos)
-                            else:
-                                layout.addWidget(widget, 1, widget_pos)
-                        elif label_pos == 'left':
-                            layout.addWidget(label, 0, widget_pos)
-                            if type(widget) is QSpacerItem:
-                                layout.addItem(widget, 0, widget_pos + 1)
-                            else:
-                                layout.addWidget(widget, 0, widget_pos + 1)
-                            widget_offset += 1
-                        else:
-                            if type(widget) is QSpacerItem:
-                                layout.addItem(widget, 0, widget_pos)
-                            else:
-                                layout.addWidget(widget, 0, widget_pos)
-                    # If widget has label but labelPosition is not configured (put it on the left by default)
+                if field.get('widgetcontrols') and field['widgetcontrols'].get('hiddenWhenNull') \
+                        and field.get('value') in (None, ''):
+                    continue
+                label, widget = tools_gw.set_widgets(dialog, complet_result, field, self.tablename, self)
+                if widget is None:
+                    continue
+
+                layout = dialog.findChild(QGridLayout, field['layoutname'])
+                if layout is not None:
+                    if layout.objectName() != prev_layout:
+                        widget_offset = 0
+                        prev_layout = layout.objectName()
+
+                    orientation = layout_orientations.get(layout.objectName(),
+                                                          "vertical")
+                    layout.setProperty('lytOrientation', orientation)
+
+                    # Take the QGridLayout with the intention of adding a QSpacerItem later
+                    if layout not in layout_list and layout.objectName() in ('lyt_main_1', 'lyt_main_2', 'lyt_main_3','lyt_buttons'):
+                        layout_list.append(layout)
+
+                    if field['layoutorder'] is None:
+                        message = "The field layoutorder is not configured for"
+                        msg = f"formname:{self.tablename}, columnname:{field['columnname']}"
+                        tools_qgis.show_message(message, 2, parameter=msg, dialog=dialog)
+                        continue
+
+                    # Manage widget and label positions
+                    label_pos = field['widgetcontrols']['labelPosition'] if (
+                                'widgetcontrols' in field and field['widgetcontrols'] and 'labelPosition' in field[
+                                 'widgetcontrols']) else None
+                    widget_pos = field['layoutorder'] + widget_offset
+
+                    # The data tab is somewhat special (it has 2 columns)
+                    if 'lyt_data' in layout.objectName() or 'lyt_epa_data' in layout.objectName():
+                        tools_gw.add_widget(dialog, field, label, widget)
                     else:
-                        layout.addWidget(label, 0, widget_pos)
-                        if type(widget) is QSpacerItem:
-                            layout.addItem(widget, 0, widget_pos + 1)
-                        else:
-                            layout.addWidget(widget, 0, widget_pos + 1)
-                # If the widget has no label
-                else:
-                    if type(widget) is QSpacerItem:
-                        layout.addItem(widget, 0, widget_pos)
-                    else:
-                        layout.addWidget(widget, 0, widget_pos)
+                        tools_gw.add_widget_combined(dialog, field, label, widget)
 
 
     def _featuretype_change(self, event):
@@ -396,12 +380,19 @@ def cmb_new_featuretype_selection_changed(**kwargs):
     cmb_new_feature_type = kwargs["widget"]
     this = kwargs["class"]
     cmb_catalog_id = tools_qt.get_widget(dialog,"tab_none_featurecat_id")
+    project_type = tools_gw.get_project_type()
 
     # Populate catalog_id
     feature_type_new = tools_qt.get_widget_value(dialog, cmb_new_feature_type)
-    sql = (f"SELECT DISTINCT(id), id as idval "
-            f"FROM {this.cat_table} "
-            f"WHERE {this.feature_type}type_id = '{feature_type_new}' AND (active IS TRUE OR active IS NULL) "
-            f"ORDER BY id")
+    if project_type == 'ws':
+        sql = (f"SELECT DISTINCT(id), id as idval "
+                f"FROM {this.cat_table} "
+                f"WHERE {this.feature_type}type_id = '{feature_type_new}' AND (active IS TRUE OR active IS NULL) "
+                f"ORDER BY id")
+    else:
+        sql = (f"SELECT DISTINCT(id), id as idval "
+               f"FROM {this.cat_table} "
+               f"WHERE {this.feature_type}_type = '{feature_type_new}' AND (active IS TRUE OR active IS NULL) "
+               f"ORDER BY id")
     rows = tools_db.get_rows(sql)
     tools_qt.fill_combo_values(cmb_catalog_id, rows)
