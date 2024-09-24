@@ -42,3 +42,7 @@ NULL, true, '{4}');
 
 INSERT INTO sys_param_user VALUES ('utils_psector_strategy', 'config', 'Psector strategy', 'role_master', null, 'Value for psector_strategy', null, null, TRUE,
 20, 'utils', FALSE, null, null, null, FALSE, 'text', 'check', TRUE, null, 'true', 'lyt_other', TRUE, null, null, null, null, 'core') ON CONFLICT (id) DO NOTHING;
+
+--24/09/2024
+INSERT INTO sys_function (id,function_name,project_type,function_type,input_params,return_type,descript,sys_role,"source")
+	VALUES (3325,'gw_fct_getgraphinundation','utils','function','','json','Retrieves GeoJSON data representing the inundation (flooding) graph for a specific area','role_edit','core');
