@@ -24,6 +24,9 @@ DECLARE
     v_node_id integer = 0;
     v_arc_id integer = 0;
     v_id integer = 0;
+    v_project_type text;
+    v_cost integer=1;
+    v_reverse_cost integer=1;
 
 BEGIN
 
@@ -43,30 +46,30 @@ BEGIN
 
     -- Disconnect arcs with modif=true at nodes with modif=true; a new arc N_new->N_original is created with the cost and reverse cost of the arc
     FOR v_record IN
-        SELECT n.pgr_node_id, n.graph_delimiter, a.pgr_arc_id, a.pgr_node_1, a.pgr_node_2, a.cost, a.reverse_cost
+        SELECT n.pgr_node_id, n.graph_delimiter as n_graph_delimiter, a.graph_delimiter as a_graph_delimiter, a.pgr_arc_id, a.pgr_node_1, a.pgr_node_2, a.cost, a.reverse_cost
         FROM temp_pgr_node n
         JOIN temp_pgr_arc a ON n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
         WHERE n.modif = true AND a.modif = true
     LOOP
         v_id = v_id + 2;
         INSERT INTO temp_pgr_node(pgr_node_id, node_id, modif, graph_delimiter)
-        VALUES (v_id, v_record.pgr_node_id::text, false, v_record.graph_delimiter);
+        VALUES (v_id, v_record.pgr_node_id::text, false, v_record.n_graph_delimiter);
 
         IF v_record.pgr_node_id = v_record.pgr_node_1 THEN
             UPDATE temp_pgr_arc SET pgr_node_1 = v_id
             WHERE pgr_arc_id = v_record.pgr_arc_id;
 
             INSERT INTO temp_pgr_arc(pgr_arc_id, arc_id, pgr_node_1, pgr_node_2, node_1, node_2, modif, graph_delimiter, cost, reverse_cost)
-            VALUES (v_id + 1, v_record.pgr_arc_id::text, v_record.pgr_node_id, v_id, v_record.pgr_node_id, v_record.pgr_node_id, false, v_record.graph_delimiter, v_record.cost, v_record.reverse_cost);
+            VALUES (v_id + 1, v_record.pgr_arc_id::text, v_record.pgr_node_id, v_id, v_record.pgr_node_id, v_record.pgr_node_id, false, v_record.a_graph_delimiter, v_record.cost, v_record.reverse_cost);
         ELSE
             UPDATE temp_pgr_arc SET pgr_node_2 = v_id
             WHERE pgr_arc_id = v_record.pgr_arc_id;
 
             INSERT INTO temp_pgr_arc(pgr_arc_id, arc_id, pgr_node_1, pgr_node_2, node_1, node_2, modif, graph_delimiter, cost, reverse_cost)
-            VALUES (v_id + 1, v_record.pgr_arc_id::text, v_id, v_record.pgr_node_id, v_record.pgr_node_id, v_record.pgr_node_id, false, v_record.graph_delimiter, v_record.cost, v_record.reverse_cost);
+            VALUES (v_id + 1, v_record.pgr_arc_id::text, v_id, v_record.pgr_node_id, v_record.pgr_node_id, v_record.pgr_node_id, false, COALESCE(v_record.a_graph_delimiter,v_record.n_graph_delimiter), v_record.cost, v_record.reverse_cost);
         END IF;
 
-        UPDATE temp_pgr_arc SET cost = 1, reverse_cost = 1 WHERE pgr_arc_id = v_record.pgr_arc_id; -- The new arc has the cost and reverse cost
+        UPDATE temp_pgr_arc SET cost = v_cost, reverse_cost = v_reverse_cost WHERE pgr_arc_id = v_record.pgr_arc_id; -- The new arc has the cost and reverse cost
     END LOOP;
 
 	RETURN ('{"status":"Accepted"}')::json;
