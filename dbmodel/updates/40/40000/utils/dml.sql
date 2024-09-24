@@ -4,6 +4,8 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
+SET search_path = SCHEMA_NAME, public, pg_catalog;
+
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source")
 VALUES (3326, 'gw_fct_graphanalytics_arrangenetwork', 'utils', 'function', NULL, 'json', 'Function to arrenge the network in graphanalytics', 'role_basic', NULL, 'core')
 ON CONFLICT (id) DO NOTHING;
@@ -33,8 +35,6 @@ Before start you need to configure:
 In explotation id you can use ''-9'' to select all explotations, or a list of explotations separated by comma.'
 WHERE id=2706;
 
-DROP TABLE IF EXISTS macrominsector;
-
 INSERT INTO config_toolbox (id, alias, functionparams, inputparams, observ, active, device)
 VALUES(3334, 'Macrominsector analysis', '{"featureType":[]}'::json,
 '[{"widgetname":"commitChanges", "label":"Commit changes:","widgettype":"check","datatype":"boolean","layoutname":"grl_option_parameters","layoutorder":1, "value":"", "tooltip": "Commit changes"}]'::json,
@@ -42,3 +42,6 @@ NULL, true, '{4}');
 
 INSERT INTO sys_param_user VALUES ('utils_psector_strategy', 'config', 'Psector strategy', 'role_master', null, 'Value for psector_strategy', null, null, TRUE,
 20, 'utils', FALSE, null, null, null, FALSE, 'text', 'check', TRUE, null, 'true', 'lyt_other', TRUE, null, null, null, null, 'core') ON CONFLICT (id) DO NOTHING;
+
+-- drop gw_trg_presszone_check_datatype
+DELETE FROM sys_function WHERE id=3306;
