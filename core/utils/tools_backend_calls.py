@@ -78,6 +78,9 @@ def add_object(**kwargs):
 
     # Check if this object is already associated to current feature
     field_object_id = dialog.findChild(QWidget, func_params['sourcewidget']).property('columnname')
+    if qtable_name == 'tbl_document' or 'doc' in tab_name:
+        field_object_id = 'doc_id'
+
     tablename = func_params['sourceview'] + "_x_" + feature_type
     sql = ("SELECT * FROM " + str(tablename) + ""
            " WHERE " + str(field_id) + " = '" + str(feature_id) + "'"
@@ -211,7 +214,8 @@ def open_visit(**kwargs):
 
 def manage_document(doc_id, **kwargs):
     """ Function called in class tools_gw.add_button(...) -->
-        widget.clicked.connect(partial(getattr(self, function_name), **kwargs)) """
+        widget.clicked.connect(partial(getattr(self, function_name), **kwargs))
+        Function called by: columnname ='btn_doc_new' """
     feature = None
     complet_result = kwargs['complet_result']
     feature_type = complet_result['body']['feature']['featureType']
@@ -937,12 +941,12 @@ def _get_list(complet_result, form_name='', tab_name='', filter_fields='', widge
 def _manage_document_new(doc, **kwargs):
     """ Get inserted doc_id and add it to current feature """
 
-    if doc.doc_id is None:
+    if doc.doc_name is None:
         return
     dialog = kwargs['dialog']
     func_params = kwargs['func_params']
 
-    tools_qt.set_widget_text(dialog,  f"{func_params['sourcewidget']}", doc.doc_id)
+    tools_qt.set_widget_text(dialog,  f"{func_params['sourcewidget']}", doc.doc_name)
     add_object(**kwargs)
 
 

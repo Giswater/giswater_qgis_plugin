@@ -6439,7 +6439,7 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 		</message>
 		<message>
 			<source>lbl_doc_id</source>
-			<translation>Id doc:</translation>
+			<translation>Nombre doc:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_doc_id</source>

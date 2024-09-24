@@ -36,7 +36,7 @@
     </layout>
    </item>
    <item row="1" column="0">
-    <layout class="QGridLayout" name="gridLayout_4">
+    <layout class="QGridLayout" name="lyt_buttons">
      <item row="0" column="0">
       <spacer name="horizontalSpacer">
        <property name="orientation">

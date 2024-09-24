@@ -25,8 +25,8 @@
      <layout class="QGridLayout" name="lyt_bot_2"/>
     </item>
     <item row="4" column="0">
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <item>
+     <layout class="QGridLayout" name="lyt_buttons">
+      <item row="0" column="0">
        <spacer name="horizontalSpacer">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -39,21 +39,21 @@
         </property>
        </spacer>
       </item>
-      <item>
+      <item row="0" column="1">
        <widget class="QPushButton" name="btn_accept">
         <property name="text">
          <string>Accept</string>
         </property>
        </widget>
       </item>
-      <item>
+      <item row="0" column="2">
        <widget class="QPushButton" name="btn_cancel">
         <property name="text">
          <string>Cancel</string>
         </property>
        </widget>
       </item>
-      <item>
+      <item row="0" column="3">
        <widget class="QPushButton" name="btn_apply">
         <property name="text">
          <string>Apply</string>
@@ -95,8 +95,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>726</width>
-             <height>335</height>
+             <width>734</width>
+             <height>365</height>
             </rect>
            </property>
            <attribute name="label">
@@ -116,8 +116,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>98</width>
-             <height>28</height>
+             <width>734</width>
+             <height>365</height>
             </rect>
            </property>
            <attribute name="label">
@@ -151,8 +151,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>111</width>
-             <height>64</height>
+             <width>734</width>
+             <height>357</height>
             </rect>
            </property>
            <attribute name="label">
@@ -191,7 +191,7 @@
              <x>0</x>
              <y>0</y>
              <width>98</width>
-             <height>42</height>
+             <height>36</height>
             </rect>
            </property>
            <attribute name="label">

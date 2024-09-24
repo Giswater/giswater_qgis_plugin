@@ -16,6 +16,7 @@ import sqlite3
 from typing import Literal, Dict
 import webbrowser
 import xml.etree.ElementTree as ET
+from sip import isdeleted
 
 if 'nt' in sys.builtin_module_names:
     import ctypes
@@ -53,6 +54,7 @@ from ...libs.tools_qt import GwHyperLinkLabel, GwHyperLinkLineEdit
 # These imports are for the add_{widget} functions (modules need to be imported in order to find it by its name)
 # noinspection PyUnresolvedReferences
 from ..shared import info, mincut_tools
+from ..toolbars.edit import featuretype_change_button
 
 QgsGeometryType = Literal['line', 'point', 'polygon']
 
@@ -1507,8 +1509,13 @@ def add_widget(dialog, field, lbl, widget):
     layout = dialog.findChild(QGridLayout, field['layoutname'])
     if layout in (None, 'null', 'NULL', 'Null'):
         return
-    row = int(field['layoutorder'])
-    col = 0
+    orientation = layout.property('lytOrientation')
+    if orientation == 'horizontal':
+        row = 0
+        col = int(field['layoutorder'])
+    else:  # default vertical
+        row = int(field['layoutorder'])
+        col = 0
     if lbl is None:
         col = row
         row = 0
@@ -1522,6 +1529,40 @@ def add_widget(dialog, field, lbl, widget):
     if lbl is not None:
         layout.setColumnStretch(col, 1)
 
+
+def add_widget_combined(dialog, field, label, widget):
+    """ Insert widget into layout based on orientation and label position """
+    layout = dialog.findChild(QGridLayout, field['layoutname'])
+
+    orientation = layout.property('lytOrientation')
+    widget_pos = int(field.get('layoutorder', 0))
+    row, col = (0, widget_pos) if orientation == "horizontal" else (widget_pos, 0)
+
+    label_pos = field['widgetcontrols']['labelPosition'] if (
+                            'widgetcontrols' in field and field['widgetcontrols'] and 'labelPosition' in field['widgetcontrols']) else None
+    print("orientation combined: ", orientation)
+    if label:
+        layout.addWidget(label, row, col)
+        if orientation == "horizontal":
+            if label_pos == 'top':
+                row += 1
+            else:
+                print("entro col")
+                col += 1
+        else:
+            if label_pos == 'top':
+                row += 1
+            else:
+                col = 1
+            layout.setColumnStretch(col, 1)
+
+    if isinstance(widget, QSpacerItem):
+        layout.addItem(widget, row, col)
+    else:
+        layout.addWidget(widget, row, col)
+
+    if label and orientation == "horizontal":
+        layout.setColumnStretch(col, 1)
 
 def get_dialog_changed_values(dialog, chk, widget, field, list, value=None):
 
@@ -1576,6 +1617,7 @@ def add_button(**kwargs):
         module = tools_backend_calls -> def manage_document(doc_id, **kwargs):
         module = tools_backend_calls -> def manage_element(element_id, **kwargs):
         module = tools_backend_calls -> def open_selected_element(**kwargs):
+        module = featuretype_change_button -> def btn_accept_featuretype_change(**kwargs):
     """
 
     field = kwargs['field']
@@ -3174,7 +3216,7 @@ def set_tablemodel_config(dialog, widget, table_name, sort_order=0, schema_name=
     """ Configuration of tables. Set visibility and width of columns """
 
     widget = tools_qt.get_widget(dialog, widget)
-    if not widget:
+    if not widget or isdeleted(widget):
         return widget
 
     if schema_name is not None:
@@ -4408,7 +4450,7 @@ def set_filter_listeners(complet_result, dialog, widget_list, columnname, widget
 def set_widgets(dialog, complet_result, field, tablename, class_info):
     """
     functions called in -> widget = getattr(self, f"manage_{field['widgettype']}")(**kwargs)
-        def manage_text(self, **kwargs)
+        def _manage_text(**kwargs)
         def manage_typeahead(self, **kwargs)
         def manage_combo(self, **kwargs)
         def manage_check(self, **kwargs)

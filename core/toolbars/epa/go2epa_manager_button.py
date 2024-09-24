@@ -440,7 +440,10 @@ class GwGo2EpaManagerButton(GwAction):
         if not result_ids:
             return
 
-        result_ids_json = "ARRAY[" + ",".join(f"'{result_id}'" for result_id in result_ids) + "]"
+        input_param = {
+            "result_ids": result_ids
+        }
+        result_ids_json = f"'{json.dumps(input_param)}'::json"
         json_result = tools_gw.execute_procedure(
             function_name="gw_fct_getinpdata",
             parameters=result_ids_json,

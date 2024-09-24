@@ -40,7 +40,7 @@
           </item>
           <item row="1" column="1">
            <widget class="QgsCollapsibleGroupBox" name="mGroupBox">
-            <property name="collapsed" stdset="0">
+            <property name="collapsed">
              <bool>true</bool>
             </property>
             <layout class="QGridLayout" name="gridLayout_8">
@@ -117,7 +117,7 @@
     </layout>
    </item>
    <item row="3" column="0">
-    <layout class="QGridLayout" name="gridLayout_3">
+    <layout class="QGridLayout" name="lyt_buttons">
      <item row="0" column="3">
       <spacer name="horizontalSpacer">
        <property name="orientation">
