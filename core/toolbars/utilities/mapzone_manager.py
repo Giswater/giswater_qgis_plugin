@@ -11,8 +11,8 @@ from functools import partial
 from sip import isdeleted
 
 from qgis.PyQt.QtGui import QCursor
-from qgis.PyQt.QtCore import Qt, QPoint
-from qgis.PyQt.QtWidgets import QAction, QMenu, QTableView, QAbstractItemView, QGridLayout, QLabel, QWidget, QComboBox
+from qgis.PyQt.QtCore import Qt, QPoint, QDateTime, QDate, QTime
+from qgis.PyQt.QtWidgets import QAction, QMenu, QTableView, QAbstractItemView, QGridLayout, QLabel, QWidget, QComboBox, QMessageBox
 from qgis.PyQt.QtSql import QSqlTableModel
 
 from qgis.gui import QgsMapToolEmitPoint
@@ -53,6 +53,7 @@ class GwMapzoneManager:
 
         # Add icons
         tools_gw.add_icon(self.mapzone_mng_dlg.btn_execute, "311", sub_folder="24x24")
+        tools_gw.add_icon(self.mapzone_mng_dlg.btn_flood, "312", sub_folder="24x24")
 
         default_tab_idx = 0
         tabs = ['sector', 'dma', 'presszone', 'dqa']
@@ -81,6 +82,7 @@ class GwMapzoneManager:
         self.mapzone_mng_dlg.txt_name.textChanged.connect(partial(self._txt_name_changed))
         self.mapzone_mng_dlg.chk_show_all.toggled.connect(partial(self._manage_current_changed))
         self.mapzone_mng_dlg.btn_execute.clicked.connect(partial(self._open_mapzones_analysis))
+        self.mapzone_mng_dlg.btn_flood.clicked.connect(partial(self._open_flood_analysis))
         self.mapzone_mng_dlg.btn_config.clicked.connect(partial(self.manage_config, self.mapzone_mng_dlg, None))
         self.mapzone_mng_dlg.btn_toggle_active.clicked.connect(partial(self._manage_toggle_active))
         self.mapzone_mng_dlg.btn_create.clicked.connect(partial(self.manage_create, self.mapzone_mng_dlg, None))
@@ -233,6 +235,39 @@ class GwMapzoneManager:
         # Set mapzone type in combo graphClass
         mapzone_type = self.mapzone_mng_dlg.main_tab.tabText(self.mapzone_mng_dlg.main_tab.currentIndex())
         tools_qt.set_combo_value(dlg_functions.findChild(QComboBox, 'graphClass'), f"{mapzone_type.upper()}", 0)
+
+    def _open_flood_analysis(self):
+        """Opens the toolbox 'flood_analysis' and runs the SQL function to create the temporal layer."""
+
+        sql_query = "SELECT sept25_ws.gw_fct_getgraphinundation()"
+        result = tools_db.get_row(sql_query, commit=False, log_sql=True)
+
+        if not result:
+            QMessageBox.critical(self.mapzone_mng_dlg, "Error", "No valid data received from the SQL function.")
+            return
+
+        # add the layer
+        geojson_data = result[0]  # Assuming result[0] contains the GeoJSON
+        print(json.dumps(geojson_data, indent=4))
+        layer_name = "Water Flow Temporal Layer"
+        temp_layer_result = tools_gw.add_layer_temp(self.mapzone_mng_dlg, geojson_data, layer_name,)
+        print(temp_layer_result)
+        # Check layer
+        if temp_layer_result and temp_layer_result['temp_layers_added']:
+            temp_layer = temp_layer_result['temp_layers_added'][0]
+            self._setup_temporal_layer(temp_layer)
+        else:
+            QMessageBox.critical(self.mapzone_mng_dlg, "Error", "Failed to create the temporal layer.")
+
+    def _setup_temporal_layer(self, vlayer):
+        """Sets the temporal properties for the layer."""
+
+        # Enable temporal properties for the layer
+        vlayer.setTemporal(True)
+        vlayer.setTemporalControlField("timestep")
+
+        self.iface.mapCanvas().enableTemporalNavigation(True)
+        self.iface.mapCanvas().refresh()
 
     # region config button
 
