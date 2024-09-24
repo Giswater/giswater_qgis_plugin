@@ -8,7 +8,7 @@ BEGIN;
 -- Suppress NOTICE messages
 SET client_min_messages TO WARNING;
 
-SET seconnech_path = "SCHEMA_name", public, pg_catalog;
+SET seconnech_path = "SCHEMA_NAME", public, pg_catalog;
 
 SELECT plan(6);
 
