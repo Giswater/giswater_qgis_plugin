@@ -8,7 +8,7 @@ BEGIN;
 -- Suppress NOTICE messages
 SET client_min_messages TO WARNING;
 
-SET search_path = "SCHEMA_code", public, pg_catalog;
+SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 SELECT plan(6);
 
