@@ -101,7 +101,7 @@ BEGIN
         FROM (
             SELECT node_id FROM man_valve WHERE (closed = FALSE OR closed IS NULL) AND broken = TRUE
         ) s
-        WHERE n.modif = TRUE AND n.node_id = s.node_id;
+        WHERE n.modif = TRUE AND n.pgr_node_id=s.node_id::int;
     END IF;
 
     -- Arcs to be disconnected: one of the two arcs that reach the valve
@@ -125,7 +125,7 @@ BEGIN
     ) s
     WHERE n.pgr_node_id = s.node_id::INT AND n.graph_delimiter = 'SECTOR';
 
-    -- Arcs to be disconnected: all those that would be InletArc for sector start nodes where "graph_delimiter" = 'SECTOR'
+    -- Arcs to be disconnected: all those that connect to the nodes where "graph_delimiter" = 'SECTOR' and are also in the "sector" table
     UPDATE temp_pgr_arc a SET modif = TRUE, cost = -1, reverse_cost = -1
     FROM (
         SELECT n.pgr_node_id, a.pgr_arc_id
