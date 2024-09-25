@@ -358,3 +358,28 @@ SELECT c.connec_id, c.arc_id, 1::int2 flag FROM selector_state,c WHERE c.state =
 SELECT p.connec_id, p.arc_id, 1::int2 FROM s, p WHERE p.psector_id = s.psector_id AND s.cur_user = "current_user"()::text AND p.state = 0
 	UNION ALL
 SELECT DISTINCT ON (p.connec_id) p.connec_id, p.arc_id, 2::int2 FROM s, p WHERE p.psector_id = s.psector_id AND s.cur_user = "current_user"()::text AND p.state = 1;
+
+CREATE OR REPLACE VIEW vu_sector
+AS SELECT s.sector_id,
+    s.name,
+    s.macrosector_id,
+    m.name AS macrosector_name,
+    et.idval,
+    s.descript,
+    s.parent_id,
+    s.pattern_id,
+    s.graphconfig::text AS graphconfig,
+    s.stylesheet::text AS stylesheet,
+    s.link,
+    s.avg_press,
+    s.active,
+    s.undelete,
+    s.tstamp,
+    s.insert_user,
+    s.lastupdate,
+    s.lastupdate_user,
+    s.the_geom
+   FROM sector s
+     LEFT JOIN macrosector m USING (macrosector_id)
+     LEFT JOIN edit_typevalue et ON et.id::text = s.sector_type::text AND et.typevalue::text = 'sector_type'::text
+  ORDER BY s.sector_id; 
