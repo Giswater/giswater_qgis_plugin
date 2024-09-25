@@ -176,3 +176,6 @@ UPDATE config_typevalue
   "lytOrientation": "horizontal"
 }'::json
 	WHERE typevalue='layout_name_typevalue' AND id='lyt_main_2';
+
+-- 25/09/2024
+UPDATE sys_table SET id = 'selector_municipality' WHERE id = 'selector_muni';
