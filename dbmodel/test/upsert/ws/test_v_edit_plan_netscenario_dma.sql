@@ -13,6 +13,9 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 SELECT plan(6);
 
 insert into plan_netscenario (netscenario_id) values (-901);
+
+INSERT INTO selector_netscenario (netscenario_id, cur_user) values (-901, current_user);
+
 INSERT INTO v_edit_plan_netscenario_dma (netscenario_id, netscenario_name, dma_id, "name", pattern_id, graphconfig, the_geom, active, stylesheet, expl_id2) 
 VALUES(-901, '', -901, '', '', null, null, false, null, 0);
 SELECT is((SELECT count(*)::integer FROM v_edit_plan_netscenario_dma WHERE dma_id = -901), 1, 'INSERT: v_edit_plan_netscenario_dma -901 was inserted');
