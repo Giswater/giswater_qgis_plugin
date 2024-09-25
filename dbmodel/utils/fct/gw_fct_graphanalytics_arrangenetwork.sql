@@ -60,7 +60,7 @@ BEGIN
             WHERE pgr_arc_id = v_record.pgr_arc_id;
 
             INSERT INTO temp_pgr_arc(pgr_arc_id, arc_id, pgr_node_1, pgr_node_2, node_1, node_2, modif, graph_delimiter, cost, reverse_cost)
-            VALUES (v_id + 1, v_record.pgr_arc_id::text, v_record.pgr_node_id, v_id, v_record.pgr_node_id, v_record.pgr_node_id, false, v_record.a_graph_delimiter, v_record.cost, v_record.reverse_cost);
+            VALUES (v_id + 1, v_record.pgr_arc_id::text, v_record.pgr_node_id, v_id, v_record.pgr_node_id, v_record.pgr_node_id, false, COALESCE(v_record.a_graph_delimiter,v_record.n_graph_delimiter), v_record.cost, v_record.reverse_cost);
         ELSE
             UPDATE temp_pgr_arc SET pgr_node_2 = v_id
             WHERE pgr_arc_id = v_record.pgr_arc_id;
