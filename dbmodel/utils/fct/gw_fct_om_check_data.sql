@@ -1312,13 +1312,14 @@ BEGIN
 
 	RAISE NOTICE '46 - Check arcs with the same geometry (479)';
 
-	v_querytext = ' (SELECT arc_id, arccat_id, state1, arc_id_aux, node_1, node_2, expl_id, the_geom FROM
-				    (WITH q_arc AS (SELECT * FROM arc JOIN v_state_arc using (arc_id))
-					SELECT DISTINCT t1.arc_id, t1.arccat_id, t1.state as state1, t2.arc_id as arc_id_aux, 
-					t2.state as state2, t1.node_1, t1.node_2, t1.expl_id, t1.the_geom
-					FROM q_arc AS t1 JOIN q_arc AS t2 USING(the_geom) JOIN '||v_edit||'arc v ON t1.arc_id = v.arc_id
-					WHERE t1.arc_id != t2.arc_id ORDER BY t1.arc_id )a 
-					where a.state1 > 0 AND a.state2 > 0	) a';
+	v_querytext = ' (SELECT arc_id, arccat_id, state1, arc_id_aux, node_1, node_2, expl_id, the_geom FROM (
+	SELECT DISTINCT t1.arc_id, t1.arccat_id, t1.state as state1, t2.arc_id as arc_id_aux,
+	t2.state as state2, t1.node_1, t1.node_2, t1.expl_id, t1.the_geom
+	FROM '||v_edit||'arc AS t1, '||v_edit||'arc AS t2
+	WHERE St_equals(t1.the_geom,t2.the_geom)
+	AND t1.arc_id != t2.arc_id
+	ORDER BY arc_id ) a where a.state1 > 0 AND a.state2 > 0) a';
+
 
 	EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
 	IF v_count > 0 THEN

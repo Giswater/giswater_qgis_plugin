@@ -64,15 +64,17 @@ BEGIN
 					SELECT arc_id, arccat_id, state1, arc_id_aux, node_1, node_2, expl_id, fid, the_geom FROM (
 					SELECT DISTINCT t1.arc_id, t1.arccat_id, t1.state as state1, t2.arc_id as arc_id_aux, 
 					t2.state as state2, t1.node_1, t1.node_2, t1.expl_id, '||v_fid||' as fid, t1.the_geom
-					FROM '||v_worklayer||' AS t1 JOIN '||v_worklayer||' AS t2 USING (the_geom)
-					WHERE t1.arc_id != t2.arc_id AND t1.arc_id IN ('||v_array||') ORDER BY t1.arc_id ) a where a.state1 > 0 AND a.state2 > 0';
+					FROM '||v_worklayer||' AS t1, '||v_worklayer||' AS t2 
+					WHERE St_equals(t1.the_geom,t2.the_geom)
+					AND t1.arc_id != t2.arc_id AND t1.arc_id IN ('||v_array||') ORDER BY t1.arc_id ) a where a.state1 > 0 AND a.state2 > 0';
 		ELSE
 			EXECUTE 'INSERT INTO anl_arc (arc_id, arccat_id, state, arc_id_aux, node_1, node_2, expl_id, fid, the_geom)
 					SELECT arc_id, arccat_id, state1, arc_id_aux, node_1, node_2, expl_id, fid, the_geom FROM (
 					SELECT DISTINCT t1.arc_id, t1.arccat_id, t1.state as state1, t2.arc_id as arc_id_aux, 
 					t2.state as state2, t1.node_1, t1.node_2, t1.expl_id, '||v_fid||' as fid, t1.the_geom
-					FROM '||v_worklayer||' AS t1 JOIN '||v_worklayer||' AS t2 USING(the_geom)
-					WHERE t1.arc_id != t2.arc_id ORDER BY t1.arc_id ) a where a.state1 > 0 AND a.state2 > 0';
+					FROM '||v_worklayer||' AS t1, '||v_worklayer||' AS t2
+					WHERE St_equals(t1.the_geom,t2.the_geom)
+					AND t1.arc_id != t2.arc_id ORDER BY t1.arc_id ) a where a.state1 > 0 AND a.state2 > 0';
 		END IF;
 	ELSIF v_checktype='finalNodes' THEN
 		-- Computing process
