@@ -176,5 +176,3 @@ UPDATE config_typevalue
   "lytOrientation": "horizontal"
 }'::json
 	WHERE typevalue='layout_name_typevalue' AND id='lyt_main_2';
-
-INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source") VALUES(3268, 'You can not insert text values into an integer column.', 'Please select the postcomplement column.', 1, true, 'utils', NULL);
