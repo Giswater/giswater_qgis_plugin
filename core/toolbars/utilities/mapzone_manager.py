@@ -11,9 +11,10 @@ from functools import partial
 from sip import isdeleted
 
 from qgis.PyQt.QtGui import QCursor
-from qgis.PyQt.QtCore import Qt, QPoint, QDateTime, QDate, QTime
+from qgis.PyQt.QtCore import Qt, QPoint, QDateTime, QDate, QTime, QVariant
 from qgis.PyQt.QtWidgets import QAction, QMenu, QTableView, QAbstractItemView, QGridLayout, QLabel, QWidget, QComboBox, QMessageBox
 from qgis.PyQt.QtSql import QSqlTableModel
+from qgis.core import QgsVectorLayer, QgsProject, QgsCoordinateReferenceSystem, QgsVectorLayerTemporalProperties
 
 from qgis.gui import QgsMapToolEmitPoint
 
@@ -239,7 +240,7 @@ class GwMapzoneManager:
     def _open_flood_analysis(self):
         """Opens the toolbox 'flood_analysis' and runs the SQL function to create the temporal layer."""
 
-        sql_query = "SELECT sept25_ws.gw_fct_getgraphinundation()"
+        sql_query = "SELECT gw_fct_getgraphinundation()"
         result = tools_db.get_row(sql_query, commit=False, log_sql=True)
 
         if not result:
@@ -247,15 +248,14 @@ class GwMapzoneManager:
             return
 
         # add the layer
-        geojson_data = result[0]  # Assuming result[0] contains the GeoJSON
-        print(json.dumps(geojson_data, indent=4))
+        geojson_data = result[0]
+        geojson_data = json.dumps(geojson_data)
         layer_name = "Water Flow Temporal Layer"
-        temp_layer_result = tools_gw.add_layer_temp(self.mapzone_mng_dlg, geojson_data, layer_name,)
-        print(temp_layer_result)
-        # Check layer
-        if temp_layer_result and temp_layer_result['temp_layers_added']:
-            temp_layer = temp_layer_result['temp_layers_added'][0]
-            self._setup_temporal_layer(temp_layer)
+
+        temp_layer_result = self.add_layer_from_select(self.mapzone_mng_dlg, geojson_data, layer_name)
+        if temp_layer_result and temp_layer_result['layer_added']:
+            temp_layer = temp_layer_result['layer_added']
+            #self._setup_temporal_layer(temp_layer)
         else:
             QMessageBox.critical(self.mapzone_mng_dlg, "Error", "Failed to create the temporal layer.")
 
@@ -268,6 +268,34 @@ class GwMapzoneManager:
 
         self.iface.mapCanvas().enableTemporalNavigation(True)
         self.iface.mapCanvas().refresh()
+
+
+    def add_layer_from_select(self, dialog, data, layer_name, group='Select Layers'):
+
+        if not data or 'features' not in data:
+            return {'text_result': 'No valid data found', 'layer_added': None}
+
+        # Create the vector layer with the GeoJSON driver
+        v_layer = QgsVectorLayer(f"GeoJSON:{data}", layer_name, "ogr")
+
+        if not v_layer.isValid():
+            return {'text_result': 'Failed to create layer', 'layer_added': None}
+
+        # Explicitly set the CRS of the layer (EPSG:25831)
+        epsg = tools_qgis.get_epsg()
+        crs = QgsCoordinateReferenceSystem(f"EPSG:{epsg}")
+        v_layer.setCrs(crs)
+
+        # Add the layer to the QGIS project
+        QgsProject.instance().addMapLayer(v_layer, False)
+        root = QgsProject.instance().layerTreeRoot()
+        group_node = root.findGroup(group)
+        if not group_node:
+            group_node = root.addGroup(group)
+        group_node.addLayer(v_layer)
+
+        return {'text_result': f'Layer {layer_name} added successfully with CRS {crs.authid()}.',
+                'layer_added': v_layer}
 
     # region config button
 
