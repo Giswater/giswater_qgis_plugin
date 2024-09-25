@@ -91,18 +91,18 @@ BEGIN
     ) s
     WHERE n.pgr_node_id = s.node_id::INT;
 
-    -- Set modif = TRUE for nodes where "graph_delimiter" = 'MINSECTOR'
-    UPDATE temp_pgr_node n SET modif = TRUE
-    WHERE n.graph_delimiter = 'MINSECTOR';
-
     -- If we want to ignore open but broken valves
     IF v_ignorebrokenvalves THEN
-        UPDATE temp_pgr_node n SET modif = FALSE
+        UPDATE temp_pgr_node n SET graph_delimiter = NULL
         FROM (
             SELECT node_id FROM man_valve WHERE (closed = FALSE OR closed IS NULL) AND broken = TRUE
         ) s
-        WHERE n.modif = TRUE AND n.pgr_node_id=s.node_id::int;
+        WHERE n.graph_delimiter = 'MINSECTOR' AND n.pgr_node_id=s.node_id::int;
     END IF;
+
+    -- Set modif = TRUE for nodes where "graph_delimiter" = 'MINSECTOR'
+    UPDATE temp_pgr_node n SET modif = TRUE
+    WHERE n.graph_delimiter = 'MINSECTOR';
 
     -- Arcs to be disconnected: one of the two arcs that reach the valve
     UPDATE temp_pgr_arc a SET modif = TRUE, cost = -1, reverse_cost = -1
