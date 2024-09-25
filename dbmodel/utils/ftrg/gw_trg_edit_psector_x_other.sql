@@ -26,7 +26,7 @@ BEGIN
 				END IF;
 			END IF;
 		
-		IF NEW.minsector_id IS NOT NULL then
+		IF NEW.id IS NOT NULL then
 			IF psector_type_aux='plan' THEN
 				INSERT INTO plan_psector_x_other (id, price_id, measurement, psector_id, observ)
 				VALUES  (NEW.id, NEW.price_id, NEW.measurement, NEW.psector_id, NEW.observ);
