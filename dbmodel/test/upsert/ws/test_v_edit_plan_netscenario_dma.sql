@@ -21,7 +21,7 @@ SELECT is((SELECT count(*)::integer FROM plan_netscenario_dma WHERE dma_id = -90
 
 UPDATE v_edit_plan_netscenario_dma SET name = 'updated name' WHERE dma_id = -901;
 SELECT is((SELECT name FROM v_edit_plan_netscenario_dma WHERE dma_id = -901), 'updated name', 'UPDATE: v_edit_plan_netscenario_dma -901 was updated');
-SELECT is((SELECT name FROM plan_netscenario_dma WHERE dma_id = -901), 'updated name', 'UPDATE: plan_netscenario_dma -901 was updated');
+SELECT is((SELECT dma_name FROM plan_netscenario_dma WHERE dma_id = -901), 'updated name', 'UPDATE: plan_netscenario_dma -901 was updated');
 
 
 DELETE FROM v_edit_plan_netscenario_dma WHERE dma_id = -901;
