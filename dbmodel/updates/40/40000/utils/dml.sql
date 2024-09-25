@@ -45,4 +45,4 @@ INSERT INTO sys_param_user VALUES ('utils_psector_strategy', 'config', 'Psector 
 
 --24/09/2024
 INSERT INTO sys_function (id,function_name,project_type,function_type,input_params,return_type,descript,sys_role,"source")
-	VALUES (3325,'gw_fct_getgraphinundation','utils','function','','json','Retrieves GeoJSON data representing the inundation (flooding) graph for a specific area','role_edit','core');
+VALUES (3336,'gw_fct_getgraphinundation','utils','function',NULL,'json','Retrieves GeoJSON data representing the inundation (flooding) graph for a specific area','role_edit','core');

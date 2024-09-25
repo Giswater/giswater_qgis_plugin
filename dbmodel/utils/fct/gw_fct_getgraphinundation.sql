@@ -4,9 +4,10 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE: 2576
+--FUNCTION CODE: 3336
 
-CREATE OR REPLACE FUNCTION sept25_ws.gw_fct_getgraphinundation()
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_getgraphinundation();
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getgraphinundation()
   RETURNS json AS
 $BODY$
 
