@@ -7,6 +7,14 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
+
+ALTER TABLE node DROP CONSTRAINT arc_macrominsector_id_fkey; -- arc_ prefix because wrong name in before version
+ALTER TABLE arc DROP CONSTRAINT arc_macrominsector_id_fkey;
+ALTER TABLE connec DROP CONSTRAINT connec_macrominsector_id_fkey;
+ALTER TABLE link DROP CONSTRAINT link_macrominsector_id_fkey;
+
+DROP TABLE IF EXISTS macrominsector;
+
 -- to change presszone_id::varchar to presszone_id::integer
 -- drop foreign key
 ALTER TABLE arc DROP CONSTRAINT arc_presszonecat_id_fkey;
@@ -37,7 +45,14 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"node
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"connec", "column":"presszone_id", "dataType":"integer"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"link", "column":"presszone_id", "dataType":"integer"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"presszone", "column":"presszone_id", "dataType":"integer"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"minsector", "column":"presszone_id", "dataType":"integer"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"samplepoint", "column":"presszone_id", "dataType":"integer"}}$$);
+
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"plan_netscenario_presszone", "column":"presszone_id", "dataType":"integer"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"plan_netscenario_arc", "column":"presszone_id", "dataType":"integer"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"plan_netscenario_node", "column":"presszone_id", "dataType":"integer"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"plan_netscenario_connec", "column":"presszone_id", "dataType":"integer"}}$$);
 
 -- drop depth and staticpressure from arc
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"arc", "column":"depth"}}$$);

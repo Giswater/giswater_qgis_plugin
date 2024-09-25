@@ -30,10 +30,10 @@ s AS (SELECT * FROM selector_psector WHERE cur_user = current_user),
 c as (SELECT connec_id, state, arc_id FROM connec)
 SELECT c.connec_id, c.arc_id FROM selector_state,c WHERE c.state = selector_state.state_id AND selector_state.cur_user = "current_user"()::text
 	EXCEPT ALL
-SELECT p.connec_id, p.arc_id FROM s, p WHERE p.psector_id = s.psector_id AND s.cur_user = "current_user"()::text
+SELECT p.connec_id, p.arc_id FROM cf, s, p WHERE p.psector_id = s.psector_id AND s.cur_user = "current_user"()::text
 AND p.state = 0 AND cf.value is TRUE
 	UNION ALL
-SELECT DISTINCT ON (p.connec_id) p.connec_id, p.arc_id FROM s, p WHERE p.psector_id = s.psector_id AND s.cur_user = "current_user"()::text
+SELECT DISTINCT ON (p.connec_id) p.connec_id, p.arc_id FROM cf, s, p WHERE p.psector_id = s.psector_id AND s.cur_user = "current_user"()::text
 AND p.state = 1 AND cf.value is TRUE;
 
 -- recreate all deleted views: arc, node, connec and dependencies
@@ -164,7 +164,7 @@ SELECT arc.arc_id,
      JOIN cat_feature ON cat_feature.id::text = cat_arc.arctype_id::text
      LEFT JOIN dma ON arc.dma_id = dma.dma_id
      LEFT JOIN dqa ON arc.dqa_id = dqa.dqa_id
-     LEFT JOIN presszone ON presszone.presszone_id::text = arc.presszone_id::text
+     LEFT JOIN presszone ON presszone.presszone_id = arc.presszone_id
      LEFT JOIN streetaxis c ON c.id::text = arc.streetaxis_id::text
      LEFT JOIN streetaxis d ON d.id::text = arc.streetaxis2_id::text
      LEFT JOIN arc_add e ON arc.arc_id::text = e.arc_id::text
@@ -313,7 +313,7 @@ SELECT node.node_id,
      LEFT JOIN sector ON node.sector_id = sector.sector_id
      LEFT JOIN exploitation ON node.expl_id = exploitation.expl_id
      LEFT JOIN dqa ON node.dqa_id = dqa.dqa_id
-     LEFT JOIN presszone ON presszone.presszone_id::text = node.presszone_id::text
+     LEFT JOIN presszone ON presszone.presszone_id = node.presszone_id
      LEFT JOIN streetaxis a ON a.id::text = node.streetaxis_id::text
      LEFT JOIN streetaxis b ON b.id::text = node.streetaxis2_id::text
      LEFT JOIN node_add e ON e.node_id::text = node.node_id::text
@@ -335,6 +335,81 @@ LEFT JOIN man_valve v USING (node_id)
 join v_sector_node s using (node_id)
 LEFT JOIN selector_municipality m using (muni_id)
 where (m.cur_user = current_user or a.muni_id is null);
+
+
+CREATE OR REPLACE VIEW vu_link AS
+ WITH typevalue AS (
+         SELECT edit_typevalue.typevalue,
+            edit_typevalue.id,
+            edit_typevalue.idval
+           FROM edit_typevalue
+          WHERE edit_typevalue.typevalue::text = ANY (ARRAY['sector_type'::character varying, 'presszone_type'::character varying, 'dma_type'::character varying, 'dqa_type'::character varying]::text[])
+        )
+ SELECT l.link_id,
+    l.feature_type,
+    l.feature_id,
+    l.exit_type,
+    l.exit_id,
+    l.state,
+    l.expl_id,
+    l.sector_id,
+    s.name AS sector_name,
+    et1.idval::character varying(16) AS sector_type,
+    s.macrosector_id,
+    presszone_id,
+    p.name AS presszone_name,
+    et2.idval::character varying(16) AS presszone_type,
+    p.head AS presszone_head,
+    l.dma_id,
+    d.name AS dma_name,
+    et3.idval::character varying(16) AS dma_type,
+    d.macrodma_id,
+    l.dqa_id,
+    q.name AS dqa_name,
+    et4.idval::character varying(16) AS dqa_type,
+    q.macrodqa_id,
+    l.exit_topelev,
+    l.exit_elev,
+    l.fluid_type,
+    st_length2d(l.the_geom)::numeric(12,3) AS gis_length,
+    l.the_geom,
+    l.muni_id,
+    l.expl_id2,
+    l.epa_type,
+    l.is_operative,
+    l.staticpressure,
+    l.connecat_id,
+    l.workcat_id,
+    l.workcat_id_end,
+    l.builtdate,
+    l.enddate,
+    date_trunc('second'::text, l.lastupdate) AS lastupdate,
+    l.lastupdate_user,
+    l.uncertain,
+    l.minsector_id,
+    l.macrominsector_id,
+    CASE
+            WHEN sector_id > 0 AND is_operative = true AND epa_type = 'JUNCTION'::character varying(16)::text AND cpu.value = '4' THEN epa_type::character varying
+            ELSE NULL::character varying(16)
+        END AS inp_type
+     FROM (SELECT value FROM config_param_user WHERE parameter = 'inp_options_networkmode' and cur_user = current_user) cpu, link l
+     LEFT JOIN sector s USING (sector_id)
+     LEFT JOIN presszone p USING (presszone_id)
+     LEFT JOIN dma d USING (dma_id)
+     LEFT JOIN dqa q USING (dqa_id)
+     LEFT JOIN typevalue et1 ON et1.id::text = s.sector_type::text AND et1.typevalue::text = 'sector_type'::text
+     LEFT JOIN typevalue et2 ON et2.id::text = p.presszone_type AND et2.typevalue::text = 'presszone_type'::text
+     LEFT JOIN typevalue et3 ON et3.id::text = d.dma_type::text AND et3.typevalue::text = 'dma_type'::text
+     LEFT JOIN typevalue et4 ON et4.id::text = q.dqa_type::text AND et4.typevalue::text = 'dqa_type'::text;
+
+CREATE OR REPLACE VIEW v_edit_link AS
+	SELECT l.* FROM (
+	SELECT *
+	FROM vu_link
+	JOIN v_state_link USING (link_id)) l
+	join selector_sector s using (sector_id)
+	LEFT JOIN selector_municipality m using (muni_id)
+	where s.cur_user = current_user and (m.cur_user = current_user or l.muni_id is null);
 
 
 CREATE OR REPLACE VIEW vu_connec AS
@@ -482,7 +557,7 @@ CREATE OR REPLACE VIEW vu_connec AS
      LEFT JOIN sector ON connec.sector_id = sector.sector_id
      LEFT JOIN exploitation ON connec.expl_id = exploitation.expl_id
      LEFT JOIN dqa ON connec.dqa_id = dqa.dqa_id
-     LEFT JOIN presszone ON presszone.presszone_id::text = connec.presszone_id::text
+     LEFT JOIN presszone ON presszone.presszone_id = connec.presszone_id
      LEFT JOIN crm_zone ON crm_zone.id::text = connec.crmzone_id::text
      LEFT JOIN streetaxis c ON c.id::text = connec.streetaxis_id::text
      LEFT JOIN streetaxis b ON b.id::text = connec.streetaxis2_id::text
@@ -493,128 +568,6 @@ CREATE OR REPLACE VIEW vu_connec AS
      LEFT JOIN typevalue et2 ON et2.id::text = presszone.presszone_type AND et2.typevalue::text = 'presszone_type'::text
      LEFT JOIN typevalue et3 ON et3.id::text = dma.dma_type::text AND et3.typevalue::text = 'dma_type'::text
      LEFT JOIN typevalue et4 ON et4.id::text = dqa.dqa_type::text AND et4.typevalue::text = 'dqa_type'::text;
-
-
-CREATE OR REPLACE VIEW vu_presszone
-AS SELECT p.presszone_id,
-    p.name,
-    p.expl_id,
-    et.idval AS presszone_type,
-    p.descript,
-    p.head,
-    p.graphconfig::text AS graphconfig,
-    p.stylesheet::text AS stylesheet,
-    p.link,
-    p.avg_press,
-    p.active,
-    p.tstamp,
-    p.insert_user,
-    p.lastupdate,
-    p.lastupdate_user,
-    p.the_geom
-   FROM presszone p
-     LEFT JOIN edit_typevalue et ON et.id::text = p.presszone_type AND et.typevalue::text = 'presszone_type'::text
-  ORDER BY p.presszone_id;
-
-CREATE OR REPLACE VIEW v_edit_presszone
-AS SELECT vu_presszone.presszone_id,
-    vu_presszone.name,
-    vu_presszone.expl_id,
-    vu_presszone.presszone_type,
-    vu_presszone.descript,
-    vu_presszone.head,
-    vu_presszone.graphconfig,
-    vu_presszone.stylesheet,
-    vu_presszone.link,
-    vu_presszone.avg_press,
-    vu_presszone.active,
-    vu_presszone.tstamp,
-    vu_presszone.insert_user,
-    vu_presszone.lastupdate,
-    vu_presszone.lastupdate_user,
-    vu_presszone.the_geom
-   FROM vu_presszone,
-    selector_expl
-  WHERE vu_presszone.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text OR vu_presszone.expl_id IS NULL
-  ORDER BY vu_presszone.presszone_id;
-
-
--- link views
-CREATE OR REPLACE VIEW vu_link AS
- WITH typevalue AS (
-         SELECT edit_typevalue.typevalue,
-            edit_typevalue.id,
-            edit_typevalue.idval
-           FROM edit_typevalue
-          WHERE edit_typevalue.typevalue::text = ANY (ARRAY['sector_type'::character varying, 'presszone_type'::character varying, 'dma_type'::character varying, 'dqa_type'::character varying]::text[])
-        )
- SELECT l.link_id,
-    l.feature_type,
-    l.feature_id,
-    l.exit_type,
-    l.exit_id,
-    l.state,
-    l.expl_id,
-    l.sector_id,
-    s.name AS sector_name,
-    et1.idval::character varying(16) AS sector_type,
-    s.macrosector_id,
-    presszone_id::character varying(16) AS presszone_id,
-    p.name AS presszone_name,
-    et2.idval::character varying(16) AS presszone_type,
-    p.head AS presszone_head,
-    l.dma_id,
-    d.name AS dma_name,
-    et3.idval::character varying(16) AS dma_type,
-    d.macrodma_id,
-    l.dqa_id,
-    q.name AS dqa_name,
-    et4.idval::character varying(16) AS dqa_type,
-    q.macrodqa_id,
-    l.exit_topelev,
-    l.exit_elev,
-    l.fluid_type,
-    st_length2d(l.the_geom)::numeric(12,3) AS gis_length,
-    l.the_geom,
-    l.muni_id,
-    l.expl_id2,
-    l.epa_type,
-    l.is_operative,
-    l.staticpressure,
-    l.connecat_id,
-    l.workcat_id,
-    l.workcat_id_end,
-    l.builtdate,
-    l.enddate,
-    date_trunc('second'::text, l.lastupdate) AS lastupdate,
-    l.lastupdate_user,
-    l.uncertain,
-    l.minsector_id,
-    l.macrominsector_id,
-    CASE
-            WHEN sector_id > 0 AND is_operative = true AND epa_type = 'JUNCTION'::character varying(16)::text AND cpu.value = '4' THEN epa_type::character varying
-            ELSE NULL::character varying(16)
-        END AS inp_type
-     FROM (SELECT value FROM config_param_user WHERE parameter = 'inp_options_networkmode' and cur_user = current_user) cpu, link l
-     LEFT JOIN sector s USING (sector_id)
-     LEFT JOIN presszone p USING (presszone_id)
-     LEFT JOIN dma d USING (dma_id)
-     LEFT JOIN dqa q USING (dqa_id)
-     LEFT JOIN typevalue et1 ON et1.id::text = s.sector_type::text AND et1.typevalue::text = 'sector_type'::text
-     LEFT JOIN typevalue et2 ON et2.id::text = p.presszone_type AND et2.typevalue::text = 'presszone_type'::text
-     LEFT JOIN typevalue et3 ON et3.id::text = d.dma_type::text AND et3.typevalue::text = 'dma_type'::text
-     LEFT JOIN typevalue et4 ON et4.id::text = q.dqa_type::text AND et4.typevalue::text = 'dqa_type'::text;
-
-
-CREATE OR REPLACE VIEW v_edit_link AS
-	SELECT l.* FROM (
-	SELECT *
-	FROM vu_link
-	JOIN v_state_link USING (link_id)) l
-	join selector_sector s using (sector_id)
-	LEFT JOIN selector_municipality m using (muni_id)
-	where s.cur_user = current_user and (m.cur_user = current_user or l.muni_id is null);
-
 
 CREATE OR REPLACE VIEW v_edit_connec AS
 SELECT  c.* FROM (
@@ -835,7 +788,291 @@ SELECT vu_connec.connec_id,
 	and (m.cur_user = current_user or c.muni_id is null);
 
 
+CREATE OR REPLACE VIEW vu_presszone
+AS SELECT p.presszone_id,
+    p.name,
+    p.expl_id,
+    et.idval AS presszone_type,
+    p.descript,
+    p.head,
+    p.graphconfig::text AS graphconfig,
+    p.stylesheet::text AS stylesheet,
+    p.link,
+    p.avg_press,
+    p.active,
+    p.tstamp,
+    p.insert_user,
+    p.lastupdate,
+    p.lastupdate_user,
+    p.the_geom
+   FROM presszone p
+     LEFT JOIN edit_typevalue et ON et.id::text = p.presszone_type AND et.typevalue::text = 'presszone_type'::text
+  ORDER BY p.presszone_id;
+
+CREATE OR REPLACE VIEW v_edit_presszone
+AS SELECT vu_presszone.presszone_id,
+    vu_presszone.name,
+    vu_presszone.expl_id,
+    vu_presszone.presszone_type,
+    vu_presszone.descript,
+    vu_presszone.head,
+    vu_presszone.graphconfig,
+    vu_presszone.stylesheet,
+    vu_presszone.link,
+    vu_presszone.avg_press,
+    vu_presszone.active,
+    vu_presszone.tstamp,
+    vu_presszone.insert_user,
+    vu_presszone.lastupdate,
+    vu_presszone.lastupdate_user,
+    vu_presszone.the_geom
+   FROM vu_presszone,
+    selector_expl
+  WHERE vu_presszone.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text OR vu_presszone.expl_id IS NULL
+  ORDER BY vu_presszone.presszone_id;
+
+
+CREATE OR REPLACE VIEW vu_dma
+AS SELECT d.dma_id,
+    d.name,
+    d.macrodma_id,
+    d.expl_id,
+    et.idval AS dma_type,
+    d.descript,
+    d.pattern_id,
+    d.graphconfig::text AS graphconfig,
+    d.stylesheet::text AS stylesheet,
+    d.link,
+    d.avg_press,
+    d.effc,
+    d.active,
+    d.undelete,
+    d.tstamp,
+    d.insert_user,
+    d.lastupdate,
+    d.lastupdate_user,
+    d.the_geom
+   FROM dma d
+     LEFT JOIN edit_typevalue et ON et.id::text = d.dma_type::text AND et.typevalue::text = 'dma_type'::text
+  ORDER BY d.dma_id;
+
+CREATE OR REPLACE VIEW v_edit_dma
+AS SELECT vu_dma.dma_id,
+    vu_dma.name,
+    vu_dma.macrodma_id,
+    vu_dma.expl_id,
+    vu_dma.dma_type,
+    vu_dma.descript,
+    vu_dma.pattern_id,
+    vu_dma.graphconfig,
+    vu_dma.stylesheet,
+    vu_dma.link,
+    vu_dma.avg_press,
+    vu_dma.effc,
+    vu_dma.active,
+    vu_dma.undelete,
+    vu_dma.tstamp,
+    vu_dma.insert_user,
+    vu_dma.lastupdate,
+    vu_dma.lastupdate_user,
+    vu_dma.the_geom
+   FROM vu_dma,
+    selector_expl
+  WHERE vu_dma.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text OR vu_dma.expl_id IS NULL
+  ORDER BY vu_dma.dma_id;
+
+
+CREATE OR REPLACE VIEW vu_dqa
+AS SELECT d.dqa_id,
+    d.name,
+    d.macrodqa_id,
+    d.descript,
+    d.expl_id,
+    et.idval AS dqa_type,
+    d.pattern_id,
+    d.graphconfig::text AS graphconfig,
+    d.stylesheet::text AS stylesheet,
+    d.link,
+    d.active,
+    d.undelete,
+    d.tstamp,
+    d.insert_user,
+    d.lastupdate,
+    d.lastupdate_user,
+    d.the_geom
+   FROM dqa d
+     LEFT JOIN edit_typevalue et ON et.id::text = d.dqa_type::text AND et.typevalue::text = 'dqa_type'::text
+  ORDER BY d.dqa_id;
+
+CREATE OR REPLACE VIEW v_edit_dqa
+AS SELECT vu_dqa.dqa_id,
+    vu_dqa.name,
+    vu_dqa.macrodqa_id,
+    vu_dqa.descript,
+    vu_dqa.expl_id,
+    vu_dqa.dqa_type,
+    vu_dqa.pattern_id,
+    vu_dqa.graphconfig,
+    vu_dqa.stylesheet,
+    vu_dqa.link,
+    vu_dqa.active,
+    vu_dqa.undelete,
+    vu_dqa.tstamp,
+    vu_dqa.insert_user,
+    vu_dqa.lastupdate,
+    vu_dqa.lastupdate_user,
+    vu_dqa.the_geom
+   FROM vu_dqa,
+    selector_expl
+  WHERE vu_dqa.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text OR vu_dqa.expl_id IS NULL
+  ORDER BY vu_dqa.dqa_id;
+
+
+CREATE OR REPLACE VIEW v_edit_minsector
+AS SELECT m.minsector_id,
+    m.code,
+    m.dma_id,
+    m.dqa_id,
+    m.presszone_id,
+    m.expl_id,
+    m.num_border,
+    m.num_connec,
+    m.num_hydro,
+    m.length,
+    m.descript,
+    m.addparam::text AS addparam,
+    m.the_geom
+   FROM selector_expl,
+    minsector m
+  WHERE m.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
+
+CREATE OR REPLACE VIEW v_edit_samplepoint
+AS SELECT sm.sample_id,
+    sm.code,
+    sm.lab_code,
+    sm.feature_id,
+    sm.featurecat_id,
+    sm.dma_id,
+    sm.macrodma_id,
+    sm.presszone_id,
+    sm.state,
+    sm.builtdate,
+    sm.enddate,
+    sm.workcat_id,
+    sm.workcat_id_end,
+    sm.rotation,
+    sm.muni_id,
+    sm.streetaxis_id,
+    sm.postnumber,
+    sm.postcode,
+    sm.district_id,
+    sm.streetaxis2_id,
+    sm.postnumber2,
+    sm.postcomplement,
+    sm.postcomplement2,
+    sm.place_name,
+    sm.cabinet,
+    sm.observations,
+    sm.verified,
+    sm.the_geom,
+    sm.expl_id,
+    sm.link,
+    sm.sector_id
+   FROM ( SELECT samplepoint.sample_id,
+            samplepoint.code,
+            samplepoint.lab_code,
+            samplepoint.feature_id,
+            samplepoint.featurecat_id,
+            samplepoint.dma_id,
+            dma.macrodma_id,
+            samplepoint.presszone_id,
+            samplepoint.state,
+            samplepoint.builtdate,
+            samplepoint.enddate,
+            samplepoint.workcat_id,
+            samplepoint.workcat_id_end,
+            samplepoint.rotation,
+            samplepoint.muni_id,
+            samplepoint.streetaxis_id,
+            samplepoint.postnumber,
+            samplepoint.postcode,
+            samplepoint.district_id,
+            samplepoint.streetaxis2_id,
+            samplepoint.postnumber2,
+            samplepoint.postcomplement,
+            samplepoint.postcomplement2,
+            samplepoint.place_name,
+            samplepoint.cabinet,
+            samplepoint.observations,
+            samplepoint.verified,
+            samplepoint.the_geom,
+            samplepoint.expl_id,
+            samplepoint.link,
+            samplepoint.sector_id
+           FROM selector_expl,
+            samplepoint
+             JOIN v_state_samplepoint ON samplepoint.sample_id::text = v_state_samplepoint.sample_id::text
+             LEFT JOIN dma ON dma.dma_id = samplepoint.dma_id
+          WHERE samplepoint.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text) sm
+     JOIN selector_sector s USING (sector_id)
+     LEFT JOIN selector_municipality m USING (muni_id)
+  WHERE s.cur_user = CURRENT_USER AND (m.cur_user = CURRENT_USER OR sm.muni_id IS NULL);
+
 -- dependent views
+CREATE OR REPLACE VIEW v_plan_netscenario_arc
+AS SELECT n.netscenario_id,
+    n.arc_id,
+    n.presszone_id,
+    n.dma_id,
+    n.the_geom,
+    a.arccat_id,
+    a.epa_type,
+    a.state,
+    a.state_type
+   FROM selector_netscenario,
+    plan_netscenario_arc n
+     LEFT JOIN arc a USING (arc_id)
+  WHERE n.netscenario_id = selector_netscenario.netscenario_id AND selector_netscenario.cur_user = "current_user"()::text;
+
+CREATE OR REPLACE VIEW v_plan_netscenario_node
+AS SELECT n.netscenario_id,
+    n.node_id,
+    n.presszone_id,
+    n.staticpressure,
+    n.dma_id,
+    n.pattern_id,
+    n.the_geom,
+    nd.nodecat_id,
+    cn.nodetype_id AS node_type,
+    nd.epa_type,
+    nd.state,
+    nd.state_type
+   FROM selector_netscenario,
+    plan_netscenario_node n
+     LEFT JOIN node nd USING (node_id)
+     LEFT JOIN cat_node cn ON nd.nodecat_id::text = cn.id::text
+  WHERE n.netscenario_id = selector_netscenario.netscenario_id AND selector_netscenario.cur_user = "current_user"()::text;
+
+CREATE OR REPLACE VIEW v_plan_netscenario_connec
+AS SELECT n.netscenario_id,
+    n.connec_id,
+    n.presszone_id,
+    n.staticpressure,
+    n.dma_id,
+    n.pattern_id,
+    n.the_geom,
+    c.connecat_id,
+    cc.connectype_id AS connec_type,
+    c.epa_type,
+    c.state,
+    c.state_type
+   FROM selector_netscenario,
+    plan_netscenario_connec n
+     LEFT JOIN connec c USING (connec_id)
+     LEFT JOIN cat_connec cc ON cc.id::text = c.connecat_id::text
+  WHERE n.netscenario_id = selector_netscenario.netscenario_id AND selector_netscenario.cur_user = "current_user"()::text;
+
+
 CREATE OR REPLACE VIEW v_plan_aux_arc_pavement
 AS SELECT plan_arc_x_pavement.arc_id,
     sum(v_price_x_catpavement.thickness * plan_arc_x_pavement.percent)::numeric(12,2) AS thickness,
@@ -1145,7 +1382,7 @@ AS SELECT p.presszone_id,
     p.lastupdate,
     p.lastupdate_user
    FROM presszone p
-  WHERE p.presszone_id::text <> ALL (ARRAY['0'::character varying, '-1'::character varying]::text[])
+  WHERE p.presszone_id <> ALL (ARRAY[0, -1]::integer[])
   ORDER BY p.presszone_id;
 
 CREATE OR REPLACE VIEW v_ui_element_x_node
@@ -1915,7 +2152,6 @@ AS SELECT v_edit_arc.arc_id,
 	JOIN inp_virtualvalve v USING (arc_id)
 	WHERE v_edit_arc.is_operative IS TRUE;
 
-DROP VIEW ve_epa_virtualvalve;
 CREATE OR REPLACE VIEW ve_epa_virtualvalve AS
  SELECT inp_virtualvalve.arc_id,
     inp_virtualvalve.valv_type,

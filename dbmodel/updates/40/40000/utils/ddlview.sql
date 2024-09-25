@@ -43,6 +43,9 @@ DROP VIEW IF EXISTS v_plan_psector_connec;
 DROP VIEW IF EXISTS v_plan_psector_node;
 DROP VIEW IF EXISTS v_plan_psector;
 DROP VIEW IF EXISTS v_plan_result_arc;
+DROP VIEW IF EXISTS v_plan_netscenario_arc;
+DROP VIEW IF EXISTS v_plan_netscenario_node;
+DROP VIEW IF EXISTS v_plan_netscenario_connec;
 DROP VIEW IF EXISTS v_ui_plan_arc_cost;
 
 DROP VIEW IF EXISTS v_ui_workcat_x_feature;
@@ -158,6 +161,7 @@ SELECT gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "l
 
 DROP VIEW IF EXISTS ve_epa_pipe;
 DROP VIEW IF EXISTS ve_epa_shortpipe;
+DROP VIEW IF EXISTS ve_epa_virtualvalve;
 DROP VIEW IF EXISTS ve_epa_valve;
 
 DROP VIEW IF EXISTS v_edit_arc;
@@ -173,19 +177,27 @@ DROP VIEW IF EXISTS vu_node;
 DROP VIEW IF EXISTS ve_connec CASCADE;
 DROP VIEW IF EXISTS vu_connec;
 
-DROP view if exists v_edit_link;
-DROP view if exists v_edit_link_connec;
-DROP view if exists v_edit_link_gully;
+DROP view IF EXISTS v_edit_link;
+DROP view IF EXISTS v_edit_link_connec;
+DROP view IF EXISTS v_edit_link_gully;
 
-DROP view if exists vu_link;
-DROP view if exists vu_link_connec;
-DROP view if exists vu_link_gully;
+DROP VIEW IF EXISTS v_edit_minsector;
+DROP VIEW IF EXISTS v_edit_samplepoint;
 
+DROP view IF EXISTS vu_link;
+DROP view IF EXISTS vu_link_connec;
+DROP view IF EXISTS vu_link_gully;
+
+DROP VIEW IF EXISTS v_edit_presszone;
 DROP VIEW IF EXISTS vu_presszone;
 
 DROP VIEW IF EXISTS v_om_mincut_hydrometer;
 
 DROP VIEW IF EXISTS v_edit_dma;
-DROP VIEW IF EXISTS v_edit_presszone;
+DROP VIEW IF EXISTS vu_dma;
 DROP VIEW IF EXISTS v_edit_plan_netscenario_presszone;
 DROP VIEW IF EXISTS v_edit_dqa;
+DROP VIEW IF EXISTS vu_dqa;
+
+DROP VIEW IF EXISTS v_state_link;
+DROP VIEW IF EXISTS v_state_connec;

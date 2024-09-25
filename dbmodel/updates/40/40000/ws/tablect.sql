@@ -23,17 +23,17 @@ ALTER TABLE plan_netscenario_connec ADD CONSTRAINT plan_netscenario_connec_netsc
 
 -- create rules to avoid presszone_id = -1 or 0
 CREATE RULE presszone_conflict AS
-    ON UPDATE TO .presszone
+    ON UPDATE TO presszone
    WHERE ((NEW.presszone_id = -1) OR (OLD.presszone_id = -1)) DO INSTEAD NOTHING;
 
 CREATE RULE presszone_del_uconflict AS
-    ON DELETE TO .presszone
+    ON DELETE TO presszone
    WHERE (OLD.presszone_id = -1) DO INSTEAD NOTHING;
 
 CREATE RULE presszone_del_undefined AS
-    ON DELETE TO .presszone
+    ON DELETE TO presszone
    WHERE (OLD.presszone_id = 0) DO INSTEAD NOTHING;
 
 CREATE RULE presszone_undefined AS
-    ON UPDATE TO .presszone
+    ON UPDATE TO presszone
    WHERE ((NEW.presszone_id = 0) OR (OLD.presszone_id = 0)) DO INSTEAD NOTHING;
