@@ -25,16 +25,29 @@ BEGIN
 				IF (NEW.measurement IS NULL) THEN NEW.measurement=1;
 				END IF;
 			END IF;
+		
+		IF NEW.minsector_id IS NOT NULL then
+			IF psector_type_aux='plan' THEN
+				INSERT INTO plan_psector_x_other (id, price_id, measurement, psector_id, observ)
+				VALUES  (NEW.id, NEW.price_id, NEW.measurement, NEW.psector_id, NEW.observ);
 			
-		IF psector_type_aux='plan' THEN
-			INSERT INTO plan_psector_x_other (price_id, measurement, psector_id, observ)
-			VALUES  (NEW.price_id, NEW.measurement, NEW.psector_id, NEW.observ);
+			ELSIF psector_type_aux='om' THEN
+				INSERT INTO om_psector_x_other (id, price_id, measurement, psector_id, observ)
+				VALUES  (NEW.id, NEW.price_id, NEW.measurement, NEW.psector_id, NEW.observ);	
 			
-		ELSIF psector_type_aux='om' THEN
-			INSERT INTO om_psector_x_other (price_id, measurement, psector_id, observ)
-			VALUES  (NEW.price_id, NEW.measurement, NEW.psector_id, NEW.observ);	
+			END IF;
+		else
+			IF psector_type_aux='plan' THEN
+				INSERT INTO plan_psector_x_other (price_id, measurement, psector_id, observ)
+				VALUES  (NEW.price_id, NEW.measurement, NEW.psector_id, NEW.observ);
 			
-		END IF;
+			ELSIF psector_type_aux='om' THEN
+				INSERT INTO om_psector_x_other (price_id, measurement, psector_id, observ)
+				VALUES  (NEW.price_id, NEW.measurement, NEW.psector_id, NEW.observ);	
+			
+			END IF;
+		end if;
+		
 		
         RETURN NEW;
 

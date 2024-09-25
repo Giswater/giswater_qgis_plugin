@@ -14,18 +14,18 @@ SELECT plan(6);
 
 INSERT INTO v_edit_review_connec (connec_id, connecat_id, annotation, observ, review_obs, expl_id, the_geom, field_date, field_checked, is_validated) 
 VALUES('-901', '', '', '', '', 0, null, null, false, 0);
-SELECT is((SELECT count(*)::integer FROM v_edit_review_connec WHERE review_connec_id = '-901'), 1, 'INSERT: v_edit_review_connec -901 was inserted');
-SELECT is((SELECT count(*)::integer FROM review_connec WHERE review_connec_id = '-901'), 1, 'INSERT: review_connec -901 was inserted');
+SELECT is((SELECT count(*)::integer FROM v_edit_review_connec WHERE connec_id = '-901'), 1, 'INSERT: v_edit_review_connec -901 was inserted');
+SELECT is((SELECT count(*)::integer FROM review_connec WHERE connec_id = '-901'), 1, 'INSERT: review_connec -901 was inserted');
 
 
-UPDATE v_edit_review_connec SET observ = 'updated observ' WHERE review_connec_id = '-901';
-SELECT is((SELECT observ FROM v_edit_review_connec WHERE review_connec_id = '-901'), 'updated observ', 'UPDATE: v_edit_review_connec -901 was updated');
-SELECT is((SELECT observ FROM review_connec WHERE review_connec_id = '-901'), 'updated observ', 'UPDATE: review_connec -901 was updated');
+UPDATE v_edit_review_connec SET observ = 'updated observ' WHERE connec_id = '-901';
+SELECT is((SELECT observ FROM v_edit_review_connec WHERE connec_id = '-901'), 'updated observ', 'UPDATE: v_edit_review_connec -901 was updated');
+SELECT is((SELECT observ FROM review_connec WHERE connec_id = '-901'), 'updated observ', 'UPDATE: review_connec -901 was updated');
 
 
-DELETE FROM v_edit_review_connec WHERE review_connec_id = '-901';
-SELECT is((SELECT count(*)::integer FROM v_edit_review_connec WHERE review_connec_id = '-901'), 0, 'DELETE: v_edit_review_connec -901 was deleted');
-SELECT is((SELECT count(*)::integer FROM review_connec WHERE review_connec_id = '-901'), 0, 'DELETE: review_connec -901 was deleted');
+DELETE FROM v_edit_review_connec WHERE connec_id = '-901';
+SELECT is((SELECT count(*)::integer FROM v_edit_review_connec WHERE connec_id = '-901'), 0, 'DELETE: v_edit_review_connec -901 was deleted');
+SELECT is((SELECT count(*)::integer FROM review_connec WHERE connec_id = '-901'), 0, 'DELETE: review_connec -901 was deleted');
 
 
 SELECT * FROM finish();
