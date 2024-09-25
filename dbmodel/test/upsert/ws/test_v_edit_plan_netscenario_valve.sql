@@ -12,6 +12,8 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 SELECT plan(6);
 
+insert into plan_netscenario (netscenario_id) values (-901);
+insert into selector_netscenario (netscenario_id, cur_user) values (-901, current_user);
 INSERT INTO v_edit_plan_netscenario_valve (netscenario_id, node_id, closed, the_geom) 
 VALUES(-901, '1079', false, null);
 SELECT is((SELECT count(*)::integer FROM v_edit_plan_netscenario_valve WHERE plan_netscenario_valve_id = -901), 1, 'INSERT: v_edit_plan_netscenario_valve -901 was inserted');

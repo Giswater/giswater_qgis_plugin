@@ -20,7 +20,7 @@ SELECT is((SELECT count(*)::integer FROM review_arc WHERE arc_id = '-901'), 1, '
 
 UPDATE v_edit_review_arc SET observ = 'updated observ' WHERE arc_id = '-901';
 SELECT is((SELECT observ FROM v_edit_review_arc WHERE arc_id = '-901'), 'updated observ', 'UPDATE: v_edit_review_arc -901 was updated');
-SELECT is((SELECT observ FROM review_arc WHERE arc_id = '-901', 'updated observ', 'UPDATE: review_arc -901 was updated');
+SELECT is((SELECT observ FROM review_arc WHERE arc_id = '-901'), 'updated observ', 'UPDATE: review_arc -901 was updated');
 
 
 DELETE FROM v_edit_review_arc WHERE arc_id = '-901';
