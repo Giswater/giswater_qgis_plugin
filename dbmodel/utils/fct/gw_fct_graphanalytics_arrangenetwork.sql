@@ -21,8 +21,6 @@ It is an auxiliary process used by macro_minsector, minsector, or mapzone that g
 DECLARE
 
     v_record record;
-    v_node_id integer = 0;
-    v_arc_id integer = 0;
     v_id integer = 0;
     v_project_type text;
     v_cost integer=1;
@@ -35,14 +33,7 @@ BEGIN
 	EXECUTE 'SELECT lower(project_type) FROM sys_version ORDER BY "date" DESC LIMIT 1' INTO v_project_type;
 	IF v_project_type='ud' THEN v_reverse_cost=-1; END IF;
 
-    EXECUTE 'SELECT MAX(pgr_node_id) FROM temp_pgr_node' INTO v_node_id;
-    EXECUTE 'SELECT MAX(pgr_arc_id) FROM temp_pgr_arc' INTO v_arc_id;
-
-    IF v_node_id > v_arc_id THEN
-        v_id = v_node_id;
-    ELSE
-        v_id = v_arc_id;
-    END IF;
+    EXECUTE 'SELECT LAST_VALUE FROM urn_id_seq' INTO v_id;
 
     -- Disconnect arcs with modif=true at nodes with modif=true; a new arc N_new->N_original is created with the cost and reverse cost of the arc
     FOR v_record IN
