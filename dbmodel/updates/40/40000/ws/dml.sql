@@ -15,3 +15,7 @@ FROM _dma;
 INSERT INTO presszone (presszone_id, "name", presszone_type, expl_id, sector, muni, expl, link, the_geom, graphconfig, stylesheet, head, active, descript, tstamp, insert_user, lastupdate, lastupdate_user, avg_press)
 SELECT presszone_id, "name", presszone_type, expl_id, NULL::int4[], NULL::int4[], ARRAY[expl_id], link, the_geom, graphconfig, stylesheet, head, active, descript, tstamp, insert_user, lastupdate, lastupdate_user, avg_press
 FROM _presszone;
+
+INSERT INTO dqa (dqa_id, "name", dqa_type, expl_id, sector, muni, expl, macrodqa_id, descript, undelete, the_geom, pattern_id, link, graphconfig, stylesheet, active, tstamp, insert_user, lastupdate, lastupdate_user, avg_press)
+SELECT dqa_id, "name", dqa_type, expl_id, NULL::int4[], NULL::int4[], ARRAY[expl_id], macrodqa_id, descript, undelete, the_geom, pattern_id, link, graphconfig, stylesheet, active, tstamp, insert_user, lastupdate, lastupdate_user, avg_press
+FROM _dqa;

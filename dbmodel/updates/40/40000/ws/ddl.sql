@@ -82,9 +82,22 @@ DROP RULE IF EXISTS dma_del_undefined ON _dma;
 DROP RULE IF EXISTS dma_undefined ON _dma;
 DROP RULE IF EXISTS undelete_dma ON _dma;
 
+
 ALTER TABLE presszone RENAME TO _presszone;
 ALTER TABLE _presszone DROP CONSTRAINT cat_presszone_pkey;
 ALTER TABLE _presszone DROP CONSTRAINT cat_presszone_expl_id_fkey;
+
+
+ALTER TABLE arc DROP CONSTRAINT arc_dqa_id_fkey;
+ALTER TABLE connec DROP CONSTRAINT connec_dqa_id_fkey;
+ALTER TABLE minsector DROP CONSTRAINT minsector_dqa_id_fkey;
+ALTER TABLE node DROP CONSTRAINT node_dqa_id_fkey;
+
+ALTER TABLE dqa RENAME TO _dqa;
+ALTER TABLE _dqa DROP CONSTRAINT dqa_pkey;
+ALTER TABLE _dqa DROP CONSTRAINT dqa_expl_id_fkey;
+ALTER TABLE _dqa DROP CONSTRAINT dqa_macrodqa_id_fkey;
+ALTER TABLE _dqa DROP CONSTRAINT dqa_pattern_id_fkey;
 
 
 -- add new columns [sector, muni, expl] to dma, presszone
@@ -141,4 +154,32 @@ CREATE TABLE presszone (
 	avg_press float8 NULL,
 	CONSTRAINT cat_presszone_pkey PRIMARY KEY (presszone_id),
 	CONSTRAINT cat_presszone_expl_id_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE dqa (
+	dqa_id serial4 NOT NULL,
+	"name" varchar(30) NULL,
+	dqa_type varchar(16) NULL,
+	expl_id int4 NULL,
+    sector int4[] NULL,
+    muni int4[] NULL,
+    expl int4[] NULL,
+	macrodqa_id int4 NULL,
+	descript text NULL,
+	undelete bool NULL,
+	the_geom public.geometry(multipolygon, 25831) NULL,
+	pattern_id varchar(16) NULL,
+	link text NULL,
+	graphconfig json DEFAULT '{"use":[{"nodeParent":"", "toArc":[]}], "ignore":[], "forceClosed":[]}'::json NULL,
+	stylesheet json NULL,
+	active bool DEFAULT true NULL,
+	tstamp timestamp DEFAULT now() NULL,
+	insert_user varchar(15) DEFAULT CURRENT_USER NULL,
+	lastupdate timestamp NULL,
+	lastupdate_user varchar(15) NULL,
+	avg_press float8 NULL,
+	CONSTRAINT dqa_pkey PRIMARY KEY (dqa_id),
+	CONSTRAINT dqa_expl_id_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT dqa_macrodqa_id_fkey FOREIGN KEY (macrodqa_id) REFERENCES macrodqa(macrodqa_id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT dqa_pattern_id_fkey FOREIGN KEY (pattern_id) REFERENCES inp_pattern(pattern_id) ON DELETE CASCADE ON UPDATE CASCADE
 );

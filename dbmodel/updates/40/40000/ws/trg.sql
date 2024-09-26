@@ -154,3 +154,6 @@ v_edit_pond FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_unconnected('pond');
 
 CREATE TRIGGER gw_trg_edit_pool INSTEAD OF INSERT OR DELETE OR UPDATE ON
 v_edit_pool FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_unconnected('pool');
+
+CREATE TRIGGER gw_trg_typevalue_fk AFTER INSERT OR UPDATE ON
+dqa FOR EACH ROW EXECUTE FUNCTION gw_trg_typevalue_fk('dqa');

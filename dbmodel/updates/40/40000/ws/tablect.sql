@@ -71,6 +71,29 @@ CREATE RULE undelete_dma AS
     ON DELETE TO dma
    WHERE (old.undelete = true) DO INSTEAD NOTHING;
 
+
+ALTER TABLE arc ADD CONSTRAINT arc_dqa_id_fkey FOREIGN KEY (dqa_id) REFERENCES dqa(dqa_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE connec ADD CONSTRAINT connec_dqa_id_fkey FOREIGN KEY (dqa_id) REFERENCES dqa(dqa_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE minsector ADD CONSTRAINT minsector_dqa_id_fkey FOREIGN KEY (dqa_id) REFERENCES dqa(dqa_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE node ADD CONSTRAINT node_dqa_id_fkey FOREIGN KEY (dqa_id) REFERENCES dqa(dqa_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+CREATE RULE dqa_conflict AS
+    ON UPDATE TO dqa
+   WHERE ((new.dqa_id = '-1'::integer) OR (old.dqa_id = '-1'::integer)) DO INSTEAD NOTHING;
+
+CREATE RULE dqa_del_conflict AS
+    ON DELETE TO dqa
+   WHERE (old.dqa_id = '-1'::integer) DO INSTEAD NOTHING;
+
+CREATE RULE dqa_del_undefined AS
+    ON DELETE TO dqa
+   WHERE (old.dqa_id = 0) DO INSTEAD NOTHING;
+
+CREATE RULE dqa_undefined AS
+    ON UPDATE TO dqa
+   WHERE ((new.dqa_id = 0) OR (old.dqa_id = 0)) DO INSTEAD NOTHING;
+
 -- remove old tables
 DROP TABLE IF EXISTS _dma;
 DROP TABLE IF EXISTS _presszone;

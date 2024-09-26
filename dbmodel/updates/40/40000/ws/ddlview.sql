@@ -4020,3 +4020,28 @@ AS SELECT e.name AS exploitation,
      JOIN exploitation e USING (expl_id)
      JOIN dma d USING (dma_id)
      JOIN ext_cat_period p ON p.id::text = om_waterbalance.cat_period_id::text;
+
+
+CREATE OR REPLACE VIEW v_ui_dqa
+AS SELECT d.dqa_id,
+    d.name,
+    d.descript,
+    d.expl_id,
+    md.name AS macrodma,
+    d.active,
+    d.undelete,
+    d.the_geom,
+    d.pattern_id,
+    d.dqa_type,
+    d.link,
+    d.graphconfig,
+    d.stylesheet,
+    d.tstamp,
+    d.insert_user,
+    d.lastupdate,
+    d.lastupdate_user
+   FROM dqa d
+     LEFT JOIN macrodqa md ON md.macrodqa_id = d.macrodqa_id
+  WHERE d.dqa_id > 0
+  ORDER BY d.dqa_id;
+
