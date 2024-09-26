@@ -30,15 +30,9 @@ BEGIN
 			END IF;
 		END IF;
 		
-		IF NEW.minsector_id IS NOT NULL then
-			INSERT INTO minsector (minsector_id, code, dma_id, dqa_id, presszone_id, expl_id, num_border, num_connec, num_hydro, length, descript, addparam, the_geom)
-			VALUES ( NEW.minsector_id, NEW.code, NEW.dma_id, NEW.dqa_id, NEW.presszone_id, NEW.expl_id, NEW.num_border, NEW.num_connec, NEW.num_hydro, NEW.length, NEW.descript, (NEW.addparam)::json, NEW.the_geom);
-		else
-			INSERT INTO minsector (code, dma_id, dqa_id, presszone_id, expl_id, num_border, num_connec, num_hydro, length, descript, addparam, the_geom)
-			VALUES ( NEW.code, NEW.dma_id, NEW.dqa_id, NEW.presszone_id, NEW.expl_id, NEW.num_border, NEW.num_connec, NEW.num_hydro, NEW.length, NEW.descript, (NEW.addparam)::json, NEW.the_geom);
-		end if;
+		INSERT INTO minsector (code, dma_id, dqa_id, presszone_id, expl_id, num_border, num_connec, num_hydro, length, descript, addparam, the_geom)
+		VALUES ( NEW.code, NEW.dma_id, NEW.dqa_id, NEW.presszone_id, NEW.expl_id, NEW.num_border, NEW.num_connec, NEW.num_hydro, NEW.length, NEW.descript, (NEW.addparam)::json, NEW.the_geom);
 			
-
 
 		RETURN NEW;
 		
