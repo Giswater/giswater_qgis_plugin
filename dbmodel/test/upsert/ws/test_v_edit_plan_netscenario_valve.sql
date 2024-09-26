@@ -20,9 +20,9 @@ SELECT is((SELECT count(*)::integer FROM v_edit_plan_netscenario_valve WHERE net
 SELECT is((SELECT count(*)::integer FROM plan_netscenario_valve WHERE netscenario_id = -901), 1, 'INSERT: plan_netscenario_valve -901 was inserted');
 
 
-UPDATE v_edit_plan_netscenario_valve SET node_id = 'updated node_id' WHERE netscenario_id = -901;
-SELECT is((SELECT node_id FROM v_edit_plan_netscenario_valve WHERE netscenario_id = -901), 'updated node_id', 'UPDATE: v_edit_plan_netscenario_valve -901 was updated');
-SELECT is((SELECT node_id FROM plan_netscenario_valve WHERE netscenario_id = -901), 'updated node_id', 'UPDATE: plan_netscenario_valve -901 was updated');
+UPDATE v_edit_plan_netscenario_valve SET closed = 'true' WHERE netscenario_id = -901;
+SELECT is((SELECT node_id FROM v_edit_plan_netscenario_valve WHERE netscenario_id = -901), 'true', 'UPDATE: v_edit_plan_netscenario_valve -901 was updated');
+SELECT is((SELECT node_id FROM plan_netscenario_valve WHERE netscenario_id = -901), 'true', 'UPDATE: plan_netscenario_valve -901 was updated');
 
 
 DELETE FROM v_edit_plan_netscenario_valve WHERE netscenario_id = -901;
