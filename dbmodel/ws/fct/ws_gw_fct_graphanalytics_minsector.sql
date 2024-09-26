@@ -176,7 +176,7 @@ BEGIN
     WHERE n.node_id = s.node_id;
 
     -- Update feature temporary tables
-    UPDATE temp_t_connec c SET minsector_id = a.minsector_id FROM arc a WHERE c.arc_id = a.arc_id;
+    UPDATE temp_t_connec c SET minsector_id = a.minsector_id FROM arc a WHERE c.arc_id::int = a.pgr_arc_id;
     UPDATE temp_t_link l SET minsector_id = c.minsector_id FROM connec c WHERE c.connec_id = l.feature_id;
 
     -- Insert into minsector temporary table
