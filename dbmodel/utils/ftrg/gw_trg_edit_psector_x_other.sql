@@ -20,33 +20,21 @@ BEGIN
     IF TG_OP = 'INSERT' THEN
 		
 		-- measurement_vdefault
-			IF (NEW.measurement IS NULL) THEN
-				NEW.measurement := (SELECT "value" FROM config_param_user WHERE "parameter"='plan_psector_measurement_vdefault' AND "cur_user"="current_user"())::float;
-				IF (NEW.measurement IS NULL) THEN NEW.measurement=1;
-				END IF;
+		IF (NEW.measurement IS NULL) THEN
+			NEW.measurement := (SELECT "value" FROM config_param_user WHERE "parameter"='plan_psector_measurement_vdefault' AND "cur_user"="current_user"())::float;
+			IF (NEW.measurement IS NULL) THEN NEW.measurement=1;
 			END IF;
+		END IF;
 		
-		IF NEW.id IS NOT NULL then
-			IF psector_type_aux='plan' THEN
-				INSERT INTO plan_psector_x_other (id, price_id, measurement, psector_id, observ)
-				VALUES  (NEW.id, NEW.price_id, NEW.measurement, NEW.psector_id, NEW.observ);
-			
-			ELSIF psector_type_aux='om' THEN
-				INSERT INTO om_psector_x_other (id, price_id, measurement, psector_id, observ)
-				VALUES  (NEW.id, NEW.price_id, NEW.measurement, NEW.psector_id, NEW.observ);	
-			
-			END IF;
-		else
-			IF psector_type_aux='plan' THEN
-				INSERT INTO plan_psector_x_other (price_id, measurement, psector_id, observ)
-				VALUES  (NEW.price_id, NEW.measurement, NEW.psector_id, NEW.observ);
-			
-			ELSIF psector_type_aux='om' THEN
-				INSERT INTO om_psector_x_other (price_id, measurement, psector_id, observ)
-				VALUES  (NEW.price_id, NEW.measurement, NEW.psector_id, NEW.observ);	
-			
-			END IF;
-		end if;
+		IF psector_type_aux='plan' THEN
+			INSERT INTO plan_psector_x_other (price_id, measurement, psector_id, observ)
+			VALUES  (NEW.price_id, NEW.measurement, NEW.psector_id, NEW.observ);
+		
+		ELSIF psector_type_aux='om' THEN
+			INSERT INTO om_psector_x_other (price_id, measurement, psector_id, observ)
+			VALUES  (NEW.price_id, NEW.measurement, NEW.psector_id, NEW.observ);	
+		
+		END IF;
 		
 		
         RETURN NEW;
