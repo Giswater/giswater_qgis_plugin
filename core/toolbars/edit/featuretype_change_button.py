@@ -304,6 +304,19 @@ def btn_accept_featuretype_change(**kwargs):
     feature_type_new = tools_qt.get_widget_value(dialog, "tab_none_feature_type_new")
     featurecat_id = tools_qt.get_widget_value(dialog, "tab_none_featurecat_id")
 
+    fluid_type = tools_qt.get_widget_value(dialog, "tab_none_fluid_type")
+    if fluid_type is None:
+        fluid_type = 'null'
+    location_type = tools_qt.get_widget_value(dialog, "tab_none_location_type")
+    if location_type is None:
+        location_type = 'null'
+    category_type = tools_qt.get_widget_value(dialog, "tab_none_category_type")
+    if category_type is None:
+        category_type = 'null'
+    function_type = tools_qt.get_widget_value(dialog, "tab_none_function_type")
+    if function_type is None:
+        function_type = 'null'
+
     if feature_type_new != "null":
 
         if (featurecat_id != "null" and featurecat_id is not None and project_type == 'ws') or (
@@ -314,6 +327,14 @@ def btn_accept_featuretype_change(**kwargs):
             extras = f'"feature_id":"{this.feature_id}"'
             extras += f', "feature_type_new":"{feature_type_new}"'
             extras += f', "featurecat_id":"{featurecat_id}"'
+<<<<<<< HEAD
+=======
+            extras += f', "fluid_type":"{fluid_type}"'
+            extras += f', "location_type":"{location_type}"'
+            extras += f', "category_type":"{category_type}"'
+            extras += f', "function_type":"{function_type}"'
+
+>>>>>>> ba0de4b8 (fix(feature): improve last commit)
             body = tools_gw.create_body(feature=feature, extras=extras)
 
             # Execute SQL function and show result to the user
