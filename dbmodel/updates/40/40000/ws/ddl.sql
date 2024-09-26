@@ -57,3 +57,60 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"plan
 -- drop depth and staticpressure from arc
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"arc", "column":"depth"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"arc", "column":"staticpressure"}}$$);
+
+-- remove references to dma_id to recreate dma table
+ALTER TABLE arc DROP CONSTRAINT arc_dma_id_fkey;
+ALTER TABLE connec DROP CONSTRAINT connec_dma_id_fkey;
+ALTER TABLE minsector DROP CONSTRAINT minsector_dma_id_fkey;
+ALTER TABLE node DROP CONSTRAINT node_dma_id_fkey;
+ALTER TABLE om_waterbalance DROP CONSTRAINT om_waterbalance_dma_id_fkey;
+ALTER TABLE pond DROP CONSTRAINT pond_dma_id_fkey;
+ALTER TABLE pool DROP CONSTRAINT pool_dma_id_fkey;
+ALTER TABLE rpt_inp_pattern_value DROP CONSTRAINT rpt_inp_pattern_value_dma_id_fkey;
+ALTER TABLE om_waterbalance_dma_graph DROP CONSTRAINT rtc_scada_x_dma_dma_id_fkey;
+ALTER TABLE samplepoint DROP CONSTRAINT samplepoint_verified_fkey;
+
+ALTER TABLE dma RENAME to _dma;
+ALTER TABLE _dma DROP CONSTRAINT dma_pkey;
+ALTER TABLE _dma DROP CONSTRAINT dma_expl_id_fkey;
+ALTER TABLE _dma DROP CONSTRAINT dma_macrodma_id_fkey;
+ALTER TABLE _dma DROP CONSTRAINT dma_pattern_id_fkey;
+
+DROP RULE IF EXISTS dma_conflict ON _dma;
+DROP RULE IF EXISTS dma_del_conflict ON _dma;
+DROP RULE IF EXISTS dma_del_undefined ON _dma;
+DROP RULE IF EXISTS dma_undefined ON _dma;
+DROP RULE IF EXISTS undelete_dma ON _dma;
+
+
+-- add new columns [sector, muni, expl] to dma
+CREATE TABLE dma (
+	dma_id serial4 NOT NULL,
+	"name" varchar(30) NULL,
+	dma_type varchar(16) NULL,
+	expl_id int4 NULL,
+    sector int4[] NULL,
+    muni int4[] NULL,
+    expl int4[] NULL,
+	macrodma_id int4 NULL,
+	descript text NULL,
+	undelete bool NULL,
+	the_geom public.geometry(multipolygon, 25831) NULL,
+	minc float8 NULL,
+	maxc float8 NULL,
+	effc float8 NULL,
+	pattern_id varchar(16) NULL,
+	link text NULL,
+	graphconfig json DEFAULT '{"use":[{"nodeParent":"", "toArc":[]}], "ignore":[], "forceClosed":[]}'::json NULL,
+	stylesheet json NULL,
+	active bool DEFAULT true NULL,
+	avg_press numeric NULL,
+	tstamp timestamp DEFAULT now() NULL,
+	insert_user varchar(15) DEFAULT CURRENT_USER NULL,
+	lastupdate timestamp NULL,
+	lastupdate_user varchar(15) NULL,
+	CONSTRAINT dma_pkey PRIMARY KEY (dma_id),
+	CONSTRAINT dma_expl_id_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT dma_macrodma_id_fkey FOREIGN KEY (macrodma_id) REFERENCES macrodma(macrodma_id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT dma_pattern_id_fkey FOREIGN KEY (pattern_id) REFERENCES inp_pattern(pattern_id) ON DELETE RESTRICT ON UPDATE CASCADE
+);

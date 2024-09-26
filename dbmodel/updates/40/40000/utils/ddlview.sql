@@ -201,3 +201,10 @@ DROP VIEW IF EXISTS vu_dqa;
 
 DROP VIEW IF EXISTS v_state_link;
 DROP VIEW IF EXISTS v_state_connec;
+
+
+DROP VIEW IF EXISTS v_edit_pond;
+DROP VIEW IF EXISTS v_edit_pool;
+DROP VIEW IF EXISTS v_om_waterbalance_report;
+DROP VIEW IF EXISTS v_ui_dma;
+DROP VIEW IF EXISTS v_om_waterbalance;

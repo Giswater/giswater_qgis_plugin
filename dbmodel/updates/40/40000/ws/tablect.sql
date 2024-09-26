@@ -37,3 +37,42 @@ CREATE RULE presszone_del_undefined AS
 CREATE RULE presszone_undefined AS
     ON UPDATE TO presszone
    WHERE ((NEW.presszone_id = 0) OR (OLD.presszone_id = 0)) DO INSTEAD NOTHING;
+
+
+
+ALTER TABLE arc ADD CONSTRAINT arc_dma_id_fkey FOREIGN KEY (dma_id) REFERENCES dma(dma_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE connec ADD CONSTRAINT connec_dma_id_fkey FOREIGN KEY (dma_id) REFERENCES dma(dma_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE minsector ADD CONSTRAINT minsector_dma_id_fkey FOREIGN KEY (dma_id) REFERENCES dma(dma_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE node ADD CONSTRAINT node_dma_id_fkey FOREIGN KEY (dma_id) REFERENCES dma(dma_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE om_waterbalance ADD CONSTRAINT om_waterbalance_dma_id_fkey FOREIGN KEY (dma_id) REFERENCES dma(dma_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE pond ADD CONSTRAINT pond_dma_id_fkey FOREIGN KEY (dma_id) REFERENCES dma(dma_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE pool ADD CONSTRAINT pool_dma_id_fkey FOREIGN KEY (dma_id) REFERENCES dma(dma_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE rpt_inp_pattern_value ADD CONSTRAINT rpt_inp_pattern_value_dma_id_fkey FOREIGN KEY (dma_id) REFERENCES dma(dma_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE om_waterbalance_dma_graph ADD CONSTRAINT rtc_scada_x_dma_dma_id_fkey FOREIGN KEY (dma_id) REFERENCES dma(dma_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE samplepoint ADD CONSTRAINT samplepoint_verified_fkey FOREIGN KEY (dma_id) REFERENCES dma(dma_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+CREATE RULE dma_conflict AS
+    ON UPDATE TO dma
+   WHERE ((new.dma_id = '-1'::integer) OR (old.dma_id = '-1'::integer)) DO INSTEAD NOTHING;
+
+CREATE RULE dma_del_conflict AS
+    ON DELETE TO dma
+   WHERE (old.dma_id = '-1'::integer) DO INSTEAD NOTHING;
+
+CREATE RULE dma_del_undefined AS
+    ON DELETE TO dma
+   WHERE (old.dma_id = 0) DO INSTEAD NOTHING;
+
+CREATE RULE dma_undefined AS
+    ON UPDATE TO dma
+   WHERE ((new.dma_id = 0) OR (old.dma_id = 0)) DO INSTEAD NOTHING;
+
+CREATE RULE undelete_dma AS
+    ON DELETE TO dma
+   WHERE (old.undelete = true) DO INSTEAD NOTHING;
+
+-- remove old tables
+DROP TABLE IF EXISTS _dma;
+DROP TABLE IF EXISTS _presszone;
+DROP TABLE IF EXISTS _dqa;
+DROP TABLE IF EXISTS _sector;
