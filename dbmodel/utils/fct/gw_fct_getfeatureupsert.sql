@@ -55,7 +55,7 @@ DECLARE
 v_state_value integer;
 v_fields json;
 v_fields_array json[];
-aux_json json;    
+aux_json json;
 combo_json json;
 schemas_array name[];
 array_index integer DEFAULT 0;
@@ -130,7 +130,7 @@ v_dqa_id integer;
 v_arc_insert_automatic_endpoint boolean;
 v_current_id text;
 v_current_idval text;
-v_new_id text; 
+v_new_id text;
 v_selected_id text;
 v_selected_idval text;
 v_errcontext text;
@@ -198,7 +198,7 @@ BEGIN
 	SELECT value INTO v_use_fire_code_seq FROM config_param_system WHERE parameter='edit_hydrant_use_firecode_seq';
 	SELECT ((value::json)->>'status') INTO v_automatic_ccode FROM config_param_system WHERE parameter='edit_connec_autofill_ccode';
 	SELECT ((value::json)->>'field') INTO v_automatic_ccode_field FROM config_param_system WHERE parameter='edit_connec_autofill_ccode';
-	
+
 	SELECT json_extract_path_text(value::json,'activated')::boolean INTO v_sys_raster_dem FROM config_param_system WHERE parameter='admin_raster_dem';
 	SELECT (value::json->>'status')::boolean INTO v_auto_streetvalues_status FROM config_param_system WHERE parameter = 'edit_auto_streetvalues';
 	SELECT (value::json->>'field')::text INTO v_auto_streetvalues_field FROM config_param_system WHERE parameter = 'edit_auto_streetvalues';
@@ -293,7 +293,7 @@ BEGIN
 		IF v_catfeature.code_autofill IS TRUE THEN
 			v_code=p_id;
 		END IF;
-	
+
 		-- check if p_table_id is defined on cat_feature
 		if v_catfeature.id is not null then
 			-- use specific sequence when its name matches featurecat_code_seq
@@ -342,11 +342,11 @@ BEGIN
 						-- getting presszone by heritage from nodes
 						IF v_noderecord1.presszone_id = v_noderecord2.presszone_id THEN
 							v_presszone_id = v_noderecord1.presszone_id;
-						ELSIF v_noderecord1.presszone_id = 0::text THEN
+						ELSIF v_noderecord1.presszone_id = 0 THEN
 							v_presszone_id = v_noderecord2.presszone_id;
-						ELSIF v_noderecord2.presszone_id = 0::text THEN
+						ELSIF v_noderecord2.presszone_id = 0 THEN
 							v_presszone_id = v_noderecord1.presszone_id;
-						ELSIF v_noderecord1.presszone_id::text != v_noderecord2.presszone_id::text THEN
+						ELSIF v_noderecord1.presszone_id != v_noderecord2.presszone_id THEN
 							v_presszone_id = v_noderecord1.presszone_id;
 						END IF;
 
@@ -365,7 +365,7 @@ BEGIN
 						IF v_noderecord1.macrominsector_id = v_noderecord2.macrominsector_id THEN
 							v_macrominsector_id = v_noderecord1.macrominsector_id;
 						END IF;
-					
+
 					END IF;
 
 					-- getting sector_id by heritage from nodes
@@ -756,8 +756,8 @@ BEGIN
 				WHEN 'staticpressure' THEN
 					field_value = v_staticpressure;
 
-				-- plot_code	
-				WHEN 'plot_code' THEN 
+				-- plot_code
+				WHEN 'plot_code' THEN
 					field_value = v_plot_code;
 
 				-- catalog values
@@ -854,7 +854,7 @@ BEGIN
 					IF (SELECT value::boolean FROM config_param_system WHERE parameter='edit_feature_auto_builtdate') IS TRUE AND field_value IS NULL  THEN
 						EXECUTE 'SELECT date(now())' INTO field_value;
 					END IF;
-					
+
 				WHEN 'inventory' THEN
 					IF (SELECT value::boolean FROM config_param_system WHERE parameter='edit_inventory_sysvdefault') IS TRUE THEN
 						field_value = (SELECT value::boolean FROM config_param_system WHERE parameter='edit_inventory_sysvdefault');

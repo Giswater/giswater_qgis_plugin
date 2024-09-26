@@ -248,7 +248,7 @@ BEGIN
 		-- graph quality analysis
 		v_input = concat('{"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{"parameters":{ "fid":',v_fid,',"selectionMode":"userSelectors", "graphClass":',quote_ident(v_class),'}}}')::json;
 		PERFORM gw_fct_graphanalytics_check_data(v_input);
-		SELECT count(*) INTO v_count2 FROM temp_audit_check_data WHERE cur_user="current_user"() AND fid=v_fid AND criticity=3 AND result_id IS NOT NULL;	
+		SELECT count(*) INTO v_count2 FROM temp_audit_check_data WHERE cur_user="current_user"() AND fid=v_fid AND criticity=3 AND result_id IS NOT NULL;
 	END IF;
 
 	IF v_expl_id = '' THEN
@@ -795,7 +795,7 @@ BEGIN
 				order by node
 				)b group by node, trace order by 1, 2 desc
 				)c order by node, c desc) t USING (node_id)
-			JOIN temp_presszone pz ON pz.presszone_id = t.presszone_id::text;
+			JOIN temp_presszone pz ON pz.presszone_id = t.presszone_id;
 
 			-- update on node table those elements connected on graph
 			UPDATE temp_t_node SET staticpressure=(log_message::json->>'staticpressure')::float FROM temp_t_data a WHERE a.feature_id=node_id
@@ -1338,7 +1338,7 @@ BEGIN
 		IF v_class = 'DMA' THEN
 
 			RAISE NOTICE 'Filling om_waterbalance_dma_graph ';
-				
+
 			v_querytext = 'INSERT INTO temp_om_waterbalance_dma_graph (node_id, '||quote_ident(v_field)||', flow_sign)
 			(SELECT DISTINCT n.node_id, a.'||quote_ident(v_field)||',
 			CASE 
@@ -1359,7 +1359,7 @@ BEGIN
 			)
 			) ON CONFLICT (node_id, dma_id) DO NOTHING';
 			EXECUTE v_querytext;
-		
+
 			delete from om_waterbalance_dma_graph where dma_id in (select distinct dma_id from temp_om_waterbalance_dma_graph);
 			INSERT INTO om_waterbalance_dma_graph SELECT * FROM temp_om_waterbalance_dma_graph ON CONFLICT (dma_id, node_id) DO NOTHING;
 
