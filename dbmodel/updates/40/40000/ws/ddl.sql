@@ -82,8 +82,12 @@ DROP RULE IF EXISTS dma_del_undefined ON _dma;
 DROP RULE IF EXISTS dma_undefined ON _dma;
 DROP RULE IF EXISTS undelete_dma ON _dma;
 
+ALTER TABLE presszone RENAME TO _presszone;
+ALTER TABLE _presszone DROP CONSTRAINT cat_presszone_pkey;
+ALTER TABLE _presszone DROP CONSTRAINT cat_presszone_expl_id_fkey;
 
--- add new columns [sector, muni, expl] to dma
+
+-- add new columns [sector, muni, expl] to dma, presszone
 CREATE TABLE dma (
 	dma_id serial4 NOT NULL,
 	"name" varchar(30) NULL,
@@ -113,4 +117,28 @@ CREATE TABLE dma (
 	CONSTRAINT dma_expl_id_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT dma_macrodma_id_fkey FOREIGN KEY (macrodma_id) REFERENCES macrodma(macrodma_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT dma_pattern_id_fkey FOREIGN KEY (pattern_id) REFERENCES inp_pattern(pattern_id) ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+CREATE TABLE presszone (
+	presszone_id int4 NOT NULL,
+	"name" text NOT NULL,
+	presszone_type text NULL,
+	expl_id int4 NOT NULL,
+    sector int4[] NULL,
+    muni int4[] NULL,
+    expl int4[] NULL,
+	link varchar(512) NULL,
+	the_geom public.geometry(multipolygon, 25831) NULL,
+	graphconfig json DEFAULT '{"use":[{"nodeParent":"", "toArc":[]}], "ignore":[], "forceClosed":[]}'::json NULL,
+	stylesheet json NULL,
+	head numeric(12, 2) NULL,
+	active bool DEFAULT true NULL,
+	descript text NULL,
+	tstamp timestamp DEFAULT now() NULL,
+	insert_user varchar(15) DEFAULT CURRENT_USER NULL,
+	lastupdate timestamp NULL,
+	lastupdate_user varchar(15) NULL,
+	avg_press float8 NULL,
+	CONSTRAINT cat_presszone_pkey PRIMARY KEY (presszone_id),
+	CONSTRAINT cat_presszone_expl_id_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON DELETE CASCADE ON UPDATE CASCADE
 );

@@ -9,4 +9,9 @@ DELETE FROM sys_function WHERE id=3306;
 
 -- insert data to new dma table
 INSERT INTO dma (dma_id, "name", dma_type, expl_id, sector, muni, expl, macrodma_id, descript, undelete, the_geom, minc, maxc, effc, pattern_id, link, graphconfig, stylesheet, active, avg_press, tstamp, insert_user, lastupdate, lastupdate_user)
-SELECT dma_id, "name", dma_type, expl_id, NULL::int4[], NULL::int4[], ARRAY[expl_id], macrodma_id, descript, undelete, the_geom, minc, maxc, effc, pattern_id, link, graphconfig, stylesheet, active, avg_press, tstamp, insert_user, lastupdate, lastupdate_user FROM _dma;
+SELECT dma_id, "name", dma_type, expl_id, NULL::int4[], NULL::int4[], ARRAY[expl_id], macrodma_id, descript, undelete, the_geom, minc, maxc, effc, pattern_id, link, graphconfig, stylesheet, active, avg_press, tstamp, insert_user, lastupdate, lastupdate_user
+FROM _dma;
+
+INSERT INTO presszone (presszone_id, "name", presszone_type, expl_id, sector, muni, expl, link, the_geom, graphconfig, stylesheet, head, active, descript, tstamp, insert_user, lastupdate, lastupdate_user, avg_press)
+SELECT presszone_id, "name", presszone_type, expl_id, NULL::int4[], NULL::int4[], ARRAY[expl_id], link, the_geom, graphconfig, stylesheet, head, active, descript, tstamp, insert_user, lastupdate, lastupdate_user, avg_press
+FROM _presszone;
