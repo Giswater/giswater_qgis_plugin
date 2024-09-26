@@ -99,8 +99,35 @@ ALTER TABLE _dqa DROP CONSTRAINT dqa_expl_id_fkey;
 ALTER TABLE _dqa DROP CONSTRAINT dqa_macrodqa_id_fkey;
 ALTER TABLE _dqa DROP CONSTRAINT dqa_pattern_id_fkey;
 
+ALTER TABLE arc DROP CONSTRAINT arc_sector_id_fkey;
+ALTER TABLE config_user_x_sector DROP CONSTRAINT config_user_x_sector_sector_id_fkey;
+ALTER TABLE connec DROP CONSTRAINT connec_sector_id_fkey;
+ALTER TABLE inp_controls DROP CONSTRAINT inp_controls_x_sector_id_fkey;
+ALTER TABLE inp_dscenario_controls DROP CONSTRAINT inp_dscenario_controls_sector_id_fkey;
+ALTER TABLE inp_dscenario_rules DROP CONSTRAINT inp_dscenario_rules_sector_id_fkey;
+ALTER TABLE inp_rules DROP CONSTRAINT inp_rules_sector_id_fkey;
+ALTER TABLE selector_sector DROP CONSTRAINT inp_selector_sector_id_fkey;
+ALTER TABLE node_border_sector DROP CONSTRAINT node_border_expl_sector_id_fkey;
+ALTER TABLE node DROP CONSTRAINT node_sector_id_fkey;
+ALTER TABLE sector DROP CONSTRAINT sector_parent_id_fkey;
+ALTER TABLE samplepoint DROP CONSTRAINT samplepoint_sector_id;
+ALTER TABLE element DROP CONSTRAINT element_sector_id;
+ALTER TABLE link DROP CONSTRAINT link_sector_id;
+ALTER TABLE dimensions DROP CONSTRAINT dimensions_sector_id;
 
--- add new columns [sector, muni, expl] to dma, presszone
+ALTER TABLE sector RENAME TO _sector;
+ALTER TABLE _sector DROP CONSTRAINT sector_pkey;
+ALTER TABLE _sector DROP CONSTRAINT sector_macrosector_id_fkey;
+ALTER TABLE _sector DROP CONSTRAINT sector_pattern_id_fkey;
+
+DROP RULE IF EXISTS sector_conflict ON _sector;
+DROP RULE IF EXISTS sector_del_conflict ON _sector;
+DROP RULE IF EXISTS sector_del_undefined ON _sector;
+DROP RULE IF EXISTS sector_undefined ON _sector;
+DROP RULE IF EXISTS undelete_sector ON _sector;
+
+
+-- add new columns [sector, muni, expl] to dma, presszone, dqa, sector
 CREATE TABLE dma (
 	dma_id serial4 NOT NULL,
 	"name" varchar(30) NULL,
@@ -182,4 +209,32 @@ CREATE TABLE dqa (
 	CONSTRAINT dqa_expl_id_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT dqa_macrodqa_id_fkey FOREIGN KEY (macrodqa_id) REFERENCES macrodqa(macrodqa_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT dqa_pattern_id_fkey FOREIGN KEY (pattern_id) REFERENCES inp_pattern(pattern_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE sector (
+	sector_id serial4 NOT NULL,
+	"name" varchar(50) NOT NULL,
+	sector_type varchar(16) NULL,
+	sector int4[] NULL,
+    muni int4[] NULL,
+    expl int4[] NULL,
+	macrosector_id int4 NULL,
+	descript text NULL,
+	undelete bool NULL,
+	the_geom public.geometry(multipolygon, 25831) NULL,
+	graphconfig json DEFAULT '{"use":[{"nodeParent":"", "toArc":[]}], "ignore":[], "forceClosed":[]}'::json NULL,
+	stylesheet json NULL,
+	active bool DEFAULT true NULL,
+	parent_id int4 NULL,
+	pattern_id varchar(20) NULL,
+	tstamp timestamp DEFAULT now() NULL,
+	insert_user varchar(15) DEFAULT CURRENT_USER NULL,
+	lastupdate timestamp NULL,
+	lastupdate_user varchar(15) NULL,
+	avg_press float8 NULL,
+	link text NULL,
+	CONSTRAINT sector_pkey PRIMARY KEY (sector_id),
+	CONSTRAINT sector_macrosector_id_fkey FOREIGN KEY (macrosector_id) REFERENCES macrosector(macrosector_id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT sector_parent_id_fkey FOREIGN KEY (parent_id) REFERENCES sector(sector_id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT sector_pattern_id_fkey FOREIGN KEY (pattern_id) REFERENCES inp_pattern(pattern_id) ON DELETE RESTRICT ON UPDATE CASCADE
 );

@@ -210,3 +210,7 @@ DROP VIEW IF EXISTS v_ui_dma;
 DROP VIEW IF EXISTS v_om_waterbalance;
 
 DROP VIEW IF EXISTS v_ui_dqa;
+
+DROP VIEW IF EXISTS v_ui_sector;
+DROP VIEW IF EXISTS v_edit_sector;
+DROP VIEW IF EXISTS vu_sector;

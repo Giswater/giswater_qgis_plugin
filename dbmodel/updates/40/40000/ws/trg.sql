@@ -157,3 +157,6 @@ v_edit_pool FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_unconnected('pool');
 
 CREATE TRIGGER gw_trg_typevalue_fk AFTER INSERT OR UPDATE ON
 dqa FOR EACH ROW EXECUTE FUNCTION gw_trg_typevalue_fk('dqa');
+
+CREATE TRIGGER gw_trg_typevalue_fk AFTER INSERT OR UPDATE ON
+sector FOR EACH ROW EXECUTE FUNCTION gw_trg_typevalue_fk('sector');

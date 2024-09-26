@@ -4045,3 +4045,73 @@ AS SELECT d.dqa_id,
   WHERE d.dqa_id > 0
   ORDER BY d.dqa_id;
 
+CREATE OR REPLACE VIEW v_ui_sector
+AS SELECT s.sector_id,
+    s.name,
+    ms.name AS macrosector,
+    s.descript,
+    s.undelete,
+    s.sector_type,
+    s.active,
+    s.parent_id,
+    s.pattern_id,
+    s.tstamp,
+    s.insert_user,
+    s.lastupdate,
+    s.lastupdate_user,
+    s.graphconfig,
+    s.stylesheet
+   FROM sector s
+     LEFT JOIN macrosector ms ON ms.macrosector_id = s.macrosector_id
+  WHERE s.sector_id > 0
+  ORDER BY s.sector_id;
+
+CREATE OR REPLACE VIEW vu_sector
+AS SELECT s.sector_id,
+    s.name,
+    s.macrosector_id,
+    m.name AS macrosector_name,
+    et.idval,
+    s.descript,
+    s.parent_id,
+    s.pattern_id,
+    s.graphconfig::text AS graphconfig,
+    s.stylesheet::text AS stylesheet,
+    s.link,
+    s.avg_press,
+    s.active,
+    s.undelete,
+    s.tstamp,
+    s.insert_user,
+    s.lastupdate,
+    s.lastupdate_user,
+    s.the_geom
+   FROM sector s
+     JOIN macrosector m USING (macrosector_id)
+     LEFT JOIN edit_typevalue et ON et.id::text = s.sector_type::text AND et.typevalue::text = 'sector_type'::text
+  ORDER BY s.sector_id;
+
+
+CREATE OR REPLACE VIEW v_edit_sector
+AS SELECT vu_sector.sector_id,
+    vu_sector.name,
+    vu_sector.macrosector_id,
+    vu_sector.macrosector_name,
+    vu_sector.idval,
+    vu_sector.descript,
+    vu_sector.parent_id,
+    vu_sector.pattern_id,
+    vu_sector.graphconfig,
+    vu_sector.stylesheet,
+    vu_sector.link,
+    vu_sector.avg_press,
+    vu_sector.active,
+    vu_sector.undelete,
+    vu_sector.tstamp,
+    vu_sector.insert_user,
+    vu_sector.lastupdate,
+    vu_sector.lastupdate_user,
+    vu_sector.the_geom
+   FROM vu_sector,
+    selector_sector
+  WHERE vu_sector.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
