@@ -46,6 +46,7 @@ v_audit_result text;
 v_level integer;
 v_status text;
 v_message text;
+v_sql text;
 
 BEGIN
 
@@ -66,6 +67,15 @@ BEGIN
 	v_feature_id = ((p_data ->>'data')::json->>'feature_id')::text; -- en vez de old_feature_id
 	v_feature_type_new = ((p_data ->>'data')::json->>'feature_type_new')::text;
 	v_featurecat_id_new = ((p_data ->>'data')::json->>'featurecat_id')::text;
+	v_category = ((p_data ->>'data')::json->>'category_type')::text;
+	v_function = ((p_data ->>'data')::json->>'function_type')::text;
+	v_fluid = ((p_data ->>'data')::json->>'fluid_type')::text;
+	v_location = ((p_data ->>'data')::json->>'location_type')::text;
+	
+	if v_category = 'null' then v_category = null; end if;
+	if v_function = 'null' then v_function = null; end if;
+	if v_fluid = 'null' then v_fluid = null; end if;
+	if v_location = 'null' then v_location = null; end if;
 
 	--define columns used for feature_cat
 	v_feature_layer = concat('v_edit_',v_feature_type);
@@ -80,38 +90,31 @@ BEGIN
 	ELSIF  v_feature_type='arc' THEN
 		v_cat_column='arccat_id';
 	END IF;
-
-	EXECUTE 'SELECT n.category_type FROM '||v_feature_layer||' n JOIN man_type_category m ON n.category_type=m.category_type
-	WHERE  feature_type = '''||upper(v_feature_type)||''' AND 
-	(featurecat_id IS NULL OR '''||v_feature_type_new||''' = ANY(featurecat_id::text[])) AND '||v_id_column||'='''||v_feature_id||''';'
-	INTO v_category;
-	IF v_category IS NULL THEN
-		EXECUTE 'UPDATE '||v_feature_layer||' SET category_type=NULL WHERE '||v_feature_type||'_id='||quote_literal(v_feature_id)||';';
-	END IF;
-
-	EXECUTE 'SELECT n.function_type FROM '||v_feature_layer||' n JOIN man_type_function m ON n.function_type=m.function_type
-	WHERE  feature_type = '''||upper(v_feature_type)||''' AND 
-	(featurecat_id IS NULL OR '''||v_feature_type_new||''' = ANY(featurecat_id::text[])) AND '||v_id_column||'='''||v_feature_id||''';'
-	INTO v_function;
-	IF v_function IS NULL THEN
-		EXECUTE 'UPDATE '||v_feature_layer||' SET function_type=NULL WHERE '||v_feature_type||'_id='||quote_literal(v_feature_id)||';';
-	END IF;
 	
-	EXECUTE 'SELECT n.fluid_type FROM '||v_feature_layer||' n JOIN man_type_fluid m ON n.fluid_type=m.fluid_type
-	WHERE  feature_type = '''||upper(v_feature_type)||''' AND 
-	(featurecat_id IS NULL OR '''||v_feature_type_new||''' = ANY(featurecat_id::text[])) AND '||v_id_column||'='''||v_feature_id||''';'
-	INTO v_fluid;
-	IF v_fluid IS NULL THEN
-		EXECUTE 'UPDATE '||v_feature_layer||' SET fluid_type=NULL WHERE '||v_feature_type||'_id='||quote_literal(v_feature_id)||';';
-	END IF;
+	if v_category is not null then
+		EXECUTE 'UPDATE '||v_feature_layer||' SET category_type='|| quote_literal(v_category)||' WHERE '||v_feature_type||'_id='||quote_literal(v_feature_id)||';';
+	else
+		EXECUTE 'UPDATE '||v_feature_layer||' SET category_type=null WHERE '||v_feature_type||'_id='||quote_literal(v_feature_id)||';';
+	end if;
 
-	EXECUTE 'SELECT n.location_type FROM '||v_feature_layer||' n JOIN man_type_location m ON n.location_type=m.location_type
-	WHERE  feature_type = '''||upper(v_feature_type)||''' AND 
-	(featurecat_id IS NULL OR '''||v_feature_type_new||''' = ANY(featurecat_id::text[])) AND '||v_id_column||'='''||v_feature_id||''';'
-	INTO v_location;
-	IF v_location IS NULL THEN
-		EXECUTE 'UPDATE '||v_feature_layer||' SET location_type=NULL WHERE '||v_feature_type||'_id='||quote_literal(v_feature_id)||';';
-	END IF;
+	if v_function is not null then
+		EXECUTE 'UPDATE '||v_feature_layer||' SET function_type='|| quote_literal(v_function)||' WHERE '||v_feature_type||'_id='||quote_literal(v_feature_id)||';';
+	else
+		EXECUTE 'UPDATE '||v_feature_layer||' SET function_type=null WHERE '||v_feature_type||'_id='||quote_literal(v_feature_id)||';';
+	end if;
+
+	if v_fluid is not null then
+		EXECUTE 'UPDATE '||v_feature_layer||' SET fluid_type='|| quote_literal(v_fluid)||' WHERE '||v_feature_type||'_id='||quote_literal(v_feature_id)||';';
+	else
+		EXECUTE 'UPDATE '||v_feature_layer||' SET fluid_type=null WHERE '||v_feature_type||'_id='||quote_literal(v_feature_id)||';';
+	end if;
+
+	if v_location is not null then
+		EXECUTE 'UPDATE '||v_feature_layer||' SET location_type='|| quote_literal(v_location)||' WHERE '||v_feature_type||'_id='||quote_literal(v_feature_id)||';';
+	else
+		EXECUTE 'UPDATE '||v_feature_layer||' SET location_type=null WHERE '||v_feature_type||'_id='||quote_literal(v_feature_id)||';';
+	end if;
+
 
 	IF v_project_type = 'WS' THEN
 		EXECUTE 'UPDATE '||v_feature_layer||' SET '||v_cat_column||'='||quote_literal(v_featurecat_id_new)||'
