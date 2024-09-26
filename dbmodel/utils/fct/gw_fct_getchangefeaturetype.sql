@@ -62,6 +62,7 @@ DECLARE
     v_values_array json;
 	v_error_context text;
 	v_project_type text;
+	v_feature_type_values json;
 
 BEGIN
     -- Set search path to local schema
@@ -98,6 +99,16 @@ BEGIN
 		v_sql := concat('SELECT ', v_feature_type, '_type FROM v_edit_', v_feature_type, ' WHERE ', v_feature_type, '_id = ''', v_feature_id, '''');
 		EXECUTE v_sql INTO v_current_featurecat_id;
 
+		
+		v_sql := concat('SELECT json_build_object(
+	    ''location_type'', location_type,
+	    ''function_type'', function_type,
+	    ''fluid_type'', fluid_type,
+	    ''category_type'', category_type
+		) AS combined_data
+		FROM v_edit_', v_feature_type, ' WHERE ', v_feature_type, '_id = ''', v_feature_id, '''');
+		EXECUTE v_sql INTO v_feature_type_values;
+		
 		-- get default new feature type
 		SELECT id into v_new_featurecat_id_default FROM cat_feature WHERE parent_layer = v_table_name AND active is True AND id != v_current_featurecat_id  order by 1 limit 1;
 
@@ -119,8 +130,11 @@ BEGIN
         FOREACH aux_json IN ARRAY v_fields_array
         LOOP
             array_index := array_index + 1;
-
-            field_value := (v_values_array->>(aux_json->>'columnname'));
+			
+			if v_feature_type_values is not null then
+				field_value := (v_feature_type_values ->> (aux_json->>'columnname'));
+			end if;
+			
             IF (aux_json->>'columnname') = 'feature_type' THEN
 				field_value := v_current_featurecat_id;
             END IF;
@@ -154,32 +168,41 @@ BEGIN
 
 			IF (aux_json->>'columnname') = 'fluid_type' THEN
 
-				 select array_agg(fluid_type) into v_fluids from man_type_fluid where lower(feature_type) = v_feature_type;
-                 v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'comboIds', COALESCE(v_fluids, '{}'));
-               	 v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'comboNames', COALESCE(v_fluids, '{}'));
+				select array_agg(fluid_type order by fluid_type nulls first) into v_fluids from (
+				select fluid_type from man_type_fluid where lower(feature_type) = v_feature_type
+				union select null)a;
+                v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'comboIds', COALESCE(v_fluids, '{}'));
+               	v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'comboNames', COALESCE(v_fluids, '{}'));
 
             END IF;
 
 			IF (aux_json->>'columnname') = 'location_type' THEN
-
-				 select array_agg(location_type) into v_locations from man_type_location where lower(feature_type) = v_feature_type;
-                 v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'comboIds', COALESCE(v_locations, '{}'));
-               	 v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'comboNames', COALESCE(v_locations, '{}'));
+				
+			 	select array_agg(location_type order by location_type nulls first) into v_locations from (
+				select location_type from man_type_location where lower(feature_type) = v_feature_type
+				union select null)a;
+				v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'comboIds', COALESCE(v_locations, '{}'));
+				v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'comboNames', COALESCE(v_locations, '{}'));
 
             END IF;
 
 			IF (aux_json->>'columnname') = 'category_type' THEN
-				 select array_agg(category_type) into v_categories from man_type_category where lower(feature_type) = v_feature_type;
-                 v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'comboIds', COALESCE(v_categories, '{}'));
-               	 v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'comboNames', COALESCE(v_categories, '{}'));
+
+			 	select array_agg(category_type order by category_type nulls first) into v_categories from (
+				select category_type from man_type_category where lower(feature_type) = v_feature_type
+				union select null)a;
+                v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'comboIds', COALESCE(v_categories, '{}'));
+               	v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'comboNames', COALESCE(v_categories, '{}'));
 
             END IF;
 
 			IF (aux_json->>'columnname') = 'function_type' THEN
 
-				 select array_agg(function_type) into v_functions from man_type_function where lower(feature_type) = v_feature_type;
-                 v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'comboIds', COALESCE(v_functions, '{}'));
-               	 v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'comboNames', COALESCE(v_functions, '{}'));
+			 	select array_agg(function_type order by function_type nulls first) into v_functions from (
+				select function_type from man_type_function where lower(feature_type) = v_feature_type
+				union select null)a;
+                v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'comboIds', COALESCE(v_functions, '{}'));
+               	v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'comboNames', COALESCE(v_functions, '{}'));
 
             END IF;
 
