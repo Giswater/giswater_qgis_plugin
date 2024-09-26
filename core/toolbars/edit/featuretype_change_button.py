@@ -305,9 +305,17 @@ def btn_accept_featuretype_change(**kwargs):
     featurecat_id = tools_qt.get_widget_value(dialog, "tab_none_featurecat_id")
 
     fluid_type = tools_qt.get_widget_value(dialog, "tab_none_fluid_type")
-    localtion_type = tools_qt.get_widget_value(dialog, "tab_none_location_type")
+    if fluid_type is None:
+        fluid_type = 'null'
+    location_type = tools_qt.get_widget_value(dialog, "tab_none_location_type")
+    if location_type is None:
+        location_type = 'null'
     category_type = tools_qt.get_widget_value(dialog, "tab_none_category_type")
+    if category_type is None:
+        category_type = 'null'
     function_type = tools_qt.get_widget_value(dialog, "tab_none_function_type")
+    if function_type is None:
+        function_type = 'null'
 
     if feature_type_new != "null":
 
@@ -320,7 +328,7 @@ def btn_accept_featuretype_change(**kwargs):
             extras += f', "feature_type_new":"{feature_type_new}"'
             extras += f', "featurecat_id":"{featurecat_id}"'
             extras += f', "fluid_type":"{fluid_type}"'
-            extras += f', "localtion_type":"{localtion_type}"'
+            extras += f', "location_type":"{location_type}"'
             extras += f', "category_type":"{category_type}"'
             extras += f', "function_type":"{function_type}"'
 
