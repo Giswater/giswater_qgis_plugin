@@ -255,20 +255,67 @@ class GwMapzoneManager:
         temp_layer_result = self.add_layer_from_select(self.mapzone_mng_dlg, geojson_data, layer_name)
         if temp_layer_result and temp_layer_result['layer_added']:
             temp_layer = temp_layer_result['layer_added']
-            #self._setup_temporal_layer(temp_layer)
+            if isinstance(temp_layer, QgsVectorLayer) and temp_layer.isValid():
+                self._setup_temporal_layer(temp_layer)
         else:
             QMessageBox.critical(self.mapzone_mng_dlg, "Error", "Failed to create the temporal layer.")
 
     def _setup_temporal_layer(self, vlayer):
-        """Sets the temporal properties for the layer."""
+        """Sets the temporal properties for the layer, specifically using the timestep field."""
 
-        # Enable temporal properties for the layer
-        vlayer.setTemporal(True)
-        vlayer.setTemporalControlField("timestep")
+        if vlayer.isValid():
+            temporal_properties = vlayer.temporalProperties()
 
-        self.iface.mapCanvas().enableTemporalNavigation(True)
-        self.iface.mapCanvas().refresh()
+            if 'timestep' in [field.name() for field in vlayer.fields()]:
 
+                temporal_properties.setStartField('timestep')
+                temporal_properties.setEndField('timestep')
+
+                temporal_properties.setIsActive(True)
+
+                vlayer.triggerRepaint()
+
+                self._activate_temporal_controller(vlayer)
+        else:
+            print("Invalid layer")
+
+    def _activate_temporal_controller(self, vlayer):
+        """Activa los controles de navegación temporal y configura el rango temporal."""
+
+        try:
+            temporal_properties = vlayer.temporalProperties()
+            if not temporal_properties.isActive():
+                return
+        except Exception as e:
+            print(e)
+            return
+
+        try:
+            field_index = vlayer.fields().indexOf(temporal_properties.startField())
+            min_time = vlayer.minimumValue(field_index)
+            max_time = vlayer.maximumValue(field_index)
+
+            if not isinstance(min_time, QDateTime) or not isinstance(max_time, QDateTime):
+                return
+
+        except Exception as e:
+            print(e)
+            return
+
+        try:
+            temporal_properties.setFixedTemporalRange(min_time, max_time)  # Pasamos directamente QDateTime
+        except Exception as e:
+            return
+
+        try:
+            self.iface.actionShowTemporalToolbar().trigger()  # Muestra la barra de herramientas del reloj
+        except Exception as e:
+            print(e)
+
+        try:
+            self.iface.mapCanvas().refreshAllLayers()
+        except Exception as e:
+            print(e)
 
     def add_layer_from_select(self, dialog, data, layer_name, group='Select Layers'):
 
