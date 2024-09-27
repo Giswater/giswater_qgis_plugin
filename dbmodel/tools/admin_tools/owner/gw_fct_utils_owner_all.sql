@@ -4,11 +4,15 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
+/*
+SELECT ws_36.gw_fct_utils_owner_all('ws', 'role_system')
+*/
 
 
-CREATE OR REPLACE FUNCTION gw_fct_utils_owner_all(    SCHEMA_NAME character varying,    cur_owner character varying,    new_owner character varying)
+CREATE OR REPLACE FUNCTION gw_fct_utils_owner_all(schema_name character varying, new_owner character varying)
   RETURNS boolean AS
 $BODY$
+
 DECLARE
     rec_object  record;
 	
@@ -17,20 +21,18 @@ BEGIN
 	-- Tables
 	FOR rec_object IN 
 		SELECT * FROM pg_tables 
-		WHERE schemaname = SCHEMA_NAME 
-		AND tableowner = cur_owner
+		WHERE schemaname = schema_name 
 		ORDER BY tablename 
 	LOOP
-        EXECUTE 'ALTER TABLE '||SCHEMA_NAME||'.'||quote_ident(rec_object.tablename)||' OWNER TO '||quote_ident(new_owner);
+        EXECUTE 'ALTER TABLE '||schema_name||'.'||quote_ident(rec_object.tablename)||' OWNER TO '||quote_ident(new_owner);
 	END LOOP;
 	
 	-- Views
 	FOR rec_object IN 
 		SELECT * FROM pg_views 
-		WHERE schemaname = SCHEMA_NAME 
-		AND viewowner = cur_owner
+		WHERE schemaname = schema_name 
 	LOOP
-        EXECUTE 'ALTER TABLE '||SCHEMA_NAME||'.'||quote_ident(rec_object.viewname)||' OWNER TO '|| quote_ident(new_owner);
+        EXECUTE 'ALTER TABLE '||schema_name||'.'||quote_ident(rec_object.viewname)||' OWNER TO '|| quote_ident(new_owner);
 	END LOOP;
 
 	-- Sequences
@@ -40,8 +42,7 @@ BEGIN
 		WHERE c.relowner = u.usesysid 
 			AND n.oid = c.relnamespace
 			AND c.relkind = 'S' 
-			AND u.usename = cur_owner
-			AND n.nspname = SCHEMA_NAME
+			AND n.nspname = schema_name
 			AND relnamespace IN (
 					SELECT oid
 					FROM pg_namespace
@@ -49,9 +50,24 @@ BEGIN
 					AND nspname != 'information_schema'
 				)
 	LOOP
-        EXECUTE 'ALTER TABLE '||SCHEMA_NAME||'.'||quote_ident(rec_object.relname)||' OWNER TO '|| quote_ident(new_owner);
+        EXECUTE 'ALTER TABLE '||schema_name||'.'||quote_ident(rec_object.relname)||' OWNER TO '|| quote_ident(new_owner);
 	END LOOP;
-  
+  	
+	-- Functions
+	FOR rec_object IN 
+		SELECT 
+		    routine_schema AS schema,
+		    routine_name AS function_name,
+		    data_type AS return_type
+	    FROM 
+	    	information_schema.routines
+		WHERE 
+		    routine_schema = schema_name
+	LOOP
+        EXECUTE 'ALTER FUNCTION  '||schema_name||'.'||quote_ident(rec_object.function_name)||' OWNER TO '||quote_ident(new_owner);
+	END LOOP;
+
+
 	RETURN TRUE;
   
 END;
