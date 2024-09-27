@@ -9,6 +9,8 @@ on:
 jobs:
   ci_test_ws_db:
     runs-on: ubuntu-latest
+    env:
+      PGPASSWORD: postgres
 
     steps:
       - name: Checkout repository
@@ -35,14 +37,10 @@ jobs:
           sudo -u postgres psql -c "ALTER USER postgres PASSWORD 'postgres';"
 
       - name: Create PostgreSQL Database
-        env:
-          PGPASSWORD: postgres
         run: |
           psql -h localhost -U postgres -c 'CREATE DATABASE gw_db;'
 
       - name: Setup PostgreSQL extensions
-        env:
-          PGPASSWORD: postgres
         run: |
           psql -h localhost -U postgres -d gw_db -c 'CREATE EXTENSION postgis;'
           psql -h localhost -U postgres -d gw_db -c 'CREATE EXTENSION pgrouting;'
@@ -54,24 +52,16 @@ jobs:
         run: python test/replace_vars.py ws
 
       - name: Create Sample Schema
-        env:
-          PGPASSWORD: postgres
         run: python test/execute_sql_files.py ws
 
       - name: Run SQL Tests with pgTAP and pg_prove (PL/SQL)
-        env:
-          PGPASSWORD: postgres
         run: |
           pg_prove -h localhost -U postgres -d gw_db test/plsql/ws/*.sql
 
       - name: Run SQL Tests with pgTAP and pg_prove (UPSERT)
-        env:
-          PGPASSWORD: postgres
         run: |
           pg_prove -h localhost -U postgres -d gw_db test/upsert/ws/*.sql
 
       - name: Run SQL Tests with pgTAP and pg_prove (STRUCTURE)
-        env:
-          PGPASSWORD: postgres
         run: |
           pg_prove -h localhost -U postgres -d gw_db test/structure/ws/*.sql
