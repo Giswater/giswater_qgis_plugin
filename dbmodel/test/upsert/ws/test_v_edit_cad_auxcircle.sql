@@ -10,7 +10,7 @@ SET client_min_messages TO WARNING;
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-SELECT plan(6);
+SELECT plan(3);
 
 INSERT INTO v_edit_cad_auxcircle(geom_multicurve)
 VALUES(ST_GeomFromText('MULTICURVE((-901 10, 20 20, 30 40), CIRCULARSTRING(10 10, 15 15, 20 10))', 25831) );
@@ -19,8 +19,8 @@ SELECT is((SELECT count(*)::integer FROM v_edit_cad_auxcircle WHERE geom_multicu
 UPDATE v_edit_cad_auxcircle SET geom_multicurve =  ST_GeomFromText('MULTICURVE((-902 10, 20 20, 30 40), CIRCULARSTRING(10 10, 15 15, 20 10))', 25831) WHERE geom_multicurve = ST_GeomFromText('MULTICURVE((-901 10, 20 20, 30 40), CIRCULARSTRING(10 10, 15 15, 20 10))', 25831);
 SELECT is((SELECT geom_multicurve FROM v_edit_cad_auxcircle WHERE geom_multicurve = ST_GeomFromText('MULTICURVE((-902 10, 20 20, 30 40), CIRCULARSTRING(10 10, 15 15, 20 10))', 25831)),  ST_GeomFromText('MULTICURVE((-902 10, 20 20, 30 40), CIRCULARSTRING(10 10, 15 15, 20 10))', 25831), 'UPDATE: v_edit_cad_auxcircle -901 was updated');
 
-DELETE FROM v_edit_cad_auxcircle WHERE geom_multicurve = ST_GeomFromText('MULTICURVE((-901 10, 20 20, 30 40), CIRCULARSTRING(10 10, 15 15, 20 10))', 25831);
-SELECT is((SELECT count(*)::integer FROM v_edit_cad_auxcircle WHERE geom_multicurve = ST_GeomFromText('MULTICURVE((-901 10, 20 20, 30 40), CIRCULARSTRING(10 10, 15 15, 20 10))', 25831)), 0, 'DELETE: v_edit_cad_auxcircle -901 was deleted');
+DELETE FROM v_edit_cad_auxcircle WHERE geom_multicurve = ST_GeomFromText('MULTICURVE((-902 10, 20 20, 30 40), CIRCULARSTRING(10 10, 15 15, 20 10))', 25831);
+SELECT is((SELECT count(*)::integer FROM v_edit_cad_auxcircle WHERE geom_multicurve = ST_GeomFromText('MULTICURVE((-902 10, 20 20, 30 40), CIRCULARSTRING(10 10, 15 15, 20 10))', 25831)), 0, 'DELETE: v_edit_cad_auxcircle -902 was deleted');
 
 
 SELECT * FROM finish();
