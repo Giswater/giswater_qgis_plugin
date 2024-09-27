@@ -47,15 +47,14 @@ def main(project_type: str) -> None:
         logger.warning(f"Directory {i18n_dir} does not exist")
 
     # Define the base updates directory
-    updates_dir = "updates/36"
+    updates_dir = ["updates/36", "updates/40"]
 
     order = ['utils', f"{project_type}"]
 
-    # Check if the updates directory exists and process it
-    if os.path.isdir(updates_dir):
-        logger.info(f"Processing root directory: {updates_dir}")
-        for subdir in sorted(os.listdir(updates_dir)):
-            subdir_path = os.path.join(updates_dir, subdir)
+    for update_dir in updates_dir:
+        logger.info(f"Processing update directory: {update_dir}")
+        for subdir in sorted(os.listdir(update_dir)):
+            subdir_path = os.path.join(update_dir, subdir)
             # Check if the updates subdirectory exists and process it
             if os.path.isdir(subdir_path):
                 for root, dirs, files in os.walk(subdir_path):
