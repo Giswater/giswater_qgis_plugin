@@ -68,7 +68,7 @@ def main(project_type: str) -> None:
     # Execute last process command
     with conn.cursor() as cursor:
         lastprocess_command = f"""
-            SELECT {project_type}_36.gw_fct_admin_schema_lastprocess(
+            SELECT {project_type}_40.gw_fct_admin_schema_lastprocess(
                 '{{"client":{{"device":4, "lang":"en_US"}}, "data":{{"isNewProject":"TRUE", "gwVersion":"3.6.012", "projectType":"{project_type.upper()}", "epsg":25831, "descript":"{project_type}_36", "name":"{project_type}_36", "author":"postgres", "date":"29-07-2024"}}}}'
             );
         """
