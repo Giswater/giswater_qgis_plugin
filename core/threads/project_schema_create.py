@@ -250,6 +250,7 @@ class GwCreateSchemaTask(GwTask):
 
         elif process_name == 'update_35to39':
             dict_folders[os.path.join(self.admin.folder_updates, '36')] = 0
+            dict_folders[os.path.join(self.admin.folder_updates, '40')] = 0
 
         return dict_folders
 
