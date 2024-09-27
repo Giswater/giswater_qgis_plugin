@@ -327,14 +327,11 @@ def btn_accept_featuretype_change(**kwargs):
             extras = f'"feature_id":"{this.feature_id}"'
             extras += f', "feature_type_new":"{feature_type_new}"'
             extras += f', "featurecat_id":"{featurecat_id}"'
-<<<<<<< HEAD
-=======
             extras += f', "fluid_type":"{fluid_type}"'
             extras += f', "location_type":"{location_type}"'
             extras += f', "category_type":"{category_type}"'
             extras += f', "function_type":"{function_type}"'
 
->>>>>>> ba0de4b8 (fix(feature): improve last commit)
             body = tools_gw.create_body(feature=feature, extras=extras)
 
             # Execute SQL function and show result to the user
