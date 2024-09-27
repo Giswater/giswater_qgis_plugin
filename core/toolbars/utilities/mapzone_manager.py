@@ -14,7 +14,7 @@ from qgis.PyQt.QtGui import QCursor
 from qgis.PyQt.QtCore import Qt, QPoint, QDateTime, QDate, QTime, QVariant
 from qgis.PyQt.QtWidgets import QAction, QMenu, QTableView, QAbstractItemView, QGridLayout, QLabel, QWidget, QComboBox, QMessageBox
 from qgis.PyQt.QtSql import QSqlTableModel
-from qgis.core import QgsVectorLayer, QgsProject, QgsCoordinateReferenceSystem, QgsVectorLayerTemporalProperties
+from qgis.core import QgsVectorLayer, QgsProject, QgsCoordinateReferenceSystem, QgsDateTimeRange, Qgis
 
 from qgis.gui import QgsMapToolEmitPoint
 
@@ -271,51 +271,58 @@ class GwMapzoneManager:
                 temporal_properties.setStartField('timestep')
                 temporal_properties.setEndField('timestep')
 
+                # Set mode to Single Field with Date/Time
+                temporal_properties.setMode(Qgis.VectorTemporalMode.FeatureDateTimeInstantFromField)
+
+                # Activate temporal properties and accumulate features over time
                 temporal_properties.setIsActive(True)
+                temporal_properties.setAccumulateFeatures(True)
 
                 vlayer.triggerRepaint()
 
                 self._activate_temporal_controller(vlayer)
-        else:
-            print("Invalid layer")
+
 
     def _activate_temporal_controller(self, vlayer):
-        """Activa los controles de navegación temporal y configura el rango temporal."""
-
-        try:
-            temporal_properties = vlayer.temporalProperties()
-            if not temporal_properties.isActive():
-                return
-        except Exception as e:
-            print(e)
+        # Get the global temporal controller
+        temporal_controller = self.iface.mapCanvas().temporalController()
+        if not temporal_controller:
             return
 
-        try:
-            field_index = vlayer.fields().indexOf(temporal_properties.startField())
-            min_time = vlayer.minimumValue(field_index)
-            max_time = vlayer.maximumValue(field_index)
-
-            if not isinstance(min_time, QDateTime) or not isinstance(max_time, QDateTime):
-                return
-
-        except Exception as e:
-            print(e)
+        # Check if the layer has active temporal properties
+        temporal_properties = vlayer.temporalProperties()
+        if not temporal_properties.isActive():
             return
 
-        try:
-            temporal_properties.setFixedTemporalRange(min_time, max_time)  # Pasamos directamente QDateTime
-        except Exception as e:
+        # Calculate temporal range based on the layer's temporal field
+        start_field = temporal_properties.startField()
+        field_index = vlayer.fields().indexOf(start_field)
+        features = vlayer.getFeatures()
+        temporal_values = [feature.attribute(field_index) for feature in features if
+                           isinstance(feature.attribute(field_index), QDateTime)]
+
+        if not temporal_values:
             return
 
-        try:
-            self.iface.actionShowTemporalToolbar().trigger()  # Muestra la barra de herramientas del reloj
-        except Exception as e:
-            print(e)
+        # Set the temporal range in the temporal controller
+        min_time = min(temporal_values)
+        max_time = max(temporal_values)
+        temporal_extent = QgsDateTimeRange(min_time, max_time)
+        temporal_controller.setTemporalExtents(temporal_extent)
 
-        try:
-            self.iface.mapCanvas().refreshAllLayers()
-        except Exception as e:
-            print(e)
+        # Activate the temporal toolbar button
+        actions = self.iface.mainWindow().findChildren(QAction)
+        for action in actions:
+            if 'Temporal' in action.text():
+                action.trigger()
+                break
+
+        # Set the temporal step to "seconds"
+        widgets = self.iface.mainWindow().findChildren(QComboBox)
+        for widget in widgets:
+            if "seconds" in [widget.itemText(i) for i in range(widget.count())]:
+                widget.setCurrentText("seconds")
+                break
 
     def add_layer_from_select(self, dialog, data, layer_name, group='Select Layers'):
 
