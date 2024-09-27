@@ -10,8 +10,8 @@ SET client_min_messages TO WARNING;
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
--- Plan for 10 test
-SELECT plan(10);
+-- Plan for 14 test
+SELECT plan(14);
 
 -- Extract and test the "status" field from the function's JSON response
 SELECT is(
@@ -69,6 +69,34 @@ SELECT is(
     "feature":{"tableName":"v_edit_sector", "id": "2"}, "data":{"filterFields":{}, "pageInfo":{}}}$$)::JSON)->>'status',
     'Accepted',
     'Check if gw_fct_getinfofromid --> "tableName":"v_edit_sector" with id returns status "Accepted"'
+);
+
+SELECT is(
+    (gw_fct_getinfofromid($${"client":{"device":4, "lang":"", "infoType":1, "epsg":25831}, "form":{},
+    "feature":{"tableName":"v_edit_dma"}, "data":{"filterFields":{}, "pageInfo":{}}}$$)::JSON)->>'status',
+    'Accepted',
+    'Check if gw_fct_getinfofromid --> "tableName":"v_edit_dma" returns status "Accepted"'
+);
+
+SELECT is(
+    (gw_fct_getinfofromid($${"client":{"device":4, "lang":"", "infoType":1, "epsg":25831}, "form":{},
+    "feature":{"tableName":"v_edit_dma", "id": "2"}, "data":{"filterFields":{}, "pageInfo":{}}}$$)::JSON)->>'status',
+    'Accepted',
+    'Check if gw_fct_getinfofromid --> "tableName":"v_edit_dma" with id returns status "Accepted"'
+);
+
+SELECT is(
+    (gw_fct_getinfofromid($${"client":{"device":4, "lang":"", "infoType":1, "epsg":25831}, "form":{},
+    "feature":{"tableName":"v_edit_dqa"}, "data":{"filterFields":{}, "pageInfo":{}}}$$)::JSON)->>'status',
+    'Accepted',
+    'Check if gw_fct_getinfofromid --> "tableName":"v_edit_dqa" returns status "Accepted"'
+);
+
+SELECT is(
+    (gw_fct_getinfofromid($${"client":{"device":4, "lang":"", "infoType":1, "epsg":25831}, "form":{},
+    "feature":{"tableName":"v_edit_dqa", "id": "2"}, "data":{"filterFields":{}, "pageInfo":{}}}$$)::JSON)->>'status',
+    'Accepted',
+    'Check if gw_fct_getinfofromid --> "tableName":"v_edit_dqa" with id returns status "Accepted"'
 );
 
 SELECT is(
