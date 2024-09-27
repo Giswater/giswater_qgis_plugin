@@ -33,11 +33,11 @@ BEGIN
 
     SET search_path = "SCHEMA_NAME", public;
 
-    EXECUTE 'SELECT LOWER(project_type) FROM sys_version ORDER BY "date" DESC LIMIT 1' INTO v_project_type;
+    SELECT project_type INTO v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
 
     v_expl = (SELECT (p_data::json->>'data')::json->>'expl_id');
 
-    IF v_project_type = 'ud' THEN
+    IF v_project_type = 'UD' THEN
         v_reverse_cost = -1;
     END IF;
 
@@ -66,6 +66,50 @@ BEGIN
         AND a.node_1 IS NOT NULL AND a.node_2 IS NOT NULL -- Avoids the crash of pgrouting functions
         AND a.expl_id IN (v_expl)
     );
+
+    INSERT INTO temp_pgr_connec (connec_id, arc_id, the_geom)
+    (
+        SELECT c.connec_id, c.arc_id, c.the_geom
+        FROM (
+            SELECT connec_id, arc_id, state, state_type, the_geom FROM connec
+            ) c
+        JOIN temp_pgr_arc a ON c.arc_id::INT = a.pgr_arc_id
+        JOIN value_state_type s ON s.id =c.state_type
+        WHERE c.state=1 AND s.is_operative =true
+    );
+
+    INSERT INTO temp_pgr_link (link_id, feature_id, feature_type, the_geom)
+    (
+        SELECT link_id, feature_id, feature_type, the_geom
+        FROM (
+            select link_id, feature_id, feature_type, state, the_geom FROM link
+            ) l
+        JOIN temp_pgr_connec c ON l.feature_id=c.connec_id
+        WHERE l.state=1 AND l.feature_type='CONNEC'
+    );
+
+    IF v_project_type='UD' THEN
+        INSERT INTO temp_pgr_gully (gully_id, arc_id, the_geom)
+        (
+            SELECT g.gully_id, g.arc_id, g.the_geom
+            FROM (
+                SELECT gully_id, arc_id, state, state_type, the_geom FROM gully
+                ) g
+            JOIN temp_pgr_arc a ON g.arc_id::int = a.pgr_arc_id
+            JOIN value_state_type s ON s.id =g.state_type
+            WHERE g.state=1 AND s.is_operative =true
+        );
+
+        INSERT INTO temp_pgr_link (link_id, feature_id, feature_type, the_geom)
+        (
+            SELECT link_id, feature_id, feature_type, the_geom
+            FROM (
+                SELECT link_id, feature_id, feature_type, state, the_geom FROM link
+                ) l
+            JOIN temp_pgr_gully g ON l.feature_id = g.gully_id
+            WHERE l.state=1 AND l.feature_type='GULLY'
+        );
+    END IF;
 
 	RETURN ('{"status":"Accepted"}')::json;
 

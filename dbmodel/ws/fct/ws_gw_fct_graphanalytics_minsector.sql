@@ -70,11 +70,6 @@ BEGIN
 	-- =======================
     PERFORM gw_fct_graphanalytics_initnetwork('{"data":{"expl_id":"'||v_expl||'"}}');
 
-    -- Insert values into temporary tables (only propagating features belonging to the selected exploitations)
-	INSERT INTO temp_t_connec SELECT * FROM connec c JOIN value_state_type s ON s.id = c.state_type WHERE c.state = 1 AND s.is_operative = TRUE
-    INSERT INTO temp_t_link SELECT * FROM link WHERE state = 1 AND is_operative = TRUE;
-
-
     -- Nodes at the limits of minsectors: nodes with "graph_delimiter" = 'MINSECTOR'
     -- Also, nodes that appear as starts in the "sector" table and have "graph_delimiter" = 'SECTOR'
     -- Note: "to_arc" is in the "man_valve" table; any valve could behave as a check-valve, although this should not happen uncontrolled
@@ -176,8 +171,8 @@ BEGIN
     WHERE n.node_id = s.node_id;
 
     -- Update feature temporary tables
-    UPDATE temp_t_connec c SET minsector_id = a.minsector_id FROM arc a WHERE c.arc_id::int = a.pgr_arc_id;
-    UPDATE temp_t_link l SET minsector_id = c.minsector_id FROM connec c WHERE c.connec_id = l.feature_id;
+    UPDATE temp_pgr_connec c SET minsector_id = a.minsector_id FROM arc a WHERE c.arc_id::INT = a.arc_id;
+    UPDATE temp_pgr_link l SET minsector_id = c.minsector_id FROM connec c WHERE c.connec_id = l.feature_id;
 
     -- Insert into minsector temporary table
     INSERT INTO temp_minsector SELECT DISTINCT zone_id FROM temp_pgr_arc;
@@ -275,8 +270,8 @@ BEGIN
         EXECUTE 'UPDATE arc a SET minsector_id = t.zone_id FROM temp_pgr_arc t WHERE a.arc_id = t.arc_id AND a.expl_id IN ('||v_expl||')';
         EXECUTE 'UPDATE node n SET minsector_id = t.zone_id FROM temp_pgr_node t WHERE n.node_id = t.node_id AND n.expl_id IN ('||v_expl||')';
 
-        EXECUTE 'UPDATE connec c SET minsector_id = t.minsector_id FROM temp_t_connec t WHERE c.connec_id = t.connec_id AND t.expl_id IN ('||v_expl||')';
-        EXECUTE 'UPDATE link l SET minsector_id = t.minsector_id FROM temp_t_link t WHERE l.link_id = t.link_id AND l.expl_id IN ('||v_expl||')';
+        EXECUTE 'UPDATE connec c SET minsector_id = t.minsector_id FROM temp_pgr_connec t WHERE c.connec_id = t.connec_id AND t.expl_id IN ('||v_expl||')';
+        EXECUTE 'UPDATE link l SET minsector_id = t.minsector_id FROM temp_pgr_link t WHERE l.link_id = t.link_id AND l.expl_id IN ('||v_expl||')';
 
         v_result := NULL;
         v_result := COALESCE(v_result, '{}');
@@ -316,14 +311,14 @@ BEGIN
     -- Drop temporary layers (new)
     DROP TABLE IF EXISTS temp_pgr_node;
     DROP TABLE IF EXISTS temp_pgr_arc;
+    DROP TABLE IF EXISTS temp_pgr_connec;
+    DROP TABLE IF EXISTS temp_pgr_link;
     DROP TABLE IF EXISTS temp_pgr_minsector;
     DROP TABLE IF EXISTS temp_pgr_connectedcomponents;
     DROP TABLE IF EXISTS temp_pgr_drivingdistance;
 
     -- Drop temporary layers (old)
     DROP TABLE IF EXISTS temp_minsector;
-    DROP TABLE IF EXISTS temp_t_connec;
-    DROP TABLE IF EXISTS temp_t_link;
     DROP TABLE IF EXISTS temp_audit_check_data;
 
     -- Return

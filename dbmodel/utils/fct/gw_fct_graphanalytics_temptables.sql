@@ -19,11 +19,14 @@ SELECT gw_fct_graphanalytics_temptables('{"data":{"fct_name":"MINSECTOR"}}');
 
 DECLARE
 
+    v_project_type text;
     v_fct_name TEXT;
 
 BEGIN
 
     SET search_path = "SCHEMA_NAME", public;
+
+    SELECT project_type INTO v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
 
     v_fct_name = (SELECT (p_data::json->>'data')::json->>'fct_name');
 
@@ -60,6 +63,28 @@ BEGIN
     CREATE INDEX temp_pgr_arc_node1 ON temp_pgr_arc USING btree (node_1);
     CREATE INDEX temp_pgr_arc_node2 ON temp_pgr_arc USING btree (node_2);
     GRANT UPDATE, INSERT, REFERENCES, SELECT, DELETE, TRUNCATE, TRIGGER ON TABLE temp_pgr_arc TO role_basic;
+
+
+    CREATE TABLE temp_pgr_connec (
+        connec_id varchar(16),
+        arc_id varchar(16),
+        zone_id varchar(200) default '0', -- per defecte és Undefined; és text perque el camp "id" per presszone és text;
+        the_geom public.geometry(linestring, 25831) NULL,
+        CONSTRAINT temp_pgr_connec_pkey PRIMARY KEY (connec_id)
+    );
+    CREATE INDEX temp_pgr_connec_connec_id ON temp_pgr_connec USING btree (connec_id);
+    CREATE INDEX temp_pgr_connec_arc_id ON temp_pgr_connec USING btree (arc_id);
+
+    CREATE TABLE temp_pgr_link (
+            link_id varchar(16),
+            feature_id varchar(16),
+            feature_type varchar(16),
+            zone_id varchar(200) default '0', -- per defecte és Undefined; és text perque el camp "id" per presszone és text;
+            the_geom public.geometry(linestring, 25831) NULL,
+            CONSTRAINT temp_pgr_link_pkey PRIMARY KEY (link_id)
+        );
+        CREATE INDEX temp_pgr_link_link_id ON temp_pgr_link USING btree (link_id);
+        CREATE INDEX temp_pgr_link_feature_id ON temp_pgr_link USING btree (feature_id);
 
     CREATE TEMP TABLE temp_pgr_minsector (
         pgr_arc_id INT NOT NULL,
@@ -102,10 +127,21 @@ BEGIN
     CREATE INDEX temp_pgr_drivingdistance_edge ON temp_pgr_drivingdistance USING btree (edge);
     GRANT UPDATE, INSERT, REFERENCES, SELECT, DELETE, TRUNCATE, TRIGGER ON TABLE temp_pgr_drivingdistance TO role_basic;
 
+
+    IF v_project_type = 'UD' THEN
+        CREATE TABLE temp_pgr_gully (
+            gully_id varchar(16),
+            arc_id varchar(16),
+            zone_id varchar(200) default '0', -- per defecte és Undefined; és text perque el camp "id" per presszone és text;
+            the_geom public.geometry(linestring, 25831) NULL,
+            CONSTRAINT temp_pgr_gully_pkey PRIMARY KEY (gully_id)
+        );
+        CREATE INDEX temp_pgr_gully_gully_id ON temp_pgr_gully USING btree (gully_id);
+        CREATE INDEX temp_pgr_gully_arc_id ON temp_pgr_gully USING btree (arc_id);
+    END IF;
+
     -- Create other additional temporary tables
 	CREATE TEMP TABLE temp_audit_check_data (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
-	CREATE TEMP TABLE temp_t_connec (LIKE SCHEMA_NAME.connec INCLUDING ALL);
-	CREATE TEMP TABLE temp_t_link (LIKE SCHEMA_NAME.link INCLUDING ALL);
 
     -- For specific functions
     IF v_fct_name = 'MINSECTOR' THEN
