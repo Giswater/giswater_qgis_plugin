@@ -20,7 +20,7 @@ SELECT SCHEMA_NAME.gw_fct_graphanalytics_check_data($${
 -- fid: main:v_fid,
 	other: 176,180,181,192,208,209,367
 
-select * FROM temp_audit_check_data WHERE fid=v_fid AND cur_user=current_user; 
+select * FROM temp_audit_check_data WHERE fid=v_fid AND cur_user=current_user;
 
 */
 
@@ -53,10 +53,10 @@ v_fid integer;
 
 BEGIN
 
-	--  Search path	
+	--  Search path
 	SET search_path = "SCHEMA_NAME", public;
 
-	-- getting input data 	
+	-- getting input data
 	v_selectionmode := ((p_data ->>'data')::json->>'parameters')::json->>'selectionMode'::text;
 	v_graphclass := ((p_data ->>'data')::json->>'parameters')::json->>'graphClass'::text;
 	v_fid := ((p_data ->>'data')::json->>'parameters')::json->>'fid'::text;
@@ -84,7 +84,7 @@ BEGIN
 	ELSIF v_selectionmode='userSelectors' THEN
 		v_edit = 'v_edit_';
 	END IF;
-	
+
 	IF v_fid = 211 OR v_fid = 101 THEN
 		CREATE TEMP TABLE temp_anl_node (LIKE SCHEMA_NAME.anl_node INCLUDING ALL);
 		CREATE TEMP TABLE temp_audit_check_data (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
@@ -103,7 +103,7 @@ BEGIN
 	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, 'INFO');
 	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, '-------');
 
-	
+
 	-- Check if there are nodes type 'ischange=1 or 2 (true or maybe)' without changing catalog of arcs (208)
 	v_querytext = '(SELECT n.node_id, count(*), nodecat_id, the_geom, a.expl_id FROM 
 			(SELECT node_1 as node_id, arccat_id, v_edit_arc.expl_id FROM v_edit_arc WHERE node_1 IN (SELECT node_id FROM v_edit_node JOIN cat_node ON id=nodecat_id WHERE ischange=1)
@@ -124,11 +124,11 @@ BEGIN
 		INSERT INTO temp_audit_check_data (fid, criticity, result_id, error_message, fcount)
 		VALUES (v_fid, 1, '208','INFO: No nodes ''ischange'' without real change have been found.',v_count);
 	END IF;
-			
+
 	-- Check if there are change of catalog with cat_feature_node 'ischange=0 (false)' (209)
 	v_querytext = '(SELECT node_id, nodecat_id, array_agg(arccat_id) as arccat_id, the_geom, node.expl_id FROM ( SELECT count(*), node_id, arccat_id FROM 
 			(SELECT node_1 as node_id, arccat_id FROM '||v_edit||'arc UNION ALL SELECT node_2, arccat_id FROM '||v_edit||'arc)a GROUP BY 2,3 HAVING count(*) <> 2 ORDER BY 2) b
-			JOIN node USING (node_id) JOIN cat_node ON id=nodecat_id WHERE ischange=0 GROUP By 1,2,4,5 HAVING count(*)=2)';	
+			JOIN node USING (node_id) JOIN cat_node ON id=nodecat_id WHERE ischange=0 GROUP By 1,2,4,5 HAVING count(*)=2)';
 
 	EXECUTE concat('SELECT count(*) FROM ',v_querytext,' b') INTO v_count;
 
@@ -159,7 +159,7 @@ BEGIN
 	END IF;
 
 	-- config_graph_mincut_x_exploitation (177)
-	SELECT count(*) INTO v_count FROM config_graph_mincut cgi INNER JOIN node n ON cgi.node_id = n.node_id 
+	SELECT count(*) INTO v_count FROM config_graph_mincut cgi INNER JOIN node n ON cgi.node_id = n.node_id
 	WHERE n.expl_id NOT IN (SELECT expl_id FROM exploitation WHERE active IS TRUE);
 
 	IF v_count > 0 THEN
@@ -180,12 +180,12 @@ BEGIN
 		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 
 		IF v_count > 0 THEN
-			INSERT INTO temp_audit_check_data (fid, criticity, result_id, error_message, fcount) 
+			INSERT INTO temp_audit_check_data (fid, criticity, result_id, error_message, fcount)
 			VALUES (v_fid, 3, '268', concat('ERROR-268: There is/are ',v_count, ' sectors on sector table with graphconfig not configured.'),v_count);
 		ELSE
-			INSERT INTO temp_audit_check_data (fid, criticity, result_id, error_message, fcount) 
+			INSERT INTO temp_audit_check_data (fid, criticity, result_id, error_message, fcount)
 			VALUES (v_fid, 1, '268', 'INFO: All sectors has graphconfig values not null.',v_count);
-		END IF;	
+		END IF;
 
 		-- sector : check coherence against nodetype.graphdelimiter and nodeparent defined on secetor.graphconfig (fid:  180)
 		v_querytext ='SELECT node_id, nodecat_id, the_geom, a.active, '||v_edit||'node.expl_id FROM '||v_edit||'node JOIN cat_node c ON id=nodecat_id JOIN cat_feature_node n ON n.id=c.nodetype_id
@@ -193,7 +193,7 @@ BEGIN
 		active FROM '||v_edit||'sector WHERE graphconfig IS NOT NULL )a USING (node_id)) a USING (node_id) WHERE graph_delimiter=''SECTOR'' AND (a.node_id IS NULL
 		OR node_id NOT IN (SELECT (json_array_elements_text((graphconfig::json->>''ignore'')::json))::text FROM '||v_edit||'sector WHERE active IS TRUE))
 		AND '||v_edit||'node.state > 0';
-	
+
 
 	END IF;
 
@@ -205,12 +205,12 @@ BEGIN
 		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 
 		IF v_count > 0 THEN
-			INSERT INTO temp_audit_check_data (fid, criticity, result_id, error_message, fcount) 
+			INSERT INTO temp_audit_check_data (fid, criticity, result_id, error_message, fcount)
 			VALUES (v_fid, 3, '269', concat('ERROR-269: There is/are ',v_count, ' dma on dma table with graphconfig not configured.'),v_count);
 		ELSE
-			INSERT INTO temp_audit_check_data (fid, criticity, result_id, error_message, fcount) 
+			INSERT INTO temp_audit_check_data (fid, criticity, result_id, error_message, fcount)
 			VALUES (v_fid, 1, '269','INFO: All dma has graphconfig values not null.',v_count);
-		END IF;	
+		END IF;
 
 		-- dma : check coherence against nodetype.graphdelimiter and nodeparent defined on dma.graphconfig (fid:  180)
 		v_querytext ='SELECT node_id, nodecat_id, the_geom, a.active, '||v_edit||'node.expl_id FROM '||v_edit||'node JOIN cat_node c ON id=nodecat_id JOIN cat_feature_node n ON n.id=c.nodetype_id
@@ -223,7 +223,7 @@ BEGIN
 		IF v_count > 0 THEN
 			EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a WHERE active IS NULL') INTO v_count;
 			IF v_count > 0 THEN
-				EXECUTE concat 
+				EXECUTE concat
 				('INSERT INTO temp_anl_node (fid, node_id, nodecat_id, descript, the_geom, expl_id) 
 				SELECT 180, node_id, nodecat_id, ''cat_feature_node.graph_delimiter is DMA but node is not configured on dma.graphconfig'', the_geom,expl_id 
 				FROM (', v_querytext,')a WHERE active IS NULL');
@@ -233,7 +233,7 @@ BEGIN
 			END IF;
 			EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a WHERE active IS FALSE') INTO v_count;
 			IF v_count > 0 THEN
-				EXECUTE concat 
+				EXECUTE concat
 				('INSERT INTO temp_anl_node (fid, node_id, nodecat_id, descript, the_geom, expl_id) 
 				SELECT 180, node_id, nodecat_id, ''cat_feature_node.graph_delimiter is DMA but node is configured for unactive mapzone'', the_geom,expl_id 
 				FROM (', v_querytext,')a WHERE active IS FALSE');
@@ -245,7 +245,7 @@ BEGIN
 			INSERT INTO temp_audit_check_data (fid, criticity, result_id, error_message, fcount)
 			VALUES (v_fid, 1, '180','INFO: All nodes with cat_feature_node.graphdelimiter=''DMA'' are defined as nodeParent on dma.graphconfig',v_count);
 		END IF;
-		
+
 		-- dma, toArc (fid:  84)
 	END IF;
 
@@ -257,12 +257,12 @@ BEGIN
 		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 
 		IF v_count > 0 THEN
-			INSERT INTO temp_audit_check_data (fid, criticity, result_id, error_message, fcount) 
+			INSERT INTO temp_audit_check_data (fid, criticity, result_id, error_message, fcount)
 			VALUES (v_fid, 3, '270', concat('ERROR-270: There is/are ',v_count, ' dqa on dqa table with graphconfig not configured.'),v_count);
 		ELSE
-			INSERT INTO temp_audit_check_data (fid, criticity, result_id, error_message, fcount) 
+			INSERT INTO temp_audit_check_data (fid, criticity, result_id, error_message, fcount)
 			VALUES (v_fid, 1, '270','INFO: All dqa has graphconfig values not null.',v_count);
-		END IF;	
+		END IF;
 
 		-- dqa : check coherence against nodetype.graphdelimiter and nodeparent defined on dqa.graphconfig (fid:  181)
 		v_querytext = 'SELECT node_id, nodecat_id, the_geom, a.active,  '||v_edit||'node.expl_id FROM '||v_edit||'node JOIN cat_node c ON id=nodecat_id JOIN cat_feature_node n ON n.id=c.nodetype_id
@@ -276,7 +276,7 @@ BEGIN
 		IF v_count > 0 THEN
 			EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a WHERE active IS NULL') INTO v_count;
 			IF v_count > 0 THEN
-				EXECUTE concat 
+				EXECUTE concat
 				('INSERT INTO temp_anl_node (fid, node_id, nodecat_id, descript, the_geom, expl_id) 
 				SELECT 181, node_id, nodecat_id, ''cat_feature_node.graph_delimiter is DQA but node is not configured on dqa.graphconfig'', the_geom, expl_id 
 				FROM (', v_querytext,')a');
@@ -286,7 +286,7 @@ BEGIN
 			END IF;
 			EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a WHERE active IS FALSE') INTO v_count;
 			IF v_count > 0 THEN
-				EXECUTE concat 
+				EXECUTE concat
 				('INSERT INTO temp_anl_node (fid, node_id, nodecat_id, descript, the_geom, expl_id) 
 				SELECT 181, node_id, nodecat_id, ''cat_feature_node.graph_delimiter is DQA but node is configured for unactive mapzone'', the_geom, expl_id 
 				FROM (', v_querytext,')a WHERE active IS FALSE');
@@ -306,16 +306,16 @@ BEGIN
 	IF v_presszone IS TRUE AND (v_graphclass = 'PRESSZONE' OR v_graphclass = 'ALL') THEN
 
 		-- check presszone.graphconfig values
-		v_querytext = 'SELECT * FROM v_edit_presszone WHERE graphconfig IS NULL and presszone_id > 0::text AND active IS TRUE' ;
+		v_querytext = 'SELECT * FROM v_edit_presszone WHERE graphconfig IS NULL and presszone_id > 0 AND active IS TRUE' ;
 		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 
 		IF v_count > 0 THEN
-			INSERT INTO temp_audit_check_data (fid, criticity, result_id, error_message, fcount) 
+			INSERT INTO temp_audit_check_data (fid, criticity, result_id, error_message, fcount)
 			VALUES (v_fid, 3, '271', concat('ERROR-271: There is/are ',v_count, ' presszone on presszone table with graphconfig not configured.'),v_count);
 		ELSE
-			INSERT INTO temp_audit_check_data (fid, criticity, result_id, error_message, fcount) 
+			INSERT INTO temp_audit_check_data (fid, criticity, result_id, error_message, fcount)
 			VALUES (v_fid, 1, '271','INFO: All presszones has graphconfig values not null.',v_count);
-		END IF;	
+		END IF;
 
 		-- presszone : check coherence between nodetype.graphdelimiter and nodeparent defined on presszone.graphconfig (fid:  182)
 		v_querytext = 'SELECT node_id, nodecat_id, the_geom, a.active,'||v_edit||'node.expl_id FROM '||v_edit||'node JOIN cat_node c ON id=nodecat_id JOIN cat_feature_node n ON n.id=c.nodetype_id
@@ -328,7 +328,7 @@ BEGIN
 		IF v_count > 0 THEN
 			EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a WHERE active IS NULL') INTO v_count;
 			IF v_count > 0 THEN
-				EXECUTE concat 
+				EXECUTE concat
 				('INSERT INTO temp_anl_node (fid, node_id, nodecat_id, descript, the_geom, expl_id) 
 				SELECT 182, node_id, nodecat_id, ''cat_feature_node.graph_delimiter is PRESSZONE but node is not configured on presszone.graphconfig'', the_geom, expl_id 
 				FROM (', v_querytext,')a');
@@ -338,7 +338,7 @@ BEGIN
 			END IF;
 			EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a WHERE active IS FALSE') INTO v_count;
 			IF v_count > 0 THEN
-				EXECUTE concat 
+				EXECUTE concat
 				('INSERT INTO temp_anl_node (fid, node_id, nodecat_id, descript, the_geom, expl_id) 
 				SELECT 182, node_id, nodecat_id, ''cat_feature_node.graph_delimiter is PRESSZONE but node is configured for unactive mapzone'', the_geom, expl_id 
 				FROM (', v_querytext,')a WHERE active IS FALSE');
@@ -355,22 +355,22 @@ BEGIN
 
 	--Check if presszone_id is a numeric value (fid 460)
 	IF v_graphclass = 'PRESSZONE' OR v_graphclass = 'ALL' THEN
-		v_querytext = 'SELECT presszone_id FROM presszone WHERE presszone_id!=''-1'' AND presszone_id ~''^\d+(\.\d+)?$'' is false' ;
+		v_querytext = 'SELECT presszone_id FROM presszone WHERE presszone_id != -1 AND presszone_id::text ~''^\d+(\.\d+)?$'' is false' ;
 		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 
 		IF v_count > 0 THEN
-			INSERT INTO temp_audit_check_data (fid, criticity, result_id, error_message, fcount) 
+			INSERT INTO temp_audit_check_data (fid, criticity, result_id, error_message, fcount)
 			VALUES (v_fid, 3, '460', concat('ERROR-460: There is/are ',v_count, ' presszone with id that is not a numeric value.'),v_count);
 		ELSE
-			INSERT INTO temp_audit_check_data (fid, criticity, result_id, error_message, fcount) 
+			INSERT INTO temp_audit_check_data (fid, criticity, result_id, error_message, fcount)
 			VALUES (v_fid, 1, '460','INFO: All presszone_ids are numeric values.',v_count);
-		END IF;	
-	END IF;	
+		END IF;
+	END IF;
 
 	--Check if defined nodes and arcs exist in a database (fid 367)
 
 	FOR rec IN SELECT unnest(ARRAY['sector', 'dma', 'dqa', 'presszone']) LOOP
-	
+
 		v_querytext = 'SELECT b.arc_id, b.'||rec||'_id as zone_id FROM (
 		SELECT '||rec||'_id, json_array_elements_text(((json_array_elements_text((graphconfig::json->>''use'')::json))::json->>''toArc'')::json) as arc_id FROM '||v_edit||rec||')b 
 		WHERE arc_id not in (select arc_id FROM arc WHERE state=1)';
@@ -409,15 +409,15 @@ BEGIN
 		-- remove anl tables
 		DELETE FROM temp_anl_node WHERE fid = v_record.fid AND cur_user = current_user;
 
-		DELETE FROM temp_audit_check_data WHERE result_id::text = v_record.fid::text AND cur_user = current_user AND fid = v_fid;		
+		DELETE FROM temp_audit_check_data WHERE result_id::text = v_record.fid::text AND cur_user = current_user AND fid = v_fid;
 	END LOOP;
 
-	
+
 	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, '');
 	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 3, '');
 	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 2, '');
 	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 1, '');
-	
+
 	IF v_fid = 211 THEN
 
 		-- delete old values on result table
@@ -427,7 +427,7 @@ BEGIN
 		INSERT INTO anl_node SELECT * FROM temp_anl_node;
 		INSERT INTO audit_check_data SELECT * FROM temp_audit_check_data;
 
-	ELSIF  v_fid = 101 THEN 
+	ELSIF  v_fid = 101 THEN
 		UPDATE temp_audit_check_data SET fid = 211;
 
 		INSERT INTO project_temp_audit_check_data SELECT * FROM temp_audit_check_data;
@@ -437,12 +437,12 @@ BEGIN
 
 	-- get results
 	-- info
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, error_message as message FROM temp_audit_check_data WHERE cur_user="current_user"() AND 
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
+	FROM (SELECT id, error_message as message FROM temp_audit_check_data WHERE cur_user="current_user"() AND
 	fid=211 order by criticity desc, id asc) row;
-	v_result := COALESCE(v_result, '{}'); 
+	v_result := COALESCE(v_result, '{}');
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
-	
+
 	--points
 	v_result = null;
 	SELECT jsonb_agg(features.feature) INTO v_result
@@ -455,21 +455,21 @@ BEGIN
   	FROM (SELECT id, node_id as feature_id, nodecat_id as feature_catalog, state, expl_id, descript,fid, the_geom
   	FROM  temp_anl_node WHERE cur_user="current_user"() AND fid IN (176,180,181,182,208,209)) row) features;
 
-	v_result := COALESCE(v_result, '{}'); 
+	v_result := COALESCE(v_result, '{}');
 
 
-	IF v_result = '{}' THEN 
+	IF v_result = '{}' THEN
 		v_result_point = '{"geometryType":"", "values":[]}';
-	ELSE 
+	ELSE
 		v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}');
 	END IF;
-	
+
 	--    Control nulls
-	v_result_info := COALESCE(v_result_info, '{}'); 
-	v_result_point := COALESCE(v_result_point, '{}'); 
-	v_result_line := COALESCE(v_result_line, '{}'); 
-	v_result_polygon := COALESCE(v_result_polygon, '{}'); 
-	
+	v_result_info := COALESCE(v_result_info, '{}');
+	v_result_point := COALESCE(v_result_point, '{}');
+	v_result_line := COALESCE(v_result_line, '{}');
+	v_result_polygon := COALESCE(v_result_polygon, '{}');
+
 	IF v_fid = 211 OR v_fid = 101 THEN
 		--DROP temp tables
 		DROP TABLE IF EXISTS temp_anl_node ;
