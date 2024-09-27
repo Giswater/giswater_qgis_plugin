@@ -12,7 +12,7 @@ def replace_vars_in_file(file_path: str, replacements: dict) -> None:
 def main(project_type: str):
     sql_dir = './'
     replacements = {
-        'SCHEMA_NAME': f'{project_type}_36',
+        'SCHEMA_NAME': f'{project_type}_40',
         'SRID_VALUE': '25831',
         # Add more replacements as needed
     }

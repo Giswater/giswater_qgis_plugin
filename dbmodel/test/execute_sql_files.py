@@ -63,8 +63,6 @@ def main(project_type: str) -> None:
                         if file.endswith(".sql"):
                             file_path = os.path.join(root, file)
                             execute_sql_file(conn, file_path)
-    else:
-        logger.warning(f"Directory {updates_dir} does not exist")
 
     logger.info(f"PERFORM lastprocess:")
     # Execute last process command
