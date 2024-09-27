@@ -76,6 +76,8 @@ ALTER TABLE _dma DROP CONSTRAINT dma_expl_id_fkey;
 ALTER TABLE _dma DROP CONSTRAINT dma_macrodma_id_fkey;
 ALTER TABLE _dma DROP CONSTRAINT dma_pattern_id_fkey;
 
+ALTER SEQUENCE SCHEMA_NAME.dma_dma_id_seq RENAME TO dma_dma_id_seq1;
+
 DROP RULE IF EXISTS dma_conflict ON _dma;
 DROP RULE IF EXISTS dma_del_conflict ON _dma;
 DROP RULE IF EXISTS dma_del_undefined ON _dma;
@@ -99,6 +101,8 @@ ALTER TABLE _dqa DROP CONSTRAINT dqa_expl_id_fkey;
 ALTER TABLE _dqa DROP CONSTRAINT dqa_macrodqa_id_fkey;
 ALTER TABLE _dqa DROP CONSTRAINT dqa_pattern_id_fkey;
 
+ALTER SEQUENCE SCHEMA_NAME.dqa_dqa_id_seq RENAME TO dqa_dqa_id_seq1;
+
 ALTER TABLE arc DROP CONSTRAINT arc_sector_id_fkey;
 ALTER TABLE config_user_x_sector DROP CONSTRAINT config_user_x_sector_sector_id_fkey;
 ALTER TABLE connec DROP CONSTRAINT connec_sector_id_fkey;
@@ -119,6 +123,8 @@ ALTER TABLE sector RENAME TO _sector;
 ALTER TABLE _sector DROP CONSTRAINT sector_pkey;
 ALTER TABLE _sector DROP CONSTRAINT sector_macrosector_id_fkey;
 ALTER TABLE _sector DROP CONSTRAINT sector_pattern_id_fkey;
+
+ALTER SEQUENCE SCHEMA_NAME.sector_sector_id_seq RENAME TO sector_sector_id_seq1;
 
 DROP RULE IF EXISTS sector_conflict ON _sector;
 DROP RULE IF EXISTS sector_del_conflict ON _sector;
