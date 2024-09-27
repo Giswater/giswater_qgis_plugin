@@ -19,9 +19,9 @@ SELECT is((SELECT count(*)::integer FROM v_edit_minsector WHERE code = '-901'), 
 SELECT is((SELECT count(*)::integer FROM minsector WHERE code = '-901'), 1, 'INSERT: minsector -901 was inserted');
 
 
-UPDATE v_edit_minsector SET code = 'updated code' WHERE code = '-901';
-SELECT is((SELECT code FROM v_edit_minsector WHERE code = '-901'), 'updated code', 'UPDATE: v_edit_minsector -901 was updated');
-SELECT is((SELECT code FROM minsector WHERE code = '-901'), 'updated code', 'UPDATE: minsector -901 was updated');
+UPDATE v_edit_minsector SET descript = 'updated descript' WHERE code = '-901';
+SELECT is((SELECT descript FROM v_edit_minsector WHERE code = '-901'), 'updated descript', 'UPDATE: v_edit_minsector -901 was updated');
+SELECT is((SELECT descript FROM minsector WHERE code = '-901'), 'updated descript', 'UPDATE: minsector -901 was updated');
 
 
 DELETE FROM v_edit_minsector WHERE code = '-901';
