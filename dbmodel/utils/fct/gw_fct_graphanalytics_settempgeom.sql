@@ -97,7 +97,7 @@ BEGIN
                     SELECT '||quote_ident(v_field)||', ST_Buffer(ST_Collect(the_geom), '||v_geomparamupdate||') AS geom FROM temp_pgr_arc a
                     WHERE '||quote_ident(v_field)||'::INTEGER > 0 GROUP BY '||quote_ident(v_field)||'
                     UNION
-                    SELECT '||quote_ident(v_field)||', ST_Collect(ext_plot.the_geom) AS geom FROM temp_t_connec a, ext_plot 
+                    SELECT '||quote_ident(v_field)||', ST_Collect(ext_plot.the_geom) AS geom FROM temp_pgr_connec a, ext_plot 
                     WHERE '||quote_ident(v_field)||'::INTEGER > 0 AND ST_DWithin(a.the_geom, ext_plot.the_geom, 0.001) GROUP BY '||quote_ident(v_field)||'	
                 ) a GROUP BY '||quote_ident(v_field)||'
             ) b 
@@ -116,17 +116,17 @@ BEGIN
                     SELECT '||quote_ident(v_field)||', ST_Buffer(ST_Collect(the_geom), '||v_geomparamupdate||') AS geom FROM temp_pgr_arc a 
                     WHERE a.'||quote_ident(v_field)||'::INTEGER > 0 GROUP BY '||quote_ident(v_field)||'
                     UNION
-                    SELECT a.'||quote_ident(v_field)||', (ST_Buffer(ST_Collect(temp_t_link.the_geom),'||v_geomparamupdate_divide||',''endcap=flat join=round'')) 
-                    AS geom FROM temp_t_link, temp_t_connec a
+                    SELECT a.'||quote_ident(v_field)||', (ST_Buffer(ST_Collect(temp_pgr_link.the_geom),'||v_geomparamupdate_divide||',''endcap=flat join=round'')) 
+                    AS geom FROM temp_pgr_link, temp_pgr_connec a
                     WHERE a.'||quote_ident(v_field)||'::INTEGER > 0
-                    AND temp_t_link.feature_id = connec_id AND temp_t_link.feature_type = ''CONNEC''
+                    AND temp_pgr_link.feature_id = connec_id AND temp_pgr_link.feature_type = ''CONNEC''
                     GROUP BY a.'||quote_ident(v_field)||'
                     UNION
-                    SELECT a.'||quote_ident(v_field)||', (ST_Buffer(ST_Collect(temp_t_link.the_geom),'||v_geomparamupdate_divide||',''endcap=flat join=round'')) 
-                    AS geom FROM temp_t_link, temp_t_connec a
+                    SELECT a.'||quote_ident(v_field)||', (ST_Buffer(ST_Collect(temp_pgr_link.the_geom),'||v_geomparamupdate_divide||',''endcap=flat join=round'')) 
+                    AS geom FROM temp_pgr_link, temp_pgr_connec a
                     JOIN temp_pgr_node n ON a.arc_id IS NULL AND n.node_id = a.pjoint_id
                     WHERE a.'||quote_ident(v_field)||'::INTEGER > 0 
-                    AND temp_t_link.feature_id = connec_id AND temp_t_link.feature_type = ''CONNEC''
+                    AND temp_pgr_link.feature_id = connec_id AND temp_pgr_link.feature_type = ''CONNEC''
                     GROUP BY a.'||quote_ident(v_field)||'
                 ) c GROUP BY '||quote_ident(v_field)||'
             ) b
