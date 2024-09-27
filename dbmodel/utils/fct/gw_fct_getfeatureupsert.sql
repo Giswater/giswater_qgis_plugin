@@ -116,7 +116,7 @@ v_edit_insert_elevation_from_dem boolean=false;
 v_noderecord1 record;
 v_noderecord2 record;
 v_input json;
-v_presszone_id text;
+v_presszone_id int;
 v_widgetvalues json;
 v_automatic_ccode boolean;
 v_automatic_ccode_field text;
