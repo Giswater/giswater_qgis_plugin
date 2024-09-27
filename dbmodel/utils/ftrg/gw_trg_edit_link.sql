@@ -64,7 +64,7 @@ v_ispresszone boolean;
 v_fluidtype text;
 v_expl integer;
 v_sector integer;
-v_presszone text;
+v_presszone integer;
 v_dma integer;
 v_dqa integer;
 v_minsector integer;

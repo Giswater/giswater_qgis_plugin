@@ -16,6 +16,9 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_node('parent');
 CREATE TRIGGER gw_trg_edit_connec INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_connec
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_connec('parent');
 
+CREATE TRIGGER gw_trg_edit_sector INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_sector
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_sector('parent');
+
 CREATE TRIGGER gw_trg_edit_element_pol INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_pol_element
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_element_pol();
 

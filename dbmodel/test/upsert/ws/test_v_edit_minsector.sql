@@ -12,21 +12,21 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 SELECT plan(6);
 
-INSERT INTO v_edit_minsector 
-(minsector_id, code, dma_id, dqa_id, presszone_id, expl_id, num_border, num_connec, num_hydro, length, descript, addparam, the_geom) 
-VALUES(-901, '', 0, 0, '1', 0, 0, 0, 0, 0, '', null, null);
-SELECT is((SELECT count(*)::integer FROM v_edit_minsector WHERE minsector_id = -901), 1, 'INSERT: v_edit_minsector -901 was inserted');
-SELECT is((SELECT count(*)::integer FROM minsector WHERE minsector_id = -901), 1, 'INSERT: minsector -901 was inserted');
+INSERT INTO v_edit_minsector
+(minsector_id, code, dma_id, dqa_id, presszone_id, expl_id, num_border, num_connec, num_hydro, length, descript, addparam, the_geom)
+VALUES(-901, '-901', 0, 0, 1, 0, 0, 0, 0, 0, '', null, null);
+SELECT is((SELECT count(*)::integer FROM v_edit_minsector WHERE code = '-901'), 1, 'INSERT: v_edit_minsector -901 was inserted');
+SELECT is((SELECT count(*)::integer FROM minsector WHERE code = '-901'), 1, 'INSERT: minsector -901 was inserted');
 
 
-UPDATE v_edit_minsector SET code = 'updated code' WHERE minsector_id = -901;
-SELECT is((SELECT code FROM v_edit_minsector WHERE minsector_id = -901), 'updated code', 'UPDATE: v_edit_minsector -901 was updated');
-SELECT is((SELECT code FROM minsector WHERE minsector_id = -901), 'updated code', 'UPDATE: minsector -901 was updated');
+UPDATE v_edit_minsector SET code = 'updated code' WHERE code = '-901';
+SELECT is((SELECT code FROM v_edit_minsector WHERE code = '-901'), 'updated code', 'UPDATE: v_edit_minsector -901 was updated');
+SELECT is((SELECT code FROM minsector WHERE code = '-901'), 'updated code', 'UPDATE: minsector -901 was updated');
 
 
-DELETE FROM v_edit_minsector WHERE minsector_id = -901;
-SELECT is((SELECT count(*)::integer FROM v_edit_minsector WHERE minsector_id = -901), 0, 'DELETE: v_edit_minsector -901 was deleted');
-SELECT is((SELECT count(*)::integer FROM minsector WHERE minsector_id = -901), 0, 'DELETE: minsector -901 was deleted');
+DELETE FROM v_edit_minsector WHERE code = '-901';
+SELECT is((SELECT count(*)::integer FROM v_edit_minsector WHERE code = '-901'), 0, 'DELETE: v_edit_minsector -901 was deleted');
+SELECT is((SELECT count(*)::integer FROM minsector WHERE code = '-901'), 0, 'DELETE: minsector -901 was deleted');
 
 
 SELECT * FROM finish();
