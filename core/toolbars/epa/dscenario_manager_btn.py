@@ -925,7 +925,7 @@ class GwDscenarioManagerButton(GwAction):
 
         # Get layers to add
         lyr_filter = f"{table_name}%"
-        sql = f"SELECT id, alias, style_id, addparam FROM sys_table WHERE id LIKE '{lyr_filter}' AND alias IS NOT NULL ORDER BY alias ASC"
+        sql = f"SELECT id, alias, addparam FROM sys_table WHERE id LIKE '{lyr_filter}' AND alias IS NOT NULL ORDER BY alias ASC"
         rows = tools_db.get_rows(sql)
 
         if rows:
@@ -939,13 +939,10 @@ class GwDscenarioManagerButton(GwAction):
             main_menu.addAction(widgetAction)
 
             # LAYERS
-            for tablename, alias, style_id, addparam in rows:
+            for tablename, alias, addparam in rows:
                 # Manage alias
                 if not alias:
                     alias = tablename.replace('v_edit_inp_dscenario_', '').replace('_', ' ').capitalize()
-                # Manage style_id
-                if not style_id:
-                    style_id = "-1"
                 # Manage pkey
                 pk = "id"
                 if addparam:
@@ -968,7 +965,7 @@ class GwDscenarioManagerButton(GwAction):
                 widget.setStyleSheet("margin: 5px 5px 5px 8px;")
 
                 widgetAction.defaultWidget().stateChanged.connect(
-                    partial(self._check_action_ischecked, tablename, the_geom, pk, style_id, alias.strip(), sub_group))
+                    partial(self._check_action_ischecked, tablename, the_geom, pk, -1, alias.strip(), sub_group))
 
         main_menu.exec_(click_point)
 
