@@ -215,7 +215,6 @@ CREATE TABLE sector (
 	sector_id serial4 NOT NULL,
 	"name" varchar(50) NOT NULL,
 	sector_type varchar(16) NULL,
-	sector int4[] NULL,
     muni int4[] NULL,
     expl int4[] NULL,
 	macrosector_id int4 NULL,
