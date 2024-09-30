@@ -17,7 +17,7 @@ $BODY$
 
 -- MODE 1: individual
 SELECT SCHEMA_NAME.gw_fct_setarcdivide($${
-"client":{"device":4, "infoType":1, "lang":"ES"}, "feature":{"id":["269951"]}, "data":{}}$$)
+"client":{"device":4, "infoType":1, "lang":"ES"}, "feature":{"id":["269951"]}, "data":{"skipInitEndMessage":true}}$$)
 
 -- MODE 2: massive using id as array
 SELECT SCHEMA_NAME.gw_fct_setarcdivide($${
@@ -73,6 +73,7 @@ v_arc_code text;
 v_count integer;
 v_count_connec integer=0;
 v_count_gully integer=0;
+v_skipinitendmessage boolean;
 
 rec_link record;
 rec_visit record;
@@ -127,9 +128,9 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 	v_schemaname = 'SCHEMA_NAME';
 
-
 	-- Get parameters from input json
 	v_array_node_id = lower(((p_data ->>'feature')::json->>'id')::text);
+	v_skipinitendmessage = lower(((p_data ->>'data')::json->>'skipInitEndMessage')::boolean);
 
 	v_node_id = (SELECT json_array_elements_text(v_array_node_id));
 	-- Get project type
@@ -177,8 +178,12 @@ BEGIN
 		"data":{"message":"1052", "function":"2114","debug_msg":null, "is_process":true}}$$);' INTO v_audit_result;
 	ELSE
 
+		
 		-- Control if node divides arc
-		IF v_isarcdivide=TRUE THEN
+		IF v_isarcdivide=TRUE then
+		
+			-- update arc_id null in case the node has related the arc_id
+			UPDATE node set arc_id = null where node_id = v_node_id and arc_id is not NULL;
 
 			-- Check if it's a end/start point node in case of wrong topology without start or end nodes
 			SELECT arc_id INTO v_arc_id FROM v_edit_arc WHERE ST_DWithin(ST_startpoint(the_geom), v_node_geom, v_arc_searchnodes) OR ST_DWithin(ST_endpoint(the_geom), v_node_geom, v_arc_searchnodes) LIMIT 1;
@@ -219,11 +224,16 @@ BEGIN
 				v_line1 := ST_LineSubstring(v_arc_geom, 0.0, v_intersect_loc);
 				v_line2 := ST_LineSubstring(v_arc_geom, v_intersect_loc, 1.0);
 
-				-- Check if any of the 'lines' are in fact a point
+				-- Check if any of the 'lines' are in fact a point AS a result to be placed on the initY
 				IF (ST_GeometryType(v_line1) = 'ST_Point') OR (ST_GeometryType(v_line2) = 'ST_Point') THEN
-
-					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-					"data":{"message":"3094", "function":"2114","debug_msg":null, "is_process":true}}$$);' INTO v_audit_result;
+	
+					IF v_skipinitendmessage THEN
+					
+					ELSE 
+						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+						"data":{"message":"3094", "function":"2114","debug_msg":null, "is_process":true}}$$);' INTO v_audit_result;
+					END;
+					
 				ELSE
 					-- check if there are not-selected psector affecting connecs
 					IF (SELECT count (*) FROM plan_psector_x_connec JOIN plan_psector USING (psector_id)
@@ -581,7 +591,7 @@ BEGIN
 							UPDATE gully SET arc_id = v_arc_closest WHERE arc_id = v_arc_id AND gully_id = rec_link.feature_id;
 							UPDATE link SET exit_id = v_arc_closest WHERE link_id = rec_link.link_id;
 						END LOOP;
-
+							
 						-- reconnect connecs without link but with arc_id
 						FOR rec_connec IN SELECT connec_id FROM connec WHERE arc_id=v_arc_id AND state = 1 AND pjoint_type='ARC'
 						AND connec_id NOT IN (SELECT DISTINCT feature_id FROM link WHERE exit_id=v_arc_id)
@@ -1101,15 +1111,6 @@ BEGIN
 		UPDATE arc SET y2=null, custom_y2=null WHERE arc_id = rec_aux1.arc_id;
 		UPDATE arc SET y1=null, custom_y1=null WHERE arc_id = rec_aux2.arc_id;
 		update config_param_system set value = true WHERE parameter='edit_state_topocontrol' ;
-	END IF;
-
-	--last process
-	UPDATE node SET arc_id=NULL WHERE node_id=v_node_id;
-	UPDATE node SET sector_id = rec_aux1.sector_id, dma_id = rec_aux1.dma_id WHERE node_id=v_node_id;
-
-	IF v_project_type ='WS' THEN
-		UPDATE node SET presszone_id = rec_aux1.presszone_id, dqa_id = rec_aux1.dqa_id, minsector_id = rec_aux1.minsector_id
-		WHERE node_id=v_node_id;
 	END IF;
 
 	-- get results
