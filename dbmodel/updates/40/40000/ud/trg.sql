@@ -13,9 +13,6 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_element('element');
 CREATE TRIGGER gw_trg_edit_samplepoint INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_samplepoint
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_samplepoint('samplepoint');
 
-CREATE TRIGGER gw_trg_edit_streetaxis INSTEAD OF INSERT OR DELETE OR UPDATE ON v_ext_streetaxis
-FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_streetaxis();
-
 CREATE TRIGGER gw_trg_edit_arc INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_arc
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_arc('parent');
 
