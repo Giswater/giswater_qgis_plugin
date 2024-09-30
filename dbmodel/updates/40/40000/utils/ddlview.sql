@@ -184,6 +184,15 @@ DROP view IF EXISTS v_edit_link_gully;
 DROP VIEW IF EXISTS v_edit_minsector;
 DROP VIEW IF EXISTS v_edit_samplepoint;
 
+DROP VIEW IF EXISTS v_plan_psector_gully;
+DROP VIEW IF EXISTS v_ui_element_x_gully;
+DROP VIEW IF EXISTS vi_gully2node;
+DROP VIEW IF EXISTS ve_pol_gully;
+DROP VIEW IF EXISTS v_edit_inp_gully;
+
+DROP VIEW IF EXISTS v_edit_gully;
+DROP VIEW IF EXISTS v_edit_element;
+
 DROP view IF EXISTS vu_link;
 DROP view IF EXISTS vu_link_connec;
 DROP view IF EXISTS vu_link_gully;
@@ -201,7 +210,6 @@ DROP VIEW IF EXISTS vu_dqa;
 
 DROP VIEW IF EXISTS v_state_link;
 DROP VIEW IF EXISTS v_state_connec;
-
 
 DROP VIEW IF EXISTS v_edit_pond;
 DROP VIEW IF EXISTS v_edit_pool;
