@@ -232,7 +232,7 @@ BEGIN
 					ELSE 
 						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 						"data":{"message":"3094", "function":"2114","debug_msg":null, "is_process":true}}$$);' INTO v_audit_result;
-					END;
+					END IF;
 					
 				ELSE
 					-- check if there are not-selected psector affecting connecs
