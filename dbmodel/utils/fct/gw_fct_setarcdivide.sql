@@ -16,18 +16,13 @@ $BODY$
 -- fid: 212
 
 -- MODE 1: individual
-SELECT SCHEMA_NAME.gw_fct_setarcdivide($${
-"client":{"device":4, "infoType":1, "lang":"ES"}, "feature":{"id":["269951"]}, "data":{"skipInitEndMessage":true}}$$)
+SELECT SCHEMA_NAME.gw_fct_setarcdivide($${"client":{"device":4, "infoType":1, "lang":"ES"}, "feature":{"id":["269951"]}}$$)
 
 -- MODE 2: massive using id as array
-SELECT SCHEMA_NAME.gw_fct_setarcdivide($${
-"client":{"device":4, "infoType":1, "lang":"ES"}, "feature":{"id":
-"SELECT array_to_json(array_agg(node_id::text)) FROM node JOIN ... WHERE ..."}, "data":{}}$$);
+SELECT SCHEMA_NAME.gw_fct_setarcdivide($${"feature":{"id":"SELECT array_to_json(array_agg(node_id::text)) FROM node JOIN ... WHERE ..."}, "data":{}}$$);
 
 -- MODE 3: massive usign pure SQL
-SELECT SCHEMA_NAME.gw_fct_setarcdivide(concat('
-{"client":{"device":4, "infoType":1, "lang":"ES"}, "feature":{"id":["',node_id,'"]},
-"data":{"filterFields":{}, "pageInfo":{}, "parameters":{}}}')::json) FROM node JOIN ... WHERE ...;
+SELECT SCHEMA_NAME.gw_fct_setarcdivide(concat('{"feature":{"id":["',node_id,'"]},"data":{"parameters":{"skipInitEndMessage":true}}}')::json) FROM node JOIN ... WHERE ...;
 
 */
 
@@ -130,7 +125,7 @@ BEGIN
 
 	-- Get parameters from input json
 	v_array_node_id = lower(((p_data ->>'feature')::json->>'id')::text);
-	v_skipinitendmessage = ((p_data ->>'data')::json->>'skipInitEndMessage')::boolean;
+	v_skipinitendmessage = (((p_data ->>'data')::json->>'parameters')::json->>'skipInitEndMessage')::boolean;
 
 	v_node_id = (SELECT json_array_elements_text(v_array_node_id));
 	-- Get project type
@@ -1086,12 +1081,29 @@ BEGIN
 					ELSE
 						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 						"data":{"message":"3044", "function":"2114","debug_msg":null, "is_process":true}}$$);' INTO v_audit_result;
+					END IF;
+					
+					-- set values of node
+					UPDATE node SET sector_id = rec_aux1.sector_id, dma_id = rec_aux1.dma_id WHERE node_id = v_node_id;
+					
+					IF v_project_type ='WS' THEN
+					
+						UPDATE node SET presszone_id = rec_aux1.presszone_id, dqa_id = rec_aux1.dqa_id, 
+						minsector_id = rec_aux1.minsector_id, macrominsector_id = rec_aux1.minsector_id WHERE node_id = v_node_id;
+				
+					ELSIF v_project_type ='UD' THEN
+					
+						-- set y1/y2 to null for those values related to new node
+						update config_param_system set value = false WHERE parameter='edit_state_topocontrol' ;
+						UPDATE arc SET y2=null, custom_y2=null WHERE arc_id = rec_aux1.arc_id;
+						UPDATE arc SET y1=null, custom_y1=null WHERE arc_id = rec_aux2.arc_id;
+						update config_param_system set value = true WHERE parameter='edit_state_topocontrol' ;
+					END IF;
+					
 				END IF;
-			END IF;
-		ELSE
-			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"3044", "function":"2114","debug_msg":null, "is_process":true}}$$);' INTO v_audit_result;
-
+			ELSE
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+					"data":{"message":"3044", "function":"2114","debug_msg":null, "is_process":true}}$$);' INTO v_audit_result;
 			END IF;
 		ELSE
 			IF v_node_type IS NOT NULL THEN
@@ -1105,13 +1117,6 @@ BEGIN
 		END IF;
 	END IF;
 
-	IF v_project_type ='UD' THEN
-		-- set y1/y2 to null for those values related to new node
-		update config_param_system set value = false WHERE parameter='edit_state_topocontrol' ;
-		UPDATE arc SET y2=null, custom_y2=null WHERE arc_id = rec_aux1.arc_id;
-		UPDATE arc SET y1=null, custom_y1=null WHERE arc_id = rec_aux2.arc_id;
-		update config_param_system set value = true WHERE parameter='edit_state_topocontrol' ;
-	END IF;
 
 	-- get results
 	-- info
@@ -1152,4 +1157,4 @@ BEGIN
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
-  COST 100;
+  COST 100;F
