@@ -30,10 +30,11 @@ BEGIN
 
     SET search_path = "SCHEMA_NAME", public;
 
-	EXECUTE 'SELECT lower(project_type) FROM sys_version ORDER BY "date" DESC LIMIT 1' INTO v_project_type;
-	IF v_project_type='ud' THEN v_reverse_cost=-1; END IF;
+    SELECT project_type INTO v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
 
-    EXECUTE 'SELECT LAST_VALUE FROM urn_id_seq' INTO v_id;
+    IF v_project_type = 'UD' THEN v_reverse_cost=-1; END IF;
+
+    SELECT LAST_VALUE into v_id FROM urn_id_seq;
 
     -- Disconnect arcs with modif=true at nodes with modif=true; a new arc N_new->N_original is created with the cost and reverse cost of the arc
     FOR v_record IN
