@@ -97,6 +97,47 @@ SELECT g.link_id FROM sp, se, cf, g JOIN l USING (link_id) WHERE g.psector_id = 
 AND l.expl_id = se.expl_id AND se.cur_user = CURRENT_USER::text AND cf.value is TRUE;
 
 
+CREATE OR REPLACE VIEW vu_dma
+AS SELECT
+    dma.dma_id,
+    dma.name,
+    dma.macrodma_id,
+    dma.dma_type,
+    dma.expl_id,
+    e.name as expl_name,
+    dma.descript,
+    dma.undelete,
+    dma.link,
+    dma.graphconfig::text,
+    dma.active,
+    dma.stylesheet,
+    dma.the_geom
+    FROM dma
+    LEFT JOIN exploitation e USING (expl_id)
+    ORDER BY 1;
+
+CREATE OR REPLACE VIEW v_edit_dma AS
+select vu_dma.* from vu_dma, selector_expl
+WHERE ((vu_dma.expl_id = selector_expl.expl_id) AND selector_expl.cur_user = "current_user"()::text) OR vu_dma.expl_id is null
+order by 1 asc;
+
+CREATE OR REPLACE VIEW v_edit_sector
+AS SELECT sector.sector_id,
+    sector.name,
+    sector.descript,
+    sector.macrosector_id,
+    sector.sector_type,
+    sector.the_geom,
+    sector.undelete,
+    sector.active,
+    sector.parent_id,
+    sector.graphconfig::text,
+    sector.stylesheet
+   FROM selector_sector,
+    sector
+  WHERE sector.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
+
+
 -- recreate v_edit_element, v_edit_samplepoint, v_ext_streetaxis, v_ext_municipality views
 -----------------------------------
 CREATE OR REPLACE VIEW v_edit_element AS
