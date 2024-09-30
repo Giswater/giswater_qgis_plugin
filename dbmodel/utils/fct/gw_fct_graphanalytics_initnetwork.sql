@@ -25,7 +25,12 @@ It is an auxiliary process used by macro_minsector, minsector, or mapzone that g
 DECLARE
 
     v_project_type TEXT;
-    v_expl_id TEXT; -- -9 for all explotations
+    v_expl_id_id TEXT;
+    v_macrominsector_id_node TEXT;
+    v_macrominsector_id_arc TEXT;
+    v_macrominsector_id_connec TEXT;
+    v_macrominsector_id_link TEXT;
+    v_macrominsector_id_gully TEXT;
     v_cost INTEGER = 1;
     v_reverse_cost INTEGER = 1;
 
@@ -35,14 +40,20 @@ BEGIN
 
     SELECT project_type INTO v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
 
-    v_expl = (SELECT (p_data::json->>'data')::json->>'expl_id');
+    v_expl_id = (SELECT (p_data::json->>'data')::json->>'expl_id');
+
+    IF v_expl_id = '-9' THEN
+        SELECT string_agg(expl_id::TEXT, ',') INTO v_expl_id FROM exploitation;
+    END IF;
+
+    SELECT string_agg(DISTINCT macrominsector_id::TEXT, ',') INTO v_macrominsector_id_node FROM node n WHERE n.expl_id IN (v_expl_id);
+    SELECT string_agg(DISTINCT macrominsector_id::TEXT, ',') INTO v_macrominsector_id_arc FROM arc a WHERE a.expl_id IN (v_expl_id);
+    SELECT string_agg(DISTINCT macrominsector_id::TEXT, ',') INTO v_macrominsector_id_connec FROM connec c WHERE c.expl_id IN (v_expl_id);
+    SELECT string_agg(DISTINCT macrominsector_id::TEXT, ',') INTO v_macrominsector_id_link FROM link l WHERE l.expl_id IN (v_expl_id);
 
     IF v_project_type = 'UD' THEN
         v_reverse_cost = -1;
-    END IF;
-
-    IF v_expl = '-9' THEN
-        v_expl = (SELECT string_agg(expl_id::TEXT, ',') FROM exploitation);
+        SELECT string_agg(DISTINCT macrominsector_id::TEXT, ',') INTO v_macrominsector_id_gully FROM gully g WHERE g.expl_id IN (v_expl_id);
     END IF;
 
     INSERT INTO temp_pgr_node (pgr_node_id, node_id)
@@ -50,11 +61,11 @@ BEGIN
         SELECT node_id::INT, node_id
         FROM
         (
-            SELECT node_id, state, state_type FROM node
+            SELECT node_id, state, state_type, macrominsector_id FROM node
         ) n
         JOIN value_state_type s ON s.id = n.state_type
         WHERE n.state = 1 AND s.is_operative = TRUE
-        AND n.expl_id IN (v_expl)
+        AND n.macrominsector_id IN (v_macrominsector_id_node)
     );
 
     INSERT INTO temp_pgr_arc (pgr_arc_id, arc_id, pgr_node_1, pgr_node_2, node_1, node_2, cost, reverse_cost, the_geom)
@@ -64,40 +75,45 @@ BEGIN
         JOIN value_state_type s ON s.id = a.state_type
         WHERE a.state = 1 AND s.is_operative = TRUE
         AND a.node_1 IS NOT NULL AND a.node_2 IS NOT NULL -- Avoids the crash of pgrouting functions
-        AND a.expl_id IN (v_expl)
+        AND a.macrominsector_id IN (v_macrominsector_id_arc)
     );
 
     INSERT INTO temp_pgr_connec (connec_id, arc_id, the_geom)
     (
         SELECT c.connec_id, c.arc_id, c.the_geom
-        FROM (
+        FROM
+        (
             SELECT connec_id, arc_id, state, state_type, the_geom FROM connec
-            ) c
+        ) c
         JOIN temp_pgr_arc a ON c.arc_id::INT = a.pgr_arc_id
-        JOIN value_state_type s ON s.id =c.state_type
-        WHERE c.state=1 AND s.is_operative =true
+        JOIN value_state_type s ON s.id = c.state_type
+        WHERE c.state = 1 AND s.is_operative = TRUE
+        AND c.macrominsector_id IN (v_macrominsector_id_connec)
     );
 
     INSERT INTO temp_pgr_link (link_id, feature_id, feature_type, the_geom)
     (
         SELECT link_id, feature_id, feature_type, the_geom
-        FROM (
-            select link_id, feature_id, feature_type, state, the_geom FROM link
-            ) l
+        FROM
+        (
+            SELECT link_id, feature_id, feature_type, state, the_geom FROM link
+        ) l
         JOIN temp_pgr_connec c ON l.feature_id=c.connec_id
-        WHERE l.state=1 AND l.feature_type='CONNEC'
+        WHERE l.state = 1 AND l.feature_type = 'CONNEC'
+        AND l.macrominsector_id IN (v_macrominsector_id_link)
     );
 
-    IF v_project_type='UD' THEN
+    IF v_project_type = 'UD' THEN
         INSERT INTO temp_pgr_gully (gully_id, arc_id, the_geom)
         (
             SELECT g.gully_id, g.arc_id, g.the_geom
             FROM (
                 SELECT gully_id, arc_id, state, state_type, the_geom FROM gully
-                ) g
-            JOIN temp_pgr_arc a ON g.arc_id::int = a.pgr_arc_id
-            JOIN value_state_type s ON s.id =g.state_type
-            WHERE g.state=1 AND s.is_operative =true
+            ) g
+            JOIN temp_pgr_arc a ON g.arc_id::INT = a.pgr_arc_id
+            JOIN value_state_type s ON s.id = g.state_type
+            WHERE g.state = 1 AND s.is_operative = TRUE
+            AND g.macrominsector_id IN (v_macrominsector_id_gully)
         );
 
         INSERT INTO temp_pgr_link (link_id, feature_id, feature_type, the_geom)
@@ -105,13 +121,14 @@ BEGIN
             SELECT link_id, feature_id, feature_type, the_geom
             FROM (
                 SELECT link_id, feature_id, feature_type, state, the_geom FROM link
-                ) l
+            ) l
             JOIN temp_pgr_gully g ON l.feature_id = g.gully_id
-            WHERE l.state=1 AND l.feature_type='GULLY'
+            WHERE l.state = 1 AND l.feature_type = 'GULLY'
+            AND l.macrominsector_id IN (v_macrominsector_id_link)
         );
     END IF;
 
-	RETURN ('{"status":"Accepted"}')::json;
+	RETURN ('{"status":"Accepted"}')::JSON;
 
 END;
 $BODY$
