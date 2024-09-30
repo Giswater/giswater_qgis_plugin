@@ -130,7 +130,7 @@ BEGIN
 
 	-- Get parameters from input json
 	v_array_node_id = lower(((p_data ->>'feature')::json->>'id')::text);
-	v_skipinitendmessage = lower(((p_data ->>'data')::json->>'skipInitEndMessage')::boolean);
+	v_skipinitendmessage = ((p_data ->>'data')::json->>'skipInitEndMessage')::boolean;
 
 	v_node_id = (SELECT json_array_elements_text(v_array_node_id));
 	-- Get project type
