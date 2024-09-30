@@ -119,8 +119,8 @@ BEGIN
 		v_arc_id = (SELECT arc_id FROM v_edit_arc WHERE st_dwithin(the_geom, NEW.the_geom, 0.01) AND state > 0 LIMIT 1);
 		IF v_arc_id IS NOT NULL THEN
 			NEW.arc_id = v_arc_id;
-			NEW.pjoint_id = NEW.connec_id;
-			NEW.pjoint_type = 'CONNEC';
+			NEW.pjoint_id = NEW.arc_id;
+			NEW.pjoint_type = 'ARC';
 			DELETE FROM link WHERE feature_id = NEW.connec_id;
 		END IF;
 	END IF;
