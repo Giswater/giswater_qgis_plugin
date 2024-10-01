@@ -1,0 +1,32 @@
+/*
+This file is part of Giswater 3
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+This version of Giswater is provided by Giswater Association
+*/
+BEGIN;
+
+-- Suppress NOTICE messages
+SET client_min_messages TO WARNING;
+
+SET search_path = "SCHEMA_NAME", public, pg_catalog;
+
+SELECT plan(6);
+
+INSERT INTO v_edit_inp_dscenario_controls (dscenario_id, sector_id,"text")
+VALUES(1, 0,'-901');
+SELECT is((SELECT count(*)::integer FROM v_edit_inp_dscenario_controls WHERE "text" = '-901'), 1, 'INSERT: v_edit_inp_dscenario_controls -901 was inserted');
+SELECT is((SELECT count(*)::integer FROM inp_dscenario_controls WHERE "text" = '-901'), 1, 'INSERT: inp_dscenario_controls -901 was inserted');
+
+UPDATE v_edit_inp_dscenario_controls SET active = true WHERE "text" = '-901';
+SELECT is((SELECT descript FROM v_edit_inp_dscenario_controls WHERE "text" = '-901'), 'updated descript', 'UPDATE: v_edit_inp_dscenario_controls -901 was updated');
+SELECT is((SELECT descript FROM inp_dscenario_controls WHERE "text" = '-901'), 'updated descript', 'UPDATE: inp_dscenario_controls -901 was updated');
+
+DELETE FROM v_edit_inp_dscenario_controls WHERE "text" = '-901';
+SELECT is((SELECT count(*)::integer FROM v_edit_inp_dscenario_controls WHERE "text" = '-901'), 0, 'DELETE: v_edit_inp_dscenario_controls -901 was deleted');
+SELECT is((SELECT count(*)::integer FROM inp_dscenario_controls WHERE "text" = '-901'), 0, 'DELETE: inp_dscenario_controls -901 was deleted');
+
+
+SELECT * FROM finish();
+
+
+ROLLBACK;
