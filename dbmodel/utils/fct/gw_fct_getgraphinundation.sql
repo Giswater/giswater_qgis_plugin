@@ -13,7 +13,11 @@ $BODY$
 
 DECLARE
     geojson_result json;
+	v_version text;
 BEGIN
+
+	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
+
     SELECT jsonb_build_object(
         'type', 'FeatureCollection',
         'features', jsonb_agg(jsonb_build_object(
@@ -35,7 +39,9 @@ BEGIN
     JOIN v_edit_arc b ON a.arc_id = b.arc_id
     WHERE a.cur_user = current_user;
 
-    RETURN geojson_result;
+    RETURN gw_fct_json_create_return((
+        '{"status":"Accepted", "message":{"level":1, "text":"Process done successfully"}, "version":"' || v_version || '", "body":{"form":{},"data":{"line":' || geojson_result || '}}}'
+    )::json, 3336, null, null, null);
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
