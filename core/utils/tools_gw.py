@@ -2582,7 +2582,10 @@ def manage_json_return(json_result, sql, rubber_band=None, i=None):
 
                     # Get values for create and populate layer
                     counter = len(json_result['body']['data'][key]['features'])
-                    geometry_type = json_result['body']['data'][key]['geometryType']
+                    geometry_type = json_result['body']['data'][key].get('geometryType')
+                    if not geometry_type and 'features' in json_result['body']['data'][key]:
+                        first_feature = json_result['body']['data'][key]['features'][0]
+                        geometry_type = first_feature.get('geometry', {}).get('type')
                     v_layer = QgsVectorLayer(f"{geometry_type}?crs=epsg:{srid}", layer_name, 'memory')
                     fill_layer_temp(v_layer, json_result['body']['data'], key, counter, sort_val=i)
 

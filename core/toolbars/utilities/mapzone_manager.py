@@ -14,7 +14,7 @@ from qgis.PyQt.QtGui import QCursor
 from qgis.PyQt.QtCore import Qt, QPoint, QDateTime, QDate, QTime, QVariant
 from qgis.PyQt.QtWidgets import QAction, QMenu, QTableView, QAbstractItemView, QGridLayout, QLabel, QWidget, QComboBox, QMessageBox
 from qgis.PyQt.QtSql import QSqlTableModel
-from qgis.core import QgsVectorLayer, QgsProject, QgsCoordinateReferenceSystem, QgsDateTimeRange, Qgis
+from qgis.core import QgsVectorLayer, QgsProject, QgsCoordinateReferenceSystem, QgsDateTimeRange, Qgis, QgsLineSymbol, QgsSingleSymbolRenderer
 
 from qgis.gui import QgsMapToolEmitPoint
 
@@ -23,7 +23,7 @@ from ...ui.ui_manager import GwMapzoneManagerUi, GwMapzoneConfigUi, GwInfoGeneri
 from ...utils.snap_manager import GwSnapManager
 from ...utils import tools_gw
 from .... import global_vars
-from ....libs import lib_vars, tools_qgis, tools_qt, tools_db, tools_os
+from ....libs import lib_vars, tools_qgis, tools_qt, tools_db, tools_os, tools_log
 
 
 class GwMapzoneManager:
@@ -83,7 +83,7 @@ class GwMapzoneManager:
         self.mapzone_mng_dlg.txt_name.textChanged.connect(partial(self._txt_name_changed))
         self.mapzone_mng_dlg.chk_show_all.toggled.connect(partial(self._manage_current_changed))
         self.mapzone_mng_dlg.btn_execute.clicked.connect(partial(self._open_mapzones_analysis))
-        self.mapzone_mng_dlg.btn_flood.clicked.connect(partial(self._open_flood_analysis))
+        self.mapzone_mng_dlg.btn_flood.clicked.connect(partial(self._open_flood_analysis, self.mapzone_mng_dlg))
         self.mapzone_mng_dlg.btn_config.clicked.connect(partial(self.manage_config, self.mapzone_mng_dlg, None))
         self.mapzone_mng_dlg.btn_toggle_active.clicked.connect(partial(self._manage_toggle_active))
         self.mapzone_mng_dlg.btn_create.clicked.connect(partial(self.manage_create, self.mapzone_mng_dlg, None))
@@ -237,28 +237,45 @@ class GwMapzoneManager:
         mapzone_type = self.mapzone_mng_dlg.main_tab.tabText(self.mapzone_mng_dlg.main_tab.currentIndex())
         tools_qt.set_combo_value(dlg_functions.findChild(QComboBox, 'graphClass'), f"{mapzone_type.upper()}", 0)
 
-    def _open_flood_analysis(self):
+    def _open_flood_analysis(self, dialog):
         """Opens the toolbox 'flood_analysis' and runs the SQL function to create the temporal layer."""
 
-        sql_query = "SELECT gw_fct_getgraphinundation()"
-        result = tools_db.get_row(sql_query, commit=False, log_sql=True)
+        # Build the body and call execute function
+        body = tools_gw.create_body()
+        json_result = tools_gw.execute_procedure('gw_fct_getgraphinundation', body)
 
-        if not result:
+        # Check if a valid result was returned
+        if not json_result or json_result.get('status') != 'Accepted':
             QMessageBox.critical(self.mapzone_mng_dlg, "Error", "No valid data received from the SQL function.")
+            tools_qgis.show_warning("No valid data received from the SQL function.", dialog=dialog)
             return
 
-        # add the layer
-        geojson_data = result[0]
-        geojson_data = json.dumps(geojson_data)
-        layer_name = "Water Flow Temporal Layer"
+        # Extract the JSON data
+        geojson_data = json_result['body']['data']
 
-        temp_layer_result = self.add_layer_from_select(self.mapzone_mng_dlg, geojson_data, layer_name)
-        if temp_layer_result and temp_layer_result['layer_added']:
-            temp_layer = temp_layer_result['layer_added']
-            if isinstance(temp_layer, QgsVectorLayer) and temp_layer.isValid():
+        # Check for valid structure and features in the 'line' geometry type
+        line_data = geojson_data.get('line', {})
+        if not line_data.get('features'):
+            return
+
+        # Ensure the 'geometryType' is set correctly
+        line_data['geometryType'] = "LineString"
+
+        # Add the temporal layer
+        temp_layer_result = tools_gw.add_layer_temp(
+            self.mapzone_mng_dlg,
+            {"line": line_data},
+            "Water Flow Temporal Layer",
+            group='GW Temporal Layers'
+        )
+
+        # Setup and apply symbology if the layer is valid
+        if temp_layer_result and temp_layer_result['temp_layers_added']:
+            temp_layer = temp_layer_result['temp_layers_added'][0]
+            if temp_layer.isValid():
                 self._setup_temporal_layer(temp_layer)
         else:
-            QMessageBox.critical(self.mapzone_mng_dlg, "Error", "Failed to create the temporal layer.")
+            tools_qgis.show_warning("Failed to create the temporal layer", dialog=dialog)
 
     def _setup_temporal_layer(self, vlayer):
         """Sets the temporal properties for the layer, specifically using the timestep field."""
@@ -284,6 +301,7 @@ class GwMapzoneManager:
 
 
     def _activate_temporal_controller(self, vlayer):
+        """Activates the Temporal Controller in QGIS with the proper settings for the temporal layer."""
         # Get the global temporal controller
         temporal_controller = self.iface.mapCanvas().temporalController()
         if not temporal_controller:
@@ -298,8 +316,19 @@ class GwMapzoneManager:
         start_field = temporal_properties.startField()
         field_index = vlayer.fields().indexOf(start_field)
         features = vlayer.getFeatures()
-        temporal_values = [feature.attribute(field_index) for feature in features if
-                           isinstance(feature.attribute(field_index), QDateTime)]
+
+        # Try to extract temporal values, handling potential format issues
+        temporal_values = []
+        for feature in features:
+            value = feature.attribute(field_index)
+
+            # Check if value can be converted to QDateTime or is already in that format
+            if isinstance(value, QDateTime):
+                temporal_values.append(value)
+            elif isinstance(value, str):
+                parsed_value = QDateTime.fromString(value, Qt.ISODate)
+                if parsed_value.isValid():
+                    temporal_values.append(parsed_value)
 
         if not temporal_values:
             return
@@ -323,33 +352,6 @@ class GwMapzoneManager:
             if "seconds" in [widget.itemText(i) for i in range(widget.count())]:
                 widget.setCurrentText("seconds")
                 break
-
-    def add_layer_from_select(self, dialog, data, layer_name, group='Select Layers'):
-
-        if not data or 'features' not in data:
-            return {'text_result': 'No valid data found', 'layer_added': None}
-
-        # Create the vector layer with the GeoJSON driver
-        v_layer = QgsVectorLayer(f"GeoJSON:{data}", layer_name, "ogr")
-
-        if not v_layer.isValid():
-            return {'text_result': 'Failed to create layer', 'layer_added': None}
-
-        # Explicitly set the CRS of the layer (EPSG:25831)
-        epsg = tools_qgis.get_epsg()
-        crs = QgsCoordinateReferenceSystem(f"EPSG:{epsg}")
-        v_layer.setCrs(crs)
-
-        # Add the layer to the QGIS project
-        QgsProject.instance().addMapLayer(v_layer, False)
-        root = QgsProject.instance().layerTreeRoot()
-        group_node = root.findGroup(group)
-        if not group_node:
-            group_node = root.addGroup(group)
-        group_node.addLayer(v_layer)
-
-        return {'text_result': f'Layer {layer_name} added successfully with CRS {crs.authid()}.',
-                'layer_added': v_layer}
 
     # region config button
 
