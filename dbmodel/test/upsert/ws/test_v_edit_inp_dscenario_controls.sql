@@ -18,8 +18,8 @@ SELECT is((SELECT count(*)::integer FROM v_edit_inp_dscenario_controls WHERE "te
 SELECT is((SELECT count(*)::integer FROM inp_dscenario_controls WHERE "text" = '-901'), 1, 'INSERT: inp_dscenario_controls -901 was inserted');
 
 UPDATE v_edit_inp_dscenario_controls SET active = true WHERE "text" = '-901';
-SELECT is((SELECT descript FROM v_edit_inp_dscenario_controls WHERE "text" = '-901'), 'updated descript', 'UPDATE: v_edit_inp_dscenario_controls -901 was updated');
-SELECT is((SELECT descript FROM inp_dscenario_controls WHERE "text" = '-901'), 'updated descript', 'UPDATE: inp_dscenario_controls -901 was updated');
+SELECT is((SELECT active FROM v_edit_inp_dscenario_controls WHERE "text" = '-901'), true, 'UPDATE: v_edit_inp_dscenario_controls -901 was updated');
+SELECT is((SELECT active FROM inp_dscenario_controls WHERE "text" = '-901'), true, 'UPDATE: inp_dscenario_controls -901 was updated');
 
 DELETE FROM v_edit_inp_dscenario_controls WHERE "text" = '-901';
 SELECT is((SELECT count(*)::integer FROM v_edit_inp_dscenario_controls WHERE "text" = '-901'), 0, 'DELETE: v_edit_inp_dscenario_controls -901 was deleted');
