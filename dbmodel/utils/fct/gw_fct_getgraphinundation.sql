@@ -20,7 +20,7 @@ BEGIN
 
     SELECT jsonb_build_object(
         'type', 'FeatureCollection',
-        'layerName', 'Water Flow Temporal Layer',
+        'layerName', 'Graphanalytics tstep process',
         'features', jsonb_agg(jsonb_build_object(
             'type', 'Feature',
             'geometry', ST_AsGeoJSON(b.the_geom)::jsonb,
