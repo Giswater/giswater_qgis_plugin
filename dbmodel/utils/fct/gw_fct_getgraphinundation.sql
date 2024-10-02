@@ -6,8 +6,8 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 3336
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_getgraphinundation();
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getgraphinundation()
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_getgraphinundation(p_data json);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getgraphinundation(p_data json)
   RETURNS json AS
 $BODY$
 
@@ -20,6 +20,7 @@ BEGIN
 
     SELECT jsonb_build_object(
         'type', 'FeatureCollection',
+        'layerName', 'Water Flow Temporal Layer',
         'features', jsonb_agg(jsonb_build_object(
             'type', 'Feature',
             'geometry', ST_AsGeoJSON(b.the_geom)::jsonb,
