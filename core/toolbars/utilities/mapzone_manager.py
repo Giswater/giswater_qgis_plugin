@@ -263,6 +263,8 @@ class GwMapzoneManager:
         if vlayer and vlayer.isValid():
             self._setup_temporal_layer(vlayer)
             tools_qgis.show_success("Temporal layer created successfully.", dialog=dialog)
+            self.iface.mapCanvas().setExtent(vlayer.extent())
+            self.iface.mapCanvas().refresh()
         else:
             tools_qgis.show_warning("Failed to retrieve the temporal layer", dialog=dialog)
 
