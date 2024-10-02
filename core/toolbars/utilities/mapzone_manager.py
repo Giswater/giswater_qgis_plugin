@@ -253,7 +253,6 @@ class GwMapzoneManager:
 
         # Check if a valid result was returned
         if not json_result or json_result.get('status') != 'Accepted':
-            QMessageBox.critical(self.mapzone_mng_dlg, "Error", "No valid data received from the SQL function.")
             tools_qgis.show_warning("No valid data received from the SQL function.", dialog=dialog)
             return
 
@@ -263,6 +262,7 @@ class GwMapzoneManager:
 
         if vlayer and vlayer.isValid():
             self._setup_temporal_layer(vlayer)
+            tools_qgis.show_success("Temporal layer created successfully.", dialog=dialog)
         else:
             tools_qgis.show_warning("Failed to retrieve the temporal layer", dialog=dialog)
 
@@ -301,6 +301,13 @@ class GwMapzoneManager:
         temporal_properties = vlayer.temporalProperties()
         if not temporal_properties.isActive():
             return
+
+        # Close the temporal controller tab if it's open
+        actions = self.iface.mainWindow().findChildren(QAction)
+        for action in actions:
+            if 'Temporal' in action.text() and action.isChecked():
+                action.trigger()
+                break
 
         # Calculate temporal range based on the layer's temporal field
         start_field = temporal_properties.startField()
