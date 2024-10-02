@@ -101,6 +101,7 @@ class GwMapzoneManager:
 
         tools_gw.open_dialog(self.mapzone_mng_dlg, 'mapzone_manager')
 
+
     def _manage_highlight(self, qtableview, view, index):
         """ Creates rubberband to indicate which feature is selected """
 
@@ -117,12 +118,14 @@ class GwMapzoneManager:
             table = f"v_edit_{feature_type.split('_')[0]}"
         tools_qgis.highlight_feature_by_id(qtableview, table, feature_type, self.rubber_band, 5, index)
 
+
     def _txt_name_changed(self, text):
         show_inactive = self.mapzone_mng_dlg.chk_active.isChecked()
         expr = f"name ilike '%{text}%'"
         if not show_inactive:
             expr += " and active is true"
         self._fill_mapzone_table(expr=expr)
+
 
     def _manage_current_changed(self):
         """ Manages tab changes """
@@ -142,6 +145,7 @@ class GwMapzoneManager:
 
         # Fill current table
         self._fill_mapzone_table(expr=expr)
+
 
     def _fill_mapzone_table(self, set_edit_triggers=QTableView.NoEditTriggers, expr=None):
         """ Fill mapzone table with data from its corresponding table """
@@ -205,6 +209,7 @@ class GwMapzoneManager:
         # Sort the table
         model.sort(0, 0)
 
+
     def _filter_active(self, dialog, active):
         """ Filters manager table by active """
 
@@ -226,6 +231,7 @@ class GwMapzoneManager:
         widget_table.model().setFilter(expr)
         widget_table.model().select()
 
+
     def _open_mapzones_analysis(self):
         """ Opens the toolbox 'mapzones_analysis' with the current type of mapzone set """
 
@@ -236,6 +242,7 @@ class GwMapzoneManager:
         # Set mapzone type in combo graphClass
         mapzone_type = self.mapzone_mng_dlg.main_tab.tabText(self.mapzone_mng_dlg.main_tab.currentIndex())
         tools_qt.set_combo_value(dlg_functions.findChild(QComboBox, 'graphClass'), f"{mapzone_type.upper()}", 0)
+
 
     def _open_flood_analysis(self, dialog):
         """Opens the toolbox 'flood_analysis' and runs the SQL function to create the temporal layer."""
@@ -250,34 +257,17 @@ class GwMapzoneManager:
             tools_qgis.show_warning("No valid data received from the SQL function.", dialog=dialog)
             return
 
-        # Extract the JSON data
-        geojson_data = json_result['body']['data']
+        # Retrieve the layer by its name
+        layer_name = json_result['body']['data']['line'].get('layerName')
+        vlayer = tools_qgis.get_layer_by_layername(layer_name)
 
-        # Check for valid structure and features in the 'line' geometry type
-        line_data = geojson_data.get('line', {})
-        if not line_data.get('features'):
-            return
-
-        # Ensure the 'geometryType' is set correctly
-        line_data['geometryType'] = "LineString"
-
-        # Add the temporal layer
-        temp_layer_result = tools_gw.add_layer_temp(
-            self.mapzone_mng_dlg,
-            {"line": line_data},
-            "Water Flow Temporal Layer",
-            group='GW Temporal Layers'
-        )
-
-        # Setup and apply symbology if the layer is valid
-        if temp_layer_result and temp_layer_result['temp_layers_added']:
-            temp_layer = temp_layer_result['temp_layers_added'][0]
-            if temp_layer.isValid():
-                self._setup_temporal_layer(temp_layer)
+        if vlayer and vlayer.isValid():
+            self._setup_temporal_layer(vlayer)
         else:
-            tools_qgis.show_warning("Failed to create the temporal layer", dialog=dialog)
+            tools_qgis.show_warning("Failed to retrieve the temporal layer", dialog=dialog)
 
-    def _setup_temporal_layer(self, vlayer):
+
+    def _setup_temporal_layer(self, vlayer: QgsVectorLayer):
         """Sets the temporal properties for the layer, specifically using the timestep field."""
 
         if vlayer.isValid():
@@ -300,7 +290,7 @@ class GwMapzoneManager:
                 self._activate_temporal_controller(vlayer)
 
 
-    def _activate_temporal_controller(self, vlayer):
+    def _activate_temporal_controller(self, vlayer: QgsVectorLayer):
         """Activates the Temporal Controller in QGIS with the proper settings for the temporal layer."""
         # Get the global temporal controller
         temporal_controller = self.iface.mapCanvas().temporalController()
@@ -502,6 +492,7 @@ class GwMapzoneManager:
             tools_qt.set_widget_enabled(self.config_dlg, 'btn_add_ignore', False)
             tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_remove_ignore, False)
 
+
     def get_snapped_feature_id(self, dialog, action, layer_name, option, widget_name, child_type):
         """ Snap feature and set a value into dialog """
 
@@ -523,6 +514,7 @@ class GwMapzoneManager:
         tools_gw.connect_signal(emit_point.canvasClicked,
                                 partial(self._get_id, dialog, action, option, emit_point, child_type),
                                 'mapzone_manager_snapping', 'get_snapped_feature_id_ep_canvasClicked_get_id')
+
 
     def _show_context_menu(self, qtableview, pos):
         """ Show custom context menu """
@@ -550,6 +542,7 @@ class GwMapzoneManager:
 
         menu.exec(QCursor.pos())
 
+
     def _mouse_moved(self, layer, point):
         """ Mouse motion detection """
 
@@ -569,6 +562,7 @@ class GwMapzoneManager:
             viewname = tools_qgis.get_layer_source_table_name(layer)
             if viewname == layer_name:
                 self.snapper_manager.add_marker(result, self.vertex_marker)
+
 
     def _get_id(self, dialog, action, option, emit_point, child_type, point, event):
         """ Get selected attribute from snapped feature """
@@ -624,6 +618,7 @@ class GwMapzoneManager:
 
         self._reset_config_vars(2 if bool(feat_id) else 1)
 
+
     def _set_to_arc(self, feat_id):
         """
         Function called in def _get_id(self, dialog, action, option, point, event):
@@ -639,6 +634,7 @@ class GwMapzoneManager:
         tools_qt.set_widget_text(self.config_dlg, 'txt_toArc', f"{to_arc_list_aux}")
         tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_add_nodeParent, True)
         tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_remove_nodeParent, True)
+
 
     def _set_force_closed(self, feat_id):
         """
@@ -656,6 +652,7 @@ class GwMapzoneManager:
         tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_add_forceClosed, True)
         tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_remove_forceClosed, True)
 
+
     def _set_ignore(self, feat_id):
         """
         Function called in def _get_id(self, dialog, action, option, point, event):
@@ -669,6 +666,7 @@ class GwMapzoneManager:
         tools_qt.set_widget_text(self.config_dlg, 'txt_ignore', f"{ignore_list_aux}")
         tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_add_ignore, True)
         tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_remove_ignore, True)
+
 
     def _add_node_parent(self, dialog):
         """ ADD button for nodeParent """
@@ -702,6 +700,7 @@ class GwMapzoneManager:
             self._cancel_snapping_tool(dialog, dialog.btn_add_nodeParent)
             self._reset_config_vars(1)
 
+
     def _remove_node_parent(self, dialog):
         """ REMOVE button for nodeParent """
 
@@ -733,6 +732,7 @@ class GwMapzoneManager:
 
             self._cancel_snapping_tool(dialog, dialog.btn_remove_nodeParent)
             self._reset_config_vars(1)
+
 
     def _add_force_closed(self, dialog):
         """ ADD button for forceClosed """
@@ -766,6 +766,7 @@ class GwMapzoneManager:
             self._cancel_snapping_tool(dialog, dialog.btn_add_forceClosed)
             self._reset_config_vars(3)
 
+
     def _remove_force_closed(self, dialog):
         """ ADD button for forceClosed """
 
@@ -797,6 +798,7 @@ class GwMapzoneManager:
 
             self._cancel_snapping_tool(dialog, dialog.btn_add_forceClosed)
             self._reset_config_vars(3)
+
 
     def _add_ignore(self, dialog):
         """ ADD button for ignore """
@@ -830,6 +832,7 @@ class GwMapzoneManager:
             self._cancel_snapping_tool(dialog, dialog.btn_add_ignore)
             self._reset_config_vars(4)
 
+
     def _remove_ignore(self, dialog):
         """ REMOVE button for ignore """
 
@@ -862,10 +865,12 @@ class GwMapzoneManager:
             self._cancel_snapping_tool(dialog, dialog.btn_remove_ignore)
             self._reset_config_vars(4)
 
+
     def _clear_preview(self, dialog):
         """ Set preview textbox to '' """
 
         tools_qt.set_widget_text(dialog, 'txt_preview', '')
+
 
     def _accept_config(self, dialog):
         """ Accept button for config dialog """
@@ -898,6 +903,7 @@ class GwMapzoneManager:
             tools_gw.close_dialog(dialog)
             self._manage_current_changed()
 
+
     def _get_graph_config(self):
         context = "OPERATIVE" if self.netscenario_id is None else "NETSCENARIO"
         extras = f'"context":"{context}", "mapzone": "{self.mapzone_type}", "mapzoneId": "{self.mapzone_id}"'
@@ -907,6 +913,7 @@ class GwMapzoneManager:
         json_result = tools_gw.execute_procedure('gw_fct_getgraphconfig', body)
         if json_result is None:
             return
+
 
     def _cancel_snapping_tool(self, dialog, action):
 
