@@ -54,7 +54,6 @@ BEGIN
         modif BOOL DEFAULT FALSE,  -- True if arcs have to be disconnected - arcs that connect with nodes at the start of mapzones and are not to_arc
         cost INT DEFAULT 1,
         reverse_cost INT DEFAULT 1,
-        the_geom public.geometry(linestring, 25831) NULL,
         CONSTRAINT temp_pgr_arc_pkey PRIMARY KEY (pgr_arc_id)
     );
     CREATE INDEX temp_pgr_arc_pgr_arc_id ON temp_pgr_arc USING btree (pgr_arc_id);
@@ -69,7 +68,6 @@ BEGIN
         connec_id varchar(16),
         arc_id varchar(16),
         zone_id INTEGER DEFAULT 0,
-        the_geom public.geometry(linestring, 25831) NULL,
         minsector_id INTEGER DEFAULT 0,
         CONSTRAINT temp_pgr_connec_pkey PRIMARY KEY (connec_id)
     );
@@ -81,7 +79,6 @@ BEGIN
         feature_id varchar(16),
         feature_type varchar(16),
         zone_id INTEGER DEFAULT 0,
-        the_geom public.geometry(linestring, 25831) NULL,
         minsector_id INTEGER DEFAULT 0,
         CONSTRAINT temp_pgr_link_pkey PRIMARY KEY (link_id)
     );
@@ -135,7 +132,6 @@ BEGIN
             gully_id varchar(16),
             arc_id varchar(16),
             zone_id INTEGER DEFAULT 0,
-            the_geom public.geometry(linestring, 25831) NULL,
             CONSTRAINT temp_pgr_gully_pkey PRIMARY KEY (gully_id)
         );
         CREATE INDEX temp_pgr_gully_gully_id ON temp_pgr_gully USING btree (gully_id);

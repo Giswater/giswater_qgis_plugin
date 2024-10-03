@@ -52,8 +52,11 @@ BEGIN
     -- Update temporary geometry
     IF v_updatemapzgeom = 0 OR v_updatemapzgeom IS NULL THEN
 
-        v_querytext := 'UPDATE temp_'||(v_table)||' SET the_geom = NULL 
-            FROM temp_pgr_arc t WHERE t.'||quote_ident(v_field)||' = temp_'||(v_table)||'.'||quote_ident(v_fieldmp)||'';
+        v_querytext := 'UPDATE temp_' || quote_ident(v_table) || ' AS temp_table
+                        SET the_geom = arc.the_geom
+                        FROM temp_pgr_arc a
+                        JOIN arc ON a.arc_id = arc.arc_id
+                        WHERE a.' || quote_ident(v_field) || ' = temp_table.' || quote_ident(v_fieldmp);
 
         EXECUTE v_querytext;
 
@@ -61,30 +64,35 @@ BEGIN
 
         -- Concave polygon
         v_querytext := 'UPDATE temp_'||(v_table)||' SET the_geom = ST_Multi(a.the_geom)
-            FROM (
-                WITH polygon AS (
-                    SELECT ST_Collect(the_geom) AS g, '||quote_ident(v_field)||' FROM temp_pgr_arc a
-                    GROUP BY '||quote_ident(v_field)||'
-                )
-                SELECT '||quote_ident(v_field)||', CASE WHEN ST_GeometryType(ST_ConcaveHull(g, '||v_concavehull||')) = ''ST_Polygon''::TEXT THEN
-                    ST_Buffer(ST_ConcaveHull(g, '||v_concavehull||'), 2)::geometry(Polygon,'||(v_srid)||')
-                ELSE
-                    ST_Expand(ST_Buffer(g, 3::DOUBLE PRECISION), 1::DOUBLE PRECISION)::geometry(Polygon,'||(v_srid)||') 
-                END AS the_geom FROM polygon
-            ) a
-            WHERE a.'||quote_ident(v_field)||' = temp_'||(v_table)||'.'||quote_ident(v_fieldmp);
+                        FROM (
+                            WITH polygon AS (
+                                SELECT ST_Collect(arc.the_geom) AS g, '||quote_ident(v_field)||' 
+                                FROM temp_pgr_arc a
+                                JOIN arc ON a.arc_id = arc.arc_id
+                                GROUP BY '||quote_ident(v_field)||'
+                            )
+                            SELECT '||quote_ident(v_field)||', CASE WHEN ST_GeometryType(ST_ConcaveHull(g, '||v_concavehull||')) = ''ST_Polygon''::TEXT THEN
+                                ST_Buffer(ST_ConcaveHull(g, '||v_concavehull||'), 2)::geometry(Polygon,'||(v_srid)||')
+                            ELSE
+                                ST_Expand(ST_Buffer(g, 3::DOUBLE PRECISION), 1::DOUBLE PRECISION)::geometry(Polygon,'||(v_srid)||') 
+                            END AS the_geom FROM polygon
+                        ) a
+                        WHERE a.'||quote_ident(v_field)||' = temp_'||(v_table)||'.'||quote_ident(v_fieldmp);
 
         EXECUTE v_querytext;
 
     ELSIF v_updatemapzgeom = 2 THEN
 
         -- Pipe buffer
-        v_querytext = '	UPDATE temp_'||(v_table)||' SET the_geom = geom 
-            FROM (
-                SELECT '||quote_ident(v_field)||', ST_Multi(ST_Buffer(ST_Collect(the_geom), '||v_geomparamupdate||')) AS geom FROM temp_pgr_arc a 
-                WHERE '||quote_ident(v_field)||'::INTEGER > 0 GROUP BY '||quote_ident(v_field)||'
-            ) a
-            WHERE a.'||quote_ident(v_field)||'= temp_'||(v_table)||'.'||quote_ident(v_fieldmp);
+        v_querytext := 'UPDATE temp_'||(v_table)||' SET the_geom = geom 
+                        FROM (
+                            SELECT '||quote_ident(v_field)||', ST_Multi(ST_Buffer(ST_Collect(arc.the_geom), '||v_geomparamupdate||')) AS geom 
+                            FROM temp_pgr_arc a 
+                            JOIN arc ON a.arc_id = arc.arc_id
+                            WHERE a.'||quote_ident(v_field)||' > 0 
+                            GROUP BY '||quote_ident(v_field)||'
+                        ) a
+                        WHERE a.'||quote_ident(v_field)||'= temp_'||(v_table)||'.'||quote_ident(v_fieldmp);
 
         EXECUTE v_querytext;
 
@@ -92,16 +100,22 @@ BEGIN
 
         -- Use plot and pipe buffer
         v_querytext := 'UPDATE temp_'||(v_table)||' SET the_geom = geom FROM (
-                SELECT '||quote_ident(v_field)||', ST_Multi(ST_Buffer(ST_Collect(geom), 0.01)) AS geom 
-                FROM (
-                    SELECT '||quote_ident(v_field)||', ST_Buffer(ST_Collect(the_geom), '||v_geomparamupdate||') AS geom FROM temp_pgr_arc a
-                    WHERE '||quote_ident(v_field)||'::INTEGER > 0 GROUP BY '||quote_ident(v_field)||'
-                    UNION
-                    SELECT '||quote_ident(v_field)||', ST_Collect(ext_plot.the_geom) AS geom FROM temp_pgr_connec a, ext_plot 
-                    WHERE '||quote_ident(v_field)||'::INTEGER > 0 AND ST_DWithin(a.the_geom, ext_plot.the_geom, 0.001) GROUP BY '||quote_ident(v_field)||'	
-                ) a GROUP BY '||quote_ident(v_field)||'
-            ) b 
-            WHERE b.'||quote_ident(v_field)||'= temp_'||(v_table)||'.'||quote_ident(v_fieldmp);
+                            SELECT '||quote_ident(v_field)||', ST_Multi(ST_Buffer(ST_Collect(geom), 0.01)) AS geom 
+                            FROM (
+                                SELECT '||quote_ident(v_field)||', ST_Buffer(ST_Collect(arc.the_geom), '||v_geomparamupdate||') AS geom 
+                                FROM temp_pgr_arc a
+                                JOIN arc ON a.arc_id = arc.arc_id
+                                WHERE '||quote_ident(v_field)||' > 0 
+                                GROUP BY '||quote_ident(v_field)||'
+                                UNION
+                                SELECT '||quote_ident(v_field)||', ST_Collect(ext_plot.the_geom) AS geom 
+                                FROM temp_pgr_connec c, ext_plot
+                                JOIN connec ON c.connec_id = connec.connec_id
+                                WHERE '||quote_ident(v_field)||' > 0 AND ST_DWithin(connec.the_geom, ext_plot.the_geom, 0.001) 
+                                GROUP BY '||quote_ident(v_field)||'	
+                            ) a GROUP BY '||quote_ident(v_field)||'
+                        ) b 
+                        WHERE b.'||quote_ident(v_field)||'= temp_'||(v_table)||'.'||quote_ident(v_fieldmp);
 
         EXECUTE v_querytext;
 
@@ -111,26 +125,30 @@ BEGIN
 		-- Use link and pipe buffer
 
         v_querytext := 'UPDATE temp_'||(v_table)||' SET the_geom = geom FROM (
-                SELECT '||quote_ident(v_field)||', ST_Multi(ST_Buffer(ST_Collect(geom),0.01)) AS geom 
-                FROM (
-                    SELECT '||quote_ident(v_field)||', ST_Buffer(ST_Collect(the_geom), '||v_geomparamupdate||') AS geom FROM temp_pgr_arc a 
-                    WHERE a.'||quote_ident(v_field)||'::INTEGER > 0 GROUP BY '||quote_ident(v_field)||'
-                    UNION
-                    SELECT a.'||quote_ident(v_field)||', (ST_Buffer(ST_Collect(temp_pgr_link.the_geom),'||v_geomparamupdate_divide||',''endcap=flat join=round'')) 
-                    AS geom FROM temp_pgr_link, temp_pgr_connec a
-                    WHERE a.'||quote_ident(v_field)||'::INTEGER > 0
-                    AND temp_pgr_link.feature_id = connec_id AND temp_pgr_link.feature_type = ''CONNEC''
-                    GROUP BY a.'||quote_ident(v_field)||'
-                    UNION
-                    SELECT a.'||quote_ident(v_field)||', (ST_Buffer(ST_Collect(temp_pgr_link.the_geom),'||v_geomparamupdate_divide||',''endcap=flat join=round'')) 
-                    AS geom FROM temp_pgr_link, temp_pgr_connec a
-                    JOIN temp_pgr_node n ON a.arc_id IS NULL AND n.node_id = a.pjoint_id
-                    WHERE a.'||quote_ident(v_field)||'::INTEGER > 0 
-                    AND temp_pgr_link.feature_id = connec_id AND temp_pgr_link.feature_type = ''CONNEC''
-                    GROUP BY a.'||quote_ident(v_field)||'
-                ) c GROUP BY '||quote_ident(v_field)||'
-            ) b
-			WHERE b.'||quote_ident(v_field)||'= temp_'||(v_table)||'.'||quote_ident(v_fieldmp);
+                            SELECT '||quote_ident(v_field)||', ST_Multi(ST_Buffer(ST_Collect(geom),0.01)) AS geom 
+                            FROM (
+                                SELECT '||quote_ident(v_field)||', ST_Buffer(ST_Collect(arc.the_geom), '||v_geomparamupdate||') AS geom 
+                                FROM temp_pgr_arc a 
+                                JOIN arc ON a.arc_id = arc.arc_id
+                                WHERE a.'||quote_ident(v_field)||' > 0 
+                                GROUP BY '||quote_ident(v_field)||'
+                                UNION
+                                SELECT a.'||quote_ident(v_field)||', (ST_Buffer(ST_Collect(link.the_geom),'||v_geomparamupdate_divide||',''endcap=flat join=round'')) AS geom 
+                                FROM temp_pgr_link l, temp_pgr_connec c
+                                JOIN link ON l.link_id = link.link_id
+                                WHERE c.'||quote_ident(v_field)||' > 0
+                                AND temp_pgr_link.feature_id = connec_id AND temp_pgr_link.feature_type = ''CONNEC''
+                                GROUP BY c.'||quote_ident(v_field)||'
+                                UNION
+                                SELECT a.'||quote_ident(v_field)||', (ST_Buffer(ST_Collect(link.the_geom),'||v_geomparamupdate_divide||',''endcap=flat join=round'')) AS geom 
+                                FROM temp_pgr_link l, temp_pgr_connec c
+                                JOIN link ON l.link_id = link.link_id
+                                JOIN temp_pgr_node n ON c.arc_id IS NULL AND n.node_id = c.pjoint_id
+                                WHERE c.'||quote_ident(v_field)||' > 0 AND temp_pgr_link.feature_id = connec_id AND temp_pgr_link.feature_type = ''CONNEC''
+                                GROUP BY c.'||quote_ident(v_field)||'
+                            ) c GROUP BY '||quote_ident(v_field)||'
+                        ) b
+                        WHERE b.'||quote_ident(v_field)||'= temp_'||(v_table)||'.'||quote_ident(v_fieldmp);
 
         RAISE NOTICE 'v_querytext, %',v_querytext;
 

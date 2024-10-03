@@ -68,9 +68,9 @@ BEGIN
         AND n.macrominsector_id::TEXT IN (v_macrominsector_id_node)
     );
 
-    INSERT INTO temp_pgr_arc (pgr_arc_id, arc_id, pgr_node_1, pgr_node_2, node_1, node_2, cost, reverse_cost, the_geom)
+    INSERT INTO temp_pgr_arc (pgr_arc_id, arc_id, pgr_node_1, pgr_node_2, node_1, node_2, cost, reverse_cost)
     (
-        SELECT a.arc_id::INT, a.arc_id, a.node_1::INT, a.node_2::INT, a.node_1, a.node_2, v_cost, v_reverse_cost, a.the_geom
+        SELECT a.arc_id::INT, a.arc_id, a.node_1::INT, a.node_2::INT, a.node_1, a.node_2, v_cost, v_reverse_cost
         FROM arc a
         JOIN value_state_type s ON s.id = a.state_type
         WHERE a.state = 1 AND s.is_operative = TRUE
@@ -78,12 +78,12 @@ BEGIN
         AND a.macrominsector_id::TEXT IN (v_macrominsector_id_arc)
     );
 
-    INSERT INTO temp_pgr_connec (connec_id, arc_id, the_geom)
+    INSERT INTO temp_pgr_connec (connec_id, arc_id)
     (
-        SELECT c.connec_id, c.arc_id, c.the_geom
+        SELECT c.connec_id, c.arc_id
         FROM
         (
-            SELECT connec_id, arc_id, state, state_type, the_geom, macrominsector_id FROM connec
+            SELECT connec_id, arc_id, state, state_type, macrominsector_id FROM connec
         ) c
         JOIN temp_pgr_arc a ON c.arc_id::INT = a.pgr_arc_id
         JOIN value_state_type s ON s.id = c.state_type
@@ -91,12 +91,12 @@ BEGIN
         AND c.macrominsector_id::TEXT IN (v_macrominsector_id_connec)
     );
 
-    INSERT INTO temp_pgr_link (link_id, feature_id, feature_type, the_geom)
+    INSERT INTO temp_pgr_link (link_id, feature_id, feature_type)
     (
-        SELECT link_id, feature_id, feature_type, the_geom
+        SELECT link_id, feature_id, feature_type
         FROM
         (
-            SELECT link_id, feature_id, feature_type, state, the_geom, macrominsector_id FROM link
+            SELECT link_id, feature_id, feature_type, state, macrominsector_id FROM link
         ) l
         JOIN temp_pgr_connec c ON l.feature_id=c.connec_id
         WHERE l.state = 1 AND l.feature_type = 'CONNEC'
@@ -104,11 +104,11 @@ BEGIN
     );
 
     IF v_project_type = 'UD' THEN
-        INSERT INTO temp_pgr_gully (gully_id, arc_id, the_geom)
+        INSERT INTO temp_pgr_gully (gully_id, arc_id)
         (
-            SELECT g.gully_id, g.arc_id, g.the_geom
+            SELECT g.gully_id, g.arc_id
             FROM (
-                SELECT gully_id, arc_id, state, state_type, the_geom, macrominsector_id FROM gully
+                SELECT gully_id, arc_id, state, state_type, macrominsector_id FROM gully
             ) g
             JOIN temp_pgr_arc a ON g.arc_id::INT = a.pgr_arc_id
             JOIN value_state_type s ON s.id = g.state_type
@@ -116,11 +116,11 @@ BEGIN
             AND g.macrominsector_id::TEXT IN (v_macrominsector_id_gully)
         );
 
-        INSERT INTO temp_pgr_link (link_id, feature_id, feature_type, the_geom)
+        INSERT INTO temp_pgr_link (link_id, feature_id, feature_type)
         (
-            SELECT link_id, feature_id, feature_type, the_geom
+            SELECT link_id, feature_id, feature_type
             FROM (
-                SELECT link_id, feature_id, feature_type, state, the_geom, macrominsector_id FROM link
+                SELECT link_id, feature_id, feature_type, state, macrominsector_id FROM link
             ) l
             JOIN temp_pgr_gully g ON l.feature_id = g.gully_id
             WHERE l.state = 1 AND l.feature_type = 'GULLY'
