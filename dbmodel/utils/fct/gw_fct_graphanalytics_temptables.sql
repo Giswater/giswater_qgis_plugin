@@ -134,7 +134,7 @@ BEGIN
         CREATE TABLE temp_pgr_gully (
             gully_id varchar(16),
             arc_id varchar(16),
-            zone_id varchar(200) default '0', -- per defecte és Undefined; és text perque el camp "id" per presszone és text;
+            zone_id INTEGER DEFAULT 0,
             the_geom public.geometry(linestring, 25831) NULL,
             CONSTRAINT temp_pgr_gully_pkey PRIMARY KEY (gully_id)
         );
