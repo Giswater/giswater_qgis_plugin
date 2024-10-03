@@ -183,6 +183,18 @@ class GwWorkcat:
         if workcat_id is None:
             return False
 
+        if 'sys_geometry' in item:
+            # Zoom to result
+            list_coord = re.search('\(\((.*)\)\)', str(item['sys_geometry']))
+            if not list_coord:
+                msg = "Empty coordinate list"
+                tools_qgis.show_warning(msg)
+                return
+            points = tools_qgis.get_geometry_vertex(list_coord)
+            tools_qgis.draw_polygon(points, self.rubber_band)
+            max_x, max_y, min_x, min_y = tools_qgis.get_max_rectangle_from_coords(list_coord)
+            tools_qgis.zoom_to_rectangle(max_x, max_y, min_x, min_y)
+
         self._update_selector_workcat(workcat_id)
         current_selectors = self._get_current_selectors()
         self._force_expl(workcat_id)
