@@ -26,7 +26,8 @@ SELECT SCHEMA_NAME.gw_fct_graphanalytics_minsector('{"data":{"parameters":{"comm
 DECLARE
 
     v_query TEXT;
-    v_hydrometer_service TEXT;
+    v_data JSON;
+    v_hydrometer_service INT[];
     v_expl TEXT;
     v_fid INTEGER = 134;
     v_querytext TEXT;
@@ -60,7 +61,8 @@ BEGIN
 
     -- Create temporary tables
 	-- =======================
-	PERFORM gw_fct_graphanalytics_temptables('{"data":{"fct_name":"MINSECTOR"}}');
+	v_data := '{"data":{"fct_name":"MINSECTOR"}}';
+	PERFORM gw_fct_graphanalytics_temptables(v_data);
 
 	-- Starting process
 	INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat('MINSECTOR DYNAMIC SECTORITZATION'));
@@ -68,7 +70,8 @@ BEGIN
 
     -- Initialize process
 	-- =======================
-    PERFORM gw_fct_graphanalytics_initnetwork('{"data":{"expl_id":"'||v_expl||'"}}');
+	v_data := '{"data":{"expl_id":"' || v_expl || '"}}';
+    PERFORM gw_fct_graphanalytics_initnetwork(v_data);
 
     -- Nodes at the limits of minsectors: nodes with "graph_delimiter" = 'MINSECTOR'
     -- Also, nodes that appear as starts in the "sector" table and have "graph_delimiter" = 'SECTOR'
@@ -171,7 +174,7 @@ BEGIN
     WHERE n.node_id = s.node_id;
 
     -- Update feature temporary tables
-    UPDATE temp_pgr_connec c SET minsector_id = a.minsector_id FROM arc a WHERE c.arc_id::INT = a.arc_id;
+    UPDATE temp_pgr_connec c SET minsector_id = a.minsector_id FROM arc a WHERE c.arc_id = a.arc_id;
     UPDATE temp_pgr_link l SET minsector_id = c.minsector_id FROM connec c WHERE c.connec_id = l.feature_id;
 
     -- Insert into minsector temporary table
@@ -193,7 +196,8 @@ BEGIN
     UPDATE minsector a SET num_connec = 0 WHERE num_connec IS NULL;
 
     -- Update minsector temporary num_hydro
-    SELECT value::json->>'1' INTO v_hydrometer_service FROM config_param_system WHERE parameter = 'admin_hydrometer_state';
+    SELECT string_to_array(REPLACE(REPLACE('[1,2,3,4]', '[', ''), ']', ''), ',')::INT[]
+    INTO v_hydrometer_service FROM config_param_system WHERE parameter = 'admin_hydrometer_state';
 
     UPDATE temp_minsector SET num_hydro = a.c FROM (
         SELECT minsector_id, COALESCE(COUNT(*), 0) AS c FROM (
@@ -202,7 +206,7 @@ BEGIN
             LEFT JOIN ext_rtc_hydrometer ON ext_rtc_hydrometer.id::TEXT = rtc_hydrometer.hydrometer_id::TEXT
             JOIN ext_rtc_hydrometer_state ON ext_rtc_hydrometer_state.id = ext_rtc_hydrometer.state_id
             JOIN connec a ON a.customer_code::TEXT = ext_rtc_hydrometer.connec_id::TEXT
-            WHERE ext_rtc_hydrometer.state_id IN (v_hydrometer_service)
+            WHERE ext_rtc_hydrometer.state_id = ANY (v_hydrometer_service)
             UNION
             SELECT hydrometer_id, minsector_id
             FROM selector_hydrometer, rtc_hydrometer
@@ -210,7 +214,7 @@ BEGIN
             JOIN ext_rtc_hydrometer_state ON ext_rtc_hydrometer_state.id = ext_rtc_hydrometer.state_id
             JOIN man_netwjoin ON man_netwjoin.customer_code::TEXT = ext_rtc_hydrometer.connec_id::TEXT
             JOIN node a ON a.node_id::TEXT = man_netwjoin.node_id::TEXT
-            WHERE ext_rtc_hydrometer.state_id IN (v_hydrometer_service)
+            WHERE ext_rtc_hydrometer.state_id = ANY (v_hydrometer_service)
         ) a GROUP BY minsector_id
     ) a WHERE a.minsector_id = temp_minsector.minsector_id;
     UPDATE minsector a SET num_hydro = 0 WHERE num_hydro IS NULL;
@@ -226,16 +230,19 @@ BEGIN
 
     -- Update minsector temporary geometry
 	-- =======================
-    PERFORM gw_fct_graphanalytics_settempgeom('{"data":{
-        "fid":'||v_fid||',
-        "updatemapzgeom":'||v_updatemapzgeom||',
-        "concavehull":'||v_concavehull||',
-        "geomparamupdate":'||v_geomparamupdate||',
-        "table":"minsector",
-        "field":"zone_id",
-        "fieldmp":"minsector_id",
-        "srid":'||v_srid||'
-    }}');
+    v_data := json_build_object(
+        'data', json_build_object(
+            'fid', v_fid,
+            'updatemapzgeom', v_updatemapzgeom,
+            'concavehull', v_concavehull,
+            'geomparamupdate', v_geomparamupdate,
+            'table', 'minsector',
+            'field', 'zone_id',
+            'fieldmp', 'minsector_id',
+            'srid', v_srid
+        )
+	);
+    PERFORM gw_fct_graphanalytics_settempgeom(v_data);
 
 	IF v_commitchanges IS FALSE THEN
         -- Polygons
@@ -293,7 +300,7 @@ BEGIN
 	-- Info
     SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
     FROM (
-        SELECT id, error_message AS message FROM temp_audit_check_data WHERE cur_user = current_user() AND fid = v_fid ORDER BY id
+        SELECT id, error_message AS message FROM temp_audit_check_data WHERE cur_user = current_user AND fid = v_fid ORDER BY id
     ) row;
     v_result := COALESCE(v_result, '{}');
     v_result_info := CONCAT('{"geometryType":"", "values":', v_result, '}');

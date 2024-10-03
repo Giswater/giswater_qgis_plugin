@@ -49,7 +49,7 @@ BEGIN
         pgr_node_2 INT,
         node_1 VARCHAR(16),
         node_2 VARCHAR(16),
-        zone_id INTEGER DEFAULT 0, -- By default it's Undefined; it's text because the "id" field for presszone is text, but XTR has already changed to integer;
+        zone_id INTEGER DEFAULT 0,
         graph_delimiter VARCHAR(30),
         modif BOOL DEFAULT FALSE,  -- True if arcs have to be disconnected - arcs that connect with nodes at the start of mapzones and are not to_arc
         cost INT DEFAULT 1,
@@ -68,23 +68,25 @@ BEGIN
     CREATE TABLE temp_pgr_connec (
         connec_id varchar(16),
         arc_id varchar(16),
-        zone_id varchar(200) default '0', -- per defecte és Undefined; és text perque el camp "id" per presszone és text;
+        zone_id INTEGER DEFAULT 0,
         the_geom public.geometry(linestring, 25831) NULL,
+        minsector_id INTEGER DEFAULT 0,
         CONSTRAINT temp_pgr_connec_pkey PRIMARY KEY (connec_id)
     );
     CREATE INDEX temp_pgr_connec_connec_id ON temp_pgr_connec USING btree (connec_id);
     CREATE INDEX temp_pgr_connec_arc_id ON temp_pgr_connec USING btree (arc_id);
 
     CREATE TABLE temp_pgr_link (
-            link_id varchar(16),
-            feature_id varchar(16),
-            feature_type varchar(16),
-            zone_id varchar(200) default '0', -- per defecte és Undefined; és text perque el camp "id" per presszone és text;
-            the_geom public.geometry(linestring, 25831) NULL,
-            CONSTRAINT temp_pgr_link_pkey PRIMARY KEY (link_id)
-        );
-        CREATE INDEX temp_pgr_link_link_id ON temp_pgr_link USING btree (link_id);
-        CREATE INDEX temp_pgr_link_feature_id ON temp_pgr_link USING btree (feature_id);
+        link_id varchar(16),
+        feature_id varchar(16),
+        feature_type varchar(16),
+        zone_id INTEGER DEFAULT 0,
+        the_geom public.geometry(linestring, 25831) NULL,
+        minsector_id INTEGER DEFAULT 0,
+        CONSTRAINT temp_pgr_link_pkey PRIMARY KEY (link_id)
+    );
+    CREATE INDEX temp_pgr_link_link_id ON temp_pgr_link USING btree (link_id);
+    CREATE INDEX temp_pgr_link_feature_id ON temp_pgr_link USING btree (feature_id);
 
     CREATE TEMP TABLE temp_pgr_minsector (
         pgr_arc_id INT NOT NULL,
