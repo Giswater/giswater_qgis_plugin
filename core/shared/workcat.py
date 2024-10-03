@@ -182,6 +182,37 @@ class GwWorkcat:
         display_name = item['display_name']
         if workcat_id is None:
             return False
+        if 'sys_geometry' not in item:
+            sql = f"""
+                SELECT row_to_json(row) FROM (SELECT 
+                    CASE
+                    WHEN st_geometrytype(st_concavehull(d.the_geom, 0.99::double precision)) = 'ST_Polygon'::text THEN st_astext(st_buffer(st_concavehull(d.the_geom, 0.99::double precision), 10::double precision)::geometry(Polygon, {lib_vars.project_epsg}))
+                    ELSE st_astext(st_expand(st_buffer(d.the_geom, 10::double precision), 1::double precision)::geometry(Polygon, {lib_vars.project_epsg}))
+                    END AS st_astext
+                
+                    FROM (SELECT st_collect(a.the_geom) AS the_geom, a.workcat_id FROM (  SELECT node.workcat_id, node.the_geom FROM node WHERE node.state = 1
+                            UNION
+                            SELECT arc.workcat_id, arc.the_geom FROM arc WHERE arc.state = 1
+                            UNION
+                            SELECT connec.workcat_id, connec.the_geom FROM connec WHERE connec.state = 1
+                            UNION
+                            SELECT element.workcat_id, element.the_geom FROM element WHERE element.state = 1
+                            UNION
+                            SELECT node.workcat_id_end AS workcat_id,node.the_geom FROM node WHERE node.state = 0
+                            UNION
+                            SELECT arc.workcat_id_end AS workcat_id, arc.the_geom FROM arc WHERE arc.state = 0
+                            UNION
+                            SELECT connec.workcat_id_end AS workcat_id,connec.the_geom FROM connec WHERE connec.state = 0
+                            UNION  
+                            SELECT element.workcat_id_end AS workcat_id, element.the_geom FROM element WHERE element.state = 0) a GROUP BY a.workcat_id ) d 
+                
+                    JOIN cat_work AS b ON d.workcat_id = b.id WHERE d.workcat_id::text = '{workcat_id}' LIMIT 1 )row
+            """
+            row = tools_db.get_row(sql)
+            try:
+                item['sys_geometry'] = row[0]['st_astext']
+            except Exception:
+                pass
 
         if 'sys_geometry' in item:
             # Zoom to result
