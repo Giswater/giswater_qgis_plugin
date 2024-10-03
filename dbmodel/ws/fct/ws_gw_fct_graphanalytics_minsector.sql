@@ -93,7 +93,7 @@ BEGIN
     IF v_ignorebrokenvalves THEN
         UPDATE temp_pgr_node n SET graph_delimiter = NULL
         FROM (
-            SELECT node_id FROM man_valve WHERE (closed = FALSE OR closed IS NULL) AND broken = TRUE
+            SELECT node_id FROM man_valve WHERE (closed =false or closed is null) and ((toArc is null and broken =true) or (toArc is not null and active=false))
         ) s
         WHERE n.graph_delimiter = 'MINSECTOR' AND n.pgr_node_id=s.node_id::int;
     END IF;
