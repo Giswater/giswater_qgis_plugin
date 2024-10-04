@@ -47,6 +47,7 @@ v_data_view json;
 exists_record BOOLEAN;
 v_exists_col boolean;
 rec_feature record;
+v_partialquery text;
 
 BEGIN
 
@@ -369,11 +370,18 @@ BEGIN
 
     END IF;
 
+    if v_project_type = 'UD' then
+
+        v_partialquery = ' union select gully_id as feature_id, ''GULLY'', 
+        as sys_`type, gully_type as feature_type from vu_gully';
+    end if;
+
     for rec_feature in execute '
             with subq_1 as (
-            select node_id as feature_id, ''NODE'' as sys_type, node_type as feature_type from node union 
-            select arc_id as feature_id, ''ARC'' as sys_type, arc_type as feature_type from arc union 
-            select connec_id as feature_id, ''CONNEC'' as sys_type, connec_type as feature_type from connec),       
+            select node_id as feature_id, ''NODE'' as sys_type, node_type as feature_type from vu_node union 
+            select arc_id as feature_id, ''ARC'' as sys_type, arc_type as feature_type from vu_arc union 
+            select connec_id as feature_id, ''CONNEC'' as sys_type, connec_type as feature_type from vu_connec
+            '||v_partialquery||'),       
         subq_2 as (
             SELECT mav.feature_id, mav.value_param, sa.param_name, sa.datatype_id
             FROM _man_addfields_value_ mav
