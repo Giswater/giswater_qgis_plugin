@@ -435,7 +435,8 @@ class GwInfo(QObject):
         finally:
             action_edit.setEnabled(is_enabled)
         action_edit.triggered.connect(partial(self._manage_edition, self.dlg_generic, action_edit, fid, new_feature, generic=True))
-        action_edit.setChecked(layer.isEditable() and can_edit)
+        if layer:
+            action_edit.setChecked(layer.isEditable() and can_edit)
 
         # Signals
         self.dlg_generic.btn_accept.clicked.connect(partial(
