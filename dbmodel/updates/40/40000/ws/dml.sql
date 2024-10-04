@@ -23,3 +23,8 @@ FROM _dqa;
 INSERT INTO sector (sector_id, "name", sector_type, muni, expl, macrosector_id, descript, undelete, the_geom, graphconfig, stylesheet, active, parent_id, pattern_id, tstamp, insert_user, lastupdate, lastupdate_user, avg_press, link)
 SELECT sector_id, "name", sector_type, NULL::int4[], NULL::int4[], macrosector_id, descript, undelete, the_geom, graphconfig, stylesheet, active, parent_id, pattern_id, tstamp, insert_user, lastupdate, lastupdate_user, avg_press, link
 FROM _sector;
+
+-- 04/10/2024
+UPDATE inp_typevalue
+SET idval='VIRTUALPUMP', id='VIRTUALPUMP'
+WHERE typevalue='inp_typevalue_dscenario' AND id='VITUALPUMP';
