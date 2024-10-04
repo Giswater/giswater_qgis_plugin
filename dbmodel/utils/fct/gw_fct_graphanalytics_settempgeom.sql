@@ -57,7 +57,7 @@ BEGIN
                         SET the_geom = arc.the_geom
                         FROM temp_pgr_arc a
                         JOIN arc ON a.arc_id = arc.arc_id
-                        WHERE a.pgr_arc_id = a.arc_id::int AND a.' || quote_ident(v_field) || ' = temp_table.' || quote_ident(v_fieldmp);
+                        WHERE a.pgr_arc_id = a.arc_id::integer AND a.' || quote_ident(v_field) || ' = temp_table.' || quote_ident(v_fieldmp);
 
         EXECUTE v_querytext;
         */
@@ -71,7 +71,7 @@ BEGIN
                                 SELECT ST_Collect(arc.the_geom) AS g, '||quote_ident(v_field)||' 
                                 FROM temp_pgr_arc a
                                 JOIN arc ON a.arc_id = arc.arc_id
-                                WHERE a.pgr_arc_id = a.arc_id::int
+                                WHERE a.pgr_arc_id = a.arc_id::integer
                                 GROUP BY '||quote_ident(v_field)||'
                             )
                             SELECT '||quote_ident(v_field)||', CASE WHEN ST_GeometryType(ST_ConcaveHull(g, '||v_concavehull||')) = ''ST_Polygon''::TEXT THEN
@@ -92,7 +92,7 @@ BEGIN
                             SELECT '||quote_ident(v_field)||', ST_Multi(ST_Buffer(ST_Collect(arc.the_geom), '||v_geomparamupdate||')) AS geom 
                             FROM temp_pgr_arc a 
                             JOIN arc ON a.arc_id = arc.arc_id
-                            WHERE a.pgr_arc_id = a.arc_id::int AND a.'||quote_ident(v_field)||' > 0 
+                            WHERE a.pgr_arc_id = a.arc_id::integer AND a.'||quote_ident(v_field)||' > 0 
                             GROUP BY '||quote_ident(v_field)||'
                         ) a
                         WHERE a.'||quote_ident(v_field)||'= temp_'||(v_table)||'.'||quote_ident(v_fieldmp);
@@ -108,7 +108,7 @@ BEGIN
                                 SELECT '||quote_ident(v_field)||', ST_Buffer(ST_Collect(arc.the_geom), '||v_geomparamupdate||') AS geom 
                                 FROM temp_pgr_arc a
                                 JOIN arc ON a.arc_id = arc.arc_id
-                                WHERE a.pgr_arc_id = a.arc_id::int AND '||quote_ident(v_field)||' > 0 
+                                WHERE a.pgr_arc_id = a.arc_id::integer AND '||quote_ident(v_field)||' > 0 
                                 GROUP BY '||quote_ident(v_field)||'
                                 UNION
                                 SELECT '||quote_ident(v_field)||', ST_Collect(ext_plot.the_geom) AS geom 
@@ -133,7 +133,7 @@ BEGIN
                                 SELECT '||quote_ident(v_field)||', ST_Buffer(ST_Collect(arc.the_geom), '||v_geomparamupdate||') AS geom 
                                 FROM temp_pgr_arc a 
                                 JOIN arc ON a.arc_id = arc.arc_id
-                                WHERE a.pgr_arc_id = a.arc_id::int AND a.'||quote_ident(v_field)||' > 0 
+                                WHERE a.pgr_arc_id = a.arc_id::integer AND a.'||quote_ident(v_field)||' > 0 
                                 GROUP BY '||quote_ident(v_field)||'
                                 UNION
                                 SELECT a.'||quote_ident(v_field)||', (ST_Buffer(ST_Collect(link.the_geom),'||v_geomparamupdate_divide||',''endcap=flat join=round'')) AS geom 
