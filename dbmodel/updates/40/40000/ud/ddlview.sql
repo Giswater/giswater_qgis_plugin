@@ -2899,6 +2899,7 @@ CREATE OR REPLACE VIEW v_edit_inp_virtual
 AS SELECT v_edit_arc.arc_id,
     v_edit_arc.node_1,
     v_edit_arc.node_2,
+    v_edit_arc.arccat_id,
     v_edit_arc.gis_length,
     v_edit_arc.sector_id,
     v_edit_arc.macrosector_id,
