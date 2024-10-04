@@ -28,3 +28,10 @@ FROM _sector;
 UPDATE inp_typevalue
 SET idval='VIRTUALPUMP', id='VIRTUALPUMP'
 WHERE typevalue='inp_typevalue_dscenario' AND id='VITUALPUMP';
+
+UPDATE config_form_fields
+	SET layoutname='lyt_buttons'
+	WHERE formname='mincut_manager' AND formtype='form_mincut' AND columnname='cancel' AND tabname='tab_none';
+UPDATE config_form_fields
+	SET layoutname='lyt_buttons'
+	WHERE formname='mincut_manager' AND formtype='form_mincut' AND columnname='hspacer_lyt_bot_3' AND tabname='tab_none';
