@@ -280,6 +280,13 @@ def save_current_tab(dialog, tab_widget, selector_name):
         pass
 
 
+def add_btn_help(dlg):
+    """ Create and add btn_help in all dialogs """
+    btn_help = QPushButton("Help")
+    btn_help.setToolTip("Help")
+    dlg.lyt_buttons.addWidget(btn_help, 0, dlg.lyt_buttons.columnCount())
+
+
 def open_dialog(dlg, dlg_name=None, stay_on_top=True, title=None, hide_config_widgets=False, plugin_dir=lib_vars.plugin_dir, plugin_name=lib_vars.plugin_name):
 
     """ Open dialog """
@@ -306,7 +313,8 @@ def open_dialog(dlg, dlg_name=None, stay_on_top=True, title=None, hide_config_wi
 
     if hide_config_widgets:
         hide_widgets_form(dlg, dlg_name)
-
+    # Create btn_help
+    add_btn_help(dlg)
     # Open dialog
     if issubclass(type(dlg), GwDialog):
         dlg.open()
@@ -3139,6 +3147,8 @@ def docker_dialog(dialog):
         lib_vars.session_vars['dialog_docker'].setWindowTitle(dialog.windowTitle())
         lib_vars.session_vars['dialog_docker'].setWidget(dialog)
         lib_vars.session_vars['dialog_docker'].setWindowFlags(Qt.WindowContextHelpButtonHint)
+        # Create btn_help
+        add_btn_help(dialog)
         global_vars.iface.addDockWidget(positions[lib_vars.session_vars['dialog_docker'].position],
                                         lib_vars.session_vars['dialog_docker'])
     except RuntimeError as e:
