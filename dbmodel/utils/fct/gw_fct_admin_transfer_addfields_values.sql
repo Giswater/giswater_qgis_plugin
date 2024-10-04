@@ -46,6 +46,7 @@ v_feature_childtable_fields text;
 v_data_view json;
 exists_record BOOLEAN;
 v_exists_col boolean;
+rec_feature record;
 
 BEGIN
 
@@ -356,6 +357,42 @@ BEGIN
         end if;
 
     END LOOP;
+
+    -- transfer common addfields
+    if v_project_type = 'UD' then 
+
+        v_sql = 'select lower(id) as feature_type from sys_feature_type where id not in (''ELEMENT'', ''LINK'')';
+
+    elsif v_project_type = 'WS' then 
+
+        v_sql = 'select lower(id) as feature_type from sys_feature_type where id not in (''ELEMENT'', ''LINK'', ''GULLY'')';
+
+    END IF;
+
+    for rec_feature in execute '
+            with subq_1 as (
+            select node_id as feature_id, ''NODE'' as sys_type, node_type as feature_type from node union 
+            select arc_id as feature_id, ''ARC'' as sys_type, arc_type as feature_type from arc union 
+            select connec_id as feature_id, ''CONNEC'' as sys_type, connec_type as feature_type from connec),       
+        subq_2 as (
+            SELECT mav.feature_id, mav.value_param, sa.param_name, sa.datatype_id
+            FROM _man_addfields_value_ mav
+            left JOIN sys_addfields sa ON sa.id = mav.parameter_id
+            left JOIN cat_feature cf ON cf.id = sa.cat_feature_id
+            where sa.feature_type = ''ALL'' and value_param is not null
+            ORDER BY sa.param_name
+        )       
+       select * from subq_2 join subq_1 using (feature_id)'
+    loop
+        v_feature_childtable_name := 'man_' || lower(rec_feature.sys_type) || '_' || lower(rec_feature.feature_type);
+    
+        v_sql := 'update ' ||v_feature_childtable_name|| 
+        ' set '||rec_feature.param_name||' = '||quote_literal(rec_feature.value_param)|| '::' ||rec_feature.datatype_id||
+        ' where  '||lower(rec_feature.sys_type)||'_id = '||quote_literal(rec_feature.feature_id)||'';
+
+        execute v_sql;
+
+    end loop;
 
     -- update sys_foreignkey values
     FOR rec_fgk IN
