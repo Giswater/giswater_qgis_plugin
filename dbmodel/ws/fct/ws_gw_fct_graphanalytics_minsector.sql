@@ -87,7 +87,7 @@ BEGIN
         JOIN (SELECT id, graph_delimiter FROM cat_feature_node) cf ON cf.id = cn.nodetype_id
         WHERE n.state = 1 AND (cf.graph_delimiter = 'MINSECTOR' OR cf.graph_delimiter = 'SECTOR')
     ) s
-    WHERE n.pgr_node_id = s.node_id::INT;
+    WHERE n.node_id = s.node_id AND n.pgr_node_id = n.node_id::INTEGER;
 
     -- If we want to ignore open but broken valves
     IF v_ignorebrokenvalves THEN
@@ -95,7 +95,7 @@ BEGIN
         FROM (
             SELECT node_id FROM man_valve WHERE closed = FALSE AND broken = TRUE
         ) s
-        WHERE n.graph_delimiter = 'MINSECTOR' AND n.pgr_node_id=s.node_id::int;
+        WHERE n.graph_delimiter = 'MINSECTOR' AND n.node_id = s.node_id AND n.pgr_node_id = n.node_id::INTEGER;
     END IF;
 
     -- Set modif = TRUE for nodes where "graph_delimiter" = 'MINSECTOR'
@@ -121,7 +121,7 @@ BEGIN
         SELECT (json_array_elements_text((graphconfig->>'use')::json))::json->>'nodeParent' AS node_id
         FROM sector WHERE graphconfig IS NOT NULL AND active IS TRUE
     ) s
-    WHERE n.pgr_node_id = s.node_id::INT AND n.graph_delimiter = 'SECTOR';
+    WHERE n.node_id = s.node_id AND n.pgr_node_id = n.node_id::INTEGER AND n.graph_delimiter = 'SECTOR';
 
     -- Arcs to be disconnected: all those that connect to the nodes where "graph_delimiter" = 'SECTOR' and are also in the "sector" table
     UPDATE temp_pgr_arc a SET modif = TRUE, cost = -1, reverse_cost = -1
