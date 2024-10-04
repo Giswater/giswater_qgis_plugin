@@ -523,6 +523,8 @@ class GwDscenarioManagerButton(GwAction):
         self.dlg_dscenario.btn_delete.clicked.connect(partial(self._manage_delete))
         self.dlg_dscenario.btn_snapping.toggled.connect(partial(self._manage_btn_snapping))
         self.dlg_dscenario.main_tab.currentChanged.connect(partial(self._manage_current_changed))
+        self.dlg_dscenario.btn_accept.clicked.connect(self.dlg_dscenario.accept)
+        self.dlg_dscenario.btn_close.clicked.connect(self.dlg_dscenario.reject)
         self.dlg_dscenario.finished.connect(self._selection_end)
         self.dlg_dscenario.finished.connect(partial(tools_gw.close_dialog, self.dlg_dscenario, True))
 

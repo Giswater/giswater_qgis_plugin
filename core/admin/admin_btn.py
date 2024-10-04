@@ -2066,8 +2066,8 @@ class GwAdminButton:
         self._add_replace_widgets(replace_json)
 
         # Connect signals
-        self.dlg_replace.buttonBox.accepted.connect(partial(self._dlg_replace_accept))
-        self.dlg_replace.buttonBox.rejected.connect(partial(self.dlg_replace.reject))
+        self.dlg_replace.btn_accept.clicked.connect(partial(self._dlg_replace_accept))
+        self.dlg_replace.btn_cancel.clicked.connect(partial(self.dlg_replace.reject))
         self.dlg_replace.finished.connect(partial(tools_gw.save_settings, self.dlg_replace))
 
         resp = self.dlg_replace.exec_()  # We do exec_() because we want the execution to stop until the dlg is closed

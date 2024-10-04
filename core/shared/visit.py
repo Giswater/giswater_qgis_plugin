@@ -12,7 +12,7 @@ from functools import partial
 from qgis.PyQt.QtCore import Qt, QDate, QStringListModel, pyqtSignal, QDateTime, QObject
 from qgis.PyQt.QtGui import QStandardItemModel, QStandardItem
 from qgis.PyQt.QtSql import QSqlTableModel
-from qgis.PyQt.QtWidgets import QAbstractItemView, QDialogButtonBox, QCompleter, QLineEdit, QFileDialog, QTableView, \
+from qgis.PyQt.QtWidgets import QAbstractItemView, QCompleter, QLineEdit, QFileDialog, QTableView, \
     QTextEdit, QPushButton, QComboBox, QTabWidget, QDateEdit, QDateTimeEdit
 
 from .document import GwDocument
@@ -143,9 +143,10 @@ class GwVisit(QObject):
 
         # tab events
         self.tabs = self.dlg_add_visit.findChild(QTabWidget, 'tab_widget')
-        self.button_box = self.dlg_add_visit.findChild(QDialogButtonBox, 'button_box')
+        self.dlg_add_visit.btn_accept.clicked.connect(self._manage_accepted)
+        self.dlg_add_visit.btn_cancel.clicked.connect(self.dlg_add_visit.reject)
         if visit_id is None:
-            self.button_box.button(QDialogButtonBox.Ok).setEnabled(False)
+            self.dlg_add_visit.btn_accept.setEnabled(False)
 
         # Tab 'Data'/'Visit'
         self.visit_id = self.dlg_add_visit.findChild(QLineEdit, "visit_id")
@@ -599,7 +600,7 @@ class GwVisit(QObject):
         if layer:
             layer.dataProvider().reloadData()
         tools_qgis.refresh_map_canvas()
-
+        self.dlg_add_visit.close()
 
     def _execute_pgfunction(self):
         """ Execute function 'gw_fct_om_visit_multiplier' """
@@ -1507,8 +1508,7 @@ class GwVisit(QObject):
         A) if some record is available => enable OK button of VisitDialog """
 
         state = (self.tbl_event.model().rowCount() > 0)
-        self.button_box.button(QDialogButtonBox.Ok).setEnabled(state)
-
+        self.dlg_add_visit.btn_accept.setEnabled(state)
 
     def _event_update(self):
         """ Update selected event. """
