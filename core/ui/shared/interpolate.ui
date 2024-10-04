@@ -32,7 +32,7 @@
     </widget>
    </item>
    <item row="4" column="0" colspan="2">
-    <layout class="QHBoxLayout" name="horizontalLayout">
+    <layout class="QHBoxLayout" name="lyt_buttons">
      <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
