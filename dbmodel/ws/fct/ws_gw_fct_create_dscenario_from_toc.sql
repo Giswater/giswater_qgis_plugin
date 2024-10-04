@@ -6,14 +6,14 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 3108
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_create_dscenario_from_toc(p_data json) 
-RETURNS json AS 
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_create_dscenario_from_toc(p_data json)
+RETURNS json AS
 $BODY$
 
 /*EXAMPLE
 
 -- fid: 403
-SELECT SCHEMA_NAME.gw_fct_create_dscenario_from_toc($${"client":{}, "form":{}, "feature":{"tableName":"v_edit_arc", "featureType":"ARC", "id":[]}, 
+SELECT SCHEMA_NAME.gw_fct_create_dscenario_from_toc($${"client":{}, "form":{}, "feature":{"tableName":"v_edit_arc", "featureType":"ARC", "id":[]},
 "data":{"selectionMode":"wholeSelection","parameters":{"name":"test", "descript":null, "type":"DEMAND"}}}$$);
 
 */
@@ -58,7 +58,7 @@ BEGIN
 
 	-- select version
 	SELECT giswater, project_type INTO v_version, v_projecttype FROM sys_version ORDER BY id DESC LIMIT 1;
-	
+
 	-- getting input data
 	-- parameters of action CREATE
 	v_name :=  ((p_data ->>'data')::json->>'parameters')::json->>'name';
@@ -70,12 +70,12 @@ BEGIN
 	v_selectionmode :=  ((p_data ->>'data')::json->>'selectionMode')::text;
 	v_tablename :=  ((p_data ->>'feature')::json->>'tableName')::text;
 	v_featuretype :=  ((p_data ->>'feature')::json->>'featureType')::text;
-	
+
 	v_table = replace(v_tablename,'v_edit_inp','inp_dscenario');
 	IF v_selectionmode = 'wholeSelection' THEN v_id= replace(replace(replace(v_id,'[','('),']',')'),'"','');END IF;
 
 	IF v_id IS NULL THEN v_id = '()';END IF;
-	
+
 	-- Reset values
 	DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=v_fid;
 	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid;
@@ -86,7 +86,7 @@ BEGIN
 
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 3, 'ERRORS');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 3, '--------');
-	
+
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 2, 'WARNINGS');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 2, '---------');
 
@@ -96,16 +96,16 @@ BEGIN
 	-- inserting on catalog table
 	PERFORM setval('SCHEMA_NAME.cat_dscenario_dscenario_id_seq'::regclass,(SELECT max(dscenario_id) FROM cat_dscenario) ,true);
 
-	INSERT INTO cat_dscenario ( name, descript, dscenario_type, expl_id, log) 
+	INSERT INTO cat_dscenario ( name, descript, dscenario_type, expl_id, log)
 	VALUES ( v_name, v_descript, v_type, v_expl, concat('Insert by ',current_user,' on ', substring(now()::text,0,20))) ON CONFLICT (name) DO NOTHING
 	RETURNING dscenario_id INTO v_scenarioid;
 
 	IF v_scenarioid IS NULL THEN
 		SELECT dscenario_id INTO v_scenarioid FROM cat_dscenario where name = v_name;
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 		VALUES (v_fid, null, 3, concat('ERROR: The dscenario ( ',v_scenarioid,' ) already exists with proposed name ',v_name ,'. Please try another one.'));
-	ELSE 
-	
+	ELSE
+
 		-- getting columns
 		IF v_table  = 'inp_dscenario_junction' THEN
 			v_columns = v_scenarioid||', node_id, demand, pattern_id';
@@ -120,14 +120,14 @@ BEGIN
 		ELSIF v_table  = 'inp_dscenario_inlet' THEN
 			v_columns = v_scenarioid||', node_id, initlevel, minlevel, maxlevel, diameter, minvol, curve_id, overflow, pattern_id, head';
 		ELSIF v_table  = 'inp_dscenario_pump' THEN
-			v_columns = v_scenarioid||', node_id, power, curve_id, speed, pattern, status';
+			v_columns = v_scenarioid||', node_id, power, curve_id, speed, pattern_id, status';
 		ELSIF v_table  = 'inp_dscenario_pipe' THEN
 			v_columns = v_scenarioid||', arc_id, minorloss, status, custom_roughness, custom_dint';
 		ELSIF v_table  = 'inp_dscenario_shortpipe' THEN
 			v_columns = v_scenarioid||', node_id, minorloss, status';
-		ELSE 
+		ELSE
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '');
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (v_fid, null, 3, concat('ERROR: The table chosen does not fit with any epa dscenario. Please try another one.'));
 			v_finish = true;
 		END IF;
@@ -136,12 +136,12 @@ BEGIN
 
 			-- log
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	VALUES (v_fid, null, 1, concat('INFO: Process done successfully.'));
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) 
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (v_fid, null, 4, concat('New scenario ',v_name,' have been created with id:',v_scenarioid,'.'));
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Exploitation: ',v_expl));
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Selection mode: ',v_selectionmode));
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '');
-			
+
 			-- inserting values on tables
 			v_count = 0;
 			IF v_selectionmode = 'wholeSelection' THEN
@@ -168,13 +168,13 @@ BEGIN
 				EXECUTE v_querytext;
 				GET DIAGNOSTICS v_count = row_count;
 			END IF;
-			
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	
+
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (v_fid, v_result_id, 1, concat('INFO: ',v_count, ' features have been inserted on table ', v_table,'.'));
-			
+
 			-- set selector
 			INSERT INTO selector_inp_dscenario (dscenario_id,cur_user) VALUES (v_scenarioid, current_user) ON CONFLICT (dscenario_id,cur_user) DO NOTHING ;
-			
+
 		END IF;
 	END IF;
 
@@ -184,20 +184,20 @@ BEGIN
 
 	-- get results
 	-- info
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid order by criticity desc, id asc) row;
-	v_result := COALESCE(v_result, '{}'); 
+	v_result := COALESCE(v_result, '{}');
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
 	-- Control nulls
-	v_result_info := COALESCE(v_result_info, '{}'); 
+	v_result_info := COALESCE(v_result_info, '{}');
 
 	-- Return
 	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Analysis done successfully"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||
 			'}}'||
-	    '}')::json, 3042, null, null, null); 
+	    '}')::json, 3042, null, null, null);
 
 END;
 $BODY$
