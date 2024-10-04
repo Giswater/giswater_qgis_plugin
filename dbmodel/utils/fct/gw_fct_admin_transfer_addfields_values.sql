@@ -360,20 +360,11 @@ BEGIN
     END LOOP;
 
     -- transfer common addfields
-    if v_project_type = 'UD' then 
-
-        v_sql = 'select lower(id) as feature_type from sys_feature_type where id not in (''ELEMENT'', ''LINK'')';
-
-    elsif v_project_type = 'WS' then 
-
-        v_sql = 'select lower(id) as feature_type from sys_feature_type where id not in (''ELEMENT'', ''LINK'', ''GULLY'')';
-
-    END IF;
-
     if v_project_type = 'UD' then
 
         v_partialquery = ' union select gully_id as feature_id, ''GULLY''
-        as sys_`type, gully_type as feature_type from vu_gully';
+        as sys_type, gully_type as feature_type from vu_gully';
+        
     end if;
 
     for rec_feature in execute '
