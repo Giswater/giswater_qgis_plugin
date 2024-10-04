@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>377</width>
-    <height>274</height>
+    <height>272</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -32,7 +32,7 @@
     </widget>
    </item>
    <item row="4" column="0">
-    <layout class="QGridLayout" name="gridLayout">
+    <layout class="QGridLayout" name="lyt_buttons">
      <item row="0" column="1">
       <widget class="QPushButton" name="btn_accept">
        <property name="text">
@@ -73,7 +73,7 @@
         <x>0</x>
         <y>0</y>
         <width>353</width>
-        <height>162</height>
+        <height>160</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
