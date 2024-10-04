@@ -372,7 +372,7 @@ BEGIN
 
     if v_project_type = 'UD' then
 
-        v_partialquery = ' union select gully_id as feature_id, ''GULLY'', 
+        v_partialquery = ' union select gully_id as feature_id, ''GULLY''
         as sys_`type, gully_type as feature_type from vu_gully';
     end if;
 
