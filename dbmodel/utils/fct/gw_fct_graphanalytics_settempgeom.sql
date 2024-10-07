@@ -51,16 +51,10 @@ BEGIN
 
     -- Update temporary geometry
     IF v_updatemapzgeom = 0 OR v_updatemapzgeom IS NULL THEN
-        -- do nothing
-        /*
-        v_querytext := 'UPDATE temp_' || quote_ident(v_table) || ' AS temp_table
-                        SET the_geom = arc.the_geom
-                        FROM temp_pgr_arc a
-                        JOIN arc ON a.arc_id = arc.arc_id
-                        WHERE a.pgr_arc_id = a.arc_id::integer AND a.' || quote_ident(v_field) || ' = temp_table.' || quote_ident(v_fieldmp);
+        -- update the_geom to NULL
+        v_querytext := 'UPDATE temp_' || quote_ident(v_table) || ' AS temp_table SET the_geom = NULL';
 
         EXECUTE v_querytext;
-        */
 
     ELSIF v_updatemapzgeom = 1 THEN
 
