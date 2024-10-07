@@ -1348,7 +1348,10 @@ class GwVisit(QObject):
         self.dlg_event.btn_delete_file.clicked.connect(
             partial(self._delete_files, self.dlg_event.tbl_docs_x_event, event.visit_id, event.id))
 
+        self.dlg_event.btn_accept.clicked.connect(self.dlg_event.accept)
+        self.dlg_event.btn_cancel.clicked.connect(self.dlg_event.reject)
         self.dlg_event.setWindowFlags(Qt.WindowStaysOnTopHint)
+        tools_gw.add_btn_help(self.dlg_event)
         tools_qt.manage_translation(dlg_name, self.dlg_event)
         ret = self.dlg_event.exec_()
 
