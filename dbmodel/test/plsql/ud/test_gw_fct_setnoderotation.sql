@@ -10,17 +10,16 @@ SET client_min_messages TO WARNING;
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-
+-- Plan for 1 test
 SELECT plan(1);
 
 -- Extract and test the "status" field from the function's JSON response
 SELECT is (
-    (gw_fct_anl_connec_duplicated($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831}, 
-    "form":{}, "feature":{"tableName":"v_edit_connec", "featureType":"CONNEC", "id":[]}, "data":{"filterFields":{}, 
-    "pageInfo":{}, "selectionMode":"wholeSelection","parameters":{"connecTolerance":"0.01"}, 
+    (gw_fct_setnoderotation($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831}, 
+    "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"nodeType":null}, 
     "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_anl_connec_duplicated returns status "Accepted"'
+    'Check if gw_fct_setnoderotation returns status "Accepted"'
 );
 
 -- Finish the test

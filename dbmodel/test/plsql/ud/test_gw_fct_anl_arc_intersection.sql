@@ -10,66 +10,65 @@ SET client_min_messages TO WARNING;
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
+-- Plan for 1 test
 SELECT plan(7);
 
 -- Extract and test the "status" field from the function's JSON response
 SELECT is (
-    (gw_fct_anl_arc_same_startend($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831}, 
+    (gw_fct_anl_arc_intersection($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831}, 
     "form":{}, "feature":{"tableName":"v_edit_arc", "featureType":"ARC", "id":[]}, "data":{"filterFields":{}, 
     "pageInfo":{}, "selectionMode":"wholeSelection","parameters":{}, "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_anl_arc_same_startend with tablename > v_edit_arc returns status "Accepted"'
+    'Check if gw_fct_anl_arc_intersection with tablename > v_edit_arc returns status "Accepted"'
 );
 
 SELECT is (
-    (gw_fct_anl_arc_same_startend($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831}, 
+    (gw_fct_anl_arc_intersection($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831}, 
     "form":{}, "feature":{"tableName":"v_edit_inp_conduit", "featureType":"ARC", "id":[]}, "data":{"filterFields":{}, 
     "pageInfo":{}, "selectionMode":"wholeSelection","parameters":{}, "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_anl_arc_same_startend with tablename > v_edit_inp_conduit returns status "Accepted"'
+    'Check if gw_fct_anl_arc_intersection with tablename > v_edit_inp_conduit returns status "Accepted"'
 );
 
 SELECT is (
-    (gw_fct_anl_arc_same_startend($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831}, 
+    (gw_fct_anl_arc_intersection($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831}, 
     "form":{}, "feature":{"tableName":"v_edit_inp_orifice", "featureType":"ARC", "id":[]}, "data":{"filterFields":{}, 
     "pageInfo":{}, "selectionMode":"wholeSelection","parameters":{}, "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_anl_arc_same_startend with tablename > v_edit_inp_orifice returns status "Accepted"'
+    'Check if gw_fct_anl_arc_intersection with tablename > v_edit_inp_orifice returns status "Accepted"'
 );
 
 SELECT is (
-    (gw_fct_anl_arc_same_startend($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831}, 
+    (gw_fct_anl_arc_intersection($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831}, 
     "form":{}, "feature":{"tableName":"v_edit_inp_outlet", "featureType":"ARC", "id":[]}, "data":{"filterFields":{}, 
     "pageInfo":{}, "selectionMode":"wholeSelection","parameters":{}, "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_anl_arc_same_startend with tablename > v_edit_inp_outlet returns status "Accepted"'
+    'Check if gw_fct_anl_arc_intersection with tablename > v_edit_inp_outlet returns status "Accepted"'
 );
 
 SELECT is (
-    (gw_fct_anl_arc_same_startend($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831}, 
+    (gw_fct_anl_arc_intersection($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831}, 
     "form":{}, "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]}, "data":{"filterFields":{}, 
     "pageInfo":{}, "selectionMode":"wholeSelection","parameters":{}, "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_anl_arc_same_startend with tablename > v_edit_inp_pump returns status "Accepted"'
+    'Check if gw_fct_anl_arc_intersection with tablename > v_edit_inp_pump returns status "Accepted"'
 );
 
 SELECT is (
-    (gw_fct_anl_arc_same_startend($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831}, 
+    (gw_fct_anl_arc_intersection($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831}, 
     "form":{}, "feature":{"tableName":"v_edit_inp_virtual", "featureType":"ARC", "id":[]}, "data":{"filterFields":{}, 
     "pageInfo":{}, "selectionMode":"wholeSelection","parameters":{}, "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_anl_arc_same_startend with tablename > v_edit_inp_virtual returns status "Accepted"'
+    'Check if gw_fct_anl_arc_intersection with tablename > v_edit_inp_virtual returns status "Accepted"'
 );
 
 SELECT is (
-    (gw_fct_anl_arc_same_startend($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831}, 
+    (gw_fct_anl_arc_intersection($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831}, 
     "form":{}, "feature":{"tableName":"v_edit_inp_weir", "featureType":"ARC", "id":[]}, "data":{"filterFields":{}, 
     "pageInfo":{}, "selectionMode":"wholeSelection","parameters":{}, "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_anl_arc_same_startend with tablename > v_edit_inp_weir returns status "Accepted"'
+    'Check if gw_fct_anl_arc_intersection with tablename > v_edit_inp_weir returns status "Accepted"'
 );
-
-
 -- Finish the test
 SELECT finish();
 
