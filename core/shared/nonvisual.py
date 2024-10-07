@@ -371,7 +371,7 @@ class GwNonVisual:
     def _print_object(self):
 
         # Get dialog
-        self.dlg_print = GwNonVisualPrint()
+        self.dlg_print = GwNonVisualPrint(self)
         tools_gw.load_settings(self.dlg_print)
 
         # Set values
