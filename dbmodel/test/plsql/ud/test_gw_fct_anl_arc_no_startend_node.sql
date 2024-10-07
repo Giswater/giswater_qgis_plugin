@@ -10,16 +10,70 @@ SET client_min_messages TO WARNING;
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
--- Plan for 1 test
-SELECT plan(1);
+SELECT plan(7);
 
 -- Extract and test the "status" field from the function's JSON response
 SELECT is (
-    (gw_fct_anl_arc_no_startend_node($${"client":{"device":4, "infoType":1, "lang":"ES"},
-    "feature":{"tableName":"v_edit_arc", "featureType":"ARC"},
-    "data":{"parameters":{"arcSearchNodes":"0.1"}}}$$)::JSON)->>'status',
+    (gw_fct_anl_arc_no_startend_node($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831}, 
+    "form":{}, "feature":{"tableName":"v_edit_arc", "featureType":"ARC", "id":[]}, "data":{"filterFields":{}, 
+    "pageInfo":{}, "selectionMode":"wholeSelection","parameters":{"arcSearchNodes":"0.5"}, 
+    "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_anl_arc_no_startend_node returns status "Accepted"'
+    'Check if gw_fct_anl_arc_no_startend_node with tablename > v_edit_arc returns status "Accepted"'
+);
+
+SELECT is (
+    (gw_fct_anl_arc_no_startend_node($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831}, 
+    "form":{}, "feature":{"tableName":"v_edit_inp_conduit", "featureType":"ARC", "id":[]}, "data":{"filterFields":{}, 
+    "pageInfo":{}, "selectionMode":"wholeSelection","parameters":{"arcSearchNodes":"0.5"}, 
+    "aux_params":null}}$$)::JSON)->>'status',
+    'Accepted',
+    'Check if gw_fct_anl_arc_no_startend_node with tablename > v_edit_inp_conduit returns status "Accepted"'
+);
+
+SELECT is (
+    (gw_fct_anl_arc_no_startend_node($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831}, 
+    "form":{}, "feature":{"tableName":"v_edit_inp_orifice", "featureType":"ARC", "id":[]}, "data":{"filterFields":{}, 
+    "pageInfo":{}, "selectionMode":"wholeSelection","parameters":{"arcSearchNodes":"0.5"}, 
+    "aux_params":null}}$$)::JSON)->>'status',
+    'Accepted',
+    'Check if gw_fct_anl_arc_no_startend_node with tablename > v_edit_inp_orifice returns status "Accepted"'
+);
+
+SELECT is (
+    (gw_fct_anl_arc_no_startend_node($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831}, 
+    "form":{}, "feature":{"tableName":"v_edit_inp_outlet", "featureType":"ARC", "id":[]}, "data":{"filterFields":{}, 
+    "pageInfo":{}, "selectionMode":"wholeSelection","parameters":{"arcSearchNodes":"0.5"}, 
+    "aux_params":null}}$$)::JSON)->>'status',
+    'Accepted',
+    'Check if gw_fct_anl_arc_no_startend_node with tablename > v_edit_inp_outlet returns status "Accepted"'
+);
+
+SELECT is (
+    (gw_fct_anl_arc_no_startend_node($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831}, 
+    "form":{}, "feature":{"tableName":"v_edit_inp_pump", "featureType":"ARC", "id":[]}, "data":{"filterFields":{}, 
+    "pageInfo":{}, "selectionMode":"wholeSelection","parameters":{"arcSearchNodes":"0.5"}, 
+    "aux_params":null}}$$)::JSON)->>'status',
+    'Accepted',
+    'Check if gw_fct_anl_arc_no_startend_node with tablename > v_edit_inp_pump returns status "Accepted"'
+);
+
+SELECT is (
+    (gw_fct_anl_arc_no_startend_node($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831}, 
+    "form":{}, "feature":{"tableName":"v_edit_inp_virtual", "featureType":"ARC", "id":[]}, "data":{"filterFields":{}, 
+    "pageInfo":{}, "selectionMode":"wholeSelection","parameters":{"arcSearchNodes":"0.5"}, 
+    "aux_params":null}}$$)::JSON)->>'status',
+    'Accepted',
+    'Check if gw_fct_anl_arc_no_startend_node with tablename > v_edit_inp_virtual returns status "Accepted"'
+);
+
+SELECT is (
+    (gw_fct_anl_arc_no_startend_node($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831}, 
+    "form":{}, "feature":{"tableName":"v_edit_inp_weir", "featureType":"ARC", "id":[]}, "data":{"filterFields":{}, 
+    "pageInfo":{}, "selectionMode":"wholeSelection","parameters":{"arcSearchNodes":"0.5"}, 
+    "aux_params":null}}$$)::JSON)->>'status',
+    'Accepted',
+    'Check if gw_fct_anl_arc_no_startend_node with tablename > v_edit_inp_weir returns status "Accepted"'
 );
 
 -- Finish the test
