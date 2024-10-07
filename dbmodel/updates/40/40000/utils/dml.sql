@@ -64,3 +64,16 @@ INSERT INTO config_function (id, function_name, "style", layermanager, actions) 
     }
   }
 }'::json, NULL, NULL);
+
+
+-- 07/10/2024
+-- update minsector function to change exploitation widget to combo
+UPDATE config_toolbox
+SET inputparams='[{"widgetname":"exploitation", "label":"Exploitation id:","widgettype":"combo","datatype":"text","tooltip": "Choose exploitation to work with", "layoutname":"grl_option_parameters","layoutorder":1, 
+"dvQueryText":"SELECT id, idval FROM (SELECT -9 AS id, ''All explotations'' AS idval, ''a'' AS sort_order UNION SELECT expl_id AS id, name AS idval, ''b'' AS sort_order FROM exploitation WHERE active IS NOT FALSE) a ORDER BY sort_order ASC, idval ASC", "selectedId":"$userExploitation"}, 
+{"widgetname":"usePsectors", "label":"Use masterplan psectors:","widgettype":"check","datatype":"boolean","layoutname":"grl_option_parameters","layoutorder":2, "value":""}, 
+{"widgetname":"commitChanges", "label":"Commit changes:","widgettype":"check","datatype":"boolean","layoutname":"grl_option_parameters","layoutorder":3, "value":""}, 
+{"widgetname":"updateMapZone", "label":"Update mapzone geometry method:","widgettype":"combo","datatype":"integer","layoutname":"grl_option_parameters","layoutorder":4,"comboIds":[0,1,2,3], "comboNames":["NONE", "CONCAVE POLYGON", "PIPE BUFFER", "PLOT & PIPE BUFFER"], "selectedId":""}, 
+{"widgetname":"geomParamUpdate", "label":"Geometry parameter:","widgettype":"text","datatype":"float","layoutname":"grl_option_parameters","layoutorder":5, "isMandatory":false, "placeholder":"5-30", "value":""}
+]'::json
+WHERE id=2706;
