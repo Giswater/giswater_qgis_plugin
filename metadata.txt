@@ -8,6 +8,10 @@ version=3.6.014
 author=David Erill, Barbara Rzepka, Sergi Muñoz, Josep Lluís Sala, Edgar Fusté, Albert Bofill, Sergi Maspons, Elies Bertran, Abel García Juanes, Maria Guzmán, Jordi Blanch, Xavier Torret, Daniel Marín, Ferran Martínez
 
 Changelog=Version 3.6.014
+    - Fix zoom & highlight to workcat features
+    - Fix "Shape to PNG" button in Non-Visual Objects
+    - Fix double-click on hydrometer table in info
+    - Disable "Run" button on toolbox if no input layers found
 
 
 tags= giswater, water networks, sewerage, urban drainage, EPANET, SWMM
