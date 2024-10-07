@@ -399,51 +399,18 @@ BEGIN
 							VALUES (214, 1, concat('Copy ',v_count,' visits from old arcs to new one.'));
 						END IF;
 
-						IF v_project_type = 'WS' THEN
+						-- update to_arc for mapzones and system tables
+						EXECUTE 'SELECT node_1, node_2 FROM v_edit_arc a WHERE a.arc_id='''||v_new_record.arc_id||''';' 
+						INTO v_node_1,v_node_2;
 
-							--check if final nodes maybe graph delimiters
-							EXECUTE 'SELECT CASE WHEN graph_delimiter IN (''NONE'', ''MINSECTOR'') THEN NULL ELSE lower(graph_delimiter) END AS graph, node_1 FROM v_edit_arc a 
-							JOIN v_edit_node n1 ON n1.node_id=node_1
-							JOIN cat_feature_node cf1 ON n1.node_type = cf1.id 
-							WHERE a.arc_id='''||v_new_record.arc_id||''';'
-							INTO v_node1_graph, v_node_1;
+						EXECUTE 'SELECT gw_fct_setmapzoneconfig($${
+						"client":{"device":4, "infoType":1,"lang":"ES"}	,"data":{"parameters":{"nodeIdOld":"'||v_node_1||'",
+						"arcIdOld":'||v_record1.arc_id||',"arcIdNew":'||v_new_record.arc_id||',"action":"updateArc"}}}$$);';
 
-							EXECUTE 'SELECT CASE WHEN graph_delimiter IN (''NONE'', ''MINSECTOR'') THEN NULL ELSE lower(graph_delimiter) END AS graph,node_2 FROM v_edit_arc a 
-							JOIN v_edit_node n2 ON n2.node_id=node_2
-							JOIN cat_feature_node cf2 ON n2.node_type = cf2.id 
-							WHERE a.arc_id='''||v_new_record.arc_id||''';'
-							INTO v_node2_graph, v_node_2;
-
-							IF v_node1_graph IS NOT NULL THEN
-								EXECUTE 'SELECT gw_fct_setmapzoneconfig($${
-								"client":{"device":4, "infoType":1,"lang":"ES"}	,"data":{"parameters":{"nodeIdOld":"'||v_node_1||'",
-								"arcIdOld":'||v_record1.arc_id||',"arcIdNew":'||v_new_record.arc_id||',"action":"updateArc"}}}$$);';
-
-								EXECUTE 'SELECT gw_fct_setmapzoneconfig($${
-								"client":{"device":4, "infoType":1,"lang":"ES"},"data":{"parameters":{"nodeIdOld":"'||v_node_1||'",
-								"arcIdOld":'||v_record2.arc_id||',"arcIdNew":'||v_new_record.arc_id||',"action":"updateArc"}}}$$);';
-
-								INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (214, 1, concat(''));
-								INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (214, 1, concat('-----MAPZONES CONFIGURATION-----'));
-								INSERT INTO audit_check_data (fid, criticity, error_message)
-								VALUES (214, 1, concat('Node_1 is a delimiter of a mapzone if arc was defined as toArc it has been reconfigured with new arc_id.'));
-							END IF;
-
-							IF v_node2_graph IS NOT NULL THEN
-								EXECUTE 'SELECT gw_fct_setmapzoneconfig($${
-								"client":{"device":4, "infoType":1,"lang":"ES"},"data":{"parameters":{"nodeIdOld":"'||v_node_2||'", 
-								"arcIdOld":'||v_record1.arc_id||',"arcIdNew":'||v_new_record.arc_id||',"action":"updateArc"}}}$$);';
-
-								EXECUTE 'SELECT gw_fct_setmapzoneconfig($${
-								"client":{"device":4, "infoType":1,"lang":"ES"},"data":{"parameters":{"nodeIdOld":"'||v_node_2||'", 
-								"arcIdOld":'||v_record2.arc_id||',"arcIdNew":'||v_new_record.arc_id||',"action":"updateArc"}}}$$);';
-
-								INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (214, 1, concat(''));
-								INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (214, 1, concat('-----MAPZONES CONFIGURATION-----'));
-								INSERT INTO audit_check_data (fid, criticity, error_message)
-								VALUES (214, 1, concat('Node_2 is a delimiter of a mapzone if arc was defined as toArc it has been reconfigured with new arc_id.'));
-							END IF;
-						END IF;
+						EXECUTE 'SELECT gw_fct_setmapzoneconfig($${
+						"client":{"device":4, "infoType":1,"lang":"ES"},"data":{"parameters":{"nodeIdOld":"'||v_node_1||'",
+						"arcIdOld":'||v_record2.arc_id||',"arcIdNew":'||v_new_record.arc_id||',"action":"updateArc"}}}$$);';
+							
 
 						-- Delete arcs
 						DELETE FROM arc WHERE arc_id = v_record1.arc_id;

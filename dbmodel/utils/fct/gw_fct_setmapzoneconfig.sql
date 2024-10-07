@@ -13,7 +13,8 @@ $BODY$
 
 /*
 
-SELECT SCHEMA_NAME.gw_fct_setmapzoneconfig($${"client":{"device":4, "infoType":1,"lang":"ES"}, "data":{"parameters":{"nodeIdOld":"23798","arcIdOld":"60344","arcIdNew":"65835","action":"updateArc"}}}$$);
+SELECT SCHEMA_NAME.gw_fct_setmapzoneconfig($${"client":{"device":4, "infoType":1,"lang":"ES"}, "data":{"parameters":{"nodeIdOld":"1115","arcIdOld":"2220","arcIdNew":"114481","action":"updateArc"}}}$$);
+
 SELECT SCHEMA_NAME.gw_fct_setmapzoneconfig($${"client":{"device":4, "infoType":1,"lang":"ES"}, "data":{"parameters":{"nodeIdOld":"23798", "nodeIdNew":"65835","action":"updateNode"}}}$$);
 
 
@@ -69,26 +70,35 @@ BEGIN
 
 	IF v_action = 'updateArc' THEN
 
-		-- mapzones
-		FOREACH v_zone IN ARRAY '{sector, dma, presszone, dqa}'::text[] 
-		LOOP
+		IF v_project_type = 'WS' THEN
 
-			--update toArc value with newly created arc id
-			v_querytext = 'UPDATE '||v_zone||' set graphconfig = replace(graphconfig::text,a.toarc,'||v_arc_id_new||'::text)::json FROM (
-			select json_array_elements_text((elem->>''toArc'')::json) as toarc, elem->>''nodeParent'' as nodeparent
-			from '||v_zone||'
-			cross join json_array_elements((graphconfig->>''use'')::json) elem
-			where elem->>''nodeParent'' = '||quote_literal(v_node_id_old)||' 
-			AND (elem::json->>''toArc'') ilike ''%'||v_arc_id_old||'%'')a';
-			raise notice ' %', v_querytext;
-			EXECUTE v_querytext;
+			-- mapzones
+			FOREACH v_zone IN ARRAY '{sector, dma, presszone, dqa}'::text[] 
+			LOOP
+
+				--update toArc value with newly created arc id
+				v_querytext = 'UPDATE '||v_zone||' set graphconfig = replace(graphconfig::text,a.toarc,'||v_arc_id_new||'::text)::json FROM (
+				select json_array_elements_text((elem->>''toArc'')::json) as toarc, elem->>''nodeParent'' as nodeparent
+				from '||v_zone||'
+				cross join json_array_elements((graphconfig->>''use'')::json) elem
+				where elem->>''nodeParent'' = '||quote_literal(v_node_id_old)||' 
+				AND (elem::json->>''toArc'') ilike ''%'||v_arc_id_old||'%'')a';
+				raise notice ' %', v_querytext;
+				EXECUTE v_querytext;
+				
+			END LOOP;
+		
+			-- man values
+			UPDATE man_pump SET to_arc = v_arc_id_new WHERE to_arc = v_arc_id_old AND node_id = v_node_id_old;
+			UPDATE man_valve SET to_arc = v_arc_id_new WHERE to_arc = v_arc_id_old AND node_id = v_node_id_old;
+
+		ELSIF _project_type = 'UD' THEN
+
+
+
+
+		END IF;
 			
-		END LOOP;
-		
-		-- man values
-		UPDATE man_pump SET to_arc = v_arc_id_new WHERE to_arc = v_arc_id_old AND node_id = v_node_id_old;
-		UPDATE man_valve SET to_arc = v_arc_id_new WHERE to_arc = v_arc_id_old AND node_id = v_node_id_old;
-		
 
 	ELSIF v_action = 'updateNode' THEN
 	
