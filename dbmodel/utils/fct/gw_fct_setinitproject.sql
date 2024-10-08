@@ -138,9 +138,6 @@ BEGIN
 		END IF;
 	END IF;
 
-	-- Add user to cat_users if not exists
-	INSERT INTO cat_users (id,name,active) values (v_user, v_user, true) ON CONFLICT (id) DO NOTHING;
-
     --    Control null
 	v_message := COALESCE(v_message, '{}');
 	v_return := COALESCE(v_return,'{}');
