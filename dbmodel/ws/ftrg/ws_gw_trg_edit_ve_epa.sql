@@ -58,8 +58,12 @@ BEGIN
 
         ELSIF v_epatype = 'valve' THEN     
 		UPDATE inp_valve SET valv_type=NEW.valv_type, pressure=NEW.pressure,custom_dint=NEW.custom_dint, flow=NEW.flow, coef_loss=NEW.coef_loss, 
-		curve_id=NEW.curve_id, minorloss=NEW.minorloss, status=NEW.status, to_arc=NEW.to_arc, add_settings = NEW.add_settings,
+		curve_id=NEW.curve_id, minorloss=NEW.minorloss, add_settings = NEW.add_settings,
 		init_quality=NEW.init_quality WHERE node_id=OLD.node_id;
+	
+		update man_valve set closed = true where new.status = 'CLOSED' AND node_id = OLD.node_id;
+		update man_valve set closed = false, active=true where new.status = 'ACTIVE' and node_id = OLD.node_id;
+		update man_valve set closed = false, active = false where new.status = 'OPEN' and node_id = OLD.node_id; 
             
         ELSIF v_epatype = 'shortpipe' THEN     
 		UPDATE inp_shortpipe SET minorloss=NEW.minorloss, bulk_coeff = NEW.bulk_coeff, wall_coeff = NEW.wall_coeff, custom_dint=NEW.custom_dint WHERE node_id=OLD.node_id;  
