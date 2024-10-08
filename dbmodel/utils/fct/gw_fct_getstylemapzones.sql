@@ -13,7 +13,7 @@ $BODY$
 /* EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_getstylemapzones($${"client":{"device":4, "infoType":1, "lang":"ES"},"data":{}}$$)
 
-SELECT SCHEMA_NAME.gw_fct_getstylemapzones($${"client":{"device":4, "infoType":1, "lang":"ES"},"data":{"graphClass":"DMA"}}$$)
+SELECT SCHEMA_NAME.gw_fct_getstylemapzones($${"client":{"device":4, "infoType":1, "lang":"ES"},"data":{"graphClass":"DMA", "tempLayer":"graphanalytics tstep process", "idName":"mapzone_id"}}$$)
 
 
 */
@@ -48,6 +48,8 @@ v_graphclass text;
 v_stylesheet json;
 v_mode text = 'Random';
 v_transparency text;
+v_templayer text;
+v_idname text;
 
 BEGIN
 
@@ -57,6 +59,9 @@ BEGIN
 	SELECT project_type INTO v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	v_graphclass = ((p_data ->>'data')::json->>'graphCLass');
+	v_templayer = ((p_data ->>'data')::json->>'tempLayer');
+	v_idname = ((p_data ->>'data')::json->>'idName');
+
 
 	--  get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
@@ -78,7 +83,7 @@ BEGIN
 		RETURN ('{"status":"Accepted", "version":'||v_version||
 				 ',"body":{"message":{}'||
 				',"data":{"mapzones":
-					[{",{"name":"graphinundation",  "mode": "'||v_mode||'", "layer":"graphanalytics tstep process", "idname": "mapzone_id", "transparency":'||v_transparency||', "values":' || v_stylesheet ||'}'||
+					[{",{"name":"graphinundation",  "mode": "'||v_mode||'", "layer":"'||v_templayer||'", "idname": "'||v_idname||'", "transparency":'||v_transparency||', "values":' || v_stylesheet ||'}'||
 					']}}'||
 			'}')::json;
 		
