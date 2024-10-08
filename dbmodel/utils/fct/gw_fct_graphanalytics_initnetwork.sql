@@ -15,9 +15,11 @@ $BODY$
 
 /* Example:
 
-SELECT SCHEMA_NAME.gw_fct_graphanalytics_initnetwork('{"data":{"expl_id":"-9"}}'); -- For all explotations
-SELECT SCHEMA_NAME.gw_fct_graphanalytics_initnetwork('{"data":{"expl_id":"1,2"}}'); -- For explotations 1 and 2
-SELECT SCHEMA_NAME.gw_fct_graphanalytics_initnetwork('{"data":{"expl_id":"2"}}'); -- For explotation 2
+SELECT SCHEMA_NAME.gw_fct_graphanalytics_initnetwork('{"data":{"expl_id":"-901"}}'); -- For all user selected exploitations
+SELECT SCHEMA_NAME.gw_fct_graphanalytics_initnetwork('{"data":{"expl_id":"-902"}}'); -- For all exploitations
+SELECT SCHEMA_NAME.gw_fct_graphanalytics_initnetwork('{"data":{"expl_id":"0"}}'); -- For exploitations 0
+SELECT SCHEMA_NAME.gw_fct_graphanalytics_initnetwork('{"data":{"expl_id":"1"}}'); -- For exploitation 1
+SELECT SCHEMA_NAME.gw_fct_graphanalytics_initnetwork('{"data":{"expl_id":"2"}}'); -- For exploitation 2
 
 It is an auxiliary process used by macro_minsector, minsector, or mapzone that generates the tables temp_pgr_node and temp_pgr_arc.
 */
@@ -42,7 +44,9 @@ BEGIN
 
     v_expl_id = (SELECT (p_data::json->>'data')::json->>'expl_id');
 
-    IF v_expl_id = '-9' THEN
+    IF v_expl_id = '-901' THEN
+        SELECT replace(replace((array_agg(expl_id))::text,'{',''),'}','') INTO v_expl_id FROM selector_expl WHERE cur_user = current_user;
+    ELSIF v_expl_id = '-902' THEN
         SELECT string_agg(expl_id::TEXT, ',') INTO v_expl_id FROM exploitation;
     END IF;
 

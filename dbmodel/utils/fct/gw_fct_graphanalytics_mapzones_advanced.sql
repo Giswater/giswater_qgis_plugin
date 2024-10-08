@@ -12,13 +12,13 @@ RETURNS json AS
 $BODY$
 
 /*
-SELECT gw_fct_graphanalytics_mapzones_advanced('{"data":{"parameters":{"graphClass":"SECTOR", "exploitation": "15", 
+SELECT gw_fct_graphanalytics_mapzones_advanced('{"data":{"parameters":{"graphClass":"SECTOR", "exploitation": "15",
 "updateFeature":"TRUE", "updateMapZone":1, "debug":"FALSE"}}}');
 
-SELECT gw_fct_graphanalytics_mapzones_advanced('{"data":{"parameters":{"graphClass":"DMA", "exploitation": "1", 
+SELECT gw_fct_graphanalytics_mapzones_advanced('{"data":{"parameters":{"graphClass":"DMA", "exploitation": "1",
 "updateFeature":"TRUE", "updateMapZone":3}}}');
 
-SELECT gw_fct_graphanalytics_mapzones_advanced('{"data":{"parameters":{"graphClass":"DQA", "exploitation": "2", 
+SELECT gw_fct_graphanalytics_mapzones_advanced('{"data":{"parameters":{"graphClass":"DQA", "exploitation": "2",
 "updateFeature":"TRUE", "updateMapZone":0}}}');
 
 */
@@ -42,7 +42,7 @@ BEGIN
 
 	-- Search path
 	SET search_path = "SCHEMA_NAME", public;
-	
+
 	v_class = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'graphClass');
 	v_updatemapzone = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'updateMapZone');
 	v_expl = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'exploitation');
@@ -66,13 +66,15 @@ BEGIN
 	IF v_valuefordisconnected IS NULL THEN v_valuefordisconnected = 0; END IF;
 	IF v_floodonlymapzone IS NULL THEN v_floodonlymapzone = ''; END IF;
 	IF v_commitchanges IS NULL THEN v_commitchanges = FALSE ; END IF;
-	
-	IF v_expl ='-999' THEN 
-		v_expl = (select replace(replace((array_agg(expl_id))::text,'{',''),'}','') from selector_expl where cur_user = current_user);
-	ELSE 
-		v_expl = (select replace(replace(v_expl,'{',''),'}',''));
+
+	IF v_expl = '-901' THEN
+        SELECT replace(replace((array_agg(expl_id))::text,'{',''),'}','') INTO v_expl FROM selector_expl WHERE cur_user = current_user;
+    ELSIF v_expl = '-902' THEN
+        SELECT string_agg(expl_id::TEXT, ',') INTO v_expl FROM exploitation;
+    ELSE
+		SELECT replace(replace(v_expl,'{',''),'}','') INTO v_expl;
 	END IF;
-	
+
 	v_data = concat ('{"data":{"parameters":{"graphClass":"',v_class,'", "exploitation": "',v_expl,'", "updateFeature":"TRUE",
 	"updateMapZone":',v_updatemapzone,', "geomParamUpdate":',v_paramupdate, ',"floodFromNode":"',v_floodfromnode,'", "forceOpen": [',v_forceopen,'], "forceClosed":[',v_forceclosed,'], "usePlanPsector": ',v_usepsector,', "debug":"FALSE", 
 	"valueForDisconnected":',v_valuefordisconnected,', "floodOnlyMapzone":"',v_floodonlymapzone,'", "commitChanges":',v_commitchanges,'}}}');
