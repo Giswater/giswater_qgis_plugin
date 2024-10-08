@@ -399,18 +399,21 @@ BEGIN
 							VALUES (214, 1, concat('Copy ',v_count,' visits from old arcs to new one.'));
 						END IF;
 
-						-- update to_arc for mapzones and system tables
-						EXECUTE 'SELECT node_1, node_2 FROM v_edit_arc a WHERE a.arc_id='''||v_new_record.arc_id||''';' 
-						INTO v_node_1,v_node_2;
+						IF v_project_type = 'WS' THEN
 
-						EXECUTE 'SELECT gw_fct_setmapzoneconfig($${
-						"client":{"device":4, "infoType":1,"lang":"ES"}	,"data":{"parameters":{"nodeIdOld":"'||v_node_1||'",
-						"arcIdOld":'||v_record1.arc_id||',"arcIdNew":'||v_new_record.arc_id||',"action":"updateArc"}}}$$);';
+							-- update to_arc for mapzones and system tables
+							EXECUTE 'SELECT node_1, node_2 FROM v_edit_arc a WHERE a.arc_id='''||v_new_record.arc_id||''';' 
+							INTO v_node_1,v_node_2;
 
-						EXECUTE 'SELECT gw_fct_setmapzoneconfig($${
-						"client":{"device":4, "infoType":1,"lang":"ES"},"data":{"parameters":{"nodeIdOld":"'||v_node_1||'",
-						"arcIdOld":'||v_record2.arc_id||',"arcIdNew":'||v_new_record.arc_id||',"action":"updateArc"}}}$$);';
+							EXECUTE 'SELECT gw_fct_setmapzoneconfig($${
+							"client":{"device":4, "infoType":1,"lang":"ES"}	,"data":{"parameters":{"nodeIdOld":"'||v_node_1||'",
+							"arcIdOld":'||v_record1.arc_id||',"arcIdNew":'||v_new_record.arc_id||',"action":"updateArc"}}}$$);';
+
+							EXECUTE 'SELECT gw_fct_setmapzoneconfig($${
+							"client":{"device":4, "infoType":1,"lang":"ES"},"data":{"parameters":{"nodeIdOld":"'||v_node_1||'",
+							"arcIdOld":'||v_record2.arc_id||',"arcIdNew":'||v_new_record.arc_id||',"action":"updateArc"}}}$$);';
 							
+						END IF;
 
 						-- Delete arcs
 						DELETE FROM arc WHERE arc_id = v_record1.arc_id;
