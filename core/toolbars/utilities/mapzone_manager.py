@@ -12,7 +12,7 @@ from sip import isdeleted
 
 from qgis.PyQt.QtGui import QCursor
 from qgis.PyQt.QtCore import Qt, QPoint, QDateTime, QDate, QTime, QVariant
-from qgis.PyQt.QtWidgets import QAction, QMenu, QTableView, QAbstractItemView, QGridLayout, QLabel, QWidget, QComboBox, QMessageBox
+from qgis.PyQt.QtWidgets import QAction, QMenu, QTableView, QAbstractItemView, QGridLayout, QLabel, QWidget, QComboBox, QMessageBox, QPushButton
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.core import QgsVectorLayer, QgsProject, QgsCoordinateReferenceSystem, QgsDateTimeRange, Qgis, QgsLineSymbol, QgsSingleSymbolRenderer
 
@@ -55,6 +55,7 @@ class GwMapzoneManager:
         # Add icons
         tools_gw.add_icon(self.mapzone_mng_dlg.btn_execute, "311", sub_folder="24x24")
         tools_gw.add_icon(self.mapzone_mng_dlg.btn_flood, "312", sub_folder="24x24")
+        self.mapzone_mng_dlg.btn_flood.setEnabled(False)
 
         default_tab_idx = 0
         tabs = ['sector', 'dma', 'presszone', 'dqa']
@@ -243,6 +244,10 @@ class GwMapzoneManager:
         mapzone_type = self.mapzone_mng_dlg.main_tab.tabText(self.mapzone_mng_dlg.main_tab.currentIndex())
         tools_qt.set_combo_value(dlg_functions.findChild(QComboBox, 'graphClass'), f"{mapzone_type.upper()}", 0)
 
+        # Connect btn 'Run' to enable btn_flood when pressed
+        run_button = dlg_functions.findChild(QPushButton, 'btn_run')
+        if run_button:
+            run_button.clicked.connect(lambda: self.mapzone_mng_dlg.btn_flood.setEnabled(True))
 
     def _open_flood_analysis(self, dialog):
         """Opens the toolbox 'flood_analysis' and runs the SQL function to create the temporal layer."""
