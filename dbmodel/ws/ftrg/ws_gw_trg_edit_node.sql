@@ -67,11 +67,13 @@ v_input json;
 v_code_prefix text;
 
 v_childtable_name text;
+v_schemaname text;
 
 BEGIN
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 	v_man_table:= TG_ARGV[0];
+    v_schemaname:= TG_TABLE_SCHEMA;
 
 	-- get dynamic mapzones status
 	v_isdma := (SELECT value::json->>'DMA' FROM config_param_system WHERE parameter = 'utils_graphanalytics_status');

@@ -70,12 +70,14 @@ v_seq_code text;
 v_code_prefix text;
 v_gully_id text;
 v_childtable_name text;
+v_schemaname text;
 
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 	-- get custom gully type
 	v_customfeature:= TG_ARGV[0];
+    v_schemaname:= TG_TABLE_SCHEMA;
 
 	IF v_customfeature='parent' THEN
 		v_customfeature:=NULL;

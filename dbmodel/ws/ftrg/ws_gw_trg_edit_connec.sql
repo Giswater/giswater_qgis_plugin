@@ -56,11 +56,13 @@ v_seq_code text;
 v_code_prefix text;
 v_connec_id text;
 v_childtable_name text;
+v_schemaname text;
 
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
     v_man_table:= TG_ARGV[0];
+    v_schemaname:= TG_TABLE_SCHEMA;
 
 	IF v_man_table IN (SELECT id FROM cat_feature WHERE feature_type = 'CONNEC') THEN
 		v_customfeature:=v_man_table;
