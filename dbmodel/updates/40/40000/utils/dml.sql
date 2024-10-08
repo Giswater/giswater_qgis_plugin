@@ -72,6 +72,6 @@ ALTER TABLE sys_foreignkey DROP CONSTRAINT sys_foreignkey_unique;
 ALTER TABLE sys_foreignkey ADD CONSTRAINT sys_foreingkey_pkey PRIMARY KEY (typevalue_table, typevalue_name, target_table, target_field);
 
 ALTER TABLE plan_psector ADD CONSTRAINT plan_psector_workcat_id_fkey FOREIGN KEY (workcat_id) REFERENCES cat_work(id) ON UPDATE CASCADE ON DELETE RESTRICT;
-ALTER TABLE plan_psector ADD CONSTRAINT plan_psector_parent_id_fkey FOREIGN KEY (parent_id) REFERENCES plan_psector(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE plan_psector ADD CONSTRAINT plan_psector_parent_id_fkey FOREIGN KEY (parent_id) REFERENCES plan_psector(psector_id) ON UPDATE CASCADE ON DELETE RESTRICT;
 CREATE INDEX plan_psector_workcat_id_index ON plan_psector USING btree (workcat_id);
 CREATE INDEX plan_psector_parent_id_index ON plan_psector USING btree (parent_id);
