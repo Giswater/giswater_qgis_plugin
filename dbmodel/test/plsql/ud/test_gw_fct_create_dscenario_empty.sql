@@ -1,19 +1,19 @@
 
     /*
-    Dit SQL-script is automatisch gegenereerd voor het testen van functies in de QGIS-plugin.
-    Het controleert verschillende combinaties van parameterwaarden om functionaliteit te verifi�ren.
+    This SQL script is automatically generated for testing functions in the QGIS plugin.
+    It checks various combinations of parameter values to verify functionality.
     */
     BEGIN;
 
-    -- Onderdrukken van NOTICE berichten
+    -- Suppress NOTICE messages
     SET client_min_messages TO WARNING;
 
     SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-    -- Plan voor meerdere tests
+    -- Plan for multiple test
     SELECT plan(45);
 
-    -- Start met testen
+    -- Begin testing
     
     SELECT is (
         (gw_fct_create_dscenario_empty($$
@@ -37,7 +37,7 @@
         }
         $$)::JSON)->>'status',
         'Accepted',
-        'Controle of de functie gw_fct_create_dscenario_empty correct werkt voor type CONDUIT met exploitatie 0'
+        'check if the function gw_fct_create_dscenario_empty works correctly for type CONDUIT with expl 0'
     );
     
     SELECT is (
@@ -62,7 +62,7 @@
         }
         $$)::JSON)->>'status',
         'Accepted',
-        'Controle of de functie gw_fct_create_dscenario_empty correct werkt voor type CONDUIT met exploitatie 1'
+        'check if the function gw_fct_create_dscenario_empty works correctly for type CONDUIT with expl 1'
     );
     
     SELECT is (
@@ -87,7 +87,7 @@
         }
         $$)::JSON)->>'status',
         'Accepted',
-        'Controle of de functie gw_fct_create_dscenario_empty correct werkt voor type CONDUIT met exploitatie 2'
+        'check if the function gw_fct_create_dscenario_empty works correctly for type CONDUIT with expl 2'
     );
     
     SELECT is (
@@ -112,7 +112,7 @@
         }
         $$)::JSON)->>'status',
         'Accepted',
-        'Controle of de functie gw_fct_create_dscenario_empty correct werkt voor type JOINED met exploitatie 0'
+        'check if the function gw_fct_create_dscenario_empty works correctly for type JOINED with expl 0'
     );
     
     SELECT is (
@@ -137,7 +137,7 @@
         }
         $$)::JSON)->>'status',
         'Accepted',
-        'Controle of de functie gw_fct_create_dscenario_empty correct werkt voor type JOINED met exploitatie 1'
+        'check if the function gw_fct_create_dscenario_empty works correctly for type JOINED with expl 1'
     );
     
     SELECT is (
@@ -162,7 +162,7 @@
         }
         $$)::JSON)->>'status',
         'Accepted',
-        'Controle of de functie gw_fct_create_dscenario_empty correct werkt voor type JOINED met exploitatie 2'
+        'check if the function gw_fct_create_dscenario_empty works correctly for type JOINED with expl 2'
     );
     
     SELECT is (
@@ -187,7 +187,7 @@
         }
         $$)::JSON)->>'status',
         'Accepted',
-        'Controle of de functie gw_fct_create_dscenario_empty correct werkt voor type JUNCTION met exploitatie 0'
+        'check if the function gw_fct_create_dscenario_empty works correctly for type JUNCTION with expl 0'
     );
     
     SELECT is (
@@ -212,7 +212,7 @@
         }
         $$)::JSON)->>'status',
         'Accepted',
-        'Controle of de functie gw_fct_create_dscenario_empty correct werkt voor type JUNCTION met exploitatie 1'
+        'check if the function gw_fct_create_dscenario_empty works correctly for type JUNCTION with expl 1'
     );
     
     SELECT is (
@@ -237,7 +237,7 @@
         }
         $$)::JSON)->>'status',
         'Accepted',
-        'Controle of de functie gw_fct_create_dscenario_empty correct werkt voor type JUNCTION met exploitatie 2'
+        'check if the function gw_fct_create_dscenario_empty works correctly for type JUNCTION with expl 2'
     );
     
     SELECT is (
@@ -262,7 +262,7 @@
         }
         $$)::JSON)->>'status',
         'Accepted',
-        'Controle of de functie gw_fct_create_dscenario_empty correct werkt voor type OTHER met exploitatie 0'
+        'check if the function gw_fct_create_dscenario_empty works correctly for type OTHER with expl 0'
     );
     
     SELECT is (
@@ -287,7 +287,7 @@
         }
         $$)::JSON)->>'status',
         'Accepted',
-        'Controle of de functie gw_fct_create_dscenario_empty correct werkt voor type OTHER met exploitatie 1'
+        'check if the function gw_fct_create_dscenario_empty works correctly for type OTHER with expl 1'
     );
     
     SELECT is (
@@ -312,7 +312,7 @@
         }
         $$)::JSON)->>'status',
         'Accepted',
-        'Controle of de functie gw_fct_create_dscenario_empty correct werkt voor type OTHER met exploitatie 2'
+        'check if the function gw_fct_create_dscenario_empty works correctly for type OTHER with expl 2'
     );
     
     SELECT is (
@@ -337,7 +337,7 @@
         }
         $$)::JSON)->>'status',
         'Accepted',
-        'Controle of de functie gw_fct_create_dscenario_empty correct werkt voor type RAINGAGE met exploitatie 0'
+        'check if the function gw_fct_create_dscenario_empty works correctly for type RAINGAGE with expl 0'
     );
     
     SELECT is (
@@ -362,7 +362,7 @@
         }
         $$)::JSON)->>'status',
         'Accepted',
-        'Controle of de functie gw_fct_create_dscenario_empty correct werkt voor type RAINGAGE met exploitatie 1'
+        'check if the function gw_fct_create_dscenario_empty works correctly for type RAINGAGE with expl 1'
     );
     
     SELECT is (
@@ -387,7 +387,7 @@
         }
         $$)::JSON)->>'status',
         'Accepted',
-        'Controle of de functie gw_fct_create_dscenario_empty correct werkt voor type RAINGAGE met exploitatie 2'
+        'check if the function gw_fct_create_dscenario_empty works correctly for type RAINGAGE with expl 2'
     );
     
     SELECT is (
@@ -412,7 +412,7 @@
         }
         $$)::JSON)->>'status',
         'Accepted',
-        'Controle of de functie gw_fct_create_dscenario_empty correct werkt voor type OUTFALL met exploitatie 0'
+        'check if the function gw_fct_create_dscenario_empty works correctly for type OUTFALL with expl 0'
     );
     
     SELECT is (
@@ -437,7 +437,7 @@
         }
         $$)::JSON)->>'status',
         'Accepted',
-        'Controle of de functie gw_fct_create_dscenario_empty correct werkt voor type OUTFALL met exploitatie 1'
+        'check if the function gw_fct_create_dscenario_empty works correctly for type OUTFALL with expl 1'
     );
     
     SELECT is (
@@ -462,7 +462,7 @@
         }
         $$)::JSON)->>'status',
         'Accepted',
-        'Controle of de functie gw_fct_create_dscenario_empty correct werkt voor type OUTFALL met exploitatie 2'
+        'check if the function gw_fct_create_dscenario_empty works correctly for type OUTFALL with expl 2'
     );
     
     SELECT is (
@@ -487,7 +487,7 @@
         }
         $$)::JSON)->>'status',
         'Accepted',
-        'Controle of de functie gw_fct_create_dscenario_empty correct werkt voor type STORAGE met exploitatie 0'
+        'check if the function gw_fct_create_dscenario_empty works correctly for type STORAGE with expl 0'
     );
     
     SELECT is (
@@ -512,7 +512,7 @@
         }
         $$)::JSON)->>'status',
         'Accepted',
-        'Controle of de functie gw_fct_create_dscenario_empty correct werkt voor type STORAGE met exploitatie 1'
+        'check if the function gw_fct_create_dscenario_empty works correctly for type STORAGE with expl 1'
     );
     
     SELECT is (
@@ -537,7 +537,7 @@
         }
         $$)::JSON)->>'status',
         'Accepted',
-        'Controle of de functie gw_fct_create_dscenario_empty correct werkt voor type STORAGE met exploitatie 2'
+        'check if the function gw_fct_create_dscenario_empty works correctly for type STORAGE with expl 2'
     );
     
     SELECT is (
@@ -562,7 +562,7 @@
         }
         $$)::JSON)->>'status',
         'Accepted',
-        'Controle of de functie gw_fct_create_dscenario_empty correct werkt voor type WEIR met exploitatie 0'
+        'check if the function gw_fct_create_dscenario_empty works correctly for type WEIR with expl 0'
     );
     
     SELECT is (
@@ -587,7 +587,7 @@
         }
         $$)::JSON)->>'status',
         'Accepted',
-        'Controle of de functie gw_fct_create_dscenario_empty correct werkt voor type WEIR met exploitatie 1'
+        'check if the function gw_fct_create_dscenario_empty works correctly for type WEIR with expl 1'
     );
     
     SELECT is (
@@ -612,7 +612,7 @@
         }
         $$)::JSON)->>'status',
         'Accepted',
-        'Controle of de functie gw_fct_create_dscenario_empty correct werkt voor type WEIR met exploitatie 2'
+        'check if the function gw_fct_create_dscenario_empty works correctly for type WEIR with expl 2'
     );
     
     SELECT is (
@@ -637,7 +637,7 @@
         }
         $$)::JSON)->>'status',
         'Accepted',
-        'Controle of de functie gw_fct_create_dscenario_empty correct werkt voor type PUMP met exploitatie 0'
+        'check if the function gw_fct_create_dscenario_empty works correctly for type PUMP with expl 0'
     );
     
     SELECT is (
@@ -662,7 +662,7 @@
         }
         $$)::JSON)->>'status',
         'Accepted',
-        'Controle of de functie gw_fct_create_dscenario_empty correct werkt voor type PUMP met exploitatie 1'
+        'check if the function gw_fct_create_dscenario_empty works correctly for type PUMP with expl 1'
     );
     
     SELECT is (
@@ -687,7 +687,7 @@
         }
         $$)::JSON)->>'status',
         'Accepted',
-        'Controle of de functie gw_fct_create_dscenario_empty correct werkt voor type PUMP met exploitatie 2'
+        'check if the function gw_fct_create_dscenario_empty works correctly for type PUMP with expl 2'
     );
     
     SELECT is (
@@ -712,7 +712,7 @@
         }
         $$)::JSON)->>'status',
         'Accepted',
-        'Controle of de functie gw_fct_create_dscenario_empty correct werkt voor type ORIFICE met exploitatie 0'
+        'check if the function gw_fct_create_dscenario_empty works correctly for type ORIFICE with expl 0'
     );
     
     SELECT is (
@@ -737,7 +737,7 @@
         }
         $$)::JSON)->>'status',
         'Accepted',
-        'Controle of de functie gw_fct_create_dscenario_empty correct werkt voor type ORIFICE met exploitatie 1'
+        'check if the function gw_fct_create_dscenario_empty works correctly for type ORIFICE with expl 1'
     );
     
     SELECT is (
@@ -762,7 +762,7 @@
         }
         $$)::JSON)->>'status',
         'Accepted',
-        'Controle of de functie gw_fct_create_dscenario_empty correct werkt voor type ORIFICE met exploitatie 2'
+        'check if the function gw_fct_create_dscenario_empty works correctly for type ORIFICE with expl 2'
     );
     
     SELECT is (
@@ -787,7 +787,7 @@
         }
         $$)::JSON)->>'status',
         'Accepted',
-        'Controle of de functie gw_fct_create_dscenario_empty correct werkt voor type OUTLET met exploitatie 0'
+        'check if the function gw_fct_create_dscenario_empty works correctly for type OUTLET with expl 0'
     );
     
     SELECT is (
@@ -812,7 +812,7 @@
         }
         $$)::JSON)->>'status',
         'Accepted',
-        'Controle of de functie gw_fct_create_dscenario_empty correct werkt voor type OUTLET met exploitatie 1'
+        'check if the function gw_fct_create_dscenario_empty works correctly for type OUTLET with expl 1'
     );
     
     SELECT is (
@@ -837,7 +837,7 @@
         }
         $$)::JSON)->>'status',
         'Accepted',
-        'Controle of de functie gw_fct_create_dscenario_empty correct werkt voor type OUTLET met exploitatie 2'
+        'check if the function gw_fct_create_dscenario_empty works correctly for type OUTLET with expl 2'
     );
     
     SELECT is (
@@ -862,7 +862,7 @@
         }
         $$)::JSON)->>'status',
         'Accepted',
-        'Controle of de functie gw_fct_create_dscenario_empty correct werkt voor type INFLOWS met exploitatie 0'
+        'check if the function gw_fct_create_dscenario_empty works correctly for type INFLOWS with expl 0'
     );
     
     SELECT is (
@@ -887,7 +887,7 @@
         }
         $$)::JSON)->>'status',
         'Accepted',
-        'Controle of de functie gw_fct_create_dscenario_empty correct werkt voor type INFLOWS met exploitatie 1'
+        'check if the function gw_fct_create_dscenario_empty works correctly for type INFLOWS with expl 1'
     );
     
     SELECT is (
@@ -912,7 +912,7 @@
         }
         $$)::JSON)->>'status',
         'Accepted',
-        'Controle of de functie gw_fct_create_dscenario_empty correct werkt voor type INFLOWS met exploitatie 2'
+        'check if the function gw_fct_create_dscenario_empty works correctly for type INFLOWS with expl 2'
     );
     
     SELECT is (
@@ -937,7 +937,7 @@
         }
         $$)::JSON)->>'status',
         'Accepted',
-        'Controle of de functie gw_fct_create_dscenario_empty correct werkt voor type TREATMENT met exploitatie 0'
+        'check if the function gw_fct_create_dscenario_empty works correctly for type TREATMENT with expl 0'
     );
     
     SELECT is (
@@ -962,7 +962,7 @@
         }
         $$)::JSON)->>'status',
         'Accepted',
-        'Controle of de functie gw_fct_create_dscenario_empty correct werkt voor type TREATMENT met exploitatie 1'
+        'check if the function gw_fct_create_dscenario_empty works correctly for type TREATMENT with expl 1'
     );
     
     SELECT is (
@@ -987,7 +987,7 @@
         }
         $$)::JSON)->>'status',
         'Accepted',
-        'Controle of de functie gw_fct_create_dscenario_empty correct werkt voor type TREATMENT met exploitatie 2'
+        'check if the function gw_fct_create_dscenario_empty works correctly for type TREATMENT with expl 2'
     );
     
     SELECT is (
@@ -1012,7 +1012,7 @@
         }
         $$)::JSON)->>'status',
         'Accepted',
-        'Controle of de functie gw_fct_create_dscenario_empty correct werkt voor type CONTROLS met exploitatie 0'
+        'check if the function gw_fct_create_dscenario_empty works correctly for type CONTROLS with expl 0'
     );
     
     SELECT is (
@@ -1037,7 +1037,7 @@
         }
         $$)::JSON)->>'status',
         'Accepted',
-        'Controle of de functie gw_fct_create_dscenario_empty correct werkt voor type CONTROLS met exploitatie 1'
+        'check if the function gw_fct_create_dscenario_empty works correctly for type CONTROLS with expl 1'
     );
     
     SELECT is (
@@ -1062,7 +1062,7 @@
         }
         $$)::JSON)->>'status',
         'Accepted',
-        'Controle of de functie gw_fct_create_dscenario_empty correct werkt voor type CONTROLS met exploitatie 2'
+        'check if the function gw_fct_create_dscenario_empty works correctly for type CONTROLS with expl 2'
     );
     
     SELECT is (
@@ -1087,7 +1087,7 @@
         }
         $$)::JSON)->>'status',
         'Accepted',
-        'Controle of de functie gw_fct_create_dscenario_empty correct werkt voor type NETWORK met exploitatie 0'
+        'check if the function gw_fct_create_dscenario_empty works correctly for type NETWORK with expl 0'
     );
     
     SELECT is (
@@ -1112,7 +1112,7 @@
         }
         $$)::JSON)->>'status',
         'Accepted',
-        'Controle of de functie gw_fct_create_dscenario_empty correct werkt voor type NETWORK met exploitatie 1'
+        'check if the function gw_fct_create_dscenario_empty works correctly for type NETWORK with expl 1'
     );
     
     SELECT is (
@@ -1137,9 +1137,9 @@
         }
         $$)::JSON)->>'status',
         'Accepted',
-        'Controle of de functie gw_fct_create_dscenario_empty correct werkt voor type NETWORK met exploitatie 2'
+        'check if the function gw_fct_create_dscenario_empty works correctly for type NETWORK with expl 2'
     );
     
-    -- Be�indig het testscript
+    -- End the test script
     ROLLBACK;
     
