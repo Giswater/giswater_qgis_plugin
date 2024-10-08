@@ -4,6 +4,9 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
+-- SELECT SCHEMA_NAME.gw_fct_getgraphinundation($${"client":{"device":4, "infoType":1, "lang":"ES"}, "data":{}}$$)
+
+
 --FUNCTION CODE: 3336
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_getgraphinundation(p_data json);
@@ -14,10 +17,11 @@ $BODY$
 DECLARE
     geojson_result json;
 	v_version text;
+	
 BEGIN
 
 	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
-
+	
     SELECT jsonb_build_object(
         'type', 'FeatureCollection',
         'layerName', 'Graphanalytics tstep process',
@@ -32,6 +36,7 @@ BEGIN
                 'state', b.state,
                 'state_type', b.state_type,
                 'is_operative', b.is_operative,
+				'mapzone_id', a.trace,
                 'timestep', (concat('2001-01-01 01:', a.checkf / 60, ':', a.checkf % 60))::timestamp
             )
         ))
@@ -39,6 +44,7 @@ BEGIN
     FROM temp_anlgraph a
     JOIN v_edit_arc b ON a.arc_id = b.arc_id
     WHERE a.cur_user = current_user;
+	
 
     RETURN gw_fct_json_create_return((
         '{"status":"Accepted", "message":{"level":1, "text":"Process done successfully"}, "version":"' || v_version || '", "body":{"form":{},"data":{"line":' || geojson_result || '}}}'
