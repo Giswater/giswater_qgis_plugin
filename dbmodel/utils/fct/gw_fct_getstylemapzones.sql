@@ -58,7 +58,7 @@ BEGIN
 
 	SELECT project_type INTO v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
 
-	v_graphclass = ((p_data ->>'data')::json->>'graphCLass');
+	v_graphclass = ((p_data ->>'data')::json->>'graphClass');
 	v_templayer = ((p_data ->>'data')::json->>'tempLayer');
 	v_idname = ((p_data ->>'data')::json->>'idName');
 
@@ -70,20 +70,25 @@ BEGIN
 	IF 	v_graphclass IS NOT NULL THEN -- called after getgraphinundation
 	
 		EXECUTE 'SELECT to_json(array_agg(row_to_json(row))) FROM (SELECT '||lower(concat(v_graphclass,'_id'))||' as id, stylesheet::json FROM '||lower(v_graphclass)||'
-				WHERE '||lower(concat(v_graphclass,'_id'))||' > 0 and active IS TRUE) row' 
-				INTO v_stylesheet;
-				
-		EXECUTE 'SELECT (value::json->>'||v_graphclass||')::json->>''transparency'' FROM config_param_system WHERE parameter=''utils_graphanalytics_style'');'
+				 WHERE '||lower(concat(v_graphclass,'_id'))||' > 0 and active IS TRUE) row'
+		INTO v_stylesheet;
+
+		EXECUTE 'SELECT (value::json->>'''||upper(v_graphclass)||''')::json->>''transparency'' FROM config_param_system WHERE parameter=''utils_graphanalytics_style'';'
 		INTO v_transparency;
-				
-		EXECUTE 'SELECT (value::json->>'||v_graphclass||')::json->>''mode'' FROM config_param_system WHERE parameter=''utils_graphanalytics_style'');'
-				INTO v_mode;
-		
+
+		EXECUTE 'SELECT (value::json->>'''||upper(v_graphclass)||''')::json->>''mode'' FROM config_param_system WHERE parameter=''utils_graphanalytics_style'';'
+		INTO v_mode;
+
+		-- Control null
+		v_stylesheet  := COALESCE(v_stylesheet, '{}');
+		v_transparency  := COALESCE(v_transparency, '{}');
+		v_mode  := COALESCE(v_mode, '{}');
+
 		--    Return
 		RETURN ('{"status":"Accepted", "version":'||v_version||
 				 ',"body":{"message":{}'||
 				',"data":{"mapzones":
-					[{",{"name":"graphinundation",  "mode": "'||v_mode||'", "layer":"'||v_templayer||'", "idname": "'||v_idname||'", "transparency":'||v_transparency||', "values":' || v_stylesheet ||'}'||
+					[{"name":"graphinundation",  "mode": "'||v_mode||'", "layer":"'||v_templayer||'", "idname": "'||v_idname||'", "transparency":'||v_transparency||', "values":' || v_stylesheet ||'}'||
 					']}}'||
 			'}')::json;
 		
