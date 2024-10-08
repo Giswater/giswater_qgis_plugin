@@ -274,8 +274,8 @@ UPDATE config_form_fields SET linkedobject=NULL WHERE formname='node' AND formty
 
 
 -- 25/04/2024
-DELETE FROM sys_foreignkey WHERE id = 75;
-DELETE FROM sys_foreignkey WHERE id = 78;
+DELETE FROM sys_foreignkey WHERE target_table = 'inp_dscenario_flwreg_orifice' AND target_field = 'ori_type';
+DELETE FROM sys_foreignkey WHERE target_table = 'inp_dscenario_flwreg_outlet' AND target_field = 'flap';
 
 
 -- 26/04/2024

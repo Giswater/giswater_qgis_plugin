@@ -64,3 +64,9 @@ INSERT INTO config_function (id, function_name, "style", layermanager, actions) 
     }
   }
 }'::json, NULL, NULL);
+
+-- 08/10/2024
+ALTER TABLE sys_foreignkey DROP CONSTRAINT sys_foreingkey_pkey;
+ALTER TABLE sys_foreignkey DROP COLUMN id;
+ALTER TABLE sys_foreignkey DROP CONSTRAINT sys_foreignkey_unique;
+ALTER TABLE sys_foreignkey ADD CONSTRAINT sys_foreingkey_pkey PRIMARY KEY (typevalue_table, typevalue_name, target_table, target_field);
