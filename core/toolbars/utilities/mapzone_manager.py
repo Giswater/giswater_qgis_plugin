@@ -10,11 +10,11 @@ import json
 from functools import partial
 from sip import isdeleted
 
-from qgis.PyQt.QtGui import QCursor
+from qgis.PyQt.QtGui import QCursor, QColor
 from qgis.PyQt.QtCore import Qt, QPoint, QDateTime, QDate, QTime, QVariant
 from qgis.PyQt.QtWidgets import QAction, QMenu, QTableView, QAbstractItemView, QGridLayout, QLabel, QWidget, QComboBox, QMessageBox, QPushButton
 from qgis.PyQt.QtSql import QSqlTableModel
-from qgis.core import QgsVectorLayer, QgsProject, QgsCoordinateReferenceSystem, QgsDateTimeRange, Qgis, QgsLineSymbol, QgsSingleSymbolRenderer
+from qgis.core import QgsVectorLayer, QgsLineSymbol, QgsRendererCategory, QgsDateTimeRange, Qgis, QgsCategorizedSymbolRenderer
 
 from qgis.gui import QgsMapToolEmitPoint
 
@@ -23,7 +23,7 @@ from ...ui.ui_manager import GwMapzoneManagerUi, GwMapzoneConfigUi, GwInfoGeneri
 from ...utils.snap_manager import GwSnapManager
 from ...utils import tools_gw
 from .... import global_vars
-from ....libs import lib_vars, tools_qgis, tools_qt, tools_db, tools_os, tools_log
+from ....libs import lib_vars, tools_qgis, tools_qt, tools_db, tools_os
 
 
 class GwMapzoneManager:
@@ -261,11 +261,26 @@ class GwMapzoneManager:
             tools_qgis.show_warning("No valid data received from the SQL function.", dialog=dialog)
             return
 
-        # Retrieve the layer by its name
+        # Determine the graphClass (current tab)
+        graph_class = self.mapzone_mng_dlg.main_tab.tabText(self.mapzone_mng_dlg.main_tab.currentIndex())
+
+        # Retrieve styling information for map zones
+        extras = f'"graphClass":"{graph_class}", "tempLayer":"Graphanalytics tstep process", "idName": "mapzone_id"'
+        body = tools_gw.create_body(extras=extras)
+
+        # Call gw_fct_getstylemapzones with simplified style_body
+        style_result = tools_gw.execute_procedure('gw_fct_getstylemapzones', body)
+        if not style_result or style_result.get('status') != 'Accepted':
+            tools_qgis.show_warning("Failed to retrieve mapzone styles.", dialog=dialog)
+            return
+
+        # Process the flood data and style it on the map
         layer_name = json_result['body']['data']['line'].get('layerName')
         vlayer = tools_qgis.get_layer_by_layername(layer_name)
 
         if vlayer and vlayer.isValid():
+            # Apply styling from style_result
+            self._apply_styles_to_layer(vlayer, style_result['body']['data']['mapzones'])
             self._setup_temporal_layer(vlayer)
             tools_qgis.show_success("Temporal layer created successfully.", dialog=dialog)
             self.iface.mapCanvas().setExtent(vlayer.extent())
@@ -296,6 +311,45 @@ class GwMapzoneManager:
 
                 self._activate_temporal_controller(vlayer)
 
+    def _apply_styles_to_layer(self, vlayer, mapzones):
+        """Applies styles to the layer based on the mapzone styles retrieved."""
+
+        for mapzone in mapzones:
+            try:
+                transparency = float(mapzone.get('transparency', 1.0))
+            except (TypeError, ValueError):
+                transparency = 1.0
+
+            values = mapzone.get('values', [])
+
+            if values:
+                categories = []
+                for value in values:
+                    mapzone_id = value['id']
+                    color_str = value['stylesheet']['featureColor']
+                    r, g, b = map(int, color_str.split(','))
+
+                    # Create color with full opacity
+                    color = QColor(r, g, b)
+                    color.setAlphaF(transparency)
+
+                    # Create a line symbol with a visible stroke width and solid style
+                    symbol = QgsLineSymbol.createSimple({'line_style': 'solid', 'width': '2', 'color': color.name()})
+
+                    # Create a renderer category for this mapzone ID
+                    # Allows to style features in a layer based on different categories or values in a specific field
+                    # In this case each unique mapzone_id can have a different color
+                    category = QgsRendererCategory(mapzone_id, symbol, str(mapzone_id))
+                    categories.append(category)
+
+                # Apply categorized renderer based on 'mapzone_id'
+                renderer = QgsCategorizedSymbolRenderer("mapzone_id", categories)
+                vlayer.setRenderer(renderer)
+
+                # Force refresh to apply style
+                vlayer.triggerRepaint()
+                self.iface.layerTreeView().refreshLayerSymbology(vlayer.id())
+                self.iface.mapCanvas().refreshAllLayers()
 
     def _activate_temporal_controller(self, vlayer: QgsVectorLayer):
         """Activates the Temporal Controller in QGIS with the proper settings for the temporal layer."""
@@ -325,8 +379,6 @@ class GwMapzoneManager:
         temporal_values = []
         for feature in features:
             value = feature.attribute(field_index)
-
-            # Check if value can be converted to QDateTime or is already in that format
             if isinstance(value, QDateTime):
                 temporal_values.append(value)
             elif isinstance(value, str):
