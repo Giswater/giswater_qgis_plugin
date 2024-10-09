@@ -75,3 +75,9 @@ ALTER TABLE plan_psector ADD CONSTRAINT plan_psector_workcat_id_fkey FOREIGN KEY
 ALTER TABLE plan_psector ADD CONSTRAINT plan_psector_parent_id_fkey FOREIGN KEY (parent_id) REFERENCES plan_psector(psector_id) ON UPDATE CASCADE ON DELETE RESTRICT;
 CREATE INDEX plan_psector_workcat_id_index ON plan_psector USING btree (workcat_id);
 CREATE INDEX plan_psector_parent_id_index ON plan_psector USING btree (parent_id);
+
+-- 09/10/2024
+UPDATE sys_feature_cat SET man_table  = 'element' where id = 'ELEMENT';
+UPDATE sys_feature_cat SET man_table  = 'link' where id = 'LINK';
+
+ALTER TABLE sys_feature_cat ALTER COLUMN man_table SET NOT NULL;
