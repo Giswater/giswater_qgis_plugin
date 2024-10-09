@@ -73,6 +73,11 @@ BEGIN
 		SELECT arc_id INTO v_arc_id FROM arc WHERE node_1 =  v_feature_id;
 	END IF;
 
+	-- check if to_arc is connected with node
+	IF v_arc_id NOT IN (SELECT arc_id FROM arc WHERE node_1 = v_feature_id AND state > 0 UNION SELECT arc_id FROM arc WHERE node_2 = v_feature_id AND state > 0) THEN
+		-- message
+	END IF;
+
 	-- man_tables
 	IF v_systype = 'PUMP' THEN
 
