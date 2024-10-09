@@ -252,7 +252,7 @@ class GwMapzoneManager:
     def _open_flood_analysis(self, dialog):
         """Opens the toolbox 'flood_analysis' and runs the SQL function to create the temporal layer."""
 
-        # Build the body and call execute function
+        # Step 1: Build the body and call gw_fct_getgraphinundation
         body = tools_gw.create_body()
         json_result = tools_gw.execute_procedure('gw_fct_getgraphinundation', body)
 
@@ -261,20 +261,29 @@ class GwMapzoneManager:
             tools_qgis.show_warning("No valid data received from the SQL function.", dialog=dialog)
             return
 
-        # Determine the graphClass (current tab)
-        graph_class = self.mapzone_mng_dlg.main_tab.tabText(self.mapzone_mng_dlg.main_tab.currentIndex())
+        # Step 2: Retrieve graph configuration for map zones using gw_fct_getgraphconfig
+        # Determine the graphClass (current tab) and create the body for gw_fct_getgraphconfig
+        graph_class = self.mapzone_mng_dlg.main_tab.tabText(self.mapzone_mng_dlg.main_tab.currentIndex()).lower()
+        config_extras = f'"context":"OPERATIVE", "mapzone":"{graph_class}"'
+        config_body = tools_gw.create_body(extras=config_extras)
 
-        # Retrieve styling information for map zones
-        extras = f'"graphClass":"{graph_class}", "tempLayer":"Graphanalytics tstep process", "idName": "mapzone_id"'
-        body = tools_gw.create_body(extras=extras)
+        # Call gw_fct_getgraphconfig
+        config_result = tools_gw.execute_procedure('gw_fct_getgraphconfig', config_body)
+        if not config_result or config_result.get('status') != 'Accepted':
+            tools_qgis.show_warning("Failed to retrieve graph configuration.", dialog=dialog)
+            return
 
-        # Call gw_fct_getstylemapzones with simplified style_body
-        style_result = tools_gw.execute_procedure('gw_fct_getstylemapzones', body)
+        # Step 3: Retrieve styling information for map zones
+        style_extras = f'"graphClass":"{graph_class}", "tempLayer":"Graphanalytics tstep process", "idName": "mapzone_id"'
+        style_body = tools_gw.create_body(extras=style_extras)
+
+        # Call gw_fct_getstylemapzones for styling information
+        style_result = tools_gw.execute_procedure('gw_fct_getstylemapzones', style_body)
         if not style_result or style_result.get('status') != 'Accepted':
             tools_qgis.show_warning("Failed to retrieve mapzone styles.", dialog=dialog)
             return
 
-        # Process the flood data and style it on the map
+        # Step 4: Process the flood data and style it on the map
         layer_name = json_result['body']['data']['line'].get('layerName')
         vlayer = tools_qgis.get_layer_by_layername(layer_name)
 
@@ -341,6 +350,9 @@ class GwMapzoneManager:
                     # In this case each unique mapzone_id can have a different color
                     category = QgsRendererCategory(mapzone_id, symbol, str(mapzone_id))
                     categories.append(category)
+
+                # Sort categories by mapzone_id in ascending order
+                categories = sorted(categories, key=lambda x: int(x.label()))
 
                 # Apply categorized renderer based on 'mapzone_id'
                 renderer = QgsCategorizedSymbolRenderer("mapzone_id", categories)
