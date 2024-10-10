@@ -43,8 +43,8 @@ BEGIN
     ) INTO geojson_result
     FROM temp_anlgraph a
     JOIN v_edit_arc b ON a.arc_id = b.arc_id
-    WHERE a.cur_user = current_user;
-	
+    WHERE a.cur_user = current_user
+    AND a.trace IS NOT NULL;
 
     RETURN gw_fct_json_create_return((
         '{"status":"Accepted", "message":{"level":1, "text":"Process done successfully"}, "version":"' || v_version || '", "body":{"form":{},"data":{"line":' || geojson_result || '}}}'
