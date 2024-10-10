@@ -6,8 +6,8 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 3262
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_create_netscenario_from_toc(p_data json) 
-RETURNS json AS 
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_create_netscenario_from_toc(p_data json)
+RETURNS json AS
 $BODY$
 
 /*EXAMPLE
@@ -45,20 +45,20 @@ BEGIN
 
 	-- select version
 	SELECT giswater, project_type INTO v_version, v_projecttype FROM sys_version ORDER BY id DESC LIMIT 1;
-	
-	-- getting input data 	
+
+	-- getting input data
 	v_name :=  ((p_data ->>'data')::json->>'parameters')::json->>'name';
 	v_descript :=  ((p_data ->>'data')::json->>'parameters')::json->>'descript';
 	v_parent_id :=  ((p_data ->>'data')::json->>'parameters')::json->>'parent';
 	v_netscenario_type :=  ((p_data ->>'data')::json->>'parameters')::json->>'type';
 	v_active :=  ((p_data ->>'data')::json->>'parameters')::json->>'active';
 	v_expl_id :=  ((p_data ->>'data')::json->>'parameters')::json->>'expl';
-	
-		
+
+
 	-- Reset values
 	DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=v_fid;
-	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid;	
-	
+	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid;
+
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('CREATE EMPTY NETSCENARIO'));
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '--------------------------------------------------');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Name: ',v_name));
@@ -70,7 +70,7 @@ BEGIN
 
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 3, 'ERRORS');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 3, '--------');
-	
+
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 2, 'WARNINGS');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 2, '---------');
 
@@ -81,25 +81,25 @@ BEGIN
 	-- inserting on catalog table
 	PERFORM setval('SCHEMA_NAME.plan_netscenario_netscenario_id_seq'::regclass,(SELECT max(netscenario_id) FROM plan_netscenario) ,true);
 
-	INSERT INTO plan_netscenario (name, descript, parent_id, netscenario_type, active, expl_id,log) 
+	INSERT INTO plan_netscenario (name, descript, parent_id, netscenario_type, active, expl_id,log)
 	VALUES (v_name, v_descript, v_parent_id, v_netscenario_type, v_active, v_expl_id, concat('Created by ',current_user,' on ',substring(now()::text,0,20)))
 	ON CONFLICT (name) DO NOTHING
 	RETURNING netscenario_id INTO v_scenarioid;
 
 	IF v_scenarioid IS NULL THEN
 		SELECT netscenario_id INTO v_scenarioid FROM plan_netscenario where name = v_name;
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 		VALUES (v_fid, null, 3, concat('ERROR: The netscenario ( ',v_scenarioid,' ) already exists with proposed name ',v_name ,'. Please try another one.'));
-	ELSE 
+	ELSE
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, 'The new netscenario have been created sucessfully');
 
 		IF v_netscenario_type = 'DMA' THEN
-			INSERT INTO plan_netscenario_dma (netscenario_id, dma_id,dma_name, pattern_id, graphconfig, the_geom, active) 
-			SELECT v_scenarioid, dma_id, name, pattern_id, graphconfig, the_geom, TRUE FROM dma WHERE expl_id = v_expl_id OR dma_id = 0 OR dma_id = -1
+			INSERT INTO plan_netscenario_dma (netscenario_id, dma_id,dma_name, pattern_id, graphconfig, the_geom, active)
+			SELECT v_scenarioid, dma_id, name, pattern_id, graphconfig, the_geom, TRUE FROM dma WHERE expl_id IN (v_expl_id) OR dma_id = 0 OR dma_id = -1
 			ON CONFLICT (netscenario_id, dma_id) DO NOTHING;
 		ELSIF v_netscenario_type = 'PRESSZONE' THEN
-			INSERT INTO plan_netscenario_presszone (netscenario_id, presszone_id,presszone_name, head, graphconfig, the_geom, active) 
-			SELECT v_scenarioid, presszone_id, name, head, graphconfig, the_geom, TRUE FROM presszone WHERE expl_id = v_expl_id OR presszone_id= '0' OR presszone_id= '-1'
+			INSERT INTO plan_netscenario_presszone (netscenario_id, presszone_id,presszone_name, head, graphconfig, the_geom, active)
+			SELECT v_scenarioid, presszone_id, name, head, graphconfig, the_geom, TRUE FROM presszone WHERE expl_id IN (v_expl_id) OR presszone_id = '0' OR presszone_id = '-1'
 			ON CONFLICT (netscenario_id, presszone_id) DO NOTHING;
 		END IF;
 
@@ -112,20 +112,20 @@ BEGIN
 
 	-- get results
 	-- info
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid order by criticity desc, id asc) row;
-	v_result := COALESCE(v_result, '{}'); 
+	v_result := COALESCE(v_result, '{}');
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
 	-- Control nulls
-	v_result_info := COALESCE(v_result_info, '{}'); 
+	v_result_info := COALESCE(v_result_info, '{}');
 
 	-- Return
 	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Analysis done successfully"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||
 			'}}'||
-	    '}')::json, 3262, null, null, null); 
+	    '}')::json, 3262, null, null, null);
 
 END;
 $BODY$
