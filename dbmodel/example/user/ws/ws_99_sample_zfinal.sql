@@ -86,3 +86,4 @@ SELECT gw_fct_graphanalytics_mapzones_advanced($${"client":{"device":4, "lang":"
 SELECT gw_fct_graphanalytics_mapzones_advanced($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"graphClass":"PRESSZONE", "exploitation":"2", "floodOnlyMapzone":null, "forceOpen":null, "forceClosed":null, "usePlanPsector":"false", "commitChanges":"true", "valueForDisconnected":null, "updateMapZone":"2", "geomParamUpdate":"8"}, "aux_params":null}}$$);
 
 
+UPDATE ext_rtc_hydrometer SET is_waterbal = false WHERE  id::integer in (3,4);
