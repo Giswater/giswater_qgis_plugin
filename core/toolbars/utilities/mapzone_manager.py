@@ -261,6 +261,17 @@ class GwMapzoneManager:
             tools_qgis.show_warning("No valid data received from the SQL function.", dialog=dialog)
             return
 
+        # Extract mapzone_ids with data from json_result
+        valid_mapzone_ids = set()
+        if 'body' in json_result and 'data' in json_result['body'] and 'line' in json_result['body']['data']:
+            # Access the 'features' list in 'line'
+            features = json_result['body']['data']['line'].get('features', [])
+            for feature in features:
+                properties = feature.get('properties', {})
+                mapzone_id = properties.get('mapzone_id')
+                if mapzone_id is not None:
+                    valid_mapzone_ids.add(mapzone_id)
+
         # Step 2: Retrieve graph configuration for map zones using gw_fct_getgraphconfig
         # Determine the graphClass (current tab) and create the body for gw_fct_getgraphconfig
         graph_class = self.mapzone_mng_dlg.main_tab.tabText(self.mapzone_mng_dlg.main_tab.currentIndex()).lower()
@@ -288,8 +299,8 @@ class GwMapzoneManager:
         vlayer = tools_qgis.get_layer_by_layername(layer_name)
 
         if vlayer and vlayer.isValid():
-            # Apply styling from style_result
-            self._apply_styles_to_layer(vlayer, style_result['body']['data']['mapzones'])
+            # Apply styling only to valid mapzones
+            self._apply_styles_to_layer(vlayer, style_result['body']['data']['mapzones'], valid_mapzone_ids)
             self._setup_temporal_layer(vlayer)
             tools_qgis.show_success("Temporal layer created successfully.", dialog=dialog)
             self.iface.mapCanvas().setExtent(vlayer.extent())
@@ -320,8 +331,10 @@ class GwMapzoneManager:
 
                 self._activate_temporal_controller(vlayer)
 
-    def _apply_styles_to_layer(self, vlayer, mapzones):
-        """Applies styles to the layer based on the mapzone styles retrieved."""
+    def _apply_styles_to_layer(self, vlayer, mapzones, valid_mapzone_ids):
+        """Applies styles to the layer based on the mapzone styles retrieved, filtering only those with data in valid_mapzone_ids."""
+
+        categories = []
 
         for mapzone in mapzones:
             try:
@@ -331,37 +344,45 @@ class GwMapzoneManager:
 
             values = mapzone.get('values', [])
 
-            if values:
-                categories = []
-                for value in values:
-                    mapzone_id = value['id']
-                    color_str = value['stylesheet']['featureColor']
-                    r, g, b = map(int, color_str.split(','))
+            # Only include values that match the `mapzone_id`s present in valid_mapzone_ids
+            filtered_values = [value for value in values if value['id'] in valid_mapzone_ids]
+            if not filtered_values:
+                continue
 
-                    # Create color with full opacity
-                    color = QColor(r, g, b)
-                    color.setAlphaF(transparency)
+            # Process each filtered value to apply styling
+            for value in filtered_values:
+                mapzone_id = value['id']
+                color_str = value['stylesheet']['featureColor']
+                r, g, b = map(int, color_str.split(','))
 
-                    # Create a line symbol with a visible stroke width and solid style
-                    symbol = QgsLineSymbol.createSimple({'line_style': 'solid', 'width': '2', 'color': color.name()})
+                # Create color with full opacity
+                color = QColor(r, g, b)
+                color.setAlphaF(transparency)
 
-                    # Create a renderer category for this mapzone ID
-                    # Allows to style features in a layer based on different categories or values in a specific field
-                    # In this case each unique mapzone_id can have a different color
-                    category = QgsRendererCategory(mapzone_id, symbol, str(mapzone_id))
-                    categories.append(category)
+                # Create a line symbol with a visible stroke width and solid style
+                symbol = QgsLineSymbol.createSimple({'line_style': 'solid', 'width': '2', 'color': color.name()})
 
-                # Sort categories by mapzone_id in ascending order
-                categories = sorted(categories, key=lambda x: int(x.label()))
+                # Create a renderer category for this mapzone ID
+                # Allows to style features in a layer based on different categories or values in a specific field
+                # In this case each unique mapzone_id can have a different color
+                category = QgsRendererCategory(mapzone_id, symbol, str(mapzone_id))
+                categories.append(category)
 
-                # Apply categorized renderer based on 'mapzone_id'
-                renderer = QgsCategorizedSymbolRenderer("mapzone_id", categories)
-                vlayer.setRenderer(renderer)
+        # Sort categories by mapzone_id in ascending order
+        categories = sorted(categories, key=lambda x: int(x.label()))
 
-                # Force refresh to apply style
-                vlayer.triggerRepaint()
-                self.iface.layerTreeView().refreshLayerSymbology(vlayer.id())
-                self.iface.mapCanvas().refreshAllLayers()
+        # Apply categorized renderer if there are valid categories
+        if categories:
+            renderer = QgsCategorizedSymbolRenderer("mapzone_id", categories)
+            vlayer.setRenderer(renderer)
+
+            # Force refresh to apply style
+            vlayer.triggerRepaint()
+            self.iface.layerTreeView().refreshLayerSymbology(vlayer.id())
+            self.iface.mapCanvas().refreshAllLayers()
+        else:
+            tools_qgis.show_warning("No valid mapzones with values were found to apply styles.")
+
 
     def _activate_temporal_controller(self, vlayer: QgsVectorLayer):
         """Activates the Temporal Controller in QGIS with the proper settings for the temporal layer."""
