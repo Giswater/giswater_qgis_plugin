@@ -1016,8 +1016,13 @@ class GwNonVisual:
 
 
     def _manage_delete_btn(self, table, plot_widget):
-        table.removeRow(table.currentRow())
-        self._manage_curve_plot(self.dialog, table, plot_widget, None, None)
+        
+        if table.item(table.currentRow(), 0) is not None or table.item(table.currentRow(), 1) is not None:
+            table.removeRow(table.currentRow())
+            self._manage_curve_plot(self.dialog, table, plot_widget, None, None)
+        else:
+            msg = "Only rows with values are allowed to be deleted."
+            tools_qgis.show_info(msg, dialog=self.dialog)
 
 
     def _accept_curves(self, dialog, is_new):
