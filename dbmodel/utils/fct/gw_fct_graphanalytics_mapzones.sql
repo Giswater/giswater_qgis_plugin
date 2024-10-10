@@ -413,7 +413,7 @@ BEGIN
 			IF v_netscenario IS NOT NULL THEN
 				EXECUTE 'INSERT INTO temp_'||v_table||' SELECT * FROM plan_netscenario_'||v_table||' WHERE active is true AND netscenario_id = '||v_netscenario;
 			ELSE
-				EXECUTE 'INSERT INTO temp_'||v_table||' SELECT * FROM '||v_table||' WHERE active is true AND expl_id IN('||v_expl_id||')';
+				EXECUTE 'INSERT INTO temp_'||v_table||' SELECT * FROM '||v_table||' WHERE active is true AND expl_id && string_to_array(''' || v_expl_id || ''', '','')::int[]';
 			END IF;
 		END IF;
 

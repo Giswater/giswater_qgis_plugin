@@ -389,7 +389,7 @@ CREATE OR REPLACE VIEW vu_link AS
     l.minsector_id,
     l.macrominsector_id,
     CASE
-            WHEN sector_id > 0 AND is_operative = true AND epa_type = 'JUNCTION'::character varying(16)::text AND cpu.value = '4' THEN epa_type::character varying
+            WHEN s.sector_id > 0 AND is_operative = true AND epa_type = 'JUNCTION'::character varying(16)::text AND cpu.value = '4' THEN epa_type::character varying
             ELSE NULL::character varying(16)
         END AS inp_type
      FROM (SELECT value FROM config_param_user WHERE parameter = 'inp_options_networkmode' and cur_user = current_user) cpu, link l
@@ -791,8 +791,10 @@ SELECT vu_connec.connec_id,
 CREATE OR REPLACE VIEW vu_presszone
 AS SELECT p.presszone_id,
     p.name,
-    p.expl_id,
     et.idval AS presszone_type,
+    p.muni_id,
+    p.expl_id,
+    p.sector_id,
     p.descript,
     p.head,
     p.graphconfig::text AS graphconfig,
@@ -812,8 +814,10 @@ AS SELECT p.presszone_id,
 CREATE OR REPLACE VIEW v_edit_presszone
 AS SELECT vu_presszone.presszone_id,
     vu_presszone.name,
-    vu_presszone.expl_id,
     vu_presszone.presszone_type,
+    vu_presszone.muni_id,
+    vu_presszone.expl_id,
+    vu_presszone.sector_id,
     vu_presszone.descript,
     vu_presszone.head,
     vu_presszone.graphconfig,
@@ -828,7 +832,7 @@ AS SELECT vu_presszone.presszone_id,
     vu_presszone.the_geom
    FROM vu_presszone,
     selector_expl
-  WHERE vu_presszone.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text OR vu_presszone.expl_id IS NULL
+  WHERE selector_expl.expl_id = ANY(vu_presszone.expl_id) AND selector_expl.cur_user = "current_user"()::text OR vu_presszone.expl_id IS NULL
   ORDER BY vu_presszone.presszone_id;
 
 
@@ -836,8 +840,10 @@ CREATE OR REPLACE VIEW vu_dma
 AS SELECT d.dma_id,
     d.name,
     d.macrodma_id,
-    d.expl_id,
     et.idval AS dma_type,
+    d.muni_id,
+    d.expl_id,
+    d.sector_id,
     d.descript,
     d.pattern_id,
     d.graphconfig::text AS graphconfig,
@@ -860,7 +866,9 @@ CREATE OR REPLACE VIEW v_edit_dma
 AS SELECT vu_dma.dma_id,
     vu_dma.name,
     vu_dma.macrodma_id,
+    vu_dma.muni_id,
     vu_dma.expl_id,
+    vu_dma.sector_id,
     vu_dma.dma_type,
     vu_dma.descript,
     vu_dma.pattern_id,
@@ -878,7 +886,7 @@ AS SELECT vu_dma.dma_id,
     vu_dma.the_geom
    FROM vu_dma,
     selector_expl
-  WHERE vu_dma.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text OR vu_dma.expl_id IS NULL
+  WHERE selector_expl.expl_id = ANY(vu_dma.expl_id) AND selector_expl.cur_user = "current_user"()::text OR vu_dma.expl_id IS NULL
   ORDER BY vu_dma.dma_id;
 
 
@@ -887,7 +895,9 @@ AS SELECT d.dqa_id,
     d.name,
     d.macrodqa_id,
     d.descript,
+    d.muni_id,
     d.expl_id,
+    d.sector_id,
     et.idval AS dqa_type,
     d.pattern_id,
     d.graphconfig::text AS graphconfig,
@@ -909,7 +919,9 @@ AS SELECT vu_dqa.dqa_id,
     vu_dqa.name,
     vu_dqa.macrodqa_id,
     vu_dqa.descript,
+    vu_dqa.muni_id,
     vu_dqa.expl_id,
+    vu_dqa.sector_id,
     vu_dqa.dqa_type,
     vu_dqa.pattern_id,
     vu_dqa.graphconfig,
@@ -924,7 +936,7 @@ AS SELECT vu_dqa.dqa_id,
     vu_dqa.the_geom
    FROM vu_dqa,
     selector_expl
-  WHERE vu_dqa.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text OR vu_dqa.expl_id IS NULL
+  WHERE selector_expl.expl_id = ANY(vu_dqa.expl_id) AND selector_expl.cur_user = "current_user"()::text OR vu_dqa.expl_id IS NULL
   ORDER BY vu_dqa.dqa_id;
 
 CREATE OR REPLACE VIEW v_edit_element AS
@@ -3931,7 +3943,7 @@ AS SELECT pond.pond_id,
    FROM selector_expl,
     pond
      LEFT JOIN dma ON pond.dma_id = dma.dma_id
-     LEFT JOIN selector_municipality m USING (muni_id)
+     LEFT JOIN selector_municipality m ON pond.muni_id = m.muni_id
   WHERE (m.cur_user = CURRENT_USER OR pond.muni_id IS NULL) AND pond.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
 
 CREATE OR REPLACE VIEW v_edit_pool
@@ -3946,7 +3958,7 @@ AS SELECT pool.pool_id,
    FROM selector_expl,
     pool
      LEFT JOIN dma ON pool.dma_id = dma.dma_id
-     LEFT JOIN selector_municipality m USING (muni_id)
+     LEFT JOIN selector_municipality m ON pool.muni_id = m.muni_id
   WHERE (m.cur_user = CURRENT_USER OR pool.muni_id IS NULL) AND pool.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
 
 CREATE OR REPLACE VIEW v_om_waterbalance_report
@@ -4122,6 +4134,8 @@ AS SELECT s.sector_id,
     s.name,
     s.macrosector_id,
     m.name AS macrosector_name,
+    s.muni_id,
+    s.expl_id,
     et.idval,
     s.descript,
     s.parent_id,
@@ -4148,6 +4162,8 @@ AS SELECT vu_sector.sector_id,
     vu_sector.name,
     vu_sector.macrosector_id,
     vu_sector.macrosector_name,
+    vu_sector.muni_id,
+    vu_sector.expl_id,
     vu_sector.idval,
     vu_sector.descript,
     vu_sector.parent_id,
