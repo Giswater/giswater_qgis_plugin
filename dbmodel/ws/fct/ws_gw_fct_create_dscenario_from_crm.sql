@@ -12,8 +12,7 @@ $BODY$
 
 /*EXAMPLE
 
-SELECT SCHEMA_NAME.gw_fct_create_dscenario_from_crm($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "data":{"parameters":{"name":"t11111",
-"descript":null, "exploitation":"1", "period":"5", "pattern":"1", "onlyIsWaterbal": false, "demandUnits":"LPS"}}}$$);-- fid: 403
+SELECT SCHEMA_NAME.gw_fct_create_dscenario_from_crm($${"client":{"device":4, "lang":"ca_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"name":"212", "descript":"te", "exploitation":"1", "period":"5", "onlyIsWaterBal":"true", "pattern":"3", "demandUnits":"LPS"}, "aux_params":null}}$$);
 
 */
 
@@ -140,23 +139,24 @@ BEGIN
 		VALUES (v_fid, v_result_id, 1, concat('There are ', v_total_hydro, ' hydrometers with data for this period and this exploitation.'));
 	
 		-- total volume of hydrometers
-		SELECT sum(sum) INTO v_total_vol FROM ext_rtc_hydrometer_x_data 
+		EXECUTE 'SELECT sum(sum) FROM ext_rtc_hydrometer_x_data 
 		JOIN ext_rtc_hydrometer erh on erh.id::varchar = hydrometer_id
 		JOIN rtc_hydrometer_x_connec hc USING (hydrometer_id) 
 		JOIN connec c ON c.connec_id = hc.connec_id	
-		WHERE  cat_period_id  = v_period AND c.expl_id = v_expl;
+		WHERE  cat_period_id  = '||v_period||'::text AND c.expl_id = '||v_expl||' AND is_waterbal IN ('||v_waterbal||');'
+		INTO v_total_vol;
+
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	
 		VALUES (v_fid, v_result_id, 1, concat('The total volume (m3) for all the hydrometers is ', v_total_vol,'.'));
 
 		-- insert connecs
-		INSERT INTO inp_dscenario_demand (feature_type, dscenario_id, feature_id, demand, source)
-		SELECT 'CONNEC' as feature_type, v_scenarioid, c.connec_id as node_id, (case when custom_sum is null then v_factor*sum else v_factor*custom_sum end) as volume, hc.hydrometer_id
+		EXECUTE 'INSERT INTO inp_dscenario_demand (feature_type, dscenario_id, feature_id, demand, source)
+		SELECT ''CONNEC'' as feature_type, '||v_scenarioid||', c.connec_id as node_id, (case when custom_sum is null then '||v_factor||'*sum else '||v_factor||'*custom_sum end) as volume, hc.hydrometer_id
 		FROM ext_rtc_hydrometer_x_data d
 		JOIN ext_rtc_hydrometer h ON h.id::text = d.hydrometer_id::text
 		JOIN rtc_hydrometer_x_connec hc USING (hydrometer_id) 
 		JOIN connec c ON c.connec_id = hc.connec_id
-		WHERE cat_period_id  = v_period AND c.expl_id = v_expl and c.state > 0
-		order by 2;
+		WHERE cat_period_id  = '||v_period||'::text AND c.expl_id = '||v_expl||' AND is_waterbal IN ('||v_waterbal||') order by 2';
 		
 		-- real number of hydrometers
 		GET DIAGNOSTICS v_count = row_count;	
@@ -164,14 +164,13 @@ BEGIN
 		VALUES (v_fid, v_result_id, 1, concat(v_count, ' rows (hydrometers) with demands on CONNEC (wjoin, greentap, fountain or tap) have been inserted on inp_dscenario_demand.'));
 
 		-- insert nodes (netwjoins)
-		INSERT INTO inp_dscenario_demand (feature_type, dscenario_id, feature_id, demand, source)
-		SELECT 'NODE' as feature_type, v_scenarioid, n.node_id, (case when custom_sum is null then v_factor*sum else v_factor*custom_sum end) as volume, h.id as hydrometer_id
+		EXECUTE 'INSERT INTO inp_dscenario_demand (feature_type, dscenario_id, feature_id, demand, source)
+		SELECT ''NODE'' as feature_type, '||v_scenarioid||', n.node_id, (case when custom_sum is null then '||v_factor||'*sum else '||v_factor||'*custom_sum end) as volume, h.id as hydrometer_id
 		FROM ext_rtc_hydrometer_x_data d
 		JOIN ext_rtc_hydrometer h ON h.id::text = d.hydrometer_id::text
 		JOIN rtc_hydrometer_x_node USING (hydrometer_id) 
 		JOIN node n USING (node_id)
-		WHERE cat_period_id = v_period AND n.expl_id = v_expl AND n.state > 0
-		order by 2;
+		WHERE cat_period_id  = '||v_period||'::text AND n.expl_id = '||v_expl||' AND is_waterbal IN ('||v_waterbal||') order by 2';
 
 		-- real number of hydrometers
 		GET DIAGNOSTICS v_count = row_count;	
