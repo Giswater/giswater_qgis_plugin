@@ -618,7 +618,13 @@ class GwNonVisual:
     # region curves
     def get_curves(self, curve_id=None, duplicate=False):
         """ Opens dialog for curve """
-
+        
+        # Show warning message if scipy/numpy is not available
+        if scipy_imported is False:
+            msg = f"Couldn't import scipy/numpy so the graph can't be shown. Please install it manually or try with another QGIS version"
+            tools_qgis.show_warning(msg, dialog=self.manager_dlg)
+            return
+        
         # Get dialog
         self.dialog = GwNonVisualCurveUi(self)
         tools_gw.load_settings(self.dialog)
@@ -962,8 +968,7 @@ class GwNonVisual:
                 tools_qgis.show_warning(msg, dialog=dialog)
 
         # Manage inverted plot and mirror plot for SHAPE type
-        if curve_type == 'SHAPE':
-
+        if scipy_imported and len(x_list) == 1 and curve_type == 'SHAPE':
             if [] in (x_list, y_list):
                 if file_name:
                     fig_title = f"{file_name}"
