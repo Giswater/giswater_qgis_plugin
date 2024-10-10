@@ -10,7 +10,7 @@ SET client_min_messages TO WARNING;
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-SELECT plan(1);
+SELECT plan(14);
 
 -- Extract and test the "status" field from the function's JSON response
 SELECT is(
@@ -18,10 +18,112 @@ SELECT is(
     "feature":{"tableName":"v_edit_node", "featureType":"NODE", "id":[]}, "data":{"filterFields":{}, "pageInfo":{},
     "selectionMode":"wholeSelection","parameters":{}, "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_anl_node_orphan --> tableName : v_edit_node returns status "Accepted"'
+    'Check if gw_fct_anl_node_orphan --> tableName : v_edit_node and selectionMode : wholeSelection returns status "Accepted"'
 );
 
--- Processes --> edit[15] --> Check nodes orphan, faltan las otras opciones del combo.
+SELECT is(
+    (gw_fct_anl_node_orphan($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831}, "form":{},
+    "feature":{"tableName":"v_edit_inp_junction", "featureType":"NODE", "id":[]}, "data":{"filterFields":{}, "pageInfo":{},
+    "selectionMode":"wholeSelection","parameters":{}, "aux_params":null}}$$)::JSON)->>'status',
+    'Accepted',
+    'Check if gw_fct_anl_node_orphan --> tableName : v_edit_inp_junction and selectionMode : wholeSelection returns status "Accepted"'
+);
+
+SELECT is(
+    (gw_fct_anl_node_orphan($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831}, "form":{},
+    "feature":{"tableName":"v_edit_inp_pump", "featureType":"NODE", "id":[]}, "data":{"filterFields":{}, "pageInfo":{},
+    "selectionMode":"wholeSelection","parameters":{}, "aux_params":null}}$$)::JSON)->>'status',
+    'Accepted',
+    'Check if gw_fct_anl_node_orphan --> tableName : v_edit_inp_pump and selectionMode : wholeSelection returns status "Accepted"'
+);
+
+SELECT is(
+    (gw_fct_anl_node_orphan($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831}, "form":{},
+    "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"NODE", "id":[]}, "data":{"filterFields":{}, "pageInfo":{},
+    "selectionMode":"wholeSelection","parameters":{}, "aux_params":null}}$$)::JSON)->>'status',
+    'Accepted',
+    'Check if gw_fct_anl_node_orphan --> tableName : v_edit_inp_reservoir and selectionMode : wholeSelection returns status "Accepted"'
+);
+
+SELECT is(
+    (gw_fct_anl_node_orphan($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831}, "form":{},
+    "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"NODE", "id":[]}, "data":{"filterFields":{}, "pageInfo":{},
+    "selectionMode":"wholeSelection","parameters":{}, "aux_params":null}}$$)::JSON)->>'status',
+    'Accepted',
+    'Check if gw_fct_anl_node_orphan --> tableName : v_edit_inp_shortpipe and selectionMode : wholeSelection returns status "Accepted"'
+);
+
+SELECT is(
+    (gw_fct_anl_node_orphan($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831}, "form":{},
+    "feature":{"tableName":"v_edit_inp_tank", "featureType":"NODE", "id":[]}, "data":{"filterFields":{}, "pageInfo":{},
+    "selectionMode":"wholeSelection","parameters":{}, "aux_params":null}}$$)::JSON)->>'status',
+    'Accepted',
+    'Check if gw_fct_anl_node_orphan --> tableName : v_edit_inp_tank and selectionMode : wholeSelection returns status "Accepted"'
+);
+
+SELECT is(
+    (gw_fct_anl_node_orphan($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831}, "form":{},
+    "feature":{"tableName":"v_edit_inp_valve", "featureType":"NODE", "id":[]}, "data":{"filterFields":{}, "pageInfo":{},
+    "selectionMode":"wholeSelection","parameters":{}, "aux_params":null}}$$)::JSON)->>'status',
+    'Accepted',
+    'Check if gw_fct_anl_node_orphan --> tableName : v_edit_inp_valve and selectionMode : wholeSelection returns status "Accepted"'
+);
+
+SELECT is(
+    (gw_fct_anl_node_orphan($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831}, "form":{},
+    "feature":{"tableName":"v_edit_node", "featureType":"NODE", "id":[]}, "data":{"filterFields":{}, "pageInfo":{},
+    "selectionMode":"previousSelection","parameters":{}, "aux_params":null}}$$)::JSON)->>'status',
+    'Accepted',
+    'Check if gw_fct_anl_node_orphan --> tableName : v_edit_node and selectionMode : previousSelection returns status "Accepted"'
+);
+
+SELECT is(
+    (gw_fct_anl_node_orphan($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831}, "form":{},
+    "feature":{"tableName":"v_edit_inp_junction", "featureType":"NODE", "id":[]}, "data":{"filterFields":{}, "pageInfo":{},
+    "selectionMode":"previousSelection","parameters":{}, "aux_params":null}}$$)::JSON)->>'status',
+    'Accepted',
+    'Check if gw_fct_anl_node_orphan --> tableName : v_edit_inp_junction and selectionMode : previousSelection returns status "Accepted"'
+);
+
+SELECT is(
+    (gw_fct_anl_node_orphan($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831}, "form":{},
+    "feature":{"tableName":"v_edit_inp_pump", "featureType":"NODE", "id":[]}, "data":{"filterFields":{}, "pageInfo":{},
+    "selectionMode":"previousSelection","parameters":{}, "aux_params":null}}$$)::JSON)->>'status',
+    'Accepted',
+    'Check if gw_fct_anl_node_orphan --> tableName : v_edit_inp_pump and selectionMode : previousSelection returns status "Accepted"'
+);
+
+SELECT is(
+    (gw_fct_anl_node_orphan($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831}, "form":{},
+    "feature":{"tableName":"v_edit_inp_reservoir", "featureType":"NODE", "id":[]}, "data":{"filterFields":{}, "pageInfo":{},
+    "selectionMode":"previousSelection","parameters":{}, "aux_params":null}}$$)::JSON)->>'status',
+    'Accepted',
+    'Check if gw_fct_anl_node_orphan --> tableName : v_edit_inp_reservoir and selectionMode : previousSelection returns status "Accepted"'
+);
+
+SELECT is(
+    (gw_fct_anl_node_orphan($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831}, "form":{},
+    "feature":{"tableName":"v_edit_inp_shortpipe", "featureType":"NODE", "id":[]}, "data":{"filterFields":{}, "pageInfo":{},
+    "selectionMode":"previousSelection","parameters":{}, "aux_params":null}}$$)::JSON)->>'status',
+    'Accepted',
+    'Check if gw_fct_anl_node_orphan --> tableName : v_edit_inp_shortpipe and selectionMode : previousSelection returns status "Accepted"'
+);
+
+SELECT is(
+    (gw_fct_anl_node_orphan($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831}, "form":{},
+    "feature":{"tableName":"v_edit_inp_tank", "featureType":"NODE", "id":[]}, "data":{"filterFields":{}, "pageInfo":{},
+    "selectionMode":"previousSelection","parameters":{}, "aux_params":null}}$$)::JSON)->>'status',
+    'Accepted',
+    'Check if gw_fct_anl_node_orphan --> tableName : v_edit_inp_tank and selectionMode : previousSelection returns status "Accepted"'
+);
+
+SELECT is(
+    (gw_fct_anl_node_orphan($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831}, "form":{},
+    "feature":{"tableName":"v_edit_inp_valve", "featureType":"NODE", "id":[]}, "data":{"filterFields":{}, "pageInfo":{},
+    "selectionMode":"previousSelection","parameters":{}, "aux_params":null}}$$)::JSON)->>'status',
+    'Accepted',
+    'Check if gw_fct_anl_node_orphan --> tableName : v_edit_inp_valve and selectionMode : previousSelection returns status "Accepted"'
+);
 
 -- Finish the test
 SELECT finish();
