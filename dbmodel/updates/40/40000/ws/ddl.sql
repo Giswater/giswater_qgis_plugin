@@ -160,7 +160,6 @@ CREATE TABLE dma (
 	lastupdate timestamp NULL,
 	lastupdate_user varchar(15) NULL,
 	CONSTRAINT dma_pkey PRIMARY KEY (dma_id),
-	CONSTRAINT dma_expl_id_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT dma_macrodma_id_fkey FOREIGN KEY (macrodma_id) REFERENCES macrodma(macrodma_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT dma_pattern_id_fkey FOREIGN KEY (pattern_id) REFERENCES inp_pattern(pattern_id) ON DELETE RESTRICT ON UPDATE CASCADE
 );
@@ -185,8 +184,7 @@ CREATE TABLE presszone (
 	lastupdate timestamp NULL,
 	lastupdate_user varchar(15) NULL,
 	avg_press float8 NULL,
-	CONSTRAINT cat_presszone_pkey PRIMARY KEY (presszone_id),
-	CONSTRAINT cat_presszone_expl_id_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON DELETE CASCADE ON UPDATE CASCADE
+	CONSTRAINT cat_presszone_pkey PRIMARY KEY (presszone_id)
 );
 
 CREATE TABLE dqa (
@@ -212,7 +210,6 @@ CREATE TABLE dqa (
 	lastupdate_user varchar(15) NULL,
 	avg_press float8 NULL,
 	CONSTRAINT dqa_pkey PRIMARY KEY (dqa_id),
-	CONSTRAINT dqa_expl_id_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT dqa_macrodqa_id_fkey FOREIGN KEY (macrodqa_id) REFERENCES macrodqa(macrodqa_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT dqa_pattern_id_fkey FOREIGN KEY (pattern_id) REFERENCES inp_pattern(pattern_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
