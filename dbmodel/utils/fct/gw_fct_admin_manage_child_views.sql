@@ -13,7 +13,7 @@ $BODY$
 /*EXAMPLE
 
 -- create views and add config_form_fields columns only if is empty
-SELECT SCHEMA_NAME.gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, 
+SELECT SCHEMA_NAME.gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},
 "feature":{"catFeature":"T"},"data":{"filterFields":{}, "pageInfo":{}, "action":"SINGLE-CREATE" }}$$);
 
 -- create views and add config_form_fields columns only if is empty
@@ -40,14 +40,14 @@ SELECT SCHEMA_NAME.gw_fct_admin_manage_child_views($${"client":{"device":4, "inf
 select *  from SCHEMA_NAME.config_form_fields where formname = 'v_edit_arc' and columnname = 'workcat_id_plan'
 */
 
-DECLARE 
+DECLARE
 
 v_schemaname text = 'SCHEMA_NAME';
 v_cat_feature text;
 v_viewname text;
 v_definition text;
 v_feature_type text;
-v_feature_system_id text;
+v_feature_sys_feature_cat text;
 v_feature_childtable_name text;
 v_man_fields text;
 v_feature_childtable_fields text;
@@ -69,7 +69,7 @@ v_return_msg text = 'Process finished with some errors';
 v_error_context text;
 v_newcolumn text;
 v_query json;
-v_system_id text;
+v_sys_feature_cat text;
 
 BEGIN
 
@@ -87,7 +87,7 @@ BEGIN
 	v_action = ((p_data ->>'data')::json->>'action')::text;
 	v_newcolumn = ((p_data ->>'data')::json->>'newColumn')::text;
 	v_feature_type = ((p_data ->>'feature')::json->>'featureType')::text;
-	v_system_id = ((p_data ->>'feature')::json->>'systemId')::text;
+	v_sys_feature_cat = ((p_data ->>'feature')::json->>'systemId')::text;
 
 	IF v_cat_feature IS NULL THEN
 		v_cat_feature = (SELECT id FROM cat_feature LIMIT 1);
@@ -95,32 +95,32 @@ BEGIN
 
 	IF v_action = 'MULTI-DELETE' THEN
 
-		FOR v_childview IN SELECT child_layer FROM cat_feature WHERE system_id <> 'LINK' AND child_layer IS NOT NULL
+		FOR v_childview IN SELECT child_layer FROM cat_feature WHERE sys_feature_cat <> 'LINK' AND child_layer IS NOT NULL
 		LOOP
 			EXECUTE 'DROP VIEW IF EXISTS '||v_childview||'';
 			PERFORM gw_fct_debug(concat('{"data":{"msg":"Deleted layer: ", "variables":"',v_childview,'"}}')::json);
 
 		END LOOP;
-		
+
 		v_return_status = 'Accepted';
 		v_return_msg = 'Multi-delete view successfully';
-		
-		
+
+
 	ELSIF v_action = 'MULTI-UPDATE' THEN
-	
-		IF v_system_id IS NOT NULL THEN			
-			v_querytext = 'SELECT child_layer, id, parent_layer FROM cat_feature WHERE system_id <> ''LINK'' AND child_layer IS NOT NULL AND system_id = '||quote_literal(v_system_id); 	
-			
+
+		IF v_sys_feature_cat IS NOT NULL THEN
+			v_querytext = 'SELECT child_layer, id, parent_layer FROM cat_feature WHERE sys_feature_cat <> ''LINK'' AND child_layer IS NOT NULL AND sys_feature_cat = '||quote_literal(v_sys_feature_cat);
+
 		ELSIF v_feature_type IS NOT NULL THEN
-			v_querytext = 'SELECT child_layer, id, parent_layer FROM cat_feature WHERE system_id <> ''LINK'' AND child_layer IS NOT NULL AND feature_type = '||quote_literal(v_feature_type); 	
-		
+			v_querytext = 'SELECT child_layer, id, parent_layer FROM cat_feature WHERE sys_feature_cat <> ''LINK'' AND child_layer IS NOT NULL AND feature_type = '||quote_literal(v_feature_type);
+
 		ELSIF v_feature_type IS NULL THEN
-			v_querytext = 'SELECT child_layer, id, parent_layer FROM cat_feature WHERE system_id <> ''LINK'' AND child_layer IS NOT NULL'; 	
-		
+			v_querytext = 'SELECT child_layer, id, parent_layer FROM cat_feature WHERE sys_feature_cat <> ''LINK'' AND child_layer IS NOT NULL';
+
 		END IF;
 
 		raise notice 'v_querytext %', v_querytext;
-	
+
 		FOR v_childview, v_cat_feature, v_parent_layer IN EXECUTE v_querytext
 		LOOP
 
@@ -129,27 +129,27 @@ BEGIN
 			-- delete existing view
 			EXECUTE 'DROP VIEW IF EXISTS '||v_childview||' CASCADE';
 			PERFORM gw_fct_debug(concat('{"data":{"msg":"Deleted layer: ", "variables":"',v_childview,'"}}')::json);
-			
+
 			-- create new view with all columns from parent/man/addfields
 			v_query = concat('{"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"catFeature":"',v_cat_feature,
-			'"},"data":{"filterFields":{}, "pageInfo":{}, "action":"SINGLE-CREATE"}}');			
+			'"},"data":{"filterFields":{}, "pageInfo":{}, "action":"SINGLE-CREATE"}}');
 
 			PERFORM gw_fct_admin_manage_child_views(v_query);
-					
+
 			-- insert into config_form_fields new column values coyping from parent
-			INSERT INTO config_form_fields (formname, formtype,tabname,  columnname, layoutname, layoutorder, 
-			datatype, widgettype, widgetcontrols, label, tooltip, placeholder, 
-			ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, 
-			dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
+			INSERT INTO config_form_fields (formname, formtype,tabname,  columnname, layoutname, layoutorder,
+			datatype, widgettype, widgetcontrols, label, tooltip, placeholder,
+			ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext,
+			dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc,
 			stylesheet, widgetfunction, linkedobject, hidden)
-			SELECT v_childview, formtype,tabname, columnname, layoutname, layoutorder, 
-			datatype, widgettype, widgetcontrols, label, tooltip, placeholder, 
-			ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, 
-			dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
+			SELECT v_childview, formtype,tabname, columnname, layoutname, layoutorder,
+			datatype, widgettype, widgetcontrols, label, tooltip, placeholder,
+			ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext,
+			dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc,
 			stylesheet, widgetfunction,linkedobject, hidden
 			FROM config_form_fields WHERE formname = v_parent_layer AND columnname = v_newcolumn
 			ON CONFLICT (formname, columnname, formtype, tabname) DO NOTHING;
-			
+
 		END LOOP;
 
 
@@ -157,55 +157,55 @@ BEGIN
 		v_return_msg = 'Multi-update view successfully';
 
 	ELSIF v_action = 'SINGLE-UPDATE' THEN
-	
+
 		SELECT child_layer, parent_layer INTO v_childview, v_parent_layer FROM cat_feature WHERE id = v_cat_feature;
 
 		raise notice 'v_childview, % v_parent_layer %', v_childview, v_parent_layer ;
 
-	
+
 		-- delete existing view
 		EXECUTE 'DROP VIEW IF EXISTS '||v_childview||' CASCADE';
 		PERFORM gw_fct_debug(concat('{"data":{"msg":"Deleted layer: ", "variables":"',v_childview,'"}}')::json);
-		
+
 		-- create new view with all columns from parent/man/addfields
 		v_query = concat('{"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"catFeature":"',v_cat_feature,
-		'"},"data":{"filterFields":{}, "pageInfo":{}, "action":"SINGLE-CREATE"}}');	
-		
+		'"},"data":{"filterFields":{}, "pageInfo":{}, "action":"SINGLE-CREATE"}}');
+
 		PERFORM gw_fct_admin_manage_child_views(v_query);
-		
+
 		-- insert into config_form_fields new column values coyping from parent
-		INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, 
-       datatype, widgettype, widgetcontrols, label, tooltip, placeholder, 
-       ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, 
-       dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
+		INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder,
+       datatype, widgettype, widgetcontrols, label, tooltip, placeholder,
+       ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext,
+       dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc,
        stylesheet, widgetfunction, linkedobject, hidden)
-		SELECT v_childview, formtype,tabname, columnname, layoutname, layoutorder, 
-       datatype, widgettype, widgetcontrols, label, tooltip, placeholder, 
-       ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, 
-       dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, 
+		SELECT v_childview, formtype,tabname, columnname, layoutname, layoutorder,
+       datatype, widgettype, widgetcontrols, label, tooltip, placeholder,
+       ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext,
+       dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc,
        stylesheet, widgetfunction, linkedobject, hidden
 		FROM config_form_fields WHERE formname = v_parent_layer AND columnname = v_newcolumn
 		ON CONFLICT (formname, columnname, formtype, tabname) DO NOTHING;
-	
+
 		v_return_status = 'Accepted';
 		v_return_msg = 'Single-update view successfully';
 
-	
-	ELSIF v_action = 'MULTI-CREATE' THEN 
-	
-		v_querytext = 'SELECT cat_feature.* FROM cat_feature WHERE system_id <> ''LINK'' ORDER BY id';
+
+	ELSIF v_action = 'MULTI-CREATE' THEN
+
+		v_querytext = 'SELECT cat_feature.* FROM cat_feature WHERE sys_feature_cat <> ''LINK'' ORDER BY id';
 
 		FOR rec IN EXECUTE v_querytext LOOP
-	
+
 			--set view definition to null
 			v_definition = null;
-			
-			--get the system type and system_id of the feature and view name
+
+			--get the system type and sys_feature_cat of the feature and view name
 			v_feature_type = lower(rec.feature_type);
-			v_feature_system_id  = lower(rec.system_id);
+			v_feature_sys_feature_cat  = lower(rec.sys_feature_cat);
 			v_cat_feature = rec.id;
 			v_feature_childtable_name := 'man_' || v_feature_type || '_' || lower(v_cat_feature);
-			
+
 			--create a child view name if doesnt exist
 			IF (SELECT child_layer FROM cat_feature WHERE id=rec.id) IS NULL THEN
 				UPDATE cat_feature SET child_layer=concat('ve_',lower(feature_type),'_',lower(id)) WHERE id=rec.id;
@@ -223,14 +223,14 @@ BEGIN
 					INTO v_definition;
 			END IF;
 
-			-- drop view before to recreate it if exists	
+			-- drop view before to recreate it if exists
 			IF v_definition IS NOT NULL THEN
 				EXECUTE 'DROP VIEW IF EXISTS '||v_viewname;
 			END IF;
 
 			--select columns from man_* table without repeating the identifier
-			EXECUTE 'SELECT DISTINCT string_agg(concat(''man_'||v_feature_system_id||'.'',column_name)::text,'', '')
-			FROM information_schema.columns where table_name=''man_'||v_feature_system_id||''' and table_schema='''||v_schemaname||''' 
+			EXECUTE 'SELECT DISTINCT string_agg(concat(''man_'||v_feature_sys_feature_cat||'.'',column_name)::text,'', '')
+			FROM information_schema.columns where table_name=''man_'||v_feature_sys_feature_cat||''' and table_schema='''||v_schemaname||''' 
 			and column_name!='''||v_feature_type||'_id'''
 			INTO v_man_fields;
 
@@ -244,10 +244,10 @@ BEGIN
 
 			RAISE NOTICE 'v_feature_childtable_fields,%',v_feature_childtable_fields;
 
-			
+
 			--check and select the addfields if are already created
 			IF (SELECT count(id) FROM sys_addfields WHERE (cat_feature_id=rec.id OR cat_feature_id IS NULL) and active is true ) != 0 THEN
-				
+
 				IF (SELECT orderby FROM sys_addfields WHERE cat_feature_id=rec.id limit 1) IS NULL THEN
 					v_orderby = 1;
 					FOR rec_orderby IN (SELECT * FROM sys_addfields WHERE cat_feature_id=rec.id ORDER BY id) LOOP
@@ -264,8 +264,8 @@ BEGIN
 					END LOOP;
 				END IF;
 
-				--create views with fields from parent table,man table and addfields 	
-				IF (v_man_fields IS NULL AND v_project_type='WS') OR (v_man_fields IS NULL AND v_project_type='UD' AND 
+				--create views with fields from parent table,man table and addfields
+				IF (v_man_fields IS NULL AND v_project_type='WS') OR (v_man_fields IS NULL AND v_project_type='UD' AND
 					( v_feature_type='arc' OR v_feature_type='node')) THEN
 					--view for WS and UD features that only have feature_id in man table and have defined addfields
 					v_view_type = 4;
@@ -277,7 +277,7 @@ BEGIN
 				ELSE
 					--view for WS and UD features that have many fields in man table and have defined addfields
 					v_view_type = 6;
-					
+
 				END IF;
 
 				v_man_fields := COALESCE(v_man_fields, 'null');
@@ -287,7 +287,7 @@ BEGIN
 				"schema":"'||v_schemaname ||'",
 				"body":{"viewname":"'||v_viewname||'",
 					"feature_type":"'||v_feature_type||'",
-					"feature_system_id":"'||v_feature_system_id||'",
+					"feature_sys_feature_cat":"'||v_feature_sys_feature_cat||'",
 					"feature_cat":"'||v_cat_feature||'",
 					"feature_childtable_name":"'||v_feature_childtable_name||'",
 					"feature_childtable_fields":"'||v_feature_childtable_fields||'",
@@ -296,11 +296,11 @@ BEGIN
 					}
 				}';
 
-				PERFORM gw_fct_admin_manage_child_views_view(v_data_view);		
-				
+				PERFORM gw_fct_admin_manage_child_views_view(v_data_view);
+
 			ELSE
 				--create views with fields from parent table and man table
-				IF (v_man_fields IS NULL AND v_project_type='WS') OR (v_man_fields IS NULL AND v_project_type='UD' AND 
+				IF (v_man_fields IS NULL AND v_project_type='WS') OR (v_man_fields IS NULL AND v_project_type='UD' AND
 					( v_feature_type='arc' OR v_feature_type='node')) THEN
 					--view for WS and UD features that only have feature_id in man table
 					v_view_type = 1;
@@ -308,11 +308,11 @@ BEGIN
 				ELSIF (v_man_fields IS NULL AND v_project_type='UD' AND (v_feature_type='connec' OR v_feature_type='gully')) THEN
 					--view for ud connec y gully which dont have man_type table
 					v_view_type = 2;
-					
+
 				ELSE
 					--view for WS and UD features that have many fields in man table
 					v_view_type = 3;
-					
+
 				END IF;
 
 				v_man_fields := COALESCE(v_man_fields, 'null');
@@ -322,7 +322,7 @@ BEGIN
 				"schema":"'||v_schemaname ||'",
 				"body":{"viewname":"'||v_viewname||'",
 					"feature_type":"'||v_feature_type||'",
-					"feature_system_id":"'||v_feature_system_id||'",
+					"feature_sys_feature_cat":"'||v_feature_sys_feature_cat||'",
 					"feature_cat":"'||v_cat_feature||'",
 					"feature_childtable_name":"'||v_feature_childtable_name||'",
 					"feature_childtable_fields":"'||v_feature_childtable_fields||'",
@@ -330,12 +330,12 @@ BEGIN
 					"view_type":"'||v_view_type||'"
 					}
 				}';
-					
-				PERFORM gw_fct_admin_manage_child_views_view(v_data_view);			
-					
+
+				PERFORM gw_fct_admin_manage_child_views_view(v_data_view);
+
 			END IF;
 
-			--create trigger on view 
+			--create trigger on view
 			EXECUTE 'DROP TRIGGER IF EXISTS gw_trg_edit_'||v_feature_type||'_'||lower(replace(replace(replace(rec.id, ' ','_'),'-','_'),'.','_'))||' ON '||
 			v_schemaname||'.'||v_viewname||';';
 
@@ -346,17 +346,17 @@ BEGIN
 			EXECUTE 'SELECT gw_fct_admin_manage_child_config($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},
 			"feature":{"catFeature":"'||v_cat_feature||'"}, 
 			"data":{"filterFields":{}, "pageInfo":{}, "view_name":"'||v_viewname||'", "feature_type":"'||v_feature_type||'" }}$$);';
-			
+
 		END LOOP;
-		
+
 		v_return_status = 'Accepted';
 		v_return_msg = 'Multi-create view successfully';
-		
-	ELSIF v_action = 'SINGLE-CREATE' THEN 
-		
-		--get the system type and system_id of the feature and view name
+
+	ELSIF v_action = 'SINGLE-CREATE' THEN
+
+		--get the system type and sys_feature_cat of the feature and view name
 		v_feature_type = (SELECT lower(feature_type) FROM cat_feature where id=v_cat_feature);
-		v_feature_system_id  = (SELECT lower(system_id) FROM cat_feature where id=v_cat_feature);
+		v_feature_sys_feature_cat  = (SELECT lower(sys_feature_cat) FROM cat_feature where id=v_cat_feature);
 		v_feature_childtable_name := 'man_' || v_feature_type || '_' || lower(v_cat_feature);
 
 		--create a child view name if doesnt exist
@@ -369,24 +369,24 @@ BEGIN
 				v_viewname = replace(replace(replace(v_viewname,'-','_'),' ','_'),'.','_');
 			UPDATE cat_feature SET child_layer=v_viewname WHERE id=v_cat_feature;
 		END IF;
-		
+
 		--check if the defined view exists
 		IF (SELECT EXISTS ( SELECT 1 FROM   information_schema.tables WHERE  table_schema = v_schemaname AND table_name = v_viewname)) IS TRUE THEN
 				EXECUTE'SELECT pg_get_viewdef('''||v_schemaname||'.'||v_viewname||''', true);'
 				INTO v_definition;
 		END IF;
-			
-		-- drop view before to recreate it if exists	
+
+		-- drop view before to recreate it if exists
 		IF v_definition IS NOT NULL THEN
 			EXECUTE 'DROP VIEW IF EXISTS '||v_viewname;
 		END IF;
-	
+
 		--select columns from man_* table without repeating the identifier
-		EXECUTE 'SELECT DISTINCT string_agg(concat(''man_'||v_feature_system_id||'.'',column_name)::text,'', '')
-		FROM information_schema.columns where table_name=''man_'||v_feature_system_id||''' and table_schema='''||v_schemaname||''' 
+		EXECUTE 'SELECT DISTINCT string_agg(concat(''man_'||v_feature_sys_feature_cat||'.'',column_name)::text,'', '')
+		FROM information_schema.columns where table_name=''man_'||v_feature_sys_feature_cat||''' and table_schema='''||v_schemaname||''' 
 		and column_name!='''||v_feature_type||'_id'''
 		INTO v_man_fields;
-		
+
 		RAISE NOTICE 'v_man_fields,%',v_man_fields;
 
 		--select columns from v_feature_childtable_name.* table without repeating the identifiers
@@ -396,11 +396,11 @@ BEGIN
 		INTO v_feature_childtable_fields;
 
 		RAISE NOTICE 'v_feature_childtable_fields,%',v_feature_childtable_fields;
-		
+
 		--check and select the addfields if are already created
 		IF (SELECT count(id) FROM sys_addfields WHERE (cat_feature_id=v_cat_feature OR cat_feature_id IS NULL) and active is true ) != 0 THEN
-		raise notice '4/addfields=1,v_man_fields,%',v_man_fields;		
-			
+		raise notice '4/addfields=1,v_man_fields,%',v_man_fields;
+
 			IF (SELECT orderby FROM sys_addfields WHERE cat_feature_id=v_cat_feature LIMIT 1) IS NULL THEN
 				v_orderby = 1;
 				FOR rec_orderby IN (SELECT * FROM sys_addfields WHERE cat_feature_id=v_cat_feature ORDER BY id) LOOP
@@ -417,9 +417,9 @@ BEGIN
 				END LOOP;
 				raise notice 'v_orderby,%',v_orderby;
 			END IF;
-			
-			--create views with fields from parent table,man table and addfields 	
-			IF (v_man_fields IS NULL AND v_project_type='WS') OR (v_man_fields IS NULL AND v_project_type='UD' AND 
+
+			--create views with fields from parent table,man table and addfields
+			IF (v_man_fields IS NULL AND v_project_type='WS') OR (v_man_fields IS NULL AND v_project_type='UD' AND
 				( v_feature_type='arc' OR v_feature_type='node')) THEN
 				--view for WS and UD features that only have feature_id in man table and have defined addfields
 				v_view_type = 4;
@@ -443,7 +443,7 @@ BEGIN
 			"schema":"'||v_schemaname ||'",
 			"body":{"viewname":"'||v_viewname||'",
 				"feature_type":"'||v_feature_type||'",
-				"feature_system_id":"'||v_feature_system_id||'",
+				"feature_sys_feature_cat":"'||v_feature_sys_feature_cat||'",
 				"feature_cat":"'||v_cat_feature||'",
 				"feature_childtable_name":"'||v_feature_childtable_name||'",
 				"feature_childtable_fields":"'||v_feature_childtable_fields||'",
@@ -454,12 +454,12 @@ BEGIN
 
 			PERFORM gw_fct_admin_manage_child_views_view(v_data_view);
 
-		ELSE	
-		
+		ELSE
+
 			--create views with fields from parent table and man table
-			IF (v_man_fields IS NULL AND v_project_type='WS') OR (v_man_fields IS NULL AND v_project_type='UD' AND 
+			IF (v_man_fields IS NULL AND v_project_type='WS') OR (v_man_fields IS NULL AND v_project_type='UD' AND
 				( v_feature_type='arc' OR v_feature_type='node')) THEN
-				--view for WS and UD features that only have feature_id in man table	
+				--view for WS and UD features that only have feature_id in man table
 				v_view_type = 1;
 
 			ELSIF (v_man_fields IS NULL AND v_project_type='UD' AND (v_feature_type='connec' OR v_feature_type='gully')) THEN
@@ -467,7 +467,7 @@ BEGIN
 				v_view_type = 2;
 
 			ELSE
-				--view for WS and UD features that have many fields in man table	
+				--view for WS and UD features that have many fields in man table
 				v_view_type = 3;
 
 			END IF;
@@ -481,7 +481,7 @@ BEGIN
 			"schema":"'||v_schemaname ||'",
 			"body":{"viewname":"'||v_viewname||'",
 				"feature_type":"'||v_feature_type||'",
-				"feature_system_id":"'||v_feature_system_id||'",
+				"feature_sys_feature_cat":"'||v_feature_sys_feature_cat||'",
 				"feature_cat":"'||v_cat_feature||'",
 				"feature_childtable_name":"'||v_feature_childtable_name||'",
 				"feature_childtable_fields":"'||v_feature_childtable_fields||'",
@@ -499,8 +499,8 @@ BEGIN
 			EXECUTE 'SELECT gw_fct_admin_manage_child_config($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{},
 			"feature":{"catFeature":"'||v_cat_feature||'"}, 
 			"data":{"filterFields":{}, "pageInfo":{}, "view_name":"'||v_viewname||'", "feature_type":"'||v_feature_type||'" }}$$);';
-			
-			--create trigger on view 
+
+			--create trigger on view
 			EXECUTE 'DROP TRIGGER IF EXISTS gw_trg_edit_'||v_feature_type||'_'||lower(replace(replace(replace(v_cat_feature, ' ','_'),'-','_'),'.','_'))||' ON '||
 			v_schemaname||'.'||v_viewname||';';
 
@@ -508,12 +508,12 @@ BEGIN
 			INSTEAD OF INSERT OR UPDATE OR DELETE ON '||v_schemaname||'.'||v_viewname||'
 			FOR EACH ROW EXECUTE PROCEDURE '||v_schemaname||'.gw_trg_edit_'||v_feature_type||'('''||v_cat_feature||''');';
 
-			
+
 		v_return_status = 'Accepted';
 		v_return_msg = 'Single-create view successfully';
 
 	END IF;
-	
+
 	-- manage permissions
     IF v_action <> 'MULTI-DELETE' THEN
         PERFORM gw_fct_admin_role_permissions();

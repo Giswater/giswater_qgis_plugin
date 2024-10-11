@@ -14,7 +14,7 @@ $BODY$
 /*
 SELECT SCHEMA_NAME.gw_fct_admin_manage_child_config($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
-"form":{}, 
+"form":{},
 "feature":{"catFeature":"SHUTOFF_VALVE"},
 "data":{"filterFields":{}, "pageInfo":{}, "view_name":"ve_node_shutoffvalve", "feature_type":"node" }}$$);
 */
@@ -32,7 +32,7 @@ v_config_fields text;
 rec record;
 
 v_cat_feature text;
-v_feature_system_id text;
+v_feature_sys_feature_cat text;
 v_man_fields text;
 v_man_addfields text;
 v_orderby integer;
@@ -46,7 +46,7 @@ BEGIN
 	v_schemaname = 'SCHEMA_NAME';
 
 	SELECT project_type, giswater  INTO v_project_type, v_version FROM sys_version ORDER BY id DESC LIMIT 1;
-	
+
 	-- dissable temporary trigger to manage control_config
 	UPDATE config_param_system SET value = 'FALSE'  WHERE parameter='admin_config_control_trigger';
 
@@ -55,7 +55,7 @@ BEGIN
 	v_view_name = ((p_data ->>'data')::json->>'view_name')::text;
 	v_feature_type = lower(((p_data ->>'data')::json->>'feature_type')::text);
 
-	v_feature_system_id  = (SELECT lower(system_id) FROM cat_feature where id=v_cat_feature);
+	v_feature_sys_feature_cat  = (SELECT lower(sys_feature_cat) FROM cat_feature where id=v_cat_feature);
 
 	IF v_view_name NOT IN (SELECT tableinfo_id FROM config_info_layer_x_type) THEN
         INSERT INTO sys_table(id, descript, sys_role)
@@ -66,11 +66,11 @@ BEGIN
         END IF;
 
 	    PERFORM gw_fct_admin_role_permissions();
-	
+
 	END IF;
 
 	--manage tab hydrometer on netwjoin
-	IF v_view_name IS NOT NULL AND v_project_type = 'WS' and v_feature_system_id = 'netwjoin' THEN
+	IF v_view_name IS NOT NULL AND v_project_type = 'WS' and v_feature_sys_feature_cat = 'netwjoin' THEN
 		INSERT INTO config_form_tabs ( formname, tabname, label, tooltip, sys_role, tabfunction, tabactions, device, orderby)
 		SELECT v_view_name,  tabname, label, tooltip, sys_role, tabfunction, tabactions, device, orderby
 		FROM config_form_tabs WHERE tabname in ('tab_hydrometer', 'tab_hydrometer_val') ON CONFLICT (formname, tabname) DO NOTHING;
@@ -86,7 +86,7 @@ BEGIN
 	FROM information_schema.columns WHERE table_name=''config_form_fields'' and table_schema='''||v_schemaname||'''
 	AND column_name!=''id'' ORDER BY ordinal_position)a;'
 	INTO v_config_fields;
-	
+
 	--select list of fields different than id and formname from config_form_fields
 	EXECUTE 'SELECT DISTINCT string_agg(concat(column_name)::text,'' ,'') FROM (SELECT column_name
 	FROM information_schema.columns WHERE table_name=''config_form_fields'' and table_schema='''||v_schemaname||'''
@@ -112,9 +112,9 @@ BEGIN
 
 	--select columns from man_* table without repeating the identifier
 	v_man_fields = 'SELECT DISTINCT column_name::text, data_type::text, numeric_precision, numeric_scale
-	FROM information_schema.columns where table_name=''man_'||v_feature_system_id||''' and table_schema='''||v_schemaname||''' 
+	FROM information_schema.columns where table_name=''man_'||v_feature_sys_feature_cat||''' and table_schema='''||v_schemaname||''' 
 	and column_name!='''||v_feature_type||'_id'' group by column_name, data_type,numeric_precision, numeric_scale';
-				
+
 
 	--insert configuration from the man_* tables of the feature type
 	FOR rec IN  EXECUTE v_man_fields LOOP
@@ -139,15 +139,15 @@ BEGIN
 		ELSIF rec.data_type = 'date' THEN
 			v_datatype='date';
 			v_widgettype='datetime';
-		ELSE 
+		ELSE
 			v_datatype='string';
 			v_widgettype='text';
 		END IF;
 
 		--insert into config_form_fields
 		INSERT INTO config_form_fields (formname, formtype, columnname, tabname, datatype, widgettype, layoutname, layoutorder,
-			label, ismandatory, isparent, iseditable, isautoupdate) 
-		VALUES (v_view_name,'form_feature', rec.column_name, 'tab_data', v_datatype, v_widgettype, 'lyt_data_1',v_orderby, 
+			label, ismandatory, isparent, iseditable, isautoupdate)
+		VALUES (v_view_name,'form_feature', rec.column_name, 'tab_data', v_datatype, v_widgettype, 'lyt_data_1',v_orderby,
 			rec.column_name, false, false,true,false) ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
 	END LOOP;
@@ -160,9 +160,9 @@ BEGIN
 		--capture max layout_id for the view
 		EXECUTE 'SELECT max(layoutorder::integer) + 1 FROM config_form_fields WHERE formname = '''||v_view_name||''' AND  layoutname=''lyt_data_1'';'
 		INTO v_orderby;
-		
+
 		--transform data and widget types
-		IF rec.datatype_id = 'numeric' THEN 
+		IF rec.datatype_id = 'numeric' THEN
 			v_datatype='double';
 		ELSE
 			v_datatype=rec.datatype_id;
@@ -172,21 +172,21 @@ BEGIN
 			v_widgettype='check';
 		ELSIF rec.datatype_id = 'date' THEN
 			v_widgettype='datetime';
-		ELSE 
+		ELSE
 			v_widgettype='text';
 		END IF;
-		
+
 		--insert into config_form_fields
 		INSERT INTO config_form_fields (formname,formtype,columnname,datatype,widgettype, layoutname,layoutorder,
-			label, ismandatory,isparent,iseditable,isautoupdate, tabname) 
+			label, ismandatory,isparent,iseditable,isautoupdate, tabname)
 		VALUES (v_view_name,'form_feature',rec.param_name, v_datatype,v_widgettype, 'lyt_data_1',v_orderby,
 			rec.param_name, rec.is_mandatory, false,rec.iseditable,false, 'tab_data') ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
-				
+
 	END LOOP;
 
 	-- enable trigger to manage control_config
 	UPDATE config_param_system SET value = 'TRUE'  WHERE parameter='admin_config_control_trigger';
-	
+
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

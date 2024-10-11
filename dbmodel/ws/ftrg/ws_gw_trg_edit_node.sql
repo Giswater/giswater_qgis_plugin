@@ -39,7 +39,7 @@ v_streetaxis text;
 v_streetaxis2 text;
 v_sys_type text;
 v_force_delete boolean;
-v_system_id text;
+v_sys_feature_cat text;
 v_featurecat_id text;
 v_psector integer;
 v_auto_streetvalues_status boolean;
@@ -103,7 +103,7 @@ BEGIN
 
 	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
 		-- man2inp_values
-		SELECT child_layer, system_id INTO v_man_view, v_system_id FROM cat_feature f JOIN cat_node c ON c.nodetype_id = f.id WHERE c.id = NEW.nodecat_id;
+		SELECT child_layer, sys_feature_cat INTO v_man_view, v_sys_feature_cat FROM cat_feature f JOIN cat_node c ON c.nodetype_id = f.id WHERE c.id = NEW.nodecat_id;
 		v_input = concat('{"feature":{"type":"node", "childLayer":"',v_man_view,'", "id":"',NEW.node_id,'"}}');
 
 		-- check if streetname exists
@@ -154,7 +154,7 @@ BEGIN
 
 		-- Epa type
 		IF NEW.epa_type IN ('VALVE', 'PUMP') THEN
-			IF NEW.epa_type <> v_system_id THEN
+			IF NEW.epa_type <> v_sys_feature_cat THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"3266", "function":"1320","debug_msg":null, "is_process":true}}$$)';
 			END IF;
@@ -535,7 +535,7 @@ BEGIN
 		NEW.om_state, NEW.conserv_state, NEW.access_type, NEW.placement_type, NEW.expl_id2, NEW.brand_id, NEW.model_id, NEW.serial_number, NEW.label_quadrant);
 
 
-		SELECT system_id, cat_feature.id INTO v_system_id, v_featurecat_id FROM cat_feature
+		SELECT sys_feature_cat, cat_feature.id INTO v_sys_feature_cat, v_featurecat_id FROM cat_feature
 		JOIN cat_node ON cat_feature.id=nodetype_id where cat_node.id=NEW.nodecat_id;
 
 		EXECUTE 'SELECT json_extract_path_text(double_geom,''activated'')::boolean, json_extract_path_text(double_geom,''value'')  
@@ -549,7 +549,7 @@ BEGIN
 				END IF;
 
 				INSERT INTO polygon(pol_id, sys_type, the_geom, featurecat_id,feature_id )
-				VALUES (v_pol_id, v_system_id, (SELECT ST_Multi(ST_Envelope(ST_Buffer(node.the_geom,v_double_geom_buffer)))
+				VALUES (v_pol_id, v_sys_feature_cat, (SELECT ST_Multi(ST_Envelope(ST_Buffer(node.the_geom,v_double_geom_buffer)))
 				from node where node_id=NEW.node_id), v_featurecat_id, NEW.node_id);
 		END IF;
 
@@ -902,8 +902,8 @@ BEGIN
 	  IF (NEW.nodecat_id != OLD.nodecat_id) THEN
 
 		-- man tables
-		v_old_node_type= (SELECT system_id FROM cat_feature JOIN cat_node ON cat_feature.id=nodetype_id where cat_node.id=OLD.nodecat_id);
-		v_new_node_type= (SELECT system_id FROM cat_feature JOIN cat_node ON cat_feature.id=nodetype_id where cat_node.id=NEW.nodecat_id);
+		v_old_node_type= (SELECT sys_feature_cat FROM cat_feature JOIN cat_node ON cat_feature.id=nodetype_id where cat_node.id=OLD.nodecat_id);
+		v_new_node_type= (SELECT sys_feature_cat FROM cat_feature JOIN cat_node ON cat_feature.id=nodetype_id where cat_node.id=NEW.nodecat_id);
 		-- Man and epa epa tables when parent is used
 			IF v_man_table='parent' THEN
 				IF v_new_node_type != v_old_node_type THEN

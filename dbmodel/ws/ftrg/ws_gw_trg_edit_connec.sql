@@ -41,7 +41,7 @@ v_autoupdate_fluid boolean;
 v_message text;
 v_dsbl_error boolean;
 v_connect2network boolean;
-v_system_id text;
+v_sys_feature_cat text;
 v_featurecat_id text;
 v_arc record;
 v_link integer;
@@ -543,11 +543,11 @@ BEGIN
 		NEW.postcomplement2, NEW.descript, NEW.link, NEW.verified, NEW.rotation, NEW.the_geom,NEW.undelete,NEW.label_x, NEW.label_y,NEW.label_rotation,  NEW.expl_id, NEW.publish, NEW.inventory,
 		NEW.num_value, NEW.connec_length, NEW.arc_id, NEW.minsector_id, NEW.dqa_id, NEW.pjoint_id, NEW.pjoint_type,
 		NEW.adate, NEW.adescript, NEW.accessibility, NEW.lastupdate, NEW.lastupdate_user, NEW.asset_id, NEW.epa_type, NEW.om_state, NEW.conserv_state, NEW.priority,
-		NEW.valve_location, NEW.valve_type, NEW.shutoff_valve, NEW.access_type, NEW.placement_type, NEW.crmzone_id, NEW.expl_id2, NEW.plot_code, NEW.brand_id, NEW.model_id, NEW.serial_number, 
+		NEW.valve_location, NEW.valve_type, NEW.shutoff_valve, NEW.access_type, NEW.placement_type, NEW.crmzone_id, NEW.expl_id2, NEW.plot_code, NEW.brand_id, NEW.model_id, NEW.serial_number,
 		NEW.cat_valve, NEW.label_quadrant);
 
 
-		SELECT system_id, cat_feature.id INTO v_system_id, v_featurecat_id FROM cat_feature
+		SELECT sys_feature_cat, cat_feature.id INTO v_sys_feature_cat, v_featurecat_id FROM cat_feature
 		JOIN cat_connec ON cat_feature.id=connectype_id where cat_connec.id=NEW.connecat_id;
 
 		EXECUTE 'SELECT json_extract_path_text(double_geom,''activated'')::boolean, json_extract_path_text(double_geom,''value'')  
@@ -556,7 +556,7 @@ BEGIN
 
 		IF (v_insert_double_geom IS TRUE) THEN
 			INSERT INTO polygon(sys_type, the_geom, featurecat_id, feature_id )
-			VALUES (v_system_id, (SELECT ST_Multi(ST_Envelope(ST_Buffer(connec.the_geom,v_double_geom_buffer)))
+			VALUES (v_sys_feature_cat, (SELECT ST_Multi(ST_Envelope(ST_Buffer(connec.the_geom,v_double_geom_buffer)))
 			from connec where connec_id=NEW.connec_id), v_featurecat_id, NEW.connec_id);
 		END IF;
 
@@ -849,8 +849,8 @@ BEGIN
 		-- Connec type for parent tables
 		IF v_man_table='parent' THEN
 	    	IF (NEW.connecat_id != OLD.connecat_id) THEN
-				v_new_connec_type= (SELECT system_id FROM cat_feature JOIN cat_connec ON cat_feature.id=connectype_id where cat_connec.id=NEW.connecat_id);
-				v_old_connec_type= (SELECT system_id FROM cat_feature JOIN cat_connec ON cat_feature.id=connectype_id where cat_connec.id=OLD.connecat_id);
+				v_new_connec_type= (SELECT sys_feature_cat FROM cat_feature JOIN cat_connec ON cat_feature.id=connectype_id where cat_connec.id=NEW.connecat_id);
+				v_old_connec_type= (SELECT sys_feature_cat FROM cat_feature JOIN cat_connec ON cat_feature.id=connectype_id where cat_connec.id=OLD.connecat_id);
 				IF v_new_connec_type != v_old_connec_type THEN
 					v_sql='INSERT INTO man_'||lower(v_new_connec_type)||' (connec_id) VALUES ('||NEW.connec_id||')';
 					EXECUTE v_sql;

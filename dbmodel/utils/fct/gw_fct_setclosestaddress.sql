@@ -54,7 +54,7 @@ BEGIN
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
 	INTO v_version;
 
-	-- getting input data   
+	-- getting input data
 	v_id :=  ((p_data ->>'feature')::json->>'id')::json;
 	v_worklayer := ((p_data ->>'feature')::json->>'tableName')::text;
 	v_selectionmode :=  ((p_data ->>'data')::json->>'selectionMode')::text;
@@ -67,26 +67,26 @@ BEGIN
 	Select count(*)
 	into v_count From ext_address
 	Where postnumber NOT SIMILAR TO '[0-9]*';
-	
-	
-	
+
+
+
 	if v_count > 0 and v_fieldtoupdate='postnumber' THEN
-		
+
 		execute 'SELECT gw_fct_getmessage($${
 		"client":{"device":4, "infoType":1, "lang":"ES"},
 		"feature":{},
 		"data":{"message":"3268", "function":"3198","debug_msg":null, "variables":"value", "is_process":true}}$$);';
-	
+
 
 	end if;
 
 	-- Reset values
 	DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=486;
-	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=486;	
-	
+	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=486;
+
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (486, null, 4, concat('GET ADDRESS VALUES FROM CLOSEST STREET NUMBER'));
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (486, null, 4, '-------------------------------------------------------------');
-	
+
 	v_expl= (select string_agg(expl_id::text,',') from selector_expl where cur_user = current_user);
 	v_expl= concat(' AND a.expl_id IN (', v_expl,')');
 
@@ -123,13 +123,13 @@ BEGIN
 	-- update with feature WHERE
 	ELSE
 		IF v_updatevalues='nullStreet' THEN
-			v_partialquery2=' WHERE cf.system_id='||quote_literal(v_catfeature)||' AND a.streetaxis_id IS NULL ';
+			v_partialquery2=' WHERE cf.sys_feature_cat='||quote_literal(v_catfeature)||' AND a.streetaxis_id IS NULL ';
 		ELSIF v_updatevalues='nullPostnumber' THEN
-			v_partialquery2=' WHERE cf.system_id='||quote_literal(v_catfeature)||' AND a.postnumber IS NULL ';
+			v_partialquery2=' WHERE cf.sys_feature_cat='||quote_literal(v_catfeature)||' AND a.postnumber IS NULL ';
 		ELSIF v_updatevalues='nullPostcomplement' THEN
-			v_partialquery2=' WHERE cf.system_id='||quote_literal(v_catfeature)||' AND a.postcomplement IS NULL ';
+			v_partialquery2=' WHERE cf.sys_feature_cat='||quote_literal(v_catfeature)||' AND a.postcomplement IS NULL ';
 		ELSIF v_updatevalues='allValues' THEN
-			v_partialquery2=' WHERE cf.system_id='||quote_literal(v_catfeature)||'';
+			v_partialquery2=' WHERE cf.sys_feature_cat='||quote_literal(v_catfeature)||'';
 		END IF;
 	END IF;
 
@@ -146,7 +146,7 @@ BEGIN
 		EXECUTE 'select column_name from INFORMATION_SCHEMA.columns 
 		where table_schema=''SCHEMA_NAME'' and udt_name=''geometry'' and table_name='||quote_literal(v_polygonlayer)||''
 		INTO v_geom_column;
-	
+
 		v_partialquery4='and a.'||v_feature_type||'_id in (select a.'||v_feature_type||'_id from '||v_polygonlayer||' p, '||v_feature_type||' a 
 		where ST_Contains (p.'||v_geom_column||', a.the_geom))';
 	END IF;
@@ -164,7 +164,7 @@ BEGIN
 		'||v_partialquery4||'
 	    ORDER BY '||v_feature_type||'_id, ST_Distance(a.the_geom, ea.the_geom))q
 	    where a.'||v_feature_type||'_id=q.'||v_feature_type||'_id and a.'||v_feature_type||'_id IN ('||v_array||');';
-	   
+
 	   	GET DIAGNOSTICS affected_rows=row_count;
 	ELSE
 		EXECUTE 'UPDATE '||v_feature_type||' a set streetaxis_id = q.streetaxis_id, '||v_fieldtoupdate||' = q.postnumber from (
@@ -175,7 +175,7 @@ BEGIN
 		'||v_partialquery2||' '||v_partialquery4||' '||v_expl||' '||v_state||'
 	    ORDER BY '||v_feature_type||'_id, ST_Distance(a.the_geom, ea.the_geom))q
 	    where a.'||v_feature_type||'_id=q.'||v_feature_type||'_id '||v_expl||' '||v_state||';';
-	   
+
 	   	GET DIAGNOSTICS affected_rows=row_count;
 	END IF;
 
@@ -183,15 +183,15 @@ BEGIN
 	VALUES (486,  concat ('There are ',affected_rows,' ',v_feature_type,' address values updated.'), affected_rows);
 
 	--info
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=486 order by id asc) row;
-	v_result := COALESCE(v_result, '{}'); 
+	v_result := COALESCE(v_result, '{}');
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
 	-- Control nulls
-	v_result := COALESCE(v_result, '{}'); 
+	v_result := COALESCE(v_result, '{}');
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
-	v_result_info := COALESCE(v_result_info, '{}'); 
+	v_result_info := COALESCE(v_result_info, '{}');
 	v_version := COALESCE(v_version, '[]');
 
 	-- return

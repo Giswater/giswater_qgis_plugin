@@ -9,7 +9,7 @@ This version of Giswater is provided by Giswater Association
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_cat_feature()
   RETURNS trigger AS
 $BODY$
-DECLARE 
+DECLARE
 
 v_table text;
 v_project_type text;
@@ -27,9 +27,9 @@ BEGIN
 		-- control nulls
 		IF NEW.code_autofill IS NULL THEN NEW.code_autofill=true; END IF;
 		IF NEW.active IS NULL THEN NEW.active=true; END IF;
-	
-		INSERT INTO cat_feature(id, system_id, shortcut_key, descript, link_path, code_autofill, active)
-		VALUES (NEW.id, NEW.system_id, NEW.shortcut_key, NEW.descript, NEW.link_path, NEW.code_autofill, NEW.active);
+
+		INSERT INTO cat_feature(id, sys_feature_cat, shortcut_key, descript, link_path, code_autofill, active)
+		VALUES (NEW.id, NEW.sys_feature_cat, NEW.shortcut_key, NEW.descript, NEW.link_path, NEW.code_autofill, NEW.active);
 
 		IF v_table='arc' THEN
 
@@ -39,12 +39,12 @@ BEGIN
 
 			IF v_project_type='ws' THEN
 				UPDATE cat_feature_connec SET epa_default=NEW.epa_default WHERE id=NEW.id;
-				
+
 			ELSIF v_project_type='ud' THEN
 
 				-- control nulls
 				IF NEW.double_geom IS NULL THEN NEW.double_geom='{"activated":false,"value":1}'; END IF;
-			
+
 				UPDATE cat_feature_connec SET double_geom=NEW.double_geom::json WHERE id=NEW.id;
 			END IF;
 
@@ -61,16 +61,16 @@ BEGIN
 
 				-- control nulls
 				IF NEW.graph_delimiter IS NULL THEN NEW.graph_delimiter='NONE'; END IF;
-			
-				UPDATE cat_feature_node SET epa_default=NEW.epa_default, isarcdivide=NEW.isarcdivide, isprofilesurface=NEW.isprofilesurface, choose_hemisphere=NEW.choose_hemisphere, 
+
+				UPDATE cat_feature_node SET epa_default=NEW.epa_default, isarcdivide=NEW.isarcdivide, isprofilesurface=NEW.isprofilesurface, choose_hemisphere=NEW.choose_hemisphere,
 				double_geom=NEW.double_geom::json, num_arcs=NEW.num_arcs, graph_delimiter=NEW.graph_delimiter  WHERE id=NEW.id;
 
 			ELSIF v_project_type='ud' THEN
-			
+
 				-- control nulls
 				IF NEW.isexitupperintro IS NULL THEN NEW.isexitupperintro=1; END IF;
-			
-				UPDATE cat_feature_node SET epa_default=NEW.epa_default, isarcdivide=NEW.isarcdivide, isprofilesurface=NEW.isprofilesurface, choose_hemisphere=NEW.choose_hemisphere, 
+
+				UPDATE cat_feature_node SET epa_default=NEW.epa_default, isarcdivide=NEW.isarcdivide, isprofilesurface=NEW.isprofilesurface, choose_hemisphere=NEW.choose_hemisphere,
 				double_geom=NEW.double_geom::json, num_arcs=NEW.num_arcs, isexitupperintro=NEW.isexitupperintro  WHERE id=NEW.id;
 			END IF;
 
@@ -82,18 +82,18 @@ BEGIN
 		END IF;
 
 		RETURN NEW;
-		
+
 	ELSIF TG_OP = 'UPDATE' THEN
-		
-		UPDATE cat_feature SET id=NEW.id, system_id=NEW.system_id, shortcut_key=NEW.shortcut_key, descript=NEW.descript, link_path=NEW.link_path, 
+
+		UPDATE cat_feature SET id=NEW.id, sys_feature_cat=NEW.sys_feature_cat, shortcut_key=NEW.shortcut_key, descript=NEW.descript, link_path=NEW.link_path,
 		code_autofill=NEW.code_autofill, active=NEW.active WHERE id=OLD.id;
 
 		IF v_table='arc' THEN
-			
+
 			UPDATE cat_feature_arc SET epa_default=NEW.epa_default WHERE id=NEW.id;
 
 		ELSIF v_table='connec' THEN
-  	
+
 			IF v_project_type='ws' THEN
 				UPDATE cat_feature_connec SET epa_default=NEW.epa_default WHERE id=NEW.id;
 			ELSIF v_project_type='ud' THEN
@@ -103,24 +103,24 @@ BEGIN
 		ELSIF v_table='node' THEN
 
 			IF v_project_type='ws' THEN
-				UPDATE cat_feature_node SET epa_default=NEW.epa_default, isarcdivide=NEW.isarcdivide, isprofilesurface=NEW.isprofilesurface, choose_hemisphere=NEW.choose_hemisphere, 
+				UPDATE cat_feature_node SET epa_default=NEW.epa_default, isarcdivide=NEW.isarcdivide, isprofilesurface=NEW.isprofilesurface, choose_hemisphere=NEW.choose_hemisphere,
 				double_geom=NEW.double_geom::json, num_arcs=NEW.num_arcs, graph_delimiter=NEW.graph_delimiter  WHERE id=NEW.id;
 
 			ELSIF v_project_type='ud' THEN
-				UPDATE cat_feature_node SET epa_default=NEW.epa_default, isarcdivide=NEW.isarcdivide, isprofilesurface=NEW.isprofilesurface, choose_hemisphere=NEW.choose_hemisphere, 
+				UPDATE cat_feature_node SET epa_default=NEW.epa_default, isarcdivide=NEW.isarcdivide, isprofilesurface=NEW.isprofilesurface, choose_hemisphere=NEW.choose_hemisphere,
 				double_geom=NEW.double_geom::json, num_arcs=NEW.num_arcs, isexitupperintro=NEW.isexitupperintro  WHERE id=NEW.id;
 			END IF;
 
 		ELSIF v_table='gully' THEN
-  	
+
 			UPDATE cat_feature_gully SET double_geom=NEW.double_geom::json WHERE id=NEW.id;
 
 		END IF;
 
 		RETURN NEW;
 
-	ELSIF TG_OP = 'DELETE' THEN 
-		
+	ELSIF TG_OP = 'DELETE' THEN
+
 		IF v_table='arc' THEN
 
 			DELETE FROM cat_feature_arc WHERE id = OLD.id;

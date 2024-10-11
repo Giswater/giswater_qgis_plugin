@@ -50,16 +50,16 @@ BEGIN
 	-- get system parameters
 	SELECT project_type, giswater, epsg INTO v_project_type, v_version, v_srid FROM sys_version ORDER BY id DESC LIMIT 1;
 
-   
+
    	v_label = ((p_data ->>'data')::json->>'importParam')::text;
    	v_fid = ((p_data ->>'data')::json->>'fid')::text;
-   	
+
 	-- manage log (fid:  234)
 	DELETE FROM audit_check_data WHERE fid = v_fid AND cur_user=current_user;
 	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('IMPORT ISTREAM DATA'));
 	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('------------------------------'));
 
-	
+
 	-- control of rows
 	SELECT count(*) INTO v_count FROM temp_csv WHERE cur_user=current_user AND fid = v_fid;
 
@@ -73,7 +73,7 @@ BEGIN
 			INSERT INTO selector_expl (expl_id) VALUES (0);
 
 			--insert values into catalogs
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) 
+			INSERT INTO cat_feature (id, sys_feature_cat, feature_type, parent_layer, descript)
 			VALUES ('MANHOLE','MANHOLE','NODE', 'v_edit_node', 'Manhole') ON CONFLICT (id) DO NOTHING;
 
 			INSERT INTO cat_node(id)
@@ -82,16 +82,16 @@ BEGIN
 			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('Insert basic catalogs for node - type MANHOLE'));
 
 			--insert data of nodes
-			INSERT INTO v_edit_node (code, top_elev, ymax,  node_type, nodecat_id, matcat_id, epa_type, expl_id, 
+			INSERT INTO v_edit_node (code, top_elev, ymax,  node_type, nodecat_id, matcat_id, epa_type, expl_id,
       sector_id, state, state_type, annotation, descript, dma_id, muni_id, the_geom)
-      SELECT DISTINCT csv1, csv5::float,csv5::float - csv4::float, 'MANHOLE', 'MANHOLE', null, 'JUNCTION', 0, 
-      0, 1, 2, csv6, csv7, 0, 0, ST_SetSRID(ST_MakePoint(csv2::float, csv3::float),v_srid) 
+      SELECT DISTINCT csv1, csv5::float,csv5::float - csv4::float, 'MANHOLE', 'MANHOLE', null, 'JUNCTION', 0,
+      0, 1, 2, csv6, csv7, 0, 0, ST_SetSRID(ST_MakePoint(csv2::float, csv3::float),v_srid)
       FROM temp_csv WHERE fid=408;
 
 
       --create exploitation around nodes and set correct expl_id
       INSERT INTO macroexploitation (macroexpl_id, name) SELECT max(macroexpl_id)+1, 'IMPORT ISTREAM' FROM macroexploitation RETURNING macroexpl_id into v_expl_id;
-      
+
       INSERT INTO exploitation (expl_id, name, macroexpl_id, the_geom)
       SELECT max(e.expl_id)+1, 'IMPORT ISTREAM', v_expl_id, ST_multi(ST_Buffer(ST_ConvexHull(ST_Collect(n.the_geom)),50))
       FROM exploitation e, v_edit_node n
@@ -116,42 +116,42 @@ BEGIN
 
       SELECT count(*) INTO v_count FROM v_edit_node WHERE expl_id=v_expl_id;
       INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('Insert ',v_count, ' nodes'));
-			
+
 			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('Create import istream mapzones.'));
 
 		ELSIF v_fid = 409 THEN
-			
+
 			SELECT count(node_id) INTO v_count FROM node WHERE code = (SELECT csv2 FROM temp_csv WHERE fid=409 LIMIT 1);
-			
+
 			IF v_count = 0 THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"3190", "function":"3104","debug_msg":null, "is_process":true}}$$);'INTO v_audit_result;
 			ELSE
 				--insert values into catalogs
-				INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript) 
+				INSERT INTO cat_feature (id, sys_feature_cat, feature_type, parent_layer, descript)
 				VALUES ('CONDUIT','CONDUIT','ARC', 'v_edit_arc', 'Conduit') ON CONFLICT (id) DO NOTHING;
 
 				INSERT INTO cat_mat_arc (id)
 				SELECT DISTINCT csv6 FROM temp_csv WHERE fid=409 ON CONFLICT (id) DO NOTHING;
-				
+
 				INSERT INTO cat_arc(id, shape, geom1, geom2)
 		  	SELECT DISTINCT CASE WHEN csv7='CIRCULAR' THEN concat(csv7,csv8::float)
 				ELSE concat(csv7,csv8::float,'x',csv9::float) end as cat,csv7,
 				csv8::float, CASE WHEN csv9!='''' and csv9!='' THEN csv9::numeric END AS geom2
 				FROM temp_csv WHERE fid=409 ON CONFLICT (id) DO NOTHING;
-				
+
 				INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('Insert basic catalogs for arc type CONDUIT'));
-			
+
 				--insert data of arcs
-				INSERT INTO v_edit_arc (code, elev1, elev2, arc_type, 
-	      arccat_id, matcat_id, epa_type,  state, state_type, 
+				INSERT INTO v_edit_arc (code, elev1, elev2, arc_type,
+	      arccat_id, matcat_id, epa_type,  state, state_type,
 	      annotation,  muni_id, descript, the_geom, expl_id)
 	      SELECT csv1, csv3::float, csv5::float, 'CONDUIT',
 	      CASE WHEN csv7='CIRCULAR' THEN concat(csv7,csv8::float)
 				ELSE concat(csv7,csv8::float,'x',csv9::float) end as cat,
-				csv6, 'CONDUIT',  1,2, 
+				csv6, 'CONDUIT',  1,2,
 				csv10, 0, csv11,ST_MakeLine(n1.the_geom, n2.the_geom), n1.expl_id
-	      FROM temp_csv 
+	      FROM temp_csv
 	      JOIN node n1 ON n1.code=csv2
 	      JOIN node n2 ON n2.code=csv4
 	      WHERE fid=409;
@@ -162,19 +162,19 @@ BEGIN
 	      INSERT INTO selector_expl (expl_id) VALUES (v_expl_id) ON CONFLICT (expl_id, cur_user) DO NOTHING;
 
 	      SELECT count(*) INTO v_count FROM v_edit_arc WHERE expl_id=v_expl_id;
-	 
+
 	      INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (v_fid, v_result_id, concat('Insert ',v_count,' arcs'));
 
 	  	END IF;
 		END IF;
-		
+
 
 	END IF;
 
 	SELECT addparam INTO v_action_params FROM config_csv WHERE fid=v_fid;
 
-	-- get log 
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	-- get log
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT id, error_message AS message FROM audit_check_data WHERE cur_user="current_user"() AND fid = v_fid) row;
 
 	IF v_audit_result is null THEN
@@ -183,27 +183,27 @@ BEGIN
         v_message = 'Process done successfully';
     ELSE
 
-        SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'status')::text INTO v_status; 
+        SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'status')::text INTO v_status;
         SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'level')::integer INTO v_level;
         SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'message')::text INTO v_message;
 
     END IF;
 
 
-	v_result := COALESCE(v_result, '{}'); 
+	v_result := COALESCE(v_result, '{}');
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 	v_action = concat('[{"funcName": "add_query_layer", "params":', v_action_params, '}]');
-				
+
 	-- Control nulls
-	v_version := COALESCE(v_version, '{}'); 
-	v_result_info := COALESCE(v_result_info, '{}'); 
-	
+	v_version := COALESCE(v_version, '{}');
+	v_result_info := COALESCE(v_result_info, '{}');
+
 	-- Return
 	RETURN gw_fct_json_create_return(('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
             ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||'}}'||
 	    '}')::json, 3104, null, null, v_action::json);
-	    
+
 
 END;
 $BODY$

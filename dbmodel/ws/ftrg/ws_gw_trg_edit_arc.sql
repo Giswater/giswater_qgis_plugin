@@ -600,8 +600,8 @@ BEGIN
 		 -- Arc type for parent view
 		IF v_man_table='parent' THEN
 	    	IF (NEW.arccat_id != OLD.arccat_id) THEN
-				v_new_arc_type= (SELECT system_id FROM cat_feature JOIN cat_arc ON cat_feature.id=arctype_id where cat_arc.id=NEW.arccat_id);
-				v_old_arc_type= (SELECT system_id FROM cat_feature JOIN cat_arc ON cat_feature.id=arctype_id where cat_arc.id=OLD.arccat_id);
+				v_new_arc_type= (SELECT sys_feature_cat FROM cat_feature JOIN cat_arc ON cat_feature.id=arctype_id where cat_arc.id=NEW.arccat_id);
+				v_old_arc_type= (SELECT sys_feature_cat FROM cat_feature JOIN cat_arc ON cat_feature.id=arctype_id where cat_arc.id=OLD.arccat_id);
 				IF v_new_arc_type != v_old_arc_type THEN
 					v_sql='INSERT INTO man_'||lower(v_new_arc_type)||' (arc_id) VALUES ('||NEW.arc_id||')';
 					EXECUTE v_sql;

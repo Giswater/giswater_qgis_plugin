@@ -77,14 +77,14 @@ BEGIN
 
 	-- get input data
 	v_debugmode := ((p_data ->>'data')::json->>'parameters')::json->>'debugMode'::text;
-	
+
 	IF (select count(*) from temp_csv where CSV1 = ';Created by Giswater') = 1 THEN
 		v_isgwproject := TRUE;
 	END IF;
 
 	-- delete previous data on log table
 	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=239;
-		
+
 	-- create a header
 	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 4, 'IMPORT INP EPANET FILE');
 	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 4, '--------------------------------');
@@ -99,17 +99,17 @@ BEGIN
 	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, '-------');
 
 	IF v_debugmode IS NOT TRUE THEN
-		
+
 		IF v_isgwproject THEN
-			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES 
+			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES
 			(239, 2, 'WARNING-239: It seems that inp file comes from Giswater project. If there are nodarcs (valves and pumps) they will be re-shaped ''on the fly'' to nodes');
 		ELSE
-			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES 
+			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES
 			(239, 2, 'WARNING-239: It seems that inp file not comes from Giswater project. All nodarcs (valves and pumps) will be imported as arc feature');
 		END IF;
 
 		IF v_delete_prev THEN
-			
+
 			DELETE FROM rpt_cat_result;
 
 			-- Delete system and user catalogs
@@ -122,7 +122,7 @@ BEGIN
 			DELETE FROM ext_municipality;
 			DELETE FROM selector_expl;
 			DELETE FROM selector_state;
-			
+
 			DELETE FROM cat_feature_arc ;
 			DELETE FROM cat_feature_node ;
 			DELETE FROM cat_feature_connec ;
@@ -132,7 +132,7 @@ BEGIN
 			DELETE FROM cat_mat_roughness;
 			DELETE FROM cat_arc;
 			DELETE FROM cat_node;
-	 
+
 			-- Delete data
 			DELETE FROM node;
 			DELETE FROM arc;
@@ -144,7 +144,7 @@ BEGIN
 			DELETE FROM man_pipe;
 			DELETE FROM man_pump;
 			DELETE FROM man_valve ;
-			
+
 			DELETE FROM inp_reservoir;
 			DELETE FROM inp_junction;
 			DELETE FROM inp_pipe;
@@ -154,7 +154,7 @@ BEGIN
 			DELETE FROM inp_valve;
 			DELETE FROM inp_virtualpump;
 			DELETE FROM inp_pump_additional;
-			
+
 			DELETE FROM inp_tags;
 			DELETE FROM inp_dscenario_demand;
 			DELETE FROM inp_pattern;
@@ -169,9 +169,9 @@ BEGIN
 			DELETE FROM rpt_inp_arc;
 			DELETE FROM rpt_inp_node;
 			DELETE FROM rpt_cat_result;
-			DELETE FROM config_graph_mincut;	
+			DELETE FROM config_graph_mincut;
 		END IF;
-		
+
 		-- check for network object id string length
 		v_count := (SELECT max(length(csv1)) FROM temp_csv WHERE source IN ('[PIPES]','[JUNCTIONS]','[TANKS]','[RESERVOIRS]','[VALVES]','[PUMPS]') AND csv1 NOT LIKE ';%');
 		IF v_count < 13 THEN
@@ -184,7 +184,7 @@ BEGIN
 			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 3, 'ERROR-239: There are at least one network id with more than 16 digits. Please check your data before continue');
 			v_status = 'Failed';
 		END IF;
-		 
+
 		-- check for non visual object id string length
 		v_count := (SELECT max(length(csv1)) FROM temp_csv WHERE source IN ('[CURVES]','[PATTERNS]') AND csv1 NOT LIKE ';%');
 		IF v_count < 17 THEN
@@ -237,8 +237,8 @@ BEGIN
 					v_curvetype=replace(replace(rpt_rec.csv1,';',''),':','');
 				ELSE
 					UPDATE temp_csv SET csv4=v_curvetype WHERE temp_csv.id=rpt_rec.id;
-				END IF;	
-			END LOOP;	
+				END IF;
+			END LOOP;
 
 			-- refactor [PIPES] target when minorloss is null and other has values
 			UPDATE temp_csv SET csv8=csv7, csv7=null WHERE source = '[PIPES]' and csv7 IN ('CV', 'CLOSED', 'OPEN') and csv8 is null;
@@ -265,54 +265,54 @@ BEGIN
 			--cat_feature
 			ALTER TABLE cat_feature DISABLE TRIGGER gw_trg_cat_feature_after;
 			--node
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript, code_autofill) 
+			INSERT INTO cat_feature (id, sys_feature_cat, feature_type, parent_layer, descript, code_autofill)
 			VALUES ('JUNCTION','JUNCTION','NODE', 'v_edit_node', 'Junction', true) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript, code_autofill) 
+			INSERT INTO cat_feature (id, sys_feature_cat, feature_type, parent_layer, descript, code_autofill)
 			VALUES ('TANK','TANK','NODE', 'v_edit_node', 'Tank', true) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript, code_autofill) 
+			INSERT INTO cat_feature (id, sys_feature_cat, feature_type, parent_layer, descript, code_autofill)
 			VALUES ('RESERVOIR','SOURCE','NODE', 'v_edit_node', 'Reservoir', true) ON CONFLICT (id) DO NOTHING;
 			--arc
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript, code_autofill) 
+			INSERT INTO cat_feature (id, sys_feature_cat, feature_type, parent_layer, descript, code_autofill)
 			VALUES ('PIPE','PIPE','ARC', 'v_edit_arc', 'Pipe', true) ON CONFLICT (id) DO NOTHING;
 
 			--nodarc (AS arc)
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript, code_autofill) 
+			INSERT INTO cat_feature (id, sys_feature_cat, feature_type, parent_layer, descript, code_autofill)
 			VALUES ('ARCCHV','VARC','ARC', 'v_edit_arc', 'Check valve (arc)', true) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript, code_autofill) 
+			INSERT INTO cat_feature (id, sys_feature_cat, feature_type, parent_layer, descript, code_autofill)
 			VALUES ('ARCFCV','VARC','ARC', 'v_edit_arc', 'Flow control valve (arc)', true) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript, code_autofill) 
+			INSERT INTO cat_feature (id, sys_feature_cat, feature_type, parent_layer, descript, code_autofill)
 			VALUES ('ARCGPV','VARC','ARC', 'v_edit_arc', 'General purpose valve (arc)', true) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript, code_autofill) 
+			INSERT INTO cat_feature (id, sys_feature_cat, feature_type, parent_layer, descript, code_autofill)
 			VALUES ('ARCPBV','VARC','ARC', 'v_edit_arc', 'Presure break valve (arc)', true) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript, code_autofill) 
+			INSERT INTO cat_feature (id, sys_feature_cat, feature_type, parent_layer, descript, code_autofill)
 			VALUES ('ARCPSV','VARC','ARC', 'v_edit_arc', 'Presure sustain valve (arc)', true) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript, code_autofill) 
+			INSERT INTO cat_feature (id, sys_feature_cat, feature_type, parent_layer, descript, code_autofill)
 			VALUES ('ARCPRV','VARC','ARC', 'v_edit_arc', 'Presure reduction valve (arc)', true) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript, code_autofill) 
+			INSERT INTO cat_feature (id, sys_feature_cat, feature_type, parent_layer, descript, code_autofill)
 			VALUES ('ARCTCV','VARC','ARC', 'v_edit_arc', 'Throttle control valve (arc)', true) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript, code_autofill) 
+			INSERT INTO cat_feature (id, sys_feature_cat, feature_type, parent_layer, descript, code_autofill)
 			VALUES ('ARCPUMP','VARC','ARC', 'v_edit_arc', 'Pump (arc)', true) ON CONFLICT (id) DO NOTHING;
 
 			--nodarc (AS node)
-		
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript, code_autofill) 
+
+			INSERT INTO cat_feature (id, sys_feature_cat, feature_type, parent_layer, descript, code_autofill)
 			VALUES ('FCV','VALVE','NODE', 'v_edit_node','Flow control valve when comes from giswater project', true) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript, code_autofill) 
+			INSERT INTO cat_feature (id, sys_feature_cat, feature_type, parent_layer, descript, code_autofill)
 			VALUES ('GPV','VALVE','NODE', 'v_edit_node','General purpose valve when comes from giswater project', true) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript, code_autofill) 
+			INSERT INTO cat_feature (id, sys_feature_cat, feature_type, parent_layer, descript, code_autofill)
 			VALUES ('PBV','VALVE','NODE', 'v_edit_node','Presure break valve when comes from giswater project', true) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript, code_autofill) 
+			INSERT INTO cat_feature (id, sys_feature_cat, feature_type, parent_layer, descript, code_autofill)
 			VALUES ('PSV','VALVE','NODE', 'v_edit_node','Presure sustain valve when comes from giswater project', true) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript, code_autofill) 
+			INSERT INTO cat_feature (id, sys_feature_cat, feature_type, parent_layer, descript, code_autofill)
 			VALUES ('PRV','VALVE','NODE', 'v_edit_node','Presure reduction valve when comes from giswater project', true) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript, code_autofill) 
+			INSERT INTO cat_feature (id, sys_feature_cat, feature_type, parent_layer, descript, code_autofill)
 			VALUES ('TCV','VALVE','NODE', 'v_edit_node','Throttle control valve when comes from giswater project', true) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript, code_autofill) 
+			INSERT INTO cat_feature (id, sys_feature_cat, feature_type, parent_layer, descript, code_autofill)
 			VALUES ('PUMP','PUMP','NODE', 'v_edit_node','Pump', true) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature (id, system_id, feature_type, parent_layer, descript, code_autofill) 
-			VALUES ('SHORTPIPE','VALVE','NODE', 'v_edit_node','Other shortpipe (meters, checkvalve, shutoff valves)  when comes from giswater project', true) 
+			INSERT INTO cat_feature (id, sys_feature_cat, feature_type, parent_layer, descript, code_autofill)
+			VALUES ('SHORTPIPE','VALVE','NODE', 'v_edit_node','Other shortpipe (meters, checkvalve, shutoff valves)  when comes from giswater project', true)
 			ON CONFLICT (id) DO NOTHING;
-			
+
 
 			--arc_type
 			--arc
@@ -343,7 +343,7 @@ BEGIN
 
 			ALTER TABLE cat_feature ENABLE TRIGGER gw_trg_cat_feature_after;
 			--Materials
-			INSERT INTO cat_mat_arc 
+			INSERT INTO cat_mat_arc
 			SELECT DISTINCT csv6, csv6 FROM temp_csv WHERE source='[PIPES]' AND csv6 IS NOT NULL;
 			DELETE FROM cat_mat_roughness; -- forcing delete because when new material is inserted on cat_mat_arc automaticly this table is filled
 			INSERT INTO cat_mat_node VALUES ('MAT', 'MAT') ON CONFLICT (id) DO NOTHING;
@@ -385,7 +385,7 @@ BEGIN
 			INSERT INTO cat_work VALUES ('IMPORTINP', 'IMPORTINP') ON CONFLICT (id) DO NOTHING;
 
 
-			--create child views 
+			--create child views
 			PERFORM gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
 			"data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-CREATE" }}$$);
 
@@ -393,7 +393,7 @@ BEGIN
 			ALTER TABLE config_param_user ADD CONSTRAINT config_param_user_parameter_cur_user_unique UNIQUE(parameter, cur_user);
 
 			-- improve velocity for junctions using directy tables in spite of vi_junctions view
-			INSERT INTO node (node_id, elevation, nodecat_id, epa_type, sector_id, dma_id, expl_id, state, state_type, presszone_id) 
+			INSERT INTO node (node_id, elevation, nodecat_id, epa_type, sector_id, dma_id, expl_id, state, state_type, presszone_id)
 			SELECT csv1, csv2::numeric(12,3), 'JUNCTION', 'JUNCTION', 1, 1, 1, 1, 2, 1
 			FROM temp_csv where source='[JUNCTIONS]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user order by 1;
 			INSERT INTO inp_junction SELECT csv1, csv3::numeric(12,6), csv4::varchar(16) FROM temp_csv where source='[JUNCTIONS]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user;
@@ -406,37 +406,37 @@ BEGIN
 			-- insert rules
 			INSERT INTO inp_rules (sector_id, text, active)
 			select 1, csv1, true FROM temp_csv where source='[RULES]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';-%' AND csv1 NOT LIKE ';text') AND cur_user=current_user order by 1;
-		
+
 			-- insert reservoirs
-			INSERT INTO node (node_id, elevation, nodecat_id,epa_type,sector_id, dma_id, expl_id, state, state_type) 
+			INSERT INTO node (node_id, elevation, nodecat_id,epa_type,sector_id, dma_id, expl_id, state, state_type)
 			select csv1, csv2::numeric(12,3), 'RESERVOIR','RESERVOIR',1,1,1,1,2 FROM temp_csv where source='[RESERVOIRS]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%' AND csv1 NOT LIKE ';text') AND cur_user=current_user order by 1;
 			INSERT INTO inp_reservoir (node_id, pattern_id) select csv1, csv3 FROM temp_csv where source='[RESERVOIRS]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%' AND csv1 NOT LIKE ';text') AND cur_user=current_user order by 1;
 			INSERT INTO man_source(node_id) select csv1 FROM temp_csv where source='[RESERVOIRS]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%' AND csv1 NOT LIKE ';text') AND cur_user=current_user order by 1;
-		
+
 			-- insert tanks
-			INSERT INTO node (node_id, elevation, nodecat_id, epa_type,sector_id, dma_id, expl_id, state, state_type) 
+			INSERT INTO node (node_id, elevation, nodecat_id, epa_type,sector_id, dma_id, expl_id, state, state_type)
 			select csv1, csv2::numeric(12,3), 'TANK','TANK',1,1,1,1,2 FROM temp_csv where source='[TANKS]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%' AND csv1 NOT LIKE ';text') AND cur_user=current_user order by 1;
-			
-			INSERT INTO inp_tank (node_id, initlevel, minlevel, maxlevel, diameter, minvol, curve_id, overflow) 
+
+			INSERT INTO inp_tank (node_id, initlevel, minlevel, maxlevel, diameter, minvol, curve_id, overflow)
 			SELECT csv1, csv3::numeric(12,3), csv4::numeric(12,3), csv5::numeric(12,3), csv6::numeric(12,3), csv7::numeric(12,3), NULL, NULL FROM temp_csv where source='[TANKS]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%' AND csv1 NOT LIKE ';text') AND cur_user=current_user order by 1;
-			
-			INSERT INTO man_tank (node_id) 
+
+			INSERT INTO man_tank (node_id)
 			select csv1 FROM temp_csv where source='[TANKS]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%' AND csv1 NOT LIKE ';text') AND cur_user=current_user order by 1;
 
 
 			-- LOOPING THE EDITABLE VIEWS TO INSERT DATA
-			FOR v_rec_table IN SELECT * FROM config_fprocess WHERE fid=v_fid AND tablename 
+			FOR v_rec_table IN SELECT * FROM config_fprocess WHERE fid=v_fid AND tablename
 			NOT IN ('vi_tanks', 'vi_reservoirs', 'vi_pipes', 'vi_junctions', 'vi_valves', 'vi_status', 'vi_controls', 'vi_rules', 'vi_coordinates') order by orderby
 			LOOP
 				--identifing the number of fields of the editable view
-				FOR v_rec_view IN SELECT row_number() over (order by v_rec_table.tablename) as rid, column_name, data_type from information_schema.columns 
+				FOR v_rec_view IN SELECT row_number() over (order by v_rec_table.tablename) as rid, column_name, data_type from information_schema.columns
 				where table_name=v_rec_table.tablename AND table_schema='SCHEMA_NAME'
-				LOOP	
+				LOOP
 					-- profilactic control for postgis specific datatypes
 					IF v_rec_view.data_type = 'USER-DEFINED' THEN v_rec_view.data_type = 'text'; END IF;
 
 					IF v_rec_view.rid=1 THEN
-						--insert of fields which are concatenation 
+						--insert of fields which are concatenation
 						v_query_fields = concat ('csv',v_rec_view.rid,'::',v_rec_view.data_type);
 					ELSE
 						v_query_fields = concat (v_query_fields,' , csv',v_rec_view.rid,'::',v_rec_view.data_type);
@@ -450,24 +450,24 @@ BEGIN
 
 				raise notice 'v_sql %', v_sql;
 				EXECUTE v_sql;
-				
+
 			END LOOP;
-		
+
 			-- improve velocity for pipes using directy tables in spite of vi_pipes view
-			INSERT INTO arc (arc_id, node_1, node_2, custom_length, arccat_id, epa_type, sector_id, dma_id, expl_id, state, state_type, presszone_id) 
-			SELECT csv1, csv2, csv3, csv4::numeric(12,3), concat((csv6::numeric(12,3))::text,'-',(csv5::numeric(12,3))::text), 'PIPE', 1, 1, 1, 1, 2, 1 
+			INSERT INTO arc (arc_id, node_1, node_2, custom_length, arccat_id, epa_type, sector_id, dma_id, expl_id, state, state_type, presszone_id)
+			SELECT csv1, csv2, csv3, csv4::numeric(12,3), concat((csv6::numeric(12,3))::text,'-',(csv5::numeric(12,3))::text), 'PIPE', 1, 1, 1, 1, 2, 1
 			FROM temp_csv where source='[PIPES]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user order by 1;
-			INSERT INTO inp_pipe (arc_id, minorloss, status) 
+			INSERT INTO inp_pipe (arc_id, minorloss, status)
 			SELECT csv1, csv7::numeric(12,6), upper(csv8) FROM temp_csv where source='[PIPES]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user;
 
 			-- delete those custom_length with same value of real_length
 			UPDATE arc SET custom_length = null WHERE custom_length::numeric(12,3) <> (st_length(the_geom))::numeric(12,3);
-			
+
 			INSERT INTO man_pipe SELECT csv1 FROM temp_csv where source='[PIPES]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user;
 
 			-- update coordinates
 			UPDATE node SET the_geom=ST_SetSrid(ST_MakePoint(csv2::numeric,csv3::numeric),v_epsg)
-			FROM temp_csv where source='[COORDINATES]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user 
+			FROM temp_csv where source='[COORDINATES]' AND fid = 239  AND (csv1 NOT LIKE '[%' AND csv1 NOT LIKE ';%') AND cur_user=current_user
 			AND csv1 = node_id;
 
 			-- force state type for arcs and nodes
@@ -513,31 +513,31 @@ BEGIN
 
 				FOR v_data IN SELECT * FROM arc WHERE arc_id like '%_n2a' OR arc_id like '%_n2a_5'
 				LOOP
-					IF v_data.epa_type = 'VIRTUALVALVE' THEN 
+					IF v_data.epa_type = 'VIRTUALVALVE' THEN
 						v_nodecat = (SELECT valv_type FROM inp_virtualvalve WHERE arc_id = v_data.arc_id);
 						v_epatype = 'VALVE';
-						
-					ELSIF v_data.epa_type = 'VIRTUALPUMP' THEN 
-						IF v_data.arc_id like '%_n2a_5' THEN 
-							v_pumptype  = 'PRESSPUMP';	
-						ELSE 
+
+					ELSIF v_data.epa_type = 'VIRTUALPUMP' THEN
+						IF v_data.arc_id like '%_n2a_5' THEN
+							v_pumptype  = 'PRESSPUMP';
+						ELSE
 							v_pumptype  = 'FLOWPUMP';
 						END IF;
 						v_nodecat = 'PUMP';
 						v_epatype = 'PUMP';
-					ELSE 
+					ELSE
 						v_nodecat = 'SHORTPIPE';
 						v_epatype = 'SHORTPIPE';
 					END IF;
-					
+
 					-- getting man_table to work with
-					SELECT type, epa_table INTO v_mantype, v_epatablename FROM cat_feature_node c JOIN sys_feature_epa_type s ON c.epa_default = s.id 
+					SELECT type, epa_table INTO v_mantype, v_epatablename FROM cat_feature_node c JOIN sys_feature_epa_type s ON c.epa_default = s.id
 					WHERE epa_default = v_epatype;
-					
+
 					-- defining geometry of new node
 					SELECT array_agg(the_geom) INTO geom_array FROM node WHERE v_data.node_1=node_id;
 					FOR rpt_rec IN SELECT * FROM temp_csv WHERE cur_user=current_user AND fid = v_fid and source='[VERTICES]' AND csv1=v_data.arc_id order by id
-					LOOP	
+					LOOP
 						v_point_geom=ST_SetSrid(ST_MakePoint(rpt_rec.csv2::numeric,rpt_rec.csv3::numeric),v_epsg);
 						geom_array=array_append(geom_array,v_point_geom);
 					END LOOP;
@@ -569,11 +569,11 @@ BEGIN
 						INSERT INTO inp_valve (node_id, valv_type, pressure, custom_dint, flow, coef_loss, curve_id, minorloss, status)
 						SELECT v_node_id, valv_type, pressure, diameter, flow, coef_loss, curve_id, minorloss, status FROM inp_virtualvalve WHERE arc_id=v_data.arc_id;
 
-					ELSE						
+					ELSE
 						INSERT INTO inp_shortpipe (node_id, status) SELECT v_node_id, status FROM inp_pipe WHERE arc_id=v_data.arc_id;
-						
+
 					END IF;
-						
+
 					-- get old nodes
 					SELECT node_1, node_2 INTO v_node1, v_node2 FROM arc WHERE arc_id=v_data.arc_id;
 
@@ -587,43 +587,43 @@ BEGIN
 					-- reconnect topology
 					UPDATE arc SET node_1=v_node_id WHERE node_1=v_node1 OR node_1=v_node2;
 					UPDATE arc SET node_2=v_node_id WHERE node_2=v_node1 OR node_2=v_node2;
-							
+
 					-- update elevation of new node
 					UPDATE node SET elevation = v_elevation WHERE node_id=v_node_id;
-					
-				END LOOP;			
-		
+
+				END LOOP;
+
 				-- to_arc on shortpipes
 				UPDATE inp_shortpipe SET to_arc = b.to_arc FROM
 					(
 					select a.arc_id, n.arc_id AS to_arc from inp_pipe
 					JOIN arc a USING (arc_id)
 					JOIN (SELECT arc_id, node_1 FROM arc UNION SELECT arc_id, node_2 FROM arc)n ON a.node_2 = n.node_1
-					WHERE 
+					WHERE
 					a.arc_id != n.arc_id
 					and status = 'CV')b
 				WHERE  b.arc_id = concat(inp_shortpipe.node_id,'_n2a');
 
-				-- transform pump additional from node to inp_pump_additional table		
+				-- transform pump additional from node to inp_pump_additional table
 				INSERT INTO inp_pump_additional (node_id, order_id, power, curve_id, speed, pattern_id, status, energyvalue)
-				select 
-				replace(arc_id, reverse(substring(reverse(arc_id),0,6)), ''), 
+				select
+				replace(arc_id, reverse(substring(reverse(arc_id),0,6)), ''),
 				(substring(reverse(arc_id),0,2))::integer,
 				power, curve_id, speed, pattern_id, status, energyvalue
 				from inp_virtualpump WHERE substring(reverse(arc_id),0,2) ~ '^\d+$' AND substring(reverse(arc_id),2,1) !='_';
 
-				-- update state=0 pump additionals 
+				-- update state=0 pump additionals
 				UPDATE arc SET state = 0 WHERE arc_id IN (SELECT arc_id FROM inp_virtualpump);
-							
+
 				-- delete objects;
 				DELETE FROM inp_pipe WHERE substring(reverse(arc_id),0,5) = 'a2n_';
 
-				INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 
+				INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1,
 				'INFO: Link geometries from VALVES AND PUMPS have been transformed using reverse nod2arc strategy as nodes. Geometry from arcs and nodes are saved using state=0');
-			
+
 				-- set node topocontrol=true
 				UPDATE config_param_system SET value='{"activated":true,"value":0.1}' WHERE "parameter"='edit_node_proximity';
-			
+
 			END IF;
 
 
@@ -633,7 +633,7 @@ BEGIN
 			-- Create arc geom
 			IF v_isgwproject THEN
 				v_querytext = 'SELECT * FROM arc WHERE epa_type=''PIPE''';
-			ELSE 
+			ELSE
 				v_querytext = 'SELECT * FROM arc ';
 			END IF;
 
@@ -644,11 +644,11 @@ BEGIN
 
 				SELECT array_agg(ST_SetSrid(ST_MakePoint(csv2::numeric,csv3::numeric),v_epsg)order by id) INTO  geom_array_vertex FROM temp_csv
 				WHERE cur_user=current_user AND fid = v_fid and source='[VERTICES]' and csv1=v_data.arc_id;
-				
+
 				IF geom_array_vertex IS NOT NULL THEN
 					geom_array=array_cat(geom_array, geom_array_vertex);
 				END IF;
-				
+
 				geom_array=array_append(geom_array,(SELECT the_geom FROM node WHERE v_data.node_2=node_id));
 
 				UPDATE arc SET the_geom=ST_MakeLine(geom_array) where arc_id=v_data.arc_id;
@@ -679,18 +679,18 @@ BEGIN
 					UPDATE arc SET node_2=v_newnode WHERE node_2=v_node_id;
 					DELETE FROM node WHERE node_id = v_node_id;
 					DELETE FROM arc WHERE arc_id = v_oldarc;
-					
+
 					UPDATE node SET the_geom = the_geom WHERE node_id = v_newnode;
 				END LOOP;
 
 				-- set nodearc variable as a max length/2+0.01 of arcs with state=0 (only are nod2arcs)
 				UPDATE config_param_system SET value = ((SELECT max(st_length(the_geom)) FROM arc WHERE state=0)/2+0.01) WHERE parameter='edit_arc_searchnodes';
-				
+
 				-- delete old nodes
 				UPDATE arc SET node_1=null where node_1 IN (SELECT node_id FROM node WHERE state=0);
 				UPDATE arc SET node_2=null where node_2 IN (SELECT node_id FROM node WHERE state=0);
 				DELETE FROM node WHERE state=0;
-					
+
 				-- repair arcs
 				SELECT gw_fct_arc_repair(concat('{"client":{"device":4, "infoType":1, "lang":"ES"},"form":{}, 
 				"feature":{"tableName":"arc","featureType":"ARC", "id":["',arc_id,'"]},"data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"previousSelection","parameters":{}}}')::json)
@@ -712,7 +712,7 @@ BEGIN
 
 			-- config graph
 			INSERT INTO config_graph_mincut SELECT node_id, null, true FROM node WHERE epa_type IN ('TANK', 'RESERVOIR');
-			
+
 			-- purge catalog tables
 			DELETE FROM cat_arc WHERE id NOT IN (SELECT DISTINCT(arccat_id) FROM arc);
 			DELETE FROM cat_node WHERE id NOT IN (SELECT DISTINCT(nodecat_id) FROM node);
@@ -725,12 +725,12 @@ BEGIN
 			UPDATE inp_valve SET status = 'ACTIVE' WHERE status IS NULL;
 			UPDATE node SET presszone_id = '1' WHERE presszone_id is null;
 			UPDATE arc SET presszone_id = '1' WHERE presszone_id is null;
-			
+
 			UPDATE node SET code = node_id  WHERE code is null;
 			UPDATE arc SET code = arc_id WHERE code is null;
-			
+
 			UPDATE config_param_user SET value = null WHERE parameter = 'inp_options_pattern';
-						
+
 			INSERT INTO config_param_user VALUES ('inp_options_patternmethod', '13', current_user);
 			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: Enabling constraints -> Done');
 			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: Process finished');
@@ -740,10 +740,10 @@ BEGIN
 		END IF;
 
 	ELSE
-	
-		INSERT INTO audit_check_data (fid, criticity, error_message) 
+
+		INSERT INTO audit_check_data (fid, criticity, error_message)
 		VALUES (239, 4, 'Variable import_epa_debug is True. As result import have been partially sucessfull.');
-		INSERT INTO audit_check_data (fid, criticity, error_message) 
+		INSERT INTO audit_check_data (fid, criticity, error_message)
 		VALUES (239, 4, 'Inp file data is stored on temp_csv table. To debug import process take a look on https://github.com/Giswater/giswater_dbmodel/wiki/import-inp-file-debug-mode');
 	END IF;
 
@@ -755,7 +755,7 @@ BEGIN
 	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 3, '');
 	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 2, '');
 	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, '');
-	
+
 	--set urn id
 	PERFORM gw_fct_import_inp_urn();
 
@@ -772,9 +772,9 @@ BEGIN
 
 	-- get results
 	-- info
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND (fid=239 OR fid=439) order by criticity DESC, id) row;
-	v_result := COALESCE(v_result, '{}'); 
+	v_result := COALESCE(v_result, '{}');
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
 	-- replace
@@ -782,15 +782,15 @@ BEGIN
 		FROM (
 		SELECT source, array_agg(distinct csv1) as csv1
 		FROM temp_csv
-		WHERE fid='239' and length(csv1) > 16 and csv1 not ilike ';%' 
-			and source in ('[PIPES]','[JUNCTIONS]','[TANKS]','[RESERVOIRS]','[VALVES]','[PUMPS]','[CURVES]','[PATTERNS]') 
+		WHERE fid='239' and length(csv1) > 16 and csv1 not ilike ';%'
+			and source in ('[PIPES]','[JUNCTIONS]','[TANKS]','[RESERVOIRS]','[VALVES]','[PUMPS]','[CURVES]','[PATTERNS]')
 		GROUP BY source ORDER BY 1) a;
 
 	-- Control nulls
-	v_result_info := COALESCE(v_result_info, '{}'); 
-	v_result_point := COALESCE(v_result_point, '{}'); 
-	v_result_line := COALESCE(v_result_line, '{}'); 	
-	v_version := COALESCE(v_version, '{}'); 	
+	v_result_info := COALESCE(v_result_info, '{}');
+	v_result_point := COALESCE(v_result_point, '{}');
+	v_result_line := COALESCE(v_result_line, '{}');
+	v_version := COALESCE(v_version, '{}');
 
 	IF v_replace IS NOT NULL THEN
 		v_replace := '"replace":'||v_replace||',';
@@ -806,7 +806,7 @@ BEGIN
 				'"point":'||v_result_point||','||
 				'"line":'||v_result_line||'}'||
 	    '}}')::json, 2522, null, null, null);
-	
+
 	--  Exception handling
 	EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
@@ -816,10 +816,10 @@ BEGIN
 		{"message":"ERRORS"},
 		{"message":"----------"},
 		{"message":'||to_json(v_error_context)||'},
-		{"message":'||to_json(SQLERRM)||'}]}}}, "NOSQLERR":' || 
+		{"message":'||to_json(SQLERRM)||'}]}}}, "NOSQLERR":' ||
 	to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
-	
-	
+
+
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

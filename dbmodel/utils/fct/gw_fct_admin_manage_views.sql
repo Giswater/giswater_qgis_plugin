@@ -24,7 +24,7 @@ SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_edit_node"], "fieldName":"_pol_id_","action":"DELETE-FIELD","hasChilds":"True","onlyChilds":"True"}}$$);
 
-"action":"DELETE-FIELD" delete field that has alias 
+"action":"DELETE-FIELD" delete field that has alias
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_edit_man_register"], "fieldName":"_pol_id_","alias":"man_register._pol_id_ AS pol_id","action":"DELETE-FIELD","hasChilds":"False"}}$$);
 
@@ -35,13 +35,13 @@ SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "action":"ADD-FIELD"
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["v_edit_node], "fieldName":"asset_id", "systemId":"METER", "action":"ADD-FIELD","hasChilds":"True"}}$$);
-	
+
 "action":"RENAME-VIEW"
 SELECT gw_fct_admin_manage_views($${"client":{"lang":"ES"}, "feature":{},
 "data":{"viewName":["ve_node_junction], "newViewName":"ve_node_junction2", "action":"RENAME-VIEW","hasChilds":"False"}}$$);
 */
 
-DECLARE 
+DECLARE
 v_version text;
 v_project_type text;
 v_error_context text;
@@ -70,7 +70,7 @@ v_replace_query text;
 v_trg_fields text;
 v_gwversion text;
 v_systemid text;
-v_cur_system_id text;
+v_cur_sys_feature_cat text;
 v_alias text;
 v_onlychilds boolean;
 BEGIN
@@ -90,9 +90,9 @@ BEGIN
 	v_haschilds=json_extract_path_text(p_data,'data','hasChilds')::boolean;
 	v_systemid = json_extract_path_text(p_data,'data','systemId');
 	v_onlychilds = json_extract_path_text(p_data,'data','onlyChilds');
-	
+
 	--change viewnames into list
-	v_viewlist = ARRAY(SELECT json_array_elements_text(v_viewname::json)); 	
+	v_viewlist = ARRAY(SELECT json_array_elements_text(v_viewname::json));
 
 	IF v_haschilds IS TRUE THEN
 		p_data = replace(p_data::text,'"hasChilds":"True"','"hasChilds":"False"');
@@ -104,8 +104,8 @@ BEGIN
 			FOREACH rec_view IN ARRAY(SELECT string_to_array(string_agg(a.child_layer::text,','),',') FROM (
 			SELECT  child_layer from cat_feature WHERE parent_layer = ANY(v_viewlist)
 			UNION SELECT DISTINCT parent_layer from cat_feature WHERE parent_layer = ANY(v_viewlist) order by 1 desc)a) LOOP
-				
-				IF v_lastview IS NULL THEN 
+
+				IF v_lastview IS NULL THEN
 					p_data = replace(p_data::text,json_array_elements_text(v_viewname::json),rec_view);
 				ELSE
 					p_data = replace(p_data::text,v_lastview,rec_view);
@@ -114,7 +114,7 @@ BEGIN
 				EXECUTE 'SELECT gw_fct_admin_manage_views($$'||p_data||'$$)';
 				v_lastview = rec_view;
 			END LOOP;
-		ELSE 
+		ELSE
 			EXECUTE 'SELECT gw_fct_admin_manage_views($$'||p_data||'$$)';
 		END IF;
 
@@ -122,11 +122,11 @@ BEGIN
 
 	IF v_action='DELETE-FIELD' THEN
 		FOREACH rec_view IN ARRAY(v_viewlist) LOOP
-			
+
 			EXECUTE 'INSERT INTO temp_csv (fid, source, csv1 )
 			SELECT ''380'', '||quote_literal(rec_view)||',  definition FROM pg_views 
 			WHERE schemaname='||quote_literal(v_schemaname)||' and viewname = '||quote_literal(rec_view)||';';
-			
+
 			--find the location of a replaced field
 			EXECUTE 'SELECT max(ordinal_position) FROM information_schema.columns 
 			WHERE table_schema='||quote_literal(v_schemaname)||' and table_name = '||quote_literal(rec_view)||';'
@@ -149,22 +149,22 @@ BEGIN
 						from temp_csv WHERE fid=380 AND source='||quote_literal(rec_view)||''
 						into v_viewdefinition;
 					end if;
-					
+
 					--find penultiate field and remove , before FROM
 					EXECUTE 'SELECT column_name FROM information_schema.columns 
 					WHERE table_schema='||quote_literal(v_schemaname)||' and table_name = '||quote_literal(rec_view)||' AND 
 					ordinal_position = '||v_maxposition||' -1 ;'
 					INTO v_penultimate_field;
 					v_viewdefinition = replace(v_viewdefinition,concat(v_penultimate_field,','),v_penultimate_field);
-			
+
 					IF  position(v_fieldname in v_viewdefinition) = 0 then --v_fieldposition = 0 THEN
 						EXECUTE 'UPDATE temp_csv set csv2 = '||quote_literal(v_viewdefinition)||' WHERE fid=380 AND source='||quote_literal(rec_view)||';';
 					END IF;
-					
+
 				END LOOP;
 			ELSE
 				FOR rec IN (select * from information_schema.view_table_usage WHERE table_schema=v_schemaname and view_name = rec_view AND table_name not ilike 'selector%') LOOP
-		
+
 					IF v_alias is null THEN
 						EXECUTE 'select replace(csv1,concat('||quote_literal(rec.table_name)||',''.'','||quote_literal(v_fieldname)||','',''),'''') 
 						from temp_csv WHERE fid=380 AND source='||quote_literal(rec_view)||''
@@ -174,15 +174,15 @@ BEGIN
 						from temp_csv WHERE fid=380 AND source='||quote_literal(rec_view)||''
 						into v_viewdefinition;
 					END IF;
-					
-					IF  position(v_fieldname in v_viewdefinition) = 0 then 
+
+					IF  position(v_fieldname in v_viewdefinition) = 0 then
 						EXECUTE 'UPDATE temp_csv set csv2 = '||quote_literal(v_viewdefinition)||' 
 						WHERE fid=380 AND source='||quote_literal(rec_view)||';';
 					END IF;
-					
+
 				END LOOP;
 			END IF;
-			
+
 
 		END LOOP;
 
@@ -199,10 +199,10 @@ BEGIN
 	ELSIF v_action='ADD-FIELD' THEN
 		--save view definition on the temp table and delete the view. Order of saving is the order defined in input array
 			FOREACH rec_view IN ARRAY(v_viewlist) LOOP
-			EXECUTE 'SELECT system_id FROM cat_feature WHERE child_layer = '||quote_literal(rec_view)||''
-			into v_cur_system_id;
-		
-				IF v_systemid IS NULL  OR upper(v_cur_system_id) = upper(v_systemid) THEN
+			EXECUTE 'SELECT sys_feature_cat FROM cat_feature WHERE child_layer = '||quote_literal(rec_view)||''
+			into v_cur_sys_feature_cat;
+
+				IF v_systemid IS NULL  OR upper(v_cur_sys_feature_cat) = upper(v_systemid) THEN
 
 					EXECUTE 'INSERT INTO temp_csv (fid, source, csv1, csv2)
 					SELECT ''380'', '||quote_literal(rec_view)||',  definition, 
@@ -222,51 +222,51 @@ BEGIN
 	ELSIF v_action='RESTORE-VIEW' THEN
 		--recreate views saved on the temp table and delete its definition from temp table. Order of restoring is the order defined in input array
 		FOREACH rec_view IN ARRAY(v_viewlist) LOOP
-			
+
 			EXECUTE 'SELECT concat(''CREATE OR REPLACE VIEW '','||quote_literal(v_schemaname)||',''.'', source, '' AS '', csv2)  from temp_csv
 			WHERE fid=380 AND source='||quote_literal(rec_view)||''
 			INTO v_viewdefinition;
 
-			IF v_viewdefinition IS NOT NULL THEN 
+			IF v_viewdefinition IS NOT NULL THEN
 				EXECUTE v_viewdefinition;
 			END IF;
 			--recreate trigger
 			EXECUTE 'SELECT csv3  from temp_csv WHERE fid=380 AND source='||quote_literal(rec_view)||''
 			INTO v_viewdefinition;
 
-			IF v_viewdefinition IS NOT NULL THEN 
+			IF v_viewdefinition IS NOT NULL THEN
 				EXECUTE v_viewdefinition;
 			END IF;
 			--remove definition of restored view from temp table
 			EXECUTE 'DELETE FROM temp_csv WHERE fid=380 AND source='||quote_literal(rec_view)||';';
 		END LOOP;
 	END IF;
-	 
+
 	IF v_action='SAVE-VIEW' OR v_action='DELETE-FIELD' THEN
-		--save trigger definition and delete view 
+		--save trigger definition and delete view
 		FOREACH rec_view IN ARRAY(v_viewlist) LOOP
-			FOR rec_trg IN 
+			FOR rec_trg IN
 				select event_object_schema as table_schema, event_object_table as table_name, trigger_schema, trigger_name,
 				string_agg(event_manipulation, ',') as event, action_timing as activation, action_condition as condition, action_statement as definition
 				from information_schema.triggers where event_object_schema = v_schemaname AND event_object_table = rec_view
 				group by 1,2,3,4,6,7,8 order by table_schema, table_name
 			LOOP
 				--replace trg definition to execute it correctly
-				SELECT string_agg(event_object_column, ',') INTO v_trg_fields FROM information_schema.triggered_update_columns 
+				SELECT string_agg(event_object_column, ',') INTO v_trg_fields FROM information_schema.triggered_update_columns
 				WHERE event_object_schema = v_schemaname and event_object_table=rec_trg.table_name AND trigger_name = rec_trg.trigger_name;
 
 				EXECUTE 'select replace('''||rec_trg.event||''', '','', '' OR '')'
-				INTO v_replace_query;	
+				INTO v_replace_query;
 
-				IF v_trg_fields IS NULL THEN 
+				IF v_trg_fields IS NULL THEN
 
 					v_trgquery = 'CREATE TRIGGER '||rec_trg.trigger_name||' '||rec_trg.activation||' '||v_replace_query||'
 					ON '||v_schemaname||'.'||rec_trg.table_name||' FOR EACH ROW '|| rec_trg.definition||';';
-				  
-				ELSE   
+
+				ELSE
 
 					EXECUTE 'select replace('''||v_replace_query||''', ''UPDATE'', '' UPDATE  OF '||v_trg_fields||''')'
-					INTO v_replace_query; 
+					INTO v_replace_query;
 
 					v_trgquery= 'CREATE TRIGGER '||rec_trg.trigger_name||' '||rec_trg.activation||' '||v_replace_query||' ON 
 					'||v_dest_schema||'.'||rec_trg.table_name||' FOR EACH ROW '|| rec_trg.definition||';';

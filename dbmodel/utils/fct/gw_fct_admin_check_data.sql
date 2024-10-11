@@ -42,11 +42,11 @@ v_fid integer;
 
 BEGIN
 
-	--  Search path	
+	--  Search path
 	SET search_path = "SCHEMA_NAME", public;
 
 	v_schemaname = 'SCHEMA_NAME';
-	
+
 	-- select config values
 	SELECT project_type, giswater INTO v_project_type, v_version FROM sys_version order by id desc limit 1;
 
@@ -58,7 +58,7 @@ BEGIN
 		v_fid = 195;
 	END IF;
 
-	
+
 	CREATE TEMP TABLE temp_audit_check_data (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
 
 	-- Starting process
@@ -158,7 +158,7 @@ BEGIN
 			VALUES (v_fid, 1, '308', 'INFO: All nodes have value on field "isexitupperintro"', 0);
 		END IF;
 	END IF;
-	
+
 	--check if all nodes have value on field choose_hemisphere (309)
 	SELECT count(*), string_agg(id,', ')  INTO v_count,v_feature_list FROM cat_feature_node WHERE choose_hemisphere IS NULL;
 
@@ -198,9 +198,9 @@ BEGIN
 			INTO v_definition;
 
 			--check if the view has well defined man_table (311)
-			IF v_project_type = 'WS' OR (v_project_type = 'UD' AND rec.system_id!='GULLY' AND rec.system_id!='CONNEC') THEN
-			
-				IF position(concat('man_',lower(rec.system_id)) in v_definition) = 0 THEN
+			IF v_project_type = 'WS' OR (v_project_type = 'UD' AND rec.sys_feature_cat!='GULLY' AND rec.sys_feature_cat!='CONNEC') THEN
+
+				IF position(concat('man_',lower(rec.sys_feature_cat)) in v_definition) = 0 THEN
 
 					v_errortext=concat('ERROR-311: View ',rec.child_layer,' has wrongly defined man_table');
 
@@ -211,10 +211,10 @@ BEGIN
 
 			--check if all active addfields are present on the view (312)
 			IF (SELECT count(param_name) FROM sys_addfields WHERE cat_feature_id IS NULL OR cat_feature_id = rec.id) > 0 THEN
-				
-				SELECT count(*), string_agg(param_name,',') INTO v_count, v_param_list FROM sys_addfields 
-				WHERE active IS TRUE AND (cat_feature_id IS NULL OR cat_feature_id = rec.id)	
-				AND param_name NOT IN 
+
+				SELECT count(*), string_agg(param_name,',') INTO v_count, v_param_list FROM sys_addfields
+				WHERE active IS TRUE AND (cat_feature_id IS NULL OR cat_feature_id = rec.id)
+				AND param_name NOT IN
 				(SELECT column_name FROM information_schema.columns WHERE  table_schema = v_schemaname AND table_name = rec.child_layer);
 
 				IF v_count > 0 THEN
@@ -224,10 +224,10 @@ BEGIN
 					VALUES (v_fid, 2, '312', v_errortext, v_count);
 
 				END IF;
-		
+
 			END IF;
 
-		ELSE 
+		ELSE
 			IF rec.child_layer is not null then
 				v_errortext=concat('ERROR-313: View ',rec.child_layer,' is defined in cat_feature table but is not created in a DB');
 
@@ -272,7 +272,7 @@ BEGIN
 
 	IF v_count > 0 THEN
 		v_errortext = concat('ERRO-316: There is/are ',v_count,' active features which views are not defined in config_form_fields. Undefined views: ',v_view_list,'.');
-		
+
 		INSERT INTO temp_audit_check_data (fid,  criticity, result_id, error_message, fcount)
 		VALUES (v_fid, 3, '316', v_errortext, v_count);
 	ELSE
@@ -281,7 +281,7 @@ BEGIN
 	END IF;
 
 	--check if all ve_node_*,ve_arc_* etc views created in schema are related to any feature in cat_feature (317)
-	FOR rec IN (SELECT table_schema, table_name from information_schema.views where table_schema=v_schemaname AND 
+	FOR rec IN (SELECT table_schema, table_name from information_schema.views where table_schema=v_schemaname AND
 	(table_name ilike 've_node_%' OR table_name ilike 've_arc_%' OR table_name ilike 've_connec_%'OR table_name ilike 've_gully_%'))
 	LOOP
 
@@ -334,7 +334,7 @@ BEGIN
 	END IF;
 
 	--check if all addfields are defined in config_form_fields (321)
-	SELECT count(*), string_agg(concat(child_layer,': ',param_name),',') INTO v_count, v_view_list FROM sys_addfields 
+	SELECT count(*), string_agg(concat(child_layer,': ',param_name),',') INTO v_count, v_view_list FROM sys_addfields
 	JOIN cat_feature ON cat_feature.id=sys_addfields.cat_feature_id
 	WHERE sys_addfields.active IS TRUE AND param_name not IN (SELECT columnname FROM config_form_fields JOIN cat_feature ON cat_feature.child_layer=formname);
 
@@ -445,14 +445,14 @@ BEGIN
 	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 3, '');
 	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 2, '');
 	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 1, '');
-		
+
 	IF v_fid = 195 THEN
 		-- delete old values on result table
 		DELETE FROM audit_check_data WHERE fid=195 AND cur_user=current_user;
 
 		INSERT INTO audit_check_data SELECT * FROM temp_audit_check_data;
 
-	ELSIF  v_fid = 101 THEN 
+	ELSIF  v_fid = 101 THEN
 		UPDATE temp_audit_check_data SET fid = 195;
 
 		INSERT INTO project_temp_audit_check_data SELECT * FROM temp_audit_check_data;
@@ -461,16 +461,16 @@ BEGIN
 
 	-- get results
 	-- info
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT id, error_message as message FROM temp_audit_check_data WHERE cur_user="current_user"() AND fid=195 order by criticity desc, id asc) row;
-	v_result := COALESCE(v_result, '{}'); 
+	v_result := COALESCE(v_result, '{}');
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
 --DROP temp tables
 	DROP TABLE IF EXISTS temp_audit_check_data;
 
 	-- Control nulls
-	v_result_info := COALESCE(v_result_info, '{}'); 
+	v_result_info := COALESCE(v_result_info, '{}');
 
 	-- Return
 	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'"'||

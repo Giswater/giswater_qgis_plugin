@@ -75,9 +75,9 @@ v_netscenario_id int;
 v_valve_value_netscenario bool;
 v_valve_epa_type text;
 
-  
+
 BEGIN
-  
+
 	--  Set search path to local schema
 	SET search_path = "SCHEMA_NAME", public;
 	schemas_array := current_schemas(FALSE);
@@ -108,10 +108,10 @@ BEGIN
 		-- 10 pixels of base sensibility
 		v_sensibility = (v_zoomScale * 10 * v_sensibility_f);
 		v_config_layer='config_web_layer';
-		
+
 	ELSIF  v_device = 3 THEN
 		EXECUTE 'SELECT value::json->>''web'' FROM config_param_system WHERE parameter=''basic_info_sensibility_factor'''
-		INTO v_sensibility_f;     
+		INTO v_sensibility_f;
 		-- 10 pixels of base sensibility
 		v_sensibility = (v_zoomScale * 10 * v_sensibility_f);
 		v_config_layer='config_web_layer';
@@ -135,14 +135,14 @@ BEGIN
 	FOREACH v_layer IN ARRAY v_visibleLayers::text[]
 	LOOP
 		IF v_layer = 'v_edit_plan_netscenario_valve' THEN v_netscenario_valve = true; END IF;
-		
+
 	END LOOP;
-	
+
 
 	v_sql := 'SELECT layer_id, 0 as orderby FROM  '||quote_ident(v_config_layer)||' WHERE layer_id= '''' UNION 
               SELECT layer_id, orderby FROM  '||quote_ident(v_config_layer)||' WHERE layer_id = any('||quote_literal(v_visibleLayers)||'::text[]) ORDER BY orderby';
 
-	FOR v_layer IN EXECUTE v_sql 
+	FOR v_layer IN EXECUTE v_sql
 	LOOP
 			v_count=v_count+1;
 				--    Get id column
@@ -169,12 +169,12 @@ BEGIN
 					AND t.relname = $1
 					AND s.nspname = $2
 					AND left (pg_catalog.format_type(a.atttypid, a.atttypmod), 8)=''geometry''
-					ORDER BY a.attnum' 
+					ORDER BY a.attnum'
 				INTO v_the_geom
 				USING v_layer, schemas_array[1];
 
 			--  Indentify geometry type
-			EXECUTE 'SELECT st_geometrytype ('||quote_ident(v_the_geom)||') FROM '||quote_ident(v_layer)||';' 
+			EXECUTE 'SELECT st_geometrytype ('||quote_ident(v_the_geom)||') FROM '||quote_ident(v_layer)||';'
 			INTO v_geometrytype;
 
 		-- get icon
@@ -188,7 +188,7 @@ BEGIN
 
 		-- Get element
 		IF v_geometrytype = 'ST_Polygon'::text OR v_geometrytype= 'ST_Multipolygon'::text THEN
-				--  Get element from active layer, using the area of the elements to order possible multiselection (minor as first)        
+				--  Get element from active layer, using the area of the elements to order possible multiselection (minor as first)
 				EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (
 				SELECT '||quote_ident(v_idname)||' AS id, '||quote_ident(v_the_geom)||' as the_geom, (SELECT St_AsText('||quote_ident(v_the_geom)||') as geometry) 
 				FROM '||quote_ident(v_layer)||' WHERE st_dwithin ($1, '||quote_ident(v_layer)||'.'||quote_ident(v_the_geom)||', $2) 
@@ -216,12 +216,12 @@ BEGIN
 
                     -- Get closest valve if there is one
                     IF v_project_type = 'WS' AND v_ids IS NOT NULL THEN
-                        FOREACH v_ids_item IN ARRAY v_ids 
+                        FOREACH v_ids_item IN ARRAY v_ids
                         LOOP
                             v_id := v_ids_item->>'id';
                             v_sql2 = 'SELECT '||v_parenttype||'_type FROM '||quote_ident(v_layer)||' WHERE '||v_idname||' = '''||v_id||'''';
                             EXECUTE v_sql2 INTO v_featuretype;
-                            IF (SELECT system_id FROM cat_feature WHERE id = v_featuretype) = 'VALVE' AND v_valve_text IS NULL THEN
+                            IF (SELECT sys_feature_cat FROM cat_feature WHERE id = v_featuretype) = 'VALVE' AND v_valve_text IS NULL THEN
 	                            EXECUTE 'SELECT child_layer FROM cat_feature WHERE id = '''||v_featuretype||'''' INTO v_valve_tablename;
                                 v_valve_id := v_id;
                                 EXECUTE 'SELECT closed_valve FROM '||quote_ident(v_layer)||' WHERE '||v_idname||' = '''||v_id||'''' INTO v_closed_valve;
@@ -251,7 +251,7 @@ BEGIN
                             END IF;
                         END LOOP;
                     END IF;
-				ELSE 
+				ELSE
 					EXECUTE 'SELECT array_agg(row_to_json(a)) FROM (
 					SELECT '||quote_ident(v_idname)||' AS id, '||quote_ident(v_idname)||' AS label, '||quote_ident(v_the_geom)||' as the_geom, 
 					(SELECT St_AsText('||quote_ident(v_the_geom)||') as geometry)
@@ -260,7 +260,7 @@ BEGIN
 					INTO v_ids
 					USING v_point, v_sensibility;
 				END IF;
-			
+
 			END IF;
 
 		IF v_ids IS NOT NULL THEN
@@ -270,7 +270,7 @@ BEGIN
 			x = x+1;
 		END IF;
 	END LOOP;
-	
+
 	IF v_valve_text IS NOT NULL THEN
 		v_valve_text := ', "valve": {"id": "'||v_valve_id||'", "text": "'||v_valve_text||
 						'", "tableName":"'||v_valve_tablename||'", "value": "'||(NOT v_closed_valve)||'"}';
@@ -280,7 +280,7 @@ BEGIN
 		v_valve_id_netscenario := COALESCE(v_valve_id_netscenario, '');
 		v_netscenario_id := COALESCE(v_netscenario_id, -1);
 		v_valve_tablename_netscenario := COALESCE(v_valve_tablename_netscenario, '');
-	
+
 		IF v_closed_valve_netscenario IS NULL THEN
 			v_closed_valve_netscenario := v_closed_valve;
 		END IF;
@@ -289,9 +289,9 @@ BEGIN
 						'", "tableName":"'||v_valve_tablename_netscenario||'", "value": "'||(NOT v_closed_valve_netscenario)||'"}';
 
 	END IF;
-    
+
 	fields := array_to_json(fields_array);
-	fields := COALESCE(fields, '[]');    
+	fields := COALESCE(fields, '[]');
 	v_valve_text := COALESCE(v_valve_text, '');
 	v_valve_text_netscenario := COALESCE(v_valve_text_netscenario, '');
 
@@ -304,7 +304,7 @@ BEGIN
 	    '}')::json, 2590, null, null, null);
 
 	-- Exception handling
-	EXCEPTION WHEN OTHERS THEN 
+	EXCEPTION WHEN OTHERS THEN
 	RETURN ('{"status":"Failed","message":' || (to_json(SQLERRM)) || ', "version":'|| v_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 END;

@@ -38,7 +38,7 @@ v_feature_childtable_name text;
 
 v_cat_feature text;
 v_feature_type text;
-v_feature_system_id text;
+v_feature_sys_feature_cat text;
 v_viewname text;
 v_view_type integer;
 v_man_fields text;
@@ -71,7 +71,7 @@ BEGIN
             -- create all addfields tables for everything in cat_feature
             FOR rec_sa IN
                 SELECT cf.id, cf.feature_type FROM cat_feature cf
-                WHERE system_id <> 'LINK' AND child_layer IS NOT NULL
+                WHERE sys_feature_cat <> 'LINK' AND child_layer IS NOT NULL
             LOOP
                 v_feature_childtable_name := 'man_' || lower(rec_sa.feature_type) || '_' || lower(rec_sa.id);
 
@@ -388,15 +388,15 @@ BEGIN
            select * from subq_2 join subq_1 using (feature_id)'
         loop
             v_feature_childtable_name := 'man_' || lower(rec_feature.sys_type) || '_' || lower(rec_feature.feature_type);
-        
-            v_sql := 'update ' ||v_feature_childtable_name|| 
+
+            v_sql := 'update ' ||v_feature_childtable_name||
             ' set '||rec_feature.param_name||' = '||quote_literal(rec_feature.value_param)|| '::' ||rec_feature.datatype_id||
             ' where  '||lower(rec_feature.sys_type)||'_id = '||quote_literal(rec_feature.feature_id)||'';
 
             execute v_sql;
 
         end loop;
-     end if;   
+     end if;
 
     -- update sys_foreignkey values
     FOR rec_fgk IN

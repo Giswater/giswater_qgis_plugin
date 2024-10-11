@@ -12,7 +12,7 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_cat_feature()
 $BODY$
 
 
-DECLARE 
+DECLARE
 v_schemaname text;
 v_viewname text;
 v_definition text;
@@ -31,7 +31,7 @@ v_new_child_layer text;
 v_old_child_layer text;
 v_isrenameview boolean;
 
-BEGIN	
+BEGIN
 
 	-- search path
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
@@ -44,7 +44,7 @@ BEGIN
 	--  Get project type
 	SELECT project_type INTO v_projecttype FROM sys_version ORDER BY id DESC LIMIT 1;
 
-	SELECT json_extract_path_text (value::json,'rename_view_x_id')::boolean INTO v_isrenameview FROM config_param_system 
+	SELECT json_extract_path_text (value::json,'rename_view_x_id')::boolean INTO v_isrenameview FROM config_param_system
 	WHERE parameter='admin_manage_cat_feature';
 
 	IF (TG_OP = 'INSERT' OR  TG_OP = 'UPDATE') THEN
@@ -61,7 +61,7 @@ BEGIN
 		IF v_id IS NOT NULL OR NEW.child_layer ilike '%-%' OR NEW.child_layer ilike '%.%' THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 			"data":{"message":"3038", "function":"2758","debug_msg":"'||NEW.child_layer||'"}}$$);';
-		END IF;	
+		END IF;
 
 		-- set v_id
 		v_id = (lower(NEW.id));
@@ -77,14 +77,14 @@ BEGIN
 		-- set layoutorder
 		SELECT max(layoutorder)+1 INTO v_layoutorder FROM sys_param_user WHERE formname='config' and layoutname=v_layout;
 
-		IF v_layoutorder IS NULL THEN 
+		IF v_layoutorder IS NULL THEN
 			v_layoutorder=1;
 		END IF;
 
 		IF v_projecttype = 'WS' THEN
 			v_partialquerytext =  concat('JOIN cat_feature ON cat_feature.id = ',
 			lower(NEW.feature_type),'type_id WHERE cat_feature.id = ',quote_literal(NEW.id));
-				
+
 		ELSIF  v_projecttype = 'UD' THEN
 			v_partialquerytext =  concat('LEFT JOIN cat_feature ON cat_feature.id = cat_',lower(NEW.feature_type),'.',lower(NEW.feature_type),'_type ',
 			' WHERE cat_feature.id = ',quote_literal(NEW.id));
@@ -99,24 +99,24 @@ BEGIN
 
 		IF v_table = 'cat_node' OR v_table = 'cat_arc' THEN
 			v_feature_field_id = concat (lower(NEW.feature_type), 'cat_id');
-				
+
 		ELSIF v_table = 'cat_connec' THEN
 			v_feature_field_id = concat (lower(NEW.feature_type), 'at_id');
 
-		ELSIF v_table = 'cat_gully' then 
-			v_table ='cat_grate'; 
+		ELSIF v_table = 'cat_gully' then
+			v_table ='cat_grate';
 			v_feature_field_id = 'gratecat_id';
-				
+
 		END IF;
-		
+
 		v_querytext = concat('SELECT ',v_table,'.id, ', v_table,'.id AS idval FROM ', v_table,' ', v_partialquerytext);
 
 		-- insert parameter
 		IF TG_OP = 'UPDATE' THEN
-			DELETE FROM sys_param_user WHERE id = concat('feat_',lower(OLD.id),'_vdefault');        
+			DELETE FROM sys_param_user WHERE id = concat('feat_',lower(OLD.id),'_vdefault');
 		END IF;
 
-		IF NEW.system_id <>'LINK' THEN
+		IF NEW.sys_feature_cat <>'LINK' THEN
 			INSERT INTO sys_param_user(id, formname, descript, sys_role, label, isenabled, layoutname, layoutorder,
 			dv_querytext, feature_field_id, project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, iseditable)
 			VALUES (concat('feat_',v_id,'_vdefault'),'config',concat ('Value default catalog for ',v_id,' cat_feature'), 'role_edit', concat ('Default catalog for ', v_id), true, v_layout ,v_layoutorder,
@@ -126,10 +126,10 @@ BEGIN
 	END IF;
 
 	IF TG_OP = 'INSERT' THEN
-		
+
 		EXECUTE 'SELECT lower(id) as id, type, concat(''man_'',lower(id)) as man_table, epa_default, 
 		CASE WHEN epa_default IS NOT NULL THEN concat(''inp_'',lower(epa_default)) END AS epa_table 
-		FROM sys_feature_cat WHERE id='||quote_literal(NEW.system_id)
+		FROM sys_feature_cat WHERE id='||quote_literal(NEW.sys_feature_cat)
 		INTO v_feature;
 
 		EXECUTE 'UPDATE cat_feature SET feature_type = '||quote_literal(v_feature.type)||', parent_layer =  concat(''v_edit_'',lower('||quote_literal(v_feature.type)||'))
@@ -137,20 +137,20 @@ BEGIN
 
 		IF lower(v_feature.type)='arc' THEN
 			EXECUTE 'INSERT INTO cat_feature_arc (id, type, epa_default)
-			VALUES ('||quote_literal(NEW.id)||','||quote_literal(NEW.system_id)||', '||quote_literal(v_feature.epa_default)||');';
+			VALUES ('||quote_literal(NEW.id)||','||quote_literal(NEW.sys_feature_cat)||', '||quote_literal(v_feature.epa_default)||');';
 		ELSIF lower(v_feature.type)='node' THEN
 			EXECUTE 'INSERT INTO cat_feature_node (id, type, epa_default, choose_hemisphere, isarcdivide, num_arcs)
-			VALUES ('||quote_literal(NEW.id)||','||quote_literal(NEW.system_id)||', '||quote_literal(v_feature.epa_default)||', TRUE, TRUE, 2)';
+			VALUES ('||quote_literal(NEW.id)||','||quote_literal(NEW.sys_feature_cat)||', '||quote_literal(v_feature.epa_default)||', TRUE, TRUE, 2)';
 		ELSIF lower(v_feature.type)='connec' THEN
 			EXECUTE 'INSERT INTO cat_feature_connec (id, type)
-			VALUES ('||quote_literal(NEW.id)||','||quote_literal(NEW.system_id)||');';
+			VALUES ('||quote_literal(NEW.id)||','||quote_literal(NEW.sys_feature_cat)||');';
 		ELSIF lower(v_feature.type)='gully' THEN
 			EXECUTE 'INSERT INTO cat_feature_gully (id, type)
-			VALUES ('||quote_literal(NEW.id)||','||quote_literal(NEW.system_id)||');';
+			VALUES ('||quote_literal(NEW.id)||','||quote_literal(NEW.sys_feature_cat)||');';
 		END IF;
-		
+
 		--create child view
-		IF NEW.system_id <>'LINK' THEN
+		IF NEW.sys_feature_cat <>'LINK' THEN
 			v_query='{"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"catFeature":"'||NEW.id||'"},
 			"data":{"filterFields":{}, "pageInfo":{}, "action":"SINGLE-CREATE" }}';
 			PERFORM gw_fct_admin_manage_child_views(v_query::json);
@@ -166,7 +166,7 @@ BEGIN
 		RETURN NEW;
 
 	ELSIF TG_OP = 'UPDATE' THEN
-	
+
 		SELECT child_layer INTO v_viewname FROM cat_feature WHERE id = NEW.id;
 		-- update child views
 		--on update and change of cat_feature.id or child layer name
@@ -196,7 +196,7 @@ BEGIN
 						PROCEDURE gw_trg_edit_'||lower(NEW.feature_type)||'('||quote_literal(NEW.id)||');';
 
 					ELSE
-						IF NEW.system_id <>'LINK' THEN
+						IF NEW.sys_feature_cat <>'LINK' THEN
 							v_query='{"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"catFeature":"'||NEW.id||'"},
 							"data":{"filterFields":{}, "pageInfo":{}, "action":"SINGLE-CREATE" }}';
 							PERFORM gw_fct_admin_manage_child_views(v_query::json);
@@ -276,11 +276,11 @@ BEGIN
 			"feature_type":"'||lower(NEW.feature_type)||'" }}$$);';
 
 			--manage tab hydrometer on netwjoin
-			IF  v_projecttype = 'WS' and OLD.system_id = 'NETWJOIN' THEN
+			IF  v_projecttype = 'WS' and OLD.sys_feature_cat = 'NETWJOIN' THEN
 				DELETE FROM config_form_tabs where formname=v_old_child_layer and tabname in ('tab_hydrometer', 'tab_hydrometer_val');
 			END IF;
 
-		ELSIF NEW.feature_type !=OLD.feature_type or NEW.system_id !=OLD.system_id THEN
+		ELSIF NEW.feature_type !=OLD.feature_type or NEW.sys_feature_cat !=OLD.sys_feature_cat THEN
 
 			EXECUTE 'DROP VIEW IF EXISTS '||NEW.child_layer||';';
 
@@ -292,7 +292,7 @@ BEGIN
 
 			EXECUTE 'SELECT lower(id) as id,type, concat(''man_'',lower(id)) as man_table, epa_default,
 			CASE WHEN epa_default IS NOT NULL THEN concat(''inp_'',lower(epa_default)) END AS epa_table
-			FROM sys_feature_cat WHERE id='||quote_literal(NEW.system_id)||';'
+			FROM sys_feature_cat WHERE id='||quote_literal(NEW.sys_feature_cat)||';'
 			INTO v_feature;
 
 			v_new_child_layer = replace(NEW.child_layer,lower(OLD.feature_type),lower(NEW.feature_type));
@@ -304,16 +304,16 @@ BEGIN
 
 			IF lower(NEW.feature_type)='arc' THEN
 				EXECUTE 'INSERT INTO cat_feature_arc (id, type, epa_default)
-				VALUES ('||quote_literal(NEW.id)||','||quote_literal(NEW.system_id)||', '||quote_literal(v_feature.epa_default)||')';
+				VALUES ('||quote_literal(NEW.id)||','||quote_literal(NEW.sys_feature_cat)||', '||quote_literal(v_feature.epa_default)||')';
 			ELSIF lower(NEW.feature_type)='node' THEN
 				EXECUTE 'INSERT INTO cat_feature_node (id, type, epa_default, choose_hemisphere, isarcdivide, num_arcs)
-				VALUES ('||quote_literal(NEW.id)||','||quote_literal(NEW.system_id)||',	'||quote_literal(v_feature.epa_default)||', TRUE, TRUE, 2);';
+				VALUES ('||quote_literal(NEW.id)||','||quote_literal(NEW.sys_feature_cat)||',	'||quote_literal(v_feature.epa_default)||', TRUE, TRUE, 2);';
 			ELSIF lower(NEW.feature_type)='connec' THEN
 				EXECUTE 'INSERT INTO cat_feature_connec (id, type)
-				VALUES ('||quote_literal(NEW.id)||','||quote_literal(NEW.system_id)||');';
+				VALUES ('||quote_literal(NEW.id)||','||quote_literal(NEW.sys_feature_cat)||');';
 			ELSIF lower(NEW.feature_type)='gully' THEN
 				EXECUTE 'INSERT INTO cat_feature_gully (id, type)
-				VALUES ('||quote_literal(NEW.id)||','||quote_literal(NEW.system_id)||');';
+				VALUES ('||quote_literal(NEW.id)||','||quote_literal(NEW.sys_feature_cat)||');';
 			END IF;
 
 			--delete configuration from config_form_fields
@@ -324,7 +324,7 @@ BEGIN
 			"data":{"filterFields":{}, "pageInfo":{}, "action":"SINGLE-CREATE" }}';
 			PERFORM gw_fct_admin_manage_child_views(v_query::json);
 
-			IF  v_projecttype = 'WS' and OLD.system_id = 'NETWJOIN' THEN
+			IF  v_projecttype = 'WS' and OLD.sys_feature_cat = 'NETWJOIN' THEN
 				DELETE FROM config_form_tabs where formname=OLD.child_layer and tabname in ('tab_hydrometer', 'tab_hydrometer_val');
 			END IF;
 		END IF;
@@ -332,19 +332,19 @@ BEGIN
 		RETURN NEW;
 
 	ELSIF TG_OP = 'DELETE' THEN
-        
-		IF v_table = 'DELETE' AND OLD.system_id <>'LINK' THEN
+
+		IF v_table = 'DELETE' AND OLD.sys_feature_cat <>'LINK' THEN
 			RETURN OLD;
 		ELSE
-		    IF OLD.system_id <>'LINK' THEN
+		    IF OLD.sys_feature_cat <>'LINK' THEN
 			-- delete child views
 			IF OLD.child_layer IS NOT NULL THEN
 			    EXECUTE 'DROP VIEW IF EXISTS '||OLD.child_layer||';';
 			END IF;
-			
+
 			--delete configuration from config_form_fields
 			DELETE FROM config_form_fields where formname=OLD.child_layer AND formtype = 'form_feature';
-			
+
 			--delete definition from config_info_layer_x_type
 			DELETE FROM config_info_layer_x_type where tableinfo_id=OLD.child_layer OR tableinfotype_id=OLD.child_layer;
 
@@ -354,7 +354,7 @@ BEGIN
 			-- delete sys_param_user parameters
 			DELETE FROM sys_param_user WHERE id = concat('feat_',lower(OLD.id),'_vdefault');
 
-			IF  v_projecttype = 'WS' and OLD.system_id = 'NETWJOIN' THEN
+			IF  v_projecttype = 'WS' and OLD.sys_feature_cat = 'NETWJOIN' THEN
 				DELETE FROM config_form_tabs where formname=OLD.child_layer and tabname in ('tab_hydrometer', 'tab_hydrometer_val');
 			END IF;
 

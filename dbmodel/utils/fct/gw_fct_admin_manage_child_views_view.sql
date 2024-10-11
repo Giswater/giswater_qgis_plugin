@@ -31,7 +31,7 @@ v_project_type text;
 v_schemaname text = 'SCHEMA_NAME';
 v_viewname text;
 v_feature_type text;
-v_feature_system_id text;
+feature_sys_feature_cat text;
 v_feature_cat text;
 v_feature_childtable_name text;
 v_feature_childtable_fields text;
@@ -54,7 +54,7 @@ BEGIN
     v_schemaname = (p_data ->> 'schema');
     v_viewname = ((p_data ->> 'body')::json->>'viewname')::text;
     v_feature_type = ((p_data ->> 'body')::json->>'feature_type')::text;
-    v_feature_system_id = ((p_data ->> 'body')::json->>'feature_system_id')::text;
+    feature_sys_feature_cat = ((p_data ->> 'body')::json->>'feature_sys_feature_cat')::text;
     v_feature_cat = ((p_data ->> 'body')::json->>'feature_cat')::text;
     v_feature_childtable_name = ((p_data ->> 'body')::json->>'feature_childtable_name')::text;
     v_feature_childtable_fields = ((p_data ->> 'body')::json->>'feature_childtable_fields')::text;
@@ -78,7 +78,7 @@ BEGIN
       CREATE OR REPLACE VIEW '||v_viewname||' AS
       SELECT '||v_node_fields||'
       FROM v_edit_'||v_feature_type||'
-      JOIN man_'||v_feature_system_id||' USING ('||v_feature_type||'_id)
+      JOIN man_'||feature_sys_feature_cat||' USING ('||v_feature_type||'_id)
       WHERE '||v_feature_type||'_type ='||quote_literal(v_feature_cat)||';';
 
     ELSE
@@ -87,7 +87,7 @@ BEGIN
       CREATE OR REPLACE VIEW '||v_viewname||' AS
       SELECT *
       FROM v_edit_'||v_feature_type||'
-      JOIN man_'||v_feature_system_id||' USING ('||v_feature_type||'_id)
+      JOIN man_'||feature_sys_feature_cat||' USING ('||v_feature_type||'_id)
       WHERE '||v_feature_type||'_type ='||quote_literal(v_feature_cat)||' ;';
 
     END IF;
@@ -109,7 +109,7 @@ BEGIN
       SELECT '||v_node_fields||',
       '||v_man_fields||'
       FROM v_edit_'||v_feature_type||'
-      JOIN man_'||v_feature_system_id||' USING ('||v_feature_type||'_id)
+      JOIN man_'||feature_sys_feature_cat||' USING ('||v_feature_type||'_id)
       WHERE '||v_feature_type||'_type ='||quote_literal(v_feature_cat)||' ;';
 
     ELSE
@@ -119,7 +119,7 @@ BEGIN
       SELECT v_edit_'||v_feature_type||'.*,
       '||v_man_fields||'
       FROM v_edit_'||v_feature_type||'
-      JOIN man_'||v_feature_system_id||' USING ('||v_feature_type||'_id)
+      JOIN man_'||feature_sys_feature_cat||' USING ('||v_feature_type||'_id)
       WHERE '||v_feature_type||'_type ='||quote_literal(v_feature_cat)||' ;';
 
     END IF;
@@ -133,7 +133,7 @@ BEGIN
        SELECT '||v_node_fields||',
        '||v_feature_childtable_fields||'
        FROM v_edit_'||v_feature_type||'
-       JOIN man_'||v_feature_system_id||' USING ('||v_feature_type||'_id)
+       JOIN man_'||feature_sys_feature_cat||' USING ('||v_feature_type||'_id)
        LEFT JOIN '||v_feature_childtable_name||' USING ('||v_feature_type||'_id)
        WHERE '||v_feature_type||'_type ='||quote_literal(v_feature_cat)||' ;';
 
@@ -144,7 +144,7 @@ BEGIN
       SELECT v_edit_'||v_feature_type||'.*,
       '||v_feature_childtable_fields||'
       FROM v_edit_'||v_feature_type||'
-      JOIN man_'||v_feature_system_id||' USING ('||v_feature_type||'_id)
+      JOIN man_'||feature_sys_feature_cat||' USING ('||v_feature_type||'_id)
       LEFT JOIN '||v_feature_childtable_name||' USING ('||v_feature_type||'_id)
       WHERE '||v_feature_type||'_type ='||quote_literal(v_feature_cat)||' ;';
 
@@ -170,7 +170,7 @@ BEGIN
       '||v_man_fields||',
       '||v_feature_childtable_fields||'
       FROM v_edit_'||v_feature_type||'
-      JOIN man_'||v_feature_system_id||' USING ('||v_feature_type||'_id)
+      JOIN man_'||feature_sys_feature_cat||' USING ('||v_feature_type||'_id)
       LEFT JOIN '||v_feature_childtable_name||' USING ('||v_feature_type||'_id)
       WHERE '||v_feature_type||'_type ='||quote_literal(v_feature_cat)||';';
 
@@ -182,7 +182,7 @@ BEGIN
       '||v_man_fields||',
       '||v_feature_childtable_fields||'
       FROM v_edit_'||v_feature_type||'
-      JOIN man_'||v_feature_system_id||' USING ('||v_feature_type||'_id)
+      JOIN man_'||feature_sys_feature_cat||' USING ('||v_feature_type||'_id)
       LEFT JOIN '||v_feature_childtable_name||' USING ('||v_feature_type||'_id)
       WHERE '||v_feature_type||'_type ='||quote_literal(v_feature_cat)||';';
 

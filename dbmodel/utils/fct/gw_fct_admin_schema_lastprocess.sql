@@ -316,9 +316,9 @@ BEGIN
 
 			-- force all cat feature not active in order to increase step-by-step
 			IF v_projecttype = 'WS' THEN
-				UPDATE cat_feature SET active = false WHERE system_id NOT IN ('VALVE', 'WJOIN', 'JUNCTION', 'TANK', 'PIPE'); -- ws projects
+				UPDATE cat_feature SET active = false WHERE sys_feature_cat NOT IN ('VALVE', 'WJOIN', 'JUNCTION', 'TANK', 'PIPE'); -- ws projects
 			ELSE
-				UPDATE cat_feature SET active = false WHERE system_id NOT IN ('CONDUIT', 'JUNCTION', 'CONNEC', 'GULLY', 'OUTFALL'); -- ud projects
+				UPDATE cat_feature SET active = false WHERE sys_feature_cat NOT IN ('CONDUIT', 'JUNCTION', 'CONNEC', 'GULLY', 'OUTFALL'); -- ud projects
 			END IF;
 
 			-- hidden lastupdate and lastupdate_user columns
@@ -468,7 +468,7 @@ BEGIN
 				END LOOP;
 			END IF;
 		END IF;
-        
+
         -- delete all functions not related to project type
         IF v_projecttype = 'WS' THEN
             DELETE FROM sys_function WHERE lower(project_type) = 'ud';
@@ -494,9 +494,9 @@ BEGIN
     -- recreate views
     PERFORM gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
     "data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-CREATE" }}$$);
-    
+
     -- set to_arc no editable for valves
-    UPDATE config_form_fields SET iseditable=false WHERE columnname='to_arc'; 
+    UPDATE config_form_fields SET iseditable=false WHERE columnname='to_arc';
 
 	v_result_info := COALESCE(v_result, '{}');
 	v_result_info = concat ('{"geometryType":"", "values":',v_result_info, '}');
