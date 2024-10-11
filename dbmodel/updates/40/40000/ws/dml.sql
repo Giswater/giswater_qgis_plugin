@@ -56,3 +56,865 @@ INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutna
 VALUES ('v_edit_sector', 'form_generic', 'tab_none', 'muni_id', 'lyt_data_1', 'string', 'text', 'Muni_id', 'Muni_id', false, false, true, false, false);
 INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, datatype, widgettype, label, tooltip, ismandatory, isparent, iseditable, isautoupdate, hidden)
 VALUES ('v_edit_sector', 'form_generic', 'tab_none', 'expl_id', 'lyt_data_1', 'string', 'text', 'Expl_id', 'Expl_id', false, false, true, false, false);
+
+INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device)
+VALUES('ve_node_shutoff_valve', 'tab_data', 'Data', 'Data', 'role_basic', NULL, '[
+  {
+    "actionName": "actionEdit",
+    "disabled": false
+  },
+  {
+    "actionName": "actionZoom",
+    "disabled": false
+  },
+  {
+    "actionName": "actionCentered",
+    "disabled": false
+  },
+  {
+    "actionName": "actionZoomOut",
+    "disabled": false
+  },
+  {
+    "actionName": "actionCatalog",
+    "disabled": i
+  },
+  {
+    "actionName": "actionWorkcat",
+    "disabled": false
+  },
+  {
+    "actionName": "actionCopyPaste",
+    "disabled": false
+  },
+  {
+    "actionName": "actionLink",
+    "disabled": false
+  },
+  {
+    "actionName": "actionSetToArc",
+    "disabled": false
+  },
+  {
+    "actionName": "actionMapZone",
+    "disabled": false
+  },
+  {
+    "actionName": "actionGetParentId",
+    "disabled": false
+  },
+  {
+    "actionName": "actionGetArcId",
+    "disabled": false
+  },
+  {
+    "actionName": "actionRotation",
+    "disabled": false
+  },
+  {
+    "actionName": "actionInterpolate",
+    "disabled": false
+  }
+]'::json, 0, '{4,5}');
+
+
+-- Auto-generated SQL script #202410111206
+INSERT INTO config_form_tabs (formname,tabname,"label",tooltip,sys_role,tabactions,orderby,device)
+	VALUES ('ve_node_check_valve','tab_data','Data','Data','role_basic','[
+  {
+    "actionName": "actionEdit",
+    "disabled": false
+  },
+  {
+    "actionName": "actionZoom",
+    "disabled": false
+  },
+  {
+    "actionName": "actionCentered",
+    "disabled": false
+  },
+  {
+    "actionName": "actionZoomOut",
+    "disabled": false
+  },
+  {
+    "actionName": "actionCatalog",
+    "disabled": false
+  },
+  {
+    "actionName": "actionWorkcat",
+    "disabled": false
+  },
+  {
+    "actionName": "actionCopyPaste",
+    "disabled": false
+  },
+  {
+    "actionName": "actionLink",
+    "disabled": false
+  },
+  {
+    "actionName": "actionSetToArc",
+    "disabled": false
+  },
+  {
+    "actionName": "actionMapZone",
+    "disabled": false
+  },
+  {
+    "actionName": "actionGetParentId",
+    "disabled": false
+  },
+  {
+    "actionName": "actionGetArcId",
+    "disabled": false
+  },
+  {
+    "actionName": "actionRotation",
+    "disabled": false
+  },
+  {
+    "actionName": "actionInterpolate",
+    "disabled": false
+  }
+]'::json,0,'{4,5}');
+
+
+-- Auto-generated SQL script #202410111207
+INSERT INTO config_form_tabs (formname,tabname,"label",tooltip,sys_role,tabactions,orderby,device)
+	VALUES ('ve_node_pr_reduc_valve','tab_data','Data','Data','role_basic','[
+  {
+    "actionName": "actionEdit",
+    "disabled": false
+  },
+  {
+    "actionName": "actionZoom",
+    "disabled": false
+  },
+  {
+    "actionName": "actionCentered",
+    "disabled": false
+  },
+  {
+    "actionName": "actionZoomOut",
+    "disabled": false
+  },
+  {
+    "actionName": "actionCatalog",
+    "disabled": false
+  },
+  {
+    "actionName": "actionWorkcat",
+    "disabled": false
+  },
+  {
+    "actionName": "actionCopyPaste",
+    "disabled": false
+  },
+  {
+    "actionName": "actionLink",
+    "disabled": false
+  },
+  {
+    "actionName": "actionSetToArc",
+    "disabled": false
+  },
+  {
+    "actionName": "actionMapZone",
+    "disabled": false
+  },
+  {
+    "actionName": "actionGetParentId",
+    "disabled": false
+  },
+  {
+    "actionName": "actionGetArcId",
+    "disabled": false
+  },
+  {
+    "actionName": "actionRotation",
+    "disabled": false
+  },
+  {
+    "actionName": "actionInterpolate",
+    "disabled": false
+  }
+]'::json,0,'{4,5}');
+
+INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device)
+VALUES('ve_node_pr_green_valve', 'tab_data', 'Data', 'Data', 'role_basic', NULL, '[
+  {
+    "actionName": "actionEdit",
+    "disabled": false
+  },
+  {
+    "actionName": "actionZoom",
+    "disabled": false
+  },
+  {
+    "actionName": "actionCentered",
+    "disabled": false
+  },
+  {
+    "actionName": "actionZoomOut",
+    "disabled": false
+  },
+  {
+    "actionName": "actionCatalog",
+    "disabled": false
+  },
+  {
+    "actionName": "actionWorkcat",
+    "disabled": false
+  },
+  {
+    "actionName": "actionCopyPaste",
+    "disabled": false
+  },
+  {
+    "actionName": "actionLink",
+    "disabled": false
+  },
+  {
+    "actionName": "actionSetToArc",
+    "disabled": false
+  },
+  {
+    "actionName": "actionMapZone",
+    "disabled": false
+  },
+  {
+    "actionName": "actionGetParentId",
+    "disabled": false
+  },
+  {
+    "actionName": "actionGetArcId",
+    "disabled": false
+  },
+  {
+    "actionName": "actionRotation",
+    "disabled": false
+  },
+  {
+    "actionName": "actionInterpolate",
+    "disabled": false
+  }
+]'::json, 0, '{4,5}');
+
+
+-- Auto-generated SQL script #202410111210
+INSERT INTO config_form_tabs (formname,tabname,"label",tooltip,sys_role,tabactions,orderby,device)
+	VALUES ('ve_node_pr_break_valve','tab_data','Data','Data','role_basic','[
+  {
+    "actionName": "actionEdit",
+    "disabled": false
+  },
+  {
+    "actionName": "actionZoom",
+    "disabled": false
+  },
+  {
+    "actionName": "actionCentered",
+    "disabled": false
+  },
+  {
+    "actionName": "actionZoomOut",
+    "disabled": false
+  },
+  {
+    "actionName": "actionCatalog",
+    "disabled": false
+  },
+  {
+    "actionName": "actionWorkcat",
+    "disabled": false
+  },
+  {
+    "actionName": "actionCopyPaste",
+    "disabled": false
+  },
+  {
+    "actionName": "actionLink",
+    "disabled": false
+  },
+  {
+    "actionName": "actionSetToArc",
+    "disabled": false
+  },
+  {
+    "actionName": "actionMapZone",
+    "disabled": false
+  },
+  {
+    "actionName": "actionGetParentId",
+    "disabled": false
+  },
+  {
+    "actionName": "actionGetArcId",
+    "disabled": false
+  },
+  {
+    "actionName": "actionRotation",
+    "disabled": false
+  },
+  {
+    "actionName": "actionInterpolate",
+    "disabled": false
+  }
+]'::json,0,'{4,5}');
+
+
+-- Auto-generated SQL script #202410111232
+INSERT INTO config_form_tabs (formname,tabname,"label",tooltip,sys_role,tabactions,orderby,device)
+	VALUES ('ve_node_outfall_valve','tab_data','Data','Data','role_basic','[
+  {
+    "actionName": "actionEdit",
+    "disabled": false
+  },
+  {
+    "actionName": "actionZoom",
+    "disabled": false
+  },
+  {
+    "actionName": "actionCentered",
+    "disabled": false
+  },
+  {
+    "actionName": "actionZoomOut",
+    "disabled": false
+  },
+  {
+    "actionName": "actionCatalog",
+    "disabled": false
+  },
+  {
+    "actionName": "actionWorkcat",
+    "disabled": false
+  },
+  {
+    "actionName": "actionCopyPaste",
+    "disabled": false
+  },
+  {
+    "actionName": "actionLink",
+    "disabled": false
+  },
+  {
+    "actionName": "actionSetToArc",
+    "disabled": false
+  },
+  {
+    "actionName": "actionMapZone",
+    "disabled": false
+  },
+  {
+    "actionName": "actionGetParentId",
+    "disabled": false
+  },
+  {
+    "actionName": "actionGetArcId",
+    "disabled": false
+  },
+  {
+    "actionName": "actionRotation",
+    "disabled": false
+  },
+  {
+    "actionName": "actionInterpolate",
+    "disabled": false
+  }
+]'::json,0,'{4,5}');
+
+-- Auto-generated SQL script #202410111232
+INSERT INTO config_form_tabs (formname,tabname,"label",tooltip,sys_role,tabactions,orderby,device)
+	VALUES ('ve_node_pr_susta_valve','tab_data','Data','Data','role_basic','[
+  {
+    "actionName": "actionEdit",
+    "disabled": false
+  },
+  {
+    "actionName": "actionZoom",
+    "disabled": false
+  },
+  {
+    "actionName": "actionCentered",
+    "disabled": false
+  },
+  {
+    "actionName": "actionZoomOut",
+    "disabled": false
+  },
+  {
+    "actionName": "actionCatalog",
+    "disabled": false
+  },
+  {
+    "actionName": "actionWorkcat",
+    "disabled": false
+  },
+  {
+    "actionName": "actionCopyPaste",
+    "disabled": false
+  },
+  {
+    "actionName": "actionLink",
+    "disabled": false
+  },
+  {
+    "actionName": "actionSetToArc",
+    "disabled": false
+  },
+  {
+    "actionName": "actionMapZone",
+    "disabled": false
+  },
+  {
+    "actionName": "actionGetParentId",
+    "disabled": false
+  },
+  {
+    "actionName": "actionGetArcId",
+    "disabled": false
+  },
+  {
+    "actionName": "actionRotation",
+    "disabled": false
+  },
+  {
+    "actionName": "actionInterpolate",
+    "disabled": false
+  }
+]'::json,0,'{4,5}');
+
+-- Auto-generated SQL script #202410111233
+INSERT INTO config_form_tabs (formname,tabname,"label",tooltip,sys_role,tabactions,orderby,device)
+	VALUES ('ve_node_air_valve','tab_data','Data','Data','role_basic','[
+  {
+    "actionName": "actionEdit",
+    "disabled": false
+  },
+  {
+    "actionName": "actionZoom",
+    "disabled": false
+  },
+  {
+    "actionName": "actionCentered",
+    "disabled": false
+  },
+  {
+    "actionName": "actionZoomOut",
+    "disabled": false
+  },
+  {
+    "actionName": "actionCatalog",
+    "disabled": false
+  },
+  {
+    "actionName": "actionWorkcat",
+    "disabled": false
+  },
+  {
+    "actionName": "actionCopyPaste",
+    "disabled": false
+  },
+  {
+    "actionName": "actionLink",
+    "disabled": false
+  },
+  {
+    "actionName": "actionSetToArc",
+    "disabled": false
+  },
+  {
+    "actionName": "actionMapZone",
+    "disabled": false
+  },
+  {
+    "actionName": "actionGetParentId",
+    "disabled": false
+  },
+  {
+    "actionName": "actionGetArcId",
+    "disabled": false
+  },
+  {
+    "actionName": "actionRotation",
+    "disabled": false
+  },
+  {
+    "actionName": "actionInterpolate",
+    "disabled": false
+  }
+]'::json,0,'{4,5}');
+
+
+-- Auto-generated SQL script #202410111234
+INSERT INTO config_form_tabs (formname,tabname,"label",tooltip,sys_role,tabactions,orderby,device)
+	VALUES ('ve_node_fl_contr_valve','tab_data','Data','Data','role_basic','[
+  {
+    "actionName": "actionEdit",
+    "disabled": false
+  },
+  {
+    "actionName": "actionZoom",
+    "disabled": false
+  },
+  {
+    "actionName": "actionCentered",
+    "disabled": false
+  },
+  {
+    "actionName": "actionZoomOut",
+    "disabled": false
+  },
+  {
+    "actionName": "actionCatalog",
+    "disabled": false
+  },
+  {
+    "actionName": "actionWorkcat",
+    "disabled": false
+  },
+  {
+    "actionName": "actionCopyPaste",
+    "disabled": false
+  },
+  {
+    "actionName": "actionLink",
+    "disabled": false
+  },
+  {
+    "actionName": "actionSetToArc",
+    "disabled": false
+  },
+  {
+    "actionName": "actionMapZone",
+    "disabled": false
+  },
+  {
+    "actionName": "actionGetParentId",
+    "disabled": false
+  },
+  {
+    "actionName": "actionGetArcId",
+    "disabled": false
+  },
+  {
+    "actionName": "actionRotation",
+    "disabled": false
+  },
+  {
+    "actionName": "actionInterpolate",
+    "disabled": false
+  }
+]'::json,0,'{4,5}');
+
+
+-- Auto-generated SQL script #202410111234
+INSERT INTO config_form_tabs (formname,tabname,"label",tooltip,sys_role,tabactions,orderby,device)
+	VALUES ('ve_node_gen_purp_valve','tab_data','Data','Data','role_basic','[
+  {
+    "actionName": "actionEdit",
+    "disabled": false
+  },
+  {
+    "actionName": "actionZoom",
+    "disabled": false
+  },
+  {
+    "actionName": "actionCentered",
+    "disabled": false
+  },
+  {
+    "actionName": "actionZoomOut",
+    "disabled": false
+  },
+  {
+    "actionName": "actionCatalog",
+    "disabled": false
+  },
+  {
+    "actionName": "actionWorkcat",
+    "disabled": false
+  },
+  {
+    "actionName": "actionCopyPaste",
+    "disabled": false
+  },
+  {
+    "actionName": "actionLink",
+    "disabled": false
+  },
+  {
+    "actionName": "actionSetToArc",
+    "disabled": false
+  },
+  {
+    "actionName": "actionMapZone",
+    "disabled": false
+  },
+  {
+    "actionName": "actionGetParentId",
+    "disabled": false
+  },
+  {
+    "actionName": "actionGetArcId",
+    "disabled": false
+  },
+  {
+    "actionName": "actionRotation",
+    "disabled": false
+  },
+  {
+    "actionName": "actionInterpolate",
+    "disabled": false
+  }
+]'::json,0,'{4,5}');
+
+
+
+-- Auto-generated SQL script #202410111235
+INSERT INTO config_form_tabs (formname,tabname,"label",tooltip,sys_role,tabactions,orderby,device)
+	VALUES ('ve_node_throttle_valve','tab_data','Data','Data','role_basic','[
+  {
+    "actionName": "actionEdit",
+    "disabled": false
+  },
+  {
+    "actionName": "actionZoom",
+    "disabled": false
+  },
+  {
+    "actionName": "actionCentered",
+    "disabled": false
+  },
+  {
+    "actionName": "actionZoomOut",
+    "disabled": false
+  },
+  {
+    "actionName": "actionCatalog",
+    "disabled": false
+  },
+  {
+    "actionName": "actionWorkcat",
+    "disabled": false
+  },
+  {
+    "actionName": "actionCopyPaste",
+    "disabled": false
+  },
+  {
+    "actionName": "actionLink",
+    "disabled": false
+  },
+  {
+    "actionName": "actionSetToArc",
+    "disabled": false
+  },
+  {
+    "actionName": "actionMapZone",
+    "disabled": false
+  },
+  {
+    "actionName": "actionGetParentId",
+    "disabled": false
+  },
+  {
+    "actionName": "actionGetArcId",
+    "disabled": false
+  },
+  {
+    "actionName": "actionRotation",
+    "disabled": false
+  },
+  {
+    "actionName": "actionInterpolate",
+    "disabled": false
+  }
+]'::json,0,'{4,5}');
+
+
+-- Auto-generated SQL script #202410111239
+INSERT INTO config_form_tabs (formname,tabname,"label",tooltip,sys_role,tabactions,orderby,device)
+	VALUES ('ve_node_pump','tab_data','Data','Data','role_basic','[
+  {
+    "actionName": "actionEdit",
+    "disabled": false
+  },
+  {
+    "actionName": "actionZoom",
+    "disabled": false
+  },
+  {
+    "actionName": "actionCentered",
+    "disabled": false
+  },
+  {
+    "actionName": "actionZoomOut",
+    "disabled": false
+  },
+  {
+    "actionName": "actionCatalog",
+    "disabled": false
+  },
+  {
+    "actionName": "actionWorkcat",
+    "disabled": false
+  },
+  {
+    "actionName": "actionCopyPaste",
+    "disabled": false
+  },
+  {
+    "actionName": "actionLink",
+    "disabled": false
+  },
+  {
+    "actionName": "actionSetToArc",
+    "disabled": false
+  },
+  {
+    "actionName": "actionMapZone",
+    "disabled": false
+  },
+  {
+    "actionName": "actionGetParentId",
+    "disabled": false
+  },
+  {
+    "actionName": "actionGetArcId",
+    "disabled": false
+  },
+  {
+    "actionName": "actionRotation",
+    "disabled": false
+  },
+  {
+    "actionName": "actionInterpolate",
+    "disabled": false
+  }
+]'::json,0,'{4,5}');
+
+
+-- Auto-generated SQL script #202410111240
+INSERT INTO config_form_tabs (formname,tabname,"label",tooltip,sys_role,tabactions,orderby,device)
+	VALUES ('ve_node_flowmeter','tab_data','Data','Data','role_basic','[
+  {
+    "actionName": "actionEdit",
+    "disabled": false
+  },
+  {
+    "actionName": "actionZoom",
+    "disabled": false
+  },
+  {
+    "actionName": "actionCentered",
+    "disabled": false
+  },
+  {
+    "actionName": "actionZoomOut",
+    "disabled": false
+  },
+  {
+    "actionName": "actionCatalog",
+    "disabled": false
+  },
+  {
+    "actionName": "actionWorkcat",
+    "disabled": false
+  },
+  {
+    "actionName": "actionCopyPaste",
+    "disabled": false
+  },
+  {
+    "actionName": "actionLink",
+    "disabled": false
+  },
+  {
+    "actionName": "actionSetToArc",
+    "disabled": false
+  },
+  {
+    "actionName": "actionMapZone",
+    "disabled": false
+  },
+  {
+    "actionName": "actionGetParentId",
+    "disabled": false
+  },
+  {
+    "actionName": "actionGetArcId",
+    "disabled": false
+  },
+  {
+    "actionName": "actionRotation",
+    "disabled": false
+  },
+  {
+    "actionName": "actionInterpolate",
+    "disabled": false
+  }
+]'::json,0,'{4,5}');
+
+
+INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device)
+VALUES('ve_node_pressure_meter', 'tab_data', 'Data', 'Data', 'role_basic', NULL, '[
+  {
+    "actionName": "actionEdit",
+    "disabled": false
+  },
+  {
+    "actionName": "actionZoom",
+    "disabled": false
+  },
+  {
+    "actionName": "actionCentered",
+    "disabled": false
+  },
+  {
+    "actionName": "actionZoomOut",
+    "disabled": false
+  },
+  {
+    "actionName": "actionCatalog",
+    "disabled": false
+  },
+  {
+    "actionName": "actionWorkcat",
+    "disabled": false
+  },
+  {
+    "actionName": "actionCopyPaste",
+    "disabled": false
+  },
+  {
+    "actionName": "actionLink",
+    "disabled": false
+  },
+  {
+    "actionName": "actionSetToArc",
+    "disabled": false
+  },
+  {
+    "actionName": "actionMapZone",
+    "disabled": false
+  },
+  {
+    "actionName": "actionGetParentId",
+    "disabled": false
+  },
+  {
+    "actionName": "actionGetArcId",
+    "disabled": false
+  },
+  {
+    "actionName": "actionRotation",
+    "disabled": false
+  },
+  {
+    "actionName": "actionInterpolate",
+    "disabled": false
+  }
+]'::json, 0, '{4,5}');
