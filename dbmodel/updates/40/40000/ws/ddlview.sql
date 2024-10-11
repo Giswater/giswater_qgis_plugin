@@ -4190,3 +4190,11 @@ AS SELECT cat_node.id,
    FROM cat_node
      JOIN cat_feature_node ON cat_feature_node.id::TEXT = cat_node.nodetype_id::TEXT
      JOIN cat_feature ON cat_feature_node.id::TEXT = cat_feature.id::TEXT;
+
+CREATE OR REPLACE VIEW v_value_cat_connec
+AS SELECT cat_connec.id,
+    cat_connec.connectype_id AS connec_type,
+    cat_feature.sys_feature_cat
+   FROM cat_connec
+     JOIN cat_feature_connec ON cat_feature_connec.id::TEXT = cat_connec.connectype_id::TEXT
+     JOIN cat_feature ON cat_feature_connec.id::TEXT = cat_feature.id::TEXT;
