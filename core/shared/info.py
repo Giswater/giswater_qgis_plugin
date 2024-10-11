@@ -1968,8 +1968,7 @@ class GwInfo(QObject):
         try:
             actions_list = dialog.findChildren(QAction)
             static_actions = ('actionEdit', 'actionCentered', 'actionLink', 'actionHelp',
-                              'actionSection', 'actionSetToArc',
-                              'actionOrifice', 'actionOutlet', 'actionPump', 'actionWeir', 'actionDemand')
+                              'actionSection', 'actionOrifice', 'actionOutlet', 'actionPump', 'actionWeir', 'actionDemand')
 
             for action in actions_list:
                 if action.objectName() not in static_actions:
