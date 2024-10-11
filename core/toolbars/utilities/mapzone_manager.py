@@ -14,7 +14,7 @@ from qgis.PyQt.QtGui import QCursor, QColor
 from qgis.PyQt.QtCore import Qt, QPoint, QDateTime, QDate, QTime, QVariant
 from qgis.PyQt.QtWidgets import QAction, QMenu, QTableView, QAbstractItemView, QGridLayout, QLabel, QWidget, QComboBox, QMessageBox, QPushButton
 from qgis.PyQt.QtSql import QSqlTableModel
-from qgis.core import QgsVectorLayer, QgsLineSymbol, QgsRendererCategory, QgsDateTimeRange, Qgis, QgsCategorizedSymbolRenderer
+from qgis.core import QgsVectorLayer, QgsLineSymbol, QgsRendererCategory, QgsDateTimeRange, Qgis, QgsCategorizedSymbolRenderer, QgsProject, QgsGeometry, QgsRectangle
 
 from qgis.gui import QgsMapToolEmitPoint
 
@@ -54,7 +54,7 @@ class GwMapzoneManager:
 
         # Add icons
         tools_gw.add_icon(self.mapzone_mng_dlg.btn_execute, "311", sub_folder="24x24")
-        tools_gw.add_icon(self.mapzone_mng_dlg.btn_flood, "313", sub_folder="24x24")
+        tools_gw.add_icon(self.mapzone_mng_dlg.btn_flood, "314", sub_folder="24x24")
         self.mapzone_mng_dlg.btn_flood.setEnabled(False)
 
         default_tab_idx = 0
@@ -85,6 +85,8 @@ class GwMapzoneManager:
         self.mapzone_mng_dlg.chk_show_all.toggled.connect(partial(self._manage_current_changed))
         self.mapzone_mng_dlg.btn_execute.clicked.connect(partial(self._open_mapzones_analysis))
         self.mapzone_mng_dlg.btn_flood.clicked.connect(partial(self._open_flood_analysis, self.mapzone_mng_dlg))
+        self.mapzone_mng_dlg.btn_flood_from_node.clicked.connect(
+            partial(self._open_flood_from_node_analysis, self.mapzone_mng_dlg))
         self.mapzone_mng_dlg.btn_config.clicked.connect(partial(self.manage_config, self.mapzone_mng_dlg, None))
         self.mapzone_mng_dlg.btn_toggle_active.clicked.connect(partial(self._manage_toggle_active))
         self.mapzone_mng_dlg.btn_create.clicked.connect(partial(self.manage_create, self.mapzone_mng_dlg, None))
@@ -441,6 +443,92 @@ class GwMapzoneManager:
             if "seconds" in [widget.itemText(i) for i in range(widget.count())]:
                 widget.setCurrentText("seconds")
                 break
+
+    def _open_flood_from_node_analysis(self, dialog):
+        """Initializes snapping to select a starting node for flood analysis."""
+
+        # Manually set feature_type to 'node' since we only care about nodes
+        self.feature_type = 'node'
+
+        # Set up the snapping tool on the map to capture points
+        self.snapper_manager = QgsMapToolEmitPoint(self.iface.mapCanvas())
+        self.iface.mapCanvas().setMapTool(self.snapper_manager)
+
+        # Connect the point-click event to identify the nearest node
+        self.snapper_manager.canvasClicked.connect(partial(self._identify_node_and_run_flood_analysis, dialog))
+
+    def _identify_node_and_run_flood_analysis(self, dialog, point):
+        """Identify the node at the selected point, retrieve node_id, and run flood analysis."""
+
+        # Disable snapping after the point is selected
+        self.iface.mapCanvas().unsetMapTool(self.snapper_manager)
+        self.snapper_manager.canvasClicked.disconnect()
+
+        # Retrieve the node layer by name
+        node_layers = QgsProject.instance().mapLayersByName("Node")
+        if not node_layers:
+            tools_qgis.show_warning("The layer 'Node' was not found. Please ensure it is loaded.", dialog=dialog)
+            return
+
+        node_layer = node_layers[0]
+
+        # Create a small buffer around the clicked point and select within this area
+        buffer_distance = 2
+        buffered_geom = QgsGeometry.fromPointXY(point).buffer(buffer_distance, 5)
+        bounding_box = buffered_geom.boundingBox()
+        node_layer.selectByRect(QgsRectangle(bounding_box))
+
+        # Get the first selected feature
+        selected_features = node_layer.selectedFeatures()
+        if selected_features:
+            feature = selected_features[0]
+            node_id = feature['node_id']
+            print("Selected Node ID for flood analysis:", node_id)
+
+            tools_qgis.show_info(f"Flood analysis will start from node ID: {node_id}", dialog=dialog)
+            self.selected_node_id = node_id
+
+            # Retrieve graphClass and exploitation from the dialog or set defaults
+            graph_class = self.mapzone_mng_dlg.main_tab.tabText(self.mapzone_mng_dlg.main_tab.currentIndex()).lower()
+            # TODO remove this when the function is made
+            exploitation = "1"
+
+            # Run mapzones analysis function
+            self._run_mapzones_analysis(graph_class, exploitation)
+
+            # Call the existing flood analysis function
+            self._open_flood_analysis(dialog)
+
+        else:
+            tools_qgis.show_warning("No node was identified at the selected point.", dialog=dialog)
+
+        # Clear the selection after processing
+        node_layer.removeSelection()
+
+    def _run_mapzones_analysis(self, graph_class, exploitation):
+        """Executes the mapzones analysis with only the required parameters."""
+
+        # Convert graph_class to uppercase
+        graph_class_upper = graph_class.upper()
+
+        # Create the JSON body directly with the "parameters" key
+        body = tools_gw.create_body(
+            extras=(
+                f'"parameters":{{"graphClass":"{graph_class_upper}", '
+                f'"exploitation":"{exploitation}", "updateFeature":"TRUE"}}'
+            )
+        )
+
+        # Execute the procedure
+        result = tools_gw.execute_procedure('gw_fct_graphanalytics_mapzones_advanced', body)
+
+        # Check if a valid result was returned
+        if not result or result.get('status') != 'Accepted':
+            tools_qgis.show_warning("Failed to execute the mapzones analysis.")
+        else:
+            tools_qgis.show_info("Mapzones analysis completed successfully.")
+
+        # TODO: Implement flood analysis starting from this node ID in the future
 
     # region config button
 
