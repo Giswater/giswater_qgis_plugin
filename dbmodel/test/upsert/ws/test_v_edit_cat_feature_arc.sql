@@ -12,7 +12,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 SELECT plan(6);
 
-INSERT INTO v_edit_cat_feature_arc (id, sys_feature_cat, epa_default, code_autofill, shortcut_key, link_path, descript, active)
+INSERT INTO v_edit_cat_feature_arc (id, system_id, epa_default, code_autofill, shortcut_key, link_path, descript, active)
 VALUES('999000', 'PIPE', 'PIPE', true, 'Y', NULL, 'Water distribution pipe', true);
 SELECT is((SELECT count(*)::integer FROM v_edit_cat_feature_arc WHERE id = '999000'), 1, 'INSERT: v_edit_cat_feature_arc 999000 was inserted');
 SELECT is((SELECT count(*)::integer FROM cat_feature_arc WHERE id = '999000'), 1, 'INSERT: cat_feature_arc 999000 was inserted');

@@ -12,7 +12,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 SELECT plan(6);
 
-INSERT INTO v_edit_cat_feature_connec (id, sys_feature_cat, epa_default, code_autofill, shortcut_key, link_path, descript, active)
+INSERT INTO v_edit_cat_feature_connec (id, system_id, epa_default, code_autofill, shortcut_key, link_path, descript, active)
 VALUES('999001', 'WJOIN', 'JUNCTION', true, 'Ctrl+A', NULL, 'Wjoin', true);
 SELECT is((SELECT count(*)::integer FROM v_edit_cat_feature_connec WHERE id = '999001'), 1, 'INSERT: v_edit_cat_feature_connec 999001 was inserted');
 SELECT is((SELECT count(*)::integer FROM cat_feature_connec WHERE id = '999001'), 1, 'INSERT: cat_feature_connec 999001 was inserted');
