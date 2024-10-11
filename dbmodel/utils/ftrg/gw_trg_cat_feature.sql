@@ -136,17 +136,17 @@ BEGIN
 		WHERE id = '||quote_literal(NEW.id)||';';
 
 		IF lower(v_feature.type)='arc' THEN
-			EXECUTE 'INSERT INTO cat_feature_arc (id, type, epa_default)
-			VALUES ('||quote_literal(NEW.id)||','||quote_literal(NEW.sys_feature_cat)||', '||quote_literal(v_feature.epa_default)||');';
+			EXECUTE 'INSERT INTO cat_feature_arc (id, epa_default)
+			VALUES ('||quote_literal(NEW.id)||', '||quote_literal(v_feature.epa_default)||');';
 		ELSIF lower(v_feature.type)='node' THEN
-			EXECUTE 'INSERT INTO cat_feature_node (id, type, epa_default, choose_hemisphere, isarcdivide, num_arcs)
-			VALUES ('||quote_literal(NEW.id)||','||quote_literal(NEW.sys_feature_cat)||', '||quote_literal(v_feature.epa_default)||', TRUE, TRUE, 2)';
+			EXECUTE 'INSERT INTO cat_feature_node (id, epa_default, choose_hemisphere, isarcdivide, num_arcs)
+			VALUES ('||quote_literal(NEW.id)||', '||quote_literal(v_feature.epa_default)||', TRUE, TRUE, 2)';
 		ELSIF lower(v_feature.type)='connec' THEN
-			EXECUTE 'INSERT INTO cat_feature_connec (id, type)
-			VALUES ('||quote_literal(NEW.id)||','||quote_literal(NEW.sys_feature_cat)||');';
+			EXECUTE 'INSERT INTO cat_feature_connec (id)
+			VALUES ('||quote_literal(NEW.id)||');';
 		ELSIF lower(v_feature.type)='gully' THEN
-			EXECUTE 'INSERT INTO cat_feature_gully (id, type)
-			VALUES ('||quote_literal(NEW.id)||','||quote_literal(NEW.sys_feature_cat)||');';
+			EXECUTE 'INSERT INTO cat_feature_gully (id)
+			VALUES ('||quote_literal(NEW.id)||');';
 		END IF;
 
 		--create child view

@@ -15,11 +15,11 @@ $BODY$
 /*EXAMPLE
 
 SELECT SCHEMA_NAME.gw_fct_settoarc($${"client":{"device":4, "infoType":1, "lang":"ES"},
-"form":{},"feature":{"featureType":"CHECK_VALVE", "id":"1082"}, 
+"form":{},"feature":{"featureType":"CHECK_VALVE", "id":"1082"},
 "data":{"filterFields":{}, "pageInfo":{}, "arcId":"2064", "dmaId":"2", "presszoneId":"3", "sectorId":"3", "dqaId":"1"}}$$);
 
 SELECT SCHEMA_NAME.gw_fct_settoarc($${"client":{"device":4, "infoType":1, "lang":"ES"},
-"form":{},"feature":{"featureType":"SHUTOFF_VALVE", "id":"1115"}, 
+"form":{},"feature":{"featureType":"SHUTOFF_VALVE", "id":"1115"},
 "data":{"filterFields":{}, "pageInfo":{},"parameters":{"arcId":"11","dmaId":"2", "presszoneId":"3"}}}$$)::text;
 
 fid:359
@@ -63,13 +63,13 @@ BEGIN
 	v_presszone_id:= json_extract_path_text (p_data,'data','presszoneId')::text;
 	v_dqa_id:= json_extract_path_text (p_data,'data','presszoneId')::text;
 
-	SELECT upper(type), upper(graph_delimiter)  INTO v_systype, v_graphdelim FROM cat_feature_node WHERE id = v_feature_type;
+	SELECT upper(sys_feature_cat), upper(graph_delimiter) INTO v_systype, v_graphdelim FROM cat_feature_node JOIN cat_feature ON cat_feature.id = cat_feature_node.id WHERE cat_feature_node.id = v_feature_type;
 	SELECT upper(epa_type) INTO v_epatype FROM node WHERE node_id = v_feature_id;
 
 	DELETE FROM audit_check_data WHERE fid=359 AND cur_user=current_user;
 
-	--If to_arc is not defined take arc to which node is connected 
-	IF v_arc_id IS NULL THEN 
+	--If to_arc is not defined take arc to which node is connected
+	IF v_arc_id IS NULL THEN
 		SELECT arc_id INTO v_arc_id FROM arc WHERE node_1 =  v_feature_id;
 	END IF;
 
@@ -81,14 +81,14 @@ BEGIN
 	-- man_tables
 	IF v_systype = 'PUMP' THEN
 
-		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (359,1, 
+		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (359,1,
 		concat('Set to_arc for pump, ', v_feature_id, ' with value ',v_arc_id, '.'));
 
 		UPDATE man_pump SET to_arc = v_arc_id WHERE node_id = v_feature_id;
 
 	ELSIF v_systype = 'VALVE' THEN
 
-		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (359,1, 
+		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (359,1,
 		concat('Set to_arc for valve, ', v_feature_id, ' with value ',v_arc_id, '.'));
 
 		UPDATE man_valve SET to_arc = v_arc_id WHERE node_id = v_feature_id;
@@ -97,11 +97,11 @@ BEGIN
 
 		-- nothing to do;
 	END IF;
-	
+
 	-- graphconfig for mapzones
 	IF v_graphdelim IN ('SECTOR','PRESSZONE','DMA', 'DQA') THEN
 
-		--define list of mapzones to be set 
+		--define list of mapzones to be set
 		v_mapzone_array = ARRAY[lower(v_graphdelim)];
 
 		FOREACH rec IN ARRAY(v_mapzone_array) LOOP
@@ -126,9 +126,9 @@ BEGIN
 			EXECUTE 'SELECT graphconfig FROM '||rec||' WHERE '||rec||'_id::text = '||quote_literal(v_mapzone_id)||'::text'
 			INTO v_check_graphconfig;
 
-			IF v_check_graphconfig IS NULL OR v_check_graphconfig = '{"use":[{"nodeParent":"", "toArc":[]}], "ignore":[], "forceClosed":[]}' THEN 
+			IF v_check_graphconfig IS NULL OR v_check_graphconfig = '{"use":[{"nodeParent":"", "toArc":[]}], "ignore":[], "forceClosed":[]}' THEN
 			--Define graphconfig in case when its null
-		       
+
 			    EXECUTE 'SELECT jsonb_build_object(''use'',ARRAY[a.feature], ''ignore'',''{}''::text[], ''forceClosed'',''{}''::text[]) FROM (
 			    SELECT jsonb_build_object(
 			    ''nodeParent'','||v_feature_id||'::text,
@@ -137,12 +137,12 @@ BEGIN
 
 			    EXECUTE'UPDATE '||rec||' SET graphconfig = '||quote_literal(v_config)||' WHERE '||rec||'_id::text = '||quote_literal(v_mapzone_id)||'::text;';
 			ELSE
-			    
+
 			    EXECUTE  'SELECT 1 FROM '||rec||' CROSS JOIN json_array_elements((graphconfig->>''use'')::json) elem 
 			    WHERE elem->>''nodeParent'' = '||quote_literal(v_feature_id)||' AND '||rec||'_id::text = '||quote_literal(v_mapzone_id)||'::text LIMIT 1'
 			    INTO v_check_graphconfig;
 
-			    IF v_check_graphconfig = '1'  THEN 
+			    IF v_check_graphconfig = '1'  THEN
 				--Define graphconfig in case when there is definition for mapzone and node is already defined there
 
 				EXECUTE 'UPDATE '||rec||' set graphconfig = replace(graphconfig::text,a.toarc,'||v_arc_id||'::text)::json FROM (
@@ -152,44 +152,44 @@ BEGIN
 				where elem->>''nodeParent'' = '||quote_literal(v_feature_id)||' AND '||rec||'_id::text = '||quote_literal(v_mapzone_id)||'::text)a 
 				WHERE '||rec||'_id::text ='||quote_literal(v_mapzone_id)||'::text';
 
-			    ELSE    
+			    ELSE
 				--Define graphconfig in case when there is definition for mapzone and node is not defined there
 				EXECUTE 'SELECT jsonb_build_object(
 				''nodeParent'','||v_feature_id||'::text,
 				''toArc'',   ARRAY['||v_arc_id||'::text] ) AS feature'
 				INTO v_config;
-			
+
 
 				EXECUTE 'SELECT jsonb_build_object(''use'',b.feature, ''ignore'',(graphconfig->>''ignore'')::json) FROM '||rec||',( 
 				SELECT jsonb_agg(a.use) || '''||v_config||'''::jsonb as feature   FROM (
 				select '||rec||'_id, json_array_elements((graphconfig->>''use'')::json) as use, graphconfig
 				from '||rec||' where '||rec||'_id::text ='||quote_literal(v_mapzone_id)||'::text)a)b where '||rec||'_id::text ='||quote_literal(v_mapzone_id)||'::text'
 				INTO v_config;
-	     
-				EXECUTE'UPDATE '||rec||' SET graphconfig = '||quote_literal(v_config)||' WHERE '||rec||'_id::text = '||quote_literal(v_mapzone_id)||'::text;';	
+
+				EXECUTE'UPDATE '||rec||' SET graphconfig = '||quote_literal(v_config)||' WHERE '||rec||'_id::text = '||quote_literal(v_mapzone_id)||'::text;';
 			    END IF;
 			END IF;
 		   END IF;
 		END LOOP;
 	ELSE
 		v_level = 0;
-		INSERT INTO audit_check_data (fid, criticity, error_message) 
+		INSERT INTO audit_check_data (fid, criticity, error_message)
 		VALUES (359,1, concat('There is no mapzone to configure for  ', v_feature_type,' ', v_feature_id, '.'));
 	END IF;
 
-	SELECT  string_agg(error_message,' ') INTO v_result  FROM audit_check_data WHERE cur_user="current_user"() AND 
+	SELECT  string_agg(error_message,' ') INTO v_result  FROM audit_check_data WHERE cur_user="current_user"() AND
 	fid = 359;
-	   
+
 	IF v_level IS NULL THEN
 		v_level=3;
-	END IF; 
+	END IF;
 
 	v_result_info = v_result;
-	    
+
 	--    Control nulls
-	v_result_info := COALESCE(v_result_info, '{}'); 
-	v_result := COALESCE(v_result, '{}'); 
-	    
+	v_result_info := COALESCE(v_result_info, '{}');
+	v_result := COALESCE(v_result, '{}');
+
 	v_result = concat ('{"geometryType":"", "values":',to_json(v_result), '}');
 
 	--  Return
@@ -203,7 +203,7 @@ BEGIN
 	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
 	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
-    
+
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

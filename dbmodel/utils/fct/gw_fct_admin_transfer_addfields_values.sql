@@ -97,7 +97,7 @@ BEGIN
         ELSIF rec_sa_featurestypes.feature_type = 'NODE' THEN
             -- create all addfields tables for everything in cat_feature_node
             FOR rec_sa IN
-                SELECT cf.id, cf.type FROM cat_feature_node cf
+                SELECT c.id, cf.sys_feature_cat AS type FROM cat_feature_node c JOIN cat_feature cf ON cf.id = c.id
             LOOP
 
                 v_feature_childtable_name := 'man_' || lower(rec_sa.type) || '_' || lower(rec_sa.id);
@@ -123,7 +123,7 @@ BEGIN
         ELSIF rec_sa_featurestypes.feature_type = 'ARC' THEN
             -- create all addfields tables for everything in cat_feature_arc
             FOR rec_sa IN
-                SELECT cf.id, cf.type FROM cat_feature_arc cf
+                SELECT c.id, cf.sys_feature_cat FROM cat_feature_arc c JOIN cat_feature cf ON cf.id = c.id
             LOOP
 
                 v_feature_childtable_name := 'man_' || lower(rec_sa.type) || '_' || lower(rec_sa.id);
@@ -149,7 +149,7 @@ BEGIN
         ELSIF rec_sa_featurestypes.feature_type = 'CONNEC' THEN
             -- create all addfields tables for everything in cat_feature_connec
             FOR rec_sa IN
-                SELECT cf.id, cf.type FROM cat_feature_connec cf
+                SELECT c.id, cf.sys_feature_cat FROM cat_feature_connec cf JOIN cat_feature cf ON cf.id = c.id
             LOOP
 
                 v_feature_childtable_name := 'man_' || lower(rec_sa.type) || '_' || lower(rec_sa.id);
@@ -175,7 +175,7 @@ BEGIN
         ELSIF rec_sa_featurestypes.feature_type = 'GULLY' THEN
             -- create all addfields tables for everything in cat_feature_gully
             FOR rec_sa IN
-                SELECT cf.id, cf.type FROM cat_feature_gully cf
+                SELECT c.id, cf.sys_feature_cat FROM cat_feature_gully cf JOIN cat_feature cf ON cf.id = c.id
             LOOP
 
                 v_feature_childtable_name := 'man_' || lower(rec_sa.type) || '_' || lower(rec_sa.id);

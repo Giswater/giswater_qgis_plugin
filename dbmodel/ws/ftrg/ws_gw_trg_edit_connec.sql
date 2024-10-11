@@ -66,7 +66,7 @@ BEGIN
 
 	IF v_man_table IN (SELECT id FROM cat_feature WHERE feature_type = 'CONNEC') THEN
 		v_customfeature:=v_man_table;
-		v_man_table:=(SELECT man_table FROM cat_feature_connec c JOIN sys_feature_cat s ON c.type = s.id WHERE c.id=v_man_table);
+		v_man_table:=(SELECT man_table FROM cat_feature_connec c JOIN cat_feature cf ON cf.id = c.id JOIN sys_feature_cat s ON cf.sys_feature_cat = s.id WHERE c.id=v_man_table);
 	END IF;
 
 	v_type_man_table:=v_man_table;
@@ -583,7 +583,7 @@ BEGIN
 		END IF;
 
 		IF v_man_table='parent' THEN
-			v_man_table:= (SELECT man_table FROM cat_feature_connec c JOIN sys_feature_cat s ON c.type = s.id JOIN cat_connec ON cat_connec.id=NEW.connecat_id
+			v_man_table:= (SELECT man_table FROM cat_feature_connec c JOIN cat_feature cf ON cf.id = c.id JOIN sys_feature_cat s ON cf.sys_feature_cat = s.id JOIN cat_connec ON cat_connec.id=NEW.connecat_id
 		    	WHERE c.id = cat_connec.connectype_id LIMIT 1)::text;
 
 			IF v_man_table IS NOT NULL THEN

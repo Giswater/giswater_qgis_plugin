@@ -117,7 +117,7 @@ BEGIN
 			SELECT value INTO v_state_type FROM config_param_user WHERE parameter='edit_statetype_2_vdefault' AND cur_user=current_user;
 		END IF;
 	END IF;
-	
+
 	v_action_mode = COALESCE(v_action_mode, 1);
 
 	-- delete old values on result table
@@ -190,9 +190,9 @@ BEGIN
 
 					IF v_project_type = 'UD' THEN
 						v_arc_type = v_new_record.arc_type;
-						
+
 					ELSIF v_project_type = 'WS' THEN
-					
+
 						v_sql := 'SELECT arctype_id FROM cat_arc WHERE id = '''||v_new_record.arccat_id||''';';
 						EXECUTE v_sql
 						INTO v_arc_type;
@@ -201,7 +201,7 @@ BEGIN
 
 				-- setting values of new record
 				v_new_record.arccat_id = v_record1.arccat_id;
-				v_new_record.the_geom := v_arc_geom;				
+				v_new_record.the_geom := v_arc_geom;
 				v_new_record.node_1 := (SELECT node_id FROM v_edit_node WHERE ST_DWithin(ST_StartPoint(v_arc_geom), v_edit_node.the_geom, 0.01) LIMIT 1);
 				v_new_record.node_2 := (SELECT node_id FROM v_edit_node WHERE ST_DWithin(ST_EndPoint(v_arc_geom), v_edit_node.the_geom, 0.01) LIMIT 1);
 				v_new_record.arc_id := (SELECT nextval('urn_id_seq'));
@@ -218,10 +218,10 @@ BEGIN
 				-- get man and epa tables
 				IF v_project_type = 'UD' THEN
 					v_new_record.arc_type = v_arc_type;
-					SELECT man_table INTO v_man_table FROM sys_feature_cat s JOIN cat_feature_arc c ON s.id=c.type WHERE c.id=v_new_record.arc_type;
+					SELECT man_table FROM sys_feature_cat s JOIN cat_feature cf ON cf.sys_feature_cat = s.id JOIN cat_feature_arc c ON c.id = cf.id WHERE c.id=v_new_record.arc_type;
 					SELECT epa_table, epa_default INTO v_epa_table, v_epatype FROM sys_feature_epa_type s JOIN cat_feature_arc c ON s.id=c.epa_default WHERE c.id=v_new_record.arc_type;
 				ELSE
-					SELECT man_table INTO v_man_table FROM sys_feature_cat s JOIN cat_feature_arc c ON s.id=c.type JOIN cat_arc ON arctype_id=c.id WHERE cat_arc.id=v_new_record.arccat_id;
+					SELECT man_table INTO v_man_table FROM sys_feature_cat s JOIN cat_feature cf ON cf.sys_feature_cat = s.id JOIN cat_feature_arc c ON c.id = cf.id JOIN cat_arc ON arctype_id=c.id WHERE cat_arc.id=v_new_record.arccat_id;
 					SELECT epa_table, epa_default INTO v_epa_table, v_epatype FROM sys_feature_epa_type s JOIN cat_feature_arc c ON s.id=c.epa_default JOIN cat_arc ON arctype_id=c.id WHERE cat_arc.id=v_new_record.arccat_id;
 				END IF;
 
@@ -234,7 +234,7 @@ BEGIN
 				UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'activated', true) WHERE parameter = 'edit_arc_searchnodes';
 
 				UPDATE arc SET node_1=v_new_record.node_1, node_2=v_new_record.node_2 where arc_id=v_new_record.arc_id;
-                
+
 				-- remove duplicated vertex on new arc because of the fusion
 				UPDATE arc SET the_geom=ST_RemoveRepeatedPoints(the_geom) WHERE arc_id=v_new_record.arc_id;
 
@@ -402,7 +402,7 @@ BEGIN
 						IF v_project_type = 'WS' THEN
 
 							-- update to_arc for mapzones and system tables
-							EXECUTE 'SELECT node_1, node_2 FROM v_edit_arc a WHERE a.arc_id='''||v_new_record.arc_id||''';' 
+							EXECUTE 'SELECT node_1, node_2 FROM v_edit_arc a WHERE a.arc_id='''||v_new_record.arc_id||''';'
 							INTO v_node_1,v_node_2;
 
 							EXECUTE 'SELECT gw_fct_setmapzoneconfig($${
@@ -412,7 +412,7 @@ BEGIN
 							EXECUTE 'SELECT gw_fct_setmapzoneconfig($${
 							"client":{"device":4, "infoType":1,"lang":"ES"},"data":{"parameters":{"nodeIdOld":"'||v_node_1||'",
 							"arcIdOld":'||v_record2.arc_id||',"arcIdNew":'||v_new_record.arc_id||',"action":"updateArc"}}}$$);';
-							
+
 						END IF;
 
 						-- Delete arcs
@@ -620,7 +620,7 @@ BEGIN
 	v_message := COALESCE(v_message, '{}');
 
 	--  Return
-	
+
 	RETURN gw_fct_json_create_return(('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
 				',"body":{"form":{}'||
 				',"data":{"info":'||v_result_info||'}}'
@@ -629,10 +629,10 @@ BEGIN
 	-- Exception control
 	EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) 
+	RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE)
 	||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
-	
+
 	END;
 $BODY$
 	LANGUAGE plpgsql VOLATILE

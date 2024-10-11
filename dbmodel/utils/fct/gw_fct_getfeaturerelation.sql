@@ -33,7 +33,7 @@ SELECT SCHEMA_NAME.gw_fct_getfeaturerelation($${
 -- fid: 151
 
 */
- 
+
 DECLARE
 
 v_feature_type text;
@@ -72,7 +72,7 @@ BEGIN
 	--  get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
         INTO v_version;
-        
+
 	--get information about feature
 	v_feature_type = lower(((p_data ->>'feature')::json->>'type'))::text;
 	v_feature_id = ((p_data ->>'data')::json->>'feature_id')::text;
@@ -80,33 +80,33 @@ BEGIN
 	EXECUTE 'SELECT '||v_feature_type||'_type FROM v_edit_'||v_feature_type||' WHERE '||v_feature_type||'_id = '''||v_feature_id||''''
 	INTO v_featurecat;
 
-	EXECUTE 'SELECT man_table FROM cat_feature_'||v_feature_type||' c JOIN sys_feature_cat s ON c.type = s.id WHERE s.id = '''||v_featurecat||''';'
+	EXECUTE 'SELECT man_table FROM cat_feature_'||v_feature_type||' c JOIN cat_feature cf ON c.id = cf.id JOIN sys_feature_cat s ON cf.sys_feature_cat = s.id WHERE s.id = '''||v_featurecat||''';'
 	INTO v_man_table;
 
 	IF v_feature_type='arc' THEN
 		--check connec& gully related to arc
-		SELECT string_agg(feature_id,',') INTO v_connect_connec FROM v_ui_arc_x_relations 
+		SELECT string_agg(feature_id,',') INTO v_connect_connec FROM v_ui_arc_x_relations
 		JOIN sys_feature_cat on sys_feature_cat.id=v_ui_arc_x_relations.sys_type WHERE type='CONNEC' AND  arc_id = v_feature_id;
 
 		IF v_connect_connec IS NOT NULL THEN
 			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (151, v_result_id, concat('Connecs connected with the feature :',v_connect_connec ));
 		END IF;
 
-		SELECT string_agg(feature_id,',') INTO v_connect_gully FROM v_ui_arc_x_relations 
+		SELECT string_agg(feature_id,',') INTO v_connect_gully FROM v_ui_arc_x_relations
 		JOIN sys_feature_cat on sys_feature_cat.id=v_ui_arc_x_relations.sys_type WHERE type='GULLY' AND  arc_id = v_feature_id;
-		
+
 		IF v_connect_gully IS NOT NULL THEN
 
 			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (151, v_result_id, concat('Gullies connected with the feature :',v_connect_gully ));
 
 		END IF;
-		
+
 		--check final nodes related to arc
-		SELECT concat(node_1,',',node_2) INTO v_connect_node FROM v_edit_arc 
+		SELECT concat(node_1,',',node_2) INTO v_connect_node FROM v_edit_arc
 		LEFT JOIN node a ON a.node_id::text = v_edit_arc.node_1::text
-     	LEFT JOIN node b ON b.node_id::text = v_edit_arc.node_2::text 
+     	LEFT JOIN node b ON b.node_id::text = v_edit_arc.node_2::text
      	WHERE v_edit_arc.arc_id = v_feature_id;
-		
+
 		IF v_connect_node IS NOT NULL THEN
 				INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (151, v_result_id, concat('Nodes connected with the feature: ',v_connect_node ));
 			END IF;
@@ -123,19 +123,19 @@ BEGIN
 		END IF;
 
 		--check arcs related to node (on service)
-		SELECT string_agg(arc.arc_id,',')  INTO v_connect_arc FROM arc 
+		SELECT string_agg(arc.arc_id,',')  INTO v_connect_arc FROM arc
 		LEFT JOIN node a ON a.node_id::text = arc.node_1::text
-     	LEFT JOIN node b ON b.node_id::text = arc.node_2::text 
+     	LEFT JOIN node b ON b.node_id::text = arc.node_2::text
      	WHERE (node_1 = v_feature_id OR node_2 = v_feature_id) AND arc.state=1;
 
 		IF v_connect_arc IS NOT NULL THEN
 			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (151, v_result_id, concat('Arcs connected with the feature (on service): ',v_connect_arc ));
 		END IF;
-	
+
 		--check arcs related to node (obsolete)
-		SELECT string_agg(arc.arc_id,',')  INTO v_connect_arc FROM arc 
+		SELECT string_agg(arc.arc_id,',')  INTO v_connect_arc FROM arc
 		LEFT JOIN node a ON a.node_id::text = arc.node_1::text
-     	LEFT JOIN node b ON b.node_id::text = arc.node_2::text 
+     	LEFT JOIN node b ON b.node_id::text = arc.node_2::text
      	WHERE  (node_1 = v_feature_id OR node_2 = v_feature_id) AND arc.state=0;
 
 		IF v_connect_arc IS NOT NULL THEN
@@ -149,7 +149,7 @@ BEGIN
 		IF v_connect_pol IS NOT NULL THEN
 			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (151, v_result_id, concat('Polygon connected with the feature: ',v_connect_pol ));
 		END IF;
-		
+
 	ELSIF v_feature_type='connec' OR v_feature_type='gully' THEN
 		EXECUTE 'SELECT string_agg(link_id::text,'','') FROM link where (exit_type=''CONNEC''  AND  exit_id = '''||v_feature_id||'''::text)
 		OR  (feature_type=''CONNEC''  AND  feature_id = '''||v_feature_id||'''::text)'
@@ -166,7 +166,7 @@ BEGIN
 		IF v_connect_gully IS NOT NULL THEN
 			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (151, v_result_id, concat('Gullies connected with the feature :',v_connect_gully ));
 		END IF;
-		
+
 		--check related polygon
 		EXECUTE 'SELECT pol_id FROM polygon where feature_id= '''||v_feature_id||''';'
 		INTO v_connect_pol;
@@ -176,7 +176,7 @@ BEGIN
 		END IF;
 
 	END IF;
-	
+
 	--check elements related to feature
 	EXECUTE 'SELECT string_agg(element_id,'','') FROM element_x_'||v_feature_type||' where '||v_feature_type||'_id = '''||v_feature_id||'''::text'
 	INTO v_element;
@@ -212,7 +212,7 @@ BEGIN
 		where node_1 =  '''||v_feature_id||'''::text or node_2= '''||v_feature_id||'''::text  and arc.state=2)a'
 		INTO v_psector;
 	ELSE
-		
+
 		EXECUTE 'SELECT string_agg(name,'', '') FROM plan_psector_x_'||v_feature_type||' 
 		JOIN plan_psector USING (psector_id) where '||v_feature_type||'_id = '''||v_feature_id||'''::text'
 		INTO v_psector;
@@ -221,17 +221,17 @@ BEGIN
 	IF v_psector IS NOT NULL THEN
 		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (151, v_result_id, concat('Psectors connected with the feature: ',v_psector ));
 		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (151, v_result_id, concat('IMPORTANT: Activate psector before deleting features.' ));
-	END IF;	
+	END IF;
 
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT id, error_message AS message FROM audit_check_data WHERE cur_user="current_user"() AND fid = 151) row;
 
-	v_result := COALESCE(v_result, '{}'); 
+	v_result := COALESCE(v_result, '{}');
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
 	-- Control nulls
-	v_version := COALESCE(v_version, '{}'); 
-	v_result_info := COALESCE(v_result_info, '{}'); 
+	v_version := COALESCE(v_version, '{}');
+	v_result_info := COALESCE(v_result_info, '{}');
 
 	RETURN ('{"status":"Accepted", "version":'||v_version||
             ',"message":{"level":1, "text":""},"body":{"data": {"info":'||v_result_info||'}}}')::json;

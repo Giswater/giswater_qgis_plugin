@@ -63,7 +63,7 @@ BEGIN
 	v_schemaname = 'SCHEMA_NAME';
 
 	SELECT project_type INTO v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
-	
+
 		--  get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
         INTO v_version;
@@ -82,7 +82,7 @@ BEGIN
 	INTO v_featurecat;
 
 	IF v_feature_type!='gully' THEN
-		EXECUTE 'SELECT man_table FROM cat_feature_'||v_feature_type||' c JOIN sys_feature_cat s ON c.type = s.id WHERE s.id = '''||v_featurecat||''';'
+		EXECUTE 'SELECT man_table FROM cat_feature_'||v_feature_type||' c JOIN cat_feature cf ON c.id = cf.id JOIN sys_feature_cat s ON cf.sys_feature_cat = s.id WHERE s.id = '''||v_featurecat||''';'
 		INTO v_man_table;
 	END IF;
 
@@ -121,7 +121,7 @@ BEGIN
 		EXECUTE 'UPDATE om_visit_event SET position_id = NULL where position_id = '''||v_feature_id||''';';
 	END IF;
 
-	IF v_feature_type='node' THEN 
+	IF v_feature_type='node' THEN
 
 		IF v_project_type = 'WS' THEN
 			--remove scada related to node
@@ -143,7 +143,7 @@ BEGIN
 			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (152, v_result_id, concat('Number of removed links:', v_count ));
 		END IF;
 
-		--remove parent related to node 
+		--remove parent related to node
 		IF v_project_type = 'WS' THEN
 			EXECUTE 'SELECT parent_id FROM node where parent_id IS NOT NULL AND node_id = '''||v_feature_id||''''
 			into v_related_id;
@@ -166,18 +166,18 @@ BEGIN
 			END IF;
 
 		--find if there is an arc related to node
-		SELECT string_agg(arc.arc_id,',')  INTO v_arc_id FROM arc 
+		SELECT string_agg(arc.arc_id,',')  INTO v_arc_id FROM arc
 		LEFT JOIN node a ON a.node_id::text = arc.node_1::text
-     	LEFT JOIN node b ON b.node_id::text = arc.node_2::text 
+     	LEFT JOIN node b ON b.node_id::text = arc.node_2::text
      	WHERE  (node_1 = v_feature_id OR node_2 = v_feature_id);
 
 		IF v_arc_id IS NULL THEN
 			--delete node
 			EXECUTE 'DELETE FROM v_edit_node WHERE node_id='''||v_feature_id||''';';
-			
+
 			INSERT INTO audit_check_data (fid, result_id, error_message)
-			VALUES (152, v_result_id, concat('Delete node: ', v_feature_id));	
-		ELSE 
+			VALUES (152, v_result_id, concat('Delete node: ', v_feature_id));
+		ELSE
 			--set final nodes to NULL and delete node
 			IF v_project_type = 'WS' THEN
 				EXECUTE'UPDATE arc SET node_1=NULL, nodetype_1=NULL, elevation1=NULL, depth1=NULL, staticpress1 = NULL WHERE node_1='''||v_feature_id||''';';
@@ -189,13 +189,13 @@ BEGIN
 			EXECUTE 'DELETE FROM node WHERE node_id='''||v_feature_id||''';';
 
 			INSERT INTO audit_check_data (fid, result_id, error_message)
-			VALUES (152, v_result_id, concat('Disconnected arcs: ',v_arc_id));	
+			VALUES (152, v_result_id, concat('Disconnected arcs: ',v_arc_id));
 			INSERT INTO audit_check_data (fid, result_id, error_message)
 			VALUES (152, v_result_id, concat('Delete node: ', v_feature_id));
 		END IF;
-	
 
-	ELSIF v_feature_type='arc' THEN 
+
+	ELSIF v_feature_type='arc' THEN
 		--remove links related to arc
 		EXECUTE 'SELECT count(*) FROM v_edit_link WHERE feature_type=''CONNEC'' AND feature_id IN 
 		(SELECT connec_id FROM connec  WHERE connec.arc_id='''||v_feature_id||''');'
@@ -205,7 +205,7 @@ BEGIN
 			EXECUTE 'DELETE FROM v_edit_link WHERE feature_type=''CONNEC'' AND feature_id IN (SELECT connec_id FROM connec  WHERE connec.arc_id='''||v_feature_id||''');';
 			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (152, v_result_id, concat('Number of removed links related to connecs: ',v_count ));
 		END IF;
-		
+
 		--set arc_id to null if there are connecs related
 		EXECUTE 'SELECT string_agg(connec_id,'','') FROM connec WHERE arc_id='''||v_feature_id||''''
 		INTO v_related_id;
@@ -261,7 +261,7 @@ BEGIN
 				VALUES (152, v_result_id, concat('Removed polygon:', v_related_id ));
 			END IF;
 
-		--remove links related to connec/gully 
+		--remove links related to connec/gully
 		IF v_feature_type='connec' THEN
 			EXECUTE 'SELECT string_agg(link_id::text,'','') FROM link where (exit_type=''CONNEC''  AND  exit_id = '''||v_feature_id||'''::text)
 			OR  (feature_type=''CONNEC''  AND  feature_id = '''||v_feature_id||'''::text)'
@@ -281,30 +281,30 @@ BEGIN
 
 		--delete feature
 	  	EXECUTE 'DELETE FROM v_edit_'||(v_feature_type)||'  WHERE '||(v_feature_type)||'_id='''||v_feature_id||''';';
-	  	
+
 	  	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (152, v_result_id, concat('Delete ',v_feature_type,': ',v_feature_id ));
-	  	
+
 	END IF;
 
  	--delete addfields values
 	v_feature_childtable_name := 'man_' || v_feature_type || '_' || lower(v_featurecat);
 
 	IF (SELECT EXISTS ( SELECT 1 FROM information_schema.tables WHERE table_schema = v_schemaname AND table_name = v_feature_childtable_name)) IS TRUE THEN
-        EXECUTE 'DELETE FROM '||v_feature_childtable_name||' WHERE '||concat(v_feature_type,'_id')||'='||quote_literal(v_feature_id)||';'; 
-    END IF; 
-	
+        EXECUTE 'DELETE FROM '||v_feature_childtable_name||' WHERE '||concat(v_feature_type,'_id')||'='||quote_literal(v_feature_id)||';';
+    END IF;
+
  	UPDATE config_param_user SET value = 'FALSE' WHERE parameter = 'edit_arc_downgrade_force' AND cur_user=current_user;
 
- 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+ 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT id, error_message AS message FROM audit_check_data WHERE cur_user="current_user"() AND fid = 152)
-	row; 
+	row;
 
-	v_result := COALESCE(v_result, '{}'); 
+	v_result := COALESCE(v_result, '{}');
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
 	-- Control nulls
-	v_version := COALESCE(v_version, '{}'); 
-	v_result_info := COALESCE(v_result_info, '{}'); 
+	v_version := COALESCE(v_version, '{}');
+	v_result_info := COALESCE(v_result_info, '{}');
 
     RETURN ('{"status":"Accepted", "version":'||v_version||
              ',"message":{"level":1, "text":""},"body":{"data": {"info":'||v_result_info||'}}}')::json;

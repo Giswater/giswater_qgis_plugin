@@ -173,10 +173,10 @@ BEGIN
 		"data":{"message":"1052", "function":"2114","debug_msg":null, "is_process":true}}$$);' INTO v_audit_result;
 	ELSE
 
-		
+
 		-- Control if node divides arc
 		IF v_isarcdivide=TRUE then
-		
+
 			-- update arc_id null in case the node has related the arc_id
 			UPDATE node set arc_id = null where node_id = v_node_id and arc_id is not NULL;
 
@@ -221,14 +221,14 @@ BEGIN
 
 				-- Check if any of the 'lines' are in fact a point AS a result to be placed on the initY
 				IF (ST_GeometryType(v_line1) = 'ST_Point') OR (ST_GeometryType(v_line2) = 'ST_Point') THEN
-	
+
 					IF v_skipinitendmessage THEN
-					
-					ELSE 
+
+					ELSE
 						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 						"data":{"message":"3094", "function":"2114","debug_msg":null, "is_process":true}}$$);' INTO v_audit_result;
 					END IF;
-					
+
 				ELSE
 					-- check if there are not-selected psector affecting connecs
 					IF (SELECT count (*) FROM plan_psector_x_connec JOIN plan_psector USING (psector_id)
@@ -264,7 +264,7 @@ BEGIN
 							rec_aux1.code=concat(v_code_prefix,v_seq_code);
 					ELSIF v_set_old_code IS TRUE THEN
 						rec_aux1.code := v_code;
-					ELSE						
+					ELSE
 						rec_aux1.code := rec_aux1.arc_id;
 					END IF;
 
@@ -281,7 +281,7 @@ BEGIN
 							rec_aux2.code=concat(v_code_prefix,v_seq_code);
 					ELSIF v_set_old_code IS TRUE THEN
 						rec_aux2.code := v_code;
-					ELSE						
+					ELSE
 						rec_aux2.code := rec_aux1.arc_id;
 					END IF;
 
@@ -290,7 +290,7 @@ BEGIN
 					rec_aux2.the_geom := v_line2;
 
 					-- getting table child information (man_table)
-					v_mantable = (SELECT man_table FROM cat_feature_arc c JOIN sys_feature_cat s ON c.type = s.id JOIN v_edit_arc ON c.id=arc_type WHERE arc_id=v_arc_id);
+					v_mantable = (SELECT man_table FROM cat_feature_arc c JOIN cat_feature cf ON c.id = cf.id JOIN sys_feature_cat s ON cf.sys_feature_cat = s.id JOIN v_edit_arc ON c.id=arc_type WHERE arc_id=v_arc_id);
 					v_epatable = (SELECT epa_table FROM cat_feature_arc c JOIN sys_feature_epa_type s ON epa_default = s.id JOIN v_edit_arc ON c.id=arc_type WHERE arc_id=v_arc_id);
 
 					-- building querytext for man_table
@@ -311,7 +311,7 @@ BEGIN
 					v_epaquerytext1 =  'INSERT INTO '||v_epatable||' SELECT ';
 					v_epaquerytext2 =  v_epaquerytext||' FROM '||v_epatable||' WHERE arc_id= '||v_arc_id||'::text';
 
-					
+
 					-- In function of states and user's variables proceed.....
 					IF v_state_node=1 THEN
 
@@ -565,7 +565,7 @@ BEGIN
 							UPDATE gully SET arc_id = v_arc_closest WHERE arc_id = v_arc_id AND gully_id = rec_link.feature_id;
 							UPDATE link SET exit_id = v_arc_closest WHERE link_id = rec_link.link_id;
 						END LOOP;
-							
+
 						-- reconnect connecs without link but with arc_id
 						FOR rec_connec IN SELECT connec_id FROM connec WHERE arc_id=v_arc_id AND state = 1 AND pjoint_type='ARC'
 						AND connec_id NOT IN (SELECT DISTINCT feature_id FROM link WHERE exit_id=v_arc_id)
@@ -1061,17 +1061,17 @@ BEGIN
 						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 						"data":{"message":"3044", "function":"2114","debug_msg":null, "is_process":true}}$$);' INTO v_audit_result;
 					END IF;
-					
+
 					-- set values of node
 					UPDATE node SET sector_id = rec_aux1.sector_id, dma_id = rec_aux1.dma_id WHERE node_id = v_node_id;
-					
+
 					IF v_project_type ='WS' THEN
-					
-						UPDATE node SET presszone_id = rec_aux1.presszone_id, dqa_id = rec_aux1.dqa_id, 
+
+						UPDATE node SET presszone_id = rec_aux1.presszone_id, dqa_id = rec_aux1.dqa_id,
 						minsector_id = rec_aux1.minsector_id, macrominsector_id = rec_aux1.minsector_id WHERE node_id = v_node_id;
-				
+
 					ELSIF v_project_type ='UD' THEN
-					
+
 						-- set y1/y2 to null for those values related to new node
 						update config_param_system set value = false WHERE parameter='edit_state_topocontrol' ;
 						UPDATE arc SET y2=null, custom_y2=null WHERE arc_id = rec_aux1.arc_id;
@@ -1082,10 +1082,10 @@ BEGIN
 					---- place where work with automatize toarc
 
 					----
-					
+
 					---- end of the place
-											
-					
+
+
 				END IF;
 			ELSE
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},

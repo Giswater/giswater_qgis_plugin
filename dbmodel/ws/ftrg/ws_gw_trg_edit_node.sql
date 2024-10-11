@@ -89,7 +89,7 @@ BEGIN
 	--modify values for custom view inserts
 	IF v_man_table IN (SELECT id FROM cat_feature WHERE feature_type = 'NODE') THEN
 		v_customfeature:=v_man_table;
-		v_man_table:=(SELECT man_table FROM cat_feature_node c JOIN sys_feature_cat s ON c.type = s.id  WHERE c.id=v_man_table);
+		v_man_table:=(SELECT man_table FROM cat_feature_node c JOIN cat_feature cf ON cf.id = c.id JOIN sys_feature_cat s ON cf.sys_feature_cat = s.id  WHERE c.id=v_man_table);
 	END IF;
 
 	v_type_man_table=v_man_table;
@@ -634,7 +634,8 @@ BEGIN
 		IF v_man_table='parent' then
 
 		    v_man_table:= (SELECT man_table FROM cat_feature_node n
-			JOIN sys_feature_cat s ON n.type = s.id
+			JOIN cat_feature cf ON cf.id = n.id
+			JOIN sys_feature_cat s ON cf.sys_feature_cat = s.id
 			JOIN cat_node ON cat_node.id=NEW.nodecat_id WHERE n.id = cat_node.nodetype_id LIMIT 1)::text;
 
 			--insert valve values for valve objects
@@ -1027,7 +1028,8 @@ BEGIN
 
 		ELSIF v_man_table='parent' THEN
 		    v_man_table:= (SELECT man_table FROM cat_feature_node n
-			JOIN sys_feature_cat s ON n.type = s.id
+			JOIN cat_feature cf ON cf.id = n.id
+			JOIN sys_feature_cat s ON cf.sys_feature_cat = s.id
 			JOIN cat_node ON cat_node.id=NEW.nodecat_id WHERE n.id = cat_node.nodetype_id LIMIT 1)::text;
 
 			IF v_man_table='man_valve' THEN
