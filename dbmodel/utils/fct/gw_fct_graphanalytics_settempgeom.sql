@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 The code of this inundation function has been provided by Claudia Dragoste (Aigues de Manresa, S.A.)
 */
 
--- FUNCTION CODE: 3332
+-- FUNCTION CODE: 3334
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_graphanalytics_settempgeom(json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_graphanalytics_settempgeom(p_data json)
@@ -22,16 +22,16 @@ Function to update the geometry of the mapzones in the temp_minsector table.
 
 DECLARE
 
-    v_querytext text;
-    v_fid integer;
-    v_updatemapzgeom integer;
-    v_geomparamupdate float;
-    v_concavehull float;
-    v_geomparamupdate_divide float;
-    v_table text; -- minsector | mapzone
-    v_field text; -- zone_id
-    v_fieldmp text; -- minisector_id
-    v_srid integer; -- 25831
+    v_querytext TEXT;
+    v_fid INTEGER;
+    v_updatemapzgeom INTEGER;
+    v_geomparamupdate FLOAT;
+    v_concavehull FLOAT;
+    v_geomparamupdate_divide FLOAT;
+    v_table TEXT; -- minsector | mapzone
+    v_field TEXT; -- zone_id
+    v_fieldmp TEXT; -- minisector_id
+    v_srid INTEGER; -- 25831
 
 BEGIN
 
@@ -183,6 +183,33 @@ BEGIN
 
     END IF;
 
+
+    RETURN jsonb_build_object(
+        'status', 'Accepted',
+        'message', jsonb_build_object(
+            'level', 1,
+            'text', 'The geometry has been updated successfully.'
+        ),
+        'version', v_version,
+        'body', jsonb_build_object(
+            'form', jsonb_build_object(),
+            'data', jsonb_build_object()
+        )
+    );
+
+    EXCEPTION WHEN OTHERS THEN
+    RETURN jsonb_build_object(
+        'status', 'Failed',
+        'message', jsonb_build_object(
+            'level', 3,
+            'text', 'An error occurred while updating the geometry. ' || SQLERRM
+        ),
+        'version', v_version,
+        'body', jsonb_build_object(
+            'form', jsonb_build_object(),
+            'data', jsonb_build_object()
+        )
+    );
 
 	RETURN ('{"status":"Accepted"}')::json;
 

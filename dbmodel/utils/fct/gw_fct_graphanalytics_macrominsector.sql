@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 The code of this inundation function have been provided by Claudia Dragoste (Aigues de Manresa, S.A.)
 */
 
--- FUNCTION CODE: 3334
+-- FUNCTION CODE: 3336
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_grafanalytics_macrominsector(json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_graphanalytics_macrominsector(p_data json)
@@ -19,9 +19,9 @@ SELECT SCHEMA_NAME.gw_fct_grafanalytics_macrominsector('{"data":{"parameters":{"
 
 DECLARE
 
-    v_version text;
-    v_project_type text;
-    v_commitchanges boolean;
+    v_version TEXT;
+    v_project_type TEXT;
+    v_commitchanges BOOLEAN;
 
 BEGIN
 

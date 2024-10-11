@@ -15,15 +15,19 @@ VALUES (3328, 'gw_fct_graphanalytics_initnetwork', 'utils', 'function', 'json', 
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source")
-VALUES (3330, 'gw_fct_graphanalytics_temptables', 'utils', 'function', 'json', 'json', 'Function to create temporal tables for graphanalytics', 'role_basic', NULL, 'core')
+VALUES (3330, 'gw_fct_graphanalytics_create_temptables', 'utils', 'function', 'json', 'json', 'Function to create temporal tables for graphanalytics', 'role_basic', NULL, 'core')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source")
-VALUES (3332, 'gw_fct_graphanalytics_settempgeom', 'utils', 'function', 'json', 'json', 'Function to update the geometry of the mapzones in the temp_minsector table for graphanalytics', 'role_basic', NULL, 'core')
+VALUES (3332, 'gw_fct_graphanalytics_delete_temptables', 'utils', 'function', 'json', 'json', 'Function to create temporal tables for graphanalytics', 'role_basic', NULL, 'core')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source")
-VALUES (3334, 'gw_fct_graphanalytics_macrominsector', 'utils', 'function', 'json', 'json', 'Function to create macrominsectors', 'role_master', NULL, 'core')
+VALUES (3334, 'gw_fct_graphanalytics_settempgeom', 'utils', 'function', 'json', 'json', 'Function to update the geometry of the mapzones in the temp_minsector table for graphanalytics', 'role_basic', NULL, 'core')
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source")
+VALUES (3336, 'gw_fct_graphanalytics_macrominsector', 'utils', 'function', 'json', 'json', 'Function to create macrominsectors', 'role_master', NULL, 'core')
 ON CONFLICT (id) DO NOTHING;
 
 -- update graphanalytic_minsector description to include explotation id description
@@ -36,7 +40,7 @@ In explotation id you can use ''-9'' to select all explotations, or a list of ex
 WHERE id=2706;
 
 INSERT INTO config_toolbox (id, alias, functionparams, inputparams, observ, active, device)
-VALUES(3334, 'Macrominsector analysis', '{"featureType":[]}'::json,
+VALUES(3336, 'Macrominsector analysis', '{"featureType":[]}'::json,
 '[{"widgetname":"commitChanges", "label":"Commit changes:","widgettype":"check","datatype":"boolean","layoutname":"grl_option_parameters","layoutorder":1, "value":"", "tooltip": "Commit changes"}]'::json,
 NULL, true, '{4}');
 
@@ -45,7 +49,7 @@ INSERT INTO sys_param_user VALUES ('utils_psector_strategy', 'config', 'Psector 
 
 --24/09/2024
 INSERT INTO sys_function (id,function_name,project_type,function_type,input_params,return_type,descript,sys_role,"source")
-VALUES (3336,'gw_fct_getgraphinundation','utils','function',NULL,'json','Retrieves GeoJSON data representing the inundation (flooding) graph for a specific area','role_edit','core');
+VALUES (3338,'gw_fct_getgraphinundation','utils','function',NULL,'json','Retrieves GeoJSON data representing the inundation (flooding) graph for a specific area','role_edit','core');
 
 --01/10/2024
 INSERT INTO config_function (id, function_name, "style", layermanager, actions) VALUES(3336, 'gw_fct_getgraphinundation', '{

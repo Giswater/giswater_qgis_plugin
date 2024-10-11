@@ -64,7 +64,33 @@ BEGIN
         UPDATE temp_pgr_arc SET cost = v_cost, reverse_cost = v_reverse_cost WHERE pgr_arc_id = v_record.pgr_arc_id; -- The new arc has the cost and reverse cost
     END LOOP;
 
-	RETURN ('{"status":"Accepted"}')::json;
+
+    RETURN jsonb_build_object(
+        'status', 'Accepted',
+        'message', jsonb_build_object(
+            'level', 1,
+            'text', 'The network has been arranged successfully.'
+        ),
+        'version', v_version,
+        'body', jsonb_build_object(
+            'form', jsonb_build_object(),
+            'data', jsonb_build_object()
+        )
+    );
+
+    EXCEPTION WHEN OTHERS THEN
+    RETURN jsonb_build_object(
+        'status', 'Failed',
+        'message', jsonb_build_object(
+            'level', 3,
+            'text', 'An error occurred while arranging the network:' || SQLERRM
+        ),
+        'version', v_version,
+        'body', jsonb_build_object(
+            'form', jsonb_build_object(),
+            'data', jsonb_build_object()
+        )
+    );
 
 END;
 $BODY$

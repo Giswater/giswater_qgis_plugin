@@ -45,6 +45,8 @@ DECLARE
     v_visible_layer TEXT;
     v_ignorebrokenvalves BOOLEAN = TRUE;
 
+    v_response JSON;
+
 BEGIN
 
 	-- Search path
@@ -62,7 +64,11 @@ BEGIN
     -- Create temporary tables
 	-- =======================
 	v_data := '{"data":{"fct_name":"MINSECTOR"}}';
-	PERFORM gw_fct_graphanalytics_temptables(v_data);
+	SELECT gw_fct_graphanalytics_create_temptables(v_data) INTO v_response;
+
+    IF v_response->>'status' <> 'Accepted' THEN
+        RETURN v_response;
+    END IF;
 
 	-- Starting process
 	INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat('MINSECTOR DYNAMIC SECTORITZATION'));
@@ -71,7 +77,11 @@ BEGIN
     -- Initialize process
 	-- =======================
 	v_data := '{"data":{"expl_id":"' || v_expl || '"}}';
-    PERFORM gw_fct_graphanalytics_initnetwork(v_data);
+    SELECT gw_fct_graphanalytics_initnetwork(v_data) INTO v_response;
+
+    IF v_response->>'status' <> 'Accepted' THEN
+        RETURN v_response;
+    END IF;
 
     -- Nodes at the limits of minsectors: nodes with "graph_delimiter" = 'MINSECTOR'
     -- Also, nodes that appear as starts in the "sector" table and have "graph_delimiter" = 'SECTOR'
@@ -138,7 +148,11 @@ BEGIN
 
     -- Generate new arcs and disconnect arcs with modif = TRUE
 	-- =======================
-    PERFORM gw_fct_graphanalytics_arrangenetwork();
+    SELECT gw_fct_graphanalytics_arrangenetwork() INTO v_response;
+
+    IF v_response->>'status' <> 'Accepted' THEN
+        RETURN v_response;
+    END IF;
 
     -- Generate the minsectors
     TRUNCATE temp_pgr_connectedcomponents;
@@ -242,7 +256,11 @@ BEGIN
             'srid', v_srid
         )
 	);
-    PERFORM gw_fct_graphanalytics_settempgeom(v_data);
+    SELECT gw_fct_graphanalytics_settempgeom(v_data) INTO v_response;
+
+    IF v_response->>'status' <> 'Accepted' THEN
+        RETURN v_response;
+    END IF;
 
 	IF v_commitchanges IS FALSE THEN
         -- Polygons
@@ -315,18 +333,15 @@ BEGIN
     v_result := COALESCE(v_result, '{}');
     v_result_line := CONCAT('{"geometryType":"LineString", "features":', v_result, '}');
 
-    -- Drop temporary layers (new)
-    DROP TABLE IF EXISTS temp_pgr_node;
-    DROP TABLE IF EXISTS temp_pgr_arc;
-    DROP TABLE IF EXISTS temp_pgr_connec;
-    DROP TABLE IF EXISTS temp_pgr_link;
-    DROP TABLE IF EXISTS temp_pgr_minsector;
-    DROP TABLE IF EXISTS temp_pgr_connectedcomponents;
-    DROP TABLE IF EXISTS temp_pgr_drivingdistance;
 
-    -- Drop temporary layers (old)
-    DROP TABLE IF EXISTS temp_minsector;
-    DROP TABLE IF EXISTS temp_audit_check_data;
+    -- Delete temporary tables
+	-- =======================
+	v_data := '{"data":{"fct_name":"MINSECTOR"}}';
+	SELECT gw_fct_graphanalytics_delete_temptables(v_data) INTO v_response;
+
+    IF v_response->>'status' <> 'Accepted' THEN
+        RETURN v_response;
+    END IF;
 
     -- Return
     RETURN gw_fct_json_create_return(

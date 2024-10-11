@@ -132,7 +132,32 @@ BEGIN
         );
     END IF;
 
-	RETURN ('{"status":"Accepted"}')::JSON;
+    RETURN jsonb_build_object(
+        'status', 'Accepted',
+        'message', jsonb_build_object(
+            'level', 1,
+            'text', 'The temporary tables have been initialized successfully'
+        ),
+        'version', v_version,
+        'body', jsonb_build_object(
+            'form', jsonb_build_object(),
+            'data', jsonb_build_object()
+        )
+    );
+
+    EXCEPTION WHEN OTHERS THEN
+    RETURN jsonb_build_object(
+        'status', 'Failed',
+        'message', jsonb_build_object(
+            'level', 3,
+            'text', 'An error occurred while initializing temporary tables: ' || SQLERRM
+        ),
+        'version', v_version,
+        'body', jsonb_build_object(
+            'form', jsonb_build_object(),
+            'data', jsonb_build_object()
+        )
+    );
 
 END;
 $BODY$
