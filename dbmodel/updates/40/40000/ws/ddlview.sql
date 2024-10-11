@@ -4182,3 +4182,11 @@ AS SELECT vu_sector.sector_id,
    FROM vu_sector,
     selector_sector
   WHERE vu_sector.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
+
+CREATE OR REPLACE VIEW v_value_cat_node
+AS SELECT cat_node.id,
+    cat_node.nodetype_id,
+    cat_feature.sys_feature_cat
+   FROM cat_node
+     JOIN cat_feature_node ON cat_feature_node.id::TEXT = cat_node.nodetype_id::TEXT
+     JOIN cat_feature ON cat_feature_node.id::TEXT = cat_feature.id::TEXT;
