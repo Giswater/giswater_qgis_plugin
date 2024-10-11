@@ -55,6 +55,7 @@ class GwMapzoneManager:
         # Add icons
         tools_gw.add_icon(self.mapzone_mng_dlg.btn_execute, "311", sub_folder="24x24")
         tools_gw.add_icon(self.mapzone_mng_dlg.btn_flood, "314", sub_folder="24x24")
+        tools_gw.add_icon(self.mapzone_mng_dlg.btn_flood_from_node, "315", sub_folder="24x24")
         self.mapzone_mng_dlg.btn_flood.setEnabled(False)
 
         default_tab_idx = 0
