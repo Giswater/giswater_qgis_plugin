@@ -55,7 +55,7 @@ SELECT gw_fct_setarcfusion('{"client":{"device":4, "infoType":1, "lang":"ES"},"f
 SELECT gw_fct_setarcfusion('{"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":[250]},
 "data":{"workcatId":"work1","enddate":"2020-02-05", "arccat_id":"RC200", "action_mode": 2, "arc_type":"CONDUIT"}}'::json);
 
-INSERT INTO inp_flwreg_weir VALUES(1,'237','100014',1,0.5,'TRANSVERSE', 16.35,1.5,null,null, 'NO', 2,1,0,0,null,null,null,null,'237WE1');
+INSERT INTO inp_flwreg_weir VALUES(1,'237', currval('SCHEMA_NAME.urn_id_seq'),1,0.5,'TRANSVERSE', 16.35,1.5,null,null, 'NO', 2,1,0,0,null,null,null,null,'237WE1')
 
 UPDATE config_param_user SET value ='PARTIAL' WHERE parameter = 'inp_options_inertial_damping';
 
