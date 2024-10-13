@@ -77,7 +77,7 @@ VALUES('ve_node_shutoff_valve', 'tab_data', 'Data', 'Data', 'role_basic', NULL, 
   },
   {
     "actionName": "actionCatalog",
-    "disabled": i
+    "disabled": false
   },
   {
     "actionName": "actionWorkcat",
