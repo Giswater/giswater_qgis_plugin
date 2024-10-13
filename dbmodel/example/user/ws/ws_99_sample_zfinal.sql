@@ -87,3 +87,33 @@ SELECT gw_fct_graphanalytics_mapzones_advanced($${"client":{"device":4, "lang":"
 
 
 UPDATE ext_rtc_hydrometer SET is_waterbal = false WHERE  id::integer in (3,4);
+
+INSERT INTO man_type_category (category_type, feature_type, featurecat_id) VALUES ('category_junction1','NODE','{JUNCTION}');
+INSERT INTO man_type_category (category_type, feature_type, featurecat_id) VALUES ('category_junction2','NODE','{JUNCTION}');
+INSERT INTO man_type_category (category_type, feature_type, featurecat_id) VALUES ('category_hydrant1','NODE','{HYDRANT}');
+INSERT INTO man_type_category (category_type, feature_type, featurecat_id) VALUES ('category_hydrant2','NODE','{HYDRANT}');
+
+INSERT INTO man_type_location (location_type, feature_type, featurecat_id) VALUES ('location_junction1','NODE','{JUNCTION}');
+INSERT INTO man_type_location (location_type, feature_type, featurecat_id) VALUES ('location_junction2','NODE','{JUNCTION}');
+INSERT INTO man_type_location (location_type, feature_type, featurecat_id) VALUES ('location_hydrant1','NODE','{HYDRANT}');
+INSERT INTO man_location_type (location_type, feature_type, featurecat_id) VALUES ('location_hydrant2','NODE','{HYDRANT}');
+
+INSERT INTO man_type_fluid (fluid_type, feature_type, featurecat_id) VALUES ('fluid_junction1','NODE','{JUNCTION}');
+INSERT INTO man_type_fluid (fluid_type, feature_type, featurecat_id) VALUES ('fluid_junction2','NODE','{JUNCTION}');
+INSERT INTO man_type_fluid (fluid_type, feature_type, featurecat_id) VALUES ('fluid_hydrant1','NODE','{HYDRANT}');
+INSERT INTO man_type_fluid (fluid_type, feature_type, featurecat_id) VALUES ('fluid_hydrant2','NODE','{HYDRANT}');
+
+INSERT INTO man_type_function (function_type, feature_type, featurecat_id) VALUES ('function_junction1','NODE','{JUNCTION}');
+INSERT INTO man_type_function (function_type, feature_type, featurecat_id) VALUES ('function_junction2','NODE','{JUNCTION}');
+INSERT INTO man_type_function (function_type, feature_type, featurecat_id) VALUES ('function_hydrant1','NODE','{HYDRANT}');
+INSERT INTO man_type_function (function_type, feature_type, featurecat_id) VALUES ('function_hydrant2','NODE','{HYDRANT}');
+
+UPDATE node SET category_type = 'category_junction1' where nodecat_id like 'JUNCT%';
+UPDATE node SET location_type = 'location_junction1' where nodecat_id like 'JUNCT%';
+UPDATE node SET fluid_type = 'fluid_junction1' where nodecat_id like 'JUNCT%';
+UPDATE node SET function_type = 'function_junction1' where nodecat_id like 'JUNCT%';
+
+UPDATE node SET category_type = 'category_hydrant1' where nodecat_id like 'HYDR%';
+UPDATE node SET location_type = 'location_hydrant1' where nodecat_id like 'HYDR%';
+UPDATE node SET fluid_type = 'fluid_hydrant1' where nodecat_id like 'HYDR%';
+UPDATE node SET function_type = 'function_hydrant1' where nodecat_id like 'HYDR%';

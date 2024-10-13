@@ -95,3 +95,34 @@ UPDATE link SET muni_id = g.muni_id FROM gully g WHERE gully_id =  feature_id;
 SELECT gw_fct_graphanalytics_mapzones_advanced($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"graphClass":"DRAINZONE", "exploitation":"1", "floodOnlyMapzone":null, "forceOpen":null, "forceClosed":null, "usePlanPsector":"false", "commitChanges":"true", "valueForDisconnected":null, "updateMapZone":"2", "geomParamUpdate":"8"}, "aux_params":null}}$$);
 
 UPDATE arc SET muni_id = 1, streetaxis_id  ='1-9150C' WHERE arc_id = '179';
+
+
+INSERT INTO man_type_category (category_type, feature_type, featurecat_id) VALUES ('category_junction1','NODE','{JUNCTION}');
+INSERT INTO man_type_category (category_type, feature_type, featurecat_id) VALUES ('category_junction2','NODE','{JUNCTION}');
+INSERT INTO man_type_category (category_type, feature_type, featurecat_id) VALUES ('category_manhole1','NODE','{CIRC_MANHOLE}');
+INSERT INTO man_type_category (category_type, feature_type, featurecat_id) VALUES ('category_manhole2','NODE','{CIRC_MANHOLE}');
+
+INSERT INTO man_type_location (location_type, feature_type, featurecat_id) VALUES ('location_junction1','NODE','{JUNCTION}');
+INSERT INTO man_type_location (location_type, feature_type, featurecat_id) VALUES ('location_junction2','NODE','{JUNCTION}');
+INSERT INTO man_type_location (location_type, feature_type, featurecat_id) VALUES ('location_manhole1','NODE','{CIRC_MANHOLE}');
+INSERT INTO man_type_location (location_type, feature_type, featurecat_id) VALUES ('location_manhole2','NODE','{CIRC_MANHOLE}');
+
+INSERT INTO man_type_fluid (fluid_type, feature_type, featurecat_id) VALUES ('fluid_junction1','NODE','{JUNCTION}');
+INSERT INTO man_type_fluid (fluid_type, feature_type, featurecat_id) VALUES ('fluid_junction2','NODE','{JUNCTION}');
+INSERT INTO man_type_fluid (fluid_type, feature_type, featurecat_id) VALUES ('fluid_manhole1','NODE','{CIRC_MANHOLE}');
+INSERT INTO man_type_fluid (fluid_type, feature_type, featurecat_id) VALUES ('fluid_manhole2','NODE','{CIRC_MANHOLE}');
+
+INSERT INTO man_type_function (function_type, feature_type, featurecat_id) VALUES ('function_junction1','NODE','{JUNCTION}');
+INSERT INTO man_type_function (function_type, feature_type, featurecat_id) VALUES ('function_junction2','NODE','{JUNCTION}');
+INSERT INTO man_type_function (function_type, feature_type, featurecat_id) VALUES ('function_manhole1','NODE','{CIRC_MANHOLE}');
+INSERT INTO man_type_function (function_type, feature_type, featurecat_id) VALUES ('function_manhole2','NODE','{CIRC_MANHOLE}');
+
+UPDATE node SET category_type = 'category_junction1' where nodecat_id like 'JUNCT%';
+UPDATE node SET location_type = 'location_junction1' where nodecat_id like 'JUNCT%';
+UPDATE node SET fluid_type = 'fluid_junction1' where nodecat_id like 'JUNCT%';
+UPDATE node SET function_type = 'function_junction1' where nodecat_id like 'JUNCT%';
+
+UPDATE node SET category_type = 'category_manhole1' where nodecat_id like 'CIRC_MANHOLE%';
+UPDATE node SET location_type = 'location_manhole1' where nodecat_id like 'CIRC_MANHOLE%';
+UPDATE node SET fluid_type = 'fluid_manhole1' where nodecat_id like 'CIRC_MANHOLE%';
+UPDATE node SET function_type = 'function_manhole1' where nodecat_id like 'CIRC_MANHOLE%';
