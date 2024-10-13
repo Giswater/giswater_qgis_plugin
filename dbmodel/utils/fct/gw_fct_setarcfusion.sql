@@ -218,7 +218,7 @@ BEGIN
 				-- get man and epa tables
 				IF v_project_type = 'UD' THEN
 					v_new_record.arc_type = v_arc_type;
-					SELECT man_table FROM sys_feature_cat s JOIN cat_feature cf ON cf.sys_feature_cat = s.id JOIN cat_feature_arc c ON c.id = cf.id WHERE c.id=v_new_record.arc_type;
+					SELECT man_table INTO v_man_table FROM sys_feature_cat s JOIN cat_feature cf ON cf.system_id = s.id JOIN cat_feature_arc c ON c.id = cf.id WHERE c.id=v_new_record.arc_type;
 					SELECT epa_table, epa_default INTO v_epa_table, v_epatype FROM sys_feature_epa_type s JOIN cat_feature_arc c ON s.id=c.epa_default WHERE c.id=v_new_record.arc_type;
 				ELSE
 					SELECT man_table INTO v_man_table FROM sys_feature_cat s JOIN cat_feature cf ON cf.sys_feature_cat = s.id JOIN cat_feature_arc c ON c.id = cf.id JOIN cat_arc ON arctype_id=c.id WHERE cat_arc.id=v_new_record.arccat_id;

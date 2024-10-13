@@ -65,7 +65,7 @@ INSERT INTO man_conduit VALUES ('100014');
 INSERT INTO inp_conduit VALUES ('100014');
 
 
-INSERT INTO inp_flwreg_weir VALUES(1,'237', (select arc_id from arc where node_1 = '237' AND node_2 = '239'),1,0.5,'TRANSVERSE', 16.35,1.5,null,null, 'NO', 2,1,0,0,null,null,null,null,'237WE1');
+INSERT INTO inp_flwreg_weir VALUES(1,'237', '100014',1,0.5,'TRANSVERSE', 16.35,1.5,null,null, 'NO', 2,1,0,0,null,null,null,null,'237WE1');
 
 
 UPDATE config_param_user SET value ='PARTIAL' WHERE parameter = 'inp_options_inertial_damping';

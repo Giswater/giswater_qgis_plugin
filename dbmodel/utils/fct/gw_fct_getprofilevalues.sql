@@ -606,7 +606,8 @@ BEGIN
 			WHERE fid=222 AND cur_user = current_user AND '||v_fymax||' IS NULL';
 
 		-- update node catalog
-		UPDATE temp_anl_node SET nodecat_id = 'BOTTOM' FROM cat_feature_node n WHERE n.type = sys_type AND isprofilesurface IS FALSE AND nodecat_id !='VNODE';
+		UPDATE temp_anl_node SET nodecat_id = 'BOTTOM' FROM cat_feature_node n JOIN cat_feature cf ON cf.id = n.id WHERE cf.system_id = sys_type 
+		AND isprofilesurface IS FALSE AND nodecat_id !='VNODE';
 		UPDATE temp_anl_node SET nodecat_id = 'TOP' WHERE nodecat_id NOT IN ('BOTTOM', 'VNODE') ;
 
 		-- update node type
