@@ -96,7 +96,7 @@ INSERT INTO man_type_category (category_type, feature_type, featurecat_id) VALUE
 INSERT INTO man_type_location (location_type, feature_type, featurecat_id) VALUES ('location_junction1','NODE','{JUNCTION}');
 INSERT INTO man_type_location (location_type, feature_type, featurecat_id) VALUES ('location_junction2','NODE','{JUNCTION}');
 INSERT INTO man_type_location (location_type, feature_type, featurecat_id) VALUES ('location_hydrant1','NODE','{HYDRANT}');
-INSERT INTO man_location_type (location_type, feature_type, featurecat_id) VALUES ('location_hydrant2','NODE','{HYDRANT}');
+INSERT INTO man_type_location (location_type, feature_type, featurecat_id) VALUES ('location_hydrant2','NODE','{HYDRANT}');
 
 INSERT INTO man_type_fluid (fluid_type, feature_type, featurecat_id) VALUES ('fluid_junction1','NODE','{JUNCTION}');
 INSERT INTO man_type_fluid (fluid_type, feature_type, featurecat_id) VALUES ('fluid_junction2','NODE','{JUNCTION}');
