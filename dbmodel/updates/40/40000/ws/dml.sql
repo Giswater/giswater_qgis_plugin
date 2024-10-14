@@ -57,6 +57,7 @@ VALUES ('v_edit_sector', 'form_generic', 'tab_none', 'muni_id', 'lyt_data_1', 's
 INSERT INTO config_form_fields(formname, formtype, tabname, columnname, layoutname, datatype, widgettype, label, tooltip, ismandatory, isparent, iseditable, isautoupdate, hidden)
 VALUES ('v_edit_sector', 'form_generic', 'tab_none', 'expl_id', 'lyt_data_1', 'string', 'text', 'Expl_id', 'Expl_id', false, false, true, false, false);
 
+-- 11/10/24
 INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device)
 VALUES('ve_node_shutoff_valve', 'tab_data', 'Data', 'Data', 'role_basic', NULL, '[
   {
@@ -118,7 +119,6 @@ VALUES('ve_node_shutoff_valve', 'tab_data', 'Data', 'Data', 'role_basic', NULL, 
 ]'::json, 0, '{4,5}');
 
 
--- Auto-generated SQL script #202410111206
 INSERT INTO config_form_tabs (formname,tabname,"label",tooltip,sys_role,tabactions,orderby,device)
 	VALUES ('ve_node_check_valve','tab_data','Data','Data','role_basic','[
   {
@@ -180,7 +180,6 @@ INSERT INTO config_form_tabs (formname,tabname,"label",tooltip,sys_role,tabactio
 ]'::json,0,'{4,5}');
 
 
--- Auto-generated SQL script #202410111207
 INSERT INTO config_form_tabs (formname,tabname,"label",tooltip,sys_role,tabactions,orderby,device)
 	VALUES ('ve_node_pr_reduc_valve','tab_data','Data','Data','role_basic','[
   {
@@ -240,6 +239,7 @@ INSERT INTO config_form_tabs (formname,tabname,"label",tooltip,sys_role,tabactio
     "disabled": false
   }
 ]'::json,0,'{4,5}');
+
 
 INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device)
 VALUES('ve_node_pr_green_valve', 'tab_data', 'Data', 'Data', 'role_basic', NULL, '[
@@ -302,7 +302,6 @@ VALUES('ve_node_pr_green_valve', 'tab_data', 'Data', 'Data', 'role_basic', NULL,
 ]'::json, 0, '{4,5}');
 
 
--- Auto-generated SQL script #202410111210
 INSERT INTO config_form_tabs (formname,tabname,"label",tooltip,sys_role,tabactions,orderby,device)
 	VALUES ('ve_node_pr_break_valve','tab_data','Data','Data','role_basic','[
   {
@@ -364,7 +363,6 @@ INSERT INTO config_form_tabs (formname,tabname,"label",tooltip,sys_role,tabactio
 ]'::json,0,'{4,5}');
 
 
--- Auto-generated SQL script #202410111232
 INSERT INTO config_form_tabs (formname,tabname,"label",tooltip,sys_role,tabactions,orderby,device)
 	VALUES ('ve_node_outfall_valve','tab_data','Data','Data','role_basic','[
   {
@@ -425,7 +423,7 @@ INSERT INTO config_form_tabs (formname,tabname,"label",tooltip,sys_role,tabactio
   }
 ]'::json,0,'{4,5}');
 
--- Auto-generated SQL script #202410111232
+
 INSERT INTO config_form_tabs (formname,tabname,"label",tooltip,sys_role,tabactions,orderby,device)
 	VALUES ('ve_node_pr_susta_valve','tab_data','Data','Data','role_basic','[
   {
@@ -486,7 +484,7 @@ INSERT INTO config_form_tabs (formname,tabname,"label",tooltip,sys_role,tabactio
   }
 ]'::json,0,'{4,5}');
 
--- Auto-generated SQL script #202410111233
+
 INSERT INTO config_form_tabs (formname,tabname,"label",tooltip,sys_role,tabactions,orderby,device)
 	VALUES ('ve_node_air_valve','tab_data','Data','Data','role_basic','[
   {
@@ -548,7 +546,6 @@ INSERT INTO config_form_tabs (formname,tabname,"label",tooltip,sys_role,tabactio
 ]'::json,0,'{4,5}');
 
 
--- Auto-generated SQL script #202410111234
 INSERT INTO config_form_tabs (formname,tabname,"label",tooltip,sys_role,tabactions,orderby,device)
 	VALUES ('ve_node_fl_contr_valve','tab_data','Data','Data','role_basic','[
   {
@@ -610,7 +607,6 @@ INSERT INTO config_form_tabs (formname,tabname,"label",tooltip,sys_role,tabactio
 ]'::json,0,'{4,5}');
 
 
--- Auto-generated SQL script #202410111234
 INSERT INTO config_form_tabs (formname,tabname,"label",tooltip,sys_role,tabactions,orderby,device)
 	VALUES ('ve_node_gen_purp_valve','tab_data','Data','Data','role_basic','[
   {
@@ -672,8 +668,6 @@ INSERT INTO config_form_tabs (formname,tabname,"label",tooltip,sys_role,tabactio
 ]'::json,0,'{4,5}');
 
 
-
--- Auto-generated SQL script #202410111235
 INSERT INTO config_form_tabs (formname,tabname,"label",tooltip,sys_role,tabactions,orderby,device)
 	VALUES ('ve_node_throttle_valve','tab_data','Data','Data','role_basic','[
   {
@@ -735,7 +729,6 @@ INSERT INTO config_form_tabs (formname,tabname,"label",tooltip,sys_role,tabactio
 ]'::json,0,'{4,5}');
 
 
--- Auto-generated SQL script #202410111239
 INSERT INTO config_form_tabs (formname,tabname,"label",tooltip,sys_role,tabactions,orderby,device)
 	VALUES ('ve_node_pump','tab_data','Data','Data','role_basic','[
   {
@@ -797,7 +790,6 @@ INSERT INTO config_form_tabs (formname,tabname,"label",tooltip,sys_role,tabactio
 ]'::json,0,'{4,5}');
 
 
--- Auto-generated SQL script #202410111240
 INSERT INTO config_form_tabs (formname,tabname,"label",tooltip,sys_role,tabactions,orderby,device)
 	VALUES ('ve_node_flowmeter','tab_data','Data','Data','role_basic','[
   {
@@ -918,3 +910,8 @@ VALUES('ve_node_pressure_meter', 'tab_data', 'Data', 'Data', 'role_basic', NULL,
     "disabled": false
   }
 ]'::json, 0, '{4,5}');
+
+-- 14/10/24
+INSERT INTO sys_message (id,error_message,hint_message,log_level,show_user,project_type,"source")
+	VALUES (3270,'The selected arc is not directly connected to the specified node. Please ensure the arc is directly linked to the node and select one that meets this requirement.','Select one arc that is connected to the selected node',2,true,'utils','core');
+

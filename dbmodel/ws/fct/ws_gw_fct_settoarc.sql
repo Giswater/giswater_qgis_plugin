@@ -76,7 +76,8 @@ BEGIN
 
 	-- check if to_arc is connected with node
 	IF v_arc_id NOT IN (SELECT arc_id FROM arc WHERE node_1 = v_feature_id AND state > 0 UNION SELECT arc_id FROM arc WHERE node_2 = v_feature_id AND state > 0) THEN
-		RAISE EXCEPTION 'The selected arc (ID: %) is not directly connected to the specified node (ID: %). Please ensure the arc is directly linked to the node and select one that meets this requirement.', v_arc_id, v_feature_id;
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                    "data":{"message":"3270", "function":"3006","debug_msg":""}}$$);';
 	END IF;
 
 	-- man_tables
