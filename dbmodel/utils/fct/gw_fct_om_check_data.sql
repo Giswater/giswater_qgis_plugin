@@ -278,7 +278,7 @@ BEGIN
 		JOIN cat_node ON nodecat_id=cat_node.id
 		JOIN cat_feature ON cat_node.nodetype_id = cat_feature.id
 		JOIN value_state_type ON state_type = value_state_type.id
-		WHERE value_state_type.is_operative IS TRUE AND sys_feature_cat = ''TANK'' and node_id NOT IN 
+		WHERE value_state_type.is_operative IS TRUE AND feature_class = ''TANK'' and node_id NOT IN 
 		(SELECT node_id FROM config_graph_mincut WHERE active IS TRUE)';
 
 		EXECUTE concat('SELECT count(*) FROM (',v_querytext,') a ') INTO v_count;

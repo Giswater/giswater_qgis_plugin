@@ -306,7 +306,7 @@ SELECT has_table('selector_sector') AS "Table 'selector_sector' exists";
 SELECT has_table('selector_state') AS "Table 'selector_state' exists";
 SELECT has_table('selector_workcat') AS "Table 'selector_workcat' exists";
 SELECT has_table('sys_addfields') AS "Table 'sys_addfields' exists";
-SELECT has_table('sys_feature_cat') AS "Table 'sys_feature_cat' exists";
+SELECT has_table('sys_feature_class') AS "Table 'sys_feature_class' exists";
 SELECT has_table('sys_feature_epa_type') AS "Table 'sys_feature_epa_type' exists";
 SELECT has_table('sys_feature_type') AS "Table 'sys_feature_type' exists";
 SELECT has_table('sys_foreignkey') AS "Table 'sys_foreignkey' exists";

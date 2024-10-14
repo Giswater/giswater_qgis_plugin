@@ -39,7 +39,7 @@ v_streetaxis text;
 v_streetaxis2 text;
 v_sys_type text;
 v_force_delete boolean;
-v_sys_feature_cat text;
+v_feature_class text;
 v_featurecat_id text;
 v_psector integer;
 v_auto_streetvalues_status boolean;
@@ -89,7 +89,7 @@ BEGIN
 	--modify values for custom view inserts
 	IF v_man_table IN (SELECT id FROM cat_feature WHERE feature_type = 'NODE') THEN
 		v_customfeature:=v_man_table;
-		v_man_table:=(SELECT man_table FROM cat_feature_node c JOIN cat_feature cf ON cf.id = c.id JOIN sys_feature_cat s ON cf.sys_feature_cat = s.id  WHERE c.id=v_man_table);
+		v_man_table:=(SELECT man_table FROM cat_feature_node c JOIN cat_feature cf ON cf.id = c.id JOIN sys_feature_class s ON cf.feature_class = s.id  WHERE c.id=v_man_table);
 	END IF;
 
 	v_type_man_table=v_man_table;
@@ -103,7 +103,7 @@ BEGIN
 
 	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
 		-- man2inp_values
-		SELECT child_layer, sys_feature_cat INTO v_man_view, v_sys_feature_cat FROM cat_feature f JOIN cat_node c ON c.nodetype_id = f.id WHERE c.id = NEW.nodecat_id;
+		SELECT child_layer, feature_class INTO v_man_view, v_feature_class FROM cat_feature f JOIN cat_node c ON c.nodetype_id = f.id WHERE c.id = NEW.nodecat_id;
 		v_input = concat('{"feature":{"type":"node", "childLayer":"',v_man_view,'", "id":"',NEW.node_id,'"}}');
 
 		-- check if streetname exists
@@ -154,7 +154,7 @@ BEGIN
 
 		-- Epa type
 		IF NEW.epa_type IN ('VALVE', 'PUMP') THEN
-			IF NEW.epa_type <> v_sys_feature_cat THEN
+			IF NEW.epa_type <> v_feature_class THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"3266", "function":"1320","debug_msg":null, "is_process":true}}$$)';
 			END IF;
@@ -535,7 +535,7 @@ BEGIN
 		NEW.om_state, NEW.conserv_state, NEW.access_type, NEW.placement_type, NEW.expl_id2, NEW.brand_id, NEW.model_id, NEW.serial_number, NEW.label_quadrant);
 
 
-		SELECT sys_feature_cat, cat_feature.id INTO v_sys_feature_cat, v_featurecat_id FROM cat_feature
+		SELECT feature_class, cat_feature.id INTO v_feature_class, v_featurecat_id FROM cat_feature
 		JOIN cat_node ON cat_feature.id=nodetype_id where cat_node.id=NEW.nodecat_id;
 
 		EXECUTE 'SELECT json_extract_path_text(double_geom,''activated'')::boolean, json_extract_path_text(double_geom,''value'')  
@@ -549,7 +549,7 @@ BEGIN
 				END IF;
 
 				INSERT INTO polygon(pol_id, sys_type, the_geom, featurecat_id,feature_id )
-				VALUES (v_pol_id, v_sys_feature_cat, (SELECT ST_Multi(ST_Envelope(ST_Buffer(node.the_geom,v_double_geom_buffer)))
+				VALUES (v_pol_id, v_feature_class, (SELECT ST_Multi(ST_Envelope(ST_Buffer(node.the_geom,v_double_geom_buffer)))
 				from node where node_id=NEW.node_id), v_featurecat_id, NEW.node_id);
 		END IF;
 
@@ -635,7 +635,7 @@ BEGIN
 
 		    v_man_table:= (SELECT man_table FROM cat_feature_node n
 			JOIN cat_feature cf ON cf.id = n.id
-			JOIN sys_feature_cat s ON cf.sys_feature_cat = s.id
+			JOIN sys_feature_class s ON cf.feature_class = s.id
 			JOIN cat_node ON cat_node.id=NEW.nodecat_id WHERE n.id = cat_node.nodetype_id LIMIT 1)::text;
 
 			--insert valve values for valve objects
@@ -903,8 +903,8 @@ BEGIN
 	  IF (NEW.nodecat_id != OLD.nodecat_id) THEN
 
 		-- man tables
-		v_old_node_type= (SELECT sys_feature_cat FROM cat_feature JOIN cat_node ON cat_feature.id=nodetype_id where cat_node.id=OLD.nodecat_id);
-		v_new_node_type= (SELECT sys_feature_cat FROM cat_feature JOIN cat_node ON cat_feature.id=nodetype_id where cat_node.id=NEW.nodecat_id);
+		v_old_node_type= (SELECT feature_class FROM cat_feature JOIN cat_node ON cat_feature.id=nodetype_id where cat_node.id=OLD.nodecat_id);
+		v_new_node_type= (SELECT feature_class FROM cat_feature JOIN cat_node ON cat_feature.id=nodetype_id where cat_node.id=NEW.nodecat_id);
 		-- Man and epa epa tables when parent is used
 			IF v_man_table='parent' THEN
 				IF v_new_node_type != v_old_node_type THEN
@@ -1029,7 +1029,7 @@ BEGIN
 		ELSIF v_man_table='parent' THEN
 		    v_man_table:= (SELECT man_table FROM cat_feature_node n
 			JOIN cat_feature cf ON cf.id = n.id
-			JOIN sys_feature_cat s ON cf.sys_feature_cat = s.id
+			JOIN sys_feature_class s ON cf.feature_class = s.id
 			JOIN cat_node ON cat_node.id=NEW.nodecat_id WHERE n.id = cat_node.nodetype_id LIMIT 1)::text;
 
 			IF v_man_table='man_valve' THEN

@@ -265,51 +265,51 @@ BEGIN
 			--cat_feature
 			ALTER TABLE cat_feature DISABLE TRIGGER gw_trg_cat_feature_after;
 			--node
-			INSERT INTO cat_feature (id, sys_feature_cat, feature_type, parent_layer, descript, code_autofill)
+			INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, descript, code_autofill)
 			VALUES ('JUNCTION','JUNCTION','NODE', 'v_edit_node', 'Junction', true) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature (id, sys_feature_cat, feature_type, parent_layer, descript, code_autofill)
+			INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, descript, code_autofill)
 			VALUES ('TANK','TANK','NODE', 'v_edit_node', 'Tank', true) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature (id, sys_feature_cat, feature_type, parent_layer, descript, code_autofill)
+			INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, descript, code_autofill)
 			VALUES ('RESERVOIR','SOURCE','NODE', 'v_edit_node', 'Reservoir', true) ON CONFLICT (id) DO NOTHING;
 			--arc
-			INSERT INTO cat_feature (id, sys_feature_cat, feature_type, parent_layer, descript, code_autofill)
+			INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, descript, code_autofill)
 			VALUES ('PIPE','PIPE','ARC', 'v_edit_arc', 'Pipe', true) ON CONFLICT (id) DO NOTHING;
 
 			--nodarc (AS arc)
-			INSERT INTO cat_feature (id, sys_feature_cat, feature_type, parent_layer, descript, code_autofill)
+			INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, descript, code_autofill)
 			VALUES ('ARCCHV','VARC','ARC', 'v_edit_arc', 'Check valve (arc)', true) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature (id, sys_feature_cat, feature_type, parent_layer, descript, code_autofill)
+			INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, descript, code_autofill)
 			VALUES ('ARCFCV','VARC','ARC', 'v_edit_arc', 'Flow control valve (arc)', true) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature (id, sys_feature_cat, feature_type, parent_layer, descript, code_autofill)
+			INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, descript, code_autofill)
 			VALUES ('ARCGPV','VARC','ARC', 'v_edit_arc', 'General purpose valve (arc)', true) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature (id, sys_feature_cat, feature_type, parent_layer, descript, code_autofill)
+			INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, descript, code_autofill)
 			VALUES ('ARCPBV','VARC','ARC', 'v_edit_arc', 'Presure break valve (arc)', true) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature (id, sys_feature_cat, feature_type, parent_layer, descript, code_autofill)
+			INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, descript, code_autofill)
 			VALUES ('ARCPSV','VARC','ARC', 'v_edit_arc', 'Presure sustain valve (arc)', true) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature (id, sys_feature_cat, feature_type, parent_layer, descript, code_autofill)
+			INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, descript, code_autofill)
 			VALUES ('ARCPRV','VARC','ARC', 'v_edit_arc', 'Presure reduction valve (arc)', true) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature (id, sys_feature_cat, feature_type, parent_layer, descript, code_autofill)
+			INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, descript, code_autofill)
 			VALUES ('ARCTCV','VARC','ARC', 'v_edit_arc', 'Throttle control valve (arc)', true) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature (id, sys_feature_cat, feature_type, parent_layer, descript, code_autofill)
+			INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, descript, code_autofill)
 			VALUES ('ARCPUMP','VARC','ARC', 'v_edit_arc', 'Pump (arc)', true) ON CONFLICT (id) DO NOTHING;
 
 			--nodarc (AS node)
 
-			INSERT INTO cat_feature (id, sys_feature_cat, feature_type, parent_layer, descript, code_autofill)
+			INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, descript, code_autofill)
 			VALUES ('FCV','VALVE','NODE', 'v_edit_node','Flow control valve when comes from giswater project', true) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature (id, sys_feature_cat, feature_type, parent_layer, descript, code_autofill)
+			INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, descript, code_autofill)
 			VALUES ('GPV','VALVE','NODE', 'v_edit_node','General purpose valve when comes from giswater project', true) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature (id, sys_feature_cat, feature_type, parent_layer, descript, code_autofill)
+			INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, descript, code_autofill)
 			VALUES ('PBV','VALVE','NODE', 'v_edit_node','Presure break valve when comes from giswater project', true) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature (id, sys_feature_cat, feature_type, parent_layer, descript, code_autofill)
+			INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, descript, code_autofill)
 			VALUES ('PSV','VALVE','NODE', 'v_edit_node','Presure sustain valve when comes from giswater project', true) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature (id, sys_feature_cat, feature_type, parent_layer, descript, code_autofill)
+			INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, descript, code_autofill)
 			VALUES ('PRV','VALVE','NODE', 'v_edit_node','Presure reduction valve when comes from giswater project', true) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature (id, sys_feature_cat, feature_type, parent_layer, descript, code_autofill)
+			INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, descript, code_autofill)
 			VALUES ('TCV','VALVE','NODE', 'v_edit_node','Throttle control valve when comes from giswater project', true) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature (id, sys_feature_cat, feature_type, parent_layer, descript, code_autofill)
+			INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, descript, code_autofill)
 			VALUES ('PUMP','PUMP','NODE', 'v_edit_node','Pump', true) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_feature (id, sys_feature_cat, feature_type, parent_layer, descript, code_autofill)
+			INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, descript, code_autofill)
 			VALUES ('SHORTPIPE','VALVE','NODE', 'v_edit_node','Other shortpipe (meters, checkvalve, shutoff valves)  when comes from giswater project', true)
 			ON CONFLICT (id) DO NOTHING;
 

@@ -64,7 +64,7 @@ BEGIN
 			UPDATE node SET the_geom=NEW.the_geom WHERE node_id = OLD.node_id;
 
 			-- Parent id
-			SELECT concat('man_',lower(sys_feature_cat)), pol_id INTO v_tablename, v_pol_id FROM polygon JOIN cat_feature ON cat_feature.id=polygon.sys_type
+			SELECT concat('man_',lower(feature_class)), pol_id INTO v_tablename, v_pol_id FROM polygon JOIN cat_feature ON cat_feature.id=polygon.sys_type
 			WHERE ST_DWithin(NEW.the_geom, polygon.the_geom, 0.001) LIMIT 1;
 
 			IF v_pol_id IS NOT NULL THEN
@@ -90,8 +90,8 @@ BEGIN
 
 		-- catalog
 		IF (NEW.nodecat_id <> OLD.nodecat_id) THEN
-			v_old_nodetype:= (SELECT cat_feature.sys_feature_cat FROM cat_feature JOIN cat_node ON (((cat_feature.id)::text = (cat_node.nodetype_id)::text)) WHERE cat_node.id=OLD.nodecat_id)::text;
-			v_new_nodetype:= (SELECT cat_feature.sys_feature_cat FROM cat_feature JOIN cat_node ON (((cat_feature.id)::text = (cat_node.nodetype_id)::text)) WHERE cat_node.id=NEW.nodecat_id)::text;
+			v_old_nodetype:= (SELECT cat_feature.feature_class FROM cat_feature JOIN cat_node ON (((cat_feature.id)::text = (cat_node.nodetype_id)::text)) WHERE cat_node.id=OLD.nodecat_id)::text;
+			v_new_nodetype:= (SELECT cat_feature.feature_class FROM cat_feature JOIN cat_node ON (((cat_feature.id)::text = (cat_node.nodetype_id)::text)) WHERE cat_node.id=NEW.nodecat_id)::text;
 			IF (quote_literal(v_old_nodetype)::text <> quote_literal(v_new_nodetype)::text) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				 "data":{"message":"1016", "function":"1310","debug_msg":null}}$$);';

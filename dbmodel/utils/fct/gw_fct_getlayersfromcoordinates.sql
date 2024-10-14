@@ -221,7 +221,7 @@ BEGIN
                             v_id := v_ids_item->>'id';
                             v_sql2 = 'SELECT '||v_parenttype||'_type FROM '||quote_ident(v_layer)||' WHERE '||v_idname||' = '''||v_id||'''';
                             EXECUTE v_sql2 INTO v_featuretype;
-                            IF (SELECT sys_feature_cat FROM cat_feature WHERE id = v_featuretype) = 'VALVE' AND v_valve_text IS NULL THEN
+                            IF (SELECT feature_class FROM cat_feature WHERE id = v_featuretype) = 'VALVE' AND v_valve_text IS NULL THEN
 	                            EXECUTE 'SELECT child_layer FROM cat_feature WHERE id = '''||v_featuretype||'''' INTO v_valve_tablename;
                                 v_valve_id := v_id;
                                 EXECUTE 'SELECT closed_valve FROM '||quote_ident(v_layer)||' WHERE '||v_idname||' = '''||v_id||'''' INTO v_closed_valve;

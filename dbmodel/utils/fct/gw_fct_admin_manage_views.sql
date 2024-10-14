@@ -70,7 +70,7 @@ v_replace_query text;
 v_trg_fields text;
 v_gwversion text;
 v_systemid text;
-v_cur_sys_feature_cat text;
+v_cur_feature_class text;
 v_alias text;
 v_onlychilds boolean;
 BEGIN
@@ -199,10 +199,10 @@ BEGIN
 	ELSIF v_action='ADD-FIELD' THEN
 		--save view definition on the temp table and delete the view. Order of saving is the order defined in input array
 			FOREACH rec_view IN ARRAY(v_viewlist) LOOP
-			EXECUTE 'SELECT sys_feature_cat FROM cat_feature WHERE child_layer = '||quote_literal(rec_view)||''
-			into v_cur_sys_feature_cat;
+			EXECUTE 'SELECT feature_class FROM cat_feature WHERE child_layer = '||quote_literal(rec_view)||''
+			into v_cur_feature_class;
 
-				IF v_systemid IS NULL  OR upper(v_cur_sys_feature_cat) = upper(v_systemid) THEN
+				IF v_systemid IS NULL  OR upper(v_cur_feature_class) = upper(v_systemid) THEN
 
 					EXECUTE 'INSERT INTO temp_csv (fid, source, csv1, csv2)
 					SELECT ''380'', '||quote_literal(rec_view)||',  definition, 

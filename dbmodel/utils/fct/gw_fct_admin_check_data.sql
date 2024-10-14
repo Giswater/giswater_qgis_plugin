@@ -198,9 +198,9 @@ BEGIN
 			INTO v_definition;
 
 			--check if the view has well defined man_table (311)
-			IF v_project_type = 'WS' OR (v_project_type = 'UD' AND rec.sys_feature_cat!='GULLY' AND rec.sys_feature_cat!='CONNEC') THEN
+			IF v_project_type = 'WS' OR (v_project_type = 'UD' AND rec.feature_class!='GULLY' AND rec.feature_class!='CONNEC') THEN
 
-				IF position(concat('man_',lower(rec.sys_feature_cat)) in v_definition) = 0 THEN
+				IF position(concat('man_',lower(rec.feature_class)) in v_definition) = 0 THEN
 
 					v_errortext=concat('ERROR-311: View ',rec.child_layer,' has wrongly defined man_table');
 

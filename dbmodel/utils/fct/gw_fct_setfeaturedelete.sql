@@ -82,7 +82,7 @@ BEGIN
 	INTO v_featurecat;
 
 	IF v_feature_type!='gully' THEN
-		EXECUTE 'SELECT man_table FROM cat_feature_'||v_feature_type||' c JOIN cat_feature cf ON c.id = cf.id JOIN sys_feature_cat s ON cf.sys_feature_cat = s.id WHERE s.id = '''||v_featurecat||''';'
+		EXECUTE 'SELECT man_table FROM cat_feature_'||v_feature_type||' c JOIN cat_feature cf ON c.id = cf.id JOIN sys_feature_class s ON cf.feature_class = s.id WHERE s.id = '''||v_featurecat||''';'
 		INTO v_man_table;
 	END IF;
 

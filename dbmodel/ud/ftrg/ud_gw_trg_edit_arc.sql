@@ -49,7 +49,7 @@ BEGIN
 	--modify values for custom view inserts
 	IF v_man_table IN (SELECT id FROM cat_feature_arc) THEN
 		v_customfeature:=v_man_table;
-		v_man_table:=(SELECT man_table FROM cat_feature_arc c JOIN cat_feature cf ON c.id = cf.id JOIN sys_feature_cat s ON cf.sys_feature_cat = s.id WHERE c.id=v_man_table);
+		v_man_table:=(SELECT man_table FROM cat_feature_arc c JOIN cat_feature cf ON c.id = cf.id JOIN sys_feature_class s ON cf.feature_class = s.id WHERE c.id=v_man_table);
 	END IF;
 
 	v_type_v_man_table:=v_man_table;
@@ -113,7 +113,7 @@ BEGIN
 			END IF;
 
 			IF (NEW.arc_type IS NULL) AND v_man_table !='parent' THEN
-				NEW.arc_type:= (SELECT c.id FROM cat_feature_arc c JOIN cat_feature cf ON c.id = cf.id JOIN sys_feature_cat s ON cf.sys_feature_cat = s.id WHERE man_table=v_type_v_man_table LIMIT 1);
+				NEW.arc_type:= (SELECT c.id FROM cat_feature_arc c JOIN cat_feature cf ON c.id = cf.id JOIN sys_feature_class s ON cf.feature_class = s.id WHERE man_table=v_type_v_man_table LIMIT 1);
 			END IF;
 		END IF;
 
@@ -479,7 +479,7 @@ BEGIN
 			INSERT INTO man_varc (arc_id) VALUES (NEW.arc_id);
 
 		ELSIF v_man_table='parent' THEN
-		v_man_table := (SELECT man_table FROM cat_feature_arc c	JOIN cat_feature cf ON c.id = cf.id JOIN sys_feature_cat s ON cf.sys_feature_cat = s.id
+		v_man_table := (SELECT man_table FROM cat_feature_arc c	JOIN cat_feature cf ON c.id = cf.id JOIN sys_feature_class s ON cf.feature_class = s.id
 		JOIN cat_arc ON c.id = cat_arc.arctype_id WHERE cat_arc.id=NEW.arccat_id);
 		v_sql:= 'INSERT INTO '||v_man_table||' (arc_id) VALUES ('||quote_literal(NEW.arc_id)||')';
 		EXECUTE v_sql;
@@ -632,8 +632,8 @@ BEGIN
 
 		 -- UPDATE management values
 		IF (NEW.arc_type <> OLD.arc_type) THEN
-			v_new_man_table:= (SELECT man_table FROM cat_feature_arc  c JOIN cat_feature cf ON c.id = cf.id JOIN sys_feature_cat s ON cf.sys_feature_cat = s.id WHERE c.id = NEW.arc_type);
-			v_old_man_table:= (SELECT man_table FROM cat_feature_arc  c JOIN cat_feature cf ON c.id = cf.id JOIN sys_feature_cat s ON cf.sys_feature_cat = s.id WHERE c.id = OLD.arc_type);
+			v_new_man_table:= (SELECT man_table FROM cat_feature_arc  c JOIN cat_feature cf ON c.id = cf.id JOIN sys_feature_class s ON cf.feature_class = s.id WHERE c.id = NEW.arc_type);
+			v_old_man_table:= (SELECT man_table FROM cat_feature_arc  c JOIN cat_feature cf ON c.id = cf.id JOIN sys_feature_class s ON cf.feature_class = s.id WHERE c.id = OLD.arc_type);
 			IF v_new_man_table IS NOT NULL THEN
 				v_sql:= 'DELETE FROM '||v_old_man_table||' WHERE arc_id= '||quote_literal(OLD.arc_id);
 				EXECUTE v_sql;

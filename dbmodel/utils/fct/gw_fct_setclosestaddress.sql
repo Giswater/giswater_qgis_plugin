@@ -123,13 +123,13 @@ BEGIN
 	-- update with feature WHERE
 	ELSE
 		IF v_updatevalues='nullStreet' THEN
-			v_partialquery2=' WHERE cf.sys_feature_cat='||quote_literal(v_catfeature)||' AND a.streetaxis_id IS NULL ';
+			v_partialquery2=' WHERE cf.feature_class='||quote_literal(v_catfeature)||' AND a.streetaxis_id IS NULL ';
 		ELSIF v_updatevalues='nullPostnumber' THEN
-			v_partialquery2=' WHERE cf.sys_feature_cat='||quote_literal(v_catfeature)||' AND a.postnumber IS NULL ';
+			v_partialquery2=' WHERE cf.feature_class='||quote_literal(v_catfeature)||' AND a.postnumber IS NULL ';
 		ELSIF v_updatevalues='nullPostcomplement' THEN
-			v_partialquery2=' WHERE cf.sys_feature_cat='||quote_literal(v_catfeature)||' AND a.postcomplement IS NULL ';
+			v_partialquery2=' WHERE cf.feature_class='||quote_literal(v_catfeature)||' AND a.postcomplement IS NULL ';
 		ELSIF v_updatevalues='allValues' THEN
-			v_partialquery2=' WHERE cf.sys_feature_cat='||quote_literal(v_catfeature)||'';
+			v_partialquery2=' WHERE cf.feature_class='||quote_literal(v_catfeature)||'';
 		END IF;
 	END IF;
 

@@ -16,8 +16,8 @@ SELECT plan(1);
 -- Extract and test the "status" field from the function's JSON response
 SELECT is (
     (gw_fct_settoarc($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{},
-    "feature":{"featureType":"SHUTOFF_VALVE", "id":"1082"}, "data":{"filterFields":{}, "pageInfo":{},
-    "arcId":"113910", "dmaId":"2", "presszoneId":"3", "sectorId":"3", "dqaId":"1"}}$$)::JSON)->>'status',
+    "feature":{"featureType":"JUNCTION", "id":"1076"}, "data":{"filterFields":{}, "pageInfo":{},
+    "arcId":"2086", "dmaId":"2", "presszoneId":"3", "sectorId":"3", "dqaId":"1"}}$$)::JSON)->>'status',
     'Accepted',
     'Check if gw_fct_settoarc returns status "Accepted"'
 );

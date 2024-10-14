@@ -11,11 +11,11 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_admin_manage_visit_view(p_data jso
 $BODY$
 
 
-DECLARE 
+DECLARE
 
 v_schemaname text;
 v_project_type text;
-v_feature_system_id text;
+v_feature_class text;
 v_class_id integer;
 v_om_visit_x_feature_fields text;
 v_om_visit_fields text;
@@ -30,7 +30,7 @@ v_old_datatype text;
 BEGIN
 
 	SET search_path = "SCHEMA_NAME", public;
-	
+
  	SELECT project_type INTO v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- get input parameters
@@ -40,9 +40,9 @@ BEGIN
 	v_old_ct_param = ((p_data ->> 'body')::json->>'old_ct_param')::text;
 	v_old_id_param = ((p_data ->> 'body')::json->>'old_id_param')::text;
 	v_old_datatype = ((p_data ->> 'body')::json->>'old_datatype')::text;
-	v_feature_system_id = ((p_data ->> 'body')::json->>'feature_system_id')::text;
+	v_feature_class = ((p_data ->> 'body')::json->>'feature_class')::text;
 	v_viewname = ((p_data ->> 'body')::json->>'viewname')::text;
-	
+
 	v_old_a_param = replace (v_old_a_param,',',E',\n    ');
 	v_old_ct_param = replace (v_old_ct_param,',',E',\n            ');
 
@@ -54,7 +54,7 @@ BEGIN
 	INTO v_new_parameters
 	FROM config_visit_parameter JOIN config_visit_class_x_parameter ON config_visit_parameter.id=config_visit_class_x_parameter.parameter_id
 	WHERE class_id=v_class_id AND config_visit_parameter.active IS TRUE AND config_visit_class_x_parameter.active IS TRUE;
-	 
+
 	raise notice 'v_new_parameters - a,%',v_new_parameters.a_param;
 	raise notice 'v_old_a_param,%',v_old_a_param;
 	raise notice 'v_new_parameters - ct,%',v_new_parameters.ct_param;
@@ -62,27 +62,27 @@ BEGIN
 
 	IF (SELECT EXISTS ( SELECT 1 FROM information_schema.tables WHERE  table_schema = v_schemaname AND table_name = v_viewname)) IS FALSE THEN
 		-- create a new view if doesn't exist
-	EXECUTE 'SELECT DISTINCT string_agg(concat(''om_visit_x_'||v_feature_system_id||'.'',column_name)::text,'', '')
-		FROM information_schema.columns where table_name=''om_visit_x_'||v_feature_system_id||''' and table_schema='''||v_schemaname||''' 
+	EXECUTE 'SELECT DISTINCT string_agg(concat(''om_visit_x_'||v_feature_class||'.'',column_name)::text,'', '')
+		FROM information_schema.columns where table_name=''om_visit_x_'||v_feature_class||''' and table_schema='''||v_schemaname||''' 
 		and column_name NOT IN (''is_last'', ''id'')'
 		INTO v_om_visit_x_feature_fields;
-		    		    
+
 		EXECUTE 'SELECT DISTINCT string_agg(concat(''om_visit.'',column_name)::text,'', '')
 		FROM information_schema.columns where table_name=''om_visit'' and table_schema='''||v_schemaname||''' and column_name!=''publish'' and column_name NOT IN (''id'', ''vehicle_id'', ''unit_id'', ''visit_type'', ''the_geom'')'
 		INTO v_om_visit_fields;
-		
+
 		raise notice 'v_new_parameters.id_param,%',v_new_parameters.id_param;
-			
+
 		EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||lower(v_viewname)||' AS
 			SELECT '||v_om_visit_x_feature_fields||',
-            '||v_feature_system_id||'.code,
-            '||v_feature_system_id||'.the_geom,
+            '||v_feature_class||'.code,
+            '||v_feature_class||'.the_geom,
 			'||v_om_visit_fields||',
 			'||v_new_parameters.a_param||'
 			FROM om_visit
 			JOIN config_visit_class ON config_visit_class.id = om_visit.class_id
-			JOIN om_visit_x_'||v_feature_system_id||' ON om_visit.id = om_visit_x_'||v_feature_system_id||'.visit_id
-			JOIN '||v_feature_system_id||' ON '||v_feature_system_id||'.'||v_feature_system_id||'_id::text = om_visit_x_'||v_feature_system_id||'.'||v_feature_system_id||'_id::text
+			JOIN om_visit_x_'||v_feature_class||' ON om_visit.id = om_visit_x_'||v_feature_class||'.visit_id
+			JOIN '||v_feature_class||' ON '||v_feature_class||'.'||v_feature_class||'_id::text = om_visit_x_'||v_feature_class||'.'||v_feature_class||'_id::text
 			LEFT JOIN ( SELECT ct.visit_id,
 		    '||v_new_parameters.ct_param||'
 			    FROM crosstab(''SELECT visit_id, om_visit_event.parameter_id, value 
@@ -93,9 +93,9 @@ BEGIN
 			    ct(visit_id integer, '||v_new_parameters.datatype||')) a ON a.visit_id = om_visit.id
 				WHERE config_visit_class.ismultievent = true AND config_visit_class.id='||v_class_id||';';
 
-	ELSE 
+	ELSE
 		-- replace values of an existing view
-		
+
 		--capture the definition of the view
 		EXECUTE'SELECT pg_get_viewdef('''||v_schemaname||'.'||v_viewname||''', true);'
 		INTO v_definition;
@@ -105,22 +105,22 @@ BEGIN
 		v_definition = replace(v_definition,v_old_a_param,v_new_parameters.a_param);
 		v_definition = replace(v_definition,v_old_id_param,v_new_parameters.id_param);
 		v_definition = replace(v_definition,v_old_datatype,v_new_parameters.datatype);
-		
+
 		RAISE NOTICE 'v_definition,%',v_definition;
 
 		--replace the existing view and create the trigger
-				
+
 		EXECUTE 'DROP VIEW '||v_schemaname||'.'||v_viewname||';';
 		EXECUTE 'CREATE OR REPLACE VIEW '||v_schemaname||'.'||v_viewname||' AS '||v_definition||';';
-		
+
 	END IF;
 
-	--create trigger on view 
+	--create trigger on view
 	EXECUTE 'DROP TRIGGER IF EXISTS gw_trg_om_visit_multievent ON '||v_schemaname||'.'||v_viewname||';';
 
 	EXECUTE 'CREATE TRIGGER gw_trg_om_visit_multievent
 	INSTEAD OF INSERT OR UPDATE OR DELETE ON '||v_schemaname||'.'||v_viewname||'
-	FOR EACH ROW EXECUTE PROCEDURE '||v_schemaname||'.gw_trg_om_visit_multievent('||v_class_id||');';		
+	FOR EACH ROW EXECUTE PROCEDURE '||v_schemaname||'.gw_trg_om_visit_multievent('||v_class_id||');';
 
 	RETURN;
 

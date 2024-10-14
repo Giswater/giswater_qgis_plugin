@@ -786,7 +786,7 @@ UPDATE config_form_fields SET placeholder = NULL where formname like '%ve_gully%
 
 UPDATE config_form_fields SET widgettype = 'typeahead',
 dv_querytext = 'SELECT id, id as idval FROM cat_grate WHERE id IS NOT NULL' FROM cat_feature WHERE
-sys_feature_cat = 'NETGULLY' AND formname = child_layer and columnname = 'gratecat_id';
+feature_class = 'NETGULLY' AND formname = child_layer and columnname = 'gratecat_id';
 
 --placeholder
 UPDATE config_form_fields SET placeholder = 'Only when state is obsolete' where columnname = 'workcat_id_end';

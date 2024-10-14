@@ -32,7 +32,7 @@ v_config_fields text;
 rec record;
 
 v_cat_feature text;
-v_feature_sys_feature_cat text;
+v_feature_class text;
 v_man_fields text;
 v_man_addfields text;
 v_orderby integer;
@@ -55,7 +55,7 @@ BEGIN
 	v_view_name = ((p_data ->>'data')::json->>'view_name')::text;
 	v_feature_type = lower(((p_data ->>'data')::json->>'feature_type')::text);
 
-	v_feature_sys_feature_cat  = (SELECT lower(sys_feature_cat) FROM cat_feature where id=v_cat_feature);
+	v_feature_class  = (SELECT lower(feature_class) FROM cat_feature where id=v_cat_feature);
 
 	IF v_view_name NOT IN (SELECT tableinfo_id FROM config_info_layer_x_type) THEN
         INSERT INTO sys_table(id, descript, sys_role)
@@ -70,7 +70,7 @@ BEGIN
 	END IF;
 
 	--manage tab hydrometer on netwjoin
-	IF v_view_name IS NOT NULL AND v_project_type = 'WS' and v_feature_sys_feature_cat = 'netwjoin' THEN
+	IF v_view_name IS NOT NULL AND v_project_type = 'WS' and v_feature_class = 'netwjoin' THEN
 		INSERT INTO config_form_tabs ( formname, tabname, label, tooltip, sys_role, tabfunction, tabactions, device, orderby)
 		SELECT v_view_name,  tabname, label, tooltip, sys_role, tabfunction, tabactions, device, orderby
 		FROM config_form_tabs WHERE tabname in ('tab_hydrometer', 'tab_hydrometer_val') ON CONFLICT (formname, tabname) DO NOTHING;
@@ -112,7 +112,7 @@ BEGIN
 
 	--select columns from man_* table without repeating the identifier
 	v_man_fields = 'SELECT DISTINCT column_name::text, data_type::text, numeric_precision, numeric_scale
-	FROM information_schema.columns where table_name=''man_'||v_feature_sys_feature_cat||''' and table_schema='''||v_schemaname||''' 
+	FROM information_schema.columns where table_name=''man_'||v_feature_class||''' and table_schema='''||v_schemaname||''' 
 	and column_name!='''||v_feature_type||'_id'' group by column_name, data_type,numeric_precision, numeric_scale';
 
 

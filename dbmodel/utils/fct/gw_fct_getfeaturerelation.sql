@@ -80,20 +80,20 @@ BEGIN
 	EXECUTE 'SELECT '||v_feature_type||'_type FROM v_edit_'||v_feature_type||' WHERE '||v_feature_type||'_id = '''||v_feature_id||''''
 	INTO v_featurecat;
 
-	EXECUTE 'SELECT man_table FROM cat_feature_'||v_feature_type||' c JOIN cat_feature cf ON c.id = cf.id JOIN sys_feature_cat s ON cf.sys_feature_cat = s.id WHERE s.id = '''||v_featurecat||''';'
+	EXECUTE 'SELECT man_table FROM cat_feature_'||v_feature_type||' c JOIN cat_feature cf ON c.id = cf.id JOIN sys_feature_class s ON cf.feature_class = s.id WHERE s.id = '''||v_featurecat||''';'
 	INTO v_man_table;
 
 	IF v_feature_type='arc' THEN
 		--check connec& gully related to arc
 		SELECT string_agg(feature_id,',') INTO v_connect_connec FROM v_ui_arc_x_relations
-		JOIN sys_feature_cat on sys_feature_cat.id=v_ui_arc_x_relations.sys_type WHERE type='CONNEC' AND  arc_id = v_feature_id;
+		JOIN sys_feature_class ON sys_feature_class.id=v_ui_arc_x_relations.sys_type WHERE type='CONNEC' AND  arc_id = v_feature_id;
 
 		IF v_connect_connec IS NOT NULL THEN
 			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (151, v_result_id, concat('Connecs connected with the feature :',v_connect_connec ));
 		END IF;
 
 		SELECT string_agg(feature_id,',') INTO v_connect_gully FROM v_ui_arc_x_relations
-		JOIN sys_feature_cat on sys_feature_cat.id=v_ui_arc_x_relations.sys_type WHERE type='GULLY' AND  arc_id = v_feature_id;
+		JOIN sys_feature_class ON sys_feature_class.id=v_ui_arc_x_relations.sys_type WHERE type='GULLY' AND  arc_id = v_feature_id;
 
 		IF v_connect_gully IS NOT NULL THEN
 

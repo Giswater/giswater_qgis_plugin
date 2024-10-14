@@ -54,7 +54,7 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 				VALUES (NEW.node_id, NEW.new_top_elev, NEW.new_ymax, NEW.new_node_type, NEW.new_nodecat_id, NEW.new_annotation, NEW.new_observ, NEW.expl_id,
 				NEW.the_geom, NEW.new_matcat_id);
 
-				IF (SELECT sys_feature_cat FROM cat_feature WHERE id=NEW.new_node_type) = 'MANHOLE' THEN
+				IF (SELECT feature_class FROM cat_feature WHERE id=NEW.new_node_type) = 'MANHOLE' THEN
 					UPDATE man_manhole SET step_pp=NEW.new_step_pp, step_fe=NEW.new_step_fe, step_replace=NEW.new_step_replace, cover=NEW.new_cover
 					WHERE node_id=NEW.node_id;
 				END IF;
@@ -65,7 +65,7 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 				node_type=NEW.new_node_type, annotation=NEW.new_annotation, observ=NEW.new_observ, matcat_id=NEW.new_matcat_id
 				WHERE node_id=NEW.node_id;
 
-				IF (SELECT sys_feature_cat FROM cat_feature WHERE id=NEW.new_node_type) = 'MANHOLE' THEN
+				IF (SELECT feature_class FROM cat_feature WHERE id=NEW.new_node_type) = 'MANHOLE' THEN
 					UPDATE man_manhole SET step_pp=NEW.new_step_pp, step_fe=NEW.new_step_fe, step_replace=NEW.new_step_replace, cover=NEW.new_cover
 					WHERE node_id=NEW.node_id;
 				END IF;
@@ -76,7 +76,7 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 				annotation=NEW.new_annotation, observ=NEW.new_observ, matcat_id=NEW.new_matcat_id
 				WHERE node_id=NEW.node_id;
 
-				IF (SELECT sys_feature_cat FROM cat_feature WHERE id=NEW.new_node_type) = 'MANHOLE' THEN
+				IF (SELECT feature_class FROM cat_feature WHERE id=NEW.new_node_type) = 'MANHOLE' THEN
 					UPDATE man_manhole SET step_pp=NEW.new_step_pp, step_fe=NEW.new_step_fe, step_replace=NEW.new_step_replace, cover=NEW.new_cover
 					WHERE node_id=NEW.node_id;
 				END IF;

@@ -54,7 +54,7 @@ v_y float;
 v_codeautofill boolean;
 v_srid integer;
 v_force_delete boolean;
-v_sys_feature_cat text;
+v_feature_class text;
 v_psector integer;
 v_trace_featuregeom boolean;
 v_seq_name text;
@@ -89,7 +89,7 @@ BEGIN
 	-- modify values for custom view inserts
 	IF v_man_table IN (SELECT id FROM cat_feature_node) THEN
 		v_customfeature:=v_man_table;
-		v_man_table:=(SELECT man_table FROM cat_feature_node c JOIN cat_feature cf ON cf.id = c.id JOIN sys_feature_cat s ON cf.sys_feature_cat = s.id  WHERE c.id=v_man_table);
+		v_man_table:=(SELECT man_table FROM cat_feature_node c JOIN cat_feature cf ON cf.id = c.id JOIN sys_feature_class s ON cf.feature_class = s.id  WHERE c.id=v_man_table);
 	END IF;
 
 	v_type_v_man_table:=v_man_table;
@@ -244,7 +244,7 @@ BEGIN
 			END IF;
 
 			IF NEW.node_type IS NULL AND v_man_table !='parent' THEN
-				NEW.node_type:= (SELECT id FROM cat_feature_node c JOIN cat_feature cf ON cf.id = n.id JOIN sys_feature_cat s ON cf.sys_feature_cat = s.id WHERE man_table=v_type_v_man_table LIMIT 1);
+				NEW.node_type:= (SELECT id FROM cat_feature_node c JOIN cat_feature cf ON cf.id = n.id JOIN sys_feature_class s ON cf.feature_class = s.id WHERE man_table=v_type_v_man_table LIMIT 1);
 			END IF;
 		END IF;
 
@@ -616,12 +616,12 @@ BEGIN
 		END IF;
 
 		--check if feature is double geom
-		SELECT sys_feature_cat INTO v_sys_feature_cat FROM cat_feature WHERE cat_feature.id=NEW.node_type;
+		SELECT feature_class INTO v_feature_class FROM cat_feature WHERE cat_feature.id=NEW.node_type;
 
-		-- set and get id for polygon
+		-- set and get id for polygonFse
 		IF (v_doublegeometry IS TRUE) THEN
 			INSERT INTO polygon(sys_type, the_geom, featurecat_id, feature_id )
-			VALUES (v_sys_feature_cat, (SELECT ST_Multi(ST_Envelope(ST_Buffer(node.the_geom,v_doublegeom_buffer)))
+			VALUES (v_feature_class, (SELECT ST_Multi(ST_Envelope(ST_Buffer(node.the_geom,v_doublegeom_buffer)))
 			from node where node_id=NEW.node_id), NEW.node_type, NEW.node_id);
 		END IF;
 
@@ -681,7 +681,7 @@ BEGIN
 
 		ELSIF v_man_table='parent' THEN
 
-			v_man_table:= (SELECT man_table FROM cat_feature_node c JOIN cat_feature cf ON cf.id = n.id JOIN sys_feature_cat s ON cf.sys_feature_cat = s.id WHERE c.id=NEW.node_type);
+			v_man_table:= (SELECT man_table FROM cat_feature_node c JOIN cat_feature cf ON cf.id = n.id JOIN sys_feature_class s ON cf.feature_class = s.id WHERE c.id=NEW.node_type);
 			v_sql:= 'INSERT INTO '||v_man_table||' (node_id) VALUES ('||quote_literal(NEW.node_id)||')';
 			EXECUTE v_sql;
 		END IF;
@@ -779,8 +779,8 @@ BEGIN
 
 		-- node type
 		IF (NEW.node_type <> OLD.node_type) THEN
-			v_new_v_man_table:= (SELECT man_table FROM cat_feature_node c JOIN cat_feature cf ON cf.id = n.id JOIN sys_feature_cat s ON cf.sys_feature_cat = s.id WHERE c.id = NEW.node_type);
-			v_old_v_man_table:= (SELECT man_table FROM cat_feature_node c JOIN cat_feature cf ON cf.id = n.id JOIN sys_feature_cat s ON cf.sys_feature_cat = s.id WHERE c.id = OLD.node_type);
+			v_new_v_man_table:= (SELECT man_table FROM cat_feature_node c JOIN cat_feature cf ON cf.id = n.id JOIN sys_feature_class s ON cf.feature_class = s.id WHERE c.id = NEW.node_type);
+			v_old_v_man_table:= (SELECT man_table FROM cat_feature_node c JOIN cat_feature cf ON cf.id = n.id JOIN sys_feature_class s ON cf.feature_class = s.id WHERE c.id = OLD.node_type);
 			IF v_new_v_man_table IS NOT NULL THEN
 				v_sql:= 'DELETE FROM '||v_old_v_man_table||' WHERE node_id= '||quote_literal(OLD.node_id);
 				EXECUTE v_sql;

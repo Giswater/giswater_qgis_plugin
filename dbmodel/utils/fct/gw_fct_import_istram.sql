@@ -73,7 +73,7 @@ BEGIN
 			INSERT INTO selector_expl (expl_id) VALUES (0);
 
 			--insert values into catalogs
-			INSERT INTO cat_feature (id, sys_feature_cat, feature_type, parent_layer, descript)
+			INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, descript)
 			VALUES ('MANHOLE','MANHOLE','NODE', 'v_edit_node', 'Manhole') ON CONFLICT (id) DO NOTHING;
 
 			INSERT INTO cat_node(id)
@@ -128,7 +128,7 @@ BEGIN
 				"data":{"message":"3190", "function":"3104","debug_msg":null, "is_process":true}}$$);'INTO v_audit_result;
 			ELSE
 				--insert values into catalogs
-				INSERT INTO cat_feature (id, sys_feature_cat, feature_type, parent_layer, descript)
+				INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, descript)
 				VALUES ('CONDUIT','CONDUIT','ARC', 'v_edit_arc', 'Conduit') ON CONFLICT (id) DO NOTHING;
 
 				INSERT INTO cat_mat_arc (id)

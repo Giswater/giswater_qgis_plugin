@@ -81,7 +81,7 @@ CREATE INDEX plan_psector_workcat_id_index ON plan_psector USING btree (workcat_
 CREATE INDEX plan_psector_parent_id_index ON plan_psector USING btree (parent_id);
 
 -- 09/10/2024
-UPDATE sys_feature_cat SET man_table  = 'element' where id = 'ELEMENT';
-UPDATE sys_feature_cat SET man_table  = 'link' where id = 'LINK';
+UPDATE sys_feature_class SET man_table  = 'element' WHERE id = 'ELEMENT';
+UPDATE sys_feature_class SET man_table  = 'link' WHERE id = 'LINK';
 
-ALTER TABLE sys_feature_cat ALTER COLUMN man_table SET NOT NULL;
+ALTER TABLE sys_feature_class ALTER COLUMN man_table SET NOT NULL;

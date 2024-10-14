@@ -83,21 +83,21 @@ BEGIN
 		--insert configuration
 		IF v_fid = 444 THEN
 			--arc
-			INSERT INTO v_edit_cat_feature_arc(id, sys_feature_cat, epa_default, code_autofill, shortcut_key, link_path, descript, active)
+			INSERT INTO v_edit_cat_feature_arc(id, feature_class, epa_default, code_autofill, shortcut_key, link_path, descript, active)
 			SELECT csv1, csv2, csv3, csv4::boolean, csv5, csv6, csv7, csv8::boolean
 			FROM temp_csv WHERE cur_user=current_user AND fid=v_fid AND csv1 NOT IN (SELECT id FROM cat_feature);
 
 		ELSIF v_fid=445 THEN
 			--node
 			IF v_project_type = 'WS' THEN
-				INSERT INTO v_edit_cat_feature_node(id, sys_feature_cat, epa_default, isarcdivide, isprofilesurface, choose_hemisphere,
+				INSERT INTO v_edit_cat_feature_node(id, feature_class, epa_default, isarcdivide, isprofilesurface, choose_hemisphere,
    	    code_autofill, double_geom, num_arcs, graph_delimiter, shortcut_key, link_path, descript, active)
 				SELECT csv1, csv2, csv3, csv4::boolean, csv5::boolean, csv6::boolean,
 				csv7::boolean,csv8::json, csv9::integer, csv10, csv11, csv12, csv13, csv14::boolean
 				FROM temp_csv WHERE cur_user=current_user AND fid=v_fid AND csv1 NOT IN (SELECT id FROM cat_feature);
 
 			ELSIF v_project_type = 'UD' THEN
-				INSERT INTO v_edit_cat_feature_node (id, sys_feature_cat, epa_default, isarcdivide, isprofilesurface, code_autofill,
+				INSERT INTO v_edit_cat_feature_node (id, feature_class, epa_default, isarcdivide, isprofilesurface, code_autofill,
        	choose_hemisphere, double_geom, num_arcs, isexitupperintro, shortcut_key, link_path, descript, active)
 				SELECT csv1, csv2, csv3, csv4::boolean, csv5::boolean, csv6::boolean,
 				csv7::boolean, csv8::json, csv9::integer, et.id::integer, csv11, csv12, csv13, csv14::boolean
@@ -109,18 +109,18 @@ BEGIN
 		ELSIF v_fid=446 THEN
 		--connec
 			IF v_project_type = 'WS' THEN
-				INSERT INTO v_edit_cat_feature_connec(id, sys_feature_cat, epa_default, code_autofill, shortcut_key, link_path, descript, active)
+				INSERT INTO v_edit_cat_feature_connec(id, feature_class, epa_default, code_autofill, shortcut_key, link_path, descript, active)
 				SELECT csv1, csv2, csv3, csv4::boolean, csv5, csv6, csv7, csv8::boolean
 				FROM temp_csv WHERE cur_user=current_user AND fid=v_fid AND csv1 NOT IN (SELECT id FROM cat_feature);
 			ELSIF v_project_type = 'UD' THEN
-				INSERT INTO v_edit_cat_feature_connec(id, sys_feature_cat, code_autofill, double_geom, shortcut_key, link_path, descript, active)
+				INSERT INTO v_edit_cat_feature_connec(id, feature_class, code_autofill, double_geom, shortcut_key, link_path, descript, active)
 				SELECT csv1, csv2, csv3::boolean, csv4::json, csv5, csv6, csv7, csv8::boolean
 				FROM temp_csv WHERE cur_user=current_user AND fid=v_fid AND csv1 NOT IN (SELECT id FROM cat_feature);
 			END IF;
 
 		ELSIF v_fid=447 THEN
 		--gully
-			INSERT INTO v_edit_cat_feature_gully(id, sys_feature_cat, code_autofill, double_geom, shortcut_key, link_path, descript, active)
+			INSERT INTO v_edit_cat_feature_gully(id, feature_class, code_autofill, double_geom, shortcut_key, link_path, descript, active)
 			SELECT csv1, csv2, csv3::boolean, csv4::json, csv5, csv6, csv7, csv8::boolean
 			FROM temp_csv WHERE cur_user=current_user AND fid=v_fid AND csv1 NOT IN (SELECT id FROM cat_feature);
 		END IF;

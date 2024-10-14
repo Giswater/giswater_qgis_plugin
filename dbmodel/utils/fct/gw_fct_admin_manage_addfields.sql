@@ -63,7 +63,7 @@ v_active boolean;
 v_orderby integer;
 v_action text;
 v_layoutorder integer;
-v_feature_sys_feature_cat text;
+v_feature_class text;
 v_man_fields text;
 v_feature_childtable_fields text;
 
@@ -248,9 +248,9 @@ BEGIN
 
         v_viewname = (SELECT child_layer FROM cat_feature WHERE id=v_cat_feature);
 
-        --get the system type and sys_feature_cat of the feature
+        --get the system type and feature_class of the feature
         v_feature_type = (SELECT lower(feature_type) FROM cat_feature where id=v_cat_feature);
-        v_feature_sys_feature_cat  = (SELECT lower(sys_feature_cat) FROM cat_feature where id=v_cat_feature);
+        v_feature_class  = (SELECT lower(feature_class) FROM cat_feature where id=v_cat_feature);
         v_feature_childtable_name := 'man_' || v_feature_type || '_' || lower(v_cat_feature);
 
         IF v_action = 'CREATE' THEN
@@ -420,9 +420,9 @@ BEGIN
 
             v_viewname = (SELECT child_layer FROM cat_feature WHERE id=rec.id);
 
-            -- get the system type and sys_feature_cat of the feature, and the name for childtable
+            -- get the system type and feature_class of the feature, and the name for childtable
             v_feature_type = (SELECT lower(feature_type) FROM cat_feature where id=rec.id);
-            v_feature_sys_feature_cat  = (SELECT lower(sys_feature_cat) FROM cat_feature where id=rec.id);
+            v_feature_class  = (SELECT lower(feature_class) FROM cat_feature where id=rec.id);
             v_feature_childtable_name := 'man_' || v_feature_type || '_' || lower(rec.id);
 
             --modify the configuration of the parameters and fields in config_form_fields

@@ -30,7 +30,7 @@ DECLARE
 v_feature_type text;
 v_feature_id text;
 v_arc_id text;
-v_systype text;
+v_feature_class text;
 v_epatype text;
 v_graphdelim text;
 v_config json;
@@ -63,7 +63,7 @@ BEGIN
 	v_presszone_id:= json_extract_path_text (p_data,'data','presszoneId')::text;
 	v_dqa_id:= json_extract_path_text (p_data,'data','presszoneId')::text;
 
-	SELECT upper(system_id), upper(graph_delimiter) INTO v_systype, v_graphdelim FROM cat_feature_node 
+	SELECT upper(feature_class), upper(graph_delimiter) INTO v_feature_class, v_graphdelim FROM cat_feature_node
 	JOIN cat_feature ON cat_feature.id = cat_feature_node.id WHERE cat_feature_node.id = v_feature_type;
 	SELECT upper(epa_type) INTO v_epatype FROM node WHERE node_id = v_feature_id;
 
@@ -81,21 +81,21 @@ BEGIN
 	END IF;
 
 	-- man_tables
-	IF v_systype = 'PUMP' THEN
+	IF v_feature_class = 'PUMP' THEN
 
 		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (359,1,
 		concat('Set to_arc for pump, ', v_feature_id, ' with value ',v_arc_id, '.'));
 
 		UPDATE man_pump SET to_arc = v_arc_id WHERE node_id = v_feature_id;
 
-	ELSIF v_systype = 'VALVE' THEN
+	ELSIF v_feature_class = 'VALVE' THEN
 
 		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (359,1,
 		concat('Set to_arc for valve, ', v_feature_id, ' with value ',v_arc_id, '.'));
 
 		UPDATE man_valve SET to_arc = v_arc_id WHERE node_id = v_feature_id;
 
-	ELSIF v_systype = 'METER' THEN
+	ELSIF v_feature_class = 'METER' THEN
 
 		-- nothing to do;
 	END IF;
