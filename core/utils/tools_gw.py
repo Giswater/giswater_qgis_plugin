@@ -1295,7 +1295,7 @@ def manage_feature_cat():
         if not tablename:
             msg += f"{value['id']}, "
             continue
-        elem = GwCatFeature(value['id'], value['system_id'], value['feature_type'], value['shortcut_key'],
+        elem = GwCatFeature(value['id'], value['feature_class'], value['feature_type'], value['shortcut_key'],
                             value['parent_layer'], value['child_layer'])
 
         feature_cat[tablename] = elem
