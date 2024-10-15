@@ -398,12 +398,20 @@ def cmb_new_featuretype_selection_changed(**kwargs):
     cmb_new_feature_type = kwargs["widget"]
     this = kwargs["class"]
     cmb_catalog_id = tools_qt.get_widget(dialog,"tab_none_featurecat_id")
+    cmb_catalog_fluid = tools_qt.get_widget(dialog,"tab_none_fluid_type")
+    cmb_catalog_location = tools_qt.get_widget(dialog,"tab_none_location_type")
+    cmb_catalog_category = tools_qt.get_widget(dialog,"tab_none_category_type")
+    cmb_catalog_function = tools_qt.get_widget(dialog,"tab_none_function_type")
     project_type = tools_gw.get_project_type()
 
     tools_qt.set_stylesheet(cmb_catalog_id, style="")
+    tools_qt.set_stylesheet(cmb_catalog_fluid, style="")
+    tools_qt.set_stylesheet(cmb_catalog_location, style="")
+    tools_qt.set_stylesheet(cmb_catalog_category, style="")
+    tools_qt.set_stylesheet(cmb_catalog_function, style="")
 
-    # Populate catalog_id
     feature_type_new = tools_qt.get_widget_value(dialog, cmb_new_feature_type)
+    # Populate catalog_id
     if project_type == 'ws':
         sql = (f"SELECT DISTINCT(id), id as idval "
                 f"FROM {this.cat_table} "
@@ -422,3 +430,46 @@ def cmb_new_featuretype_selection_changed(**kwargs):
         tools_qt.set_stylesheet(cmb_catalog_id, style="background-color: #ff8080")
         msg = "There is no catalog for this feature type. Please add one in the corresponding cat table."
         tools_qgis.show_critical(msg, dialog=dialog)
+
+    # Populate fluid
+    sql = (f"SELECT fluid_type as id, fluid_type as idval "
+           f"FROM man_type_fluid "
+           f"WHERE feature_type = '{this.feature_type.upper()}' "
+           f"AND (featurecat_id = '{{{feature_type_new}}}' OR featurecat_id IS NULL) "
+           f"AND (active IS TRUE OR active IS NULL) "
+           f"ORDER BY id")
+    rows = tools_db.get_rows(sql)
+    tools_qt.fill_combo_values(cmb_catalog_fluid, rows)
+
+    # Populate location
+    sql = (f"SELECT location_type as id, location_type as idval "
+           f"FROM man_type_location "
+           f"WHERE feature_type = '{this.feature_type.upper()}' "
+           f"AND (featurecat_id = '{{{feature_type_new}}}' OR featurecat_id IS NULL) "
+           f"AND (active IS TRUE OR active IS NULL) "
+           f"ORDER BY id")
+    rows = tools_db.get_rows(sql)
+    tools_qt.fill_combo_values(cmb_catalog_location, rows)
+
+    # Populate category
+    sql = (f"SELECT category_type as id, category_type as idval "
+           f"FROM man_type_category "
+           f"WHERE feature_type = '{this.feature_type.upper()}' "
+           f"AND (featurecat_id = '{{{feature_type_new}}}' OR featurecat_id IS NULL) "
+           f"AND (active IS TRUE OR active IS NULL) "
+           f"ORDER BY id")
+    rows = tools_db.get_rows(sql)
+    tools_qt.fill_combo_values(cmb_catalog_category, rows)
+
+    # Populate function
+    sql = (f"SELECT function_type as id, function_type as idval "
+           f"FROM man_type_function "
+           f"WHERE feature_type = '{this.feature_type.upper()}' "
+           f"AND (featurecat_id = '{{{feature_type_new}}}' OR featurecat_id IS NULL) "
+           f"AND (active IS TRUE OR active IS NULL) "
+           f"ORDER BY id")
+    rows = tools_db.get_rows(sql)
+    tools_qt.fill_combo_values(cmb_catalog_function, rows)
+
+    cmb_catalog_fluid.insertItem(0, "(fake_data)")
+    cmb_catalog_fluid.setCurrentIndex(0)
