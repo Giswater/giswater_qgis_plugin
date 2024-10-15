@@ -415,7 +415,7 @@ BEGIN
 	-- the exception when others need to be disabled because in case of update if it breaks update proces need to be canceled
 	--EXCEPTION WHEN OTHERS THEN
 	--GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	--RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ', "message":{"level":'||right(SQLSTATE, 1)||', "text":"'||SQLERRM||'"},"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
+	--RETURN ('{"status":"Failed","NOSQLERR":' || to_json(SQLERRM) || ', "message":{"level":'||right(SQLSTATE, 1)||', "text":"'||to_json(SQLERRM)||'"},"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
 END;
 $BODY$

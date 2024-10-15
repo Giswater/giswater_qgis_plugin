@@ -159,7 +159,7 @@ BEGIN
 	    
 	-- Exception handling
 	EXCEPTION WHEN OTHERS THEN 
-	RETURN ('{"status":"Failed","message":' || to_json(SQLERRM) || ', "message":{"level":'||right(SQLSTATE, 1)||', "text":"'||SQLERRM||'"}, "version":'|| v_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
+	RETURN ('{"status":"Failed","message":' || to_json(SQLERRM) || ', "message":{"level":'||right(SQLSTATE, 1)||', "text":"'||to_json(SQLERRM)||'"}, "version":'|| v_version ||',"SQLSTATE":' || to_json(SQLSTATE) || '}')::json;
 
 END;
 $BODY$
