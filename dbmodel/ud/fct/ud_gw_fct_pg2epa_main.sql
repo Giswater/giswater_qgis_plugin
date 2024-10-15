@@ -269,7 +269,7 @@ BEGIN
 	--  Exception handling
 	EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	RETURN ('{"status":"Failed", "body":{"data":{"info":{"values":[{"message":'||to_json(SQLERRM)||'}]}}}, "NOSQLERR":' ||
+	RETURN ('{"status":"Failed", "level": ' || to_json(right(SQLSTATE, 1)) || ',"text": ' || to_json(SQLERRM) || ', "body":{"data":{"info":{"values":[{"message":'||to_json(SQLERRM)||'}]}}}, "NOSQLERR":' ||
 	to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 
 

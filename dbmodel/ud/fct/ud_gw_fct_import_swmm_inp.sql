@@ -711,7 +711,7 @@ BEGIN
 	--  Exception handling
 	EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	RETURN ('{"status":"Failed", "body":{"data":{"info":{"values":[{"message":"IMPORT INP FILE FUNCTION"},
+	RETURN ('{"status":"Failed", "level": ' || to_json(right(SQLSTATE, 1)) || ',"text": ' || to_json(SQLERRM) || ',"body":{"data":{"info":{"values":[{"message":"IMPORT INP FILE FUNCTION"},
 																   {"message":"-----------------------------"},
 																   {"message":""},
 																   {"message":"ERRORS"},
