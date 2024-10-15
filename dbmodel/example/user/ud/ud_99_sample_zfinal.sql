@@ -137,3 +137,5 @@ UPDATE node SET category_type = 'category_manhole1' where nodecat_id like 'CIRC_
 UPDATE node SET location_type = 'location_manhole1' where nodecat_id like 'CIRC_MANHOLE%';
 UPDATE node SET fluid_type = 'fluid_manhole1' where nodecat_id like 'CIRC_MANHOLE%';
 UPDATE node SET function_type = 'function_manhole1' where nodecat_id like 'CIRC_MANHOLE%';
+
+UPDATE om_visit SET ext_code = concat('EXT', 1000 + id);
