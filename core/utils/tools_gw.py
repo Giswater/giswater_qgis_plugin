@@ -2473,7 +2473,10 @@ def manage_json_exception(json_result, sql=None, stack_level=2, stack_level_incr
 
             # Show exception message only if we are not in a task process
             if len(lib_vars.session_vars['threads']) == 0:
-                tools_qgis.show_message(msg, level)
+                if 'SQLCONTEXT' in json_result:
+                    tools_qgis.show_message(msg, level, sqlcontext=json_result['SQLCONTEXT'])
+                else:
+                    tools_qgis.show_message(msg, level)
             else:
                 tools_log.log_info(msg)
 
