@@ -65,10 +65,16 @@ BEGIN
 
 		-- log_level of type 'WARNING' (mostly applied to functions)
 		ELSIF rec_cat_error.log_level = 1 THEN
+			SELECT * INTO rec_function
+			FROM sys_function WHERE sys_function.id=v_function_id;
+		
 			IF v_debug THEN
 				SELECT  concat('Function: ',function_name,' - ',upper(rec_cat_error.error_message),' ',v_message,'. HINT: ', upper(rec_cat_error.hint_message),'.')  INTO v_return_text
 				FROM sys_function WHERE sys_function.id=v_function_id;
 			END IF;
+		
+			RAISE 'Function: [%] - %. HINT: % - %', rec_function.function_name, upper(rec_cat_error.error_message), upper(rec_cat_error.hint_message), v_variables
+			USING ERRCODE  = concat('GW00', rec_cat_error.log_level);
 			v_level = 1;
 			v_status = 'Failed';
 
@@ -78,9 +84,11 @@ BEGIN
 			FROM sys_function WHERE sys_function.id=v_function_id;
 
 			IF v_message IS NOT NULL THEN
-				RAISE EXCEPTION 'Function: [%] - %. HINT: % - % ', rec_function.function_name, concat(upper(rec_cat_error.error_message), ' ',v_message), upper(rec_cat_error.hint_message), v_variables ;
+				RAISE 'Function: [%] - %. HINT: % - % ', rec_function.function_name, concat(upper(rec_cat_error.error_message), ' ',v_message), upper(rec_cat_error.hint_message), v_variables 
+				USING ERRCODE  = concat('GW00', rec_cat_error.log_level);
 			ELSE
-				RAISE EXCEPTION 'Function: [%] - %. HINT: % - %', rec_function.function_name, upper(rec_cat_error.error_message), upper(rec_cat_error.hint_message), v_variables ;
+				RAISE 'Function: [%] - %. HINT: % - %', rec_function.function_name, upper(rec_cat_error.error_message), upper(rec_cat_error.hint_message), v_variables
+				USING ERRCODE  = concat('GW00', rec_cat_error.log_level);
 			END IF;
 		ELSIF rec_cat_error.log_level = 3 THEN
 			IF v_debug THEN
