@@ -93,7 +93,7 @@ BEGIN
 
 	INSERT INTO cat_hydrology (name, infiltration, text, expl_id, active, log)
 	VALUES (v_name, v_infiltration, v_text, v_expl_id, v_active, concat('Created by ',current_user,' on ',substring(now()::text,0,20)))
-	ON CONFLICT DO NOTHING
+	ON CONFLICT (name) DO NOTHING
 	RETURNING hydrology_id INTO v_scenarioid;
 
 	IF v_scenarioid IS NULL THEN
