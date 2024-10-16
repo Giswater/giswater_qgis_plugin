@@ -392,7 +392,7 @@ def btn_catalog_featuretype_change(**kwargs):
 
 
 def cmb_new_featuretype_selection_changed(**kwargs):
-    """ When new featuretype change, catalog_id changes as well """
+    """ When new featuretype changes, catalog_id and related fields (fluid, location, etc.) update as well """
 
     dialog = kwargs["dialog"]
     cmb_new_feature_type = kwargs["widget"]
@@ -404,13 +404,16 @@ def cmb_new_featuretype_selection_changed(**kwargs):
     cmb_catalog_function = tools_qt.get_widget(dialog,"tab_none_function_type")
     project_type = tools_gw.get_project_type()
 
+    # Reset styles
     tools_qt.set_stylesheet(cmb_catalog_id, style="")
     tools_qt.set_stylesheet(cmb_catalog_fluid, style="")
     tools_qt.set_stylesheet(cmb_catalog_location, style="")
     tools_qt.set_stylesheet(cmb_catalog_category, style="")
     tools_qt.set_stylesheet(cmb_catalog_function, style="")
 
+    # Fetch the new feature type
     feature_type_new = tools_qt.get_widget_value(dialog, cmb_new_feature_type)
+
     # Populate catalog_id
     if project_type == 'ws':
         sql = (f"SELECT DISTINCT(id), id as idval "
@@ -425,51 +428,46 @@ def cmb_new_featuretype_selection_changed(**kwargs):
     rows = tools_db.get_rows(sql)
     tools_qt.fill_combo_values(cmb_catalog_id, rows)
 
-    # Manage if there is no catalog for the selected feature type
-    if not rows or len(rows) == 0:
+    # Show warning if no catalog rows are found
+    if not rows:
         tools_qt.set_stylesheet(cmb_catalog_id, style="background-color: #ff8080")
-        msg = "There is no catalog for this feature type. Please add one in the corresponding cat table."
-        tools_qgis.show_critical(msg, dialog=dialog)
+        tools_qgis.show_critical(
+            "There is no catalog for this feature type. Please add one in the corresponding cat table.",
+            dialog=dialog
+        )
 
-    # Populate fluid
-    sql = (f"SELECT fluid_type as id, fluid_type as idval "
-           f"FROM man_type_fluid "
-           f"WHERE feature_type = '{this.feature_type.upper()}' "
-           f"AND (featurecat_id = '{{{feature_type_new}}}' OR featurecat_id IS NULL) "
-           f"AND (active IS TRUE OR active IS NULL) "
-           f"ORDER BY id")
-    rows = tools_db.get_rows(sql)
-    tools_qt.fill_combo_values(cmb_catalog_fluid, rows)
+    # Create body with only newFeatureCat in extras
+    feature = f'"tableName":"{this.tablename}", "id":"{this.feature_id}"'
+    extras = f'"newFeatureCat":"{feature_type_new}"'
+    body = tools_gw.create_body(feature=feature, extras=extras)
 
-    # Populate location
-    sql = (f"SELECT location_type as id, location_type as idval "
-           f"FROM man_type_location "
-           f"WHERE feature_type = '{this.feature_type.upper()}' "
-           f"AND (featurecat_id = '{{{feature_type_new}}}' OR featurecat_id IS NULL) "
-           f"AND (active IS TRUE OR active IS NULL) "
-           f"ORDER BY id")
-    rows = tools_db.get_rows(sql)
-    tools_qt.fill_combo_values(cmb_catalog_location, rows)
+    # Execute function to get additional data for fluid, location, category, and function types
+    response = tools_gw.execute_procedure("gw_fct_getchangefeaturetype", body)
 
-    # Populate category
-    sql = (f"SELECT category_type as id, category_type as idval "
-           f"FROM man_type_category "
-           f"WHERE feature_type = '{this.feature_type.upper()}' "
-           f"AND (featurecat_id = '{{{feature_type_new}}}' OR featurecat_id IS NULL) "
-           f"AND (active IS TRUE OR active IS NULL) "
-           f"ORDER BY id")
-    rows = tools_db.get_rows(sql)
-    tools_qt.fill_combo_values(cmb_catalog_category, rows)
+    # Check if the response is valid
+    if not response or response.get("status") != "Accepted":
+        tools_qgis.show_warning("Failed to retrieve feature type data")
+        return
 
-    # Populate function
-    sql = (f"SELECT function_type as id, function_type as idval "
-           f"FROM man_type_function "
-           f"WHERE feature_type = '{this.feature_type.upper()}' "
-           f"AND (featurecat_id = '{{{feature_type_new}}}' OR featurecat_id IS NULL) "
-           f"AND (active IS TRUE OR active IS NULL) "
-           f"ORDER BY id")
-    rows = tools_db.get_rows(sql)
-    tools_qt.fill_combo_values(cmb_catalog_function, rows)
+    # Populate combos based on response data
+    fields = response["body"]["data"]["fields"]
+    combo_mapping = {
+        "fluid_type": cmb_catalog_fluid,
+        "location_type": cmb_catalog_location,
+        "category_type": cmb_catalog_category,
+        "function_type": cmb_catalog_function
+    }
 
-    cmb_catalog_fluid.insertItem(0, "(fake_data)")
-    cmb_catalog_fluid.setCurrentIndex(0)
+    # Populate each combo box based on the retrieved fields
+    for field_data in fields:
+        column_name = field_data.get("columnname")
+        combo_widget = combo_mapping.get(column_name)
+        selected_id = field_data.get("selectedId")
+        if combo_widget and "comboIds" in field_data and "comboNames" in field_data:
+            rows = []
+            combo_ids = field_data["comboIds"]
+            combo_names = field_data["comboNames"]
+
+            for i in range(len(combo_ids)):
+                rows.append((combo_ids[i], combo_names[i]))
+            tools_qt.fill_combo_values(combo=combo_widget, rows=rows, value_to_show=selected_id, item_to_compare=0)
