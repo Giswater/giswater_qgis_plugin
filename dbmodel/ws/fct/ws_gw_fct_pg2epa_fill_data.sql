@@ -133,7 +133,7 @@ BEGIN
 	
 	EXECUTE 'INSERT INTO temp_t_arc (arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, roughness, 
 		length, diameter, the_geom, expl_id, dma_id, presszone_id, dqa_id, minsector_id, age)
-		SELECT
+		SELECT DISTINCT ON (arc_id)
 		v_edit_arc.arc_id, node_1, node_2, v_edit_arc.arc_type, arccat_id, epa_type, v_edit_arc.sector_id, v_edit_arc.state, v_edit_arc.state_type, v_edit_arc.annotation,
 		CASE WHEN custom_roughness IS NOT NULL THEN custom_roughness ELSE roughness END AS roughness,
 		(CASE WHEN v_edit_arc.custom_length IS NOT NULL THEN custom_length ELSE gis_length END), 
@@ -150,7 +150,7 @@ BEGIN
 			LEFT JOIN inp_virtualvalve ON v_edit_arc.arc_id = inp_virtualvalve.arc_id
 			LEFT JOIN cat_mat_roughness ON cat_mat_roughness.matcat_id = cat_mat_arc.id
 			WHERE (now()::date - (CASE WHEN builtdate IS NULL THEN ''1900-01-01''::date ELSE builtdate END))/365 >= cat_mat_roughness.init_age
-			AND (now()::date - (CASE WHEN builtdate IS NULL THEN ''1900-01-01''::date ELSE builtdate END))/365 < cat_mat_roughness.end_age '
+			AND (now()::date - (CASE WHEN builtdate IS NULL THEN ''1900-01-01''::date ELSE builtdate END))/365 <= cat_mat_roughness.end_age '
 			||v_statetype||' AND v_edit_arc.sector_id=selector_sector.sector_id AND selector_sector.cur_user=current_user
 			AND epa_type != ''UNDEFINED''
 			AND v_edit_arc.sector_id > 0 AND v_edit_arc.state > 0
@@ -161,7 +161,8 @@ BEGIN
 		-- this need to be solved here in spite of fill_data functions because some kind of incosnstency done on this function on previous lines
 		EXECUTE 'INSERT INTO temp_t_arc (arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, roughness, length, diameter, the_geom,
 			expl_id, dma_id, presszone_id, dqa_id, minsector_id, status, minorloss, age)
-			SELECT concat(''CO'',connec_id), connec_id as node_1, 
+			SELECT DISTINCT ON (connec_id)
+			concat(''CO'',connec_id), connec_id as node_1, 
 			CASE WHEN exit_type = ''ARC'' THEN concat(''VN'',vnode_id) WHEN exit_type = ''NODE'' THEN exit_id::text ELSE pjoint_id end AS node_2, 
 			''LINK'', connecat_id, ''PIPE'', c.sector_id, c.state, c.state_type, annotation, 
 			(CASE WHEN custom_roughness IS NOT NULL THEN custom_roughness ELSE roughness END) AS roughness,
@@ -177,7 +178,7 @@ BEGIN
 			JOIN inp_connec USING (connec_id)
 			LEFT JOIN cat_mat_roughness ON cat_mat_roughness.matcat_id = cat_connec.matcat_id
 				WHERE (now()::date - (CASE WHEN builtdate IS NULL THEN ''1900-01-01''::date ELSE builtdate END))/365 >= cat_mat_roughness.init_age
-				AND (now()::date - (CASE WHEN builtdate IS NULL THEN ''1900-01-01''::date ELSE builtdate END))/365 < cat_mat_roughness.end_age '
+				AND (now()::date - (CASE WHEN builtdate IS NULL THEN ''1900-01-01''::date ELSE builtdate END))/365 <= cat_mat_roughness.end_age '
 				||v_statetype||' AND c.sector_id=selector_sector.sector_id AND selector_sector.cur_user=current_user
 				AND epa_type = ''JUNCTION''
 				AND c.sector_id > 0 AND c.state > 0
