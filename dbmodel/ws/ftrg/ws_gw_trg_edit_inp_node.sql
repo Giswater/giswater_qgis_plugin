@@ -116,7 +116,7 @@ BEGIN
             WHERE node_id=OLD.node_id;
 
         ELSIF v_node_table = 'inp_pump' THEN
-            UPDATE inp_pump SET power=NEW.power, curve_id=NEW.curve_id, speed=NEW.speed, pattern_id=NEW.pattern_id, to_arc=NEW.to_arc, status=NEW.status , pump_type=NEW.pump_type,
+            UPDATE inp_pump SET power=NEW.power, curve_id=NEW.curve_id, speed=NEW.speed, pattern_id=NEW.pattern_id, status=NEW.status , pump_type=NEW.pump_type,
             effic_curve_id = NEW.effic_curve_id, energy_price = NEW.energy_price, energy_pattern_id = NEW.energy_pattern_id
             WHERE node_id=OLD.node_id;
 
