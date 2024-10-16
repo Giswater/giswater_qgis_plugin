@@ -252,14 +252,13 @@ class GwMapzoneManager:
         if run_button:
             run_button.clicked.connect(lambda: self.mapzone_mng_dlg.btn_flood.setEnabled(True))
 
+
     def _open_flood_analysis(self, dialog):
         """Opens the toolbox 'flood_analysis' and runs the SQL function to create the temporal layer."""
 
-        # Step 1: Build the body and call gw_fct_getgraphinundation
+        # Call gw_fct_getgraphinundation
         body = tools_gw.create_body()
         json_result = tools_gw.execute_procedure('gw_fct_getgraphinundation', body)
-
-        # Check if a valid result was returned
         if not json_result or json_result.get('status') != 'Accepted':
             tools_qgis.show_warning("No valid data received from the SQL function.", dialog=dialog)
             return
@@ -275,8 +274,7 @@ class GwMapzoneManager:
                 if mapzone_id is not None:
                     valid_mapzone_ids.add(mapzone_id)
 
-        # Step 2: Retrieve graph configuration for map zones using gw_fct_getgraphconfig
-        # Determine the graphClass (current tab) and create the body for gw_fct_getgraphconfig
+        # Get graphconfig for mapzone using gw_fct_getgraphconfig
         graph_class = self.mapzone_mng_dlg.main_tab.tabText(self.mapzone_mng_dlg.main_tab.currentIndex()).lower()
         config_extras = f'"context":"OPERATIVE", "mapzone":"{graph_class}"'
         config_body = tools_gw.create_body(extras=config_extras)
@@ -287,17 +285,16 @@ class GwMapzoneManager:
             tools_qgis.show_warning("Failed to retrieve graph configuration.", dialog=dialog)
             return
 
-        # Step 3: Retrieve styling information for map zones
+        # Get mapzones style by calling gw_fct_getstylemapzones
         style_extras = f'"graphClass":"{graph_class}", "tempLayer":"Graphanalytics tstep process", "idName": "mapzone_id"'
         style_body = tools_gw.create_body(extras=style_extras)
 
-        # Call gw_fct_getstylemapzones for styling information
         style_result = tools_gw.execute_procedure('gw_fct_getstylemapzones', style_body)
         if not style_result or style_result.get('status') != 'Accepted':
             tools_qgis.show_warning("Failed to retrieve mapzone styles.", dialog=dialog)
             return
 
-        # Step 4: Process the flood data and style it on the map
+        # Add the flooding data to a temporal layer
         layer_name = json_result['body']['data']['line'].get('layerName')
         vlayer = tools_qgis.get_layer_by_layername(layer_name)
 
@@ -334,6 +331,7 @@ class GwMapzoneManager:
 
                 self._activate_temporal_controller(vlayer)
 
+
     def _apply_styles_to_layer(self, vlayer, mapzones, valid_mapzone_ids):
         """Applies styles to the layer based on the mapzone styles retrieved, filtering only those with data in valid_mapzone_ids."""
 
@@ -365,9 +363,7 @@ class GwMapzoneManager:
                 # Create a line symbol with a visible stroke width and solid style
                 symbol = QgsLineSymbol.createSimple({'line_style': 'solid', 'width': '2', 'color': color.name()})
 
-                # Create a renderer category for this mapzone ID
-                # Allows to style features in a layer based on different categories or values in a specific field
-                # In this case each unique mapzone_id can have a different color
+                # Apply categorized style to the layer. In this case each unique mapzone_id will have a different color
                 category = QgsRendererCategory(mapzone_id, symbol, str(mapzone_id))
                 categories.append(category)
 
@@ -445,6 +441,7 @@ class GwMapzoneManager:
                 widget.setCurrentText("seconds")
                 break
 
+
     def _open_flood_from_node_analysis(self, dialog):
         """Initializes snapping to select a starting node for flood analysis."""
 
@@ -457,6 +454,7 @@ class GwMapzoneManager:
 
         # Connect the point-click event to identify the nearest node
         self.snapper_manager.canvasClicked.connect(partial(self._identify_node_and_run_flood_analysis, dialog))
+
 
     def _identify_node_and_run_flood_analysis(self, dialog, point):
         """Identify the node at the selected point, retrieve node_id, and run flood analysis."""
@@ -505,6 +503,7 @@ class GwMapzoneManager:
 
         # Clear the selection after processing
         node_layer.removeSelection()
+
 
     def _run_mapzones_analysis(self, graph_class, exploitation):
         """Executes the mapzones analysis with only the required parameters."""
