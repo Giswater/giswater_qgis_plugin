@@ -49,6 +49,8 @@ BEGIN
 		energyparam =NEW.energyparam, energyvalue=NEW.energyvalue, pump_type=NEW.pump_type, effic_curve_id=NEW.effic_curve_id, 
 		energy_price=NEW.energy_price, energy_pattern_id=NEW.energy_pattern_id
 		WHERE node_id=OLD.node_id;
+		
+		UPDATE man_pump SET to_arc=NEW.to_arc WHERE node_id=NEW.node_id;
 
         ELSIF v_epatype = 'pump_additional' THEN          
 		UPDATE inp_pump_additional SET order_id=NEW.order_id, power=NEW.power, curve_id=NEW.curve_id, speed=NEW.speed, pattern_id=NEW.pattern_id, 
