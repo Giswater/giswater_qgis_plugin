@@ -11,9 +11,8 @@ RETURNS json AS
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_duplicate_hydrology_scenario($${"client":{"device":4, "infoType":1, "lang":"ES"}, "data":{"parameters":{"target":"1", "copyFrom":"2", "action":"DELETE-COPY"}}}$$)
-
-SELECT SCHEMA_NAME.gw_fct_duplicate_hydrology_scenario($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"name":"test", "descript":null, "parent":null, "type":"DEMAND", "active":"true", "expl":"1", "copyFrom": 1}}}$$)
+SELECT SCHEMA_NAME.gw_fct_duplicate_hydrology_scenario($${"client":{"device":4, "lang":"ca_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, 
+"data":{"filterFields":{}, "pageInfo":{}, "parameters":{"copyFrom":"1", "name":"11111", "text":"asasg", "expl":"1", "active":"true"}, "aux_params":null}}$$);
 
 -- fid: 459
 
@@ -50,7 +49,7 @@ v_aux_params json;
 v_infiltration text;
 v_text text;
 v_inp_hydrology text;
-
+v_sourcename text;
 
 BEGIN
 
@@ -61,22 +60,23 @@ BEGIN
 
 	-- getting input data
 	v_name :=  ((p_data ->>'data')::json->>'parameters')::json->>'name';
-	v_infiltration :=  ((p_data ->>'data')::json->>'parameters')::json->>'infiltration';
 	v_text :=  ((p_data ->>'data')::json->>'parameters')::json->>'text';
 	v_expl_id :=  ((p_data ->>'data')::json->>'parameters')::json->>'expl';
 	v_active :=  ((p_data ->>'data')::json->>'parameters')::json->>'active';
 	v_aux_params :=  ((p_data ->>'data')::json->>'aux_params')::json;
 	v_copyfrom := ((p_data ->>'data')::json->>'parameters')::json->>'copyFrom';
-    v_action := 'KEEP-COPY';
+	v_action := 'KEEP-COPY';
 
 	-- Reset values
 	DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=v_fid;
 	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid;
 
+	SELECT name INTO v_sourcename FROM cat_hydrology WHERE hydrology_id  = v_copyfrom;
+
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('DUPLICATE HYDROLOGY SCENARIO'));
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '--------------------------------------------------');
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Name: ',v_name));
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Infiltration: ',v_infiltration));
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Source scenario: ',v_sourcename));
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('New scenario: ',v_name));
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Text: ',v_text));
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Expl_id: ',v_expl_id));
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Active: ',v_active));
@@ -91,17 +91,25 @@ BEGIN
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, 'INFO');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, '---------');
 
-	-- process
+	-- setting the infitration data from source scenario
+	SELECT infiltration INTO v_inp_hydrology FROM cat_hydrology WHERE hydrology_id = v_copyfrom;
+	p_data = replace(p_data::text, ', "text":"', concat(' ,"infiltration":"',v_inp_hydrology,'", "text":"'));
+
 	-- Create empty hydrology_scenario
 	EXECUTE 'SELECT gw_fct_create_hydrology_scenario_empty($$'||p_data||'$$);';
 	SELECT hydrology_id INTO v_scenarioid FROM cat_hydrology where name = v_name;
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-		VALUES (v_fid, null, 1, concat('INFO: Hydrology scenario named "',v_name,'" created with values from hydrology scenario ( ',v_copyfrom,' )'));
+	VALUES (v_fid, null, 1, concat('INFO: Hydrology scenario named (',v_name,') have been created with values from hydrology scenario (',v_sourcename,').'));
 
 	-- Copy values from hydrology scenario to copy from
 	EXECUTE 'SELECT gw_fct_manage_hydrology_values($${"client": '||(p_data ->>'client')::json||', "data": {"parameters": {"target": '||v_scenarioid||', "copyFrom": '||v_copyfrom||', "action": '||quote_ident(v_action)||', "sector":-998}}}$$);';
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-		VALUES (v_fid, null, 1, concat('INFO: Copied values from hydrology scenario ( ',v_copyfrom,' ) to new hydrology scenario ( ',v_scenarioid,' )'));
+
+
+	-- setting current dwf for user
+	UPDATE config_param_user SET value = v_scenarioid WHERE cur_user = current_user AND parameter = 'inp_options_hydrology_scenario';
+
+	-- manage log (fid: v_fid)
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 1, concat('The new hydrology scenario (',v_name,') is now your current scenario.'));
 
 	-- insert spacers
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 3, concat(''));

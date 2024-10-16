@@ -52,12 +52,19 @@ BEGIN
 			-- insert log
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message, table_id) 
 			VALUES (v_fid, v_result_id, 1, concat('INFO: Node ',rec_csv.csv2,' in DWF Scenario ',rec_csv.csv1,' have been imported succesfully'), rec_csv.csv1);
-	
-			-- insert inp_timeseries
+				
+			-- insert inp_dwf
 			INSERT INTO inp_dwf (dwfscenario_id, node_id, value, pat1, pat2, pat3, pat4)
-			VALUES (rec_csv.csv1::integer, rec_csv.csv2, rec_csv.csv3::integer, rec_csv.csv4, rec_csv.csv5, rec_csv.csv6, rec_csv.csv7);
+			VALUES (rec_csv.csv1::integer, rec_csv.csv2, rec_csv.csv3::numeric, rec_csv.csv4, rec_csv.csv5, rec_csv.csv6, rec_csv.csv7);		
 		END IF;
 	END LOOP;
+
+	-- setting current dwf for user
+	UPDATE config_param_user SET value = rec_csv.csv1::integer WHERE cur_user = current_user AND parameter = 'inp_options_dwfscenario';
+	
+	-- manage log (fid: v_fid)
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 1, concat('This DWF scenario is now your current scenario'));
+
 	-- manage log (fid: v_fid)
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 1, concat('Process finished'));
 	

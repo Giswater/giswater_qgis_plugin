@@ -11,9 +11,8 @@ RETURNS json AS
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_duplicate_dwf_scenario($${"client":{"device":4, "infoType":1, "lang":"ES"}, "data":{"parameters":{"target":"1", "copyFrom":"2", "action":"DELETE-COPY"}}}$$)
-
-SELECT SCHEMA_NAME.gw_fct_duplicate_dwf_scenario($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"name":"test", "descript":null, "parent":null, "type":"DEMAND", "active":"true", "expl":"1", "copyFrom": 1}}}$$)
+SELECT SCHEMA_NAME.gw_fct_duplicate_dwf_scenario($${"client":{"device":4, "lang":"ca_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{}, 
+"pageInfo":{}, "parameters":{"copyFrom":"2", "idval":"SGASGA", "startdate":"2024/10/16", "enddate":"2024/10/16", "observ":"SDGA", "expl":"1", "active":"true"}, "aux_params":null}}$$);
 
 -- fid: 459
 
@@ -68,13 +67,13 @@ BEGIN
 	v_active :=  ((p_data ->>'data')::json->>'parameters')::json->>'active';
 	v_aux_params := ((p_data ->>'data')::json->>'aux_params')::json;
 	v_copyfrom := ((p_data ->>'data')::json->>'parameters')::json->>'copyFrom';
-    v_action := 'KEEP-COPY';
+	v_action := 'KEEP-COPY';
 
 	-- Reset values
 	DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=v_fid;
 	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid;
 
-    INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('DUPLICATE DWF SCENARIO'));
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('DUPLICATE DWF SCENARIO'));
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '--------------------------------------------------');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Id_val: ',v_idval));
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Descript: ',v_startdate));
@@ -93,17 +92,24 @@ BEGIN
 
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, 'INFO');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, '---------');
+	
 	-- process
 	-- Create empty dwf scenario
 	EXECUTE 'SELECT gw_fct_create_dwf_scenario_empty($$'||p_data||'$$);';
 	SELECT id INTO v_scenarioid FROM cat_dwf_scenario where idval = v_idval;
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-		VALUES (v_fid, null, 1, concat('INFO: Dwf scenario named "',v_idval,'" created with values from Dwf scenario ( ',v_copyfrom,' )'));
+		VALUES (v_fid, null, 1, concat('INFO: Dwf scenario named "',v_idval,'" created with values from Dwf scenario ( ',v_copyfrom,' ).'));
 
 	-- Copy values from Dwf scenario to copy from
 	EXECUTE 'SELECT gw_fct_manage_dwf_values($${"client": '||(p_data ->>'client')::json||', "data": {"parameters": {"target": '||v_scenarioid||', "copyFrom": '||v_copyfrom||', "action": '||quote_ident(v_action)||', "sector":-998}}}$$);';
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-		VALUES (v_fid, null, 1, concat('INFO: Copied values from Dwf scenario ( ',v_copyfrom,' ) to new Dwf scenario ( ',v_scenarioid,' )'));
+		VALUES (v_fid, null, 1, concat('INFO: Copied values from Dwf scenario ( ',v_copyfrom,' ) to new Dwf scenario ( ',v_scenarioid,' ).'));
+
+	-- setting current dwf for user
+	UPDATE config_param_user SET value = v_scenarioid WHERE cur_user = current_user AND parameter = 'inp_options_dwfscenario';
+
+	-- manage log (fid: v_fid)
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 1, concat('This DWF scenario is now your current scenario.'));
 
 	-- insert spacers
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 3, concat(''));
