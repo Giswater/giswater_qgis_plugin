@@ -14,7 +14,7 @@ SELECT plan(6);
 
 
 INSERT INTO v_edit_cat_hydrology ("name", infiltration, "text", expl_id, active, log)
-VALUES('-901', 'CURVE_NUMBER', 'Default value of infiltration', NULL, true, NULL);
+VALUES('-901', 'CURVE_NUMBER', 'Test', NULL, true, NULL);
 
 SELECT is((SELECT count(*)::integer FROM v_edit_cat_hydrology WHERE name = '-901'), 1, 'INSERT: v_edit_cat_hydrology -901 was inserted');
 SELECT is((SELECT count(*)::integer FROM cat_hydrology WHERE name = '-901'), 1, 'INSERT: cat_hydrology -901 was inserted');
