@@ -81,21 +81,15 @@ BEGIN
 			v_layoutorder=1;
 		END IF;
 
-		IF v_projecttype = 'WS' THEN
-			v_partialquerytext =  concat('JOIN cat_feature ON cat_feature.id = ',
-			lower(NEW.feature_type),'type_id WHERE cat_feature.id = ',quote_literal(NEW.id));
+		v_table = concat('cat_',lower(NEW.feature_type));
 
-		ELSIF  v_projecttype = 'UD' THEN
-			v_partialquerytext =  concat('LEFT JOIN cat_feature ON cat_feature.id = cat_',lower(NEW.feature_type),'.',lower(NEW.feature_type),'_type ',
-			' WHERE cat_feature.id = ',quote_literal(NEW.id));
+		v_partialquerytext = concat('JOIN cat_feature ON cat_feature.id = ',v_table,'.',lower(NEW.feature_type),'_type WHERE cat_feature.id = ',quote_literal(NEW.id));
 
-			-- special case for gully
-			IF lower(NEW.feature_type) = 'gully' THEN
-				v_partialquerytext = concat('LEFT JOIN cat_feature ON cat_feature.id = cat_grate.gully_type WHERE cat_feature.id = ', quote_literal(NEW.id));
-			END IF;
+		-- special case for gully
+		IF lower(NEW.feature_type) = 'gully' THEN
+			v_partialquerytext = concat('LEFT JOIN cat_feature ON cat_feature.id = cat_grate.gully_type WHERE cat_feature.id = ', quote_literal(NEW.id));
 		END IF;
 
-		v_table = concat ('cat_',lower(NEW.feature_type));
 
 		IF v_table = 'cat_node' OR v_table = 'cat_arc' THEN
 			v_feature_field_id = concat (lower(NEW.feature_type), 'cat_id');
@@ -303,17 +297,17 @@ BEGIN
 			EXECUTE 'DELETE FROM cat_feature_'||lower(OLD.feature_type)||' WHERE id = '||quote_literal(NEW.id)||';';
 
 			IF lower(NEW.feature_type)='arc' THEN
-				EXECUTE 'INSERT INTO cat_feature_arc (id, type, epa_default)
-				VALUES ('||quote_literal(NEW.id)||','||quote_literal(NEW.feature_class)||', '||quote_literal(v_feature.epa_default)||')';
+				EXECUTE 'INSERT INTO cat_feature_arc (id, epa_default)
+				VALUES ('||quote_literal(NEW.id)||','||quote_literal(v_feature.epa_default)||')';
 			ELSIF lower(NEW.feature_type)='node' THEN
-				EXECUTE 'INSERT INTO cat_feature_node (id, type, epa_default, choose_hemisphere, isarcdivide, num_arcs)
-				VALUES ('||quote_literal(NEW.id)||','||quote_literal(NEW.feature_class)||',	'||quote_literal(v_feature.epa_default)||', TRUE, TRUE, 2);';
+				EXECUTE 'INSERT INTO cat_feature_node (id, epa_default, choose_hemisphere, isarcdivide, num_arcs)
+				VALUES ('||quote_literal(NEW.id)||','||quote_literal(v_feature.epa_default)||', TRUE, TRUE, 2);';
 			ELSIF lower(NEW.feature_type)='connec' THEN
-				EXECUTE 'INSERT INTO cat_feature_connec (id, type)
-				VALUES ('||quote_literal(NEW.id)||','||quote_literal(NEW.feature_class)||');';
+				EXECUTE 'INSERT INTO cat_feature_connec (id)
+				VALUES ('||quote_literal(NEW.id)||',);';
 			ELSIF lower(NEW.feature_type)='gully' THEN
-				EXECUTE 'INSERT INTO cat_feature_gully (id, type)
-				VALUES ('||quote_literal(NEW.id)||','||quote_literal(NEW.feature_class)||');';
+				EXECUTE 'INSERT INTO cat_feature_gully (id)
+				VALUES ('||quote_literal(NEW.id)||',);';
 			END IF;
 
 			--delete configuration from config_form_fields

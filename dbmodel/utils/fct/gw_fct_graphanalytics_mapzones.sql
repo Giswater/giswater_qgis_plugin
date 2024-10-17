@@ -66,10 +66,10 @@ water: 0 dry, 1 wet
 
 Look graph flooders (flag=0 and graphdelimiter node)
 SELECT node_1 AS node_id, arc_id AS to_arc FROM temp_anlgraph WHERE flag=0 AND node_1 IN (
-SELECT DISTINCT node_id::integer FROM node a JOIN cat_node b ON nodecat_id=b.id JOIN node_type c ON c.id=b.nodetype_id JOIN temp_anlgraph e ON a.node_id::integer=e.node_1::integer WHERE graph_delimiter IN ('DQA', 'SECTOR'))
+SELECT DISTINCT node_id::integer FROM node a JOIN cat_node b ON nodecat_id=b.id JOIN node_type c ON c.id=b.node_type JOIN temp_anlgraph e ON a.node_id::integer=e.node_1::integer WHERE graph_delimiter IN ('DQA', 'SECTOR'))
 
 SELECT node_1 AS node_id, arc_id AS to_arc FROM temp_anlgraph WHERE flag=0 AND node_1 IN (
-SELECT DISTINCT node_id::integer FROM node a JOIN cat_node b ON nodecat_id=b.id JOIN node_type c ON c.id=b.nodetype_id JOIN temp_anlgraph e ON a.node_id::integer=e.node_1::integer WHERE graph_delimiter IN ('DMA', 'SECTOR'))
+SELECT DISTINCT node_id::integer FROM node a JOIN cat_node b ON nodecat_id=b.id JOIN node_type c ON c.id=b.node_type JOIN temp_anlgraph e ON a.node_id::integer=e.node_1::integer WHERE graph_delimiter IN ('DMA', 'SECTOR'))
 
 Look for the graph stoppers (flag=1)
 SELECT arc_id, node_1 FROM temp_anlgraph where flag=1 order by node_1
@@ -490,7 +490,7 @@ BEGIN
 		IF v_class !='DRAINZONE' THEN
 			v_querytext  = 'UPDATE temp_t_anlgraph SET flag=1 WHERE 
 				node_1::integer IN (
-				SELECT a.node_id::integer FROM temp_t_node a JOIN cat_node b ON nodecat_id=b.id JOIN cat_feature_node c ON c.id=b.nodetype_id 
+				SELECT a.node_id::integer FROM temp_t_node a JOIN cat_node b ON nodecat_id=b.id JOIN cat_feature_node c ON c.id=b.node_type 
 				LEFT JOIN man_valve d ON a.node_id::integer=d.node_id::integer 
 				JOIN temp_t_anlgraph e ON a.node_id::integer=e.node_1::integer 
 				WHERE closed=TRUE)';
@@ -498,7 +498,7 @@ BEGIN
 
 			v_querytext  = 'UPDATE temp_t_anlgraph SET flag=1 WHERE 
 				node_2::integer IN (
-				SELECT (a.node_id::integer) FROM temp_t_node a JOIN cat_node b ON nodecat_id=b.id JOIN cat_feature_node c ON c.id=b.nodetype_id 
+				SELECT (a.node_id::integer) FROM temp_t_node a JOIN cat_node b ON nodecat_id=b.id JOIN cat_feature_node c ON c.id=b.node_type 
 				LEFT JOIN man_valve d ON a.node_id::integer=d.node_id::integer 
 				JOIN temp_t_anlgraph e ON a.node_id::integer=e.node_1::integer 
 				WHERE closed=TRUE)';

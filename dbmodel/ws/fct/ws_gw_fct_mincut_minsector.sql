@@ -21,9 +21,9 @@ SELECT SCHEMA_NAME.gw_fct_mincut_minsector('2061', -1, FALSE)
 
 DECLARE
 
-v_expl integer; 
-v_muni integer; 
-v_macroexpl integer; 
+v_expl integer;
+v_muni integer;
+v_macroexpl integer;
 v_minsector integer;
 v_state integer;
 v_isoperative boolean;
@@ -76,9 +76,9 @@ BEGIN
 	DROP TABLE IF EXISTS temp_om_mincut_connec;
 	DROP TABLE IF EXISTS temp_om_mincut_hydrometer;
 	DROP TABLE IF EXISTS temp_om_mincut_valve;
-	DROP TABLE IF EXISTS temp_t_mincut;	
+	DROP TABLE IF EXISTS temp_t_mincut;
 
-	-- Create temp tables and setting selectors';	
+	-- Create temp tables and setting selectors';
 	CREATE TEMP TABLE temp_t_anlgraph (LIKE SCHEMA_NAME.temp_anlgraph INCLUDING ALL);
 	CREATE TEMP TABLE temp_t_node (LIKE SCHEMA_NAME.temp_node INCLUDING ALL);
 	CREATE TEMP TABLE temp_t_table (LIKE SCHEMA_NAME.temp_table INCLUDING ALL);
@@ -91,7 +91,7 @@ BEGIN
 	CREATE TEMP TABLE temp_om_mincut_valve (LIKE SCHEMA_NAME.om_mincut_valve INCLUDING ALL);
 	CREATE TEMP TABLE temp_t_mincut (LIKE SCHEMA_NAME.temp_mincut INCLUDING ALL);
 
-	CREATE OR REPLACE TEMP VIEW v_t_anl_graph AS 
+	CREATE OR REPLACE TEMP VIEW v_t_anl_graph AS
 		 SELECT t.arc_id,
 		        t.node_1,
 		        t.node_2,
@@ -122,18 +122,18 @@ BEGIN
 	INSERT INTO temp_om_mincut_arc (result_id, arc_id, the_geom, minsector_id) SELECT p_mincut_id, arc_id, the_geom, minsector_id FROM v_edit_arc WHERE minsector_id = v_minsector;
 	INSERT INTO temp_om_mincut_node (result_id, node_id, the_geom, minsector_id) SELECT p_mincut_id, node_id, the_geom, minsector_id FROM v_edit_node WHERE minsector_id = v_minsector;
 
-	INSERT INTO temp_om_mincut_valve (result_id, node_id, unaccess, closed, broken, the_geom) 
+	INSERT INTO temp_om_mincut_valve (result_id, node_id, unaccess, closed, broken, the_geom)
 	SELECT p_mincut_id, node.node_id, false, closed, broken, node.the_geom
 	FROM node
-	JOIN exploitation ON node.expl_id=exploitation.expl_id 
+	JOIN exploitation ON node.expl_id=exploitation.expl_id
 	JOIN cat_node c ON nodecat_id = c.id
-	JOIN cat_feature_node f ON nodetype_id = f.id
+	JOIN cat_feature_node f ON node_type = f.id
 	JOIN man_valve USING (node_id)
 	WHERE graph_delimiter = 'MINSECTOR' AND  macroexpl_id=v_macroexpl;
 
 	UPDATE temp_om_mincut_valve SET unaccess = TRUE where node_id IN (SELECT node_id FROM om_mincut_valve_unaccess WHERE result_id = p_mincut_id);
 
-	UPDATE temp_om_mincut_valve SET proposed = TRUE FROM 
+	UPDATE temp_om_mincut_valve SET proposed = TRUE FROM
 	(SELECT DISTINCT ON (a.node_id) p_mincut_id, a.node_id FROM (SELECT node_1 node_id, arc_id from temp_om_mincut_arc JOIN arc USING (arc_id)
 			UNION ALL
 			SELECT node_2, arc_id from temp_om_mincut_arc JOIN arc USING (arc_id) ) a
@@ -142,15 +142,15 @@ BEGIN
 			WHERE m.node_id is null) a WHERE a.node_id = temp_om_mincut_valve.node_id;
 
 	FOR v_check IN SELECT node_id, minsector_id from config_graph_checkvalve JOIN arc on to_arc = arc_id JOIN temp_om_mincut_valve USING (node_id) WHERE active
-	LOOP	
+	LOOP
 		IF v_check.minsector_id  = v_minsector THEN
-			SELECT minsector_id INTO v_minsector_check FROM (SELECT minsector_id FROM arc WHERE node_1 = v_check.node_id 
+			SELECT minsector_id INTO v_minsector_check FROM (SELECT minsector_id FROM arc WHERE node_1 = v_check.node_id
 			UNION SELECT minsector_id FROM arc WHERE node_2 = v_check.node_id) a WHERE minsector_id <> v_minsector;
 
 			-- insert network features into mincut tables
-			INSERT INTO temp_om_mincut_arc (result_id, arc_id, the_geom, minsector_id) SELECT p_mincut_id, arc_id, the_geom, minsector_id 
+			INSERT INTO temp_om_mincut_arc (result_id, arc_id, the_geom, minsector_id) SELECT p_mincut_id, arc_id, the_geom, minsector_id
 			FROM v_edit_arc WHERE minsector_id = v_minsector_check;
-			INSERT INTO temp_om_mincut_node (result_id, node_id, the_geom, minsector_id) SELECT p_mincut_id, node_id, the_geom, minsector_id 
+			INSERT INTO temp_om_mincut_node (result_id, node_id, the_geom, minsector_id) SELECT p_mincut_id, node_id, the_geom, minsector_id
 			FROM v_edit_node WHERE minsector_id = v_minsector_check;
 		END IF;
 	END LOOP;
@@ -164,9 +164,9 @@ BEGIN
 	-- cleaning results
 	DELETE FROM temp_om_mincut_valve WHERE node_id NOT IN (
 		SELECT node_1 FROM arc JOIN temp_om_mincut_arc USING (arc_id)
-		UNION 
+		UNION
 		SELECT node_2 FROM arc JOIN temp_om_mincut_arc USING (arc_id));
-					
+
 	-- set proposed = false for broken, unaccess and closed valves
 	UPDATE temp_om_mincut_valve SET proposed=FALSE WHERE broken = TRUE OR unaccess = TRUE OR closed = TRUE;
 
@@ -176,29 +176,29 @@ BEGIN
 	-- insert connec table
 	INSERT INTO temp_om_mincut_connec (result_id, connec_id, the_geom, customer_code)
 	SELECT p_mincut_id, connec_id, connec.the_geom, customer_code FROM connec JOIN temp_om_mincut_arc ON connec.arc_id=temp_om_mincut_arc.arc_id WHERE state = 1;
-	
+
 	-- insert hydrometer from connec
 	INSERT INTO temp_om_mincut_hydrometer (result_id, hydrometer_id)
-	SELECT p_mincut_id,rtc_hydrometer_x_connec.hydrometer_id FROM rtc_hydrometer_x_connec 
-	JOIN temp_om_mincut_connec ON rtc_hydrometer_x_connec.connec_id=temp_om_mincut_connec.connec_id 
+	SELECT p_mincut_id,rtc_hydrometer_x_connec.hydrometer_id FROM rtc_hydrometer_x_connec
+	JOIN temp_om_mincut_connec ON rtc_hydrometer_x_connec.connec_id=temp_om_mincut_connec.connec_id
 	JOIN connec ON temp_om_mincut_connec.connec_id=connec.connec_id
 	JOIN value_state_type v ON state_type = v.id
 	WHERE result_id=p_mincut_id AND v.is_operative=TRUE AND rtc_hydrometer_x_connec.connec_id=temp_om_mincut_connec.connec_id;
 
 	-- insert hydrometer from node
 	INSERT INTO temp_om_mincut_hydrometer (result_id, hydrometer_id)
-	SELECT p_mincut_id,rtc_hydrometer_x_node.hydrometer_id FROM rtc_hydrometer_x_node 
-	JOIN temp_om_mincut_node ON rtc_hydrometer_x_node.node_id=temp_om_mincut_node.node_id 
+	SELECT p_mincut_id,rtc_hydrometer_x_node.hydrometer_id FROM rtc_hydrometer_x_node
+	JOIN temp_om_mincut_node ON rtc_hydrometer_x_node.node_id=temp_om_mincut_node.node_id
 	JOIN node ON temp_om_mincut_node.node_id=node.node_id
 	JOIN value_state_type v ON state_type = v.id
 	WHERE result_id=p_mincut_id AND v.is_operative=TRUE AND rtc_hydrometer_x_node.node_id=temp_om_mincut_node.node_id;
 
 	-- getting mincut details
 	-- count arcs
-	SELECT count(arc_id), sum(st_length(arc.the_geom))::numeric(12,2) INTO v_numarcs, v_length 
+	SELECT count(arc_id), sum(st_length(arc.the_geom))::numeric(12,2) INTO v_numarcs, v_length
 	FROM temp_om_mincut_arc JOIN arc USING (arc_id);
-	
-	SELECT sum(pi()*(dint*dint/4000000)*st_length(arc.the_geom))::numeric(12,2) INTO v_volume 
+
+	SELECT sum(pi()*(dint*dint/4000000)*st_length(arc.the_geom))::numeric(12,2) INTO v_volume
 	FROM temp_om_mincut_arc JOIN arc USING (arc_id) JOIN cat_arc ON arccat_id=cat_arc.id ;
 
 	-- count valves
@@ -212,36 +212,36 @@ BEGIN
 	SELECT count (*) INTO v_numhydrometer FROM temp_om_mincut_hydrometer WHERE result_id=p_mincut_id;
 
 	-- setting boundary of mincut
-	SELECT st_astext(st_envelope(st_extent(st_buffer(the_geom,20)))) INTO v_geometry 
+	SELECT st_astext(st_envelope(st_extent(st_buffer(the_geom,20)))) INTO v_geometry
 	FROM (SELECT the_geom FROM temp_om_mincut_arc UNION SELECT the_geom FROM temp_om_mincut_valve) a;
 
 	-- priority hydrometers
 	v_priority = 	(SELECT (array_to_json(array_agg((b)))) FROM (SELECT concat('{"category":"',category_id,'","number":"', count(hydrometer_id), '"}')::json as b FROM
-				(SELECT h.hydrometer_id, h.category_id FROM rtc_hydrometer_x_connec 
-				JOIN temp_om_mincut_connec ON rtc_hydrometer_x_connec.connec_id=temp_om_mincut_connec.connec_id 
+				(SELECT h.hydrometer_id, h.category_id FROM rtc_hydrometer_x_connec
+				JOIN temp_om_mincut_connec ON rtc_hydrometer_x_connec.connec_id=temp_om_mincut_connec.connec_id
 				JOIN v_rtc_hydrometer h ON h.hydrometer_id=rtc_hydrometer_x_connec.hydrometer_id
 				union
-				SELECT h.hydrometer_id, h.category_id FROM rtc_hydrometer_x_node 
-				JOIN temp_om_mincut_node ON rtc_hydrometer_x_node.node_id=temp_om_mincut_node.node_id 
+				SELECT h.hydrometer_id, h.category_id FROM rtc_hydrometer_x_node
+				JOIN temp_om_mincut_node ON rtc_hydrometer_x_node.node_id=temp_om_mincut_node.node_id
 				JOIN v_rtc_hydrometer h ON h.hydrometer_id=rtc_hydrometer_x_node.hydrometer_id
 				)a
 				GROUP BY category_id ORDER BY category_id)a)b;
-				
+
 	IF v_priority IS NULL THEN v_priority='{}'; END IF;
-	
-	v_mincutdetails = (concat('{"minsector_id":"',v_minsector,'","psectors":{"used":"',p_usepsectors,'", "unselected":',v_count,'}, "arcs":{"number":"',v_numarcs,'", "length":"',v_length,'", "volume":"', 
+
+	v_mincutdetails = (concat('{"minsector_id":"',v_minsector,'","psectors":{"used":"',p_usepsectors,'", "unselected":',v_count,'}, "arcs":{"number":"',v_numarcs,'", "length":"',v_length,'", "volume":"',
 	v_volume, '"}, "connecs":{"number":"',v_numconnecs,'","hydrometers":{"total":"',v_numhydrometer,'","classified":',v_priority,'}}, "valve":{"proposed":"'
 	,v_numvalveproposed,'","closed":"',v_numvalveclosed,'"}}'));
-	
-	-- start of single transactional part 
+
+	-- start of single transactional part
 	INSERT INTO om_mincut (id) VALUES (p_mincut_id) ON CONFLICT DO NOTHING;
-	
+
 	-- Update selector_mincut_result
 	DELETE FROM selector_mincut_result WHERE result_id = p_mincut_id AND cur_user = current_user;
 	INSERT INTO selector_mincut_result(cur_user, result_id) VALUES (current_user, p_mincut_id);
 
 	-- update mincut values
-	UPDATE om_mincut SET mincut_state=4, anl_feature_id = p_arc_id, muni_id=v_muni, expl_id=v_expl, macroexpl_id=v_macroexpl, output = v_mincutdetails 
+	UPDATE om_mincut SET mincut_state=4, anl_feature_id = p_arc_id, muni_id=v_muni, expl_id=v_expl, macroexpl_id=v_macroexpl, output = v_mincutdetails
 	WHERE id=p_mincut_id;
 
 	DELETE FROM om_mincut_node WHERE result_id = p_mincut_id;
@@ -255,14 +255,14 @@ BEGIN
 	INSERT INTO om_mincut_valve SELECT * FROM temp_om_mincut_valve;
 	INSERT INTO om_mincut_connec SELECT * FROM temp_om_mincut_connec;
 	INSERT INTO om_mincut_hydrometer SELECT * FROM temp_om_mincut_hydrometer;
-	
+
 	-- returning
-	v_result := COALESCE(v_result, '{}'); 
+	v_result := COALESCE(v_result, '{}');
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
-	v_version := COALESCE(v_version, '{}'); 
-	v_geometry := COALESCE(v_geometry, '{}'); 
-	v_mincutdetails := COALESCE(v_mincutdetails, '{}'); 
-	v_geometry := COALESCE(v_geometry, '{}'); 
+	v_version := COALESCE(v_version, '{}');
+	v_geometry := COALESCE(v_geometry, '{}');
+	v_mincutdetails := COALESCE(v_mincutdetails, '{}');
+	v_geometry := COALESCE(v_geometry, '{}');
 
 	-- building the response
 	IF (SELECT addparam::text FROM temp_data WHERE fid=199 AND cur_user=current_user) != v_mincutdetails::text THEN
@@ -278,7 +278,7 @@ BEGIN
 		v_level = ((((v_error_message::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'level')::integer;
 		v_message = ((((v_error_message::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'message')::text;
 	END IF;
-	
+
 	RETURN ('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
 	',"body":{"form":{}'||
 			',"data":{ '||

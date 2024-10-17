@@ -12,7 +12,7 @@ DELETE FROM selector_psector;
 
 INSERT INTO selector_municipality SELECT muni_id,current_user FROM ext_municipality ON CONFLICT (muni_id, cur_user) DO NOTHING;
 
-UPDATE cat_arc SET active=TRUE WHERE arctype_id='VARC' AND id='VIRTUAL';
+UPDATE cat_arc SET active=TRUE WHERE arc_type = 'VARC' AND id = 'VIRTUAL';
 
 UPDATE om_visit SET startdate = startdate -  random() * (startdate - timestamp '2022-01-01 10:00:00');
 UPDATE om_visit SET enddate = startdate;
@@ -31,7 +31,7 @@ INSERT INTO om_waterbalance_dma_graph VALUES ('113766',1,1);
 INSERT INTO om_waterbalance_dma_graph VALUES ('113766',4,-1);
 
 
-UPDATE config_param_user SET value = replace(value, '"removeDemandOnDryNodes":false', '"delDryNetwork":false, "removeDemandOnDryNodes":true') 
+UPDATE config_param_user SET value = replace(value, '"removeDemandOnDryNodes":false', '"delDryNetwork":false, "removeDemandOnDryNodes":true')
 WHERE parameter = 'inp_options_debug';
 
 UPDATE cat_feature_node SET graph_delimiter ='MINSECTOR' WHERE id = 'SHUTOFF_VALVE';
@@ -39,14 +39,14 @@ UPDATE cat_feature_node SET graph_delimiter ='MINSECTOR' WHERE id = 'CHECK_VALVE
 UPDATE cat_feature_node SET graph_delimiter ='PRESSZONE' WHERE id in('PUMP', 'PR_REDUC_VALVE','PR_BREAK_VALVE','PR_SUSTA_VALVE');
 
 -- 01/05/2024
-UPDATE config_param_system SET value = 
+UPDATE config_param_system SET value =
 '{"status":true, "values":[
 {"sourceTable":"ve_node_pr_reduc_valve", "query":"UPDATE presszone t SET head=elevation + pression_exit FROM ve_node_pr_reduc_valve s "},
 {"sourceTable":"ve_node_tank", "query":"UPDATE presszone t SET head=elevation + hmax/2  FROM ve_node_tank s "}]}'
 WHERE parameter = 'epa_automatic_man2graph_values';
 
 
-UPDATE config_param_system SET value = 
+UPDATE config_param_system SET value =
 '{"status":true, "values":[
 {"sourceTable":"ve_node_tank", "query":"UPDATE inp_inlet t SET maxlevel = hmax, diameter=sqrt(4*area/3.14159) FROM ve_node_tank s "},
 {"sourceTable":"ve_node_pr_reduc_valve", "query":"UPDATE inp_valve t SET pressure = pression_exit FROM ve_node_pr_reduc_valve s "}]}'
@@ -75,7 +75,7 @@ UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, '
 
 UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'sys_geom', 's.the_geom'::text)
 	WHERE parameter ='basic_search_v2_tab_address';
-	
+
 UPDATE config_param_system SET isenabled = true WHERE parameter = 'basic_selector_tab_municipality';
 
 UPDATE link SET muni_id = c.muni_id FROM connec c WHERE connec_id =  feature_id;

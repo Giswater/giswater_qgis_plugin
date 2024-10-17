@@ -355,30 +355,30 @@ BEGIN
 
 			--cat_arc
 			--pipe
-			INSERT INTO cat_arc( id, arctype_id, matcat_id,  dint)
+			INSERT INTO cat_arc( id, arc_type, matcat_id,  dint)
 			SELECT DISTINCT ON (csv6, csv5) concat(csv6::numeric(10,3),'-',csv5::numeric(10,3))::text, 'PIPE', csv6, csv5::float FROM temp_csv WHERE source='[PIPES]' AND csv1 not like ';%' AND csv5 IS NOT NULL  ON CONFLICT (id) DO NOTHING;
 
-			INSERT INTO cat_arc (id, arctype_id, matcat_id, active) VALUES ('ARCPUMP', 'ARCPUMP', 'MAT', TRUE)  ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_arc (id, arctype_id, matcat_id, active) VALUES ('ARCCHV', 'ARCCHV', 'MAT', TRUE) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_arc (id, arctype_id, matcat_id, active) VALUES ('ARCFCV', 'ARCFCV', 'MAT', TRUE) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_arc (id, arctype_id, matcat_id, active) VALUES ('ARCGPV', 'ARCGPV', 'MAT', TRUE) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_arc (id, arctype_id, matcat_id, active) VALUES ('ARCPBV', 'ARCPBV', 'MAT', TRUE) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_arc (id, arctype_id, matcat_id, active) VALUES ('ARCPSV', 'ARCPSV', 'MAT', TRUE) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_arc (id, arctype_id, matcat_id, active) VALUES ('ARCTCV', 'ARCTCV', 'MAT', TRUE) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_arc (id, arctype_id, matcat_id, active) VALUES ('ARCPRV', 'ARCPRV', 'MAT', TRUE) ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_arc (id, arc_type, matcat_id, active) VALUES ('ARCPUMP', 'ARCPUMP', 'MAT', TRUE)  ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_arc (id, arc_type, matcat_id, active) VALUES ('ARCCHV', 'ARCCHV', 'MAT', TRUE) ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_arc (id, arc_type, matcat_id, active) VALUES ('ARCFCV', 'ARCFCV', 'MAT', TRUE) ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_arc (id, arc_type, matcat_id, active) VALUES ('ARCGPV', 'ARCGPV', 'MAT', TRUE) ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_arc (id, arc_type, matcat_id, active) VALUES ('ARCPBV', 'ARCPBV', 'MAT', TRUE) ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_arc (id, arc_type, matcat_id, active) VALUES ('ARCPSV', 'ARCPSV', 'MAT', TRUE) ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_arc (id, arc_type, matcat_id, active) VALUES ('ARCTCV', 'ARCTCV', 'MAT', TRUE) ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_arc (id, arc_type, matcat_id, active) VALUES ('ARCPRV', 'ARCPRV', 'MAT', TRUE) ON CONFLICT (id) DO NOTHING;
 
 			--cat_node
-			INSERT INTO cat_node (id, nodetype_id, matcat_id, active) VALUES ('JUNCTION', 'JUNCTION', 'MAT', TRUE) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_node (id, nodetype_id, matcat_id, active) VALUES ('TANK', 'TANK', 'MAT', TRUE) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_node (id, nodetype_id, matcat_id, active) VALUES ('RESERVOIR', 'RESERVOIR', 'MAT', TRUE) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_node (id, nodetype_id, matcat_id, active) VALUES ('FCV', 'FCV', 'MAT', TRUE) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_node (id, nodetype_id, matcat_id, active) VALUES ('GPV', 'GPV', 'MAT', TRUE) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_node (id, nodetype_id, matcat_id, active) VALUES ('PBV', 'PBV', 'MAT', TRUE) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_node (id, nodetype_id, matcat_id, active) VALUES ('PSV', 'PSV', 'MAT', TRUE) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_node (id, nodetype_id, matcat_id, active) VALUES ('TCV', 'TCV', 'MAT', TRUE) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_node (id, nodetype_id, matcat_id, active) VALUES ('PRV', 'PRV', 'MAT', TRUE) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_node (id, nodetype_id, matcat_id, active) VALUES ('PUMP', 'PUMP', 'MAT', TRUE) ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_node (id, nodetype_id, matcat_id, active) VALUES ('SHORTPIPE', 'SHORTPIPE', 'MAT', TRUE) ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_node (id, node_type, matcat_id, active) VALUES ('JUNCTION', 'JUNCTION', 'MAT', TRUE) ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_node (id, node_type, matcat_id, active) VALUES ('TANK', 'TANK', 'MAT', TRUE) ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_node (id, node_type, matcat_id, active) VALUES ('RESERVOIR', 'RESERVOIR', 'MAT', TRUE) ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_node (id, node_type, matcat_id, active) VALUES ('FCV', 'FCV', 'MAT', TRUE) ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_node (id, node_type, matcat_id, active) VALUES ('GPV', 'GPV', 'MAT', TRUE) ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_node (id, node_type, matcat_id, active) VALUES ('PBV', 'PBV', 'MAT', TRUE) ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_node (id, node_type, matcat_id, active) VALUES ('PSV', 'PSV', 'MAT', TRUE) ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_node (id, node_type, matcat_id, active) VALUES ('TCV', 'TCV', 'MAT', TRUE) ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_node (id, node_type, matcat_id, active) VALUES ('PRV', 'PRV', 'MAT', TRUE) ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_node (id, node_type, matcat_id, active) VALUES ('PUMP', 'PUMP', 'MAT', TRUE) ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_node (id, node_type, matcat_id, active) VALUES ('SHORTPIPE', 'SHORTPIPE', 'MAT', TRUE) ON CONFLICT (id) DO NOTHING;
 
 
 			-- insert other catalog tables
@@ -718,8 +718,8 @@ BEGIN
 			DELETE FROM cat_node WHERE id NOT IN (SELECT DISTINCT(nodecat_id) FROM node);
 			DELETE FROM cat_mat_arc WHERE id NOT IN (SELECT DISTINCT(matcat_id) FROM cat_arc);
 			DELETE FROM cat_mat_node WHERE id NOT IN (SELECT DISTINCT(matcat_id) FROM cat_node);
-			DELETE FROM cat_feature WHERE id NOT IN (SELECT DISTINCT(arctype_id) FROM cat_arc) AND feature_type = 'ARC';
-			DELETE FROM cat_feature WHERE id NOT IN (SELECT DISTINCT(nodetype_id) FROM cat_node) AND feature_type = 'NODE';
+			DELETE FROM cat_feature WHERE id NOT IN (SELECT DISTINCT(arc_type) FROM cat_arc) AND feature_type = 'ARC';
+			DELETE FROM cat_feature WHERE id NOT IN (SELECT DISTINCT(node_type) FROM cat_node) AND feature_type = 'NODE';
 
 			-- last process. Harmonize values
 			UPDATE inp_valve SET status = 'ACTIVE' WHERE status IS NULL;

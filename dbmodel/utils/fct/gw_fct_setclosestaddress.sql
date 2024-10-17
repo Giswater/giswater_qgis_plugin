@@ -96,9 +96,9 @@ BEGIN
 	-- Partial query
 	IF v_project_type = 'WS' THEN
 		IF v_feature_type='node' THEN
-			v_partialquery=' JOIN cat_node cn on cn.id=a.nodecat_id JOIN cat_feature cf on cf.id=cn.nodetype_id ';
+			v_partialquery=' JOIN cat_node cn on cn.id=a.nodecat_id JOIN cat_feature cf on cf.id=cn.node_type ';
 		ELSIF v_feature_type='connec' THEN
-			v_partialquery=' JOIN cat_connec cn on cn.id=a.connecat_id JOIN cat_feature cf on cf.id=cn.connectype_id ';
+			v_partialquery=' JOIN cat_connec cn on cn.id=a.connecat_id JOIN cat_feature cf on cf.id=cn.connec_type ';
 		END IF;
 	ELSIF v_project_type = 'UD' THEN
 		IF v_feature_type='node' THEN

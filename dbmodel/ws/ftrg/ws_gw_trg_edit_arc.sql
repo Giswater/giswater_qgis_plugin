@@ -319,7 +319,7 @@ BEGIN
 
 		-- Code
 		SELECT code_autofill, cat_feature.id, addparam::json->>'code_prefix' INTO v_code_autofill_bool, v_featurecat, v_code_prefix FROM cat_feature
-		JOIN cat_arc ON cat_feature.id=cat_arc.arctype_id WHERE cat_arc.id=NEW.arccat_id;
+		JOIN cat_arc ON cat_feature.id=cat_arc.arc_type WHERE cat_arc.id=NEW.arccat_id;
 
 		-- use specific sequence for code when its name matches featurecat_code_seq
 		EXECUTE 'SELECT concat('||quote_literal(lower(v_featurecat))||',''_code_seq'');' INTO v_seq_name;
@@ -374,7 +374,7 @@ BEGIN
 			NEW.link=NEW.arc_id;
 		END IF;
 
-		v_featurecat = (SELECT arctype_id FROM cat_arc WHERE id = NEW.arccat_id);
+		v_featurecat = (SELECT arc_type FROM cat_arc WHERE id = NEW.arccat_id);
 
 		--Location type
 		IF NEW.location_type IS NULL AND (SELECT value FROM config_param_user WHERE parameter = 'edit_feature_location_vdefault' AND cur_user = current_user)  = v_featurecat THEN
@@ -449,7 +449,7 @@ BEGIN
 
 		ELSIF v_man_table='parent' THEN
 			v_man_table := (SELECT man_table FROM cat_feature_arc c	JOIN cat_feature cf ON c.id = cf.id JOIN sys_feature_class s ON cf.feature_class = s.id
-			JOIN cat_arc ON c.id = cat_arc.arctype_id WHERE cat_arc.id=NEW.arccat_id);
+			JOIN cat_arc ON c.id = cat_arc.arc_type WHERE cat_arc.id=NEW.arccat_id);
         	IF v_man_table IS NOT NULL THEN
             	v_sql:= 'INSERT INTO '||v_man_table||' (arc_id) VALUES ('||quote_literal(NEW.arc_id)||')';
            		EXECUTE v_sql;
@@ -591,7 +591,7 @@ BEGIN
 		END IF;
 
 		--link_path
-		SELECT link_path INTO v_link_path FROM cat_feature JOIN cat_arc ON cat_arc.arctype_id=cat_feature.id WHERE cat_arc.id=NEW.arccat_id;
+		SELECT link_path INTO v_link_path FROM cat_feature JOIN cat_arc ON cat_arc.arc_type=cat_feature.id WHERE cat_arc.id=NEW.arccat_id;
 
 		IF v_link_path IS NOT NULL THEN
 			NEW.link = replace(NEW.link, v_link_path,'');
@@ -600,8 +600,8 @@ BEGIN
 		 -- Arc type for parent view
 		IF v_man_table='parent' THEN
 	    	IF (NEW.arccat_id != OLD.arccat_id) THEN
-				v_new_arc_type= (SELECT feature_class FROM cat_feature JOIN cat_arc ON cat_feature.id=arctype_id where cat_arc.id=NEW.arccat_id);
-				v_old_arc_type= (SELECT feature_class FROM cat_feature JOIN cat_arc ON cat_feature.id=arctype_id where cat_arc.id=OLD.arccat_id);
+				v_new_arc_type= (SELECT feature_class FROM cat_feature JOIN cat_arc ON cat_feature.id=arc_type where cat_arc.id=NEW.arccat_id);
+				v_old_arc_type= (SELECT feature_class FROM cat_feature JOIN cat_arc ON cat_feature.id=arc_type where cat_arc.id=OLD.arccat_id);
 				IF v_new_arc_type != v_old_arc_type THEN
 					v_sql='INSERT INTO man_'||lower(v_new_arc_type)||' (arc_id) VALUES ('||NEW.arc_id||')';
 					EXECUTE v_sql;

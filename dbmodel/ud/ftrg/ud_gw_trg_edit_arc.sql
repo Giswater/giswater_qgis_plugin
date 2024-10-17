@@ -480,7 +480,7 @@ BEGIN
 
 		ELSIF v_man_table='parent' THEN
 		v_man_table := (SELECT man_table FROM cat_feature_arc c	JOIN cat_feature cf ON c.id = cf.id JOIN sys_feature_class s ON cf.feature_class = s.id
-		JOIN cat_arc ON c.id = cat_arc.arctype_id WHERE cat_arc.id=NEW.arccat_id);
+		JOIN cat_arc ON c.id = cat_arc.arc_type WHERE cat_arc.id=NEW.arccat_id);
 		v_sql:= 'INSERT INTO '||v_man_table||' (arc_id) VALUES ('||quote_literal(NEW.arc_id)||')';
 		EXECUTE v_sql;
 

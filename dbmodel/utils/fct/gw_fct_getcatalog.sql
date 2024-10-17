@@ -18,9 +18,9 @@ SELECT SCHEMA_NAME.gw_fct_getcatalog($${
 "feature":{"tableName":"ve_arc_pipe", "idName":"arc_id", "featureId":"2001", "feature_type":"PIPE"},
 "data":{"fields":{"matcat_id":"PVC", "pnom":"16", "dnom":"160"}}}$$);
 
-SELECT gw_fct_getcatalog($${"client":{"device":4, "infoType":1, "lang":"ES"}, 
-"form":{"formName":"new_mapzone", "tabName":"data", "editable":"TRUE"}, 
-"feature":{"tableName":"ve_node_junction", "featureId":"1004", "feature_type":"JUNCTION"}, 
+SELECT gw_fct_getcatalog($${"client":{"device":4, "infoType":1, "lang":"ES"},
+"form":{"formName":"new_mapzone", "tabName":"data", "editable":"TRUE"},
+"feature":{"tableName":"ve_node_junction", "featureId":"1004", "feature_type":"JUNCTION"},
 "data":{"filterFields":{}, "pageInfo":{}, "coordinates":{"x1":419254.36901256104, "y1":4576614.161159909}}}$$);
 */
 
@@ -34,7 +34,7 @@ v_device integer;
 v_formname varchar;
 v_tabname varchar;
 fields_array json[];
-fields json;   
+fields json;
 field json;
 query_result character varying;
 query_result_ids json;
@@ -77,7 +77,7 @@ BEGIN
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
 	INTO v_version;
 
-	--	getting input data 
+	--	getting input data
 	v_device := ((p_data ->>'client')::json->>'device')::text;
 	v_formname :=  ((p_data ->>'form')::json->>'formName')::text;
 	v_tabname :=  ((p_data ->>'form')::json->>'tabName')::text;
@@ -89,7 +89,7 @@ BEGIN
 
 	-- Set 1st parent field
 	fields_array[1] := gw_fct_json_object_set_key(fields_array[1], 'selectedId', v_matcat);
-	
+
 	IF v_formname='new_mapzone' THEN
 		v_querystring = concat('SELECT lower(graph_delimiter) FROM cat_feature_node WHERE id=',quote_literal(v_feature_type),';');
 		v_debug_vars := json_build_object('v_feature_type', v_feature_type);
@@ -107,12 +107,12 @@ BEGIN
 	-- 	Calling function to build form fields
 	SELECT gw_fct_getformfields(v_formname, 'form_catalog', v_tabname, v_feature_type, null, null, null, 'INSERT',NULL, v_device, null)
 	INTO fields_array;
-	
+
 
 	--	Remove selectedId form fields
 	FOREACH field in ARRAY fields_array
-	LOOP	
-	
+	LOOP
+
 		IF v_formgroup='new_mapzone' AND json_extract_path_text(field,'columnname') = 'expl_id' THEN
 
 			v_querystring = concat('SELECT lower(feature_type) FROM cat_feature WHERE id = ',quote_literal(v_feature_type),';');
@@ -120,7 +120,7 @@ BEGIN
 			v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getcatalog', 'flag', 20);
 			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 			EXECUTE v_querystring INTO v_system_id;
-			
+
 			v_querystring = concat('SELECT expl_id FROM ',v_system_id,' WHERE ',v_system_id,'_id = ',quote_literal(v_featureid),';');
 			v_debug_vars := json_build_object('v_system_id', v_system_id, 'v_featureid', v_featureid);
 			v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getcatalog', 'flag', 30);
@@ -141,32 +141,18 @@ BEGIN
 			fields_array[(field->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(field->>'orderby')::INT], 'selectedId', ''::text);
 		END IF;
 	END LOOP;
-	
+
 	-- Set featuretype_id
-	IF v_project_type = 'WS' THEN
-	
-		IF v_formname='upsert_catalog_arc' THEN
-			v_featurecat_id = 'arctype_id';
-		ELSIF v_formname='upsert_catalog_node' THEN
-			v_featurecat_id = 'nodetype_id';
-		ELSIF v_formname='upsert_catalog_connec' THEN
-			v_featurecat_id = 'connectype_id';
-		END IF;
-		
-	ELSIF v_project_type = 'UD' THEN
-	
-		IF v_formname='upsert_catalog_arc' THEN
-			v_featurecat_id = 'arc_type';
-		ELSIF v_formname='upsert_catalog_node' THEN
-			v_featurecat_id = 'node_type';
-		ELSIF v_formname='upsert_catalog_connec' THEN
-			v_featurecat_id = 'connec_type';
-		ELSIF v_formname='upsert_catalog_gully' THEN
-			v_featurecat_id = 'gully_type';
-		END IF;
-		
+	IF v_formname='upsert_catalog_arc' THEN
+		v_featurecat_id = 'arc_type';
+	ELSIF v_formname='upsert_catalog_node' THEN
+		v_featurecat_id = 'node_type';
+	ELSIF v_formname='upsert_catalog_connec' THEN
+		v_featurecat_id = 'connec_type';
+	ELSIF v_formname='upsert_catalog_gully' THEN
+		v_featurecat_id = 'gully_type';
 	END IF;
-	
+
 	--	Setting the catalog 'id' value  (hard coded for catalogs, fixed objective field as id on 4th position
 	IF v_formname='upsert_catalog_arc' OR v_formname='upsert_catalog_node' OR v_formname='upsert_catalog_connec' OR v_formname='upsert_catalog_gully' THEN
 
@@ -184,31 +170,31 @@ BEGIN
 		IF v_text IS NOT NULL THEN
 			FOREACH text IN ARRAY v_text
 			LOOP
-				
+
 				-- Get field and value from json
 				SELECT v_text [i] into v_json_field;
 				IF v_json_field ->> 'value' != '' THEN
-					
+
 					v_field:= (SELECT (v_json_field ->> 'key')) ;
 					v_value:= (SELECT (v_json_field ->> 'value')) ;
 				END IF;
-				
+
 				i=i+1;
-				
+
 				-- creating the query_text (it's supossed that with field id there is no creation of query text filter)
 				IF v_value IS NOT NULL AND v_field != 'id' THEN
 					v_query_result := v_query_result || ' AND '||v_field||'::text = '|| quote_literal(v_value) ||'::text';
 				END IF;
-				
+
 			END LOOP;
-			
+
 			IF v_project_type = 'WS' THEN
 				v_query_result := v_query_result || ' AND '|| quote_ident(v_featurecat_id) ||' = '|| quote_literal(v_feature_type) ||' AND active IS TRUE ';
-				
+
 			ELSIF v_project_type = 'UD' AND v_formname!='upsert_catalog_gully'  THEN
 				v_query_result := v_query_result || ' AND active IS TRUE AND ('|| quote_ident(v_featurecat_id) ||' = '|| quote_literal(v_feature_type) ||' OR '|| quote_ident(v_featurecat_id) ||' IS null)';
 			END IF;
-			
+
 		END IF;
 		raise notice 'v_query_result %', v_query_result;
 
@@ -224,14 +210,14 @@ BEGIN
 		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 		EXECUTE v_querystring INTO query_result_names;
 
-		-- Set new values json of id's (it's supossed that id is on 4th position on json)	
+		-- Set new values json of id's (it's supossed that id is on 4th position on json)
 		fields_array[4] := gw_fct_json_object_set_key(fields_array[4], 'queryText', v_query_result);
 		fields_array[4] := gw_fct_json_object_set_key(fields_array[4], 'comboIds', query_result_ids);
 		fields_array[4] := gw_fct_json_object_set_key(fields_array[4], 'comboNames', query_result_names);
-		fields_array[4] := gw_fct_json_object_set_key(fields_array[4], 'selectedId',  query_result_ids -> 0);	
-		
+		fields_array[4] := gw_fct_json_object_set_key(fields_array[4], 'selectedId',  query_result_ids -> 0);
+
 	END IF;
-  
+
 	-- Convert to json
 	fields := array_to_json(fields_array);
 
@@ -244,7 +230,7 @@ BEGIN
 	      ',"body":{"message":{"level":1, "text":"Process done successfully"}'||
 		      ',"form":'||(p_data->>'form')::json||
 		      ',"feature":'||(p_data->>'feature')::json||
-		      ',"data":{"fields":' || fields ||'}}'||		     
+		      ',"data":{"fields":' || fields ||'}}'||
 	       '}')::json;
 
 END;

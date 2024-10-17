@@ -193,7 +193,7 @@ BEGIN
 
 					ELSIF v_project_type = 'WS' THEN
 
-						v_sql := 'SELECT arctype_id FROM cat_arc WHERE id = '''||v_new_record.arccat_id||''';';
+						v_sql := 'SELECT arc_type FROM cat_arc WHERE id = '''||v_new_record.arccat_id||''';';
 						EXECUTE v_sql
 						INTO v_arc_type;
 					END IF;
@@ -221,8 +221,8 @@ BEGIN
 					SELECT man_table INTO v_man_table FROM sys_feature_class s JOIN cat_feature cf ON cf.feature_class = s.id JOIN cat_feature_arc c ON c.id = cf.id WHERE c.id=v_new_record.arc_type;
 					SELECT epa_table, epa_default INTO v_epa_table, v_epatype FROM sys_feature_epa_type s JOIN cat_feature_arc c ON s.id=c.epa_default WHERE c.id=v_new_record.arc_type;
 				ELSE
-					SELECT man_table INTO v_man_table FROM sys_feature_class s JOIN cat_feature cf ON cf.feature_class = s.id JOIN cat_feature_arc c ON c.id = cf.id JOIN cat_arc ON arctype_id=c.id WHERE cat_arc.id=v_new_record.arccat_id;
-					SELECT epa_table, epa_default INTO v_epa_table, v_epatype FROM sys_feature_epa_type s JOIN cat_feature_arc c ON s.id=c.epa_default JOIN cat_arc ON arctype_id=c.id WHERE cat_arc.id=v_new_record.arccat_id;
+					SELECT man_table INTO v_man_table FROM sys_feature_class s JOIN cat_feature cf ON cf.feature_class = s.id JOIN cat_feature_arc c ON c.id = cf.id JOIN cat_arc ON arc_type=c.id WHERE cat_arc.id=v_new_record.arccat_id;
+					SELECT epa_table, epa_default INTO v_epa_table, v_epatype FROM sys_feature_epa_type s JOIN cat_feature_arc c ON s.id=c.epa_default JOIN cat_arc ON arc_type=c.id WHERE cat_arc.id=v_new_record.arccat_id;
 				END IF;
 
 				v_new_record.epa_type = v_epatype;
@@ -629,7 +629,7 @@ BEGIN
 	-- Exception control
 	EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	RETURN json_build_object('status', 'Failed', 'NOSQLERR', SQLERRM,  'message', json_build_object('level', right(SQLSTATE, 1), 'text', SQLERRM), 'SQLSTATE', SQLSTATE, 
+	RETURN json_build_object('status', 'Failed', 'NOSQLERR', SQLERRM,  'message', json_build_object('level', right(SQLSTATE, 1), 'text', SQLERRM), 'SQLSTATE', SQLSTATE,
 	'SQLCONTEXT', v_error_context)::json;
 
 

@@ -7,11 +7,11 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 1344
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_topocontrol_arc() RETURNS trigger AS $BODY$
-DECLARE 
-nodeRecord1 record; 
-nodeRecord2 record;  
+DECLARE
+nodeRecord1 record;
+nodeRecord2 record;
 vnoderec record;
-newPoint public.geometry;    
+newPoint public.geometry;
 connecPoint public.geometry;
 v_sys_statetopocontrol boolean;
 connec_id_aux varchar;
@@ -29,11 +29,11 @@ v_msg boolean = false;
 v_check_conflictmapzones boolean = false;
 v_zone text;
 v_edit_disable_arctopocontrol boolean;
-	
-BEGIN 
+
+BEGIN
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
-    
+
 	-- Get system variables
 	SELECT ((value::json)->>'activated') INTO v_check_conflictmapzones FROM config_param_system WHERE parameter='edit_arc_check_conflictmapzones';
 	SELECT value::boolean INTO v_sys_statetopocontrol FROM config_param_system WHERE parameter='edit_state_topocontrol';
@@ -62,18 +62,18 @@ BEGIN
 	IF v_sys_statetopocontrol IS NOT TRUE OR v_user_statetopocontrol IS TRUE THEN
 
 		-- working without statetopocontrol
-		SELECT node.*,nodetype_id INTO nodeRecord1 FROM node
+		SELECT node.*,node_type INTO nodeRecord1 FROM node
 		JOIN cat_node ON cat_node.id=node.nodecat_id
-		JOIN cat_feature_node ON cat_feature_node.id = nodetype_id
+		JOIN cat_feature_node ON cat_feature_node.id = node_type
 		WHERE ST_DWithin(ST_startpoint(NEW.the_geom), node.the_geom, v_arc_searchnodes) ORDER BY
-		(case when isarcdivide is true then 1 else 2 end), 
+		(case when isarcdivide is true then 1 else 2 end),
 		ST_Distance(node.the_geom, ST_startpoint(NEW.the_geom)) limit 1;
 
-		SELECT node.*,nodetype_id INTO nodeRecord2 FROM node
+		SELECT node.*,node_type INTO nodeRecord2 FROM node
 		JOIN cat_node ON cat_node.id=node.nodecat_id
-		JOIN cat_feature_node ON cat_feature_node.id = nodetype_id
+		JOIN cat_feature_node ON cat_feature_node.id = node_type
 		WHERE ST_DWithin(ST_endpoint(NEW.the_geom), node.the_geom, v_arc_searchnodes) ORDER BY
-		(case when isarcdivide is true then 1 else 2 end), 
+		(case when isarcdivide is true then 1 else 2 end),
 		ST_Distance(node.the_geom, ST_endpoint(NEW.the_geom)) limit 1;
 
 	ELSE
@@ -84,51 +84,51 @@ BEGIN
 		IF NEW.state=0 THEN
 			RETURN NEW;
 		END IF;
-		
-		-- Starting process
-		IF TG_OP='INSERT' THEN  
 
-			SELECT * INTO nodeRecord1 FROM node 
+		-- Starting process
+		IF TG_OP='INSERT' THEN
+
+			SELECT * INTO nodeRecord1 FROM node
 			JOIN cat_node ON cat_node.id=node.nodecat_id
-			JOIN cat_feature_node ON cat_feature_node.id = nodetype_id
+			JOIN cat_feature_node ON cat_feature_node.id = node_type
 			WHERE ST_DWithin(ST_startpoint(NEW.the_geom), node.the_geom, v_arc_searchnodes)
 			AND ((NEW.state=1 AND node.state=1)
-						
+
 						-- looking for existing nodes that not belongs on the same alternatives that arc
-						OR (NEW.state=2 AND node.state=1 AND node_id NOT IN 
-							(SELECT node_id FROM plan_psector_x_node 
+						OR (NEW.state=2 AND node.state=1 AND node_id NOT IN
+							(SELECT node_id FROM plan_psector_x_node
 							 WHERE plan_psector_x_node.node_id=node.node_id AND state=0 AND psector_id=
-								(SELECT value::integer FROM config_param_user 
+								(SELECT value::integer FROM config_param_user
 								WHERE parameter='plan_psector_vdefault' AND cur_user="current_user"() LIMIT 1)))
-						
+
 						-- looking for planified nodes that belongs on the same alternatives that arc
-						OR (NEW.state=2 AND node.state=2 AND node_id IN 
-							(SELECT node_id FROM plan_psector_x_node 
+						OR (NEW.state=2 AND node.state=2 AND node_id IN
+							(SELECT node_id FROM plan_psector_x_node
 							 WHERE plan_psector_x_node.node_id=node.node_id AND state=1 AND psector_id=
-								(SELECT value::integer FROM config_param_user 
+								(SELECT value::integer FROM config_param_user
 								WHERE parameter='plan_psector_vdefault' AND cur_user="current_user"() LIMIT 1))))
 
 			ORDER BY ST_Distance(node.the_geom, ST_startpoint(NEW.the_geom)) LIMIT 1;
 
-		
-			SELECT * INTO nodeRecord2 FROM node 
+
+			SELECT * INTO nodeRecord2 FROM node
 			JOIN cat_node ON cat_node.id=node.nodecat_id
-			JOIN cat_feature_node ON cat_feature_node.id = nodetype_id
-			WHERE ST_DWithin(ST_endpoint(NEW.the_geom), node.the_geom, v_arc_searchnodes) 
+			JOIN cat_feature_node ON cat_feature_node.id = node_type
+			WHERE ST_DWithin(ST_endpoint(NEW.the_geom), node.the_geom, v_arc_searchnodes)
 			AND ((NEW.state=1 AND node.state=1)
 
 						-- looking for existing nodes that not belongs on the same alternatives that arc
-						OR (NEW.state=2 AND node.state=1 AND node_id NOT IN 
-							(SELECT node_id FROM plan_psector_x_node 
+						OR (NEW.state=2 AND node.state=1 AND node_id NOT IN
+							(SELECT node_id FROM plan_psector_x_node
 							 WHERE plan_psector_x_node.node_id=node.node_id AND state=0 AND psector_id=
-								(SELECT value::integer FROM config_param_user 
+								(SELECT value::integer FROM config_param_user
 								WHERE parameter='plan_psector_vdefault' AND cur_user="current_user"() LIMIT 1)))
-						
+
 						-- looking for planified nodes that belongs on the same alternatives that arc
-						OR (NEW.state=2 AND node.state=2 AND node_id IN 
-							(SELECT node_id FROM plan_psector_x_node 
+						OR (NEW.state=2 AND node.state=2 AND node_id IN
+							(SELECT node_id FROM plan_psector_x_node
 							 WHERE plan_psector_x_node.node_id=node.node_id AND state=1 AND psector_id=
-								(SELECT value::integer FROM config_param_user 
+								(SELECT value::integer FROM config_param_user
 								WHERE parameter='plan_psector_vdefault' AND cur_user="current_user"() LIMIT 1))))
 
 			ORDER BY ST_Distance(node.the_geom, ST_endpoint(NEW.the_geom)) LIMIT 1;
@@ -136,44 +136,44 @@ BEGIN
 		ELSIF TG_OP='UPDATE' THEN
 
 
-			SELECT * INTO nodeRecord1 FROM node 
+			SELECT * INTO nodeRecord1 FROM node
 			JOIN cat_node ON cat_node.id=node.nodecat_id
-			JOIN cat_feature_node ON cat_feature_node.id = nodetype_id 
+			JOIN cat_feature_node ON cat_feature_node.id = node_type
 			WHERE ST_DWithin(ST_startpoint(NEW.the_geom), node.the_geom, v_arc_searchnodes)
 			AND ((NEW.state=1 AND node.state=1)
 
 						-- looking for existing nodes that not belongs on the same alternatives that arc
-						OR (NEW.state=2 AND node.state=1 AND node_id NOT IN 
-							(SELECT node_id FROM plan_psector_x_node 
-							 WHERE plan_psector_x_node.node_id=node.node_id AND state=0 AND psector_id IN 
+						OR (NEW.state=2 AND node.state=1 AND node_id NOT IN
+							(SELECT node_id FROM plan_psector_x_node
+							 WHERE plan_psector_x_node.node_id=node.node_id AND state=0 AND psector_id IN
 								(SELECT psector_id FROM plan_psector_x_arc WHERE arc_id=NEW.arc_id)))
-								
+
 
 						-- looking for planified nodes that belongs on the same alternatives that arc
-						OR (NEW.state=2 AND node.state=2 AND node_id IN 
-							(SELECT node_id FROM plan_psector_x_node 
+						OR (NEW.state=2 AND node.state=2 AND node_id IN
+							(SELECT node_id FROM plan_psector_x_node
 							 WHERE plan_psector_x_node.node_id=node.node_id AND state=1 AND psector_id IN
 								(SELECT psector_id FROM plan_psector_x_arc WHERE arc_id=NEW.arc_id))))
 
 			ORDER BY ST_Distance(node.the_geom, ST_startpoint(NEW.the_geom)) LIMIT 1;
 
-		
-			SELECT * INTO nodeRecord2 FROM node 
+
+			SELECT * INTO nodeRecord2 FROM node
 			JOIN cat_node ON cat_node.id=node.nodecat_id
-			JOIN cat_feature_node ON cat_feature_node.id = nodetype_id 
-			WHERE ST_DWithin(ST_endpoint(NEW.the_geom), node.the_geom, v_arc_searchnodes) 
+			JOIN cat_feature_node ON cat_feature_node.id = node_type
+			WHERE ST_DWithin(ST_endpoint(NEW.the_geom), node.the_geom, v_arc_searchnodes)
 			AND ((NEW.state=1 AND node.state=1)
 
 						-- looking for existing nodes that not belongs on the same alternatives that arc
-						OR (NEW.state=2 AND node.state=1 AND node_id NOT IN 
-							(SELECT node_id FROM plan_psector_x_node 
-							 WHERE plan_psector_x_node.node_id=node.node_id AND state=0 AND psector_id IN 
+						OR (NEW.state=2 AND node.state=1 AND node_id NOT IN
+							(SELECT node_id FROM plan_psector_x_node
+							 WHERE plan_psector_x_node.node_id=node.node_id AND state=0 AND psector_id IN
 								(SELECT psector_id FROM plan_psector_x_arc WHERE arc_id=NEW.arc_id)))
-								
+
 
 						-- looking for planified nodes that belongs on the same alternatives that arc
-						OR (NEW.state=2 AND node.state=2 AND node_id IN 
-							(SELECT node_id FROM plan_psector_x_node 
+						OR (NEW.state=2 AND node.state=2 AND node_id IN
+							(SELECT node_id FROM plan_psector_x_node
 							 WHERE plan_psector_x_node.node_id=node.node_id AND state=1 AND psector_id IN
 								(SELECT psector_id FROM plan_psector_x_arc WHERE arc_id=NEW.arc_id))))
 
@@ -184,46 +184,46 @@ BEGIN
 	-- check mapzones conflict
     IF v_check_conflictmapzones IS TRUE then
     	if nodeRecord1.sector_id != nodeRecord2.sector_id and nodeRecord1.sector_id > 0 and nodeRecord2.sector_id > 0 and
-    	(nodeRecord1.nodetype_id not in (select id from cat_feature_node where graph_delimiter = 'SECTOR') and 
-    	nodeRecord2.nodetype_id not in (select id from cat_feature_node where graph_delimiter = 'SECTOR')) then 
+    	(nodeRecord1.node_type not in (select id from cat_feature_node where graph_delimiter = 'SECTOR') and
+    	nodeRecord2.node_type not in (select id from cat_feature_node where graph_delimiter = 'SECTOR')) then
     		v_msg  = true;
     		v_zone = 'SECTOR';
     	end if;
-    
+
         if nodeRecord1.presszone_id != nodeRecord2.presszone_id and nodeRecord1.presszone_id::integer > 0 and nodeRecord2.presszone_id::integer > 0 and
-    	(nodeRecord1.nodetype_id not in (select id from cat_feature_node where graph_delimiter = 'PRESSZONE') and 
-    	nodeRecord2.nodetype_id not in (select id from cat_feature_node where graph_delimiter = 'PRESSZONE')) then 
+    	(nodeRecord1.node_type not in (select id from cat_feature_node where graph_delimiter = 'PRESSZONE') and
+    	nodeRecord2.node_type not in (select id from cat_feature_node where graph_delimiter = 'PRESSZONE')) then
     		v_msg  = true;
     		v_zone = 'PRESSZONE';
     	end if;
-    
+
         if nodeRecord1.dma_id != nodeRecord2.dma_id and nodeRecord1.dma_id > 0 and nodeRecord2.dma_id > 0 and
-    	(nodeRecord1.nodetype_id not in (select id from cat_feature_node where graph_delimiter = 'DMA') and 
-    	nodeRecord2.nodetype_id not in (select id from cat_feature_node where graph_delimiter = 'DMA')) then 
+    	(nodeRecord1.node_type not in (select id from cat_feature_node where graph_delimiter = 'DMA') and
+    	nodeRecord2.node_type not in (select id from cat_feature_node where graph_delimiter = 'DMA')) then
     		v_msg  = true;
     		v_zone = 'DMA';
     	end if;
-    
+
         if nodeRecord1.dqa_id != nodeRecord2.dqa_id and nodeRecord1.dqa_id > 0 and nodeRecord2.dqa_id > 0 and
-    	(nodeRecord1.nodetype_id not in (select id from cat_feature_node where graph_delimiter = 'DQA') and 
-    	nodeRecord2.nodetype_id not in (select id from cat_feature_node where graph_delimiter = 'DQA')) then 
+    	(nodeRecord1.node_type not in (select id from cat_feature_node where graph_delimiter = 'DQA') and
+    	nodeRecord2.node_type not in (select id from cat_feature_node where graph_delimiter = 'DQA')) then
     		v_msg  = true;
     		v_zone = 'DQA';
     	end if;
-    
+
     	if v_msg THEN
      			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                 "data":{"message":"3236", "function":"1344","debug_msg":"'||v_zone||'"}}$$);';
-		end if;    
+		end if;
     end if;
-    
+
 
     -- only if user variable is not disabled
     IF v_user_statetopocontrol IS FALSE THEN
-    
+
         --  Control of start/end node
         IF (nodeRecord1.node_id IS NOT NULL) AND (nodeRecord2.node_id IS NOT NULL) THEN
-       
+
             -- Control of same node initial and final
             IF (nodeRecord1.node_id = nodeRecord2.node_id) AND (v_samenode_init_end_control IS TRUE) THEN
                 IF v_dsbl_error IS NOT TRUE THEN
@@ -231,7 +231,7 @@ BEGIN
                     "data":{"message":"1040", "function":"1344","debug_msg":"'||nodeRecord1.node_id||'"}}$$);';
                 ELSE
                     SELECT concat('ERROR-',id,':',error_message,'.',hint_message) INTO v_message FROM sys_message WHERE id = 1040;
-                    INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (103, NEW.arc_id, v_message);			
+                    INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (103, NEW.arc_id, v_message);
                 END IF;
             ELSIF ((nodeRecord1.state = 2) OR (nodeRecord2.state = 2)) AND (NEW.state = 1) THEN
                 EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
@@ -240,11 +240,11 @@ BEGIN
                 -- Update coordinates
                 NEW.the_geom:= ST_SetPoint(NEW.the_geom, 0, nodeRecord1.the_geom);
                 NEW.the_geom:= ST_SetPoint(NEW.the_geom, ST_NumPoints(NEW.the_geom) - 1, nodeRecord2.the_geom);
-                NEW.node_1:= nodeRecord1.node_id; 
+                NEW.node_1:= nodeRecord1.node_id;
                 NEW.node_2:= nodeRecord2.node_id;
-                
+
             END IF;
-                
+
         -- Check auto insert end nodes
         ELSIF (nodeRecord1.node_id IS NOT NULL) AND (nodeRecord2.node_id IS NULL) AND v_nodeinsert_arcendpoint THEN
             IF TG_OP = 'INSERT' THEN
@@ -262,12 +262,12 @@ BEGIN
                 VALUES ((SELECT nextval('urn_id_seq')), NEW.sector_id, NEW.state, NEW.state_type, NEW.dma_id, NEW.presszone_id, NEW.soilcat_id, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate, v_nodecat,
                 NEW.ownercat_id, NEW.muni_id, NEW.postcode, NEW.district_id, NEW.expl_id, st_endpoint(NEW.the_geom))
                 RETURNING node_id INTO v_node2;
-                        
+
                 -- Update arc
-                NEW.node_1:= nodeRecord1.node_id; 
+                NEW.node_1:= nodeRecord1.node_id;
                 NEW.node_2:= v_node2;
             END IF;
-            
+
         --Error, no existing nodes
         ELSIF ((nodeRecord1.node_id IS NULL) OR (nodeRecord2.node_id IS NULL)) AND (v_arc_searchnodes_control IS TRUE) THEN
             IF v_dsbl_error IS NOT TRUE THEN
@@ -275,27 +275,27 @@ BEGIN
                     "data":{"message":"1042", "function":"1344","debug_msg":""}}$$);';
             ELSE
                 SELECT concat('ERROR-',id,':',error_message,'.',hint_message) INTO v_message FROM sys_message WHERE id = 1042;
-                INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (103, NEW.arc_id, v_message);		
+                INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (103, NEW.arc_id, v_message);
             END IF;
-            
+
         --Not existing nodes but accepted insertion
         ELSIF ((nodeRecord1.node_id IS NULL) OR (nodeRecord2.node_id IS NULL)) AND (v_arc_searchnodes_control IS FALSE) THEN
             RETURN NEW;
-            
-        ELSE		
+
+        ELSE
             IF v_dsbl_error IS NOT TRUE THEN
                 EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                     "data":{"message":"1042", "function":"1344","debug_msg":""}}$$);';
             ELSE
                 SELECT concat('ERROR-',id,':',error_message,'.',hint_message) INTO v_message FROM sys_message WHERE id = 1042;
-                INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (103, NEW.arc_id, v_message);		
+                INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (103, NEW.arc_id, v_message);
             END IF;
         END IF;
     END IF;
-	
+
 RETURN NEW;
-		
-END; 
+
+END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;

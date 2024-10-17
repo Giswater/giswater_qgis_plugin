@@ -93,8 +93,8 @@ BEGIN
         FROM (
             SELECT node_id, nodecat_id, state FROM node
         ) n
-        JOIN (SELECT id, nodetype_id FROM cat_node) cn ON cn.id = n.nodecat_id
-        JOIN (SELECT id, graph_delimiter FROM cat_feature_node) cf ON cf.id = cn.nodetype_id
+        JOIN (SELECT id, node_type FROM cat_node) cn ON cn.id = n.nodecat_id
+        JOIN (SELECT id, graph_delimiter FROM cat_feature_node) cf ON cf.id = cn.node_type
         WHERE n.state = 1 AND (cf.graph_delimiter = 'MINSECTOR' OR cf.graph_delimiter = 'SECTOR')
     ) s
     WHERE n.node_id = s.node_id AND n.pgr_node_id = n.node_id::INTEGER;

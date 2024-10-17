@@ -69,7 +69,7 @@ BEGIN
 
 	-- built partial query
 	IF v_projectype = 'WS' THEN
-		v_partialquery = 'JOIN cat_node nc ON nodecat_id=id JOIN cat_feature_node nt ON nt.id=nc.nodetype_id';
+		v_partialquery = 'JOIN cat_node nc ON nodecat_id=id JOIN cat_feature_node nt ON nt.id=nc.node_type';
 	ELSIF v_projectype = 'UD' THEN
 		v_partialquery = 'JOIN cat_feature_node ON id = a.node_type';
 	END IF;

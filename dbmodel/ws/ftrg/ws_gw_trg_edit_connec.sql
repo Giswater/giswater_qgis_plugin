@@ -423,7 +423,7 @@ BEGIN
 
 		-- Code
 		SELECT code_autofill, cat_feature.id, addparam::json->>'code_prefix' INTO v_code_autofill_bool, v_featurecat, v_code_prefix FROM cat_feature
-		join cat_connec on cat_feature.id=cat_connec.connectype_id where cat_connec.id=NEW.connecat_id;
+		join cat_connec on cat_feature.id=cat_connec.connec_type where cat_connec.id=NEW.connecat_id;
 
 		-- use specific sequence for code when its name matches featurecat_code_seq
 		EXECUTE 'SELECT concat('||quote_literal(lower(v_featurecat))||',''_code_seq'');' INTO v_seq_name;
@@ -462,7 +462,7 @@ BEGIN
 
 		END IF;
 
-		v_featurecat = (SELECT connectype_id FROM cat_connec WHERE id = NEW.connecat_id);
+		v_featurecat = (SELECT connec_type FROM cat_connec WHERE id = NEW.connecat_id);
 
 		--Location type
 		IF NEW.location_type IS NULL AND (SELECT value FROM config_param_user WHERE parameter = 'edit_feature_location_vdefault' AND cur_user = current_user)  = v_featurecat THEN
@@ -548,7 +548,7 @@ BEGIN
 
 
 		SELECT feature_class, cat_feature.id INTO v_feature_class, v_featurecat_id FROM cat_feature
-		JOIN cat_connec ON cat_feature.id=connectype_id where cat_connec.id=NEW.connecat_id;
+		JOIN cat_connec ON cat_feature.id=connec_type where cat_connec.id=NEW.connecat_id;
 
 		EXECUTE 'SELECT json_extract_path_text(double_geom,''activated'')::boolean, json_extract_path_text(double_geom,''value'')  
 		FROM cat_feature_connec WHERE id='||quote_literal(v_featurecat_id)||''
@@ -584,7 +584,7 @@ BEGIN
 
 		IF v_man_table='parent' THEN
 			v_man_table:= (SELECT man_table FROM cat_feature_connec c JOIN cat_feature cf ON cf.id = c.id JOIN sys_feature_class s ON cf.feature_class = s.id JOIN cat_connec ON cat_connec.id=NEW.connecat_id
-		    	WHERE c.id = cat_connec.connectype_id LIMIT 1)::text;
+		    	WHERE c.id = cat_connec.connec_type LIMIT 1)::text;
 
 			IF v_man_table IS NOT NULL THEN
 			    v_sql:= 'INSERT INTO '||v_man_table||' (connec_id) VALUES ('||quote_literal(NEW.connec_id)||')';
@@ -841,7 +841,7 @@ BEGIN
 		END IF;
 
 		--link_path
-		SELECT link_path INTO v_link_path FROM cat_feature JOIN cat_connec ON cat_connec.connectype_id=cat_feature.id WHERE cat_connec.id=NEW.connecat_id;
+		SELECT link_path INTO v_link_path FROM cat_feature JOIN cat_connec ON cat_connec.connec_type=cat_feature.id WHERE cat_connec.id=NEW.connecat_id;
 		IF v_link_path IS NOT NULL THEN
 			NEW.link = replace(NEW.link, v_link_path,'');
 		END IF;
@@ -849,8 +849,8 @@ BEGIN
 		-- Connec type for parent tables
 		IF v_man_table='parent' THEN
 	    	IF (NEW.connecat_id != OLD.connecat_id) THEN
-				v_new_connec_type= (SELECT feature_class FROM cat_feature JOIN cat_connec ON cat_feature.id=connectype_id where cat_connec.id=NEW.connecat_id);
-				v_old_connec_type= (SELECT feature_class FROM cat_feature JOIN cat_connec ON cat_feature.id=connectype_id where cat_connec.id=OLD.connecat_id);
+				v_new_connec_type= (SELECT feature_class FROM cat_feature JOIN cat_connec ON cat_feature.id=connec_type where cat_connec.id=NEW.connecat_id);
+				v_old_connec_type= (SELECT feature_class FROM cat_feature JOIN cat_connec ON cat_feature.id=connec_type where cat_connec.id=OLD.connecat_id);
 				IF v_new_connec_type != v_old_connec_type THEN
 					v_sql='INSERT INTO man_'||lower(v_new_connec_type)||' (connec_id) VALUES ('||NEW.connec_id||')';
 					EXECUTE v_sql;

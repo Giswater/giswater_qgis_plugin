@@ -53,7 +53,7 @@ BEGIN
 	v_isrecursive = ((SELECT (p_data::json->>'data')::json->>'parameters')::json->>'isRecursive');
 
 
-	CREATE OR REPLACE TEMP VIEW v_anl_graph AS 
+	CREATE OR REPLACE TEMP VIEW v_anl_graph AS
 	 SELECT anl_graph.arc_id,
 	    anl_graph.node_1,
 	    anl_graph.node_2,
@@ -72,7 +72,7 @@ BEGIN
 	          WHERE anl_graph_1.water = 1) a ON anl_graph.node_1::text = a.node_2::text
 	  WHERE anl_graph.flag < 2 AND anl_graph.water = 0 AND a.flag < 2;
 
-	IF v_mincutstep = 1 THEN 
+	IF v_mincutstep = 1 THEN
 
 		-- reset selectors
 		DELETE FROM selector_state WHERE cur_user=current_user;
@@ -83,25 +83,25 @@ BEGIN
 
 		-- create graph
 		INSERT INTO temp_anlgraph (arc_id, node_1, node_2, water, flag, checkf )
-		SELECT arc_id, node_1, node_2, 0, 0, 0 FROM v_edit_arc 
+		SELECT arc_id, node_1, node_2, 0, 0, 0 FROM v_edit_arc
 		WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND is_operative=TRUE
 		UNION
-		SELECT arc_id, node_2, node_1, 0, 0, 0 FROM v_edit_arc 
+		SELECT arc_id, node_2, node_1, 0, 0, 0 FROM v_edit_arc
 		WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND is_operative=TRUE;
 
 		-- setup graph closing proposable valves
 		UPDATE temp_anlgraph SET flag = 1
 		FROM om_mincut_valve WHERE result_id=v_mincutid AND ((unaccess = FALSE AND broken = FALSE))
 		AND (temp_anlgraph.node_1 = om_mincut_valve.node_id OR temp_anlgraph.node_2 = om_mincut_valve.node_id);
-			
+
 		-- setup graph closing closed valves
-		UPDATE temp_anlgraph SET flag = 1 
-		FROM om_mincut_valve WHERE result_id=v_mincutid AND closed=TRUE 
+		UPDATE temp_anlgraph SET flag = 1
+		FROM om_mincut_valve WHERE result_id=v_mincutid AND closed=TRUE
 		AND (temp_anlgraph.node_1 = om_mincut_valve.node_id OR temp_anlgraph.node_2 = om_mincut_valve.node_id);
-		
+
 		-- setup graph closing tank's inlet
-		UPDATE temp_anlgraph SET flag = 1 
-		FROM config_graph_mincut 
+		UPDATE temp_anlgraph SET flag = 1
+		FROM config_graph_mincut
 		WHERE (temp_anlgraph.node_1 = config_graph_mincut.node_id OR temp_anlgraph.node_2 = config_graph_mincut.node_id)
 		AND active;
 
@@ -109,11 +109,11 @@ BEGIN
 		UPDATE temp_anlgraph SET water=0;
 
 		-- set the starting element
-		v_querytext = 'UPDATE temp_anlgraph SET water=1 , flag = 1 WHERE arc_id='||quote_literal(v_arc); 
+		v_querytext = 'UPDATE temp_anlgraph SET water=1 , flag = 1 WHERE arc_id='||quote_literal(v_arc);
 		EXECUTE v_querytext;
 
-		
-	ELSIF v_mincutstep = 2 THEN 
+
+	ELSIF v_mincutstep = 2 THEN
 
 		-- setup graph reset water and flag
 		UPDATE temp_anlgraph SET water=0, flag=0;
@@ -125,25 +125,25 @@ BEGIN
 
 		-- setup graph closing closed valves
 		UPDATE temp_anlgraph SET flag = 1
-		FROM om_mincut_valve WHERE result_id=v_mincutid AND closed=TRUE 
+		FROM om_mincut_valve WHERE result_id=v_mincutid AND closed=TRUE
 		AND (temp_anlgraph.node_1 = om_mincut_valve.node_id OR temp_anlgraph.node_2 = om_mincut_valve.node_id);
 
 		-- setup graph closing tank's inlet
 		UPDATE temp_anlgraph SET flag = 1
-		FROM config_graph_mincut 
+		FROM config_graph_mincut
 		WHERE (temp_anlgraph.node_1 = config_graph_mincut.node_id OR temp_anlgraph.node_2 = config_graph_mincut.node_id)
 		AND active;
-	
+
 		-- set the starting elements
 		UPDATE temp_anlgraph SET water=1 , flag = 1 WHERE arc_id::text IN (SELECT arc_id FROM temp_arc WHERE result_id = v_mincutid::text);
-		
+
 	END IF;
 
 	-- start engine
 	---------------
 	UPDATE temp_anlgraph SET checkf = 0;
-	
-	LOOP	
+
+	LOOP
 		cont1 = cont1+1;
 		UPDATE temp_anlgraph n SET water = 1, flag = n.flag+1, checkf = checkf + 1 FROM v_anl_graph a WHERE n.node_1 = a.node_1 AND n.arc_id = a.arc_id;
 		GET DIAGNOSTICS affected_rows =row_count;
@@ -151,11 +151,11 @@ BEGIN
 	END LOOP;
 
 	-- 2) remove results (arc twin as closest chosen arc connected with valve if click on user takes it)
-	IF v_mincutstep = 1 THEN 
+	IF v_mincutstep = 1 THEN
 
 		UPDATE temp_anlgraph SET water=0 WHERE arc_id IN (
 
-			SELECT distinct (t.arc_id) FROM temp_anlgraph t JOIN 
+			SELECT distinct (t.arc_id) FROM temp_anlgraph t JOIN
 			(SELECT node_1 AS node_id, arc_id FROM temp_anlgraph WHERE arc_id = v_arc UNION SELECT node_2, arc_id FROM temp_anlgraph WHERE arc_id = v_arc) a
 			ON a.node_id = node_1 or a.node_id = node_2
 			JOIN om_mincut_valve v on v.node_id = a.node_id::text
@@ -173,40 +173,40 @@ BEGIN
 
 	-- insert node results into table
 	EXECUTE 'INSERT INTO om_mincut_node (result_id, node_id, the_geom, node_type)
-		SELECT '||v_mincutid||', b.node_1, the_geom, b.nodetype_id FROM (SELECT DISTINCT node_1, the_geom, nodetype_id FROM
+		SELECT '||v_mincutid||', b.node_1, the_geom, b.node_type FROM (SELECT DISTINCT node_1, the_geom, node_type FROM
 		(SELECT node_1,water FROM temp_anlgraph UNION SELECT node_2,water FROM temp_anlgraph)a
 		JOIN node ON node.node_id = a.node_1
 		JOIN cat_node cn ON node.nodecat_id=cn.id
-		GROUP BY node_1, water, the_geom, nodetype_id HAVING water=1) b
+		GROUP BY node_1, water, the_geom, node_type HAVING water=1) b
 		ON CONFLICT (node_id, result_id) DO NOTHING';
 
 	-- insert valve results into table
-	IF v_mincutstep = 1 THEN 
+	IF v_mincutstep = 1 THEN
 		v_querytext = 'UPDATE om_mincut_valve SET proposed=TRUE WHERE proposed IS NULL AND result_id = '||v_mincutid||' AND node_id IN 
 			(SELECT node_1::varchar(16) FROM (
 			select id, arc_id, node_1, node_2, water, flag from temp_anlgraph where checkf > 0 UNION select id, arc_id, node_2, node_1, water, flag from temp_anlgraph  where checkf > 0 
 			)a)';
 		EXECUTE v_querytext;
 
-	ELSIF v_mincutstep = 2 THEN 
-	
+	ELSIF v_mincutstep = 2 THEN
+
 		v_querytext = 'UPDATE om_mincut_valve SET proposed=FALSE WHERE proposed IS NULL AND result_id = '||v_mincutid||' AND node_id IN 
 			(SELECT node_1::varchar(16) FROM (
 			select id, arc_id, node_1, node_2, water, flag, checkf from temp_anlgraph where checkf > 0 UNION select id, arc_id, node_2, node_1, water, flag, checkf from temp_anlgraph  where checkf > 0 
 			)a group by node_1  having sum(water) > 1 and sum(flag) > 2 or  sum(flag) = 6)';
 		EXECUTE v_querytext;
-	
+
 	END IF;
 
 	-- looking for check-valves
-	FOR v_checkvalve IN 
+	FOR v_checkvalve IN
 	SELECT config_graph_checkvalve.* FROM om_mincut_valve JOIN config_graph_checkvalve USING (node_id) WHERE proposed = true and result_id = v_mincutid
 	AND active IS TRUE
 	LOOP
 		IF v_checkvalve.to_arc IN (SELECT arc_id FROM om_mincut_arc WHERE result_id = v_mincutid) AND v_isrecursive IS NOT TRUE THEN  -- checkvalve is proposed valve and to_arc is wet
 
 			v_arc = (SELECT distinct(arc_id) FROM temp_anlgraph WHERE (node_1::text = v_checkvalve.node_id OR  node_2::text = v_checkvalve.node_id) AND arc_id::text != v_checkvalve.to_arc::text);
-		
+
 			-- mincut must continue
 			PERFORM gw_fct_graphanalytics_mincut(concat('{"data":{"arc":"',v_arc,'", "step":1, "parameters":{"isRecursive":true, "id":',v_mincutid,'}}}')::json);
 
@@ -215,7 +215,7 @@ BEGIN
 
 	-- set proposed = false for broken valves
 	v_querytext = 'UPDATE om_mincut_valve SET proposed=FALSE WHERE broken = TRUE AND result_id = '||v_mincutid;
-	EXECUTE v_querytext;	
+	EXECUTE v_querytext;
 
 	-- set proposed = false for closed valves
 	v_querytext = 'UPDATE om_mincut_valve SET proposed=FALSE WHERE closed = TRUE AND result_id = '||v_mincutid;
@@ -227,7 +227,7 @@ BEGIN
 	EXECUTE v_querytext;
 
 DROP VIEW IF EXISTS v_anl_graph;
-	
+
 RETURN 1;
 END;
 $BODY$

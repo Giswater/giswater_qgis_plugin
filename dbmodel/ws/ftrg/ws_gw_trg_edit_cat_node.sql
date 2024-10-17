@@ -9,20 +9,19 @@ This version of Giswater is provided by Giswater Association
 
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_cat_node()  RETURNS trigger AS
 $BODY$
-DECLARE 
-	
+DECLARE
+
 BEGIN
 
-    EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
-	
-	IF NEW.nodetype_id='TANK' THEN 	
-		NEW.cost_unit='m3';
+  EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
+
+	IF NEW.node_type = 'TANK' THEN
+	  NEW.cost_unit='m3';
 	END IF;
 
-RETURN NEW;
+  RETURN NEW;
 
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
- 

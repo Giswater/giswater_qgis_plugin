@@ -276,7 +276,7 @@ BEGIN
 	IF v_project_type = 'WS' THEN
 		v_querytext = 'SELECT node_id, nodecat_id, the_geom FROM '||v_edit||'node 
 		JOIN cat_node ON nodecat_id=cat_node.id
-		JOIN cat_feature ON cat_node.nodetype_id = cat_feature.id
+		JOIN cat_feature ON cat_node.node_type = cat_feature.id
 		JOIN value_state_type ON state_type = value_state_type.id
 		WHERE value_state_type.is_operative IS TRUE AND feature_class = ''TANK'' and node_id NOT IN 
 		(SELECT node_id FROM config_graph_mincut WHERE active IS TRUE)';
@@ -1191,7 +1191,7 @@ BEGIN
 	RAISE NOTICE '41 - Check orphan nodes with isarcdivide=TRUE (OM)(442)';
 
 	IF v_project_type = 'WS' THEN
-		v_partialquery = 'JOIN cat_node nc ON nodecat_id=id JOIN cat_feature_node nt ON nt.id=nc.nodetype_id';
+		v_partialquery = 'JOIN cat_node nc ON nodecat_id=id JOIN cat_feature_node nt ON nt.id=nc.node_type';
 	ELSIF v_project_type = 'UD' THEN
 		v_partialquery = 'JOIN cat_feature_node ON id = a.node_type';
 	END IF;
@@ -1215,7 +1215,7 @@ BEGIN
 	RAISE NOTICE '42 - Check orphan nodes with isarcdivide=FALSE (OM)(443)';
 
 	IF v_project_type = 'WS' THEN
-		v_partialquery = 'JOIN cat_node nc ON nodecat_id=id JOIN cat_feature_node nt ON nt.id=nc.nodetype_id WHERE a.state>0 AND isarcdivide=''false'' AND arc_id IS NULL';
+		v_partialquery = 'JOIN cat_node nc ON nodecat_id=id JOIN cat_feature_node nt ON nt.id=nc.node_type WHERE a.state>0 AND isarcdivide=''false'' AND arc_id IS NULL';
 	ELSIF v_project_type = 'UD' THEN
 		v_partialquery = 'JOIN cat_feature_node ON id = a.node_type WHERE a.state>0 AND isarcdivide=''false''';
 	END IF;

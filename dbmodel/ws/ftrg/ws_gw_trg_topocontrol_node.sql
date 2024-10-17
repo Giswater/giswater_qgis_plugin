@@ -157,7 +157,7 @@ BEGIN
 						v_arcrecordtb.state_type := (SELECT (value::json->>'plan_statetype_ficticius')::smallint FROM config_param_system WHERE parameter='plan_statetype_vdefault');
 
 						-- Get arctype
-                        v_sql := 'SELECT arctype_id FROM cat_arc WHERE id = '''||v_arcrecordtb.arccat_id||''';';
+                        v_sql := 'SELECT arc_type FROM cat_arc WHERE id = '''||v_arcrecordtb.arccat_id||''';';
                         EXECUTE v_sql
                         INTO v_arc_type;
 
@@ -297,7 +297,7 @@ BEGIN
 
 			IF (SELECT value::boolean FROM config_param_user WHERE cur_user=current_user AND parameter = 'edit_node2arc_update_disable') IS NOT TRUE THEN
 				-- values of node
-				v_nodetype = (SELECT nodetype_id FROM cat_node WHERE NEW.nodecat_id = id);
+				v_nodetype = (SELECT node_type FROM cat_node WHERE NEW.nodecat_id = id);
 				v_staticpress = coalesce(NEW.staticpressure,0);
 				v_elevation = NEW.elevation;
 				v_depth = coalesce(NEW.depth,0);

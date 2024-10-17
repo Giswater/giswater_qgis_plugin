@@ -7,14 +7,14 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2328
 
 DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_pg2epa_fill_data(varchar);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_fill_data(result_id_var varchar)  RETURNS integer AS 
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_fill_data(result_id_var varchar)  RETURNS integer AS
 $BODY$
 
 /*EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "useNetworkGeom":"false"}}$$)
 */
 
-DECLARE     
+DECLARE
 
 v_usedmapattern boolean;
 v_buildupmode integer;
@@ -60,7 +60,7 @@ BEGIN
 		AND v_edit_arc.sector_id > 0 AND v_edit_arc.state > 0'
 		||v_statetype||')
 		SELECT DISTINCT ON (n.node_id)
-		n.node_id, elevation, elevation-depth as elev, nodetype_id, nodecat_id, epa_type, a.sector_id, n.state, n.state_type, n.annotation, n.the_geom, n.expl_id, dma_id, presszone_id, dqa_id, minsector_id,
+		n.node_id, elevation, elevation-depth as elev, node_type, nodecat_id, epa_type, a.sector_id, n.state, n.state_type, n.annotation, n.the_geom, n.expl_id, dma_id, presszone_id, dqa_id, minsector_id,
 		(case when n.builtdate is not null then (now()::date-n.builtdate)/30 else 0 end)
 		FROM node n 
 		JOIN (SELECT node_1 AS node_id, sector_id FROM b UNION SELECT node_2, sector_id FROM b)a USING (node_id)
@@ -72,7 +72,7 @@ BEGIN
 	END IF;
 
 	IF v_networkmode = 4 THEN
-	
+
 		EXECUTE ' INSERT INTO temp_t_node (node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, the_geom, expl_id, 
 			dma_id, presszone_id, dqa_id, minsector_id, age)
 			SELECT DISTINCT ON (c.connec_id)
@@ -86,7 +86,7 @@ BEGIN
 			AND pjoint_id IS NOT NULL AND pjoint_type IS NOT NULL
 			AND epa_type = ''JUNCTION''
 			AND selector_sector.cur_user = "current_user"()::text '
-			||v_statetype;		
+			||v_statetype;
 	END IF;
 
 	-- update child param for inp_reservoir
@@ -94,7 +94,7 @@ BEGIN
 
 	-- update head for those reservoirs head is not null
 	UPDATE temp_t_node SET elevation = head, elev = head FROM inp_reservoir WHERE temp_t_node.node_id=inp_reservoir.node_id AND head is not null;
-	
+
 	-- update head for those inlet acting as reservoir with head not null
 	UPDATE temp_t_node SET elevation = head, elev = head FROM inp_inlet WHERE temp_t_node.node_id=inp_inlet.node_id AND head is not null AND epa_type = 'RESERVOIR';
 
@@ -102,7 +102,7 @@ BEGIN
 	UPDATE temp_t_node SET addparam=concat('{"initlevel":"',initlevel,'", "minlevel":"',minlevel,'", "maxlevel":"',maxlevel,'", "diameter":"'
 	,diameter,'", "minvol":"',minvol,'", "curve_id":"',curve_id,'", "overflow":"',overflow,'"}')
 	FROM inp_tank WHERE temp_t_node.node_id=inp_tank.node_id;
-	
+
 	-- update child param for inp_inlet
 	UPDATE temp_t_node SET
 	addparam=concat('{"pattern_id":"',i.pattern_id,'", "initlevel":"',initlevel,'", "minlevel":"',minlevel,'", "maxlevel":"',maxlevel,'", "diameter":"'
@@ -114,7 +114,7 @@ BEGIN
 	-- update child param for inp_junction
 	UPDATE temp_t_node SET demand=inp_junction.demand, pattern_id=inp_junction.pattern_id, addparam=concat('{"emitter_coeff":"',emitter_coeff,'"}')
 	FROM inp_junction WHERE temp_t_node.node_id=inp_junction.node_id;
-	
+
 	UPDATE temp_t_node SET demand=inp_connec.demand, pattern_id=inp_connec.pattern_id, addparam=concat('{"emitter_coeff":"',emitter_coeff,'"}')
 	FROM inp_connec WHERE temp_t_node.node_id=inp_connec.connec_id;
 
@@ -130,7 +130,7 @@ BEGIN
 	FROM v_edit_inp_pump p WHERE temp_t_node.node_id=p.node_id;
 
 	raise notice 'inserting arcs on temp_t_arc table';
-	
+
 	EXECUTE 'INSERT INTO temp_t_arc (arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, roughness, 
 		length, diameter, the_geom, expl_id, dma_id, presszone_id, dqa_id, minsector_id, age)
 		SELECT DISTINCT ON (arc_id)
@@ -184,19 +184,19 @@ BEGIN
 				AND c.sector_id > 0 AND c.state > 0
 				AND pjoint_id IS NOT NULL AND pjoint_type IS NOT NULL';
 	END IF;
-        
+
 	-- update child param for inp_pipe
-	UPDATE temp_t_arc SET 
+	UPDATE temp_t_arc SET
 	minorloss = inp_pipe.minorloss,
-	status = (CASE WHEN inp_pipe.status IS NULL THEN 'OPEN' ELSE inp_pipe.status END),	
+	status = (CASE WHEN inp_pipe.status IS NULL THEN 'OPEN' ELSE inp_pipe.status END),
 	addparam=concat('{"reactionparam":"',inp_pipe.reactionparam, '","reactionvalue":"',inp_pipe.reactionvalue,'"}')
 	FROM inp_pipe WHERE temp_t_arc.arc_id=inp_pipe.arc_id;
 
 	-- update child param for inp_virtualvalve
-	UPDATE temp_t_arc SET 
-	minorloss = inp_virtualvalve.minorloss, 
-	diameter = inp_virtualvalve.diameter, 
-	status = inp_virtualvalve.status, 
+	UPDATE temp_t_arc SET
+	minorloss = inp_virtualvalve.minorloss,
+	diameter = inp_virtualvalve.diameter,
+	status = inp_virtualvalve.status,
 	addparam=concat('{"valv_type":"',valv_type,'", "pressure":"',pressure,'", "flow":"',flow,'", "coef_loss":"',coef_loss,'", "curve_id":"',curve_id,'"}')
 	FROM inp_virtualvalve WHERE temp_t_arc.arc_id=inp_virtualvalve.arc_id;
 
@@ -210,7 +210,7 @@ BEGIN
 	FROM v_edit_inp_shortpipe JOIN man_valve USING (node_id)
 	JOIN (SELECT node_1 as node_id, diameter, roughness FROM temp_t_arc) a USING (node_id)
 	WHERE temp_t_node.node_id=v_edit_inp_shortpipe.node_id;
- 
+
 	-- update addparam for inp_shortpipe (step 2)
 	UPDATE temp_t_node SET addparam=concat('{"minorloss":"',minorloss,'", "to_arc":"',to_arc,'", "status":"',status,'", "diameter":"", "roughness":"',a.roughness,'"}')
 	FROM v_edit_inp_shortpipe JOIN man_valve USING (node_id)
@@ -218,7 +218,7 @@ BEGIN
 	WHERE temp_t_node.node_id=v_edit_inp_shortpipe.node_id;
 
 	RETURN 1;
-		
+
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

@@ -14,7 +14,7 @@ SELECT plan(6);
 
 
 INSERT INTO v_edit_cat_dwf_scenario (id, idval, startdate, enddate, observ, expl_id, active, log)
-VALUES(-901, 'Default values', NULL, NULL, NULL, NULL, true, NULL);
+VALUES(-901, 'Default values for testing', NULL, NULL, NULL, NULL, true, NULL);
 
 SELECT is((SELECT count(*)::integer FROM v_edit_cat_dwf_scenario WHERE id = -901), 1, 'INSERT: v_edit_cat_dwf_scenario -901 was inserted');
 SELECT is((SELECT count(*)::integer FROM cat_dwf_scenario WHERE id = -901), 1, 'INSERT: cat_dwf_scenario -901 was inserted');

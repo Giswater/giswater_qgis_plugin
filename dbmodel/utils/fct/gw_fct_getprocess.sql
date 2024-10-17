@@ -93,11 +93,11 @@ BEGIN
 	END IF;
 
 	IF v_projectype = 'ws' THEN
-		v_nodetype = (SELECT nodetype_id FROM cat_node JOIN config_param_user ON cat_node.id = config_param_user.value
+		v_nodetype = (SELECT node_type FROM cat_node JOIN config_param_user ON cat_node.id = config_param_user.value
 		WHERE cur_user = current_user AND parameter = 'edit_nodecat_vdefault');
-		IF v_nodetype IS NULL OR (SELECT id FROM cat_node WHERE nodetype_id = v_nodetype limit 1) IS NULL THEN
+		IF v_nodetype IS NULL OR (SELECT id FROM cat_node WHERE node_type = v_nodetype limit 1) IS NULL THEN
 			v_nodetype = (SELECT ctn.id FROM cat_feature_node ctn JOIN cat_feature USING  (id)
-			join cat_node cn ON cn.nodetype_id=ctn.id  WHERE cat_feature.active IS TRUE and cn.active IS TRUE limit 1);
+			join cat_node cn ON cn.node_type=ctn.id  WHERE cat_feature.active IS TRUE and cn.active IS TRUE limit 1);
 		END IF;
 	ELSE
 		v_nodetype = (SELECT value FROM config_param_user WHERE cur_user = current_user AND parameter = 'edit_nodetype_vdefault');
@@ -109,11 +109,7 @@ BEGIN
 	v_nodecat = (SELECT value FROM config_param_user WHERE cur_user = current_user AND parameter = 'edit_nodecat_vdefault');
 
 	IF v_nodecat IS NULL THEN
-		IF v_projectype = 'ws' THEN
-			v_nodecat = (SELECT id FROM cat_node WHERE active IS true AND nodetype_id = v_nodetype limit 1);
-		ELSIF  v_projectype = 'ud' THEN
-			v_nodecat = (SELECT id FROM cat_node WHERE active IS true AND node_type = v_nodetype limit 1);
-		END IF;
+		v_nodecat = (SELECT id FROM cat_node WHERE active IS true AND node_type = v_nodetype limit 1);
 
 		IF v_nodecat IS NULL and v_projectype = 'ud' THEN
 			v_nodecat = (SELECT id FROM cat_node WHERE active IS true limit 1);

@@ -9,7 +9,7 @@ This version of Giswater is provided by Giswater Association
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_node_rotation_update()
   RETURNS trigger AS
 $BODY$
-DECLARE 
+DECLARE
 	v_version text;
 	v_project_type text;
     rec_arc Record;
@@ -36,58 +36,53 @@ BEGIN
 	SELECT giswater, upper(project_type) INTO v_version, v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- get parameters;
-	IF v_project_type = 'WS' THEN
-		SELECT choose_hemisphere INTO v_hemisphere FROM cat_feature_node JOIN cat_node ON cat_feature_node.id=cat_node.nodetype_id WHERE cat_node.id=NEW.nodecat_id limit 1;
-		SELECT num_arcs INTO v_numarcs FROM cat_feature_node JOIN cat_node ON cat_feature_node.id=cat_node.nodetype_id WHERE cat_node.id=NEW.nodecat_id limit 1;
-	ELSIF v_project_type = 'UD' then
-		SELECT choose_hemisphere INTO v_hemisphere FROM cat_feature_node JOIN cat_node ON cat_feature_node.id=cat_node.node_type WHERE cat_node.id=NEW.nodecat_id limit 1;
-		SELECT num_arcs INTO v_numarcs FROM cat_feature_node JOIN cat_node ON cat_feature_node.id=cat_node.node_type WHERE cat_node.id=NEW.nodecat_id limit 1;
-	END IF;
+	SELECT choose_hemisphere INTO v_hemisphere FROM cat_feature_node JOIN cat_node ON cat_feature_node.id=cat_node.node_type WHERE cat_node.id=NEW.nodecat_id limit 1;
+	SELECT num_arcs INTO v_numarcs FROM cat_feature_node JOIN cat_node ON cat_feature_node.id=cat_node.node_type WHERE cat_node.id=NEW.nodecat_id limit 1;
 	SELECT value::boolean INTO v_rotation_disable FROM config_param_user WHERE parameter='edit_noderotation_update_dsbl' AND cur_user=current_user;
 
 	-- for disconnected nodes
 	IF v_numarcs = 0 THEN
 
 		-- Find closest arc inside tolerance
-		SELECT arc_id, state, the_geom INTO arc_id_aux, state_aux, arc_geom  FROM v_edit_arc AS a 
+		SELECT arc_id, state, the_geom INTO arc_id_aux, state_aux, arc_geom  FROM v_edit_arc AS a
 		WHERE ST_DWithin(NEW.the_geom, a.the_geom, 0.01) ORDER BY ST_Distance(NEW.the_geom, a.the_geom) LIMIT 1;
 
-		IF arc_id_aux IS NOT NULL THEN 
+		IF arc_id_aux IS NOT NULL THEN
 
 			--  Locate position of the nearest point
 			intersect_loc := ST_LineLocatePoint(arc_geom, NEW.the_geom);
 			IF intersect_loc < 1 THEN
 				IF intersect_loc > 0.5 THEN
-					v_rotation=st_azimuth(ST_LineInterpolatePoint(arc_geom,intersect_loc), ST_LineInterpolatePoint(arc_geom,intersect_loc-0.01)); 
+					v_rotation=st_azimuth(ST_LineInterpolatePoint(arc_geom,intersect_loc), ST_LineInterpolatePoint(arc_geom,intersect_loc-0.01));
 				ELSE
-					v_rotation=st_azimuth(ST_LineInterpolatePoint(arc_geom,intersect_loc), ST_LineInterpolatePoint(arc_geom,intersect_loc+0.01)); 
+					v_rotation=st_azimuth(ST_LineInterpolatePoint(arc_geom,intersect_loc), ST_LineInterpolatePoint(arc_geom,intersect_loc+0.01));
 				END IF;
 					IF v_rotation> 3.14159 THEN
 					v_rotation = v_rotation-3.14159;
 				END IF;
 			END IF;
-				
+
 			IF v_hemisphere IS true THEN
-	
+
 				IF (NEW.hemisphere >180)  THEN
 					UPDATE node set rotation=(v_rotation*(180/3.14159)+90) where node_id=NEW.node_id;
-				ELSE		
+				ELSE
 					UPDATE node set rotation=(v_rotation*(180/3.14159)-90) where node_id=NEW.node_id;
 				END IF;
 			ELSE
-				UPDATE node set rotation=(v_rotation*(180/3.14159)-90) where node_id=NEW.node_id;		
-			END IF;				
+				UPDATE node set rotation=(v_rotation*(180/3.14159)-90) where node_id=NEW.node_id;
+			END IF;
 		END IF;
 	END IF;
 
-	-- for all nodes 
-	IF v_rotation_disable IS TRUE THEN 
+	-- for all nodes
+	IF v_rotation_disable IS TRUE THEN
     		UPDATE node SET rotation=NEW.hemisphere WHERE node_id=NEW.node_id;
 	END IF;
 
     IF TG_OP = 'UPDATE' THEN
-        IF v_rotation_disable IS FALSE AND ((NEW.hemisphere != OLD.hemisphere) 
-        OR (OLD.hemisphere IS NULL AND NEW.hemisphere IS NOT NULL)) THEN 
+        IF v_rotation_disable IS FALSE AND ((NEW.hemisphere != OLD.hemisphere)
+        OR (OLD.hemisphere IS NULL AND NEW.hemisphere IS NOT NULL)) THEN
 			if v_hemisphere IS TRUE THEN
 	            NEW.rotation=NEW.rotation - 180;
 	           	IF NEW.rotation > 360 then
@@ -95,18 +90,18 @@ BEGIN
 	           	ELSIF NEW.rotation < 0 then
 	           		NEW.rotation=NEW.rotation+360;
 	           	end if;
-	           	
+
 	        else
 	        	new.rotation=new.hemisphere;
 	        end if;
-	       
+
 	       	UPDATE node SET rotation=new.rotation where node_id=NEW.node_id;
-	       
+
         END IF;
     END IF;
 
 	RETURN NEW;
-END; 
+END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;

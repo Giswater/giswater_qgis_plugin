@@ -76,6 +76,8 @@ BEGIN
 	v_new_featurecat := ((p_data ->>'data')::json->>'newFeatureCat')::text;
 
 
+
+
     -- Get api version
     SELECT giswater, project_type INTO v_version, v_project_type FROM sys_version;
 
@@ -99,11 +101,13 @@ BEGIN
 		-- get current feature_cat
 		v_sql := concat('SELECT ', v_feature_type, '_type FROM v_edit_', v_feature_type, ' WHERE ', v_feature_type, '_id = ''', v_feature_id, '''');
 		EXECUTE v_sql INTO v_curr_featurecat;
-		
+
 		-- setting new featurecat as same as current
+		IF v_new_featurecat IS NULL THEN
 		IF v_new_featurecat IS NULL THEN
 			v_new_featurecat = v_curr_featurecat;
 		END IF;
+
 
 		v_sql := concat('SELECT json_build_object(
 	    ''location_type'', location_type,
@@ -113,6 +117,8 @@ BEGIN
 		) AS combined_data
 		FROM v_edit_', v_feature_type, ' WHERE ', v_feature_type, '_id = ''', v_feature_id, '''');
 		EXECUTE v_sql INTO v_feature_type_values;
+
+
 
 
 		-- SELECT array_agg( layoutname) into v_layouts FROM config_form_fields  WHERE formtype = 'form_featuretype_change';
@@ -134,9 +140,11 @@ BEGIN
         LOOP
             array_index := array_index + 1;
 
+
 			if v_feature_type_values is not null then
 				field_value := (v_feature_type_values ->> (aux_json->>'columnname'));
 			end if;
+
 
             IF (aux_json->>'columnname') = 'feature_type' THEN
 				field_value := v_curr_featurecat;
@@ -153,16 +161,11 @@ BEGIN
             END IF;
 
             IF (aux_json->>'columnname') = 'featurecat_id' THEN
-		       IF(v_project_type = 'WS') THEN
-		       	v_sql := concat('SELECT array_agg(id) FROM cat_', v_feature_type, ' WHERE ', v_feature_type, 'type_id = ''', v_new_featurecat, ''' AND active is True OR active is null ORDER BY 1');
-			   else
-			   	if(v_feature_type = 'gully')then
-			   		v_sql := concat('SELECT array_agg(id) FROM cat_grate WHERE ', v_feature_type, '_type = ''', v_new_featurecat, ''' AND active is True OR active is null ORDER BY 1');
-				else
-			   		v_sql := concat('SELECT array_agg(id) FROM cat_', v_feature_type, ' WHERE ', v_feature_type, '_type = ''', v_new_featurecat, ''' AND active is True OR active is null ORDER BY 1');
-
-			   	END IF;
-			   end if;
+			   	IF (v_feature_type = 'gully') THEN
+			   		v_sql := concat('SELECT array_agg(id) FROM cat_grate WHERE ', v_feature_type, '_type = ''', v_new_featurecat_id_default, ''' AND active is True OR active is null ORDER BY 1');
+                ELSE THEN
+                    v_sql := concat('SELECT array_agg(id) FROM cat_', v_feature_type, ' WHERE ', v_feature_type, '_type = ''', v_new_featurecat_id_default, ''' AND active IS TRUE OR active IS NULL ORDER BY 1');
+                END IF;
 		       EXECUTE v_sql INTO v_catalogs_ids;
 
                v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'comboIds', COALESCE(v_catalogs_ids, '{}'));
@@ -179,7 +182,7 @@ BEGIN
 			      AND (active IS TRUE OR active IS NULL);
                 v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'comboIds', COALESCE(v_fluids, '{}'));
                	v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'comboNames', COALESCE(v_fluids, '{}'));
-				
+
 				-- set selectedId in combo box
 				EXECUTE 'SELECT fluid_type FROM '||v_feature_type||' WHERE '||v_feature_type||'_id = '''||v_feature_id||''';'
 				INTO field_value;
@@ -194,6 +197,7 @@ BEGIN
 			      AND (active IS TRUE OR active IS NULL);
 				v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'comboIds', COALESCE(v_locations, '{}'));
 				v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'comboNames', COALESCE(v_locations, '{}'));
+
 
 				-- set selectedId in combo box
 				EXECUTE 'SELECT location_type FROM '||v_feature_type||' WHERE '||v_feature_type||'_id = '''||v_feature_id||''';'
@@ -211,6 +215,7 @@ BEGIN
                 v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'comboIds', COALESCE(v_categories, '{}'));
                	v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'comboNames', COALESCE(v_categories, '{}'));
 
+
 				-- set selectedId in combo box
 				EXECUTE 'SELECT category_type FROM '||v_feature_type||' WHERE '||v_feature_type||'_id = '''||v_feature_id||''';'
 				INTO field_value;
@@ -225,6 +230,7 @@ BEGIN
 			      AND (active IS TRUE OR active IS NULL);
                 v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'comboIds', COALESCE(v_functions, '{}'));
                	v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'comboNames', COALESCE(v_functions, '{}'));
+
 
 				-- set selectedId in combo box
 				EXECUTE 'SELECT function_type FROM '||v_feature_type||' WHERE '||v_feature_type||'_id = '''||v_feature_id||''';'

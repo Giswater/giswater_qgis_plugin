@@ -136,3 +136,5 @@ DROP TABLE IF EXISTS _dma;
 DROP TABLE IF EXISTS _presszone;
 DROP TABLE IF EXISTS _dqa;
 DROP TABLE IF EXISTS _sector;
+
+ALTER TABLE cat_dwf_scenario ADD CONSTRAINT unique_idval UNIQUE (idval);

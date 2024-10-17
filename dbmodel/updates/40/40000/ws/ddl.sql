@@ -7,7 +7,6 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-
 ALTER TABLE node DROP CONSTRAINT arc_macrominsector_id_fkey; -- arc_ prefix because wrong name in before version
 ALTER TABLE arc DROP CONSTRAINT arc_macrominsector_id_fkey;
 ALTER TABLE connec DROP CONSTRAINT connec_macrominsector_id_fkey;
@@ -237,3 +236,8 @@ CREATE TABLE sector (
 	CONSTRAINT sector_parent_id_fkey FOREIGN KEY (parent_id) REFERENCES sector(sector_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT sector_pattern_id_fkey FOREIGN KEY (pattern_id) REFERENCES inp_pattern(pattern_id) ON DELETE RESTRICT ON UPDATE CASCADE
 );
+
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"cat_arc", "column":"arctype_id", "newName":"arc_type"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"cat_node", "column":"nodetype_id", "newName":"node_type"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"cat_connec", "column":"connectype_id", "newName":"connec_type"}}$$);

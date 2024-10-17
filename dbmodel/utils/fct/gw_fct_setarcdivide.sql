@@ -137,7 +137,7 @@ BEGIN
 
 	IF v_project_type = 'WS' THEN
 		SELECT isarcdivide, cat_feature_node.id INTO v_isarcdivide, v_node_type
-		FROM cat_feature_node JOIN cat_node ON cat_node.nodetype_id=cat_feature_node.id
+		FROM cat_feature_node JOIN cat_node ON cat_node.node_type=cat_feature_node.id
 		JOIN node ON node.nodecat_id = cat_node.id WHERE node.node_id=v_node_id;
 	ELSE
 		SELECT isarcdivide, cat_feature_node.id INTO v_isarcdivide, v_node_type
@@ -201,15 +201,9 @@ BEGIN
 				VALUES (212, 1, concat('Divide arc ', v_arc_id,'.'));
 
 				-- Get arctype
-				IF v_project_type = 'UD' THEN
-					v_sql := 'SELECT arc_type FROM cat_arc WHERE id = (SELECT arccat_id FROM arc WHERE arc_id = '||v_arc_id||'::text);';
-					EXECUTE v_sql
-					INTO v_arc_type;
-				ELSIF v_project_type = 'WS' THEN
-					v_sql := 'SELECT arctype_id FROM cat_arc WHERE id = (SELECT arccat_id FROM arc WHERE arc_id = '||v_arc_id||'::text);';
-					EXECUTE v_sql
-					INTO v_arc_type;
-				END IF;
+				v_sql := 'SELECT arc_type FROM cat_arc WHERE id = (SELECT arccat_id FROM arc WHERE arc_id = '||v_arc_id||'::text);';
+				EXECUTE v_sql
+				INTO v_arc_type;
 
 
 				--  Locate position of the nearest point

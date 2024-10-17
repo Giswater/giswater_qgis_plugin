@@ -1309,6 +1309,24 @@ UNION
            FROM plan_arc_x_pavement) a USING (arc_id)
   WHERE a.arc_id IS NULL;
 
+CREATE OR REPLACE VIEW v_price_x_catarc
+AS SELECT cat_arc.id,
+    cat_arc.geom1,
+    cat_arc.z1,
+    cat_arc.z2,
+    cat_arc.width,
+    cat_arc.area,
+    cat_arc.bulk,
+    cat_arc.estimated_depth,
+    cat_arc.cost_unit,
+    price_cost.price AS cost,
+    price_m2bottom.price AS m2bottom_cost,
+    price_m3protec.price AS m3protec_cost
+   FROM cat_arc
+     JOIN v_price_compost price_cost ON cat_arc.cost::text = price_cost.id::text
+     JOIN v_price_compost price_m2bottom ON cat_arc.m2bottom_cost::text = price_m2bottom.id::text
+     JOIN v_price_compost price_m3protec ON cat_arc.m3protec_cost::text = price_m3protec.id::text;
+
 CREATE OR REPLACE VIEW v_plan_arc
 AS SELECT d.arc_id,
     d.node_1,
@@ -2156,6 +2174,14 @@ AS SELECT polygon.pol_id,
     FROM polygon
 	JOIN v_edit_node ON polygon.feature_id::text = v_edit_node.node_id::text
     WHERE polygon.sys_type::text = 'NETGULLY'::text;
+
+CREATE OR REPLACE VIEW v_price_x_catnode
+AS SELECT cat_node.id,
+    cat_node.estimated_y,
+    cat_node.cost_unit,
+    v_price_compost.price AS cost
+   FROM cat_node
+     JOIN v_price_compost ON cat_node.cost::text = v_price_compost.id::text;
 
 CREATE OR REPLACE VIEW v_plan_node
 AS SELECT a.node_id,

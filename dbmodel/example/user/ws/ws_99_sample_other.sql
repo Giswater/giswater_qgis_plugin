@@ -340,7 +340,7 @@ UPDATE ext_rtc_dma_period SET minc = null, maxc = null, pattern_volume = 32;
 UPDATE v_edit_arc SET arccat_id = 'VIRTUAL' WHERE arc_type = 'VARC';
 
 UPDATE cat_mat_roughness set roughness  = 0.003;
-DELETE FROM cat_arc WHERE arctype_id = 'VARC' AND id !='VIRTUAL';
+DELETE FROM cat_arc WHERE arc_type = 'VARC' AND id !='VIRTUAL';
 
 UPDATE config_form_fields SET dv_querytext_filterc  = ' AND id '
 WHERE formname IN ('upsert_catalog_node', 'upsert_catalog_arc', 'upsert_catalog_connec') AND columnname ='matcat_id' AND dv_parent_id IS NOT NULL;
