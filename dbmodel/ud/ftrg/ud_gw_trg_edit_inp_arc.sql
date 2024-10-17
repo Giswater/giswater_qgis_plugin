@@ -71,7 +71,7 @@ BEGIN
 			
 		ELSIF (v_epa_table = 'inp_orifice') THEN 
 			UPDATE inp_orifice 
-			SET ori_type=NEW.ori_type,offsetval=NEW.offsetval,cd=NEW.cd,orate=NEW.orate,flap=NEW.flap,shape=NEW.shape,geom1=NEW.geom1,geom2=NEW.geom2,geom3=NEW.geom3,geom4=NEW.geom4 
+			SET ori_type=NEW.ori_type,offsetval=NEW.offsetval,cd=NEW.cd,orate=NEW.orate,flap=NEW.flap,shape=NEW.shape,geom1=NEW.geom1,geom2=NEW.geom2
 			WHERE arc_id=OLD.arc_id;
 			
 		ELSIF (v_epa_table = 'inp_weir') THEN 

@@ -20,3 +20,14 @@ UPDATE config_toolbox SET inputparams = '
 {"widgetname":"active", "label":"Active:", "widgettype":"check", "datatype":"boolean", "tooltip":"If true, active" , "layoutname":"grl_option_parameters","layoutorder":6, "value":"true"}
 ]'
 WHERE id = 3294;
+
+UPDATE config_form_fields SET iseditable = true where columnname = 'to_arc';
+
+UPDATE config_form_fields SET iseditable = true where columnname like '%road%';
+
+UPDATE config_form_fields SET iseditable = true where columnname like 'coef_curve';
+
+UPDATE config_form_fields SET hidden = true where columnname in ('geom3', 'geom4') and formname like '%orifice%';
+
+UPDATE sys_param_user SET dv_isnullvalue = true where id = 'inp_options_hydrology_scenario';
+
