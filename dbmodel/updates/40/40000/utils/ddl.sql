@@ -21,3 +21,13 @@ ALTER TABLE cat_feature_connec DROP CONSTRAINT cat_feature_connec_type_fkey;
 ALTER TABLE cat_feature_arc DROP COLUMN type;
 ALTER TABLE cat_feature_node DROP COLUMN type;
 ALTER TABLE cat_feature_connec DROP COLUMN type;
+
+-- 17/10/2024
+CREATE TABLE config_form_help (
+    formtype VARCHAR(50) NOT NULL,
+    formname VARCHAR(50) NOT NULL,
+    tabname VARCHAR(30) NOT NULL,
+    path TEXT,
+    device INT[],
+    CONSTRAINT config_form_help_pkey PRIMARY KEY (formtype, formname, tabname)
+)
