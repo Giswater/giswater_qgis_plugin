@@ -282,7 +282,11 @@ def save_current_tab(dialog, tab_widget, selector_name):
 
 def add_btn_help(dlg):
     """ Create and add btn_help in all dialogs """
+    if tools_qt.get_widget(dlg, 'btn_help') is not None:
+        return
+
     btn_help = QPushButton("Help")
+    btn_help.setObjectName("btn_help")
     btn_help.setToolTip("Help")
     dlg.lyt_buttons.addWidget(btn_help, 0, dlg.lyt_buttons.columnCount())
 
