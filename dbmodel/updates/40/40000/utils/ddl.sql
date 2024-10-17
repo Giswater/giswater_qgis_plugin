@@ -24,9 +24,9 @@ ALTER TABLE cat_feature_connec DROP COLUMN type;
 
 -- 17/10/2024
 CREATE TABLE config_form_help (
-    formtype VARCHAR(50) NOT NULL,
+    formtype VARCHAR(50) NOT NULL DEFAULT 'generic'::character varying,
     formname VARCHAR(50) NOT NULL,
-    tabname VARCHAR(30) NOT NULL,
+    tabname VARCHAR(30) NOT NULL DEFAULT 'tab_none'::character varying,
     path TEXT,
     device INT[],
     CONSTRAINT config_form_help_pkey PRIMARY KEY (formtype, formname, tabname)
