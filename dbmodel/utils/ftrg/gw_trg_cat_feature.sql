@@ -120,6 +120,32 @@ BEGIN
 	END IF;
 
 	IF TG_OP = 'INSERT' THEN
+	
+		IF NEW.feature_class IN ('VALVE', 'PUMP', 'METER') THEN
+            
+            SELECT concat('ve_', lower(feature_type), '_', lower(id)) INTO v_viewname FROM cat_feature WHERE id=NEW.id;
+        
+            INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) 
+            VALUES(v_viewname, 'tab_data', 'Data', 'Data', 'role_basic', NULL, 
+            '[{
+            "actionName": "actionEdit",
+            "disabled": false},
+            {"actionName": "actionZoom","disabled": false},
+            {"actionName": "actionCentered","disabled": false},
+            {"actionName": "actionZoomOut","disabled": false},
+            {"actionName": "actionCatalog","disabled": false},
+            {"actionName": "actionWorkcat","disabled": false},
+            {"actionName": "actionCopyPaste","disabled": false},
+            {"actionName": "actionLink","disabled": false},
+            {"actionName": "actionSetToArc","disabled": false},
+            {"actionName": "actionMapZone","disabled": false},
+            {"actionName": "actionGetParentId","disabled": false},
+            {"actionName": "actionGetArcId","disabled": false},
+            {"actionName": "actionRotation","disabled": false},
+            {"actionName": "actionInterpolate","disabled": false}
+            ]'::json, 0, '{4,5}') ON CONFLICT (formname, tabname) DO NOTHING;
+           
+        END IF;
 
 		EXECUTE 'SELECT lower(id) as id, type, concat(''man_'',lower(id)) as man_table, epa_default, 
 		CASE WHEN epa_default IS NOT NULL THEN concat(''inp_'',lower(epa_default)) END AS epa_table 
@@ -161,6 +187,14 @@ BEGIN
 
 	ELSIF TG_OP = 'UPDATE' THEN
 
+		IF NEW.feature_class IN ('VALVE', 'PUMP', 'METER') THEN
+		
+			SELECT concat('ve_', lower(feature_type), '_', lower(id)) INTO v_viewname FROM cat_feature WHERE id=NEW.id;
+        
+			UPDATE config_form_tabs SET formname = v_viewname WHERE formname = concat('ve_', lower(NEW.feature_type), '_', lower(OLD.id));		
+			
+		END IF;
+		
 		SELECT child_layer INTO v_viewname FROM cat_feature WHERE id = NEW.id;
 		-- update child views
 		--on update and change of cat_feature.id or child layer name
@@ -326,6 +360,8 @@ BEGIN
 		RETURN NEW;
 
 	ELSIF TG_OP = 'DELETE' THEN
+	
+		DELETE FROM config_form_tabs WHERE formname = concat('ve_', lower(feature_type), '_', lower(id))
 
 		IF v_table = 'DELETE' AND OLD.feature_class <>'LINK' THEN
 			RETURN OLD;
