@@ -361,7 +361,7 @@ BEGIN
 
 	ELSIF TG_OP = 'DELETE' THEN
 	
-		DELETE FROM config_form_tabs WHERE formname = concat('ve_', lower(feature_type), '_', lower(id));
+		DELETE FROM config_form_tabs WHERE formname = concat('ve_', lower(old.feature_type), '_', lower(old.id));
 
 		IF v_table = 'DELETE' AND OLD.feature_class <>'LINK' THEN
 			RETURN OLD;
