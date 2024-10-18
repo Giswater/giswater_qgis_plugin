@@ -16,7 +16,7 @@ from qgis.PyQt.QtWidgets import QAction, QMenu, QTableView, QAbstractItemView, Q
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.core import QgsVectorLayer, QgsLineSymbol, QgsRendererCategory, QgsDateTimeRange, Qgis, QgsCategorizedSymbolRenderer, QgsProject, QgsGeometry, QgsRectangle
 
-from qgis.gui import QgsMapToolEmitPoint
+from qgis.gui import QgsMapToolEmitPoint, QgsMapToolPan
 
 from .toolbox_btn import GwToolBoxButton
 from ...ui.ui_manager import GwMapzoneManagerUi, GwMapzoneConfigUi, GwInfoGenericUi
@@ -97,6 +97,7 @@ class GwMapzoneManager:
         self.mapzone_mng_dlg.btn_cancel.clicked.connect(self.mapzone_mng_dlg.reject)
         self.mapzone_mng_dlg.finished.connect(partial(tools_gw.reset_rubberband, self.rubber_band, None))
         self.mapzone_mng_dlg.finished.connect(partial(tools_gw.close_dialog, self.mapzone_mng_dlg, True))
+        self.mapzone_mng_dlg.finished.connect(partial(self._on_dialog_closed))
         self.mapzone_mng_dlg.chk_active.stateChanged.connect(partial(self._filter_active, self.mapzone_mng_dlg))
 
 
@@ -445,65 +446,95 @@ class GwMapzoneManager:
     def _open_flood_from_node_analysis(self, dialog):
         """Initializes snapping to select a starting node for flood analysis."""
 
-        # Manually set feature_type to 'node' since we only care about nodes
-        self.feature_type = 'node'
+        if hasattr(self, 'emit_point') and self.emit_point is not None:
+            print("entro")
+            tools_gw.disconnect_signal('mapzone_manager_snapping', 'flood_analysis_xyCoordinates_mouse_move_node')
+            tools_gw.disconnect_signal('mapzone_manager_snapping', 'flood_analysis_canvasClicked_identify_node')
 
-        # Set up the snapping tool on the map to capture points
-        self.snapper_manager = QgsMapToolEmitPoint(self.iface.mapCanvas())
-        self.iface.mapCanvas().setMapTool(self.snapper_manager)
+        # Ensure the QgsMapToolEmitPoint is initialized for capturing points on the map
+        self.emit_point = QgsMapToolEmitPoint(self.canvas)
 
-        # Connect the point-click event to identify the nearest node
-        self.snapper_manager.canvasClicked.connect(partial(self._identify_node_and_run_flood_analysis, dialog))
+        # Set the map tool to capture point
+        self.canvas.setMapTool(self.emit_point)
+
+        # Initialize snapping manager
+        self.snapper_manager = GwSnapManager(self.iface)
+        self.snapper = self.snapper_manager.get_snapper()
+        self.vertex_marker = self.snapper_manager.vertex_marker
+        self.layer_node = tools_qgis.get_layer_by_tablename("v_edit_node")
+
+        # Connect mouse movement and click signals
+        tools_gw.connect_signal(self.canvas.xyCoordinates, partial(self._mouse_moved, self.layer_node), 'mapzone_manager_snapping',
+                                'flood_analysis_xyCoordinates_mouse_move_node')
+
+        tools_gw.connect_signal(self.emit_point.canvasClicked,
+                                partial(self._identify_node_and_run_flood_analysis, dialog),
+                                'mapzone_manager_snapping', 'flood_analysis_canvasClicked_identify_node')
 
 
-    def _identify_node_and_run_flood_analysis(self, dialog, point):
+    def _identify_node_and_run_flood_analysis(self, dialog, point, event):
         """Identify the node at the selected point, retrieve node_id, and run flood analysis."""
 
-        # Disable snapping after the point is selected
-        self.iface.mapCanvas().unsetMapTool(self.snapper_manager)
-        self.snapper_manager.canvasClicked.disconnect()
-
-        # Retrieve the node layer by name
-        node_layers = QgsProject.instance().mapLayersByName("Node")
-        if not node_layers:
-            tools_qgis.show_warning("The layer 'Node' was not found. Please ensure it is loaded.", dialog=dialog)
+        # Manage right click
+        if event == Qt.RightButton:
+            self._cancel_snapping_tool(dialog, None)
             return
 
-        node_layer = node_layers[0]
+        # Get the event point (convert point to QgsPointXY)
+        event_point = self.snapper_manager.get_event_point(point=point)
 
-        # Create a small buffer around the clicked point and select within this area
-        buffer_distance = 2
-        buffered_geom = QgsGeometry.fromPointXY(point).buffer(buffer_distance, 5)
-        bounding_box = buffered_geom.boundingBox()
-        node_layer.selectByRect(QgsRectangle(bounding_box))
+        # Ensure that the snapper returned a valid result
+        result = self.snapper_manager.snap_to_current_layer(event_point)
+        if not result.isValid():
+            tools_qgis.show_warning("No valid snapping result. Please select a valid point.", dialog=dialog)
+            return
 
-        # Get the first selected feature
-        selected_features = node_layer.selectedFeatures()
-        if selected_features:
-            feature = selected_features[0]
-            node_id = feature['node_id']
-            print("Selected Node ID for flood analysis:", node_id)
+        # Get the snapped feature and ensure it's from the correct layer (node layer)
+        snapped_feature = self.snapper_manager.get_snapped_feature(result)
 
-            tools_qgis.show_info(f"Flood analysis will start from node ID: {node_id}", dialog=dialog)
-            self.selected_node_id = node_id
+        # Extract node information from the snapped feature
+        node_id = snapped_feature.attribute('node_id')
 
-            # Retrieve graphClass and exploitation from the dialog or set defaults
-            graph_class = self.mapzone_mng_dlg.main_tab.tabText(self.mapzone_mng_dlg.main_tab.currentIndex()).lower()
-            # TODO remove this when the function is made
-            exploitation = "1"
+        # Check that node_id is valid
+        if not node_id:
+            tools_qgis.show_warning("No node ID found at the snapped location.", dialog=dialog)
+            return
 
-            # Run mapzones analysis function
-            self._run_mapzones_analysis(graph_class, exploitation)
+        # Highlight the snapped feature (like you do with the arc highlighting)
+        try:
+            geometry = snapped_feature.geometry()
+            self.rubber_band.setToGeometry(geometry, None)
+            self.rubber_band.setColor(QColor(255, 0, 0, 100))
+            self.rubber_band.setWidth(5)
+            self.rubber_band.show()
+        except AttributeError:
+            tools_qgis.show_warning("Unable to highlight the snapped node.", dialog=dialog)
 
-            # Call the existing flood analysis function
-            self._open_flood_analysis(dialog)
+        # Show the node ID in a message box
+        tools_qgis.show_info(f"Flood analysis will start from node ID: {node_id}", dialog=dialog)
+        self.selected_node_id = node_id
 
-        else:
-            tools_qgis.show_warning("No node was identified at the selected point.", dialog=dialog)
+        # Retrieve graphClass and exploitation from the dialog or set defaults
+        graph_class = self.mapzone_mng_dlg.main_tab.tabText(self.mapzone_mng_dlg.main_tab.currentIndex()).lower()
+        # TODO remove this when the function is made
+        exploitation = "1"
+
+        # Run mapzones analysis function
+        self._run_mapzones_analysis(graph_class, exploitation)
+
+        # Call the existing flood analysis function
+        self._open_flood_analysis(dialog)
 
         # Clear the selection after processing
-        node_layer.removeSelection()
+        self.layer_node.removeSelection()
 
+        tools_qgis.disconnect_snapping(True, self.emit_point, self.vertex_marker)
+        tools_qgis.disconnect_signal_selection_changed()
+
+    def _on_dialog_closed(self):
+        """Ensure snapping is deactivated and Pan tool is set when dialog closes."""
+        self._cancel_snapping_tool(self.mapzone_mng_dlg, None)
+        self.iface.actionPan().trigger()
 
     def _run_mapzones_analysis(self, graph_class, exploitation):
         """Executes the mapzones analysis with only the required parameters."""
@@ -1109,6 +1140,7 @@ class GwMapzoneManager:
         dialog.blockSignals(False)
         if action:
             action.setChecked(False)
+        self.iface.actionPan().trigger()
         # self.signal_activate.emit()
 
     # endregion
