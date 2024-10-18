@@ -30,4 +30,20 @@ CREATE TABLE config_form_help (
     path TEXT,
     device INT[],
     CONSTRAINT config_form_help_pkey PRIMARY KEY (formtype, formname, tabname)
-)
+);
+
+-- 18/10/2024
+DROP TRIGGER IF EXISTS gw_trg_config_control ON man_type_category;
+DROP TRIGGER IF EXISTS gw_trg_config_control ON man_type_fluid;
+DROP TRIGGER IF EXISTS gw_trg_config_control ON man_type_function;
+DROP TRIGGER IF EXISTS gw_trg_config_control ON man_type_location;
+DROP TRIGGER IF EXISTS gw_trg_config_control ON cat_brand;
+DROP TRIGGER IF EXISTS gw_trg_config_control ON cat_brand_model;
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"man_type_category", "column":"featurecat_id", "dataType":"text[]"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"man_type_fluid", "column":"featurecat_id", "dataType":"text[]"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"man_type_function", "column":"featurecat_id", "dataType":"text[]"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"man_type_location", "column":"featurecat_id", "dataType":"text[]"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"cat_brand", "column":"featurecat_id", "dataType":"text[]"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"cat_brand_model", "column":"featurecat_id", "dataType":"text[]"}}$$);
+
