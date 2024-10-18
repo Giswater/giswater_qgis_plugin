@@ -6,9 +6,9 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2562
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_get_formfields(character varying, character varying, character varying, 
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_get_formfields(character varying, character varying, character varying,
 character varying, character varying, character varying, character varying, character varying, character varying, integer);
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_get_formfields(character varying, character varying, character varying, 
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_get_formfields(character varying, character varying, character varying,
 character varying, character varying, character varying, character varying, character varying, character varying, integer, json);
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getformfields(
@@ -42,7 +42,7 @@ UPDATE config_param_user SET value =  'true' WHERE parameter = 'utils_debug_mode
 DECLARE
 fields json;
 fields_array json[];
-aux_json json;    
+aux_json json;
 combo_json json;
 schemas_array name[];
 array_index integer DEFAULT 0;
@@ -61,7 +61,7 @@ v_array text[];
 v_widgetvalue json;
 v_input json;
 v_editability text;
-v_label text;     
+v_label text;
 v_clause text;
 v_device text;
 v_debug boolean;
@@ -74,12 +74,12 @@ v_msgerr json;
 v_featuretype text;
 v_currency text;
 v_filter_widgets text = '';
-       
+
 BEGIN
 
 	-- Set search path to local schema
 	SET search_path = "SCHEMA_NAME", public;
-	
+
 	-- Get schema name
 	schemas_array := current_schemas(FALSE);
 
@@ -90,11 +90,11 @@ BEGIN
 	-- get project type
 	SELECT project_type INTO v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
 	SELECT value::boolean INTO v_debug FROM config_param_user WHERE parameter='utils_debug_mode';
-	
+
 	IF v_debug = TRUE THEN
 		v_debug_var = (SELECT jsonb_build_object('formname',  p_formname,'formtype',   p_formtype, 'tabname', p_tabname,'tablename', p_tablename, 'idname', p_idname,
 		'id',p_id, 'columntype', p_columntype, 'tgop', p_tgop, 'filterfield', p_filterfield, 'device', p_device, 'values_array', p_values_array	));
-		
+
 		PERFORM gw_fct_debug(concat('{"data":{"msg":"----> INPUT FOR gw_fct_getformfields: ", "variables":',v_debug_var,'}}')::json);
 	END IF;
 
@@ -102,17 +102,17 @@ BEGIN
 	IF p_tabname IS NULL THEN
 		p_tabname = 'tabname';
 	END IF;
-	
+
 	-- setting device
 	IF p_device IN (1,2,3) THEN
 		v_device = ' b.camelstyle AS type, columnname AS name, datatype AS "dataType", a.camelstyle AS "widgetAction", a.camelstyle as "updateAction", a.camelstyle as "changeAction",
 		     (CASE WHEN layoutname=''0'' OR layoutname =''lyt_top_1'' THEN ''header'' WHEN layoutname=''9'' OR layoutname =''lyt_bot_1'' OR layoutname =''lyt_bot_2'' 
 		     THEN ''footer'' ELSE ''body'' END) AS "position",
-		     (CASE WHEN iseditable=true THEN false ELSE true END)  AS disabled,';     
-	ELSE 
+		     (CASE WHEN iseditable=true THEN false ELSE true END)  AS disabled,';
+	ELSE
 		v_device = '';
 	END IF;
-		
+
 
 	IF p_filterfield IS NOT NULL AND p_filterfield!='' THEN
 		v_filter_widgets = ' AND columnname NOT IN('||(p_filterfield)||') ';
@@ -247,6 +247,16 @@ BEGIN
       		fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'imageVal', COALESCE((aux_json->>'queryText'), ''));
       		fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_delete_keys(fields_array[(aux_json->>'orderby')::INT],
       		'queryText', 'orderById', 'isNullValue', 'parentId', 'queryTextFilter');
+	END LOOP;
+
+	-- for buttons
+	FOR aux_json IN SELECT * FROM json_array_elements(array_to_json(fields_array)) AS a WHERE a->>'widgettype' = 'button'
+	LOOP
+		IF json_extract_path_text(aux_json,'widgetcontrols','text') IS NOT NULL THEN
+			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'value', json_extract_path_text(aux_json,'widgetcontrols','text'));
+		ELSE
+			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'value', COALESCE(field_value, ''));
+		END IF;
 	END LOOP;
 
 	-- combo no childs

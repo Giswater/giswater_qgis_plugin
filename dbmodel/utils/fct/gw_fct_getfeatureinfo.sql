@@ -29,7 +29,7 @@ DECLARE
 
 fields json;
 fields_array json[];
-aux_json json;    
+aux_json json;
 schemas_array name[];
 array_index integer DEFAULT 0;
 field_value character varying;
@@ -47,14 +47,14 @@ BEGIN
 
 	-- Set search path to local schema
 	SET search_path = "SCHEMA_NAME", public;
-    
+
 	--  get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
 		INTO v_version;
 
 	--    Get schema name
 	schemas_array := current_schemas(FALSE);
-	
+
 	-- getting values from feature
 	if p_id is not null then
         v_querystring = concat('SELECT (row_to_json(a)) FROM (SELECT * FROM ',quote_ident(p_table_id),' WHERE ',quote_ident(p_idname),' = CAST(',quote_nullable(p_id),' AS ',(p_columntype),'))a');
@@ -63,7 +63,7 @@ BEGIN
         SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
         EXECUTE v_querystring INTO v_values_array;
     end if;
-	IF  p_configtable THEN 
+	IF  p_configtable THEN
 
 		raise notice 'Configuration fields are defined on config_info_layer_field, calling gw_fct_getformfields with formname: % tablename: % id %', p_table_id, p_table_id, p_id;
 
@@ -72,10 +72,10 @@ BEGIN
 		SELECT gw_fct_getformfields( p_table_id, v_formtype, 'tab_data', p_table_id, p_idname, p_id, null, 'SELECT',null, p_device, v_values_array) INTO fields_array;
 	ELSE
 		raise notice 'Configuration fields are NOT defined on config_info_layer_field. System values will be used';
-		
+
 		IF p_id IS NULL THEN
 			RETURN '{}'; -- returning null for those layers are not configured and id is null (first call on load project)
-			
+
 		ELSE
 			-- Get fields
 			v_querystring = concat('SELECT array_agg(row_to_json(a)) FROM 
@@ -114,35 +114,33 @@ BEGIN
 	END IF;
 
 	IF p_tgop !='LAYER' THEN
-	
+
 		-- Fill every value
 		FOREACH aux_json IN ARRAY fields_array
 		LOOP
 			array_index := array_index + 1;
 			field_value := (v_values_array->>(aux_json->>'columnname'));
 			field_value := COALESCE(field_value, '');
-		
+
 			-- Update array
 			IF (aux_json->>'widgettype')='combo' THEN
 				fields_array[array_index] := gw_fct_json_object_set_key(fields_array[array_index], 'selectedId', field_value);
-			ELSIF (aux_json->>'widgettype')='button' and json_extract_path_text(aux_json,'widgetcontrols','text') IS NOT NULL THEN
-				fields_array[array_index] := gw_fct_json_object_set_key(fields_array[array_index], 'value', json_extract_path_text(aux_json,'widgetcontrols','text'));
-			ELSE
+			ELSIF (aux_json->>'widgettype') !='button' THEN
 				fields_array[array_index] := gw_fct_json_object_set_key(fields_array[array_index], 'value', field_value);
-			END IF;   
+			END IF;
 		END LOOP;
-		
+
 	END IF;
-   
+
 	-- Convert to json
 	fields := array_to_json(fields_array);
 
 	-- Control NULL's
-	fields := COALESCE(fields, '[]');    
+	fields := COALESCE(fields, '[]');
 
 	-- Return
 	RETURN  fields;
-	
+
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

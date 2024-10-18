@@ -11,7 +11,7 @@ RETURNS json AS
 $BODY$
 
 DECLARE
-  aux_json json;   
+  aux_json json;
   array_index integer DEFAULT 0;
   field_value character varying;
   v_querystring text;
@@ -22,11 +22,11 @@ DECLARE
   v_selected_id text;
   v_selected_idval text;
   v_current_id text;
-  v_new_id text; 
+  v_new_id text;
   v_widgetcontrols json;
   v_values_array json;
   v_widgetvalues json;
- 
+
   v_fields_array json[];
   v_fieldsjson jsonb := '[]';
   v_version json;
@@ -40,7 +40,7 @@ BEGIN
   v_version := row_to_json(row) FROM (
     SELECT value FROM config_param_system WHERE parameter='admin_version'
   ) row;
- 
+
   SELECT gw_fct_getformfields(
     'mincut_manager',
     'form_mincut',
@@ -54,16 +54,16 @@ BEGIN
     NULL,
     NULL
   ) INTO v_fields_array;
-  
+
  -- looping the array setting values and widgetcontrols
-		FOREACH aux_json IN ARRAY v_fields_array 
-		LOOP          
+		FOREACH aux_json IN ARRAY v_fields_array
+		LOOP
 			array_index := array_index + 1;
 
 			field_value := (v_values_array->>(aux_json->>'columnname'));
-		
+
 			-- setting values
-			IF (aux_json->>'widgettype')='combo' THEN 
+			IF (aux_json->>'widgettype')='combo' THEN
 				--check if selected id is on combo list
 				IF field_value::text not in  (select a from json_array_elements_text(json_extract_path(v_fields_array[array_index],'comboIds'))a) AND field_value IS NOT NULL then
 					--find dvquerytext for combo
@@ -74,7 +74,7 @@ BEGIN
 					v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getfeatureupsert', 'flag', 100);
 					SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 					EXECUTE v_querystring INTO v_querytext;
-					
+
 					v_querytext = replace(lower(v_querytext),'active is true','1=1');
 
 					--select values for missing id
@@ -84,9 +84,9 @@ BEGIN
 					v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getfeatureupsert', 'flag', 110);
 					SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 					EXECUTE v_querystring INTO v_selected_id,v_selected_idval;
-					
+
 					v_current_id =json_extract_path_text(v_fields_array[array_index],'comboIds');
-		
+
 					IF v_current_id='[]' THEN
 						--case when list is empty
 						EXECUTE 'SELECT  array_to_json(''{'||v_selected_id||'}''::text[])'
@@ -96,14 +96,14 @@ BEGIN
 						INTO v_new_id;
 						v_fields_array[array_index] = gw_fct_json_object_set_key(v_fields_array[array_index],'comboNames',v_new_id::json);
 					ELSE
-					
+
 						select string_agg(quote_ident(a),',') into v_new_id from json_array_elements_text(v_current_id::json) a ;
 						--remove current combo Ids from return json
 						v_fields_array[array_index] = v_fields_array[array_index]::jsonb - 'comboIds'::text;
 						v_new_id = '['||v_new_id || ','|| quote_ident(v_selected_id)||']';
 						--add new combo Ids to return json
 						v_fields_array[array_index] = gw_fct_json_object_set_key(v_fields_array[array_index],'comboIds',v_new_id::json);
-		
+
 						v_current_id =json_extract_path_text(v_fields_array[array_index],'comboNames');
 						select string_agg(quote_ident(a),',') into v_new_id from json_array_elements_text(v_current_id::json) a ;
 						--remove current combo names from return json
@@ -114,21 +114,19 @@ BEGIN
 					END IF;
 				END IF;
 				v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'selectedId', COALESCE(field_value, ''));
-			ELSIF (aux_json->>'widgettype')='button' and json_extract_path_text(aux_json,'widgetcontrols','text') IS NOT NULL THEN
-				v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'value', json_extract_path_text(aux_json,'widgetcontrols','text'));
-			ELSE 
+			ELSIF (aux_json->>'widgettype') !='button' THEN
 				v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'value', COALESCE(field_value, ''));
-			END IF;		
-			
+			END IF;
+
 			-- setting widgetcontrols
-			IF (aux_json->>'datatype')='double' OR (aux_json->>'datatype')='integer' OR (aux_json->>'datatype')='numeric' THEN 
+			IF (aux_json->>'datatype')='double' OR (aux_json->>'datatype')='integer' OR (aux_json->>'datatype')='numeric' THEN
 				IF v_widgetvalues IS NOT NULL THEN
 					v_widgetcontrols = gw_fct_json_object_set_key ((aux_json->>'widgetcontrols')::json, 'maxMinValues' ,(v_widgetvalues->>(aux_json->>'columnname'))::json);
 					v_fields_array[array_index] := gw_fct_json_object_set_key (v_fields_array[array_index], 'widgetcontrols', v_widgetcontrols);
 				END IF;
 			END IF;
-		END LOOP;  
- 
+		END LOOP;
+
   v_fieldsjson := to_json(v_fields_array);
 
   v_response := '{
