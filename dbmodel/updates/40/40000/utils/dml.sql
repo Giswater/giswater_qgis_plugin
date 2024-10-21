@@ -96,3 +96,11 @@ UPDATE config_form_fields SET widgetcontrols='{
     "featurecat_id"
   ]
 }'::json WHERE formname='generic' AND formtype='form_featuretype_change' AND columnname='feature_type_new' AND tabname='tab_none';
+
+-- 21/10/2024
+UPDATE config_form_fields
+  SET widgetcontrols='{"labelPosition": "top", "filterSign": ">="}'::json
+  WHERE formtype='form_feature' AND columnname='date_event_from' AND tabname='tab_event';
+UPDATE config_form_fields
+  SET widgetcontrols='{"labelPosition": "top", "filterSign": "<="}'::json
+  WHERE formtype='form_feature' AND columnname='date_event_to' AND tabname='tab_event';
