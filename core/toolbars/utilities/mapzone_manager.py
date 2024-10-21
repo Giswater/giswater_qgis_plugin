@@ -447,7 +447,6 @@ class GwMapzoneManager:
         """Initializes snapping to select a starting node for flood analysis."""
 
         if hasattr(self, 'emit_point') and self.emit_point is not None:
-            print("entro")
             tools_gw.disconnect_signal('mapzone_manager_snapping', 'flood_analysis_xyCoordinates_mouse_move_node')
             tools_gw.disconnect_signal('mapzone_manager_snapping', 'flood_analysis_canvasClicked_identify_node')
 
@@ -1134,12 +1133,24 @@ class GwMapzoneManager:
 
 
     def _cancel_snapping_tool(self, dialog, action):
+        """Cancel snapping tool and reset the state."""
 
+        # Disconnect snapping and signals
         tools_qgis.disconnect_snapping(False, None, self.vertex_marker)
         tools_gw.disconnect_signal('mapzone_manager_snapping')
+
+        # Hide markers or cross cursor
+        if hasattr(self, 'vertex_marker') and self.vertex_marker:
+            self.vertex_marker.hide()
+
+        # Unblock signals for dialog
         dialog.blockSignals(False)
         if action:
             action.setChecked(False)
+
+        # Forcefully switch to Pan tool
+        pan_tool = QgsMapToolPan(self.canvas)
+        self.canvas.setMapTool(pan_tool)
         self.iface.actionPan().trigger()
         # self.signal_activate.emit()
 
