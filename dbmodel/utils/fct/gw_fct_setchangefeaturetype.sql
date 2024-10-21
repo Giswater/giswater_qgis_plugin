@@ -72,10 +72,10 @@ BEGIN
 	v_fluid = ((p_data ->>'data')::json->>'fluid_type')::text;
 	v_location = ((p_data ->>'data')::json->>'location_type')::text;
 
-	if v_category = 'null' then v_category = null; end if;
-	if v_function = 'null' then v_function = null; end if;
-	if v_fluid = 'null' then v_fluid = null; end if;
-	if v_location = 'null' then v_location = null; end if;
+	if v_category = '' then v_category = null; end if;
+	if v_function = '' then v_function = null; end if;
+	if v_fluid = '' then v_fluid = null; end if;
+	if v_location = '' then v_location = null; end if;
 
 	--define columns used for feature_cat
 	v_feature_layer = concat('v_edit_',v_feature_type);

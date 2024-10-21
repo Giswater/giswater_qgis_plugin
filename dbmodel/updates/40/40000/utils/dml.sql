@@ -85,3 +85,14 @@ UPDATE sys_feature_class SET man_table  = 'element' WHERE id = 'ELEMENT';
 UPDATE sys_feature_class SET man_table  = 'link' WHERE id = 'LINK';
 
 ALTER TABLE sys_feature_class ALTER COLUMN man_table SET NOT NULL;
+
+-- 18/10/2024
+UPDATE config_form_fields SET widgetcontrols='{
+  "reloadFields": [
+    "fluid_type",
+    "location_type",
+    "category_type",
+    "function_type",
+    "featurecat_id"
+  ]
+}'::json WHERE formname='generic' AND formtype='form_featuretype_change' AND columnname='feature_type_new' AND tabname='tab_none';
