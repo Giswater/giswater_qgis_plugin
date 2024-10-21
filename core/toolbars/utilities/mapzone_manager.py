@@ -14,7 +14,7 @@ from qgis.PyQt.QtGui import QCursor, QColor
 from qgis.PyQt.QtCore import Qt, QPoint, QDateTime, QDate, QTime, QVariant
 from qgis.PyQt.QtWidgets import QAction, QMenu, QTableView, QAbstractItemView, QGridLayout, QLabel, QWidget, QComboBox, QMessageBox, QPushButton
 from qgis.PyQt.QtSql import QSqlTableModel
-from qgis.core import QgsVectorLayer, QgsLineSymbol, QgsRendererCategory, QgsDateTimeRange, Qgis, QgsCategorizedSymbolRenderer, QgsProject, QgsGeometry, QgsRectangle
+from qgis.core import QgsVectorLayer, QgsLineSymbol, QgsRendererCategory, QgsDateTimeRange, Qgis, QgsCategorizedSymbolRenderer, QgsTemporalNavigationObject, QgsInterval
 
 from qgis.gui import QgsMapToolEmitPoint, QgsMapToolPan
 
@@ -385,8 +385,9 @@ class GwMapzoneManager:
 
 
     def _activate_temporal_controller(self, vlayer: QgsVectorLayer):
-        """Activates the Temporal Controller in QGIS with the proper settings for the temporal layer."""
-        # Get the global temporal controller
+        """Activates the Temporal Controller with animated temporal navigation."""
+
+        # Get the temporal controller from the QGIS project
         temporal_controller = self.iface.mapCanvas().temporalController()
         if not temporal_controller:
             return
@@ -403,12 +404,12 @@ class GwMapzoneManager:
                 action.trigger()
                 break
 
-        # Calculate temporal range based on the layer's temporal field
+        # Extract temporal values and set temporal extents
         start_field = temporal_properties.startField()
         field_index = vlayer.fields().indexOf(start_field)
         features = vlayer.getFeatures()
 
-        # Try to extract temporal values, handling potential format issues
+        # Extract temporal values
         temporal_values = []
         for feature in features:
             value = feature.attribute(field_index)
@@ -422,24 +423,23 @@ class GwMapzoneManager:
         if not temporal_values:
             return
 
-        # Set the temporal range in the temporal controller
+        # Set temporal extents in the temporal controller
         min_time = min(temporal_values)
         max_time = max(temporal_values)
-        temporal_extent = QgsDateTimeRange(min_time, max_time)
-        temporal_controller.setTemporalExtents(temporal_extent)
+        temporal_controller.setTemporalExtents(QgsDateTimeRange(min_time, max_time))
 
-        # Activate the temporal toolbar button
+        # Set frame duration using QgsInterval for 1 second
+        frame_duration = QgsInterval(1)  # 1-second duration
+        temporal_controller.setFrameDuration(frame_duration)
+        temporal_controller.setFramesPerSecond(1.0)
+
+        # Set navigation mode to Animated for dynamic playback
+        temporal_controller.setNavigationMode(QgsTemporalNavigationObject.NavigationMode.Animated)
+
         actions = self.iface.mainWindow().findChildren(QAction)
         for action in actions:
             if 'Temporal' in action.text():
                 action.trigger()
-                break
-
-        # Set the temporal step to "seconds"
-        widgets = self.iface.mainWindow().findChildren(QComboBox)
-        for widget in widgets:
-            if "seconds" in [widget.itemText(i) for i in range(widget.count())]:
-                widget.setCurrentText("seconds")
                 break
 
 
