@@ -140,3 +140,13 @@ UPDATE node SET function_type = 'function_manhole1' where nodecat_id like 'CIRC_
 UPDATE om_visit SET ext_code = concat('EXT', 1000 + id);
 
 UPDATE cat_arc SET geom2 = 0 WHERE id = 'EG150';
+
+UPDATE inp_junction SET ysur=999 WHERE node_id= '302';
+
+UPDATE cat_arc SET id = 'PP030', geom1 = 0.25 WHERE id = 'PP020';
+
+UPDATE inp_dwf SET value = value*6*random();
+
+UPDATE inp_dwf SET pat1 = 'pattern_12';
+
+UPDATE node set ymax = 2 WHERE node_id = '301';
