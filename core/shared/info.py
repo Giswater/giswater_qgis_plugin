@@ -3055,7 +3055,6 @@ class GwInfo(QObject):
                 self.my_json[str(widget.property('columnname'))] = field['selectedId']
             elif type(widget) == QComboBox:
                 widget = tools_gw.fill_combo(widget, field)
-                tools_qt.set_combo_value(widget, field['selectedId'], 0)
                 widget.setProperty('selectedId', field['selectedId'])
                 self.my_json[str(widget.property('columnname'))] = field['selectedId']
 

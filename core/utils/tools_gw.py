@@ -1569,14 +1569,12 @@ def add_widget_combined(dialog, field, label, widget):
 
     label_pos = field['widgetcontrols']['labelPosition'] if (
                             'widgetcontrols' in field and field['widgetcontrols'] and 'labelPosition' in field['widgetcontrols']) else None
-    print("orientation combined: ", orientation)
     if label:
         layout.addWidget(label, row, col)
         if orientation == "horizontal":
             if label_pos == 'top':
                 row += 1
             else:
-                print("entro col")
                 col += 1
         else:
             if label_pos == 'top':
@@ -2157,7 +2155,6 @@ def add_combo(field, dialog=None, complet_result=None, ignore_function=False, cl
         widget.setProperty('columnname', field['columnname'])
     widget = fill_combo(widget, field)
     if 'selectedId' in field:
-        tools_qt.set_combo_value(widget, field['selectedId'], 0)
         widget.setProperty('selectedId', field['selectedId'])
     else:
         widget.setProperty('selectedId', None)
@@ -2202,23 +2199,23 @@ def add_combo(field, dialog=None, complet_result=None, ignore_function=False, cl
     return widget
 
 
-def fill_combo(widget, field, index_to_show=1):
+def fill_combo(widget, field, index_to_show=1, index_to_compare=0):
     # check if index_to_show is in widgetcontrols, then assign new value
     if field.get('widgetcontrols') and 'index_to_show' in field.get('widgetcontrols'):
         index_to_show = field.get('widgetcontrols')['index_to_show']
-
     # Generate list of items to add into combo
     widget.blockSignals(True)
     widget.clear()
     widget.blockSignals(False)
     combolist = []
-    comboIds = field.get('comboIds')
-    comboNames = field.get('comboNames')
+    combo_ids = field.get('comboIds')
+    combo_names = field.get('comboNames')
+
     if 'comboIds' in field and 'comboNames' in field:
         if tools_os.set_boolean(field.get('isNullValue'), False):
             combolist.append(['', ''])
         for i in range(0, len(field['comboIds'])):
-            elem = [comboIds[i], comboNames[i]]
+            elem = [combo_ids[i], combo_names[i]]
             combolist.append(elem)
     else:
         msg = f"key 'comboIds' or/and comboNames not found WHERE widgetname='{field['widgetname']}' " \
@@ -2227,7 +2224,8 @@ def fill_combo(widget, field, index_to_show=1):
     # Populate combo
     for record in combolist:
         widget.addItem(record[index_to_show], record)
-
+    if 'selectedId' in field:
+        tools_qt.set_combo_value(widget, field['selectedId'], index_to_compare)
     return widget
 
 
