@@ -911,7 +911,7 @@ BEGIN
 		   FROM ( SELECT unnest(inp_subcatchment.outlet_id::character varying[]) AS outlet_id,
 			    inp_subcatchment.subc_id
 			   FROM inp_subcatchment
-			     JOIN temp_node ON inp_subcatchment.outlet_id::text = temp_node.node_id::text
+			     LEFT JOIN temp_t_node ON inp_subcatchment.outlet_id::text = temp_t_node.node_id::text
 			  WHERE "left"(inp_subcatchment.outlet_id::text, 1) = '{'::text
 			UNION
 			 SELECT inp_subcatchment.outlet_id,

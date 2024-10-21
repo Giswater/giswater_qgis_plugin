@@ -9,3 +9,19 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 ALTER TABLE cat_dwf_scenario ADD CONSTRAINT cat_dwf_scenario_unique_idval UNIQUE(idval);
 ALTER TABLE cat_hydrology ADD CONSTRAINT cat_hydrology_unique_name UNIQUE(name);
+
+ALTER TABLE inp_dscenario_lid_usage DROP CONSTRAINT inp_dscenario_lid_usage_pkey;
+
+ALTER TABLE inp_dscenario_lid_usage ADD CONSTRAINT inp_dscenario_lid_usage_pkey PRIMARY KEY(dscenario_id, subc_id);
+
+ALTER TABLE inp_dscenario_lid_usage ALTER COLUMN lidco_id DROP NOT NULL;
+
+SELECT * FROM config_form_fields where columnname = 'lidco_id';
+
+ALTER TABLE temp_lid_usage DROP CONSTRAINT temp_lid_usage_pkey ;
+
+ALTER TABLE temp_lid_usage ADD CONSTRAINT temp_lid_usage_pkey PRIMARY KEY(subc_id);
+
+ALTER TABLE temp_lid_usage ALTER COLUMN lidco_id DROP NOT NULL;
+
+INSERT INTO config_fprocess VALUES (140,'rpt_lidperformance_sum', 'LID Performance Summary', 88);

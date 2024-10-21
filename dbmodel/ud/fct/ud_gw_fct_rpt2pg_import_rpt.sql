@@ -42,6 +42,7 @@ v_result_id text;
 v_error_context text;
 v_epaversion text;
 v_poll text;
+v_count1 integer;
 
 BEGIN
 
@@ -71,6 +72,13 @@ BEGIN
 		EXECUTE 'DELETE FROM '||rpt_rec.tablename||' WHERE result_id='''||v_result_id||''';';
 	END LOOP;
 
+	SELECT id into v_count1 FROM temp_t_csv WHERE source ='rpt_subcatchrunoff_sum' and csv1 = 'LID';
+
+	IF v_count1 > 0 THEN 
+		--raise exception ' %', v_count1;
+		UPDATE temp_t_csv SET source ='rpt_lidperformance_sum' WHERE source ='rpt_subcatchrunoff_sum' and id > v_count1;
+	END IF;
+
 	-- delete trash rows
 	DELETE FROM temp_t_csv WHERE source ='rpt_controls_actions_taken' and csv1='Control' and csv2='Actions';
 		
@@ -86,6 +94,11 @@ BEGIN
 	DELETE FROM temp_t_csv WHERE source ='rpt_subcatchrunoff_sum' and csv1='Total' and csv2='Total';
 	DELETE FROM temp_t_csv WHERE source ='rpt_subcatchrunoff_sum' and csv1='Precip' and csv2='Runon';
 	DELETE FROM temp_t_csv WHERE source ='rpt_subcatchrunoff_sum' and csv1='Subcatchment' and csv2='mm';
+	DELETE FROM temp_t_csv WHERE source ='rpt_subcatchrunoff_sum' and csv1='LID';
+
+	DELETE FROM temp_t_csv WHERE source ='rpt_lidperformance_sum' and csv1='Total';
+	DELETE FROM temp_t_csv WHERE source ='rpt_lidperformance_sum' and csv1='Inflow';
+	DELETE FROM temp_t_csv WHERE source ='rpt_lidperformance_sum' and csv1='Subcatchment';
 
 	DELETE FROM temp_t_csv WHERE source ='rpt_subcatchwashoff_sum' and csv1='Subcatchment' and csv2='Washoff';
 	DELETE FROM temp_t_csv WHERE source ='rpt_subcatchwashoff_sum' and csv1='Subcatchment' and csv2='kg';
@@ -145,7 +158,7 @@ BEGIN
 	DELETE FROM temp_t_csv WHERE source ='rpt_flowclass_sum' and csv1='Conduit' and csv2='Length';
 
 	DELETE FROM temp_t_csv WHERE source ='rpt_condsurcharge_sum' and csv1='Conduit' and csv2='Surcharge';
-    DELETE FROM temp_csv WHERE source ='rpt_condsurcharge_sum' and csv2='conduits';
+	DELETE FROM temp_csv WHERE source ='rpt_condsurcharge_sum' and csv2='conduits';
 	DELETE FROM temp_t_csv WHERE source ='rpt_condsurcharge_sum' and csv1='Hours' and csv2='Hours';
 	DELETE FROM temp_t_csv WHERE source ='rpt_condsurcharge_sum' and csv1='Conduit' and csv2='Both';
 	DELETE FROM temp_t_csv WHERE source ='rpt_condsurcharge_sum' and csv1='Pollutant';
@@ -160,12 +173,17 @@ BEGIN
 	DELETE FROM temp_t_csv WHERE source ='rpt_pumping_sum' and csv1='Min' and csv2='Avg';
 	DELETE FROM temp_t_csv WHERE source ='rpt_pumping_sum' and csv1='Percent' and csv2='Number';
 	DELETE FROM temp_t_csv WHERE source ='rpt_pumping_sum' and csv1='Pump' and csv2='Utilized';
+
+	
 	
 	FOR rpt_rec IN SELECT * FROM temp_t_csv order by id
 	LOOP
 		i = 0;
 		IF rpt_rec.csv1 = 'WARNING' THEN
 			type_aux = 'rpt_warning_summary';
+			
+		--ELSIF rpt_rec.csv1 = 'LID' THEN
+			--type_aux = 'rpt_lidperformance_sum';
 		ELSE
 			type_aux = rpt_rec.source;
 		END IF;
@@ -288,6 +306,14 @@ BEGIN
 				rpt_rec.csv7::numeric,rpt_rec.csv8::numeric,rpt_rec.csv9::numeric,rpt_rec.csv10::numeric,rpt_rec.csv11::numeric,rpt_rec.csv12::numeric,
 				rpt_rec.csv13::numeric,rpt_rec.csv14::numeric);
 			END IF;
+
+		ELSIF type_aux='rpt_lidperformance_sum' then
+		
+			INSERT INTO rpt_lidperformance_sum(result_id, subc_id, lidco_id, tot_inflow, evap_loss, infil_loss, surf_outf, drain_outf, init_stor, final_stor, per_error)
+			VALUES  (v_result_id,rpt_rec.csv1,rpt_rec.csv2,rpt_rec.csv3::numeric,rpt_rec.csv4::numeric,rpt_rec.csv5::numeric,rpt_rec.csv6::numeric,rpt_rec.csv7::numeric,
+			rpt_rec.csv8::numeric,rpt_rec.csv9::numeric,rpt_rec.csv10::numeric);
+
+--		SELECT * FROM SCHEMA_NAME.rpt_lidperformance_sum
 
 		ELSIF  type_aux='rpt_subcatchwashoff_sum' then 
 		

@@ -434,7 +434,7 @@ BEGIN
 
 		FOR object_rec IN SELECT 
 		json_array_elements_text('["junction", "conduit", "raingage", "flwreg_orifice", "flwreg_weir", "flwreg_outlet", "flwreg_outlet", "storage",  "outfall",  "treatment", "lid_usage" ]'::json) as tabname, 
-		json_array_elements_text('["node_id" , "arc_id",  "rg_id",    "nodarc_id",      "nodarc_id",   "nodarc_id",     "nodarc_id",     "node_id",  "node_id",  "node_id",   "lidco_id"]'::json) as colname,
+		json_array_elements_text('["node_id" , "arc_id",  "rg_id",    "nodarc_id",      "nodarc_id",   "nodarc_id",     "nodarc_id",     "node_id",  "node_id",  "node_id",   "subc_id"]'::json) as colname,
  		json_array_elements_text('["anl_node" ,"anl_arc", "",        "anl_nodarc",     "anl_nodarc",  "anl_nodarc",    "anl_nodarc",    "anl_node", "anl_node", "anl_node",  "anl_polygon"]'::json) as tablename
 		LOOP
 
@@ -463,7 +463,7 @@ BEGIN
 
 				ELSIF object_rec.tablename = 'anl_polygon' THEN
 
-					EXECUTE 'INSERT INTO anl_polygon (pol_id, pol_type, fid, descript, the_geom)
+					EXECUTE 'INSERT INTO anl_polygon (pol_id, fid, descript, the_geom)
 					SELECT '||object_rec.colname||', 396, concat(''Present on '',count(*),'' enabled dscenarios''), the_geom FROM v_edit_inp_dscenario_'||object_rec.tabname||
 					' GROUP BY '||object_rec.colname||', the_geom  having count(*) > 1';
 

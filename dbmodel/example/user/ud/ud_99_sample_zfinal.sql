@@ -150,3 +150,5 @@ UPDATE inp_dwf SET value = value*6*random();
 UPDATE inp_dwf SET pat1 = 'pattern_12';
 
 UPDATE node set ymax = 2 WHERE node_id = '301';
+
+UPDATE inp_subcatchment SET outlet_id = 95 where subc_id IN ('S91','S92','S94');

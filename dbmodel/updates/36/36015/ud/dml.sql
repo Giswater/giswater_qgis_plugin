@@ -31,3 +31,5 @@ UPDATE config_form_fields SET hidden = true where columnname in ('geom3', 'geom4
 
 UPDATE sys_param_user SET dv_isnullvalue = true where id = 'inp_options_hydrology_scenario';
 
+INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario', 'LIDS', 'LIDS');
+

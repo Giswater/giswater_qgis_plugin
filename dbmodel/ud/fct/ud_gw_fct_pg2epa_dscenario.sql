@@ -108,7 +108,7 @@ BEGIN
 		-- insert lid-usage
 		INSERT INTO temp_t_lid_usage SELECT subc_id, lidco_id, numelem, area, width, initsat, fromimp, toperv, rptfile 
 		FROM inp_dscenario_lid_usage
-		ON CONFLICT (subc_id, lidco_id) DO NOTHING;
+		ON CONFLICT (subc_id) DO NOTHING;
 
 		-- TODO: update outfallparam
 
@@ -142,13 +142,17 @@ BEGIN
 		UPDATE temp_t_node t SET addparam = gw_fct_json_object_set_key(addparam::json, 'hc', d.hc) FROM inp_dscenario_storage d 
 		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.hc IS NOT NULL;		
 		UPDATE temp_t_node t SET addparam = gw_fct_json_object_set_key(addparam::json, 'imd', d.imd) FROM inp_dscenario_storage d 
-		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.imd IS NOT NULL;		
-		UPDATE temp_t_node t SET addparam = gw_fct_json_object_set_key(addparam::json, 'y0', d.y0) FROM inp_dscenario_storage d 
-		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.y0 IS NOT NULL;		
-		UPDATE temp_t_node t SET addparam = gw_fct_json_object_set_key(addparam::json, 'ysur', d.ysur) FROM inp_dscenario_storage d 
-		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.ysur IS NOT NULL;		
-		UPDATE temp_t_node t SET addparam = gw_fct_json_object_set_key(addparam::json, 'apond', d.apond) FROM inp_dscenario_storage d 
-		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.apond IS NOT NULL;		
+		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.imd IS NOT NULL;	
+		UPDATE temp_t_node t SET y0 = d.y0 FROM inp_dscenario_storage d 
+		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.y0 IS NOT NULL;	
+		UPDATE temp_t_node t SET ysur = d.ysur FROM inp_dscenario_storage d 
+		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.ysur IS NOT NULL;	
+		UPDATE temp_t_node t SET apond = d.apond FROM inp_dscenario_storage d 
+		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.apond IS NOT NULL;
+		UPDATE temp_t_node t SET elev = d.elev FROM inp_dscenario_storage d 
+		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.elev IS NOT NULL;		
+		UPDATE temp_t_node t SET ymax = d.ymax FROM inp_dscenario_storage d 
+		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.ymax IS NOT NULL;		
 
 		-- update flwreg orifice
 		UPDATE temp_t_arc_flowregulator t SET ori_type = d.ori_type FROM inp_dscenario_flwreg_orifice d 
@@ -232,7 +236,7 @@ BEGIN
 		-- insert lid-usage
 		INSERT INTO temp_t_lid_usage SELECT subc_id, lidco_id, numelem, area, width, initsat, fromimp, toperv, rptfile 
 		FROM inp_dscenario_lid_usage
-		ON CONFLICT (subc_id, lidco_id) DO NOTHING;
+		ON CONFLICT (subc_id) DO NOTHING;
 
 		-- insertar inflows
 		INSERT INTO temp_t_node_other (node_id, type, timser_id, other, sfactor, base, pattern_id)
