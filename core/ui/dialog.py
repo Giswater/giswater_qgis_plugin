@@ -40,8 +40,7 @@ class GwDialog(QDialog):
             # Create the message bar
             self._messageBar = QgsMessageBar()
             self._messageBar.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)  # Full width, fixed height
-            self._messageBar.setMaximumHeight(30)
-            self._messageBar.hide()  # Hide the message bar initially
+            self._messageBar.setMaximumHeight(35)
 
             # Add message bar to stacked layout
             self.stacked_layout.addWidget(self._messageBar)
