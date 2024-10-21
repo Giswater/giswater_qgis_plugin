@@ -397,44 +397,10 @@ def cmb_new_featuretype_selection_changed(**kwargs):
     dialog = kwargs["dialog"]
     cmb_new_feature_type = kwargs["widget"]
     this = kwargs["class"]
-    cmb_catalog_id = tools_qt.get_widget(dialog,"tab_none_featurecat_id")
-    cmb_catalog_fluid = tools_qt.get_widget(dialog,"tab_none_fluid_type")
-    cmb_catalog_location = tools_qt.get_widget(dialog,"tab_none_location_type")
-    cmb_catalog_category = tools_qt.get_widget(dialog,"tab_none_category_type")
-    cmb_catalog_function = tools_qt.get_widget(dialog,"tab_none_function_type")
-    project_type = tools_gw.get_project_type()
-
-    # Reset styles
-    tools_qt.set_stylesheet(cmb_catalog_id, style="")
-    tools_qt.set_stylesheet(cmb_catalog_fluid, style="")
-    tools_qt.set_stylesheet(cmb_catalog_location, style="")
-    tools_qt.set_stylesheet(cmb_catalog_category, style="")
-    tools_qt.set_stylesheet(cmb_catalog_function, style="")
+    reload_fields = []
 
     # Fetch the new feature type
     feature_type_new = tools_qt.get_widget_value(dialog, cmb_new_feature_type)
-
-    # Populate catalog_id
-    if project_type == 'ws':
-        sql = (f"SELECT DISTINCT(id), id as idval "
-                f"FROM {this.cat_table} "
-                f"WHERE {this.feature_type}type_id = '{feature_type_new}' AND (active IS TRUE OR active IS NULL) "
-                f"ORDER BY id")
-    else:
-        sql = (f"SELECT DISTINCT(id), id as idval "
-               f"FROM {this.cat_table} "
-               f"WHERE {this.feature_type}_type = '{feature_type_new}' AND (active IS TRUE OR active IS NULL) "
-               f"ORDER BY id")
-    rows = tools_db.get_rows(sql)
-    tools_qt.fill_combo_values(cmb_catalog_id, rows)
-
-    # Show warning if no catalog rows are found
-    if not rows:
-        tools_qt.set_stylesheet(cmb_catalog_id, style="background-color: #ff8080")
-        tools_qgis.show_critical(
-            "There is no catalog for this feature type. Please add one in the corresponding cat table.",
-            dialog=dialog
-        )
 
     # Create body with only newFeatureCat in extras
     feature = f'"tableName":"{this.tablename}", "id":"{this.feature_id}"'
@@ -442,32 +408,14 @@ def cmb_new_featuretype_selection_changed(**kwargs):
     body = tools_gw.create_body(feature=feature, extras=extras)
 
     # Execute function to get additional data for fluid, location, category, and function types
-    response = tools_gw.execute_procedure("gw_fct_getchangefeaturetype", body)
+    json_result = tools_gw.execute_procedure("gw_fct_getchangefeaturetype", body)
 
-    # Check if the response is valid
-    if not response or response.get("status") != "Accepted":
-        tools_qgis.show_warning("Failed to retrieve feature type data")
-        return
+    for field in json_result['body']['data']['fields']:
+        if field.get('widgetcontrols') and field['widgetcontrols'].get('reloadFields'):
+            reload_fields = field['widgetcontrols'].get('reloadFields')
+        if field['widgettype'] == 'combo':
+            if field.get('hidden') or (field.get('widgetcontrols') and field['widgetcontrols'].get('hiddenWhenNull')
+                                       and field.get('value') in (None, '')) or field['columnname'] not in reload_fields:
+                continue
 
-    # Populate combos based on response data
-    fields = response["body"]["data"]["fields"]
-    combo_mapping = {
-        "fluid_type": cmb_catalog_fluid,
-        "location_type": cmb_catalog_location,
-        "category_type": cmb_catalog_category,
-        "function_type": cmb_catalog_function
-    }
-
-    # Populate each combo box based on the retrieved fields
-    for field_data in fields:
-        column_name = field_data.get("columnname")
-        combo_widget = combo_mapping.get(column_name)
-        selected_id = field_data.get("selectedId")
-        if combo_widget and "comboIds" in field_data and "comboNames" in field_data:
-            rows = []
-            combo_ids = field_data["comboIds"]
-            combo_names = field_data["comboNames"]
-
-            for i in range(len(combo_ids)):
-                rows.append((combo_ids[i], combo_names[i]))
-            tools_qt.fill_combo_values(combo=combo_widget, rows=rows, value_to_show=selected_id, item_to_compare=0)
+            tools_gw.fill_combo(tools_qt.get_widget(dialog, field['widgetname']), field)
