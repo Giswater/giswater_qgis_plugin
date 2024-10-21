@@ -290,6 +290,23 @@ def add_btn_help(dlg):
     btn_help.setToolTip("Help")
     dlg.lyt_buttons.addWidget(btn_help, 0, dlg.lyt_buttons.columnCount())
 
+    btn_help.clicked.connect(partial(open_help_link, "test"))
+
+
+def open_help_link(dlg_name):
+    """ Opens the help link for the given dialog, or a default link if not found. """
+
+    # Search url in DB
+    # TODO: get formname, formtype & tabname
+    sql = f"SELECT path FROM config_form_help WHERE formtype = '{dlg_name}'"
+    rows = tools_db.get_rows(sql)
+
+    if rows and rows[0]:
+        file_path = rows[0][0]
+    else:
+        file_path = "https://giswater.gitbook.io/giswater-manual"
+    tools_os.open_file(file_path)
+
 
 def open_dialog(dlg, dlg_name=None, stay_on_top=True, title=None, hide_config_widgets=False, plugin_dir=lib_vars.plugin_dir, plugin_name=lib_vars.plugin_name):
 
