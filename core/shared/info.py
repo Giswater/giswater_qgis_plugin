@@ -4155,10 +4155,10 @@ def new_visit(**kwargs):
         tools_qgis.show_warning(msg)
         return
 
-    date_event_from = dlg_cf.tab_event.findChild(QgsDateTimeEdit, "date_event_from")
-    date_event_to = dlg_cf.tab_event.findChild(QgsDateTimeEdit, "date_event_to")
+    date_event_from = dlg_cf.tab_event.findChild(QgsDateTimeEdit, "tab_event_date_event_from")
+    date_event_to = dlg_cf.tab_event.findChild(QgsDateTimeEdit, "tab_event_date_event_to")
 
-    tbl_event_cf = dlg_cf.findChild(QTableView, "tbl_event_cf")
+    tbl_event_cf = dlg_cf.findChild(QTableView, "tab_event_tbl_event_cf")
     manage_visit = GwVisit()
     manage_visit.visit_added.connect(partial(_update_visit_table, feature_type, date_event_from, date_event_to, tbl_event_cf))
     # TODO: the following query fix a (for me) misterious bug
@@ -4174,7 +4174,6 @@ def _update_visit_table(feature_type, date_event_from, date_event_to, tbl_event_
     """ Convenience fuction set as slot to update table after a Visit GUI close. """
     table_name = "v_ui_event_x_" + feature_type
     tools_gw.set_dates_from_to(date_event_from, date_event_to, table_name, 'visit_start', 'visit_end')
-    tbl_event_cf.model().select()
 
 
 def open_visit_document(**kwargs):
