@@ -334,8 +334,13 @@ def open_dialog(dlg, dlg_name=None, stay_on_top=True, title=None, hide_config_wi
 
     if hide_config_widgets:
         hide_widgets_form(dlg, dlg_name)
+
+    # Hide the message bar initially
+    dlg.messageBar().hide()
+
     # Create btn_help
     add_btn_help(dlg)
+
     # Open dialog
     if issubclass(type(dlg), GwDialog):
         dlg.open()
