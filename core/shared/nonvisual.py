@@ -618,13 +618,13 @@ class GwNonVisual:
     # region curves
     def get_curves(self, curve_id=None, duplicate=False):
         """ Opens dialog for curve """
-        
+
         # Show warning message if scipy/numpy is not available
         if scipy_imported is False:
             msg = f"Couldn't import scipy/numpy so the graph can't be shown. Please install it manually or try with another QGIS version"
             tools_qgis.show_warning(msg, dialog=self.manager_dlg)
             return
-        
+
         # Get dialog
         self.dialog = GwNonVisualCurveUi(self)
         tools_gw.load_settings(self.dialog)
@@ -830,11 +830,25 @@ class GwNonVisual:
     def _manage_curve_value(self, dialog, table, row, column):
         """ Validate data in curve values table """
 
+        # Define validity messages
+        VALID = (True, "")
+        NOT_VALID_NUMERIC = (False, "Invalid curve, values must be numeric.")
+        NOT_VALID_ASCENDING = (False, "Invalid curve. First column values must be ascending.")
+        NOT_VALID_DESCENDING = (False, "Invalid curve. Second column values must be descending.")
+        NOT_VALID_PAIRS = (False, "Invalid curve. Values must go in pairs.")
+
         # Get curve_type
         curve_type = tools_qt.get_text(dialog, 'cmb_curve_type')
         # Control data depending on curve type
         valid = True
         self.valid = (True, "")
+        if table.item(row, column):
+            valid = False
+            self.valid = NOT_VALID_NUMERIC
+
+        if not valid:
+            return
+
         if column == 0:
             # If not first row, check if previous row has a smaller value than current row
             if row - 1 >= 0:
@@ -842,15 +856,18 @@ class GwNonVisual:
                 prev_cell = table.item(row-1, column)
                 if None not in (cur_cell, prev_cell):
                     if cur_cell.data(0) not in (None, '') and prev_cell.data(0) not in (None, ''):
-                        cur_value = float(cur_cell.data(0))
-                        prev_value = float(prev_cell.data(0))
-                        if (cur_value < prev_value) and (curve_type != 'SHAPE' and global_vars.project_type != 'ud'):
+                        try:
+                            cur_value = float(cur_cell.data(0))
+                            prev_value = float(prev_cell.data(0))
+                            if (cur_value < prev_value) and (curve_type != 'SHAPE' and global_vars.project_type != 'ud'):
+                                valid = False
+                                self.valid = NOT_VALID_ASCENDING
+                        except ValueError:
                             valid = False
-                            self.valid = (False, "Invalid curve. First column values must be ascending.")
+                            self.valid = NOT_VALID_NUMERIC
 
         # If first check is valid, check all rows for column for final validation
         if valid:
-
             # Create list with column values
             x_values = []
             y_values = []
@@ -858,7 +875,11 @@ class GwNonVisual:
                 x_item = table.item(n, 0)
                 if x_item is not None:
                     if x_item.data(0) not in (None, ''):
-                        x_values.append(float(x_item.data(0)))
+                        try:
+                            x_values.append(float(x_item.data(0)))
+                        except ValueError:
+                            self.valid = NOT_VALID_NUMERIC
+                            return
                     else:
                         x_values.append(None)
                 else:
@@ -867,7 +888,11 @@ class GwNonVisual:
                 y_item = table.item(n, 1)
                 if y_item is not None:
                     if y_item.data(0) not in (None, ''):
-                        y_values.append(float(y_item.data(0)))
+                        try:
+                            y_values.append(float(y_item.data(0)))
+                        except ValueError:
+                            self.valid = NOT_VALID_NUMERIC
+                            return
                     else:
                         y_values.append(None)
                 else:
@@ -881,10 +906,10 @@ class GwNonVisual:
                 if (n > x_values[i-1]) or (curve_type == 'SHAPE' and global_vars.project_type == 'ud'):
                     continue
                 valid = False
-                self.valid = (False, "Invalid curve. First column values must be ascending.")
+                self.valid = NOT_VALID_ASCENDING
                 break
-            # If PUMP, check that y_values are descending
 
+            # If PUMP, check that y_values are descending
             if curve_type == 'PUMP':
                 for i, n in enumerate(y_values):
                     if i == 0 or n is None:
@@ -892,7 +917,7 @@ class GwNonVisual:
                     if n < y_values[i - 1]:
                         continue
                     valid = False
-                    self.valid = (False, "Invalid curve. Second column values must be descending.")
+                    self.valid = NOT_VALID_DESCENDING
                     break
 
             if valid:
@@ -900,7 +925,7 @@ class GwNonVisual:
                 x_len = len([x for x in x_values if x is not None])  # Length of the x_values list without Nones
                 y_len = len([y for y in y_values if y is not None])  # Length of the y_values list without Nones
                 valid = x_len == y_len
-                self.valid = (valid, "Invalid curve. Values must go in pairs.")
+                self.valid = VALID if valid else NOT_VALID_PAIRS
 
 
     def _manage_curve_plot(self, dialog, table, plot_widget, file_name=None, geom1=None, geom2=None):
@@ -1016,7 +1041,7 @@ class GwNonVisual:
 
 
     def _manage_delete_btn(self, table, plot_widget):
-        
+
         if table.item(table.currentRow(), 0) is not None or table.item(table.currentRow(), 1) is not None:
             table.removeRow(table.currentRow())
             self._manage_curve_plot(self.dialog, table, plot_widget, None, None)
