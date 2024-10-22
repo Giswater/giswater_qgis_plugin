@@ -33,3 +33,5 @@ UPDATE sys_param_user SET dv_isnullvalue = true where id = 'inp_options_hydrolog
 
 INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario', 'LIDS', 'LIDS');
 
+UPDATE config_form_fields SET linkedobject='tbl_event_x_gully' WHERE formname='gully' AND formtype='form_feature' AND tabname='tab_event' AND linkedobject = 'tbl_visit_x_gully';
+
