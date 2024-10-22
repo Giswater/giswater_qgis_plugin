@@ -1015,8 +1015,8 @@ BEGIN
 	    cat_arc_shape.epa AS shape,
 	    cat_arc.geom1::text AS other1,
 	    cat_arc.geom2::text AS other2,
-	    coalesce(cat_arc.geom3::text,0) AS other3,
-	    coalesce (cat_arc.geom4::text,0) AS other4,
+	    coalesce(cat_arc.geom3::text,'0') AS other3,
+	    coalesce (cat_arc.geom4::text,'0') AS other4,
 	    temp_t_arc.barrels AS other5,
 	    temp_t_arc.culvert::text AS other6
 	   FROM temp_t_arc
@@ -1043,8 +1043,8 @@ BEGIN
 	    temp_t_arc_flowregulator.shape,
 	    temp_t_arc_flowregulator.geom1::text AS other1,
 	    temp_t_arc_flowregulator.geom2::text AS other2,
-	    coalesce(temp_t_arc_flowregulator.geom3::text,0) AS other3,
-	    coalesce(temp_t_arc_flowregulator.geom4::text,0) AS other4,
+	    coalesce(temp_t_arc_flowregulator.geom3::text,'0') AS other3,
+	    coalesce(temp_t_arc_flowregulator.geom4::text,'0') AS other4,
 	    NULL::integer AS other5,
 	    NULL::text AS other6
 	   FROM temp_t_arc_flowregulator
