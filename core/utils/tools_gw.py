@@ -1142,12 +1142,11 @@ def enable_all(dialog, result):
                     elif type(widget) in (QComboBox, QgsDateTimeEdit):
                         widget.setEnabled(field['iseditable'])
                         widget.setStyleSheet(None)
-                        widget.focusPolicy(Qt.StrongFocus) if widget.setEnabled(
-                            field['iseditable']) else widget.setFocusPolicy(Qt.NoFocus)
+                        widget.setFocusPolicy(Qt.StrongFocus if field['iseditable'] else Qt.NoFocus)
+
                     elif type(widget) in (QCheckBox, QPushButton):
                         widget.setEnabled(field['iseditable'])
-                        widget.focusPolicy(Qt.StrongFocus) if widget.setEnabled(
-                            field['iseditable']) else widget.setFocusPolicy(Qt.NoFocus)
+                        widget.setFocusPolicy(Qt.StrongFocus if field['iseditable'] else Qt.NoFocus)
     except RuntimeError:
         pass
 
