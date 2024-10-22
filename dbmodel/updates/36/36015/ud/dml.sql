@@ -35,3 +35,17 @@ INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario', 'LIDS', 'LIDS');
 
 UPDATE config_form_fields SET linkedobject='tbl_event_x_gully' WHERE formname='gully' AND formtype='form_feature' AND tabname='tab_event' AND linkedobject = 'tbl_visit_x_gully';
 
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source") 
+VALUES (3326, 'gw_fct_epa_hydraulic_performance', 'ud', 'function', 'json', 'json', 'Function to calculate the hydraulic performance of network', 'role_epa', NULL, 'core');
+
+INSERT INTO config_toolbox 
+VALUES (3326, 'Calculate the hydraulic performance for specific result','{"featureType":[]}',
+'[
+{"widgetname":"resultId", "label":"Result_id:","widgettype":"combo","datatype":"text", "isMandatory":true, "tooltip":"Result_id", "dvQueryText":"SELECT result_id as id,  result_id as idval FROM rpt_cat_result WHERE status = 2","layoutname":"grl_option_parameters","layoutorder":1, "value":""},
+{"widgetname":"wwtpOutfalls", "label":"Outfalls as WWTP:","widgettype":"linetext","datatype":"text", "isMandatory":true, "tooltip":"Outfalls as WWTP", "placeholder":"234,235,3246", "layoutname":"grl_option_parameters","layoutorder":2, "value":""}
+]'
+,null, true, '{4}') ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_fprocess VALUES (531, 'fprocess to calculate the performance of ud networks','ud',null,'core',FALSE, 'Function process')
+ON CONFLICT (fid) DO NOTHING;
+

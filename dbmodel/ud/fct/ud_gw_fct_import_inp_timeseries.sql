@@ -47,6 +47,7 @@ BEGIN
 	-- reset sequence
 	PERFORM setval('SCHEMA_NAME.inp_timeseries_value_id_seq', (SELECT max(id) FROM inp_timeseries_value), true);
 
+
   	-- starting process
  	FOR rec_csv IN SELECT * FROM temp_csv WHERE cur_user=current_user AND fid = v_fid
 	LOOP
@@ -60,7 +61,7 @@ BEGIN
 
 				-- insert inp_timeseries
 				INSERT INTO inp_timeseries (id, timser_type, times_type, idval, descript, expl_id, log) 
-				VALUES (rec_csv.csv1, rec_csv.csv5, rec_csv.csv6, rec_csv.csv1, rec_csv.csv7, rec_csv.csv8::integer, concat('Insert by ',current_user,' on ', substring(now()::text,0,20)));
+				VALUES (rec_csv.csv1, rec_csv.csv4, rec_csv.csv5, rec_csv.csv1, rec_csv.csv6, rec_csv.csv7::integer, concat('Insert by ',current_user,' on ', substring(now()::text,0,20)));
 				
 				-- insert into inp_timeseries_value
 				IF rec_csv.csv6 = 'ABSOLUTE' THEN			

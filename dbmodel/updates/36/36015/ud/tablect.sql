@@ -25,3 +25,7 @@ ALTER TABLE temp_lid_usage ADD CONSTRAINT temp_lid_usage_pkey PRIMARY KEY(subc_i
 ALTER TABLE temp_lid_usage ALTER COLUMN lidco_id DROP NOT NULL;
 
 INSERT INTO config_fprocess VALUES (140,'rpt_lidperformance_sum', 'LID Performance Summary', 88);
+
+ALTER TABLE rpt_runoff_quant ADD CONSTRAINT rpt_runoff_quant_unique_result_id UNIQUE (result_id);
+
+ALTER TABLE rpt_flowrouting_cont ADD CONSTRAINT rpt_flowrouting_cont_unique_result_id UNIQUE (result_id);
