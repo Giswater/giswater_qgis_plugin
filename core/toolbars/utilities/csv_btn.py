@@ -301,7 +301,7 @@ class GwCSVButton(GwAction):
 
         progress = 0
         dialog.progressBar.setVisible(True)
-        dialog.progressBar.setValue(progress)
+        dialog.progressBar.setValue(int(progress))
         # Counts rows in csvfile, using var "row_count" to do progressbar
         # noinspection PyUnusedLocal
         row_count = sum(1 for rows in csvfile)
@@ -326,7 +326,7 @@ class GwCSVButton(GwAction):
             fields.append(field)
             cont += 1
             progress = (100 * cont) / row_count
-            dialog.progressBar.setValue(progress)
+            dialog.progressBar.setValue(int(progress))
         dialog.progressBar.setValue(100)
         if not fields:
             return False
