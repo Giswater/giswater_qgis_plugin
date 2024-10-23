@@ -278,8 +278,6 @@ class GwFeatureTypeChangeButton(GwMaptool):
 
         self.tablename = tablename
         self.cat_table = f'cat_{self.feature_type}'
-        if self.feature_type == 'gully':
-            self.cat_table = f'cat_grate'
         self.feature_edit_type = f'{self.feature_type}_type'
         self.feature_type_cat = f'{self.feature_type}type_id'
         self.feature_id = snapped_feat.attribute(f'{self.feature_type}_id')

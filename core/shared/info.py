@@ -2415,14 +2415,7 @@ class GwInfo(QObject):
     def _open_catalog(self, tab_type, feature_type, child_type):
 
         self.catalog = GwCatalog()
-
-        # Check feature_type
-        if self.feature_type == 'connec':
-            widget = f'tab_{tab_type}_{self.feature_type}at_id'
-        elif self.feature_type == 'gully':
-            widget = f'tab_{tab_type}_gratecat_id'
-        else:
-            widget = f'tab_{tab_type}_{self.feature_type}cat_id'
+        widget = f'tab_{tab_type}_{self.feature_type}cat_id'
         self.catalog.open_catalog(self.dlg_cf, widget, feature_type, child_type)
 
 
