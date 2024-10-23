@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1073</width>
+    <width>1161</width>
     <height>786</height>
    </rect>
   </property>
@@ -51,59 +51,18 @@
       <string/>
      </property>
      <layout class="QGridLayout" name="verticalLayout_3">
-      <item row="1" column="11">
-       <widget class="QPushButton" name="btn_toggle_active">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
+      <item row="1" column="2" colspan="2">
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
         </property>
-        <property name="text">
-         <string>Toggle active</string>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>80</width>
+          <height>20</height>
+         </size>
         </property>
-       </widget>
-      </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="lbl_psector_name">
-        <property name="text">
-         <string>Filter by: Psector name</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="13">
-       <widget class="QPushButton" name="btn_merge">
-        <property name="text">
-         <string>Merge</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QCheckBox" name="chk_active">
-        <property name="text">
-         <string>Show inactive</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="14">
-       <widget class="QPushButton" name="btn_duplicate">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string>Duplicate</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="12">
-       <widget class="QPushButton" name="btn_create">
-        <property name="text">
-         <string>Create</string>
-        </property>
-       </widget>
+       </spacer>
       </item>
       <item row="1" column="8">
        <widget class="QLabel" name="lbl_vdefault_psector">
@@ -118,21 +77,25 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="2" colspan="2">
-       <spacer name="horizontalSpacer_2">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+      <item row="0" column="0">
+       <widget class="QLabel" name="lbl_psector_name">
+        <property name="text">
+         <string>Filter by: Psector name</string>
         </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>80</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
+       </widget>
       </item>
-      <item row="2" column="0" colspan="17">
-       <widget class="QTableView" name="tbl_psm"/>
+      <item row="1" column="10">
+       <widget class="QPushButton" name="btn_update_psector">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Current psector</string>
+        </property>
+       </widget>
       </item>
       <item row="1" column="16">
        <widget class="QPushButton" name="btn_delete">
@@ -147,8 +110,8 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="0">
-       <widget class="QLineEdit" name="txt_name">
+      <item row="1" column="11">
+       <widget class="QPushButton" name="btn_toggle_active">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -156,20 +119,14 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string/>
+         <string>Toggle active</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="10">
-       <widget class="QPushButton" name="btn_update_psector">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
+      <item row="1" column="13">
+       <widget class="QPushButton" name="btn_merge">
         <property name="text">
-         <string>Current psector</string>
+         <string>Merge</string>
         </property>
        </widget>
       </item>
@@ -199,6 +156,56 @@
          </widget>
         </item>
        </layout>
+      </item>
+      <item row="1" column="1">
+       <widget class="QCheckBox" name="chk_active">
+        <property name="text">
+         <string>Show inactive</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" colspan="17">
+       <widget class="QTableView" name="tbl_psm"/>
+      </item>
+      <item row="1" column="12">
+       <widget class="QPushButton" name="btn_create">
+        <property name="text">
+         <string>Create</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLineEdit" name="txt_name">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="14">
+       <widget class="QPushButton" name="btn_duplicate">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Duplicate</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="9">
+       <widget class="QPushButton" name="btn_show_psector">
+        <property name="text">
+         <string>Show Psector</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>

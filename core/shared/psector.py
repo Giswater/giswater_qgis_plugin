@@ -1689,6 +1689,8 @@ class GwPsector:
         self.dlg_psector_mng.btn_delete.clicked.connect(partial(
             self.multi_rows_delete, self.dlg_psector_mng, self.qtbl_psm, table_name, column_id, 'lbl_vdefault_psector', 'psector'))
         self.dlg_psector_mng.btn_delete.clicked.connect(partial(tools_gw.refresh_selectors))
+        self.dlg_psector_mng.btn_show_psector.clicked.connect(self._show_psector)
+
         self.dlg_psector_mng.btn_update_psector.clicked.connect(
             partial(self.update_current_psector, self.dlg_psector_mng, self.qtbl_psm))
         self.dlg_psector_mng.btn_duplicate.clicked.connect(self.psector_duplicate)
@@ -1879,6 +1881,31 @@ class GwPsector:
 
         # Refresh canvas
         tools_qgis.refresh_map_canvas()
+
+
+    def _show_psector(self):
+
+        selected_rows = self.qtbl_psm.selectionModel().selectedRows()
+        if len(selected_rows) == 0:
+            tools_qgis.show_warning("No sector selected. Please select at least one.", dialog=self.dlg_psector_mng)
+            return
+
+        # Get selected psector_id from the first column (adjust index if needed)
+        psector_id = selected_rows[0].data()
+        print(psector_id)
+
+        # Call the SQL function to get the sector features
+        extras = f'"psector_id":"{psector_id}"'
+        body = tools_gw.create_body(extras=extras)
+        result = tools_gw.execute_procedure('gw_fct_getpsectorfeatures', body)
+
+        # Check for valid result
+        if not result or result.get('status') != 'Accepted':
+            tools_qgis.show_warning("Failed to retrieve sector features.", dialog=self.dlg_psector_mng)
+            return
+
+        # The SQL procedure should manage creating the temporal layers based on the returned features
+        tools_qgis.show_success("Psector features loaded successfully.", dialog=self.dlg_psector_mng)
 
 
     def multi_rows_delete(self, dialog, widget, table_name, column_id, label, action):
