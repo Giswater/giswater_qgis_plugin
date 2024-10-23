@@ -111,7 +111,7 @@ SELECT is((SELECT count(*)::integer FROM cat_arc WHERE id = '-902'), 0, 'DELETE:
 
 -- Subtest 10: Testing cat_node operations | insert/update/delete
 
--- Subtest 11: Testing cat_grate operations | insert/update/delete
+-- Subtest 11: Testing cat_gully operations | insert/update/delete
 
 
 SELECT * FROM finish();

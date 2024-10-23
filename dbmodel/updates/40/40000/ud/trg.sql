@@ -135,3 +135,9 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_drainzone();
 
 CREATE trigger gw_trg_edit_sector INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_sector
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_sector('sector');
+
+CREATE TRIGGER gw_trg_edit_review_gully INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_review_gully
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_review_gully();
+
+CREATE TRIGGER gw_trg_edit_review_connec INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_review_connec
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_review_connec();

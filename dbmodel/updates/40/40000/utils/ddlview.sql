@@ -156,6 +156,9 @@ DROP VIEW IF EXISTS v_edit_inp_virtualvalve;
 DROP VIEW IF EXISTS v_edit_inp_virtualpump;
 DROP VIEW IF EXISTS v_edit_inp_pipe;
 
+DROP VIEW IF EXISTS v_edit_review_connec;
+DROP VIEW IF EXISTS v_edit_review_gully;
+
 SELECT gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
  "data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-DELETE" }}$$);
 
@@ -192,6 +195,9 @@ DROP VIEW IF EXISTS v_edit_inp_gully;
 
 DROP VIEW IF EXISTS v_edit_gully;
 DROP VIEW IF EXISTS v_edit_element;
+
+DROP VIEW IF EXISTS ve_gully;
+DROP VIEW IF EXISTS vu_gully;
 
 DROP view IF EXISTS vu_link;
 DROP view IF EXISTS vu_link_connec;

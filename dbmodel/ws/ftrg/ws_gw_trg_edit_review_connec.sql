@@ -24,8 +24,8 @@ BEGIN
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
 	--getting original values
-	SELECT connec_id, matcat_id, pnom, dnom,connecat_id,connec_type, annotation, observ, expl_id, the_geom INTO rec_connec
-	FROM connec JOIN cat_connec ON cat_connec.id=connec.connecat_id WHERE connec_id=NEW.connec_id;
+	SELECT connec_id, matcat_id, pnom, dnom, conneccat_id,connec_type, annotation, observ, expl_id, the_geom INTO rec_connec
+	FROM connec JOIN cat_connec ON cat_connec.id=connec.conneccat_id WHERE connec_id=NEW.connec_id;
 
 	--get value from edit_review_auto_field_checked
 	IF (SELECT value::boolean FROM config_param_system WHERE parameter = 'edit_review_auto_field_checked') IS TRUE THEN
@@ -36,7 +36,7 @@ BEGIN
 	IF (NEW.field_checked is TRUE) THEN
 	--looking for insert/update/delete values on audit table
 		IF
-			rec_connec.connecat_id!= NEW.connecat_id OR (rec_connec.connecat_id IS NULL AND NEW.connecat_id IS NOT NULL) OR
+			rec_connec.conneccat_id!= NEW.conneccat_id OR (rec_connec.conneccat_id IS NULL AND NEW.conneccat_id IS NOT NULL) OR
 			rec_connec.annotation != NEW.annotation	OR (rec_connec.annotation IS NULL AND NEW.annotation IS NOT NULL) OR
 			rec_connec.observ != NEW.observ	OR  (rec_connec.observ IS NULL AND NEW.observ IS NOT NULL) OR
 			rec_connec.the_geom::text<>NEW.the_geom::text THEN
@@ -90,16 +90,16 @@ BEGIN
 
 
 		-- insert values on review table
-		INSERT INTO review_connec (connec_id, connecat_id, annotation, observ, review_obs, expl_id, the_geom, field_checked, field_date)
-		VALUES (NEW.connec_id, NEW.connecat_id, NEW.annotation, NEW.observ, NEW.review_obs, NEW.expl_id, NEW.the_geom, NEW.field_checked, NEW.field_date);
+		INSERT INTO review_connec (connec_id, conneccat_id, annotation, observ, review_obs, expl_id, the_geom, field_checked, field_date)
+		VALUES (NEW.connec_id, NEW.conneccat_id, NEW.annotation, NEW.observ, NEW.review_obs, NEW.expl_id, NEW.the_geom, NEW.field_checked, NEW.field_date);
 
 
 		--looking for insert values on audit table
 	  IF NEW.field_checked=TRUE THEN
 
-			INSERT INTO review_audit_connec(connec_id, old_connecat_id, new_connecat_id,
+			INSERT INTO review_audit_connec(connec_id, old_conneccat_id, new_conneccat_id,
 				old_annotation, new_annotation, old_observ, new_observ, review_obs, expl_id ,the_geom ,review_status_id, field_date, field_user)
-				VALUES (NEW.connec_id, rec_connec.connecat_id, NEW.connecat_id, rec_connec.annotation, NEW.annotation, rec_connec.observ, NEW.observ, NEW.review_obs, NEW.expl_id,
+				VALUES (NEW.connec_id, rec_connec.conneccat_id, NEW.conneccat_id, rec_connec.annotation, NEW.annotation, rec_connec.observ, NEW.observ, NEW.review_obs, NEW.expl_id,
 				NEW.the_geom, v_review_status,  NEW.field_date, current_user);
 		END IF;
 
@@ -108,7 +108,7 @@ BEGIN
     ELSIF TG_OP = 'UPDATE' THEN
 
 		-- update values on review table
-		UPDATE review_connec SET connecat_id=NEW.connecat_id, annotation=NEW.annotation,
+		UPDATE review_connec SET conneccat_id=NEW.conneccat_id, annotation=NEW.annotation,
 		observ=NEW.observ, review_obs=NEW.review_obs, expl_id=NEW.expl_id, the_geom=NEW.the_geom, field_checked=NEW.field_checked
 		WHERE connec_id=NEW.connec_id;
 
@@ -118,14 +118,14 @@ BEGIN
 
 			-- upserting values on review_audit_connec connec table
 			IF EXISTS (SELECT connec_id FROM review_audit_connec WHERE connec_id=NEW.connec_id) THEN
-				UPDATE review_audit_connec SET old_connecat_id=rec_connec.connecat_id, new_connecat_id=NEW.connecat_id, old_annotation=rec_connec.annotation, new_annotation=NEW.annotation, old_observ=rec_connec.observ,
+				UPDATE review_audit_connec SET old_conneccat_id=rec_connec.conneccat_id, new_conneccat_id=NEW.conneccat_id, old_annotation=rec_connec.annotation, new_annotation=NEW.annotation, old_observ=rec_connec.observ,
 				new_observ=NEW.observ, review_obs=NEW.review_obs, expl_id=NEW.expl_id, the_geom=NEW.the_geom, review_status_id=v_review_status, field_date= NEW.field_date,
 				field_user=current_user WHERE connec_id=NEW.connec_id;
 			ELSE
 
-				INSERT INTO review_audit_connec(connec_id, old_connecat_id, new_connecat_id,
+				INSERT INTO review_audit_connec(connec_id, old_conneccat_id, new_conneccat_id,
 				old_annotation, new_annotation, old_observ, new_observ, review_obs, expl_id ,the_geom ,review_status_id, field_date, field_user)
-				VALUES (NEW.connec_id, rec_connec.connecat_id, NEW.connecat_id, rec_connec.annotation, NEW.annotation, rec_connec.observ, NEW.observ, NEW.review_obs, NEW.expl_id,
+				VALUES (NEW.connec_id, rec_connec.conneccat_id, NEW.conneccat_id, rec_connec.annotation, NEW.annotation, rec_connec.observ, NEW.observ, NEW.review_obs, NEW.expl_id,
 				NEW.the_geom, v_review_status,  NEW.field_date, current_user);
 			END IF;
 

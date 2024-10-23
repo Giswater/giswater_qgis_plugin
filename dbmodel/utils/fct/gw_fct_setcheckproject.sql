@@ -14,7 +14,7 @@ $BODY$
 
 /*
 SELECT SCHEMA_NAME.gw_fct_setcheckproject($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{},
-"version":"3.5.021.1", "fid":101, "initProject":false, "addSchema":"NULL", "mainSchema":"NULL", "projecRole":"role_admin", "infoType":"full", "logFolderVolume":"139.56 MB", 
+"version":"3.5.021.1", "fid":101, "initProject":false, "addSchema":"NULL", "mainSchema":"NULL", "projecRole":"role_admin", "infoType":"full", "logFolderVolume":"139.56 MB",
 "projectType":"ws", "qgisVersion":"3.16.6-Hannover", "osVersion":"Windows 10"}}$$);
 
 -- fid: main: 101
@@ -27,7 +27,7 @@ SELECT SCHEMA_NAME.gw_fct_setcheckproject($${"client":{"device":4, "lang":"es_ES
 	user: 251
 */
 
-DECLARE 
+DECLARE
 
 v_querytext text;
 v_parameter text;
@@ -90,14 +90,14 @@ v_ignoreplan boolean;
 v_usepsector boolean;
 v_cur_expl integer[];
 
-BEGIN 
+BEGIN
 
 	-- search path
 	SET search_path = "SCHEMA_NAME", public;
 	v_schemaname = 'SCHEMA_NAME';
 
 	SELECT project_type, giswater, epsg INTO v_project_type, v_version, v_epsg FROM sys_version order by id desc limit 1;
-	
+
 	-- Get input parameters
 	v_fid := (p_data ->> 'data')::json->> 'fid';
 	v_qgis_version := (p_data ->> 'data')::json->> 'version';
@@ -114,10 +114,10 @@ BEGIN
 	v_isaudit := (p_data ->> 'data')::json->> 'isAudit';
 
 
-	IF (SELECT value::boolean FROM config_param_system WHERE parameter = 'admin_exploitation_x_user') IS TRUE 
+	IF (SELECT value::boolean FROM config_param_system WHERE parameter = 'admin_exploitation_x_user') IS TRUE
 	OR (p_data ->> 'data')::json->> 'selectionMode' = 'userSelectors' THEN
 		v_selection_mode = 'userSelectors';
-	ELSE 
+	ELSE
 		v_selection_mode = 'wholeSystem';
 	END IF;
 
@@ -129,7 +129,7 @@ BEGIN
 
 	-- profilactic control of schema name
 	IF lower(v_addschema) = 'none' OR v_addschema = '' OR lower(v_addschema) ='null' OR v_addschema is null THEN
-		 v_addschema = null; 
+		 v_addschema = null;
 	ELSE
 		IF (select schemaname from pg_tables WHERE schemaname = v_addschema LIMIT 1) IS NULL THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
@@ -137,7 +137,7 @@ BEGIN
 			-- todo: send message to response
 		END IF;
 	END IF;
-	
+
 	-- get user parameters
 	SELECT value INTO v_user_control FROM config_param_user where parameter='utils_checkproject_database' AND cur_user=current_user;
 	SELECT value INTO v_layer_log FROM config_param_user where parameter='utils_checkproject_qgislayer' AND cur_user=current_user;
@@ -163,7 +163,7 @@ BEGIN
 		v_user_control = TRUE;
 		v_hidden_form = FALSE;
 	END IF;
-	
+
 	-- init process
 	v_isenabled:=FALSE;
 	v_count=0;
@@ -173,10 +173,10 @@ BEGIN
 	CREATE TEMP TABLE IF NOT EXISTS project_temp_anl_node (LIKE SCHEMA_NAME.anl_node INCLUDING ALL);
 	CREATE TEMP TABLE IF NOT EXISTS project_temp_anl_arc (LIKE SCHEMA_NAME.anl_arc INCLUDING ALL);
 	CREATE TEMP TABLE IF NOT EXISTS project_temp_anl_connec (LIKE SCHEMA_NAME.anl_connec INCLUDING ALL);
-  
+
 	select array_agg(expl_id) INTO v_cur_expl from selector_expl where cur_user = current_user;
-    
-	
+
+
 	query_text=NULL;
 	FOR field in SELECT * FROM json_array_elements(v_insert_fields) LOOP
 		select into query_text concat(query_text, 'INSERT INTO '||v_schemaname||'.audit_check_project (table_schema, table_id, table_dbname, table_host, fid, table_user) ') ;
@@ -184,15 +184,15 @@ BEGIN
 		select into query_text concat(query_text, ', '||quote_literal((field->>'fid'))||', '||quote_literal((field->>'table_user'))||');') ;
 	END LOOP;
 	IF query_text IS NOT NULL THEN EXECUTE query_text; END IF;
-    
 
-	
+
+
 	-- profilactic control on feat vdefault parameters on sys_param_user table
 	IF 'role_admin' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
 		UPDATE sys_param_user set project_type = lower(v_project_type) where project_type IS NULL;
 	END IF;
 
-	
+
 	-- Starting process
 	INSERT INTO project_temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, 'AUDIT CHECK PROJECT');
 	INSERT INTO project_temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, '------------------------------');
@@ -224,22 +224,22 @@ BEGIN
 	INSERT INTO project_temp_audit_check_data (fid,  criticity, error_message) VALUES (101, 4, concat ('Log volume (User folder): ', v_logfoldervolume));
 	INSERT INTO project_temp_audit_check_data (fid,  criticity, error_message) VALUES (101, 4, concat ('QGIS variables: gwProjectType:',quote_nullable(v_qgis_project_type),', gwInfoType:',
 	quote_nullable(v_infotype),', gwProjectRole:', quote_nullable(v_projectrole),', gwMainSchema:',quote_nullable(v_mainschema),', gwAddSchema:',quote_nullable(v_addschema)));
-	
+
 	v_errortext=concat('Logged as ', current_user,' on ', now());
-	
+
 	INSERT INTO project_temp_audit_check_data (fid,  criticity, error_message) VALUES (101, 4, v_errortext);
 
-  
+
 
 	-- manage mandatory values of config_param_user where feature is deprecated
 	IF 'role_admin' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
-	
-		DELETE FROM sys_param_user WHERE id IN (SELECT sys_param_user.id FROM sys_param_user, cat_feature 
+
+		DELETE FROM sys_param_user WHERE id IN (SELECT sys_param_user.id FROM sys_param_user, cat_feature
 		WHERE active=false AND concat(lower(cat_feature.id),'_vdefault') = sys_param_user.id);
 
 		v_errortext=concat('Inactive parameters have been deleted from sys_param_user.');
 		INSERT INTO project_temp_audit_check_data (fid,  criticity, error_message) VALUES (101, 4, v_errortext);
-		
+
 	END IF;
 
 
@@ -247,13 +247,13 @@ BEGIN
 		-- force expl = 0
 		INSERT INTO selector_expl (expl_id, cur_user) SELECT 0, current_user FROM exploitation LIMIT 1 ON CONFLICT (expl_id, cur_user) DO NOTHING;
 	END IF;
-				
-	
+
+
 	-- Force state selector in case of null values for addschema
 	IF v_addschema IS NOT NULL THEN
 
 		EXECUTE 'SET search_path = '||v_addschema||', public';
-		IF (SELECT count(*) FROM selector_state WHERE cur_user=current_user) < 1 THEN 
+		IF (SELECT count(*) FROM selector_state WHERE cur_user=current_user) < 1 THEN
 			INSERT INTO selector_state (state_id, cur_user) VALUES (1, current_user);
 			v_errortext=concat('Set feature state = 1 for addschema and user');
 			INSERT INTO project_temp_audit_check_data (fid,  criticity, error_message) VALUES (101, 4, v_errortext);
@@ -261,10 +261,10 @@ BEGIN
 		SET search_path = 'SCHEMA_NAME';
 	END IF;
 
-	-- Force psector selector in case of v_usepsector is false 
+	-- Force psector selector in case of v_usepsector is false
 	IF v_usepsector IS NOT TRUE THEN
-	
-		-- save psector selector 
+
+		-- save psector selector
 		DELETE FROM temp_table WHERE fid=288 AND cur_user=current_user;
 		INSERT INTO temp_table (fid, text_column)
 		SELECT 288, (array_agg(psector_id)) FROM selector_psector WHERE cur_user=current_user;
@@ -272,15 +272,15 @@ BEGIN
 		-- set psector selector
 		DELETE FROM selector_psector WHERE cur_user=current_user;
 	END IF;
-	
+
 
 	-- get uservalues
 	PERFORM gw_fct_setinitproject($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{}}$$);
-	
+
 
 	-- Force psector vdefault visible to current_user (only to => role_master)
 	IF 'role_master' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
-	
+
 		SELECT value::integer INTO v_psector_vdef FROM config_param_user WHERE parameter='plan_psector_vdefault' AND cur_user=current_user;
 
 		IF v_psector_vdef IS NULL THEN
@@ -308,17 +308,17 @@ BEGIN
 
 	--If user has activated full project control, depending on user role - execute corresponding check function
 	IF v_user_control THEN
-		
+
 		IF 'role_om' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
 			EXECUTE 'SELECT gw_fct_om_check_data($${
 			"client":{"device":4, "infoType":1, "lang":"ES"},
 			"feature":{},"data":{"parameters":{"selectionMode":"'||v_selection_mode||'","fid":101}}}$$)';
-			-- insert results 
+			-- insert results
 			UPDATE project_temp_audit_check_data SET error_message = concat(split_part(error_message,':',1), ' (DB OM):', split_part(error_message,': ',2))
 			WHERE fid=125 AND criticity < 4 AND error_message !='' AND cur_user=current_user AND result_id IS NOT NULL;
 
 			INSERT INTO project_temp_audit_check_data  (fid, criticity, result_id, error_message, fcount)
-			SELECT 101, criticity, result_id, error_message, fcount FROM project_temp_audit_check_data 
+			SELECT 101, criticity, result_id, error_message, fcount FROM project_temp_audit_check_data
 			WHERE fid=125 AND criticity < 4 AND error_message NOT IN ('CRITICAL ERRORS','WARNINGS','INFO', '') AND error_message NOT LIKE '---%' AND cur_user=current_user;
 
 			IF v_ignoregraphanalytics IS FALSE THEN
@@ -326,12 +326,12 @@ BEGIN
 					EXECUTE 'SELECT gw_fct_graphanalytics_check_data($${
 					"client":{"device":4, "infoType":1, "lang":"ES"},
 					"feature":{},"data":{"parameters":{"selectionMode":"'||v_selection_mode||'", "graphClass":"ALL","fid":101}}}$$)';
-					-- insert results 
+					-- insert results
 					UPDATE project_temp_audit_check_data SET error_message = concat(split_part(error_message,':',1), ' (DB GRAPH):', split_part(error_message,': ',2))
 					WHERE fid=211 AND criticity < 4 AND error_message !='' AND cur_user=current_user AND result_id IS NOT NULL;
 
 					INSERT INTO project_temp_audit_check_data  (fid, criticity, result_id, error_message, fcount)
-					SELECT 101, criticity, result_id, error_message, fcount FROM project_temp_audit_check_data 
+					SELECT 101, criticity, result_id, error_message, fcount FROM project_temp_audit_check_data
 					WHERE fid=211 AND criticity < 4 AND error_message NOT IN ('CRITICAL ERRORS','WARNINGS','INFO', '') AND error_message NOT LIKE '---%' AND cur_user=current_user;
 				END IF;
 			ELSE
@@ -339,21 +339,21 @@ BEGIN
 				DELETE FROM project_temp_audit_check_data WHERE fid=211 AND cur_user=current_user;
 				DELETE FROM anl_node WHERE cur_user=current_user AND fid IN (176,180,181,182,208,209);
 			END IF;
-		END IF;		
+		END IF;
 
 		IF 'role_epa' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
 
 			IF v_ignoreepa IS FALSE THEN
 				EXECUTE 'SELECT gw_fct_pg2epa_check_data($${
 				"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{"parameters":{"fid":101}}}$$)';
-				
-				-- insert results 
+
+				-- insert results
 				UPDATE project_temp_audit_check_data SET error_message = concat(split_part(error_message,':',1), ' (DB EPA):', split_part(error_message,': ',2))
 				WHERE fid=225 AND criticity < 4 AND error_message !='' AND cur_user=current_user AND result_id IS NOT NULL;
 
 				INSERT INTO project_temp_audit_check_data  (fid, criticity, result_id, error_message, fcount)
-				SELECT 101, criticity, result_id, error_message, fcount FROM project_temp_audit_check_data 
-				WHERE fid=225 AND criticity < 4 AND error_message NOT IN ('CRITICAL ERRORS','WARNINGS','INFO', '') AND error_message NOT LIKE '---%' AND cur_user=current_user;	
+				SELECT 101, criticity, result_id, error_message, fcount FROM project_temp_audit_check_data
+				WHERE fid=225 AND criticity < 4 AND error_message NOT IN ('CRITICAL ERRORS','WARNINGS','INFO', '') AND error_message NOT LIKE '---%' AND cur_user=current_user;
 			END IF;
 		END IF;
 
@@ -362,12 +362,12 @@ BEGIN
 			IF v_ignoreplan IS FALSE THEN
 				EXECUTE 'SELECT gw_fct_plan_check_data($${
 				"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{"parameters":{"fid":101}}}$$)';
-				-- insert results 
+				-- insert results
 				UPDATE project_temp_audit_check_data SET error_message = concat(split_part(error_message,':',1), ' (DB PLAN):', split_part(error_message,': ',2))
 				WHERE fid=115 AND criticity < 4 AND error_message !='' AND cur_user=current_user AND result_id IS NOT NULL;
 
 				INSERT INTO project_temp_audit_check_data  (fid, criticity, result_id, error_message, fcount)
-				SELECT 101, criticity, result_id, error_message, fcount FROM project_temp_audit_check_data 
+				SELECT 101, criticity, result_id, error_message, fcount FROM project_temp_audit_check_data
 				WHERE fid=115 AND criticity < 4 AND error_message NOT IN ('CRITICAL ERRORS','WARNINGS','INFO', '') AND error_message NOT LIKE '---%' AND cur_user=current_user;
 			ELSE
 				-- delete old values on result table
@@ -382,37 +382,37 @@ BEGIN
 			EXECUTE 'SELECT gw_fct_admin_check_data($${"client":
 			{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
 			"data":{"filterFields":{}, "pageInfo":{}, "parameters":{"fid":101}}}$$)::text';
-			-- insert results 
+			-- insert results
 			UPDATE project_temp_audit_check_data SET error_message = concat(split_part(error_message,':',1), ' (DB ADMIN):', split_part(error_message,': ',2))
 			WHERE fid=195 AND criticity < 4 AND error_message !='' AND cur_user=current_user AND result_id IS NOT NULL;
 
 			INSERT INTO project_temp_audit_check_data  (fid, criticity, result_id, error_message, fcount)
-			SELECT 101, criticity, result_id, error_message, fcount FROM project_temp_audit_check_data 
+			SELECT 101, criticity, result_id, error_message, fcount FROM project_temp_audit_check_data
 			WHERE fid=195 AND criticity < 4 AND error_message NOT IN ('CRITICAL ERRORS','WARNINGS','INFO', '') AND error_message NOT LIKE '---%' AND cur_user=current_user;
-			
+
 		END IF;
 
 		IF v_isaudit IS NULL THEN v_isaudit='false'; END IF;
-		
+
 		EXECUTE 'SELECT gw_fct_user_check_data($${"client":
 		{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
 		"data":{"filterFields":{}, "pageInfo":{}, "parameters":{"checkType":"Project","isAudit":'||v_isaudit||', "selectionMode":"'||v_selection_mode||'"}}}$$)::text';
-			
-		-- insert results 
+
+		-- insert results
 		UPDATE project_temp_audit_check_data SET error_message = concat(split_part(error_message,':',1), ' (DB USER):', split_part(error_message,': ',2))
 		WHERE fid=251 AND criticity < 4 AND error_message !='' AND cur_user=current_user AND result_id IS NOT NULL;
 
 		INSERT INTO project_temp_audit_check_data  (fid, criticity, result_id, error_message, fcount)
-		SELECT 101, criticity, result_id, error_message, fcount FROM project_temp_audit_check_data 
-		WHERE fid=251 AND criticity < 4 AND error_message NOT IN ('CRITICAL ERRORS','WARNINGS','INFO', '') 
+		SELECT 101, criticity, result_id, error_message, fcount FROM project_temp_audit_check_data
+		WHERE fid=251 AND criticity < 4 AND error_message NOT IN ('CRITICAL ERRORS','WARNINGS','INFO', '')
 		AND error_message NOT LIKE 'DATA%'
 		AND error_message NOT LIKE '---%' AND cur_user=current_user;
-			
+
 	END IF;
 
 	-- get uservalues
 	PERFORM gw_fct_workspacemanager($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},"data":{"filterFields":{}, "pageInfo":{}, "action":"CHECK"}}$$);
-		
+
 	v_uservalues = (SELECT to_json(array_agg(row_to_json(a))) FROM (SELECT parameter, value FROM config_param_user WHERE parameter IN ('plan_psector_vdefault', 'utils_workspace_vdefault')
 	AND cur_user = current_user ORDER BY parameter)a);
 
@@ -424,35 +424,35 @@ BEGIN
 		select unnest(text_column::integer[]), current_user from temp_table where fid=288 and cur_user=current_user
 		ON CONFLICT (psector_id, cur_user) DO NOTHING;
 	END IF;
-		
+
 	-- show form
 	IF v_hidden_form IS FALSE AND v_fid=101 THEN
 
 		-- get values using v_edit_node as 'current'  (in case v_edit_node is wrong all will he wrong)
-		SELECT table_host, table_dbname, table_schema INTO v_table_host, v_table_dbname, v_table_schema 
+		SELECT table_host, table_dbname, table_schema INTO v_table_host, v_table_dbname, v_table_schema
 		FROM audit_check_project where table_id = 'v_edit_node' and cur_user=current_user;
-			
+
 		--check layers host (350)
-		SELECT count(*), string_agg(table_id,',') INTO v_count, v_layer_list 
+		SELECT count(*), string_agg(table_id,',') INTO v_count, v_layer_list
 		FROM audit_check_project WHERE table_host != v_table_host AND cur_user=current_user;
-			
+
 		IF v_count>0 THEN
 			v_errortext = concat('ERROR-350 (QGIS PROJ): There is/are ',v_count,' layers that come from differen host: ',v_layer_list,'.');
-			
+
 			INSERT INTO project_temp_audit_check_data (fid,  criticity, result_id,error_message)
 			VALUES (101, 3,'350',v_errortext );
 		ELSE
 			INSERT INTO project_temp_audit_check_data (fid,  criticity, result_id, error_message)
 			VALUES (101, 1, '350', 'INFO (QGIS PROJ): All layers come from current host');
 		END IF;
-		
+
 		--check layers database (351)
-		SELECT count(*), string_agg(table_id,',') INTO v_count, v_layer_list 
+		SELECT count(*), string_agg(table_id,',') INTO v_count, v_layer_list
 		FROM audit_check_project WHERE table_dbname != v_table_dbname AND cur_user=current_user;
-		
+
 		IF v_count>0 THEN
 			v_errortext = concat('ERROR-351 (QGIS PROJ): There is/are ',v_count,' layers that come from different database: ',v_layer_list,'.');
-		
+
 			INSERT INTO project_temp_audit_check_data (fid,  criticity, result_id, error_message)
 			VALUES (101, 3, '351', v_errortext );
 		ELSE
@@ -461,12 +461,12 @@ BEGIN
 		END IF;
 
 		--check layers database(352)
-		SELECT count(*), string_agg(table_id,',') INTO v_count, v_layer_list 
+		SELECT count(*), string_agg(table_id,',') INTO v_count, v_layer_list
 		FROM audit_check_project WHERE table_schema != v_table_schema AND cur_user=current_user;
-		
+
 		IF v_count>0 THEN
 			v_errortext = concat('ERROR-352 (QGIS PROJ): There is/are ',v_count,' layers that come from different schema: ',v_layer_list,'.');
-		
+
 			INSERT INTO project_temp_audit_check_data (fid,  criticity, result_id, error_message)
 			VALUES (101, 3, '352', v_errortext );
 		ELSE
@@ -475,12 +475,12 @@ BEGIN
 		END IF;
 
 		--check layers user (353)
-		SELECT count(*), string_agg(table_id,',') INTO v_count, v_layer_list 
+		SELECT count(*), string_agg(table_id,',') INTO v_count, v_layer_list
 		FROM audit_check_project WHERE cur_user != table_user AND table_user != 'None' AND cur_user=current_user;
-		
+
 		IF v_count>0 THEN
 			v_errortext = concat('ERROR-353 (QGIS PROJ): There is/are ',v_count,' layers that have been added by different user: ',v_layer_list,'.');
-		
+
 			INSERT INTO project_temp_audit_check_data (fid,  criticity, result_id, error_message)
 			VALUES (101, 3,'353',v_errortext );
 		ELSE
@@ -501,19 +501,19 @@ BEGIN
 		INSERT INTO project_temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, '');
 
 		-- start process
-		FOR v_rectable IN SELECT * FROM sys_table WHERE sys_role IN 
+		FOR v_rectable IN SELECT * FROM sys_table WHERE sys_role IN
 		(SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member') )
 		LOOP
-		
+
 			--RAISE NOTICE 'v_count % id % ', v_count, v_rectable.id;
 			IF v_rectable.id NOT IN (SELECT table_id FROM audit_check_project WHERE cur_user=current_user AND fid=v_fid) THEN
 				INSERT INTO audit_check_project (table_id, fid, criticity, enabled, message) VALUES (v_rectable.id, 101, v_rectable.criticity, FALSE, v_rectable.descript);
-			--ELSE 
+			--ELSE
 			--	UPDATE audit_check_project SET criticity=v_rectable.qgis_criticity, enabled=TRUE WHERE table_id=v_rectable.id;
-			END IF;	
+			END IF;
 			v_count=v_count+1;
 		END LOOP;
-		
+
 		--error 1 (criticity = 3 and false)
 		SELECT count (*) INTO v_error FROM audit_check_project WHERE cur_user=current_user AND fid=101 AND criticity=3 AND enabled=FALSE;
 
@@ -544,11 +544,11 @@ BEGIN
 		WHERE audit_check_project.criticity=2 and enabled IS NOT TRUE) a'
 		INTO v_result_layers_criticity2;
 
-		v_result_layers_criticity3 := COALESCE(v_result_layers_criticity3, '{}'); 
-		v_result_layers_criticity2 := COALESCE(v_result_layers_criticity2, '{}'); 
+		v_result_layers_criticity3 := COALESCE(v_result_layers_criticity3, '{}');
+		v_result_layers_criticity2 := COALESCE(v_result_layers_criticity2, '{}');
 
 		v_missing_layers = v_result_layers_criticity3::jsonb||v_result_layers_criticity2::jsonb;
-		
+
 
 		INSERT INTO project_temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (101, v_result_id, 4, NULL);
 		INSERT INTO project_temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (101, v_result_id, 3, NULL);
@@ -559,17 +559,17 @@ BEGIN
 		DELETE FROM selector_expl  where cur_user = current_user;
 		INSERT INTO selector_expl
 		SELECT expl_id, current_user FROM exploitation where expl_id = ANY (v_cur_expl);
-		
+
 
 		-- get results
 		-- info
 		SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 		FROM (SELECT id, error_message as message FROM project_temp_audit_check_data WHERE cur_user="current_user"() AND fid=101 order by criticity desc, id asc) row;
-		v_result := COALESCE(v_result, '{}'); 
+		v_result := COALESCE(v_result, '{}');
 		v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
 		IF v_layer_log THEN
-		
+
 			--points
 			v_result = null;
 			SELECT jsonb_agg(features.feature) INTO v_result
@@ -583,11 +583,11 @@ BEGIN
 			UNION
 			SELECT id, node_id, nodecat_id, state, expl_id, descript, fid, the_geom FROM project_temp_anl_node WHERE cur_user="current_user"() AND fid IN (104,176,179,180,181,182,187,196,197,202,203)  -- om
 			UNION
-			SELECT id, connec_id, connecat_id, state, expl_id, descript,fid, the_geom FROM project_temp_anl_connec WHERE cur_user="current_user"() AND fid IN (201,202,204,205,206) -- om
+			SELECT id, connec_id, conneccat_id, state, expl_id, descript,fid, the_geom FROM project_temp_anl_connec WHERE cur_user="current_user"() AND fid IN (201,202,204,205,206) -- om
 			) row) features;
 
-			v_result := COALESCE(v_result, '{}'); 
-			v_result_point = concat ('{"geometryType":"Point", "features":',v_result,',"category_field":"descript"}'); 
+			v_result := COALESCE(v_result, '{}');
+			v_result_point = concat ('{"geometryType":"Point", "features":',v_result,',"category_field":"descript"}');
 
 			--lines
 			v_result = null;
@@ -604,7 +604,7 @@ BEGIN
 			SELECT id, arc_id, arccat_id, state, expl_id, descript, fid, the_geom FROM project_temp_anl_arc WHERE cur_user="current_user"() AND fid IN (104, 188, 202) -- om
 			) row) features;
 
-			v_result := COALESCE(v_result, '{}'); 
+			v_result := COALESCE(v_result, '{}');
 			v_result_line = concat ('{"geometryType":"LineString", "features":',v_result, ',"category_field":"descript"}');
 
 		END IF;
@@ -646,45 +646,45 @@ BEGIN
 
 	DELETE FROM audit_check_data WHERE cur_user = current_user AND fid in (101, 251, 115, 125, 195, 225);
 
-	DELETE FROM anl_node 
+	DELETE FROM anl_node
 	WHERE cur_user = current_user AND fid IN (103,104,106,187,188,196,197,201,202,203,204,205,257,372,417,418,419,421,422,423,424,442,443,461,478,479,488,480,497,498,499,	-- OM
 								       176,180,181,192,208,209,367,-- GRAPH
 								       106,107,111,113,164,175,187,188,294,295,379,427,430,440,480,522,528,529,530,-- EPA UD
 								       107,153,164,165,166,167,169,170,171,188,198,227,229,230,292,294,295,371,379,433,411,412,430,432,480,482,-- EPA WS
-								       252,354,355,452,467);-- PLAN 
-									   
-   DELETE FROM anl_arc 
+								       252,354,355,452,467);-- PLAN
+
+   DELETE FROM anl_arc
 	WHERE cur_user = current_user AND fid IN (103,104,106,187,188,196,197,201,202,203,204,205,257,372,417,418,419,421,422,423,424,442,443,461,478,479,488,480,497,498,499,-- OM
 								       176,180,181,192,208,209,367,-- GRAPH
 								       106,107,111,113,164,175,187,188,294,295,379,427,430,440,480,522,528,529,530,-- EPA UD
 								       107,153,164,165,166,167,169,170,171,188,198,227,229,230,292,294,295,371,379,433,411,412,430,432,480,482,	-- EPA WS
 								       252,354,355,452,467);-- PLAN
 
-	DELETE FROM anl_connec 
+	DELETE FROM anl_connec
 	WHERE cur_user = current_user AND fid IN (103,104,106,187,188,196,197,201,202,203,204,205,257,372,417,418,419,421,422,423,424,442,443,461,478,479,488,480,497,498,499,	-- OM
 								       176,180,181,192,208,209,367, -- GRAPH
 								       106,107,111,113,164,175,187,188,294,295,379,427,430,440,480,522,528,529,530,-- EPA UD
 								       107,153,164,165,166,167,169,170,171,188,198,227,229,230,292,294,295,371,379,433,411,412,430,432,480,482, -- EPA WS
 								       252,354,355,452,467);-- PLAN
-	
+
 	INSERT INTO anl_arc SELECT * FROM project_temp_anl_arc;
 	INSERT INTO anl_node SELECT * FROM project_temp_anl_node;
 	INSERT INTO anl_connec SELECT * FROM project_temp_anl_connec;
 	INSERT INTO audit_check_data SELECT * FROM project_temp_audit_check_data;
-	
+
 	DROP TABLE IF EXISTS project_temp_anl_arc;
 	DROP TABLE IF EXISTS project_temp_anl_node;
 	DROP TABLE IF EXISTS project_temp_anl_connec;
 	DROP TABLE IF EXISTS project_temp_audit_check_data;
-		
-	--  Return	   
+
+	--  Return
 	RETURN v_return;
-	
+
 	--  Exception handling
 	EXCEPTION WHEN OTHERS THEN
-	GET STACKED DIAGNOSTICS v_error_context = pg_exception_context;  
+	GET STACKED DIAGNOSTICS v_error_context = pg_exception_context;
 	RETURN json_build_object('status', 'Failed', 'NOSQLERR', SQLERRM, 'message', json_build_object('level', right(SQLSTATE, 1), 'text', SQLERRM), 'SQLSTATE', SQLSTATE, 'SQLCONTEXT', v_error_context)::json;
-	  
+
 END;
 
 $BODY$

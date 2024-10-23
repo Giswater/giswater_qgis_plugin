@@ -12,7 +12,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 SELECT plan(6);
 
-INSERT INTO v_edit_review_connec (connec_id, connecat_id, annotation, observ, review_obs, expl_id, the_geom, field_date, field_checked, is_validated) 
+INSERT INTO v_edit_review_connec (connec_id, conneccat_id, annotation, observ, review_obs, expl_id, the_geom, field_date, field_checked, is_validated)
 VALUES('-901', '', '', '', '', 0, null, null, false, 0);
 SELECT is((SELECT count(*)::integer FROM v_edit_review_connec WHERE connec_id = '-901'), 1, 'INSERT: v_edit_review_connec -901 was inserted');
 SELECT is((SELECT count(*)::integer FROM review_connec WHERE connec_id = '-901'), 1, 'INSERT: review_connec -901 was inserted');

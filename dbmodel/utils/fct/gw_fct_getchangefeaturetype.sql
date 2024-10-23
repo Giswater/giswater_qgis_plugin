@@ -105,26 +105,16 @@ BEGIN
         v_curr_featurecat = v_new_featurecat;
         v_new_featurecat_exist = true;
     END IF;
-   
-   	if v_feature_type = 'connec' then
-   		v_sql := concat('SELECT json_build_object(
-	    ''location_type'', location_type,
-	    ''function_type'', function_type,
-	    ''fluid_type'', fluid_type,
-	    ''category_type'', category_type,
-		''',v_feature_type,'cat_id'', ',v_feature_type,'at_id
-	    ) AS combined_data
-	    FROM v_edit_', v_feature_type, ' WHERE ', v_feature_type, '_id = ''', v_feature_id, '''');
-   	else
-   		v_sql := concat('SELECT json_build_object(
-	    ''location_type'', location_type,
-	    ''function_type'', function_type,
-	    ''fluid_type'', fluid_type,
-	    ''category_type'', category_type,
-		''',v_feature_type,'cat_id'', ',v_feature_type,'cat_id
-	    ) AS combined_data
-	    FROM v_edit_', v_feature_type, ' WHERE ', v_feature_type, '_id = ''', v_feature_id, '''');
-   	end if;
+
+
+    v_sql := concat('SELECT json_build_object(
+    ''location_type'', location_type,
+    ''function_type'', function_type,
+    ''fluid_type'', fluid_type,
+    ''category_type'', category_type,
+    ''',v_feature_type,'cat_id'', ',v_feature_type,'cat_id
+    ) AS combined_data
+    FROM v_edit_', v_feature_type, ' WHERE ', v_feature_type, '_id = ''', v_feature_id, '''');
     EXECUTE v_sql INTO v_feature_type_values;
 
     -- SELECT array_agg( layoutname) into v_layouts FROM config_form_fields  WHERE formtype = 'form_featuretype_change';
@@ -156,23 +146,18 @@ BEGIN
         END IF;
 
         IF (aux_json->>'columnname') = 'feature_type_new' then
-        
+
             SELECT array_agg(id) into v_featurecat_ids FROM cat_feature WHERE parent_layer = v_table_name AND active is True group by parent_layer order by 1;
             -- fill combo values
             v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'comboIds', COALESCE(v_featurecat_ids, '{}'));
             v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'comboNames', COALESCE(v_featurecat_ids, '{}'));
             -- set selectedId in combo box
             field_value = v_new_featurecat;
-           
+
         END IF;
 
         IF (aux_json->>'columnname') = 'featurecat_id' THEN
-            IF (v_feature_type = 'gully') THEN
-                v_sql := concat('SELECT array_agg(id) FROM cat_grate WHERE ', v_feature_type, '_type = ''', v_curr_featurecat, ''' AND active is True OR active is null ORDER BY 1');
-            ELSE
-                v_sql := concat('SELECT array_agg(id) FROM cat_', v_feature_type, ' WHERE ', v_feature_type, '_type = ''', v_curr_featurecat, ''' AND active IS TRUE OR active IS NULL ORDER BY 1');
-            END IF;
-
+            v_sql := concat('SELECT array_agg(id) FROM cat_', v_feature_type, ' WHERE ', v_feature_type, '_type = ''', v_curr_featurecat, ''' AND active IS TRUE OR active IS NULL ORDER BY 1');
            EXECUTE v_sql INTO v_catalogs_ids;
 
 			v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'comboIds', COALESCE(v_catalogs_ids, '{}'));
@@ -181,7 +166,7 @@ BEGIN
 			if v_new_featurecat_exist is false THEN
 				field_value = v_feature_type_values ->> concat(v_feature_type, 'cat_id');
 			end if;
-          
+
         END IF;
 
         -- todo: for all *_type need to be implemented the filter of fetaurecat_id and alos the field_value
@@ -200,10 +185,10 @@ BEGIN
             v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'comboNames', COALESCE(v_fluids, '{}'));
 
             -- set selectedId if v_new_featurecat is null
-            if v_new_featurecat_exist is false then 
+            if v_new_featurecat_exist is false then
                 EXECUTE 'SELECT fluid_type FROM '||v_feature_type||' WHERE '||v_feature_type||'_id = '''||v_feature_id||''';'
                 INTO field_value;
-            else 
+            else
                 field_value = null;
             end if;
 
@@ -215,7 +200,7 @@ BEGIN
             WHERE lower(feature_type) = v_feature_type
                 AND (v_new_featurecat = any (featurecat_id) OR featurecat_id IS NULL)
                 AND (active IS TRUE OR active IS NULL);
-            
+
             -- Enable null value
             v_locations = array_prepend('',v_locations);
 
@@ -223,10 +208,10 @@ BEGIN
             v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'comboNames', COALESCE(v_locations, '{}'));
 
             -- set selectedId if v_new_featurecat is null
-            if v_new_featurecat_exist is false then 
+            if v_new_featurecat_exist is false then
                 EXECUTE 'SELECT location_type FROM '||v_feature_type||' WHERE '||v_feature_type||'_id = '''||v_feature_id||''';'
                 INTO field_value;
-            else 
+            else
                 field_value = null;
             end if;
 
@@ -238,7 +223,7 @@ BEGIN
             WHERE lower(feature_type) = v_feature_type
                 AND (v_new_featurecat = any (featurecat_id) OR featurecat_id IS NULL)
                 AND (active IS TRUE OR active IS NULL);
-            
+
             -- Enable null value
             v_categories = array_prepend('',v_categories);
 
@@ -246,10 +231,10 @@ BEGIN
             v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'comboNames', COALESCE(v_categories, '{}'));
 
             -- set selectedId if v_new_featurecat is null
-            if v_new_featurecat_exist is false then 
+            if v_new_featurecat_exist is false then
                 EXECUTE 'SELECT category_type FROM '||v_feature_type||' WHERE '||v_feature_type||'_id = '''||v_feature_id||''';'
                 INTO field_value;
-            else 
+            else
                 field_value = null;
             end if;
 
@@ -261,7 +246,7 @@ BEGIN
             WHERE lower(feature_type) = v_feature_type
                 AND (v_new_featurecat = any (featurecat_id) OR featurecat_id IS NULL)
                 AND (active IS TRUE OR active IS NULL);
-            
+
             -- Enable null value
             v_functions = array_prepend('',v_functions);
 
@@ -269,10 +254,10 @@ BEGIN
             v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'comboNames', COALESCE(v_functions, '{}'));
 
             -- set selectedId if v_new_featurecat is null
-            if v_new_featurecat_exist is false then 
+            if v_new_featurecat_exist is false then
                 EXECUTE 'SELECT function_type FROM '||v_feature_type||' WHERE '||v_feature_type||'_id = '''||v_feature_id||''';'
                 INTO field_value;
-            else 
+            else
                 field_value = null;
             end if;
 
@@ -293,7 +278,7 @@ BEGIN
                 --select values for missing id
                 v_querystring = concat('SELECT id, idval FROM (',v_querytext,')a
                 WHERE id::text = ',quote_literal(field_value),'');
-              
+
                 v_debug_vars := json_build_object('v_querytext', v_querytext, 'field_value', field_value);
                 v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getfeatureupsert', 'flag', 110);
                 SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;

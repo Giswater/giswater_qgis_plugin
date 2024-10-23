@@ -13,7 +13,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 SELECT plan(6);
 
 
-INSERT INTO v_edit_review_connec (connec_id, y1, y2, connec_type, matcat_id, connecat_id, annotation, observ, review_obs, expl_id, the_geom, field_date, field_checked, is_validated)
+INSERT INTO v_edit_review_connec (connec_id, y1, y2, connec_type, matcat_id, conneccat_id, annotation, observ, review_obs, expl_id, the_geom, field_date, field_checked, is_validated)
 VALUES('-901', 0, 0, '', '', '', '', '', '', 0, null, null, false, 0);
 
 

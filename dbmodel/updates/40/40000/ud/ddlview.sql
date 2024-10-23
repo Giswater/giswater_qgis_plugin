@@ -291,7 +291,7 @@ AS SELECT DISTINCT ON (link_id)
     l.expl_id2,
     l.epa_type,
     l.is_operative,
-    l.connecat_id,
+    l.conneccat_id,
     l.workcat_id,
     l.workcat_id_end,
     l.builtdate,
@@ -762,10 +762,10 @@ SELECT connec.connec_id,
     connec.top_elev,
     connec.y1,
     connec.y2,
-    connec.connecat_id,
+    connec.conneccat_id,
     connec.connec_type,
     cat_feature.feature_class AS sys_type,
-    connec.private_connecat_id,
+    connec.private_conneccat_id,
         CASE
             WHEN connec.matcat_id IS NULL THEN cat_connec.matcat_id
             ELSE connec.matcat_id
@@ -850,7 +850,7 @@ SELECT connec.connec_id,
     connec.lastupdate_user,
     connec.the_geom
    FROM connec
-     JOIN cat_connec ON connec.connecat_id::text = cat_connec.id::text
+     JOIN cat_connec ON connec.conneccat_id::text = cat_connec.id::text
      LEFT JOIN ext_streetaxis ON connec.streetaxis_id::text = ext_streetaxis.id::text
      LEFT JOIN dma ON connec.dma_id = dma.dma_id
      LEFT JOIN exploitation ON connec.expl_id = exploitation.expl_id
@@ -875,10 +875,10 @@ WITH s AS (
     vu_connec.top_elev,
     vu_connec.y1,
     vu_connec.y2,
-    vu_connec.connecat_id,
+    vu_connec.conneccat_id,
     vu_connec.connec_type,
     vu_connec.sys_type,
-    vu_connec.private_connecat_id,
+    vu_connec.private_conneccat_id,
     vu_connec.matcat_id,
 	vu_connec.state,
     vu_connec.state_type,
@@ -1017,10 +1017,10 @@ CREATE OR REPLACE VIEW vu_gully AS
     gully.matcat_id,
     gully.gully_type,
     cat_feature.feature_class AS sys_type,
-    gully.gratecat_id,
-    cat_grate.matcat_id AS cat_grate_matcat,
-    cat_grate.width AS grate_width,
-    cat_grate.length AS grate_length,
+    gully.gullycat_id,
+    cat_gully.matcat_id AS cat_gully_matcat,
+    cat_gully.width AS grate_width,
+    cat_gully.length AS grate_length,
     gully.units,
     gully.groove,
     gully.groove_height,
@@ -1075,12 +1075,12 @@ CREATE OR REPLACE VIEW vu_gully AS
     mu.region_id,
     mu.province_id,
     gully.descript,
-    cat_grate.svg,
+    cat_gully.svg,
     gully.rotation,
     concat(cat_feature.link_path, gully.link) AS link,
     gully.verified,
     gully.undelete,
-    cat_grate.label,
+    cat_gully.label,
     gully.label_x,
     gully.label_y,
     gully.label_rotation,
@@ -1096,7 +1096,7 @@ CREATE OR REPLACE VIEW vu_gully AS
             WHEN gully.connec_matcat_id IS NULL THEN cc.matcat_id::text
             ELSE gully.connec_matcat_id
         END AS connec_matcat_id,
-    gully.gratecat2_id,
+    gully.gullycat2_id,
     gully.units_placement,
     gully.expl_id2,
     vst.is_operative,
@@ -1118,7 +1118,7 @@ CREATE OR REPLACE VIEW vu_gully AS
             ELSE NULL::character varying(16)
         END AS inp_type
    FROM (SELECT value FROM config_param_user WHERE parameter = 'inp_options_networkmode' and cur_user = current_user) cpu, gully
-     LEFT JOIN cat_grate ON gully.gratecat_id::text = cat_grate.id::text
+     LEFT JOIN cat_gully ON gully.gullycat_id::text = cat_gully.id::text
      LEFT JOIN dma ON gully.dma_id = dma.dma_id
      LEFT JOIN sector ON gully.sector_id = sector.sector_id
      LEFT JOIN exploitation ON gully.expl_id = exploitation.expl_id
@@ -1145,8 +1145,8 @@ WITH s AS (
     vu_gully.matcat_id,
     vu_gully.gully_type,
     vu_gully.sys_type,
-    vu_gully.gratecat_id,
-    vu_gully.cat_grate_matcat,
+    vu_gully.gullycat_id,
+    vu_gully.cat_gully_matcat,
     vu_gully.units,
     vu_gully.groove,
 	vu_gully.groove_height,
@@ -1236,7 +1236,7 @@ WITH s AS (
             ELSE a.exit_type
         END AS pjoint_type,
     vu_gully.asset_id,
-	vu_gully.gratecat2_id,
+	vu_gully.gullycat2_id,
 	vu_gully.units_placement,
     vu_gully.expl_id2,
     vu_gully.is_operative,
@@ -1703,7 +1703,7 @@ AS WITH links_node AS (
  SELECT row_number() OVER () + 1000000 AS rid,
     v_edit_connec.arc_id,
     v_edit_connec.connec_type AS featurecat_id,
-    v_edit_connec.connecat_id AS catalog,
+    v_edit_connec.conneccat_id AS catalog,
     v_edit_connec.connec_id AS feature_id,
     v_edit_connec.code AS feature_code,
     v_edit_connec.sys_type,
@@ -1722,7 +1722,7 @@ UNION
  SELECT DISTINCT ON (c.connec_id) row_number() OVER () + 2000000 AS rid,
     a.arc_id,
     c.connec_type AS featurecat_id,
-    c.connecat_id AS catalog,
+    c.conneccat_id AS catalog,
     c.connec_id AS feature_id,
     c.code AS feature_code,
     c.sys_type,
@@ -1740,7 +1740,7 @@ UNION
  SELECT row_number() OVER () + 3000000 AS rid,
     v_edit_gully.arc_id,
     v_edit_gully.gully_type AS featurecat_id,
-    v_edit_gully.gratecat_id AS catalog,
+    v_edit_gully.gullycat_id AS catalog,
     v_edit_gully.gully_id AS feature_id,
     v_edit_gully.code AS feature_code,
     v_edit_gully.sys_type,
@@ -1759,7 +1759,7 @@ UNION
  SELECT DISTINCT ON (g.gully_id) row_number() OVER () + 4000000 AS rid,
     a.arc_id,
     g.gully_type AS featurecat_id,
-    g.gratecat_id AS catalog,
+    g.gullycat_id AS catalog,
     g.gully_id AS feature_id,
     g.code AS feature_code,
     g.sys_type,
@@ -2417,9 +2417,9 @@ AS SELECT n.node_id,
     n.sys_elev,
     n.node_type,
     n.nodecat_id,
-    man_netgully.gratecat_id,
-    (cat_grate.width / 100::numeric)::numeric(12,3) AS grate_width,
-    (cat_grate.length / 100::numeric)::numeric(12,3) AS grate_length,
+    man_netgully.gullycat_id,
+    (cat_gully.width / 100::numeric)::numeric(12,3) AS grate_width,
+    (cat_gully.length / 100::numeric)::numeric(12,3) AS grate_length,
     n.sector_id,
     n.macrosector_id,
     n.expl_id,
@@ -2431,17 +2431,17 @@ AS SELECT n.node_id,
     man_netgully.groove,
     man_netgully.groove_height,
     man_netgully.groove_length,
-    cat_grate.a_param,
-    cat_grate.b_param,
+    cat_gully.a_param,
+    cat_gully.b_param,
         CASE
-            WHEN man_netgully.units_placement::text = 'LENGTH-SIDE'::text THEN (COALESCE(man_netgully.units::integer, 1)::numeric * cat_grate.width / 100::numeric)::numeric(12,3)
-            WHEN man_netgully.units_placement::text = 'WIDTH-SIDE'::text THEN (COALESCE(man_netgully.units::integer, 1)::numeric * cat_grate.length / 100::numeric)::numeric(12,3)
-            ELSE (cat_grate.width / 100::numeric)::numeric(12,3)
+            WHEN man_netgully.units_placement::text = 'LENGTH-SIDE'::text THEN (COALESCE(man_netgully.units::integer, 1)::numeric * cat_gully.width / 100::numeric)::numeric(12,3)
+            WHEN man_netgully.units_placement::text = 'WIDTH-SIDE'::text THEN (COALESCE(man_netgully.units::integer, 1)::numeric * cat_gully.length / 100::numeric)::numeric(12,3)
+            ELSE (cat_gully.width / 100::numeric)::numeric(12,3)
         END AS total_width,
         CASE
-            WHEN man_netgully.units_placement::text = 'LENGTH-SIDE'::text THEN (COALESCE(man_netgully.units::integer, 1)::numeric * cat_grate.width / 100::numeric)::numeric(12,3)
-            WHEN man_netgully.units_placement::text = 'WIDTH-SIDE'::text THEN (COALESCE(man_netgully.units::integer, 1)::numeric * cat_grate.length / 100::numeric)::numeric(12,3)
-            ELSE (cat_grate.length / 100::numeric)::numeric(12,3)
+            WHEN man_netgully.units_placement::text = 'LENGTH-SIDE'::text THEN (COALESCE(man_netgully.units::integer, 1)::numeric * cat_gully.width / 100::numeric)::numeric(12,3)
+            WHEN man_netgully.units_placement::text = 'WIDTH-SIDE'::text THEN (COALESCE(man_netgully.units::integer, 1)::numeric * cat_gully.length / 100::numeric)::numeric(12,3)
+            ELSE (cat_gully.length / 100::numeric)::numeric(12,3)
         END AS total_length,
     n.ymax - COALESCE(man_netgully.sander_depth, 0::numeric) AS depth,
     n.annotation,
@@ -2461,7 +2461,7 @@ AS SELECT n.node_id,
     FROM v_edit_node n
     JOIN inp_netgully i USING (node_id)
     LEFT JOIN man_netgully USING (node_id)
-    LEFT JOIN cat_grate ON man_netgully.gratecat_id::text = cat_grate.id::text
+    LEFT JOIN cat_gully ON man_netgully.gullycat_id::text = cat_gully.id::text
     WHERE n.is_operative IS TRUE;
 
 
@@ -3010,7 +3010,7 @@ UNION
 UNION
  SELECT row_number() OVER (ORDER BY connec.connec_id) + 3000000 AS rid,
     connec.feature_type,
-    connec.connecat_id AS featurecat_id,
+    connec.conneccat_id AS featurecat_id,
     connec.connec_id AS feature_id,
     connec.code,
     exploitation.name AS expl_name,
@@ -3022,7 +3022,7 @@ UNION
 UNION
  SELECT row_number() OVER (ORDER BY gully.gully_id) + 4000000 AS rid,
     gully.feature_type,
-    gully.gratecat_id AS featurecat_id,
+    gully.gullycat_id AS featurecat_id,
     gully.gully_id AS feature_id,
     gully.code,
     exploitation.name AS expl_name,
@@ -3071,7 +3071,7 @@ UNION
 UNION
  SELECT row_number() OVER (ORDER BY v_edit_connec.connec_id) + 3000000 AS rid,
     'CONNEC'::character varying AS feature_type,
-    v_edit_connec.connecat_id AS featurecat_id,
+    v_edit_connec.conneccat_id AS featurecat_id,
     v_edit_connec.connec_id AS feature_id,
     v_edit_connec.code,
     exploitation.name AS expl_name,
@@ -3095,7 +3095,7 @@ UNION
 UNION
  SELECT row_number() OVER (ORDER BY v_edit_gully.gully_id) + 4000000 AS rid,
     'GULLY'::character varying AS feature_type,
-    v_edit_gully.gratecat_id AS featurecat_id,
+    v_edit_gully.gullycat_id AS featurecat_id,
     v_edit_gully.gully_id AS feature_id,
     v_edit_gully.code,
     exploitation.name AS expl_name,
@@ -3158,7 +3158,7 @@ UNION
     v_edit_connec.connec_id AS feature_id,
     v_edit_connec.code::text AS feature_code,
     v_edit_connec.connec_type AS featurecat_id,
-    v_edit_connec.connecat_id AS arccat_id,
+    v_edit_connec.conneccat_id AS arccat_id,
     v_edit_connec.y1 AS depth,
     st_length2d(link.the_geom)::numeric(12,2) AS length,
     v_edit_connec.connec_id AS upstream_id,
@@ -3174,7 +3174,7 @@ UNION
    FROM v_edit_connec
      JOIN link ON link.feature_id::text = v_edit_connec.connec_id::text AND link.feature_type::text = 'CONNEC'::text
      JOIN node ON v_edit_connec.pjoint_id::text = node.node_id::text AND v_edit_connec.pjoint_type::text = 'NODE'::text
-     LEFT JOIN cat_connec ON v_edit_connec.connecat_id::text = cat_connec.id::text
+     LEFT JOIN cat_connec ON v_edit_connec.conneccat_id::text = cat_connec.id::text
      JOIN value_state ON v_edit_connec.state = value_state.id
 UNION
  SELECT DISTINCT ON (v_edit_connec.connec_id) row_number() OVER (ORDER BY node.node_id) + 3000000 AS rid,
@@ -3182,7 +3182,7 @@ UNION
     v_edit_connec.connec_id AS feature_id,
     v_edit_connec.code::text AS feature_code,
     v_edit_connec.connec_type AS featurecat_id,
-    v_edit_connec.connecat_id AS arccat_id,
+    v_edit_connec.conneccat_id AS arccat_id,
     v_edit_connec.y1 AS depth,
     st_length2d(link.the_geom)::numeric(12,2) AS length,
     v_edit_connec.connec_id AS upstream_id,
@@ -3199,7 +3199,7 @@ UNION
      JOIN link ON link.feature_id::text = v_edit_connec.connec_id::text AND link.feature_type::text = 'CONNEC'::text AND link.exit_type::text = 'CONNEC'::text
      JOIN connec ON connec.connec_id::text = link.exit_id::text AND connec.pjoint_type::text = 'NODE'::text
      JOIN node ON connec.pjoint_id::text = node.node_id::text
-     LEFT JOIN cat_connec ON v_edit_connec.connecat_id::text = cat_connec.id::text
+     LEFT JOIN cat_connec ON v_edit_connec.conneccat_id::text = cat_connec.id::text
      JOIN value_state ON v_edit_connec.state = value_state.id
 UNION
  SELECT DISTINCT ON (v_edit_gully.gully_id) row_number() OVER (ORDER BY node.node_id) + 4000000 AS rid,
@@ -3877,7 +3877,7 @@ AS SELECT row_number() OVER () AS rid,
     connec.connec_id,
     plan_psector_x_connec.psector_id,
     connec.code,
-    connec.connecat_id,
+    connec.conneccat_id,
     connec.connec_type,
     cat_feature.feature_class,
     connec.state AS original_state,
@@ -3888,7 +3888,7 @@ AS SELECT row_number() OVER () AS rid,
    FROM selector_psector,
     connec
      JOIN plan_psector_x_connec USING (connec_id)
-     JOIN cat_connec ON cat_connec.id::text = connec.connecat_id::text
+     JOIN cat_connec ON cat_connec.id::text = connec.conneccat_id::text
      JOIN cat_feature ON cat_feature.id::text = connec.connec_type::text
   WHERE plan_psector_x_connec.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text;
 
@@ -4404,7 +4404,7 @@ AS SELECT g.gully_id,
     g.code,
     g.top_elev,
     g.gully_type,
-    g.gratecat_id,
+    g.gullycat_id,
     (g.grate_width / 100::numeric)::numeric(12,2) AS grate_width,
     (g.grate_length / 100::numeric)::numeric(12,2) AS grate_length,
     g.arc_id,
@@ -4420,17 +4420,17 @@ AS SELECT g.gully_id,
     g.groove_length,
     g.pjoint_id,
     g.pjoint_type,
-    cat_grate.a_param,
-    cat_grate.b_param,
+    cat_gully.a_param,
+    cat_gully.b_param,
         CASE
             WHEN g.units_placement::text = 'LENGTH-SIDE'::text THEN (COALESCE(g.units::integer, 1)::numeric * g.grate_width / 100::numeric)::numeric(12,3)
             WHEN g.units_placement::text = 'WIDTH-SIDE'::text THEN (COALESCE(g.units::integer, 1)::numeric * g.grate_length / 100::numeric)::numeric(12,3)
-            ELSE (cat_grate.width / 100::numeric)::numeric(12,3)
+            ELSE (cat_gully.width / 100::numeric)::numeric(12,3)
         END AS total_width,
         CASE
             WHEN g.units_placement::text = 'LENGTH-SIDE'::text THEN (COALESCE(g.units::integer, 1)::numeric * g.grate_width / 100::numeric)::numeric(12,3)
             WHEN g.units_placement::text = 'WIDTH-SIDE'::text THEN (COALESCE(g.units::integer, 1)::numeric * g.grate_length / 100::numeric)::numeric(12,3)
-            ELSE (cat_grate.length / 100::numeric)::numeric(12,3)
+            ELSE (cat_gully.length / 100::numeric)::numeric(12,3)
         END AS total_length,
     g.ymax - COALESCE(g.sandbox, 0::numeric) AS depth,
     g.annotation,
@@ -4447,7 +4447,7 @@ AS SELECT g.gully_id,
     i.efficiency
     FROM v_edit_gully g
     JOIN inp_gully i USING (gully_id)
-    JOIN cat_grate ON g.gratecat_id::text = cat_grate.id::text
+    JOIN cat_gully ON g.gullycat_id::text = cat_gully.id::text
     WHERE is_operative IS TRUE;
 
 CREATE OR REPLACE VIEW ve_pol_gully
@@ -4502,7 +4502,7 @@ SELECT row_number() OVER () AS rid,
 gully.gully_id,
 plan_psector_x_gully.psector_id,
 gully.code,
-gully.gratecat_id,
+gully.gullycat_id,
 gully.gully_type,
 cat_feature.feature_class,
 gully.state AS original_state,
@@ -4512,6 +4512,50 @@ plan_psector_x_gully.doable,
 gully.the_geom
 FROM selector_psector, gully
 JOIN plan_psector_x_gully USING (gully_id)
-JOIN cat_grate ON cat_grate.id=gully.gratecat_id
+JOIN cat_gully ON cat_gully.id=gully.gullycat_id
 JOIN cat_feature ON cat_feature.id=gully.gully_type
 WHERE plan_psector_x_gully.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text;
+
+
+CREATE OR REPLACE VIEW v_edit_review_gully
+AS SELECT review_gully.gully_id,
+    review_gully.top_elev,
+    review_gully.ymax,
+    review_gully.sandbox,
+    review_gully.matcat_id,
+    review_gully.gully_type,
+    review_gully.gullycat_id,
+    review_gully.units,
+    review_gully.groove,
+    review_gully.siphon,
+    review_gully.connec_arccat_id,
+    review_gully.annotation,
+    review_gully.observ,
+    review_gully.review_obs,
+    review_gully.expl_id,
+    review_gully.the_geom,
+    review_gully.field_date,
+    review_gully.field_checked,
+    review_gully.is_validated
+   FROM review_gully,
+    selector_expl
+  WHERE selector_expl.cur_user = "current_user"()::text AND review_gully.expl_id = selector_expl.expl_id;
+
+CREATE OR REPLACE VIEW v_edit_review_connec
+AS SELECT review_connec.connec_id,
+    review_connec.y1,
+    review_connec.y2,
+    review_connec.connec_type,
+    review_connec.matcat_id,
+    review_connec.conneccat_id,
+    review_connec.annotation,
+    review_connec.observ,
+    review_connec.review_obs,
+    review_connec.expl_id,
+    review_connec.the_geom,
+    review_connec.field_date,
+    review_connec.field_checked,
+    review_connec.is_validated
+   FROM review_connec,
+    selector_expl
+  WHERE selector_expl.cur_user = "current_user"()::text AND review_connec.expl_id = selector_expl.expl_id;

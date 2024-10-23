@@ -319,8 +319,8 @@ BEGIN
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,') a ') INTO v_count;
 
 	IF v_count > 0 THEN
-		EXECUTE concat ('INSERT INTO temp_anl_connec (fid, connec_id, connecat_id, descript, the_geom, expl_id)
-		SELECT 210, connec_id, connecat_id, ''Connecs with null customer code'', the_geom, expl_id FROM connec WHERE connec_id IN (', v_querytext,')');
+		EXECUTE concat ('INSERT INTO temp_anl_connec (fid, connec_id, conneccat_id, descript, the_geom, expl_id)
+		SELECT 210, connec_id, conneccat_id, ''Connecs with null customer code'', the_geom, expl_id FROM connec WHERE connec_id IN (', v_querytext,')');
 		INSERT INTO temp_audit_check_data (fid, criticity, result_id,error_message, fcount)
 		VALUES (v_fid, 2, '210', concat('WARNING-210 (anl_connec): There is/are ',v_count,' connec with customer code null. Please, check your data before continue'),v_count);
 	ELSE
@@ -334,8 +334,8 @@ BEGIN
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,') a ') INTO v_count;
 
 	IF v_count > 0 THEN
-		EXECUTE concat ('INSERT INTO temp_anl_connec (fid, connec_id, connecat_id, descript, the_geom, expl_id)
-		SELECT 201, connec_id, connecat_id, ''Connecs with customer code duplicated'', the_geom, expl_id FROM connec WHERE customer_code IN (', v_querytext,')');
+		EXECUTE concat ('INSERT INTO temp_anl_connec (fid, connec_id, conneccat_id, descript, the_geom, expl_id)
+		SELECT 201, connec_id, conneccat_id, ''Connecs with customer code duplicated'', the_geom, expl_id FROM connec WHERE customer_code IN (', v_querytext,')');
 		INSERT INTO temp_audit_check_data (fid, criticity, result_id, error_message, fcount)
 		VALUES (v_fid, 2, '201', concat('WARNING-201 (anl_connec): There is/are ',v_count,' connec customer code duplicated. Please, check your data before continue'),v_count);
 	ELSE
@@ -351,7 +351,7 @@ BEGIN
 						UNION SELECT CASE WHEN node_id~E''^\\d+$'' THEN CAST (node_id AS INTEGER)
    						ELSE 0 END as feature_id, ''NODE'' as type, nodecat_id as featurecat, the_geom, expl_id FROM '||v_edit||'node
 						UNION SELECT CASE WHEN connec_id~E''^\\d+$'' THEN CAST (connec_id AS INTEGER)
-   						ELSE 0 END as feature_id, ''CONNEC'' as type, connecat_id as featurecat, the_geom, expl_id FROM '||v_edit||'connec) a';
+   						ELSE 0 END as feature_id, ''CONNEC'' as type, conneccat_id as featurecat, the_geom, expl_id FROM '||v_edit||'connec) a';
 
    		EXECUTE concat('SELECT count(*) FROM ',v_querytext,' WHERE feature_id=0') INTO v_count;
    	ELSIF v_project_type = 'UD' THEN
@@ -360,16 +360,16 @@ BEGIN
 						UNION SELECT CASE WHEN node_id~E''^\\d+$'' THEN CAST (node_id AS INTEGER)
    						ELSE 0 END as feature_id, ''NODE'' as type, nodecat_id as featurecat,the_geom, expl_id FROM '||v_edit||'node
 						UNION SELECT CASE WHEN connec_id~E''^\\d+$'' THEN CAST (connec_id AS INTEGER)
-   						ELSE 0 END as feature_id, ''CONNEC'' as type, connecat_id as featurecat,the_geom, expl_id FROM '||v_edit||'connec
+   						ELSE 0 END as feature_id, ''CONNEC'' as type, conneccat_id as featurecat,the_geom, expl_id FROM '||v_edit||'connec
    						UNION SELECT CASE WHEN gully_id~E''^\\d+$'' THEN CAST (gully_id AS INTEGER)
-   						ELSE 0 END as feature_id, ''GULLY'' as type, gratecat_id as featurecat,the_geom, expl_id FROM '||v_edit||'gully) a');
+   						ELSE 0 END as feature_id, ''GULLY'' as type, gullycat_id as featurecat,the_geom, expl_id FROM '||v_edit||'gully) a');
    	END IF;
 
    	EXECUTE concat('SELECT count(*) FROM ',v_querytext,' WHERE feature_id=0') INTO v_count;
 
    	IF v_count > 0 THEN
 
-		EXECUTE concat ('INSERT INTO temp_anl_connec (fid, connec_id, connecat_id, descript, the_geom, expl_id)
+		EXECUTE concat ('INSERT INTO temp_anl_connec (fid, connec_id, conneccat_id, descript, the_geom, expl_id)
 		SELECT 202, feature_id, featurecat, ''Connecs with id which is not an integer'', the_geom, expl_id FROM ', v_querytext,' 
 		WHERE  feature_id=0 AND type = ''CONNEC'' ');
 
@@ -382,7 +382,7 @@ BEGIN
 		WHERE  feature_id=0 AND type = ''NODE'' ');
 
 		IF v_project_type = 'UD' THEN
-			EXECUTE concat ('INSERT INTO temp_anl_connec (fid, connec_id, connecat_id, descript, the_geom, expl_id)
+			EXECUTE concat ('INSERT INTO temp_anl_connec (fid, connec_id, conneccat_id, descript, the_geom, expl_id)
 			SELECT 202, feature_id, featurecat, ''Gullies with id which is not an integer'', the_geom, expl_id FROM ', v_querytext,' 
 			WHERE feature_id=0 AND type = ''GULLY'' ');
 		END IF;
@@ -436,8 +436,8 @@ BEGIN
 	IF v_project_type ='UD' THEN
 		v_querytext = '(SELECT arc_id, arccat_id, the_geom FROM '||v_edit||'arc WHERE code IS NULL 
 					UNION SELECT node_id, nodecat_id, the_geom FROM '||v_edit||'node WHERE code IS NULL
-					UNION SELECT connec_id, connecat_id, the_geom FROM '||v_edit||'connec WHERE code IS NULL
-					UNION SELECT gully_id, gratecat_id, the_geom FROM '||v_edit||'gully WHERE code IS NULL
+					UNION SELECT connec_id, conneccat_id, the_geom FROM '||v_edit||'connec WHERE code IS NULL
+					UNION SELECT gully_id, gullycat_id, the_geom FROM '||v_edit||'gully WHERE code IS NULL
 					UNION SELECT element_id, elementcat_id, the_geom FROM '||v_edit||'element WHERE code IS NULL) a';
 
 		EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
@@ -454,7 +454,7 @@ BEGIN
 
 		v_querytext = '(SELECT arc_id, arccat_id, the_geom FROM '||v_edit||'arc WHERE code IS NULL 
 				UNION SELECT node_id, nodecat_id, the_geom FROM '||v_edit||'node WHERE code IS NULL
-				UNION SELECT connec_id, connecat_id, the_geom FROM '||v_edit||'connec WHERE code IS NULL
+				UNION SELECT connec_id, conneccat_id, the_geom FROM '||v_edit||'connec WHERE code IS NULL
 				UNION SELECT element_id, elementcat_id, the_geom FROM '||v_edit||'element WHERE code IS NULL) a';
 
 		EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
@@ -507,18 +507,18 @@ BEGIN
 
 	RAISE NOTICE '18 - connec/gully without link (204)';
 
-	v_querytext = 'SELECT connec_id, connecat_id, c.the_geom, c.expl_id from '||v_edit||'connec c WHERE c.state= 1 
+	v_querytext = 'SELECT connec_id, conneccat_id, c.the_geom, c.expl_id from '||v_edit||'connec c WHERE c.state= 1 
 					AND connec_id NOT IN (SELECT feature_id FROM link)
 					EXCEPT 
-					SELECT connec_id, connecat_id, c.the_geom, c.expl_id FROM '||v_edit||'connec c
+					SELECT connec_id, conneccat_id, c.the_geom, c.expl_id FROM '||v_edit||'connec c
 					LEFT JOIN '||v_edit||'arc a USING (arc_id) WHERE c.state= 1 
 					AND arc_id IS NOT NULL AND st_dwithin(c.the_geom, a.the_geom, 0.1)';
 
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 
 	IF v_count > 0 THEN
-		EXECUTE concat ('INSERT INTO temp_anl_connec (fid, connec_id, connecat_id, descript, the_geom, expl_id)
-		SELECT 204, connec_id, connecat_id, ''Connecs without links'', the_geom, expl_id FROM (', v_querytext,')a');
+		EXECUTE concat ('INSERT INTO temp_anl_connec (fid, connec_id, conneccat_id, descript, the_geom, expl_id)
+		SELECT 204, connec_id, conneccat_id, ''Connecs without links'', the_geom, expl_id FROM (', v_querytext,')a');
 
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
 		VALUES (v_fid, '204', 2, concat('WARNING-204 (anl_connec): There is/are ',v_count,' connecs without links or connecs over arc without arc_id'),v_count);
@@ -529,10 +529,10 @@ BEGIN
 
 	IF v_project_type = 'UD' THEN
 
-		v_querytext = 'SELECT gully_id, gratecat_id, c.the_geom, c.expl_id from '||v_edit||'gully c WHERE c.state= 1 
+		v_querytext = 'SELECT gully_id, gullycat_id, c.the_geom, c.expl_id from '||v_edit||'gully c WHERE c.state= 1 
 						AND gully_id NOT IN (SELECT feature_id FROM link)
 						EXCEPT 
-						SELECT gully_id, gratecat_id, c.the_geom, c.expl_id FROM '||v_edit||'gully c
+						SELECT gully_id, gullycat_id, c.the_geom, c.expl_id FROM '||v_edit||'gully c
 						LEFT JOIN '||v_edit||'arc a USING (arc_id) WHERE c.state= 1 
 						AND arc_id IS NOT NULL AND st_dwithin(c.the_geom, a.the_geom, 0.1)';
 
@@ -540,8 +540,8 @@ BEGIN
 		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 
 		IF v_count > 0 THEN
-			EXECUTE concat ('INSERT INTO temp_anl_connec (fid, connec_id, connecat_id, descript, the_geom, expl_id)
-			SELECT 204, gully_id, gratecat_id, ''Gullies without links'', the_geom, expl_id FROM (', v_querytext,')a');
+			EXECUTE concat ('INSERT INTO temp_anl_connec (fid, connec_id, conneccat_id, descript, the_geom, expl_id)
+			SELECT 204, gully_id, gullycat_id, ''Gullies without links'', the_geom, expl_id FROM (', v_querytext,')a');
 
 			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
 			VALUES (v_fid, '204',2, concat('WARNING-204 (anl_connec): There is/are ',v_count,' gullies without links or gullies over arc without arc_id.'), v_count);
@@ -555,7 +555,7 @@ BEGIN
 
 	RAISE NOTICE '19 - connec/gully without arc_id or with arc_id different than the one to which points its link (257)';
 
-	v_querytext = 'SELECT c.connec_id, c.connecat_id, c.the_geom, c.expl_id, l.feature_type, link_id 
+	v_querytext = 'SELECT c.connec_id, c.conneccat_id, c.the_geom, c.expl_id, l.feature_type, link_id 
 		FROM arc a, link l
 		JOIN '||v_edit||'connec c ON l.feature_id = c.connec_id 
 		WHERE st_dwithin(a.the_geom, st_endpoint(l.the_geom), 0.01)
@@ -563,7 +563,7 @@ BEGIN
 		AND (a.arc_id <> c.arc_id or c.arc_id is null) 
 		AND l.feature_type = ''CONNEC'' AND a.state=1 and c.state = 1 and l.state=1
 		EXCEPT
-		SELECT c.connec_id, c.connecat_id, c.the_geom, c.expl_id, l.feature_type, link_id
+		SELECT c.connec_id, c.conneccat_id, c.the_geom, c.expl_id, l.feature_type, link_id
 		FROM node n, link l
 		JOIN '||v_edit||'connec c ON l.feature_id = c.connec_id 
 		WHERE st_dwithin(n.the_geom, st_endpoint(l.the_geom), 0.01)
@@ -574,8 +574,8 @@ BEGIN
 		EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 
 		IF v_count > 0 THEN
-			EXECUTE concat ('INSERT INTO temp_anl_connec (fid, connec_id, connecat_id, descript, the_geom, expl_id)
-			SELECT 257, connec_id, connecat_id, ''Connecs without or with incorrect arc_id'', the_geom, expl_id FROM (', v_querytext,')a');
+			EXECUTE concat ('INSERT INTO temp_anl_connec (fid, connec_id, conneccat_id, descript, the_geom, expl_id)
+			SELECT 257, connec_id, conneccat_id, ''Connecs without or with incorrect arc_id'', the_geom, expl_id FROM (', v_querytext,')a');
 
 			INSERT INTO temp_audit_check_data (fid, criticity, result_id,error_message, fcount)
 			VALUES (v_fid, 2, '257', concat('WARNING-257 (anl_connec): There is/are ',v_count,' connecs without or with incorrect arc_id.'),v_count);
@@ -585,7 +585,7 @@ BEGIN
 		END IF;
 
 		IF v_project_type = 'UD' THEN
-			v_querytext = 'SELECT c.gully_id, c.gratecat_id, c.the_geom, c.expl_id, l.feature_type, link_id 
+			v_querytext = 'SELECT c.gully_id, c.gullycat_id, c.the_geom, c.expl_id, l.feature_type, link_id 
 				FROM arc a, link l
 				JOIN '||v_edit||'gully c ON l.feature_id = c.gully_id 
 				WHERE st_dwithin(a.the_geom, st_endpoint(l.the_geom), 0.01)
@@ -593,7 +593,7 @@ BEGIN
 				AND (a.arc_id <> c.arc_id or c.arc_id is null) 
 				AND l.feature_type = ''GULLY'' AND a.state=1 and c.state = 1 and l.state=1
 				EXCEPT
-				SELECT c.gully_id, c.gratecat_id, c.the_geom, c.expl_id, l.feature_type, link_id
+				SELECT c.gully_id, c.gullycat_id, c.the_geom, c.expl_id, l.feature_type, link_id
 				FROM node n, link l
 				JOIN '||v_edit||'gully c ON l.feature_id = c.gully_id 
 				WHERE st_dwithin(n.the_geom, st_endpoint(l.the_geom), 0.01)
@@ -604,8 +604,8 @@ BEGIN
 			EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 
 			IF v_count > 0 THEN
-				EXECUTE concat ('INSERT INTO temp_anl_connec (fid, connec_id, connecat_id, descript, the_geom, expl_id)
-				SELECT 257, gully_id, gratecat_id, ''Gully without or with incorrect arc_id'', the_geom, expl_id FROM (', v_querytext,')a');
+				EXECUTE concat ('INSERT INTO temp_anl_connec (fid, connec_id, conneccat_id, descript, the_geom, expl_id)
+				SELECT 257, gully_id, gullycat_id, ''Gully without or with incorrect arc_id'', the_geom, expl_id FROM (', v_querytext,')a');
 
 				INSERT INTO temp_audit_check_data (fid, criticity, result_id, error_message, fcount)
 				VALUES (v_fid, 2, '257', concat('WARNING-257 (anl_gully): There is/are ',v_count,' gullies without or with incorrect arc_id.'),v_count);
@@ -645,7 +645,7 @@ BEGIN
 	RAISE NOTICE '21 - Chained connecs/gullies which has different arc_id than the final connec/gully. (205)';
 	IF v_project_type = 'WS' THEN
 		v_querytext = 'with c as (
-					Select '||v_edit||'connec.connec_id as id, arc_id as arc, '||v_edit||'connec.connecat_id as 
+					Select '||v_edit||'connec.connec_id as id, arc_id as arc, '||v_edit||'connec.conneccat_id as 
 					feature_catalog, the_geom, '||v_edit||'connec.expl_id
 					from '||v_edit||'connec
 					)
@@ -657,9 +657,9 @@ BEGIN
 					and c1.arc <> c2.arc';
 	ELSIF v_project_type = 'UD' THEN
 		v_querytext = 'with c as (
-					Select '||v_edit||'connec.connec_id as id, arc_id as arc,'||v_edit||'connec.connecat_id as 
+					Select '||v_edit||'connec.connec_id as id, arc_id as arc,'||v_edit||'connec.conneccat_id as 
 					feature_catalog, the_geom, '||v_edit||'connec.expl_id from '||v_edit||'connec
-					UNION select '||v_edit||'gully.gully_id as id, arc_id as arc,'||v_edit||'gully.gratecat_id, 
+					UNION select '||v_edit||'gully.gully_id as id, arc_id as arc,'||v_edit||'gully.gullycat_id, 
 					the_geom, '||v_edit||'gully.expl_id  from '||v_edit||'gully
 					)
 					select c1.id, c1.feature_catalog, c1.the_geom,  c1.expl_id
@@ -674,13 +674,13 @@ BEGIN
 
 	IF v_count > 0 THEN
 		IF v_project_type = 'UD' THEN
-			EXECUTE concat ('INSERT INTO temp_anl_connec (fid, connec_id, connecat_id, descript, the_geom, expl_id)
+			EXECUTE concat ('INSERT INTO temp_anl_connec (fid, connec_id, conneccat_id, descript, the_geom, expl_id)
 			SELECT 205, id, feature_catalog, ''Chained connecs or gullies with different arc_id'', the_geom, expl_id FROM (', v_querytext,')a');
 
 			INSERT INTO temp_audit_check_data (fid, criticity, result_id, error_message, fcount)
 			VALUES (v_fid, 2, '205', concat('WARNING-205 (anl_connec): There is/are ',v_count,' chained connecs or gullies with different arc_id.'),v_count);
 		ELSIF v_project_type = 'WS' THEN
-			EXECUTE concat ('INSERT INTO temp_anl_connec (fid, connec_id, connecat_id, descript, the_geom, expl_id)
+			EXECUTE concat ('INSERT INTO temp_anl_connec (fid, connec_id, conneccat_id, descript, the_geom, expl_id)
 			SELECT 205, id, feature_catalog, ''Chained connecs with different arc_id'', the_geom, expl_id FROM (', v_querytext,')a');
 
 			INSERT INTO temp_audit_check_data (fid, criticity, result_id, error_message, fcount)
@@ -829,23 +829,23 @@ BEGIN
 	RAISE NOTICE '28 - Connecs and gullies with different expl_id than arc (291)';
 
 	IF v_project_type = 'WS' THEN
-		v_querytext = 'SELECT DISTINCT connec_id, connecat_id, c.the_geom, c.expl_id FROM '||v_edit||'connec c JOIN '||v_edit||'arc b using (arc_id) WHERE b.expl_id::text != c.expl_id::text';
+		v_querytext = 'SELECT DISTINCT connec_id, conneccat_id, c.the_geom, c.expl_id FROM '||v_edit||'connec c JOIN '||v_edit||'arc b using (arc_id) WHERE b.expl_id::text != c.expl_id::text';
 	ELSIF v_project_type = 'UD' THEN
-		v_querytext = 'SELECT * FROM (SELECT DISTINCT connec_id, connecat_id, c.the_geom, c.expl_id FROM '||v_edit||'connec c JOIN '||v_edit||'arc b using (arc_id) 
+		v_querytext = 'SELECT * FROM (SELECT DISTINCT connec_id, conneccat_id, c.the_geom, c.expl_id FROM '||v_edit||'connec c JOIN '||v_edit||'arc b using (arc_id) 
 		WHERE b.expl_id::text != c.expl_id::text
-		UNION SELECT DISTINCT  gully_id, gratecat_id, g.the_geom gully_id, g.expl_id FROM '||v_edit||'gully g JOIN '||v_edit||'arc d using (arc_id) WHERE d.expl_id::text != g.expl_id::text)a';
+		UNION SELECT DISTINCT  gully_id, gullycat_id, g.the_geom gully_id, g.expl_id FROM '||v_edit||'gully g JOIN '||v_edit||'arc d using (arc_id) WHERE d.expl_id::text != g.expl_id::text)a';
 	END IF;
 
 	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
 
 	IF v_count = 1 THEN
-		EXECUTE concat ('INSERT INTO temp_anl_connec (fid, connec_id, connecat_id, descript, the_geom, expl_id)
-		SELECT 291, connec_id, connecat_id, ''Connec or gully with different expl_id than related arc'', the_geom, expl_id FROM (', v_querytext,')a');
+		EXECUTE concat ('INSERT INTO temp_anl_connec (fid, connec_id, conneccat_id, descript, the_geom, expl_id)
+		SELECT 291, connec_id, conneccat_id, ''Connec or gully with different expl_id than related arc'', the_geom, expl_id FROM (', v_querytext,')a');
 		INSERT INTO temp_audit_check_data (fid, criticity, result_id, error_message)
 		VALUES (v_fid, 3, '291', concat('ERROR-291 (anl_connec): There is ',v_count,' connec or gully with exploitation different than the exploitation of the related arc'));
 	ELSIF v_count > 1 THEN
-		EXECUTE concat ('INSERT INTO temp_anl_connec (fid, connec_id, connecat_id, descript, the_geom, expl_id)
-		SELECT 291, connec_id, connecat_id, ''Connec or gully with different expl_id than related arc'', the_geom, expl_id FROM (', v_querytext,')a');
+		EXECUTE concat ('INSERT INTO temp_anl_connec (fid, connec_id, conneccat_id, descript, the_geom, expl_id)
+		SELECT 291, connec_id, conneccat_id, ''Connec or gully with different expl_id than related arc'', the_geom, expl_id FROM (', v_querytext,')a');
 		INSERT INTO temp_audit_check_data (fid, criticity, result_id, error_message)
 		VALUES (v_fid, 3, '291', concat('ERROR-291 (anl_connec): There are ',v_count,' connecs or gullies with exploitation different than the exploitation of the related arc'));
 	ELSE
@@ -1292,16 +1292,16 @@ BEGIN
 	RAISE NOTICE '45 - Check sector_id 0 or -1 (connec, gully) (478)';
 
 	IF v_project_type = 'WS' THEN
-		v_querytext = '(SELECT connec_id, connecat_id, the_geom, expl_id FROM '||v_edit||'connec WHERE state > 0 AND (sector_id=0 OR sector_id=-1))a';
+		v_querytext = '(SELECT connec_id, conneccat_id, the_geom, expl_id FROM '||v_edit||'connec WHERE state > 0 AND (sector_id=0 OR sector_id=-1))a';
   ELSIF v_project_type = 'UD' THEN
-		v_querytext = '(SELECT connec_id, connecat_id, the_geom, expl_id FROM '||v_edit||'connec WHERE state > 0 AND (sector_id=0 OR sector_id=-1)
-		        UNION SELECT gully_id, gratecat_id, the_geom, expl_id FROM '||v_edit||'gully WHERE state > 0 AND (sector_id=0 OR sector_id=-1))a';
+		v_querytext = '(SELECT connec_id, conneccat_id, the_geom, expl_id FROM '||v_edit||'connec WHERE state > 0 AND (sector_id=0 OR sector_id=-1)
+		        UNION SELECT gully_id, gullycat_id, the_geom, expl_id FROM '||v_edit||'gully WHERE state > 0 AND (sector_id=0 OR sector_id=-1))a';
   END IF;
 
 	EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
 	IF v_count > 0 THEN
-			EXECUTE concat ('INSERT INTO temp_anl_connec (fid, connec_id, connecat_id, descript, the_geom, expl_id)
-			SELECT 478, connec_id, connecat_id, ''Sector_id with 0 or -1 values'', the_geom, expl_id FROM ', v_querytext,'');
+			EXECUTE concat ('INSERT INTO temp_anl_connec (fid, connec_id, conneccat_id, descript, the_geom, expl_id)
+			SELECT 478, connec_id, conneccat_id, ''Sector_id with 0 or -1 values'', the_geom, expl_id FROM ', v_querytext,'');
 
 		INSERT INTO temp_audit_check_data (fid,  criticity, result_id, error_message, fcount)
 		VALUES (v_fid, 2, '478',concat('WARNING-478: There is/are ',v_count,' features (connec, gullys) with sector_id 0 or -1.'),v_count);
@@ -1338,13 +1338,13 @@ BEGIN
         IF (SELECT value::json->>'status' FROM config_param_system WHERE parameter = 'edit_link_check_arcdnom')::boolean IS TRUE THEN
             v_check_arcdnom:= (SELECT value::json->>'diameter' FROM config_param_system WHERE parameter = 'edit_link_check_arcdnom');
 
-            v_querytext = '(SELECT connec_id, connecat_id, the_geom, expl_id FROM '||v_edit||'connec WHERE state>0 AND arc_id IN (
+            v_querytext = '(SELECT connec_id, conneccat_id, the_geom, expl_id FROM '||v_edit||'connec WHERE state>0 AND arc_id IN (
                             SELECT arc_id FROM '||v_edit||'arc JOIN cat_arc ON arccat_id=id WHERE dnom::integer>'||v_check_arcdnom||')) a';
 
             EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
             IF v_count > 0 THEN
-                    EXECUTE concat ('INSERT INTO temp_anl_connec (fid, connec_id, connecat_id, descript, the_geom, expl_id)
-                    SELECT 488, connec_id, connecat_id, ''Connecs related to arcs with diameter bigger than defined'', the_geom, expl_id FROM ', v_querytext,'');
+                    EXECUTE concat ('INSERT INTO temp_anl_connec (fid, connec_id, conneccat_id, descript, the_geom, expl_id)
+                    SELECT 488, connec_id, conneccat_id, ''Connecs related to arcs with diameter bigger than defined'', the_geom, expl_id FROM ', v_querytext,'');
 
                 INSERT INTO temp_audit_check_data (fid,  criticity, result_id, error_message, fcount)
                 VALUES (v_fid, 2, '488',concat('WARNING-488 (anl_connec): There is/are ',v_count,' connecs related to arcs with diameter bigger than defined value (',v_check_arcdnom,')'),v_count);
@@ -1358,19 +1358,19 @@ BEGIN
     RAISE NOTICE '48 - Check connects with more than 1 link on service (480)';
 
     IF v_project_type = 'WS' THEN
-	    v_querytext = '(SELECT connec_id, connecat_id, the_geom, expl_id FROM '||v_edit||'connec WHERE connec_id 
+	    v_querytext = '(SELECT connec_id, conneccat_id, the_geom, expl_id FROM '||v_edit||'connec WHERE connec_id 
 		IN (SELECT feature_id FROM link WHERE state=1 GROUP BY feature_id HAVING count(*) > 1)) a';
 	ELSIF v_project_type = 'UD' THEN
-	    v_querytext = '(SELECT connec_id, connecat_id, the_geom, expl_id FROM '||v_edit||'connec WHERE connec_id 
+	    v_querytext = '(SELECT connec_id, conneccat_id, the_geom, expl_id FROM '||v_edit||'connec WHERE connec_id 
 		IN (SELECT feature_id FROM link WHERE state=1 GROUP BY feature_id HAVING count(*) > 1)
-		UNION SELECT gully_id, gratecat_id, the_geom, expl_id FROM '||v_edit||'gully WHERE gully_id 
+		UNION SELECT gully_id, gullycat_id, the_geom, expl_id FROM '||v_edit||'gully WHERE gully_id 
 		IN (SELECT feature_id FROM link WHERE state=1 GROUP BY feature_id HAVING count(*) > 1)) a';
 	END IF;
 
     EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
     IF v_count > 0 THEN
-            EXECUTE concat ('INSERT INTO temp_anl_connec (fid, connec_id, connecat_id, descript, the_geom, expl_id)
-            SELECT 480, connec_id, connecat_id, ''Connects with more than 1 link on service'', the_geom, expl_id FROM ', v_querytext,'');
+            EXECUTE concat ('INSERT INTO temp_anl_connec (fid, connec_id, conneccat_id, descript, the_geom, expl_id)
+            SELECT 480, connec_id, conneccat_id, ''Connects with more than 1 link on service'', the_geom, expl_id FROM ', v_querytext,'');
 
         INSERT INTO temp_audit_check_data (fid,  criticity, result_id, error_message, fcount)
         VALUES (v_fid, 2, '480',concat('WARNING-480 (anl_connec): There is/are ',v_count,' connects with more than 1 link on service'),v_count);
@@ -1538,7 +1538,7 @@ BEGIN
   	FROM (SELECT node_id, nodecat_id as feature_catalog, state, expl_id, descript, fid, the_geom FROM temp_anl_node WHERE cur_user="current_user"()
 	AND fid IN (106,177,187,202,442,443,175,432)
 	UNION
-	SELECT connec_id, connecat_id, state, expl_id, descript, fid, the_geom FROM temp_anl_connec WHERE cur_user="current_user"()
+	SELECT connec_id, conneccat_id, state, expl_id, descript, fid, the_geom FROM temp_anl_connec WHERE cur_user="current_user"()
 	AND fid IN (210,201,202,204,205,291,478,488,480)) row) features;
 
 	v_result := COALESCE(v_result, '{}');

@@ -223,7 +223,7 @@ BEGIN
 	    INSERT INTO cat_brand_model(id, catbrand_id)
 	   	SELECT csv15, csv14 FROM temp_csv WHERE cur_user=current_user AND fid=v_fid AND csv15 IS NOT NULL ON CONFLICT (id) DO NOTHING;
 
-			INSERT INTO cat_grate(id, matcat_id, length, width, total_area, effective_area, n_barr_l,
+			INSERT INTO cat_gully(id, matcat_id, length, width, total_area, effective_area, n_barr_l,
        n_barr_w, n_barr_diag, a_param, b_param, descript, link, brand, model, svg, active, label, gully_type)
 			SELECT csv1, csv2, csv3::numeric, csv4::numeric, csv5::numeric, csv6::numeric, csv7::numeric,
 			csv8::numeric, csv9::numeric, csv10::numeric, csv11::numeric, csv12, csv13, csv14, csv15, csv16, csv17::boolean, csv18, csv19

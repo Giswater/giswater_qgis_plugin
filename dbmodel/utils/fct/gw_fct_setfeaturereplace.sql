@@ -88,16 +88,7 @@ BEGIN
 	--define columns used for feature_cat
 	v_feature_layer = concat('v_edit_',v_feature_type);
 	v_id_column:=concat(v_feature_type,'_id');
-
-	IF v_feature_type='connec' THEN
-		v_cat_column='connecat_id';
-	ELSIF  v_feature_type='gully' THEN
-		v_cat_column = 'gratecat_id';
-	ELSIF  v_feature_type='node' THEN
-		v_cat_column='nodecat_id';
-	ELSIF  v_feature_type='arc' THEN
-		v_cat_column='arccat_id';
-	END IF;
+	v_cat_column = concat(v_feature_type,'cat_id');
 
 	EXECUTE 'SELECT n.category_type FROM '||v_feature_layer||' n JOIN man_type_category m ON n.category_type=m.category_type
 	WHERE  feature_type = '''||upper(v_feature_type)||''' AND 
@@ -132,9 +123,9 @@ BEGIN
 	END IF;
 
 
-	-- update only the not null-man_type_new values 
-	
-	for v_rec in execute 
+	-- update only the not null-man_type_new values
+
+	for v_rec in execute
 	'WITH json_man_type AS (
 	SELECT json_build_object(
     ''location_type'', ' || coalesce(quote_literal(v_location_new), 'null') || ',
@@ -146,13 +137,13 @@ BEGIN
 	SELECT key AS man_type, value AS man_value
 	FROM json_man_type,
 	json_each_text(json_man_type.json_values) where value is not null'
-	loop	
-		
+	loop
+
 		EXECUTE 'UPDATE "' || v_feature_layer || '" SET '||v_rec.man_type||'=' || quote_literal(v_rec.man_value) || ' 
 		WHERE ' || v_feature_type || '_id=' || quote_literal(v_feature_id) || ';';
-		
+
 	end loop;
-	
+
 
 	IF v_project_type = 'WS' THEN
 		EXECUTE 'UPDATE '||v_feature_layer||' SET '||v_cat_column||'='||quote_literal(v_featurecat_id_new)||'

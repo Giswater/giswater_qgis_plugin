@@ -42,7 +42,7 @@ SELECT has_table('cat_feature_arc') AS "Table 'cat_feature_arc' exists";
 SELECT has_table('cat_feature_connec') AS "Table 'cat_feature_connec' exists";
 SELECT has_table('cat_feature_gully') AS "Table 'cat_feature_gully' exists";
 SELECT has_table('cat_feature_node') AS "Table 'cat_feature_node' exists";
-SELECT has_table('cat_grate') AS "Table 'cat_grate' exists";
+SELECT has_table('cat_gully') AS "Table 'cat_gully' exists";
 SELECT has_table('cat_hydrology') AS "Table 'cat_hydrology' exists";
 SELECT has_table('cat_manager') AS "Table 'cat_manager' exists";
 SELECT has_table('cat_mat_arc') AS "Table 'cat_mat_arc' exists";

@@ -13,7 +13,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 SELECT plan(6);
 
 
-INSERT INTO v_edit_review_gully (gully_id, top_elev, ymax, sandbox, matcat_id, gully_type, gratecat_id, units, groove, siphon, connec_arccat_id, annotation, observ, review_obs, expl_id, the_geom, field_date, field_checked, is_validated)
+INSERT INTO v_edit_review_gully (gully_id, top_elev, ymax, sandbox, matcat_id, gully_type, gullycat_id, units, groove, siphon, connec_arccat_id, annotation, observ, review_obs, expl_id, the_geom, field_date, field_checked, is_validated)
 VALUES('-901', 0, 0, 0, '', '', '', 0, false, false, '', '', '', '', 0, null, null, false, 0);
 
 

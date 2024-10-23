@@ -160,9 +160,9 @@ BEGIN
 		NEW.rotation = v_rotation*180/pi();
 		v_rotation = -(v_rotation - pi()/2);
 
-		-- get gratecat dimensions
-		v_length = (SELECT length FROM cat_grate WHERE id=NEW.gratecat_id);
-		v_width = (SELECT width FROM cat_grate WHERE id=NEW.gratecat_id);
+		-- get gullycat dimensions
+		v_length = (SELECT length FROM cat_gully WHERE id=NEW.gullycat_id);
+		v_width = (SELECT width FROM cat_gully WHERE id=NEW.gullycat_id);
 
 		-- control null grate dimensions
 		IF v_length*v_width IS NULL OR v_length*v_width = 0 THEN -- use default values for node polygon
@@ -645,9 +645,9 @@ BEGIN
 
 		ELSIF v_man_table='man_netgully' THEN
 
-			INSERT INTO man_netgully (node_id,  sander_depth, gratecat_id, units, groove, siphon, gratecat2_id, groove_length, groove_height, units_placement )
-			VALUES(NEW.node_id,  NEW.sander_depth, NEW.gratecat_id, NEW.units,
-			NEW.groove, NEW.siphon, NEW.gratecat2_id, NEW.groove_length, NEW.groove_height, NEW.units_placement);
+			INSERT INTO man_netgully (node_id,  sander_depth, gullycat_id, units, groove, siphon, gullycat2_id, groove_length, groove_height, units_placement )
+			VALUES(NEW.node_id,  NEW.sander_depth, NEW.gullycat_id, NEW.units,
+			NEW.groove, NEW.siphon, NEW.gullycat2_id, NEW.groove_length, NEW.groove_height, NEW.units_placement);
 
 		ELSIF v_man_table='man_chamber' THEN
 
@@ -911,12 +911,12 @@ BEGIN
 		ELSIF v_man_table='man_netgully' THEN
 
 			-- update geom polygon
-			IF NEW.gratecat_id != OLD.gratecat_id OR OLD.gratecat_id IS NULL THEN
+			IF NEW.gullycat_id != OLD.gullycat_id OR OLD.gullycat_id IS NULL THEN
 				UPDATE polygon SET the_geom = v_the_geom_pol WHERE feature_id = NEW.node_id;
 			END IF;
 
-			UPDATE man_netgully SET sander_depth=NEW.sander_depth, gratecat_id=NEW.gratecat_id, units=NEW.units, groove=NEW.groove, siphon=NEW.siphon,
-			gratecat2_id=NEW.gratecat2_id, groove_length=NEW.groove_length, groove_height=NEW.groove_height, units_placement=NEW.units_placement
+			UPDATE man_netgully SET sander_depth=NEW.sander_depth, gullycat_id=NEW.gullycat_id, units=NEW.units, groove=NEW.groove, siphon=NEW.siphon,
+			gullycat2_id=NEW.gullycat2_id, groove_length=NEW.groove_length, groove_height=NEW.groove_height, units_placement=NEW.units_placement
 			WHERE node_id=OLD.node_id;
 
 		ELSIF v_man_table='man_outfall' THEN

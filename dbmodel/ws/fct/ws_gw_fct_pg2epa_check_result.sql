@@ -84,10 +84,10 @@ v_psectorused integer;
 
 BEGIN
 
-	--  Search path	
+	--  Search path
 	SET search_path = "SCHEMA_NAME", public;
 
-	-- getting input data 	
+	-- getting input data
 	v_result_id := ((p_data ->>'data')::json->>'parameters')::json->>'resultId'::text;
 	v_fid := ((p_data ->>'data')::json->>'parameters')::json->>'fid';
 
@@ -96,7 +96,7 @@ BEGIN
 	SELECT value::json->>'elevation' INTO v_outlayer_elevation FROM config_param_system WHERE parameter = 'epa_outlayer_values';
 	SELECT value::json->>'elevation' INTO v_outlayer_depth FROM config_param_system WHERE parameter = 'epa_outlayer_values';
 	v_minlength := (SELECT value FROM config_param_system WHERE parameter = 'epa_arc_minlength');
-	
+
 	-- get user values
 	v_checkresult = (SELECT value::json->>'checkResult' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
 	v_graphiclog = (SELECT (value::json->>'graphicLog') FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
@@ -106,9 +106,9 @@ BEGIN
 		v_result  = (SELECT array_to_json(array_agg(row_to_json(row))) FROM (SELECT 1::integer as id, 'No result found whith this name....' as  message)row);
 		v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 		RETURN ('{"status":"Accepted", "message":{"level":1, "text":"No result found"}, "version":"'||v_version||'"'||
-			',"body":{"form":{}, "data":{"info":'||v_result_info||'}}}')::json;		
-	END IF; 
-			
+			',"body":{"form":{}, "data":{"info":'||v_result_info||'}}}')::json;
+	END IF;
+
 	-- init variables
 	v_count=0;
 
@@ -117,17 +117,17 @@ BEGIN
 			FROM crosstab('SELECT cur_user, parameter, value
 			FROM config_param_user WHERE parameter IN (''inp_options_interval_from'',''inp_options_interval_to'') 
 			AND cur_user = current_user'::text) as ct(cur_user varchar(50), inp_options_interval_from text, inp_options_interval_to text))row
-	INTO v_options;		
-			
+	INTO v_options;
+
 	SELECT  count(*) INTO v_doublen2a FROM v_edit_inp_pump 	WHERE pump_type = 'PRESSPUMP';
-	
+
 	SELECT value INTO v_patternmethod FROM config_param_user WHERE parameter = 'inp_options_patternmethod' AND cur_user=current_user;
 	SELECT value INTO v_dscenario FROM config_param_user WHERE parameter = 'inp_options_dscenario_priority' AND cur_user=current_user;
 	SELECT value INTO v_networkmode FROM config_param_user WHERE parameter = 'inp_options_networkmode' AND cur_user=current_user;
 	SELECT value INTO v_qualitymode FROM config_param_user WHERE parameter = 'inp_options_quality_mode' AND cur_user=current_user;
 	SELECT value INTO v_buildupmode FROM config_param_user WHERE parameter = 'inp_options_buildup_mode' AND cur_user=current_user;
 	SELECT name INTO v_workspace FROM config_param_user c JOIN cat_workspace ON value = id::text WHERE parameter = 'utils_workspace_vdefault' AND c.cur_user=current_user;
-	
+
 	SELECT idval INTO v_dscenarioval FROM inp_typevalue WHERE id=v_dscenario::text AND typevalue ='inp_options_dscenario_priority';
 	SELECT idval INTO v_patternmethodval FROM inp_typevalue WHERE id=v_patternmethod::text AND typevalue ='inp_value_patternmethod';
 	SELECT idval INTO v_networkmodeval FROM inp_typevalue WHERE id=v_networkmode::text AND typevalue ='inp_options_networkmode';
@@ -144,7 +144,7 @@ BEGIN
 	-- get settings values
 	v_default = (SELECT value::json->>'status' FROM config_param_user WHERE parameter = 'inp_options_vdefault' AND cur_user=current_user);
 	v_defaultval = (SELECT value::json->>'parameters' FROM config_param_user WHERE parameter = 'inp_options_vdefault' AND cur_user=current_user);
-	
+
 	v_advanced = (SELECT value::json->>'status' FROM config_param_user WHERE parameter = 'inp_options_advancedsettings' AND cur_user=current_user);
 	v_advancedval = (SELECT value::json->>'parameters' FROM config_param_user WHERE parameter = 'inp_options_advancedsettings' AND cur_user=current_user);
 
@@ -168,7 +168,7 @@ BEGIN
 
 	INSERT INTO temp_audit_check_data (id, fid, result_id, criticity, error_message) VALUES (-4, v_fid, v_result_id, 1, 'INFO');
 	INSERT INTO temp_audit_check_data (id, fid, result_id, criticity, error_message) VALUES (-3, v_fid, v_result_id, 1, '-------');
-		
+
 	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Result id: ', v_result_id));
 	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Created by: ', current_user, ', on ', to_char(now(),'YYYY/MM/DD - HH:MM:SS')));
 	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Network export mode: ', v_networkmodeval));
@@ -184,16 +184,16 @@ BEGIN
 	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Number of psectors used: ', v_psectorused));
 
 	IF v_checkresult THEN
-	
+
 		IF v_default::boolean THEN
 			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Default values: ', v_defaultval));
-		ELSE 
+		ELSE
 			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Default values: No default values used'));
 		END IF;
 
 		IF v_advanced::boolean THEN
 			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Advanced settings: ', v_advancedval));
-		ELSE 
+		ELSE
 			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Advanced settings: No advanced settings used'));
 		END IF;
 
@@ -206,21 +206,21 @@ BEGIN
 		IF v_count > 0 THEN
 			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (v_fid, v_result_id, 2, concat('WARNING-172: There is/are ',v_count,' pump(s) with a curve defined by 3 points. Check this 3-points has thresholds defined (133%).'));
-		ELSE 
+		ELSE
 			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (v_fid, v_result_id, 1, 'INFO: Pumps with 3-point curves checked. No results found.');
 		END IF;
 
-		
-		RAISE NOTICE '2 - Check nod2arc length control';	
+
+		RAISE NOTICE '2 - Check nod2arc length control';
 		v_nodearc_real = (SELECT st_length (the_geom) FROM temp_t_arc WHERE  arc_type='NODE2ARC' AND result_id =  v_result_id LIMIT 1);
 		v_nodearc_user = (SELECT value FROM config_param_user WHERE parameter = 'inp_options_nodarc_length' AND cur_user=current_user);
 
-		IF  v_nodearc_user > (v_nodearc_real+0.01) THEN 
+		IF  v_nodearc_user > (v_nodearc_real+0.01) THEN
 			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (v_fid, v_result_id, 2, concat('WARNING-375: The node2arc parameter have been modified from ',
 			v_nodearc_user::numeric(12,3), ' to ', v_nodearc_real::numeric(12,3), ' in order to prevent length conflicts.'));
-		ELSE 
+		ELSE
 			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (v_fid, v_result_id, 1, concat('INFO: The node2arc parameter is ok for the whole analysis. Current value is ', v_nodearc_user::numeric(12,3)));
 		END IF;
@@ -230,17 +230,17 @@ BEGIN
 		v_min = (SELECT min(roughness) FROM cat_mat_roughness);
 		v_max = (SELECT max(roughness) FROM cat_mat_roughness);
 		v_headloss = (SELECT value FROM config_param_user WHERE cur_user=current_user AND parameter='inp_options_headloss.');
-			
+
 		IF v_headloss = 'D-W' AND (v_min < 0.0025 AND v_max > 0.15) THEN
 				INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message)
 				VALUES (v_fid, v_result_id, 2, concat(
 				'WARNING-377: There is/are at least one value of roughnesss out of range using headloss formula D-W (0.0025-0.15) acording EPANET user''s manual. Current values, minimum:(',v_min,'), maximum:(',v_max,').'));
-			
+
 		ELSIF v_headloss = 'H-W' AND (v_min < 110 AND v_max > 150) THEN
 				INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message)
 				VALUES (v_fid, v_result_id, 2, concat(
 				'WARNING-377: There is/are at least one value of roughnesss out of range using headloss formula h-W (110-150) acording EPANET user''s manual. Current values, minimum:(',v_min,'), maximum:(',v_max,').'));
-			
+
 		ELSIF v_headloss = 'C-M' AND (v_min < 0.011 AND v_max > 0.017) THEN
 				INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message)
 				VALUES (v_fid, v_result_id, 2, concat(
@@ -253,10 +253,10 @@ BEGIN
 
 		RAISE NOTICE '4 - Check for network mode';
 		IF v_networkmode = 4 THEN
-		
+
 			RAISE NOTICE '4.1- Epa connecs over epa node (413)';
 			v_querytext = 'SELECT * FROM (
-				SELECT DISTINCT t2.connec_id, t2.connecat_id , t2.state as state1, t1.node_id, t1.nodecat_id, t1.state as state2, t1.expl_id, 413, 
+				SELECT DISTINCT t2.connec_id, t2.conneccat_id , t2.state as state1, t1.node_id, t1.nodecat_id, t1.state as state2, t1.expl_id, 413, 
 				t1.the_geom, st_distance(t1.the_geom, t2.the_geom) as dist, ''Epa connec over other EPA node'' as descript
 				FROM selector_expl e, selector_sector s, node AS t1 JOIN connec AS t2 ON ST_Dwithin(t1.the_geom, t2.the_geom, 0.1) 
 				WHERE s.sector_id = t1.sector_id AND s.cur_user = current_user
@@ -288,21 +288,21 @@ BEGIN
 			ELSE
 				INSERT INTO temp_audit_check_data (fid, result_id, criticity, table_id, error_message)
 				VALUES (v_fid, v_result_id , 1,  '414','INFO: No registers found without material on cat_connec table.');
-			END IF;	
-			
+			END IF;
+
 
 			RAISE NOTICE '4.3 - Check pjoint_id/pjoint_type on connecs (415)';
-			SELECT count(*) INTO v_count FROM (SELECT DISTINCT ON (connec_id) * FROM v_edit_connec c, selector_sector s 
-			WHERE c.sector_id = s.sector_id AND cur_user=current_user AND epa_type ='JUNCTION' 
+			SELECT count(*) INTO v_count FROM (SELECT DISTINCT ON (connec_id) * FROM v_edit_connec c, selector_sector s
+			WHERE c.sector_id = s.sector_id AND cur_user=current_user AND epa_type ='JUNCTION'
 			AND (pjoint_id IS NULL OR pjoint_type IS NULL)) a1;
 
 			IF v_count > 0 THEN
 				INSERT INTO temp_audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 				VALUES (v_fid, v_result_id, 3, '415',concat(
 				'ERROR-415: There is/are ',v_count,' connecs with epa_type ''JUNCTION'' and missed information on pjoint_id or pjoint_type.'),v_count);
-				INSERT INTO temp_anl_node (fid, node_id, descript, the_geom) 
+				INSERT INTO temp_anl_node (fid, node_id, descript, the_geom)
 				SELECT 415, connec_id, 'Connecs with epa_type ''JUNCTION'' and missed information on pjoint_id or pjoint_type', the_geom
-				FROM (SELECT DISTINCT ON (connec_id) * FROM v_edit_connec c, selector_sector s WHERE c.sector_id = s.sector_id AND cur_user=current_user 
+				FROM (SELECT DISTINCT ON (connec_id) * FROM v_edit_connec c, selector_sector s WHERE c.sector_id = s.sector_id AND cur_user=current_user
 				AND epa_type ='JUNCTION' AND (pjoint_id IS NULL OR pjoint_type IS NULL))a;
 				v_count=0;
 			ELSE
@@ -326,7 +326,7 @@ BEGIN
 		RAISE NOTICE '5 - Check for UNDEFINED elements on temp table (297)';
 		INSERT INTO temp_anl_node (fid, node_id, nodecat_id, the_geom, descript)
 		SELECT 297, node_id, nodecat_id, the_geom, 'Node with epa_type UNDEFINED' FROM temp_t_node WHERE  epa_type = 'UNDEFINED';
-		
+
 		SELECT count(*) INTO v_count FROM temp_anl_node WHERE fid = 297 AND cur_user = current_user;
 		IF  v_count > 0 THEN
 			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message)
@@ -338,7 +338,7 @@ BEGIN
 
 		INSERT INTO temp_anl_arc (fid, arc_id, arccat_id, the_geom, descript)
 		SELECT 297, arc_id, arccat_id, the_geom, 'Arc with epa_type UNDEFINED' FROM temp_t_arc WHERE  epa_type = 'UNDEFINED';
-		
+
 		SELECT count(*) INTO v_count FROM temp_t_arc WHERE epa_type = 'UNDEFINED';
 		IF  v_count > 0 THEN
 			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message)
@@ -347,36 +347,36 @@ BEGIN
 			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (v_fid, v_result_id, 1, concat('INFO: All arcs have epa_type defined.'));
 		END IF;
-		
-		RAISE NOTICE '6 - Info about roughness and diameter for shortpipes';	
+
+		RAISE NOTICE '6 - Info about roughness and diameter for shortpipes';
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (v_fid, v_result_id, 1, concat('INFO: All roughness values used for shortpipes have been taken from neighbourg values'));
 
 	END IF;
-	
+
 	RAISE NOTICE '7 - Check if there are features with sector_id = 0 (373)';
 	v_querytext = 'SELECT 373, arc_id, ''Arc with sector_id = 0'', the_geom FROM v_edit_arc WHERE sector_id = 0';
-	
-	EXECUTE 'SELECT count(*) FROM ('||v_querytext||')b'INTO v_count; 
+
+	EXECUTE 'SELECT count(*) FROM ('||v_querytext||')b'INTO v_count;
 
 		IF v_count > 0 THEN
-			
+
 			EXECUTE 'INSERT INTO temp_anl_arc (fid, arc_id, descript, the_geom) '||v_querytext;
 
 			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 2, 
+			VALUES (v_fid, v_result_id, 2,
 			concat('WARNING-373 (anl_arc): There is/are ', v_count, ' arc on v_edit_arc with sector_id = 0 that didn''t take part in the simulation. Topological nodes will be exported if they are associated with some other exported arc.'));
 		ELSE
 			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message)
-			VALUES (v_fid, v_result_id, 1, concat('INFO: All arcs on v_edit_arc have sector_id different than 0.'));			
+			VALUES (v_fid, v_result_id, 1, concat('INFO: All arcs on v_edit_arc have sector_id different than 0.'));
 			v_count=0;
 		END IF;
 
 
 	RAISE NOTICE '8 - Check if there are conflicts with dscenarios (396)';
 	IF (SELECT count(*) FROM selector_inp_dscenario WHERE cur_user = current_user) > 0 THEN
-	
-		FOR object_rec IN SELECT json_array_elements_text('["tank", "reservoir", "pipe", "pump", "valve", "virtualvalve", "connec", "inlet", "junction"]'::json) as tabname, 
+
+		FOR object_rec IN SELECT json_array_elements_text('["tank", "reservoir", "pipe", "pump", "valve", "virtualvalve", "connec", "inlet", "junction"]'::json) as tabname,
 					 json_array_elements_text('["node", "node" , "arc" , "node" , "node", "arc", "connec", "node", "node"]'::json) as colname
 		LOOP
 
@@ -384,7 +384,7 @@ BEGIN
 			IF v_count > 0 THEN
 
 				IF object_rec.colname IN ('arc', 'node') THEN
-				
+
 					EXECUTE 'INSERT INTO anl_'||object_rec.colname||' ('||object_rec.colname||'_id, fid, descript, the_geom) 
 					SELECT '||object_rec.colname||'_id, 396, concat(''Present on '',count(*),'' enabled dscenarios''), v_edit_inp_dscenario_'||object_rec.tabname||'.the_geom 
 					FROM v_edit_inp_dscenario_'||object_rec.tabname||' JOIN '||	object_rec.colname||' USING ('||object_rec.colname||'_id) GROUP 
@@ -393,11 +393,11 @@ BEGIN
 
 					INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message)
 					VALUES (v_fid, v_result_id, 3, concat('ERROR-396 (anl_',object_rec.colname,'): There is/are ', v_count, ' ',
-					object_rec.colname,'(s) for ',upper(object_rec.tabname),' used on more than one enabled dscenarios.'));				
+					object_rec.colname,'(s) for ',upper(object_rec.tabname),' used on more than one enabled dscenarios.'));
 				ELSE
 					INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message)
 					VALUES (v_fid, v_result_id, 3, concat('ERROR-396: There is/are ', v_count, ' ',
-					object_rec.colname,'(s) for ',upper(object_rec.tabname),' used on more than one enabled dscenarios.'));				
+					object_rec.colname,'(s) for ',upper(object_rec.tabname),' used on more than one enabled dscenarios.'));
 				END IF;
 			END IF;
 		END LOOP;
@@ -415,7 +415,7 @@ BEGIN
 		WHERE b.arc_id IS NULL AND a.arc_id IS NOT NULL 
 		AND a.sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user=current_user) AND a.sector_id IS NOT NULL
 		OR a.sector_id::text != b.sector_id::text) a';
-	
+
 	EXECUTE concat ('SELECT count(*) FROM ',v_querytext) INTO v_count;
 	IF v_count > 0 THEN
 		EXECUTE concat ('SELECT array_agg(id) FROM ',v_querytext) INTO v_querytext;
@@ -433,7 +433,7 @@ BEGIN
 		WHERE b.node_id IS NULL AND a.node_id IS NOT NULL 
 		AND a.sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user=current_user) AND a.sector_id IS NOT NULL
 		OR a.sector_id::text != b.sector_id::text) a';
-	
+
 	EXECUTE concat ('SELECT count(*) FROM ',v_querytext) INTO v_count;
 	IF v_count > 0 THEN
 		EXECUTE concat ('SELECT array_agg(id) FROM ',v_querytext) INTO v_querytext;
@@ -453,7 +453,7 @@ BEGIN
 		WHERE b.node_id IS NULL AND a.node_id IS NOT NULL 
 		AND a.sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user=current_user) AND a.sector_id IS NOT NULL
 		OR a.sector_id::text != b.sector_id::text) a';
-	
+
 		EXECUTE concat ('SELECT count(*) FROM ',v_querytext) INTO v_count;
 		IF v_count > 0 THEN
 			i = i+1;
@@ -478,7 +478,7 @@ BEGIN
 		WHERE b.arc_id IS NULL AND a.arc_id IS NOT NULL 
 		AND a.sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user=current_user) AND a.sector_id IS NOT NULL
 		OR a.sector_id::text != b.sector_id::text) a';
-	
+
 		EXECUTE concat ('SELECT count(*) FROM ',v_querytext) INTO v_count;
 		IF v_count > 0 THEN
 			i = i+1;
@@ -497,7 +497,7 @@ BEGIN
 	RAISE NOTICE '10 - EPA Outlayer values (407)';
 
 	-- elevation
-	SELECT count(*) INTO v_count FROM (SELECT case when elev is not null then elev else elevation end as elev FROM temp_t_node) a 
+	SELECT count(*) INTO v_count FROM (SELECT case when elev is not null then elev else elevation end as elev FROM temp_t_node) a
 	WHERE elev < (v_outlayer_elevation->>'min')::float OR elev > (v_outlayer_elevation->>'max')::float;
 	IF v_count > 0 THEN
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
@@ -506,9 +506,9 @@ BEGIN
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
 		VALUES (v_fid, v_result_id, 1, '400', concat('INFO: All nodes has elevation without outlayer values.'),v_count);
 	END IF;
-	
+
 	-- depth
-	SELECT count(*) INTO v_count FROM (SELECT elevation-elev as depth FROM temp_t_node) a 
+	SELECT count(*) INTO v_count FROM (SELECT elevation-elev as depth FROM temp_t_node) a
 	WHERE depth < (v_outlayer_depth->>'min')::float OR depth > (v_outlayer_depth->>'max')::float;
 	IF v_count > 0 THEN
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, table_id, error_message, fcount)
@@ -524,14 +524,14 @@ BEGIN
 	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 3, '');
 	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 2, '');
 	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 1, '');
-	
+
 	-- get results
 	-- info
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (
 	SELECT error_message as message FROM temp_audit_check_data WHERE cur_user="current_user"() AND fid = v_fid order by criticity desc, id asc
-	) row; 
-	v_result := COALESCE(v_result, '{}'); 
+	) row;
+	v_result := COALESCE(v_result, '{}');
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
 	IF v_graphiclog THEN
@@ -543,7 +543,7 @@ BEGIN
 		SELECT jsonb_build_object(
 		 'type',       'Feature',
 		'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
-		'properties', to_jsonb(row) - 'the_geom' 
+		'properties', to_jsonb(row) - 'the_geom'
 		) AS feature
 		FROM (SELECT node_id as id, 228 as fid, 'ERROR-228: Orphan node' as descript, the_geom FROM temp_anl_node WHERE cur_user="current_user"() AND fid IN (107,228)
 			UNION
@@ -568,12 +568,12 @@ BEGIN
 		      SELECT node_id, fid, 'ERROR-166: Node2arc with more than two arcs', the_geom FROM temp_anl_node WHERE cur_user="current_user"() AND fid = 166
 		    UNION
 		      SELECT node_id, fid, 'ERROR-167: Mandatory Node2arc with less than two arcs', the_geom FROM temp_anl_node WHERE cur_user="current_user"() AND fid = 167
-		
+
 		      ) row
 		      ) features;
 
-		v_result := COALESCE(v_result, '[]'); 
-		v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}'); 
+		v_result := COALESCE(v_result, '[]');
+		v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}');
 
 		-- arcs
 		v_result = null;
@@ -601,16 +601,16 @@ BEGIN
 			SELECT arc_id as id, fid, 'ERROR-454: Arc with state=1 and without node_1 or node_2'::text as descript, the_geom FROM temp_anl_arc WHERE cur_user="current_user"() AND fid=454
 		     ) row) features;
 
-		v_result := COALESCE(v_result, '{}'); 
-		v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}'); 
+		v_result := COALESCE(v_result, '{}');
+		v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}');
 
 	END IF;
 
 	-- control nulls
-	v_options := COALESCE(v_options, '{}'); 
-	v_result_info := COALESCE(v_result_info, '{}'); 
-	v_result_point := COALESCE(v_result_point, '{}'); 
-	v_result_line := COALESCE(v_result_line, '{}'); 
+	v_options := COALESCE(v_options, '{}');
+	v_result_info := COALESCE(v_result_info, '{}');
+	v_result_point := COALESCE(v_result_point, '{}');
+	v_result_line := COALESCE(v_result_line, '{}');
 
 	IF v_fid = 114 THEN
 
@@ -622,7 +622,7 @@ BEGIN
 		DROP TABLE temp_anl_arc;
 		DROP TABLE temp_audit_check_data;
 	END IF;
-	
+
 	--  Return
 	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'"'||
 		',"body":{"form":{}'||

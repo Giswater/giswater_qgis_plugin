@@ -1231,15 +1231,15 @@ BEGIN
 		    'geometry',   ST_AsGeoJSON(the_geom)::jsonb,
 		    'properties', to_jsonb(row) - 'the_geom'
 		) AS feature
-		FROM (SELECT DISTINCT ON (connec_id) connec_id, connecat_id, c.state, c.expl_id, 'Disconnected'::text as descript, c.the_geom FROM temp_t_connec c JOIN temp_t_anlgraph USING (arc_id) WHERE water = 0
-		group by (arc_id, connec_id, connecat_id, state, expl_id, the_geom) having count(arc_id)=2
+		FROM (SELECT DISTINCT ON (connec_id) connec_id, conneccat_id, c.state, c.expl_id, 'Disconnected'::text as descript, c.the_geom FROM temp_t_connec c JOIN temp_t_anlgraph USING (arc_id) WHERE water = 0
+		group by (arc_id, connec_id, conneccat_id, state, expl_id, the_geom) having count(arc_id)=2
 		UNION
-		SELECT DISTINCT ON (connec_id) connec_id, connecat_id, state, expl_id, 'Conflict'::text as descript, the_geom FROM temp_t_connec c JOIN temp_t_anlgraph USING (arc_id) WHERE water = -1
-		group by (arc_id, connec_id, connecat_id, state, expl_id, the_geom) having count(arc_id)=2
+		SELECT DISTINCT ON (connec_id) connec_id, conneccat_id, state, expl_id, 'Conflict'::text as descript, the_geom FROM temp_t_connec c JOIN temp_t_anlgraph USING (arc_id) WHERE water = -1
+		group by (arc_id, connec_id, conneccat_id, state, expl_id, the_geom) having count(arc_id)=2
 		UNION
-		(SELECT DISTINCT ON (connec_id) connec_id, connecat_id, state, expl_id, 'Orphan'::text as descript, the_geom FROM temp_t_connec c WHERE arc_id IS NULL
+		(SELECT DISTINCT ON (connec_id) connec_id, conneccat_id, state, expl_id, 'Orphan'::text as descript, the_geom FROM temp_t_connec c WHERE arc_id IS NULL
 		EXCEPT
-		SELECT DISTINCT ON (connec_id) connec_id, connecat_id, c.state, c.expl_id, 'Orphan'::text as descript, c.the_geom FROM temp_t_connec c
+		SELECT DISTINCT ON (connec_id) connec_id, conneccat_id, c.state, c.expl_id, 'Orphan'::text as descript, c.the_geom FROM temp_t_connec c
 		JOIN temp_t_node a ON a.node_id=c.pjoint_id
 		WHERE c.pjoint_type = 'NODE')
 		) row) features;

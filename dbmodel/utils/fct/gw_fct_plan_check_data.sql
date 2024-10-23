@@ -8,7 +8,7 @@ This version of Giswater is provided by Giswater Association
 
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_plan_audit_check_data(integer);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_plan_check_data(p_data json)  
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_plan_check_data(p_data json)
 RETURNS json AS
 $BODY$
 
@@ -22,7 +22,7 @@ SELECT * FROM anl_node WHERE fid=v_fid AND cur_user=current_user;
 
 */
 
-DECLARE 
+DECLARE
 
 v_record record;
 v_project_type 	text;
@@ -30,7 +30,7 @@ v_table_count integer;
 v_count integer;
 v_global_count	integer;
 v_return integer;
-v_version text;	
+v_version text;
 v_result json;
 v_result_info json;
 v_result_point json;
@@ -43,7 +43,7 @@ v_comment text;
 v_querytext text;
 v_fid integer;
 
-BEGIN 
+BEGIN
 
 	-- init function
 	SET search_path="SCHEMA_NAME", public;
@@ -52,7 +52,7 @@ BEGIN
 
 	SELECT project_type, giswater  INTO v_project_type, v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
-	-- getting input data 	
+	-- getting input data
 	v_fid := ((p_data ->>'data')::json->>'parameters')::json->>'fid'::text;
 
 
@@ -138,7 +138,7 @@ BEGIN
 		VALUES (v_fid, '437', 1,'INFO: There is/are no row(s) without values on cat_arc.estimated_depth column.',v_count);
 	END IF;
 
-	
+
 	--node catalog
 	SELECT count(*) INTO v_table_count FROM cat_node WHERE active=TRUE;
 
@@ -174,10 +174,10 @@ BEGIN
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
 		VALUES (v_fid, '329', 1,'INFO: There is/are no row(s) without values on cat_node.cost_unit column.',v_count);
 	END IF;
-	
-	
-	IF v_project_type='WS' THEN 
-	
+
+
+	IF v_project_type='WS' THEN
+
 		--check cat_node estimated_depth column (330)
 		SELECT count(*) INTO v_count FROM cat_node WHERE estimated_depth IS NOT NULL and active=TRUE;
 		IF v_table_count>v_count THEN
@@ -189,8 +189,8 @@ BEGIN
 			VALUES (v_fid, '330', 1,'INFO: There is/are no row(s) without values on cat_node.estimated_depth column.',v_count);
 		END IF;
 
-	ELSIF v_project_type='UD' THEN 
-	
+	ELSIF v_project_type='UD' THEN
+
 		 --check cat_node estimated_y column (331)
 		SELECT count(*) INTO v_count FROM cat_node WHERE estimated_y IS NOT NULL and active=TRUE;
 		IF v_table_count>v_count THEN
@@ -314,20 +314,20 @@ BEGIN
 
 	IF v_project_type='UD' THEN
 
-		--grate catalog
-		SELECT count(*) INTO v_table_count FROM cat_grate WHERE active=TRUE;
+		-- Gully catalog
+		SELECT count(*) INTO v_table_count FROM cat_gully WHERE active=TRUE;
 
-		--check cat_grate active column (344)
-		SELECT count(*) INTO v_count FROM cat_grate WHERE active IS NULL;
+		--check cat_gully active column (344)
+		SELECT count(*) INTO v_count FROM cat_gully WHERE active IS NULL;
 		IF v_count>0 THEN
 			INSERT INTO temp_audit_check_data (fid, result_id, table_id, column_id, criticity, enabled,  error_message, fcount)
-			VALUES (v_fid, '344', 'cat_grate', 'active', 3, FALSE, concat('ERROR-344: There are ',v_count,' row(s) without values on cat_grate.active column.'), v_count);
+			VALUES (v_fid, '344', 'cat_gully', 'active', 3, FALSE, concat('ERROR-344: There are ',v_count,' row(s) without values on cat_gully.active column.'), v_count);
 		ELSE
 			v_count = 0;
 			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
-			VALUES (v_fid, '344', 1,'INFO: There is/are no row(s) without values on cat_grate.active column.',v_count);
+			VALUES (v_fid, '344', 1,'INFO: There is/are no row(s) without values on cat_gully.active column.',v_count);
 		END IF;
-	END IF;	
+	END IF;
 
 	--table plan_arc_x_pavement
 	SELECT count(*) INTO v_table_count FROM arc WHERE state>0;
@@ -360,24 +360,24 @@ BEGIN
 		v_query = 'SELECT a.feature_id, a.feature, a.catalog, a.the_geom, count(*) FROM (
 		SELECT node_id as feature_id, ''NODE'' as feature, nodecat_id as catalog, the_geom FROM v_edit_node WHERE state=2 AND node_id NOT IN (select node_id FROM plan_psector_x_node) UNION
 		SELECT arc_id as feature_id, ''ARC'' as feature, arccat_id as catalog, the_geom  FROM v_edit_arc WHERE state=2 AND arc_id NOT IN (select arc_id FROM plan_psector_x_arc) UNION
-		SELECT connec_id as feature_id, ''CONNEC'' as feature, connecat_id  as catalog, the_geom  FROM v_edit_connec WHERE state=2 AND connec_id NOT IN (select connec_id FROM plan_psector_x_connec)) a 
+		SELECT connec_id as feature_id, ''CONNEC'' as feature, conneccat_id  as catalog, the_geom  FROM v_edit_connec WHERE state=2 AND connec_id NOT IN (select connec_id FROM plan_psector_x_connec)) a 
 		GROUP BY a.feature_id, a.feature , a.catalog, a.the_geom';
 
-	ELSE	
+	ELSE
 		v_query = 'SELECT a.feature_id, a.feature , a.catalog, a.the_geom, count(*) FROM (
 		SELECT node_id as feature_id, ''NODE'' as feature, nodecat_id as catalog, the_geom FROM v_edit_node WHERE state=2 AND node_id NOT IN (select node_id FROM plan_psector_x_node) UNION
 		SELECT arc_id as feature_id, ''ARC'' as feature, arccat_id as catalog, the_geom  FROM v_edit_arc WHERE state=2 AND arc_id NOT IN (select arc_id FROM plan_psector_x_arc) UNION
-		SELECT connec_id as feature_id, ''CONNEC'' as feature, connecat_id  as catalog, the_geom  FROM v_edit_connec WHERE state=2 AND connec_id NOT IN (select connec_id FROM plan_psector_x_connec) UNION
-		SELECT gully_id as feature_id, ''GULLY'' as feature , gratecat_id as catalog, the_geom FROM v_edit_gully WHERE state=2 AND gully_id NOT IN (select gully_id FROM plan_psector_x_gully)) a 
+		SELECT connec_id as feature_id, ''CONNEC'' as feature, conneccat_id  as catalog, the_geom  FROM v_edit_connec WHERE state=2 AND connec_id NOT IN (select connec_id FROM plan_psector_x_connec) UNION
+		SELECT gully_id as feature_id, ''GULLY'' as feature , gullycat_id as catalog, the_geom FROM v_edit_gully WHERE state=2 AND gully_id NOT IN (select gully_id FROM plan_psector_x_gully)) a 
 		GROUP BY a.feature_id, a.feature ,a.catalog, a.the_geom';
 	END IF;
 
 		EXECUTE 'SELECT count(*) FROM ('||v_query||')b'
-		INTO v_count; 
+		INTO v_count;
 
 	IF v_count > 0 THEN
 		EXECUTE 'SELECT count(*) FROM ('||v_query||')b WHERE feature = ''ARC'';'
-		INTO v_count; 
+		INTO v_count;
 		IF v_count > 0 THEN
 			EXECUTE concat ('INSERT INTO temp_anl_arc (fid, arc_id, arccat_id, descript, the_geom,state)
 			SELECT 252, b.feature_id, b.catalog, ''Arcs state = 2 without psector'', b.the_geom, 2 FROM (', v_query,')b  WHERE feature = ''ARC''');
@@ -385,21 +385,21 @@ BEGIN
 			VALUES (v_fid, '252', 3, FALSE, concat('ERROR-252 (anl_arc): There are ',v_count,' planified arcs without psector.'),v_count);
 		END IF;
 		EXECUTE 'SELECT count(*) FROM ('||v_query||')b WHERE feature = ''NODE'';'
-		INTO v_count; 
+		INTO v_count;
 		IF v_count > 0 THEN
 			EXECUTE concat ('INSERT INTO temp_anl_node (fid, node_id, nodecat_id, descript, the_geom, state)
 			SELECT 252, b.feature_id, b.catalog, ''Nodes state = 2 without psector'', b.the_geom, 2 FROM (', v_query,')b  WHERE feature = ''NODE''');
 			INSERT INTO temp_audit_check_data (fid, result_id,  criticity, enabled,  error_message,fcount)
 			VALUES (v_fid, '252', 3, FALSE, concat('ERROR-252 (anl_node): There are ',v_count,' planified nodes without psector.'),v_count);		END IF;
 		EXECUTE 'SELECT count(*) FROM ('||v_query||')b WHERE feature = ''CONNEC'';'
-		INTO v_count; 
+		INTO v_count;
 		IF v_count > 0 THEN
-			EXECUTE concat ('INSERT INTO temp_anl_connec (fid, connec_id, connecat_id, descript, the_geom,state)
+			EXECUTE concat ('INSERT INTO temp_anl_connec (fid, connec_id, conneccat_id, descript, the_geom,state)
 			SELECT 252, b.feature_id, b.catalog, ''Connecs state = 2 without psector'', b.the_geom,2 FROM (', v_query,')b  WHERE feature = ''CONNEC''');
 			INSERT INTO temp_audit_check_data (fid, result_id,  criticity, enabled,  error_message,fcount)
 			VALUES (v_fid, '252', 3, FALSE, concat('ERROR-252 (anl_connec): There are ',v_count,' planified connecs without psector.'),v_count);		END IF;
 		EXECUTE 'SELECT count(*) FROM ('||v_query||')b WHERE feature = ''GULLY'';'
-		INTO v_count; 
+		INTO v_count;
 		IF v_count > 0 THEN
 			EXECUTE concat ('INSERT INTO temp_anl_connec (fid, gully_id, gullycat_id, descript, the_geom, state)
 			SELECT 252, b.feature_id, b.catalog, ''Gullies state = 2 without psector'', b.the_geom, 2 FROM (', v_query,')b  WHERE feature = ''GULLY''');
@@ -424,7 +424,7 @@ BEGIN
 		) b';
 
 	EXECUTE 'SELECT count(*) FROM ('||v_query||')c'
-	INTO v_count; 
+	INTO v_count;
 
 	IF v_count > 0 THEN
 
@@ -449,8 +449,8 @@ BEGIN
 	WHERE pa.psector_id = pn2.psector_id AND pa.state = 1 AND pn2.state = 0) b';
 
 	EXECUTE 'SELECT count(*) FROM ('||v_query||')c'
-	INTO v_count; 
-	
+	INTO v_count;
+
 
 	IF v_count > 0 THEN
 
@@ -465,12 +465,12 @@ BEGIN
 
 
 	-- Planified pumps with more than two arcs (467);
-	IF v_project_type='WS' THEN 
+	IF v_project_type='WS' THEN
 		INSERT INTO temp_anl_node (fid, node_id, nodecat_id, the_geom, descript, expl_id)
 		select 467, b.node_id, nodecat_id, the_geom, 'Planified EPA pump with more than two arcs', expl_id
 		FROM(
 		SELECT node_id, count(*) FROM(
-		SELECT node_id FROM arc JOIN inp_pump ON node_1 = node_id 
+		SELECT node_id FROM arc JOIN inp_pump ON node_1 = node_id
 		WHERE (arc.state=1 OR arc.state=2)
 		UNION ALL
 		SELECT node_id FROM arc JOIN inp_pump ON node_2 = node_id
@@ -480,7 +480,7 @@ BEGIN
 		GROUP BY node_id
 		HAVING count(*)>2)b
 		JOIN node USING (node_id);
-		
+
 		SELECT count(*) FROM temp_anl_node INTO v_count WHERE fid=467 AND cur_user=current_user;
 		IF v_count > 0 THEN
 			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
@@ -490,12 +490,12 @@ BEGIN
 		ELSE
 			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
 			VALUES (v_fid, '467' , 1,  'INFO: EPA pumps checked. No pumps with more than two arcs detected.',v_count);
-		END IF;		
+		END IF;
 	END IF;
 
 	--check if number of rows in plan_price
 	EXECUTE 'SELECT count(*) FROM plan_price'
-	INTO v_count; 
+	INTO v_count;
 
 	IF v_count > 700 THEN
 		INSERT INTO temp_audit_check_data (fid, result_id,  criticity, enabled,  error_message, fcount)
@@ -517,7 +517,7 @@ BEGIN
 		DELETE FROM temp_anl_arc WHERE fid = v_record.fid AND cur_user = current_user;
 		DELETE FROM temp_anl_connec WHERE fid = v_record.fid AND cur_user = current_user;
 
-		DELETE FROM temp_audit_check_data WHERE result_id::text = v_record.fid::text AND cur_user = current_user AND fid = v_fid;		
+		DELETE FROM temp_audit_check_data WHERE result_id::text = v_record.fid::text AND cur_user = current_user AND fid = v_fid;
 	END LOOP;
 
 		-- insert spacers
@@ -539,8 +539,8 @@ BEGIN
 		INSERT INTO anl_connec SELECT * FROM temp_anl_connec;
 		INSERT INTO audit_check_data SELECT * FROM temp_audit_check_data;
 
-	ELSIF  v_fid = 101 THEN 
-	
+	ELSIF  v_fid = 101 THEN
+
 		UPDATE temp_audit_check_data SET fid = 115;
 
 		INSERT INTO project_temp_anl_arc SELECT * FROM temp_anl_arc;
@@ -552,12 +552,12 @@ BEGIN
 
 	-- get results
 	-- info
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND 
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
+	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND
 	fid = 115 order by criticity desc, id asc) row;
-	v_result := COALESCE(v_result, '{}'); 
+	v_result := COALESCE(v_result, '{}');
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
-	
+
 	--points
 	v_result = null;
 
@@ -574,14 +574,14 @@ BEGIN
 	SELECT id, arc_id, arccat_id, state, expl_id, descript, fid, the_geom FROM anl_arc WHERE cur_user="current_user"()
 	AND fid IN (252, 452)
 	UNION
-	SELECT id, connec_id, connecat_id, state, expl_id, descript,fid, the_geom FROM anl_connec WHERE cur_user="current_user"()
+	SELECT id, connec_id, conneccat_id, state, expl_id, descript,fid, the_geom FROM anl_connec WHERE cur_user="current_user"()
 	AND fid IN (252)) row) features;
 
-	v_result := COALESCE(v_result, '{}'); 
+	v_result := COALESCE(v_result, '{}');
 
-	IF v_result::text = '{}' THEN 
+	IF v_result::text = '{}' THEN
 		v_result_point = '{"geometryType":"", "features":[]}';
-	ELSE 
+	ELSE
 		v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}');
 	END IF;
 
@@ -597,14 +597,14 @@ BEGIN
   	FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript, fid, the_geom
   	FROM  anl_arc WHERE cur_user="current_user"() AND fid IN (252, 354, 355, 452)) row) features;
 
-	v_result := COALESCE(v_result, '{}'); 
-	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}'); 
+	v_result := COALESCE(v_result, '{}');
+	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}');
 
 	--    Control nulls
-	v_result_info := COALESCE(v_result_info, '{}'); 
-	v_result_point := COALESCE(v_result_point, '{}'); 
-	v_result_line := COALESCE(v_result_line, '{}'); 
-	v_result_polygon := COALESCE(v_result_polygon, '{}'); 
+	v_result_info := COALESCE(v_result_info, '{}');
+	v_result_point := COALESCE(v_result_point, '{}');
+	v_result_line := COALESCE(v_result_line, '{}');
+	v_result_polygon := COALESCE(v_result_polygon, '{}');
 
 	--drop temp tables
 	DROP TABLE  IF EXISTS temp_anl_arc;
@@ -627,4 +627,3 @@ $BODY$
 LANGUAGE plpgsql VOLATILE
   COST 100;
 
- 	

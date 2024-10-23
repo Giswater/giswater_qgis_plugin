@@ -646,7 +646,7 @@ BEGIN
 
 		-- getting propierties from feature catalog value
 		SELECT (a->>'vdef'), (a->>'param') INTO v_catalog, v_catalogtype FROM json_array_elements(v_values_array) AS a
-			WHERE (a->>'param') = 'arccat_id' OR (a->>'param') = 'nodecat_id' OR (a->>'param') = 'connecat_id' OR (a->>'param') = 'gratecat_id';
+			WHERE (a->>'param') = 'arccat_id' OR (a->>'param') = 'nodecat_id' OR (a->>'param') = 'conneccat_id' OR (a->>'param') = 'gullycat_id';
 
 		IF v_project_type ='WS' AND v_catfeature.feature_type IS NOT NULL AND v_catfeature.feature_type != 'LINK' THEN
 			v_querystring = concat('SELECT pnom::integer, dnom::integer, matcat_id FROM cat_',lower(v_catfeature.feature_type),' WHERE id=',quote_nullable(v_catalog));
@@ -657,7 +657,7 @@ BEGIN
 
 		ELSIF v_project_type ='UD' AND v_catfeature.feature_type IS NOT NULL AND v_catfeature.feature_type != 'LINK'THEN
 			IF (v_catfeature.feature_type) ='GULLY' THEN
-				v_querystring = concat('SELECT matcat_id FROM cat_grate WHERE id=',quote_nullable(v_catalog));
+				v_querystring = concat('SELECT matcat_id FROM cat_gully WHERE id=',quote_nullable(v_catalog));
 				v_debug_vars := json_build_object('v_catalog', v_catalog);
 				v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getfeatureupsert', 'flag', 50);
 				SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
@@ -777,10 +777,6 @@ BEGIN
 				WHEN concat(lower(v_catfeature.feature_type),'cat_id') THEN
 					SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array) AS a
 					 WHERE a->>'parameter' = concat('feat_', lower(v_catfeature.id), '_vdefault');
-				WHEN 'connecat_id' THEN
-					SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array) AS a
-					WHERE a->>'parameter' = concat('feat_', lower(v_catfeature.id), '_vdefault');
-
 
 				-- *_type
 				WHEN 'category_type' THEN
@@ -908,7 +904,7 @@ BEGIN
 						field_value =v_noderecord2.sys_ymax;
 					WHEN 'sys_elev2' THEN
 						field_value =v_noderecord2.sys_elev;
-					WHEN 'gratecat_id' THEN
+					WHEN 'gullycat_id' THEN
 						SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array) AS a
 						WHERE a->>'parameter' = concat('feat_', lower(v_catfeature.id), '_vdefault');
 					ELSE

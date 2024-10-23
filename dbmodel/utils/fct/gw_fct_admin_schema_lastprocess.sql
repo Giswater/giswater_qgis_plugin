@@ -386,7 +386,7 @@ BEGIN
 			WHERE parameter = 'basic_search_network_arc';
 
 			UPDATE config_param_system SET value =
-			'{"sys_table_id":"v_edit_connec","sys_id_field":"connec_id","sys_search_field":"connec_id","alias":"Connecs","cat_field":"connecat_id","orderby":"3","search_type":"connec"}'
+			'{"sys_table_id":"v_edit_connec","sys_id_field":"connec_id","sys_search_field":"connec_id","alias":"Connecs","cat_field":"conneccat_id","orderby":"3","search_type":"connec"}'
 			WHERE parameter = 'basic_search_network_connec';
 
 			UPDATE config_param_system SET value =
@@ -398,7 +398,7 @@ BEGIN
 			WHERE  parameter = 'basic_search_network_node';
 
 			UPDATE config_param_system SET value =
-			'{"sys_table_id":"v_edit_gully","sys_id_field":"gully_id","sys_search_field":"gully_id","alias":"Gullies","cat_field":"gratecat_id","orderby":"3","search_type":"gully"}'
+			'{"sys_table_id":"v_edit_gully","sys_id_field":"gully_id","sys_search_field":"gully_id","alias":"Gullies","cat_field":"gullycat_id","orderby":"3","search_type":"gully"}'
 			WHERE  parameter = 'basic_search_network_gully';
 
 		ELSIF v_isnew IS FALSE THEN

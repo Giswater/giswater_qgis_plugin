@@ -163,3 +163,6 @@ dqa FOR EACH ROW EXECUTE FUNCTION gw_trg_typevalue_fk('dqa');
 
 CREATE TRIGGER gw_trg_typevalue_fk AFTER INSERT OR UPDATE ON
 sector FOR EACH ROW EXECUTE FUNCTION gw_trg_typevalue_fk('sector');
+
+CREATE TRIGGER gw_trg_edit_review_connec INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_review_connec
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_review_connec();

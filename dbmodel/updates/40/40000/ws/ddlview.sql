@@ -378,7 +378,7 @@ CREATE OR REPLACE VIEW vu_link AS
     l.epa_type,
     l.is_operative,
     l.staticpressure,
-    l.connecat_id,
+    l.conneccat_id,
     l.workcat_id,
     l.workcat_id_end,
     l.builtdate,
@@ -430,7 +430,7 @@ CREATE OR REPLACE VIEW vu_connec AS
     connec.depth,
     cat_connec.connec_type,
     cat_feature.feature_class AS sys_type,
-    connec.connecat_id,
+    connec.conneccat_id,
     cat_connec.matcat_id AS cat_matcat_id,
     cat_connec.pnom AS cat_pnom,
     cat_connec.dnom AS cat_dnom,
@@ -551,7 +551,7 @@ CREATE OR REPLACE VIEW vu_connec AS
             ELSE NULL::character varying(16)
         END AS inp_type
    FROM (SELECT value FROM config_param_user WHERE parameter = 'inp_options_networkmode' and cur_user = current_user) cpu, connec
-     JOIN cat_connec ON connec.connecat_id::text = cat_connec.id::text
+     JOIN cat_connec ON connec.conneccat_id::text = cat_connec.id::text
      JOIN cat_feature ON cat_feature.id::text = cat_connec.connec_type::text
      LEFT JOIN dma ON connec.dma_id = dma.dma_id
      LEFT JOIN sector ON connec.sector_id = sector.sector_id
@@ -582,7 +582,7 @@ SELECT vu_connec.connec_id,
     vu_connec.depth,
     vu_connec.connec_type,
     vu_connec.sys_type,
-    vu_connec.connecat_id,
+    vu_connec.conneccat_id,
 	vu_connec.cat_matcat_id,
     vu_connec.cat_pnom,
     vu_connec.cat_dnom,
@@ -1124,7 +1124,7 @@ AS SELECT n.netscenario_id,
     n.dma_id,
     n.pattern_id,
     n.the_geom,
-    c.connecat_id,
+    c.conneccat_id,
     cc.connec_type,
     c.epa_type,
     c.state,
@@ -1132,7 +1132,7 @@ AS SELECT n.netscenario_id,
    FROM selector_netscenario,
     plan_netscenario_connec n
      LEFT JOIN connec c USING (connec_id)
-     LEFT JOIN cat_connec cc ON cc.id::text = c.connecat_id::text
+     LEFT JOIN cat_connec cc ON cc.id::text = c.conneccat_id::text
   WHERE n.netscenario_id = selector_netscenario.netscenario_id AND selector_netscenario.cur_user = "current_user"()::text;
 
 
@@ -1537,7 +1537,7 @@ AS WITH links_node AS (
  SELECT row_number() OVER () + 1000000 AS rid,
     v_edit_connec.arc_id,
     v_edit_connec.connec_type AS featurecat_id,
-    v_edit_connec.connecat_id AS catalog,
+    v_edit_connec.conneccat_id AS catalog,
     v_edit_connec.connec_id AS feature_id,
     v_edit_connec.code AS feature_code,
     v_edit_connec.sys_type,
@@ -1556,7 +1556,7 @@ UNION
  SELECT DISTINCT ON (c.connec_id) row_number() OVER () + 2000000 AS rid,
     a.arc_id,
     c.connec_type AS featurecat_id,
-    c.connecat_id AS catalog,
+    c.conneccat_id AS catalog,
     c.connec_id AS feature_id,
     c.code AS feature_code,
     c.sys_type,
@@ -2301,7 +2301,7 @@ CREATE OR REPLACE VIEW v_edit_inp_connec
 AS SELECT v_edit_connec.connec_id,
     v_edit_connec.elevation,
     v_edit_connec.depth,
-    v_edit_connec.connecat_id,
+    v_edit_connec.conneccat_id,
     v_edit_connec.arc_id,
     v_edit_connec.expl_id,
     v_edit_connec.sector_id,
@@ -2968,7 +2968,7 @@ UNION
 UNION
  SELECT row_number() OVER (ORDER BY connec.connec_id) + 3000000 AS rid,
     connec.feature_type,
-    connec.connecat_id AS featurecat_id,
+    connec.conneccat_id AS featurecat_id,
     connec.connec_id AS feature_id,
     connec.code,
     exploitation.name AS expl_name,
@@ -3017,7 +3017,7 @@ UNION
 UNION
  SELECT row_number() OVER (ORDER BY v_edit_connec.connec_id) + 3000000 AS rid,
     'CONNEC'::character varying AS feature_type,
-    v_edit_connec.connecat_id AS featurecat_id,
+    v_edit_connec.conneccat_id AS featurecat_id,
     v_edit_connec.connec_id AS feature_id,
     v_edit_connec.code,
     exploitation.name AS expl_name,
@@ -3393,7 +3393,7 @@ AS SELECT row_number() OVER () AS rid,
     connec.connec_id,
     plan_psector_x_connec.psector_id,
     connec.code,
-    connec.connecat_id,
+    connec.conneccat_id,
     cat_connec.connec_type,
     cat_feature.feature_class,
     connec.state AS original_state,
@@ -3404,7 +3404,7 @@ AS SELECT row_number() OVER () AS rid,
    FROM selector_psector,
     connec
      JOIN plan_psector_x_connec USING (connec_id)
-     JOIN cat_connec ON cat_connec.id::text = connec.connecat_id::text
+     JOIN cat_connec ON cat_connec.id::text = connec.conneccat_id::text
      JOIN cat_feature ON cat_feature.id::text = cat_connec.connec_type::text
   WHERE plan_psector_x_connec.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text;
 
@@ -4198,3 +4198,18 @@ AS SELECT cat_connec.id,
    FROM cat_connec
      JOIN cat_feature_connec ON cat_feature_connec.id::TEXT = cat_connec.connec_type::TEXT
      JOIN cat_feature ON cat_feature_connec.id::TEXT = cat_feature.id::TEXT;
+
+CREATE OR REPLACE VIEW v_edit_review_connec
+AS SELECT review_connec.connec_id,
+    review_connec.conneccat_id,
+    review_connec.annotation,
+    review_connec.observ,
+    review_connec.review_obs,
+    review_connec.expl_id,
+    review_connec.the_geom,
+    review_connec.field_date,
+    review_connec.field_checked,
+    review_connec.is_validated
+   FROM review_connec,
+    selector_expl
+  WHERE selector_expl.cur_user = "current_user"()::text AND review_connec.expl_id = selector_expl.expl_id;

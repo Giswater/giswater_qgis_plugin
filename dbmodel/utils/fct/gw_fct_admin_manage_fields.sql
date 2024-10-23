@@ -19,7 +19,7 @@ SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","
 
 */
 
-DECLARE 
+DECLARE
 
 v_schemaname varchar = 'SCHEMA_NAME';
 v_project_type text;
@@ -42,15 +42,15 @@ v_widgettype text;
 v_count integer;
 
 
-BEGIN 
+BEGIN
 
 	-- search path
 	SET search_path = "SCHEMA_NAME", public;
-	
+
 	-- get info from version table
 	IF (SELECT tablename FROM pg_tables WHERE schemaname = v_schemaname AND tablename = 'version') IS NOT NULL THEN v_tableversion = 'version'; v_columntype = 'wsoftware'; END IF;
  	EXECUTE 'SELECT '||quote_ident(v_columntype)||' FROM '||quote_ident(v_tableversion)||' LIMIT 1' INTO v_project_type;
-	
+
 	v_action = (p_data->>'data')::json->>'action';
 	v_table = (p_data->>'data')::json->>'table';
 	v_column = (p_data->>'data')::json->>'column';
@@ -74,7 +74,7 @@ BEGIN
         ELSE
             v_querytext = 'ALTER TABLE '||quote_ident(v_schemaname) ||'.'|| quote_ident(v_table) ||' ADD COLUMN '||quote_ident(v_column)||' '||v_datatype;
         END IF;
-        
+
         EXECUTE v_querytext;
 
 
@@ -87,9 +87,9 @@ BEGIN
 
 			if v_count > 0 then
 
-				if v_datatype ilike '%boolean%' then 	
+				if v_datatype ilike '%boolean%' then
 					v_widgettype = 'check';
-				
+
 				else
 					v_widgettype = 'text';
 
@@ -103,20 +103,20 @@ BEGIN
 			loop
 
 				-- v_edit_feature
-				SELECT max(layoutorder)+1 into v_max_layoutorder from config_form_fields 
+				SELECT max(layoutorder)+1 into v_max_layoutorder from config_form_fields
 				where formname = v_layers.parent_layer
 				and formtype = 'form_feature' and tabname = 'tab_data' and layoutname = 'lyt_data_1' and layoutorder < 900;
 
-				INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, iseditable, hidden) 
+				INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, iseditable, hidden)
 				VALUES(v_layers.parent_layer, 'form_feature', 'tab_data', v_column, 'lyt_data_1', v_max_layoutorder, v_datatype, v_widgettype, v_column, v_column, NULL, false, true, false)
 				ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
 
 				-- ve_feature_type
-				SELECT max(layoutorder)+1 into v_max_layoutorder from config_form_fields 
+				SELECT max(layoutorder)+1 into v_max_layoutorder from config_form_fields
 				where formname = v_layers.child_layer
 				and formtype = 'form_feature' and tabname = 'tab_data' and layoutname = 'lyt_data_1' and layoutorder < 900;
 
-				INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, iseditable, hidden) 
+				INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, iseditable, hidden)
 				VALUES(v_layers.child_layer, 'form_feature', 'tab_data', v_column, 'lyt_data_1', v_max_layoutorder, v_datatype, v_widgettype, concat(upper(left(v_column, 1)), substring(v_column, 2)), v_column, NULL, false, true, false)
 				ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
 
@@ -124,8 +124,8 @@ BEGIN
 
 		end if;
 
-		
-	ELSIF v_action='RENAME' AND (SELECT column_name FROM information_schema.columns WHERE table_schema=v_schemaname and table_name = v_table AND column_name = v_column) IS NOT NULL  
+
+	ELSIF v_action='RENAME' AND (SELECT column_name FROM information_schema.columns WHERE table_schema=v_schemaname and table_name = v_table AND column_name = v_column) IS NOT NULL
 				AND (SELECT column_name FROM information_schema.columns WHERE table_schema=v_schemaname and table_name = v_table AND column_name = v_newname) IS NULL THEN
 
 		v_querytext = 'ALTER TABLE '|| quote_ident(v_table) ||' RENAME COLUMN '||quote_ident(v_column)||' TO '||quote_ident(v_newname);
@@ -148,7 +148,7 @@ BEGIN
 				set	columnname = '||quote_literal(v_newname)||', tooltip = '||quote_literal(v_newname)||', label = '||quote_literal(concat(upper(left(v_newname, 1)), substring(v_newname, 2)))||' 
 				where formname = '||quote_literal(v_layers.parent_layer)||'
 				and columnname = '||quote_literal(v_column)||'';
-				
+
 			end loop;
 
 		end if;
@@ -169,18 +169,18 @@ BEGIN
 				EXECUTE '
 				DELETE FROM config_form_fields 
 				WHERE formname = '||quote_literal(v_layers.child_layer)||' AND columnname = '||quote_literal(v_column)||'';
-				
+
 			end loop;
 
 		end if;
 
-	ELSIF v_action='CHANGETYPE' AND (SELECT column_name FROM information_schema.columns 
+	ELSIF v_action='CHANGETYPE' AND (SELECT column_name FROM information_schema.columns
 		WHERE table_schema=v_schemaname and table_name = v_table AND column_name = v_column AND data_type!=v_datatype) IS NOT NULL THEN
 
 		v_querytext = 'ALTER TABLE '|| quote_ident(v_table) ||' ALTER COLUMN '||quote_ident(v_column)||' TYPE '||v_datatype||' USING '||quote_ident(v_column)||'::'||v_datatype;
 		EXECUTE v_querytext;
-	
-	-- manage config_form_fields
+
+		-- manage config_form_fields
 		if v_table in ('node', 'arc', 'connec', 'gully') then
 
 			execute 'select count(*) from config_typevalue where typevalue = ''datatype_typevalue'' and id ilike ''%'||v_datatype||'%'' limit 1'
@@ -188,9 +188,9 @@ BEGIN
 
 			if v_count > 0 then
 
-				if v_datatype ilike '%boolean%' then 	
+				if v_datatype ilike '%boolean%' then
 					v_widgettype = 'check';
-				
+
 				else
 					v_widgettype = 'text';
 
@@ -212,12 +212,12 @@ BEGIN
 				UPDATE config_form_fields 
 				SET datatype = '||quote_literal(v_datatype)||' 
 				WHERE formname = '||quote_literal(v_layers.child_layer)||' AND columnname = '||quote_literal(v_column)||'';
-				
+
 			end loop;
 
 		end if;
 
-	ELSE 
+	ELSE
 		v_querytext = 'Process not executed. Table has already been modified.';
 	END IF;
 

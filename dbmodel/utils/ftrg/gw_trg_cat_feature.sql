@@ -84,24 +84,7 @@ BEGIN
 		v_table = concat('cat_',lower(NEW.feature_type));
 
 		v_partialquerytext = concat('JOIN cat_feature ON cat_feature.id = ',v_table,'.',lower(NEW.feature_type),'_type WHERE cat_feature.id = ',quote_literal(NEW.id));
-
-		-- special case for gully
-		IF lower(NEW.feature_type) = 'gully' THEN
-			v_partialquerytext = concat('LEFT JOIN cat_feature ON cat_feature.id = cat_grate.gully_type WHERE cat_feature.id = ', quote_literal(NEW.id));
-		END IF;
-
-
-		IF v_table = 'cat_node' OR v_table = 'cat_arc' THEN
-			v_feature_field_id = concat (lower(NEW.feature_type), 'cat_id');
-
-		ELSIF v_table = 'cat_connec' THEN
-			v_feature_field_id = concat (lower(NEW.feature_type), 'at_id');
-
-		ELSIF v_table = 'cat_gully' then
-			v_table ='cat_grate';
-			v_feature_field_id = 'gratecat_id';
-
-		END IF;
+		v_feature_field_id = concat (lower(NEW.feature_type), 'cat_id');
 
 		v_querytext = concat('SELECT ',v_table,'.id, ', v_table,'.id AS idval FROM ', v_table,' ', v_partialquerytext);
 
@@ -120,13 +103,13 @@ BEGIN
 	END IF;
 
 	IF TG_OP = 'INSERT' THEN
-	
+
 		IF NEW.feature_class IN ('VALVE', 'PUMP', 'METER') THEN
-            
+
             SELECT concat('ve_', lower(feature_type), '_', lower(id)) INTO v_viewname FROM cat_feature WHERE id=NEW.id;
-        
-            INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) 
-            VALUES(v_viewname, 'tab_data', 'Data', 'Data', 'role_basic', NULL, 
+
+            INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device)
+            VALUES(v_viewname, 'tab_data', 'Data', 'Data', 'role_basic', NULL,
             '[{
             "actionName": "actionEdit",
             "disabled": false},
@@ -144,7 +127,7 @@ BEGIN
             {"actionName": "actionRotation","disabled": false},
             {"actionName": "actionInterpolate","disabled": false}
             ]'::json, 0, '{4,5}') ON CONFLICT (formname, tabname) DO NOTHING;
-           
+
         END IF;
 
 		EXECUTE 'SELECT lower(id) as id, type, concat(''man_'',lower(id)) as man_table, epa_default, 
@@ -188,13 +171,13 @@ BEGIN
 	ELSIF TG_OP = 'UPDATE' THEN
 
 		IF NEW.feature_class IN ('VALVE', 'PUMP', 'METER') THEN
-		
+
 			SELECT concat('ve_', lower(feature_type), '_', lower(id)) INTO v_viewname FROM cat_feature WHERE id=NEW.id;
-        
-			UPDATE config_form_tabs SET formname = v_viewname WHERE formname = concat('ve_', lower(NEW.feature_type), '_', lower(OLD.id));		
-			
+
+			UPDATE config_form_tabs SET formname = v_viewname WHERE formname = concat('ve_', lower(NEW.feature_type), '_', lower(OLD.id));
+
 		END IF;
-		
+
 		SELECT child_layer INTO v_viewname FROM cat_feature WHERE id = NEW.id;
 		-- update child views
 		--on update and change of cat_feature.id or child layer name
@@ -360,7 +343,7 @@ BEGIN
 		RETURN NEW;
 
 	ELSIF TG_OP = 'DELETE' THEN
-	
+
 		DELETE FROM config_form_tabs WHERE formname = concat('ve_', lower(old.feature_type), '_', lower(old.id));
 
 		IF v_table = 'DELETE' AND OLD.feature_class <>'LINK' THEN

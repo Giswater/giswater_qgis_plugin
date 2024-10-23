@@ -76,7 +76,7 @@ BEGIN
 		EXECUTE ' INSERT INTO temp_t_node (node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, the_geom, expl_id, 
 			dma_id, presszone_id, dqa_id, minsector_id, age)
 			SELECT DISTINCT ON (c.connec_id)
-			c.connec_id, elevation, elevation-depth as elev, ''CONNEC'', connecat_id, epa_type, c.sector_id, c.state, c.state_type, c.annotation, c.the_geom, c.expl_id, 
+			c.connec_id, elevation, elevation-depth as elev, ''CONNEC'', conneccat_id, epa_type, c.sector_id, c.state, c.state_type, c.annotation, c.the_geom, c.expl_id, 
 			c.dma_id, c.presszone_id, c.dqa_id, c.minsector_id,
 			(case when c.builtdate is not null then (now()::date-c.builtdate)/30 else 0 end)
 			FROM selector_sector, v_edit_connec c
@@ -164,7 +164,7 @@ BEGIN
 			SELECT DISTINCT ON (connec_id)
 			concat(''CO'',connec_id), connec_id as node_1, 
 			CASE WHEN exit_type = ''ARC'' THEN concat(''VN'',vnode_id) WHEN exit_type = ''NODE'' THEN exit_id::text ELSE pjoint_id end AS node_2, 
-			''LINK'', connecat_id, ''PIPE'', c.sector_id, c.state, c.state_type, annotation, 
+			''LINK'', conneccat_id, ''PIPE'', c.sector_id, c.state, c.state_type, annotation, 
 			(CASE WHEN custom_roughness IS NOT NULL THEN custom_roughness ELSE roughness END) AS roughness,
 			(CASE WHEN custom_length IS NOT NULL THEN custom_length ELSE st_length(l.the_geom) END), 
 			(CASE WHEN custom_dint IS NOT NULL THEN custom_dint ELSE dint END),  -- diameter is child value but in order to make simple the query getting values from v_edit_arc (dint)...
@@ -174,7 +174,7 @@ BEGIN
 			FROM selector_sector, temp_link l 
 			JOIN connec c ON connec_id = feature_id
 			JOIN value_state_type ON value_state_type.id = state_type
-			JOIN cat_connec ON cat_connec.id = connecat_id
+			JOIN cat_connec ON cat_connec.id = conneccat_id
 			JOIN inp_connec USING (connec_id)
 			LEFT JOIN cat_mat_roughness ON cat_mat_roughness.matcat_id = cat_connec.matcat_id
 				WHERE (now()::date - (CASE WHEN builtdate IS NULL THEN ''1900-01-01''::date ELSE builtdate END))/365 >= cat_mat_roughness.init_age

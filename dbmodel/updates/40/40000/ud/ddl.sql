@@ -7,24 +7,24 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 11/10/2024
-ALTER TABLE cat_feature_gully DROP CONSTRAINT cat_feature_gully_type_fkey;
+ALTER TABLE cat_feature_gully DROP CONSTRAINT IF EXISTS cat_feature_gully_type_fkey;
 ALTER TABLE cat_feature_gully DROP COLUMN type;
 
 -- 15/10/2024
 ALTER TABLE cat_arc RENAME TO _cat_arc;
 
-ALTER TABLE arc DROP CONSTRAINT arc_arccat_id_fkey;
-ALTER TABLE inp_dscenario_conduit DROP CONSTRAINT inp_dscenario_conduit_arccat_id_fkey;
+ALTER TABLE arc DROP CONSTRAINT IF EXISTS arc_arccat_id_fkey;
+ALTER TABLE inp_dscenario_conduit DROP CONSTRAINT IF EXISTS inp_dscenario_conduit_arccat_id_fkey;
 
-ALTER TABLE _cat_arc DROP CONSTRAINT cat_arc_pkey;
-ALTER TABLE _cat_arc DROP CONSTRAINT cat_arc_arc_type_fkey;
-ALTER TABLE _cat_arc DROP CONSTRAINT cat_arc_cost_fkey;
-ALTER TABLE _cat_arc DROP CONSTRAINT cat_arc_curve_id_fkey;
-ALTER TABLE _cat_arc DROP CONSTRAINT cat_arc_m2bottom_cost_fkey;
-ALTER TABLE _cat_arc DROP CONSTRAINT cat_arc_m3protec_cost_fkey;
-ALTER TABLE _cat_arc DROP CONSTRAINT cat_arc_matcat_id_fkey;
-ALTER TABLE _cat_arc DROP CONSTRAINT cat_arc_shape_id_fkey;
-ALTER TABLE _cat_arc DROP CONSTRAINT cat_arc_tsect_id_fkey;
+ALTER TABLE _cat_arc DROP CONSTRAINT IF EXISTS cat_arc_pkey;
+ALTER TABLE _cat_arc DROP CONSTRAINT IF EXISTS cat_arc_arc_type_fkey;
+ALTER TABLE _cat_arc DROP CONSTRAINT IF EXISTS cat_arc_cost_fkey;
+ALTER TABLE _cat_arc DROP CONSTRAINT IF EXISTS cat_arc_curve_id_fkey;
+ALTER TABLE _cat_arc DROP CONSTRAINT IF EXISTS cat_arc_m2bottom_cost_fkey;
+ALTER TABLE _cat_arc DROP CONSTRAINT IF EXISTS cat_arc_m3protec_cost_fkey;
+ALTER TABLE _cat_arc DROP CONSTRAINT IF EXISTS cat_arc_matcat_id_fkey;
+ALTER TABLE _cat_arc DROP CONSTRAINT IF EXISTS cat_arc_shape_id_fkey;
+ALTER TABLE _cat_arc DROP CONSTRAINT IF EXISTS cat_arc_tsect_id_fkey;
 
 DROP INDEX IF EXISTS cat_arc_cost_pkey;
 DROP INDEX IF EXISTS cat_arc_m2bottom_cost_pkey;
@@ -83,14 +83,14 @@ CREATE INDEX cat_arc_m3protec_cost_idx ON cat_arc USING btree (m3protec_cost);
 
 ALTER TABLE cat_node RENAME TO _cat_node;
 
-ALTER TABLE node DROP CONSTRAINT node_nodecat_id_fkey;
+ALTER TABLE node DROP CONSTRAINT IF EXISTS node_nodecat_id_fkey;
 
-ALTER TABLE _cat_node DROP CONSTRAINT cat_node_pkey;
-ALTER TABLE _cat_node DROP CONSTRAINT cat_node_brand_fkey;
-ALTER TABLE _cat_node DROP CONSTRAINT cat_node_cost_fkey;
-ALTER TABLE _cat_node DROP CONSTRAINT cat_node_matcat_id_fkey;
-ALTER TABLE _cat_node DROP CONSTRAINT cat_node_model_fkey;
-ALTER TABLE _cat_node DROP CONSTRAINT cat_node_node_type_fkey;
+ALTER TABLE _cat_node DROP CONSTRAINT IF EXISTS cat_node_pkey;
+ALTER TABLE _cat_node DROP CONSTRAINT IF EXISTS cat_node_brand_fkey;
+ALTER TABLE _cat_node DROP CONSTRAINT IF EXISTS cat_node_cost_fkey;
+ALTER TABLE _cat_node DROP CONSTRAINT IF EXISTS cat_node_matcat_id_fkey;
+ALTER TABLE _cat_node DROP CONSTRAINT IF EXISTS cat_node_model_fkey;
+ALTER TABLE _cat_node DROP CONSTRAINT IF EXISTS cat_node_node_type_fkey;
 
 CREATE TABLE cat_node (
 	id varchar(30) NOT NULL,
@@ -124,16 +124,16 @@ CREATE INDEX cat_node_cost_idx ON cat_node USING btree (cost);
 
 ALTER TABLE cat_connec RENAME TO _cat_connec;
 
-ALTER TABLE connec DROP CONSTRAINT connec_connecat_id_fkey;
-ALTER TABLE connec DROP CONSTRAINT connec_private_connecat_id_fkey;
-ALTER TABLE gully DROP CONSTRAINT gully_connec_arccat_id_fkey;
-ALTER TABLE link DROP CONSTRAINT link_connecat_id_fkey;
+ALTER TABLE connec DROP CONSTRAINT IF EXISTS connec_connecat_id_fkey;
+ALTER TABLE connec DROP CONSTRAINT IF EXISTS connec_private_connecat_id_fkey;
+ALTER TABLE gully DROP CONSTRAINT IF EXISTS gully_connec_arccat_id_fkey;
+ALTER TABLE link DROP CONSTRAINT IF EXISTS link_connecat_id_fkey;
 
-ALTER TABLE _cat_connec DROP CONSTRAINT cat_connec_pkey;
-ALTER TABLE _cat_connec DROP CONSTRAINT cat_connec_brand_fkey;
-ALTER TABLE _cat_connec DROP CONSTRAINT cat_connec_connec_type_fkey;
-ALTER TABLE _cat_connec DROP CONSTRAINT cat_connec_matcat_id_fkey;
-ALTER TABLE _cat_connec DROP CONSTRAINT cat_connec_model_fkey;
+ALTER TABLE _cat_connec DROP CONSTRAINT IF EXISTS cat_connec_pkey;
+ALTER TABLE _cat_connec DROP CONSTRAINT IF EXISTS cat_connec_brand_fkey;
+ALTER TABLE _cat_connec DROP CONSTRAINT IF EXISTS cat_connec_connec_type_fkey;
+ALTER TABLE _cat_connec DROP CONSTRAINT IF EXISTS cat_connec_matcat_id_fkey;
+ALTER TABLE _cat_connec DROP CONSTRAINT IF EXISTS cat_connec_model_fkey;
 
 CREATE TABLE cat_connec (
 	id varchar(30) NOT NULL,
@@ -162,18 +162,18 @@ CREATE TABLE cat_connec (
 
 ALTER TABLE cat_grate RENAME TO _cat_grate;
 
-ALTER TABLE gully DROP CONSTRAINT gully_gratecat2_id_fkey;
-ALTER TABLE gully DROP CONSTRAINT gully_gratecat_id_fkey;
-ALTER TABLE man_netgully DROP CONSTRAINT man_netgully_gratecat2_id_fkey;
-ALTER TABLE man_netgully DROP CONSTRAINT man_netgully_gratecat_id_fkey;
+ALTER TABLE gully DROP CONSTRAINT IF EXISTS gully_gratecat2_id_fkey;
+ALTER TABLE gully DROP CONSTRAINT IF EXISTS gully_gratecat_id_fkey;
+ALTER TABLE man_netgully DROP CONSTRAINT IF EXISTS man_netgully_gratecat2_id_fkey;
+ALTER TABLE man_netgully DROP CONSTRAINT IF EXISTS man_netgully_gratecat_id_fkey;
 
-ALTER TABLE _cat_grate DROP CONSTRAINT cat_grate_pkey;
-ALTER TABLE _cat_grate DROP CONSTRAINT cat_grate_brand_fkey;
-ALTER TABLE _cat_grate DROP CONSTRAINT cat_grate_gully_type_fkey;
-ALTER TABLE _cat_grate DROP CONSTRAINT cat_grate_matcat_id_fkey;
-ALTER TABLE _cat_grate DROP CONSTRAINT cat_grate_model_fkey;
+ALTER TABLE _cat_grate DROP CONSTRAINT IF EXISTS cat_grate_pkey;
+ALTER TABLE _cat_grate DROP CONSTRAINT IF EXISTS cat_grate_brand_fkey;
+ALTER TABLE _cat_grate DROP CONSTRAINT IF EXISTS cat_grate_gully_type_fkey;
+ALTER TABLE _cat_grate DROP CONSTRAINT IF EXISTS cat_grate_matcat_id_fkey;
+ALTER TABLE _cat_grate DROP CONSTRAINT IF EXISTS cat_grate_model_fkey;
 
-CREATE TABLE cat_grate (
+CREATE TABLE cat_gully (
 	id varchar(30) NOT NULL,
 	gully_type text NULL,
 	matcat_id varchar(16) NULL,
@@ -193,9 +193,45 @@ CREATE TABLE cat_grate (
 	svg varchar(50) NULL,
 	active bool DEFAULT true NULL,
 	"label" varchar(255) NULL,
-	CONSTRAINT cat_grate_pkey PRIMARY KEY (id),
-	CONSTRAINT cat_grate_brand_fkey FOREIGN KEY (brand) REFERENCES cat_brand(id) ON DELETE CASCADE ON UPDATE CASCADE,
-	CONSTRAINT cat_grate_gully_type_fkey FOREIGN KEY (gully_type) REFERENCES cat_feature_gully(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT cat_grate_matcat_id_fkey FOREIGN KEY (matcat_id) REFERENCES cat_mat_grate(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT cat_grate_model_fkey FOREIGN KEY (model) REFERENCES cat_brand_model(id) ON DELETE CASCADE ON UPDATE CASCADE
+	CONSTRAINT cat_gully_pkey PRIMARY KEY (id),
+	CONSTRAINT cat_gully_brand_fkey FOREIGN KEY (brand) REFERENCES cat_brand(id) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT cat_gully_gully_type_fkey FOREIGN KEY (gully_type) REFERENCES cat_feature_gully(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT cat_gully_matcat_id_fkey FOREIGN KEY (matcat_id) REFERENCES cat_mat_grate(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT cat_gully_model_fkey FOREIGN KEY (model) REFERENCES cat_brand_model(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+
+-- 22/10/2024
+-- update dv_querytext before rename column to prevent error on config_control()
+-- fix config_form_fields
+UPDATE config_form_fields SET dv_querytext='SELECT id, id AS idval FROM cat_gully WHERE id IS NOT NULL AND active IS TRUE ' WHERE formname='v_edit_gully' AND formtype='form_feature' AND columnname='gratecat_id' AND tabname='tab_data';
+UPDATE config_form_fields SET dv_querytext='SELECT id, id AS idval FROM cat_gully WHERE id IS NOT NULL AND active IS TRUE ' WHERE formname='v_edit_inp_gully' AND formtype='form_feature' AND columnname='gratecat_id' AND tabname='tab_data';
+UPDATE config_form_fields SET dv_querytext='SELECT id, id AS idval FROM cat_gully WHERE id IS NOT NULL AND active IS TRUE ' WHERE formname='v_edit_gully' AND formtype='form_feature' AND columnname='gratecat2_id' AND tabname='tab_data';
+UPDATE config_form_fields SET dv_querytext='SELECT id, id AS idval FROM cat_gully WHERE id IS NOT NULL AND active IS TRUE ' WHERE formname='v_edit_inp_netgully' AND formtype='form_feature' AND columnname='gratecat_id' AND tabname='tab_data';
+UPDATE config_form_fields SET dv_querytext='SELECT id, id AS idval FROM cat_gully WHERE id IS NOT NULL AND active IS TRUE ' WHERE formname='ve_gully' AND formtype='form_feature' AND columnname='gratecat2_id' AND tabname='tab_data';
+UPDATE config_form_fields SET dv_querytext='SELECT id, id AS idval FROM cat_gully WHERE id IS NOT NULL AND active IS TRUE ' WHERE formname='ve_gully_gully' AND formtype='form_feature' AND columnname='gratecat2_id' AND tabname='tab_data';
+UPDATE config_form_fields SET dv_querytext='SELECT id, id AS idval FROM cat_gully WHERE id IS NOT NULL AND active IS TRUE ' WHERE formname='ve_gully_pgully' AND formtype='form_feature' AND columnname='gratecat2_id' AND tabname='tab_data';
+UPDATE config_form_fields SET dv_querytext='SELECT id, id AS idval FROM cat_gully WHERE id IS NOT NULL AND active IS TRUE ' WHERE formname='ve_gully_vgully' AND formtype='form_feature' AND columnname='gratecat2_id' AND tabname='tab_data';
+UPDATE config_form_fields SET dv_querytext='SELECT id, id AS idval FROM cat_gully WHERE id IS NOT NULL AND active IS TRUE ' WHERE formname='ve_gully' AND formtype='form_feature' AND columnname='gratecat_id' AND tabname='tab_data';
+UPDATE config_form_fields SET dv_querytext='SELECT id, id AS idval FROM cat_gully WHERE id IS NOT NULL AND active IS TRUE ' WHERE formname='ve_gully_gully' AND formtype='form_feature' AND columnname='gratecat_id' AND tabname='tab_data';
+UPDATE config_form_fields SET dv_querytext='SELECT id, id AS idval FROM cat_gully WHERE id IS NOT NULL AND active IS TRUE ' WHERE formname='ve_gully_pgully' AND formtype='form_feature' AND columnname='gratecat_id' AND tabname='tab_data';
+UPDATE config_form_fields SET dv_querytext='SELECT id, id AS idval FROM cat_gully WHERE id IS NOT NULL AND active IS TRUE ' WHERE formname='ve_gully_vgully' AND formtype='form_feature' AND columnname='gratecat_id' AND tabname='tab_data';
+UPDATE config_form_fields SET dv_querytext='SELECT DISTINCT NULL AS id, NULL AS idval FROM cat_gully WHERE id IS NOT NULL' WHERE formname='upsert_catalog_gully' AND formtype='form_catalog' AND columnname='geom1' AND tabname='tab_none';
+UPDATE config_form_fields SET dv_querytext='SELECT DISTINCT NULL AS id, NULL AS idval FROM cat_gully WHERE id IS NOT NULL' WHERE formname='upsert_catalog_gully' AND formtype='form_catalog' AND columnname='shape' AND tabname='tab_none';
+UPDATE config_form_fields SET dv_querytext='SELECT id, id AS idval FROM cat_gully WHERE id IS NOT NULL' WHERE formname='v_edit_review_audit_gully' AND formtype='form_feature' AND columnname='old_gratecat_id' AND tabname='tab_none';
+UPDATE config_form_fields SET dv_querytext='SELECT id, id AS idval FROM cat_gully WHERE id IS NOT NULL' WHERE formname='v_edit_review_audit_gully' AND formtype='form_feature' AND columnname='new_gratecat_id' AND tabname='tab_none';
+UPDATE config_form_fields SET dv_querytext='SELECT DISTINCT(id) AS id, id AS idval FROM cat_gully WHERE id IS NOT NULL' WHERE formname='upsert_catalog_gully' AND formtype='form_catalog' AND columnname='id' AND tabname='tab_none';
+UPDATE config_form_fields SET dv_querytext='SELECT DISTINCT(matcat_id) AS id, matcat_id AS idval FROM cat_gully WHERE id IS NOT NULL' WHERE formname='upsert_catalog_gully' AND formtype='form_catalog' AND columnname='matcat_id' AND tabname='tab_none';
+UPDATE config_form_fields SET dv_querytext='SELECT id, id AS idval FROM cat_gully WHERE id IS NOT NULL' WHERE formname='v_edit_review_gully' AND formtype='form_feature' AND columnname='gratecat_id' AND tabname='tab_none';
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"connec", "column":"connecat_id", "newName":"conneccat_id"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"connec", "column":"private_connecat_id", "newName":"private_conneccat_id"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"anl_connec", "column":"connecat_id", "newName":"conneccat_id"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"review_connec", "column":"connecat_id", "newName":"conneccat_id"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"gully", "column":"gratecat_id", "newName":"gullycat_id"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"anl_gully", "column":"gratecat_id", "newName":"gullycat_id"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"gully", "column":"gratecat2_id", "newName":"gullycat2_id"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"man_netgully", "column":"gratecat_id", "newName":"gullycat_id"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"man_netgully", "column":"gratecat2_id", "newName":"gullycat2_id"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"review_gully", "column":"gratecat_id", "newName":"gullycat_id"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"link", "column":"connecat_id", "newName":"conneccat_id"}}$$);

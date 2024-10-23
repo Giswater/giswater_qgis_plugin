@@ -552,17 +552,17 @@ BEGIN
 		IF v_projectype = 'WS' THEN
 
 			INSERT INTO link (link_id, feature_type, feature_id, expl_id, exit_id, exit_type, userdefined_geom, state, the_geom, sector_id,
-			 fluid_type, dma_id, dqa_id, presszone_id, minsector_id, connecat_id, workcat_id, workcat_id_end, builtdate, enddate, exit_elev, exit_topelev, uncertain, muni_id)
+			 fluid_type, dma_id, dqa_id, presszone_id, minsector_id, conneccat_id, workcat_id, workcat_id_end, builtdate, enddate, exit_elev, exit_topelev, uncertain, muni_id)
 			VALUES (NEW.link_id, NEW.feature_type, NEW.feature_id, v_expl, NEW.exit_id, NEW.exit_type, TRUE, NEW.state, NEW.the_geom, v_sector,
-			v_fluidtype, v_dma, v_dqa, v_presszone, v_minsector, NEW.connecat_id, NEW.workcat_id, NEW.workcat_id_end, NEW.builtdate, NEW.enddate,
+			v_fluidtype, v_dma, v_dqa, v_presszone, v_minsector, NEW.conneccat_id, NEW.workcat_id, NEW.workcat_id_end, NEW.builtdate, NEW.enddate,
 			NEW.exit_elev, NEW.exit_topelev, NEW.uncertain, NEW.muni_id);
 
 		ELSIF  v_projectype = 'UD' THEN
 
 			INSERT INTO link (link_id, feature_type, feature_id, expl_id, exit_id, exit_type, userdefined_geom, state, the_geom, sector_id, fluid_type, dma_id,
-				connecat_id, workcat_id, workcat_id_end, builtdate, enddate, exit_elev, exit_topelev, uncertain, muni_id)
+				conneccat_id, workcat_id, workcat_id_end, builtdate, enddate, exit_elev, exit_topelev, uncertain, muni_id)
 			VALUES (NEW.link_id, NEW.feature_type, NEW.feature_id, v_expl, NEW.exit_id, NEW.exit_type, TRUE, NEW.state, NEW.the_geom, v_sector, v_fluidtype, v_dma,
-				NEW.connecat_id, NEW.workcat_id, NEW.workcat_id_end, NEW.builtdate, NEW.enddate, NEW.exit_elev, NEW.exit_topelev, NEW.uncertain, NEW.muni_id);
+				NEW.conneccat_id, NEW.workcat_id, NEW.workcat_id_end, NEW.builtdate, NEW.enddate, NEW.exit_elev, NEW.exit_topelev, NEW.uncertain, NEW.muni_id);
 		END IF;
 
 		-- update feature
@@ -657,7 +657,7 @@ BEGIN
 			IF NEW.feature_type = 'CONNEC' THEN
 				UPDATE connec SET arc_id = v_arc_id, pjoint_type = NEW.exit_type, pjoint_id = NEW.exit_id,
 				dma_id = v_dma, fluid_type=v_fluidtype WHERE connec_id = NEW.feature_id;
-				UPDATE link SET connecat_id = c.connecat_id FROM connec c WHERE connec_id = NEW.feature_id AND link.state > 0;
+				UPDATE link SET conneccat_id = c.conneccat_id FROM connec c WHERE connec_id = NEW.feature_id AND link.state > 0;
 
 			ELSIF NEW.feature_type = 'GULLY' THEN
 				UPDATE gully SET arc_id = v_arc_id, pjoint_type = NEW.exit_type, pjoint_id = NEW.exit_id,
@@ -674,7 +674,7 @@ BEGIN
 			-- update values on plan_psector tables
 			IF NEW.feature_type='CONNEC' THEN
 				UPDATE plan_psector_x_connec SET arc_id = v_arc_id WHERE plan_psector_x_connec.link_id=NEW.link_id;
-				UPDATE link SET connecat_id = c.connecat_id FROM connec c WHERE connec_id = NEW.feature_id AND link.state > 0;
+				UPDATE link SET conneccat_id = c.conneccat_id FROM connec c WHERE connec_id = NEW.feature_id AND link.state > 0;
 
 			ELSIF NEW.feature_type='GULLY' THEN
 				UPDATE plan_psector_x_gully SET arc_id = v_arc_id WHERE plan_psector_x_gully.link_id=NEW.link_id;

@@ -26,14 +26,14 @@ If is_validated=1, depending on review_status the trigger do diferent actions:
 
 DECLARE
 	v_review_status integer;
-	
+
 BEGIN
 EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
 	IF TG_OP = 'UPDATE' THEN
-	
+
 		SELECT review_status_id INTO v_review_status FROM review_audit_connec WHERE connec_id=NEW.connec_id;
-		
+
 		IF NEW.is_validated = 0 THEN
 
 			DELETE FROM review_connec WHERE connec_id = NEW.connec_id;
@@ -41,43 +41,43 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
 		ELSIF NEW.is_validated = 1 THEN
 
-			IF NEW.new_connecat_id IS NULL THEN
+			IF NEW.new_conneccat_id IS NULL THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"3056", "function":"2476","debug_msg":"'||NEW.connec_id||'"}}$$);';
 			END IF;
-			
-			UPDATE review_audit_connec SET new_connecat_id=NEW.new_connecat_id, is_validated=NEW.is_validated WHERE connec_id=NEW.connec_id;
-			
-			IF v_review_status=1 AND NEW.connec_id NOT IN (SELECT connec_id FROM connec) THEN 
 
-				INSERT INTO v_edit_connec (connec_id, y1, y2, connec_type, connecat_id, annotation, observ, expl_id, the_geom, matcat_id)
-				VALUES (NEW.connec_id, NEW.new_y1, NEW.new_y2, NEW.new_connec_type, NEW.new_connecat_id, NEW.new_annotation, NEW.new_observ, NEW.expl_id, 
-				NEW.the_geom, NEW.new_matcat_id); 
-		
+			UPDATE review_audit_connec SET new_conneccat_id=NEW.new_conneccat_id, is_validated=NEW.is_validated WHERE connec_id=NEW.connec_id;
+
+			IF v_review_status=1 AND NEW.connec_id NOT IN (SELECT connec_id FROM connec) THEN
+
+				INSERT INTO v_edit_connec (connec_id, y1, y2, connec_type, conneccat_id, annotation, observ, expl_id, the_geom, matcat_id)
+				VALUES (NEW.connec_id, NEW.new_y1, NEW.new_y2, NEW.new_connec_type, NEW.new_conneccat_id, NEW.new_annotation, NEW.new_observ, NEW.expl_id,
+				NEW.the_geom, NEW.new_matcat_id);
+
 			ELSIF v_review_status=2 THEN
-				UPDATE v_edit_connec SET the_geom=NEW.the_geom, y1=NEW.new_y1, y2=NEW.new_y2, connecat_id=NEW.new_connecat_id, 
+				UPDATE v_edit_connec SET the_geom=NEW.the_geom, y1=NEW.new_y1, y2=NEW.new_y2, conneccat_id=NEW.new_conneccat_id,
 				connec_type=NEW.new_connec_type, annotation=NEW.new_annotation, observ=NEW.new_observ, matcat_id=NEW.new_matcat_id
 				WHERE connec_id=NEW.connec_id;
-					
+
 			ELSIF v_review_status=3 THEN
 
-				UPDATE v_edit_connec SET y1=NEW.new_y1, y2=NEW.new_y2, connecat_id=NEW.new_connecat_id, connec_type=NEW.new_connec_type,
+				UPDATE v_edit_connec SET y1=NEW.new_y1, y2=NEW.new_y2, conneccat_id=NEW.new_conneccat_id, connec_type=NEW.new_connec_type,
 				annotation=NEW.new_annotation, observ=NEW.new_observ, matcat_id=NEW.new_matcat_id
 				WHERE connec_id=NEW.connec_id;
-	
-			END IF;	
-			
-			
+
+			END IF;
+
+
 			DELETE FROM review_connec WHERE connec_id = NEW.connec_id;
 
 		ELSIF NEW.is_validated = 2 THEN
-			
+
 			UPDATE review_connec SET field_checked=FALSE, is_validated=2 WHERE connec_id=NEW.connec_id;
 			UPDATE review_audit_connec SET is_validated=NEW.is_validated WHERE connec_id=NEW.connec_id;
 		END IF;
 	ELSIF TG_OP = 'DELETE' THEN
-		DELETE FROM review_audit_connec WHERE connec_id=OLD.connec_id;	
-	END IF;	
+		DELETE FROM review_audit_connec WHERE connec_id=OLD.connec_id;
+	END IF;
 
 RETURN NEW;
 

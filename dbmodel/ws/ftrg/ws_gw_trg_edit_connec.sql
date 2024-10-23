@@ -141,19 +141,19 @@ BEGIN
 		END IF;
 
 		-- connec Catalog ID
-		IF (NEW.connecat_id IS NULL) THEN
+		IF (NEW.conneccat_id IS NULL) THEN
 			IF ((SELECT COUNT(*) FROM cat_connec WHERE active IS TRUE) = 0) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 			  "data":{"message":"1022", "function":"1304","debug_msg":null, "variables":null}}$$);';
 			END IF;
 
 			IF v_customfeature IS NOT NULL THEN
-				NEW.connecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"=lower(concat(v_customfeature,'_vdefault')) AND "cur_user"="current_user"() LIMIT 1);
+				NEW.conneccat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"=lower(concat(v_customfeature,'_vdefault')) AND "cur_user"="current_user"() LIMIT 1);
 			ELSE
-				NEW.connecat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='edit_connecat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+				NEW.conneccat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='edit_connecat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			END IF;
 
-			IF (NEW.connecat_id IS NULL) THEN
+			IF (NEW.conneccat_id IS NULL) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				 "data":{"message":"1086", "function":"1304","debug_msg":null, "variables":null}}$$);';
 			END IF;
@@ -423,7 +423,7 @@ BEGIN
 
 		-- Code
 		SELECT code_autofill, cat_feature.id, addparam::json->>'code_prefix' INTO v_code_autofill_bool, v_featurecat, v_code_prefix FROM cat_feature
-		join cat_connec on cat_feature.id=cat_connec.connec_type where cat_connec.id=NEW.connecat_id;
+		join cat_connec on cat_feature.id=cat_connec.connec_type where cat_connec.id=NEW.conneccat_id;
 
 		-- use specific sequence for code when its name matches featurecat_code_seq
 		EXECUTE 'SELECT concat('||quote_literal(lower(v_featurecat))||',''_code_seq'');' INTO v_seq_name;
@@ -462,7 +462,7 @@ BEGIN
 
 		END IF;
 
-		v_featurecat = (SELECT connec_type FROM cat_connec WHERE id = NEW.connecat_id);
+		v_featurecat = (SELECT connec_type FROM cat_connec WHERE id = NEW.conneccat_id);
 
 		--Location type
 		IF NEW.location_type IS NULL AND (SELECT value FROM config_param_user WHERE parameter = 'edit_feature_location_vdefault' AND cur_user = current_user)  = v_featurecat THEN
@@ -531,13 +531,13 @@ BEGIN
 		END IF;
 
 		-- FEATURE INSERT
-		INSERT INTO connec (connec_id, code, elevation, depth,connecat_id,  sector_id, customer_code,  state, state_type, annotation, observ, comment,dma_id, presszone_id, soilcat_id,
+		INSERT INTO connec (connec_id, code, elevation, depth,conneccat_id,  sector_id, customer_code,  state, state_type, annotation, observ, comment,dma_id, presszone_id, soilcat_id,
 		function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, workcat_id_plan, buildercat_id, builtdate, enddate, ownercat_id, streetaxis_id, postnumber, postnumber2,
 		muni_id, streetaxis2_id,  postcode, district_id, postcomplement, postcomplement2, descript, link, verified, rotation,  the_geom, undelete, label_x,label_y,label_rotation, expl_id,
 		publish, inventory,num_value, connec_length, arc_id, minsector_id, dqa_id, pjoint_id, pjoint_type,
 		adate, adescript, accessibility, lastupdate, lastupdate_user, asset_id, epa_type, om_state, conserv_state, priority,
 		valve_location, valve_type, shutoff_valve, access_type, placement_type, crmzone_id, expl_id2, plot_code, brand_id, model_id, serial_number, cat_valve, label_quadrant)
-		VALUES (NEW.connec_id, NEW.code, NEW.elevation, NEW.depth, NEW.connecat_id, NEW.sector_id, NEW.customer_code,  NEW.state, NEW.state_type, NEW.annotation,   NEW.observ, NEW.comment,
+		VALUES (NEW.connec_id, NEW.code, NEW.elevation, NEW.depth, NEW.conneccat_id, NEW.sector_id, NEW.customer_code,  NEW.state, NEW.state_type, NEW.annotation,   NEW.observ, NEW.comment,
 		NEW.dma_id, NEW.presszone_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type,  NEW.location_type, NEW.workcat_id, NEW.workcat_id_end,  NEW.workcat_id_plan, NEW.buildercat_id,
 		NEW.builtdate, NEW.enddate, NEW.ownercat_id, v_streetaxis, NEW.postnumber, NEW.postnumber2, NEW.muni_id, v_streetaxis2, NEW.postcode, NEW.district_id, NEW.postcomplement,
 		NEW.postcomplement2, NEW.descript, NEW.link, NEW.verified, NEW.rotation, NEW.the_geom,NEW.undelete,NEW.label_x, NEW.label_y,NEW.label_rotation,  NEW.expl_id, NEW.publish, NEW.inventory,
@@ -548,7 +548,7 @@ BEGIN
 
 
 		SELECT feature_class, cat_feature.id INTO v_feature_class, v_featurecat_id FROM cat_feature
-		JOIN cat_connec ON cat_feature.id=connec_type where cat_connec.id=NEW.connecat_id;
+		JOIN cat_connec ON cat_feature.id=connec_type where cat_connec.id=NEW.conneccat_id;
 
 		EXECUTE 'SELECT json_extract_path_text(double_geom,''activated'')::boolean, json_extract_path_text(double_geom,''value'')  
 		FROM cat_feature_connec WHERE id='||quote_literal(v_featurecat_id)||''
@@ -583,7 +583,7 @@ BEGIN
 		END IF;
 
 		IF v_man_table='parent' THEN
-			v_man_table:= (SELECT man_table FROM cat_feature_connec c JOIN cat_feature cf ON cf.id = c.id JOIN sys_feature_class s ON cf.feature_class = s.id JOIN cat_connec ON cat_connec.id=NEW.connecat_id
+			v_man_table:= (SELECT man_table FROM cat_feature_connec c JOIN cat_feature cf ON cf.id = c.id JOIN sys_feature_class s ON cf.feature_class = s.id JOIN cat_connec ON cat_connec.id=NEW.conneccat_id
 		    	WHERE c.id = cat_connec.connec_type LIMIT 1)::text;
 
 			IF v_man_table IS NOT NULL THEN
@@ -796,8 +796,8 @@ BEGIN
 			UPDATE connec SET state=NEW.state WHERE connec_id = NEW.connec_id;
 
 		END IF;
-		IF (NEW.connecat_id != OLD.connecat_id) AND NEW.state > 0 THEN
-			UPDATE link SET connecat_id=NEW.connecat_id WHERE feature_id = NEW.connec_id AND state>0;
+		IF (NEW.conneccat_id != OLD.conneccat_id) AND NEW.state > 0 THEN
+			UPDATE link SET conneccat_id=NEW.conneccat_id WHERE feature_id = NEW.connec_id AND state>0;
 		END IF;
 
 		-- State_type
@@ -841,16 +841,16 @@ BEGIN
 		END IF;
 
 		--link_path
-		SELECT link_path INTO v_link_path FROM cat_feature JOIN cat_connec ON cat_connec.connec_type=cat_feature.id WHERE cat_connec.id=NEW.connecat_id;
+		SELECT link_path INTO v_link_path FROM cat_feature JOIN cat_connec ON cat_connec.connec_type=cat_feature.id WHERE cat_connec.id=NEW.conneccat_id;
 		IF v_link_path IS NOT NULL THEN
 			NEW.link = replace(NEW.link, v_link_path,'');
 		END IF;
 
 		-- Connec type for parent tables
 		IF v_man_table='parent' THEN
-	    	IF (NEW.connecat_id != OLD.connecat_id) THEN
-				v_new_connec_type= (SELECT feature_class FROM cat_feature JOIN cat_connec ON cat_feature.id=connec_type where cat_connec.id=NEW.connecat_id);
-				v_old_connec_type= (SELECT feature_class FROM cat_feature JOIN cat_connec ON cat_feature.id=connec_type where cat_connec.id=OLD.connecat_id);
+	    	IF (NEW.conneccat_id != OLD.conneccat_id) THEN
+				v_new_connec_type= (SELECT feature_class FROM cat_feature JOIN cat_connec ON cat_feature.id=connec_type where cat_connec.id=NEW.conneccat_id);
+				v_old_connec_type= (SELECT feature_class FROM cat_feature JOIN cat_connec ON cat_feature.id=connec_type where cat_connec.id=OLD.conneccat_id);
 				IF v_new_connec_type != v_old_connec_type THEN
 					v_sql='INSERT INTO man_'||lower(v_new_connec_type)||' (connec_id) VALUES ('||NEW.connec_id||')';
 					EXECUTE v_sql;
@@ -866,7 +866,7 @@ BEGIN
 		END IF;
 
 		UPDATE connec
-			SET code=NEW.code, elevation=NEW.elevation, "depth"=NEW.depth, connecat_id=NEW.connecat_id, sector_id=NEW.sector_id,
+			SET code=NEW.code, elevation=NEW.elevation, "depth"=NEW.depth, conneccat_id=NEW.conneccat_id, sector_id=NEW.sector_id,
 			annotation=NEW.annotation, observ=NEW.observ, "comment"=NEW.comment, rotation=NEW.rotation,dma_id=NEW.dma_id, presszone_id=NEW.presszone_id,
 			soilcat_id=NEW.soilcat_id, function_type=NEW.function_type, category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id,
 			workcat_id_end=NEW.workcat_id_end, workcat_id_plan=NEW.workcat_id_plan, buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, enddate=NEW.enddate, ownercat_id=NEW.ownercat_id, streetaxis2_id=v_streetaxis2,

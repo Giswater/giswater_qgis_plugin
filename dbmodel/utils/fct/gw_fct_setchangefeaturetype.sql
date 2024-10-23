@@ -80,16 +80,7 @@ BEGIN
 	--define columns used for feature_cat
 	v_feature_layer = concat('v_edit_',v_feature_type);
 	v_id_column:=concat(v_feature_type,'_id');
-
-	IF v_feature_type='connec' THEN
-		v_cat_column='connecat_id';
-	ELSIF  v_feature_type='gully' THEN
-		v_cat_column = 'gratecat_id';
-	ELSIF  v_feature_type='node' THEN
-		v_cat_column='nodecat_id';
-	ELSIF  v_feature_type='arc' THEN
-		v_cat_column='arccat_id';
-	END IF;
+	v_cat_column= concat(v_feature_type,'cat_id');
 
 	if v_category is not null then
 		EXECUTE 'UPDATE '||v_feature_layer||' SET category_type='|| quote_literal(v_category)||' WHERE '||v_feature_type||'_id='||quote_literal(v_feature_id)||';';
