@@ -9,3 +9,6 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source")
 VALUES(3270, 'You can''t create or update a document with an empty name. Please provide a valid name.', NULL, 2, true, 'utils', 'core');
+
+UPDATE config_form_fields SET dv_querytext = 'SELECT muni_id as id, name as idval from v_ext_municipality WHERE muni_id IS NOT NULL' WHERE columnname  = 'muni_id' AND widgettype = 'combo';
+

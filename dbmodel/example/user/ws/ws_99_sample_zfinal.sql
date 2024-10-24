@@ -119,3 +119,5 @@ UPDATE node SET fluid_type = 'fluid_hydrant1' where nodecat_id like 'HYDR%';
 UPDATE node SET function_type = 'function_hydrant1' where nodecat_id like 'HYDR%';
 
 UPDATE om_visit SET ext_code = concat('EXT', 1000 + id);
+
+UPDATE ext_plot set muni_id = 2 where id::integer < 40;

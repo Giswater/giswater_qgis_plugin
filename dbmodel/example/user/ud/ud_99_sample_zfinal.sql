@@ -152,3 +152,5 @@ UPDATE inp_dwf SET pat1 = 'pattern_12';
 UPDATE node set ymax = 2 WHERE node_id = '301';
 
 UPDATE inp_subcatchment SET outlet_id = 95 where subc_id IN ('S91','S92','S94');
+
+UPDATE ext_plot set muni_id = 2 where id::integer < 40;

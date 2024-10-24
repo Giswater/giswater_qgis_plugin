@@ -49,3 +49,6 @@ VALUES (3326, 'Calculate the hydraulic performance for specific result','{"featu
 INSERT INTO sys_fprocess VALUES (531, 'fprocess to calculate the performance of ud networks','ud',null,'core',FALSE, 'Function process')
 ON CONFLICT (fid) DO NOTHING;
 
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, widgettype, label, tooltip, ismandatory, isparent, iseditable, dv_querytext, dv_orderby_id, dv_isnullvalue, hidden)
+SELECT 'v_edit_raingage', 'form_feature', 'tab_none', columnname, widgettype, label, tooltip, false, isparent, iseditable, 'SELECT muni_id as id, name as idval from v_ext_municipality WHERE muni_id IS NOT NULL', dv_orderby_id, dv_isnullvalue, hidden FROM config_form_fields 
+WHERE columnname  = 'muni_id' AND formname = 'v_ext_address';
