@@ -30,14 +30,14 @@ SELECT is((SELECT count(*)::integer FROM doc_type WHERE id = 'AS_BUILT2'), 0, 'D
 
 -- Subtest 2: Testing doc operations
 INSERT INTO doc (id, doc_type, "path", observ, "date", user_name, tstamp, the_geom, "name")
-VALUES('Demo document 4', 'OTHER', 'https://bgeo.es', NULL, '2024-08-19 12:06:28.330', 'postgres', '2024-08-19 12:06:28.330', NULL, NULL);
+VALUES('Demo document 4', 'OTHER', 'https://bgeo.es', NULL, '2024-08-19 12:06:28.330', 'postgres', '2024-08-19 12:06:28.330', NULL, 'Demo document 4');
 SELECT is((SELECT count(*)::integer FROM doc WHERE id = 'Demo document 4'), 1, 'INSERT: doc "Demo document 4" was inserted');
 
 UPDATE doc SET observ = 'updated test' WHERE id = 'Demo document 4';
 SELECT is((SELECT observ FROM doc WHERE id = 'Demo document 4'), 'updated test', 'UPDATE: observ was updated to "updated test"');
 
 INSERT INTO doc (id, doc_type, "path", observ, "date", user_name, tstamp, the_geom, "name")
-VALUES('Demo document 4', 'OTHER', 'https://bgeo.es', 'upsert test', '2024-08-19 12:06:28.330', 'postgres', '2024-08-19 12:06:28.330', NULL, NULL)
+VALUES('Demo document 4', 'OTHER', 'https://bgeo.es', 'upsert test', '2024-08-19 12:06:28.330', 'postgres', '2024-08-19 12:06:28.330', NULL, 'Demo document 5')
 ON CONFLICT (id) DO UPDATE SET observ = EXCLUDED.observ;
 SELECT is((SELECT observ FROM doc WHERE id = 'Demo document 4'), 'upsert test', 'UPSERT: observ was updated to "upsert test" using ON CONFLICT');
 
