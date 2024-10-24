@@ -50,19 +50,19 @@ BEGIN
 		v_user = current_user;
 	end if;
 
-    -- check if role name exists
-    IF v_user IS NOT NULL THEN
-        SELECT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = quote_ident(v_user)) INTO v_rol_exists;
-        IF NOT v_rol_exists THEN
-            v_message := concat('The user ''', v_user, ''' does not exist in the database. Please contact an administrator.');
+	-- check if role name exists
+	IF v_user IS NOT NULL THEN
+		SELECT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = quote_ident(v_user)) INTO v_rol_exists;
+		IF NOT v_rol_exists THEN
+			v_message := concat('The user ''', v_user, ''' does not exist in the database. Please contact an administrator.');
 			RETURN ('{"status":"Failed", "message":{"level":1, "text":"'|| v_message ||'"}, "version":"'||v_version||'"'||'}')::json;
-        END IF;
-    END IF;
+		END IF;
+	END IF;
 
-    -- get user parameters
-    SELECT value INTO v_qgis_init_guide_map FROM config_param_user where parameter='qgis_init_guide_map' AND cur_user=current_user;
+	-- get user parameters
+	SELECT value INTO v_qgis_init_guide_map FROM config_param_user where parameter='qgis_init_guide_map' AND cur_user=current_user;
 
-    -- profilactic null control
+	-- profilactic null control
 	IF v_qgis_init_guide_map IS NULL THEN v_qgis_init_guide_map = FALSE; END IF;
 
 	-- set mandatory values of config_param_user in case of not exists (for new users or for updates)
@@ -120,6 +120,9 @@ BEGIN
 
 	-- Force sector selector for 0 values
 	INSERT INTO selector_sector VALUES (0, current_user) ON CONFLICT (sector_id, cur_user) DO NOTHING;
+
+	-- Force muni selector for 0 values
+	INSERT INTO selector_municipality VALUES (0, current_user) ON CONFLICT (muni_id, cur_user) DO NOTHING;
 	
 	-- force hydrometer_selector in case of null values
 	IF (select cur_user FROM selector_hydrometer WHERE cur_user = current_user limit 1) IS NULL THEN
