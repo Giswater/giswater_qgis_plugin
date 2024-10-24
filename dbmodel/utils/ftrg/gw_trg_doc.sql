@@ -8,33 +8,45 @@ This version of Giswater is provided by Giswater Association
 
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_doc() RETURNS trigger AS $BODY$
-DECLARE 
+DECLARE
     doc_table varchar;
     v_sql varchar;
     v_sourcetext json;
     v_targettext text;
     v_record record;
     v_enabled boolean;
-    
+
 BEGIN
 
-   -- set search_path
-   EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
-    
-   -- getting config data
-   v_enabled = (SELECT value::json->>'enabled' FROM config_param_system WHERE parameter='edit_replace_doc_folderpath')::boolean;
-   v_sourcetext = (SELECT value::json->>'values' FROM config_param_system WHERE parameter='edit_replace_doc_folderpath')::text;
+    -- set search_path
+	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
-   IF v_enabled THEN 
-	-- looping data
-	FOR v_record IN SELECT (a)->>'source' as source,(a)->>'target' as target  FROM json_array_elements(v_sourcetext) a
-	LOOP
-		NEW.path=REPLACE (NEW.path, v_record.source, v_record.target);
-	END LOOP;
-  END IF;
- 
-   RETURN NEW;    
-    
+	-- control for spaces or empty on name column
+   	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
+		IF (NEW.name IS NULL OR TRIM(NEW.name) = '') THEN
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+                    "data":{"message":"3270", "function":"2686","debug_msg":""}}$$);';
+		END IF;
+	END IF;
+
+   	IF TG_OP = 'INSERT' THEN
+
+	   -- getting config data
+	   v_enabled = (SELECT value::json->>'enabled' FROM config_param_system WHERE parameter='edit_replace_doc_folderpath')::boolean;
+	   v_sourcetext = (SELECT value::json->>'values' FROM config_param_system WHERE parameter='edit_replace_doc_folderpath')::text;
+
+	   IF v_enabled THEN
+			-- looping data
+			FOR v_record IN SELECT (a)->>'source' as source,(a)->>'target' as target  FROM json_array_elements(v_sourcetext) a
+			LOOP
+				NEW.path=REPLACE (NEW.path, v_record.source, v_record.target);
+			END LOOP;
+	   END IF;
+
+	END IF;
+
+    RETURN NEW;
+
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
