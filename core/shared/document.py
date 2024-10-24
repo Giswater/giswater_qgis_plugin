@@ -547,17 +547,6 @@ class GwDocument(QObject):
         path = tools_qt.get_text(self.dlg_add_doc, "path", return_string_null=False)
         observ = tools_qt.get_text(self.dlg_add_doc, "observ", False, False)
 
-        # Validations
-        if not name:
-            message = "The 'name' field is mandatory."
-            tools_qgis.show_warning(message, dialog=self.dlg_add_doc)
-            return
-
-        if doc_type in (None, '', -1):
-            message = "You need to insert doc_type"
-            tools_qgis.show_warning(message, dialog=self.dlg_add_doc)
-            return
-
         # Get SRID
         srid = lib_vars.data_epsg
 
@@ -576,6 +565,8 @@ class GwDocument(QObject):
         if row is None and self.is_new:
             if len(self.files_path) <= 1:
                 sql, doc_id = self._insert_doc_sql(doc_type, observ, date, path, the_geom, name)
+                if doc_id is None:
+                    return
             else:
                 msg = ("You have selected multiple documents. In this case, name will be a sequential number for "
                        "all selected documents and your name won't be used.")
@@ -619,6 +610,8 @@ class GwDocument(QObject):
                f"VALUES ({values}) RETURNING id;")
         new_doc_id = tools_db.execute_returning(sql)
         sql = ""
+        if new_doc_id is False:
+            return None, None
         doc_id = str(new_doc_id[0])
         return sql, doc_id
 
