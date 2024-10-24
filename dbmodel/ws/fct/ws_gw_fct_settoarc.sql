@@ -77,7 +77,7 @@ BEGIN
 	-- check if to_arc is connected with node
 	IF v_arc_id NOT IN (SELECT arc_id FROM arc WHERE node_1 = v_feature_id AND state > 0 UNION SELECT arc_id FROM arc WHERE node_2 = v_feature_id AND state > 0) THEN
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                    "data":{"message":"3270", "function":"3006","debug_msg":""}}$$);';
+                    "data":{"message":"3272", "function":"3006","debug_msg":""}}$$);';
 	END IF;
 
 	-- man_tables

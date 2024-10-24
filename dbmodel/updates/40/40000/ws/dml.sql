@@ -915,7 +915,7 @@ VALUES('ve_node_pressure_meter', 'tab_data', 'Data', 'Data', 'role_basic', NULL,
 
 -- 14/10/24
 INSERT INTO sys_message (id,error_message,hint_message,log_level,show_user,project_type,"source")
-	VALUES (3270,'The selected arc is not directly connected to the specified node. Please ensure the arc is directly linked to the node and select one that meets this requirement.','Select one arc that is connected to the selected node',2,true,'utils','core');
+	VALUES (3272,'The selected arc is not directly connected to the specified node. Please ensure the arc is directly linked to the node and select one that meets this requirement.','Select one arc that is connected to the selected node',2,true,'utils','core');
 
 
 UPDATE config_form_fields SET columnname='arc_type', "label"='arc_type', tooltip='arc_type' WHERE formname='cat_arc' AND formtype='form_feature' AND columnname='arctype_id' AND tabname='tab_none';
