@@ -31,8 +31,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>574</width>
-         <height>652</height>
+         <width>578</width>
+         <height>666</height>
         </rect>
        </property>
        <layout class="QGridLayout" name="gridLayout_5">
@@ -929,15 +929,11 @@
      </widget>
     </item>
     <item row="3" column="0">
-     <layout class="QHBoxLayout" name="horizontalLayout_2">
-      <item>
-       <widget class="QLabel" name="lbl_time">
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
-      <item>
+     <layout class="QGridLayout" name="lyt_buttons">
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <item row="0" column="1">
        <spacer name="horizontalSpacer">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -950,21 +946,28 @@
         </property>
        </spacer>
       </item>
-      <item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="lbl_time">
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
        <widget class="QPushButton" name="btn_accept">
         <property name="text">
          <string>OK</string>
         </property>
        </widget>
       </item>
-      <item>
+      <item row="0" column="3">
        <widget class="QPushButton" name="btn_cancel_task">
         <property name="text">
          <string>Cancel task</string>
         </property>
        </widget>
       </item>
-      <item>
+      <item row="0" column="4">
        <widget class="QPushButton" name="btn_cancel">
         <property name="text">
          <string>Cancel</string>
@@ -993,11 +996,13 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionMincut"/>
+   <addaction name="actionAddConnec"/>
+   <addaction name="actionAddHydrometer"/>
+   <addaction name="separator"/>
    <addaction name="actionCustomMincut"/>
    <addaction name="actionChangeValveStatus"/>
    <addaction name="actionRefreshMincut"/>
-   <addaction name="actionAddConnec"/>
-   <addaction name="actionAddHydrometer"/>
+   <addaction name="separator"/>
    <addaction name="actionComposer"/>
    <addaction name="actionExportHydroCsv"/>
   </widget>
@@ -1152,9 +1157,6 @@
   <tabstop>scrollArea</tabstop>
   <tabstop>tbl_hydro</tabstop>
   <tabstop>txt_infolog</tabstop>
-  <tabstop>btn_accept</tabstop>
-  <tabstop>btn_cancel_task</tabstop>
-  <tabstop>btn_cancel</tabstop>
  </tabstops>
  <resources/>
  <connections/>

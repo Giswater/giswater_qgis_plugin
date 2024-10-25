@@ -25,10 +25,6 @@ class GwCatalog:
     def open_catalog(self, previous_dialog, widget_name, feature_type, child_type):
         """ Main function of catalog """
 
-        # Manage if feature_type is gully and set grate
-        if feature_type == 'gully':
-            feature_type = 'grate'
-
         form_name = 'upsert_catalog_' + feature_type + ''
         form = f'"formName":"{form_name}", "tabName":"data", "editable":"TRUE"'
         feature = f'"feature_type":"{child_type}"'

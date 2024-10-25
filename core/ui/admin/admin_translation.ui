@@ -111,8 +111,8 @@
     </spacer>
    </item>
    <item row="11" column="1">
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
+    <layout class="QGridLayout" name="lyt_buttons">
+     <item row="0" column="0">
       <spacer name="horizontalSpacer">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -125,14 +125,14 @@
        </property>
       </spacer>
      </item>
-     <item>
+     <item row="0" column="1">
       <widget class="QPushButton" name="btn_translate">
        <property name="text">
         <string>Translate</string>
        </property>
       </widget>
      </item>
-     <item>
+     <item row="0" column="2">
       <widget class="QPushButton" name="btn_close">
        <property name="text">
         <string>Close</string>

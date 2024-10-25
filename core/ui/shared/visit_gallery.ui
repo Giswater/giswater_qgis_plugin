@@ -254,38 +254,6 @@
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QPushButton" name="btn_previous">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="geometry">
-    <rect>
-     <x>220</x>
-     <y>550</y>
-     <width>75</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string/>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="btn_next">
-   <property name="enabled">
-    <bool>true</bool>
-   </property>
-   <property name="geometry">
-    <rect>
-     <x>320</x>
-     <y>550</y>
-     <width>75</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string/>
-   </property>
-  </widget>
   <widget class="QLineEdit" name="visit_id">
    <property name="enabled">
     <bool>false</bool>
@@ -310,19 +278,6 @@
    </property>
    <property name="text">
     <string>Visit id: </string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="btn_close">
-   <property name="geometry">
-    <rect>
-     <x>510</x>
-     <y>550</y>
-     <width>75</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Close</string>
    </property>
   </widget>
   <widget class="QLineEdit" name="event_id">
@@ -350,6 +305,58 @@
    <property name="text">
     <string>Event id: </string>
    </property>
+  </widget>
+  <widget class="QWidget" name="gridLayoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>540</y>
+     <width>581</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <layout class="QGridLayout" name="lyt_buttons">
+    <item row="0" column="0">
+     <widget class="QPushButton" name="btn_previous">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QPushButton" name="btn_next">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="2">
+     <spacer name="horizontalSpacer">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>40</width>
+        <height>20</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item row="0" column="3">
+     <widget class="QPushButton" name="btn_close">
+      <property name="text">
+       <string>Close</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
   </widget>
  </widget>
  <resources/>

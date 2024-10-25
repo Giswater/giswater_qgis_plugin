@@ -30,67 +30,7 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout_4">
-    <item row="5" column="0" colspan="16">
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <item>
-       <widget class="QLabel" name="lbl_status">
-        <property name="enabled">
-         <bool>true</bool>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="pixmap">
-         <pixmap>../../../Desktop/Edgar/READ SQL/images/status_ok.png</pixmap>
-        </property>
-        <property name="scaledContents">
-         <bool>false</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="lbl_schema_name">
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="lbl_status_text">
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <spacer name="horizontalSpacer_2">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item>
-       <widget class="QPushButton" name="btn_close">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string>Close</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </item>
-    <item row="3" column="0" colspan="16">
+    <item row="3" column="0" colspan="2">
      <widget class="QTabWidget" name="tab_main">
       <property name="enabled">
        <bool>true</bool>
@@ -113,8 +53,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>509</width>
-             <height>807</height>
+             <width>501</width>
+             <height>790</height>
             </rect>
            </property>
            <layout class="QGridLayout" name="gridLayout_11">
@@ -153,35 +93,6 @@
                   </widget>
                  </item>
                 </layout>
-               </item>
-              </layout>
-             </widget>
-            </item>
-            <item row="0" column="0">
-             <widget class="QGroupBox" name="grb_conection">
-              <property name="title">
-               <string>Connection</string>
-              </property>
-              <layout class="QGridLayout" name="gridLayout_2">
-               <item row="1" column="0" colspan="2">
-                <widget class="QComboBox" name="cmb_connection">
-                 <property name="enabled">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="0" colspan="2">
-                <widget class="QLabel" name="lbl_connection">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="text">
-                  <string>Connection name:</string>
-                 </property>
-                </widget>
                </item>
               </layout>
              </widget>
@@ -360,9 +271,98 @@
               </layout>
              </widget>
             </item>
+            <item row="0" column="0">
+             <widget class="QGroupBox" name="grb_conection">
+              <property name="title">
+               <string>Connection</string>
+              </property>
+              <layout class="QGridLayout" name="gridLayout_2">
+               <item row="1" column="0" colspan="2">
+                <widget class="QComboBox" name="cmb_connection">
+                 <property name="enabled">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="0" colspan="2">
+                <widget class="QLabel" name="lbl_connection">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="text">
+                  <string>Connection name:</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
            </layout>
           </widget>
          </widget>
+        </item>
+        <item row="1" column="1">
+         <layout class="QGridLayout" name="lyt_buttons">
+          <item row="0" column="2">
+           <widget class="QLabel" name="lbl_status_text">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLabel" name="lbl_schema_name">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="lbl_status">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="pixmap">
+             <pixmap>../../../Desktop/Edgar/READ SQL/images/status_ok.png</pixmap>
+            </property>
+            <property name="scaledContents">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="3">
+           <spacer name="horizontalSpacer_2">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="0" column="4">
+           <widget class="QPushButton" name="btn_close">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string>Close</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
        </layout>
       </widget>
@@ -381,8 +381,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>509</width>
-             <height>807</height>
+             <width>501</width>
+             <height>827</height>
             </rect>
            </property>
            <layout class="QGridLayout" name="gridLayout_12">
@@ -576,8 +576,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>509</width>
-             <height>807</height>
+             <width>501</width>
+             <height>827</height>
             </rect>
            </property>
            <layout class="QGridLayout" name="gridLayout_20">

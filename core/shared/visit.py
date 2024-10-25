@@ -12,7 +12,7 @@ from functools import partial
 from qgis.PyQt.QtCore import Qt, QDate, QStringListModel, pyqtSignal, QDateTime, QObject
 from qgis.PyQt.QtGui import QStandardItemModel, QStandardItem
 from qgis.PyQt.QtSql import QSqlTableModel
-from qgis.PyQt.QtWidgets import QAbstractItemView, QDialogButtonBox, QCompleter, QLineEdit, QFileDialog, QTableView, \
+from qgis.PyQt.QtWidgets import QAbstractItemView, QCompleter, QLineEdit, QFileDialog, QTableView, \
     QTextEdit, QPushButton, QComboBox, QTabWidget, QDateEdit, QDateTimeEdit
 
 from .document import GwDocument
@@ -143,9 +143,10 @@ class GwVisit(QObject):
 
         # tab events
         self.tabs = self.dlg_add_visit.findChild(QTabWidget, 'tab_widget')
-        self.button_box = self.dlg_add_visit.findChild(QDialogButtonBox, 'button_box')
+        self.dlg_add_visit.btn_accept.clicked.connect(self._manage_accepted)
+        self.dlg_add_visit.btn_cancel.clicked.connect(self.dlg_add_visit.reject)
         if visit_id is None:
-            self.button_box.button(QDialogButtonBox.Ok).setEnabled(False)
+            self.dlg_add_visit.btn_accept.setEnabled(False)
 
         # Tab 'Data'/'Visit'
         self.visit_id = self.dlg_add_visit.findChild(QLineEdit, "visit_id")
@@ -493,8 +494,8 @@ class GwVisit(QObject):
         self.dlg_add_visit.btn_event_update.clicked.connect(self._event_update)
         self.tabs.currentChanged.connect(partial(self._manage_tab_changed, self.dlg_add_visit))
         self.visit_id.textChanged.connect(partial(self._manage_visit_id_change, self.dlg_add_visit))
-        self.dlg_add_visit.btn_doc_insert.clicked.connect(self._document_insert)
-        self.dlg_add_visit.btn_doc_delete.clicked.connect(self._document_delete)
+        self.dlg_add_visit.btn_doc_insert.clicked.connect(partial(self._document_insert, self.dlg_add_visit))
+        self.dlg_add_visit.btn_doc_delete.clicked.connect(partial(self._document_delete, self.dlg_add_visit))
         self.dlg_add_visit.btn_doc_new.clicked.connect(self._manage_document)
         self.dlg_add_visit.btn_open_doc.clicked.connect(partial(tools_qt.document_open, self.tbl_document, 'path'))
         self.tbl_document.doubleClicked.connect(partial(tools_qt.document_open, self.tbl_document, 'path'))
@@ -599,7 +600,7 @@ class GwVisit(QObject):
         if layer:
             layer.dataProvider().reloadData()
         tools_qgis.refresh_map_canvas()
-
+        self.dlg_add_visit.close()
 
     def _execute_pgfunction(self):
         """ Execute function 'gw_fct_om_visit_multiplier' """
@@ -1262,7 +1263,7 @@ class GwVisit(QObject):
         self.dlg_add_visit.doc_id.setCompleter(self.completer)
         model = QStringListModel()
 
-        sql = "SELECT DISTINCT(id) FROM v_ui_document"
+        sql = "SELECT DISTINCT(name) FROM v_ui_doc ORDER BY name"
         rows = tools_db.get_rows(sql)
         values = []
         if rows:
@@ -1347,7 +1348,10 @@ class GwVisit(QObject):
         self.dlg_event.btn_delete_file.clicked.connect(
             partial(self._delete_files, self.dlg_event.tbl_docs_x_event, event.visit_id, event.id))
 
+        self.dlg_event.btn_accept.clicked.connect(self.dlg_event.accept)
+        self.dlg_event.btn_cancel.clicked.connect(self.dlg_event.reject)
         self.dlg_event.setWindowFlags(Qt.WindowStaysOnTopHint)
+        tools_gw.add_btn_help(self.dlg_event)
         tools_qt.manage_translation(dlg_name, self.dlg_event)
         ret = self.dlg_event.exec_()
 
@@ -1507,8 +1511,7 @@ class GwVisit(QObject):
         A) if some record is available => enable OK button of VisitDialog """
 
         state = (self.tbl_event.model().rowCount() > 0)
-        self.button_box.button(QDialogButtonBox.Ok).setEnabled(state)
-
+        self.dlg_add_visit.btn_accept.setEnabled(state)
 
     def _event_update(self):
         """ Update selected event. """
@@ -1724,18 +1727,38 @@ class GwVisit(QObject):
         self._manage_events_changed()
 
 
-    def _document_insert(self):
+    def _document_insert(self, dialog):
         """ Insert a document related to the current visit. """
 
-        doc_id = self.doc_id.text()
+        doc_name = self.doc_id.text()
         visit_id = self.visit_id.text()
-        if not doc_id:
-            message = "You need to insert doc_id"
-            tools_qgis.show_warning(message, dialog=self.dlg_add_visit)
+        if not doc_name:
+            message = "You need to insert a document name"
+            tools_qgis.show_warning(message, dialog=dialog)
             return
         if not visit_id:
             message = "You need to insert visit_id"
-            tools_qgis.show_warning(message, dialog=self.dlg_add_visit)
+            tools_qgis.show_warning(message, dialog=dialog)
+            return
+
+        # Get doc_id using doc_name
+        sql = f"SELECT id FROM doc WHERE name = '{doc_name}'"
+        row = tools_db.get_row(sql)
+        if not row:
+            message = "Document name not found"
+            tools_qgis.show_warning(message, dialog=dialog)
+            return
+
+        doc_id = row['id']
+
+        # Check if document already exists
+        sql = (f"SELECT doc_id"
+               f" FROM doc_x_visit"
+               f" WHERE doc_id = '{doc_id}' AND visit_id = '{visit_id}'")
+        row = tools_db.get_row(sql)
+        if row:
+            msg = "Document already exists"
+            tools_qgis.show_warning(msg, dialog=dialog)
             return
 
         # Insert into new table
@@ -1744,19 +1767,20 @@ class GwVisit(QObject):
         status = tools_db.execute_sql(sql)
         if status:
             message = "Document inserted successfully"
-            tools_qgis.show_info(message, dialog=self.dlg_add_visit)
+            tools_qgis.show_info(message, dialog=dialog)
 
         self.dlg_add_visit.tbl_document.model().select()
+        self.doc_id.clear()
 
 
-    def _document_delete(self):
+    def _document_delete(self, dialog):
         """ Delete a document from the current visit. """
 
         # Get selected rows. 0 is the column of the pk 0 'id'
         selected_list = self.tbl_document.selectionModel().selectedRows(0)
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_qt.show_info_box(message)
+            tools_qgis.show_warning(message, dialog=dialog)
             return
 
         selected_id = []
@@ -1773,7 +1797,7 @@ class GwVisit(QObject):
             status = tools_db.execute_sql(sql)
             if status:
                 message = "Documents deleted successfully"
-                tools_qgis.show_info(message, dialog=self.dlg_add_visit)
+                tools_qgis.show_info(message, dialog=dialog)
 
             self.tbl_document.model().select()
 

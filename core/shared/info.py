@@ -31,7 +31,7 @@ from .document import GwDocument
 from .element import GwElement
 from .visit_gallery import GwVisitGallery
 from .visit import GwVisit
-
+from .workcat import GwWorkcat
 from ..utils import tools_gw, tools_backend_calls
 from ..threads.toggle_valve_state import GwToggleValveTask
 
@@ -374,7 +374,7 @@ class GwInfo(QObject):
         for field in result['fields']:
             if 'hidden' in field and field['hidden']:
                 continue
-            if 'layoutname' in field and field['layoutname'] == 'lyt_none':
+            if 'layoutname' in field and field['layoutname'] in ('lyt_none', 'lyt_buttons'):
                 continue
             if field.get('tabname') not in ('tab_data', 'tab_none'):
                 continue
@@ -434,9 +434,9 @@ class GwInfo(QObject):
                 pass
         finally:
             action_edit.setEnabled(is_enabled)
-
-        action_edit.triggered.connect(partial(self._manage_edition, self.dlg_generic, action_edit, fid, new_feature, True))
-        action_edit.setChecked(layer.isEditable() and can_edit)
+        action_edit.triggered.connect(partial(self._manage_edition, self.dlg_generic, action_edit, fid, new_feature, generic=True))
+        if layer:
+            action_edit.setChecked(layer.isEditable() and can_edit)
 
         # Signals
         self.dlg_generic.btn_accept.clicked.connect(partial(
@@ -827,11 +827,10 @@ class GwInfo(QObject):
         child_type = complet_result['body']['feature']['childType']
 
         # Actions signals
-        self.action_edit.triggered.connect(partial(self._manage_edition, dlg_cf, self.action_edit, fid, new_feature, False))
+        self.action_edit.triggered.connect(partial(self._manage_edition, dlg_cf, self.action_edit, fid, new_feature, generic=False))
+        self.dlg_cf.btn_apply.clicked.connect(partial(self._manage_edition, dlg_cf, self.action_edit, fid, new_feature, False, from_apply=True))
         self.action_catalog.triggered.connect(partial(self._open_catalog, tab_type, self.feature_type, child_type))
-        self.action_workcat.triggered.connect(
-            partial(self._get_catalog, 'new_workcat', self.tablename, child_type, self.feature_id, list_points,
-                    id_name))
+        self.action_workcat.triggered.connect(partial(GwWorkcat(self.iface, self.canvas).create_workcat))
         self.action_mapzone.triggered.connect(
             partial(self._get_catalog, 'new_mapzone', self.tablename, child_type, self.feature_id, list_points,
                     id_name))
@@ -1599,13 +1598,12 @@ class GwInfo(QObject):
                 pass
 
 
-    def _manage_edition(self, dialog, action_edit, fid, new_feature=None, generic=False):
+    def _manage_edition(self, dialog, action_edit, fid, new_feature=None, generic=False, from_apply=False):
 
         # With the editing QAction we need to collect the last modified value (self.get_last_value()),
         # since the "editingFinished" signals of the widgets are not detected.
         # Therefore whenever the cursor enters a widget, it will ask if we want to save changes
-
-        if not action_edit.isChecked():
+        if not action_edit.isChecked() or from_apply:
             self._get_last_value(dialog, generic)
             if str(self.my_json) == '{}' and str(self.my_json_epa) == '{}':
                 tools_qt.set_action_checked(action_edit, False)
@@ -1629,6 +1627,11 @@ class GwInfo(QObject):
             if save and accepted:
                 self._reload_epa_tab(dialog)
                 self._reset_my_json()
+            if from_apply:
+                action_edit.setChecked(True)
+                tools_gw.enable_all(dialog, self.complet_result['body']['data'])
+                if self.epa_complet_result:
+                    tools_gw.enable_all(dialog, self.epa_complet_result['body']['data'])
         else:
             tools_qt.set_action_checked(action_edit, True)
             tools_gw.enable_all(dialog, self.complet_result['body']['data'])
@@ -1822,6 +1825,10 @@ class GwInfo(QObject):
                         new_feature.setAttribute(k, v)
                         _json.pop(k, None)
 
+                epa_type = tools_qt.get_text(dialog, 'tab_data_epa_type')
+                if epa_type != 'null':
+                    _json['epa_type'] = epa_type
+
                 if not self.layer_new_feature.isEditable():
                     self.layer_new_feature.startEditing()
                 self.layer_new_feature.updateFeature(new_feature)
@@ -1884,9 +1891,7 @@ class GwInfo(QObject):
                 return False
 
             if clear_json:
-                _json = {}
-
-            self._reset_my_json(False)
+                _json.clear()
 
             if "Accepted" in json_result['status']:
                 msg_text = json_result['message']['text']
@@ -1963,8 +1968,7 @@ class GwInfo(QObject):
         try:
             actions_list = dialog.findChildren(QAction)
             static_actions = ('actionEdit', 'actionCentered', 'actionLink', 'actionHelp',
-                              'actionSection', 'actionSetToArc',
-                              'actionOrifice', 'actionOutlet', 'actionPump', 'actionWeir', 'actionDemand')
+                              'actionSection', 'actionOrifice', 'actionOutlet', 'actionPump', 'actionWeir', 'actionDemand')
 
             for action in actions_list:
                 if action.objectName() not in static_actions:
@@ -2134,17 +2138,23 @@ class GwInfo(QObject):
 
         # Manage change epa_type message
         if _json.get('epa_type'):
-
-            widget_epatype = dialog.findChild(QComboBox, 'tab_data_epa_type')
-            message = "You are going to change the epa_type. With this operation you will lose information about " \
-                        "current epa_type values of this object. Would you like to continue?"
-            title = "Change epa_type"
-            answer = tools_qt.show_question(message, title)
-            if not answer:
-                widget_epatype.blockSignals(True)
-                tools_qt.set_combo_value(widget_epatype, self.epa_type, 1)
-                widget_epatype.blockSignals(False)
-                return
+            if new_feature is None:
+                can_edit = tools_os.set_boolean(tools_db.check_role_user('role_epa'))
+                if not can_edit:
+                    message = "You are not enabled to modify this epa_type widget"
+                    title = "Change epa_type"
+                    tools_qt.show_info_box(message, title)
+                    return
+                widget_epatype = dialog.findChild(QComboBox, 'tab_data_epa_type')
+                message = "You are going to change the epa_type. With this operation you will lose information about " \
+                            "current epa_type values of this object. Would you like to continue?"
+                title = "Change epa_type"
+                answer = tools_qt.show_question(message, title)
+                if not answer:
+                    widget_epatype.blockSignals(True)
+                    tools_qt.set_combo_value(widget_epatype, self.epa_type, 1)
+                    widget_epatype.blockSignals(False)
+                    return
             self.epa_type = _json.get('epa_type')
 
         # Call accept fct
@@ -2283,18 +2293,7 @@ class GwInfo(QObject):
         if widget.property('isfilter'): return widget
         if widget.property('widgetcontrols') is not None and 'saveValue' in widget.property('widgetcontrols'):
             if widget.property('widgetcontrols')['saveValue'] is False: return widget
-
-        if self._check_tab_data(field):  # Tab data
-            if field['isautoupdate'] and self.new_feature_id is None:
-                _json = {}
-                widget.currentIndexChanged.connect(partial(self._clean_my_json, widget))
-                widget.currentIndexChanged.connect(partial(tools_gw.get_values, dialog, widget, _json))
-                widget.currentIndexChanged.connect(partial(self._accept_auto_update, dialog, self.complet_result, _json, widget, True, False, new_feature=new_feature))
-            else:
-                widget.currentIndexChanged.connect(partial(tools_gw.get_values, dialog, widget, self.my_json))
-        else:  # Other tabs
-            widget.currentIndexChanged.connect(partial(tools_gw.get_values, dialog, widget, self.my_json_epa))
-            # TODO: Make autoupdate widgets work
+        widget.currentIndexChanged.connect(partial(self._handle_combobox_change, widget, dialog, field))
 
         return widget
 
@@ -2365,6 +2364,21 @@ class GwInfo(QObject):
         return widget
 
 
+    def _handle_combobox_change(self, widget, dialog, field):
+        _json = {}
+        if self._check_tab_data(field):  # Tab data
+            if field['isautoupdate'] and self.new_feature_id is None:
+                self._clean_my_json(widget)
+                tools_gw.get_values(dialog, widget, _json)
+                self._accept_auto_update(dialog, self.complet_result, _json, widget, True, False,
+                                         new_feature=self.new_feature_id)
+            else:
+                tools_gw.get_values(dialog, widget, self.my_json)
+        else:  # Other tabs
+            tools_gw.get_values(dialog, widget, self.my_json_epa)
+            # TODO: Make autoupdate widgets work for other tabs as well
+
+
     def run_settopology(self, widget, **kwargs):
         """ Sets node_1/2 from lineedit & converts widget into button if function run successfully """
 
@@ -2401,14 +2415,7 @@ class GwInfo(QObject):
     def _open_catalog(self, tab_type, feature_type, child_type):
 
         self.catalog = GwCatalog()
-
-        # Check feature_type
-        if self.feature_type == 'connec':
-            widget = f'tab_{tab_type}_{self.feature_type}at_id'
-        elif self.feature_type == 'gully':
-            widget = f'tab_{tab_type}_gratecat_id'
-        else:
-            widget = f'tab_{tab_type}_{self.feature_type}cat_id'
+        widget = f'tab_{tab_type}_{self.feature_type}cat_id'
         self.catalog.open_catalog(self.dlg_cf, widget, feature_type, child_type)
 
 
@@ -2804,7 +2811,7 @@ class GwInfo(QObject):
             widget = tools_gw.add_tableview_header(widget, field)
             widget = tools_gw.fill_tableview_rows(widget, field)
             tools_qt.set_tableview_config(widget, edit_triggers=QTableView.DoubleClicked, sectionResizeMode=0)
-            widget = tools_gw.set_tablemodel_config(dialog, widget, linkedobject, 1, True)
+            widget = tools_gw.set_tablemodel_config(dialog, widget, linkedobject, 1)
             if 'tab_epa' in widgetname:
                 widget.doubleClicked.connect(partial(epa_tbl_doubleClicked, widget, self.dlg_cf))
                 model = widget.model()
@@ -3041,7 +3048,6 @@ class GwInfo(QObject):
                 self.my_json[str(widget.property('columnname'))] = field['selectedId']
             elif type(widget) == QComboBox:
                 widget = tools_gw.fill_combo(widget, field)
-                tools_qt.set_combo_value(widget, field['selectedId'], 0)
                 widget.setProperty('selectedId', field['selectedId'])
                 self.my_json[str(widget.property('columnname'))] = field['selectedId']
 
@@ -3078,8 +3084,11 @@ class GwInfo(QObject):
         """ Get selected attribute from snapped feature """
 
         # @options{'key':['att to get from snapped feature', 'widget name destination']}
-        options = {'arc': ['arc_id', 'tab_data_arc_id'], 'node': ['node_id', 'tab_data_parent_id'],
-                   'set_to_arc': ['arc_id', '_set_to_arc']}
+        options = {
+                    'arc': ['arc_id', 'tab_data_arc_id'],
+                    'node': ['node_id', 'tab_data_parent_id'],
+                    'set_to_arc': ['arc_id', '_set_to_arc']
+                   }
 
         if event == Qt.RightButton:
             self._cancel_snapping_tool(dialog, action)
@@ -3149,6 +3158,9 @@ class GwInfo(QObject):
                 if 'level' in json_result['message']:
                     level = int(json_result['message']['level'])
                 tools_qgis.show_message(json_result['message']['text'], level)
+
+            # Refresh to_arc from tab_data
+            tools_qt.set_widget_text(self.dlg_cf, "tab_data_to_arc", feat_id)
 
             # Refresh tab epa
             epa_type = tools_qt.get_text(self.dlg_cf, 'tab_data_epa_type')
@@ -3391,7 +3403,7 @@ def open_epa_dlg(**kwargs):
 
         complet_list = get_list(view, id_name, feature_id)
         fill_tbl(complet_list, tbl, info, view, info.dlg)
-        tools_gw.set_tablemodel_config(info.dlg, tbl, view, schema_name=info.schema_name, isQStandardItemModel=True)
+        tools_gw.set_tablemodel_config(info.dlg, tbl, view, schema_name=info.schema_name)
         info.dlg.btn_accept.clicked.connect(partial(save_tbl_changes, view, info, info.dlg, pk))
 
         # Add & Delete buttons
@@ -3563,7 +3575,7 @@ def refresh_epa_tbl(tblview, dlg, **kwargs):
             view = tableview['view']
         complet_list = get_list(view, id_name, feature_id)
         fill_tbl(complet_list, tbl, info, view, dlg)
-        tools_gw.set_tablemodel_config(dlg, tbl, view, schema_name=info.schema_name, isQStandardItemModel=True)
+        tools_gw.set_tablemodel_config(dlg, tbl, view, schema_name=info.schema_name)
 
 
 def reload_tbl_dscenario(info, tablename, tableview, id_name, feature_id):
@@ -4136,10 +4148,10 @@ def new_visit(**kwargs):
         tools_qgis.show_warning(msg)
         return
 
-    date_event_from = dlg_cf.tab_event.findChild(QgsDateTimeEdit, "date_event_from")
-    date_event_to = dlg_cf.tab_event.findChild(QgsDateTimeEdit, "date_event_to")
+    date_event_from = dlg_cf.tab_event.findChild(QgsDateTimeEdit, "tab_event_date_event_from")
+    date_event_to = dlg_cf.tab_event.findChild(QgsDateTimeEdit, "tab_event_date_event_to")
 
-    tbl_event_cf = dlg_cf.findChild(QTableView, "tbl_event_cf")
+    tbl_event_cf = dlg_cf.findChild(QTableView, "tab_event_tbl_event_cf")
     manage_visit = GwVisit()
     manage_visit.visit_added.connect(partial(_update_visit_table, feature_type, date_event_from, date_event_to, tbl_event_cf))
     # TODO: the following query fix a (for me) misterious bug
@@ -4155,7 +4167,6 @@ def _update_visit_table(feature_type, date_event_from, date_event_to, tbl_event_
     """ Convenience fuction set as slot to update table after a Visit GUI close. """
     table_name = "v_ui_event_x_" + feature_type
     tools_gw.set_dates_from_to(date_event_from, date_event_to, table_name, 'visit_start', 'visit_end')
-    tbl_event_cf.model().select()
 
 
 def open_visit_document(**kwargs):

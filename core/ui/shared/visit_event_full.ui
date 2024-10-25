@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>393</width>
-    <height>631</height>
+    <height>754</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -239,12 +239,29 @@
      </widget>
     </widget>
    </item>
-   <item row="1" column="1">
-    <widget class="QPushButton" name="btn_close">
-     <property name="text">
-      <string>Close</string>
-     </property>
-    </widget>
+   <item row="2" column="0" colspan="2">
+    <layout class="QGridLayout" name="lyt_buttons">
+     <item row="0" column="1">
+      <widget class="QPushButton" name="btn_close">
+       <property name="text">
+        <string>Close</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>

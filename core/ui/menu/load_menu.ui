@@ -15,17 +15,28 @@
   </property>
   <layout class="QGridLayout" name="gridLayout_2">
    <item row="1" column="1">
-    <spacer name="horizontalSpacer_2">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>40</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
+    <layout class="QGridLayout" name="lyt_buttons">
+     <item row="0" column="0">
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item row="0" column="1">
+      <widget class="QPushButton" name="btn_close">
+       <property name="text">
+        <string>Close</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item row="0" column="0" colspan="3">
     <widget class="QTreeWidget" name="tree_config_files">
@@ -34,13 +45,6 @@
        <string notr="true">1</string>
       </property>
      </column>
-    </widget>
-   </item>
-   <item row="1" column="2">
-    <widget class="QPushButton" name="btn_close">
-     <property name="text">
-      <string>Close</string>
-     </property>
     </widget>
    </item>
   </layout>

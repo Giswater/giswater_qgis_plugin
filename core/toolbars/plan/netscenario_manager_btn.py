@@ -79,8 +79,6 @@ class GwNetscenarioManagerButton(GwAction):
         self.dlg_netscenario_manager.btn_execute.clicked.connect(partial(self._execute_current_netscenario))
         self.dlg_netscenario_manager.btn_delete.clicked.connect(partial(self._delete_selected_netscenario))
         self.dlg_netscenario_manager.btn_delete.clicked.connect(partial(tools_gw.refresh_selectors))
-        self.tbl_netscenario.doubleClicked.connect(partial(self._update_current_netscenario,
-                                                           self.dlg_netscenario_manager, self.tbl_netscenario))
         self.tbl_netscenario.doubleClicked.connect(self._open_netscenario)
         self.dlg_netscenario_manager.btn_update_netscenario.clicked.connect(
             partial(self._update_current_netscenario, self.dlg_netscenario_manager, self.tbl_netscenario))
@@ -737,7 +735,7 @@ class GwNetscenarioManagerButton(GwAction):
 
         # Get layers to add
         lyr_filter = "%plan_netscenario_%"
-        sql = f"SELECT id, alias, style_id, addparam FROM sys_table WHERE id LIKE '{lyr_filter}' AND alias IS NOT NULL"
+        sql = f"SELECT id, alias, addparam FROM sys_table WHERE id LIKE '{lyr_filter}' AND alias IS NOT NULL"
         rows = tools_db.get_rows(sql)
         if rows:
             # LOAD ALL
@@ -750,13 +748,10 @@ class GwNetscenarioManagerButton(GwAction):
             main_menu.addAction(widgetAction)
 
             # LAYERS
-            for tablename, alias, style_id, addparam in rows:
+            for tablename, alias, addparam in rows:
                 # Manage alias
                 if not alias:
                     alias = tablename.replace('plan_netscenario_', '').replace('_', ' ').capitalize()
-                # Manage style_id
-                if not style_id:
-                    style_id = "-1"
                 # Manage pkey
                 pk = "id"
                 if addparam:
@@ -779,7 +774,7 @@ class GwNetscenarioManagerButton(GwAction):
                 widget.setStyleSheet("margin: 5px 5px 5px 8px;")
 
                 widgetAction.defaultWidget().stateChanged.connect(
-                    partial(self._check_action_ischecked, tablename, the_geom, pk, style_id, alias.strip()))
+                    partial(self._check_action_ischecked, tablename, the_geom, pk, -1, alias.strip()))
 
         main_menu.exec_(click_point)
 

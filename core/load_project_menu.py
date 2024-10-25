@@ -254,6 +254,8 @@ class GwMenuLoad(QObject):
             section = item.parent().text(0)
             parameter = item.text(1)
             value = item.text(2)
+            if value == '':
+                value = "None"
             tools_gw.set_config_parser(section, parameter, value, file_name=file_name, prefix=False, chk_user_params=False)
 
 

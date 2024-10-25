@@ -46,7 +46,7 @@ class GwLoadProject(QObject):
 
         # Check if loaded project is valid for Giswater
         if not self._check_project(show_warning):
-            return
+            return False
 
         # Force commit before opening project and set new database connection
         if not self._check_database_connection(show_warning):
@@ -142,9 +142,6 @@ class GwLoadProject(QObject):
         force_tab_expl = tools_gw.get_config_parser('system', 'force_tab_expl', 'user', 'init', prefix=False)
         if tools_os.set_boolean(force_tab_expl, False):
             self._force_tab_exploitation()
-
-        # Manage epa POV
-        tools_gw.set_epa_world(False, is_init=True)
 
         # Set lib_vars.project_epsg
         lib_vars.project_epsg = tools_qgis.get_epsg()
@@ -250,6 +247,7 @@ class GwLoadProject(QObject):
         lib_vars.project_vars['project_role'] = tools_qgis.get_project_variable('gwProjectRole')
         lib_vars.project_vars['project_type'] = tools_qgis.get_project_variable('gwProjectType')
         lib_vars.project_vars['store_credentials'] = tools_qgis.get_project_variable('gwStoreCredentials')
+        lib_vars.project_vars['current_style'] = tools_qgis.get_project_variable('gwCurrentStyle')
 
 
     def _get_user_variables(self):
@@ -510,7 +508,7 @@ class GwLoadProject(QObject):
             self._enable_toolbar("epa")
             self._hide_button("308", False)
 
-        elif lib_vars.project_vars['project_role'] == 'role_master' or lib_vars.project_vars['project_role'] == 'role_admin':
+        elif lib_vars.project_vars['project_role'] == 'role_master' or lib_vars.project_vars['project_role'] == 'role_admin' or lib_vars.project_vars['project_role'] == 'role_system':
             self._enable_toolbar("om")
             self._enable_toolbar("edit")
             self._enable_toolbar("cad")

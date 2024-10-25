@@ -1,8 +1,9 @@
 dwfscenario_id;node_id;value;pat1;pat2;pat3;pat4
-1;1001;0,0001;pattern_11;pattern_12 ;pattern_13;pattern_14
-1;1002;0,0001;pattern_11;pattern_12 ;pattern_13;pattern_14
-1;1003;0,0001;pattern_11;pattern_12 ;pattern_13;pattern_14
-1;1004;0,0001;pattern_11;pattern_12 ;pattern_13;pattern_14
-1;1005;0,0001;pattern_11;pattern_12 ;pattern_13;pattern_14
-1;1006;0,0001;pattern_11;pattern_12 ;pattern_13;pattern_14
-1;1007;0,0001;pattern_11;pattern_12 ;pattern_13;pattern_14
+2;236;0,0001;pattern_11;pattern_12 ;pattern_13;pattern_14
+2;301;0,0001;pattern_11;pattern_12 ;pattern_13;pattern_14
+2;302;0,0001;pattern_11;pattern_12 ;pattern_13;pattern_14
+2;20593;0,0001;pattern_11;pattern_12 ;pattern_13;pattern_14
+2;18973;0,0001;pattern_11;pattern_12 ;pattern_13;pattern_14
+2;50;0,0001;pattern_11;pattern_12 ;pattern_13;pattern_14
+2;78;0,0001;pattern_11;pattern_12 ;pattern_13;pattern_14
+

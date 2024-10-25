@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>427</width>
-    <height>200</height>
+    <height>206</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -146,7 +146,7 @@
      </layout>
     </item>
     <item row="7" column="0" colspan="4">
-     <layout class="QGridLayout" name="gridLayout_2">
+     <layout class="QGridLayout" name="lyt_buttons">
       <item row="0" column="0">
        <spacer name="horizontalSpacer">
         <property name="orientation">

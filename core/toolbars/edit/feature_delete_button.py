@@ -243,8 +243,11 @@ class GwFeatureDeleteButton(GwAction):
             # Get selected features of the layer
             features = layer.selectedFeatures()
             for feature in features:
-                # Append 'feature_id' into the list
-                selected_id = feature.attribute(field_id)
+                try:
+                    # Append 'feature_id' into the list
+                    selected_id = feature.attribute(field_id)
+                except Exception:
+                    pass
 
             if selected_id:
                 tools_qt.set_widget_text(self.dlg_feature_delete, self.dlg_feature_delete.feature_id, str(selected_id))

@@ -12,7 +12,7 @@ import os
 
 from .task import GwTask
 from ..utils import tools_gw
-from ...libs import tools_qt, tools_log
+from ...libs import tools_qt, tools_log, tools_os, tools_db, tools_qgis
 
 
 class GwCreateSchemaTask(GwTask):
@@ -56,7 +56,7 @@ class GwCreateSchemaTask(GwTask):
         self.admin.progress_value = 0
         tools_log.log_info(f"Task 'Create schema' execute function 'def main_execution'")
         status = self.main_execution()
-        if not status:
+        if not tools_os.set_boolean(status, False):
             tools_log.log_info("Function main_execution returned False")
             return False
         tools_log.log_info(f"Task 'Create schema' execute function 'def custom_execution'")
@@ -85,6 +85,7 @@ class GwCreateSchemaTask(GwTask):
             if self.db_exception is not None:
                 error, sql, filepath = self.db_exception
                 tools_qt.manage_exception_db(error, sql, filepath=filepath)
+                tools_db.dao.rollback()
             return
 
         # Handle exception
@@ -132,28 +133,31 @@ class GwCreateSchemaTask(GwTask):
         tools_log.log_info(f"Number of SQL files 'TOTAL': {self.admin.total_sql_files}")
 
         status = self.admin.load_base(self.dict_folders_process['load_base'])
-        if (not status and self.admin.dev_commit is False) or self.isCanceled():
+        if (not tools_os.set_boolean(status, False) and tools_os.set_boolean(self.admin.dev_commit, False) is False) \
+                or self.isCanceled():
             return False
 
         status = self.admin.load_locale()
-        if (not status and self.admin.dev_commit is False) or self.isCanceled():
+        if (not tools_os.set_boolean(status, False) and tools_os.set_boolean(self.admin.dev_commit, False) is False) \
+                or self.isCanceled():
             return False
 
         status = self.admin.update_dict_folders(True, project_type, dict_update_folders=self.dict_folders_process['update_35to39'])
-        if (not status and self.admin.dev_commit is False) or self.isCanceled():
+        if (not tools_os.set_boolean(status, False) and tools_os.set_boolean(self.admin.dev_commit, False) is False) \
+                or self.isCanceled():
             return False
 
-        status = self.admin.load_childviews()
-        if (not status and self.admin.dev_commit is False) or self.isCanceled():
-            return False
+        # status = self.admin.load_childviews()
+        # if (not tools_os.set_boolean(status, False) and tools_os.set_boolean(self.admin.dev_commit, False) is False) \
+        #         or self.isCanceled():
+        #     return False
 
-        status = True
+        json_result = None
         if exec_last_process:
             tools_log.log_info("Execute function 'gw_fct_admin_schema_lastprocess'")
-            status = self.admin.execute_last_process(True, project_name_schema, self.admin.schema_type,
+            json_result = self.admin.execute_last_process(True, project_name_schema, self.admin.schema_type,
                                                      project_locale, project_srid)
-
-        if (not status and self.admin.dev_commit is False) or self.isCanceled():
+        if (not json_result or json_result['status'] == 'Failed' and tools_os.set_boolean(self.admin.dev_commit, False) is False) or self.isCanceled():
             return False
 
         return True
@@ -246,6 +250,7 @@ class GwCreateSchemaTask(GwTask):
 
         elif process_name == 'update_35to39':
             dict_folders[os.path.join(self.admin.folder_updates, '36')] = 0
+            dict_folders[os.path.join(self.admin.folder_updates, '40')] = 0
 
         return dict_folders
 

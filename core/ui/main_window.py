@@ -8,7 +8,7 @@ or (at your option) any later version.
 import os
 
 from qgis.PyQt import QtCore
-from qgis.PyQt.QtWidgets import QMainWindow, QShortcut, QSizePolicy
+from qgis.PyQt.QtWidgets import QMainWindow, QShortcut, QSizePolicy, QStackedLayout, QWidget
 from qgis.PyQt.QtGui import QKeySequence, QIcon
 
 from qgis.gui import QgsMessageBar
@@ -30,19 +30,27 @@ class GwMainWindow(QMainWindow):
         self.setupUi(self)
         # Create message bar
         try:
+            # Wrap the existing layout in a widget
+            main_widget = QWidget()
+            main_widget.setLayout(self.layout())
+
+            # Create a stacked layout to overlay the message bar
+            self.stacked_layout = QStackedLayout(self)
+            self.setLayout(self.stacked_layout)
+            self.stacked_layout.setStackingMode(1)
+
+            # Create the message bar
             self._messageBar = QgsMessageBar()
-            self.messageBar().setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
-            for idx in range(self.centralWidget().layout().count(), 0, -1):
-                item = self.centralWidget().layout().itemAt(idx - 1)
-                row, column, rowSpan, columnSpan = self.centralWidget().layout().getItemPosition(idx - 1)
-                if item is not None:
-                    self.centralWidget().layout().removeItem(item)
-                    if item.widget() is not None:
-                        self.centralWidget().layout().addWidget(item.widget(), row + 1, column, rowSpan, columnSpan)
-                    elif item.layout() is not None:
-                        self.centralWidget().layout().addLayout(item.layout(), row + 1, column, rowSpan, columnSpan)
-            self.centralWidget().layout().addWidget(self.messageBar(), 0, 0, 1, -1)
-        except Exception:
+            self._messageBar.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)  # Full width, fixed height
+            self._messageBar.setMaximumHeight(35)
+
+            # Add message bar to stacked layout
+            self.stacked_layout.addWidget(self._messageBar)
+
+            # Add the main widget to the stacked layout
+            self.stacked_layout.addWidget(main_widget)
+        except Exception as e:
+            print("Exception in GwMainWindow:", e)
             self._messageBar = global_vars.iface
 
         self.setProperty('class_obj', class_obj)

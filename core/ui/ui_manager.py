@@ -182,6 +182,10 @@ class GwFeatureReplaceUi(GwDialog, FORM_CLASS):
 FORM_CLASS = _get_ui_class('featuretype_change.ui', 'edit')
 class GwFeatureTypeChangeUi(GwDialog, FORM_CLASS):
     pass
+
+FORM_CLASS = _get_ui_class('workcat_manager.ui', 'edit')
+class GwWorkcatManagerUi(GwDialog, FORM_CLASS):
+    pass
 # endregion
 
 
@@ -265,10 +269,6 @@ FORM_CLASS = _get_ui_class('psector.ui', 'plan')
 class GwPsectorUi(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = _get_ui_class('price_manager.ui', 'plan')
-class GwPriceManagerUi(GwDialog, FORM_CLASS):
-    pass
-
 FORM_CLASS = _get_ui_class('psector_duplicate.ui', 'plan')
 class GwPsectorDuplicateUi(GwDialog, FORM_CLASS):
     pass
@@ -291,7 +291,6 @@ class GwReplaceArc(GwDialog, FORM_CLASS):
 
 FORM_CLASS = _get_ui_class('netscenario_manager.ui', 'plan')
 class GwNetscenarioManagerUi(GwDialog, FORM_CLASS):
-    pass
     pass
 
 FORM_CLASS = _get_ui_class('netscenario.ui', 'plan')
@@ -328,6 +327,14 @@ class GwCreateWorkspaceUi(GwDialog, FORM_CLASS):
 
 FORM_CLASS = _get_ui_class('mapzone_manager.ui', 'utilities')
 class GwMapzoneManagerUi(GwDialog, FORM_CLASS):
+    pass
+
+FORM_CLASS = _get_ui_class('style_manager.ui', 'utilities')
+class GwStyleManagerUi(GwDialog, FORM_CLASS):
+    pass
+
+FORM_CLASS = _get_ui_class('create_style_group.ui', 'utilities')
+class GwCreateStyleGroupUi(GwDialog, FORM_CLASS):
     pass
 
 FORM_CLASS = _get_ui_class('mapzone_config.ui', 'utilities')

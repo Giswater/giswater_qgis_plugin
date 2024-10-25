@@ -15,8 +15,8 @@
   </property>
   <layout class="QGridLayout" name="gridLayout_2">
    <item row="1" column="0">
-    <layout class="QHBoxLayout" name="horizontalLayout_18">
-     <item>
+    <layout class="QGridLayout" name="lyt_buttons">
+     <item row="0" column="0">
       <spacer name="horizontalSpacer_15">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -29,14 +29,14 @@
        </property>
       </spacer>
      </item>
-     <item>
+     <item row="0" column="1">
       <widget class="QPushButton" name="btn_accept">
        <property name="text">
         <string>Accept</string>
        </property>
       </widget>
      </item>
-     <item>
+     <item row="0" column="2">
       <widget class="QPushButton" name="btn_cancel">
        <property name="text">
         <string>Cancel</string>
@@ -65,8 +65,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>594</width>
-            <height>788</height>
+            <width>565</width>
+            <height>831</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout">
