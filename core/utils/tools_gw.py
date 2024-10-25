@@ -290,15 +290,25 @@ def add_btn_help(dlg):
     btn_help.setToolTip("Help")
     dlg.lyt_buttons.addWidget(btn_help, 0, dlg.lyt_buttons.columnCount())
 
-    btn_help.clicked.connect(partial(open_help_link, "test"))
+    # Get formtype, formname & tabname
+    formtype = dlg.property('formtype')
+    formname = dlg.property('formname')
+    tabname = 'tab_none'
+    tab_widgets = dlg.findChildren(QTabWidget, "")
+    if tab_widgets:
+        tab_widget = tab_widgets[0]
+        index_tab = tab_widget.currentIndex()
+        tabname = tab_widget.widget(index_tab).objectName()
+
+    btn_help.clicked.connect(partial(open_help_link, formtype, formname, tabname))
 
 
-def open_help_link(dlg_name):
+def open_help_link(formtype, formname, tabname):
     """ Opens the help link for the given dialog, or a default link if not found. """
 
     # Search url in DB
     # TODO: get formname, formtype & tabname
-    sql = f"SELECT path FROM config_form_help WHERE formtype = '{dlg_name}'"
+    sql = f"SELECT path FROM config_form_help WHERE formtype = '{formtype}' AND formname = '{formname}' AND tabname = '{tabname}'"
     rows = tools_db.get_rows(sql)
 
     if rows and rows[0]:
