@@ -104,17 +104,7 @@ BEGIN
         v_curr_featurecat = v_new_featurecat;
     END IF;
    
-   	if v_feature_type = 'connec' then
-   		v_sql := concat('SELECT json_build_object(
-	    ''location_type'', location_type,
-	    ''function_type'', function_type,
-	    ''fluid_type'', fluid_type,
-	    ''category_type'', category_type,
-		''',v_feature_type,'cat_id'', ',v_feature_type,'at_id
-	    ) AS combined_data
-	    FROM v_edit_', v_feature_type, ' WHERE ', v_feature_type, '_id = ''', v_feature_id, '''');
-   	else
-   		v_sql := concat('SELECT json_build_object(
+    v_sql := concat('SELECT json_build_object(
 	    ''location_type'', location_type,
 	    ''function_type'', function_type,
 	    ''fluid_type'', fluid_type,
@@ -122,7 +112,7 @@ BEGIN
 		''',v_feature_type,'cat_id'', ',v_feature_type,'cat_id
 	    ) AS combined_data
 	    FROM v_edit_', v_feature_type, ' WHERE ', v_feature_type, '_id = ''', v_feature_id, '''');
-   	end if;
+        
     EXECUTE v_sql INTO v_feature_type_values;
 
     -- SELECT array_agg( layoutname) into v_layouts FROM config_form_fields  WHERE formtype = 'form_featuretype_change';
