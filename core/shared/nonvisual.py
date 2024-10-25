@@ -842,9 +842,12 @@ class GwNonVisual:
         # Control data depending on curve type
         valid = True
         self.valid = (True, "")
-        if table.item(row, column):
-            valid = False
-            self.valid = NOT_VALID_NUMERIC
+        if table.item(row, column) is not None:
+            try:
+                float(table.item(row, column).data(0))
+            except ValueError:
+                valid = False
+                self.valid = NOT_VALID_NUMERIC
 
         if not valid:
             return
