@@ -107,9 +107,9 @@ class GwProjectLayersConfig(GwTask):
                 continue
             config = layer.editFormConfig()
             if Qgis.QGIS_VERSION_INT >= 33200:
-                config.setSuppress(QgsEditFormConfig.FeatureFormSuppress.Default)
+                config.setSuppress(QgsEditFormConfig.FeatureFormSuppress.SuppressOn)
             else:
-                config.setSuppress(0)
+                config.setSuppress(1)
             layer.setEditFormConfig(config)
 
 

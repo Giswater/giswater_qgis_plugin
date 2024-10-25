@@ -40,9 +40,9 @@ class GwDimensioningButton(GwMaptool):
             config = self.layer.editFormConfig()
             self.conf_supp = config.suppress()
             if Qgis.QGIS_VERSION_INT >= 33200:
-                config.setSuppress(QgsEditFormConfig.FeatureFormSuppress.Default)
+                config.setSuppress(QgsEditFormConfig.FeatureFormSuppress.SuppressOn)
             else:
-                config.setSuppress(0)
+                config.setSuppress(1)
             self.layer.setEditFormConfig(config)
 
             self.iface.setActiveLayer(self.layer)
