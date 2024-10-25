@@ -36,7 +36,7 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 
 	--  Get input data
-	v_psector_id = ((p_data->>'data')::json->>'psectorId')::int;
+	v_psector_id = ((p_data->>'data')::json->>'psector_id')::int;
 	
 	-- get project type
 	SELECT project_type, giswater INTO v_project_type, v_version FROM sys_version ORDER BY id DESC LIMIT 1;
