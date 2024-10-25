@@ -27,7 +27,7 @@ from ...utils import tools_gw
 from ..dialog import GwAction
 
 CREATE_NEW = "Create new"
-TESTING_MODE = False
+TESTING_MODE = True
 
 
 class ProjectType(Enum):
@@ -107,6 +107,7 @@ class GwImportInp(GwAction):
         )
         tools_gw.open_dialog(self.dlg_inp_parsing, dlg_name="parse_inp")
 
+        global GwParseInpTask
         self.parse_inp_task = GwParseInpTask(
             "Parse INP task", file_path, self.dlg_inp_parsing
         )
@@ -137,6 +138,7 @@ class GwImportInp(GwAction):
         self.dlg_config.btn_accept.clicked.connect(self._importinp_accept)
 
         # Get catalogs from thread
+        global Catalogs
         self.catalogs: Catalogs = self.parse_inp_task.catalogs
 
         # Fill nodes table
@@ -312,7 +314,15 @@ class GwImportInp(GwAction):
                 'DELETE FROM v_edit_node;',
                 'DELETE FROM inp_pump;',
                 'DELETE FROM v_edit_arc;',
-                'DELETE FROM cat_work WHERE id = $$import_inp_test$$'
+                'DELETE FROM cat_work WHERE id = $$import_inp_test$$;',
+                "DELETE FROM cat_mat_arc;",
+                "DELETE FROM sector WHERE sector_id = 1;",
+                "DELETE FROM ext_municipality WHERE muni_id = 1;",
+                "DELETE FROM exploitation WHERE expl_id = 1;",
+                "INSERT INTO cat_mat_arc (id, active) VALUES ('FC', true), ('PVC', true), ('FD', true);",
+                "INSERT INTO exploitation (expl_id, name, macroexpl_id, descript, active) VALUES (1, 'expl_1_import_inp_test', 0, 'Created by import inp in TESTING MODE', true) ON CONFLICT DO NOTHING;",
+                "INSERT INTO ext_municipality (muni_id, name, observ, active) VALUES (1, 'muni_1_import_inp_test', 'Created by import inp in TESTING MODE', true) ON CONFLICT DO NOTHING;",
+                "INSERT INTO sector (sector_id, name, muni_id, expl_id, macrosector_id, descript, active) VALUES (1, 'sector_1_import_inp_test', '{1}'::int[], '{1}'::int[], 0, 'Created by import inp in TESTING MODE', true);"
             ]
             for sql in queries:
                 tools_db.execute_sql(sql)
@@ -321,7 +331,14 @@ class GwImportInp(GwAction):
             workcat = "import_inp_test"
             exploitation = 1
             sector = 1
-            catalogs = {'pipes': {(57.0, 0.0025): 'INP-PIPE01', (57.0, 0.025): 'INP-PIPE02', (99.0, 0.0025): 'PELD110-PN10', (99.0, 0.025): 'FC110-PN10', (144.0, 0.0025): 'PVC160-PN16', (144.0, 0.025): 'FC160-PN10', (153.0, 0.03): 'INP-PIPE03', (204.0, 0.03): 'INP-PIPE04'}, 'materials': {0.025: 'FC', 0.0025: 'PVC', 0.03: 'FD'}, 'features': {'junctions': 'JUNCTION', 'pipes': 'PIPE', 'pumps': 'VARC', 'reservoirs': 'SOURCE', 'tanks': 'TANK', 'valves': 'VARC'}, 'junctions': 'JUNCTION DN110', 'reservoirs': 'SOURCE-01', 'tanks': 'TANK_01', 'pumps': 'INP-PUMP', 'valves': 'INP-VALVE'}
+            catalogs = {'pipes': {(57.0, 0.0025): 'INP-PIPE01', (57.0, 0.025): 'INP-PIPE02', (99.0, 0.0025): 'PELD110-PN10', (99.0, 0.025): 'FC110-PN10', (144.0, 0.0025): 'PVC160-PN16', (144.0, 0.025): 'FC160-PN10', (153.0, 0.03): 'INP-PIPE03', (204.0, 0.03): 'INP-PIPE04'},
+                        'materials': {0.025: 'FC', 0.0025: 'PVC', 0.03: 'FD'},
+                        'features': {'junctions': 'JUNCTION', 'pipes': 'PIPE', 'pumps': 'VARC', 'reservoirs': 'SOURCE', 'tanks': 'TANK', 'valves': 'VARC'},
+                        'junctions': 'JUNCTION DN110',
+                        'reservoirs': 'SOURCE-01',
+                        'tanks': 'TANK_01',
+                        'pumps': 'INP-PUMP',
+                        'valves': 'INP-VALVE'}
 
             # Set background task 'Import INP'
             description = "Import INP (TESTING MODE)"
