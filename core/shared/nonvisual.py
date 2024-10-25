@@ -41,7 +41,7 @@ class GwNonVisual:
         self.schema_name = lib_vars.schema_name
         self.canvas = global_vars.canvas
         self.dialog = None
-        self.manager_dlg = None
+        self.manager_dlg: GwNonVisualManagerUi = None
         self.dict_views = {'ws': {'cat_mat_roughness': 'roughness', 'v_edit_inp_curve': 'curves', 'v_edit_inp_pattern': 'patterns',
                                   'v_edit_inp_controls': 'controls', 'v_edit_inp_rules': 'rules'},
                            'ud': {'v_edit_inp_curve': 'curves', 'v_edit_inp_pattern': 'patterns',
@@ -254,15 +254,15 @@ class GwNonVisual:
         expr = ""
         if not active:
             expr = f"active is true"
-        if curve_type is not None:
+        if curve_type not in (None, -1):
             if expr:
                 expr += " and "
             expr += f"curve_type::text ILIKE '%{curve_type}%'"
-        if pattern_type is not None:
+        if pattern_type not in (None, -1):
             if expr:
                 expr += " and "
             expr += f"pattern_type::text ILIKE '%{pattern_type}%'"
-        if timser_type is not None:
+        if timser_type not in (None, -1):
             if expr:
                 expr += " and "
             expr += f"timser_type::text ILIKE '%{timser_type}%'"
