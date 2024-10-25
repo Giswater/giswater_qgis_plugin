@@ -3185,6 +3185,7 @@ def docker_dialog(dialog):
         lib_vars.session_vars['dialog_docker'].setWindowFlags(Qt.WindowContextHelpButtonHint)
         # Create btn_help
         add_btn_help(dialog)
+        dialog.messageBar().hide()
         global_vars.iface.addDockWidget(positions[lib_vars.session_vars['dialog_docker'].position],
                                         lib_vars.session_vars['dialog_docker'])
     except RuntimeError as e:
