@@ -67,7 +67,7 @@ class Catalogs:
         rows = tools_db.get_rows("""
                 SELECT n.id, f.epa_default
                 FROM cat_node AS n
-                JOIN cat_feature_node AS f ON (n.nodetype_id = f.id)
+                JOIN cat_feature_node AS f ON (n.node_type = f.id)
             """)
 
         db_node_catalog: dict[str, str] = {}

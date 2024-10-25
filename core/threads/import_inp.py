@@ -184,7 +184,7 @@ class GwImportInpTask(GwTask):
             nodetype_id: str = self.catalogs["features"][node_type]
 
             sql = """
-                INSERT INTO cat_node (id, nodetype_id)
+                INSERT INTO cat_node (id, node_type)
                 VALUES (%s, %s)
             """
             execute_sql(
@@ -221,7 +221,7 @@ class GwImportInpTask(GwTask):
             )
 
             sql = """
-                INSERT INTO cat_arc (id, arctype_id, matcat_id, dint)
+                INSERT INTO cat_arc (id, arc_type, matcat_id, dint)
                 VALUES (%s, %s, 'UNKNOWN', 999)
             """
             _id = self.catalogs[varc_type]
@@ -241,7 +241,7 @@ class GwImportInpTask(GwTask):
                 material = self.catalogs["materials"][pipe_roughness]
 
                 sql = """
-                    INSERT INTO cat_arc (id, arctype_id, matcat_id, dint)
+                    INSERT INTO cat_arc (id, arc_type, matcat_id, dint)
                     VALUES (%s, %s, %s, %s);
                 """
                 execute_sql(
