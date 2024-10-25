@@ -8,6 +8,11 @@ version=3.6.015
 author=David Erill, Barbara Rzepka, Sergi Muñoz, Josep Lluís Sala, Edgar Fusté, Albert Bofill, Sergi Maspons, Elies Bertran, Abel García Juanes, Maria Guzmán, Jordi Blanch, Xavier Torret, Daniel Marín, Ferran Martínez
 
 Changelog=Version 3.6.015
+    - Show warning message if scipy/numpy is not available.
+    - Replace scenario id for dwf csv file.
+    - Manage non numeric values in curves editor.
+    - Change layer of sample from ext_municipality to v_ext_municipality, wich is filtered by user selector.
+    - Bug fix in Non visual objects manager: sometimes the table didn't have rows.
 
 tags= giswater, water networks, sewerage, urban drainage, EPANET, SWMM
 homepage=https://www.giswater.org
