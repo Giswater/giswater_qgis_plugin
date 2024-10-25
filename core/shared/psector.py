@@ -1892,7 +1892,6 @@ class GwPsector:
 
         # Get selected psector_id from the first column (adjust index if needed)
         psector_id = selected_rows[0].data()
-        print(psector_id)
 
         # Call the SQL function to get the sector features
         extras = f'"psector_id":"{psector_id}"'
@@ -1904,8 +1903,8 @@ class GwPsector:
             tools_qgis.show_warning("Failed to retrieve sector features.", dialog=self.dlg_psector_mng)
             return
 
-        # The SQL procedure should manage creating the temporal layers based on the returned features
-        tools_qgis.show_success("Psector features loaded successfully.", dialog=self.dlg_psector_mng)
+        # The SQL procedure manage creating the temporal layers based on the returned features
+        tools_qgis.show_success("Psector features loaded successfully on the map.", dialog=self.dlg_psector_mng)
 
 
     def multi_rows_delete(self, dialog, widget, table_name, column_id, label, action):
