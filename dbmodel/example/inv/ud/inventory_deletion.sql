@@ -37,6 +37,7 @@ UPDATE inp_pump SET curve_id=null, status=null, startup=null , shutoff=null;
 
 UPDATE cat_mat_arc SET n = null;
 
+DELETE FROM inp_dwf;
 DELETE FROM inp_pattern;
 DELETE FROM inp_curve;
 
