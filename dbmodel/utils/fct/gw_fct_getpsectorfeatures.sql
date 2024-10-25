@@ -86,7 +86,7 @@ BEGIN
                 UNION
                 SELECT pc.link_id::text AS feature_id, pc.state, 'CONNEC' AS feature_type, c.the_geom
                 FROM plan_psector_x_connec pc
-                JOIN connec c ON connec_id = pc.connec_id
+                JOIN connec c ON c.connec_id = pc.connec_id
                 WHERE pc.psector_id = ANY(v_psector_id_aux)
                 UNION
                 SELECT pg.gully_id AS feature_id, pg.state, 'GULLY' AS feature_type, g.the_geom
