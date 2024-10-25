@@ -109,13 +109,13 @@ class Catalogs:
 
         # Get feature catalog
         rows = tools_db.get_rows("""
-                SELECT id, system_id, feature_type
+                SELECT id, feature_class, feature_type
                 FROM cat_feature
             """)
         db_feat_cat: dict[str, tuple[str, str]] = {}
         if rows:
             unsorted_dict = {
-                _id: (feat_type, system_id) for _id, system_id, feat_type in rows
+                _id: (feat_type, feature_class) for _id, feature_class, feat_type in rows
             }
             db_feat_cat = dict(sorted(unsorted_dict.items()))
 

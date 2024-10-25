@@ -276,7 +276,7 @@ class GwImportInp(GwAction):
 
         self.tbl_elements["features"] = {}
 
-        for tag, rec_catalog, system_id, feature_type in feature_types:
+        for tag, rec_catalog, feature_class, feature_type in feature_types:
             if rec_catalog is None:
                 continue
 
@@ -544,8 +544,8 @@ class GwImportInp(GwAction):
         for element_type, (combo,) in self.tbl_elements["features"].items():
             system_catalog = [
                 feat_id
-                for feat_id, (system_id, _) in self.catalogs.db_features.items()
-                if system_id in feature_types[element_type][0]
+                for feat_id, (feature_class, _) in self.catalogs.db_features.items()
+                if feature_class in feature_types[element_type][0]
             ]
             feat_catalog = [
                 feat_id

@@ -10,10 +10,10 @@ or (at your option) any later version.
 class GwCatFeature(object):
     """ Class to serialize table 'cat_feature' """
 
-    def __init__(self, id_, system_id, feature_type, shortcut_key, parent_layer, child_layer):
+    def __init__(self, id_, feature_class, feature_type, shortcut_key, parent_layer, child_layer):
 
         self.id = id_
-        self.system_id = system_id
+        self.feature_class = feature_class
         self.feature_type = feature_type
         self.shortcut_key = shortcut_key
         self.parent_layer = parent_layer
