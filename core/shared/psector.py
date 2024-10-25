@@ -1891,7 +1891,7 @@ class GwPsector:
             return
 
         # Get selected psector_id from the first column (adjust index if needed)
-        psector_id = selected_rows[0].data()
+        psector_id = [row.data() for row in selected_rows]
 
         # Call the SQL function to get the sector features
         extras = f'"psector_id":"{psector_id}"'
