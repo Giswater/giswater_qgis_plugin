@@ -59,12 +59,12 @@ BEGIN
                 'properties', to_jsonb(row) - 'the_geom_p'
             ) AS feature
             FROM (
-                SELECT pn.node_id AS feature_id, pn.state, 'NODE' AS feature_type, n.the_geom
+                SELECT pn.node_id AS feature_id, pn.psector_id, pn.state, 'NODE' AS feature_type, n.the_geom
                 FROM plan_psector_x_node pn
                 JOIN node n ON n.node_id = pn.node_id
                 WHERE pn.psector_id = ANY(v_psector_id_aux)
                 UNION
-                SELECT pc.link_id::text AS feature_id, pc.state, 'CONNEC' AS feature_type, c.the_geom
+                SELECT pc.link_id::text AS feature_id, pc.psector_id, pc.state, 'CONNEC' AS feature_type, c.the_geom
                 FROM plan_psector_x_connec pc
                 JOIN connec c ON c.connec_id = pc.connec_id
                 WHERE pc.psector_id = ANY(v_psector_id_aux)
@@ -79,17 +79,17 @@ BEGIN
                 'properties', to_jsonb(row) - 'the_geom_p'
             ) AS feature
             FROM (
-                SELECT pn.node_id AS feature_id, pn.state, 'NODE' AS feature_type, n.the_geom
+                SELECT pn.node_id AS feature_id, pn.psector_id, pn.state, 'NODE' AS feature_type, n.the_geom
                 FROM plan_psector_x_node pn
                 JOIN node n ON n.node_id = pn.node_id
                 WHERE pn.psector_id = ANY(v_psector_id_aux)
                 UNION
-                SELECT pc.link_id::text AS feature_id, pc.state, 'CONNEC' AS feature_type, c.the_geom
+                SELECT pc.link_id::text AS feature_id, pc.psector_id, pc.state, 'CONNEC' AS feature_type, c.the_geom
                 FROM plan_psector_x_connec pc
                 JOIN connec c ON c.connec_id = pc.connec_id
                 WHERE pc.psector_id = ANY(v_psector_id_aux)
                 UNION
-                SELECT pg.gully_id AS feature_id, pg.state, 'GULLY' AS feature_type, g.the_geom
+                SELECT pg.gully_id AS feature_id, pg.psector_id, pg.state, 'GULLY' AS feature_type, g.the_geom
                 FROM plan_psector_x_gully pg
                 JOIN gully g ON g.gully_id = pg.gully_id
                 WHERE pg.psector_id = ANY(v_psector_id_aux)
@@ -110,12 +110,12 @@ BEGIN
             'properties', to_jsonb(row) - 'the_geom'
         ) AS feature
         FROM (
-            SELECT pa.arc_id AS feature_id, pa.state, 'ARC' AS feature_type, a.the_geom
+            SELECT pa.arc_id AS feature_id, pa.pesctor_id, pa.state, 'ARC' AS feature_type, a.the_geom
             FROM plan_psector_x_arc pa
             JOIN arc a ON a.arc_id = pa.arc_id
             WHERE pa.psector_id = ANY(v_psector_id_aux)
             UNION
-            SELECT ppxc.link_id::text AS feature_id, ppxc.state, 'LINK' AS feature_type, l.the_geom
+            SELECT ppxc.link_id::text AS feature_id, ppxc.psector_id, ppxc.state, 'LINK' AS feature_type, l.the_geom
             FROM plan_psector_x_connec ppxc
             JOIN link l ON l.link_id = ppxc.link_id
             WHERE ppxc.psector_id = ANY(v_psector_id_aux)
