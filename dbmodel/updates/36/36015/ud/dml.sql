@@ -29,6 +29,8 @@ UPDATE config_form_fields SET iseditable = true where columnname like 'coef_curv
 
 UPDATE config_form_fields SET hidden = true where columnname in ('geom3', 'geom4') and formname like '%orifice%';
 
+UPDATE config_form_fields SET hidden = true where columnname in ('apond') and formname like '%storage%';
+
 UPDATE sys_param_user SET dv_isnullvalue = true where id = 'inp_options_hydrology_scenario';
 
 INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario', 'LIDS', 'LIDS');

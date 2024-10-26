@@ -166,3 +166,5 @@ UPDATE config_form_fields SET hidden = true where columnname in ('geom3', 'geom4
 UPDATE config_form_fields SET linkedobject='tbl_event_x_gully' WHERE formname='gully' AND formtype='form_feature' AND tabname='tab_event' AND linkedobject = 'tbl_visit_x_gully';
 
 UPDATE config_form_fields SET dv_querytext = 'SELECT muni_id as id, name as idval from v_ext_municipality WHERE muni_id IS NOT NULL' WHERE columnname  = 'muni_id' AND widgettype = 'combo';
+
+UPDATE config_form_fields SET hidden = true where columnname in ('apond') and formname like '%storage%';
