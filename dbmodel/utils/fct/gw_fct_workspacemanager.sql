@@ -70,6 +70,7 @@ v_deleted_dscenario text;
 v_deleted_psector text;
 v_deleted_sector text;
 v_deleted_result text;
+v_deleted_muni text;
 
 BEGIN
 
@@ -125,6 +126,9 @@ BEGIN
 		SELECT json_agg(s.selector_conf) INTO v_selectors_config FROM (
 		select jsonb_build_object('selector_expl', array_agg(expl_id))  as selector_conf
 		FROM selector_expl where cur_user=current_user 
+		UNION
+		select jsonb_build_object('selector_municipality', array_agg(muni_id)) as selector_conf 
+		FROM selector_municipality where cur_user=current_user 
 		UNION
 		select jsonb_build_object('selector_sector', array_agg(sector_id)) as selector_conf 
 		FROM selector_sector where cur_user=current_user 
@@ -322,6 +326,14 @@ BEGIN
 							EXECUTE 'INSERT INTO selector_sector
 							SELECT value::integer, current_user FROM json_array_elements_text('''||v_selector_value||''') WHERE value::integer IN (SELECT sector_id FROM sector);';
 
+					ELSIF v_selector_name = 'selector_municipality' THEN	
+
+							EXECUTE 'SELECT string_agg(value::text, '', '')  FROM json_array_elements_text('''||v_selector_value||''') WHERE value::integer NOT IN (SELECT muni_id FROM ext_municipality)'
+							INTO v_deleted_muni;
+
+							EXECUTE 'INSERT INTO selector_municipality
+							SELECT value::integer, current_user FROM json_array_elements_text('''||v_selector_value||''') WHERE value::integer IN (SELECT muni_id FROM ext_municipality);';
+
 					ELSIF v_selector_name = 'selector_psector' THEN
 
 							EXECUTE 'SELECT string_agg(value::text, '', '')  FROM json_array_elements_text('''||v_selector_value||''') WHERE value::integer NOT IN (SELECT psector_id FROM plan_psector)'
@@ -394,6 +406,9 @@ BEGIN
 		
 		IF v_deleted_psector IS NOT NULL THEN	
 			v_return_msg = concat(v_return_msg,'. Workspace recreated without psectors:',v_deleted_psector);
+		END IF;
+		IF v_deleted_psector IS NOT NULL THEN	
+			v_return_msg = concat(v_return_msg,'. Workspace recreated without muni:',v_deleted_muni);
 		END IF;
 		IF v_deleted_dscenario IS NOT NULL THEN	
 			v_return_msg = concat(v_return_msg,'. Workspace recreated without dscenarios:',v_deleted_dscenario,'.');
