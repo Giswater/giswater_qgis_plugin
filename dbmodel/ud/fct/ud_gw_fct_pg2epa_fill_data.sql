@@ -30,6 +30,7 @@ v_rainfall text;
 v_isoperative boolean;
 v_statetype text;
 v_networkmode integer;
+v_timeseries record;
 
 BEGIN
 
@@ -52,10 +53,6 @@ BEGIN
 	v_isoperative = (SELECT value::json->>'onlyIsOperative' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
 
 	v_networkmode = (SELECT value FROM config_param_user WHERE parameter='inp_options_networkmode' AND cur_user=current_user);
-
-	IF v_rainfall IS NOT NULL THEN
-		UPDATE raingage SET timser_id=v_rainfall, rgage_type='TIMESERIES' WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user=current_user);
-	END IF;
 
 	--Use state_type only is operative true or not
 	IF v_isoperative THEN
@@ -287,6 +284,30 @@ BEGIN
 	-- rpt_inp_raingage
 	INSERT INTO temp_rpt_inp_raingage
 	SELECT result_id_var, * FROM v_edit_raingage;
+	
+	-- setting same rainfall for all raingage
+	IF v_rainfall IS NOT NULL THEN
+		UPDATE temp_rpt_inp_raingage SET timser_id=v_rainfall, rgage_type='TIMESERIES';
+	END IF;
+	
+	-- setting for date-time parameters if rainfall has addparam values)
+	select * into v_timeseries from inp_timeseries where id = v_rainfall;
+	IF json_extract_path_text(v_timeseries.addparam,'start_date') IS NOT NULL THEN
+		update config_param_user set value = json_extract_path_text(v_timeseries.addparam,'start_date') 
+		where cur_user = current_user and parameter = 'inp_options_start_date';
+		update config_param_user set value = json_extract_path_text(v_timeseries.addparam,'start_time')
+		where cur_user = current_user and parameter = 'inp_options_start_time';
+		update config_param_user set value = json_extract_path_text(v_timeseries.addparam,'end_date')
+		where cur_user = current_user and parameter = 'inp_options_end_date';
+		update config_param_user set value = json_extract_path_text(v_timeseries.addparam,'end_time')
+		where cur_user = current_user and parameter = 'inp_options_end_time';
+		update config_param_user set value = json_extract_path_text(v_timeseries.addparam,'start_date')
+		where cur_user = current_user and parameter = 'inp_options_report_start_date';
+		update config_param_user set value = json_extract_path_text(v_timeseries.addparam,'start_time')
+		where cur_user = current_user and parameter = 'inp_options_report_start_time';
+	
+	END IF;
+	
 
 	RETURN 1;
 END;
