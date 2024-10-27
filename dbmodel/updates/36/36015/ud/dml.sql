@@ -56,3 +56,5 @@ SELECT 'v_edit_raingage', 'form_feature', 'tab_none', columnname, widgettype, la
 WHERE columnname  = 'muni_id' AND formname = 'v_ext_address';
 
 UPDATE sys_param_user set dv_querytext = 'SELECT id, id as idval FROM v_edit_inp_timeseries WHERE timser_type= ''Rainfall'' and active' where id = 'inp_options_setallraingages';
+
+INSERT INTO inp_typevalue VALUES ('inp_value_options_in','MODIFIED_GREEN_AMPT','MODIFIED_GREEN_AMPT');
