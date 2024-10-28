@@ -316,12 +316,16 @@ class GwImportInp(GwAction):
                 'DELETE FROM v_edit_arc;',
                 'DELETE FROM cat_work WHERE id = $$import_inp_test$$;',
                 "DELETE FROM cat_mat_arc;",
+                "DELETE FROM cat_mat_roughness;",
                 "DELETE FROM sector WHERE sector_id = 1;",
                 "DELETE FROM ext_municipality WHERE muni_id = 1;",
                 "DELETE FROM exploitation WHERE expl_id = 1;",
                 "INSERT INTO cat_mat_arc (id, active) VALUES ('FC', true), ('PVC', true), ('FD', true);",
-                "INSERT INTO exploitation (expl_id, name, macroexpl_id, descript, active) VALUES (1, 'expl_1_import_inp_test', 0, 'Created by import inp in TESTING MODE', true) ON CONFLICT DO NOTHING;",
-                "INSERT INTO ext_municipality (muni_id, name, observ, active) VALUES (1, 'muni_1_import_inp_test', 'Created by import inp in TESTING MODE', true) ON CONFLICT DO NOTHING;",
+                "UPDATE cat_mat_roughness SET roughness = 0.025 WHERE matcat_id = 'FC';",
+                "UPDATE cat_mat_roughness SET roughness = 0.0025 WHERE matcat_id = 'PVC';",
+                "UPDATE cat_mat_roughness SET roughness = 0.03 WHERE matcat_id = 'FD';",
+                "INSERT INTO exploitation (expl_id, name, macroexpl_id, descript, active) VALUES (1, 'expl_1_import_inp_test', 0, 'Created by import inp in TESTING MODE', true);",
+                "INSERT INTO ext_municipality (muni_id, name, observ, active) VALUES (1, 'muni_1_import_inp_test', 'Created by import inp in TESTING MODE', true);",
                 "INSERT INTO sector (sector_id, name, muni_id, expl_id, macrosector_id, descript, active) VALUES (1, 'sector_1_import_inp_test', '{1}'::int[], '{1}'::int[], 0, 'Created by import inp in TESTING MODE', true);"
             ]
             for sql in queries:
