@@ -53,6 +53,7 @@ BEGIN
 			JOIN pg_class t on a.attrelid = t.oid
 			JOIN pg_namespace s on t.relnamespace = s.oid
 			WHERE a.attnum > 0 
+			AND nspname = ''SCHEMA_NAME''
 			AND NOT a.attisdropped
 			AND t.relname = $1
 			AND left (pg_catalog.format_type(a.atttypid, a.atttypmod), 8)=''geometry''
@@ -60,7 +61,7 @@ BEGIN
 			LIMIT 1'
 			INTO v_the_geom
 			USING v_feature_type;
-	END IF;
+	END IF;	
 		
 	FOR v_id IN SELECT * FROM json_array_elements(array_to_json(v_ids_aux))
 	LOOP
@@ -82,16 +83,16 @@ BEGIN
 	v_return := COALESCE(v_return, '{}');
 
 	-- Return
-		RETURN ('{"status":"Accepted", "message":{"level":1, "text":"Executed successfully"}, "version":"'||v_version||'"'||
-             ',"body":{"form":{}'||
-		     ',"data":'||fields_array[0]||''||
-		     ',"styles":'||v_return||''||
-	    '}}')::json;
+	RETURN ('{"status":"Accepted", "message":{"level":1, "text":"Executed successfully"}, "version":"'||v_version||'"'||
+            ',"body":{"form":{}'||
+	     ',"data":'||fields_array[0]||''||
+	     ',"styles":'||v_return||''||
+	'}}')::json;
 
 	-- Exception handling
-    EXCEPTION WHEN OTHERS THEN
-    GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-    RETURN json_build_object('status', 'Failed', 'NOSQLERR', SQLERRM, 'message', json_build_object('level', right(SQLSTATE, 1), 'text', SQLERRM), 'SQLSTATE', SQLSTATE, 'SQLCONTEXT', v_error_context)::json;
+	EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	RETURN json_build_object('status', 'Failed', 'NOSQLERR', SQLERRM, 'message', json_build_object('level', right(SQLSTATE, 1), 'text', SQLERRM), 'SQLSTATE', SQLSTATE, 'SQLCONTEXT', v_error_context)::json;
 
 END;
 $BODY$
