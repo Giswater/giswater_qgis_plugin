@@ -45,22 +45,26 @@ BEGIN
 	
 	SELECT string_to_array(v_ids, ',') into v_ids_aux;
 
-	EXECUTE 'SELECT attname FROM pg_attribute a        
-		JOIN pg_class t on a.attrelid = t.oid
-		JOIN pg_namespace s on t.relnamespace = s.oid
-		WHERE a.attnum > 0 
-		AND NOT a.attisdropped
-		AND t.relname = $1
-		AND left (pg_catalog.format_type(a.atttypid, a.atttypmod), 8)=''geometry''
-		ORDER BY a.attnum
-		LIMIT 1'
-		INTO v_the_geom
-		USING v_feature_type;
+
+	IF v_feature_type IN ('arc','node','connec', 'gully') THEN 
+		v_the_geom = 'the_geom';
+	ELSE
+		EXECUTE 'SELECT attname FROM pg_attribute a        
+			JOIN pg_class t on a.attrelid = t.oid
+			JOIN pg_namespace s on t.relnamespace = s.oid
+			WHERE a.attnum > 0 
+			AND NOT a.attisdropped
+			AND t.relname = $1
+			AND left (pg_catalog.format_type(a.atttypid, a.atttypmod), 8)=''geometry''
+			ORDER BY a.attnum
+			LIMIT 1'
+			INTO v_the_geom
+			USING v_feature_type;
+	END IF;
 		
 	FOR v_id IN SELECT * FROM json_array_elements(array_to_json(v_ids_aux))
 	LOOP
 		
-
 		v_id = replace(v_id::text, '"', '');
 		v_id = replace(v_id::text, ' ', '');
 		

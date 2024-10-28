@@ -1798,7 +1798,8 @@ INSERT INTO config_param_system VALUES ('epa_automatic_man2graph_values','{"stat
 {"sourceTable":"ve_node_pr_reduc_valve", "query":"UPDATE presszone t SET head=elevation + pression_exit FROM ve_node_pr_reduc_valve s "}]}]}',
 'Before insert - update of any mapzone, automatic update of columns on mapzone from columns on man_table',
 'GRAPH auto update mapzone tables:','','',TRUE, 14,'utils',null,null,'json','text',null,TRUE,null,null,null,null,null,
-'{"status":false}','lyt_admin_other');
+'{"status":false}','lyt_admin_other')
+ON CONFLICT (parameter) DO NOTHING;
 
 
 UPDATE config_toolbox SET inputparams =
