@@ -113,7 +113,7 @@ class GwDocument(QObject):
         self._fill_combo_doc_type(self.dlg_add_doc.doc_type)
 
         # If document exists
-        if item_id:
+        if item_id and row:
             self.is_new = False
             # Enable tabs
             for n in range(1, 5):
