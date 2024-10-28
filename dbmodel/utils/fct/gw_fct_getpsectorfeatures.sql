@@ -110,7 +110,7 @@ BEGIN
             'properties', to_jsonb(row) - 'the_geom'
         ) AS feature
         FROM (
-            SELECT pa.arc_id AS feature_id, pa.pesctor_id, pa.state, 'ARC' AS feature_type, a.the_geom
+            SELECT pa.arc_id AS feature_id, pa.psector_id, pa.state, 'ARC' AS feature_type, a.the_geom
             FROM plan_psector_x_arc pa
             JOIN arc a ON a.arc_id = pa.arc_id
             WHERE pa.psector_id = ANY(v_psector_id_aux)
