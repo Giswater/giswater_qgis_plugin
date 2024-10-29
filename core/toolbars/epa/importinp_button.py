@@ -394,13 +394,13 @@ class GwImportInp(GwAction):
             tools_qt.show_info_box(message)
             return
 
-        # # Municipality
-        # municipality = tools_qt.get_combo_value(self.dlg_config, "cmb_muni")
+        # Municipality
+        municipality = tools_qt.get_combo_value(self.dlg_config, "cmb_muni")
 
-        # if municipality == "":
-        #     message = "Please select a municipality to proceed with this import."
-        #     tools_qt.show_info_box(message)
-        #     return
+        if municipality == "":
+            message = "Please select a municipality to proceed with this import."
+            tools_qt.show_info_box(message)
+            return
 
         # Tables (Arcs and Nodes)
         catalogs = {"pipes": {}, "materials": {}, "features": {}}
@@ -479,6 +479,19 @@ class GwImportInp(GwAction):
         cmb_sector.clear()
         tools_qt.fill_combo_values(cmb_sector, rows, add_empty=True)
         cmb_sector.setCurrentText(sector_value)
+
+        # Fill municipality combo
+        cmb_muni: QComboBox = self.dlg_config.cmb_muni
+        muni_value: str = cmb_muni.currentText()
+
+        rows = tools_db.get_rows("""
+            SELECT muni_id, name
+            FROM ext_municipality
+            WHERE muni_id > 0
+        """)
+        cmb_muni.clear()
+        tools_qt.fill_combo_values(cmb_muni, rows, add_empty=True)
+        cmb_muni.setCurrentText(muni_value)
 
         self.catalogs = Catalogs.from_network_model(self.parse_inp_task.network)
 
