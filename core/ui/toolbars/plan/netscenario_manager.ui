@@ -143,13 +143,6 @@
         </property>
        </widget>
       </item>
-      <item row="5" column="6">
-       <widget class="QLabel" name="lbl_vdefault_netscenario">
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
       <item row="5" column="0" colspan="2">
        <widget class="QLineEdit" name="txt_name">
         <property name="sizePolicy">
@@ -189,6 +182,16 @@
          </widget>
         </item>
        </layout>
+      </item>
+      <item row="5" column="8">
+       <widget class="QLabel" name="lbl_vdefault_netscenario">
+        <property name="text">
+         <string/>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
