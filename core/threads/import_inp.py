@@ -83,6 +83,20 @@ def toolsdb_execute_values(
     return result
 
 
+def get_geometry_from_link(link) -> str:
+
+    start_node_x, start_node_y = link.start_node.coordinates
+    end_node_x, end_node_y = link.end_node.coordinates
+    vertices = link.vertices
+
+    coordinates = f"{start_node_x} {start_node_y},"
+    for v in vertices:
+        coordinates += f"{v[0]} {v[1]},"
+    coordinates += f"{end_node_x} {end_node_y}"
+
+    return f"LINESTRING({coordinates})"
+
+
 class GwImportInpTask(GwTask):
 
     message_logged = pyqtSignal(str, str)
@@ -412,14 +426,14 @@ class GwImportInpTask(GwTask):
         """
 
         template = (
-            "(ST_SetSRID(ST_MakeLine(ST_Point(%s, %s), ST_Point(%s, %s)), %s), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+            "(ST_GeomFromText(%s, %s), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
         )
 
         params = []
 
         for p_name, p in self.network.pipes():
-            x1, y1 = p.start_node.coordinates
-            x2, y2 = p.end_node.coordinates
+            geometry = get_geometry_from_link(p)
+
             srid = lib_vars.data_epsg
             try:
                 node_1 = self.junction_ids[p.start_node_name]
@@ -437,8 +451,7 @@ class GwImportInpTask(GwTask):
             workcat_id = self.workcat
             params.append(
                 (
-                    x1, y1,
-                    x2, y2,
+                    geometry,
                     srid,
                     p_name,
                     node_1,
