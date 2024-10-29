@@ -18,4 +18,4 @@ update config_toolbox SET inputparams =
 where id = 3110;
 
 
-DELETE FROM config_form_fields WHERE columnname like 'real_press%' and formtype IN ('form_list_footer', 'form_list_header', 'form_print', 'form_catalog', 'form_visit')
+DELETE FROM config_form_fields WHERE columnname like 'real_press%' and formtype IN ('form_list_footer', 'form_list_header', 'form_print', 'form_catalog', 'form_visit');
