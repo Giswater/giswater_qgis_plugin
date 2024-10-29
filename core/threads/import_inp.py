@@ -425,9 +425,9 @@ class GwImportInpTask(GwTask):
                 node_1 = self.junction_ids[p.start_node_name]
                 node_2 = self.junction_ids[p.end_node_name]
             except KeyError as e:
-                self._log_message(f"{e}")
+                self._log_message(f"Node not found: {e}")
                 continue
-            arccat_id = self.catalogs["pipes"]  # TODO: get arccat_id from dint & roughness
+            arccat_id = self.catalogs["pipes"][(round(p.diameter*1000, 0), p.roughness)]
             epa_type = "PIPE"
             expl_id = self.exploitation
             sector_id = self.sector
