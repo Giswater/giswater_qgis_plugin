@@ -70,6 +70,7 @@ class GwNetscenarioManagerButton(GwAction):
         # Fill table
         self.tbl_netscenario = self.dlg_netscenario_manager.findChild(QTableView, 'tbl_netscenario')
         self._fill_manager_table()
+        self._set_label_current_netscenario(self.dlg_netscenario_manager, from_open_dialog=True)
 
         # Connect main dialog signals
         self.dlg_netscenario_manager.txt_name.textChanged.connect(partial(self._fill_manager_table))
@@ -90,8 +91,6 @@ class GwNetscenarioManagerButton(GwAction):
         self.dlg_netscenario_manager.chk_active.stateChanged.connect(partial(self._fill_manager_table))
         self.dlg_netscenario_manager.btn_toggle_active.clicked.connect(partial(self._manage_toggle_active,
             self.tbl_netscenario, 'plan_netscenario', is_manager=True))
-
-        self._set_label_current_netscenario(self.dlg_netscenario_manager, from_open_dialog=True)
 
         # Open dialog
         tools_gw.open_dialog(self.dlg_netscenario_manager, 'netscenario_manager')
@@ -184,16 +183,6 @@ class GwNetscenarioManagerButton(GwAction):
         except (KeyError, TypeError) as e:
             print(f"Error accessing netscenario data: {e}")
             return
-
-        # Selector configuration with the retrieved netscenario_id
-        selector_extras = (
-            f'"selectorType":"selector_basic", "tabName":"tab_netscenario", '
-            f'"id":{netscenario_id}, "isAlone":"False", "disableParent":"False", '
-            f'"value":"True"'
-        )
-        body = tools_gw.create_body(extras=selector_extras)
-        selector_result = tools_gw.execute_procedure("gw_fct_getselectors", body)
-        tools_gw.manage_current_selections_docker(selector_result)
 
     # region netscenario manager
 
