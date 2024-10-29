@@ -68,6 +68,9 @@ BEGIN
         WHEN 'dwf' THEN
             parameter_name := 'inp_options_dwfscenario';
 
+        WHEN 'workspace' THEN
+            parameter_name := 'utils_workspace_vdefault';
+
         ELSE
             RAISE EXCEPTION 'Unknown type';
     END CASE;
@@ -116,6 +119,12 @@ BEGIN
             EXECUTE query INTO v_type_id, v_type_name;
             result := json_build_object('dwf_id', v_type_id, 'name', v_type_name);
 
+        WHEN 'workspace' THEN
+            query := 'SELECT t1.id, t1.name FROM cat_workspace AS t1 '
+                  || 'INNER JOIN config_param_user AS t2 ON t1.id::text = t2.value '
+                  || 'WHERE t2.parameter = ''utils_workspace_vdefault'' AND t2.cur_user = current_user';
+            EXECUTE query INTO v_type_id, v_type_name;
+            result := json_build_object('dwf_id', v_type_id, 'name', v_type_name);
     END CASE;
 
     -- Return JSON response
