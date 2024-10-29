@@ -358,6 +358,7 @@ class GwImportInp(GwAction):
                 municipality,
                 catalogs,
             )
+            self.import_inp_task.message_logged.connect(self._message_logged)
             QgsApplication.taskManager().addTask(self.import_inp_task)
             QgsApplication.taskManager().triggerTask(self.import_inp_task)
             return
@@ -651,3 +652,9 @@ class GwImportInp(GwAction):
     def _update_time_elapsed(self, text: str, dialog: GwDialog) -> None:
         lbl_time: QLabel = dialog.findChild(QLabel, "lbl_time")
         lbl_time.setText(text)
+
+    def _message_logged(self, message: str, end: str="\n"):
+
+        print(f"message: {message}")
+        data = {"info": {"values": [{"message": message}]}}
+        tools_gw.fill_tab_log(self.dlg_config, data, reset_text=True, close=False, end=end, call_set_tabs_enabled=False)

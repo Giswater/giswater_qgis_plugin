@@ -11,6 +11,8 @@ try:
 except ImportError:
     pass
 
+from qgis.PyQt.QtCore import pyqtSignal
+
 from ...libs import lib_vars, tools_db, tools_log
 from .task import GwTask
 
@@ -82,6 +84,9 @@ def toolsdb_execute_values(
 
 
 class GwImportInpTask(GwTask):
+
+    message_logged = pyqtSignal(str, str)
+
     def __init__(
         self,
         description: str,
@@ -110,23 +115,49 @@ class GwImportInpTask(GwTask):
     def run(self) -> bool:
         super().run()
         try:
+            self._log_message("Validating inputs...", end="")
             self._validate_inputs()
+            self._log_message("done!")
+
+            self._log_message("Getting units from DB...", end="")
             self._get_db_units()
+            self._log_message("done!")
+
+            self._log_message("Creating workcat...", end="")
             self._create_workcat_id()
+            self._log_message("done!")
+
+            self._log_message("Creating new node catalogs...", end="")
             self._create_new_node_catalogs()
+            self._log_message("done!")
 
             # Get existing catalogs in DB
             cat_arc_ids = get_rows("SELECT id FROM cat_arc", commit=False)
             if cat_arc_ids:
                 self.arccat_db += [x[0] for x in cat_arc_ids]
 
+            self._log_message("Creating new varc catalogs...")
             self._create_new_varc_catalogs()
+            self._log_message("done!")
+
+            self._log_message("Creating new pipe catalogs...")
             self._create_new_pipe_catalogs()
+            self._log_message("done!")
+
+            self._log_message("Inserting patterns into DB...")
             self._save_patterns()
+            self._log_message("done!")
+
+            self._log_message("Inserting curves into DB...")
             self._save_curves()
+            self._log_message("done!")
+
+            self._log_message("Inserting junctions into DB...")
             self._save_junctions_to_v_edit_node()
+            self._log_message("done!")
 
             execute_sql("select 1", commit=True)
+            self._log_message("ALL DONE! INP successfully imported.")
             return True
         except Exception as e:
             self.exception = traceback.format_exc()
@@ -268,6 +299,7 @@ class GwImportInpTask(GwTask):
                     if new_name in patterns_db:
                         continue
                     message = f'The pattern "{pattern_name}" has been renamed to "{new_name}" to avoid a collision with an existing pattern.'
+                    self._log_message(message)
                     self.mappings["patterns"][pattern_name] = new_name
                     pattern_name = new_name
                     break
@@ -376,3 +408,7 @@ class GwImportInpTask(GwTask):
         )
 
         print(junctions)
+
+    def _log_message(self, message: str, end: str="\n"):
+        self.log.append(message)
+        self.message_logged.emit(message, end)
