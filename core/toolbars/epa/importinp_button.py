@@ -447,7 +447,7 @@ class GwImportInp(GwAction):
             workcat,
             exploitation,
             sector,
-            # municipality,
+            municipality,
             catalogs,
         )
         QgsApplication.taskManager().addTask(self.import_inp_task)
