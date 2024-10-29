@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>929</width>
+    <width>1104</width>
     <height>795</height>
    </rect>
   </property>
@@ -20,14 +20,47 @@
       <string/>
      </property>
      <layout class="QGridLayout" name="verticalLayout_3">
-      <item row="6" column="12">
-       <widget class="QPushButton" name="btn_toolbox">
+      <item row="6" column="1">
+       <widget class="QCheckBox" name="chk_active">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="text">
-         <string>Actions</string>
+         <string>Show inactive</string>
         </property>
        </widget>
       </item>
-      <item row="6" column="9">
+      <item row="6" column="8">
+       <widget class="QPushButton" name="btn_toc">
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="10" column="0" colspan="15">
+       <widget class="QTableView" name="tbl_dscenario">
+        <property name="selectionMode">
+         <enum>QAbstractItemView::SingleSelection</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="0">
+       <widget class="QLineEdit" name="txt_name">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="10">
        <widget class="QToolButton" name="btn_create">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
@@ -52,70 +85,17 @@
         </property>
        </widget>
       </item>
-      <item row="6" column="8">
-       <widget class="QPushButton" name="btn_toggle_active">
+      <item row="6" column="7">
+       <widget class="QPushButton" name="btn_update_dscenario">
         <property name="text">
-         <string>Toggle active</string>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="10">
-       <widget class="QPushButton" name="btn_duplicate">
-        <property name="text">
-         <string>Duplicate</string>
+         <string>Current Dscenario</string>
         </property>
        </widget>
       </item>
       <item row="6" column="13">
-       <widget class="QPushButton" name="btn_delete">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
+       <widget class="QPushButton" name="btn_toolbox">
         <property name="text">
-         <string>Delete</string>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="11">
-       <widget class="QPushButton" name="btn_update">
-        <property name="text">
-         <string>Update</string>
-        </property>
-       </widget>
-      </item>
-      <item row="10" column="0" colspan="14">
-       <widget class="QTableView" name="tbl_dscenario">
-        <property name="selectionMode">
-         <enum>QAbstractItemView::SingleSelection</enum>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="0">
-       <widget class="QLineEdit" name="txt_name">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="1">
-       <widget class="QCheckBox" name="chk_active">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string>Show inactive</string>
+         <string>Actions</string>
         </property>
        </widget>
       </item>
@@ -139,10 +119,47 @@
         </property>
        </widget>
       </item>
-      <item row="6" column="7">
-       <widget class="QPushButton" name="btn_toc">
+      <item row="6" column="9">
+       <widget class="QPushButton" name="btn_toggle_active">
+        <property name="text">
+         <string>Toggle active</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="12">
+       <widget class="QPushButton" name="btn_update">
+        <property name="text">
+         <string>Update</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="14">
+       <widget class="QPushButton" name="btn_delete">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Delete</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="11">
+       <widget class="QPushButton" name="btn_duplicate">
+        <property name="text">
+         <string>Duplicate</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="6">
+       <widget class="QLabel" name="lbl_vdefault_dscenario">
         <property name="text">
          <string/>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
         </property>
        </widget>
       </item>

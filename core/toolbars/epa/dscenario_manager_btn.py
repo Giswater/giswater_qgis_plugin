@@ -140,6 +140,7 @@ class GwDscenarioManagerButton(GwAction):
         # Fill table
         self.tbl_dscenario = self.dlg_hydrology_manager.findChild(QTableView, 'tbl_dscenario')
         self._fill_manager_table('v_edit_cat_hydrology')
+        self._set_label_current_dscenario_type(self.dlg_hydrology_manager, scenario_type="hydrology", from_open_dialog=True)
 
         # Connect main dialog signals
         self.dlg_hydrology_manager.btn_toc.clicked.connect(partial(self._manage_add_layers, 'v_edit_cat_hydrology', 'Catalogs'))
@@ -158,6 +159,10 @@ class GwDscenarioManagerButton(GwAction):
                                                 self.dlg_hydrology_manager, self.tbl_dscenario, 'v_edit_cat_hydrology'))
         self.dlg_hydrology_manager.chk_active.stateChanged.connect(
             partial(self._fill_manager_table, 'v_edit_cat_hydrology'))
+
+        self.dlg_hydrology_manager.btn_update_dscenario.clicked.connect(
+            partial(self.update_current_scenario, self.dlg_hydrology_manager, qtbl=self.tbl_dscenario,
+                    scenario_type="hydrology", col_id_name="hydrology_id", view_name="v_edit_cat_hydrology",))
 
         self.dlg_hydrology_manager.btn_cancel.clicked.connect(
             partial(tools_gw.close_dialog, self.dlg_hydrology_manager))
@@ -191,6 +196,7 @@ class GwDscenarioManagerButton(GwAction):
         # Fill table
         self.tbl_dscenario = self.dlg_dwf_manager.findChild(QTableView, 'tbl_dscenario')
         self._fill_manager_table('v_edit_cat_dwf_scenario')
+        self._set_label_current_dscenario_type(self.dlg_dwf_manager, scenario_type="dwf", from_open_dialog=True)
 
         # Connect main dialog signals
         self.dlg_dwf_manager.btn_toc.clicked.connect(partial(self._manage_add_layers, 'v_edit_cat_dwf_scenario', 'Catalogs'))
@@ -209,6 +215,10 @@ class GwDscenarioManagerButton(GwAction):
                                                 self.dlg_dwf_manager, self.tbl_dscenario, 'v_edit_cat_dwf_scenario'))
         self.dlg_dwf_manager.chk_active.stateChanged.connect(
             partial(self._fill_manager_table, 'v_edit_cat_dwf_scenario'))
+
+        self.dlg_dwf_manager.btn_update_dscenario.clicked.connect(
+            partial(self.update_current_scenario, self.dlg_dwf_manager, qtbl=self.tbl_dscenario, scenario_type="dwf",
+                    col_id_name="id", view_name="v_edit_cat_dwf_scenario"))
 
         #self.tbl_dscenario.doubleClicked.connect(self._open_dscenario)
 
@@ -248,6 +258,10 @@ class GwDscenarioManagerButton(GwAction):
 
         # CheckBox filter
         self.filter_active = self.dlg_dscenario_manager.findChild(QCheckBox, 'chk_active')
+
+        # Make specific widgets invisible
+        self.dlg_dscenario_manager.findChild(QWidget, 'btn_update_dscenario').setVisible(False)
+        self.dlg_dscenario_manager.findChild(QWidget, 'lbl_vdefault_dscenario').setVisible(False)
 
         # Connect main dialog signals
         self.dlg_dscenario_manager.txt_name.textChanged.connect(partial(self._fill_manager_table,
@@ -310,6 +324,80 @@ class GwDscenarioManagerButton(GwAction):
 
     def save_user_values(self):
         pass
+
+    def update_current_scenario(self, dialog, qtbl, scenario_type, col_id_name, view_name):
+        """ Sets the selected scenario as current if it is active, based on scenario type """
+
+        # Get selected rows in the table
+        selected_list = qtbl.selectionModel().selectedRows()
+
+        # Check if any row is selected
+        if len(selected_list) == 0:
+            message = "No record selected"
+            tools_qgis.show_warning(message, dialog=dialog)
+            return
+
+        # Get the first selected row and retrieve scenario_id and active status
+        row = selected_list[0].row()
+        model = qtbl.model()
+        col_id = tools_qt.get_col_index_by_col_name(qtbl, col_id_name)
+        col_active = tools_qt.get_col_index_by_col_name(qtbl, 'active')
+
+        # Access the data using the model's index method
+        scenario_id = model.index(row, col_id).data()
+        active = model.index(row, col_active).data()
+
+        # Verify that the selected scenario is active
+        if not active:
+            message = f"Cannot set the current {scenario_type} scenario of an inactive scenario. Please activate it first."
+            tools_qgis.show_warning(message, dialog=dialog)
+            return
+
+        # Prepare the JSON body for gw_fct_set_current
+        extras = f'"type": "{scenario_type}", "id": "{scenario_id}"'
+        body = tools_gw.create_body(extras=extras)
+
+        # Execute the stored procedure
+        result = tools_gw.execute_procedure("gw_fct_set_current", body)
+        print(result)
+        # Check if the stored procedure returned a successful status
+        if result.get("status") == "Accepted":
+            # Refresh the table view and set the label for the current scenario
+            self._set_label_current_dscenario_type(dialog, result=result)
+        else:
+            # If the procedure fails, show a warning
+            tools_qgis.show_warning(f"Failed to set {scenario_type} scenario", dialog=dialog)
+
+        # Re-open the dialog
+        tools_gw.open_dialog(dialog)
+
+
+    def _set_label_current_dscenario_type(self, dialog, scenario_type=None, from_open_dialog=False, result=None):
+        """
+        Sets the label for the current scenario by retrieving its name.
+
+        If `from_open_dialog` is True, the function calls `gw_fct_set_current`
+        to retrieve the name based on `scenario_type` only. Otherwise, it
+        uses the provided `result`.
+        """
+        # If called from open dialog, retrieve the current scenario without updating config_param_user
+        if from_open_dialog:
+            # Prepare the JSON body to get the current scenario of the given type
+            extras = f'"type": "{scenario_type}"'
+            body = tools_gw.create_body(extras=extras)
+
+            # Execute the stored procedure to retrieve the current scenario information
+            result = tools_gw.execute_procedure("gw_fct_set_current", body)
+
+            # Check if the stored procedure returned a successful status
+            if result.get("status") != "Accepted":
+                print("Failed to retrieve current scenario name")
+                return
+        try:
+            name_value = result["body"]["data"]["name"]
+            tools_qt.set_widget_text(dialog, 'lbl_vdefault_dscenario', name_value)
+        except KeyError:
+            print("Error: 'name' field is missing in the result.")
 
 
     def _get_list(self, table_name='v_edit_cat_dscenario', filter_name="", filter_id=None, filter_active=None):
