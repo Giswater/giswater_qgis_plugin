@@ -90,6 +90,7 @@ class GwImportInpTask(GwTask):
         workcat,
         exploitation,
         sector,
+        municipality,
         catalogs,
     ) -> None:
         super().__init__(description)
@@ -98,6 +99,7 @@ class GwImportInpTask(GwTask):
         self.workcat: str = workcat
         self.exploitation: int = exploitation
         self.sector: int = sector
+        self.municipality: int = municipality
         self.catalogs: dict[str, Any] = catalogs
         self.log: list[str] = []
         self.mappings: dict[str, dict[str, str]] = {"curves": {}, "patterns": {}}
@@ -150,6 +152,10 @@ class GwImportInpTask(GwTask):
 
         if not self.sector:
             message = "Please select a sector to proceed with this import."
+            raise ValueError(message)
+
+        if not self.municipality:
+            message = "Please select a municipality to proceed with this import."
             raise ValueError(message)
 
     def _create_workcat_id(self):
@@ -325,13 +331,13 @@ class GwImportInpTask(GwTask):
 
     def _save_junctions_to_v_edit_node(self) -> None:
         sql = """
-            INSERT INTO v_edit_node (the_geom, code, elevation, nodecat_id, epa_type, expl_id, sector_id, state, state_type, workcat_id)
+            INSERT INTO v_edit_node (the_geom, code, elevation, nodecat_id, epa_type, expl_id, sector_id, muni_id, state, state_type, workcat_id)
             VALUES %s
             RETURNING node_id, code
         """
 
         template = (
-            "(ST_SetSRID(ST_Point(%s, %s),%s), %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+            "(ST_SetSRID(ST_Point(%s, %s),%s), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
         )
 
         params = []
@@ -343,6 +349,7 @@ class GwImportInpTask(GwTask):
             epa_type = "JUNCTION"
             expl_id = self.exploitation
             sector_id = self.sector
+            muni_id = self.municipality
             state = 1
             state_type = 2
             workcat_id = self.workcat
@@ -357,6 +364,7 @@ class GwImportInpTask(GwTask):
                     epa_type,
                     expl_id,
                     sector_id,
+                    muni_id,
                     state,
                     state_type,
                     workcat_id,

@@ -336,6 +336,7 @@ class GwImportInp(GwAction):
             workcat = "import_inp_test"
             exploitation = 1
             sector = 1
+            municipality = 1
             catalogs = {'pipes': {(57.0, 0.0025): 'INP-PIPE01', (57.0, 0.025): 'INP-PIPE02', (99.0, 0.0025): 'PELD110-PN10', (99.0, 0.025): 'FC110-PN10', (144.0, 0.0025): 'PVC160-PN16', (144.0, 0.025): 'FC160-PN10', (153.0, 0.03): 'INP-PIPE03', (204.0, 0.03): 'INP-PIPE04'},
                         'materials': {0.025: 'FC', 0.0025: 'PVC', 0.03: 'FD'},
                         'features': {'junctions': 'JUNCTION', 'pipes': 'PIPE', 'pumps': 'VARC', 'reservoirs': 'SOURCE', 'tanks': 'TANK', 'valves': 'VARC'},
@@ -354,6 +355,7 @@ class GwImportInp(GwAction):
                 workcat,
                 exploitation,
                 sector,
+                municipality,
                 catalogs,
             )
             QgsApplication.taskManager().addTask(self.import_inp_task)
@@ -390,6 +392,14 @@ class GwImportInp(GwAction):
             message = "Please select a sector to proceed with this import."
             tools_qt.show_info_box(message)
             return
+
+        # # Municipality
+        # municipality = tools_qt.get_combo_value(self.dlg_config, "cmb_muni")
+
+        # if municipality == "":
+        #     message = "Please select a municipality to proceed with this import."
+        #     tools_qt.show_info_box(message)
+        #     return
 
         # Tables (Arcs and Nodes)
         catalogs = {"pipes": {}, "materials": {}, "features": {}}
@@ -436,6 +446,7 @@ class GwImportInp(GwAction):
             workcat,
             exploitation,
             sector,
+            # municipality,
             catalogs,
         )
         QgsApplication.taskManager().addTask(self.import_inp_task)
