@@ -1692,7 +1692,9 @@ class GwPsector:
         self.dlg_psector_mng.btn_show_psector.clicked.connect(self._show_psector)
 
         self.dlg_psector_mng.btn_update_psector.clicked.connect(
-            partial(self.update_current_psector, self.dlg_psector_mng, self.qtbl_psm))
+            partial(self.update_current_psector, self.dlg_psector_mng, qtbl=self.qtbl_psm, scenario_type="psector",
+                col_id_name="psector_id", view_name="v_edit_plan_psector"))
+
         self.dlg_psector_mng.btn_duplicate.clicked.connect(self.psector_duplicate)
         self.dlg_psector_mng.btn_merge.clicked.connect(self.psector_merge)
         self.dlg_psector_mng.txt_name.textChanged.connect(partial(
@@ -1703,7 +1705,7 @@ class GwPsector:
         tools_gw.set_tablemodel_config(self.dlg_psector_mng, self.qtbl_psm, table_name)
         selection_model = self.qtbl_psm.selectionModel()
         selection_model.selectionChanged.connect(partial(self._fill_txt_infolog))
-        self.set_label_current_psector(self.dlg_psector_mng)
+        self.set_label_current_psector(self.dlg_psector_mng, scenario_type="psector", from_open_dialog=True)
         # Open form
         self.dlg_psector_mng.setWindowFlags(Qt.WindowStaysOnTopHint)
         tools_gw.open_dialog(self.dlg_psector_mng, dlg_name="psector_manager")
@@ -1747,77 +1749,50 @@ class GwPsector:
             tools_qgis.force_refresh_map_canvas()
             tools_gw.refresh_selectors()
 
+    def update_current_psector(self, dialog, qtbl, scenario_type, col_id_name, view_name):
+        """ Sets the selected psector as current if it is active """
+        # Get selected rows in the table
+        selected_list = qtbl.selectionModel().selectedRows()
 
-    def update_current_psector(self, dialog, qtbl_psm):
-
-        selected_list = qtbl_psm.selectionModel().selectedRows()
+        # Check if any row is selected
         if len(selected_list) == 0:
-            message = "Any record selected"
+            message = "No record selected"
             tools_qgis.show_warning(message, dialog=dialog)
             return
+
+        # Get the first selected row and retrieve psector_id and active status
         row = selected_list[0].row()
-        psector_id = qtbl_psm.model().record(row).value("psector_id")
-        active = qtbl_psm.model().record(row).value("active")
-        if active is False:
-            message = f"Cannot set the current psector of an inactive psector. You must activate it before."
-            tools_qgis.show_warning(message, dialog=self.dlg_psector_mng)
+        model = qtbl.model()
+        col_id = tools_qt.get_col_index_by_col_name(qtbl, col_id_name)
+        col_active = tools_qt.get_col_index_by_col_name(qtbl, 'active')
+
+        # Access the data using the model's index method
+        scenario_id = model.index(row, col_id).data()
+        active = model.index(row, col_active).data()
+
+        # Verify that the selected psector is active
+        if not active:
+            message = "Cannot set the current psector of an inactive scenario. Please activate it first."
+            tools_qgis.show_warning(message, dialog=dialog)
             return
-        aux_widget = QLineEdit()
-        aux_widget.setText(str(psector_id))
-        self.upsert_config_param_user(dialog, aux_widget, "plan_psector_vdefault")
 
-        message = "Values has been updated"
-        tools_qgis.show_info(message, dialog=dialog)
+        # Prepare the JSON body for gw_fct_set_current
+        extras = f'"type": "{scenario_type}", "id": "{scenario_id}"'
+        body = tools_gw.create_body(extras=extras)
 
-        self.fill_table(dialog, qtbl_psm, "v_ui_plan_psector")
-        tools_gw.set_tablemodel_config(dialog, qtbl_psm, "v_ui_plan_psector")
-        self.set_label_current_psector(dialog)
-        tools_gw.open_dialog(dialog)
+        # Execute the stored procedure
+        result = tools_gw.execute_procedure("gw_fct_set_current", body)
 
-
-    def upsert_config_param_user(self, dialog, widget, parameter):
-        """ Insert or update values in tables with current_user control """
-
-        tablename = "config_param_user"
-        sql = (f"SELECT * FROM {tablename}"
-               f" WHERE cur_user = current_user")
-        rows = tools_db.get_rows(sql)
-        exist_param = False
-        if type(widget) != QDateEdit:
-            if tools_qt.get_text(dialog, widget) != "":
-                for row in rows:
-                    if row[0] == parameter:
-                        exist_param = True
-                if exist_param:
-                    sql = f"UPDATE {tablename} SET value = "
-                    if widget.objectName() != 'edit_state_vdefault':
-                        sql += (f"'{tools_qt.get_text(dialog, widget)}'"
-                                f" WHERE cur_user = current_user AND parameter = '{parameter}'")
-                    else:
-                        sql += (f"(SELECT id FROM value_state"
-                                f" WHERE name = '{tools_qt.get_text(dialog, widget)}')"
-                                f" WHERE cur_user = current_user AND parameter = 'edit_state_vdefault'")
-                else:
-                    sql = f'INSERT INTO {tablename} (parameter, value, cur_user)'
-                    if widget.objectName() != 'edit_state_vdefault':
-                        sql += f" VALUES ('{parameter}', '{tools_qt.get_text(dialog, widget)}', current_user)"
-                    else:
-                        sql += (f" VALUES ('{parameter}',"
-                                f" (SELECT id FROM value_state"
-                                f" WHERE name = '{tools_qt.get_text(dialog, widget)}'), current_user)")
+        # Check if the stored procedure returned a successful status
+        if result.get("status") == "Accepted":
+            # Refresh the table view and set the label for the current psector
+            self.set_label_current_psector(dialog, result=result)
         else:
-            for row in rows:
-                if row[0] == parameter:
-                    exist_param = True
-            _date = widget.dateTime().toString('yyyy-MM-dd')
-            if exist_param:
-                sql = (f"UPDATE {tablename}"
-                       f" SET value = '{_date}'"
-                       f" WHERE cur_user = current_user AND parameter = '{parameter}'")
-            else:
-                sql = (f"INSERT INTO {tablename} (parameter, value, cur_user)"
-                       f" VALUES ('{parameter}', '{_date}', current_user);")
-        tools_db.execute_sql(sql)
+            # If the procedure fails, show a warning
+            tools_qgis.show_warning("Failed to set psector", dialog=dialog)
+
+        # Re-open the dialog
+        tools_gw.open_dialog(dialog)
 
 
     def _filter_table(self, dialog, table, widget_txt, widget_chk, tablename):
@@ -2053,21 +2028,46 @@ class GwPsector:
         psector_id = self.qtbl_psm.model().record(row).value("psector_id")
         self.duplicate_psector = GwPsectorDuplicate()
         self.duplicate_psector.is_duplicated.connect(partial(self.fill_table, self.dlg_psector_mng, self.qtbl_psm, 'v_ui_plan_psector'))
-        self.duplicate_psector.is_duplicated.connect(partial(self.set_label_current_psector, self.dlg_psector_mng))
+        self.duplicate_psector.is_duplicated.connect(partial(self.set_label_current_psector, self.dlg_psector_mng, scenario_type="psector", from_open_dialog=True))
         self.duplicate_psector.manage_duplicate_psector(psector_id)
 
 
-    def set_label_current_psector(self, dialog):
+    def set_label_current_psector(self, dialog, scenario_type=None, from_open_dialog=False, result=None):
+        """
+        Sets the label for the current psector scenario by retrieving its name.
 
-        sql = ("SELECT t1.psector_id, t1.name FROM plan_psector AS t1 "
-               " INNER JOIN config_param_user AS t2 ON t1.psector_id::text = t2.value "
-               " WHERE t2.parameter='plan_psector_vdefault' AND cur_user = current_user")
-        row = tools_db.get_row(sql)
-        self.current_psector_id = row
-        if not row:
+        If `from_open_dialog` is True, the function calls `gw_fct_set_current`
+        to retrieve the name based on `scenario_type` only. Otherwise, it
+        uses the provided `result`.
+
+        It also respects the selector settings using `gw_fct_getselectors`.
+        """
+        # If called from open dialog, retrieve the current psector without updating config_param_user
+        if from_open_dialog:
+            # Prepare the JSON body to get the current psector of the given type
+            extras = f'"type": "{scenario_type}"'
+            body = tools_gw.create_body(extras=extras)
+
+            # Execute the stored procedure to retrieve the current psector information
+            result = tools_gw.execute_procedure("gw_fct_set_current", body)
+            if not result or result.get("status") != "Accepted":
+                print("Failed to retrieve current psector name")
+                return
+
+        # Extract and set the name from the result, regardless of how it was obtained
+        try:
+            # Retrieve the 'name' value from the result and set it on the dialog label
+            name_value = result["body"]["data"]["name"]
+            tools_qt.set_widget_text(dialog, 'lbl_vdefault_psector', name_value)
+
+            # Retrieve the psector ID for use in the extras configuration
+            psector_id = result["body"]["data"]["psector_id"]
+        except KeyError:
+            print("Error: 'name' or 'psector_id' field is missing in the result.")
             return
-        tools_qt.set_widget_text(dialog, 'lbl_vdefault_psector', self.current_psector_id[1])
-        extras = (f'"selectorType":"selector_basic", "tabName":"tab_psector", "id":{self.current_psector_id[0]}, '
+
+        # Define `extras` with the retrieved psector ID and other parameters
+        extras = (f'"selectorType":"selector_basic", "tabName":"tab_psector", "id":{psector_id}, '
                   f'"isAlone":"False", "disableParent":"False", '
                   f'"value":"True"')
         body = tools_gw.create_body(extras=extras)
