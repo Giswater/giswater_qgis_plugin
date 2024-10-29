@@ -147,6 +147,9 @@ class GwImportInpTask(GwTask):
             self._log_message("Inserting junctions into DB")
             self._save_junctions_to_v_edit_node()
 
+            self._log_message("Inserting pipes into DB")
+            self._save_pipes_to_v_edit_arc()
+
             execute_sql("select 1", commit=True)
             self._log_message("ALL DONE! INP successfully imported.")
             return True
@@ -398,7 +401,64 @@ class GwImportInpTask(GwTask):
             sql, params, template, fetch=True, commit=True
         )
 
+        self.junction_ids = {j[1]: j[0] for j in junctions} if junctions else {}
         print(junctions)
+
+    def _save_pipes_to_v_edit_arc(self) -> None:
+        sql = """
+            INSERT INTO v_edit_arc (the_geom, code, node_1, node_2, arccat_id, epa_type, expl_id, sector_id, muni_id, state, state_type, workcat_id)
+            VALUES %s
+            RETURNING arc_id, code
+        """
+
+        template = (
+            "(ST_SetSRID(ST_MakeLine(ST_Point(%s, %s), ST_Point(%s, %s)), %s), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        )
+
+        params = []
+
+        for p_name, p in self.network.pipes():
+            x1, y1 = p.start_node.coordinates
+            x2, y2 = p.end_node.coordinates
+            srid = lib_vars.data_epsg
+            try:
+                node_1 = self.junction_ids[p.start_node_name]
+                node_2 = self.junction_ids[p.end_node_name]
+            except KeyError as e:
+                self._log_message(f"{e}")
+                continue
+            arccat_id = self.catalogs["pipes"]  # TODO: get arccat_id from dint & roughness
+            epa_type = "PIPE"
+            expl_id = self.exploitation
+            sector_id = self.sector
+            muni_id = self.municipality
+            state = 1
+            state_type = 2
+            workcat_id = self.workcat
+            params.append(
+                (
+                    x1, y1,
+                    x2, y2,
+                    srid,
+                    p_name,
+                    node_1,
+                    node_2,
+                    arccat_id,
+                    epa_type,
+                    expl_id,
+                    sector_id,
+                    muni_id,
+                    state,
+                    state_type,
+                    workcat_id,
+                )
+            )
+
+        pipes = toolsdb_execute_values(
+            sql, params, template, fetch=True, commit=True
+        )
+
+        print(pipes)
 
     def _log_message(self, message: str, end: str="\n"):
         self.log.append(message)
