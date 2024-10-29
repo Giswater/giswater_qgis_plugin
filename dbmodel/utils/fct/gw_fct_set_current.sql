@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE:
+--FUNCTION CODE 3342:
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_set_current(json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_set_current(p_data JSON)

@@ -518,5 +518,4 @@ INSERT INTO sys_style (layername, styleconfig_id, styletype, stylevalue, active)
   <layerGeometryType>0</layerGeometryType>
 </qgis>', true);
 
-
-
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source") VALUES(3342, 'gw_fct_set_current', 'utils', 'function', 'json', 'json', 'Sets the selected value as "current" for the user in config_param_user(value) and return the id and name to set it on label', 'role_basic', NULL, 'core');
