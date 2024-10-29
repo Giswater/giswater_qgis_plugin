@@ -115,46 +115,37 @@ class GwImportInpTask(GwTask):
     def run(self) -> bool:
         super().run()
         try:
-            self._log_message("Validating inputs...", end="")
+            self._log_message("Validating inputs")
             self._validate_inputs()
-            self._log_message("done!")
 
-            self._log_message("Getting units from DB...", end="")
+            self._log_message("Getting units from DB")
             self._get_db_units()
-            self._log_message("done!")
 
-            self._log_message("Creating workcat...", end="")
+            self._log_message("Creating workcat")
             self._create_workcat_id()
-            self._log_message("done!")
 
-            self._log_message("Creating new node catalogs...", end="")
+            self._log_message("Creating new node catalogs")
             self._create_new_node_catalogs()
-            self._log_message("done!")
 
             # Get existing catalogs in DB
             cat_arc_ids = get_rows("SELECT id FROM cat_arc", commit=False)
             if cat_arc_ids:
                 self.arccat_db += [x[0] for x in cat_arc_ids]
 
-            self._log_message("Creating new varc catalogs...")
+            self._log_message("Creating new varc catalogs")
             self._create_new_varc_catalogs()
-            self._log_message("done!")
 
-            self._log_message("Creating new pipe catalogs...")
+            self._log_message("Creating new pipe catalogs")
             self._create_new_pipe_catalogs()
-            self._log_message("done!")
 
-            self._log_message("Inserting patterns into DB...")
+            self._log_message("Inserting patterns into DB")
             self._save_patterns()
-            self._log_message("done!")
 
-            self._log_message("Inserting curves into DB...")
+            self._log_message("Inserting curves into DB")
             self._save_curves()
-            self._log_message("done!")
 
-            self._log_message("Inserting junctions into DB...")
+            self._log_message("Inserting junctions into DB")
             self._save_junctions_to_v_edit_node()
-            self._log_message("done!")
 
             execute_sql("select 1", commit=True)
             self._log_message("ALL DONE! INP successfully imported.")
