@@ -1,17 +1,9 @@
 <div align="center">
 	<h1>Giswater DB Model</h1>
-	<a href="https://github.com/Giswater/giswater_dbmodel">
-		<img alt="Giswater Dbmodel Badge" src="https://img.shields.io/badge/GISWATER-DBMODEL-blue?style=for-the-badge&logo=postgresql&logoColor=ffffff">
-	</a>
-	<a href="./LICENSE">
-		<img alt="LICENSE" src="https://img.shields.io/github/license/giswater/giswater_dbmodel?style=for-the-badge">
-	</a>
-	<a href="https://github.com/Giswater/giswater_dbmodel/actions/workflows/ci_test_ud_db.yml">
-		<img alt="CI Testing UD" src="https://img.shields.io/github/actions/workflow/status/giswater/giswater_dbmodel/ci_test_ud_db.yml?branch=dev-4.0&style=for-the-badge&label=TEST%20UD">
-	</a>
-	<a href="https://github.com/Giswater/giswater_dbmodel/actions/workflows/ci_test_ws_db.yml">
-		<img alt="CI Testing WS" src="https://img.shields.io/github/actions/workflow/status/giswater/giswater_dbmodel/ci_test_ws_db.yml?branch=dev-4.0&style=for-the-badge&label=TEST%20WS">
-	</a>
+	<a href="https://github.com/Giswater/giswater_dbmodel"><img alt="Giswater Dbmodel Badge" src="https://img.shields.io/badge/GISWATER-DBMODEL-blue?style=for-the-badge&logo=postgresql&logoColor=ffffff"></a>
+	<a href="./LICENSE"><img alt="LICENSE" src="https://img.shields.io/github/license/giswater/giswater_dbmodel?style=for-the-badge"></a>
+	<a href="https://github.com/Giswater/giswater_dbmodel/actions/workflows/ci_test_ud_db.yml"><img alt="CI Testing UD" src="https://img.shields.io/github/actions/workflow/status/giswater/giswater_dbmodel/ci_test_ud_db.yml?branch=dev-4.0&style=for-the-badge&label=TEST%20UD"></a>
+	<a href="https://github.com/Giswater/giswater_dbmodel/actions/workflows/ci_test_ws_db.yml"><img alt="CI Testing WS" src="https://img.shields.io/github/actions/workflow/status/giswater/giswater_dbmodel/ci_test_ws_db.yml?branch=dev-4.0&style=for-the-badge&label=TEST%20WS"></a>
 </div>
 
 **Giswater** revolutionizes water management by simplifying the planning and control of water supply networks without costly investments. Since its launch in 2014, Giswater is the first open-source software designed for integrated water management, connecting IT solutions and databases for high-performance management systems. It integrates seamlessly with hydraulic modeling software like **EPANET** and **SWMM**, making it indispensable for professionals and organizations in water management.
