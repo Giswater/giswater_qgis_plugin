@@ -970,7 +970,7 @@ class GwPsector:
             if self.project_type.upper() == 'UD':
                 self.reset_model_psector("gully")
             self.reset_model_psector("other")
-            tools_gw.close_dialog(self.dlg_plan_psector)
+            self._handle_dialog_close()
             tools_qgis.disconnect_snapping()
             tools_gw.disconnect_signal('psector')
             tools_qgis.disconnect_signal_selection_changed()
@@ -1674,6 +1674,7 @@ class GwPsector:
         tools_gw.load_settings(self.dlg_psector_mng)
         table_name = "v_ui_plan_psector"
         column_id = "psector_id"
+        self._original_visibility_state = {}
 
         # Tables
         self.qtbl_psm = self.dlg_psector_mng.findChild(QTableView, "tbl_psm")
@@ -1683,9 +1684,12 @@ class GwPsector:
         # Set signals
         self.dlg_psector_mng.chk_active.stateChanged.connect(partial(self._filter_table, self.dlg_psector_mng,
            self.qtbl_psm, self.dlg_psector_mng.txt_name, self.dlg_psector_mng.chk_active, table_name))
-        self.dlg_psector_mng.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_psector_mng))
+
+        self.dlg_psector_mng.chk_filter_canvas.stateChanged.connect(self._toggle_canvas_filter)
+
+        self.dlg_psector_mng.btn_cancel.clicked.connect(self._handle_dialog_close)
         self.dlg_psector_mng.btn_toggle_active.clicked.connect(partial(self.set_toggle_active, self.dlg_psector_mng, self.qtbl_psm))
-        self.dlg_psector_mng.rejected.connect(partial(tools_gw.close_dialog, self.dlg_psector_mng))
+        self.dlg_psector_mng.rejected.connect(self._handle_dialog_close)
         self.dlg_psector_mng.btn_delete.clicked.connect(partial(
             self.multi_rows_delete, self.dlg_psector_mng, self.qtbl_psm, table_name, column_id, 'lbl_vdefault_psector', 'psector'))
         self.dlg_psector_mng.btn_delete.clicked.connect(partial(tools_gw.refresh_selectors))
@@ -1825,6 +1829,134 @@ class GwPsector:
         table.model().setFilter(expr)
         table.model().select()
 
+    def _toggle_canvas_filter(self):
+        """
+        Toggles the filter on or off based on checkbox state.
+        Saves visibility state, connects/disconnects filter, and updates the table.
+        """
+        if self.dlg_psector_mng.chk_filter_canvas.isChecked():
+            # Save initial visibility of target layer
+            self._save_visibility_state('v_edit_plan_psector')
+
+            # Ensure layer is loaded and visible
+            self._enable_layers_for_filtering()
+
+            # Connect filter to canvas updates
+            self.canvas.mapCanvasRefreshed.connect(self._apply_canvas_filter)
+
+            # Apply filter based on current canvas extent
+            self._apply_canvas_filter()
+        else:
+            # Restore original visibility states
+            self._restore_visibility_state()
+
+            try:
+                self.canvas.mapCanvasRefreshed.disconnect(self._apply_canvas_filter)
+            except TypeError:
+                pass # Ignore if already disconnected
+
+            # Clear filter to show all features in the table
+            self.dlg_psector_mng.tbl_psm.model().setFilter("")
+
+    def _apply_canvas_filter(self):
+        """Filters the psector layer by the current map extent, updating visible features in the table."""
+
+        # Get current map canvas extent
+        canvas_extent = self.iface.mapCanvas().extent()
+        # Retrieve the target layer
+        psector_layer = tools_qgis.get_layer_by_tablename('v_edit_plan_psector')
+
+        # Find features within the current extent
+        visible_feature_ids = []
+        for feature in psector_layer.getFeatures():
+            if canvas_extent.intersects(feature.geometry().boundingBox()):
+                visible_feature_ids.append(feature.id())
+        self._update_psector_manager_table(visible_feature_ids)
+
+
+    def _update_psector_manager_table(self, visible_ids):
+        """Filters the table to show only features with IDs in `visible_ids`."""
+
+        model = self.dlg_psector_mng.tbl_psm.model()
+
+        if visible_ids:
+            # Create a filter string for SQL that matches only the visible IDs
+            id_list_str = ",".join(map(str, visible_ids))
+            filter_expression = f"psector_id IN ({id_list_str})"
+        else:
+            # Set filter to an impossible condition to show nothing in the table
+            filter_expression = "psector_id IN (NULL)"
+
+        # Apply the filter to the model
+        model.setFilter(filter_expression)
+
+
+    def _enable_layers_for_filtering(self):
+        """Ensures `v_edit_plan_psector` is loaded and visible in QGIS."""
+
+        plan_layer = tools_qgis.get_layer_by_tablename('v_edit_plan_psector')
+        if not plan_layer:
+            # Load layer if not present in project
+            self._load_layer_to_project('v_edit_plan_psector', "the_geom", "psector_id")
+            # Reload reference after adding
+            plan_layer = tools_qgis.get_layer_by_tablename('v_edit_plan_psector')
+        if plan_layer:
+            self._activate_layer(plan_layer)
+
+    def _load_layer_to_project(self, tablename, geom_field, field_id):
+        """Loads a specified database layer yo load v_edit_plan_psector."""
+
+        tools_gw.add_layer_database(tablename=tablename, the_geom=geom_field, field_id=field_id, style_id=None)
+
+    def _activate_layer(self, layer):
+        """Makes the layer and its parent groups visible and sets it as active."""
+
+        root = self.iface.layerTreeCanvasBridge().rootGroup()
+        layer_node = root.findLayer(layer.id())
+        if layer_node:
+            layer_node.setItemVisibilityChecked(True)  # Ensure layer is visible
+            # Ensure visibility for parent groups up to root
+            parent = layer_node.parent()
+            while parent:
+                parent.setItemVisibilityChecked(True)
+                parent = parent.parent()
+            self.iface.setActiveLayer(layer)  # Set as active layer in QGIS
+
+    def _save_visibility_state(self, tablename):
+        """Saves visibility of the layer and its parent groups."""
+
+        layer = tools_qgis.get_layer_by_tablename(tablename)
+        if layer:
+            layer_node = self.iface.layerTreeCanvasBridge().rootGroup().findLayer(layer.id())
+            while layer_node:
+                # Store visibility state
+                self._original_visibility_state[layer_node.name()] = layer_node.isVisible()
+                # Move up to parent node
+                layer_node = layer_node.parent()
+
+    def _restore_visibility_state(self):
+        """Restores saved visibility state of layers and groups."""
+
+        root = self.iface.layerTreeCanvasBridge().rootGroup()
+        # Iterate saved visibility states and apply them to nodes
+        for name, is_visible in self._original_visibility_state.items():
+            node = root.findGroup(name) or root.findLayer(name)  # Find by group name or layer ID
+            if node:
+                node.setItemVisibilityChecked(is_visible)  # Restore saved visibility
+
+    def _handle_dialog_close(self):
+        """
+        Handles the dialog close event, ensuring the checkbox is unchecked
+        and the filter is disabled if it was still active.
+        """
+        if self.dlg_psector_mng.chk_filter_canvas.isChecked():
+            # Uncheck the checkbox and disable the filter
+            self.dlg_psector_mng.chk_filter_canvas.setChecked(False)
+            # Disable filter and restore visibility
+            self._toggle_canvas_filter()
+
+        # Accept the close event to allow the dialog to close
+        tools_gw.close_dialog(self.dlg_psector_mng)
 
 
     def charge_psector(self, qtbl_psm):
@@ -1844,7 +1976,7 @@ class GwPsector:
         psector_id = qtbl_psm.model().record(row).value("psector_id")
         keep_open_form = tools_gw.get_config_parser('dialogs_actions', 'psector_manager_keep_open', "user", "init", prefix=True)
         if tools_os.set_boolean(keep_open_form, False) is not True:
-            tools_gw.close_dialog(self.dlg_psector_mng)
+            self._handle_dialog_close()
 
         # put psector on selector_psector
         sql = f"DELETE FROM selector_psector WHERE psector_id = {psector_id} AND cur_user = current_user;" \
