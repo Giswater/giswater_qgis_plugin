@@ -970,7 +970,7 @@ class GwPsector:
             if self.project_type.upper() == 'UD':
                 self.reset_model_psector("gully")
             self.reset_model_psector("other")
-            self._handle_dialog_close()
+            tools_gw.close_dialog(self.dlg_plan_psector)
             tools_qgis.disconnect_snapping()
             tools_gw.disconnect_signal('psector')
             tools_qgis.disconnect_signal_selection_changed()
