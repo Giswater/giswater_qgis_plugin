@@ -28,7 +28,6 @@ CREATE TABLE config_form_help (
     formname VARCHAR(50) NOT NULL,
     tabname VARCHAR(30) NOT NULL DEFAULT 'tab_none'::character varying,
     path TEXT,
-    device INT[],
     CONSTRAINT config_form_help_pkey PRIMARY KEY (formtype, formname, tabname)
 );
 
