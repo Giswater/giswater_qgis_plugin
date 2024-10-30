@@ -550,3 +550,5 @@ DELETE FROM config_typevalue WHERE typevalue='linkedaction_typevalue' AND id='ac
 DELETE FROM config_typevalue WHERE typevalue='linkedaction_typevalue' AND id='action_link';
 DELETE FROM config_typevalue WHERE typevalue='linkedaction_typevalue' AND id='action_workcat';
 ALTER TABLE config_typevalue ENABLE TRIGGER gw_trg_typevalue_config_fk;
+
+DELETE FROM plan_typevalue WHERE typevalue = 'result_type';
