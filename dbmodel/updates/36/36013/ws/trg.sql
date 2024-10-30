@@ -14,17 +14,3 @@ FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_arc('inp_pipe');
 
 CREATE TRIGGER gw_trg_edit_ve_epa_pipe INSTEAD OF INSERT OR UPDATE OR DELETE ON ve_epa_pipe
 FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_ve_epa('pipe');
-
-
--- 20/09/2024
-drop trigger if exists gw_trg_typevalue_fk on arc;
-create trigger gw_trg_typevalue_fk after insert or update of verified
-on arc for each row execute function gw_trg_typevalue_fk('arc');
-
-drop trigger if exists gw_trg_typevalue_fk on node;
-create trigger gw_trg_typevalue_fk after insert or update of verified
-on node for each row execute function gw_trg_typevalue_fk('node');
-
-drop trigger if exists gw_trg_typevalue_fk on connec;
-create trigger gw_trg_typevalue_fk after insert or update of verified
-on connec for each row execute function gw_trg_typevalue_fk('connec');

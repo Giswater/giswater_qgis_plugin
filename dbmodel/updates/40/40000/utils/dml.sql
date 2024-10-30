@@ -519,3 +519,34 @@ INSERT INTO sys_style (layername, styleconfig_id, styletype, stylevalue, active)
 </qgis>', true);
 
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source") VALUES(3342, 'gw_fct_set_current', 'utils', 'function', 'json', 'json', 'Sets the selected value as "current" for the user in config_param_user(value) and return the id and name to set it on label', 'role_basic', NULL, 'core');
+
+
+-- 30/10/2024
+
+DELETE FROM sys_foreignkey WHERE typevalue_table='inp_typevalue' AND typevalue_name='inp_value_param_energy' AND target_table='inp_pump' AND target_field='energyparam';
+DELETE FROM sys_foreignkey WHERE typevalue_table='inp_typevalue' AND typevalue_name='inp_value_param_energy' AND target_table='inp_pump_additional' AND target_field='energyparam';
+DELETE FROM sys_foreignkey WHERE typevalue_table='inp_typevalue' AND typevalue_name='inp_value_param_energy' AND target_table='inp_dscenario_pump_additional' AND target_field='energyparam';
+
+DELETE FROM sys_foreignkey WHERE typevalue_table='inp_typevalue' AND typevalue_name='inp_value_pattern_type' AND target_table='inp_pattern' AND target_field='pattern_type';
+
+DELETE FROM sys_foreignkey WHERE typevalue_table='inp_typevalue' AND typevalue_name='inp_value_status_valve' AND target_table='inp_valve' AND target_field='status';
+
+DELETE FROM sys_foreignkey  WHERE typevalue_table='config_typevalue' AND typevalue_name='linkedaction_typevalue' AND target_table='config_form_fields' AND target_field='linkedaction';
+
+ALTER TABLE inp_typevalue DISABLE TRIGGER gw_trg_typevalue_config_fk;
+DELETE FROM inp_typevalue WHERE typevalue='inp_value_param_energy' AND id='EFFIC';
+DELETE FROM inp_typevalue WHERE typevalue='inp_value_param_energy' AND id='PATTERN';
+DELETE FROM inp_typevalue WHERE typevalue='inp_value_param_energy' AND id='PRICE';
+
+DELETE FROM inp_typevalue WHERE typevalue='inp_value_pattern_type' AND id='VOLUME';
+DELETE FROM inp_typevalue WHERE typevalue='inp_value_pattern_type' AND id='UNITARY';
+
+DELETE FROM inp_typevalue WHERE typevalue='inp_value_status_valve' AND id='CLOSED';
+DELETE FROM inp_typevalue WHERE typevalue='inp_value_status_valve' AND id='OPEN';
+ALTER TABLE inp_typevalue ENABLE TRIGGER gw_trg_typevalue_config_fk;
+
+ALTER TABLE config_typevalue DISABLE TRIGGER gw_trg_typevalue_config_fk;
+DELETE FROM config_typevalue WHERE typevalue='linkedaction_typevalue' AND id='action_catalog';
+DELETE FROM config_typevalue WHERE typevalue='linkedaction_typevalue' AND id='action_link';
+DELETE FROM config_typevalue WHERE typevalue='linkedaction_typevalue' AND id='action_workcat';
+ALTER TABLE config_typevalue ENABLE TRIGGER gw_trg_typevalue_config_fk;

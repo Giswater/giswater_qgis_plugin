@@ -25,16 +25,17 @@ rec record;
 
 v_version text;
 v_notify_action json;
-rec_json record; 
+rec_json record;
 v_table record;
+v_field_conditions text;
 v_tableversion text = 'sys_version';
 v_schemaname text = 'SCHEMA_NAME';
 
 BEGIN
-	
+
 	-- Search path
 	SET search_path = "SCHEMA_NAME", public;
-	
+
 	-- get info from version table
 	IF (SELECT tablename FROM pg_tables WHERE schemaname = v_schemaname AND tablename = 'version') IS NOT NULL THEN v_tableversion = 'version'; END IF;
  	EXECUTE 'SELECT giswater FROM '||quote_ident(v_tableversion)||' LIMIT 1' INTO v_version;
@@ -44,17 +45,17 @@ BEGIN
 		FOR rec IN (select * FROM sys_table WHERE notify_action IS NOT NULL AND id NOT IN (SELECT viewname FROM pg_views WHERE schemaname = 'SCHEMA_NAME')) LOOP
 			v_notify_action = rec.notify_action;
 
-			FOR rec_json IN  SELECT (a)->>'action' as action,(a)->>'name' as name, (a)->>'trg_fields' as trg_fields,(a)->>'featureType' as featureType 
+			FOR rec_json IN  SELECT (a)->>'action' as action,(a)->>'name' as name, (a)->>'trg_fields' as trg_fields,(a)->>'featureType' as featureType
 			FROM json_array_elements(v_notify_action) a LOOP
 
-				IF (rec.id ILIKE 'v_%' OR rec.id ILIKE 've_%' OR rec.id ILIKE 'vi_%') AND rec.id != 'vnode' 
+				IF (rec.id ILIKE 'v_%' OR rec.id ILIKE 've_%' OR rec.id ILIKE 'vi_%') AND rec.id != 'vnode'
 				AND rec.id not ilike 'value%' AND rec_json.action = 'desktop' THEN
 
 					EXECUTE 'DROP TRIGGER IF EXISTS  gw_trg_notify ON '||rec.id||';';
 					EXECUTE  'CREATE TRIGGER gw_trg_notify 
 							INSTEAD OF INSERT OR UPDATE OF '||rec_json.trg_fields||' OR DELETE ON '||rec.id||'
 							FOR EACH ROW EXECUTE PROCEDURE gw_trg_notify('''||rec.id||''');';
-					
+
 				ELSE
 					EXECUTE 'DROP TRIGGER IF EXISTS gw_trg_notify ON '||rec.id||';';
 					EXECUTE 'CREATE TRIGGER gw_trg_notify 
@@ -69,17 +70,33 @@ BEGIN
 		EXECUTE 'DROP TRIGGER IF EXISTS gw_trg_typevalue_fk ON '||p_table||';';
 		EXECUTE 'CREATE TRIGGER gw_trg_typevalue_fk AFTER INSERT OR UPDATE ON '||p_table||'
 		FOR EACH ROW EXECUTE PROCEDURE gw_trg_typevalue_fk('''||p_table||''');';
-				
+
 	ELSIF p_action = 'fk' AND p_table IS NOT NULL AND p_table ='ALL' THEN
 
-		FOR v_table IN SELECT * FROM sys_foreignkey WHERE active IS TRUE
+		FOR v_table IN SELECT target_table, array_agg(target_field) AS fields FROM sys_foreignkey WHERE active IS TRUE GROUP BY target_table
 		LOOP
-			RAISE NOTICE ' v_table %', v_table;
-			IF (SELECT table_type FROM information_schema.tables WHERE  table_schema = 'SCHEMA_NAME' 
-			AND table_name = v_table.target_table) ='BASE TABLE' THEN
-				EXECUTE 'DROP TRIGGER IF EXISTS gw_trg_typevalue_fk ON '||v_table.target_table||';';
-				EXECUTE 'CREATE TRIGGER gw_trg_typevalue_fk AFTER INSERT OR UPDATE ON '||v_table.target_table||'
-				FOR EACH ROW EXECUTE PROCEDURE gw_trg_typevalue_fk('''||v_table.target_table||''');';
+			IF (SELECT table_type FROM information_schema.tables WHERE table_schema = 'SCHEMA_NAME'
+			AND table_name = v_table.target_table) = 'BASE TABLE' THEN
+				EXECUTE 'DROP TRIGGER IF EXISTS gw_trg_typevalue_fk ON ' || quote_ident(v_table.target_table) || ';';
+				EXECUTE 'DROP TRIGGER IF EXISTS gw_trg_typevalue_fk_insert ON ' || quote_ident(v_table.target_table) || ';';
+				EXECUTE 'DROP TRIGGER IF EXISTS gw_trg_typevalue_fk_update ON ' || quote_ident(v_table.target_table) || ';';
+
+				 -- Create the trigger for INSERT without WHEN condition
+				EXECUTE 'CREATE TRIGGER gw_trg_typevalue_fk_insert AFTER INSERT ON '
+						|| quote_ident(v_table.target_table)
+						|| ' FOR EACH ROW EXECUTE FUNCTION gw_trg_typevalue_fk('''
+						|| quote_ident(v_table.target_table) || ''');';
+
+				v_field_conditions = array_to_string(ARRAY(
+					SELECT 'OLD.' || quote_ident(f) || ' IS DISTINCT FROM NEW.' || quote_ident(f)
+					FROM unnest(v_table.fields) AS f), ' OR ');
+
+				EXECUTE 'CREATE TRIGGER gw_trg_typevalue_fk_update AFTER UPDATE OF '
+						|| array_to_string(v_table.fields, ', ')
+						|| ' ON ' || quote_ident(v_table.target_table)
+						|| ' FOR EACH ROW WHEN (' || v_field_conditions || ') '
+						|| ' EXECUTE FUNCTION gw_trg_typevalue_fk('''
+						|| quote_ident(v_table.target_table) || ''');';
 			END IF;
 		END LOOP;
 
@@ -87,14 +104,13 @@ BEGIN
 
 		FOR v_table IN SELECT * FROM sys_foreignkey WHERE active IS TRUE
 		LOOP
-			RAISE NOTICE ' v_table %', v_table;
 			EXECUTE 'UPDATE '||v_table.target_table||' SET '||v_table.target_field||' = '||v_table.target_field;
 		END LOOP;
 
 	END IF;
-	
+
 	RETURN;
-	
+
 END;
 $BODY$
  LANGUAGE plpgsql VOLATILE

@@ -8,14 +8,17 @@ This version of Giswater is provided by Giswater Association
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 ALTER TABLE arc DISABLE TRIGGER gw_trg_topocontrol_arc;
-ALTER TABLE arc DISABLE TRIGGER gw_trg_typevalue_fk;
+ALTER TABLE arc DISABLE TRIGGER gw_trg_typevalue_fk_insert;
+ALTER TABLE arc DISABLE TRIGGER gw_trg_typevalue_fk_update;
 ALTER TABLE connec DISABLE TRIGGER gw_trg_connec_proximity_insert;
 ALTER TABLE connec DISABLE TRIGGER gw_trg_unique_field;
-ALTER TABLE connec DISABLE TRIGGER gw_trg_typevalue_fk;
+ALTER TABLE connec DISABLE TRIGGER gw_trg_typevalue_fk_insert;
+ALTER TABLE connec DISABLE TRIGGER gw_trg_typevalue_fk_update;
 ALTER TABLE node DISABLE TRIGGER gw_trg_node_arc_divide;
 ALTER TABLE node DISABLE TRIGGER gw_trg_node_statecontrol;
 ALTER TABLE node DISABLE TRIGGER gw_trg_topocontrol_node;
-ALTER TABLE node DISABLE TRIGGER gw_trg_typevalue_fk;
+ALTER TABLE node DISABLE TRIGGER gw_trg_typevalue_fk_insert;
+ALTER TABLE node DISABLE TRIGGER gw_trg_typevalue_fk_update;
 
 INSERT INTO node VALUES ('131', '131', 50.5400, 0.0000, 'EXPANTANK', 'JUNCTION', 3, NULL, NULL, 1, 2, NULL, NULL, NULL, 2, '3', 'soil1', 'St. Function', 'St. Category', 'St. Fluid', 'St. Location', 'work1', NULL, 'builder1', '2017-12-06', NULL, 'owner1', 1, '08830', '1-10220C', NULL, NULL, NULL, NULL, NULL, NULL, 'https://www.giswater.org', '0', NULL, '0101000020E764000014FCE91F11931941633D9BA782755141', NULL, NULL, NULL, NULL, NULL, true, NULL, 1, NULL, 'NODE', '2020-08-13 09:15:52.215974', '2020-08-13 09:15:52.215974', 'postgres', 'postgres', NULL, 1, 0.000, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO node VALUES ('128', '128', 54.0000, 0.0000, 'FLEXUNION', 'JUNCTION', 3, NULL, NULL, 1, 2, NULL, NULL, NULL, 2, '3', 'soil1', 'St. Function', 'St. Category', 'St. Fluid', 'St. Location', 'work1', NULL, 'builder1', '2017-12-06', NULL, 'owner1', 1, '08830', '1-10220C', NULL, NULL, NULL, NULL, NULL, NULL, 'https://www.giswater.org', '0', NULL, '0101000020E76400002A176CFFE9911941FF68107A89755141', NULL, NULL, NULL, NULL, NULL, true, NULL, 1, NULL, 'NODE', '2020-08-13 09:15:52.215974', '2020-08-13 09:15:52.215974', 'postgres', 'postgres', NULL, 1, 0.000, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
@@ -10192,11 +10195,14 @@ INSERT INTO man_wjoin VALUES ('114463', NULL, NULL);
 INSERT INTO man_wtp VALUES ('18', NULL);
 
 ALTER TABLE arc ENABLE TRIGGER gw_trg_topocontrol_arc;
-ALTER TABLE arc ENABLE TRIGGER gw_trg_typevalue_fk;
+ALTER TABLE arc ENABLE TRIGGER gw_trg_typevalue_fk_insert;
+ALTER TABLE arc ENABLE TRIGGER gw_trg_typevalue_fk_update;
 ALTER TABLE connec ENABLE TRIGGER gw_trg_connec_proximity_insert;
 ALTER TABLE connec ENABLE TRIGGER gw_trg_unique_field;
-ALTER TABLE connec ENABLE TRIGGER gw_trg_typevalue_fk;
+ALTER TABLE connec ENABLE TRIGGER gw_trg_typevalue_fk_insert;
+ALTER TABLE connec ENABLE TRIGGER gw_trg_typevalue_fk_update;
 ALTER TABLE node ENABLE TRIGGER gw_trg_node_arc_divide;
 ALTER TABLE node ENABLE TRIGGER gw_trg_node_statecontrol;
 ALTER TABLE node ENABLE TRIGGER gw_trg_topocontrol_node;
-ALTER TABLE node ENABLE TRIGGER gw_trg_typevalue_fk;
+ALTER TABLE node ENABLE TRIGGER gw_trg_typevalue_fk_insert;
+ALTER TABLE node ENABLE TRIGGER gw_trg_typevalue_fk_update;

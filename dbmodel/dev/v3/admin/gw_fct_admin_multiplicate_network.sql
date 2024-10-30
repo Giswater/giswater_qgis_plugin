@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE:
 
 CREATE OR REPLACE FUNCTION ws36010.gw_fct_admin_multiplicate_network(p_x integer, p_y integer, p_dx integer, p_dy integer)
-RETURNS json AS 
+RETURNS json AS
 $BODY$
 
 /* example
@@ -27,7 +27,7 @@ BEGIN
 
 	-- Set search path to local schema
 	SET search_path = "ws36010", public;
-	
+
 	-- set previous
 	ALTER TABLE ext_plot ALTER COLUMN id SET DEFAULT nextval('ws36010.urn_id_seq'::regclass);
 
@@ -36,20 +36,23 @@ BEGIN
 	ALTER TABLE node DISABLE TRIGGER gw_trg_node_rotation_update;
 	ALTER TABLE node DISABLE TRIGGER gw_trg_node_statecontrol;
 	ALTER TABLE node DISABLE TRIGGER gw_trg_topocontrol_node;
-	ALTER TABLE node DISABLE TRIGGER gw_trg_typevalue_fk;
+	ALTER TABLE node DISABLE TRIGGER gw_trg_typevalue_fk_insert;
+	ALTER TABLE node DISABLE TRIGGER gw_trg_typevalue_fk_update;
 	ALTER TABLE node DISABLE RULE insert_plan_psector_x_node;
 
 	ALTER TABLE arc DISABLE TRIGGER gw_trg_arc_noderotation_update;
 	ALTER TABLE arc DISABLE TRIGGER gw_trg_edit_foreignkey;
 	ALTER TABLE arc DISABLE TRIGGER gw_trg_topocontrol_arc;
-	ALTER TABLE arc DISABLE TRIGGER gw_trg_typevalue_fk;
+	ALTER TABLE arc DISABLE TRIGGER gw_trg_typevalue_fk_insert;
+	ALTER TABLE arc DISABLE TRIGGER gw_trg_typevalue_fk_update;
 	ALTER TABLE arc DISABLE RULE insert_plan_psector_x_arc;
 
 	ALTER TABLE connec DISABLE TRIGGER gw_trg_connec_proximity_insert;
 	ALTER TABLE connec DISABLE TRIGGER gw_trg_connec_proximity_update;
 	ALTER TABLE connec DISABLE TRIGGER gw_trg_connect_update;
 	ALTER TABLE connec DISABLE TRIGGER gw_trg_edit_foreignkey;
-	ALTER TABLE connec DISABLE TRIGGER gw_trg_typevalue_fk;
+	ALTER TABLE connec DISABLE TRIGGER gw_trg_typevalue_fk_insert;
+	ALTER TABLE connec DISABLE TRIGGER gw_trg_typevalue_fk_update;
 	ALTER TABLE connec DISABLE TRIGGER gw_trg_unique_field;
 
 	ALTER TABLE link DISABLE TRIGGER gw_trg_link_connecrotation_update;
@@ -66,13 +69,13 @@ BEGIN
 			RAISE NOTICE 'X LOOP % , %', y,x;
 
 			RAISE NOTICE 'nodes';
-			INSERT INTO node (code, elevation, depth, nodecat_id, epa_type, sector_id, arc_id, parent_id, state, state_type, annotation, observ,comment, dma_id, presszone_id, 
-				soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, workcat_id_plan, buildercat_id, builtdate, enddate, ownercat_id, muni_id,streetaxis_id, 
+			INSERT INTO node (code, elevation, depth, nodecat_id, epa_type, sector_id, arc_id, parent_id, state, state_type, annotation, observ,comment, dma_id, presszone_id,
+				soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, workcat_id_plan, buildercat_id, builtdate, enddate, ownercat_id, muni_id,streetaxis_id,
 				streetaxis2_id, postcode, postnumber, postnumber2, postcomplement, district_id,	postcomplement2, descript, link, rotation,verified, undelete,label_x,label_y,label_rotation,
 				expl_id, publish, inventory, the_geom, hemisphere, num_value, adate, adescript, accessibility, lastupdate, lastupdate_user, asset_id)
 
-			SELECT code, elevation, depth, nodecat_id, epa_type, sector_id, arc_id, parent_id, state, state_type, annotation, observ,comment, dma_id, presszone_id, 
-				soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, workcat_id_plan, buildercat_id, builtdate, enddate, ownercat_id, muni_id,streetaxis_id, 
+			SELECT code, elevation, depth, nodecat_id, epa_type, sector_id, arc_id, parent_id, state, state_type, annotation, observ,comment, dma_id, presszone_id,
+				soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, workcat_id_plan, buildercat_id, builtdate, enddate, ownercat_id, muni_id,streetaxis_id,
 				streetaxis2_id, postcode, postnumber, postnumber2, postcomplement, district_id,	postcomplement2, descript, link, rotation,verified, undelete,label_x,label_y,label_rotation,
 				expl_id, publish, inventory, st_translate(the_geom,x*p_dx,y*p_dy), hemisphere, num_value, adate, adescript, accessibility, lastupdate, lastupdate_user, asset_id FROM node;
 
@@ -85,16 +88,16 @@ BEGIN
 			INSERT INTO inp_shortpipe SELECT node_id FROM node WHERE state >0 and epa_type = 'SHORTPIPE' ON CONFLICT (node_id) DO NOTHING;
 
 
-			-- TODO: insert man_junctio & others nodes.....	
+			-- TODO: insert man_junctio & others nodes.....
 
 			RAISE NOTICE 'arcs';
 			INSERT INTO arc (code, node_1,node_2, arccat_id, epa_type, sector_id, "state", state_type, annotation, observ,"comment",custom_length,dma_id, presszone_id, soilcat_id, function_type, category_type, fluid_type, location_type,
 							workcat_id, workcat_id_end, workcat_id_plan, buildercat_id, builtdate,enddate, ownercat_id, muni_id, postcode, district_id, streetaxis_id, postnumber, postcomplement,
-							streetaxis2_id,postnumber2, postcomplement2,descript,link,verified,the_geom,undelete,label_x,label_y,label_rotation,  publish, inventory, expl_id, num_value, 
+							streetaxis2_id,postnumber2, postcomplement2,descript,link,verified,the_geom,undelete,label_x,label_y,label_rotation,  publish, inventory, expl_id, num_value,
 							depth, adate, adescript, lastupdate, lastupdate_user, asset_id, pavcat_id)
 			SELECT code, node_1,node_2, arccat_id, epa_type, sector_id, "state", state_type, annotation, observ,"comment",custom_length,dma_id, presszone_id, soilcat_id, function_type, category_type, fluid_type, location_type,
 							workcat_id, workcat_id_end, workcat_id_plan, buildercat_id, builtdate,enddate, ownercat_id, muni_id, postcode, district_id, streetaxis_id, postnumber, postcomplement,
-							streetaxis2_id,postnumber2, postcomplement2,descript,link,verified, st_translate(the_geom,x*p_dx,y*p_dy), undelete,label_x,label_y,label_rotation,  publish, inventory, expl_id, num_value, 
+							streetaxis2_id,postnumber2, postcomplement2,descript,link,verified, st_translate(the_geom,x*p_dx,y*p_dy), undelete,label_x,label_y,label_rotation,  publish, inventory, expl_id, num_value,
 							depth, adate, adescript, lastupdate, lastupdate_user, asset_id, pavcat_id FROM arc;
 
 			INSERT INTO inp_pipe SELECT arc_id FROM arc WHERE state >0 and epa_type = 'PIPE' ON CONFLICT (arc_id) DO NOTHING;
@@ -105,59 +108,62 @@ BEGIN
 
 			RAISE NOTICE 'connecs';
 			INSERT INTO connec (code, elevation, depth,connecat_id,  sector_id, customer_code,  state, state_type, annotation, observ, comment,dma_id, presszone_id, soilcat_id,
-				function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, workcat_id_plan, buildercat_id, builtdate, enddate, ownercat_id, streetaxis2_id, postnumber, postnumber2, 
+				function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, workcat_id_plan, buildercat_id, builtdate, enddate, ownercat_id, streetaxis2_id, postnumber, postnumber2,
 				muni_id, streetaxis_id,  postcode, district_id, postcomplement, postcomplement2, descript, link, verified, rotation,  the_geom, undelete, label_x,label_y,label_rotation, expl_id,
 				publish, inventory,num_value, connec_length, arc_id, minsector_id, dqa_id, staticpressure, pjoint_id, pjoint_type,
 				adate, adescript, accessibility, lastupdate, lastupdate_user, asset_id, epa_type,
 				om_state, conserv_state, priority, valve_location, valve_type, shutoff_valve, access_type, placement_type, crmzone_id, expl_id2, plot_code)
 			SELECT 	code, elevation, depth,connecat_id,  sector_id, customer_code,  state, state_type, annotation, observ, comment,dma_id, presszone_id, soilcat_id,
-				function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, workcat_id_plan, buildercat_id, builtdate, enddate, ownercat_id, streetaxis2_id, postnumber, postnumber2, 
+				function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, workcat_id_plan, buildercat_id, builtdate, enddate, ownercat_id, streetaxis2_id, postnumber, postnumber2,
 				muni_id, streetaxis_id,  postcode, district_id, postcomplement, postcomplement2, descript, link, verified, rotation, st_translate(the_geom,x*p_dx,y*p_dy), undelete, label_x,label_y,label_rotation, expl_id,
 				publish, inventory,num_value, connec_length, arc_id, minsector_id, dqa_id, staticpressure, pjoint_id, pjoint_type,
-				adate, adescript, accessibility, lastupdate, lastupdate_user, asset_id, epa_type, om_state, conserv_state, priority, valve_location, valve_type, shutoff_valve, access_type, 
+				adate, adescript, accessibility, lastupdate, lastupdate_user, asset_id, epa_type, om_state, conserv_state, priority, valve_location, valve_type, shutoff_valve, access_type,
 				placement_type, crmzone_id, expl_id2, plot_code FROM connec;
 
 			INSERT INTO inp_connec SELECT connec_id FROM connec WHERE epa_type = 'JUNCTION' ON CONFLICT (connec_id) DO NOTHING;
 
 			RAISE NOTICE 'links';
-			INSERT INTO link (feature_type, feature_id, expl_id, exit_id, exit_type, userdefined_geom, state, the_geom, exit_topelev, 
+			INSERT INTO link (feature_type, feature_id, expl_id, exit_id, exit_type, userdefined_geom, state, the_geom, exit_topelev,
 			exit_elev, sector_id, dma_id, fluid_type, presszone_id, dqa_id, minsector_id,expl_id2, epa_type, is_operative, insert_user, lastupdate, lastupdate_user, connecat_id, workcat_id, workcat_id_end, builtdate, enddate)
 			SELECT feature_type, feature_id, expl_id, exit_id, exit_type, userdefined_geom, state,  st_translate(the_geom,x*p_dx,y*p_dy), exit_topelev,
 			exit_elev, sector_id, dma_id, fluid_type, presszone_id, dqa_id, minsector_id,expl_id2, epa_type, is_operative, insert_user, lastupdate, lastupdate_user, connecat_id, workcat_id, workcat_id_end, builtdate, enddate
 			FROM link;
 
 			RAISE NOTICE 'Plot';
-			INSERT INTO ext_plot (plot_code, muni_id,  postcode, streetaxis_id, postnumber, complement, placement, square, observ, text, the_geom, expl_id) 
+			INSERT INTO ext_plot (plot_code, muni_id,  postcode, streetaxis_id, postnumber, complement, placement, square, observ, text, the_geom, expl_id)
 			SELECT plot_code, muni_id,  postcode, streetaxis_id, postnumber, complement, placement, square, observ, text, st_translate(the_geom,x*p_dx,y*p_dy), expl_id FROM ext_plot;
-			
+
 		END LOOP;
-		
+
 	END LOOP;
-	
+
 	-- restore environment
 	ALTER TABLE node ENABLE TRIGGER gw_trg_edit_foreignkey;
 	ALTER TABLE node ENABLE TRIGGER gw_trg_node_arc_divide;
 	ALTER TABLE node ENABLE TRIGGER gw_trg_node_rotation_update;
 	ALTER TABLE node ENABLE TRIGGER gw_trg_node_statecontrol;
 	ALTER TABLE node ENABLE TRIGGER gw_trg_topocontrol_node;
-	ALTER TABLE node ENABLE TRIGGER gw_trg_typevalue_fk;
+	ALTER TABLE node ENABLE TRIGGER gw_trg_typevalue_fk_insert;
+	ALTER TABLE node ENABLE TRIGGER gw_trg_typevalue_fk_update;
 	ALTER TABLE node ENABLE RULE insert_plan_psector_x_node;
 
 	ALTER TABLE arc ENABLE TRIGGER gw_trg_arc_noderotation_update;
 	ALTER TABLE arc ENABLE TRIGGER gw_trg_edit_foreignkey;
 	ALTER TABLE arc ENABLE TRIGGER gw_trg_topocontrol_arc;
-	ALTER TABLE arc ENABLE TRIGGER gw_trg_typevalue_fk;
+	ALTER TABLE arc ENABLE TRIGGER gw_trg_typevalue_fk_insert;
+	ALTER TABLE arc ENABLE TRIGGER gw_trg_typevalue_fk_update;
 	ALTER TABLE arc ENABLE RULE insert_plan_psector_x_arc;
 
 	ALTER TABLE connec ENABLE TRIGGER gw_trg_connec_proximity_insert;
 	ALTER TABLE connec ENABLE TRIGGER gw_trg_connec_proximity_update;
 	ALTER TABLE connec ENABLE TRIGGER gw_trg_connect_update;
 	ALTER TABLE connec ENABLE TRIGGER gw_trg_edit_foreignkey;
-	ALTER TABLE connec ENABLE TRIGGER gw_trg_typevalue_fk;
+	ALTER TABLE connec ENABLE TRIGGER gw_trg_typevalue_fk_insert;
+	ALTER TABLE connec ENABLE TRIGGER gw_trg_typevalue_fk_update;
 	ALTER TABLE connec ENABLE TRIGGER gw_trg_unique_field;
 
 	ALTER TABLE link ENABLE TRIGGER gw_trg_link_connecrotation_update;
-	     
+
 	-- Return
 	RETURN '{"status":"Accepted"}';
 
