@@ -4559,3 +4559,4 @@ AS SELECT review_connec.connec_id,
    FROM review_connec,
     selector_expl
   WHERE selector_expl.cur_user = "current_user"()::text AND review_connec.expl_id = selector_expl.expl_id;
+  

@@ -4213,3 +4213,82 @@ AS SELECT review_connec.connec_id,
    FROM review_connec,
     selector_expl
   WHERE selector_expl.cur_user = "current_user"()::text AND review_connec.expl_id = selector_expl.expl_id;
+
+-- 30/10//2024
+
+CREATE OR REPLACE VIEW vcp_pipes AS
+ SELECT p.arc_id,
+    p.minorloss,
+    p.dint, p.dscenario_id
+   FROM config_param_user c, selector_inp_result r, rpt_inp_arc rpt
+   JOIN inp_dscenario_pipe p ON rpt.arc_id = p.arc_id
+   WHERE c.parameter::text = 'epatools_calibrator_dscenario_id'::text AND c.value = p.dscenario_id::text
+   AND c.cur_user = "current_user"()::text AND r.result_id = rpt.result_id AND r.cur_user = "current_user"()::text;
+ALTER TABLE vcp_pipes
+  OWNER TO role_admin;
+GRANT ALL ON TABLE vcp_pipes TO role_admin;
+GRANT ALL ON TABLE vcp_pipes TO role_basic;
+
+CREATE OR REPLACE VIEW vcv_junction AS
+SELECT rpt.node_id,
+    rpt.dma_id
+   FROM selector_inp_result r,
+    rpt_inp_node rpt
+  WHERE r.result_id::text = rpt.result_id::text AND r.cur_user = "current_user"()::text AND rpt.epa_type = 'JUNCTION';
+
+ALTER TABLE vcv_junction
+  OWNER TO role_admin;
+GRANT ALL ON TABLE vcv_junction TO role_admin;
+GRANT ALL ON TABLE vcv_junction TO role_basic;
+
+CREATE OR REPLACE VIEW vcv_demands AS
+ SELECT inp.feature_id, inp.demand, inp.pattern_id, inp.source, dscenario_id
+   FROM config_param_user c, inp_dscenario_demand inp
+   WHERE c.parameter::text = 'epatools_calibrator_dscenario_id'::text AND c.value = inp.dscenario_id::text
+   AND c.cur_user = "current_user"()::text;
+
+ALTER TABLE vcv_demands
+  OWNER TO role_admin;
+GRANT ALL ON TABLE vcv_demands TO role_admin;
+GRANT ALL ON TABLE vcv_demands TO role_basic;
+
+CREATE OR REPLACE VIEW vcv_patterns AS
+ SELECT patt.*
+   FROM selector_inp_result r, rpt_inp_pattern_value patt
+   WHERE r.result_id = patt.result_id AND r.cur_user = "current_user"()::text;;
+
+ALTER TABLE vcv_patterns
+  OWNER TO role_admin;
+GRANT ALL ON TABLE vcv_patterns TO role_admin;
+GRANT ALL ON TABLE vcv_patterns TO role_basic;
+
+CREATE OR REPLACE VIEW vcv_emitters_log
+ AS
+ SELECT DISTINCT n.node_id, n.dma_id,
+    sum(a.length / 10000::numeric) AS c0_default,
+	NULL::numeric AS c0_updated
+   FROM selector_inp_result r,
+    rpt_inp_arc a
+     JOIN rpt_inp_node n USING (result_id)
+  WHERE (a.node_1::text = n.node_id::text OR a.node_2::text = n.node_id::text) AND r.result_id::text = n.result_id::text AND r.cur_user = "current_user"()::text
+  GROUP BY n.node_id, n.dma_id;
+
+ALTER TABLE vcv_emitters_log
+    OWNER TO role_admin;
+
+CREATE OR REPLACE VIEW vcv_dma_log
+ AS
+ SELECT DISTINCT
+    n.dma_id,
+    NULL::numeric AS coef
+   FROM selector_inp_result r,
+    rpt_inp_arc a
+     JOIN rpt_inp_node n USING (result_id)
+  WHERE (a.node_1::text = n.node_id::text OR a.node_2::text = n.node_id::text) AND r.result_id::text = n.result_id::text AND r.cur_user = "current_user"()::text
+  GROUP BY n.node_id, n.dma_id;
+
+ALTER TABLE vcv_dma_log
+    OWNER TO role_admin;
+
+GRANT ALL ON TABLE vcv_dma_log TO role_basic;
+GRANT ALL ON TABLE vcv_dma_log TO role_admin;
