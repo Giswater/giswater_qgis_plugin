@@ -47,6 +47,7 @@ from .epa.go2epa_manager_button import GwGo2EpaManagerButton
 from .epa.go2epa_selector_button import GwGo2EpaSelectorButton
 from .epa.dscenario_manager_btn import GwDscenarioManagerButton
 from .epa.nonvisual_manager_button import GwNonVisualManagerButton
+from .epa.epa_tools_button import GwEpaTools
 
 # Plan
 from .plan.psector_button import GwPsectorButton
