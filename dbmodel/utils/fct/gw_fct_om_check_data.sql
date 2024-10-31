@@ -140,8 +140,8 @@ BEGIN
 
 	RAISE NOTICE '03 - Check state 1 arcs with state 0 nodes (196)';
 	v_querytext = '(SELECT a.arc_id, arccat_id, a.the_geom, a.expl_id FROM '||v_edit||'arc a 
-			JOIN '||v_edit||'node n ON node_1=node_id WHERE a.state =1 AND n.state=0 UNION
-			SELECT a.arc_id, arccat_id, a.the_geom, a.expl_id FROM '||v_edit||'arc a JOIN '||v_edit||'node n ON node_2=node_id WHERE a.state =1 AND n.state=0) a';
+			JOIN node n ON node_1=node_id WHERE a.state =1 AND n.state=0 UNION
+			SELECT a.arc_id, arccat_id, a.the_geom, a.expl_id FROM '||v_edit||'arc a JOIN node n ON node_2=node_id WHERE a.state =1 AND n.state=0) a';
 
 	EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
 	IF v_count > 0 THEN
