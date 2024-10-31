@@ -84,7 +84,7 @@
             <Option/>
           </customproperties>
         </layer-tree-layer>
-        <layer-tree-layer providerKey="postgres" legend_split_behavior="0" id="cat_grate_c32f087c_3368_4aa6_966e_1ff0e19c5894" patch_size="0,0" source=" __DATASOURCE__  key='id' checkPrimaryKeyUnicity='0' table=&quot;SCHEMA_NAME&quot;.&quot;cat_grate&quot;" checked="Qt::Checked" name="Grate catalog" expanded="1" legend_exp="">
+        <layer-tree-layer providerKey="postgres" legend_split_behavior="0" id="cat_gully_c32f087c_3368_4aa6_966e_1ff0e19c5894" patch_size="0,0" source=" __DATASOURCE__  key='id' checkPrimaryKeyUnicity='0' table=&quot;SCHEMA_NAME&quot;.&quot;cat_gully&quot;" checked="Qt::Checked" name="Gully catalog" expanded="1" legend_exp="">
           <customproperties>
             <Option/>
           </customproperties>
@@ -646,9 +646,9 @@
             <legendlayerfile visible="0" layerid="cat_connec_c478157f_493b_462e_addb_2de2fbf4f4da" isInOverview="0"/>
           </filegroup>
         </legendlayer>
-        <legendlayer showFeatureCount="0" drawingOrder="-1" checked="Qt::Checked" name="Grate catalog" open="true">
+        <legendlayer showFeatureCount="0" drawingOrder="-1" checked="Qt::Checked" name="Gully catalog" open="true">
           <filegroup hidden="false" open="true">
-            <legendlayerfile visible="0" layerid="cat_grate_c32f087c_3368_4aa6_966e_1ff0e19c5894" isInOverview="0"/>
+            <legendlayerfile visible="0" layerid="cat_gully_c32f087c_3368_4aa6_966e_1ff0e19c5894" isInOverview="0"/>
           </filegroup>
         </legendlayer>
       </legendgroup>
@@ -2106,12 +2106,12 @@
       <mapTip></mapTip>
     </maplayer>
     <maplayer hasScaleBasedVisibilityFlag="0" geometry="No geometry" minScale="1e+08" styleCategories="AllStyleCategories" autoRefreshEnabled="0" refreshOnNotifyMessage="" autoRefreshTime="0" refreshOnNotifyEnabled="0" wkbType="NoGeometry" type="vector" readOnly="0" maxScale="0" legendPlaceholderImage="">
-      <id>cat_grate_c32f087c_3368_4aa6_966e_1ff0e19c5894</id>
-      <datasource> __DATASOURCE__   key='id' checkPrimaryKeyUnicity='0' table="SCHEMA_NAME"."cat_grate"</datasource>
+      <id>cat_gully_c32f087c_3368_4aa6_966e_1ff0e19c5894</id>
+      <datasource> __DATASOURCE__   key='id' checkPrimaryKeyUnicity='0' table="SCHEMA_NAME"."cat_gully"</datasource>
       <keywordList>
         <value></value>
       </keywordList>
-      <layername>Grate catalog</layername>
+      <layername>Gully catalog</layername>
       <srs>
         <spatialrefsys nativeFormat="Wkt">
           <wkt></wkt>
@@ -10590,7 +10590,7 @@ def my_form_open(dialog, layer, feature):
             </config>
           </editWidget>
         </field>
-        <field configurationFlags="None" name="connecat_id">
+        <field configurationFlags="None" name="conneccat_id">
           <editWidget type="TextEdit">
             <config>
               <Option/>
@@ -10611,7 +10611,7 @@ def my_form_open(dialog, layer, feature):
             </config>
           </editWidget>
         </field>
-        <field configurationFlags="None" name="private_connecat_id">
+        <field configurationFlags="None" name="private_conneccat_id">
           <editWidget type="TextEdit">
             <config>
               <Option/>
@@ -11102,10 +11102,10 @@ def my_form_open(dialog, layer, feature):
         <alias index="3" name="" field="top_elev"/>
         <alias index="4" name="" field="y1"/>
         <alias index="5" name="" field="y2"/>
-        <alias index="6" name="" field="connecat_id"/>
+        <alias index="6" name="" field="conneccat_id"/>
         <alias index="7" name="" field="connec_type"/>
         <alias index="8" name="" field="sys_type"/>
-        <alias index="9" name="" field="private_connecat_id"/>
+        <alias index="9" name="" field="private_conneccat_id"/>
         <alias index="10" name="" field="matcat_id"/>
         <alias index="11" name="" field="expl_id"/>
         <alias index="12" name="" field="macroexpl_id"/>
@@ -11182,10 +11182,10 @@ def my_form_open(dialog, layer, feature):
         <default applyOnUpdate="0" expression="" field="top_elev"/>
         <default applyOnUpdate="0" expression="" field="y1"/>
         <default applyOnUpdate="0" expression="" field="y2"/>
-        <default applyOnUpdate="0" expression="" field="connecat_id"/>
+        <default applyOnUpdate="0" expression="" field="conneccat_id"/>
         <default applyOnUpdate="0" expression="" field="connec_type"/>
         <default applyOnUpdate="0" expression="" field="sys_type"/>
-        <default applyOnUpdate="0" expression="" field="private_connecat_id"/>
+        <default applyOnUpdate="0" expression="" field="private_conneccat_id"/>
         <default applyOnUpdate="0" expression="" field="matcat_id"/>
         <default applyOnUpdate="0" expression="" field="expl_id"/>
         <default applyOnUpdate="0" expression="" field="macroexpl_id"/>
@@ -11262,10 +11262,10 @@ def my_form_open(dialog, layer, feature):
         <constraint exp_strength="0" notnull_strength="0" unique_strength="0" constraints="0" field="top_elev"/>
         <constraint exp_strength="0" notnull_strength="0" unique_strength="0" constraints="0" field="y1"/>
         <constraint exp_strength="0" notnull_strength="0" unique_strength="0" constraints="0" field="y2"/>
-        <constraint exp_strength="0" notnull_strength="0" unique_strength="0" constraints="0" field="connecat_id"/>
+        <constraint exp_strength="0" notnull_strength="0" unique_strength="0" constraints="0" field="conneccat_id"/>
         <constraint exp_strength="0" notnull_strength="0" unique_strength="0" constraints="0" field="connec_type"/>
         <constraint exp_strength="0" notnull_strength="0" unique_strength="0" constraints="0" field="sys_type"/>
-        <constraint exp_strength="0" notnull_strength="0" unique_strength="0" constraints="0" field="private_connecat_id"/>
+        <constraint exp_strength="0" notnull_strength="0" unique_strength="0" constraints="0" field="private_conneccat_id"/>
         <constraint exp_strength="0" notnull_strength="0" unique_strength="0" constraints="0" field="matcat_id"/>
         <constraint exp_strength="0" notnull_strength="0" unique_strength="0" constraints="0" field="expl_id"/>
         <constraint exp_strength="0" notnull_strength="0" unique_strength="0" constraints="0" field="macroexpl_id"/>
@@ -11342,10 +11342,10 @@ def my_form_open(dialog, layer, feature):
         <constraint exp="" desc="" field="top_elev"/>
         <constraint exp="" desc="" field="y1"/>
         <constraint exp="" desc="" field="y2"/>
-        <constraint exp="" desc="" field="connecat_id"/>
+        <constraint exp="" desc="" field="conneccat_id"/>
         <constraint exp="" desc="" field="connec_type"/>
         <constraint exp="" desc="" field="sys_type"/>
-        <constraint exp="" desc="" field="private_connecat_id"/>
+        <constraint exp="" desc="" field="private_conneccat_id"/>
         <constraint exp="" desc="" field="matcat_id"/>
         <constraint exp="" desc="" field="expl_id"/>
         <constraint exp="" desc="" field="macroexpl_id"/>
@@ -11427,10 +11427,10 @@ def my_form_open(dialog, layer, feature):
           <column hidden="0" type="field" width="-1" name="top_elev"/>
           <column hidden="0" type="field" width="-1" name="y1"/>
           <column hidden="0" type="field" width="-1" name="y2"/>
-          <column hidden="0" type="field" width="-1" name="connecat_id"/>
+          <column hidden="0" type="field" width="-1" name="conneccat_id"/>
           <column hidden="0" type="field" width="-1" name="connec_type"/>
           <column hidden="0" type="field" width="-1" name="sys_type"/>
-          <column hidden="0" type="field" width="-1" name="private_connecat_id"/>
+          <column hidden="0" type="field" width="-1" name="private_conneccat_id"/>
           <column hidden="0" type="field" width="-1" name="matcat_id"/>
           <column hidden="0" type="field" width="-1" name="expl_id"/>
           <column hidden="0" type="field" width="-1" name="macroexpl_id"/>
@@ -11536,7 +11536,7 @@ def my_form_open(dialog, layer, feature):
         <field editable="1" name="connec_id"/>
         <field editable="1" name="connec_length"/>
         <field editable="1" name="connec_type"/>
-        <field editable="1" name="connecat_id"/>
+        <field editable="1" name="conneccat_id"/>
         <field editable="1" name="customer_code"/>
         <field editable="1" name="demand"/>
         <field editable="1" name="descript"/>
@@ -11574,7 +11574,7 @@ def my_form_open(dialog, layer, feature):
         <field editable="1" name="postcomplement2"/>
         <field editable="1" name="postnumber"/>
         <field editable="1" name="postnumber2"/>
-        <field editable="1" name="private_connecat_id"/>
+        <field editable="1" name="private_conneccat_id"/>
         <field editable="1" name="publish"/>
         <field editable="1" name="rotation"/>
         <field editable="1" name="sector_id"/>
@@ -11610,7 +11610,7 @@ def my_form_open(dialog, layer, feature):
         <field labelOnTop="0" name="connec_id"/>
         <field labelOnTop="0" name="connec_length"/>
         <field labelOnTop="0" name="connec_type"/>
-        <field labelOnTop="0" name="connecat_id"/>
+        <field labelOnTop="0" name="conneccat_id"/>
         <field labelOnTop="0" name="customer_code"/>
         <field labelOnTop="0" name="demand"/>
         <field labelOnTop="0" name="descript"/>
@@ -11648,7 +11648,7 @@ def my_form_open(dialog, layer, feature):
         <field labelOnTop="0" name="postcomplement2"/>
         <field labelOnTop="0" name="postnumber"/>
         <field labelOnTop="0" name="postnumber2"/>
-        <field labelOnTop="0" name="private_connecat_id"/>
+        <field labelOnTop="0" name="private_conneccat_id"/>
         <field labelOnTop="0" name="publish"/>
         <field labelOnTop="0" name="rotation"/>
         <field labelOnTop="0" name="sector_id"/>
@@ -16075,14 +16075,14 @@ def my_form_open(dialog, layer, feature):
             </config>
           </editWidget>
         </field>
-        <field configurationFlags="None" name="gratecat_id">
+        <field configurationFlags="None" name="gullycat_id">
           <editWidget type="TextEdit">
             <config>
               <Option/>
             </config>
           </editWidget>
         </field>
-        <field configurationFlags="None" name="cat_grate_matcat">
+        <field configurationFlags="None" name="cat_gully_matcat">
           <editWidget type="TextEdit">
             <config>
               <Option/>
@@ -16516,7 +16516,7 @@ def my_form_open(dialog, layer, feature):
             </config>
           </editWidget>
         </field>
-        <field configurationFlags="None" name="gratecat2_id">
+        <field configurationFlags="None" name="gullycat2_id">
           <editWidget type="TextEdit">
             <config>
               <Option/>
@@ -16652,8 +16652,8 @@ def my_form_open(dialog, layer, feature):
         <alias index="5" name="" field="matcat_id"/>
         <alias index="6" name="" field="gully_type"/>
         <alias index="7" name="" field="sys_type"/>
-        <alias index="8" name="" field="gratecat_id"/>
-        <alias index="9" name="" field="cat_grate_matcat"/>
+        <alias index="8" name="" field="gullycat_id"/>
+        <alias index="9" name="" field="cat_gully_matcat"/>
         <alias index="10" name="" field="units"/>
         <alias index="11" name="" field="groove"/>
         <alias index="12" name="" field="siphon"/>
@@ -16715,7 +16715,7 @@ def my_form_open(dialog, layer, feature):
         <alias index="68" name="" field="workcat_id_plan"/>
         <alias index="69" name="" field="asset_id"/>
         <alias index="70" name="" field="connec_matcat_id"/>
-        <alias index="71" name="" field="gratecat2_id"/>
+        <alias index="71" name="" field="gullycat2_id"/>
         <alias index="72" name="" field="connec_y1"/>
         <alias index="73" name="" field="connec_y2"/>
         <alias index="74" name="" field="epa_type"/>
@@ -16743,8 +16743,8 @@ def my_form_open(dialog, layer, feature):
         <default applyOnUpdate="0" expression="" field="matcat_id"/>
         <default applyOnUpdate="0" expression="" field="gully_type"/>
         <default applyOnUpdate="0" expression="" field="sys_type"/>
-        <default applyOnUpdate="0" expression="" field="gratecat_id"/>
-        <default applyOnUpdate="0" expression="" field="cat_grate_matcat"/>
+        <default applyOnUpdate="0" expression="" field="gullycat_id"/>
+        <default applyOnUpdate="0" expression="" field="cat_gully_matcat"/>
         <default applyOnUpdate="0" expression="" field="units"/>
         <default applyOnUpdate="0" expression="" field="groove"/>
         <default applyOnUpdate="0" expression="" field="siphon"/>
@@ -16806,7 +16806,7 @@ def my_form_open(dialog, layer, feature):
         <default applyOnUpdate="0" expression="" field="workcat_id_plan"/>
         <default applyOnUpdate="0" expression="" field="asset_id"/>
         <default applyOnUpdate="0" expression="" field="connec_matcat_id"/>
-        <default applyOnUpdate="0" expression="" field="gratecat2_id"/>
+        <default applyOnUpdate="0" expression="" field="gullycat2_id"/>
         <default applyOnUpdate="0" expression="" field="connec_y1"/>
         <default applyOnUpdate="0" expression="" field="connec_y2"/>
         <default applyOnUpdate="0" expression="" field="epa_type"/>
@@ -16834,8 +16834,8 @@ def my_form_open(dialog, layer, feature):
         <constraint exp_strength="0" notnull_strength="0" unique_strength="0" constraints="0" field="matcat_id"/>
         <constraint exp_strength="0" notnull_strength="0" unique_strength="0" constraints="0" field="gully_type"/>
         <constraint exp_strength="0" notnull_strength="0" unique_strength="0" constraints="0" field="sys_type"/>
-        <constraint exp_strength="0" notnull_strength="0" unique_strength="0" constraints="0" field="gratecat_id"/>
-        <constraint exp_strength="0" notnull_strength="0" unique_strength="0" constraints="0" field="cat_grate_matcat"/>
+        <constraint exp_strength="0" notnull_strength="0" unique_strength="0" constraints="0" field="gullycat_id"/>
+        <constraint exp_strength="0" notnull_strength="0" unique_strength="0" constraints="0" field="cat_gully_matcat"/>
         <constraint exp_strength="0" notnull_strength="0" unique_strength="0" constraints="0" field="units"/>
         <constraint exp_strength="0" notnull_strength="0" unique_strength="0" constraints="0" field="groove"/>
         <constraint exp_strength="0" notnull_strength="0" unique_strength="0" constraints="0" field="siphon"/>
@@ -16897,7 +16897,7 @@ def my_form_open(dialog, layer, feature):
         <constraint exp_strength="0" notnull_strength="0" unique_strength="0" constraints="0" field="workcat_id_plan"/>
         <constraint exp_strength="0" notnull_strength="0" unique_strength="0" constraints="0" field="asset_id"/>
         <constraint exp_strength="0" notnull_strength="0" unique_strength="0" constraints="0" field="connec_matcat_id"/>
-        <constraint exp_strength="0" notnull_strength="0" unique_strength="0" constraints="0" field="gratecat2_id"/>
+        <constraint exp_strength="0" notnull_strength="0" unique_strength="0" constraints="0" field="gullycat2_id"/>
         <constraint exp_strength="0" notnull_strength="0" unique_strength="0" constraints="0" field="connec_y1"/>
         <constraint exp_strength="0" notnull_strength="0" unique_strength="0" constraints="0" field="connec_y2"/>
         <constraint exp_strength="0" notnull_strength="0" unique_strength="0" constraints="0" field="epa_type"/>
@@ -16925,8 +16925,8 @@ def my_form_open(dialog, layer, feature):
         <constraint exp="" desc="" field="matcat_id"/>
         <constraint exp="" desc="" field="gully_type"/>
         <constraint exp="" desc="" field="sys_type"/>
-        <constraint exp="" desc="" field="gratecat_id"/>
-        <constraint exp="" desc="" field="cat_grate_matcat"/>
+        <constraint exp="" desc="" field="gullycat_id"/>
+        <constraint exp="" desc="" field="cat_gully_matcat"/>
         <constraint exp="" desc="" field="units"/>
         <constraint exp="" desc="" field="groove"/>
         <constraint exp="" desc="" field="siphon"/>
@@ -16988,7 +16988,7 @@ def my_form_open(dialog, layer, feature):
         <constraint exp="" desc="" field="workcat_id_plan"/>
         <constraint exp="" desc="" field="asset_id"/>
         <constraint exp="" desc="" field="connec_matcat_id"/>
-        <constraint exp="" desc="" field="gratecat2_id"/>
+        <constraint exp="" desc="" field="gullycat2_id"/>
         <constraint exp="" desc="" field="connec_y1"/>
         <constraint exp="" desc="" field="connec_y2"/>
         <constraint exp="" desc="" field="epa_type"/>
@@ -17021,8 +17021,8 @@ def my_form_open(dialog, layer, feature):
           <column hidden="0" type="field" width="-1" name="matcat_id"/>
           <column hidden="0" type="field" width="-1" name="gully_type"/>
           <column hidden="0" type="field" width="-1" name="sys_type"/>
-          <column hidden="0" type="field" width="-1" name="gratecat_id"/>
-          <column hidden="0" type="field" width="-1" name="cat_grate_matcat"/>
+          <column hidden="0" type="field" width="-1" name="gullycat_id"/>
+          <column hidden="0" type="field" width="-1" name="cat_gully_matcat"/>
           <column hidden="0" type="field" width="-1" name="units"/>
           <column hidden="0" type="field" width="-1" name="groove"/>
           <column hidden="0" type="field" width="-1" name="siphon"/>
@@ -17084,7 +17084,7 @@ def my_form_open(dialog, layer, feature):
           <column hidden="1" type="actions" width="-1"/>
           <column hidden="0" type="field" width="-1" name="asset_id"/>
           <column hidden="0" type="field" width="-1" name="connec_matcat_id"/>
-          <column hidden="0" type="field" width="-1" name="gratecat2_id"/>
+          <column hidden="0" type="field" width="-1" name="gullycat2_id"/>
           <column hidden="0" type="field" width="-1" name="connec_y1"/>
           <column hidden="0" type="field" width="-1" name="connec_y2"/>
           <column hidden="0" type="field" width="-1" name="epa_type"/>
@@ -17141,7 +17141,7 @@ def my_form_open(dialog, layer, feature):
         <field editable="1" name="asset_id"/>
         <field editable="1" name="buildercat_id"/>
         <field editable="1" name="builtdate"/>
-        <field editable="1" name="cat_grate_matcat"/>
+        <field editable="1" name="cat_gully_matcat"/>
         <field editable="1" name="category_type"/>
         <field editable="1" name="code"/>
         <field editable="1" name="comment"/>
@@ -17165,8 +17165,8 @@ def my_form_open(dialog, layer, feature):
         <field editable="1" name="function_type"/>
         <field editable="1" name="grate_length"/>
         <field editable="1" name="grate_width"/>
-        <field editable="1" name="gratecat2_id"/>
-        <field editable="1" name="gratecat_id"/>
+        <field editable="1" name="gullycat2_id"/>
+        <field editable="1" name="gullycat_id"/>
         <field editable="1" name="groove"/>
         <field editable="1" name="groove_height"/>
         <field editable="1" name="groove_length"/>
@@ -17234,7 +17234,7 @@ def my_form_open(dialog, layer, feature):
         <field labelOnTop="0" name="asset_id"/>
         <field labelOnTop="0" name="buildercat_id"/>
         <field labelOnTop="0" name="builtdate"/>
-        <field labelOnTop="0" name="cat_grate_matcat"/>
+        <field labelOnTop="0" name="cat_gully_matcat"/>
         <field labelOnTop="0" name="category_type"/>
         <field labelOnTop="0" name="code"/>
         <field labelOnTop="0" name="comment"/>
@@ -17258,8 +17258,8 @@ def my_form_open(dialog, layer, feature):
         <field labelOnTop="0" name="function_type"/>
         <field labelOnTop="0" name="grate_length"/>
         <field labelOnTop="0" name="grate_width"/>
-        <field labelOnTop="0" name="gratecat2_id"/>
-        <field labelOnTop="0" name="gratecat_id"/>
+        <field labelOnTop="0" name="gullycat2_id"/>
+        <field labelOnTop="0" name="gullycat_id"/>
         <field labelOnTop="0" name="groove"/>
         <field labelOnTop="0" name="groove_height"/>
         <field labelOnTop="0" name="groove_length"/>
@@ -17327,7 +17327,7 @@ def my_form_open(dialog, layer, feature):
         <field reuseLastValue="0" name="asset_id"/>
         <field reuseLastValue="0" name="buildercat_id"/>
         <field reuseLastValue="0" name="builtdate"/>
-        <field reuseLastValue="0" name="cat_grate_matcat"/>
+        <field reuseLastValue="0" name="cat_gully_matcat"/>
         <field reuseLastValue="0" name="category_type"/>
         <field reuseLastValue="0" name="code"/>
         <field reuseLastValue="0" name="comment"/>
@@ -17349,8 +17349,8 @@ def my_form_open(dialog, layer, feature):
         <field reuseLastValue="0" name="function_type"/>
         <field reuseLastValue="0" name="grate_length"/>
         <field reuseLastValue="0" name="grate_width"/>
-        <field reuseLastValue="0" name="gratecat2_id"/>
-        <field reuseLastValue="0" name="gratecat_id"/>
+        <field reuseLastValue="0" name="gullycat2_id"/>
+        <field reuseLastValue="0" name="gullycat_id"/>
         <field reuseLastValue="0" name="groove"/>
         <field reuseLastValue="0" name="groove_height"/>
         <field reuseLastValue="0" name="groove_length"/>
@@ -22415,7 +22415,7 @@ def my_form_open(dialog, layer, feature):
             </config>
           </editWidget>
         </field>
-        <field configurationFlags="None" name="gratecat_id">
+        <field configurationFlags="None" name="gullycat_id">
           <editWidget type="TextEdit">
             <config>
               <Option/>
@@ -22645,7 +22645,7 @@ def my_form_open(dialog, layer, feature):
         <alias index="1" name="" field="code"/>
         <alias index="2" name="" field="top_elev"/>
         <alias index="3" name="" field="gully_type"/>
-        <alias index="4" name="" field="gratecat_id"/>
+        <alias index="4" name="" field="gullycat_id"/>
         <alias index="5" name="" field="grate_width"/>
         <alias index="6" name="" field="grate_length"/>
         <alias index="7" name="" field="arc_id"/>
@@ -22683,7 +22683,7 @@ def my_form_open(dialog, layer, feature):
         <default applyOnUpdate="0" expression="" field="code"/>
         <default applyOnUpdate="0" expression="" field="top_elev"/>
         <default applyOnUpdate="0" expression="" field="gully_type"/>
-        <default applyOnUpdate="0" expression="" field="gratecat_id"/>
+        <default applyOnUpdate="0" expression="" field="gullycat_id"/>
         <default applyOnUpdate="0" expression="" field="grate_width"/>
         <default applyOnUpdate="0" expression="" field="grate_length"/>
         <default applyOnUpdate="0" expression="" field="arc_id"/>
@@ -22721,7 +22721,7 @@ def my_form_open(dialog, layer, feature):
         <constraint exp_strength="0" notnull_strength="0" unique_strength="0" constraints="0" field="code"/>
         <constraint exp_strength="0" notnull_strength="0" unique_strength="0" constraints="0" field="top_elev"/>
         <constraint exp_strength="0" notnull_strength="0" unique_strength="0" constraints="0" field="gully_type"/>
-        <constraint exp_strength="0" notnull_strength="0" unique_strength="0" constraints="0" field="gratecat_id"/>
+        <constraint exp_strength="0" notnull_strength="0" unique_strength="0" constraints="0" field="gullycat_id"/>
         <constraint exp_strength="0" notnull_strength="0" unique_strength="0" constraints="0" field="grate_width"/>
         <constraint exp_strength="0" notnull_strength="0" unique_strength="0" constraints="0" field="grate_length"/>
         <constraint exp_strength="0" notnull_strength="0" unique_strength="0" constraints="0" field="arc_id"/>
@@ -22759,7 +22759,7 @@ def my_form_open(dialog, layer, feature):
         <constraint exp="" desc="" field="code"/>
         <constraint exp="" desc="" field="top_elev"/>
         <constraint exp="" desc="" field="gully_type"/>
-        <constraint exp="" desc="" field="gratecat_id"/>
+        <constraint exp="" desc="" field="gullycat_id"/>
         <constraint exp="" desc="" field="grate_width"/>
         <constraint exp="" desc="" field="grate_length"/>
         <constraint exp="" desc="" field="arc_id"/>
@@ -22802,7 +22802,7 @@ def my_form_open(dialog, layer, feature):
           <column hidden="0" type="field" width="-1" name="code"/>
           <column hidden="0" type="field" width="-1" name="top_elev"/>
           <column hidden="0" type="field" width="-1" name="gully_type"/>
-          <column hidden="0" type="field" width="-1" name="gratecat_id"/>
+          <column hidden="0" type="field" width="-1" name="gullycat_id"/>
           <column hidden="0" type="field" width="-1" name="grate_width"/>
           <column hidden="0" type="field" width="-1" name="grate_length"/>
           <column hidden="0" type="field" width="-1" name="arc_id"/>
@@ -22882,7 +22882,7 @@ def my_form_open(dialog, layer, feature):
         <field editable="1" name="expl_id"/>
         <field editable="1" name="grate_length"/>
         <field editable="1" name="grate_width"/>
-        <field editable="1" name="gratecat_id"/>
+        <field editable="1" name="gullycat_id"/>
         <field editable="1" name="groove"/>
         <field editable="1" name="groove_height"/>
         <field editable="1" name="groove_length"/>
@@ -22921,7 +22921,7 @@ def my_form_open(dialog, layer, feature):
         <field labelOnTop="0" name="expl_id"/>
         <field labelOnTop="0" name="grate_length"/>
         <field labelOnTop="0" name="grate_width"/>
-        <field labelOnTop="0" name="gratecat_id"/>
+        <field labelOnTop="0" name="gullycat_id"/>
         <field labelOnTop="0" name="groove"/>
         <field labelOnTop="0" name="groove_height"/>
         <field labelOnTop="0" name="groove_length"/>
@@ -22960,7 +22960,7 @@ def my_form_open(dialog, layer, feature):
         <field reuseLastValue="0" name="expl_id"/>
         <field reuseLastValue="0" name="grate_length"/>
         <field reuseLastValue="0" name="grate_width"/>
-        <field reuseLastValue="0" name="gratecat_id"/>
+        <field reuseLastValue="0" name="gullycat_id"/>
         <field reuseLastValue="0" name="groove"/>
         <field reuseLastValue="0" name="groove_height"/>
         <field reuseLastValue="0" name="groove_length"/>
@@ -24144,7 +24144,7 @@ def my_form_open(dialog, layer, feature):
             </config>
           </editWidget>
         </field>
-        <field configurationFlags="None" name="gratecat_id">
+        <field configurationFlags="None" name="gullycat_id">
           <editWidget type="TextEdit">
             <config>
               <Option/>
@@ -24381,7 +24381,7 @@ def my_form_open(dialog, layer, feature):
         <alias index="8" name="" field="sys_elev"/>
         <alias index="9" name="" field="node_type"/>
         <alias index="10" name="" field="nodecat_id"/>
-        <alias index="11" name="" field="gratecat_id"/>
+        <alias index="11" name="" field="gullycat_id"/>
         <alias index="12" name="" field="grate_width"/>
         <alias index="13" name="" field="grate_length"/>
         <alias index="14" name="" field="sector_id"/>
@@ -24426,7 +24426,7 @@ def my_form_open(dialog, layer, feature):
         <default applyOnUpdate="0" expression="" field="sys_elev"/>
         <default applyOnUpdate="0" expression="" field="node_type"/>
         <default applyOnUpdate="0" expression="" field="nodecat_id"/>
-        <default applyOnUpdate="0" expression="" field="gratecat_id"/>
+        <default applyOnUpdate="0" expression="" field="gullycat_id"/>
         <default applyOnUpdate="0" expression="" field="grate_width"/>
         <default applyOnUpdate="0" expression="" field="grate_length"/>
         <default applyOnUpdate="0" expression="" field="sector_id"/>
@@ -24471,7 +24471,7 @@ def my_form_open(dialog, layer, feature):
         <constraint exp_strength="0" notnull_strength="0" unique_strength="0" constraints="0" field="sys_elev"/>
         <constraint exp_strength="0" notnull_strength="0" unique_strength="0" constraints="0" field="node_type"/>
         <constraint exp_strength="0" notnull_strength="0" unique_strength="0" constraints="0" field="nodecat_id"/>
-        <constraint exp_strength="0" notnull_strength="0" unique_strength="0" constraints="0" field="gratecat_id"/>
+        <constraint exp_strength="0" notnull_strength="0" unique_strength="0" constraints="0" field="gullycat_id"/>
         <constraint exp_strength="0" notnull_strength="0" unique_strength="0" constraints="0" field="grate_width"/>
         <constraint exp_strength="0" notnull_strength="0" unique_strength="0" constraints="0" field="grate_length"/>
         <constraint exp_strength="0" notnull_strength="0" unique_strength="0" constraints="0" field="sector_id"/>
@@ -24516,7 +24516,7 @@ def my_form_open(dialog, layer, feature):
         <constraint exp="" desc="" field="sys_elev"/>
         <constraint exp="" desc="" field="node_type"/>
         <constraint exp="" desc="" field="nodecat_id"/>
-        <constraint exp="" desc="" field="gratecat_id"/>
+        <constraint exp="" desc="" field="gullycat_id"/>
         <constraint exp="" desc="" field="grate_width"/>
         <constraint exp="" desc="" field="grate_length"/>
         <constraint exp="" desc="" field="sector_id"/>
@@ -24566,7 +24566,7 @@ def my_form_open(dialog, layer, feature):
           <column hidden="0" type="field" width="-1" name="sys_elev"/>
           <column hidden="0" type="field" width="-1" name="node_type"/>
           <column hidden="0" type="field" width="-1" name="nodecat_id"/>
-          <column hidden="0" type="field" width="-1" name="gratecat_id"/>
+          <column hidden="0" type="field" width="-1" name="gullycat_id"/>
           <column hidden="0" type="field" width="-1" name="grate_width"/>
           <column hidden="0" type="field" width="-1" name="grate_length"/>
           <column hidden="0" type="field" width="-1" name="sector_id"/>
@@ -24649,7 +24649,7 @@ def my_form_open(dialog, layer, feature):
         <field editable="1" name="expl_id"/>
         <field editable="1" name="grate_length"/>
         <field editable="1" name="grate_width"/>
-        <field editable="1" name="gratecat_id"/>
+        <field editable="1" name="gullycat_id"/>
         <field editable="1" name="groove"/>
         <field editable="1" name="groove_height"/>
         <field editable="1" name="groove_length"/>
@@ -24694,7 +24694,7 @@ def my_form_open(dialog, layer, feature):
         <field labelOnTop="0" name="expl_id"/>
         <field labelOnTop="0" name="grate_length"/>
         <field labelOnTop="0" name="grate_width"/>
-        <field labelOnTop="0" name="gratecat_id"/>
+        <field labelOnTop="0" name="gullycat_id"/>
         <field labelOnTop="0" name="groove"/>
         <field labelOnTop="0" name="groove_height"/>
         <field labelOnTop="0" name="groove_length"/>
@@ -24739,7 +24739,7 @@ def my_form_open(dialog, layer, feature):
         <field reuseLastValue="0" name="expl_id"/>
         <field reuseLastValue="0" name="grate_length"/>
         <field reuseLastValue="0" name="grate_width"/>
-        <field reuseLastValue="0" name="gratecat_id"/>
+        <field reuseLastValue="0" name="gullycat_id"/>
         <field reuseLastValue="0" name="groove"/>
         <field reuseLastValue="0" name="groove_height"/>
         <field reuseLastValue="0" name="groove_length"/>
@@ -33488,7 +33488,7 @@ def my_form_open(dialog, layer, feature):
             </config>
           </editWidget>
         </field>
-        <field configurationFlags="None" name="connecat_id">
+        <field configurationFlags="None" name="conneccat_id">
           <editWidget type="TextEdit">
             <config>
               <Option/>
@@ -33560,7 +33560,7 @@ def my_form_open(dialog, layer, feature):
         <alias index="18" name="" field="is_operative"/>
         <alias index="19" name="" field="drainzone_id"/>
         <alias index="20" name="" field="drainzone_name"/>
-        <alias index="21" name="" field="connecat_id"/>
+        <alias index="21" name="" field="conneccat_id"/>
         <alias index="22" name="" field="workcat_id"/>
         <alias index="23" name="" field="workcat_id_end"/>
         <alias index="24" name="" field="builtdate"/>
@@ -33590,7 +33590,7 @@ def my_form_open(dialog, layer, feature):
         <default applyOnUpdate="0" expression="" field="is_operative"/>
         <default applyOnUpdate="0" expression="" field="drainzone_id"/>
         <default applyOnUpdate="0" expression="" field="drainzone_name"/>
-        <default applyOnUpdate="0" expression="" field="connecat_id"/>
+        <default applyOnUpdate="0" expression="" field="conneccat_id"/>
         <default applyOnUpdate="0" expression="" field="workcat_id"/>
         <default applyOnUpdate="0" expression="" field="workcat_id_end"/>
         <default applyOnUpdate="0" expression="" field="builtdate"/>
@@ -33620,7 +33620,7 @@ def my_form_open(dialog, layer, feature):
         <constraint exp_strength="0" notnull_strength="0" unique_strength="0" constraints="0" field="is_operative"/>
         <constraint exp_strength="0" notnull_strength="0" unique_strength="0" constraints="0" field="drainzone_id"/>
         <constraint exp_strength="0" notnull_strength="0" unique_strength="0" constraints="0" field="drainzone_name"/>
-        <constraint exp_strength="0" notnull_strength="0" unique_strength="0" constraints="0" field="connecat_id"/>
+        <constraint exp_strength="0" notnull_strength="0" unique_strength="0" constraints="0" field="conneccat_id"/>
         <constraint exp_strength="0" notnull_strength="0" unique_strength="0" constraints="0" field="workcat_id"/>
         <constraint exp_strength="0" notnull_strength="0" unique_strength="0" constraints="0" field="workcat_id_end"/>
         <constraint exp_strength="0" notnull_strength="0" unique_strength="0" constraints="0" field="builtdate"/>
@@ -33650,7 +33650,7 @@ def my_form_open(dialog, layer, feature):
         <constraint exp="" desc="" field="is_operative"/>
         <constraint exp="" desc="" field="drainzone_id"/>
         <constraint exp="" desc="" field="drainzone_name"/>
-        <constraint exp="" desc="" field="connecat_id"/>
+        <constraint exp="" desc="" field="conneccat_id"/>
         <constraint exp="" desc="" field="workcat_id"/>
         <constraint exp="" desc="" field="workcat_id_end"/>
         <constraint exp="" desc="" field="builtdate"/>
@@ -33691,7 +33691,7 @@ def my_form_open(dialog, layer, feature):
           <column hidden="0" type="field" width="-1" name="epa_type"/>
           <column hidden="0" type="field" width="-1" name="is_operative"/>
           <column hidden="0" type="field" width="-1" name="staticpressure"/>
-          <column hidden="0" type="field" width="-1" name="connecat_id"/>
+          <column hidden="0" type="field" width="-1" name="conneccat_id"/>
           <column hidden="0" type="field" width="-1" name="workcat_id"/>
           <column hidden="0" type="field" width="-1" name="workcat_id_end"/>
           <column hidden="0" type="field" width="-1" name="builtdate"/>
@@ -33731,7 +33731,7 @@ def my_form_open(dialog, layer, feature):
       <editorlayout>generatedlayout</editorlayout>
       <editable>
         <field editable="1" name="builtdate"/>
-        <field editable="1" name="connecat_id"/>
+        <field editable="1" name="conneccat_id"/>
         <field editable="1" name="dma_id"/>
         <field editable="1" name="dma_name"/>
         <field editable="1" name="dqa_id"/>
@@ -33772,7 +33772,7 @@ def my_form_open(dialog, layer, feature):
       </editable>
       <labelOnTop>
         <field labelOnTop="0" name="builtdate"/>
-        <field labelOnTop="0" name="connecat_id"/>
+        <field labelOnTop="0" name="conneccat_id"/>
         <field labelOnTop="0" name="dma_id"/>
         <field labelOnTop="0" name="dma_name"/>
         <field labelOnTop="0" name="dqa_id"/>
@@ -33813,7 +33813,7 @@ def my_form_open(dialog, layer, feature):
       </labelOnTop>
       <reuseLastValue>
         <field reuseLastValue="0" name="builtdate"/>
-        <field reuseLastValue="0" name="connecat_id"/>
+        <field reuseLastValue="0" name="conneccat_id"/>
         <field reuseLastValue="0" name="dma_id"/>
         <field reuseLastValue="0" name="dma_name"/>
         <field reuseLastValue="0" name="dqa_id"/>
@@ -60406,7 +60406,7 @@ def my_form_open(dialog, layer, feature):
                 <edittype widgetv2type="TextEdit" name="sys_type">
                   <widgetv2config labelOnTop="0" UseHtml="0" IsMultiline="0" constraint="" constraintDescription="" notNull="0" fieldEditable="1"/>
                 </edittype>
-                <edittype widgetv2type="ValueRelation" name="connecat_id">
+                <edittype widgetv2type="ValueRelation" name="conneccat_id">
                   <widgetv2config Value="id" labelOnTop="0" OrderByValue="0" FilterExpression="" constraint="" AllowMulti="0" Layer="cat_connec20160216122620764" AllowNull="0" Key="id" constraintDescription="" notNull="0" UseCompleter="0" fieldEditable="1"/>
                 </edittype>
                 <edittype widgetv2type="ValueRelation" name="sector_id">
@@ -60915,7 +60915,7 @@ def my_form_open(dialog, layer, feature):
                 <alias index="3" name="" field="depth"/>
                 <alias index="4" name="" field="connectype_id"/>
                 <alias index="5" name="" field="sys_type"/>
-                <alias index="6" name="" field="connecat_id"/>
+                <alias index="6" name="" field="conneccat_id"/>
                 <alias index="7" name="" field="sector_id"/>
                 <alias index="8" name="" field="macrosector_id"/>
                 <alias index="9" name="" field="customer_code"/>
@@ -60982,7 +60982,7 @@ def my_form_open(dialog, layer, feature):
                   <column hidden="0" type="field" width="-1" name="depth"/>
                   <column hidden="0" type="field" width="-1" name="connectype_id"/>
                   <column hidden="0" type="field" width="-1" name="sys_type"/>
-                  <column hidden="0" type="field" width="-1" name="connecat_id"/>
+                  <column hidden="0" type="field" width="-1" name="conneccat_id"/>
                   <column hidden="0" type="field" width="-1" name="sector_id"/>
                   <column hidden="0" type="field" width="-1" name="customer_code"/>
                   <column hidden="0" type="field" width="-1" name="cat_matcat_id"/>
@@ -61074,7 +61074,7 @@ def my_form_open(dialog, layer, feature):
                 <default expression="" field="depth"/>
                 <default expression="" field="connectype_id"/>
                 <default expression="" field="sys_type"/>
-                <default expression="" field="connecat_id"/>
+                <default expression="" field="conneccat_id"/>
                 <default expression="" field="sector_id"/>
                 <default expression="" field="macrosector_id"/>
                 <default expression="" field="customer_code"/>
