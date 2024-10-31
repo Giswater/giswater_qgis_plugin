@@ -65,8 +65,7 @@ BEGIN
 	v_id := (p_data ->> 'feature')::json->> 'id';
 	v_closedstatus := json_extract_path_text (p_data,'data','fields', 'closed')::text;
 
-	SELECT type INTO v_type FROM cat_feature JOIN cat_feature_node USING (id) WHERE child_layer = v_tablename AND graph_delimiter !='NONE'
-	AND graph_delimiter IS NOT NULL;
+	SELECT type INTO v_type FROM cat_feature JOIN cat_feature_node USING (id) WHERE child_layer = v_tablename AND graph_delimiter ='MINSECTOR';
 	
 	-- getting exploitation
 	v_exploitation = (SELECT array_agg(expl_id) FROM selector_expl where cur_user = current_user);
@@ -185,7 +184,7 @@ BEGIN
 			v_message = '{"status": "Accepted", "level": 0, "text": "Valve status have been succesfully updated. Nothing to do because automatic trigger is not enabled to recalculate DYNAMIC MAPZONES"}';			
 		END IF;
 	ELSE
-		v_message = '{"status": "Accepted", "level": 0, "text": "Nothing to do because it is not a valve"}';
+		v_message = '{"status": "Accepted", "level": 0, "text": "Nothing to do because it is not a valid valve. Only those valves with cat_feature_node.graph_delimiter = MINSECTOR are valid"}';
 	END IF;
 
 	-- Return
