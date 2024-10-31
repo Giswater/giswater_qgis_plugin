@@ -162,7 +162,7 @@ class GwImportInpTask(GwTask):
             self._save_controls_and_rules()
 
             self._log_message("Inserting junctions into DB")
-            self._save_junctions_to_v_edit_node()
+            self._save_junctions()
 
             self._log_message("Inserting pipes into DB")
             self._save_pipes_to_v_edit_arc()
@@ -416,7 +416,7 @@ class GwImportInpTask(GwTask):
                 execute_sql(sql, params, commit=False)
 
 
-    def _save_junctions_to_v_edit_node(self) -> None:
+    def _save_junctions(self) -> None:
         node_sql = """ 
             INSERT INTO node (
                 the_geom, code, nodecat_id, epa_type, expl_id, sector_id, muni_id, state, state_type, workcat_id, elevation
