@@ -158,6 +158,9 @@ class GwImportInpTask(GwTask):
             self._log_message("Inserting curves into DB")
             self._save_curves()
 
+            self._log_message("Inserting controls and rules into DB")
+            self._save_controls_and_rules()
+
             self._log_message("Inserting junctions into DB")
             self._save_junctions_to_v_edit_node()
 
@@ -169,7 +172,7 @@ class GwImportInpTask(GwTask):
             return True
         except Exception as e:
             self.exception = traceback.format_exc()
-            self.log.append(f"{e}")
+            self.log.append(f"{traceback.format_stack()}")
             tools_db.dao.rollback()
             return False
 
@@ -368,6 +371,44 @@ class GwImportInpTask(GwTask):
                     (curve_name, x, y),
                     commit=False,
                 )
+
+    def _save_controls_and_rules(self) -> None:
+        from wntr.network.controls import Control, Rule
+
+        controls_rows = get_rows("SELECT id FROM inp_controls", commit=False)
+        controls_db: set[str] = set()
+        if controls_rows:
+            controls_db = {x[0] for x in controls_rows}
+
+        rules_rows = get_rows("SELECT id FROM inp_rules", commit=False)
+        rules_db: set[str] = set()
+        if rules_rows:
+            rules_db = {x[0] for x in rules_rows}
+
+        for control_name, control in self.network.controls():
+            control_dict = control.to_dict()
+            condition = control.condition
+            then_actions = control_dict.get("then_actions")
+            else_actions = control_dict.get("else_actions")
+            priority = control.priority
+            if type(control) is Control:
+                # TODO: manage if already exists?
+                text = f"IF {condition} THEN {' AND '.join(then_actions)} PRIORITY {priority}"
+
+                sql = "INSERT INTO inp_controls (sector_id, text, active) VALUES (%s, %s, true)"
+                params = (self.sector, text)
+                execute_sql(sql, params, commit=False)
+            elif type(control) is Rule:
+                # TODO: manage if already exists?
+                text = f"RULE {control.name}\nIF {condition}\nTHEN {'\nAND '.join(then_actions)}"
+                if else_actions:
+                    text += f"\nELSE {else_actions}"
+                text += f"\nPRIORITY {priority}"
+
+                sql = "INSERT INTO inp_rules (sector_id, text, active) VALUES (%s, %s, true)"
+                params = (self.sector, text)
+                execute_sql(sql, params, commit=False)
+
 
     def _save_junctions_to_v_edit_node(self) -> None:
         sql = """
