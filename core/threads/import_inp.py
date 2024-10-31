@@ -375,12 +375,12 @@ class GwImportInpTask(GwTask):
     def _save_controls_and_rules(self) -> None:
         from wntr.network.controls import Control, Rule
 
-        controls_rows = get_rows("SELECT id FROM inp_controls", commit=False)
+        controls_rows = get_rows("SELECT text FROM inp_controls", commit=False)
         controls_db: set[str] = set()
         if controls_rows:
             controls_db = {x[0] for x in controls_rows}
 
-        rules_rows = get_rows("SELECT id FROM inp_rules", commit=False)
+        rules_rows = get_rows("SELECT text FROM inp_rules", commit=False)
         rules_db: set[str] = set()
         if rules_rows:
             rules_db = {x[0] for x in rules_rows}
@@ -392,18 +392,24 @@ class GwImportInpTask(GwTask):
             else_actions = control_dict.get("else_actions")
             priority = control.priority
             if type(control) is Control:
-                # TODO: manage if already exists?
                 text = f"IF {condition} THEN {' AND '.join(then_actions)} PRIORITY {priority}"
+                if text in controls_db:
+                    msg = f"The control '{control_name}' is already on database. Skipping..."
+                    self._log_message(msg)
+                    continue
 
                 sql = "INSERT INTO inp_controls (sector_id, text, active) VALUES (%s, %s, true)"
                 params = (self.sector, text)
                 execute_sql(sql, params, commit=False)
             elif type(control) is Rule:
-                # TODO: manage if already exists?
                 text = f"RULE {control.name}\nIF {condition}\nTHEN {'\nAND '.join(then_actions)}"
                 if else_actions:
                     text += f"\nELSE {else_actions}"
                 text += f"\nPRIORITY {priority}"
+                if text in rules_db:
+                    msg = f"The rule '{control_name}' is already on database. Skipping..."
+                    self._log_message(msg)
+                    continue
 
                 sql = "INSERT INTO inp_rules (sector_id, text, active) VALUES (%s, %s, true)"
                 params = (self.sector, text)
