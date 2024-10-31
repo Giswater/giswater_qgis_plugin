@@ -634,13 +634,3 @@ BEGIN
 	*/
 END;
 $BODY$;
-
-ALTER FUNCTION SCHEMA_NAME.gw_fct_pg2epa_check_network(json)
-    OWNER TO role_admin;
-
-GRANT EXECUTE ON FUNCTION SCHEMA_NAME.gw_fct_pg2epa_check_network(json) TO PUBLIC;
-
-GRANT EXECUTE ON FUNCTION SCHEMA_NAME.gw_fct_pg2epa_check_network(json) TO role_admin;
-
-GRANT EXECUTE ON FUNCTION SCHEMA_NAME.gw_fct_pg2epa_check_network(json) TO role_basic;
-
