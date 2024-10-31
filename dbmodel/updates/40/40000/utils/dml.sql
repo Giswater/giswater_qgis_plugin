@@ -552,3 +552,21 @@ DELETE FROM config_typevalue WHERE typevalue='linkedaction_typevalue' AND id='ac
 ALTER TABLE config_typevalue ENABLE TRIGGER gw_trg_typevalue_config_fk;
 
 DELETE FROM plan_typevalue WHERE typevalue = 'result_type';
+
+INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, source, isaudit, fprocess_type, addparam)
+VALUES (474, 'Get epa calibration file for pressures', 'ws', NULL, 'core', true, 'Function process', NULL) ON CONFLICT (fid) DO NOTHING;
+INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, source, isaudit, fprocess_type, addparam)
+VALUES (475, 'Get epa calibration file for volumes', 'ws', NULL, 'core', true, 'Function process', NULL) ON CONFLICT (fid) DO NOTHING;
+INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, source, isaudit, fprocess_type, addparam)
+VALUES (476, 'Get log for epa calibration volumes', 'ws', NULL, 'core', true, 'Function process', NULL) ON CONFLICT (fid) DO NOTHING;
+
+
+INSERT INTO config_fprocess (fid, tablename, target, querytext, orderby, addparam, active) VALUES (474, 'vcp_pipes', '[PIPES]', NULL, 1, NULL, TRUE) ON CONFLICT (fid, tablename, target) DO NOTHING;
+INSERT INTO config_fprocess (fid, tablename, target, querytext, orderby, addparam, active) VALUES (475, 'vcv_times', '[TIMES]', NULL, 1, NULL, TRUE) ON CONFLICT (fid, tablename, target) DO NOTHING;
+INSERT INTO config_fprocess (fid, tablename, target, querytext, orderby, addparam, active) VALUES (475, 'vcv_dma', '[DMA]', NULL, 2, NULL, TRUE) ON CONFLICT (fid, tablename, target) DO NOTHING;
+INSERT INTO config_fprocess (fid, tablename, target, querytext, orderby, addparam, active) VALUES (475, 'vcv_junction', '[JUNCTIONS]', NULL, 3, NULL, TRUE) ON CONFLICT (fid, tablename, target) DO NOTHING;
+INSERT INTO config_fprocess (fid, tablename, target, querytext, orderby, addparam, active) VALUES (475, 'vcv_emitters', '[EMITTERS]', NULL, 4, NULL, TRUE) ON CONFLICT (fid, tablename, target) DO NOTHING;
+INSERT INTO config_fprocess (fid, tablename, target, querytext, orderby, addparam, active) VALUES (475, 'vcv_demands', '[DEMANDS]', NULL, 5, NULL, TRUE) ON CONFLICT (fid, tablename, target) DO NOTHING;
+INSERT INTO config_fprocess (fid, tablename, target, querytext, orderby, addparam, active) VALUES (475, 'vcv_patterns', '[PATTERNS]', NULL, 6, NULL, TRUE) ON CONFLICT (fid, tablename, target) DO NOTHING;
+INSERT INTO config_fprocess (fid, tablename, target, querytext, orderby, addparam, active) VALUES (476, 'vcv_emitters_log', '[EMITTER]', NULL, 1, NULL, TRUE) ON CONFLICT (fid, tablename, target) DO NOTHING;
+INSERT INTO config_fprocess (fid, tablename, target, querytext, orderby, addparam, active) VALUES (476, 'vcv_dma_log', '[DMA]', NULL, 2, NULL, TRUE) ON CONFLICT (fid, tablename, target) DO NOTHING;
