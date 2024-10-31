@@ -155,13 +155,9 @@ BEGIN
         END IF;
 
         IF (aux_json->>'columnname') = 'featurecat_id' THEN
-            IF (v_feature_type = 'gully') THEN
-                v_sql := concat('SELECT array_agg(id) FROM cat_grate WHERE ', v_feature_type, '_type = ''', v_curr_featurecat, ''' AND active is True OR active is null ORDER BY 1');
-            ELSE
-                v_sql := concat('SELECT array_agg(id) FROM cat_', v_feature_type, ' WHERE ', v_feature_type, '_type = ''', v_curr_featurecat, ''' AND active IS TRUE OR active IS NULL ORDER BY 1');
-            END IF;
+            v_sql := concat('SELECT array_agg(id) FROM cat_', v_feature_type, ' WHERE ', v_feature_type, '_type = ''', v_curr_featurecat, ''' AND active IS TRUE OR active IS NULL ORDER BY 1');
 
-           EXECUTE v_sql INTO v_catalogs_ids;
+            EXECUTE v_sql INTO v_catalogs_ids;
 
 			v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'comboIds', COALESCE(v_catalogs_ids, '{}'));
 			v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'comboNames', COALESCE(v_catalogs_ids, '{}'));
