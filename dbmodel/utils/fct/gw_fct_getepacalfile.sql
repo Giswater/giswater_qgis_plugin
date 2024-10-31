@@ -16,7 +16,7 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getepacalfile(
 AS $BODY$
 /*EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_getepacalfile($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831},
-"data":{"type":"pressure", "resultType":"dint", "resultValue":"{'2':[3,0.22]}", "inputFile":"file_name", "outputFile":"out_file_name", "dscenarioId":"2", "resultId":"test1", "nodeId":"1001", "pressure":"34", "duration":"3600", "Accuaracy":"1", "trials":"30"}}$$)
+"data":{"type":"pressure", "resultType":"dint", "resultValue":0.22, "inputFile":"file_name", "outputFile":"out_file_name", "dscenarioId":"2", "resultId":"test1", "nodeId":"1001", "pressure":"34", "duration":"3600", "Accuaracy":"1", "trials":"30"}}$$)
 --fid:474/475/476
 */
 DECLARE
@@ -35,7 +35,7 @@ v_dscenario text;
 v_inputfile text;
 v_outputfile text;
 v_result_type text;
-v_result_value json;
+v_result_value float;
 v_node text;
 v_pressure text;
 v_duration text;
@@ -243,11 +243,3 @@ BEGIN
 		
 END;
 $BODY$;
-
-ALTER FUNCTION SCHEMA_NAME.gw_fct_getepacalfile(json)
-    OWNER TO postgres;
-
-GRANT EXECUTE ON FUNCTION SCHEMA_NAME.gw_fct_getepacalfile(json) TO PUBLIC;
-
-GRANT EXECUTE ON FUNCTION SCHEMA_NAME.gw_fct_getepacalfile(json) TO postgres;
-
