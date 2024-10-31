@@ -313,6 +313,11 @@ class GwImportInp(GwAction):
                 'DELETE FROM connec CASCADE;',
                 'DELETE FROM node CASCADE;',
                 'DELETE FROM inp_pump CASCADE;',
+                'DELETE FROM inp_curve CASCADE;',
+                'DELETE FROM inp_pattern_value CASCADE;',
+                'DELETE FROM inp_pattern CASCADE;',
+                'DELETE FROM inp_controls CASCADE;',
+                'DELETE FROM inp_rules CASCADE;',
                 'DELETE FROM arc CASCADE;',
                 "DELETE FROM cat_work WHERE id = 'import_inp_test';",
                 "DELETE FROM cat_arc CASCADE;"
