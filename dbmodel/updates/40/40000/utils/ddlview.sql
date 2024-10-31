@@ -236,11 +236,6 @@ CREATE OR REPLACE VIEW vcv_times AS
     rpt.inp_options ->> 'inp_times_duration'::text AS duration
    FROM selector_inp_result r, rpt_cat_result rpt
    WHERE r.result_id = rpt.result_id AND r.cur_user = "current_user"()::text;
-ALTER TABLE vcv_times
-  OWNER TO role_admin;
-GRANT ALL ON TABLE vcv_times TO role_admin;
-GRANT ALL ON TABLE vcv_times TO role_basic;
-
 
 CREATE OR REPLACE VIEW vcv_dma AS
  SELECT ext_rtc_dma_period.id,
@@ -250,12 +245,6 @@ CREATE OR REPLACE VIEW vcv_dma AS
     ext_rtc_dma_period.pattern_id
    FROM ext_rtc_dma_period;
 
-ALTER TABLE vcv_dma
-  OWNER TO role_admin;
-GRANT ALL ON TABLE vcv_dma TO role_admin;
-GRANT ALL ON TABLE vcv_dma TO role_basic;
-
-
 CREATE OR REPLACE VIEW vcv_emitters AS
   SELECT DISTINCT node_id, sum(length/10000) as coef
     FROM selector_inp_result r,rpt_inp_arc a
@@ -263,8 +252,3 @@ CREATE OR REPLACE VIEW vcv_emitters AS
     WHERE (a.node_1 = n.node_id OR a.node_2 = n.node_id) and r.result_id = n.result_id
     AND r.cur_user = "current_user"()::text
     GROUP BY node_id;
-
-ALTER TABLE vcv_emitters
-  OWNER TO role_admin;
-GRANT ALL ON TABLE vcv_emitters TO role_admin;
-GRANT ALL ON TABLE vcv_emitters TO role_basic;
