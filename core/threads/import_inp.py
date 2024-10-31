@@ -417,17 +417,35 @@ class GwImportInpTask(GwTask):
 
 
     def _save_junctions_to_v_edit_node(self) -> None:
-        sql = """
-            INSERT INTO v_edit_node (the_geom, code, elevation, nodecat_id, epa_type, expl_id, sector_id, muni_id, state, state_type, workcat_id)
-            VALUES %s
+        node_sql = """ 
+            INSERT INTO node (
+                the_geom, code, nodecat_id, epa_type, expl_id, sector_id, muni_id, state, state_type, workcat_id, elevation
+            ) VALUES %s
             RETURNING node_id, code
-        """
-
-        template = (
+        """  # --"depth", arc_id, annotation, observ, "comment", label_x, label_y, label_rotation, staticpressure, feature_type
+        node_template = (
             "(ST_SetSRID(ST_Point(%s, %s),%s), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
         )
 
-        params = []
+        man_sql = """
+            INSERT INTO man_junction (
+                node_id
+            ) VALUES %s
+        """
+        man_template = "(%s)"
+
+        inp_sql = """
+            INSERT INTO inp_junction (
+                node_id, demand, emitter_coeff, init_quality
+            ) VALUES %s
+        """  # --pattern_id, peak_factor, source_type, source_quality, source_pattern_id
+        inp_template = (
+            "(%s, %s, %s, %s)"
+        )
+
+        node_params = []
+
+        inp_dict = {}
 
         for j_name, j in self.network.junctions():
             x, y = j.coordinates
@@ -440,13 +458,10 @@ class GwImportInpTask(GwTask):
             state = 1
             state_type = 2
             workcat_id = self.workcat
-            params.append(
+            node_params.append(
                 (
-                    x,
-                    y,
-                    srid,
-                    j_name,
-                    j.elevation,
+                    x, y, srid,  # the_geom
+                    j_name,  # code
                     nodecat_id,
                     epa_type,
                     expl_id,
@@ -455,15 +470,51 @@ class GwImportInpTask(GwTask):
                     state,
                     state_type,
                     workcat_id,
+                    j.elevation,
                 )
             )
+            inp_dict[j_name] = {
+                "demand": j.base_demand,
+                "pattern_id": None,
+                "peak_factor": None,
+                "emitter_coeff": j.emitter_coefficient,
+                "init_quality": j.initial_quality,
+                "source_type": None,
+                "source_quality": None,
+                "source_pattern_id": None
+            }
 
+        # Insert into parent table
         junctions = toolsdb_execute_values(
-            sql, params, template, fetch=True, commit=True
+            node_sql, node_params, node_template, fetch=True, commit=True
         )
 
         self.junction_ids = {j[1]: j[0] for j in junctions} if junctions else {}
         print(junctions)
+
+        man_params = []
+        inp_params = []
+
+        for j in junctions:
+            node_id = j[0]
+            code = j[1]
+            man_params.append(
+                (node_id,)
+            )
+
+            inp_data = inp_dict[code]
+            inp_params.append(
+                (node_id, inp_data["demand"], inp_data["emitter_coeff"], inp_data["init_quality"])
+            )
+
+        # Insert into inp table
+        toolsdb_execute_values(
+            inp_sql, inp_params, inp_template, fetch=False, commit=True
+        )
+        # Insert into man table
+        toolsdb_execute_values(
+            man_sql, man_params, man_template, fetch=False, commit=True
+        )
 
     def _save_pipes_to_v_edit_arc(self) -> None:
         sql = """
