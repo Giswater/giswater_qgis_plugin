@@ -60,3 +60,5 @@ UPDATE sys_param_user set dv_querytext = 'SELECT id, id as idval FROM v_edit_inp
 INSERT INTO inp_typevalue VALUES ('inp_value_options_in','MODIFIED_GREEN_AMPT','MODIFIED_GREEN_AMPT');
 
 UPDATE sys_function SET descript='Function to manage values of defined target hydrology catalog (delete or copy from another one). It works with all objects linked with hydrology catalog (Subcatchment, Lids, Loadings, Coverages and Groundwater).' WHERE id=3100 AND function_name='gw_fct_manage_hydrology_values';
+
+UPDATE sys_param_user SET placeholder = 'MM/DD/YYYY' WHERE id in ('inp_options_end_date','inp_options_start_date', 'inp_options_report_start_date');

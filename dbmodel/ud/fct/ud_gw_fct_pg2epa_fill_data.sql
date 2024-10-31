@@ -292,7 +292,8 @@ BEGIN
 	
 	-- setting for date-time parameters if rainfall has addparam values)
 	select * into v_timeseries from inp_timeseries where id = v_rainfall;
-	IF json_extract_path_text(v_timeseries.addparam,'start_date') IS NOT NULL THEN
+	
+	IF json_extract_path_text(v_timeseries.addparam,'start_date') IS NOT NULL AND json_extract_path_text(v_timeseries.addparam,'start_date') != '' THEN
 		update config_param_user set value = json_extract_path_text(v_timeseries.addparam,'start_date') 
 		where cur_user = current_user and parameter = 'inp_options_start_date';
 		update config_param_user set value = json_extract_path_text(v_timeseries.addparam,'start_time')
