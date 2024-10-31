@@ -164,6 +164,9 @@ class GwImportInpTask(GwTask):
             self._log_message("Inserting junctions into DB")
             self._save_junctions()
 
+            self._log_message("Inserting reservoirs into DB")
+            self._save_reservoirs()
+
             self._log_message("Inserting pipes into DB")
             self._save_pipes_to_v_edit_arc()
 
@@ -505,6 +508,105 @@ class GwImportInpTask(GwTask):
             inp_data = inp_dict[code]
             inp_params.append(
                 (node_id, inp_data["demand"], inp_data["emitter_coeff"], inp_data["init_quality"])
+            )
+
+        # Insert into inp table
+        toolsdb_execute_values(
+            inp_sql, inp_params, inp_template, fetch=False, commit=True
+        )
+        # Insert into man table
+        toolsdb_execute_values(
+            man_sql, man_params, man_template, fetch=False, commit=True
+        )
+
+    def _save_reservoirs(self) -> None:
+        feature_class = self.catalogs['features']['reservoirs'].lower()
+
+        node_sql = """ 
+            INSERT INTO node (
+                the_geom, code, nodecat_id, epa_type, expl_id, sector_id, muni_id, state, state_type, workcat_id
+            ) VALUES %s
+            RETURNING node_id, code
+        """  # --"depth", arc_id, annotation, observ, "comment", label_x, label_y, label_rotation, staticpressure, feature_type
+        node_template = (
+            "(ST_SetSRID(ST_Point(%s, %s),%s), %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        )
+
+        man_sql = f"""
+            INSERT INTO man_{feature_class} (
+                node_id
+            ) VALUES %s
+        """
+        man_template = "(%s)"
+
+        inp_sql = """
+            INSERT INTO inp_reservoir (
+                node_id, pattern_id, head, init_quality
+            ) VALUES %s
+        """  # --pattern_id, peak_factor, source_type, source_quality, source_pattern_id
+        inp_template = (
+            "(%s, %s, %s, %s)"
+        )
+
+        node_params = []
+
+        inp_dict = {}
+
+        for r_name, r in self.network.reservoirs():
+            x, y = r.coordinates
+            srid = lib_vars.data_epsg
+            nodecat_id = self.catalogs["reservoirs"]
+            epa_type = "RESERVOIR"
+            expl_id = self.exploitation
+            sector_id = self.sector
+            muni_id = self.municipality
+            state = 1
+            state_type = 2
+            workcat_id = self.workcat
+            node_params.append(
+                (
+                    x, y, srid,  # the_geom
+                    r_name,  # code
+                    nodecat_id,
+                    epa_type,
+                    expl_id,
+                    sector_id,
+                    muni_id,
+                    state,
+                    state_type,
+                    workcat_id,
+                )
+            )
+            inp_dict[r_name] = {
+                "pattern_id": r.head_pattern_name,
+                "head": r.head,
+                "init_quality": r.initial_quality,
+                "source_type": None,
+                "source_quality": None,
+                "source_pattern_id": None
+            }
+
+        # Insert into parent table
+        reservoirs = toolsdb_execute_values(
+            node_sql, node_params, node_template, fetch=True, commit=True
+        )
+
+        self.reservoirs_ids = {r[1]: r[0] for r in reservoirs} if reservoirs else {}
+        print(reservoirs)
+
+        man_params = []
+        inp_params = []
+
+        for r in reservoirs:
+            node_id = r[0]
+            code = r[1]
+            man_params.append(
+                (node_id,)
+            )
+
+            inp_data = inp_dict[code]
+            inp_params.append(
+                (node_id, inp_data["pattern_id"], inp_data["head"], inp_data["init_quality"])
             )
 
         # Insert into inp table
