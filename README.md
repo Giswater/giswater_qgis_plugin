@@ -134,7 +134,7 @@ Giswater uses the following third-party libraries:
 
 - **WNTR**: [WNTR GitHub](https://github.com/USEPA/WNTR)
   WNTR is an open-source Python package for analyzing water distribution systems using hydraulic and water quality models.
-  The WNTR license can be found in the [LICENSE](./packages/wntr/LICENSE) file or in their [repository](https://github.com/USEPA/WNTR/blob/main/LICENSE.md).
+  The WNTR license can be found in the [LICENSE](./packages/wntr/LICENSE.md) file or in their [repository](https://github.com/USEPA/WNTR/blob/main/LICENSE.md).
 
 ## License
 
