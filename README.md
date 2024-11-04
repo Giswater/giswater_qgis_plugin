@@ -23,9 +23,10 @@ Here after you will find all the information you need to getting started with Gi
 	6- FAQ's
 	7- Code repositories
 	8- Versioning
-	9- License
-	10- Thanks to
-	
+	9- Third-Party Libraries
+	10- License
+	11- Thanks to
+
 
 ## REQUIREMENTS
 To work with Giswater you will need at least 2 programs:
@@ -114,6 +115,14 @@ The time-period for built releases is one-per-month (12 builts / year).<br>
 The time-period for minor releases is one-per-year (1 minor / year).<br>
 There is no time-period defined for major releases.<br>
 
+
+## Third-Party Libraries
+
+Giswater uses the following third-party libraries:
+
+- **WNTR**: [WNTR GitHub](https://github.com/USEPA/WNTR)  
+  WNTR is an open-source Python package for analyzing water distribution systems using hydraulic and water quality models.  
+  The WNTR license can be found in the `packages/wntr/LICENSE` file or in their [repository](https://github.com/USEPA/WNTR/blob/main/LICENSE.md).
 
 ## LICENSE
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version. See LICENSE file for more information.
