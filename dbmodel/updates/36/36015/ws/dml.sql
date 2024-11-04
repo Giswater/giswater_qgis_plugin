@@ -19,3 +19,5 @@ where id = 3110;
 
 
 DELETE FROM config_form_fields WHERE columnname like 'real_press%' and formtype IN ('form_list_footer', 'form_list_header', 'form_print', 'form_catalog', 'form_visit');
+
+UPDATE sys_table SET id='config_graph_mincut', descript='Table to configure the inlets of the network. Optionally, you can set if any of its arc is an inlet arc' WHERE id='config_graph_inlet';
