@@ -21,6 +21,7 @@ import os
 import sys
 plugin_path = os.path.abspath(os.path.join(os.path.dirname(__file__)))
 sys.path.append(plugin_path)
+sys.path.append(os.path.join(plugin_path, 'packages'))
 
 
 # noinspection PyPep8Naming

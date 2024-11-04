@@ -35,8 +35,9 @@ Developed in Python (QGIS plugin) and PL/SQL (PostgreSQL database), the project 
 6. [FAQ](#faqs)
 7. [Code Repositories](#code-repositories)
 8. [Versioning](#versioning)
-9. [License](#license)
-10. [Acknowledgments](#acknowledgments)
+9. [Third-Party Libraries](#third-party-libraries)
+10. [License](#license)
+11. [Acknowledgments](#acknowledgments)
 
 ---
 
@@ -126,6 +127,14 @@ Release frequency:
 - **Build**: Monthly (12 builds/year)
 - **Minor**: Annually
 - **Major**: No fixed schedule
+
+## Third-Party Libraries
+
+Giswater uses the following third-party libraries:
+
+- **WNTR**: [WNTR GitHub](https://github.com/USEPA/WNTR)
+  WNTR is an open-source Python package for analyzing water distribution systems using hydraulic and water quality models.
+  The WNTR license can be found in the [LICENSE](./packages/wntr/LICENSE) file or in their [repository](https://github.com/USEPA/WNTR/blob/main/LICENSE.md).
 
 ## License
 
