@@ -21,3 +21,7 @@ where id = 3110;
 DELETE FROM config_form_fields WHERE columnname like 'real_press%' and formtype IN ('form_list_footer', 'form_list_header', 'form_print', 'form_catalog', 'form_visit');
 
 UPDATE sys_table SET id='config_graph_mincut', descript='Table to configure the inlets of the network. Optionally, you can set if any of its arc is an inlet arc' WHERE id='config_graph_inlet';
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source")
+VALUES(3274, 'There isn''t any node configured on config_graph_mincut for the selected macroexploitation',
+'Fill config_graph_mincut with the inlets before executing the mincut', 2, true, 'utils', 'core') on conflict (id) do nothing;

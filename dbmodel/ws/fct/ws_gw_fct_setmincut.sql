@@ -144,7 +144,7 @@ BEGIN
 		-- check if there is no node_id configured on config_graph_mincut for the macroexploitation
 		IF (SELECT count (node_id) FROM v_edit_node WHERE node_id IN (SELECT node_id FROM config_graph_mincut)) = 0 THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"3264", "function":"2980","debug_msg":null, "is_process":true}}$$)';
+			"data":{"message":"3274", "function":"2980","debug_msg":null, "is_process":true}}$$)';
 		END IF;
 
 		--check if arc exists in database or look for a new arc_id in the same location
