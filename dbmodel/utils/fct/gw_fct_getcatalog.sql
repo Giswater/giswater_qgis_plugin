@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2568
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_getcatalog(p_data json);
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_getcatalog(p_data json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getcatalog(p_data json)
   RETURNS json AS
 $BODY$
@@ -65,6 +65,7 @@ v_querystring text;
 v_debug_vars json;
 v_debug json;
 v_msgerr json;
+last_index integer;
 
 BEGIN
 
@@ -89,7 +90,7 @@ BEGIN
 
 	-- Set 1st parent field
 	fields_array[1] := gw_fct_json_object_set_key(fields_array[1], 'selectedId', v_matcat);
-
+    last_index := array_length(fields_array, 1);
 	IF v_formname='new_mapzone' THEN
 		v_querystring = concat('SELECT lower(graph_delimiter) FROM cat_feature_node WHERE id=',quote_literal(v_feature_type),';');
 		v_debug_vars := json_build_object('v_feature_type', v_feature_type);
@@ -163,40 +164,30 @@ BEGIN
 		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 		EXECUTE v_querystring INTO v_query_result;
 
-		--  add filters
+		-- Add filters
 		v_filter_values := (p_data ->> 'data')::json->> 'fields';
-		SELECT array_agg(row_to_json(a)) into v_text from json_each(v_filter_values) a;
-		i=1;
+		SELECT array_agg(row_to_json(a)) INTO v_text FROM json_each(v_filter_values) a;
+		i = 1;
 		IF v_text IS NOT NULL THEN
-			FOREACH text IN ARRAY v_text
-			LOOP
+		    FOREACH text IN ARRAY v_text
+		    LOOP
+		        -- Get field and value from JSON
+		        SELECT v_text[i] INTO v_json_field;
+		        IF v_json_field ->> 'value' != '' THEN
+		            v_field := (SELECT (v_json_field ->> 'key'));
+		            v_value := (SELECT (v_json_field ->> 'value'));
+		        END IF;
 
-				-- Get field and value from json
-				SELECT v_text [i] into v_json_field;
-				IF v_json_field ->> 'value' != '' THEN
+		        i := i + 1;
 
-					v_field:= (SELECT (v_json_field ->> 'key')) ;
-					v_value:= (SELECT (v_json_field ->> 'value')) ;
-				END IF;
-
-				i=i+1;
-
-				-- creating the query_text (it's supossed that with field id there is no creation of query text filter)
-				IF v_value IS NOT NULL AND v_field != 'id' THEN
-					v_query_result := v_query_result || ' AND '||v_field||'::text = '|| quote_literal(v_value) ||'::text';
-				END IF;
-
-			END LOOP;
-
-			IF v_project_type = 'WS' THEN
-				v_query_result := v_query_result || ' AND '|| quote_ident(v_featurecat_id) ||' = '|| quote_literal(v_feature_type) ||' AND active IS TRUE ';
-
-			ELSIF v_project_type = 'UD' AND v_formname!='upsert_catalog_gully'  THEN
-				v_query_result := v_query_result || ' AND active IS TRUE AND ('|| quote_ident(v_featurecat_id) ||' = '|| quote_literal(v_feature_type) ||' OR '|| quote_ident(v_featurecat_id) ||' IS null)';
-			END IF;
-
+		        -- Exclude 'shape' and 'geom1' if v_project_type = 'UD' and v_formname = 'upsert_catalog_gully'
+		        IF v_value IS NOT NULL AND v_field != 'id' THEN
+		            IF NOT (v_project_type = 'UD' AND v_formname = 'upsert_catalog_gully' AND (v_field = 'shape' OR v_field = 'geom1')) THEN
+		                v_query_result := v_query_result || ' AND ' || quote_ident(v_field) || '::text = ' || quote_literal(v_value) || '::text';
+		            END IF;
+		        END IF;
+		    END LOOP;
 		END IF;
-		raise notice 'v_query_result %', v_query_result;
 
 		v_querystring = concat('SELECT array_to_json(array_agg(id)) FROM (',(v_query_result),') a');
 		v_debug_vars := json_build_object('v_query_result', v_query_result);
@@ -211,10 +202,12 @@ BEGIN
 		EXECUTE v_querystring INTO query_result_names;
 
 		-- Set new values json of id's (it's supossed that id is on 4th position on json)
-		fields_array[4] := gw_fct_json_object_set_key(fields_array[4], 'queryText', v_query_result);
-		fields_array[4] := gw_fct_json_object_set_key(fields_array[4], 'comboIds', query_result_ids);
-		fields_array[4] := gw_fct_json_object_set_key(fields_array[4], 'comboNames', query_result_names);
-		fields_array[4] := gw_fct_json_object_set_key(fields_array[4], 'selectedId',  query_result_ids -> 0);
+		IF last_index IS NOT NULL THEN
+            fields_array[last_index] := gw_fct_json_object_set_key(fields_array[last_index], 'queryText', v_query_result);
+            fields_array[last_index] := gw_fct_json_object_set_key(fields_array[last_index], 'comboIds', query_result_ids);
+            fields_array[last_index] := gw_fct_json_object_set_key(fields_array[last_index], 'comboNames', query_result_names);
+            fields_array[last_index] := gw_fct_json_object_set_key(fields_array[last_index], 'selectedId', query_result_ids -> 0);
+        END IF;
 
 	END IF;
 
