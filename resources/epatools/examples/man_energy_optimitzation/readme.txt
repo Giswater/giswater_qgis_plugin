@@ -1,0 +1,1 @@
+Folder for examples for energy analysis

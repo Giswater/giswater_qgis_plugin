@@ -1,0 +1,18 @@
+; EMITTER CALIBRATION
+; Configuration file
+
+[OPTIONS]
+;option              value
+default_efficiency   0.9
+default_emitter      0.2
+accuracy             0.01
+trials               60
+
+[DMAS]
+;dma_id              efficiency           pattern_id
+2                    0.82                 PTN-DMA-02-DEF
+3                    0.73                 PTN-DMA-03-DEF
+1                    0.7999999999999999   PTN-DMA-01-DEF
+5                    0.8                  PTN-DMA-05-DEF
+6                    0.8                  PTN-DMA-06-DEF
+4                    0.9                  PTN-DMA-04-DEF

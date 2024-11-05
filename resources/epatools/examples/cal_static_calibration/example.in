@@ -1,0 +1,38 @@
+; STATIC CALIBRATION
+; Configuration file
+
+[OPTIONS]
+accuracy  0.0001
+trials    15
+
+[SCENARIOS]
+;Scenario name          parameter          values
+EXAMPLE-PRESS-SETTING   target_parameter   pressure
+EXAMPLE-PRESS-SETTING   target_id          1073
+EXAMPLE-PRESS-SETTING   target_val         30
+EXAMPLE-PRESS-SETTING   calibration_mode   setting
+EXAMPLE-PRESS-SETTING   features           1083
+
+EXAMPLE-PRESS-POWER     target_parameter   pressure
+EXAMPLE-PRESS-POWER     target_id          113880
+EXAMPLE-PRESS-POWER     target_val         1.5
+EXAMPLE-PRESS-POWER     calibration_mode   power
+EXAMPLE-PRESS-POWER     features           1105
+
+EXAMPLE-PRESS-ELEVATION target_parameter   pressure
+EXAMPLE-PRESS-ELEVATION target_id          1046
+EXAMPLE-PRESS-ELEVATION target_val         10
+EXAMPLE-PRESS-ELEVATION calibration_mode   elevation
+EXAMPLE-PRESS-ELEVATION features           1046
+
+EXAMPLE-FLOW-LOSSES     target_parameter   flow
+EXAMPLE-FLOW-LOSSES     target_id          2071
+EXAMPLE-FLOW-LOSSES     target_val         0.055
+EXAMPLE-FLOW-LOSSES     calibration_mode   losses
+EXAMPLE-FLOW-LOSSES     features           2070 2213 2101
+
+EXAMPLE-FLOW-DIAMETER   target_parameter   flow
+EXAMPLE-FLOW-DIAMETER   target_id          2054
+EXAMPLE-FLOW-DIAMETER   target_val         -0.041
+EXAMPLE-FLOW-DIAMETER   calibration_mode   diameter
+EXAMPLE-FLOW-DIAMETER   features           130 2055 2066
