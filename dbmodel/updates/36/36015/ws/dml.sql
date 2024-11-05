@@ -27,3 +27,8 @@ VALUES(3274, 'There isn''t any node configured on config_graph_mincut for the se
 'Fill config_graph_mincut with the inlets before executing the mincut', 2, true, 'utils', 'core') on conflict (id) do nothing;
 
 delete from config_form_fields where formname like 've_epa%' and layoutname='lyt_data_2' and columnname='to_arc';
+
+update config_form_fields set columnname='flow_max' where columnname='flowmax' and tabname='tab_epa';
+update config_form_fields set columnname='flow_min' where columnname='flowmin' and tabname='tab_epa';
+update config_form_fields set columnname='vel_max' where columnname='velmax' and tabname='tab_epa';
+update config_form_fields set columnname='vel_min' where columnname='velmin' and tabname='tab_epa';
