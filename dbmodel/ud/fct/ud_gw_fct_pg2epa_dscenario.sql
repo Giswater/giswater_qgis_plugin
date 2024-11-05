@@ -105,11 +105,6 @@ BEGIN
 		UPDATE temp_t_node t SET apond = d.apond FROM inp_dscenario_junction d 
 		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.apond IS NOT NULL;
 
-		-- insert lid-usage
-		INSERT INTO temp_t_lid_usage SELECT subc_id, lidco_id, numelem, area, width, initsat, fromimp, toperv, rptfile 
-		FROM inp_dscenario_lid_usage
-		ON CONFLICT (subc_id) DO NOTHING;
-
 		-- TODO: update outfallparam
 
 		-- update outfalls
@@ -236,7 +231,7 @@ BEGIN
 		-- insert lid-usage
 		INSERT INTO temp_t_lid_usage SELECT subc_id, lidco_id, numelem, area, width, initsat, fromimp, toperv, rptfile 
 		FROM inp_dscenario_lid_usage
-		ON CONFLICT (subc_id) DO NOTHING;
+		ON CONFLICT (subc_id, lidco_id) DO NOTHING;
 
 		-- insertar inflows
 		INSERT INTO temp_t_node_other (node_id, type, timser_id, other, sfactor, base, pattern_id)
@@ -256,6 +251,7 @@ BEGIN
 		WHERE dscenario_id IN (SELECT unnest(v_userscenario))
 		ON CONFLICT (node_id, type) DO NOTHING;
 	END IF;
+
 
 	RETURN 1;
 	

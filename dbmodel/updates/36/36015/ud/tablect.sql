@@ -29,3 +29,6 @@ INSERT INTO config_fprocess VALUES (140,'rpt_lidperformance_sum', 'LID Performan
 ALTER TABLE rpt_runoff_quant ADD CONSTRAINT rpt_runoff_quant_unique_result_id UNIQUE (result_id);
 
 ALTER TABLE rpt_flowrouting_cont ADD CONSTRAINT rpt_flowrouting_cont_unique_result_id UNIQUE (result_id);
+
+ALTER TABLE temp_lid_usage DROP CONSTRAINT temp_lid_usage_pkey;
+ALTER TABLE temp_lid_usage  ADD CONSTRAINT temp_lid_usage_pkey PRIMARY KEY(subc_id,lidco_id);
