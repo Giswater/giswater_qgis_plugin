@@ -25,3 +25,5 @@ UPDATE sys_table SET id='config_graph_mincut', descript='Table to configure the 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source")
 VALUES(3274, 'There isn''t any node configured on config_graph_mincut for the selected macroexploitation',
 'Fill config_graph_mincut with the inlets before executing the mincut', 2, true, 'utils', 'core') on conflict (id) do nothing;
+
+delete from config_form_fields where formname like 've_epa%' and layoutname='lyt_data_2' and columnname='to_arc';
