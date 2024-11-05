@@ -37,10 +37,10 @@ INSERT INTO inp_typevalue VALUES ('inp_typevalue_dscenario', 'LIDS', 'LIDS');
 
 UPDATE config_form_fields SET linkedobject='tbl_event_x_gully' WHERE formname='gully' AND formtype='form_feature' AND tabname='tab_event' AND linkedobject = 'tbl_visit_x_gully';
 
-INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source") 
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source")
 VALUES (3326, 'gw_fct_epa_hydraulic_performance', 'ud', 'function', 'json', 'json', 'Function to calculate the hydraulic performance of network', 'role_epa', NULL, 'core');
 
-INSERT INTO config_toolbox 
+INSERT INTO config_toolbox
 VALUES (3326, 'Calculate the hydraulic performance for specific result','{"featureType":[]}',
 '[
 {"widgetname":"resultId", "label":"Result_id:","widgettype":"combo","datatype":"text", "isMandatory":true, "tooltip":"Result_id", "dvQueryText":"SELECT result_id as id,  result_id as idval FROM rpt_cat_result WHERE status = 2","layoutname":"grl_option_parameters","layoutorder":1, "value":""},
@@ -52,7 +52,7 @@ INSERT INTO sys_fprocess VALUES (531, 'fprocess to calculate the performance of 
 ON CONFLICT (fid) DO NOTHING;
 
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, widgettype, label, tooltip, ismandatory, isparent, iseditable, dv_querytext, dv_orderby_id, dv_isnullvalue, hidden)
-SELECT 'v_edit_raingage', 'form_feature', 'tab_none', columnname, widgettype, label, tooltip, false, isparent, iseditable, 'SELECT muni_id as id, name as idval from v_ext_municipality WHERE muni_id IS NOT NULL', dv_orderby_id, dv_isnullvalue, hidden FROM config_form_fields 
+SELECT 'v_edit_raingage', 'form_feature', 'tab_none', columnname, widgettype, label, tooltip, false, isparent, iseditable, 'SELECT muni_id as id, name as idval from v_ext_municipality WHERE muni_id IS NOT NULL', dv_orderby_id, dv_isnullvalue, hidden FROM config_form_fields
 WHERE columnname  = 'muni_id' AND formname = 'v_ext_address';
 
 UPDATE sys_param_user set dv_querytext = 'SELECT id, id as idval FROM v_edit_inp_timeseries WHERE timser_type= ''Rainfall'' and active' where id = 'inp_options_setallraingages';
@@ -62,3 +62,14 @@ INSERT INTO inp_typevalue VALUES ('inp_value_options_in','MODIFIED_GREEN_AMPT','
 UPDATE sys_function SET descript='Function to manage values of defined target hydrology catalog (delete or copy from another one). It works with all objects linked with hydrology catalog (Subcatchment, Lids, Loadings, Coverages and Groundwater).' WHERE id=3100 AND function_name='gw_fct_manage_hydrology_values';
 
 UPDATE sys_param_user SET placeholder = 'MM/DD/YYYY' WHERE id in ('inp_options_end_date','inp_options_start_date', 'inp_options_report_start_date');
+
+-- 05/11/24
+UPDATE config_form_tabs
+	SET tabactions='[{"actionName": "actionEdit","actionTooltip": "Edit","disabled": false},{"actionName": "actionZoom","actionTooltip": "Zoom In","disabled": false},{"actionName": "actionCentered","actionTooltip": "Center","disabled": false},{"actionName": "actionZoomOut","actionTooltip": "Zoom Out","disabled": false},{"actionName": "actionCatalog","actionTooltip": "Change Catalog","disabled": false},{"actionName": "actionWorkcat","actionTooltip": "Add Workcat","disabled": false},{"actionName": "actionCopyPaste","actionTooltip": "Copy Paste","disabled": false},{"actionName": "actionLink","actionTooltip": "Open Link","disabled": false},{"actionName": "actionHelp","actionTooltip": "Help","disabled": false},{"actionName": "actionMapZone","actionTooltip": "Add Mapzone","disabled": false},{"actionName": "actionGetParentId","actionTooltip": "Set parent_id","disabled": false},{"actionName": "actionGetArcId","actionTooltip": "Set arc_id","disabled": false},{"actionName": "actionRotation","actionTooltip": "Rotation","disabled": false},{"actionName": "actionRotation","disabled": false}]'::json
+	WHERE formname='v_edit_node' AND tabname='tab_epa';
+UPDATE config_form_tabs
+	SET tabactions='[{"actionName": "actionEdit","actionTooltip": "Edit","disabled": false},{"actionName": "actionZoom","actionTooltip": "Zoom In","disabled": false},{"actionName": "actionCentered","actionTooltip": "Center","disabled": false},{"actionName": "actionZoomOut","actionTooltip": "Zoom Out","disabled": false},{"actionName": "actionCatalog","actionTooltip": "Change Catalog","disabled": false},{"actionName": "actionWorkcat","actionTooltip": "Add Workcat","disabled": false},{"actionName": "actionCopyPaste","actionTooltip": "Copy Paste","disabled": false},{"actionName": "actionLink","actionTooltip": "Open Link","disabled": false},{"actionName": "actionHelp","actionTooltip": "Help","disabled": false},{"actionName": "actionInterpolate","actionTooltip": "Interpolate","disabled": false},{"actionName": "actionGetArcId","actionTooltip": "Set arc_id","disabled": false},{"actionName": "actionOrifice","actionTooltip": "Orifice","disabled": false},{"actionName": "actionOutlet","actionTooltip": "Outlet","disabled": false},{"actionName": "actionPump","actionTooltip": "Pump","disabled": false},{"actionName": "actionWeir","actionTooltip": "Weir","disabled": false},{"actionName": "actionDemand","actionTooltip": "DWF","disabled": false}]'::json
+	WHERE formname='ve_epa_junction' AND tabname='tab_epa';
+UPDATE config_form_tabs
+	SET tabactions='[{"actionName": "actionEdit","actionTooltip": "Edit","disabled": false},{"actionName": "actionZoom","actionTooltip": "Zoom In","disabled": false},{"actionName": "actionCentered","actionTooltip": "Center","disabled": false},{"actionName": "actionZoomOut","actionTooltip": "Zoom Out","disabled": false},{"actionName": "actionCatalog","actionTooltip": "Change Catalog","disabled": false},{"actionName": "actionWorkcat","actionTooltip": "Add Workcat","disabled": false},{"actionName": "actionCopyPaste","actionTooltip": "Copy Paste","disabled": false},{"actionName": "actionInterpolate","actionTooltip": "Interpolate","disabled": false},{"actionName": "actionLink","actionTooltip": "Open Link","disabled": false},{"actionName": "actionHelp","actionTooltip": "Help","disabled": false},{"actionName": "actionGetArcId","actionTooltip": "Set arc_id","disabled": false},{"actionName": "actionOrifice","actionTooltip": "Orifice","disabled": false},{"actionName": "actionOutlet","actionTooltip": "Outlet","disabled": false},{"actionName": "actionPump","actionTooltip": "Pump","disabled": false},{"actionName": "actionWeir","actionTooltip": "Weir","disabled": false}]'::json
+	WHERE formname='ve_epa_storage' AND tabname='tab_epa';
