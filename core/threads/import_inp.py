@@ -167,6 +167,9 @@ class GwImportInpTask(GwTask):
             self._log_message("Inserting reservoirs into DB")
             self._save_reservoirs()
 
+            self._log_message("Inserting tanks into DB")
+            self._save_tanks()
+
             self._log_message("Inserting pipes into DB")
             self._save_pipes_to_v_edit_arc()
 
@@ -607,6 +610,117 @@ class GwImportInpTask(GwTask):
             inp_data = inp_dict[code]
             inp_params.append(
                 (node_id, inp_data["pattern_id"], inp_data["head"], inp_data["init_quality"])
+            )
+
+        # Insert into inp table
+        toolsdb_execute_values(
+            inp_sql, inp_params, inp_template, fetch=False, commit=True
+        )
+        # Insert into man table
+        toolsdb_execute_values(
+            man_sql, man_params, man_template, fetch=False, commit=True
+        )
+
+    def _save_tanks(self) -> None:
+        feature_class = self.catalogs['features']['tanks'].lower()
+
+        node_sql = """ 
+            INSERT INTO node (
+                the_geom, code, nodecat_id, epa_type, expl_id, sector_id, muni_id, state, state_type, workcat_id, elevation
+            ) VALUES %s
+            RETURNING node_id, code
+        """  # --"depth", arc_id, annotation, observ, "comment", label_x, label_y, label_rotation, staticpressure, feature_type
+        node_template = (
+            "(ST_SetSRID(ST_Point(%s, %s),%s), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        )
+
+        man_sql = f"""
+            INSERT INTO man_{feature_class} (
+                node_id
+            ) VALUES %s
+        """
+        man_template = "(%s)"
+
+        inp_sql = """
+            INSERT INTO inp_tank (
+                node_id, initlevel, minlevel, maxlevel, diameter, minvol, curve_id, overflow, mixing_model, mixing_fraction, reaction_coeff, init_quality
+            ) VALUES %s
+        """  # --
+        inp_template = (
+            "(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        )
+
+        node_params = []
+
+        inp_dict = {}
+
+        for t_name, t in self.network.tanks():
+            x, y = t.coordinates
+            srid = lib_vars.data_epsg
+            nodecat_id = self.catalogs["tanks"]
+            epa_type = "TANK"
+            expl_id = self.exploitation
+            sector_id = self.sector
+            muni_id = self.municipality
+            state = 1
+            state_type = 2
+            workcat_id = self.workcat
+            elevation = t.elevation
+            node_params.append(
+                (
+                    x, y, srid,  # the_geom
+                    t_name,  # code
+                    nodecat_id,
+                    epa_type,
+                    expl_id,
+                    sector_id,
+                    muni_id,
+                    state,
+                    state_type,
+                    workcat_id,
+                    elevation,
+                )
+            )
+            inp_dict[t_name] = {
+                "initlevel": t.init_level,
+                "minlevel": t.min_level,
+                "maxlevel": t.max_level,
+                "diameter": t.diameter,
+                "minvol": t.min_vol,
+                "curve_id": t.vol_curve_name,
+                "overflow": "Yes" if t.overflow else "No",
+                "mixing_model": t.mixing_model,
+                "mixing_fraction": t.mixing_fraction,
+                "reaction_coeff": t.bulk_coeff,
+                "init_quality": t.initial_quality,
+                "source_type": None,
+                "source_quality": None,
+                "source_pattern_id": None,
+            }
+
+        # Insert into parent table
+        tanks = toolsdb_execute_values(
+            node_sql, node_params, node_template, fetch=True, commit=True
+        )
+
+        self.tanks_ids = {t[1]: t[0] for t in tanks} if tanks else {}
+        print(tanks)
+
+        man_params = []
+        inp_params = []
+
+        for t in tanks:
+            node_id = t[0]
+            code = t[1]
+            man_params.append(
+                (node_id,)
+            )
+
+            inp_data = inp_dict[code]
+            inp_params.append(
+                (node_id, inp_data["initlevel"], inp_data["minlevel"], inp_data["maxlevel"], inp_data["diameter"],
+                 inp_data["minvol"], inp_data["curve_id"], inp_data["overflow"], inp_data["mixing_model"],
+                 inp_data["mixing_fraction"], inp_data["reaction_coeff"], inp_data["init_quality"])
             )
 
         # Insert into inp table
