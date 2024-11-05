@@ -28,12 +28,6 @@ class GwEpaTools(GwAction):
         super().__init__(icon_path, action_name, text, toolbar, action_group)
         self.iface = global_vars.iface
 
-        self.icon_path = icon_path
-        self.action_name = action_name
-        self.text = text
-        self.toolbar = toolbar
-        self.action_group = action_group
-
         # Create a menu and add all the actions
         self.menu = QMenu()
         self.menu.setObjectName("GW_epa_tools")
