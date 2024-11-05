@@ -146,7 +146,7 @@ class GwDimensioning:
 
         tools_qt.hide_void_groupbox(self.dlg_dim)
         self.iface.actionPan().trigger()
-        
+
         title = f"DIMENSIONING - {self.fid}"
         tools_gw.open_dialog(self.dlg_dim, dlg_name='dimensioning', title=title)
         return False, False
@@ -187,7 +187,7 @@ class GwDimensioning:
         for widget in list_widgets:
             widget_name = widget.property('columnname')
             widget_value = f'"{tools_qt.is_checked(self.dlg_dim, widget)}"'
-            if widget_value == 'null':
+            if widget_value in ('null', '""'):
                 continue
             fields += f'"{widget_name}":{widget_value},'
 
@@ -196,7 +196,7 @@ class GwDimensioning:
         for widget in list_widgets:
             widget_name = widget.property('columnname')
             widget_value = f'"{tools_qt.get_combo_value(self.dlg_dim, widget)}"'
-            if widget_value == 'null':
+            if widget_value in ('null', '""', '"-1"'):
                 continue
             fields += f'"{widget_name}":{widget_value},'
 

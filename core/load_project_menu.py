@@ -187,8 +187,7 @@ class GwMenuLoad(QObject):
             return
 
         # Open dialog
-        self.dlg_manage_menu.setWindowTitle(f'Advanced Menu')
-        self.dlg_manage_menu.open()
+        tools_gw.open_dialog(self.dlg_manage_menu, title="Advanced Menu")
 
 
     def _reset_position_dialog(self):

@@ -70,6 +70,7 @@ class GwNetscenarioManagerButton(GwAction):
         # Fill table
         self.tbl_netscenario = self.dlg_netscenario_manager.findChild(QTableView, 'tbl_netscenario')
         self._fill_manager_table()
+        self._set_label_current_netscenario(self.dlg_netscenario_manager, from_open_dialog=True)
 
         # Connect main dialog signals
         self.dlg_netscenario_manager.txt_name.textChanged.connect(partial(self._fill_manager_table))
@@ -90,8 +91,6 @@ class GwNetscenarioManagerButton(GwAction):
         self.dlg_netscenario_manager.chk_active.stateChanged.connect(partial(self._fill_manager_table))
         self.dlg_netscenario_manager.btn_toggle_active.clicked.connect(partial(self._manage_toggle_active,
             self.tbl_netscenario, 'plan_netscenario', is_manager=True))
-
-        self._set_label_current_netscenario(self.dlg_netscenario_manager)
 
         # Open dialog
         tools_gw.open_dialog(self.dlg_netscenario_manager, 'netscenario_manager')
@@ -118,62 +117,72 @@ class GwNetscenarioManagerButton(GwAction):
         else:
             self.fill_table(dialog, table, tablename)
 
-    def _update_current_netscenario(self, dialog, qtbl_nsm):
+    def _update_current_netscenario(self, dialog, qtbl):
+        """ Update the current netscenario if it is active and refresh label """
 
-        selected_list = qtbl_nsm.selectionModel().selectedRows()
-        if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message, dialog=dialog)
+        # Get selected rows in the table
+        selected_list = qtbl.selectionModel().selectedRows()
+
+        # Ensure a row is selected
+        if not selected_list:
+            tools_qgis.show_warning("No record selected", dialog=dialog)
             return
 
-        index = selected_list[0]
+        # Get ID and active status of the first selected row
+        row = selected_list[0].row()
+        model = qtbl.model()
+        col_id = tools_qt.get_col_index_by_col_name(qtbl, 'netscenario_id')
+        col_active = tools_qt.get_col_index_by_col_name(qtbl, 'active')
+        netscenario_id = model.index(row, col_id).data()
+        active = model.index(row, col_active).data()
 
-        # Get selected netscenario_id and active
-        col_ind = tools_qt.get_col_index_by_col_name(qtbl_nsm, 'netscenario_id')
-        netscenario_id = index.sibling(index.row(), col_ind).data()
-        col_ind = tools_qt.get_col_index_by_col_name(qtbl_nsm, 'active')
-        active = index.sibling(index.row(), col_ind).data()
-
-        if active in (False, "False"):
-            message = f"Cannot set the current psector of an inactive psector. You must activate it before."
-            tools_qgis.show_warning(message, dialog=self.dlg_netscenario_manager)
+        # Check if the netscenario is active
+        if not active:
+            tools_qgis.show_warning(
+                "Cannot set the current netscenario of an inactive scenario. Please activate it first.", dialog=dialog)
             return
 
-        self._set_selector(netscenario_id)
-
-        message = "Values has been updated"
-        tools_qgis.show_info(message, dialog=dialog)
-
-        self._set_label_current_netscenario(dialog)
-
-
-    def _set_selector(self, netscenario_id):
-        """ Insert or update values in tables with current_user control """
-
-        extras = f'"selectorType":"None", "tabName":"tab_netscenario", "checkAll":null, "addSchema":"None", "id":"{netscenario_id}", "value":"True", "isAlone":"True"'
+        # Prepare JSON body for gw_fct_set_current
+        extras = f'"type": "netscenario", "id": "{netscenario_id}"'
         body = tools_gw.create_body(extras=extras)
-        json_result = tools_gw.execute_procedure('gw_fct_setselectors', body)
-        if json_result is None or json_result['status'] == 'Failed':
+        result = tools_gw.execute_procedure("gw_fct_set_current", body)
+
+        # Check if update was successful and refresh label
+        if result.get("status") == "Accepted":
+            # Refresh the label with the latest netscenario data
+            self._set_label_current_netscenario(dialog, result=result)
+        else:
+            tools_qgis.show_warning("Failed to set netscenario", dialog=dialog)
+
+        # Re-open the dialog to reflect the changes
+        tools_gw.open_dialog(dialog)
+
+
+    def _set_label_current_netscenario(self, dialog, from_open_dialog=False, result=None):
+        """Set label for the current netscenario."""
+
+        # Fetch the current netscenario if called from open dialog
+        if from_open_dialog:
+            extras = '"type": "netscenario"'
+            body = tools_gw.create_body(extras=extras)
+            result = tools_gw.execute_procedure("gw_fct_set_current", body)
+
+            if not result or result.get("status") != "Accepted":
+                print("Failed to retrieve current netscenario name")
+                return
+
+        # Ensure result has the necessary data
+        try:
+            # Extract name and netscenario_id from the result
+            name_value = result["body"]["data"]["name"]
+            netscenario_id = result["body"]["data"]["netscenario_id"]
+
+            # Set the label text
+            tools_qt.set_widget_text(dialog, 'lbl_vdefault_netscenario', name_value)
+
+        except (KeyError, TypeError) as e:
+            print(f"Error accessing netscenario data: {e}")
             return
-        level = json_result['body']['message']['level']
-        if level == 0:
-            message = json_result['body']['message']['text']
-            tools_qgis.show_message(message, level)
-
-
-    def _set_label_current_netscenario(self, dialog):
-
-        sql = ("SELECT t1.netscenario_id, t1.name FROM plan_netscenario AS t1 "
-               " INNER JOIN selector_netscenario AS t2 ON t1.netscenario_id = t2.netscenario_id "
-               " WHERE t2.cur_user = current_user")
-        row = tools_db.get_row(sql)
-        self.current_netscenario_id = row
-
-        if not row:
-            return
-
-        tools_qt.set_widget_text(dialog, 'lbl_vdefault_netscenario', self.current_netscenario_id[1])
-
 
     # region netscenario manager
 

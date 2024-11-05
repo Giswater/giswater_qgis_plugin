@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1008</width>
+    <width>1094</width>
     <height>788</height>
    </rect>
   </property>
@@ -78,19 +78,6 @@
        <widget class="QTableView" name="tbl_wrkspcm">
         <property name="selectionMode">
          <enum>QAbstractItemView::SingleSelection</enum>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="4">
-       <widget class="QLabel" name="lbl_vdefault_workspace">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string/>
         </property>
        </widget>
       </item>
@@ -199,6 +186,22 @@
          </widget>
         </item>
        </layout>
+      </item>
+      <item row="5" column="5">
+       <widget class="QLabel" name="lbl_vdefault_workspace">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>

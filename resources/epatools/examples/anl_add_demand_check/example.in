@@ -1,0 +1,15 @@
+; ADDITIONAL DEMAND CHECK
+; Configuration file
+
+[OPTIONS]
+; Maximum distance between two nodes to be paired
+max_distance 500
+
+[JUNCTIONS]
+; Demand and pressure use the same units from inp_file
+;node   demand    pressure
+1038    16.667    10
+1035    16.667    10
+1041    16.667    10
+1020    16.667    10
+1021    16.667    10

@@ -199,53 +199,50 @@ class GwFeatureTypeChangeButton(GwMaptool):
 
         for field in complet_result['body']['data']['fields']:
 
-            if field['columnname'] == 'btn_catalog' and self.feature_type == 'gully':
+            if field.get('hidden'):
                 continue
-            else:
-                if field.get('hidden'):
+
+            if field['widgettype'] is "button":
+                continue
+
+            if field.get('widgetcontrols') and field['widgetcontrols'].get('hiddenWhenNull') \
+                    and field.get('value') in (None, ''):
+                continue
+            label, widget = tools_gw.set_widgets(dialog, complet_result, field, self.tablename, self)
+            if widget is None:
+                continue
+
+            layout = dialog.findChild(QGridLayout, field['layoutname'])
+            if layout is not None:
+                if layout.objectName() != prev_layout:
+                    widget_offset = 0
+                    prev_layout = layout.objectName()
+
+                orientation = layout_orientations.get(layout.objectName(),
+                                                      "vertical")
+                layout.setProperty('lytOrientation', orientation)
+
+                # Take the QGridLayout with the intention of adding a QSpacerItem later
+                if layout not in layout_list and layout.objectName() in ('lyt_main_1', 'lyt_main_2', 'lyt_main_3','lyt_buttons'):
+                    layout_list.append(layout)
+
+                if field['layoutorder'] is None:
+                    message = "The field layoutorder is not configured for"
+                    msg = f"formname:{self.tablename}, columnname:{field['columnname']}"
+                    tools_qgis.show_message(message, 2, parameter=msg, dialog=dialog)
                     continue
 
-                if field['widgettype'] is "button":
-                    continue
+                # Manage widget and label positions
+                label_pos = field['widgetcontrols']['labelPosition'] if (
+                            'widgetcontrols' in field and field['widgetcontrols'] and 'labelPosition' in field[
+                             'widgetcontrols']) else None
+                widget_pos = field['layoutorder'] + widget_offset
 
-                if field.get('widgetcontrols') and field['widgetcontrols'].get('hiddenWhenNull') \
-                        and field.get('value') in (None, ''):
-                    continue
-                label, widget = tools_gw.set_widgets(dialog, complet_result, field, self.tablename, self)
-                if widget is None:
-                    continue
-
-                layout = dialog.findChild(QGridLayout, field['layoutname'])
-                if layout is not None:
-                    if layout.objectName() != prev_layout:
-                        widget_offset = 0
-                        prev_layout = layout.objectName()
-
-                    orientation = layout_orientations.get(layout.objectName(),
-                                                          "vertical")
-                    layout.setProperty('lytOrientation', orientation)
-
-                    # Take the QGridLayout with the intention of adding a QSpacerItem later
-                    if layout not in layout_list and layout.objectName() in ('lyt_main_1', 'lyt_main_2', 'lyt_main_3','lyt_buttons'):
-                        layout_list.append(layout)
-
-                    if field['layoutorder'] is None:
-                        message = "The field layoutorder is not configured for"
-                        msg = f"formname:{self.tablename}, columnname:{field['columnname']}"
-                        tools_qgis.show_message(message, 2, parameter=msg, dialog=dialog)
-                        continue
-
-                    # Manage widget and label positions
-                    label_pos = field['widgetcontrols']['labelPosition'] if (
-                                'widgetcontrols' in field and field['widgetcontrols'] and 'labelPosition' in field[
-                                 'widgetcontrols']) else None
-                    widget_pos = field['layoutorder'] + widget_offset
-
-                    # The data tab is somewhat special (it has 2 columns)
-                    if 'lyt_data' in layout.objectName() or 'lyt_epa_data' in layout.objectName():
-                        tools_gw.add_widget(dialog, field, label, widget)
-                    else:
-                        tools_gw.add_widget_combined(dialog, field, label, widget)
+                # The data tab is somewhat special (it has 2 columns)
+                if 'lyt_data' in layout.objectName() or 'lyt_epa_data' in layout.objectName():
+                    tools_gw.add_widget(dialog, field, label, widget)
+                else:
+                    tools_gw.add_widget_combined(dialog, field, label, widget)
 
 
     def _featuretype_change(self, event):
@@ -299,19 +296,19 @@ def btn_accept_featuretype_change(**kwargs):
     dialog = kwargs["dialog"]
 
     project_type = tools_gw.get_project_type()
-    feature_type_new = tools_qt.get_widget_value(dialog, "tab_none_feature_type_new")
-    featurecat_id = tools_qt.get_widget_value(dialog, "tab_none_featurecat_id")
+    feature_type_new = tools_qt.get_combo_value(dialog, "tab_none_feature_type_new", 1)
+    featurecat_id = tools_qt.get_combo_value(dialog, "tab_none_featurecat_id", 1)
 
-    fluid_type = tools_qt.get_widget_value(dialog, "tab_none_fluid_type")
+    fluid_type = tools_qt.get_combo_value(dialog, 'tab_none_fluid_type', 1)
     if fluid_type is None:
         fluid_type = 'null'
-    location_type = tools_qt.get_widget_value(dialog, "tab_none_location_type")
+    location_type = tools_qt.get_combo_value(dialog, 'tab_none_location_type', 1)
     if location_type is None:
         location_type = 'null'
-    category_type = tools_qt.get_widget_value(dialog, "tab_none_category_type")
+    category_type = tools_qt.get_combo_value(dialog, 'tab_none_category_type', 1)
     if category_type is None:
         category_type = 'null'
-    function_type = tools_qt.get_widget_value(dialog, "tab_none_function_type")
+    function_type = tools_qt.get_combo_value(dialog, 'tab_none_function_type', 1)
     if function_type is None:
         function_type = 'null'
 
@@ -319,7 +316,15 @@ def btn_accept_featuretype_change(**kwargs):
 
         if (featurecat_id != "null" and featurecat_id is not None and project_type == 'ws') or (
                 project_type == 'ud'):
-
+            if ((featurecat_id.startswith('(') and featurecat_id.endswith(')')) or
+                (fluid_type.startswith('(') and fluid_type.endswith(')')) or
+                (location_type.startswith('(') and location_type.endswith(')')) or
+                (category_type.startswith('(') and category_type.endswith(')')) or
+                (function_type.startswith('(') and function_type.endswith(')'))):
+                message = "Selected values are not valid for this process, they are not related to selected feature."
+                tools_qgis.show_warning(message, dialog=dialog)
+                return
+        
             # Get function input parameters
             feature = f'"type":"{this.feature_type}"'
             extras = f'"feature_id":"{this.feature_id}"'
