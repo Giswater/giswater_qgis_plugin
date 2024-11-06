@@ -121,26 +121,23 @@ BEGIN
 			INTO v_sensibility_f;
 			-- 10 pixels of base sensibility
 			v_sensibility = (v_zoomratio * 10 * v_sensibility_f);
-			v_config_layer='config_web_layer';
 
 		ELSIF  v_device = 3 THEN
 			EXECUTE 'SELECT (value::json->>''web'')::float FROM config_param_system WHERE parameter=''basic_info_sensibility_factor'''
 			INTO v_sensibility_f;
 			-- 10 pixels of base sensibility
 			v_sensibility = (v_zoomratio * 10 * v_sensibility_f);
-			v_config_layer='config_web_layer';
 
 		ELSIF  v_device IN (4, 5) THEN
 			EXECUTE 'SELECT (value::json->>''desktop'')::float FROM config_param_system WHERE parameter=''basic_info_sensibility_factor'''
 			INTO v_sensibility_f;
 
-			--v_sensibility_f = 1;
-
 			-- ESCALE 1:5000 as base sensibility
 			v_sensibility = ((v_zoomratio/5000) * 10 * v_sensibility_f);
-			v_config_layer='config_info_layer';
 
 		END IF;
+
+		v_config_layer='config_info_layer';
 
 		-- Get feature
 		v_sql = concat('SELECT DISTINCT(layer_id), orderby+100 orderby, cl.addparam->>''geomType'' as geomtype, lower(headertext) as feature_type FROM  ',quote_ident(v_config_layer),' cl JOIN cat_feature cf ON parent_layer=layer_id  ORDER BY orderby');

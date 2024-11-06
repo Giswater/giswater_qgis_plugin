@@ -107,24 +107,23 @@ BEGIN
 		INTO v_sensibility_f;
 		-- 10 pixels of base sensibility
 		v_sensibility = (v_zoomScale * 10 * v_sensibility_f);
-		v_config_layer='config_web_layer';
-
+		
 	ELSIF  v_device = 3 THEN
 		EXECUTE 'SELECT value::json->>''web'' FROM config_param_system WHERE parameter=''basic_info_sensibility_factor'''
 		INTO v_sensibility_f;
 		-- 10 pixels of base sensibility
 		v_sensibility = (v_zoomScale * 10 * v_sensibility_f);
-		v_config_layer='config_web_layer';
 
 	ELSIF  v_device IN (4, 5) THEN
 		EXECUTE 'SELECT value::json->>''desktop'' FROM config_param_system WHERE parameter=''basic_info_sensibility_factor'''
 		INTO v_sensibility_f;
 		-- ESCALE 1:5000 as base sensibility
 		v_sensibility = ((v_zoomScale/5000) * 10 * v_sensibility_f);
-		v_config_layer='config_info_layer';
 
 	END IF;
 
+	v_config_layer='config_info_layer';
+	
 	-- TODO:: REFORMAT v_visiblelayers
 	v_visibleLayers = REPLACE (v_visibleLayers, '[', '{');
 	v_visibleLayers = REPLACE (v_visibleLayers, ']', '}');

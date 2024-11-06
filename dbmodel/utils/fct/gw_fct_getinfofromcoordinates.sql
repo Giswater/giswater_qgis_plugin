@@ -144,26 +144,24 @@ BEGIN
 		INTO v_sensibility_f;
 		-- 10 pixels of base sensibility
 		v_sensibility = (v_zoomratio * 10 * v_sensibility_f);
-		v_config_layer='config_web_layer';
 		
 	ELSIF  v_device = 3 THEN
 		EXECUTE 'SELECT (value::json->>''web'')::float FROM config_param_system WHERE parameter=''basic_info_sensibility_factor'''
 		INTO v_sensibility_f;     
 		-- 10 pixels of base sensibility
 		v_sensibility = (v_zoomratio * 10 * v_sensibility_f);
-		v_config_layer='config_web_layer';
 
 	ELSIF  v_device IN (4, 5) THEN
 		EXECUTE 'SELECT (value::json->>''desktop'')::float FROM config_param_system WHERE parameter=''basic_info_sensibility_factor'''
 		INTO v_sensibility_f;
 
-		--v_sensibility_f = 1;
-
 		-- ESCALE 1:5000 as base sensibility
 		v_sensibility = ((v_zoomratio/5000) * 10 * v_sensibility_f);
-		v_config_layer='config_info_layer';
 
 	END IF;
+
+	v_config_layer='config_info_layer';
+
 
 	-- Make point
 	SELECT ST_Transform(ST_SetSRID(ST_MakePoint(v_xcoord,v_ycoord),v_client_epsg),v_epsg) INTO v_point;
