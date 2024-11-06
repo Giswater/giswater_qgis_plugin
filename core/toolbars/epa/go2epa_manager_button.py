@@ -223,7 +223,7 @@ class GwGo2EpaManagerButton(GwAction):
                 set_corporate_enabled = False
 
             col_idx = tools_qt.get_col_index_by_col_name(self.dlg_manager.tbl_rpt_cat_result, 'iscorporate')
-            if col_idx is None:
+            if col_idx is not None:
                 row = index.row()
                 is_corporate = index.sibling(row, col_idx).data()
 
