@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>775</width>
+    <width>827</width>
     <height>375</height>
    </rect>
   </property>
@@ -125,7 +125,7 @@
           <bool>true</bool>
          </property>
          <property name="currentIndex">
-          <number>0</number>
+          <number>6</number>
          </property>
          <property name="documentMode">
           <bool>false</bool>
@@ -955,6 +955,48 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>txt_name</tabstop>
+  <tabstop>cmb_lidtype</tabstop>
+  <tabstop>tab_lidlayers</tabstop>
+  <tabstop>txt_1_berm_height</tabstop>
+  <tabstop>txt_2_vegetation_volume</tabstop>
+  <tabstop>txt_3_surface_roughness</tabstop>
+  <tabstop>txt_4_surface_slope</tabstop>
+  <tabstop>txt_5_surface_side_slope</tabstop>
+  <tabstop>txt_1_thickness</tabstop>
+  <tabstop>txt_2_porosity</tabstop>
+  <tabstop>txt_3_field_capacity</tabstop>
+  <tabstop>txt_4_wilting_point</tabstop>
+  <tabstop>txt_5_conductivity</tabstop>
+  <tabstop>txt_6_conducticity_slope</tabstop>
+  <tabstop>txt_7_suction_head</tabstop>
+  <tabstop>txt_1_thickness_pavement</tabstop>
+  <tabstop>txt_2_void_ratio_pavement</tabstop>
+  <tabstop>txt_3_imprevious_surface</tabstop>
+  <tabstop>txt_4_permeability</tabstop>
+  <tabstop>txt_5_clogging_factor_pavement</tabstop>
+  <tabstop>txt_6_regeneration_interval</tabstop>
+  <tabstop>txt_7_regeneration_fraction</tabstop>
+  <tabstop>txt_1_thickness_storage</tabstop>
+  <tabstop>txt_2_void_ratio_storage</tabstop>
+  <tabstop>txt_3_seepage_rate</tabstop>
+  <tabstop>txt_4_clogging_factor_storage</tabstop>
+  <tabstop>txt_1_flow_coefficient</tabstop>
+  <tabstop>txt_2_flow_exponent</tabstop>
+  <tabstop>txt_3_offset</tabstop>
+  <tabstop>txt_4_drain_delay</tabstop>
+  <tabstop>txt_5_open_level</tabstop>
+  <tabstop>txt_6_closed_level</tabstop>
+  <tabstop>txt_7_cmb_control_curve</tabstop>
+  <tabstop>txt_1_thickness_drainage</tabstop>
+  <tabstop>txt_2_void_fraction</tabstop>
+  <tabstop>txt_3_roughness</tabstop>
+  <tabstop>txt_flow_capacity</tabstop>
+  <tabstop>btn_ok</tabstop>
+  <tabstop>btn_cancel</tabstop>
+  <tabstop>btn_help</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

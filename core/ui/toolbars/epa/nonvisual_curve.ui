@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>627</width>
-    <height>397</height>
+    <height>430</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -219,6 +219,16 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>txt_curve_id</tabstop>
+  <tabstop>cmb_curve_type</tabstop>
+  <tabstop>cmb_expl_id</tabstop>
+  <tabstop>txt_descript</tabstop>
+  <tabstop>btn_delete_item</tabstop>
+  <tabstop>tbl_curve_value</tabstop>
+  <tabstop>btn_accept</tabstop>
+  <tabstop>btn_cancel</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

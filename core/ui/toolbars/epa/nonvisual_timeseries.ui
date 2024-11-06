@@ -211,6 +211,18 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>txt_id</tabstop>
+  <tabstop>txt_idval</tabstop>
+  <tabstop>cmb_timeser_type</tabstop>
+  <tabstop>cmb_times_type</tabstop>
+  <tabstop>cmb_expl_id</tabstop>
+  <tabstop>txt_fname</tabstop>
+  <tabstop>txt_descript</tabstop>
+  <tabstop>tbl_timeseries_value</tabstop>
+  <tabstop>btn_accept</tabstop>
+  <tabstop>btn_cancel</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>870</width>
+    <width>995</width>
     <height>704</height>
    </rect>
   </property>
@@ -198,8 +198,16 @@
  </widget>
  <tabstops>
   <tabstop>txt_filter</tabstop>
+  <tabstop>chk_active</tabstop>
+  <tabstop>cmb_curve_type</tabstop>
+  <tabstop>cmb_pattern_type</tabstop>
+  <tabstop>cmb_timser_type</tabstop>
+  <tabstop>btn_print</tabstop>
   <tabstop>btn_duplicate</tabstop>
+  <tabstop>btn_create</tabstop>
   <tabstop>btn_delete</tabstop>
+  <tabstop>main_tab</tabstop>
+  <tabstop>btn_cancel</tabstop>
  </tabstops>
  <resources/>
  <connections/>
