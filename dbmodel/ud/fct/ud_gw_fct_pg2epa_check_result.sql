@@ -463,7 +463,7 @@ BEGIN
 
 				ELSIF object_rec.tablename = 'anl_polygon' THEN
 
-					EXECUTE 'INSERT INTO anl_polygon (pol_id, fid, descript, the_geom)
+					EXECUTE 'INSERT INTO anl_polygon (pol_id, pol_type, fid, descript, the_geom)
 					SELECT '||object_rec.colname||', 396, concat(''Present on '',count(*),'' enabled dscenarios''), the_geom FROM v_edit_inp_dscenario_'||object_rec.tabname||
 					' GROUP BY '||object_rec.colname||', the_geom  having count(*) > 1';
 
