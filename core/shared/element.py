@@ -5,6 +5,8 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
+import webbrowser
+
 from functools import partial
 
 from qgis.PyQt.QtCore import QRegExp
@@ -92,6 +94,7 @@ class GwElement:
         tools_gw.add_icon(self.dlg_add_element.btn_insert, "111", sub_folder="24x24")
         tools_gw.add_icon(self.dlg_add_element.btn_delete, "112", sub_folder="24x24")
         tools_gw.add_icon(self.dlg_add_element.btn_snapping, "137")
+        tools_gw.add_icon(self.dlg_add_element.btn_path_url, "173", sub_folder="24x24")
 
         # Remove all previous selections
         self.layers = tools_gw.remove_selection(True, layers=self.layers)
@@ -157,7 +160,8 @@ class GwElement:
                                                                           self.dlg_add_element.tbl_element_x_connec, "v_edit_connec", "connec_id", self.rubber_band, 10))
         self.dlg_add_element.tbl_element_x_gully.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
                                                                          self.dlg_add_element.tbl_element_x_gully, "v_edit_gully", "gully_id", self.rubber_band, 10))
-
+        self.dlg_add_element.btn_path_url.clicked.connect(partial(self._open_web_browser, self.dlg_add_element, "link"))
+        
         # Fill combo boxes of the form and related events
         self.dlg_add_element.element_type.currentIndexChanged.connect(partial(self._filter_elementcat_id))
         self.dlg_add_element.element_type.currentIndexChanged.connect(partial(self._update_location_cmb))
@@ -784,5 +788,17 @@ class GwElement:
         if row:
             tools_qt.set_widget_text(dialog, widget, row[0])
 
+
+    def _open_web_browser(self, dialog, widget=None):
+        """ Display url using the default browser """
+
+        if widget is not None:
+            url = tools_qt.get_text(dialog, widget)
+            if url == 'null':
+                url = 'http://www.giswater.org'
+        else:
+            url = 'http://www.giswater.org'
+
+        webbrowser.open(url)
 
     # endregion
