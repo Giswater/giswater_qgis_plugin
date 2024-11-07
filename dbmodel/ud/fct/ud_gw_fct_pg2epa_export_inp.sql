@@ -567,6 +567,7 @@ BEGIN
 		    NULL::text AS other6,
 		    NULL::text AS other7
 		   FROM inp_lid
+ 		   JOIN (select distinct (lidco_id) from v_edit_inp_dscenario_lid_usage)a USING (lidco_id)
 		  WHERE inp_lid.active
 		UNION
 		 SELECT inp_lid_value.id,
@@ -581,6 +582,7 @@ BEGIN
 		    inp_lid_value.value_8 AS other7
 		   FROM inp_lid_value
 		     JOIN inp_lid USING (lidco_id)
+		     JOIN (select distinct (lidco_id) from v_edit_inp_dscenario_lid_usage)a USING (lidco_id)
 		     LEFT JOIN inp_typevalue ON inp_typevalue.id::text = inp_lid_value.lidlayer::text
 		  WHERE inp_lid.active AND inp_typevalue.typevalue::text = 'inp_value_lidlayer'::text) a
 	  ORDER BY a.lidco_id, a.id;
@@ -1123,7 +1125,7 @@ BEGIN
 	     ORDER BY pattern_id;
 
 	CREATE OR REPLACE TEMP VIEW vi_t_timeseries AS
-	SELECT 
+	SELECT c.* FROM (SELECT
 	b.timser_id,
 	b.other1,
 	b.other2,
@@ -1215,7 +1217,9 @@ BEGIN
 						  WHERE inp_timeseries.times_type::text = 'RELATIVE'::text AND inp_timeseries.active) a
 				  ORDER BY a.id) t
 		  WHERE t.expl_id is NULL) b
-  	ORDER BY b.id;
+  	ORDER BY b.id) c
+	JOIN inp_timeseries ON id = timser_id
+	WHERE (timser_type = 'Rainfall' AND timser_id IN (SELECT timser_id FROM v_edit_raingage)) or timser_type != 'Rainfall'::text;
 
 
 	CREATE OR REPLACE TEMP VIEW vi_t_curves AS
