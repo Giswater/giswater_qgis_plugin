@@ -31,12 +31,12 @@ BEGIN
 	-- Search path
 	SET search_path = "SCHEMA_NAME", public;
 
-	v_owner = ((p_data ->>'data')::json->>'owner')::text; 
+	v_owner = ((p_data ->>'data')::json->>'owner')::text;
 	v_schema = 'SCHEMA_NAME';
 
-	
+
 	SELECT lower(project_type) into v_project_type from sys_version order by id desc limit 1;
-	
+
 	SELECT giswater INTO v_version FROM sys_version order by id desc limit 1;
 
 	EXECUTE 'ALTER SCHEMA '|| v_schema ||' OWNER TO '|| v_owner ||';';
@@ -75,29 +75,40 @@ BEGIN
 	END LOOP;
 
 	FOR rec IN
-		EXECUTE 'select case when input_params is null or input_params = ''void'' then concat(function_name, ''()'') 
-		else concat(function_name, ''('', input_params, '')'') end from sys_function
-		WHERE project_type = '||quote_literal(v_project_type)||''
+		EXECUTE 'SELECT CASE WHEN input_params IS NULL OR input_params = ''void'' THEN CONCAT(function_name, ''()'') 
+		ELSE CONCAT(function_name, ''('', input_params, '')'') END FROM sys_function
+		WHERE project_type = ' || QUOTE_LITERAL(v_project_type) || ''
 	LOOP
-		
-		IF rec ilike '%character varying%' THEN
-			rec = replace(rec, 'character varying', 'varchar');
-		
-		ELSIF rec ilike '%boolean%' then
-			rec = replace(rec, 'boolean', 'bool');
-		
+		-- Replace specific data types for function signature
+		IF rec ILIKE '%CHARACTER VARYING%' THEN
+			rec = REPLACE(rec, 'CHARACTER VARYING', 'VARCHAR');
+		ELSIF rec ILIKE '%BOOLEAN%' THEN
+			rec = REPLACE(rec, 'BOOLEAN', 'BOOL');
 		END IF;
-		
-		EXECUTE 'ALTER FUNCTION '|| v_schema ||'.'|| rec ||' OWNER TO '|| v_owner ||';';
-		
+
+		-- Check if the function exists in the schema
+		PERFORM 1
+		FROM pg_proc p
+		JOIN pg_namespace n ON p.pronamespace = n.oid
+		WHERE n.nspname = QUOTE_LITERAL(v_schema)
+		AND p.proname = SPLIT_PART(rec, '(', 1);
+
+		-- If the function exists, alter its owner
+		IF FOUND THEN
+			EXECUTE 'ALTER FUNCTION ' || v_schema || '.' || rec || ' OWNER TO ' || v_owner || ';';
+		END IF;
 	END LOOP;
 
 	--  Return
-	RETURN ('{"status":"Accepted", "message":{"level":1, "text":"Set owner done successfully"}, "version":"'||v_version||'"'||
-             ',"body":{"form":{}'||
-		     ',"data":{ "info":{}'||			
-			'}}'||
-	    '}')::json;
+	RETURN json_build_object(
+		'status', 'Accepted',
+		'message', json_build_object('level', 1, 'text', 'Set owner done successfully'),
+		'version', v_version,
+		'body', json_build_object(
+			'form', json_build_object(),
+			'data', json_build_object('info', json_build_object())
+		)
+	);
 
 END;
 $BODY$
