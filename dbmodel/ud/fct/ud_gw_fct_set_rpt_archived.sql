@@ -224,7 +224,7 @@ BEGIN
 		EXECUTE 'DELETE FROM rpt_lidperformance_sum WHERE result_id = '||quote_literal(v_result_id)||';';
 
 		-- update status set to ARCHIVED
-		EXECUTE 'UPDATE rpt_cat_result set status = 4 WHERE result_id = '||quote_literal(v_result_id)||';';
+		EXECUTE 'UPDATE rpt_cat_result set status = 3 WHERE result_id = '||quote_literal(v_result_id)||';';
 
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Data from rpt_inp and rpt tables has been moved to archived_* tables.'));
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Selected result status has been set to ARCHIVED.'));
@@ -247,7 +247,8 @@ BEGIN
 		SELECT DISTINCT
 			'||quote_literal(v_result_id)||', arc_id, max_flow, time_days, time_hour, max_veloc, mfull_flow, mfull_dept, max_shear, max_hr, max_slope, day_max, time_max, min_shear, day_min, time_min
 		FROM archived_rpt_inp_arc
-		WHERE result_id = '||quote_literal(v_result_id)||';';
+		WHERE result_id = '||quote_literal(v_result_id)||'
+		AND max_flow IS NOT NULL;';
 
 		-- Recover data for rpt_arcpolload_sum
 		EXECUTE 'INSERT INTO rpt_arcpolload_sum (
@@ -256,7 +257,8 @@ BEGIN
 		SELECT DISTINCT
 			'||quote_literal(v_result_id)||', arc_id, poll_id
 		FROM archived_rpt_inp_arc
-		WHERE result_id = '||quote_literal(v_result_id)||';';
+		WHERE result_id = '||quote_literal(v_result_id)||'
+		AND poll_id IS NOT NULL;';
 
 		-- Recover data for rpt_condsurcharge_sum
 		EXECUTE 'INSERT INTO rpt_condsurcharge_sum (
@@ -265,7 +267,8 @@ BEGIN
 		SELECT DISTINCT
 			'||quote_literal(v_result_id)||', arc_id, both_ends, upstream, dnstream, hour_nflow, hour_limit
 		FROM archived_rpt_inp_arc
-		WHERE result_id = '||quote_literal(v_result_id)||';';
+		WHERE result_id = '||quote_literal(v_result_id)||'
+		AND both_ends IS NOT NULL;';
 
 		-- Recover data for rpt_pumping_sum
 		EXECUTE 'INSERT INTO rpt_pumping_sum (
@@ -274,7 +277,8 @@ BEGIN
 		SELECT DISTINCT
 			'||quote_literal(v_result_id)||', arc_id, percent, num_startup, min_flow, avg_flow, max_flow_pumping, vol_ltr, powus_kwh, timoff_min, timoff_max
 		FROM archived_rpt_inp_arc
-		WHERE result_id = '||quote_literal(v_result_id)||';';
+		WHERE result_id = '||quote_literal(v_result_id)||'
+		AND percent IS NOT NULL;';
 
 		-- Recover data for rpt_flowclass_sum
 		EXECUTE 'INSERT INTO rpt_flowclass_sum (
@@ -283,7 +287,8 @@ BEGIN
 		SELECT DISTINCT
 			'||quote_literal(v_result_id)||', arc_id, length_flowclass, dry, up_dry, down_dry, sub_crit, sub_crit_1, up_crit, down_crit, froud_numb, flow_chang
 		FROM archived_rpt_inp_arc
-		WHERE result_id = '||quote_literal(v_result_id)||';';
+		WHERE result_id = '||quote_literal(v_result_id)||'
+		AND length_flowclass IS NOT NULL;';
 
 		EXECUTE 'DELETE FROM archived_rpt_inp_arc WHERE result_id = '||quote_literal(v_result_id)||';';
 
@@ -315,7 +320,8 @@ BEGIN
 		SELECT
 			'||quote_literal(v_result_id)||', node_id, hour_flood, max_rate, flooding_time_days, flooding_time_hour, tot_flood, max_ponded
 		FROM archived_rpt_inp_node
-		WHERE result_id = '||quote_literal(v_result_id)||';';
+		WHERE result_id = '||quote_literal(v_result_id)||'
+		AND hour_flood IS NOT NULL;';
 
 		-- Recover data for rpt_nodesurcharge_sum table
 		EXECUTE 'INSERT INTO rpt_nodesurcharge_sum (
@@ -324,7 +330,8 @@ BEGIN
 		SELECT
 			'||quote_literal(v_result_id)||', node_id, hour_surch, max_height, min_depth
 		FROM archived_rpt_inp_node
-		WHERE result_id = '||quote_literal(v_result_id)||';';
+		WHERE result_id = '||quote_literal(v_result_id)||'
+		AND hour_surch IS NOT NULL;';
 
 		-- Recover data for rpt_nodeinflow_sum table
 		EXECUTE 'INSERT INTO rpt_nodeinflow_sum (
@@ -333,7 +340,8 @@ BEGIN
 		SELECT
 			'||quote_literal(v_result_id)||', node_id, max_latinf, max_totinf, inflow_time_days, inflow_time_hour, latinf_vol, totinf_vol, flow_balance_error, other_info
 		FROM archived_rpt_inp_node
-		WHERE result_id = '||quote_literal(v_result_id)||';';
+		WHERE result_id = '||quote_literal(v_result_id)||'
+		AND max_latinf IS NOT NULL;';
 
 		-- Recover data for rpt_nodedepth_sum table
 		EXECUTE 'INSERT INTO rpt_nodedepth_sum (
@@ -342,7 +350,8 @@ BEGIN
 		SELECT
 			'||quote_literal(v_result_id)||', node_id, aver_depth, max_depth, max_hgl, depth_time_days, depth_time_hour
 		FROM archived_rpt_inp_node
-		WHERE result_id = '||quote_literal(v_result_id)||';';
+		WHERE result_id = '||quote_literal(v_result_id)||'
+		AND aver_depth IS NOT NULL;';
 
 		-- Recover data for rpt_outfallflow_sum table
 		EXECUTE 'INSERT INTO rpt_outfallflow_sum (
@@ -351,7 +360,8 @@ BEGIN
 		SELECT
 			'||quote_literal(v_result_id)||', node_id, flow_freq, avg_flow, max_flow, total_vol
 		FROM archived_rpt_inp_node
-		WHERE result_id = '||quote_literal(v_result_id)||';';
+		WHERE result_id = '||quote_literal(v_result_id)||'
+		AND flow_freq IS NOT NULL;';
 
 		-- Recover data for rpt_outfallload_sum table
 		EXECUTE 'INSERT INTO rpt_outfallload_sum (
@@ -360,7 +370,8 @@ BEGIN
 		SELECT
 			'||quote_literal(v_result_id)||', node_id, poll_id, value
 		FROM archived_rpt_inp_node
-		WHERE result_id = '||quote_literal(v_result_id)||';';
+		WHERE result_id = '||quote_literal(v_result_id)||'
+		AND poll_id IS NOT NULL;';
 
 		-- Recover data for rpt_storagevol_sum table
 		EXECUTE 'INSERT INTO rpt_storagevol_sum (
@@ -369,7 +380,8 @@ BEGIN
 		SELECT
 			'||quote_literal(v_result_id)||', node_id, aver_vol, avg_full, ei_loss, max_vol, max_full, storagevol_time_days, storagevol_time_hour, max_out
 		FROM archived_rpt_inp_node
-		WHERE result_id = '||quote_literal(v_result_id)||';';
+		WHERE result_id = '||quote_literal(v_result_id)||'
+		AND aver_vol IS NOT NULL;';
 
 		EXECUTE 'DELETE FROM archived_rpt_inp_node WHERE result_id = '||quote_literal(v_result_id)||';';
 
