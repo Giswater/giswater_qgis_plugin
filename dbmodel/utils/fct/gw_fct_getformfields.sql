@@ -262,6 +262,7 @@ BEGIN
 	-- combo no childs
 	FOR aux_json IN SELECT * FROM json_array_elements(array_to_json(fields_array)) AS a WHERE a->>'widgettype' = 'combo'  AND  a->>'parentId' IS NULL
 	LOOP
+		v_array := null;
 		-- Define the order by column
 		IF (aux_json->>'orderById')::boolean IS TRUE THEN
 			v_orderby='id';
