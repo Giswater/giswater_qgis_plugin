@@ -77,13 +77,8 @@ BEGIN
 			IF (SELECT json_extract_path_text(value::json,'activated')::boolean FROM config_param_system WHERE parameter='admin_raster_dem') IS TRUE
 			AND (NEW.elevation IS NULL) AND
 			(SELECT upper(value)  FROM config_param_user WHERE parameter = 'edit_update_elevation_from_dem' and cur_user = current_user) = 'TRUE' THEN
-				NEW.elevation = (SELECT ST_Value(rast,1,NEW.the_geom,false) FROM v_ext_raster_dem WHERE id =
-					(SELECT id FROM v_ext_raster_dem WHERE
-					st_dwithin (ST_MakeEnvelope(
-					ST_UpperLeftX(rast),
-					ST_UpperLeftY(rast),
-					ST_UpperLeftX(rast) + ST_ScaleX(rast)*ST_width(rast),
-					ST_UpperLeftY(rast) + ST_ScaleY(rast)*ST_height(rast), st_srid(rast)), NEW.the_geom, 1) LIMIT 1));
+					NEW.elevation = (SELECT ST_Value(rast,1,NEW.the_geom,true) FROM ext_raster_dem WHERE id =
+					(SELECT id FROM ext_raster_dem WHERE st_dwithin (envelope, NEW.the_geom, 1) LIMIT 1));	
 			END IF;
 
 		END IF;
