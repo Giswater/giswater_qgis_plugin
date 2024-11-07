@@ -28,6 +28,8 @@ v_project_type text;
 v_version text;
 v_fid integer = 385;
 v_timsertype text;
+v_count integer = 0;
+
 
 BEGIN
 
@@ -60,30 +62,34 @@ BEGIN
 				VALUES (v_fid, v_result_id, 1, concat('INFO: Timeseries id (',rec_csv.csv1,') have been imported succesfully'), rec_csv.csv1);
 
 				-- insert inp_timeseries
-				INSERT INTO inp_timeseries (id, timser_type, times_type, idval, descript, expl_id, log) 
-				VALUES (rec_csv.csv1, rec_csv.csv4, rec_csv.csv5, rec_csv.csv1, rec_csv.csv6, rec_csv.csv7::integer, concat('Insert by ',current_user,' on ', substring(now()::text,0,20)));
+				INSERT INTO inp_timeseries (id, timser_type, times_type, descript, expl_id, log, addparam) 
+				VALUES (rec_csv.csv1, rec_csv.csv4, rec_csv.csv5, rec_csv.csv6, rec_csv.csv7::integer, concat('Insert by ',current_user,' on ', substring(now()::text,0,20)), rec_csv.csv8::json);
 				
 				-- insert into inp_timeseries_value
-				IF rec_csv.csv6 = 'ABSOLUTE' THEN			
+				IF rec_csv.csv5 = 'ABSOLUTE' THEN			
 					INSERT INTO inp_timeseries_value (timser_id, date, hour, value) VALUES
-					(rec_csv.csv1, rec_csv.csv2, rec_csv.csv3, rec_csv.csv4::float);
-				ELSIF rec_csv.csv6 = 'RELATIVE' THEN
+					(rec_csv.csv1, split_part(rec_csv.csv2, ' ',1), split_part(rec_csv.csv2, ' ',2), rec_csv.csv3::float);
+				ELSIF rec_csv.csv5 = 'RELATIVE' THEN
 					INSERT INTO inp_timeseries_value (timser_id, "time", value) VALUES
 					(rec_csv.csv1, rec_csv.csv2, rec_csv.csv3::float);
 				END IF;
 
-				v_timsertype = rec_csv.csv6;
+				v_timsertype = rec_csv.csv5;
+
+				v_count = v_count + 1;
 
 			ELSIF rec_csv.csv1 IN (SELECT id FROM inp_timeseries) AND rec_csv.csv1 IN (SELECT table_id FROM audit_check_data WHERE fid = v_fid AND cur_user=current_user)   THEN
 
 				-- insert into inp_timeseries_value
 				IF v_timsertype = 'ABSOLUTE' THEN			
 					INSERT INTO inp_timeseries_value (timser_id, date, hour, value) VALUES
-					(rec_csv.csv1, rec_csv.csv2, rec_csv.csv3, rec_csv.csv4::float);
+					(rec_csv.csv1, split_part(rec_csv.csv2, ' ',1), split_part(rec_csv.csv2, ' ',2), rec_csv.csv3::float);
 				ELSIF v_timsertype = 'RELATIVE' THEN
 					INSERT INTO inp_timeseries_value (timser_id, "time", value) VALUES
 					(rec_csv.csv1, rec_csv.csv2, rec_csv.csv3::float);
 				END IF;
+
+				v_count = v_count + 1;
 			ELSE 
 				IF rec_csv.csv1 in (SELECT column_id FROM audit_check_data WHERE fid = v_fid AND cur_user=current_user) THEN 
 				
@@ -98,7 +104,7 @@ BEGIN
 	END LOOP;
 
 	-- manage log (fid: v_fid)
-	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 1, concat('Process finished'));
+	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 1, concat('Process finished with ', v_count, ' rows inserted'));
 
 	-- get log (fid: v_fid)
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
