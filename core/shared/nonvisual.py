@@ -2674,13 +2674,13 @@ class GwNonVisual:
         """ Hides widgets that are not necessary in specific tabs """
 
         # List of widgets
-        widgets_hide = {'BC': {'lbl_surface_side_slope', 'txt_5_surface_side_slope', 'lbl_drain_delay', 'txt_4_drain_delay'},
-                        'RG': {'lbl_surface_side_slope', 'txt_5_surface_side_slope'},
-                        'GR': {'lbl_surface_slope', 'txt_4_surface_slope'},
-                        'IT': {'lbl_surface_side_slope', 'txt_5_surface_side_slope', 'lbl_drain_delay', 'txt_4_drain_delay'},
-                        'PP': {'lbl_surface_side_slope', 'txt_5_surface_side_slope', 'lbl_drain_delay', 'txt_4_drain_delay'},
+        widgets_hide = {'BC': {'lbl_swale_side_slope', 'txt_5_swale_side_slope', 'lbl_drain_delay', 'txt_4_drain_delay'},
+                        'RG': {'lbl_swale_side_slope', 'txt_5_swale_side_slope'},
+                        'GR': {'lbl_swale_side_slope', 'txt_5_swale_side_slope'},
+                        'IT': {'lbl_swale_side_slope', 'txt_5_swale_side_slope', 'lbl_drain_delay', 'txt_4_drain_delay'},
+                        'PP': {'lbl_swale_side_slope', 'txt_5_swale_side_slope', 'lbl_drain_delay', 'txt_4_drain_delay'},
                         'RB': {'lbl_seepage_rate', 'txt_3_seepage_rate', 'lbl_clogging_factor_storage', 'txt_4_clogging_factor_storage'},
-                        'RD': {'lbl_vegetation_volume', 'txt_2_vegetation_volume', 'lbl_surface_side_slope', 'txt_5_surface_side_slope',
+                        'RD': {'lbl_vegetation_volume', 'txt_2_vegetation_volume', 'lbl_swale_side_slope', 'txt_5_swale_side_slope',
                                'lbl_flow_exponent','lbl_offset', 'lbl_drain_delay', 'lbl_open_level',
                                'lbl_closed_level', 'lbl_control_curve', 'lbl_flow_description', 'txt_2_flow_exponent',
                                'txt_3_offset', 'txt_4_drain_delay', 'txt_5_open_level', 'txt_6_closed_level', 'txt_7_cmb_control_curve',},
@@ -2810,16 +2810,14 @@ class GwNonVisual:
                 # List with all QLineEdit children
                 child_list = dialog.tab_lidlayers.widget(i).children()
                 widgets_list = [widget for widget in child_list if type(widget) == QLineEdit or type(widget) == QComboBox]
-                # Get QLineEdits and QComboBox that are visible
-                visible_widgets = [widget for widget in widgets_list if not widget.isHidden()]
-                visible_widgets = self._order_list(visible_widgets)
+                widgets_list = self._order_list(widgets_list)
 
                 sql = f"INSERT INTO inp_lid_value (lidco_id, lidlayer,"
-                for y, widget in enumerate(visible_widgets):
+                for y, widget in enumerate(widgets_list):
                     sql += f"value_{y + 2}, "
                 sql = sql.rstrip(', ') + ")"
                 sql += f"VALUES ('{lidco_id}', '{tab_name}', "
-                for widget in visible_widgets:
+                for widget in widgets_list:
                     value = tools_qt.get_text(dialog, widget.objectName(), add_quote=True)
                     if value == "null":
                         value = "'0'"
