@@ -216,7 +216,8 @@ class GwFeatureTypeChangeButton(GwMaptool):
 
             # Adjust alignment for the Catalog id label
             if field['columnname'] == "featurecat_id":
-                layout.addWidget(label, field['layoutorder'] - 1, 0, alignment=Qt.AlignTop)  # Align label to top
+                # Add the label and combo box (Catalog ID) with the button
+                layout.addWidget(label, field['layoutorder'] - 1, 0)
                 layout.addWidget(widget, field['layoutorder'] - 1, 1)
             else:
                 # Use add_widget_combined for other fields
@@ -224,7 +225,8 @@ class GwFeatureTypeChangeButton(GwMaptool):
 
             # Apply consistent column stretch across all layouts
             layout.setColumnStretch(0, 1)  # Label column stretch (keep this compact)
-            layout.setColumnStretch(1, 4)  # Widget column stretch for sufficient space
+            layout.setColumnStretch(1, 3)  # Widget column stretch for sufficient space
+
 
     def _featuretype_change(self, event):
 
