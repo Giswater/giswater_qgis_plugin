@@ -182,8 +182,12 @@ class GwSearch:
             tools_qgis.show_warning(msg, dialog=dialog)
 
 
-    def refresh_tab(self, tab_name="tab_hydro"):
-        form = f'"singleTab":"{tab_name}"'
+    def refresh_tab(self, tab_name=None):
+        
+        if tab_name:
+            form = f'"singleTab":"{tab_name}"'
+        else:
+            form = ''
 
         qgis_project_add_schema = lib_vars.project_vars['add_schema']
         if qgis_project_add_schema is None:
