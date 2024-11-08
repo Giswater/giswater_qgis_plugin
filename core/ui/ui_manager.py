@@ -254,27 +254,27 @@ FROM_CLASS = _get_ui_class('nonvisual_lids.ui', 'epa')
 class GwNonVisualLidsUi(GwDialog, FROM_CLASS):
     pass
 
-FORM_CLASS = _get_ui_class('add_demand_check.ui', 'epa')
+FORM_CLASS = _get_ui_class('epatoosls_add_demand_check.ui', 'epa')
 class AddDemandCheckUi(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = _get_ui_class('recursive_go2epa.ui', 'epa')
+FORM_CLASS = _get_ui_class('epatoosls_recursive_go2epa.ui', 'epa')
 class RecursiveEpaUi(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = _get_ui_class('emitter_calibration.ui', 'epa')
+FORM_CLASS = _get_ui_class('epatoosls_emitter_calibration.ui', 'epa')
 class EmitterCalibrationUi(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = _get_ui_class('quantized_demands.ui', 'epa')
+FORM_CLASS = _get_ui_class('epatoosls_quantized_demands.ui', 'epa')
 class QuantizedDemandsUi(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = _get_ui_class('static_calibration.ui', 'epa')
+FORM_CLASS = _get_ui_class('epatoosls_static_calibration.ui', 'epa')
 class StaticCalibrationUi(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = _get_ui_class('valve_operation_check.ui', 'epa')
+FORM_CLASS = _get_ui_class('epatoosls_valve_operation_check.ui', 'epa')
 class ValveOperationCheckUi(GwDialog, FORM_CLASS):
     pass
 
