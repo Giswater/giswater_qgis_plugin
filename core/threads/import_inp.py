@@ -824,7 +824,7 @@ class GwImportInpTask(GwTask):
                 "curve_id": None,
                 "speed": p.base_speed,
                 "pattern_id": p.speed_pattern_name,
-                "status": "OPEN" if p.initial_status == 1 else "CLOSED",
+                "status": p.initial_status.name.upper(),
                 "energyvalue": None,
                 "effic_curve_id": p.efficiency,
                 "energy_price": p.energy_price,
