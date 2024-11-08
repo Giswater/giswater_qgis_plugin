@@ -175,6 +175,9 @@ class GwImportInpTask(GwTask):
             self._log_message("Inserting pumps into DB")
             self._save_pumps()
 
+            self._log_message("Inserting valves into DB")
+            self._save_valves()
+
             self._log_message("Inserting pipes into DB")
             self._save_pipes_to_v_edit_arc()
 
@@ -868,6 +871,132 @@ class GwImportInpTask(GwTask):
             man_sql, man_params, man_template, fetch=False, commit=True
         )
 
+    def _save_valves(self) -> None:
+        feature_class = self.catalogs['features']['valves'].lower()
+
+        arc_sql = """ 
+            INSERT INTO arc (
+                the_geom, code, node_1, node_2, arccat_id, epa_type, expl_id, sector_id, muni_id, state, state_type, workcat_id
+            ) VALUES %s
+            RETURNING arc_id, code
+        """  # --"depth", arc_id, annotation, observ, "comment", label_x, label_y, label_rotation, staticpressure, feature_type
+        arc_template = (
+            "(ST_GeomFromText(%s, %s), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        )
+
+        man_sql = f"""
+            INSERT INTO man_{feature_class} (
+                arc_id
+            ) VALUES %s
+        """
+        man_template = "(%s)"
+
+        inp_sql = """
+            INSERT INTO inp_virtualvalve (
+                arc_id, valv_type, pressure, diameter, flow, coef_loss, curve_id, minorloss, status, init_quality
+            ) VALUES %s
+        """  # --
+        inp_template = (
+            "(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        )
+
+        arc_params = []
+
+        inp_dict = {}
+
+        for v_name, v in self.network.valves():
+            geometry = get_geometry_from_link(v)
+
+            srid = lib_vars.data_epsg
+            try:
+                node_1 = self.node_ids[v.start_node_name]
+                node_2 = self.node_ids[v.end_node_name]
+            except KeyError as e:
+                self._log_message(f"Node not found: {e}")
+                continue
+            arccat_id = self.catalogs["valves"]
+            epa_type = "VIRTUALVALVE"
+            expl_id = self.exploitation
+            sector_id = self.sector
+            muni_id = self.municipality
+            state = 1
+            state_type = 2
+            workcat_id = self.workcat
+            arc_params.append(
+                (
+                    geometry, srid,  # the_geom
+                    v_name,  # code
+                    node_1,
+                    node_2,
+                    arccat_id,
+                    epa_type,
+                    expl_id,
+                    sector_id,
+                    muni_id,
+                    state,
+                    state_type,
+                    workcat_id,
+                )
+            )
+            inp_dict[v_name] = {
+                "valv_type": v.valve_type,
+                "pressure": None,
+                "diameter": v.diameter,
+                "flow": None,
+                "coef_loss": None,
+                "curve_id": None,
+                "minorloss": v.minor_loss,
+                "status": v.initial_status.name.upper(),
+                "init_quality": None,
+            }
+
+            valve_key_map = {
+                "PRV": "pressure",
+                "PSV": "pressure",
+                "PBV": "pressure",
+                "FCV": "flow",
+                # "TCV": "",
+                # "GPV": "",
+            }
+            key = valve_key_map.get(v.valve_type)
+            if key:
+                inp_dict[v_name][key] = v.initial_setting
+
+        # Insert into parent table
+        valves = toolsdb_execute_values(
+            arc_sql, arc_params, arc_template, fetch=True, commit=True
+        )
+        print(valves)
+        if not valves:
+            self._log_message("Valves couldn't be inserted!")
+            return
+
+        man_params = []
+        inp_params = []
+
+        for v in valves:
+            arc_id = v[0]
+            code = v[1]
+            man_params.append(
+                (arc_id,)
+            )
+
+            inp_data = inp_dict[code]
+            inp_params.append(
+                (arc_id, inp_data["valv_type"], inp_data["pressure"], inp_data["diameter"], inp_data["flow"],
+                 inp_data["coef_loss"], inp_data["curve_id"], inp_data["minorloss"], inp_data["status"],
+                 inp_data["init_quality"])
+            )
+            print(inp_params)
+
+        # Insert into inp table
+        toolsdb_execute_values(
+            inp_sql, inp_params, inp_template, fetch=False, commit=True
+        )
+        # Insert into man table
+        toolsdb_execute_values(
+            man_sql, man_params, man_template, fetch=False, commit=True
+        )
 
     def _save_pipes_to_v_edit_arc(self) -> None:
         sql = """
