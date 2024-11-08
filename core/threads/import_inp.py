@@ -817,7 +817,7 @@ class GwImportInpTask(GwTask):
                 )
             )
             inp_dict[p_name] = {
-                "power": None,  # TODO: manage different pump types (HeadPump i PowerPump)
+                "power": None,
                 "curve_id": None,
                 "speed": p.base_speed,
                 "pattern_id": p.speed_pattern_name,
@@ -828,6 +828,10 @@ class GwImportInpTask(GwTask):
                 "energy_pattern_id": p.energy_pattern,
                 "pump_type": "FLOWPUMP",
             }
+            if p.pump_type == "POWER":
+                inp_dict[p_name]["power"] = p.power
+            elif p.pump_type == "HEAD":
+                inp_dict[p_name]["curve_id"] = p.pump_curve_name
 
         # Insert into parent table
         pumps = toolsdb_execute_values(
