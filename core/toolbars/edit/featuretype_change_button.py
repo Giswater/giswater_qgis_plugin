@@ -187,7 +187,9 @@ class GwFeatureTypeChangeButton(GwMaptool):
         """ Creates and populates all the widgets, preserving original layout logic while ensuring two-column alignment """
 
         layout_orientations = {}
-        dialog.setMinimumSize(480, 230)
+        # Define a fixed width for labels to ensure alignment
+        label_fixed_width = 100
+
         # Retrieve layout orientations from the JSON response if provided
         for layout_name, layout_info in complet_result['body']['form']['layouts'].items():
             orientation = layout_info.get('lytOrientation')
@@ -204,6 +206,10 @@ class GwFeatureTypeChangeButton(GwMaptool):
             label, widget = tools_gw.set_widgets(dialog, complet_result, field, self.tablename, self)
             if widget is None:
                 continue
+
+            # Check if the label is valid before applying size adjustments
+            if label is not None:
+                label.setFixedWidth(label_fixed_width)
 
             # Find the layout for the current field based on layoutname
             layout = dialog.findChild(QGridLayout, field['layoutname'])
