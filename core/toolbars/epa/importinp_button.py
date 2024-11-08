@@ -313,6 +313,8 @@ class GwImportInp(GwAction):
                 'DELETE FROM connec CASCADE;',
                 'DELETE FROM node CASCADE;',
                 'DELETE FROM inp_pump CASCADE;',
+                'DELETE FROM inp_virtualpump CASCADE;',
+                'DELETE FROM inp_virtualvalve CASCADE;',
                 'DELETE FROM inp_curve CASCADE;',
                 'DELETE FROM inp_pattern_value CASCADE;',
                 'DELETE FROM inp_pattern CASCADE;',
