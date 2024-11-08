@@ -935,3 +935,8 @@ INSERT INTO sys_table (id, descript, sys_role, criticity, context, orderby, alia
 INSERT INTO sys_table (id, descript, sys_role, criticity, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam) VALUES('vcv_patterns', 'View patterns for epatools', 'role_admin', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'core', NULL);
 INSERT INTO sys_table (id, descript, sys_role, criticity, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam) VALUES('vcv_emitters_log', 'View emiters log for epatools', 'role_admin', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'core', NULL);
 INSERT INTO sys_table (id, descript, sys_role, criticity, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam) VALUES('vcv_dma_log', 'View dma for epatools', 'role_admin', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'core', NULL);
+
+-- 08/11/24
+INSERT INTO inp_typevalue (typevalue,id,idval) VALUES ('inp_value_status_valve','CLOSED','CLOSED');
+INSERT INTO inp_typevalue (typevalue,id,idval) VALUES ('inp_value_status_valve','OPEN','OPEN');
+
