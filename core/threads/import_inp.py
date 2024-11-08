@@ -126,6 +126,8 @@ class GwImportInpTask(GwTask):
         self.db_units = None
         self.exception: str = ""
 
+        self.node_ids: dict[str, str] = {}
+
     def run(self) -> bool:
         super().run()
         try:
@@ -494,9 +496,10 @@ class GwImportInpTask(GwTask):
         junctions = toolsdb_execute_values(
             node_sql, node_params, node_template, fetch=True, commit=True
         )
-
-        self.junction_ids = {j[1]: j[0] for j in junctions} if junctions else {}
         print(junctions)
+        if not junctions:
+            self._log_message("Junctions couldn't be inserted!")
+            return
 
         man_params = []
         inp_params = []
@@ -504,6 +507,9 @@ class GwImportInpTask(GwTask):
         for j in junctions:
             node_id = j[0]
             code = j[1]
+
+            self.node_ids[code] = node_id
+
             man_params.append(
                 (node_id,)
             )
@@ -593,9 +599,10 @@ class GwImportInpTask(GwTask):
         reservoirs = toolsdb_execute_values(
             node_sql, node_params, node_template, fetch=True, commit=True
         )
-
-        self.reservoirs_ids = {r[1]: r[0] for r in reservoirs} if reservoirs else {}
         print(reservoirs)
+        if not reservoirs:
+            self._log_message("Reservoirs couldn't be inserted!")
+            return
 
         man_params = []
         inp_params = []
@@ -603,6 +610,9 @@ class GwImportInpTask(GwTask):
         for r in reservoirs:
             node_id = r[0]
             code = r[1]
+
+            self.node_ids[code] = node_id
+
             man_params.append(
                 (node_id,)
             )
@@ -702,9 +712,10 @@ class GwImportInpTask(GwTask):
         tanks = toolsdb_execute_values(
             node_sql, node_params, node_template, fetch=True, commit=True
         )
-
-        self.tanks_ids = {t[1]: t[0] for t in tanks} if tanks else {}
         print(tanks)
+        if not tanks:
+            self._log_message("Tanks couldn't be inserted!")
+            return
 
         man_params = []
         inp_params = []
@@ -712,6 +723,9 @@ class GwImportInpTask(GwTask):
         for t in tanks:
             node_id = t[0]
             code = t[1]
+
+            self.node_ids[code] = node_id
+
             man_params.append(
                 (node_id,)
             )
@@ -750,8 +764,8 @@ class GwImportInpTask(GwTask):
 
             srid = lib_vars.data_epsg
             try:
-                node_1 = self.junction_ids[p.start_node_name]
-                node_2 = self.junction_ids[p.end_node_name]
+                node_1 = self.node_ids[p.start_node_name]
+                node_2 = self.node_ids[p.end_node_name]
             except KeyError as e:
                 self._log_message(f"Node not found: {e}")
                 continue
