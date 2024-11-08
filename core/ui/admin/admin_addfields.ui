@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>557</width>
-    <height>726</height>
+    <height>738</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -468,12 +468,12 @@
   <tabstop>dv_orderby_id</tabstop>
   <tabstop>stylesheet</tabstop>
   <tabstop>linkedobject</tabstop>
-  <tabstop>btn_accept</tabstop>
-  <tabstop>btn_cancel</tabstop>
-  <tabstop>txt_infolog</tabstop>
   <tabstop>btn_open</tabstop>
   <tabstop>tbl_update</tabstop>
   <tabstop>cmb_fields</tabstop>
+  <tabstop>txt_infolog</tabstop>
+  <tabstop>btn_accept</tabstop>
+  <tabstop>btn_cancel</tabstop>
  </tabstops>
  <resources/>
  <connections/>
