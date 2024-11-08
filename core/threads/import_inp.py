@@ -172,6 +172,9 @@ class GwImportInpTask(GwTask):
             self._log_message("Inserting tanks into DB")
             self._save_tanks()
 
+            self._log_message("Inserting pumps into DB")
+            self._save_pumps()
+
             self._log_message("Inserting pipes into DB")
             self._save_pipes_to_v_edit_arc()
 
@@ -745,6 +748,122 @@ class GwImportInpTask(GwTask):
         toolsdb_execute_values(
             man_sql, man_params, man_template, fetch=False, commit=True
         )
+
+    def _save_pumps(self) -> None:
+        feature_class = self.catalogs['features']['pumps'].lower()
+
+        arc_sql = """ 
+            INSERT INTO arc (
+                the_geom, code, node_1, node_2, arccat_id, epa_type, expl_id, sector_id, muni_id, state, state_type, workcat_id
+            ) VALUES %s
+            RETURNING arc_id, code
+        """  # --"depth", arc_id, annotation, observ, "comment", label_x, label_y, label_rotation, staticpressure, feature_type
+        arc_template = (
+            "(ST_GeomFromText(%s, %s), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        )
+
+        man_sql = f"""
+            INSERT INTO man_{feature_class} (
+                arc_id
+            ) VALUES %s
+        """
+        man_template = "(%s)"
+
+        inp_sql = """
+            INSERT INTO inp_virtualpump (
+                arc_id, power, curve_id, speed, pattern_id, status, energyvalue, effic_curve_id, energy_price, energy_pattern_id, pump_type
+            ) VALUES %s
+        """  # --
+        inp_template = (
+            "(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        )
+
+        arc_params = []
+
+        inp_dict = {}
+
+        for p_name, p in self.network.pumps():
+            geometry = get_geometry_from_link(p)
+
+            srid = lib_vars.data_epsg
+            try:
+                node_1 = self.node_ids[p.start_node_name]
+                node_2 = self.node_ids[p.end_node_name]
+            except KeyError as e:
+                self._log_message(f"Node not found: {e}")
+                continue
+            arccat_id = self.catalogs["pumps"]
+            epa_type = "VIRTUALPUMP"
+            expl_id = self.exploitation
+            sector_id = self.sector
+            muni_id = self.municipality
+            state = 1
+            state_type = 2
+            workcat_id = self.workcat
+            arc_params.append(
+                (
+                    geometry, srid,  # the_geom
+                    p_name,  # code
+                    node_1,
+                    node_2,
+                    arccat_id,
+                    epa_type,
+                    expl_id,
+                    sector_id,
+                    muni_id,
+                    state,
+                    state_type,
+                    workcat_id,
+                )
+            )
+            inp_dict[p_name] = {
+                "power": None,  # TODO: manage different pump types (HeadPump i PowerPump)
+                "curve_id": None,
+                "speed": p.base_speed,
+                "pattern_id": p.speed_pattern_name,
+                "status": "OPEN" if p.initial_status == 1 else "CLOSED",
+                "energyvalue": None,
+                "effic_curve_id": p.efficiency,
+                "energy_price": p.energy_price,
+                "energy_pattern_id": p.energy_pattern,
+                "pump_type": "FLOWPUMP",
+            }
+
+        # Insert into parent table
+        pumps = toolsdb_execute_values(
+            arc_sql, arc_params, arc_template, fetch=True, commit=True
+        )
+        print(pumps)
+        if not pumps:
+            self._log_message("Pumps couldn't be inserted!")
+            return
+
+        man_params = []
+        inp_params = []
+
+        for p in pumps:
+            arc_id = p[0]
+            code = p[1]
+            man_params.append(
+                (arc_id,)
+            )
+
+            inp_data = inp_dict[code]
+            inp_params.append(
+                (arc_id, inp_data["power"], inp_data["curve_id"], inp_data["speed"], inp_data["pattern_id"],
+                 inp_data["status"], inp_data["energyvalue"], inp_data["effic_curve_id"], inp_data["energy_price"],
+                 inp_data["energy_pattern_id"], inp_data["pump_type"])
+            )
+
+        # Insert into inp table
+        toolsdb_execute_values(
+            inp_sql, inp_params, inp_template, fetch=False, commit=True
+        )
+        # Insert into man table
+        toolsdb_execute_values(
+            man_sql, man_params, man_template, fetch=False, commit=True
+        )
+
 
     def _save_pipes_to_v_edit_arc(self) -> None:
         sql = """
