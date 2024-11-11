@@ -201,6 +201,21 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>mainTab</tabstop>
+  <tabstop>data_inp_input_file</tabstop>
+  <tabstop>btn_push_inp_input_file</tabstop>
+  <tabstop>data_config_file</tabstop>
+  <tabstop>btn_push_config_file</tabstop>
+  <tabstop>rdb_nodes_config</tabstop>
+  <tabstop>rdb_nodes_database</tabstop>
+  <tabstop>data_output_folder</tabstop>
+  <tabstop>btn_push_output_folder</tabstop>
+  <tabstop>txt_filename</tabstop>
+  <tabstop>txt_infolog</tabstop>
+  <tabstop>btn_ok</tabstop>
+  <tabstop>btn_cancel</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

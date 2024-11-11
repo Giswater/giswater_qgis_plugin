@@ -315,6 +315,19 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>rpt_selector_result_id</tabstop>
+  <tabstop>rpt_selector_compare_id</tabstop>
+  <tabstop>cmb_time_to_show</tabstop>
+  <tabstop>cmb_time_to_compare</tabstop>
+  <tabstop>cmb_sel_date</tabstop>
+  <tabstop>cmb_sel_time</tabstop>
+  <tabstop>cmb_com_date</tabstop>
+  <tabstop>cmb_com_time</tabstop>
+  <tabstop>btn_accept</tabstop>
+  <tabstop>btn_cancel</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

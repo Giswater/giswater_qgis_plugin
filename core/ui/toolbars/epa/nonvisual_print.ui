@@ -68,6 +68,13 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>txt_path</tabstop>
+  <tabstop>btn_path</tabstop>
+  <tabstop>chk_cross_arccat</tabstop>
+  <tabstop>btn_accept</tabstop>
+  <tabstop>btn_close</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
