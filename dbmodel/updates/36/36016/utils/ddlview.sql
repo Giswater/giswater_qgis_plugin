@@ -7,15 +7,15 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-drop VIEW ud.v_ui_workspace;
+drop VIEW v_ui_workspace;
 
-CREATE OR REPLACE VIEW ud.v_ui_workspace
+CREATE OR REPLACE VIEW v_ui_workspace
 AS SELECT cat_workspace.id,
     cat_workspace.name,
     cat_workspace.private,
     cat_workspace.descript,
     cat_workspace.cur_user as insert_user,
     cat_workspace.config
-   FROM ud.cat_workspace
+   FROM cat_workspace
   WHERE cat_workspace.private IS FALSE OR cat_workspace.private IS TRUE AND cat_workspace.cur_user = CURRENT_USER::text;
   
