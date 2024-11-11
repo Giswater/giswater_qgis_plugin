@@ -302,6 +302,7 @@ class GwImportInp(GwAction):
         tools_gw.open_dialog(self.dlg_config, dlg_name="dlg_inp_config_import")
 
     def _importinp_accept(self):
+        self.dlg_config.tab_main.setCurrentIndex(self.dlg_config.tab_main.count()-1)
         if TESTING_MODE:
 
             # Delete the network before importing
