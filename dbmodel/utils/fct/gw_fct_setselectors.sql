@@ -391,10 +391,18 @@ BEGIN
 			SELECT DISTINCT sector_id, current_user FROM node WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user)
 			ON CONFLICT (sector_id, cur_user) DO NOTHING;
 
+			-- sector for those objects wich has expl_id2 and expl_id2 is not selected but yes one
+			INSERT INTO selector_sector
+			SELECT DISTINCT sector_id,current_user FROM arc WHERE expl_id2 IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user) AND sector_id > 0
+			UNION
+			SELECT DISTINCT sector_id,current_user FROM node WHERE expl_id2 IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user) AND sector_id > 0
+			ON CONFLICT (sector_id, cur_user) DO NOTHING;
+
 			-- muni
 			DELETE FROM selector_municipality WHERE cur_user = current_user;
 			INSERT INTO selector_municipality
 			SELECT DISTINCT muni_id, current_user FROM node WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user);
+			
 		END IF;
 
 		-- inserting expl and muni from selected sectors
@@ -411,7 +419,7 @@ BEGIN
 			SELECT DISTINCT muni_id, current_user FROM node WHERE sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user = current_user AND sector_id > 0);		
 		END IF;
 
-		-- inserting muni_id from selected muni
+		-- inserting expl from selected muni
 		IF v_tabname IN ('tab_municipality') THEN
 
 			-- expl
@@ -423,6 +431,13 @@ BEGIN
 			DELETE FROM selector_sector WHERE cur_user = current_user AND sector_id > 0;
 			INSERT INTO selector_sector
 			SELECT DISTINCT sector_id, current_user FROM node WHERE muni_id IN (SELECT muni_id FROM selector_municipality WHERE cur_user = current_user)
+			ON CONFLICT (sector_id, cur_user) DO NOTHING;
+
+			-- sector for those objects wich has expl_id2 and expl_id2 is not selected but yes one
+			INSERT INTO selector_sector
+			SELECT DISTINCT sector_id,current_user FROM arc WHERE expl_id2 IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user) AND sector_id > 0
+			UNION
+			SELECT DISTINCT sector_id,current_user FROM node WHERE expl_id2 IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user) AND sector_id > 0
 			ON CONFLICT (sector_id, cur_user) DO NOTHING;
 		END IF;
 
