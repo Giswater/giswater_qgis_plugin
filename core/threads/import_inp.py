@@ -181,6 +181,9 @@ class GwImportInpTask(GwTask):
             self._log_message("Inserting pipes into DB")
             self._save_pipes_to_v_edit_arc()
 
+            self._log_message("Inserting sources into DB")
+            self._save_sources()
+
             execute_sql("select 1", commit=True)
             self._log_message("ALL DONE! INP successfully imported.")
             return True
@@ -1112,6 +1115,34 @@ class GwImportInpTask(GwTask):
         toolsdb_execute_values(
             man_sql, man_params, man_template, fetch=False, commit=True
         )
+
+    def _save_sources(self):
+        for s_name, s in self.network.sources():
+            # Get source properties
+            node_name = s.node_name
+            source_type = s.source_type
+            source_quality = s.strength_timeseries.base_value
+            source_pattern_id = s.strength_timeseries.pattern_name
+
+            # Get node_id & epa_type of related node
+            sql = """
+                SELECT node_id, epa_type FROM node WHERE code = %s
+            """
+            params = (node_name,)
+            row = get_row(sql, params)
+            if not row:
+                self._log_message(f"Couldn't find node '{node_name}' for source '{s_name}'.")
+                continue
+            node_id, epa_type = row
+
+            # Update source columns
+            sql = f"""
+                UPDATE inp_{epa_type.lower()} 
+                SET source_type = %s, source_quality = %s, source_pattern_id = %s 
+                WHERE node_id = %s;
+            """
+            params = (source_type, source_quality, source_pattern_id, node_id)
+            execute_sql(sql, params)
 
     def _log_message(self, message: str, end: str="\n"):
         self.log.append(message)
