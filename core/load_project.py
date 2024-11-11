@@ -267,8 +267,7 @@ class GwLoadProject(QObject):
         # Check if table 'v_edit_node' is loaded
         self.layer_node = tools_qgis.get_layer_by_tablename("v_edit_node")
         layer_arc = tools_qgis.get_layer_by_tablename("v_edit_arc")
-        layer_connec = tools_qgis.get_layer_by_tablename("v_edit_connec")
-        if (self.layer_node, layer_arc, layer_connec) == (None, None, None):  # If no gw layers are present
+        if (self.layer_node, layer_arc) == (None, None):  # If no gw layers are present
             return False
 
         # Check missing layers
@@ -277,8 +276,6 @@ class GwLoadProject(QObject):
             missing_layers['v_edit_node'] = True
         if layer_arc is None:
             missing_layers['v_edit_arc'] = True
-        if layer_connec is None:
-            missing_layers['v_edit_connec'] = True
 
         # Show message if layers are missing
         if missing_layers:
