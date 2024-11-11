@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 --FUNCTION CODE: 2624
-
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_json_object_delete_keys(json, text[]);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME."gw_fct_json_object_delete_keys"(p_json json, VARIADIC "keys_to_delete" TEXT[])
   RETURNS json
   LANGUAGE sql
