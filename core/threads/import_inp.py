@@ -278,7 +278,7 @@ class GwImportInpTask(GwTask):
         template = "(%s, %s)"
 
         # Execute batch update
-        toolsdb_execute_values(sql, update_params, template, fetch=False, commit=True)
+        toolsdb_execute_values(sql, update_params, template, fetch=False, commit=False)
 
     def _create_workcat_id(self):
         sql = """
@@ -566,7 +566,7 @@ class GwImportInpTask(GwTask):
 
         # Insert into parent table
         junctions = toolsdb_execute_values(
-            node_sql, node_params, node_template, fetch=True, commit=True
+            node_sql, node_params, node_template, fetch=True, commit=False
         )
         print(junctions)
         if not junctions:
@@ -593,11 +593,11 @@ class GwImportInpTask(GwTask):
 
         # Insert into inp table
         toolsdb_execute_values(
-            inp_sql, inp_params, inp_template, fetch=False, commit=True
+            inp_sql, inp_params, inp_template, fetch=False, commit=False
         )
         # Insert into man table
         toolsdb_execute_values(
-            man_sql, man_params, man_template, fetch=False, commit=True
+            man_sql, man_params, man_template, fetch=False, commit=False
         )
 
     def _save_reservoirs(self) -> None:
@@ -669,7 +669,7 @@ class GwImportInpTask(GwTask):
 
         # Insert into parent table
         reservoirs = toolsdb_execute_values(
-            node_sql, node_params, node_template, fetch=True, commit=True
+            node_sql, node_params, node_template, fetch=True, commit=False
         )
         print(reservoirs)
         if not reservoirs:
@@ -696,11 +696,11 @@ class GwImportInpTask(GwTask):
 
         # Insert into inp table
         toolsdb_execute_values(
-            inp_sql, inp_params, inp_template, fetch=False, commit=True
+            inp_sql, inp_params, inp_template, fetch=False, commit=False
         )
         # Insert into man table
         toolsdb_execute_values(
-            man_sql, man_params, man_template, fetch=False, commit=True
+            man_sql, man_params, man_template, fetch=False, commit=False
         )
 
     def _save_tanks(self) -> None:
@@ -782,7 +782,7 @@ class GwImportInpTask(GwTask):
 
         # Insert into parent table
         tanks = toolsdb_execute_values(
-            node_sql, node_params, node_template, fetch=True, commit=True
+            node_sql, node_params, node_template, fetch=True, commit=False
         )
         print(tanks)
         if not tanks:
@@ -811,11 +811,11 @@ class GwImportInpTask(GwTask):
 
         # Insert into inp table
         toolsdb_execute_values(
-            inp_sql, inp_params, inp_template, fetch=False, commit=True
+            inp_sql, inp_params, inp_template, fetch=False, commit=False
         )
         # Insert into man table
         toolsdb_execute_values(
-            man_sql, man_params, man_template, fetch=False, commit=True
+            man_sql, man_params, man_template, fetch=False, commit=False
         )
 
     def _save_pumps(self) -> None:
@@ -906,7 +906,7 @@ class GwImportInpTask(GwTask):
 
         # Insert into parent table
         pumps = toolsdb_execute_values(
-            arc_sql, arc_params, arc_template, fetch=True, commit=True
+            arc_sql, arc_params, arc_template, fetch=True, commit=False
         )
         print(pumps)
         if not pumps:
@@ -932,11 +932,11 @@ class GwImportInpTask(GwTask):
 
         # Insert into inp table
         toolsdb_execute_values(
-            inp_sql, inp_params, inp_template, fetch=False, commit=True
+            inp_sql, inp_params, inp_template, fetch=False, commit=False
         )
         # Insert into man table
         toolsdb_execute_values(
-            man_sql, man_params, man_template, fetch=False, commit=True
+            man_sql, man_params, man_template, fetch=False, commit=False
         )
 
     def _save_valves(self) -> None:
@@ -1033,7 +1033,7 @@ class GwImportInpTask(GwTask):
 
         # Insert into parent table
         valves = toolsdb_execute_values(
-            arc_sql, arc_params, arc_template, fetch=True, commit=True
+            arc_sql, arc_params, arc_template, fetch=True, commit=False
         )
         print(valves)
         if not valves:
@@ -1060,11 +1060,11 @@ class GwImportInpTask(GwTask):
 
         # Insert into inp table
         toolsdb_execute_values(
-            inp_sql, inp_params, inp_template, fetch=False, commit=True
+            inp_sql, inp_params, inp_template, fetch=False, commit=False
         )
         # Insert into man table
         toolsdb_execute_values(
-            man_sql, man_params, man_template, fetch=False, commit=True
+            man_sql, man_params, man_template, fetch=False, commit=False
         )
 
     def _save_pipes_to_v_edit_arc(self) -> None:
@@ -1148,7 +1148,7 @@ class GwImportInpTask(GwTask):
 
         # Insert into parent table
         pipes = toolsdb_execute_values(
-            arc_sql, arc_params, arc_template, fetch=True, commit=True
+            arc_sql, arc_params, arc_template, fetch=True, commit=False
         )
         print(pipes)
         if not pipes:
@@ -1175,11 +1175,11 @@ class GwImportInpTask(GwTask):
 
         # Insert into inp table
         toolsdb_execute_values(
-            inp_sql, inp_params, inp_template, fetch=False, commit=True
+            inp_sql, inp_params, inp_template, fetch=False, commit=False
         )
         # Insert into man table
         toolsdb_execute_values(
-            man_sql, man_params, man_template, fetch=False, commit=True
+            man_sql, man_params, man_template, fetch=False, commit=False
         )
 
     def _save_sources(self):
