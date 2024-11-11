@@ -82,8 +82,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>327</width>
-            <height>118</height>
+            <width>302</width>
+            <height>109</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout_2">
@@ -134,6 +134,15 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>mainTab</tabstop>
+  <tabstop>txt_current_arccat</tabstop>
+  <tabstop>cmb_newarccat</tabstop>
+  <tabstop>scrollArea</tabstop>
+  <tabstop>txt_infolog</tabstop>
+  <tabstop>btn_accept</tabstop>
+  <tabstop>btn_cancel</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

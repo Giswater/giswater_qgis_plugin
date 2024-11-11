@@ -211,8 +211,13 @@
  <tabstops>
   <tabstop>txt_name</tabstop>
   <tabstop>btn_current</tabstop>
+  <tabstop>btn_toggle_privacy</tabstop>
+  <tabstop>btn_create</tabstop>
+  <tabstop>btn_update</tabstop>
   <tabstop>btn_delete</tabstop>
   <tabstop>tbl_wrkspcm</tabstop>
+  <tabstop>txt_infolog</tabstop>
+  <tabstop>btn_cancel</tabstop>
  </tabstops>
  <resources/>
  <connections/>
