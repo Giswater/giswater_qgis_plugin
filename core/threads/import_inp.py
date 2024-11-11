@@ -192,7 +192,7 @@ class GwImportInpTask(GwTask):
             return True
         except Exception as e:
             self.exception = traceback.format_exc()
-            self.log.append(f"{traceback.format_stack()}")
+            self._log_message(f"{traceback.format_stack()}")
             tools_db.dao.rollback()
             return False
 
