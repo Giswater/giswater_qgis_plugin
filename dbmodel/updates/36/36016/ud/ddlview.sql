@@ -196,3 +196,16 @@ AS SELECT a.node_id,
   WHERE s.cur_user = CURRENT_USER AND (m.cur_user = CURRENT_USER OR a.muni_id IS NULL);
      
 
+CREATE OR REPLACE VIEW v_edit_inp_dwf
+AS SELECT i.dwfscenario_id,
+    node_id,
+    i.value,
+    i.pat1,
+    i.pat2,
+    i.pat3,
+    i.pat4,
+    node.the_geom
+   FROM config_param_user c,
+    inp_dwf i
+     JOIN node USING (node_id)
+  WHERE c.cur_user::name = CURRENT_USER AND c.parameter::text = 'inp_options_dwfscenario'::text AND c.value::integer = i.dwfscenario_id;
