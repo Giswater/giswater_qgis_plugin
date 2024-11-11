@@ -297,8 +297,14 @@
   </layout>
  </widget>
  <tabstops>
-  <tabstop>workcat_id_end</tabstop>
+  <tabstop>mainTab</tabstop>
+  <tabstop>cmb_nodeaction</tabstop>
   <tabstop>enddate</tabstop>
+  <tabstop>workcat_id_end</tabstop>
+  <tabstop>cmb_statetype</tabstop>
+  <tabstop>txt_infolog</tabstop>
+  <tabstop>btn_accept</tabstop>
+  <tabstop>btn_cancel</tabstop>
  </tabstops>
  <resources/>
  <connections/>

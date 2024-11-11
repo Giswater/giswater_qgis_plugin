@@ -565,6 +565,21 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>mainTab</tabstop>
+  <tabstop>workcat_id_end</tabstop>
+  <tabstop>btn_new_workcat</tabstop>
+  <tabstop>enddate</tabstop>
+  <tabstop>feature_type</tabstop>
+  <tabstop>feature_type_new</tabstop>
+  <tabstop>featurecat_id</tabstop>
+  <tabstop>btn_catalog</tabstop>
+  <tabstop>keep_elements</tabstop>
+  <tabstop>keep_epa_values</tabstop>
+  <tabstop>txt_infolog</tabstop>
+  <tabstop>btn_accept</tabstop>
+  <tabstop>btn_cancel</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

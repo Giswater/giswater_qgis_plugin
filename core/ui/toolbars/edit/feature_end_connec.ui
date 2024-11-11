@@ -120,6 +120,12 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>arc_id</tabstop>
+  <tabstop>tbl_arc_x_relations</tabstop>
+  <tabstop>btn_accept</tabstop>
+  <tabstop>btn_cancel</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

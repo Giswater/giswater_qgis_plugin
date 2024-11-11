@@ -112,6 +112,13 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>element_id</tabstop>
+  <tabstop>tbl_element</tabstop>
+  <tabstop>btn_create</tabstop>
+  <tabstop>btn_delete</tabstop>
+  <tabstop>btn_cancel</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
