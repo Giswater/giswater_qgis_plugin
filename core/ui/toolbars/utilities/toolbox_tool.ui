@@ -213,6 +213,18 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>mainTab</tabstop>
+  <tabstop>cmb_feature_type</tabstop>
+  <tabstop>cmb_layers</tabstop>
+  <tabstop>txt_info</tabstop>
+  <tabstop>rbt_previous</tabstop>
+  <tabstop>rbt_layer</tabstop>
+  <tabstop>btn_run</tabstop>
+  <tabstop>txt_infolog</tabstop>
+  <tabstop>btn_cancel</tabstop>
+  <tabstop>btn_close</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

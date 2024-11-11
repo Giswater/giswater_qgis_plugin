@@ -424,6 +424,24 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>mainTab</tabstop>
+  <tabstop>cmb_import_type</tabstop>
+  <tabstop>txt_import</tabstop>
+  <tabstop>txt_file_csv</tabstop>
+  <tabstop>cmb_unicode_list</tabstop>
+  <tabstop>chk_ignore_header</tabstop>
+  <tabstop>rb_comma</tabstop>
+  <tabstop>rb_semicolon</tabstop>
+  <tabstop>rb_space</tabstop>
+  <tabstop>rb_dec_comma</tabstop>
+  <tabstop>rb_dec_period</tabstop>
+  <tabstop>btn_file_csv</tabstop>
+  <tabstop>tbl_csv</tabstop>
+  <tabstop>txt_infolog</tabstop>
+  <tabstop>btn_accept</tabstop>
+  <tabstop>btn_cancel</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

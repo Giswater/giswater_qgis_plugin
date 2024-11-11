@@ -226,6 +226,14 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>mGroupBox</tabstop>
+  <tabstop>tbl_reports</tabstop>
+  <tabstop>txt_export_path</tabstop>
+  <tabstop>btn_export_path</tabstop>
+  <tabstop>btn_export</tabstop>
+  <tabstop>btn_close</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
