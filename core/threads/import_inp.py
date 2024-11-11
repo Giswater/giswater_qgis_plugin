@@ -134,6 +134,9 @@ class GwImportInpTask(GwTask):
             self._log_message("Validating inputs")
             self._validate_inputs()
 
+            self._log_message("Getting options")
+            self._save_options()
+
             self._log_message("Getting units from DB")
             self._get_db_units()
 
@@ -216,6 +219,66 @@ class GwImportInpTask(GwTask):
         if not self.municipality:
             message = "Please select a municipality to proceed with this import."
             raise ValueError(message)
+
+    def _save_options(self):
+        """
+            Import options to table 'config_param_user'.
+            "hydraulic" -> inp_options_%
+            "energy" -> inp_energy_%
+            "reaction" -> inp_reactions_%
+            "report" -> inp_report_%
+            "time" -> inp_times_%
+            "quality" -> inp_options_quality_mode??
+        """
+        # Define prefixes for each category
+        prefix_map = {
+            "time": "inp_times_",
+            "hydraulic": "inp_options_",
+            "report": "inp_report_",
+            "quality": "inp_quality_",
+            "reaction": "inp_reactions_",
+            "energy": "inp_energy_",
+            # "graphics": "inp_graphics_",
+            # "user": "inp_user_"
+        }
+
+        # List to accumulate parameters for batch update
+        update_params = []
+
+        options_dict = dict(self.network.options)
+
+        def process_options(options, prefix, parent_key=""):
+            """Recursively process options, including nested dictionaries."""
+            for key, value in options.items():
+                # Build the full parameter name
+                full_key = f"{parent_key}_{key.lower()}" if parent_key else key.lower()
+
+                if isinstance(value, dict):
+                    # Recursively process nested dictionaries
+                    process_options(value, prefix, full_key)
+                else:
+                    param_name = f"{prefix}{full_key}"
+                    update_params.append((str(value), param_name))
+
+        # Iterate over each category and its options
+        for category, options in options_dict.items():
+            if category in ("graphics", "user", "quality"):
+                continue
+            prefix = prefix_map.get(category, "inp_options_")  # Default prefix if not in map
+
+            process_options(options, prefix)
+
+        # SQL query for batch update
+        sql = """
+            UPDATE config_param_user
+            SET value = data.value
+            FROM (VALUES %s) AS data(value, parameter)
+            WHERE config_param_user.parameter::text = data.parameter::text;
+        """
+        template = "(%s, %s)"
+
+        # Execute batch update
+        toolsdb_execute_values(sql, update_params, template, fetch=False, commit=True)
 
     def _create_workcat_id(self):
         sql = """
