@@ -24,8 +24,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>947</width>
-        <height>384</height>
+        <width>943</width>
+        <height>368</height>
        </rect>
       </property>
       <attribute name="label">
@@ -84,8 +84,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>947</width>
-        <height>384</height>
+        <width>943</width>
+        <height>368</height>
        </rect>
       </property>
       <attribute name="label">
@@ -177,6 +177,18 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>btn_add_base</tabstop>
+  <tabstop>btn_delete_base</tabstop>
+  <tabstop>btn_edit_base</tabstop>
+  <tabstop>tbl_orifice</tabstop>
+  <tabstop>btn_accept</tabstop>
+  <tabstop>btn_cancel</tabstop>
+  <tabstop>btn_delete_dscenario</tabstop>
+  <tabstop>btn_edit_dscenario</tabstop>
+  <tabstop>tbl_dscenario_orifice</tabstop>
+  <tabstop>btn_add_dscenario</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

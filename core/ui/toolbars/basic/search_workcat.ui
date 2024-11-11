@@ -412,6 +412,25 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>txt_path</tabstop>
+  <tabstop>btn_path</tabstop>
+  <tabstop>btn_export_to_csv</tabstop>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>txt_name</tabstop>
+  <tabstop>btn_state1</tabstop>
+  <tabstop>tbl_psm</tabstop>
+  <tabstop>txt_name_end</tabstop>
+  <tabstop>btn_state0</tabstop>
+  <tabstop>tbl_psm_end</tabstop>
+  <tabstop>doc_id</tabstop>
+  <tabstop>btn_doc_insert</tabstop>
+  <tabstop>btn_doc_delete</tabstop>
+  <tabstop>btn_doc_new</tabstop>
+  <tabstop>btn_open_doc</tabstop>
+  <tabstop>tbl_document</tabstop>
+  <tabstop>btn_close</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

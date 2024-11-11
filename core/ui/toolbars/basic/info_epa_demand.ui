@@ -24,8 +24,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>947</width>
-        <height>407</height>
+        <width>943</width>
+        <height>394</height>
        </rect>
       </property>
       <attribute name="label">
@@ -117,6 +117,14 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>btn_add_dscenario</tabstop>
+  <tabstop>btn_delete_dscenario</tabstop>
+  <tabstop>btn_edit_dscenario</tabstop>
+  <tabstop>tbl_dscenario_demand</tabstop>
+  <tabstop>btn_accept</tabstop>
+  <tabstop>btn_cancel</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
