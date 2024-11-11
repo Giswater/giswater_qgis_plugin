@@ -259,6 +259,7 @@ class GwRecursiveEpa(GwTask):
 
         # Execute pg2epa
         status = self._exec_function_pg2epa(resultname)
+        tools_db.dao.reset_db()
         if not status:
             self.function_name = 'gw_fct_pg2epa_main'
             return False
