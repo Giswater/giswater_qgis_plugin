@@ -22,20 +22,16 @@ SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","
 DECLARE
 
 v_schemaname varchar = 'SCHEMA_NAME';
-v_project_type text;
-v_schemautils boolean;
-v_action text;
+v_target_schemaname varchar;
 v_table text;
+v_target_table text;
+v_action text;
+
 v_column text;
 v_datatype text;
 v_isutils boolean;
 v_newname text;
 v_querytext text;
-v_currentcolumn text;
-v_tableversion text = 'sys_version';
-v_columntype text = 'project_type';
-v_type text;
-v_error_context text;
 v_layers record;
 v_max_layoutorder numeric;
 v_widgettype text;
@@ -47,10 +43,6 @@ BEGIN
 	-- search path
 	SET search_path = "SCHEMA_NAME", public;
 
-	-- get info from version table
-	IF (SELECT tablename FROM pg_tables WHERE schemaname = v_schemaname AND tablename = 'version') IS NOT NULL THEN v_tableversion = 'version'; v_columntype = 'wsoftware'; END IF;
- 	EXECUTE 'SELECT '||quote_ident(v_columntype)||' FROM '||quote_ident(v_tableversion)||' LIMIT 1' INTO v_project_type;
-
 	v_action = (p_data->>'data')::json->>'action';
 	v_table = (p_data->>'data')::json->>'table';
 	v_column = (p_data->>'data')::json->>'column';
@@ -59,49 +51,50 @@ BEGIN
 	v_newname = (p_data->>'data')::json->>'newName';
 
 
-	-- check if column not exists
-	IF v_action='ADD' AND (SELECT column_name FROM information_schema.columns WHERE table_schema=v_schemaname and table_name = v_table AND column_name = v_column) IS NULL THEN
 
-        IF v_isutils IS TRUE THEN
-            -- alter table from utils schema if admin_utils_schema is TRUE
-            IF (select value::boolean from config_param_system where parameter='admin_utils_schema') IS TRUE THEN
-                -- the utils schema table is assumed to have the same name except ext_
-                v_table = replace(v_table, 'ext_', '');
-                v_querytext = 'ALTER TABLE utils.'|| quote_ident(v_table) ||' ADD COLUMN '||quote_ident(v_column)||' '||v_datatype;
-            ELSE
-                v_querytext = 'ALTER TABLE '||quote_ident(v_schemaname) ||'.'|| quote_ident(v_table) ||' ADD COLUMN '||quote_ident(v_column)||' '||v_datatype;
-            END IF;
-        ELSE
-            v_querytext = 'ALTER TABLE '||quote_ident(v_schemaname) ||'.'|| quote_ident(v_table) ||' ADD COLUMN '||quote_ident(v_column)||' '||v_datatype;
-        END IF;
+	-- Determine the target schema and table
+	IF v_isutils IS TRUE AND (SELECT value::boolean FROM config_param_system WHERE parameter='admin_utils_schema') IS TRUE THEN
+		v_target_schemaname := 'utils';
+		v_target_table := replace(v_table, 'ext_', '');
+	ELSE
+		v_target_schemaname := v_schemaname;
+		v_target_table := v_table;
+	END IF;
 
-        EXECUTE v_querytext;
-
+	-- Check if the column does not exist in the target schema and table
+	IF v_action = 'ADD' AND NOT EXISTS (
+		SELECT 1
+		FROM information_schema.columns
+		WHERE table_schema = v_target_schemaname
+		AND table_name = v_target_table
+		AND column_name = v_column
+	) THEN
+		v_querytext := 'ALTER TABLE ' || quote_ident(v_target_schemaname) || '.' || quote_ident(v_target_table)
+					|| ' ADD COLUMN ' || quote_ident(v_column) || ' ' || v_datatype;
+		EXECUTE v_querytext;
 
 		-- manage config_form_fields only if column has been added to parent tables
-		if v_table in ('node', 'arc', 'connec', 'gully') then
+		IF v_table IN ('node', 'arc', 'connec', 'gully') THEN
+			EXECUTE 'SELECT COUNT(*) 
+			FROM config_typevalue 
+			WHERE typevalue = ''datatype_typevalue'' 
+			AND id ILIKE ''%'||v_datatype||'%'' 
+			LIMIT 1'
+			INTO v_count;
 
-
-			execute 'select count(*) from config_typevalue where typevalue = ''datatype_typevalue'' and id ilike ''%'||v_datatype||'%'' limit 1'
-			into v_count;
-
-			if v_count > 0 then
-
-				if v_datatype ilike '%boolean%' then
+			IF v_count > 0 THEN
+				IF v_datatype ILIKE '%boolean%' THEN
 					v_widgettype = 'check';
-
-				else
+				ELSE
 					v_widgettype = 'text';
+				END IF;
+			ELSE
+				v_datatype = 'text';
+				v_widgettype = 'text';
+			END IF;
 
-				end if;
-			else
-					v_datatype = 'text';
-					v_widgettype = 'text';
-			end if;
-
-			for v_layers in select parent_layer, child_layer from cat_feature where feature_type = upper(v_table)
-			loop
-
+			FOR v_layers IN SELECT parent_layer, child_layer FROM cat_feature WHERE feature_type = UPPER(v_table)
+			LOOP
 				-- v_edit_feature
 				SELECT max(layoutorder)+1 into v_max_layoutorder from config_form_fields
 				where formname = v_layers.parent_layer
@@ -119,10 +112,8 @@ BEGIN
 				INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, iseditable, hidden)
 				VALUES(v_layers.child_layer, 'form_feature', 'tab_data', v_column, 'lyt_data_1', v_max_layoutorder, v_datatype, v_widgettype, concat(upper(left(v_column, 1)), substring(v_column, 2)), v_column, NULL, false, true, false)
 				ON CONFLICT (formname, formtype, tabname, columnname) DO NOTHING;
-
-			end loop;
-
-		end if;
+			END LOOP;
+		END IF;
 
 
 	ELSIF v_action='RENAME' AND (SELECT column_name FROM information_schema.columns WHERE table_schema=v_schemaname and table_name = v_table AND column_name = v_column) IS NOT NULL
