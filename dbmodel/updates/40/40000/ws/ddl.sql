@@ -116,6 +116,7 @@ ALTER TABLE sector DROP CONSTRAINT sector_parent_id_fkey;
 ALTER TABLE samplepoint DROP CONSTRAINT samplepoint_sector_id;
 ALTER TABLE element DROP CONSTRAINT element_sector_id;
 ALTER TABLE link DROP CONSTRAINT IF EXISTS link_sector_id;
+ALTER TABLE link DROP CONSTRAINT IF EXISTS link_sector_id_fkey;
 ALTER TABLE dimensions DROP CONSTRAINT dimensions_sector_id;
 
 ALTER TABLE sector RENAME TO _sector;
