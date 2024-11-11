@@ -955,13 +955,14 @@ class GwImportInpTask(GwTask):
                 "init_quality": None,
             }
 
+            # TODO: refactor this so all values go to one 'setting' column (except curve_id).
             valve_key_map = {
                 "PRV": "pressure",
                 "PSV": "pressure",
                 "PBV": "pressure",
                 "FCV": "flow",
-                # "TCV": "",
-                # "GPV": "",
+                "TCV": "coef_loss",
+                "GPV": "curve_id",
             }
             key = valve_key_map.get(v.valve_type)
             if key:
