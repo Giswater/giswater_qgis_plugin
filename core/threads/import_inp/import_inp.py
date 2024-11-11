@@ -13,8 +13,8 @@ except ImportError:
 
 from qgis.PyQt.QtCore import pyqtSignal
 
-from ...libs import lib_vars, tools_db, tools_log
-from .task import GwTask
+from ....libs import lib_vars, tools_db, tools_log
+from ..task import GwTask
 
 
 def batched(iterable, n):

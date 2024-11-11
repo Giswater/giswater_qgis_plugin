@@ -22,7 +22,7 @@ from ....libs import tools_db, tools_qgis, tools_qt
 from ...models.plugin_toolbar import GwPluginToolbar
 from ...ui.dialog import GwDialog
 from ...ui.ui_manager import GwInpConfigImportUi, GwInpParsingUi
-from ...threads.import_inp import GwImportInpTask
+from ...threads.import_inp.import_inp import GwImportInpTask
 from ...utils import tools_gw
 from ..dialog import GwAction
 
@@ -55,7 +55,7 @@ class GwImportInp(GwAction):
         if global_vars.project_type == ProjectType.WS.value:
             try:
                 import wntr
-                from ...threads import parse_inp
+                from ...threads.import_inp import parse_inp
 
                 global Catalogs, GwParseInpTask
                 Catalogs = parse_inp.Catalogs

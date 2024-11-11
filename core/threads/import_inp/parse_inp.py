@@ -5,9 +5,9 @@ from typing import Optional
 
 import wntr
 
-from ...libs import tools_db
-from ..ui.dialog import GwDialog
-from .task import GwTask
+from ....libs import tools_db
+from ...ui.dialog import GwDialog
+from ..task import GwTask
 
 
 class GwParseInpTask(GwTask):
