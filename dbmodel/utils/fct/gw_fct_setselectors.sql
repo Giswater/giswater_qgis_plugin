@@ -477,6 +477,12 @@ BEGIN
 		(SELECT expl_id FROM selector_expl WHERE cur_user=current_user)) b) a;
 	END IF;
 
+	-- Force sector selector for 0 values
+	INSERT INTO selector_sector VALUES (0, current_user) ON CONFLICT (sector_id, cur_user) DO NOTHING;
+
+	-- Force muni selector for 0 values
+	INSERT INTO selector_municipality VALUES (0, current_user) ON CONFLICT (muni_id, cur_user) DO NOTHING;
+
 	-- get uservalues
 	PERFORM gw_fct_workspacemanager($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},"data":{"filterFields":{}, "pageInfo":{}, "action":"CHECK"}}$$);
 	v_uservalues = (SELECT to_json(array_agg(row_to_json(a))) FROM (SELECT parameter, value FROM config_param_user WHERE parameter IN ('plan_psector_vdefault', 'utils_workspace_vdefault')

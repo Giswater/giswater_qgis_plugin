@@ -209,3 +209,20 @@ AS SELECT i.dwfscenario_id,
     inp_dwf i
      JOIN node USING (node_id)
   WHERE c.cur_user::name = CURRENT_USER AND c.parameter::text = 'inp_options_dwfscenario'::text AND c.value::integer = i.dwfscenario_id;
+  
+ 
+CREATE OR REPLACE VIEW v_edit_raingage
+AS SELECT raingage.rg_id,
+    raingage.form_type,
+    raingage.intvl,
+    raingage.scf,
+    raingage.rgage_type,
+    raingage.timser_id,
+    raingage.fname,
+    raingage.sta,
+    raingage.units,
+    raingage.the_geom,
+    raingage.expl_id,
+    raingage.muni_id
+   FROM selector_expl, raingage
+  WHERE raingage.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
