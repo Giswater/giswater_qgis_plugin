@@ -66,7 +66,7 @@ v_sql_final_reverse_point text;
 BEGIN
 
 	-- Set search path to local schema
-	SET search_path = "ws30", public;
+	SET search_path = "SCHEMA_NAME", public;
 
 	-- get system variables
 	SELECT  giswater, upper(project_type) INTO v_version, v_project FROM sys_version order by id desc limit 1;
@@ -148,15 +148,15 @@ BEGIN
 
 	
 
-	raise notice 'connec_id, v_rec_point_final.arc_id: % %', v_connec, v_rec_point_final.arc_id;
+	--raise exception 'connec_id, v_rec_point_final.arc_id: % %', v_connec, v_rec_point_final.arc_id;
 -----------------
 
 	-- si HAY ramal, hacerlo
 
-
-	execute 'select count(*) from ('||v_sql_ramal||')a' into v_count;
-
-	if v_count > 0 then --existe una capa de ramal con geometria
+	 
+	--execute 'select count(*) from ('||v_sql_ramal||')a' into v_count;
+	if v_sql_ramal is not null then
+	--if v_count > 0 then --existe una capa de ramal con geometria
 	
 		execute v_sql into v_ramal_table, v_ramal_geom;
 	
@@ -317,11 +317,23 @@ BEGIN
 	--  Exception handling
 	EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_error_context = pg_exception_context;  
-	RETURN json_build_object('status', 'Failed', 'NOSQLERR', SQLERRM, 'message', 
-	json_build_object('level', right(SQLSTATE, 1), 'text', SQLERRM), 
-	'SQLSTATE', SQLSTATE, 'SQLCONTEXT', v_error_context,
-	json_build_object('connec_id', v_connec, 'closest_arc', v_rec_point_final.arc_id, 'closest_parcel', v_closest_parcel))::json;
-	
+
+	RETURN json_build_object(
+    'status', 'Failed', 
+    'NOSQLERR', SQLERRM, 
+    'message', json_build_object(
+        'level', right(SQLSTATE, 1), 
+        'text', SQLERRM
+    ), 
+    'SQLSTATE', SQLSTATE, 
+    'SQLCONTEXT', v_error_context,
+    'details', json_build_object(
+        'connec_id', v_connec, 
+        --'closest_arc', v_rec_point_final.arc_id, 
+        'closest_parcel', v_closest_parcel
+    )
+)::json;
+
 
 
 END;
