@@ -7,4 +7,3 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-DELETE FROM sys_table WHERE id  = 'v_sector_node';

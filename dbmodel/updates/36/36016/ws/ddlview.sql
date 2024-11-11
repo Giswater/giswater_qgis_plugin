@@ -247,64 +247,6 @@ CREATE OR REPLACE VIEW v_edit_node AS
   WHERE s.cur_user = CURRENT_USER AND (m.cur_user = CURRENT_USER OR a.muni_id IS NULL);
 
 
-CREATE OR REPLACE VIEW v_edit_inp_dscenario_inlet
-AS SELECT p.dscenario_id,
-    n.node_id,
-    p.initlevel,
-    p.minlevel,
-    p.maxlevel,
-    p.diameter,
-    p.minvol,
-    p.curve_id,
-    p.overflow,
-    p.mixing_model,
-    p.mixing_fraction,
-    p.reaction_coeff,
-    p.init_quality,
-    p.source_type,
-    p.source_quality,
-    p.source_pattern_id,
-    p.head,
-    p.pattern_id,
-    p.demand,
-    p.demand_pattern_id,
-    p.emitter_coeff,
-    n.the_geom
-   FROM selector_inp_dscenario,
-    v_edit_node n
-     JOIN inp_dscenario_inlet p USING (node_id)
-     JOIN cat_dscenario d USING (dscenario_id)
-  WHERE p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text AND n.is_operative IS TRUE;
-
-
-CREATE OR REPLACE VIEW v_edit_inp_dscenario_tank
-AS SELECT d.dscenario_id,
-    p.node_id,
-    p.initlevel,
-    p.minlevel,
-    p.maxlevel,
-    p.diameter,
-    p.minvol,
-    p.curve_id,
-    p.overflow,
-    p.mixing_model,
-    p.mixing_fraction,
-    p.reaction_coeff,
-    p.init_quality,
-    p.source_type,
-    p.source_quality,
-    p.source_pattern_id,
-    n.the_geom
-   FROM selector_inp_dscenario,
-    v_edit_node n
-     JOIN inp_dscenario_tank p USING (node_id)
-     JOIN cat_dscenario d USING (dscenario_id)
-  WHERE p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text AND n.is_operative IS TRUE;
-
- 
-DROP VIEW IF EXISTS v_sector_node;
-  
-
 CREATE OR REPLACE VIEW v_ui_dma
 AS SELECT d.dma_id,
     d.name,
