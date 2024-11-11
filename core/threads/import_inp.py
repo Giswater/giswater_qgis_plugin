@@ -829,7 +829,7 @@ class GwImportInpTask(GwTask):
                 "pattern_id": p.speed_pattern_name,
                 "status": p.initial_status.name.upper(),
                 "energyvalue": None,
-                "effic_curve_id": p.efficiency,
+                "effic_curve_id": p.efficiency.name if p.efficiency else None,
                 "energy_price": p.energy_price,
                 "energy_pattern_id": p.energy_pattern,
                 "pump_type": None,
