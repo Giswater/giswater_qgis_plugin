@@ -814,15 +814,29 @@ BEGIN
 	  WHERE temp_t_node.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text;
 
 
-
 	CREATE OR REPLACE TEMP VIEW vi_t_report AS
-	 SELECT a.idval AS parameter,
-	    b.value
-	   FROM sys_param_user a
-	     JOIN config_param_user b ON a.id = b.parameter::text
-	  WHERE (a.layoutname = ANY (ARRAY['lyt_reports_1'::text, 'lyt_reports_2'::text])) AND b.cur_user::name = "current_user"() AND b.value IS NOT NULL;
-
-
+	select * from (
+		SELECT a.idval AS parameter,
+		b.value
+		FROM sys_param_user a
+		JOIN ud.config_param_user b ON a.id = b.parameter::text
+		WHERE (a.layoutname = ANY (ARRAY['lyt_reports_1'::text, 'lyt_reports_2'::text])) AND b.cur_user::name = "current_user"() AND b.value IS NOT null and parameter not in ('inp_report_nodes_2', 'inp_report_nodes', 'inp_report_links')
+		union
+		select 'NODES', replace(replace(replace(array_agg(a.node_id)::text,',',' '),'}',''),'{','')  from (select unnest(concat('{',replace(value,' ',','),'}')::integer[]) as node_id 
+		from config_param_user where parameter = 'inp_report_nodes' and cur_user='mguzman')a
+		join v_edit_node n on n.node_id::integer = a.node_id
+		UNION
+		select 'NODES', replace(replace(replace(array_agg(a.node_id)::text,',',' '),'}',''),'{','')  from (select unnest(concat('{',replace(value,' ',','),'}')::integer[]) as node_id 
+		from config_param_user where parameter = 'inp_report_nodes_2' and cur_user='mguzman')a
+		join v_edit_node n on n.node_id::integer = a.node_id
+		union
+		select 'LINKS', replace(replace(replace(array_agg(a.arc_id)::text,',',' '),'}',''),'{','')  from (select unnest(concat('{',replace(value,' ',','),'}')::integer[]) as arc_id 
+		from config_param_user where parameter = 'inp_report_link' and cur_user='mguzman')a
+		join v_edit_arc n on n.arc_id::integer = a.arc_id)a
+		where value is not null
+		ORDER BY 1;
+		
+		
 	CREATE OR REPLACE TEMP VIEW vi_t_snowpacks AS
 	 SELECT inp_snowpack_value.snow_id,
 	    inp_snowpack_value.snow_type,
