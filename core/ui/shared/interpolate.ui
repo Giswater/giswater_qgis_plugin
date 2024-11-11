@@ -97,6 +97,13 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>rb_interpolate</tabstop>
+  <tabstop>rb_extrapolate</tabstop>
+  <tabstop>txt_infolog</tabstop>
+  <tabstop>btn_accept</tabstop>
+  <tabstop>btn_close</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

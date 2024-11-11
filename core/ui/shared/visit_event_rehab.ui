@@ -536,7 +536,12 @@
   <tabstop>geom1</tabstop>
   <tabstop>geom2</tabstop>
   <tabstop>geom3</tabstop>
+  <tabstop>text</tabstop>
+  <tabstop>tbl_docs_x_event</tabstop>
   <tabstop>btn_add_file</tabstop>
+  <tabstop>btn_delete_file</tabstop>
+  <tabstop>btn_accept</tabstop>
+  <tabstop>btn_cancel</tabstop>
  </tabstops>
  <resources/>
  <connections/>

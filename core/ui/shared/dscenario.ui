@@ -115,6 +115,17 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>txt_feature_id</tabstop>
+  <tabstop>btn_properties</tabstop>
+  <tabstop>btn_toc</tabstop>
+  <tabstop>btn_insert</tabstop>
+  <tabstop>btn_delete</tabstop>
+  <tabstop>btn_snapping</tabstop>
+  <tabstop>main_tab</tabstop>
+  <tabstop>btn_accept</tabstop>
+  <tabstop>btn_close</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
