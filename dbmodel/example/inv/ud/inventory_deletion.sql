@@ -32,8 +32,8 @@ DELETE FROM inp_flwreg_pump;
 DELETE FROM inp_flwreg_orifice;
 DELETE FROM inp_flwreg_outlet;
 
-DELETE FROM inp_weir;
-DELETE FROM inp_pump;
+UPDATE inp_weir SET weir_type=null, offsetval=null, cd=null, geom1=null, geom2=null, geom3=null, geom4=null;
+UPDATE inp_pump SET curve_id=null, status=null, startup=null , shutoff=null;
 
 UPDATE cat_mat_arc SET n = null;
 
