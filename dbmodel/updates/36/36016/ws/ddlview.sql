@@ -250,3 +250,96 @@ CREATE OR REPLACE VIEW v_edit_node AS
 DROP VIEW IF EXISTS v_sector_node;
   
 
+CREATE OR REPLACE VIEW v_ui_dma
+AS SELECT d.dma_id,
+    d.name,
+    d.descript,
+    d.expl_id,
+    md.name AS macrodma,
+    d.active,
+    d.undelete,
+    d.minc,
+    d.maxc,
+    d.effc,
+    d.avg_press,
+    d.pattern_id,
+    d.link,
+    d.graphconfig,
+    d.stylesheet,
+    d.tstamp,
+    d.insert_user,
+    d.lastupdate,
+    d.lastupdate_user
+   FROM selector_expl s, dma d
+   	   LEFT JOIN macrodma md ON md.macrodma_id = d.macrodma_id
+  WHERE d.dma_id > 0 
+  and s.expl_id = d.expl_id and s.cur_user = current_user
+  ORDER BY d.dma_id;
+  
+ 
+ CREATE OR REPLACE VIEW v_ui_sector
+AS SELECT s.sector_id,
+    s.name,
+    ms.name AS macrosector,
+    s.descript,
+    s.undelete,
+    s.sector_type,
+    s.active,
+    s.parent_id,
+    s.pattern_id,
+    s.tstamp,
+    s.insert_user,
+    s.lastupdate,
+    s.lastupdate_user,
+    s.graphconfig,
+    s.stylesheet
+   FROM selector_sector ss, sector s
+     LEFT JOIN macrosector ms ON ms.macrosector_id = s.macrosector_id
+  WHERE s.sector_id > 0
+  and ss.sector_id = s.sector_id and ss.cur_user = current_user
+  ORDER BY s.sector_id;
+  
+ 
+ CREATE OR REPLACE VIEW v_ui_presszone
+AS SELECT presszone_id,
+    name,
+    descript,
+    p.expl_id,
+    link,
+    head,
+    active,
+    graphconfig,
+    stylesheet,
+    tstamp,
+    insert_user,
+    lastupdate,
+    lastupdate_user
+   FROM selector_expl s, presszone p
+  WHERE presszone_id::text <> ALL (ARRAY['0'::character varying, '-1'::character varying]::text[])
+  and s.expl_id = p.expl_id and s.cur_user = current_user
+  ORDER BY presszone_id;
+  
+ 
+CREATE OR REPLACE VIEW v_ui_dqa
+AS SELECT d.dqa_id,
+    d.name,
+    d.descript,
+    d.expl_id,
+    md.name AS macrodma,
+    d.active,
+    d.undelete,
+    d.the_geom,
+    d.pattern_id,
+    d.dqa_type,
+    d.link,
+    d.graphconfig,
+    d.stylesheet,
+    d.tstamp,
+    d.insert_user,
+    d.lastupdate,
+    d.lastupdate_user
+   FROM selector_expl s, dqa d
+     LEFT JOIN macrodqa md ON md.macrodqa_id = d.macrodqa_id
+  WHERE d.dqa_id > 0
+  and s.expl_id = d.expl_id and s.cur_user = current_user
+  ORDER BY d.dqa_id;
