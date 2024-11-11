@@ -18,4 +18,4 @@ update rpt_cat_result r set expl_id = expl_id from
 (select array_agg(distinct a.expl_id) as expl_id, r.result_id from arc a join rpt_cat_result r on a.sector_id=any(r.sector_id) group by  result_id)a 
 where a.result_id = r.result_id and r.expl_id is null;
 
-update ud.rpt_cat_result set network_type = 1 where network_type is null;
+update rpt_cat_result set network_type = 1 where network_type is null;
