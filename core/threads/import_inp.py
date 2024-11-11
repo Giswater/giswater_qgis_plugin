@@ -999,17 +999,37 @@ class GwImportInpTask(GwTask):
         )
 
     def _save_pipes_to_v_edit_arc(self) -> None:
-        sql = """
-            INSERT INTO v_edit_arc (the_geom, code, node_1, node_2, arccat_id, epa_type, expl_id, sector_id, muni_id, state, state_type, workcat_id)
-            VALUES %s
-            RETURNING arc_id, code
-        """
+        feature_class = self.catalogs['features']['pipes'].lower()
 
-        template = (
+        arc_sql = """ 
+            INSERT INTO arc (
+                the_geom, code, node_1, node_2, arccat_id, epa_type, expl_id, sector_id, muni_id, state, state_type, workcat_id
+            ) VALUES %s
+            RETURNING arc_id, code
+        """  # --"depth", arc_id, annotation, observ, "comment", label_x, label_y, label_rotation, staticpressure, feature_type
+        arc_template = (
             "(ST_GeomFromText(%s, %s), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
         )
 
-        params = []
+        man_sql = f"""
+            INSERT INTO man_{feature_class} (
+                arc_id
+            ) VALUES %s
+        """
+        man_template = "(%s)"
+
+        inp_sql = """
+            INSERT INTO inp_pipe (
+                arc_id, minorloss, status, custom_roughness, custom_dint, reactionparam, reactionvalue, bulk_coeff, wall_coeff
+            ) VALUES %s
+        """  # --
+        inp_template = (
+            "(%s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        )
+
+        arc_params = []
+
+        inp_dict = {}
 
         for p_name, p in self.network.pipes():
             geometry = get_geometry_from_link(p)
@@ -1029,7 +1049,7 @@ class GwImportInpTask(GwTask):
             state = 1
             state_type = 2
             workcat_id = self.workcat
-            params.append(
+            arc_params.append(
                 (
                     geometry,
                     srid,
@@ -1046,12 +1066,52 @@ class GwImportInpTask(GwTask):
                     workcat_id,
                 )
             )
+            inp_dict[p_name] = {
+                "minorloss": p.minor_loss,
+                "status": p.initial_status.name.upper(),
+                "custom_roughness": p.roughness,
+                "custom_dint": p.diameter,
+                "reactionparam": None,
+                "reactionvalue": None,
+                "bulk_coeff": p.bulk_coeff,
+                "wall_coeff": p.wall_coeff,
+            }
 
+        # Insert into parent table
         pipes = toolsdb_execute_values(
-            sql, params, template, fetch=True, commit=True
+            arc_sql, arc_params, arc_template, fetch=True, commit=True
         )
-
         print(pipes)
+        if not pipes:
+            self._log_message("Pipes couldn't be inserted!")
+            return
+
+        man_params = []
+        inp_params = []
+
+        for p in pipes:
+            arc_id = p[0]
+            code = p[1]
+            man_params.append(
+                (arc_id,)
+            )
+
+            inp_data = inp_dict[code]
+            inp_params.append(
+                (arc_id, inp_data["minorloss"], inp_data["status"], inp_data["custom_roughness"], inp_data["custom_dint"],
+                 inp_data["reactionparam"], inp_data["reactionvalue"], inp_data["bulk_coeff"], inp_data["wall_coeff"],
+                 )
+            )
+            print(inp_params)
+
+        # Insert into inp table
+        toolsdb_execute_values(
+            inp_sql, inp_params, inp_template, fetch=False, commit=True
+        )
+        # Insert into man table
+        toolsdb_execute_values(
+            man_sql, man_params, man_template, fetch=False, commit=True
+        )
 
     def _log_message(self, message: str, end: str="\n"):
         self.log.append(message)
