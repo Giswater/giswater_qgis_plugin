@@ -26,7 +26,7 @@
          <x>0</x>
          <y>0</y>
          <width>317</width>
-         <height>394</height>
+         <height>395</height>
         </rect>
        </property>
        <layout class="QGridLayout" name="gridLayout">
@@ -200,6 +200,7 @@
   </action>
  </widget>
  <tabstops>
+  <tabstop>scrollArea</tabstop>
   <tabstop>txt_profile_id</tabstop>
   <tabstop>tbl_list_arc</tabstop>
   <tabstop>btn_load_profile</tabstop>
@@ -209,7 +210,6 @@
   <tabstop>txt_title</tabstop>
   <tabstop>date</tabstop>
   <tabstop>btn_draw_profile</tabstop>
-  <tabstop>scrollArea</tabstop>
  </tabstops>
  <resources/>
  <connections/>
