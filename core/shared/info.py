@@ -10,6 +10,7 @@ import os
 import re
 import urllib.parse as parse
 import webbrowser
+import traceback
 from functools import partial
 from qgis.core import QgsEditFormConfig
 
@@ -274,6 +275,7 @@ class GwInfo(QObject):
                 return False, None
         except Exception as e:
             tools_qgis.show_warning("Exception in info", parameter=e)
+            tools_log.log_error(f"{traceback.format_exc()}")
             self._disconnect_signals()  # Disconnect signals
             tools_qgis.restore_cursor()  # Restore overridden cursor
             return False, None
@@ -713,6 +715,11 @@ class GwInfo(QObject):
                                                                          'lyt_epa_data_1', 'lyt_epa_data_2'):
                     layout_list.append(layout)
 
+                if field['layoutname'] is None:
+                    message = "The field layoutname is not configured for"
+                    msg = f"formname:{self.tablename}, columnname:{field['columnname']}"
+                    tools_qgis.show_message(message, 2, parameter=msg, dialog=self.dlg_cf)
+                    continue
                 if field['layoutorder'] is None:
                     message = "The field layoutorder is not configured for"
                     msg = f"formname:{self.tablename}, columnname:{field['columnname']}"

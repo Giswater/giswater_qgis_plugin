@@ -1109,7 +1109,8 @@ def enable_widgets(dialog, result, enable):
             for field in result['fields']:
                 if widget.property('columnname') == field['columnname']:
                     # If it's not the main tab we want the widgets to be enabled
-                    if not any(substring in field['layoutname'] for substring in ['main', 'data', 'top', 'bot']): continue
+                    if field.get('layoutname') is not None and not any(substring in field['layoutname'] for substring in ['main', 'data', 'top', 'bot']):
+                        continue
                     if type(widget) in (QDoubleSpinBox, QLineEdit, QSpinBox, QTextEdit, GwHyperLinkLineEdit):
                         widget.setReadOnly(not enable)
                         widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(110, 110, 110)}")
