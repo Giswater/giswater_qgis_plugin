@@ -14,6 +14,7 @@ except ImportError:
 from qgis.PyQt.QtCore import pyqtSignal
 
 from ....libs import lib_vars, tools_db, tools_log
+from ...utils import tools_gw
 from ..task import GwTask
 
 
@@ -119,6 +120,7 @@ class GwImportInpTask(GwTask):
         self.exploitation: int = exploitation
         self.sector: int = sector
         self.municipality: int = municipality
+        self.dscenario_id: int = None
         self.catalogs: dict[str, Any] = catalogs
         self.log: list[str] = []
         self.mappings: dict[str, dict[str, str]] = {"curves": {}, "patterns": {}}
@@ -142,6 +144,9 @@ class GwImportInpTask(GwTask):
 
             self._log_message("Creating workcat")
             self._create_workcat_id()
+
+            self._log_message("Creating demand dscenario")
+            self._create_demand_dscenario()
 
             self._log_message("Creating new node catalogs")
             self._create_new_node_catalogs()
@@ -293,6 +298,26 @@ class GwImportInpTask(GwTask):
             (self.workcat, description, builtdate),
             commit=False,
         )
+
+    def _create_demand_dscenario(self):
+        extras = '"parameters": {'
+        extras += '"name": "demands_import_inp",'  # TODO: ask user for name?
+        extras += '"descript": "Demand dscenario used when importing INP file",'
+        extras += '"parent": null,'
+        extras += '"type": "DEMAND",'
+        extras += '"active": "true",'
+        extras += f'"expl": "{self.exploitation}"'
+        extras += '}'
+        body = tools_gw.create_body(extras=extras)
+        json_result = tools_gw.execute_procedure('gw_fct_create_dscenario_empty', body, commit=False, is_thread=True)
+        if not json_result or json_result.get('status') != 'Accepted':
+            message = "Error executing gw_fct_create_dscenario_empty"
+            raise ValueError(message)
+
+        self.dscenario_id = json_result['body']['data'].get('dscenario_id')
+        if self.dscenario_id is None:
+            message = "Function gw_fct_create_dscenario_empty returned no dscenario_id"
+            raise ValueError(message)
 
     def _create_new_node_catalogs(self):
         cat_node_ids = get_rows("SELECT id FROM cat_node", commit=False)
@@ -523,6 +548,15 @@ class GwImportInpTask(GwTask):
             "(%s, %s, %s, %s)"
         )
 
+        demands_sql = """
+            INSERT INTO inp_dscenario_demand (dscenario_id, feature_id, feature_type, demand, pattern_id, demand_type, source)
+            VALUES %s
+        """
+        demands_template = (
+            "(%s, %s, 'NODE', %s, %s, null, %s)"
+        )
+        demands_params = []
+
         node_params = []
 
         inp_dict = {}
@@ -564,6 +598,21 @@ class GwImportInpTask(GwTask):
                 "source_pattern_id": None
             }
 
+            # If only one demand timeseries, set pattern_id in inp_dict; otherwise, populate demands_params
+            if j.demand_timeseries_list:
+                inp_dict[j_name]["pattern_id"] = j.demand_timeseries_list[0].pattern_name
+                if len(j.demand_timeseries_list) > 1:
+                    for d in j.demand_timeseries_list:
+                        demands_params.append(
+                            (
+                                self.dscenario_id,
+                                j_name,
+                                d.base_value,
+                                d.pattern_name,
+                                d.category,
+                            )
+                        )
+
         # Insert into parent table
         junctions = toolsdb_execute_values(
             node_sql, node_params, node_template, fetch=True, commit=False
@@ -591,6 +640,15 @@ class GwImportInpTask(GwTask):
                 (node_id, inp_data["demand"], inp_data["emitter_coeff"], inp_data["init_quality"])
             )
 
+        # Update demands_params to replace j_name with node_id
+        for i, demand_param in enumerate(demands_params):
+            j_name = demand_param[1]  # Get the original j_name
+            node_id = self.node_ids.get(j_name)  # Find the node_id associated with j_name
+            if node_id is not None:
+                demands_params[i] = (demand_param[0], node_id, *demand_param[2:])
+            else:
+                self._log_message(f"Node ID for {j_name} not found!")
+
         # Insert into inp table
         toolsdb_execute_values(
             inp_sql, inp_params, inp_template, fetch=False, commit=False
@@ -599,6 +657,11 @@ class GwImportInpTask(GwTask):
         toolsdb_execute_values(
             man_sql, man_params, man_template, fetch=False, commit=False
         )
+        # Insert demands into dscenario table
+        toolsdb_execute_values(
+            demands_sql, demands_params, demands_template, fetch=False, commit=False
+        )
+
 
     def _save_reservoirs(self) -> None:
         feature_class = self.catalogs['features']['reservoirs'].lower()
