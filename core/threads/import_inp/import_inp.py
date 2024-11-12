@@ -272,7 +272,6 @@ class GwImportInpTask(GwTask):
                 "inpfile_units": "units",
             },
             "report": {
-                "headloss": "",  # TODO: add to database (sys_param_user)
                 "f-factor": "f_factor",
                 "report_filename": "file",
             }
@@ -290,6 +289,8 @@ class GwImportInpTask(GwTask):
                     # Recursively process nested dictionaries
                     process_options(value, category)
                 else:
+                    if category == "report" and type(value) is bool:
+                        value = "YES" if value else "NO"
                     prefix = prefix_map.get(category, "inp_options_")
                     param_name = params_map[category].get(key.lower(), key.lower())
                     param_name = f"{prefix}{param_name}"
