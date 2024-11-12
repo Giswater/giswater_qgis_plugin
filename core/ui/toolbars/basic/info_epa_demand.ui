@@ -7,8 +7,14 @@
     <x>0</x>
     <y>0</y>
     <width>965</width>
-    <height>484</height>
+    <height>489</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>182</width>
+    <height>203</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>Demand</string>
@@ -24,8 +30,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>943</width>
-        <height>394</height>
+        <width>947</width>
+        <height>413</height>
        </rect>
       </property>
       <attribute name="label">
