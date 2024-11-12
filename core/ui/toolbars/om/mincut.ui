@@ -10,6 +10,12 @@
     <height>768</height>
    </rect>
   </property>
+  <property name="minimumSize">
+   <size>
+    <width>387</width>
+    <height>333</height>
+   </size>
+  </property>
   <property name="font">
    <font>
     <weight>50</weight>
