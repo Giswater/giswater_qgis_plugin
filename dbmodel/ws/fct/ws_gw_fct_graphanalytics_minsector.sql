@@ -93,16 +93,16 @@ BEGIN
     JOIN cat_feature_node cf ON cf.id = cn.nodetype_id
     WHERE p.node_id = n.node_id AND (cf.graph_delimiter = 'MINSECTOR' OR cf.graph_delimiter = 'SECTOR');
 
-    -- If we want to ignore open but broken valves
-    IF v_ignorebrokenvalves THEN
-        UPDATE temp_pgr_node n SET graph_delimiter = NULL
-        FROM man_valve v 
-        WHERE n.node_id = v.node_id AND n.graph_delimiter = 'MINSECTOR' AND v.closed = FALSE AND v.broken = TRUE;
-    END IF;
-
     -- Set modif = TRUE for nodes where "graph_delimiter" = 'MINSECTOR'
     UPDATE temp_pgr_node n SET modif = TRUE
     WHERE n.graph_delimiter = 'MINSECTOR';
+
+    -- If we want to ignore open but broken valves
+    IF v_ignorebrokenvalves THEN
+        UPDATE temp_pgr_node n SET modif = FALSE
+        FROM man_valve v 
+        WHERE n.node_id = v.node_id AND n.graph_delimiter = 'MINSECTOR' AND v.closed = FALSE AND v.broken = TRUE;
+    END IF;
 
     -- Arcs to be disconnected: one of the two arcs that reach the valve
     UPDATE temp_pgr_arc a SET modif = TRUE, cost = -1, reverse_cost = -1
@@ -121,10 +121,6 @@ BEGIN
         FROM sector WHERE graphconfig IS NOT NULL AND active IS TRUE
     ) s
     WHERE n.node_id = s.node_id AND n.pgr_node_id = n.node_id::INTEGER AND n.graph_delimiter = 'SECTOR';
-
-    -- put in NULL the graph_delimiter for nodes that are 'SECTOR' but they are not HEAD in the table  "sector"
-    UPDATE temp_pgr_node n SET graph_delimiter = NULL
-    WHERE n.graph_delimiter ='SECTOR' AND n.modif=false;
 
     -- Arcs to be disconnected: all those that connect to the nodes where "graph_delimiter" = 'SECTOR' and are also in the "sector" table
     UPDATE temp_pgr_arc p SET modif = TRUE, cost = -1, reverse_cost = -1
