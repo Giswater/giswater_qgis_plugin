@@ -240,11 +240,42 @@ class GwImportInpTask(GwTask):
             "time": "inp_times_",
             "hydraulic": "inp_options_",
             "report": "inp_report_",
-            "quality": "inp_quality_",
+            "quality": "inp_options_",
             "reaction": "inp_reactions_",
             "energy": "inp_energy_",
             # "graphics": "inp_graphics_",
             # "user": "inp_user_"
+        }
+        params_map = {
+            "energy": {
+                "global_price": "price",
+                "global_pattern": "price_pattern",
+                "global_efficiency": "pump_effic",
+            },
+            "time": {
+            },
+            "quality": {
+                "parameter": "quality_mode",
+                "trace_node": "node_id",
+            },
+            "reaction": {
+                "bulk_coeff": "global_bulk",
+                "wall_coeff": "global_wall",
+                "limiting_potential": "limit_concentration",
+                "roughness_correl": "wall_coeff_correlation",
+            },
+            "hydraulic": {
+                "hydraulics_filename": "hydraulics_fname",
+                "unbalanced_value": "unbalanced_n",
+                "headerror": "max_headerror",
+                "flowchange": "max_flowchange",
+                "inpfile_units": "units",
+            },
+            "report": {
+                "headloss": "",  # TODO: add to database (sys_param_user)
+                "f-factor": "f_factor",
+                "report_filename": "file",
+            }
         }
 
         # List to accumulate parameters for batch update
@@ -252,26 +283,24 @@ class GwImportInpTask(GwTask):
 
         options_dict = dict(self.network.options)
 
-        def process_options(options, prefix, parent_key=""):
+        def process_options(options, category):
             """Recursively process options, including nested dictionaries."""
             for key, value in options.items():
-                # Build the full parameter name
-                full_key = f"{parent_key}_{key.lower()}" if parent_key else key.lower()
-
                 if isinstance(value, dict):
                     # Recursively process nested dictionaries
-                    process_options(value, prefix, full_key)
+                    process_options(value, category)
                 else:
-                    param_name = f"{prefix}{full_key}"
+                    prefix = prefix_map.get(category, "inp_options_")
+                    param_name = params_map[category].get(key.lower(), key.lower())
+                    param_name = f"{prefix}{param_name}"
                     update_params.append((str(value), param_name))
 
         # Iterate over each category and its options
         for category, options in options_dict.items():
-            if category in ("graphics", "user", "quality"):
+            if category in ("graphics", "user"):
                 continue
-            prefix = prefix_map.get(category, "inp_options_")  # Default prefix if not in map
 
-            process_options(options, prefix)
+            process_options(options, category)
 
         # SQL query for batch update
         sql = """
@@ -281,6 +310,9 @@ class GwImportInpTask(GwTask):
             WHERE config_param_user.parameter::text = data.parameter::text;
         """
         template = "(%s, %s)"
+
+        print("OPTIONS:")
+        print(update_params)
 
         # Execute batch update
         toolsdb_execute_values(sql, update_params, template, fetch=False, commit=False)
