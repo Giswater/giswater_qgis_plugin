@@ -943,3 +943,5 @@ INSERT INTO inp_typevalue (typevalue,id,idval) VALUES ('inp_value_status_valve',
 -- 12/11/24
 INSERT INTO sys_param_user (id,formname,descript,sys_role,idval,"label",dv_querytext,isenabled,layoutorder,project_type,isparent,isautoupdate,"datatype",widgettype,ismandatory,vdefault,layoutname,iseditable,"source")
 	VALUES ('inp_report_headloss','epaoptions','If true, value of headloss will be reported','role_epa','HEADLOSS','Headloss','SELECT idval AS id, idval FROM inp_typevalue WHERE typevalue=''inp_value_yesno''',true,11,'ws',false,false,'string','combo',true,'YES','lyt_reports_1',false,'core');
+
+DELETE FROM config_form_fields WHERE columnname = 'energyvalue';
