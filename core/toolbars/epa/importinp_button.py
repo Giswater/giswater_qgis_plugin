@@ -316,6 +316,7 @@ class GwImportInp(GwAction):
                 'DELETE FROM inp_pump CASCADE;',
                 'DELETE FROM inp_virtualpump CASCADE;',
                 'DELETE FROM inp_virtualvalve CASCADE;',
+                'DELETE FROM inp_dscenario_demand CASCADE;',
                 'DELETE FROM inp_curve CASCADE;',
                 'DELETE FROM inp_pattern_value CASCADE;',
                 'DELETE FROM inp_pattern CASCADE;',
@@ -323,6 +324,7 @@ class GwImportInp(GwAction):
                 'DELETE FROM inp_rules CASCADE;',
                 'DELETE FROM arc CASCADE;',
                 "DELETE FROM cat_work WHERE id = 'import_inp_test';",
+                "DELETE FROM cat_dscenario WHERE expl_id = 1;",
                 "DELETE FROM cat_arc CASCADE;"
                 "DELETE FROM cat_mat_arc CASCADE;",
                 "DELETE FROM cat_mat_roughness CASCADE;",
@@ -338,7 +340,10 @@ class GwImportInp(GwAction):
                 "INSERT INTO sector (sector_id, name, muni_id, expl_id, macrosector_id, descript, active) VALUES (1, 'sector_1_import_inp_test', '{1}'::int[], '{1}'::int[], 0, 'Created by import inp in TESTING MODE', true);"
             ]
             for sql in queries:
-                tools_db.execute_sql(sql)
+                result = tools_db.execute_sql(sql, commit=False)
+                if not result:
+                    return
+
 
             # Set variables
             workcat = "import_inp_test"
