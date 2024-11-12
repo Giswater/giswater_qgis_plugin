@@ -6,8 +6,8 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 3134
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_create_dscenario_empty(p_data json) 
-RETURNS json AS 
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_create_dscenario_empty(p_data json)
+RETURNS json AS
 $BODY$
 
 /*EXAMPLE
@@ -53,20 +53,20 @@ BEGIN
 
 	-- select version
 	SELECT giswater, project_type INTO v_version, v_projecttype FROM sys_version ORDER BY id DESC LIMIT 1;
-	
-	-- getting input data 	
+
+	-- getting input data
 	v_name :=  ((p_data ->>'data')::json->>'parameters')::json->>'name';
 	v_descript :=  ((p_data ->>'data')::json->>'parameters')::json->>'descript';
 	v_parent_id :=  ((p_data ->>'data')::json->>'parameters')::json->>'parent';
 	v_dscenario_type :=  ((p_data ->>'data')::json->>'parameters')::json->>'type';
 	v_active :=  ((p_data ->>'data')::json->>'parameters')::json->>'active';
 	v_expl_id :=  ((p_data ->>'data')::json->>'parameters')::json->>'expl';
-	
-		
+
+
 	-- Reset values
 	DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=v_fid;
-	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid;	
-	
+	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid;
+
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('CREATE EMPTY DSCENARIO'));
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '--------------------------------------------------');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Name: ',v_name));
@@ -78,7 +78,7 @@ BEGIN
 
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 3, 'ERRORS');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 3, '--------');
-	
+
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 2, 'WARNINGS');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 2, '---------');
 
@@ -89,17 +89,17 @@ BEGIN
 	-- inserting on catalog table
 	PERFORM setval('SCHEMA_NAME.cat_dscenario_dscenario_id_seq'::regclass,(SELECT max(dscenario_id) FROM cat_dscenario) ,true);
 
-	INSERT INTO cat_dscenario (name, descript, parent_id, dscenario_type, active, expl_id,log) 
+	INSERT INTO cat_dscenario (name, descript, parent_id, dscenario_type, active, expl_id,log)
 	VALUES (v_name, v_descript, v_parent_id, v_dscenario_type, v_active, v_expl_id, concat('Created by ',current_user,' on ',substring(now()::text,0,20)))
 	ON CONFLICT (name) DO NOTHING
 	RETURNING dscenario_id INTO v_scenarioid;
 
 	IF v_scenarioid IS NULL THEN
 		SELECT dscenario_id INTO v_scenarioid FROM cat_dscenario where name = v_name;
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 		VALUES (v_fid, null, 3, concat('ERROR: The dscenario ( ',v_scenarioid,' ) already exists with proposed name ',v_name ,'. Please try another one.'));
-	ELSE 
-	
+	ELSE
+
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, 'The new dscenario have been created sucessfully');
 	END IF;
 
@@ -109,20 +109,20 @@ BEGIN
 
 	-- get results
 	-- info
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid order by criticity desc, id asc) row;
-	v_result := COALESCE(v_result, '{}'); 
+	v_result := COALESCE(v_result, '{}');
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
 	-- Control nulls
-	v_result_info := COALESCE(v_result_info, '{}'); 
+	v_result_info := COALESCE(v_result_info, '{}');
 
 	-- Return
 	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Analysis done successfully"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
-		     ',"data":{ "info":'||v_result_info||
+		     ',"data":{ "dscenario_id": "'||v_scenarioid||'","info":'||v_result_info||
 			'}}'||
-	    '}')::json, 3042, null, null, null); 
+	    '}')::json, 3042, null, null, null);
 
 END;
 $BODY$
