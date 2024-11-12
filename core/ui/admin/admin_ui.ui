@@ -45,6 +45,12 @@
        <layout class="QGridLayout" name="gridLayout">
         <item row="0" column="1">
          <widget class="QScrollArea" name="scrollArea">
+          <property name="minimumSize">
+           <size>
+            <width>370</width>
+            <height>273</height>
+           </size>
+          </property>
           <property name="widgetResizable">
            <bool>true</bool>
           </property>
@@ -53,8 +59,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>509</width>
-             <height>807</height>
+             <width>501</width>
+             <height>790</height>
             </rect>
            </property>
            <layout class="QGridLayout" name="gridLayout_11">
@@ -373,6 +379,12 @@
        <layout class="QGridLayout" name="gridLayout_21">
         <item row="0" column="0">
          <widget class="QScrollArea" name="scrollArea_2">
+          <property name="minimumSize">
+           <size>
+            <width>370</width>
+            <height>273</height>
+           </size>
+          </property>
           <property name="widgetResizable">
            <bool>true</bool>
           </property>
@@ -381,8 +393,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>509</width>
-             <height>838</height>
+             <width>350</width>
+             <height>365</height>
             </rect>
            </property>
            <layout class="QGridLayout" name="gridLayout_12">
@@ -576,8 +588,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>509</width>
-             <height>838</height>
+             <width>199</width>
+             <height>294</height>
             </rect>
            </property>
            <layout class="QGridLayout" name="gridLayout_20">
