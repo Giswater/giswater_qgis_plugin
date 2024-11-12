@@ -936,11 +936,11 @@ class GwImportInpTask(GwTask):
 
         inp_sql = """
             INSERT INTO inp_virtualpump (
-                arc_id, power, curve_id, speed, pattern_id, status, energyvalue, effic_curve_id, energy_price, energy_pattern_id, pump_type
+                arc_id, power, curve_id, speed, pattern_id, status, effic_curve_id, energy_price, energy_pattern_id, pump_type
             ) VALUES %s
         """  # --
         inp_template = (
-            "(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+            "(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
         )
 
         arc_params = []
@@ -987,7 +987,6 @@ class GwImportInpTask(GwTask):
                 "speed": p.base_speed,
                 "pattern_id": p.speed_pattern_name,
                 "status": p.initial_status.name.upper(),
-                "energyvalue": None,
                 "effic_curve_id": p.efficiency.name if p.efficiency else None,
                 "energy_price": p.energy_price,
                 "energy_pattern_id": p.energy_pattern,
@@ -1022,7 +1021,7 @@ class GwImportInpTask(GwTask):
             inp_data = inp_dict[code]
             inp_params.append(
                 (arc_id, inp_data["power"], inp_data["curve_id"], inp_data["speed"], inp_data["pattern_id"],
-                 inp_data["status"], inp_data["energyvalue"], inp_data["effic_curve_id"], inp_data["energy_price"],
+                 inp_data["status"], inp_data["effic_curve_id"], inp_data["energy_price"],
                  inp_data["energy_pattern_id"], inp_data["pump_type"])
             )
 
