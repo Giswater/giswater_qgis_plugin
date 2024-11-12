@@ -23,16 +23,19 @@ DECLARE
 
 BEGIN
 
+	-- Search path
     SET search_path = "SCHEMA_NAME", public;
 
+    -- Select configuration values
     SELECT giswater, project_type INTO v_version, v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
 
-    v_fct_name = (SELECT (p_data::json->>'data')::json->>'fct_name'); -- Get the function name
+	-- Get variables from input JSON
+    v_fct_name = (SELECT (p_data::json->>'data')::json->>'fct_name');
 
     CREATE TEMP TABLE temp_pgr_node (
         pgr_node_id INT NOT NULL,
         node_id VARCHAR(16),
-        zone_id INTEGER DEFAULT 0, -- By default it's Undefined; it's text because the "id" field for presszone is text, but XTR has already changed to integer;
+        zone_id INTEGER DEFAULT 0,
         modif BOOL DEFAULT FALSE,  -- True if nodes have to be disconnected - closed valves, starts of mapzones
         graph_delimiter VARCHAR(30),
         CONSTRAINT temp_pgr_node_pkey PRIMARY KEY (pgr_node_id)
@@ -62,7 +65,7 @@ BEGIN
     GRANT UPDATE, INSERT, REFERENCES, SELECT, DELETE, TRUNCATE, TRIGGER ON TABLE temp_pgr_arc TO role_basic;
 
 
-    CREATE TABLE temp_pgr_connec (
+    CREATE TEMP TABLE temp_pgr_connec (
         connec_id varchar(16),
         arc_id varchar(16),
         zone_id INTEGER DEFAULT 0,
@@ -72,7 +75,7 @@ BEGIN
     CREATE INDEX temp_pgr_connec_connec_id ON temp_pgr_connec USING btree (connec_id);
     CREATE INDEX temp_pgr_connec_arc_id ON temp_pgr_connec USING btree (arc_id);
 
-    CREATE TABLE temp_pgr_link (
+    CREATE TEMP TABLE temp_pgr_link (
         link_id varchar(16),
         feature_id varchar(16),
         feature_type varchar(16),
@@ -111,7 +114,7 @@ BEGIN
 
     -- Create temporary layers depending on the project type
     IF v_project_type = 'UD' THEN
-        CREATE TABLE temp_pgr_gully (
+        CREATE TEMP TABLE temp_pgr_gully (
             gully_id varchar(16),
             arc_id varchar(16),
             zone_id INTEGER DEFAULT 0,

@@ -17,15 +17,19 @@ SELECT gw_fct_graphanalytics_delete_temptables('{"data":{"fct_name":"MINSECTOR"}
 
 DECLARE
 
-    v_project_type text;
+	v_version TEXT;
+    v_project_type TEXT;
     v_fct_name TEXT;
 
 BEGIN
 
+	-- Search path
     SET search_path = "SCHEMA_NAME", public;
 
+    -- Select configuration values
     SELECT project_type INTO v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
 
+    -- Get variables from input JSON
     v_fct_name = (SELECT (p_data::json->>'data')::json->>'fct_name'); -- Get the function name
 
     -- Drop temporary layers

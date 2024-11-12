@@ -20,17 +20,20 @@ It is an auxiliary process used by macro_minsector, minsector, or mapzone that g
 
 DECLARE
 
-    v_record record;
-    v_id integer = 0;
-    v_project_type text;
-    v_cost integer=1;
-    v_reverse_cost integer=1;
+	v_version TEXT;
+    v_record RECORD;
+    v_id INTEGER = 0;
+    v_project_type TEXT;
+    v_cost INTEGER = 1;
+    v_reverse_cost INTEGER = 1;
 
 BEGIN
 
+	-- Search path
     SET search_path = "SCHEMA_NAME", public;
 
-    SELECT project_type INTO v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
+    -- Select configuration values
+    SELECT giswater, UPPER(project_type) INTO v_version, v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
 
     IF v_project_type = 'UD' THEN v_reverse_cost=-1; END IF;
 
