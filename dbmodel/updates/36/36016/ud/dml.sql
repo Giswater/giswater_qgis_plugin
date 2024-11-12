@@ -22,5 +22,5 @@ update rpt_cat_result set network_type = 1 where network_type is null;
 
 -- 12/11/24
 UPDATE config_form_fields
-	SET layoutname='lyt_data_1', layoutorder=10, "datatype"='string',
+	SET layoutname='lyt_data_1', layoutorder=10, "datatype"='string'
 	WHERE formname='v_edit_raingage' AND columnname='muni_id';
