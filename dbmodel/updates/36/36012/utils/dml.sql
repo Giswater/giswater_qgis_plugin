@@ -176,7 +176,20 @@ group by c.formname, formtype, tabname,  layoutname, datatype, widgettype, label
 iseditable, isautoupdate,  dv_querytext, dv_orderby_id, dv_isnullvalue, lytorder, hidden
 ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
-INSERT INTO selector_municipality SELECT muni_id,current_user FROM ext_municipality;
+
+DO $$
+DECLARE
+    v_utils boolean;
+BEGIN
+
+	SELECT value::boolean INTO v_utils FROM config_param_system WHERE parameter='admin_utils_schema';
+
+	IF v_utils IS true THEN
+		INSERT INTO selector_municipality SELECT muni_id,current_user FROM utils.municipality;
+    ELSE
+		INSERT INTO selector_municipality SELECT muni_id,current_user FROM ext_municipality;
+    END IF;
+END; $$;
 
 -- clean code for user's selector function
 UPDATE config_param_system set value = gw_fct_json_object_delete_keys(value::json, 'explFromMuni') where parameter = 'basic_selector_tab_municipality';
