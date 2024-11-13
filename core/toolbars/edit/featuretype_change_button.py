@@ -313,7 +313,7 @@ def btn_accept_featuretype_change(**kwargs):
                 message = "Selected values are not valid for this process, they are not related to selected feature."
                 tools_qgis.show_warning(message, dialog=dialog)
                 return
-        
+
             # Get function input parameters
             feature = f'"type":"{this.feature_type}"'
             extras = f'"feature_id":"{this.feature_id}"'
@@ -403,20 +403,26 @@ def cmb_new_featuretype_selection_changed(**kwargs):
     json_result = tools_gw.execute_procedure("gw_fct_getchangefeaturetype", body)
 
     for field in json_result['body']['data']['fields']:
-        if field.get('widgetcontrols') and field['widgetcontrols'].get('reloadFields'):
-            reload_fields = field['widgetcontrols'].get('reloadFields')
-        if field.get('hidden') or (field.get('widgetcontrols') and field['widgetcontrols'].get('hiddenWhenNull')
-                                       and field.get('value') in (None, '')) or field['columnname'] not in reload_fields:
-                continue
+        widgetcontrols = field.get('widgetcontrols')
+        if widgetcontrols:
+            reload_fields = widgetcontrols.get('reloadFields', [])
+
+        if field.get('hidden') or (
+            widgetcontrols and widgetcontrols.get('hiddenWhenNull') and field.get('value') in (None, '')
+        ) or field['columnname'] not in reload_fields:
+            continue
+
         if field['widgettype'] == 'combo':
             tools_gw.fill_combo(tools_qt.get_widget(dialog, field['widgetname']), field)
         if field['widgettype'] == 'typeahead':
-            if 'queryText' not in field or field.get('queryText') is None or 'queryTextFilter' not in field:
-                if 'comboIds' in field and 'comboNames' in field:
-                    selected_value = tools_qt.get_widget_value(dialog, tools_qt.get_widget(dialog, field['widgetname']))
-                    rows = []
-                    for i in range(0, len(field.get('comboIds'))):
-                        rows.append([field.get('comboIds')[i], field.get('comboNames')[i]])
-                    tools_qt.set_completer_rows(tools_qt.get_widget(dialog, field['widgetname']), rows)
-                    if not (selected_value.startswith('(') and selected_value.endswith(')')):
-                        tools_qt.set_widget_text(dialog, tools_qt.get_widget(dialog, field['widgetname']), f"({selected_value})")
+            # Retrieve widget and selected value
+            widget = tools_qt.get_widget(dialog, field['widgetname'])
+            selected_value = tools_qt.get_widget_value(dialog, widget)
+
+            # Populate rows from comboIds and comboNames
+            rows = list(zip(field.get('comboIds', []), field.get('comboNames', [])))
+            tools_qt.set_completer_rows(widget, rows)
+
+            # Update widget text if the selected value does not already appear formatted
+            if not (selected_value.startswith('(') and selected_value.endswith(')')):
+                tools_qt.set_widget_text(dialog, widget, f"{selected_value}")
