@@ -55,9 +55,7 @@ BEGIN
         SELECT string_agg(expl_id::TEXT, ',') INTO v_expl_id FROM exploitation;
     END IF;
 
-	SELECT string_agg(DISTINCT macrominsector_id::TEXT, ',') INTO v_macrominsector_id_arc FROM arc a WHERE a.expl_id::TEXT IN (v_expl_id);
-
-
+	SELECT string_agg(DISTINCT macrominsector_id::TEXT, ',') INTO v_macrominsector_id_arc FROM arc a WHERE a.expl_id::TEXT = ANY(string_to_array(v_expl_id, ','));
 
     INSERT INTO temp_pgr_arc (pgr_arc_id, arc_id, pgr_node_1, pgr_node_2, node_1, node_2, cost, reverse_cost)
     (
@@ -66,12 +64,12 @@ BEGIN
         JOIN value_state_type s ON s.id = a.state_type
         WHERE a.state = 1 AND s.is_operative = TRUE
         AND a.node_1 IS NOT NULL AND a.node_2 IS NOT NULL -- Avoids the crash of pgrouting functions
-        AND a.macrominsector_id::TEXT IN (v_macrominsector_id_arc)
+        AND a.macrominsector_id::TEXT = ANY(string_to_array(v_macrominsector_id_arc, ','))
     );
 
     INSERT INTO temp_pgr_node (pgr_node_id, node_id)
     (
-        SELECT node_id::INT, node_id
+        SELECT DISTINCT node_id::INT, node_id
         FROM node n
         JOIN temp_pgr_arc a ON n.node_id IN (a.node_1, a.node_2)
         JOIN value_state_type s ON s.id = n.state_type
