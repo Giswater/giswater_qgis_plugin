@@ -286,7 +286,7 @@ def btn_accept_featuretype_change(**kwargs):
 
     project_type = tools_gw.get_project_type()
     feature_type_new = tools_qt.get_combo_value(dialog, "tab_none_feature_type_new", 1)
-    featurecat_id = tools_qt.get_combo_value(dialog, "tab_none_featurecat_id", 1)
+    featurecat_id = tools_qt.get_widget_value(dialog, "tab_none_featurecat_id")
 
     fluid_type = tools_qt.get_combo_value(dialog, 'tab_none_fluid_type', 1)
     if fluid_type is None:
@@ -405,9 +405,18 @@ def cmb_new_featuretype_selection_changed(**kwargs):
     for field in json_result['body']['data']['fields']:
         if field.get('widgetcontrols') and field['widgetcontrols'].get('reloadFields'):
             reload_fields = field['widgetcontrols'].get('reloadFields')
-        if field['widgettype'] == 'combo':
-            if field.get('hidden') or (field.get('widgetcontrols') and field['widgetcontrols'].get('hiddenWhenNull')
+        if field.get('hidden') or (field.get('widgetcontrols') and field['widgetcontrols'].get('hiddenWhenNull')
                                        and field.get('value') in (None, '')) or field['columnname'] not in reload_fields:
                 continue
-
+        if field['widgettype'] == 'combo':
             tools_gw.fill_combo(tools_qt.get_widget(dialog, field['widgetname']), field)
+        if field['widgettype'] == 'typeahead':
+            if 'queryText' not in field or field.get('queryText') is None or 'queryTextFilter' not in field:
+                if 'comboIds' in field and 'comboNames' in field:
+                    selected_value = tools_qt.get_widget_value(dialog, tools_qt.get_widget(dialog, field['widgetname']))
+                    rows = []
+                    for i in range(0, len(field.get('comboIds'))):
+                        rows.append([field.get('comboIds')[i], field.get('comboNames')[i]])
+                    tools_qt.set_completer_rows(tools_qt.get_widget(dialog, field['widgetname']), rows)
+                    if not (selected_value.startswith('(') and selected_value.endswith(')')):
+                        tools_qt.set_widget_text(dialog, tools_qt.get_widget(dialog, field['widgetname']), f"({selected_value})")

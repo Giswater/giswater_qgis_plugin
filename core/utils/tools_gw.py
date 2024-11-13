@@ -1995,8 +1995,14 @@ def add_calendar(dlg, fld, **kwargs):
 def set_typeahead(field, dialog, widget, completer, feature_id=None):
 
     if field['widgettype'] == 'typeahead':
-        if 'queryText' not in field or 'queryTextFilter' not in field:
+        if 'queryText' not in field or field.get('queryText') is None or 'queryTextFilter' not in field:
+            if 'comboIds' in field and 'comboNames' in field:
+                rows = []
+                for i in range(0, len(field.get('comboIds'))):
+                    rows.append([field.get('comboIds')[i], field.get('comboNames')[i]])
+                tools_qt.set_completer_rows(widget, rows)
             return widget
+            
         widget.setProperty('typeahead', True)
         model = QStringListModel()
         widget.textChanged.connect(partial(fill_typeahead, completer, model, field, dialog, widget, feature_id))
@@ -4628,7 +4634,7 @@ def _manage_typeahead(**kwargs):
     dialog = kwargs['dialog']
     field = kwargs['field']
     complet_result = kwargs['complet_result']
-    feature_id = complet_result['body']['feature']['id']
+    feature_id = complet_result['body']['feature'].get('id', None)
     completer = QCompleter()
     widget = _manage_text(**kwargs)
     widget = set_typeahead(field, dialog, widget, completer, feature_id=feature_id)
