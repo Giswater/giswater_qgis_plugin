@@ -35,7 +35,6 @@ BEGIN
     UPDATE node SET macrominsector_id = 0;
     UPDATE arc SET macrominsector_id = 0;
     UPDATE connec SET macrominsector_id = 0;
-    UPDATE link SET macrominsector_id = 0;
 
     UPDATE node n SET macrominsector_id = c.component
     FROM (
@@ -54,10 +53,6 @@ BEGIN
     UPDATE connec c SET macrominsector_id = a.macrominsector_id
     FROM (SELECT arc_id, macrominsector_id FROM arc) a
     WHERE c.arc_id = a.arc_id AND a.macrominsector_id <> 0;
-
-    UPDATE link l SET macrominsector_id = c.macrominsector_id
-    FROM (SELECT connec_id, macrominsector_id FROM connec) c
-    WHERE l.feature_id = c.connec_id AND c.macrominsector_id <> 0;
 
     IF v_project_type = 'UD' THEN
         UPDATE gully g SET macrominsector_id = a.macrominsector_id
