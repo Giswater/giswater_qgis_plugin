@@ -407,9 +407,20 @@ BEGIN
 
 
 
+	IF v_audit_result is null THEN
+		v_status = 'Accepted';
+		v_level = 3;
+		v_message = 'Mapzones dynamic analysis done succesfull';
+	ELSE
+		SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'status')::text INTO v_status;
+		SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'level')::integer INTO v_level;
+		SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'message')::text INTO v_message;
+	END IF;
+
+
 	IF v_commitchanges IS FALSE THEN
 		-- arc elements
-
+		IF v_floodonlymapzone IS NULL THEN
 			EXECUTE 'SELECT jsonb_agg(features.feature) 
 			FROM (
 				SELECT jsonb_build_object(
@@ -427,11 +438,50 @@ BEGIN
 				) row 
 			) features'
 			INTO v_result;
-
+		ELSE
+			EXECUTE 'SELECT jsonb_agg(features.feature) 
+			FROM (
+				SELECT jsonb_build_object(
+					''type'',       ''Feature'',
+					''geometry'',   ST_AsGeoJSON(the_geom)::jsonb,
+					''properties'', to_jsonb(row) - ''the_geom''
+				) AS feature
+				FROM (
+					SELECT t.arc_id, a.arccat_id, a.state, a.expl_id, a.'||v_mapzone_field||'::TEXT AS mapzone_id, a.the_geom, m.name AS descript 
+					FROM temp_pgr_arc t
+					JOIN arc a USING (arc_id)
+					JOIN '|| v_mapzone_name ||' m USING ('|| v_mapzone_field ||')
+					WHERE '|| v_mapzone_field ||'::integer IN ('||v_floodonlymapzone||')
+					AND t.pgr_arc_id = t.arc_id::INT
+				) row 
+			) features'
+			INTO v_result;
+		END IF;
 		v_result := COALESCE(v_result, '{}');
 		v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}');
 
 		v_result = null;
+
+		-- polygon elements
+		EXECUTE 'SELECT jsonb_agg(features.feature) 
+			FROM (
+				SELECT jsonb_build_object(
+					''type'',       ''Feature'',
+					''geometry'',   ST_AsGeoJSON(the_geom)::jsonb,
+					''properties'', to_jsonb(row) - ''the_geom''
+				) AS feature
+				FROM (
+					SELECT n.'||v_mapzone_field||'::TEXT AS mapzone_id, m.name AS descript, '||v_fid||' as fid, n.expl_id, n.the_geom
+					FROM temp_pgr_node t
+					JOIN node n USING (node_id)
+					JOIN '|| v_mapzone_name ||' m USING ('|| v_mapzone_field ||')
+					WHERE t.pgr_node_id = t.node_id::INT
+				) row 
+			) features'
+			INTO v_result;
+
+		v_result := COALESCE(v_result, '{}');
+		v_result_polygon = concat ('{"geometryType":"Polygon", "features":',v_result, '}');
 
 	END IF;
 
@@ -444,6 +494,16 @@ BEGIN
     IF v_response->>'status' <> 'Accepted' THEN
         RETURN v_response;
     END IF;
+
+	-- Control NULL values
+	v_result_info := COALESCE(v_result_info, '{}');
+	v_result_point := COALESCE(v_result_point, '{}');
+	v_result_line := COALESCE(v_result_line, '{}');
+	v_result_polygon := COALESCE(v_result_polygon, '{}');
+	v_level := COALESCE(v_level, 0);
+	v_message := COALESCE(v_message, '');
+	v_version := COALESCE(v_version, '');
+	v_netscenario := COALESCE(v_netscenario, '');
 
 	--  Return
 	RETURN json_build_object(
