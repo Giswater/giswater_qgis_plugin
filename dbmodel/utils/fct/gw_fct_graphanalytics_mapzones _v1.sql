@@ -315,7 +315,7 @@ BEGIN
 		AND n.to_arc IS NOT NULL AND n.closed is null 
 		AND a.pgr_node_1=a.node_1::INT;
 
-        UPDATE temp_pgr_arc a SET cost = 1
+        UPDATE temp_pgr_arc a SET reverse_cost = 1
 		FROM temp_pgr_node n ON a.node_1 = n.node_id
         WHERE n.pgr_node_id = n.node_id::INT 
 		AND a.cost = -1 AND (a.graph_delimiter = 'minsector' OR a.graph_delimiter is null) 
