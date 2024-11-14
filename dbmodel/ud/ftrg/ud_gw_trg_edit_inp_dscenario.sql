@@ -142,24 +142,24 @@ BEGIN
 		ELSIF v_dscenario_type = 'LID-USAGE' THEN
 
 			-- default values
-			IF NEW.numelem IS NULL THEN NEW.numelem = (SELECT elev FROM v_edit_inp_dscenario_lid_usage 
+			IF NEW.numelem IS NULL THEN NEW.numelem = (SELECT elev FROM v_edit_inp_dscenario_lids 
 			WHERE dscenario_id = NEW.dscenario_id AND subc_id=NEW.subc_id);END IF;
-			IF NEW.area IS NULL THEN NEW.area = (SELECT area FROM v_edit_inp_dscenario_lid_usage
+			IF NEW.area IS NULL THEN NEW.area = (SELECT area FROM v_edit_inp_dscenario_lids
 			WHERE dscenario_id = NEW.dscenario_id AND subc_id=NEW.subc_id );END IF;
-			IF NEW.width IS NULL THEN NEW.width = (SELECT width FROM v_edit_inp_dscenario_lid_usage
+			IF NEW.width IS NULL THEN NEW.width = (SELECT width FROM v_edit_inp_dscenario_lids
 			WHERE dscenario_id = NEW.dscenario_id AND subc_id=NEW.subc_id );END IF;
-			IF NEW.initsat IS NULL THEN NEW.initsat = (SELECT initsat FROM v_edit_inp_dscenario_lid_usage
+			IF NEW.initsat IS NULL THEN NEW.initsat = (SELECT initsat FROM v_edit_inp_dscenario_lids
 			WHERE dscenario_id = NEW.dscenario_id AND subc_id=NEW.subc_id );END IF;
-			IF NEW.fromimp IS NULL THEN NEW.fromimp = (SELECT fromimp FROM v_edit_inp_dscenario_lid_usage
+			IF NEW.fromimp IS NULL THEN NEW.fromimp = (SELECT fromimp FROM v_edit_inp_dscenario_lids
 			WHERE dscenario_id = NEW.dscenario_id AND subc_id=NEW.subc_id );END IF;
-			IF NEW.toperv IS NULL THEN NEW.toperv = (SELECT toperv FROM v_edit_inp_dscenario_lid_usage
+			IF NEW.toperv IS NULL THEN NEW.toperv = (SELECT toperv FROM v_edit_inp_dscenario_lids
 			WHERE dscenario_id = NEW.dscenario_id AND subc_id=NEW.subc_id );END IF;
-			IF NEW.rptfile IS NULL THEN NEW.rptfile = (SELECT rptfile FROM v_edit_inp_dscenario_lid_usage
+			IF NEW.rptfile IS NULL THEN NEW.rptfile = (SELECT rptfile FROM v_edit_inp_dscenario_lids
 			WHERE dscenario_id = NEW.dscenario_id AND subc_id=NEW.subc_id );END IF;
-			IF NEW.descript IS NULL THEN NEW.descript = (SELECT descript FROM v_edit_inp_dscenario_lid_usage
+			IF NEW.descript IS NULL THEN NEW.descript = (SELECT descript FROM v_edit_inp_dscenario_lids
 			WHERE dscenario_id = NEW.dscenario_id AND subc_id=NEW.subc_id );END IF;
 	 	
-			INSERT INTO inp_dscenario_lid_usage (dscenario_id, subc_id, lidco_id, numelem, area, width, initsat, fromimp, toperv, rptfile, descript)
+			INSERT INTO inp_dscenario_lids (dscenario_id, subc_id, lidco_id, numelem, area, width, initsat, fromimp, toperv, rptfile, descript)
 	 		VALUES (NEW.dscenario_id, NEW.subc_id, NEW.lidco_id, NEW.numelem, NEW.area, NEW.width, NEW.initsat, NEW.fromimp, NEW.toperv, NEW.rptfile,NEW.descript);
 		
 
@@ -275,8 +275,8 @@ BEGIN
 		 	y0=NEW.y0, ysur=NEW.ysur, apond=NEW.apond, outfallparam=NEW.outfallparam 
 		 	WHERE dscenario_id=OLD.dscenario_id AND node_id=OLD.node_id;
 	
-		 ELSIF v_dscenario_type = 'LID-USAGE' THEN
-			UPDATE inp_dscenario_lid_usage SET dscenario_id=NEW.dscenario_id, subc_id=NEW.subc_id, lidco_id=NEW.lidco_id, 
+		 ELSIF v_dscenario_type = 'LIDS' THEN
+			UPDATE inp_dscenario_lids SET dscenario_id=NEW.dscenario_id, subc_id=NEW.subc_id, lidco_id=NEW.lidco_id, 
 			numelem=NEW.numelem, area=NEW.area, width=NEW.width, initsat=NEW.initsat, fromimp=NEW.fromimp, toperv=NEW.toperv, rptfile=NEW.rptfile, descript=NEW.descript
 			WHERE dscenario_id = OLD.dscenario_id AND subc_id=OLD.subc_id;
 
@@ -332,8 +332,8 @@ BEGIN
 		ELSIF v_dscenario_type = 'JUNCTION' THEN
 			DELETE FROM inp_dscenario_junction WHERE dscenario_id=OLD.dscenario_id AND node_id=OLD.node_id;
 
-		ELSIF v_dscenario_type = 'LID-USAGE' THEN
-			DELETE FROM inp_dscenario_lid_usage
+		ELSIF v_dscenario_type = 'LIDS' THEN
+			DELETE FROM inp_dscenario_lids
 			WHERE dscenario_id = OLD.dscenario_id AND subc_id=OLD.subc_id AND lidco_id=OLD.lidco_id;
 
 		ELSIF v_dscenario_type = 'OUTFALL' THEN

@@ -69,7 +69,7 @@ AS SELECT d.drainzone_id,
     ORDER BY d.drainzone_id;
 
 CREATE OR REPLACE VIEW vu_dma
-AS SELECT 
+AS SELECT
     dma.dma_id,
     dma.name,
     dma.macrodma_id,
@@ -214,12 +214,12 @@ SELECT element.element_id,
   WHERE element.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text) e
   join selector_sector s using (sector_id)
   LEFT JOIN selector_municipality m using (muni_id)
-  where s.cur_user = current_user 
+  where s.cur_user = current_user
   and (m.cur_user = current_user or e.muni_id is null);
 
 CREATE OR REPLACE VIEW v_edit_samplepoint AS
 SELECT sm.* FROM (
-SELECT 
+SELECT
     samplepoint.sample_id,
     samplepoint.code,
     samplepoint.lab_code,
@@ -256,9 +256,9 @@ SELECT
 	WHERE samplepoint.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text) sm
 	join selector_sector s using (sector_id)
     LEFT JOIN selector_municipality m using (muni_id)
-    where s.cur_user = current_user 
+    where s.cur_user = current_user
     and (m.cur_user = current_user or sm.muni_id is null);
-	
+
 
 CREATE OR REPLACE VIEW v_ext_streetaxis
 AS SELECT ext_streetaxis.id,
@@ -330,7 +330,7 @@ AS SELECT DISTINCT ON (link_id)
 	 LEFT JOIN ext_municipality m USING (muni_id)
      LEFT JOIN drainzone USING (drainzone_id);
 
-CREATE OR REPLACE VIEW vu_link_connec AS 
+CREATE OR REPLACE VIEW vu_link_connec AS
 	SELECT l.*
 	FROM link l
 	WHERE l.feature_type::text = 'CONNEC'::text;
@@ -339,9 +339,9 @@ CREATE OR REPLACE VIEW vu_link_gully AS
 	SELECT l.*
 	FROM link l
     WHERE l.feature_type::text = 'GULLY'::text;
-		
-	
-CREATE OR REPLACE VIEW v_edit_link AS 
+
+
+CREATE OR REPLACE VIEW v_edit_link AS
 	SELECT l.* FROM (
 	SELECT *
 	FROM vu_link
@@ -349,8 +349,8 @@ CREATE OR REPLACE VIEW v_edit_link AS
 	join selector_sector s using (sector_id)
 	LEFT JOIN selector_municipality m using (muni_id)
 	where s.cur_user = current_user and (m.cur_user = current_user or l.muni_id is null);
-	     
-CREATE OR REPLACE VIEW v_edit_link_connec AS 
+
+CREATE OR REPLACE VIEW v_edit_link_connec AS
 	SELECT l.* FROM (
 	SELECT l.*
 	FROM vu_link_connec l) l
@@ -358,7 +358,7 @@ CREATE OR REPLACE VIEW v_edit_link_connec AS
 	LEFT JOIN selector_municipality m using (muni_id)
 	where s.cur_user = current_user and (m.cur_user = current_user or l.muni_id is null);
 
-CREATE OR REPLACE VIEW v_edit_link_gully AS 
+CREATE OR REPLACE VIEW v_edit_link_gully AS
 	SELECT l.* FROM (
 	SELECT l.*
     FROM vu_link_connec l) l
@@ -385,7 +385,7 @@ AS SELECT drainzone.drainzone_id,
     LEFT JOIN edit_typevalue et ON et.id::text = drainzone.drainzone_type::text AND et.typevalue::text = 'drainzone_type'::text
   WHERE drainzone.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
 
-	
+
 -- recreate all deleted views: arc, node, connec, gully and dependencies
 -----------------------------------
 CREATE OR REPLACE VIEW vu_arc AS
@@ -557,7 +557,7 @@ JOIN v_state_arc USING (arc_id)
 WHERE a.expl_id = s.expl_id OR a.expl_id2 = s.expl_id) a
 join selector_sector s using (sector_id)
 LEFT JOIN selector_municipality m using (muni_id)
-where s.cur_user = current_user 
+where s.cur_user = current_user
 and (m.cur_user = current_user or a.muni_id is null);
 
 
@@ -886,7 +886,7 @@ SELECT connec.connec_id,
      LEFT JOIN ext_municipality mu ON connec.muni_id = mu.muni_id
      LEFT JOIN drainzone USING (drainzone_id);
 
-CREATE OR REPLACE VIEW v_edit_connec AS 
+CREATE OR REPLACE VIEW v_edit_connec AS
 SELECT  c.* FROM (
 WITH s AS (
          SELECT selector_expl.expl_id
@@ -1024,7 +1024,7 @@ WITH s AS (
 	WHERE vu_connec.expl_id = s.expl_id OR vu_connec.expl_id2 = s.expl_id) c
 	join selector_sector s using (sector_id)
 	LEFT JOIN selector_municipality m using (muni_id)
-	where s.cur_user = current_user 
+	where s.cur_user = current_user
 	and (m.cur_user = current_user or c.muni_id is null);
 
 CREATE OR REPLACE VIEW vu_gully AS
@@ -1147,7 +1147,7 @@ SELECT gully.gully_id,
      LEFT JOIN ext_municipality mu ON gully.muni_id = mu.muni_id
      LEFT JOIN drainzone USING (drainzone_id);
 
-CREATE OR REPLACE VIEW v_edit_gully AS 
+CREATE OR REPLACE VIEW v_edit_gully AS
 SELECT g.* FROM (
 WITH s AS (
          SELECT selector_expl.expl_id
@@ -1296,10 +1296,10 @@ WITH s AS (
 	WHERE vu_gully.expl_id = s.expl_id OR vu_gully.expl_id2 = s.expl_id) g
   	join selector_sector s using (sector_id)
 	LEFT JOIN selector_municipality m using (muni_id)
-	where s.cur_user = current_user 
+	where s.cur_user = current_user
 	and (m.cur_user = current_user or g.muni_id is null);
-  
-  
+
+
 -- dependent views
 CREATE OR REPLACE VIEW v_plan_aux_arc_pavement
 AS SELECT plan_arc_x_pavement.arc_id,
@@ -2589,7 +2589,7 @@ AS SELECT i.dwfscenario_id,
     i.pat4
     FROM config_param_user c,  inp_dwf i
     JOIN v_edit_inp_junction USING (node_id)
-    WHERE c.cur_user::name = CURRENT_USER AND c.parameter::text = 'inp_options_dwfscenario'::text 
+    WHERE c.cur_user::name = CURRENT_USER AND c.parameter::text = 'inp_options_dwfscenario'::text
     AND c.value::integer = i.dwfscenario_id;
 
 CREATE OR REPLACE VIEW v_edit_inp_dscenario_treatment
@@ -4468,7 +4468,7 @@ AS SELECT a.gully_id,
      JOIN node n USING (node_id);
 
 
-CREATE OR REPLACE VIEW v_edit_raingage AS 
+CREATE OR REPLACE VIEW v_edit_raingage AS
  SELECT raingage.rg_id,
     raingage.form_type,
     raingage.intvl,
@@ -4485,13 +4485,13 @@ CREATE OR REPLACE VIEW v_edit_raingage AS
     LEFT JOIN selector_municipality m USING (muni_id)
     WHERE raingage.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text
     AND (m.cur_user = current_user or raingage.muni_id is null);
-    
-    
+
+
 CREATE OR REPLACE VIEW v_plan_psector_gully AS
 SELECT row_number() OVER () AS rid,
 gully.gully_id,
 plan_psector_x_gully.psector_id,
-gully.code, 
+gully.code,
 gully.gratecat_id,
 gully.gully_type,
 cat_feature.system_id,
@@ -4531,7 +4531,7 @@ CREATE OR REPLACE VIEW v_rpt_lidperformance_sum AS
     (inp_subcatchment
      JOIN rpt_lidperformance_sum ON (((rpt_lidperformance_sum.subc_id)::text = (inp_subcatchment.subc_id)::text)))
   WHERE (((rpt_lidperformance_sum.result_id)::text = (selector_rpt_main.result_id)::text) AND (selector_rpt_main.cur_user = "current_user"()));
-  
+
 DROP VIEW IF EXISTS v_rpt_comp_lidperfomance_sum;
 CREATE OR REPLACE VIEW v_rpt_comp_lidperformance_sum AS
  SELECT rpt_lidperformance_sum.id,
@@ -4552,7 +4552,7 @@ CREATE OR REPLACE VIEW v_rpt_comp_lidperformance_sum AS
     (inp_subcatchment
      JOIN rpt_lidperformance_sum ON (((rpt_lidperformance_sum.subc_id)::text = (inp_subcatchment.subc_id)::text)))
   WHERE (((rpt_lidperformance_sum.result_id)::text = (selector_rpt_compare.result_id)::text) AND (selector_rpt_compare.cur_user = "current_user"()));
-  
+
 DROP VIEW IF EXISTS v_rpt_subcatchwasoff_sum;
 CREATE OR REPLACE VIEW v_rpt_subcatchwashoff_sum AS
  SELECT rpt_subcatchwashoff_sum.id,
@@ -4566,7 +4566,7 @@ CREATE OR REPLACE VIEW v_rpt_subcatchwashoff_sum AS
     (inp_subcatchment
      JOIN rpt_subcatchwashoff_sum ON (((rpt_subcatchwashoff_sum.subc_id)::text = (inp_subcatchment.subc_id)::text)))
   WHERE (((rpt_subcatchwashoff_sum.result_id)::text = (selector_rpt_main.result_id)::text) AND (selector_rpt_main.cur_user = "current_user"()));
-  
+
 DROP VIEW IF EXISTS v_rpt_comp_subcatchwasoff_sum;
 CREATE OR REPLACE VIEW v_rpt_comp_subcatchwashoff_sum AS
  SELECT rpt_subcatchwashoff_sum.id,
@@ -4580,4 +4580,3 @@ CREATE OR REPLACE VIEW v_rpt_comp_subcatchwashoff_sum AS
     (inp_subcatchment
      JOIN rpt_subcatchwashoff_sum ON (((rpt_subcatchwashoff_sum.subc_id)::text = (inp_subcatchment.subc_id)::text)))
   WHERE (((rpt_subcatchwashoff_sum.result_id)::text = (selector_rpt_compare.result_id)::text) AND (selector_rpt_compare.cur_user = "current_user"()));
-  

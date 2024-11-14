@@ -2177,7 +2177,6 @@ AS SELECT a.arc_id,
     p.speed,
     p.pattern_id,
     p.status,
-    p.energyvalue,
     p.effic_curve_id,
     p.energy_price,
     p.energy_pattern_id,
@@ -4264,3 +4263,33 @@ CREATE OR REPLACE VIEW vcv_dma_log
      JOIN rpt_inp_node n USING (result_id)
   WHERE (a.node_1::text = n.node_id::text OR a.node_2::text = n.node_id::text) AND r.result_id::text = n.result_id::text AND r.cur_user = "current_user"()::text
   GROUP BY n.node_id, n.dma_id;
+
+-- 12/11/24
+CREATE OR REPLACE VIEW ve_epa_virtualpump
+AS SELECT p.arc_id,
+    p.power,
+    p.curve_id,
+    p.speed,
+    p.pattern_id,
+    p.status,
+    p.pump_type,
+    p.effic_curve_id,
+    p.energy_price,
+    p.energy_pattern_id,
+    v_rpt_arc.result_id,
+    v_rpt_arc.flow_max AS flowmax,
+    v_rpt_arc.flow_min AS flowmin,
+    v_rpt_arc.flow_avg AS flowavg,
+    v_rpt_arc.vel_max AS velmax,
+    v_rpt_arc.vel_min AS velmin,
+    v_rpt_arc.vel_avg AS velavg,
+    v_rpt_arc.headloss_max,
+    v_rpt_arc.headloss_min,
+    v_rpt_arc.setting_max,
+    v_rpt_arc.setting_min,
+    v_rpt_arc.reaction_max,
+    v_rpt_arc.reaction_min,
+    v_rpt_arc.ffactor_max,
+    v_rpt_arc.ffactor_min
+   FROM inp_virtualpump p
+     LEFT JOIN v_rpt_arc USING (arc_id);

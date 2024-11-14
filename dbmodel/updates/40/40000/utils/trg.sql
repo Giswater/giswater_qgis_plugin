@@ -13,3 +13,10 @@ CREATE TRIGGER gw_trg_config_control AFTER INSERT OR UPDATE OF featurecat_id ON 
 CREATE TRIGGER gw_trg_config_control AFTER INSERT OR UPDATE OF featurecat_id ON man_type_location FOR EACH ROW EXECUTE FUNCTION gw_trg_config_control('man_type_location');
 CREATE TRIGGER gw_trg_config_control AFTER INSERT OR UPDATE OF featurecat_id ON cat_brand FOR EACH ROW EXECUTE FUNCTION gw_trg_config_control('cat_brand');
 CREATE TRIGGER gw_trg_config_control AFTER INSERT OR UPDATE OF featurecat_id ON cat_brand_model FOR EACH ROW EXECUTE FUNCTION gw_trg_config_control('cat_brand_model');
+
+-- 12/11/2024
+CREATE TRIGGER gw_trg_edit_config_addfields INSTEAD OF UPDATE ON
+ve_config_addfields FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_config_addfields();
+
+CREATE TRIGGER gw_trg_edit_config_sysfields INSTEAD OF UPDATE ON ve_config_sysfields
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_config_sysfields();

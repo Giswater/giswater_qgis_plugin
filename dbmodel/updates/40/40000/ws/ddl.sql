@@ -248,3 +248,7 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"connec",
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"anl_connec", "column":"connecat_id", "newName":"conneccat_id"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"review_connec", "column":"connecat_id", "newName":"conneccat_id"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"link", "column":"connecat_id", "newName":"conneccat_id"}}$$);
+
+-- 12/11/24
+DROP VIEW ve_epa_virtualpump;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"inp_virtualpump", "column":"energyvalue"}}$$);

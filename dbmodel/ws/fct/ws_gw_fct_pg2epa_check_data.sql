@@ -182,13 +182,13 @@ BEGIN
 	SELECT 167, a.node_id, a.nodecat_id, a.the_geom, 'Node2arc with less than two arcs', a.expl_id FROM (
 		SELECT node_id, nodecat_id, v_edit_node.the_geom, v_edit_node.expl_id FROM v_edit_node
 		JOIN selector_sector USING (sector_id) 
-		JOIN v_edit_arc a1 ON node_id=a1.node_1 WHERE cur_user = current_user
+		JOIN arc a1 ON node_id=a1.node_1 WHERE cur_user = current_user
 		AND v_edit_node.epa_type IN ('VALVE', 'PUMP') AND a1.sector_id IN 
 		(SELECT sector_id FROM selector_sector WHERE cur_user=current_user)
 		UNION ALL
 		SELECT node_id, nodecat_id, v_edit_node.the_geom, v_edit_node.expl_id FROM v_edit_node
 		JOIN selector_sector USING (sector_id) 
-		JOIN v_edit_arc a1 ON node_id=a1.node_1 WHERE cur_user = current_user
+		JOIN arc a1 ON node_id=a1.node_1 WHERE cur_user = current_user
 		AND v_edit_node.epa_type IN ('VALVE', 'PUMP') AND a1.sector_id IN 
 		(SELECT sector_id FROM selector_sector WHERE cur_user=current_user))a
 	GROUP by node_id, nodecat_id, the_geom, expl_id
@@ -210,13 +210,13 @@ BEGIN
 	SELECT 292, a.node_id, a.nodecat_id, a.the_geom, 'Node2arc with less than two arcs', a.expl_id FROM (
 		SELECT node_id, nodecat_id, v_edit_node.the_geom, v_edit_node.expl_id FROM v_edit_node
 		JOIN selector_sector USING (sector_id) 
-		JOIN v_edit_arc a1 ON node_id=a1.node_1 WHERE cur_user = current_user
+		JOIN arc a1 ON node_id=a1.node_1 WHERE cur_user = current_user
 		AND v_edit_node.epa_type IN ('SHORTPIPE') AND a1.sector_id IN 
 		(SELECT sector_id FROM selector_sector WHERE cur_user=current_user)
 		UNION ALL
 		SELECT node_id, nodecat_id, v_edit_node.the_geom, v_edit_node.expl_id FROM v_edit_node
 		JOIN selector_sector USING (sector_id) 
-		JOIN v_edit_arc a1 ON node_id=a1.node_1 WHERE cur_user = current_user
+		JOIN arc a1 ON node_id=a1.node_1 WHERE cur_user = current_user
 		AND v_edit_node.epa_type IN ('SHORTPIPE') AND a1.sector_id IN 
 		(SELECT sector_id FROM selector_sector WHERE cur_user=current_user))a
 	GROUP by node_id, nodecat_id, the_geom, expl_id

@@ -92,7 +92,7 @@ BEGIN
 		DROP VIEW IF EXISTS SCHEMA_NAME.ext_region;
 
 		CREATE TABLE IF NOT EXISTS utils._region_ AS SELECT * FROM utils.region;
-		ALTER TABLE utils.region DROP COLUMN province_id;
+		ALTER TABLE utils.region DROP COLUMN IF EXISTS province_id;
 
 		-- refresh views
 		CREATE OR REPLACE VIEW ud.ext_region AS SELECT * FROM utils.region;
@@ -103,6 +103,7 @@ BEGIN
 		CREATE OR REPLACE VIEW SCHEMA_NAME.ext_province AS SELECT * FROM utils.province;
 
 		-- create fk
+		ALTER TABLE utils.municipality DROP CONSTRAINT IF EXISTS municipality_province_region_fk;
 		ALTER TABLE utils.municipality ADD CONSTRAINT municipality_province_region_fk FOREIGN KEY (province_id, region_id)
         REFERENCES utils.region_x_province (province_id, region_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 

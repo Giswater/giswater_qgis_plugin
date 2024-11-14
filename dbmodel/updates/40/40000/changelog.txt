@@ -1,0 +1,3 @@
+4.0.000
+*************
+- Drop 'energyvalue' column from inp_virtualpump

@@ -112,6 +112,9 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_node('inp_reservoir');
 CREATE TRIGGER gw_trg_edit_inp_dscenario_valve INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_dscenario_valve
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_dscenario('VALVE');
 
+CREATE TRIGGER gw_trg_edit_inp_dscenario_demand INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_dscenario_demand
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_dscenario_demand();
+
 CREATE TRIGGER gw_trg_edit_inp_node_valve INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_valve
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_node('inp_valve');
 
@@ -166,3 +169,7 @@ sector FOR EACH ROW EXECUTE FUNCTION gw_trg_typevalue_fk('sector');
 
 CREATE TRIGGER gw_trg_edit_review_connec INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_review_connec
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_review_connec();
+
+-- 12/11/24
+CREATE TRIGGER gw_trg_edit_ve_epa_virtualpump INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_epa_virtualpump
+ FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_ve_epa('virtualpump');

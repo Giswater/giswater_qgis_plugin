@@ -52,14 +52,15 @@ BEGIN
 	-- Search path
 	SET search_path = "SCHEMA_NAME";
 
+    -- Select configuration values
+	SELECT giswater, epsg INTO v_version, v_srid FROM sys_version ORDER BY id DESC LIMIT 1;
+
     -- Get variables from input JSON
 	v_expl = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'exploitation');
 	v_commitchanges = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'commitChanges');
 	v_updatemapzgeom = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'updateMapZone');
 	v_geomparamupdate = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'geomParamUpdate');
 
-    -- Select configuration values
-	SELECT giswater, epsg INTO v_version, v_srid FROM sys_version ORDER BY id DESC LIMIT 1;
 
     -- Create temporary tables
 	-- =======================
@@ -87,41 +88,30 @@ BEGIN
     -- Also, nodes that appear as starts in the "sector" table and have "graph_delimiter" = 'SECTOR'
     -- Note: "to_arc" is in the "man_valve" table; any valve could behave as a check-valve, although this should not happen uncontrolled
 
-    UPDATE temp_pgr_node n SET graph_delimiter = s.graph_delimiter
-    FROM (
-        SELECT n.node_id, cf.graph_delimiter
-        FROM (
-            SELECT node_id, nodecat_id, state FROM node
-        ) n
-        JOIN (SELECT id, node_type FROM cat_node) cn ON cn.id = n.nodecat_id
-        JOIN (SELECT id, graph_delimiter FROM cat_feature_node) cf ON cf.id = cn.node_type
-        WHERE n.state = 1 AND (cf.graph_delimiter = 'MINSECTOR' OR cf.graph_delimiter = 'SECTOR')
-    ) s
-    WHERE n.node_id = s.node_id AND n.pgr_node_id = n.node_id::INTEGER;
-
-    -- If we want to ignore open but broken valves
-    IF v_ignorebrokenvalves THEN
-        UPDATE temp_pgr_node n SET graph_delimiter = NULL
-        FROM (
-            SELECT node_id FROM man_valve WHERE closed = FALSE AND broken = TRUE
-        ) s
-        WHERE n.graph_delimiter = 'MINSECTOR' AND n.node_id = s.node_id AND n.pgr_node_id = n.node_id::INTEGER;
-    END IF;
+    UPDATE temp_pgr_node t SET graph_delimiter = cf.graph_delimiter
+    FROM node n
+    JOIN cat_node cn ON cn.id = n.nodecat_id
+    JOIN cat_feature_node cf ON cf.id = cn.nodetype_id
+    WHERE t.node_id = n.node_id AND (cf.graph_delimiter = 'MINSECTOR' OR cf.graph_delimiter = 'SECTOR');
 
     -- Set modif = TRUE for nodes where "graph_delimiter" = 'MINSECTOR'
     UPDATE temp_pgr_node n SET modif = TRUE
     WHERE n.graph_delimiter = 'MINSECTOR';
 
+    -- If we want to ignore open but broken valves
+    IF v_ignorebrokenvalves THEN
+        UPDATE temp_pgr_node n SET modif = FALSE
+        FROM man_valve v
+        WHERE n.node_id = v.node_id AND n.graph_delimiter = 'MINSECTOR' AND v.closed = FALSE AND v.broken = TRUE;
+    END IF;
+
     -- Arcs to be disconnected: one of the two arcs that reach the valve
     UPDATE temp_pgr_arc a SET modif = TRUE, cost = -1, reverse_cost = -1
     FROM (
         SELECT DISTINCT ON (n.pgr_node_id) n.pgr_node_id, a.pgr_arc_id
-        FROM (
-            SELECT pgr_node_id FROM temp_pgr_node WHERE modif = TRUE
-        ) n  -- Nodes that are minsectors
-        JOIN (
-            SELECT pgr_arc_id, arc_id, pgr_node_1, pgr_node_2 FROM temp_pgr_arc
-        ) a ON n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
+        FROM temp_pgr_node n
+        JOIN temp_pgr_arc a ON n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
+        WHERE n.modif = TRUE -- Nodes that are minsectors
     ) s
     WHERE a.pgr_arc_id = s.pgr_arc_id;
 
@@ -134,17 +124,10 @@ BEGIN
     WHERE n.node_id = s.node_id AND n.pgr_node_id = n.node_id::INTEGER AND n.graph_delimiter = 'SECTOR';
 
     -- Arcs to be disconnected: all those that connect to the nodes where "graph_delimiter" = 'SECTOR' and are also in the "sector" table
-    UPDATE temp_pgr_arc a SET modif = TRUE, cost = -1, reverse_cost = -1
-    FROM (
-        SELECT n.pgr_node_id, a.pgr_arc_id
-        FROM (
-            SELECT pgr_node_id FROM temp_pgr_node WHERE modif = TRUE AND graph_delimiter = 'SECTOR'
-        ) n
-        JOIN (
-            SELECT pgr_arc_id, arc_id, pgr_node_1, pgr_node_2 FROM temp_pgr_arc
-        ) a ON n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
-    ) s
-    WHERE a.pgr_arc_id = s.pgr_arc_id;
+    UPDATE temp_pgr_arc t SET modif = TRUE, cost = -1, reverse_cost = -1
+    FROM temp_pgr_node n
+    JOIN temp_pgr_arc a ON n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
+    WHERE t.pgr_arc_id = a.pgr_arc_id AND n.modif = TRUE AND n.graph_delimiter = 'SECTOR';
 
     -- Generate new arcs and disconnect arcs with modif = TRUE
 	-- =======================
@@ -155,7 +138,6 @@ BEGIN
     END IF;
 
     -- Generate the minsectors
-    TRUNCATE temp_pgr_connectedcomponents;
     v_query := 'SELECT pgr_arc_id AS id, pgr_node_1 AS source, pgr_node_2 AS target, cost, reverse_cost FROM temp_pgr_arc a';
     INSERT INTO temp_pgr_connectedcomponents(seq, component, node)
     SELECT seq, component, node FROM pgr_connectedcomponents(v_query);
@@ -167,9 +149,8 @@ BEGIN
 
     UPDATE temp_pgr_arc a SET zone_id = c.component
     FROM temp_pgr_connectedcomponents c
-    WHERE a.pgr_node_1 = c.node AND (cost >= 0 OR reverse_cost >= 0);
+    WHERE a.pgr_node_1 = c.node AND (a.cost >= 0 OR a.reverse_cost >= 0);
 
-    TRUNCATE temp_pgr_minsector;
     INSERT INTO temp_pgr_minsector (pgr_arc_id, node_id, minsector_id_1, minsector_id_2, graph_delimiter)
     SELECT a.pgr_arc_id, n1.node_id, n1.zone_id, n2.zone_id, n1.graph_delimiter
     FROM temp_pgr_arc a

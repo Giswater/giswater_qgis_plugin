@@ -84,7 +84,7 @@ BEGIN
 	IF v_selectionmode = 'wholeSelection' THEN v_id= replace(replace(replace(v_id::text,'[','('),']',')'),'"','');END IF;
 
 	-- subcatchment <-> lids
-	IF v_targettable = 'inp_dscenario_subcatchment' THEN v_targettable  = 'inp_dscenario_lid_usage';END IF;
+	IF v_targettable = 'inp_dscenario_subcatchment' THEN v_targettable  = 'inp_dscenario_lids';END IF;
 
 	IF v_id IS NULL THEN v_id = '()';END IF;
 
@@ -147,7 +147,7 @@ BEGIN
 	 	ELSIF v_targettable = 'inp_dscenario_junction' THEN
 			v_columns = v_scenarioid||', node_id, y0, ysur, apond, outfallparam::json';
 
-		ELSIF v_targettable = 'inp_dscenario_lid_usage' THEN
+		ELSIF v_targettable = 'inp_dscenario_lids' THEN
 			v_columns = v_scenarioid||', subc_id, null, null, area, width, null, null, null, null, descript';
 
  		ELSIF v_targettable = 'inp_dscenario_outfall' THEN

@@ -567,7 +567,7 @@ BEGIN
 		    NULL::text AS other6,
 		    NULL::text AS other7
 		   FROM inp_lid
- 		   JOIN (select distinct (lidco_id) from v_edit_inp_dscenario_lid_usage)a USING (lidco_id)
+ 		   JOIN (select distinct (lidco_id) from v_edit_inp_dscenario_lids)a USING (lidco_id)
 		  WHERE inp_lid.active
 		UNION
 		 SELECT inp_lid_value.id,
@@ -582,7 +582,7 @@ BEGIN
 		    inp_lid_value.value_8 AS other7
 		   FROM inp_lid_value
 		     JOIN inp_lid USING (lidco_id)
-		     JOIN (select distinct (lidco_id) from v_edit_inp_dscenario_lid_usage)a USING (lidco_id)
+		     JOIN (select distinct (lidco_id) from v_edit_inp_dscenario_lids)a USING (lidco_id)
 		     LEFT JOIN inp_typevalue ON inp_typevalue.id::text = inp_lid_value.lidlayer::text
 		  WHERE inp_lid.active AND inp_typevalue.typevalue::text = 'inp_value_lidlayer'::text) a
 	  ORDER BY a.lidco_id, a.id;

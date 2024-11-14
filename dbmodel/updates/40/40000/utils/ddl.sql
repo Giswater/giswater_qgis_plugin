@@ -46,3 +46,11 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"man_
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"cat_brand", "column":"featurecat_id", "dataType":"text[]"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"cat_brand_model", "column":"featurecat_id", "dataType":"text[]"}}$$);
 
+
+-- 12/11/2024
+DROP VIEW IF EXISTS ve_config_addfields;
+DROP VIEW IF EXISTS ve_config_sysfields;
+
+DROP TRIGGER IF EXISTS gw_trg_typevalue_fk_update ON config_form_fields;
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"config_form_fields", "column":"layoutname", "dataType":"text"}}$$);

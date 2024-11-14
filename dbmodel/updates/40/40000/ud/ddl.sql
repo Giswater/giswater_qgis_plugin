@@ -235,3 +235,7 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"man_netg
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"man_netgully", "column":"gratecat2_id", "newName":"gullycat2_id"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"review_gully", "column":"gratecat_id", "newName":"gullycat_id"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"link", "column":"connecat_id", "newName":"conneccat_id"}}$$);
+
+-- 14/11/2024
+DROP VIEW IF EXISTS v_edit_inp_dscenario_lid_usage;
+ALTER TABLE inp_dscenario_lid_usage RENAME TO inp_dscenario_lids;

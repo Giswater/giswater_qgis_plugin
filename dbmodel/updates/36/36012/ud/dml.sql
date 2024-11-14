@@ -196,10 +196,27 @@ VALUES('gully', 'form_feature', 'tab_none', 'btn_cancel', 'lyt_buttons', 0, NULL
 INSERT INTO inp_typevalue (typevalue, id, idval, descript, addparam) VALUES('inp_result_status', '3', 'ARCHIVED', NULL, NULL);
 
 -- get values by intersection
-update raingage r set muni_id = a.muni_id from (
-select r.rg_id, m.muni_id from raingage r left join ext_municipality m on st_dwithin (m.the_geom, r.the_geom, 0.01)
-)a where r.rg_id = a.rg_id;
 
+
+DO $$
+DECLARE
+    v_utils boolean;
+BEGIN
+
+	SELECT value::boolean INTO v_utils FROM config_param_system WHERE parameter='admin_utils_schema';
+
+	IF v_utils IS true THEN
+        UPDATE raingage r SET muni_id = a.muni_id FROM (
+        SELECT r.rg_id, m.muni_id FROM raingage r LEFT JOIN utils.municipality m ON st_dwithin (m.the_geom, r.the_geom, 0.01)
+        ) a
+        WHERE r.rg_id = a.rg_id;
+    ELSE
+        UPDATE raingage r SET muni_id = a.muni_id FROM (
+        SELECT r.rg_id, m.muni_id FROM raingage r LEFT JOIN ext_municipality m ON st_dwithin (m.the_geom, r.the_geom, 0.01)
+        ) a
+        WHERE r.rg_id = a.rg_id;
+    END IF;
+END; $$;
 
 update "element" e set muni_id = a.muni_id, sector_id = a.sector_id from (
 select element_id, gully_id, g.muni_id, g.sector_id from element_x_gully
@@ -254,28 +271,28 @@ UPDATE config_form_list
 SET addparam='{"enableGlobalFilter": false,"enableStickyHeader": true,"positionToolbarAlertBanner": "bottom","enableGrouping": false,"enablePinning": true,"enableColumnOrdering": true,"enableColumnFilterModes": true,"enableFullScreenToggle": false,"enablePagination": true,"enableExporting": true,"muiTablePaginationProps": {"rowsPerPageOptions": [5,10,15,20,50,100],"showFirstButton": true,"showLastButton": true},"enableRowSelection": true,"multipleRowSelection": true,"initialState": {"showColumnFilters": false,"pagination": {"pageSize": 10,"pageIndex": 0},"density": "compact","columnFilters": [],"sorting": [{"id": "id","desc": true}]},"modifyTopToolBar": true,"renderTopToolbarCustomActions": [{"widgetfunction": {"functionName": "open","params": {}},"color": "success","text": "Open","disableOnSelect": true,"moreThanOneDisable": true},{"widgetfunction": {"functionName": "delete","params": {}},"color": "error","text": "Delete","disableOnSelect": true},{"widgetfunction": {"functionName": "refresh","params": {}},"color": "info","text": "Refresh"}],"enableRowActions": false,"renderRowActionMenuItems": [{"widgetfunction": {"functionName": "open","params": {}},"icon": "OpenInBrowser","text": "Open"},{"widgetfunction": {"functionName": "delete","params": {}},"icon": "Delete","text": "Delete"}]}'::json
 WHERE listname='tbl_visit_manager' AND device=5;
 
-INSERT INTO edit_typevalue (typevalue, id, idval) 
+INSERT INTO edit_typevalue (typevalue, id, idval)
 VALUES('drainzone_type', 'UNDEFINED', 'UNDEFINED')
 ON CONFLICT(typevalue, id) DO NOTHING;
 
-INSERT INTO edit_typevalue (typevalue, id, idval) 
+INSERT INTO edit_typevalue (typevalue, id, idval)
 VALUES('sector_type', 'UNDEFINED', 'UNDEFINED'), ('sector_type', 'URBAN DRAINAGE', 'URBAN DRAINAGE'), ('sector_type', 'MAIN SEWER NETWORK', 'MAIN SEWER NETWORK')
 ON CONFLICT(typevalue, id) DO NOTHING;
 
-INSERT INTO edit_typevalue (typevalue, id, idval) 
+INSERT INTO edit_typevalue (typevalue, id, idval)
 VALUES('dma_type', 'UNDEFINED', 'UNDEFINED')
 ON CONFLICT(typevalue, id) DO NOTHING;
 
 
-INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, active) 
-VALUES('edit_typevalue', 'drainzone_type', 'drainzone', 'drainzone_type', true) 
+INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, active)
+VALUES('edit_typevalue', 'drainzone_type', 'drainzone', 'drainzone_type', true)
 ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field) DO NOTHING;
 
-INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, active) 
+INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, active)
 VALUES('edit_typevalue', 'sector_type', 'sector', 'sector_type', true)
 ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field) DO NOTHING;
 
-INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, active) 
+INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, active)
 VALUES('edit_typevalue', 'dma_type', 'dma', 'dma_type', true)
 ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field) DO NOTHING;
 
