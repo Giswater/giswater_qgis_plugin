@@ -39,6 +39,9 @@ BEGIN
         zone_id INTEGER DEFAULT 0,
         modif BOOL DEFAULT FALSE,  -- True if nodes have to be disconnected - closed valves, starts of mapzones
         graph_delimiter VARCHAR(30),
+        closed BOOL, 
+        broken BOOL, 
+        to_arc VARCHAR(30),    
         CONSTRAINT temp_pgr_node_pkey PRIMARY KEY (pgr_node_id)
     );
     CREATE INDEX temp_pgr_node_node_id ON temp_pgr_node USING btree (node_id);
