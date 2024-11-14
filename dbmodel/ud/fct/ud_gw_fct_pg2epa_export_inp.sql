@@ -819,7 +819,7 @@ BEGIN
 		SELECT a.idval AS parameter,
 		b.value
 		FROM sys_param_user a
-		JOIN ud.config_param_user b ON a.id = b.parameter::text
+		JOIN config_param_user b ON a.id = b.parameter::text
 		WHERE (a.layoutname = ANY (ARRAY['lyt_reports_1'::text, 'lyt_reports_2'::text])) AND b.cur_user::name = "current_user"() AND b.value IS NOT null and parameter not in ('inp_report_nodes_2', 'inp_report_nodes', 'inp_report_links')
 		union
 		select 'NODES', replace(replace(replace(array_agg(a.node_id)::text,',',' '),'}',''),'{','')  from (select unnest(concat('{',replace(value,' ',','),'}')::integer[]) as node_id 
