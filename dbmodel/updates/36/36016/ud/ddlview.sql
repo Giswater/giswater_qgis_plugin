@@ -226,3 +226,46 @@ AS SELECT raingage.rg_id,
     raingage.muni_id
    FROM selector_expl, raingage
   WHERE raingage.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
+
+
+CREATE OR REPLACE VIEW v_edit_inp_subcatchment AS 
+ SELECT a.* from (SELECT inp_subcatchment.hydrology_id,
+    inp_subcatchment.subc_id,
+    inp_subcatchment.outlet_id,
+    inp_subcatchment.rg_id,
+    inp_subcatchment.area,
+    inp_subcatchment.imperv,
+    inp_subcatchment.width,
+    inp_subcatchment.slope,
+    inp_subcatchment.clength,
+    inp_subcatchment.snow_id,
+    inp_subcatchment.nimp,
+    inp_subcatchment.nperv,
+    inp_subcatchment.simp,
+    inp_subcatchment.sperv,
+    inp_subcatchment.zero,
+    inp_subcatchment.routeto,
+    inp_subcatchment.rted,
+    inp_subcatchment.maxrate,
+    inp_subcatchment.minrate,
+    inp_subcatchment.decay,
+    inp_subcatchment.drytime,
+    inp_subcatchment.maxinfil,
+    inp_subcatchment.suction,
+    inp_subcatchment.conduct,
+    inp_subcatchment.initdef,
+    inp_subcatchment.curveno,
+    inp_subcatchment.conduct_2,
+    inp_subcatchment.drytime_2,
+    inp_subcatchment.sector_id,
+    inp_subcatchment.the_geom,
+    inp_subcatchment.descript,
+    inp_subcatchment.minelev,
+    muni_id
+   FROM inp_subcatchment
+   LEFT JOIN node ON node_id = outlet_id
+   ) a, config_param_user, selector_sector, selector_municipality
+   WHERE a.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text 
+   AND ((a.muni_id = selector_municipality.muni_id AND selector_municipality.cur_user = "current_user"()::text) or a.muni_id is null)
+   AND a.hydrology_id = config_param_user.value::integer AND config_param_user.cur_user::text = "current_user"()::text 
+   AND config_param_user.parameter::text = 'inp_options_hydrology_scenario'::text;
