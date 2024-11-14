@@ -14,6 +14,7 @@ from qgis.PyQt.QtWidgets import (
     QLabel,
     QTableWidget,
     QTableWidgetItem,
+    QTextEdit,
 )
 from sip import isdeleted
 
@@ -47,6 +48,9 @@ class GwImportInp(GwAction):
         action_group: QActionGroup,
     ) -> None:
         super().__init__(icon_path, action_name, text, toolbar, action_group)
+
+        self.cur_process = None
+        self.cur_text = None
 
     def clicked_event(self) -> None:
         """Start the Import INP workflow"""
@@ -371,7 +375,19 @@ class GwImportInp(GwAction):
                 municipality,
                 catalogs,
             )
+
+            # Create timer
+            self.t0: float = time()
+            self.timer: QTimer = QTimer()
+            self.timer.timeout.connect(
+                partial(self._update_config_dialog, self.dlg_config)
+            )
+            self.timer.start(1000)
             self.import_inp_task.message_logged.connect(self._message_logged)
+            self.import_inp_task.progress_changed.connect(self._progress_changed)
+            self.import_inp_task.taskCompleted.connect(self.timer.stop)
+
+            # Run task
             QgsApplication.taskManager().addTask(self.import_inp_task)
             QgsApplication.taskManager().triggerTask(self.import_inp_task)
             return
@@ -654,6 +670,17 @@ class GwImportInp(GwAction):
             self.timer.stop()
             self.dlg_inp_parsing.progressBar.setVisible(False)
 
+    def _update_config_dialog(self, dialog: GwDialog):
+        if not dialog.isVisible():
+            self.timer.stop()
+            return
+
+        self._calculate_elapsed_time(dialog)
+
+        if isdeleted(self.parse_inp_task) or not self.parse_inp_task.isActive():
+            self.timer.stop()
+            self.dlg_config.progressBar.setVisible(False)
+
     def _calculate_elapsed_time(self, dialog: GwDialog) -> None:
         tf: float = time()  # Final time
         td: float = tf - self.t0  # Delta time
@@ -684,3 +711,33 @@ class GwImportInp(GwAction):
         print(f"message: {message}")
         data = {"info": {"values": [{"message": message}]}}
         tools_gw.fill_tab_log(self.dlg_config, data, reset_text=True, close=False, end=end, call_set_tabs_enabled=False)
+
+    def _progress_changed(self, process: str, progress: int, text: str, new_line: bool) -> None:
+        # Progress bar
+        if progress is not None:
+            self.dlg_config.progressBar.setValue(progress)
+
+        # TextEdit log
+        txt_infolog = self.dlg_config.findChild(QTextEdit, 'txt_infolog')
+        cur_text = tools_qt.get_text(self.dlg_config, txt_infolog, return_string_null=False)
+        if process and process not in (self.cur_process, "Generate INP algorithm"):
+            cur_text = f"{cur_text}\n" \
+                       f"--------------------\n" \
+                       f"{process}\n" \
+                       f"--------------------\n\n"
+            self.cur_process = process
+            self.cur_text = None
+
+        # Generate INP log is cumulative, so it's saved until the process ends
+        if process == "Generate INP algorithm" and not self.cur_text:
+            self.cur_text = cur_text
+
+        if self.cur_text:
+            cur_text = self.cur_text
+
+        end_line = '\n' if new_line else ''
+        txt_infolog.setText(f"{cur_text}{text}{end_line}")
+        txt_infolog.show()
+        # Scroll to the bottom
+        scrollbar = txt_infolog.verticalScrollBar()
+        scrollbar.setValue(scrollbar.maximum())

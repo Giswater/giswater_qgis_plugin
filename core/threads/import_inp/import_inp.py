@@ -18,6 +18,12 @@ from ...utils import tools_gw
 from ..task import GwTask
 
 
+def lerp_progress(subtask_progress: int, global_min: int, global_max: int) -> int:
+    global_progress = global_min + ((subtask_progress - 0) / (100 - 0)) * (global_max - global_min)
+
+    return int(global_progress)
+
+
 def batched(iterable, n):
     # batched('ABCDEFG', 3) --> ABC DEF G
     if n < 1:
@@ -101,6 +107,17 @@ def get_geometry_from_link(link) -> str:
 class GwImportInpTask(GwTask):
 
     message_logged = pyqtSignal(str, str)
+    progress_changed = pyqtSignal(str, int, str, bool)  # (Process, Progress, Text, '\n')
+
+    # Progress percentages
+    PROGRESS_INIT = 0
+    PROGRESS_VALIDATE = 5
+    PROGRESS_OPTIONS = 10
+    PROGRESS_CATALOGS = 30
+    PROGRESS_NONVISUAL = 50
+    PROGRESS_VISUAL = 90
+    PROGRESS_SOURCES = 97
+    PROGRESS_END = 100
 
     def __init__(
         self,
@@ -133,73 +150,83 @@ class GwImportInpTask(GwTask):
     def run(self) -> bool:
         super().run()
         try:
-            self._log_message("Validating inputs")
+            self.progress_changed.emit("Validate inputs", self.PROGRESS_INIT, "Validating inputs...", False)
             self._validate_inputs()
+            self.progress_changed.emit("Validate inputs", self.PROGRESS_VALIDATE, "done!", True)
 
-            self._log_message("Getting options")
+            self.progress_changed.emit("Getting options", self.PROGRESS_VALIDATE, "Importing options...", False)
             self._save_options()
+            self.progress_changed.emit("Getting options", self.PROGRESS_OPTIONS, "done!", True)
 
-            self._log_message("Getting units from DB")
+            self.progress_changed.emit("Getting options", self.PROGRESS_OPTIONS, "Getting units...", False)
             self._get_db_units()
+            self.progress_changed.emit("Getting options", self.PROGRESS_OPTIONS, "done!", True)
 
-            self._log_message("Creating workcat")
-            self._create_workcat_id()
+            self._manage_catalogs()
 
-            self._log_message("Creating demand dscenario")
-            self._create_demand_dscenario()
+            self._manage_nonvisual()
 
-            self._log_message("Creating new node catalogs")
-            self._create_new_node_catalogs()
+            self._manage_visual()
 
-            # Get existing catalogs in DB
-            cat_arc_ids = get_rows("SELECT id FROM cat_arc", commit=False)
-            if cat_arc_ids:
-                self.arccat_db += [x[0] for x in cat_arc_ids]
-
-            self._log_message("Creating new varc catalogs")
-            self._create_new_varc_catalogs()
-
-            self._log_message("Creating new pipe catalogs")
-            self._create_new_pipe_catalogs()
-
-            self._log_message("Inserting patterns into DB")
-            self._save_patterns()
-
-            self._log_message("Inserting curves into DB")
-            self._save_curves()
-
-            self._log_message("Inserting controls and rules into DB")
-            self._save_controls_and_rules()
-
-            self._log_message("Inserting junctions into DB")
-            self._save_junctions()
-
-            self._log_message("Inserting reservoirs into DB")
-            self._save_reservoirs()
-
-            self._log_message("Inserting tanks into DB")
-            self._save_tanks()
-
-            self._log_message("Inserting pumps into DB")
-            self._save_pumps()
-
-            self._log_message("Inserting valves into DB")
-            self._save_valves()
-
-            self._log_message("Inserting pipes into DB")
-            self._save_pipes_to_v_edit_arc()
-
-            self._log_message("Inserting sources into DB")
+            self.progress_changed.emit("Sources", self.PROGRESS_VISUAL, "Importing sources...", False)
             self._save_sources()
+            self.progress_changed.emit("Sources", self.PROGRESS_SOURCES, "done!", True)
 
             execute_sql("select 1", commit=True)
-            self._log_message("ALL DONE! INP successfully imported.")
+            self.progress_changed.emit("", self.PROGRESS_END, "ALL DONE! INP successfully imported.", True)
             return True
         except Exception as e:
             self.exception = traceback.format_exc()
             self._log_message(f"{traceback.format_exc()}")
             tools_db.dao.rollback()
             return False
+
+    def _manage_catalogs(self) -> None:
+        self.progress_changed.emit("Create catalogs", lerp_progress(0, self.PROGRESS_OPTIONS, self.PROGRESS_CATALOGS), "Creating workcat", True)
+        self._create_workcat_id()
+        self.progress_changed.emit("Create catalogs", lerp_progress(10, self.PROGRESS_OPTIONS, self.PROGRESS_CATALOGS), "Creating demand dscenario", True)
+        self._create_demand_dscenario()
+        self.progress_changed.emit("Create catalogs", lerp_progress(20, self.PROGRESS_OPTIONS, self.PROGRESS_CATALOGS), "Creating new node catalogs", True)
+        self._create_new_node_catalogs()
+
+        # Get existing catalogs in DB
+        cat_arc_ids = get_rows("SELECT id FROM cat_arc", commit=False)
+        if cat_arc_ids:
+            self.arccat_db += [x[0] for x in cat_arc_ids]
+
+        self.progress_changed.emit("Create catalogs", lerp_progress(50, self.PROGRESS_OPTIONS, self.PROGRESS_CATALOGS), "Creating new varc catalogs", True)
+        self._create_new_varc_catalogs()
+        self.progress_changed.emit("Create catalogs", lerp_progress(70, self.PROGRESS_OPTIONS, self.PROGRESS_CATALOGS), "Creating new pipe catalogs", True)
+        self._create_new_pipe_catalogs()
+
+    def _manage_nonvisual(self) -> None:
+        self.progress_changed.emit("Non-visual objects", lerp_progress(0, self.PROGRESS_CATALOGS, self.PROGRESS_NONVISUAL), "Importing patterns", True)
+        self._save_patterns()
+
+        self.progress_changed.emit("Non-visual objects", lerp_progress(40, self.PROGRESS_CATALOGS, self.PROGRESS_NONVISUAL), "Importing curves", True)
+        self._save_curves()
+
+        self.progress_changed.emit("Non-visual objects", lerp_progress(80, self.PROGRESS_CATALOGS, self.PROGRESS_NONVISUAL), "Importing controls and rules", True)
+        self._save_controls_and_rules()
+
+    def _manage_visual(self) -> None:
+        self.progress_changed.emit("Visual objects", lerp_progress(0, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing junctions", True)
+        self._save_junctions()
+
+        self.progress_changed.emit("Visual objects", lerp_progress(30, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing reservoirs", True)
+        self._save_reservoirs()
+
+        self.progress_changed.emit("Visual objects", lerp_progress(40, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing tanks", True)
+        self._save_tanks()
+
+        self.progress_changed.emit("Visual objects", lerp_progress(50, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing pumps", True)
+        self._save_pumps()
+
+        self.progress_changed.emit("Visual objects", lerp_progress(60, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing valves", True)
+        self._save_valves()
+
+        self.progress_changed.emit("Visual objects", lerp_progress(70, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing pipes", True)
+        self._save_pipes()
 
     def _get_db_units(self) -> None:
         units_query = "SELECT value FROM vi_options WHERE parameter = 'UNITS'"
@@ -1162,7 +1189,7 @@ class GwImportInpTask(GwTask):
             man_sql, man_params, man_template, fetch=False, commit=False
         )
 
-    def _save_pipes_to_v_edit_arc(self) -> None:
+    def _save_pipes(self) -> None:
         feature_class = self.catalogs['features']['pipes'].lower()
 
         arc_sql = """ 
@@ -1305,6 +1332,6 @@ class GwImportInpTask(GwTask):
             params = (source_type, source_quality, source_pattern_id, node_id)
             execute_sql(sql, params)
 
-    def _log_message(self, message: str, end: str="\n"):
+    def _log_message(self, message: str):
         self.log.append(message)
-        self.message_logged.emit(message, end)
+        self.progress_changed.emit("", None, f"{message}", True)
