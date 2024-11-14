@@ -458,7 +458,7 @@ BEGIN
 
 		v_networkstats = gw_fct_json_object_set_key((select json_build_object('sector', array_agg(sector_id)) FROM selector_sector where cur_user=current_user and sector_id > 0)
 		 ,'Total Length (Km)', v_sumlength);
-				
+
 	ELSIF v_project_type  ='UD' THEN
 
 		SELECT sum(length)/1000 INTO v_sumlength FROM temp_t_arc;
@@ -466,7 +466,10 @@ BEGIN
 		concat('Total length (Km) : ',coalesce(v_sumlength,0::numeric),'.'));
 		
 		IF v_linkoffsets  = 'ELEVATION' THEN
-			SELECT min(((elevmax1-elevmax2)/length)::numeric(12,4)), max(((elevmax1-elevmax2)/length)::numeric(12,4)) 
+		
+			UPDATE temp_t_arc SET length = null where length = 0;
+		
+			SELECT min(((elevmax1-elevmax2)/coalesce(length,0.1))::numeric(12,4)), max(((elevmax1-elevmax2)/coalesce(length,0.1)::numeric(12,4))) 
 			INTO v_min, v_max FROM temp_t_arc;
 			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 0,
 			concat('Data analysis for conduit slope. Values from [',v_min,'] to [',v_max,'] have been found.'));
@@ -499,7 +502,9 @@ BEGIN
 		v_networkstats = gw_fct_json_object_set_key((select json_build_object('sector', array_agg(sector_id)) FROM selector_sector where cur_user=current_user and sector_id > 0),
 		'Total Length (Km)', v_sumlength);
 	END IF;
-
+	
+	-- set rpt_cat_result table with network stats
+	UPDATE rpt_cat_result SET network_stats = v_networkstats WHERE result_id = v_result_id;
 	
 	-- get results
 	-- info
