@@ -18,14 +18,14 @@ from qgis.PyQt.QtWidgets import (
 )
 from sip import isdeleted
 
-from .... import global_vars
-from ....libs import tools_db, tools_qgis, tools_qt
-from ...models.plugin_toolbar import GwPluginToolbar
-from ...ui.dialog import GwDialog
-from ...ui.ui_manager import GwInpConfigImportUi, GwInpParsingUi
-from ...threads.import_inp.import_inp import GwImportInpTask
-from ...utils import tools_gw
-from ..dialog import GwAction
+from ..... import global_vars
+from .....libs import tools_db, tools_qgis, tools_qt
+from ....models.plugin_toolbar import GwPluginToolbar
+from ....ui.dialog import GwDialog
+from ....ui.ui_manager import GwInpConfigImportUi, GwInpParsingUi
+from ....threads.import_inp.import_inp import GwImportInpTask
+from ....utils import tools_gw
+from ...dialog import GwAction
 
 CREATE_NEW = "Create new"
 TESTING_MODE = True
@@ -36,69 +36,39 @@ class ProjectType(Enum):
     UD = "ud"
 
 
-class GwImportInp(GwAction):
+class GwImportEpanet:
     """Button 22: Import INP"""
 
-    def __init__(
-        self,
-        icon_path: str,
-        action_name: str,
-        text: str,
-        toolbar: GwPluginToolbar,
-        action_group: QActionGroup,
-    ) -> None:
-        super().__init__(icon_path, action_name, text, toolbar, action_group)
-
+    def __init__(self) -> None:
+        self.file_path: Optional[Path] = None
         self.cur_process = None
         self.cur_text = None
 
     def clicked_event(self) -> None:
         """Start the Import INP workflow"""
 
-        # WS
-        if global_vars.project_type == ProjectType.WS.value:
-            try:
-                import wntr
-                from ...threads.import_inp import parse_inp
+        try:
+            import wntr
+            from ....threads.import_inp import parse_inp
 
-                global Catalogs, GwParseInpTask
-                Catalogs = parse_inp.Catalogs
-                GwParseInpTask = parse_inp.GwParseInpTask
+            global Catalogs, GwParseInpTask
+            Catalogs = parse_inp.Catalogs
+            GwParseInpTask = parse_inp.GwParseInpTask
 
-                self.file_path: Optional[Path] = self._get_file()
+            self.file_path: Optional[Path] = self._get_file()
 
-                if not self.file_path:
-                    return
+            if not self.file_path:
+                return
 
-                self.parse_inp_file(self.file_path)
+            self.parse_inp_file(self.file_path)
 
-            except ImportError:
-                message: str = (
-                    "wntr package not installed. "
-                    "Open OSGeo4W Shell and execute 'python -m pip install wntr'. "
-                    "Restart QGIS after instalation."
-                )
-                tools_qgis.show_message(message)
-
-        # UD
-        if global_vars.project_type == ProjectType.UD.value:
-            try:
-                import swmm_api
-
-                file_path: Optional[Path] = self._get_file()
-
-                if not file_path:
-                    return
-
-                self.parse_inp_file(file_path)
-
-            except ImportError:
-                message: str = (
-                    "swmm-api package not installed."
-                    " Open OSGeo4W Shell and execute 'python -m pip install swmm-api'. "
-                    "Restart QGIS after instalation."
-                )
-                tools_qgis.show_message(message)
+        except ImportError:
+            message: str = (
+                "wntr package not installed. "
+                "Open OSGeo4W Shell and execute 'python -m pip install wntr'. "
+                "Restart QGIS after instalation."
+            )
+            tools_qgis.show_message(message)
 
     def parse_inp_file(self, file_path: Path) -> None:
         """Parse INP file, showing a log to the user"""
