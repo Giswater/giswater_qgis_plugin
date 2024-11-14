@@ -164,6 +164,8 @@ class GwDscenarioManagerButton(GwAction):
             partial(self.update_current_scenario, self.dlg_hydrology_manager, qtbl=self.tbl_dscenario,
                     scenario_type="hydrology", col_id_name="hydrology_id", view_name="v_edit_cat_hydrology",))
 
+        self.tbl_dscenario.doubleClicked.connect(partial(self._manage_properties, self.dlg_hydrology_manager, 'v_edit_cat_hydrology'))
+
         self.dlg_hydrology_manager.btn_cancel.clicked.connect(
             partial(tools_gw.close_dialog, self.dlg_hydrology_manager))
         self.dlg_hydrology_manager.finished.connect(partial(tools_gw.save_settings, self.dlg_hydrology_manager))
@@ -220,7 +222,7 @@ class GwDscenarioManagerButton(GwAction):
             partial(self.update_current_scenario, self.dlg_dwf_manager, qtbl=self.tbl_dscenario, scenario_type="dwf",
                     col_id_name="id", view_name="v_edit_cat_dwf_scenario"))
 
-        #self.tbl_dscenario.doubleClicked.connect(self._open_dscenario)
+        self.tbl_dscenario.doubleClicked.connect(partial(self._manage_properties, self.dlg_dwf_manager, 'v_edit_cat_dwf_scenario'))
 
         self.dlg_dwf_manager.btn_cancel.clicked.connect(
             partial(tools_gw.close_dialog, self.dlg_dwf_manager))
