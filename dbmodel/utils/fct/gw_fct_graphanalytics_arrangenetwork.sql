@@ -23,9 +23,6 @@ DECLARE
 	v_version TEXT;
     v_record RECORD;
     v_id INTEGER = 0;
-    v_project_type TEXT;
-    v_cost INTEGER = 1;
-    v_reverse_cost INTEGER = 1;
 
 BEGIN
 
@@ -33,15 +30,12 @@ BEGIN
     SET search_path = "SCHEMA_NAME", public;
 
     -- Select configuration values
-    SELECT giswater, UPPER(project_type) INTO v_version, v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
-
-    IF v_project_type = 'UD' THEN v_reverse_cost=-1; END IF;
 
     SELECT LAST_VALUE into v_id FROM urn_id_seq;
 
-    -- Disconnect arcs with modif=true at nodes with modif=true; a new arc N_new->N_original is created with the cost and reverse cost of the arc
+    -- Disconnect arcs with modif=true at nodes with modif=true; a new arc N_new->N_original is created with the cost and reverse cost -1, -1
     FOR v_record IN
-        SELECT n.pgr_node_id, n.graph_delimiter as n_graph_delimiter, a.graph_delimiter as a_graph_delimiter, a.pgr_arc_id, a.pgr_node_1, a.pgr_node_2, a.cost, a.reverse_cost
+        SELECT n.pgr_node_id, n.graph_delimiter as n_graph_delimiter, a.graph_delimiter as a_graph_delimiter, a.pgr_arc_id, a.pgr_node_1, a.pgr_node_2
         FROM temp_pgr_node n
         JOIN temp_pgr_arc a ON n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
         WHERE n.modif = true AND a.modif = true
@@ -55,16 +49,14 @@ BEGIN
             WHERE pgr_arc_id = v_record.pgr_arc_id;
 
             INSERT INTO temp_pgr_arc(pgr_arc_id, arc_id, pgr_node_1, pgr_node_2, node_1, node_2, modif, graph_delimiter, cost, reverse_cost)
-            VALUES (v_id + 1, v_record.pgr_arc_id::text, v_record.pgr_node_id, v_id, v_record.pgr_node_id, v_record.pgr_node_id, false, COALESCE(v_record.a_graph_delimiter,v_record.n_graph_delimiter), v_record.cost, v_record.reverse_cost);
+            VALUES (v_id + 1, v_record.pgr_arc_id::text, v_record.pgr_node_id, v_id, v_record.pgr_node_id, v_record.pgr_node_id, false, COALESCE(v_record.a_graph_delimiter,v_record.n_graph_delimiter), -1, -1);
         ELSE
             UPDATE temp_pgr_arc SET pgr_node_2 = v_id
             WHERE pgr_arc_id = v_record.pgr_arc_id;
 
             INSERT INTO temp_pgr_arc(pgr_arc_id, arc_id, pgr_node_1, pgr_node_2, node_1, node_2, modif, graph_delimiter, cost, reverse_cost)
-            VALUES (v_id + 1, v_record.pgr_arc_id::text, v_id, v_record.pgr_node_id, v_record.pgr_node_id, v_record.pgr_node_id, false, COALESCE(v_record.a_graph_delimiter,v_record.n_graph_delimiter), v_record.cost, v_record.reverse_cost);
+            VALUES (v_id + 1, v_record.pgr_arc_id::text, v_id, v_record.pgr_node_id, v_record.pgr_node_id, v_record.pgr_node_id, false, COALESCE(v_record.a_graph_delimiter,v_record.n_graph_delimiter), -1, -1);
         END IF;
-
-        UPDATE temp_pgr_arc SET cost = v_cost, reverse_cost = v_reverse_cost WHERE pgr_arc_id = v_record.pgr_arc_id; -- The new arc has the cost and reverse cost
     END LOOP;
 
 
