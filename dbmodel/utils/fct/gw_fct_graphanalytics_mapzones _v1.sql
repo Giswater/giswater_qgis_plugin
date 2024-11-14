@@ -201,13 +201,13 @@ BEGIN
 		-- valves to modify: 
 		-- closed valves
 		UPDATE temp_pgr_node n SET closed = v.closed, broken = v.broken, modif = TRUE
-		FROM man_valve v ON  n.node_id = v.node_id
-		WHERE n.graph_delimiter = 'minsector' AND v.closed = TRUE;
+		FROM man_valve v 
+		WHERE n.node_id = v.node_id AND n.graph_delimiter = 'minsector' AND v.closed = TRUE;
 
 		--valves with to_arc NOT NULL
 		UPDATE temp_pgr_node n SET to_arc = v.to_arc, broken = v.broken, modif = TRUE
-		FROM man_valve v ON n.node_id = v.node_id 
-		WHERE v.to_arc IS NOT NULL AND v.broken = FALSE;
+		FROM man_valve v
+		WHERE n.node_id = v.node_id  AND v.to_arc IS NOT NULL AND v.broken = FALSE;
 
 		-- arcs to modify:
 		-- for the closed valves when to_arc IS NULL, one of the arcs that connect to the valve 
@@ -309,15 +309,15 @@ BEGIN
 	-- Note: node_1 = node_2 for the new arcs generated at the nodes
     IF v_project_type = 'WS' THEN
         UPDATE temp_pgr_arc a SET cost = 1
-		FROM temp_pgr_node n ON a.node_1 = n.node_id
-        WHERE n.pgr_node_id = n.node_id::INT 
+		FROM temp_pgr_node n
+        WHERE a.node_1 = n.node_id AND n.pgr_node_id = n.node_id::INT 
 		AND a.cost = -1 AND (a.graph_delimiter = 'minsector' OR a.graph_delimiter is null) 
 		AND n.to_arc IS NOT NULL AND n.closed is null 
 		AND a.pgr_node_1=a.node_1::INT;
 
         UPDATE temp_pgr_arc a SET reverse_cost = 1
-		FROM temp_pgr_node n ON a.node_1 = n.node_id
-        WHERE n.pgr_node_id = n.node_id::INT 
+		FROM temp_pgr_node n
+        WHERE a.node_1 = n.node_id AND n.pgr_node_id = n.node_id::INT 
 		AND a.cost = -1 AND (a.graph_delimiter = 'minsector' OR a.graph_delimiter is null) 
 		AND n.to_arc IS NOT NULL AND n.closed is null 
 		AND pgr_node_2 = node_2::INT;
