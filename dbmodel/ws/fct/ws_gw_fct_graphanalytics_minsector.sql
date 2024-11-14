@@ -98,15 +98,18 @@ BEGIN
     UPDATE temp_pgr_node n SET modif = TRUE
     WHERE n.graph_delimiter = 'MINSECTOR';
 
+    UPDATE temp_pgr_node n set closed = v.closed, broken = v.broken, to_arc = v.to_arc, modif=true
+    FROM man_valve v
+    WHERE n.node_id=v.node_id and n.graph_delimiter = 'MINSECTOR';
+
     -- If we want to ignore open but broken valves
     IF v_ignorebrokenvalves THEN
         UPDATE temp_pgr_node n SET modif = FALSE
-        FROM man_valve v
-        WHERE n.node_id = v.node_id AND n.graph_delimiter = 'MINSECTOR' AND v.closed = FALSE AND v.broken = TRUE;
+        WHERE n.graph_delimiter = 'MINSECTOR' AND n.closed = FALSE AND n.broken = TRUE;
     END IF;
 
     -- Arcs to be disconnected: one of the two arcs that reach the valve
-    UPDATE temp_pgr_arc a SET modif = TRUE, cost = -1, reverse_cost = -1
+    UPDATE temp_pgr_arc a SET modif = TRUE
     FROM (
         SELECT DISTINCT ON (n.pgr_node_id) n.pgr_node_id, a.pgr_arc_id
         FROM temp_pgr_node n
@@ -124,7 +127,7 @@ BEGIN
     WHERE n.node_id = s.node_id AND n.pgr_node_id = n.node_id::INTEGER AND n.graph_delimiter = 'SECTOR';
 
     -- Arcs to be disconnected: all those that connect to the nodes where "graph_delimiter" = 'SECTOR' and are also in the "sector" table
-    UPDATE temp_pgr_arc t SET modif = TRUE, cost = -1, reverse_cost = -1
+    UPDATE temp_pgr_arc t SET modif = TRUE
     FROM temp_pgr_node n
     JOIN temp_pgr_arc a ON n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
     WHERE t.pgr_arc_id = a.pgr_arc_id AND n.modif = TRUE AND n.graph_delimiter = 'SECTOR';
