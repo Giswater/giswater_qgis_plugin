@@ -91,8 +91,8 @@ class GwFeatureEndButton(GwAction):
                 self.layers['gully'] = tools_gw.get_layers_from_feature_type('gully')
 
         # Set icons
-        tools_gw.add_icon(self.dlg_work_end.btn_insert, "111", sub_folder="24x24")
-        tools_gw.add_icon(self.dlg_work_end.btn_delete, "112", sub_folder="24x24")
+        tools_gw.add_icon(self.dlg_work_end.btn_insert, "111")
+        tools_gw.add_icon(self.dlg_work_end.btn_delete, "112")
         tools_gw.add_icon(self.dlg_work_end.btn_snapping, "137")
         tools_gw.add_icon(self.dlg_work_end.btn_new_workcat, "193")
 

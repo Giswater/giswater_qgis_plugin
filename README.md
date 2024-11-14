@@ -1,7 +1,7 @@
 <div align="center">
 	<a href="https://www.giswater.org/">
 		<picture>
-		<img alt="Giswater logo" src="./icons/dialogs/20x20/giswater.png" height="128">
+		<img alt="Giswater logo" src="./icons/dialogs/136.png" height="128">
 		</picture>
 	</a>
 	<h1>Giswater</h1>

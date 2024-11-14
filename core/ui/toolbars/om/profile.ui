@@ -181,10 +181,6 @@
    <property name="checkable">
     <bool>false</bool>
    </property>
-   <property name="icon">
-    <iconset>
-     <normaloff>../icons/131.png</normaloff>../icons/131.png</iconset>
-   </property>
    <property name="text">
     <string>actionProfile</string>
    </property>

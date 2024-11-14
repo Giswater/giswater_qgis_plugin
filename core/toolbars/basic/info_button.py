@@ -133,7 +133,7 @@ class GwInfoButton(GwMaptool):
         if len_layers == 0:
             return False
 
-        self.icon_folder = self.plugin_dir + '/icons/'
+        self.icon_folder = self.plugin_dir + '/icons/dialogs/'
 
         # Right click main QMenu
         main_menu = QMenu()

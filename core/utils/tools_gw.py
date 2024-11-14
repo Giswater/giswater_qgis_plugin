@@ -3346,11 +3346,11 @@ def set_tablemodel_config(dialog, widget, table_name, sort_order=0, schema_name=
     return widget
 
 
-def add_icon(widget, icon, sub_folder="20x20", folder="dialogs"):
+def add_icon(widget, icon, folder="dialogs", sub_folder="20x20"):
     """ Set @icon to selected @widget """
 
     # Get icons folder
-    icons_folder = os.path.join(lib_vars.plugin_dir, f"icons{os.sep}{folder}{os.sep}{sub_folder}")
+    icons_folder = os.path.join(lib_vars.plugin_dir, f"icons{os.sep}{folder}")
     icon_path = os.path.join(icons_folder, str(icon) + ".png")
 
     if os.path.exists(icon_path):
@@ -3363,9 +3363,9 @@ def add_icon(widget, icon, sub_folder="20x20", folder="dialogs"):
         return False
 
 
-def get_icon(icon, folder="dialogs", sub_folder="20x20"):
+def get_icon(icon, folder="dialogs"):
     # Get icons folder
-    icons_folder = os.path.join(lib_vars.plugin_dir, f"icons{os.sep}{folder}{os.sep}{sub_folder}")
+    icons_folder = os.path.join(lib_vars.plugin_dir, f"icons{os.sep}{folder}")
     icon_path = os.path.join(icons_folder, str(icon) + ".png")
 
     if os.path.exists(icon_path):

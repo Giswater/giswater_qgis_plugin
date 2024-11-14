@@ -656,8 +656,8 @@ class GwInfo(QObject):
 
         # Set actions icon
         tools_gw.add_icon(self.action_edit, "101")
-        tools_gw.add_icon(self.action_copy_paste, "107b", "24x24")
-        tools_gw.add_icon(self.action_rotation, "107c", "24x24")
+        tools_gw.add_icon(self.action_copy_paste, "106")
+        tools_gw.add_icon(self.action_rotation, "110")
         tools_gw.add_icon(self.action_catalog, "195")
         tools_gw.add_icon(self.action_workcat, "193")
         tools_gw.add_icon(self.action_mapzone, "213", sub_folder="24x24")
@@ -665,9 +665,9 @@ class GwInfo(QObject):
         tools_gw.add_icon(self.action_get_arc_id, "209")
         tools_gw.add_icon(self.action_get_parent_id, "210")
         tools_gw.add_icon(self.action_centered, "104")
-        tools_gw.add_icon(self.action_link, "173", sub_folder="24x24")
+        tools_gw.add_icon(self.action_link, "173")
         tools_gw.add_icon(self.action_section, "207")
-        tools_gw.add_icon(self.action_help, "73", sub_folder="24x24")
+        tools_gw.add_icon(self.action_help, "130")
         tools_gw.add_icon(self.action_interpolate, "194")
         tools_gw.add_icon(self.action_orifice, "250", sub_folder="24x24")
         tools_gw.add_icon(self.action_outlet, "251", sub_folder="24x24")
@@ -3417,7 +3417,7 @@ def open_epa_dlg(**kwargs):
         if 'dscenario' not in view:
             btn_add_base = info.dlg.findChild(QPushButton, 'btn_add_base')
             if btn_add_base:
-                tools_gw.add_icon(btn_add_base, '111b', "24x24")
+                tools_gw.add_icon(btn_add_base, '111b')
                 btn_add_base.clicked.connect(partial(add_row_epa, tbl, view, add_view, pk, info.dlg, add_dlg_title, "INSERT", **kwargs))
             btn_edit_base = info.dlg.findChild(QPushButton, 'btn_edit_base')
             if btn_edit_base:
@@ -3425,16 +3425,16 @@ def open_epa_dlg(**kwargs):
                 btn_edit_base.clicked.connect(partial(edit_row_epa, tbl, view, add_view, pk, info.dlg, add_dlg_title, **kwargs))
             btn_delete_base = info.dlg.findChild(QPushButton, 'btn_delete_base')
             if btn_delete_base:
-                tools_gw.add_icon(btn_delete_base, '112b', "24x24")
+                tools_gw.add_icon(btn_delete_base, '112b')
                 btn_delete_base.clicked.connect(partial(delete_tbl_row, tbl, view, pk, info.dlg, tablename=tableview['tbl'], tableview=tableview['view'], id_name=id_name, feature_id=feature_id, **kwargs))
         else:
             btn_add_dscenario = info.dlg.findChild(QPushButton, 'btn_add_dscenario')
             if btn_add_dscenario:
-                tools_gw.add_icon(btn_add_dscenario, '111b', "24x24")
+                tools_gw.add_icon(btn_add_dscenario, '111b')
                 btn_add_dscenario.clicked.connect(partial(add_row_epa, tbl, view, add_view, pk, info.dlg, add_dlg_title, "INSERT", **kwargs))
             btn_delete_dscenario = info.dlg.findChild(QPushButton, 'btn_delete_dscenario')
             if btn_delete_dscenario:
-                tools_gw.add_icon(btn_delete_dscenario, '112b', "24x24")
+                tools_gw.add_icon(btn_delete_dscenario, '112b')
                 btn_delete_dscenario.clicked.connect(partial(delete_tbl_row, tbl, view, pk, info.dlg, **kwargs))
             btn_edit_dscenario = info.dlg.findChild(QPushButton, 'btn_edit_dscenario')
             if btn_edit_dscenario:

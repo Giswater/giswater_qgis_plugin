@@ -146,10 +146,6 @@
             <property name="text">
              <string>Add geom</string>
             </property>
-            <property name="icon">
-             <iconset>
-              <normaloff>../icons/133.png</normaloff>../icons/133.png</iconset>
-            </property>
            </widget>
           </item>
           <item row="1" column="3">
@@ -414,10 +410,6 @@
               <property name="text">
                <string/>
               </property>
-              <property name="icon">
-               <iconset>
-                <normaloff>../icons/111.png</normaloff>../icons/111.png</iconset>
-              </property>
              </widget>
             </item>
             <item>
@@ -425,20 +417,12 @@
               <property name="text">
                <string/>
               </property>
-              <property name="icon">
-               <iconset>
-                <normaloff>../icons/112.png</normaloff>../icons/112.png</iconset>
-              </property>
              </widget>
             </item>
             <item>
              <widget class="QPushButton" name="btn_feature_snapping">
               <property name="text">
                <string/>
-              </property>
-              <property name="icon">
-               <iconset>
-                <normaloff>../icons/137.png</normaloff>../icons/137.png</iconset>
               </property>
              </widget>
             </item>
@@ -616,10 +600,6 @@
               <property name="text">
                <string/>
               </property>
-              <property name="icon">
-               <iconset>
-                <normaloff>../icons/111.png</normaloff>../icons/111.png</iconset>
-              </property>
              </widget>
             </item>
             <item>
@@ -627,20 +607,12 @@
               <property name="text">
                <string/>
               </property>
-              <property name="icon">
-               <iconset>
-                <normaloff>../icons/112.png</normaloff>../icons/112.png</iconset>
-              </property>
              </widget>
             </item>
             <item>
              <widget class="QPushButton" name="btn_doc_new">
               <property name="text">
                <string/>
-              </property>
-              <property name="icon">
-               <iconset>
-                <normaloff>../icons/34.png</normaloff>../icons/34.png</iconset>
               </property>
              </widget>
             </item>

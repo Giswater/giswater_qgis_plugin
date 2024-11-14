@@ -179,7 +179,7 @@ class Giswater(QObject):
         lib_vars.plugin_dir = plugin_dir
         global_vars.iface = self.iface
         self.plugin_name = tools_qgis.get_plugin_metadata('name', 'giswater', plugin_dir)
-        self.icon_folder = f"{plugin_dir}{os.sep}icons{os.sep}dialogs{os.sep}24x24{os.sep}"
+        self.icon_folder = f"{plugin_dir}{os.sep}icons{os.sep}dialogs{os.sep}"
         major_version = tools_qgis.get_major_version(plugin_dir=plugin_dir)
         user_folder_dir = f'{tools_os.get_datadir()}{os.sep}{self.plugin_name.capitalize()}{os.sep}{major_version}'
         global_vars.init_global(self.iface, self.iface.mapCanvas(), plugin_dir, self.plugin_name, user_folder_dir)
@@ -329,7 +329,7 @@ class Giswater(QObject):
             self.action_info = self.iface.addToolBarWidget(main_toolbutton)
 
             # Set icon button if exists
-            icon_path = self.icon_folder + '36.png'
+            icon_path = self.icon_folder + '118.png'
             if os.path.exists(icon_path):
                 icon = QIcon(icon_path)
                 self.action = QAction(icon, "Show info", self.iface.mainWindow())

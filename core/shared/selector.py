@@ -264,7 +264,7 @@ class GwSelector:
             self.help_button = QToolButton(None)
             style = "border: none;"
             tools_qt.set_stylesheet(self.help_button, style)
-            help_icon = tools_gw.add_icon(self.help_button, '73', sub_folder='24x24')
+            help_icon = tools_gw.add_icon(self.help_button, '130')
             action = QAction(help_icon, "Help")
             action.triggered.connect(partial(self._show_help, dialog, selection_modes))
             self.help_button.setDefaultAction(action)

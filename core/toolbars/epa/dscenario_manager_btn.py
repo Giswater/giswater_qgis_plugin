@@ -581,8 +581,8 @@ class GwDscenarioManagerButton(GwAction):
 
         # Add icons
         tools_gw.add_icon(self.dlg_dscenario.btn_toc, "306", sub_folder="24x24")
-        tools_gw.add_icon(self.dlg_dscenario.btn_insert, "111", sub_folder="24x24")
-        tools_gw.add_icon(self.dlg_dscenario.btn_delete, "112", sub_folder="24x24")
+        tools_gw.add_icon(self.dlg_dscenario.btn_insert, "111")
+        tools_gw.add_icon(self.dlg_dscenario.btn_delete, "112")
         tools_gw.add_icon(self.dlg_dscenario.btn_snapping, "137")
 
         default_tab_idx = 0

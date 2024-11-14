@@ -120,16 +120,16 @@ class GwPsector:
         self.layers = tools_gw.remove_selection(True, layers=self.layers)
 
         # Set icons
-        tools_gw.add_icon(self.dlg_plan_psector.btn_insert, "111", sub_folder="24x24")
-        tools_gw.add_icon(self.dlg_plan_psector.btn_delete, "112", sub_folder="24x24")
+        tools_gw.add_icon(self.dlg_plan_psector.btn_insert, "111")
+        tools_gw.add_icon(self.dlg_plan_psector.btn_delete, "112")
         tools_gw.add_icon(self.dlg_plan_psector.btn_snapping, "137")
         tools_gw.add_icon(self.dlg_plan_psector.btn_select_arc, "310", sub_folder="24x24")
-        tools_gw.add_icon(self.dlg_plan_psector.btn_arc_fusion, "17", sub_folder="24x24")
+        tools_gw.add_icon(self.dlg_plan_psector.btn_arc_fusion, "116")
         tools_gw.add_icon(self.dlg_plan_psector.btn_set_to_arc, "209")
         tools_gw.add_icon(self.dlg_plan_psector.btn_toggle, "101")
-        tools_gw.add_icon(self.dlg_plan_psector.btn_doc_insert, "111", sub_folder="24x24")
-        tools_gw.add_icon(self.dlg_plan_psector.btn_doc_delete, "112", sub_folder="24x24")
-        tools_gw.add_icon(self.dlg_plan_psector.btn_doc_new, "34", sub_folder="24x24")
+        tools_gw.add_icon(self.dlg_plan_psector.btn_doc_insert, "111")
+        tools_gw.add_icon(self.dlg_plan_psector.btn_doc_delete, "112")
+        tools_gw.add_icon(self.dlg_plan_psector.btn_doc_new, "117")
         tools_gw.add_icon(self.dlg_plan_psector.btn_open_doc, "170")
 
         table_object = "psector"

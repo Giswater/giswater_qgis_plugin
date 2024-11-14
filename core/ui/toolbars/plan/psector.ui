@@ -1682,28 +1682,16 @@
              <property name="text">
               <string/>
              </property>
-             <property name="icon">
-              <iconset>
-               <normaloff>../icons/111b.png</normaloff>../icons/111b.png</iconset>
-             </property>
             </widget>
            </item>
            <item>
             <widget class="QPushButton" name="btn_doc_delete">
-             <property name="icon">
-              <iconset>
-               <normaloff>../icons/112b.png</normaloff>../icons/112b.png</iconset>
-             </property>
             </widget>
            </item>
            <item>
             <widget class="QPushButton" name="btn_doc_new">
              <property name="text">
               <string/>
-             </property>
-             <property name="icon">
-              <iconset>
-               <normaloff>../icons/34.png</normaloff>../icons/34.png</iconset>
              </property>
             </widget>
            </item>

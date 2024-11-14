@@ -99,14 +99,14 @@ class GwDocument(QObject):
 
         # Set icons
         tools_gw.add_icon(self.dlg_add_doc.btn_add_geom, "133")
-        tools_gw.add_icon(self.dlg_add_doc.btn_insert, "111", sub_folder="24x24")
-        tools_gw.add_icon(self.dlg_add_doc.btn_insert_workcat, "111", sub_folder="24x24")
-        tools_gw.add_icon(self.dlg_add_doc.btn_insert_psector, "111", sub_folder="24x24")
-        tools_gw.add_icon(self.dlg_add_doc.btn_insert_visit, "111", sub_folder="24x24")
-        tools_gw.add_icon(self.dlg_add_doc.btn_delete, "112", sub_folder="24x24")
-        tools_gw.add_icon(self.dlg_add_doc.btn_delete_workcat, "112", sub_folder="24x24")
-        tools_gw.add_icon(self.dlg_add_doc.btn_delete_psector, "112", sub_folder="24x24")
-        tools_gw.add_icon(self.dlg_add_doc.btn_delete_visit, "112", sub_folder="24x24")
+        tools_gw.add_icon(self.dlg_add_doc.btn_insert, "111")
+        tools_gw.add_icon(self.dlg_add_doc.btn_insert_workcat, "111")
+        tools_gw.add_icon(self.dlg_add_doc.btn_insert_psector, "111")
+        tools_gw.add_icon(self.dlg_add_doc.btn_insert_visit, "111")
+        tools_gw.add_icon(self.dlg_add_doc.btn_delete, "112")
+        tools_gw.add_icon(self.dlg_add_doc.btn_delete_workcat, "112")
+        tools_gw.add_icon(self.dlg_add_doc.btn_delete_psector, "112")
+        tools_gw.add_icon(self.dlg_add_doc.btn_delete_visit, "112")
         tools_gw.add_icon(self.dlg_add_doc.btn_snapping, "137")
 
         # Fill combo boxes
