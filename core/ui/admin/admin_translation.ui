@@ -191,17 +191,19 @@
   </layout>
  </widget>
  <tabstops>
+  <tabstop>txt_host</tabstop>
+  <tabstop>txt_port</tabstop>
+  <tabstop>txt_db</tabstop>
+  <tabstop>txt_user</tabstop>
   <tabstop>txt_pass</tabstop>
   <tabstop>btn_connection</tabstop>
   <tabstop>cmb_language</tabstop>
   <tabstop>chk_py_msg</tabstop>
   <tabstop>chk_db_msg</tabstop>
+  <tabstop>chk_refresh_i18n</tabstop>
+  <tabstop>chk_missing_translations</tabstop>
   <tabstop>btn_translate</tabstop>
   <tabstop>btn_close</tabstop>
-  <tabstop>txt_host</tabstop>
-  <tabstop>txt_port</tabstop>
-  <tabstop>txt_db</tabstop>
-  <tabstop>txt_user</tabstop>
  </tabstops>
  <resources/>
  <connections/>

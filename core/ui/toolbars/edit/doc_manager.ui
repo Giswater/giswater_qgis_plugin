@@ -118,6 +118,13 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>doc_name</tabstop>
+  <tabstop>tbl_document</tabstop>
+  <tabstop>btn_create</tabstop>
+  <tabstop>btn_delete</tabstop>
+  <tabstop>btn_cancel</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

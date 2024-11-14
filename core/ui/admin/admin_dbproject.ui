@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>676</width>
-    <height>796</height>
+    <width>604</width>
+    <height>692</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -298,10 +298,14 @@
   <tabstop>srid_id</tabstop>
   <tabstop>tbl_srid</tabstop>
   <tabstop>rdb_empty</tabstop>
+  <tabstop>rdb_sample_inv</tabstop>
   <tabstop>rdb_sample_full</tabstop>
   <tabstop>rdb_inp</tabstop>
   <tabstop>data_file</tabstop>
   <tabstop>btn_push_file</tabstop>
+  <tabstop>btn_accept</tabstop>
+  <tabstop>btn_cancel_task</tabstop>
+  <tabstop>btn_close</tabstop>
  </tabstops>
  <resources/>
  <connections/>

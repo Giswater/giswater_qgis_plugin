@@ -86,6 +86,12 @@
       <layout class="QGridLayout" name="gridLayout_2">
        <item row="0" column="0">
         <widget class="QScrollArea" name="scrollArea">
+         <property name="minimumSize">
+          <size>
+           <width>529</width>
+           <height>178</height>
+          </size>
+         </property>
          <property name="widgetResizable">
           <bool>true</bool>
          </property>
@@ -94,8 +100,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>571</width>
-            <height>494</height>
+            <width>563</width>
+            <height>472</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout_5">
@@ -418,8 +424,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>571</width>
-            <height>494</height>
+            <width>109</width>
+            <height>109</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout_6">
@@ -436,6 +442,26 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>mainTab</tabstop>
+  <tabstop>scrollArea</tabstop>
+  <tabstop>btn_hs_ds</tabstop>
+  <tabstop>btn_options</tabstop>
+  <tabstop>txt_result_name</tabstop>
+  <tabstop>chk_export</tabstop>
+  <tabstop>chk_export_subcatch</tabstop>
+  <tabstop>txt_file_inp</tabstop>
+  <tabstop>btn_file_inp</tabstop>
+  <tabstop>chk_exec</tabstop>
+  <tabstop>txt_file_rpt</tabstop>
+  <tabstop>btn_file_rpt</tabstop>
+  <tabstop>chk_import_result</tabstop>
+  <tabstop>scrollArea_2</tabstop>
+  <tabstop>txt_infolog</tabstop>
+  <tabstop>btn_accept</tabstop>
+  <tabstop>btn_cancel</tabstop>
+  <tabstop>btn_close</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

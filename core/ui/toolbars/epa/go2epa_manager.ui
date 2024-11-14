@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>843</width>
+    <width>919</width>
     <height>786</height>
    </rect>
   </property>
@@ -167,6 +167,17 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>txt_result_id</tabstop>
+  <tabstop>btn_edit</tabstop>
+  <tabstop>btn_show_inp_data</tabstop>
+  <tabstop>btn_archive</tabstop>
+  <tabstop>btn_set_corporate</tabstop>
+  <tabstop>btn_delete</tabstop>
+  <tabstop>tbl_rpt_cat_result</tabstop>
+  <tabstop>txt_infolog</tabstop>
+  <tabstop>btn_close</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

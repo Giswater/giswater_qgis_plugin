@@ -180,6 +180,18 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>mainTab</tabstop>
+  <tabstop>feature_type</tabstop>
+  <tabstop>feature_id</tabstop>
+  <tabstop>btn_snapping</tabstop>
+  <tabstop>btn_relations</tabstop>
+  <tabstop>txt_feature_infolog</tabstop>
+  <tabstop>btn_delete</tabstop>
+  <tabstop>txt_infolog</tabstop>
+  <tabstop>btn_delete_another</tabstop>
+  <tabstop>btn_cancel</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

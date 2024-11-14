@@ -144,8 +144,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>109</width>
-            <height>109</height>
+            <width>307</width>
+            <height>461</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout_5">
@@ -200,6 +200,20 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>mainTab</tabstop>
+  <tabstop>data_inp_input_file</tabstop>
+  <tabstop>btn_push_inp_input_file</tabstop>
+  <tabstop>data_config_file</tabstop>
+  <tabstop>btn_push_config_file</tabstop>
+  <tabstop>data_output_folder</tabstop>
+  <tabstop>btn_push_output_folder</tabstop>
+  <tabstop>txt_filename</tabstop>
+  <tabstop>scrollArea</tabstop>
+  <tabstop>txt_infolog</tabstop>
+  <tabstop>btn_accept</tabstop>
+  <tabstop>btn_close</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

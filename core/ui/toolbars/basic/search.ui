@@ -10,6 +10,12 @@
     <height>278</height>
    </rect>
   </property>
+  <property name="minimumSize">
+   <size>
+    <width>188</width>
+    <height>197</height>
+   </size>
+  </property>
   <property name="windowTitle">
    <string>SearchPlus</string>
   </property>

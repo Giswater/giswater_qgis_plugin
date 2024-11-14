@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>479</width>
-    <height>241</height>
+    <height>282</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -163,6 +163,19 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>txt_path</tabstop>
+  <tabstop>btn_path</tabstop>
+  <tabstop>chk_composer</tabstop>
+  <tabstop>cmb_templates</tabstop>
+  <tabstop>txt_composer_path</tabstop>
+  <tabstop>txt_csv_detail_path</tabstop>
+  <tabstop>txt_csv_path</tabstop>
+  <tabstop>chk_csv_detail</tabstop>
+  <tabstop>chk_csv</tabstop>
+  <tabstop>btn_ok</tabstop>
+  <tabstop>btn_cancel</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

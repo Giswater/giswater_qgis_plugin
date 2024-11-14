@@ -193,6 +193,18 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>txt_style_name</tabstop>
+  <tabstop>cmb_stylegroup</tabstop>
+  <tabstop>btn_add_group</tabstop>
+  <tabstop>btn_delete_group</tabstop>
+  <tabstop>btn_add_style</tabstop>
+  <tabstop>btn_update_style</tabstop>
+  <tabstop>btn_delete_style</tabstop>
+  <tabstop>btn_refresh_all</tabstop>
+  <tabstop>tbl_style</tabstop>
+  <tabstop>btn_close</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

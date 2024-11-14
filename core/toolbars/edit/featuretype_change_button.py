@@ -20,7 +20,7 @@ from ....libs import tools_qgis, tools_qt, tools_db
 from .... import global_vars
 from qgis.PyQt.QtWidgets import QAction, QAbstractItemView, QCheckBox, QComboBox, QCompleter, QDoubleSpinBox, \
     QDateEdit, QGridLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QPushButton, QSizePolicy, \
-    QSpinBox, QSpacerItem, QTableView, QTabWidget, QWidget, QTextEdit, QRadioButton, QToolBox
+    QSpinBox, QSpacerItem, QTableView, QTabWidget, QWidget, QTextEdit, QRadioButton, QToolBox, QHBoxLayout
 
 class GwFeatureTypeChangeButton(GwMaptool):
     """ Button 28: Change feature type
@@ -184,65 +184,54 @@ class GwFeatureTypeChangeButton(GwMaptool):
 
 
     def _manage_dlg_widgets(self, dialog, complet_result):
-        """ Creates and populates all the widgets """
+        """ Creates and populates all the widgets, preserving original layout logic while ensuring two-column alignment """
 
-        layout_list = []
-        widget_offset = 0
-        prev_layout = ""
         layout_orientations = {}
+        # Define a fixed width for labels to ensure alignment
+        label_fixed_width = 100
 
-
+        # Retrieve layout orientations from the JSON response if provided
         for layout_name, layout_info in complet_result['body']['form']['layouts'].items():
             orientation = layout_info.get('lytOrientation')
             if orientation:
                 layout_orientations[layout_name] = orientation
 
+        # Loop through fields to add them to the appropriate layout
         for field in complet_result['body']['data']['fields']:
-
+            # Skip hidden fields based on conditions
             if field.get('hidden'):
                 continue
 
-            if field['widgettype'] is "button":
-                continue
-
-            if field.get('widgetcontrols') and field['widgetcontrols'].get('hiddenWhenNull') \
-                    and field.get('value') in (None, ''):
-                continue
+            # Create label and widget
             label, widget = tools_gw.set_widgets(dialog, complet_result, field, self.tablename, self)
             if widget is None:
                 continue
 
+            # Check if the label is valid before applying size adjustments
+            if label is not None:
+                label.setFixedWidth(label_fixed_width)
+
+            # Find the layout for the current field based on layoutname
             layout = dialog.findChild(QGridLayout, field['layoutname'])
-            if layout is not None:
-                if layout.objectName() != prev_layout:
-                    widget_offset = 0
-                    prev_layout = layout.objectName()
+            if layout is None:
+                continue
 
-                orientation = layout_orientations.get(layout.objectName(),
-                                                      "vertical")
-                layout.setProperty('lytOrientation', orientation)
+            # Apply layout orientation if specified in JSON
+            orientation = layout_orientations.get(layout.objectName(), "vertical")
+            layout.setProperty('lytOrientation', orientation)
 
-                # Take the QGridLayout with the intention of adding a QSpacerItem later
-                if layout not in layout_list and layout.objectName() in ('lyt_main_1', 'lyt_main_2', 'lyt_main_3','lyt_buttons'):
-                    layout_list.append(layout)
+            # Adjust alignment for the Catalog id label
+            if field['columnname'] == "featurecat_id":
+                # Add the label and combo box (Catalog ID) with the button
+                layout.addWidget(label, field['layoutorder'] - 1, 0)
+                layout.addWidget(widget, field['layoutorder'] - 1, 1)
+            else:
+                # Use add_widget_combined for other fields
+                tools_gw.add_widget_combined(dialog, field, label, widget)
 
-                if field['layoutorder'] is None:
-                    message = "The field layoutorder is not configured for"
-                    msg = f"formname:{self.tablename}, columnname:{field['columnname']}"
-                    tools_qgis.show_message(message, 2, parameter=msg, dialog=dialog)
-                    continue
-
-                # Manage widget and label positions
-                label_pos = field['widgetcontrols']['labelPosition'] if (
-                            'widgetcontrols' in field and field['widgetcontrols'] and 'labelPosition' in field[
-                             'widgetcontrols']) else None
-                widget_pos = field['layoutorder'] + widget_offset
-
-                # The data tab is somewhat special (it has 2 columns)
-                if 'lyt_data' in layout.objectName() or 'lyt_epa_data' in layout.objectName():
-                    tools_gw.add_widget(dialog, field, label, widget)
-                else:
-                    tools_gw.add_widget_combined(dialog, field, label, widget)
+            # Apply consistent column stretch across all layouts
+            layout.setColumnStretch(0, 1)  # Label column stretch (keep this compact)
+            layout.setColumnStretch(1, 3)  # Widget column stretch for sufficient space
 
 
     def _featuretype_change(self, event):
@@ -297,7 +286,7 @@ def btn_accept_featuretype_change(**kwargs):
 
     project_type = tools_gw.get_project_type()
     feature_type_new = tools_qt.get_combo_value(dialog, "tab_none_feature_type_new", 1)
-    featurecat_id = tools_qt.get_combo_value(dialog, "tab_none_featurecat_id", 1)
+    featurecat_id = tools_qt.get_widget_value(dialog, "tab_none_featurecat_id")
 
     fluid_type = tools_qt.get_combo_value(dialog, 'tab_none_fluid_type', 1)
     if fluid_type is None:
@@ -324,7 +313,7 @@ def btn_accept_featuretype_change(**kwargs):
                 message = "Selected values are not valid for this process, they are not related to selected feature."
                 tools_qgis.show_warning(message, dialog=dialog)
                 return
-        
+
             # Get function input parameters
             feature = f'"type":"{this.feature_type}"'
             extras = f'"feature_id":"{this.feature_id}"'
@@ -414,11 +403,26 @@ def cmb_new_featuretype_selection_changed(**kwargs):
     json_result = tools_gw.execute_procedure("gw_fct_getchangefeaturetype", body)
 
     for field in json_result['body']['data']['fields']:
-        if field.get('widgetcontrols') and field['widgetcontrols'].get('reloadFields'):
-            reload_fields = field['widgetcontrols'].get('reloadFields')
-        if field['widgettype'] == 'combo':
-            if field.get('hidden') or (field.get('widgetcontrols') and field['widgetcontrols'].get('hiddenWhenNull')
-                                       and field.get('value') in (None, '')) or field['columnname'] not in reload_fields:
-                continue
+        widgetcontrols = field.get('widgetcontrols')
+        if widgetcontrols:
+            reload_fields = widgetcontrols.get('reloadFields', [])
 
+        if field.get('hidden') or (
+            widgetcontrols and widgetcontrols.get('hiddenWhenNull') and field.get('value') in (None, '')
+        ) or field['columnname'] not in reload_fields:
+            continue
+
+        if field['widgettype'] == 'combo':
             tools_gw.fill_combo(tools_qt.get_widget(dialog, field['widgetname']), field)
+        if field['widgettype'] == 'typeahead':
+            # Retrieve widget and selected value
+            widget = tools_qt.get_widget(dialog, field['widgetname'])
+            selected_value = tools_qt.get_widget_value(dialog, widget)
+
+            # Populate rows from comboIds and comboNames
+            rows = list(zip(field.get('comboIds', []), field.get('comboNames', [])))
+            tools_qt.set_completer_rows(widget, rows)
+
+            # Update widget text if the selected value does not already appear formatted
+            if not (selected_value.startswith('(') and selected_value.endswith(')')):
+                tools_qt.set_widget_text(dialog, widget, f"{selected_value}")

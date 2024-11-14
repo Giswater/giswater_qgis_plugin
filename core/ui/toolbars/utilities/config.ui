@@ -12,8 +12,8 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>0</width>
-    <height>0</height>
+    <width>244</width>
+    <height>273</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -328,8 +328,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>866</width>
-             <height>600</height>
+             <width>457</width>
+             <height>472</height>
             </rect>
            </property>
            <layout class="QGridLayout" name="gridLayout_3">
@@ -477,8 +477,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>866</width>
-             <height>600</height>
+             <width>457</width>
+             <height>472</height>
             </rect>
            </property>
            <layout class="QGridLayout" name="gridLayout_36">
@@ -646,8 +646,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>866</width>
-             <height>600</height>
+             <width>457</width>
+             <height>472</height>
             </rect>
            </property>
            <layout class="QGridLayout" name="gridLayout_7">
@@ -703,8 +703,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>866</width>
-             <height>600</height>
+             <width>457</width>
+             <height>472</height>
             </rect>
            </property>
            <layout class="QGridLayout" name="gridLayout_8">
@@ -856,6 +856,16 @@
    </layout>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>tab_main</tabstop>
+  <tabstop>scrollArea_2</tabstop>
+  <tabstop>scrollArea</tabstop>
+  <tabstop>scrollArea_6</tabstop>
+  <tabstop>scrollArea_4</tabstop>
+  <tabstop>scrollArea_5</tabstop>
+  <tabstop>btn_accept</tabstop>
+  <tabstop>btn_cancel</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

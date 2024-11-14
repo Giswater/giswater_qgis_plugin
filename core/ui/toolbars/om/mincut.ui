@@ -10,6 +10,12 @@
     <height>768</height>
    </rect>
   </property>
+  <property name="minimumSize">
+   <size>
+    <width>387</width>
+    <height>333</height>
+   </size>
+  </property>
   <property name="font">
    <font>
     <weight>50</weight>
@@ -32,7 +38,7 @@
          <x>0</x>
          <y>0</y>
          <width>578</width>
-         <height>666</height>
+         <height>667</height>
         </rect>
        </property>
        <layout class="QGridLayout" name="gridLayout_5">
@@ -1125,6 +1131,11 @@
   </action>
  </widget>
  <tabstops>
+  <tabstop>scrollArea</tabstop>
+  <tabstop>result_mincut_id</tabstop>
+  <tabstop>state</tabstop>
+  <tabstop>work_order</tabstop>
+  <tabstop>mainTab</tabstop>
   <tabstop>chk_use_planified</tabstop>
   <tabstop>main_tab</tabstop>
   <tabstop>type</tabstop>
@@ -1150,13 +1161,11 @@
   <tabstop>cbx_date_end</tabstop>
   <tabstop>cbx_hours_end</tabstop>
   <tabstop>btn_end</tabstop>
-  <tabstop>mainTab</tabstop>
-  <tabstop>state</tabstop>
-  <tabstop>work_order</tabstop>
-  <tabstop>result_mincut_id</tabstop>
-  <tabstop>scrollArea</tabstop>
   <tabstop>tbl_hydro</tabstop>
   <tabstop>txt_infolog</tabstop>
+  <tabstop>btn_accept</tabstop>
+  <tabstop>btn_cancel_task</tabstop>
+  <tabstop>btn_cancel</tabstop>
  </tabstops>
  <resources/>
  <connections/>

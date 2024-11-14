@@ -45,6 +45,12 @@
        <layout class="QGridLayout" name="gridLayout">
         <item row="0" column="1">
          <widget class="QScrollArea" name="scrollArea">
+          <property name="minimumSize">
+           <size>
+            <width>370</width>
+            <height>273</height>
+           </size>
+          </property>
           <property name="widgetResizable">
            <bool>true</bool>
           </property>
@@ -373,6 +379,12 @@
        <layout class="QGridLayout" name="gridLayout_21">
         <item row="0" column="0">
          <widget class="QScrollArea" name="scrollArea_2">
+          <property name="minimumSize">
+           <size>
+            <width>370</width>
+            <height>273</height>
+           </size>
+          </property>
           <property name="widgetResizable">
            <bool>true</bool>
           </property>
@@ -381,8 +393,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>501</width>
-             <height>827</height>
+             <width>350</width>
+             <height>365</height>
             </rect>
            </property>
            <layout class="QGridLayout" name="gridLayout_12">
@@ -576,8 +588,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>501</width>
-             <height>827</height>
+             <width>199</width>
+             <height>294</height>
             </rect>
            </property>
            <layout class="QGridLayout" name="gridLayout_20">
@@ -682,6 +694,8 @@
   </action>
  </widget>
  <tabstops>
+  <tabstop>tab_main</tabstop>
+  <tabstop>scrollArea</tabstop>
   <tabstop>cmb_connection</tabstop>
   <tabstop>cmb_project_type</tabstop>
   <tabstop>project_schema_name</tabstop>
@@ -690,7 +704,26 @@
   <tabstop>btn_schema_rename</tabstop>
   <tabstop>btn_delete</tabstop>
   <tabstop>btn_copy</tabstop>
-  <tabstop>tab_main</tabstop>
+  <tabstop>btn_schema_create</tabstop>
+  <tabstop>btn_gis_create</tabstop>
+  <tabstop>scrollArea_2</tabstop>
+  <tabstop>custom_path_folder</tabstop>
+  <tabstop>btn_custom_select_file</tabstop>
+  <tabstop>btn_custom_load_file</tabstop>
+  <tabstop>cmb_formname_fields</tabstop>
+  <tabstop>chk_add_fields_multi</tabstop>
+  <tabstop>btn_create_field</tabstop>
+  <tabstop>btn_update_field</tabstop>
+  <tabstop>btn_delete_field</tabstop>
+  <tabstop>btn_reload_fct_ftrg</tabstop>
+  <tabstop>scrollArea_4</tabstop>
+  <tabstop>btn_create_qgis_template</tabstop>
+  <tabstop>btn_translation</tabstop>
+  <tabstop>cmb_utils_ws</tabstop>
+  <tabstop>cmb_utils_ud</tabstop>
+  <tabstop>btn_create_utils</tabstop>
+  <tabstop>btn_update_utils</tabstop>
+  <tabstop>btn_close</tabstop>
  </tabstops>
  <resources/>
  <connections/>

@@ -586,6 +586,18 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>txt_pattern_id</tabstop>
+  <tabstop>cmb_pattern_type</tabstop>
+  <tabstop>cmb_expl_id</tabstop>
+  <tabstop>txt_observ</tabstop>
+  <tabstop>tbl_monthly</tabstop>
+  <tabstop>tbl_daily</tabstop>
+  <tabstop>tbl_hourly</tabstop>
+  <tabstop>tbl_weekend</tabstop>
+  <tabstop>btn_accept</tabstop>
+  <tabstop>btn_cancel</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

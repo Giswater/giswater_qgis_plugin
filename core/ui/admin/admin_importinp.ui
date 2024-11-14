@@ -137,6 +137,13 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>mainTab</tabstop>
+  <tabstop>txt_info</tabstop>
+  <tabstop>txt_infolog</tabstop>
+  <tabstop>btn_run</tabstop>
+  <tabstop>btn_close</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

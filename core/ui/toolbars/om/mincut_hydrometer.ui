@@ -179,6 +179,14 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>btn_insert</tabstop>
+  <tabstop>customer_code_connec</tabstop>
+  <tabstop>hydrometer_cc</tabstop>
+  <tabstop>btn_delete</tabstop>
+  <tabstop>tbl_hydro</tabstop>
+  <tabstop>btn_accept</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

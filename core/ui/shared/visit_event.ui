@@ -313,15 +313,17 @@
   </layout>
  </widget>
  <tabstops>
-  <tabstop>value</tabstop>
+  <tabstop>parameter_id</tabstop>
   <tabstop>event_code</tabstop>
+  <tabstop>value</tabstop>
   <tabstop>position_id</tabstop>
   <tabstop>position_value</tabstop>
   <tabstop>text</tabstop>
   <tabstop>tbl_docs_x_event</tabstop>
   <tabstop>btn_add_file</tabstop>
   <tabstop>btn_delete_file</tabstop>
-  <tabstop>parameter_id</tabstop>
+  <tabstop>btn_accept</tabstop>
+  <tabstop>btn_cancel</tabstop>
  </tabstops>
  <resources/>
  <connections/>

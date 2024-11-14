@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>470</width>
-    <height>499</height>
+    <height>503</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -62,6 +62,12 @@
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>403</width>
+       <height>0</height>
+      </size>
      </property>
      <property name="title">
       <string/>
@@ -211,6 +217,18 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>txt_id</tabstop>
+  <tabstop>txt_idval</tabstop>
+  <tabstop>cmb_timeser_type</tabstop>
+  <tabstop>cmb_times_type</tabstop>
+  <tabstop>cmb_expl_id</tabstop>
+  <tabstop>txt_fname</tabstop>
+  <tabstop>txt_descript</tabstop>
+  <tabstop>tbl_timeseries_value</tabstop>
+  <tabstop>btn_accept</tabstop>
+  <tabstop>btn_cancel</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

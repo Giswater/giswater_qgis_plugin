@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>443</width>
+    <width>450</width>
     <height>562</height>
    </rect>
   </property>
@@ -504,6 +504,23 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>parameter_id</tabstop>
+  <tabstop>parameter_type</tabstop>
+  <tabstop>code</tabstop>
+  <tabstop>data_type</tabstop>
+  <tabstop>vdefault</tabstop>
+  <tabstop>form_type</tabstop>
+  <tabstop>descript</tabstop>
+  <tabstop>short_descript</tabstop>
+  <tabstop>widgettype</tabstop>
+  <tabstop>isenabled</tabstop>
+  <tabstop>iseditable</tabstop>
+  <tabstop>ismandatory</tabstop>
+  <tabstop>dv_querytext</tabstop>
+  <tabstop>btn_ok</tabstop>
+  <tabstop>btn_cancel</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

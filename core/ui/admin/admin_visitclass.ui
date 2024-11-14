@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>479</width>
-    <height>768</height>
+    <width>431</width>
+    <height>708</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -467,6 +467,26 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>class_id</tabstop>
+  <tabstop>class_name</tabstop>
+  <tabstop>active</tabstop>
+  <tabstop>ismultievent</tabstop>
+  <tabstop>ismultifeature</tabstop>
+  <tabstop>feature_type</tabstop>
+  <tabstop>visit_type</tabstop>
+  <tabstop>param_options</tabstop>
+  <tabstop>descript</tabstop>
+  <tabstop>viewname</tabstop>
+  <tabstop>btn_class_ok</tabstop>
+  <tabstop>btn_class_cancel</tabstop>
+  <tabstop>btn_param_create</tabstop>
+  <tabstop>btn_param_update</tabstop>
+  <tabstop>btn_param_delete</tabstop>
+  <tabstop>tableView</tabstop>
+  <tabstop>btn_ok</tabstop>
+  <tabstop>btn_cancel</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

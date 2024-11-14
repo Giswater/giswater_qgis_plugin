@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>418</width>
-    <height>661</height>
+    <width>618</width>
+    <height>781</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -33,19 +33,6 @@
           <string>Element</string>
          </attribute>
          <layout class="QGridLayout" name="gridLayout_2">
-          <item row="10" column="0">
-           <spacer name="verticalSpacer">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>20</width>
-              <height>40</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
           <item row="9" column="0">
            <widget class="QPushButton" name="btn_add_geom">
             <property name="sizePolicy">
@@ -69,34 +56,21 @@
             </property>
            </widget>
           </item>
+          <item row="10" column="0">
+           <spacer name="verticalSpacer">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
           <item row="0" column="0">
            <layout class="QGridLayout" name="gridLayout_3">
-            <item row="2" column="2">
-             <widget class="QComboBox" name="element_type"/>
-            </item>
-            <item row="3" column="2">
-             <widget class="QComboBox" name="elementcat_id"/>
-            </item>
-            <item row="7" column="2">
-             <widget class="QComboBox" name="expl_id"/>
-            </item>
-            <item row="0" column="2">
-             <widget class="QLineEdit" name="element_id">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="frame">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="1">
-             <widget class="QLabel" name="lbl_code">
-              <property name="text">
-               <string> Code:</string>
-              </property>
-             </widget>
-            </item>
             <item row="3" column="1">
              <widget class="QLabel" name="lbl_elementcat_id">
               <property name="sizePolicy">
@@ -120,6 +94,51 @@
               </property>
               <property name="text">
                <string>Elementcat id:</string>
+              </property>
+              <property name="textFormat">
+               <enum>Qt::AutoText</enum>
+              </property>
+              <property name="scaledContents">
+               <bool>false</bool>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+              </property>
+              <property name="margin">
+               <number>3</number>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QLabel" name="lbl_code">
+              <property name="text">
+               <string> Code:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="5" column="1">
+             <widget class="QLabel" name="lbl_state">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="font">
+               <font>
+                <pointsize>8</pointsize>
+                <weight>50</weight>
+                <bold>false</bold>
+               </font>
+              </property>
+              <property name="frameShape">
+               <enum>QFrame::NoFrame</enum>
+              </property>
+              <property name="frameShadow">
+               <enum>QFrame::Plain</enum>
+              </property>
+              <property name="text">
+               <string>State:</string>
               </property>
               <property name="textFormat">
                <enum>Qt::AutoText</enum>
@@ -173,19 +192,6 @@
               </property>
              </widget>
             </item>
-            <item row="6" column="2">
-             <widget class="QComboBox" name="state_type">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-             </widget>
-            </item>
-            <item row="8" column="2">
-             <widget class="QComboBox" name="ownercat_id"/>
-            </item>
             <item row="10" column="1">
              <widget class="QLabel" name="lbl_buildercat_id">
               <property name="sizePolicy">
@@ -198,53 +204,6 @@
                <string>Buildercat id:</string>
               </property>
              </widget>
-            </item>
-            <item row="5" column="1">
-             <widget class="QLabel" name="lbl_state">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="font">
-               <font>
-                <pointsize>8</pointsize>
-                <weight>50</weight>
-                <bold>false</bold>
-               </font>
-              </property>
-              <property name="frameShape">
-               <enum>QFrame::NoFrame</enum>
-              </property>
-              <property name="frameShadow">
-               <enum>QFrame::Plain</enum>
-              </property>
-              <property name="text">
-               <string>State:</string>
-              </property>
-              <property name="textFormat">
-               <enum>Qt::AutoText</enum>
-              </property>
-              <property name="scaledContents">
-               <bool>false</bool>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-              </property>
-              <property name="margin">
-               <number>3</number>
-              </property>
-             </widget>
-            </item>
-            <item row="9" column="2">
-             <widget class="QComboBox" name="location_type"/>
-            </item>
-            <item row="5" column="2">
-             <widget class="QComboBox" name="state"/>
-            </item>
-            <item row="10" column="2">
-             <widget class="QComboBox" name="buildercat_id"/>
             </item>
             <item row="11" column="1">
              <widget class="QLabel" name="lbl_builtdate">
@@ -291,8 +250,18 @@
               </property>
              </widget>
             </item>
-            <item row="11" column="2">
-             <widget class="QLineEdit" name="builtdate"/>
+            <item row="9" column="1">
+             <widget class="QLabel" name="lbl_location_type">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="text">
+               <string>Location type:</string>
+              </property>
+             </widget>
             </item>
             <item row="8" column="1">
              <widget class="QLabel" name="lbl_ownercat_id">
@@ -307,6 +276,42 @@
               </property>
               <property name="margin">
                <number>0</number>
+              </property>
+             </widget>
+            </item>
+            <item row="7" column="1">
+             <widget class="QLabel" name="lbl_expl_id">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="font">
+               <font>
+                <pointsize>8</pointsize>
+               </font>
+              </property>
+              <property name="frameShape">
+               <enum>QFrame::NoFrame</enum>
+              </property>
+              <property name="frameShadow">
+               <enum>QFrame::Plain</enum>
+              </property>
+              <property name="text">
+               <string>Exploitation:</string>
+              </property>
+              <property name="textFormat">
+               <enum>Qt::AutoText</enum>
+              </property>
+              <property name="scaledContents">
+               <bool>false</bool>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+              </property>
+              <property name="margin">
+               <number>3</number>
               </property>
              </widget>
             </item>
@@ -361,8 +366,8 @@
               </property>
              </widget>
             </item>
-            <item row="9" column="1">
-             <widget class="QLabel" name="lbl_location_type">
+            <item row="15" column="1">
+             <widget class="QLabel" name="lbl_comment">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
                 <horstretch>0</horstretch>
@@ -370,55 +375,16 @@
                </sizepolicy>
               </property>
               <property name="text">
-               <string>Location type:</string>
+               <string>Comment:</string>
               </property>
              </widget>
             </item>
-            <item row="7" column="1">
-             <widget class="QLabel" name="lbl_expl_id">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="font">
-               <font>
-                <pointsize>8</pointsize>
-               </font>
-              </property>
-              <property name="frameShape">
-               <enum>QFrame::NoFrame</enum>
-              </property>
-              <property name="frameShadow">
-               <enum>QFrame::Plain</enum>
-              </property>
+            <item row="12" column="1">
+             <widget class="QLabel" name="lbl_enddate">
               <property name="text">
-               <string>Exploitation:</string>
-              </property>
-              <property name="textFormat">
-               <enum>Qt::AutoText</enum>
-              </property>
-              <property name="scaledContents">
-               <bool>false</bool>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-              </property>
-              <property name="margin">
-               <number>3</number>
+               <string>Enddate:</string>
               </property>
              </widget>
-            </item>
-            <item row="13" column="2">
-             <widget class="QComboBox" name="workcat_id">
-              <property name="editable">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="2">
-             <widget class="QLineEdit" name="code"/>
             </item>
             <item row="6" column="1">
              <widget class="QLabel" name="lbl_state_type">
@@ -430,6 +396,48 @@
               </property>
               <property name="text">
                <string>State type:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="17" column="3">
+             <widget class="QLineEdit" name="link"/>
+            </item>
+            <item row="16" column="1">
+             <widget class="QLabel" name="lbl_observ">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="text">
+               <string>Observations:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="17" column="1">
+             <widget class="QLabel" name="lbl_link">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="text">
+               <string>Link:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="18" column="1">
+             <widget class="QLabel" name="lbl_verified">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="text">
+               <string>Verified:</string>
               </property>
              </widget>
             </item>
@@ -455,7 +463,73 @@
               </property>
              </widget>
             </item>
-            <item row="4" column="2">
+            <item row="19" column="1">
+             <widget class="QLabel" name="lbl_rotation">
+              <property name="text">
+               <string>Rotation:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="16" column="3" colspan="2">
+             <widget class="QLineEdit" name="observ"/>
+            </item>
+            <item row="17" column="4">
+             <widget class="QPushButton" name="btn_path_url">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>33</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
+            <item row="15" column="3" colspan="2">
+             <widget class="QLineEdit" name="comment"/>
+            </item>
+            <item row="9" column="3" colspan="2">
+             <widget class="QComboBox" name="location_type"/>
+            </item>
+            <item row="14" column="3" colspan="2">
+             <widget class="QComboBox" name="workcat_id_end"/>
+            </item>
+            <item row="10" column="3" colspan="2">
+             <widget class="QComboBox" name="buildercat_id"/>
+            </item>
+            <item row="7" column="3" colspan="2">
+             <widget class="QComboBox" name="expl_id"/>
+            </item>
+            <item row="6" column="3" colspan="2">
+             <widget class="QComboBox" name="state_type">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+             </widget>
+            </item>
+            <item row="5" column="3" colspan="2">
+             <widget class="QComboBox" name="state"/>
+            </item>
+            <item row="8" column="3" colspan="2">
+             <widget class="QComboBox" name="ownercat_id"/>
+            </item>
+            <item row="4" column="3" colspan="2">
              <widget class="QLineEdit" name="num_elements">
               <property name="enabled">
                <bool>true</bool>
@@ -465,101 +539,52 @@
               </property>
              </widget>
             </item>
-            <item row="14" column="2">
-             <widget class="QComboBox" name="workcat_id_end"/>
-            </item>
-            <item row="15" column="1">
-             <widget class="QLabel" name="lbl_comment">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="text">
-               <string>Comment:</string>
+            <item row="13" column="3" colspan="2">
+             <widget class="QComboBox" name="workcat_id">
+              <property name="editable">
+               <bool>true</bool>
               </property>
              </widget>
             </item>
-            <item row="15" column="2">
-             <widget class="QLineEdit" name="comment"/>
+            <item row="11" column="3" colspan="2">
+             <widget class="QLineEdit" name="builtdate"/>
             </item>
-            <item row="16" column="1">
-             <widget class="QLabel" name="lbl_observ">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="text">
-               <string>Observations:</string>
-              </property>
-             </widget>
+            <item row="12" column="3" colspan="2">
+             <widget class="QLineEdit" name="enddate"/>
             </item>
-            <item row="16" column="2">
-             <widget class="QLineEdit" name="observ"/>
+            <item row="2" column="3" colspan="2">
+             <widget class="QComboBox" name="element_type"/>
             </item>
-            <item row="17" column="1">
-             <widget class="QLabel" name="lbl_link">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
+            <item row="3" column="3" colspan="2">
+             <widget class="QComboBox" name="elementcat_id"/>
+            </item>
+            <item row="1" column="3" colspan="2">
+             <widget class="QLineEdit" name="code"/>
+            </item>
+            <item row="0" column="3" colspan="2">
+             <widget class="QLineEdit" name="element_id">
+              <property name="enabled">
+               <bool>false</bool>
               </property>
-              <property name="text">
-               <string>Link:</string>
+              <property name="frame">
+               <bool>true</bool>
               </property>
              </widget>
             </item>
-            <item row="20" column="2">
-             <widget class="QCheckBox" name="undelete">
-              <property name="text">
-               <string>Undelete</string>
-              </property>
-             </widget>
+            <item row="18" column="3" colspan="2">
+             <widget class="QComboBox" name="verified"/>
             </item>
-            <item row="19" column="2">
+            <item row="19" column="3" colspan="2">
              <widget class="QLineEdit" name="rotation">
               <property name="text">
                <string>0</string>
               </property>
              </widget>
             </item>
-            <item row="17" column="2">
-             <widget class="QLineEdit" name="link"/>
-            </item>
-            <item row="19" column="1">
-             <widget class="QLabel" name="lbl_rotation">
+            <item row="20" column="3" colspan="2">
+             <widget class="QCheckBox" name="undelete">
               <property name="text">
-               <string>Rotation:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="18" column="2">
-             <widget class="QComboBox" name="verified"/>
-            </item>
-            <item row="18" column="1">
-             <widget class="QLabel" name="lbl_verified">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="text">
-               <string>Verified:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="12" column="2">
-             <widget class="QLineEdit" name="enddate"/>
-            </item>
-            <item row="12" column="1">
-             <widget class="QLabel" name="lbl_enddate">
-              <property name="text">
-               <string>Enddate:</string>
+               <string>Undelete</string>
               </property>
              </widget>
             </item>
@@ -718,6 +743,43 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>element_id</tabstop>
+  <tabstop>code</tabstop>
+  <tabstop>element_type</tabstop>
+  <tabstop>elementcat_id</tabstop>
+  <tabstop>num_elements</tabstop>
+  <tabstop>state</tabstop>
+  <tabstop>state_type</tabstop>
+  <tabstop>expl_id</tabstop>
+  <tabstop>ownercat_id</tabstop>
+  <tabstop>location_type</tabstop>
+  <tabstop>buildercat_id</tabstop>
+  <tabstop>builtdate</tabstop>
+  <tabstop>enddate</tabstop>
+  <tabstop>workcat_id</tabstop>
+  <tabstop>workcat_id_end</tabstop>
+  <tabstop>comment</tabstop>
+  <tabstop>observ</tabstop>
+  <tabstop>link</tabstop>
+  <tabstop>btn_path_url</tabstop>
+  <tabstop>verified</tabstop>
+  <tabstop>rotation</tabstop>
+  <tabstop>undelete</tabstop>
+  <tabstop>btn_add_geom</tabstop>
+  <tabstop>feature_id</tabstop>
+  <tabstop>btn_insert</tabstop>
+  <tabstop>btn_delete</tabstop>
+  <tabstop>btn_snapping</tabstop>
+  <tabstop>tab_feature</tabstop>
+  <tabstop>tbl_element_x_arc</tabstop>
+  <tabstop>tbl_element_x_node</tabstop>
+  <tabstop>tbl_element_x_connec</tabstop>
+  <tabstop>tbl_element_x_gully</tabstop>
+  <tabstop>btn_accept</tabstop>
+  <tabstop>btn_cancel</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

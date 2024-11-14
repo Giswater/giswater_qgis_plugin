@@ -196,8 +196,18 @@
   </layout>
  </widget>
  <tabstops>
+  <tabstop>txt_name</tabstop>
+  <tabstop>chk_active</tabstop>
+  <tabstop>btn_update_dscenario</tabstop>
+  <tabstop>btn_toc</tabstop>
+  <tabstop>btn_toggle_active</tabstop>
+  <tabstop>btn_create</tabstop>
+  <tabstop>btn_duplicate</tabstop>
+  <tabstop>btn_update</tabstop>
+  <tabstop>btn_toolbox</tabstop>
   <tabstop>btn_delete</tabstop>
   <tabstop>tbl_dscenario</tabstop>
+  <tabstop>btn_cancel</tabstop>
  </tabstops>
  <resources/>
  <connections/>

@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>dlg_add_demand_check</class>
- <widget class="QDialog" name="dlg_add_demand_check">
+ <class>dlg_valve_operation_check</class>
+ <widget class="QDialog" name="dlg_valve_operation_check">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>394</width>
+    <width>383</width>
     <height>634</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Additional Demand Check</string>
+   <string>Valve Operation Check</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_2">
    <item row="11" column="0">
@@ -65,55 +65,38 @@
        <string>Config</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_4">
+       <item row="15" column="0">
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>33</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="12" column="0">
+        <widget class="QLabel" name="lbl_filename">
+         <property name="text">
+          <string>File name:</string>
+         </property>
+        </widget>
+       </item>
        <item row="3" column="0" colspan="2">
-        <widget class="QLabel" name="lbl_config">
+        <widget class="QLabel" name="lbl_config_file">
          <property name="text">
           <string>Configuration file:</string>
          </property>
         </widget>
        </item>
-       <item row="4" column="0" colspan="2">
-        <widget class="QTextEdit" name="data_config_file"/>
-       </item>
-       <item row="11" column="1">
+       <item row="12" column="1">
         <widget class="QLineEdit" name="txt_filename"/>
        </item>
-       <item row="7" column="1">
-        <widget class="QRadioButton" name="rdb_nodes_database">
-         <property name="toolTip">
-          <string>Retrieve node data with fid=491 from the anl_node table.</string>
-         </property>
-         <property name="text">
-          <string>Database</string>
-         </property>
-        </widget>
-       </item>
-       <item row="8" column="0" colspan="2">
-        <widget class="QLabel" name="lbl_output_folder">
-         <property name="text">
-          <string>Output folder:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="9" column="0" colspan="2">
-        <widget class="QTextEdit" name="data_output_folder"/>
-       </item>
-       <item row="0" column="0" colspan="2">
-        <widget class="QLabel" name="lbl_input_file">
-         <property name="text">
-          <string>Input INP file:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="0">
-        <widget class="QLabel" name="lbl_nodes">
-         <property name="text">
-          <string>Use nodes from:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="10" column="0" colspan="2" alignment="Qt::AlignRight">
-        <widget class="QToolButton" name="btn_push_output_folder">
+       <item row="5" column="0" colspan="2" alignment="Qt::AlignRight">
+        <widget class="QToolButton" name="btn_push_config_file">
          <property name="text">
           <string>...</string>
          </property>
@@ -122,23 +105,23 @@
        <item row="1" column="0" colspan="2">
         <widget class="QTextEdit" name="data_inp_input_file"/>
        </item>
-       <item row="11" column="0">
-        <widget class="QLabel" name="lbl_filename">
-         <property name="text">
-          <string>File name:</string>
-         </property>
-        </widget>
-       </item>
        <item row="6" column="1">
-        <widget class="QRadioButton" name="rdb_nodes_config">
+        <widget class="QRadioButton" name="rdb_scenarios_config">
          <property name="toolTip">
-          <string>Retrieve node data from the &quot;nodes&quot; property within the configuration file.</string>
+          <string>Retrieve scenarios data from the [SCENARIOS] section within the configuration file.</string>
          </property>
          <property name="text">
           <string>Configuration file</string>
          </property>
          <property name="checked">
           <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="0">
+        <widget class="QLabel" name="lbl_scenarios">
+         <property name="text">
+          <string>Use scenarios from:</string>
          </property>
         </widget>
        </item>
@@ -149,10 +132,40 @@
          </property>
         </widget>
        </item>
-       <item row="5" column="0" colspan="2" alignment="Qt::AlignRight">
-        <widget class="QToolButton" name="btn_push_config_file">
+       <item row="10" column="0" colspan="2">
+        <widget class="QTextEdit" name="data_output_folder"/>
+       </item>
+       <item row="4" column="0" colspan="2">
+        <widget class="QTextEdit" name="data_config_file"/>
+       </item>
+       <item row="9" column="0" colspan="2">
+        <widget class="QLabel" name="lbl_output_folder">
+         <property name="text">
+          <string>Output folder:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0" colspan="2">
+        <widget class="QLabel" name="lbl_input_file">
+         <property name="text">
+          <string>Input INP file:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="11" column="0" colspan="2" alignment="Qt::AlignRight">
+        <widget class="QToolButton" name="btn_push_output_folder">
          <property name="text">
           <string>...</string>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="1">
+        <widget class="QRadioButton" name="rdb_scenarios_database">
+         <property name="toolTip">
+          <string>Retrieve scenarios data with fid=493 from the anl_arc table.</string>
+         </property>
+         <property name="text">
+          <string>Database</string>
          </property>
         </widget>
        </item>
@@ -186,21 +199,23 @@
      </widget>
     </widget>
    </item>
-   <item row="4" column="0">
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>33</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>mainTab</tabstop>
+  <tabstop>data_inp_input_file</tabstop>
+  <tabstop>btn_push_inp_input_file</tabstop>
+  <tabstop>data_config_file</tabstop>
+  <tabstop>btn_push_config_file</tabstop>
+  <tabstop>rdb_scenarios_config</tabstop>
+  <tabstop>rdb_scenarios_database</tabstop>
+  <tabstop>data_output_folder</tabstop>
+  <tabstop>btn_push_output_folder</tabstop>
+  <tabstop>txt_filename</tabstop>
+  <tabstop>txt_infolog</tabstop>
+  <tabstop>btn_ok</tabstop>
+  <tabstop>btn_cancel</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

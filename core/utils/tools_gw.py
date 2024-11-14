@@ -1111,7 +1111,8 @@ def enable_widgets(dialog, result, enable):
             for field in result['fields']:
                 if widget.property('columnname') == field['columnname']:
                     # If it's not the main tab we want the widgets to be enabled
-                    if not any(substring in field['layoutname'] for substring in ['main', 'data', 'top', 'bot']): continue
+                    if field.get('layoutname') is not None and not any(substring in field['layoutname'] for substring in ['main', 'data', 'top', 'bot']):
+                        continue
                     if type(widget) in (QDoubleSpinBox, QLineEdit, QSpinBox, QTextEdit, GwHyperLinkLineEdit):
                         widget.setReadOnly(not enable)
                         widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(110, 110, 110)}")
@@ -1995,13 +1996,24 @@ def add_calendar(dlg, fld, **kwargs):
 
 def set_typeahead(field, dialog, widget, completer, feature_id=None):
 
-    if field['widgettype'] == 'typeahead':
-        if 'queryText' not in field or 'queryTextFilter' not in field:
-            return widget
+    # Check for the first behavior: 'queryText' and 'queryTextFilter' are required
+    if field.get('queryText') is not None and 'queryTextFilter' in field:
+        # Typeahead with queryText and queryTextFilter
         widget.setProperty('typeahead', True)
         model = QStringListModel()
         widget.textChanged.connect(partial(fill_typeahead, completer, model, field, dialog, widget, feature_id))
+        return widget
 
+    # Check for the second behavior: 'comboIds' and 'comboNames' are required
+    if 'comboIds' in field and 'comboNames' in field:
+        # Populate completer rows from comboIds and comboNames
+        rows = list(zip(field.get('comboIds', []), field.get('comboNames', [])))
+        tools_qt.set_completer_rows(widget, rows)
+        return widget
+
+    # If none of the conditions are met, log or display an appropriate message
+    msg = f"Typeahead '{field.get('columnname')}' doesn't have neither a queryText nor comboIds/comboNames."
+    tools_qgis.show_critical(msg)
     return widget
 
 
@@ -4629,7 +4641,7 @@ def _manage_typeahead(**kwargs):
     dialog = kwargs['dialog']
     field = kwargs['field']
     complet_result = kwargs['complet_result']
-    feature_id = complet_result['body']['feature']['id']
+    feature_id = complet_result['body']['feature'].get('id')
     completer = QCompleter()
     widget = _manage_text(**kwargs)
     widget = set_typeahead(field, dialog, widget, completer, feature_id=feature_id)

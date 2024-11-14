@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>638</width>
-    <height>883</height>
+    <width>557</width>
+    <height>738</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -57,6 +57,12 @@
       <layout class="QGridLayout" name="gridLayout">
        <item row="0" column="0">
         <widget class="QScrollArea" name="scrollArea_2">
+         <property name="minimumSize">
+          <size>
+           <width>264</width>
+           <height>217</height>
+          </size>
+         </property>
          <property name="widgetResizable">
           <bool>true</bool>
          </property>
@@ -65,8 +71,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>565</width>
-            <height>831</height>
+            <width>488</width>
+            <height>813</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout">
@@ -468,12 +474,12 @@
   <tabstop>dv_orderby_id</tabstop>
   <tabstop>stylesheet</tabstop>
   <tabstop>linkedobject</tabstop>
-  <tabstop>btn_accept</tabstop>
-  <tabstop>btn_cancel</tabstop>
-  <tabstop>txt_infolog</tabstop>
   <tabstop>btn_open</tabstop>
   <tabstop>tbl_update</tabstop>
   <tabstop>cmb_fields</tabstop>
+  <tabstop>txt_infolog</tabstop>
+  <tabstop>btn_accept</tabstop>
+  <tabstop>btn_cancel</tabstop>
  </tabstops>
  <resources/>
  <connections/>

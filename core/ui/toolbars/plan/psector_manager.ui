@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1261</width>
+    <width>1400</width>
     <height>786</height>
    </rect>
   </property>
@@ -227,9 +227,18 @@
  </widget>
  <tabstops>
   <tabstop>txt_name</tabstop>
+  <tabstop>chk_active</tabstop>
+  <tabstop>chk_filter_canvas</tabstop>
   <tabstop>btn_update_psector</tabstop>
+  <tabstop>btn_show_psector</tabstop>
+  <tabstop>btn_toggle_active</tabstop>
+  <tabstop>btn_create</tabstop>
+  <tabstop>btn_merge</tabstop>
+  <tabstop>btn_duplicate</tabstop>
   <tabstop>btn_delete</tabstop>
   <tabstop>tbl_psm</tabstop>
+  <tabstop>txt_infolog</tabstop>
+  <tabstop>btn_cancel</tabstop>
  </tabstops>
  <resources/>
  <connections/>

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>960</width>
-    <height>743</height>
+    <height>753</height>
    </rect>
   </property>
   <property name="maximumSize">
@@ -971,8 +971,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>916</width>
-            <height>304</height>
+            <width>908</width>
+            <height>294</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout_3">
@@ -1765,6 +1765,61 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>psector_id</tabstop>
+  <tabstop>name</tabstop>
+  <tabstop>priority</tabstop>
+  <tabstop>ext_code</tabstop>
+  <tabstop>status</tabstop>
+  <tabstop>expl_id</tabstop>
+  <tabstop>workcat_id</tabstop>
+  <tabstop>parent_id</tabstop>
+  <tabstop>descript</tabstop>
+  <tabstop>text1</tabstop>
+  <tabstop>text2</tabstop>
+  <tabstop>observ</tabstop>
+  <tabstop>chk_enable_all</tabstop>
+  <tabstop>scale</tabstop>
+  <tabstop>rotation</tabstop>
+  <tabstop>atlas_id</tabstop>
+  <tabstop>num_value</tabstop>
+  <tabstop>text3</tabstop>
+  <tabstop>text4</tabstop>
+  <tabstop>text5</tabstop>
+  <tabstop>text6</tabstop>
+  <tabstop>feature_id</tabstop>
+  <tabstop>btn_insert</tabstop>
+  <tabstop>btn_delete</tabstop>
+  <tabstop>btn_snapping</tabstop>
+  <tabstop>btn_toggle</tabstop>
+  <tabstop>btn_select_arc</tabstop>
+  <tabstop>btn_arc_fusion</tabstop>
+  <tabstop>btn_set_to_arc</tabstop>
+  <tabstop>tab_feature</tabstop>
+  <tabstop>tbl_psector_x_arc</tabstop>
+  <tabstop>scrollArea</tabstop>
+  <tabstop>btn_set_geom</tabstop>
+  <tabstop>btn_remove</tabstop>
+  <tabstop>txt_name</tabstop>
+  <tabstop>btn_select</tabstop>
+  <tabstop>all_rows</tabstop>
+  <tabstop>gexpenses</tabstop>
+  <tabstop>vat</tabstop>
+  <tabstop>other</tabstop>
+  <tabstop>btn_reports</tabstop>
+  <tabstop>doc_id</tabstop>
+  <tabstop>btn_doc_insert</tabstop>
+  <tabstop>btn_doc_delete</tabstop>
+  <tabstop>btn_doc_new</tabstop>
+  <tabstop>btn_open_doc</tabstop>
+  <tabstop>tbl_document</tabstop>
+  <tabstop>btn_accept</tabstop>
+  <tabstop>btn_cancel</tabstop>
+  <tabstop>tbl_psector_x_node</tabstop>
+  <tabstop>tbl_psector_x_connec</tabstop>
+  <tabstop>tbl_psector_x_gully</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

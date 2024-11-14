@@ -125,6 +125,13 @@
    </property>
   </action>
  </widget>
+ <tabstops>
+  <tabstop>mainTab</tabstop>
+  <tabstop>info_updates</tabstop>
+  <tabstop>btn_update</tabstop>
+  <tabstop>btn_close</tabstop>
+  <tabstop>txt_infolog</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

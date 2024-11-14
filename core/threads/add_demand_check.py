@@ -17,23 +17,13 @@ from pathlib import Path
 from qgis.core import QgsTask
 
 from .task import GwTask
-from ...libs import tools_qt, tools_db
+from ...libs import tools_db, tools_log
 
 try:
     import wntr
     from wntr.epanet.util import from_si, to_si, FlowUnits, HydParam
 except ImportError:
-    if tools_qt.show_question(
-        "WNTR Python package not found. Do you want to install WNTR?"
-    ):
-        subprocess.run(["python", "-m", "ensurepip"])
-        install_wntr = subprocess.run(["python", "-m", "pip", "install", "wntr==0.5.0"])
-        if install_wntr.returncode:
-            tools_qt.show_info_box(
-                "WNTR cannot be installed automatically. See the gw_epatools_plugin documentation for manual WNTR installation."
-            )
-        else:
-            tools_qt.show_info_box("WNTR installed successfully. Please restart QGIS.")
+        tools_log.log_error("Couldn't import WNTR Python package. Please check if the Giswater plugin is installed and it has a 'packages' folder in it with 'wntr'.")
 
 
 class GwAddDemandCheck(GwTask):
