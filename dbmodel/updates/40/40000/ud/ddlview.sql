@@ -4559,4 +4559,23 @@ AS SELECT review_connec.connec_id,
    FROM review_connec,
     selector_expl
   WHERE selector_expl.cur_user = "current_user"()::text AND review_connec.expl_id = selector_expl.expl_id;
-  
+
+-- 14/11/2024
+CREATE OR REPLACE VIEW v_edit_inp_dscenario_lids
+AS SELECT sd.dscenario_id,
+    l.subc_id,
+    l.lidco_id,
+    l.numelem,
+    l.area,
+    l.width,
+    l.initsat,
+    l.fromimp,
+    l.toperv,
+    l.rptfile,
+    l.descript,
+    s.the_geom
+   FROM selector_inp_dscenario sd,
+    inp_dscenario_lids l
+     JOIN v_edit_inp_subcatchment s USING (subc_id)
+  WHERE l.dscenario_id = sd.dscenario_id AND sd.cur_user = CURRENT_USER;
+ 

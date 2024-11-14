@@ -230,7 +230,7 @@ BEGIN
 
 		-- insert lid-usage
 		INSERT INTO temp_t_lid_usage SELECT subc_id, lidco_id, numelem, area, width, initsat, fromimp, toperv, rptfile 
-		FROM v_edit_inp_dscenario_lid_usage
+		FROM v_edit_inp_dscenario_lids
 		ON CONFLICT (subc_id, lidco_id) DO NOTHING;
 
 		-- insertar inflows

@@ -158,3 +158,7 @@ ON connec FOR EACH ROW EXECUTE FUNCTION gw_trg_typevalue_fk('connec');
 DROP TRIGGER IF EXISTS gw_trg_typevalue_fk ON gully;
 CREATE TRIGGER gw_trg_typevalue_fk AFTER INSERT OR UPDATE OF verified, units_placement, function_type, category_type, fluid_type, location_type
 ON gully FOR EACH ROW EXECUTE FUNCTION gw_trg_typevalue_fk('gully');
+
+-- 14/11/2024
+CREATE TRIGGER gw_trg_edit_inp_dscenario INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_dscenario_lids 
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_dscenario('LIDS');

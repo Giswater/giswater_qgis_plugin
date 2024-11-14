@@ -27,15 +27,15 @@ BEGIN
    	IF v_featurefield = 'inp_subcatchment' THEN 
       IF TG_OP = 'UPDATE' THEN
         IF NEW.subc_id != OLD.subc_id THEN
-          UPDATE inp_dscenario_lid_usage SET subc_id=NEW.subc_id WHERE subc_id=OLD.subc_id;
+          UPDATE inp_dscenario_lids SET subc_id=NEW.subc_id WHERE subc_id=OLD.subc_id;
           RETURN NEW;
         END IF;
       ELSIF TG_OP = 'DELETE' THEN
-        DELETE FROM inp_dscenario_lid_usage WHERE subc_id=OLD.subc_id;
+        DELETE FROM inp_dscenario_lids WHERE subc_id=OLD.subc_id;
         RETURN NULL;
       END IF;
 
-    ELSIF v_featurefield = 'inp_dscenario_lid_usage' THEN 
+    ELSIF v_featurefield = 'inp_dscenario_lids' THEN 
       IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
       
         IF NEW.subc_id NOT IN (SELECT DISTINCT subc_id FROM inp_subcatchment) THEN

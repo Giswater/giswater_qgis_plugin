@@ -148,7 +148,7 @@ SELECT has_table('inp_dscenario_flwreg_weir') AS "Table 'inp_dscenario_flwreg_we
 SELECT has_table('inp_dscenario_inflows') AS "Table 'inp_dscenario_inflows' exists";
 SELECT has_table('inp_dscenario_inflows_poll') AS "Table 'inp_dscenario_inflows_poll' exists";
 SELECT has_table('inp_dscenario_junction') AS "Table 'inp_dscenario_junction' exists";
-SELECT has_table('inp_dscenario_lid_usage') AS "Table 'inp_dscenario_lid_usage' exists";
+SELECT has_table('inp_dscenario_lids') AS "Table 'inp_dscenario_lids' exists";
 SELECT has_table('inp_dscenario_outfall') AS "Table 'inp_dscenario_outfall' exists";
 SELECT has_table('inp_dscenario_raingage') AS "Table 'inp_dscenario_raingage' exists";
 SELECT has_table('inp_dscenario_storage') AS "Table 'inp_dscenario_storage' exists";
