@@ -191,46 +191,43 @@ BEGIN
 
 
 	IF v_project_type = 'WS' THEN
-		-- Vàlvules tancades: totes, les que són MINSECTOR i les que no
-        UPDATE temp_pgr_node n SET modif = TRUE, graph_delimiter = 'closed_valve'
-        FROM man_valve v
-        WHERE n.node_id = v.node_id AND v.closed = TRUE;
+		UPDATE temp_pgr_node t SET graph_delimiter = lower(cf.graph_delimiter)
+		FROM node n 
+		JOIN cat_node cn ON cn.id=n.nodecat_id
+		JOIN cat_feature_node cf ON cf.id=cn.nodetype_id
+		WHERE t.node_id=n.node_id AND cf.graph_delimiter='MINSECTOR';
 
-        -- Un dels 2 arcs que arriben a les vàlvules tancades
-        UPDATE temp_pgr_arc a SET modif = TRUE, cost = -1, reverse_cost = -1
-        FROM
-        (SELECT DISTINCT ON (n.node_id) n.node_id, a.arc_id
-        FROM temp_pgr_node n
-        JOIN temp_pgr_arc a ON n.node_id IN (a.node_1, a.node_2)
-        WHERE n.graph_delimiter = 'closed_valve'
-        ) s
-        WHERE a.arc_id = s.arc_id;
+		-- UPDATE "closed", "broken", "to_arc" only if the values make sense - check the explanations/rules for the possible valve scenarios MINSECTOR/to_arc/closed/broken 
+		-- valves to modify: 
+		-- closed valves
+		UPDATE temp_pgr_node n SET closed = v.closed, broken = v.broken, modif = TRUE
+		FROM man_valve v
+		WHERE n.node_id = v.node_id AND nd n.graph_delimiter = 'minsector' AND v.closed = TRUE;
 
-        -- Vàlvules amb to_arc
-        /* Canviar la consulta per la següent:
+		--valves with to_arc NOT NULL
+		UPDATE temp_pgr_node n SET to_arc = v.to_arc, broken = v.broken, modif = TRUE
+		FROM man_valve v
+		WHERE n.node_id = v.node_id AND v.to_arc IS NOT NULL AND v.broken = FALSE;
 
-        UPDATE temp_pgr_node n SET modif = TRUE, graph_delimiter = 'to_arc_valve'
-        FROM man_valve v
-        WHERE n.node_id = v.node_id AND v.to_arc IS NOT NULL AND v.active = TRUE AND (v.closed IS NULL OR v.closed = FALSE); -- Si tot estaria ben posat, la condició active=TRUE seria suficient
-        */
-        UPDATE temp_pgr_node n SET modif = TRUE, graph_delimiter = 'to_arc_valve'
-        FROM man_valve v
-        JOIN config_graph_checkvalve c ON c.node_id = v.node_id
-        WHERE n.node_id = v.node_id AND v.closed = FALSE;
+		-- arcs to modify:
+		-- for the closed valves when to_arc IS NULL, one of the arcs that connect to the valve 
+		UPDATE temp_pgr_arc t set modif=true
+		FROM
+		(SELECT DISTINCT ON (n.node_id) n.node_id, a.arc_id
+		FROM temp_pgr_node n
+		join temp_pgr_arc a ON n.node_id IN (a.node_1, a.node_2)
+		WHERE n.modif = TRUE AND n.to_arc IS NULL
+		) a
+		WHERE t.arc_id = a.arc_id;
 
-        -- L'arc que és el to_arc
-        /* Canviar la consulta per la següent:
+		-- for the valves with to_arc NOT NULL; 
+		UPDATE temp_pgr_arc a SET modif = TRUE
+		FROM temp_pgr_node n
+		WHERE a.arc_id = n.to_arc
+		-- AND n.modif = TRUE AND n.to_arc IS NOT NULL -- not necessaries
+		;
 
-        -- El cost/reverse_cost s'actualitzarà amb els valors correctes després d'executar la funció preparar_xarxa
-
-        UPDATE temp_pgr_arc a SET modif = TRUE, cost = -1, reverse_cost = -1
-        FROM man_valve v
-        WHERE v.node_id IN (a.node_1, a.node_2) AND v.to_arc IS NOT NULL AND v.active = TRUE AND (v.closed IS NULL OR v.closed = FALSE);
-        */
-        UPDATE temp_pgr_arc a SET modif = TRUE, cost = -1, reverse_cost = -1 -- El cost/reverse_cost s'actualitzarà amb els valors correctes després d'executar la funció preparar_xarxa
-        FROM man_valve v
-        JOIN config_graph_checkvalve c ON c.node_id = v.node_id
-        WHERE v.node_id IN (a.node_1, a.node_2) AND v.closed = FALSE AND a.arc_id = c.to_arc;
+	-- cost/reverse_cost for the open valves with to_arc will be update after gw_fct_graphanalytics_arrangenetwork with the correct values
 	END IF;
 
 	-- get mapzone field name
@@ -250,7 +247,7 @@ BEGIN
 
 	-- Arcs forceClosed - all arcs that are connected to forceClosed nodes
     v_querytext =
-		'UPDATE temp_pgr_arc a SET modif = TRUE, cost = -1, reverse_cost = -1 
+		'UPDATE temp_pgr_arc a SET modif = TRUE 
 		FROM temp_pgr_node n
 		WHERE n.node_id IN (a.node_1, a.node_2) 
 		AND n.graph_delimiter = ''forceClosed''';
@@ -270,7 +267,7 @@ BEGIN
 
 	-- Disconnect the InletArc (those that are not to_arc)
     v_querytext =
-		'UPDATE temp_pgr_arc a SET modif = TRUE, cost = -1, reverse_cost = -1
+		'UPDATE temp_pgr_arc a SET modif = TRUE
 		FROM (
 			SELECT a.arc_id, n.node_id
 			FROM temp_pgr_node n
@@ -307,25 +304,32 @@ BEGIN
         RETURN v_response;
     END IF;
 
-	-- Update the cost/reverse_cost of the to_arc_valve with the correct values
-	-- Note: when a.graph_delimiter IS NOT NULL, node_1 = node_2; these are the new arcs generated at the nodes
+	-- Update the cost/reverse_cost with the correct values for the open valves with to_arc NOT NULL 
+	-- and graph_delimiter 'minsector' or null (it wasn't changed for 'forceClosed' for example)
+	-- Note: node_1 = node_2 for the new arcs generated at the nodes
     IF v_project_type = 'WS' THEN
         UPDATE temp_pgr_arc a SET cost = 1
-        WHERE a.graph_delimiter = 'to_arc_valve'
-		AND pgr_node_1 = node_1::int;
+		FROM temp_pgr_node n
+        WHERE a.node_1 = n.node_id AND n.pgr_node_id = n.node_id::INT 
+		AND a.cost = -1 AND (a.graph_delimiter = 'minsector' OR a.graph_delimiter is null) 
+		AND n.to_arc IS NOT NULL AND n.closed is null 
+		AND a.pgr_node_1=a.node_1::INT;
 
-        UPDATE temp_pgr_arc a SET reverse_cost = 1
-        WHERE a.graph_delimiter = 'to_arc_valve'
-		AND pgr_node_2 = node_2::int;
+        UPDATE temp_pgr_arc a SET cost = 1
+		FROM temp_pgr_node n
+        WHERE a.node_1 = n.node_id AND n.pgr_node_id = n.node_id::INT 
+		AND a.cost = -1 AND (a.graph_delimiter = 'minsector' OR a.graph_delimiter is null) 
+		AND n.to_arc IS NOT NULL AND n.closed is null 
+		AND pgr_node_2 = node_2::INT;
     END IF;
 
-    EXECUTE 'SELECT COUNT(*)::int FROM temp_pgr_arc'
+    EXECUTE 'SELECT COUNT(*)::INT FROM temp_pgr_arc'
     INTO v_pgr_distance;
 
-	EXECUTE 'SELECT array_agg(pgr_node_id)::int[] 
+	EXECUTE 'SELECT array_agg(pgr_node_id)::INT[] 
 			FROM temp_pgr_node 
 			WHERE graph_delimiter = ''' || v_mapzone_name || ''' 
-			AND pgr_node_id = node_id::int'
+			AND pgr_node_id = node_id::INT'
 	INTO v_pgr_root_vids;
 
 
