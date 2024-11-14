@@ -483,13 +483,14 @@ BEGIN
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
 		VALUES (v_fid, '279', 1, 'INFO: Virtualpumps checked. No mandatory values for pump_type missed.',v_count);
 	END IF;
+		
 	
 	--pump curve(280)
-	SELECT count(*) INTO v_count FROM v_edit_inp_pump WHERE curve_id IS NULL;
+	SELECT count(*) INTO v_count FROM v_edit_inp_pump WHERE curve_id IS null AND power is NULL;
 	IF v_count > 0 THEN
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
 		VALUES (v_fid, '280', 3, concat(
-		'ERROR-280: There is/are ',v_count,' pump(s) with null values at least on mandatory column curve_id.'),v_count);
+		'ERROR-280: There is/are ',v_count,' pump(s) with null values at least on mandatory column curve_id or power.'),v_count);
 		v_count=0;
 	ELSE
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
@@ -497,11 +498,11 @@ BEGIN
 	END IF;	
 
 	--pump curve(280)
-	SELECT count(*) INTO v_count FROM v_edit_inp_virtualpump WHERE curve_id IS NULL;
+	SELECT count(*) INTO v_count FROM v_edit_inp_virtualpump WHERE curve_id IS null AND power is NULL;
 	IF v_count > 0 THEN
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
 		VALUES (v_fid, '280', 3, concat(
-		'ERROR-280: There is/are ',v_count,' virtualpump(s) with null values at least on mandatory column curve_id.'),v_count);
+		'ERROR-280: There is/are ',v_count,' virtualpump(s) with null values at least on mandatory column curve_id or power.'),v_count);
 		v_count=0;
 	ELSE
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
@@ -509,7 +510,8 @@ BEGIN
 	END IF;	
 
 	--pump additional(281)
-	SELECT count(*) INTO v_count FROM inp_pump_additional JOIN v_edit_inp_pump USING (node_id) WHERE inp_pump_additional.curve_id IS NULL;
+	SELECT count(*) INTO v_count FROM inp_pump_additional JOIN v_edit_inp_pump USING (node_id) WHERE inp_pump_additional.curve_id IS null 
+	AND inp_pump_additional.power is NULL;
 	IF v_count > 0 THEN
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
 		VALUES (v_fid, '281', 3, concat(

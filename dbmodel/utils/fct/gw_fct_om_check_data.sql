@@ -79,15 +79,12 @@ BEGIN
 	END IF;
 
 
-	--create temp tables
-	IF v_fid = 125 OR v_fid = 101 THEN
-		CREATE TEMP TABLE temp_anl_arc (LIKE SCHEMA_NAME.anl_arc INCLUDING ALL);
-		CREATE TEMP TABLE temp_anl_node (LIKE SCHEMA_NAME.anl_node INCLUDING ALL);
-		CREATE TEMP TABLE temp_anl_connec (LIKE SCHEMA_NAME.anl_connec INCLUDING ALL);
-		CREATE TEMP TABLE temp_audit_check_data (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
-	END IF;
-
-	CREATE TEMP TABLE temp_t_arc (LIKE SCHEMA_NAME.temp_arc INCLUDING ALL);
+	-- crate temp tables
+	CREATE TEMP TABLE if not exists temp_anl_arc (LIKE SCHEMA_NAME.anl_arc INCLUDING ALL);
+	CREATE TEMP TABLE if not exists temp_anl_node (LIKE SCHEMA_NAME.anl_node INCLUDING ALL);
+	CREATE TEMP TABLE if not exists temp_anl_connec (LIKE SCHEMA_NAME.anl_connec INCLUDING ALL);
+	CREATE TEMP TABLE if not exists temp_audit_check_data (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
+	CREATE TEMP TABLE if not exists temp_t_arc (LIKE SCHEMA_NAME.temp_arc INCLUDING ALL);
 
 	-- Starting process
 	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('DATA QUALITY ANALYSIS ACORDING O&M RULES'));
