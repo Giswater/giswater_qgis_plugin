@@ -30,15 +30,13 @@ BEGIN
     SELECT project_type INTO v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
 
     -- Get variables from input JSON
-    v_fct_name = (SELECT (p_data::json->>'data')::json->>'fct_name'); -- Get the function name
+    v_fct_name = (SELECT (p_data::json->>'data')::json->>'fct_name');
 
     -- Drop temporary layers
     DROP TABLE IF EXISTS temp_pgr_node;
     DROP TABLE IF EXISTS temp_pgr_arc;
     DROP TABLE IF EXISTS temp_pgr_connec;
     DROP TABLE IF EXISTS temp_pgr_link;
-    DROP TABLE IF EXISTS temp_pgr_connectedcomponents;
-    DROP TABLE IF EXISTS temp_pgr_drivingdistance;
 
     -- Drop temporary layers depending on the project type
     IF v_project_type = 'UD' THEN
@@ -50,8 +48,11 @@ BEGIN
 
     -- For specific functions
     IF v_fct_name = 'MINSECTOR' THEN
+    DROP TABLE IF EXISTS temp_pgr_connectedcomponents;
  	    DROP TABLE IF EXISTS temp_pgr_minsector;
         DROP TABLE IF EXISTS temp_minsector;
+    ELSE
+        DROP TABLE IF EXISTS temp_pgr_drivingdistance;
     END IF;
 
     RETURN jsonb_build_object(
