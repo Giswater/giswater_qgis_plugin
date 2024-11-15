@@ -493,7 +493,7 @@ BEGIN
 		INSERT INTO project_temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, 'To check CRITICAL ERRORS or WARNINGS, execute a query FROM anl_table WHERE fid=error number AND current_user.');
 		INSERT INTO project_temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, 'For example:');
 		INSERT INTO project_temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, '');
-		INSERT INTO project_temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, 'SELECT * FROM anl_arc WHERE fid=103 AND cur_user=current_user;');
+		INSERT INTO project_temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, 'SELECT * FROM MySchema.anl_arc WHERE fid = Myfid AND cur_user=current_user;');
 		INSERT INTO project_temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, '');
 		INSERT INTO project_temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, 'Only the errors with anl_table next to the number can be checked this way.');
 		INSERT INTO project_temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (101, null, 4, 'Using Giswater Toolbox it''s also posible to check these errors.');
@@ -644,7 +644,10 @@ BEGIN
 				-- setQgisLayers: not used variable on python 3.4 because threath is operative to refresh_attribute of whole layers
 	END IF;
 
-	DELETE FROM audit_check_data WHERE cur_user = current_user AND fid in (101, 251, 115, 125, 195, 225);
+	DELETE FROM audit_check_data WHERE cur_user = current_user AND fid in (101, 251, 115, 125, 195, 225, 350, 351, 352, 353);
+
+	DELETE FROM audit_check_project where cur_user = current_user;
+
 
 	DELETE FROM anl_node
 	WHERE cur_user = current_user AND fid IN (103,104,106,187,188,196,197,201,202,203,204,205,257,372,417,418,419,421,422,423,424,442,443,461,478,479,488,480,497,498,499,	-- OM

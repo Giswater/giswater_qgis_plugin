@@ -168,3 +168,6 @@ UPDATE config_form_fields SET linkedobject='tbl_event_x_gully' WHERE formname='g
 UPDATE config_form_fields SET dv_querytext = 'SELECT muni_id as id, name as idval from v_ext_municipality WHERE muni_id IS NOT NULL' WHERE columnname  = 'muni_id' AND widgettype = 'combo';
 
 UPDATE config_form_fields SET hidden = true where columnname in ('apond') and formname like '%storage%';
+
+UPDATE arc SET y1 = 3, y2 = 3, matcat_id = 'Concret' WHERE arc_id = '100012';
+UPDATE arc SET y1 = 2.2, y2 = 3, matcat_id = 'Concret' WHERE arc_id = '100014';
