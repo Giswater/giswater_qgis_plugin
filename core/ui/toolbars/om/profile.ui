@@ -191,7 +191,7 @@
   <action name="actionAddPoint">
    <property name="icon">
     <iconset>
-     <normaloff>../../../../icons/dialogs/24x24/131b.png</normaloff>../../../../icons/dialogs/24x24/131b.png</iconset>
+     <normaloff>../../../../icons/dialogs/143.png</normaloff>../../../../icons/dialogs/143.png</iconset>
    </property>
    <property name="text">
     <string>addPoint</string>

@@ -425,7 +425,7 @@ class GwMincut:
 
         action = self.dlg_mincut.findChild(QAction, "actionComposer")
         action.triggered.connect(self._mincut_composer)
-        tools_gw.add_icon(action, "181", sub_folder="24x24")
+        tools_gw.add_icon(action, "148")
         self.action_mincut_composer = action
 
         action = self.dlg_mincut.findChild(QAction, "actionExportHydroCsv")

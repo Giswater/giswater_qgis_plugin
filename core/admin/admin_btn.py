@@ -95,10 +95,10 @@ class GwAdminButton:
             self.form_enabled = False
 
         # Set label status connection
-        self.icon_folder = f"{self.plugin_dir}{os.sep}icons{os.sep}dialogs{os.sep}20x20{os.sep}"
-        self.status_ok = QPixmap(f"{self.icon_folder}status_ok.png")
-        self.status_ko = QPixmap(f"{self.icon_folder}status_ko.png")
-        self.status_no_update = QPixmap(f"{self.icon_folder}status_not_updated.png")
+        self.icon_folder = f"{self.plugin_dir}{os.sep}icons{os.sep}dialogs{os.sep}"
+        self.status_ok = QPixmap(f"{self.icon_folder}140.png")
+        self.status_ko = QPixmap(f"{self.icon_folder}138.png")
+        self.status_no_update = QPixmap(f"{self.icon_folder}139.png")
 
         # Create the dialog and signals
         self._init_show_database()

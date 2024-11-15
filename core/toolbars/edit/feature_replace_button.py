@@ -198,8 +198,8 @@ class GwFeatureReplaceButton(GwMaptool):
         # Create the dialog and signals
         self.dlg_replace = GwFeatureReplaceUi(self)
         tools_gw.load_settings(self.dlg_replace)
-        tools_gw.add_icon(self.dlg_replace.btn_new_workcat, "193")
-        tools_gw.add_icon(self.dlg_replace.btn_catalog, "195")
+        tools_gw.add_icon(self.dlg_replace.btn_new_workcat, "150")
+        tools_gw.add_icon(self.dlg_replace.btn_catalog, "152")
 
         sql = "SELECT id, id as idval FROM cat_work ORDER BY id"
         rows = tools_db.get_rows(sql)

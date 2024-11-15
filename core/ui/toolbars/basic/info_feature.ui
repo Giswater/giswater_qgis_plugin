@@ -448,10 +448,6 @@
    </property>
   </action>
   <action name="actionLink">
-   <property name="icon">
-    <iconset>
-     <normaloff>../icons/173.png</normaloff>../icons/173.png</iconset>
-   </property>
    <property name="text">
     <string>actionLink</string>
    </property>
@@ -477,10 +473,6 @@
    </property>
   </action>
   <action name="actionWorkcat">
-   <property name="icon">
-    <iconset>
-     <normaloff>../icons/193.png</normaloff>../icons/193.png</iconset>
-   </property>
    <property name="text">
     <string>Workcat</string>
    </property>
@@ -508,10 +500,6 @@
    </property>
   </action>
   <action name="actionInterpolate">
-   <property name="icon">
-    <iconset>
-     <normaloff>../icons/194.png</normaloff>../icons/194.png</iconset>
-   </property>
    <property name="text">
     <string>Interpolate</string>
    </property>

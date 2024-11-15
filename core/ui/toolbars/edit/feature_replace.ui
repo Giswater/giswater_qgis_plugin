@@ -215,7 +215,7 @@
                 </property>
                 <property name="icon">
                  <iconset>
-                  <normaloff>../../../../icons/dialogs/20x20/193.png</normaloff>../../../../icons/dialogs/20x20/193.png</iconset>
+                  <normaloff>../../../../icons/dialogs/150.png</normaloff>../../../../icons/dialogs/150.png</iconset>
                 </property>
                 <property name="iconSize">
                  <size>
@@ -485,7 +485,7 @@
                 </property>
                 <property name="icon">
                  <iconset>
-                  <normaloff>../../../../icons/dialogs/20x20/195.png</normaloff>../../../../icons/dialogs/20x20/195.png</iconset>
+                  <normaloff>../../../../icons/dialogs/152.png</normaloff>../../../../icons/dialogs/152.png</iconset>
                 </property>
                 <property name="iconSize">
                  <size>

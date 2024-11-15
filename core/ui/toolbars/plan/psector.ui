@@ -1700,10 +1700,6 @@
              <property name="text">
               <string/>
              </property>
-             <property name="icon">
-              <iconset>
-               <normaloff>../icons/170b.png</normaloff>../icons/170b.png</iconset>
-             </property>
             </widget>
            </item>
           </layout>

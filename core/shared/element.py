@@ -94,7 +94,7 @@ class GwElement:
         tools_gw.add_icon(self.dlg_add_element.btn_insert, "111")
         tools_gw.add_icon(self.dlg_add_element.btn_delete, "112")
         tools_gw.add_icon(self.dlg_add_element.btn_snapping, "137")
-        tools_gw.add_icon(self.dlg_add_element.btn_path_url, "173", sub_folder="24x24")
+        tools_gw.add_icon(self.dlg_add_element.btn_path_url, "173")
 
         # Remove all previous selections
         self.layers = tools_gw.remove_selection(True, layers=self.layers)

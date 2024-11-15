@@ -1078,7 +1078,7 @@
    </property>
    <property name="icon">
     <iconset>
-     <normaloff>../../../../icons/dialogs/20x20/181.png</normaloff>../../../../icons/dialogs/20x20/181.png</iconset>
+     <normaloff>../../../../icons/dialogs/148.png</normaloff>../../../../icons/dialogs/148.png</iconset>
    </property>
    <property name="text">
     <string>Composer</string>

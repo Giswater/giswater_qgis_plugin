@@ -621,10 +621,6 @@
               <property name="text">
                <string/>
               </property>
-              <property name="icon">
-               <iconset>
-                <normaloff>../icons/170.png</normaloff>../icons/170.png</iconset>
-              </property>
              </widget>
             </item>
            </layout>

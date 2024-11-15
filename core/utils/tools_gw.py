@@ -502,7 +502,7 @@ def refresh_legend():
 def get_cursor_multiple_selection():
     """ Set cursor for multiple selection """
 
-    path_cursor = os.path.join(lib_vars.plugin_dir, f"icons{os.sep}dialogs{os.sep}20x20", '201.png')
+    path_cursor = os.path.join(lib_vars.plugin_dir, f"icons{os.sep}dialogs", '153.png')
     if os.path.exists(path_cursor):
         cursor = QCursor(QPixmap(path_cursor))
     else:
@@ -3359,7 +3359,7 @@ def add_icon(widget, icon, folder="dialogs", sub_folder="20x20"):
             widget.setProperty('has_icon', True)
         return QIcon(icon_path)
     else:
-        tools_log.log_info("File not found", parameter=icon_path)
+        tools_log.log_info("File not found", parameter=icon_path) 
         return False
 
 

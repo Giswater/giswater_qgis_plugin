@@ -124,7 +124,7 @@ class GwDscenarioManagerButton(GwAction):
         self.dlg_hydrology_manager = GwDscenarioManagerUi(self)
         tools_gw.load_settings(self.dlg_hydrology_manager)
 
-        tools_gw.add_icon(self.dlg_hydrology_manager.btn_toc, "306", sub_folder="24x24")
+        tools_gw.add_icon(self.dlg_hydrology_manager.btn_toc, "164")
 
         # Manage btn create
         self._manage_btn_create(self.dlg_hydrology_manager, 'v_edit_cat_hydrology')
@@ -182,7 +182,7 @@ class GwDscenarioManagerButton(GwAction):
         self.dlg_dwf_manager = GwDscenarioManagerUi(self)
         tools_gw.load_settings(self.dlg_dwf_manager)
 
-        tools_gw.add_icon(self.dlg_dwf_manager.btn_toc, "306", sub_folder="24x24")
+        tools_gw.add_icon(self.dlg_dwf_manager.btn_toc, "164")
 
         # Manage btn create
         self._manage_btn_create(self.dlg_dwf_manager, 'v_edit_cat_dwf_scenario')
@@ -241,7 +241,7 @@ class GwDscenarioManagerButton(GwAction):
         self.dlg_dscenario_manager = GwDscenarioManagerUi(self)
         tools_gw.load_settings(self.dlg_dscenario_manager)
 
-        tools_gw.add_icon(self.dlg_dscenario_manager.btn_toc, "306", sub_folder="24x24")
+        tools_gw.add_icon(self.dlg_dscenario_manager.btn_toc, "164")
 
         # Manage btn create
         self._manage_btn_create(self.dlg_dscenario_manager, 'v_edit_cat_dscenario')
@@ -580,9 +580,9 @@ class GwDscenarioManagerButton(GwAction):
         tools_gw.load_settings(self.dlg_dscenario)
 
         # Add icons
-        tools_gw.add_icon(self.dlg_dscenario.btn_toc, "306", sub_folder="24x24")
         tools_gw.add_icon(self.dlg_dscenario.btn_insert, "111")
         tools_gw.add_icon(self.dlg_dscenario.btn_delete, "112")
+        tools_gw.add_icon(self.dlg_dscenario.btn_toc, "164")
         tools_gw.add_icon(self.dlg_dscenario.btn_snapping, "137")
 
         default_tab_idx = 0
