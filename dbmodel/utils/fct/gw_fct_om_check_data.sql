@@ -1495,7 +1495,7 @@ BEGIN
 
 		-- delete old values on anl table
 		DELETE FROM anl_connec WHERE cur_user=current_user AND fid IN (210,201,202,204,205,257,291,478);
-		DELETE FROM anl_arc WHERE cur_user=current_user AND fid IN (103,196,197,188,223,202,372,391,417,418,461,381, 479);
+		DELETE FROM anl_arc WHERE cur_user=current_user AND fid IN (103,196,197,188,223,202,251,372,391,417,418,461,381, 479);
 		DELETE FROM anl_node WHERE cur_user=current_user AND fid IN (106,177,187,202,442,443,461,432);
 
 		INSERT INTO anl_arc SELECT * FROM temp_anl_arc;
