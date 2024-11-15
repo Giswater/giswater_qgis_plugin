@@ -577,3 +577,52 @@ INSERT INTO sys_function (id, function_name, project_type, function_type, input_
 
 
 INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam) VALUES(532, 'Dynamic macrominsector analysis', 'utils', NULL, 'core', true, 'Function process', NULL);
+-- 15/11/2024
+
+UPDATE config_form_fields
+	SET stylesheet='{"icon":"129"}'::json
+	WHERE stylesheet->>'icon'='70';
+
+UPDATE config_form_fields
+	SET stylesheet='{"icon":"113"}'::json
+	WHERE stylesheet->>'icon'='111b';
+
+UPDATE config_form_fields
+	SET stylesheet='{"icon":"143"}'::json
+	WHERE stylesheet->>'icon'='131b';
+
+UPDATE config_form_fields
+	SET stylesheet='{"icon":"144"}'::json
+	WHERE stylesheet->>'icon'='134b';
+
+UPDATE config_form_fields
+	SET stylesheet='{"icon":"147"}'::json
+	WHERE stylesheet->>'icon'='170b';
+
+UPDATE config_form_fields
+	SET stylesheet='{"icon":"145"}'::json
+	WHERE stylesheet->>'icon'='136b';
+
+UPDATE config_form_fields
+	SET stylesheet='{"icon":"114"}'::json
+	WHERE stylesheet->>'icon'='112b';
+
+UPDATE config_form_fields
+	SET stylesheet='{"icon":"119"}'::json
+	WHERE stylesheet->>'icon'='64';
+
+UPDATE config_form_fields
+	SET stylesheet='{"icon":"101"}'::json
+	WHERE stylesheet->>'icon'='101';
+
+UPDATE config_form_fields
+	SET stylesheet='{"icon":"127"}'::json
+	WHERE stylesheet->>'icon'='65';
+
+UPDATE config_form_fields
+	SET stylesheet='{"icon":"149"}'::json
+	WHERE stylesheet->>'icon'='191';
+
+UPDATE config_form_fields
+	SET stylesheet='{"icon":"152"}'::json
+	WHERE stylesheet->>'icon'='195';
