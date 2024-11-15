@@ -23,7 +23,7 @@ from .....libs import tools_db, tools_qgis, tools_qt
 from ....models.plugin_toolbar import GwPluginToolbar
 from ....ui.dialog import GwDialog
 from ....ui.ui_manager import GwInpConfigImportUi, GwInpParsingUi
-from ....threads.import_inp.import_inp import GwImportInpTask
+from ....threads.import_inp.import_epanet_task import GwImportInpTask
 from ....utils import tools_gw
 from ...dialog import GwAction
 
@@ -49,11 +49,11 @@ class GwImportEpanet:
 
         try:
             import wntr
-            from ....threads.import_inp import parse_inp
+            from ....threads.import_inp import parse_epanet_task
 
             global Catalogs, GwParseInpTask
-            Catalogs = parse_inp.Catalogs
-            GwParseInpTask = parse_inp.GwParseInpTask
+            Catalogs = parse_epanet_task.Catalogs
+            GwParseInpTask = parse_epanet_task.GwParseInpTask
 
             self.file_path: Optional[Path] = self._get_file()
 
@@ -64,9 +64,9 @@ class GwImportEpanet:
 
         except ImportError:
             message: str = (
-                "wntr package not installed. "
-                "Open OSGeo4W Shell and execute 'python -m pip install wntr'. "
-                "Restart QGIS after instalation."
+                "Couldn't import wntr package. "
+                "Try to reload the Giswater plugin. "
+                "If the issue persists restart QGIS."
             )
             tools_qgis.show_message(message)
 
