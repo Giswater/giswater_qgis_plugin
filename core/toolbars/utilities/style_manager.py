@@ -10,7 +10,7 @@ import json
 import tempfile
 
 from ..toc.layerstyle_change_button import apply_styles_to_layers
-from ...ui.ui_manager import GwStyleManagerUi, GwCreateStyleGroupUi
+from ...ui.ui_manager import GwStyleManagerUi, GwStyleUi
 from ...utils import tools_gw
 from ....libs import lib_vars, tools_db, tools_qgis, tools_qt
 from .... import global_vars
@@ -115,7 +115,7 @@ class GwStyleManager:
 
     def _add_style_group(self, dialog):
         """Logic for adding a style group using the Qt Designer dialog."""
-        dialog_create = GwCreateStyleGroupUi(self)
+        dialog_create = GwStyleUi(self)
         tools_gw.load_settings(dialog_create)
 
         self._load_sys_roles(dialog_create)

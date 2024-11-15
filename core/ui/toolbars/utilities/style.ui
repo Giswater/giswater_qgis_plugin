@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>dlg_feature_add</class>
- <widget class="QDialog" name="dlg_feature_add">
+ <class>dlg_style</class>
+ <widget class="QDialog" name="dlg_style">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>405</width>
-    <height>255</height>
+    <height>241</height>
    </rect>
   </property>
   <property name="windowTitle">
