@@ -97,6 +97,7 @@ DECLARE
 
 	--
 	v_audit_result text;
+	v_visible_layer text;
 	v_has_conflicts boolean = false;
 
 
@@ -178,6 +179,36 @@ BEGIN
         RETURN v_response;
     END IF;
 
+	-- Start Building Log Message
+	-- =======================
+	INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat('MAPZONES DYNAMIC SECTORITZATION - ', upper(v_class)));
+	INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat('------------------------------------------------------------------'));
+	INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat('Use psectors: ', upper(v_usepsector::text)));
+	INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat('Mapzone constructor method: ', upper(v_updatemapzgeom::text)));
+	INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat('Update feature mapzone attributes: ', upper(v_commitchanges::text)));
+	INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat('Previous data quality control: ', v_checkdata));
+
+	IF v_floodonlymapzone IS NOT NULL THEN
+		INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat('Flood only mapzone have been ACTIVATED, ',v_field, ':',v_floodonlymapzone,'.'));
+	END IF;
+
+	INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat(''));
+	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 3, 'ERRORS');
+	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 3, '-----------');
+	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 2, '');
+	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 2, 'WARNINGS');
+	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 2, '--------------');
+	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 1, 'INFO');
+	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 1, '-------');
+	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 0, 'DETAILS');
+	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, NULL, 0, '----------');
+
+	IF v_updatemapzgeom > 0 THEN
+		-- message
+		INSERT INTO temp_audit_check_data (fid, criticity, error_message)
+		VALUES (v_fid, 1, concat('INFO: ',v_class,' values for features and geometry of the mapzone has been modified by this process'));
+	END IF;
+
 	v_mapzone_name = LOWER(v_class);
 
 	-- Initialize process
@@ -192,16 +223,16 @@ BEGIN
 
 	IF v_project_type = 'WS' THEN
 		UPDATE temp_pgr_node t SET graph_delimiter = lower(cf.graph_delimiter)
-		FROM node n 
+		FROM node n
 		JOIN cat_node cn ON cn.id=n.nodecat_id
-		JOIN cat_feature_node cf ON cf.id=cn.nodetype_id
+		JOIN cat_feature_node cf ON cf.id=cn.node_type
 		WHERE t.node_id=n.node_id AND cf.graph_delimiter='MINSECTOR';
 
-		-- UPDATE "closed", "broken", "to_arc" only if the values make sense - check the explanations/rules for the possible valve scenarios MINSECTOR/to_arc/closed/broken 
-		-- valves to modify: 
+		-- UPDATE "closed", "broken", "to_arc" only if the values make sense - check the explanations/rules for the possible valve scenarios MINSECTOR/to_arc/closed/broken
+		-- valves to modify:
 		-- closed valves
 		UPDATE temp_pgr_node n SET closed = v.closed, broken = v.broken, modif = TRUE
-		FROM man_valve v 
+		FROM man_valve v
 		WHERE n.node_id = v.node_id AND n.graph_delimiter = 'minsector' AND v.closed = TRUE;
 
 		--valves with to_arc NOT NULL
@@ -210,7 +241,7 @@ BEGIN
 		WHERE n.node_id = v.node_id  AND v.to_arc IS NOT NULL AND v.broken = FALSE;
 
 		-- arcs to modify:
-		-- for the closed valves when to_arc IS NULL, one of the arcs that connect to the valve 
+		-- for the closed valves when to_arc IS NULL, one of the arcs that connect to the valve
 		UPDATE temp_pgr_arc t set modif=true
 		FROM
 		(SELECT DISTINCT ON (n.node_id) n.node_id, a.arc_id
@@ -220,7 +251,7 @@ BEGIN
 		) a
 		WHERE t.arc_id = a.arc_id;
 
-		-- for the valves with to_arc NOT NULL; 
+		-- for the valves with to_arc NOT NULL;
 		UPDATE temp_pgr_arc a SET modif = TRUE
 		FROM temp_pgr_node n
 		WHERE a.arc_id = n.to_arc
@@ -232,6 +263,7 @@ BEGIN
 
 	-- get mapzone field name
     v_mapzone_field = v_mapzone_name || '_id';
+	v_visible_layer = 'v_edit_' || v_mapzone_name;
 
 	-- Nodes forceClosed
     v_querytext =
@@ -304,22 +336,22 @@ BEGIN
         RETURN v_response;
     END IF;
 
-	-- Update the cost/reverse_cost with the correct values for the open valves with to_arc NOT NULL 
+	-- Update the cost/reverse_cost with the correct values for the open valves with to_arc NOT NULL
 	-- and graph_delimiter 'minsector' or null (it wasn't changed for 'forceClosed' for example)
 	-- Note: node_1 = node_2 for the new arcs generated at the nodes
     IF v_project_type = 'WS' THEN
         UPDATE temp_pgr_arc a SET cost = 1
 		FROM temp_pgr_node n
-        WHERE a.node_1 = n.node_id AND n.pgr_node_id = n.node_id::INT 
-		AND a.cost = -1 AND (a.graph_delimiter = 'minsector' OR a.graph_delimiter is null) 
-		AND n.to_arc IS NOT NULL AND n.closed is null 
+        WHERE a.node_1 = n.node_id AND n.pgr_node_id = n.node_id::INT
+		AND a.cost = -1 AND (a.graph_delimiter = 'minsector' OR a.graph_delimiter is null)
+		AND n.to_arc IS NOT NULL AND n.closed is null
 		AND a.pgr_node_1=a.node_1::INT;
 
         UPDATE temp_pgr_arc a SET reverse_cost = 1
 		FROM temp_pgr_node n
-        WHERE a.node_1 = n.node_id AND n.pgr_node_id = n.node_id::INT 
-		AND a.cost = -1 AND (a.graph_delimiter = 'minsector' OR a.graph_delimiter is null) 
-		AND n.to_arc IS NOT NULL AND n.closed is null 
+        WHERE a.node_1 = n.node_id AND n.pgr_node_id = n.node_id::INT
+		AND a.cost = -1 AND (a.graph_delimiter = 'minsector' OR a.graph_delimiter is null)
+		AND n.to_arc IS NOT NULL AND n.closed is null
 		AND pgr_node_2 = node_2::INT;
     END IF;
 
@@ -487,6 +519,7 @@ BEGIN
 		v_result := COALESCE(v_result, '{}');
 		v_result_polygon = concat ('{"geometryType":"Polygon", "features":',v_result, '}');
 
+		v_visible_layer = NULL;
 	END IF;
 
 
@@ -509,27 +542,27 @@ BEGIN
 	v_version := COALESCE(v_version, '');
 	v_netscenario := COALESCE(v_netscenario, '');
 
-	--  Return
-	RETURN json_build_object(
-		'status', v_status,
-		'message', json_build_object(
-			'level', v_level,
-			'text', v_message
-		),
-		'version', v_version,
-		'body', json_build_object(
-			'form', json_build_object(),
-			'data', json_build_object(
-				'graphClass', v_class,
-				'netscenarioId', v_netscenario,
-				'hasConflicts', v_has_conflicts,
-				'info', v_result_info,
-				'point', v_result_point,
-				'line', v_result_line,
-				'polygon', v_result_polygon
-			)
-		)
-	);
+	-- Return JSON
+	RETURN gw_fct_json_create_return(('{
+		"status":"'||v_status||'", 
+		"message":{
+			"level":'||v_level||', 
+			"text":"'||v_message||'"
+		}, 
+		"version":"'||v_version||'",
+		"body":{
+			"form":{}, 
+			"data":{
+				"graphClass": "'||v_class||'", 
+				"netscenarioId": "'||v_netscenario||'", 
+				"hasConflicts": '||v_has_conflicts||', 
+				"info":'||v_result_info||',
+				"point":'||v_result_point||',
+				"line":'||v_result_line||',
+				"polygon":'||v_result_polygon||'
+			}
+		}
+	}')::json, 2710, null, ('{"visible": ['||v_visible_layer||']}')::json, null)::json;
 
 END;
 $BODY$
