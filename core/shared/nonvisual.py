@@ -633,7 +633,7 @@ class GwNonVisual:
         plot_widget = self._create_plot_widget(self.dialog)
 
         # Icons
-        tools_gw.add_icon(self.dialog.btn_delete_item, "112", sub_folder="24x24")
+        tools_gw.add_icon(self.dialog.btn_delete_item, "112")
 
         # Define variables
         tbl_curve_value = self.dialog.tbl_curve_value

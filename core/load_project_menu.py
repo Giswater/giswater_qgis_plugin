@@ -97,7 +97,7 @@ class GwMenuLoad(QObject):
 
         # region Open plugin folder
         if lib_vars.plugin_dir:
-            icon_path = f"{icon_folder}{os.sep}dialogs{os.sep}20x20{os.sep}108.png"
+            icon_path = f"{icon_folder}{os.sep}dialogs{os.sep}108.png"
             folder_icon = QIcon(icon_path)
             action_open_plugin_path = self.main_menu.addAction(f"Open plugin folder")
             action_open_plugin_path.setIcon(folder_icon)
@@ -107,7 +107,7 @@ class GwMenuLoad(QObject):
         # region Advanced
         action_manage_file = self.main_menu.addAction(f"Advanced")
         action_manage_file.triggered.connect(self._open_manage_file)
-        icon_path = f"{icon_folder}{os.sep}dialogs{os.sep}20x20{os.sep}105.png"
+        icon_path = f"{icon_folder}{os.sep}dialogs{os.sep}105.png"
         folder_icon = QIcon(icon_path)
         action_manage_file.setIcon(folder_icon)
         # endregion
@@ -117,7 +117,7 @@ class GwMenuLoad(QObject):
             log_folder = f"{lib_vars.user_folder_dir}{os.sep}core{os.sep}log"
             size = tools_os.get_folder_size(log_folder)
             log_folder_volume = f"{round(size / (1024 * 1024), 2)} MB"
-            icon_path = f"{icon_folder}{os.sep}dialogs{os.sep}20x20{os.sep}102.png"
+            icon_path = f"{icon_folder}{os.sep}dialogs{os.sep}102.png"
             folder_icon = QIcon(icon_path)
             action_open_path = self.main_menu.addAction(f"Open user folder ({log_folder_volume})")
             action_open_path.setIcon(folder_icon)

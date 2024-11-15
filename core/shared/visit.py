@@ -132,11 +132,11 @@ class GwVisit(QObject):
 
 
         # Set icons
-        tools_gw.add_icon(self.dlg_add_visit.btn_feature_insert, "111", sub_folder="24x24")
-        tools_gw.add_icon(self.dlg_add_visit.btn_feature_delete, "112", sub_folder="24x24")
+        tools_gw.add_icon(self.dlg_add_visit.btn_feature_insert, "111")
+        tools_gw.add_icon(self.dlg_add_visit.btn_feature_delete, "112")
         tools_gw.add_icon(self.dlg_add_visit.btn_feature_snapping, "137")
-        tools_gw.add_icon(self.dlg_add_visit.btn_doc_insert, "111", sub_folder="24x24")
-        tools_gw.add_icon(self.dlg_add_visit.btn_doc_delete, "112", sub_folder="24x24")
+        tools_gw.add_icon(self.dlg_add_visit.btn_doc_insert, "111")
+        tools_gw.add_icon(self.dlg_add_visit.btn_doc_delete, "112")
         tools_gw.add_icon(self.dlg_add_visit.btn_doc_new, "134")
         tools_gw.add_icon(self.dlg_add_visit.btn_open_doc, "170")
         tools_gw.add_icon(self.dlg_add_visit.btn_add_geom, "133")

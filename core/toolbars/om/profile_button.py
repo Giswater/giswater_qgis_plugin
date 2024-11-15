@@ -108,13 +108,13 @@ class GwProfileButton(GwAction):
 
         # Toolbar actions
         action = self.dlg_draw_profile.findChild(QAction, "actionProfile")
-        tools_gw.add_icon(action, "131", sub_folder="24x24")
+        tools_gw.add_icon(action, "131")
         action.triggered.connect(partial(self._activate_add_points, False))
         action.triggered.connect(partial(self._activate_snapping_node))
         self.action_profile = action
 
         action = self.dlg_draw_profile.findChild(QAction, "actionAddPoint")
-        tools_gw.add_icon(action, "111", sub_folder="24x24")
+        tools_gw.add_icon(action, "111")
         action.triggered.connect(partial(self._activate_add_points, True))
         action.triggered.connect(partial(self._activate_snapping_node))
         self.action_add_point = action

@@ -115,10 +115,6 @@
    <property name="checkable">
     <bool>true</bool>
    </property>
-   <property name="icon">
-    <iconset>
-     <normaloff>../icons/103.png</normaloff>../icons/103.png</iconset>
-   </property>
    <property name="text">
     <string>snapping</string>
    </property>
@@ -133,10 +129,6 @@
    <property name="checkable">
     <bool>true</bool>
    </property>
-   <property name="icon">
-    <iconset>
-     <normaloff>../icons/133.png</normaloff>../icons/133.png</iconset>
-   </property>
    <property name="text">
     <string>orientation</string>
    </property>
@@ -150,10 +142,6 @@
   <action name="actionEdit">
    <property name="checkable">
     <bool>true</bool>
-   </property>
-   <property name="icon">
-    <iconset>
-     <normaloff>../icons/101.png</normaloff>../icons/101.png</iconset>
    </property>
    <property name="text">
     <string>edit</string>

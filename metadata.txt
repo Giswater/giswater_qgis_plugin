@@ -15,7 +15,7 @@ homepage=https://www.giswater.org
 repository=https://github.com/giswater/giswater_qgis_plugin
 tracker=https://github.com/giswater/giswater_qgis_plugin/issues
 category=Plugins
-icon=icons/dialogs/20x20/giswater.png
+icon=icons/dialogs/136.png
 experimental=False
 
 # Compatibility versions

@@ -224,10 +224,6 @@
               <property name="text">
                <string/>
               </property>
-              <property name="icon">
-               <iconset>
-                <normaloff>../../../workspace/giswater_plugin/icons/111b.png</normaloff>../../../workspace/giswater_plugin/icons/111b.png</iconset>
-              </property>
              </widget>
             </item>
             <item>
@@ -235,20 +231,12 @@
               <property name="text">
                <string/>
               </property>
-              <property name="icon">
-               <iconset>
-                <normaloff>../../../workspace/giswater_plugin/icons/112b.png</normaloff>../../../workspace/giswater_plugin/icons/112b.png</iconset>
-              </property>
              </widget>
             </item>
             <item>
              <widget class="QPushButton" name="btn_snapping">
               <property name="text">
                <string/>
-              </property>
-              <property name="icon">
-               <iconset>
-                <normaloff>../../../workspace/giswater_plugin/icons/137.png</normaloff>../../../workspace/giswater_plugin/icons/137.png</iconset>
               </property>
              </widget>
             </item>

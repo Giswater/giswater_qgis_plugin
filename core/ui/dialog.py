@@ -59,7 +59,7 @@ class GwDialog(QDialog):
         sh.activated.connect(tools_gw.open_dlg_help)
         # Set window icon
         icon_folder = f"{lib_vars.plugin_dir}{os.sep}icons"
-        icon_path = f"{icon_folder}{os.sep}dialogs{os.sep}20x20{os.sep}giswater.png"
+        icon_path = f"{icon_folder}{os.sep}dialogs{os.sep}136.png"
         giswater_icon = QIcon(icon_path)
         self.setWindowIcon(giswater_icon)
         # Enable event filter

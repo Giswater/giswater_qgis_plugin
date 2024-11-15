@@ -368,10 +368,6 @@
               <property name="text">
                <string/>
               </property>
-              <property name="icon">
-               <iconset>
-                <normaloff>../icons/111b.png</normaloff>../icons/111b.png</iconset>
-              </property>
              </widget>
             </item>
             <item>
@@ -379,20 +375,12 @@
               <property name="text">
                <string/>
               </property>
-              <property name="icon">
-               <iconset>
-                <normaloff>../icons/112b.png</normaloff>../icons/112b.png</iconset>
-              </property>
              </widget>
             </item>
             <item>
              <widget class="QPushButton" name="btn_snapping">
               <property name="text">
                <string/>
-              </property>
-              <property name="icon">
-               <iconset>
-                <normaloff>../icons/137.png</normaloff>../icons/137.png</iconset>
               </property>
              </widget>
             </item>
@@ -478,10 +466,6 @@
               <property name="text">
                <string/>
               </property>
-              <property name="icon">
-               <iconset>
-                <normaloff>../icons/111b.png</normaloff>../icons/111b.png</iconset>
-              </property>
              </widget>
             </item>
             <item>
@@ -489,10 +473,7 @@
               <property name="text">
                <string/>
               </property>
-              <property name="icon">
-               <iconset>
-                <normaloff>../icons/112b.png</normaloff>../icons/112b.png</iconset>
-              </property>
+
              </widget>
             </item>
            </layout>
@@ -517,20 +498,12 @@
               <property name="text">
                <string/>
               </property>
-              <property name="icon">
-               <iconset>
-                <normaloff>../icons/111b.png</normaloff>../icons/111b.png</iconset>
-              </property>
              </widget>
             </item>
             <item>
              <widget class="QPushButton" name="btn_delete_psector">
               <property name="text">
                <string/>
-              </property>
-              <property name="icon">
-               <iconset>
-                <normaloff>../icons/112b.png</normaloff>../icons/112b.png</iconset>
               </property>
              </widget>
             </item>
@@ -556,20 +529,12 @@
               <property name="text">
                <string/>
               </property>
-              <property name="icon">
-               <iconset>
-                <normaloff>../icons/111b.png</normaloff>../icons/111b.png</iconset>
-              </property>
              </widget>
             </item>
             <item>
              <widget class="QPushButton" name="btn_delete_visit">
               <property name="text">
                <string/>
-              </property>
-              <property name="icon">
-               <iconset>
-                <normaloff>../icons/112b.png</normaloff>../icons/112b.png</iconset>
               </property>
              </widget>
             </item>

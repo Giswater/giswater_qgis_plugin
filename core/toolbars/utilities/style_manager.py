@@ -36,8 +36,8 @@ class GwStyleManager:
         tools_gw.load_settings(self.style_mng_dlg)
 
         # Add icons to the buttons
-        tools_gw.add_icon(self.style_mng_dlg.btn_add_group, "111", sub_folder="24x24")
-        tools_gw.add_icon(self.style_mng_dlg.btn_delete_group, "112", sub_folder="24x24")
+        tools_gw.add_icon(self.style_mng_dlg.btn_add_group, "111")
+        tools_gw.add_icon(self.style_mng_dlg.btn_delete_group, "112")
 
         # Load layers and populate the menu
         layers_data = self._load_layers_with_geom()

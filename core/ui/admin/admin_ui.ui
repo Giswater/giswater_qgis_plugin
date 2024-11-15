@@ -334,9 +334,6 @@
             <property name="text">
              <string/>
             </property>
-            <property name="pixmap">
-             <pixmap>../../../Desktop/Edgar/READ SQL/images/status_ok.png</pixmap>
-            </property>
             <property name="scaledContents">
              <bool>false</bool>
             </property>

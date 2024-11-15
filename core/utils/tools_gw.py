@@ -502,7 +502,7 @@ def refresh_legend():
 def get_cursor_multiple_selection():
     """ Set cursor for multiple selection """
 
-    path_cursor = os.path.join(lib_vars.plugin_dir, f"icons{os.sep}dialogs{os.sep}20x20", '201.png')
+    path_cursor = os.path.join(lib_vars.plugin_dir, f"icons{os.sep}dialogs", '153.png')
     if os.path.exists(path_cursor):
         cursor = QCursor(QPixmap(path_cursor))
     else:
@@ -1689,9 +1689,8 @@ def add_button(**kwargs):
         real_name = widget.objectName()[9:len(widget.objectName())]
 
     if field['stylesheet'] is not None and 'icon' in field['stylesheet']:
-        icon = field['stylesheet']['icon']
-        size = field['stylesheet']['size'] if 'size' in field['stylesheet'] else "20x20"
-        add_icon(widget, f'{icon}', size)
+        icon = field['stylesheet']['icon']        
+        add_icon(widget, f'{icon}')
 
     func_params = ""
     if field.get('widgetfunction'):
@@ -3346,11 +3345,11 @@ def set_tablemodel_config(dialog, widget, table_name, sort_order=0, schema_name=
     return widget
 
 
-def add_icon(widget, icon, sub_folder="20x20", folder="dialogs"):
+def add_icon(widget, icon, folder="dialogs", sub_folder="20x20"):
     """ Set @icon to selected @widget """
 
     # Get icons folder
-    icons_folder = os.path.join(lib_vars.plugin_dir, f"icons{os.sep}{folder}{os.sep}{sub_folder}")
+    icons_folder = os.path.join(lib_vars.plugin_dir, f"icons{os.sep}{folder}")
     icon_path = os.path.join(icons_folder, str(icon) + ".png")
 
     if os.path.exists(icon_path):
@@ -3359,13 +3358,13 @@ def add_icon(widget, icon, sub_folder="20x20", folder="dialogs"):
             widget.setProperty('has_icon', True)
         return QIcon(icon_path)
     else:
-        tools_log.log_info("File not found", parameter=icon_path)
+        tools_log.log_info("File not found", parameter=icon_path) 
         return False
 
 
-def get_icon(icon, folder="dialogs", sub_folder="20x20"):
+def get_icon(icon, folder="dialogs"):
     # Get icons folder
-    icons_folder = os.path.join(lib_vars.plugin_dir, f"icons{os.sep}{folder}{os.sep}{sub_folder}")
+    icons_folder = os.path.join(lib_vars.plugin_dir, f"icons{os.sep}{folder}")
     icon_path = os.path.join(icons_folder, str(icon) + ".png")
 
     if os.path.exists(icon_path):

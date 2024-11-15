@@ -1021,7 +1021,7 @@
    </property>
    <property name="icon">
     <iconset>
-     <normaloff>../../../../icons/dialogs/20x20/126.png</normaloff>../../../../icons/dialogs/20x20/126.png</iconset>
+     <normaloff>../../../../icons/dialogs/126.png</normaloff>../../../../icons/dialogs/126.png</iconset>
    </property>
    <property name="text">
     <string>Network Mincut</string>
@@ -1039,7 +1039,7 @@
    </property>
    <property name="icon">
     <iconset>
-     <normaloff>../../../../icons/dialogs/20x20/123.png</normaloff>../../../../icons/dialogs/20x20/123.png</iconset>
+     <normaloff>../../../../icons/dialogs/123.png</normaloff>../../../../icons/dialogs/123.png</iconset>
    </property>
    <property name="text">
     <string>Custom Mincut</string>
@@ -1054,7 +1054,7 @@
    </property>
    <property name="icon">
     <iconset>
-     <normaloff>../../../../icons/dialogs/20x20/121.png</normaloff>../../../../icons/dialogs/20x20/121.png</iconset>
+     <normaloff>../../../../icons/dialogs/121.png</normaloff>../../../../icons/dialogs/121.png</iconset>
    </property>
    <property name="text">
     <string>Connec Mincut</string>
@@ -1066,7 +1066,7 @@
    </property>
    <property name="icon">
     <iconset>
-     <normaloff>../../../../icons/dialogs/20x20/122.png</normaloff>../../../../icons/dialogs/20x20/122.png</iconset>
+     <normaloff>../../../../icons/dialogs/122.png</normaloff>../../../../icons/dialogs/122.png</iconset>
    </property>
    <property name="text">
     <string>Hydrometer Mincut</string>
@@ -1078,7 +1078,7 @@
    </property>
    <property name="icon">
     <iconset>
-     <normaloff>../../../../icons/dialogs/20x20/181.png</normaloff>../../../../icons/dialogs/20x20/181.png</iconset>
+     <normaloff>../../../../icons/dialogs/148.png</normaloff>../../../../icons/dialogs/148.png</iconset>
    </property>
    <property name="text">
     <string>Composer</string>
@@ -1093,7 +1093,7 @@
    </property>
    <property name="icon">
     <iconset>
-     <normaloff>../../../../icons/dialogs/20x20/124.png</normaloff>../../../../icons/dialogs/20x20/124.png</iconset>
+     <normaloff>../../../../icons/dialogs/124.png</normaloff>../../../../icons/dialogs/124.png</iconset>
    </property>
    <property name="text">
     <string>Change valve status</string>
@@ -1108,7 +1108,7 @@
    </property>
    <property name="icon">
     <iconset>
-     <normaloff>../../../../icons/dialogs/20x20/125.png</normaloff>../../../../icons/dialogs/20x20/125.png</iconset>
+     <normaloff>../../../../icons/dialogs/125.png</normaloff>../../../../icons/dialogs/125.png</iconset>
    </property>
    <property name="text">
     <string>Refresh Mincut</string>
@@ -1120,7 +1120,7 @@
    </property>
    <property name="icon">
     <iconset>
-     <normaloff>../../../../icons/dialogs/20x20/125.png</normaloff>../../../../icons/dialogs/20x20/125.png</iconset>
+     <normaloff>../../../../icons/dialogs/125.png</normaloff>../../../../icons/dialogs/125.png</iconset>
    </property>
    <property name="text">
     <string>Export Hydro Csv</string>

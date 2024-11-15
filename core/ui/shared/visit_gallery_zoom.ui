@@ -81,20 +81,12 @@
        <property name="text">
         <string/>
        </property>
-       <property name="icon">
-        <iconset>
-         <normaloff>../icons/109.png</normaloff>../icons/109.png</iconset>
-       </property>
       </widget>
      </item>
      <item row="0" column="2">
       <widget class="QPushButton" name="btn_slideNext">
        <property name="text">
         <string/>
-       </property>
-       <property name="icon">
-        <iconset>
-         <normaloff>../icons/108.png</normaloff>../icons/108.png</iconset>
        </property>
       </widget>
      </item>
