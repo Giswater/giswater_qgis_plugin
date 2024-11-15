@@ -13,15 +13,18 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_graphanalytics_macrominsector(p_da
 RETURNS json AS
 $BODY$
 
-/*
-SELECT SCHEMA_NAME.gw_fct_grafanalytics_macrominsector('{"data":{"parameters":{"commitChanges":true}}}');
+/* EXAMPLE OF CALL
+    SELECT SCHEMA_NAME.gw_fct_grafanalytics_macrominsector('{"data":{"parameters":{}}}');
 */
 
 DECLARE
 
     v_version TEXT;
     v_project_type TEXT;
-    v_commitchanges BOOLEAN;
+    v_fid INTEGER = 532;
+    v_result JSON;
+    v_result_info JSON;
+
 
 BEGIN
 
@@ -29,12 +32,15 @@ BEGIN
 
     SELECT giswater, project_type INTO v_version, v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
 
-    -- TODO: use this variable to commit changes or not
-    v_commitchanges = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'commitChanges');
+    CREATE TEMP TABLE temp_audit_check_data (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
 
-    UPDATE node SET macrominsector_id = 0;
-    UPDATE arc SET macrominsector_id = 0;
-    UPDATE connec SET macrominsector_id = 0;
+    -- Starting process
+	INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat('MACROMINSECTOR DYNAMIC SECTORITZATION'));
+	INSERT INTO temp_audit_check_data (fid, error_message) VALUES (v_fid, concat('---------------------------------------------------'));
+
+    UPDATE node SET macrominsector_id = 0 WHERE macrominsector_id <> 0;
+    UPDATE arc SET macrominsector_id = 0 WHERE macrominsector_id <> 0;
+    UPDATE connec SET macrominsector_id = 0 WHERE macrominsector_id <> 0;
 
     UPDATE node n SET macrominsector_id = c.component
     FROM (
@@ -60,12 +66,38 @@ BEGIN
         WHERE g.arc_id = a.arc_id AND a.macrominsector_id <> 0;
     END IF;
 
-    RETURN gw_fct_json_create_return(
-        ('{"status":"Accepted", "message":{"level":1, "text":"Macrominsector analysis done successfully"}, "version":"' || v_version || '"' ||
-        ',"body":{"form":{}' ||
-        '}' ||
-        '}')::json, 3334, NULL, NULL, NULL
-    );
+    -- Message
+    INSERT INTO temp_audit_check_data (fid, error_message)
+    VALUES (v_fid, CONCAT('INFO-', v_fid, ': Macrominsector attribute on arc/node/connec/gully features have been updated by this process'));
+
+
+	-- Info
+    SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
+    FROM (
+        SELECT id, error_message AS message FROM temp_audit_check_data WHERE cur_user = current_user AND fid = v_fid ORDER BY id
+    ) row;
+    v_result := COALESCE(v_result, '{}');
+    v_result_info := CONCAT('{"geometryType":"", "values":', v_result, '}');
+
+    DROP TABLE IF EXISTS temp_audit_check_data;
+
+    RETURN  gw_fct_json_create_return(('{
+        "status":"Accepted", 
+        "message":{
+            "level":1, 
+            "text":"Macrominsector analysis done successfully"
+        }, 
+        "version":"'||v_version||'",
+        "body":{
+            "form":{},
+            "data":{
+                "info":'||v_result_info||',
+                "point":{},
+                "line":{},
+                "polygon":{}
+            }
+        }
+    }')::json, 3336, NULL, ('{"visible": ["'||NULL||'"]}')::json, NULL)::json;
 
 END;
 $BODY$

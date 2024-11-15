@@ -40,9 +40,7 @@ In explotation id you can use ''-9'' to select all explotations, or a list of ex
 WHERE id=2706;
 
 INSERT INTO config_toolbox (id, alias, functionparams, inputparams, observ, active, device)
-VALUES(3336, 'Macrominsector analysis', '{"featureType":[]}'::json,
-'[{"widgetname":"commitChanges", "label":"Commit changes:","widgettype":"check","datatype":"boolean","layoutname":"grl_option_parameters","layoutorder":1, "value":"", "tooltip": "Commit changes"}]'::json,
-NULL, true, '{4}');
+VALUES(3336, 'Macrominsector analysis', '{"featureType":[]}'::json, NULL, NULL, true, '{4}');
 
 INSERT INTO sys_param_user VALUES ('utils_psector_strategy', 'config', 'Psector strategy', 'role_master', null, 'Value for psector_strategy', null, null, TRUE,
 20, 'utils', FALSE, null, null, null, FALSE, 'text', 'check', TRUE, null, 'true', 'lyt_other', TRUE, null, null, null, null, 'core') ON CONFLICT (id) DO NOTHING;
@@ -576,3 +574,6 @@ INSERT INTO sys_table (id, descript, sys_role, criticity, context, orderby, alia
 INSERT INTO sys_table (id, descript, sys_role, criticity, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam) VALUES('vcv_emitters', 'View emitters for epatools', 'role_admin', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'core', NULL);
 
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source") VALUES(3344, 'gw_fct_getepacalfile', 'utils', 'function', 'json', 'json', 'Function to get calibration files from epatools', 'role_admin', NULL, 'core');
+
+
+INSERT INTO sys_fprocess (fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam) VALUES(532, 'Dynamic macrominsector analysis', 'utils', NULL, 'core', true, 'Function process', NULL);
