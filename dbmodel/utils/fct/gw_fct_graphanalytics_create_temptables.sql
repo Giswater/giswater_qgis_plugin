@@ -39,9 +39,6 @@ BEGIN
         zone_id INTEGER DEFAULT 0,
         modif BOOL DEFAULT FALSE,  -- True if nodes have to be disconnected - closed valves, starts of mapzones
         graph_delimiter VARCHAR(30),
-        closed BOOL, 
-        broken BOOL, 
-        to_arc VARCHAR(30),    
         CONSTRAINT temp_pgr_node_pkey PRIMARY KEY (pgr_node_id)
     );
     CREATE INDEX temp_pgr_node_node_id ON temp_pgr_node USING btree (node_id);
@@ -103,6 +100,10 @@ BEGIN
         );
         CREATE INDEX temp_pgr_gully_gully_id ON temp_pgr_gully USING btree (gully_id);
         CREATE INDEX temp_pgr_gully_arc_id ON temp_pgr_gully USING btree (arc_id);
+    ELSIF v_project_type = 'WS' THEN
+        ALTER TABLE temp_pgr_node ADD COLUMN closed BOOL DEFAULT FALSE;
+        ALTER TABLE temp_pgr_node ADD COLUMN broken BOOL DEFAULT FALSE;
+        ALTER TABLE temp_pgr_node ADD COLUMN to_arc VARCHAR(30);
     END IF;
 
     -- Create other additional temporary tables
