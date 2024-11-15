@@ -1689,9 +1689,8 @@ def add_button(**kwargs):
         real_name = widget.objectName()[9:len(widget.objectName())]
 
     if field['stylesheet'] is not None and 'icon' in field['stylesheet']:
-        icon = field['stylesheet']['icon']
-        size = field['stylesheet']['size'] if 'size' in field['stylesheet'] else "20x20"
-        add_icon(widget, f'{icon}', size)
+        icon = field['stylesheet']['icon']        
+        add_icon(widget, f'{icon}')
 
     func_params = ""
     if field.get('widgetfunction'):
