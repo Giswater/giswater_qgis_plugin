@@ -144,15 +144,15 @@ BEGIN
 		IF v_count = 2 THEN
 
 			-- Get both arc features
-			SELECT * INTO v_record1 FROM arc WHERE (node_1 = v_node_id OR node_2 = v_node_id) AND state > 0 ORDER BY arc_id DESC LIMIT 1;
-			SELECT * INTO v_record2 FROM arc WHERE (node_1 = v_node_id OR node_2 = v_node_id) AND state > 0 ORDER BY arc_id ASC LIMIT 1;
+			SELECT * INTO v_record1 FROM arc WHERE (node_2 = v_node_id) AND state > 0 ORDER BY arc_id DESC LIMIT 1;
+			SELECT * INTO v_record2 FROM arc where (node_1 = v_node_id) AND state > 0 ORDER BY arc_id ASC LIMIT 1;
 
 			-- get states
 			SELECT state INTO v_state_node FROM node WHERE node_id = v_node_id;
 			SELECT state INTO v_state_arc FROM arc WHERE arc_id = v_record1.arc_id;
 
 			INSERT INTO audit_check_data (fid,  criticity, error_message)
-			VALUES (214, 1, concat('Arcs related to selected node: ', v_record1.arc_id,', ',v_record2.arc_id,'.'));
+			VALUES (214, 1, concat('Arcs related to selected node have been removed: ', v_record1.arc_id,', ',v_record2.arc_id,'.'));
 
 			IF v_arccat_id IS NOT NULL THEN
 				v_record1.arccat_id = v_arccat_id;
@@ -205,14 +205,24 @@ BEGIN
 				v_new_record.node_1 := (SELECT node_id FROM v_edit_node WHERE ST_DWithin(ST_StartPoint(v_arc_geom), v_edit_node.the_geom, 0.01) LIMIT 1);
 				v_new_record.node_2 := (SELECT node_id FROM v_edit_node WHERE ST_DWithin(ST_EndPoint(v_arc_geom), v_edit_node.the_geom, 0.01) LIMIT 1);
 				v_new_record.arc_id := (SELECT nextval('urn_id_seq'));
+			
+				INSERT INTO audit_check_data (fid,  criticity, error_message)
+				VALUES (214, 1, concat('New arc have been inserted: ', v_new_record.arc_id, '.'));
+
 
 				IF v_project_type = 'UD' THEN
 
-					v_new_record.y1 := (SELECT y1 FROM arc WHERE node_2 = v_node_id AND arc_id IN ( v_record1.arc_id, v_record2.arc_id));
-					v_new_record.custom_y1 := (SELECT custom_y1 FROM arc WHERE node_2 = v_node_id AND arc_id IN ( v_record1.arc_id, v_record2.arc_id));
-					v_new_record.y2 := (SELECT y2 FROM arc WHERE node_1 = v_node_id AND arc_id IN ( v_record1.arc_id, v_record2.arc_id));
-					v_new_record.custom_y2 := (SELECT custom_y2 FROM arc WHERE node_1 = v_node_id AND arc_id IN ( v_record1.arc_id, v_record2.arc_id));
-
+					v_new_record.y1 := (SELECT y1 FROM arc WHERE arc_id = v_record1.arc_id);
+					v_new_record.custom_y1 := (SELECT custom_y1 FROM arc WHERE arc_id = v_record1.arc_id);
+					v_new_record.elev1 := (SELECT elev1 FROM arc WHERE arc_id = v_record1.arc_id);
+					v_new_record.custom_elev1 := (SELECT custom_elev1 FROM arc WHERE arc_id = v_record1.arc_id);
+					v_new_record.sys_elev1 := (SELECT sys_elev1 FROM arc WHERE arc_id = v_record1.arc_id);
+				
+					v_new_record.y2 := (SELECT y2 FROM arc WHERE arc_id = v_record2.arc_id);
+					v_new_record.custom_y2 := (SELECT custom_y2 FROM arc where arc_id = v_record2.arc_id);
+					v_new_record.elev2 := (SELECT elev2 FROM arc WHERE arc_id = v_record2.arc_id);
+					v_new_record.sys_elev2 := (SELECT sys_elev2 FROM arc where arc_id = v_record2.arc_id);
+				
 				END IF;
 
 				-- get man and epa tables
@@ -231,13 +241,22 @@ BEGIN
 				-- to get values topocontrol arc needs to be before, but this is not possible
 				UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'activated', false) WHERE parameter = 'edit_arc_searchnodes';
 				INSERT INTO arc SELECT v_new_record.*;
-				UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'activated', true) WHERE parameter = 'edit_arc_searchnodes';
-
-				UPDATE arc SET node_1=v_new_record.node_1, node_2=v_new_record.node_2 where arc_id=v_new_record.arc_id;
 
 				-- remove duplicated vertex on new arc because of the fusion
 				UPDATE arc SET the_geom=ST_RemoveRepeatedPoints(the_geom) WHERE arc_id=v_new_record.arc_id;
+			
+				UPDATE arc SET node_1=v_new_record.node_1, node_2=v_new_record.node_2 where arc_id=v_new_record.arc_id;
+			
+				UPDATE arc SET sys_elev1=v_new_record.sys_elev1, y1 = v_new_record.y1, 	custom_y1 = v_new_record.custom_y1 , 
+				elev1 = v_new_record.elev1, custom_elev1 = v_new_record.custom_elev1
+				where arc_id=v_new_record.arc_id;
+			
+				UPDATE arc SET sys_elev2=v_new_record.sys_elev2, y2 = v_new_record.y2, 	custom_y2 = v_new_record.custom_y2 , 
+				elev2 = v_new_record.elev2, custom_elev2 = v_new_record.custom_elev2
+				where arc_id=v_new_record.arc_id;
 
+				UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'activated', true) WHERE parameter = 'edit_arc_searchnodes';
+			
 				v_arc_childtable_name := 'man_arc_' || lower(v_arc_type);
 
 				IF (SELECT EXISTS ( SELECT 1 FROM information_schema.tables WHERE table_schema = v_schemaname AND table_name = v_arc_childtable_name)) IS TRUE THEN
@@ -305,11 +324,6 @@ BEGIN
 					-- delete rows for old arcs
 					EXECUTE 'DELETE FROM '||v_arc_childtable_name||' WHERE arc_id = '||quote_literal(v_record1.arc_id)||';';
 					EXECUTE 'DELETE FROM '||v_arc_childtable_name||' WHERE arc_id = '||quote_literal(v_record2.arc_id)||';';
-				END IF;
-
-				-- update link only with enabled variable
-				IF (SELECT (value::json->>'fid')::boolean FROM config_param_system WHERE parameter='edit_custom_link') IS TRUE THEN
-				    UPDATE arc SET link=v_new_record.arc_id where arc_id=v_new_record.arc_id;
 				END IF;
 
 				EXECUTE 'INSERT INTO '||v_man_table||' VALUES ('||v_new_record.arc_id||')';
