@@ -26,6 +26,7 @@ from ....ui.ui_manager import GwInpConfigImportUi, GwInpParsingUi
 from ....threads.import_inp.import_epanet_task import GwImportInpTask
 from ....utils import tools_gw
 from ...dialog import GwAction
+from ....threads.import_inp import parse_swmm_task
 
 CREATE_NEW = "Create new"
 TESTING_MODE = True
@@ -131,16 +132,17 @@ class GwImportSwmm:
         self.dlg_config.btn_accept.clicked.connect(self._importinp_accept)
 
         # Get catalogs from thread
-        global Catalogs
-        self.catalogs: Catalogs = self.parse_inp_task.catalogs
+        # global Catalogs
+        self.catalogs: parse_swmm_task.Catalogs = self.parse_inp_task.catalogs
 
         # Fill nodes table
         tbl_nodes: QTableWidget = self.dlg_config.tbl_nodes
 
         node_elements = [
             ("junctions", self.catalogs.inp_junctions, "JUNCTION"),
-            ("reservoirs", self.catalogs.inp_reservoirs, "RESERVOIR"),
-            ("tanks", self.catalogs.inp_tanks, "TANK"),
+            ("outfalls", self.catalogs.inp_outfalls, "OUTFALL"),
+            ("dividers", self.catalogs.inp_dividers, "DIVIDER"),
+            ("storage", self.catalogs.inp_storage, "STORAGE"),
         ]
 
         self.tbl_elements = {}
@@ -168,37 +170,36 @@ class GwImportSwmm:
 
         # Fill arcs table with the pipes
         tbl_arcs: QTableWidget = self.dlg_config.tbl_arcs
+        tbl_arcs.setColumnCount(8)
 
-        if self.catalogs.inp_pipes:
-            self.tbl_elements["pipes"] = {}
+        if self.catalogs.inp_conduits:
+            self.tbl_elements["conduits"] = {}
 
-            for (diameter, roughness), rec_catalog in self.catalogs.inp_pipes.items():
+            for cat_tuple, rec_catalog in self.catalogs.inp_conduits.items():
                 row: int = tbl_arcs.rowCount()
                 tbl_arcs.setRowCount(row + 1)
 
-                first_column = QTableWidgetItem("PIPE")
+                first_column = QTableWidgetItem("CONDUIT")
                 first_column.setFlags(Qt.ItemIsEnabled)
                 tbl_arcs.setItem(row, 0, first_column)
 
-                d_column = QTableWidgetItem(str(diameter))
-                d_column.setFlags(Qt.ItemIsEnabled)
-                tbl_arcs.setItem(row, 1, d_column)
-
-                r_column = QTableWidgetItem(str(roughness))
-                r_column.setFlags(Qt.ItemIsEnabled)
-                tbl_arcs.setItem(row, 2, r_column)
+                for idx, prop in enumerate(cat_tuple):
+                    value = str(prop) if prop is not None else ''
+                    item = QTableWidgetItem(value)
+                    item.setFlags(Qt.ItemIsEnabled)
+                    tbl_arcs.setItem(row, idx+1, item)
 
                 combo_cat = QComboBox()
-                tbl_arcs.setCellWidget(row, 3, combo_cat)
+                tbl_arcs.setCellWidget(row, 6, combo_cat)
 
                 new_cat_name = QTableWidgetItem("")
                 new_cat_name.setFlags(Qt.NoItemFlags)
-                tbl_arcs.setItem(row, 4, new_cat_name)
+                tbl_arcs.setItem(row, 7, new_cat_name)
                 combo_cat.currentTextChanged.connect(
                     partial(self._toggle_enabled_new_catalog_field, new_cat_name)
                 )
 
-                self.tbl_elements["pipes"][(diameter, roughness)] = (
+                self.tbl_elements["conduits"][cat_tuple] = (
                     combo_cat,
                     new_cat_name,
                 )
@@ -206,7 +207,9 @@ class GwImportSwmm:
         # Fill arcs table with pumps and valves
         arc_elements = [
             ("pumps", self.catalogs.inp_pumps, "PUMP"),
-            ("valves", self.catalogs.inp_valves, "VALVE"),
+            ("orifices", self.catalogs.inp_orifice, "ORIFICE"),
+            ("weirs", self.catalogs.inp_weir, "WEIR"),
+            ("outlets", self.catalogs.inp_outlet, "OUTLET"),
         ]
 
         for element, rec_catalog, tag in arc_elements:
@@ -221,11 +224,11 @@ class GwImportSwmm:
             tbl_arcs.setItem(row, 0, first_column)
 
             combo_cat = QComboBox()
-            tbl_arcs.setCellWidget(row, 3, combo_cat)
+            tbl_arcs.setCellWidget(row, 6, combo_cat)
 
             new_cat_name = QTableWidgetItem("")
             new_cat_name.setFlags(Qt.NoItemFlags)
-            tbl_arcs.setItem(row, 4, new_cat_name)
+            tbl_arcs.setItem(row, 7, new_cat_name)
             combo_cat.currentTextChanged.connect(
                 partial(self._toggle_enabled_new_catalog_field, new_cat_name)
             )
@@ -235,9 +238,9 @@ class GwImportSwmm:
         # Fill materials table
         tbl_material: QTableWidget = self.dlg_config.tbl_material
 
-        if self.catalogs.inp_pipes:
+        if self.catalogs.roughness_catalog:
             self.tbl_elements["materials"] = {}
-            roughnesses = {roughness for (_, roughness) in self.catalogs.inp_pipes}
+            roughnesses = {roughness for roughness in self.catalogs.roughness_catalog}
 
             for roughness in roughnesses:
                 row: int = tbl_material.rowCount()
@@ -256,17 +259,15 @@ class GwImportSwmm:
         tbl_feature: QTableWidget = self.dlg_config.tbl_feature
 
         feature_types = [
-            ("JUNCTIONS", self.catalogs.inp_junctions, ("JUNCTION",), "NODE"),
-            ("PIPES", self.catalogs.inp_pipes, ("PIPE",), "ARC"),
+            ("JUNCTIONS", self.catalogs.inp_junctions, ("MANHOLE",), "NODE"),
+            ("OUTFALLS", self.catalogs.inp_outfalls, ("MANHOLE",), "NODE"),
+            ("DIVIDERS", self.catalogs.inp_dividers, ("MANHOLE",), "NODE"),
+            ("STORAGE", self.catalogs.inp_storage, ("STORAGE",), "NODE"),
+            ("CONDUITS", self.catalogs.inp_conduits, ("CONDUIT",), "ARC"),
             ("PUMPS", self.catalogs.inp_pumps, ("VARC",), "ARC"),
-            (
-                "RESERVOIRS",
-                self.catalogs.inp_reservoirs,
-                ("SOURCE", "WATERWELL", "WTP"),
-                "NODE",
-            ),
-            ("TANKS", self.catalogs.inp_tanks, ("TANK",), "NODE"),
-            ("VALVES", self.catalogs.inp_valves, ("VARC",), "ARC"),
+            ("ORIFICES", self.catalogs.inp_orifice, ("VARC",), "ARC"),
+            ("WEIRS", self.catalogs.inp_weir, ("VARC",), "ARC"),
+            ("OUTLETS", self.catalogs.inp_outlet, ("VARC",), "ARC"),
         ]
 
         self.tbl_elements["features"] = {}
@@ -275,7 +276,7 @@ class GwImportSwmm:
             if rec_catalog is None:
                 continue
 
-            if tag == "PIPES" and not rec_catalog:
+            if tag == "CONDUITS" and not rec_catalog:
                 continue
 
             row: int = tbl_feature.rowCount()
@@ -294,6 +295,363 @@ class GwImportSwmm:
 
         tools_gw.open_dialog(self.dlg_config, dlg_name="dlg_inp_config_import")
 
+    def _importinp_accept(self):
+        self.dlg_config.tab_main.setCurrentIndex(self.dlg_config.tab_main.count()-1)
+        if TESTING_MODE:
+
+            # Delete the network before importing
+            queries = [
+                'SELECT gw_fct_admin_manage_migra($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"action":"TRUE"}, "aux_params":null}}$$);',
+                'UPDATE arc SET node_1 = NULL, node_2 = NULL;',
+                'DELETE FROM ext_rtc_scada_x_data;',
+                'DELETE FROM config_graph_checkvalve;',
+                'DELETE FROM connec CASCADE;',
+                'DELETE FROM node CASCADE;',
+                'DELETE FROM inp_pump CASCADE;',
+                'DELETE FROM inp_virtualpump CASCADE;',
+                'DELETE FROM inp_virtualvalve CASCADE;',
+                'DELETE FROM inp_dscenario_demand CASCADE;',
+                'DELETE FROM inp_curve CASCADE;',
+                'DELETE FROM inp_pattern_value CASCADE;',
+                'DELETE FROM inp_pattern CASCADE;',
+                'DELETE FROM inp_controls CASCADE;',
+                'DELETE FROM inp_rules CASCADE;',
+                'DELETE FROM arc CASCADE;',
+                "DELETE FROM cat_work WHERE id = 'import_inp_test';",
+                "DELETE FROM cat_dscenario WHERE expl_id = 1;",
+                "DELETE FROM cat_arc CASCADE;"
+                "DELETE FROM cat_mat_arc CASCADE;",
+                "DELETE FROM cat_mat_roughness CASCADE;",
+                "DELETE FROM sector WHERE sector_id = 1;",
+                "DELETE FROM ext_municipality WHERE muni_id = 1;",
+                "DELETE FROM exploitation WHERE expl_id = 1;",
+                "INSERT INTO cat_mat_arc (id, active) VALUES ('FC', true), ('PVC', true), ('FD', true);",
+                "UPDATE cat_mat_roughness SET roughness = 0.025 WHERE matcat_id = 'FC';",
+                "UPDATE cat_mat_roughness SET roughness = 0.0025 WHERE matcat_id = 'PVC';",
+                "UPDATE cat_mat_roughness SET roughness = 0.03 WHERE matcat_id = 'FD';",
+                "INSERT INTO exploitation (expl_id, name, macroexpl_id, descript, active) VALUES (1, 'expl_1_import_inp_test', 0, 'Created by import inp in TESTING MODE', true);",
+                "INSERT INTO ext_municipality (muni_id, name, observ, active) VALUES (1, 'muni_1_import_inp_test', 'Created by import inp in TESTING MODE', true);",
+                "INSERT INTO sector (sector_id, name, muni_id, expl_id, macrosector_id, descript, active) VALUES (1, 'sector_1_import_inp_test', '{1}'::int[], '{1}'::int[], 0, 'Created by import inp in TESTING MODE', true);"
+            ]
+            for sql in queries:
+                result = tools_db.execute_sql(sql, commit=False)
+                if not result:
+                    return
+
+
+            # Set variables
+            workcat = "import_inp_test"
+            exploitation = 1
+            sector = 1
+            municipality = 1
+            catalogs = {'pipes': {(57.0, 0.0025): 'INP-PIPE01', (57.0, 0.025): 'INP-PIPE02', (99.0, 0.0025): 'PELD110-PN10', (99.0, 0.025): 'FC110-PN10', (144.0, 0.0025): 'PVC160-PN16', (144.0, 0.025): 'FC160-PN10', (153.0, 0.03): 'INP-PIPE03', (204.0, 0.03): 'INP-PIPE04'},
+                        'materials': {0.025: 'FC', 0.0025: 'PVC', 0.03: 'FD'},
+                        'features': {'junctions': 'JUNCTION', 'pipes': 'PIPE', 'pumps': 'VARC', 'reservoirs': 'SOURCE', 'tanks': 'TANK', 'valves': 'VARC'},
+                        'junctions': 'JUNCTION DN110',
+                        'reservoirs': 'SOURCE-01',
+                        'tanks': 'TANK_01',
+                        'pumps': 'INP-PUMP',
+                        'valves': 'INP-VALVE'}
+
+            # Set background task 'Import INP'
+            description = "Import INP (TESTING MODE)"
+            self.import_inp_task = GwImportInpTask(
+                description,
+                self.file_path,
+                self.parse_inp_task.network,
+                workcat,
+                exploitation,
+                sector,
+                municipality,
+                catalogs,
+            )
+
+            # Create timer
+            self.t0: float = time()
+            self.timer: QTimer = QTimer()
+            self.timer.timeout.connect(
+                partial(self._update_config_dialog, self.dlg_config)
+            )
+            self.timer.start(1000)
+            self.import_inp_task.message_logged.connect(self._message_logged)
+            self.import_inp_task.progress_changed.connect(self._progress_changed)
+            self.import_inp_task.taskCompleted.connect(self.timer.stop)
+
+            # Run task
+            QgsApplication.taskManager().addTask(self.import_inp_task)
+            QgsApplication.taskManager().triggerTask(self.import_inp_task)
+            return
+
+        # Workcat
+        workcat: str = self.dlg_config.txt_workcat.text().strip()
+
+        if workcat == "":
+            message = "Please enter a Workcat_id to proceed with this import."
+            tools_qt.show_info_box(message)
+            return
+
+        sql: str = "SELECT id FROM cat_work WHERE id = %s"
+        row = tools_db.get_row(sql, params=(workcat,))
+        if row is not None:
+            message = f'The Workcat_id "{workcat}" is already in use. Please enter a different ID.'
+            tools_qt.show_info_box(message)
+            return
+
+        # Exploitation
+        exploitation = tools_qt.get_combo_value(self.dlg_config, "cmb_expl")
+
+        if exploitation == "":
+            message = "Please select an exploitation to proceed with this import."
+            tools_qt.show_info_box(message)
+            return
+
+        # Sector
+        sector = tools_qt.get_combo_value(self.dlg_config, "cmb_sector")
+
+        if sector == "":
+            message = "Please select a sector to proceed with this import."
+            tools_qt.show_info_box(message)
+            return
+
+        # Municipality
+        municipality = tools_qt.get_combo_value(self.dlg_config, "cmb_muni")
+
+        if municipality == "":
+            message = "Please select a municipality to proceed with this import."
+            tools_qt.show_info_box(message)
+            return
+
+        # Tables (Arcs and Nodes)
+        catalogs = {"pipes": {}, "materials": {}, "features": {}}
+
+        for _input, result in [
+            (self.tbl_elements, catalogs),
+            (self.tbl_elements["pipes"], catalogs["pipes"]),
+            (self.tbl_elements["materials"], catalogs["materials"]),
+            (self.tbl_elements["features"], catalogs["features"]),
+        ]:
+            for element in _input:
+                if type(_input[element]) is not tuple:
+                    continue
+
+                combo = _input[element][0]
+                combo_value = combo.currentText()
+
+                if combo_value == "":
+                    message = "Please select a catalog item for all elements in the tabs: Nodes, Arcs, Materials, Features."
+                    tools_qt.show_info_box(message)
+                    return
+
+                new_catalog = None
+
+                if len(_input[element]) > 1:
+                    new_catalog_cell = _input[element][1]
+                    new_catalog = new_catalog_cell.text().strip()
+
+                    if combo_value == CREATE_NEW and new_catalog == "":
+                        message = f'Please enter a new catalog name when the "{CREATE_NEW}" option is selected.'
+                        tools_qt.show_info_box(message)
+                        return
+
+                result[element] = (
+                    new_catalog if combo_value == CREATE_NEW else combo_value
+                )
+
+        # Set background task 'Import INP'
+        description = "Import INP"
+        self.import_inp_task = GwImportInpTask(
+            description,
+            self.file_path,
+            self.parse_inp_task.network,
+            workcat,
+            exploitation,
+            sector,
+            municipality,
+            catalogs,
+        )
+        QgsApplication.taskManager().addTask(self.import_inp_task)
+        QgsApplication.taskManager().triggerTask(self.import_inp_task)
+
+    def _fill_combo_boxes(self):
+        # Fill exploitation combo
+        cmb_expl: QComboBox = self.dlg_config.cmb_expl
+        expl_value: str = cmb_expl.currentText()
+
+        rows = tools_db.get_rows("""
+            SELECT expl_id, name
+            FROM exploitation
+            WHERE expl_id > 0
+        """)
+        cmb_expl.clear()
+        tools_qt.fill_combo_values(cmb_expl, rows, add_empty=True)
+        cmb_expl.setCurrentText(expl_value)
+
+        # Fill sector combo
+        cmb_sector: QComboBox = self.dlg_config.cmb_sector
+        sector_value: str = cmb_sector.currentText()
+
+        rows = tools_db.get_rows("""
+            SELECT sector_id, name
+            FROM sector
+            WHERE sector_id > 0
+        """)
+        cmb_sector.clear()
+        tools_qt.fill_combo_values(cmb_sector, rows, add_empty=True)
+        cmb_sector.setCurrentText(sector_value)
+
+        # Fill municipality combo
+        cmb_muni: QComboBox = self.dlg_config.cmb_muni
+        muni_value: str = cmb_muni.currentText()
+
+        rows = tools_db.get_rows("""
+            SELECT muni_id, name
+            FROM ext_municipality
+            WHERE muni_id > 0
+        """)
+        cmb_muni.clear()
+        tools_qt.fill_combo_values(cmb_muni, rows, add_empty=True)
+        cmb_muni.setCurrentText(muni_value)
+
+        self.catalogs = Catalogs.from_network_model(self.parse_inp_task.network)
+
+        # Fill nodes and arcs tables
+        elements = [
+            ("junctions", self.catalogs.inp_junctions, self.catalogs.db_nodes),
+            ("outfalls", self.catalogs.inp_outfalls, self.catalogs.db_nodes),
+            ("dividers", self.catalogs.inp_dividers, self.catalogs.db_nodes),
+            ("storage", self.catalogs.inp_storage, self.catalogs.db_nodes),
+            ("conduits", self.catalogs.inp_conduits, self.catalogs.db_arcs),
+            ("pumps", self.catalogs.inp_pumps, self.catalogs.db_arcs),
+            ("orifices", self.catalogs.inp_orifice, self.catalogs.db_arcs),
+            ("weirs", self.catalogs.inp_weir, self.catalogs.db_arcs),
+            ("outlets", self.catalogs.inp_outlet, self.catalogs.db_arcs),
+        ]
+
+        for element_type, element_catalog, db_catalog in elements:
+            if element_type == "conduits":
+                continue
+
+            if element_type not in self.tbl_elements:
+                continue
+
+            combo: QComboBox = self.tbl_elements[element_type][0]
+            old_value: str = combo.currentText()
+
+            combo.clear()
+            combo.addItems(["", CREATE_NEW])
+            if len(element_catalog) > 0:
+                combo.insertSeparator(combo.count())
+                combo.addItem("Recommended catalogs:")
+                combo.model().item(combo.count() - 1).setEnabled(False)
+                combo.addItems(element_catalog)
+            if len(db_catalog) > len(element_catalog):
+                combo.insertSeparator(combo.count())
+                combo.addItem("Other catalogs:")
+                combo.model().item(combo.count() - 1).setEnabled(False)
+                combo.addItems(cat for cat in db_catalog if cat not in element_catalog)
+            combo.setCurrentText(old_value)
+
+        if self.catalogs.inp_conduits is not None:
+            for pipe_type, pipe_catalog in self.catalogs.inp_conduits.items():
+                if pipe_type not in self.tbl_elements["conduits"]:
+                    continue
+
+                combo: QComboBox = self.tbl_elements["conduits"][pipe_type][0]
+                old_value: str = combo.currentText()
+
+                combo.clear()
+                combo.addItems(["", CREATE_NEW])
+                if len(pipe_catalog) > 0:
+                    combo.insertSeparator(combo.count())
+                    combo.addItem("Recommended catalogs:")
+                    combo.model().item(combo.count() - 1).setEnabled(False)
+                    combo.addItems(pipe_catalog)
+                if len(self.catalogs.db_arcs) > len(pipe_catalog):
+                    combo.insertSeparator(combo.count())
+                    combo.addItem("Other catalogs:")
+                    combo.model().item(combo.count() - 1).setEnabled(False)
+                    combo.addItems(
+                        cat for cat in self.catalogs.db_arcs if cat not in pipe_catalog
+                    )
+                combo.setCurrentText(old_value)
+
+        # Fill materials
+        for roughness, (combo,) in self.tbl_elements["materials"].items():
+            material_catalog = [
+                mat
+                for mat, roughnesses in self.catalogs.db_materials.items()
+                if roughness == roughnesses
+            ]
+
+            old_value: str = combo.currentText()
+            combo.clear()
+            combo.addItem("")
+            if len(material_catalog) > 0:
+                combo.insertSeparator(combo.count())
+                combo.addItem("Recommended materials:")
+                combo.model().item(combo.count() - 1).setEnabled(False)
+                combo.addItems(material_catalog)
+            if len(self.catalogs.db_materials) > len(material_catalog):
+                combo.insertSeparator(combo.count())
+                combo.addItem("Other materials:")
+                combo.model().item(combo.count() - 1).setEnabled(False)
+                combo.addItems(
+                    mat
+                    for mat in self.catalogs.db_materials
+                    if mat not in material_catalog
+                )
+            combo.setCurrentText(old_value)
+
+        # Fill features
+        feature_types = {
+            "junctions": ("NODE", ("MANHOLE",)),
+            "outfalls": ("NODE", ("MANHOLE",)),
+            "dividers": ("NODE", ("MANHOLE",)),
+            "storage": ("NODE", ("STORAGE",)),
+            "conduits": ("ARC", ("CONDUIT",)),
+            "pumps": ("ARC", ("VARC",)),
+            "valves": ("ARC", ("VARC",)),
+            "orifices": ("ARC", ("VARC",)),
+            "weirs": ("ARC", ("VARC",)),
+            "outlets": ("ARC", ("VARC",)),
+        }
+        for element_type, (combo,) in self.tbl_elements["features"].items():
+            system_catalog = [
+                feat_id
+                for feat_id, (feature_class, _) in self.catalogs.db_features.items()
+                if feature_class in feature_types[element_type][0]
+            ]
+            feat_catalog = [
+                feat_id
+                for feat_id, (_, feat_type) in self.catalogs.db_features.items()
+                if feat_type in feature_types[element_type][1]
+            ]
+
+            old_value: str = combo.currentText()
+            combo.clear()
+            combo.addItem("")
+            if len(feat_catalog) > 0:
+                combo.insertSeparator(combo.count())
+                combo.addItem("Recommended feature ids:")
+                combo.model().item(combo.count() - 1).setEnabled(False)
+                combo.addItems(feat_catalog)
+            if len(system_catalog) > len(feat_catalog):
+                combo.insertSeparator(combo.count())
+                combo.addItem("Other feature ids:")
+                combo.model().item(combo.count() - 1).setEnabled(False)
+                combo.addItems(
+                    feat for feat in system_catalog if feat not in feat_catalog
+                )
+            combo.setCurrentText(old_value)
+
+    def _toggle_enabled_new_catalog_field(
+        self, field: QTableWidgetItem, text: str
+    ) -> None:
+        field.setFlags(
+            Qt.ItemIsEnabled | Qt.ItemIsEditable
+            if text == CREATE_NEW
+            else Qt.NoItemFlags
+        )
 
     def _update_parsing_dialog(self, dialog: GwDialog) -> None:
         if not dialog.isVisible():

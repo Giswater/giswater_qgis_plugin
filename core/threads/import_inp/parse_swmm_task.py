@@ -7,10 +7,11 @@ from swmm_api import read_inp_file, SwmmInput
 from swmm_api.input_file.section_labels import (
     OPTIONS,
     JUNCTIONS, OUTFALLS, DIVIDERS, STORAGE,
-    CONDUITS, PUMPS, ORIFICES, WEIRS, OUTLETS
+    CONDUITS, PUMPS, ORIFICES, WEIRS, OUTLETS,
+    XSECTIONS
 )
 from swmm_api.input_file.sections import (
-    Conduit
+    Conduit, CrossSection
 )
 
 from ....libs import tools_db
@@ -58,16 +59,20 @@ class Catalogs:
     If a INP file doesn't have a type of node, its property receives `None`.
     """
 
-    db_arcs: dict[str, tuple[float, float]]
+    db_arcs: dict[str, tuple[str, Optional[float], Optional[float], Optional[float], Optional[float]]]
     db_features: dict[str, tuple[str, str]]
-    db_materials: dict[str, list[float]]
+    db_materials: dict[str, float]
     db_nodes: dict[str, str]
     inp_junctions: Optional[list[str]]
-    inp_pipes: dict[tuple[float, float], list[str]]
+    inp_outfalls: Optional[list[str]]
+    inp_dividers: Optional[list[str]]
+    inp_storage: Optional[list[str]]
+    inp_conduits: dict[tuple[str, Optional[float], Optional[float], Optional[float], Optional[float]], list[str]]
     inp_pumps: Optional[list[str]]
-    inp_reservoirs: Optional[list[str]]
-    inp_tanks: Optional[list[str]]
-    inp_valves: Optional[list[str]]
+    inp_orifice: Optional[list[str]]
+    inp_weir: Optional[list[str]]
+    inp_outlet: Optional[list[str]]
+    roughness_catalog: Optional[list[float]]
 
     @classmethod
     def from_network_model(cls, wn: SwmmInput):
@@ -86,32 +91,30 @@ class Catalogs:
 
         # Get arc catalog from DB
         rows = tools_db.get_rows("""
-                SELECT a.id, a.dint, r.roughness
-                FROM cat_arc AS a
-                JOIN cat_mat_roughness AS r USING (matcat_id)
+                SELECT id, shape, geom1, geom2, geom3, geom4
+                FROM cat_arc
             """)
 
-        db_arc_catalog: dict[str, tuple[float, float]] = {}
+        db_arc_catalog: dict[str, tuple[str, Optional[float], Optional[float], Optional[float], Optional[float]]] = {}
         if rows:
             unsorted_dict = {
-                _id: (float(dint), float(roughness)) for _id, dint, roughness in rows
+                _id: (str(shape), geom1, geom2, geom3, geom4) for _id, shape, geom1, geom2, geom3, geom4 in rows
             }
             db_arc_catalog = dict(sorted(unsorted_dict.items()))
 
         # Get roughness catalog
         rows = tools_db.get_rows("""
-                SELECT matcat_id, array_agg(roughness)
-                FROM cat_mat_roughness
-                GROUP BY matcat_id
+                SELECT id, n
+                FROM cat_mat_arc
             """)
-        db_mat_roughness_cat: dict[str, list[float]] = {}
+        db_mat_roughness_cat: dict[str, float] = {}
         if rows:
 
             def tofloat(x):
                 return 0.0 if x is None else float(x)
 
             unsorted_dict = {
-                _id: [tofloat(x) for x in array_rough] for _id, array_rough in rows
+                _id: tofloat(roughness) for _id, roughness in rows
             }
             db_mat_roughness_cat = dict(sorted(unsorted_dict.items()))
 
@@ -169,13 +172,29 @@ class Catalogs:
         )
 
         conduit_types = set()
-        for _, conduit in wn[CONDUITS].items():
-            conduit: Conduit
-            diameter = float(round(conduit.diameter * 1000))
-            roughness = float(conduit.roughness)
-            conduit_types.add((diameter, roughness))
+        for _, xs in wn[XSECTIONS].items():
+            xs: CrossSection
+            shape = xs.shape
+            geom1 = xs.height
+            geom2 = xs.parameter_2
+            geom3 = xs.parameter_3
+            geom4 = xs.parameter_4
+            n_barrels = xs.n_barrels
+            culvert = xs.culvert
+            transect = xs.transect
+            curve_name = xs.curve_name
 
-        conduit_catalogs: dict[tuple[float, float], list[str]] = {}
+            conduit_types.add((shape, geom1, geom2, geom3, geom4))
+
+        conduit_roughness = set()
+        for _, c in wn[CONDUITS].items():
+            c: Conduit
+            roughness = c.roughness
+            conduit_roughness.add(roughness)
+
+        roughness_catalog: Optional[list[float]] = [roughness for roughness in sorted(conduit_roughness)] if conduit_roughness else None
+
+        conduit_catalogs: dict[tuple[str, Optional[float], Optional[float], Optional[float], Optional[float]], list[str]] = {}
         for conduit_type in sorted(conduit_types):
             conduit_catalogs[conduit_type] = [
                 _id for _id, dr_pair in db_arc_catalog.items() if dr_pair == conduit_type
@@ -195,9 +214,13 @@ class Catalogs:
             db_mat_roughness_cat,
             db_node_catalog,
             junction_catalogs,
-            pipe_catalogs,
+            outfall_catalogs,
+            divider_catalogs,
+            storage_catalogs,
+            conduit_catalogs,
             pump_catalogs,
-            reservoir_catalogs,
-            tank_catalogs,
-            valve_catalogs,
+            orifice_catalogs,
+            weir_catalogs,
+            outlet_catalogs,
+            roughness_catalog,
         )
