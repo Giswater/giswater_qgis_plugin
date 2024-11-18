@@ -171,6 +171,7 @@ class GwImportSwmm:
         # Fill arcs table with the pipes
         tbl_arcs: QTableWidget = self.dlg_config.tbl_arcs
         tbl_arcs.setColumnCount(8)
+        tbl_arcs.setHorizontalHeaderLabels(["EPA type", "SHAPE", "geom1", "geom2", "geom3", "geom4", "Arc catalog", "New catalog name"])
 
         if self.catalogs.inp_conduits:
             self.tbl_elements["conduits"] = {}
