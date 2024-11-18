@@ -10,7 +10,7 @@ from ...shared.document import GwDocument
 
 
 class GwDocumentManagerButton(GwAction):
-    """ Button 66: Document Manager """
+    """ Button 32: Document Manager """
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
         super().__init__(icon_path, action_name, text, toolbar, action_group)

@@ -26,7 +26,7 @@ from ....libs import lib_vars, tools_qgis, tools_qt, tools_db, tools_os
 
 
 class GwNetscenarioManagerButton(GwAction):
-    """ Button 219: Netscenario manager """
+    """ Button 63: Netscenario manager """
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 

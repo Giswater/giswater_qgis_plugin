@@ -20,7 +20,7 @@ from .... import global_vars
 
 
 class GwConnectLinkButton(GwMaptool):
-    """ Button 20: Connect Link
+    """ Button 25: Connect Link
     User select connections from layer 'connec'
     Execute SQL function: 'gw_fct_setlinktonetwork ' """
 

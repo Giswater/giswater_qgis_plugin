@@ -20,7 +20,7 @@ from ....libs import tools_qgis, tools_qt, lib_vars
 
 
 class GwAddChildLayerButton(GwAction):
-    """ Button 306: Add child layer """
+    """ Button 71: Add child layer """
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 

@@ -11,7 +11,7 @@ from ....core.utils import tools_gw
 
 
 class GwSelectorButton(GwAction):
-    """ Button 142: Selector """
+    """ Button 02: Selector """
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
         super().__init__(icon_path, action_name, text, toolbar, action_group)

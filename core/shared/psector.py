@@ -60,7 +60,7 @@ class GwPsector:
 
 
     def get_psector(self, psector_id=None, list_coord=None):
-        """ Buttons 45 and 81: New psector """
+        """ Buttons 61 and 62: New psector """
 
         row = tools_gw.get_config_value(parameter='admin_currency', columns='value::text', table='config_param_system')
         if row:
@@ -205,7 +205,7 @@ class GwPsector:
         all_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
         all_rows.horizontalHeader().setSectionResizeMode(3)
 
-        # if a row is selected from mg_psector_mangement(button 46 or button 81)
+        # if a row is selected from mg_psector_mangement(button 62 or button 61)
         # if psector_id contains "1" or "0" python takes it as boolean, if it is True, it means that it does not
         # contain a value and therefore it is a new one. We convert that value to 0 since no id will be 0 in this way
         # if psector_id has a value other than 0, it is that the sector already exists and we want to do an update.
@@ -1661,12 +1661,12 @@ class GwPsector:
 
 
     def master_new_psector(self, psector_id=None):
-        """ Button 45: New psector """
+        """ Button 61: New psector """
         self.get_psector(psector_id)
 
 
     def manage_psectors(self):
-        """ Button 46: Psector management """
+        """ Button 62: Psector management """
 
         # Create the dialog and signals
         self.dlg_psector_mng = GwPsectorManagerUi(self)

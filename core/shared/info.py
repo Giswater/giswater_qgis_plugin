@@ -285,7 +285,7 @@ class GwInfo(QObject):
 
 
     def add_feature(self, feature_cat, action=None):
-        """ Button 01, 02: Add 'node' or 'arc' """
+        """ Button 21, 22: Add 'node' or 'arc' """
 
         global is_inserting
         if is_inserting:

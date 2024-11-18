@@ -25,7 +25,7 @@ from ....libs import lib_vars, tools_qgis, tools_os, tools_qt
 
 
 class GwInfoButton(GwMaptool):
-    """ Button 37: Info """
+    """ Button 01: Info """
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 

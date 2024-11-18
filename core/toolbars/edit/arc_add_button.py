@@ -18,7 +18,7 @@ from ....libs import tools_os
 
 
 class GwArcAddButton(GwAction):
-    """ Button 02: Add arc """
+    """ Button 22: Add arc """
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 

@@ -418,7 +418,7 @@ class GwDocument(QObject):
 
 
     def manage_documents(self):
-        """ Button 66: Edit document """
+        """ Button 32: Edit document """
 
         # Create the dialog
         self.dlg_man = GwDocManagerUi(self)

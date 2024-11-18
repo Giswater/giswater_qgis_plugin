@@ -15,7 +15,7 @@ from ....libs import tools_qt, tools_qgis
 
 
 class GwDimensioningButton(GwMaptool):
-    """ Button 39: Dimensioning """
+    """ Button 30: Dimensioning """
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 
