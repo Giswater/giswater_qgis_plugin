@@ -242,7 +242,7 @@ BEGIN
 
 		-- arcs to modify:
 		-- for the closed valves when to_arc IS NULL, one of the arcs that connect to the valve
-		UPDATE temp_pgr_arc t set modif=true
+		UPDATE temp_pgr_arc t SET modif = TRUE
 		FROM
 		(SELECT DISTINCT ON (n.node_id) n.node_id, a.arc_id
 		FROM temp_pgr_node n
@@ -251,12 +251,17 @@ BEGIN
 		) a
 		WHERE t.arc_id = a.arc_id;
 
-		-- for the valves with to_arc NOT NULL;
-		UPDATE temp_pgr_arc a SET modif = TRUE
-		FROM temp_pgr_node n
-		WHERE a.arc_id = n.to_arc
-		-- AND n.modif = TRUE AND n.to_arc IS NOT NULL -- not necessaries
-		;
+        -- for the valves with to_arc NOT NULL; the InletArc - the one that is not to_arc
+        UPDATE temp_pgr_arc t SET modif = TRUE
+        FROM (
+            SELECT a.arc_id, n.node_id, n.to_arc
+            FROM  temp_pgr_node n 
+            JOIN temp_pgr_arc a ON n.node_id IN (a.node_1, a.node_2)
+            WHERE n.to_arc IS NOT NULL AND a.arc_id<>n.to_arc
+        ) a
+        WHERE a.arc_id = n.to_arc
+        -- AND n.modif = TRUE AND n.to_arc IS NOT NULL -- not necessaries
+        ;
 
 	-- cost/reverse_cost for the open valves with to_arc will be update after gw_fct_graphanalytics_arrangenetwork with the correct values
 	END IF;
@@ -340,14 +345,14 @@ BEGIN
 	-- and graph_delimiter 'minsector' or null (it wasn't changed for 'forceClosed' for example)
 	-- Note: node_1 = node_2 for the new arcs generated at the nodes
     IF v_project_type = 'WS' THEN
-        UPDATE temp_pgr_arc a SET cost = 1
+        UPDATE temp_pgr_arc a SET reverse_cost = 1
 		FROM temp_pgr_node n
         WHERE a.node_1 = n.node_id AND n.pgr_node_id = n.node_id::INT
 		AND a.cost = -1 AND (a.graph_delimiter = 'minsector' OR a.graph_delimiter is null)
 		AND n.to_arc IS NOT NULL AND n.closed is null
 		AND a.pgr_node_1=a.node_1::INT;
 
-        UPDATE temp_pgr_arc a SET reverse_cost = 1
+        UPDATE temp_pgr_arc a SET cost = 1
 		FROM temp_pgr_node n
         WHERE a.node_1 = n.node_id AND n.pgr_node_id = n.node_id::INT
 		AND a.cost = -1 AND (a.graph_delimiter = 'minsector' OR a.graph_delimiter is null)
