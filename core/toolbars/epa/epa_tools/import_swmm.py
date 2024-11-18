@@ -667,3 +667,12 @@ class GwImportSwmm:
         if isdeleted(self.parse_inp_task) or not self.parse_inp_task.isActive():
             self.timer.stop()
             self.dlg_inp_parsing.progressBar.setVisible(False)
+
+    def _calculate_elapsed_time(self, dialog: GwDialog) -> None:
+        tf: float = time()  # Final time
+        td: float = tf - self.t0  # Delta time
+        self._update_time_elapsed(f"Exec. time: {timedelta(seconds=round(td))}", dialog)
+
+    def _update_time_elapsed(self, text: str, dialog: GwDialog) -> None:
+        lbl_time: QLabel = dialog.findChild(QLabel, "lbl_time")
+        lbl_time.setText(text)
