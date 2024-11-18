@@ -95,12 +95,10 @@ BEGIN
     WHERE t.node_id = n.node_id AND (cf.graph_delimiter = 'MINSECTOR' OR cf.graph_delimiter = 'SECTOR');
 
     -- Set modif = TRUE for nodes where "graph_delimiter" = 'MINSECTOR'
-    UPDATE temp_pgr_node n SET modif = TRUE
-    WHERE n.graph_delimiter = 'MINSECTOR';
 
-    UPDATE temp_pgr_node n set closed = v.closed, broken = v.broken, to_arc = v.to_arc, modif=true
+    UPDATE temp_pgr_node n set closed = v.closed, broken = v.broken, to_arc = v.to_arc, modif = TRUE
     FROM man_valve v
-    WHERE n.node_id=v.node_id and n.graph_delimiter = 'MINSECTOR';
+    WHERE n.node_id = v.node_id AND n.graph_delimiter = 'MINSECTOR';
 
     -- If we want to ignore open but broken valves
     IF v_ignorebrokenvalves THEN
