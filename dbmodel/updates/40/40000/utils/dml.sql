@@ -626,3 +626,6 @@ UPDATE config_form_fields
 UPDATE config_form_fields
 	SET stylesheet='{"icon":"152"}'::json
 	WHERE stylesheet->>'icon'='195';
+
+-- 18/11/24
+UPDATE config_form_fields SET widgettype='typeahead' WHERE formname='generic' AND formtype='form_featuretype_change' AND columnname='featurecat_id' AND tabname='tab_none';
