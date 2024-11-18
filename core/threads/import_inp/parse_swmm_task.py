@@ -76,6 +76,8 @@ class Catalogs:
 
     @classmethod
     def from_network_model(cls, wn: SwmmInput):
+        def tofloat(x):
+            return 0.0 if x is None else float(x)
         # Get node catalog from DB
         rows = tools_db.get_rows("""
                 SELECT n.id, f.epa_default
@@ -98,7 +100,7 @@ class Catalogs:
         db_arc_catalog: dict[str, tuple[str, Optional[float], Optional[float], Optional[float], Optional[float]]] = {}
         if rows:
             unsorted_dict = {
-                _id: (str(shape), geom1, geom2, geom3, geom4) for _id, shape, geom1, geom2, geom3, geom4 in rows
+                _id: (str(shape), tofloat(geom1), tofloat(geom2), tofloat(geom3), tofloat(geom4)) for _id, shape, geom1, geom2, geom3, geom4 in rows
             }
             db_arc_catalog = dict(sorted(unsorted_dict.items()))
 
@@ -109,10 +111,6 @@ class Catalogs:
             """)
         db_mat_roughness_cat: dict[str, float] = {}
         if rows:
-
-            def tofloat(x):
-                return 0.0 if x is None else float(x)
-
             unsorted_dict = {
                 _id: tofloat(roughness) for _id, roughness in rows
             }
