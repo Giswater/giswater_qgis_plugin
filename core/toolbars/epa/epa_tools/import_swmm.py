@@ -297,7 +297,6 @@ class GwImportSwmm:
         tools_gw.open_dialog(self.dlg_config, dlg_name="dlg_inp_config_import")
 
     def _importinp_accept(self):
-        self.dlg_config.tab_main.setCurrentIndex(self.dlg_config.tab_main.count()-1)
         if TESTING_MODE:
 
             # Delete the network before importing
@@ -305,34 +304,34 @@ class GwImportSwmm:
                 'SELECT gw_fct_admin_manage_migra($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"action":"TRUE"}, "aux_params":null}}$$);',
                 'UPDATE arc SET node_1 = NULL, node_2 = NULL;',
                 'DELETE FROM ext_rtc_scada_x_data;',
-                'DELETE FROM config_graph_checkvalve;',
                 'DELETE FROM connec CASCADE;',
                 'DELETE FROM node CASCADE;',
+                'DELETE FROM gully CASCADE;',
+                'DELETE FROM inp_conduit CASCADE;',
                 'DELETE FROM inp_pump CASCADE;',
-                'DELETE FROM inp_virtualpump CASCADE;',
-                'DELETE FROM inp_virtualvalve CASCADE;',
-                'DELETE FROM inp_dscenario_demand CASCADE;',
+                'DELETE FROM inp_orifice CASCADE;',
+                'DELETE FROM inp_outlet CASCADE;',
+                'DELETE FROM inp_outfall CASCADE;',
+                'DELETE FROM inp_storage CASCADE;',
+                'DELETE FROM inp_curve_value CASCADE;',
                 'DELETE FROM inp_curve CASCADE;',
                 'DELETE FROM inp_pattern_value CASCADE;',
                 'DELETE FROM inp_pattern CASCADE;',
+                'DELETE FROM inp_timeseries_value CASCADE;',
+                'DELETE FROM inp_timeseries CASCADE;',
                 'DELETE FROM inp_controls CASCADE;',
-                'DELETE FROM inp_rules CASCADE;',
                 'DELETE FROM arc CASCADE;',
                 "DELETE FROM cat_work WHERE id = 'import_inp_test';",
                 "DELETE FROM cat_dscenario WHERE expl_id = 1;",
                 "DELETE FROM cat_arc CASCADE;"
                 "DELETE FROM cat_mat_arc CASCADE;",
-                "DELETE FROM cat_mat_roughness CASCADE;",
                 "DELETE FROM sector WHERE sector_id = 1;",
                 "DELETE FROM ext_municipality WHERE muni_id = 1;",
                 "DELETE FROM exploitation WHERE expl_id = 1;",
-                "INSERT INTO cat_mat_arc (id, active) VALUES ('FC', true), ('PVC', true), ('FD', true);",
-                "UPDATE cat_mat_roughness SET roughness = 0.025 WHERE matcat_id = 'FC';",
-                "UPDATE cat_mat_roughness SET roughness = 0.0025 WHERE matcat_id = 'PVC';",
-                "UPDATE cat_mat_roughness SET roughness = 0.03 WHERE matcat_id = 'FD';",
+                "INSERT INTO cat_mat_arc (id, n) VALUES ('PVC', 0.011), ('Brick', 0.014);",
                 "INSERT INTO exploitation (expl_id, name, macroexpl_id, descript, active) VALUES (1, 'expl_1_import_inp_test', 0, 'Created by import inp in TESTING MODE', true);",
                 "INSERT INTO ext_municipality (muni_id, name, observ, active) VALUES (1, 'muni_1_import_inp_test', 'Created by import inp in TESTING MODE', true);",
-                "INSERT INTO sector (sector_id, name, muni_id, expl_id, macrosector_id, descript, active) VALUES (1, 'sector_1_import_inp_test', '{1}'::int[], '{1}'::int[], 0, 'Created by import inp in TESTING MODE', true);"
+                "INSERT INTO sector (sector_id, name, macrosector_id, descript, active) VALUES (1, 'sector_1_import_inp_test', 0, 'Created by import inp in TESTING MODE', true);"
             ]
             for sql in queries:
                 result = tools_db.execute_sql(sql, commit=False)
@@ -345,14 +344,41 @@ class GwImportSwmm:
             exploitation = 1
             sector = 1
             municipality = 1
-            catalogs = {'pipes': {(57.0, 0.0025): 'INP-PIPE01', (57.0, 0.025): 'INP-PIPE02', (99.0, 0.0025): 'PELD110-PN10', (99.0, 0.025): 'FC110-PN10', (144.0, 0.0025): 'PVC160-PN16', (144.0, 0.025): 'FC160-PN10', (153.0, 0.03): 'INP-PIPE03', (204.0, 0.03): 'INP-PIPE04'},
-                        'materials': {0.025: 'FC', 0.0025: 'PVC', 0.03: 'FD'},
-                        'features': {'junctions': 'JUNCTION', 'pipes': 'PIPE', 'pumps': 'VARC', 'reservoirs': 'SOURCE', 'tanks': 'TANK', 'valves': 'VARC'},
-                        'junctions': 'JUNCTION DN110',
-                        'reservoirs': 'SOURCE-01',
-                        'tanks': 'TANK_01',
-                        'pumps': 'INP-PUMP',
-                        'valves': 'INP-VALVE'}
+            catalogs = {
+                'conduits': {
+                    ('CIRCULAR', 0.2, 0.0, 0.0, 0.0): 'CC020',
+                    ('CIRCULAR', 0.4, 0.0, 0.0, 0.0): 'CC040',
+                    ('CIRCULAR', 0.6, 0.0, 0.0, 0.0): 'CC060',
+                    ('CIRCULAR', 0.8, 0.0, 0.0, 0.0): 'CC080',
+                    ('CIRCULAR', 1.0, 0.0, 0.0, 0.0): 'CC100',
+                    ('EGG', 1.5, 1.0, 0.0, 0.0): 'EGG150',
+                    ('FORCE_MAIN', 0.18, 100.0, 0.0, 0.0): 'FM18',
+                    ('RECT_CLOSED', 1.5, 1.5, 0.0, 0.0): 'RC150',
+                    ('RECT_CLOSED', 2.0, 2.0, 0.0, 0.0): 'RC200',
+                    ('RECT_OPEN', 1.0, 1.0, 0.0, 0.0): 'RO100',
+                    ('RECT_OPEN', 2.0, 2.0, 0.0, 0.0): 'RO200'
+                },
+                'materials': {
+                    0.011: 'PVC',
+                    0.014: 'Brick'
+                },
+                'features': {
+                    'junctions': 'CIRC_MANHOLE',
+                    'outfalls': 'RECT_MANHOLE',
+                    'storage': 'SEWER_STORAGE',
+                    'conduits': 'CONDUIT',
+                    'pumps': 'VARC',
+                    'weirs': 'VARC'
+                },
+                'junctions': 'C_MANHOLE_100',
+                'outfalls': 'R_MANHOLE_100',
+                'storage': 'SEW_STORAGE-01',
+                'pumps': 'VIRTUAL',
+                'weirs': 'VIRTUAL'
+            }
+
+            # Show tab log
+            self.dlg_config.tab_main.setCurrentIndex(self.dlg_config.tab_main.count()-1)
 
             # Set background task 'Import INP'
             description = "Import INP (TESTING MODE)"
@@ -423,11 +449,11 @@ class GwImportSwmm:
             return
 
         # Tables (Arcs and Nodes)
-        catalogs = {"pipes": {}, "materials": {}, "features": {}}
+        catalogs = {"conduits": {}, "materials": {}, "features": {}}
 
         for _input, result in [
             (self.tbl_elements, catalogs),
-            (self.tbl_elements["pipes"], catalogs["pipes"]),
+            (self.tbl_elements["conduits"], catalogs["conduits"]),
             (self.tbl_elements["materials"], catalogs["materials"]),
             (self.tbl_elements["features"], catalogs["features"]),
         ]:
@@ -439,7 +465,7 @@ class GwImportSwmm:
                 combo_value = combo.currentText()
 
                 if combo_value == "":
-                    message = "Please select a catalog item for all elements in the tabs: Nodes, Arcs, Materials, Features."
+                    message = "Please select a catalog item for all elements in the tabs: Features, Nodes, Arcs, Materials."
                     tools_qt.show_info_box(message)
                     return
 
@@ -457,6 +483,9 @@ class GwImportSwmm:
                 result[element] = (
                     new_catalog if combo_value == CREATE_NEW else combo_value
                 )
+
+        # Show tab log
+        self.dlg_config.tab_main.setCurrentIndex(self.dlg_config.tab_main.count()-1)
 
         # Set background task 'Import INP'
         description = "Import INP"
