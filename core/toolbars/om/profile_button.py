@@ -69,7 +69,7 @@ class GwNodeData:
 
 
 class GwProfileButton(GwAction):
-    """ Button 43: Profile """
+    """ Button 53: Profile """
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 

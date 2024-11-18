@@ -23,7 +23,7 @@ from ....libs import tools_qgis, tools_qt
 
 
 class GwPrintButton(GwAction):
-    """ Button 58: Print """
+    """ Button 81: Print """
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 

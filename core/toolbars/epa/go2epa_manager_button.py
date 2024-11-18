@@ -21,7 +21,7 @@ from ....libs.tools_qt import GwEditDialog
 
 
 class GwGo2EpaManagerButton(GwAction):
-    """ Button 25: Go2epa maanger """
+    """ Button 42: Go2epa maanger """
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 

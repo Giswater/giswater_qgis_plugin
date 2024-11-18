@@ -75,7 +75,7 @@ class GwMincut:
 
 
     def manage_mincuts(self, dialog):
-        """ Button 27: Mincut management """
+        """ Button 52: Mincut management """
 
         self.action = "manage_mincuts"
         self.mincut_tools.set_dialog(dialog)
@@ -468,7 +468,7 @@ class GwMincut:
 
 
     def get_mincut(self):
-        """ Button 26: Mincut """
+        """ Button 51: Mincut """
 
         self.is_new = True
         self.init_mincut_form()

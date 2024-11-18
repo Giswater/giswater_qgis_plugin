@@ -28,7 +28,7 @@ from ....libs import lib_vars, tools_qgis, tools_qt, tools_db, tools_os
 
 
 class GwDscenarioManagerButton(GwAction):
-    """ Button 215: Dscenario manager """
+    """ Button 44: Dscenario manager """
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 

@@ -18,7 +18,7 @@ from ....libs import tools_qgis, tools_qt, tools_db
 
 
 class GwDateSelectorButton(GwAction):
-    """ Button 84: Date selector """
+    """ Button 58: Date selector """
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
         super().__init__(icon_path, action_name, text, toolbar, action_group)

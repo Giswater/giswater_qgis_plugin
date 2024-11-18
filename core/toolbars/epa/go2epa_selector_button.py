@@ -15,7 +15,7 @@ from ....libs import tools_qt, tools_db, tools_qgis, tools_os
 
 
 class GwGo2EpaSelectorButton(GwAction):
-    """ Button 29: Go2epa selector """
+    """ Button 43: Go2epa selector """
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 
@@ -24,7 +24,7 @@ class GwGo2EpaSelectorButton(GwAction):
 
 
     def clicked_event(self):
-        """ Button 29: Epa result selector """
+        """ Button 43: Epa result selector """
 
         self._open_go2epa_selector()
 

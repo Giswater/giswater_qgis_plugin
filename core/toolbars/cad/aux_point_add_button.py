@@ -19,7 +19,7 @@ from ....libs import lib_vars, tools_qgis, tools_qt, tools_db
 
 
 class GwAuxPointAddButton(GwMaptool):
-    """ Button 72: Add point aux """
+    """ Button 12: Add point aux """
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 

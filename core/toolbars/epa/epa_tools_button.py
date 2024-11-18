@@ -21,7 +21,7 @@ from .epa_tools.cal_static import StaticCalibration
 
 
 class GwEpaTools(GwAction):
-    """ Button 220: Epa tools """
+    """ Button 46: Epa tools """
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 
