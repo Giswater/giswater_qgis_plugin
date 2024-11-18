@@ -48,7 +48,7 @@ class GwImportSwmm:
     def clicked_event(self) -> None:
         """Start the Import INP workflow"""
 
-        msg = "Import INP is only available for WS (WNTR projects)"
+        msg = "Import INP is only available for WS (EPANET projects)"
         tools_qgis.show_warning(msg)
 
         try:
