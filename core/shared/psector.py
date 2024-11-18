@@ -1104,7 +1104,7 @@ class GwPsector:
     def set_plan(self):
 
         psector_id = tools_qt.get_text(self.dlg_plan_psector, self.psector_id)
-        if psector_id is None:
+        if psector_id in (None, "null"):
             return False
         psector_name = tools_qt.get_text(self.dlg_plan_psector, "name", return_string_null=False)
         extras = f'"psectorId":"{psector_id}"'
