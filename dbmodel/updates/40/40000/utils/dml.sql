@@ -636,3 +636,7 @@ ALTER TABLE rpt_cat_result ALTER COLUMN iscorporate SET DEFAULT false;
 
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, "source")
 VALUES (3346, 'gw_trg_mantypevalue_fk', 'utils', 'trigger', NULL, NULL, 'Control foreign keys created in man_type_* tables', 'role_edit', 'core');
+
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, "source")
+VALUES (3347, 'gw_fct_get_dialog', 'utils', 'function', 'json', 'json', 'Function to build dialogs for generic forms', 'role_basic', 'core');
+
