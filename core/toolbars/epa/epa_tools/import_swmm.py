@@ -23,7 +23,7 @@ from .....libs import tools_db, tools_qgis, tools_qt
 from ....models.plugin_toolbar import GwPluginToolbar
 from ....ui.dialog import GwDialog
 from ....ui.ui_manager import GwInpConfigImportUi, GwInpParsingUi
-from ....threads.import_inp.import_epanet_task import GwImportInpTask
+from ....threads.import_inp.import_swmm_task import GwImportInpTask
 from ....utils import tools_gw
 from ...dialog import GwAction
 from ....threads.import_inp import parse_swmm_task
