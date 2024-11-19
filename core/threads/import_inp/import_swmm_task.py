@@ -166,11 +166,11 @@ class GwImportInpTask(GwTask):
             self._save_options()
             self.progress_changed.emit("Getting options", self.PROGRESS_OPTIONS, "done!", True)
 
-            self.progress_changed.emit("Getting options", self.PROGRESS_OPTIONS, "Getting units...", False)
-            self._get_db_units()
-            self.progress_changed.emit("Getting options", self.PROGRESS_OPTIONS, "done!", True)
+            # self.progress_changed.emit("Getting options", self.PROGRESS_OPTIONS, "Getting units...", False)
+            # self._get_db_units()
+            # self.progress_changed.emit("Getting options", self.PROGRESS_OPTIONS, "done!", True)
 
-            # self._manage_catalogs()
+            self._manage_catalogs()
 
             # self._manage_nonvisual()
 
@@ -192,8 +192,6 @@ class GwImportInpTask(GwTask):
     def _manage_catalogs(self) -> None:
         self.progress_changed.emit("Create catalogs", lerp_progress(0, self.PROGRESS_OPTIONS, self.PROGRESS_CATALOGS), "Creating workcat", True)
         self._create_workcat_id()
-        self.progress_changed.emit("Create catalogs", lerp_progress(10, self.PROGRESS_OPTIONS, self.PROGRESS_CATALOGS), "Creating demand dscenario", True)
-        self._create_demand_dscenario()
         self.progress_changed.emit("Create catalogs", lerp_progress(20, self.PROGRESS_OPTIONS, self.PROGRESS_CATALOGS), "Creating new node catalogs", True)
         self._create_new_node_catalogs()
 
@@ -205,7 +203,7 @@ class GwImportInpTask(GwTask):
         self.progress_changed.emit("Create catalogs", lerp_progress(50, self.PROGRESS_OPTIONS, self.PROGRESS_CATALOGS), "Creating new varc catalogs", True)
         self._create_new_varc_catalogs()
         self.progress_changed.emit("Create catalogs", lerp_progress(70, self.PROGRESS_OPTIONS, self.PROGRESS_CATALOGS), "Creating new pipe catalogs", True)
-        self._create_new_pipe_catalogs()
+        self._create_new_conduit_catalogs()
 
     def _manage_nonvisual(self) -> None:
         self.progress_changed.emit("Non-visual objects", lerp_progress(0, self.PROGRESS_CATALOGS, self.PROGRESS_NONVISUAL), "Importing patterns", True)
@@ -348,7 +346,7 @@ class GwImportInpTask(GwTask):
         if cat_node_ids:
             nodecat_db = [x[0] for x in cat_node_ids]
 
-        node_catalogs = ["junctions", "reservoirs", "tanks"]
+        node_catalogs = ["junctions", "outfalls", "dividers", "storage"]
 
         for node_type in node_catalogs:
             if node_type not in self.catalogs:
@@ -371,7 +369,7 @@ class GwImportInpTask(GwTask):
             nodecat_db.append(self.catalogs[node_type])
 
     def _create_new_varc_catalogs(self) -> None:
-        varc_catalogs: list[str] = ["pumps", "valves"]
+        varc_catalogs: list[str] = ["pumps", "orifices", "weirs", "outlets"]
 
         for varc_type in varc_catalogs:
             if varc_type not in self.catalogs:
@@ -385,43 +383,41 @@ class GwImportInpTask(GwTask):
             # So, we perform a conditional INSERT here.
             execute_sql(
                 """
-                INSERT INTO cat_mat_arc (id, descript)
-                SELECT 'UNKNOWN', 'Unknown'
+                INSERT INTO cat_mat_arc (id, descript, n)
+                SELECT 'Unknown', 'Unknown', 0.013
                 WHERE NOT EXISTS (
                     SELECT 1
                     FROM cat_mat_arc
-                    WHERE id = 'UNKNOWN'
+                    WHERE id = 'Unknown'
                 );
                 """,
                 commit=False,
             )
 
             sql = """
-                INSERT INTO cat_arc (id, arc_type, matcat_id, dint)
-                VALUES (%s, %s, 'UNKNOWN', 999)
+                INSERT INTO cat_arc (id, arc_type, shape, geom1)
+                VALUES (%s, %s, 'VIRTUAL', 0)
             """
             _id = self.catalogs[varc_type]
             arctype_id = self.catalogs["features"][varc_type]
             execute_sql(sql, (_id, arctype_id), commit=False)
             self.arccat_db.append(_id)
 
-    def _create_new_pipe_catalogs(self):
-        if "pipes" in self.catalogs:
-            pipe_catalog = self.catalogs["pipes"].items()
-            for (pipe_dint, pipe_roughness), catalog in pipe_catalog:
+    def _create_new_conduit_catalogs(self):
+        if "conduits" in self.catalogs:
+            conduit_catalog = self.catalogs["conduits"].items()
+            for (shape, geom1, geom2, geom3, geom4), catalog in conduit_catalog:
                 if catalog in self.arccat_db:
                     continue
 
-                arctype_id = self.catalogs["features"]["pipes"]
-
-                material = self.catalogs["materials"][pipe_roughness]
+                arctype_id = self.catalogs["features"]["conduits"]
 
                 sql = """
-                    INSERT INTO cat_arc (id, arc_type, matcat_id, dint)
-                    VALUES (%s, %s, %s, %s);
+                    INSERT INTO cat_arc (id, arc_type, shape, geom1, geom2, geom3, geom4)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s);
                 """
                 execute_sql(
-                    sql, (catalog, arctype_id, material, pipe_dint), commit=False
+                    sql, (catalog, arctype_id, shape, geom1, geom2, geom3, geom4), commit=False
                 )
                 self.arccat_db.append(catalog)
 

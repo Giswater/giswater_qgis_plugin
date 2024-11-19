@@ -368,13 +368,17 @@ class GwImportSwmm:
                     'storage': 'SEWER_STORAGE',
                     'conduits': 'CONDUIT',
                     'pumps': 'VARC',
-                    'weirs': 'VARC'
+                    'weirs': 'VARC',
+                    'orifices': 'VARC',
+                    'outlets': 'VARC'
                 },
                 'junctions': 'C_MANHOLE_100',
                 'outfalls': 'R_MANHOLE_100',
                 'storage': 'SEW_STORAGE-01',
-                'pumps': 'VIRTUAL',
-                'weirs': 'VIRTUAL'
+                'pumps': 'INP-PUMP',
+                'weirs': 'INP-WEIR',
+                'orifices': 'INP-ORIFICE',
+                'outlets': 'INP-OUTLET'
             }
 
             # Show tab log
