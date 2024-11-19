@@ -135,7 +135,7 @@ class Catalogs:
                 for _id, epa_default in db_node_catalog.items()
                 if epa_default == "JUNCTION"
             ]
-            if len(wn[JUNCTIONS]) > 0
+            if JUNCTIONS in wn and len(wn[JUNCTIONS]) > 0
             else None
         )
 
@@ -145,7 +145,7 @@ class Catalogs:
                 for _id, epa_default in db_node_catalog.items()
                 if epa_default == "OUTFALL"
             ]
-            if len(wn[OUTFALLS]) > 0
+            if OUTFALLS in wn and len(wn[OUTFALLS]) > 0
             else None
         )
 
@@ -155,7 +155,7 @@ class Catalogs:
                 for _id, epa_default in db_node_catalog.items()
                 if epa_default == "DIVIDER"
             ]
-            if len(wn[DIVIDERS]) > 0
+            if DIVIDERS in wn and len(wn[DIVIDERS]) > 0
             else None
         )
 
@@ -165,7 +165,7 @@ class Catalogs:
                 for _id, epa_default in db_node_catalog.items()
                 if epa_default == "STORAGE"
             ]
-            if len(wn[STORAGE]) > 0
+            if STORAGE in wn and len(wn[STORAGE]) > 0
             else None
         )
 
@@ -198,13 +198,13 @@ class Catalogs:
                 _id for _id, dr_pair in db_arc_catalog.items() if dr_pair == conduit_type
             ]
 
-        pump_catalogs: Optional[list[str]] = [] if len(wn[PUMPS]) > 0 else None
+        pump_catalogs: Optional[list[str]] = [] if PUMPS in wn and len(wn[PUMPS]) > 0 else None
 
-        orifice_catalogs: Optional[list[str]] = [] if len(wn[ORIFICES]) > 0 else None
+        orifice_catalogs: Optional[list[str]] = [] if ORIFICES in wn and len(wn[ORIFICES]) > 0 else None
 
-        weir_catalogs: Optional[list[str]] = [] if len(wn[WEIRS]) > 0 else None
+        weir_catalogs: Optional[list[str]] = [] if WEIRS in wn and len(wn[WEIRS]) > 0 else None
 
-        outlet_catalogs: Optional[list[str]] = [] if len(wn[OUTLETS]) > 0 else None
+        outlet_catalogs: Optional[list[str]] = [] if OUTLETS in wn and len(wn[OUTLETS]) > 0 else None
 
         return cls(
             db_arc_catalog,
