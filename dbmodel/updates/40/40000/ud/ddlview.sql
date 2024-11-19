@@ -1008,6 +1008,20 @@ CREATE OR REPLACE VIEW vu_gully AS
          SELECT v_ext_streetaxis.id,
             v_ext_streetaxis.descript
            FROM v_ext_streetaxis
+        ), inp_netw_mode AS (
+         WITH inp_netw_mode_aux AS (
+                 SELECT count(*) AS t
+                   FROM inframoura_ws.config_param_user
+                  WHERE config_param_user.parameter::text = 'inp_options_networkmode'::text AND config_param_user.cur_user::text = CURRENT_USER
+                )
+         SELECT
+                CASE
+                    WHEN inp_netw_mode_aux.t > 0 THEN ( SELECT config_param_user.value
+                       FROM inframoura_ws.config_param_user
+                      WHERE config_param_user.parameter::text = 'inp_options_networkmode'::text AND config_param_user.cur_user::text = CURRENT_USER)
+                    ELSE NULL::text
+                END AS value
+           FROM inp_netw_mode_aux
         )
  SELECT gully.gully_id,
     gully.code,
@@ -1117,7 +1131,7 @@ CREATE OR REPLACE VIEW vu_gully AS
             WHEN gully.sector_id > 0 AND vst.is_operative = true AND gully.epa_type::text = 'GULLY'::character varying(16)::text AND cpu.value = '2' THEN gully.epa_type
             ELSE NULL::character varying(16)
         END AS inp_type
-   FROM (SELECT value FROM config_param_user WHERE parameter = 'inp_options_networkmode' and cur_user = current_user) cpu, gully
+   FROM (SELECT inp_netw_mode.value FROM inp_netw_mode) cpu,, gully
      LEFT JOIN cat_gully ON gully.gullycat_id::text = cat_gully.id::text
      LEFT JOIN dma ON gully.dma_id = dma.dma_id
      LEFT JOIN sector ON gully.sector_id = sector.sector_id

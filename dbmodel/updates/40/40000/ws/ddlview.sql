@@ -344,7 +344,22 @@ CREATE OR REPLACE VIEW vu_link AS
             edit_typevalue.idval
            FROM edit_typevalue
           WHERE edit_typevalue.typevalue::text = ANY (ARRAY['sector_type'::character varying, 'presszone_type'::character varying, 'dma_type'::character varying, 'dqa_type'::character varying]::text[])
+        ),inp_netw_mode AS (
+         WITH inp_netw_mode_aux AS (
+                 SELECT count(*) AS t
+                   FROM inframoura_ws.config_param_user
+                  WHERE config_param_user.parameter::text = 'inp_options_networkmode'::text AND config_param_user.cur_user::text = CURRENT_USER
+                )
+         SELECT
+                CASE
+                    WHEN inp_netw_mode_aux.t > 0 THEN ( SELECT config_param_user.value
+                       FROM inframoura_ws.config_param_user
+                      WHERE config_param_user.parameter::text = 'inp_options_networkmode'::text AND config_param_user.cur_user::text = CURRENT_USER)
+                    ELSE NULL::text
+                END AS value
+           FROM inp_netw_mode_aux
         )
+
  SELECT l.link_id,
     l.feature_type,
     l.feature_id,
@@ -392,7 +407,7 @@ CREATE OR REPLACE VIEW vu_link AS
             WHEN s.sector_id > 0 AND is_operative = true AND epa_type = 'JUNCTION'::character varying(16)::text AND cpu.value = '4' THEN epa_type::character varying
             ELSE NULL::character varying(16)
         END AS inp_type
-     FROM (SELECT value FROM config_param_user WHERE parameter = 'inp_options_networkmode' and cur_user = current_user) cpu, link l
+     FROM ( SELECT inp_netw_mode.value FROM inp_netw_mode) cpu, link l
      LEFT JOIN sector s USING (sector_id)
      LEFT JOIN presszone p USING (presszone_id)
      LEFT JOIN dma d USING (dma_id)
@@ -423,6 +438,20 @@ CREATE OR REPLACE VIEW vu_connec AS
             edit_typevalue.idval
            FROM edit_typevalue
           WHERE edit_typevalue.typevalue::text = ANY (ARRAY['sector_type'::character varying, 'presszone_type'::character varying, 'dma_type'::character varying, 'dqa_type'::character varying]::text[])
+        ), inp_netw_mode AS (
+         WITH inp_netw_mode_aux AS (
+                 SELECT count(*) AS t
+                   FROM inframoura_ws.config_param_user
+                  WHERE config_param_user.parameter::text = 'inp_options_networkmode'::text AND config_param_user.cur_user::text = CURRENT_USER
+                )
+         SELECT
+                CASE
+                    WHEN inp_netw_mode_aux.t > 0 THEN ( SELECT config_param_user.value
+                       FROM inframoura_ws.config_param_user
+                      WHERE config_param_user.parameter::text = 'inp_options_networkmode'::text AND config_param_user.cur_user::text = CURRENT_USER)
+                    ELSE NULL::text
+                END AS value
+           FROM inp_netw_mode_aux
         )
  SELECT connec.connec_id,
     connec.code,
@@ -550,7 +579,7 @@ CREATE OR REPLACE VIEW vu_connec AS
             WHEN connec.sector_id > 0 AND vst.is_operative = true AND connec.epa_type = 'JUNCTION'::character varying(16)::text AND cpu.value = '4' THEN connec.epa_type::character varying
             ELSE NULL::character varying(16)
         END AS inp_type
-   FROM (SELECT value FROM config_param_user WHERE parameter = 'inp_options_networkmode' and cur_user = current_user) cpu, connec
+   FROM  (SELECT inp_netw_mode.value FROM inp_netw_mode) cpu, connec
      JOIN cat_connec ON connec.conneccat_id::text = cat_connec.id::text
      JOIN cat_feature ON cat_feature.id::text = cat_connec.connec_type::text
      LEFT JOIN dma ON connec.dma_id = dma.dma_id
