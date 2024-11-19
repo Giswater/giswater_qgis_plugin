@@ -305,14 +305,6 @@ def btn_accept_featuretype_change(**kwargs):
 
         if (featurecat_id != "null" and featurecat_id is not None and project_type == 'ws') or (
                 project_type == 'ud'):
-            if ((featurecat_id.startswith('(') and featurecat_id.endswith(')')) or
-                (fluid_type.startswith('(') and fluid_type.endswith(')')) or
-                (location_type.startswith('(') and location_type.endswith(')')) or
-                (category_type.startswith('(') and category_type.endswith(')')) or
-                (function_type.startswith('(') and function_type.endswith(')'))):
-                message = "Selected values are not valid for this process, they are not related to selected feature."
-                tools_qgis.show_warning(message, dialog=dialog)
-                return
 
             # Get function input parameters
             feature = f'"type":"{this.feature_type}"'
@@ -336,10 +328,14 @@ def btn_accept_featuretype_change(**kwargs):
                 tools_gw.close_dialog(dialog)
                 return
 
+            if "Accepted" in complet_result['status']:
+                msg_text = complet_result['message']['text']
+                if msg_text is None:
+                    msg_text = 'Replace feature done successfully'
+                tools_qgis.show_info(msg_text)
+
             tools_gw.set_config_parser("btn_featuretype_change", "feature_type_new", feature_type_new)
             tools_gw.set_config_parser("btn_featuretype_change", "featurecat_id", featurecat_id)
-            message = "Values has been updated"
-            tools_qgis.show_info(message)
 
         else:
             message = "Field catalog_id required!"
