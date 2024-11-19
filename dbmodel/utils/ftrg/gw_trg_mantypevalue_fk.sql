@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE: XXXX
+--FUNCTION CODE: 3346
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_mantypevalue_fk()
   RETURNS trigger AS
@@ -16,10 +16,13 @@ DECLARE
     v_new_data jsonb;
     v_type_table text;
 	v_type text;
+	v_cat_table text;
     v_columname text;
 	v_columname_value text;
     v_feature_type text;
     v_feature_type_value text;
+	v_featurecat_id text;
+	v_featurecat_id_value text;
     v_querytext text;
     v_list TEXT[];
 
@@ -37,9 +40,14 @@ BEGIN
 		v_type_table := 'man_type_' || v_type;
         v_columname := v_type || '_type';
 		v_columname_value := v_new_data ->> v_columname;
+		v_cat_table := 'cat_' || v_table;
         v_feature_type := v_table || '_type';
-        v_feature_type_value := v_new_data ->> v_feature_type;
+		v_featurecat_id := v_table || 'cat_id';
+        v_featurecat_id_value := v_new_data ->> v_featurecat_id;
 
+		--select feature_type
+		v_querytext = 'SELECT '||v_feature_type||' FROM '||v_cat_table||' WHERE id = '''||v_featurecat_id_value||'''';
+		EXECUTE v_querytext INTO v_feature_type_value;
 
 		--select typevalue
 		v_querytext = 'SELECT array_agg('||v_columname||') FROM '||v_type_table||' 
@@ -49,7 +57,6 @@ BEGIN
 							featurecat_id IS NULL
 							OR '''||v_feature_type_value||''' = ANY(featurecat_id)
 						)';
-		RAISE NOTICE 'v_querytext: %', v_querytext;
 		EXECUTE v_querytext INTO v_list;
 
 		IF v_columname_value = ANY(v_list) OR v_columname_value IS NULL THEN

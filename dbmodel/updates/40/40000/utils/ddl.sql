@@ -54,3 +54,20 @@ DROP VIEW IF EXISTS ve_config_sysfields;
 DROP TRIGGER IF EXISTS gw_trg_typevalue_fk_update ON config_form_fields;
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"config_form_fields", "column":"layoutname", "dataType":"text"}}$$);
+
+
+-- 19/11/2024
+ALTER TABLE arc DROP CONSTRAINT arc_category_type_feature_type_fkey;
+ALTER TABLE arc DROP CONSTRAINT arc_fluid_type_feature_type_fkey;
+ALTER TABLE arc DROP CONSTRAINT arc_function_type_feature_type_fkey;
+ALTER TABLE arc DROP CONSTRAINT arc_location_type_feature_type_fkey;
+
+ALTER TABLE node DROP CONSTRAINT node_category_type_feature_type_fkey;
+ALTER TABLE node DROP CONSTRAINT node_fluid_type_feature_type_fkey;
+ALTER TABLE node DROP CONSTRAINT node_function_type_feature_type_fkey;
+ALTER TABLE node DROP CONSTRAINT node_location_type_feature_type_fkey;
+
+ALTER TABLE connec DROP CONSTRAINT connec_category_type_feature_type_fkey;
+ALTER TABLE connec DROP CONSTRAINT connec_fluid_type_feature_type_fkey;
+ALTER TABLE connec DROP CONSTRAINT connec_function_type_feature_type_fkey;
+ALTER TABLE connec DROP CONSTRAINT connec_location_type_feature_type_fkey;

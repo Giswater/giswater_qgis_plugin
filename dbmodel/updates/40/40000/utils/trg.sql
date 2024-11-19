@@ -20,3 +20,58 @@ ve_config_addfields FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_config_addfields()
 
 CREATE TRIGGER gw_trg_edit_config_sysfields INSTEAD OF UPDATE ON ve_config_sysfields
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_config_sysfields();
+
+
+-- 19/11/2024
+CREATE TRIGGER gw_trg_mantypevalue_fk_insert AFTER
+INSERT
+    ON
+    arc FOR EACH ROW EXECUTE FUNCTION gw_trg_mantypevalue_fk('arc');
+CREATE TRIGGER gw_trg_mantypevalue_fk_update AFTER
+UPDATE
+    OF function_type,
+    category_type,
+    fluid_type,
+    location_type ON
+    arc FOR EACH ROW
+    WHEN (((old.function_type)::TEXT IS DISTINCT FROM (new.function_type)::TEXT)
+    OR ((OLD.category_type)::TEXT IS DISTINCT FROM (NEW.category_type)::TEXT)
+    OR ((OLD.fluid_type)::TEXT IS DISTINCT FROM (NEW.fluid_type)::TEXT)
+    OR ((OLD.location_type)::TEXT IS DISTINCT FROM (NEW.location_type)::TEXT))
+    EXECUTE FUNCTION gw_trg_mantypevalue_fk('arc');
+
+
+CREATE TRIGGER gw_trg_mantypevalue_fk_insert AFTER
+INSERT
+    ON
+    node FOR EACH ROW EXECUTE FUNCTION gw_trg_mantypevalue_fk('node');
+CREATE TRIGGER gw_trg_mantypevalue_fk_update AFTER
+UPDATE
+    OF function_type,
+    category_type,
+    fluid_type,
+    location_type ON
+    node FOR EACH ROW
+    WHEN (((old.function_type)::TEXT IS DISTINCT FROM (new.function_type)::TEXT)
+    OR ((OLD.category_type)::TEXT IS DISTINCT FROM (NEW.category_type)::TEXT)
+    OR ((OLD.fluid_type)::TEXT IS DISTINCT FROM (NEW.fluid_type)::TEXT)
+    OR ((OLD.location_type)::TEXT IS DISTINCT FROM (NEW.location_type)::TEXT))
+    EXECUTE FUNCTION gw_trg_mantypevalue_fk('node');
+
+
+CREATE TRIGGER gw_trg_mantypevalue_fk_insert AFTER
+INSERT
+    ON
+    connec FOR EACH ROW EXECUTE FUNCTION gw_trg_mantypevalue_fk('connec');
+CREATE TRIGGER gw_trg_mantypevalue_fk_update AFTER
+UPDATE
+    OF function_type,
+    category_type,
+    fluid_type,
+    location_type ON
+    connec FOR EACH ROW
+    WHEN (((old.function_type)::TEXT IS DISTINCT FROM (new.function_type)::TEXT)
+    OR ((OLD.category_type)::TEXT IS DISTINCT FROM (NEW.category_type)::TEXT)
+    OR ((OLD.fluid_type)::TEXT IS DISTINCT FROM (NEW.fluid_type)::TEXT)
+    OR ((OLD.location_type)::TEXT IS DISTINCT FROM (NEW.location_type)::TEXT))
+    EXECUTE FUNCTION gw_trg_mantypevalue_fk('connec');

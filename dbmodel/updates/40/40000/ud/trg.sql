@@ -160,5 +160,23 @@ CREATE TRIGGER gw_trg_typevalue_fk AFTER INSERT OR UPDATE OF verified, units_pla
 ON gully FOR EACH ROW EXECUTE FUNCTION gw_trg_typevalue_fk('gully');
 
 -- 14/11/2024
-CREATE TRIGGER gw_trg_edit_inp_dscenario INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_dscenario_lids 
+CREATE TRIGGER gw_trg_edit_inp_dscenario INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_dscenario_lids
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_dscenario('LIDS');
+
+-- 19/11/2024
+CREATE TRIGGER gw_trg_mantypevalue_fk_insert AFTER
+INSERT
+    ON
+    gully FOR EACH ROW EXECUTE FUNCTION gw_trg_mantypevalue_fk('gully');
+CREATE TRIGGER gw_trg_mantypevalue_fk_update AFTER
+UPDATE
+    OF function_type,
+    category_type,
+    fluid_type,
+    location_type ON
+    gully FOR EACH ROW
+    WHEN (((old.function_type)::TEXT IS DISTINCT FROM (new.function_type)::TEXT)
+    OR ((OLD.category_type)::TEXT IS DISTINCT FROM (NEW.category_type)::TEXT)
+    OR ((OLD.fluid_type)::TEXT IS DISTINCT FROM (NEW.fluid_type)::TEXT)
+    OR ((OLD.location_type)::TEXT IS DISTINCT FROM (NEW.location_type)::TEXT))
+    EXECUTE FUNCTION gw_trg_mantypevalue_fk('gully');

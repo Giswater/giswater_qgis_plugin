@@ -239,3 +239,10 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"link", "
 -- 14/11/2024
 DROP VIEW IF EXISTS v_edit_inp_dscenario_lid_usage;
 ALTER TABLE inp_dscenario_lid_usage RENAME TO inp_dscenario_lids;
+
+
+-- 19/11/2024
+ALTER TABLE gully DROP CONSTRAINT gully_category_type_feature_type_fkey;
+ALTER TABLE gully DROP CONSTRAINT gully_fluid_type_feature_type_fkey;
+ALTER TABLE gully DROP CONSTRAINT gully_function_type_feature_type_fkey;
+ALTER TABLE gully DROP CONSTRAINT gully_location_type_feature_type_fkey;
