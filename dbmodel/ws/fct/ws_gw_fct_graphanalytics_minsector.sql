@@ -85,52 +85,74 @@ BEGIN
     END IF;
 
     -- Nodes at the limits of minsectors: nodes with "graph_delimiter" = 'MINSECTOR'
-    -- Also, nodes that appear as starts in the "sector" table and have "graph_delimiter" = 'SECTOR'
-    -- Note: "to_arc" is in the "man_valve" table; any valve could behave as a check-valve, although this should not happen uncontrolled
+    -- Also, nodes that appear as starts in the "sector" table and have "graph_delimiter" = 'SECTOR' and have InletArcs (<>toArc)
 
-    UPDATE temp_pgr_node t SET graph_delimiter = cf.graph_delimiter
+    UPDATE temp_pgr_node t SET graph_delimiter = LOWER(cf.graph_delimiter)
     FROM node n
     JOIN cat_node cn ON cn.id = n.nodecat_id
     JOIN cat_feature_node cf ON cf.id = cn.nodetype_id
     WHERE t.node_id = n.node_id AND (cf.graph_delimiter = 'MINSECTOR' OR cf.graph_delimiter = 'SECTOR');
 
-    -- Set modif = TRUE for nodes where "graph_delimiter" = 'MINSECTOR'
+    -- Set modif = TRUE for nodes where "graph_delimiter" = 'minsector'
 
     UPDATE temp_pgr_node n set closed = v.closed, broken = v.broken, to_arc = v.to_arc, modif = TRUE
     FROM man_valve v
-    WHERE n.node_id = v.node_id AND n.graph_delimiter = 'MINSECTOR';
+    WHERE n.node_id = v.node_id AND n.graph_delimiter = 'minsector';
 
     -- If we want to ignore open but broken valves
     IF v_ignorebrokenvalves THEN
         UPDATE temp_pgr_node n SET modif = FALSE
-        WHERE n.graph_delimiter = 'MINSECTOR' AND n.closed = FALSE AND n.broken = TRUE;
+        WHERE n.graph_delimiter = 'minsector' AND n.closed = FALSE AND n.broken = TRUE;
     END IF;
 
     -- Arcs to be disconnected: one of the two arcs that reach the valve
-    UPDATE temp_pgr_arc a SET modif = TRUE
+    UPDATE temp_pgr_arc a 
+    SET 
+        modif1 = CASE WHEN s.node_id = s.node_1 THEN TRUE ELSE modif1 END,
+        modif2 = CASE WHEN s.node_id = s.node_2 THEN TRUE ELSE modif2 END
     FROM (
-        SELECT DISTINCT ON (n.pgr_node_id) n.pgr_node_id, a.pgr_arc_id
+        SELECT DISTINCT ON (n.pgr_node_id) n.pgr_node_id, a.pgr_arc_id, a.node_1, a.node_2 
         FROM temp_pgr_node n
-        JOIN temp_pgr_arc a ON n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
+        JOIN temp_pgr_arc a ON n.pgr_node_id IN (a.node_1, a.node_2)
         WHERE n.modif = TRUE -- Nodes that are minsectors
     ) s
-    WHERE a.pgr_arc_id = s.pgr_arc_id;
+    WHERE a.arc_id = s.arc_id;
 
-    -- Nodes where "graph_delimiter" = 'SECTOR' and are also in the "sector" table
+    -- nodes SECTOR:
+    -- Nodes that are the starting points of mapzones, have "graph_delimiter"='sector'  and have InletArcs (arcs that are not toArc)
     UPDATE temp_pgr_node n SET modif = TRUE
     FROM (
-        SELECT (json_array_elements_text((graphconfig->>'use')::json))::json->>'nodeParent' AS node_id
-        FROM sector WHERE graphconfig IS NOT NULL AND active IS TRUE
+	    SELECT distinct  n.node_id
+	    FROM temp_pgr_node n
+	    JOIN temp_pgr_arc a ON n.node_id IN (a.node_1, a.node_2) 
+	    LEFT JOIN (
+		    SELECT json_array_elements_text(((json_array_elements_text((graphconfig->>'use')::json))::json->>'toArc')::json) AS to_arc
+		    FROM sector
+		    WHERE graphconfig IS NOT NULL AND active IS TRUE
+	    ) sa ON sa.to_arc = a.arc_id
+	    WHERE n.graph_delimiter = 'sector' AND sa.to_arc IS NULL
     ) s
-    WHERE n.node_id = s.node_id AND n.pgr_node_id = n.node_id::INTEGER AND n.graph_delimiter = 'SECTOR';
+    WHERE n.node_id = s.node_id;
 
-    -- Arcs to be disconnected: all those that connect to the nodes where "graph_delimiter" = 'SECTOR' and are also in the "sector" table
-    UPDATE temp_pgr_arc t SET modif = TRUE
-    FROM temp_pgr_node n
-    JOIN temp_pgr_arc a ON n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
-    WHERE t.pgr_arc_id = a.pgr_arc_id AND n.modif = TRUE AND n.graph_delimiter = 'SECTOR';
+    -- Disconnect the InletArc (those that are not to_arc)
+    UPDATE temp_pgr_arc a 
+    SET
+	    modif1= case when s.node_id = s.node_1 then true else modif1 end,
+	    modif2= case when s.node_id = s.node_2 then true else modif2 end
+    FROM (
+	    SELECT a.arc_id, n.node_id, a.node_1, a.node_2
+	    FROM temp_pgr_node n
+	    JOIN temp_pgr_arc a ON n.node_id IN (a.node_1, a.node_2) 
+	    LEFT JOIN (
+		    SELECT json_array_elements_text(((json_array_elements_text((graphconfig->>'use')::json))::json->>'toArc')::json) AS to_arc
+		    FROM sector
+		    WHERE graphconfig IS NOT NULL AND active IS TRUE
+	    ) sa ON sa.to_arc = a.arc_id
+	    WHERE n.graph_delimiter = 'sector' AND sa.to_arc IS NULL
+    ) s
+    WHERE a.arc_id = s.arc_id;
 
-    -- Generate new arcs and disconnect arcs with modif = TRUE
+    -- Generate new arcs and disconnect arcs with modif1 = TRUE OR modif2 = TRUE
 	-- =======================
     SELECT gw_fct_graphanalytics_arrangenetwork() INTO v_response;
 
