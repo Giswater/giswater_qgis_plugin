@@ -84,6 +84,7 @@ class GwCSVButton(GwAction):
 
         if str(tools_qt.get_text(self.dlg_csv, self.dlg_csv.txt_file_csv)) != 'null':
             self._preview_csv(self.dlg_csv)
+        self.dlg_csv.line.setVisible(False)
         self.dlg_csv.progressBar.setVisible(False)
 
         # Disable tab log
@@ -300,6 +301,7 @@ class GwCSVButton(GwAction):
     def _insert_into_db(self, dialog, csvfile, delimiter, _unicode):
 
         progress = 0
+        dialog.line.setVisible(True)
         dialog.progressBar.setVisible(True)
         dialog.progressBar.setValue(int(progress))
         # Counts rows in csvfile, using var "row_count" to do progressbar
