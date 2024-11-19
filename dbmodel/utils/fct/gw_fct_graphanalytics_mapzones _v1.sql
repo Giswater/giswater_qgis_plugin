@@ -228,6 +228,7 @@ BEGIN
 		JOIN cat_feature_node cf ON cf.id=cn.node_type
 		WHERE t.node_id=n.node_id AND cf.graph_delimiter='MINSECTOR';
 
+		-- NODES VALVES
 		-- UPDATE "closed", "broken", "to_arc" only if the values make sense - check the explanations/rules for the possible valve scenarios MINSECTOR/to_arc/closed/broken
 		-- valves to modify:
 		-- closed valves
@@ -240,28 +241,33 @@ BEGIN
 		FROM man_valve v
 		WHERE n.node_id = v.node_id  AND v.to_arc IS NOT NULL AND v.broken = FALSE;
 
+		-- ARCS VALVES
 		-- arcs to modify:
 		-- for the closed valves when to_arc IS NULL, one of the arcs that connect to the valve
-		UPDATE temp_pgr_arc t SET modif = TRUE
+		UPDATE temp_pgr_arc t 
+		SET
+		    modif1= CASE WHEN s.node_id = s.node_1 THEN true ELSE modif1 END,
+        	modif2= CASE WHEN s.node_id = s.node_2 THEN true ELSE modif2 END
 		FROM
-		(SELECT DISTINCT ON (n.node_id) n.node_id, a.arc_id
+		(SELECT DISTINCT ON (n.node_id) n.node_id, a.arc_id, a.node_1, a.node_2
 		FROM temp_pgr_node n
 		join temp_pgr_arc a ON n.node_id IN (a.node_1, a.node_2)
 		WHERE n.modif = TRUE AND n.to_arc IS NULL
-		) a
-		WHERE t.arc_id = a.arc_id;
+		) s
+		WHERE t.arc_id = s.arc_id;
 
         -- for the valves with to_arc NOT NULL; the InletArc - the one that is not to_arc
-        UPDATE temp_pgr_arc t SET modif = TRUE
-        FROM (
-            SELECT a.arc_id, n.node_id, n.to_arc
-            FROM  temp_pgr_node n 
-            JOIN temp_pgr_arc a ON n.node_id IN (a.node_1, a.node_2)
-            WHERE n.to_arc IS NOT NULL AND a.arc_id<>n.to_arc
-        ) a
-        WHERE a.arc_id = n.to_arc
-        -- AND n.modif = TRUE AND n.to_arc IS NOT NULL -- not necessaries
-        ;
+  		UPDATE amsa_pgr_arc t 
+		SET 
+			modif1= CASE WHEN s.node_id = s.node_1 THEN true ELSE modif1 END,
+        	modif2= CASE WHEN s.node_id = s.node_2 THEN true ELSE modif2 END
+		FROM 
+		(SELECT a.arc_id, n.node_id, n.to_arc, a.node_1, a.node_2
+			FROM  amsa_pgr_node n 
+			JOIN amsa_pgr_arc a ON n.node_id IN (a.node_1, a.node_2)
+			WHERE n.modif=true AND n.to_arc IS NOT NULL AND a.arc_id<>n.to_arc
+		) s
+		WHERE t.arc_id= s.arc_id;
 
 	-- cost/reverse_cost for the open valves with to_arc will be update after gw_fct_graphanalytics_arrangenetwork with the correct values
 	END IF;
@@ -269,6 +275,19 @@ BEGIN
 	-- get mapzone field name
     v_mapzone_field = v_mapzone_name || '_id';
 	v_visible_layer = 'v_edit_' || v_mapzone_name;
+
+	--NODES MAPZONES
+	-- Nodes that are the starting points of mapzones
+    v_querytext =
+		'UPDATE temp_pgr_node n SET modif = TRUE, graph_delimiter = ''' || v_mapzone_name || ''', zone_id = ' || v_mapzone_field || '
+		FROM (
+			SELECT ' || v_mapzone_field || ', (json_array_elements_text((graphconfig->>''use'')::json))::json->>''nodeParent'' AS node_id
+			FROM ' || v_mapzone_name || ' 
+			WHERE graphconfig IS NOT NULL 
+			AND active IS TRUE
+		) AS s 
+		WHERE s.node_id <> '''' AND n.node_id = s.node_id';
+    EXECUTE v_querytext;
 
 	-- Nodes forceClosed
     v_querytext =
@@ -282,45 +301,6 @@ BEGIN
 		WHERE n.node_id = s.node_id';
     EXECUTE v_querytext;
 
-	-- Arcs forceClosed - all arcs that are connected to forceClosed nodes
-    v_querytext =
-		'UPDATE temp_pgr_arc a SET modif = TRUE 
-		FROM temp_pgr_node n
-		WHERE n.node_id IN (a.node_1, a.node_2) 
-		AND n.graph_delimiter = ''forceClosed''';
-    EXECUTE v_querytext;
-
-	-- Nodes that are the starting points of mapzones
-    v_querytext =
-		'UPDATE temp_pgr_node n SET modif = TRUE, graph_delimiter = ''' || v_mapzone_name || ''', zone_id = ' || v_mapzone_field || '
-		FROM (
-			SELECT ' || v_mapzone_field || ', (json_array_elements_text((graphconfig->>''use'')::json))::json->>''nodeParent'' AS node_id
-			FROM ' || v_mapzone_name || ' 
-			WHERE graphconfig IS NOT NULL 
-			AND active IS TRUE
-		) AS s 
-		WHERE s.node_id <> '''' AND n.node_id = s.node_id';
-    EXECUTE v_querytext;
-
-	-- Disconnect the InletArc (those that are not to_arc)
-    v_querytext =
-		'UPDATE temp_pgr_arc a SET modif = TRUE
-		FROM (
-			SELECT a.arc_id, n.node_id
-			FROM temp_pgr_node n
-			JOIN temp_pgr_arc a ON n.node_id IN (a.node_1, a.node_2) 
-			AND n.graph_delimiter = ''' || v_mapzone_name || '''
-			LEFT JOIN (
-				SELECT json_array_elements_text(((json_array_elements_text((graphconfig->>''use'')::json))::json->>''toArc'')::json) AS to_arc
-				FROM ' || v_mapzone_name || ' 
-				WHERE graphconfig IS NOT NULL 
-				AND active IS TRUE
-			) sa ON sa.to_arc = a.arc_id
-			WHERE sa.to_arc IS NULL
-		) s
-		WHERE a.arc_id = s.arc_id';
-	EXECUTE v_querytext;
-
 	-- Nodes "ignore", should not be disconnected
     v_querytext =
 		'UPDATE temp_pgr_node n SET modif = FALSE, graph_delimiter = ''ignore'' 
@@ -331,6 +311,44 @@ BEGIN
 			AND active IS TRUE 
 		) s 
 		WHERE n.node_id = s.node_id';
+    EXECUTE v_querytext;
+
+	-- ARCS MAPZONES
+	-- Disconnect the InletArc (those that are not to_arc)
+    v_querytext =
+		'UPDATE temp_pgr_arc a 
+		SET
+			modif1= CASE WHEN s.node_id = s.node_1 THEN true ELSE modif1 END,
+        	modif2= CASE WHEN s.node_id = s.node_2 THEN true ELSE modif2 END
+		FROM (
+			SELECT a.arc_id, n.node_id, a.node_1, a.node_2
+			FROM temp_pgr_node n
+			JOIN temp_pgr_arc a ON n.node_id IN (a.node_1, a.node_2) 
+			LEFT JOIN (
+				SELECT json_array_elements_text(((json_array_elements_text((graphconfig->>''use'')::json))::json->>''toArc'')::json) AS to_arc
+				FROM ' || v_mapzone_name || ' 
+				WHERE graphconfig IS NOT NULL 
+				AND active IS TRUE
+			) sa ON sa.to_arc = a.arc_id
+			WHERE n.graph_delimiter = ''' || v_mapzone_name || '''
+			AND sa.to_arc IS NULL
+		) s
+		WHERE a.arc_id = s.arc_id';
+	EXECUTE v_querytext;
+
+	-- Arcs forceClosed - all arcs that are connected to forceClosed nodes
+    v_querytext =
+		'UPDATE temp_pgr_arc a 
+		SET
+			modif1= CASE WHEN s.node_id = s.node_1 THEN true ELSE modif1 END,
+        	modif2= CASE WHEN s.node_id = s.node_2 THEN true ELSE modif2 END
+		FROM (
+			SELECT  n.node_id, a.arc_id, a.node_1, a.node_2
+			FROM temp_pgr_node n 
+			JOIN temp_pgr_arc a ON n.node_id IN (a.node_1, node_2)
+			WHERE n.graph_delimiter = ''forceClosed''
+		) s
+	WHERE a.arc_id= s.arc_id';
     EXECUTE v_querytext;
 
 	-- Generate new arcs and disconnect arcs with modif = TRUE
@@ -345,14 +363,14 @@ BEGIN
 	-- and graph_delimiter 'minsector' or null (it wasn't changed for 'forceClosed' for example)
 	-- Note: node_1 = node_2 for the new arcs generated at the nodes
     IF v_project_type = 'WS' THEN
-        UPDATE temp_pgr_arc a SET reverse_cost = 1
+        UPDATE temp_pgr_arc a SET reverse_cost = 0 -- for inundation process, better to be 0 instead of 1; these arcs don't exist
 		FROM temp_pgr_node n
         WHERE a.node_1 = n.node_id AND n.pgr_node_id = n.node_id::INT
 		AND a.cost = -1 AND (a.graph_delimiter = 'minsector' OR a.graph_delimiter is null)
 		AND n.to_arc IS NOT NULL AND n.closed is null
 		AND a.pgr_node_1=a.node_1::INT;
 
-        UPDATE temp_pgr_arc a SET cost = 1
+        UPDATE temp_pgr_arc a SET cost = 0 -- for inundation process, better to be 0 instead of 1; these arcs don't exist
 		FROM temp_pgr_node n
         WHERE a.node_1 = n.node_id AND n.pgr_node_id = n.node_id::INT
 		AND a.cost = -1 AND (a.graph_delimiter = 'minsector' OR a.graph_delimiter is null)
