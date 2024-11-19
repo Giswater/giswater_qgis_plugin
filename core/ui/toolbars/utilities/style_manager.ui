@@ -20,10 +20,16 @@
       <string/>
      </property>
      <layout class="QGridLayout" name="verticalLayout_3">
-      <item row="2" column="0" colspan="12">
-       <widget class="QTableView" name="tbl_style">
-        <property name="sortingEnabled">
-         <bool>true</bool>
+      <item row="1" column="8">
+       <widget class="QPushButton" name="btn_delete_style">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Delete style</string>
         </property>
        </widget>
       </item>
@@ -34,16 +40,10 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="3">
-       <widget class="QPushButton" name="btn_delete_group">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string/>
+      <item row="2" column="0" colspan="10">
+       <widget class="QTableView" name="tbl_style">
+        <property name="sortingEnabled">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -66,8 +66,8 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="10">
-       <widget class="QPushButton" name="btn_delete_style">
+      <item row="1" column="3">
+       <widget class="QPushButton" name="btn_delete_group">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -75,11 +75,37 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Delete style</string>
+         <string/>
         </property>
        </widget>
       </item>
       <item row="1" column="9">
+       <widget class="QPushButton" name="btn_refresh_all">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Refresh all </string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="6">
+       <widget class="QPushButton" name="btn_add_style">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Add style</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="7">
        <widget class="QPushButton" name="btn_update_style">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -102,46 +128,6 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="11">
-       <widget class="QPushButton" name="btn_refresh_all">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string>Refresh all </string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="8">
-       <widget class="QPushButton" name="btn_add_style">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string>Add style</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="lbl_filter_name">
-        <property name="text">
-         <string>Filter by: layername</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0" colspan="12">
-       <widget class="QTableView" name="tbl_style">
-        <property name="sortingEnabled">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
       <item row="1" column="2">
        <widget class="QPushButton" name="btn_add_group">
         <property name="sizePolicy">
@@ -155,20 +141,7 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="3">
-       <widget class="QPushButton" name="btn_delete_group">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="4" colspan="4">
+      <item row="1" column="4" colspan="2">
        <spacer name="horizontalSpacer_2">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -188,7 +161,7 @@
         </property>
        </widget>
       </item>
-      <item row="4" column="0" colspan="12">
+      <item row="4" column="0" colspan="10">
        <layout class="QGridLayout" name="lyt_buttons">
         <property name="topMargin">
          <number>0</number>
