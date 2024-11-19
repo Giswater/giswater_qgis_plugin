@@ -11,10 +11,11 @@ try:
         OPTIONS, REPORT,
         JUNCTIONS, OUTFALLS, DIVIDERS, STORAGE,
         CONDUITS, PUMPS, ORIFICES, WEIRS, OUTLETS,
-        XSECTIONS
+        XSECTIONS,
+        PATTERNS,
     )
     from swmm_api.input_file.sections import (
-        Conduit, CrossSection
+        Conduit, CrossSection, Pattern
     )
 except ImportError:
     pass
@@ -172,7 +173,7 @@ class GwImportInpTask(GwTask):
 
             self._manage_catalogs()
 
-            # self._manage_nonvisual()
+            self._manage_nonvisual()
 
             # self._manage_visual()
 
@@ -209,11 +210,11 @@ class GwImportInpTask(GwTask):
         self.progress_changed.emit("Non-visual objects", lerp_progress(0, self.PROGRESS_CATALOGS, self.PROGRESS_NONVISUAL), "Importing patterns", True)
         self._save_patterns()
 
-        self.progress_changed.emit("Non-visual objects", lerp_progress(40, self.PROGRESS_CATALOGS, self.PROGRESS_NONVISUAL), "Importing curves", True)
-        self._save_curves()
+        # self.progress_changed.emit("Non-visual objects", lerp_progress(40, self.PROGRESS_CATALOGS, self.PROGRESS_NONVISUAL), "Importing curves", True)
+        # self._save_curves()
 
-        self.progress_changed.emit("Non-visual objects", lerp_progress(80, self.PROGRESS_CATALOGS, self.PROGRESS_NONVISUAL), "Importing controls and rules", True)
-        self._save_controls_and_rules()
+        # self.progress_changed.emit("Non-visual objects", lerp_progress(80, self.PROGRESS_CATALOGS, self.PROGRESS_NONVISUAL), "Importing controls and rules", True)
+        # self._save_controls_and_rules()
 
     def _manage_visual(self) -> None:
         self.progress_changed.emit("Visual objects", lerp_progress(0, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing junctions", True)
@@ -427,7 +428,7 @@ class GwImportInpTask(GwTask):
         if pattern_rows:
             patterns_db = [x[0] for x in pattern_rows]
 
-        for pattern_name, pattern in self.network.patterns.items():
+        for pattern_name, pattern in self.network[PATTERNS].items():
             if pattern_name in patterns_db:
                 for i in count(2):
                     new_name = f"{pattern_name}_{i}"
@@ -439,22 +440,26 @@ class GwImportInpTask(GwTask):
                     pattern_name = new_name
                     break
 
+            pattern_type = pattern.cycle
             execute_sql(
-                "INSERT INTO inp_pattern (pattern_id) VALUES (%s)",
-                (pattern_name,),
+                "INSERT INTO inp_pattern (pattern_id, pattern_type) VALUES (%s, %s)",
+                (pattern_name, pattern_type),
                 commit=False,
             )
 
+            fields_str = "pattern_id"
+            values_str = "%s"
+            values = (pattern_name,)
+            for idx, f in enumerate(pattern.factors):
+                fields_str += f",factor_{idx+1}"
+                values_str += ",%s"
+                values += (f,)
+
             sql = (
-                "INSERT INTO inp_pattern_value (pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8, factor_9, factor_10, factor_11, factor_12) "
-                "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+                f"INSERT INTO inp_pattern_value ({fields_str}) "
+                f"VALUES ({values_str})"
             )
-            for b in batched(pattern.multipliers, 12):
-                # Fill up the last batch
-                while len(b) < 12:
-                    b: tuple[Any] = b + (None,)
-                values = (pattern_name,) + b
-                execute_sql(sql, values, commit=False)
+            execute_sql(sql, values, commit=False)
 
     def _save_curves(self) -> None:
         curve_rows = get_rows("SELECT id FROM inp_curve", commit=False)
