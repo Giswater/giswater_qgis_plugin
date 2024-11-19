@@ -20,7 +20,7 @@ from ....libs import lib_vars, tools_qt, tools_log, tools_db, tools_qgis, tools_
 
 
 class GwCSVButton(GwAction):
-    """ Button 83: Csv """
+    """ Button 66: Csv """
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 

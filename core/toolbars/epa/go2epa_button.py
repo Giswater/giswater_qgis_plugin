@@ -29,7 +29,7 @@ from ..dialog import GwAction
 
 
 class GwGo2EpaButton(GwAction):
-    """ Button 41: Go2epa """
+    """ Button 42: Go2epa """
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 
@@ -57,7 +57,7 @@ class GwGo2EpaButton(GwAction):
 
 
     def _go2epa(self):
-        """ Button 23: Open form to set INP, RPT and project """
+        """ Button 42: Open form to set INP, RPT and project """
 
         # Show form in docker?
         tools_gw.init_docker('qgis_form_docker')
@@ -501,7 +501,7 @@ class GwGo2EpaButton(GwAction):
                         lyt.addItem(spacer)
 
     def _go2epa_options(self):
-        """ Button 23: Open form to set INP, RPT and project """
+        """ Button 42: Open form to set INP, RPT and project """
 
         # Clear list
         self.epa_options_list = []

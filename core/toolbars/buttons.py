@@ -36,8 +36,6 @@ from .edit.document_button import GwDocumentButton
 from .edit.document_manager_button import GwDocumentManagerButton
 from .edit.element_button import GwElementButton
 from .edit.element_manager_button import GwElementManagerButton
-
-# Cad
 from .cad.aux_circle_add_button import GwAuxCircleAddButton
 from .cad.aux_point_add_button import GwAuxPointAddButton
 

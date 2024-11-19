@@ -60,7 +60,7 @@ class GwPsector:
 
 
     def get_psector(self, psector_id=None, list_coord=None):
-        """ Buttons 61 and 62: New psector """
+        """ Buttons 51 and 52: New psector """
 
         row = tools_gw.get_config_value(parameter='admin_currency', columns='value::text', table='config_param_system')
         if row:
@@ -1661,12 +1661,12 @@ class GwPsector:
 
 
     def master_new_psector(self, psector_id=None):
-        """ Button 61: New psector """
+        """ Button 51: New psector """
         self.get_psector(psector_id)
 
 
     def manage_psectors(self):
-        """ Button 62: Psector management """
+        """ Button 52: Psector management """
 
         # Create the dialog and signals
         self.dlg_psector_mng = GwPsectorManagerUi(self)

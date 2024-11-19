@@ -47,7 +47,7 @@ class GwDocument(QObject):
 
 
     def get_document(self, tablename=None, qtable=None, item_id=None, feature=None, feature_type=None, row=None, list_tabs=None, doc_tables=None):
-        """ Button 34: Add document """
+        """ Button 31: Add document """
 
         self.rubber_band = tools_gw.create_rubberband(self.canvas)
         # Create the dialog and signals

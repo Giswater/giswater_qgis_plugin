@@ -13,7 +13,7 @@ from .... import global_vars
 
 
 class GwMincutButton(GwAction):
-    """ Button 51: Minuct """
+    """ Button 11: Minuct """
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 

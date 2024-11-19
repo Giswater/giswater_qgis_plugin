@@ -55,7 +55,7 @@ class GwVisit(QObject):
     def get_visit(self, visit_id=None, feature_type=None, feature_id=None, single_tool=True, expl_id=None, tag=None,
                   open_dlg=True, is_new_from_cf=False):
 
-        """ Button 54. Add visit.
+        """ Button 16. Add visit.
         if visit_id => load record related to the visit_id
         if feature_type => lock feature_type in relations tab
         if feature_id => load related feature basing on feature_type in relation
@@ -261,7 +261,7 @@ class GwVisit(QObject):
 
 
     def manage_visits(self, feature_type=None, feature_id=None):
-        """ Button 55: manage visits """
+        """ Button 17: manage visits """
 
         # Create the dialog
         self.dlg_visit_manager = GwVisitManagerUi(self)

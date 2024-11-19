@@ -11,7 +11,7 @@ from ...shared.nonvisual import GwNonVisual
 
 
 class GwNonVisualManagerButton(GwAction):
-    """ Button 45: Non visual objects manager """
+    """ Button 41: Non visual objects manager """
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
         super().__init__(icon_path, action_name, text, toolbar, action_group)

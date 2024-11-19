@@ -23,7 +23,7 @@ from qgis.PyQt.QtWidgets import QAction, QAbstractItemView, QCheckBox, QComboBox
     QSpinBox, QSpacerItem, QTableView, QTabWidget, QWidget, QTextEdit, QRadioButton, QToolBox, QHBoxLayout
 
 class GwFeatureTypeChangeButton(GwMaptool):
-    """ Button 28: Change feature type
+    """ Button 25: Change feature type
     User select from drop-down button feature type: ARC, NODE, CONNEC.
     Snap to this feature type is activated.
     User selects a feature of that type from the map.

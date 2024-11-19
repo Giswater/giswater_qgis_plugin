@@ -22,7 +22,7 @@ from ...shared.workcat import GwWorkcat
 
 
 class GwUtilsManagerButton(GwAction):
-    """ Button 87: Utils manager """
+    """ Button 61: Utils manager """
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 

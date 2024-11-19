@@ -446,7 +446,7 @@ class GwLoadProject(QObject):
         self._enable_toolbar("basic")
         self._enable_toolbar("utilities")
         self._enable_toolbar("toc")
-        self._hide_button("308")
+        self._hide_button("72")
 
 
     def _create_toolbar(self, toolbar_id):
@@ -496,27 +496,24 @@ class GwLoadProject(QObject):
         elif lib_vars.project_vars['project_role'] == 'role_edit':
             self._enable_toolbar("om")
             self._enable_toolbar("edit")
-            self._enable_toolbar("cad")
 
         elif lib_vars.project_vars['project_role'] == 'role_epa':
             self._enable_toolbar("om")
             self._enable_toolbar("edit")
-            self._enable_toolbar("cad")
             self._enable_toolbar("epa")
-            self._hide_button("308", False)
+            self._hide_button("72", False)
 
         elif lib_vars.project_vars['project_role'] == 'role_master' or lib_vars.project_vars['project_role'] == 'role_admin' or lib_vars.project_vars['project_role'] == 'role_system':
             self._enable_toolbar("om")
             self._enable_toolbar("edit")
-            self._enable_toolbar("cad")
             self._enable_toolbar("epa")
             self._enable_toolbar("plan")
-            self._hide_button("308", False)
+            self._hide_button("72", False)
 
         # Check if exist some feature_cat with active True on cat_feature table
         if global_vars.feature_cat is None:
-            self._enable_button("01", False)
-            self._enable_button("02", False)
+            self._enable_button("21", False)
+            self._enable_button("22", False)
 
 
     def _config_layers(self):

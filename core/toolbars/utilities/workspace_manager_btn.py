@@ -21,7 +21,7 @@ from ....libs import tools_qgis, tools_qt, tools_db
 
 
 class GwWorkspaceManagerButton(GwAction):
-    """ Button 86: Workspace manager """
+    """ Button 64: Workspace manager """
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 

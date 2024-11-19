@@ -274,7 +274,7 @@ class GwElement:
 
 
     def manage_elements(self):
-        """ Button 27: Edit element """
+        """ Button 34: Edit element """
 
         # Create the dialog
         self.dlg_man = GwElementManagerUi(self)
