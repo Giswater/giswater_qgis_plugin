@@ -54,7 +54,8 @@ BEGIN
         node_2 VARCHAR(16),
         zone_id INTEGER DEFAULT 0,
         graph_delimiter VARCHAR(30),
-        modif BOOL DEFAULT FALSE,  -- True if arcs have to be disconnected - arcs that connect with nodes at the start of mapzones and are not to_arc
+        modif1 BOOL DEFAULT FALSE,  -- True if arcs have to be disconnected on node_1
+        modif2 BOOL DEFAULT FALSE,  -- True if arcs have to be disconnected on node_2
         cost INT DEFAULT 1,
         reverse_cost INT DEFAULT 1,
         CONSTRAINT temp_pgr_arc_pkey PRIMARY KEY (pgr_arc_id)
