@@ -36,8 +36,8 @@ from .edit.document_button import GwDocumentButton
 from .edit.document_manager_button import GwDocumentManagerButton
 from .edit.element_button import GwElementButton
 from .edit.element_manager_button import GwElementManagerButton
-from .cad.aux_circle_add_button import GwAuxCircleAddButton
-from .cad.aux_point_add_button import GwAuxPointAddButton
+from .edit.aux_circle_add_button import GwAuxCircleAddButton
+from .edit.aux_point_add_button import GwAuxPointAddButton
 
 # Epa
 from .epa.go2epa_button import GwGo2EpaButton
