@@ -12,7 +12,7 @@ try:
         JUNCTIONS, OUTFALLS, DIVIDERS, STORAGE,
         CONDUITS, PUMPS, ORIFICES, WEIRS, OUTLETS,
         XSECTIONS,
-        PATTERNS,
+        PATTERNS, CURVES,
     )
     from swmm_api.input_file.sections import (
         Conduit, CrossSection, Pattern
@@ -210,8 +210,8 @@ class GwImportInpTask(GwTask):
         self.progress_changed.emit("Non-visual objects", lerp_progress(0, self.PROGRESS_CATALOGS, self.PROGRESS_NONVISUAL), "Importing patterns", True)
         self._save_patterns()
 
-        # self.progress_changed.emit("Non-visual objects", lerp_progress(40, self.PROGRESS_CATALOGS, self.PROGRESS_NONVISUAL), "Importing curves", True)
-        # self._save_curves()
+        self.progress_changed.emit("Non-visual objects", lerp_progress(40, self.PROGRESS_CATALOGS, self.PROGRESS_NONVISUAL), "Importing curves", True)
+        self._save_curves()
 
         # self.progress_changed.emit("Non-visual objects", lerp_progress(80, self.PROGRESS_CATALOGS, self.PROGRESS_NONVISUAL), "Importing controls and rules", True)
         # self._save_controls_and_rules()
@@ -467,9 +467,10 @@ class GwImportInpTask(GwTask):
         if curve_rows:
             curves_db = {x[0] for x in curve_rows}
 
-        for curve_name, curve in self.network.curves.items():
-            if curve.curve_type is None:
+        for curve_name, curve in self.network[CURVES].items():
+            if curve.kind is None:
                 message = f'The "{curve_name}" curve does not have a specified curve type and was not imported.'
+                self._log_message(message)
                 continue
 
             if curve_name in curves_db:
@@ -482,9 +483,7 @@ class GwImportInpTask(GwTask):
                     curve_name = new_name
                     break
 
-            curve_type: str = curve.curve_type
-            if curve.curve_type == "HEAD":
-                curve_type = "PUMP"
+            curve_type: str = curve.kind
 
             execute_sql(
                 "INSERT INTO inp_curve (id, curve_type) VALUES (%s, %s)",
@@ -493,8 +492,6 @@ class GwImportInpTask(GwTask):
             )
 
             for x, y in curve.points:
-                if curve_type != "VOLUME":
-                    x = from_si(FlowUnits[self.db_units], x, HydParam.Flow)
                 execute_sql(
                     "INSERT INTO inp_curve_value (curve_id, x_value, y_value) VALUES (%s, %s, %s)",
                     (curve_name, x, y),
