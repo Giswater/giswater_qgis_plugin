@@ -629,3 +629,7 @@ UPDATE config_form_fields
 
 -- 18/11/24
 UPDATE config_form_fields SET widgettype='typeahead' WHERE formname='generic' AND formtype='form_featuretype_change' AND columnname='featurecat_id' AND tabname='tab_none';
+
+-- 19/11/24
+ALTER TABLE rpt_cat_result ALTER COLUMN iscorporate SET NOT NULL;
+ALTER TABLE rpt_cat_result ALTER COLUMN iscorporate SET DEFAULT false;
