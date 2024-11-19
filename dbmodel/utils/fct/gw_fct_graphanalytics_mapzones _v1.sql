@@ -360,22 +360,20 @@ BEGIN
     END IF;
 
 	-- Update the cost/reverse_cost with the correct values for the open valves with to_arc NOT NULL
-	-- and graph_delimiter 'minsector' or null (it wasn't changed for 'forceClosed' for example)
+	-- and graph_delimiter 'minsector' or null (it wasn't changed for 'forceClosed' or 'ignore' for example)
 	-- Note: node_1 = node_2 for the new arcs generated at the nodes
     IF v_project_type = 'WS' THEN
         UPDATE temp_pgr_arc a SET reverse_cost = 0 -- for inundation process, better to be 0 instead of 1; these arcs don't exist
 		FROM temp_pgr_node n
-        WHERE a.node_1 = n.node_id AND n.pgr_node_id = n.node_id::INT
-		AND a.cost = -1 AND (a.graph_delimiter = 'minsector' OR a.graph_delimiter is null)
-		AND n.to_arc IS NOT NULL AND n.closed is null
-		AND a.pgr_node_1=a.node_1::INT;
+        WHERE a.pgr_node_1=n.pgr_node_id AND a.pgr_node_1=a.node_1::INT AND a.node_1 = a.node_2 
+    	AND (a.graph_delimiter ='minsector' OR a.graph_delimiter IS NULL) 
+		AND n.to_arc is not NULL and n.closed is null;
 
         UPDATE temp_pgr_arc a SET cost = 0 -- for inundation process, better to be 0 instead of 1; these arcs don't exist
 		FROM temp_pgr_node n
-        WHERE a.node_1 = n.node_id AND n.pgr_node_id = n.node_id::INT
-		AND a.cost = -1 AND (a.graph_delimiter = 'minsector' OR a.graph_delimiter is null)
-		AND n.to_arc IS NOT NULL AND n.closed is null
-		AND pgr_node_2 = node_2::INT;
+        WHERE a.pgr_node_2=n.pgr_node_id AND a.pgr_node_2=a.node_2::INT AND a.node_1 = a.node_2 
+    	AND (a.graph_delimiter ='minsector' OR a.graph_delimiter IS NULL) 
+		AND n.to_arc is not NULL and n.closed is null;
     END IF;
 
     EXECUTE 'SELECT COUNT(*)::INT FROM temp_pgr_arc'
