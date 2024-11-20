@@ -1131,7 +1131,7 @@ CREATE OR REPLACE VIEW vu_gully AS
             WHEN gully.sector_id > 0 AND vst.is_operative = true AND gully.epa_type::text = 'GULLY'::character varying(16)::text AND cpu.value = '2' THEN gully.epa_type
             ELSE NULL::character varying(16)
         END AS inp_type
-   FROM (SELECT inp_netw_mode.value FROM inp_netw_mode) cpu,, gully
+   FROM (SELECT inp_netw_mode.value FROM inp_netw_mode) cpu, gully
      LEFT JOIN cat_gully ON gully.gullycat_id::text = cat_gully.id::text
      LEFT JOIN dma ON gully.dma_id = dma.dma_id
      LEFT JOIN sector ON gully.sector_id = sector.sector_id
