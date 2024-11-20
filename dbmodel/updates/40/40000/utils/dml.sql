@@ -656,3 +656,21 @@ VALUES (3349, 'gw_fct_get_epa_selector', 'ws', 'function', 'json', 'json', 'Func
 
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, "source")
 VALUES (3350, 'gw_fct_get_epa_selector', 'ud', 'function', 'json', 'json', 'Function to get epa selector dialog with filled combos', 'role_basic', 'core');
+
+
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('layout_name_typevalue', 'lyt_epa_select_1', 'lyt_epa_select_1', 'layoutEpaSelector1', '{"lytOrientation": "vertical"}'::json);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('layout_name_typevalue', 'lyt_epa_select_2', 'lyt_epa_select_2', 'layoutEpaSelector2', '{"lytOrientation": "vertical"}'::json);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('layout_name_typevalue', 'lyt_epa_select_3', 'lyt_epa_select_3', 'layoutEpaSelector3', '{"lytOrientation": "vertical"}'::json);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('layout_name_typevalue', 'lyt_result_1', 'lyt_result_1', 'layoutResult1', '{"lytOrientation": "vertical"}'::json);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('layout_name_typevalue', 'lyt_time_1', 'lyt_time_1', 'layoutTime1', '{"lytOrientation": "vertical"}'::json);
+
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('tabname_typevalue', 'tab_result', 'tab_result', 'tabResult', NULL);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('tabname_typevalue', 'tab_time', 'tab_time', 'tabTime', NULL);
+
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('widgettype_typevalue', 'tabwidget', 'tabwidget', 'tabwidget', NULL);
+
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('formtype_typevalue', 'epa_selector', 'epa_selector', 'epaSelector', NULL);
+
+INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('epa_selector', 'tab_result', 'Result', 'Result', 'role_baisc', NULL, NULL, 0, '{5}');
+
+INSERT INTO config_param_system ("parameter", value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, placeholder, standardvalue, layoutname) VALUES('epa_selector_tab_result', '{"layouts":["lyt_result_1"]}', NULL, NULL, NULL, NULL, false, NULL, 'utils', NULL, NULL, 'string', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
