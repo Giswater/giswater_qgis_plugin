@@ -244,7 +244,7 @@ BEGIN
 		-- ARCS VALVES
 		-- arcs to modify:
 		-- for the closed valves when to_arc IS NULL, one of the arcs that connect to the valve
-		UPDATE temp_pgr_arc t 
+		UPDATE temp_pgr_arc t
 		SET
 		    modif1= CASE WHEN s.node_id = s.node_1 THEN true ELSE modif1 END,
         	modif2= CASE WHEN s.node_id = s.node_2 THEN true ELSE modif2 END
@@ -257,14 +257,14 @@ BEGIN
 		WHERE t.arc_id = s.arc_id;
 
         -- for the valves with to_arc NOT NULL; the InletArc - the one that is not to_arc
-  		UPDATE amsa_pgr_arc t 
-		SET 
+  		UPDATE temp_pgr_arc t
+		SET
 			modif1= CASE WHEN s.node_id = s.node_1 THEN true ELSE modif1 END,
         	modif2= CASE WHEN s.node_id = s.node_2 THEN true ELSE modif2 END
-		FROM 
+		FROM
 		(SELECT a.arc_id, n.node_id, n.to_arc, a.node_1, a.node_2
-			FROM  amsa_pgr_node n 
-			JOIN amsa_pgr_arc a ON n.node_id IN (a.node_1, a.node_2)
+			FROM  temp_pgr_node n
+			JOIN temp_pgr_arc a ON n.node_id IN (a.node_1, a.node_2)
 			WHERE n.modif=true AND n.to_arc IS NOT NULL AND a.arc_id<>n.to_arc
 		) s
 		WHERE t.arc_id= s.arc_id;
@@ -365,14 +365,14 @@ BEGIN
     IF v_project_type = 'WS' THEN
         UPDATE temp_pgr_arc a SET reverse_cost = 0 -- for inundation process, better to be 0 instead of 1; these arcs don't exist
 		FROM temp_pgr_node n
-        WHERE a.pgr_node_1=n.pgr_node_id AND a.pgr_node_1=a.node_1::INT AND a.node_1 = a.node_2 
-    	AND (a.graph_delimiter ='minsector' OR a.graph_delimiter IS NULL) 
+        WHERE a.pgr_node_1=n.pgr_node_id AND a.pgr_node_1=a.node_1::INT AND a.node_1 = a.node_2
+    	AND (a.graph_delimiter ='minsector' OR a.graph_delimiter IS NULL)
 		AND n.to_arc is not NULL and n.closed is null;
 
         UPDATE temp_pgr_arc a SET cost = 0 -- for inundation process, better to be 0 instead of 1; these arcs don't exist
 		FROM temp_pgr_node n
-        WHERE a.pgr_node_2=n.pgr_node_id AND a.pgr_node_2=a.node_2::INT AND a.node_1 = a.node_2 
-    	AND (a.graph_delimiter ='minsector' OR a.graph_delimiter IS NULL) 
+        WHERE a.pgr_node_2=n.pgr_node_id AND a.pgr_node_2=a.node_2::INT AND a.node_1 = a.node_2
+    	AND (a.graph_delimiter ='minsector' OR a.graph_delimiter IS NULL)
 		AND n.to_arc is not NULL and n.closed is null;
     END IF;
 
