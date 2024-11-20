@@ -343,19 +343,19 @@ AS SELECT d.dqa_id,
 
 
 CREATE OR REPLACE VIEW v_edit_macrosector
-AS SELECT macrosector_id,
+AS SELECT distinct on (macrosector_id) macrosector_id,
     m.name,
     m.descript,
     m.the_geom,
     m.undelete,
     m.active
-   FROM selector_sector ss, macrosector m join sector s using (macrosector_id) 
-   where ss.sector_id = s.sector_id and cur_user = current_user
+   FROM selector_sector ss, macrosector m left join sector s using (macrosector_id) 
+   where (ss.sector_id = s.sector_id and cur_user = current_user or s.macrosector_id is null)
    and m.active is true;
-   
+
    
 CREATE OR REPLACE VIEW v_edit_macroexploitation
 AS SELECT distinct  on (macroexpl_id) m.*
    FROM selector_expl ss, macroexploitation m join exploitation s using (macroexpl_id) 
-   where ss.expl_id = s.expl_id and cur_user = current_user
+   where (ss.expl_id = s.expl_id and cur_user = current_user or s.macroexpl_id is null)
    and m.active is true;
