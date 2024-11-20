@@ -945,3 +945,11 @@ INSERT INTO sys_param_user (id,formname,descript,sys_role,idval,"label",dv_query
 	VALUES ('inp_report_headloss','epaoptions','If true, value of headloss will be reported','role_epa','HEADLOSS','Headloss','SELECT idval AS id, idval FROM inp_typevalue WHERE typevalue=''inp_value_yesno''',true,11,'ws',false,false,'string','combo',true,'YES','lyt_reports_1',false,'core');
 
 DELETE FROM config_form_fields WHERE columnname = 'energyvalue';
+
+-- 20/11/2024
+UPDATE config_form_fields SET dv_querytext_filterc = ' AND arc_type'
+WHERE dv_querytext_filterc ilike '%arctype_id%';
+UPDATE config_form_fields SET dv_querytext_filterc = ' AND node_type'
+WHERE dv_querytext_filterc ilike '%nodetype_id%';
+UPDATE config_form_fields SET dv_querytext_filterc = ' AND connec_type'
+WHERE dv_querytext_filterc ilike '%connectype_id%';
