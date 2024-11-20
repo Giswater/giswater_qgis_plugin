@@ -512,7 +512,7 @@ class GwImportInpTask(GwTask):
             ts_data_f = tuple()
             if not ts_data:
                 return ts_data_f
-            def format_time(time, value):
+            def format_time(time, value) -> tuple:
                 if isinstance(time, float):
                     total_minutes = int(time * 60)
                     hh = total_minutes // 60
@@ -522,6 +522,7 @@ class GwImportInpTask(GwTask):
                     date_str = time.strftime("%m/%d/%Y")
                     time_str = time.strftime("%H:%M")
                     return (f"{date_str}", f"{time_str}", value)
+                return tuple()
 
             ts_data_f = format_time(ts_data[0], ts_data[1])
             return ts_data_f
@@ -569,8 +570,7 @@ class GwImportInpTask(GwTask):
                     values = "%s, %s, %s, %s"
                 else:
                     continue
-                print(ts_name)
-                print(ts_data_f)
+
                 execute_sql(
                     f"INSERT INTO inp_timeseries_value ({fields}) VALUES ({values})",
                     (ts_name,) + ts_data_f,
