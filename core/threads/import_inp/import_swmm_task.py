@@ -2,6 +2,7 @@ import traceback
 from datetime import date
 from itertools import count, islice
 from typing import Any
+from datetime import datetime
 
 from psycopg2.extras import execute_values
 
@@ -12,10 +13,10 @@ try:
         JUNCTIONS, OUTFALLS, DIVIDERS, STORAGE,
         CONDUITS, PUMPS, ORIFICES, WEIRS, OUTLETS,
         XSECTIONS,
-        PATTERNS, CURVES,
+        PATTERNS, CURVES, TIMESERIES
     )
     from swmm_api.input_file.sections import (
-        Conduit, CrossSection, Pattern
+        Conduit, CrossSection, Pattern, TimeseriesData, TimeseriesFile
     )
 except ImportError:
     pass
@@ -149,7 +150,7 @@ class GwImportInpTask(GwTask):
         self.dscenario_id: int = None
         self.catalogs: dict[str, Any] = catalogs
         self.log: list[str] = []
-        self.mappings: dict[str, dict[str, str]] = {"curves": {}, "patterns": {}}
+        self.mappings: dict[str, dict[str, str]] = {"curves": {}, "patterns": {}, "timeseries": {}}
         self.arccat_db: list[str] = []
         self.db_units = None
         self.exception: str = ""
@@ -212,6 +213,9 @@ class GwImportInpTask(GwTask):
 
         self.progress_changed.emit("Non-visual objects", lerp_progress(40, self.PROGRESS_CATALOGS, self.PROGRESS_NONVISUAL), "Importing curves", True)
         self._save_curves()
+
+        self.progress_changed.emit("Non-visual objects", lerp_progress(60, self.PROGRESS_CATALOGS, self.PROGRESS_NONVISUAL), "Importing timeseries", True)
+        self._save_timeseries()
 
         # self.progress_changed.emit("Non-visual objects", lerp_progress(80, self.PROGRESS_CATALOGS, self.PROGRESS_NONVISUAL), "Importing controls and rules", True)
         # self._save_controls_and_rules()
@@ -495,6 +499,81 @@ class GwImportInpTask(GwTask):
                 execute_sql(
                     "INSERT INTO inp_curve_value (curve_id, x_value, y_value) VALUES (%s, %s, %s)",
                     (curve_name, x, y),
+                    commit=False,
+                )
+
+    def _save_timeseries(self) -> None:
+        ts_rows = get_rows("SELECT id FROM inp_timeseries", commit=False)
+        ts_db: set[str] = set()
+        if ts_rows:
+            ts_db = {x[0] for x in ts_rows}
+
+        def format_ts(ts_data: tuple) -> tuple:
+            ts_data_f = tuple()
+            if not ts_data:
+                return ts_data_f
+            def format_time(time, value):
+                if isinstance(time, float):
+                    total_minutes = int(time * 60)
+                    hh = total_minutes // 60
+                    mm = total_minutes % 60
+                    return (f"{hh:02}:{mm:02}", value)
+                if isinstance(time, datetime):
+                    date_str = time.strftime("%m/%d/%Y")
+                    time_str = time.strftime("%H:%M")
+                    return (f"{date_str}", f"{time_str}", value)
+
+            ts_data_f = format_time(ts_data[0], ts_data[1])
+            return ts_data_f
+
+        for ts_name, ts in self.network[TIMESERIES].items():
+            if ts is None:
+                message = f'The timeseries "{ts_name}" was not imported.'
+                self._log_message(message)
+                continue
+
+            if ts_name in ts_db:
+                for i in count(2):
+                    new_name = f"{ts_name}_{i}"
+                    if new_name in ts_db:
+                        continue
+                    message = f'The curve "{ts_name}" has been renamed to "{new_name}" to avoid a collision with an existing curve.'
+                    self.mappings["timeseries"][ts_name] = new_name
+                    ts_name = new_name
+                    break
+
+            fname = None
+            times_type = None
+            if type(ts) is TimeseriesFile:  # TODO: import timeseries from file?
+                fname = ts.filename
+                times_type = "FILE"
+            elif type(ts) is TimeseriesData:
+                times_type = "ABSOLUTE" if isinstance(ts.data[0][0], datetime) else "RELATIVE"
+
+            execute_sql(
+                "INSERT INTO inp_timeseries (id, timser_type, times_type, fname) VALUES (%s, 'Other', %s, %s)",
+                (ts_name, times_type, fname),
+                commit=False,
+            )
+
+            if times_type == "FILE":  # TODO: import timeseries from file?
+                continue
+
+            for ts_data in ts.data:
+                ts_data_f = format_ts(ts_data)
+                if len(ts_data_f) == 2:
+                    fields = "timser_id, time, value"
+                    values = "%s, %s, %s"
+                elif len(ts_data_f) == 3:
+                    fields = "timser_id, date, hour, value"
+                    values = "%s, %s, %s, %s"
+                else:
+                    continue
+                print(ts_name)
+                print(ts_data_f)
+                execute_sql(
+                    f"INSERT INTO inp_timeseries_value ({fields}) VALUES ({values})",
+                    (ts_name,) + ts_data_f,
                     commit=False,
                 )
 
