@@ -978,6 +978,9 @@ class Control(BaseSectionObject):
             elif last is SECTIONS.ACTIONS_ELSE:
                 kwargs['actions_else'].append(cls._Action(*line))
 
+        if not all(key in kwargs for key in ['name', 'conditions', 'actions_if']):
+            return
+
         # last
         yield Control(**kwargs)
 
