@@ -220,9 +220,9 @@ class GwImportInpTask(GwTask):
             self.progress_changed.emit("Non-visual objects", lerp_progress(60, self.PROGRESS_CATALOGS, self.PROGRESS_NONVISUAL), "Importing timeseries", True)
             self._save_timeseries()
 
-        # if CONTROLS in self.network:  # type: ignore
-        #     self.progress_changed.emit("Non-visual objects", lerp_progress(80, self.PROGRESS_CATALOGS, self.PROGRESS_NONVISUAL), "Importing controls", True)
-        #     self._save_controls()
+        if CONTROLS in self.network:  # type: ignore
+            self.progress_changed.emit("Non-visual objects", lerp_progress(80, self.PROGRESS_CATALOGS, self.PROGRESS_NONVISUAL), "Importing controls", True)
+            self._save_controls()
 
         # if LID_CONTROLS in self.network:  # type: ignore
         #     self.progress_changed.emit("Non-visual objects", lerp_progress(80, self.PROGRESS_CATALOGS, self.PROGRESS_NONVISUAL), "Importing LIDs", True)
@@ -591,35 +591,15 @@ class GwImportInpTask(GwTask):
         if controls_rows:
             controls_db = {x[0] for x in controls_rows}
 
-        for control_name, control in self.network.controls():
-            control_dict = control.to_dict()
-            condition = control.condition
-            then_actions = control_dict.get("then_actions")
-            else_actions = control_dict.get("else_actions")
-            priority = control.priority
-            if type(control) is Control:
-                text = f"IF {condition} THEN {' AND '.join(then_actions)} PRIORITY {priority}"
-                if text in controls_db:
-                    msg = f"The control '{control_name}' is already on database. Skipping..."
-                    self._log_message(msg)
-                    continue
-
-                sql = "INSERT INTO inp_controls (sector_id, text, active) VALUES (%s, %s, true)"
-                params = (self.sector, text)
-                execute_sql(sql, params, commit=False)
-            elif type(control) is Rule:
-                text = f"RULE {control.name}\nIF {condition}\nTHEN {'\nAND '.join(then_actions)}"
-                if else_actions:
-                    text += f"\nELSE {else_actions}"
-                text += f"\nPRIORITY {priority}"
-                if text in rules_db:
-                    msg = f"The rule '{control_name}' is already on database. Skipping..."
-                    self._log_message(msg)
-                    continue
-
-                sql = "INSERT INTO inp_rules (sector_id, text, active) VALUES (%s, %s, true)"
-                params = (self.sector, text)
-                execute_sql(sql, params, commit=False)
+        for control_name, control in self.network[CONTROLS].items():
+            text = control.to_inp_line()
+            if text in controls_db:
+                msg = f"The control '{control_name}' is already on database. Skipping..."
+                self._log_message(msg)
+                continue
+            sql = "INSERT INTO inp_controls (sector_id, text, active) VALUES (%s, %s, true)"
+            params = (self.sector, text)
+            execute_sql(sql, params, commit=False)
 
     def _save_lids(self) -> None:
         pass
