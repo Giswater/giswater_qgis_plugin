@@ -163,6 +163,12 @@ BEGIN
 
 				ELSIF  v_tabname = 'tab_sector' THEN
 					EXECUTE 'INSERT INTO selector_sector SELECT sector_id, current_user FROM config_user_x_sector WHERE username = current_user ON CONFLICT DO NOTHING';
+
+				ELSIF v_tabname='tab_municipality' THEN
+					EXECUTE concat('INSERT INTO ',v_tablename,' (',v_columnname,', cur_user) SELECT ',v_tableid,', current_user FROM ',v_table,'
+					',(CASE when v_ids is not null then concat(' WHERE id = ANY(ARRAY',v_ids,')') end),' WHERE active AND muni_id > 0
+					ON CONFLICT (',v_columnname,', cur_user) DO NOTHING;');
+				
 				END IF;
 
 			ELSIF v_tabname='tab_macroexploitation' OR v_tabname='tab_macrosector' THEN
@@ -342,7 +348,6 @@ BEGIN
 		END IF;
 	END IF;
 
-	SELECT count(the_geom) INTO v_count_2 FROM v_edit_node LIMIT 1;
 	/*set expl as vdefault if only one value on selector. In spite expl_vdefault is a hidden value, user can enable this variable if he needs it when working on more than
 	one exploitation in order to choose what is the default (remember default value has priority over spatial intersection)*/
 	
@@ -402,7 +407,6 @@ BEGIN
 			DELETE FROM selector_municipality WHERE cur_user = current_user;
 			INSERT INTO selector_municipality
 			SELECT DISTINCT muni_id, current_user FROM node WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user);
-			
 		END IF;
 
 		-- inserting expl and muni from selected sectors
@@ -419,7 +423,7 @@ BEGIN
 			SELECT DISTINCT muni_id, current_user FROM node WHERE sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user = current_user AND sector_id > 0);		
 		END IF;
 
-		-- inserting expl from selected muni
+		-- inserting muni_id from selected muni
 		IF v_tabname IN ('tab_municipality') THEN
 
 			-- expl
@@ -444,6 +448,8 @@ BEGIN
 	END IF;
 
 	-- get envelope
+	SELECT count(the_geom) INTO v_count_2 FROM v_edit_node LIMIT 1;
+
 	IF v_tabname IN ('tab_sector', 'tab_macrosector') THEN
 		SELECT row_to_json (a)
 		INTO v_geometry
@@ -451,6 +457,12 @@ BEGIN
 		st_xmax(the_geom)::numeric(12,2) as x2, st_ymax(the_geom)::numeric(12,2) as y2
 		FROM (SELECT st_expand(st_collect(the_geom), v_expand) as the_geom FROM sector where sector_id IN
 		(SELECT sector_id FROM selector_sector WHERE cur_user=current_user)) b) a;
+	
+	ELSIF v_count_2 > 0 or (v_checkall IS False and v_id is null) THEN
+		SELECT row_to_json (a)
+		INTO v_geometry
+		FROM (SELECT st_xmin(the_geom)::numeric(12,2) as x1, st_ymin(the_geom)::numeric(12,2) as y1, st_xmax(the_geom)::numeric(12,2) as x2, st_ymax(the_geom)::numeric(12,2) as y2
+		FROM (SELECT st_expand(st_collect(the_geom), v_expand) as the_geom FROM v_edit_node) b) a;
 
 	ELSIF v_tabname='tab_exploitation_add' THEN
 		EXECUTE 'SELECT row_to_json (a) 
@@ -463,30 +475,27 @@ BEGIN
 	ELSIF v_tabname IN ('tab_hydro_state', 'tab_psector', 'tab_network_state', 'tab_dscenario') THEN
 		v_geometry = NULL;
 
-	ELSIF v_count_2 > 0 IS NOT NULL or (v_checkall IS False and v_id is null) THEN
-		SELECT row_to_json (a)
-		INTO v_geometry
-		FROM (SELECT st_xmin(the_geom)::numeric(12,2) as x1, st_ymin(the_geom)::numeric(12,2) as y1, st_xmax(the_geom)::numeric(12,2) as x2, st_ymax(the_geom)::numeric(12,2) as y2
-		FROM (SELECT st_expand(st_collect(the_geom), v_expand) as the_geom FROM v_edit_node) b) a;
-
 	ELSIF v_tabname='tab_exploitation' THEN
 		SELECT row_to_json (a)
 		INTO v_geometry
 		FROM (SELECT st_xmin(the_geom)::numeric(12,2) as x1, st_ymin(the_geom)::numeric(12,2) as y1, st_xmax(the_geom)::numeric(12,2) as x2, st_ymax(the_geom)::numeric(12,2) as y2
 		FROM (SELECT st_expand(the_geom, v_expand) as the_geom FROM exploitation where expl_id IN
 		(SELECT expl_id FROM selector_expl WHERE cur_user=current_user)) b) a;
+	
+	ELSIF v_tabname='tab_municipality' THEN
+		SELECT row_to_json (a)
+		INTO v_geometry
+		FROM (SELECT st_xmin(the_geom)::numeric(12,2) as x1, st_ymin(the_geom)::numeric(12,2) as y1, st_xmax(the_geom)::numeric(12,2) as x2, st_ymax(the_geom)::numeric(12,2) as y2
+		FROM (SELECT st_expand(the_geom, v_expand) as the_geom FROM ext_municipality where muni_id IN
+		(SELECT muni_id FROM selector_municipality WHERE cur_user=current_user)) b) a;
+
 	END IF;
-
-	-- Force sector selector for 0 values
-	INSERT INTO selector_sector VALUES (0, current_user) ON CONFLICT (sector_id, cur_user) DO NOTHING;
-
-	-- Force muni selector for 0 values
-	INSERT INTO selector_municipality VALUES (0, current_user) ON CONFLICT (muni_id, cur_user) DO NOTHING;
 
 	-- get uservalues
 	PERFORM gw_fct_workspacemanager($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},"data":{"filterFields":{}, "pageInfo":{}, "action":"CHECK"}}$$);
 	v_uservalues = (SELECT to_json(array_agg(row_to_json(a))) FROM (SELECT parameter, value FROM config_param_user WHERE parameter IN ('plan_psector_vdefault', 'utils_workspace_vdefault')
 	AND cur_user = current_user ORDER BY parameter)a);
+
 
 	-- Control NULL's
 	v_geometry := COALESCE(v_geometry, '{}');

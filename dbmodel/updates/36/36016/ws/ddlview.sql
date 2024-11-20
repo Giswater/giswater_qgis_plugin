@@ -340,3 +340,22 @@ AS SELECT d.dqa_id,
   WHERE d.dqa_id > 0
   and s.expl_id = d.expl_id and s.cur_user = current_user
   ORDER BY d.dqa_id;
+
+
+CREATE OR REPLACE VIEW v_edit_macrosector
+AS SELECT macrosector_id,
+    m.name,
+    m.descript,
+    m.the_geom,
+    m.undelete,
+    m.active
+   FROM selector_sector ss, macrosector m join sector s using (macrosector_id) 
+   where ss.sector_id = s.sector_id and cur_user = current_user
+   and m.active is true;
+   
+   
+CREATE OR REPLACE VIEW v_edit_macroexploitation
+AS SELECT distinct  on (macroexpl_id) m.*
+   FROM selector_expl ss, macroexploitation m join exploitation s using (macroexpl_id) 
+   where ss.expl_id = s.expl_id and cur_user = current_user
+   and m.active is true;
