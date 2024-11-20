@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-DROP FUNCTION SCHEMA_NAME.gw_fct_set_epa_selector(json);
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_set_epa_selector(json);
 -- FUNCTION CODE: 3348
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_set_epa_selector(p_data json)
  RETURNS json
