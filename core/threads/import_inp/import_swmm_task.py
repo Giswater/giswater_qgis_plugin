@@ -13,7 +13,7 @@ try:
         JUNCTIONS, OUTFALLS, DIVIDERS, STORAGE,
         CONDUITS, PUMPS, ORIFICES, WEIRS, OUTLETS,
         XSECTIONS,
-        PATTERNS, CURVES, TIMESERIES
+        PATTERNS, CURVES, TIMESERIES, CONTROLS, LID_CONTROLS, LID_USAGE
     )
     from swmm_api.input_file.sections import (
         Conduit, CrossSection, Pattern, TimeseriesData, TimeseriesFile
@@ -208,17 +208,25 @@ class GwImportInpTask(GwTask):
         self._create_new_conduit_catalogs()
 
     def _manage_nonvisual(self) -> None:
-        self.progress_changed.emit("Non-visual objects", lerp_progress(0, self.PROGRESS_CATALOGS, self.PROGRESS_NONVISUAL), "Importing patterns", True)
-        self._save_patterns()
+        if PATTERNS in self.network:  # type: ignore
+            self.progress_changed.emit("Non-visual objects", lerp_progress(0, self.PROGRESS_CATALOGS, self.PROGRESS_NONVISUAL), "Importing patterns", True)
+            self._save_patterns()
 
-        self.progress_changed.emit("Non-visual objects", lerp_progress(40, self.PROGRESS_CATALOGS, self.PROGRESS_NONVISUAL), "Importing curves", True)
-        self._save_curves()
+        if CURVES in self.network:  # type: ignore
+            self.progress_changed.emit("Non-visual objects", lerp_progress(40, self.PROGRESS_CATALOGS, self.PROGRESS_NONVISUAL), "Importing curves", True)
+            self._save_curves()
 
-        self.progress_changed.emit("Non-visual objects", lerp_progress(60, self.PROGRESS_CATALOGS, self.PROGRESS_NONVISUAL), "Importing timeseries", True)
-        self._save_timeseries()
+        if TIMESERIES in self.network:  # type: ignore
+            self.progress_changed.emit("Non-visual objects", lerp_progress(60, self.PROGRESS_CATALOGS, self.PROGRESS_NONVISUAL), "Importing timeseries", True)
+            self._save_timeseries()
 
-        # self.progress_changed.emit("Non-visual objects", lerp_progress(80, self.PROGRESS_CATALOGS, self.PROGRESS_NONVISUAL), "Importing controls and rules", True)
-        # self._save_controls_and_rules()
+        # if CONTROLS in self.network:  # type: ignore
+        #     self.progress_changed.emit("Non-visual objects", lerp_progress(80, self.PROGRESS_CATALOGS, self.PROGRESS_NONVISUAL), "Importing controls", True)
+        #     self._save_controls()
+
+        # if LID_CONTROLS in self.network:  # type: ignore
+        #     self.progress_changed.emit("Non-visual objects", lerp_progress(80, self.PROGRESS_CATALOGS, self.PROGRESS_NONVISUAL), "Importing LIDs", True)
+        #     self._save_lids()
 
     def _manage_visual(self) -> None:
         self.progress_changed.emit("Visual objects", lerp_progress(0, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing junctions", True)
@@ -577,18 +585,11 @@ class GwImportInpTask(GwTask):
                     commit=False,
                 )
 
-    def _save_controls_and_rules(self) -> None:
-        from wntr.network.controls import Control, Rule
-
+    def _save_controls(self) -> None:
         controls_rows = get_rows("SELECT text FROM inp_controls", commit=False)
         controls_db: set[str] = set()
         if controls_rows:
             controls_db = {x[0] for x in controls_rows}
-
-        rules_rows = get_rows("SELECT text FROM inp_rules", commit=False)
-        rules_db: set[str] = set()
-        if rules_rows:
-            rules_db = {x[0] for x in rules_rows}
 
         for control_name, control in self.network.controls():
             control_dict = control.to_dict()
@@ -620,6 +621,8 @@ class GwImportInpTask(GwTask):
                 params = (self.sector, text)
                 execute_sql(sql, params, commit=False)
 
+    def _save_lids(self) -> None:
+        pass
 
     def _save_junctions(self) -> None:
         node_sql = """ 
