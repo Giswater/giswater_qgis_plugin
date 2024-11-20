@@ -347,13 +347,13 @@ CREATE OR REPLACE VIEW vu_link AS
         ),inp_netw_mode AS (
          WITH inp_netw_mode_aux AS (
                  SELECT count(*) AS t
-                   FROM inframoura_ws.config_param_user
+                   FROM config_param_user
                   WHERE config_param_user.parameter::text = 'inp_options_networkmode'::text AND config_param_user.cur_user::text = CURRENT_USER
                 )
          SELECT
                 CASE
                     WHEN inp_netw_mode_aux.t > 0 THEN ( SELECT config_param_user.value
-                       FROM inframoura_ws.config_param_user
+                       FROM config_param_user
                       WHERE config_param_user.parameter::text = 'inp_options_networkmode'::text AND config_param_user.cur_user::text = CURRENT_USER)
                     ELSE NULL::text
                 END AS value
@@ -441,13 +441,13 @@ CREATE OR REPLACE VIEW vu_connec AS
         ), inp_netw_mode AS (
          WITH inp_netw_mode_aux AS (
                  SELECT count(*) AS t
-                   FROM inframoura_ws.config_param_user
+                   FROM config_param_user
                   WHERE config_param_user.parameter::text = 'inp_options_networkmode'::text AND config_param_user.cur_user::text = CURRENT_USER
                 )
          SELECT
                 CASE
                     WHEN inp_netw_mode_aux.t > 0 THEN ( SELECT config_param_user.value
-                       FROM inframoura_ws.config_param_user
+                       FROM config_param_user
                       WHERE config_param_user.parameter::text = 'inp_options_networkmode'::text AND config_param_user.cur_user::text = CURRENT_USER)
                     ELSE NULL::text
                 END AS value

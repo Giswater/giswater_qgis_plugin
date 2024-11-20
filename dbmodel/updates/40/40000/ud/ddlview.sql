@@ -1011,13 +1011,13 @@ CREATE OR REPLACE VIEW vu_gully AS
         ), inp_netw_mode AS (
          WITH inp_netw_mode_aux AS (
                  SELECT count(*) AS t
-                   FROM inframoura_ws.config_param_user
+                   FROM config_param_user
                   WHERE config_param_user.parameter::text = 'inp_options_networkmode'::text AND config_param_user.cur_user::text = CURRENT_USER
                 )
          SELECT
                 CASE
                     WHEN inp_netw_mode_aux.t > 0 THEN ( SELECT config_param_user.value
-                       FROM inframoura_ws.config_param_user
+                       FROM config_param_user
                       WHERE config_param_user.parameter::text = 'inp_options_networkmode'::text AND config_param_user.cur_user::text = CURRENT_USER)
                     ELSE NULL::text
                 END AS value
@@ -4592,4 +4592,3 @@ AS SELECT sd.dscenario_id,
     inp_dscenario_lids l
      JOIN v_edit_inp_subcatchment s USING (subc_id)
   WHERE l.dscenario_id = sd.dscenario_id AND sd.cur_user = CURRENT_USER;
- 
