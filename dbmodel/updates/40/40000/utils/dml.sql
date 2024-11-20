@@ -650,3 +650,9 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, "source")
 VALUES (3348, 'gw_fct_set_epa_selector', 'utils', 'function', 'json', 'json', 'Function to update tables with new selected values', 'role_basic', 'core');
+
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, "source")
+VALUES (3349, 'gw_fct_get_epa_selector', 'ws', 'function', 'json', 'json', 'Function to get epa selector dialog with filled combos', 'role_basic', 'core');
+
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, "source")
+VALUES (3350, 'gw_fct_get_epa_selector', 'ud', 'function', 'json', 'json', 'Function to get epa selector dialog with filled combos', 'role_basic', 'core');
