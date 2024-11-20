@@ -360,19 +360,19 @@ BEGIN
     END IF;
 
 	-- Update the cost/reverse_cost with the correct values for the open valves with to_arc NOT NULL
-	-- and graph_delimiter 'minsector' or null (it wasn't changed for 'forceClosed' or 'ignore' for example)
+	-- and graph_delimiter 'minsector' or 'none' (it wasn't changed for 'forceClosed' or 'ignore' for example)
 	-- Note: node_1 = node_2 for the new arcs generated at the nodes
     IF v_project_type = 'WS' THEN
         UPDATE temp_pgr_arc a SET reverse_cost = 0 -- for inundation process, better to be 0 instead of 1; these arcs don't exist
 		FROM temp_pgr_node n
         WHERE a.pgr_node_1=n.pgr_node_id AND a.pgr_node_1=a.node_1::INT AND a.node_1 = a.node_2
-    	AND (a.graph_delimiter ='minsector' OR a.graph_delimiter IS NULL)
+    	AND (a.graph_delimiter ='minsector' OR a.graph_delimiter = 'none')
 		AND n.to_arc is not NULL and n.closed is null;
 
         UPDATE temp_pgr_arc a SET cost = 0 -- for inundation process, better to be 0 instead of 1; these arcs don't exist
 		FROM temp_pgr_node n
         WHERE a.pgr_node_2=n.pgr_node_id AND a.pgr_node_2=a.node_2::INT AND a.node_1 = a.node_2
-    	AND (a.graph_delimiter ='minsector' OR a.graph_delimiter IS NULL)
+    	AND (a.graph_delimiter ='minsector' OR a.graph_delimiter = 'none')
 		AND n.to_arc is not NULL and n.closed is null;
     END IF;
 
@@ -433,7 +433,7 @@ BEGIN
     	GROUP BY node_id
    		HAVING COUNT(DISTINCT zone_id) > 1
 	) s
-	WHERE n.node_id = s.node_id;
+	WHERE n.node_id = s.node_id AND n.graph_delimiter <> 'sector';
 
 	-- The connecs take the zone_id of the arc they are associated with and the link takes the zone_id of the gully
     UPDATE temp_pgr_connec c SET zone_id = a.zone_id
