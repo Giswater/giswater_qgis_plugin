@@ -418,8 +418,9 @@ BEGIN
 	-- Update arcs
     UPDATE temp_pgr_arc a SET zone_id = n.zone_id
     FROM temp_pgr_node n
-    WHERE (a.pgr_node_1 = n.pgr_node_id AND a.cost >= 0)
-	OR (a.pgr_node_2 = n.pgr_node_id AND reverse_cost >= 0);
+    WHERE ((a.pgr_node_1 = n.pgr_node_id AND a.cost >= 0)
+	OR (a.pgr_node_2 = n.pgr_node_id AND reverse_cost >= 0))
+	AND n.zone_id <> 0;
 
 	-- Now set to '0' the nodes that connect arcs with different zone_id
 	-- Note: if a closed valve, for example, is between sector 2 and sector 3, it means it is a boundary, it will have '0' as zone_id; if it is between -1 and 2 it will also have 0;
