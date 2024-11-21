@@ -30,7 +30,7 @@ from qgis.utils import reloadPlugin
 from .gis_file_create import GwGisFileCreate
 from ..threads.task import GwTask
 from ..ui.ui_manager import GwAdminUi, GwAdminDbProjectUi, GwAdminRenameProjUi, GwAdminProjectInfoUi, \
-    GwAdminGisProjectUi, GwAdminImportUi, GwAdminFieldsUi, GwCredentialsUi, GwReplaceInFileUi
+    GwAdminGisProjectUi, GwAdminFieldsUi, GwCredentialsUi, GwReplaceInFileUi
 from ..utils import tools_gw
 from ... import global_vars
 from .i18n_generator import GwI18NGenerator
@@ -133,8 +133,6 @@ class GwAdminButton:
         # Save in settings
         tools_gw.set_config_parser('btn_admin', 'project_name_schema', f'{project_name_schema}', prefix=False)
         tools_gw.set_config_parser('btn_admin', 'project_descript', f'{project_descript}', prefix=False)
-        inp_file_path = tools_qt.get_text(self.dlg_readsql_create_project, 'data_file', False, False)
-        tools_gw.set_config_parser('btn_admin', 'inp_file_path', f'{inp_file_path}', prefix=False)
         locale = tools_qt.get_combo_value(self.dlg_readsql_create_project, self.cmb_locale, 0)
         tools_gw.set_config_parser('btn_admin', 'project_locale', f'{locale}', prefix=False)
 
@@ -156,28 +154,7 @@ class GwAdminButton:
 
         tools_log.log_info(f"Create schema of type '{project_type}': '{project_name_schema}'")
 
-        if self.rdb_inp.isChecked():
-            self.file_inp = tools_qt.get_text(self.dlg_readsql_create_project, 'data_file')
-            if self.file_inp == 'null':
-                msg = "The 'Path' field is required for Import INP data."
-                tools_qt.show_info_box(msg, "Info")
-                return
-            # Check that the INP file works with the selected project_type
-            with open(self.file_inp, 'rb', 0) as file, \
-                    mmap.mmap(file.fileno(), 0, access=mmap.ACCESS_READ) as s:
-                msg = ""
-                # If we're creating a 'ud' project but the INP file is from epanet
-                if project_type == 'ud' and s.find(b'[PIPES]') != -1:
-                    msg = "The selected INP file does not match with a 'UD' project.\n" \
-                          "Please check it before continuing..."
-                # If we're creating a 'ws' project but the INP file is from swmm
-                if project_type == 'ws' and s.find(b'[CONDUITS]') != -1:
-                    msg = "The selected INP file does not match with a 'WS' project.\n" \
-                          "Please check it before continuing..."
-                if msg:
-                    tools_qt.show_info_box(msg, "Warning")
-                    return
-        elif self.rdb_sample_full.isChecked() or self.rdb_sample_inv.isChecked():
+        if self.rdb_sample_full.isChecked() or self.rdb_sample_inv.isChecked():
             if self.locale != 'en_US' or str(self.project_epsg) != '25831':
                 msg = ("This functionality is only allowed with the locality 'en_US' and SRID 25831."
                        "\nDo you want change it and continue?")
@@ -275,43 +252,6 @@ class GwAdminButton:
         return result
 
 
-    def execute_import_inp_data(self, project_name, project_type):
-        """ Executed when option 'Import INP data' has been selected """
-
-        # Create dialog
-        self.dlg_import_inp = GwAdminImportUi(self)
-        tools_gw.load_settings(self.dlg_import_inp)
-
-        # Hide widgets
-        self.dlg_import_inp.progressBar.setVisible(False)
-
-        if project_type.lower() == 'ws':
-            extras = '"functionId":2522'
-        elif project_type.lower() == 'ud':
-            extras = '"functionId":2524'
-        else:
-            self.error_count = self.error_count + 1
-            return
-
-        schema_name = tools_qt.get_text(self.dlg_readsql_create_project, 'project_name')
-
-        body = tools_gw.create_body(extras=extras)
-        complet_result = tools_gw.execute_procedure('gw_fct_getprocess', body, schema_name, commit=False)
-        if not complet_result or complet_result['status'] == 'Failed':
-            return False
-        self._populate_functions_dlg(self.dlg_import_inp, complet_result['body']['data'])
-
-        # Disable tab log
-        tools_gw.disable_tab_log(self.dlg_import_inp)
-
-        # Set listeners
-        self.dlg_import_inp.btn_run.clicked.connect(partial(self._execute_import_inp, True, project_name, project_type))
-        self.dlg_import_inp.btn_close.clicked.connect(partial(self._execute_import_inp, False, project_name, project_type))
-
-        # Open dialog
-        tools_gw.open_dialog(self.dlg_import_inp, dlg_name='admin_importinp')
-
-
     def cancel_task(self):
         if hasattr(self, 'task_create_schema') and not isdeleted(self.task_create_schema):
             self.task_create_schema.cancel()
@@ -401,8 +341,6 @@ class GwAdminButton:
         self.rdb_sample_inv = self.dlg_readsql_create_project.findChild(QRadioButton, 'rdb_sample_inv')
         self.rdb_sample_full = self.dlg_readsql_create_project.findChild(QRadioButton, 'rdb_sample_full')
         self.rdb_empty = self.dlg_readsql_create_project.findChild(QRadioButton, 'rdb_empty')
-        self.rdb_inp = self.dlg_readsql_create_project.findChild(QRadioButton, 'rdb_inp')
-        self.data_file = self.dlg_readsql_create_project.findChild(QLineEdit, 'data_file')
 
         # Load user values
         self.project_name.setText(tools_gw.get_config_parser('btn_admin', 'project_name_schema', "user", "session",
@@ -417,12 +355,9 @@ class GwAdminButton:
                 chk_widget.setChecked(True)
             except:
                 pass
-        inp_file_path = tools_gw.get_config_parser('btn_admin', 'inp_file_path', "user", "session", False, force_reload=True)
-        if inp_file_path not in ('null', None):
-            self.data_file.setText(inp_file_path)
+
 
         # TODO: do and call listener for buton + table -> temp_csv
-        self.btn_push_file = self.dlg_readsql_create_project.findChild(QPushButton, 'btn_push_file')
 
         # Manage SRID
         self._manage_srid()
@@ -435,9 +370,6 @@ class GwAdminButton:
         if project_type:
             tools_qt.set_widget_text(self.dlg_readsql_create_project, self.cmb_create_project_type, project_type)
             self._change_project_type(self.cmb_create_project_type)
-
-        # Enable_disable data file widgets
-        self._enable_datafile()
 
         # Get combo locale
         self.cmb_locale = self.dlg_readsql_create_project.findChild(QComboBox, 'cmb_locale')
@@ -1480,17 +1412,6 @@ class GwAdminButton:
         self.folder_locale = os.path.join(self.sql_dir, 'i18n', cmb_locale)
 
 
-    def _enable_datafile(self):
-        """"""
-
-        if self.rdb_inp.isChecked() is True:
-            self.data_file.setEnabled(True)
-            self.btn_push_file.setEnabled(True)
-        else:
-            self.data_file.setEnabled(False)
-            self.btn_push_file.setEnabled(False)
-
-
     def _populate_data_schema_name(self, widget):
         """"""
 
@@ -1576,12 +1497,14 @@ class GwAdminButton:
 
         self.postgresql_version = tools_db.get_pg_version()
         self.postgis_version = tools_db.get_postgis_version()
+        self.pgrouting_version = tools_db.get_pgrouting_version()
 
         if schema_name == 'null':
             tools_qt.enable_tab_by_tab_name(self.dlg_readsql.tab_main, "others", False)
 
-            msg = (f'Database version: {self.postgresql_version}\n'
-                   f'PostGis version: {self.postgis_version}\n \n')
+            msg = (f'PostgreSQL version: {self.postgresql_version}\n'
+                   f'PostGis version: {self.postgis_version}\n'
+                   f'pgRouting version: {self.pgrouting_version}\n \n')
             self.software_version_info.setText(msg)
 
         else:
@@ -1596,8 +1519,9 @@ class GwAdminButton:
             project_date_update = last_dict_info['project_date'].strftime('%d-%m-%Y %H:%M:%S')
             if project_date_create == project_date_update:
                 project_date_update = ''
-            msg = (f'Database version: {self.postgresql_version}\n'
-                   f'PostGis version: {self.postgis_version}\n \n'
+            msg = (f'PostgreSQL version: {self.postgresql_version}\n'
+                   f'PostGis version: {self.postgis_version}\n'
+                   f'PgRouting version: {self.pgrouting_version}\n \n'
                    f'Schema name: {schema_name}\n'
                    f'Version: {self.project_version}\n'
                    f'EPSG: {self.project_epsg}\n'
@@ -1696,11 +1620,9 @@ class GwAdminButton:
         self.dlg_readsql_create_project.btn_accept.clicked.connect(partial(self.create_project_data_schema))
         self.dlg_readsql_create_project.btn_close.clicked.connect(
             partial(self._close_dialog_admin, self.dlg_readsql_create_project))
-        self.dlg_readsql_create_project.btn_push_file.clicked.connect(partial(self._select_file_inp))
         self.cmb_create_project_type.currentIndexChanged.connect(
             partial(self._change_project_type, self.cmb_create_project_type))
         self.cmb_locale.currentIndexChanged.connect(partial(self._update_locale))
-        self.rdb_inp.toggled.connect(partial(self._enable_datafile))
         self.filter_srid.textChanged.connect(partial(self._filter_srid_changed))
 
 
@@ -1963,96 +1885,6 @@ class GwAdminButton:
                 self._populate_data_schema_name(self.dlg_readsql.cmb_project_type)
                 self._manage_utils()
                 self._set_info_project()
-
-
-    def _execute_import_inp(self, accepted, project_name, project_type):
-        """"""
-
-        if accepted:
-
-            self.dlg_import_inp.btn_run.setVisible(False)
-
-            # Set wait cursor
-            self.task1 = GwTask('Manage schema')
-            QgsApplication.taskManager().addTask(self.task1)
-            self.task1.setProgress(0)
-
-            # Insert inp values into database
-            self._insert_inp_into_db(self.file_inp)
-
-            # Get the debugMode. If it's None it will be False
-            debug_mode = tools_gw.get_config_parser('system', 'import_inp_debug_mode', "user", "init", force_reload=True) or False
-
-            # Execute import data
-            if project_type.lower() == 'ws':
-                function_name = 'gw_fct_import_epanet_inp'
-                extras = '"parameters":{"debugMode":"' + debug_mode + '"}'
-            elif project_type.lower() == 'ud':
-                function_name = 'gw_fct_import_swmm_inp'
-                createSubcGeom = self.dlg_import_inp.findChild(QWidget, 'createSubcGeom')
-                extras = '"parameters":{"createSubcGeom":"' + str(createSubcGeom.isChecked()) + '", "debugMode":"' + debug_mode + '"}'
-            else:
-                self.error_count = self.error_count + 1
-                return
-
-            # Set progressBar ON
-            self.dlg_import_inp.progressBar.setMaximum(0)
-            self.dlg_import_inp.progressBar.setMinimum(0)
-            self.dlg_import_inp.progressBar.setVisible(True)
-            self.dlg_import_inp.progressBar.setFormat("Running function: " + str(function_name))
-            self.dlg_import_inp.progressBar.setAlignment(Qt.AlignCenter)
-            self.dlg_import_inp.progressBar.setFormat("")
-
-            body = tools_gw.create_body(extras=extras)
-            complet_result = tools_gw.execute_procedure(f"{function_name}", body, self.schema, commit=False)
-
-            self.task1 = GwTask('Manage schema')
-            QgsApplication.taskManager().addTask(self.task1)
-            self.task1.setProgress(50)
-
-            if complet_result:
-
-                if complet_result['status'] == 'Failed':
-                    msg = f'The importation process has failed!'
-                    replace = complet_result['body']['data'].get('replace')
-                    if replace is not None:
-                        msg += f'<br>This can be fixed in the next dialog.'
-                    msg += f'<br>See Info log for more details.'
-                    self._set_log_text(self.dlg_import_inp, complet_result['body']['data'])
-                    tools_qt.show_info_box(msg, "Info")
-                    if replace is not None:
-                        retry = self._build_replace_dlg(replace)
-                        if retry:
-                            sql = "DELETE FROM temp_csv WHERE fid = 239;"
-                            tools_db.execute_sql(sql, commit=False)
-                            self.dlg_import_inp.mainTab.setTabEnabled(0, True)
-                            self.dlg_import_inp.mainTab.setCurrentIndex(0)  # TODO: this doesnt work for some reason...
-                            return self._execute_import_inp(accepted, project_name, project_type)
-                    tools_db.dao.rollback()
-                    self.error_count = 0
-
-                    # Close dialog
-                    tools_gw.close_dialog(self.dlg_import_inp)
-                    tools_gw.close_dialog(self.dlg_readsql_create_project, False)
-                    return
-                self._set_log_text(self.dlg_import_inp, complet_result['body']['data'])
-            else:
-                self.error_count = self.error_count + 1
-
-            self.task1.setProgress(100)
-            # Manage process result
-            self.manage_process_result(project_name, project_type, dlg=self.dlg_import_inp)
-        else:
-            msg = "A rollback on schema will be done."
-            tools_qt.show_info_box(msg, "Info")
-            tools_db.dao.rollback()
-            self.error_count = 0
-            tools_gw.close_dialog(self.dlg_import_inp)
-            return
-
-
-        # Hide button execute
-        self.dlg_import_inp.btn_run.setVisible(False)
 
 
     def _build_replace_dlg(self, replace_json):
@@ -2789,24 +2621,6 @@ class GwAdminButton:
 
         _file.close()
         del _file
-
-
-    def _select_file_inp(self):
-        """ Select INP file """
-
-        file_inp = tools_qt.get_text(self.dlg_readsql_create_project, 'data_file')
-        # Set default value if necessary
-        if file_inp is None or file_inp == '':
-            file_inp = self.plugin_dir
-
-        # Get directory of that file
-        folder_path = os.path.dirname(file_inp)
-        if not os.path.exists(folder_path):
-            folder_path = os.path.dirname(__file__)
-        os.chdir(folder_path)
-        message = tools_qt.tr("Select INP file")
-        file_inp, filter_ = QFileDialog.getOpenFileName(None, message, "", '*.inp')
-        self.dlg_readsql_create_project.data_file.setText(file_inp)
 
 
     def _populate_functions_dlg(self, dialog, result):
