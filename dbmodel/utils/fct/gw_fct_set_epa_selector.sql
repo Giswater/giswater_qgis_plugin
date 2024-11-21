@@ -19,7 +19,6 @@ SELECT SCHEMA_NAME.gw_fct_set_epa_selector($${"client":{"device":5, "lang":"es_E
 */
 DECLARE
 v_error_context text;
-v_schemaname text;
 v_cur_user text;
 v_result_name_to_show text;
 v_result_name_to_compare text;
@@ -34,8 +33,7 @@ v_form text = '';
 BEGIN
 
 	-- Search path
-	SET search_path = 'ws_36_013', public;
-	v_schemaname := 'ws_36_013';
+	SET search_path = "SCHEMA_NAME", public;
 
 	-- Get api version
     SELECT value INTO v_version FROM config_param_system WHERE parameter='admin_version';
