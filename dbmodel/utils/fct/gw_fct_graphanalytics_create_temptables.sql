@@ -105,6 +105,14 @@ BEGIN
         ALTER TABLE temp_pgr_node ADD COLUMN closed BOOL DEFAULT FALSE;
         ALTER TABLE temp_pgr_node ADD COLUMN broken BOOL DEFAULT FALSE;
         ALTER TABLE temp_pgr_node ADD COLUMN to_arc VARCHAR(30);
+        IF v_fct_name = 'MINCUT' THEN
+            ALTER TABLE temp_pgr_arc ADD COLUMN cost_mincut int default 1;
+            ALTER TABLE temp_pgr_arc ADD COLUMN reverse_cost_mincut int default 1;
+            ALTER TABLE temp_pgr_arc ADD COLUMN unaccess BOOL; -- if TRUE, it means the valve is not accessible
+            ALTER TABLE temp_pgr_arc ADD COLUMN proposed BOOL; 
+            -- "proposed" IS NULL if it's not involved in the mincut
+            -- "proposed" = TRUE if it's in the mincut and it has to be closed, FALSE if it's in the mincut and it cannot be closed
+        END IF;
     END IF;
 
     -- Create other additional temporary tables
