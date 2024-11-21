@@ -43,7 +43,7 @@ BEGIN
     UPDATE connec SET macrominsector_id = 0 WHERE macrominsector_id <> 0;
     IF v_project_type = 'UD' THEN
         UPDATE gully SET macrominsector_id = 0 WHERE macrominsector_id <> 0;
-    ELIF v_project_type = 'WS' THEN
+    ELSIF v_project_type = 'WS' THEN
         UPDATE minsector_graph SET macrominsector_id = 0 WHERE macrominsector_id <> 0;
     END IF;
 
@@ -70,7 +70,7 @@ BEGIN
         UPDATE gully g SET macrominsector_id = a.macrominsector_id
         FROM (SELECT arc_id, macrominsector_id FROM arc) a
         WHERE g.arc_id = a.arc_id AND a.macrominsector_id <> 0;
-     ELIF v_project_type = 'WS' THEN
+     ELSIF v_project_type = 'WS' THEN
         UPDATE minsector_graph SET macrominsector_id = n.macrominsector_id
         FROM (SELECT node_id, macrominsector_id FROM node) n
         WHERE node_id = n.node_id AND n.macrominsector_id <> 0;
