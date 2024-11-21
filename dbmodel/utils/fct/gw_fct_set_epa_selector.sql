@@ -29,7 +29,6 @@ v_compare_time text;
 v_time_to_show text;
 v_time_to_compare text;
 v_version text;
-v_form text = '';
 BEGIN
 
 	-- Search path
