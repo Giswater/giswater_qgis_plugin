@@ -4,9 +4,8 @@ import warnings
 from typing import Literal
 
 from .._type_converter import infer_type, type2str, get_line_splitter, convert_string
-from ..helpers import InpSectionGeneric, SEP_INP
+from ..helpers import InpSectionGeneric, SEP_INP, COMMENT_EMPTY_SECTION
 from ..section_labels import TITLE, OPTIONS, REPORT, EVAPORATION, TEMPERATURE, MAP, FILES, ADJUSTMENTS, BACKDROP
-
 
 logger = logging.getLogger(__name__)
 
@@ -21,10 +20,7 @@ def line_iter(lines):
     for line in lines:
         line = line.split(';')[0]
         line = line.strip()
-        if line == '':  # ignore empty and comment lines
-            continue
-        else:
-
+        if line != '':  # ignore empty and comment lines
             yield _split_line(line)
 
 
@@ -85,6 +81,14 @@ class TitleSection(InpSectionGeneric):
     def __str__(self):
         return self.txt
 
+    def __add__(self, other):
+        return self.__class__(self.txt + str(other))
+
+    def __radd__(self, other):
+        if isinstance(other, str):
+            return self.__class__(other + self.txt)
+        return self.__class__(str(other) + self.txt)
+
 
 class OptionSection(InpSectionGeneric):
     """
@@ -123,9 +127,9 @@ class OptionSection(InpSectionGeneric):
             SWEEP_START          month/day (1/1)
             SWEEP_END            month/day (12/31)
             DRY_DAYS             days (0)
-            REPORT_STEP          hours:minutes:seconds (0:15:00)
-            WET_STEP             hours:minutes:seconds (0:05:00)
-            DRY_STEP             hours:minutes:seconds (1:00:00)
+            REPORT_STEP          hours:minutes:seconds (0:15:00) or hours
+            WET_STEP             hours:minutes:seconds (0:05:00) or hours
+            DRY_STEP             hours:minutes:seconds (1:00:00) or hours
             ROUTING_STEP         seconds (600)
             LENGTHENING_STEP     seconds (0)
             VARIABLE_STEP        value (0)
@@ -317,20 +321,42 @@ class OptionSection(InpSectionGeneric):
             data[key] = infer_type(line[0])
         return data
 
+    def __eq__(self, other):
+        if not isinstance(other, OptionSection):
+            return False
+        if tuple(sorted(self.keys())) != tuple(sorted(other.keys())):
+            return False
+        for key in self:
+            if type(self[key]) is not type(other[key]):
+                return False
+            if self[key] != other[key]:
+                return False
+        return True
+
     # getter and setter #######################################################################################################################
-    def set_flow_units(self, value:Literal['CFS', 'GPM', 'MGD', 'CMS', 'LPS', 'MLD']='CFS'):
+    def set_flow_units(self, value: Literal['CFS', 'GPM', 'MGD', 'CMS', 'LPS', 'MLD'] = 'CFS'):
         """
         Makes a choice of flow units.
 
         Selecting a US flow unit means that all other quantities will be expressed in US units,
         while choosing a metric flow unit will force all quantities to be expressed in metric units.
 
+        US units:
+            CFS: cubic feet per second
+            GPM: gallons per minute
+            MGD: million gallons per day
+
+        metric units:
+            CMS: cubic meters per second
+            LPS: liters per second
+            MLD: million liters per day
+
         Args:
             value (str): Flow unit. The default is CFS.
         """
         self['FLOW_UNITS'] = value
 
-    def set_infiltration(self, value: Literal['HORTON', 'MODIFIED_HORTON', 'GREEN_AMPT', 'MODIFIED_GREEN_AMPT', 'CURVE_NUMBER']='HORTON'):
+    def set_infiltration(self, value: Literal['HORTON', 'MODIFIED_HORTON', 'GREEN_AMPT', 'MODIFIED_GREEN_AMPT', 'CURVE_NUMBER'] = 'HORTON'):
         """
         Selects a model for computing infiltration of rainfall into the upper soil zone of subcatchments.
 
@@ -339,7 +365,7 @@ class OptionSection(InpSectionGeneric):
 """
         self['INFILTRATION'] = value
 
-    def set_flow_routing(self, value: Literal['STEADY', 'KINWAVE', 'DYNWAVE']='KINWAVE'):
+    def set_flow_routing(self, value: Literal['STEADY', 'KINWAVE', 'DYNWAVE'] = 'KINWAVE'):
         """
         Determines which method is used to route flows through the drainage system. 
         
@@ -354,7 +380,7 @@ class OptionSection(InpSectionGeneric):
         """
         self['FLOW_ROUTING'] = value
 
-    def set_link_offsets(self, value: Literal['DEPTH', 'ELEVATION']='DEPTH'):
+    def set_link_offsets(self, value: Literal['DEPTH', 'ELEVATION'] = 'DEPTH'):
         """
         LINK_OFFSETS determines the convention used to specify the position of a link offset above the invert of its connecting node. 
         
@@ -368,7 +394,7 @@ class OptionSection(InpSectionGeneric):
         """
         self['LINK_OFFSETS'] = value
 
-    def set_force_main_equation(self, value: Literal['H-W', 'D-W']='H-W'):
+    def set_force_main_equation(self, value: Literal['H-W', 'D-W'] = 'H-W'):
         """
         FORCE_MAIN_EQUATION establishes whether 
         - the Hazen-Williams (H-W) or 
@@ -603,7 +629,9 @@ class OptionSection(InpSectionGeneric):
         REPORT_STEP is the time interval for reporting of computed results. 
         
         The default is 0:15:00.
-        
+
+        accepts time as hr:min:sec or as decimal hours.
+
         Args:
             value: 
         """
@@ -614,7 +642,9 @@ class OptionSection(InpSectionGeneric):
         WET_STEP is the time step length used to compute runoff from subcatchments during periods of rainfall or when ponded water still remains on the surface. 
         
         The default is 0:05:00.
-        
+
+        accepts time as hr:min:sec or as decimal hours.
+
         Args:
             value: 
         """
@@ -625,7 +655,9 @@ class OptionSection(InpSectionGeneric):
         DRY_STEP is the time step length used for runoff computations (consisting essentially of pollutant buildup) during periods when there is no rainfall and no ponded water.
         
         The default is 1:00:00.
-        
+
+        accepts time as hr:min:sec or as decimal hours.
+
         Args:
             value: 
         """
@@ -691,7 +723,7 @@ class OptionSection(InpSectionGeneric):
             value: 
         """
         self['MIN_SURFAREA'] = value
-        
+
     def set_min_slope(self, value=0):
         """
         MIN_SLOPE is the minimum value allowed for a conduit’s slope (%). 
@@ -702,7 +734,7 @@ class OptionSection(InpSectionGeneric):
             value (int or float): 
         """
         self['MIN_SLOPE'] = value
-        
+
     def set_max_trials(self, value=8):
         """
         MAX_TRIALS is the maximum number of trials allowed during a time step to reach convergence when updating hydraulic heads at the conveyance system’s nodes. 
@@ -713,7 +745,7 @@ class OptionSection(InpSectionGeneric):
             value (int): 
         """
         self['MAX_TRIALS'] = value
-        
+
     def set_head_tolerance(self, value):
         """
         HEAD_TOLERANCE is the difference in computed head at each node between successive trials below which the flow solution for the current time step is assumed to have converged.
@@ -724,7 +756,7 @@ class OptionSection(InpSectionGeneric):
             value (float): 
         """
         self['HEAD_TOLERANCE'] = value
-        
+
     def set_threads(self, value=1):
         """
         THREADS is the number of parallel computing threads to use for dynamic wave flow routing on machines equipped with multi-core processors. 
@@ -735,7 +767,7 @@ class OptionSection(InpSectionGeneric):
             value (int): 
         """
         self['THREADS'] = value
-        
+
     def set_tempdir(self, value):
         """
         TEMPDIR provides the name of a file directory (or folder) where SWMM writes its temporary files.
@@ -749,7 +781,7 @@ class OptionSection(InpSectionGeneric):
         """
         self['TEMPDIR'] = value
 
-    def set_inertial_damping(self, value:Literal['NONE', 'PARTIAL', 'FULL']):
+    def set_inertial_damping(self, value: Literal['NONE', 'PARTIAL', 'FULL']):
         """
         Indicates how the inertial terms in the Saint Venant momentum equation will be handled under dynamic wave flow routing.
 
@@ -762,7 +794,7 @@ class OptionSection(InpSectionGeneric):
         """
         self['INERTIAL_DAMPING'] = value
 
-    def set_inertial_terms(self, value:Literal['ignore', 'dampen', 'keep']):
+    def set_inertial_terms(self, value: Literal['ignore', 'dampen', 'keep']):
         """
         Indicates how the inertial terms in the Saint Venant momentum equation will be handled under dynamic wave flow routing.
 
@@ -775,7 +807,7 @@ class OptionSection(InpSectionGeneric):
         """
         self.set_inertial_damping({'ignore': 'FULL', 'dampen': 'PARTIAL', 'keep': 'NONE'}[value])
 
-    def set_normal_flow_limited(self, value:Literal['SLOPE', 'FROUDE', 'BOTH']='BOTH'):
+    def set_normal_flow_limited(self, value: Literal['SLOPE', 'FROUDE', 'BOTH'] = 'BOTH'):
         """
         Specifies which condition is checked to determine if flow in a conduit is supercritical and should thus be limited to the normal flow.
         
@@ -799,7 +831,7 @@ class OptionSection(InpSectionGeneric):
         """
         self.set_start_date(dt.date())
         self.set_start_time(dt.time())
-        
+
     def set_end(self, dt):
         """
         Set the date and time when the simulation is to end.
@@ -857,6 +889,22 @@ class OptionSection(InpSectionGeneric):
         """Set the simulation start based of the report start and a minimum simulation head time before report start."""
         self.set_start(self.get_report_start() - td)
 
+    def get_step(self, which: Literal['REPORT_STEP', 'WET_STEP', 'DRY_STEP']) -> datetime.timedelta:
+        """Convert the step input format to timedelta."""
+        v = self[which]
+        if ':' in v:
+            h, m, s = v.split(':')
+            td = datetime.timedelta(hours=int(h), minutes=int(m), seconds=int(s))
+        else:
+            td = datetime.timedelta(hours=float(v))
+        return td
+
+    def is_imperial(self):
+        return self['FLOW_UNITS'].upper() in {'CFS', 'GPM', 'MGD'}
+
+    def is_metric(self):
+        return not self.is_imperial()
+
 
 class ReportSection(InpSectionGeneric):
     """
@@ -871,6 +919,7 @@ class ReportSection(InpSectionGeneric):
     Formats:
         ::
 
+            DISABLED       YES / NO*
             INPUT          YES / NO*
             CONTINUITY     YES* / NO
             FLOWSTATS      YES* / NO
@@ -883,6 +932,9 @@ class ReportSection(InpSectionGeneric):
         `* .. defaults`
 
     Remarks:
+        DISABLED
+            Setting DISABLED to YES disables all reporting (except for error and warning messages)
+            regardless of what other reporting options are chosen. The default is NO.
         INPUT
             specifies whether or not a summary of the input data should be provided in the output report.
             The default is NO.
@@ -964,6 +1016,8 @@ class ReportSection(InpSectionGeneric):
 
     def to_inp_lines(self, fast=False, sort_objects_alphabetical=False):
         f = ''
+        if not self:
+            return COMMENT_EMPTY_SECTION
         max_len = len(max(self.keys(), key=len)) + 2
 
         def _dict_format(key, value):
@@ -980,7 +1034,10 @@ class ReportSection(InpSectionGeneric):
                 for end in range(20, size, 20):
                     f += _dict_format(key=sub, value=value[start:end])
                     start = end
-
+                # remain
+                remaining_values = value[start:size]
+                if remaining_values:
+                    f += _dict_format(key=sub, value=remaining_values)
             else:
                 f += _dict_format(key=sub, value=value)
 
@@ -1202,7 +1259,8 @@ class EvaporationSection(InpSectionGeneric):
 
         if sum(mult_infos) != 1:
             if sum(mult_infos) == 0:
-                data[cls.KEYS.CONSTANT] = 0
+                return data
+                # data[cls.KEYS.CONSTANT] = 0
             else:
                 raise UserWarning('Too much evaporation')
 
@@ -1442,9 +1500,15 @@ class FilesSection(InpSectionGeneric):
         Fname
             is the name of an interface file.
 
-        Refer to Section 11.7 Interface Files for a description of interface files. Rainfall, Runoff, and
-        RDII files can either be used or saved in a run, but not both. A run can both use and save a Hot
-        Start file (with different names).
+        Refer to Section 11.7 (Interface Files) in de User Manual for a description of interface files.
+
+        Rainfall, Runoff, and RDII files can either be used or saved in a run, but not both.
+
+        A run can both use and save a Hot Start file (with different names).
+
+        INFLOWS and OUTFLOWS is called routing interface files
+
+        The rainfall and runoff interface files are binary files created internally by SWMM that can be saved and reused from one analysis to the next.
 
     Attributes:
         KEYS: Enum-like for the key values with following members -> {``USE`` | ``SAVE`` | ``RAINFALL`` | ``RUNOFF`` | ``HOTSTART`` | ``RDII`` | ``INFLOWS`` | ``OUTFLOWS``}

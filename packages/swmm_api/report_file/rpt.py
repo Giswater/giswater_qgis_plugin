@@ -6,7 +6,7 @@ __version__ = "0.1"
 __license__ = "MIT"
 
 import datetime
-import os.path
+from pathlib import Path
 import warnings
 
 import pandas as pd
@@ -41,7 +41,7 @@ class SwmmReport:
             The summary results displayed in these tables are based on results found at every
             computational time step and not just on the results from each reporting time step.
         """
-        self._filename = filename
+        self._filename = Path(filename)
         # ________________
         self._raw_parts = {}
         self._converted_parts = {}
@@ -130,7 +130,7 @@ class SwmmReport:
 
     def is_file(self) -> bool:
         """Bool if file exists."""
-        return os.path.isfile(self._filename)
+        return self._filename.is_file()
 
     def _report_to_dict(self, encoding=''):
         """
@@ -477,6 +477,21 @@ class SwmmReport:
         """
         Node Inflow Summary
 
+        Example:
+            ::
+
+              -------------------------------------------------------------------------------------------------
+                                              Maximum  Maximum                  Lateral       Total        Flow
+                                              Lateral    Total  Time of Max      Inflow      Inflow     Balance
+                                               Inflow   Inflow   Occurrence      Volume      Volume       Error
+              Node                 Type           LPS      LPS  days hr:min    10^6 ltr    10^6 ltr     Percent
+              -------------------------------------------------------------------------------------------------
+
+        Columns:
+            ['Type', 'Maximum_Lateral_Inflow_LPS', 'Maximum_Total_Inflow_LPS',
+            'Time of Max_Occurrence_days hr:min', 'Lateral_Inflow_Volume_10^6 ltr',
+            'Total_Inflow_Volume_10^6 ltr', 'Flow_Balance_Error_Percent']
+
         Returns:
             pandas.DataFrame: Node Inflow Summary
         """
@@ -528,6 +543,17 @@ class SwmmReport:
     def outfall_loading_summary(self):
         """
         Outfall Loading Summary
+
+        Examples:
+            ::
+
+              -----------------------------------------------------------
+                                     Flow       Avg       Max       Total
+                                     Freq      Flow      Flow      Volume
+              Outfall Node           Pcnt       LPS       LPS    10^6 ltr
+              -----------------------------------------------------------
+
+        columns = [Flow_Frag_Pct, Avg_Flow_LPS, Max_Flow_LPS, Total_Volume_10^6 ltr]
 
         Returns:
             pandas.DataFrame: Outfall Loading Summary

@@ -35,7 +35,7 @@ class SubCatchment(BaseSectionObject):
     _identifier = IDENTIFIERS.name
     _section_label = SUBCATCHMENTS
 
-    def __init__(self, name, rain_gage, outlet, area, imperviousness, width, slope, curb_length=0, snow_pack=np.NaN):
+    def __init__(self, name, rain_gage, outlet, area, imperviousness, width, slope, curb_length=0, snow_pack=np.nan):
         """
         Basic subcatchment information.
 
@@ -159,10 +159,19 @@ class Infiltration(BaseSectionObject):
     _identifier = IDENTIFIERS.subcatchment
     _section_label = INFILTRATION
 
-    # _table_inp_export = False
+    _table_inp_export = True  # due to possible mixed objects
 
     # jetbrains://clion/navigate/reference?project=Swmm5&path=src/infil.c : 133
     # infil_readParams
+
+    class TYPES:
+        HORTON = 'HORTON'
+        MODIFIED_HORTON = 'MODIFIED_HORTON'
+        GREEN_AMPT = 'GREEN_AMPT'
+        MODIFIED_GREEN_AMPT = 'MODIFIED_GREEN_AMPT'
+        CURVE_NUMBER = 'CURVE_NUMBER'
+
+    _CONVERSION_DICT = {}
 
     def __init__(self, subcatchment):
         """
@@ -199,9 +208,9 @@ class Infiltration(BaseSectionObject):
         if (CONFIG['swmm_version'] == '5.1.015') or CONFIG['swmm_version'].startswith('5.2.'):
             # NEU in swmm 5.1.015
             last_arg = args[-1]
-            if last_arg in INFILTRATION_DICT:
+            if last_arg in Infiltration._CONVERSION_DICT:
                 sub_class_id = last_arg
-                sub_cls = INFILTRATION_DICT[last_arg]
+                sub_cls = Infiltration._CONVERSION_DICT[last_arg]
                 # args = args[:-1]
 
         if sub_cls != InfiltrationHorton:
@@ -260,7 +269,7 @@ class InfiltrationHorton(Infiltration):
         self.decay = float(decay)
         self.time_dry = float(time_dry)
         self.volume_max = float(volume_max)
-        self.kind = np.NaN if kind is None else kind
+        self.kind = np.nan if kind is None else kind
 
 
 class InfiltrationGreenAmpt(Infiltration):
@@ -308,7 +317,7 @@ class InfiltrationGreenAmpt(Infiltration):
         self.suction_head = float(suction_head)
         self.hydraulic_conductivity = float(hydraulic_conductivity)
         self.moisture_deficit_init = float(moisture_deficit_init)
-        self.kind = np.NaN if kind is None else kind
+        self.kind = np.nan if kind is None else kind
 
 
 class InfiltrationCurveNumber(Infiltration):
@@ -352,15 +361,15 @@ class InfiltrationCurveNumber(Infiltration):
         self.curve_no = curve_no
         self.hydraulic_conductivity = float(hydraulic_conductivity)
         self.time_dry = float(time_dry)
-        self.kind = np.NaN if kind is None else kind
+        self.kind = np.nan if kind is None else Infiltration.TYPES.CURVE_NUMBER
 
 
-INFILTRATION_DICT = {
-    'HORTON'             : InfiltrationHorton,
-    'MODIFIED_HORTON'    : InfiltrationHorton,
-    'GREEN_AMPT'         : InfiltrationGreenAmpt,
-    'MODIFIED_GREEN_AMPT': InfiltrationGreenAmpt,
-    'CURVE_NUMBER'       : InfiltrationCurveNumber
+Infiltration._CONVERSION_DICT = {
+    Infiltration.TYPES.HORTON             : InfiltrationHorton,
+    Infiltration.TYPES.MODIFIED_HORTON    : InfiltrationHorton,
+    Infiltration.TYPES.GREEN_AMPT         : InfiltrationGreenAmpt,
+    Infiltration.TYPES.MODIFIED_GREEN_AMPT: InfiltrationGreenAmpt,
+    Infiltration.TYPES.CURVE_NUMBER       : InfiltrationCurveNumber
 }
 
 
@@ -409,9 +418,14 @@ class Polygon(BaseSectionObject):
     def _convert_lines(cls, multi_line_args):
         if isinstance(multi_line_args, str) and multi_line_args == '':
             return ()
-        a = np.loadtxt(io.StringIO(multi_line_args), comments=';',
-                       dtype={'names': ('polygon', 'x', 'y'),
-                              'formats': ('O', 'f4', 'f4')})
+
+        with warnings.catch_warnings():
+            warnings.filterwarnings(
+                action='ignore',
+                message='.*loadtxt: input contained no data*', category=UserWarning)
+            a = np.loadtxt(io.StringIO(multi_line_args), comments=';',
+                           dtype={'names': ('polygon', 'x', 'y'),
+                                  'formats': ('O', 'f4', 'f4')})
 
         if a.size == 0:
             return ()
@@ -455,8 +469,8 @@ class Polygon(BaseSectionObject):
         Returns:
             shapely.geometry.Polygon: LineString object for the polygon.
         """
-        import shapely.geometry as sh
-        return sh.Polygon(self.polygon)
+        import shapely.geometry as shp
+        return shp.Polygon(self.polygon)
 
     @classmethod
     def create_section_from_geoseries(cls, data):
@@ -809,7 +823,7 @@ class Groundwater(BaseSectionObject):
     _identifier = (IDENTIFIERS.subcatchment, 'aquifer', IDENTIFIERS.node)
     _section_label = GROUNDWATER
 
-    def __init__(self, subcatchment, aquifer, node, Esurf, A1, B1, A2, B2, A3, Dsw, Egwt=np.NaN, Ebot=np.NaN, Egw=np.NaN, Umc=np.NaN):
+    def __init__(self, subcatchment, aquifer, node, Esurf, A1, B1, A2, B2, A3, Dsw, Egwt=np.nan, Ebot=np.nan, Egw=np.nan, Umc=np.nan):
         """
         Subcatchment groundwater parameters.
 
@@ -825,8 +839,8 @@ class Groundwater(BaseSectionObject):
             A3 (float): Surface water – groundwater interaction coefficient (see below).
             Dsw (float): Fixed depth of surface water at receiving node (ft or m)
                         (set to zero if surface water depth will vary as computed by flow routing).
-            Egwt (float): Threshold groundwater table elevation which must be reached before any flow occurs (ft or m).
-                        Leave blank (or enter \\*) to use the elevation of the receiving node's invert.
+            Egwt (float or str): Threshold groundwater table elevation which must be reached before any flow occurs (ft or m).
+                        Leave blank (or enter `*`) to use the elevation of the receiving node's invert.
             Ebot (float): Elevation of the bottom of the aquifer (ft or m).
             Egw (float): Groundwater table elevation at the start of the simulation (ft or m).
             Umc (float): Unsaturated zone moisture content at start of simulation (volumetric fraction).

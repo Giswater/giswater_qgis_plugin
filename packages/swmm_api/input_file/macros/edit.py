@@ -1,9 +1,9 @@
 import warnings
 from typing import Literal
 
-from numpy import interp, mean, ceil
+import numpy as np
 
-from ._helpers import print_warning, get_constituents
+from ._helpers import get_constituents, SwmmApiInputMacrosWarning
 from .collection import nodes_dict, links_dict, subcatchments_per_node_dict
 from .combine_dwf import combine_dwf
 from .graph import next_links_labels, previous_links, previous_links_labels, links_connected, _previous_links_labels
@@ -14,7 +14,7 @@ from ..section_labels import *
 from ..section_lists import NODE_SECTIONS, LINK_SECTIONS, SUBCATCHMENT_SECTIONS, POLLUTANT_SECTIONS, NODE_SECTIONS_ADD, \
     LINK_SECTIONS_ADD
 from ..sections import Tag, DryWeatherFlow, Junction, Coordinate, Conduit, Loss, Vertices, EvaporationSection, Inflow, \
-    ReportSection, GroundwaterFlow, Groundwater, LIDUsage, InletUsage, Control
+    ReportSection, GroundwaterFlow, Groundwater, LIDUsage, InletUsage, Control, ControlVariable, ControlExpression
 from ..sections._identifiers import IDENTIFIERS
 
 
@@ -23,7 +23,7 @@ def delete_node(inp, node_label, graph=None, alt_node=None):
     Delete node in inp data.
 
     Args:
-        inp (SwmmInput): inp data
+        inp (swmm_api.SwmmInput): SWMM input-file data.
         node_label (str): label of node to delete
         graph (networkx.DiGraph): networkx graph of model
         alt_node (str): node label | optional: move flows to this node
@@ -88,7 +88,8 @@ def delete_node(inp, node_label, graph=None, alt_node=None):
             #     delete_subcatchment(sc.name)
             #     sc.outlet = to_node
 
-            warnings.warn('delete_node in SUBCATCHMENTS section not implemented.')  # TODO
+            # TODO
+            warnings.warn('delete_node in SUBCATCHMENTS section not implemented.', SwmmApiInputMacrosWarning)
             # delete_subcatchment()
 
         # ---
@@ -135,7 +136,7 @@ def _mean_dwf_flow(inp, node):
     else:
         return
     attributes_pattern = ['pattern1', 'pattern2', 'pattern3', 'pattern4']
-    return obj.base_value * prod(mean(inp.PATTERNS[obj[p]].factors) for p in attributes_pattern if isinstance(obj[p], str))
+    return obj.base_value * prod(np.mean(inp.PATTERNS[obj[p]].factors) for p in attributes_pattern if isinstance(obj[p], str))
 
 
 def move_flows(inp: SwmmInput, from_node, to_node, only_constituent=None):
@@ -143,7 +144,7 @@ def move_flows(inp: SwmmInput, from_node, to_node, only_constituent=None):
     move flow (INFLOWS or DWF) from one node to another
 
     Args:
-        inp (SwmmInput): inp data
+        inp (swmm_api.SwmmInput): SWMM input-file data.
         from_node (str): first node label
         to_node (str): second node label
         only_constituent (list): only consider this constituent (default: FLOW)
@@ -177,7 +178,7 @@ def move_flows(inp: SwmmInput, from_node, to_node, only_constituent=None):
 
                     # DryWeatherFlow can be easily added when Patterns are equal
                     if not all(is_equal(obj[p], inp[section][index_new][p]) for p in attributes_pattern):
-                        print_warning(f'`move_flows` from "{from_node}" to "{to_node}". DWF patterns don\'t match!')
+                        warnings.warn(f'`move_flows` from "{from_node}" to "{to_node}". DWF patterns don\'t match!', SwmmApiInputMacrosWarning)
 
                         # combine flow to fit annual flow in the best possible way
                         combine_dwf(inp, obj, to_node, constituent)
@@ -201,7 +202,7 @@ def move_flows(inp: SwmmInput, from_node, to_node, only_constituent=None):
                         inp[section][index_new].base_value += obj.base_value
 
                     else:
-                        print_warning(f'in `move_flows` from "{from_node}" to "{to_node}". {section} Already Exists! -> Ignoring')
+                        warnings.warn(f'in `move_flows` from "{from_node}" to "{to_node}". {section} Already Exists! -> Ignoring', SwmmApiInputMacrosWarning)
 
             # else:
             #     print_warning(f'Nothing to move from "{from_node}" [{section}]')
@@ -212,7 +213,7 @@ def reconnect_subcatchments(inp: SwmmInput, from_node, to_node, graph=None, conn
     Reconnect sub-catchements from one node to another.
 
     Args:
-        inp (SwmmInput): inp data
+        inp (swmm_api.SwmmInput): SWMM input-file data.
         from_node (str): first node label
         to_node (str): second node label
 
@@ -288,7 +289,8 @@ def delete_subcatchment(inp: SwmmInput, subcatchment: str):
 
 
 def split_conduit(inp, conduit, intervals=None, length=None, from_inlet=True):
-    raise NotImplementedError('"split_conduit" is not working yet.')
+    if _ := True:
+        raise NotImplementedError('"split_conduit" is not working yet.')
     # mode = [cut_point (GUI), intervals (n), length (l)]
     nodes = nodes_dict(inp)
     if isinstance(conduit, str):
@@ -301,7 +303,7 @@ def split_conduit(inp, conduit, intervals=None, length=None, from_inlet=True):
         n_new_nodes = intervals - 1
     elif length:
         dx = length
-        n_new_nodes = ceil(conduit.length / length - 1)
+        n_new_nodes = np.ceil(conduit.length / length - 1)
 
     from_node = nodes[conduit.from_node]
     to_node = nodes[conduit.to_node]
@@ -319,26 +321,25 @@ def split_conduit(inp, conduit, intervals=None, length=None, from_inlet=True):
     x = dx
     last_node: Junction = from_node
     for new_node_i in range(n_new_nodes + 1):
-        # TODO node is not a junction
-        warnings.warn()
+        warnings.warn('unknown behavior for node is not a junction', SwmmApiInputMacrosWarning)  # TODO node is not a junction
         if x >= conduit.length:
             node = to_node
         else:
             node = Junction(name=f'{from_node.name}_{to_node.name}_{chr(new_node_i + 97)}',
-                            elevation=interp(x, [0, conduit.length], [from_node.elevation, to_node.elevation]),
-                            depth_max=interp(x, [0, conduit.length], [from_node.depth_max, to_node.depth_max]),
-                            depth_init=interp(x, [0, conduit.length], [from_node.depth_init, to_node.depth_init]),
-                            depth_surcharge=interp(x, [0, conduit.length], [from_node.depth_surcharge, to_node.depth_surcharge]),
-                            area_ponded=float(mean([from_node.area_ponded, to_node.area_ponded])),
+                            elevation=np.interp(x, [0, conduit.length], [from_node.elevation, to_node.elevation]),
+                            depth_max=np.interp(x, [0, conduit.length], [from_node.depth_max, to_node.depth_max]),
+                            depth_init=np.interp(x, [0, conduit.length], [from_node.depth_init, to_node.depth_init]),
+                            depth_surcharge=np.interp(x, [0, conduit.length], [from_node.depth_surcharge, to_node.depth_surcharge]),
+                            area_ponded=float(np.mean([from_node.area_ponded, to_node.area_ponded])),
                             )
             new_nodes.append(node)
             inp[JUNCTIONS].add_obj(node)
 
             # TODO: COORDINATES based on vertices
             inp[COORDINATES].add_obj(Coordinate(node.name,
-                                                x=interp(x, [0, conduit.length],
+                                                x=np.interp(x, [0, conduit.length],
                                                              [from_node_coord.x, to_node_coord.x]),
-                                                y=interp(x, [0, conduit.length],
+                                                y=np.interp(x, [0, conduit.length],
                                                              [from_node_coord.y, to_node_coord.y])))
 
         link = Conduit(name=f'{conduit.name}_{chr(new_node_i + 97)}',
@@ -418,7 +419,7 @@ def combine_conduits(inp, c1, c2, graph=None, reroute_flows_to: Literal['from_no
     Combine the two conduits to one - keep attributes of the first (c1).
 
     Args:
-        inp (SwmmInput): inp data
+        inp (swmm_api.SwmmInput): SWMM input-file data.
         c1 (str | Conduit): conduit 1 to combine
         c2 (str | Conduit): conduit 2 to combine
         graph (networkx.DiGraph): optional, runs faster with graph (inp representation)
@@ -470,7 +471,7 @@ def combine_conduits(inp, c1, c2, graph=None, reroute_flows_to: Literal['from_no
 
     # Loss
     if (LOSSES in inp) and (c_new.name in inp[LOSSES]):
-        print_warning(f'combine_conduits {c1.name} and {c2.name}. BUT WHAT TO DO WITH LOSSES?')
+        warnings.warn(f'combine_conduits {c1.name} and {c2.name}. BUT WHAT TO DO WITH LOSSES?', SwmmApiInputMacrosWarning)
         # add losses
         pass
 
@@ -484,7 +485,7 @@ def combine_conduits_keep_slope(inp, c1, c2, graph=None):
     and keep the slope of c1 by adding a downstream offset.
 
     Args:
-        inp (SwmmInput): inp data
+        inp (swmm_api.SwmmInput): SWMM input-file data.
         c1 (str | Conduit): conduit 1 to combine
         c2 (str | Conduit): conduit 2 to combine
         graph (networkx.DiGraph): optional, runs faster with graph (inp representation)
@@ -510,7 +511,7 @@ def dissolve_conduit(inp, c, graph=None):
     Dissolve a conduit.
 
     Args:
-        inp (SwmmInput): inp data
+        inp (swmm_api.SwmmInput): SWMM input-file data.
         c (str | Conduit): conduit 1 to combine
         graph (networkx.DiGraph): optional, runs faster with graph (inp representation)
 
@@ -536,7 +537,7 @@ def dissolve_conduit(inp, c, graph=None):
 
         # Loss
         if LOSSES in inp and c_new.name in inp[LOSSES]:
-            print_warning(f'dissolve_conduit {c.name} in {c_new.name}. BUT WHAT TO DO WITH LOSSES?')
+            warnings.warn(f'dissolve_conduit {c.name} in {c_new.name}. BUT WHAT TO DO WITH LOSSES?', SwmmApiInputMacrosWarning)
 
         if isinstance(c_new, Conduit):
             c_new.length = round(c.length + c_new.length, 1)
@@ -551,7 +552,7 @@ def rename_node(inp: SwmmInput, old_label: str, new_label: str, g=None):
     change node label
 
     Args:
-        inp (SwmmInput): inp data
+        inp (swmm_api.SwmmInput): SWMM input-file data.
         old_label (str): previous node label
         new_label (str): new node label
         g (DiGraph): optional - graph of the network
@@ -560,6 +561,16 @@ def rename_node(inp: SwmmInput, old_label: str, new_label: str, g=None):
         works inplace
         CONTROLS Not Implemented!
     """
+    # subcatchment outlets
+    if SUBCATCHMENTS in inp:
+        for obj in subcatchments_per_node_dict(inp)[old_label]:
+            obj.outlet = new_label
+        # -------
+        # for obj in inp.SUBCATCHMENTS.filter_keys([old_label], 'outlet'):  # type: SubCatchment
+        #     obj.outlet = new_label
+        # -------
+
+    # ---
     # Nodes and basic node components
     for section in NODE_SECTIONS + NODE_SECTIONS_ADD:
         if (section in inp) and (old_label in inp[section]):
@@ -573,16 +584,6 @@ def rename_node(inp: SwmmInput, old_label: str, new_label: str, g=None):
     rename_obj_in_tags(inp, Tag.TYPES.Node, old_label, new_label)
     rename_obj_in_reporting_section(inp, ReportSection.KEYS.NODES, old_label, new_label)
     rename_obj_in_control_section(inp, Control.OBJECTS.NODE, old_label, new_label)
-
-    # ---
-    # subcatchment outlets
-    if SUBCATCHMENTS in inp:
-        for obj in subcatchments_per_node_dict(inp)[old_label]:
-            obj.outlet = new_label
-        # -------
-        # for obj in inp.SUBCATCHMENTS.filter_keys([old_label], 'outlet'):  # type: SubCatchment
-        #     obj.outlet = new_label
-        # -------
 
     # ---
     # link: from-node and to-node
@@ -633,14 +634,14 @@ def rename_link(inp: SwmmInput, old_label: str, new_label: str):
         CONTROLS Not Implemented!
 
     Args:
-        inp (SwmmInput): inp data
+        inp (swmm_api.SwmmInput): SWMM input-file data.
         old_label (str): previous link label
         new_label (str): new link label
     """
     for section in LINK_SECTIONS + LINK_SECTIONS_ADD:
         if (section in inp) and (old_label in inp[section]):
             inp[section][new_label] = inp[section].pop(old_label)
-            if hasattr(inp[section][new_label], 'Name'):
+            if hasattr(inp[section][new_label], IDENTIFIERS.name):
                 inp[section][new_label].name = new_label
             else:
                 inp[section][new_label].link = new_label
@@ -661,7 +662,7 @@ def rename_subcatchment(inp: SwmmInput, old_label: str, new_label: str):
     for section in SUBCATCHMENT_SECTIONS:
         if (section in inp) and (old_label in inp[section]):
             inp[section][new_label] = inp[section].pop(old_label)
-            if hasattr(inp[section][new_label], 'name'):
+            if hasattr(inp[section][new_label], IDENTIFIERS.name):
                 inp[section][new_label].name = new_label
             else:
                 inp[section][new_label].subcatchment = new_label
@@ -708,7 +709,7 @@ def rename_timeseries(inp, old_label, new_label):
     change timeseries label
 
     Args:
-        inp (SwmmInput): inp data
+        inp (swmm_api.SwmmInput): SWMM input-file data.
         old_label (str): previous timeseries label
         new_label (str): new timeseries label
 
@@ -765,12 +766,12 @@ def remove_quality_model(inp):
     remove all sections only for modelling quality
 
     Args:
-        inp (SwmmInput): inp-data
+        inp (swmm_api.SwmmInput): SWMM input-file data.
 
     .. Important::
         works inplace
     """
-    delete_sections(inp, POLLUTANT_SECTIONS)
+    inp.delete_sections(POLLUTANT_SECTIONS)
 
     for sec in [INFLOWS, DWF]:
         for k in list(inp[sec].keys()):
@@ -785,7 +786,7 @@ def delete_pollutant(inp, label):
     Remove all entries with this pollutant
 
     Args:
-        inp (SwmmInput):
+        inp (swmm_api.SwmmInput): SWMM input-file data.
         label (str):
 
     .. Important::
@@ -809,7 +810,7 @@ def delete_pollutant(inp, label):
         for lid_control in inp.LID_CONTROLS.values():
             if ((lid_control.LAYER_TYPES.REMOVALS in lid_control.layer_dict)
                     and (label in lid_control.layer_dict[lid_control.LAYER_TYPES.REMOVALS])):
-                warnings.warn('delete_pollutant in LID_CONTROLS (REMOVALS) section not implemented.')  # TODO
+                warnings.warn('delete_pollutant in LID_CONTROLS (REMOVALS) section not implemented.', SwmmApiInputMacrosWarning)  # TODO
     # ---
     for n in nodes_dict(inp):
         for sec in [TREATMENT, DWF, INFLOWS]:
@@ -842,7 +843,7 @@ def remove_obj_from_reporting(inp, kind, label):
     Object will not be reported in the output-file.
 
     Args:
-        inp (swmm_api.SwmmInput): input-data.
+        inp (swmm_api.SwmmInput): SWMM input-file data.
         kind (str): one of (`SUBCATCHMENTS`, `NODES`, `LINKS`). You can use the :attr:`ReportSection.KEYS` attribute.
         label (str): label of the object, which shouldn't be reported in the output-file.
 
@@ -861,7 +862,7 @@ def rename_obj_in_reporting_section(inp, kind, old_label, new_label):
     Rename object in reporting section.
 
     Args:
-        inp (swmm_api.SwmmInput): input-data.
+        inp (swmm_api.SwmmInput): SWMM input-file data.
         kind (str): one of (`SUBCATCHMENTS`, `NODES`, `LINKS`). You can use the :attr:`ReportSection.KEYS` attribute.
         old_label (str): old label of the object, which tag should be renamed.
         new_label (str): new label of the object, which tag should be renamed.
@@ -882,7 +883,7 @@ def remove_obj_tag(inp, kind, label):
     Remove tag froo object.
 
     Args:
-        inp (swmm_api.SwmmInput): input-data.
+        inp (swmm_api.SwmmInput): SWMM input-file data.
         kind (str): one of (`Subcatch`, `Node`, `Link`). You can use the :attr:`Tag.TYPES` attribute.
         label (str): label of the object, which tag should be removed.
 
@@ -898,7 +899,7 @@ def rename_obj_in_tags(inp, kind, old_label, new_label):
     Rename object in tags section.
 
     Args:
-        inp (swmm_api.SwmmInput): input-data.
+        inp (swmm_api.SwmmInput): SWMM input-file data.
         kind (str): one of (`Subcatch`, `Node`, `Link`). You can use the :attr:`Tag.TYPES` attribute.
         old_label (str): old label of the object, which tag should be renamed.
         new_label (str): new label of the object, which tag should be renamed.
@@ -916,7 +917,7 @@ def remove_obj_from_control(inp, kind: str, label: str):
     Remove object from CONTROLS section.
 
     Args:
-        inp (swmm_api.SwmmInput): input-data.
+        inp (swmm_api.SwmmInput): SWMM input-file data.
         kind (str): one of (`NODE`, `LINK`). You can use the :attr:`swmm_api.input_file.sections.Control.OBJECTS` attribute.
         label (str): label of the object, which will be removed from the model.
 
@@ -937,33 +938,43 @@ def remove_obj_from_control(inp, kind: str, label: str):
 
     for label_control in list(inp.CONTROLS.keys()):
         control = inp.CONTROLS[label_control]
-        # ---
-        # if object in condition: remove whole rule
-        for condition in control.conditions:  # type: Control._Condition
-            if (condition.kind in possible_kinds) and (condition.label == label):
+
+        if isinstance(control, ControlExpression):
+            # expressions dont have object labels
+            ...
+        elif isinstance(control, ControlVariable):
+            if (control.object_kind in possible_kinds) and (control.label == label):
                 del inp.CONTROLS[label_control]
+        else:
+            # ---
+            # if object in condition: remove whole rule
+            for condition in control.conditions:  # type: Control._Condition
+                if (condition.object_kind in possible_kinds) and (condition.label == label):
+                    del inp.CONTROLS[label_control]
+                    continue
+
+            # ---
+            if label_control not in inp.CONTROLS:
                 continue
 
-        # ---
-        if label_control not in inp.CONTROLS:
-            continue
+            # ---
+            # if object in action: remove only this action
+            if kind == Control.OBJECTS.LINK:  # action only for links
+                for action in list(control.actions_if):  # type: Control._Action
+                    if action.label == label:
+                        # i = control.actions_if.index(action)
+                        # inp.CONTROLS[label_control].actions_if.remove(i)
+                        inp.CONTROLS[label_control].actions_if.remove(action)
 
-        # ---
-        # if object in action: remove only this action
-        if kind == Control.OBJECTS.LINK:  # action only for links
-            for action in list(control.actions_if):  # type: Control._Action
-                if action.label == label:
-                    i = control.actions_if.index(action)
-                    inp.CONTROLS[label_control].actions_if.remove(i)
+                for action in list(control.actions_else):  # type: Control._Action
+                    if action.label == label:
+                        # i = control.actions_else.index(action)
+                        # inp.CONTROLS[label_control].actions_else.remove(i)
+                        inp.CONTROLS[label_control].actions_else.remove(action)
 
-            for action in list(control.actions_else):  # type: Control._Action
-                if action.label == label:
-                    i = control.actions_else.index(action)
-                    inp.CONTROLS[label_control].actions_else.remove(i)
-
-            # if no actions left
-            if not control.actions_if:
-                del inp.CONTROLS[label_control]
+                # if no actions left
+                if not control.actions_if:
+                    del inp.CONTROLS[label_control]
 
 
 def rename_obj_in_control_section(inp, kind, old_label: str, new_label: str):
@@ -992,13 +1003,21 @@ def rename_obj_in_control_section(inp, kind, old_label: str, new_label: str):
                           Control.OBJECTS.PUMP}
 
     for control in inp.CONTROLS.values():
-        # ---
-        for condition in control.conditions:  # type: Control._Condition
-            if (condition.kind in possible_kinds) and (condition.label == old_label):
-                condition.label = new_label
+        if isinstance(control, ControlExpression):
+            # expressions dont have object labels
+            ...
+        elif isinstance(control, ControlVariable):
+            if (control.object_kind in possible_kinds) and (control.label == old_label):
+                control.label = new_label
+            #warnings.warn('The reduction of Variables and Expressions in the CONTROL section is not yet implemented in function `rename_obj_in_control_section`.', SwmmApiInputMacrosWarning)
+        else:
+            # ---
+            for condition in control.conditions:  # type: Control._Condition
+                if (condition.object_kind in possible_kinds) and (condition.label == old_label):
+                    condition.label = new_label
 
-        # ---
-        if kind == Control.OBJECTS.LINK:  # action only for links
-            for action in list(control.actions_if) + list(control.actions_else):  # type: Control._Action
-                if action.label == old_label:
-                    action.label = new_label
+            # ---
+            if kind == Control.OBJECTS.LINK:  # action only for links
+                for action in list(control.actions_if) + list(control.actions_else):  # type: Control._Action
+                    if action.label == old_label:
+                        action.label = new_label

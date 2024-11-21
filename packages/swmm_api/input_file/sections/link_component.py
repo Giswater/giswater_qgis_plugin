@@ -1,7 +1,7 @@
 from typing import NamedTuple
 
 import numpy as np
-from numpy import NaN, isnan
+from numpy import nan, isnan
 from pandas import DataFrame
 
 from ._identifiers import IDENTIFIERS
@@ -87,7 +87,7 @@ class CrossSection(BaseSectionObject):
         BASKETHANDLE = 'BASKETHANDLE'  # Full Height
         SEMICIRCULAR = 'SEMICIRCULAR'  # Full Height
 
-    def __init__(self, link, shape, height=0, parameter_2=0, parameter_3=0, parameter_4=0, n_barrels=1, culvert=NaN,
+    def __init__(self, link, shape, height=0, parameter_2=0, parameter_3=0, parameter_4=0, n_barrels=1, culvert=nan,
                  transect=None, curve_name=None, street=None):
         """
         Conduit, orifice, and weir cross-section geometry.
@@ -109,12 +109,12 @@ class CrossSection(BaseSectionObject):
         self.link = str(link)
         self.shape = shape
 
-        self.height = NaN
-        self.transect = NaN
-        self.street = NaN
+        self.height = nan
+        self.transect = nan
+        self.street = nan
 
-        self.parameter_2 = NaN
-        self.curve_name = NaN
+        self.parameter_2 = nan
+        self.curve_name = nan
 
         if shape == self.SHAPES.IRREGULAR:
             if transect is None:
@@ -307,8 +307,8 @@ class Vertices(BaseSectionObject):
         Returns:
             shapely.geometry.LineString: LineString object for the vertices.
         """
-        import shapely.geometry as sh
-        return sh.LineString(self.vertices)
+        import shapely.geometry as shp
+        return shp.LineString(self.vertices)
 
     @classmethod
     def create_section_from_geoseries(cls, data) :

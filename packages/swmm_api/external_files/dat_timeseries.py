@@ -9,6 +9,7 @@ from pathlib import Path
 
 import pandas as pd
 from swmm_api.external_files.following_values import remove_following_zeros
+from swmm_api.input_file._type_converter import str_to_datetime
 
 
 def write_swmm_timeseries_data(series, filename, drop_zeros=True):
@@ -113,7 +114,7 @@ def read_swmm_tsf(filename, sep='\t'):
     return df
 
 
-def write_calibration_files(df, filename, decimal=3):
+def write_calibration_file(df, filename, decimal=3):
     """
     Calibration Files contain measurements of variables at one or more locations that can be compared with simulated values in Time Series Plots.
 
@@ -185,3 +186,47 @@ def write_calibration_files(df, filename, decimal=3):
             f.write('\n\n' + '_'*20 + f'\n{col}\n')
 
             df_[col].to_csv(f, sep='\t', index=True, header=True, date_format='%m/%d/%Y %H:%M', lineterminator='\n')
+
+
+def write_calibration_files(*args, **kwargs):
+    raise NotImplementedError('Function rename to write_calibration_file (without the `s`)')
+
+
+def read_calibration_file(filename):
+    """
+    Read calibration data from file.
+
+    Args:
+        filename (str | Path): Filename of the calibration file.
+
+    Returns:
+        pandas.DataFrame: time-series-data-frame.
+    """
+    di_ts = {}
+    with open(filename, 'r') as f:
+        current_label = None
+        for line in f:
+            args = line.split()
+            if len(args) == 1:
+                current_label = args[0]
+                di_ts[current_label] = {}
+            elif len(args) == 3:
+                date_time = tuple(args[:-1])
+                if date_time[0].isdecimal() and date_time[1].count(':') > 1:
+                    td = pd.Timedelta(days=int(date_time[0]))
+                    if date_time[1].count(':') == 1:
+                        h, m = date_time[1].split(':')
+                        td += pd.Timedelta(hours=int(h), minutes=int(m))
+                    elif date_time[1].count(':') == 2:
+                        h, m, s = date_time[1].split(':')
+                        td += pd.Timedelta(hours=int(h), minutes=int(m), seconds=int(s))
+                    date_time = td
+                else:
+                    date_time = str_to_datetime(date_time[0], date_time[1])
+                # relative to start days and HH:MM:SS
+                # absolute
+                value = float(args[-1])
+                di_ts[current_label][date_time] = value
+            else:
+                print('UNKOWN')
+    return pd.DataFrame(di_ts)

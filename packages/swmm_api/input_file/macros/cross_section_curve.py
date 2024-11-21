@@ -1,4 +1,6 @@
-from ._helpers import print_warning
+import warnings
+
+from ._helpers import SwmmApiInputMacrosWarning
 from .. import SEC
 from ..sections import CrossSection
 from ..inp import SwmmInput
@@ -11,7 +13,7 @@ def get_cross_section_maker(inp, link_label):
     Object type from the package `SWMM-xsections-shape-generator` to analyse and plot cross-sections.
 
     Args:
-        inp (SwmmInput): inp-data
+        inp (swmm_api.SwmmInput): SWMM input-file data.
         link_label (str): label of the link, where the cross-section is wanted
 
     Returns:
@@ -33,7 +35,7 @@ def to_cross_section_maker(xs: CrossSection, inp: SwmmInput = None):
                                                      RectangularRound, RectangularTriangular, Triangular, Parabolic,
                                                      Power, Trapezoidal)
     except ImportError as e:
-        print_warning('Missing package: pip install SWMM-xsections-shape-generator')
+        warnings.warn('Missing package: pip install SWMM-xsections-shape-generator', SwmmApiInputMacrosWarning)
         return
 
     if xs.shape == CrossSection.SHAPES.CUSTOM:
@@ -94,7 +96,7 @@ def profil_area(inp, link_label):
     Get the area of the link with a given cross-section.
 
     Args:
-        inp (SwmmInput): inp-data
+        inp (swmm_api.SwmmInput): SWMM input-file data.
         link_label (str): label of the link, where the cross-section area is wanted
 
     Returns:

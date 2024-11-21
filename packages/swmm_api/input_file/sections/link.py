@@ -1,8 +1,8 @@
-from numpy import NaN, isnan
+from numpy import nan, isnan
 
 from ._identifiers import IDENTIFIERS
 from ..helpers import BaseSectionObject
-from .._type_converter import to_bool, infer_offset_elevation
+from .._type_converter import to_bool, infer_offset_elevation, convert_args
 from ..section_labels import CONDUITS, ORIFICES, OUTLETS, PUMPS, WEIRS
 
 
@@ -46,7 +46,7 @@ class Conduit(_Link):
     _section_label = CONDUITS
 
     def __init__(self, name, from_node, to_node, length, roughness, offset_upstream=0, offset_downstream=0,
-                 flow_initial=0, flow_max=NaN):
+                 flow_initial=0, flow_max=nan):
         """
         Conduit link information.
 
@@ -71,7 +71,7 @@ class Conduit(_Link):
         self.flow_initial = float(flow_initial)
         self.flow_max = float(flow_max)
         if self.flow_max == 0:
-            self.flow_max = NaN
+            self.flow_max = nan
 
 
 class Orifice(_Link):
@@ -223,6 +223,7 @@ class Outlet(_Link):
             if self.curve_type.startswith('TABULAR'):
                 self._tabular_init(*args)
             elif self.curve_type.startswith('FUNCTIONAL'):
+                args = convert_args(args)
                 self._functional_init(*args)
             else:
                 raise NotImplementedError(f'Type: "{self.curve_type}" is not implemented')
@@ -389,8 +390,8 @@ class Weir(_Link):
         GRAVEL = 'GRAVEL'
 
     def __init__(self, name, from_node, to_node, form, height_crest, discharge_coefficient, has_flap_gate=False,
-                 n_end_contractions=0, discharge_coefficient_end=NaN, can_surcharge=True,
-                 road_width=NaN, road_surface=NaN, coefficient_curve=NaN):
+                 n_end_contractions=0, discharge_coefficient_end=nan, can_surcharge=True,
+                 road_width=nan, road_surface=nan, coefficient_curve=nan):
         """
         Weir link information.
 
@@ -423,19 +424,19 @@ class Weir(_Link):
 
         # road_width and road_surface will be marked as '*' in epa-swmm GUI
         # either '*', NaN or a float
-        self.road_width = NaN if isinstance(road_width, str) and road_width == '*' else float(road_width)
+        self.road_width = nan if isinstance(road_width, str) and road_width == '*' else float(road_width)
         # either '*', NaN or a string
         if isinstance(road_surface, str):
             if road_surface.lower() in {'*', 'nan'}:
-                self.road_surface = NaN
+                self.road_surface = nan
             elif road_surface.upper() in (self.ROAD_SURFACES.PAVED, self.ROAD_SURFACES.GRAVEL):
                 self.road_surface = road_surface.upper()
             else:
-                raise NotImplementedError(f'The parameter road_surface takes either "*", np.NaN, "{self.ROAD_SURFACES.PAVED}" or "{self.ROAD_SURFACES.GRAVEL}"')
+                raise NotImplementedError(f'The parameter road_surface takes either "*", np.nan, "{self.ROAD_SURFACES.PAVED}" or "{self.ROAD_SURFACES.GRAVEL}"')
         elif isinstance(road_surface, (float, int)) and isnan(road_surface):
-            self.road_surface = road_surface  # = NaN
+            self.road_surface = road_surface  # = nan
         else:
-            raise NotImplementedError(f'The parameter road_surface takes either "*", np.NaN, "{self.ROAD_SURFACES.PAVED}" or "{self.ROAD_SURFACES.GRAVEL}"')
+            raise NotImplementedError(f'The parameter road_surface takes either "*", np.nan, "{self.ROAD_SURFACES.PAVED}" or "{self.ROAD_SURFACES.GRAVEL}"')
         # either NaN or a string
         self.coefficient_curve = coefficient_curve
         self._set_unused_parameters_stars()

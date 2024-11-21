@@ -1,17 +1,18 @@
-from warnings import warn
 import os
+from pathlib import Path
+from warnings import warn
 
 from pandas import to_datetime
 
+from swmm_api import read_inp_file, swmm5_run
+from swmm_api.input_file import SwmmInput, section_labels as sec
+from swmm_api.input_file._type_converter import offset2delta
 from swmm_api.input_file.macros import (find_node,
                                         find_link, calc_slope, conduit_iter_over_inp, combined_subcatchment_frame, )
 from swmm_api.input_file.macros.convert_object import junction_to_storage, junction_to_outfall
-from swmm_api.input_file.macros.reduce_unneeded import reduce_curves, reduce_raingages
 from swmm_api.input_file.macros.edit import delete_node, combine_conduits
-from swmm_api import read_inp_file, swmm5_run
+from swmm_api.input_file.macros.reduce_unneeded import reduce_curves, reduce_raingages
 from swmm_api.input_file.section_types import SECTION_TYPES
-from swmm_api.input_file import SwmmInput, section_labels as sec
-from swmm_api.input_file._type_converter import offset2delta
 from swmm_api.output_file import parquet_helpers as parquet
 from swmm_api.output_file.out import read_out_file
 
@@ -19,27 +20,23 @@ from swmm_api.output_file.out import read_out_file
 class InpMacros(SwmmInput):
     def __init__(self):
         SwmmInput.__init__(self, {})
-        self.filename = None
-        self.basename = None
-        self.dirname = None
+        self.filename = None  # type: Path
         self._out = None
 
     def set_name(self, name):
-        self.filename = name
-        self.basename = '.'.join(os.path.basename(name).split('.')[:-1])
-        self.dirname = os.path.dirname(name)
+        self.filename = Path(name)
 
     @property
     def report_filename(self):
-        return os.path.join(self.dirname, self.basename + '.rpt')
+        return self.filename.with_suffix('.rpt')
 
     @property
     def out_filename(self):
-        return os.path.join(self.dirname, self.basename + '.out')
+        return self.filename.with_suffix('.out')
 
     @property
     def parquet_filename(self):
-        return os.path.join(self.dirname, self.basename + '.parquet')
+        return self.filename.with_suffix('.parquet')
 
     def __repr__(self):
         return str(self)

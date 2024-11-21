@@ -1,4 +1,4 @@
-import os
+from pathlib import Path
 
 from ..inp import SwmmInput
 
@@ -12,16 +12,17 @@ def split_inp_to_files(inp_fn, **kwargs):
 
     Args:
         inp_fn (str): path to inp-file
-        **kwargs: keyword arguments of the :func:`~swmm_api.input_file.inp_reader.read_inp_file`-function
+        **kwargs: keyword arguments of the :func:`~swmm_api.input_file.inp.read_inp_file`-function
 
     Keyword Args:
         custom_converter (dict): dictionary of {section: converter/section_type} Default: :const:`SECTION_TYPES`
     """
-    parent = inp_fn.replace('.inp', '')
-    os.mkdir(parent)
-    inp = SwmmInput.read_file(inp_fn, **kwargs)
+    inp_fn = Path(inp_fn)
+    parent = inp_fn.parent / inp_fn.stem
+    parent.mkdir(exist_ok=True)
+    inp = SwmmInput(inp_fn, **kwargs)
     for s in inp.keys():
-        with open(os.path.join(parent, f'{s}.txt'), 'w') as f:
+        with open(parent / f'{s}.txt', 'w') as f:
             f.write(inp._data[s])
 
 
@@ -36,8 +37,7 @@ def read_split_inp_file(inp_fn):
         SwmmInput: inp-file data
     """
     inp = SwmmInput()
-    for header_file in os.listdir(inp_fn):
-        header = header_file.replace('.txt', '')
-        with open(os.path.join(inp_fn, header_file), 'r') as f:
-            inp[header] = f.read()
+    for header_file in Path(inp_fn).iterdir():
+        with open(header_file, 'r') as f:
+            inp[header_file.stem] = f.read()
     return inp

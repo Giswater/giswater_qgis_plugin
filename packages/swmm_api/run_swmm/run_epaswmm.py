@@ -8,7 +8,9 @@ __license__ = "MIT"
 
 import os
 import re
+import shutil
 import subprocess
+import warnings
 from pathlib import Path
 from sys import platform as _platform
 
@@ -125,6 +127,22 @@ def resolve_paths(fn_inp, pth_rpt_dir=None, pth_out_dir=None, pth_working_dir=No
     return fn_inp, fn_rpt, fn_out, pth_working_dir
 
 
+def is_executable_available(exec_name):
+    # Check if the executable is in the system path
+    if shutil.which(exec_name):
+        return True
+
+    # Check if it's an absolute path and the file exists and is executable
+    if os.path.isabs(exec_name) and os.path.isfile(exec_name) and os.access(exec_name, os.X_OK):
+        return True
+
+    # Check if it's a relative path, and the file exists and is executable
+    if os.path.isfile(exec_name) and os.access(exec_name, os.X_OK):
+        return True
+
+    return False
+
+
 def get_swmm_command_line_auto(fn_inp, fn_rpt, fn_out, create_out=True, swmm_path=None):
     # -----------------------
     if swmm_path is None:
@@ -132,6 +150,9 @@ def get_swmm_command_line_auto(fn_inp, fn_rpt, fn_out, create_out=True, swmm_pat
     else:
         ...  # TODO check if in system path or valide file name
         # if executed -> raises a file not found error
+
+    if not is_executable_available(swmm_path):
+        warnings.warn(f'Executable of SWMM not found ({swmm_path}).')
 
     return get_swmm_command_line(swmm_path, fn_inp, fn_rpt, fn_out if create_out else '')
 

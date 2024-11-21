@@ -157,7 +157,7 @@ class SwmmOutExtract(BinaryReader):
 
         # ____
         # Read codes of pollutant concentration UNITS = Number of pollutants * 4 byte integers
-        _pollutant_unit_labels = [_CONCENTRATION_UNITS[p] if p < len(_CONCENTRATION_UNITS) else 'NaN'
+        _pollutant_unit_labels = [_CONCENTRATION_UNITS[p] if p < len(_CONCENTRATION_UNITS) else 'nan'
                                   for p in self._next(n_pollutants, flat=False)]
         self.pollutant_units = dict(zip(self.labels[OBJECTS.POLLUTANT], _pollutant_unit_labels))
 
@@ -194,7 +194,9 @@ class SwmmOutExtract(BinaryReader):
         # double check variables
         for kind in [OBJECTS.SUBCATCHMENT, OBJECTS.NODE, OBJECTS.LINK, OBJECTS.SYSTEM]:
             n_vars = self._next()
-            assert n_vars == len(self.variables[kind])
+            n_vars_labels = len(self.variables[kind])
+            if n_vars != n_vars_labels:
+                raise SwmmExtractValueError(f'Number of variables in out-file (={n_vars}) different to standard out-file (={n_vars_labels}) for object type "{kind}". Please add the variable names to swmm_api.output_file.definitions.{kind.upper()}_VARIABLES.LIST_ object before reading custom out-file.')
             self._next(n_vars)
 
         # ____
@@ -309,11 +311,11 @@ class SwmmOutExtract(BinaryReader):
             i_period_start = (start - self.start_date) / self.report_interval
 
         if end is None:
-            i_period_end = self.n_periods - i_period_start
+            i_period_end = self.n_periods  # - i_period_start
         else:
-            i_period_end = (end - self.start_date) / self.report_interval
+            i_period_end = (end - self.start_date) / self.report_interval + 1
 
-        n_periods = i_period_end - i_period_start + 1
+        n_periods = i_period_end - i_period_start
         pos_start_output = self._pos_start_output + i_period_start * self._bytes_per_period
         return int(pos_start_output), int(n_periods)
 

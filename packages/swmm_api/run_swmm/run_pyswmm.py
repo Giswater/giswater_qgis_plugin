@@ -25,7 +25,7 @@ def swmm5_run_progress(fn_inp, fn_rpt=None, fn_out=None, n_total=100, swmm_lib_p
         working_dir = Path(fn_inp).resolve().parent
 
     with TemporaryWorkingDirectory(working_dir):
-        with Simulation(inputfile=str(fn_inp), reportfile=fn_rpt, outputfile=fn_out, swmm_lib_path=swmm_lib_path) as sim:
+        with Simulation(inputfile=str(fn_inp), reportfile=fn_rpt, outputfile=fn_out) as sim:  # , swmm_lib_path=swmm_lib_path
             total_time_seconds = (sim.end_time - sim.start_time) / timedelta(seconds=1)
             sim.step_advance(floor(total_time_seconds / n_total))
 

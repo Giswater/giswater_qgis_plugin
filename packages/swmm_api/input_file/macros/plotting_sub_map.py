@@ -8,7 +8,7 @@ def plot_sub_map(inp, node, depth=2):
     Plot model as map but only around a base-node of interest.
 
     Args:
-        inp (swmm_api.SwmmInput): input-data.
+        inp (swmm_api.SwmmInput): SWMM input-file data.
         node (str): label of the node.
         depth (int): number of nodes around the base-node to be included in the plot.
 

@@ -1,6 +1,6 @@
 import struct
 from io import SEEK_SET, BytesIO
-from tqdm import tqdm
+from tqdm.auto import tqdm
 
 _RECORDSIZE = 4
 

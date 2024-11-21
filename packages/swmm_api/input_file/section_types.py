@@ -5,21 +5,24 @@ from .sections import *
 SECTION_TYPES = {
     TITLE        : TitleSection,
     OPTIONS      : OptionSection,
-    EVAPORATION  : EvaporationSection,
-    TEMPERATURE  : TemperatureSection,
     REPORT       : ReportSection,
     FILES        : FilesSection,
-    BACKDROP     : BackdropSection,
+    EVAPORATION  : EvaporationSection,
+    TEMPERATURE  : TemperatureSection,
     ADJUSTMENTS  : AdjustmentsSection,
-    # -----
-    # GUI data
+    # ---
+    # GEO data
     COORDINATES  : Coordinate,
     VERTICES     : Vertices,
     POLYGONS     : Polygon,
+    # ---
+    # GUI data
     SYMBOLS      : Symbol,
     MAP          : MapSection,
+    BACKDROP     : BackdropSection,
     LABELS       : Label,
-    # -----
+    # PROFILES     : not implemented
+    # ---
     # custom section objects
     CONDUITS     : Conduit,
     ORIFICES     : Orifice,
@@ -30,16 +33,17 @@ SECTION_TYPES = {
     TRANSECTS    : Transect,
     XSECTIONS    : CrossSection,
     LOSSES       : Loss,
-    # -----
+    # ---
     JUNCTIONS    : Junction,
     OUTFALLS     : Outfall,
     STORAGE      : Storage,
+    DIVIDERS     : Divider,
 
     DWF          : DryWeatherFlow,
     INFLOWS      : Inflow,
     RDII         : RainfallDependentInfiltrationInflow,
     TREATMENT    : Treatment,
-    # -----
+    # ---
     SUBCATCHMENTS: SubCatchment,
     SUBAREAS     : SubArea,
     INFILTRATION : Infiltration,  # multiple possible
@@ -51,7 +55,7 @@ SECTION_TYPES = {
     GWF          : GroundwaterFlow,
     GROUNDWATER  : Groundwater,
     SNOWPACKS    : SnowPack,
-    # -----
+    # ---
     RAINGAGES    : RainGage,
     PATTERNS     : Pattern,
     POLLUTANTS   : Pollutant,
@@ -62,10 +66,10 @@ SECTION_TYPES = {
     HYDROGRAPHS  : Hydrograph,
     LANDUSES     : LandUse,
     AQUIFERS     : Aquifer,
-    # -----
+    # ---
     LID_CONTROLS : LIDControl,
     LID_USAGE    : LIDUsage,
-    # -----
+    # ---
     STREETS      : Street,
     INLETS       : Inlet,  # multiple possible
     INLET_USAGE  : InletUsage,

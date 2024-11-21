@@ -1,6 +1,4 @@
-from typing import Mapping
-
-from numpy import NaN
+from numpy import nan
 
 from ._identifiers import IDENTIFIERS
 from .._type_converter import to_bool, convert_string
@@ -169,7 +167,8 @@ class LIDControl(BaseSectionObject):
                 layer = cls.LAYER_TYPES._dict[layer_type](*line)
                 last.add_layer(layer)
                 # last.layer_dict[layer_type] = layer
-        yield last
+        if last is not None:
+            yield last
 
     class LAYER_TYPES:
         """Layer types to add to LID controls."""
@@ -217,6 +216,10 @@ class LIDControl(BaseSectionObject):
 
             def __init__(self, Thick, Por, FC, WP, Ksat, Kcoeff, Suct):
                 """
+                The Soil Layer of the LID Control describes the properties of the engineered soil
+                mixture used in bio-retention types of LIDs and the optional sand layer beneath permeable
+                pavement.
+
                 Used:
                     bio-retention cell
                     rain garden
@@ -224,16 +227,19 @@ class LIDControl(BaseSectionObject):
                     permeable pavement (only optional)
 
                 Args:
-                    Thick (float): thickness of the soil layer (inches or mm).
-                    Por (float): soil porosity (volume of pore space relative to total volume).
+                    Thick (float): thickness of the soil layer (inches or mm). Typical values range from 18 to 36 inches (450 to 900 mm) for rain gardens, street planters and other types of land-based bio-retention units, but only 3 to 6 inches (75 to 150 mm) for green roofs.
+                    Por (float): soil porosity (The volume of pore space relative to total volume as a fraction).
                     FC (float): soil field capacity (volume of pore water relative to total volume after the
-                        soil has been allowed to drain fully).
+                        soil has been allowed to drain fully). Below this level, vertical drainage of water through the soil layer does not occur.
                     WP (float): soil wilting point (volume of pore water relative to total volume for a well
-                        dried soil where only bound water remains).
+                        dried soil where only bound water remains). The moisture content of the soil cannot fall below this limit.
                     Ksat (float): soil’s saturated hydraulic conductivity (in/hr or mm/hr).
-                    Kcoeff (float): slope of the curve of log(conductivity) versus soil moisture content
-                        (dimensionless).
-                    Suct (float): soil capillary suction (in or mm).
+                    Kcoeff (float): slope of the curve of log(conductivity) versus soil moisture content (dimensionless).
+                        Conductivity Slope - Average slope of the curve of log(conductivity) versus soil moisture deficit (porosity minus moisture content) (unitless).
+                        Typical values range from 30 to 60. It can be estimated from a standard soil grain size analysis as 0.48(%Sand) + 0.85(%Clay).
+                    Suct (float): soil capillary suction (in or mm) or Suction Head.
+                        The average value of soil capillary suction along the wetting front (inches or mm).
+                        This is the same parameter as used in the Green-Ampt infiltration model.
                 """
                 self.Thick = float(Thick)
                 self.Por = float(Por)
@@ -246,7 +252,7 @@ class LIDControl(BaseSectionObject):
         class Pavement(BaseSectionObject):
             _LABEL = 'PAVEMENT'
 
-            def __init__(self, Thick, Vratio, FracImp, Perm, Vclog, regeneration_interval=NaN, regeneration_fraction=NaN):
+            def __init__(self, Thick, Vratio, FracImp, Perm, Vclog, regeneration_interval=nan, regeneration_fraction=nan):
                 """
                 Used:
                     permeable pavement
@@ -307,7 +313,7 @@ class LIDControl(BaseSectionObject):
         class Drain(BaseSectionObject):
             _LABEL = 'DRAIN'
 
-            def __init__(self, Coeff, Expon, Offset, Delay, open_level=NaN, close_level=NaN, Qcurve=NaN):
+            def __init__(self, Coeff, Expon, Offset, Delay, open_level=nan, close_level=nan, Qcurve=nan):
                 """
 
                 Used:
@@ -394,9 +400,8 @@ class LIDControl(BaseSectionObject):
         DRAINMAT = Drainmat._LABEL
         REMOVALS = Removals._LABEL
 
-        _possible = {SURFACE, SOIL, PAVEMENT, STORAGE, DRAIN, DRAINMAT, REMOVALS}
-
         _dict = {x._LABEL: x for x in (Surface, Soil, Pavement, Storage, Drain, Drainmat, Removals)}
+        _possible = set(_dict.keys())
 
     def add_layer(self, layer):
         """
@@ -497,7 +502,7 @@ class LIDUsage(BaseSectionObject):
     _identifier = (IDENTIFIERS.subcatchment, 'lid')
     _section_label = LID_USAGE
 
-    def __init__(self, subcatchment, lid, n_replicate, area, width, saturation_init, impervious_portion, route_to_pervious=0, fn_lid_report=NaN, drain_to=NaN, from_pervious=NaN):
+    def __init__(self, subcatchment, lid, n_replicate, area, width, saturation_init, impervious_portion, route_to_pervious=0, fn_lid_report=nan, drain_to=nan, from_pervious=nan):
         """
         Assignment of LID controls to subcatchments.
 

@@ -39,7 +39,7 @@ def get_pattern_time_frame(index, pattern_section):
                 i[p.cycle] = range(len(p.factors))
                 temp[CYCLE.WEEKEND] = index.hour
                 weekend = index.dayofweek.isin([5, 6])
-                temp.loc[~weekend, CYCLE.WEEKEND] = np.NaN
+                temp.loc[~weekend, CYCLE.WEEKEND] = np.nan
 
         df[p.name] = temp[p.cycle].map(dict(zip(i[p.cycle], p.factors))).fillna(
             1).round(3)
@@ -91,7 +91,7 @@ def get_dwf_node_series(inp, dwf: DryWeatherFlow, index):
     return dwf.base_value * ts_pattern_prod
 
 
-def prep_factors(values, dec=3, even_out=False):
+def prep_factors(values: list, dec=3, even_out=False):
     n = len(values)
 
     values_round = list(np.round(values, dec))
@@ -123,7 +123,7 @@ class MARKER:
 
 
 class PatternRegression:
-    def __init__(self, ts, with_year=True):
+    def __init__(self, ts, set_cycles=None, with_year=True):
         self.ts = ts.rename('values')
 
         # --------------------------------------------------------------
@@ -133,12 +133,22 @@ class PatternRegression:
         d = self.ts.to_frame()
         cols = []
 
+        if set_cycles is None:
+            set_cycles = {Pattern.CYCLES.MONTHLY, Pattern.CYCLES.DAILY,
+                          Pattern.CYCLES.HOURLY, Pattern.CYCLES.WEEKEND}
+
         is_weekend = d.index.weekday >= 5
 
-        levels = [f'{MARKER.MONTH}{MARKER.SEP}%m_%b',
-                  f'{MARKER.DAY}{MARKER.SEP}%w_%a',
-                  f'{MARKER.HOURLY}{MARKER.SEP}%H',
-                  f'{MARKER.WEEKEND}{MARKER.SEP}%H']
+        levels = []
+
+        if Pattern.CYCLES.MONTHLY in set_cycles:
+            levels.append(f'{MARKER.MONTH}{MARKER.SEP}%m_%b')
+        if Pattern.CYCLES.DAILY in set_cycles:
+            levels.append(f'{MARKER.DAY}{MARKER.SEP}%w_%a')
+        if Pattern.CYCLES.HOURLY in set_cycles:
+            levels.append(f'{MARKER.HOURLY}{MARKER.SEP}%H')
+        if Pattern.CYCLES.WEEKEND in set_cycles:
+            levels.append(f'{MARKER.WEEKEND}{MARKER.SEP}%H')
 
         if with_year:
             levels.append(f'{MARKER.YEAR}{MARKER.SEP}%Y')
@@ -172,18 +182,26 @@ class PatternRegression:
         parameters_mul = pd.Series(index=parameters_add.index,
                                    name='params_MUL', dtype=float)
 
-        days_list = parameters_add.xs(MARKER.DAY, level=0).index.values
-        # index_wd = ['1_Mon', '2_Tue', '3_Wed', '4_Thu', '5_Fri']
-        # index_we = ['0_Sun', '6_Sat']
-        index_wd, index_we = ([list(g) for k, g in groupby(sorted(days_list, key=lambda i: i[0] in '06'), key=lambda i: i[0] in '06')])
+        # ---
+        # TODO wenn nur eine liste von Cycles gegeben
 
-        day_wd = parameters_add.xs(MARKER.DAY, level=0).loc[index_wd].mean()
-        day_we = parameters_add.xs(MARKER.DAY, level=0).loc[index_we].mean()
-        hour_we = parameters_add.xs(MARKER.WEEKEND, level=0).mean()
-        hour_wd = parameters_add.xs(MARKER.HOURLY, level=0).mean()
+        if MARKER.DAY in parameters_add.index.levels[0]:
+            days_list = parameters_add.xs(MARKER.DAY, level=0).index.values
+            # index_wd = ['1_Mon', '2_Tue', '3_Wed', '4_Thu', '5_Fri']
+            # index_we = ['0_Sun', '6_Sat']
+            index_wd, index_we = ([list(g) for k, g in groupby(sorted(days_list, key=lambda i: i[0] in '06'), key=lambda i: i[0] in '06')])
 
-        for g in (
-        MARKER.WEEKEND, MARKER.HOURLY, MARKER.DAY, MARKER.MONTH, MARKER.YEAR):
+            day_wd = parameters_add.xs(MARKER.DAY, level=0).loc[index_wd].mean()
+            day_we = parameters_add.xs(MARKER.DAY, level=0).loc[index_we].mean()
+        else:
+            day_wd = 0
+            day_we = 0
+        if MARKER.WEEKEND in parameters_add.index.levels[0]:
+            hour_we = parameters_add.xs(MARKER.WEEKEND, level=0).mean()
+        if MARKER.HOURLY in parameters_add.index.levels[0]:
+            hour_wd = parameters_add.xs(MARKER.HOURLY, level=0).mean()
+
+        for g in (MARKER.WEEKEND, MARKER.HOURLY, MARKER.DAY, MARKER.MONTH, MARKER.YEAR):
             if g in parameters_add.index.levels[0]:
                 g_values = parameters_add.xs(g, level=0).copy()
                 if g == MARKER.DAY:
@@ -201,9 +219,21 @@ class PatternRegression:
                 parameters_mul.loc[(g, g_values.index)] = (g_values - g_base).values
                 if g in (MARKER.DAY, MARKER.MONTH, MARKER.YEAR):
                     self.average_value += g_base
+        if (MARKER.DAY not in parameters_add.index.levels[0]) and (MARKER.MONTH not in parameters_add.index.levels[0]):
+            self.average_value = hour_wd
 
-        self.parameters_mul = (
-                                          parameters_mul + self.average_value) / self.average_value
+        self.parameters_mul = (parameters_mul + self.average_value) / self.average_value
+
+        # == validation ==
+        # print(ts.sum())
+        #
+        # inp = self.resulting_inp_data()
+        # ts2 = get_dwf_node_series(self.resulting_inp_data(), inp.DWF[('node', DryWeatherFlow.TYPES.FLOW)], index=ts.index)
+        # print(ts2.sum())
+        #
+        # from statsmodels.tools.eval_measures import rmse
+        # print(f'{rmse(ts, ts2)=}')
+
 
     def _get_pattern(self, pattern_type, even_out=False):
         factors = prep_factors(
@@ -225,8 +255,9 @@ class PatternRegression:
         return self._get_pattern(Pattern.CYCLES.WEEKEND)
 
     def new_inp_objects(self, node_label='node', constituent=DryWeatherFlow.TYPES.FLOW):
-        pattern_types = (Pattern.CYCLES.WEEKEND, Pattern.CYCLES.HOURLY,
-                         Pattern.CYCLES.DAILY, Pattern.CYCLES.MONTHLY)
+        # pattern_types = (Pattern.CYCLES.WEEKEND, Pattern.CYCLES.HOURLY,
+        #                  Pattern.CYCLES.DAILY, Pattern.CYCLES.MONTHLY)
+        pattern_types = set(self.parameters_mul.index.levels[0])
         return (
             *(Pattern(f'{node_label}_DW_{constituent}_{pattern_type}', pattern_type, factors=prep_factors(self.parameters_mul.loc[pattern_type].sort_index()))
                 for pattern_type in pattern_types),
@@ -306,7 +337,7 @@ class PatternRegression:
 
 def combine_dwf(inp: SwmmInput, node_to_add, node_base, constituent):
     # dummy index -> no meaning -> must be one year to fit all patterns
-    index = pd.date_range('2022-01-01 00:00', '2023-01-01 00:00', freq='H',
+    index = pd.date_range('2022-01-01 00:00', '2023-01-01 00:00', freq='h',
                           inclusive='left')
 
     if isinstance(node_to_add, DryWeatherFlow):
@@ -322,8 +353,18 @@ def combine_dwf(inp: SwmmInput, node_to_add, node_base, constituent):
     ts = get_dwf_node_series(inp, dwf_to_add, index=index)
     ts2 = get_dwf_node_series(inp, dwf_base, index=index)
 
+    set_cycles = set()
+    for p in dwf_base.get_pattern_list() + dwf_to_add.get_pattern_list():
+        set_cycles.add(inp.PATTERNS[p].cycle)
+
+    if Pattern.CYCLES.DAILY in set_cycles:
+        if Pattern.CYCLES.HOURLY in set_cycles:
+            set_cycles.add(Pattern.CYCLES.WEEKEND)
+        if Pattern.CYCLES.WEEKEND in set_cycles:
+            set_cycles.add(Pattern.CYCLES.HOURLY)
+
     ts_sum = ts + ts2
-    pr = PatternRegression(ts_sum)
+    pr = PatternRegression(ts_sum, set_cycles, with_year=False)
 
     inp.add_multiple(
         *pr.new_inp_objects(node_base, constituent)

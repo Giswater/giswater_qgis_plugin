@@ -9,7 +9,7 @@ def plot_time_series_instabile_links(inp, rpt, out):
     Plot time series of link flow with the highest instability index.
 
     Args:
-        inp (swmm_api.SwmmInput): input data
+        inp (swmm_api.SwmmInput): SWMM input-file data.
         rpt (swmm_api.SwmmReport): report data
         out (swmm_api.SwmmOutput): output data
 

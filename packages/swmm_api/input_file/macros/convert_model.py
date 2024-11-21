@@ -1,4 +1,6 @@
-from ._helpers import print_warning
+import warnings
+
+from ._helpers import SwmmApiInputMacrosWarning
 from .collection import nodes_dict
 from .convert_object import junction_to_divider, junction_to_storage
 from .graph import inp_to_graph, next_links_labels, next_links, previous_nodes, next_nodes, previous_links
@@ -29,7 +31,7 @@ def to_kinematic_wave(inp):
         Under Steady or Kinematic Wave flow routing, orifices, weirs, and outlet links can only be used as outflow links from storage nodes.
 
     Args:
-        inp (swmm_api.SwmmInput):
+        inp (swmm_api.SwmmInput): SWMM input-file data.
 
     Returns:
         swmm_api.SwmmInput: model is kinematic wave ready
@@ -56,7 +58,7 @@ def to_kinematic_wave(inp):
                 node_out.elevation = node_in.elevation
                 print(f'   {node_out._short_debug_string}.elevation = {node_in._short_debug_string}.elevation = {node_in.elevation}')
             else:
-                print_warning('   No solution found.')
+                warnings.warn('   No solution found.', SwmmApiInputMacrosWarning)
 
     # -----------------
     # Für jedes Wehr -> gibt es eine abzweigung? mach einen

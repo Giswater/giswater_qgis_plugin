@@ -1,5 +1,6 @@
 import os
 import warnings
+from pathlib import Path
 
 
 def read_txt_file(filename, encoding):
@@ -20,7 +21,7 @@ def read_txt_file(filename, encoding):
     #     encoding1 = detection["encoding"]
     #     confidence1 = detection["confidence"]
     #     txt1 = binary_txt.decode(encoding1)
-    if isinstance(filename, (str, bytes, os.PathLike)):
+    if isinstance(filename, (str, bytes, os.PathLike, Path)):
         with open(filename, 'rb') as file:
             binary = file.read()
     else:

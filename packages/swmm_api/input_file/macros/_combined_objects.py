@@ -1,3 +1,4 @@
+from swmm_api.input_file import SEC
 from swmm_api.input_file.macros import calc_slope, get_link_tags, nodes_dict
 from swmm_api.input_file.sections import CrossSection, Loss, Vertices
 from swmm_api.input_file.sections.link import _Link, Conduit, Orifice, Outlet, Pump, Weir
@@ -23,23 +24,23 @@ class SuperConduit(Conduit, CrossSection, Loss, Vertices):
         """
 
         Args:
-            inp (swmm_api.SwmmInput):
-            label:
+            inp (swmm_api.SwmmInput): SWMM input-file data.
+            label (str): label of the conduit.
 
         Returns:
-
+            SuperConduit: conduit object with combined attrubutes.
         """
-        if label in inp.CONDUITS:
+        if SEC.CONDUITS in inp and label in inp.CONDUITS:
             loss = None
-            if label in inp.LOSSES:
+            if SEC.LOSSES in inp and label in inp.LOSSES:
                 loss = inp.LOSSES[label]
 
             vertices = None
-            if label in inp.VERTICES:
+            if SEC.VERTICES in inp and label in inp.VERTICES:
                 vertices = inp.VERTICES[label]
             tag = None
             tags = get_link_tags(inp)
-            if label in tags:
+            if SEC.TAGS in inp and label in tags:
                 tag = tags[label]
             return cls(inp, inp.CONDUITS[label], inp.XSECTIONS[label], loss, vertices, tag)
 
@@ -71,11 +72,11 @@ class SuperConduit(Conduit, CrossSection, Loss, Vertices):
             return self.shape_generator.area_v
 
     @property
-    def from_node(self):
+    def from_node_obj(self):
         return self._nodes[self.from_node]
 
     @property
-    def to_node(self):
+    def to_node_obj(self):
         return self._nodes[self.to_node]
 
     @property

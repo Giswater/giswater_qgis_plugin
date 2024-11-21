@@ -11,7 +11,7 @@ def filter_tags(inp, kind, list_of_objects):
     Filter tags for one object-type.
 
     Args:
-        inp (SwmmInput): inp-file data
+        inp (swmm_api.SwmmInput): SWMM input-file data.
         kind (str): one of (`Subcatch`, `Node`, `Link`). You can use the :attr:`Tag.TYPES` attribute.
         list_of_objects (list[str]): list of object-labels.
 
@@ -35,11 +35,11 @@ def filter_nodes(inp, final_nodes):
      Filter nodes in the network.
 
     Args:
-        inp (SwmmInput): inp-file data
+        inp (swmm_api.SwmmInput): SWMM input-file data.
         final_nodes (list | set):
 
     Returns:
-        SwmmInput: new inp-file data
+        swmm_api.SwmmInput: new inp-file data
     """
     for section in NODE_SECTIONS + NODE_SECTIONS_ADD:
         if section in inp:
@@ -63,11 +63,11 @@ def filter_links_within_nodes(inp, final_nodes):
     filter links by nodes in the network
 
     Args:
-        inp (SwmmInput): inp-file data
+        inp (swmm_api.SwmmInput): SWMM input-file data.
         final_nodes (list | set):
 
     Returns:
-        SwmmInput: new inp-file data
+        swmm_api.SwmmInput: new inp-file data
     """
     final_links = set()
     for section in LINK_SECTIONS:
@@ -87,11 +87,11 @@ def filter_links(inp, final_links):
     filter links by nodes in the network
 
     Args:
-        inp (SwmmInput): inp-file data
+        inp (swmm_api.SwmmInput): SWMM input-file data.
         final_links (list | set):
 
     Returns:
-        SwmmInput: new inp-file data
+        swmm_api.SwmmInput: new inp-file data
     """
     for section in LINK_SECTIONS:
         if section in inp:
@@ -126,11 +126,11 @@ def filter_subcatchments(inp, final_nodes):
     filter subcatchments by nodes in the network
 
     Args:
-        inp (SwmmInput): inp-file data
+        inp (swmm_api.SwmmInput): SWMM input-file data.
         final_nodes (list | set):
 
     Returns:
-        SwmmInput: new inp-file data
+        swmm_api.SwmmInput: new inp-file data
     """
     other_sc_sections = SUBCATCHMENT_SECTIONS.copy()
     other_sc_sections.remove(SUBCATCHMENTS)
@@ -175,11 +175,11 @@ def create_sub_inp(inp, nodes):
         This changes the inp-object. Use inp.copy() as parameter for this function when original structure should not be changed.
 
     Args:
-        inp (SwmmInput): inp-file data
+        inp (swmm_api.SwmmInput): SWMM input-file data.
         nodes (list[str]): list of node labels to keep in inp data
 
     Returns:
-        SwmmInput: filtered inp-file data
+        swmm_api.SwmmInput: filtered inp-file data
     """
     inp = filter_nodes(inp, nodes)
     inp = filter_links_within_nodes(inp, nodes)

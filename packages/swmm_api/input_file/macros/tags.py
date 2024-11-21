@@ -14,7 +14,7 @@ def _get_tags_frame(inp, part=None):
     if TAGS in inp and inp[TAGS]:
         df_tags = inp[TAGS].frame
         if part in df_tags.index.levels[0]:
-            return inp[TAGS].frame.xs(part, axis=0, level=0)
+            return df_tags.xs(part, axis=0, level=0)
     return pd.Series(name=TAG_COL_NAME, dtype=str)
 
 
@@ -23,7 +23,7 @@ def get_node_tags(inp):
     get node tags as pandas.Series
 
     Args:
-        inp (SwmmInput): inp data
+        inp (swmm_api.SwmmInput): SWMM input-file data.
 
     Returns:
         pandas.Series: node tags
@@ -36,7 +36,7 @@ def get_link_tags(inp):
     get node link as pandas.Series
 
     Args:
-        inp (SwmmInput): inp data
+        inp (swmm_api.SwmmInput): SWMM input-file data.
 
     Returns:
         pandas.Series: link tags
@@ -49,7 +49,7 @@ def get_subcatchment_tags(inp):
     get subcatchment tags as pandas.Series
 
     Args:
-        inp (SwmmInput): inp data
+        inp (swmm_api.SwmmInput): SWMM input-file data.
 
     Returns:
         pandas.Series: subcatchment tags
@@ -88,12 +88,12 @@ def delete_tag_group(inp, part):
     delete all tags of one group
 
     Args:
-        inp (SwmmInput):
+        inp (swmm_api.SwmmInput): SWMM input-file data.
         part (str): label of the group i.e.: :attr:`Tag.TYPE.Node` (or the strings: 'Node', 'Subcatch', 'Link')
     """
     if TAGS in inp:
         for key in list(inp[TAGS].keys()):
-            if inp[TAGS][key].kind == part:
+            if inp.TAGS[key].kind == part:
                 del inp[TAGS][key]
 
 

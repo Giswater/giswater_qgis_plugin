@@ -1,15 +1,18 @@
-import os
+import warnings
+from pathlib import Path
 from statistics import mean
 
 import pandas as pd
 
+from ._helpers import SwmmApiInputMacrosWarning
 from .collection import nodes_dict, links_dict
 from .graph import links_connected
 from .tags import get_subcatchment_tags, get_node_tags
+from .. import SEC
 from ..inp import SwmmInput
 from ..section_labels import *
 from ..section_lists import LINK_SECTIONS, NODE_SECTIONS
-from ..sections import TimeseriesFile
+from ..sections import TimeseriesFile, TemperatureSection
 from ..sections.link import _Link, Conduit, Weir, Outlet, Orifice
 from ..sections.link_component import CrossSection
 
@@ -26,7 +29,7 @@ def find_node(inp: SwmmInput, label):
     find node in inp-file data
 
     Args:
-        inp (SwmmInput): inp-file data
+        inp (swmm_api.SwmmInput): SWMM input-file data.
         label (str): node Name/label
 
     Returns:
@@ -40,7 +43,7 @@ def find_link(inp: SwmmInput, label):
     find link in inp-file data
 
     Args:
-        inp (SwmmInput): inp-file data
+        inp (swmm_api.SwmmInput): SWMM input-file data.
         label (str): link Name/label
 
     Returns:
@@ -55,7 +58,7 @@ def calc_slope(inp: SwmmInput, conduit):
     calculate the slop of a conduit
 
     Args:
-        inp (SwmmInput): inp-file data
+        inp (swmm_api.SwmmInput): SWMM input-file data.
         conduit (Conduit): link
 
     Returns:
@@ -71,7 +74,7 @@ def conduit_slopes(inp: SwmmInput):
     get the slope of all conduits
 
     Args:
-        inp (SwmmInput):
+        inp (swmm_api.SwmmInput): SWMM input-file data.
 
     Returns:
         pandas.Series: slopes
@@ -104,7 +107,7 @@ def conduits_are_equal(inp: SwmmInput, link0, link1, diff_roughness=0.1, diff_sl
     check if the links (with all there components) are equal
 
     Args:
-        inp (SwmmInput):
+        inp (swmm_api.SwmmInput): SWMM input-file data.
         link0 (Conduit | Weir | Outlet | Orifice | Pump | _Link): first link
         link1 (Conduit | Weir | Outlet | Orifice | Pump | _Link): second link
         diff_roughness (float | None): difference from which it is considered different.
@@ -193,7 +196,7 @@ def set_times(inp, start, end, head=None, tail=None):
     set start and end time of the inp-file
 
     Args:
-        inp (SwmmInput): inp data
+        inp (swmm_api.SwmmInput): SWMM input-file data.
         start (datetime.datetime): start time of the simulation and the reporting
         end (datetime.datetime): end time of the simulation
         head (datetime.timedelta): brings start time forward
@@ -229,7 +232,7 @@ def combined_subcatchment_frame(inp: SwmmInput):
     combine all information of the subcatchment data-frames
 
     Args:
-        inp (SwmmInput): inp-file data
+        inp (swmm_api.SwmmInput): SWMM input-file data.
 
     Returns:
         pandas.DataFrame: combined subcatchment data
@@ -246,7 +249,7 @@ def combined_nodes_frame(inp: SwmmInput):
 def nodes_data_frame(inp, label_sep='.'):
     nodes_tags = get_node_tags(inp)
     res = None
-    for s, _ in iter_sections(inp, NODE_SECTIONS):
+    for s, _ in inp.iter_avail_sections(NODE_SECTIONS):
         df = inp[s].frame.rename(columns=lambda c: f'{label_sep}{c}')
 
         if s == STORAGE:
@@ -267,41 +270,70 @@ def nodes_data_frame(inp, label_sep='.'):
     return res
 
 
-def iter_sections(inp, section_list):
-    for s in section_list:
-        if s in inp:
-            yield s, inp[s]
+def iter_sections(inp: SwmmInput, section_list: (list, tuple, set)):
+    inp.iter_avail_sections(section_list)
 
 
-def delete_sections(inp, section_list):
-    for s in section_list:
-        if s in inp:
-            del inp[s]
+def delete_sections(inp: SwmmInput, section_list: (list, tuple, set)):
+    inp.delete_sections(section_list)
 
 
 def set_absolute_file_paths(inp, path_data_base):
     """
+    Change the paths in the input file to absolute paths.
 
     Args:
-        inp (SwmmInput):
-        path_data_base:
-
-    Returns:
-
+        inp (swmm_api.SwmmInput): SWMM input-file data.
+        path_data_base (str | pathlib.Path): absolute path where the files are stored.
     """
+    path_data_base = Path(path_data_base)
+
     if FILES in inp:
-        pass  # ?
+        warnings.warn('set_absolute_file_paths for FILES not implemented.', SwmmApiInputMacrosWarning)
 
     if RAINGAGES in inp:
         for rg in inp.RAINGAGES.values():
             if isinstance(rg.filename, str):
-                rg.filename = os.path.join(path_data_base, rg.filename)
+                rg.filename = path_data_base / rg.filename
 
     if TEMPERATURE in inp:
-        if 'FILE' in inp.TEMPERATURE:
-            inp.TEMPERATURE['FILE'] = os.path.join(path_data_base, inp.TEMPERATURE['FILE'])
+        if TemperatureSection.KEYS.FILE in inp.TEMPERATURE:
+            inp.TEMPERATURE[TemperatureSection.KEYS.FILE] = path_data_base / inp.TEMPERATURE[TemperatureSection.KEYS.FILE]
 
     if TIMESERIES in inp:
         for ts in inp.TIMESERIES.values():
             if isinstance(ts, TimeseriesFile):
-                ts.filename = os.path.join(path_data_base, ts.filename)
+                ts.filename = path_data_base / ts.filename
+
+
+def convert_cms_to_lps(inp: SwmmInput):
+    # TODO Testing
+    #   not tested: CONTROLS, DIVIDERS(CUTOFF), WEIRS(discharge coefficient), INLET_USAGE(Q_max)
+
+    if SEC.CONDUITS in inp:
+        for c in inp.CONDUITS.values():
+            c.flow_max *= 1000
+            c.flow_initial *= 1000
+
+    if SEC.CURVES in inp:
+        for c in inp.CURVES.values():
+            from swmm_api.input_file.sections import Curve
+            if c.kind in {Curve.TYPES.DIVERSION, Curve.TYPES.PUMP1, Curve.TYPES.PUMP2, Curve.TYPES.PUMP3, Curve.TYPES.PUMP4, Curve.TYPES.RATING}:
+                for row in range(len(c.points)):
+                    c.points[row][1] *= 1000
+
+    if SEC.DWF in inp:
+        for d in inp.DWF.values():
+            if d.constituent == d.TYPES.FLOW:
+                d.base_value *= 1000
+
+    if SEC.INFLOWS in inp:
+        for i in inp.INFLOWS.values():
+            if i.constituent == i.TYPES.FLOW:
+                i.scale_factor *= 1000
+                i.base_value *= 1000
+
+    if SEC.OPTIONS in inp:
+        inp.OPTIONS['FLOW_UNITS'] = 'LPS'
+
+    warnings.warn('convert_cms_to_lps(inp): Not every section is converted.', SwmmApiInputMacrosWarning)

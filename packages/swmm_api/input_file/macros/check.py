@@ -12,7 +12,7 @@ def check_for_nodes_old(inp):
     check if any link-end-node is missing
 
     Args:
-        inp (swmm_api.SwmmInput): inp data
+        inp (swmm_api.SwmmInput): SWMM input-file data.
 
     Returns:
        tuple[set[swmm_api.input_file.sections.link._Link], set[str]]: set of corrupt links and a set of missing nodes
@@ -38,7 +38,7 @@ def check_for_nodes(inp):
     Check if any link-end-node is missing.
 
     Args:
-        inp (swmm_api.SwmmInput): inp data
+        inp (swmm_api.SwmmInput): SWMM input-file data.
 
     Returns:
        dict[str, list[swmm_api.input_file.sections.link._Link]]: dict of missing nodes with connected corrupt links
@@ -69,7 +69,7 @@ def check_for_duplicate_nodes(inp):
     Check if any node or subcatchment has a duplicate label in a different section.
 
     Args:
-        inp (swmm_api.SwmmInput): inp data
+        inp (swmm_api.SwmmInput): SWMM input-file data.
 
     Returns:
         set[str]: set of duplicate nodes and subcatchments
@@ -88,7 +88,7 @@ def check_for_duplicate_links(inp):
     Check if any link has a duplicate label in a different section.
 
     Args:
-        inp (swmm_api.SwmmInput): inp data
+        inp (swmm_api.SwmmInput): SWMM input-file data.
 
     Returns:
         set[str]: set of duplicate links
@@ -107,7 +107,7 @@ def check_for_duplicates(inp):
     check if any node, link or subcatchment has a duplicate label in a different section
 
     Args:
-        inp (swmm_api.SwmmInput): inp data
+        inp (swmm_api.SwmmInput): SWMM input-file data.
 
     Returns:
         tuple[set[str], set[str]]: set of duplicate nodes, links and subcatchments
@@ -120,7 +120,7 @@ def check_for_subcatchment_outlets_old(inp):
     check if any subcatchments lost their outlets
 
     Args:
-        inp (swmm_api.SwmmInput): inp data
+        inp (swmm_api.SwmmInput): SWMM input-file data.
 
     Returns:
         tuple[set[swmm_api.input_file.sections.subcatch.SubCatchment], set[str]]: : set of subcatchments_corrupt, outlets_missing
@@ -138,7 +138,7 @@ def check_for_subcatchment_outlets(inp):
     Check if any subcatchments lost their outlets.
 
     Args:
-        inp (swmm_api.SwmmInput): inp data
+        inp (swmm_api.SwmmInput): SWMM input-file data.
 
     Returns:
         dict[str, list[swmm_api.input_file.sections.subcatch.SubCatchment]]: : dict of outlets_missing with connected subcatchments
@@ -157,7 +157,7 @@ def check_for_curves(inp):
     Check if any curve is missing.
 
     Args:
-        inp (swmm_api.SwmmInput): inp data
+        inp (swmm_api.SwmmInput): SWMM input-file data.
 
     Returns:
        dict[str, list[swmm_api.input_file.sections.link._Link]]: dict of missing nodes with connected corrupt links
@@ -173,7 +173,7 @@ def check_outfall_connections(inp):
     ERROR 141: Outfall ____ has more than 1 inlet link or an outlet link.
 
     Args:
-        inp (swmm_api.SwmmInput): inp data
+        inp (swmm_api.SwmmInput): SWMM input-file data.
 
     Returns:
 

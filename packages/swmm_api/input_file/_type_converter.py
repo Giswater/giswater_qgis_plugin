@@ -161,6 +161,8 @@ def datetime_to_str(dt):
         if s:
             t += f':{s:02d}'
         return t
+    elif isinstance(dt, int):
+        return f'{dt:02d}:00'
     elif isinstance(dt, str):
         return dt
     elif isinstance(dt, datetime.datetime):
@@ -252,8 +254,20 @@ def convert_string(x) -> str:
     x = str(x)
     s = x.strip(' "')
     if s == '':
-        return np.NaN
+        return np.nan
     return s
+
+
+def convert_args(args):
+    # if any arg is a string of a list, tuple or set -> convert type
+    args_fix = []
+    for a in args:
+        if isinstance(a, str) and ((('[' in a) and (']' in a)) or (('(' in a) and (')' in a)) or (('{' in a) and ('}' in a))):
+            a = list(eval(a))
+            args_fix += a
+        else:
+            args_fix.append(a)
+    return args_fix
 
 
 def get_gis_inp_decimals():

@@ -1,10 +1,12 @@
-import numpy as np
+import warnings
+from collections import ChainMap
 
 from .collection import links_dict, nodes_dict
-from ._helpers import get_used_curves
+from ._helpers import get_used_curves, verbose_logging, logger, SwmmApiInputMacrosWarning
 from ..section_labels import *
 from ..misc.curve_simplification import ramer_douglas
 from ..sections import Control, EvaporationSection, ReportSection, ControlVariable, ControlExpression
+from ... import SwmmInput
 
 
 def reduce_curves(inp):
@@ -14,7 +16,7 @@ def reduce_curves(inp):
     Only keep used CURVES from the sections [STORAGE, OUTFALLS, OUTLETS, PUMPS and XSECTIONS].
 
     Args:
-        inp (swmm_api.SwmmInput): inp-file data
+        inp (swmm_api.SwmmInput): SWMM input-file data.
 
     .. Important::
         works inplace
@@ -48,17 +50,18 @@ def reduce_pattern(inp):
         inp[PATTERNS] = inp[PATTERNS].slice_section(used_pattern)
 
 
-def reduce_controls(inp):
+@verbose_logging
+def reduce_controls(inp, verbose=False):
     """
-    remove unused controls
+    Remove unused controls.
 
-    only keep used CONTROLS the sections [CONDUIT, ORIFICE, WEIR, OUTLET / NODE, LINK, CONDUIT, PUMP, ORIFICE, WEIR, OUTLET]
+    Only keep used CONTROLS the sections [CONDUIT, ORIFICE, WEIR, OUTLET / NODE, LINK, CONDUIT, PUMP, ORIFICE, WEIR, OUTLET]
 
-    if unavailable object in condition: remove whole rule
-    if unavailable object in action: remove only this action
+    If an unavailable object is in the condition: remove whole rule.
+    If an unavailable object is in an action: remove only this action.
 
     Args:
-        inp (swmm_api.SwmmInput): inp-file data
+        inp (swmm_api.SwmmInput): SWMM input-file data.
 
     .. Important::
         works inplace
@@ -69,36 +72,69 @@ def reduce_controls(inp):
     links = links_dict(inp)
     nodes = nodes_dict(inp)
 
+    def element_exists(obj: (ControlVariable | Control._Condition), inp: SwmmInput):
+        if (obj.object_kind.upper() + 'S') in inp:  # CONDUIT PUMP ORIFICE WEIR OUTLET
+            return obj.label in inp[obj.object_kind + 'S']
+        elif obj.object_kind.upper() == Control.OBJECTS.NODE:
+            return obj.label in nodes
+        elif obj.object_kind.upper() == Control.OBJECTS.LINK:
+            return obj.label in links
+        elif obj.object_kind.upper() == Control.OBJECTS.GAGE:
+            return (RAINGAGES in inp) and (obj.label in inp.RAINGAGES)
+        elif obj.object_kind.upper() == Control.OBJECTS.SIMULATION:
+            return True
+        elif ((obj.object_kind.upper() + 'S') in inp._converter) and ((obj.object_kind.upper() + 'S') not in inp):
+            return False
+        else:
+            msg = f'NotImplemented: Could not check if VARIABLE or object ("{obj.object_kind.upper()}") exists for function `reduce_controls`.'
+            if verbose:
+                logger.warning(msg)
+            else:
+                warnings.warn(msg, SwmmApiInputMacrosWarning)
+            return True
+
+    # filter and remove variables based on availability of objects - same as conditions
+    di_variables = {label_variable: variable for label_variable, variable in inp.CONTROLS.items() if isinstance(variable, ControlVariable) and element_exists(variable, inp)}
+
+    # filter and remove expressions based on availability of variables
+    di_expressions = {label_expression: expression for label_expression, expression in inp.CONTROLS.items() if isinstance(expression, ControlExpression) and all([label_variable in di_variables for label_variable in expression.get_variables_involved()])}
+
+    di_variables_or_expression = ChainMap(di_variables, di_expressions)
+
     for label in list(inp.CONTROLS.keys()):
         control = inp.CONTROLS[label]
 
         if isinstance(control, (ControlVariable, ControlExpression)):
+            if control.name not in di_variables_or_expression:
+                logger.debug(f'delete {control}: not in {list(di_variables_or_expression)=}')
+                del inp.CONTROLS[label]
+
+            # if verbose:
+            #     logging.warning('The reduction of Variables and Expressions in the CONTROL section is not yet implemented.')
+            # else:
+            #     print_warning('The reduction of Variables and Expressions in the CONTROL section is not yet implemented.')
             continue
 
         # if unavailable object in condition: remove whole rule
         for condition in control.conditions:  # type: Control._Condition
 
-            if isinstance(condition.kind, float) and np.isnan(condition.kind):  # Condition of a variable
-                continue
-
-            if condition.kind + 'S' in inp:
-                # CONDUIT PUMP ORIFICE WEIR OUTLET
-                if condition.label not in inp[condition.kind + 'S']:
-                    # delete whole rule
+            if condition.involves_variable_or_expression():
+                # if verbose:
+                #     logging.warning('The reduction of Variables and Expressions as a condition in a CONTROL rule is not yet implemented.')
+                # else:
+                #     print_warning('The reduction of Variables and Expressions as a condition in a CONTROL rule is not yet implemented.')
+                if condition.label not in di_variables_or_expression:
+                    # expression or variable not available or deleted -> delete rule
+                    logger.debug(f'{condition} not in {list(di_variables_or_expression)=} -> delete CONTROL-rule "{label}"')
                     del inp.CONTROLS[label]
                     break
-            elif condition.kind == Control.OBJECTS.NODE:
-                if condition.label not in nodes:
-                    # delete whole rule
-                    del inp.CONTROLS[label]
-                    break
-            elif condition.kind == Control.OBJECTS.LINK:
-                if condition.label not in links:
-                    # delete whole rule
-                    del inp.CONTROLS[label]
-                    break
+            elif not element_exists(condition, inp):
+                logger.debug(f'{condition.object_kind} {condition.label} does not exist in inp-data -> delete CONTROL-rule "{label}"')
+                del inp.CONTROLS[label]
+                break
 
         if label not in inp.CONTROLS:
+            # if the control rule is already deleted because some objects used in the conditions are missing
             continue
 
         def _delete_action(_label, _action):
@@ -162,7 +198,7 @@ def reduce_raingages(inp):
     Set used ``RAINGAGES`` from ``SUBCATCHMENTS`` and keep only used rain-gages in the section.
 
     Args:
-        inp (SwmmInput):  inp-file data
+        inp (swmm_api.SwmmInput): SWMM input-file data.
 
     .. Important::
         works inplace
@@ -179,7 +215,7 @@ def reduce_hydrographs(inp):
     Set used ``HYDROGRAPHS`` from ``RDII`` and keep only used hydrographs in the section.
 
     Args:
-        inp (SwmmInput):  inp-file data
+        inp (swmm_api.SwmmInput): SWMM input-file data.
 
     .. Important::
         works inplace
@@ -196,7 +232,7 @@ def reduce_snowpacks(inp):
     Set used ``SNOWPACKS`` from ``SUBCATCHMENTS`` and keep only used snow-packs in the section.
 
     Args:
-        inp (SwmmInput):  inp-file data
+        inp (swmm_api.SwmmInput): SWMM input-file data.
 
     .. Important::
         works inplace
@@ -213,7 +249,7 @@ def remove_empty_sections(inp):
     Remove empty inp-file data sections.
 
     Args:
-        inp (SwmmInput): inp-file data
+        inp (swmm_api.SwmmInput): SWMM input-file data.
 
     Returns:
         SwmmInput: cleaned inp-file data
@@ -260,7 +296,7 @@ def reduce_report_objects(inp):
     Remove lost objects in report section.
 
     Args:
-        inp (swmm_api.SwmmInput): inp-file data
+        inp (swmm_api.SwmmInput): SWMM input-file data.
     """
     T = ReportSection.KEYS
 
@@ -269,7 +305,7 @@ def reduce_report_objects(inp):
         value = inp.REPORT[T.SUBCATCHMENTS]
         if value is None:
             pass  # Do nothing -> looks like a placeholder / could be deleted
-        elif isinstance(value, str) and value.upper() == 'all':
+        elif isinstance(value, str) and value.upper() == 'ALL':
             pass  # Do nothing -> looks like a placeholder / could be deleted if no subcatchments are in the input data
         else:  # list of SC
             if SUBCATCHMENTS in inp:
@@ -284,7 +320,7 @@ def reduce_report_objects(inp):
         value = inp.REPORT[T.LINKS]
         if value is None:
             pass  # Do nothing -> looks like a placeholder / could be deleted
-        elif isinstance(value, str) and value.upper() == 'all':
+        elif isinstance(value, str) and value.upper() == 'ALL':
             pass  # Do nothing -> looks like a placeholder / could be deleted if no subcatchments are in the input data
         else:  # list of links
             avail_objects = set(links_dict(inp))  # set of strings
@@ -300,7 +336,7 @@ def reduce_report_objects(inp):
         value = inp.REPORT[T.NODES]
         if value is None:
             pass  # Do nothing -> looks like a placeholder / could be deleted
-        elif isinstance(value, str) and value.upper() == 'all':
+        elif isinstance(value, str) and value.upper() == 'ALL':
             pass  # Do nothing -> looks like a placeholder / could be deleted if no subcatchments are in the input data
         else:  # list of links
             avail_objects = set(nodes_dict(inp))  # set of strings

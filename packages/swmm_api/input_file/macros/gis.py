@@ -2,8 +2,6 @@ import inspect
 import time
 
 import pandas as pd
-from numpy import NaN
-# from pandas import MultiIndex
 from tqdm.auto import tqdm
 
 from .reduce_unneeded import remove_empty_sections
@@ -12,8 +10,7 @@ from .tags import get_node_tags, get_link_tags, get_subcatchment_tags, TAG_COL_N
 from ..inp import SwmmInput
 from ..section_labels import *
 from ..section_lists import LINK_SECTIONS, NODE_SECTIONS
-from ..section_types import SECTION_TYPES
-from ..sections import Tag
+from ..sections import Tag, InfiltrationGreenAmpt, InfiltrationHorton, InfiltrationCurveNumber
 from ..sections._identifiers import IDENTIFIERS
 
 """
@@ -75,8 +72,8 @@ def convert_inp_to_geo_package(inp_fn, gpkg_fn=None, driver='GPKG', label_sep='.
     convert inp file data from an .inp-file to a GIS database
 
     Args:
-        inp_fn (str): filename of the SWMM inp file
-        gpkg_fn (str): filename of the new geopackage file
+        inp_fn (str | pathlib.Path): filename of the SWMM inp file
+        gpkg_fn (str | pathlib.Path): filename of the new geopackage file
         driver (str): The OGR format driver used to write the vector file. (see: fiona.supported_drivers)
         label_sep (str): separator for attribute label between section header and object attribute.
             I.e. "JUNCTIONS.Elevation" with label_sep='.'
@@ -85,7 +82,10 @@ def convert_inp_to_geo_package(inp_fn, gpkg_fn=None, driver='GPKG', label_sep='.
                     such as an authority string (eg “EPSG:4326”) or a WKT string.
     """
     if gpkg_fn is None:
-        gpkg_fn = inp_fn.replace('.inp', '.gpkg')
+        if isinstance(inp_fn, str):
+            gpkg_fn = inp_fn.replace('.inp', '.gpkg')
+        else:
+            gpkg_fn = inp_fn.with_suffix('.gpkg')
 
     inp = SwmmInput.read_file(inp_fn)
 
@@ -93,13 +93,13 @@ def convert_inp_to_geo_package(inp_fn, gpkg_fn=None, driver='GPKG', label_sep='.
 
 
 def write_geo_package(inp, gpkg_fn, driver='GPKG', label_sep='.', crs="EPSG:32633",
-                      simplify_link_min_length=None, add_style=False, add_subcatchment_connector=False):
+                      simplify_link_min_length=None, add_style=True, add_subcatchment_connector=False):
     """
     Write the inp file data to a GIS database.
 
     Args:
-        inp (SwmmInput): inp file data
-        gpkg_fn (str): filename of the new geopackage file
+        inp (swmm_api.SwmmInput): SWMM input-file data.
+        gpkg_fn (str | pathlib.Path): filename of the new geopackage file
         driver (str): The OGR format driver used to write the vector file. (see: fiona.supported_drivers)
         label_sep (str): separator for attribute label between section header and object attribute.
             I.e. "JUNCTIONS.Elevation" with label_sep='.'
@@ -110,7 +110,7 @@ def write_geo_package(inp, gpkg_fn, driver='GPKG', label_sep='.', crs="EPSG:3263
         add_style (bool): if the default style should be added to the geopackage.
         add_subcatchment_connector (bool): if a line layer should be added which symbolize the connection between the subcatchments and their outlet.
     """
-    from geopandas import GeoDataFrame
+    import geopandas as gpd
 
     remove_empty_sections(inp)
 
@@ -139,7 +139,7 @@ def write_geo_package(inp, gpkg_fn, driver='GPKG', label_sep='.', crs="EPSG:3263
                 df = df.join(inp[COORDINATES].geo_series).join(nodes_tags)
 
                 if not df.empty:
-                    GeoDataFrame(df).to_file(gpkg_fn, driver=driver, layer=sec)
+                    gpd.GeoDataFrame(df).to_file(gpkg_fn, driver=driver, layer=sec)
                 print(f'{f"{time.perf_counter() - t0:0.1f}s":^{len(sec)}s}', end=' | ')
             else:
                 print(f'{f"-":^{len(sec)}s}', end=' | ')
@@ -163,7 +163,7 @@ def write_geo_package(inp, gpkg_fn, driver='GPKG', label_sep='.', crs="EPSG:3263
                 df = df.join(inp[VERTICES].geo_series).join(links_tags)
 
                 if not df.empty:
-                    GeoDataFrame(df).to_file(gpkg_fn, driver=driver, layer=sec)
+                    gpd.GeoDataFrame(df).to_file(gpkg_fn, driver=driver, layer=sec)
 
                 print(f'{f"{time.perf_counter() - t0:0.1f}s":^{len(sec)}s}', end=' | ')
             else:
@@ -180,13 +180,13 @@ def write_geo_package(inp, gpkg_fn, driver='GPKG', label_sep='.', crs="EPSG:3263
             inp[POLYGONS].geo_series).join(get_subcatchment_tags(inp))
 
         if not df.empty:
-            GeoDataFrame(df).to_file(gpkg_fn, driver=driver, layer=SUBCATCHMENTS)
+            gpd.GeoDataFrame(df).to_file(gpkg_fn, driver=driver, layer=SUBCATCHMENTS)
 
         print(f'{f"{time.perf_counter() - t0:0.1f}s":^{len(SUBCATCHMENTS)}s}')
 
         if add_subcatchment_connector and (COORDINATES in inp):
             gs_connector = get_subcatchment_connectors(inp)
-            GeoDataFrame(gs_connector).to_file(gpkg_fn, driver=driver, layer=SUBCATCHMENTS + '_connector')
+            gpd.GeoDataFrame(gs_connector).to_file(gpkg_fn, driver=driver, layer=SUBCATCHMENTS + '_connector')
     else:
         print(f'{f"-":^{len(SUBCATCHMENTS)}s}')
 
@@ -199,7 +199,7 @@ def get_subcatchment_connectors(inp):
     create connector line objects between subcatchment outlets and centroids
 
     Args:
-        inp (SwmmInput): inp file data
+        inp (swmm_api.SwmmInput): SWMM input-file data.
 
     Returns:
         geopandas.GeoSeries: line objects between subcatchment outlets and centroids
@@ -208,8 +208,8 @@ def get_subcatchment_connectors(inp):
     # outlets = inp[s.SUBCATCHMENTS].frame.outlet
     # junctions = inp[s.COORDINATES].geo_series.reindex(outlets.values)
     # junctions.index = outlets.index
-    from geopandas import GeoSeries
-    from shapely.geometry import LineString
+    import geopandas as gpd
+    import shapely.geometry as shp
 
     res = {}
 
@@ -223,14 +223,14 @@ def get_subcatchment_connectors(inp):
         c = inp[POLYGONS][p].geo.centroid
         o = inp[SUBCATCHMENTS][p].outlet
         if o in inp[COORDINATES]:
-            res[p] = LineString([inp[COORDINATES][o].point, (c.x, c.y)])
+            res[p] = shp.LineString([inp[COORDINATES][o].point, (c.x, c.y)])
         elif o in inp[POLYGONS]:
-            res[p] = LineString([inp[POLYGONS][o].geo.centroid, (c.x, c.y)])
+            res[p] = shp.LineString([inp[POLYGONS][o].geo.centroid, (c.x, c.y)])
         else:
             print(inp[SUBCATCHMENTS][p])
             continue
 
-    gs = GeoSeries(res, crs=inp[POLYGONS]._crs)
+    gs = gpd.GeoSeries(res, crs=inp[POLYGONS]._crs)
     gs.index.name = 'Subcatchment'
     gs.name = 'geometry'
     return gs
@@ -241,14 +241,14 @@ def links_geo_data_frame(inp, label_sep='.'):
     convert link data in inp file to geo-data-frame
 
     Args:
-        inp (SwmmInput): inp file data
+        inp (swmm_api.SwmmInput): SWMM input-file data.
         label_sep (str): separator for attribute label between section header and object attribute.
             I.e. "JUNCTIONS.Elevation" with label_sep='.'
 
     Returns:
         geopandas.GeoDataFrame: links as geo-data-frame
     """
-    from geopandas import GeoDataFrame
+    import geopandas as gpd
 
     links_tags = get_link_tags(inp)
     complete_vertices(inp)
@@ -270,7 +270,7 @@ def links_geo_data_frame(inp, label_sep='.'):
             else:
                 res = pd.concat([res, df], axis=0)
                 # res = res.append(df)
-    return GeoDataFrame(res)
+    return gpd.GeoDataFrame(res)
 
 
 def nodes_geo_data_frame(inp, label_sep='.'):
@@ -278,14 +278,14 @@ def nodes_geo_data_frame(inp, label_sep='.'):
     convert nodes data in inp file to geo-data-frame
 
     Args:
-        inp (SwmmInput): inp file data
+        inp (swmm_api.SwmmInput): SWMM input-file data.
         label_sep (str): separator for attribute label between section header and object attribute.
             I.e. "JUNCTIONS.Elevation" with label_sep='.'
 
     Returns:
         geopandas.GeoDataFrame: nodes as geo-data-frame
     """
-    from geopandas import GeoDataFrame
+    import geopandas as gpd
 
     nodes_tags = get_node_tags(inp)
     res = None
@@ -310,7 +310,7 @@ def nodes_geo_data_frame(inp, label_sep='.'):
                 res = pd.concat([res, df], axis=0)
                 # res = res.append(df)
 
-    return GeoDataFrame(res)
+    return gpd.GeoDataFrame(res)
 
 
 def subcatchment_geo_data_frame(inp: SwmmInput, label_sep='.'):
@@ -325,15 +325,14 @@ def gpkg_to_swmm(fn, label_sep='.', infiltration_class=None, custom_section_hand
     import inp data from GIS gpkg file created from the swmm_api.input_file.macro_snippets.gis_export.convert_inp_to_geo_package function
 
     Args:
-        fn (str): filename to GPKG datebase file
+        fn (str | pathlib.Path): filename to GPKG datebase file
         label_sep (str):  separator for attribute label between section header and object attribute.
             I.e. "JUNCTIONS.Elevation" with label_sep='.'
 
     Returns:
         SwmmInput: inp data
     """
-    import fiona
-    from geopandas import read_file
+    import geopandas as gpd
 
     inp = SwmmInput(custom_section_handler=custom_section_handler)
 
@@ -342,13 +341,15 @@ def gpkg_to_swmm(fn, label_sep='.', infiltration_class=None, custom_section_hand
 
     section_dict = inp._converter
 
+    layers_available = gpd.list_layers(fn).name.values
+
     for sec in NODE_SECTIONS:
-        if sec not in fiona.listlayers(fn):
+        if sec not in layers_available:
             continue
-        gdf = read_file(fn, layer=sec).set_index(IDENTIFIERS.name).fillna(NaN)
+        gdf = gpd.read_file(fn, layer=sec).set_index(IDENTIFIERS.name).infer_objects()
 
         cols = gdf.columns[gdf.columns.str.startswith(sec)]
-        inp[sec] = section_dict[sec].create_section(gdf[cols].reset_index().fillna(NaN).values)
+        inp[sec] = section_dict[sec].create_section(gdf[cols].reset_index().infer_objects().values)
 
         for sub_sec in [DWF, INFLOWS]:
             cols = gdf.columns[gdf.columns.str.startswith(sub_sec)]
@@ -356,7 +357,9 @@ def gpkg_to_swmm(fn, label_sep='.', infiltration_class=None, custom_section_hand
                 gdf_sub = gdf[cols].copy()
                 gdf_sub.columns = pd.MultiIndex.from_tuples([col.split(label_sep) for col in gdf_sub.columns])
                 cols_order = gdf_sub.columns.droplevel(1)
-                gdf_sub = gdf_sub.stack(1)[cols_order]
+                gdf_sub = gdf_sub.stack(1, future_stack=True)[cols_order]
+                if sub_sec == DWF:
+                    gdf_sub = gdf_sub.loc[gdf_sub[(sub_sec, 'base_value')].notna()]
                 inp[sub_sec].update(section_dict[sub_sec].create_section(gdf_sub.reset_index().values))
 
         inp[COORDINATES].update(section_dict[COORDINATES].create_section_from_geoseries(gdf.geometry))
@@ -366,20 +369,14 @@ def gpkg_to_swmm(fn, label_sep='.', infiltration_class=None, custom_section_hand
             tags['type'] = Tag.TYPES.Node
             inp[TAGS].update(section_dict[TAGS].create_section(tags.reset_index()[['type', IDENTIFIERS.name, TAG_COL_NAME]].values))
 
-    if STORAGE in inp:
-        for i in inp[STORAGE]:
-            c = inp.STORAGE[i].data
-            if isinstance(c, list):
-                inp.STORAGE[i].data = [float(j) for j in c[0][1:-1].split(',')]
-
     # ---------------------------------
     for sec in LINK_SECTIONS:
-        if sec not in fiona.listlayers(fn):
+        if sec not in layers_available:
             continue
-        gdf = read_file(fn, layer=sec).set_index(IDENTIFIERS.name).fillna(NaN)
+        gdf = gpd.read_file(fn, layer=sec).set_index(IDENTIFIERS.name).infer_objects()
 
         cols = gdf.columns[gdf.columns.str.startswith(sec)]
-        inp[sec] = section_dict[sec].create_section(gdf[cols].reset_index().fillna(NaN).values)
+        inp[sec] = section_dict[sec].create_section(gdf[cols].reset_index().infer_objects().values)
 
         for sub_sec in [XSECTIONS, LOSSES]:
             cols = gdf.columns[gdf.columns.str.startswith(sub_sec)].to_list()
@@ -388,7 +385,8 @@ def gpkg_to_swmm(fn, label_sep='.', infiltration_class=None, custom_section_hand
                     cols = [f'{sub_sec}{label_sep}{i}' for i in inspect.getfullargspec(section_dict[sub_sec]).args[2:]]
                 gdf_sub = gdf[cols].copy().dropna(how='all')
                 if sub_sec == LOSSES:
-                    gdf_sub[f'{LOSSES}{label_sep}has_flap_gate'] = gdf_sub[f'{LOSSES}{label_sep}has_flap_gate'] == 1
+                    # either a number or a string
+                    gdf_sub[f'{LOSSES}{label_sep}has_flap_gate'] = (gdf_sub[f'{LOSSES}{label_sep}has_flap_gate'] == 1) | (gdf_sub[f'{LOSSES}{label_sep}has_flap_gate'] == 'True')
                 inp[sub_sec].update(section_dict[sub_sec].create_section(gdf_sub.reset_index().values))
 
         inp[VERTICES].update(section_dict[VERTICES].create_section_from_geoseries(gdf.geometry))
@@ -398,23 +396,37 @@ def gpkg_to_swmm(fn, label_sep='.', infiltration_class=None, custom_section_hand
             tags['type'] = Tag.TYPES.Link
             inp[TAGS].update(section_dict[TAGS].create_section(tags.reset_index()[['type', IDENTIFIERS.name, TAG_COL_NAME]].values))
 
-    if OUTLETS in inp:
-        for i in inp[OUTLETS]:
-            c = inp[OUTLETS][i].curve_description
-            if isinstance(c, list):
-                inp[OUTLETS][i].curve_description = [float(j) for j in c[0][1:-1].split(',')]
-
     if simplify:
         simplify_vertices(inp)
     reduce_vertices(inp)
 
     # ---------------------------------
-    if SUBCATCHMENTS in fiona.listlayers(fn):
-        gdf = read_file(fn, layer=SUBCATCHMENTS).set_index(IDENTIFIERS.name).fillna(NaN)
+    if SUBCATCHMENTS in layers_available:
+        gdf = gpd.read_file(fn, layer=SUBCATCHMENTS).set_index(IDENTIFIERS.name).infer_objects()
 
         for sec in [SUBCATCHMENTS, SUBAREAS, INFILTRATION]:
             cols = gdf.columns[gdf.columns.str.startswith(sec)]
-            inp[sec] = section_dict[sec].create_section(gdf[cols].reset_index().fillna(NaN).values)
+            if (sec == INFILTRATION) and infiltration_class is None:
+                given_cols = [c.replace(f'{sec}.', '') for c in cols]
+
+                for _inf_cls in (InfiltrationGreenAmpt, InfiltrationHorton, InfiltrationCurveNumber):
+                    # Extract the parameter names, excluding 'self'
+                    init_args = list(inspect.signature(_inf_cls.__init__).parameters.keys())[2:]
+                    if len(set(given_cols) & set(init_args)) == len(given_cols):
+                        # print('found', _inf_cls)
+                        infiltration_class = _inf_cls
+                        inp.set_infiltration_method(infiltration_class)
+                        break
+                # ---
+                if infiltration_class is None:
+                    for _inf_cls in (InfiltrationGreenAmpt, InfiltrationHorton, InfiltrationCurveNumber):
+                        try:
+                            inp.set_infiltration_method(_inf_cls)
+                            inp[sec] = section_dict[sec].create_section(gdf[cols].reset_index().infer_objects().values)
+                        except TypeError:
+                            pass
+            else:
+                inp[sec] = section_dict[sec].create_section(gdf[cols].reset_index().infer_objects().values)
 
         inp[POLYGONS] = section_dict[POLYGONS].create_section_from_geoseries(gdf.geometry)
 
@@ -431,7 +443,7 @@ def update_length(inp):
     Set the length of all conduits based on the length of the vertices.
 
     Args:
-        inp (SwmmInput): inp data
+        inp (swmm_api.SwmmInput): SWMM input-file data.
 
     .. Important::
         Works inplace.
@@ -445,7 +457,7 @@ def update_area(inp, decimals=4):
     Set the area of all subcatchments based on the area of the polygons.
 
     Args:
-        inp (SwmmInput): inp data
+        inp (swmm_api.SwmmInput): SWMM input-file data.
         decimals (int): decimal places for the new value
 
     .. Important::
@@ -494,7 +506,7 @@ def apply_gis_style_to_gpkg(fn_gpkg):
 
     _create_gpkg_style_table(fn_gpkg)
 
-    for section in (JUNCTIONS, STORAGE, OUTFALLS, CONDUITS, ORIFICES, PUMPS, WEIRS, SUBCATCHMENTS, SUBCATCHMENTS + '_connector'):
+    for section in (JUNCTIONS, STORAGE, OUTFALLS, CONDUITS, ORIFICES, OUTLETS, PUMPS, WEIRS, SUBCATCHMENTS, SUBCATCHMENTS + '_connector'):
         layer_name = section
 
         # Path to your QML file and GeoPackage

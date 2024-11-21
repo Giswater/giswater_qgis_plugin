@@ -12,7 +12,6 @@ from .._io_helpers import get_default_encoding, read_txt_file
 from .section_types import SECTION_TYPES
 from .section_labels import *
 from .sections import *
-from .sections.subcatch import INFILTRATION_DICT
 
 
 class SwmmInput(CustomDict):
@@ -71,8 +70,11 @@ class SwmmInput(CustomDict):
                 new._data[key] = self._data[key]
         return new
 
-    def update(self, d=None, **kwargs):
+    def update(self, d=None, convert_inp_data=True, **kwargs):
         """Update inp-data with another inp-data-object."""
+        if convert_inp_data:
+            self.force_convert_all()
+            d.force_convert_all()
         for sec in d:
             if sec not in self:
                 self._data[sec] = d._data[sec]
@@ -222,7 +224,7 @@ class SwmmInput(CustomDict):
         if OPTIONS in self \
                 and 'INFILTRATION' in self[OPTIONS] \
                 and isinstance(self[OPTIONS], (dict, OptionSection, InpSectionGeneric)):
-            self.set_infiltration_method(INFILTRATION_DICT.get(self[OPTIONS]['INFILTRATION']))
+            self.set_infiltration_method(Infiltration._CONVERSION_DICT.get(self[OPTIONS]['INFILTRATION']))
 
     def set_infiltration_method(self, infiltration_class):
         """
@@ -234,6 +236,7 @@ class SwmmInput(CustomDict):
                 :class:`~swmm_api.input_file.sections.InfiltrationGreenAmpt`,
                 :class:`~swmm_api.input_file.sections.InfiltrationHorton`
         """
+        # self[OPTIONS]['INFILTRATION'] = INFILTRATION_DICT_r[infiltration_class]
         self._converter[INFILTRATION] = infiltration_class
 
     def _get_section_headers(self, custom_sections_order=None):
@@ -313,6 +316,8 @@ class SwmmInput(CustomDict):
                                               sort_objects_alphabetical=sort_objects_alphabetical))
         return filename
 
+    to_file = write_file  # alias
+
     def print_string(self, custom_sections_order=None):
         """
         Print the string of the inp-data (to the stdout).
@@ -350,6 +355,33 @@ class SwmmInput(CustomDict):
             self[section_label] = new_empty_section
         return self[section_label]
 
+    def iter_avail_section_labels(self, section_list):
+        """
+        Iterate over sections labels given if they exist in the inp data.
+
+        Args:
+            section_list (list[str] | tuple[str] | set[str]): list of section labels.
+
+        Yields:
+            str: section label
+        """
+        for s in section_list:
+            if s in self:
+                yield s
+
+    def iter_avail_sections(self, section_list):
+        """
+        Iterate over sections given if they exist in the inp data.
+
+        Args:
+            section_list (list[str] | tuple[str] | set[str]): list of section labels.
+
+        Yields:
+            (str, InpSection): section label and section-object
+        """
+        for s in self.iter_avail_section_labels(section_list):
+            yield s, self[s]
+
     def add_new_section(self, section):
         """
         Add new section to the inp-data.
@@ -364,6 +396,22 @@ class SwmmInput(CustomDict):
             self[section._label] = section
         else:
             warnings.warn(f'Section [{section._label}] not empty!', SwmmInputWarning)
+
+    def delete_section(self, section_label: (str or list[str] or tuple[str] or set[str])):
+        """
+        Delete a section from the inp-data.
+
+        Args:
+            section_label (str | list[str] | tuple[str] | set[str]): label of the section or list of sections to be deleted.
+        """
+        if isinstance(section_label, str):
+            if section_label in self:
+                del self[section_label]
+        elif isinstance(section_list := section_label, (list, tuple, set)):
+            for s in section_list:
+                self.delete_section(s)
+
+    delete_sections = delete_section  # alias
 
     def add_obj(self, obj):
         """
@@ -932,7 +980,7 @@ class SwmmInput(CustomDict):
         LID_CONTROLS section
 
         Returns:
-            Mapping[tuple[str, str], LIDControl] | InpSection: LIDControl section
+            Mapping[str, LIDControl] | InpSection: LIDControl section
         """
         if LID_CONTROLS in self:
             return self[LID_CONTROLS]

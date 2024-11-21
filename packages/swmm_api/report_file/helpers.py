@@ -5,10 +5,11 @@ __email__ = "markus.pichler@tugraz.at"
 __version__ = "0.1"
 __license__ = "MIT"
 
-from io import StringIO
-import pandas as pd
 import re
-from numpy import NaN
+from io import StringIO
+
+import pandas as pd
+import numpy as np
 
 
 def _get_title_of_part(part, alt):
@@ -147,7 +148,7 @@ def _part_to_frame(part, replace_parts=None):
         header, data = subs
     else:
         notes, header, data = subs
-    header = ['_'.join([i for i in c if i is not NaN]) for c in pd.read_fwf(StringIO(header), header=None).values.T]
+    header = ['_'.join([i for i in c if i is not np.nan]) for c in pd.read_fwf(StringIO(header), header=None).values.T]
 
     # Pumping Summary
     if '% Time Off_Pump Curve_Low   High' in header:
@@ -173,14 +174,14 @@ def _part_to_frame(part, replace_parts=None):
     if len(df.columns) < len(header):
         df.columns = header[:len(df.columns)]
         for h in header[len(df.columns):]:
-            df[h] = NaN
+            df[h] = np.nan
     else:
         df.columns = header
 
     df = df.set_index(header[0])
 
     # New error in Version 5.1.015 ????
-    df = df.replace('-nan(ind)', NaN)
+    df = df.replace('-nan(ind)', np.nan)
 
     for col in df:
         if 'days hr:min' in col:
@@ -277,15 +278,25 @@ def _transect_street_shape_converter(raw, key):
 class ReportUnitConversion:
     """
     Unit conversion for the simulation results in the report file
-    
+
+    US units:
+        CFS: cubic feet per second
+        GPM: gallons per minute
+        MGD: million gallons per day
+
+    metric units:
+        CMS: cubic meters per second
+        LPS: liters per second
+        MLD: million liters per day
+
     Attributes:
         FLOW (str): for metric one of ['CMS', 'LPS', 'MLD'] | for imperial one of ['CFS', 'GPM', 'MGD']
-        VOL1 (str): for metric: 'hectare-m' | for imperial:
-        VOL2 (str): for metric: 'ltr' | for imperial: 'acre-feet'
-        DEPTH1 (str): for metric: 'mm'| for imperial: 'gal'
-        DEPTH2 (str): hydrological | for metric: 'Meters' | for imperial: 'inches'
-        MASS (str): hydraulic | for metric: 'kg' | for imperial: 'Feet'
-        LENGTH (str): for metric: 'm' | for imperial: 'lbs'
+        VOL1 (str): for metric: 'hectare-m' | for imperial: 'acre-feet'
+        VOL2 (str): for metric: 'ltr' | for imperial: 'gal'
+        DEPTH1 (str): for metric: 'mm'| for imperial: 'inches'
+        DEPTH2 (str): hydrological | for metric: 'Meters' | for imperial: 'Feet'
+        MASS (str): hydraulic | for metric: 'kg' | for imperial: 'lbs'
+        LENGTH (str): for metric: 'm' | for imperial: 'ft'
         VOL3 (str): for metric: 'm3' | for imperial: 'ft3'
         VELO (str): for metric: 'm/sec' | for imperial: 'ft/sec'
 

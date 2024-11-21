@@ -57,7 +57,7 @@ class SwmmOutput(SwmmOutExtract):
         variables (dict[str, list]): variables per object-type inclusive the pollutants.
         fp (file-like): Stream of the open file.
     """
-    filename: Path = ...
+    filename: str | Path
 
     def __init__(self, filename, skip_init=False, encoding=''):
         """
@@ -172,11 +172,11 @@ class SwmmOutput(SwmmOutExtract):
                 except:
                     array = np.frombuffer(self.fp.read1(), dtype=np.dtype(types), count=n_periods)
 
-            # if file is incomplete n_periods can be different to inferred number of periods
-            self.n_periods = int(array.size)
-            self.index = self._get_index(start, end)
-
             if all([i is None for i in [start, end]]):
+                # if file is incomplete n_periods can be different to inferred number of periods
+                self.n_periods = int(array.size)
+                self.index = self._get_index(start, end)
+
                 # if the data is not sliced, save it as an attribute
                 self._data = array
 
@@ -185,9 +185,15 @@ class SwmmOutput(SwmmOutExtract):
         # if the attribute self._data is already set
         if not all([i is None for i in [start, end]]):
             # slice data
-            i_start = (self.index < start).sum()
-            i_end = (self.index > end).sum()
-            return self._data[i_start:-i_end]
+            if start is None:
+                i_start = None
+            else:
+                i_start = (self.index < start).sum()
+            if end is None:
+                i_end = None
+            else:
+                i_end = -(self.index > end).sum()
+            return self._data[i_start:i_end]
 
         return self._data
 
@@ -219,9 +225,9 @@ class SwmmOutput(SwmmOutExtract):
             there are a lot of objects (many columns) and just few time-steps (fewer rows) in the out-file.
 
         Args:
-            kind (str | list): [``'subcatchment'``, ``'node'`, ``'link'``, ``'system'``] (predefined in :obj:`swmm_api.output_file.definitions.OBJECTS`)
-            label (str | list): name of the objekts
-            variable (str | list): variable names (predefined in :obj:`swmm_api.output_file.definitions.VARIABLES`)
+            kind (str | list | optional): [``'subcatchment'``, ``'node'`, ``'link'``, ``'system'``] (predefined in :obj:`swmm_api.output_file.definitions.OBJECTS`)
+            label (str | list | optional): name of the objekts
+            variable (str | list | optional): variable names (predefined in :obj:`swmm_api.output_file.definitions.VARIABLES`)
 
                 * subcatchment:
                     - ``rainfall`` or :attr:`~swmm_api.output_file.definitions.SUBCATCHMENT_VARIABLES.RAINFALL`
@@ -392,20 +398,16 @@ class SwmmOutput(SwmmOutExtract):
         }
         parquet.write(frame, self.filename.with_suffix('.parquet'))
 
-    def to_parquet_chunks(self, fn, rows_at_a_time=1000, show_progress=True, kind=None, label=None, variable=None, slim=False):
-        import pyarrow as pa
-        import pyarrow.parquet as pq
-
-        types = np.dtype([('datetime', 'f8')] + [('/'.join(i), 'f4') for i in self._columns_raw])
+    def _iter_chunks(self, rows_at_a_time=1000, show_progress=True, kind=None, label=None, variable=None, slim=False, sep='/'):
+        types = np.dtype([('datetime', 'f8')] + [(sep.join(i), 'f4') for i in self._columns_raw])
         self.fp.seek(self._pos_start_output, 0)
 
-        parq_writer = None
         columns = self._filter_part_columns(kind, label, variable)
-        use_columns = ['datetime'] + ['/'.join(c) for c in columns]
+        use_columns = ['datetime'] + [sep.join(c) for c in columns]
 
         # ---
         if show_progress:
-            import tqdm
+            import tqdm.auto as tqdm
             iterator = tqdm.trange(0, self.n_periods, rows_at_a_time)
         else:
             iterator = range(0, self.n_periods, rows_at_a_time)
@@ -427,7 +429,7 @@ class SwmmOutput(SwmmOutExtract):
 
                 df = pd.DataFrame(data)
 
-                df.index = pd.date_range(self.start_date + i*self.report_interval, periods=rows_at_a_time, freq=self.report_interval)
+                df.index = pd.date_range(self.start_date + i * self.report_interval, periods=rows_at_a_time, freq=self.report_interval)
 
             else:
                 data = np.fromfile(self.fp, dtype=types, count=rows_at_a_time)[use_columns]
@@ -435,7 +437,17 @@ class SwmmOutput(SwmmOutExtract):
                 df = pd.DataFrame(data)
 
                 df.index = (pd.Timedelta(days=1) * df.pop('datetime') + self._base_date).dt.round('s')
+            yield df
 
+    def to_parquet_chunks(self, fn, rows_at_a_time=1000, show_progress=True, kind=None, label=None, variable=None, slim=False):
+        import pyarrow as pa
+        import pyarrow.parquet as pq
+
+        parq_writer = None
+        for df in self._iter_chunks(rows_at_a_time=rows_at_a_time,
+                                    show_progress=show_progress,
+                                    kind=kind, label=label, variable=variable,
+                                    slim=slim):  # type: pandas.DataFrame
             table = pa.Table.from_pandas(df)
 
             # for the first chunk of records

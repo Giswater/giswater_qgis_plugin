@@ -11,7 +11,7 @@ def inp_to_graph(inp, add_subcatchments=False):
     Create a network of the model with the networkx package
 
     Args:
-        inp (SwmmInput): inp-file data
+        inp (swmm_api.SwmmInput): SWMM input-file data.
         add_subcatchments (bool): if the subcatchments should be added to the graph
 
     Returns:
@@ -130,7 +130,7 @@ def links_connected(inp, node, g=None):
     Get the names of the links connected to the node.
 
     Args:
-        inp (SwmmInput): inp-data.
+        inp (swmm_api.SwmmInput): SWMM input-file data.
         node (str): name of the node.
         g (networkx.DiGraph | optionl): graph of the swmm-network.
 
@@ -183,7 +183,7 @@ def _downstream_nodes(graph: nx.DiGraph, node: str, node_list=None) -> list:
 #         yield from _downstream_nodes2(graph, n)
 
 
-# def _downstream_nodes3(graph: DiGraph, node: str) -> list[str]: NOT WORING
+# def _downstream_nodes3(graph: DiGraph, node: str) -> list[str]: NOT WORKING
 #     while graph.out_degree[node] >= 1:
 #         yield node
 #         node = list(graph.successors(node))[0]
@@ -224,10 +224,10 @@ def _upstream_nodes(graph: nx.DiGraph, node: str, nodes_list=None) -> set:
 
 def subcatchments_connected(inp, node: str, graph=None):
     """
-    Get the SC with have the node as outlet.
+    Get as list of SC, which have the same node as outlet.
 
     Args:
-        inp (SwmmInput): model
+        inp (swmm_api.SwmmInput): SWMM input-file data.
         node (str): label of the node
         graph (nx.DiGraph): network
 
@@ -258,7 +258,7 @@ def split_network(inp, keep_node, split_at_node=None, keep_split_node=True, grap
         CONTROLS not supported
 
     Args:
-        inp (SwmmInput): inp-file data
+        inp (swmm_api.SwmmInput): SWMM input-file data.
         keep_node (str): label of a node in the part you want to keep
         split_at_node (str | list | tuple | set): if you want to split the network,
                 define the label of the node (or multiple) where you want to split it.
@@ -311,7 +311,7 @@ def conduit_iter_over_inp(inp, start, end):
     doesn't look backwards if split node
 
     Args:
-        inp (SwmmInput): inp-file data
+        inp (swmm_api.SwmmInput): SWMM input-file data.
         start (str): start node label
         end (str): end node label
 

@@ -1,3 +1,5 @@
+import warnings
+
 from .collection import links_dict
 from .macros import find_link
 from ..misc.curve_simplification import _vec2d_dist, ramer_douglas
@@ -10,7 +12,7 @@ def transform_coordinates(inp, from_proj='epsg:31256', to_proj='epsg:32633'):
     transform all coordinates of the sections COORDINATES, VERTICES and POLYGONS from one projection to another.
 
     Args:
-        inp (swmm_api.SwmmInput): SWMM input data
+        inp (swmm_api.SwmmInput): SWMM input-file data.
         from_proj (str): Projection of data
         to_proj (str): Projection for resulting data
 
@@ -47,7 +49,7 @@ def complete_link_vertices(inp, label_link):
         works inplace
 
     Args:
-        inp (swmm_api.SwmmInput): SWMM input data
+        inp (swmm_api.SwmmInput): SWMM input-file data.
         label_link (str): label of the link
     """
     link = find_link(inp, label_link)
@@ -66,7 +68,7 @@ def complete_vertices(inp):
         works inplace
 
     Args:
-        inp (swmm_api.SwmmInput): SWMM input data
+        inp (swmm_api.SwmmInput): SWMM input-file data.
     """
     if COORDINATES in inp:
         links = links_dict(inp)
@@ -89,7 +91,7 @@ def reduce_vertices(inp, node_range=0.25):
     important if data originally from GIS and export to SWMM
 
     Args:
-        inp (swmm_api.SwmmInput): SWMM input data
+        inp (swmm_api.SwmmInput): SWMM input-file data.
         node_range (float): minimal distance in m from the first and last vertices to the end nodes
 
     .. Important::
@@ -97,17 +99,37 @@ def reduce_vertices(inp, node_range=0.25):
     """
     links = links_dict(inp)
 
+    if COORDINATES not in inp or VERTICES not in inp:
+        return
+
     for link_label in list(inp.VERTICES.keys()):
         l = links[link_label]
         v = inp[VERTICES][link_label].vertices
-        p = inp[COORDINATES][l.from_node].point
-        if _vec2d_dist(p, v[0]) < node_range:
-            v = v[1:]
 
-        if v:
-            p = inp[COORDINATES][l.to_node].point
-            if _vec2d_dist(p, v[-1]) < node_range:
-                v = v[:-1]
+        for n, i_vertices, slice_vertices_keep in ((l.from_node, 0, slice(1, None)),
+                                                   (l.to_node, -1, slice(None, -1))):
+            if v:
+                if n in inp.COORDINATES:
+                    p = inp[COORDINATES][n].point
+                    if _vec2d_dist(p, v[i_vertices]) < node_range:
+                        v = v[slice_vertices_keep]
+                else:
+                    warnings.warn(f'Node "{n}" not in inp-data (at least no coordinates in inp-data) (Endpoint for link "{link_label}")')
+
+        # if l.from_node in inp.COORDINATES:
+        #     p = inp[COORDINATES][l.from_node].point
+        #     if _vec2d_dist(p, v[0]) < node_range:
+        #         v = v[1:]
+        # else:
+        #     warnings.warn(f'Node "{l.from_node}" not in inp-data (at least no coordinates in inp-data) (Endpoint for link "{link_label}")')
+        #
+        # if v:
+        #     if l.to_node in inp.COORDINATES:
+        #         p = inp[COORDINATES][l.to_node].point
+        #         if _vec2d_dist(p, v[-1]) < node_range:
+        #             v = v[:-1]
+        #     else:
+        #         warnings.warn(f'Node "{l.to_node}" not in inp-data (at least no coordinates in inp-data) (Endpoint for link "{link_label}")')
 
         if v:
             inp[VERTICES][link_label].vertices = v
@@ -137,7 +159,7 @@ def simplify_vertices(inp, dist=1., min_length=None):
     Use :func:`~swmm_api.input_file.macros.geo.complete_vertices` to prepare inp.
 
     Args:
-        inp (swmm_api.SwmmInput): SWMM input data
+        inp (swmm_api.SwmmInput): SWMM input-file data.
         dist (float): threshold of algorythm
         min_length (float): minimum length of link to be simplified
 

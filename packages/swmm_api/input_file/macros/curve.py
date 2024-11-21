@@ -1,5 +1,5 @@
-from matplotlib.pyplot import subplots
-from numpy import append, arange, array, concatenate
+import matplotlib.pyplot as plt
+import numpy as np
 
 
 def curve_figure(curve):
@@ -12,7 +12,7 @@ def curve_figure(curve):
     Returns:
         matplotlib.pyplot.Figure: curve plot
     """
-    fig, ax = subplots(layout='constrained')
+    fig, ax = plt.subplots(layout='constrained')
 
     # -------------------------
     xlim = 1
@@ -29,14 +29,14 @@ def curve_figure(curve):
     # -------------------------
     y, x = list(zip(*curve.points))
 
-    y = array(y)
-    x = array(x) / 2
+    y = np.array(y)
+    x = np.array(x) / 2
 
-    y = concatenate(([0], y, [1]))
-    x = concatenate(([0], x, [0]))
+    y = np.concatenate(([0], y, [1]))
+    x = np.concatenate(([0], x, [0]))
 
-    y = append(y, y[::-1])
-    x = append(x, x[::-1] * -1)
+    y = np.append(y, y[::-1])
+    x = np.append(x, x[::-1] * -1)
 
     # -------------------------
     ax.plot(x, y, marker='.', ls='-', zorder=1000000, clip_on=False)
@@ -44,13 +44,13 @@ def curve_figure(curve):
     # -------------------------
     # ax.legend().remove()
     ax.set_aspect('equal', 'box')
-    ax.set_xticks(arange(xlim_left, xlim, base), minor=False)
+    ax.set_xticks(np.arange(xlim_left, xlim, base), minor=False)
     if base / 2 != 0:
-        ax.set_xticks(arange(xlim_left, xlim, base / 2), minor=True)
+        ax.set_xticks(np.arange(xlim_left, xlim, base / 2), minor=True)
 
-    ax.set_yticks(arange(0, ylim, base), minor=False)
+    ax.set_yticks(np.arange(0, ylim, base), minor=False)
     if base / 2 != 0:
-        ax.set_yticks(arange(0, ylim, base / 2), minor=True)
+        ax.set_yticks(np.arange(0, ylim, base / 2), minor=True)
 
     ax.tick_params(which='both', length=0, width=0, labelbottom=False, labeltop=False, labelleft=False,
                    labelright=False, bottom=False, top=False, left=False, right=False)

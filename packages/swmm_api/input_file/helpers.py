@@ -6,12 +6,11 @@ from abc import ABC
 from collections.abc import Mapping
 from inspect import isfunction, isclass, getdoc, signature
 import warnings
-from packaging import version
+from pprint import pformat
 
 import pandas as pd
-from numpy import isnan
+import numpy as np
 from tqdm.auto import tqdm
-from pprint import pformat
 
 from ._type_converter import type2str, is_equal, txt_to_lines
 from .section_labels import *
@@ -22,7 +21,9 @@ COMMENT_STR = ';;'
 SEP_INP = COMMENT_STR + "_" * 100
 COMMENT_EMPTY_SECTION = COMMENT_STR + ' No Data'
 
-_TYPES_NO_COPY = (type(None), int, float, str, datetime.date, datetime.time)
+_TYPES_NO_COPY = (type(None), int, float, str, datetime.date, datetime.time, datetime.timedelta)
+
+DEFAULT_NOT_SPECIFIED = np.nan
 
 
 class SwmmInputWarning(UserWarning): ...
@@ -135,15 +136,15 @@ class InpSectionABC(ABC, CustomDict):
 
     @abc.abstractmethod
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self._inp = None
+        CustomDict.__init__(self, *args, **kwargs)
+        self._inp = None  # type: swmm_api.SwmmInput
 
     def set_parent_inp(self, inp):
         """
         Set inp-data object related to this section.
 
         Args:
-            inp (SwmmInput): inp-data object related to this section.
+            inp (swmm_api.SwmmInput): SWMM input-file data-object related to this section.
         """
         self._inp = inp
 
@@ -152,7 +153,7 @@ class InpSectionABC(ABC, CustomDict):
         Get inp-data object related to this section.
 
         Returns:
-            SwmmInput: inp-data object related to this section.
+            swmm_api.SwmmInput: inp-data object related to this section.
         """
         return self._inp
 
@@ -241,6 +242,8 @@ class InpSectionGeneric(InpSectionABC, ABC):
             str: Lines of the ``.inp``-file section.
         """
         # size of the longest key (number of characters)
+        if not self:
+            return COMMENT_EMPTY_SECTION
         max_len = len(max(self.keys(), key=len))
         return '\n'.join(f'{(key if isinstance(key, str) else " ".join(key)).ljust(max_len)}  {type2str(value)}' for key, value in self.items())
 
@@ -345,7 +348,7 @@ class InpSection(InpSectionABC):
             try:
                 self.add_obj(obj)
             except Exception as e:
-                print(e, 'error adding objects to section')
+                warnings.warn(f'error ({e}) when adding object ({obj}) to section "{self._label}"')
 
     def add_obj(self, obj):
         """
@@ -413,8 +416,38 @@ class InpSection(InpSectionABC):
         if fast or not self._table_inp_export:
             return '\n'.join(self.iter_inp_lines(sort_objects_alphabetical)) + '\n'
         else:
-            return dataframe_to_inp_string(self.get_dataframe(set_index=True,
-                                                              sort_objects_alphabetical=sort_objects_alphabetical))
+            if self._label == INFILTRATION:
+                # mixed object class
+                if not self:  # if empty
+                    return COMMENT_EMPTY_SECTION
+
+                split = {}
+                keys = self.keys()
+                if sort_objects_alphabetical:
+                    keys = sorted(keys, key=natural_keys)
+
+                for k in keys:
+                    o = self[k]
+                    if type(o) not in split:
+                        split[type(o)] = []
+                    split[type(o)].append(o.to_dict_())
+
+                # TODO
+                #   detect multiple types
+                #   set kind as last parameter for each object
+                #   what to use - modified?
+                # if len(split) > 1:
+                #     ...
+                # default_o = self.get_parent_inp()._converter[INFILTRATION]
+                # self.get_parent_inp().set_default_infiltration_from_options()
+
+                s = ''
+                for v in split.values():
+                    s += dataframe_to_inp_string(pd.DataFrame(v).set_index(self._index_labels)) + '\n\n'
+                return s
+            else:
+                return dataframe_to_inp_string(self.get_dataframe(set_index=True,
+                                                                  sort_objects_alphabetical=sort_objects_alphabetical))
 
     def iter_inp_lines(self, sort_objects_alphabetical=False):
         """
@@ -713,7 +746,7 @@ class BaseSectionObject(ABC):
         Returns:
             tuple[any]: Attribute values used for the object
         """
-        return tuple(v for v in self.values if not (isinstance(v, float) and isnan(v)))
+        return tuple(v for v in self.values if not (isinstance(v, float) and np.isnan(v)))
 
     def __iter__(self):
         for k, v in self.to_dict_().items():
@@ -909,6 +942,7 @@ def dataframe_to_inp_string(df, index=True):
     if not index:
         c.columns = [COMMENT_STR + c.columns[0]] + list(c.columns)[1:]
 
+    from packaging import version
     if version.parse(pd.__version__) >= version.parse('2.1'):
         return c.map(type2str).to_string(sparsify=False,
                                          line_width=999999,
@@ -1117,6 +1151,8 @@ def section_to_string(section, fast=True, sort_objects_alphabetical=False):
 
     # ----------------------
     elif isinstance(section, InpSectionGeneric):  # V4
+        if not section:
+            return COMMENT_EMPTY_SECTION
         return section.to_inp_lines(fast=fast)
 
     elif isinstance(section, InpSection):  # V4

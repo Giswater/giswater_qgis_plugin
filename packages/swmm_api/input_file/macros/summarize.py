@@ -8,7 +8,7 @@ def print_summary(inp):
     Print basic summary of the inp-data.
 
     Args:
-        inp (SwmmInput): inp-data
+        inp (swmm_api.SwmmInput): SWMM input-file data.
     """
     if SEC.OPTIONS in inp and "ROUTING_STEP" in inp.OPTIONS:
         print(f'ROUTING_STEP: {inp.OPTIONS["ROUTING_STEP"]}')

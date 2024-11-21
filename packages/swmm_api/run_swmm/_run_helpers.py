@@ -48,7 +48,7 @@ def delete_swmm_files(fn_inp, including_inp=False):
 
 
 def get_report_errors(fn_rpt):
-    if os.path.isfile(fn_rpt):
+    if Path(fn_rpt).is_file():
         rpt = SwmmReport(fn_rpt)
         errors = rpt.get_errors()
         if errors:

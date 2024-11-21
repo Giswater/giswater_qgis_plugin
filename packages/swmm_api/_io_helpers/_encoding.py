@@ -1,7 +1,7 @@
-import os
 import subprocess
 import sys
 import warnings
+from pathlib import Path
 
 from ._config import CONFIG
 
@@ -11,7 +11,7 @@ def get_default_encoding(encoding='', filename=None):
 
     Args:
         encoding (str): Encoding of the text-file (None -> auto-detect encoding ... takes a few seconds | '' -> use default = 'utf-8')
-        filename (str): path to file, for which the encoding should be detected.
+        filename (str | pathlib.Path): path to file, for which the encoding should be detected.
 
     Returns:
         str: final encoding
@@ -33,7 +33,7 @@ def detect_encoding(filename):
     Detect encoding of text-file.
 
     Args:
-        filename (str): path to file, for which the encoding should be detected.
+        filename (str | pathlib.Path): path to file, for which the encoding should be detected.
 
     Returns:
 
@@ -42,10 +42,11 @@ def detect_encoding(filename):
         shell_output = subprocess.check_output(['file', '-i', str(filename)]).decode().strip()
     else:
         try:
-            cwd = os.path.dirname(filename)
+            filename = Path(filename)
+            cwd = filename.parent
             if not cwd:
                 cwd = None
-            shell_output = subprocess.check_output(f'bash -ic "file -i {os.path.basename(filename)}"',
+            shell_output = subprocess.check_output(f'bash -ic "file -i {filename.name}"',
                                                    cwd=cwd
                                                    ).decode().strip()
         except:

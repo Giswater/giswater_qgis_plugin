@@ -10,4 +10,4 @@ from ._io_helpers import CONFIG
 # Post-release segment: .postN oder .rN oder .revN
 # Development release segment: .devN
 # anstatt . kann auch - oder _ verwendet werden
-__version__ = '0.4.42'
+__version__ = '0.4.60'

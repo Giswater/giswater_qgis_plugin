@@ -148,10 +148,10 @@ def plot_longitudinal(inp, start_node, end_node, out=None, ax=None, zero_node=No
     Make a longitudinal plot.
 
     Args:
-        inp (SwmmInput):
+        inp (swmm_api.SwmmInput): SWMM input-file data.
         start_node (str): Label of the start node.
         end_node (str): Label of the end node.
-        out (SwmmOut):
+        out (swmm_api.SwmmOutput):
         ax (plt.Axes):
         zero_node (str): Label
         add_node_labels (bool): of the node, where the x-axis should be 0. Default: at start node.
@@ -194,8 +194,7 @@ def plot_longitudinal(inp, start_node, end_node, out=None, ax=None, zero_node=No
     if add_node_labels:
         _add_node_labels(ax, res)
 
-
-        ax.set_xticks(res[COLS.STATION], which='major')
+        ax.set_xticks(res[COLS.STATION], minor=False)
         ax.set_xticklabels(res[COLS.LABEL], rotation=90, minor=False)
         ax.grid(axis='x', ls=':', color='grey', which='major')
 
@@ -219,7 +218,7 @@ def animated_plot_longitudinal(filename, inp, start_node, end_node, out=None, ax
 
     Args:
         filename:
-        inp (SwmmInput):
+        inp (swmm_api.SwmmInput): SWMM input-file data.
         start_node (str): Label of the start node.
         end_node (str): Label of the end node.
         out (SwmmOut):
@@ -228,7 +227,7 @@ def animated_plot_longitudinal(filename, inp, start_node, end_node, out=None, ax
         add_node_labels (bool): of the node, where the x-axis should be 0. Default: at start node.
     """
     import matplotlib.animation as animation
-    from tqdm import tqdm
+    from tqdm.auto import tqdm
     import sys
 
     if path_ffmpeg is None:

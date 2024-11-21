@@ -11,7 +11,7 @@ def nodes_dict(inp):
     The objects are referenced, so you can use it to modify too.
 
     Args:
-        inp (swmm_api.SwmmInput): inp-file data
+        inp (swmm_api.SwmmInput): SWMM input-file data.
 
     Returns:
         ChainMap[str, swmm_api.input_file.sections.node._Node]: dict of {labels: objects}
@@ -31,7 +31,7 @@ def nodes_subcatchments_dict(inp):
     The objects are referenced, so you can use it to modify too.
 
     Args:
-        inp (swmm_api.SwmmInput): inp-file data
+        inp (swmm_api.SwmmInput): SWMM input-file data.
 
     Returns:
         ChainMap[str, swmm_api.input_file.sections.node._Node | swmm_api.input_file.sections.subcatch.SubCatchment]: dict of {labels: objects}
@@ -49,7 +49,7 @@ def links_dict(inp):
     The objects are referenced, so you can use it to modify too.
 
     Args:
-        inp (swmm_api.SwmmInput): inp-file data
+        inp (swmm_api.SwmmInput): SWMM input-file data.
 
     Returns:
         ChainMap[str, swmm_api.input_file.sections.link._Link]: dict of {labels: objects}
@@ -62,7 +62,7 @@ def subcatchments_per_node_dict(inp):
     Get dict where key=node and value=list of subcatchment connected to the node (set as outlet).
 
     Args:
-        inp (swmm_api.SwmmInput): inp data
+        inp (swmm_api.SwmmInput): SWMM input-file data.
 
     Returns:
         dict[str, list[swmm_api.input_file.sections.subcatch.SubCatchment]]: dict[node] = list(subcatchments)

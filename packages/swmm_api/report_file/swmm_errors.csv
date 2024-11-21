@@ -1,0 +1,101 @@
+error_no;message;description
+101;memory allocation error.;There is not enough physical memory in the computer to analyze the study area.
+103;cannot solve KW equations for Link xxx.;The internal solver for Kinematic Wave routing failed to converge for the specified link at some stage of the simulation.
+105;cannot open ODE solver.;The system could not open its Ordinary Differential Equation solver.
+107;cannot compute a valid time step.;A valid time step for runoff or flow routing calculations (i.e., a number greater than 0) could not be computed at some stage of the simulation.
+108;ambiguous outlet ID name for Subcatchment xxx.;The name of the element identified as the outlet of a subcatchment belongs to both a node and a subcatchment in the project's data base.
+109;invalid parameter values for Aquifer xxx.;The properties entered for an aquifer object were either invalid numbers or were inconsistent with one another (e.g., the soil field capacity was higher than the porosity).
+110;ground elevation is below water table for Subcatchment xxx.;The ground elevation assigned to a subcatchment's groundwater parameters cannot be below the initial water table elevation of the aquifer object used by the subcatchment.
+111;invalid length for Conduit xxx.;Conduits cannot have zero or negative lengths.
+112;elevation drop exceeds length for Conduit xxx.;The elevation drop across the ends of a conduit cannot be greater than the conduit's length. Check for errors in the length and in both the invert elevations and offsets at the conduit's upstream and downstream nodes.
+113;invalid roughness for Conduit xxx.;Conduits cannot have zero or negative roughness values.
+114;invalid number of barrels for Conduit xxx.;Conduits must consist of one or more barrels.
+115;adverse slope for Conduit xxx.;Under Steady or Kinematic Wave routing, all conduits must have positive slopes. This can usually be corrected by reversing the inlet and outlet nodes of the conduit (i.e., right click on the conduit and select Reverse from the popup menu that appears). Adverse slopes are permitted under Dynamic Wave routing.
+117;no cross-section defined for Link xxx.;Cross-section geometry was never defined for the specified link.
+119;invalid cross-section for Link xxx.;Either an invalid shape or invalid set of dimensions was specified for a link's cross-section.
+121;missing or invalid pump curve assigned to Pump xxx.;Either no pump curve or an invalid type of curve was specified for a pump.
+122;startup depth not higher than shutoff depth for Pump xxx.;Automatic startup for a pump always occurs at a wet well water level that is higher than its automatic shutoff level.
+131;the following links form cyclic loops in the drainage system.;The Steady and Kinematic Wave flow routing methods cannot be applied to systems where a cyclic loop exists (i.e., a directed path along a set of links that begins and ends at the same node). Most often the cyclic nature of the loop can be eliminated by reversing the direction of one of its links (i.e., switching the inlet and outlet nodes of the link). The names of the links that form the loop will be listed following this message.
+133;Node xxx has more than one outlet link.;Under Steady and Kinematic Wave flow routing, a junction node can have only a single outlet link.
+134;Node xxx has illegal DUMMY link connections.;Only a single conduit with a DUMMY cross-section or Ideal-type pump can be directed out of a node/ a node with an outgoing Dummy conduit or Ideal pump cannot have all of its incoming links be Dummy conduits and Ideal pumps/ a Dummy conduit cannot have its upstream end connected to a storage node.
+135;Divider xxx does not have two outlet links.;Flow divider nodes must have two outlet links connected to them.
+136;Divider xxx has invalid diversion link.;The link specified as being the one carrying the diverted flow from a flow divider node was defined with a different inlet node.
+137;Weir Divider xxx has invalid parameters.;The parameters of a Weir-type divider node either are non-positive numbers or are inconsistent (i.e., the value of the discharge coefficient times the weir height raised to the 3/2 power must be greater than the minimum flow parameter).
+138;Node xxx has initial depth greater than maximum depth.;Self-explanatory.
+139;Regulator xxx is the outlet of a non-storage node.;Under Steady or Kinematic Wave flow routing, orifices, weirs, and outlet links can only be used as outflow links from storage nodes.
+140;Storage node xxx has negative volume at full depth.;The storage unit's Shape data (surface area versus depth) is producing a negative volume at full depth. This can occur when a storage node's surface area curve slopes downward at its highest depth which is below the node's full depth.
+141;Outfall xxx has more than 1 inlet link or an outlet link.;An outfall node is only permitted to have one link attached to it.
+143;Regulator xxx has invalid cross-section shape.;An orifice must have either a CIRCULAR or RECT_CLOSED shape, while a weir must have either a RECT_OPEN, TRAPEZOIDAL, or TRIANGULAR shape.
+145;Drainage system has no acceptable outlet nodes.;Under Dynamic Wave flow routing, there must be at least one node designated as an outfall.
+151;a Unit Hydrograph in set xxx has invalid time base.;The time base of a Unit Hydrograph cannot be negative and if positive, must not be less than the recording interval for its rain gage.
+153;a Unit Hydrograph in set xxx has invalid response ratios.;The response ratios for a set of Unit Hydrographs (the short-, medium-, and long- term response hydrographs) must be between 0 and 1.0 and cannot add up to a value greater than 1.0
+155;invalid sewer area for RDII at Node xxx.;The sewer area contributing RDII inflow to a node cannot be a negative number.
+156;ambiguous station ID for Rain Gage xxx.;If two Rain Gages use files for their data sources and have the same Station IDs then they must also use the same data files.
+157;inconsistent rainfall format for Rain Gage xxx.;If two or more rain gages use the same Time Series for their rainfall data then they must all use the same data format (intensity, volume, or cumulative volume).
+158;time series for Rain Gage xxx is also used by another object.;A rainfall Time Series associated with a Rain Gage cannot be used by another object that is not also a Rain Gage.
+159;recording interval greater than time series interval for Rain Gage xxx.;The recording time interval specified for the rain gage is greater than the smallest time interval between values in the Time Series used by the gage.
+161;cyclic dependency in treatment functions at Node xxx.;An example would be where the removal of pollutant 1 is defined as a function of the removal of pollutant 2 while the removal of pollutant 2 is defined as a function of the removal of pollutant 1.
+171;Curve xxx has invalid or out of sequence data.;The X-values of a curve object must be entered in increasing order.
+173;Time Series xxx has its data out of sequence.;The time (or date/time) values of a time series must be entered in sequential order.
+181;invalid Snow Melt Climatology parameters.;The ATI Weight or Negative Melt Ratio parameters are not between 0 and 1 or the site latitude is not between -60 and +60 degrees.
+182;invalid parameters for Snow Pack xxx.;A snow pack's minimum melt coefficient is greater than its maximum coefficient/ the fractions of free water capacity or impervious plowable area are not between 0 and 1/ or the snow removal fractions sum to more than 1.0.
+183;no type specified for LID xxx.;A named LID control has layers defined for it but its LID type was never specified.
+184;missing layer for LID xxx.;A required design layer is missing for the specified LID control.
+185;invalid parameter value for LID xxx.;An invalid value was supplied for an LID control's design parameter.
+187;LID area exceeds total area for Subcatchment xxx.;The area of the LID controls placed within the subcatchment is greater than that of the subcatchment itself.
+188;LID capture area exceeds total impervious area for Subcatchment xxx.;The amount of impervious area assigned to be treated by LID controls in the subcatchment exceeds the total amount of impervious area available.
+191;simulation start date comes after ending date.;Self-explanatory.
+193;report start date comes after ending date.;Self-explanatory.
+195;reporting time step is less than routing time step.;Self-explanatory.
+200;one or more errors in input file.;This message appears when one or more input file parsing errors (the 200-series errors) occur.
+201;too many characters in input line.;A line in the input file cannot exceed 1024 characters.
+203;too few items at line n of input file.;Not enough data items were supplied on a line of the input file.
+205;invalid keyword at line n of input file.;An unrecognized keyword was encountered when parsing a line of the input file.
+207;duplicate ID name at line n of input file.;An ID name used for an object was already assigned to an object of the same category.
+209;undefined object xxx at line n of input file.;A reference was made to an object that was never defined. An example would be if node 123 were designated as the outlet point of a subcatchment, yet no such node was ever defined in the study area.
+211;invalid number xxx at line n of input file.;Either a string value was encountered where a numerical value was expected or an invalid number (e.g., a negative value) was supplied.
+213;invalid date/time xxx at line n of input file.;An invalid format for a date or time was encountered. Dates must be entered as month/day/year and times as either decimal hours or as hour:minute:second.
+217;control rule clause out of sequence at line n of input file.;Errors of this nature can occur when the format for writing control rules is not followed correctly (see Section C.3).
+219;data provided for unidentified transect at line n of input file.;A GR line with Station-Elevation data was encountered in the [TRANSECTS] section of the input file after an NC line but before any X1 line that contains the transect's ID name.
+221;transect station out of sequence at line n of input file.;The station distances specified for the transect of an irregular cross-section must be in increasing numerical order starting from the left bank.
+223;Transect xxx has too few stations.;A transect for an irregular cross-section must have at least 2 stations.
+225;Transect xxx has too many stations.;A transect cannot have more than 1500 stations defined for it.
+227;Transect xxx has no Manning's N.;No Manning's N was specified for a transect (i.e., there was no NC line in the [TRANSECTS] section of the input file.
+229;Transect xxx has invalid overbank locations.;The distance values specified for either the left or right overbank locations of a transect do not match any of the distances listed for the transect's stations.
+231;Transect xxx has no depth.;All of the stations for a transect were assigned the same elevation.
+233;invalid math expression at line n of input file.;A math expression used for a treatment function, a groundwater flow function or a control rule condition clause is either not correctly formed or contains undefined variables or math functions.
+235;invalid infiltration parameters.;Examples are a Horton maximum infiltration rate lower than the minimum rate or a Green-Ampt initial moisture deficit greater than 1.
+301;files share same names.;The input, report, and binary output files specified on the command line cannot have the same names.
+303;cannot open input file.;The input file either does not exist or cannot be opened (e.g., it might be in use by another program).
+305;cannot open report file.;The report file cannot be opened (e.g., it might reside in a directory to which the user does not have write privileges).
+307;cannot open binary results file.;The binary output file cannot be opened (e.g., it might reside in a directory to which the user does not have write privileges).
+308;amount of output produced will exceed maximum file size.;For the 32-bit command line version of the program, the maximum size of the binary results file is limited to 2 GB.
+309;error writing to binary results file.;There was an error in trying to write results to the binary output file (e.g., the disk might be full or the file size exceeds the limit imposed by the operating system).
+311;error reading from binary results file.;The command line version of SWMM could not read results saved to the binary output file when writing results to the report file.
+313;cannot open scratch rainfall interface file.;SWMM could not open the temporary file it uses to collate data together from external rainfall files.
+315;cannot open rainfall interface file xxx.;SWMM could not open the specified rainfall interface file, possibly because itdoes not exist or because the user does not have write privileges to its directory.
+317;cannot open rainfall data file xxx.;An external rainfall data file could not be opened, most likely because it does not exist.
+318;date out of sequence in rainfall data file xxx.;An external user-prepared rainfall data file must have its entries appear in chronological order. The first out-of-order entry will be listed.
+319;unknown format for rainfall data file.;SWMM could not recognize the format used for a designated rainfall data file.
+320;invalid format for rainfall interface file.;SWMM was trying to read data from a designated rainfall interface file with the wrong format (i.e., it may have been created for some other project or actually be some other type of file).
+321;no data in rainfall interface file for gage xxx.;This message occurs when a project wants to use a previously saved rainfall interface file, but cannot find any data for one of its rain gages in the interface file. It can also occur if the gage uses data from a user-prepared rainfall file and the station id entered for the gage cannot be found in the file.
+323;cannot open runoff interface file xxx.;A runoff interface file could not be opened, possibly because it does not exist or because the user does not have write privileges to its directory.
+325;incompatible data found in runoff interface file.;SWMM was trying to read data from a designated runoff interface file with the wrong format (i.e., it may have been created for some other project or actually be some other type of file).
+327;attempting to read beyond end of runoff interface file.;This error can occur when a previously saved runoff interface file is being used in a simulation with a longer duration than the one that created the interface file.
+329;error in reading from runoff interface file.;A format error was encountered while trying to read data from a previously saved runoff interface file.
+331;cannot open hot start interface file xxx.;A hot start interface file could not be opened, possibly because it does not exist or because the user does not have write privileges to its directory.
+333;incompatible data found in hot start interface file.;SWMM was trying to read data from a designated hot start interface file with the wrong format (i.e., it may have been created for some other project or actually be some other type of file).
+335;error in reading from hot start interface file.;A format error was encountered while trying to read data from a previously saved hot start interface file.
+336;no climate file specified for evaporation and/or wind speed.;This error occurs when the user specifies that evaporation or wind speed data will be read from an external climate file, but no name is supplied for the file.
+337;cannot open climate file xxx.;An external climate data file could not be opened, most likely because it does not exist.
+338;error in reading from climate file xxx.;SWMM was trying to read data from an external climate file with the wrong format.
+339;attempt to read beyond end of climate file xxx.;The specified external climate does not include data for the period of time being simulated.
+341;cannot open scratch RDII interface file.;SWMM could not open the temporary file it uses to store RDII flow data.
+343;cannot open RDII interface file xxx.;An RDII interface file could not be opened, possibly because it does not exist or because the user does not have write privileges to its directory.
+345;invalid format for RDII interface file.;SWMM was trying to read data from a designated RDII interface file with the wrong format (i.e., it may have been created for some other project or actually be some other type of file).
+351;cannot open routing interface file xxx.;A routing interface file could not be opened, possibly because it does not exist or because the user does not have write privileges to its directory.
+353;invalid format for routing interface file xxx.;SWMM was trying to read data from a designated routing interface file with the wrong format (i.e., it may have been created for some other project or actually be some other type of file).
+355;mismatched names in routing interface file xxx.;The names of pollutants found in a designated routing interface file do not match the names used in the current project.
+357;inflows and outflows interface files have same name.;In cases where a run uses one routing interface file to provide inflows for a set of locations and another to save outflow results, the two files cannot both have the same name.
+361;could not open external file used for Time Series xxx.;The external file used to provide data for the named time series could not be opened, most likely because it does not exist.
+363;invalid data in external file used for used for Time Series xxx.;The external file used to provide data for the named time series has one or more lines with the wrong format.

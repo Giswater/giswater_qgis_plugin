@@ -4,8 +4,8 @@ import locale
 import warnings
 from typing import Literal
 
+import numpy as np
 import pandas as pd
-from numpy import NaN
 
 from ._identifiers import IDENTIFIERS
 from .._type_converter import infer_type, to_bool, str_to_datetime, datetime_to_str, type2str, convert_string
@@ -32,13 +32,13 @@ class RainGage(BaseSectionObject):
     Attributes:
         name (str): Name assigned to rain gage.
         form (str): Form of recorded rainfall, either ``INTENSITY``, ``VOLUME`` or ``CUMULATIVE`` (:attr:`RainGage.FORMATS`).
-        interval (str, Timedelta): time interval between gage readings in decimal hours or hours:minutes format (e.g., 0:15 for 15-minute readings).
+        interval (str | pd.Timedelta): time interval between gage readings in decimal hours or hours:minutes format (e.g., 0:15 for 15-minute readings).
         SCF (float): Snow catch deficiency correction factor (use 1.0 for no adjustment).
-        source (str): One of ``'TIMESERIES'`` ``'FILE'`` (:attr:`RainGage.SOURCES`).
+        source (str | Literal['TIMESERIES', 'FILE']): One of ``'TIMESERIES'`` ``'FILE'`` (:attr:`RainGage.SOURCES`).
         timeseries (str): Name of time series in [``TIMESERIES``] section (:class:`TimeSeries`) with rainfall data.
         filename (str): Name of external file with rainfall data. Rainfall files are discussed in Section 11.3 Rainfall Files.
         station (str): Name of recording station used in the rain file.
-        units (str): Rain depth units used in the rain file, either IN (inches) or MM (millimeters) (:attr:`RainGage.UNITS`).
+        units (str | Literal['MM', 'IN']): Rain depth units used in the rain file, either ``'IN'`` (inches) or ``'MM'`` (millimeters) (:attr:`RainGage.UNITS`).
 
         FORMATS: Enum-like for the attribute :attr:`RainGage.form` with following members -> {``INTENSITY`` | ``VOLUME`` | ``CUMULATIVE``}
         SOURCES: Enum-like for the attribute :attr:`RainGage.source` with following members -> {``TIMESERIES`` | ``FILE``}
@@ -60,20 +60,20 @@ class RainGage(BaseSectionObject):
         IN = 'IN'
         MM = 'MM'
 
-    def __init__(self, name, form, interval, SCF, source, *args, timeseries=NaN, filename=NaN, station=NaN, units=NaN):
+    def __init__(self, name, form, interval, SCF, source: Literal['TIMESERIES', 'FILE'] or str, *args, timeseries=np.nan, filename=np.nan, station=np.nan, units: str or Literal['MM', 'IN'] = np.nan):
         """
         Rain gage information.
 
         Args:
             name (str): Name assigned to rain gage.
             form (str): Form of recorded rainfall, either ``INTENSITY``, ``VOLUME`` or ``CUMULATIVE`` (:attr:`RainGage.FORMATS`).
-            interval (str, Timedelta): time interval between gage readings in decimal hours or hours:minutes format (e.g., 0:15 for 15-minute readings).
+            interval (str or pd.Timedelta): time interval between gage readings in decimal hours or hours:minutes format (e.g., 0:15 for 15-minute readings).
             SCF (float): Snow catch deficiency correction factor (use 1.0 for no adjustment).
-            source (str): One of ``'TIMESERIES'`` ``'FILE'`` (:attr:`RainGage.SOURCES`).
+            source (str or Literal['TIMESERIES', 'FILE']): One of ``'TIMESERIES'`` ``'FILE'`` (:attr:`RainGage.SOURCES`).
             timeseries (str): Name of time series in [``TIMESERIES``] section (:class:`TimeSeries`) with rainfall data.
             filename (str): Name of external file with rainfall data. Rainfall files are discussed in Section 11.3 Rainfall Files.
             station (str): Name of recording station used in the rain file.
-            units (str): Rain depth units used in the rain file, either IN (inches) or MM (millimeters) (:attr:`RainGage.UNITS`).
+            units (str): Rain depth units used in the rain file, either ``'IN'`` (inches) or ``'MM'`` (millimeters) (:attr:`RainGage.UNITS`).
         """
         self.name = str(name)
         self.form = form
@@ -98,7 +98,7 @@ class RainGage(BaseSectionObject):
                 self.units = args[2]
 
             else:
-                raise NotImplementedError()
+                raise NotImplementedError(f'{source=} is not implemented in the RainGage object.')
 
 
 class Symbol(BaseSectionObject):
@@ -505,7 +505,9 @@ class Transect(BaseSectionObject):
                 for station in it:
                     elevation = next(it)
                     last.add_station_elevation(station, elevation)
-        yield last
+
+        if last is not None:
+            yield last
 
     def to_inp_line(self, break_every=1):
         """
@@ -835,29 +837,29 @@ class Control(BaseSectionObject):
             SIMULATION CLOCKTIME = 22:45:00
         """
 
-        def __init__(self, logic: Literal['IF', 'OR', 'AND'], kind=NaN, *args, label=NaN, attribute=None, relation: Literal['=', '<>', '<', '<=', '>', '>='] = None, value=None):
+        def __init__(self, logic: Literal['IF', 'OR', 'AND'], object_kind=np.nan, *args, label=np.nan, attribute=None, relation: Literal['=', '<>', '<', '<=', '>', '>='] = None, value=None):
             self.logic = logic.upper()  # if, and, or
 
-            if isinstance(kind, str):
-                self.kind = kind.upper()  # Control.OBJECTS
+            if isinstance(object_kind, str):
+                self.object_kind = object_kind.upper()  # Control.OBJECTS
             else:
-                self.kind = kind  # NaN for Variables
+                self.object_kind = object_kind  # NaN for Variables
 
             line = list(args)
-            if line and self.kind not in Control.OBJECT_TYPES:
-                # Variable
+            if line and self.object_kind not in Control.OBJECT_TYPES:
+                # Variable or Expression
 
-                self.attribute = NaN
-                self.label = kind
-                self.kind = NaN
+                self.attribute = np.nan
+                self.label = object_kind  # Name of the variable or expression
+                self.object_kind = np.nan
 
                 self.relation = line.pop(0)
                 self.value = ' '.join([str(i) for i in line])
 
             elif line:
-                self.label = NaN  # only for kind==SIMULATION
+                self.label = np.nan  # only for kind==SIMULATION
                 # 'SIMULATION' has/needs no label
-                if self.kind != Control.OBJECTS.SIMULATION:
+                if self.object_kind != Control.OBJECTS.SIMULATION:
                     self.label = line.pop(0)
 
                 self.attribute = line.pop(0).upper()
@@ -868,6 +870,9 @@ class Control(BaseSectionObject):
                 self.attribute = attribute
                 self.relation = relation
                 self.value = value
+
+        def involves_variable_or_expression(self):
+            return isinstance(self.object_kind, float) and np.isnan(self.object_kind)
 
     class _Action(BaseSectionObject):
         """
@@ -941,7 +946,7 @@ class Control(BaseSectionObject):
                 if kwargs:
                     yield cls(**kwargs)
                     kwargs = {}
-                kwargs['name'] = line[0]
+                kwargs[IDENTIFIERS.name] = line[0]
                 last = None
 
             elif logic == cls.LOGIC.IF:
@@ -978,11 +983,9 @@ class Control(BaseSectionObject):
             elif last is SECTIONS.ACTIONS_ELSE:
                 kwargs['actions_else'].append(cls._Action(*line))
 
-        if not all(key in kwargs for key in ['name', 'conditions', 'actions_if']):
-            return
-
         # last
-        yield Control(**kwargs)
+        if kwargs:  # if section was empty
+            yield Control(**kwargs)
 
     def copy(self):
         return type(self)(self.name, self.conditions.copy(), self.actions_if.copy(), self.actions_else.copy(), self.priority)
@@ -1002,6 +1005,8 @@ class ControlVariable(Control):
     Named Variables are aliases used to represent the triplet of
     <object type | object id | object attribute> (or a doublet for Simulation times)
     that appear in the condition clauses of control rules.
+
+    Tested in GUI: object must exists, else error when running swmm -> no placeholders
 
     They allow condition clauses to be written as:
 
@@ -1034,11 +1039,11 @@ class ControlVariable(Control):
     """
     KEYWORD = 'VARIABLE'
 
-    def __init__(self, name, object_kind, label, variable=NaN):
+    def __init__(self, name, object_kind, label, attribute=np.nan):
         self.name = name
-        self.object_kind = object_kind
+        self.object_kind = object_kind.upper()   # Control.OBJECTS
         self.label = label
-        self.variable = variable
+        self.attribute = attribute
 
     def copy(self):
         return BaseSectionObject.copy(self)
@@ -1048,7 +1053,7 @@ class ControlVariable(Control):
         return cls(*(l for l in line_args if l != '='))
 
     def to_inp_line(self):
-        return f'{self.KEYWORD} {self.name} = {self.object_kind} {self.label} {self.variable}\n'
+        return f'{self.KEYWORD} {self.name} = {self.object_kind} {self.label} {self.attribute}\n'
 
 
 class ControlExpression(Control):
@@ -1062,6 +1067,8 @@ class ControlExpression(Control):
 
     where `expression` is defined on a separate line before its first use in a rule using the format:
     `EXPRESSION name = f(variable1, variable2, ...)`
+
+    Tested with GUI: expression as  a function of another expression is not possible (no chained dependencies)
 
     The function `f(...)` can be any well-formed mathematical expression containing one or more
     named variables as well as any of the following math functions (which are case insensitive) and
@@ -1107,6 +1114,26 @@ class ControlExpression(Control):
 
     def to_inp_line(self):
         return f'{self.KEYWORD} {self.name} = {self.expression}\n'
+
+    def get_variables_involved(self) -> set:
+        # variables can't be named only as number
+        e = self.expression
+
+        set_functions = {'abs', 'sgn', 'step', 'sqrt', 'log', 'log10', 'exp'}
+
+        for func in ('sin', 'cos', 'tan', 'cot'):
+            set_functions.add(func)
+            set_functions.add(func+'h')
+            set_functions.add('a'+func)
+
+        # replace ()*/+-^ with space
+        li_operators = '()*/+-^'
+        for op in li_operators:
+            e = e.replace(op, ' ')
+
+        # split by space and make set
+        # remove numbers and functions
+        return {i for i in set(e.split(' ')) if not (i.replace('.', '').isnumeric() or (i.lower() in set_functions))}
 
 
 class Curve(BaseSectionObject):
@@ -1397,6 +1424,8 @@ class Inlet(BaseSectionObject):
     _identifier = (IDENTIFIERS.name, 'kind')
     _section_label = INLETS
 
+    _table_inp_export = False  # due to possible mixed objects
+
     class TYPES:
         GRATE = 'GRATE'
         CURB = 'CURB'
@@ -1423,8 +1452,8 @@ class Inlet(BaseSectionObject):
 
 
 class InletGrate(Inlet):
-    def __init__(self, name, kind=Inlet.TYPES.GRATE, length=None, width=None, grate_type=None, area_open=NaN,
-                 velocity_splash=NaN):
+    def __init__(self, name, kind=Inlet.TYPES.GRATE, length=None, width=None, grate_type=None, area_open=np.nan,
+                 velocity_splash=np.nan):
         super().__init__(name, kind)
         self.length = float(length)
         self.width = float(width)
@@ -1434,7 +1463,7 @@ class InletGrate(Inlet):
 
 
 class InletCurb(Inlet):
-    def __init__(self, name, kind=Inlet.TYPES.CURB, length=None, height=None, throat_angle=NaN):
+    def __init__(self, name, kind=Inlet.TYPES.CURB, length=None, height=None, throat_angle=np.nan):
         super().__init__(name, kind)
         self.length = float(length)
         self.height = float(height)
@@ -1513,8 +1542,8 @@ class InletUsage(BaseSectionObject):
         ON_GRADE = 'ON_GRADE'
         ON_SAG = 'ON_SAG'
 
-    def __init__(self, conduit, inlet, node, num=NaN, clogged_pct=NaN, flow_max=NaN, height_gutter=NaN,
-                 width_gutter=NaN, placement=NaN):
+    def __init__(self, conduit, inlet, node, num=np.nan, clogged_pct=np.nan, flow_max=np.nan, height_gutter=np.nan,
+                 width_gutter=np.nan, placement=np.nan):
         """
         Assignment of inlets to street and channel conduits.
 
@@ -1595,8 +1624,8 @@ class Timeseries(BaseSectionObject):
         TYPES: Enum-like for the attribute :attr:`TimeseriesFile.kind` with following members -> {``FILE``}
     """
     _identifier = IDENTIFIERS.name
-    _table_inp_export = False
     _section_label = TIMESERIES
+    _table_inp_export = False  # due to possible mixed objects
 
     class TYPES:
         FILE = 'FILE'
@@ -1767,7 +1796,7 @@ class TimeseriesData(Timeseries):
             for dt in date_time:
                 if isinstance(dt, (pd.Timestamp, datetime.datetime)):
                     date_time_new.append(dt)
-                elif isinstance(dt, float):
+                elif isinstance(dt, (float, int)):
                     date_time_new.append(dt)
                 else:
                     parts = dt.split()
@@ -1908,7 +1937,7 @@ class Label(BaseSectionObject):
     _identifier = ('x', 'y', 'label')
     _section_label = LABELS
 
-    def __init__(self, x, y, label, anchor=NaN, font=NaN, size=NaN, bold=NaN, italic=NaN):
+    def __init__(self, x, y, label, anchor=np.nan, font=np.nan, size=np.nan, bold=np.nan, italic=np.nan):
         """
         X,Y coordinates and text of labels.
 
@@ -2025,14 +2054,15 @@ class Hydrograph(BaseSectionObject):
                 last = cls(name, rain_gage=line[0])
             elif name == last.name:
                 last.monthly_parameters.append(cls.MONTHS.Parameters(name, *line))
-        yield last
+        if last is not None:
+            yield last
 
     class MONTHS:
         JAN = 'JAN'
         FEB = 'FEB'
         MAR = 'MAR'
         APR = 'APR'
-        MAI = 'MAI'
+        MAY = 'MAY'
         JUN = 'JUN'
         JUL = 'JUL'
         AUG = 'AUG'
@@ -2043,13 +2073,13 @@ class Hydrograph(BaseSectionObject):
 
         ALL = 'ALL'
 
-        _possible = [JAN, FEB, MAR, APR, MAI, JUN, JUL, AUG, SEP, OCT, NOV, DEC, ALL]
+        _possible = [JAN, FEB, MAR, APR, MAY, JUN, JUL, AUG, SEP, OCT, NOV, DEC, ALL]
 
         class Parameters(BaseSectionObject):
             _identifier = (IDENTIFIERS.name, 'month', 'response')
 
             def __init__(self, name, month, response, response_ratio, time_to_peak, recession_limb_ratio,
-                         depth_max=NaN, depth_recovery=NaN, depth_init=NaN):
+                         depth_max=np.nan, depth_recovery=np.nan, depth_init=np.nan):
                 """
                 Unit hydrograph parameters.
 
@@ -2102,7 +2132,7 @@ class LandUse(BaseSectionObject):
     _identifier = IDENTIFIERS.name
     _section_label = LANDUSES
 
-    def __init__(self, name, sweep_interval=NaN, availability=NaN, last_sweep=NaN):
+    def __init__(self, name, sweep_interval=np.nan, availability=np.nan, last_sweep=np.nan):
         """
         Land use categories.
 
@@ -2358,7 +2388,8 @@ class SnowPack(BaseSectionObject):
 
             kind = kind.upper()
             last.parts[kind] = cls.PARTS._dict[kind](*line)
-        yield last
+        if last is not None:
+            yield last
 
     class PARTS:
         class _Base(BaseSectionObject):
@@ -2416,7 +2447,7 @@ class SnowPack(BaseSectionObject):
         class Removal(BaseSectionObject):
             _LABEL = 'REMOVAL'
 
-            def __init__(self, Dplow, Fout, Fimp, Fperv, Fimelt, Fsub=NaN, Scatch=NaN):
+            def __init__(self, Dplow, Fout, Fimp, Fperv, Fimelt, Fsub=np.nan, Scatch=np.nan):
                 """
                 The ``REMOVAL`` line describes how snow removed from the plowable area is
                 transferred onto other areas. The various transfer fractions should sum to no more
@@ -2511,7 +2542,7 @@ class Aquifer(BaseSectionObject):
     _identifier = IDENTIFIERS.name
     _section_label = AQUIFERS
 
-    def __init__(self, name, Por, WP, FC, Ks, Kslp, Tslp, ETu, ETs, Seep, Ebot, Egw, Umc, pattern=NaN):
+    def __init__(self, name, Por, WP, FC, Ks, Kslp, Tslp, ETu, ETs, Seep, Ebot, Egw, Umc, pattern=np.nan):
         """
         Groundwater aquifer parameters.
 

@@ -31,7 +31,7 @@ class SwmmHotstart(BinaryReader):
 
         Args:
             filename (str): Path to the hotstart-file.
-            inp (swmm_api.SwmmInput): inp-file-data.
+            inp (swmm_api.SwmmInput): SWMM input-file data.
         """
         super().__init__(filename)
         self.fp.seek(0, SEEK_SET)
@@ -79,10 +79,8 @@ class SwmmHotstart(BinaryReader):
             self.columns_subcatchment += ['theta', 'bottomElev+lowerDepth', 'newFlow', 'maxInfilVol']
 
         if SEC.SNOWPACKS in inp:
-            for s in [subareas]:
-                for v in ['depth_snow', 'depth_free_water_snow', 'cold_content',
-                                              'antecedent_temperature', 'initial_AWESI']:
-
+            for s in subareas:
+                for v in ['depth_snow', 'depth_free_water_snow', 'cold_content', 'antecedent_temperature', 'initial_AWESI']:
                     self.columns_subcatchment.append(f'{s}_{v}')
 
         if n_pollutants:
