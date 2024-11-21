@@ -82,7 +82,7 @@ BEGIN
                 ''state'', a.state,
                 ''state_type'', a.state_type,
                 ''is_operative'', vst.is_operative,
-                ''mapzone_id'', s.start_vid_zone_id,
+                ''mapzone_id'', s.start_vid_zone_name,
                 ''timestep'', (concat(''2001-01-01 01:'', floor(c.agg_cost)::integer / 60, '':'', floor(c.agg_cost)::integer % 60))::timestamp
 
             )
@@ -93,7 +93,7 @@ BEGIN
     JOIN cat_arc ca ON a.arccat_id::text = ca.id::text
     JOIN value_state_type vst ON vst.id = a.state_type
     JOIN (
-        SELECT '||v_mapzone_field||' AS start_vid_zone_id, (json_array_elements_text((graphconfig->>''use'')::json))::json->>''nodeParent'' as node_id
+        SELECT '||v_mapzone_field||' AS start_vid_zone_id, name as start_vid_zone_name, (json_array_elements_text((graphconfig->>''use'')::json))::json->>''nodeParent'' as node_id
         FROM '||v_mapzone||' WHERE graphconfig IS NOT NULL AND active IS TRUE
     ) s ON c.start_vid = s.node_id::INT;
     ';
