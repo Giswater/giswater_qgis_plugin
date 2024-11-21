@@ -99,15 +99,7 @@ class GwCreateSchemaTask(GwTask):
         if self.timer:
             self.timer.stop()
 
-        if self.finish_execution['import_data']:
-            tools_gw.set_config_parser('btn_admin', 'create_schema_type', 'rdb_inp', prefix=False)
-            msg = ("The base schema have been correctly executed."
-                   "\nNow will start the import process. It is experimental and it may crash."
-                   "\nIf this happens, please notify it by send a e-mail to info@giswater.org.")
-            tools_qt.show_info_box(msg, "Info")
-            self.admin.execute_import_inp_data(self.params['project_name_schema'], self.params['project_type'])
-        else:
-            self.admin.manage_process_result(self.params['project_name_schema'], self.params['project_type'],
+        self.admin.manage_process_result(self.params['project_name_schema'], self.params['project_type'],
                                              is_test=self.is_test)
         self.setProgress(100)
 
@@ -174,9 +166,8 @@ class GwCreateSchemaTask(GwTask):
         self.admin.total_sql_files = 100
         self.admin.progress_ratio = 1.0
 
-        if self.admin.rdb_inp.isChecked():
-            self.finish_execution['import_data'] = True
-        elif self.admin.rdb_sample_inv.isChecked() and example_data:
+
+        if self.admin.rdb_sample_inv.isChecked() and example_data:
             tools_gw.set_config_parser('btn_admin', 'create_schema_type', 'rdb_sample_full', prefix=False)
             self.admin.load_sample_data(project_type=project_type)
             self.admin.load_inv_data(project_type=project_type)

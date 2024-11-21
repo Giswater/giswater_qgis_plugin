@@ -411,10 +411,6 @@ FORM_CLASS = _get_ui_class('admin_gisproject.ui', 'admin')
 class GwAdminGisProjectUi(GwMainWindow, FORM_CLASS):
     pass
 
-FORM_CLASS = _get_ui_class('admin_importinp.ui', 'admin')
-class GwAdminImportUi(GwDialog, FORM_CLASS):
-    pass
-
 FORM_CLASS = _get_ui_class('admin_projectinfo.ui', 'admin')
 class GwAdminProjectInfoUi(GwMainWindow, FORM_CLASS):
     pass
