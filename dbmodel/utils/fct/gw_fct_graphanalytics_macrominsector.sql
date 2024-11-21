@@ -71,7 +71,7 @@ BEGIN
         FROM (SELECT arc_id, macrominsector_id FROM arc) a
         WHERE g.arc_id = a.arc_id AND a.macrominsector_id <> 0;
      ELSIF v_project_type = 'WS' THEN
-        UPDATE minsector_graph m SET m.macrominsector_id = n.macrominsector_id
+        UPDATE minsector_graph m SET macrominsector_id = n.macrominsector_id
         FROM (SELECT node_id, macrominsector_id FROM node) n
         WHERE m.node_id = n.node_id AND n.macrominsector_id <> 0;
     END IF;
