@@ -4,7 +4,11 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
--- SELECT SCHEMA_NAME.gw_fct_getgraphinundation($${"client":{"device":4, "infoType":1, "lang":"ES"}, "data":{}}$$)
+-- SELECT SCHEMA_NAME.gw_fct_getgraphinundation($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"mapzone":"SECTOR"}}}$$);
+-- SELECT SCHEMA_NAME.gw_fct_getgraphinundation($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"mapzone":"DMA"}}}$$);
+-- SELECT SCHEMA_NAME.gw_fct_getgraphinundation($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"mapzone":"PRESSZONE"}}}$$);
+-- SELECT SCHEMA_NAME.gw_fct_getgraphinundation($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"mapzone":"DQA"}}}$$);
+
 
 
 --FUNCTION CODE: 3336
@@ -17,34 +21,84 @@ $BODY$
 DECLARE
     geojson_result json;
 	v_version text;
-	
+    v_querytext text;
+
+    v_mapzone text;
+    v_mapzone_field text;
+
 BEGIN
 
 	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
-	
-    SELECT jsonb_build_object(
-        'type', 'FeatureCollection',
-        'layerName', 'Graphanalytics tstep process',
-        'features', jsonb_agg(jsonb_build_object(
-            'type', 'Feature',
-            'geometry', ST_AsGeoJSON(b.the_geom)::jsonb,
-            'properties', jsonb_build_object(
-                'arc_id', a.arc_id,
-                'node_1', a.node_1,
-                'node_2', a.node_2,
-                'arc_type', b.arc_type,
-                'state', b.state,
-                'state_type', b.state_type,
-                'is_operative', b.is_operative,
-				'mapzone_id', a.trace,
-                'timestep', (concat('2001-01-01 01:', a.checkf / 60, ':', a.checkf % 60))::timestamp
+
+    v_mapzone = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'mapzone');
+    v_mapzone_field = v_mapzone || '_id';
+
+    v_querytext = '
+        WITH connected_arcs AS (
+            SELECT d1.start_vid,
+            a.pgr_arc_id,
+            d1.edge AS edge1,
+            d2.edge AS edge2,
+            CASE
+                WHEN a.pgr_arc_id = d1.edge THEN d1.agg_cost
+                WHEN a.pgr_arc_id = d2.edge THEN d2.agg_cost
+                ELSE
+                LEAST(
+                    CASE WHEN a.cost >= 0 THEN d1.agg_cost + a.cost ELSE NULL END,
+                    CASE WHEN a.reverse_cost>=0 THEN d2.agg_cost + a.reverse_cost ELSE NULL END
+                )
+            END AS agg_cost,
+            d1.depth AS depth1,
+            d2.depth AS depth2,
+            d1.agg_cost AS agg_cost1,
+            d2.agg_cost AS agg_cost2,
+            a.arc_id,
+            a.pgr_node_1,
+            a.pgr_node_2,
+            a.zone_id,
+            a.cost,
+            a.reverse_cost
+            FROM temp_pgr_arc a
+            JOIN temp_pgr_drivingdistance d1 ON a.pgr_node_1 = d1.node
+            JOIN temp_pgr_drivingdistance d2 ON a.pgr_node_2 = d2.node
+            WHERE a.pgr_arc_id = a.arc_id::int
+            AND d1.start_vid = d2.start_vid
+            AND (
+                a.cost >= 0 OR a.reverse_cost >= 0
+            )
+        )
+        SELECT jsonb_build_object(
+        ''type'', ''FeatureCollection'',
+        ''layerName'', ''Graphanalytics tstep process'',
+        ''features'', jsonb_agg(jsonb_build_object(
+            ''type'', ''Feature'',
+            ''geometry'', ST_AsGeoJSON(a.the_geom)::jsonb,
+            ''properties'', jsonb_build_object(
+                ''arc_id'', a.arc_id,
+                ''start_vid'', c.start_vid,
+                ''node_1'', a.node_1,
+                ''node_2'', a.node_2,
+                ''arc_type'', ca.arc_type,
+                ''state'', a.state,
+                ''state_type'', a.state_type,
+                ''is_operative'', vst.is_operative,
+                ''mapzone_id'', s.start_vid_zone_id,
+                ''timestep'', (concat(''2001-01-01 01:'', floor(c.agg_cost)::integer / 60, '':'', floor(c.agg_cost)::integer % 60))::timestamp
+
             )
         ))
-    ) INTO geojson_result
-    FROM temp_anlgraph a
-    JOIN v_edit_arc b ON a.arc_id = b.arc_id
-    WHERE a.cur_user = current_user
-    AND a.trace IS NOT NULL;
+    )
+    FROM connected_arcs c
+    JOIN arc a on c.arc_id = a.arc_id
+    JOIN cat_arc ca ON a.arccat_id::text = ca.id::text
+    JOIN value_state_type vst ON vst.id = a.state_type
+    JOIN (
+        SELECT '||v_mapzone_field||' AS start_vid_zone_id, (json_array_elements_text((graphconfig->>''use'')::json))::json->>''nodeParent'' as node_id
+        FROM '||v_mapzone||' WHERE graphconfig IS NOT NULL AND active IS TRUE
+    ) s ON c.start_vid = s.node_id::INT;
+    ';
+
+    EXECUTE v_querytext INTO geojson_result;
 
     RETURN gw_fct_json_create_return((
         '{"status":"Accepted", "message":{"level":1, "text":"Process done successfully"}, "version":"' || v_version || '", "body":{"form":{},"data":{"line":' || geojson_result || '}}}'
