@@ -4342,3 +4342,17 @@ AS SELECT distinct  on (macroexpl_id) m.*
    FROM selector_expl ss, macroexploitation m join exploitation s using (macroexpl_id)
    where ss.expl_id = s.expl_id and cur_user = current_user
    and m.active is true;
+
+-- 21/11/24
+CREATE OR REPLACE VIEW v_minsector_graph AS
+SELECT
+    m.node_id,
+    m.nodecat_id,
+    m.minsector_1,
+    m.minsector_2,
+    m.macrominsector_id,
+    n.expl_id
+FROM minsector_graph m
+JOIN node n ON n.node_id = m.node_id
+JOIN selector_expl s ON s.expl_id = n.expl_id
+WHERE s.cur_user = CURRENT_USER;

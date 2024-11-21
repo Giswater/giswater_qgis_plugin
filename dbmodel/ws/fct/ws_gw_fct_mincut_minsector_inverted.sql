@@ -38,12 +38,12 @@ BEGIN
 
 		-- this make sense when some of the proposed valves are not operative. Then inundation for that valve is needed in order to find next one
 		IF (SELECT count(*) FROM temp_om_mincut_valve WHERE (broken or unaccess) and proposed) > 0 THEN
-	
+
 			-- create the graph
 			INSERT INTO temp_t_anlgraph (arc_id, node_1, node_2, water, flag, checkf )
-			SELECT node_id, minsector_1, minsector_2, 0, 0, 0 FROM minsector_graph WHERE expl_id = rec_mincut.expl_id
+			SELECT node_id, minsector_1, minsector_2, 0, 0, 0 FROM v_minsector_graph WHERE expl_id = rec_mincut.expl_id
 			UNION
-			SELECT node_id, minsector_2, minsector_1, 0, 0, 0 FROM minsector_graph WHERE expl_id = rec_mincut.expl_id;
+			SELECT node_id, minsector_2, minsector_1, 0, 0, 0 FROM v_minsector_graph WHERE expl_id = rec_mincut.expl_id;
 
 			-- setup valves enabled to participate
 			UPDATE temp_t_anlgraph SET flag = 1 WHERE arc_id IN (SELECT node_id FROM temp_om_mincut_valve WHERE broken IS FALSE AND unaccess IS FALSE AND proposed IS not true);
@@ -56,14 +56,14 @@ BEGIN
 
 			-- setting the starting elements to the right sense
 			UPDATE temp_t_anlgraph SET water=1, trace = node_1::integer WHERE arc_id IN (SELECT node_id FROM temp_om_mincut_valve WHERE (broken or unaccess) and proposed)
-			AND node_1::integer = rec_mincut.minsector_id; 
+			AND node_1::integer = rec_mincut.minsector_id;
 
 			-- close the starting elements on the opossite sense
 			UPDATE temp_t_anlgraph SET flag = 1 WHERE arc_id IN (SELECT node_id FROM temp_om_mincut_valve WHERE (broken or unaccess) and proposed)
-			AND node_2::integer = rec_mincut.minsector_id; 
-						
+			AND node_2::integer = rec_mincut.minsector_id;
+
 			--- start engine
-			LOOP	
+			LOOP
 				v_cont1 = v_cont1+1;
 				UPDATE temp_t_anlgraph n SET water = 1, trace = rec_mincut.minsector_id FROM v_t_anl_graph a WHERE n.node_1 = a.node_1 AND n.arc_id = a.arc_id;
 				GET DIAGNOSTICS v_affected_rows =row_count;
@@ -83,9 +83,9 @@ BEGIN
 			ON CONFLICT (result_id, node_id) DO NOTHING;
 
 			-- update proposed valves
-			UPDATE temp_om_mincut_valve SET proposed = true 
-			WHERE node_id IN (SELECT arc_id FROM temp_t_anlgraph WHERE water = 1);			
-						
+			UPDATE temp_om_mincut_valve SET proposed = true
+			WHERE node_id IN (SELECT arc_id FROM temp_t_anlgraph WHERE water = 1);
+
 		END IF;
 
 	ELSIF p_step = 2 THEN
@@ -94,42 +94,42 @@ BEGIN
 		SELECT macroexpl_id INTO v_macroexpl FROM exploitation WHERE expl_id=rec_mincut.expl_id;
 
 		-- Create the matrix to work with pgrouting
-		INSERT INTO temp_t_mincut 
+		INSERT INTO temp_t_mincut
 		SELECT a.id, a.source, a.target,
 		(case when (a.id = b.id and a.source::text != b.source::text) then -1 else cost end) as cost, 			-- close especial case of config_graph_checkvalve only direct sense
 		(case when (a.id = b.id and a.source::text = b.source::text) then -1 else reverse_cost end) as reverse_cost  	-- close especial case of config_graph_checkvalve only reverse sense
 		FROM (
-			SELECT arc.arc_id::int8 as id, node_1::int8 as source, node_2::int8 as target, 
+			SELECT arc.arc_id::int8 as id, node_1::int8 as source, node_2::int8 as target,
 			(case when a.closed=true then -1 else 1 end) as cost,
 			(case when a.closed=true then -1 else 1 end) as reverse_cost
-			FROM arc 
+			FROM arc
 			JOIN exploitation USING (expl_id)
 			LEFT JOIN (
 				SELECT arc_id, true as closed FROM arc WHERE arc_id IN (SELECT arc_id FROM temp_om_mincut_arc)
-				OR (node_1 IN (SELECT node_id FROM temp_om_mincut_valve WHERE closed=TRUE AND proposed IS NOT TRUE))					
-				OR (node_2 IN (SELECT node_id FROM temp_om_mincut_valve WHERE closed=TRUE AND proposed IS NOT TRUE))	
+				OR (node_1 IN (SELECT node_id FROM temp_om_mincut_valve WHERE closed=TRUE AND proposed IS NOT TRUE))
+				OR (node_2 IN (SELECT node_id FROM temp_om_mincut_valve WHERE closed=TRUE AND proposed IS NOT TRUE))
 				UNION
 				SELECT json_array_elements_text((parameters->>'inletArc')::json) as arc_id, true as closed FROM config_graph_mincut
-				)a 
+				)a
 			ON a.arc_id=arc.arc_id
 			WHERE node_1 is not null and node_2 is not null AND state = 1 and macroexpl_id = v_macroexpl
-		)a	
+		)a
 		LEFT JOIN (SELECT minsector_id::int8 AS source, node_id::int8 AS id FROM arc JOIN config_graph_checkvalve ON arc_id = to_arc where active )b USING (id);
 
 		-- Loop for all the proposed valves
 		FOR rec_valve IN SELECT node_id FROM temp_om_mincut_valve WHERE proposed = TRUE and unaccess=FALSE AND broken=FALSE
 		LOOP
-			FOR rec_tank IN 
+			FOR rec_tank IN
 			SELECT v_edit_node.node_id, v_edit_node.the_geom FROM config_graph_mincut
 			JOIN v_edit_node ON v_edit_node.node_id=config_graph_mincut.node_id
 			JOIN exploitation ON exploitation.expl_id=v_edit_node.expl_id
-			WHERE (is_operative IS TRUE) AND (exploitation.macroexpl_id=v_macroexpl) AND config_graph_mincut.active IS TRUE 
+			WHERE (is_operative IS TRUE) AND (exploitation.macroexpl_id=v_macroexpl) AND config_graph_mincut.active IS TRUE
 			AND v_edit_node.the_geom IS NOT NULL
 			ORDER BY 1
 			LOOP
 				/*
 				The aim of this query_text is to draw (if exists) routing from valve to tank defineds on the loop using the pgrouting function ''pgr_dijkstra''
-				We need to create the network matrix (transfering the closed status of closed valves an proposed valves to the closests arcs) 
+				We need to create the network matrix (transfering the closed status of closed valves an proposed valves to the closests arcs)
 				In order to transfer this propierty to the arc we need to identify
 					1) Arcs into the proposed sector with node1 or node2 as proposed valves
 					2) Arcs out of the proposed sector with node1 or node2 as (closed valves and not proposed valves)
@@ -144,14 +144,14 @@ BEGIN
 					v_inletpath=true;
 					RAISE NOTICE 'valve % tank % v_inletpath % ', rec_valve.node_id, rec_tank.node_id, v_inletpath;
 					EXIT;
-				ELSE 
+				ELSE
 					v_inletpath=false;
 					RAISE NOTICE 'valve % tank % v_inletpath % ', rec_valve.node_id, rec_tank.node_id, v_inletpath;
 				END IF;
 			END LOOP;
-			
+
 			IF v_inletpath IS FALSE THEN
-								
+
 				--Valve has no exit. Update proposed value
 				UPDATE temp_om_mincut_valve SET proposed=FALSE, flag=TRUE WHERE node_id=rec_valve.node_id;
 			END IF;
@@ -174,14 +174,14 @@ BEGIN
 
 			-- set the closed valve
 			UPDATE temp_t_anlgraph SET flag = 1 WHERE arc_id IN (SELECT node_id FROM temp_om_mincut_valve WHERE closed is true);
-			UPDATE temp_t_anlgraph SET flag = 1 WHERE arc_id IN (SELECT node_id FROM temp_om_mincut_valve WHERE proposed is true); 
+			UPDATE temp_t_anlgraph SET flag = 1 WHERE arc_id IN (SELECT node_id FROM temp_om_mincut_valve WHERE proposed is true);
 
 			-- close the starting elements on the opossite sense
 			UPDATE temp_t_anlgraph SET flag = 1 WHERE arc_id IN (SELECT node_id FROM temp_om_mincut_valve WHERE flag)
 			AND node_2::integer IN (SELECT DISTINCT minsector_id FROM temp_om_mincut_arc);
-						
+
 			--- start engine
-			LOOP	
+			LOOP
 				v_cont1 = v_cont1+1;
 				UPDATE temp_t_anlgraph n SET water = 1, trace = rec_mincut.minsector_id FROM v_t_anl_graph a WHERE n.node_1 = a.node_1 AND n.arc_id = a.arc_id;
 				GET DIAGNOSTICS v_affected_rows =row_count;
@@ -201,7 +201,7 @@ BEGIN
 			ON CONFLICT (result_id, node_id) DO NOTHING;
 
 			-- set proposed = false all those valves have been inundated
-			UPDATE temp_om_mincut_valve SET proposed=FALSE WHERE node_id IN (SELECT arc_id FROM temp_t_anlgraph WHERE water = 1); 
+			UPDATE temp_om_mincut_valve SET proposed=FALSE WHERE node_id IN (SELECT arc_id FROM temp_t_anlgraph WHERE water = 1);
 		END IF;
 
 	ELSIF p_step = 3 THEN -- when is called on mincut conflict
@@ -213,42 +213,42 @@ BEGIN
 		CREATE TEMP TABLE temp_t_mincut (LIKE SCHEMA_NAME.temp_mincut INCLUDING ALL);
 
 		-- Create the matrix to work with pgrouting
-		INSERT INTO temp_t_mincut 
+		INSERT INTO temp_t_mincut
 		SELECT a.id, a.source, a.target,
 		(case when (a.id = b.id and a.source::text != b.source::text) then -1 else cost end) as cost, 			-- close especial case of config_graph_checkvalve only direct sense
 		(case when (a.id = b.id and a.source::text = b.source::text) then -1 else reverse_cost end) as reverse_cost  	-- close especial case of config_graph_checkvalve only reverse sense
 		FROM (
-			SELECT arc.arc_id::int8 as id, node_1::int8 as source, node_2::int8 as target, 
+			SELECT arc.arc_id::int8 as id, node_1::int8 as source, node_2::int8 as target,
 			(case when a.closed=true then -1 else 1 end) as cost,
 			(case when a.closed=true then -1 else 1 end) as reverse_cost
-			FROM arc 
+			FROM arc
 			JOIN exploitation USING (expl_id)
 			LEFT JOIN (
 				SELECT arc_id, true as closed FROM arc WHERE arc_id IN (SELECT arc_id FROM om_mincut_arc WHERE result_id = -2)
-				OR (node_1 IN (SELECT node_id FROM om_mincut_valve WHERE closed=TRUE AND proposed IS NOT TRUE AND result_id = -2))					
-				OR (node_2 IN (SELECT node_id FROM om_mincut_valve WHERE closed=TRUE AND proposed IS NOT TRUE AND result_id = -2))	
+				OR (node_1 IN (SELECT node_id FROM om_mincut_valve WHERE closed=TRUE AND proposed IS NOT TRUE AND result_id = -2))
+				OR (node_2 IN (SELECT node_id FROM om_mincut_valve WHERE closed=TRUE AND proposed IS NOT TRUE AND result_id = -2))
 				UNION
 				SELECT json_array_elements_text((parameters->>'inletArc')::json) as arc_id, true as closed FROM config_graph_mincut
-				)a 
+				)a
 			ON a.arc_id=arc.arc_id
 			WHERE node_1 is not null and node_2 is not null AND state = 1 and macroexpl_id = v_macroexpl
-		)a	
+		)a
 		LEFT JOIN (SELECT minsector_id::int8 AS source, node_id::int8 AS id FROM arc JOIN config_graph_checkvalve ON arc_id = to_arc where active )b USING (id);
 
 		-- Loop for all the proposed valves
 		FOR rec_valve IN SELECT node_id FROM om_mincut_valve WHERE proposed = TRUE and unaccess=FALSE AND broken=FALSE AND result_id = p_result
 		LOOP
-			FOR rec_tank IN 
+			FOR rec_tank IN
 			SELECT v_edit_node.node_id, v_edit_node.the_geom FROM config_graph_mincut
 			JOIN v_edit_node ON v_edit_node.node_id=config_graph_mincut.node_id
 			JOIN exploitation ON exploitation.expl_id= v_edit_node.expl_id
-			WHERE (is_operative IS TRUE) AND (exploitation.macroexpl_id=v_macroexpl) AND config_graph_mincut.active IS TRUE 
-			AND v_edit_node.the_geom IS NOT NULL AND v_edit_node.node_id NOT IN (select node_id FROM om_mincut_node WHERE result_id = p_result) 
+			WHERE (is_operative IS TRUE) AND (exploitation.macroexpl_id=v_macroexpl) AND config_graph_mincut.active IS TRUE
+			AND v_edit_node.the_geom IS NOT NULL AND v_edit_node.node_id NOT IN (select node_id FROM om_mincut_node WHERE result_id = p_result)
 			ORDER BY 1
 			LOOP
 				/*
 				The aim of this query_text is to draw (if exists) routing from valve to tank defineds on the loop using the pgrouting function ''pgr_dijkstra''
-				We need to create the network matrix (transfering the closed status of closed valves an proposed valves to the closests arcs) 
+				We need to create the network matrix (transfering the closed status of closed valves an proposed valves to the closests arcs)
 				In order to transfer this propierty to the arc we need to identify
 					1) Arcs into the proposed sector with node1 or node2 as proposed valves
 					2) Arcs out of the proposed sector with node1 or node2 as (closed valves and not proposed valves)
@@ -263,13 +263,13 @@ BEGIN
 					v_inletpath=true;
 					RAISE NOTICE 'valve % tank % v_inletpath % ', rec_valve.node_id, rec_tank.node_id, v_inletpath;
 					EXIT;
-				ELSE 
+				ELSE
 					v_inletpath=false;
 					RAISE NOTICE 'valve % tank % v_inletpath % ', rec_valve.node_id, rec_tank.node_id, v_inletpath;
 				END IF;
 			END LOOP;
-			
-			IF v_inletpath IS FALSE THEN				
+
+			IF v_inletpath IS FALSE THEN
 				--Valve has no exit. Update proposed value
 				UPDATE om_mincut_valve SET proposed=FALSE, flag=TRUE WHERE node_id=rec_valve.node_id AND result_id = p_result;
 			END IF;
@@ -282,7 +282,7 @@ BEGIN
 
 			-- create temporal tables
 			CREATE TEMP TABLE temp_t_anlgraph (LIKE SCHEMA_NAME.temp_anlgraph INCLUDING ALL);
-			CREATE OR REPLACE TEMP VIEW v_t_anl_graph AS 
+			CREATE OR REPLACE TEMP VIEW v_t_anl_graph AS
 			SELECT t.arc_id,t.node_1,t.node_2,t.trace,t.flag,t.water
 			FROM temp_t_anlgraph t
 			     JOIN ( SELECT arc_id, node_1, node_2, water, flag FROM temp_t_anlgraph WHERE water = 1) a ON t.node_1::text = a.node_2::text
@@ -301,7 +301,7 @@ BEGIN
 			UPDATE temp_t_anlgraph SET water=1, flag = 0 , trace = 3 WHERE arc_id IN (SELECT node_id FROM om_mincut_valve WHERE flag AND result_id = -2);
 
 			--- start engine
-			LOOP	
+			LOOP
 				v_cont1 = v_cont1+1;
 				UPDATE temp_t_anlgraph n SET water = 1, trace = 4 FROM v_t_anl_graph a WHERE n.node_1 = a.node_1 AND n.arc_id = a.arc_id;
 				GET DIAGNOSTICS v_affected_rows =row_count;
@@ -321,7 +321,7 @@ BEGIN
 			ON CONFLICT (result_id, node_id) DO NOTHING;
 
 			-- set proposed = false all those valves have been inundated
-			UPDATE om_mincut_valve SET proposed=FALSE WHERE node_id IN (SELECT arc_id FROM temp_t_anlgraph WHERE water = 1)  AND result_id = p_result; 
+			UPDATE om_mincut_valve SET proposed=FALSE WHERE node_id IN (SELECT arc_id FROM temp_t_anlgraph WHERE water = 1)  AND result_id = p_result;
 		END IF;
 
 		DROP TABLE IF EXISTS temp_t_mincut;

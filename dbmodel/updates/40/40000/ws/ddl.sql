@@ -252,3 +252,7 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"link", "
 -- 12/11/24
 DROP VIEW ve_epa_virtualpump;
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"inp_virtualpump", "column":"energyvalue"}}$$);
+
+-- 21/11/24
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"minsector_graph", "column":"expl_id"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"minsector_graph", "column":"macrominsector_id", "dataType":"integer"}}$$);
