@@ -188,7 +188,7 @@ BEGIN
 
 			-- Get isNullValue field
 			SELECT dv_isnullvalue::BOOLEAN INTO v_isnullvalue FROM config_form_fields WHERE formname = 'generic'
-			AND formtype = 'epa_selector' AND tabname = 'tab_result' AND columnname = v_child LIMIT 1;
+			AND formtype = 'epa_selector' AND columnname = v_child LIMIT 1;
 
 			IF v_isnullvalue IS TRUE THEN
 				v_combo_values := array_prepend('', v_combo_values);

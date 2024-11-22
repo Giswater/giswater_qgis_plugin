@@ -246,7 +246,7 @@ BEGIN
 	LOOP
       		fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'imageVal', COALESCE((aux_json->>'queryText'), ''));
       		fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_delete_keys(fields_array[(aux_json->>'orderby')::INT],
-      		'queryText', 'orderById', 'isNullValue', 'parentId', 'queryTextFilter');
+      		'queryText', 'orderById', 'parentId', 'queryTextFilter');
 	END LOOP;
 
 	-- for buttons
@@ -313,7 +313,7 @@ BEGIN
 		ELSE
 			--removing the not used keys
 			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_delete_keys(fields_array[(aux_json->>'orderby')::INT],
-			'queryText', 'orderById', 'isNullValue', 'parentId', 'queryTextFilter');
+			'queryText', 'orderById', 'parentId', 'queryTextFilter');
 		END IF;
 
 	END LOOP;
@@ -428,7 +428,7 @@ BEGIN
 		ELSE
 			--removing the not used keys
 			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_delete_keys(fields_array[(aux_json->>'orderby')::INT],
-			'queryText', 'orderById', 'isNullValue', 'parentId', 'queryTextFilter');
+			'queryText', 'orderById', 'parentId', 'queryTextFilter');
 		END IF;
 
 	END LOOP;
@@ -437,7 +437,7 @@ BEGIN
 	FOR aux_json IN SELECT * FROM json_array_elements(array_to_json(fields_array)) AS a WHERE a->>'widgettype' NOT IN ('image', 'combo', 'typeahead')
 	LOOP
 		fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_delete_keys(fields_array[(aux_json->>'orderby')::INT],
-		'queryText', 'orderById', 'isNullValue', 'parentId', 'queryTextFilter');
+		'queryText', 'orderById', 'parentId', 'queryTextFilter');
 	END LOOP;
 
 	-- Remove widgetaction when is null
