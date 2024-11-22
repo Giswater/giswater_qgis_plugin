@@ -4323,6 +4323,24 @@ AS SELECT p.arc_id,
    FROM inp_virtualpump p
      LEFT JOIN v_rpt_arc USING (arc_id);
 
+-- 19/11/24
+CREATE OR REPLACE VIEW v_edit_macrosector
+AS SELECT DISTINCT ON (macrosector_id) macrosector_id,
+    m.name,
+    m.descript,
+    m.the_geom,
+    m.undelete,
+    m.active
+   FROM selector_sector ss, macrosector m LEFT JOIN sector s USING (macrosector_id)
+   WHERE (ss.sector_id = s.sector_id AND cur_user = current_user OR s.macrosector_id IS NULL)
+   AND m.active IS true;
+
+
+CREATE OR REPLACE VIEW v_edit_macroexploitation
+AS SELECT DISTINCT ON (macroexpl_id) m.*
+   FROM selector_expl ss, macroexploitation m JOIN exploitation s USING (macroexpl_id)
+   WHERE (ss.expl_id = s.expl_id AND cur_user = current_user OR s.macroexpl_id IS NULL)
+   AND m.active IS true;
 
 -- 21/11/24
 CREATE OR REPLACE VIEW v_minsector_graph AS
