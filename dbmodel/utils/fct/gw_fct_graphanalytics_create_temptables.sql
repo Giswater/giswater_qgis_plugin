@@ -109,9 +109,9 @@ BEGIN
             ALTER TABLE temp_pgr_arc ADD COLUMN cost_mincut int default 1;
             ALTER TABLE temp_pgr_arc ADD COLUMN reverse_cost_mincut int default 1;
             ALTER TABLE temp_pgr_arc ADD COLUMN unaccess BOOL; -- if TRUE, it means the valve is not accessible
-            ALTER TABLE temp_pgr_arc ADD COLUMN proposed BOOL; 
-            -- "proposed" IS NULL if it's not involved in the mincut
-            -- "proposed" = TRUE if it's in the mincut and it has to be closed, FALSE if it's in the mincut and it cannot be closed
+            ALTER TABLE temp_pgr_arc ADD COLUMN proposed BOOL DEFAULT FALSE; 
+            -- "proposed"= FALSE AND ZONE_ID <> '0' if it's in the mincut and it cannot be closed
+            -- "proposed" = TRUE if it's in the mincut and it has to be closed
         END IF;
     END IF;
 

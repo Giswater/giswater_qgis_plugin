@@ -60,7 +60,7 @@ BEGIN
 	    UPDATE temp_pgr_arc set pgr_node_2=v_id
 	    WHERE pgr_arc_id=v_record.pgr_arc_id;
 	    INSERT INTO temp_pgr_arc(pgr_arc_id, arc_id, pgr_node_1,pgr_node_2,node_1,node_2, graph_delimiter, cost, reverse_cost)
-	    VALUES (v_id+1, v_record.pgr_arc_id::TEXT,v_record.pgr_node_id, v_id, v_record.pgr_node_id,v_record.pgr_node_id, COALESCE(v_record.a_graph_delimiter,v_record.n_graph_delimiter),-1, -1);
+	    VALUES (v_id+1, v_record.pgr_arc_id::TEXT,v_id, v_record.pgr_node_id, v_record.pgr_node_id,v_record.pgr_node_id, COALESCE(v_record.a_graph_delimiter,v_record.n_graph_delimiter),-1, -1);
     END LOOP;
 
     RETURN jsonb_build_object(
