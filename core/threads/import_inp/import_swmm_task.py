@@ -224,9 +224,9 @@ class GwImportInpTask(GwTask):
             self.progress_changed.emit("Non-visual objects", lerp_progress(80, self.PROGRESS_CATALOGS, self.PROGRESS_NONVISUAL), "Importing controls", True)
             self._save_controls()
 
-        # if LID_CONTROLS in self.network:  # type: ignore
-        #     self.progress_changed.emit("Non-visual objects", lerp_progress(80, self.PROGRESS_CATALOGS, self.PROGRESS_NONVISUAL), "Importing LIDs", True)
-        #     self._save_lids()
+        if LID_CONTROLS in self.network:  # type: ignore
+            self.progress_changed.emit("Non-visual objects", lerp_progress(80, self.PROGRESS_CATALOGS, self.PROGRESS_NONVISUAL), "Importing LIDs", True)
+            self._save_lids()
 
     def _manage_visual(self) -> None:
         self.progress_changed.emit("Visual objects", lerp_progress(0, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing junctions", True)
@@ -602,7 +602,27 @@ class GwImportInpTask(GwTask):
             execute_sql(sql, params, commit=False)
 
     def _save_lids(self) -> None:
-        pass
+        lid_rows = get_rows("SELECT lidco_id FROM inp_lid", commit=False)
+        lids_db: set[str] = set()
+        if lid_rows:
+            lids_db = {x[0] for x in lid_rows}
+
+        for lid_name, lid in self.network[LID_CONTROLS].items():
+            if lid_name in lids_db:
+                # Manage if lid already exists
+                for i in count(2):
+                    new_name = f"{lid_name}_{i}"
+                    if new_name in lids_db:
+                        continue
+                    message = f'The curve "{lid_name}" has been renamed to "{new_name}" to avoid a collision with an existing curve.'
+                    self.mappings["curves"][lid_name] = new_name
+                    lid_name = new_name
+                    break
+
+            lid_type: str = lid.lid_kind
+            sql = "INSERT INTO inp_lid (lidco_id, lidco_type) VALUES (%s, %s)"
+            params = (lid_name, lid_type)
+            execute_sql(sql, params, commit=False)
 
     def _save_junctions(self) -> None:
         node_sql = """ 
