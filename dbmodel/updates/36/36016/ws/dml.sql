@@ -25,3 +25,18 @@ where a.result_id = r.result_id and r.expl_id is null;
 update rpt_cat_result set network_type = 1 where network_type is null;
 
 ALTER TABLE macroexploitation ADD the_geom public.geometry(multipolygon, SRID_VALUE) NULL;
+
+INSERT INTO sys_table(id, descript, sys_role, source) VALUES ('v_om_mincut_current_arc', 'View for current mincuts', 'role_basic', 'core') 
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_table(id, descript, sys_role, source) VALUES ('v_om_mincut_current_node', 'View for current mincuts', 'role_basic', 'core') 
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_table(id, descript, sys_role, source) VALUES ('v_om_mincut_current_connec', 'View for current mincuts', 'role_basic', 'core') 
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_table(id, descript, sys_role, source) VALUES ('v_om_mincut_current_hydrometer', 'View for current mincuts', 'role_basic', 'core') 
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO sys_table(id, descript, sys_role, source) VALUES ('v_om_mincut_current_initpoint', 'View for current mincuts', 'role_basic', 'core') 
+ON CONFLICT (id) DO NOTHING;
