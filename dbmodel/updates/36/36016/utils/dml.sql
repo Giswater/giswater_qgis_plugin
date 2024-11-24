@@ -6,6 +6,3 @@ This version of Giswater is provided by Giswater Association
 
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
-
-update config_param_system set value= '{"status":false , "diameter":150, "maxDistance":15}',
-parameter = 'edit_link_link2network' where "parameter" ='edit_link_check_arcdnom';

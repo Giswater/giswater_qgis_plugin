@@ -40,3 +40,6 @@ ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO sys_table(id, descript, sys_role, source) VALUES ('v_om_mincut_current_initpoint', 'View for current mincuts', 'role_basic', 'core') 
 ON CONFLICT (id) DO NOTHING;
+
+update config_param_system set value= '{"status":false , "diameter":150, "maxDistance":15}',
+parameter = 'edit_link_link2network' where "parameter" ='edit_link_check_arcdnom';

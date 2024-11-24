@@ -24,3 +24,7 @@ update rpt_cat_result set network_type = 1 where network_type is null;
 UPDATE config_form_fields
 	SET layoutname='lyt_data_1', layoutorder=10, "datatype"='string'
 	WHERE formname='v_edit_raingage' AND columnname='muni_id';
+	
+update config_param_system set value= '{"status":false, "maxDistance":15}',
+parameter = 'edit_link_link2network' where "parameter" ='edit_link_check_arcdnom';
+
