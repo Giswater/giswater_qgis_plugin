@@ -734,6 +734,5 @@ AS SELECT vu_sector.sector_id,
     vu_sector.lastupdate,
     vu_sector.lastupdate_user,
     case when active is true then vu_sector.the_geom else null::geometry(MultiPolygon,SRID_VALUE) end the_geom
-   FROM ws.vu_sector,
-    ws.selector_sector
+   FROM vu_sector, selector_sector
   WHERE vu_sector.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;

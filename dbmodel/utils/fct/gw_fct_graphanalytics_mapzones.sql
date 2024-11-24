@@ -388,7 +388,7 @@ BEGIN
 		ELSE
 			v_query_arc = 'SELECT * FROM arc WHERE state=1 AND expl_id IN ('||v_expl_id||')';
 			v_query_node = 'SELECT * FROM node WHERE state=1 AND expl_id IN ('||v_expl_id||')';
-			v_query_connec = 'SELECT c.* FROM connec c JOIN link on feature_id = connec_id WHERE c.state=1 AND c.expl_id IN ('||v_expl_id||')';
+			v_query_connec = 'SELECT c.* FROM connec c JOIN link l on feature_id = connec_id WHERE c.state=1 AND l.state = 1 AND c.expl_id IN ('||v_expl_id||')';
 			v_query_link = 'SELECT * FROM link WHERE state=1 AND expl_id IN ('||v_expl_id||')';
 			IF v_project_type='UD' THEN
 				v_query_gully = 'SELECT * FROM gully WHERE expl_id IN ('||v_expl_id||')';
