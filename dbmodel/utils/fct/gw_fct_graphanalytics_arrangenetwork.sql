@@ -45,7 +45,7 @@ BEGIN
 	    UPDATE temp_pgr_arc set pgr_node_1=v_id
 	    WHERE pgr_arc_id=v_record.pgr_arc_id;
 	    INSERT INTO temp_pgr_arc(pgr_arc_id, arc_id, pgr_node_1,pgr_node_2,node_1,node_2, graph_delimiter, cost, reverse_cost)
-	    VALUES (v_id+1, v_record.pgr_arc_id::TEXT,v_record.pgr_node_id, v_id, v_record.pgr_node_id,v_record.pgr_node_id, COALESCE(v_record.a_graph_delimiter,v_record.n_graph_delimiter),-1, -1);
+	    VALUES (v_id+1, v_record.pgr_arc_id::TEXT,v_record.pgr_node_id, v_id, v_record.pgr_node_id,v_record.pgr_node_id, CASE WHEN v_record.a_graph_delimiter = 'none' THEN v_record.n_graph_delimiter ELSE v_record.a_graph_delimiter END,-1, -1);
     END LOOP;
 
     -- Disconnect arcs with modif=true at nodes with modif2 = true; a new arc N_new->N_original is created with the cost and reverse cost -1, -1
@@ -60,7 +60,7 @@ BEGIN
 	    UPDATE temp_pgr_arc set pgr_node_2=v_id
 	    WHERE pgr_arc_id=v_record.pgr_arc_id;
 	    INSERT INTO temp_pgr_arc(pgr_arc_id, arc_id, pgr_node_1,pgr_node_2,node_1,node_2, graph_delimiter, cost, reverse_cost)
-	    VALUES (v_id+1, v_record.pgr_arc_id::TEXT,v_id, v_record.pgr_node_id, v_record.pgr_node_id,v_record.pgr_node_id, COALESCE(v_record.a_graph_delimiter,v_record.n_graph_delimiter),-1, -1);
+	    VALUES (v_id+1, v_record.pgr_arc_id::TEXT,v_id, v_record.pgr_node_id, v_record.pgr_node_id,v_record.pgr_node_id, CASE WHEN v_record.a_graph_delimiter = 'none' then v_record.n_graph_delimiter ELSE v_record.a_graph_delimiter END,-1, -1);
     END LOOP;
 
     RETURN jsonb_build_object(

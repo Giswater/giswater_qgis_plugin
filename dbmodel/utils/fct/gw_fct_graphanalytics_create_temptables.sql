@@ -53,7 +53,7 @@ BEGIN
         node_1 VARCHAR(16),
         node_2 VARCHAR(16),
         zone_id INTEGER DEFAULT 0,
-        graph_delimiter VARCHAR(30),
+        graph_delimiter VARCHAR(30) DEFAULT 'none',
         modif1 BOOL DEFAULT FALSE,  -- True if arcs have to be disconnected on node_1
         modif2 BOOL DEFAULT FALSE,  -- True if arcs have to be disconnected on node_2
         cost INT DEFAULT 1,
@@ -106,9 +106,9 @@ BEGIN
         ALTER TABLE temp_pgr_node ADD COLUMN broken BOOL DEFAULT FALSE;
         ALTER TABLE temp_pgr_node ADD COLUMN to_arc VARCHAR(30);
         IF v_fct_name = 'MINCUT' THEN
-            ALTER TABLE temp_pgr_arc ADD COLUMN cost_mincut int default 1;
-            ALTER TABLE temp_pgr_arc ADD COLUMN reverse_cost_mincut int default 1;
-            ALTER TABLE temp_pgr_arc ADD COLUMN unaccess BOOL; -- if TRUE, it means the valve is not accessible
+            ALTER TABLE temp_pgr_arc ADD COLUMN cost_mapzone int default 1;
+            ALTER TABLE temp_pgr_arc ADD COLUMN reverse_cost_mapzone int default 1;
+            ALTER TABLE temp_pgr_arc ADD COLUMN unaccess BOOL DEFAULT FALSE; -- if TRUE, it means the valve is not accessible
             ALTER TABLE temp_pgr_arc ADD COLUMN proposed BOOL DEFAULT FALSE; 
             -- "proposed"= FALSE AND ZONE_ID <> '0' if it's in the mincut and it cannot be closed
             -- "proposed" = TRUE if it's in the mincut and it has to be closed
