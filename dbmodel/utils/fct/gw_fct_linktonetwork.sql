@@ -141,7 +141,7 @@ BEGIN
 
 	--control v_check status and value and distance
 	IF v_check_maxdistance IS NULL THEN v_check_maxdistance = 100; END IF;
-  	IF v_check_status IS TRUE THEN	
+  	IF v_check_status IS TRUE and v_projecttype = 'WS' THEN	
   	  	IF v_check_arcdnom IS NULL THEN v_check_arcdnom = 2000; END IF;
 		IF v_check_arcdnom <= (SELECT min(cat_dnom::float) FROM vu_arc) THEN
 		  EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
@@ -245,9 +245,11 @@ BEGIN
 			v_forcedarcs = concat (' AND arc_id::integer = ',v_connect.arc_id,' ');
 			
 			-- check if forced arc diameter is smaller than configured
-			IF (SELECT cat_dnom::integer FROM vu_arc WHERE arc_id=v_connect.arc_id) >= v_check_arcdnom AND v_check_status IS TRUE THEN
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"3232", "function":"3188","debug_msg":'||v_check_arcdnom||', "is_process":true}}$$);';
+			IF v_projecttype = 'WS' then
+				if (SELECT cat_dnom::integer FROM vu_arc WHERE arc_id=v_connect.arc_id) >= v_check_arcdnom AND v_check_status IS TRUE THEN
+					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+					"data":{"message":"3232", "function":"3188","debug_msg":'||v_check_arcdnom||', "is_process":true}}$$);';
+				end if;
 			END IF;
 		END IF;	
 		
