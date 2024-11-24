@@ -19,3 +19,13 @@ AS SELECT cat_workspace.id,
    FROM cat_workspace
   WHERE cat_workspace.private IS FALSE OR cat_workspace.private IS TRUE AND cat_workspace.cur_user = CURRENT_USER::text;
   
+  
+CREATE OR REPLACE VIEW v_ext_municipality
+AS SELECT DISTINCT m.muni_id,
+    m.name,
+    m.active,
+    m.the_geom
+   FROM ext_municipality m,
+    selector_municipality
+  WHERE m.muni_id = selector_municipality.muni_id AND selector_municipality.cur_user = "current_user"()::text
+  and m.muni_id > 0;

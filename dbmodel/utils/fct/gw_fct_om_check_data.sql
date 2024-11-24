@@ -1315,8 +1315,7 @@ BEGIN
 	FROM '||v_edit||'arc AS t1, '||v_edit||'arc AS t2
 	WHERE St_equals(t1.the_geom,t2.the_geom)
 	AND t1.arc_id != t2.arc_id
-	ORDER BY arc_id ) a where a.state1 > 0 AND a.state2 > 0) a';
-
+	ORDER BY arc_id ) a where a.state1 = 1 AND a.state2 = 1) a';
 
 	EXECUTE concat('SELECT count(*) FROM ',v_querytext) INTO v_count;
 	IF v_count > 0 THEN
