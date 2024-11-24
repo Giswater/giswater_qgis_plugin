@@ -118,6 +118,7 @@ BEGIN
     ) s
     WHERE a.arc_id = s.arc_id;
 
+    /*
     -- nodes SECTOR:
     -- Nodes that are the starting points of mapzones, have "graph_delimiter"='sector'  and have InletArcs (arcs that are not toArc)
     UPDATE temp_pgr_node n SET modif = TRUE
@@ -151,6 +152,25 @@ BEGIN
 	    WHERE n.graph_delimiter = 'sector' AND sa.to_arc IS NULL
     ) s
     WHERE a.arc_id = s.arc_id;
+    */
+
+    -- disconnect all the nodes that are SECTOR and all the arcs that connect to nodes SECTOR
+    UPDATE temp_pgr_node n
+    SET
+	    modif = TRUE
+    WHERE n.graph_delimiter = 'sector';
+
+    UPDATE 	temp_pgr_arc t
+    SET
+	    modif1 = CASE WHEN s.node_id = s.node_1 THEN TRUE ELSE modif1 END,
+	    modif2 = CASE WHEN s.node_id = s.node_2 THEN TRUE ELSE modif2 END
+    FROM (
+	    SELECT n.node_id, a.arc_id, a.node_1, a.node_2
+		FROM temp_pgr_node n
+		JOIN temp_pgr_arc a ON n.node_id IN (a.node_1, node_2)
+		WHERE n.graph_delimiter = 'sector'
+	) s
+    WHERE t.arc_id = s.arc_id;
 
     -- Generate new arcs and disconnect arcs with modif1 = TRUE OR modif2 = TRUE
 	-- =======================
