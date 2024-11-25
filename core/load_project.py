@@ -411,7 +411,7 @@ class GwLoadProject(QObject):
                         # Check if the class associated to the button definition exists
                         if hasattr(buttons, button_def):
                             text = tools_qt.tr(f'{button_def}')
-                            icon_path = f"{icon_folder}{os.sep}{index_action}.png"
+                            icon_path = f"{icon_folder}{os.sep}{plugin_toolbar.toolbar_id}{os.sep}{index_action}.png"
                             button_class = getattr(buttons, button_def)
                             button = button_class(icon_path, button_def, text, plugin_toolbar.toolbar, ag)
                             self.buttons[index_action] = button
