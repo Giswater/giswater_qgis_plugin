@@ -624,6 +624,31 @@ class GwImportInpTask(GwTask):
             params = (lid_name, lid_type)
             execute_sql(sql, params, commit=False)
 
+            # Insert lid_values
+            sql = """
+                INSERT INTO inp_lid_value (lidco_id, lidlayer, value_2, value_3, value_4, value_5, value_6, value_7, value_8)
+                VALUES %s
+            """
+            template = "(%s, %s, %s, %s, %s, %s, %s, %s, %s)"
+            params = []
+            for k, v in lid.layer_dict.items():
+                if k == 'SURFACE':
+                    lid_values = (lid_name, k, v.StorHt, v.VegFrac, v.Rough, v.Slope, v.Xslope, None, None)
+                elif k == 'SOIL':
+                    lid_values = (lid_name, k, v.Thick, v.Por, v.FC, v.WP, v.Ksat, v.Kcoeff, v.Suct)
+                elif k == 'PAVEMENT':
+                    lid_values = (lid_name, k, v.Thick, v.Vratio, v.FracImp, v.Perm, v.Vclog, v.Treg, v.Freg)
+                elif k == 'STORAGE':
+                    lid_values = (lid_name, k, v.Height, v.Vratio, v.Seepage, v.Vclog, v.Covrd, None, None)
+                elif k == 'DRAIN':
+                    lid_values = (lid_name, k, v.Coeff, v.Expon, v.Offset, v.Delay, v.open_level, v.close_level, v.Qcurve)
+                elif k == 'DRAINMAT':
+                    lid_values = (lid_name, k, v.Thick, v.Vratio, v.Rough, None, None, None, None)
+                else:
+                    continue
+                params.append(lid_values)
+            toolsdb_execute_values(sql, params, template, commit=False)
+
     def _save_junctions(self) -> None:
         node_sql = """ 
             INSERT INTO node (
