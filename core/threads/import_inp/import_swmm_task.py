@@ -12,7 +12,7 @@ try:
         OPTIONS, REPORT,
         JUNCTIONS, OUTFALLS, DIVIDERS, STORAGE,
         CONDUITS, PUMPS, ORIFICES, WEIRS, OUTLETS,
-        XSECTIONS,
+        XSECTIONS, COORDINATES,
         PATTERNS, CURVES, TIMESERIES, CONTROLS, LID_CONTROLS, LID_USAGE
     )
     from swmm_api.input_file.sections import (
@@ -176,7 +176,7 @@ class GwImportInpTask(GwTask):
 
             self._manage_nonvisual()
 
-            # self._manage_visual()
+            self._manage_visual()
 
             # self.progress_changed.emit("Sources", self.PROGRESS_VISUAL, "Importing sources...", False)
             # self._save_sources()
@@ -232,20 +232,20 @@ class GwImportInpTask(GwTask):
         self.progress_changed.emit("Visual objects", lerp_progress(0, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing junctions", True)
         self._save_junctions()
 
-        self.progress_changed.emit("Visual objects", lerp_progress(30, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing reservoirs", True)
-        self._save_reservoirs()
+        # self.progress_changed.emit("Visual objects", lerp_progress(30, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing reservoirs", True)
+        # self._save_reservoirs()
 
-        self.progress_changed.emit("Visual objects", lerp_progress(40, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing tanks", True)
-        self._save_tanks()
+        # self.progress_changed.emit("Visual objects", lerp_progress(40, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing tanks", True)
+        # self._save_tanks()
 
-        self.progress_changed.emit("Visual objects", lerp_progress(50, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing pumps", True)
-        self._save_pumps()
+        # self.progress_changed.emit("Visual objects", lerp_progress(50, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing pumps", True)
+        # self._save_pumps()
 
-        self.progress_changed.emit("Visual objects", lerp_progress(60, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing valves", True)
-        self._save_valves()
+        # self.progress_changed.emit("Visual objects", lerp_progress(60, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing valves", True)
+        # self._save_valves()
 
-        self.progress_changed.emit("Visual objects", lerp_progress(70, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing pipes", True)
-        self._save_pipes()
+        # self.progress_changed.emit("Visual objects", lerp_progress(70, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing pipes", True)
+        # self._save_pipes()
 
     def _get_db_units(self) -> None:
         units_query = "SELECT value FROM vi_options WHERE parameter = 'UNITS'"
@@ -652,12 +652,12 @@ class GwImportInpTask(GwTask):
     def _save_junctions(self) -> None:
         node_sql = """ 
             INSERT INTO node (
-                the_geom, code, nodecat_id, epa_type, expl_id, sector_id, muni_id, state, state_type, workcat_id, elevation
+                the_geom, code, node_type, nodecat_id, epa_type, expl_id, sector_id, muni_id, state, state_type, workcat_id, top_elev, ymax
             ) VALUES %s
             RETURNING node_id, code
         """  # --"depth", arc_id, annotation, observ, "comment", label_x, label_y, label_rotation, staticpressure, feature_type
         node_template = (
-            "(ST_SetSRID(ST_Point(%s, %s),%s), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+            "(ST_SetSRID(ST_Point(%s, %s),%s), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
         )
 
         man_sql = """
@@ -669,29 +669,24 @@ class GwImportInpTask(GwTask):
 
         inp_sql = """
             INSERT INTO inp_junction (
-                node_id, demand, emitter_coeff, init_quality
+                node_id, y0, ysur, apond
             ) VALUES %s
-        """  # --pattern_id, peak_factor, source_type, source_quality, source_pattern_id
+        """  # --outfallparam
         inp_template = (
             "(%s, %s, %s, %s)"
         )
-
-        demands_sql = """
-            INSERT INTO inp_dscenario_demand (dscenario_id, feature_id, feature_type, demand, pattern_id, demand_type, source)
-            VALUES %s
-        """
-        demands_template = (
-            "(%s, %s, 'NODE', %s, %s, null, %s)"
-        )
-        demands_params = []
 
         node_params = []
 
         inp_dict = {}
 
-        for j_name, j in self.network.junctions():
-            x, y = j.coordinates
+        for j_name, j in self.network[JUNCTIONS].items():
+            if j_name not in self.network[COORDINATES]:
+                self._log_message(f"ERROR: JUNCTION '{j_name}' has no coordinates in [COORDINATES] section.")
+                continue
+            x, y = self.network[COORDINATES][j_name].x, self.network[COORDINATES][j_name].y
             srid = lib_vars.data_epsg
+            node_type = self.catalogs["features"]["junctions"]
             nodecat_id = self.catalogs["junctions"]
             epa_type = "JUNCTION"
             expl_id = self.exploitation
@@ -704,6 +699,7 @@ class GwImportInpTask(GwTask):
                 (
                     x, y, srid,  # the_geom
                     j_name,  # code
+                    node_type,
                     nodecat_id,
                     epa_type,
                     expl_id,
@@ -713,33 +709,15 @@ class GwImportInpTask(GwTask):
                     state_type,
                     workcat_id,
                     j.elevation,
+                    j.depth_max,
                 )
             )
             inp_dict[j_name] = {
-                "demand": j.base_demand,
-                "pattern_id": None,
-                "peak_factor": None,
-                "emitter_coeff": j.emitter_coefficient,
-                "init_quality": j.initial_quality,
-                "source_type": None,
-                "source_quality": None,
-                "source_pattern_id": None
+                "y0": j.depth_init,
+                "ysur": j.depth_surcharge,
+                "apond": j.area_ponded,
+                "outfallparam": None,
             }
-
-            # If only one demand timeseries, set pattern_id in inp_dict; otherwise, populate demands_params
-            if j.demand_timeseries_list:
-                inp_dict[j_name]["pattern_id"] = j.demand_timeseries_list[0].pattern_name
-                if len(j.demand_timeseries_list) > 1:
-                    for d in j.demand_timeseries_list:
-                        demands_params.append(
-                            (
-                                self.dscenario_id,
-                                j_name,
-                                d.base_value,
-                                d.pattern_name,
-                                d.category,
-                            )
-                        )
 
         # Insert into parent table
         junctions = toolsdb_execute_values(
@@ -765,17 +743,8 @@ class GwImportInpTask(GwTask):
 
             inp_data = inp_dict[code]
             inp_params.append(
-                (node_id, inp_data["demand"], inp_data["emitter_coeff"], inp_data["init_quality"])
+                (node_id, inp_data["y0"], inp_data["ysur"], inp_data["apond"])
             )
-
-        # Update demands_params to replace j_name with node_id
-        for i, demand_param in enumerate(demands_params):
-            j_name = demand_param[1]  # Get the original j_name
-            node_id = self.node_ids.get(j_name)  # Find the node_id associated with j_name
-            if node_id is not None:
-                demands_params[i] = (demand_param[0], node_id, *demand_param[2:])
-            else:
-                self._log_message(f"Node ID for {j_name} not found!")
 
         # Insert into inp table
         toolsdb_execute_values(
@@ -785,11 +754,6 @@ class GwImportInpTask(GwTask):
         toolsdb_execute_values(
             man_sql, man_params, man_template, fetch=False, commit=False
         )
-        # Insert demands into dscenario table
-        toolsdb_execute_values(
-            demands_sql, demands_params, demands_template, fetch=False, commit=False
-        )
-
 
     def _save_reservoirs(self) -> None:
         feature_class = self.catalogs['features']['reservoirs'].lower()
