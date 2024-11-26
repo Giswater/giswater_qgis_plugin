@@ -222,11 +222,11 @@ BEGIN
 
 
 	IF v_project_type = 'WS' THEN
-		UPDATE temp_pgr_node t SET graph_delimiter = lower(cf.graph_delimiter)
+		UPDATE temp_pgr_node t SET graph_delimiter = LOWER(cf.graph_delimiter)
 		FROM node n
-		JOIN cat_node cn ON cn.id=n.nodecat_id
-		JOIN cat_feature_node cf ON cf.id=cn.node_type
-		WHERE t.node_id=n.node_id AND cf.graph_delimiter='MINSECTOR';
+		JOIN cat_node cn ON cn.id = n.nodecat_id
+		JOIN cat_feature_node cf ON cf.id = cn.node_type
+		WHERE t.node_id=n.node_id AND cf.graph_delimiter = 'MINSECTOR';
 
 		-- NODES VALVES
 		-- UPDATE "closed", "broken", "to_arc" only if the values make sense - check the explanations/rules for the possible valve scenarios MINSECTOR/to_arc/closed/broken
@@ -234,38 +234,40 @@ BEGIN
 		-- closed valves
 		UPDATE temp_pgr_node n SET closed = v.closed, broken = v.broken, modif = TRUE
 		FROM man_valve v
-		WHERE n.node_id = v.node_id AND n.graph_delimiter = 'minsector' AND v.closed = TRUE;
+		WHERE n.node_id = v.node_id AND n.graph_delimiter = 'minsector' AND v.closed;
 
 		--valves with to_arc NOT NULL
 		UPDATE temp_pgr_node n SET to_arc = v.to_arc, broken = v.broken, modif = TRUE
 		FROM man_valve v
-		WHERE n.node_id = v.node_id  AND v.to_arc IS NOT NULL AND v.broken = FALSE;
+		WHERE n.node_id = v.node_id AND v.to_arc IS NOT NULL AND v.broken = FALSE;
 
 		-- ARCS VALVES
 		-- arcs to modify:
 		-- for the closed valves when to_arc IS NULL, one of the arcs that connect to the valve
 		UPDATE temp_pgr_arc t
 		SET
-		    modif1= CASE WHEN s.node_id = s.node_1 THEN true ELSE modif1 END,
-        	modif2= CASE WHEN s.node_id = s.node_2 THEN true ELSE modif2 END
+		    modif1 = CASE WHEN s.node_id = s.node_1 THEN TRUE ELSE modif1 END,
+        	modif2 = CASE WHEN s.node_id = s.node_2 THEN TRUE ELSE modif2 END
 		FROM
-		(SELECT DISTINCT ON (n.node_id) n.node_id, a.arc_id, a.node_1, a.node_2
-		FROM temp_pgr_node n
-		join temp_pgr_arc a ON n.node_id IN (a.node_1, a.node_2)
-		WHERE n.modif = TRUE AND n.to_arc IS NULL
+		(
+			SELECT DISTINCT ON (n.node_id) n.node_id, a.arc_id, a.node_1, a.node_2
+			FROM temp_pgr_node n
+			join temp_pgr_arc a ON n.node_id IN (a.node_1, a.node_2)
+			WHERE n.modif AND n.to_arc IS NULL
 		) s
 		WHERE t.arc_id = s.arc_id;
 
         -- for the valves with to_arc NOT NULL; the InletArc - the one that is not to_arc
   		UPDATE temp_pgr_arc t
 		SET
-			modif1= CASE WHEN s.node_id = s.node_1 THEN true ELSE modif1 END,
-        	modif2= CASE WHEN s.node_id = s.node_2 THEN true ELSE modif2 END
+			modif1 = CASE WHEN s.node_id = s.node_1 THEN TRUE ELSE modif1 END,
+        	modif2 = CASE WHEN s.node_id = s.node_2 THEN TRUE ELSE modif2 END
 		FROM
-		(SELECT a.arc_id, n.node_id, n.to_arc, a.node_1, a.node_2
+		(
+			SELECT a.arc_id, n.node_id, n.to_arc, a.node_1, a.node_2
 			FROM  temp_pgr_node n
 			JOIN temp_pgr_arc a ON n.node_id IN (a.node_1, a.node_2)
-			WHERE n.modif=true AND n.to_arc IS NOT NULL AND a.arc_id<>n.to_arc
+			WHERE n.modif AND n.to_arc IS NOT NULL AND a.arc_id <> n.to_arc
 		) s
 		WHERE t.arc_id= s.arc_id;
 
@@ -284,7 +286,7 @@ BEGIN
 			SELECT ' || v_mapzone_field || ', (json_array_elements_text((graphconfig->>''use'')::json))::json->>''nodeParent'' AS node_id
 			FROM ' || v_mapzone_name || ' 
 			WHERE graphconfig IS NOT NULL 
-			AND active IS TRUE
+			AND active
 		) AS s 
 		WHERE s.node_id <> '''' AND n.node_id = s.node_id';
     EXECUTE v_querytext;
@@ -296,7 +298,7 @@ BEGIN
 			SELECT json_array_elements_text((graphconfig->>''forceClosed'')::json) AS node_id
 			FROM ' || v_mapzone_name || ' 
 			WHERE graphconfig IS NOT NULL 
-			AND active IS TRUE
+			AND active
 		) s 
 		WHERE n.node_id = s.node_id';
     EXECUTE v_querytext;
@@ -308,7 +310,7 @@ BEGIN
 			SELECT json_array_elements_text((graphconfig->>''ignore'')::json) AS node_id
 			FROM ' || v_mapzone_name || ' 
 			WHERE graphconfig IS NOT NULL 
-			AND active IS TRUE 
+			AND active 
 		) s 
 		WHERE n.node_id = s.node_id';
     EXECUTE v_querytext;
@@ -318,8 +320,8 @@ BEGIN
     v_querytext =
 		'UPDATE temp_pgr_arc a 
 		SET
-			modif1= CASE WHEN s.node_id = s.node_1 THEN true ELSE modif1 END,
-        	modif2= CASE WHEN s.node_id = s.node_2 THEN true ELSE modif2 END
+			modif1 = CASE WHEN s.node_id = s.node_1 THEN TRUE ELSE modif1 END,
+        	modif2 = CASE WHEN s.node_id = s.node_2 THEN TRUE ELSE modif2 END
 		FROM (
 			SELECT a.arc_id, n.node_id, a.node_1, a.node_2
 			FROM temp_pgr_node n
@@ -328,7 +330,7 @@ BEGIN
 				SELECT json_array_elements_text(((json_array_elements_text((graphconfig->>''use'')::json))::json->>''toArc'')::json) AS to_arc
 				FROM ' || v_mapzone_name || ' 
 				WHERE graphconfig IS NOT NULL 
-				AND active IS TRUE
+				AND active
 			) sa ON sa.to_arc = a.arc_id
 			WHERE n.graph_delimiter = ''' || v_mapzone_name || '''
 			AND sa.to_arc IS NULL
@@ -340,10 +342,10 @@ BEGIN
     v_querytext =
 		'UPDATE temp_pgr_arc a 
 		SET
-			modif1= CASE WHEN s.node_id = s.node_1 THEN true ELSE modif1 END,
-        	modif2= CASE WHEN s.node_id = s.node_2 THEN true ELSE modif2 END
+			modif1 = CASE WHEN s.node_id = s.node_1 THEN TRUE ELSE modif1 END,
+        	modif2 = CASE WHEN s.node_id = s.node_2 THEN TRUE ELSE modif2 END
 		FROM (
-			SELECT  n.node_id, a.arc_id, a.node_1, a.node_2
+			SELECT n.node_id, a.arc_id, a.node_1, a.node_2
 			FROM temp_pgr_node n 
 			JOIN temp_pgr_arc a ON n.node_id IN (a.node_1, node_2)
 			WHERE n.graph_delimiter = ''forceClosed''
@@ -365,15 +367,15 @@ BEGIN
     IF v_project_type = 'WS' THEN
         UPDATE temp_pgr_arc a SET reverse_cost = 0 -- for inundation process, better to be 0 instead of 1; these arcs don't exist
 		FROM temp_pgr_node n
-        WHERE a.pgr_node_1=n.pgr_node_id AND a.pgr_node_1=a.node_1::INT AND a.node_1 = a.node_2
-    	AND (a.graph_delimiter ='minsector' OR a.graph_delimiter = 'none')
-		AND n.to_arc is not NULL and n.closed is null;
+        WHERE a.pgr_node_1 = n.pgr_node_id AND a.pgr_node_1 = a.node_1::INT AND a.node_1 = a.node_2
+    	AND (a.graph_delimiter = 'minsector' OR a.graph_delimiter = 'none')
+		AND n.to_arc IS NOT NULL AND n.closed IS NULL;
 
         UPDATE temp_pgr_arc a SET cost = 0 -- for inundation process, better to be 0 instead of 1; these arcs don't exist
 		FROM temp_pgr_node n
-        WHERE a.pgr_node_2=n.pgr_node_id AND a.pgr_node_2=a.node_2::INT AND a.node_1 = a.node_2
-    	AND (a.graph_delimiter ='minsector' OR a.graph_delimiter = 'none')
-		AND n.to_arc is not NULL and n.closed is null;
+        WHERE a.pgr_node_2 = n.pgr_node_id AND a.pgr_node_2 = a.node_2::INT AND a.node_1 = a.node_2
+    	AND (a.graph_delimiter = 'minsector' OR a.graph_delimiter = 'none')
+		AND n.to_arc IS NOT NULL AND n.closed IS NULL;
     END IF;
 
     EXECUTE 'SELECT COUNT(*)::INT FROM temp_pgr_arc'
@@ -385,7 +387,6 @@ BEGIN
 			AND pgr_node_id = node_id::INT'
 	INTO v_pgr_root_vids;
 
-
 	-- Execute pgr_drivingDistance function
     TRUNCATE temp_pgr_drivingdistance;
     v_querytext = 'SELECT pgr_arc_id AS id, pgr_node_1 AS source, pgr_node_2 AS target, cost, reverse_cost FROM temp_pgr_arc a';
@@ -394,6 +395,7 @@ BEGIN
 		SELECT seq, "depth", start_vid, pred, node, edge, "cost", agg_cost
 		FROM pgr_drivingdistance(v_querytext, v_pgr_root_vids, v_pgr_distance)
     );
+
 	-- Update zone_id
 	-- Update nodes with mapzone conflicts; nodes that are heads of mapzones in conflict with other mapzones are overwritten;
 	UPDATE temp_pgr_node n SET zone_id = -1
@@ -409,9 +411,10 @@ BEGIN
 	-- Update nodes with a single mapzone
     UPDATE temp_pgr_node n SET zone_id = s.zone_id
     FROM
-    (SELECT d.node, n.zone_id
-    FROM temp_pgr_drivingdistance d
-    JOIN temp_pgr_node n ON d.start_vid = n.pgr_node_id
+    (
+		SELECT d.node, n.zone_id
+    	FROM temp_pgr_drivingdistance d
+    	JOIN temp_pgr_node n ON d.start_vid = n.pgr_node_id
     ) AS s
     WHERE n.pgr_node_id = s.node AND n.zone_id = 0;
 
@@ -463,7 +466,11 @@ BEGIN
     END IF;
 
 
-
+	-- Get Info for the audit
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
+	FROM (SELECT id, error_message AS message FROM temp_audit_check_data WHERE cur_user="current_user"() AND fid IN (v_fid) ORDER BY criticity DESC, id ASC) row;
+	v_result := COALESCE(v_result, '{}');
+	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
 	IF v_audit_result is null THEN
 		v_status = 'Accepted';
@@ -490,8 +497,8 @@ BEGIN
 					SELECT t.arc_id, a.arccat_id, a.state, a.expl_id, a.'||v_mapzone_field||'::TEXT AS mapzone_id, a.the_geom, m.name AS descript 
 					FROM temp_pgr_arc t
 					JOIN arc a USING (arc_id)
-					JOIN '|| v_mapzone_name ||' m USING ('|| v_mapzone_field ||')
-					WHERE '|| v_mapzone_field ||'::integer > 0
+					JOIN '|| v_mapzone_name ||' m ON t.zone_id = m.'|| v_mapzone_field ||'
+					WHERE m.'|| v_mapzone_field ||'::integer > 0
 					AND t.pgr_arc_id = t.arc_id::INT
 				) row 
 			) features'
@@ -529,7 +536,7 @@ BEGIN
 					''properties'', to_jsonb(row) - ''the_geom''
 				) AS feature
 				FROM (
-					SELECT n.'||v_mapzone_field||'::TEXT AS mapzone_id, m.name AS descript, '||v_fid||' as fid, n.expl_id, n.the_geom
+					SELECT n.'||v_mapzone_field||'::TEXT AS mapzone_id, m.name AS descript, '||v_fid||' AS fid, n.expl_id, n.the_geom
 					FROM temp_pgr_node t
 					JOIN node n USING (node_id)
 					JOIN '|| v_mapzone_name ||' m USING ('|| v_mapzone_field ||')
