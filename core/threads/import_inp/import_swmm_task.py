@@ -3,6 +3,7 @@ from datetime import date
 from itertools import count, islice
 from typing import Any
 from datetime import datetime
+from math import isnan
 
 from psycopg2.extras import execute_values
 
@@ -258,6 +259,9 @@ class GwImportInpTask(GwTask):
 
         self.progress_changed.emit("Visual objects", lerp_progress(40, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing storage units", True)
         self._save_storage()
+
+        self.progress_changed.emit("Visual objects", lerp_progress(70, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing conduits", True)
+        self._save_conduits()
 
         # self.progress_changed.emit("Visual objects", lerp_progress(50, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing pumps", True)
         # self._save_pumps()
@@ -1364,64 +1368,67 @@ class GwImportInpTask(GwTask):
             man_sql, man_params, man_template, fetch=False, commit=False
         )
 
-    def _save_pipes(self) -> None:
-        feature_class = self.catalogs['features']['pipes'].lower()
+    def _save_conduits(self) -> None:
+        feature_class = self.catalogs['features']['conduits']
 
         arc_sql = """ 
             INSERT INTO arc (
-                the_geom, code, node_1, node_2, arccat_id, epa_type, expl_id, sector_id, muni_id, state, state_type, workcat_id
+                the_geom, code, node_1, node_2, arc_type, arccat_id, epa_type, expl_id, sector_id, muni_id, state, state_type, workcat_id, dma_id
             ) VALUES %s
             RETURNING arc_id, code
         """  # --"depth", arc_id, annotation, observ, "comment", label_x, label_y, label_rotation, staticpressure, feature_type
         arc_template = (
-            "(ST_GeomFromText(%s, %s), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+            "(ST_GeomFromText(%s, %s), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
         )
 
         man_sql = f"""
-            INSERT INTO man_{feature_class} (
+            INSERT INTO man_{feature_class.split('_')[-1].lower()} (
                 arc_id
             ) VALUES %s
         """
         man_template = "(%s)"
 
         inp_sql = """
-            INSERT INTO inp_pipe (
-                arc_id, minorloss, status, custom_roughness, custom_dint, reactionparam, reactionvalue, bulk_coeff, wall_coeff
+            INSERT INTO inp_conduit (
+                arc_id, barrels, culvert, kentry, kexit, kavg, flap, q0, qmax, seepage, custom_n
             ) VALUES %s
         """  # --
         inp_template = (
-            "(%s, %s, %s, %s, %s, %s, %s, %s, %s)"
+            "(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
         )
 
         arc_params = []
 
         inp_dict = {}
 
-        for p_name, p in self.network.pipes():
-            geometry = get_geometry_from_link(p)
+        for c_name, c in self.network[CONDUITS].items():
+            geometry = get_geometry_from_link(self.network, c)
 
             srid = lib_vars.data_epsg
             try:
-                node_1 = self.node_ids[p.start_node_name]
-                node_2 = self.node_ids[p.end_node_name]
+                node_1 = self.node_ids[c.from_node]
+                node_2 = self.node_ids[c.to_node]
             except KeyError as e:
                 self._log_message(f"Node not found: {e}")
                 continue
-            arccat_id = self.catalogs["pipes"][(round(p.diameter*1000, 0), p.roughness)]
-            epa_type = "PIPE"
+            xs = self.network[XSECTIONS][c_name]
+            arccat_id = self.catalogs["conduits"][(xs.shape, xs.height, xs.parameter_2, xs.parameter_3, xs.parameter_4)]
+            epa_type = "CONDUIT"
             expl_id = self.exploitation
             sector_id = self.sector
             muni_id = self.municipality
             state = 1
             state_type = 2
             workcat_id = self.workcat
+            dma_id = 0
             arc_params.append(
                 (
                     geometry,
                     srid,
-                    p_name,
+                    c_name,
                     node_1,
                     node_2,
+                    feature_class,
                     arccat_id,
                     epa_type,
                     expl_id,
@@ -1430,45 +1437,55 @@ class GwImportInpTask(GwTask):
                     state,
                     state_type,
                     workcat_id,
+                    dma_id,
                 )
             )
-            inp_dict[p_name] = {
-                "minorloss": p.minor_loss,
-                "status": p.initial_status.name.upper(),
-                "custom_roughness": p.roughness,
-                "custom_dint": p.diameter,
-                "reactionparam": None,
-                "reactionvalue": None,
-                "bulk_coeff": p.bulk_coeff,
-                "wall_coeff": p.wall_coeff,
+            inp_dict[c_name] = {
+                "barrels": xs.n_barrels,
+                "culvert": None if (isinstance(xs.culvert, float) and isnan(xs.culvert)) else xs.culvert,
+                "kentry": None,
+                "kexit": None,
+                "kavg": None,
+                "flap": None,
+                "q0": c.flow_initial,
+                "qmax": None if (isinstance(c.flow_max, float) and isnan(c.flow_max)) else c.flow_max,
+                "seepage": None,
+                "custom_n": None,
             }
+            if c_name in self.network[LOSSES]:
+                loss = self.network[LOSSES][c_name]
+                inp_dict[c_name]["kentry"] = loss.entrance
+                inp_dict[c_name]["kexit"] = loss.exit
+                inp_dict[c_name]["kavg"] = loss.average
+                inp_dict[c_name]["flap"] = "YES" if loss.has_flap_gate else "NO"
+                inp_dict[c_name]["seepage"] = loss.seepage_rate
 
         # Insert into parent table
-        pipes = toolsdb_execute_values(
+        conduits = toolsdb_execute_values(
             arc_sql, arc_params, arc_template, fetch=True, commit=False
         )
-        print(pipes)
-        if not pipes:
-            self._log_message("Pipes couldn't be inserted!")
+        print(conduits)
+        if not conduits:
+            self._log_message("Conduits couldn't be inserted!")
             return
 
         man_params = []
         inp_params = []
 
-        for p in pipes:
-            arc_id = p[0]
-            code = p[1]
+        for c in conduits:
+            arc_id = c[0]
+            code = c[1]
             man_params.append(
                 (arc_id,)
             )
 
             inp_data = inp_dict[code]
             inp_params.append(
-                (arc_id, inp_data["minorloss"], inp_data["status"], inp_data["custom_roughness"], inp_data["custom_dint"],
-                 inp_data["reactionparam"], inp_data["reactionvalue"], inp_data["bulk_coeff"], inp_data["wall_coeff"],
+                (arc_id, inp_data["barrels"], inp_data["culvert"], inp_data["kentry"], inp_data["kexit"], inp_data["kavg"],
+                 inp_data["flap"], inp_data["q0"], inp_data["qmax"], inp_data["seepage"], inp_data["custom_n"],
                  )
             )
-            print(inp_params)
+        print(inp_params)
 
         # Insert into inp table
         toolsdb_execute_values(
