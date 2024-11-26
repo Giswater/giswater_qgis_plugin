@@ -765,12 +765,12 @@ class GwImportInpTask(GwTask):
 
         node_sql = """ 
             INSERT INTO node (
-                the_geom, code, node_type, nodecat_id, epa_type, expl_id, sector_id, muni_id, state, state_type, workcat_id
+                the_geom, code, node_type, nodecat_id, epa_type, expl_id, sector_id, muni_id, state, state_type, workcat_id, top_elev
             ) VALUES %s
             RETURNING node_id, code
         """  # --"depth", arc_id, annotation, observ, "comment", label_x, label_y, label_rotation, staticpressure, feature_type
         node_template = (
-            "(ST_SetSRID(ST_Point(%s, %s),%s), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+            "(ST_SetSRID(ST_Point(%s, %s),%s), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
         )
 
         man_sql = f"""
@@ -807,6 +807,7 @@ class GwImportInpTask(GwTask):
             state = 1
             state_type = 2
             workcat_id = self.workcat
+            elevation = o.elevation
             node_params.append(
                 (
                     x, y, srid,  # the_geom
@@ -820,6 +821,7 @@ class GwImportInpTask(GwTask):
                     state,
                     state_type,
                     workcat_id,
+                    elevation
                 )
             )
             inp_dict[o_name] = {
@@ -871,7 +873,7 @@ class GwImportInpTask(GwTask):
 
         node_sql = """ 
             INSERT INTO node (
-                the_geom, code, node_type, nodecat_id, epa_type, expl_id, sector_id, muni_id, state, state_type, workcat_id, elevation
+                the_geom, code, node_type, nodecat_id, epa_type, expl_id, sector_id, muni_id, state, state_type, workcat_id, top_elev
             ) VALUES %s
             RETURNING node_id, code
         """  # --"depth", arc_id, annotation, observ, "comment", label_x, label_y, label_rotation, staticpressure, feature_type
@@ -913,7 +915,7 @@ class GwImportInpTask(GwTask):
             state = 1
             state_type = 2
             workcat_id = self.workcat
-            elevation = d.elev
+            elevation = d.elevation
             node_params.append(
                 (
                     x, y, srid,  # the_geom
