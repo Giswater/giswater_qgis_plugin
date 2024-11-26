@@ -59,6 +59,10 @@ def to_yesno(x: bool):
     return "YES" if x else "NO"
 
 
+def nan_to_none(x):
+    return None if (isinstance(x, float) and isnan(x)) else x
+
+
 def execute_sql(sql, params=None, /, log_sql=False, **kwargs) -> bool:
     sql = tools_db._get_sql(sql, log_sql, params)
     result: bool = tools_db.execute_sql(
@@ -1434,13 +1438,13 @@ class GwImportInpTask(GwTask):
             )
             inp_dict[c_name] = {
                 "barrels": xs.n_barrels,
-                "culvert": None if (isinstance(xs.culvert, float) and isnan(xs.culvert)) else xs.culvert,
+                "culvert": nan_to_none(xs.culvert),
                 "kentry": None,
                 "kexit": None,
                 "kavg": None,
                 "flap": None,
                 "q0": c.flow_initial,
-                "qmax": None if (isinstance(c.flow_max, float) and isnan(c.flow_max)) else c.flow_max,
+                "qmax": nan_to_none(c.flow_max),
                 "seepage": None,
                 "custom_n": None,
             }
@@ -1449,7 +1453,7 @@ class GwImportInpTask(GwTask):
                 inp_dict[c_name]["kentry"] = loss.entrance
                 inp_dict[c_name]["kexit"] = loss.exit
                 inp_dict[c_name]["kavg"] = loss.average
-                inp_dict[c_name]["flap"] = "YES" if loss.has_flap_gate else "NO"
+                inp_dict[c_name]["flap"] = to_yesno(loss.has_flap_gate)
                 inp_dict[c_name]["seepage"] = loss.seepage_rate
 
         # Insert into parent table
@@ -1477,7 +1481,6 @@ class GwImportInpTask(GwTask):
                  inp_data["flap"], inp_data["q0"], inp_data["qmax"], inp_data["seepage"], inp_data["custom_n"],
                  )
             )
-        print(inp_params)
 
         # Insert into inp table
         toolsdb_execute_values(
