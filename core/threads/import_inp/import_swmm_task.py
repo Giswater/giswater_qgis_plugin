@@ -238,6 +238,9 @@ class GwImportInpTask(GwTask):
         self.progress_changed.emit("Visual objects", lerp_progress(40, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing dividers", True)
         self._save_dividers()
 
+        self.progress_changed.emit("Visual objects", lerp_progress(40, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing storage units", True)
+        self._save_storage()
+
         # self.progress_changed.emit("Visual objects", lerp_progress(50, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing pumps", True)
         # self._save_pumps()
 
@@ -965,6 +968,123 @@ class GwImportInpTask(GwTask):
             inp_params.append(
                 (node_id, inp_data["divider_type"], inp_data["arc_id"], inp_data["curve_id"],
                  inp_data["qmin"], inp_data["ht"], inp_data["cd"], inp_data["y0"], inp_data["ysur"], inp_data["apond"])
+            )
+
+        # Insert into inp table
+        toolsdb_execute_values(
+            inp_sql, inp_params, inp_template, fetch=False, commit=False
+        )
+        # Insert into man table
+        toolsdb_execute_values(
+            man_sql, man_params, man_template, fetch=False, commit=False
+        )
+
+    def _save_storage(self) -> None:
+        feature_class = self.catalogs['features']['storage']
+
+        node_sql = """ 
+            INSERT INTO node (
+                the_geom, code, node_type, nodecat_id, epa_type, expl_id, sector_id, muni_id, state, state_type, workcat_id, top_elev
+            ) VALUES %s
+            RETURNING node_id, code
+        """  # --"depth", arc_id, annotation, observ, "comment", label_x, label_y, label_rotation, staticpressure, feature_type
+        node_template = (
+            "(ST_SetSRID(ST_Point(%s, %s),%s), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        )
+
+        man_sql = f"""
+            INSERT INTO man_{feature_class.split('_')[-1].lower()} (
+                node_id
+            ) VALUES %s
+        """
+        man_template = "(%s)"
+
+        inp_sql = """
+            INSERT INTO inp_storage (
+                node_id, storage_type, curve_id, a1, a2, a0, fevap, sh, hc, imd, y0, ysur, apond
+            ) VALUES %s
+        """  # --
+        inp_template = (
+            "(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        )
+
+        node_params = []
+
+        inp_dict = {}
+
+        for s_name, s in self.network[STORAGE].items():
+            if s_name not in self.network[COORDINATES]:
+                self._log_message(f"ERROR: STORAGE '{s_name}' has no coordinates in [COORDINATES] section.")
+                continue
+            x, y = self.network[COORDINATES][s_name].x, self.network[COORDINATES][s_name].y
+            srid = lib_vars.data_epsg
+            nodecat_id = self.catalogs["storage"]
+            epa_type = "STORAGE"
+            expl_id = self.exploitation
+            sector_id = self.sector
+            muni_id = self.municipality
+            state = 1
+            state_type = 2
+            workcat_id = self.workcat
+            elevation = s.elevation
+            node_params.append(
+                (
+                    x, y, srid,  # the_geom
+                    s_name,  # code
+                    feature_class,
+                    nodecat_id,
+                    epa_type,
+                    expl_id,
+                    sector_id,
+                    muni_id,
+                    state,
+                    state_type,
+                    workcat_id,
+                    elevation,
+                )
+            )
+            inp_dict[s_name] = {
+                "storage_type": s.kind,
+                "curve_id": s.data if s.kind == "TABULAR" else None,
+                "a1": s.data[0] if s.kind == "FUNCTIONAL" else None,
+                "a2": s.data[1] if s.kind == "FUNCTIONAL" else None,
+                "a0": s.data[2] if s.kind == "FUNCTIONAL" else None,
+                "fevap": s.frac_evaporation,
+                "sh": s.suction_head,
+                "hc": s.hydraulic_conductivity,
+                "imd": s.moisture_deficit_init,
+                "y0": s.depth_init,
+                "ysur": s.depth_surcharge,
+                "apond": None,
+            }
+
+        # Insert into parent table
+        storage = toolsdb_execute_values(
+            node_sql, node_params, node_template, fetch=True, commit=False
+        )
+        print(storage)
+        if not storage:
+            self._log_message("Dividers couldn't be inserted!")
+            return
+
+        man_params = []
+        inp_params = []
+
+        for s in storage:
+            node_id = s[0]
+            code = s[1]
+
+            self.node_ids[code] = node_id
+
+            man_params.append(
+                (node_id,)
+            )
+
+            inp_data = inp_dict[code]
+            inp_params.append(
+                (node_id, inp_data["storage_type"], inp_data["curve_id"], inp_data["a1"], inp_data["a2"], inp_data["a0"],
+                 inp_data["fevap"], inp_data["sh"], inp_data["hc"], inp_data["imd"], inp_data["y0"], inp_data["ysur"],
+                 inp_data["apond"])
             )
 
         # Insert into inp table
