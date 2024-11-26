@@ -277,8 +277,8 @@ class GwImportInpTask(GwTask):
         self.progress_changed.emit("Visual objects", lerp_progress(65, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing weirs", True)
         self._save_weirs()
 
-        # self.progress_changed.emit("Visual objects", lerp_progress(70, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing outlets", True)
-        # self._save_outlets()
+        self.progress_changed.emit("Visual objects", lerp_progress(70, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing outlets", True)
+        self._save_outlets()
 
         self.progress_changed.emit("Visual objects", lerp_progress(80, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing conduits", True)
         self._save_conduits()
@@ -1468,6 +1468,118 @@ class GwImportInpTask(GwTask):
                 (arc_id, inp_data["weir_type"], inp_data["offsetval"], inp_data["cd"], inp_data["ec"], inp_data["cd2"],
                  inp_data["flap"], inp_data["geom1"], inp_data["geom2"], inp_data["geom3"], inp_data["geom4"],
                  inp_data["surcharge"], inp_data["road_width"], inp_data["road_surf"], inp_data["coef_curve"],
+                )
+            )
+
+        # Insert into inp table
+        toolsdb_execute_values(
+            inp_sql, inp_params, inp_template, fetch=False, commit=False
+        )
+        # Insert into man table
+        toolsdb_execute_values(
+            man_sql, man_params, man_template, fetch=False, commit=False
+        )
+
+    def _save_outlets(self) -> None:
+        feature_class = self.catalogs['features']['outlets']
+
+        arc_sql = """ 
+            INSERT INTO arc (
+                the_geom, code, node_1, node_2, arc_type, arccat_id, epa_type, expl_id, sector_id, muni_id, state, state_type, workcat_id, dma_id
+            ) VALUES %s
+            RETURNING arc_id, code
+        """  # --"depth", arc_id, annotation, observ, "comment", label_x, label_y, label_rotation, staticpressure, feature_type
+        arc_template = (
+            "(ST_GeomFromText(%s, %s), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 0)"
+        )
+
+        man_sql = f"""
+            INSERT INTO man_{feature_class.lower()} (
+                arc_id
+            ) VALUES %s
+        """
+        man_template = "(%s)"
+
+        inp_sql = """
+            INSERT INTO inp_outlet (
+                arc_id, outlet_type, offsetval, curve_id, cd1, cd2, flap
+            ) VALUES %s
+        """  # --
+        inp_template = (
+            "(%s, %s, %s, %s, %s, %s, %s)"
+        )
+
+        arc_params = []
+
+        inp_dict = {}
+
+        for o_name, o in self.network[OUTLETS].items():
+            geometry = get_geometry_from_link(self.network, o)
+
+            srid = lib_vars.data_epsg
+            try:
+                node_1 = self.node_ids[o.from_node]
+                node_2 = self.node_ids[o.to_node]
+            except KeyError as e:
+                self._log_message(f"Node not found: {e}")
+                continue
+            arccat_id = self.catalogs["outlets"]
+            epa_type = "OUTLET"
+            expl_id = self.exploitation
+            sector_id = self.sector
+            muni_id = self.municipality
+            state = 1
+            state_type = 2
+            workcat_id = self.workcat
+            arc_params.append(
+                (
+                    geometry, srid,  # the_geom
+                    o_name,  # code
+                    node_1,
+                    node_2,
+                    feature_class,
+                    arccat_id,
+                    epa_type,
+                    expl_id,
+                    sector_id,
+                    muni_id,
+                    state,
+                    state_type,
+                    workcat_id,
+                )
+            )
+            inp_dict[o_name] = {
+                "outlet_type": o.curve_type,
+                "offsetval": o.offset,
+                "curve_id": o.curve_description if o.curve_type in ("TABULAR/DEPTH", "TABULAR/HEAD") else None,  # TODO: use enum
+                "cd1": o.curve_description[0] if o.curve_type in ("FUNCTIONAL/DEPTH", "FUNCTIONAL/HEAD") else None,
+                "cd2": o.curve_description[1] if o.curve_type in ("FUNCTIONAL/DEPTH", "FUNCTIONAL/HEAD") else None,
+                "flap": to_yesno(o.has_flap_gate),
+            }
+
+        # Insert into parent table
+        outlets = toolsdb_execute_values(
+            arc_sql, arc_params, arc_template, fetch=True, commit=False
+        )
+        print(outlets)
+        if not outlets:
+            self._log_message("Outlets couldn't be inserted!")
+            return
+
+        man_params = []
+        inp_params = []
+
+        for o in outlets:
+            arc_id = o[0]
+            code = o[1]
+            man_params.append(
+                (arc_id,)
+            )
+
+            inp_data = inp_dict[code]
+            inp_params.append(
+                (arc_id, inp_data["outlet_type"], inp_data["offsetval"], inp_data["curve_id"],
+                 inp_data["cd1"], inp_data["cd2"], inp_data["flap"],
                 )
             )
 
