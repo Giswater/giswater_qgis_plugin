@@ -102,14 +102,14 @@ BEGIN
         CREATE INDEX temp_pgr_gully_gully_id ON temp_pgr_gully USING btree (gully_id);
         CREATE INDEX temp_pgr_gully_arc_id ON temp_pgr_gully USING btree (arc_id);
     ELSIF v_project_type = 'WS' THEN
-        ALTER TABLE temp_pgr_node ADD COLUMN closed BOOL DEFAULT FALSE;
-        ALTER TABLE temp_pgr_node ADD COLUMN broken BOOL DEFAULT FALSE;
+        ALTER TABLE temp_pgr_node ADD COLUMN closed BOOL;
+        ALTER TABLE temp_pgr_node ADD COLUMN broken BOOL;
         ALTER TABLE temp_pgr_node ADD COLUMN to_arc VARCHAR(30);
         IF v_fct_name = 'MINCUT' THEN
             ALTER TABLE temp_pgr_arc ADD COLUMN cost_mapzone int default 1;
             ALTER TABLE temp_pgr_arc ADD COLUMN reverse_cost_mapzone int default 1;
             ALTER TABLE temp_pgr_arc ADD COLUMN unaccess BOOL DEFAULT FALSE; -- if TRUE, it means the valve is not accessible
-            ALTER TABLE temp_pgr_arc ADD COLUMN proposed BOOL DEFAULT FALSE; 
+            ALTER TABLE temp_pgr_arc ADD COLUMN proposed BOOL DEFAULT FALSE;
             -- "proposed"= FALSE AND ZONE_ID <> '0' if it's in the mincut and it cannot be closed
             -- "proposed" = TRUE if it's in the mincut and it has to be closed
         END IF;
