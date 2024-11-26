@@ -265,20 +265,23 @@ class GwImportInpTask(GwTask):
         self.progress_changed.emit("Visual objects", lerp_progress(40, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing dividers", True)
         self._save_dividers()
 
-        self.progress_changed.emit("Visual objects", lerp_progress(40, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing storage units", True)
+        self.progress_changed.emit("Visual objects", lerp_progress(45, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing storage units", True)
         self._save_storage()
 
         self.progress_changed.emit("Visual objects", lerp_progress(50, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing pumps", True)
         self._save_pumps()
 
-        self.progress_changed.emit("Visual objects", lerp_progress(60, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing weirs", True)
+        self.progress_changed.emit("Visual objects", lerp_progress(60, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing orifices", True)
+        self._save_orifices()
+
+        self.progress_changed.emit("Visual objects", lerp_progress(65, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing weirs", True)
         self._save_weirs()
 
-        self.progress_changed.emit("Visual objects", lerp_progress(70, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing conduits", True)
-        self._save_conduits()
+        # self.progress_changed.emit("Visual objects", lerp_progress(70, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing outlets", True)
+        # self._save_outlets()
 
-        # self.progress_changed.emit("Visual objects", lerp_progress(70, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing pipes", True)
-        # self._save_pipes()
+        self.progress_changed.emit("Visual objects", lerp_progress(80, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing conduits", True)
+        self._save_conduits()
 
     def _get_db_units(self) -> None:
         units_query = "SELECT value FROM vi_options WHERE parameter = 'UNITS'"
@@ -1225,6 +1228,125 @@ class GwImportInpTask(GwTask):
             inp_data = inp_dict[code]
             inp_params.append(
                 (arc_id, inp_data["curve_id"], inp_data["status"], inp_data["startup"], inp_data["shutoff"])
+            )
+
+        # Insert into inp table
+        toolsdb_execute_values(
+            inp_sql, inp_params, inp_template, fetch=False, commit=False
+        )
+        # Insert into man table
+        toolsdb_execute_values(
+            man_sql, man_params, man_template, fetch=False, commit=False
+        )
+
+    def _save_orifices(self) -> None:
+        feature_class = self.catalogs['features']['orifices']
+
+        arc_sql = """ 
+            INSERT INTO arc (
+                the_geom, code, node_1, node_2, arc_type, arccat_id, epa_type, expl_id, sector_id, muni_id, state, state_type, workcat_id, dma_id
+            ) VALUES %s
+            RETURNING arc_id, code
+        """  # --"depth", arc_id, annotation, observ, "comment", label_x, label_y, label_rotation, staticpressure, feature_type
+        arc_template = (
+            "(ST_GeomFromText(%s, %s), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 0)"
+        )
+
+        man_sql = f"""
+            INSERT INTO man_{feature_class.lower()} (
+                arc_id
+            ) VALUES %s
+        """
+        man_template = "(%s)"
+
+        inp_sql = """
+            INSERT INTO inp_orifice (
+                arc_id, ori_type, offsetval, cd, orate, flap, shape, geom1, geom2, geom3, geom4, close_time
+            ) VALUES %s
+        """  # --
+        inp_template = (
+            "(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        )
+
+        arc_params = []
+
+        inp_dict = {}
+
+        for o_name, o in self.network[ORIFICES].items():
+            geometry = get_geometry_from_link(self.network, o)
+
+            srid = lib_vars.data_epsg
+            try:
+                node_1 = self.node_ids[o.from_node]
+                node_2 = self.node_ids[o.to_node]
+            except KeyError as e:
+                self._log_message(f"Node not found: {e}")
+                continue
+            xs = self.network[XSECTIONS][o_name]
+            arccat_id = self.catalogs["orifices"]
+            epa_type = "ORIFICE"
+            expl_id = self.exploitation
+            sector_id = self.sector
+            muni_id = self.municipality
+            state = 1
+            state_type = 2
+            workcat_id = self.workcat
+            arc_params.append(
+                (
+                    geometry, srid,  # the_geom
+                    o_name,  # code
+                    node_1,
+                    node_2,
+                    feature_class,
+                    arccat_id,
+                    epa_type,
+                    expl_id,
+                    sector_id,
+                    muni_id,
+                    state,
+                    state_type,
+                    workcat_id,
+                )
+            )
+            inp_dict[o_name] = {
+                "ori_type": o.orientation,
+                "offsetval": o.offset,
+                "cd": o.discharge_coefficient,
+                "orate": o.hours_to_open,
+                "flap": to_yesno(o.has_flap_gate),
+                "shape": xs.shape,
+                "geom1": xs.height,
+                "geom2": xs.parameter_2,
+                "geom3": xs.parameter_3,
+                "geom4": xs.parameter_4,
+                "close_time": None,
+            }
+
+        # Insert into parent table
+        orifices = toolsdb_execute_values(
+            arc_sql, arc_params, arc_template, fetch=True, commit=False
+        )
+        print(orifices)
+        if not orifices:
+            self._log_message("Orifices couldn't be inserted!")
+            return
+
+        man_params = []
+        inp_params = []
+
+        for o in orifices:
+            arc_id = o[0]
+            code = o[1]
+            man_params.append(
+                (arc_id,)
+            )
+
+            inp_data = inp_dict[code]
+            inp_params.append(
+                (arc_id, inp_data["ori_type"], inp_data["offsetval"], inp_data["cd"], inp_data["orate"], inp_data["flap"],
+                 inp_data["shape"], inp_data["geom1"], inp_data["geom2"], inp_data["geom3"], inp_data["geom4"],
+                 inp_data["close_time"],
+                )
             )
 
         # Insert into inp table
