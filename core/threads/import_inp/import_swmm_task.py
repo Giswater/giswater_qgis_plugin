@@ -271,11 +271,11 @@ class GwImportInpTask(GwTask):
         self.progress_changed.emit("Visual objects", lerp_progress(50, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing pumps", True)
         self._save_pumps()
 
+        self.progress_changed.emit("Visual objects", lerp_progress(60, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing weirs", True)
+        self._save_weirs()
+
         self.progress_changed.emit("Visual objects", lerp_progress(70, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing conduits", True)
         self._save_conduits()
-
-        # self.progress_changed.emit("Visual objects", lerp_progress(60, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing valves", True)
-        # self._save_valves()
 
         # self.progress_changed.emit("Visual objects", lerp_progress(70, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing pipes", True)
         # self._save_pipes()
@@ -1236,51 +1236,52 @@ class GwImportInpTask(GwTask):
             man_sql, man_params, man_template, fetch=False, commit=False
         )
 
-    def _save_valves(self) -> None:
-        feature_class = self.catalogs['features']['valves'].lower()
+    def _save_weirs(self) -> None:
+        feature_class = self.catalogs['features']['weirs']
 
         arc_sql = """ 
             INSERT INTO arc (
-                the_geom, code, node_1, node_2, arccat_id, epa_type, expl_id, sector_id, muni_id, state, state_type, workcat_id
+                the_geom, code, node_1, node_2, arc_type, arccat_id, epa_type, expl_id, sector_id, muni_id, state, state_type, workcat_id, dma_id
             ) VALUES %s
             RETURNING arc_id, code
         """  # --"depth", arc_id, annotation, observ, "comment", label_x, label_y, label_rotation, staticpressure, feature_type
         arc_template = (
-            "(ST_GeomFromText(%s, %s), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+            "(ST_GeomFromText(%s, %s), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 0)"
         )
 
         man_sql = f"""
-            INSERT INTO man_{feature_class} (
+            INSERT INTO man_{feature_class.lower()} (
                 arc_id
             ) VALUES %s
         """
         man_template = "(%s)"
 
         inp_sql = """
-            INSERT INTO inp_virtualvalve (
-                arc_id, valv_type, pressure, diameter, flow, coef_loss, curve_id, minorloss, status, init_quality
+            INSERT INTO inp_weir (
+                arc_id, weir_type, offsetval, cd, ec, cd2, flap, geom1, geom2, geom3, geom4, surcharge, road_width, road_surf, coef_curve
             ) VALUES %s
         """  # --
         inp_template = (
-            "(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+            "(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
         )
 
         arc_params = []
 
         inp_dict = {}
 
-        for v_name, v in self.network.valves():
-            geometry = get_geometry_from_link(v)
+        for w_name, w in self.network[WEIRS].items():
+            geometry = get_geometry_from_link(self.network, w)
 
             srid = lib_vars.data_epsg
             try:
-                node_1 = self.node_ids[v.start_node_name]
-                node_2 = self.node_ids[v.end_node_name]
+                node_1 = self.node_ids[w.from_node]
+                node_2 = self.node_ids[w.to_node]
             except KeyError as e:
                 self._log_message(f"Node not found: {e}")
                 continue
-            arccat_id = self.catalogs["valves"]
-            epa_type = "VIRTUALVALVE"
+            xs = self.network[XSECTIONS][w_name]
+            arccat_id = self.catalogs["weirs"]
+            epa_type = "WEIR"
             expl_id = self.exploitation
             sector_id = self.sector
             muni_id = self.municipality
@@ -1290,9 +1291,10 @@ class GwImportInpTask(GwTask):
             arc_params.append(
                 (
                     geometry, srid,  # the_geom
-                    v_name,  # code
+                    w_name,  # code
                     node_1,
                     node_2,
+                    feature_class,
                     arccat_id,
                     epa_type,
                     expl_id,
@@ -1303,57 +1305,49 @@ class GwImportInpTask(GwTask):
                     workcat_id,
                 )
             )
-            inp_dict[v_name] = {
-                "valv_type": v.valve_type,
-                "pressure": None,
-                "diameter": v.diameter,
-                "flow": None,
-                "coef_loss": None,
-                "curve_id": None,
-                "minorloss": v.minor_loss,
-                "status": v.initial_status.name.upper(),
-                "init_quality": None,
+            inp_dict[w_name] = {
+                "weir_type": w.form,
+                "offsetval": w.height_crest,
+                "cd": w.discharge_coefficient,
+                "ec": w.n_end_contractions,
+                "cd2": w.discharge_coefficient_end,
+                "flap": to_yesno(w.has_flap_gate),
+                "geom1": xs.height,
+                "geom2": xs.parameter_2,
+                "geom3": xs.parameter_3,
+                "geom4": xs.parameter_4,
+                "surcharge": to_yesno(w.can_surcharge),
+                "road_width": nan_to_none(w.road_width),
+                "road_surf": nan_to_none(w.road_surface),
+                "coef_curve": nan_to_none(w.coefficient_curve),
             }
-
-            # TODO: refactor this so all values go to one 'setting' column (except curve_id).
-            valve_key_map = {
-                "PRV": "pressure",
-                "PSV": "pressure",
-                "PBV": "pressure",
-                "FCV": "flow",
-                "TCV": "coef_loss",
-                "GPV": "curve_id",
-            }
-            key = valve_key_map.get(v.valve_type)
-            if key:
-                inp_dict[v_name][key] = v.initial_setting
 
         # Insert into parent table
-        valves = toolsdb_execute_values(
+        weirs = toolsdb_execute_values(
             arc_sql, arc_params, arc_template, fetch=True, commit=False
         )
-        print(valves)
-        if not valves:
-            self._log_message("Valves couldn't be inserted!")
+        print(weirs)
+        if not weirs:
+            self._log_message("Weirs couldn't be inserted!")
             return
 
         man_params = []
         inp_params = []
 
-        for v in valves:
-            arc_id = v[0]
-            code = v[1]
+        for w in weirs:
+            arc_id = w[0]
+            code = w[1]
             man_params.append(
                 (arc_id,)
             )
 
             inp_data = inp_dict[code]
             inp_params.append(
-                (arc_id, inp_data["valv_type"], inp_data["pressure"], inp_data["diameter"], inp_data["flow"],
-                 inp_data["coef_loss"], inp_data["curve_id"], inp_data["minorloss"], inp_data["status"],
-                 inp_data["init_quality"])
+                (arc_id, inp_data["weir_type"], inp_data["offsetval"], inp_data["cd"], inp_data["ec"], inp_data["cd2"],
+                 inp_data["flap"], inp_data["geom1"], inp_data["geom2"], inp_data["geom3"], inp_data["geom4"],
+                 inp_data["surcharge"], inp_data["road_width"], inp_data["road_surf"], inp_data["coef_curve"],
+                )
             )
-            print(inp_params)
 
         # Insert into inp table
         toolsdb_execute_values(
