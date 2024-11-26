@@ -52,6 +52,8 @@ v_node_1 text;
 v_partialquery text;
 v_check_arcdnom integer;
 v_fid integer;
+v_psector_list varchar;
+
 
 BEGIN
 
@@ -1233,20 +1235,33 @@ BEGIN
 	END IF;
 
 	RAISE NOTICE '43 - Check nodes planified duplicated(453)';
-	v_querytext = 'SELECT * FROM (SELECT DISTINCT t1.node_id AS node_1, t1.nodecat_id AS nodecat_1, t1.state as state1, t2.node_id AS node_2, t2.nodecat_id AS nodecat_2, t2.state as state2, t1.expl_id, 453, t1.the_geom
-	FROM '||v_edit||'node AS t1 JOIN '||v_edit||'node AS t2 ON ST_Dwithin(t1.the_geom, t2.the_geom, 0.01) WHERE t1.node_id != t2.node_id ORDER BY t1.node_id ) a where a.state1 = 2 AND a.state2 = 2';
+	v_querytext = 'SELECT * FROM (SELECT DISTINCT t1.node_id AS node_1, t1.nodecat_id AS nodecat_1, t1.state AS state1, t2.node_id AS node_2, t2.nodecat_id AS nodecat_2, t2.state AS state2, t1.expl_id, 453, 
+	t1.the_geom , COALESCE(px1.psector_id, px2.psector_id) AS psector_id
+	FROM '||v_edit||'node AS t1  JOIN '||v_edit||'node AS t2 
+	ON ST_DWithin(t1.the_geom, t2.the_geom, 0.01) 
+	LEFT JOIN plan_psector_x_node AS px1 ON t1.node_id = px1.node_id 
+	LEFT JOIN plan_psector_x_node AS px2 ON t2.node_id = px2.node_id 
+	WHERE t1.node_id != t2.node_id AND ((px1.psector_id = px2.psector_id) 
+	OR (px1.psector_id IS NULL OR px2.psector_id IS NULL)) ORDER BY t1.node_id) 
+	a WHERE a.state1 = 2 AND a.state2 = 2';
 
-	EXECUTE concat('SELECT count(*) FROM (',v_querytext,')a') INTO v_count;
+   	EXECUTE concat(
+    'SELECT count(*), string_agg(psector_id::TEXT || '' ('' || total_nodes::TEXT || '' nodes)'', '', '') ' || 
+    'FROM (SELECT psector_id, count(*) AS total_nodes ' ||
+    'FROM (', v_querytext, ') a ' || 
+    'GROUP BY psector_id) a'
+	) INTO v_count, v_psector_list;
 
+	
 	IF v_count > 0 THEN
 		EXECUTE concat ('INSERT INTO temp_anl_node (fid, node_id, nodecat_id, descript, the_geom, expl_id)
 		SELECT 453, node_1, nodecat_1, ''Duplicated nodes'', the_geom, expl_id FROM (', v_querytext,')a');
 
 		INSERT INTO temp_audit_check_data (fid, criticity, result_id, error_message, fcount)
-		VALUES (v_fid, 3, '453', concat('ERROR-453 (anl_node): There is/are ',v_count,' nodes duplicated with state 2.'),v_count);
+		VALUES (v_fid, 3, '453', concat('ERROR-453 (anl_node): There are nodes duplicated with state 2 in same psectors ', v_psector_list,'.'),v_count);
 	ELSE
 		INSERT INTO temp_audit_check_data (fid, criticity, result_id, error_message, fcount)
-		VALUES (v_fid, 1, '453','INFO: There are no nodes duplicated with state 2',v_count);
+		VALUES (v_fid, 1, '453','INFO: There are no nodes duplicated with state 2 in same psector',v_count);
 	END IF;
 
 	RAISE NOTICE '44 - Check redundant values on y-top_elev-elev (461)';
