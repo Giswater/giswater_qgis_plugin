@@ -1370,7 +1370,7 @@ class GwImportInpTask(GwTask):
 
     def _save_conduits(self) -> None:
         feature_class = self.catalogs['features']['conduits']
-
+        # TODO: get rid of dma_id
         arc_sql = """ 
             INSERT INTO arc (
                 the_geom, code, node_1, node_2, arc_type, arccat_id, epa_type, expl_id, sector_id, muni_id, state, state_type, workcat_id, dma_id
@@ -1420,7 +1420,7 @@ class GwImportInpTask(GwTask):
             state = 1
             state_type = 2
             workcat_id = self.workcat
-            dma_id = 0
+            dma_id = 0  # TODO: get rid of dma_id
             arc_params.append(
                 (
                     geometry,
@@ -1437,7 +1437,7 @@ class GwImportInpTask(GwTask):
                     state,
                     state_type,
                     workcat_id,
-                    dma_id,
+                    dma_id,  # TODO: get rid of dma_id
                 )
             )
             inp_dict[c_name] = {
