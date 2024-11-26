@@ -48,7 +48,8 @@ BEGIN
 	sector_id, dma_id, exit_topelev, exit_elev, the_geom, st_endpoint(the_geom), false FROM v_edit_link where exit_type = 'ARC';
 
 	INSERT INTO temp_link SELECT link_id, exit_id::integer, exit_type, feature_id, feature_type, exit_id, exit_type, state, expl_id, 
-	sector_id, dma_id, exit_topelev, exit_elev, the_geom, st_endpoint(the_geom), false FROM v_edit_link where exit_type = 'NODE';
+	sector_id, dma_id, exit_topelev, exit_elev, the_geom, st_endpoint(the_geom), false FROM v_edit_link where exit_type IN ('NODE', 'CONNEC');
+
 
 	-- insert duplicated features on temp_vnode
 	if p_input = 1 then -- the whole v_edit_link
