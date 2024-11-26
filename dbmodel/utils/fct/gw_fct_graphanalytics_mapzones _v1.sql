@@ -220,15 +220,15 @@ BEGIN
         RETURN v_response;
     END IF;
 
-
+	-- NODES TO MODIFY
 	IF v_project_type = 'WS' THEN
+		-- NODES VALVES
 		UPDATE temp_pgr_node t SET graph_delimiter = LOWER(cf.graph_delimiter)
 		FROM node n
 		JOIN cat_node cn ON cn.id = n.nodecat_id
 		JOIN cat_feature_node cf ON cf.id = cn.node_type
 		WHERE t.node_id=n.node_id AND cf.graph_delimiter = 'MINSECTOR';
 
-		-- NODES VALVES
 		-- UPDATE "closed", "broken", "to_arc" only if the values make sense - check the explanations/rules for the possible valve scenarios MINSECTOR/to_arc/closed/broken
 		-- valves to modify:
 		-- closed valves
@@ -240,36 +240,6 @@ BEGIN
 		UPDATE temp_pgr_node n SET to_arc = v.to_arc, broken = v.broken, modif = TRUE
 		FROM man_valve v
 		WHERE n.node_id = v.node_id AND v.to_arc IS NOT NULL AND v.broken = FALSE;
-
-		-- ARCS VALVES
-		-- arcs to modify:
-		-- for the closed valves when to_arc IS NULL, one of the arcs that connect to the valve
-		UPDATE temp_pgr_arc t
-		SET
-		    modif1 = CASE WHEN s.node_id = s.node_1 THEN TRUE ELSE modif1 END,
-        	modif2 = CASE WHEN s.node_id = s.node_2 THEN TRUE ELSE modif2 END
-		FROM
-		(
-			SELECT DISTINCT ON (n.node_id) n.node_id, a.arc_id, a.node_1, a.node_2
-			FROM temp_pgr_node n
-			join temp_pgr_arc a ON n.node_id IN (a.node_1, a.node_2)
-			WHERE n.modif AND n.to_arc IS NULL
-		) s
-		WHERE t.arc_id = s.arc_id;
-
-        -- for the valves with to_arc NOT NULL; the InletArc - the one that is not to_arc
-  		UPDATE temp_pgr_arc t
-		SET
-			modif1 = CASE WHEN s.node_id = s.node_1 THEN TRUE ELSE modif1 END,
-        	modif2 = CASE WHEN s.node_id = s.node_2 THEN TRUE ELSE modif2 END
-		FROM
-		(
-			SELECT a.arc_id, n.node_id, n.to_arc, a.node_1, a.node_2
-			FROM  temp_pgr_node n
-			JOIN temp_pgr_arc a ON n.node_id IN (a.node_1, a.node_2)
-			WHERE n.modif AND n.to_arc IS NOT NULL AND a.arc_id <> n.to_arc
-		) s
-		WHERE t.arc_id= s.arc_id;
 
 	-- cost/reverse_cost for the open valves with to_arc will be update after gw_fct_graphanalytics_arrangenetwork with the correct values
 	END IF;
@@ -314,6 +284,40 @@ BEGIN
 		) s 
 		WHERE n.node_id = s.node_id';
     EXECUTE v_querytext;
+
+	-- ARCS TO MODIFY
+	IF v_project_type = 'WS' THEN
+		-- ARCS VALVES
+		-- for the closed valves ('minsector', with or without to_arc), one of the arcs that connect to the valve
+		UPDATE temp_pgr_arc t
+		SET
+		    modif1 = CASE WHEN s.node_id = s.node_1 THEN TRUE ELSE modif1 END,
+        	modif2 = CASE WHEN s.node_id = s.node_2 THEN TRUE ELSE modif2 END
+		FROM
+		(
+			SELECT DISTINCT ON (n.node_id) n.node_id, a.arc_id, a.node_1, a.node_2
+			FROM temp_pgr_node n
+			join temp_pgr_arc a ON n.node_id IN (a.node_1, a.node_2)
+			WHERE n.graph_delimiter = 'minsector' AND n.closed = TRUE
+		) s
+		WHERE t.arc_id = s.arc_id;
+
+        -- for the valves with to_arc NOT NULL that are not closed ('minsector' or 'none'); the InletArc - the one that is not to_arc
+  		UPDATE temp_pgr_arc t
+		SET
+			modif1 = CASE WHEN s.node_id = s.node_1 THEN TRUE ELSE modif1 END,
+        	modif2 = CASE WHEN s.node_id = s.node_2 THEN TRUE ELSE modif2 END
+		FROM
+		(
+			SELECT a.arc_id, n.node_id, n.to_arc, a.node_1, a.node_2
+			FROM  temp_pgr_node n
+			JOIN temp_pgr_arc a ON n.node_id IN (a.node_1, a.node_2)
+			WHERE (n.graph_delimiter = 'minsector' OR n.graph_delimiter = 'none') AND n.closed IS NULL AND a.arc_id <> n.to_arc
+		) s
+		WHERE t.arc_id= s.arc_id;
+
+	-- cost/reverse_cost for the open valves with to_arc will be update after gw_fct_graphanalytics_arrangenetwork with the correct values
+	END IF;
 
 	-- ARCS MAPZONES
 	-- Disconnect the InletArc (those that are not to_arc)
@@ -361,20 +365,16 @@ BEGIN
         RETURN v_response;
     END IF;
 
-	-- Update the cost/reverse_cost with the correct values for the open valves with to_arc NOT NULL
-	-- and graph_delimiter 'minsector' or 'none' (it wasn't changed for 'forceClosed' or 'ignore' for example)
 	-- Note: node_1 = node_2 for the new arcs generated at the nodes
     IF v_project_type = 'WS' THEN
-        UPDATE temp_pgr_arc a SET reverse_cost = 0 -- for inundation process, better to be 0 instead of 1; these arcs don't exist
+		-- Update the cost/reverse_cost with the correct values for the open valves with to_arc NOT NULL
+		-- and graph_delimiter 'minsector' or 'none' (it wasn't changed for 'forceClosed' or 'ignore' for example)
+        UPDATE temp_pgr_arc a 
+		SET reverse_cost = CASE WHEN a.pgr_node_1=a.node_1::INT THEN 0 ELSE a.reverse_cost END, -- for inundation process, better to be 0 instead of 1; these arcs don't exist
+			cost = CASE WHEN a.pgr_node_2=a.node_2::INT THEN 0 ELSE a.cost END -- for inundation process, better to be 0 instead of 1; these arcs don't exist
 		FROM temp_pgr_node n
-        WHERE a.pgr_node_1 = n.pgr_node_id AND a.pgr_node_1 = a.node_1::INT AND a.node_1 = a.node_2
-    	AND (a.graph_delimiter = 'minsector' OR a.graph_delimiter = 'none')
-		AND n.to_arc IS NOT NULL AND n.closed IS NULL;
-
-        UPDATE temp_pgr_arc a SET cost = 0 -- for inundation process, better to be 0 instead of 1; these arcs don't exist
-		FROM temp_pgr_node n
-        WHERE a.pgr_node_2 = n.pgr_node_id AND a.pgr_node_2 = a.node_2::INT AND a.node_1 = a.node_2
-    	AND (a.graph_delimiter = 'minsector' OR a.graph_delimiter = 'none')
+		WHERE n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2) AND a.node_1 = a.node_2 
+		AND (a.graph_delimiter = 'minsector' OR a.graph_delimiter = 'none')
 		AND n.to_arc IS NOT NULL AND n.closed IS NULL;
     END IF;
 
