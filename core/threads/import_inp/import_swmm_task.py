@@ -235,8 +235,8 @@ class GwImportInpTask(GwTask):
         self.progress_changed.emit("Visual objects", lerp_progress(30, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing outfalls", True)
         self._save_outfalls()
 
-        # self.progress_changed.emit("Visual objects", lerp_progress(40, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing tanks", True)
-        # self._save_tanks()
+        self.progress_changed.emit("Visual objects", lerp_progress(40, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing dividers", True)
+        self._save_dividers()
 
         # self.progress_changed.emit("Visual objects", lerp_progress(50, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing pumps", True)
         # self._save_pumps()
@@ -863,55 +863,59 @@ class GwImportInpTask(GwTask):
             man_sql, man_params, man_template, fetch=False, commit=False
         )
 
-    def _save_tanks(self) -> None:
-        feature_class = self.catalogs['features']['tanks'].lower()
+    def _save_dividers(self) -> None:
+        feature_class = self.catalogs['features']['dividers']
 
         node_sql = """ 
             INSERT INTO node (
-                the_geom, code, nodecat_id, epa_type, expl_id, sector_id, muni_id, state, state_type, workcat_id, elevation
+                the_geom, code, node_type, nodecat_id, epa_type, expl_id, sector_id, muni_id, state, state_type, workcat_id, elevation
             ) VALUES %s
             RETURNING node_id, code
         """  # --"depth", arc_id, annotation, observ, "comment", label_x, label_y, label_rotation, staticpressure, feature_type
         node_template = (
-            "(ST_SetSRID(ST_Point(%s, %s),%s), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+            "(ST_SetSRID(ST_Point(%s, %s),%s), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
         )
 
         man_sql = f"""
-            INSERT INTO man_{feature_class} (
+            INSERT INTO man_{feature_class.split('_')[-1].lower()} (
                 node_id
             ) VALUES %s
         """
         man_template = "(%s)"
 
         inp_sql = """
-            INSERT INTO inp_tank (
-                node_id, initlevel, minlevel, maxlevel, diameter, minvol, curve_id, overflow, mixing_model, mixing_fraction, reaction_coeff, init_quality
+            INSERT INTO inp_divider (
+                node_id, divider_type, arc_id, curve_id, qmin, ht, cd, y0, ysur, apond
             ) VALUES %s
         """  # --
         inp_template = (
-            "(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+            "(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
         )
 
         node_params = []
 
         inp_dict = {}
 
-        for t_name, t in self.network.tanks():
-            x, y = t.coordinates
+        for d_name, d in self.network[DIVIDERS].items():
+            if d_name not in self.network[COORDINATES]:
+                self._log_message(f"ERROR: DIVIDER '{d_name}' has no coordinates in [COORDINATES] section.")
+                continue
+            x, y = self.network[COORDINATES][d_name].x, self.network[COORDINATES][d_name].y
             srid = lib_vars.data_epsg
-            nodecat_id = self.catalogs["tanks"]
-            epa_type = "TANK"
+            nodecat_id = self.catalogs["dividers"]
+            epa_type = "DIVIDER"
             expl_id = self.exploitation
             sector_id = self.sector
             muni_id = self.municipality
             state = 1
             state_type = 2
             workcat_id = self.workcat
-            elevation = t.elevation
+            elevation = d.elev
             node_params.append(
                 (
                     x, y, srid,  # the_geom
-                    t_name,  # code
+                    d_name,  # code
+                    feature_class,
                     nodecat_id,
                     epa_type,
                     expl_id,
@@ -923,38 +927,33 @@ class GwImportInpTask(GwTask):
                     elevation,
                 )
             )
-            inp_dict[t_name] = {
-                "initlevel": t.init_level,
-                "minlevel": t.min_level,
-                "maxlevel": t.max_level,
-                "diameter": t.diameter,
-                "minvol": t.min_vol,
-                "curve_id": t.vol_curve_name,
-                "overflow": "Yes" if t.overflow else "No",
-                "mixing_model": t.mixing_model,
-                "mixing_fraction": t.mixing_fraction,
-                "reaction_coeff": t.bulk_coeff,
-                "init_quality": t.initial_quality,
-                "source_type": None,
-                "source_quality": None,
-                "source_pattern_id": None,
+            inp_dict[d_name] = {
+                "divider_type": d.kind,
+                "arc_id": d.link,
+                "curve_id": d.data if d.kind == "TABULAR" else None,
+                "qmin": (d.data[0] if isinstance(d.data, tuple) else d.data) if d.kind in ("WEIR", "CUTOFF") else None,
+                "ht": d.data[1] if d.kind == "WEIR" else None,
+                "cd": d.data[2] if d.kind == "WEIR" else None,
+                "y0": d.depth_init,
+                "ysur": d.depth_surcharge,
+                "apond": d.area_ponded,
             }
 
         # Insert into parent table
-        tanks = toolsdb_execute_values(
+        dividers = toolsdb_execute_values(
             node_sql, node_params, node_template, fetch=True, commit=False
         )
-        print(tanks)
-        if not tanks:
-            self._log_message("Tanks couldn't be inserted!")
+        print(dividers)
+        if not dividers:
+            self._log_message("Dividers couldn't be inserted!")
             return
 
         man_params = []
         inp_params = []
 
-        for t in tanks:
-            node_id = t[0]
-            code = t[1]
+        for d in dividers:
+            node_id = d[0]
+            code = d[1]
 
             self.node_ids[code] = node_id
 
@@ -964,9 +963,8 @@ class GwImportInpTask(GwTask):
 
             inp_data = inp_dict[code]
             inp_params.append(
-                (node_id, inp_data["initlevel"], inp_data["minlevel"], inp_data["maxlevel"], inp_data["diameter"],
-                 inp_data["minvol"], inp_data["curve_id"], inp_data["overflow"], inp_data["mixing_model"],
-                 inp_data["mixing_fraction"], inp_data["reaction_coeff"], inp_data["init_quality"])
+                (node_id, inp_data["divider_type"], inp_data["arc_id"], inp_data["curve_id"],
+                 inp_data["qmin"], inp_data["ht"], inp_data["cd"], inp_data["y0"], inp_data["ysur"], inp_data["apond"])
             )
 
         # Insert into inp table
