@@ -55,6 +55,10 @@ def batched(iterable, n):
         yield batch
 
 
+def to_yesno(x: bool):
+    return "YES" if x else "NO"
+
+
 def execute_sql(sql, params=None, /, log_sql=False, **kwargs) -> bool:
     sql = tools_db._get_sql(sql, log_sql, params)
     result: bool = tools_db.execute_sql(
@@ -315,7 +319,7 @@ class GwImportInpTask(GwTask):
             parameter = f"inp_options_{parameter}"
             value = f"{v}"
             if type(v) is bool:
-                value = "YES" if v else "NO"
+                value = to_yesno(v)
             update_params.append((value, parameter))
 
         report_dict: dict = self.network[REPORT]
@@ -326,7 +330,7 @@ class GwImportInpTask(GwTask):
             parameter = f"inp_report_{parameter}"
             value = f"{v}"
             if type(v) is bool:
-                value = "YES" if v else "NO"
+                value = to_yesno(v)
             update_params.append((value, parameter))
 
         # SQL query for batch update
@@ -851,7 +855,7 @@ class GwImportInpTask(GwTask):
                 "stage": o.data if o.kind == 'FIXED' else None,
                 "curve_id": o.data if o.kind == 'TIDAL' else None,
                 "timser_id": o.data if o.kind == 'TIMESERIES' else None,
-                "gate": "YES" if o.has_flap_gate else "NO"
+                "gate": to_yesno(o.has_flap_gate)
             }
 
         # Insert into parent table
