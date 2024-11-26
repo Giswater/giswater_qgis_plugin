@@ -260,11 +260,11 @@ class GwImportInpTask(GwTask):
         self.progress_changed.emit("Visual objects", lerp_progress(40, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing storage units", True)
         self._save_storage()
 
+        self.progress_changed.emit("Visual objects", lerp_progress(50, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing pumps", True)
+        self._save_pumps()
+
         self.progress_changed.emit("Visual objects", lerp_progress(70, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing conduits", True)
         self._save_conduits()
-
-        # self.progress_changed.emit("Visual objects", lerp_progress(50, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing pumps", True)
-        # self._save_pumps()
 
         # self.progress_changed.emit("Visual objects", lerp_progress(60, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing valves", True)
         # self._save_valves()
@@ -1121,50 +1121,50 @@ class GwImportInpTask(GwTask):
         )
 
     def _save_pumps(self) -> None:
-        feature_class = self.catalogs['features']['pumps'].lower()
+        feature_class = self.catalogs['features']['pumps']
 
         arc_sql = """ 
             INSERT INTO arc (
-                the_geom, code, node_1, node_2, arccat_id, epa_type, expl_id, sector_id, muni_id, state, state_type, workcat_id
+                the_geom, code, node_1, node_2, arc_type, arccat_id, epa_type, expl_id, sector_id, muni_id, state, state_type, workcat_id, dma_id
             ) VALUES %s
             RETURNING arc_id, code
         """  # --"depth", arc_id, annotation, observ, "comment", label_x, label_y, label_rotation, staticpressure, feature_type
         arc_template = (
-            "(ST_GeomFromText(%s, %s), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+            "(ST_GeomFromText(%s, %s), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 0)"
         )
 
         man_sql = f"""
-            INSERT INTO man_{feature_class} (
+            INSERT INTO man_{feature_class.lower()} (
                 arc_id
             ) VALUES %s
         """
         man_template = "(%s)"
 
         inp_sql = """
-            INSERT INTO inp_virtualpump (
-                arc_id, power, curve_id, speed, pattern_id, status, effic_curve_id, energy_price, energy_pattern_id, pump_type
+            INSERT INTO inp_pump (
+                arc_id, curve_id, status, startup, shutoff
             ) VALUES %s
         """  # --
         inp_template = (
-            "(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+            "(%s, %s, %s, %s, %s)"
         )
 
         arc_params = []
 
         inp_dict = {}
 
-        for p_name, p in self.network.pumps():
-            geometry = get_geometry_from_link(p)
+        for p_name, p in self.network[PUMPS].items():
+            geometry = get_geometry_from_link(self.network, p)
 
             srid = lib_vars.data_epsg
             try:
-                node_1 = self.node_ids[p.start_node_name]
-                node_2 = self.node_ids[p.end_node_name]
+                node_1 = self.node_ids[p.from_node]
+                node_2 = self.node_ids[p.to_node]
             except KeyError as e:
                 self._log_message(f"Node not found: {e}")
                 continue
             arccat_id = self.catalogs["pumps"]
-            epa_type = "VIRTUALPUMP"
+            epa_type = "PUMP"
             expl_id = self.exploitation
             sector_id = self.sector
             muni_id = self.municipality
@@ -1177,6 +1177,7 @@ class GwImportInpTask(GwTask):
                     p_name,  # code
                     node_1,
                     node_2,
+                    feature_class,
                     arccat_id,
                     epa_type,
                     expl_id,
@@ -1188,22 +1189,11 @@ class GwImportInpTask(GwTask):
                 )
             )
             inp_dict[p_name] = {
-                "power": None,
-                "curve_id": None,
-                "speed": p.base_speed,
-                "pattern_id": p.speed_pattern_name,
-                "status": p.initial_status.name.upper(),
-                "effic_curve_id": p.efficiency.name if p.efficiency else None,
-                "energy_price": p.energy_price,
-                "energy_pattern_id": p.energy_pattern,
-                "pump_type": None,
+                "curve_id": p.curve_name,
+                "status": p.status,
+                "startup": p.depth_on,
+                "shutoff": p.depth_off,
             }
-            if p.pump_type == "POWER":
-                inp_dict[p_name]["power"] = p.power
-                inp_dict[p_name]["pump_type"] = "FLOWPUMP"
-            elif p.pump_type == "HEAD":
-                inp_dict[p_name]["curve_id"] = p.pump_curve_name
-                inp_dict[p_name]["pump_type"] = "PRESSPUMP"
 
         # Insert into parent table
         pumps = toolsdb_execute_values(
@@ -1226,9 +1216,7 @@ class GwImportInpTask(GwTask):
 
             inp_data = inp_dict[code]
             inp_params.append(
-                (arc_id, inp_data["power"], inp_data["curve_id"], inp_data["speed"], inp_data["pattern_id"],
-                 inp_data["status"], inp_data["effic_curve_id"], inp_data["energy_price"],
-                 inp_data["energy_pattern_id"], inp_data["pump_type"])
+                (arc_id, inp_data["curve_id"], inp_data["status"], inp_data["startup"], inp_data["shutoff"])
             )
 
         # Insert into inp table
