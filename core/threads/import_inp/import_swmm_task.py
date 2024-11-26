@@ -232,8 +232,8 @@ class GwImportInpTask(GwTask):
         self.progress_changed.emit("Visual objects", lerp_progress(0, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing junctions", True)
         self._save_junctions()
 
-        # self.progress_changed.emit("Visual objects", lerp_progress(30, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing reservoirs", True)
-        # self._save_reservoirs()
+        self.progress_changed.emit("Visual objects", lerp_progress(30, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing outfalls", True)
+        self._save_outfalls()
 
         # self.progress_changed.emit("Visual objects", lerp_progress(40, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing tanks", True)
         # self._save_tanks()
@@ -650,6 +650,8 @@ class GwImportInpTask(GwTask):
             toolsdb_execute_values(sql, params, template, commit=False)
 
     def _save_junctions(self) -> None:
+        feature_class = self.catalogs['features']['junctions']
+
         node_sql = """ 
             INSERT INTO node (
                 the_geom, code, node_type, nodecat_id, epa_type, expl_id, sector_id, muni_id, state, state_type, workcat_id, top_elev, ymax
@@ -660,8 +662,8 @@ class GwImportInpTask(GwTask):
             "(ST_SetSRID(ST_Point(%s, %s),%s), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
         )
 
-        man_sql = """
-            INSERT INTO man_junction (
+        man_sql = f"""
+            INSERT INTO man_{feature_class.split('_')[-1].lower()} (
                 node_id
             ) VALUES %s
         """
@@ -686,7 +688,7 @@ class GwImportInpTask(GwTask):
                 continue
             x, y = self.network[COORDINATES][j_name].x, self.network[COORDINATES][j_name].y
             srid = lib_vars.data_epsg
-            node_type = self.catalogs["features"]["junctions"]
+            node_type = feature_class
             nodecat_id = self.catalogs["junctions"]
             epa_type = "JUNCTION"
             expl_id = self.exploitation
@@ -755,44 +757,47 @@ class GwImportInpTask(GwTask):
             man_sql, man_params, man_template, fetch=False, commit=False
         )
 
-    def _save_reservoirs(self) -> None:
-        feature_class = self.catalogs['features']['reservoirs'].lower()
+    def _save_outfalls(self) -> None:
+        feature_class = self.catalogs['features']['outfalls']
 
         node_sql = """ 
             INSERT INTO node (
-                the_geom, code, nodecat_id, epa_type, expl_id, sector_id, muni_id, state, state_type, workcat_id
+                the_geom, code, node_type, nodecat_id, epa_type, expl_id, sector_id, muni_id, state, state_type, workcat_id
             ) VALUES %s
             RETURNING node_id, code
         """  # --"depth", arc_id, annotation, observ, "comment", label_x, label_y, label_rotation, staticpressure, feature_type
         node_template = (
-            "(ST_SetSRID(ST_Point(%s, %s),%s), %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+            "(ST_SetSRID(ST_Point(%s, %s),%s), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
         )
 
         man_sql = f"""
-            INSERT INTO man_{feature_class} (
+            INSERT INTO man_{feature_class.split('_')[-1].lower()} (
                 node_id
             ) VALUES %s
         """
         man_template = "(%s)"
 
         inp_sql = """
-            INSERT INTO inp_reservoir (
-                node_id, pattern_id, head, init_quality
+            INSERT INTO inp_outfall (
+                node_id, outfall_type, stage, curve_id, timser_id, gate
             ) VALUES %s
         """  # --pattern_id, peak_factor, source_type, source_quality, source_pattern_id
         inp_template = (
-            "(%s, %s, %s, %s)"
+            "(%s, %s, %s, %s, %s, %s)"
         )
 
         node_params = []
 
         inp_dict = {}
 
-        for r_name, r in self.network.reservoirs():
-            x, y = r.coordinates
+        for o_name, o in self.network[OUTFALLS].items():
+            if o_name not in self.network[COORDINATES]:
+                self._log_message(f"ERROR: OUTFALL '{o_name}' has no coordinates in [COORDINATES] section.")
+                continue
+            x, y = self.network[COORDINATES][o_name].x, self.network[COORDINATES][o_name].y
             srid = lib_vars.data_epsg
-            nodecat_id = self.catalogs["reservoirs"]
-            epa_type = "RESERVOIR"
+            nodecat_id = self.catalogs["outfalls"]
+            epa_type = "OUTFALL"
             expl_id = self.exploitation
             sector_id = self.sector
             muni_id = self.municipality
@@ -802,7 +807,8 @@ class GwImportInpTask(GwTask):
             node_params.append(
                 (
                     x, y, srid,  # the_geom
-                    r_name,  # code
+                    o_name,  # code
+                    feature_class,
                     nodecat_id,
                     epa_type,
                     expl_id,
@@ -813,30 +819,29 @@ class GwImportInpTask(GwTask):
                     workcat_id,
                 )
             )
-            inp_dict[r_name] = {
-                "pattern_id": r.head_pattern_name,
-                "head": r.head,
-                "init_quality": r.initial_quality,
-                "source_type": None,
-                "source_quality": None,
-                "source_pattern_id": None
+            inp_dict[o_name] = {
+                "outfall_type": o.kind,
+                "stage": o.data if o.kind == 'FIXED' else None,
+                "curve_id": o.data if o.kind == 'TIDAL' else None,
+                "timser_id": o.data if o.kind == 'TIMESERIES' else None,
+                "gate": "YES" if o.has_flap_gate else "NO"
             }
 
         # Insert into parent table
-        reservoirs = toolsdb_execute_values(
+        outfalls = toolsdb_execute_values(
             node_sql, node_params, node_template, fetch=True, commit=False
         )
-        print(reservoirs)
-        if not reservoirs:
-            self._log_message("Reservoirs couldn't be inserted!")
+        print(outfalls)
+        if not outfalls:
+            self._log_message("Outfalls couldn't be inserted!")
             return
 
         man_params = []
         inp_params = []
 
-        for r in reservoirs:
-            node_id = r[0]
-            code = r[1]
+        for o in outfalls:
+            node_id = o[0]
+            code = o[1]
 
             self.node_ids[code] = node_id
 
@@ -846,7 +851,7 @@ class GwImportInpTask(GwTask):
 
             inp_data = inp_dict[code]
             inp_params.append(
-                (node_id, inp_data["pattern_id"], inp_data["head"], inp_data["init_quality"])
+                (node_id, inp_data["outfall_type"], inp_data["stage"], inp_data["curve_id"], inp_data["timser_id"], inp_data["gate"])
             )
 
         # Insert into inp table
