@@ -12,13 +12,24 @@ try:
         OPTIONS, REPORT,
         JUNCTIONS, OUTFALLS, DIVIDERS, STORAGE,
         CONDUITS, PUMPS, ORIFICES, WEIRS, OUTLETS,
-        XSECTIONS, COORDINATES,
-        PATTERNS, CURVES, TIMESERIES, CONTROLS, LID_CONTROLS, LID_USAGE
+        XSECTIONS, COORDINATES, VERTICES,
+        PATTERNS, CURVES, TIMESERIES, CONTROLS, LID_CONTROLS, LID_USAGE,
+        LOSSES
     )
     from swmm_api.input_file.sections import (
         Conduit, CrossSection, Pattern, TimeseriesData, TimeseriesFile
     )
 except ImportError:
+    SwmmInput = None
+
+    OPTIONS, REPORT = None, None
+    JUNCTIONS, OUTFALLS, DIVIDERS, STORAGE = None, None, None, None
+    CONDUITS, PUMPS, ORIFICES, WEIRS, OUTLETS = None, None, None, None, None
+    XSECTIONS, COORDINATES, VERTICES = None, None, None
+    PATTERNS, CURVES, TIMESERIES, CONTROLS, LID_CONTROLS, LID_USAGE  = None, None, None, None, None, None
+    LOSSES = None
+
+    Conduit, CrossSection, Pattern, TimeseriesData, TimeseriesFile = None, None, None, None, None
     pass
 
 from qgis.PyQt.QtCore import pyqtSignal
@@ -100,11 +111,18 @@ def toolsdb_execute_values(
     return result
 
 
-def get_geometry_from_link(link) -> str:
+def get_geometry_from_link(inp, link) -> str:
 
-    start_node_x, start_node_y = link.start_node.coordinates
-    end_node_x, end_node_y = link.end_node.coordinates
-    vertices = link.vertices
+    from_node = link.from_node
+    if from_node not in inp[COORDINATES]:
+        return "null"
+    to_node = link.to_node
+    if to_node not in inp[COORDINATES]:
+        return "null"
+
+    start_node_x, start_node_y = inp[COORDINATES][from_node].x, inp[COORDINATES][from_node].y
+    end_node_x, end_node_y = inp[COORDINATES][to_node].x, inp[COORDINATES][to_node].y
+    vertices = inp[VERTICES][link.name].vertices if link.name in inp[VERTICES] else []
 
     coordinates = f"{start_node_x} {start_node_y},"
     for v in vertices:
@@ -208,23 +226,23 @@ class GwImportInpTask(GwTask):
         self._create_new_conduit_catalogs()
 
     def _manage_nonvisual(self) -> None:
-        if PATTERNS in self.network:  # type: ignore
+        if PATTERNS in self.network:
             self.progress_changed.emit("Non-visual objects", lerp_progress(0, self.PROGRESS_CATALOGS, self.PROGRESS_NONVISUAL), "Importing patterns", True)
             self._save_patterns()
 
-        if CURVES in self.network:  # type: ignore
+        if CURVES in self.network:
             self.progress_changed.emit("Non-visual objects", lerp_progress(40, self.PROGRESS_CATALOGS, self.PROGRESS_NONVISUAL), "Importing curves", True)
             self._save_curves()
 
-        if TIMESERIES in self.network:  # type: ignore
+        if TIMESERIES in self.network:
             self.progress_changed.emit("Non-visual objects", lerp_progress(60, self.PROGRESS_CATALOGS, self.PROGRESS_NONVISUAL), "Importing timeseries", True)
             self._save_timeseries()
 
-        if CONTROLS in self.network:  # type: ignore
+        if CONTROLS in self.network:
             self.progress_changed.emit("Non-visual objects", lerp_progress(80, self.PROGRESS_CATALOGS, self.PROGRESS_NONVISUAL), "Importing controls", True)
             self._save_controls()
 
-        if LID_CONTROLS in self.network:  # type: ignore
+        if LID_CONTROLS in self.network:
             self.progress_changed.emit("Non-visual objects", lerp_progress(80, self.PROGRESS_CATALOGS, self.PROGRESS_NONVISUAL), "Importing LIDs", True)
             self._save_lids()
 
