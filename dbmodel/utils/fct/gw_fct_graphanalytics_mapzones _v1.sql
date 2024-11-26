@@ -388,7 +388,6 @@ BEGIN
 	INTO v_pgr_root_vids;
 
 	-- Execute pgr_drivingDistance function
-    TRUNCATE temp_pgr_drivingdistance;
     v_querytext = 'SELECT pgr_arc_id AS id, pgr_node_1 AS source, pgr_node_2 AS target, cost, reverse_cost FROM temp_pgr_arc a';
     INSERT INTO temp_pgr_drivingdistance(seq, "depth", start_vid, pred, node, edge, "cost", agg_cost)
     (
