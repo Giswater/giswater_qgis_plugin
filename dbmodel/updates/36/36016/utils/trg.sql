@@ -4,9 +4,15 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-INSERT INTO sys_function
-(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source")
-VALUES(3326, 'gw_trg_edit_municipality', 'utils', 'function', 'json', 'json', 'Trigger to insert or update elements in v_ext_municipality table.', 'role_edit', NULL, 'core');
+-- 27/11/2024
+DROP TRIGGER IF EXISTS gw_trg_edit_municipality ON v_ext_municipality;
+CREATE TRIGGER gw_trg_edit_municipality INSTEAD OF
+INSERT
+    OR
+DELETE
+    OR
+UPDATE
+    ON
+    v_ext_municipality FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_municipality();
