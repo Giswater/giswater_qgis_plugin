@@ -61,7 +61,9 @@ BEGIN
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (218, null, 4, 'TRANSFER ADDFIELDS VALUES');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (218, null, 4, '-------------------------------------------------------------');
 
-
+	
+	IF EXISTS (SELECT 1 FROM sys_addfields) THEN
+	
     -- check cat_feature_id null on sys_addfields
     FOR rec_sa_featurestypes IN
         select sa.param_name, sa.feature_type, sa.datatype_id from sys_addfields sa
@@ -204,6 +206,7 @@ BEGIN
 
 
     -- transfer data from _man_addfields_value_ to new childtables
+	IF EXISTS (SELECT 1 FROM _man_addfields_value_ mav LEFT JOIN sys_addfields sa ON sa.id = mav.parameter_id WHERE mav.value_param IS NOT NULL) THEN
     FOR rec_sa IN
         SELECT sa.param_name, sa.datatype_id, cf.id, cf.feature_type FROM sys_addfields sa
         INNER JOIN cat_feature cf ON cf.id = sa.cat_feature_id
@@ -228,6 +231,7 @@ BEGIN
 
         END IF;
     END LOOP;
+	END IF;
 
     -- insert into log tables those null addfield values
     insert into audit_log_data (fid, feature_id, feature_type, log_message, addparam)
@@ -370,6 +374,8 @@ BEGIN
             as sys_type, gully_type as feature_type from vu_gully';
 
         end if;
+		
+		IF EXISTS (SELECT 1 FROM _man_addfields_value_ mav LEFT JOIN sys_addfields sa ON sa.id = mav.parameter_id WHERE mav.value_param IS NOT NULL) THEN
 
         for rec_feature in execute '
                 with subq_1 as (
@@ -396,9 +402,12 @@ BEGIN
             execute v_sql;
 
         end loop;
+
+		end if;
      end if;
 
     -- update sys_foreignkey values
+	IF EXISTS (SELECT 1 FROM _man_addfields_value_ mav LEFT JOIN sys_addfields sa ON sa.id = mav.parameter_id WHERE mav.value_param IS NOT NULL) THEN
     FOR rec_fgk IN
         SELECT sf.id, cf.feature_type, sa.cat_feature_id, sa.param_name
         FROM sys_foreignkey sf
@@ -409,6 +418,8 @@ BEGIN
          v_feature_childtable_name := 'man_' || lower(rec_fgk.feature_type) || '_' || lower(rec_fgk.cat_feature_id);
          EXECUTE 'UPDATE sys_foreignkey SET typevalue_table=''edit_typevalue'', typevalue_name='''|| rec_fgk.param_name ||''', target_table='''|| v_feature_childtable_name ||''', target_field='''|| rec_fgk.param_name ||''' WHERE id='|| rec_fgk.id ||';';
     END LOOP;
+	END IF;
+	END IF; 
 
 	RETURN ('{"status":"Accepted", "message":{"level":"3", "text":"Process done successfully"}, "version":"'||v_version||'"}')::json;
 
