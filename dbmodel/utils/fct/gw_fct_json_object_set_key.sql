@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2626
 
-
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_json_object_set_key(json, text, anyelement);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_json_object_set_key(p_json json,key_to_set text,value_to_set anyelement)
   RETURNS json AS
 $BODY$
