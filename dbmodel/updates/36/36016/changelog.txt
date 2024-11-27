@@ -3,3 +3,6 @@
 - Update combo of raingage showing only actives an Rainfall type
 - Enhance performance for v_edit_node
 - Enable see expl_id2 objects when only expl_id is selected by managing sector_id
+- Add columns brand_id, model_id and serial_number for node and arc UD
+- Delete column serial_number on man_element UD
+- Change columns brand and model for brand_id and model_id on cat_arc, cat_node and cat_grate UD
