@@ -86,8 +86,7 @@ DECLARE
 	v_expl_id text;
 	v_updatemapzgeom integer = 0;
 	v_geomparamupdate float;
-	v_forceopen text;
-	v_forceclosed text;
+    v_parameters json;
 	v_usepsector boolean;
 	v_valuefordisconnected integer;
 	v_floodonlymapzone text;
@@ -142,8 +141,8 @@ BEGIN
 	v_expl_id = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'exploitation');
 	v_updatemapzgeom = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'updateMapZone');
 	v_geomparamupdate = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'geomParamUpdate');
-	v_forceopen = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'forceOpen'); -- to use in the future as string array -> = ANY(string_to_array(v_forceopen, ','));
-	v_forceclosed = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'forceClosed'); -- to use in the future as string array -> = ANY(string_to_array(forceClosed, ','));
+	v_parameters = (SELECT ((p_data::json->>'data')::json->>'parameters'));
+	-- to use forceopen and forceclosed -> WHERE X IN (SELECT json_array_elements_text((v_parameters->>'forceClosed')::JSON))
 	v_usepsector = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'usePlanPsector');
 	v_valuefordisconnected = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'valueForDisconnected');
 	v_floodonlymapzone = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'floodOnlyMapzone');

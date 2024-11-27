@@ -76,7 +76,7 @@ BEGIN
 	END IF;
 
 	v_data = concat ('{"data":{"parameters":{"graphClass":"',v_class,'", "exploitation": "',v_expl,'", "updateFeature":"TRUE",
-	"updateMapZone":',v_updatemapzone,', "geomParamUpdate":',v_paramupdate, ',"floodFromNode":"',v_floodfromnode,'", "forceOpen": "',v_forceopen,'", "forceClosed":"',v_forceclosed,'", "usePlanPsector": ',v_usepsector,', "debug":"FALSE", 
+	"updateMapZone":',v_updatemapzone,', "geomParamUpdate":',v_paramupdate, ',"floodFromNode":"',v_floodfromnode,'", "forceOpen": [',v_forceopen,'], "forceClosed":[',v_forceclosed,'], "usePlanPsector": ',v_usepsector,', "debug":"FALSE", 
 	"valueForDisconnected":',v_valuefordisconnected,', "floodOnlyMapzone":"',v_floodonlymapzone,'", "commitChanges":',v_commitchanges,'}}}');
 
 	RETURN gw_fct_graphanalytics_mapzones(v_data);
