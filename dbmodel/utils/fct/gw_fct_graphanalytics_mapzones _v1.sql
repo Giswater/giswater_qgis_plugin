@@ -490,6 +490,8 @@ BEGIN
 					VALUES (v_fid, 2, concat('WARNING-395: There is a conflict against ',upper(v_mapzone_name),'''s (',v_mapzones_count,') with ',v_arcs_count,' arc(s) and ',v_connecs_count,' connec(s) affected.'));
 				END IF;
 
+				-- TODO: update mapzone geometry
+			END IF;
 		END IF;
 	END IF;
 
@@ -622,6 +624,7 @@ BEGIN
 
 		-- disconnected and conflict connecs
 		v_result = NULL;
+		-- TODO: add orphan connecs
 		EXECUTE 'SELECT jsonb_agg(features.feature) 
 			FROM (
 				SELECT jsonb_build_object(

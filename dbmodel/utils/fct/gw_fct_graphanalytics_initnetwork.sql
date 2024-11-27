@@ -67,6 +67,7 @@ BEGIN
         AND a.macrominsector_id::TEXT = ANY(string_to_array(v_macrominsector_id_arc, ','))
     );
 
+    -- TODO: add macrominsector_id 0 with the logic of the exploitation (to catch isolated nodes)
     INSERT INTO temp_pgr_node (pgr_node_id, node_id)
     (
         SELECT DISTINCT node_id::INT, node_id
