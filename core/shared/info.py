@@ -3417,7 +3417,7 @@ def open_epa_dlg(**kwargs):
         if 'dscenario' not in view:
             btn_add_base = info.dlg.findChild(QPushButton, 'btn_add_base')
             if btn_add_base:
-                tools_gw.add_icon(btn_add_base, '111b')
+                tools_gw.add_icon(btn_add_base, '113')
                 btn_add_base.clicked.connect(partial(add_row_epa, tbl, view, add_view, pk, info.dlg, add_dlg_title, "INSERT", **kwargs))
             btn_edit_base = info.dlg.findChild(QPushButton, 'btn_edit_base')
             if btn_edit_base:
@@ -3425,16 +3425,16 @@ def open_epa_dlg(**kwargs):
                 btn_edit_base.clicked.connect(partial(edit_row_epa, tbl, view, add_view, pk, info.dlg, add_dlg_title, **kwargs))
             btn_delete_base = info.dlg.findChild(QPushButton, 'btn_delete_base')
             if btn_delete_base:
-                tools_gw.add_icon(btn_delete_base, '112b')
+                tools_gw.add_icon(btn_delete_base, '114')
                 btn_delete_base.clicked.connect(partial(delete_tbl_row, tbl, view, pk, info.dlg, tablename=tableview['tbl'], tableview=tableview['view'], id_name=id_name, feature_id=feature_id, **kwargs))
         else:
             btn_add_dscenario = info.dlg.findChild(QPushButton, 'btn_add_dscenario')
             if btn_add_dscenario:
-                tools_gw.add_icon(btn_add_dscenario, '111b')
+                tools_gw.add_icon(btn_add_dscenario, '113')
                 btn_add_dscenario.clicked.connect(partial(add_row_epa, tbl, view, add_view, pk, info.dlg, add_dlg_title, "INSERT", **kwargs))
             btn_delete_dscenario = info.dlg.findChild(QPushButton, 'btn_delete_dscenario')
             if btn_delete_dscenario:
-                tools_gw.add_icon(btn_delete_dscenario, '112b')
+                tools_gw.add_icon(btn_delete_dscenario, '114')
                 btn_delete_dscenario.clicked.connect(partial(delete_tbl_row, tbl, view, pk, info.dlg, **kwargs))
             btn_edit_dscenario = info.dlg.findChild(QPushButton, 'btn_edit_dscenario')
             if btn_edit_dscenario:

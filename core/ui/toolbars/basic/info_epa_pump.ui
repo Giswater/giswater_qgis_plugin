@@ -30,8 +30,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>947</width>
-        <height>386</height>
+        <width>943</width>
+        <height>368</height>
        </rect>
       </property>
       <attribute name="label">
@@ -90,8 +90,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>134</width>
-        <height>122</height>
+        <width>943</width>
+        <height>368</height>
        </rect>
       </property>
       <attribute name="label">
@@ -148,8 +148,8 @@
     </widget>
    </item>
    <item row="1" column="0">
-    <layout class="QHBoxLayout" name="lyt_buttons">
-     <item>
+    <layout class="QGridLayout" name="lyt_buttons">
+     <item row="0" column="0">
       <spacer name="horizontalSpacer_3">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -162,7 +162,7 @@
        </property>
       </spacer>
      </item>
-     <item>
+     <item row="0" column="1">
       <widget class="QPushButton" name="btn_accept">
        <property name="enabled">
         <bool>false</bool>
@@ -172,7 +172,7 @@
        </property>
       </widget>
      </item>
-     <item>
+     <item row="0" column="2">
       <widget class="QPushButton" name="btn_cancel">
        <property name="text">
         <string>Cancel</string>
