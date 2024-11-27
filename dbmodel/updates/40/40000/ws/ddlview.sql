@@ -808,7 +808,7 @@ SELECT vu_connec.connec_id,
             vu_link.macrodqa_id,
             vu_link.expl_id2,
             vu_link.staticpressure
-           FROM vu_link, s s_1
+           FROM v_edit_link vu_link, s s_1
           WHERE (vu_link.expl_id = s_1.expl_id OR vu_link.expl_id2 = s_1.expl_id) AND vu_link.state = 2) a ON a.feature_id::text = vu_connec.connec_id::text
 	WHERE vu_connec.expl_id = s.expl_id OR vu_connec.expl_id2 = s.expl_id) c
 	join selector_sector s using (sector_id)
