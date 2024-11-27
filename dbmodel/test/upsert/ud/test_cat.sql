@@ -93,7 +93,7 @@ SELECT is((SELECT count(*)::integer FROM cat_work WHERE id = 'work5'), 0, 'DELET
 
 -- Subtest 9: Testing cat_arc operations | insert/update/delete
 INSERT INTO cat_arc
-(id, matcat_id, shape, geom1, geom2, geom3, geom4, geom5, geom6, geom7, geom8, geom_r, descript, link, brand, model, svg, z1, z2, width, area, estimated_depth, bulk, cost_unit, "cost", m2bottom_cost, m3protec_cost, active, "label", tsect_id, curve_id, arc_type, acoeff, connect_cost, visitability_vdef)
+(id, matcat_id, shape, geom1, geom2, geom3, geom4, geom5, geom6, geom7, geom8, geom_r, descript, link, brand_id, model_id, svg, z1, z2, width, area, estimated_depth, bulk, cost_unit, "cost", m2bottom_cost, m3protec_cost, active, "label", tsect_id, curve_id, arc_type, acoeff, connect_cost, visitability_vdef)
 VALUES('-902', NULL, 'RECT_CLOSED', 2.0000, 2.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, NULL, 'Conduit', NULL, NULL, NULL, NULL, 0.10, 0.10, 2.60, 4.0000, 3.20, 0.30, 'm', 'A_CON_R200', 'S_REP', 'S_NULL', true, NULL, NULL, NULL, 'SIPHON', NULL, 'N_CONNECTION', 3);
 SELECT is((SELECT count(*)::integer FROM cat_arc WHERE id = '-902'), 1, 'INSERT: cat_arc "-902" was inserted');
 
@@ -101,7 +101,7 @@ UPDATE cat_arc SET geom1 = 0.2 WHERE id = '-902';
 SELECT is((SELECT geom1 FROM cat_arc WHERE id = '-902'), 0.2, 'UPDATE: cat_arc "-902" was updated');
 
 INSERT INTO cat_arc
-(id, matcat_id, shape, geom1, geom2, geom3, geom4, geom5, geom6, geom7, geom8, geom_r, descript, link, brand, model, svg, z1, z2, width, area, estimated_depth, bulk, cost_unit, "cost", m2bottom_cost, m3protec_cost, active, "label", tsect_id, curve_id, arc_type, acoeff, connect_cost, visitability_vdef)
+(id, matcat_id, shape, geom1, geom2, geom3, geom4, geom5, geom6, geom7, geom8, geom_r, descript, link, brand_id, model_id, svg, z1, z2, width, area, estimated_depth, bulk, cost_unit, "cost", m2bottom_cost, m3protec_cost, active, "label", tsect_id, curve_id, arc_type, acoeff, connect_cost, visitability_vdef)
 VALUES('-902', NULL, 'RECT_CLOSED', 4.0000, 2.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, NULL, 'Conduit', NULL, NULL, NULL, NULL, 0.10, 0.10, 2.60, 4.0000, 3.20, 0.30, 'm', 'A_CON_R200', 'S_REP', 'S_NULL', true, NULL, NULL, NULL, 'SIPHON', NULL, 'N_CONNECTION', 3)
 ON CONFLICT (id) DO UPDATE SET geom1 = EXCLUDED.geom1;
 SELECT is((SELECT geom1 FROM cat_arc WHERE id = '-902'), 4.0000, 'UPDATE: cat_arc "-902" was upserted');
