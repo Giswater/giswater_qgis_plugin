@@ -367,10 +367,6 @@ select visit_id, connec_id, n.muni_id, n.sector_id from om_visit_x_connec
 
 update om_visit set sector_id = 0 where sector_id is null;
 
--- 02/09/2024
-INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device)
-VALUES ('visit_arc_leak', 'tab_data', 'Data', 'Data', 'role_om', '{"name":"gwGetVisit", "parameters":{"form":{"tabData":{"active":true}, "tabFiles":{"active":false}}}}'::json, '[{"actionName":"actionAddFile", "actionFunction":"gwSetFileInsert", "actionTooltip":"Add file", "disabled":false}]'::json, 1, '{5}');
-
 delete from sys_table where id='v_ui_document';
 
 -- 03/09/2024
