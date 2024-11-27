@@ -10,7 +10,7 @@ from psycopg2.extras import execute_values
 try:
     from swmm_api import SwmmInput
     from swmm_api.input_file.section_labels import (
-        OPTIONS, REPORT,
+        OPTIONS, REPORT, FILES,
         JUNCTIONS, OUTFALLS, DIVIDERS, STORAGE,
         CONDUITS, PUMPS, ORIFICES, WEIRS, OUTLETS,
         XSECTIONS, COORDINATES, VERTICES,
@@ -23,7 +23,7 @@ try:
 except ImportError:
     SwmmInput = None
 
-    OPTIONS, REPORT = None, None
+    OPTIONS, REPORT, FILES = None, None, None
     JUNCTIONS, OUTFALLS, DIVIDERS, STORAGE = None, None, None, None
     CONDUITS, PUMPS, ORIFICES, WEIRS, OUTLETS = None, None, None, None, None
     XSECTIONS, COORDINATES, VERTICES = None, None, None
@@ -195,6 +195,11 @@ class GwImportInpTask(GwTask):
             self._save_options()
             self.progress_changed.emit("Getting options", self.PROGRESS_OPTIONS, "done!", True)
 
+            if FILES in self.network:
+                self.progress_changed.emit("Getting options", self.PROGRESS_VALIDATE, "Importing files...", False)
+                self._save_files()
+                self.progress_changed.emit("Getting options", self.PROGRESS_OPTIONS, "done!", True)
+
             # self.progress_changed.emit("Getting options", self.PROGRESS_OPTIONS, "Getting units...", False)
             # self._get_db_units()
             # self.progress_changed.emit("Getting options", self.PROGRESS_OPTIONS, "done!", True)
@@ -354,6 +359,30 @@ class GwImportInpTask(GwTask):
 
         # Execute batch update
         toolsdb_execute_values(sql, update_params, template, fetch=False, commit=False)
+
+    def _save_files(self):
+        """
+            Import options to table 'config_param_user'.
+        """
+
+        params = []
+        for k, v in self.network[FILES].items():
+            actio_type, file_type = k.split(' ')[0], k.split(' ')[1]
+            fname = v
+            params.append((actio_type, file_type, fname))
+
+        # SQL query for batch update
+        sql = """
+            INSERT INTO inp_files (actio_type, file_type, fname)
+            VALUES %s
+        """
+        template = "(%s, %s, %s)"
+
+        print("FILES:")
+        print(params)
+
+        # Execute batch update
+        toolsdb_execute_values(sql, params, template, fetch=False, commit=False)
 
     def _create_workcat_id(self):
         sql = """
