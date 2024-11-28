@@ -75,7 +75,7 @@ BEGIN
 
         UPDATE link l SET macrominsector_id = g.macrominsector_id
         FROM gully g
-        WHERE g.gully_id = l.feature_id AND c.feature_type = 'CONNEC' AND c.macrominsector_id <> 0 AND l.state = 1;
+        WHERE g.gully_id = l.feature_id AND g.feature_type = 'GULLY' AND g.macrominsector_id <> 0 AND l.state = 1;
      ELSIF v_project_type = 'WS' THEN
         UPDATE minsector_graph m SET macrominsector_id = n.macrominsector_id
         FROM node n
