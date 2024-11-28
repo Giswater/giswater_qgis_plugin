@@ -1035,4 +1035,3 @@ AS SELECT a.arc_id,
      JOIN selector_sector s USING (sector_id)
      LEFT JOIN selector_municipality m USING (muni_id)
   WHERE s.cur_user = CURRENT_USER AND (m.cur_user = CURRENT_USER OR a.muni_id IS NULL);
->>>>>>> 7c157d522... feat: add brand_id, model_id and serial_number for node and arc UD
