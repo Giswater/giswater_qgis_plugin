@@ -41,6 +41,7 @@ BEGIN
     UPDATE node SET macrominsector_id = 0 WHERE macrominsector_id <> 0;
     UPDATE arc SET macrominsector_id = 0 WHERE macrominsector_id <> 0;
     UPDATE connec SET macrominsector_id = 0 WHERE macrominsector_id <> 0;
+    UPDATE link SET macrominsector_id = 0 WHERE macrominsector_id <> 0;
     IF v_project_type = 'UD' THEN
         UPDATE gully SET macrominsector_id = 0 WHERE macrominsector_id <> 0;
     ELSIF v_project_type = 'WS' THEN
@@ -49,30 +50,35 @@ BEGIN
 
 
     UPDATE node n SET macrominsector_id = c.component
-    FROM (
-        SELECT seq, component, node
-        FROM pgr_connectedcomponents('
+    FROM pgr_connectedcomponents('
             SELECT arc_id::int AS id, node_1::int AS source, node_2::int AS target, 1 AS cost 
             FROM arc WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND state = 1
-        ')
-    ) c
+        ') c
     WHERE n.node_id::int = c.node;
 
     UPDATE arc a SET macrominsector_id = n.macrominsector_id
-    FROM (SELECT node_id, macrominsector_id FROM node) n
+    FROM node n
     WHERE a.node_2 = n.node_id AND n.macrominsector_id <> 0 AND a.state = 1;
 
     UPDATE connec c SET macrominsector_id = a.macrominsector_id
-    FROM (SELECT arc_id, macrominsector_id FROM arc) a
-    WHERE c.arc_id = a.arc_id AND a.macrominsector_id <> 0;
+    FROM arc a
+    WHERE c.arc_id = a.arc_id AND a.macrominsector_id <> 0 AND c.state = 1;
+
+    UPDATE link l SET macrominsector_id = c.macrominsector_id
+    FROM connec c
+    WHERE c.connec_id = l.feature_id AND c.macrominsector_id <> 0 AND l.state = 1;
 
     IF v_project_type = 'UD' THEN
         UPDATE gully g SET macrominsector_id = a.macrominsector_id
-        FROM (SELECT arc_id, macrominsector_id FROM arc) a
-        WHERE g.arc_id = a.arc_id AND a.macrominsector_id <> 0;
+        FROM arc a
+        WHERE g.arc_id = a.arc_id AND a.macrominsector_id <> 0 AND g.state = 1;
+
+        UPDATE link l SET macrominsector_id = g.macrominsector_id
+        FROM gully g
+        WHERE g.gully_id = l.feature_id AND c.macrominsector_id <> 0 AND l.state = 1;
      ELSIF v_project_type = 'WS' THEN
         UPDATE minsector_graph m SET macrominsector_id = n.macrominsector_id
-        FROM (SELECT node_id, macrominsector_id FROM node) n
+        FROM node n
         WHERE m.node_id = n.node_id AND n.macrominsector_id <> 0;
     END IF;
 
