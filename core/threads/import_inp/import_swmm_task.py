@@ -13,12 +13,14 @@ try:
         OPTIONS, REPORT, FILES,
         JUNCTIONS, OUTFALLS, DIVIDERS, STORAGE,
         CONDUITS, PUMPS, ORIFICES, WEIRS, OUTLETS,
-        XSECTIONS, COORDINATES, VERTICES, SYMBOLS,
+        XSECTIONS, COORDINATES, VERTICES, SYMBOLS, POLYGONS,
         PATTERNS, CURVES, TIMESERIES, CONTROLS, LID_CONTROLS, LID_USAGE,
-        LOSSES, INFLOWS, DWF, SUBCATCHMENTS, RAINGAGES
+        LOSSES, INFLOWS, DWF, SUBCATCHMENTS, RAINGAGES, SUBAREAS,
+        INFILTRATION, ADJUSTMENTS
     )
     from swmm_api.input_file.sections import (
-        Conduit, CrossSection, Pattern, TimeseriesData, TimeseriesFile
+        Conduit, CrossSection, Pattern, TimeseriesData, TimeseriesFile,
+        InfiltrationHorton, InfiltrationGreenAmpt, InfiltrationCurveNumber
     )
 except ImportError:
     SwmmInput = None
@@ -28,9 +30,11 @@ except ImportError:
     CONDUITS, PUMPS, ORIFICES, WEIRS, OUTLETS = None, None, None, None, None
     XSECTIONS, COORDINATES, VERTICES, SYMBOLS = None, None, None, None
     PATTERNS, CURVES, TIMESERIES, CONTROLS, LID_CONTROLS, LID_USAGE  = None, None, None, None, None, None
-    LOSSES, INFLOWS, DWF, SUBCATCHMENTS, RAINGAGES = None, None, None, None, None
+    LOSSES, INFLOWS, DWF, SUBCATCHMENTS, RAINGAGES, SUBAREAS = None, None, None, None, None, None
+    INFILTRATION, ADJUSTMENTS = None, None
 
     Conduit, CrossSection, Pattern, TimeseriesData, TimeseriesFile = None, None, None, None, None
+    InfiltrationHorton, InfiltrationGreenAmpt, InfiltrationCurveNumber = object, object, object
     pass
 
 from qgis.PyQt.QtCore import pyqtSignal
@@ -304,6 +308,10 @@ class GwImportInpTask(GwTask):
         if DWF in self.network:
             self.progress_changed.emit("Others", lerp_progress(20, self.PROGRESS_VISUAL, self.PROGRESS_END), "Importing DWF", True)
             self._save_dwf()
+
+        if SUBCATCHMENTS in self.network:
+            self.progress_changed.emit("Others", lerp_progress(40, self.PROGRESS_VISUAL, self.PROGRESS_END), "Importing subcatchments", True)
+            self._save_subcatchments()
 
     def _get_db_units(self) -> None:
         units_query = "SELECT value FROM vi_options WHERE parameter = 'UNITS'"
@@ -1880,6 +1888,85 @@ class GwImportInpTask(GwTask):
             params.append((node_id, value, pat1, pat2, pat3, pat4))
         dwfs = toolsdb_execute_values(sql, params, template, fetch=True, commit=False)
         self.results["dwf"] = len(dwfs) if dwfs else 0
+
+    def _save_subcatchments(self):
+        sql = """
+            INSERT INTO inp_subcatchment (
+                subc_id, outlet_id, rg_id, area, imperv, width, slope, clength, snow_id, nimp, nperv, simp, sperv, zero, 
+                routeto, rted, maxrate, minrate, decay, drytime, maxinfil, suction, conduct, initdef, curveno, 
+                conduct_2, drytime_2, sector_id, hydrology_id, the_geom, descript, nperv_pattern_id, dstore_pattern_id, 
+                infil_pattern_id, minelev
+            )
+            VALUES %s
+            RETURNING subc_id, hydrology_id
+        """
+        template = "(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        params = []
+
+        def get_attr(obj, attr: str):
+            return getattr(obj, attr) if obj and hasattr(obj, attr) else None
+
+        def get_adjustment(attr: str, subc_name: str):
+            try:
+                return self.network[ADJUSTMENTS][(attr, subc_name)]
+            except KeyError:
+                return None
+
+        for subc_name, subc in self.network[SUBCATCHMENTS].items():
+            subarea = self.network[SUBAREAS].get(subc_name)
+
+            infiltration = self.network[INFILTRATION].get(subc_name)
+
+
+            # [SUBCATCHMENTS]
+            subc_id = subc_name
+            outlet_id = subc.outlet
+            rg_id = subc.rain_gage
+            area = subc.area
+            imperv = subc.imperviousness
+            width = subc.width
+            slope = subc.slope
+            clength = subc.curb_length
+            snow_id = nan_to_none(subc.snow_pack)
+            # [SUBAREAS]
+            nimp = get_attr(subarea, "n_imperv")
+            nperv = get_attr(subarea, "n_perv")
+            simp = get_attr(subarea, "storage_imperv")
+            sperv = get_attr(subarea, "storage_perv")
+            zero = get_attr(subarea, "pct_zero")
+            routeto = get_attr(subarea, "route_to")
+            rted = get_attr(subarea, "pct_routed")
+            # [INFILTRATION] -- InfiltrationHorton
+            maxrate = get_attr(infiltration, "rate_max")
+            minrate = get_attr(infiltration, "rate_min")
+            decay = get_attr(infiltration, "decay")
+            drytime = get_attr(infiltration, "time_dry") if isinstance(infiltration, InfiltrationHorton) else None
+            maxinfil = get_attr(infiltration, "volume_max")
+            # [INFILTRATION] -- InfiltrationGreenAmpt
+            suction = get_attr(infiltration, "suction_head")
+            conduct = get_attr(infiltration, "hydraulic_conductivity") if isinstance(infiltration, InfiltrationGreenAmpt) else None
+            initdef = get_attr(infiltration, "moisture_deficit_init")
+            # [INFILTRATION] -- InfiltrationCurveNumber
+            curveno = get_attr(infiltration, "curve_no")
+            conduct_2 = get_attr(infiltration, "hydraulic_conductivity") if isinstance(infiltration, InfiltrationCurveNumber) else None
+            drytime_2 = get_attr(infiltration, "time_dry") if isinstance(infiltration, InfiltrationCurveNumber) else None
+            # Giswater columns
+            sector_id = self.sector
+            hydrology_id = 1  # TODO: get/create from cat_hydrology, depending on infiltration kind
+            the_geom = None  # TODO: get_subc_geom()
+            descript = None
+            nperv_pattern_id = get_adjustment("N-PERV", subc_name)
+            dstore_pattern_id = get_adjustment("DSTORE", subc_name)
+            infil_pattern_id = get_adjustment("INFIL", subc_name)
+            minelev = None
+            params.append(
+                (subc_id, outlet_id, rg_id, area, imperv, width, slope, clength, snow_id, nimp, nperv, simp, sperv, zero,
+                 routeto, rted, maxrate, minrate, decay, drytime, maxinfil, suction, conduct, initdef, curveno,
+                 conduct_2, drytime_2, sector_id, hydrology_id, the_geom, descript, nperv_pattern_id, dstore_pattern_id,
+                 infil_pattern_id, minelev)
+            )
+        subcatchments = toolsdb_execute_values(sql, params, template, fetch=True, commit=False)
+        self.results["subcatchments"] = len(subcatchments) if subcatchments else 0
 
     def _save_sources(self):
         for s_name, s in self.network.sources():
