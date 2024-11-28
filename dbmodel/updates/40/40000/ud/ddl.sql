@@ -46,8 +46,8 @@ CREATE TABLE cat_arc (
 	geom_r varchar(20) NULL,
 	descript varchar(255) NULL,
 	link varchar(512) NULL,
-	brand varchar(30) NULL,
-	model varchar(30) NULL,
+	brand_id varchar(30) NULL,
+	model_id varchar(30) NULL,
 	svg varchar(50) NULL,
 	z1 numeric(12, 2) NULL,
 	z2 numeric(12, 2) NULL,
@@ -74,7 +74,9 @@ CREATE TABLE cat_arc (
 	CONSTRAINT cat_arc_m3protec_cost_fkey FOREIGN KEY (m3protec_cost) REFERENCES plan_price(id) ON DELETE CASCADE ON UPDATE CASCADE,
 	CONSTRAINT cat_arc_matcat_id_fkey FOREIGN KEY (matcat_id) REFERENCES cat_mat_arc(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT cat_arc_shape_id_fkey FOREIGN KEY (shape) REFERENCES cat_arc_shape(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT cat_arc_tsect_id_fkey FOREIGN KEY (tsect_id) REFERENCES inp_transects(id) ON DELETE RESTRICT ON UPDATE CASCADE
+	CONSTRAINT cat_arc_tsect_id_fkey FOREIGN KEY (tsect_id) REFERENCES inp_transects(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT cat_arc_brand_fkey FOREIGN KEY (brand_id) REFERENCES cat_brand(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT cat_arc_model_fkey FOREIGN KEY (model_id) REFERENCES cat_brand_model(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 CREATE INDEX cat_arc_cost_idx ON cat_arc USING btree (cost);
 CREATE INDEX cat_arc_m2bottom_cost_idx ON cat_arc USING btree (m2bottom_cost);
@@ -102,8 +104,8 @@ CREATE TABLE cat_node (
 	geom3 numeric(12, 2) DEFAULT 0 NULL,
 	descript varchar(255) NULL,
 	link varchar(512) NULL,
-	brand varchar(30) NULL,
-	model varchar(30) NULL,
+	brand_id varchar(30) NULL,
+	model_id varchar(30) NULL,
 	svg varchar(50) NULL,
 	estimated_y numeric(12, 2) NULL,
 	cost_unit varchar(3) DEFAULT 'u'::character varying NULL,
@@ -112,10 +114,10 @@ CREATE TABLE cat_node (
 	"label" varchar(255) NULL,
 	acoeff float8 NULL,
 	CONSTRAINT cat_node_pkey PRIMARY KEY (id),
-	CONSTRAINT cat_node_brand_fkey FOREIGN KEY (brand) REFERENCES cat_brand(id) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT cat_node_brand_fkey FOREIGN KEY (brand_id) REFERENCES cat_brand(id) ON DELETE CASCADE ON UPDATE CASCADE,
 	CONSTRAINT cat_node_cost_fkey FOREIGN KEY ("cost") REFERENCES plan_price(id) ON DELETE CASCADE ON UPDATE CASCADE,
 	CONSTRAINT cat_node_matcat_id_fkey FOREIGN KEY (matcat_id) REFERENCES cat_mat_node(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT cat_node_model_fkey FOREIGN KEY (model) REFERENCES cat_brand_model(id) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT cat_node_model_fkey FOREIGN KEY (model_id) REFERENCES cat_brand_model(id) ON DELETE CASCADE ON UPDATE CASCADE,
 	CONSTRAINT cat_node_node_type_fkey FOREIGN KEY (node_type) REFERENCES cat_feature_node(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT cat_node_shape_fkey FOREIGN KEY (shape) REFERENCES cat_node_shape(id) ON DELETE RESTRICT ON UPDATE CASCADE
 );
@@ -147,16 +149,16 @@ CREATE TABLE cat_connec (
 	geom_r varchar(20) NULL,
 	descript varchar(255) NULL,
 	link varchar(512) NULL,
-	brand varchar(30) NULL,
-	model varchar(30) NULL,
+	brand_id varchar(30) NULL,
+	model_id varchar(30) NULL,
 	svg varchar(50) NULL,
 	active bool DEFAULT true NULL,
 	"label" varchar(255) NULL,
 	CONSTRAINT cat_connec_pkey PRIMARY KEY (id),
-	CONSTRAINT cat_connec_brand_fkey FOREIGN KEY (brand) REFERENCES cat_brand(id) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT cat_connec_brand_fkey FOREIGN KEY (brand_id) REFERENCES cat_brand(id) ON DELETE CASCADE ON UPDATE CASCADE,
 	CONSTRAINT cat_connec_connec_type_fkey FOREIGN KEY (connec_type) REFERENCES cat_feature_connec(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT cat_connec_matcat_id_fkey FOREIGN KEY (matcat_id) REFERENCES cat_mat_arc(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT cat_connec_model_fkey FOREIGN KEY (model) REFERENCES cat_brand_model(id) ON DELETE CASCADE ON UPDATE CASCADE
+	CONSTRAINT cat_connec_model_fkey FOREIGN KEY (model_id) REFERENCES cat_brand_model(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 
@@ -188,16 +190,16 @@ CREATE TABLE cat_gully (
 	b_param numeric(12, 4) DEFAULT 0.00 NULL,
 	descript varchar(255) NULL,
 	link varchar(512) NULL,
-	brand varchar(30) NULL,
-	model varchar(30) NULL,
+	brand_id varchar(30) NULL,
+	model_id varchar(30) NULL,
 	svg varchar(50) NULL,
 	active bool DEFAULT true NULL,
 	"label" varchar(255) NULL,
 	CONSTRAINT cat_gully_pkey PRIMARY KEY (id),
-	CONSTRAINT cat_gully_brand_fkey FOREIGN KEY (brand) REFERENCES cat_brand(id) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT cat_gully_brand_fkey FOREIGN KEY (brand_id) REFERENCES cat_brand(id) ON DELETE CASCADE ON UPDATE CASCADE,
 	CONSTRAINT cat_gully_gully_type_fkey FOREIGN KEY (gully_type) REFERENCES cat_feature_gully(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT cat_gully_matcat_id_fkey FOREIGN KEY (matcat_id) REFERENCES cat_mat_grate(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT cat_gully_model_fkey FOREIGN KEY (model) REFERENCES cat_brand_model(id) ON DELETE CASCADE ON UPDATE CASCADE
+	CONSTRAINT cat_gully_model_fkey FOREIGN KEY (model_id) REFERENCES cat_brand_model(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 
