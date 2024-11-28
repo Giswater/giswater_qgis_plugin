@@ -388,10 +388,11 @@ BEGIN
 		ELSE
 			v_query_arc = 'SELECT * FROM arc WHERE state=1 AND expl_id IN ('||v_expl_id||')';
 			v_query_node = 'SELECT * FROM node WHERE state=1 AND expl_id IN ('||v_expl_id||')';
-			v_query_connec = 'SELECT c.* FROM connec c JOIN link l on feature_id = connec_id WHERE c.state=1 AND l.state = 1 AND c.expl_id IN ('||v_expl_id||')';
-			v_query_link = 'SELECT * FROM link WHERE state=1 AND expl_id IN ('||v_expl_id||')';
+			v_query_connec = 'SELECT c.* FROM connec c JOIN arc a on a.arc_id = c.arc_id WHERE c.state=1 AND a.state = 1 AND c.expl_id IN ('||v_expl_id||')';
+			v_query_link = 'SELECT * FROM link l join connec c on c.connec_id = l.feature_id WHERE c.state=1 AND l.state =1 AND l.feature_type = ''CONNEC'' AND l.expl_id IN ('||v_expl_id||')';
 			IF v_project_type='UD' THEN
-				v_query_gully = 'SELECT * FROM gully WHERE expl_id IN ('||v_expl_id||')';
+				v_query_gully = 'SELECT * FROM gully JOIN arc a on a.arc_id = g.arc_id WHERE g.state=1 AND a.state = 1 AND g.expl_id IN ('||v_expl_id||')';
+				v_query_link = 'SELECT * FROM link l join gully g on g.gully_id = l.feature_id WHERE c.state=1 AND l.state =1 AND l.feature_type = ''GULLY'' AND l.expl_id IN ('||v_expl_id||')';
 			END IF;
 		END IF;
 
