@@ -71,3 +71,6 @@ ALTER TABLE connec DROP CONSTRAINT connec_category_type_feature_type_fkey;
 ALTER TABLE connec DROP CONSTRAINT connec_fluid_type_feature_type_fkey;
 ALTER TABLE connec DROP CONSTRAINT connec_function_type_feature_type_fkey;
 ALTER TABLE connec DROP CONSTRAINT connec_location_type_feature_type_fkey;
+
+-- 28/11/2024
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"cat_element", "column":"elementtype_id", "newName":"element_type"}}$$);

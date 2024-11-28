@@ -972,7 +972,7 @@ CREATE OR REPLACE VIEW v_edit_element AS
 SELECT e.* FROM ( SELECT element.element_id,
     element.code,
     element.elementcat_id,
-    cat_element.elementtype_id,
+    cat_element.element_type,
     element.brand_id,
     element.model_id,
     element.serial_number,
@@ -1013,7 +1013,7 @@ SELECT e.* FROM ( SELECT element.element_id,
    FROM selector_expl, element
      JOIN v_state_element ON element.element_id::text = v_state_element.element_id::text
      JOIN cat_element ON element.elementcat_id::text = cat_element.id::text
-     JOIN element_type ON element_type.id::text = cat_element.elementtype_id::text
+     JOIN element_type ON element_type.id::text = cat_element.element_type::text
   WHERE element.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text) e
   join selector_sector s using (sector_id)
   LEFT JOIN selector_municipality m using (muni_id)

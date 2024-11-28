@@ -12,7 +12,7 @@ This version of Giswater is provided by Giswater Association
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_element()
 RETURNS trigger AS
 $BODY$
-DECLARE 
+DECLARE
 
 v_code_autofill_bool boolean;
 v_doublegeometry boolean;
@@ -24,9 +24,9 @@ v_unitsfactor float;
 v_linelocatepoint float;
 v_thegeom public.geometry;
 v_the_geom_pol public.geometry;
-p21x float; 
+p21x float;
 p02x float;
-p21y float; 
+p21y float;
 p02y float;
 p22x float;
 p22y float;
@@ -42,7 +42,7 @@ v_project_type text;
 
 v_feature text;
 v_tablefeature text;
-v_elementtype_id text;
+v_element_type text;
 v_trace_featuregeom boolean;
 
 BEGIN
@@ -62,12 +62,12 @@ BEGIN
 
 	-- get element_type and associated feature
 	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
-        SELECT elementtype_id INTO v_elementtype_id FROM cat_element WHERE id=NEW.elementcat_id;
+        SELECT element_type INTO v_element_type FROM cat_element WHERE id=NEW.elementcat_id;
 		SELECT node_id, 'node'::text INTO v_feature, v_tablefeature FROM v_edit_node WHERE st_dwithin(the_geom, NEW.the_geom, 0.01);
 		IF v_feature IS NULL THEN
 			SELECT connec_id, 'connec'::text INTO v_feature, v_tablefeature FROM v_edit_connec WHERE st_dwithin(the_geom, NEW.the_geom, 0.01);
 			IF v_feature IS NULL THEN
-				SELECT arc_id, 'arc'::text INTO v_feature, v_tablefeature FROM v_edit_arc WHERE st_dwithin(the_geom, NEW.the_geom, 0.01);		
+				SELECT arc_id, 'arc'::text INTO v_feature, v_tablefeature FROM v_edit_arc WHERE st_dwithin(the_geom, NEW.the_geom, 0.01);
 				IF v_feature IS NULL AND v_project_type='UD' THEN
 					SELECT gully_id, 'gully'::text INTO v_feature, v_tablefeature FROM v_edit_gully WHERE st_dwithin(the_geom, NEW.the_geom, 0.01);
 				END IF;
@@ -87,22 +87,22 @@ BEGIN
 		IF (NEW.elementcat_id IS NULL) THEN
 			NEW.elementcat_id:= (SELECT "value" FROM config_param_user WHERE "parameter"='edit_elementcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 		END IF;
-	
+
 		-- Verified
 		IF (NEW.verified IS NULL) THEN
 			NEW.verified := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_verified_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 		END IF;
-	
+
 		-- State
 		IF (NEW.state IS NULL) THEN
 			NEW.state := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_state_vdefault' AND "cur_user"="current_user"());
 		END IF;
-        
+
 		-- State type
 		IF (NEW.state_type IS NULL) THEN
 			NEW.state_type := (SELECT "value" FROM config_param_user WHERE "parameter"='state_type_vdefault' AND "cur_user"="current_user"());
 		END IF;
-	
+
 		-- Exploitation
 		IF (NEW.expl_id IS NULL) THEN
 			NEW.expl_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_exploitation_vdefault' AND "cur_user"="current_user"());
@@ -111,10 +111,10 @@ BEGIN
 				IF (NEW.expl_id IS NULL) THEN
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
        				 "data":{"message":"2012", "function":"1114","debug_msg":"'||NEW.element_id||'"}}$$);';
-				END IF;		
+				END IF;
 			END IF;
-		END IF;		
-	
+		END IF;
+
 		-- Sector
 		IF (NEW.sector_id IS NULL) THEN
 			NEW.sector_id := (SELECT sector_id FROM sector WHERE ST_intersects(NEW.the_geom, sector.the_geom) AND active IS TRUE limit 1);
@@ -123,33 +123,33 @@ BEGIN
 				NEW.sector_id := 0;
 			END IF;
 		END IF;
-	
+
 		-- Municipality
 		IF (NEW.muni_id IS NULL) THEN
 			NEW.muni_id := (SELECT m.muni_id FROM ext_municipality m WHERE ST_intersects(NEW.the_geom, m.the_geom) AND active IS TRUE limit 1);
 		END IF;
-	
+
 
 		-- Enddate
 		IF (NEW.state > 0) THEN
 			NEW.enddate := NULL;
 		END IF;
 
-		--Inventory	
+		--Inventory
 		NEW.inventory := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_inventory_sysvdefault');
 
 		--Publish
-		NEW.publish := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_publish_sysvdefault');	
+		NEW.publish := (SELECT "value" FROM config_param_system WHERE "parameter"='edit_publish_sysvdefault');
 
-		-- Element id 
+		-- Element id
 		IF (NEW.element_id IS NULL) THEN
 			NEW.element_id:= (SELECT nextval('urn_id_seq'));
 		END IF;
-		
-		SELECT code_autofill INTO v_code_autofill_bool FROM element_type join cat_element on element_type.id=cat_element.elementtype_id where cat_element.id=NEW.elementcat_id;
+
+		SELECT code_autofill INTO v_code_autofill_bool FROM element_type join cat_element on element_type.id=cat_element.element_type where cat_element.id=NEW.elementcat_id;
 
 		--Copy id to code field
-		IF (v_code_autofill_bool IS TRUE) THEN 
+		IF (v_code_autofill_bool IS TRUE) THEN
 			NEW.code=NEW.element_id;
 		END IF;
 
@@ -182,7 +182,7 @@ BEGIN
 			v_width = (SELECT geom2 FROM cat_element WHERE id=NEW.elementcat_id);
 
 			IF v_length IS NULL OR v_length = 0 THEN
-			
+
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				"data":{"message":"3152", "function":"1114","debug_msg":"'||NEW.elementcat_id::text||'"}}$$);';
 
@@ -190,11 +190,11 @@ BEGIN
 
 				-- get element dimensions to generate CIRCULARE geometry
 				v_pol_id:= (SELECT nextval('urn_id_seq'));
-				INSERT INTO polygon(sys_type, the_geom, pol_id, featurecat_id, feature_id) 
-				VALUES ('ELEMENT', St_Multi(ST_buffer(NEW.the_geom, v_length*0.01*v_unitsfactor/2)),v_pol_id, v_elementtype_id, NEW.element_id);
+				INSERT INTO polygon(sys_type, the_geom, pol_id, featurecat_id, feature_id)
+				VALUES ('ELEMENT', St_Multi(ST_buffer(NEW.the_geom, v_length*0.01*v_unitsfactor/2)),v_pol_id, v_element_type, NEW.element_id);
 
 			ELSIF v_length*v_width != 0 THEN
- 
+
 				-- get element dimensions
 				v_unitsfactor = 0.01*v_unitsfactor ; -- using 0.01 to convert from cms of catalog  to meters of the map
 				v_length = v_length*v_unitsfactor;
@@ -203,7 +203,7 @@ BEGIN
 				-- calculate center coordinates
 				v_x = st_x(NEW.the_geom);
 				v_y = st_y(NEW.the_geom);
-	    
+
 				-- calculate dx & dy to fix extend from center
 				dx = v_length/2;
 				dy = v_width/2;
@@ -211,36 +211,36 @@ BEGIN
 				-- calculate the extend polygon
 				p01x = v_x - dx*cos(v_rotation)-dy*sin(v_rotation);
 				p01y = v_y - dx*sin(v_rotation)+dy*cos(v_rotation);
-		
+
 				p02x = v_x + dx*cos(v_rotation)-dy*sin(v_rotation);
 				p02y = v_y + dx*sin(v_rotation)+dy*cos(v_rotation);
 
 				p21x = v_x - dx*cos(v_rotation)+dy*sin(v_rotation);
-				p21y = v_y - dx*sin(v_rotation)-dy*cos(v_rotation); 
+				p21y = v_y - dx*sin(v_rotation)-dy*cos(v_rotation);
 
 				p22x = v_x + dx*cos(v_rotation)+dy*sin(v_rotation);
 				p22y = v_y + dx*sin(v_rotation)-dy*cos(v_rotation);
-				
+
 
 				-- generating the geometry
 				EXECUTE 'SELECT ST_Multi(ST_makePolygon(St_SetSrid(ST_GeomFromText(''LINESTRING(' || p21x ||' '|| p21y || ',' ||
 					p22x ||' '|| p22y || ',' || p02x || ' ' || p02y || ','|| p01x ||' '|| p01y || ',' || p21x ||' '|| p21y || ')''),'||v_srid||')))'
 					INTO v_the_geom_pol;
-				
+
 				v_pol_id:= (SELECT nextval('urn_id_seq'));
 
-				INSERT INTO polygon(sys_type, the_geom, pol_id, featurecat_id, feature_id) 
-				VALUES ('ELEMENT', v_the_geom_pol, v_pol_id, v_elementtype_id, NEW.element_id);
+				INSERT INTO polygon(sys_type, the_geom, pol_id, featurecat_id, feature_id)
+				VALUES ('ELEMENT', v_the_geom_pol, v_pol_id, v_element_type, NEW.element_id);
 			END IF;
 		END IF;
-		
-		-- FEATURE INSERT      
-		INSERT INTO element (element_id, code, elementcat_id, model_id, brand_id, serial_number, "state", state_type, observ, "comment", function_type, category_type, location_type, 
-		workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, rotation, link, verified, the_geom, label_x, label_y, label_rotation, publish, 
+
+		-- FEATURE INSERT
+		INSERT INTO element (element_id, code, elementcat_id, model_id, brand_id, serial_number, "state", state_type, observ, "comment", function_type, category_type, location_type,
+		workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, rotation, link, verified, the_geom, label_x, label_y, label_rotation, publish,
 		inventory, undelete, expl_id, num_elements, pol_id, expl_id2, sector_id, muni_id)
-		VALUES (NEW.element_id, NEW.code, NEW.elementcat_id, NEW.model_id, NEW.brand_id, NEW.serial_number, NEW."state", NEW.state_type, NEW.observ, NEW."comment", 
-		NEW.function_type, NEW.category_type, NEW.location_type, NEW.workcat_id, NEW.workcat_id_end, NEW.buildercat_id, NEW.builtdate, NEW.enddate, 
-		NEW.ownercat_id, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom, NEW.label_x, NEW.label_y, NEW.label_rotation, NEW.publish, 
+		VALUES (NEW.element_id, NEW.code, NEW.elementcat_id, NEW.model_id, NEW.brand_id, NEW.serial_number, NEW."state", NEW.state_type, NEW.observ, NEW."comment",
+		NEW.function_type, NEW.category_type, NEW.location_type, NEW.workcat_id, NEW.workcat_id_end, NEW.buildercat_id, NEW.builtdate, NEW.enddate,
+		NEW.ownercat_id, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom, NEW.label_x, NEW.label_y, NEW.label_rotation, NEW.publish,
 		NEW.inventory, NEW.undelete, NEW.expl_id, NEW.num_elements, v_pol_id, NEW.expl_id2, NEW.sector_id, NEW.muni_id);
 
 		-- update element_x_feature table
@@ -248,11 +248,11 @@ BEGIN
 			EXECUTE 'INSERT INTO element_x_'||v_tablefeature||' ('||v_tablefeature||'_id, element_id) VALUES ('||v_feature||','||NEW.element_id||') ON CONFLICT 
 			('||v_tablefeature||'_id, element_id) DO NOTHING';
 		END IF;
-		
+
 		IF v_project_type = 'WS' THEN
 
 			--elevation from raster
-			IF (SELECT json_extract_path_text(value::json,'activated')::boolean FROM config_param_system WHERE parameter='admin_raster_dem') IS TRUE 
+			IF (SELECT json_extract_path_text(value::json,'activated')::boolean FROM config_param_system WHERE parameter='admin_raster_dem') IS TRUE
 			 AND (NEW.elevation IS NULL) AND
 			(SELECT upper(value)  FROM config_param_user WHERE parameter = 'edit_insert_elevation_from_dem' and cur_user = current_user) = 'TRUE' THEN
 				NEW.elevation = (SELECT ST_Value(rast,1,NEW.the_geom,true) FROM ext_raster_dem WHERE id =
@@ -263,7 +263,7 @@ BEGIN
 		ELSIF v_project_type = 'UD' THEN
 
 				--elevation from raster
-			IF (SELECT json_extract_path_text(value::json,'activated')::boolean FROM config_param_system WHERE parameter='admin_raster_dem') IS TRUE 
+			IF (SELECT json_extract_path_text(value::json,'activated')::boolean FROM config_param_system WHERE parameter='admin_raster_dem') IS TRUE
 			AND (NEW.top_elev IS NULL) AND
 			(SELECT upper(value)  FROM config_param_user WHERE parameter = 'edit_insert_elevation_from_dem' and cur_user = current_user) = 'TRUE' THEN
 				NEW.top_elev = (SELECT ST_Value(rast,1,NEW.the_geom,true) FROM ext_raster_dem WHERE id =
@@ -280,9 +280,9 @@ BEGIN
 	ELSIF TG_OP = 'UPDATE' THEN
 
 		UPDATE element
-		SET element_id=NEW.element_id, code=NEW.code,  elementcat_id=NEW.elementcat_id, model_id=NEW.model_id, brand_id=NEW.brand_id, serial_number=NEW.serial_number, "state"=NEW."state", state_type=NEW.state_type, observ=NEW.observ, "comment"=NEW."comment", 
-		function_type=NEW.function_type, category_type=NEW.category_type,  location_type=NEW.location_type, workcat_id=NEW.workcat_id, workcat_id_end=NEW.workcat_id_end, 
-		buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, enddate=NEW.enddate, ownercat_id=NEW.ownercat_id, rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, 
+		SET element_id=NEW.element_id, code=NEW.code,  elementcat_id=NEW.elementcat_id, model_id=NEW.model_id, brand_id=NEW.brand_id, serial_number=NEW.serial_number, "state"=NEW."state", state_type=NEW.state_type, observ=NEW.observ, "comment"=NEW."comment",
+		function_type=NEW.function_type, category_type=NEW.category_type,  location_type=NEW.location_type, workcat_id=NEW.workcat_id, workcat_id_end=NEW.workcat_id_end,
+		buildercat_id=NEW.buildercat_id, builtdate=NEW.builtdate, enddate=NEW.enddate, ownercat_id=NEW.ownercat_id, rotation=NEW.rotation, link=NEW.link, verified=NEW.verified,
 		the_geom=NEW.the_geom, label_x=NEW.label_x, label_y=NEW.label_y, label_rotation=NEW.label_rotation, publish=NEW.publish, inventory=NEW.inventory, undelete=NEW.undelete,expl_id=NEW.expl_id, num_elements=NEW.num_elements,
 		lastupdate=now(), lastupdate_user=current_user, trace_featuregeom=NEW.trace_featuregeom, sector_id=NEW.sector_id, muni_id=NEW.muni_id
 		WHERE element_id=OLD.element_id;
@@ -292,7 +292,7 @@ BEGIN
 			IF st_equals(NEW.the_geom, OLD.the_geom) IS FALSE AND geometrytype(NEW.the_geom)='POINT'  THEN
 
 				--update elevation from raster
-				IF (SELECT json_extract_path_text(value::json,'activated')::boolean FROM config_param_system WHERE parameter='admin_raster_dem') IS TRUE 	
+				IF (SELECT json_extract_path_text(value::json,'activated')::boolean FROM config_param_system WHERE parameter='admin_raster_dem') IS TRUE
 				AND (NEW.elevation = OLD.elevation) AND
 				(SELECT upper(value)  FROM config_param_user WHERE parameter = 'edit_update_elevation_from_dem' and cur_user = current_user) = 'TRUE' THEN
 					NEW.elevation = (SELECT ST_Value(rast,1,NEW.the_geom,true) FROM ext_raster_dem WHERE id =
@@ -307,7 +307,7 @@ BEGIN
 			IF st_equals( NEW.the_geom, OLD.the_geom) IS FALSE THEN
 
 				--update elevation from raster
-				IF (SELECT json_extract_path_text(value::json,'activated')::boolean FROM config_param_system WHERE parameter='admin_raster_dem') IS TRUE 
+				IF (SELECT json_extract_path_text(value::json,'activated')::boolean FROM config_param_system WHERE parameter='admin_raster_dem') IS TRUE
 				AND (NEW.top_elev = OLD.top_elev) AND
 				(SELECT upper(value)  FROM config_param_user WHERE parameter = 'edit_update_elevation_from_dem' and cur_user = current_user) = 'TRUE' THEN
 					NEW.top_elev = (SELECT ST_Value(rast,1,NEW.the_geom,true) FROM ext_raster_dem WHERE id =
@@ -316,7 +316,7 @@ BEGIN
 			END IF;
 			UPDATE element SET top_elev = NEW.top_elev WHERE element_id = OLD.element_id;
 		END IF;
-		
+
 		--set rotation field
 		WITH index_query AS(
 		SELECT ST_Distance(the_geom, NEW.the_geom) as distance, the_geom FROM arc WHERE state=1 ORDER BY the_geom <-> NEW.the_geom LIMIT 10)
@@ -336,7 +336,7 @@ BEGIN
 		v_doublegeometry = (SELECT isdoublegeom FROM cat_element WHERE id = NEW.elementcat_id);
 
 		-- double geometry catalog update
-		IF v_insert_double_geom AND v_doublegeometry AND 
+		IF v_insert_double_geom AND v_doublegeometry AND
 		(NEW.elementcat_id != OLD.elementcat_id OR NEW.the_geom::text <> OLD.the_geom::text) THEN
 
 			v_length = (SELECT geom1 FROM cat_element WHERE id=NEW.elementcat_id);
@@ -354,12 +354,12 @@ BEGIN
 				-- get element dimensions to generate CIRCULARE geometry
 				IF (SELECT pol_id FROM element WHERE element_id = NEW.element_id) IS NULL THEN
 					INSERT INTO polygon(sys_type, the_geom, pol_id, featurecat_id, feature_id)
-					VALUES ('ELEMENT', St_multi(ST_buffer(NEW.the_geom, v_length*0.01*v_unitsfactor/2)),v_pol_id, v_elementtype_id, NEW.element_id);
+					VALUES ('ELEMENT', St_multi(ST_buffer(NEW.the_geom, v_length*0.01*v_unitsfactor/2)),v_pol_id, v_element_type, NEW.element_id);
 					UPDATE element SET pol_id=v_pol_id WHERE element_id = NEW.element_id;
 				ELSE
 					SELECT trace_featuregeom INTO v_trace_featuregeom FROM polygon WHERE feature_id=OLD.element_id;
-					IF v_trace_featuregeom IS TRUE THEN   
-						UPDATE polygon SET the_geom = St_multi(ST_buffer(NEW.the_geom, v_length*0.01*v_unitsfactor/2)) 
+					IF v_trace_featuregeom IS TRUE THEN
+						UPDATE polygon SET the_geom = St_multi(ST_buffer(NEW.the_geom, v_length*0.01*v_unitsfactor/2))
 						WHERE pol_id = (SELECT pol_id FROM element WHERE element_id = NEW.element_id);
 					END IF;
 				END IF;
@@ -374,7 +374,7 @@ BEGIN
 				-- calculate center coordinates
 				v_x = st_x(NEW.the_geom);
 				v_y = st_y(NEW.the_geom);
-	    
+
 				-- calculate dx & dy to fix extend from center
 				dx = v_length/2;
 				dy = v_width/2;
@@ -382,16 +382,16 @@ BEGIN
 				-- calculate the extend polygon
 				p01x = v_x - dx*cos(v_rotation)-dy*sin(v_rotation);
 				p01y = v_y - dx*sin(v_rotation)+dy*cos(v_rotation);
-		
+
 				p02x = v_x + dx*cos(v_rotation)-dy*sin(v_rotation);
 				p02y = v_y + dx*sin(v_rotation)+dy*cos(v_rotation);
 
 				p21x = v_x - dx*cos(v_rotation)+dy*sin(v_rotation);
-				p21y = v_y - dx*sin(v_rotation)-dy*cos(v_rotation); 
+				p21y = v_y - dx*sin(v_rotation)-dy*cos(v_rotation);
 
 				p22x = v_x + dx*cos(v_rotation)+dy*sin(v_rotation);
 				p22y = v_y + dx*sin(v_rotation)-dy*cos(v_rotation);
-				
+
 				-- generating the geometry
 				EXECUTE 'SELECT ST_Multi(ST_makePolygon(St_SetSrid(ST_GeomFromText(''LINESTRING(' || p21x ||' '|| p21y || ',' ||
 					p22x ||' '|| p22y || ',' || p02x || ' ' || p02y || ','|| p01x ||' '|| p01y || ',' || p21x ||' '|| p21y || ')''),'||v_srid||')))'
@@ -400,13 +400,13 @@ BEGIN
 				v_pol_id:= (SELECT nextval('urn_id_seq'));
 
 				IF (SELECT pol_id FROM element WHERE element_id = NEW.element_id) IS NULL THEN
-					INSERT INTO polygon(sys_type, the_geom, pol_id, featurecat_id, feature_id) 
-					VALUES ('ELEMENT', v_the_geom_pol, v_pol_id, v_elementtype_id, NEW.element_id);
+					INSERT INTO polygon(sys_type, the_geom, pol_id, featurecat_id, feature_id)
+					VALUES ('ELEMENT', v_the_geom_pol, v_pol_id, v_element_type, NEW.element_id);
 					UPDATE element SET pol_id=v_pol_id WHERE element_id = NEW.element_id;
 
 				ELSE
 					SELECT trace_featuregeom INTO v_trace_featuregeom FROM polygon WHERE feature_id=OLD.element_id;
-					IF v_trace_featuregeom IS TRUE THEN   
+					IF v_trace_featuregeom IS TRUE THEN
 						UPDATE polygon SET the_geom = v_the_geom_pol WHERE pol_id = (SELECT pol_id FROM element WHERE element_id = NEW.element_id);
 					END IF;
 				END IF;
@@ -415,16 +415,16 @@ BEGIN
 			-- Updating polygon geometry in case of exists it
 			SELECT pol_id, trace_featuregeom INTO v_pol_id, v_trace_featuregeom FROM polygon WHERE feature_id=OLD.element_id;
 			IF v_pol_id IS NOT NULL AND (NEW.the_geom::text <> OLD.the_geom::text) THEN
-				IF v_trace_featuregeom IS TRUE THEN   
+				IF v_trace_featuregeom IS TRUE THEN
 					v_x= (st_x(NEW.the_geom)-st_x(OLD.the_geom));
 					v_y= (st_y(NEW.the_geom)-st_y(OLD.the_geom));
 					UPDATE polygon SET the_geom=ST_translate(the_geom, v_x, v_y) WHERE pol_id=v_pol_id;
 				END IF;
 			END IF;
 		END IF;
-		
+
 		RETURN NEW;
-    
+
 	-- DELETE
 	ELSIF TG_OP = 'DELETE' THEN
 
@@ -432,13 +432,13 @@ BEGIN
     	IF OLD.pol_id IS NOT NULL THEN
 			DELETE FROM polygon WHERE feature_id=OLD.element_id;
 		END IF;
-        
+
 		DELETE FROM element WHERE element_id=OLD.element_id;
 
         RETURN NULL;
-   
+
 	END IF;
-    
+
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
