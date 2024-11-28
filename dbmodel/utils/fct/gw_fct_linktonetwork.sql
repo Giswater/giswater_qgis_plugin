@@ -463,10 +463,12 @@ BEGIN
 						v_connect.state, v_arc.expl_id, v_arc.sector_id, v_dma_value, v_fluidtype_value, v_connect.muni_id);
 					END IF;
 				ELSE
-					UPDATE link SET the_geom=v_link.the_geom, exit_type=v_link.exit_type, exit_id=v_link.exit_id, dma_id = v_dma_value, fluid_type = v_fluidtype_value WHERE link_id = v_link.link_id;
+					UPDATE link SET the_geom=v_link.the_geom, exit_type=v_link.exit_type, exit_id=v_link.exit_id, dma_id = v_dma_value, fluid_type = v_fluidtype_value
+					WHERE link_id = v_link.link_id;
 	
 					IF v_projecttype = 'WS' THEN
-						UPDATE link SET	presszone_id=v_arc.presszone_id, dqa_id=v_arc.dqa_id, minsector_id=v_arc.minsector_id;
+						UPDATE link SET	presszone_id=v_arc.presszone_id, dqa_id=v_arc.dqa_id, minsector_id=v_arc.minsector_id
+						WHERE link_id = v_link.link_id;
 					END IF;
 				END IF;
 	
