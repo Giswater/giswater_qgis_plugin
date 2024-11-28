@@ -320,6 +320,7 @@ class GwImportSwmm:
                 'DELETE FROM inp_timeseries_value CASCADE;',
                 'DELETE FROM inp_timeseries CASCADE;',
                 'DELETE FROM inp_controls CASCADE;',
+                'DELETE FROM inp_files CASCADE;',
                 'DELETE FROM arc CASCADE;',
                 "DELETE FROM cat_work WHERE id = 'import_inp_test';",
                 "DELETE FROM cat_dscenario WHERE expl_id = 1;",

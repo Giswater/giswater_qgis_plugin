@@ -183,6 +183,7 @@ class GwImportInpTask(GwTask):
         self.exception: str = ""
 
         self.node_ids: dict[str, str] = {}
+        self.results: dict[str, int] = {}
 
     def run(self) -> bool:
         super().run()
@@ -215,7 +216,9 @@ class GwImportInpTask(GwTask):
             # self.progress_changed.emit("Sources", self.PROGRESS_SOURCES, "done!", True)
 
             execute_sql("select 1", commit=True)
-            self.progress_changed.emit("", self.PROGRESS_END, "ALL DONE! INP successfully imported.", True)
+            report_message = '\n'.join([f"{k.upper()} imported: {v}" for k, v in self.results.items()])
+            self.progress_changed.emit("REPORT", self.PROGRESS_END, report_message, True)
+            self.progress_changed.emit("REPORT", self.PROGRESS_END, "ALL DONE! INP successfully imported.", True)
             return True
         except Exception as e:
             self.exception = traceback.format_exc()
@@ -378,11 +381,9 @@ class GwImportInpTask(GwTask):
         """
         template = "(%s, %s, %s)"
 
-        print("FILES:")
-        print(params)
-
         # Execute batch update
         toolsdb_execute_values(sql, params, template, fetch=False, commit=False)
+        self.results["files"] = len(self.network[FILES])
 
     def _create_workcat_id(self):
         sql = """
@@ -505,6 +506,7 @@ class GwImportInpTask(GwTask):
         if pattern_rows:
             patterns_db = [x[0] for x in pattern_rows]
 
+        self.results["patterns"] = 0
         for pattern_name, pattern in self.network[PATTERNS].items():
             if pattern_name in patterns_db:
                 for i in count(2):
@@ -537,6 +539,7 @@ class GwImportInpTask(GwTask):
                 f"VALUES ({values_str})"
             )
             execute_sql(sql, values, commit=False)
+            self.results["patterns"] += 1
 
     def _save_curves(self) -> None:
         curve_rows = get_rows("SELECT id FROM inp_curve", commit=False)
@@ -544,6 +547,7 @@ class GwImportInpTask(GwTask):
         if curve_rows:
             curves_db = {x[0] for x in curve_rows}
 
+        self.results["curves"] = 0
         for curve_name, curve in self.network[CURVES].items():
             if curve.kind is None:
                 message = f'The "{curve_name}" curve does not have a specified curve type and was not imported.'
@@ -574,6 +578,7 @@ class GwImportInpTask(GwTask):
                     (curve_name, x, y),
                     commit=False,
                 )
+            self.results["curves"] += 1
 
     def _save_timeseries(self) -> None:
         ts_rows = get_rows("SELECT id FROM inp_timeseries", commit=False)
@@ -600,6 +605,7 @@ class GwImportInpTask(GwTask):
             ts_data_f = format_time(ts_data[0], ts_data[1])
             return ts_data_f
 
+        self.results["timeseries"] = 0
         for ts_name, ts in self.network[TIMESERIES].items():
             if ts is None:
                 message = f'The timeseries "{ts_name}" was not imported.'
@@ -649,6 +655,7 @@ class GwImportInpTask(GwTask):
                     (ts_name,) + ts_data_f,
                     commit=False,
                 )
+            self.results["timeseries"] += 1
 
     def _save_controls(self) -> None:
         controls_rows = get_rows("SELECT text FROM inp_controls", commit=False)
@@ -656,6 +663,7 @@ class GwImportInpTask(GwTask):
         if controls_rows:
             controls_db = {x[0] for x in controls_rows}
 
+        self.results["controls"] = 0
         for control_name, control in self.network[CONTROLS].items():
             text = control.to_inp_line()
             if text in controls_db:
@@ -665,6 +673,7 @@ class GwImportInpTask(GwTask):
             sql = "INSERT INTO inp_controls (sector_id, text, active) VALUES (%s, %s, true)"
             params = (self.sector, text)
             execute_sql(sql, params, commit=False)
+            self.results["controls"] += 1
 
     def _save_lids(self) -> None:
         lid_rows = get_rows("SELECT lidco_id FROM inp_lid", commit=False)
@@ -672,6 +681,7 @@ class GwImportInpTask(GwTask):
         if lid_rows:
             lids_db = {x[0] for x in lid_rows}
 
+        self.results["lids"] = 0
         for lid_name, lid in self.network[LID_CONTROLS].items():
             if lid_name in lids_db:
                 # Manage if lid already exists
@@ -713,6 +723,7 @@ class GwImportInpTask(GwTask):
                     continue
                 params.append(lid_values)
             toolsdb_execute_values(sql, params, template, commit=False)
+            self.results["lids"] += 1
 
     def _save_junctions(self) -> None:
         feature_class = self.catalogs['features']['junctions']
@@ -791,6 +802,7 @@ class GwImportInpTask(GwTask):
             node_sql, node_params, node_template, fetch=True, commit=False
         )
         print(junctions)
+        self.results["junctions"] = len(junctions) if junctions else 0
         if not junctions:
             self._log_message("Junctions couldn't be inserted!")
             return
@@ -899,6 +911,7 @@ class GwImportInpTask(GwTask):
             node_sql, node_params, node_template, fetch=True, commit=False
         )
         print(outfalls)
+        self.results["outfalls"] = len(outfalls) if outfalls else 0
         if not outfalls:
             self._log_message("Outfalls couldn't be inserted!")
             return
@@ -1011,6 +1024,7 @@ class GwImportInpTask(GwTask):
             node_sql, node_params, node_template, fetch=True, commit=False
         )
         print(dividers)
+        self.results["dividers"] = len(dividers) if dividers else 0
         if not dividers:
             self._log_message("Dividers couldn't be inserted!")
             return
@@ -1127,6 +1141,7 @@ class GwImportInpTask(GwTask):
             node_sql, node_params, node_template, fetch=True, commit=False
         )
         print(storage)
+        self.results["storage"] = len(storage) if storage else 0
         if not storage:
             self._log_message("Dividers couldn't be inserted!")
             return
@@ -1240,6 +1255,7 @@ class GwImportInpTask(GwTask):
             arc_sql, arc_params, arc_template, fetch=True, commit=False
         )
         print(pumps)
+        self.results["pumps"] = len(pumps) if pumps else 0
         if not pumps:
             self._log_message("Pumps couldn't be inserted!")
             return
@@ -1356,6 +1372,7 @@ class GwImportInpTask(GwTask):
             arc_sql, arc_params, arc_template, fetch=True, commit=False
         )
         print(orifices)
+        self.results["orifices"] = len(orifices) if orifices else 0
         if not orifices:
             self._log_message("Orifices couldn't be inserted!")
             return
@@ -1478,6 +1495,7 @@ class GwImportInpTask(GwTask):
             arc_sql, arc_params, arc_template, fetch=True, commit=False
         )
         print(weirs)
+        self.results["weirs"] = len(weirs) if weirs else 0
         if not weirs:
             self._log_message("Weirs couldn't be inserted!")
             return
@@ -1591,6 +1609,7 @@ class GwImportInpTask(GwTask):
             arc_sql, arc_params, arc_template, fetch=True, commit=False
         )
         print(outlets)
+        self.results["outlets"] = len(outlets) if outlets else 0
         if not outlets:
             self._log_message("Outlets couldn't be inserted!")
             return
@@ -1718,6 +1737,7 @@ class GwImportInpTask(GwTask):
             arc_sql, arc_params, arc_template, fetch=True, commit=False
         )
         print(conduits)
+        self.results["conduits"] = len(conduits) if conduits else 0
         if not conduits:
             self._log_message("Conduits couldn't be inserted!")
             return
