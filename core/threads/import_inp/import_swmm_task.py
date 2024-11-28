@@ -13,9 +13,9 @@ try:
         OPTIONS, REPORT, FILES,
         JUNCTIONS, OUTFALLS, DIVIDERS, STORAGE,
         CONDUITS, PUMPS, ORIFICES, WEIRS, OUTLETS,
-        XSECTIONS, COORDINATES, VERTICES,
+        XSECTIONS, COORDINATES, VERTICES, SYMBOLS,
         PATTERNS, CURVES, TIMESERIES, CONTROLS, LID_CONTROLS, LID_USAGE,
-        LOSSES, INFLOWS, DWF
+        LOSSES, INFLOWS, DWF, SUBCATCHMENTS, RAINGAGES
     )
     from swmm_api.input_file.sections import (
         Conduit, CrossSection, Pattern, TimeseriesData, TimeseriesFile
@@ -26,9 +26,9 @@ except ImportError:
     OPTIONS, REPORT, FILES = None, None, None
     JUNCTIONS, OUTFALLS, DIVIDERS, STORAGE = None, None, None, None
     CONDUITS, PUMPS, ORIFICES, WEIRS, OUTLETS = None, None, None, None, None
-    XSECTIONS, COORDINATES, VERTICES = None, None, None
+    XSECTIONS, COORDINATES, VERTICES, SYMBOLS = None, None, None, None
     PATTERNS, CURVES, TIMESERIES, CONTROLS, LID_CONTROLS, LID_USAGE  = None, None, None, None, None, None
-    LOSSES, INFLOWS, DWF = None, None, None
+    LOSSES, INFLOWS, DWF, SUBCATCHMENTS, RAINGAGES = None, None, None, None, None
 
     Conduit, CrossSection, Pattern, TimeseriesData, TimeseriesFile = None, None, None, None, None
     pass
@@ -292,6 +292,9 @@ class GwImportInpTask(GwTask):
 
         self.progress_changed.emit("Visual objects", lerp_progress(80, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing conduits", True)
         self._save_conduits()
+
+        self.progress_changed.emit("Visual objects", lerp_progress(95, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing raingages", True)
+        self._save_raingages()
 
     def _manage_others(self) -> None:
         if INFLOWS in self.network:
@@ -1778,6 +1781,62 @@ class GwImportInpTask(GwTask):
         toolsdb_execute_values(
             man_sql, man_params, man_template, fetch=False, commit=False
         )
+
+    def _save_raingages(self) -> None:
+
+        node_sql = """ 
+            INSERT INTO raingage (
+                the_geom, expl_id, muni_id, rg_id, form_type, intvl, scf, rgage_type, timser_id, fname, sta, units
+            ) VALUES %s
+            RETURNING rg_id
+        """
+        node_template = (
+            "(ST_SetSRID(ST_Point(%s, %s),%s), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        )
+        node_params = []
+
+        for rg_name, rg in self.network[RAINGAGES].items():
+            if rg_name not in self.network[SYMBOLS]:
+                self._log_message(f"ERROR: RAINGAGE '{rg_name}' has no coordinates in [SYMBOLS] section.")
+                continue
+            x, y = self.network[SYMBOLS][rg_name].x, self.network[SYMBOLS][rg_name].y
+            srid = lib_vars.data_epsg
+            expl_id = self.exploitation
+            muni_id = self.municipality
+            form_type = rg.form
+            intvl = rg.interval
+            scf = rg.SCF
+            rgage_type = rg.source
+            timser_id = nan_to_none(rg.timeseries)
+            fname = nan_to_none(rg.filename)
+            sta = nan_to_none(rg.station)
+            units = nan_to_none(rg.units)
+            node_params.append(
+                (
+                    x, y, srid,  # the_geom
+                    expl_id,
+                    muni_id,
+                    rg_name,  # code
+                    form_type,
+                    intvl,
+                    scf,
+                    rgage_type,
+                    timser_id,
+                    fname,
+                    sta,
+                    units
+                )
+            )
+
+        # Insert into parent table
+        raingages = toolsdb_execute_values(
+            node_sql, node_params, node_template, fetch=True, commit=False
+        )
+        print(raingages)
+        self.results["raingages"] = len(raingages) if raingages else 0
+        if not raingages:
+            self._log_message("Raingages couldn't be inserted!")
+            return
 
     def _save_inflows(self):
         sql = """
