@@ -15,7 +15,7 @@ try:
         CONDUITS, PUMPS, ORIFICES, WEIRS, OUTLETS,
         XSECTIONS, COORDINATES, VERTICES,
         PATTERNS, CURVES, TIMESERIES, CONTROLS, LID_CONTROLS, LID_USAGE,
-        LOSSES
+        LOSSES, INFLOWS, DWF
     )
     from swmm_api.input_file.sections import (
         Conduit, CrossSection, Pattern, TimeseriesData, TimeseriesFile
@@ -28,7 +28,7 @@ except ImportError:
     CONDUITS, PUMPS, ORIFICES, WEIRS, OUTLETS = None, None, None, None, None
     XSECTIONS, COORDINATES, VERTICES = None, None, None
     PATTERNS, CURVES, TIMESERIES, CONTROLS, LID_CONTROLS, LID_USAGE  = None, None, None, None, None, None
-    LOSSES = None
+    LOSSES, INFLOWS, DWF = None, None, None
 
     Conduit, CrossSection, Pattern, TimeseriesData, TimeseriesFile = None, None, None, None, None
     pass
@@ -211,6 +211,8 @@ class GwImportInpTask(GwTask):
 
             self._manage_visual()
 
+            self._manage_others()
+
             # self.progress_changed.emit("Sources", self.PROGRESS_VISUAL, "Importing sources...", False)
             # self._save_sources()
             # self.progress_changed.emit("Sources", self.PROGRESS_SOURCES, "done!", True)
@@ -290,6 +292,15 @@ class GwImportInpTask(GwTask):
 
         self.progress_changed.emit("Visual objects", lerp_progress(80, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing conduits", True)
         self._save_conduits()
+
+    def _manage_others(self) -> None:
+        if INFLOWS in self.network:
+            self.progress_changed.emit("Others", lerp_progress(0, self.PROGRESS_VISUAL, self.PROGRESS_END), "Importing inflows", True)
+            self._save_inflows()
+
+        if DWF in self.network:
+            self.progress_changed.emit("Others", lerp_progress(20, self.PROGRESS_VISUAL, self.PROGRESS_END), "Importing DWF", True)
+            self._save_dwf()
 
     def _get_db_units(self) -> None:
         units_query = "SELECT value FROM vi_options WHERE parameter = 'UNITS'"
@@ -1767,6 +1778,49 @@ class GwImportInpTask(GwTask):
         toolsdb_execute_values(
             man_sql, man_params, man_template, fetch=False, commit=False
         )
+
+    def _save_inflows(self):
+        sql = """
+            INSERT INTO inp_inflows (node_id, timser_id, sfactor, base, pattern_id)
+            VALUES %s
+            RETURNING order_id
+        """
+        template = "(%s, %s, %s, %s, %s)"
+        params = []
+        for i_name, i in self.network[INFLOWS].items():
+            try:
+                node_id = self.node_ids[i.node]
+            except KeyError:
+                continue
+            timser_id = i.time_series if i.time_series not in ('""', '') else None
+            sfactor = i.scale_factor
+            base = i.base_value
+            pattern_id = nan_to_none(i.pattern)
+            params.append((node_id, timser_id, sfactor, base, pattern_id))
+        inflows = toolsdb_execute_values(sql, params, template, fetch=True, commit=False)
+        self.results["inflows"] = len(inflows) if inflows else 0
+
+    def _save_dwf(self):
+        sql = """
+            INSERT INTO inp_dwf (dwfscenario_id, node_id, value, pat1, pat2, pat3, pat4)
+            VALUES %s
+            RETURNING dwfscenario_id, node_id
+        """
+        template = "(1, %s, %s, %s, %s, %s, %s)"
+        params = []
+        for dwf_name, dwf in self.network[DWF].items():
+            try:
+                node_id = self.node_ids[dwf.node]
+            except KeyError:
+                continue
+            value = dwf.base_value
+            pat1 = nan_to_none(dwf.pattern1)
+            pat2 = nan_to_none(dwf.pattern2)
+            pat3 = nan_to_none(dwf.pattern3)
+            pat4 = nan_to_none(dwf.pattern4)
+            params.append((node_id, value, pat1, pat2, pat3, pat4))
+        dwfs = toolsdb_execute_values(sql, params, template, fetch=True, commit=False)
+        self.results["dwf"] = len(dwfs) if dwfs else 0
 
     def _save_sources(self):
         for s_name, s in self.network.sources():
