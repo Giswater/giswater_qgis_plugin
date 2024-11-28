@@ -161,14 +161,14 @@ class GwElement:
         self.dlg_add_element.tbl_element_x_gully.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
                                                                          self.dlg_add_element.tbl_element_x_gully, "v_edit_gully", "gully_id", self.rubber_band, 10))
         self.dlg_add_element.btn_path_url.clicked.connect(partial(self._open_web_browser, self.dlg_add_element, "link"))
-        
+
         # Fill combo boxes of the form and related events
         self.dlg_add_element.element_type.currentIndexChanged.connect(partial(self._filter_elementcat_id))
         self.dlg_add_element.element_type.currentIndexChanged.connect(partial(self._update_location_cmb))
 
         # TODO maybe all this values can be in one Json query
         # Fill combo boxes
-        sql = "SELECT DISTINCT(elementtype_id), elementtype_id FROM cat_element ORDER BY elementtype_id"
+        sql = "SELECT DISTINCT(element_type), element_type FROM cat_element ORDER BY element_type"
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_add_element.element_type, rows)
 
@@ -319,7 +319,7 @@ class GwElement:
 
         row = tools_gw.get_config_value("edit_elementcat_vdefault")
         if row is not None and row[0]:
-            sql = f"SELECT elementtype_id, elementtype_id FROM cat_element WHERE id = '{row[0]}'"
+            sql = f"SELECT element_type, element_type FROM cat_element WHERE id = '{row[0]}'"
             element_type = tools_db.get_row(sql)
             tools_qt.set_combo_value(self.dlg_add_element.element_type, element_type[0], 0)
 
@@ -575,11 +575,11 @@ class GwElement:
 
 
     def _filter_elementcat_id(self):
-        """ Filter QComboBox @elementcat_id according QComboBox @elementtype_id """
+        """ Filter QComboBox @elementcat_id according QComboBox @element_type """
 
         element_type = tools_qt.get_combo_value(self.dlg_add_element, self.dlg_add_element.element_type, 1)
         sql = (f"SELECT DISTINCT(id), id FROM cat_element"
-               f" WHERE elementtype_id = '{element_type}'"
+               f" WHERE element_type = '{element_type}'"
                f" ORDER BY id")
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_add_element.elementcat_id, rows)
@@ -732,7 +732,7 @@ class GwElement:
             return
 
         tools_qt.set_widget_text(dialog, "code", row['code'])
-        sql = (f"SELECT elementtype_id FROM cat_element"
+        sql = (f"SELECT element_type FROM cat_element"
                f" WHERE id = '{row['elementcat_id']}'")
         row_type = tools_db.get_row(sql)
         if row_type:
