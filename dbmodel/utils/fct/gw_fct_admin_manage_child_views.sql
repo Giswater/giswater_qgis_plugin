@@ -95,7 +95,7 @@ BEGIN
 
 	IF v_action = 'MULTI-DELETE' THEN
 
-		FOR v_childview IN SELECT child_layer FROM cat_feature WHERE feature_class <> 'LINK' AND child_layer IS NOT NULL
+		FOR v_childview IN SELECT child_layer FROM cat_feature WHERE feature_type <> 'LINK' AND child_layer IS NOT NULL
 		LOOP
 			EXECUTE 'DROP VIEW IF EXISTS '||v_childview||'';
 			PERFORM gw_fct_debug(concat('{"data":{"msg":"Deleted layer: ", "variables":"',v_childview,'"}}')::json);
