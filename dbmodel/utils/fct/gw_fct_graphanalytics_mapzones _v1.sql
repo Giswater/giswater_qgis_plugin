@@ -286,6 +286,14 @@ BEGIN
 		WHERE n.node_id = s.node_id';
     EXECUTE v_querytext;
 
+	-- Nodes forceClosed acording init parameters
+	UPDATE temp_pgr_node n SET modif = TRUE, graph_delimiter = 'forceClosed'
+	WHERE n.node_id IN (SELECT json_array_elements_text((v_parameters->>'forceClosed')::json));
+
+	-- Nodes forceOpen acording init parameters
+	UPDATE temp_pgr_node n SET modif = FALSE, graph_delimiter = 'ignore'
+	WHERE n.node_id IN (SELECT json_array_elements_text((v_parameters->>'forceOpen')::json));
+
 	-- ARCS TO MODIFY
 	IF v_project_type = 'WS' THEN
 		-- ARCS VALVES
