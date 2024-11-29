@@ -1934,11 +1934,10 @@ class GwImportInpTask(GwTask):
 
             infiltration = self.network[INFILTRATION].get(subc_name)
 
-
             # [SUBCATCHMENTS]
             subc_id = subc_name
-            outlet_id = subc.outlet
-            rg_id = subc.rain_gage if subc.rain_gage != '*' else None
+            outlet_id = self.node_ids[subc.outlet] if subc.outlet in self.node_ids else subc.outlet
+            rg_id = subc.rain_gage if subc.rain_gage != '*' else None  # TODO: show warning if raingage is *
             area = subc.area
             imperv = subc.imperviousness
             width = subc.width
