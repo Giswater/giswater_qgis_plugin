@@ -41,7 +41,7 @@ BEGIN
     UPDATE node SET macrominsector_id = 0 WHERE macrominsector_id <> 0;
     UPDATE arc SET macrominsector_id = 0 WHERE macrominsector_id <> 0;
     UPDATE connec SET macrominsector_id = 0 WHERE macrominsector_id <> 0;
-    UPDATE link SET macrominsector_id = 0 WHERE macrominsector_id <> 0;
+    --UPDATE link SET macrominsector_id = 0 WHERE macrominsector_id <> 0; add this line after adding macrominsector_id for ud.link
     IF v_project_type = 'UD' THEN
         UPDATE gully SET macrominsector_id = 0 WHERE macrominsector_id <> 0;
     ELSIF v_project_type = 'WS' THEN
