@@ -90,7 +90,7 @@ BEGIN
 		-- looking for related connecs
 		FOR v_connect IN SELECT feature_id FROM v_edit_link WHERE feature_type = 'CONNEC' AND exit_type = 'CONNEC' and exit_id = NEW.connec_id
 		LOOP
-			UPDATE plan_psector_x_connec SET arc_id = NEW.arc_id WHERE connec_id = v_connect AND psector_id = NEW.psector_id;
+			UPDATE plan_psector_x_connec SET arc_id = NEW.arc_id WHERE connec_id = v_connect AND psector_id = NEW.psector_id AND state = 1;
 		END LOOP;
 		
 		-- looking for related gullies
@@ -98,7 +98,7 @@ BEGIN
 			FOR v_connect IN SELECT feature_id FROM v_edit_link WHERE feature_type = 'GULLY' AND exit_type = 'CONNEC' and exit_id = NEW.connec_id
 			LOOP
 			
-				UPDATE plan_psector_x_gully SET arc_id = NEW.arc_id WHERE gully_id = v_connect AND psector_id = NEW.psector_id;
+				UPDATE plan_psector_x_gully SET arc_id = NEW.arc_id WHERE gully_id = v_connect AND psector_id = NEW.psector_id AND state = 1;
 			END LOOP;
 		END IF;
 
@@ -108,13 +108,13 @@ BEGIN
 		-- looking for related connecs
 		FOR v_connect IN SELECT feature_id FROM v_edit_link WHERE feature_type = 'CONNEC' AND exit_type = 'GULLY' and exit_id = NEW.gully_id
 		LOOP
-			UPDATE plan_psector_x_connec SET arc_id = NEW.arc_id WHERE connec_id = v_connect AND psector_id = NEW.psector_id;
+			UPDATE plan_psector_x_connec SET arc_id = NEW.arc_id WHERE connec_id = v_connect AND psector_id = NEW.psector_id AND state = 1;
 		END LOOP;
 		
 		-- looking for related gullies
 		FOR v_connect IN SELECT feature_id FROM v_edit_link WHERE feature_type = 'GULLY' AND exit_type = 'GULLY' and exit_id = NEW.gully_id
 		LOOP
-			UPDATE plan_psector_x_gully SET arc_id = NEW.arc_id WHERE gully_id = v_connect AND psector_id = NEW.psector_id;
+			UPDATE plan_psector_x_gully SET arc_id = NEW.arc_id WHERE gully_id = v_connect AND psector_id = NEW.psector_id AND state = 1;
 		END LOOP;
 	END IF;		
 
