@@ -67,7 +67,7 @@ BEGIN
 			percent, num_startup, min_flow, avg_flow, max_flow_pumping, vol_ltr, powus_kwh, timoff_min, timoff_max,
 			-- rpt_flowclass_sum
 			length_flowclass, dry, up_dry, down_dry, sub_crit, sub_crit_1, up_crit, down_crit, froud_numb, flow_chang
-		) SELECT
+		) SELECT DISTINCT ON (r.arc_id)
 			-- rpt_inp_arc
 			r.result_id, r.arc_id, r.node_1, r.node_2, r.elevmax1, r.elevmax2, r.arc_type, r.arccat_id, r.epa_type, r.sector_id, r.state, r.state_type, r.annotation, r.length, r.n, r.the_geom, r.expl_id, r.addparam, r.arcparent, r.q0, r.qmax, r.barrels, r.slope, r.culvert, r.kentry, r.kexit, r.kavg, r.flap, r.seepage, r.age,
 			-- rpt_arcflow_sum
@@ -123,7 +123,7 @@ BEGIN
 			poll_id, value,
 			-- rpt_storagevol_sum
 			aver_vol, avg_full, ei_loss, max_vol, max_full, storagevol_time_days, storagevol_time_hour, max_out
-		) SELECT
+		) SELECT DISTINCT ON (r.node_id)
 			-- rpt_inp_node
 			r.result_id, r.node_id, r.top_elev, r.ymax, r.elev, r.node_type, r.nodecat_id, r.epa_type, r.sector_id, r.state, r.state_type, r.annotation, r.y0, r.ysur, r.apond, r.the_geom, r.expl_id, r.addparam, r.parent, r.arcposition, r.fusioned_node, r.age,
 			-- rpt_nodeflooding_sum
