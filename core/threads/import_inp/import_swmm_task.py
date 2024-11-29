@@ -28,7 +28,7 @@ except ImportError:
     OPTIONS, REPORT, FILES = None, None, None
     JUNCTIONS, OUTFALLS, DIVIDERS, STORAGE = None, None, None, None
     CONDUITS, PUMPS, ORIFICES, WEIRS, OUTLETS = None, None, None, None, None
-    XSECTIONS, COORDINATES, VERTICES, SYMBOLS = None, None, None, None
+    XSECTIONS, COORDINATES, VERTICES, SYMBOLS, POLYGONS = None, None, None, None, None
     PATTERNS, CURVES, TIMESERIES, CONTROLS, LID_CONTROLS, LID_USAGE  = None, None, None, None, None, None
     LOSSES, INFLOWS, DWF, SUBCATCHMENTS, RAINGAGES, SUBAREAS = None, None, None, None, None, None
     INFILTRATION, ADJUSTMENTS = None, None
@@ -1892,15 +1892,15 @@ class GwImportInpTask(GwTask):
     def _save_subcatchments(self):
         sql = """
             INSERT INTO inp_subcatchment (
-                subc_id, outlet_id, rg_id, area, imperv, width, slope, clength, snow_id, nimp, nperv, simp, sperv, zero, 
+                the_geom, subc_id, outlet_id, rg_id, area, imperv, width, slope, clength, snow_id, nimp, nperv, simp, sperv, zero, 
                 routeto, rted, maxrate, minrate, decay, drytime, maxinfil, suction, conduct, initdef, curveno, 
-                conduct_2, drytime_2, sector_id, hydrology_id, the_geom, descript, nperv_pattern_id, dstore_pattern_id, 
+                conduct_2, drytime_2, sector_id, hydrology_id, descript, nperv_pattern_id, dstore_pattern_id, 
                 infil_pattern_id, minelev
             )
             VALUES %s
             RETURNING subc_id, hydrology_id
         """
-        template = "(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        template = "(ST_GeomFromText(%s, %s), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
         params = []
 
         def get_attr(obj, attr: str):
@@ -1912,6 +1912,23 @@ class GwImportInpTask(GwTask):
             except KeyError:
                 return None
 
+        def get_subc_geom(subc):
+            coordinates = []
+            # Get coordinates from [POLYGONS] section
+            if subc.name in self.network[POLYGONS]:
+                coordinates = self.network[POLYGONS][subc.name].polygon
+            # If there are no coordinates or there are less than 3 distinct points, it isn't a valid polygon.
+            if not coordinates or len(list(dict.fromkeys(coordinates))) < 3:
+                return None
+
+            # Ensure the polygon is closed by repeating the first coordinate if necessary
+            if coordinates[0] != coordinates[-1]:
+                coordinates.append(coordinates[0])
+
+            # Create a WKT string for the polygon
+            wkt = f"POLYGON(({', '.join(f'{x} {y}' for x, y in coordinates)}))"
+            return wkt
+
         for subc_name, subc in self.network[SUBCATCHMENTS].items():
             subarea = self.network[SUBAREAS].get(subc_name)
 
@@ -1921,7 +1938,7 @@ class GwImportInpTask(GwTask):
             # [SUBCATCHMENTS]
             subc_id = subc_name
             outlet_id = subc.outlet
-            rg_id = subc.rain_gage
+            rg_id = subc.rain_gage if subc.rain_gage != '*' else None
             area = subc.area
             imperv = subc.imperviousness
             width = subc.width
@@ -1953,16 +1970,17 @@ class GwImportInpTask(GwTask):
             # Giswater columns
             sector_id = self.sector
             hydrology_id = 1  # TODO: get/create from cat_hydrology, depending on infiltration kind
-            the_geom = None  # TODO: get_subc_geom()
+            the_geom = get_subc_geom(subc)
+            srid = lib_vars.data_epsg
             descript = None
             nperv_pattern_id = get_adjustment("N-PERV", subc_name)
             dstore_pattern_id = get_adjustment("DSTORE", subc_name)
             infil_pattern_id = get_adjustment("INFIL", subc_name)
             minelev = None
             params.append(
-                (subc_id, outlet_id, rg_id, area, imperv, width, slope, clength, snow_id, nimp, nperv, simp, sperv, zero,
+                (the_geom, srid, subc_id, outlet_id, rg_id, area, imperv, width, slope, clength, snow_id, nimp, nperv, simp, sperv, zero,
                  routeto, rted, maxrate, minrate, decay, drytime, maxinfil, suction, conduct, initdef, curveno,
-                 conduct_2, drytime_2, sector_id, hydrology_id, the_geom, descript, nperv_pattern_id, dstore_pattern_id,
+                 conduct_2, drytime_2, sector_id, hydrology_id, descript, nperv_pattern_id, dstore_pattern_id,
                  infil_pattern_id, minelev)
             )
         subcatchments = toolsdb_execute_values(sql, params, template, fetch=True, commit=False)

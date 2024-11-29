@@ -309,6 +309,7 @@ class GwImportSwmm:
                 'DELETE FROM connec CASCADE;',
                 'DELETE FROM node CASCADE;',
                 'DELETE FROM gully CASCADE;',
+                'DELETE FROM inp_subcatchment CASCADE',
                 'DELETE FROM raingage CASCADE;',
                 'DELETE FROM inp_conduit CASCADE;',
                 'DELETE FROM inp_pump CASCADE;',
