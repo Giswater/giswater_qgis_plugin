@@ -67,14 +67,6 @@ BEGIN
 	IF v_floodonlymapzone IS NULL THEN v_floodonlymapzone = ''; END IF;
 	IF v_commitchanges IS NULL THEN v_commitchanges = FALSE ; END IF;
 
-	IF v_expl = '-901' THEN
-        SELECT replace(replace((array_agg(expl_id))::text,'{',''),'}','') INTO v_expl FROM selector_expl WHERE cur_user = current_user;
-    ELSIF v_expl = '-902' THEN
-        SELECT string_agg(expl_id::TEXT, ',') INTO v_expl FROM exploitation;
-    ELSE
-		SELECT replace(replace(v_expl,'{',''),'}','') INTO v_expl;
-	END IF;
-
 	v_data = concat ('{"data":{"parameters":{"graphClass":"',v_class,'", "exploitation": "',v_expl,'", "updateFeature":"TRUE",
 	"updateMapZone":',v_updatemapzone,', "geomParamUpdate":',v_paramupdate, ',"floodFromNode":"',v_floodfromnode,'", "forceOpen": [',v_forceopen,'], "forceClosed":[',v_forceclosed,'], "usePlanPsector": ',v_usepsector,', "debug":"FALSE", 
 	"valueForDisconnected":',v_valuefordisconnected,', "floodOnlyMapzone":"',v_floodonlymapzone,'", "commitChanges":',v_commitchanges,'}}}');
