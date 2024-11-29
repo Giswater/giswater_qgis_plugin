@@ -47,15 +47,28 @@ BEGIN
 	-- Get variables from input JSON
     v_expl_id = (SELECT (p_data::json->>'data')::json->>'expl_id');
 
-    IF v_project_type = 'UD' THEN v_reverse_cost=-1; END IF;
+    IF v_project_type = 'UD' THEN v_reverse_cost = -1; END IF;
 
+    -- For user selected exploitations
     IF v_expl_id = '-901' THEN
-        SELECT replace(replace((array_agg(expl_id))::text,'{',''),'}','') INTO v_expl_id FROM selector_expl WHERE cur_user = current_user;
+        SELECT string_agg(DISTINCT macrominsector_id::TEXT, ',') INTO v_macrominsector_id_arc
+        FROM v_edit_arc a
+        WHERE a.minsector_id <> '0'
+        AND a.macrominsector_id <> '0';
+    -- For all exploitations
     ELSIF v_expl_id = '-902' THEN
-        SELECT string_agg(expl_id::TEXT, ',') INTO v_expl_id FROM exploitation;
+        SELECT string_agg(DISTINCT macrominsector_id::TEXT, ',') INTO v_macrominsector_id_arc
+        FROM arc a
+        WHERE a.minsector_id <> '0'
+        AND a.macrominsector_id <> '0';
+    -- For a specific exploitation/s
+    ELSE
+        SELECT string_agg(DISTINCT macrominsector_id::TEXT, ',') INTO v_macrominsector_id_arc
+        FROM arc a
+        WHERE a.minsector_id <> '0'
+        AND a.macrominsector_id <> '0'
+        AND a.expl_id::TEXT = ANY(string_to_array(v_expl_id, ','));
     END IF;
-
-	SELECT string_agg(DISTINCT macrominsector_id::TEXT, ',') INTO v_macrominsector_id_arc FROM arc a WHERE a.expl_id::TEXT = ANY(string_to_array(v_expl_id, ','));
 
     INSERT INTO temp_pgr_arc (pgr_arc_id, arc_id, pgr_node_1, pgr_node_2, node_1, node_2, cost, reverse_cost)
     (
