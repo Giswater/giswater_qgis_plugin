@@ -8,7 +8,7 @@ or (at your option) any later version.
 from functools import partial
 
 from qgis.PyQt.QtCore import QRect, Qt
-from qgis.PyQt.QtWidgets import QApplication
+from qgis.PyQt.QtWidgets import QApplication, QMenu, QAction, QActionGroup
 from qgis.core import QgsVectorLayer, QgsRectangle, QgsApplication, QgsProject, QgsWkbTypes
 
 from ..maptool import GwMaptool
@@ -30,6 +30,43 @@ class GwConnectLinkButton(GwMaptool):
         self.dragging = False
         self.select_rect = QRect()
 
+        # Store the current selected action
+        self.current_action = "CLOSEST ARCS"
+
+        # Create a dropdown menu
+        self.menu = QMenu()
+        self.actions = ["CLOSEST ARCS", "FORCED ARCS"]
+
+        # Fill the menu
+        self._fill_action_menu()
+
+        # Add menu to toolbar
+        if toolbar is not None:
+            self.action.setMenu(self.menu)
+            toolbar.addAction(self.action)
+
+    def _fill_action_menu(self):
+        """Fill the dropdown menu with actions."""
+
+        # disconnect and remove previuos signals and actions
+        actions = self.menu.actions()
+        for action in actions:
+            action.disconnect()
+            self.menu.removeAction(action)
+            del action
+
+        # Create actions for the menu
+        ag = QActionGroup(self.iface.mainWindow())
+        for action in self.actions:
+            obj_action = QAction(f"{action}", ag)
+            self.menu.addAction(obj_action)
+
+            obj_action.triggered.connect(partial(self._set_current_action, action))
+            obj_action.triggered.connect(partial(super().clicked_event))
+
+    def _set_current_action(self, action_name):
+        """Set the currently selected action."""
+        self.current_action = action_name
 
     # region QgsMapTools inherited
     """ QgsMapTools inherited event functions """
@@ -148,6 +185,19 @@ class GwConnectLinkButton(GwMaptool):
             if layer_connec:
                 number_connec_features += layer_connec.selectedFeatureCount()
             if number_connec_features > 0 and QgsProject.instance().layerTreeRoot().findLayer(layer_connec).isVisible():
+                # Check if the current action is "FORCED ARCS"
+                if self.current_action == "FORCED ARCS":
+                    if number_connec_features > 0:
+                        # Notify user and switch to arc selection
+                        tools_qgis.show_info(
+                            "Nodes selected. Now, please select an arc on the map and confirm with a right-click.")
+                        self._activate_arc_selection()
+                        return
+                    else:
+                        tools_qgis.show_warning("No nodes selected. Please select nodes first.")
+                        return
+
+                # Existing logic for CLOSEST ARCS
                 message = "Number of features selected in the group of"
                 title = "Connect to network"
                 answer = tools_qt.show_question(message, title, parameter='connec: ' + str(number_connec_features))
@@ -164,6 +214,21 @@ class GwConnectLinkButton(GwMaptool):
             if number_connec_features == 0 or QgsProject.instance().layerTreeRoot().findLayer(layer_connec).isVisible() is False:
                 self.cancel_map_tool()
 
+    def _activate_arc_selection(self):
+        """Activate the map tool for selecting arcs."""
+        layer_arcs = tools_qgis.get_layer_by_tablename('v_edit_arc')
+        if not layer_arcs:
+            tools_qgis.show_warning("Arc layer not found. Please ensure the arc layer is loaded.")
+            return
+
+        # Clear any previous selection in the arc layer
+        layer_arcs.removeSelection()
+
+        # Change the active layer to arcs
+        self.iface.setActiveLayer(layer_arcs)
+
+        # Notify the user
+        tools_qgis.show_info("Please select an arc and confirm with a right-click.")
 
     def manage_result(self, result, layer):
 
