@@ -248,3 +248,11 @@ ALTER TABLE gully DROP CONSTRAINT gully_category_type_feature_type_fkey;
 ALTER TABLE gully DROP CONSTRAINT gully_fluid_type_feature_type_fkey;
 ALTER TABLE gully DROP CONSTRAINT gully_function_type_feature_type_fkey;
 ALTER TABLE gully DROP CONSTRAINT gully_location_type_feature_type_fkey;
+
+-- 29/11/2024
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"link", "column":"macrominsector_id", "dataType":"integer"}}$$);
+ALTER TABLE node ALTER COLUMN macrominsector_id SET DEFAULT 0;
+ALTER TABLE arc ALTER COLUMN macrominsector_id SET DEFAULT 0;
+ALTER TABLE connec ALTER COLUMN macrominsector_id SET DEFAULT 0;
+ALTER TABLE link ALTER COLUMN macrominsector_id SET DEFAULT 0;
+ALTER TABLE gully ALTER COLUMN macrominsector_id SET DEFAULT 0;

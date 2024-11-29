@@ -41,7 +41,8 @@ BEGIN
     UPDATE node SET macrominsector_id = 0 WHERE macrominsector_id <> 0;
     UPDATE arc SET macrominsector_id = 0 WHERE macrominsector_id <> 0;
     UPDATE connec SET macrominsector_id = 0 WHERE macrominsector_id <> 0;
-    --UPDATE link SET macrominsector_id = 0 WHERE macrominsector_id <> 0; add this line after adding macrominsector_id for ud.link
+    UPDATE link SET macrominsector_id = 0 WHERE macrominsector_id <> 0;
+
     IF v_project_type = 'UD' THEN
         UPDATE gully SET macrominsector_id = 0 WHERE macrominsector_id <> 0;
     ELSIF v_project_type = 'WS' THEN
@@ -64,20 +65,19 @@ BEGIN
     FROM arc a
     WHERE c.arc_id = a.arc_id AND a.macrominsector_id <> 0 AND c.state = 1;
 
-/*
+
     UPDATE link l SET macrominsector_id = c.macrominsector_id
     FROM connec c
     WHERE c.connec_id = l.feature_id AND c.feature_type = 'CONNEC' AND c.macrominsector_id <> 0 AND l.state = 1;
-*/
+
     IF v_project_type = 'UD' THEN
         UPDATE gully g SET macrominsector_id = a.macrominsector_id
         FROM arc a
         WHERE g.arc_id = a.arc_id AND a.macrominsector_id <> 0 AND g.state = 1;
 
-        /*UPDATE link l SET macrominsector_id = g.macrominsector_id
+        UPDATE link l SET macrominsector_id = g.macrominsector_id
         FROM gully g
         WHERE g.gully_id = l.feature_id AND g.feature_type = 'GULLY' AND g.macrominsector_id <> 0 AND l.state = 1;
-        */
      ELSIF v_project_type = 'WS' THEN
         UPDATE minsector_graph m SET macrominsector_id = n.macrominsector_id
         FROM node n

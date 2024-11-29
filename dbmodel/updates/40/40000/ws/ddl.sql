@@ -256,3 +256,10 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"inp_virtua
 -- 21/11/24
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"minsector_graph", "column":"expl_id"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"minsector_graph", "column":"macrominsector_id", "dataType":"integer"}}$$);
+
+-- 29/11/24
+ALTER TABLE node ALTER COLUMN macrominsector_id SET DEFAULT 0;
+ALTER TABLE arc ALTER COLUMN macrominsector_id SET DEFAULT 0;
+ALTER TABLE connec ALTER COLUMN macrominsector_id SET DEFAULT 0;
+ALTER TABLE link ALTER COLUMN macrominsector_id SET DEFAULT 0;
+ALTER TABLE minsector_graph ALTER COLUMN macrominsector_id SET DEFAULT 0;
