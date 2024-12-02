@@ -280,7 +280,8 @@ BEGIN
 
 			-- inserting on config_param_system table
 			INSERT INTO config_param_system (parameter, value, datatype, descript, project_type, label)
-			VALUES ('admin_schema_info', v_schema_info,'json', 'Basic information about schema','utils', 'Schema manager:') ON CONFLICT (parameter) DO NOTHING;
+			VALUES ('admin_schema_info', v_schema_info,'json', 'Basic information about schema','utils', 'Schema manager:')
+			ON CONFLICT (parameter) DO UPDATE SET value = EXCLUDED.value;
 
 			--update value of rename_view_x_id parameter
 			UPDATE config_param_system SET value='{"rename_view_x_id":true}' WHERE parameter='admin_manage_cat_feature';
