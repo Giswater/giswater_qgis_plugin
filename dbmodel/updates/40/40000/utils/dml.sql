@@ -711,3 +711,8 @@ INSERT INTO config_form_tableview (location_type, project_type, objectname, colu
 }'::json);
 INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('epamanager_form', 'utils', 'epa_results', 'inp_options', NULL, false, NULL, NULL, NULL, NULL);
 INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('epamanager_form', 'utils', 'epa_results', 'network_stats', NULL, false, NULL, NULL, NULL, NULL);
+
+-- 02/12/24
+
+INSERT INTO connec_add (connec_id, demand_base, press_max, press_min, press_avg, quality_max, quality_min, quality_avg, result_id)
+SELECT connec_id, demand, press_max, press_min, press_avg, quality_max, quality_min, quality_avg, result_id from _connec_add_;
