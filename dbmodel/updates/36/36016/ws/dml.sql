@@ -43,3 +43,6 @@ ON CONFLICT (id) DO NOTHING;
 
 update config_param_system set value= '{"status":false , "diameter":150, "maxDistance":15}',
 parameter = 'edit_link_link2network' where "parameter" ='edit_link_check_arcdnom';
+
+INSERT INTO sys_fprocess(fid, fprocess_name, project_type, parameters, "source", isaudit, fprocess_type, addparam) 
+VALUES(524, 'Check roughness value does not have overlapping time periods', 'ws', NULL, 'core', true, 'Function process', NULL);

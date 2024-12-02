@@ -17,7 +17,7 @@ SELECT SCHEMA_NAME.gw_fct_pg2epa_check_data($${"data":{"parameters":{"fid":101}}
 SELECT SCHEMA_NAME.gw_fct_pg2epa_check_data('{"parameters":{}}')-- when is called from toolbox
 
 -- fid: main: 225
-		other: 107,153,164,165,166,167,169,170,171,188,198,227,229,230,292,294,295,371,379,433,411,412,430,432,480,482
+		other: 107,153,164,165,166,167,169,170,171,188,198,227,229,230,292,294,295,371,379,433,411,412,430,432,480,482,524
 
 */
 
@@ -924,6 +924,22 @@ BEGIN
             VALUES (v_fid, '188', 1, 'INFO: No arcs with state > 0 AND state_type.is_operative on FALSE found.',v_count);
         END IF;
     END IF;
+	
+	RAISE NOTICE '38 - Check roughness value does not have overlapping time periods(524)';
+  
+	SELECT COUNT(*) INTO v_count
+	FROM cat_mat_roughness t1 JOIN cat_mat_roughness t2  ON t1.matcat_id = t2.matcat_id
+	AND t1.init_age < t2.end_age   AND t1.end_age > t2.init_age   AND t1.id != t2.id; -- Avoid comparing the same ROW
+	
+	IF v_count > 0 THEN
+		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
+		VALUES (v_fid, '524', 2, concat(
+		'WARNING-524: There are ',v_count,' conflicting roughness values for the same material during overlapping time periods.'),v_count);
+		v_count=0;
+	ELSE
+		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message, fcount)
+		VALUES (v_fid, '524', 1, 'INFO: No conflicting roughness values for the same material during overlapping time periods.',v_count);
+	END IF;
 
 	-- Removing isaudit false sys_fprocess
 	FOR v_record IN SELECT * FROM sys_fprocess WHERE isaudit is false
