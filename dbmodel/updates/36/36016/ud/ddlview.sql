@@ -490,7 +490,8 @@ CREATE OR REPLACE VIEW v_edit_inp_subcatchment AS
     inp_subcatchment.muni_id
    FROM inp_subcatchment, config_param_user, selector_sector, selector_municipality
    WHERE inp_subcatchment.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text 
-   AND ((muni_id = selector_municipality.muni_id AND selector_municipality.cur_user = "current_user"()::text) or muni_id is NULL OR muni_id = 0)
+   AND ((inp_subcatchment.muni_id = selector_municipality.muni_id AND selector_municipality.cur_user = "current_user"()::text) 
+   or inp_subcatchment.muni_id is NULL OR inp_subcatchment.muni_id = 0)
    AND hydrology_id = config_param_user.value::integer AND config_param_user.cur_user::text = "current_user"()::text
    AND config_param_user.parameter::text = 'inp_options_hydrology_scenario'::text;
 
