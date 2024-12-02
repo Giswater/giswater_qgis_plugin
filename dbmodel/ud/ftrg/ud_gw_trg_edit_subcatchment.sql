@@ -36,8 +36,21 @@ BEGIN
 	
 		-- Subc ID
 		IF (NEW.subc_id IS NULL) THEN
-			NEW.subc_id := concat((SELECT value FROM config_param_system WHERE parameter='epa_subcatchment_concat_prefix_id'),(SELECT nextval('SCHEMA_NAME.inp_subcatchment_subc_id_seq'::regclass)));
+			NEW.subc_id := concat((SELECT coalesce (value,'') FROM config_param_system WHERE parameter='epa_subcatchment_concat_prefix_id'),(SELECT nextval('SCHEMA_NAME.inp_subcatchment_subc_id_seq'::regclass)));
 		END IF;
+	
+		-- Muni ID
+		IF (NEW.muni_id IS NULL) THEN
+			NEW.muni_id := (select muni_id from ext_municipality em where st_dwithin((the_geom), new.the_geom, 0) limit 1);
+			if NEW.muni_id is null then new.muni_id = 0; end if;
+		END IF;
+		
+		-- Sector ID
+		IF (NEW.sector_id IS NULL) THEN
+			NEW.sector_id := (select sector_id from sector em where st_dwithin((the_geom), new.the_geom, 0) limit 1);
+			if NEW.sector_id is null then new.sector_id = 0; end if;
+		END IF;
+	
 
 		-- FEATURE INSERT
 		INSERT INTO inp_subcatchment (subc_id, outlet_id, rg_id, area, imperv, width, slope, clength, snow_id, nimp, nperv, simp, sperv, zero, routeto, rted, maxrate, minrate, decay, drytime, maxinfil, suction,
