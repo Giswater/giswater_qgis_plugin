@@ -269,18 +269,18 @@ ALTER TABLE minsector_graph ALTER COLUMN macrominsector_id SET DEFAULT 0;
 ALTER TABLE connec_add RENAME to _connec_add_;
 ALTER TABLE _connec_add_ DROP CONSTRAINT connec_add_pkey;
 
-CREATE TABLE connec_add 
-(connec_id character varying(16) NOT NULl PRIMARY KEY, 
+CREATE TABLE connec_add
+(connec_id character varying(16) NOT NULl PRIMARY KEY,
 demand_base numeric(12,2),
-demand_max numeric(12,2), 
-demand_min numeric(12,2), 
-demand_avg numeric(12,2), 
-press_max numeric(12,2), 
+demand_max numeric(12,2),
+demand_min numeric(12,2),
+demand_avg numeric(12,2),
+press_max numeric(12,2),
 press_min numeric(12,2),
-press_avg numeric(12,2), 
-quality_max numeric(12,4), 
+press_avg numeric(12,2),
+quality_max numeric(12,4),
 quality_min numeric(12,4),
-quality_avg numeric(12,4), 
+quality_avg numeric(12,4),
 flow_max numeric(12,2),
 flow_min numeric(12,2),
 flow_avg numeric(12,2),
@@ -288,3 +288,5 @@ vel_max numeric(12,2),
 vel_min numeric(12,2),
 vel_avg numeric(12,2),
 result_id text);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"inp_virtualvalve", "column":"_to_arc_"}}$$);
