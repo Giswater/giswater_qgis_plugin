@@ -10,7 +10,7 @@ from psycopg2.extras import execute_values
 try:
     from swmm_api import SwmmInput
     from swmm_api.input_file.section_labels import (
-        OPTIONS, REPORT, FILES,
+        TITLE, OPTIONS, REPORT, FILES,
         JUNCTIONS, OUTFALLS, DIVIDERS, STORAGE,
         CONDUITS, PUMPS, ORIFICES, WEIRS, OUTLETS,
         XSECTIONS, COORDINATES, VERTICES, SYMBOLS, POLYGONS,
@@ -25,7 +25,7 @@ try:
 except ImportError:
     SwmmInput = None
 
-    OPTIONS, REPORT, FILES = None, None, None
+    TITLE, OPTIONS, REPORT, FILES = None, None, None, None
     JUNCTIONS, OUTFALLS, DIVIDERS, STORAGE = None, None, None, None
     CONDUITS, PUMPS, ORIFICES, WEIRS, OUTLETS = None, None, None, None, None
     XSECTIONS, COORDINATES, VERTICES, SYMBOLS, POLYGONS = None, None, None, None, None
@@ -200,8 +200,13 @@ class GwImportInpTask(GwTask):
             self._save_options()
             self.progress_changed.emit("Getting options", self.PROGRESS_OPTIONS, "done!", True)
 
+            if TITLE in self.network:
+                self.progress_changed.emit("Getting options", self.PROGRESS_OPTIONS, "Importing title...", False)
+                self._save_title()
+                self.progress_changed.emit("Getting options", self.PROGRESS_OPTIONS, "done!", True)
+
             if FILES in self.network:
-                self.progress_changed.emit("Getting options", self.PROGRESS_VALIDATE, "Importing files...", False)
+                self.progress_changed.emit("Getting options", self.PROGRESS_OPTIONS, "Importing files...", False)
                 self._save_files()
                 self.progress_changed.emit("Getting options", self.PROGRESS_OPTIONS, "done!", True)
 
@@ -384,6 +389,19 @@ class GwImportInpTask(GwTask):
 
         # Execute batch update
         toolsdb_execute_values(sql, update_params, template, fetch=False, commit=False)
+
+    def _save_title(self):
+        title = self.network[TITLE].txt
+
+        sql = """
+            UPDATE config_param_system
+            SET value = jsonb_set(value::jsonb, '{descript}', %s)::text
+            WHERE parameter = 'admin_schema_info';
+        """
+
+        params = (f'''"{title.replace('\n', '\\n')}"''',)
+
+        execute_sql(sql, params)
 
     def _save_files(self):
         """
