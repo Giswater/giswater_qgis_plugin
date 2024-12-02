@@ -426,7 +426,7 @@ BEGIN
 		JOIN om_mincut_connec ON rtc_hydrometer_x_connec.connec_id=om_mincut_connec.connec_id 
 		LEFT JOIN v_rtc_hydrometer ON v_rtc_hydrometer.hydrometer_id=rtc_hydrometer_x_connec.hydrometer_id
 		JOIN v_edit_connec ON om_mincut_connec.connec_id=v_edit_connec.connec_id
-		WHERE result_id=v_mincutid AND v_edit_connec.is_operative=TRUE
+		WHERE om_mincut_connec.result_id=v_mincutid AND v_edit_connec.is_operative=TRUE
 		ON CONFLICT (hydrometer_id, result_id) DO NOTHING;
 
 		INSERT INTO om_mincut_hydrometer (result_id, hydrometer_id)
