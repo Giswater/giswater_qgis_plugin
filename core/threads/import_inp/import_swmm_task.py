@@ -19,7 +19,7 @@ try:
         INFILTRATION, ADJUSTMENTS
     )
     from swmm_api.input_file.sections import (
-        Conduit, CrossSection, Pattern, TimeseriesData, TimeseriesFile,
+        TimeseriesData, TimeseriesFile,
         InfiltrationHorton, InfiltrationGreenAmpt, InfiltrationCurveNumber
     )
 except ImportError:
@@ -210,10 +210,6 @@ class GwImportInpTask(GwTask):
                 self._save_files()
                 self.progress_changed.emit("Getting options", self.PROGRESS_OPTIONS, "done!", True)
 
-            # self.progress_changed.emit("Getting options", self.PROGRESS_OPTIONS, "Getting units...", False)
-            # self._get_db_units()
-            # self.progress_changed.emit("Getting options", self.PROGRESS_OPTIONS, "done!", True)
-
             self._manage_catalogs()
 
             self._manage_nonvisual()
@@ -221,10 +217,6 @@ class GwImportInpTask(GwTask):
             self._manage_visual()
 
             self._manage_others()
-
-            # self.progress_changed.emit("Sources", self.PROGRESS_VISUAL, "Importing sources...", False)
-            # self._save_sources()
-            # self.progress_changed.emit("Sources", self.PROGRESS_SOURCES, "done!", True)
 
             execute_sql("select 1", commit=True)
             report_message = '\n'.join([f"{k.upper()} imported: {v}" for k, v in self.results.items()])
@@ -317,13 +309,6 @@ class GwImportInpTask(GwTask):
         if SUBCATCHMENTS in self.network:
             self.progress_changed.emit("Others", lerp_progress(40, self.PROGRESS_VISUAL, self.PROGRESS_END), "Importing subcatchments", True)
             self._save_subcatchments()
-
-    def _get_db_units(self) -> None:
-        units_query = "SELECT value FROM vi_options WHERE parameter = 'UNITS'"
-        units_row = get_row(units_query, commit=False)
-        if not units_row:
-            raise ValueError("Units not specified in the Giswater project.")
-        self.db_units = units_row[0]
 
     def _validate_inputs(self) -> None:
         if not self.workcat:
@@ -2002,34 +1987,6 @@ class GwImportInpTask(GwTask):
             )
         subcatchments = toolsdb_execute_values(sql, params, template, fetch=True, commit=False)
         self.results["subcatchments"] = len(subcatchments) if subcatchments else 0
-
-    def _save_sources(self):
-        for s_name, s in self.network.sources():
-            # Get source properties
-            node_name = s.node_name
-            source_type = s.source_type
-            source_quality = s.strength_timeseries.base_value
-            source_pattern_id = s.strength_timeseries.pattern_name
-
-            # Get node_id & epa_type of related node
-            sql = """
-                SELECT node_id, epa_type FROM node WHERE code = %s
-            """
-            params = (node_name,)
-            row = get_row(sql, params)
-            if not row:
-                self._log_message(f"Couldn't find node '{node_name}' for source '{s_name}'.")
-                continue
-            node_id, epa_type = row
-
-            # Update source columns
-            sql = f"""
-                UPDATE inp_{epa_type.lower()} 
-                SET source_type = %s, source_quality = %s, source_pattern_id = %s 
-                WHERE node_id = %s;
-            """
-            params = (source_type, source_quality, source_pattern_id, node_id)
-            execute_sql(sql, params)
 
     def _log_message(self, message: str):
         self.log.append(message)
