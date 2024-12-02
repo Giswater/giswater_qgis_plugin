@@ -159,7 +159,7 @@ class GwImportInpTask(GwTask):
             self.progress_changed.emit("Getting options", self.PROGRESS_OPTIONS, "done!", True)
 
             self.progress_changed.emit("Getting options", self.PROGRESS_OPTIONS, "Getting units...", False)
-            self._get_db_units()
+            self._get_units()
             self.progress_changed.emit("Getting options", self.PROGRESS_OPTIONS, "done!", True)
 
             self._manage_catalogs()
@@ -228,7 +228,7 @@ class GwImportInpTask(GwTask):
         self.progress_changed.emit("Visual objects", lerp_progress(70, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing pipes", True)
         self._save_pipes()
 
-    def _get_db_units(self) -> None:
+    def _get_units(self) -> None:
         units = self.network.options.hydraulic.inpfile_units
         if not units:
             raise ValueError("Units not specified in the INP file.")
