@@ -778,7 +778,7 @@ BEGIN
 				"polygon":'||v_result_polygon||'
 			}
 		}
-	}')::json, 2710, null, ('{"visible": ['||v_visible_layer||']}')::json, null)::json;
+	}')::json, 2710, null, ('{"visible": ["'||v_visible_layer||'"]}')::json, null)::json;
 
 END;
 $BODY$
