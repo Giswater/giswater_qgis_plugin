@@ -395,8 +395,13 @@ BEGIN
 								INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 								VALUES (217, null, 4, concat('Create new link connected to the closest arc with diameter smaller than ',v_check_arcdnom,'.'));
 							ELSE
-								INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-								VALUES (217, null, 4, concat('Create new link connected to the closest arc.'));
+							    IF v_isforcedarcs THEN
+							        INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+							        VALUES (217, null, 4, concat('Create new link connected to the selected arc: ', v_connect.arc_id, '.'));
+							    ELSE
+							        INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+							        VALUES (217, null, 4, concat('Create new link connected to the closest arc.'));
+							    END IF;
 							END IF;
 						ELSE
 							v_link.state = 2; -- because it is copied from existing one but related to psector
