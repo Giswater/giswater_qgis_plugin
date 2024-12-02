@@ -6,6 +6,7 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from functools import partial
+from enum import Enum
 
 from qgis.PyQt.QtCore import QRect, Qt
 from qgis.PyQt.QtWidgets import QApplication, QMenu, QAction, QActionGroup
@@ -17,6 +18,12 @@ from ...utils import tools_gw
 from ....libs import tools_qgis, tools_qt
 from ...threads.connect_link import GwConnectLink
 from .... import global_vars
+
+
+class SelectAction(Enum):
+    CLOSEST_ARCS = "CLOSEST ARCS"
+    FORCED_ARCS = "FORCED ARCS"
+    FORCED_ARCS2 = "FORCED ARCS (SELECTING ONLY ARCS)"
 
 
 class GwConnectLinkButton(GwMaptool):
@@ -31,11 +38,13 @@ class GwConnectLinkButton(GwMaptool):
         self.select_rect = QRect()
 
         # Store the current selected action
-        self.current_action = "CLOSEST ARCS"
+        self.current_action = SelectAction.CLOSEST_ARCS
 
         # Create a dropdown menu
         self.menu = QMenu()
-        self.actions = ["CLOSEST ARCS", "FORCED ARCS"]
+
+        # Dynamically set actions from the SelectAction Enum, excluding FORCED_ARCS2
+        self.actions = [action for action in SelectAction if action != SelectAction.FORCED_ARCS2]
 
         # Fill the menu
         self._fill_action_menu()
@@ -48,19 +57,19 @@ class GwConnectLinkButton(GwMaptool):
     def _fill_action_menu(self):
         """Fill the dropdown menu with actions."""
 
-        # disconnect and remove previuos signals and actions
-        actions = self.menu.actions()
-        for action in actions:
-            action.disconnect()
-            self.menu.removeAction(action)
-            del action
+        # Disconnect and remove previous signals and actions
+        for action in self.menu.actions():
+            action.disconnect()  # Disconnect signals
+            self.menu.removeAction(action)  # Remove from menu
 
         # Create actions for the menu
         ag = QActionGroup(self.iface.mainWindow())
         for action in self.actions:
-            obj_action = QAction(f"{action}", ag)
+            # Use `action.value` for user-friendly labels
+            obj_action = QAction(action.value, ag)
             self.menu.addAction(obj_action)
 
+            # Connect signals for action selection
             obj_action.triggered.connect(partial(self._set_current_action, action))
             obj_action.triggered.connect(partial(super().clicked_event))
 
@@ -180,55 +189,65 @@ class GwConnectLinkButton(GwMaptool):
         elif event.button() == Qt.RightButton:
             # Check selected records
             number_connec_features = 0
-
+            # Get the connection layer and count selected features
             layer_connec = tools_qgis.get_layer_by_tablename('v_edit_connec')
             if layer_connec:
                 number_connec_features += layer_connec.selectedFeatureCount()
             if number_connec_features > 0 and QgsProject.instance().layerTreeRoot().findLayer(layer_connec).isVisible():
                 # Check if the current action is "FORCED ARCS"
-                if self.current_action == "FORCED ARCS":
+                if self.current_action == SelectAction.FORCED_ARCS:
                     if number_connec_features > 0:
                         # Notify user and switch to arc selection
+                        self._set_current_action(SelectAction.FORCED_ARCS2)
                         tools_qgis.show_info(
                             "Nodes selected. Now, please select an arc on the map and confirm with a right-click.")
-                        self._activate_arc_selection()
                         return
                     else:
                         tools_qgis.show_warning("No nodes selected. Please select nodes first.")
                         return
-
-                # Existing logic for CLOSEST ARCS
-                message = "Number of features selected in the group of"
+                # Handle the FORCED_ARCS2 case
+                if self.current_action == SelectAction.FORCED_ARCS2:
+                    # Retrieve the selected arc
+                    layer_arc = tools_qgis.get_layer_by_tablename('v_edit_arc')
+                    selected_arc = None
+                    selected_arc_msg = ""
+                    if layer_arc and layer_arc.selectedFeatureCount() > 0:
+                        # Get the first selected arc (or handle multiple arcs if needed)
+                        selected_arc_feature = layer_arc.selectedFeatures()[0]  # Use the first selected arc
+                        selected_arc = selected_arc_feature.attribute("arc_id")
+                        selected_arc_msg = f" Arc ID: {selected_arc}"
+                    # Append arc info to the message
+                    message = f"For the selected {selected_arc_msg}, wil have a number of features selected in the group of connec"
+                else:
+                    # Default message for non-FORCED_ARCS2 cases
+                    message = "Number of features selected in the group of connec"
+                # Show the confirmation dialog
                 title = "Connect to network"
-                answer = tools_qt.show_question(message, title, parameter='connec: ' + str(number_connec_features))
+                answer = tools_qt.show_question(message, title, parameter=str(number_connec_features))
                 if answer:
-                    # Create link
-                    self.connect_link_task = GwConnectLink("Connect link", self, 'connec', layer_connec)
+                    # Create the task
+                    if self.current_action == SelectAction.FORCED_ARCS2:
+                        # Include the selected arc in the function call
+                        self.connect_link_task = GwConnectLink(
+                            "Connect link", self, 'connec', layer_connec, selected_arc=selected_arc
+                        )
+                    else:
+                        # Default behavior for non-FORCED_ARCS2 cases
+                        self.connect_link_task = GwConnectLink(
+                            "Connect link", self, 'connec', layer_connec
+                        )
+                    # Add and trigger the task
                     QgsApplication.taskManager().addTask(self.connect_link_task)
                     QgsApplication.taskManager().triggerTask(self.connect_link_task)
                 else:
                     self.manage_gully_result()
             else:
                 self.manage_gully_result()
-
-            if number_connec_features == 0 or QgsProject.instance().layerTreeRoot().findLayer(layer_connec).isVisible() is False:
+            # Cancel map tool if no features are selected or the layer is not visible
+            if number_connec_features == 0 or QgsProject.instance().layerTreeRoot().findLayer(
+                    layer_connec).isVisible() is False:
                 self.cancel_map_tool()
 
-    def _activate_arc_selection(self):
-        """Activate the map tool for selecting arcs."""
-        layer_arcs = tools_qgis.get_layer_by_tablename('v_edit_arc')
-        if not layer_arcs:
-            tools_qgis.show_warning("Arc layer not found. Please ensure the arc layer is loaded.")
-            return
-
-        # Clear any previous selection in the arc layer
-        layer_arcs.removeSelection()
-
-        # Change the active layer to arcs
-        self.iface.setActiveLayer(layer_arcs)
-
-        # Notify the user
-        tools_qgis.show_info("Please select an arc and confirm with a right-click.")
 
     def manage_result(self, result, layer):
 
@@ -332,12 +351,33 @@ class GwConnectLinkButton(GwMaptool):
             behaviour = QgsVectorLayer.AddToSelection
 
         # Selection for all connec and gully layers
-        layer = tools_qgis.get_layer_by_tablename('v_edit_connec')
-        if layer:
-            layer.selectByRect(select_geometry, behaviour)
+        if self.current_action in (SelectAction.FORCED_ARCS, SelectAction.CLOSEST_ARCS):
+            print("ENTROO 1")
+            layer = tools_qgis.get_layer_by_tablename('v_edit_connec')
+            if layer:
+                layer.selectByRect(select_geometry, behaviour)
 
-        layer = tools_qgis.get_layer_by_tablename('v_edit_gully')
-        if layer:
-            layer.selectByRect(select_geometry, behaviour)
+            layer = tools_qgis.get_layer_by_tablename('v_edit_gully')
+            if layer:
+                layer.selectByRect(select_geometry, behaviour)
+            return
+        if self.current_action == SelectAction.FORCED_ARCS2:
+            print("ENTROO 2")
+            layer = tools_qgis.get_layer_by_tablename('v_edit_arc')
+            if layer:
+                # Use selectByRect to initially select features
+                layer.selectByRect(select_geometry, behaviour)
+
+                # Get the selected features after selection
+                selected_features = layer.selectedFeatures()
+
+                # If more than one feature is selected, keep only the first one
+                if len(selected_features) > 1:
+                    # Get the IDs of all selected features
+                    selected_ids = [feature.id() for feature in selected_features]
+                    # Keep only the first ID and deselect the others
+                    layer.selectByIds([selected_ids[0]])
+
+
 
     # endregion
