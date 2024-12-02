@@ -28,7 +28,7 @@ DECLARE
     v_query TEXT;
     v_data JSON;
     v_hydrometer_service INT[];
-    v_expl TEXT;
+    v_expl_id TEXT;
     v_fid INTEGER = 134;
     v_querytext TEXT;
     v_commitchanges BOOLEAN;
@@ -45,6 +45,8 @@ DECLARE
     v_visible_layer TEXT;
     v_ignorebrokenvalves BOOLEAN = TRUE;
 
+    v_macrominsector_id_arc TEXT;
+
     v_response JSON;
 
 BEGIN
@@ -56,7 +58,7 @@ BEGIN
 	SELECT giswater, epsg INTO v_version, v_srid FROM sys_version ORDER BY id DESC LIMIT 1;
 
     -- Get variables from input JSON
-	v_expl = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'exploitation');
+	v_expl_id = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'exploitation');
 	v_commitchanges = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'commitChanges');
 	v_updatemapzgeom = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'updateMapZone');
 	v_geomparamupdate = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'geomParamUpdate');
@@ -77,7 +79,7 @@ BEGIN
 
     -- Initialize process
 	-- =======================
-	v_data := '{"data":{"expl_id":"' || v_expl || '"}}';
+	v_data := '{"data":{"expl_id":"' || v_expl_id || '"}}';
     SELECT gw_fct_graphanalytics_initnetwork(v_data) INTO v_response;
 
     IF v_response->>'status' <> 'Accepted' THEN
@@ -106,12 +108,12 @@ BEGIN
     END IF;
 
     -- Arcs to be disconnected: one of the two arcs that reach the valve
-    UPDATE temp_pgr_arc a 
-    SET 
+    UPDATE temp_pgr_arc a
+    SET
         modif1 = CASE WHEN s.node_id = s.node_1 THEN TRUE ELSE modif1 END,
         modif2 = CASE WHEN s.node_id = s.node_2 THEN TRUE ELSE modif2 END
     FROM (
-        SELECT DISTINCT ON (n.pgr_node_id) n.pgr_node_id, a.pgr_arc_id, a.node_1, a.node_2 
+        SELECT DISTINCT ON (n.pgr_node_id) n.pgr_node_id, a.pgr_arc_id, a.node_1, a.node_2
         FROM temp_pgr_node n
         JOIN temp_pgr_arc a ON n.pgr_node_id IN (a.node_1, a.node_2)
         WHERE n.modif = TRUE -- Nodes that are minsectors
@@ -125,7 +127,7 @@ BEGIN
     FROM (
 	    SELECT distinct  n.node_id
 	    FROM temp_pgr_node n
-	    JOIN temp_pgr_arc a ON n.node_id IN (a.node_1, a.node_2) 
+	    JOIN temp_pgr_arc a ON n.node_id IN (a.node_1, a.node_2)
 	    LEFT JOIN (
 		    SELECT json_array_elements_text(((json_array_elements_text((graphconfig->>'use')::json))::json->>'toArc')::json) AS to_arc
 		    FROM sector
@@ -136,14 +138,14 @@ BEGIN
     WHERE n.node_id = s.node_id;
 
     -- Disconnect the InletArc (those that are not to_arc)
-    UPDATE temp_pgr_arc a 
+    UPDATE temp_pgr_arc a
     SET
 	    modif1= case when s.node_id = s.node_1 then true else modif1 end,
 	    modif2= case when s.node_id = s.node_2 then true else modif2 end
     FROM (
 	    SELECT a.arc_id, n.node_id, a.node_1, a.node_2
 	    FROM temp_pgr_node n
-	    JOIN temp_pgr_arc a ON n.node_id IN (a.node_1, a.node_2) 
+	    JOIN temp_pgr_arc a ON n.node_id IN (a.node_1, a.node_2)
 	    LEFT JOIN (
 		    SELECT json_array_elements_text(((json_array_elements_text((graphconfig->>'use')::json))::json->>'toArc')::json) AS to_arc
 		    FROM sector
@@ -311,16 +313,47 @@ BEGIN
         INSERT INTO minsector SELECT * FROM temp_minsector;
 
         -- Update minsector graph
-        TRUNCATE minsector_graph;
+        -- For user selected exploitations
+        IF v_expl_id = '-901' THEN
+            SELECT string_agg(DISTINCT macrominsector_id::TEXT, ',') INTO v_macrominsector_id_arc
+            FROM v_edit_arc a
+            WHERE a.minsector_id <> '0'
+            AND a.macrominsector_id <> '0';
+
+            DELETE FROM minsector_graph WHERE macrominsector_id::TEXT = ANY(string_to_array(v_macrominsector_id_arc, ','));
+        -- For all exploitations
+        ELSIF v_expl_id = '-902' THEN
+            SELECT string_agg(DISTINCT macrominsector_id::TEXT, ',') INTO v_macrominsector_id_arc
+            FROM arc a
+            WHERE a.minsector_id <> '0'
+            AND a.macrominsector_id <> '0';
+
+            TRUNCATE minsector_graph;
+        -- For a specific exploitation/s
+        ELSE
+            SELECT string_agg(DISTINCT macrominsector_id::TEXT, ',') INTO v_macrominsector_id_arc
+            FROM arc a
+            WHERE a.minsector_id <> '0'
+            AND a.macrominsector_id <> '0'
+            AND a.expl_id::TEXT = ANY(string_to_array(v_expl_id, ','));
+
+            DELETE FROM minsector_graph WHERE macrominsector_id::TEXT = ANY(string_to_array(v_macrominsector_id_arc, ','));
+        END IF;
+
         INSERT INTO minsector_graph (node_id, minsector_1, minsector_2)
         SELECT DISTINCT ON (node_id) node_id, minsector_id_1, minsector_id_2 FROM temp_pgr_minsector;
 
-        -- Update values (only for objects belonging to the selected exploitations)
-        EXECUTE 'UPDATE arc a SET minsector_id = t.zone_id FROM temp_pgr_arc t WHERE a.arc_id = t.arc_id AND a.expl_id IN ('||v_expl||')';
-        EXECUTE 'UPDATE node n SET minsector_id = t.zone_id FROM temp_pgr_node t WHERE n.node_id = t.node_id AND n.expl_id IN ('||v_expl||')';
+        -- Update minsector_id set to '0'
+        EXECUTE 'UPDATE arc SET minsector_id = 0 WHERE minsector_id <> 0 AND macrominsector_id::TEXT = ANY(string_to_array('''||v_macrominsector_id_arc||''', '',''))';
+        EXECUTE 'UPDATE node SET minsector_id = 0 WHERE minsector_id <> 0 AND macrominsector_id::TEXT = ANY(string_to_array('''||v_macrominsector_id_arc||''', '',''))';
+        EXECUTE 'UPDATE connec SET minsector_id = 0 WHERE minsector_id <> 0 AND macrominsector_id::TEXT = ANY(string_to_array('''||v_macrominsector_id_arc||''', '',''))';
+        EXECUTE 'UPDATE link SET minsector_id = 0 WHERE minsector_id <> 0 AND macrominsector_id::TEXT = ANY(string_to_array('''||v_macrominsector_id_arc||''', '',''))';
 
-        EXECUTE 'UPDATE connec c SET minsector_id = t.minsector_id FROM temp_pgr_connec t WHERE c.connec_id = t.connec_id AND t.expl_id IN ('||v_expl||')';
-        EXECUTE 'UPDATE link l SET minsector_id = t.minsector_id FROM temp_pgr_link t WHERE l.link_id = t.link_id AND l.expl_id IN ('||v_expl||')';
+        -- Update minsector_id only for the elements that are in the temporary tables
+        EXECUTE 'UPDATE arc a SET minsector_id = t.zone_id FROM temp_pgr_arc t WHERE a.arc_id = t.arc_id';
+        EXECUTE 'UPDATE node n SET minsector_id = t.zone_id FROM temp_pgr_node t WHERE n.node_id = t.node_id';
+        EXECUTE 'UPDATE connec c SET minsector_id = t.minsector_id FROM temp_pgr_connec t WHERE c.connec_id = t.connec_id';
+        EXECUTE 'UPDATE link l SET minsector_id = t.minsector_id FROM temp_pgr_link t WHERE l.link_id = t.link_id';
 
         v_result := NULL;
         v_result := COALESCE(v_result, '{}');
