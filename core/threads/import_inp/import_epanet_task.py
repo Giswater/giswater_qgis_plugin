@@ -229,11 +229,10 @@ class GwImportInpTask(GwTask):
         self._save_pipes()
 
     def _get_db_units(self) -> None:
-        units_query = "SELECT value FROM vi_options WHERE parameter = 'UNITS'"
-        units_row = get_row(units_query, commit=False)
-        if not units_row:
-            raise ValueError("Units not specified in the Giswater project.")
-        self.db_units = units_row[0]
+        units = self.network.options.hydraulic.inpfile_units
+        if not units:
+            raise ValueError("Units not specified in the INP file.")
+        self.db_units = units
 
     def _validate_inputs(self) -> None:
         if not self.workcat:
