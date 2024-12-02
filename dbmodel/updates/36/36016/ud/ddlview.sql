@@ -487,7 +487,7 @@ CREATE OR REPLACE VIEW v_edit_inp_subcatchment AS
     inp_subcatchment.the_geom,
     inp_subcatchment.descript,
     inp_subcatchment.minelev,
-    muni_id
+    inp_subcatchment.muni_id
    FROM inp_subcatchment, config_param_user, selector_sector, selector_municipality
    WHERE inp_subcatchment.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text 
    AND ((muni_id = selector_municipality.muni_id AND selector_municipality.cur_user = "current_user"()::text) or muni_id is NULL OR muni_id = 0)
