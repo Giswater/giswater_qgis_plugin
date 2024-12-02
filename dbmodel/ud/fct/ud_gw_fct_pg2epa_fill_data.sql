@@ -232,12 +232,12 @@ BEGIN
 	END IF;
 
 	-- orifice
-	INSERT INTO temp_t_arc_flowregulator (arc_id, type, ori_type, offsetval, cd, orate, flap, shape, geom1, geom2, geom3, geom4, close_time)
-	SELECT arc_id, 'ORIFICE', ori_type, offsetval, cd, orate, flap, shape, geom1, geom2, 0, 0, close_time
+	INSERT INTO temp_t_arc_flowregulator (arc_id, type, ori_type, offsetval, cd, orate, flap, shape, geom1, geom2, geom3, geom4)
+	SELECT arc_id, 'ORIFICE', ori_type, offsetval, cd, orate, flap, shape, geom1, geom2, 0, 0
 	FROM v_edit_inp_orifice;
 
-	INSERT INTO temp_t_arc_flowregulator (arc_id, type, ori_type, offsetval, cd, orate, flap, shape, geom1, geom2, geom3, geom4, close_time)
-	SELECT nodarc_id, 'ORIFICE', ori_type, offsetval, cd, orate, flap, shape, geom1, geom2, 0, 0, close_time
+	INSERT INTO temp_t_arc_flowregulator (arc_id, type, ori_type, offsetval, cd, orate, flap, shape, geom1, geom2, geom3, geom4)
+	SELECT nodarc_id, 'ORIFICE', ori_type, offsetval, cd, orate, flap, shape, geom1, geom2, 0, 0
 	FROM v_edit_inp_flwreg_orifice;
 
 	-- outlet
@@ -284,17 +284,17 @@ BEGIN
 	-- rpt_inp_raingage
 	INSERT INTO temp_rpt_inp_raingage
 	SELECT result_id_var, * FROM v_edit_raingage;
-	
+
 	-- setting same rainfall for all raingage
 	IF v_rainfall IS NOT NULL THEN
 		UPDATE temp_rpt_inp_raingage SET timser_id=v_rainfall, rgage_type='TIMESERIES';
 	END IF;
-	
+
 	-- setting for date-time parameters if rainfall has addparam values)
 	select * into v_timeseries from inp_timeseries where id = v_rainfall;
-	
+
 	IF json_extract_path_text(v_timeseries.addparam,'start_date') IS NOT NULL AND json_extract_path_text(v_timeseries.addparam,'start_date') != '' THEN
-		update config_param_user set value = json_extract_path_text(v_timeseries.addparam,'start_date') 
+		update config_param_user set value = json_extract_path_text(v_timeseries.addparam,'start_date')
 		where cur_user = current_user and parameter = 'inp_options_start_date';
 		update config_param_user set value = json_extract_path_text(v_timeseries.addparam,'start_time')
 		where cur_user = current_user and parameter = 'inp_options_start_time';
@@ -306,9 +306,9 @@ BEGIN
 		where cur_user = current_user and parameter = 'inp_options_report_start_date';
 		update config_param_user set value = json_extract_path_text(v_timeseries.addparam,'start_time')
 		where cur_user = current_user and parameter = 'inp_options_report_start_time';
-	
+
 	END IF;
-	
+
 
 	RETURN 1;
 END;

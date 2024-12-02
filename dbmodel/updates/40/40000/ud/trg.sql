@@ -180,3 +180,6 @@ UPDATE
     OR ((OLD.fluid_type)::TEXT IS DISTINCT FROM (NEW.fluid_type)::TEXT)
     OR ((OLD.location_type)::TEXT IS DISTINCT FROM (NEW.location_type)::TEXT))
     EXECUTE FUNCTION gw_trg_mantypevalue_fk('gully');
+
+-- 02/12/2024
+CREATE TRIGGER gw_trg_edit_ve_epa_orifice INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_epa_orifice FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_ve_epa('orifice');

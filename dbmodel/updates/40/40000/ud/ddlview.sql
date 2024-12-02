@@ -2755,7 +2755,6 @@ AS SELECT f.nodarc_id,
     f.geom2,
     f.geom3,
     f.geom4,
-    f.close_time,
     st_setsrid(st_makeline(n.the_geom, st_lineinterpolatepoint(a.the_geom, f.flwreg_length / st_length(a.the_geom))), SRID_VALUE)::geometry(LineString,SRID_VALUE) AS the_geom
     FROM inp_flwreg_orifice f
     JOIN v_edit_node n USING (node_id)
@@ -2829,7 +2828,6 @@ AS SELECT s.dscenario_id,
     f.geom2,
     f.geom3,
     f.geom4,
-    f.close_time,
     n.the_geom
     FROM selector_inp_dscenario s, inp_dscenario_flwreg_orifice f
     JOIN v_edit_inp_flwreg_orifice n USING (nodarc_id)
@@ -2870,8 +2868,7 @@ AS SELECT v_edit_arc.arc_id,
     inp_orifice.geom2,
     inp_orifice.geom3,
     inp_orifice.geom4,
-    v_edit_arc.the_geom,
-    inp_orifice.close_time
+    v_edit_arc.the_geom
     FROM v_edit_arc
     JOIN inp_orifice USING (arc_id)
     WHERE is_operative IS TRUE;
@@ -4601,3 +4598,33 @@ AS SELECT sd.dscenario_id,
     inp_dscenario_lids l
      JOIN v_edit_inp_subcatchment s USING (subc_id)
   WHERE l.dscenario_id = sd.dscenario_id AND sd.cur_user = CURRENT_USER;
+
+-- 02/12/2024
+CREATE OR REPLACE VIEW ve_epa_orifice
+AS SELECT inp_orifice.arc_id,
+    inp_orifice.ori_type,
+    inp_orifice.offsetval,
+    inp_orifice.cd,
+    inp_orifice.orate,
+    inp_orifice.flap,
+    inp_orifice.shape,
+    inp_orifice.geom1,
+    inp_orifice.geom2,
+    inp_orifice.geom3,
+    inp_orifice.geom4,
+    rpt_arcflow_sum.max_flow,
+    rpt_arcflow_sum.time_days,
+    rpt_arcflow_sum.time_hour,
+    rpt_arcflow_sum.max_veloc,
+    rpt_arcflow_sum.mfull_flow,
+    rpt_arcflow_sum.mfull_dept,
+    rpt_arcflow_sum.max_shear,
+    rpt_arcflow_sum.max_hr,
+    rpt_arcflow_sum.max_slope,
+    rpt_arcflow_sum.day_max,
+    rpt_arcflow_sum.time_max,
+    rpt_arcflow_sum.min_shear,
+    rpt_arcflow_sum.day_min,
+    rpt_arcflow_sum.time_min
+   FROM inp_orifice
+     LEFT JOIN rpt_arcflow_sum USING (arc_id);

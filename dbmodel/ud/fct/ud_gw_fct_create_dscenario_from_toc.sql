@@ -6,19 +6,19 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 3118
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_create_dscenario_from_toc(p_data json) 
-RETURNS json AS 
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_create_dscenario_from_toc(p_data json)
+RETURNS json AS
 $BODY$
 
 /*EXAMPLE
 
 -- fid: 403
-SELECT SCHEMA_NAME.gw_fct_create_dscenario_from_toc($${"client":{"device":4, "lang":"ca_ES", "infoType":1, "epsg":25831}, "form":{}, 
-"feature":{"tableName":"v_edit_arc", "featureType":"ARC", "id":[]}, 
+SELECT SCHEMA_NAME.gw_fct_create_dscenario_from_toc($${"client":{"device":4, "lang":"ca_ES", "infoType":1, "epsg":25831}, "form":{},
+"feature":{"tableName":"v_edit_arc", "featureType":"ARC", "id":[]},
 "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"wholeSelection","parameters":{"name":"test", "type":"CONDUIT"}}}$$);
 
-SELECT SCHEMA_NAME.gw_fct_create_dscenario_from_toc($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{}, 
-"feature":{"tableName":"v_edit_inp_storage", "featureType":"NODE", "id":[]}, "data":{"filterFields":{}, "pageInfo":{}, 
+SELECT SCHEMA_NAME.gw_fct_create_dscenario_from_toc($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{},
+"feature":{"tableName":"v_edit_inp_storage", "featureType":"NODE", "id":[]}, "data":{"filterFields":{}, "pageInfo":{},
 "selectionMode":"wholeSelection","parameters":{"name":"storage", "type":"STORAGE", "exploitation":"1", "descript":"test"}, "aux_params":null}}$$);
 
 */
@@ -61,13 +61,13 @@ v_lidco text;
 BEGIN
 
 	SET search_path = "SCHEMA_NAME", public;
-	
+
 	-- get system parameters
 	SELECT giswater, project_type INTO v_version, v_projecttype FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- get user parameters
 	v_lidco :=  (SELECT value FROM config_param_user WHERE parameter = 'epa_lidco_vdefault' AND cur_user = current_user);
-	
+
 	-- get input parameters
 	v_name :=  ((p_data ->>'data')::json->>'parameters')::json->>'name';
 	v_descript :=  ((p_data ->>'data')::json->>'parameters')::json->>'descript';
@@ -80,7 +80,7 @@ BEGIN
 	v_featuretype :=  ((p_data ->>'feature')::json->>'featureType')::text;
 	v_targettable = replace(v_sourcetable,'v_edit_inp','inp_dscenario'); -- for all in exception of v_edit_raingage
 	v_targettable = replace(v_targettable,'v_edit','inp_dscenario'); -- for v_edit_raingage
-	
+
 	IF v_selectionmode = 'wholeSelection' THEN v_id= replace(replace(replace(v_id::text,'[','('),']',')'),'"','');END IF;
 
 	-- subcatchment <-> lids
@@ -98,7 +98,7 @@ BEGIN
 
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 3, 'ERRORS');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 3, '--------');
-	
+
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 2, 'WARNINGS');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 2, '---------');
 
@@ -108,26 +108,26 @@ BEGIN
 	-- inserting on catalog table
 	PERFORM setval('SCHEMA_NAME.cat_dscenario_dscenario_id_seq'::regclass,(SELECT max(dscenario_id) FROM cat_dscenario) ,true);
 
-	INSERT INTO cat_dscenario ( name, descript, dscenario_type, expl_id, log) 
+	INSERT INTO cat_dscenario ( name, descript, dscenario_type, expl_id, log)
 	VALUES ( v_name, v_descript, v_type, v_expl, concat('Insert by ',current_user,' on ', substring(now()::text,0,20))) ON CONFLICT (name) DO NOTHING
 	RETURNING dscenario_id INTO v_scenarioid;
 
 	IF v_scenarioid IS NULL THEN
 		SELECT dscenario_id INTO v_scenarioid FROM cat_dscenario where name = v_name;
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 		VALUES (v_fid, null, 3, concat('ERROR: The dscenario ( ',v_scenarioid,' ) already exists with proposed name ',v_name ,'. Please try another one.'));
-	ELSE 
+	ELSE
 		-- getting columns
 		IF v_targettable = 'inp_dscenario_conduit' THEN
 			v_columns = v_scenarioid||', arc_id, arccat_id, matcat_id, custom_n, barrels, culvert, kentry, kexit,kavg, flap, q0, qmax, seepage';
-			
+
 		ELSIF v_targettable = 'inp_dscenario_divider' THEN
 			v_columns = v_scenarioid||', node_id, elev, ymax, divider_type, arc_id, curve_id, qmin, ht, cd, y0, ysur, apond';
 
 		ELSIF v_targettable = 'inp_dscenario_flwreg_orifice' THEN
 			v_columns = v_scenarioid||', node_id, order_id, to_arc, flwreg_length,  ori_type, offsetval, cd, orate, flap, shape,
-			geom1, geom2, geom3, geom4, close_time';
-			
+			geom1, geom2, geom3, geom4';
+
 	 	ELSIF v_targettable = 'inp_dscenario_flwreg_outlet' THEN
 			v_columns = v_scenarioid||', node_id, order_id, to_arc, flwreg_length, outlet_type, offsetval, curve_id, cd1, cd2';
 
@@ -137,13 +137,13 @@ BEGIN
 	 	ELSIF v_targettable = 'inp_dscenario_flwreg_weir' THEN
 			v_columns = v_scenarioid||', node_id, order_id, to_arc, flwreg_length, weir_type, offsetval, cd, ec, 
 			cd2, flap, geom1, geom2, geom3, geom4, surcharge, road_width, road_surf, coef_curve';
-			
+
 		ELSIF v_targettable = 'inp_dscenario_inflows' THEN
 			v_columns = v_scenarioid||', node_id, order_id, timser_id, format_type, mfactor, sfactor, base, pattern_id';
-			
+
 	 	ELSIF v_targettable = 'inp_dscenario_inflows_poll' THEN
 			v_columns = v_scenarioid||', poll_id,  node_id, timser_id, form_type, mfactor, factor, base, pattern_id';
-						
+
 	 	ELSIF v_targettable = 'inp_dscenario_junction' THEN
 			v_columns = v_scenarioid||', node_id, y0, ysur, apond, outfallparam::json';
 
@@ -152,33 +152,33 @@ BEGIN
 
  		ELSIF v_targettable = 'inp_dscenario_outfall' THEN
 			v_columns = v_scenarioid||', node_id, outfall_type, stage, curve_id, timser_id, gate';
-			
+
 		ELSIF v_targettable = 'inp_dscenario_raingage' THEN
 			v_columns = v_scenarioid||', rg_id, form_type, intvl, scf, rgage_type, timser_id, fname, sta, units';
-	 		
+
 		ELSIF v_targettable = 'inp_dscenario_storage' THEN
 			v_columns = v_scenarioid||', node_id, elev, ymax, storage_type, curve_id, a1, a2, a0, fevap, sh, hc, imd, y0, ysur, apond';
 
 	 	ELSIF v_targettable = 'inp_dscenario_treatment' THEN
 			v_columns = v_scenarioid||', node_id, poll_id, function';
-			
-		ELSE 
+
+		ELSE
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '');
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (v_fid, null, 3, concat('ERROR: The table chosen does not fit with any epa dscenario. Please try another one.'));
 			v_finish = true;
-			
+
 			DELETE FROM cat_dscenario WHERE dscenario_id = v_scenarioid;
 		END IF;
-		
+
 		IF v_finish IS NOT TRUE THEN
 
 			-- log
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	VALUES (v_fid, null, 1, concat('INFO: Process done successfully.'));
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) 
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (v_fid, null, 4, concat('New scenario type ',v_type,' with name ''',v_name, ''' and id ''',v_scenarioid,''' have been created.'));
 			INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '');
-		
+
 			-- inserting values on tables
 			v_count = 0;
 			IF v_selectionmode = 'wholeSelection' THEN
@@ -205,15 +205,15 @@ BEGIN
 				EXECUTE v_querytext;
 				GET DIAGNOSTICS v_count = row_count;
 			END IF;
-			
-			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	
+
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (v_fid, v_result_id, 1, concat('INFO: ',v_count, ' features have been inserted on table ', v_targettable,'.'));
 
-			
+
 
 			-- set selector
 			DELETE FROM selector_inp_dscenario WHERE cur_user = current_user;
-			INSERT INTO selector_inp_dscenario (dscenario_id,cur_user) VALUES (v_scenarioid, current_user) ON CONFLICT (dscenario_id,cur_user) DO NOTHING ;	
+			INSERT INTO selector_inp_dscenario (dscenario_id,cur_user) VALUES (v_scenarioid, current_user) ON CONFLICT (dscenario_id,cur_user) DO NOTHING ;
 		END IF;
 	END IF;
 
@@ -223,20 +223,20 @@ BEGIN
 
 	-- get results
 	-- info
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid order by criticity desc, id asc) row;
-	v_result := COALESCE(v_result, '{}'); 
+	v_result := COALESCE(v_result, '{}');
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
 	-- Control nulls
-	v_result_info := COALESCE(v_result_info, '{}'); 
+	v_result_info := COALESCE(v_result_info, '{}');
 
 	-- Return
 	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Analysis done successfully"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||
 			'}}'||
-	    '}')::json, 3042, null, null, null); 
+	    '}')::json, 3042, null, null, null);
 
 END;
 $BODY$

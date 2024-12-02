@@ -682,8 +682,7 @@ BEGIN
 	    f.offsetval,
 	    f.cd,
 	    f.flap,
-	    f.orate,
-	    f.close_time
+	    f.orate
 	   FROM temp_t_arc_flowregulator f
 	     JOIN temp_t_arc USING (arc_id)
 	  WHERE f.type::text = 'ORIFICE'::text;

@@ -7,11 +7,11 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION NODE: 3140
 
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_ve_epa() 
-RETURNS trigger AS 
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_ve_epa()
+RETURNS trigger AS
 $BODY$
 
-DECLARE 
+DECLARE
 v_epatype varchar;
 
 
@@ -20,7 +20,7 @@ BEGIN
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
     v_epatype:= TG_ARGV[0];
 
-   
+
     -- Control insertions ID
     IF TG_OP = 'INSERT' THEN
         EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
@@ -30,28 +30,28 @@ BEGIN
     ELSIF TG_OP = 'UPDATE' THEN
 
 		IF v_epatype = 'junction' THEN
-            UPDATE inp_junction 
+            UPDATE inp_junction
             SET y0=NEW.y0, ysur=NEW.ysur, apond=NEW.apond, outfallparam = NEW.outfallparam::json
             WHERE node_id=OLD.node_id;
-            
+
         ELSIF v_epatype = 'storage' THEN
-            UPDATE inp_storage 
-            SET storage_type=NEW.storage_type,curve_id=NEW.curve_id,a1=NEW.a1,a2=NEW.a2,a0=NEW.a0,fevap=NEW.fevap,sh=NEW.sh,hc=NEW.hc,imd=NEW.imd,y0=NEW.y0, ysur=NEW.ysur, apond=NEW.apond 
+            UPDATE inp_storage
+            SET storage_type=NEW.storage_type,curve_id=NEW.curve_id,a1=NEW.a1,a2=NEW.a2,a0=NEW.a0,fevap=NEW.fevap,sh=NEW.sh,hc=NEW.hc,imd=NEW.imd,y0=NEW.y0, ysur=NEW.ysur, apond=NEW.apond
             WHERE node_id=OLD.node_id;
-            
-        ELSIF v_epatype = 'outfall' THEN          
-            UPDATE inp_outfall 
-            SET outfall_type=NEW.outfall_type,stage=NEW.stage,curve_id=NEW.curve_id,timser_id=NEW.timser_id,gate=NEW.gate 
+
+        ELSIF v_epatype = 'outfall' THEN
+            UPDATE inp_outfall
+            SET outfall_type=NEW.outfall_type,stage=NEW.stage,curve_id=NEW.curve_id,timser_id=NEW.timser_id,gate=NEW.gate
             WHERE node_id=OLD.node_id;
 
         ELSIF v_epatype = 'conduit' THEN
-            UPDATE inp_conduit 
-            SET barrels=NEW.barrels,culvert=NEW.culvert,kentry=NEW.kentry,kexit=NEW.kexit,kavg=NEW.kavg,flap=NEW.flap,q0=NEW.q0 
-            WHERE arc_id=OLD.arc_id; 
+            UPDATE inp_conduit
+            SET barrels=NEW.barrels,culvert=NEW.culvert,kentry=NEW.kentry,kexit=NEW.kexit,kavg=NEW.kavg,flap=NEW.flap,q0=NEW.q0
+            WHERE arc_id=OLD.arc_id;
 
         ELSIF v_epatype = 'pump' THEN
-            UPDATE inp_pump 
-            SET curve_id=NEW.curve_id,status=NEW.status,startup=NEW.startup,shutoff=NEW.shutoff 
+            UPDATE inp_pump
+            SET curve_id=NEW.curve_id,status=NEW.status,startup=NEW.startup,shutoff=NEW.shutoff
             WHERE arc_id=OLD.arc_id;
 
         ELSIF v_epatype = 'virtual' THEN
@@ -68,7 +68,7 @@ BEGIN
         ELSIF v_epatype = 'orifice' THEN
             UPDATE inp_orifice
             SET ori_type=NEW.ori_type, offsetval=NEW.offsetval, cd=NEW.cd, orate=NEW.orate, flap=NEW.flap, shape=NEW.shape, geom1=NEW.geom1,
-            geom2=NEW.geom2, geom3=NEW.geom3, geom4=NEW.geom4, close_time=NEW.close_time
+            geom2=NEW.geom2, geom3=NEW.geom3, geom4=NEW.geom4
             WHERE arc_id=OLD.arc_id;
 
         ELSIF v_epatype = 'weir' THEN
@@ -84,14 +84,14 @@ BEGIN
         END IF;
 
 		RETURN NEW;
-        
+
     ELSIF TG_OP = 'DELETE' THEN
         EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
         "data":{"message":"1032", "function":"3140","debug_msg":null}}$$);';
         RETURN NEW;
-    
+
     END IF;
-       
+
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

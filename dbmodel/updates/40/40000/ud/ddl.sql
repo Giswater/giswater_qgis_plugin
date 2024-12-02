@@ -256,3 +256,13 @@ ALTER TABLE arc ALTER COLUMN macrominsector_id SET DEFAULT 0;
 ALTER TABLE connec ALTER COLUMN macrominsector_id SET DEFAULT 0;
 ALTER TABLE link ALTER COLUMN macrominsector_id SET DEFAULT 0;
 ALTER TABLE gully ALTER COLUMN macrominsector_id SET DEFAULT 0;
+
+-- 02/12/2024
+DROP VIEW IF EXISTS ve_epa_orifice;
+DROP VIEW IF EXISTS v_edit_inp_orifice;
+DROP VIEW IF EXISTS v_edit_inp_dscenario_flwreg_orifice;
+DROP VIEW IF EXISTS v_edit_inp_flwreg_orifice;
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP", "table":"inp_orifice", "column":"close_time"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP", "table":"inp_flwreg_orifice", "column":"close_time"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP", "table":"inp_dscenario_flwreg_orifice", "column":"close_time"}}$$);
