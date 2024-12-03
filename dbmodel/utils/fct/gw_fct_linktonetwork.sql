@@ -140,7 +140,7 @@ BEGIN
 	IF v_forceendpoint IS NULL THEN v_forceendpoint = FALSE; END IF;
 
 	--control v_check status and value and distance
-	IF v_check_maxdistance IS NULL THEN v_check_maxdistance = 100; END IF;
+	IF v_check_status IS FALSE OR v_check_maxdistance IS NULL THEN v_check_maxdistance = 999; END IF;
   	IF v_check_status IS TRUE and v_projecttype = 'WS' THEN	
   	  	IF v_check_arcdnom IS NULL THEN v_check_arcdnom = 2000; END IF;
 		IF v_check_arcdnom <= (SELECT min(cat_dnom::float) FROM vu_arc) THEN
@@ -198,8 +198,18 @@ BEGIN
 			v_forcedarcs= '';
 		END IF; 
 
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-		VALUES (217, null, 4, concat('Trying to connect ', lower(v_feature_type),' with id ',v_connect_id,'.'));
+		IF v_check_status IS TRUE and v_projecttype = 'WS' THEN
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+			VALUES (217, null, 4, 
+			concat('Trying to connect ', lower(v_feature_type),' with id ',v_connect_id,' to an arc with a diameter smaller than ',v_check_arcdnom,' and at maximum distance of ',v_check_maxdistance,' meters.'));
+		ELSIF v_check_status IS TRUE and v_projecttype = 'UD' THEN
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+			VALUES (217, null, 4, 
+			concat('Trying to connect ', lower(v_feature_type),' with id ',v_connect_id,' to an arc at a maximum distance of ',v_check_maxdistance,' meters.'));
+		ELSE
+			INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+			VALUES (217, null, 4, concat('Trying to connect ', lower(v_feature_type),' with id ',v_connect_id,'.'));
+		END IF;
 
 		-- get feature information
 		IF v_feature_type ='CONNEC' THEN
@@ -259,7 +269,7 @@ BEGIN
 		ELSE
 
 			-- Use check arc diameter variable 
-			IF v_check_status IS TRUE THEN	
+			IF v_check_status IS TRUE and v_projecttype = 'WS' THEN
 				v_checkeddiam = concat(' AND cat_dnom::float <',v_check_arcdnom,' ');
 			ELSE v_checkeddiam = '';
 			END IF;
@@ -393,7 +403,7 @@ BEGIN
 						
 							IF  v_check_status IS TRUE THEN	
 								INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-								VALUES (217, null, 4, concat('Create new link connected to the closest arc with diameter smaller than ',v_check_arcdnom,'.'));
+								VALUES (217, null, 4, concat('Create new link connected to the closest arc with the appropriate conditions.'));
 							ELSE
 							    IF v_isforcedarcs THEN
 							        INSERT INTO audit_check_data (fid, result_id, criticity, error_message)

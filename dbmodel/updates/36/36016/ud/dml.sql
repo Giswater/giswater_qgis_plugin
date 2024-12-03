@@ -25,6 +25,6 @@ UPDATE config_form_fields
 	SET layoutname='lyt_data_1', layoutorder=10, "datatype"='string'
 	WHERE formname='v_edit_raingage' AND columnname='muni_id';
 	
-update config_param_system set value= '{"status":false, "maxDistance":15}',
+update config_param_system set value= '{"status":false, "maxDistance":30}',
 parameter = 'edit_link_link2network' where "parameter" ='edit_link_check_arcdnom';
 
