@@ -711,3 +711,19 @@ INSERT INTO config_form_tableview (location_type, project_type, objectname, colu
 }'::json);
 INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('epamanager_form', 'utils', 'epa_results', 'inp_options', NULL, false, NULL, NULL, NULL, NULL);
 INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('epamanager_form', 'utils', 'epa_results', 'network_stats', NULL, false, NULL, NULL, NULL, NULL);
+
+
+
+-- 03/12/2024
+UPDATE config_form_fields
+	SET widgetfunction='{"functionName": "btn_accept_featuretype_change", "module": "featuretype_change_btn", "parameters": {}}'::json
+	WHERE formname='generic' AND formtype='form_featuretype_change' AND columnname='btn_accept' AND tabname='tab_none';
+UPDATE config_form_fields
+	SET widgetfunction='{"functionName": "btn_cancel_featuretype_change", "module": "featuretype_change_btn", "parameters": {}}'::json
+	WHERE formname='generic' AND formtype='form_featuretype_change' AND columnname='btn_cancel' AND tabname='tab_none';
+UPDATE config_form_fields
+	SET widgetfunction='{"functionName": "btn_catalog_featuretype_change", "module": "featuretype_change_btn", "parameters": {}}'::json
+	WHERE formname='generic' AND formtype='form_featuretype_change' AND columnname='btn_catalog' AND tabname='tab_none';
+UPDATE config_form_fields
+	SET widgetfunction='{"functionName": "cmb_new_featuretype_selection_changed", "module": "featuretype_change_btn", "parameters": {}}'::json
+	WHERE formname='generic' AND formtype='form_featuretype_change' AND columnname='feature_type_new' AND tabname='tab_none';
