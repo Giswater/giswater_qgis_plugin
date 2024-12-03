@@ -46,7 +46,7 @@ from ..ui.ui_manager import GwSelectorUi
 from . import tools_backend_calls
 from ..load_project_menu import GwMenuLoad
 from ..utils.select_manager import GwSelectManager
-from ..toolbars.toc import layerstyle_change_button
+from ..toolbars.toc import layerstyle_change_btn
 from ... import global_vars
 from ...libs import lib_vars, tools_qgis, tools_qt, tools_log, tools_os, tools_db
 from ...libs.tools_qt import GwHyperLinkLabel, GwHyperLinkLineEdit
@@ -54,7 +54,7 @@ from ...libs.tools_qt import GwHyperLinkLabel, GwHyperLinkLineEdit
 # These imports are for the add_{widget} functions (modules need to be imported in order to find it by its name)
 # noinspection PyUnresolvedReferences
 from ..shared import info, mincut_tools
-from ..toolbars.edit import featuretype_change_button
+from ..toolbars.edit import featuretype_change_btn
 
 QgsGeometryType = Literal['line', 'point', 'polygon']
 

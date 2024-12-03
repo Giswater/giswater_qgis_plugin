@@ -13,7 +13,7 @@ from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QCompleter
 from qgis.core import QgsExpression, QgsFeatureRequest
 
-from ...toolbars.dialog import GwAction
+from ..dialog import GwAction
 from ...ui.ui_manager import GwFeatureEndUi, GwInfoWorkcatUi, GwFeatureEndConnecUi
 from ...utils import tools_gw
 from ....libs import lib_vars, tools_qgis, tools_qt, tools_log, tools_db

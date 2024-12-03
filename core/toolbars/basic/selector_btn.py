@@ -7,7 +7,7 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from ..dialog import GwAction
 from ...shared.selector import GwSelector
-from ....core.utils import tools_gw
+from ...utils import tools_gw
 
 
 class GwSelectorButton(GwAction):

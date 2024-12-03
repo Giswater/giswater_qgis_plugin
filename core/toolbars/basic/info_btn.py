@@ -17,7 +17,7 @@ from qgis.core import QgsApplication, QgsGeometry, QgsMapToPixel, QgsPointXY
 
 from ...shared import info
 from ...shared.info import GwInfo
-from ...toolbars.maptool import GwMaptool
+from ..maptool import GwMaptool
 from ...threads.toggle_valve_state import GwToggleValveTask
 from ...utils import tools_gw
 from .... import global_vars
