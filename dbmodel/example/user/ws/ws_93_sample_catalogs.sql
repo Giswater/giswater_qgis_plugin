@@ -148,9 +148,9 @@ INSERT INTO cat_node VALUES ('MANHOLE', 'MANHOLE', 'N/I', NULL, NULL, NULL, NULL
 INSERT INTO cat_node VALUES ('TDN160-63 PN16', 'T', 'FD', '16', '160', NULL, NULL, NULL, 'FD T', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_T160-63_PN16', true, NULL, 2, NULL);
 INSERT INTO cat_node VALUES ('XDN110-90 PN16', 'X', 'FD', '16', '110', NULL, NULL, NULL, 'X', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_XDN110-90_PN16', true, NULL, 2, NULL);
 INSERT INTO cat_node VALUES ('JUNCTION CHNGMAT', 'JUNCTION', 'N/I', '16', '160', NULL, NULL, NULL, 'Change of arc material', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_JUNCT_CHNGMAT', true, NULL, 1, NULL);
-INSERT INTO cat_node VALUES('CONTROL_REGISTER_1', 'CONTROL_REGISTER', 'N/I', NULL, NULL, NULL, NULL, NULL, 'Control register', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', NULL, true, NULL, 2, NULL);
-INSERT INTO cat_node VALUES('PR_BREAK_VALVE100-PN16', 'PR_BREAK_VALVE', 'FD', '16', '100', 102.00000, NULL, NULL, 'Pressure break valve 100mm', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', NULL, true, NULL, 2, NULL);
-INSERT INTO cat_node VALUES('PR_SUSTA_VALVE100-PN16', 'PR_SUSTA_VALVE', 'FD', '16', '100', 102.00000, NULL, NULL, 'Pressure sustain valve 100mm', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', NULL, true, NULL, 2, NULL);
+INSERT INTO cat_node VALUES('CONTROL_REGISTER_1', 'CONTROL_REGISTER', 'N/I', NULL, NULL, NULL, NULL, NULL, 'Control register', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_REGISTER', true, NULL, 2, NULL);
+INSERT INTO cat_node VALUES('PR_BREAK_VALVE100-PN16', 'PR_BREAK_VALVE', 'FD', '16', '100', 102.00000, NULL, NULL, 'Pressure break valve 100mm', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_PRVAL100_6/16', true, NULL, 2, NULL);
+INSERT INTO cat_node VALUES('PR_SUSTA_VALVE100-PN16', 'PR_SUSTA_VALVE', 'FD', '16', '100', 102.00000, NULL, NULL, 'Pressure sustain valve 100mm', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1.00, 'u', 'N_PRVAL100_6/16', true, NULL, 2, NULL);
 
 
 INSERT INTO cat_owner VALUES ('owner1', NULL, NULL, true);

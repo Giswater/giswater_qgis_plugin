@@ -58,7 +58,7 @@ UPDATE config_param_system SET value = '{"setArcObsolete":"true","setOldCode":"f
 SELECT gw_fct_setchangefeaturetype($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{"type":"node"}, "data":{"filterFields":{}, "pageInfo":{}, "feature_id":"1082", "feature_type_new":"SHUTOFF_VALVE", "featurecat_id":"SHTFF-VALVE110-PN16"}}$$);
 
 UPDATE cat_feature set active=true where id = 'THROTTLE_VALVE';
-INSERT INTO cat_node VALUES ('THROTTLE_VALVE_200','THROTTLE_VALVE','FD','16','200',200, null, null, 'THROTTLE VALVE 200mm','c:\users\users\catalog.pdf');
+INSERT INTO cat_node (id, nodetype_id, matcat_id, pnom, dnom, dint, dext, shape, descript, link, brand_id, model_id, svg, estimated_depth, cost_unit, "cost", active, "label", ischange, acoeff) VALUES('THROTTLE_VALVE_200', 'THROTTLE_VALVE', 'FD', '16', '200', 200.00000, NULL, NULL, 'THROTTLE VALVE 200mm', 'c:\users\users\catalog.pdf', NULL, NULL, NULL, 1, 'u', 'N_CHKVAL200_PN10', true, NULL, 2, NULL);
 
 SELECT gw_fct_setchangefeaturetype($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{"type":"node"}, "data":{"filterFields":{}, "pageInfo":{}, "feature_id":"1107", "feature_type_new":"THROTTLE_VALVE", "featurecat_id":"THROTTLE_VALVE_200"}}$$);
 
