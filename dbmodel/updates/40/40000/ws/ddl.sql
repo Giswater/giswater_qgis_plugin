@@ -302,6 +302,9 @@ DELETE FROM config_form_fields WHERE formname IN ('v_edit_pool', 'v_edit_pond');
 
 DROP FUNCTION IF EXISTS gw_trg_edit_unconnected();
 
+ALTER TABLE node_border_sector drop CONSTRAINT node_border_expl_sector_id_fkey;
+ALTER TABLE node_border_sector RENAME TO _node_border_sector;
+
 
 
 
