@@ -665,3 +665,11 @@ INSERT INTO sys_style (layername, styleconfig_id, styletype) VALUES ('v_edit_arc
 INSERT INTO sys_style (layername, styleconfig_id, styletype) VALUES ('v_edit_arc', 108, 'qml');
 
 UPDATE config_form_fields SET hidden=false WHERE formtype='form_featuretype_change' AND columnname='featurecat_id';
+
+UPDATE config_form_fields SET layoutname='lyt_nvo_roughness_1', layoutorder= 6 WHERE formtype='nvo_roughness' AND columnname = 'descript';
+UPDATE config_form_fields SET layoutname='lyt_nvo_curves_1', layoutorder= 2, stylesheet= NULL WHERE formtype='nvo_curves' AND columnname = 'expl_id';
+UPDATE config_form_fields SET layoutname='lyt_nvo_curves_2', layoutorder= 0, stylesheet= NULL WHERE formtype='nvo_curves' AND columnname = 'descript';
+UPDATE config_form_fields SET layoutname='lyt_nvo_patterns_1', layoutorder= 2, stylesheet= NULL WHERE formtype='nvo_patterns' AND columnname = 'expl_id';
+UPDATE config_form_fields SET layoutname='lyt_nvo_patterns_1', layoutorder= 1, stylesheet= NULL WHERE formtype='nvo_patterns' AND columnname = 'observ';
+UPDATE config_form_fields SET layoutname='lyt_nvo_controls_1', layoutorder= 0, stylesheet= NULL WHERE formtype='nvo_controls' AND columnname = 'sector_id';
+UPDATE config_form_fields SET layoutname='lyt_nvo_rules_1', layoutorder= 0, stylesheet= NULL WHERE formtype='nvo_rules' AND columnname = 'sector_id';
