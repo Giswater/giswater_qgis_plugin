@@ -542,10 +542,6 @@ UPDATE config_form_fields SET web_layoutorder=NULL
 UPDATE config_form_fields SET web_layoutorder=4
 	WHERE columnname='connec_id';
 
-INSERT INTO node_border_sector VALUES (113766 , 1);
-INSERT INTO node_border_sector VALUES (113766 , 2);
-INSERT INTO node_border_sector VALUES (113952 , 4);
-
 UPDATE config_form_tabs SET device = '{4,5}' where formname = 've_node_water_connection';
 UPDATE config_form_tabs SET device = '{5}' where formname like 'visit_%';
 UPDATE config_form_tabs SET device = '{5}' where formname like 'incident_%';

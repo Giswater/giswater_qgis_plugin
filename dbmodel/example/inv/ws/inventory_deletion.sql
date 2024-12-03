@@ -17,7 +17,6 @@ UPDATE link SET sector_id = expl_id;
 
 DELETE FROM inp_rules;
 DELETE FROM inp_controls;
-DELETE FROM node_border_sector;
 
 DELETE FROM sector WHERE sector_id > 2;
 

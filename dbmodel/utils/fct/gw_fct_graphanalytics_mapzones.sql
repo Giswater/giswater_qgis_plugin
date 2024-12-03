@@ -1372,19 +1372,6 @@ BEGIN
 
 		ELSIF v_class = 'SECTOR' THEN
 
-			EXECUTE 'DELETE FROM node_border_sector WHERE node_id IN (SELECT node_id FROM temp_t_node WHERE expl_id IN ('||v_expl_id||') AND state=1)';
-
-			EXECUTE 'INSERT INTO node_border_sector
-			WITH arcs AS (SELECT arc_id, node_1, node_2, sector_id FROM temp_t_arc WHERE state>0)
-			SELECT node_id, a1.sector_id
-			FROM  temp_t_node
-			JOIN arcs a1 ON node_id=node_1
-			where a1.sector_id != temp_t_node.sector_id AND expl_id IN ('||v_expl_id||')
-			UNION
-			SELECT node_id, a2.sector_id
-			FROM  temp_t_node
-			JOIN arcs a2 ON node_id=node_2
-			where a2.sector_id != temp_t_node.sector_id AND expl_id IN ('||v_expl_id||')  ON CONFLICT (node_id, sector_id) DO NOTHING';
 		END IF;
 
 		-- mapzone

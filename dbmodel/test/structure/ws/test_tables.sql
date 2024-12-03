@@ -217,7 +217,6 @@ SELECT has_table('minsector') AS "Table 'minsector' exists";
 SELECT has_table('minsector_graph') AS "Table 'minsector_graph' exists";
 SELECT has_table('node') AS "Table 'node' exists";
 SELECT has_table('node_add') AS "Table 'node_add' exists";
-SELECT has_table('node_border_sector') AS "Table 'node_border_sector' exists";
 SELECT has_table('om_mincut') AS "Table 'om_mincut' exists";
 SELECT has_table('om_mincut_arc') AS "Table 'om_mincut_arc' exists";
 SELECT has_table('om_mincut_cat_type') AS "Table 'om_mincut_cat_type' exists";

@@ -732,3 +732,11 @@ INSERT INTO sys_param_user (id, formname, descript, sys_role, idval, "label", dv
 
 --3/12/24
 DELETE FROM sys_table where id = 'v_sector_node';
+
+DELETE FROM sys_function WHERE id = 3204;
+DELETE FROM sys_function WHERE id = 3238;
+DELETE FROM sys_function WHERE id = 3190;
+
+
+DELETE FROM sys_table WHERE id = 'node_border_sector';
+
