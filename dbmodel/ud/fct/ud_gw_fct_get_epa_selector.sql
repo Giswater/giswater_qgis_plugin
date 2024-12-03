@@ -30,6 +30,7 @@ v_selected_selector_date text;
 v_selected_compare_date text;
 v_selected_compare_time text;
 v_selected_selector_time text;
+v_selected_value text;
 v_child text;
 v_childs text[];
 v_combo_values text[];
@@ -174,14 +175,16 @@ BEGIN
 			CASE v_child
 				WHEN 'selector_date' THEN
 					SELECT  array_agg(distinct resultdate) into v_combo_values FROM rpt_arc  WHERE result_id = v_selected_result_show;
-					v_selected_selector_date = v_combo_values[1];
+					SELECT resultdate INTO v_selected_value FROM selector_rpt_main_tstep WHERE cur_user = v_cur_user;
 				WHEN 'selector_time' THEN
-					SELECT array_agg(resulttime) into v_combo_values FROM rpt_arc  WHERE result_id = v_selected_result_show AND resultdate = v_selected_selector_date;
+					SELECT array_agg(resulttime) into v_combo_values FROM rpt_arc  WHERE result_id = v_selected_result_show AND resultdate = COALESCE(v_selected_value, v_selected_selector_date);
+					SELECT resulttime FROM selector_rpt_main_tstep INTO v_selected_value WHERE cur_user = v_cur_user;
 				WHEN 'compare_date' THEN
 					SELECT array_agg(distinct resultdate) into v_combo_values FROM rpt_arc  WHERE result_id = v_selected_result_compare;
-					v_selected_compare_date = v_combo_values[1];
+					SELECT resultdate INTO v_selected_value FROM selector_rpt_compare_tstep WHERE cur_user = v_cur_user;
 				WHEN 'compare_time' THEN
-					SELECT array_agg(resulttime) into v_combo_values FROM rpt_arc  WHERE result_id = v_selected_result_compare AND resultdate = v_selected_compare_date;
+					SELECT array_agg(resulttime) into v_combo_values FROM rpt_arc  WHERE result_id = v_selected_result_compare AND resultdate = COALESCE(v_selected_value, v_selected_compare_date);
+					SELECT resulttime FROM selector_rpt_compare_tstep INTO v_selected_value WHERE cur_user = v_cur_user;
 				ELSE
 					v_combo_values = NULL;
 			END CASE;
@@ -194,7 +197,19 @@ BEGIN
 				v_combo_values := array_prepend('', v_combo_values);
 	        END IF;
 
-			v_body := v_body || jsonb_build_object(v_child, COALESCE(to_json(v_combo_values), '[]'));
+			-- Check if the previous value selected is not in the combo list
+			IF v_selected_value IS NULL OR v_selected_value NOT IN (SELECT UNNEST(v_combo_values)) THEN
+				v_selected_value := v_combo_values[1];
+			END IF;
+
+			-- JSON body
+		    v_body := v_body || jsonb_build_object(
+		        v_child,
+		        jsonb_build_object(
+		            'values', COALESCE(v_combo_values, ARRAY[]::TEXT[]),
+		            'selectedValue', COALESCE(v_selected_value, '')
+		        )
+		    );
 
 		END LOOP;
 
