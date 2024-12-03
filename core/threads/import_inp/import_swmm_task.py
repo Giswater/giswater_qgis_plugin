@@ -1940,7 +1940,7 @@ class GwImportInpTask(GwTask):
 
             # [SUBCATCHMENTS]
             subc_id = subc_name
-            outlet_id = self.node_ids[subc.outlet] if subc.outlet in self.node_ids else subc.outlet
+            outlet_id = self.node_ids[subc.outlet] if subc.outlet in self.node_ids else None  # TODO: show warning if outlet is * or not found in nodes
             rg_id = self.default_raingage if subc.rain_gage == '*' else subc.rain_gage  # TODO: show warning if raingage is *
             area = subc.area
             imperv = subc.imperviousness
