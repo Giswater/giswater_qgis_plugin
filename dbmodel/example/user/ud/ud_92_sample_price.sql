@@ -79,6 +79,8 @@ INSERT INTO plan_price VALUES ('VIRTUAL_U', 'u', 'Null price for unitary virtual
 INSERT INTO plan_price VALUES ('VIRTUAL_M', 'm', 'Null price for  m virtual elements', 'Null price for m virtual elements', 0.0000, NULL);
 INSERT INTO plan_price VALUES ('VIRTUAL_M2', 'm2', 'Null price for m2 virtual elements', 'Null price for m2 virtual elements', 0.0000, NULL);
 INSERT INTO plan_price VALUES ('VIRTUAL_M3', 'm3', 'Null price for m3 virtual elements', 'Null price for m3 virtual elements', 0.0000, NULL);
+INSERT INTO plan_price VALUES('N_OF_STR', 'u', 'Construction of a rainwater overflow tank.', 'Construction of a rainwater overflow tank.', 750000.0000, NULL);
+INSERT INTO plan_price VALUES('N_PUMP_STN', 'u', 'Construction of a sewage pumping station.', 'Construction of a sewage pumping station.', 50000.0000, NULL);
 
 INSERT INTO plan_price_compost VALUES (1, 'P_ASPHALT-10', 'F931201F', 0.2500);
 INSERT INTO plan_price_compost VALUES (2, 'P_ASPHALT-10', 'F9H118E1', 0.1440);
