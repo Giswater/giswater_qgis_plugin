@@ -137,6 +137,8 @@ class GwWorkcat:
 
         dialog.cat_work_id.textChanged.connect(partial(self._check_workcat_exists, dialog))
 
+        dialog.messageBar().hide()
+
         dialog.show()
 
 
