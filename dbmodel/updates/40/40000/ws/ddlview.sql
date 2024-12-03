@@ -332,7 +332,6 @@ v.closed as closed_valve, v.broken as broken_valve
 JOIN v_state_node USING (node_id)
 WHERE n.expl_id = s.expl_id OR n.expl_id2 = s.expl_id) a
 LEFT JOIN man_valve v USING (node_id)
-join v_sector_node s using (node_id)
 LEFT JOIN selector_municipality m using (muni_id)
 where (m.cur_user = current_user or a.muni_id is null);
 
@@ -2548,7 +2547,6 @@ AS SELECT d.dscenario_id,
     FROM selector_inp_dscenario, v_edit_node n
     JOIN inp_dscenario_tank p USING (node_id)
     JOIN cat_dscenario d USING (dscenario_id)
-    JOIN v_sector_node s ON s.node_id::text = n.node_id::text
     WHERE p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text AND n.is_operative IS TRUE;
 
 CREATE OR REPLACE VIEW v_edit_inp_tank
@@ -2702,7 +2700,6 @@ AS SELECT p.dscenario_id,
 	FROM selector_inp_dscenario, v_edit_node n
 	JOIN inp_dscenario_inlet p USING (node_id)
 	JOIN cat_dscenario d USING (dscenario_id)
-	JOIN v_sector_node s ON s.node_id::text = n.node_id::text
 	WHERE p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text AND n.is_operative IS TRUE;
 
 CREATE OR REPLACE VIEW v_edit_inp_inlet
@@ -3979,36 +3976,6 @@ AS SELECT v_plan_arc.arc_id,
   ORDER BY plan_psector_x_arc.psector_id, v_plan_arc.soilcat_id, v_plan_arc.arccat_id;
 
 
-CREATE OR REPLACE VIEW v_edit_pond
-AS SELECT pond.pond_id,
-    pond.connec_id,
-    pond.dma_id,
-    dma.macrodma_id,
-    pond.state,
-    pond.the_geom,
-    pond.expl_id,
-    pond.muni_id
-   FROM selector_expl,
-    pond
-     LEFT JOIN dma ON pond.dma_id = dma.dma_id
-     LEFT JOIN selector_municipality m ON pond.muni_id = m.muni_id
-  WHERE (m.cur_user = CURRENT_USER OR pond.muni_id IS NULL) AND pond.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
-
-CREATE OR REPLACE VIEW v_edit_pool
-AS SELECT pool.pool_id,
-    pool.connec_id,
-    pool.dma_id,
-    dma.macrodma_id,
-    pool.state,
-    pool.the_geom,
-    pool.expl_id,
-    pool.muni_id
-   FROM selector_expl,
-    pool
-     LEFT JOIN dma ON pool.dma_id = dma.dma_id
-     LEFT JOIN selector_municipality m ON pool.muni_id = m.muni_id
-  WHERE (m.cur_user = CURRENT_USER OR pool.muni_id IS NULL) AND pool.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
-
 CREATE OR REPLACE VIEW v_om_waterbalance_report
 AS WITH expl_data AS (
          SELECT sum(w_1.auth) / sum(w_1.total) AS expl_rw_eff,
@@ -4375,3 +4342,6 @@ FROM minsector_graph m
 JOIN node n ON n.node_id = m.node_id
 JOIN selector_expl s ON s.expl_id = n.expl_id
 WHERE s.cur_user = CURRENT_USER;
+
+
+DROP VIEW IF EXISTS v_sector_node;

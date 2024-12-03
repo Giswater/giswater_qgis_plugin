@@ -759,7 +759,6 @@ select a.*, case when s.sector_id > 0 and is_operative = true and epa_type !='UN
 FROM ( select n.* FROM ( SELECT selector_expl.expl_id FROM selector_expl WHERE selector_expl.cur_user = CURRENT_USER) s, vu_node n
 JOIN v_state_node USING (node_id)
 WHERE n.expl_id = s.expl_id OR n.expl_id2 = s.expl_id) a
-join v_sector_node s using (node_id)
 LEFT JOIN selector_municipality m using (muni_id)
 where (m.cur_user = current_user or a.muni_id is null);
 
@@ -4628,3 +4627,5 @@ AS SELECT inp_orifice.arc_id,
     rpt_arcflow_sum.time_min
    FROM inp_orifice
      LEFT JOIN rpt_arcflow_sum USING (arc_id);
+
+DROP VIEW IF EXISTS v_sector_node;
