@@ -755,9 +755,9 @@ WITH vu_node AS (SELECT node.node_id,
    FROM vu_node;
 
 create or replace view v_edit_node as
-select a.*, 
+select a.*,
 case when a.sector_id > 0 and is_operative = true and epa_type !='UNDEFINED'::varchar(16) THEN epa_type else NULL::varchar(16) end as inp_type
-FROM 
+FROM
 ( select n.* FROM ( SELECT selector_expl.expl_id FROM selector_expl WHERE selector_expl.cur_user = CURRENT_USER) s, vu_node n
 JOIN v_state_node USING (node_id)
 WHERE n.expl_id = s.expl_id OR n.expl_id2 = s.expl_id) a
@@ -2391,6 +2391,7 @@ AS SELECT v_edit_node.node_id,
     inp_outfall.curve_id,
     inp_outfall.timser_id,
     inp_outfall.gate,
+    inp_outfall.route_to,
     v_edit_node.the_geom
     FROM v_edit_node
     JOIN inp_outfall USING (node_id)
@@ -2551,6 +2552,7 @@ AS SELECT s.dscenario_id,
     f.curve_id,
     f.timser_id,
     f.gate,
+    f.route_to,
     v_edit_inp_outfall.the_geom
     FROM selector_inp_dscenario s,
     inp_dscenario_outfall f

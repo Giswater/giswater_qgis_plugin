@@ -266,3 +266,7 @@ DROP VIEW IF EXISTS v_edit_inp_flwreg_orifice;
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP", "table":"inp_orifice", "column":"close_time"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP", "table":"inp_flwreg_orifice", "column":"close_time"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP", "table":"inp_dscenario_flwreg_orifice", "column":"close_time"}}$$);
+
+-- 03/12/2024
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_outfall", "column":"route_to", "dataType":"varchar(16)"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_outfall", "column":"route_to", "dataType":"varchar(16)"}}$$);
