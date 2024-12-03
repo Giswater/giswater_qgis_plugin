@@ -1331,11 +1331,11 @@ class GwImportInpTask(GwTask):
 
         inp_sql = """
             INSERT INTO inp_orifice (
-                arc_id, ori_type, offsetval, cd, orate, flap, shape, geom1, geom2, geom3, geom4, close_time
+                arc_id, ori_type, offsetval, cd, orate, flap, shape, geom1, geom2, geom3, geom4
             ) VALUES %s
         """  # --
         inp_template = (
-            "(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+            "(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
         )
 
         arc_params = []
@@ -1389,7 +1389,6 @@ class GwImportInpTask(GwTask):
                 "geom2": xs.parameter_2,
                 "geom3": xs.parameter_3,
                 "geom4": xs.parameter_4,
-                "close_time": None,
             }
 
         # Insert into parent table
@@ -1416,7 +1415,6 @@ class GwImportInpTask(GwTask):
             inp_params.append(
                 (arc_id, inp_data["ori_type"], inp_data["offsetval"], inp_data["cd"], inp_data["orate"], inp_data["flap"],
                  inp_data["shape"], inp_data["geom1"], inp_data["geom2"], inp_data["geom3"], inp_data["geom4"],
-                 inp_data["close_time"],
                 )
             )
 
