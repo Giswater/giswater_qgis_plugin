@@ -448,34 +448,48 @@ def reconnect_signal(section, signal_name):
     return False
 
 
-def create_body(form='', feature='', filter_fields='', extras=None, list_feature=None):
+def create_body(form='', feature='', filter_fields='', extras=None, list_feature=None, body=None) -> str:
     """ Create and return parameters as body to functions"""
+
 
     info_types = {'full': 1}
     info_type = info_types.get(lib_vars.project_vars['info_type'])
     lang = QSettings().value('locale/globalLocale', QLocale().name())
 
-    client = f'$${{"client":{{"device":4, "lang":"{lang}"'
-    if info_type is not None:
-        client += f', "infoType":{info_type}'
-    if lib_vars.project_epsg is not None:
-        client += f', "epsg":{lib_vars.project_epsg}'
-    client += f'}}, '
-
-    form = f'"form":{{{form}}}, '
-    if list_feature:
-        feature = f'"feature":{feature}, '
+    if body:
+        body.setdefault('client', {"device":4, "lang":lang})
+        if info_type is not None:
+            body['client'].setdefault('infoType', info_type)
+        if lib_vars.project_epsg is not None:
+            body['client'].setdefault('epsg', lib_vars.project_epsg)
+        body.setdefault('form', {})
+        body.setdefault('feature', {})
+        body.setdefault('data', {})
+        body["data"].setdefault("filterFields", {})
+        body["data"].setdefault("pafeInfo", {})
+        str_body = f"$${json.dumps(body)}$$"
     else:
-        feature = f'"feature":{{{feature}}}, '
-    filter_fields = f'"filterFields":{{{filter_fields}}}'
-    page_info = f'"pageInfo":{{}}'
-    data = f'"data":{{{filter_fields}, {page_info}'
-    if extras is not None:
-        data += ', ' + extras
-    data += f'}}}}$$'
-    body = "" + client + form + feature + data
+        client = f'$${{"client":{{"device":4, "lang":"{lang}"'
+        if info_type is not None:
+            client += f', "infoType":{info_type}'
+        if lib_vars.project_epsg is not None:
+            client += f', "epsg":{lib_vars.project_epsg}'
+        client += f'}}, '
 
-    return body
+        form = f'"form":{{{form}}}, '
+        if list_feature:
+            feature = f'"feature":{feature}, '
+        else:
+            feature = f'"feature":{{{feature}}}, '
+        filter_fields = f'"filterFields":{{{filter_fields}}}'
+        page_info = f'"pageInfo":{{}}'
+        data = f'"data":{{{filter_fields}, {page_info}'
+        if extras is not None:
+            data += ', ' + extras
+        data += f'}}}}$$'
+        str_body = "" + client + form + feature + data
+
+    return str_body
 
 
 def refresh_legend():
@@ -2400,6 +2414,7 @@ def exec_pg_function(function_name, parameters=None, commit=True, schema_name=No
 
 def execute_procedure(function_name, parameters=None, schema_name=None, commit=True, log_sql=True, rubber_band=None,
         aux_conn=None, is_thread=False, check_function=True):
+
     """ Manage execution database function
     :param function_name: Name of function to call (text)
     :param parameters: Parameters for function (json) or (query parameters)
@@ -2423,6 +2438,9 @@ def execute_procedure(function_name, parameters=None, schema_name=None, commit=T
         sql = f"SELECT {lib_vars.schema_name}.{function_name}("
     else:
         sql = f"SELECT {function_name}("
+    if type(parameters) is dict:
+        parameters_dict = parameters
+        parameters = create_body(body=parameters)
     if parameters:
         sql += f"{parameters}"
     sql += f");"
@@ -2462,7 +2480,22 @@ def execute_procedure(function_name, parameters=None, schema_name=None, commit=T
 
     if not is_thread:
         manage_json_response(json_result, sql, rubber_band)
+    if json_result.get('body') and json_result['body']['data'].get('question'):
 
+        answer = tools_qt.show_question(json_result['body']['data']['question']['message'])
+        if not answer:
+            cancel_action = json_result['body']['data']['question'].get('cancel_action')
+            if cancel_action is not None:
+                parameters_dict['data'] = {}
+                parameters_dict['data'][cancel_action] = True
+            else:
+                return {"status":"Accepted", "message":{"level":1, "text":"Action canceled"}}
+        else:
+            accept_action = json_result['body']['data']['question'].get('accept_action')
+            if accept_action:
+                parameters_dict['data'][accept_action] = True
+        parameters = create_body(body=parameters_dict)
+        execute_procedure('gw_fct_epa2data', parameters)
     return json_result
 
 

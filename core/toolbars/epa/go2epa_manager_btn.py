@@ -47,8 +47,6 @@ class GwGo2EpaManagerButton(GwAction):
         self.dlg_manager.txt_infolog.setReadOnly(True)
         self.dlg_manager.btn_set_corporate.setEnabled(False)
         self.dlg_manager.btn_archive.setEnabled(False)
-        if self.project_type != 'ws':
-            self.dlg_manager.btn_set_corporate.setVisible(False)
 
         # Fill combo box and table view
         # self._fill_combo_result_id()
@@ -236,9 +234,9 @@ class GwGo2EpaManagerButton(GwAction):
                 if status == 'PARTIAL' or status != last_status or tools_os.set_boolean(is_corporate, False):
                     archive_enabled = False
             last_status = status
-
         if not selected_rows:
             set_corporate_enabled, archive_enabled = False, False
+        print(f"set_corporate_enabled -> {set_corporate_enabled}")
         self.dlg_manager.btn_set_corporate.setEnabled(set_corporate_enabled)
         self.dlg_manager.btn_archive.setEnabled(archive_enabled)
 
@@ -340,10 +338,10 @@ class GwGo2EpaManagerButton(GwAction):
 
     def _epa2data(self, widget, column_id):
         """ Delete selected elements of the table
-                :param QTableView widget: origin
-                :param table_name: table origin
-                :param column_id: Refers to the id of the source table
-                """
+            :param QTableView widget: origin
+            :param table_name: table origin
+            :param column_id: Refers to the id of the source table
+        """
 
         # Get selected rows
         selected_list = widget.selectionModel().selectedRows()
@@ -352,6 +350,13 @@ class GwGo2EpaManagerButton(GwAction):
             tools_qgis.show_warning(message, dialog=self.dlg_manager)
             return
 
+        msg = ("You are going to make this result corporate. From now on the result values will appear on feature form. "
+            "Do you want to continue?")
+
+        answer = tools_qt.show_question(msg)
+        if not answer:
+            return
+        
         result_id = ""
         set_corporate = True
         for i in range(0, len(selected_list)):
@@ -362,39 +367,19 @@ class GwGo2EpaManagerButton(GwAction):
             set_corporate = widget.model().index(row, col).data()
         set_corporate = not tools_os.set_boolean(set_corporate, False)
 
-        # check corporate
-        extras = f'"resultId":"{result_id}", "action": "CHECK"'
-        body = tools_gw.create_body(extras=extras)
-        result = tools_gw.execute_procedure('gw_fct_epa2data', body)
+        parameter = {"data":{"resultId" : result_id, "isCorporate" : str(set_corporate).lower()}}
+        result = tools_gw.execute_procedure('gw_fct_epa2data', parameter)
 
         if not result or result.get('status') != 'Accepted':
             message = "Epa2data execution failed. See logs for more details..."
             tools_qgis.show_warning(message, dialog=self.dlg_manager)
             return
-
-        current_sectors = result['body']['data']['info']['currentSectors']
-        affected_results = result['body']['data']['info']['affectedResults']
-
-        if current_sectors and current_sectors > 0:
-            msg = (f"There are {current_sectors} sectors with affected results: {affected_results}. "
-                   "Would you like to conitnue?")
-        else:
-            msg = ("You are going to make this result corporate. From now on the result values will appear on feature form. "
-                   "Do you want to continue?")
-
-        answer = tools_qt.show_question(msg)
-        if not answer:
+        elif result['message'].get('level') == 2:
+            tools_qgis.show_warning(result['message']['text'], dialog=self.dlg_manager)
             return
-
-        extras = f'"resultId":"{result_id}", "isCorporate": {str(set_corporate).lower()}'
-        body = tools_gw.create_body(extras=extras)
-        result = tools_gw.execute_procedure('gw_fct_epa2data', body)
-        if not result or result.get('status') != 'Accepted':
-            message = "Epa2data execution failed. See logs for more details..."
-            tools_qgis.show_warning(message, dialog=self.dlg_manager)
-            return
-        message = "Epa2data execution successful."
-        tools_qgis.show_info(message, dialog=self.dlg_manager)
+                
+        tools_qgis.show_info(result['message']['text'], dialog=self.dlg_manager)
+        
         # Refresh table
         self._fill_manager_table()
 
