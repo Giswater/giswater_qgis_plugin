@@ -262,8 +262,6 @@ SELECT has_table('plan_reh_result_node') AS "Table 'plan_reh_result_node' exists
 SELECT has_table('plan_result_cat') AS "Table 'plan_result_cat' exists";
 SELECT has_table('plan_typevalue') AS "Table 'plan_typevalue' exists";
 SELECT has_table('polygon') AS "Table 'polygon' exists";
-SELECT has_table('pond') AS "Table 'pond' exists";
-SELECT has_table('pool') AS "Table 'pool' exists";
 SELECT has_table('presszone') AS "Table 'presszone' exists";
 SELECT has_table('review_arc') AS "Table 'review_arc' exists";
 SELECT has_table('review_audit_arc') AS "Table 'review_audit_arc' exists";

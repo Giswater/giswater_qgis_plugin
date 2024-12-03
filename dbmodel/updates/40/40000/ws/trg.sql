@@ -154,13 +154,6 @@ v_edit_minsector FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_minsector();
 CREATE TRIGGER gw_trg_edit_samplepoint INSTEAD OF INSERT OR DELETE OR UPDATE ON
 v_edit_samplepoint FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_samplepoint('samplepoint');
 
-
-CREATE TRIGGER gw_trg_edit_pond INSTEAD OF INSERT OR DELETE OR UPDATE ON
-v_edit_pond FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_unconnected('pond');
-
-CREATE TRIGGER gw_trg_edit_pool INSTEAD OF INSERT OR DELETE OR UPDATE ON
-v_edit_pool FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_unconnected('pool');
-
 CREATE TRIGGER gw_trg_typevalue_fk AFTER INSERT OR UPDATE ON
 dqa FOR EACH ROW EXECUTE FUNCTION gw_trg_typevalue_fk('dqa');
 

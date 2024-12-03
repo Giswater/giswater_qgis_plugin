@@ -290,3 +290,20 @@ vel_avg numeric(12,2),
 result_id text);
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"inp_virtualvalve", "column":"_to_arc_"}}$$);
+
+-- 3/12/2024
+DROP VIEW IF EXISTS v_edit_pool;
+DROP VIEW IF EXISTS v_edit_pond;
+
+ALTER TABLE pool RENAME to _pool_;
+ALTER TABLE pond rename TO _pond_;
+
+DELETE FROM sys_table WHERE id IN ('v_edit_pool','v_edit_pond','pool','pond');
+DELETE FROM config_form_fields WHERE formname IN ('v_edit_pool', 'v_edit_pond');
+
+DROP FUNCTION IF EXISTS gw_trg_edit_unconnected();
+
+
+
+
+
