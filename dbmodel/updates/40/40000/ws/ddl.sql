@@ -119,7 +119,7 @@ ALTER TABLE link DROP CONSTRAINT IF EXISTS link_sector_id_fkey;
 ALTER TABLE dimensions DROP CONSTRAINT dimensions_sector_id;
 
 ALTER TABLE sector RENAME TO _sector;
---ALTER TABLE _sector DROP CONSTRAINT sector_pkey;
+ALTER TABLE _sector RENAME CONSTRAINT sector_pkey TO _sector_pkey;
 ALTER TABLE _sector DROP CONSTRAINT sector_macrosector_id_fkey;
 ALTER TABLE _sector DROP CONSTRAINT sector_pattern_id_fkey;
 
