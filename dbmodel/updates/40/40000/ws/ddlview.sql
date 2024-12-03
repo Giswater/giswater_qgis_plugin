@@ -325,7 +325,7 @@ SELECT node.node_id,
      LEFT JOIN typevalue et4 on et4.id = dqa.dqa_type AND et4.typevalue = 'dqa_type';
 
 create or replace view v_edit_node as
-select a.*, case when s.sector_id > 0 and is_operative = true and epa_type !='UNDEFINED'::varchar(16) THEN epa_type else NULL::varchar(16) end as inp_type,
+select a.*, case when a.sector_id > 0 and is_operative = true and epa_type !='UNDEFINED'::varchar(16) THEN epa_type else NULL::varchar(16) end as inp_type,
 v.closed as closed_valve, v.broken as broken_valve
  FROM (select n.* FROM
 ( SELECT selector_expl.expl_id FROM selector_expl WHERE selector_expl.cur_user = CURRENT_USER) s, vu_node n
