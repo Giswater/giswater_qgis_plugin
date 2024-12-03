@@ -881,11 +881,11 @@ class GwImportInpTask(GwTask):
 
         inp_sql = """
             INSERT INTO inp_outfall (
-                node_id, outfall_type, stage, curve_id, timser_id, gate
+                node_id, outfall_type, stage, curve_id, timser_id, gate, route_to
             ) VALUES %s
         """  # --pattern_id, peak_factor, source_type, source_quality, source_pattern_id
         inp_template = (
-            "(%s, %s, %s, %s, %s, %s)"
+            "(%s, %s, %s, %s, %s, %s, %s)"
         )
 
         node_params = []
@@ -928,7 +928,8 @@ class GwImportInpTask(GwTask):
                 "stage": o.data if o.kind == 'FIXED' else None,
                 "curve_id": o.data if o.kind == 'TIDAL' else None,
                 "timser_id": o.data if o.kind == 'TIMESERIES' else None,
-                "gate": to_yesno(o.has_flap_gate)
+                "gate": to_yesno(o.has_flap_gate),
+                "route_to": nan_to_none(o.route_to)
             }
 
         # Insert into parent table
@@ -956,7 +957,7 @@ class GwImportInpTask(GwTask):
 
             inp_data = inp_dict[code]
             inp_params.append(
-                (node_id, inp_data["outfall_type"], inp_data["stage"], inp_data["curve_id"], inp_data["timser_id"], inp_data["gate"])
+                (node_id, inp_data["outfall_type"], inp_data["stage"], inp_data["curve_id"], inp_data["timser_id"], inp_data["gate"], inp_data["route_to"])
             )
 
         # Insert into inp table
