@@ -28,3 +28,7 @@ UPDATE config_form_fields
 update config_param_system set value= '{"status":false, "maxDistance":30}',
 parameter = 'edit_link_link2network' where "parameter" ='edit_link_check_arcdnom';
 
+
+-- 3/12/24
+update inp_subcatchment set muni_id  = 0 WHERE muni_id is null;
+update gully set muni_id  = 0 WHERE muni_id is null;
