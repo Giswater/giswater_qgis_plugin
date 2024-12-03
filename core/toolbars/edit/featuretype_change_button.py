@@ -301,19 +301,19 @@ def btn_accept_featuretype_change(**kwargs):
     dialog = kwargs["dialog"]
 
     project_type = tools_gw.get_project_type()
-    feature_type_new = tools_qt.get_widget_value(dialog, "tab_none_feature_type_new")
+    feature_type_new = tools_qt.get_combo_value(dialog, "tab_none_feature_type_new", 1)
     featurecat_id = tools_qt.get_widget_value(dialog, "tab_none_featurecat_id")
 
-    fluid_type = tools_qt.get_widget_value(dialog, "tab_none_fluid_type")
+    fluid_type = tools_qt.get_combo_value(dialog, 'tab_none_fluid_type', 1)
     if fluid_type is None:
         fluid_type = 'null'
-    location_type = tools_qt.get_widget_value(dialog, "tab_none_location_type")
+    location_type = tools_qt.get_combo_value(dialog, 'tab_none_location_type', 1)
     if location_type is None:
         location_type = 'null'
-    category_type = tools_qt.get_widget_value(dialog, "tab_none_category_type")
+    category_type = tools_qt.get_combo_value(dialog, 'tab_none_category_type', 1)
     if category_type is None:
         category_type = 'null'
-    function_type = tools_qt.get_widget_value(dialog, "tab_none_function_type")
+    function_type = tools_qt.get_combo_value(dialog, 'tab_none_function_type', 1)
     if function_type is None:
         function_type = 'null'
 
@@ -344,10 +344,14 @@ def btn_accept_featuretype_change(**kwargs):
                 tools_gw.close_dialog(dialog)
                 return
 
+            if "Accepted" in complet_result['status']:
+                msg_text = complet_result['message']['text']
+                if msg_text is None:
+                    msg_text = 'Replace feature done successfully'
+                tools_qgis.show_info(msg_text)
+
             tools_gw.set_config_parser("btn_featuretype_change", "feature_type_new", feature_type_new)
             tools_gw.set_config_parser("btn_featuretype_change", "featurecat_id", featurecat_id)
-            message = "Values has been updated"
-            tools_qgis.show_info(message)
 
         else:
             message = "Field catalog_id required!"
@@ -392,33 +396,45 @@ def btn_catalog_featuretype_change(**kwargs):
 
 
 def cmb_new_featuretype_selection_changed(**kwargs):
-    """ When new featuretype change, catalog_id changes as well """
+    """ When new featuretype changes, catalog_id and related fields (fluid, location, etc.) update as well """
 
     dialog = kwargs["dialog"]
     cmb_new_feature_type = kwargs["widget"]
     this = kwargs["class"]
-    cmb_catalog_id = tools_qt.get_widget(dialog,"tab_none_featurecat_id")
-    project_type = tools_gw.get_project_type()
+    reload_fields = []
 
-    tools_qt.set_stylesheet(cmb_catalog_id, style="")
-
-    # Populate catalog_id
+    # Fetch the new feature type
     feature_type_new = tools_qt.get_widget_value(dialog, cmb_new_feature_type)
-    if project_type == 'ws':
-        sql = (f"SELECT DISTINCT(id), id as idval "
-                f"FROM {this.cat_table} "
-                f"WHERE {this.feature_type}type_id = '{feature_type_new}' AND (active IS TRUE OR active IS NULL) "
-                f"ORDER BY id")
-    else:
-        sql = (f"SELECT DISTINCT(id), id as idval "
-               f"FROM {this.cat_table} "
-               f"WHERE {this.feature_type}_type = '{feature_type_new}' AND (active IS TRUE OR active IS NULL) "
-               f"ORDER BY id")
-    rows = tools_db.get_rows(sql)
-    tools_qt.fill_combo_values(cmb_catalog_id, rows)
 
-    # Manage if there is no catalog for the selected feature type
-    if not rows or len(rows) == 0:
-        tools_qt.set_stylesheet(cmb_catalog_id, style="background-color: #ff8080")
-        msg = "There is no catalog for this feature type. Please add one in the corresponding cat table."
-        tools_qgis.show_critical(msg, dialog=dialog)
+    # Create body with only newFeatureCat in extras
+    feature = f'"tableName":"{this.tablename}", "id":"{this.feature_id}"'
+    extras = f'"newFeatureCat":"{feature_type_new}"'
+    body = tools_gw.create_body(feature=feature, extras=extras)
+
+    # Execute function to get additional data for fluid, location, category, and function types
+    json_result = tools_gw.execute_procedure("gw_fct_getchangefeaturetype", body)
+
+    for field in json_result['body']['data']['fields']:
+        widgetcontrols = field.get('widgetcontrols')
+        if widgetcontrols:
+            reload_fields = widgetcontrols.get('reloadFields', [])
+
+        if field.get('hidden') or (
+            widgetcontrols and widgetcontrols.get('hiddenWhenNull') and field.get('value') in (None, '')
+        ) or field['columnname'] not in reload_fields:
+            continue
+
+        if field['widgettype'] == 'combo':
+            tools_gw.fill_combo(tools_qt.get_widget(dialog, field['widgetname']), field)
+        if field['widgettype'] == 'typeahead':
+            # Retrieve widget and selected value
+            widget = tools_qt.get_widget(dialog, field['widgetname'])
+            selected_value = tools_qt.get_widget_value(dialog, widget)
+
+            # Populate rows from comboIds and comboNames
+            rows = list(zip(field.get('comboIds', []), field.get('comboNames', [])))
+            tools_qt.set_completer_rows(widget, rows)
+
+            # Update widget text if the selected value does not already appear formatted
+            if not (selected_value.startswith('(') and selected_value.endswith(')')):
+                tools_qt.set_widget_text(dialog, widget, f"{selected_value}")
