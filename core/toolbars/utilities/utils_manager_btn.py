@@ -12,10 +12,10 @@ from functools import partial
 from qgis.PyQt.QtCore import QPoint
 from qgis.PyQt.QtWidgets import QAction, QMenu
 
-from .style_manager import GwStyleManager
+from .utilities_manager.style_manager import GwStyleManager
 from .... import global_vars
 from ..dialog import GwAction
-from .mapzone_manager import GwMapzoneManager
+from .utilities_manager.mapzone_manager import GwMapzoneManager
 from ...shared.info import GwInfo
 from ...shared.psector import GwPsector
 from ...shared.workcat import GwWorkcat

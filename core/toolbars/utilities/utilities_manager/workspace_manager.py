@@ -13,11 +13,11 @@ from qgis.PyQt.QtGui import QRegExpValidator, QStandardItemModel
 from qgis.PyQt.QtCore import QRegExp, QItemSelectionModel
 from qgis.PyQt.QtWidgets import QDialog, QLabel, QLineEdit, QPlainTextEdit, QCheckBox, QAbstractItemView, QTableView, QApplication
 
-from ..dialog import GwAction
-from ...ui.ui_manager import GwWorkspaceManagerUi, GwCreateWorkspaceUi, GwGo2EpaOptionsUi
-from ...utils import tools_gw
-from .... import global_vars
-from ....libs import tools_qgis, tools_qt, tools_db
+from ...dialog import GwAction
+from ....ui.ui_manager import GwWorkspaceManagerUi, GwCreateWorkspaceUi, GwGo2EpaOptionsUi
+from ....utils import tools_gw
+from ..... import global_vars
+from .....libs import tools_qgis, tools_qt, tools_db
 
 
 class GwWorkspaceManagerButton(GwAction):

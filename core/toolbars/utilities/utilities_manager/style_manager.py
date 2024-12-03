@@ -9,11 +9,11 @@ from functools import partial
 import json
 import tempfile
 
-from ..toc.layerstyle_change_button import apply_styles_to_layers
-from ...ui.ui_manager import GwStyleManagerUi, GwStyleUi
-from ...utils import tools_gw
-from ....libs import lib_vars, tools_db, tools_qgis, tools_qt
-from .... import global_vars
+from ...toc.layerstyle_change_btn import apply_styles_to_layers
+from ....ui.ui_manager import GwStyleManagerUi, GwStyleUi
+from ....utils import tools_gw
+from .....libs import lib_vars, tools_db, tools_qgis, tools_qt
+from ..... import global_vars
 
 from qgis.PyQt.QtWidgets import QDialog, QLabel, QHeaderView, QTableView, QMenu, QAction, QMessageBox
 from qgis.PyQt.QtCore import Qt

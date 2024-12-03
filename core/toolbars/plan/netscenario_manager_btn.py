@@ -18,7 +18,7 @@ from qgis.PyQt.QtWidgets import QDialog, QLineEdit, QDateEdit
 
 from ..dialog import GwAction
 from ..utilities.toolbox_btn import GwToolBoxButton
-from ..utilities.mapzone_manager import GwMapzoneManager
+from ..utilities.utilities_manager.mapzone_manager import GwMapzoneManager
 from ...ui.ui_manager import GwNetscenarioManagerUi, GwNetscenarioUi, GwInfoGenericUi
 from ...utils import tools_gw
 from .... import global_vars
