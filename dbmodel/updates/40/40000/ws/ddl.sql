@@ -110,7 +110,6 @@ ALTER TABLE inp_dscenario_controls DROP CONSTRAINT inp_dscenario_controls_sector
 ALTER TABLE inp_dscenario_rules DROP CONSTRAINT inp_dscenario_rules_sector_id_fkey;
 ALTER TABLE inp_rules DROP CONSTRAINT inp_rules_sector_id_fkey;
 ALTER TABLE selector_sector DROP CONSTRAINT inp_selector_sector_id_fkey;
-ALTER TABLE node_border_sector DROP CONSTRAINT node_border_expl_sector_id_fkey;
 ALTER TABLE node DROP CONSTRAINT node_sector_id_fkey;
 ALTER TABLE sector DROP CONSTRAINT sector_parent_id_fkey;
 ALTER TABLE samplepoint DROP CONSTRAINT samplepoint_sector_id;

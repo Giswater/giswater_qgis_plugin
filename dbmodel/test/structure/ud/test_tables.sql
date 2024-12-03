@@ -232,7 +232,6 @@ SELECT has_table('man_waccel') AS "Table 'man_waccel' exists";
 SELECT has_table('man_wjump') AS "Table 'man_wjump' exists";
 SELECT has_table('man_wwtp') AS "Table 'man_wwtp' exists";
 SELECT has_table('node') AS "Table 'node' exists";
-SELECT has_table('node_border_sector') AS "Table 'node_border_sector' exists";
 SELECT has_table('om_profile') AS "Table 'om_profile' exists";
 SELECT has_table('om_reh_cat_works') AS "Table 'om_reh_cat_works' exists";
 SELECT has_table('om_reh_parameter_x_works') AS "Table 'om_reh_parameter_x_works' exists";
