@@ -8,7 +8,7 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 UPDATE config_form_fields SET dv_querytext = 'SELECT id, id as idval FROM inp_timeseries WHERE timser_type = ''Rainfall'' AND active'
-WHERE formname = 'v_edit_raingage' and columnname = 'rg_id';
+WHERE formname = 'v_edit_raingage' and columnname = 'timser_id';
 
 update rpt_cat_result r set sector_id = a.sector_id from
 (select array_agg(distinct a.sector_id) as sector_id, a.result_id from rpt_inp_arc a group by result_id) a
