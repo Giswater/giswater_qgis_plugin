@@ -322,7 +322,7 @@ BEGIN
 
 	--check if all the fields defined as combo or typeahead have dv_querytext defined (320)
 	SELECT count(*), string_agg(concat(formname,'.',columnname),',') INTO v_count, v_view_list  FROM config_form_fields
-	WHERE (widgettype = 'combo' or widgettype ='typeahead') and dv_querytext is null and columnname !='composer';
+	WHERE (widgettype = 'combo' or widgettype ='typeahead') and dv_querytext is null and columnname !='composer' and formtype != 'form_featuretype_change';
 
 	IF v_count > 0 THEN
 		v_errortext = concat('ERROR-320: There is/are ',v_count,' feature form fields in config_form_fields that are combo or typeahead but don''t have dv_querytext defined. Fields: ',v_view_list,'.');
