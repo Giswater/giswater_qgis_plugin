@@ -29,7 +29,7 @@ from ...dialog import GwAction
 from ....threads.import_inp import parse_swmm_task
 
 CREATE_NEW = "Create new"
-TESTING_MODE = True
+TESTING_MODE = False
 
 
 class ProjectType(Enum):
@@ -513,6 +513,18 @@ class GwImportSwmm:
             municipality,
             catalogs,
         )
+
+        # Create timer
+        self.t0: float = time()
+        self.timer: QTimer = QTimer()
+        self.timer.timeout.connect(
+            partial(self._update_config_dialog, self.dlg_config)
+        )
+        self.timer.start(1000)
+        self.import_inp_task.message_logged.connect(self._message_logged)
+        self.import_inp_task.progress_changed.connect(self._progress_changed)
+        self.import_inp_task.taskCompleted.connect(self.timer.stop)
+
         QgsApplication.taskManager().addTask(self.import_inp_task)
         QgsApplication.taskManager().triggerTask(self.import_inp_task)
 
