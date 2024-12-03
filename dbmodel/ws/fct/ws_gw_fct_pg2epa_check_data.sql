@@ -271,7 +271,8 @@ BEGIN
 	IF (SELECT value FROM config_param_system WHERE parameter = 'epa_shutoffvalve') = 'VALVE' THEN
 		INSERT INTO temp_anl_node (fid, node_id, nodecat_id, the_geom, descript, sector_id)
 		select 170, node_id, nodecat_id, n.the_geom, 'To arc does not exists as closest arc for valve', n.sector_id
-		from man_valve LEFT JOIN v_edit_arc v on arc_id = to_arc JOIN v_edit_node n USING (node_id) where node_id not in (node_1, node_2) AND valv_type !='TCV';		
+		from man_valve JOIN inp_valve USING (node_id) LEFT JOIN v_edit_arc v on arc_id = to_arc JOIN node n USING (node_id)
+	    where node_id not in (node_1, node_2) AND valv_type !='TCV' AND n.state = 1;		
 	ELSE 
 		INSERT INTO temp_anl_node (fid, node_id, nodecat_id, the_geom, descript, sector_id)
 		select 170, node_id, nodecat_id, n.the_geom, 'To arc does not exists as closest arc for valve', n.sector_id
