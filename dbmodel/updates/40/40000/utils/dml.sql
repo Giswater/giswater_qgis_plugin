@@ -727,3 +727,5 @@ UPDATE config_form_fields
 UPDATE config_form_fields
 	SET widgetfunction='{"functionName": "cmb_new_featuretype_selection_changed", "module": "featuretype_change_btn", "parameters": {}}'::json
 	WHERE formname='generic' AND formtype='form_featuretype_change' AND columnname='feature_type_new' AND tabname='tab_none';
+
+INSERT INTO sys_param_user (id, formname, descript, sys_role, idval, "label", dv_querytext, dv_parent_id, isenabled, layoutorder, project_type, isparent, dv_querytext_filterc, feature_field_id, feature_dv_parent_value, isautoupdate, "datatype", widgettype, ismandatory, widgetcontrols, vdefault, layoutname, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, placeholder, "source") VALUES('epa_maxresults_peruser', 'hidden', 'Limit of maximum number of models for user', 'role_epa', NULL, NULL, NULL, NULL, NULL, NULL, 'utils', NULL, NULL, NULL, NULL, NULL, 'integer', 'text', true, NULL, '20', NULL, NULL, NULL, NULL, NULL, NULL, 'core');

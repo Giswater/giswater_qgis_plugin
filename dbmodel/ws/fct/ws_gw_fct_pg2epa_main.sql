@@ -60,6 +60,7 @@ v_sector_0 boolean = false;
 v_expl_id integer[];
 v_sector_id integer[];
 v_network_type integer;
+v_epa_maxresults integer;
 
 BEGIN
 
@@ -70,6 +71,13 @@ BEGIN
 	v_result = (p_data->>'data')::json->>'resultId';
 	v_step = (p_data->>'data')::json->>'step';  -- use network previously defined
 	v_input = concat('{"data":{"parameters":{"resultId":"',v_result,'", "fid":227}}}')::json;
+
+	-- step 0: Manage epa max results variable
+	select value into v_epa_maxresults from config_param_user where parameter = 'epa_maxresults_peruser' and cur_user=current_user;
+	
+	if (select count(*) from rpt_cat_result where cur_user = current_user) > v_epa_maxresults then 
+		RETURN ('{"status":"Failed","message":{"level":1, "text":"You have reached the maximum results limit."}}')::json;
+	end if;
 
 	-- step 1: preprocess
 	IF v_step = 1 THEN
