@@ -314,6 +314,7 @@ class GwImportEpanet:
             exploitation = 1
             sector = 1
             municipality = 1
+            dscenario = "import_inp_demands"
             catalogs = {'pipes': {(57.0, 0.0025): 'INP-PIPE01', (57.0, 0.025): 'INP-PIPE02', (99.0, 0.0025): 'PELD110-PN10', (99.0, 0.025): 'FC110-PN10', (144.0, 0.0025): 'PVC160-PN16', (144.0, 0.025): 'FC160-PN10', (153.0, 0.03): 'INP-PIPE03', (204.0, 0.03): 'INP-PIPE04'},
                         'materials': {0.025: 'FC', 0.0025: 'PVC', 0.03: 'FD'},
                         'features': {'junctions': 'JUNCTION', 'pipes': 'PIPE', 'pumps': 'VARC', 'reservoirs': 'SOURCE', 'tanks': 'TANK', 'valves': 'VARC'},
@@ -333,6 +334,7 @@ class GwImportEpanet:
                 exploitation,
                 sector,
                 municipality,
+                dscenario,
                 catalogs,
             )
 
@@ -391,6 +393,14 @@ class GwImportEpanet:
             tools_qt.show_info_box(message)
             return
 
+        # Demands dscenario
+        dscenario = tools_qt.get_text(self.dlg_config, "txt_dscenario")
+
+        if dscenario in ("", "null", None):
+            message = "Please enter a demands dscenario name to proceed with this import."
+            tools_qt.show_info_box(message)
+            return
+
         # Tables (Arcs and Nodes)
         catalogs = {"pipes": {}, "materials": {}, "features": {}}
 
@@ -437,8 +447,21 @@ class GwImportEpanet:
             exploitation,
             sector,
             municipality,
+            dscenario,
             catalogs,
         )
+
+        # Create timer
+        self.t0: float = time()
+        self.timer: QTimer = QTimer()
+        self.timer.timeout.connect(
+            partial(self._update_config_dialog, self.dlg_config)
+        )
+        self.timer.start(1000)
+        self.import_inp_task.message_logged.connect(self._message_logged)
+        self.import_inp_task.progress_changed.connect(self._progress_changed)
+        self.import_inp_task.taskCompleted.connect(self.timer.stop)
+
         QgsApplication.taskManager().addTask(self.import_inp_task)
         QgsApplication.taskManager().triggerTask(self.import_inp_task)
 

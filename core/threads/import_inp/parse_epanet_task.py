@@ -83,10 +83,13 @@ class Catalogs:
                 JOIN cat_mat_roughness AS r USING (matcat_id)
             """)
 
+        def tofloat(x):
+            return 0.0 if x is None else float(x)
+
         db_arc_catalog: dict[str, tuple[float, float]] = {}
         if rows:
             unsorted_dict = {
-                _id: (float(dint), float(roughness)) for _id, dint, roughness in rows
+                _id: (float(dint), tofloat(float(roughness))) for _id, dint, roughness in rows
             }
             db_arc_catalog = dict(sorted(unsorted_dict.items()))
 
@@ -98,9 +101,6 @@ class Catalogs:
             """)
         db_mat_roughness_cat: dict[str, list[float]] = {}
         if rows:
-
-            def tofloat(x):
-                return 0.0 if x is None else float(x)
 
             unsorted_dict = {
                 _id: [tofloat(x) for x in array_rough] for _id, array_rough in rows

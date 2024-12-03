@@ -116,7 +116,7 @@
               <x>0</x>
               <y>0</y>
               <width>684</width>
-              <height>645</height>
+              <height>644</height>
              </rect>
             </property>
             <layout class="QGridLayout" name="gridLayout_2">
@@ -208,9 +208,6 @@
                    <string>Basic</string>
                   </property>
                   <layout class="QGridLayout" name="gridLayout_12">
-                   <item row="2" column="0" rowspan="2">
-                    <layout class="QGridLayout" name="lyt_basic"/>
-                   </item>
                    <item row="1" column="0">
                     <widget class="QLabel" name="label">
                      <property name="text">
@@ -218,7 +215,10 @@
                      </property>
                     </widget>
                    </item>
-                   <item row="4" column="0">
+                   <item row="3" column="0" rowspan="2">
+                    <layout class="QGridLayout" name="lyt_basic"/>
+                   </item>
+                   <item row="5" column="0">
                     <spacer name="verticalSpacer_18">
                      <property name="orientation">
                       <enum>Qt::Vertical</enum>
@@ -233,6 +233,23 @@
                    </item>
                    <item row="1" column="1">
                     <widget class="QLineEdit" name="txt_workcat">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="2" column="0">
+                    <widget class="QLabel" name="label_5">
+                     <property name="text">
+                      <string>Demands dscenario name:</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="2" column="1">
+                    <widget class="QLineEdit" name="txt_dscenario">
                      <property name="sizePolicy">
                       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                        <horstretch>0</horstretch>

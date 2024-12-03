@@ -128,6 +128,7 @@ class GwImportInpTask(GwTask):
         exploitation,
         sector,
         municipality,
+        dscenario,
         catalogs,
     ) -> None:
         super().__init__(description)
@@ -137,6 +138,7 @@ class GwImportInpTask(GwTask):
         self.exploitation: int = exploitation
         self.sector: int = sector
         self.municipality: int = municipality
+        self.dscenario: str = dscenario
         self.dscenario_id: int = None
         self.catalogs: dict[str, Any] = catalogs
         self.log: list[str] = []
@@ -360,7 +362,7 @@ class GwImportInpTask(GwTask):
 
     def _create_demand_dscenario(self):
         extras = '"parameters": {'
-        extras += '"name": "demands_import_inp",'  # TODO: ask user for name?
+        extras += f'"name": "{self.dscenario}",'
         extras += '"descript": "Demand dscenario used when importing INP file",'
         extras += '"parent": null,'
         extras += '"type": "DEMAND",'
