@@ -263,10 +263,17 @@ class GwImportEpanet:
 
         self._fill_combo_boxes()
 
+        self._manage_widgets_visibility()
+
         tools_gw.open_dialog(self.dlg_config, dlg_name="dlg_inp_config_import")
 
+    def _manage_widgets_visibility(self):
+        # Disable the whole dialog if testing mode
+        if TESTING_MODE:
+            tools_gw.set_tabs_enabled(self.dlg_config)
+
     def _importinp_accept(self):
-        self.dlg_config.tab_main.setCurrentIndex(self.dlg_config.tab_main.count()-1)
+        self.dlg_config.mainTab.setCurrentIndex(self.dlg_config.mainTab.count()-1)
         if TESTING_MODE:
 
             # Delete the network before importing

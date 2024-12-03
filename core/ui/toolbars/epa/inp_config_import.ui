@@ -68,7 +68,7 @@
       </layout>
      </item>
      <item row="0" column="0">
-      <widget class="QTabWidget" name="tab_main">
+      <widget class="QTabWidget" name="mainTab">
        <property name="enabled">
         <bool>true</bool>
        </property>

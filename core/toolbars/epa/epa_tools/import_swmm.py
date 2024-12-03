@@ -299,6 +299,10 @@ class GwImportSwmm:
         tools_gw.open_dialog(self.dlg_config, dlg_name="dlg_inp_config_import")
 
     def _manage_widgets_visibility(self):
+        # Disable the whole dialog if testing mode
+        if TESTING_MODE:
+            tools_gw.set_tabs_enabled(self.dlg_config)
+
         # Default raingage widget
         subcatchments = self.catalogs.inp_subcatchments
         print(subcatchments)
@@ -404,7 +408,7 @@ class GwImportSwmm:
             }
 
             # Show tab log
-            self.dlg_config.tab_main.setCurrentIndex(self.dlg_config.tab_main.count()-1)
+            self.dlg_config.mainTab.setCurrentIndex(self.dlg_config.mainTab.count()-1)
 
             # Set background task 'Import INP'
             description = "Import INP (TESTING MODE)"
@@ -520,7 +524,7 @@ class GwImportSwmm:
                 )
 
         # Show tab log
-        self.dlg_config.tab_main.setCurrentIndex(self.dlg_config.tab_main.count()-1)
+        self.dlg_config.mainTab.setCurrentIndex(self.dlg_config.mainTab.count()-1)
 
         # Set background task 'Import INP'
         description = "Import INP"
