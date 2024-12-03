@@ -1015,6 +1015,7 @@ INSERT INTO config_form_list (listname, query_text, device, listtype, listclass,
   "modifyTopToolBar": true,
   "renderTopToolbarCustomActions": [
     {
+      "name": "btn_edit",
       "widgetfunction": {
         "functionName": "edit",
         "params": {}
@@ -1025,6 +1026,7 @@ INSERT INTO config_form_list (listname, query_text, device, listtype, listclass,
       "moreThanOneDisable": true
     },
     {
+      "name": "btn_show_inp_data",
       "widgetfunction": {
         "functionName": "showInpData",
         "params": {}
@@ -1035,6 +1037,7 @@ INSERT INTO config_form_list (listname, query_text, device, listtype, listclass,
       "moreThanOneDisable": false
     },
     {
+      "name": "btn_toggle_archive",
       "widgetfunction": {
         "functionName": "toggleArchive",
         "params": {}
@@ -1045,6 +1048,7 @@ INSERT INTO config_form_list (listname, query_text, device, listtype, listclass,
       "moreThanOneDisable": true
     },
     {
+      "name": "btn_toggle_corporate",
       "widgetfunction": {
         "functionName": "toggleCorporate",
         "params": {}
@@ -1055,6 +1059,7 @@ INSERT INTO config_form_list (listname, query_text, device, listtype, listclass,
       "moreThanOneDisable": true
     },
     {
+      "name": "btn_delete",
       "widgetfunction": {
         "functionName": "delete",
         "params": {}
