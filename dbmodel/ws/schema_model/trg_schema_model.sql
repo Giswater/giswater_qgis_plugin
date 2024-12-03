@@ -617,20 +617,6 @@ CREATE TRIGGER gw_trg_edit_pol_node INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_
 
 
 --
--- Name: v_edit_pond gw_trg_edit_pond; Type: TRIGGER; Schema: Schema; Owner: -
---
-
-CREATE TRIGGER gw_trg_edit_pond INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_pond FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_unconnected('pond');
-
-
---
--- Name: v_edit_pool gw_trg_edit_pool; Type: TRIGGER; Schema: Schema; Owner: -
---
-
-CREATE TRIGGER gw_trg_edit_pool INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_pool FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_unconnected('pool');
-
-
---
 -- Name: v_edit_presszone gw_trg_edit_presszone; Type: TRIGGER; Schema: Schema; Owner: -
 --
 
