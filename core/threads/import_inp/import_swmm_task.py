@@ -864,7 +864,7 @@ class GwImportInpTask(GwTask):
 
         node_sql = """ 
             INSERT INTO node (
-                the_geom, code, node_type, nodecat_id, epa_type, expl_id, sector_id, muni_id, state, state_type, workcat_id, top_elev
+                the_geom, code, node_type, nodecat_id, epa_type, expl_id, sector_id, muni_id, state, state_type, workcat_id, elev
             ) VALUES %s
             RETURNING node_id, code
         """  # --"depth", arc_id, annotation, observ, "comment", label_x, label_y, label_rotation, staticpressure, feature_type
@@ -973,7 +973,7 @@ class GwImportInpTask(GwTask):
 
         node_sql = """ 
             INSERT INTO node (
-                the_geom, code, node_type, nodecat_id, epa_type, expl_id, sector_id, muni_id, state, state_type, workcat_id, top_elev
+                the_geom, code, node_type, nodecat_id, epa_type, expl_id, sector_id, muni_id, state, state_type, workcat_id, elev
             ) VALUES %s
             RETURNING node_id, code
         """  # --"depth", arc_id, annotation, observ, "comment", label_x, label_y, label_rotation, staticpressure, feature_type
@@ -1087,7 +1087,7 @@ class GwImportInpTask(GwTask):
 
         node_sql = """ 
             INSERT INTO node (
-                the_geom, code, node_type, nodecat_id, epa_type, expl_id, sector_id, muni_id, state, state_type, workcat_id, top_elev
+                the_geom, code, node_type, nodecat_id, epa_type, expl_id, sector_id, muni_id, state, state_type, workcat_id, elev
             ) VALUES %s
             RETURNING node_id, code
         """  # --"depth", arc_id, annotation, observ, "comment", label_x, label_y, label_rotation, staticpressure, feature_type
