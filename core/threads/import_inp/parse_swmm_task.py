@@ -8,7 +8,7 @@ from swmm_api.input_file.section_labels import (
     OPTIONS,
     JUNCTIONS, OUTFALLS, DIVIDERS, STORAGE,
     CONDUITS, PUMPS, ORIFICES, WEIRS, OUTLETS,
-    XSECTIONS
+    XSECTIONS, SUBCATCHMENTS
 )
 from swmm_api.input_file.sections import (
     Conduit, CrossSection
@@ -72,6 +72,7 @@ class Catalogs:
     inp_orifice: Optional[list[str]]
     inp_weir: Optional[list[str]]
     inp_outlet: Optional[list[str]]
+    inp_subcatchments: Optional[list[tuple[str, str]]]
     roughness_catalog: Optional[list[float]]
 
     @classmethod
@@ -206,6 +207,8 @@ class Catalogs:
 
         outlet_catalogs: Optional[list[str]] = [] if OUTLETS in wn and len(wn[OUTLETS]) > 0 else None
 
+        inp_subcatchments: Optional[list[tuple[str, str]]] = [(f"{s.outlet}", f"{s.rain_gage}") for s in wn[SUBCATCHMENTS].values()] if SUBCATCHMENTS in wn else None
+
         return cls(
             db_arc_catalog,
             db_feat_cat,
@@ -220,5 +223,6 @@ class Catalogs:
             orifice_catalogs,
             weir_catalogs,
             outlet_catalogs,
+            inp_subcatchments,
             roughness_catalog,
         )

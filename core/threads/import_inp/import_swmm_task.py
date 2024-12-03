@@ -4,7 +4,7 @@ from itertools import count, islice
 from typing import Any
 from datetime import datetime
 from math import isnan
-
+from typing import Optional
 from psycopg2.extras import execute_values
 
 try:
@@ -169,6 +169,7 @@ class GwImportInpTask(GwTask):
         exploitation,
         sector,
         municipality,
+        raingage,
         catalogs,
     ) -> None:
         super().__init__(description)
@@ -178,7 +179,8 @@ class GwImportInpTask(GwTask):
         self.exploitation: int = exploitation
         self.sector: int = sector
         self.municipality: int = municipality
-        self.dscenario_id: int = None
+        self.dscenario_id: Optional[int] = None
+        self.default_raingage: Optional[str] = raingage
         self.catalogs: dict[str, Any] = catalogs
         self.log: list[str] = []
         self.mappings: dict[str, dict[str, str]] = {"curves": {}, "patterns": {}, "timeseries": {}}
@@ -1939,7 +1941,7 @@ class GwImportInpTask(GwTask):
             # [SUBCATCHMENTS]
             subc_id = subc_name
             outlet_id = self.node_ids[subc.outlet] if subc.outlet in self.node_ids else subc.outlet
-            rg_id = subc.rain_gage if subc.rain_gage != '*' else None  # TODO: show warning if raingage is *
+            rg_id = self.default_raingage if subc.rain_gage == '*' else subc.rain_gage  # TODO: show warning if raingage is *
             area = subc.area
             imperv = subc.imperviousness
             width = subc.width

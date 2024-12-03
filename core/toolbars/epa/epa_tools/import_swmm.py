@@ -294,7 +294,18 @@ class GwImportSwmm:
 
         self._fill_combo_boxes()
 
+        self._manage_widgets_visibility()
+
         tools_gw.open_dialog(self.dlg_config, dlg_name="dlg_inp_config_import")
+
+    def _manage_widgets_visibility(self):
+        # Default raingage widget
+        subcatchments = self.catalogs.inp_subcatchments
+        print(subcatchments)
+        has_empty = any([x[1] for x in subcatchments if x[1] == '*'] if subcatchments else [])
+        if not has_empty:
+            tools_qt.set_widget_visible(self.dlg_config, 'lbl_raingage', False)
+            tools_qt.set_widget_visible(self.dlg_config, 'txt_raingage', False)
 
     def _importinp_accept(self):
         if TESTING_MODE:
@@ -349,6 +360,7 @@ class GwImportSwmm:
             exploitation = 1
             sector = 1
             municipality = 1
+            raingage = None
             catalogs = {
                 'conduits': {
                     ('CIRCULAR', 0.2, 0.0, 0.0, 0.0): 'CC020',
@@ -404,6 +416,7 @@ class GwImportSwmm:
                 exploitation,
                 sector,
                 municipality,
+                raingage,
                 catalogs,
             )
 
@@ -462,6 +475,14 @@ class GwImportSwmm:
             tools_qt.show_info_box(message)
             return
 
+        # Raingage
+        raingage = tools_qt.get_text(self.dlg_config, "txt_raingage")
+
+        if self.dlg_config.txt_raingage.isVisible() and raingage in ("", "null", None):
+            message = "Please select a default raingage to proceed with this import."
+            tools_qt.show_info_box(message)
+            return
+
         # Tables (Arcs and Nodes)
         catalogs = {"conduits": {}, "materials": {}, "features": {}}
 
@@ -511,6 +532,7 @@ class GwImportSwmm:
             exploitation,
             sector,
             municipality,
+            raingage,
             catalogs,
         )
 
