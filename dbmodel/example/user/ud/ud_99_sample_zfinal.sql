@@ -174,3 +174,7 @@ UPDATE arc SET y1 = 3, y2 = 3, matcat_id = 'Concret' WHERE arc_id = '100012';
 UPDATE arc SET y1 = 2.2, y2 = 3, matcat_id = 'Concret' WHERE arc_id = '100014';
 
 update cat_feature_node set isexitupperintro=2 where id in ('VIRTUAL_NODE', 'RECT_MANHOLE', 'CIRC_MANHOLE');
+
+delete from element where element_id in ('787', '791', '794', '983', '987', '990', '1650', '1653', '1662');
+
+delete from om_visit where id in (386, 389, 390, 575);
