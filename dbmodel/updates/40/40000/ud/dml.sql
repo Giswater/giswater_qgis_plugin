@@ -523,3 +523,22 @@ INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tab
     "disabled": false
   }
 ]'::json, 0, '{4,5}');
+
+UPDATE config_form_list
+	SET query_text='SELECT nodarc_id, to_arc, order_id, flwreg_length, ori_type, offsetval, cd, orate, flap, shape, geom1, geom2, geom3, geom4 FROM inp_flwreg_orifice WHERE id IS NOT NULL'
+	WHERE listname='inp_flwreg_orifice' AND device=4;
+UPDATE config_form_list
+	SET query_text='SELECT d.dscenario_id, d.nodarc_id, f.node_id, d.ori_type, d.offsetval, d.cd, d.orate, d.flap, d.shape, d.geom1, d.geom2, d.geom3, d.geom4
+FROM inp_dscenario_flwreg_orifice d
+JOIN inp_flwreg_orifice f USING (nodarc_id)
+WHERE dscenario_id IS NOT NULL AND nodarc_id IS NOT NULL'
+	WHERE listname='inp_dscenario_flwreg_orifice' AND device=4;
+
+
+DELETE FROM config_form_tableview
+	WHERE objectname='inp_dscenario_flwreg_orifice' AND columnname='close_time';
+DELETE FROM config_form_tableview
+	WHERE objectname='inp_flwreg_orifice' AND columnname='close_time';
+UPDATE config_form_tableview
+	SET columnindex=16
+	WHERE objectname='inp_flwreg_orifice' AND columnname='nodarc_id';
