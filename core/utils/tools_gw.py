@@ -2480,8 +2480,8 @@ def execute_procedure(function_name, parameters=None, schema_name=None, commit=T
 
     if not is_thread:
         manage_json_response(json_result, sql, rubber_band)
-    if json_result.get('body') and json_result['body']['data'].get('question'):
 
+    try:
         answer = tools_qt.show_question(json_result['body']['data']['question']['message'])
         if not answer:
             cancel_action = json_result['body']['data']['question'].get('cancel_action')
@@ -2496,6 +2496,8 @@ def execute_procedure(function_name, parameters=None, schema_name=None, commit=T
                 parameters_dict['data'][accept_action] = True
         parameters = create_body(body=parameters_dict)
         execute_procedure('gw_fct_epa2data', parameters)
+    except KeyError:
+        pass
     return json_result
 
 
