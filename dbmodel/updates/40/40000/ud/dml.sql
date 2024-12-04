@@ -490,3 +490,36 @@ INSERT INTO config_form_list (listname, query_text, device, listtype, listclass,
     }
   ]
 }'::json);
+
+-- 04/12/2024
+INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('v_edit_inp_flwreg_outlet', 'tab_none', NULL, NULL, 'role_basic', NULL, '[
+  {
+    "actionName": "actionSetToArc",
+    "disabled": false
+  }
+]'::json, 0, '{4,5}');
+INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('v_edit_inp_flwreg_orifice', 'tab_none', NULL, NULL, 'role_basic', NULL, '[
+  {
+    "actionName": "actionSetToArc",
+    "disabled": false
+  }
+]'::json, 0, '{4,5}');
+INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('v_edit_inp_flwreg_pump', 'tab_none', NULL, NULL, 'role_basic', NULL, '[
+  {
+    "actionName": "actionSetToArc",
+    "disabled": false
+  }
+]'::json, 0, '{4,5}');
+INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('v_edit_inp_flwreg_weir', 'tab_none', NULL, NULL, 'role_basic', NULL, '[
+  {
+    "actionName": "actionSetToArc",
+    "disabled": false
+  }
+]'::json, 0, '{4,5}');
+INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('v_edit_inp_dwf', 'tab_none', NULL, NULL, 'role_basic', NULL, NULL, 0, '{4,5}');
+INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('v_edit_link', 'tab_none', NULL, NULL, 'role_basic', NULL, '[
+  {
+    "actionName": "actionEdit",
+    "disabled": false
+  }
+]'::json, 0, '{4,5}');
