@@ -54,12 +54,12 @@ class GwDscenarioManagerButton(GwAction):
                                 "inp_dscenario_flwreg_pump", "inp_dscenario_flwreg_weir", "inp_dscenario_flwreg_orifice",
                                 "inp_dscenario_flwreg_outlet", "inp_dscenario_inflows_poll", #"inp_dscenario_pump_additional"
                                 ]
-        self.dict_ids = {'v_edit_cat_hydrology': 'name', 'v_edit_cat_dwf_scenario': 'idval', 'v_edit_cat_dscenario': 'name'}
+        self.dict_ids = {'v_edit_cat_hydrology': 'name', 'v_edit_cat_dwf': 'idval', 'v_edit_cat_dscenario': 'name'}
         self.rubber_band = tools_gw.create_rubberband(global_vars.canvas)
 
         if self.project_type == 'ud':
 
-            self.views_dict = {'v_edit_cat_hydrology': 'hydrology_id', 'v_edit_cat_dwf_scenario': 'id',
+            self.views_dict = {'v_edit_cat_hydrology': 'hydrology_id', 'v_edit_cat_dwf': 'id',
                                'v_edit_cat_dscenario': 'dscenario_id'}
             self.menu = QMenu()
             self.menu.setObjectName("GW_dsenario_menu")
@@ -185,7 +185,7 @@ class GwDscenarioManagerButton(GwAction):
         tools_gw.add_icon(self.dlg_dwf_manager.btn_toc, "164")
 
         # Manage btn create
-        self._manage_btn_create(self.dlg_dwf_manager, 'v_edit_cat_dwf_scenario')
+        self._manage_btn_create(self.dlg_dwf_manager, 'v_edit_cat_dwf')
 
         # Apply filter validator
         self.filter_name = self.dlg_dwf_manager.findChild(QLineEdit, 'txt_name')
@@ -197,32 +197,32 @@ class GwDscenarioManagerButton(GwAction):
 
         # Fill table
         self.tbl_dscenario = self.dlg_dwf_manager.findChild(QTableView, 'tbl_dscenario')
-        self._fill_manager_table('v_edit_cat_dwf_scenario')
+        self._fill_manager_table('v_edit_cat_dwf')
         self._set_label_current_dscenario_type(self.dlg_dwf_manager, scenario_type="dwf", from_open_dialog=True)
 
         # Connect main dialog signals
-        self.dlg_dwf_manager.btn_toc.clicked.connect(partial(self._manage_add_layers, 'v_edit_cat_dwf_scenario', 'Catalogs'))
+        self.dlg_dwf_manager.btn_toc.clicked.connect(partial(self._manage_add_layers, 'v_edit_cat_dwf', 'Catalogs'))
         self.dlg_dwf_manager.txt_name.textChanged.connect(partial(self._fill_manager_table,
-                                                                  'v_edit_cat_dwf_scenario', None))
+                                                                  'v_edit_cat_dwf', None))
         self.dlg_dwf_manager.btn_duplicate.clicked.connect(partial(self._duplicate_selected_dscenario,
-                                                self.dlg_dwf_manager, 'v_edit_cat_dwf_scenario', 3296))
+                                                self.dlg_dwf_manager, 'v_edit_cat_dwf', 3296))
         self.dlg_dwf_manager.btn_toolbox.clicked.connect(partial(self._open_toolbox_function, 3102,
-                                                                 'v_edit_cat_dwf_scenario'))
+                                                                 'v_edit_cat_dwf'))
         self.dlg_dwf_manager.btn_update.clicked.connect(partial(self._manage_properties,
-                                                self.dlg_dwf_manager, 'v_edit_cat_dwf_scenario', True))
+                                                self.dlg_dwf_manager, 'v_edit_cat_dwf', True))
         self.dlg_dwf_manager.btn_delete.clicked.connect(partial(self._delete_selected_dscenario,
-                                                self.dlg_dwf_manager, 'v_edit_cat_dwf_scenario'))
+                                                self.dlg_dwf_manager, 'v_edit_cat_dwf'))
         self.dlg_dwf_manager.btn_delete.clicked.connect(partial(tools_gw.refresh_selectors))
         self.dlg_dwf_manager.btn_toggle_active.clicked.connect(partial(self._manage_toggle_active,
-                                                self.dlg_dwf_manager, self.tbl_dscenario, 'v_edit_cat_dwf_scenario'))
+                                                self.dlg_dwf_manager, self.tbl_dscenario, 'v_edit_cat_dwf'))
         self.dlg_dwf_manager.chk_active.stateChanged.connect(
-            partial(self._fill_manager_table, 'v_edit_cat_dwf_scenario'))
+            partial(self._fill_manager_table, 'v_edit_cat_dwf'))
 
         self.dlg_dwf_manager.btn_update_dscenario.clicked.connect(
             partial(self.update_current_scenario, self.dlg_dwf_manager, qtbl=self.tbl_dscenario, scenario_type="dwf",
-                    col_id_name="id", view_name="v_edit_cat_dwf_scenario"))
+                    col_id_name="id", view_name="v_edit_cat_dwf"))
 
-        self.tbl_dscenario.doubleClicked.connect(partial(self._manage_properties, self.dlg_dwf_manager, 'v_edit_cat_dwf_scenario'))
+        self.tbl_dscenario.doubleClicked.connect(partial(self._manage_properties, self.dlg_dwf_manager, 'v_edit_cat_dwf'))
 
         self.dlg_dwf_manager.btn_cancel.clicked.connect(
             partial(tools_gw.close_dialog, self.dlg_dwf_manager))
@@ -465,7 +465,7 @@ class GwDscenarioManagerButton(GwAction):
             if view == 'v_edit_cat_hydrology':
                 values.append([3290, "Create empty hydrology scenario"])
                 # values.append([3290, "Create hydrology scenario values"])
-            elif view == 'v_edit_cat_dwf_scenario':
+            elif view == 'v_edit_cat_dwf':
                 values.append([3292, "Create empty dwf scenario"])
                 # values.append([3292, "Create dwf scenario values"])
             elif view == 'v_edit_cat_dscenario':
