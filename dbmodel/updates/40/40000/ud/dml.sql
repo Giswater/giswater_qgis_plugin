@@ -542,3 +542,24 @@ DELETE FROM config_form_tableview
 UPDATE config_form_tableview
 	SET columnindex=16
 	WHERE objectname='inp_flwreg_orifice' AND columnname='nodarc_id';
+
+-- cat_dwf_scenario rename to cat_dwf
+UPDATE sys_table SET id = 'cat_dwf' WHERE id = 'cat_dwf_scenario';
+
+UPDATE config_toolbox SET inputparams='[
+  {"widgetname":"target", "label":"Target Scenario:", "widgettype":"combo", "datatype":"text", "dvQueryText":"SELECT id, idval FROM cat_dwf c WHERE active IS TRUE", "layoutname":"grl_option_parameters","layoutorder":1, "selectedId":"$userDwf"},
+  {"widgetname":"sector", "label":"Sector:", "widgettype":"combo", "datatype":"text", "dvQueryText":"SELECT sector_id AS id, name as idval FROM sector JOIN selector_sector USING (sector_id) WHERE cur_user = current_user UNION SELECT -999,''ALL VISIBLE SECTORS'' ORDER BY 1 DESC", "layoutname":"grl_option_parameters","layoutorder":2, "selectedId":"$userSector"},
+  {"widgetname":"action", "label":"Action:", "widgettype":"combo", "datatype":"text", "comboIds":["INSERT-ONLY", "DELETE-COPY", "KEEP-COPY", "DELETE-ONLY"], "comboNames":["INSERT ONLY", "DELETE & COPY", "KEEP & COPY", "DELETE ONLY"], "layoutname":"grl_option_parameters","layoutorder":3, "selectedId":"INSERT-ONLY"},
+  {"widgetname":"copyFrom", "label":"Copy from:", "widgettype":"combo", "datatype":"text", "dvQueryText":"SELECT id, idval FROM cat_dwf c WHERE active IS TRUE", "layoutname":"grl_option_parameters","layoutorder":4, "selectedId":""}
+  ]'::json WHERE id=3102;
+
+UPDATE config_form_fields SET formname='v_edit_cat_dwf' WHERE formname='v_edit_cat_dwf_scenario' AND formtype='form_feature' AND columnname='id' AND tabname='tab_none';
+UPDATE config_form_fields SET formname='v_edit_cat_dwf' WHERE formname='v_edit_cat_dwf_scenario' AND formtype='form_feature' AND columnname='idval' AND tabname='tab_none';
+UPDATE config_form_fields SET formname='v_edit_cat_dwf' WHERE formname='v_edit_cat_dwf_scenario' AND formtype='form_feature' AND columnname='startdate' AND tabname='tab_none';
+UPDATE config_form_fields SET formname='v_edit_cat_dwf' WHERE formname='v_edit_cat_dwf_scenario' AND formtype='form_feature' AND columnname='enddate' AND tabname='tab_none';
+UPDATE config_form_fields SET formname='v_edit_cat_dwf' WHERE formname='v_edit_cat_dwf_scenario' AND formtype='form_feature' AND columnname='active' AND tabname='tab_none';
+UPDATE config_form_fields SET formname='v_edit_cat_dwf' WHERE formname='v_edit_cat_dwf_scenario' AND formtype='form_feature' AND columnname='log' AND tabname='tab_none';
+UPDATE config_form_fields SET formname='v_edit_cat_dwf' WHERE formname='v_edit_cat_dwf_scenario' AND formtype='form_feature' AND columnname='observ' AND tabname='tab_none';
+UPDATE config_form_fields SET formname='v_edit_cat_dwf' WHERE formname='v_edit_cat_dwf_scenario' AND formtype='form_feature' AND columnname='expl_id' AND tabname='tab_none';
+
+UPDATE sys_param_user SET dv_querytext='SELECT id, idval FROM cat_dwf WHERE id IS not null' WHERE id='inp_options_dwfscenario';
