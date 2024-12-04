@@ -102,7 +102,7 @@ BEGIN
    			INSERT INTO plan_price(id, unit, descript)
    			SELECT csv22, 'u', csv22 FROM temp_csv WHERE cur_user=current_user AND fid=v_fid AND csv22 IS NOT NULL  ON CONFLICT (id) DO NOTHING;
 
-				INSERT INTO cat_arc(id, arc_type, matcat_id, pnom, dnom, dint, dext, descript, link, brand, model, svg, z1, z2, width, area, estimated_depth,
+				INSERT INTO cat_arc(id, arc_type, matcat_id, pnom, dnom, dint, dext, descript, link, brand_id, model_id, svg, z1, z2, width, area, estimated_depth,
 	      bulk, cost_unit, cost, m2bottom_cost, m3protec_cost, active, label, shape, acoeff, connect_cost)
 				SELECT csv1, csv2, csv3, csv4, csv5, csv6::numeric, csv7::numeric, csv8, csv9, csv10, csv11, csv12, csv13::numeric, csv14::numeric, csv15::numeric, csv16::numeric, csv17::numeric,
 	      csv18::numeric, csv19, csv20, csv21, csv22, csv23::boolean, csv24, csv25, csv26::numeric, csv27
@@ -129,7 +129,7 @@ BEGIN
    			SELECT csv27, 'u', csv27 FROM temp_csv WHERE cur_user=current_user AND fid=v_fid AND csv27 IS NOT NULL  ON CONFLICT (id) DO NOTHING;
 
 				INSERT INTO cat_arc(id, matcat_id, shape, geom1, geom2, geom3, geom4, geom5, geom6,
-        geom7, geom8, geom_r, descript, link, brand, model, svg, z1, z2, width,
+        geom7, geom8, geom_r, descript, link, brand_id, model_id, svg, z1, z2, width,
         area, estimated_depth, bulk, cost_unit, cost, m2bottom_cost,
         m3protec_cost, active, label, tsect_id, curve_id, arc_type, acoeff, connect_cost)
         SELECT csv1, csv2, csv3, csv4::numeric, csv5::numeric, csv6::numeric, csv7::numeric, csv8::numeric, csv9::numeric,
@@ -157,7 +157,7 @@ BEGIN
    			WHERE cur_user=current_user AND csv16 IS NOT NULL AND fid=v_fid ON CONFLICT (id) DO NOTHING;
 
 				INSERT INTO cat_node(id, node_type, matcat_id, pnom, dnom, dint, dext, shape, descript,
-        link, brand, model, svg, estimated_depth, cost_unit, cost, active,
+        link, brand_id, model_id, svg, estimated_depth, cost_unit, cost, active,
         label, ischange, acoeff)
 				SELECT csv1, csv2, csv3, csv4, csv5, csv6::numeric, csv7::numeric, csv8, csv9,
 				csv10, csv11, csv12, csv13, csv14::numeric, csv15, csv16, csv17::boolean,
@@ -182,8 +182,8 @@ BEGIN
    			SELECT csv14, CASE WHEN csv13 IS NULL THEN 'u' ELSE csv13 END , csv14 FROM temp_csv
    			WHERE cur_user=current_user AND csv14 IS NOT NULL AND fid=v_fid ON CONFLICT (id) DO NOTHING;
 
-				INSERT INTO cat_node(id, matcat_id, shape, geom1, geom2, geom3, descript, link, brand,
-         model, svg, estimated_y, cost_unit, cost, active, label, node_type, acoeff)
+				INSERT INTO cat_node(id, matcat_id, shape, geom1, geom2, geom3, descript, link, brand_id,
+         model_id, svg, estimated_y, cost_unit, cost, active, label, node_type, acoeff)
    			SELECT csv1, csv2, csv3, csv4::numeric, csv5::numeric, csv6::numeric, csv7, csv8, csv9,
    			csv10, csv11, csv12::numeric, csv13, csv14, csv15::boolean, csv16, csv17, csv18::numeric
    			FROM temp_csv WHERE cur_user=current_user AND fid=v_fid ON CONFLICT (id) DO NOTHING;
@@ -206,7 +206,7 @@ BEGIN
 	   	SELECT csv12, csv11 FROM temp_csv WHERE cur_user=current_user AND fid=v_fid AND csv12 IS NOT NULL ON CONFLICT (id) DO NOTHING;
 
 			INSERT INTO cat_connec (id, matcat_id, shape, geom1, geom2, geom3, geom4, geom_r, descript,
-      link, brand, model, svg, active, label, connec_type)
+      link, brand_id, model_id, svg, active, label, connec_type)
 			SELECT csv1, csv2, csv3, csv4::numeric, csv5::numeric, csv6::numeric, csv7::numeric, csv8::numeric, csv9,
 			csv10, csv11, csv12, csv13, csv14::boolean, csv15, csv16
 			FROM temp_csv WHERE cur_user=current_user AND fid=v_fid ON CONFLICT (id) DO NOTHING;
@@ -224,7 +224,7 @@ BEGIN
 	   	SELECT csv15, csv14 FROM temp_csv WHERE cur_user=current_user AND fid=v_fid AND csv15 IS NOT NULL ON CONFLICT (id) DO NOTHING;
 
 			INSERT INTO cat_gully(id, matcat_id, length, width, total_area, effective_area, n_barr_l,
-       n_barr_w, n_barr_diag, a_param, b_param, descript, link, brand, model, svg, active, label, gully_type)
+       n_barr_w, n_barr_diag, a_param, b_param, descript, link, brand_id, model_id, svg, active, label, gully_type)
 			SELECT csv1, csv2, csv3::numeric, csv4::numeric, csv5::numeric, csv6::numeric, csv7::numeric,
 			csv8::numeric, csv9::numeric, csv10::numeric, csv11::numeric, csv12, csv13, csv14, csv15, csv16, csv17::boolean, csv18, csv19
 			FROM temp_csv WHERE cur_user=current_user AND fid=v_fid ON CONFLICT (id) DO NOTHING;
