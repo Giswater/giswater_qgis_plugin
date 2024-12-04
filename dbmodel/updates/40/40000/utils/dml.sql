@@ -741,3 +741,7 @@ DELETE FROM sys_function WHERE id = 3190;
 
 DELETE FROM sys_table WHERE id = 'node_border_sector';
 
+
+-- 04/12/2024
+INSERT INTO doc (id, "name", doc_type, "path", observ, "date", user_name, tstamp, the_geom)
+SELECT id, "name", doc_type, "path", observ, "date", user_name, tstamp, the_geom FROM _doc;

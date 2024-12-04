@@ -74,3 +74,31 @@ ALTER TABLE connec DROP CONSTRAINT connec_location_type_feature_type_fkey;
 
 -- 28/11/2024
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"cat_element", "column":"elementtype_id", "newName":"element_type"}}$$);
+
+-- 04/12/2024
+ALTER TABLE doc_x_psector DROP CONSTRAINT doc_x_psector_doc_id_fkey;
+ALTER TABLE doc_x_workcat DROP CONSTRAINT doc_x_workcat_doc_id_fkey;
+ALTER TABLE doc_x_visit DROP CONSTRAINT doc_x_visit_doc_id_fkey;
+ALTER TABLE doc_x_node DROP CONSTRAINT doc_x_node_doc_id_fkey;
+ALTER TABLE doc_x_arc DROP CONSTRAINT doc_x_arc_doc_id_fkey;
+ALTER TABLE doc_x_connec DROP CONSTRAINT doc_x_connec_doc_id_fkey;
+
+ALTER TABLE doc RENAME TO _doc;
+ALTER TABLE _doc RENAME CONSTRAINT doc_pkey TO _doc_pkey;
+ALTER TABLE _doc DROP CONSTRAINT name_chk;
+ALTER TABLE _doc DROP CONSTRAINT doc_doc_type_fkey;
+
+CREATE TABLE doc (
+    id varchar(30) DEFAULT nextval('doc_seq'::regclass) NOT NULL,
+    "name" varchar(30) NOT NULL,
+    doc_type varchar(30) NOT NULL,
+    "path" varchar(512) NOT NULL,
+    observ varchar(512) NULL,
+    "date" timestamp(6) DEFAULT now() NULL,
+    user_name varchar(50) DEFAULT USER NULL,
+    tstamp timestamp DEFAULT now() NULL,
+    the_geom public.geometry(point, 25831) NULL,
+    CONSTRAINT doc_pkey PRIMARY KEY (id),
+    CONSTRAINT name_chk UNIQUE ("name"),
+    CONSTRAINT doc_doc_type_fkey FOREIGN KEY (doc_type) REFERENCES doc_type(id) ON DELETE RESTRICT ON UPDATE CASCADE
+);

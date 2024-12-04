@@ -4647,3 +4647,15 @@ AS SELECT DISTINCT ON (c.id) c.id,
    FROM cat_dwf c,
     selector_expl s
   WHERE s.expl_id = c.expl_id AND s.cur_user = CURRENT_USER OR c.expl_id IS NULL;
+
+CREATE OR REPLACE VIEW v_ui_doc_x_gully
+AS SELECT doc_x_gully.id,
+    doc_x_gully.gully_id,
+    doc.name AS doc_name,
+    doc.doc_type,
+    doc.path,
+    doc.observ,
+    doc.date,
+    doc.user_name
+   FROM doc_x_gully
+     JOIN doc ON doc.id::text = doc_x_gully.doc_id::text;

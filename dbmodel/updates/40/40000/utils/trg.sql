@@ -75,3 +75,7 @@ UPDATE
     OR ((OLD.fluid_type)::TEXT IS DISTINCT FROM (NEW.fluid_type)::TEXT)
     OR ((OLD.location_type)::TEXT IS DISTINCT FROM (NEW.location_type)::TEXT))
     EXECUTE FUNCTION gw_trg_mantypevalue_fk('connec');
+
+-- 04/12/2024
+CREATE TRIGGER gw_trg_doc BEFORE INSERT OR UPDATE ON doc
+FOR EACH ROW EXECUTE FUNCTION gw_trg_doc();

@@ -275,3 +275,5 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenar
 DROP VIEW IF EXISTS v_edit_cat_dwf_scenario;
 ALTER TABLE cat_dwf_scenario RENAME TO cat_dwf;
 ALTER SEQUENCE cat_dwf_scenario_id_seq RENAME TO cat_dwf_id_seq;
+
+ALTER TABLE doc_x_gully DROP CONSTRAINT doc_x_gully_doc_id_fkey;
