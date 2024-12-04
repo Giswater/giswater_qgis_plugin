@@ -358,7 +358,7 @@ class GwInfo(QObject):
         tools_gw.disconnect_signal('info_snapping', 'get_snapped_feature_id_ep_canvasClicked_get_id')
         emit_point = QgsMapToolEmitPoint(self.canvas)
         self.canvas.setMapTool(emit_point)
-        tools_gw.connect_signal(emit_point.canvasClicked, partial(self._get_id, dialog, action, option, emit_point, child_type),
+        tools_gw.connect_signal(emit_point.canvasClicked, partial(self._get_id, dialog, action, option, emit_point, child_type, widget_name),
                                 'info_snapping', 'get_snapped_feature_id_ep_canvasClicked_get_id')
 
 
@@ -424,8 +424,13 @@ class GwInfo(QObject):
                 tools_gw.enable_widgets(self.dlg_generic, complet_result['body']['data'], False)
 
         # Manage actions
-        action_edit = self.dlg_generic.findChild(QAction, "actionEdit")
-        tools_gw.add_icon(action_edit, "101")
+        self.action_edit = self.dlg_generic.findChild(QAction, "actionEdit")
+        tools_gw.add_icon(self.action_edit, "101")
+
+        for tab in complet_result['body']['form']['visibleTabs']:
+            self.visible_tabs[tab['tabName']] = tab
+        self._show_actions(self.dlg_generic, "tab_none")
+
         is_enabled = False
         try:
             is_enabled = complet_result['body']['feature']['permissions']['isEditable']
@@ -435,14 +440,14 @@ class GwInfo(QObject):
             except (KeyError, TypeError):
                 pass
         finally:
-            action_edit.setEnabled(is_enabled)
-        action_edit.triggered.connect(partial(self._manage_edition, self.dlg_generic, action_edit, fid, new_feature, generic=True))
+            self.action_edit.setEnabled(is_enabled)
+        self.action_edit.triggered.connect(partial(self._manage_edition, self.dlg_generic, self.action_edit, fid, new_feature, generic=True))
         if layer:
-            action_edit.setChecked(layer.isEditable() and can_edit)
+            self.action_edit.setChecked(layer.isEditable() and can_edit)
 
         # Signals
         self.dlg_generic.btn_accept.clicked.connect(partial(
-            self._accept_from_btn, self.dlg_generic, action_edit, new_feature, self.my_json, complet_result, True
+            self._accept_from_btn, self.dlg_generic, self.action_edit, new_feature, self.my_json, complet_result, True
         ))
         self.dlg_generic.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_generic))
         self.dlg_generic.key_escape.connect(partial(tools_gw.close_dialog, self.dlg_generic))
@@ -842,7 +847,7 @@ class GwInfo(QObject):
             partial(self._get_catalog, 'new_mapzone', self.tablename, child_type, self.feature_id, list_points,
                     id_name))
         self.action_set_to_arc.triggered.connect(
-            partial(self.get_snapped_feature_id, dlg_cf, self.action_set_to_arc, 'v_edit_arc', 'set_to_arc', None,
+            partial(self.get_snapped_feature_id, dlg_cf, self.action_set_to_arc, 'v_edit_arc', 'set_to_arc', 'tab_data_to_arc',
                     child_type))
         self.action_get_arc_id.triggered.connect(
             partial(self.get_snapped_feature_id, dlg_cf, self.action_get_arc_id, 'v_edit_arc', 'arc', 'tab_data_arc_id',
@@ -2426,7 +2431,7 @@ class GwInfo(QObject):
         self.catalog.open_catalog(self.dlg_cf, widget, feature_type, child_type)
 
 
-    def _show_actions(self, dialog, tab_name):
+    def _show_actions(self, dialog, tab_name, enable_actions=True):
         """
         Hide all actions and show actions for the corresponding tab
             :param tab_name: corresponding tab
@@ -2451,7 +2456,8 @@ class GwInfo(QObject):
                                 action.setToolTip(act['actionTooltip'])
                             action.setVisible(True)
 
-        self._enable_actions(dialog, self.action_edit.isChecked())
+        if enable_actions:
+            self._enable_actions(dialog, self.action_edit.isChecked())
 
 
     def _check_elev_y(self):
@@ -2995,6 +3001,8 @@ class GwInfo(QObject):
 
         dlg_generic = GwInfoGenericUi(self)
         tools_gw.load_settings(dlg_generic)
+        #self._show_actions(dlg_generic, "tab_none")
+
 
         # Set signals
         dlg_generic.btn_close.clicked.connect(partial(tools_gw.close_dialog, dlg_generic))
@@ -3087,14 +3095,15 @@ class GwInfo(QObject):
                 self.snapper_manager.add_marker(result, self.vertex_marker)
 
 
-    def _get_id(self, dialog, action, option, emit_point, child_type, point, event):
+    def _get_id(self, dialog, action, option, emit_point, child_type, widget_name, point, event):
         """ Get selected attribute from snapped feature """
 
         # @options{'key':['att to get from snapped feature', 'widget name destination']}
         options = {
                     'arc': ['arc_id', 'tab_data_arc_id'],
                     'node': ['node_id', 'tab_data_parent_id'],
-                    'set_to_arc': ['arc_id', '_set_to_arc']
+                    'set_to_arc': ['arc_id', '_set_to_arc'],
+                    'set_to_arc_simple': ['arc_id', '_set_to_arc']
                    }
 
         if event == Qt.RightButton:
@@ -3120,60 +3129,77 @@ class GwInfo(QObject):
                 if str(feat_id) not in ('', None, -1, "None") and widget.property('columnname'):
                         self.my_json[str(widget.property('columnname'))] = str(feat_id)
             elif option == 'set_to_arc':
+                print("entro no simple")
                 # functions called in -> getattr(self, options[option][0])(feat_id, child_type)
-                #       def _set_to_arc(self, feat_id, child_type)
-                getattr(self, options[option][1])(feat_id, child_type)
+                #       def _set_to_arc(self, dialog, feat_id, child_type, widget_name, simple=False)
+                getattr(self, options[option][1])(dialog, feat_id, child_type, widget_name)
+            elif option == 'set_to_arc_simple':
+                print("entro simple")
+                # functions called in -> getattr(self, options[option][0])(feat_id, child_type)
+                #       def _set_to_arc(self, dialog, feat_id, child_type, widget_name, simple=False)
+                getattr(self, options[option][1])(dialog, feat_id, child_type, widget_name, simple=True)
         except Exception as e:
             tools_qgis.show_warning(f"Exception in info (def _get_id)", parameter=e)
         finally:
             self._cancel_snapping_tool(dialog, action)
 
 
-    def _set_to_arc(self, feat_id, child_type):
+    def _set_to_arc(self, dialog, feat_id, child_type, widget_name, simple=False):
         """
         Function called in def get_id(self, dialog, action, option, point, event):
             getattr(self, options[option][1])(feat_id, child_type)
 
             :param feat_id: Id of the snapped feature
+            :param child_type: Feature type context.
+            :param simple: If True, only updates the label without backend calls.
         """
+        if not simple:
 
-        w_dma_id = self.dlg_cf.findChild(QWidget, 'tab_data_dma_id')
-        if isinstance(w_dma_id, QComboBox):
-            dma_id = tools_qt.get_combo_value(self.dlg_cf, w_dma_id)
-        else:
-            dma_id = tools_qt.get_text(self.dlg_cf, w_dma_id)
-        w_presszone_id = self.dlg_cf.findChild(QComboBox, 'tab_data_presszone_id')
-        presszone_id = tools_qt.get_combo_value(self.dlg_cf, w_presszone_id)
-        w_sector_id = self.dlg_cf.findChild(QComboBox, 'tab_data_sector_id')
-        sector_id = tools_qt.get_combo_value(self.dlg_cf, w_sector_id)
-        w_dqa_id = self.dlg_cf.findChild(QComboBox, 'tab_data_dqa_id')
-        dqa_id = tools_qt.get_combo_value(self.dlg_cf, w_dqa_id)
-        if dqa_id == -1:
-            dqa_id = "null"
+            # Standard mode: Perform backend call and update the dialog
+            w_dma_id = self.dlg_cf.findChild(QWidget, 'tab_data_dma_id')
+            if isinstance(w_dma_id, QComboBox):
+                dma_id = tools_qt.get_combo_value(self.dlg_cf, w_dma_id)
+            else:
+                dma_id = tools_qt.get_text(self.dlg_cf, w_dma_id)
 
-        feature = f'"featureType":"{child_type}", "id":"{self.feature_id}"'
-        extras = (f'"arcId":"{feat_id}", "dmaId":"{dma_id}", "presszoneId":"{presszone_id}", "sectorId":"{sector_id}", '
-                  f'"dqaId":"{dqa_id}"')
-        body = tools_gw.create_body(feature=feature, extras=extras)
-        json_result = tools_gw.execute_procedure('gw_fct_settoarc', body)
-        if json_result is None:
-            return
+            w_presszone_id = self.dlg_cf.findChild(QComboBox, 'tab_data_presszone_id')
+            presszone_id = tools_qt.get_combo_value(self.dlg_cf, w_presszone_id)
+            w_sector_id = self.dlg_cf.findChild(QComboBox, 'tab_data_sector_id')
+            sector_id = tools_qt.get_combo_value(self.dlg_cf, w_sector_id)
+            w_dqa_id = self.dlg_cf.findChild(QComboBox, 'tab_data_dqa_id')
+            dqa_id = tools_qt.get_combo_value(self.dlg_cf, w_dqa_id)
+            if dqa_id == -1:
+                dqa_id = "null"
 
-        if 'status' in json_result and json_result['status'] == 'Accepted':
+            feature = f'"featureType":"{child_type}", "id":"{self.feature_id}"'
+            extras = (f'"arcId":"{feat_id}", "dmaId":"{dma_id}", "presszoneId":"{presszone_id}", "sectorId":"{sector_id}", '
+                      f'"dqaId":"{dqa_id}"')
+            body = tools_gw.create_body(feature=feature, extras=extras)
+            json_result = tools_gw.execute_procedure('gw_fct_settoarc', body)
+            if json_result is None:
+                return
+
+            if 'status' not in json_result or json_result['status'] != 'Accepted':
+                return
             if json_result['message']:
                 level = 1
                 if 'level' in json_result['message']:
                     level = int(json_result['message']['level'])
                 tools_qgis.show_message(json_result['message']['text'], level)
 
-            # Refresh to_arc from tab_data
-            tools_qt.set_widget_text(self.dlg_cf, "tab_data_to_arc", feat_id)
-
             # Refresh tab epa
             epa_type = tools_qt.get_text(self.dlg_cf, 'tab_data_epa_type')
             if epa_type and epa_type.lower() in ('valve', 'shortpipe', 'pump'):
                 self._reload_epa_tab(self.dlg_cf)
 
+        # Refresh to_arc and emit editingFinished signal
+        widget = dialog.findChild(QWidget, widget_name)
+        if widget:
+            tools_qt.set_widget_text(dialog, widget, str(feat_id))
+            if hasattr(widget, "editingFinished"):
+                widget.editingFinished.emit()  # Emit signal to indicate value has changed
+        else:
+            tools_qgis.show_warning(f"Widget '{widget_name}' not found in the dialog.")
 
     def _cancel_snapping_tool(self, dialog, action):
 
@@ -3500,6 +3526,10 @@ def add_row_epa(tbl, view, tablename, pkey, dlg, dlg_title, force_action, **kwar
         return
     result = json_result
 
+    if 'form' in json_result['body'] and 'visibleTabs' in json_result['body']['form']:
+        for tab in json_result['body']['form']['visibleTabs']:
+            info.visible_tabs[tab['tabName']] = tab
+
     # Build dlg
     info.add_dlg = GwInfoGenericUi(info)
     tools_gw.load_settings(info.add_dlg)
@@ -3553,8 +3583,18 @@ def add_row_epa(tbl, view, tablename, pkey, dlg, dlg_title, force_action, **kwar
     info.add_dlg.dlg_closed.connect(partial(refresh_epa_tbl, tbl, dlg, **kwargs))
     info.add_dlg.btn_accept.clicked.connect(partial(accept_add_dlg, info.add_dlg, tablename, pkey, feature_id, info.my_json_add, result, info, force_action))
 
+    info._show_actions(info.add_dlg, "tab_none", enable_actions=False)
+
     # Open dlg
     tools_gw.open_dialog(info.add_dlg, dlg_name='info_generic', title=dlg_title)
+
+    # Setup "Set to Arc" action
+    action_set_to_arc = info.add_dlg.findChild(QAction, "actionSetToArc")
+    tools_gw.add_icon(action_set_to_arc, "157")
+
+    action_set_to_arc.triggered.connect(
+        partial(info.get_snapped_feature_id, info.add_dlg, action_set_to_arc, 'v_edit_arc', 'set_to_arc_simple', 'tab_none_to_arc',
+                None))
 
 
 def refresh_epa_tbl(tblview, dlg, **kwargs):

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>542</width>
-    <height>701</height>
+    <height>800</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,39 +15,6 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout_2">
-    <item row="0" column="0">
-     <widget class="QScrollArea" name="scrollArea">
-      <property name="widgetResizable">
-       <bool>true</bool>
-      </property>
-      <widget class="QWidget" name="scrollAreaWidgetContents_2">
-       <property name="geometry">
-        <rect>
-         <x>0</x>
-         <y>0</y>
-         <width>518</width>
-         <height>589</height>
-        </rect>
-       </property>
-       <layout class="QVBoxLayout" name="verticalLayout">
-        <item>
-         <layout class="QGridLayout" name="lyt_main_1">
-          <item row="1" column="0">
-           <widget class="QPushButton" name="hydrometer_link">
-            <property name="text">
-             <string/>
-            </property>
-            <property name="flat">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-       </layout>
-      </widget>
-     </widget>
-    </item>
     <item row="1" column="0">
      <layout class="QGridLayout" name="lyt_buttons">
       <item row="0" column="0">
@@ -79,6 +46,39 @@
       </item>
      </layout>
     </item>
+    <item row="0" column="0">
+     <widget class="QScrollArea" name="scrollArea">
+      <property name="widgetResizable">
+       <bool>true</bool>
+      </property>
+      <widget class="QWidget" name="scrollAreaWidgetContents_2">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>518</width>
+         <height>688</height>
+        </rect>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <item>
+         <layout class="QGridLayout" name="lyt_main_1">
+          <item row="1" column="0">
+           <widget class="QPushButton" name="hydrometer_link">
+            <property name="text">
+             <string/>
+            </property>
+            <property name="flat">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
    </layout>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
@@ -93,6 +93,7 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionEdit"/>
+   <addaction name="actionSetToArc"/>
   </widget>
   <action name="actionEdit">
    <property name="checkable">
@@ -100,6 +101,11 @@
    </property>
    <property name="text">
     <string>Edit</string>
+   </property>
+  </action>
+  <action name="actionSetToArc">
+   <property name="text">
+    <string>Set To Arc</string>
    </property>
   </action>
  </widget>
