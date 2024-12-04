@@ -158,9 +158,9 @@ BEGIN
 
 			-- reset sequences
 			IF v_projecttype = 'UD' THEN
-				ALTER SEQUENCE SCHEMA_NAME.cat_dwf_scenario_id_seq MINVALUE 0;
+				ALTER SEQUENCE SCHEMA_NAME.cat_dwf_id_seq MINVALUE 0;
 				ALTER SEQUENCE SCHEMA_NAME.cat_hydrology_hydrology_id_seq MINVALUE 0;
-				PERFORM setval('SCHEMA_NAME.cat_dwf_scenario_id_seq',0);
+				PERFORM setval('SCHEMA_NAME.cat_dwf_id_seq',0);
 				PERFORM setval('SCHEMA_NAME.cat_hydrology_hydrology_id_seq',0);
 			END IF;
 

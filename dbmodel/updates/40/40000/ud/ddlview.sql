@@ -4633,3 +4633,17 @@ AS SELECT inp_orifice.arc_id,
      LEFT JOIN rpt_arcflow_sum USING (arc_id);
 
 DROP VIEW IF EXISTS v_sector_node;
+
+-- 04/12/2024
+CREATE OR REPLACE VIEW v_edit_cat_dwf
+AS SELECT DISTINCT ON (c.id) c.id,
+    c.idval,
+    c.startdate,
+    c.enddate,
+    c.observ,
+    c.expl_id,
+    c.active,
+    c.log
+   FROM cat_dwf c,
+    selector_expl s
+  WHERE s.expl_id = c.expl_id AND s.cur_user = CURRENT_USER OR c.expl_id IS NULL;

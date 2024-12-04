@@ -11,7 +11,7 @@ RETURNS json AS
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_duplicate_dwf_scenario($${"client":{"device":4, "lang":"ca_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{}, 
+SELECT SCHEMA_NAME.gw_fct_duplicate_dwf_scenario($${"client":{"device":4, "lang":"ca_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{},
 "pageInfo":{}, "parameters":{"copyFrom":"2", "idval":"SGASGA", "startdate":"2024/10/16", "enddate":"2024/10/16", "observ":"SDGA", "expl":"1", "active":"true"}, "aux_params":null}}$$);
 
 -- fid: 459
@@ -92,11 +92,11 @@ BEGIN
 
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, 'INFO');
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, '---------');
-	
+
 	-- process
 	-- Create empty dwf scenario
 	EXECUTE 'SELECT gw_fct_create_dwf_scenario_empty($$'||p_data||'$$);';
-	SELECT id INTO v_scenarioid FROM cat_dwf_scenario where idval = v_idval;
+	SELECT id INTO v_scenarioid FROM cat_dwf where idval = v_idval;
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 		VALUES (v_fid, null, 1, concat('INFO: Dwf scenario named "',v_idval,'" created with values from Dwf scenario ( ',v_copyfrom,' ).'));
 

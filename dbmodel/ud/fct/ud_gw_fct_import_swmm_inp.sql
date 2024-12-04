@@ -124,7 +124,7 @@ BEGIN
 			DELETE FROM cat_mat_node;
 			DELETE FROM cat_arc;
 			DELETE FROM cat_node;
-			DELETE FROM cat_dwf_scenario;
+			DELETE FROM cat_dwf;
 			DELETE FROM cat_hydrology;
 
 			-- Delete data
@@ -286,7 +286,7 @@ BEGIN
 			INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, code_autofill) VALUES ('ORIFICE','VARC','ARC', 'v_edit_arc', TRUE);
 			INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, code_autofill) VALUES ('OUTLET','VARC','ARC', 'v_edit_arc', TRUE);
 
-			INSERT INTO cat_dwf_scenario VALUES (1, 'default');
+			INSERT INTO cat_dwf VALUES (1, 'default');
 
 			--arc_type
 			--arc

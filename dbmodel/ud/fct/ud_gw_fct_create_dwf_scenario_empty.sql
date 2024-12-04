@@ -83,15 +83,15 @@ BEGIN
 
 	-- process
 	-- inserting on catalog table
-	PERFORM setval('SCHEMA_NAME.cat_dwf_scenario_id_seq'::regclass,(SELECT max(id) FROM cat_dwf_scenario) ,true);
+	PERFORM setval('SCHEMA_NAME.cat_dwf_id_seq'::regclass,(SELECT max(id) FROM cat_dwf) ,true);
 
-	INSERT INTO cat_dwf_scenario (idval, startdate, enddate, observ, active, expl_id,log)
+	INSERT INTO cat_dwf (idval, startdate, enddate, observ, active, expl_id,log)
 	VALUES (v_idval, v_startdate, v_enddate, v_observ, v_active, v_expl_id, concat('Created by ',current_user,' on ',substring(now()::text,0,20)))
 	ON CONFLICT (idval) DO NOTHING
 	RETURNING id INTO v_scenarioid;
 
 	IF v_scenarioid IS NULL THEN
-		SELECT id INTO v_scenarioid FROM cat_dwf_scenario where idval = v_idval;
+		SELECT id INTO v_scenarioid FROM cat_dwf where idval = v_idval;
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 		VALUES (v_fid, null, 3, concat('ERROR: The dwf scenario already exists with proposed name (',v_idval ,'). Please try another one.'));
 	ELSE

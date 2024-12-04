@@ -6,8 +6,8 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 3102
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_manage_dwf_values(p_data json) 
-RETURNS json AS 
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_manage_dwf_values(p_data json)
+RETURNS json AS
 $BODY$
 
 /*EXAMPLE
@@ -60,8 +60,8 @@ BEGIN
 	v_action :=  ((p_data ->>'data')::json->>'parameters')::json->>'action';
 
 	-- getting scenario name
-	v_source_name := (SELECT idval FROM cat_dwf_scenario WHERE id = v_copyfrom);
-	v_target_name := (SELECT idval FROM cat_dwf_scenario WHERE id = v_target);
+	v_source_name := (SELECT idval FROM cat_dwf WHERE id = v_copyfrom);
+	v_target_name := (SELECT idval FROM cat_dwf WHERE id = v_target);
 	v_sector_name := (SELECT name FROM sector WHERE sector_id = v_sector);
 
 	IF v_sector = -999 THEN
@@ -173,21 +173,21 @@ BEGIN
 		-- set selector
 		UPDATE config_param_user SET value = v_target WHERE parameter = 'inp_options_dwfscenario' AND cur_user = current_user;
 
-	END IF;	
+	END IF;
 
 	-- insert spacers
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 3, concat(''));
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 2, concat(''));
-		
+
 	-- get results
 	-- info
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid order by criticity desc, id asc) row;
-	v_result := COALESCE(v_result, '{}'); 
+	v_result := COALESCE(v_result, '{}');
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
 	--    Control nulls
-	v_result_info := COALESCE(v_result_info, '{}'); 
+	v_result_info := COALESCE(v_result_info, '{}');
 
 	--  Return
 	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Process done successfully"}, "version":"'||v_version||'"'||

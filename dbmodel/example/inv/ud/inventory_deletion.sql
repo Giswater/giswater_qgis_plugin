@@ -41,7 +41,7 @@ DELETE FROM inp_pattern;
 DELETE FROM inp_curve;
 
 DELETE FROM cat_hydrology;
-DELETE FROM cat_dwf_scenario;
+DELETE FROM cat_dwf;
 DELETE FROM cat_dscenario;
 DELETE FROM plan_psector;
 

@@ -61,7 +61,7 @@ BEGIN
 	INSERT INTO temp_t_csv (source, csv1,csv2,fid) VALUES ('header',';Hydrology scenario: ',(SELECT name
 	FROM config_param_user JOIN cat_hydrology ON value = hydrology_id::text WHERE parameter = 'inp_options_hydrology_scenario' AND cur_user = current_user), v_fid);
 	INSERT INTO temp_t_csv (source, csv1,csv2,fid) VALUES ('header',';DWF scenario: ',(SELECT idval
-	FROM config_param_user JOIN cat_dwf_scenario c ON value = c.id::text WHERE parameter = 'inp_options_dwfscenario' AND cur_user = current_user), v_fid);
+	FROM config_param_user JOIN cat_dwf c ON value = c.id::text WHERE parameter = 'inp_options_dwfscenario' AND cur_user = current_user), v_fid);
 	INSERT INTO temp_t_csv (source, csv1,csv2,fid) VALUES ('header',';Default values: ',(SELECT value::json->>'status'
 	FROM config_param_user WHERE parameter = 'inp_options_vdefault' AND cur_user = current_user), v_fid);
 	INSERT INTO temp_t_csv (source, csv1,csv2,fid) VALUES ('header',';Advanced settings: ',(SELECT value::json->>'status'

@@ -35,7 +35,7 @@ SELECT has_table('cat_brand_model') AS "Table 'cat_brand_model' exists";
 SELECT has_table('cat_builder') AS "Table 'cat_builder' exists";
 SELECT has_table('cat_connec') AS "Table 'cat_connec' exists";
 SELECT has_table('cat_dscenario') AS "Table 'cat_dscenario' exists";
-SELECT has_table('cat_dwf_scenario') AS "Table 'cat_dwf_scenario' exists";
+SELECT has_table('cat_dwf') AS "Table 'cat_dwf' exists";
 SELECT has_table('cat_element') AS "Table 'cat_element' exists";
 SELECT has_table('cat_feature') AS "Table 'cat_feature' exists";
 SELECT has_table('cat_feature_arc') AS "Table 'cat_feature_arc' exists";

@@ -270,3 +270,8 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP", "table":"inp_dscen
 -- 03/12/2024
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_outfall", "column":"route_to", "dataType":"varchar(16)"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_dscenario_outfall", "column":"route_to", "dataType":"varchar(16)"}}$$);
+
+-- 04/12/2024
+DROP VIEW IF EXISTS v_edit_cat_dwf_scenario;
+ALTER TABLE cat_dwf_scenario RENAME TO cat_dwf;
+ALTER SEQUENCE cat_dwf_scenario_id_seq RENAME TO cat_dwf_id_seq;

@@ -13,19 +13,19 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 SELECT plan(6);
 
 
-INSERT INTO v_edit_cat_dwf_scenario (id, idval, startdate, enddate, observ, expl_id, active, log)
+INSERT INTO v_edit_cat_dwf (id, idval, startdate, enddate, observ, expl_id, active, log)
 VALUES(-901, 'Test', NULL, NULL, NULL, NULL, true, NULL);
 
-SELECT is((SELECT count(*)::integer FROM v_edit_cat_dwf_scenario WHERE id = -901), 1, 'INSERT: v_edit_cat_dwf_scenario -901 was inserted');
-SELECT is((SELECT count(*)::integer FROM cat_dwf_scenario WHERE id = -901), 1, 'INSERT: cat_dwf_scenario -901 was inserted');
+SELECT is((SELECT count(*)::integer FROM v_edit_cat_dwf WHERE id = -901), 1, 'INSERT: v_edit_cat_dwf -901 was inserted');
+SELECT is((SELECT count(*)::integer FROM cat_dwf WHERE id = -901), 1, 'INSERT: cat_dwf -901 was inserted');
 
-UPDATE v_edit_cat_dwf_scenario SET observ = 'updated observ' WHERE id = -901;
-SELECT is((SELECT observ FROM v_edit_cat_dwf_scenario WHERE id = -901), 'updated observ', 'UPDATE: v_edit_cat_dwf_scenario -901 was updated');
-SELECT is((SELECT observ FROM cat_dwf_scenario WHERE id = -901), 'updated observ', 'UPDATE: cat_dwf_scenario -901 was updated');
+UPDATE v_edit_cat_dwf SET observ = 'updated observ' WHERE id = -901;
+SELECT is((SELECT observ FROM v_edit_cat_dwf WHERE id = -901), 'updated observ', 'UPDATE: v_edit_cat_dwf -901 was updated');
+SELECT is((SELECT observ FROM cat_dwf WHERE id = -901), 'updated observ', 'UPDATE: cat_dwf -901 was updated');
 
-DELETE FROM v_edit_cat_dwf_scenario WHERE id = -901;
-SELECT is((SELECT count(*)::integer FROM v_edit_cat_dwf_scenario WHERE id = -901), 0, 'DELETE: v_edit_cat_dwf_scenario -901 was deleted');
-SELECT is((SELECT count(*)::integer FROM cat_dwf_scenario WHERE id = -901), 0, 'DELETE: cat_dwf_scenario -901 was deleted');
+DELETE FROM v_edit_cat_dwf WHERE id = -901;
+SELECT is((SELECT count(*)::integer FROM v_edit_cat_dwf WHERE id = -901), 0, 'DELETE: v_edit_cat_dwf -901 was deleted');
+SELECT is((SELECT count(*)::integer FROM cat_dwf WHERE id = -901), 0, 'DELETE: cat_dwf -901 was deleted');
 
 
 SELECT * FROM finish();

@@ -183,3 +183,7 @@ UPDATE
 
 -- 02/12/2024
 CREATE TRIGGER gw_trg_edit_ve_epa_orifice INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_epa_orifice FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_ve_epa('orifice');
+
+-- 04/12/2024
+CREATE TRIGGER gw_trg_edit_inp_dwf INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_cat_dwf
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_dwf('cat_dwf');
