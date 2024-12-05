@@ -60,7 +60,7 @@ BEGIN
             parameter_name := 'plan_netscenario_current';
 
         WHEN 'psector' THEN
-            parameter_name := 'plan_psector_vdefault';
+            parameter_name := 'plan_psector_current';
 
         WHEN 'hydrology' THEN
             parameter_name := 'inp_options_hydrology_scenario';
@@ -101,7 +101,7 @@ BEGIN
         WHEN 'psector' THEN
             query := 'SELECT t1.psector_id, t1.name FROM plan_psector AS t1 '
                   || 'INNER JOIN config_param_user AS t2 ON t1.psector_id::text = t2.value '
-                  || 'WHERE t2.parameter = ''plan_psector_vdefault'' AND t2.cur_user = current_user';
+                  || 'WHERE t2.parameter = ''plan_psector_current'' AND t2.cur_user = current_user';
             EXECUTE query INTO v_type_id, v_type_name;
             result := json_build_object('psector_id', v_type_id, 'name', v_type_name);
 

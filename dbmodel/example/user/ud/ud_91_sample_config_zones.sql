@@ -14,7 +14,7 @@ INSERT INTO config_param_user VALUES ('edit_gratecat_vdefault', 'N/I', current_u
 INSERT INTO config_param_user VALUES ('plan_psector_gexpenses_vdefault', '19.00', current_user);
 INSERT INTO config_param_user VALUES ('plan_psector_vat_vdefault', '21.00', current_user);
 INSERT INTO config_param_user VALUES ('plan_psector_other_vdefault', '4.00', current_user);
-INSERT INTO config_param_user VALUES ('plan_psector_vdefault', '1', current_user);
+INSERT INTO config_param_user VALUES ('plan_psector_current', '1', current_user);
 INSERT INTO config_param_user VALUES ('edit_arccat_vdefault', 'CC040', current_user);
 INSERT INTO config_param_user VALUES ('edit_state_vdefault', '1', current_user);
 INSERT INTO config_param_user VALUES ('edit_workcat_vdefault', 'work1', current_user);

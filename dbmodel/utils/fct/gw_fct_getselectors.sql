@@ -109,7 +109,7 @@ BEGIN
 
 	raise notice 'GET SELECTORS %', p_data;
 
-	
+
 	-- Get input parameters:
 	v_selector_type := (p_data ->> 'data')::json->> 'selectorType';
 	v_currenttab := (p_data ->> 'form')::json->> 'currentTab';
@@ -131,7 +131,7 @@ BEGIN
 	END IF;
 
 	-- profilactic control of schema name
-	IF lower(v_addschema) = 'none' OR v_addschema = '' OR lower(v_addschema) ='null' OR v_addschema is null OR v_addschema='NULL' THEN 
+	IF lower(v_addschema) = 'none' OR v_addschema = '' OR lower(v_addschema) ='null' OR v_addschema is null OR v_addschema='NULL' THEN
 		v_addschema = null;
 		v_exclude_tab = ' AND tabname != ''tab_exploitation_add''';
 	END IF;
@@ -147,12 +147,12 @@ BEGIN
 	-- when typeahead only one tab is executed
 	IF v_filterfrominput IS NULL OR v_filterfrominput = '' OR lower(v_filterfrominput) ='None' or lower(v_filterfrominput) = 'null' THEN
 		v_querytab = '';
-	ELSE 
+	ELSE
 		v_querytab = concat(' AND tabname = ', quote_literal(v_currenttab));
 	END IF;
 
 	-- Start the construction of the tabs array
-	v_formTabs := '['; 
+	v_formTabs := '[';
 
 	v_query = concat(
 	'SELECT formname, tabname, label, tooltip, tabfunction, tabactions, value
@@ -165,7 +165,7 @@ BEGIN
 
 	FOR v_tab IN EXECUTE v_query
 ​
-	LOOP		
+	LOOP
 		-- get variables form input
 		v_selector_list := (p_data ->> 'data')::json->> 'ids';
 		v_filterfrominput := (p_data ->> 'data')::json->> 'filterText';
@@ -205,7 +205,7 @@ BEGIN
 			ELSE
 				v_filterfrominput = concat (' AND expl_id IN (SELECT expl_id FROM config_user_x_expl WHERE username = current_user) ', v_typeahead,' LIKE ''%', lower(v_filterfrominput), '%''');
 			END IF;
-			
+
 		ELSIF v_selector = 'selector_sector' AND v_expl_x_user THEN
 			IF v_filterfrominput IS NULL OR v_filterfrominput = '' THEN
 				v_filterfrominput = ' AND sector_id IN (SELECT sector_id FROM config_user_x_sector WHERE username = current_user)';
@@ -213,11 +213,11 @@ BEGIN
 				v_filterfrominput = concat (' AND sector_id IN (SELECT sector_id FROM config_user_x_sector WHERE username = current_user) ', v_typeahead,' LIKE ''%', lower(v_filterfrominput), '%''');
 			END IF;
 
-		ELSE 
+		ELSE
 			-- built filter from input (recalled from typeahead)
 			IF v_filterfrominput IS NULL OR v_filterfrominput = '' OR lower(v_filterfrominput) ='None' or lower(v_filterfrominput) = 'null' THEN
 				v_filterfrominput := NULL;
-			ELSE 
+			ELSE
 				v_filterfrominput = concat (v_typeahead,' LIKE ''%', lower(v_filterfrominput), '%''');
 			END IF;
 		END IF;
@@ -231,7 +231,7 @@ BEGIN
 		END IF;
 
 
-		-- built full filter 
+		-- built full filter
 		v_fullfilter = concat(v_filterfromids, v_filterfromconfig, v_filterfrominput);
 
 		-- use atlas on psector selector
@@ -239,11 +239,11 @@ BEGIN
 			v_orderby = 'atlas_id::integer';
 			v_name = 'concat(row_number() over(order by atlas_id::integer), ''-'',name)';
 		END IF;
-			
+
 		-- profilactic null control
 		v_fullfilter := COALESCE(v_fullfilter, '');
 		IF v_tab.tabname ='tab_macroexploitation' OR v_tab.tabname='tab_macrosector'  or v_tab.tabname ='tab_macroexploitation_add' THEN
-			
+
 			IF v_tab.tabname ='tab_macroexploitation' or v_tab.tabname ='tab_macroexploitation_add' THEN
 				v_zonetable='exploitation';
 				v_zoneid = 'expl_id';
@@ -259,56 +259,56 @@ BEGIN
 				v_macroselector = 'selector_sector';
 				--EXECUTE 'SELECT array_agg(macrosector_id) FROM v_edit_macrosector' INTO v_ids;
 			END IF;
-	
-	
+
+
 			if v_addschema is NULL then
 				v_query = 'SELECT '||v_macroid||' FROM '||v_macrotable||'';
 			else
 				v_query = 'SELECT '||v_macroid||' FROM '||v_addschema||'.'||v_macrotable||'';
 			end if;
-			
+
 				FOR rec_macro IN EXECUTE v_query LOOP
 
 					IF v_tab.tabname ='tab_macroexploitation_add' and (v_addschema IS NOT NULL) THEN
-						
+
 						EXECUTE 'SELECT count('||v_zoneid||') as count  FROM '||v_addschema||'.'||v_zonetable||' 
 						WHERE '||v_macroid||'='||rec_macro||' and active IS TRUE group by '||v_macroid||''
 						INTO v_count_zone;
-	
+
 						EXECUTE 'SELECT count(*) FROM '||v_addschema||'.'||v_macroselector||' JOIN '||v_addschema||'.'||v_zonetable||' USING ('||v_zoneid||') 
 						WHERE '||v_macroid||'='||rec_macro||'  AND active IS TRUE AND cur_user=current_user'
 						INTO v_count_selector;
 					ELSE
-	
+
 						EXECUTE 'SELECT count('||v_zoneid||') as count  FROM '||v_zonetable||' WHERE '||v_macroid||'='||rec_macro||' and active IS TRUE group by '||v_macroid||''
 						INTO v_count_zone;
-	
+
 						EXECUTE 'SELECT count(*) FROM '||v_macroselector||' JOIN '||v_zonetable||' USING ('||v_zoneid||') 
 						WHERE '||v_macroid||'='||rec_macro||'  AND active IS TRUE AND cur_user=current_user'
 						INTO v_count_selector;
 					END IF;
-				
+
 					IF v_count_zone = v_count_selector THEN
-	
-						IF v_ids IS NULL THEN 
+
+						IF v_ids IS NULL THEN
 							v_ids = rec_macro::text;
 						ELSE
 							v_ids = concat(v_ids,',',rec_macro::text );
 						END IF;
 					END IF;
-				 END LOOP;	
+				 END LOOP;
 
 			v_ids = replace(v_ids,'{','');
-			v_ids = replace(v_ids,'}','');	
+			v_ids = replace(v_ids,'}','');
 
 			IF v_ids IS NULL THEN v_ids='0'; END IF;
 				IF v_tab.tabname ='tab_macroexploitation_add' and v_addschema IS NOT NULL THEN
 					v_finalquery = concat('SELECT array_to_json(array_agg(row_to_json(a))) FROM (
-						SELECT ',quote_ident(v_table_id),', concat(' , v_label , ') AS label, ',v_orderby,' as orderby , ',v_name,' as name, ', v_table_id , '::text as widgetname, ''' , 
+						SELECT ',quote_ident(v_table_id),', concat(' , v_label , ') AS label, ',v_orderby,' as orderby , ',v_name,' as name, ', v_table_id , '::text as widgetname, ''' ,
 						v_selector_id , ''' as columnname, ''check'' as type, ''boolean'' as "dataType", true as "value" 
 						FROM ',v_addschema,'.' , v_table , ' m JOIN  ',v_addschema,'.', v_zonetable , '  USING (',v_table_id,') 
 						WHERE ',v_table_id ,' IN (' , v_ids, ') ', v_fullfilter ,' UNION 
-						SELECT ',quote_ident(v_table_id),', concat(' , v_label , ') AS label, ',v_orderby,' as orderby , ',v_name,' as name, ', v_table_id , '::text as widgetname, ''' , 
+						SELECT ',quote_ident(v_table_id),', concat(' , v_label , ') AS label, ',v_orderby,' as orderby , ',v_name,' as name, ', v_table_id , '::text as widgetname, ''' ,
 						v_selector_id , ''' as columnname, ''check'' as type, ''boolean'' as "dataType", false as "value" 
 						FROM ',v_addschema,'.', v_table , ' m JOIN   ',v_addschema,'.', v_zonetable , '    USING (',v_table_id,')
 						WHERE ',v_table_id ,' NOT IN (' , v_ids, ') ',
@@ -316,11 +316,11 @@ BEGIN
 				ELSE
 
 				v_finalquery = concat('SELECT array_to_json(array_agg(row_to_json(a))) FROM (
-						SELECT ',quote_ident(v_table_id),', concat(' , v_label , ') AS label, ',v_orderby,' as orderby , ',v_name,' as name, ', v_table_id , '::text as widgetname, ''' , 
+						SELECT ',quote_ident(v_table_id),', concat(' , v_label , ') AS label, ',v_orderby,' as orderby , ',v_name,' as name, ', v_table_id , '::text as widgetname, ''' ,
 						v_selector_id , ''' as columnname, ''check'' as type, ''boolean'' as "dataType", true as "value" 
 						FROM ' , v_table , ' m JOIN  ' , v_zonetable , '  USING (',v_table_id,') 
 						WHERE ',v_table_id ,' IN (' , v_ids, ') ', v_fullfilter ,' UNION 
-						SELECT ',quote_ident(v_table_id),', concat(' , v_label , ') AS label, ',v_orderby,' as orderby , ',v_name,' as name, ', v_table_id , '::text as widgetname, ''' , 
+						SELECT ',quote_ident(v_table_id),', concat(' , v_label , ') AS label, ',v_orderby,' as orderby , ',v_name,' as name, ', v_table_id , '::text as widgetname, ''' ,
 						v_selector_id , ''' as columnname, ''check'' as type, ''boolean'' as "dataType", false as "value" 
 						FROM ' , v_table , ' m JOIN   ' , v_zonetable , '    USING (',v_table_id,')
 						WHERE ',v_table_id ,' NOT IN (' , v_ids, ') ',
@@ -328,31 +328,31 @@ BEGIN
 				END IF;
 		ELSIF v_tab.tabname ='tab_exploitation_add' and v_addschema IS NOT NULL THEN
 			v_finalquery = concat('SELECT array_to_json(array_agg(row_to_json(a))) FROM (
-						SELECT ',quote_ident(v_table_id),', concat(' , v_label , ') AS label, ',v_orderby,' as orderby , ',v_name,' as name, ', v_table_id , '::text as widgetname, ''' , 
+						SELECT ',quote_ident(v_table_id),', concat(' , v_label , ') AS label, ',v_orderby,' as orderby , ',v_name,' as name, ', v_table_id , '::text as widgetname, ''' ,
 						v_selector_id , ''' as columnname, ''check'' as type, ''boolean'' as "dataType", true as "value" 
 						FROM ',v_addschema,'.' , v_table , ' m 
-						WHERE ',v_table_id ,' NOT IN (SELECT ',v_table_id ,' FROM  ws36007.', v_table , ') AND ' , 
+						WHERE ',v_table_id ,' NOT IN (SELECT ',v_table_id ,' FROM  ws36007.', v_table , ') AND ' ,
 						v_table_id , ' IN (SELECT ' , v_selector_id , ' FROM ',v_addschema,'.' , v_selector ,' WHERE cur_user=' , quote_literal(current_user) , ') ', v_fullfilter ,' UNION 
-						SELECT ',quote_ident(v_table_id),', concat(' , v_label , ') AS label, ',v_orderby,' as orderby , ',v_name,' as name, ', v_table_id , '::text as widgetname, ''' , 
+						SELECT ',quote_ident(v_table_id),', concat(' , v_label , ') AS label, ',v_orderby,' as orderby , ',v_name,' as name, ', v_table_id , '::text as widgetname, ''' ,
 						v_selector_id , ''' as columnname, ''check'' as type, ''boolean'' as "dataType", false as "value" 
 						FROM ',v_addschema,'.', v_table , ' m
-						WHERE ',v_table_id ,' NOT IN (SELECT ',v_table_id ,' FROM  ws36007.', v_table , ') AND ' , 
+						WHERE ',v_table_id ,' NOT IN (SELECT ',v_table_id ,' FROM  ws36007.', v_table , ') AND ' ,
 						v_table_id , ' NOT IN (SELECT ' , v_selector_id , ' FROM ',v_addschema,'.' , v_selector ,' WHERE cur_user=' , quote_literal(current_user) , ') ', v_fullfilter ,' ORDER BY orderby asc) a');
-			
-		ELSE 
-		
+
+		ELSE
+
 			v_finalquery = concat('SELECT array_to_json(array_agg(row_to_json(b))) FROM (
 					select *, row_number() OVER (ORDER BY orderby) as orderby from (
-					SELECT ',quote_ident(v_table_id),', concat(' , v_label , ') AS label, ',v_name,' as name, ', v_table_id , '::text as widgetname, ' , 
+					SELECT ',quote_ident(v_table_id),', concat(' , v_label , ') AS label, ',v_name,' as name, ', v_table_id , '::text as widgetname, ' ,
 					v_orderby, ' as orderby , ''', v_selector_id , ''' as columnname, ''check'' as type, ''boolean'' as "dataType", true as "value" 
 					FROM ', v_table ,' WHERE ' , v_table_id , ' IN (SELECT ' , v_selector_id , ' FROM ', v_selector ,' WHERE cur_user=' , quote_literal(current_user) , ') ', v_fullfilter ,' UNION 
-					SELECT ',quote_ident(v_table_id),', concat(' , v_label , ') AS label, ',v_name,' as name, ', v_table_id , '::text as widgetname, ' , 
+					SELECT ',quote_ident(v_table_id),', concat(' , v_label , ') AS label, ',v_name,' as name, ', v_table_id , '::text as widgetname, ' ,
 					v_orderby, ' , ''',v_selector_id , ''' as columnname, ''check'' as type, ''boolean'' as "dataType", false as "value" 
 					FROM ', v_table ,' WHERE ' , v_table_id , ' NOT IN (SELECT ' , v_selector_id , ' FROM ', v_selector ,' WHERE cur_user=' , quote_literal(current_user) , ') ',
 					 v_fullfilter ,') a)b');
 
 		END IF;
-		v_debug_vars := json_build_object('v_table_id', v_table_id, 'v_label', v_label, 'v_orderby', v_orderby, 'v_name', v_name, 'v_selector_id', v_selector_id, 
+		v_debug_vars := json_build_object('v_table_id', v_table_id, 'v_label', v_label, 'v_orderby', v_orderby, 'v_name', v_name, 'v_selector_id', v_selector_id,
 						  'v_table', v_table, 'v_selector', v_selector, 'current_user', current_user, 'v_fullfilter', v_fullfilter);
 		v_debug := json_build_object('querystring', v_finalquery, 'vars', v_debug_vars, 'funcname', 'gw_fct_getselectors', 'flag', 30);
 		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
@@ -386,28 +386,28 @@ BEGIN
 		v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'typeaheadFilter', v_typeahead::TEXT);
 		v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'selectionMode', v_selectionMode::TEXT);
 		v_formTabsAux := gw_fct_json_object_set_key(v_formTabsAux, 'typeaheadForced', v_typeaheadForced::TEXT);
-	
+
 		-- Create tabs array
 		IF v_firsttab THEN
 			v_formTabs := v_formTabs || ',' || v_formTabsAux::text;
-		ELSE 
+		ELSE
 			v_formTabs := v_formTabs || v_formTabsAux::text;
 		END IF;
 		v_firsttab := TRUE;
-	
+
 	END LOOP;
 
 	-- Manage QWC
 	IF v_device = 5 THEN
-	
+
 		-- Get active exploitations geometry (to zoom on them)
 		IF v_loadProject IS TRUE AND v_geometry IS NULL THEN
-			SELECT row_to_json (a) 
+			SELECT row_to_json (a)
 			INTO v_geometry
-			FROM (SELECT st_xmin(the_geom)::numeric(12,2) as x1, st_ymin(the_geom)::numeric(12,2) as y1, st_xmax(the_geom)::numeric(12,2) as x2, st_ymax(the_geom)::numeric(12,2) as y2 
+			FROM (SELECT st_xmin(the_geom)::numeric(12,2) as x1, st_ymin(the_geom)::numeric(12,2) as y1, st_xmax(the_geom)::numeric(12,2) as x2, st_ymax(the_geom)::numeric(12,2) as y2
 			FROM (SELECT st_expand(st_collect(the_geom), 50.0) as the_geom FROM exploitation where expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user)) b) a;
 		END IF;
-		
+
 		if v_selector_type='selector_mincut' then
 			-- GET GEOJSON
 			--v_om_mincut
@@ -424,7 +424,7 @@ BEGIN
 			raise notice 'v_om_mincut -> %', v_result;
 			v_result := COALESCE(v_result, '{}');
 			v_mincut_init = concat('{"geometryType":"Point", "features":',v_result, '}');
-			
+
 			--v_om_mincut_valve proposed true
             SELECT jsonb_agg(features.feature) INTO v_result
                 FROM (
@@ -439,7 +439,7 @@ BEGIN
 
             v_result := COALESCE(v_result, '{}');
             v_mincut_valve_proposed = concat('{"geometryType":"Point", "features":',v_result, '}');
-            
+
             --v_om_mincut_valve proposed false
             SELECT jsonb_agg(features.feature) INTO v_result
                 FROM (
@@ -454,7 +454,7 @@ BEGIN
 
             v_result := COALESCE(v_result, '{}');
             v_mincut_valve_not_proposed = concat('{"geometryType":"Point", "features":',v_result, '}');
-	
+
 			--v_om_mincut_node
 			SELECT jsonb_agg(features.feature) INTO v_result
 				FROM (
@@ -466,10 +466,10 @@ BEGIN
 		  	) AS feature
 		  	FROM (SELECT id, ST_AsText(the_geom) as the_geom, ST_SRID(the_geom) as srid
 		  	FROM  v_om_mincut_node) row) features;
-	
+
 			v_result := COALESCE(v_result, '{}');
 			v_mincut_node = concat('{"geometryType":"Point", "features":',v_result, '}');
-	
+
 			--v_om_mincut_connec
 			SELECT jsonb_agg(features.feature) INTO v_result
 				FROM (
@@ -481,10 +481,10 @@ BEGIN
 		  	) AS feature
 		  	FROM (SELECT id, ST_AsText(the_geom) as the_geom, ST_SRID(the_geom) as srid
 		  	FROM  v_om_mincut_connec) row) features;
-	
+
 			v_result := COALESCE(v_result, '{}');
 			v_mincut_connec = concat('{"geometryType":"Point", "features":',v_result, '}');
-	
+
 			--v_om_mincut_arc
 			SELECT jsonb_agg(features.feature) INTO v_result
 				FROM (
@@ -496,7 +496,7 @@ BEGIN
 		  	) AS feature
 		  	FROM (SELECT id, arc_id, ST_AsText(the_geom) as the_geom, ST_SRID(the_geom) as srid
 		  	FROM  v_om_mincut_arc) row) features;
-	
+
 			v_result := COALESCE(v_result, '{}');
 			v_mincut_arc = concat('{"geometryType":"LineString", "features":',v_result, '}');
 		end if;
@@ -507,7 +507,7 @@ BEGIN
 
 	-- Check null
 	v_formTabs := COALESCE(v_formTabs, '[]');
-	v_manageall := COALESCE(v_manageall, FALSE);	
+	v_manageall := COALESCE(v_manageall, FALSE);
 	v_selectionMode = COALESCE(v_selectionMode, '');
 	v_currenttab = COALESCE(v_currenttab, '');
 	v_geometry = COALESCE(v_geometry, '{}');
@@ -520,10 +520,10 @@ BEGIN
 	v_mincut_connec = COALESCE(v_mincut_connec, '[]');
 	v_mincut_arc = COALESCE(v_mincut_arc, '[]');
 	v_uservalues = COALESCE(v_uservalues, '{}');
-	v_tiled = COALESCE(v_tiled, FALSE);	
-	
+	v_tiled = COALESCE(v_tiled, FALSE);
+
 	EXECUTE 'SET ROLE "'||v_prev_cur_user||'"';
-	
+
 	-- Return
 	IF v_firsttab IS FALSE THEN
 		-- Return not implemented
@@ -531,14 +531,14 @@ BEGIN
 		', "version":'|| v_version ||
 		', "message":"Not implemented"'||
 		'}')::json;
-	ELSE 
-		v_uservalues := COALESCE(json_extract_path_text(p_data,'data','userValues'), 
-			(SELECT to_json(array_agg(row_to_json(a))) FROM (SELECT parameter, value FROM config_param_user WHERE parameter IN ('plan_psector_vdefault', 'utils_workspace_vdefault') AND cur_user = current_user ORDER BY parameter)a)::text, 
+	ELSE
+		v_uservalues := COALESCE(json_extract_path_text(p_data,'data','userValues'),
+			(SELECT to_json(array_agg(row_to_json(a))) FROM (SELECT parameter, value FROM config_param_user WHERE parameter IN ('plan_psector_current', 'utils_workspace_vdefault') AND cur_user = current_user ORDER BY parameter)a)::text,
 			'{}');
 		v_action := json_extract_path_text(p_data,'data','action');
 		IF v_action = '' THEN v_action = NULL; END IF;
-		
-		
+
+
 		-- Return formtabs
 		RETURN gw_fct_json_create_return(('{"status":"Accepted", "version":'||v_version||
 			',"body":{"message":'||v_message||
@@ -555,7 +555,7 @@ BEGIN
 					"mincutNotProposedValve":'||v_mincut_valve_not_proposed||',
 					"mincutNode":'||v_mincut_node||',
 					"mincutConnec":'||v_mincut_connec||',
-					"mincutArc":'||v_mincut_arc else '' end ) ||	
+					"mincutArc":'||v_mincut_arc else '' end ) ||
 				'}'||
 			'}'||
 		    '}')::json,2796, null, null, v_action::json);

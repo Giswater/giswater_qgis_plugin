@@ -281,7 +281,7 @@ BEGIN
 	-- Force psector vdefault visible to current_user (only to => role_master)
 	IF 'role_master' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
 
-		SELECT value::integer INTO v_psector_vdef FROM config_param_user WHERE parameter='plan_psector_vdefault' AND cur_user=current_user;
+		SELECT value::integer INTO v_psector_vdef FROM config_param_user WHERE parameter='plan_psector_current' AND cur_user=current_user;
 
 		IF v_psector_vdef IS NULL THEN
 			SELECT psector_id INTO v_psector_vdef FROM plan_psector WHERE status=2 LIMIT 1;
@@ -413,7 +413,7 @@ BEGIN
 	-- get uservalues
 	PERFORM gw_fct_workspacemanager($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},"data":{"filterFields":{}, "pageInfo":{}, "action":"CHECK"}}$$);
 
-	v_uservalues = (SELECT to_json(array_agg(row_to_json(a))) FROM (SELECT parameter, value FROM config_param_user WHERE parameter IN ('plan_psector_vdefault', 'utils_workspace_vdefault')
+	v_uservalues = (SELECT to_json(array_agg(row_to_json(a))) FROM (SELECT parameter, value FROM config_param_user WHERE parameter IN ('plan_psector_current', 'utils_workspace_vdefault')
 	AND cur_user = current_user ORDER BY parameter)a);
 
 	v_uservalues := COALESCE(v_uservalues, '{}');

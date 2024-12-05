@@ -88,7 +88,7 @@ BEGIN
 	SELECT value::boolean INTO v_dsbl_error FROM config_param_system WHERE parameter='edit_topocontrol_disable_error' ;
 	SELECT project_type INTO v_projectype FROM sys_version LIMIT 1;
 	v_ispresszone:= (SELECT value::json->>'PRESSZONE' FROM config_param_system WHERE parameter = 'utils_graphanalytics_status');
-	v_currentpsector = (SELECT value::integer from config_param_user WHERE cur_user = current_user AND parameter = 'plan_psector_vdefault');
+	v_currentpsector = (SELECT value::integer from config_param_user WHERE cur_user = current_user AND parameter = 'plan_psector_current');
 	v_check_arcdnom_status:= (SELECT value::json->>'status' FROM config_param_system WHERE parameter = 'edit_link_check_arcdnom');
 	v_check_arcdnom:= (SELECT value::json->>'diameter' FROM config_param_system WHERE parameter = 'edit_link_check_arcdnom');
 

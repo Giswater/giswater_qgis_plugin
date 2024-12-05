@@ -72,7 +72,7 @@ BEGIN
 	DELETE FROM audit_check_data WHERE fid=153 AND cur_user=current_user;
 	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (153, v_result_id, concat('DUPLICATE PSECTOR'));
 	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (153, v_result_id, concat('------------------------------'));
-		
+
     -- insert connec2network variable for user in case it doesn't exist
     INSERT INTO config_param_user VALUES('edit_connec_automatic_link', 'false', current_user) ON CONFLICT (parameter, cur_user) DO NOTHING;
     IF v_project_type='UD' THEN
@@ -85,7 +85,7 @@ BEGIN
 
 	UPDATE  config_param_system SET value = gw_fct_json_object_set_key(v_connec_proximity::json, 'activated'::text, 'false'::text) WHERE parameter='edit_connec_proximity';
 	UPDATE  config_param_system SET value = gw_fct_json_object_set_key(v_gully_proximity::json, 'activated'::text, 'false'::text) WHERE parameter='edit_gully_proximity';
-	
+
 	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (153, v_result_id, concat('Deactivate topology control for connecs and gullies.' ));
 
 	--capture input values
@@ -93,23 +93,23 @@ BEGIN
 	v_new_psector_name = ((p_data ->>'data')::json->>'new_psector_name')::text;
 
 	--copy psector definition, update plan selector and psector vdefault
- 	INSERT INTO plan_psector (name, psector_type, descript, expl_id, priority, text1, text2, observ, rotation, scale,  atlas_id, gexpenses, 
- 	vat, other, active, the_geom, enable_all, status, ext_code, text3, text4, text5, text6, num_value) 
- 	SELECT v_new_psector_name, psector_type, descript, expl_id, priority, text1, text2, observ, rotation, scale,  atlas_id, gexpenses, 
- 	vat, other, active, the_geom, enable_all, status, ext_code, text3, text4, text5, text6, num_value 
+ 	INSERT INTO plan_psector (name, psector_type, descript, expl_id, priority, text1, text2, observ, rotation, scale,  atlas_id, gexpenses,
+ 	vat, other, active, the_geom, enable_all, status, ext_code, text3, text4, text5, text6, num_value)
+ 	SELECT v_new_psector_name, psector_type, descript, expl_id, priority, text1, text2, observ, rotation, scale,  atlas_id, gexpenses,
+ 	vat, other, active, the_geom, enable_all, status, ext_code, text3, text4, text5, text6, num_value
  	FROM plan_psector WHERE psector_id=v_old_psector_id RETURNING psector_id INTO v_new_psector_id;
-	
+
 	INSERT INTO audit_check_data (fid, result_id, error_message)
 	VALUES (153, v_result_id, concat('Copy psector ',v_old_psector_id,' as ',v_new_psector_name,'.' ));
 
-	SELECT value INTO v_psector_vdefault FROM config_param_user where parameter = 'plan_psector_vdefault' and cur_user=current_user;
-	
+	SELECT value INTO v_psector_vdefault FROM config_param_user where parameter = 'plan_psector_current' and cur_user=current_user;
+
 	IF v_psector_vdefault IS NULL THEN
-		INSERT INTO config_param_user (parameter,value, cur_user) VALUES ('plan_psector_vdefault', v_new_psector_id, current_user);
-	ELSE 
-		UPDATE config_param_user SET value=v_new_psector_id WHERE parameter='plan_psector_vdefault' and cur_user=current_user;
+		INSERT INTO config_param_user (parameter,value, cur_user) VALUES ('plan_psector_current', v_new_psector_id, current_user);
+	ELSE
+		UPDATE config_param_user SET value=v_new_psector_id WHERE parameter='plan_psector_current' and cur_user=current_user;
 	END IF;
-	
+
 	INSERT INTO audit_check_data (fid, result_id, error_message)
 	VALUES (153, v_result_id, concat('Set source psector (',v_old_psector_id,') as current psector.' ));
 
@@ -121,12 +121,12 @@ BEGIN
 
 	IF v_list_features_obsolete IS NOT NULL THEN
 		UPDATE config_param_user SET value='false' WHERE parameter='edit_plan_order_control' AND cur_user=current_user;
-	
+
 		PERFORM setval('SCHEMA_NAME.plan_psector_x_arc_id_seq', (select max(id) from plan_psector_x_arc) , true);
-		INSERT INTO plan_psector_x_arc(arc_id, psector_id, state, doable, descript, addparam) 
-		SELECT arc_id, v_new_psector_id, state, doable, descript, addparam FROM plan_psector_x_arc 
+		INSERT INTO plan_psector_x_arc(arc_id, psector_id, state, doable, descript, addparam)
+		SELECT arc_id, v_new_psector_id, state, doable, descript, addparam FROM plan_psector_x_arc
 		WHERE psector_id=v_old_psector_id AND state=0;
-	
+
 		UPDATE config_param_user SET value='true' WHERE parameter='edit_plan_order_control' AND cur_user=current_user;
 
 		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (153, v_result_id, concat('Copied arcs with state 0: ', v_list_features_obsolete ));
@@ -137,8 +137,8 @@ BEGIN
 
 	IF v_list_features_obsolete IS NOT NULL THEN
 		PERFORM setval('SCHEMA_NAME.plan_psector_x_node_id_seq', (select max(id) from plan_psector_x_node) , true);
-		INSERT INTO plan_psector_x_node(node_id, psector_id, state, doable, descript) 
-		SELECT node_id, v_new_psector_id, state, doable, descript FROM plan_psector_x_node 
+		INSERT INTO plan_psector_x_node(node_id, psector_id, state, doable, descript)
+		SELECT node_id, v_new_psector_id, state, doable, descript FROM plan_psector_x_node
 		WHERE psector_id=v_old_psector_id AND state=0;
 
 		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (153, v_result_id, concat('Copied nodes with state 0: ', v_list_features_obsolete ));
@@ -149,8 +149,8 @@ BEGIN
 
 	IF v_list_features_obsolete IS NOT NULL THEN
 		PERFORM setval('SCHEMA_NAME.plan_psector_x_connec_id_seq', (select max(id) from plan_psector_x_connec) , true);
-		INSERT INTO plan_psector_x_connec(connec_id, psector_id, state, doable, descript, arc_id, link_id) 
-		SELECT DISTINCT connec_id, v_new_psector_id, 0, false, descript, arc_id, link_id FROM plan_psector_x_connec 
+		INSERT INTO plan_psector_x_connec(connec_id, psector_id, state, doable, descript, arc_id, link_id)
+		SELECT DISTINCT connec_id, v_new_psector_id, 0, false, descript, arc_id, link_id FROM plan_psector_x_connec
 		WHERE psector_id=v_old_psector_id AND state=0 ON CONFLICT (psector_id, connec_id, state) DO NOTHING;
 
 		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (153, v_result_id, concat('Copied connecs with state 0: ', v_list_features_obsolete ));
@@ -161,8 +161,8 @@ BEGIN
 
 	IF v_list_connec_undoable IS NOT NULL THEN
 		PERFORM setval('SCHEMA_NAME.plan_psector_x_connec_id_seq', (select max(id) from plan_psector_x_connec) , true);
-		INSERT INTO plan_psector_x_connec(connec_id, psector_id, state, doable, descript) 
-		SELECT DISTINCT connec_id, v_new_psector_id, 1, false, descript FROM plan_psector_x_connec 
+		INSERT INTO plan_psector_x_connec(connec_id, psector_id, state, doable, descript)
+		SELECT DISTINCT connec_id, v_new_psector_id, 1, false, descript FROM plan_psector_x_connec
 		WHERE psector_id=v_old_psector_id AND state=1 AND doable=false ON CONFLICT (psector_id, connec_id, state) DO NOTHING;
 
 		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (153, v_result_id, concat('Copied connecs with state 1 (doable false): ', v_list_connec_undoable));
@@ -173,39 +173,39 @@ BEGIN
 		SELECT string_agg(gully_id,',') INTO v_list_features_obsolete FROM plan_psector_x_gully WHERE psector_id=v_old_psector_id AND state=0;
 		IF v_list_features_obsolete IS NOT NULL THEN
 			PERFORM setval('SCHEMA_NAME.plan_psector_x_gully_id_seq', (select max(id) from plan_psector_x_gully) , true);
-			INSERT INTO plan_psector_x_gully(gully_id, psector_id, state, doable, descript, arc_id, link_id) 
-			SELECT DISTINCT gully_id, v_new_psector_id, state, doable, descript, arc_id, link_id FROM plan_psector_x_gully 
+			INSERT INTO plan_psector_x_gully(gully_id, psector_id, state, doable, descript, arc_id, link_id)
+			SELECT DISTINCT gully_id, v_new_psector_id, state, doable, descript, arc_id, link_id FROM plan_psector_x_gully
 			WHERE psector_id=v_old_psector_id AND state=0 ON CONFLICT (psector_id, gully_id, state) DO NOTHING;
-	
+
 			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (153, v_result_id, concat('Copied gullies with state 0: ', v_list_features_obsolete ));
 		END IF;
-	
+
 		--copy gullies with state 1 inside plan_psector tables
 		SELECT string_agg(gully_id,',') INTO v_list_gully_undoable FROM plan_psector_x_gully WHERE psector_id=v_old_psector_id AND state=1 AND doable=false;
 
 		IF v_list_connec_undoable IS NOT NULL THEN
 			PERFORM setval('SCHEMA_NAME.plan_psector_x_gully_id_seq', (select max(id) from plan_psector_x_gully) , true);
-			INSERT INTO plan_psector_x_gully(gully_id, psector_id, state, doable, descript) 
-			SELECT DISTINCT gully_id, v_new_psector_id, 1, false, descript FROM plan_psector_x_gully 
+			INSERT INTO plan_psector_x_gully(gully_id, psector_id, state, doable, descript)
+			SELECT DISTINCT gully_id, v_new_psector_id, 1, false, descript FROM plan_psector_x_gully
 			WHERE psector_id=v_old_psector_id AND state=1 AND doable=false ON CONFLICT (psector_id, gully_id, state) DO NOTHING;
-	
+
 			INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (153, v_result_id, concat('Copied gullies with state 1: ', v_list_gully_undoable));
 		END IF;
 	END IF;
 	--copy features inside plan_psector tables
-	SELECT string_agg(price_id,',') INTO v_list_features_obsolete FROM plan_psector_x_other WHERE psector_id=v_old_psector_id;	
+	SELECT string_agg(price_id,',') INTO v_list_features_obsolete FROM plan_psector_x_other WHERE psector_id=v_old_psector_id;
 	IF v_list_features_obsolete IS NOT NULL THEN
 		INSERT INTO plan_psector_x_other(price_id, measurement, psector_id, descript)
 		SELECT  price_id, measurement, psector_id, descript FROM plan_psector_x_other WHERE psector_id=v_old_psector_id;
-		
+
 		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (153, v_result_id, concat('Copied other prices: ', v_list_features_obsolete ));
 	END IF;
 
 	--insert copy of the planified feature in the corresponding v_edit_* view and insert it into plan_psector_x_* table
 	FOR rec_type IN (SELECT * FROM sys_feature_type WHERE classlevel=1 OR classlevel = 2 ORDER BY CASE
-		WHEN id='NODE' THEN 1 
+		WHEN id='NODE' THEN 1
 		WHEN id='ARC' THEN 2
-		WHEN id='CONNEC' THEN 3 
+		WHEN id='CONNEC' THEN 3
 		WHEN id='GULLY' THEN 4 END) LOOP
 
 		EXECUTE 'SELECT DISTINCT string_agg(column_name::text,'' ,'')
@@ -213,7 +213,7 @@ BEGIN
 		and column_name IN (SELECT column_name FROM information_schema.columns where table_name='''||lower(rec_type.id)||''' and table_schema='''||v_schemaname||''') 
 		AND column_name!='''||lower(rec_type.id)||'_id'' and column_name!=''state'' and column_name != ''node_1'' and  column_name != ''node_2'' and column_name != ''code'';'
 		INTO v_insert_fields;
-	
+
 		IF rec_type.id='CONNEC' OR rec_type.id='GULLY' THEN
 			v_subquery = ' AND doable = true';
 		ELSE
@@ -231,21 +231,21 @@ BEGIN
 				v_field_id=rec.gully_id;
 			END IF;
 
-			--activate topocontrol for arc, deactivate for other features 
+			--activate topocontrol for arc, deactivate for other features
 			if rec_type.id='arc' THEN
 				UPDATE config_param_system SET value ='FALSE' WHERE parameter='edit_topocontrol_disable_error';
 			ELSE
 				UPDATE config_param_system SET value ='TRUE' WHERE parameter='edit_topocontrol_disable_error';
 			END IF;
-			
+
 			EXECUTE 'INSERT INTO v_edit_'||lower(rec_type.id)||' ('||v_insert_fields||',state) SELECT '||v_insert_fields||',2 FROM '||lower(rec_type.id)||'
 			WHERE '||lower(rec_type.id)||'_id='''||v_field_id||''';';
-			
+
 		END LOOP;
 
 		EXECUTE 'SELECT string_agg('||lower(rec_type.id)||'_id,'','') FROM plan_psector_x_'||lower(rec_type.id)||' WHERE psector_id='||v_old_psector_id||' and state=1'
 		into v_list_features_obsolete;
-		
+
 		IF v_list_features_obsolete IS NOT NULL THEN
 			INSERT INTO audit_check_data (fid, result_id, error_message)
 			VALUES (153, v_result_id, concat('New ',lower(rec_type.id),' inserted with state 1: ', v_list_features_obsolete));
@@ -256,12 +256,12 @@ BEGIN
 	-- delete old psector from selector and set new
 	DELETE FROM selector_psector WHERE psector_id=v_old_psector_id AND cur_user=current_user;
 	INSERT INTO selector_psector VALUES (v_new_psector_id, current_user) ON CONFLICT (psector_id, cur_user) DO NOTHING;
-	
+
 	INSERT INTO audit_check_data (fid, result_id, error_message)
 	VALUES (153, v_result_id, concat('Set ',v_new_psector_name,' as current psector.' ));
 
 	-- select forced arcs to connect with
-	SELECT string_agg(arc_id,',') INTO v_list_arc_new FROM plan_psector_x_arc WHERE psector_id=v_new_psector_id;	
+	SELECT string_agg(arc_id,',') INTO v_list_arc_new FROM plan_psector_x_arc WHERE psector_id=v_new_psector_id;
 
 	IF v_list_connec_undoable IS NOT NULL AND v_list_arc_new IS NOT NULL THEN
 		-- connect to network connecs with state 1 from v_list_connec_undoable
@@ -277,18 +277,18 @@ BEGIN
 		END IF;
 	END IF;
 
-	SELECT string_agg(connec_id,',') INTO v_list_connec_doable FROM plan_psector_x_connec WHERE psector_id=v_new_psector_id AND doable=true AND state=1 AND 
-	connec_id NOT IN (SELECT feature_id FROM link WHERE feature_type='CONNEC');	
+	SELECT string_agg(connec_id,',') INTO v_list_connec_doable FROM plan_psector_x_connec WHERE psector_id=v_new_psector_id AND doable=true AND state=1 AND
+	connec_id NOT IN (SELECT feature_id FROM link WHERE feature_type='CONNEC');
 
 	IF v_list_connec_doable IS NOT NULL THEN
 		-- connect to network connecs with state 1 from v_list_connec_doable
 		EXECUTE 'SELECT gw_fct_linktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
 		"feature":{"id":"['||v_list_connec_doable||']"},"data":{"feature_type":"CONNEC"}}$$)';
 	END IF;
-    
+
 	IF v_project_type='UD' THEN
-        SELECT string_agg(gully_id,',') INTO v_list_gully_doable FROM plan_psector_x_gully WHERE psector_id=v_new_psector_id AND doable=true AND state=1 AND 
-        gully_id NOT IN (SELECT feature_id FROM link WHERE feature_type='GULLY');	
+        SELECT string_agg(gully_id,',') INTO v_list_gully_doable FROM plan_psector_x_gully WHERE psector_id=v_new_psector_id AND doable=true AND state=1 AND
+        gully_id NOT IN (SELECT feature_id FROM link WHERE feature_type='GULLY');
 
         IF v_list_gully_doable IS NOT NULL THEN
             -- connect to network gullys with state 1 from v_list_gully_doable
@@ -301,20 +301,20 @@ BEGIN
 	--activate the functions an set back the values of parameters
 	UPDATE config_param_user SET value=v_connecautolink WHERE parameter='edit_connec_automatic_link' and cur_user=current_user;
 	UPDATE config_param_user SET value=v_gullyautolink WHERE parameter='edit_gully_automatic_link' and cur_user=current_user;
-	
+
 	UPDATE config_param_system SET value = v_connec_proximity WHERE parameter='edit_connec_proximity';
 	UPDATE config_param_system SET value = v_gully_proximity WHERE parameter='edit_gully_proximity';
 	UPDATE config_param_system SET value ='FALSE' WHERE parameter='edit_topocontrol_disable_error';
 
 	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (153, v_result_id, concat('Activate topology control.'));
-	
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT id, error_message AS message FROM audit_check_data WHERE cur_user="current_user"() AND fid=153) row;
 
 	-- Control nulls
-	v_result := COALESCE(v_result, '{}'); 
+	v_result := COALESCE(v_result, '{}');
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
-	v_result_info := COALESCE(v_result_info, '{}'); 
+	v_result_info := COALESCE(v_result_info, '{}');
 	v_version := COALESCE(v_version, '[]');
 
 	-- return

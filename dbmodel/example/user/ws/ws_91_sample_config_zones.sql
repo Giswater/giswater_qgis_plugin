@@ -15,7 +15,7 @@ INSERT INTO config_param_user VALUES ('plan_psector_measurement_vdefault', '1', 
 INSERT INTO config_param_user VALUES ('plan_psector_gexpenses_vdefault', '19.00', current_user);
 INSERT INTO config_param_user VALUES ('plan_psector_vat_vdefault', '21.00', current_user);
 INSERT INTO config_param_user VALUES ('plan_psector_other_vdefault', '4.00', current_user);
-INSERT INTO config_param_user VALUES ('plan_psector_vdefault', '1', current_user);
+INSERT INTO config_param_user VALUES ('plan_psector_current', '1', current_user);
 INSERT INTO config_param_user VALUES ('edit_presszone_vdefault', '3', current_user);
 INSERT INTO config_param_user VALUES ('edit_arccat_vdefault', 'FC110-PN10', current_user);
 INSERT INTO config_param_user VALUES ('edit_state_vdefault', '1', current_user);

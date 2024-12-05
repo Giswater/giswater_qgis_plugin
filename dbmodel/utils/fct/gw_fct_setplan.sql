@@ -51,31 +51,31 @@ BEGIN
 	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid = 355;
 	DELETE FROM anl_arc WHERE cur_user="current_user"() AND fid = 354;
 	DELETE FROM anl_arc WHERE cur_user="current_user"() AND fid = 355;
-	
+
 	-- return el json. There are some topological inconsistences on this psector. Would you like to see the log (YES)  (LATER)
 	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (355, 4, concat('TOPOLOGICAL INCONSISTENCES'));
 	INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (355, 4, '-------------------------------------------------------------');
 
-	
+
 	IF v_psector IS NOT NULL THEN
-	
+
 		-- find links for connects state 0 and link null
 		SELECT count(*) INTO v_count FROM plan_psector_x_connec p JOIN link l ON feature_id = connec_id WHERE p.state = 0 AND p.link_id IS NULL AND l.state = 1 AND psector_id = v_psector;
 		IF v_count > 0 THEN
 			INSERT INTO audit_check_data (fid, result_id,  criticity, enabled,  error_message, fcount)
 			VALUES (354, '354', 3, FALSE, concat('ERROR-354: There are ',v_count,' downgraded connecs without link_id informed in this psector.'),v_count);
 			v_level = 1;
-			
-		END IF;		
-		
+
+		END IF;
+
 		IF v_project_type = 'UD' THEN
 			SELECT count(*) INTO v_count FROM plan_psector_x_gully p JOIN link l ON feature_id = gully_id WHERE p.state = 0 AND p.link_id IS NULL AND l.state = 1 AND psector_id = v_psector;
 			IF v_count > 0 THEN
 				INSERT INTO audit_check_data (fid, result_id,  criticity, enabled,  error_message, fcount)
 				VALUES (354, '354', 3, FALSE, concat('ERROR-354: There are ',v_count,' downgraded gullies without link_id informed in this psector.'),v_count);
-				v_level = 1;	
-				
-			END IF;				
+				v_level = 1;
+
+			END IF;
 		END IF;
 
 		-- control psector topology: find operative/planned arcs without operative nodes in this psector
@@ -91,18 +91,18 @@ BEGIN
 		where p.arc_id is null and a.state=1';
 
 		EXECUTE 'SELECT count(*) FROM ('||v_query||')c'
-		INTO v_count; 
+		INTO v_count;
 
 		IF v_count > 0 THEN
 
 			EXECUTE concat ('INSERT INTO anl_arc (fid, arc_id, arccat_id, descript, the_geom,state)
 			SELECT 354, c.arc_id, c.arccat_id, concat(''Arc '', arc_id ,'' without some init/end operative nodes in this psector '',c.psector_id), c.the_geom, 1 FROM (', v_query,')c ');
-			
+
 			INSERT INTO audit_check_data (fid, result_id,  criticity, enabled,  error_message, fcount)
 			VALUES (354, '354', 3, FALSE, concat('ERROR-354 (anl_arc): There are ',v_count,' arcs without some init/end operative nodes in this psector.'),v_count);
 			v_level = 1;
-		
-		END IF;		
+
+		END IF;
 
 		-- control psector topology: find planned arcs without planned nodes in this psector
 		v_query = '
@@ -119,26 +119,26 @@ BEGIN
 		where pn.node_id is null and a.state=2  and node.state = 2';
 
 		EXECUTE 'SELECT count(*) FROM ('||v_query||')c'
-		INTO v_count; 
+		INTO v_count;
 
 		IF v_count > 0 THEN
 
 			EXECUTE concat ('INSERT INTO anl_arc (fid, arc_id, arccat_id, descript, the_geom,state)
 			SELECT 355, c.arc_id, c.arccat_id, concat(''Planned arc  '', arc_id ,'' without some init/end planned nodes in this psector''), c.the_geom, 2 FROM (', v_query,')c ');
-			
+
 			INSERT INTO audit_check_data (fid, result_id,  criticity, enabled,  error_message, fcount)
 			VALUES (355, '355', 3, FALSE, concat('ERROR-354 (anl_arc): There are ',v_count,' planned arcs without some init/end planed nodes in this psector.'),v_count);
 			v_level = 1;
 
-		END IF;		
+		END IF;
 
 	END IF;
 
 	-- get uservalues
 	PERFORM gw_fct_workspacemanager($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},"data":{"filterFields":{}, "pageInfo":{}, "action":"CHECK"}}$$);
-	v_uservalues = (SELECT to_json(array_agg(row_to_json(a))) FROM (SELECT parameter, value FROM config_param_user WHERE parameter IN ('plan_psector_vdefault', 'utils_workspace_vdefault')
+	v_uservalues = (SELECT to_json(array_agg(row_to_json(a))) FROM (SELECT parameter, value FROM config_param_user WHERE parameter IN ('plan_psector_current', 'utils_workspace_vdefault')
 	AND cur_user = current_user ORDER BY parameter)a);
-	
+
 	IF v_level = 1 THEN
 		v_message = 'Proces done successfully but with some incosistency';
 	END IF;
@@ -160,15 +160,15 @@ BEGIN
 	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result, '}');
 
 	-- info
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid IN (354, 355) order by criticity desc, id asc) row;
-	v_result := COALESCE(v_result, '{}'); 
+	v_result := COALESCE(v_result, '{}');
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
 	-- Control nulls
-	v_result_info := COALESCE(v_result_info, '{}'); 
+	v_result_info := COALESCE(v_result_info, '{}');
 	v_uservalues := COALESCE(v_uservalues, '{}');
-	
+
 	--  Return
 	RETURN gw_fct_json_create_return(('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
@@ -180,7 +180,7 @@ BEGIN
 	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
 	RETURN json_build_object('status', 'Failed', 'NOSQLERR', SQLERRM, 'message', json_build_object('level', right(SQLSTATE, 1), 'text', SQLERRM), 'SQLSTATE', SQLSTATE, 'SQLCONTEXT', v_error_context)::json;
 
- 
+
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
