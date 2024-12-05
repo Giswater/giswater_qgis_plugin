@@ -55,6 +55,7 @@ from ...libs.tools_qt import GwHyperLinkLabel, GwHyperLinkLineEdit
 # noinspection PyUnresolvedReferences
 from ..shared import info, mincut_tools
 from ..toolbars.edit import featuretype_change_btn
+from ..toolbars.epa import go2epa_selector_btn
 
 QgsGeometryType = Literal['line', 'point', 'polygon']
 
@@ -458,6 +459,8 @@ def create_body(form='', feature='', filter_fields='', extras=None, list_feature
 
     if body:
         body.setdefault('client', {"device":4, "lang":lang})
+        body["client"].setdefault('device', 4)
+        body["client"].setdefault('lang', lang)
         if info_type is not None:
             body['client'].setdefault('infoType', info_type)
         if lib_vars.project_epsg is not None:
@@ -1703,7 +1706,7 @@ def add_button(**kwargs):
         real_name = widget.objectName()[9:len(widget.objectName())]
 
     if field['stylesheet'] is not None and 'icon' in field['stylesheet']:
-        icon = field['stylesheet']['icon']        
+        icon = field['stylesheet']['icon']
         add_icon(widget, f'{icon}')
 
     func_params = ""
@@ -3393,7 +3396,7 @@ def add_icon(widget, icon, folder="dialogs", sub_folder="20x20"):
             widget.setProperty('has_icon', True)
         return QIcon(icon_path)
     else:
-        tools_log.log_info("File not found", parameter=icon_path) 
+        tools_log.log_info("File not found", parameter=icon_path)
         return False
 
 
