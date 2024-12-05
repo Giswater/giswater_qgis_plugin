@@ -453,3 +453,62 @@ AS SELECT ext_streetaxis.id,
    FROM selector_municipality,
     ext_streetaxis
   WHERE ext_streetaxis.muni_id = selector_municipality.muni_id AND selector_municipality.cur_user = "current_user"()::text;
+
+
+
+CREATE OR REPLACE VIEW v_edit_plan_psector
+AS SELECT plan_psector.psector_id,
+    plan_psector.name,
+    plan_psector.descript,
+    plan_psector.priority,
+    plan_psector.text1,
+    plan_psector.text2,
+    plan_psector.observ,
+    plan_psector.rotation,
+    plan_psector.scale,
+    plan_psector.atlas_id,
+    plan_psector.gexpenses,
+    plan_psector.vat,
+    plan_psector.other,
+    plan_psector.the_geom,
+    plan_psector.expl_id,
+    plan_psector.psector_type,
+    plan_psector.active,
+    plan_psector.ext_code,
+    plan_psector.status,
+    plan_psector.text3,
+    plan_psector.text4,
+    plan_psector.text5,
+    plan_psector.text6,
+    plan_psector.num_value,
+    plan_psector.workcat_id,
+    plan_psector.parent_id
+   FROM selector_expl,
+    plan_psector
+  WHERE plan_psector.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
+
+CREATE OR REPLACE VIEW v_ui_plan_psector
+AS SELECT plan_psector.psector_id,
+    plan_psector.ext_code,
+    plan_psector.name,
+    plan_psector.descript,
+    p.idval AS priority,
+    s.idval AS status,
+    plan_psector.text1,
+    plan_psector.text2,
+    plan_psector.observ,
+    plan_psector.vat,
+    plan_psector.other,
+    plan_psector.expl_id,
+    t.idval AS psector_type,
+    plan_psector.active,
+    plan_psector.workcat_id,
+    plan_psector.parent_id
+   FROM selector_expl,
+    plan_psector
+     JOIN exploitation USING (expl_id)
+     LEFT JOIN plan_typevalue p ON p.id::text = plan_psector.priority::text AND p.typevalue = 'value_priority'::text
+     LEFT JOIN plan_typevalue s ON s.id::text = plan_psector.status::text AND s.typevalue = 'psector_status'::text
+     LEFT JOIN plan_typevalue t ON t.id::integer = plan_psector.psector_type AND t.typevalue = 'psector_type'::text
+  WHERE plan_psector.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
+

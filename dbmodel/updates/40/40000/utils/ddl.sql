@@ -111,3 +111,7 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"ext_addres
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"ext_streetaxis", "column":"source", "dataType":"text", "isUtils":"True"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"ext_address", "column":"source", "dataType":"text", "isUtils":"True"}}$$);
+
+DROP VIEW IF EXISTS v_edit_plan_psector;
+DROP VIEW IF EXISTS v_ui_plan_psector;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE", "table":"plan_psector", "column":"ext_code", "dataType":"text"}}$$);

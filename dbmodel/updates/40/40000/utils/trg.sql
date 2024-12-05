@@ -79,3 +79,11 @@ UPDATE
 -- 04/12/2024
 CREATE TRIGGER gw_trg_doc BEFORE INSERT OR UPDATE ON doc
 FOR EACH ROW EXECUTE FUNCTION gw_trg_doc();
+
+
+-- 05/12/2024
+CREATE TRIGGER gw_trg_edit_psector INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_plan_psector
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_psector('plan');
+
+CREATE TRIGGER gw_trg_ui_plan_psector INSTEAD OF INSERT OR DELETE OR UPDATE ON v_ui_plan_psector
+FOR EACH ROW EXECUTE FUNCTION gw_trg_ui_plan_psector();
