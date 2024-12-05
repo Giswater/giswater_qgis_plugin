@@ -94,7 +94,7 @@ ORDER BY feature_type, link_id', info_msg='All gullies have correct arc_id.', fu
 
 UPDATE sys_fprocess SET fprocess_name='Features with code null', project_type='ud', parameters=NULL, "source"='core', isaudit=true, fprocess_type='Check om-data', addparam=NULL, except_level=3, except_msg='features with code with NULL values. Please, check your data before continue with code with NULL values. Please, check your data before continue', except_msg_feature=NULL, query_text='SELECT arc_id, arccat_id, the_geom FROM v_prefix_arc WHERE code IS NULL 
 UNION SELECT node_id, nodecat_id, the_geom FROM v_prefix_node WHERE code IS NULL
-UNION SELECT connec_id, connecat_id, the_geom FROM v_prefix_connec WHERE code IS NULL
+UNION SELECT connec_id, conneccat_id, the_geom FROM v_prefix_connec WHERE code IS NULL
 UNION SELECT gully_id, gratecat_id, the_geom FROM v_prefix_gully WHERE code IS NULL
 UNION SELECT element_id, elementcat_id, the_geom FROM v_prefix_element WHERE code IS NULL', info_msg='No features (arc, node, connec, element, gully) with NULL values on code found.', function_name='[gw_fct_om_check_data]' WHERE fid=553;
 
@@ -103,7 +103,7 @@ UNION SELECT node_id from v_prefix_node where state = 0 and enddate is null
 UNION SELECT connec_id from v_prefix_connec where state = 0 and enddate is null
 UNION SELECT gully_id from v_prefix_gully where state = 0 and enddate is null', info_msg='No features with state 0 are missing the end date', function_name='[gw_fct_om_check_data]' WHERE fid=554;
 
-UPDATE sys_fprocess SET fprocess_name='Check connecs with more than 1 link on service', project_type='ud', parameters=NULL, "source"='core', isaudit=true, fprocess_type='Check om-data', addparam=NULL, except_level=2, except_msg='connecs with more than 1 link on service', except_msg_feature=NULL, query_text='SELECT connec_id, connecat_id, the_geom, expl_id FROM v_prefix_connec WHERE connec_id 
+UPDATE sys_fprocess SET fprocess_name='Check connecs with more than 1 link on service', project_type='ud', parameters=NULL, "source"='core', isaudit=true, fprocess_type='Check om-data', addparam=NULL, except_level=2, except_msg='connecs with more than 1 link on service', except_msg_feature=NULL, query_text='SELECT connec_id, conneccat_id, the_geom, expl_id FROM v_prefix_connec WHERE connec_id 
 IN (SELECT feature_id FROM link WHERE state=1 GROUP BY feature_id HAVING count(*) > 1)
 UNION SELECT gully_id, gratecat_id, the_geom, expl_id FROM v_prefix_gully WHERE gully_id 
 IN (SELECT feature_id FROM link WHERE state=1 GROUP BY feature_id HAVING count(*) > 1)', info_msg='No connects with more than 1 link on service', function_name='[gw_fct_om_check_data, gw_fct_pg2epa_check_data]' WHERE fid=555;
@@ -147,7 +147,7 @@ SELECT a.connec_id FROM v_prefix_connec a RIGHT JOIN plan_psector_x_connec USING
 UNION 
 SELECT a.gully_id FROM v_prefix_gully a RIGHT JOIN plan_psector_x_gully USING (gully_id) WHERE a.state = 2 AND a.gully_id IS NULL', info_msg='There are no features with state=2 without psector.', function_name='[gw_fct_plan_check_data]' WHERE fid=562;
 
-UPDATE sys_fprocess SET fprocess_name='Connec or gully with different expl_id than arc', project_type='ud', parameters=NULL, "source"='core', isaudit=true, fprocess_type='Check om-data', addparam=NULL, except_level=3, except_msg='connecs with exploitation different than the exploitation of the related arc', except_msg_feature=NULL, query_text='SELECT DISTINCT connec_id, connecat_id, c.the_geom, c.expl_id FROM v_prefix_connec c JOIN v_prefix_arc b using (arc_id) 
+UPDATE sys_fprocess SET fprocess_name='Connec or gully with different expl_id than arc', project_type='ud', parameters=NULL, "source"='core', isaudit=true, fprocess_type='Check om-data', addparam=NULL, except_level=3, except_msg='connecs with exploitation different than the exploitation of the related arc', except_msg_feature=NULL, query_text='SELECT DISTINCT connec_id, conneccat_id, c.the_geom, c.expl_id FROM v_prefix_connec c JOIN v_prefix_arc b using (arc_id) 
 WHERE b.expl_id::text != c.expl_id::text
 UNION 
 SELECT DISTINCT  gully_id, gratecat_id, g.the_geom gully_id, g.expl_id FROM v_prefix_gully g JOIN v_prefix_arc d using (arc_id) WHERE d.expl_id::text != g.expl_id::text', info_msg='All connecs or gullys have the same exploitation as the related arc', function_name='[gw_fct_om_check_data]' WHERE fid=563;
@@ -159,7 +159,7 @@ UNION SELECT node_id from v_prefix_node where enddate < builtdate and state = 1
 UNION SELECT connec_id from v_prefix_connec where enddate < builtdate and state = 1
 UNION SELECT gully_id from v_prefix_gully where enddate < builtdate and state = 1', info_msg='No features with end date earlier than built date', function_name='[gw_fct_om_check_data]' WHERE fid=566;
 
-UPDATE sys_fprocess SET fprocess_name='Check features without defined sector_id', project_type='ud', parameters=NULL, "source"='core', isaudit=true, fprocess_type='Check om-data', addparam=NULL, except_level=2, except_msg='connecs with sector_id 0 or -1.', except_msg_feature=NULL, query_text='SELECT connec_id, connecat_id, the_geom, expl_id FROM v_prefix_connec WHERE state > 0 AND (sector_id=0 OR sector_id=-1)
+UPDATE sys_fprocess SET fprocess_name='Check features without defined sector_id', project_type='ud', parameters=NULL, "source"='core', isaudit=true, fprocess_type='Check om-data', addparam=NULL, except_level=2, except_msg='connecs with sector_id 0 or -1.', except_msg_feature=NULL, query_text='SELECT connec_id, conneccat_id, the_geom, expl_id FROM v_prefix_connec WHERE state > 0 AND (sector_id=0 OR sector_id=-1)
 UNION SELECT gully_id, gratecat_id, the_geom, expl_id FROM v_prefix_gully WHERE state > 0 AND (sector_id=0 OR sector_id=-1)', info_msg='No connecs with 0 or -1 value on sector_id.', function_name='[gw_fct_om_check_data]' WHERE fid=567;
 
 UPDATE sys_fprocess SET fprocess_name='Check category_type values exists on man_ table', project_type='ud', parameters=NULL, "source"='core', isaudit=true, fprocess_type='Check om-data', addparam=NULL, except_level=3, except_msg='features with category_type does not exists on man_type_category table.', except_msg_feature=NULL, query_text='SELECT ''ARC'', arc_id, category_type FROM v_prefix_arc WHERE category_type NOT IN (SELECT category_type FROM man_type_category WHERE feature_type is null or feature_type = ''ARC'' or featurecat_id IS NOT NULL) AND category_type IS NOT NULL
