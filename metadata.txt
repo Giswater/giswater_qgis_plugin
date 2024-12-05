@@ -8,7 +8,20 @@ version=4.0.001
 author=David Erill, Barbara Rzepka, Sergi Muñoz, Josep Lluís Sala, Edgar Fusté, Albert Bofill, Sergi Maspons, Elies Bertran, Abel García Juanes, Maria Guzmán, Jordi Blanch, Xavier Torret, Daniel Marín, Ferran Martínez
 
 Changelog=Version 4.0.001
-
+    - Added tools to analyze & calibrate hydraulic models.
+    - Added tool to massively print composers.
+    - Psector: select rows in relations table when selecting features in map canvas.
+    - Psector: add checkbox to only show psectors visible on canvas.
+    - Added new button in psector manager to show the psector in a temporal layer.
+    - Refactor featuretype change button.
+    - Add buttons on mapzones manager to visualize network inundation.
+    - Button 'Connect to network': add option to force an arc where they will be connected.
+    - Giswater no longer requires the 'v_edit_connec' layer to be in the QGIS project.
+    - Add 'set to arc' action to orifice, outlet, pump & weir.
+    - Make dialog's messageBar appear on top of widgets, no longer moving all widgets downwards.
+    - Improve tab order in all dialogs.
+    - Add 'Help' button on all dialogs.
+    - Split icons into folders & improve order of buttons id numbers.
 
 tags= giswater, water networks, sewerage, urban drainage, EPANET, SWMM
 homepage=https://www.giswater.org
