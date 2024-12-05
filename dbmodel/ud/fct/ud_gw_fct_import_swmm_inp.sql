@@ -264,7 +264,7 @@ BEGIN
 			INSERT INTO selector_state(state_id,cur_user) VALUES (1,current_user);
 			INSERT INTO selector_sector(sector_id,cur_user) VALUES (1,current_user);
 
-			INSERT INTO config_param_user(parameter,value, cur_user) VALUES ('inp_options_hydrology_scenario','1', current_user);
+			INSERT INTO config_param_user(parameter,value, cur_user) VALUES ('inp_options_hydrology_current','1', current_user);
 			INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('inp_options_dwfscenario', '1', current_user);
 
 			INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1, 'INFO: Setting selectors -> Done');

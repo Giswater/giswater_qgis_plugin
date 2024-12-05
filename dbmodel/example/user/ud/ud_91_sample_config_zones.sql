@@ -108,7 +108,7 @@ INSERT INTO config_param_user VALUES ('inp_options_vdefault', '{"status":true, "
 "outlet":{"outletType":"TABULAR/DEPTH", "cd1":null, "cd2":null, "flap":"NO"},
 "pump":{},
 "raingage":{"scf":1}}}', current_user);
-INSERT INTO config_param_user VALUES ('inp_options_hydrology_scenario', '1', current_user);
+INSERT INTO config_param_user VALUES ('inp_options_hydrology_current', '1', current_user);
 INSERT INTO config_param_user VALUES ('inp_options_flow_units', 'CMS', current_user);
 INSERT INTO config_param_user VALUES ('inp_options_flow_routing', 'DYNWAVE', current_user);
 INSERT INTO config_param_user VALUES ('inp_options_link_offsets', 'ELEVATION', current_user);

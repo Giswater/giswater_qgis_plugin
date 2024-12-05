@@ -63,7 +63,7 @@ BEGIN
             parameter_name := 'plan_psector_current';
 
         WHEN 'hydrology' THEN
-            parameter_name := 'inp_options_hydrology_scenario';
+            parameter_name := 'inp_options_hydrology_current';
 
         WHEN 'dwf' THEN
             parameter_name := 'inp_options_dwfscenario';
@@ -108,7 +108,7 @@ BEGIN
         WHEN 'hydrology' THEN
             query := 'SELECT t1.hydrology_id, t1.name FROM cat_hydrology AS t1 '
                   || 'INNER JOIN config_param_user AS t2 ON t1.hydrology_id::text = t2.value '
-                  || 'WHERE t2.parameter = ''inp_options_hydrology_scenario'' AND t2.cur_user = current_user';
+                  || 'WHERE t2.parameter = ''inp_options_hydrology_current'' AND t2.cur_user = current_user';
             EXECUTE query INTO v_type_id, v_type_name;
             result := json_build_object('hydrology_id', v_type_id, 'name', v_type_name);
 

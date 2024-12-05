@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 3242
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_epa_setoptimumoutlet(p_data json) RETURNS json AS 
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_epa_setoptimumoutlet(p_data json) RETURNS json AS
 $BODY$
 
 /*
@@ -51,8 +51,8 @@ BEGIN
 
 	-- select version
 	SELECT giswater INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
-	
-	-- getting input data 	
+
+	-- getting input data
 	v_sector := ((p_data ->>'data')::json->>'parameters')::json->>'sector';
 	IF v_sector = -999 THEN
 		v_sector = (SELECT replace (replace ((array_agg(sector_id))::text, '{', ''), '}', '') FROM v_edit_sector);
@@ -64,52 +64,52 @@ BEGIN
 	TRUNCATE temp_node;
 	DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=v_fid;
 	DELETE FROM anl_arc WHERE cur_user="current_user"() AND fid=v_fid;
-	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid;		
-	
+	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid;
+
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('SET OPTIMUM OUTLET'));
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '-------------------------------------------------------------');
 
-	INSERT INTO temp_node (node_id, the_geom, elev) SELECT node_id, the_geom, elev FROM v_edit_node 
+	INSERT INTO temp_node (node_id, the_geom, elev) SELECT node_id, the_geom, elev FROM v_edit_node
 	WHERE epa_type = 'JUNCTION' AND state > 0 AND sector_id = v_sector;
 
-	SELECT value::integer INTO v_hydrology FROM config_param_user where parameter = 'inp_options_hydrology_scenario' and cur_user = current_user;
+	SELECT value::integer INTO v_hydrology FROM config_param_user where parameter = 'inp_options_hydrology_current' and cur_user = current_user;
 	select name into v_name from cat_hydrology where hydrology_id = 11;
 
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 3, concat('SECTOR ID: ', v_sector));
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('HYDROLOGY SCENARIO: ', v_name));
-	
+
 	select count(*) into v_count1 from v_edit_inp_subcatchment where outlet_id is null;
 
 	FOR rec_subc IN SELECT * FROM inp_subcatchment WHERE hydrology_id = v_hydrology AND sector_id in (v_sector)
 	loop
-		
+
 		raise notice 'loop rec_subc % ', rec_subc.subc_id;
-		
+
 		IF rec_subc.minelev IS NULL THEN
-			SELECT n.* INTO rec_node FROM temp_node n WHERE st_dwithin(rec_subc.the_geom, n.the_geom, 5000) 
+			SELECT n.* INTO rec_node FROM temp_node n WHERE st_dwithin(rec_subc.the_geom, n.the_geom, 5000)
 			ORDER BY st_distance(rec_subc.the_geom, n.the_geom) ASC LIMIT 1;
 		ELSE
-			SELECT n.* INTO rec_node FROM temp_node n WHERE st_dwithin(rec_subc.the_geom, n.the_geom, 5000) 
+			SELECT n.* INTO rec_node FROM temp_node n WHERE st_dwithin(rec_subc.the_geom, n.the_geom, 5000)
 			AND n.elev > rec_subc.minelev
 			ORDER BY st_distance(rec_subc.the_geom, n.the_geom) ASC LIMIT 1;
 		END IF;
 
 		UPDATE inp_subcatchment SET outlet_id = rec_node.node_id WHERE hydrology_id = v_hydrology AND subc_id = rec_subc.subc_id;
-		
+
 	END LOOP;
 
 	select count(*) into v_count2 from v_edit_inp_subcatchment where outlet_id is null;
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, concat (v_count1-v_count2,' subcatchments have been updated with outlet values'));
 
 	-- get results
-	-- info	
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	-- info
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid order by  id asc) row;
-	v_result := COALESCE(v_result, '{}'); 
-	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');	
+	v_result := COALESCE(v_result, '{}');
+	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
 	-- Control nulls
-	v_result_info := COALESCE(v_result_info, '{}'); 
+	v_result_info := COALESCE(v_result_info, '{}');
 
 	--  Return
 	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Analysis done successfully"}, "version":"'||v_version||'"'||

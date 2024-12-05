@@ -9,38 +9,38 @@ This version of Giswater is provided by Giswater Association
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_hydrology()  RETURNS trigger AS
 $BODY$
 
-DECLARE 
+DECLARE
 v_id integer;
 
 BEGIN
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
-	
+
 	IF TG_OP = 'INSERT' THEN
 
 		INSERT INTO cat_hydrology(name, infiltration, text, active, expl_id, log)
     VALUES (NEW.name, NEW.infiltration, NEW.text, NEW.active, NEW.expl_id, NEW.log) RETURNING hydrology_id INTO v_id;
 
-    UPDATE config_param_user SET value=v_id WHERE parameter='inp_options_hydrology_scenario' AND cur_user=current_user;
+    UPDATE config_param_user SET value=v_id WHERE parameter='inp_options_hydrology_current' AND cur_user=current_user;
 
 		RETURN NEW;
-		
+
 	ELSIF TG_OP = 'UPDATE' THEN
-   	
-		UPDATE cat_hydrology 
+
+		UPDATE cat_hydrology
 		SET hydrology_id=NEW.hydrology_id, name=NEW.name, infiltration=NEW.infiltration, text=NEW.text, active=NEW.active, expl_id=NEW.expl_id, log=NEW.log
 		WHERE hydrology_id=OLD.hydrology_id;
-		
+
 		RETURN NEW;
-		
-	ELSIF TG_OP = 'DELETE' THEN  
-	 
-		DELETE FROM cat_hydrology WHERE hydrology_id = OLD.hydrology_id;		
-	
+
+	ELSIF TG_OP = 'DELETE' THEN
+
+		DELETE FROM cat_hydrology WHERE hydrology_id = OLD.hydrology_id;
+
 		RETURN NULL;
 	END IF;
 END;
-	
+
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;

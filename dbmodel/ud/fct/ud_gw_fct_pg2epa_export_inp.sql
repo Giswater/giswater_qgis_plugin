@@ -59,7 +59,7 @@ BEGIN
 	(SELECT idval FROM config_param_user, inp_typevalue WHERE id = value AND typevalue = 'inp_options_networkmode' and cur_user = current_user and parameter = 'inp_options_networkmode')
 	, v_fid);
 	INSERT INTO temp_t_csv (source, csv1,csv2,fid) VALUES ('header',';Hydrology scenario: ',(SELECT name
-	FROM config_param_user JOIN cat_hydrology ON value = hydrology_id::text WHERE parameter = 'inp_options_hydrology_scenario' AND cur_user = current_user), v_fid);
+	FROM config_param_user JOIN cat_hydrology ON value = hydrology_id::text WHERE parameter = 'inp_options_hydrology_current' AND cur_user = current_user), v_fid);
 	INSERT INTO temp_t_csv (source, csv1,csv2,fid) VALUES ('header',';DWF scenario: ',(SELECT idval
 	FROM config_param_user JOIN cat_dwf c ON value = c.id::text WHERE parameter = 'inp_options_dwfscenario' AND cur_user = current_user), v_fid);
 	INSERT INTO temp_t_csv (source, csv1,csv2,fid) VALUES ('header',';Default values: ',(SELECT value::json->>'status'
@@ -669,7 +669,7 @@ BEGIN
 		    2
 		   FROM config_param_user,
 		    cat_hydrology
-		  WHERE config_param_user.parameter::text = 'inp_options_hydrology_scenario'::text AND config_param_user.cur_user::text = "current_user"()::text) a
+		  WHERE config_param_user.parameter::text = 'inp_options_hydrology_current'::text AND config_param_user.cur_user::text = "current_user"()::text) a
 	  ORDER BY a.layoutname, a.layoutorder;
 
 

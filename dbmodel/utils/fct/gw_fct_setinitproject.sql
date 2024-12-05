@@ -46,7 +46,7 @@ BEGIN
    	v_user := (p_data ->> 'client')::json->> 'cur_user';
 	v_isaudit := (p_data ->> 'data')::json->> 'isAudit';
 
-	if v_user is null then 
+	if v_user is null then
 		v_user = current_user;
 	end if;
 
@@ -123,7 +123,7 @@ BEGIN
 
 	-- Force muni selector for 0 values
 	INSERT INTO selector_municipality VALUES (0, current_user) ON CONFLICT (muni_id, cur_user) DO NOTHING;
-	
+
 	-- force hydrometer_selector in case of null values
 	IF (select cur_user FROM selector_hydrometer WHERE cur_user = current_user limit 1) IS NULL THEN
 		INSERT INTO selector_hydrometer (state_id, cur_user)
@@ -134,10 +134,10 @@ BEGIN
 	IF v_project_type='UD' THEN
 		IF (SELECT hydrology_id FROM cat_hydrology LIMIT 1) IS NOT NULL THEN
 			INSERT INTO config_param_user
-			SELECT 'inp_options_hydrology_scenario', hydrology_id, current_user FROM cat_hydrology LIMIT 1
+			SELECT 'inp_options_hydrology_current', hydrology_id, current_user FROM cat_hydrology LIMIT 1
 			ON CONFLICT (parameter, cur_user) DO NOTHING;
 			UPDATE config_param_user SET value = hydrology_id FROM (SELECT hydrology_id FROM cat_hydrology LIMIT 1) a
-			WHERE parameter =  'inp_options_hydrology_scenario' and value is null;
+			WHERE parameter =  'inp_options_hydrology_current' and value is null;
 		END IF;
 	END IF;
 
