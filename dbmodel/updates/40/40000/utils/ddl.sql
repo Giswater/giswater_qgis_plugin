@@ -115,3 +115,56 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"ext_addres
 DROP VIEW IF EXISTS v_edit_plan_psector;
 DROP VIEW IF EXISTS v_ui_plan_psector;
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE", "table":"plan_psector", "column":"ext_code", "dataType":"text"}}$$);
+
+DO $$
+DECLARE
+    v_utils BOOLEAN;
+BEGIN
+    SELECT value::boolean INTO v_utils FROM config_param_system WHERE parameter='admin_utils_schema';
+
+    IF v_utils THEN
+
+        -- create indexes
+        CREATE INDEX idx_address_streetaxis_id ON utils.address USING btree (streetaxis_id);
+        CREATE INDEX idx_address_plot_id ON utils.address USING btree (plot_id);
+        CREATE INDEX idx_address_postcode ON utils.address USING btree (postcode);
+        CREATE INDEX idx_address_the_geom ON utils.address USING gist (the_geom);
+
+        CREATE INDEX idx_streetaxis_name ON utils.streetaxis USING btree (name);
+        CREATE INDEX idx_streetaxis_the_geom ON utils.streetaxis USING gist (the_geom);
+        CREATE INDEX idx_streetaxis_muni_id ON utils.streetaxis USING btree (muni_id);
+        CREATE INDEX idx_streetaxis_code ON utils.streetaxis USING btree (code);
+
+        CREATE INDEX idx_municipality_name ON utils.municipality USING btree (name);
+        CREATE INDEX idx_municipality_the_geom ON utils.municipality USING gist (the_geom);
+
+        CREATE INDEX idx_plot_plot_code ON utils.plot USING btree (plot_code);
+        CREATE INDEX idx_plot_muni_id ON utils.plot USING btree (muni_id);
+        CREATE INDEX idx_plot_streetaxis_id ON utils.plot USING btree (streetaxis_id);
+        CREATE INDEX idx_plot_the_geom ON utils.plot USING gist (the_geom);
+        CREATE INDEX idx_plot_postcode ON utils.plot USING btree (postcode);
+
+    ELSE
+
+        -- create indexes
+        CREATE INDEX idx_ext_address_streetaxis_id ON SCHEMA_NAME.ext_address USING btree (streetaxis_id);
+        CREATE INDEX idx_ext_address_plot_id ON SCHEMA_NAME.ext_address USING btree (plot_id);
+        CREATE INDEX idx_ext_address_postcode ON SCHEMA_NAME.ext_address USING btree (postcode);
+        CREATE INDEX idx_ext_address_the_geom ON SCHEMA_NAME.ext_address USING gist (the_geom);
+
+        CREATE INDEX idx_ext_streetaxis_name ON SCHEMA_NAME.ext_streetaxis USING btree (name);
+        CREATE INDEX idx_ext_streetaxis_the_geom ON SCHEMA_NAME.ext_streetaxis USING gist (the_geom);
+        CREATE INDEX idx_ext_streetaxis_muni_id ON SCHEMA_NAME.ext_streetaxis USING btree (muni_id);
+        CREATE INDEX idx_ext_streetaxis_code ON SCHEMA_NAME.ext_streetaxis USING btree (code);
+
+        CREATE INDEX idx_ext_municipality_name ON SCHEMA_NAME.ext_municipality USING btree (name);
+        CREATE INDEX idx_ext_municipality_the_geom ON SCHEMA_NAME.ext_municipality USING gist (the_geom);
+
+        CREATE INDEX idx_ext_plot_plot_code ON SCHEMA_NAME.ext_plot USING btree (plot_code);
+        CREATE INDEX idx_ext_plot_muni_id ON SCHEMA_NAME.ext_plot USING btree (muni_id);
+        CREATE INDEX idx_ext_plot_streetaxis_id ON SCHEMA_NAME.ext_plot USING btree (streetaxis_id);
+        CREATE INDEX idx_ext_plot_the_geom ON SCHEMA_NAME.ext_plot USING gist (the_geom);
+        CREATE INDEX idx_ext_plot_postcode ON SCHEMA_NAME.ext_plot USING btree (postcode);
+
+	END IF;
+END; $$;
