@@ -324,7 +324,7 @@ AS WITH streetaxis AS (
      LEFT JOIN typevalue et2 ON et2.id::text = presszone.presszone_type AND et2.typevalue::text = 'presszone_type'::text
      LEFT JOIN typevalue et3 ON et3.id::text = dma.dma_type::text AND et3.typevalue::text = 'dma_type'::text
      LEFT JOIN typevalue et4 ON et4.id::text = dqa.dqa_type::text AND et4.typevalue::text = 'dqa_type'::text;
-     
+
 /*
 create or replace view v_edit_arc as
 select a.* FROM (
@@ -1517,7 +1517,7 @@ AS SELECT connec_id,
                     v_edit_link.inp_type
                    FROM v_edit_link
                   WHERE v_edit_link.state = 2) a ON a.feature_id::text = vu_connec.connec_id::text) c;
-                  
+
 CREATE OR REPLACE VIEW vu_presszone
 AS SELECT p.presszone_id,
     p.name,
@@ -4567,6 +4567,36 @@ AS SELECT n.netscenario_id,
     n.expl_id2
    FROM config_param_user,
     plan_netscenario_presszone n
+     JOIN plan_netscenario p USING (netscenario_id)
+  WHERE config_param_user.cur_user::text = "current_user"()::text
+  AND config_param_user.parameter::text = 'plan_netscenario_current'::text
+  AND config_param_user.value::integer = n.netscenario_id;
+
+CREATE OR REPLACE VIEW v_edit_plan_netscenario_valve
+AS SELECT v.netscenario_id,
+    v.node_id,
+    v.closed,
+    node.the_geom
+   FROM config_param_user,
+    plan_netscenario_valve v
+     JOIN node USING (node_id)
+  WHERE config_param_user.cur_user::text = "current_user"()::text
+  AND config_param_user.parameter::text = 'plan_netscenario_current'::text
+  AND config_param_user.value::integer = v.netscenario_id;
+
+CREATE OR REPLACE VIEW v_edit_plan_netscenario_dma
+AS SELECT n.netscenario_id,
+    p.name AS netscenario_name,
+    n.dma_id,
+    n.dma_name AS name,
+    n.pattern_id,
+    n.graphconfig,
+    n.the_geom,
+    n.active,
+    n.stylesheet::text AS stylesheet,
+    n.expl_id2
+   FROM config_param_user,
+    plan_netscenario_dma n
      JOIN plan_netscenario p USING (netscenario_id)
   WHERE config_param_user.cur_user::text = "current_user"()::text
   AND config_param_user.parameter::text = 'plan_netscenario_current'::text
