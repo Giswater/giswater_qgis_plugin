@@ -1140,10 +1140,12 @@ AS SELECT n.netscenario_id,
     a.epa_type,
     a.state,
     a.state_type
-   FROM selector_netscenario,
+   FROM config_param_user,
     plan_netscenario_arc n
-     LEFT JOIN arc a USING (arc_id)
-  WHERE n.netscenario_id = selector_netscenario.netscenario_id AND selector_netscenario.cur_user = "current_user"()::text;
+   LEFT JOIN arc a USING (arc_id)
+  WHERE config_param_user.cur_user::text = "current_user"()::text
+  AND config_param_user.parameter::text = 'plan_netscenario_current'::text
+  AND config_param_user.value::integer = n.netscenario_id;
 
 CREATE OR REPLACE VIEW v_plan_netscenario_node
 AS SELECT n.netscenario_id,
@@ -1158,11 +1160,13 @@ AS SELECT n.netscenario_id,
     nd.epa_type,
     nd.state,
     nd.state_type
-   FROM selector_netscenario,
-    plan_netscenario_node n
+   FROM config_param_user,
+   plan_netscenario_node n
      LEFT JOIN node nd USING (node_id)
      LEFT JOIN cat_node cn ON nd.nodecat_id::text = cn.id::text
-  WHERE n.netscenario_id = selector_netscenario.netscenario_id AND selector_netscenario.cur_user = "current_user"()::text;
+  WHERE config_param_user.cur_user::text = "current_user"()::text
+  AND config_param_user.parameter::text = 'plan_netscenario_current'::text
+  AND config_param_user.value::integer = n.netscenario_id;
 
 CREATE OR REPLACE VIEW v_plan_netscenario_connec
 AS SELECT n.netscenario_id,
@@ -1177,12 +1181,13 @@ AS SELECT n.netscenario_id,
     c.epa_type,
     c.state,
     c.state_type
-   FROM selector_netscenario,
-    plan_netscenario_connec n
+   FROM config_param_user,
+   plan_netscenario_connec n
      LEFT JOIN connec c USING (connec_id)
      LEFT JOIN cat_connec cc ON cc.id::text = c.conneccat_id::text
-  WHERE n.netscenario_id = selector_netscenario.netscenario_id AND selector_netscenario.cur_user = "current_user"()::text;
-
+  WHERE config_param_user.cur_user::text = "current_user"()::text
+  AND config_param_user.parameter::text = 'plan_netscenario_current'::text
+  AND config_param_user.value::integer = n.netscenario_id;
 
 CREATE OR REPLACE VIEW v_plan_aux_arc_pavement
 AS SELECT plan_arc_x_pavement.arc_id,
@@ -3878,11 +3883,12 @@ AS SELECT n.netscenario_id,
     n.presszone_type,
     n.stylesheet::text AS stylesheet,
     n.expl_id2
-   FROM selector_netscenario,
+   FROM config_param_user,
     plan_netscenario_presszone n
      JOIN plan_netscenario p USING (netscenario_id)
-  WHERE n.netscenario_id = selector_netscenario.netscenario_id AND selector_netscenario.cur_user = "current_user"()::text;
-
+  WHERE config_param_user.cur_user::text = "current_user"()::text
+  AND config_param_user.parameter::text = 'plan_netscenario_current'::text
+  AND config_param_user.value::integer = n.netscenario_id;
 
 CREATE OR REPLACE VIEW v_plan_psector_budget
 AS SELECT row_number() OVER (ORDER BY v_plan_arc.arc_id) AS rid,
@@ -4350,8 +4356,8 @@ DROP VIEW IF EXISTS v_sector_node;
 DROP  VIEW IF EXISTS v_rpt_comp_arc;
 
 CREATE OR REPLACE VIEW v_rpt_comp_arc
-AS 
-WITH main AS 
+AS
+WITH main AS
 	(SELECT r.arc_id,
     r.result_id,
     r.arc_type,
@@ -4374,8 +4380,7 @@ WITH main AS
     r.the_geom
    FROM rpt_arc_stats r, selector_rpt_main s
 	WHERE r.result_id::text = s.result_id::text AND s.cur_user = "current_user"()::text) ,
-  
-  compare AS 
+  compare AS
 	(SELECT r.arc_id,
     r.result_id,
     r.arc_type,
@@ -4397,8 +4402,7 @@ WITH main AS
     r.ffactor_min,
     r.the_geom
    FROM rpt_arc_stats r, selector_rpt_compare s
-  WHERE r.result_id::text = s.result_id::text AND s.cur_user = "current_user"()::text) 
-  
+  WHERE r.result_id::text = s.result_id::text AND s.cur_user = "current_user"()::text)
 	SELECT main.arc_id,
 	main.arc_type,
 	main.sector_id,
@@ -4413,7 +4417,7 @@ WITH main AS
 	main.flow_min - compare.flow_min as flow_min_diff,
 	main.flow_avg as flow_avg_main,
 	compare.flow_avg as flow_avg_compare,
-	main.flow_avg - compare.flow_avg as flow_avg_diff, 
+	main.flow_avg - compare.flow_avg as flow_avg_diff,
 	main.vel_max as vel_max_main,
 	compare.vel_max as vel_max_compare,
 	main.vel_max - compare.vel_max as vel_max_diff,
@@ -4422,39 +4426,39 @@ WITH main AS
 	main.vel_min - compare.vel_min as vel_min_diff,
 	main.vel_avg as vel_avg_main,
 	compare.vel_avg as vel_avg_compare,
-	main.vel_avg - compare.vel_avg as vel_avg_diff, 
+	main.vel_avg - compare.vel_avg as vel_avg_diff,
 	main.headloss_max as headloss_max_main,
 	compare.headloss_max as headloss_max_compare,
-	main.headloss_max - compare.headloss_max as headloss_max_diff, 
+	main.headloss_max - compare.headloss_max as headloss_max_diff,
 	main.headloss_min as headloss_min_main,
 	compare.headloss_min as headloss_min_compare,
-	main.headloss_min - compare.headloss_min as headloss_min_diff, 
+	main.headloss_min - compare.headloss_min as headloss_min_diff,
 	main.setting_max as setting_max_main,
 	compare.setting_max as setting_max_compare,
-	main.setting_max - compare.setting_max as setting_max_diff, 
+	main.setting_max - compare.setting_max as setting_max_diff,
 	main.setting_min as setting_min_main,
 	compare.setting_min as setting_min_compare,
-	main.setting_min - compare.setting_min as setting_min_diff, 
+	main.setting_min - compare.setting_min as setting_min_diff,
 	main.reaction_max as reaction_max_main,
 	compare.reaction_max as reaction_max_compare,
-	main.reaction_max - compare.reaction_max as reaction_max_diff, 
+	main.reaction_max - compare.reaction_max as reaction_max_diff,
 	main.reaction_min as reaction_min_main,
 	compare.reaction_min as reaction_min_compare,
-	main.reaction_min - compare.reaction_min as reaction_min_diff, 
+	main.reaction_min - compare.reaction_min as reaction_min_diff,
 	main.ffactor_max as ffactor_max_main,
 	compare.ffactor_max as ffactor_max_compare,
-	main.ffactor_max - compare.ffactor_max as ffactor_max_diff, 
+	main.ffactor_max - compare.ffactor_max as ffactor_max_diff,
 	main.ffactor_min as ffactor_min_main,
 	compare.ffactor_min as ffactor_min_compare,
 	main.ffactor_min - compare.ffactor_min as ffactor_min_diff,
 	main.the_geom
 	FROM main JOIN compare ON main.arc_id = compare.arc_id;
-  
-  
+
+
 DROP VIEW IF EXISTS v_rpt_comp_node;
 
 CREATE OR REPLACE VIEW v_rpt_comp_node
-AS 
+AS
 WITH main AS (
 SELECT r.node_id,
     r.result_id,
@@ -4477,8 +4481,8 @@ SELECT r.node_id,
     r.the_geom
    FROM rpt_node_stats r,
     selector_rpt_main s
-    WHERE r.result_id::text = s.result_id::text AND s.cur_user = "current_user"()::text), 
-     
+    WHERE r.result_id::text = s.result_id::text AND s.cur_user = "current_user"()::text),
+
 compare AS (
 SELECT r.node_id,
     r.result_id,
@@ -4502,50 +4506,49 @@ SELECT r.node_id,
    FROM rpt_node_stats r,
     selector_rpt_compare s
      WHERE r.result_id::text = s.result_id::text AND s.cur_user = "current_user"()::text)
-     
+
      SELECT main.node_id,
-     main.node_type, 
-     main.sector_id, 
-     main.nodecat_id, 
-     main.result_id AS result_id_main, 
+     main.node_type,
+     main.sector_id,
+     main.nodecat_id,
+     main.result_id AS result_id_main,
      compare.result_id AS result_id_compare,
      main.elevation,
-     main.demand_max AS demand_max_main, 
+     main.demand_max AS demand_max_main,
      compare.demand_max AS demand_max_compare,
-     main.demand_max - compare.demand_max AS demand_max_diff, 
-     main.demand_min AS demand_min_main, 
+     main.demand_max - compare.demand_max AS demand_max_diff,
+     main.demand_min AS demand_min_main,
      compare.demand_min AS demand_min_compare,
      main.demand_min - compare.demand_min AS demand_min_diff,
-     main.demand_avg AS demand_avg_main, 
+     main.demand_avg AS demand_avg_main,
      compare.demand_avg AS demand_avg_compare,
      main.demand_avg - compare.demand_avg AS demand_avg_diff,
-     main.head_max AS head_max_main, 
+     main.head_max AS head_max_main,
      compare.head_max AS head_max_compare,
-     main.head_max - compare.head_max AS head_max_diff, 
-     main.head_min AS head_min_main, 
+     main.head_max - compare.head_max AS head_max_diff,
+     main.head_min AS head_min_main,
      compare.head_min AS head_min_compare,
      main.head_min - compare.head_min AS head_min_diff,
-     main.head_avg AS head_avg_main, 
+     main.head_avg AS head_avg_main,
      compare.head_avg AS head_avg_compare,
      main.head_avg - compare.head_avg AS head_avg_diff,
-     main.press_max AS press_max_main, 
+     main.press_max AS press_max_main,
      compare.press_max AS press_max_compare,
-     main.press_max - compare.press_max AS press_max_diff, 
-     main.press_min AS press_min_main, 
+     main.press_max - compare.press_max AS press_max_diff,
+     main.press_min AS press_min_main,
      compare.press_min AS press_min_compare,
      main.press_min - compare.press_min AS press_min_diff,
-     main.press_avg AS press_avg_main, 
+     main.press_avg AS press_avg_main,
      compare.press_avg AS press_avg_compare,
      main.press_avg - compare.press_avg AS press_avg_diff,
-      main.quality_max AS quality_max_main, 
+      main.quality_max AS quality_max_main,
      compare.quality_max AS quality_max_compare,
-     main.quality_max - compare.quality_max AS quality_max_diff, 
-     main.quality_min AS quality_min_main, 
+     main.quality_max - compare.quality_max AS quality_max_diff,
+     main.quality_min AS quality_min_main,
      compare.quality_min AS quality_min_compare,
      main.quality_min - compare.quality_min AS quality_min_diff,
-     main.quality_avg AS quality_avg_main, 
+     main.quality_avg AS quality_avg_main,
      compare.quality_avg AS quality_avg_compare,
      main.quality_avg - compare.quality_avg AS quality_avg_diff,
      main.the_geom
      FROM main JOIN compare ON main.node_id = compare.node_id;
-	 

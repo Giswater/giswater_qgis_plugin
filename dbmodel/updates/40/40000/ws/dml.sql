@@ -1343,3 +1343,13 @@ UPDATE sys_style SET stylevalue = replace(stylevalue,'max_pressure','press_max_c
 
 INSERT INTO inp_dscenario_demand (dscenario_id, id, feature_id, feature_type, demand, pattern_id, demand_type, "source")
 SELECT dscenario_id, id, feature_id, feature_type, demand, pattern_id, demand_type, "source" FROM _inp_dscenario_demand;
+
+INSERT INTO config_param_user (parameter, value, cur_user)
+SELECT
+    'plan_netscenario_current' AS parameter,
+    netscenario_id AS value,
+    cur_user
+FROM _selector_netscenario
+ON CONFLICT (parameter, cur_user)
+DO UPDATE SET
+    value = excluded.value;

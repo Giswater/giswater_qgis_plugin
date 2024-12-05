@@ -343,3 +343,5 @@ CREATE TABLE inp_dscenario_demand (
 
 CREATE INDEX inp_dscenario_demand_dscenario_id ON inp_dscenario_demand USING btree (dscenario_id);
 CREATE INDEX inp_dscenario_demand_source ON inp_dscenario_demand USING btree ("source");
+
+ALTER TABLE selector_netscenario RENAME TO _selector_netscenario;

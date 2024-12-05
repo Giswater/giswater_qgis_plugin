@@ -57,7 +57,7 @@ BEGIN
     -- Determine the parameter name based on the provided type
     CASE p_data->'data'->>'type'
         WHEN 'netscenario' THEN
-            parameter_name := 'plan_netscenario_vdefault';
+            parameter_name := 'plan_netscenario_current';
 
         WHEN 'psector' THEN
             parameter_name := 'plan_psector_vdefault';
@@ -94,7 +94,7 @@ BEGIN
         WHEN 'netscenario' THEN
 		    query := 'SELECT t1.netscenario_id, t1.name FROM plan_netscenario AS t1 '
 		          || 'INNER JOIN config_param_user AS t2 ON t1.netscenario_id::text = t2.value '
-		          || 'WHERE t2.parameter = ''plan_netscenario_vdefault'' AND t2.cur_user = current_user';
+		          || 'WHERE t2.parameter = ''plan_netscenario_current'' AND t2.cur_user = current_user';
 		    EXECUTE query INTO v_type_id, v_type_name;
 		    result := json_build_object('netscenario_id', v_type_id, 'name', v_type_name);
 

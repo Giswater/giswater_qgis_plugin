@@ -107,7 +107,7 @@ BEGIN
 		INTO v_sensibility_f;
 		-- 10 pixels of base sensibility
 		v_sensibility = (v_zoomScale * 10 * v_sensibility_f);
-		
+
 	ELSIF  v_device = 3 THEN
 		EXECUTE 'SELECT value::json->>''web'' FROM config_param_system WHERE parameter=''basic_info_sensibility_factor'''
 		INTO v_sensibility_f;
@@ -123,7 +123,7 @@ BEGIN
 	END IF;
 
 	v_config_layer='config_info_layer';
-	
+
 	-- TODO:: REFORMAT v_visiblelayers
 	v_visibleLayers = REPLACE (v_visibleLayers, '[', '{');
 	v_visibleLayers = REPLACE (v_visibleLayers, ']', '}');
@@ -230,22 +230,18 @@ BEGIN
                                     v_valve_text := 'Close valve ('||v_id||')';
                                 END IF;
 
-                                IF v_netscenario_valve IS TRUE THEN
-                                	EXECUTE 'SELECT netscenario_id FROM selector_netscenario WHERE cur_user = current_user LIMIT 1' INTO v_netscenario_id;
-                                	IF (SELECT count(netscenario_id) FROM selector_netscenario WHERE cur_user = current_user) != 1 THEN
-                                		v_valve_text_netscenario := 'To change valve status in netsenario you must have only one netscenario active';
-                                	ELSE
-	                                	v_valve_tablename_netscenario := 'v_edit_plan_netscenario_valve';
-	                                	v_valve_id_netscenario := v_id;
-	                                	EXECUTE 'SELECT closed FROM '||quote_ident(v_valve_tablename_netscenario)||' WHERE netscenario_id = '||v_netscenario_id||' AND '||v_idname||' = '''||v_id||'''' INTO v_closed_valve_netscenario;
+                                IF v_netscenario_valve IS TRUE THEN\
+									SELECT value::integer INTO v_netscenario_id FROM config_param_user WHERE cur_user=current_user AND parameter = 'plan_netscenario_current'
 
-		                                IF v_closed_valve_netscenario IS True OR (v_closed_valve_netscenario ISNULL AND v_closed_valve IS TRUE) THEN
-		                                    v_valve_text_netscenario := 'Open valve in netscenario '||v_netscenario_id||' ('||v_id||')';
-		                                ELSE
-		                                    v_valve_text_netscenario := 'Close valve in netscenario '||v_netscenario_id||' ('||v_id||')';
-		                                END IF;
-		                            END IF;
+									v_valve_tablename_netscenario := 'v_edit_plan_netscenario_valve';
+									v_valve_id_netscenario := v_id;
+									EXECUTE 'SELECT closed FROM '||quote_ident(v_valve_tablename_netscenario)||' WHERE netscenario_id = '||v_netscenario_id||' AND '||v_idname||' = '''||v_id||'''' INTO v_closed_valve_netscenario;
 
+									IF v_closed_valve_netscenario IS True OR (v_closed_valve_netscenario ISNULL AND v_closed_valve IS TRUE) THEN
+										v_valve_text_netscenario := 'Open valve in netscenario '||v_netscenario_id||' ('||v_id||')';
+									ELSE
+										v_valve_text_netscenario := 'Close valve in netscenario '||v_netscenario_id||' ('||v_id||')';
+									END IF;
                                 END IF;
                             END IF;
                         END LOOP;

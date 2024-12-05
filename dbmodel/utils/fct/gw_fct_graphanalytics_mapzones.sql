@@ -1473,8 +1473,7 @@ BEGIN
 			INSERT INTO selector_inp_dscenario (dscenario_id) VALUES (v_dscenario_valve::integer);
 		END IF;
 
-		DELETE FROM selector_netscenario  WHERE cur_user=current_user;
-		INSERT INTO selector_netscenario (netscenario_id) VALUES (v_netscenario::integer);
+		UPDATE config_param_user SET value = v_netscenario::text WHERE parameter = 'plan_netscenario_current' AND cur_user = current_user;
 
 	END IF;
 

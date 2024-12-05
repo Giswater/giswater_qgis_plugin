@@ -10,7 +10,7 @@ SET client_min_messages TO WARNING;
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-SELECT plan(316);
+SELECT plan(315);
 
 SELECT has_table('anl_arc') AS "Table 'anl_arc' exists";
 SELECT has_table('anl_arc_x_node') AS "Table 'anl_arc_x_node' exists";
@@ -291,7 +291,6 @@ SELECT has_table('selector_inp_dscenario') AS "Table 'selector_inp_dscenario' ex
 SELECT has_table('selector_inp_result') AS "Table 'selector_inp_result' exists";
 SELECT has_table('selector_mincut_result') AS "Table 'selector_mincut_result' exists";
 SELECT has_table('selector_municipality') AS "Table 'selector_municipality' exists";
-SELECT has_table('selector_netscenario') AS "Table 'selector_netscenario' exists";
 SELECT has_table('selector_period') AS "Table 'selector_period' exists";
 SELECT has_table('selector_plan_result') AS "Table 'selector_plan_result' exists";
 SELECT has_table('selector_psector') AS "Table 'selector_psector' exists";
