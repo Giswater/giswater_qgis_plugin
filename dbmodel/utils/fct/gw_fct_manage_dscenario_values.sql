@@ -173,13 +173,17 @@ BEGIN
 						VALUES (v_fid, v_result_id, 1, concat('INFO: ',v_count,' row(s) have been keep from inp_dscenario_',object_rec.table,' table.'));
 					END IF;
 
-
-					v_querytext = 'INSERT INTO inp_dscenario_'||object_rec.table||' SELECT '||v_target||','||object_rec.column||' 
-					FROM inp_dscenario_'||object_rec.table||' WHERE dscenario_id = '||v_copyfrom||
-					' ON CONFLICT (dscenario_id, '||object_rec.pk||') DO NOTHING';
-					RAISE NOTICE 'v_querytext %', v_querytext;
-					EXECUTE v_querytext;
-
+					IF object_rec.table = 'demand' THEN -- it is not possible to parametrize due table structure (dscenario_id is not first column)
+						INSERT INTO inp_dscenario_demand (dscenario_id, feature_id, feature_type, demand, pattern_id, demand_type, source)
+						SELECT v_target, feature_id, feature_type, demand, pattern_id, demand_type, source
+						FROM inp_dscenario_demand WHERE dscenario_id = v_copyfrom;
+					ELSE
+						v_querytext = 'INSERT INTO inp_dscenario_'||object_rec.table||' SELECT '||v_target||','||object_rec.column||' 
+						FROM inp_dscenario_'||object_rec.table||' WHERE dscenario_id = '||v_copyfrom||
+						' ON CONFLICT (dscenario_id, '||object_rec.pk||') DO NOTHING';
+						RAISE NOTICE 'v_querytext %', v_querytext;
+						EXECUTE v_querytext;
+					END IF;
 
 					-- get message
 					GET DIAGNOSTICS v_count2 = row_count;
