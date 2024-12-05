@@ -98,8 +98,9 @@ class GwConnectLinkButton(GwMaptool):
 
         # Show help message when action is activated
         if self.show_help:
-            message = "Select connecs or gullies with qgis tool and use right click to connect them with network"
-            tools_qgis.show_info(message)
+            message = "Select connecs or gullies with qgis tool and use right click to connect them with network. " \
+                      "CTRL + SHIFT over selection to remove it"
+            tools_qgis.show_info(message, duration=9)
 
 
     def canvasMoveEvent(self, event):
