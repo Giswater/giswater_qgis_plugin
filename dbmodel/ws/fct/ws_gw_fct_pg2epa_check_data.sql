@@ -68,7 +68,7 @@ BEGIN
 		CREATE TEMP TABLE temp_anl_connec (LIKE SCHEMA_NAME.anl_connec INCLUDING ALL);
 		CREATE TEMP TABLE temp_audit_check_data (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
 	
-		CREATE TEMP TABLE temp_t_arc (LIKE ws_3613_100.temp_arc INCLUDING ALL);
+		CREATE TEMP TABLE temp_t_arc (LIKE temp_arc INCLUDING ALL);
 
 		-- Header
 		INSERT INTO temp_audit_check_data (fid,  criticity, error_message) VALUES (v_fid,  4, 'CHECK GIS DATA QUALITY ACORDING EPA RULES');
