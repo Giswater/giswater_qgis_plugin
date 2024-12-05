@@ -1090,15 +1090,15 @@ class GwPsector:
 
             tools_qt.set_widget_text(self.dlg_plan_psector, self.dlg_plan_psector.psector_id, str(new_psector_id[0]))
             if new_psector_id:
-                row = tools_gw.get_config_value('plan_psector_vdefault')
+                row = tools_gw.get_config_value('plan_psector_current')
                 if row:
                     sql = (f"UPDATE config_param_user "
                            f" SET value = $${new_psector_id[0]}$$ "
-                           f" WHERE parameter = 'plan_psector_vdefault'"
+                           f" WHERE parameter = 'plan_psector_current'"
                            f" AND cur_user=current_user; ")
                 else:
                     sql = (f"INSERT INTO config_param_user (parameter, value, cur_user) "
-                           f" VALUES ('plan_psector_vdefault', '{new_psector_id[0]}', current_user);")
+                           f" VALUES ('plan_psector_current', '{new_psector_id[0]}', current_user);")
             tools_db.execute_sql(sql)
 
         self.dlg_plan_psector.tabWidget.setTabEnabled(1, True)
@@ -2036,7 +2036,7 @@ class GwPsector:
             message = "Any record selected"
             tools_qgis.show_warning(message, dialog=dialog)
             return
-        cur_psector = tools_gw.get_config_value('plan_psector_vdefault')
+        cur_psector = tools_gw.get_config_value('plan_psector_current')
         inf_text = ""
         list_id = ""
         for i in range(0, len(selected_list)):
@@ -2430,16 +2430,16 @@ class GwPsector:
         # Manage current psector
         sql = ("SELECT t1.psector_id FROM plan_psector AS t1 "
                " INNER JOIN config_param_user AS t2 ON t1.psector_id::text = t2.value "
-               " WHERE t2.parameter='plan_psector_vdefault' AND cur_user = current_user")
+               " WHERE t2.parameter='plan_psector_current' AND cur_user = current_user")
         row = tools_db.get_row(sql)
 
         selected_psector = tools_qt.get_text(self.dlg_plan_psector, self.psector_id)
 
         if row is None:
-            message = "Current user does not have 'plan_psector_vdefault'. Value of current psector will be inserted."
+            message = "Current user does not have 'plan_psector_current'. Value of current psector will be inserted."
             tools_qt.show_info_box(message)
 
-            sql = (f"INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('plan_psector_vdefault', '{selected_psector}', current_user)")
+            sql = (f"INSERT INTO config_param_user (parameter, value, cur_user) VALUES ('plan_psector_current', '{selected_psector}', current_user)")
             tools_db.execute_sql(sql)
 
         elif str(row[0]) != str(selected_psector):
@@ -2448,7 +2448,7 @@ class GwPsector:
 
             sql = (f"UPDATE config_param_user "
                    f"SET value = '{selected_psector}' "
-                   f"WHERE parameter = 'plan_psector_vdefault' AND cur_user=current_user")
+                   f"WHERE parameter = 'plan_psector_current' AND cur_user=current_user")
             tools_db.execute_sql(sql)
 
         # Snap point
@@ -2536,7 +2536,7 @@ class GwPsector:
         # Manage current psector
         sql = ("SELECT t1.psector_id FROM plan_psector AS t1 "
                " INNER JOIN config_param_user AS t2 ON t1.psector_id::text = t2.value "
-               " WHERE t2.parameter='plan_psector_vdefault' AND cur_user = current_user")
+               " WHERE t2.parameter='plan_psector_current' AND cur_user = current_user")
         row = tools_db.get_row(sql)
         current_psector = row[0]
         selected_psector = tools_qt.get_text(self.dlg_plan_psector, self.psector_id)
@@ -2547,7 +2547,7 @@ class GwPsector:
 
             sql = (f"UPDATE config_param_user "
                    f"SET value = '{selected_psector}' "
-                   f"WHERE parameter = 'plan_psector_vdefault' AND cur_user=current_user")
+                   f"WHERE parameter = 'plan_psector_current' AND cur_user=current_user")
             tools_db.execute_sql(sql)
 
         # Snap point
@@ -2688,7 +2688,7 @@ class GwPsector:
                 # Manage current psector
                 sql = ("SELECT t1.psector_id FROM plan_psector AS t1 "
                        " INNER JOIN config_param_user AS t2 ON t1.psector_id::text = t2.value "
-                       " WHERE t2.parameter='plan_psector_vdefault' AND cur_user = current_user")
+                       " WHERE t2.parameter='plan_psector_current' AND cur_user = current_user")
                 row = tools_db.get_row(sql)
                 current_psector = row[0]
                 selected_psector = tools_qt.get_text(self.dlg_plan_psector, self.psector_id)
@@ -2699,7 +2699,7 @@ class GwPsector:
 
                     sql = (f"UPDATE config_param_user "
                            f"SET value = '{selected_psector}' "
-                           f"WHERE parameter = 'plan_psector_vdefault' AND cur_user=current_user")
+                           f"WHERE parameter = 'plan_psector_current' AND cur_user=current_user")
                     tools_db.execute_sql(sql)
 
                 # Execute setarcfusion

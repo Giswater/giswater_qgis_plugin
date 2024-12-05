@@ -3851,7 +3851,7 @@ def manage_current_selections_docker(result, open=False):
     title = "Gw Selectors: "
     if 'userValues' in result['body']['data']:
         for user_value in result['body']['data']['userValues']:
-            if user_value['parameter'] == 'plan_psector_vdefault' and user_value['value']:
+            if user_value['parameter'] == 'plan_psector_current' and user_value['value']:
                 sql = f"SELECT name FROM plan_psector WHERE psector_id = {user_value['value']}"
                 row = tools_db.get_row(sql, log_info=False)
                 if row:
