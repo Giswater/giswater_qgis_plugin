@@ -250,7 +250,8 @@ AS SELECT ext_streetaxis.id,
             WHEN ext_streetaxis.text IS NULL THEN ((ext_streetaxis.name::text || ', '::text) || ext_streetaxis.type::text) || '.'::text
             WHEN ext_streetaxis.type IS NULL AND ext_streetaxis.text IS NULL THEN ext_streetaxis.name::text
             ELSE (((ext_streetaxis.name::text || ', '::text) || ext_streetaxis.type::text) || '. '::text) || ext_streetaxis.text
-        END AS descript
+        END AS descript,
+    ext_streetaxis.source
    FROM selector_municipality s, ext_streetaxis
    WHERE ext_streetaxis.muni_id = s.muni_id AND s.cur_user = "current_user"()::text;
 

@@ -102,3 +102,12 @@ CREATE TABLE doc (
     CONSTRAINT name_chk UNIQUE ("name"),
     CONSTRAINT doc_doc_type_fkey FOREIGN KEY (doc_type) REFERENCES doc_type(id) ON DELETE RESTRICT ON UPDATE CASCADE
 );
+
+-- 05/12/2024
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"ext_address", "column":"postcomplement", "dataType":"text", "isUtils":"True"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"ext_district", "column":"ext_code", "dataType":"text", "isUtils":"True"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"ext_address", "column":"ext_code", "dataType":"text", "isUtils":"True"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"ext_streetaxis", "column":"source", "dataType":"text", "isUtils":"True"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"ext_address", "column":"source", "dataType":"text", "isUtils":"True"}}$$);
