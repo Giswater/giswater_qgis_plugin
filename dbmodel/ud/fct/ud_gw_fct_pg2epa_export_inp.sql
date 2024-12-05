@@ -61,7 +61,7 @@ BEGIN
 	INSERT INTO temp_t_csv (source, csv1,csv2,fid) VALUES ('header',';Hydrology scenario: ',(SELECT name
 	FROM config_param_user JOIN cat_hydrology ON value = hydrology_id::text WHERE parameter = 'inp_options_hydrology_current' AND cur_user = current_user), v_fid);
 	INSERT INTO temp_t_csv (source, csv1,csv2,fid) VALUES ('header',';DWF scenario: ',(SELECT idval
-	FROM config_param_user JOIN cat_dwf c ON value = c.id::text WHERE parameter = 'inp_options_dwfscenario' AND cur_user = current_user), v_fid);
+	FROM config_param_user JOIN cat_dwf c ON value = c.id::text WHERE parameter = 'inp_options_dwfscenario_current' AND cur_user = current_user), v_fid);
 	INSERT INTO temp_t_csv (source, csv1,csv2,fid) VALUES ('header',';Default values: ',(SELECT value::json->>'status'
 	FROM config_param_user WHERE parameter = 'inp_options_vdefault' AND cur_user = current_user), v_fid);
 	INSERT INTO temp_t_csv (source, csv1,csv2,fid) VALUES ('header',';Advanced settings: ',(SELECT value::json->>'status'
@@ -303,7 +303,7 @@ BEGIN
 	     JOIN inp_dwf ON inp_dwf.node_id::text = temp_t_node.node_id::text
 	  WHERE temp_t_node.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text AND inp_dwf.dwfscenario_id = (( SELECT config_param_user.value::integer AS value
 		   FROM config_param_user
-		  WHERE config_param_user.parameter::text = 'inp_options_dwfscenario'::text AND config_param_user.cur_user::text = CURRENT_USER))
+		  WHERE config_param_user.parameter::text = 'inp_options_dwfscenario_current'::text AND config_param_user.cur_user::text = CURRENT_USER))
 	UNION
 	 SELECT temp_t_node.node_id,
 	    inp_dwf_pol_x_node.poll_id AS type_dwf,
@@ -317,7 +317,7 @@ BEGIN
 	     JOIN inp_dwf_pol_x_node ON inp_dwf_pol_x_node.node_id::text = temp_t_node.node_id::text
 	  WHERE temp_t_node.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text AND inp_dwf_pol_x_node.dwfscenario_id = (( SELECT config_param_user.value::integer AS value
 		   FROM config_param_user
-		  WHERE config_param_user.parameter::text = 'inp_options_dwfscenario'::text AND config_param_user.cur_user::text = CURRENT_USER));
+		  WHERE config_param_user.parameter::text = 'inp_options_dwfscenario_current'::text AND config_param_user.cur_user::text = CURRENT_USER));
 
 
 

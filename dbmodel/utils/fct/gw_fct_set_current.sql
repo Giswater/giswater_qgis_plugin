@@ -66,7 +66,7 @@ BEGIN
             parameter_name := 'inp_options_hydrology_current';
 
         WHEN 'dwf' THEN
-            parameter_name := 'inp_options_dwfscenario';
+            parameter_name := 'inp_options_dwfscenario_current';
 
         WHEN 'workspace' THEN
             parameter_name := 'utils_workspace_vdefault';
@@ -115,7 +115,7 @@ BEGIN
         WHEN 'dwf' THEN
             query := 'SELECT t1.id, t1.idval FROM cat_dwf AS t1 '
                   || 'INNER JOIN config_param_user AS t2 ON t1.id::text = t2.value '
-                  || 'WHERE t2.parameter = ''inp_options_dwfscenario'' AND t2.cur_user = current_user';
+                  || 'WHERE t2.parameter = ''inp_options_dwfscenario_current'' AND t2.cur_user = current_user';
             EXECUTE query INTO v_type_id, v_type_name;
             result := json_build_object('dwf_id', v_type_id, 'name', v_type_name);
 

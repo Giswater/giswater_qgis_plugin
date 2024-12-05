@@ -116,7 +116,7 @@ INSERT INTO config_param_user VALUES ('inp_options_networkmode', '1', current_us
 INSERT INTO config_param_user VALUES ('inp_options_variable_step', '0.75', current_user);
 INSERT INTO config_param_user VALUES ('inp_options_minimum_step', '0.5', current_user);
 INSERT INTO config_param_user VALUES ('edit_node2arc_update_disable', 'false', current_user);
-INSERT INTO config_param_user VALUES ('inp_options_dwfscenario', NULL, current_user);
+INSERT INTO config_param_user VALUES ('inp_options_dwfscenario_current', NULL, current_user);
 INSERT INTO config_param_user VALUES ('inp_report_nodes', NULL, current_user);
 INSERT INTO config_param_user VALUES ('inp_report_nodes_2', NULL, current_user);
 INSERT INTO config_param_user VALUES ('inp_report_links', NULL, current_user);

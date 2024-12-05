@@ -106,7 +106,7 @@ BEGIN
 		VALUES (v_fid, null, 1, concat('INFO: Copied values from Dwf scenario ( ',v_copyfrom,' ) to new Dwf scenario ( ',v_scenarioid,' ).'));
 
 	-- setting current dwf for user
-	UPDATE config_param_user SET value = v_scenarioid WHERE cur_user = current_user AND parameter = 'inp_options_dwfscenario';
+	UPDATE config_param_user SET value = v_scenarioid WHERE cur_user = current_user AND parameter = 'inp_options_dwfscenario_current';
 
 	-- manage log (fid: v_fid)
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 1, concat('This DWF scenario is now your current scenario.'));

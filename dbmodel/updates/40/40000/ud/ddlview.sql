@@ -3311,7 +3311,7 @@ AS SELECT i.dwfscenario_id,
     i.pat4
     FROM config_param_user c,  inp_dwf i
     JOIN v_edit_inp_junction USING (node_id)
-    WHERE c.cur_user::name = CURRENT_USER AND c.parameter::text = 'inp_options_dwfscenario'::text
+    WHERE c.cur_user::name = CURRENT_USER AND c.parameter::text = 'inp_options_dwfscenario_current'::text
     AND c.value::integer = i.dwfscenario_id;
 
 CREATE OR REPLACE VIEW v_edit_inp_dscenario_treatment
