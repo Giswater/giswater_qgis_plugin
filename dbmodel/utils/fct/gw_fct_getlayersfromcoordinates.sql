@@ -230,8 +230,8 @@ BEGIN
                                     v_valve_text := 'Close valve ('||v_id||')';
                                 END IF;
 
-                                IF v_netscenario_valve IS TRUE THEN\
-									SELECT value::integer INTO v_netscenario_id FROM config_param_user WHERE cur_user=current_user AND parameter = 'plan_netscenario_current'
+                                IF v_netscenario_valve IS TRUE THEN
+									SELECT value::integer INTO v_netscenario_id FROM config_param_user WHERE cur_user=current_user AND parameter = 'plan_netscenario_current';
 
 									v_valve_tablename_netscenario := 'v_edit_plan_netscenario_valve';
 									v_valve_id_netscenario := v_id;

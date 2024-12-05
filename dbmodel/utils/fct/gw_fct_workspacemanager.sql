@@ -162,10 +162,8 @@ BEGIN
 				UNION
 				select jsonb_build_object('selector_date', json_agg(a.selector_value::json)) as selector_conf FROM (
 				select json_build_object('from_date', from_date, 'to_date', to_date,'context', context)::text as selector_value
-				FROM selector_date where cur_user=current_user)a
-				UNION
-				SELECT json_build_object('selector_netscenario', array_agg(a.netscenario_id)) as selector_conf
-				FROM (SELECT value AS netscenario_id FROM config_param_user WHERE cur_user=current_user AND parameter = 'plan_netscenario_current') a
+				FROM selector_date where cur_user=current_user) a
+			) s;
 		ELSIF v_project_type = 'UD' THEN
 			SELECT json_agg(s.selector_conf) INTO v_selectors_configcompound  FROM (
 				select jsonb_build_object('selector_rpt_main_tstep', json_agg(a.selector_value::json))as selector_conf FROM (
@@ -178,7 +176,8 @@ BEGIN
 				UNION
 				select jsonb_build_object('selector_date', json_agg(a.selector_value::json)) as selector_conf FROM (
 				select json_build_object('from_date', from_date, 'to_date', to_date,'context', context)::text as selector_value
-				FROM selector_date where cur_user=current_user)a )s;
+				FROM selector_date where cur_user=current_user) a
+			) s;
 		END IF;
 
 		--join jsons of configuration

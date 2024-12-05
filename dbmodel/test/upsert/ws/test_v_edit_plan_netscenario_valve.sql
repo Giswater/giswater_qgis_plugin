@@ -13,7 +13,8 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 SELECT plan(6);
 
 insert into plan_netscenario (netscenario_id) values (-901);
-UPDATE config_param_user SET value = -901::text WHERE parameter = 'plan_netscenario_current' AND cur_user = current_user;
+INSERT INTO config_param_user ("parameter", value, cur_user) VALUES ('plan_netscenario_current', '-901', current_user)
+ON CONFLICT ("parameter", cur_user) DO UPDATE SET value = EXCLUDED.value;
 INSERT INTO v_edit_plan_netscenario_valve (netscenario_id, node_id, closed, the_geom)
 VALUES(-901, '1079', false, null);
 SELECT is((SELECT count(*)::integer FROM v_edit_plan_netscenario_valve WHERE netscenario_id = -901), 1, 'INSERT: v_edit_plan_netscenario_valve -901 was inserted');
