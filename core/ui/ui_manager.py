@@ -357,6 +357,10 @@ class GwStyleUi(GwDialog, FORM_CLASS):
 FORM_CLASS = _get_ui_class('mapzone_config.ui', 'utilities')
 class GwMapzoneConfigUi(GwDialog, FORM_CLASS):
     pass
+
+FORM_CLASS = _get_ui_class('massive_composer.ui', 'utilities')
+class GwCompPagesUi(GwDialog, FORM_CLASS):
+    pass
 # endregion
 
 # region TOC
