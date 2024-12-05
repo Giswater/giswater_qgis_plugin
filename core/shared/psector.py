@@ -15,12 +15,12 @@ from collections import OrderedDict
 from functools import partial
 from sip import isdeleted
 
-from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtCore import Qt, QItemSelectionModel
 from qgis.PyQt.QtGui import QDoubleValidator, QIntValidator, QKeySequence, QColor, QCursor
 from qgis.PyQt.QtSql import QSqlQueryModel, QSqlTableModel, QSqlError
 from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCheckBox, QComboBox, QDateEdit, QLabel, \
     QLineEdit, QTableView, QWidget, QDoubleSpinBox, QTextEdit, QPushButton, QGridLayout, QMenu
-from qgis.core import QgsLayoutExporter, QgsProject, QgsRectangle, QgsPointXY, QgsGeometry, QgsMapToPixel
+from qgis.core import QgsLayoutExporter, QgsProject, QgsRectangle, QgsPointXY, QgsGeometry, QgsMapToPixel, QgsMapLayer
 from qgis.gui import QgsMapToolEmitPoint
 
 from .document import GwDocument, global_vars
@@ -53,6 +53,11 @@ class GwPsector:
         self.tablename_psector_x_node = "plan_psector_x_node"
         self.tablename_psector_x_connec = "v_edit_plan_psector_x_connec"
         self.tablename_psector_x_gully = "v_edit_plan_psector_x_gully"
+
+        self.qtbl_node = None
+        self.qtbl_arc = None
+        self.qtbl_connec = None
+        self.qtbl_gully = None
 
         self.previous_map_tool = self.canvas.mapTool()
 
@@ -192,14 +197,14 @@ class GwPsector:
 
         # Tables
         # tab Elements
-        self.qtbl_arc = self.dlg_plan_psector.findChild(QTableView, "tbl_psector_x_arc")
+        self.qtbl_arc: QTableView = self.dlg_plan_psector.findChild(QTableView, "tbl_psector_x_arc")
         self.qtbl_arc.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self.qtbl_node = self.dlg_plan_psector.findChild(QTableView, "tbl_psector_x_node")
+        self.qtbl_node: QTableView = self.dlg_plan_psector.findChild(QTableView, "tbl_psector_x_node")
         self.qtbl_node.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self.qtbl_connec = self.dlg_plan_psector.findChild(QTableView, "tbl_psector_x_connec")
+        self.qtbl_connec: QTableView = self.dlg_plan_psector.findChild(QTableView, "tbl_psector_x_connec")
         self.qtbl_connec.setSelectionBehavior(QAbstractItemView.SelectRows)
         if self.project_type.upper() == 'UD':
-            self.qtbl_gully = self.dlg_plan_psector.findChild(QTableView, "tbl_psector_x_gully")
+            self.qtbl_gully: QTableView = self.dlg_plan_psector.findChild(QTableView, "tbl_psector_x_gully")
             self.qtbl_gully.setSelectionBehavior(QAbstractItemView.SelectRows)
         all_rows = self.dlg_plan_psector.findChild(QTableView, "all_rows")
         all_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
@@ -509,6 +514,9 @@ class GwPsector:
         widget_to_ignore = ('btn_accept', 'btn_cancel', 'btn_reports', 'btn_open_doc')
         restriction = ('role_basic', 'role_om', 'role_epa', 'role_om')
         self.set_restriction_by_role(self.dlg_plan_psector, widget_to_ignore, restriction)
+
+        # Connect selectionChanged signal to select features in relations tables when selecting them on the canvas
+        global_vars.canvas.selectionChanged.connect(partial(self._manage_selection_changed))
 
         # Open dialog
         tools_gw.open_dialog(self.dlg_plan_psector, dlg_name='plan_psector')
@@ -2572,6 +2580,10 @@ class GwPsector:
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_replace_arc.cmb_newarccat, rows)
 
+        vdefault = tools_gw.get_config_parser('dlg_replace_arc', 'cmb_newarccat', "user", "session")
+        if vdefault:
+            tools_qt.set_combo_value(self.dlg_replace_arc.cmb_newarccat, vdefault, 0)
+
         # Set text current arccat
         self.dlg_replace_arc.txt_current_arccat.setText(self.arc_cat_id)
 
@@ -2596,7 +2608,10 @@ class GwPsector:
 
     def _set_plan_replace_feature(self):
 
-        new_arc_cat = f'"{tools_qt.get_combo_value(self.dlg_replace_arc, self.dlg_replace_arc.cmb_newarccat)}"'
+        cmb_value = tools_qt.get_combo_value(self.dlg_replace_arc, self.dlg_replace_arc.cmb_newarccat)
+        new_arc_cat = f'"{cmb_value}"'
+
+        tools_gw.set_config_parser('dlg_replace_arc', 'cmb_newarccat', f"{cmb_value}", "user", "session")
 
         feature = f'"featureType":"ARC", "ids":["{self.arc_id}"]'
         extras = f'"catalog":{new_arc_cat}'
@@ -2906,5 +2921,47 @@ class GwPsector:
                 connect = [connect]
         dlg_functions = toolbox_btn.open_function_by_id(function, connect_signal=connect)
         return dlg_functions
+
+    def _manage_selection_changed(self, layer: QgsMapLayer):
+        if layer is None:
+            return
+
+        if layer.providerType() != 'postgres':
+            return
+
+        tablename = tools_qgis.get_layer_source_table_name(layer)
+        if not tablename:
+            return
+
+        mapping_dict = {
+            "v_edit_node": ("node_id", self.qtbl_node),
+            "v_edit_arc": ("arc_id", self.qtbl_arc),
+            "v_edit_connec": ("connec_id", self.qtbl_connec),
+            "v_edit_gully": ("gully_id", self.qtbl_gully),
+        }
+        idname, tableview = mapping_dict[tablename]
+        if layer.selectedFeatureCount() > 0:
+            # Get selected features of the layer
+            features = layer.selectedFeatures()
+            feature_ids = [feature.attribute(idname) for feature in features]
+
+            # Select in table
+            selection_model = tableview.selectionModel()
+
+            # Clear previous selection
+            selection_model.clearSelection()
+
+            model = tableview.model()
+
+            # Loop through the model rows to find matching feature_ids
+            for row in range(model.rowCount()):
+                index = model.index(row, model.fieldIndex(idname))
+                feature_id = model.data(index)
+
+                index = model.index(row, model.fieldIndex("state"))
+                state = model.data(index)
+
+                if feature_id in feature_ids and f"{state}" == "1":
+                    selection_model.select(index, (QItemSelectionModel.Select | QItemSelectionModel.Rows))
 
     # endregion
