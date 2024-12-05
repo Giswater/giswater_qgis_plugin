@@ -38,8 +38,6 @@ v_selector_date_list text[];
 v_compare_date_list text[];
 v_selector_time_list text[];
 v_compare_time_list text[];
-v_combos json[];
-v_combo json;
 v_isnullvalue bool;
 BEGIN
     -- Set search path
@@ -69,35 +67,6 @@ BEGIN
 		SELECT array_agg(resulttime) INTO v_selector_time_list FROM rpt_arc  WHERE resultdate = COALESCE(v_selected_selector_date, v_selector_date_list[1]);
 		SELECT array_agg(resulttime) INTO v_compare_time_list  FROM rpt_arc  WHERE resultdate = v_selected_compare_date;
 
-		-- Get combo names and dv_isnullvalue values
-		SELECT ARRAY(SELECT jsonb_build_object('columnname', widget->>'columnname','isNullValue', widget->>'isNullValue')::json
-	    FROM jsonb_array_elements(v_fieldsjson) widget WHERE widget->>'widgettype' = 'combo'
-		AND widget->>'columnname' NOT IN ('result_name_show', 'result_name_compare')) INTO v_combos;
-
-		-- Set first value empty (null value) if dv_isnullvalue is true
-		FOREACH v_combo IN ARRAY v_combos
-	    LOOP
-	        CASE v_combo->>'columnname'
-				WHEN 'selector_date' THEN
-	                IF v_combo->>'isNullValue' = 'true' THEN
-	                    v_selector_date_list := array_prepend('', v_selector_date_list);
-	                END IF;
-	            WHEN 'selector_time' THEN
-	                IF v_combo->>'isNullValue' = 'true' THEN
-	                    v_selector_time_list := array_prepend('', v_selector_time_list);
-	                END IF;
-	            WHEN 'compare_date' THEN
-	                IF v_combo->>'isNullValue' = 'true' THEN
-	                    v_compare_date_list := array_prepend('', v_compare_date_list);
-	                END IF;
-				WHEN 'compare_time' THEN
-	                IF v_combo->>'isNullValue' = 'true' THEN
-	                    v_compare_time_list := array_prepend('', v_compare_time_list);
-	                END IF;
-	            ELSE NULL;
-	        END CASE;
-	    END LOOP;
-
 		-- Update JSON fields with selectedId values for specific column names
 	    v_fieldsjson := (
 	        SELECT jsonb_agg(
@@ -111,7 +80,7 @@ BEGIN
 					WHEN field->>'columnname' = 'selector_date' AND v_selector_date_list IS NOT NULL THEN
 		                jsonb_set(
 		                    jsonb_set(
-		                        jsonb_set(field - 'isNullValue', '{comboIds}', to_jsonb(v_selector_date_list)),
+		                        jsonb_set(field, '{comboIds}', to_jsonb(v_selector_date_list)),
 		                        '{comboNames}', to_jsonb(v_selector_date_list)
 		                    ),
 		                    '{selectedId}', to_jsonb(COALESCE(v_selected_selector_date, v_selector_date_list[1]))
@@ -120,7 +89,7 @@ BEGIN
 					WHEN field->>'columnname' = 'selector_time' AND v_selector_time_list IS NOT NULL THEN
 						jsonb_set(
 		                    jsonb_set(
-		                        jsonb_set(field - 'isNullValue', '{comboIds}', to_jsonb(v_selector_time_list)),
+		                        jsonb_set(field, '{comboIds}', to_jsonb(v_selector_time_list)),
 		                        '{comboNames}', to_jsonb(v_selector_time_list)
 		                    ),
 		                    '{selectedId}', to_jsonb(COALESCE(v_selected_selector_time, v_selector_time_list[1]))
@@ -129,7 +98,7 @@ BEGIN
 					WHEN field->>'columnname' = 'compare_date' AND v_compare_date_list IS NOT NULL THEN
 						jsonb_set(
 		                    jsonb_set(
-		                        jsonb_set(field - 'isNullValue', '{comboIds}', to_jsonb(v_compare_date_list)),
+		                        jsonb_set(field, '{comboIds}', to_jsonb(v_compare_date_list)),
 		                        '{comboNames}', to_jsonb(v_compare_date_list)
 		                    ),
 		                    '{selectedId}', to_jsonb(COALESCE(v_selected_compare_date, v_compare_date_list[1]))
@@ -138,7 +107,7 @@ BEGIN
 					WHEN field->>'columnname' = 'compare_time' AND v_compare_time_list IS NOT NULL THEN
 						jsonb_set(
 		                    jsonb_set(
-		                        jsonb_set(field - 'isNullValue', '{comboIds}', to_jsonb(v_compare_time_list)),
+		                        jsonb_set(field, '{comboIds}', to_jsonb(v_compare_time_list)),
 		                        '{comboNames}', to_jsonb(v_compare_time_list)
 		                    ),
 		                    '{selectedId}', to_jsonb(COALESCE(v_selected_compare_time, v_compare_time_list[1]))
