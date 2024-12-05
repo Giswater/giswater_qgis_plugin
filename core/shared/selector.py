@@ -279,6 +279,68 @@ class GwSelector:
         if tab:
             main_tab.setCurrentWidget(tab)
 
+
+    def _get_layers(self):
+            
+        self.arc_layers = [lyr for lyr in [tools_qgis.get_layer_by_tablename('v_edit_arc')] if lyr is not None]
+        self.node_layers = [lyr for lyr in [tools_qgis.get_layer_by_tablename('v_edit_node')] if lyr is not None]
+        self.connec_layers = [lyr for lyr in [tools_qgis.get_layer_by_tablename('v_edit_connec')] if lyr is not None]
+        self.gully_layers = [lyr for lyr in [tools_qgis.get_layer_by_tablename('v_edit_gully')] if lyr is not None]
+        self.link_layers = [lyr for lyr in [tools_qgis.get_layer_by_tablename('v_edit_link')] if lyr is not None]
+
+        return self.arc_layers, self.node_layers, self.connec_layers, self.gully_layers, self.link_layers
+    
+
+    def _apply_filter(self, subset_filter: str) -> None:
+
+        """
+        Apply a subset filter to layers based on the project type.
+
+        :param subset_filter: SQL-like filter string to apply to the layers.
+        """
+        arc_layers, node_layers, connec_layers, gully_layers, link_layers = self._get_layers()
+
+        # Apply filter to arc and node layers
+        for layer in arc_layers + node_layers + connec_layers + link_layers:
+            layer.setSubsetString(subset_filter)
+        
+        if global_vars.project_type == 'ud':
+            for layer in gully_layers:
+                layer.setSubsetString(subset_filter)
+        return
+    
+
+    def _build_filter(self) -> str:
+
+        # Call get_selectors
+        extras = f'"selectorType":"selector_basic", "filterText":""'
+        body = tools_gw.create_body(extras=extras)
+        json_result = tools_gw.execute_procedure('gw_fct_getselectors', body)
+
+        filter = []
+
+        if json_result is not None:
+            try:
+                form_tabs = json_result.get('body', {}).get('form', {}).get('formTabs', [])
+                for selector in form_tabs:
+                    if selector.get('tableName') in ('selector_municipality', 'selector_expl', 'selector_sector'):
+                        selector_filter = []  
+                        for field in selector.get('fields', []):
+                            if field.get('value'):
+                                column_name = field.get('columnname')
+                                if column_name:
+                                    if column_name == 'expl_id':
+                                        selector_filter.append(f"({column_name} = {field[column_name]} or expl_id2 = {field[column_name]})")
+                                    else:
+                                        selector_filter.append(f"{column_name} = {field[column_name]}")
+                        if selector_filter:
+                            filter.append(f"({ ' or '.join(selector_filter) })")
+            except KeyError as e:
+                print(f"KeyError encountered: {e}")
+
+        return ' and '.join(filter)
+
+
     # region private functions
 
     def _show_help(self, dialog, selection_modes):
@@ -380,6 +442,10 @@ class GwSelector:
                 tools_qgis.zoom_to_rectangle(x1, y1, x2, y2, margin=0)
         except KeyError:
             pass
+        
+        # Build and Apply filters
+        filter = self._build_filter()
+        self._apply_filter(filter)
 
         # Refresh canvas
         tools_qgis.set_layer_index('v_edit_arc')
