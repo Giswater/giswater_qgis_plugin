@@ -160,7 +160,7 @@ UPDATE sys_fprocess SET fprocess_name='DMA without graphconfig', project_type='w
 
 UPDATE sys_fprocess SET fprocess_name='DQA without graphconfig', project_type='ws', parameters='{"graphClass":"DQA"}'::json, "source"='core', isaudit=true, fprocess_type='Check graph-config', addparam=NULL, except_level=3, except_msg='dqas on dqa table with graphconfig not configured.', except_msg_feature=NULL, query_text='SELECT * FROM v_edit_dqa WHERE graphconfig IS NULL and dqa_id > 0 AND active IS TRUE', info_msg='All dqa has graphconfig values not null.', function_name='[gw_fct_graphanalytics_check_data, gw_fct_admin_check_data]' WHERE fid=270;
 
-UPDATE sys_fprocess SET fprocess_name='Presszone without graphconfig', project_type='ws', parameters='{"graphClass":"PRESSZONE"}'::json, "source"='core', isaudit=true, fprocess_type='Check graph-config', addparam=NULL, except_level=3, except_msg='presszones on presszone table with graphconfig not configured.', except_msg_feature=NULL, query_text='SELECT * FROM v_edit_presszone WHERE graphconfig IS NULL and presszone_id > 0::text AND active IS TRUE', info_msg='All presszones has graphconfig values not null.', function_name='[gw_fct_graphanalytics_check_data, gw_fct_admin_check_data]' WHERE fid=271;
+UPDATE sys_fprocess SET fprocess_name='Presszone without graphconfig', project_type='ws', parameters='{"graphClass":"PRESSZONE"}'::json, "source"='core', isaudit=true, fprocess_type='Check graph-config', addparam=NULL, except_level=3, except_msg='presszones on presszone table with graphconfig not configured.', except_msg_feature=NULL, query_text='SELECT * FROM v_edit_presszone WHERE graphconfig IS NULL and presszone_id > 0 AND active IS TRUE', info_msg='All presszones has graphconfig values not null.', function_name='[gw_fct_graphanalytics_check_data, gw_fct_admin_check_data]' WHERE fid=271;
 
 UPDATE sys_fprocess SET fprocess_name='Null values on valv_type table', project_type='ws', parameters=NULL, "source"='core', isaudit=true, fprocess_type='Check epa-data', addparam=NULL, except_level=3, except_msg='valves with null values on valv_type column.', except_msg_feature=NULL, query_text='SELECT * FROM v_edit_inp_valve WHERE valv_type IS NULL', info_msg='Valve valv_type checked. No mandatory values missed.', function_name='[gw_fct_pg2epa_check_data, gw_fct_admin_check_data]' WHERE fid=273;
 
@@ -279,7 +279,7 @@ UPDATE sys_fprocess SET fprocess_name='Check orphan documents', project_type='ws
 select distinct  doc_id from doc_x_connec UNION 
 select distinct  doc_id from doc_x_node)', info_msg='All documents are related to the features.', function_name='[gw_fct_om_check_data, gw_fct_admin_check_data]' WHERE fid=497;
 
-UPDATE sys_fprocess SET fprocess_name='Check orphan visits', project_type='ws', parameters=NULL, "source"='core', isaudit=true, fprocess_type='Function process', addparam=NULL, except_level=2, except_msg='visits not related to any feature and without geometry.', except_msg_feature=NULL, query_text='select id from om_visit where the_geom is null and id not in (
+UPDATE sys_fprocess SET fprocess_name='Check orphan visits', project_type='ws', parameters=NULL, "source"='core', isaudit=true, fprocess_type='Function process', addparam=NULL, except_level=2, except_msg='visits not related to any feature and without geometry.', except_msg_feature=NULL, query_text='select id, the_geom from om_visit where the_geom is null and id not in (
 with mec as (
 select distinct visit_id from om_visit_x_arc UNION
 select distinct visit_id from om_visit_x_connec UNION
@@ -287,7 +287,7 @@ select distinct visit_id from om_visit_x_node)
 select a.visit_id from mec a left join om_visit b on a.visit_id = id
 )', info_msg='All visits are related to the features or have geometry.', function_name='[gw_fct_om_check_data, gw_fct_admin_check_data]' WHERE fid=498;
 
-UPDATE sys_fprocess SET fprocess_name='Check orphan elements', project_type='ws', parameters=NULL, "source"='core', isaudit=true, fprocess_type='Function process', addparam=NULL, except_level=2, except_msg='elements not related to any feature and without geometry.', except_msg_feature=NULL, query_text='select element_id from element where the_geom is null and element_id not in (
+UPDATE sys_fprocess SET fprocess_name='Check orphan elements', project_type='ws', parameters=NULL, "source"='core', isaudit=true, fprocess_type='Function process', addparam=NULL, except_level=2, except_msg='elements not related to any feature and without geometry.', except_msg_feature=NULL, query_text='select element_id, the_geom from element where the_geom is null and element_id not in (
 with mec as (select distinct element_id from element_x_arc UNION
 select distinct element_id from element_x_connec UNION
 select distinct element_id from element_x_node)
