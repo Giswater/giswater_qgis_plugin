@@ -119,8 +119,11 @@ BEGIN
 	-- Create JSON from layouts
 	SELECT array_agg(distinct layoutname) into v_layouts FROM config_form_fields  WHERE formtype = v_formtype;
 
-
 	v_form:= '"layouts": {';
+
+	-- Add form layout
+	SELECT addparam INTO v_addparam FROM config_typevalue WHERE id = v_formtype;
+	v_form := concat(v_form, '"', v_formtype, '":', coalesce(v_addparam, '{}'), ',');
 
 	FOREACH v_layout IN ARRAY v_layouts
 	LOOP
