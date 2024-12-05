@@ -159,8 +159,8 @@ BEGIN
 			elsif v_rec.query_text ilike '% SELECT connec_id%' then
 			
 				execute '
-				insert into anl_connec (connec_id, connecat_id, expl_id, fid, the_geom, descript)
-				select connec_id, connecat_id, expl_id, '||v_check_fid||', the_geom, '||quote_literal(v_exc_msg)||' from ('||v_sql||')b';
+				insert into anl_connec (connec_id, conneccat_id, expl_id, fid, the_geom, descript)
+				select connec_id, conneccat_id, expl_id, '||v_check_fid||', the_geom, '||quote_literal(v_exc_msg)||' from ('||v_sql||')b';
 
 			end if;
 

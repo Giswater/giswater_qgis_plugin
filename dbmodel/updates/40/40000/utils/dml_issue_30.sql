@@ -66,7 +66,7 @@ UPDATE sys_fprocess SET fprocess_name='Check cat_feature_node field isarcdivide'
 UPDATE sys_fprocess SET fprocess_name='Check cat_feature_node field choose_hemisphere', project_type='utils', parameters=NULL, "source"='core', isaudit=true, fprocess_type='Check admin', addparam=NULL, except_level=3, except_msg='nodes without value on field "choose_hemisphere" from cat_feature_node.', except_msg_feature=NULL, query_text='SELECT * FROM cat_feature_node WHERE choose_hemisphere IS NULL', info_msg='All nodes have value on field "choose_hemisphere"', function_name='[gw_fct_admin_check_data]' WHERE fid=309;
 UPDATE sys_fprocess SET fprocess_name='Check cat_feature_node field isprofilesurface', project_type='utils', parameters=NULL, "source"='core', isaudit=true, fprocess_type='Check admin', addparam=NULL, except_level=3, except_msg='nodes without value on field "isprofilesurface" from cat_feature_node. Features - '',v_feature_list::text,''.''', except_msg_feature=NULL, query_text='SELECT * FROM cat_feature_node WHERE isprofilesurface IS NULL', info_msg='All nodes have value on field "isprofilesurface"', function_name='[gw_fct_admin_check_data]' WHERE fid=310;
 UPDATE sys_fprocess SET fprocess_name='Check child view man table definition', project_type='utils', parameters=NULL, "source"='core', isaudit=true, fprocess_type='Check admin', addparam=NULL, except_level=3, except_msg='view wrongly defined man_table', except_msg_feature=NULL, query_text='WITH subq_1 as (
-SELECT id, system_id, child_layer from cat_Feature
+SELECT id, sys_feature_cat, child_layer from cat_feature
 ), subq_2 as (
 select*from information_schema.views a join subq_1 m on m.child_layer = a.table_name
 where a.table_schema = current_schema

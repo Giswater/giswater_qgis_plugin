@@ -212,7 +212,7 @@ BEGIN
   	FROM (SELECT node_id, nodecat_id as feature_catalog, state, expl_id, descript, fid, the_geom FROM temp_anl_node WHERE cur_user="current_user"()
 	AND fid IN (106,177,187,202,442,443,175,432)
 	UNION
-	SELECT connec_id, connecat_id, state, expl_id, descript, fid, the_geom FROM temp_anl_connec WHERE cur_user="current_user"()
+	SELECT connec_id, conneccat_id, state, expl_id, descript, fid, the_geom FROM temp_anl_connec WHERE cur_user="current_user"()
 	AND fid IN (210,201,202,204,205,291,478,488,480)) row) features;
 
 	v_result := COALESCE(v_result, '{}'); 
