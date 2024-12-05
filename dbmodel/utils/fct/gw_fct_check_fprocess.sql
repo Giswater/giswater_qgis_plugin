@@ -1,9 +1,8 @@
 -- DROP FUNCTION SCHEMA_NAME.gw_fct_check_fprocess(json);
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_check_fprocess(p_data json)
- RETURNS json
- LANGUAGE plpgsql
-AS $function$
+  RETURNS json AS
+$BODY$
 /*
 select gw_fct_check_fprocess($${"data":{"parameters":{"functionFid": '||v_fid||', "checkFid":"103", "prefixTable": "'||v_edit||'"}}}$$)';
 
