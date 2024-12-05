@@ -306,6 +306,40 @@ ALTER TABLE node_border_sector drop CONSTRAINT node_border_expl_sector_id_fkey;
 ALTER TABLE node_border_sector RENAME TO _node_border_sector;
 
 
+-- 05/12/2024
+ALTER TABLE inp_dscenario_demand RENAME TO _inp_dscenario_demand;
+ALTER TABLE _inp_dscenario_demand DROP CONSTRAINT inp_dscenario_demand_pkey;
+ALTER TABLE _inp_dscenario_demand DROP CONSTRAINT inp_demand_dscenario_id_fkey;
+ALTER TABLE _inp_dscenario_demand DROP CONSTRAINT inp_dscenario_demand_feature_type_fkey;
+ALTER TABLE _inp_dscenario_demand DROP CONSTRAINT inp_dscenario_demand_pattern_id_fkey;
 
+ALTER TABLE _inp_dscenario_demand ALTER COLUMN id DROP DEFAULT;
+DROP SEQUENCE IF EXISTS SCHEMA_NAME.inp_dscenario_demand_id_seq1;
+ALTER SEQUENCE SCHEMA_NAME.inp_dscenario_demand_id_seq RENAME TO inp_dscenario_demand_id_seq1;
 
+DROP INDEX IF EXISTS inp_dscenario_demand_dscenario_id;
+DROP INDEX IF EXISTS inp_dscenario_demand_source;
 
+CREATE TABLE inp_dscenario_demand (
+    dscenario_id int4 NOT NULL,
+    id serial4 NOT NULL,
+    feature_id varchar(16) NOT NULL,
+    feature_type varchar(16) NULL,
+    demand numeric(12, 6) NULL,
+    pattern_id varchar(16) NULL,
+    demand_type varchar(18) NULL,
+    "source" text NULL,
+    CONSTRAINT inp_dscenario_demand_pkey PRIMARY KEY (id),
+    CONSTRAINT inp_demand_dscenario_id_fkey FOREIGN KEY (dscenario_id)
+        REFERENCES cat_dscenario(dscenario_id)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT inp_dscenario_demand_feature_type_fkey FOREIGN KEY (feature_type)
+        REFERENCES sys_feature_type(id)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT inp_dscenario_demand_pattern_id_fkey FOREIGN KEY (pattern_id)
+        REFERENCES inp_pattern(pattern_id)
+        ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+CREATE INDEX inp_dscenario_demand_dscenario_id ON inp_dscenario_demand USING btree (dscenario_id);
+CREATE INDEX inp_dscenario_demand_source ON inp_dscenario_demand USING btree ("source");

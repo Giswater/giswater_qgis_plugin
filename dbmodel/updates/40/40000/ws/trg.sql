@@ -166,3 +166,10 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_review_connec();
 -- 12/11/24
 CREATE TRIGGER gw_trg_edit_ve_epa_virtualpump INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_epa_virtualpump
  FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_ve_epa('virtualpump');
+
+-- 05/12/24
+CREATE TRIGGER gw_trg_dscenario_demand_feature AFTER INSERT ON inp_dscenario_demand
+FOR EACH ROW EXECUTE FUNCTION gw_trg_dscenario_demand_feature();
+
+CREATE TRIGGER gw_trg_typevalue_fk AFTER INSERT OR UPDATE ON inp_dscenario_demand
+FOR EACH ROW EXECUTE FUNCTION gw_trg_typevalue_fk('inp_dscenario_demand');

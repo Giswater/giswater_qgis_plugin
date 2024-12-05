@@ -493,12 +493,12 @@ INSERT INTO inp_curve VALUES ('PUMP_02', 'PUMP', NULL, NULL, NULL);
 INSERT INTO inp_curve_value VALUES (1, 'PUMP_02', 10.0000, 50.0000);
 INSERT INTO inp_curve_value VALUES (2, 'PUMP_01', 5.0000, 100.0000);
 
-INSERT INTO inp_dscenario_demand VALUES (1, 1, '1009', 'NODE', 8.000000, 'PTN-HYDRANT', '3', 'NODE 1009');
-INSERT INTO inp_dscenario_demand VALUES (2, 1, '1012', 'NODE', 8.000000, 'PTN-HYDRANT', '3', 'NODE 1012');
-INSERT INTO inp_dscenario_demand VALUES (3, 1, '1054', 'NODE', 8.000000, 'PTN-HYDRANT', '3', 'NODE 1054');
-INSERT INTO inp_dscenario_demand VALUES (4, 1, '113959', 'NODE', 8.000000, 'PTN-HYDRANT', '3', 'NODE 113959');
-INSERT INTO inp_dscenario_demand VALUES (5, 1, '113961', 'NODE', 8.000000, 'PTN-HYDRANT', '3', 'NODE 113961');
-INSERT INTO inp_dscenario_demand VALUES (6, 1, '113960', 'NODE', 8.000000, 'PTN-HYDRANT', '3', 'NODE 113960');
+INSERT INTO inp_dscenario_demand (dscenario_id, id, feature_id, feature_type, demand, pattern_id, demand_type, "source") VALUES(1, 1, '1009', 'NODE', 8.000000, 'PTN-HYDRANT', '3', 'NODE 1009');
+INSERT INTO inp_dscenario_demand (dscenario_id, id, feature_id, feature_type, demand, pattern_id, demand_type, "source") VALUES(1, 2, '1012', 'NODE', 8.000000, 'PTN-HYDRANT', '3', 'NODE 1012');
+INSERT INTO inp_dscenario_demand (dscenario_id, id, feature_id, feature_type, demand, pattern_id, demand_type, "source") VALUES(1, 3, '1054', 'NODE', 8.000000, 'PTN-HYDRANT', '3', 'NODE 1054');
+INSERT INTO inp_dscenario_demand (dscenario_id, id, feature_id, feature_type, demand, pattern_id, demand_type, "source") VALUES(1, 4, '113959', 'NODE', 8.000000, 'PTN-HYDRANT', '3', 'NODE 113959');
+INSERT INTO inp_dscenario_demand (dscenario_id, id, feature_id, feature_type, demand, pattern_id, demand_type, "source") VALUES(1, 5, '113961', 'NODE', 8.000000, 'PTN-HYDRANT', '3', 'NODE 113961');
+INSERT INTO inp_dscenario_demand (dscenario_id, id, feature_id, feature_type, demand, pattern_id, demand_type, "source") VALUES(1, 6, '113960', 'NODE', 8.000000, 'PTN-HYDRANT', '3', 'NODE 113960');
 
 INSERT INTO inp_pattern_value VALUES (55, 'PTN-DMA-05-P6', 0.1000, 0.1500, 0.3000, 0.4000, 0.5000, 0.5000, 0.8000, 1.1000, 1.5000, 1.3000, 1.3000, 1.3000, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO inp_pattern_value VALUES (56, 'PTN-DMA-05-P6', 1.8500, 2.2000, 2.2000, 1.9000, 1.0000, 0.7000, 0.9000, 1.3000, 1.2000, 0.7000, 0.5000, 0.3000, NULL, NULL, NULL, NULL, NULL, NULL);
