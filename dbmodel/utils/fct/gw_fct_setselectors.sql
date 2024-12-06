@@ -168,7 +168,7 @@ BEGIN
 					EXECUTE concat('INSERT INTO ',v_tablename,' (',v_columnname,', cur_user) SELECT ',v_tableid,', current_user FROM ',v_table,'
 					',(CASE when v_ids is not null then concat(' WHERE id = ANY(ARRAY',v_ids,')') end),' WHERE active AND muni_id > 0
 					ON CONFLICT (',v_columnname,', cur_user) DO NOTHING;');
-				
+
 				END IF;
 
 			ELSIF v_tabname='tab_macroexploitation' OR v_tabname='tab_macrosector' THEN
@@ -350,7 +350,7 @@ BEGIN
 
 	/*set expl as vdefault if only one value on selector. In spite expl_vdefault is a hidden value, user can enable this variable if he needs it when working on more than
 	one exploitation in order to choose what is the default (remember default value has priority over spatial intersection)*/
-	
+
 	IF (SELECT count (*) FROM selector_expl WHERE cur_user = current_user) = 1 THEN
 
 		v_expl = (SELECT expl_id FROM selector_expl WHERE cur_user = current_user);
@@ -411,7 +411,7 @@ BEGIN
 
 		-- inserting expl and muni from selected sectors
 		IF v_tabname IN ('tab_sector', 'tab_macrosector') THEN
-		
+
 			-- expl
 			DELETE FROM selector_expl WHERE cur_user = current_user;
 			INSERT INTO selector_expl
@@ -420,7 +420,7 @@ BEGIN
 			-- muni
 			DELETE FROM selector_municipality WHERE cur_user = current_user;
 			INSERT INTO selector_municipality
-			SELECT DISTINCT muni_id, current_user FROM node WHERE sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user = current_user AND sector_id > 0);		
+			SELECT DISTINCT muni_id, current_user FROM node WHERE sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user = current_user AND sector_id > 0);
 		END IF;
 
 		-- inserting muni_id from selected muni
@@ -457,7 +457,7 @@ BEGIN
 		st_xmax(the_geom)::numeric(12,2) as x2, st_ymax(the_geom)::numeric(12,2) as y2
 		FROM (SELECT st_expand(st_collect(the_geom), v_expand) as the_geom FROM sector where sector_id IN
 		(SELECT sector_id FROM selector_sector WHERE cur_user=current_user)) b) a;
-	
+
 	ELSIF v_count_2 > 0 or (v_checkall IS False and v_id is null) THEN
 		SELECT row_to_json (a)
 		INTO v_geometry
@@ -481,7 +481,7 @@ BEGIN
 		FROM (SELECT st_xmin(the_geom)::numeric(12,2) as x1, st_ymin(the_geom)::numeric(12,2) as y1, st_xmax(the_geom)::numeric(12,2) as x2, st_ymax(the_geom)::numeric(12,2) as y2
 		FROM (SELECT st_expand(the_geom, v_expand) as the_geom FROM exploitation where expl_id IN
 		(SELECT expl_id FROM selector_expl WHERE cur_user=current_user)) b) a;
-	
+
 	ELSIF v_tabname='tab_municipality' THEN
 		SELECT row_to_json (a)
 		INTO v_geometry
@@ -497,7 +497,7 @@ BEGIN
 
 	-- get uservalues
 	PERFORM gw_fct_workspacemanager($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},"data":{"filterFields":{}, "pageInfo":{}, "action":"CHECK"}}$$);
-	v_uservalues = (SELECT to_json(array_agg(row_to_json(a))) FROM (SELECT parameter, value FROM config_param_user WHERE parameter IN ('plan_psector_vdefault', 'utils_workspace_vdefault')
+	v_uservalues = (SELECT to_json(array_agg(row_to_json(a))) FROM (SELECT parameter, value FROM config_param_user WHERE parameter IN ('plan_psector_current', 'utils_workspace_vdefault')
 	AND cur_user = current_user ORDER BY parameter)a);
 
 

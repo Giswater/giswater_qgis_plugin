@@ -57,16 +57,16 @@ BEGIN
     -- Determine the parameter name based on the provided type
     CASE p_data->'data'->>'type'
         WHEN 'netscenario' THEN
-            parameter_name := 'plan_netscenario_vdefault';
+            parameter_name := 'plan_netscenario_current';
 
         WHEN 'psector' THEN
-            parameter_name := 'plan_psector_vdefault';
+            parameter_name := 'plan_psector_current';
 
         WHEN 'hydrology' THEN
-            parameter_name := 'inp_options_hydrology_scenario';
+            parameter_name := 'inp_options_hydrology_current';
 
         WHEN 'dwf' THEN
-            parameter_name := 'inp_options_dwfscenario';
+            parameter_name := 'inp_options_dwfscenario_current';
 
         WHEN 'workspace' THEN
             parameter_name := 'utils_workspace_vdefault';
@@ -94,28 +94,28 @@ BEGIN
         WHEN 'netscenario' THEN
 		    query := 'SELECT t1.netscenario_id, t1.name FROM plan_netscenario AS t1 '
 		          || 'INNER JOIN config_param_user AS t2 ON t1.netscenario_id::text = t2.value '
-		          || 'WHERE t2.parameter = ''plan_netscenario_vdefault'' AND t2.cur_user = current_user';
+		          || 'WHERE t2.parameter = ''plan_netscenario_current'' AND t2.cur_user = current_user';
 		    EXECUTE query INTO v_type_id, v_type_name;
 		    result := json_build_object('netscenario_id', v_type_id, 'name', v_type_name);
 
         WHEN 'psector' THEN
             query := 'SELECT t1.psector_id, t1.name FROM plan_psector AS t1 '
                   || 'INNER JOIN config_param_user AS t2 ON t1.psector_id::text = t2.value '
-                  || 'WHERE t2.parameter = ''plan_psector_vdefault'' AND t2.cur_user = current_user';
+                  || 'WHERE t2.parameter = ''plan_psector_current'' AND t2.cur_user = current_user';
             EXECUTE query INTO v_type_id, v_type_name;
             result := json_build_object('psector_id', v_type_id, 'name', v_type_name);
 
         WHEN 'hydrology' THEN
             query := 'SELECT t1.hydrology_id, t1.name FROM cat_hydrology AS t1 '
                   || 'INNER JOIN config_param_user AS t2 ON t1.hydrology_id::text = t2.value '
-                  || 'WHERE t2.parameter = ''inp_options_hydrology_scenario'' AND t2.cur_user = current_user';
+                  || 'WHERE t2.parameter = ''inp_options_hydrology_current'' AND t2.cur_user = current_user';
             EXECUTE query INTO v_type_id, v_type_name;
             result := json_build_object('hydrology_id', v_type_id, 'name', v_type_name);
 
         WHEN 'dwf' THEN
             query := 'SELECT t1.id, t1.idval FROM cat_dwf AS t1 '
                   || 'INNER JOIN config_param_user AS t2 ON t1.id::text = t2.value '
-                  || 'WHERE t2.parameter = ''inp_options_dwfscenario'' AND t2.cur_user = current_user';
+                  || 'WHERE t2.parameter = ''inp_options_dwfscenario_current'' AND t2.cur_user = current_user';
             EXECUTE query INTO v_type_id, v_type_name;
             result := json_build_object('dwf_id', v_type_id, 'name', v_type_name);
 

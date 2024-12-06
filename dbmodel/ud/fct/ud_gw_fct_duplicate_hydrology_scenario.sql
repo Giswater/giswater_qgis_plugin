@@ -11,7 +11,7 @@ RETURNS json AS
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_duplicate_hydrology_scenario($${"client":{"device":4, "lang":"ca_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, 
+SELECT SCHEMA_NAME.gw_fct_duplicate_hydrology_scenario($${"client":{"device":4, "lang":"ca_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{},
 "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"copyFrom":"1", "name":"11111", "text":"asasg", "expl":"1", "active":"true"}, "aux_params":null}}$$);
 
 -- fid: 459
@@ -106,7 +106,7 @@ BEGIN
 
 
 	-- setting current dwf for user
-	UPDATE config_param_user SET value = v_scenarioid WHERE cur_user = current_user AND parameter = 'inp_options_hydrology_scenario';
+	UPDATE config_param_user SET value = v_scenarioid WHERE cur_user = current_user AND parameter = 'inp_options_hydrology_current';
 
 	-- manage log (fid: v_fid)
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 1, concat('The new hydrology scenario (',v_name,') is now your current scenario.'));

@@ -171,7 +171,7 @@ BEGIN
 			END LOOP;
 		end loop;
 		-- set selector
-		UPDATE config_param_user SET value = v_target WHERE parameter = 'inp_options_dwfscenario' AND cur_user = current_user;
+		UPDATE config_param_user SET value = v_target WHERE parameter = 'inp_options_dwfscenario_current' AND cur_user = current_user;
 
 	END IF;
 

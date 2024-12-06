@@ -55,7 +55,7 @@ BEGIN
 	SELECT giswater, project_type INTO v_version, v_projecttype FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- getting variables
-	v_inp_hydrology = (SELECT value FROM config_param_user WHERE parameter = 'inp_options_hydrology_scenario' AND cur_user = current_user limit 1);
+	v_inp_hydrology = (SELECT value FROM config_param_user WHERE parameter = 'inp_options_hydrology_current' AND cur_user = current_user limit 1);
 
 	-- getting input data
 	v_name :=  ((p_data ->>'data')::json->>'parameters')::json->>'name';
@@ -102,7 +102,7 @@ BEGIN
 		VALUES (v_fid, null, 3, concat('ERROR: The hydrology scenario ( ',v_scenarioid,' ) already exists with proposed name ',v_name ,'. Please try another one.'));
 	ELSE
 		-- setting current dwf for user
-		UPDATE config_param_user SET value = v_scenarioid WHERE cur_user = current_user AND parameter = 'inp_options_hydrology_scenario';
+		UPDATE config_param_user SET value = v_scenarioid WHERE cur_user = current_user AND parameter = 'inp_options_hydrology_current';
 
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, 'The new dscenario have been created sucessfully');
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, concat('This new hydrology scenario is now your current scenario.'));

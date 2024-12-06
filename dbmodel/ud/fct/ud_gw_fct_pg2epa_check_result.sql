@@ -126,8 +126,8 @@ BEGIN
 	DELETE FROM audit_check_data WHERE id < 0;
 
 	-- get user parameters
-	v_hydroscenarioval = (SELECT name FROM config_param_user JOIN cat_hydrology c ON value = hydrology_id::text WHERE parameter = 'inp_options_hydrology_scenario' AND cur_user = current_user);
-	v_dwfscenarioval = (SELECT idval FROM config_param_user JOIN cat_dwf c ON value = c.id::text WHERE parameter = 'inp_options_dwfscenario' AND cur_user = current_user);
+	v_hydroscenarioval = (SELECT name FROM config_param_user JOIN cat_hydrology c ON value = hydrology_id::text WHERE parameter = 'inp_options_hydrology_current' AND cur_user = current_user);
+	v_dwfscenarioval = (SELECT idval FROM config_param_user JOIN cat_dwf c ON value = c.id::text WHERE parameter = 'inp_options_dwfscenario_current' AND cur_user = current_user);
 	IF v_dwfscenarioval IS NULL THEN
 		v_dwfscenarioval = 'No dwf scenario chosen';
 	END IF;
@@ -346,7 +346,7 @@ BEGIN
 			VALUES (v_fid, v_result_id, 1, concat('INFO: Column rted on scenario subcatchments have been checked without any values missed.'));
 		END IF;
 
-		SELECT infiltration INTO v_infiltration FROM cat_hydrology JOIN config_param_user ON hydrology_id=value::integer WHERE cur_user=current_user AND parameter = 'inp_options_hydrology_scenario';
+		SELECT infiltration INTO v_infiltration FROM cat_hydrology JOIN config_param_user ON hydrology_id=value::integer WHERE cur_user=current_user AND parameter = 'inp_options_hydrology_current';
 
 		IF v_infiltration='CURVE_NUMBER' THEN
 

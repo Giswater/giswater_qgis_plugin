@@ -74,21 +74,21 @@ BEGIN
     v_formname := ((p_data::json->>'form')::json->>'formName');
 
     raise notice 'v_fields %', v_fields;
-	
+
     FOR v_json IN SELECT * FROM json_array_elements(v_fields) as v_text
     LOOP
-    
+
 	-- Get values from json
 	v_widget:= (SELECT (v_json ->> 'widget')) ;
 	v_chk:= (SELECT (v_json ->> 'chk')) ;
 	v_value:= (SELECT (v_json ->> 'value')) ;
 	v_isChecked:= (SELECT (v_json ->> 'isChecked')) ;
 	v_widgettype:= (SELECT (v_json ->> 'widget_type')) ;
-		
+
 	IF v_json ->> 'sysRoleId' = 'role_admin' THEN
 		v_table:= 'config_param_system';
 
-		EXECUTE 'SELECT * FROM '|| quote_ident(v_table) ||' WHERE parameter = $1' 
+		EXECUTE 'SELECT * FROM '|| quote_ident(v_table) ||' WHERE parameter = $1'
 		INTO result
 		USING v_widget;
 
@@ -96,17 +96,17 @@ BEGIN
 
 		EXECUTE 'UPDATE '|| quote_ident(v_table) ||' SET value = $1 WHERE parameter = $2'
 		USING  v_value, v_widget;
-		
+
 		END IF;
 
 	ELSE
 		v_table:= 'config_param_user';
 
-		EXECUTE 'SELECT * FROM '|| quote_ident(v_table) ||' WHERE parameter = $1 AND cur_user=current_user' 
+		EXECUTE 'SELECT * FROM '|| quote_ident(v_table) ||' WHERE parameter = $1 AND cur_user=current_user'
 		INTO result
 		USING v_widget;
 		RAISE NOTICE 'result: %',result;
-		
+
 		-- Perform INSERT
 		IF v_isChecked = 'True' THEN
 
@@ -114,13 +114,13 @@ BEGIN
 
 			EXECUTE 'UPDATE '|| quote_ident(v_table) ||' SET value = $1 WHERE parameter = $2 AND cur_user=current_user'
 			USING  v_value, v_widget;
-			
+
 			ELSE
 
 			EXECUTE 'INSERT INTO '|| quote_ident(v_table) ||' (parameter, value, cur_user) VALUES ($1, $2, current_user)'
 			USING  v_widget, v_value;
 			END IF;
-			
+
 		ELSIF v_isChecked = 'False' THEN
 
 			IF v_widgettype = 'check' THEN
@@ -131,19 +131,19 @@ BEGIN
 
 				EXECUTE 'DELETE FROM '|| quote_ident(v_table) ||' WHERE parameter = $1 AND cur_user=current_user'
 				USING v_widget;
-				
+
 				END IF;
 			END IF;
 		ELSIF v_formname = 'epaoptions' THEN
 			EXECUTE 'UPDATE '|| quote_ident(v_table) ||' SET value = $1 WHERE parameter = $2 AND cur_user=current_user'
-			USING  v_value, v_widget;			
+			USING  v_value, v_widget;
 		END IF;
 	END IF;
    END LOOP;
 
 	-- get uservalues
 	PERFORM gw_fct_workspacemanager($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},"data":{"filterFields":{}, "pageInfo":{}, "action":"CHECK"}}$$);
-	v_uservalues = (SELECT to_json(array_agg(row_to_json(a))) FROM (SELECT parameter, value FROM config_param_user WHERE parameter IN ('plan_psector_vdefault', 'utils_workspace_vdefault')
+	v_uservalues = (SELECT to_json(array_agg(row_to_json(a))) FROM (SELECT parameter, value FROM config_param_user WHERE parameter IN ('plan_psector_current', 'utils_workspace_vdefault')
 	AND cur_user = current_user ORDER BY parameter)a);
 
 	-- Control nulls
@@ -156,9 +156,9 @@ BEGIN
 			',"feature":{}'||
 			',"data":{ "userValues":'||v_uservalues||'}}'||
 	    '}')::json;
-	    
+
 	-- Exception handling
-	EXCEPTION WHEN OTHERS THEN 
+	EXCEPTION WHEN OTHERS THEN
 	RETURN json_build_object('status', 'Failed', 'NOSQLERR', SQLERRM, 'message', json_build_object('level', right(SQLSTATE, 1), 'text', SQLERRM),  'version', v_version, 'SQLSTATE', SQLSTATE)::json;
 
 END;

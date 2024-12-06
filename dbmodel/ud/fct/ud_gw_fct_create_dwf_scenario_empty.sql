@@ -54,7 +54,7 @@ BEGIN
 	SELECT giswater, project_type INTO v_version, v_projecttype FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- getting variables
-	v_inp_dwf = (SELECT value FROM config_param_user WHERE parameter = 'inp_options_dwfscenario' AND cur_user = current_user limit 1);
+	v_inp_dwf = (SELECT value FROM config_param_user WHERE parameter = 'inp_options_dwfscenario_current' AND cur_user = current_user limit 1);
 
 	-- getting input data
 	v_idval :=  ((p_data ->>'data')::json->>'parameters')::json->>'idval';
@@ -107,7 +107,7 @@ BEGIN
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, 'The new dscenario is now your current DWF scenario');
 
 		-- setting current dwf for user
-		UPDATE config_param_user SET value = v_scenarioid WHERE cur_user = current_user AND parameter = 'inp_options_dwfscenario';
+		UPDATE config_param_user SET value = v_scenarioid WHERE cur_user = current_user AND parameter = 'inp_options_dwfscenario_current';
 	END IF;
 
 	-- insert spacers

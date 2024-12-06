@@ -14,7 +14,7 @@ INSERT INTO config_param_user VALUES ('edit_gratecat_vdefault', 'N/I', current_u
 INSERT INTO config_param_user VALUES ('plan_psector_gexpenses_vdefault', '19.00', current_user);
 INSERT INTO config_param_user VALUES ('plan_psector_vat_vdefault', '21.00', current_user);
 INSERT INTO config_param_user VALUES ('plan_psector_other_vdefault', '4.00', current_user);
-INSERT INTO config_param_user VALUES ('plan_psector_vdefault', '1', current_user);
+INSERT INTO config_param_user VALUES ('plan_psector_current', '1', current_user);
 INSERT INTO config_param_user VALUES ('edit_arccat_vdefault', 'CC040', current_user);
 INSERT INTO config_param_user VALUES ('edit_state_vdefault', '1', current_user);
 INSERT INTO config_param_user VALUES ('edit_workcat_vdefault', 'work1', current_user);
@@ -108,7 +108,7 @@ INSERT INTO config_param_user VALUES ('inp_options_vdefault', '{"status":true, "
 "outlet":{"outletType":"TABULAR/DEPTH", "cd1":null, "cd2":null, "flap":"NO"},
 "pump":{},
 "raingage":{"scf":1}}}', current_user);
-INSERT INTO config_param_user VALUES ('inp_options_hydrology_scenario', '1', current_user);
+INSERT INTO config_param_user VALUES ('inp_options_hydrology_current', '1', current_user);
 INSERT INTO config_param_user VALUES ('inp_options_flow_units', 'CMS', current_user);
 INSERT INTO config_param_user VALUES ('inp_options_flow_routing', 'DYNWAVE', current_user);
 INSERT INTO config_param_user VALUES ('inp_options_link_offsets', 'ELEVATION', current_user);
@@ -116,7 +116,7 @@ INSERT INTO config_param_user VALUES ('inp_options_networkmode', '1', current_us
 INSERT INTO config_param_user VALUES ('inp_options_variable_step', '0.75', current_user);
 INSERT INTO config_param_user VALUES ('inp_options_minimum_step', '0.5', current_user);
 INSERT INTO config_param_user VALUES ('edit_node2arc_update_disable', 'false', current_user);
-INSERT INTO config_param_user VALUES ('inp_options_dwfscenario', NULL, current_user);
+INSERT INTO config_param_user VALUES ('inp_options_dwfscenario_current', NULL, current_user);
 INSERT INTO config_param_user VALUES ('inp_report_nodes', NULL, current_user);
 INSERT INTO config_param_user VALUES ('inp_report_nodes_2', NULL, current_user);
 INSERT INTO config_param_user VALUES ('inp_report_links', NULL, current_user);

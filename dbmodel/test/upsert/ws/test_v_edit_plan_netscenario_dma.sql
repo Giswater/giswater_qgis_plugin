@@ -14,9 +14,10 @@ SELECT plan(6);
 
 insert into plan_netscenario (netscenario_id) values (-901);
 
-INSERT INTO selector_netscenario (netscenario_id, cur_user) values (-901, current_user);
+INSERT INTO config_param_user ("parameter", value, cur_user) VALUES ('plan_netscenario_current', '-901', current_user)
+ON CONFLICT ("parameter", cur_user) DO UPDATE SET value = EXCLUDED.value;
 
-INSERT INTO v_edit_plan_netscenario_dma (netscenario_id, netscenario_name, dma_id, "name", pattern_id, graphconfig, the_geom, active, stylesheet, expl_id2) 
+INSERT INTO v_edit_plan_netscenario_dma (netscenario_id, netscenario_name, dma_id, "name", pattern_id, graphconfig, the_geom, active, stylesheet, expl_id2)
 VALUES(-901, '', -901, '', '', null, null, false, null, 0);
 SELECT is((SELECT count(*)::integer FROM v_edit_plan_netscenario_dma WHERE dma_id = -901), 1, 'INSERT: v_edit_plan_netscenario_dma -901 was inserted');
 SELECT is((SELECT count(*)::integer FROM plan_netscenario_dma WHERE dma_id = -901), 1, 'INSERT: plan_netscenario_dma -901 was inserted');
