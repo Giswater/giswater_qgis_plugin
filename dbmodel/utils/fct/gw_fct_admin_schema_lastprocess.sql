@@ -242,14 +242,15 @@ BEGIN
 				ALTER TABLE config_graph_mincut DROP COLUMN if exists _to_arc;
 				ALTER TABLE ext_rtc_hydrometer DROP COLUMN IF EXISTS hydrometer_category;
 				ALTER TABLE ext_rtc_hydrometer DROP COLUMN IF EXISTS cat_hydrometer_id ;
+				
 			ELSE
 				ALTER TABLE cat_arc_shape DROP COLUMN if exists _tsect_id;
 				ALTER TABLE cat_arc_shape DROP COLUMN if exists _curve_id;
 				ALTER TABLE node DROP COLUMN if exists _sys_elev;
-				ALTER TABLE arc DROP COLUMN if exists _sys_length;
 
 			END IF;
-
+			
+			ALTER TABLE arc DROP COLUMN if exists _sys_length;
 			ALTER TABLE sys_addfields DROP COLUMN if exists _default_value_;
 			ALTER TABLE sys_addfields DROP COLUMN if exists _form_label_;
 			ALTER TABLE sys_addfields DROP COLUMN if exists _widgettype_id_;
