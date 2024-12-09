@@ -13,7 +13,7 @@ from qgis.core import QgsMapToPixel
 from qgis.gui import QgsVertexMarker
 
 from ..maptool import GwMaptool
-from ...ui.ui_manager import GwDialogTextUi, GwPsectorUi
+from ...ui.ui_manager import GwDialogShowExceptionUi, GwPsectorUi
 from ...utils import tools_gw
 from ....libs import lib_vars, tools_qt, tools_qgis, tools_db, tools_os
 
@@ -231,11 +231,11 @@ class GwArcDivideButton(GwMaptool):
             if result and result['status'] == 'Accepted':
                 log = tools_gw.get_config_parser("user_edit_tricks", "arc_divide_disable_showlog", 'user', 'init')
                 if not tools_os.set_boolean(log, False):
-                    self.dlg_dtext = GwDialogTextUi(self, 'arc_divide')
-                    tools_gw.load_settings(self.dlg_dtext)
-                    tools_gw.fill_tab_log(self.dlg_dtext, result['body']['data'], False, True, 1)
-                    self.dlg_dtext.finished.connect(partial(tools_gw.save_settings, self.dlg_dtext))
-                    tools_gw.open_dialog(self.dlg_dtext)
+                    self.dlg_exception = GwDialogShowExceptionUi(self, 'arc_divide')
+                    tools_gw.load_settings(self.dlg_exception)
+                    tools_gw.fill_tab_log(self.dlg_exception, result['body']['data'], False, True, 1)
+                    self.dlg_exception.finished.connect(partial(tools_gw.save_settings, self.dlg_exception))
+                    tools_gw.open_dialog(self.dlg_exception)
         else:
             message = "Move node: Error updating geometry"
             tools_qgis.show_warning(message)

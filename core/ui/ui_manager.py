@@ -457,8 +457,8 @@ class GwLoadMenuUi(GwDialog, FORM_CLASS):
 
 
 # region SHARED
-FORM_CLASS = _get_ui_class('dialog_text.ui')
-class GwDialogTextUi(GwDialog, FORM_CLASS):
+FORM_CLASS = _get_ui_class('show_exception.ui')
+class GwDialogShowExceptionUi(GwDialog, FORM_CLASS):
     pass
 
 FORM_CLASS = _get_ui_class('info_catalog.ui')
