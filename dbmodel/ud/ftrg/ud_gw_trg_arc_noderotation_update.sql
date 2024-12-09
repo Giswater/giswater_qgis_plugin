@@ -17,11 +17,14 @@ DECLARE
     ang_aux float;
     count int2;
     azm_aux float;
+	v_srid numeric;
 
         
 BEGIN 
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
+	
+	v_srid = (SELECT epsg FROM sys_version ORDER BY id DESC LIMIT 1);
 	
 	IF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_noderotation_update_dsbl' AND cur_user=current_user) IS NOT TRUE THEN 
     
@@ -133,6 +136,79 @@ BEGIN
 				ELSIF (SELECT rotation FROM node where node_id = rec_node.node_id) > 360 then
 					UPDATE node set rotation = rotation -360 where node_id =  rec_node.node_id;
 				END IF;
+				
+				
+				-- set label_quadrant, label_x and label_y according to cat_Feature
+			
+				EXECUTE '
+				SELECT addparam->''labelPosition''->''dist''->>0  from cat_feature WHERE id = '||quote_literal(rec_node.node_type)||'					
+				' INTO v_dist_xlab;
+			
+				EXECUTE '
+				SELECT addparam->''labelPosition''->''dist''->>1  from cat_feature WHERE id = '||quote_literal(rec_node.node_type)||'					
+				' INTO v_dist_ylab;
+				
+				if v_dist_xlab is not null and v_dist_ylab is not null then --continue only with not-null values
+				
+					-- prev calc: current label position
+					select st_setsrid(st_makepoint(label_x::numeric, label_y::numeric), v_srid) 
+					into v_label_point from node where node_id = rec_node.node_id;
+				
+					-- prev calc: geom of the rec_node
+					execute 'select the_geom from node where node_id = '||quote_literal(rec_node.node_id)||''  
+					into v_geom;
+					
+					--prev calc: angle between rec_node.node and its label
+					v_sql = '
+					with mec as (
+						SELECT 
+						n.the_geom as vertex_point,
+						n.rotation as rotation_node,
+						$1 as point1,
+						ST_LineInterpolatePoint(a.the_geom, ST_LineLocatePoint(a.the_geom, n.the_geom)) as point2
+						from node n, arc a  where n.node_id = $2 and st_dwithin (a.the_geom, n.the_geom, 0.001) limit 1
+					)
+					select degrees(ST_Azimuth(vertex_point, point1))
+					from mec';
+				
+					execute v_sql into v_cur_rotation using v_label_point, rec_node.node_id;
+				   		
+					-- start process: calc intermediate rotations to project the label
+				   if (v_dist_xlab > 0 and v_dist_ylab > 0) -- top right
+					or (v_dist_xlab < 0 and v_dist_ylab < 0) -- bottom left
+					then 
+						v_rot1 = 90+rec_node.rotation; 
+						v_rot2 = 0+rec_node.rotation; 
+					
+					elsif (v_dist_xlab > 0 and v_dist_ylab < 0) -- bottom right
+					or 	  (v_dist_xlab < 0 and v_dist_ylab > 0) -- top left
+					then 
+						v_rot1 = 0+rec_node.rotation;
+						v_rot2 = 90+rec_node.rotation; 
+					
+					end if;
+				
+					
+				   	-- new label position
+					v_sql = '
+					with mec as (
+					select the_geom, ST_Project(ST_Transform(the_geom, 4326)::geography, '||v_dist_ylab||', radians('||v_rot1||')) as eee
+					FROM node WHERE node_id = '||QUOTE_LITERAL(rec_node.node_id)||'), lab_point as (
+					SELECT ST_Project(ST_Transform(eee::geometry, 4326)::geography, '||v_dist_xlab||', radians('||v_rot2||')) as fff
+					from mec)
+					select st_transform(fff::geometry, '||v_srid||') as label_p from lab_point';
+								
+					execute v_sql into v_label_point;
+										
+				
+					update node set label_rotation = rec_node.rotation where node_id = rec_node.node_id;
+				
+					update node set label_x = st_x(v_label_point) where node_id = rec_node.node_id;
+					update node set label_y = st_y(v_label_point) where node_id = rec_node.node_id;
+					
+						
+				end if;
+				
 				
 			END LOOP;
 		

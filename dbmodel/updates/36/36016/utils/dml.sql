@@ -30,3 +30,11 @@ update node set muni_id  = 0 WHERE muni_id is null;
 update connec set muni_id  = 0 WHERE muni_id is null;
 update element set muni_id  = 0 WHERE muni_id is null;
 update dimensions set muni_id  = 0 WHERE muni_id is null;
+
+INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('label_quadrant', 'TL', 'TL', NULL, NULL);
+INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('label_quadrant', 'TR', 'TR', NULL, NULL);
+INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('label_quadrant', 'BL', 'BL', NULL, NULL);
+INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('label_quadrant', 'BR', 'BR', NULL, NULL);
+
+UPDATE config_form_fields SET dv_querytext='select id, idval from edit_typevalue where typevalue = ''label_quadrant''' WHERE columnname='label_quadrant';
+
