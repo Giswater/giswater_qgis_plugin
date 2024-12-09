@@ -345,7 +345,7 @@ INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tab
 
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'epa_selector', 'tab_none', 'tab_main', 'lyt_epa_select_1', 0, NULL, 'tabwidget', NULL, NULL, NULL, false, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"tabs":["tab_result", "tab_time"]}'::json, NULL, NULL, false, 0);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'epa_selector', 'tab_result', 'compare_date', 'lyt_time_2', 0, 'string', 'combo', 'Compare date', 'Compare date', NULL, false, false, true, false, false, NULL, NULL, false, NULL, NULL, NULL, '{"setMultiline":false}'::json, '{
-  "functionName": "setComboValues",
+  "functionName": "set_combo_values",
   "parameters": {
     "cmbListToChange": [
       "compare_time"
@@ -354,7 +354,7 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
   "module": "go2epa_selector_btn"
 }'::json, NULL, false, 0);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'epa_selector', 'tab_result', 'result_name_compare', 'lyt_result_1', 1, 'string', 'combo', 'Result name (to compare):', 'Result name (to compare)', NULL, false, false, true, false, false, 'SELECT result_id AS id, result_id AS idval FROM v_ui_rpt_cat_result WHERE status = ''COMPLETED''', NULL, true, NULL, NULL, NULL, '{"setMultiline":false}'::json, '{
-  "functionName": "setComboValues",
+  "functionName": "set_combo_values",
   "parameters": {
     "cmbListToChange": [
       "compare_date",
@@ -366,7 +366,7 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'epa_selector', 'tab_time', 'selector_time', 'lyt_time_1', 1, 'string', 'combo', 'Selector time', 'Selector time', NULL, false, false, true, false, false, NULL, NULL, true, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, 1);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'epa_selector', 'tab_result', 'compare_time', 'lyt_time_2', 1, 'string', 'combo', 'Compare time', 'Compare time', NULL, false, false, true, false, false, NULL, NULL, true, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, 1);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'epa_selector', 'tab_time', 'selector_date', 'lyt_time_1', 0, 'string', 'combo', 'Selector date', 'Selector date', NULL, false, false, true, false, false, NULL, NULL, false, NULL, NULL, NULL, '{"setMultiline":false}'::json, '{
-  "functionName": "setComboValues",
+  "functionName": "set_combo_values",
   "parameters": {
     "cmbListToChange": [
       "selector_time"
@@ -375,7 +375,7 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
   "module": "go2epa_selector_btn"
 }'::json, NULL, false, 0);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'epa_selector', 'tab_result', 'result_name_show', 'lyt_result_1', 0, 'string', 'combo', 'Result name (to show):', 'Result name', NULL, false, false, true, false, false, 'SELECT result_id AS id, result_id AS idval FROM v_ui_rpt_cat_result WHERE status = ''COMPLETED''', NULL, false, NULL, NULL, NULL, '{"setMultiline":false}'::json, '{
-  "functionName": "setComboValues",
+  "functionName": "set_combo_values",
   "parameters": {
     "cmbListToChange": [
       "selector_date",
