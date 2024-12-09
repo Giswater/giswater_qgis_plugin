@@ -291,3 +291,8 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"inp_dscena
 
 DROP TABLE IF EXISTS rtc_scada_x_dma;
 DROP TABLE IF EXISTS rtc_scada_x_sector;
+
+DROP TABLE IF EXISTS om_reh_cat_works;
+DROP TABLE IF EXISTS om_reh_parameter_x_works;
+DROP TABLE IF EXISTS om_reh_value_loc_condition;
+DROP TABLE IF EXISTS om_reh_works_x_pcompost;

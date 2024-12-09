@@ -10,7 +10,7 @@ SET client_min_messages TO WARNING;
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-SELECT plan(352);
+SELECT plan(348);
 
 SELECT has_table('anl_arc') AS "Table 'anl_arc' exists";
 SELECT has_table('anl_arc_x_node') AS "Table 'anl_arc_x_node' exists";
@@ -232,10 +232,6 @@ SELECT has_table('man_wjump') AS "Table 'man_wjump' exists";
 SELECT has_table('man_wwtp') AS "Table 'man_wwtp' exists";
 SELECT has_table('node') AS "Table 'node' exists";
 SELECT has_table('om_profile') AS "Table 'om_profile' exists";
-SELECT has_table('om_reh_cat_works') AS "Table 'om_reh_cat_works' exists";
-SELECT has_table('om_reh_parameter_x_works') AS "Table 'om_reh_parameter_x_works' exists";
-SELECT has_table('om_reh_value_loc_condition') AS "Table 'om_reh_value_loc_condition' exists";
-SELECT has_table('om_reh_works_x_pcompost') AS "Table 'om_reh_works_x_pcompost' exists";
 SELECT has_table('om_typevalue') AS "Table 'om_typevalue' exists";
 SELECT has_table('om_visit') AS "Table 'om_visit' exists";
 SELECT has_table('om_visit_cat') AS "Table 'om_visit_cat' exists";
