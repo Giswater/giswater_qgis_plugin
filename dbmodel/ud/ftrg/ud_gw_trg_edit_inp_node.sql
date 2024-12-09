@@ -67,7 +67,7 @@ BEGIN
 		(SELECT upper(value)  FROM config_param_user WHERE parameter = 'edit_update_elevation_from_dem' and cur_user = current_user) = 'TRUE' THEN
 		NEW.top_elev = (SELECT ST_Value(rast,1,NEW.the_geom,false) FROM ext_raster_dem WHERE id =
 		(SELECT id FROM ext_raster_dem WHERE st_dwithin (envelope, NEW.the_geom, 1) LIMIT 1));
-	END IF; 
+	END IF;
 
         UPDATE node
         SET nodecat_id=NEW.nodecat_id, sector_id=NEW.sector_id, annotation=NEW.annotation, state_type=NEW.state_type
@@ -85,7 +85,7 @@ BEGIN
 
         ELSIF v_node_table = 'inp_storage' THEN
             UPDATE inp_storage
-			SET storage_type=NEW.storage_type,curve_id=NEW.curve_id,a1=NEW.a1,a2=NEW.a2,a0=NEW.a0,fevap=NEW.fevap,sh=NEW.sh,hc=NEW.hc,imd=NEW.imd,y0=NEW.y0, ysur=NEW.ysur, apond=NEW.apond
+			SET storage_type=NEW.storage_type,curve_id=NEW.curve_id,a1=NEW.a1,a2=NEW.a2,a0=NEW.a0,fevap=NEW.fevap,sh=NEW.sh,hc=NEW.hc,imd=NEW.imd,y0=NEW.y0, ysur=NEW.ysur
 			WHERE node_id=OLD.node_id;
 
         ELSIF v_node_table = 'inp_outfall' THEN

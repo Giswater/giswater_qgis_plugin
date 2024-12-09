@@ -157,7 +157,7 @@ BEGIN
 			v_columns = v_scenarioid||', rg_id, form_type, intvl, scf, rgage_type, timser_id, fname, sta, units';
 
 		ELSIF v_targettable = 'inp_dscenario_storage' THEN
-			v_columns = v_scenarioid||', node_id, elev, ymax, storage_type, curve_id, a1, a2, a0, fevap, sh, hc, imd, y0, ysur, apond';
+			v_columns = v_scenarioid||', node_id, elev, ymax, storage_type, curve_id, a1, a2, a0, fevap, sh, hc, imd, y0, ysur';
 
 	 	ELSIF v_targettable = 'inp_dscenario_treatment' THEN
 			v_columns = v_scenarioid||', node_id, poll_id, function';

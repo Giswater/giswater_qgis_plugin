@@ -142,8 +142,6 @@ BEGIN
 		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.y0 IS NOT NULL;
 		UPDATE temp_t_node t SET ysur = d.ysur FROM inp_dscenario_storage d
 		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.ysur IS NOT NULL;
-		UPDATE temp_t_node t SET apond = d.apond FROM inp_dscenario_storage d
-		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.apond IS NOT NULL;
 		UPDATE temp_t_node t SET elev = d.elev FROM inp_dscenario_storage d
 		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.elev IS NOT NULL;
 		UPDATE temp_t_node t SET ymax = d.ymax FROM inp_dscenario_storage d

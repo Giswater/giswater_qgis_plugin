@@ -40,6 +40,9 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_ui_element('element_x_arc');
 CREATE TRIGGER gw_trg_ui_element INSTEAD OF INSERT OR DELETE OR UPDATE ON v_ui_element_x_gully
 FOR EACH ROW EXECUTE FUNCTION gw_trg_ui_element('element_x_gully');
 
+CREATE TRIGGER gw_trg_edit_inp_node_storage INSTEAD OF INSERT OR UPDATE OR DELETE
+ON v_edit_inp_storage FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_node('inp_storage');
+
 CREATE TRIGGER gw_trg_edit_inp_dscenario INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_dscenario_storage
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_dscenario('STORAGE');
 
@@ -187,3 +190,7 @@ CREATE TRIGGER gw_trg_edit_ve_epa_orifice INSTEAD OF INSERT OR DELETE OR UPDATE 
 -- 04/12/2024
 CREATE TRIGGER gw_trg_edit_inp_dwf INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_cat_dwf
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_dwf('cat_dwf');
+
+-- 09/12/2024
+CREATE TRIGGER gw_trg_edit_ve_epa_storage INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_epa_storage
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_ve_epa('storage');

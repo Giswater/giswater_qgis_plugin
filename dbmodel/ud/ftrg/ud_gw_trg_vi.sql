@@ -135,12 +135,12 @@ BEGIN
 			INSERT INTO man_storage (node_id) VALUES (NEW.node_id);
 
 			IF NEW.storage_type = 'FUNCTIONAL' THEN
-				INSERT INTO inp_storage(node_id,y0,storage_type,a1,a2,a0,apond, fevap, sh, hc, imd)
-				VALUES (NEW.node_id,NEW.y0,'FUNCTIONAL', NEW.other1::numeric, NEW.other2::numeric, NEW.other3::numeric, NEW.other4::numeric, NEW.other5::numeric, NEW.other6::numeric, NEW.other7::numeric, NEW.other8::numeric);
+				INSERT INTO inp_storage(node_id,y0,storage_type,a1,a2,a0, fevap, sh, hc, imd)
+				VALUES (NEW.node_id,NEW.y0,'FUNCTIONAL', NEW.other1::numeric, NEW.other2::numeric, NEW.other3::numeric, NEW.other4::numeric, NEW.other5::numeric, NEW.other6::numeric, NEW.other7::numeric);
 
 			ELSIF NEW.storage_type like 'TABULAR' THEN
-				INSERT INTO inp_storage(node_id,y0,storage_type,curve_id,apond,fevap, sh, hc, imd)
-				VALUES (NEW.node_id,NEW.y0,'TABULAR',NEW.other1, NEW.other2::numeric, NEW.other3::numeric, NEW.other4::numeric, NEW.other5::numeric, NEW.other6::numeric);
+				INSERT INTO inp_storage(node_id,y0,storage_type,curve_id,fevap, sh, hc, imd)
+				VALUES (NEW.node_id,NEW.y0,'TABULAR',NEW.other1, NEW.other2::numeric, NEW.other3::numeric, NEW.other4::numeric, NEW.other5::numeric);
 			END IF;
 
 		ELSIF v_view='vi_pumps' THEN

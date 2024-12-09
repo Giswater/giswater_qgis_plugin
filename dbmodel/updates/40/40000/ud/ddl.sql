@@ -281,3 +281,10 @@ ALTER TABLE doc_x_gully DROP CONSTRAINT doc_x_gully_doc_id_fkey;
 -- 09/12/2024
 ALTER SEQUENCE audit_psector_gully_traceability_id_seq RENAME TO archived_psector_gully_traceability_id_seq;
 ALTER TABLE audit_psector_gully_traceability RENAME TO archived_psector_gully_traceability;
+
+DROP VIEW IF EXISTS ve_epa_storage;
+DROP VIEW IF EXISTS v_edit_inp_dscenario_storage;
+DROP VIEW IF EXISTS v_edit_inp_storage;
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"inp_storage", "column":"apond"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"inp_dscenario_storage", "column":"apond"}}$$);

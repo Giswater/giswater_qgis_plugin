@@ -854,11 +854,10 @@ BEGIN
 	    temp_t_node.addparam::json ->> 'a1'::text AS other1,
 	    temp_t_node.addparam::json ->> 'a2'::text AS other2,
 	    temp_t_node.addparam::json ->> 'a0'::text AS other3,
-	    temp_t_node.apond::text AS other4,
-	    temp_t_node.addparam::json ->> 'fevap'::text AS other5,
-	    temp_t_node.addparam::json ->> 'sh'::text AS other6,
-	    temp_t_node.addparam::json ->> 'hc'::text AS other7,
-	    temp_t_node.addparam::json ->> 'imd'::text AS other8
+	    temp_t_node.addparam::json ->> 'fevap'::text AS other4,
+	    temp_t_node.addparam::json ->> 'sh'::text AS other5,
+	    temp_t_node.addparam::json ->> 'hc'::text AS other6,
+	    temp_t_node.addparam::json ->> 'imd'::text AS other7
 	   FROM temp_t_node
 	  WHERE temp_t_node.epa_type::text = 'STORAGE'::text AND (temp_t_node.addparam::json ->> 'storage_type'::text) = 'FUNCTIONAL'::text
 	UNION
@@ -868,11 +867,10 @@ BEGIN
 	    temp_t_node.y0,
 	    temp_t_node.addparam::json ->> 'storage_type'::text AS storage_type,
 	    temp_t_node.addparam::json ->> 'curve_id'::text AS other1,
-	    temp_t_node.apond::text AS other2,
-	    temp_t_node.addparam::json ->> 'fevap'::text AS other3,
-	    temp_t_node.addparam::json ->> 'sh'::text AS other4,
-	    temp_t_node.addparam::json ->> 'hc'::text AS other5,
-	    temp_t_node.addparam::json ->> 'imd'::text AS other6,
+	    temp_t_node.addparam::json ->> 'fevap'::text AS other2,
+	    temp_t_node.addparam::json ->> 'sh'::text AS other3,
+	    temp_t_node.addparam::json ->> 'hc'::text AS other4,
+	    temp_t_node.addparam::json ->> 'imd'::text AS other5,
 	    NULL::text AS other7,
 	    NULL::text AS other8
 	   FROM temp_t_node

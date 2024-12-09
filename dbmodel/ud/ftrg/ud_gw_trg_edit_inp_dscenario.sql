@@ -206,11 +206,10 @@ BEGIN
 			IF NEW.imd IS NULL THEN NEW.imd = (SELECT imd FROM v_edit_inp_storage WHERE node_id = NEW.node_id);END IF;
 			IF NEW.y0 IS NULL THEN NEW.y0 = (SELECT y0 FROM v_edit_inp_storage WHERE node_id = NEW.node_id);END IF;
 			IF NEW.ysur IS NULL THEN NEW.ysur = (SELECT ysur FROM v_edit_inp_storage WHERE node_id = NEW.node_id);END IF;
-			IF NEW.apond IS NULL THEN NEW.apond = (SELECT apond FROM v_edit_inp_storage WHERE node_id = NEW.node_id);END IF;
 
-			INSERT INTO inp_dscenario_storage (dscenario_id, node_id, elev, ymax, storage_type, curve_id, a1, a2, a0, fevap, sh, hc, imd, y0, ysur, apond)
+			INSERT INTO inp_dscenario_storage (dscenario_id, node_id, elev, ymax, storage_type, curve_id, a1, a2, a0, fevap, sh, hc, imd, y0, ysur)
 			VALUES (NEW.dscenario_id, NEW.node_id, NEW.elev, NEW.ymax, NEW.storage_type, NEW.curve_id, NEW.a1, NEW.a2, NEW.a0,
-			NEW.fevap, NEW.sh, NEW.hc, NEW.imd, NEW.y0, NEW.ysur, NEW.apond);
+			NEW.fevap, NEW.sh, NEW.hc, NEW.imd, NEW.y0, NEW.ysur);
 
 	 	ELSIF v_dscenario_type = 'TREATMENT' THEN
 
@@ -291,7 +290,7 @@ BEGIN
 
 		ELSIF v_dscenario_type = 'STORAGE' THEN
 			UPDATE inp_dscenario_storage SET dscenario_id=NEW.dscenario_id, node_id=NEW.node_id, elev=NEW.elev, ymax=New.ymax, storage_type=NEW.storage_type, curve_id=NEW.curve_id,
-			a1=NEW.a1, a2=NEW.a2, a0=NEW.a0, fevap=NEW.fevap, sh=NEW.sh, hc=NEW.hc, imd=NEW.imd, y0=NEW.y0, ysur=NEW.ysur, apond=NEW.apond
+			a1=NEW.a1, a2=NEW.a2, a0=NEW.a0, fevap=NEW.fevap, sh=NEW.sh, hc=NEW.hc, imd=NEW.imd, y0=NEW.y0, ysur=NEW.ysur
 			WHERE dscenario_id=OLD.dscenario_id AND node_id=OLD.node_id;
 
 	 	ELSIF v_dscenario_type = 'TREATMENT' THEN

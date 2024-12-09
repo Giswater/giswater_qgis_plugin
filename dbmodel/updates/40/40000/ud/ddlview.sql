@@ -333,7 +333,7 @@ CREATE OR REPLACE VIEW v_edit_link AS
 	SELECT *
 	FROM vu_link
     JOIN v_state_link USING (link_id)) l;
-    
+
 CREATE OR REPLACE VIEW v_edit_link_connec AS
 	SELECT l.* FROM (
 	SELECT l.*
@@ -2562,7 +2562,6 @@ AS SELECT v_edit_node.node_id,
     inp_storage.imd,
     inp_storage.y0,
     inp_storage.ysur,
-    inp_storage.apond,
     v_edit_node.the_geom
     FROM v_edit_node
     JOIN inp_storage USING (node_id)
@@ -2674,7 +2673,6 @@ AS SELECT s.dscenario_id,
     f.imd,
     f.y0,
     f.ysur,
-    f.apond,
     v_edit_inp_storage.the_geom
     FROM selector_inp_dscenario s, inp_dscenario_storage f
     JOIN v_edit_inp_storage USING (node_id)
@@ -4797,3 +4795,28 @@ AS SELECT doc_x_gully.id,
     doc.user_name
    FROM doc_x_gully
      JOIN doc ON doc.id::text = doc_x_gully.doc_id::text;
+
+
+CREATE OR REPLACE VIEW ve_epa_storage
+AS SELECT inp_storage.node_id,
+    inp_storage.storage_type,
+    inp_storage.curve_id,
+    inp_storage.a1,
+    inp_storage.a2,
+    inp_storage.a0,
+    inp_storage.fevap,
+    inp_storage.sh,
+    inp_storage.hc,
+    inp_storage.imd,
+    inp_storage.y0,
+    inp_storage.ysur,
+    v_rpt_storagevol_sum.aver_vol,
+    v_rpt_storagevol_sum.avg_full,
+    v_rpt_storagevol_sum.ei_loss,
+    v_rpt_storagevol_sum.max_vol,
+    v_rpt_storagevol_sum.max_full,
+    v_rpt_storagevol_sum.time_days,
+    v_rpt_storagevol_sum.time_hour,
+    v_rpt_storagevol_sum.max_out
+   FROM inp_storage
+     LEFT JOIN v_rpt_storagevol_sum USING (node_id);
