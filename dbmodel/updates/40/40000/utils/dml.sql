@@ -745,3 +745,11 @@ DELETE FROM sys_table WHERE id = 'node_border_sector';
 -- 04/12/2024
 INSERT INTO doc (id, "name", doc_type, "path", observ, "date", user_name, tstamp, the_geom)
 SELECT id, "name", doc_type, "path", observ, "date", user_name, tstamp, the_geom FROM _doc;
+
+-- 09/12(2024
+INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('v_edit_link', 'tab_none', NULL, NULL, 'role_basic', NULL, '[
+  {
+    "actionName": "actionEdit",
+    "disabled": false
+  }
+]'::json, 0, '{4,5}');

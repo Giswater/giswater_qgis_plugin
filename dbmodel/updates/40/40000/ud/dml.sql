@@ -517,12 +517,7 @@ INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tab
   }
 ]'::json, 0, '{4,5}');
 INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('v_edit_inp_dwf', 'tab_none', NULL, NULL, 'role_basic', NULL, NULL, 0, '{4,5}');
-INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('v_edit_link', 'tab_none', NULL, NULL, 'role_basic', NULL, '[
-  {
-    "actionName": "actionEdit",
-    "disabled": false
-  }
-]'::json, 0, '{4,5}');
+
 
 UPDATE config_form_list
 	SET query_text='SELECT nodarc_id, to_arc, order_id, flwreg_length, ori_type, offsetval, cd, orate, flap, shape, geom1, geom2, geom3, geom4 FROM inp_flwreg_orifice WHERE id IS NOT NULL'
