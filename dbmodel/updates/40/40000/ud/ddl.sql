@@ -288,3 +288,6 @@ DROP VIEW IF EXISTS v_edit_inp_storage;
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"inp_storage", "column":"apond"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"inp_dscenario_storage", "column":"apond"}}$$);
+
+DROP TABLE IF EXISTS rtc_scada_x_dma;
+DROP TABLE IF EXISTS rtc_scada_x_sector;

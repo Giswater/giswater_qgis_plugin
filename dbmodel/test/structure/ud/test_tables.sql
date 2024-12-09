@@ -10,7 +10,7 @@ SET client_min_messages TO WARNING;
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-SELECT plan(354);
+SELECT plan(352);
 
 SELECT has_table('anl_arc') AS "Table 'anl_arc' exists";
 SELECT has_table('anl_arc_x_node') AS "Table 'anl_arc_x_node' exists";
@@ -317,8 +317,6 @@ SELECT has_table('rpt_warning_summary') AS "Table 'rpt_warning_summary' exists";
 SELECT has_table('rtc_hydrometer') AS "Table 'rtc_hydrometer' exists";
 SELECT has_table('rtc_hydrometer_x_connec') AS "Table 'rtc_hydrometer_x_connec' exists";
 SELECT has_table('rtc_scada_node') AS "Table 'rtc_scada_node' exists";
-SELECT has_table('rtc_scada_x_dma') AS "Table 'rtc_scada_x_dma' exists";
-SELECT has_table('rtc_scada_x_sector') AS "Table 'rtc_scada_x_sector' exists";
 SELECT has_table('samplepoint') AS "Table 'samplepoint' exists";
 SELECT has_table('sector') AS "Table 'sector' exists";
 SELECT has_table('selector_audit') AS "Table 'selector_audit' exists";
