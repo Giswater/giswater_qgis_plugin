@@ -120,12 +120,6 @@ BEGIN
 	   FROM inp_aquifer
 	  ORDER BY inp_aquifer.aquif_id;
 
-
-	CREATE OR REPLACE TEMP VIEW vi_t_backdrop AS
-	 SELECT inp_backdrop.text
-	   FROM inp_backdrop;
-
-
 	CREATE OR REPLACE TEMP VIEW vi_t_buildup AS
 	 SELECT inp_buildup.landus_id,
 	    inp_buildup.poll_id,
@@ -1348,7 +1342,7 @@ BEGIN
 		' ', rpad(csv21,20), ' ', rpad(csv22,20), ' ', rpad(csv23,20), ' ', rpad(csv24,20), ' ', rpad(csv25,20), ' ', rpad(csv26,20), ' ', rpad(csv27,20), ' ', rpad(csv28,20), ' ', rpad(csv29,20), ' ', rpad(csv30,20)) as text
 			from temp_t_csv where fid = 141 and cur_user = current_user and source is null
 		union
-			select id, csv1 as text from temp_t_csv where fid  = 141 and cur_user = current_user and source in ('vi_t_transects','vi_t_controls','vi_t_rules', 'vi_t_backdrop', 'vi_t_hydrographs','vi_t_polygons')
+			select id, csv1 as text from temp_t_csv where fid  = 141 and cur_user = current_user and source in ('vi_t_transects','vi_t_controls','vi_t_rules', 'vi_t_hydrographs','vi_t_polygons')
 		union
 			select id, concat(rpad(csv1,20), ' ', rpad(coalesce(csv2,''),20), ' ', rpad(coalesce(csv3,''),20), ' ', rpad(coalesce(csv4,''),20), ' ', rpad(coalesce(csv5,''),20), ' ', rpad(coalesce(csv6,''),20), ' ', csv7) as text
 			from temp_t_csv where fid  = 141 and cur_user = current_user and source in ('vi_t_junctions')
@@ -1379,7 +1373,7 @@ BEGIN
 			' ', rpad(coalesce(csv19,''),20), ' ',rpad(coalesce(csv20,''),20),' ',rpad(coalesce(csv21,''),20),' ',rpad(coalesce(csv22,''),20),' ',rpad(coalesce(csv23,''),20),' ',rpad(coalesce(csv24,''),20),
 			' ', rpad(coalesce(csv25,''),20),' ',rpad(coalesce(csv26,''),20),' ',rpad(coalesce(csv27,''),20),' ', rpad(coalesce(csv28,''),20), ' ', rpad(coalesce(csv29,''),20),' ',rpad(coalesce(csv30,''),20)) as text
 			from temp_t_csv where fid  = 141 and cur_user = current_user and source not in
-			('header','vi_t_controls','vi_t_rules', 'vi_t_backdrop', 'vi_t_adjustments','vi_t_evaporation', 'vi_t_files','vi_t_hydrographs','vi_t_polygons','vi_t_temperature','vi_t_transects',
+			('header','vi_t_controls','vi_t_rules', 'vi_t_adjustments','vi_t_evaporation', 'vi_t_files','vi_t_hydrographs','vi_t_polygons','vi_t_temperature','vi_t_transects',
 			'vi_t_raingages','vi_t_timeseries', 'vi_t_report', 'vi_t_map', 'vi_t_junctions', 'vi_t_conduits')
 		order by id
 		)a )row;
@@ -1391,7 +1385,6 @@ BEGIN
 
 	DROP VIEW IF EXISTS vi_t_adjustments;
 	DROP VIEW IF EXISTS vi_t_aquifers;
-	DROP VIEW IF EXISTS vi_t_backdrop;
 	DROP VIEW IF EXISTS vi_t_buildup;
 	DROP VIEW IF EXISTS vi_t_conduits;
 	DROP VIEW IF EXISTS vi_t_controls;

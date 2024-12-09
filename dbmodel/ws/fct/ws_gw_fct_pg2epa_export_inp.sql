@@ -48,9 +48,6 @@ BEGIN
 	v_result = (p_data->>'data')::json->>'resultId';
 	v_client_epsg = (p_data->>'client')::json->>'epsg';
 
-	CREATE OR REPLACE TEMP VIEW vi_t_backdrop AS
-	SELECT inp_backdrop.text FROM inp_backdrop;
-
 	CREATE OR REPLACE TEMP VIEW vi_t_controls AS
 	 SELECT c.text
 	   FROM ( SELECT inp_controls.id,
@@ -637,7 +634,6 @@ BEGIN
 	END LOOP;
 
 	-- drop views
-	DROP VIEW IF EXISTS vi_t_backdrop;
 	DROP VIEW IF EXISTS vi_t_controls;
 	DROP VIEW IF EXISTS vi_t_coordinates;
 	DROP VIEW IF EXISTS vi_t_curves;
@@ -704,7 +700,7 @@ BEGIN
 		union
 			select id, concat(rpad(csv1,22), ' ', csv2)as text from temp_t_csv where fid  = 141 and cur_user = current_user and source in ('header')
 		union
-			select id, csv1 as text from temp_t_csv where fid  = 141 and cur_user = current_user and source in ('vi_t_controls','vi_t_rules', 'vi_t_backdrop')
+			select id, csv1 as text from temp_t_csv where fid  = 141 and cur_user = current_user and source in ('vi_t_controls','vi_t_rules')
 		union
 			-- spacer-19 it's used because a rare bug reading epanet when spacer=20 on target [PATTERNS]????
 			select id, concat(rpad(csv1,20),' ',rpad(coalesce(csv2,''),19),' ', rpad(coalesce(csv3,''),19),' ',rpad(coalesce(csv4,''),19),' ',rpad(coalesce(csv5,''),19),
@@ -717,7 +713,7 @@ BEGIN
 			' ',rpad(coalesce(csv6,''),20),	' ',rpad(coalesce(csv7,''),20),' ',rpad(coalesce(csv8,''),20),' ',rpad(coalesce(csv9,''),20),' ',rpad(coalesce(csv10,''),20),
 			' ',rpad(coalesce(csv11,''),20),' ',rpad(coalesce(csv12,''),20),' ',rpad(csv13,20),' ',rpad(csv14,20),' ',rpad(csv15,20),' ', rpad(csv15,20),' ',
 			rpad(csv16,20),	' ',rpad(csv17,20),' ', rpad(csv20,20), ' ', rpad(csv19,20),' ',rpad(csv20,20)) as text
-			from temp_t_csv where source not in ('header','vi_t_controls','vi_t_rules', 'vi_t_backdrop','vi_t_patterns', 'vi_t_reactions','vi_t_junctions', 'vi_t_tanks',
+			from temp_t_csv where source not in ('header','vi_t_controls','vi_t_rules','vi_t_patterns', 'vi_t_reactions','vi_t_junctions', 'vi_t_tanks',
 			'vi_t_valves','vi_t_reservoirs','vi_t_pipes','vi_t_pumps', 'vi_t_demands')
 		order by id)a )row;
 

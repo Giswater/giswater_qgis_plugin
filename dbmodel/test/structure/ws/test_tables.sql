@@ -130,7 +130,6 @@ SELECT has_table('ext_rtc_scada_x_data') AS "Table 'ext_rtc_scada_x_data' exists
 SELECT has_table('ext_streetaxis') AS "Table 'ext_streetaxis' exists";
 SELECT has_table('ext_timeseries') AS "Table 'ext_timeseries' exists";
 SELECT has_table('ext_type_street') AS "Table 'ext_type_street' exists";
-SELECT has_table('inp_backdrop') AS "Table 'inp_backdrop' exists";
 SELECT has_table('inp_connec') AS "Table 'inp_connec' exists";
 SELECT has_table('inp_controls') AS "Table 'inp_controls' exists";
 SELECT has_table('inp_curve') AS "Table 'inp_curve' exists";

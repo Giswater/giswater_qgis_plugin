@@ -131,7 +131,6 @@ SELECT has_table('ext_type_street') AS "Table 'ext_type_street' exists";
 SELECT has_table('gully') AS "Table 'gully' exists";
 SELECT has_table('inp_adjustments') AS "Table 'inp_adjustments' exists";
 SELECT has_table('inp_aquifer') AS "Table 'inp_aquifer' exists";
-SELECT has_table('inp_backdrop') AS "Table 'inp_backdrop' exists";
 SELECT has_table('inp_buildup') AS "Table 'inp_buildup' exists";
 SELECT has_table('inp_conduit') AS "Table 'inp_conduit' exists";
 SELECT has_table('inp_controls') AS "Table 'inp_controls' exists";

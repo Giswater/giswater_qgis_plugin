@@ -184,3 +184,6 @@ ALTER SEQUENCE audit_psector_node_traceability_id_seq RENAME TO archived_psector
 ALTER TABLE audit_psector_arc_traceability RENAME TO archived_psector_arc_traceability;
 ALTER TABLE audit_psector_connec_traceability RENAME TO archived_psector_connec_traceability;
 ALTER TABLE audit_psector_node_traceability RENAME TO archived_psector_node_traceability;
+
+DROP VIEW IF EXISTS vi_backdrop;
+DROP TABLE IF EXISTS inp_backdrop;

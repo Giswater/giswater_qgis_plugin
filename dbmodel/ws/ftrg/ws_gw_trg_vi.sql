@@ -10,22 +10,22 @@ This version of Giswater is provided by Giswater Association
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_vi()
   RETURNS trigger AS
 $BODY$
-DECLARE 
+DECLARE
   v_view text;
   v_epsg integer;
   geom_array public.geometry array;
   v_point_geom public.geometry;
   rec_arc record;
 
-  
+
 BEGIN
 
     --Get schema name
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
-    
+
     -- Get SRID
   SELECT epsg INTO v_epsg FROM sys_version ORDER BY id DESC LIMIT 1;
-  
+
     --Get view name
     v_view = TG_ARGV[0];
 
@@ -33,51 +33,51 @@ BEGIN
     --split_part(NEW.other_val,';',1) splitting the values concatenated in a vie in order to put it in separated fields of a view
     --nullif(split_part(NEW.other_val,';',1),'')::numeric in case of trying to split the value that may not exist(optional value),
     --nullif function returns null instead of cast value error in case when there is no value in the inp data
-    
-   IF TG_OP = 'INSERT' THEN
-	    
 
-	  IF v_view='vi_pumps' THEN 
-	    INSERT INTO arc (arc_id, node_1, node_2, arccat_id, epa_type, sector_id, dma_id, expl_id, state, state_type) 
+   IF TG_OP = 'INSERT' THEN
+
+
+	  IF v_view='vi_pumps' THEN
+	    INSERT INTO arc (arc_id, node_1, node_2, arccat_id, epa_type, sector_id, dma_id, expl_id, state, state_type)
 	    VALUES (NEW.arc_id, NEW.node_1, NEW.node_2, 'ARCPUMP','VIRTUALPUMP',1,1,1,1,(SELECT id FROM value_state_type WHERE state=1 LIMIT 1));
 	    IF NEW.power ='POWER' THEN
 			NEW.power=NEW.head;
 	    ELSIF NEW.power ='HEAD' THEN
-			NEW.power=NULL;	   
+			NEW.power=NULL;
 	    END IF;
-	    
+
 	    INSERT INTO inp_virtualpump (arc_id,power,curve_id,speed,pattern_id)
 	    VALUES (NEW.arc_id,NEW.power, NEW.head, NEW.speed::numeric, NEW.pattern_id);
-	    INSERT INTO man_pipe (arc_id) VALUES (NEW.arc_id); 
-	    
+	    INSERT INTO man_pipe (arc_id) VALUES (NEW.arc_id);
+
 	  ELSIF v_view='vi_valves' THEN
-	    INSERT INTO arc (arc_id, node_1, node_2, arccat_id, epa_type, sector_id, dma_id, expl_id, state, state_type) 
+	    INSERT INTO arc (arc_id, node_1, node_2, arccat_id, epa_type, sector_id, dma_id, expl_id, state, state_type)
 	    VALUES (NEW.arc_id, NEW.node_1, NEW.node_2, concat('ARC',NEW.valv_type),'VIRTUALVALVE',1,1,1,1,(SELECT id FROM value_state_type WHERE state=1 LIMIT 1));
 	    INSERT INTO inp_virtualvalve (arc_id, diameter, valv_type, minorloss) VALUES (NEW.arc_id,NEW.diameter, NEW.valv_type, NEW.minorloss);
 	      IF NEW.valv_type IN ('PRV','PSV','PBV') THEN
 		UPDATE inp_virtualvalve SET pressure=NEW.setting::numeric WHERE arc_id=NEW.arc_id;
-	      ELSIF NEW.valv_type='FCV' THEN 
+	      ELSIF NEW.valv_type='FCV' THEN
 		UPDATE inp_virtualvalve SET flow=NEW.setting::numeric WHERE arc_id=NEW.arc_id;
 	      ELSIF NEW.valv_type='TCV' THEN
 		UPDATE inp_virtualvalve SET coef_loss=NEW.setting::numeric WHERE arc_id=NEW.arc_id;
 	      ELSIF NEW.valv_type='GPV' THEN
 		UPDATE inp_virtualvalve SET curve_id=NEW.setting WHERE arc_id=NEW.arc_id;
-	      END IF;         
-	    
-	  ELSIF v_view='vi_tags' THEN 
+	      END IF;
+
+	  ELSIF v_view='vi_tags' THEN
 		INSERT INTO inp_tags(feature_type, feature_id, tag) VALUES (NEW.feature_type, NEW.feature_id, NEW.tag);
-	    
-	  ELSIF v_view='vi_demands' THEN 
+
+	  ELSIF v_view='vi_demands' THEN
 	  	INSERT INTO inp_pattern (pattern_id) VALUES (NEW.pattern_id) ON CONFLICT (pattern_id) DO NOTHING;
 	 	 	INSERT INTO cat_dscenario (dscenario_id, name) VALUES (1, 'IMPORTINP') ON CONFLICT (dscenario_id) DO NOTHING;
 			INSERT INTO inp_dscenario_demand (dscenario_id, feature_id, demand, pattern_id, demand_type) VALUES (1, NEW.feature_id, NEW.demand, NEW.pattern_id, NEW.other);
-      	    
-	  ELSIF v_view='vi_patterns' THEN 
+
+	  ELSIF v_view='vi_patterns' THEN
 		INSERT INTO inp_pattern_value (pattern_id, factor_1,factor_2,factor_3,factor_4,factor_5,factor_6,factor_7,factor_8, factor_9,factor_10,
-					   factor_11,factor_12,factor_13,factor_14, factor_15, factor_16,factor_17, factor_18) VALUES 
+					   factor_11,factor_12,factor_13,factor_14, factor_15, factor_16,factor_17, factor_18) VALUES
 					   (NEW.pattern_id, NEW.factor_1,NEW.factor_2,NEW.factor_3,NEW.factor_4,NEW.factor_5,NEW.factor_6,NEW.factor_7,NEW.factor_8, NEW.factor_9,
 					   NEW.factor_10,NEW.factor_11,NEW.factor_12,NEW.factor_13,NEW.factor_14, NEW.factor_15, NEW.factor_16,NEW.factor_17, NEW.factor_18);
-	  
+
 	  ELSIF v_view='vi_curves' THEN
 
 		IF NEW.curve_id NOT IN (SELECT id FROM inp_curve) then
@@ -85,18 +85,18 @@ BEGIN
 		END IF;
 
 		INSERT INTO inp_curve_value(curve_id, x_value, y_value) VALUES (NEW.curve_id, NEW.x_value, NEW.y_value);
-	    
+
 	  ELSIF v_view='vi_emitters' THEN
 		--INSERT INTO inp_emitter(node_id, coef) VALUES (NEW.node_id, NEW.coef);
 		UPDATE inp_junction SET emitter_coeff = NEW.coef WHERE node_id=NEW.node_id;
-	    
+
 	  ELSIF v_view='vi_quality' THEN
 		--INSERT INTO inp_quality (node_id,initqual) VALUES (NEW.node_id,NEW.initqual);
 		UPDATE inp_junction SET init_quality = NEW.initqual WHERE node_id = NEW.node_id;
 		UPDATE inp_tank SET init_quality = NEW.initqual WHERE node_id = NEW.node_id;
 		UPDATE inp_reservoir SET init_quality = NEW.initqual WHERE node_id = NEW.node_id;
 		UPDATE inp_inlet SET init_quality = NEW.initqual WHERE node_id = NEW.node_id;
-	    
+
 	  ELSIF v_view='vi_sources' THEN
 		--INSERT INTO inp_source(node_id, sourc_type, quality, pattern_id) VALUES (NEW.node_id, NEW.sourc_type, NEW.quality, NEW.pattern_id);
 
@@ -109,54 +109,51 @@ BEGIN
 
 	  	/*IF NEW.arc_id IN (SELECT arc_id FROM inp_pipe) THEN
 	  		UPDATE inp_pipe SET reactionparam = NEW.idval, reactionvalue = NEW.reactionvalue WHERE arc_id=NEW.arc_id;
-	  	ELSE 
+	  	ELSE
 	  		INSERT INTO inp_reactions (descript) VALUES (concat(NEW.idval,' ', NEW.arc_id,' ',NEW.reactionvalue));
 	  	END IF;*/
 
 	  ELSIF v_view='vi_energy' THEN
 	  	IF NEW.pump_id ilike 'PUMP%' THEN
-	  		UPDATE inp_virtualpump SET energyvalue = NEW.energyvalue 
+	  		UPDATE inp_virtualpump SET energyvalue = NEW.energyvalue
 	  		WHERE arc_id = REGEXP_REPLACE(LTRIM (NEW.pump_id, 'PUMP '),' ','');
 	  	ELSE
-	  		INSERT INTO inp_energy(descript) select concat(NEW.pump_id, ' ',NEW.idval); 
+	  		INSERT INTO inp_energy(descript) select concat(NEW.pump_id, ' ',NEW.idval);
 	  	END IF;
 
 	  ELSIF v_view='vi_mixing' THEN
 	    INSERT INTO inp_mixing(node_id, mix_type, value) VALUES (NEW.node_id, NEW.mix_type, NEW.value);
-	    
-	  ELSIF v_view='vi_times' THEN 
+
+	  ELSIF v_view='vi_times' THEN
 	    IF NEW.value IS NULL THEN
-	      INSERT INTO config_param_user (parameter, value, cur_user) 
+	      INSERT INTO config_param_user (parameter, value, cur_user)
 	      VALUES (concat('inp_times_',(lower(split_part(NEW.parameter,'_',1)))), split_part(NEW.parameter,'_',2), current_user)
 	      ON CONFLICT (parameter,cur_user) DO NOTHING;
 	    ELSE
-	      INSERT INTO config_param_user (parameter, value, cur_user) 
-	      VALUES (concat('inp_times_',(lower(NEW.parameter))), NEW.value, current_user) 
+	      INSERT INTO config_param_user (parameter, value, cur_user)
+	      VALUES (concat('inp_times_',(lower(NEW.parameter))), NEW.value, current_user)
 	     ON CONFLICT (parameter,cur_user) DO NOTHING;
 	    END IF;
-	    
+
 	  ELSIF v_view='vi_report' THEN
-	    INSERT INTO config_param_user (parameter, value, cur_user) 
-	    SELECT id, vdefault, current_user FROM sys_param_user 
+	    INSERT INTO config_param_user (parameter, value, cur_user)
+	    SELECT id, vdefault, current_user FROM sys_param_user
 	    WHERE layoutname IN ('lyt_reports_1', 'lyt_reports_2') AND ismandatory=true AND vdefault IS NOT NULL
 	    ON CONFLICT (parameter,cur_user) DO NOTHING;
-	    
+
 	  ELSIF v_view='vi_labels' THEN
 	    INSERT INTO inp_label (xcoord, ycoord, label, node_id) VALUES (NEW.xcoord, NEW.ycoord, NEW.label, NEW.node_id);
-	    
-	  ELSIF v_view='vi_backdrop' THEN
-	    INSERT INTO inp_backdrop(text) VALUES (NEW.text);
-	    
+
 	  ELSIF v_view='vi_options' THEN
-	    INSERT INTO config_param_user (parameter, value, cur_user) 
-	    VALUES (concat('inp_options_',(lower(NEW.parameter))), NEW.value, current_user) 
+	    INSERT INTO config_param_user (parameter, value, cur_user)
+	    VALUES (concat('inp_options_',(lower(NEW.parameter))), NEW.value, current_user)
 	    ON CONFLICT (parameter,cur_user) DO NOTHING;
 	  END IF;
-	  
-	  RETURN NEW; 	
+
+	  RETURN NEW;
     END IF;
 
- 
+
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

@@ -165,7 +165,6 @@ BEGIN
 			DELETE FROM inp_rules;
 			DELETE FROM config_param_user;
 			DELETE FROM inp_label;
-			DELETE FROM inp_backdrop;
 			DELETE FROM rpt_inp_arc;
 			DELETE FROM rpt_inp_node;
 			DELETE FROM rpt_cat_result;
