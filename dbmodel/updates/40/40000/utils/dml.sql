@@ -75,8 +75,12 @@ ALTER TABLE sys_foreignkey ADD CONSTRAINT sys_foreingkey_pkey PRIMARY KEY (typev
 
 ALTER TABLE plan_psector ADD CONSTRAINT plan_psector_workcat_id_fkey FOREIGN KEY (workcat_id) REFERENCES cat_work(id) ON UPDATE CASCADE ON DELETE RESTRICT;
 ALTER TABLE plan_psector ADD CONSTRAINT plan_psector_parent_id_fkey FOREIGN KEY (parent_id) REFERENCES plan_psector(psector_id) ON UPDATE CASCADE ON DELETE RESTRICT;
-CREATE INDEX plan_psector_workcat_id_index ON plan_psector USING btree (workcat_id);
-CREATE INDEX plan_psector_parent_id_index ON plan_psector USING btree (parent_id);
+CREATE INDEX idx_plan_psector_expl_id ON plan_psector USING btree (expl_id);
+CREATE INDEX idx_plan_psector_workcat_id ON plan_psector USING btree (workcat_id);
+CREATE INDEX ifx_plan_psector_parent_id ON plan_psector USING btree (parent_id);
+CREATE INDEX idx_plan_psector_name ON plan_psector USING btree (name);
+CREATE INDEX idx_plan_psector_status ON plan_psector USING btree (status);
+CREATE INDEX ifx_plan_psector_the_geom ON plan_psector USING gist (the_geom);
 
 -- 09/10/2024
 UPDATE sys_feature_class SET man_table  = 'element' WHERE id = 'ELEMENT';
