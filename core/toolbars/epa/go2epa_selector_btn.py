@@ -5,14 +5,11 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from functools import partial
-
 from ..dialog import GwAction
 from ...ui.ui_manager import GwGo2EpaSelectorUi
 from ...utils import tools_gw
 from .... import global_vars
 from ....libs import tools_qt, tools_db, tools_qgis, tools_os
-
 
 class GwGo2EpaSelectorButton(GwAction):
     """ Button 44: Go2epa selector """
@@ -26,289 +23,148 @@ class GwGo2EpaSelectorButton(GwAction):
     def clicked_event(self):
         """ Button 44: Epa result selector """
 
-        self._open_go2epa_selector()
+        self._open_dialog()
 
+    def _open_dialog(self):
+        """ Open Epa Selector Dialog dynamic """
 
-    # region private functions
+        user = tools_db.current_user
+        form = { "formName" : "generic", "formType" : "epa_selector" }
+        body = { "client" : { "cur_user": user }, "form" : form }
 
-    def _load_result_layers(self):
-        """ Adds any missing Compare layers to TOC """
+        json_result = tools_gw.execute_procedure('gw_fct_get_epa_selector', body)
 
-        # Manage user variable
-        if not tools_os.set_boolean(tools_gw.get_config_parser('btn_go2epa_selector', 'load_result_layers', "user", "init"), default=False):
-            return
-
-        filtre = "(id LIKE 'v_rpt_arc%' OR id LIKE 'v_rpt_node%')"
-        if global_vars.project_type == 'ud':
-            filtre = "id LIKE 'v_rpt_%_sum'"
-        sql = f"SELECT id, alias FROM sys_table WHERE {filtre} AND alias IS NOT NULL"
-        rows = tools_db.get_rows(sql)
-        if rows:
-            for tablename, alias in rows:
-                lyr = tools_qgis.get_layer_by_tablename(tablename)
-                if not lyr:
-                    pk = "id"
-                    if global_vars.project_type == 'ws' and (tablename == 'v_rpt_node' or tablename == 'v_rpt_arc'):
-                        pk = f"{tablename.split('_')[-1]}_id"
-                    tools_gw.add_layer_database(tablename, alias=alias, group="EPA", sub_group="Results", field_id=pk)
-
-
-    def _load_compare_layers(self):
-        """ Adds any missing Compare layers to TOC """
-        """ This function is no longer used after reversing the change to load compare layers. """
-
-        # Manage user variable
-        if not tools_os.set_boolean(tools_gw.get_config_parser('btn_go2epa_selector', 'load_compare_layers', "user", "init"), default=False):
-            return
-
-        filtre = 'v_rpt_comp_%'
-        if global_vars.project_type == 'ud':
-            filtre = 'v_rpt_comp_%_sum'
-        sql = f"SELECT id, alias FROM sys_table WHERE id LIKE '{filtre}' AND alias IS NOT NULL"
-        rows = tools_db.get_rows(sql)
-        if rows:
-            for tablename, alias in rows:
-                lyr = tools_qgis.get_layer_by_tablename(tablename)
-                if not lyr:
-                    pk = "id"
-                    if global_vars.project_type == 'ws' and 'hourly' not in tablename:
-                        pk = f"{tablename.split('_')[-1]}_id"
-                    tools_gw.add_layer_database(tablename, alias=alias, group="EPA", sub_group="Compare", field_id=pk)
-
-
-    def _open_go2epa_selector(self):
-
-        # Create the dialog and signals
         self.dlg_go2epa_result = GwGo2EpaSelectorUi(self, 'go2epa')
         tools_gw.load_settings(self.dlg_go2epa_result)
-        if self.project_type == 'ud':
-            tools_qt.remove_tab(self.dlg_go2epa_result.tabWidget, "tab_time")
-        if self.project_type == 'ws':
-            tools_qt.remove_tab(self.dlg_go2epa_result.tabWidget, "tab_datetime")
-        self.dlg_go2epa_result.btn_accept.clicked.connect(self._result_selector_accept)
-        self.dlg_go2epa_result.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_go2epa_result))
-        self.dlg_go2epa_result.rejected.connect(partial(tools_gw.close_dialog, self.dlg_go2epa_result))
-        self.dlg_go2epa_result.tabWidget.currentChanged.connect(self._tab_changed)
-
-        # Set values from widgets of type QComboBox
-        sql = ("SELECT DISTINCT(result_id), result_id "
-               "FROM v_ui_rpt_cat_result WHERE status = 'COMPLETED' ORDER BY result_id")
-        rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.dlg_go2epa_result.rpt_selector_result_id, rows)
-        sql2 = "SELECT result_id FROM selector_rpt_main WHERE cur_user = current_user"
-        row = tools_db.get_row(sql2)
-        if row:
-            tools_qt.set_combo_value(self.dlg_go2epa_result.rpt_selector_result_id, row[0], 0)
-
-        rows = tools_db.get_rows(sql, add_empty_row=True)
-        tools_qt.fill_combo_values(self.dlg_go2epa_result.rpt_selector_compare_id, rows)
-        sql2 = "SELECT result_id FROM selector_rpt_compare WHERE cur_user = current_user"
-        row = tools_db.get_row(sql2)
-        if row:
-            tools_qt.set_combo_value(self.dlg_go2epa_result.rpt_selector_compare_id, row[0], 0)
-
-        # Open the dialog
-        tools_gw.open_dialog(self.dlg_go2epa_result, dlg_name='go2epa_selector')
+        tools_gw.manage_dlg_widgets(self, self.dlg_go2epa_result, json_result)
+        tools_gw.open_dialog(self.dlg_go2epa_result, 'go2epa_selector')
 
 
-    def _tab_changed(self, index):
-        current_tab_widget = self.dlg_go2epa_result.tabWidget.widget(index)
-        current_tab_object_name = current_tab_widget.objectName()
+def set_combo_values(**kwargs):
+    """ Update values of combo childs """
 
-        if current_tab_object_name == "tab_time":
-            # Realizar la consulta y llenar los combo box correspondientes
-            sql = "SELECT DISTINCT time, time FROM rpt_arc WHERE result_id ILIKE '%%' ORDER BY time"
-            rows = tools_db.get_rows(sql, add_empty_row=True)
-            tools_qt.fill_combo_values(self.dlg_go2epa_result.cmb_time_to_show, rows)
-            tools_qt.fill_combo_values(self.dlg_go2epa_result.cmb_time_to_compare, rows)
+    dialog = kwargs["dialog"]
+    combo_childs = kwargs["func_params"]["cmbListToChange"]
 
-            tools_qt.set_combo_value(self.dlg_go2epa_result.cmb_time_to_show,
-                                     tools_gw.get_config_parser('btn_go2epa_selector', 'time_to_show', 'user',
-                                                                'session', prefix=False), 0)
-            tools_qt.set_combo_value(self.dlg_go2epa_result.cmb_time_to_compare,
-                                     tools_gw.get_config_parser('btn_go2epa_selector', 'time_to_compare', 'user',
-                                                                'session', prefix=False), 0)
+    form = _get_form_with_combos(dialog)
+    user = tools_db.current_user
+    feature = { "childs" : combo_childs }
 
-        elif current_tab_object_name == "tab_datetime":
-            # Realizar la consulta y llenar los combo box correspondientes
-            result_id = tools_qt.get_combo_value(self.dlg_go2epa_result.rpt_selector_result_id, 0)
-            sql = (f"SELECT DISTINCT(resultdate), resultdate FROM rpt_arc "
-                   f"WHERE result_id = '{result_id}' "
-                   f"ORDER BY resultdate")
-            rows = tools_db.get_rows(sql)
-            if rows is not None:
-                tools_qt.fill_combo_values(self.dlg_go2epa_result.cmb_sel_date, rows)
-                selector_date = tools_qt.get_combo_value(self.dlg_go2epa_result.cmb_sel_date, 0)
-                sql = (f"SELECT DISTINCT(resulttime), resulttime FROM rpt_arc "
-                       f"WHERE result_id = '{result_id}' "
-                       f"AND resultdate = '{selector_date}' "
-                       f"ORDER BY resulttime")
-                rows = tools_db.get_rows(sql, add_empty_row=True)
-                tools_qt.fill_combo_values(self.dlg_go2epa_result.cmb_sel_time, rows)
+    body = { "client" : { "cur_user": user }, "form" : form, "feature" : feature }
 
-                tools_qt.set_combo_value(self.dlg_go2epa_result.cmb_sel_date,
-                                         tools_gw.get_config_parser('btn_go2epa_selector', 'sel_date', 'user',
-                                                                    'session', prefix=False), 0)
-                tools_qt.set_combo_value(self.dlg_go2epa_result.cmb_sel_time,
-                                         tools_gw.get_config_parser('btn_go2epa_selector', 'sel_time', 'user',
-                                                                    'session', prefix=False), 0)
+    # db fct
+    combo_list = tools_gw.execute_procedure('gw_fct_get_epa_selector', body)["body"]
 
-            self._populate_date_time(self.dlg_go2epa_result.cmb_sel_date)
-            self._populate_time(self.dlg_go2epa_result.rpt_selector_result_id,self.dlg_go2epa_result.cmb_sel_time)
-
-            # Populate GroupBox Selector compare
-            result_id_to_comp = tools_qt.get_combo_value(self.dlg_go2epa_result,
-                                                         self.dlg_go2epa_result.rpt_selector_result_id, 0)
-            sql = (f"SELECT DISTINCT(resultdate), resultdate FROM rpt_arc "
-                   f"WHERE result_id = '{result_id_to_comp}' "
-                   f"ORDER BY resultdate ")
-            rows = tools_db.get_rows(sql)
-            if rows:
-                tools_qt.fill_combo_values(self.dlg_go2epa_result.cmb_com_date, rows)
-                selector_cmp_date = tools_qt.get_combo_value(self.dlg_go2epa_result,
-                                                             self.dlg_go2epa_result.cmb_com_date, 0)
-                sql = (f"SELECT DISTINCT(resulttime), resulttime FROM rpt_arc "
-                       f"WHERE result_id = '{result_id_to_comp}' "
-                       f"AND resultdate = '{selector_cmp_date}' "
-                       f"ORDER BY resulttime")
-                rows = tools_db.get_rows(sql, add_empty_row=True)
-                tools_qt.fill_combo_values(self.dlg_go2epa_result.cmb_com_time, rows)
-
-                tools_qt.set_combo_value(self.dlg_go2epa_result.cmb_com_date,
-                                         tools_gw.get_config_parser('btn_go2epa_selector', 'com_date', 'user',
-                                                                    'session', prefix=False), 0)
-                tools_qt.set_combo_value(self.dlg_go2epa_result.cmb_com_time,
-                                         tools_gw.get_config_parser('btn_go2epa_selector', 'com_time', 'user',
-                                                                    'session', prefix=False), 0)
-
-            self._populate_date_time(self.dlg_go2epa_result.cmb_com_date)
-            self._populate_time(self.dlg_go2epa_result.rpt_selector_compare_id,self.dlg_go2epa_result.cmb_com_time)
-
-            # Get current data from tables 'rpt_selector_result' and 'rpt_selector_compare'
-            sql = "SELECT result_id FROM selector_rpt_main"
-            row = tools_db.get_row(sql)
-            if row:
-                tools_qt.set_combo_value(self.dlg_go2epa_result.rpt_selector_result_id, row["result_id"], 0)
-            sql = "SELECT result_id FROM selector_rpt_compare"
-            row = tools_db.get_row(sql)
-            if row:
-                tools_qt.set_combo_value(self.dlg_go2epa_result.rpt_selector_compare_id, row["result_id"], 0)
+    for combo_name, combo in combo_list.items():
+        combo_widget = tools_qt.get_widget(dialog, f"tab_time_{combo_name}")
+        combo_items = None if not combo["values"] else [(item, item) for item in combo["values"]]
+        tools_qt.fill_combo_values(combo_widget, combo_items)
+        tools_qt.set_combo_value(combo_widget, combo["selectedValue"], 0)
 
 
+def accept(**kwargs):
+    """ Update current values to the table """
 
-    def _result_selector_accept(self):
-        """ Update current values to the table """
+    dialog = kwargs["dialog"]
 
-        # Set project user
-        user = tools_db.current_user
+    # Get form
+    form = _get_form_with_combos(dialog)
 
-        # Delete previous values
-        sql = (f"DELETE FROM selector_rpt_main WHERE cur_user = '{user}';\n"
-               f"DELETE FROM selector_rpt_compare WHERE cur_user = '{user}';\n")
-        sql += (f"DELETE FROM selector_rpt_main_tstep WHERE cur_user = '{user}';\n"
-                f"DELETE FROM selector_rpt_compare_tstep WHERE cur_user = '{user}';\n")
-        tools_db.execute_sql(sql)
+    user = tools_db.current_user
+    body = { "client" : { "cur_user": user }, "form" : form }
 
-        # Get new values from widgets of type QComboBox
-        rpt_selector_result_id = tools_qt.get_combo_value(
-            self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_result_id)
-        rpt_selector_compare_id = tools_qt.get_combo_value(
-            self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_compare_id)
+    # db fct
+    tools_gw.execute_procedure('gw_fct_set_epa_selector', body)
 
-        if rpt_selector_result_id not in (None, -1, ''):
-            tools_qgis.set_cursor_wait()
-            try:
-                self._load_result_layers()
-            except Exception:
-                pass
-            tools_qgis.restore_cursor()
-            sql = (f"INSERT INTO selector_rpt_main (result_id, cur_user)"
-                   f" VALUES ('{rpt_selector_result_id}', '{user}');\n")
-            tools_db.execute_sql(sql)
+    tools_qgis.set_cursor_wait()
+    try:
+        _load_result_layers()
+        _load_compare_layers()
+    except Exception:
+        pass
+    tools_qgis.restore_cursor()
 
-            tools_gw.set_config_parser('btn_go2epa_selector', 'rpt_selector_result', f'{rpt_selector_result_id}')
+    # Force a map refresh
+    tools_qgis.force_refresh_map_canvas()
 
-        if rpt_selector_compare_id not in (None, -1, ''):
-
-            sql = (f"INSERT INTO selector_rpt_compare (result_id, cur_user)"
-                   f" VALUES ('{rpt_selector_compare_id}', '{user}');\n")
-            tools_db.execute_sql(sql)
-
-            tools_gw.set_config_parser('btn_go2epa_selector', 'rpt_selector_compare', f'{rpt_selector_compare_id}')
-
-        if self.project_type == 'ws':
-            time_to_show = tools_qt.get_combo_value(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_time_to_show)
-            time_to_compare = tools_qt.get_combo_value(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_time_to_compare)
-            if time_to_show not in (None, -1, ''):
-                sql = (f"INSERT INTO selector_rpt_main_tstep (timestep, cur_user)"
-                       f" VALUES ('{time_to_show}', '{user}');\n")
-                tools_db.execute_sql(sql)
-
-                tools_gw.set_config_parser('btn_go2epa_selector', 'time_to_show', f'{time_to_show}', prefix=False)
-
-            if time_to_compare not in (None, -1, ''):
-                sql = (f"INSERT INTO selector_rpt_compare_tstep (timestep, cur_user)"
-                       f" VALUES ('{time_to_compare}', '{user}');\n")
-                tools_db.execute_sql(sql)
-
-                tools_gw.set_config_parser('btn_go2epa_selector', 'time_to_compare', f'{time_to_compare}', prefix=False)
-
-        elif self.project_type == 'ud':
-            sel_date = tools_qt.get_combo_value(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_sel_date)
-            sel_time = tools_qt.get_combo_value(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_sel_time)
-            com_date = tools_qt.get_combo_value(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_com_date)
-            com_time = tools_qt.get_combo_value(self.dlg_go2epa_result, self.dlg_go2epa_result.cmb_com_time)
-
-            if sel_date not in (None, -1, ''):
-                sql = (f"INSERT INTO selector_rpt_main_tstep (resultdate, resulttime, cur_user)"
-                       f" VALUES ('{sel_date}', '{sel_time}', '{user}');\n")
-                tools_db.execute_sql(sql)
-
-                tools_gw.set_config_parser('btn_go2epa_selector', 'sel_date', f'{sel_date}', prefix=False)
-                tools_gw.set_config_parser('btn_go2epa_selector', 'sel_time', f'{sel_time}', prefix=False)
-
-            if com_date not in (None, -1, ''):
-                sql = (f"INSERT INTO selector_rpt_compare_tstep (resultdate, resulttime, cur_user)"
-                       f" VALUES ('{com_date}', '{com_time}', '{user}');\n")
-                tools_db.execute_sql(sql)
-
-                tools_gw.set_config_parser('btn_go2epa_selector', 'com_date', f'{com_date}', prefix=False)
-                tools_gw.set_config_parser('btn_go2epa_selector', 'com_time', f'{com_time}', prefix=False)
-
-        # Force a map refresh
-        tools_qgis.force_refresh_map_canvas()
-
-        # Show message to user
-        message = "Values has been updated"
-        tools_qgis.show_info(message)
-        tools_gw.close_dialog(self.dlg_go2epa_result)
+    # Show message to user
+    message = "Values has been updated"
+    tools_qgis.show_info(message)
+    tools_gw.close_dialog(dialog)
 
 
-    def _populate_time(self, combo_result, combo_time):
-        """ Populate combo times """
+def close_dlg(**kwargs):
+    """ Close form """
 
-        result_id = tools_qt.get_combo_value(self.dlg_go2epa_result, combo_result)
-        if self.project_type == 'ws':
-            field = "time"
-        else:
-            field = "resulttime"
-
-        sql = (f"SELECT DISTINCT {field}, {field} "
-               f"FROM rpt_arc "
-               f"WHERE result_id ILIKE '{result_id}' "
-               f"ORDER BY {field};")
-
-        rows = tools_db.get_rows(sql, add_empty_row=True)
-        tools_qt.fill_combo_values(combo_time, rows)
+    dialog = kwargs["dialog"]
+    tools_gw.close_dialog(dialog)
 
 
-    def _populate_date_time(self, combo_date):
+# region private functions
 
-        result_id = tools_qt.get_combo_value(self.dlg_go2epa_result, self.dlg_go2epa_result.rpt_selector_result_id, 0)
-        sql = (f"SELECT DISTINCT(resultdate), resultdate FROM rpt_arc "
-               f"WHERE result_id = '{result_id}' "
-               f"ORDER BY resultdate")
-        rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(combo_date, rows)
+def _get_form_with_combos(dialog):
+    """ Get combo values of tab result """
 
-    # endregion
+    form = {}
+    form["result_name_show"] = tools_qt.get_combo_value(dialog, "tab_result_result_name_show", 1)
+    form["result_name_compare"] = tools_qt.get_combo_value(dialog, "tab_result_result_name_compare", 1)
+
+    # check project type
+    project_type = tools_gw.get_project_type()
+    if project_type == "ud":
+        form["selector_date"] = tools_qt.get_combo_value(dialog, "tab_time_selector_date", 1)
+        form["selector_time"] = tools_qt.get_combo_value(dialog, "tab_time_selector_time", 1)
+        form["compare_date"] = tools_qt.get_combo_value(dialog, "tab_time_compare_date", 1)
+        form["compare_time"] = tools_qt.get_combo_value(dialog, "tab_time_compare_time", 1)
+    elif project_type == "ws":
+        form["time_show"] = tools_qt.get_combo_value(dialog, "tab_time_time_show", 1)
+        form["time_compare"] = tools_qt.get_combo_value(dialog, "tab_time_time_compare", 1)
+
+    return form
+
+
+def _load_result_layers():
+    """ Adds any missing Compare layers to TOC """
+
+    # Manage user variable
+    if not tools_os.set_boolean(tools_gw.get_config_parser('btn_go2epa_selector', 'load_result_layers', "user", "init"), default=False):
+        return
+
+    filtre = "(id LIKE 'v_rpt_arc%' OR id LIKE 'v_rpt_node%')"
+    if global_vars.project_type == 'ud':
+        filtre = "id LIKE 'v_rpt_%_sum'"
+    sql = f"SELECT id, alias FROM sys_table WHERE {filtre} AND alias IS NOT NULL"
+    rows = tools_db.get_rows(sql)
+    if rows:
+        for tablename, alias in rows:
+            lyr = tools_qgis.get_layer_by_tablename(tablename)
+            if not lyr:
+                pk = "id"
+                if global_vars.project_type == 'ws' and (tablename == 'v_rpt_node' or tablename == 'v_rpt_arc'):
+                    pk = f"{tablename.split('_')[-1]}_id"
+                tools_gw.add_layer_database(tablename, alias=alias, group="EPA", sub_group="Results", field_id=pk)
+
+
+def _load_compare_layers():
+    """ Adds any missing Compare layers to TOC """
+    """ This function is no longer used after reversing the change to load compare layers. """
+
+    # Manage user variable
+    if not tools_os.set_boolean(tools_gw.get_config_parser('btn_go2epa_selector', 'load_compare_layers', "user", "init"), default=False):
+        return
+
+    filtre = 'v_rpt_comp_%'
+    if global_vars.project_type == 'ud':
+        filtre = 'v_rpt_comp_%_sum'
+    sql = f"SELECT id, alias FROM sys_table WHERE id LIKE '{filtre}' AND alias IS NOT NULL"
+    rows = tools_db.get_rows(sql)
+    if rows:
+        for tablename, alias in rows:
+            lyr = tools_qgis.get_layer_by_tablename(tablename)
+            if not lyr:
+                pk = "id"
+                if global_vars.project_type == 'ws' and 'hourly' not in tablename:
+                    pk = f"{tablename.split('_')[-1]}_id"
+                tools_gw.add_layer_database(tablename, alias=alias, group="EPA", sub_group="Compare", field_id=pk)
+
+# end region
