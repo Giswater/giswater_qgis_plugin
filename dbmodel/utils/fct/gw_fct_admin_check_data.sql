@@ -65,10 +65,10 @@ BEGIN
 	CREATE TEMP TABLE temp_audit_check_data (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
 	IF v_fid IN (101,225) THEN
 		--create temp tables
-		CREATE TEMP TABLE temp_anl_arc (LIKE ws_msg_trad_1.anl_arc INCLUDING ALL);
-		CREATE TEMP TABLE temp_anl_node (LIKE ws_msg_trad_1.anl_node INCLUDING ALL);
-		CREATE TEMP TABLE temp_anl_connec (LIKE ws_msg_trad_1.anl_connec INCLUDING ALL);
-		
+		CREATE TEMP TABLE temp_anl_arc (LIKE SCHEMA_NAME.anl_arc INCLUDING ALL);
+		CREATE TEMP TABLE temp_anl_node (LIKE SCHEMA_NAME.anl_node INCLUDING ALL);
+		CREATE TEMP TABLE temp_anl_connec (LIKE SCHEMA_NAME.anl_connec INCLUDING ALL);
+
 	END IF;
 
 
@@ -91,32 +91,32 @@ BEGIN
 		and addparam is null
 		and query_text is not null
 		and function_name ilike ''%admin%'' ';
-	
 
 
-	for v_rec in execute v_sql		
+
+	for v_rec in execute v_sql
 	loop
-		
+
 		-- check que los addschemas existan
 		select (addparam::json ->>'addSchema')::text into v_addschema from sys_fprocess where fid = v_rec.fid;
 
 		if v_addschema is not null then
-		
+
 			-- check if exists
 			select count(*) into v_count from information_schema.tables where table_catalog = current_catalog and table_schema = v_addschema;
-		
+
 			if v_count = 0 then
-			
+
 				continue;
-			
+
 			end if;
-		
+
 		end if;
 
 		--raise notice 'v_rec.fid %', v_rec.fid;
 		execute 'select gw_fct_check_fprocess($${"client":{"device":4, "infoType":1, "lang":"ES"}, 
 	    "form":{},"feature":{},"data":{"parameters":{"functionFid": '||v_fid||', "prefixTable": "", "checkFid":"'||v_rec.fid||'","graphClass":"SECTOR"}}}$$)';
-		
+
    	end loop;
 
 

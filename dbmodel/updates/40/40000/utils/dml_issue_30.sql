@@ -16,8 +16,6 @@ UPDATE sys_fprocess SET fprocess_name='Orphan polygons', project_type='utils', p
 
 UPDATE sys_fprocess SET fprocess_name='Check shape with null values on arc catalog', project_type='utils', parameters=NULL, "source"='core', isaudit=true, fprocess_type='Check epa-data', addparam=NULL, except_level=3, except_msg='ows on arc catalog without values on shape column.', except_msg_feature=NULL, query_text='SELECT * FROM cat_arc WHERE shape is null', info_msg='No rows on arc catalog without values on shape column.', function_name='[gw_fct_pg2epa_check_data]' WHERE fid=581;
 
-UPDATE sys_fprocess SET fprocess_name='Check geom1 with null values on arc catalog', project_type='utils', parameters=NULL, "source"='core', isaudit=true, fprocess_type='Check epa-data', addparam=NULL, except_level=3, except_msg='rows on arc catalog without values on shape column.', except_msg_feature=NULL, query_text='SELECT * FROM cat_arc WHERE geom1 is null', info_msg='No rows on arc catalog without values on geom1 column.', function_name='[gw_fct_pg2epa_check_data]' WHERE fid=582;
-
 UPDATE sys_fprocess SET fprocess_name='Arc without start-end nodes', project_type='utils', parameters=NULL, "source"='core', isaudit=true, fprocess_type='Check om-topology', addparam=NULL, except_level=3, except_msg='arcs with state=1 and without node_1 or node_2.', except_msg_feature=NULL, query_text='SELECT arc_id,arccat_id,the_geom, expl_id FROM v_prefix_arc WHERE state = 1 AND node_1 IS NULL UNION 
 SELECT arc_id, arccat_id, the_geom, expl_id FROM v_prefix_arc WHERE state = 1 AND node_2 IS NULL', info_msg='No arc''''s with state=1 and without node_1 or node_2 nodes found.', function_name='[gw_fct_om_check_data]' WHERE fid=103;
 
@@ -66,12 +64,12 @@ UPDATE sys_fprocess SET fprocess_name='Check cat_feature_node field isarcdivide'
 UPDATE sys_fprocess SET fprocess_name='Check cat_feature_node field choose_hemisphere', project_type='utils', parameters=NULL, "source"='core', isaudit=true, fprocess_type='Check admin', addparam=NULL, except_level=3, except_msg='nodes without value on field "choose_hemisphere" from cat_feature_node.', except_msg_feature=NULL, query_text='SELECT * FROM cat_feature_node WHERE choose_hemisphere IS NULL', info_msg='All nodes have value on field "choose_hemisphere"', function_name='[gw_fct_admin_check_data]' WHERE fid=309;
 UPDATE sys_fprocess SET fprocess_name='Check cat_feature_node field isprofilesurface', project_type='utils', parameters=NULL, "source"='core', isaudit=true, fprocess_type='Check admin', addparam=NULL, except_level=3, except_msg='nodes without value on field "isprofilesurface" from cat_feature_node. Features - '',v_feature_list::text,''.''', except_msg_feature=NULL, query_text='SELECT * FROM cat_feature_node WHERE isprofilesurface IS NULL', info_msg='All nodes have value on field "isprofilesurface"', function_name='[gw_fct_admin_check_data]' WHERE fid=310;
 UPDATE sys_fprocess SET fprocess_name='Check child view man table definition', project_type='utils', parameters=NULL, "source"='core', isaudit=true, fprocess_type='Check admin', addparam=NULL, except_level=3, except_msg='view wrongly defined man_table', except_msg_feature=NULL, query_text='WITH subq_1 as (
-SELECT id, sys_feature_cat, child_layer from cat_feature
+SELECT id, feature_class, feature_type, child_layer from cat_feature
 ), subq_2 as (
 select*from information_schema.views a join subq_1 m on m.child_layer = a.table_name
 where a.table_schema = current_schema
 ), subq_3 as (
-select position(concat(''man_'',lower(system_id)) in view_definition) from subq_2
+select position(concat(''man_'',lower(feature_type)) in view_definition) from subq_2
 )
 select*from subq_3 where position = 0', info_msg='All views are well defined in man_table', function_name='[gw_fct_admin_check_data]' WHERE fid=311;
 UPDATE sys_fprocess SET fprocess_name='Check child view addfields', project_type='utils', parameters=NULL, "source"='core', isaudit=true, fprocess_type='Check admin', addparam=NULL, except_level=2, except_msg='active addfields that may not be present on its corresponding child view:', except_msg_feature=NULL, query_text='WITH subq AS (
@@ -158,7 +156,7 @@ UPDATE sys_fprocess SET fprocess_name='Links without connec on startpoint', proj
 		FROM link l JOIN connec c ON feature_id = connec_id WHERE l.state = 1 and l.feature_type = ''CONNEC''
 	) -- si el link cuyo startpoint està tocant un connec, no està informat com que està connectat a un connec, mal
 	select * from mec where link_id not in (select link_id from moc)', info_msg='All connec links has connec on startpoint', function_name='[gw_fct_om_check_data]' WHERE fid=417;
-	
+
 UPDATE sys_fprocess SET fprocess_name='Duplicated hydrometer related to more than one connec', project_type='utils', parameters=NULL, "source"='core', isaudit=true, fprocess_type='Check om-data', addparam=NULL, except_level=2, except_msg='hydrometer related to more than one connec. HINT-419: Type ''''SELECT hydrometer_id, count(*) FROM v_rtc_hydrometer  group by hydrometer_id having count(*)> 1''''''', except_msg_feature=NULL, query_text='SELECT hydrometer_id, count(*) FROM v_rtc_hydrometer  group by hydrometer_id having count(*)> 1 ', info_msg='All hydrometeres are related to a unique connec', function_name='[gw_fct_om_check_data]' WHERE fid=419;
 
 UPDATE sys_fprocess SET fprocess_name='Check expl.geom is not null when raster DEM is enabled', project_type='utils', parameters=NULL, "source"='core', isaudit=true, fprocess_type='Check om-data', addparam=NULL, except_level=2, except_msg='exploitations without geometry. Capturing values from DEM is enabled, but it will fail on exploitation: '',string_agg(name,'', '')', except_msg_feature=NULL, query_text='SELECT * FROM exploitation WHERE the_geom IS NULL AND active IS TRUE and expl_id > 0 ', info_msg='Capturing values from DEM is enabled and will work correctly as all exploitations have geometry.', function_name='[gw_fct_om_check_data]' WHERE fid=428;
@@ -209,13 +207,13 @@ UPDATE sys_fprocess SET fprocess_name='Check duplicated arcs', project_type='uti
  FROM q_arc AS t1 JOIN q_arc AS t2 USING(the_geom) JOIN arc v ON t1.arc_id = v.arc_id
  WHERE t1.arc_id != t2.arc_id ORDER BY t1.arc_id )a
  where a.state1 > 0 AND a.state2 > 0', info_msg='No arcs with duplicated geometry.', function_name='[gw_fct_om_check_data]' WHERE fid=479;
- 
+
 UPDATE sys_fprocess SET fprocess_name='Check arcs with value of custom length', project_type='utils', parameters=NULL, "source"='core', isaudit=true, fprocess_type='Check epa-data', addparam=NULL, except_level=2, except_msg='percent of arcs have value on custom_length.', except_msg_feature=NULL, query_text='WITH cust_len AS (SELECT count(*) FROM v_edit_arc WHERE custom_length IS NOT NULL), 
 		arcs AS (SELECT count(*) FROM v_edit_arc),
 		thres as (SELECT json_extract_path_text(value::json,''customLength'',''maxPercent'')::NUMERIC as t FROM config_param_system WHERE parameter = ''epa_outlayer_values'')
 		SELECT round(cust_len.count::numeric / arcs.count::numeric *100, 2) FROM arcs, cust_len, thres
 		where round(cust_len.count::numeric / arcs.count::numeric *100, 2) > t', info_msg='No arcs have value on custom_length.', function_name='[gw_fct_pg2epa_check_data]' WHERE fid=482;
-		
+
 UPDATE sys_fprocess SET fprocess_name='Connec without link', project_type='utils', parameters=NULL, "source"='core', isaudit=true, fprocess_type='Check om-topology', addparam=NULL, except_level=2, except_msg='connecs without links or connecs over arc without arc_id.', except_msg_feature=NULL, query_text='SELECT connec_id, conneccat_id, c.the_geom, c.expl_id from v_prefix_connec c WHERE c.state= 1 
 AND connec_id NOT IN (SELECT feature_id FROM link) EXCEPT  
 SELECT connec_id, conneccat_id, c.the_geom, c.expl_id FROM v_prefix_connec c 
