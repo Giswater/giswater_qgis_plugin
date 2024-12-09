@@ -277,3 +277,7 @@ ALTER TABLE cat_dwf_scenario RENAME TO cat_dwf;
 ALTER SEQUENCE cat_dwf_scenario_id_seq RENAME TO cat_dwf_id_seq;
 
 ALTER TABLE doc_x_gully DROP CONSTRAINT doc_x_gully_doc_id_fkey;
+
+-- 09/12/2024
+ALTER SEQUENCE audit_psector_gully_traceability_id_seq RENAME TO archived_psector_gully_traceability_id_seq;
+ALTER TABLE audit_psector_gully_traceability RENAME TO archived_psector_gully_traceability;

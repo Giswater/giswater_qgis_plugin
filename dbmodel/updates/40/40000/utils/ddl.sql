@@ -176,3 +176,11 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sys_fproces
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sys_fprocess", "column":"query_text", "dataType":"text"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sys_fprocess", "column":"info_msg", "dataType":"text"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sys_fprocess", "column":"function_name", "dataType":"text"}}$$);
+
+-- 09/12/2024
+ALTER SEQUENCE audit_psector_arc_traceability_id_seq RENAME TO archived_psector_arc_traceability_id_seq;
+ALTER SEQUENCE audit_psector_connec_traceability_id_seq RENAME TO archived_psector_connec_traceability_id_seq;
+ALTER SEQUENCE audit_psector_node_traceability_id_seq RENAME TO archived_psector_node_traceability_id_seq;
+ALTER TABLE audit_psector_arc_traceability RENAME TO archived_psector_arc_traceability;
+ALTER TABLE audit_psector_connec_traceability RENAME TO archived_psector_connec_traceability;
+ALTER TABLE audit_psector_node_traceability RENAME TO archived_psector_node_traceability;

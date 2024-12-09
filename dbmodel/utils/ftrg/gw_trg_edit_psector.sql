@@ -103,8 +103,8 @@ BEGIN
 			-- copy values into traceability tables
 			IF v_projectype = 'WS' THEN
 
-				INSERT INTO audit_psector_connec_traceability
-				SELECT nextval('SCHEMA_NAME.audit_psector_connec_traceability_id_seq'), psector_id, pc.state, doable, pc.arc_id, l.link_id, l.the_geom, now(), current_user, 'Execute psector',
+				INSERT INTO archived_psector_connec_traceability
+				SELECT nextval('SCHEMA_NAME.archived_psector_connec_traceability_id_seq'), psector_id, pc.state, doable, pc.arc_id, l.link_id, l.the_geom, now(), current_user, 'Execute psector',
 				connec_id, code, elevation, depth, c.conneccat_id,  c.sector_id, customer_code, c.state, c.state_type, c.arc_id, connec_length, annotation, observ, comment, c.dma_id,
 				c.presszone_id, soilcat_id, function_type, category_type, c.fluid_type, location_type, c.workcat_id, c.workcat_id_end,  buildercat_id, c.builtdate, c.enddate, ownercat_id,
 				c.muni_id, postcode, streetaxis_id, postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, c.descript, link, verified, rotation, c.the_geom, undelete,
@@ -116,21 +116,21 @@ BEGIN
 				WHERE psector_id=NEW.psector_id;
 
 				-- arc & node insert is different from ud because UD has legacy of _sys_length & _sys_elev and the impossibility to remove it from old production environments
-				INSERT INTO audit_psector_arc_traceability
-				SELECT nextval('SCHEMA_NAME.audit_psector_arc_traceability_id_seq'), psector_id, pa.state, doable, addparam, now(), current_user, 'Execute psector', arc.*
+				INSERT INTO archived_psector_arc_traceability
+				SELECT nextval('SCHEMA_NAME.archived_psector_arc_traceability_id_seq'), psector_id, pa.state, doable, addparam, now(), current_user, 'Execute psector', arc.*
 				FROM plan_psector_x_arc pa JOIN arc USING (arc_id)
 				WHERE psector_id=NEW.psector_id;
 
-				INSERT INTO audit_psector_node_traceability
-				SELECT nextval('SCHEMA_NAME.audit_psector_node_traceability_id_seq'), psector_id, pn.state, doable, addparam, now(), current_user, 'Execute psector', node.*
+				INSERT INTO archived_psector_node_traceability
+				SELECT nextval('SCHEMA_NAME.archived_psector_node_traceability_id_seq'), psector_id, pn.state, doable, addparam, now(), current_user, 'Execute psector', node.*
 				FROM plan_psector_x_node pn JOIN node USING (node_id)
 				WHERE psector_id=NEW.psector_id;
 
 			ELSIF v_projectype = 'UD' THEN
 
 				-- arc & node insert is different from ws because legacy of _sys_length & _sys_elev and the impossibility to remove it from old production environments
-				INSERT INTO audit_psector_arc_traceability
-				SELECT nextval('SCHEMA_NAME.audit_psector_arc_traceability_id_seq'), psector_id, pa.state, doable, addparam, now(), current_user, 'Execute psector',
+				INSERT INTO archived_psector_arc_traceability
+				SELECT nextval('SCHEMA_NAME.archived_psector_arc_traceability_id_seq'), psector_id, pa.state, doable, addparam, now(), current_user, 'Execute psector',
 				a.arc_id,code,node_1,node_2,y1,y2,elev1,elev2,custom_y1,custom_y2,custom_elev1,custom_elev2,sys_elev1,sys_elev2,arc_type,arccat_id,
 				matcat_id,epa_type,sector_id,a.state,state_type,annotation,observ,comment,sys_slope,inverted_slope,custom_length,dma_id,soilcat_id,
 				function_type,category_type,fluid_type,location_type,workcat_id,workcat_id_end,buildercat_id,builtdate,enddate,ownercat_id,muni_id,
@@ -141,8 +141,8 @@ BEGIN
 				FROM plan_psector_x_arc pa JOIN arc a USING (arc_id)
 				WHERE psector_id=NEW.psector_id;
 
-				INSERT INTO audit_psector_node_traceability
-				SELECT nextval('SCHEMA_NAME.audit_psector_node_traceability_id_seq'), psector_id, pn.state, doable, addparam, now(), current_user, 'Execute psector',
+				INSERT INTO archived_psector_node_traceability
+				SELECT nextval('SCHEMA_NAME.archived_psector_node_traceability_id_seq'), psector_id, pn.state, doable, addparam, now(), current_user, 'Execute psector',
 				n.node_id,code,top_elev,ymax,elev,custom_top_elev,custom_ymax,custom_elev,node_type,nodecat_id,epa_type,sector_id,n.state,state_type,annotation,observ,
 				comment,dma_id,soilcat_id,function_type,category_type,fluid_type,location_type,workcat_id,workcat_id_end,buildercat_id,builtdate,enddate,ownercat_id,
 				muni_id,postcode,streetaxis_id,postnumber,postcomplement,streetaxis2_id,postnumber2,postcomplement2,n.descript,rotation,link,verified,the_geom,undelete,
@@ -152,14 +152,14 @@ BEGIN
 				FROM plan_psector_x_node pn JOIN node n USING (node_id)
 				WHERE psector_id=NEW.psector_id;
 
-				INSERT INTO audit_psector_connec_traceability
-				SELECT nextval('SCHEMA_NAME.audit_psector_connec_traceability_id_seq'), psector_id, pc.state, doable, pc.arc_id, l.link_id, l.the_geom, now(), current_user, 'Execute psector', connec.*
+				INSERT INTO archived_psector_connec_traceability
+				SELECT nextval('SCHEMA_NAME.archived_psector_connec_traceability_id_seq'), psector_id, pc.state, doable, pc.arc_id, l.link_id, l.the_geom, now(), current_user, 'Execute psector', connec.*
 				FROM plan_psector_x_connec pc JOIN connec USING (connec_id)
 				JOIN link l USING (link_id)
 				WHERE psector_id=NEW.psector_id;
 
-				INSERT INTO audit_psector_gully_traceability
-				SELECT nextval('SCHEMA_NAME.audit_psector_gully_traceability_id_seq'), psector_id, pg.state, doable, pg.arc_id, l.link_id, l.the_geom, now(), current_user, 'Execute psector', gully.*
+				INSERT INTO archived_psector_gully_traceability
+				SELECT nextval('SCHEMA_NAME.archived_psector_gully_traceability_id_seq'), psector_id, pg.state, doable, pg.arc_id, l.link_id, l.the_geom, now(), current_user, 'Execute psector', gully.*
 				FROM plan_psector_x_gully pg JOIN gully USING (gully_id)
 				JOIN link l USING (link_id)
 				WHERE psector_id=NEW.psector_id;
@@ -320,8 +320,8 @@ BEGIN
 			-- copy values into traceability tables
 			IF v_projectype = 'WS' THEN
 
-				INSERT INTO audit_psector_connec_traceability
-				SELECT nextval('SCHEMA_NAME.audit_psector_connec_traceability_id_seq'), psector_id, pc.state, doable, pc.arc_id, l.link_id, l.the_geom, now(), current_user, v_action,
+				INSERT INTO archived_psector_connec_traceability
+				SELECT nextval('SCHEMA_NAME.archived_psector_connec_traceability_id_seq'), psector_id, pc.state, doable, pc.arc_id, l.link_id, l.the_geom, now(), current_user, v_action,
 				connec_id, code, elevation, depth, c.conneccat_id,  c.sector_id, customer_code, c.state, c.state_type, c.arc_id, connec_length, annotation, observ, comment, c.dma_id,
 				c.presszone_id, soilcat_id, function_type, category_type, c.fluid_type, location_type, c.workcat_id, c.workcat_id_end,  buildercat_id, c.builtdate, c.enddate, ownercat_id,
 				c.muni_id, postcode, streetaxis_id, postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, c.descript, link, verified, rotation, c.the_geom, undelete,
@@ -333,21 +333,21 @@ BEGIN
 				WHERE psector_id=NEW.psector_id;
 
 				-- arc & node insert is different from ud because UD has legacy of _sys_length & _sys_elev and the impossibility to remove it from old production environments
-				INSERT INTO audit_psector_arc_traceability
-				SELECT nextval('SCHEMA_NAME.audit_psector_arc_traceability_id_seq'), psector_id, pa.state, doable, addparam, now(), current_user, v_action, arc.*
+				INSERT INTO archived_psector_arc_traceability
+				SELECT nextval('SCHEMA_NAME.archived_psector_arc_traceability_id_seq'), psector_id, pa.state, doable, addparam, now(), current_user, v_action, arc.*
 				FROM plan_psector_x_arc pa JOIN arc USING (arc_id)
 				WHERE psector_id=NEW.psector_id;
 
-				INSERT INTO audit_psector_node_traceability
-				SELECT nextval('SCHEMA_NAME.audit_psector_node_traceability_id_seq'), psector_id, pn.state, doable, addparam, now(), current_user, v_action, node.*
+				INSERT INTO archived_psector_node_traceability
+				SELECT nextval('SCHEMA_NAME.archived_psector_node_traceability_id_seq'), psector_id, pn.state, doable, addparam, now(), current_user, v_action, node.*
 				FROM plan_psector_x_node pn JOIN node USING (node_id)
 				WHERE psector_id=NEW.psector_id;
 
 			ELSIF v_projectype = 'UD' THEN
 
 				-- arc & node insert is different from ws because legacy of _sys_length & _sys_elev and the impossibility to remove it from old production environments
-				INSERT INTO audit_psector_arc_traceability
-				SELECT nextval('SCHEMA_NAME.audit_psector_arc_traceability_id_seq'), psector_id, pa.state, doable, addparam, now(), current_user, v_action,
+				INSERT INTO archived_psector_arc_traceability
+				SELECT nextval('SCHEMA_NAME.archived_psector_arc_traceability_id_seq'), psector_id, pa.state, doable, addparam, now(), current_user, v_action,
 				a.arc_id,code,node_1,node_2,y1,y2,elev1,elev2,custom_y1,custom_y2,custom_elev1,custom_elev2,sys_elev1,sys_elev2,arc_type,arccat_id,
 				matcat_id,epa_type,sector_id,a.state,state_type,annotation,observ,comment,sys_slope,inverted_slope,custom_length,dma_id,soilcat_id,
 				function_type,category_type,fluid_type,location_type,workcat_id,workcat_id_end,buildercat_id,builtdate,enddate,ownercat_id,muni_id,
@@ -358,8 +358,8 @@ BEGIN
 				FROM plan_psector_x_arc pa JOIN arc a USING (arc_id)
 				WHERE psector_id=NEW.psector_id;
 
-				INSERT INTO audit_psector_node_traceability
-				SELECT nextval('SCHEMA_NAME.audit_psector_node_traceability_id_seq'), psector_id, pn.state, doable, addparam, now(), current_user, v_action,
+				INSERT INTO archived_psector_node_traceability
+				SELECT nextval('SCHEMA_NAME.archived_psector_node_traceability_id_seq'), psector_id, pn.state, doable, addparam, now(), current_user, v_action,
 				n.node_id,code,top_elev,ymax,elev,custom_top_elev,custom_ymax,custom_elev,node_type,nodecat_id,epa_type,sector_id,n.state,state_type,annotation,observ,
 				comment,dma_id,soilcat_id,function_type,category_type,fluid_type,location_type,workcat_id,workcat_id_end,buildercat_id,builtdate,enddate,ownercat_id,
 				muni_id,postcode,streetaxis_id,postnumber,postcomplement,streetaxis2_id,postnumber2,postcomplement2,n.descript,rotation,link,verified,the_geom,undelete,
@@ -369,14 +369,14 @@ BEGIN
 				FROM plan_psector_x_node pn JOIN node n USING (node_id)
 				WHERE psector_id=NEW.psector_id;
 
-				INSERT INTO audit_psector_connec_traceability
-				SELECT nextval('SCHEMA_NAME.audit_psector_connec_traceability_id_seq'), psector_id, pc.state, doable, pc.arc_id, l.link_id, l.the_geom, now(), current_user, v_action, connec.*
+				INSERT INTO archived_psector_connec_traceability
+				SELECT nextval('SCHEMA_NAME.archived_psector_connec_traceability_id_seq'), psector_id, pc.state, doable, pc.arc_id, l.link_id, l.the_geom, now(), current_user, v_action, connec.*
 				FROM plan_psector_x_connec pc JOIN connec USING (connec_id)
 				JOIN link l USING (link_id)
 				WHERE psector_id=NEW.psector_id;
 
-				INSERT INTO audit_psector_gully_traceability
-				SELECT nextval('SCHEMA_NAME.audit_psector_gully_traceability_id_seq'), psector_id, pg.state, doable, pg.arc_id, l.link_id, l.the_geom, now(), current_user, v_action, gully.*
+				INSERT INTO archived_psector_gully_traceability
+				SELECT nextval('SCHEMA_NAME.archived_psector_gully_traceability_id_seq'), psector_id, pg.state, doable, pg.arc_id, l.link_id, l.the_geom, now(), current_user, v_action, gully.*
 				FROM plan_psector_x_gully pg JOIN gully USING (gully_id)
 				JOIN link l USING (link_id)
 				WHERE psector_id=NEW.psector_id;
