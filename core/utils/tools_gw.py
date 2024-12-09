@@ -4597,6 +4597,44 @@ def set_filter_listeners(complet_result, dialog, widget_list, columnname, widget
         elif type(last_widget) is QComboBox:
             last_widget.currentIndexChanged.emit(last_widget.currentIndex())
 
+def manage_dlg_widgets(class_object, dialog, complet_result):
+    """ Creates and populates all the widgets, preserving original layout logic while ensuring two-column alignment """
+
+    layout_orientations = {}
+
+    # Retrieve layout orientations from the JSON response if provided
+    for layout_name, layout_info in complet_result['body']['form']['layouts'].items():
+        orientation = layout_info.get('lytOrientation')
+        if orientation:
+            layout_orientations[layout_name] = orientation
+
+    # Loop through fields to add them to the appropriate layout
+    for field in complet_result['body']['data']['fields']:
+        # Skip hidden fields based on conditions
+        if field.get('hidden'):
+            continue
+
+        # Create label and widget
+        label, widget = set_widgets(dialog, complet_result, field, None, class_object)
+        if widget is None:
+            continue
+
+        # Find the layout for the current field based on layoutname
+        layout = dialog.findChild(QGridLayout, field['layoutname'])
+        if layout is None:
+            continue
+
+        # Apply layout orientation if specified in JSON
+        orientation = layout_orientations.get(layout.objectName(), "vertical")
+        layout.setProperty('lytOrientation', orientation)
+
+        # Add widget into layout
+        add_widget_combined(dialog, field, label, widget)
+
+        # Apply consistent column stretch across all layouts
+        layout.setColumnStretch(0, 1)  # Label column stretch (keep this compact)
+        layout.setColumnStretch(1, 3)  # Widget column stretch for sufficient space
+
 def set_widgets(dialog, complet_result, field, tablename, class_info):
     """
     functions called in -> widget = getattr(self, f"manage_{field['widgettype']}")(**kwargs)
