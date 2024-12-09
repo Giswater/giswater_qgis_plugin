@@ -18,6 +18,14 @@ DECLARE
     count int2;
     azm_aux float;
 	v_srid numeric;
+	v_dist_xlab numeric;
+	v_dist_ylab numeric;
+	v_sql text;
+	v_label_point public.geometry;
+	v_rot1 numeric;
+	v_rot2 numeric;
+	v_geom public.geometry;
+	v_cur_rotation numeric;
 
         
 BEGIN 
