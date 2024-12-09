@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>dlg_admin_ui</class>
- <widget class="QMainWindow" name="dlg_admin_ui">
+ <class>dlg_admin</class>
+ <widget class="QMainWindow" name="dlg_admin">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -390,8 +390,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>350</width>
-             <height>365</height>
+             <width>501</width>
+             <height>827</height>
             </rect>
            </property>
            <layout class="QGridLayout" name="gridLayout_12">
@@ -585,8 +585,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>199</width>
-             <height>294</height>
+             <width>501</width>
+             <height>827</height>
             </rect>
            </property>
            <layout class="QGridLayout" name="gridLayout_20">
