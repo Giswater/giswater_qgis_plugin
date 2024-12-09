@@ -30,7 +30,7 @@ from qgis.PyQt.QtGui import QCursor, QPixmap, QColor, QFontMetrics, QStandardIte
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QSpacerItem, QSizePolicy, QLineEdit, QLabel, QComboBox, QGridLayout, QTabWidget, \
     QCompleter, QPushButton, QTableView, QFrame, QCheckBox, QDoubleSpinBox, QSpinBox, QDateEdit, QTextEdit, \
-    QToolButton, QWidget, QApplication, QDockWidget, QMenu
+    QToolButton, QWidget, QApplication, QDockWidget, QMenu, QAction
 from qgis.core import Qgis, QgsProject, QgsPointXY, QgsVectorLayer, QgsField, QgsFeature, QgsSymbol, \
     QgsFeatureRequest, QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer, QgsPointLocator, \
     QgsSnappingConfig, QgsCoordinateTransform, QgsCoordinateReferenceSystem, QgsApplication, QgsVectorFileWriter, \
@@ -1361,13 +1361,23 @@ def manage_feature_cat():
     return feature_cat
 
 
-def build_dialog_info(dialog, result, my_json=None):
+def build_dialog_info(dialog, result, my_json=None, tab_name=None, enable_actions=True, is_inserting=False):
+    """
+    Builds the dialog and configures fields and actions dynamically based on the provided result.
+    Handles tab-specific action visibility and configurations.
+    """
+    if my_json is None:
+        my_json = {}
 
+    # Extract fields from the result
     fields = result['body']['data']
     if 'fields' not in fields:
         return
+
+    # Set up the grid layout for widgets
     grid_layout = dialog.findChild(QGridLayout, 'lyt_main_1')
 
+    # Iterate through fields to create widgets dynamically
     for order, field in enumerate(fields["fields"]):
         if field.get('hidden'):
             continue
@@ -1418,8 +1428,49 @@ def build_dialog_info(dialog, result, my_json=None):
         grid_layout.addWidget(label, order, 0)
         grid_layout.addWidget(widget, order, 1)
 
+    # Add vertical spacer for layout spacing
     vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
     grid_layout.addItem(vertical_spacer1)
+
+    # Handle actions dynamically based on tab_name
+    form_config = result['body'].get('form', {})
+    visible_tabs = form_config.get('visibleTabs', [])  # Retrieve tab-specific visibility
+    actions_list = dialog.findChildren(QAction)
+
+    # Hide all actions by default
+    for action in actions_list:
+        if not action.objectName():
+            continue
+        action.setVisible(False)
+
+    # Configure actions based on the tab_name
+    # Configure actions based on the tab_name
+    for tab in visible_tabs:
+        if tab['tabName'] == tab_name and 'tabactions' in tab:
+            if tab['tabactions']:  # Ensure tabactions is not None
+                for act in tab['tabactions']:
+                    action = dialog.findChild(QAction, act['actionName'])
+                    if action:
+                        action.setVisible(True)
+                        if 'actionTooltip' in act:
+                            action.setToolTip(act['actionTooltip'])
+
+    # Enable/Disable actions based on global and static rules
+    static_actions = ('actionEdit', 'actionCentered', 'actionLink', 'actionHelp',
+                      'actionSection', 'actionOrifice', 'actionOutlet', 'actionPump', 'actionWeir', 'actionDemand')
+
+    for action in actions_list:
+        if action.objectName() not in static_actions:
+            if is_inserting:
+                # For inserting, follow database configuration
+                for tab in visible_tabs:
+                    if tab['tabName'] == tab_name and 'tabactions' in tab:
+                        for act in tab['tabactions']:
+                            if action.objectName() == act['actionName']:
+                                action.setEnabled(not act.get('disabled', False))
+            else:
+                # For editing, enable/disable based on editable state
+                action.setEnabled(enable_actions)
 
     return result
 

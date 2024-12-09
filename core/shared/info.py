@@ -409,8 +409,8 @@ class GwInfo(QObject):
         # Dialog
         self.dlg_generic = GwInfoGenericUi(self)
         tools_gw.load_settings(self.dlg_generic)
-        result = tools_gw.build_dialog_info(self.dlg_generic, complet_result, self.my_json)
-
+        result = tools_gw.build_dialog_info(self.dlg_generic, complet_result, self.my_json, tab_name="tab_none",
+                                            enable_actions=True, is_inserting=False)
         # Set variables
         self._get_features(complet_result)
         layer = self.layer
@@ -429,7 +429,6 @@ class GwInfo(QObject):
 
         for tab in complet_result['body']['form']['visibleTabs']:
             self.visible_tabs[tab['tabName']] = tab
-        self._show_actions(self.dlg_generic, "tab_none")
 
         is_enabled = False
         try:
@@ -3001,7 +3000,6 @@ class GwInfo(QObject):
 
         dlg_generic = GwInfoGenericUi(self)
         tools_gw.load_settings(dlg_generic)
-        #self._show_actions(dlg_generic, "tab_none")
 
 
         # Set signals
@@ -3009,8 +3007,8 @@ class GwInfo(QObject):
         dlg_generic.dlg_closed.connect(partial(tools_gw.close_dialog, dlg_generic))
         dlg_generic.btn_accept.clicked.connect(partial(self._set_catalog, dlg_generic, form_name, table_name, feature_id, id_name))
 
-        tools_gw.build_dialog_info(dlg_generic, json_result)
-
+        tools_gw.build_dialog_info(dlg_generic, json_result, my_json=None, tab_name="tab_none",
+                                    enable_actions=True, is_inserting=False)
         # Open dialog
         dlg_generic.setWindowTitle(f"{(form_name.lower()).capitalize().replace('_', ' ')}")
         tools_gw.open_dialog(dlg_generic)
@@ -3534,7 +3532,7 @@ def add_row_epa(tbl, view, tablename, pkey, dlg, dlg_title, force_action, **kwar
     info.add_dlg = GwInfoGenericUi(info)
     tools_gw.load_settings(info.add_dlg)
     info.my_json_add = {}
-    tools_gw.build_dialog_info(info.add_dlg, result, my_json=info.my_json_add)
+    tools_gw.build_dialog_info(info.add_dlg, result, my_json=info.my_json_add, tab_name="tab_none", enable_actions=True, is_inserting=False)
 
     # Populate node_id/feature_id
     tools_qt.set_widget_text(info.add_dlg, f'tab_none_{info.feature_type}_id', feature_id)
@@ -3582,8 +3580,6 @@ def add_row_epa(tbl, view, tablename, pkey, dlg, dlg_title, force_action, **kwar
     info.add_dlg.dlg_closed.connect(partial(tools_gw.close_dialog, info.add_dlg))
     info.add_dlg.dlg_closed.connect(partial(refresh_epa_tbl, tbl, dlg, **kwargs))
     info.add_dlg.btn_accept.clicked.connect(partial(accept_add_dlg, info.add_dlg, tablename, pkey, feature_id, info.my_json_add, result, info, force_action))
-
-    info._show_actions(info.add_dlg, "tab_none", enable_actions=False)
 
     # Open dlg
     tools_gw.open_dialog(info.add_dlg, dlg_name='info_generic', title=dlg_title)
