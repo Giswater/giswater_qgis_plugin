@@ -62,10 +62,10 @@ BEGIN
 		SELECT resultdate, resulttime INTO v_selected_compare_date, v_selected_compare_time FROM selector_rpt_compare_tstep WHERE cur_user = v_cur_user;
 
 		-- Get list values for combo childs
-		SELECT array_agg(resultdate) INTO v_selector_date_list FROM rpt_arc WHERE result_id = COALESCE(v_selected_result_show, result_id);
-		SELECT array_agg(resultdate) INTO v_compare_date_list FROM rpt_arc WHERE result_id = v_selected_result_compare;
-		SELECT array_agg(resulttime) INTO v_selector_time_list FROM rpt_arc  WHERE resultdate = COALESCE(v_selected_selector_date, v_selector_date_list[1]);
-		SELECT array_agg(resulttime) INTO v_compare_time_list  FROM rpt_arc  WHERE resultdate = v_selected_compare_date;
+		SELECT array_agg(distinct resultdate) INTO v_selector_date_list FROM rpt_arc WHERE result_id = COALESCE(v_selected_result_show, result_id);
+		SELECT array_agg(distinct resultdate) INTO v_compare_date_list FROM rpt_arc WHERE result_id = v_selected_result_compare;
+		SELECT array_agg(distinct resulttime) INTO v_selector_time_list FROM rpt_arc  WHERE resultdate = COALESCE(v_selected_selector_date, v_selector_date_list[1]);
+		SELECT array_agg(distinct resulttime) INTO v_compare_time_list  FROM rpt_arc  WHERE resultdate = v_selected_compare_date;
 
 		-- Update JSON fields with selectedId values for specific column names
 	    v_fieldsjson := (
@@ -146,13 +146,13 @@ BEGIN
 					SELECT  array_agg(distinct resultdate) into v_combo_values FROM rpt_arc  WHERE result_id = v_selected_result_show;
 					SELECT resultdate INTO v_selected_value FROM selector_rpt_main_tstep WHERE cur_user = v_cur_user;
 				WHEN 'selector_time' THEN
-					SELECT array_agg(resulttime) into v_combo_values FROM rpt_arc  WHERE result_id = v_selected_result_show AND resultdate = COALESCE(v_selected_value, v_selected_selector_date);
+					SELECT array_agg(distinct resulttime) into v_combo_values FROM rpt_arc  WHERE result_id = v_selected_result_show AND resultdate = COALESCE(v_selected_value, v_selected_selector_date);
 					SELECT resulttime FROM selector_rpt_main_tstep INTO v_selected_value WHERE cur_user = v_cur_user;
 				WHEN 'compare_date' THEN
 					SELECT array_agg(distinct resultdate) into v_combo_values FROM rpt_arc  WHERE result_id = v_selected_result_compare;
 					SELECT resultdate INTO v_selected_value FROM selector_rpt_compare_tstep WHERE cur_user = v_cur_user;
 				WHEN 'compare_time' THEN
-					SELECT array_agg(resulttime) into v_combo_values FROM rpt_arc  WHERE result_id = v_selected_result_compare AND resultdate = COALESCE(v_selected_value, v_selected_compare_date);
+					SELECT array_agg(distinct resulttime) into v_combo_values FROM rpt_arc  WHERE result_id = v_selected_result_compare AND resultdate = COALESCE(v_selected_value, v_selected_compare_date);
 					SELECT resulttime FROM selector_rpt_compare_tstep INTO v_selected_value WHERE cur_user = v_cur_user;
 				ELSE
 					v_combo_values = NULL;
