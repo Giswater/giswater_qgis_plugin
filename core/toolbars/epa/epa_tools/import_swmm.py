@@ -48,8 +48,9 @@ class GwImportSwmm:
     def clicked_event(self) -> None:
         """Start the Import INP workflow"""
 
-        msg = "Import INP is only available for WS (EPANET projects)"
-        tools_qgis.show_warning(msg)
+        # TODO: remove this message once it's not in developement
+        msg = "Import INP is still in developement. It may not work as intended yet. Please report any unexpected behaviour to the Giswater team."
+        tools_qgis.show_warning(msg, duration=30)
 
         try:
             import swmm_api
