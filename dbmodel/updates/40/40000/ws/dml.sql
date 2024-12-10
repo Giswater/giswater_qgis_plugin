@@ -1338,8 +1338,7 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 
 -- 05/12/2024
 
-UPDATE sys_style SET stylevalue = replace(stylevalue,'max_vel','vel_max_compare') WHERE layername IN ('v_rpt_comp_arc_hourly', 'v_rpt_comp_arc');
-UPDATE sys_style SET stylevalue = replace(stylevalue,'max_pressure','press_max_compare') WHERE layername IN  ('v_rpt_comp_node_hourly','v_rpt_comp_node');
+UPDATE sys_style SET stylevalue = replace(stylevalue,'max_vel','vel_max_compare') WHERE layername IN ( 'v_rpt_comp_arc');
 
 INSERT INTO inp_dscenario_demand (dscenario_id, id, feature_id, feature_type, demand, pattern_id, demand_type, "source")
 SELECT dscenario_id, id, feature_id, feature_type, demand, pattern_id, demand_type, "source" FROM _inp_dscenario_demand;
@@ -1353,3 +1352,6 @@ FROM _selector_netscenario
 ON CONFLICT (parameter, cur_user)
 DO UPDATE SET
     value = excluded.value;
+
+--10/12/2024
+UPDATE sys_style SET stylevalue = replace(stylevalue,'vel','vel_compare') WHERE layername IN  ('v_rpt_comp_arc_hourly');
