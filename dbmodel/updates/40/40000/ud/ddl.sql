@@ -296,3 +296,5 @@ ALTER TABLE om_reh_cat_works RENAME TO _om_reh_cat_works;
 ALTER TABLE om_reh_parameter_x_works RENAME TO _om_reh_parameter_x_works;
 ALTER TABLE om_reh_value_loc_condition RENAME TO _om_reh_value_loc_condition;
 ALTER TABLE om_reh_works_x_pcompost RENAME TO _om_reh_works_x_pcompost;
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"man_conduit", "column":"inlet_offset", "newName":"_inlet_offset"}}$$);
