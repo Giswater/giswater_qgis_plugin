@@ -106,19 +106,19 @@ def _get_form_with_combos(dialog):
     """ Get combo values of tab result """
 
     form = {}
-    form["result_name_show"] = tools_qt.get_combo_value(dialog, "tab_result_result_name_show", 1)
-    form["result_name_compare"] = tools_qt.get_combo_value(dialog, "tab_result_result_name_compare", 1)
+    form["tab_result_result_name_show"] = tools_qt.get_combo_value(dialog, "tab_result_result_name_show", 1)
+    form["tab_result_result_name_compare"] = tools_qt.get_combo_value(dialog, "tab_result_result_name_compare", 1)
 
     # check project type
     project_type = tools_gw.get_project_type()
     if project_type == "ud":
-        form["selector_date"] = tools_qt.get_combo_value(dialog, "tab_time_selector_date", 1)
-        form["selector_time"] = tools_qt.get_combo_value(dialog, "tab_time_selector_time", 1)
-        form["compare_date"] = tools_qt.get_combo_value(dialog, "tab_time_compare_date", 1)
-        form["compare_time"] = tools_qt.get_combo_value(dialog, "tab_time_compare_time", 1)
+        form["tab_time_selector_date"] = tools_qt.get_combo_value(dialog, "tab_time_selector_date", 1)
+        form["tab_time_selector_time"] = tools_qt.get_combo_value(dialog, "tab_time_selector_time", 1)
+        form["tab_time_compare_date"] = tools_qt.get_combo_value(dialog, "tab_time_compare_date", 1)
+        form["tab_time_compare_time"] = tools_qt.get_combo_value(dialog, "tab_time_compare_time", 1)
     elif project_type == "ws":
-        form["time_show"] = tools_qt.get_combo_value(dialog, "tab_time_time_show", 1)
-        form["time_compare"] = tools_qt.get_combo_value(dialog, "tab_time_time_compare", 1)
+        form["tab_time_time_show"] = tools_qt.get_combo_value(dialog, "tab_time_time_show", 1)
+        form["tab_time_time_compare"] = tools_qt.get_combo_value(dialog, "tab_time_time_compare", 1)
 
     return form
 
