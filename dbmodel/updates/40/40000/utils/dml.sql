@@ -752,3 +752,6 @@ INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tab
     "disabled": false
   }
 ]'::json, 0, '{4,5}');
+
+DELETE FROM config_fprocess WHERE fid=239 AND tablename='vi_backdrop' AND target='[BACKDROP]';
+DELETE FROM config_fprocess WHERE fid=141 AND tablename='vi_t_backdrop' AND target='[BACKDROP]';

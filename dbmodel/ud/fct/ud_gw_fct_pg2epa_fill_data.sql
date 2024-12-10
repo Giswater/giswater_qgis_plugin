@@ -92,7 +92,7 @@ BEGIN
 	UNION
 	SELECT '||quote_literal(result_id_var)||',
 	node.node_id, sys_top_elev, sys_ymax, v_edit_node.sys_elev, node.node_type, node.nodecat_id, node.epa_type, node.sector_id, 
-	node.state, node.state_type, node.annotation, node.expl_id, y0, ysur, node.the_geom, (now()::date-node.builtdate)/30
+	node.state, node.state_type, node.annotation, node.expl_id, y0, ysur, NULL, node.the_geom, (now()::date-node.builtdate)/30
 	FROM selector_sector, node 
 		LEFT JOIN v_edit_node USING (node_id) 	
 		JOIN inp_storage ON node.node_id=inp_storage.node_id
