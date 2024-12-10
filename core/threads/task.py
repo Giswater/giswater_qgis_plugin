@@ -26,7 +26,7 @@ class GwTask(QgsTask, QObject):
         self.aux_conn = None
 
 
-    def run(self):
+    def run(self) -> bool:
 
         lib_vars.session_vars['threads'].append(self)
         self.aux_conn = tools_db.dao.get_aux_conn()

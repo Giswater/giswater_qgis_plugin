@@ -1024,6 +1024,8 @@ def fill_tab_log(dialog, data, force_tab=True, reset_text=True, tab_idx=1, call_
 
     change_tab = False
     text = tools_qt.get_text(dialog, dialog.txt_infolog, return_string_null=False)
+    if text is None:
+        text = ""
 
     if reset_text:
         text = ""

@@ -1,0 +1,54 @@
+{
+    "01":{
+        "message":"wet weather time step reduced to recording interval for Rain Gage xxx.",
+        "description":"The wet weather time step was automatically reduced so that no period with rainfall would be skipped during a simulation."
+    },
+    "02":{
+        "message":"maximum depth increased for Node xxx.",
+        "description":"The maximum depth for the node was automatically increased to match the top of the highest connecting conduit."
+    },
+    "03":{
+        "message":"negative offset ignored for Link xxx.",
+        "description":"The link's stipulated offset was below the connecting node's invert so its actual offset was set to 0."
+    },
+    "04":{
+        "message":"minimum elevation drop used for Conduit xxx.",
+        "description":"The elevation drop between the end nodes of the conduit was below 0.001 ft (0.00035 m) so the latter value was used instead to calculate its slope."
+    },
+    "05":{
+        "message":"minimum slope used for Conduit xxx.",
+        "description":"The conduit's computed slope was below the user-specified Minimum Conduit Slope so the latter value was used instead."
+    },
+    "06":{
+        "message":"dry weather time step increased to wet weather time step.",
+        "description":"The user-specified time step for computing runoff during dry weather periods was lower than that set for wet weather periods and was automatically increased to the wet weather value."
+    },
+    "07":{
+        "message":"routing time step reduced to wet weather time step.",
+        "description":"The user-specified time step for flow routing was larger than the wet weather runoff time step and was automatically reduced to the runoff time step to prevent loss of accuracy."
+    },
+    "08":{
+        "message":"elevation drop exceeds length for Conduit xxx.",
+        "description":"The elevation drop across the ends of a conduit exceeds its length. The program computes the conduit's slope as the elevation drop divided by the length instead of using the more accurate right triangle method. The user should check for errors in the length and in both the invert elevations and offsets at the conduit's upstream and downstream nodes."
+    },
+    "09":{
+        "message":"time series interval greater than recording interval for Rain Gage xxx.",
+        "description":"The smallest time interval between entries in the precipitation time series used by the rain gage is greater than the recording time interval specified for the gage. If this was not actually intended then what appear to be continuous periods of rainfall in the time series will instead be read with time gaps in between them."
+    },
+    "10a":{
+        "message":"crest elevation is below downstream invert for regulator Link xxx.",
+        "description":"For Kinematic Wave or Steady Flow routing, the height of the opening on an orifice, weir, or outlet at a storage node is below the invert elevation of its downstream node. Users should check to see if the regulator's offset height or the downstream node's invert elevation is in error."
+    },
+    "10b":{
+        "message":"crest elevation raised to downstream invert for regulator Link xxx.",
+        "description":"For Dynamic Wave routing, the height of the opening on an orifice, weir or outlet will be raised to the invert elevation of its downstream node if necessary."
+    },
+    "11":{
+        "message":"non-matching attributes in Control Rule xxx.",
+        "description":"The premise of a control is comparing two different types of attributes to one another (for example, conduit flow and junction water depth)."
+    },
+    "12":{
+        "message":"inlet removed due to unsupported shape for Conduit xxx.",
+        "description":"Curb and gutter inlets can only be placed in conduits with a Street shaped cross- section while drop inlets can only be placed in open rectangular and trapezoidal conduits."
+    }
+}

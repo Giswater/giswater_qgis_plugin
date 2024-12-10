@@ -1,0 +1,6 @@
+<svg viewBox="0 0 25 25" height="25" width="25" version="1.1" id="svg2" xmlns="http://www.w3.org/2000/svg">
+    <path fill="param(fill) #fff" stroke="param(outline) #000" stroke-width="1" d="M3.7 4.04h17.74v16.93H3.7Z" id="path1"/>
+    <ellipse ry="4.82" rx="4.77" cy="12.5" cx="12.68" fill="none" stroke="param(outline) #000" stroke-width="1" id="ellipse1"/>
+    <path d="M0 12.5h3.7m17.73 0h3.7" fill="none" stroke="param(outline) #000" stroke-width="param(outline-width) 1" id="path2"/>
+</svg>
+

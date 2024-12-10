@@ -4,20 +4,25 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 """
 # -*- coding: utf-8 -*-
+import os
 from datetime import datetime
 from functools import partial
 
 from qgis.PyQt.QtCore import QPoint
 from qgis.PyQt.QtWidgets import QMenu, QAction, QActionGroup
+from qgis.PyQt.QtGui import QIcon
 
 from ..dialog import GwAction
 from .... import global_vars
+from ....libs import lib_vars
 from .epa_tools.anl_add_demand_check import AddDemandCheck
 from .epa_tools.anl_recursive_go2epa import RecursiveEpa
 from .epa_tools.anl_quantized_demands import QuantizedDemands
 from .epa_tools.anl_valve_operation_check import ValveOperationCheck
 from .epa_tools.cal_emitter import EmitterCalibration
 from .epa_tools.cal_static import StaticCalibration
+from .epa_tools.import_epanet import GwImportEpanet
+from .epa_tools.import_swmm import GwImportSwmm
 
 
 class GwEpaTools(GwAction):
@@ -37,7 +42,7 @@ class GwEpaTools(GwAction):
             self.action.setMenu(self.menu)
             toolbar.addAction(self.action)
 
-    def clicked_event(self): 
+    def clicked_event(self):
         button = self.action.associatedWidgets()[1]
         menu_point = button.mapToGlobal(QPoint(0,button.height()))
         self.menu.exec(menu_point)
@@ -57,16 +62,20 @@ class GwEpaTools(GwAction):
         cal_menu = self.menu.addMenu("CALIBRATION")
 
         new_actions = [
-            (anl_menu, ('ws'), 'ADDITIONAL DEMAND CHECK'),
-            (anl_menu, ('ud', 'ws'), 'EPA MULTI CALLS'),
-            (anl_menu, ('ws'), 'QUANTIZED DEMANDS'),
-            (anl_menu, ('ws'), 'VALVE OPERATION CHECK'),
-            (cal_menu, ('ws'), 'EMITTER CALIBRATION'),
-            (cal_menu, ('ws'), 'STATIC CALIBRATION'),
+            (anl_menu, ('ws'), 'ADDITIONAL DEMAND CHECK', None),
+            (anl_menu, ('ud', 'ws'), 'EPA MULTI CALLS', None),
+            (anl_menu, ('ws'), 'QUANTIZED DEMANDS', None),
+            (anl_menu, ('ws'), 'VALVE OPERATION CHECK', None),
+            (cal_menu, ('ws'), 'EMITTER CALIBRATION', None),
+            (cal_menu, ('ws'), 'STATIC CALIBRATION', None),
+            (self.menu, ('ud', 'ws'), 'IMPORT INP FILE', QIcon(f"{lib_vars.plugin_dir}{os.sep}icons{os.sep}toolbars{os.sep}epa{os.sep}22.png"))
         ]
-        for menu, types, action in new_actions:
+        for menu, types, action, icon in new_actions:
             if global_vars.project_type in types:
-                obj_action = QAction(f"{action}", ag)
+                if icon:
+                    obj_action = QAction(icon, f"{action}", ag)
+                else:
+                    obj_action = QAction(f"{action}", ag)
                 menu.addAction(obj_action)
                 obj_action.triggered.connect(partial(self._get_selected_action, action))
 
@@ -93,7 +102,7 @@ class GwEpaTools(GwAction):
         elif name == 'QUANTIZED DEMANDS':
             quantized_demands = QuantizedDemands()
             quantized_demands.clicked_event()
-        
+
         elif name == 'STATIC CALIBRATION':
             static_calibration = StaticCalibration()
             static_calibration.clicked_event()
@@ -101,3 +110,13 @@ class GwEpaTools(GwAction):
         elif name == 'VALVE OPERATION CHECK':
             valve_operation_check = ValveOperationCheck()
             valve_operation_check.clicked_event()
+
+        elif name == 'IMPORT INP FILE':
+            if global_vars.project_type == 'ws':
+                import_inp = GwImportEpanet()
+                import_inp.clicked_event()
+                return
+            if global_vars.project_type == 'ud':
+                import_inp = GwImportSwmm()
+                import_inp.clicked_event()
+                return
