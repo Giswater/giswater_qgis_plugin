@@ -203,10 +203,7 @@ BEGIN
 				DROP VIEW IF EXISTS v_anl_mincut_result_node;
 				DROP VIEW IF EXISTS v_anl_mincut_result_polygon;
 				DROP VIEW IF EXISTS v_anl_mincut_result_valve;
-
-
 			ELSIF v_projecttype = 'UD' THEN
-
 				DROP VIEW IF EXISTS v_edit_man_chamber;
 				DROP VIEW IF EXISTS v_edit_man_chamber_pol;
 				DROP VIEW IF EXISTS v_edit_man_conduit;
@@ -228,40 +225,41 @@ BEGIN
 				DROP VIEW IF EXISTS v_edit_man_wjump;
 				DROP VIEW IF EXISTS v_edit_man_wwtp;
 				DROP VIEW IF EXISTS v_edit_man_wwtp_pol;
-
 			END IF;
 
 			-- drop deprecated columns
 			IF v_projecttype = 'WS' THEN
-				ALTER TABLE inp_pattern_value DROP COLUMN if exists _factor_19;
-				ALTER TABLE inp_pattern_value DROP COLUMN if exists _factor_20;
-				ALTER TABLE inp_pattern_value DROP COLUMN if exists _factor_21;
-				ALTER TABLE inp_pattern_value DROP COLUMN if exists _factor_22;
-				ALTER TABLE inp_pattern_value DROP COLUMN if exists _factor_23;
-				ALTER TABLE inp_pattern_value DROP COLUMN if exists _factor_24;
-				ALTER TABLE config_graph_mincut DROP COLUMN if exists _to_arc;
+				ALTER TABLE inp_pattern_value DROP COLUMN IF EXISTS _factor_19;
+				ALTER TABLE inp_pattern_value DROP COLUMN IF EXISTS _factor_20;
+				ALTER TABLE inp_pattern_value DROP COLUMN IF EXISTS _factor_21;
+				ALTER TABLE inp_pattern_value DROP COLUMN IF EXISTS _factor_22;
+				ALTER TABLE inp_pattern_value DROP COLUMN IF EXISTS _factor_23;
+				ALTER TABLE inp_pattern_value DROP COLUMN IF EXISTS _factor_24;
+				ALTER TABLE config_graph_mincut DROP COLUMN IF EXISTS _to_arc;
 				ALTER TABLE ext_rtc_hydrometer DROP COLUMN IF EXISTS hydrometer_category;
 				ALTER TABLE ext_rtc_hydrometer DROP COLUMN IF EXISTS cat_hydrometer_id ;
-				
 			ELSE
-				ALTER TABLE cat_arc_shape DROP COLUMN if exists _tsect_id;
-				ALTER TABLE cat_arc_shape DROP COLUMN if exists _curve_id;
-				ALTER TABLE node DROP COLUMN if exists _sys_elev;
-
+				ALTER TABLE cat_arc_shape DROP COLUMN IF EXISTS _tsect_id;
+				ALTER TABLE cat_arc_shape DROP COLUMN IF EXISTS _curve_id;
+				ALTER TABLE node DROP COLUMN IF EXISTS _sys_elev;
 			END IF;
-			
-			ALTER TABLE arc DROP COLUMN if exists _sys_length;
-			ALTER TABLE sys_addfields DROP COLUMN if exists _default_value_;
-			ALTER TABLE sys_addfields DROP COLUMN if exists _form_label_;
-			ALTER TABLE sys_addfields DROP COLUMN if exists _widgettype_id_;
-			ALTER TABLE sys_addfields DROP COLUMN if exists _dv_table_;
-			ALTER TABLE sys_addfields DROP COLUMN if exists _dv_key_column_;
-			ALTER TABLE sys_addfields DROP COLUMN if exists _sql_text_;
-			ALTER TABLE sys_addfields DROP COLUMN if exists _field_length_;
-			ALTER TABLE sys_addfields DROP COLUMN if exists _num_decimals_;
-			ALTER TABLE sys_addfields DROP COLUMN if exists _dv_value_column_;
 
-			--drop NOT NULL restrictions
+			ALTER TABLE sys_foreignkey DROP COLUMN IF EXISTS _id;
+			ALTER TABLE cat_feature_arc DROP COLUMN IF EXISTS _type;
+			ALTER TABLE cat_feature_node DROP COLUMN IF EXISTS _type;
+			ALTER TABLE cat_feature_connec DROP COLUMN IF EXISTS _type;
+			ALTER TABLE arc DROP COLUMN IF EXISTS _sys_length;
+			ALTER TABLE sys_addfields DROP COLUMN IF EXISTS _default_value_;
+			ALTER TABLE sys_addfields DROP COLUMN IF EXISTS _form_label_;
+			ALTER TABLE sys_addfields DROP COLUMN IF EXISTS _widgettype_id_;
+			ALTER TABLE sys_addfields DROP COLUMN IF EXISTS _dv_table_;
+			ALTER TABLE sys_addfields DROP COLUMN IF EXISTS _dv_key_column_;
+			ALTER TABLE sys_addfields DROP COLUMN IF EXISTS _sql_text_;
+			ALTER TABLE sys_addfields DROP COLUMN IF EXISTS _field_length_;
+			ALTER TABLE sys_addfields DROP COLUMN IF EXISTS _num_decimals_;
+			ALTER TABLE sys_addfields DROP COLUMN IF EXISTS _dv_value_column_;
+
+			-- drop NOT NULL restrictions
 			ALTER TABLE arc ALTER COLUMN verified DROP NOT NULL;
 			ALTER TABLE node ALTER COLUMN verified DROP NOT NULL;
 			ALTER TABLE connec ALTER COLUMN verified DROP NOT NULL;
@@ -275,6 +273,7 @@ BEGIN
 			ALTER TABLE samplepoint ALTER COLUMN workcat_id DROP NOT NULL;
 
 			IF v_projecttype = 'UD' THEN
+				ALTER TABLE cat_feature_gully DROP COLUMN IF EXISTS _type;
 				ALTER TABLE gully ALTER COLUMN verified DROP NOT NULL;
 				ALTER TABLE gully ALTER COLUMN workcat_id DROP NOT NULL;
 			END IF;

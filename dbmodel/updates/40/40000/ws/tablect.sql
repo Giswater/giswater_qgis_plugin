@@ -127,10 +127,3 @@ CREATE RULE sector_undefined AS
 CREATE RULE undelete_sector AS
     ON DELETE TO sector
    WHERE (old.undelete = true) DO INSTEAD NOTHING;
-
--- remove old tables
-DROP TABLE IF EXISTS _dma;
-DROP TABLE IF EXISTS _presszone;
-DROP TABLE IF EXISTS _dqa;
-DROP TABLE IF EXISTS _sector;
-DROP TABLE _doc;

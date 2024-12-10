@@ -8,7 +8,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 11/10/2024
 ALTER TABLE cat_feature_gully DROP CONSTRAINT IF EXISTS cat_feature_gully_type_fkey;
-ALTER TABLE cat_feature_gully DROP COLUMN type;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"cat_feature_gully", "column":"type", "newName":"_type"}}$$);
 
 -- 15/10/2024
 ALTER TABLE cat_arc RENAME TO _cat_arc;
@@ -289,10 +289,10 @@ DROP VIEW IF EXISTS v_edit_inp_storage;
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"inp_storage", "column":"apond"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"inp_dscenario_storage", "column":"apond"}}$$);
 
-DROP TABLE IF EXISTS rtc_scada_x_dma;
-DROP TABLE IF EXISTS rtc_scada_x_sector;
+ALTER TABLE rtc_scada_x_dma RENAME to _rtc_scada_x_dma;
+ALTER TABLE rtc_scada_x_sector RENAME to _rtc_scada_x_sector;
 
-DROP TABLE IF EXISTS om_reh_cat_works;
-DROP TABLE IF EXISTS om_reh_parameter_x_works;
-DROP TABLE IF EXISTS om_reh_value_loc_condition;
-DROP TABLE IF EXISTS om_reh_works_x_pcompost;
+ALTER TABLE om_reh_cat_works RENAME TO _om_reh_cat_works;
+ALTER TABLE om_reh_parameter_x_works RENAME TO _om_reh_parameter_x_works;
+ALTER TABLE om_reh_value_loc_condition RENAME TO _om_reh_value_loc_condition;
+ALTER TABLE om_reh_works_x_pcompost RENAME TO _om_reh_works_x_pcompost;

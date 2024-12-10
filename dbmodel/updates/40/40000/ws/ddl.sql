@@ -12,7 +12,7 @@ ALTER TABLE arc DROP CONSTRAINT arc_macrominsector_id_fkey;
 ALTER TABLE connec DROP CONSTRAINT connec_macrominsector_id_fkey;
 ALTER TABLE link DROP CONSTRAINT link_macrominsector_id_fkey;
 
-DROP TABLE IF EXISTS macrominsector;
+ALTER TABLE macrominsector RENAME to _macrominsector;
 
 -- to change presszone_id::varchar to presszone_id::integer
 -- drop foreign key

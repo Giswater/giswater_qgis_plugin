@@ -6,6 +6,21 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
+-- 08/10/2024
+ALTER TABLE sys_foreignkey DROP CONSTRAINT sys_foreingkey_pkey;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"sys_foreignkey", "column":"id", "newName":"_id"}}$$);
+ALTER TABLE sys_foreignkey DROP CONSTRAINT sys_foreignkey_unique;
+ALTER TABLE sys_foreignkey ADD CONSTRAINT sys_foreingkey_pkey PRIMARY KEY (typevalue_table, typevalue_name, target_table, target_field);
+
+ALTER TABLE plan_psector ADD CONSTRAINT plan_psector_workcat_id_fkey FOREIGN KEY (workcat_id) REFERENCES cat_work(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE plan_psector ADD CONSTRAINT plan_psector_parent_id_fkey FOREIGN KEY (parent_id) REFERENCES plan_psector(psector_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+CREATE INDEX idx_plan_psector_expl_id ON plan_psector USING btree (expl_id);
+CREATE INDEX idx_plan_psector_workcat_id ON plan_psector USING btree (workcat_id);
+CREATE INDEX ifx_plan_psector_parent_id ON plan_psector USING btree (parent_id);
+CREATE INDEX idx_plan_psector_name ON plan_psector USING btree (name);
+CREATE INDEX idx_plan_psector_status ON plan_psector USING btree (status);
+CREATE INDEX ifx_plan_psector_the_geom ON plan_psector USING gist (the_geom);
+
 -- 11/10/2024
 ALTER TABLE sys_feature_cat RENAME TO sys_feature_class;
 
@@ -18,9 +33,9 @@ DROP VIEW IF EXISTS v_value_cat_connec;
 ALTER TABLE cat_feature_arc DROP CONSTRAINT cat_feature_arc_type_fkey;
 ALTER TABLE cat_feature_node DROP CONSTRAINT cat_feature_node_type_fkey;
 ALTER TABLE cat_feature_connec DROP CONSTRAINT cat_feature_connec_type_fkey;
-ALTER TABLE cat_feature_arc DROP COLUMN type;
-ALTER TABLE cat_feature_node DROP COLUMN type;
-ALTER TABLE cat_feature_connec DROP COLUMN type;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"cat_feature_arc", "column":"type", "newName":"_type"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"cat_feature_node", "column":"type", "newName":"_type"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"cat_feature_connec", "column":"type", "newName":"_type"}}$$);
 
 -- 17/10/2024
 CREATE TABLE config_form_help (
@@ -186,4 +201,4 @@ ALTER TABLE audit_psector_connec_traceability RENAME TO archived_psector_connec_
 ALTER TABLE audit_psector_node_traceability RENAME TO archived_psector_node_traceability;
 
 DROP VIEW IF EXISTS vi_backdrop;
-DROP TABLE IF EXISTS inp_backdrop;
+ALTER TABLE inp_backdrop RENAME to _inp_backdrop;
