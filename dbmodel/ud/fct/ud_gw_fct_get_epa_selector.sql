@@ -132,10 +132,10 @@ BEGIN
 
 	ELSE
 		-- Get parameters from input
-		v_selected_result_show = ((p_data ->>'form')::json->>'result_name_show');
-		v_selected_result_compare = ((p_data ->>'form')::json->>'result_name_compare');
-		v_selected_selector_date = ((p_data ->>'form')::json->>'selector_date');
-		v_selected_compare_date = ((p_data ->>'form')::json->>'compare_date');
+		v_selected_result_show = ((p_data ->>'form')::json->>'tab_result_result_name_show');
+		v_selected_result_compare = ((p_data ->>'form')::json->>'tab_result_result_name_compare');
+		v_selected_selector_date = ((p_data ->>'form')::json->>'tab_time_selector_date');
+		v_selected_compare_date = ((p_data ->>'form')::json->>'tab_time_compare_date');
 
 		v_childs = ARRAY(SELECT jsonb_array_elements_text((p_data -> 'feature' -> 'childs')::jsonb));
 

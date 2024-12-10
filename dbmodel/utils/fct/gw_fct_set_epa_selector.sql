@@ -38,18 +38,18 @@ BEGIN
     SELECT value INTO v_version FROM config_param_system WHERE parameter='admin_version';
 
     -- Get parameters from input
-	v_result_name_to_show = ((p_data ->>'form')::json->>'result_name_show');
-	v_result_name_to_compare = ((p_data ->>'form')::json->>'result_name_compare');
+	v_result_name_to_show = ((p_data ->>'form')::json->>'tab_result_result_name_show');
+	v_result_name_to_compare = ((p_data ->>'form')::json->>'tab_result_result_name_compare');
 
 	-- ud combos:
-	v_selector_date = ((p_data ->>'form')::json->>'selector_date');
-	v_compare_date = ((p_data ->>'form')::json->>'compare_date');
-	v_selector_time = ((p_data ->>'form')::json->>'selector_time');
-	v_compare_time = ((p_data ->>'form')::json->>'compare_time');
+	v_selector_date = ((p_data ->>'form')::json->>'tab_time_selector_date');
+	v_compare_date = ((p_data ->>'form')::json->>'tab_time_compare_date');
+	v_selector_time = ((p_data ->>'form')::json->>'tab_time_selector_time');
+	v_compare_time = ((p_data ->>'form')::json->>'tab_time_compare_time');
 
 	-- ws combos:
-	v_time_to_show = ((p_data ->>'form')::json->>'time_show');
-	v_time_to_compare = ((p_data ->>'form')::json->>'time_compare');
+	v_time_to_show = ((p_data ->>'form')::json->>'tab_time_time_show');
+	v_time_to_compare = ((p_data ->>'form')::json->>'tab_time_time_compare');
 
     -- Set project user
 	v_cur_user = ((p_data ->>'client')::json->>'cur_user');
