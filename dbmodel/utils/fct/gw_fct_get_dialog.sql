@@ -48,8 +48,10 @@ v_tab_name text;
 v_tab_names jsonb;
 v_tab_data jsonb;
 v_tablename text;
+v_idname text;
 v_id text;
-v_idval text;
+v_idname_array text[];
+v_id_array text[];
 v_values_array json;
 
 BEGIN
@@ -65,9 +67,8 @@ BEGIN
 	v_formname = ((p_data ->>'form')::json->>'formName');
 	v_formtype = ((p_data ->>'form')::json->>'formType');
 	v_tablename = ((p_data ->>'form')::json->>'tableName');
+	v_idname = ((p_data ->>'form')::json->>'idname');
 	v_id = ((p_data ->>'form')::json->>'id');
-	v_idval = ((p_data ->>'form')::json->>'idval');
-
 
     -- Get fields
     SELECT gw_fct_getformfields(
@@ -85,18 +86,29 @@ BEGIN
     ) INTO v_fields_array;
 
 	IF array_length(v_fields_array, 1) IS NULL THEN
-    	RAISE EXCEPTION 'Variable v_fields_array is empty. Check the "formName" or "formType" parameters.';
+    	RAISE EXCEPTION 'Variable v_fields_array is empty. Check the "formName" or "formType" parameters: %', v_fields_array;
 	END IF;
+	IF v_tablename IS NOT NULL AND v_idname IS NOT NULL OR v_id IS NOT NULL THEN
 
-	IF v_tablename IS NOT NULL AND v_id IS NOT NULL OR v_idval IS NOT NULL THEN
+		-- Accept multiple idnames and ids
+	    IF v_idname IS NOT NULL AND v_id IS NOT NULL THEN
+	        v_idname_array := string_to_array(v_idname, ', ');
+	        v_id_array := string_to_array(v_id, ', ');
+	    END IF;
 
-		v_querystring = concat(
-		    'SELECT row_to_json(a) FROM (SELECT * FROM ',v_tablename,' WHERE ',v_id,' = ',quote_literal(v_idval),') a;'
-		);
+	    v_querystring := 'SELECT row_to_json(a) FROM (SELECT * FROM ' || quote_ident(v_tablename);
 
-	    raise notice 'test v_querystring %', v_querystring;
+	    IF cardinality(v_idname_array) > 0 AND cardinality(v_id_array) > 0 THEN
+	        v_querystring := v_querystring || ' WHERE ';
+	        FOR i IN 1..cardinality(v_idname_array) LOOP
+	            v_querystring := v_querystring || quote_ident(v_idname_array[i]) || ' = ' || quote_literal(v_id_array[i]) || ' AND ';
+	        END LOOP;
+
+	        v_querystring := substring(v_querystring FROM 1 FOR length(v_querystring) - 5);
+	    END IF;
+
+	    v_querystring := v_querystring || ') a;';
 	    EXECUTE v_querystring INTO v_values_array;
-	    raise notice 'test v_values_array %', v_values_array;
 
 		-- looping the array setting values
 		FOREACH v_aux_json IN ARRAY v_fields_array
