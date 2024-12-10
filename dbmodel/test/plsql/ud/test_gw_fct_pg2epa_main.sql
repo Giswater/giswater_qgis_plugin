@@ -10,16 +10,59 @@ SET client_min_messages TO WARNING;
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
--- Plan for 1 test
-SELECT plan(1);
+-- Plan for 7 test
+SELECT plan(7);
 
 -- Extract and test the "status" field from the function's JSON response
 SELECT is(
     (gw_fct_pg2epa_main($${"client":{"device":4, "lang":"", "infoType":1, "epsg":25831}, "form":{}, "feature":{},
-    "data":{"filterFields":{}, "pageInfo":{}, "resultId":"test", "dumpSubcatch":"False", "step": 2}}$$)::JSON)->>'status',
+    "data":{"filterFields":{}, "pageInfo":{}, "resultId":"expl_1", "dumpSubcatch":"False", "step": 1}}$$)::JSON)->>'status',
     'Accepted',
-    'Check if gw_fct_pg2epa_main returns status "Accepted"'
+    'Check if gw_fct_pg2epa_main: dumpSubcatch=False | step=1 returns status "Accepted"'
 );
+
+SELECT is(
+    (gw_fct_pg2epa_main($${"client":{"device":4, "lang":"", "infoType":1, "epsg":25831}, "form":{}, "feature":{},
+    "data":{"filterFields":{}, "pageInfo":{}, "resultId":"expl_1", "dumpSubcatch":"False", "step": 2}}$$)::JSON)->>'status',
+    'Accepted',
+    'Check if gw_fct_pg2epa_main: dumpSubcatch=False | step=2 returns status "Accepted"'
+);
+
+SELECT is(
+    (gw_fct_pg2epa_main($${"client":{"device":4, "lang":"", "infoType":1, "epsg":25831}, "form":{}, "feature":{},
+    "data":{"filterFields":{}, "pageInfo":{}, "resultId":"expl_1", "dumpSubcatch":"False", "step": 3}}$$)::JSON)->>'status',
+    'Accepted',
+    'Check if gw_fct_pg2epa_main: dumpSubcatch=False | step=3 returns status "Accepted"'
+);
+
+SELECT is(
+    (gw_fct_pg2epa_main($${"client":{"device":4, "lang":"", "infoType":1, "epsg":25831}, "form":{}, "feature":{},
+    "data":{"filterFields":{}, "pageInfo":{}, "resultId":"expl_1", "dumpSubcatch":"False", "step": 4}}$$)::JSON)->>'status',
+    'Accepted',
+    'Check if gw_fct_pg2epa_main: dumpSubcatch=False | step=4 returns status "Accepted"'
+);
+
+SELECT is(
+    (gw_fct_pg2epa_main($${"client":{"device":4, "lang":"", "infoType":1, "epsg":25831}, "form":{}, "feature":{},
+    "data":{"filterFields":{}, "pageInfo":{}, "resultId":"expl_1", "dumpSubcatch":"False", "step": 5}}$$)::JSON)->>'status',
+    'Accepted',
+    'Check if gw_fct_pg2epa_main: dumpSubcatch=False | step=5 returns status "Accepted"'
+);
+
+SELECT is(
+    (gw_fct_pg2epa_main($${"client":{"device":4, "lang":"", "infoType":1, "epsg":25831}, "form":{}, "feature":{},
+    "data":{"filterFields":{}, "pageInfo":{}, "resultId":"expl_1", "dumpSubcatch":"False", "step": 6}}$$)::JSON)->>'status',
+    'Accepted',
+    'Check if gw_fct_pg2epa_main: dumpSubcatch=False | step=6 returns status "Accepted"'
+);
+
+SELECT is(
+    (gw_fct_pg2epa_main($${"client":{"device":4, "lang":"", "infoType":1, "epsg":25831}, "form":{}, "feature":{},
+    "data":{"filterFields":{}, "pageInfo":{}, "resultId":"expl_1", "dumpSubcatch":"False", "step": 7}}$$)::JSON)->>'status',
+    'Accepted',
+    'Check if gw_fct_pg2epa_main: dumpSubcatch=False | step=7 returns status "Accepted"'
+);
+
 
 -- Finish the test
 SELECT finish();
