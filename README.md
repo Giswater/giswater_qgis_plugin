@@ -136,6 +136,18 @@ Giswater uses the following third-party libraries:
   WNTR is an open-source Python package for analyzing water distribution systems using hydraulic and water quality models.
   The WNTR license can be found in the [LICENSE](./packages/wntr/LICENSE.md) file or in their [repository](https://github.com/USEPA/WNTR/blob/main/LICENSE.md).
 
+- **swmm-api**: [swmm-api GitLab](https://gitlab.com/markuspichler/swmm_api)
+  swmm-api provides a Pythonic interface to the EPA SWMM5 software, enabling advanced scripting, simulation control, and access to simulation results.
+  The license and further details can be found in the [LICENSE](./packages/swmm_api/LICENSE) or in their [repository](https://gitlab.com/markuspichler/swmm_api/-/blob/master/LICENSE).
+
+- **tqdm**: [tqdm GitHub](https://github.com/tqdm/tqdm)
+  tqdm is a fast, extensible progress bar library for Python, supporting console, GUI, and notebook environments.
+  The tqdm license can be viewed in the [LICENSE](./packages/tqdm/LICENCE) or in their [repository](https://github.com/tqdm/tqdm/blob/master/LICENCE).
+
+- **PyPDF2**: [PyPDF2 GitHub](https://github.com/py-pdf/pypdf)
+  PyPDF2 is a Python library for working with PDF files, offering functionalities such as splitting, merging, and text extraction.
+  The PyPDF2 license is available in the [LICENSE](./packages/PyPDF2/LICENSE) or in their [repository](https://github.com/py-pdf/pypdf/blob/main/LICENSE).
+
 ## License
 
 This program is free software, licensed under the GNU General Public License (GPL) version 3 or later. Refer to the [LICENSE](./LICENSE) file for details.
