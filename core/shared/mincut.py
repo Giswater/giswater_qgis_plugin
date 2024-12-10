@@ -27,10 +27,9 @@ from .search import GwSearch
 from ..threads.auto_mincut_execute import GwAutoMincutTask
 from ..utils import tools_gw
 from ..utils.snap_manager import GwSnapManager
-from ..ui.ui_manager import GwDialogShowExceptionUi, GwMincutComposerUi, GwMincutConnecUi, GwMincutEndUi, GwMincutHydrometerUi
+from ..ui.ui_manager import GwDialogShowInfoUi, GwMincutComposerUi, GwMincutConnecUi, GwMincutEndUi, GwMincutHydrometerUi
 from ... import global_vars
 from ...libs import lib_vars, tools_qt, tools_qgis, tools_log, tools_db
-
 
 class GwMincut:
 
@@ -993,16 +992,16 @@ class GwMincut:
             if result['body']['overlapStatus'] == 'Ok':
                 self._mincut_ok(result)
             elif result['body']['overlapStatus'] == 'Conflict':
-                self.dlg_exception = GwDialogShowExceptionUi(self)
-                tools_gw.load_settings(self.dlg_dtext)
-                self.dlg_exception.btn_close.setText('Cancel')
-                self.dlg_exception.btn_accept.setText('Continue')
-                self.dlg_exception.setWindowTitle('Mincut conflict')
-                self.dlg_exception.btn_accept.clicked.connect(partial(self._force_mincut_overlap))
-                self.dlg_exception.btn_accept.clicked.connect(partial(tools_gw.close_dialog, self.dlg_exception))
-                self.dlg_exception.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_exception))
-                tools_gw.fill_tab_log(self.dlg_exception, result['body']['data'], False, close=False)
-                tools_gw.open_dialog(self.dlg_exception)
+                self.dlg_info = GwDialogShowInfoUi(self)
+                tools_gw.load_settings(self.dlg_info)
+                self.dlg_info.btn_close.setText('Cancel')
+                self.dlg_info.btn_accept.setText('Continue')
+                self.dlg_info.setWindowTitle('Mincut conflict')
+                self.dlg_info.btn_accept.clicked.connect(partial(self._force_mincut_overlap))
+                self.dlg_info.btn_accept.clicked.connect(partial(tools_gw.close_dialog, self.dlg_info))
+                self.dlg_info.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_info))
+                tools_gw.fill_tab_log(self.dlg_info, result['body']['data'], False, close=False)
+                tools_gw.open_dialog(self.dlg_info)
 
         self._save_widgets_values()
         self.iface.actionPan().trigger()

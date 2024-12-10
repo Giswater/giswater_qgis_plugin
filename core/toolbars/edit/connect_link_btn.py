@@ -13,7 +13,7 @@ from qgis.PyQt.QtWidgets import QApplication, QMenu, QAction, QActionGroup
 from qgis.core import QgsVectorLayer, QgsRectangle, QgsApplication, QgsProject, QgsWkbTypes
 
 from ..maptool import GwMaptool
-from ...ui.ui_manager import GwDialogShowExceptionUi
+from ...ui.ui_manager import GwDialogShowInfoUi
 from ...utils import tools_gw
 from ....libs import tools_qgis, tools_qt
 from ...threads.connect_link import GwConnectLink
@@ -253,17 +253,17 @@ class GwConnectLinkButton(GwMaptool):
     def manage_result(self, result, layer):
 
         if result and result['status'] != 'Failed':
-            self.dlg_exception = GwDialogShowExceptionUi(self, 'connect_to_network')
-            tools_gw.load_settings(self.dlg_dtext)
-            self.dlg_exception.btn_accept.hide()
-            self.dlg_exception.setWindowTitle('Connect to network')
-            self.dlg_exception.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_exception))
-            self.dlg_exception.rejected.connect(partial(tools_gw.close_dialog, self.dlg_exception))
+            self.dlg_info = GwDialogShowInfoUi()
+            tools_gw.load_settings(self.dlg_info)
+            self.dlg_info.btn_accept.hide()
+            self.dlg_info.setWindowTitle('Connect to network')
+            self.dlg_info.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_info))
+            self.dlg_info.rejected.connect(partial(tools_gw.close_dialog, self.dlg_info))
             if layer.name() == 'Connec' and global_vars.project_type == 'ud':
-                self.dlg_exception.btn_close.clicked.connect(partial(self.manage_gully_result))
-                self.dlg_exception.rejected.connect(partial(self.manage_gully_result))
-            tools_gw.fill_tab_log(self.dlg_exception, result['body']['data'], False)
-            tools_gw.open_dialog(self.dlg_exception, dlg_name='dialog_text')
+                self.dlg_info.btn_close.clicked.connect(partial(self.manage_gully_result))
+                self.dlg_info.rejected.connect(partial(self.manage_gully_result))
+            tools_gw.fill_tab_log(self.dlg_info, result['body']['data'], False)
+            tools_gw.open_dialog(self.dlg_info, dlg_name='dialog_text')
         else:
             tools_qgis.show_warning("gw_fct_setlinktonetwork (Check log messages)", title='Function error')
 

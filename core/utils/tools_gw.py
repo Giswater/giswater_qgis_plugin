@@ -347,7 +347,10 @@ def open_dialog(dlg, dlg_name=None, stay_on_top=True, title=None, hide_config_wi
         hide_widgets_form(dlg, dlg_name)
 
     # Hide the message bar initially
-    dlg.messageBar().hide()
+    try:
+        dlg.messageBar().hide()
+    except AttributeError:
+        pass
 
     # Create btn_help
     add_btn_help(dlg)

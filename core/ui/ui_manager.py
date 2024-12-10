@@ -11,6 +11,8 @@ from qgis.PyQt import uic, QtCore
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction, QLineEdit
 
+from ...libs import lib_vars
+from ...libs.ui.ui_manager import ShowInfoUi
 from .dialog import GwDialog
 from .docker import GwDocker
 from .main_window import GwMainWindow
@@ -457,9 +459,12 @@ class GwLoadMenuUi(GwDialog, FORM_CLASS):
 
 
 # region SHARED
-FORM_CLASS = _get_ui_class('show_exception.ui')
-class GwDialogShowExceptionUi(GwDialog, FORM_CLASS):
-    pass
+class GwDialogShowInfoUi(ShowInfoUi):
+    def __init__(self, class_obj=None, subtag=None):
+        icon_folder = f"{lib_vars.plugin_dir}{os.sep}icons"
+        icon_path = f"{icon_folder}{os.sep}dialogs{os.sep}136.png"
+        giswater_icon = QIcon(icon_path)
+        super().__init__(icon=giswater_icon)
 
 FORM_CLASS = _get_ui_class('info_catalog.ui')
 class GwInfoCatalogUi(GwMainWindow, FORM_CLASS):
