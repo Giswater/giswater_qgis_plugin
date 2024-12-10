@@ -241,7 +241,7 @@ BEGIN
 	        FOREACH v_aux_json IN ARRAY v_fields_array
 	        LOOP
 	            v_array_index := v_array_index + 1;
-				v_expected_tabname := 'tab_nvo_lid_' || lower(v_lidlayer);
+				v_expected_tabname := 'tab_' || lower(v_lidlayer);
 
 				-- Set widget value only for current tab
 				IF (v_aux_json->>'tabname') = v_expected_tabname THEN
