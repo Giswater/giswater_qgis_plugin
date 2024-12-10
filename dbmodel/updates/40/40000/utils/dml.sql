@@ -755,3 +755,7 @@ INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tab
 
 DELETE FROM config_fprocess WHERE fid=239 AND tablename='vi_backdrop' AND target='[BACKDROP]';
 DELETE FROM config_fprocess WHERE fid=141 AND tablename='vi_t_backdrop' AND target='[BACKDROP]';
+
+-- 10/12/2024
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, "source")
+VALUES (3351, 'gw_fct_getlid', 'ud', 'function', 'json', 'json', 'Function to get lid dialog with filled combos', 'role_basic', 'core');
