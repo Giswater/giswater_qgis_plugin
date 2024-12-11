@@ -36,5 +36,4 @@ INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('la
 INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('label_quadrant', 'BL', 'BL', NULL, NULL);
 INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('label_quadrant', 'BR', 'BR', NULL, NULL);
 
-UPDATE config_form_fields SET dv_querytext='select id, idval from edit_typevalue where typevalue = ''label_quadrant''' WHERE columnname='label_quadrant';
-
+UPDATE config_form_fields SET widgettype = 'combo', dv_querytext='select id, idval from edit_typevalue where typevalue = ''label_quadrant''', dv_isnullvalue = true WHERE columnname='label_quadrant';

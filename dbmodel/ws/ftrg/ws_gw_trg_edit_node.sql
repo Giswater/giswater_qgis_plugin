@@ -11,7 +11,7 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_node()
   RETURNS trigger AS
 $BODY$
 DECLARE
-v_srid numeric;
+v_srid integer;
 v_inp_table varchar;
 v_man_table varchar;
 v_type_man_table varchar;
