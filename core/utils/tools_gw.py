@@ -292,8 +292,8 @@ def add_btn_help(dlg):
     dlg.lyt_buttons.addWidget(btn_help, 0, dlg.lyt_buttons.columnCount())
 
     # Get formtype, formname & tabname
-    formtype = dlg.property('formtype')
-    formname = dlg.property('formname')
+    context = dlg.property('context')
+    uiname = dlg.property('uiname')
     tabname = 'tab_none'
     tab_widgets = dlg.findChildren(QTabWidget, "")
     if tab_widgets:
@@ -301,21 +301,24 @@ def add_btn_help(dlg):
         index_tab = tab_widget.currentIndex()
         tabname = tab_widget.widget(index_tab).objectName()
 
-    btn_help.clicked.connect(partial(open_help_link, formtype, formname, tabname))
+    btn_help.clicked.connect(partial(open_help_link, context, uiname, tabname))
 
 
-def open_help_link(formtype, formname, tabname):
+def open_help_link(context, uiname, tabname=None):
     """ Opens the help link for the given dialog, or a default link if not found. """
 
-    # Search url in DB
-    # TODO: get formname, formtype & tabname
-    sql = f"SELECT path FROM config_form_help WHERE formtype = '{formtype}' AND formname = '{formname}' AND tabname = '{tabname}'"
-    rows = tools_db.get_rows(sql)
+    # Base URL for the documentation
+    base_url = "https://giswater.gitbook.io"
 
-    if rows and rows[0]:
-        file_path = rows[0][0]
+    # Construct the path dynamically
+    if context and uiname:
+        file_path = f"{base_url}/dialogs/{context}/{uiname}"
+        if tabname != 'tab_none':
+            file_path += f"/{tabname}"  # Append tabname as an anchor if provided
     else:
-        file_path = "https://giswater.gitbook.io/giswater-manual"
+        # Fallback to the general manual link if context and uiname are missing
+        file_path = f"{base_url}/giswater-manual"
+
     tools_os.open_file(file_path)
 
 

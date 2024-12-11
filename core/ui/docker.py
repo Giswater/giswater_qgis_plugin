@@ -19,14 +19,26 @@ class GwDocker(QDockWidget):
     def __init__(self, class_obj=None, subtag=None):
 
         super().__init__()
+
+        # Check if CONTEXT and UINAME are defined and set properties accordingly
+        context = getattr(self, 'CONTEXT', None)
+        uiname = getattr(self, 'UINAME', None)
+
+        if context and uiname:
+            # Use provided CONTEXT and UINAME
+            print(f"GwDocker.__init__: context = {context}, uiname = {uiname}")
+            self.setProperty('context', context)
+            self.setProperty('uiname', uiname)
+
+        # Always set class_obj and subtag
+        self.setProperty('class_obj', class_obj)
+        self.subtag = subtag
+
         # TODO: Check try/catch. Strange error: "GwDocker object has no attribute 'setupUi"
         try:
             self.setupUi(self)
         except Exception:
             pass
-
-        self.setProperty('class_obj', class_obj)
-        self.subtag = subtag
 
 
     def closeEvent(self, event):

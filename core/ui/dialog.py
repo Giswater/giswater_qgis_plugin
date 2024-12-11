@@ -26,6 +26,21 @@ class GwDialog(QDialog):
 
         super().__init__()
         self.setupUi(self)
+
+        # Check if CONTEXT and UINAME are defined and set properties accordingly
+        context = getattr(self, 'CONTEXT', None)
+        uiname = getattr(self, 'UINAME', None)
+
+        if context and uiname:
+            # Use provided CONTEXT and UINAME
+            print(f"GwDocker.__init__: context = {context}, uiname = {uiname}")
+            self.setProperty('context', context)
+            self.setProperty('uiname', uiname)
+
+        # Always set class_obj and subtag
+        self.setProperty('class_obj', class_obj)
+        self.subtag = subtag
+
         # Create message bar
         try:
             # Wrap the existing layout in a widget
@@ -51,8 +66,6 @@ class GwDialog(QDialog):
             print("Exception in GwDialog:", e)
             self._messageBar = global_vars.iface
 
-        self.setProperty('class_obj', class_obj)
-        self.subtag = subtag
         # Connect the help shortcut
         action_help_shortcut = tools_gw.get_config_parser("actions_shortcuts", f"shortcut_help", "user", "init", prefix=False)
         sh = QShortcut(QKeySequence(f"{action_help_shortcut}"), self)
