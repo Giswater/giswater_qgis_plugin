@@ -40,6 +40,8 @@ v_code_prefix text;
 v_arc_id text;
 v_childtable_name text;
 v_schemaname text;
+rec_param_link record;
+v_connecs text;
 
 BEGIN
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
@@ -530,6 +532,30 @@ BEGIN
 				END IF;
 			END LOOP;
 		END IF;
+		
+		
+		-- automatic connection of closest connecs to the arc
+		SELECT 
+		("value"::json->>'active')::boolean as v_active,
+		("value"::json->>'buffer')::numeric as v_buffer
+		INTO rec_param_link
+		FROM config_param_user 
+		WHERE "parameter" ilike 'edit_arc_automatic_link2netowrk' 
+		AND cur_user = current_user;
+	
+		IF rec_param_link.v_active is true THEN
+		
+			SELECT string_agg(connec_id::text, ',') 
+			INTO v_connecs
+			FROM v_edit_connec c 
+			WHERE st_dwithin (new.the_geom, c.the_geom, rec_param_link.v_buffer) 
+			AND c.connec_id not in (select feature_id from v_edit_link);
+						
+			execute 'SELECT ws_link2net.gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1,"lang":"ES"},"feature":
+			{"id":"['||v_connecs||']"}, "data":{"feature_type":"CONNEC", "forcedArcs":["'||new.arc_id||'"]}}$$)';
+	
+		END IF;
+		
 
 
 		RETURN NEW;

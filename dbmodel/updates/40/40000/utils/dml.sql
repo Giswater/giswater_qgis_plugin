@@ -759,3 +759,7 @@ DELETE FROM config_fprocess WHERE fid=141 AND tablename='vi_t_backdrop' AND targ
 -- 10/12/2024
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, "source")
 VALUES (3351, 'gw_fct_getlid', 'ud', 'function', 'json', 'json', 'Function to get lid dialog with filled combos', 'role_basic', 'core');
+
+-- 11/12/24
+INSERT INTO config_param_user ("parameter", value, cur_user) VALUES('edit_arc_automatic_link2netowrk', '{"active":"true", "buffer":"10"}', current_user)
+ON CONFLICT ("parameter", cur_user) DO NOTHING;
