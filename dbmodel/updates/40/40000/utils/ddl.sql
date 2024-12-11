@@ -202,3 +202,6 @@ ALTER TABLE audit_psector_node_traceability RENAME TO archived_psector_node_trac
 
 DROP VIEW IF EXISTS vi_backdrop;
 ALTER TABLE inp_backdrop RENAME to _inp_backdrop;
+
+-- 11/12/2024
+ALTER TABLE element ADD COLUMN asset_id varchar(50);
