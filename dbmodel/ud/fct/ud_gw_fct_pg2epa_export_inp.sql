@@ -1224,7 +1224,7 @@ BEGIN
 		  WHERE t.expl_id is NULL) b
   	ORDER BY b.id) c
 	JOIN inp_timeseries ON id = timser_id
-	WHERE (timser_type = 'Rainfall' AND timser_id IN (SELECT timser_id FROM v_edit_raingage)) or timser_type != 'Rainfall'::text
+	WHERE (timser_type = 'Rainfall' and timser_id IN (SELECT timser_id FROM temp_rpt_inp_raingage)) or timser_type != 'Rainfall'::text 
 	ORDER BY timser_id, other2;
 
 
