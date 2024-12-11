@@ -26,7 +26,6 @@ class GwDocker(QDockWidget):
 
         if context and uiname:
             # Use provided CONTEXT and UINAME
-            print(f"GwDocker.__init__: context = {context}, uiname = {uiname}")
             self.setProperty('context', context)
             self.setProperty('uiname', uiname)
 

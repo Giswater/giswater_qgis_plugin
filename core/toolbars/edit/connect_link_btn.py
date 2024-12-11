@@ -353,7 +353,6 @@ class GwConnectLinkButton(GwMaptool):
 
         # Selection for all connec and gully layers
         if self.current_action in (SelectAction.FORCED_ARCS, SelectAction.CLOSEST_ARCS):
-            print("ENTROO 1")
             layer = tools_qgis.get_layer_by_tablename('v_edit_connec')
             if layer:
                 layer.selectByRect(select_geometry, behaviour)
@@ -363,7 +362,6 @@ class GwConnectLinkButton(GwMaptool):
                 layer.selectByRect(select_geometry, behaviour)
             return
         if self.current_action == SelectAction.FORCED_ARCS2:
-            print("ENTROO 2")
             layer = tools_qgis.get_layer_by_tablename('v_edit_arc')
             if layer:
                 # Use selectByRect to initially select features
