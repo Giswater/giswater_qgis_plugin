@@ -763,3 +763,5 @@ VALUES (3351, 'gw_fct_getlid', 'ud', 'function', 'json', 'json', 'Function to ge
 -- 11/12/24
 INSERT INTO config_param_user ("parameter", value, cur_user) VALUES('edit_arc_automatic_link2netowrk', '{"active":"false", "buffer":"10"}', current_user)
 ON CONFLICT ("parameter", cur_user) DO NOTHING;
+
+UPDATE sys_message SET log_level=2 WHERE id=3268; --get closest address
