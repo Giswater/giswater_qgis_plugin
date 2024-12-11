@@ -2544,6 +2544,8 @@ def execute_procedure(function_name, parameters=None, schema_name=None, commit=T
         manage_json_response(json_result, sql, rubber_band)
 
     try:
+        if not isinstance(json_result['body']['data'], dict):
+            raise KeyError
         answer = tools_qt.show_question(json_result['body']['data']['question']['message'])
         if not answer:
             cancel_action = json_result['body']['data']['question'].get('cancel_action')
