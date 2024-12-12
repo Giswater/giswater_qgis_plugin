@@ -27,7 +27,7 @@ from ..ui.ui_manager import GwNonVisualManagerUi, GwNonVisualControlsUi, GwNonVi
     GwNonVisualRoughnessUi
 from ..utils.matplotlib_widget import MplCanvas
 from ..utils import tools_gw
-from ...libs import lib_vars, tools_qgis, tools_qt, tools_db, tools_log
+from ...libs import lib_vars, tools_qgis, tools_qt, tools_db, tools_log, tools_os
 from ... import global_vars
 
 
@@ -91,6 +91,7 @@ class GwNonVisual:
         self.manager_dlg.finished.connect(partial(tools_gw.close_dialog, self.manager_dlg))
         self.manager_dlg.btn_print.clicked.connect(partial(self._print_object))
         self.manager_dlg.chk_active.stateChanged.connect(partial(self._filter_table, self.manager_dlg))
+        self.manager_dlg.btn_toggle_active.clicked.connect(self._manage_toggle_active)
 
         self.manager_dlg.main_tab.currentChanged.connect(partial(self._manage_tabs_changed))
         self.manager_dlg.main_tab.currentChanged.connect(partial(self._filter_table, self.manager_dlg, None))
@@ -139,15 +140,43 @@ class GwNonVisual:
                 tools_qt.fill_combo_values(self.manager_dlg.cmb_timser_type, rows, add_empty=True)
 
 
+    def _manage_toggle_active(self):
+        """ Toggle the active state of selected items in the current table. """
+        tableview = self.manager_dlg.main_tab.currentWidget()
+        view = tableview.objectName().replace('tbl_', '').replace('v_ui_', 'v_edit_')
+        selected_list = tableview.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "No record selected"
+            tools_qgis.show_warning(message, dialog=self.manager_dlg)
+            return
+
+        for index in selected_list:
+            row = index.row()
+            active_index = tableview.model().index(row, tools_qt.get_col_index_by_col_name(tableview, 'active'))
+            current_active_state = active_index.data()
+            new_active_state = not tools_os.set_boolean(current_active_state)
+
+            # Get primary key value
+            id_index = tableview.model().index(row, 0)
+            row_id = id_index.data()
+            field_id = self.dict_ids.get(view, 'id')
+
+            # Update the active state in the database
+            sql = f"UPDATE {view} SET active = {str(new_active_state).lower()} WHERE {field_id} = '{row_id}'"
+            tools_db.execute_sql(sql)
+
+        # Refresh the table view
+        self._reload_manager_table()
+
     def _manage_tabs_changed(self):
 
         tab_name = self.manager_dlg.main_tab.currentWidget().objectName()
 
         visibility_settings = {  # tab_name: (chk_active, btn_print, cmb_curve_type, cmb_pattern_type, cmb_timser_type)
-            'v_edit_inp_curve': (False, True, True, False, False),
-            'v_edit_inp_pattern': (False, False, False, True, False),
+            'v_edit_inp_curve': (True, True, True, False, False),
+            'v_edit_inp_pattern': (True, False, False, True, False),
             'v_edit_inp_timeseries': (True, False, False, False, True),
-            'inp_lid': (False, False, False, False, False),
+            'inp_lid': (True, False, False, False, False),
         }
         default_visibility = (True, False, False, False, False)
 
