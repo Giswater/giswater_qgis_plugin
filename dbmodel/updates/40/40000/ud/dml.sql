@@ -552,6 +552,8 @@ UPDATE config_form_fields SET dv_querytext='SELECT id, idval FROM cat_dwf WHERE 
 
 UPDATE sys_param_user SET dv_querytext='SELECT id, idval FROM cat_dwf WHERE id IS not null' WHERE id='inp_options_dwfscenario';
 
+UPDATE config_toolbox SET inputparams = replace(inputparams::text, 'cat_dwf_scenario', 'cat_dwf')::json;
+
 --05/12/2024
 INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('v_edit_inp_dscenario_flwreg_orifice', 'tab_none', NULL, NULL, 'role_basic', NULL, NULL, 0, '{4,5}');
 INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('v_edit_inp_dscenario_flwreg_outlet', 'tab_none', NULL, NULL, 'role_basic', NULL, NULL, 0, '{4,5}');
