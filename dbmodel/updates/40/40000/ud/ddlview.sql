@@ -5193,3 +5193,483 @@ WITH main AS (
     compare.the_geom
 	FROM main RIGHT JOIN compare ON main.node_id = compare.node_id;
 	
+-- v_rpt_comp_arcflow_sum
+DROP VIEW IF EXISTS v_rpt_comp_arcflow_sum;
+CREATE OR REPLACE VIEW v_rpt_comp_arcflow_sum
+AS 
+WITH main AS (
+	SELECT rpt_inp_arc.id,
+    rpt_inp_arc.arc_id,
+    rpt_inp_arc.result_id,
+    rpt_inp_arc.arc_type,
+    rpt_inp_arc.arccat_id,
+    rpt_inp_arc.sector_id,
+    rpt_inp_arc.the_geom,
+    rpt_arcflow_sum.arc_type AS swarc_type,
+    rpt_arcflow_sum.max_flow,
+    rpt_arcflow_sum.time_days,
+    rpt_arcflow_sum.time_hour,
+    rpt_arcflow_sum.max_veloc,
+    COALESCE(rpt_arcflow_sum.mfull_flow, 0::numeric(12,4)) AS mfull_flow,
+    COALESCE(rpt_arcflow_sum.mfull_dept, 0::numeric(12,4)) AS mfull_dept,
+    rpt_arcflow_sum.max_shear,
+    rpt_arcflow_sum.max_hr,
+    rpt_arcflow_sum.max_slope,
+    rpt_arcflow_sum.day_max,
+    rpt_arcflow_sum.time_max,
+    rpt_arcflow_sum.min_shear,
+    rpt_arcflow_sum.day_min,
+    rpt_arcflow_sum.time_min
+   	FROM selector_rpt_main,
+    rpt_inp_arc
+    JOIN rpt_arcflow_sum ON rpt_arcflow_sum.arc_id::text = rpt_inp_arc.arc_id::TEXT
+   	WHERE rpt_arcflow_sum.result_id::text = selector_rpt_main.result_id::text AND 
+   	selector_rpt_main.cur_user = "current_user"()::text AND rpt_inp_arc.result_id::text = selector_rpt_main.result_id::TEXT),	
+
+compare AS ( 
+ 	SELECT rpt_arcflow_sum.id,
+    selector_rpt_compare.result_id,
+    rpt_arcflow_sum.arc_id,
+    rpt_inp_arc.arc_type,
+    rpt_inp_arc.arccat_id,
+	rpt_arcflow_sum.arc_type AS swarc_type,
+    rpt_arcflow_sum.max_flow,
+    rpt_arcflow_sum.time_days,
+    rpt_arcflow_sum.time_hour,
+    rpt_arcflow_sum.max_veloc,
+    rpt_arcflow_sum.mfull_flow,
+    rpt_arcflow_sum.mfull_dept,
+    rpt_arcflow_sum.max_shear,
+    rpt_arcflow_sum.max_hr,
+    rpt_arcflow_sum.max_slope,
+    rpt_arcflow_sum.day_max,
+    rpt_arcflow_sum.time_max,
+    rpt_arcflow_sum.min_shear,
+    rpt_arcflow_sum.day_min,
+    rpt_arcflow_sum.time_min,
+    rpt_inp_arc.sector_id,
+    rpt_inp_arc.the_geom
+   	FROM selector_rpt_compare,
+    rpt_inp_arc
+    JOIN rpt_arcflow_sum ON rpt_arcflow_sum.arc_id::text = rpt_inp_arc.arc_id::text
+  	WHERE rpt_arcflow_sum.result_id::text = selector_rpt_compare.result_id::text AND selector_rpt_compare.cur_user = "current_user"()::text AND rpt_inp_arc.result_id::text = selector_rpt_compare.result_id::TEXT) 	
+ 
+  	SELECT 
+    main.arc_id,
+    main.sector_id,
+    main.arc_type,
+    main.arccat_id,
+    main.swarc_type,
+    main.result_id AS result_id_main,
+    compare.result_id AS result_id_compare,
+    main.max_flow AS max_flow_main,
+    compare.max_flow AS max_flow_compare,
+    main.max_flow - compare.max_flow AS max_flow_diff,
+    main.max_veloc AS max_veloc_main,
+    compare.max_veloc AS max_veloc_compare,
+    main.max_veloc - compare.max_veloc AS max_veloc_diff,
+    main.mfull_flow AS mfull_flow_main,
+    compare.mfull_flow AS mfull_flow_compare,
+    main.mfull_flow - compare.mfull_flow AS mfull_flow_diff,
+    main.mfull_dept AS mfull_dept_main,
+    compare.mfull_dept AS mfull_dept_compare,
+    main.mfull_dept - compare.mfull_dept AS mfull_dept_diff,
+    main.max_shear AS max_shear_main,
+    compare.max_shear AS max_shear_compare,
+    main.max_shear - compare.max_shear AS max_shear_diff,
+    main.max_hr AS max_hr_main,
+    compare.max_hr AS max_hr_compare,
+    main.max_hr - compare.max_hr AS max_hr_diff,
+    main.max_slope AS max_slope_main,
+    compare.max_slope AS max_slope_compare,
+    main.max_slope - compare.max_slope AS max_slope_diff,
+    main.day_max AS day_max_main,
+    compare.day_max AS day_max_compare,
+    main.time_max AS time_max_main,
+    compare.time_max AS time_max_compare,
+    main.min_shear AS min_shear_main,
+    compare.min_shear AS min_shear_compare,
+    main.min_shear - compare.min_shear AS min_shear_diff,
+    main.day_min AS day_min_main,
+    compare.day_min AS day_min_compare,
+    main.time_min AS time_min_main,
+    compare.time_min AS time_min_compare,
+    main.time_days AS time_days_main,
+    compare.time_days AS time_days_compare,
+    main.time_hour AS time_hour_main,
+    compare.time_hour AS time_hour_compare,
+    main.the_geom
+    FROM main LEFT JOIN compare ON main.arc_id = compare.arc_id
+	
+	UNION
+	
+	SELECT 
+    compare.arc_id,
+    compare.sector_id,
+    compare.arc_type,
+    compare.arccat_id,
+    compare.swarc_type,
+    main.result_id AS result_id_main,
+    compare.result_id AS result_id_compare,
+    main.max_flow AS max_flow_main,
+    compare.max_flow AS max_flow_compare,
+    main.max_flow - compare.max_flow AS max_flow_diff,
+    main.max_veloc AS max_veloc_main,
+    compare.max_veloc AS max_veloc_compare,
+    main.max_veloc - compare.max_veloc AS max_veloc_diff,
+    main.mfull_flow AS mfull_flow_main,
+    compare.mfull_flow AS mfull_flow_compare,
+    main.mfull_flow - compare.mfull_flow AS mfull_flow_diff,
+    main.mfull_dept AS mfull_dept_main,
+    compare.mfull_dept AS mfull_dept_compare,
+    main.mfull_dept - compare.mfull_dept AS mfull_dept_diff,
+    main.max_shear AS max_shear_main,
+    compare.max_shear AS max_shear_compare,
+    main.max_shear - compare.max_shear AS max_shear_diff,
+    main.max_hr AS max_hr_main,
+    compare.max_hr AS max_hr_compare,
+    main.max_hr - compare.max_hr AS max_hr_diff,
+    main.max_slope AS max_slope_main,
+    compare.max_slope AS max_slope_compare,
+    main.max_slope - compare.max_slope AS max_slope_diff,
+    main.day_max AS day_max_main,
+    compare.day_max AS day_max_compare,
+    main.time_max AS time_max_main,
+    compare.time_max AS time_max_compare,
+    main.min_shear AS min_shear_main,
+    compare.min_shear AS min_shear_compare,
+    main.min_shear - compare.min_shear AS min_shear_diff,
+    main.day_min AS day_min_main,
+    compare.day_min AS day_min_compare,
+    main.time_min AS time_min_main,
+    compare.time_min AS time_min_compare,
+    main.time_days AS time_days_main,
+    compare.time_days AS time_days_compare,
+    main.time_hour AS time_hour_main,
+    compare.time_hour AS time_hour_compare,
+    compare.the_geom
+    FROM main RIGHT JOIN compare ON main.arc_id = compare.arc_id;
+    
+   
+----v_rpt_comp_condsurcharge_sum 
+DROP VIEW IF EXISTS v_rpt_comp_condsurcharge_sum;
+CREATE OR REPLACE VIEW v_rpt_comp_condsurcharge_sum
+AS 
+WITH main AS (
+	SELECT rpt_inp_arc.id,
+    rpt_inp_arc.arc_id,
+    rpt_inp_arc.result_id,
+    rpt_inp_arc.arc_type,
+    rpt_inp_arc.arccat_id,
+    rpt_inp_arc.sector_id,
+    rpt_inp_arc.the_geom,
+    rpt_condsurcharge_sum.both_ends,
+    rpt_condsurcharge_sum.upstream,
+    rpt_condsurcharge_sum.dnstream,
+    rpt_condsurcharge_sum.hour_nflow,
+    rpt_condsurcharge_sum.hour_limit
+   	FROM selector_rpt_main,
+    rpt_inp_arc
+    JOIN rpt_condsurcharge_sum ON rpt_condsurcharge_sum.arc_id::text = rpt_inp_arc.arc_id::text
+  	WHERE rpt_condsurcharge_sum.result_id::text = selector_rpt_main.result_id::text AND selector_rpt_main.cur_user = "current_user"()::text AND rpt_inp_arc.result_id::text = selector_rpt_main.result_id::TEXT),
+  
+compare AS (	
+ 	SELECT rpt_condsurcharge_sum.id,
+    rpt_condsurcharge_sum.result_id,
+    rpt_condsurcharge_sum.arc_id,
+    rpt_inp_arc.arc_type,
+    rpt_inp_arc.arccat_id,
+    rpt_condsurcharge_sum.both_ends,
+    rpt_condsurcharge_sum.upstream,
+    rpt_condsurcharge_sum.dnstream,
+    rpt_condsurcharge_sum.hour_nflow,
+    rpt_condsurcharge_sum.hour_limit,
+    rpt_inp_arc.sector_id,
+    rpt_inp_arc.the_geom
+    FROM selector_rpt_compare,
+    rpt_inp_arc
+    JOIN rpt_condsurcharge_sum ON rpt_condsurcharge_sum.arc_id::text = rpt_inp_arc.arc_id::text
+    WHERE rpt_condsurcharge_sum.result_id::text = selector_rpt_compare.result_id::text AND selector_rpt_compare.cur_user = "current_user"()::text AND rpt_inp_arc.result_id::text = selector_rpt_compare.result_id::text)
+  
+    SELECT  
+    main.arc_id, 
+    main.sector_id,
+    main.arc_type,
+    main.arccat_id,
+    main.result_id AS result_id_main, 
+    compare.result_id AS result_id_compare,
+    main.both_ends AS both_ends_main,
+    compare.both_ends AS both_ends_compare,
+    main.both_ends - compare.both_ends AS both_ends_diff,
+    main.upstream AS upstream_main,
+    compare.upstream AS upstream_compare,
+    main.upstream - compare.upstream AS upstream_diff,
+    main.dnstream AS dnstream_main,
+    compare.dnstream AS dnstream_compare,
+    main.dnstream - compare.dnstream AS dnstream_diff,
+    main.hour_nflow AS hour_nflow_main,
+    compare.hour_nflow AS hour_nflow_compare,
+    main.hour_nflow - compare.hour_nflow AS hour_nflow_diff,
+    main.hour_limit AS hour_limit_main,
+    compare.hour_limit AS hour_limit_compare,
+    main.hour_limit - compare.hour_limit AS hour_limit_diff, 
+    main.the_geom
+    FROM main LEFT JOIN compare ON main.arc_id = compare.arc_id
+    
+    UNION
+    
+    SELECT  
+    compare.arc_id, 
+    compare.sector_id,
+    compare.arc_type,
+    compare.arccat_id,
+    main.result_id AS result_id_main, 
+    compare.result_id AS result_id_compare,
+    main.both_ends AS both_ends_main,
+    compare.both_ends AS both_ends_compare,
+    main.both_ends - compare.both_ends AS both_ends_diff,
+    main.upstream AS upstream_main,
+    compare.upstream AS upstream_compare,
+    main.upstream - compare.upstream AS upstream_diff,
+    main.dnstream AS dnstream_main,
+    compare.dnstream AS dnstream_compare,
+    main.dnstream - compare.dnstream AS dnstream_diff,
+    main.hour_nflow AS hour_nflow_main,
+    compare.hour_nflow AS hour_nflow_compare,
+    main.hour_nflow - compare.hour_nflow AS hour_nflow_diff,
+    main.hour_limit AS hour_limit_main,
+    compare.hour_limit AS hour_limit_compare,
+    main.hour_limit - compare.hour_limit AS hour_limit_diff, 
+    compare.the_geom
+    FROM main RIGHT JOIN compare ON main.arc_id = compare.arc_id;
+ 
+ 
+---- v_rpt_comp_pumping_sum
+DROP VIEW IF EXISTS v_rpt_comp_pumping_sum;
+CREATE OR REPLACE VIEW v_rpt_comp_pumping_sum
+AS WITH main AS (
+	SELECT rpt_pumping_sum.id,
+    rpt_pumping_sum.result_id,
+    rpt_pumping_sum.arc_id,
+    rpt_inp_arc.arc_type,
+    rpt_inp_arc.arccat_id,
+    rpt_pumping_sum.percent,
+    rpt_pumping_sum.num_startup,
+    rpt_pumping_sum.min_flow,
+    rpt_pumping_sum.avg_flow,
+    rpt_pumping_sum.max_flow,
+    rpt_pumping_sum.vol_ltr,
+    rpt_pumping_sum.powus_kwh,
+    rpt_pumping_sum.timoff_min,
+    rpt_pumping_sum.timoff_max,
+    rpt_inp_arc.sector_id,
+    rpt_inp_arc.the_geom
+	FROM selector_rpt_main,
+    rpt_inp_arc
+    JOIN rpt_pumping_sum ON rpt_pumping_sum.arc_id::text = rpt_inp_arc.arc_id::text
+	WHERE rpt_pumping_sum.result_id::text = selector_rpt_main.result_id::text AND selector_rpt_main.cur_user = "current_user"()::text AND rpt_inp_arc.result_id::text = selector_rpt_main.result_id::TEXT),
+  
+ compare AS (
+ 	SELECT rpt_pumping_sum.id,
+    rpt_pumping_sum.result_id,
+    rpt_pumping_sum.arc_id,
+    rpt_inp_arc.arc_type,
+    rpt_inp_arc.arccat_id,
+    rpt_pumping_sum.percent,
+    rpt_pumping_sum.num_startup,
+    rpt_pumping_sum.min_flow,
+    rpt_pumping_sum.avg_flow,
+    rpt_pumping_sum.max_flow,
+    rpt_pumping_sum.vol_ltr,
+    rpt_pumping_sum.powus_kwh,
+    rpt_pumping_sum.timoff_min,
+    rpt_pumping_sum.timoff_max,
+    rpt_inp_arc.sector_id,
+    rpt_inp_arc.the_geom
+	FROM selector_rpt_compare,
+    rpt_inp_arc
+    JOIN rpt_pumping_sum ON rpt_pumping_sum.arc_id::text = rpt_inp_arc.arc_id::text
+	WHERE rpt_pumping_sum.result_id::text = selector_rpt_compare.result_id::text AND selector_rpt_compare.cur_user = "current_user"()::text AND rpt_inp_arc.result_id::text = selector_rpt_compare.result_id::text)
+  
+  SELECT 
+    main.arc_id,
+    main.sector_id,
+    main.arc_type,
+    main.arccat_id,
+    main.result_id AS result_id_main,
+    compare.result_id AS result_id_compare,
+    main.percent AS percent_main,
+    compare.percent AS percent_compare,
+    main.percent - compare.percent AS percent_diff,
+    main.num_startup AS num_startup_main,
+    compare.num_startup AS num_startup_compare,
+    main.num_startup - compare.num_startup AS num_startup_diff,
+    main.min_flow AS min_flow_main,
+    compare.min_flow AS min_flow_compare,
+    main.min_flow - compare.min_flow AS min_flow_diff,
+    main.avg_flow AS avg_flow_main,
+    compare.avg_flow AS avg_flow_compare,
+    main.avg_flow - compare.avg_flow AS avg_flow_diff,
+    main.max_flow AS max_flow_main,
+    compare.max_flow AS max_flow_compare,
+    main.max_flow - compare.max_flow AS max_flow_diff,
+    main.vol_ltr AS vol_ltr_main,
+    compare.vol_ltr AS vol_ltr_compare,
+    main.vol_ltr - compare.vol_ltr AS vol_ltr_diff,
+    main.powus_kwh AS powus_kwh_main,
+    compare.powus_kwh AS powus_kwh_compare,
+    main.powus_kwh - compare.powus_kwh AS powus_kwh_diff,
+    main.timoff_min AS timoff_min_main,
+    compare.timoff_min AS timoff_min_compare,
+    main.timoff_min - compare.timoff_min AS timoff_min_diff,
+    main.timoff_max AS timoff_max_main,
+    compare.timoff_max AS timoff_max_compare,
+    main.timoff_max - compare.timoff_max AS timoff_max_diff,
+    main.the_geom 
+    FROM main LEFT JOIN compare ON main.arc_id = compare.arc_id
+	
+	UNION
+	 
+	SELECT 
+    compare.arc_id,
+    compare.sector_id,
+    compare.arc_type,
+    compare.arccat_id,
+    main.result_id AS result_id_main,
+    compare.result_id AS result_id_compare,
+    main.percent AS percent_main,
+    compare.percent AS percent_compare,
+    main.percent - compare.percent AS percent_diff,
+    main.num_startup AS num_startup_main,
+    compare.num_startup AS num_startup_compare,
+    main.num_startup - compare.num_startup AS num_startup_diff,
+    main.min_flow AS min_flow_main,
+    compare.min_flow AS min_flow_compare,
+    main.min_flow - compare.min_flow AS min_flow_diff,
+    main.avg_flow AS avg_flow_main,
+    compare.avg_flow AS avg_flow_compare,
+    main.avg_flow - compare.avg_flow AS avg_flow_diff,
+    main.max_flow AS max_flow_main,
+    compare.max_flow AS max_flow_compare,
+    main.max_flow - compare.max_flow AS max_flow_diff,
+    main.vol_ltr AS vol_ltr_main,
+    compare.vol_ltr AS vol_ltr_compare,
+    main.vol_ltr - compare.vol_ltr AS vol_ltr_diff,
+    main.powus_kwh AS powus_kwh_main,
+    compare.powus_kwh AS powus_kwh_compare,
+    main.powus_kwh - compare.powus_kwh AS powus_kwh_diff,
+    main.timoff_min AS timoff_min_main,
+    compare.timoff_min AS timoff_min_compare,
+    main.timoff_min - compare.timoff_min AS timoff_min_diff,
+    main.timoff_max AS timoff_max_main,
+    compare.timoff_max AS timoff_max_compare,
+    main.timoff_max - compare.timoff_max AS timoff_max_diff,
+    compare.the_geom 
+    FROM main RIGHT JOIN compare ON main.arc_id = compare.arc_id; ; 
+   
+---- v_rpt_comp_flowclass_sum 
+DROP VIEW IF EXISTS v_rpt_comp_flowclass_sum;
+CREATE OR REPLACE VIEW v_rpt_comp_flowclass_sum
+AS WITH main AS (
+	SELECT rpt_flowclass_sum.id,
+    rpt_flowclass_sum.result_id,
+    rpt_flowclass_sum.arc_id,
+    rpt_inp_arc.arc_type,
+    rpt_inp_arc.arccat_id,
+    rpt_flowclass_sum.length,
+    rpt_flowclass_sum.dry,
+    rpt_flowclass_sum.up_dry,
+    rpt_flowclass_sum.down_dry,
+    rpt_flowclass_sum.sub_crit,
+    rpt_flowclass_sum.sub_crit_1,
+    rpt_flowclass_sum.up_crit,
+    rpt_inp_arc.sector_id,
+    rpt_inp_arc.the_geom
+   	FROM selector_rpt_main,
+    rpt_inp_arc
+    JOIN rpt_flowclass_sum ON rpt_flowclass_sum.arc_id::text = rpt_inp_arc.arc_id::text
+	WHERE rpt_flowclass_sum.result_id::text = selector_rpt_main.result_id::text AND selector_rpt_main.cur_user = "current_user"()::text AND rpt_inp_arc.result_id::text = selector_rpt_main.result_id::TEXT),
+  
+ compare AS (
+ 	SELECT rpt_flowclass_sum.id,
+    rpt_flowclass_sum.result_id,
+    rpt_flowclass_sum.arc_id,
+    rpt_inp_arc.arc_type,
+    rpt_inp_arc.arccat_id,
+    rpt_flowclass_sum.length,
+    rpt_flowclass_sum.dry,
+    rpt_flowclass_sum.up_dry,
+    rpt_flowclass_sum.down_dry,
+    rpt_flowclass_sum.sub_crit,
+    rpt_flowclass_sum.sub_crit_1,
+    rpt_flowclass_sum.up_crit,
+    rpt_inp_arc.sector_id,
+    rpt_inp_arc.the_geom
+   	FROM selector_rpt_compare,
+    rpt_inp_arc
+    JOIN rpt_flowclass_sum ON rpt_flowclass_sum.arc_id::text = rpt_inp_arc.arc_id::text
+  	WHERE rpt_flowclass_sum.result_id::text = selector_rpt_compare.result_id::text AND selector_rpt_compare.cur_user = "current_user"()::text AND rpt_inp_arc.result_id::text = selector_rpt_compare.result_id::text)
+ 
+SELECT 
+    main.arc_id,
+    main.sector_id,
+    main.arc_type,
+    main.arccat_id,
+    main.result_id AS result_id_main,
+    compare.result_id AS result_id_compare,
+    main.length AS length_main,
+    compare.length AS length_compare,
+    main.length - compare.length AS length_diff,
+    main.dry AS dry_main,
+    compare.dry AS dry_compare,
+    main.dry - compare.dry AS dry_diff,
+    main.up_dry AS up_dry_main,
+    compare.up_dry AS up_dry_compare,
+    main.up_dry - compare.up_dry AS up_dry_diff,
+    main.down_dry AS down_dry_main,
+    compare.down_dry AS down_dry_compare,
+    main.down_dry - compare.down_dry AS down_dry_diff,
+    main.sub_crit AS sub_crit_main,
+    compare.sub_crit AS sub_crit_compare,
+    main.sub_crit - compare.sub_crit AS sub_crit_diff,
+    main.sub_crit_1 AS sub_crit_1_main,
+    compare.sub_crit_1 AS sub_crit_1_compare,
+    main.sub_crit_1 - compare.sub_crit_1 AS sub_crit_1_diff,
+    main.up_crit AS up_crit_main,
+    compare.up_crit AS up_crit_compare,
+    main.up_crit - compare.up_crit AS up_crit_diff,
+    main.the_geom
+	FROM main LEFT JOIN compare ON main.arc_id = compare.arc_id
+	
+	UNION 
+	
+	SELECT 
+    compare.arc_id,
+    compare.sector_id,
+    compare.arc_type,
+    compare.arccat_id,
+    main.result_id AS result_id_main,
+    compare.result_id AS result_id_compare,
+    main.length AS length_main,
+    compare.length AS length_compare,
+    main.length - compare.length AS length_diff,
+    main.dry AS dry_main,
+    compare.dry AS dry_compare,
+    main.dry - compare.dry AS dry_diff,
+    main.up_dry AS up_dry_main,
+    compare.up_dry AS up_dry_compare,
+    main.up_dry - compare.up_dry AS up_dry_diff,
+    main.down_dry AS down_dry_main,
+    compare.down_dry AS down_dry_compare,
+    main.down_dry - compare.down_dry AS down_dry_diff,
+    main.sub_crit AS sub_crit_main,
+    compare.sub_crit AS sub_crit_compare,
+    main.sub_crit - compare.sub_crit AS sub_crit_diff,
+    main.sub_crit_1 AS sub_crit_1_main,
+    compare.sub_crit_1 AS sub_crit_1_compare,
+    main.sub_crit_1 - compare.sub_crit_1 AS sub_crit_1_diff,
+    main.up_crit AS up_crit_main,
+    compare.up_crit AS up_crit_compare,
+    main.up_crit - compare.up_crit AS up_crit_diff,
+    compare.the_geom
+	FROM main RIGHT JOIN compare ON main.arc_id = compare.arc_id;
