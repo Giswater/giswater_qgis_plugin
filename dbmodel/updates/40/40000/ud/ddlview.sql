@@ -5032,10 +5032,10 @@ WITH main AS (
 	UNION 
 	
 	 SELECT 
-    main.node_id,
-    main.sector_id,
-    main.node_type,
-    main.nodecat_id,
+    compare.node_id,
+    compare.sector_id,
+    compare.node_type,
+    compare.nodecat_id,
     main.result_id AS result_id_main, 
     compare.result_id AS result_id_compare,
     main.hour_flood AS hour_flood_main,
@@ -5054,7 +5054,7 @@ WITH main AS (
     compare.time_days AS time_days_compare,
     main.time_hour AS time_hour_main,
     compare.time_hour AS time_hour_compare,
-    main.the_geom 
+    compare.the_geom 
 	FROM main RIGHT JOIN compare ON main.node_id = compare.node_id;
 
 --v_rpt_comp_nodesurcharge_sum
@@ -5117,11 +5117,11 @@ WITH main AS (
 	UNION
 	
 	SELECT 
-    main.node_id,
-    main.sector_id,
-    main.node_type,
-    main.nodecat_id,
-    main.swnod_type,
+    compare.node_id,
+    compare.sector_id,
+    compare.node_type,
+    compare.nodecat_id,
+    compare.swnod_type,
     main.result_id AS result_id_main,
     compare.result_id AS result_id_compare,
     main.hour_surch AS hour_surch_main,
@@ -5133,5 +5133,5 @@ WITH main AS (
     main.min_depth AS min_depth_main,
     compare.min_depth AS min_depth_compare,
     main.min_depth - compare.min_depth AS min_depth_diff,
-    main.the_geom
+    compare.the_geom
 	FROM main RIGHT JOIN compare ON main.node_id = compare.node_id;
