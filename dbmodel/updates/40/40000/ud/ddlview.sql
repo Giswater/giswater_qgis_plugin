@@ -4819,4 +4819,319 @@ AS SELECT inp_storage.node_id,
     v_rpt_storagevol_sum.time_hour,
     v_rpt_storagevol_sum.max_out
    FROM inp_storage
-     LEFT JOIN v_rpt_storagevol_sum USING (node_id);
+    LEFT JOIN v_rpt_storagevol_sum USING (node_id); 
+
+--12/12/2024
+
+--v_rpt_comp_nodedepth_sum 
+DROP VIEW IF EXISTS v_rpt_comp_nodedepth_sum;
+CREATE OR REPLACE VIEW v_rpt_comp_nodedepth_sum
+AS  WITH main AS (
+	SELECT rpt_nodedepth_sum.id,
+    rpt_nodedepth_sum.result_id,
+    rpt_nodedepth_sum.node_id,
+    rpt_inp_node.node_type,
+    rpt_inp_node.nodecat_id,
+    rpt_nodedepth_sum.swnod_type,
+    rpt_nodedepth_sum.aver_depth,
+    rpt_nodedepth_sum.max_depth,
+    rpt_nodedepth_sum.max_hgl,
+    rpt_nodedepth_sum.time_days,
+    rpt_nodedepth_sum.time_hour,
+    rpt_inp_node.sector_id,
+    rpt_inp_node.the_geom
+	FROM selector_rpt_main,
+    rpt_inp_node
+	JOIN rpt_nodedepth_sum ON rpt_nodedepth_sum.node_id::text = rpt_inp_node.node_id::text 
+	WHERE rpt_nodedepth_sum.result_id::text = selector_rpt_main.result_id::text AND selector_rpt_main.cur_user = "current_user"()::text AND rpt_inp_node.result_id::text = selector_rpt_main.result_id::text),
+compare AS (
+	SELECT rpt_nodedepth_sum.id,
+    rpt_nodedepth_sum.result_id,
+    rpt_nodedepth_sum.node_id,
+    rpt_inp_node.node_type,
+    rpt_inp_node.nodecat_id,
+    rpt_nodedepth_sum.swnod_type,
+    rpt_nodedepth_sum.aver_depth,
+    rpt_nodedepth_sum.max_depth,
+    rpt_nodedepth_sum.max_hgl,
+    rpt_nodedepth_sum.time_days,
+    rpt_nodedepth_sum.time_hour,
+    rpt_inp_node.sector_id,
+    rpt_inp_node.the_geom 
+	FROM selector_rpt_compare,
+    rpt_inp_node
+    JOIN rpt_nodedepth_sum ON rpt_nodedepth_sum.node_id::text = rpt_inp_node.node_id::text 
+	WHERE rpt_nodedepth_sum.result_id::text = selector_rpt_compare.result_id::text AND selector_rpt_compare.cur_user = "current_user"()::text AND rpt_inp_node.result_id::text = selector_rpt_compare.result_id::text)
+
+SELECT main.node_id,
+    main.sector_id,
+    main.node_type,
+    main.nodecat_id,
+    main.swnod_type,
+    main.result_id AS result_id_main, 
+    compare.result_id AS result_id_compare,
+    main.aver_depth AS aver_depth_main,
+    compare.aver_depth AS aver_depth_compare,
+    main.aver_depth - compare.aver_depth AS aver_depth_diff,
+    main.max_depth AS max_depth_main,
+    compare.max_depth AS max_depth_compare,
+    main.max_depth - compare.max_depth AS max_depth_diff,
+    main.max_hgl AS max_hgl_main,
+    compare.max_hgl AS max_hgl_compare,
+    main.max_hgl - compare.max_hgl AS max_hgl_diff,
+    main.time_days AS time_days_main,
+    compare.time_days AS time_days_compare,
+    main.time_hour AS time_hour_main,
+    compare.time_hour AS time_hour_compare,
+    main.the_geom 
+	FROM main JOIN compare ON main.node_id = compare.node_id;
+
+--v_rpt_comp_nodeinflow_sum
+DROP VIEW IF EXISTS v_rpt_comp_nodeinflow_sum;
+CREATE OR REPLACE VIEW v_rpt_comp_nodeinflow_sum 
+AS 
+WITH main AS (
+	SELECT rpt_inp_node.id,
+    rpt_nodeinflow_sum.node_id,
+    rpt_nodeinflow_sum.result_id,
+    rpt_inp_node.node_type,
+    rpt_inp_node.nodecat_id,
+    rpt_nodeinflow_sum.swnod_type,
+    rpt_nodeinflow_sum.max_latinf,
+    rpt_nodeinflow_sum.max_totinf,
+    rpt_nodeinflow_sum.time_days,
+    rpt_nodeinflow_sum.time_hour,
+    rpt_nodeinflow_sum.latinf_vol,
+    rpt_nodeinflow_sum.totinf_vol,
+    rpt_nodeinflow_sum.flow_balance_error,
+    rpt_inp_node.sector_id,
+    rpt_inp_node.the_geom
+   FROM selector_rpt_main,
+    rpt_inp_node
+     JOIN rpt_nodeinflow_sum ON rpt_nodeinflow_sum.node_id::text = rpt_inp_node.node_id::text
+  WHERE rpt_nodeinflow_sum.result_id::text = selector_rpt_main.result_id::text AND selector_rpt_main.cur_user = "current_user"()::text AND rpt_inp_node.result_id::text = selector_rpt_main.result_id::text),
+ 
+ compare AS (
+	SELECT rpt_nodeinflow_sum.id,
+    rpt_nodeinflow_sum.result_id,
+    rpt_nodeinflow_sum.node_id,
+    rpt_inp_node.node_type,
+    rpt_inp_node.nodecat_id,
+    rpt_nodeinflow_sum.swnod_type,
+    rpt_nodeinflow_sum.max_latinf,
+    rpt_nodeinflow_sum.max_totinf,
+    rpt_nodeinflow_sum.time_days,
+    rpt_nodeinflow_sum.time_hour,
+    rpt_nodeinflow_sum.latinf_vol,
+    rpt_nodeinflow_sum.totinf_vol,
+    rpt_nodeinflow_sum.flow_balance_error,
+    rpt_inp_node.sector_id,
+    rpt_inp_node.the_geom 
+	FROM selector_rpt_compare,
+    rpt_inp_node
+    JOIN rpt_nodeinflow_sum ON rpt_nodeinflow_sum.node_id::text = rpt_inp_node.node_id::text 
+	WHERE rpt_nodeinflow_sum.result_id::text = selector_rpt_compare.result_id::text AND selector_rpt_compare.cur_user = "current_user"()::text AND rpt_inp_node.result_id::text = selector_rpt_compare.result_id::text)
+ SELECT 
+    main.node_id,
+    main.sector_id,
+    main.node_type,
+    main.nodecat_id,
+    main.swnod_type,
+    main.result_id AS result_id_main, 
+    compare.result_id AS result_id_compare,
+    main.max_latinf AS max_latinf_main,
+    compare.max_latinf AS max_latinf_compare,
+    main.max_latinf - compare.max_latinf AS max_latinf_diff,
+    main.max_totinf AS max_totinf_main,
+    compare.max_totinf AS max_totinf_compare,
+    main.max_totinf - compare.max_totinf AS max_totinf_diff,
+    main.latinf_vol AS latinf_vol_main,
+    compare.latinf_vol AS latinf_vol_compare,
+    main.latinf_vol - compare.latinf_vol AS latinf_vol_diff,
+    main.totinf_vol AS totninf_vol_main,
+    compare.totinf_vol AS totninf_vol_compare,
+    main.totinf_vol - compare.totinf_vol AS totninf_vol_diff,
+    main.flow_balance_error AS flow_balance_error_main,
+    compare.flow_balance_error AS flow_balance_error_compare,
+    main.flow_balance_error - compare.flow_balance_error AS flow_balance_error_diff,
+    main.time_days AS time_days_main,
+    compare.time_days AS time_days_compare,
+    main.time_hour AS time_hour_main,
+    compare.time_hour AS time_hour_compare,
+    main.the_geom 
+	FROM main JOIN compare ON main.node_id = compare.node_id;
+	
+-- v_rpt_comp_nodeflooding_sum
+DROP VIEW IF EXISTS v_rpt_comp_nodeflooding_sum;
+CREATE OR REPLACE VIEW v_rpt_comp_nodeflooding_sum
+AS 
+WITH main AS (
+	SELECT rpt_inp_node.id,
+    rpt_nodeflooding_sum.node_id,
+    selector_rpt_main.result_id,
+    rpt_inp_node.node_type,
+    rpt_inp_node.nodecat_id,
+    rpt_nodeflooding_sum.hour_flood,
+    rpt_nodeflooding_sum.max_rate,
+    rpt_nodeflooding_sum.time_days,
+    rpt_nodeflooding_sum.time_hour,
+    rpt_nodeflooding_sum.tot_flood,
+    rpt_nodeflooding_sum.max_ponded,
+    rpt_inp_node.sector_id,
+    rpt_inp_node.the_geom 
+	FROM selector_rpt_main,
+    rpt_inp_node
+    JOIN rpt_nodeflooding_sum ON rpt_nodeflooding_sum.node_id::text = rpt_inp_node.node_id::text 
+	WHERE rpt_nodeflooding_sum.result_id::text = selector_rpt_main.result_id::text AND selector_rpt_main.cur_user = "current_user"()::text AND rpt_inp_node.result_id::text = selector_rpt_main.result_id::TEXT),
+ 
+ compare AS (
+	SELECT rpt_nodeflooding_sum.id,
+    selector_rpt_compare.result_id,
+    rpt_nodeflooding_sum.node_id,
+    rpt_inp_node.node_type,
+    rpt_inp_node.nodecat_id,
+    rpt_nodeflooding_sum.hour_flood,
+    rpt_nodeflooding_sum.max_rate,
+    rpt_nodeflooding_sum.time_days,
+    rpt_nodeflooding_sum.time_hour,
+    rpt_nodeflooding_sum.tot_flood,
+    rpt_nodeflooding_sum.max_ponded,
+    rpt_inp_node.sector_id,
+    rpt_inp_node.the_geom 
+	FROM selector_rpt_compare,
+    rpt_inp_node 
+	JOIN rpt_nodeflooding_sum ON rpt_nodeflooding_sum.node_id::text = rpt_inp_node.node_id::text 
+	WHERE rpt_nodeflooding_sum.result_id::text = selector_rpt_compare.result_id::text AND selector_rpt_compare.cur_user = "current_user"()::text AND rpt_inp_node.result_id::text = selector_rpt_compare.result_id::text)
+ 
+ SELECT 
+    main.node_id,
+    main.sector_id,
+    main.node_type,
+    main.nodecat_id,
+    main.result_id AS result_id_main, 
+    compare.result_id AS result_id_compare,
+    main.hour_flood AS hour_flood_main,
+    compare.hour_flood AS hour_flood_compare,
+    main.hour_flood - compare.hour_flood AS hour_flood_diff,
+    main.max_rate AS max_rate_main,
+    compare.max_rate AS max_rate_compare,
+    main.max_rate - compare.max_rate AS max_rate_diff,
+    main.tot_flood AS tot_flood_main,
+    compare.tot_flood AS tot_flood_compare,
+    main.tot_flood - compare.tot_flood AS tot_flood_diff,
+    main.max_ponded AS max_ponded_main,
+    compare.max_ponded AS max_ponded_compare,
+    main.max_ponded - compare.max_ponded AS max_ponded_diff,
+    main.time_days AS time_days_main,
+    compare.time_days AS time_days_compare,
+    main.time_hour AS time_hour_main,
+    compare.time_hour AS time_hour_compare,
+    main.the_geom 
+	FROM main LEFT JOIN compare ON main.node_id = compare.node_id
+	
+	UNION 
+	
+	 SELECT 
+    main.node_id,
+    main.sector_id,
+    main.node_type,
+    main.nodecat_id,
+    main.result_id AS result_id_main, 
+    compare.result_id AS result_id_compare,
+    main.hour_flood AS hour_flood_main,
+    compare.hour_flood AS hour_flood_compare,
+    main.hour_flood - compare.hour_flood AS hour_flood_diff,
+    main.max_rate AS max_rate_main,
+    compare.max_rate AS max_rate_compare,
+    main.max_rate - compare.max_rate AS max_rate_diff,
+    main.tot_flood AS tot_flood_main,
+    compare.tot_flood AS tot_flood_compare,
+    main.tot_flood - compare.tot_flood AS tot_flood_diff,
+    main.max_ponded AS max_ponded_main,
+    compare.max_ponded AS max_ponded_compare,
+    main.max_ponded - compare.max_ponded AS max_ponded_diff,
+    main.time_days AS time_days_main,
+    compare.time_days AS time_days_compare,
+    main.time_hour AS time_hour_main,
+    compare.time_hour AS time_hour_compare,
+    main.the_geom 
+	FROM main RIGHT JOIN compare ON main.node_id = compare.node_id;
+
+--v_rpt_comp_nodesurcharge_sum
+DROP VIEW IF EXISTS v_rpt_comp_nodesurcharge_sum;
+CREATE OR REPLACE VIEW v_rpt_comp_nodesurcharge_sum
+AS 
+WITH main AS (
+	SELECT rpt_inp_node.id,
+    rpt_inp_node.node_id,
+    rpt_nodesurcharge_sum.result_id,
+    rpt_inp_node.node_type,
+    rpt_inp_node.nodecat_id,
+    rpt_nodesurcharge_sum.swnod_type,
+    rpt_nodesurcharge_sum.hour_surch,
+    rpt_nodesurcharge_sum.max_height,
+    rpt_nodesurcharge_sum.min_depth,
+    rpt_inp_node.sector_id,
+    rpt_inp_node.the_geom
+	FROM selector_rpt_main,
+    rpt_inp_node
+    JOIN rpt_nodesurcharge_sum ON rpt_nodesurcharge_sum.node_id::text = rpt_inp_node.node_id::text
+	WHERE rpt_nodesurcharge_sum.result_id::text = selector_rpt_main.result_id::text AND selector_rpt_main.cur_user = "current_user"()::text AND rpt_inp_node.result_id::text = selector_rpt_main.result_id::TEXT),
+ compare AS (
+	SELECT rpt_nodesurcharge_sum.id,
+    rpt_nodesurcharge_sum.result_id,
+    rpt_inp_node.node_id,
+    rpt_inp_node.node_type,
+    rpt_inp_node.nodecat_id,
+    rpt_nodesurcharge_sum.swnod_type,
+    rpt_nodesurcharge_sum.hour_surch,
+    rpt_nodesurcharge_sum.max_height,
+    rpt_nodesurcharge_sum.min_depth,
+    rpt_inp_node.sector_id,
+    rpt_inp_node.the_geom
+	FROM selector_rpt_compare,
+    rpt_inp_node
+    JOIN rpt_nodesurcharge_sum ON rpt_nodesurcharge_sum.node_id::text = rpt_inp_node.node_id::text
+	WHERE rpt_nodesurcharge_sum.result_id::text = selector_rpt_compare.result_id::text AND selector_rpt_compare.cur_user = "current_user"()::text AND rpt_inp_node.result_id::text = selector_rpt_compare.result_id::text)
+
+ SELECT 
+    main.node_id,
+    main.sector_id,
+    main.node_type,
+    main.nodecat_id,
+    main.swnod_type,
+    main.result_id AS result_id_main,
+    compare.result_id AS result_id_compare,
+    main.hour_surch AS hour_surch_main,
+    compare.hour_surch AS hour_surch_compare,
+    main.hour_surch - compare.hour_surch AS hour_surch_diff,
+    main.max_height AS max_height_main,
+    compare.max_height AS max_height_compare,
+    main.max_height - compare.max_height AS max_height_diff,
+    main.min_depth AS min_depth_main,
+    compare.min_depth AS min_depth_compare,
+    main.min_depth - compare.min_depth AS min_depth_diff,
+    main.the_geom
+	FROM main LEFT JOIN compare ON main.node_id = compare.node_id
+	
+	UNION
+	
+	SELECT 
+    main.node_id,
+    main.sector_id,
+    main.node_type,
+    main.nodecat_id,
+    main.swnod_type,
+    main.result_id AS result_id_main,
+    compare.result_id AS result_id_compare,
+    main.hour_surch AS hour_surch_main,
+    compare.hour_surch AS hour_surch_compare,
+    main.hour_surch - compare.hour_surch AS hour_surch_diff,
+    main.max_height AS max_height_main,
+    compare.max_height AS max_height_compare,
+    main.max_height - compare.max_height AS max_height_diff,
+    main.min_depth AS min_depth_main,
+    compare.min_depth AS min_depth_compare,
+    main.min_depth - compare.min_depth AS min_depth_diff,
+    main.the_geom
+	FROM main RIGHT JOIN compare ON main.node_id = compare.node_id;
