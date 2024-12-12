@@ -673,3 +673,6 @@ UPDATE config_form_fields SET layoutname='lyt_nvo_patterns_1', layoutorder= 2, s
 UPDATE config_form_fields SET layoutname='lyt_nvo_patterns_1', layoutorder= 1, stylesheet= NULL WHERE formtype='nvo_patterns' AND columnname = 'observ';
 UPDATE config_form_fields SET layoutname='lyt_nvo_controls_1', layoutorder= 0, stylesheet= NULL WHERE formtype='nvo_controls' AND columnname = 'sector_id';
 UPDATE config_form_fields SET layoutname='lyt_nvo_rules_1', layoutorder= 0, stylesheet= NULL WHERE formtype='nvo_rules' AND columnname = 'sector_id';
+
+update node set verified=2 where node_id in ('1084', '113957', '114227', '114230', '42');
+
