@@ -4884,7 +4884,32 @@ SELECT main.node_id,
     main.time_hour AS time_hour_main,
     compare.time_hour AS time_hour_compare,
     main.the_geom 
-	FROM main JOIN compare ON main.node_id = compare.node_id;
+	FROM main LEFT JOIN compare ON main.node_id = compare.node_id
+	
+	UNION
+	
+	SELECT compare.node_id,
+    compare.sector_id,
+    compare.node_type,
+    compare.nodecat_id,
+    compare.swnod_type,
+    main.result_id AS result_id_main, 
+    compare.result_id AS result_id_compare,
+    main.aver_depth AS aver_depth_main,
+    compare.aver_depth AS aver_depth_compare,
+    main.aver_depth - compare.aver_depth AS aver_depth_diff,
+    main.max_depth AS max_depth_main,
+    compare.max_depth AS max_depth_compare,
+    main.max_depth - compare.max_depth AS max_depth_diff,
+    main.max_hgl AS max_hgl_main,
+    compare.max_hgl AS max_hgl_compare,
+    main.max_hgl - compare.max_hgl AS max_hgl_diff,
+    main.time_days AS time_days_main,
+    compare.time_days AS time_days_compare,
+    main.time_hour AS time_hour_main,
+    compare.time_hour AS time_hour_compare,
+    compare.the_geom 
+	FROM main RIGHT JOIN compare ON main.node_id = compare.node_id;
 
 --v_rpt_comp_nodeinflow_sum
 DROP VIEW IF EXISTS v_rpt_comp_nodeinflow_sum;
@@ -4959,7 +4984,39 @@ WITH main AS (
     main.time_hour AS time_hour_main,
     compare.time_hour AS time_hour_compare,
     main.the_geom 
-	FROM main JOIN compare ON main.node_id = compare.node_id;
+	FROM main LEFT JOIN compare ON main.node_id = compare.node_id
+	
+	UNION
+	
+	SELECT 
+    compare.node_id,
+    compare.sector_id,
+    compare.node_type,
+    compare.nodecat_id,
+    compare.swnod_type,
+    main.result_id AS result_id_main, 
+    compare.result_id AS result_id_compare,
+    main.max_latinf AS max_latinf_main,
+    compare.max_latinf AS max_latinf_compare,
+    main.max_latinf - compare.max_latinf AS max_latinf_diff,
+    main.max_totinf AS max_totinf_main,
+    compare.max_totinf AS max_totinf_compare,
+    main.max_totinf - compare.max_totinf AS max_totinf_diff,
+    main.latinf_vol AS latinf_vol_main,
+    compare.latinf_vol AS latinf_vol_compare,
+    main.latinf_vol - compare.latinf_vol AS latinf_vol_diff,
+    main.totinf_vol AS totninf_vol_main,
+    compare.totinf_vol AS totninf_vol_compare,
+    main.totinf_vol - compare.totinf_vol AS totninf_vol_diff,
+    main.flow_balance_error AS flow_balance_error_main,
+    compare.flow_balance_error AS flow_balance_error_compare,
+    main.flow_balance_error - compare.flow_balance_error AS flow_balance_error_diff,
+    main.time_days AS time_days_main,
+    compare.time_days AS time_days_compare,
+    main.time_hour AS time_hour_main,
+    compare.time_hour AS time_hour_compare,
+    compare.the_geom 
+	FROM main RIGHT JOIN compare ON main.node_id = compare.node_id;
 	
 -- v_rpt_comp_nodeflooding_sum
 DROP VIEW IF EXISTS v_rpt_comp_nodeflooding_sum;
@@ -5135,3 +5192,4 @@ WITH main AS (
     main.min_depth - compare.min_depth AS min_depth_diff,
     compare.the_geom
 	FROM main RIGHT JOIN compare ON main.node_id = compare.node_id;
+	
