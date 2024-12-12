@@ -539,6 +539,17 @@ UPDATE config_form_fields SET formname='v_edit_cat_dwf' WHERE formname='v_edit_c
 UPDATE config_form_fields SET formname='v_edit_cat_dwf' WHERE formname='v_edit_cat_dwf_scenario' AND formtype='form_feature' AND columnname='observ' AND tabname='tab_none';
 UPDATE config_form_fields SET formname='v_edit_cat_dwf' WHERE formname='v_edit_cat_dwf_scenario' AND formtype='form_feature' AND columnname='expl_id' AND tabname='tab_none';
 
+UPDATE config_form_fields SET formname='cat_dwf' WHERE formname='cat_dwf_scenario' AND formtype='form_feature' AND columnname='idval' AND tabname='tab_none';
+UPDATE config_form_fields SET formname='cat_dwf' WHERE formname='cat_dwf_scenario' AND formtype='form_feature' AND columnname='id' AND tabname='tab_none';
+UPDATE config_form_fields SET formname='cat_dwf' WHERE formname='cat_dwf_scenario' AND formtype='form_feature' AND columnname='startdate' AND tabname='tab_none';
+UPDATE config_form_fields SET formname='cat_dwf' WHERE formname='cat_dwf_scenario' AND formtype='form_feature' AND columnname='enddate' AND tabname='tab_none';
+UPDATE config_form_fields SET formname='cat_dwf' WHERE formname='cat_dwf_scenario' AND formtype='form_feature' AND columnname='active' AND tabname='tab_none';
+UPDATE config_form_fields SET formname='cat_dwf' WHERE formname='cat_dwf_scenario' AND formtype='form_feature' AND columnname='observ' AND tabname='tab_none';
+
+UPDATE config_form_fields SET dv_querytext='SELECT id, idval FROM cat_dwf WHERE active IS true', widgetcontrols='{"setMultiline":false,"valueRelation":{"nullValue":false, "layer": "cat_dwf", "activated": true, "keyColumn": "id", "valueColumn": "idval", "filterExpression": ""}}'::json WHERE formname='inp_dwf' AND formtype='form_feature' AND columnname='dwfscenario_id' AND tabname='tab_none';
+UPDATE config_form_fields SET dv_querytext='SELECT id, idval FROM cat_dwf WHERE active IS true', widgetcontrols='{"setMultiline":false,"valueRelation":{"nullValue":false, "layer": "cat_dwf", "activated": true, "keyColumn": "id", "valueColumn": "idval", "filterExpression": ""}}'::json WHERE formname='inp_dwf_pol_x_node' AND formtype='form_feature' AND columnname='dwfscenario_id' AND tabname='tab_none';
+UPDATE config_form_fields SET dv_querytext='SELECT id, idval FROM cat_dwf WHERE active IS true', widgetcontrols='{"setMultiline":false,"valueRelation":{"nullValue":false, "layer": "cat_dwf", "activated": true, "keyColumn": "id", "valueColumn": "idval", "filterExpression": ""}}'::json WHERE formname='v_edit_inp_dwf' AND formtype='form_feature' AND columnname='dwfscenario_id' AND tabname='tab_none';
+
 UPDATE sys_param_user SET dv_querytext='SELECT id, idval FROM cat_dwf WHERE id IS not null' WHERE id='inp_options_dwfscenario';
 
 --05/12/2024
