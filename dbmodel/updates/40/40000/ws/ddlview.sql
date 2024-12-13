@@ -5264,7 +5264,7 @@ SELECT r.node_id,
      main.quality_avg - compare.quality_avg AS quality_avg_diff,
      main.the_geom
      FROM main JOIN compare ON main.node_id = compare.node_id;
-	 
+
 --10/12/2024
 --v_rpt_comp_node_hourly--
 DROP VIEW IF EXISTS v_rpt_comp_node_hourly;
@@ -5285,10 +5285,10 @@ CREATE OR REPLACE VIEW v_rpt_comp_node_hourly  AS
          selector_rpt_main_tstep,
          rpt_inp_node node
          JOIN rpt_node ON rpt_node.node_id::text = node.node_id::text
-   WHERE rpt_node.result_id::text = selector_rpt_main.result_id::text 
-     AND rpt_node."time"::text = selector_rpt_main_tstep.timestep::text 
-     AND selector_rpt_main.cur_user = "current_user"()::text 
-     AND selector_rpt_main_tstep.cur_user = "current_user"()::text 
+   WHERE rpt_node.result_id::text = selector_rpt_main.result_id::text
+     AND rpt_node."time"::text = selector_rpt_main_tstep.timestep::text
+     AND selector_rpt_main.cur_user = "current_user"()::text
+     AND selector_rpt_main_tstep.cur_user = "current_user"()::text
      AND node.result_id::text = selector_rpt_main.result_id::text
 ),
 compare AS (
@@ -5307,40 +5307,40 @@ compare AS (
          selector_rpt_compare_tstep,
          rpt_inp_node node
          JOIN rpt_node ON rpt_node.node_id::text = node.node_id::text
-   WHERE rpt_node.result_id::text = selector_rpt_compare.result_id::text 
-     AND rpt_node."time"::text = selector_rpt_compare_tstep.timestep::text 
-     AND selector_rpt_compare.cur_user = "current_user"()::text 
-     AND selector_rpt_compare_tstep.cur_user = "current_user"()::text 
+   WHERE rpt_node.result_id::text = selector_rpt_compare.result_id::text
+     AND rpt_node."time"::text = selector_rpt_compare_tstep.timestep::text
+     AND selector_rpt_compare.cur_user = "current_user"()::text
+     AND selector_rpt_compare_tstep.cur_user = "current_user"()::text
      AND node.result_id::text = selector_rpt_compare.result_id::text
 )
 SELECT main.node_id,
        main.sector_id,
        main.elevation,
-       main.result_id AS result_id_main, 
+       main.result_id AS result_id_main,
        compare.result_id AS result_id_compare,
-       main.time AS time_main, 
-       compare.time AS time_compare, 
-       main.demand AS demand_main, 
+       main.time AS time_main,
+       compare.time AS time_compare,
+       main.demand AS demand_main,
        compare.demand AS demand_compare,
-       main.demand - compare.demand AS demand_diff, 
-       main.head AS head_main, 
+       main.demand - compare.demand AS demand_diff,
+       main.head AS head_main,
        compare.head AS head_compare,
-       main.head - compare.head AS head_diff, 
-       main.press AS press_main, 
+       main.head - compare.head AS head_diff,
+       main.press AS press_main,
        compare.press AS press_compare,
-       main.press - compare.press AS press_diff, 
-       main.quality AS quality_main, 
+       main.press - compare.press AS press_diff,
+       main.quality AS quality_main,
        compare.quality AS quality_compare,
-       main.quality - compare.quality AS quality_diff, 
+       main.quality - compare.quality AS quality_diff,
        main.the_geom
-  FROM main 
+  FROM main
   JOIN compare ON main.node_id = compare.node_id;
- 
- 
+
+
  --v_rpt_comp_arc_hourly--
 DROP VIEW IF EXISTS v_rpt_comp_arc_hourly;
 CREATE OR REPLACE VIEW v_rpt_comp_arc_hourly
-AS 
+AS
 WITH main AS (
   SELECT rpt_arc.id,
          arc.arc_id,
@@ -5357,10 +5357,10 @@ WITH main AS (
          selector_rpt_main_tstep,
          rpt_inp_arc arc
          JOIN rpt_arc ON rpt_arc.arc_id::text = arc.arc_id::text
-   WHERE rpt_arc.result_id::text = selector_rpt_main.result_id::text 
-     AND rpt_arc."time"::text = selector_rpt_main_tstep.timestep::text 
-     AND selector_rpt_main.cur_user = "current_user"()::text 
-     AND selector_rpt_main_tstep.cur_user = "current_user"()::text 
+   WHERE rpt_arc.result_id::text = selector_rpt_main.result_id::text
+     AND rpt_arc."time"::text = selector_rpt_main_tstep.timestep::text
+     AND selector_rpt_main.cur_user = "current_user"()::text
+     AND selector_rpt_main_tstep.cur_user = "current_user"()::text
      AND arc.result_id::text = selector_rpt_main.result_id::TEXT
 ),
 compare AS (
@@ -5379,10 +5379,10 @@ compare AS (
          selector_rpt_compare_tstep,
          rpt_inp_arc arc
          JOIN rpt_arc ON rpt_arc.arc_id::text = arc.arc_id::text
-   WHERE rpt_arc.result_id::text = selector_rpt_compare.result_id::text 
-     AND rpt_arc."time"::text = selector_rpt_compare_tstep.timestep::text 
-     AND selector_rpt_compare.cur_user = "current_user"()::text 
-     AND selector_rpt_compare_tstep.cur_user = "current_user"()::text 
+   WHERE rpt_arc.result_id::text = selector_rpt_compare.result_id::text
+     AND rpt_arc."time"::text = selector_rpt_compare_tstep.timestep::text
+     AND selector_rpt_compare.cur_user = "current_user"()::text
+     AND selector_rpt_compare_tstep.cur_user = "current_user"()::text
      AND arc.result_id::text = selector_rpt_compare.result_id::TEXT
 )
 SELECT main.arc_id,
@@ -5409,3 +5409,19 @@ SELECT main.arc_id,
        main.the_geom
   FROM main
   JOIN compare ON main.arc_id = compare.arc_id;
+
+CREATE OR REPLACE VIEW v_om_mincut_hydrometer
+AS SELECT om_mincut_hydrometer.id,
+    om_mincut_hydrometer.result_id,
+    om_mincut.work_order,
+    om_mincut_hydrometer.hydrometer_id,
+    ext_rtc_hydrometer.code AS hydrometer_customer_code,
+    rtc_hydrometer_x_connec.connec_id,
+    connec.code AS connec_code
+   FROM selector_mincut_result,
+    om_mincut_hydrometer
+     JOIN ext_rtc_hydrometer ON om_mincut_hydrometer.hydrometer_id::text = ext_rtc_hydrometer.id::text
+     JOIN rtc_hydrometer_x_connec ON om_mincut_hydrometer.hydrometer_id::text = rtc_hydrometer_x_connec.hydrometer_id::text
+     JOIN connec ON rtc_hydrometer_x_connec.connec_id::text = connec.connec_id::text
+     JOIN om_mincut ON om_mincut_hydrometer.result_id = om_mincut.id
+  WHERE selector_mincut_result.result_id::text = om_mincut_hydrometer.result_id::text AND selector_mincut_result.cur_user = "current_user"()::text;
