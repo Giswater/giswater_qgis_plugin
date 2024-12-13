@@ -411,6 +411,7 @@ class GwNonVisual:
         self.dlg_print.btn_path.clicked.connect(
             partial(tools_qt.get_folder_path, self.dlg_print, self.dlg_print.txt_path))
         self.dlg_print.btn_accept.clicked.connect(partial(self._exec_print))
+        self.dlg_print.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_print))
 
         # Open dialog
         tools_gw.open_dialog(self.dlg_print, dlg_name=f'dlg_nonvisual_print')
