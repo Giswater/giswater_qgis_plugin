@@ -277,13 +277,6 @@ class GwFeatureTypeChangeUi(GwDialog, FORM_CLASS):
     CONTEXT = CONTEXT
     UINAME = UINAME
 
-
-UINAME = "workcat_manager"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
-class GwWorkcatManagerUi(GwDialog, FORM_CLASS):
-    CONTEXT = CONTEXT
-    UINAME = UINAME
-
 # endregion
 
 
@@ -610,6 +603,12 @@ class GwMapzoneConfigUi(GwDialog, FORM_CLASS):
 UINAME = "massive_composer"
 FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
 class GwCompPagesUi(GwDialog, FORM_CLASS):
+    CONTEXT = CONTEXT
+    UINAME = UINAME
+
+UINAME = "workcat_manager"
+FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+class GwWorkcatManagerUi(GwDialog, FORM_CLASS):
     CONTEXT = CONTEXT
     UINAME = UINAME
 
