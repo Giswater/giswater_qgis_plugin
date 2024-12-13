@@ -30,37 +30,37 @@
         <customproperties>
           <Option/>
         </customproperties>
-        <layer-tree-layer source=" __DATASOURCE__  key='id' checkPrimaryKeyUnicity='1' table=&quot;ws_cat_material&quot;.&quot;v_edit_cat_feature_node&quot;" name="Node feature catalog" legend_split_behavior="0" expanded="1" id="v_edit_cat_feature_node_ea70bfb4_8fbc_4012_8ac4_3f3f7b2557ae" checked="Qt::Checked" legend_exp="" providerKey="postgres" patch_size="-1,-1">
+        <layer-tree-layer source=" __DATASOURCE__  key='id' checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_cat_feature_node&quot;" name="Node feature catalog" legend_split_behavior="0" expanded="1" id="v_edit_cat_feature_node_ea70bfb4_8fbc_4012_8ac4_3f3f7b2557ae" checked="Qt::Checked" legend_exp="" providerKey="postgres" patch_size="-1,-1">
           <customproperties>
             <Option/>
           </customproperties>
         </layer-tree-layer>
-        <layer-tree-layer source=" __DATASOURCE__  key='id' checkPrimaryKeyUnicity='1' table=&quot;ws_cat_material&quot;.&quot;v_edit_cat_feature_arc&quot;" name="Arc feature catalog" legend_split_behavior="0" expanded="1" id="v_edit_cat_feature_arc_e9a8f87d_5db9_4265_9496_b9ee76cffadd" checked="Qt::Checked" legend_exp="" providerKey="postgres" patch_size="-1,-1">
+        <layer-tree-layer source=" __DATASOURCE__  key='id' checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_cat_feature_arc&quot;" name="Arc feature catalog" legend_split_behavior="0" expanded="1" id="v_edit_cat_feature_arc_e9a8f87d_5db9_4265_9496_b9ee76cffadd" checked="Qt::Checked" legend_exp="" providerKey="postgres" patch_size="-1,-1">
           <customproperties>
             <Option/>
           </customproperties>
         </layer-tree-layer>
-        <layer-tree-layer source=" __DATASOURCE__  sslmode=__SSLMODE__ key='id' checkPrimaryKeyUnicity='0' table=&quot;ws_cat_material&quot;.&quot;cat_material&quot;" name="Materials catalog" legend_split_behavior="0" expanded="1" id="cat_material_a52a5827_9bbd_4251_b630_25899f2e39f2" checked="Qt::Checked" legend_exp="" providerKey="postgres" patch_size="-1,-1">
+        <layer-tree-layer source=" __DATASOURCE__  sslmode=__SSLMODE__ key='id' checkPrimaryKeyUnicity='0' table=&quot;SCHEMA_NAME&quot;.&quot;cat_material&quot;" name="Materials catalog" legend_split_behavior="0" expanded="1" id="cat_material_a52a5827_9bbd_4251_b630_25899f2e39f2" checked="Qt::Checked" legend_exp="" providerKey="postgres" patch_size="-1,-1">
           <customproperties>
             <Option/>
           </customproperties>
         </layer-tree-layer>
-        <layer-tree-layer source=" __DATASOURCE__  key='id' checkPrimaryKeyUnicity='1' table=&quot;ws_cat_material&quot;.&quot;v_edit_cat_feature_connec&quot;" name="Connec feature catalog" legend_split_behavior="0" expanded="1" id="v_edit_cat_feature_connec_79421626_dc83_4ace_a970_9edeceeef98d" checked="Qt::Checked" legend_exp="" providerKey="postgres" patch_size="-1,-1">
+        <layer-tree-layer source=" __DATASOURCE__  key='id' checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_cat_feature_connec&quot;" name="Connec feature catalog" legend_split_behavior="0" expanded="1" id="v_edit_cat_feature_connec_79421626_dc83_4ace_a970_9edeceeef98d" checked="Qt::Checked" legend_exp="" providerKey="postgres" patch_size="-1,-1">
           <customproperties>
             <Option/>
           </customproperties>
         </layer-tree-layer>
-        <layer-tree-layer source=" __DATASOURCE__  key='id' checkPrimaryKeyUnicity='1' table=&quot;ws_cat_material&quot;.&quot;cat_node&quot;" name="Node catalog" legend_split_behavior="0" expanded="1" id="cat_node20151105202206790" checked="Qt::Checked" legend_exp="" providerKey="postgres" patch_size="0,0">
+        <layer-tree-layer source=" __DATASOURCE__  key='id' checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;cat_node&quot;" name="Node catalog" legend_split_behavior="0" expanded="1" id="cat_node20151105202206790" checked="Qt::Checked" legend_exp="" providerKey="postgres" patch_size="0,0">
           <customproperties>
             <Option/>
           </customproperties>
         </layer-tree-layer>
-        <layer-tree-layer source=" __DATASOURCE__  key='id' checkPrimaryKeyUnicity='1' table=&quot;ws_cat_material&quot;.&quot;cat_arc&quot;" name="Arc catalog" legend_split_behavior="0" expanded="1" id="cat_arc20151120192002466" checked="Qt::Checked" legend_exp="" providerKey="postgres" patch_size="0,0">
+        <layer-tree-layer source=" __DATASOURCE__  key='id' checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;cat_arc&quot;" name="Arc catalog" legend_split_behavior="0" expanded="1" id="cat_arc20151120192002466" checked="Qt::Checked" legend_exp="" providerKey="postgres" patch_size="0,0">
           <customproperties>
             <Option/>
           </customproperties>
         </layer-tree-layer>
-        <layer-tree-layer source=" __DATASOURCE__  key='id' checkPrimaryKeyUnicity='1' table=&quot;ws_cat_material&quot;.&quot;cat_connec&quot;" name="Connec catalog" legend_split_behavior="0" expanded="1" id="cat_connec20160216122620764" checked="Qt::Checked" legend_exp="" providerKey="postgres" patch_size="0,0">
+        <layer-tree-layer source=" __DATASOURCE__  key='id' checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;cat_connec&quot;" name="Connec catalog" legend_split_behavior="0" expanded="1" id="cat_connec20160216122620764" checked="Qt::Checked" legend_exp="" providerKey="postgres" patch_size="0,0">
           <customproperties>
             <Option/>
           </customproperties>
@@ -70,27 +70,27 @@
         <customproperties>
           <Option/>
         </customproperties>
-        <layer-tree-layer source=" __DATASOURCE__  key='expl_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;ws_cat_material&quot;.&quot;v_edit_exploitation&quot; (the_geom)" name="Exploitation" legend_split_behavior="0" expanded="1" id="v_edit_exploitation_fd06cc08_9e9d_4a22_bfca_586b3919d086" checked="Qt::Unchecked" legend_exp="" providerKey="postgres" patch_size="0,0">
+        <layer-tree-layer source=" __DATASOURCE__  key='expl_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_exploitation&quot; (the_geom)" name="Exploitation" legend_split_behavior="0" expanded="1" id="v_edit_exploitation_fd06cc08_9e9d_4a22_bfca_586b3919d086" checked="Qt::Unchecked" legend_exp="" providerKey="postgres" patch_size="0,0">
           <customproperties>
             <Option/>
           </customproperties>
         </layer-tree-layer>
-        <layer-tree-layer source=" __DATASOURCE__  key='dma_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;ws_cat_material&quot;.&quot;v_edit_dma&quot; (the_geom)" name="Dma" legend_split_behavior="0" expanded="0" id="v_edit_dma20190515092620863" checked="Qt::Unchecked" legend_exp="" providerKey="postgres" patch_size="0,0">
+        <layer-tree-layer source=" __DATASOURCE__  key='dma_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_dma&quot; (the_geom)" name="Dma" legend_split_behavior="0" expanded="0" id="v_edit_dma20190515092620863" checked="Qt::Unchecked" legend_exp="" providerKey="postgres" patch_size="0,0">
           <customproperties>
             <Option/>
           </customproperties>
         </layer-tree-layer>
-        <layer-tree-layer source=" __DATASOURCE__  key='sector_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;ws_cat_material&quot;.&quot;v_edit_sector&quot; (the_geom)" name="Sector" legend_split_behavior="0" expanded="0" id="v_edit_sector20171204170540567" checked="Qt::Unchecked" legend_exp="" providerKey="postgres" patch_size="0,0">
+        <layer-tree-layer source=" __DATASOURCE__  key='sector_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_sector&quot; (the_geom)" name="Sector" legend_split_behavior="0" expanded="0" id="v_edit_sector20171204170540567" checked="Qt::Unchecked" legend_exp="" providerKey="postgres" patch_size="0,0">
           <customproperties>
             <Option/>
           </customproperties>
         </layer-tree-layer>
-        <layer-tree-layer source=" __DATASOURCE__  key='dqa_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;ws_cat_material&quot;.&quot;v_edit_dqa&quot; (the_geom)" name="Dqa" legend_split_behavior="0" expanded="0" id="v_edit_dqa_4e695ade_c45c_4562_afb6_1d3c41532a1b" checked="Qt::Unchecked" legend_exp="" providerKey="postgres" patch_size="0,0">
+        <layer-tree-layer source=" __DATASOURCE__  key='dqa_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_dqa&quot; (the_geom)" name="Dqa" legend_split_behavior="0" expanded="0" id="v_edit_dqa_4e695ade_c45c_4562_afb6_1d3c41532a1b" checked="Qt::Unchecked" legend_exp="" providerKey="postgres" patch_size="0,0">
           <customproperties>
             <Option/>
           </customproperties>
         </layer-tree-layer>
-        <layer-tree-layer source=" __DATASOURCE__  key='presszone_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;ws_cat_material&quot;.&quot;v_edit_presszone&quot; (the_geom)" name="Presszone" legend_split_behavior="0" expanded="0" id="v_edit_presszone_d6c14d1a_a691_4ec8_a373_97438e05f219" checked="Qt::Unchecked" legend_exp="" providerKey="postgres" patch_size="0,0">
+        <layer-tree-layer source=" __DATASOURCE__  key='presszone_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_presszone&quot; (the_geom)" name="Presszone" legend_split_behavior="0" expanded="0" id="v_edit_presszone_d6c14d1a_a691_4ec8_a373_97438e05f219" checked="Qt::Unchecked" legend_exp="" providerKey="postgres" patch_size="0,0">
           <customproperties>
             <Option/>
           </customproperties>
@@ -100,24 +100,24 @@
         <customproperties>
           <Option/>
         </customproperties>
-        <layer-tree-layer source=" __DATASOURCE__  key='node_id' srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table=&quot;ws_cat_material&quot;.&quot;v_edit_node&quot; (the_geom)" name="Node" legend_split_behavior="0" expanded="0" id="v_edit_node_79e9d657_9f6a_4303_b422_e1ba0c998c2f" checked="Qt::Checked" legend_exp="" providerKey="postgres" patch_size="0,0">
+        <layer-tree-layer source=" __DATASOURCE__  key='node_id' srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_node&quot; (the_geom)" name="Node" legend_split_behavior="0" expanded="0" id="v_edit_node_79e9d657_9f6a_4303_b422_e1ba0c998c2f" checked="Qt::Checked" legend_exp="" providerKey="postgres" patch_size="0,0">
           <customproperties>
             <Option type="Map">
               <Option name="showFeatureCount" value="0" type="int"/>
             </Option>
           </customproperties>
         </layer-tree-layer>
-        <layer-tree-layer source=" __DATASOURCE__  key='connec_id' srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table=&quot;ws_cat_material&quot;.&quot;v_edit_connec&quot; (the_geom)" name="Connec" legend_split_behavior="0" expanded="0" id="v_edit_connec_decaeb94_529d_4842_9e89_33c065483403" checked="Qt::Checked" legend_exp="" providerKey="postgres" patch_size="0,0">
+        <layer-tree-layer source=" __DATASOURCE__  key='connec_id' srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_connec&quot; (the_geom)" name="Connec" legend_split_behavior="0" expanded="0" id="v_edit_connec_decaeb94_529d_4842_9e89_33c065483403" checked="Qt::Checked" legend_exp="" providerKey="postgres" patch_size="0,0">
           <customproperties>
             <Option/>
           </customproperties>
         </layer-tree-layer>
-        <layer-tree-layer source=" __DATASOURCE__  key='arc_id' srid=__SRID__ type=LineString checkPrimaryKeyUnicity='1' table=&quot;ws_cat_material&quot;.&quot;v_edit_arc&quot; (the_geom)" name="Arc" legend_split_behavior="0" expanded="0" id="v_edit_arc_c8e5e4a7_f9e3_4940_b0b2_40bf55f4c3ca" checked="Qt::Checked" legend_exp="" providerKey="postgres" patch_size="0,0">
+        <layer-tree-layer source=" __DATASOURCE__  key='arc_id' srid=__SRID__ type=LineString checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_arc&quot; (the_geom)" name="Arc" legend_split_behavior="0" expanded="0" id="v_edit_arc_c8e5e4a7_f9e3_4940_b0b2_40bf55f4c3ca" checked="Qt::Checked" legend_exp="" providerKey="postgres" patch_size="0,0">
           <customproperties>
             <Option/>
           </customproperties>
         </layer-tree-layer>
-        <layer-tree-layer source=" __DATASOURCE__  key='link_id' srid=__SRID__ type=LineString checkPrimaryKeyUnicity='1' table=&quot;ws_cat_material&quot;.&quot;v_edit_link&quot; (the_geom)" name="Link" legend_split_behavior="0" expanded="0" id="v_edit_link_bf3255de_b7b9_47f1_b2d1_2275d23b83d7" checked="Qt::Checked" legend_exp="" providerKey="postgres" patch_size="-1,-1">
+        <layer-tree-layer source=" __DATASOURCE__  key='link_id' srid=__SRID__ type=LineString checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_link&quot; (the_geom)" name="Link" legend_split_behavior="0" expanded="0" id="v_edit_link_bf3255de_b7b9_47f1_b2d1_2275d23b83d7" checked="Qt::Checked" legend_exp="" providerKey="postgres" patch_size="-1,-1">
           <customproperties>
             <Option/>
           </customproperties>
@@ -126,12 +126,12 @@
           <customproperties>
             <Option/>
           </customproperties>
-          <layer-tree-layer source=" __DATASOURCE__  key='pol_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;ws_cat_material&quot;.&quot;ve_pol_connec&quot; (the_geom)" name="Connec polygon" legend_split_behavior="0" expanded="0" id="ve_pol_connec_da965155_3efa_448d_83c5_82ce457fd689" checked="Qt::Checked" legend_exp="" providerKey="postgres" patch_size="-1,-1">
+          <layer-tree-layer source=" __DATASOURCE__  key='pol_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;ve_pol_connec&quot; (the_geom)" name="Connec polygon" legend_split_behavior="0" expanded="0" id="ve_pol_connec_da965155_3efa_448d_83c5_82ce457fd689" checked="Qt::Checked" legend_exp="" providerKey="postgres" patch_size="-1,-1">
             <customproperties>
               <Option/>
             </customproperties>
           </layer-tree-layer>
-          <layer-tree-layer source=" __DATASOURCE__  key='pol_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;ws_cat_material&quot;.&quot;ve_pol_node&quot; (the_geom)" name="Node polygon" legend_split_behavior="0" expanded="0" id="ve_pol_node_f56fce40_7d46_402c_b62d_87c0348f9226" checked="Qt::Checked" legend_exp="" providerKey="postgres" patch_size="-1,-1">
+          <layer-tree-layer source=" __DATASOURCE__  key='pol_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;ve_pol_node&quot; (the_geom)" name="Node polygon" legend_split_behavior="0" expanded="0" id="ve_pol_node_f56fce40_7d46_402c_b62d_87c0348f9226" checked="Qt::Checked" legend_exp="" providerKey="postgres" patch_size="-1,-1">
             <customproperties>
               <Option/>
             </customproperties>
@@ -142,12 +142,12 @@
         <customproperties>
           <Option/>
         </customproperties>
-        <layer-tree-layer source=" __DATASOURCE__  key='id' srid=__SRID__ type=LineString checkPrimaryKeyUnicity='1' table=&quot;ws_cat_material&quot;.&quot;v_edit_dimensions&quot; (the_geom)" name="Dimensioning" legend_split_behavior="0" expanded="0" id="v_edit_dimensions20170628134034849" checked="Qt::Checked" legend_exp="" providerKey="postgres" patch_size="0,0">
+        <layer-tree-layer source=" __DATASOURCE__  key='id' srid=__SRID__ type=LineString checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_dimensions&quot; (the_geom)" name="Dimensioning" legend_split_behavior="0" expanded="0" id="v_edit_dimensions20170628134034849" checked="Qt::Checked" legend_exp="" providerKey="postgres" patch_size="0,0">
           <customproperties>
             <Option/>
           </customproperties>
         </layer-tree-layer>
-        <layer-tree-layer source=" __DATASOURCE__  key='element_id' srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table=&quot;ws_cat_material&quot;.&quot;v_edit_element&quot; (the_geom)" name="Element" legend_split_behavior="0" expanded="1" id="v_edit_element20170828122555146" checked="Qt::Unchecked" legend_exp="" providerKey="postgres" patch_size="0,0">
+        <layer-tree-layer source=" __DATASOURCE__  key='element_id' srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_element&quot; (the_geom)" name="Element" legend_split_behavior="0" expanded="1" id="v_edit_element20170828122555146" checked="Qt::Unchecked" legend_exp="" providerKey="postgres" patch_size="0,0">
           <customproperties>
             <Option/>
           </customproperties>
@@ -162,24 +162,24 @@
         <customproperties>
           <Option/>
         </customproperties>
-        <layer-tree-layer source=" __DATASOURCE__  key='muni_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;ws_cat_material&quot;.&quot;v_ext_municipality&quot; (the_geom)" name="Municipality" legend_split_behavior="0" expanded="1" id="v_ext_municipality20171204170633784" checked="Qt::Checked" legend_exp="" providerKey="postgres" patch_size="0,0">
+        <layer-tree-layer source=" __DATASOURCE__  key='muni_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_ext_municipality&quot; (the_geom)" name="Municipality" legend_split_behavior="0" expanded="1" id="v_ext_municipality20171204170633784" checked="Qt::Checked" legend_exp="" providerKey="postgres" patch_size="0,0">
           <customproperties>
             <Option type="Map">
               <Option name="overview" value="1" type="QString"/>
             </Option>
           </customproperties>
         </layer-tree-layer>
-        <layer-tree-layer source=" __DATASOURCE__  key='id' srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table=&quot;ws_cat_material&quot;.&quot;v_ext_address&quot; (the_geom)" name="Address" legend_split_behavior="0" expanded="1" id="v_ext_address20180201103159332" checked="Qt::Unchecked" legend_exp="" providerKey="postgres" patch_size="0,0">
+        <layer-tree-layer source=" __DATASOURCE__  key='id' srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_ext_address&quot; (the_geom)" name="Address" legend_split_behavior="0" expanded="1" id="v_ext_address20180201103159332" checked="Qt::Unchecked" legend_exp="" providerKey="postgres" patch_size="0,0">
           <customproperties>
             <Option/>
           </customproperties>
         </layer-tree-layer>
-        <layer-tree-layer source=" __DATASOURCE__  key='id' srid=__SRID__ type=MultiLineString checkPrimaryKeyUnicity='1' table=&quot;ws_cat_material&quot;.&quot;v_ext_streetaxis&quot; (the_geom)" name="Streetaxis" legend_split_behavior="0" expanded="1" id="v_ext_streetaxis_4f78944b_a2c1_4f3c_924c_ec36fd045dc7" checked="Qt::Checked" legend_exp="" providerKey="postgres" patch_size="0,0">
+        <layer-tree-layer source=" __DATASOURCE__  key='id' srid=__SRID__ type=MultiLineString checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_ext_streetaxis&quot; (the_geom)" name="Streetaxis" legend_split_behavior="0" expanded="1" id="v_ext_streetaxis_4f78944b_a2c1_4f3c_924c_ec36fd045dc7" checked="Qt::Checked" legend_exp="" providerKey="postgres" patch_size="0,0">
           <customproperties>
             <Option/>
           </customproperties>
         </layer-tree-layer>
-        <layer-tree-layer source=" __DATASOURCE__  key='id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;ws_cat_material&quot;.&quot;v_ext_plot&quot; (the_geom)" name="Plot" legend_split_behavior="0" expanded="1" id="v_ext_plot20180201103159443" checked="Qt::Checked" legend_exp="" providerKey="postgres" patch_size="0,0">
+        <layer-tree-layer source=" __DATASOURCE__  key='id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_ext_plot&quot; (the_geom)" name="Plot" legend_split_behavior="0" expanded="1" id="v_ext_plot20180201103159443" checked="Qt::Checked" legend_exp="" providerKey="postgres" patch_size="0,0">
           <customproperties>
             <Option/>
           </customproperties>
@@ -234,10 +234,10 @@
   <mapcanvas name="theMapCanvas" annotationsVisible="1">
     <units>meters</units>
     <extent>
-       <xmin>__XMIN__</xmin>
-       <ymin>__YMIN__</ymin>
-       <xmax>__XMAX__</xmax>
-       <ymax>__YMAX__</ymax>
+           <xmin>__XMIN__</xmin>
+           <ymin>__YMIN__</ymin>
+           <xmax>__XMAX__</xmax>
+           <ymax>__YMAX__</ymax>
     </extent>
     <rotation>0</rotation>
     <destinationsrs>
@@ -399,10 +399,10 @@
   <mapcanvas name="mAreaCanvas" annotationsVisible="1">
     <units>degrees</units>
     <extent>
-       <xmin>__XMIN__</xmin>
-       <ymin>__YMIN__</ymin>
-       <xmax>__XMAX__</xmax>
-       <ymax>__YMAX__</ymax>
+           <xmin>__XMIN__</xmin>
+           <ymin>__YMIN__</ymin>
+           <xmax>__XMAX__</xmax>
+           <ymax>__YMAX__</ymax>
     </extent>
     <rotation>0</rotation>
     <destinationsrs>
@@ -484,7 +484,7 @@
   <projectlayers>
     <maplayer autoRefreshTime="0" maxScale="-4.65661e-10" autoRefreshMode="Disabled" styleCategories="AllStyleCategories" minScale="1e+08" refreshOnNotifyEnabled="0" refreshOnNotifyMessage="" geometry="No geometry" readOnly="0" wkbType="NoGeometry" legendPlaceholderImage="" type="vector" hasScaleBasedVisibilityFlag="0">
       <id>cat_arc20151120192002466</id>
-      <datasource> __DATASOURCE__   key='id' checkPrimaryKeyUnicity='1' table="ws_cat_material"."cat_arc"</datasource>
+      <datasource> __DATASOURCE__   key='id' checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."cat_arc"</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -742,7 +742,7 @@
                 <Option name="Layer" value="cat_material_a52a5827_9bbd_4251_b630_25899f2e39f2" type="QString"/>
                 <Option name="LayerName" value="Materials catalog" type="QString"/>
                 <Option name="LayerProviderName" value="postgres" type="QString"/>
-                <Option name="LayerSource" value=" __DATASOURCE__  sslmode=__SSLMODE__ key='id' checkPrimaryKeyUnicity='0' table=&quot;ws_cat_material&quot;.&quot;cat_material&quot;" type="QString"/>
+                <Option name="LayerSource" value=" __DATASOURCE__  sslmode=__SSLMODE__ key='id' checkPrimaryKeyUnicity='0' table=&quot;SCHEMA_NAME&quot;.&quot;cat_material&quot;" type="QString"/>
                 <Option name="NofColumns" value="1" type="int"/>
                 <Option name="OrderByValue" value="false" type="bool"/>
                 <Option name="UseCompleter" value="false" type="bool"/>
@@ -1121,7 +1121,7 @@
       <expressionfields/>
       <attributeactions>
         <defaultAction value="{00000000-0000-0000-0000-000000000000}" key="Canvas"/>
-        <actionsetting isEnabledOnlyWhenEditable="0" name="History aws_cat_materialit" action="qgis.utils.plugins['postgres91plusaws_cat_materialitor'].aws_cat_materialit('cat_arc20151120192002466',[% $id %])" capture="0" id="{922ecae5-8ab4-480b-a7a9-c5c80cff4ee5}" notificationMessage="" type="1" shortTitle="" icon="">
+        <actionsetting isEnabledOnlyWhenEditable="0" name="History aSCHEMA_NAMEit" action="qgis.utils.plugins['postgres91plusaSCHEMA_NAMEitor'].aSCHEMA_NAMEit('cat_arc20151120192002466',[% $id %])" capture="0" id="{922ecae5-8ab4-480b-a7a9-c5c80cff4ee5}" notificationMessage="" type="1" shortTitle="" icon="">
           <actionScope id="Canvas"/>
           <actionScope id="Field"/>
           <actionScope id="Feature"/>
@@ -1287,7 +1287,7 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer autoRefreshTime="0" maxScale="0" autoRefreshMode="Disabled" styleCategories="AllStyleCategories" minScale="1e+08" refreshOnNotifyEnabled="0" refreshOnNotifyMessage="" geometry="No geometry" readOnly="0" wkbType="NoGeometry" legendPlaceholderImage="" type="vector" hasScaleBasedVisibilityFlag="0">
       <id>cat_connec20160216122620764</id>
-      <datasource> __DATASOURCE__   key='id' checkPrimaryKeyUnicity='1' table="ws_cat_material"."cat_connec"</datasource>
+      <datasource> __DATASOURCE__   key='id' checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."cat_connec"</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -1547,7 +1547,7 @@ def my_form_open(dialog, layer, feature):
                 <Option name="Layer" value="cat_material_a52a5827_9bbd_4251_b630_25899f2e39f2" type="QString"/>
                 <Option name="LayerName" value="Materials catalog" type="QString"/>
                 <Option name="LayerProviderName" value="postgres" type="QString"/>
-                <Option name="LayerSource" value=" __DATASOURCE__  sslmode=__SSLMODE__ key='id' checkPrimaryKeyUnicity='0' table=&quot;ws_cat_material&quot;.&quot;cat_material&quot;" type="QString"/>
+                <Option name="LayerSource" value=" __DATASOURCE__  sslmode=__SSLMODE__ key='id' checkPrimaryKeyUnicity='0' table=&quot;SCHEMA_NAME&quot;.&quot;cat_material&quot;" type="QString"/>
                 <Option name="NofColumns" value="1" type="int"/>
                 <Option name="OrderByValue" value="false" type="bool"/>
                 <Option name="UseCompleter" value="false" type="bool"/>
@@ -1736,7 +1736,7 @@ def my_form_open(dialog, layer, feature):
       <expressionfields/>
       <attributeactions>
         <defaultAction value="{00000000-0000-0000-0000-000000000000}" key="Canvas"/>
-        <actionsetting isEnabledOnlyWhenEditable="0" name="History aws_cat_materialit" action="qgis.utils.plugins['postgres91plusaws_cat_materialitor'].aws_cat_materialit('cat_connec20160216122620764',[% $id %])" capture="0" id="{9b51f506-29f1-48fd-a506-f089b9aa881b}" notificationMessage="" type="1" shortTitle="" icon="">
+        <actionsetting isEnabledOnlyWhenEditable="0" name="History aSCHEMA_NAMEit" action="qgis.utils.plugins['postgres91plusaSCHEMA_NAMEitor'].aSCHEMA_NAMEit('cat_connec20160216122620764',[% $id %])" capture="0" id="{9b51f506-29f1-48fd-a506-f089b9aa881b}" notificationMessage="" type="1" shortTitle="" icon="">
           <actionScope id="Canvas"/>
           <actionScope id="Field"/>
           <actionScope id="Feature"/>
@@ -1856,7 +1856,7 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer autoRefreshTime="0" maxScale="0" autoRefreshMode="Disabled" styleCategories="AllStyleCategories" minScale="1e+08" refreshOnNotifyEnabled="0" refreshOnNotifyMessage="" geometry="No geometry" readOnly="0" wkbType="NoGeometry" legendPlaceholderImage="" type="vector" hasScaleBasedVisibilityFlag="0">
       <id>cat_material_a52a5827_9bbd_4251_b630_25899f2e39f2</id>
-      <datasource> __DATASOURCE__   sslmode=__SSLMODE__ key='id' checkPrimaryKeyUnicity='0' table="ws_cat_material"."cat_material"</datasource>
+      <datasource> __DATASOURCE__   sslmode=__SSLMODE__ key='id' checkPrimaryKeyUnicity='0' table="SCHEMA_NAME"."cat_material"</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -2259,7 +2259,7 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer autoRefreshTime="0" maxScale="0" autoRefreshMode="Disabled" styleCategories="AllStyleCategories" minScale="1e+08" refreshOnNotifyEnabled="0" refreshOnNotifyMessage="" geometry="No geometry" readOnly="0" wkbType="NoGeometry" legendPlaceholderImage="" type="vector" hasScaleBasedVisibilityFlag="0">
       <id>cat_node20151105202206790</id>
-      <datasource> __DATASOURCE__   key='id' checkPrimaryKeyUnicity='1' table="ws_cat_material"."cat_node"</datasource>
+      <datasource> __DATASOURCE__   key='id' checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."cat_node"</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -2519,7 +2519,7 @@ def my_form_open(dialog, layer, feature):
                 <Option name="Layer" value="cat_material_a52a5827_9bbd_4251_b630_25899f2e39f2" type="QString"/>
                 <Option name="LayerName" value="Materials catalog" type="QString"/>
                 <Option name="LayerProviderName" value="postgres" type="QString"/>
-                <Option name="LayerSource" value=" __DATASOURCE__  sslmode=__SSLMODE__ key='id' checkPrimaryKeyUnicity='0' table=&quot;ws_cat_material&quot;.&quot;cat_material&quot;" type="QString"/>
+                <Option name="LayerSource" value=" __DATASOURCE__  sslmode=__SSLMODE__ key='id' checkPrimaryKeyUnicity='0' table=&quot;SCHEMA_NAME&quot;.&quot;cat_material&quot;" type="QString"/>
                 <Option name="NofColumns" value="1" type="int"/>
                 <Option name="OrderByValue" value="false" type="bool"/>
                 <Option name="UseCompleter" value="false" type="bool"/>
@@ -2801,7 +2801,7 @@ def my_form_open(dialog, layer, feature):
       <expressionfields/>
       <attributeactions>
         <defaultAction value="{00000000-0000-0000-0000-000000000000}" key="Canvas"/>
-        <actionsetting isEnabledOnlyWhenEditable="0" name="History aws_cat_materialit" action="qgis.utils.plugins['postgres91plusaws_cat_materialitor'].aws_cat_materialit('cat_node20151105202206790',[% $id %])" capture="0" id="{9146de0d-51f8-4a54-95cf-0e97790df700}" notificationMessage="" type="1" shortTitle="" icon="">
+        <actionsetting isEnabledOnlyWhenEditable="0" name="History aSCHEMA_NAMEit" action="qgis.utils.plugins['postgres91plusaSCHEMA_NAMEitor'].aSCHEMA_NAMEit('cat_node20151105202206790',[% $id %])" capture="0" id="{9146de0d-51f8-4a54-95cf-0e97790df700}" notificationMessage="" type="1" shortTitle="" icon="">
           <actionScope id="Canvas"/>
           <actionScope id="Field"/>
           <actionScope id="Feature"/>
@@ -2939,19 +2939,19 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer wkbType="LineString" refreshOnNotifyEnabled="0" styleCategories="AllStyleCategories" simplifyDrawingHints="1" simplifyMaxScale="1" maxScale="0" simplifyLocal="1" minScale="100000000" simplifyAlgorithm="0" type="vector" autoRefreshMode="Disabled" symbologyReferenceScale="-1" readOnly="0" geometry="Line" hasScaleBasedVisibilityFlag="0" labelsEnabled="1" simplifyDrawingTol="1" legendPlaceholderImage="" refreshOnNotifyMessage="" autoRefreshTime="0">
       <extent>
-         <xmin>__XMIN__</xmin>
-         <ymin>__YMIN__</ymin>
-         <xmax>__XMAX__</xmax>
-         <ymax>__YMAX__</ymax>
+             <xmin>__XMIN__</xmin>
+             <ymin>__YMIN__</ymin>
+             <xmax>__XMAX__</xmax>
+             <ymax>__YMAX__</ymax>
       </extent>
       <wgs84extent>
-         <xmin>__XMIN__</xmin>
-         <ymin>__YMIN__</ymin>
-         <xmax>__XMAX__</xmax>
-         <ymax>__YMAX__</ymax>
+             <xmin>__XMIN__</xmin>
+             <ymin>__YMIN__</ymin>
+             <xmax>__XMAX__</xmax>
+             <ymax>__YMAX__</ymax>
       </wgs84extent>
       <id>v_edit_arc_c8e5e4a7_f9e3_4940_b0b2_40bf55f4c3ca</id>
-      <datasource> __DATASOURCE__   key='arc_id' srid=__SRID__ type=LineString checkPrimaryKeyUnicity='1' table="ws_cat_material"."v_edit_arc" (the_geom)</datasource>
+      <datasource> __DATASOURCE__   key='arc_id' srid=__SRID__ type=LineString checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_arc" (the_geom)</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -5650,7 +5650,7 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer autoRefreshTime="0" maxScale="0" autoRefreshMode="Disabled" styleCategories="AllStyleCategories" minScale="1e+08" refreshOnNotifyEnabled="0" refreshOnNotifyMessage="" geometry="No geometry" readOnly="0" wkbType="NoGeometry" legendPlaceholderImage="" type="vector" hasScaleBasedVisibilityFlag="0">
       <id>v_edit_cat_feature_arc_e9a8f87d_5db9_4265_9496_b9ee76cffadd</id>
-      <datasource> __DATASOURCE__   key='id' checkPrimaryKeyUnicity='1' table="ws_cat_material"."v_edit_cat_feature_arc"</datasource>
+      <datasource> __DATASOURCE__   key='id' checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_cat_feature_arc"</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -5996,7 +5996,7 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer autoRefreshTime="0" maxScale="0" autoRefreshMode="Disabled" styleCategories="AllStyleCategories" minScale="1e+08" refreshOnNotifyEnabled="0" refreshOnNotifyMessage="" geometry="No geometry" readOnly="0" wkbType="NoGeometry" legendPlaceholderImage="" type="vector" hasScaleBasedVisibilityFlag="0">
       <id>v_edit_cat_feature_connec_79421626_dc83_4ace_a970_9edeceeef98d</id>
-      <datasource> __DATASOURCE__   key='id' checkPrimaryKeyUnicity='1' table="ws_cat_material"."v_edit_cat_feature_connec"</datasource>
+      <datasource> __DATASOURCE__   key='id' checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_cat_feature_connec"</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -6342,7 +6342,7 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer autoRefreshTime="0" maxScale="0" autoRefreshMode="Disabled" styleCategories="AllStyleCategories" minScale="1e+08" refreshOnNotifyEnabled="0" refreshOnNotifyMessage="" geometry="No geometry" readOnly="0" wkbType="NoGeometry" legendPlaceholderImage="" type="vector" hasScaleBasedVisibilityFlag="0">
       <id>v_edit_cat_feature_node_ea70bfb4_8fbc_4012_8ac4_3f3f7b2557ae</id>
-      <datasource> __DATASOURCE__   key='id' checkPrimaryKeyUnicity='1' table="ws_cat_material"."v_edit_cat_feature_node"</datasource>
+      <datasource> __DATASOURCE__   key='id' checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_cat_feature_node"</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -6780,19 +6780,19 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer wkbType="Point" refreshOnNotifyEnabled="0" styleCategories="AllStyleCategories" simplifyDrawingHints="0" simplifyMaxScale="1" maxScale="0" simplifyLocal="1" minScale="100000000" simplifyAlgorithm="0" type="vector" autoRefreshMode="Disabled" symbologyReferenceScale="-1" readOnly="0" geometry="Point" hasScaleBasedVisibilityFlag="0" labelsEnabled="0" simplifyDrawingTol="1" legendPlaceholderImage="" refreshOnNotifyMessage="" autoRefreshTime="0">
       <extent>
-         <xmin>__XMIN__</xmin>
-         <ymin>__YMIN__</ymin>
-         <xmax>__XMAX__</xmax>
-         <ymax>__YMAX__</ymax>
+             <xmin>__XMIN__</xmin>
+             <ymin>__YMIN__</ymin>
+             <xmax>__XMAX__</xmax>
+             <ymax>__YMAX__</ymax>
       </extent>
       <wgs84extent>
-         <xmin>__XMIN__</xmin>
-         <ymin>__YMIN__</ymin>
-         <xmax>__XMAX__</xmax>
-         <ymax>__YMAX__</ymax>
+             <xmin>__XMIN__</xmin>
+             <ymin>__YMIN__</ymin>
+             <xmax>__XMAX__</xmax>
+             <ymax>__YMAX__</ymax>
       </wgs84extent>
       <id>v_edit_connec_decaeb94_529d_4842_9e89_33c065483403</id>
-      <datasource> __DATASOURCE__   key='connec_id' srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table="ws_cat_material"."v_edit_connec" (the_geom)</datasource>
+      <datasource> __DATASOURCE__   key='connec_id' srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_connec" (the_geom)</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -9767,7 +9767,7 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer wkbType="LineString" refreshOnNotifyEnabled="0" styleCategories="AllStyleCategories" simplifyDrawingHints="1" simplifyMaxScale="1" maxScale="0" simplifyLocal="1" minScale="100000000" simplifyAlgorithm="0" type="vector" autoRefreshMode="Disabled" symbologyReferenceScale="-1" readOnly="0" geometry="Line" hasScaleBasedVisibilityFlag="0" labelsEnabled="1" simplifyDrawingTol="1" legendPlaceholderImage="" refreshOnNotifyMessage="" autoRefreshTime="0">
       <id>v_edit_dimensions20170628134034849</id>
-      <datasource> __DATASOURCE__   key='id' srid=__SRID__ type=LineString checkPrimaryKeyUnicity='1' table="ws_cat_material"."v_edit_dimensions" (the_geom)</datasource>
+      <datasource> __DATASOURCE__   key='id' srid=__SRID__ type=LineString checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_dimensions" (the_geom)</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -12270,7 +12270,7 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer wkbType="MultiPolygon" refreshOnNotifyEnabled="0" styleCategories="AllStyleCategories" simplifyDrawingHints="1" simplifyMaxScale="1" maxScale="0" simplifyLocal="1" minScale="100000000" simplifyAlgorithm="0" type="vector" autoRefreshMode="Disabled" symbologyReferenceScale="-1" readOnly="0" geometry="Polygon" hasScaleBasedVisibilityFlag="0" labelsEnabled="0" simplifyDrawingTol="1" legendPlaceholderImage="" refreshOnNotifyMessage="" autoRefreshTime="0">
       <id>v_edit_dma20190515092620863</id>
-      <datasource> __DATASOURCE__   key='dma_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="ws_cat_material"."v_edit_dma" (the_geom)</datasource>
+      <datasource> __DATASOURCE__   key='dma_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_dma" (the_geom)</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -12907,7 +12907,7 @@ def my_form_open(dialog, layer, feature):
       <expressionfields/>
       <attributeactions>
         <defaultAction value="{00000000-0000-0000-0000-000000000000}" key="Canvas"/>
-        <actionsetting isEnabledOnlyWhenEditable="0" name="History aws_cat_materialit" action="qgis.utils.plugins['postgres91plusaws_cat_materialitor'].aws_cat_materialit('dma20151127113007431',[% $id %])" capture="0" id="{8102c551-2530-47bc-b894-7e46e0cd8d90}" notificationMessage="" type="1" shortTitle="" icon="">
+        <actionsetting isEnabledOnlyWhenEditable="0" name="History aSCHEMA_NAMEit" action="qgis.utils.plugins['postgres91plusaSCHEMA_NAMEitor'].aSCHEMA_NAMEit('dma20151127113007431',[% $id %])" capture="0" id="{8102c551-2530-47bc-b894-7e46e0cd8d90}" notificationMessage="" type="1" shortTitle="" icon="">
           <actionScope id="Canvas"/>
           <actionScope id="Field"/>
           <actionScope id="Feature"/>
@@ -12998,7 +12998,7 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer wkbType="MultiPolygon" refreshOnNotifyEnabled="0" styleCategories="AllStyleCategories" simplifyDrawingHints="1" simplifyMaxScale="1" maxScale="0" simplifyLocal="1" minScale="0" simplifyAlgorithm="0" type="vector" autoRefreshMode="Disabled" symbologyReferenceScale="-1" readOnly="0" geometry="Polygon" hasScaleBasedVisibilityFlag="0" labelsEnabled="0" simplifyDrawingTol="1" legendPlaceholderImage="" refreshOnNotifyMessage="" autoRefreshTime="0">
       <id>v_edit_dqa_4e695ade_c45c_4562_afb6_1d3c41532a1b</id>
-      <datasource> __DATASOURCE__   key='dqa_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="ws_cat_material"."v_edit_dqa" (the_geom)</datasource>
+      <datasource> __DATASOURCE__   key='dqa_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_dqa" (the_geom)</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -13692,7 +13692,7 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer wkbType="Point" refreshOnNotifyEnabled="0" styleCategories="AllStyleCategories" simplifyDrawingHints="0" simplifyMaxScale="1" maxScale="1" simplifyLocal="1" minScale="1500" simplifyAlgorithm="0" type="vector" autoRefreshMode="Disabled" symbologyReferenceScale="-1" readOnly="0" geometry="Point" hasScaleBasedVisibilityFlag="1" labelsEnabled="0" simplifyDrawingTol="1" legendPlaceholderImage="" refreshOnNotifyMessage="" autoRefreshTime="0">
       <id>v_edit_element20170828122555146</id>
-      <datasource> __DATASOURCE__   key='element_id' srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table="ws_cat_material"."v_edit_element" (the_geom)</datasource>
+      <datasource> __DATASOURCE__   key='element_id' srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_element" (the_geom)</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -14771,7 +14771,7 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer wkbType="MultiPolygon" refreshOnNotifyEnabled="0" styleCategories="AllStyleCategories" simplifyDrawingHints="1" simplifyMaxScale="1" maxScale="0" simplifyLocal="1" minScale="100000000" simplifyAlgorithm="0" type="vector" autoRefreshMode="Disabled" symbologyReferenceScale="-1" readOnly="0" geometry="Polygon" hasScaleBasedVisibilityFlag="0" labelsEnabled="0" simplifyDrawingTol="1" legendPlaceholderImage="" refreshOnNotifyMessage="" autoRefreshTime="0">
       <id>v_edit_exploitation_fd06cc08_9e9d_4a22_bfca_586b3919d086</id>
-      <datasource> __DATASOURCE__   key='expl_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="ws_cat_material"."v_edit_exploitation" (the_geom)</datasource>
+      <datasource> __DATASOURCE__   key='expl_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_exploitation" (the_geom)</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -15302,19 +15302,19 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer wkbType="LineString" refreshOnNotifyEnabled="0" styleCategories="AllStyleCategories" simplifyDrawingHints="1" simplifyMaxScale="1" maxScale="1" simplifyLocal="1" minScale="1500" simplifyAlgorithm="0" type="vector" autoRefreshMode="Disabled" symbologyReferenceScale="-1" readOnly="0" geometry="Line" hasScaleBasedVisibilityFlag="0" labelsEnabled="0" simplifyDrawingTol="1" legendPlaceholderImage="" refreshOnNotifyMessage="" autoRefreshTime="0">
       <extent>
-         <xmin>__XMIN__</xmin>
-         <ymin>__YMIN__</ymin>
-         <xmax>__XMAX__</xmax>
-         <ymax>__YMAX__</ymax>
+             <xmin>__XMIN__</xmin>
+             <ymin>__YMIN__</ymin>
+             <xmax>__XMAX__</xmax>
+             <ymax>__YMAX__</ymax>
       </extent>
       <wgs84extent>
-         <xmin>__XMIN__</xmin>
-         <ymin>__YMIN__</ymin>
-         <xmax>__XMAX__</xmax>
-         <ymax>__YMAX__</ymax>
+             <xmin>__XMIN__</xmin>
+             <ymin>__YMIN__</ymin>
+             <xmax>__XMAX__</xmax>
+             <ymax>__YMAX__</ymax>
       </wgs84extent>
       <id>v_edit_link_bf3255de_b7b9_47f1_b2d1_2275d23b83d7</id>
-      <datasource> __DATASOURCE__   key='link_id' srid=__SRID__ type=LineString checkPrimaryKeyUnicity='1' table="ws_cat_material"."v_edit_link" (the_geom)</datasource>
+      <datasource> __DATASOURCE__   key='link_id' srid=__SRID__ type=LineString checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_link" (the_geom)</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -16713,19 +16713,19 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer wkbType="Point" refreshOnNotifyEnabled="0" styleCategories="AllStyleCategories" simplifyDrawingHints="0" simplifyMaxScale="1" maxScale="0" simplifyLocal="1" minScale="100000000" simplifyAlgorithm="0" type="vector" autoRefreshMode="Disabled" symbologyReferenceScale="-1" readOnly="0" geometry="Point" hasScaleBasedVisibilityFlag="0" labelsEnabled="0" simplifyDrawingTol="1" legendPlaceholderImage="" refreshOnNotifyMessage="" autoRefreshTime="0">
       <extent>
-         <xmin>__XMIN__</xmin>
-         <ymin>__YMIN__</ymin>
-         <xmax>__XMAX__</xmax>
-         <ymax>__YMAX__</ymax>
+             <xmin>__XMIN__</xmin>
+             <ymin>__YMIN__</ymin>
+             <xmax>__XMAX__</xmax>
+             <ymax>__YMAX__</ymax>
       </extent>
       <wgs84extent>
-         <xmin>__XMIN__</xmin>
-         <ymin>__YMIN__</ymin>
-         <xmax>__XMAX__</xmax>
-         <ymax>__YMAX__</ymax>
+             <xmin>__XMIN__</xmin>
+             <ymin>__YMIN__</ymin>
+             <xmax>__XMAX__</xmax>
+             <ymax>__YMAX__</ymax>
       </wgs84extent>
       <id>v_edit_node_79e9d657_9f6a_4303_b422_e1ba0c998c2f</id>
-      <datasource> __DATASOURCE__   key='node_id' srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table="ws_cat_material"."v_edit_node" (the_geom)</datasource>
+      <datasource> __DATASOURCE__   key='node_id' srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_node" (the_geom)</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -20915,7 +20915,7 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer wkbType="MultiPolygon" refreshOnNotifyEnabled="0" styleCategories="AllStyleCategories" simplifyDrawingHints="1" simplifyMaxScale="1" maxScale="0" simplifyLocal="1" minScale="100000000" simplifyAlgorithm="0" type="vector" autoRefreshMode="Disabled" symbologyReferenceScale="-1" readOnly="0" geometry="Polygon" hasScaleBasedVisibilityFlag="0" labelsEnabled="0" simplifyDrawingTol="1" legendPlaceholderImage="" refreshOnNotifyMessage="" autoRefreshTime="0">
       <id>v_edit_presszone_d6c14d1a_a691_4ec8_a373_97438e05f219</id>
-      <datasource> __DATASOURCE__   key='presszone_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="ws_cat_material"."v_edit_presszone" (the_geom)</datasource>
+      <datasource> __DATASOURCE__   key='presszone_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_presszone" (the_geom)</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -21553,7 +21553,7 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer wkbType="MultiPolygon" refreshOnNotifyEnabled="0" styleCategories="AllStyleCategories" simplifyDrawingHints="1" simplifyMaxScale="1" maxScale="0" simplifyLocal="1" minScale="100000000" simplifyAlgorithm="0" type="vector" autoRefreshMode="Disabled" symbologyReferenceScale="-1" readOnly="0" geometry="Polygon" hasScaleBasedVisibilityFlag="0" labelsEnabled="0" simplifyDrawingTol="1" legendPlaceholderImage="" refreshOnNotifyMessage="" autoRefreshTime="0">
       <id>v_edit_sector20171204170540567</id>
-      <datasource> __DATASOURCE__   key='sector_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="ws_cat_material"."v_edit_sector" (the_geom)</datasource>
+      <datasource> __DATASOURCE__   key='sector_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_sector" (the_geom)</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -22236,7 +22236,7 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer wkbType="Point" refreshOnNotifyEnabled="0" styleCategories="AllStyleCategories" simplifyDrawingHints="0" simplifyMaxScale="1" maxScale="0" simplifyLocal="1" minScale="1500" simplifyAlgorithm="0" type="vector" autoRefreshMode="Disabled" symbologyReferenceScale="-1" readOnly="0" geometry="Point" hasScaleBasedVisibilityFlag="1" labelsEnabled="1" simplifyDrawingTol="1" legendPlaceholderImage="" refreshOnNotifyMessage="" autoRefreshTime="0">
       <id>v_ext_address20180201103159332</id>
-      <datasource> __DATASOURCE__   key='id' srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table="ws_cat_material"."v_ext_address" (the_geom)</datasource>
+      <datasource> __DATASOURCE__   key='id' srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_ext_address" (the_geom)</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -22942,7 +22942,7 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer wkbType="MultiPolygon" refreshOnNotifyEnabled="0" styleCategories="AllStyleCategories" simplifyDrawingHints="1" simplifyMaxScale="1" maxScale="0" simplifyLocal="1" minScale="100000000" simplifyAlgorithm="0" type="vector" autoRefreshMode="Disabled" symbologyReferenceScale="-1" readOnly="0" geometry="Polygon" hasScaleBasedVisibilityFlag="0" labelsEnabled="0" simplifyDrawingTol="1" legendPlaceholderImage="" refreshOnNotifyMessage="" autoRefreshTime="0">
       <id>v_ext_municipality20171204170633784</id>
-      <datasource> __DATASOURCE__   key='muni_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="ws_cat_material"."v_ext_municipality" (the_geom)</datasource>
+      <datasource> __DATASOURCE__   key='muni_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_ext_municipality" (the_geom)</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -23399,7 +23399,7 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer wkbType="MultiPolygon" refreshOnNotifyEnabled="0" styleCategories="AllStyleCategories" simplifyDrawingHints="1" simplifyMaxScale="1" maxScale="0" simplifyLocal="1" minScale="100000000" simplifyAlgorithm="0" type="vector" autoRefreshMode="Disabled" symbologyReferenceScale="-1" readOnly="0" geometry="Polygon" hasScaleBasedVisibilityFlag="0" labelsEnabled="0" simplifyDrawingTol="1" legendPlaceholderImage="" refreshOnNotifyMessage="" autoRefreshTime="0">
       <id>v_ext_plot20180201103159443</id>
-      <datasource> __DATASOURCE__   key='id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="ws_cat_material"."v_ext_plot" (the_geom)</datasource>
+      <datasource> __DATASOURCE__   key='id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_ext_plot" (the_geom)</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -24016,7 +24016,7 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer wkbType="MultiLineString" refreshOnNotifyEnabled="0" styleCategories="AllStyleCategories" simplifyDrawingHints="1" simplifyMaxScale="1" maxScale="0" simplifyLocal="1" minScale="3000" simplifyAlgorithm="0" type="vector" autoRefreshMode="Disabled" symbologyReferenceScale="-1" readOnly="0" geometry="Line" hasScaleBasedVisibilityFlag="1" labelsEnabled="1" simplifyDrawingTol="1" legendPlaceholderImage="" refreshOnNotifyMessage="" autoRefreshTime="0">
       <id>v_ext_streetaxis_4f78944b_a2c1_4f3c_924c_ec36fd045dc7</id>
-      <datasource> __DATASOURCE__   key='id' srid=__SRID__ type=MultiLineString checkPrimaryKeyUnicity='1' table="ws_cat_material"."v_ext_streetaxis" (the_geom)</datasource>
+      <datasource> __DATASOURCE__   key='id' srid=__SRID__ type=MultiLineString checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_ext_streetaxis" (the_geom)</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -24732,7 +24732,7 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer wkbType="MultiPolygon" refreshOnNotifyEnabled="0" styleCategories="AllStyleCategories" simplifyDrawingHints="1" simplifyMaxScale="1" maxScale="0" simplifyLocal="1" minScale="5000" simplifyAlgorithm="0" type="vector" autoRefreshMode="Disabled" symbologyReferenceScale="-1" readOnly="0" geometry="Polygon" hasScaleBasedVisibilityFlag="1" labelsEnabled="0" simplifyDrawingTol="1" legendPlaceholderImage="" refreshOnNotifyMessage="" autoRefreshTime="0">
       <id>ve_pol_connec_da965155_3efa_448d_83c5_82ce457fd689</id>
-      <datasource> __DATASOURCE__   key='pol_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="ws_cat_material"."ve_pol_connec" (the_geom)</datasource>
+      <datasource> __DATASOURCE__   key='pol_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."ve_pol_connec" (the_geom)</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -25253,7 +25253,7 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer wkbType="MultiPolygon" refreshOnNotifyEnabled="0" styleCategories="AllStyleCategories" simplifyDrawingHints="1" simplifyMaxScale="1" maxScale="0" simplifyLocal="1" minScale="5000" simplifyAlgorithm="0" type="vector" autoRefreshMode="Disabled" symbologyReferenceScale="-1" readOnly="0" geometry="Polygon" hasScaleBasedVisibilityFlag="1" labelsEnabled="0" simplifyDrawingTol="1" legendPlaceholderImage="" refreshOnNotifyMessage="" autoRefreshTime="0">
       <id>ve_pol_node_f56fce40_7d46_402c_b62d_87c0348f9226</id>
-      <datasource> __DATASOURCE__   key='pol_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="ws_cat_material"."ve_pol_node" (the_geom)</datasource>
+      <datasource> __DATASOURCE__   key='pol_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."ve_pol_node" (the_geom)</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -26089,9 +26089,9 @@ def my_form_open(dialog, layer, feature):
         <value>v_edit_pond20170619120829609</value>
         <value>v_edit_pool20170619120829771</value>
         <value>v_edit_review_arc20180309112934750</value>
-        <value>v_edit_review_aws_cat_materialit_arc20180227100849608</value>
-        <value>v_edit_review_aws_cat_materialit_connec20180227100849451</value>
-        <value>v_edit_review_aws_cat_materialit_node20180227100849186</value>
+        <value>v_edit_review_aSCHEMA_NAMEit_arc20180227100849608</value>
+        <value>v_edit_review_aSCHEMA_NAMEit_connec20180227100849451</value>
+        <value>v_edit_review_aSCHEMA_NAMEit_node20180227100849186</value>
         <value>v_edit_review_connec20180309112935025</value>
         <value>v_edit_review_node20180309112934879</value>
         <value>v_edit_samplepoint20170619120830016</value>
@@ -26404,7 +26404,7 @@ def my_form_open(dialog, layer, feature):
       <ProjectCRSID type="int">2104</ProjectCRSID>
       <ProjectCRSProj4String type="QString">+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</ProjectCRSProj4String>
        <ProjectCrs type="QString">__AUTHID__</ProjectCrs>
-       <ProjectionsEnabled type="int">1</ProjectionsEnabled>
+           <ProjectionsEnabled type="int">1</ProjectionsEnabled>
     </SpatialRefSys>
     <Variables>
       <variableNames type="QStringList">
@@ -27416,16 +27416,16 @@ def my_form_open(dialog, layer, feature):
         </LayoutObject>
         <Extent ymax="4577071.35527538601309061" xmax="419842.63581420265836641" xmin="418477.63581281033111736" ymin="4576100.62452332023531199"/>
         <LayerSet>
-          <Layer source=" __DATASOURCE__  key='id' checkPrimaryKeyUnicity='1' table=&quot;ws_cat_material&quot;.&quot;cat_node&quot;" name="Node catalog" provider="postgres">cat_node20151105202206790</Layer>
-          <Layer source=" __DATASOURCE__  key='id' checkPrimaryKeyUnicity='1' table=&quot;ws_cat_material&quot;.&quot;cat_arc&quot;" name="Arc catalog" provider="postgres">cat_arc20151120192002466</Layer>
-          <Layer source=" __DATASOURCE__  key='id' checkPrimaryKeyUnicity='1' table=&quot;ws_cat_material&quot;.&quot;cat_connec&quot;" name="Connec catalog" provider="postgres">cat_connec20160216122620764</Layer>
-          <Layer source=" __DATASOURCE__  key='id' srid=__SRID__ type=LineString checkPrimaryKeyUnicity='1' table=&quot;ws_cat_material&quot;.&quot;v_edit_dimensions&quot; (the_geom)" name="Dimensioning" provider="postgres">v_edit_dimensions20170628134034849</Layer>
-          <Layer source=" __DATASOURCE__  key='muni_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;ws_cat_material&quot;.&quot;v_ext_municipality&quot; (the_geom)" name="Municipality" provider="postgres">v_ext_municipality20171204170633784</Layer>
-          <Layer source=" __DATASOURCE__  key='id' srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table=&quot;ws_cat_material&quot;.&quot;v_ext_address&quot; (the_geom)" name="Address" provider="postgres">v_ext_address20180201103159332</Layer>
-          <Layer source=" __DATASOURCE__  key='id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;ws_cat_material&quot;.&quot;v_ext_plot&quot; (the_geom)" name="Plot" provider="postgres">v_ext_plot20180201103159443</Layer>
+          <Layer source=" __DATASOURCE__  key='id' checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;cat_node&quot;" name="Node catalog" provider="postgres">cat_node20151105202206790</Layer>
+          <Layer source=" __DATASOURCE__  key='id' checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;cat_arc&quot;" name="Arc catalog" provider="postgres">cat_arc20151120192002466</Layer>
+          <Layer source=" __DATASOURCE__  key='id' checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;cat_connec&quot;" name="Connec catalog" provider="postgres">cat_connec20160216122620764</Layer>
+          <Layer source=" __DATASOURCE__  key='id' srid=__SRID__ type=LineString checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_dimensions&quot; (the_geom)" name="Dimensioning" provider="postgres">v_edit_dimensions20170628134034849</Layer>
+          <Layer source=" __DATASOURCE__  key='muni_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_ext_municipality&quot; (the_geom)" name="Municipality" provider="postgres">v_ext_municipality20171204170633784</Layer>
+          <Layer source=" __DATASOURCE__  key='id' srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_ext_address&quot; (the_geom)" name="Address" provider="postgres">v_ext_address20180201103159332</Layer>
+          <Layer source=" __DATASOURCE__  key='id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_ext_plot&quot; (the_geom)" name="Plot" provider="postgres">v_ext_plot20180201103159443</Layer>
         </LayerSet>
         <LayerStyles>
-          <LayerStyle source=" __DATASOURCE__  key='id' checkPrimaryKeyUnicity='1' table=&quot;ws_cat_material&quot;.&quot;cat_arc&quot;" name="Arc catalog" layerid="cat_arc20151120192002466" provider="postgres">
+          <LayerStyle source=" __DATASOURCE__  key='id' checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;cat_arc&quot;" name="Arc catalog" layerid="cat_arc20151120192002466" provider="postgres">
             <qgis readOnly="0" minimumScale="-4.65661e-10" maximumScale="1e+08" hasScaleBasedVisibilityFlag="0" version="2.18.14">
               <edittypes>
                 <edittype name="id" widgetv2type="TextEdit">
@@ -27524,10 +27524,10 @@ def my_form_open(dialog, layer, feature):
                 <alias name="" field="m3protec_cost" index="21"/>
                 <alias name="" field="active" index="22"/>
               </aliases>
-              <exclws_cat_materialeAttributesWMS/>
-              <exclws_cat_materialeAttributesWFS/>
+              <exclSCHEMA_NAMEeAttributesWMS/>
+              <exclSCHEMA_NAMEeAttributesWFS/>
               <attributeactions default="0">
-                <actionsetting name="History aws_cat_materialit" action="qgis.utils.plugins['postgres91plusaws_cat_materialitor'].aws_cat_materialit('cat_arc20151120192002466',[% $id %])" capture="0" showInAttributeTable="1" type="1" shortTitle="" icon=""/>
+                <actionsetting name="History aSCHEMA_NAMEit" action="qgis.utils.plugins['postgres91plusaSCHEMA_NAMEitor'].aSCHEMA_NAMEit('cat_arc20151120192002466',[% $id %])" capture="0" showInAttributeTable="1" type="1" shortTitle="" icon=""/>
               </attributeactions>
               <attributetableconfig actionWidgetStyle="dropDown" sortExpression="&quot;id&quot;" sortOrder="0">
                 <columns>
@@ -27614,7 +27614,7 @@ def my_form_open(dialog, layer, feature):
               <layerGeometryType>4</layerGeometryType>
             </qgis>
           </LayerStyle>
-          <LayerStyle source=" __DATASOURCE__  key='id' checkPrimaryKeyUnicity='1' table=&quot;ws_cat_material&quot;.&quot;cat_connec&quot;" name="Connec catalog" layerid="cat_connec20160216122620764" provider="postgres">
+          <LayerStyle source=" __DATASOURCE__  key='id' checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;cat_connec&quot;" name="Connec catalog" layerid="cat_connec20160216122620764" provider="postgres">
             <qgis readOnly="0" minimumScale="0" maximumScale="1e+08" hasScaleBasedVisibilityFlag="0" version="2.18.14">
               <edittypes>
                 <edittype name="id" widgetv2type="TextEdit">
@@ -27685,10 +27685,10 @@ def my_form_open(dialog, layer, feature):
                 <alias name="" field="cost_m3" index="14"/>
                 <alias name="" field="active" index="15"/>
               </aliases>
-              <exclws_cat_materialeAttributesWMS/>
-              <exclws_cat_materialeAttributesWFS/>
+              <exclSCHEMA_NAMEeAttributesWMS/>
+              <exclSCHEMA_NAMEeAttributesWFS/>
               <attributeactions default="0">
-                <actionsetting name="History aws_cat_materialit" action="qgis.utils.plugins['postgres91plusaws_cat_materialitor'].aws_cat_materialit('cat_connec20160216122620764',[% $id %])" capture="0" showInAttributeTable="1" type="1" shortTitle="" icon=""/>
+                <actionsetting name="History aSCHEMA_NAMEit" action="qgis.utils.plugins['postgres91plusaSCHEMA_NAMEitor'].aSCHEMA_NAMEit('cat_connec20160216122620764',[% $id %])" capture="0" showInAttributeTable="1" type="1" shortTitle="" icon=""/>
               </attributeactions>
               <attributetableconfig actionWidgetStyle="dropDown" sortExpression="" sortOrder="0">
                 <columns>
@@ -27761,7 +27761,7 @@ def my_form_open(dialog, layer, feature):
               <layerGeometryType>4</layerGeometryType>
             </qgis>
           </LayerStyle>
-          <LayerStyle source=" __DATASOURCE__  key='id' checkPrimaryKeyUnicity='1' table=&quot;ws_cat_material&quot;.&quot;cat_node&quot;" name="Node catalog" layerid="cat_node20151105202206790" provider="postgres">
+          <LayerStyle source=" __DATASOURCE__  key='id' checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;cat_node&quot;" name="Node catalog" layerid="cat_node20151105202206790" provider="postgres">
             <qgis readOnly="0" minimumScale="0" maximumScale="1e+08" hasScaleBasedVisibilityFlag="0" version="2.18.14">
               <edittypes>
                 <edittype name="id" widgetv2type="TextEdit">
@@ -27836,10 +27836,10 @@ def my_form_open(dialog, layer, feature):
                 <alias name="" field="cost" index="15"/>
                 <alias name="" field="active" index="16"/>
               </aliases>
-              <exclws_cat_materialeAttributesWMS/>
-              <exclws_cat_materialeAttributesWFS/>
+              <exclSCHEMA_NAMEeAttributesWMS/>
+              <exclSCHEMA_NAMEeAttributesWFS/>
               <attributeactions default="0">
-                <actionsetting name="History aws_cat_materialit" action="qgis.utils.plugins['postgres91plusaws_cat_materialitor'].aws_cat_materialit('cat_node20151105202206790',[% $id %])" capture="0" showInAttributeTable="1" type="1" shortTitle="" icon=""/>
+                <actionsetting name="History aSCHEMA_NAMEit" action="qgis.utils.plugins['postgres91plusaSCHEMA_NAMEitor'].aSCHEMA_NAMEit('cat_node20151105202206790',[% $id %])" capture="0" showInAttributeTable="1" type="1" shortTitle="" icon=""/>
               </attributeactions>
               <attributetableconfig actionWidgetStyle="dropDown" sortExpression="&quot;cost&quot;" sortOrder="0">
                 <columns>
@@ -27914,7 +27914,7 @@ def my_form_open(dialog, layer, feature):
               <layerGeometryType>4</layerGeometryType>
             </qgis>
           </LayerStyle>
-          <LayerStyle source=" __DATASOURCE__  key='id' srid=__SRID__ type=LineString checkPrimaryKeyUnicity='1' table=&quot;ws_cat_material&quot;.&quot;v_edit_dimensions&quot; (the_geom)" name="Dimensioning" layerid="v_edit_dimensions20170628134034849" provider="postgres">
+          <LayerStyle source=" __DATASOURCE__  key='id' srid=__SRID__ type=LineString checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_dimensions&quot; (the_geom)" name="Dimensioning" layerid="v_edit_dimensions20170628134034849" provider="postgres">
             <qgis simplifyAlgorithm="0" readOnly="0" scaleBasedLabelVisibilityFlag="0" minimumScale="0" maximumScale="1e+08" simplifyDrawingTol="1" simplifyDrawingHints="1" maxLabelScale="1e+08" hasScaleBasedVisibilityFlag="0" version="2.18.14" simplifyMaxScale="1" minLabelScale="0" simplifyLocal="1">
               <edittypes>
                 <edittype name="id" widgetv2type="TextEdit">
@@ -28708,8 +28708,8 @@ def my_form_open(dialog, layer, feature):
                 <alias name="" field="state" index="12"/>
                 <alias name="" field="expl_id" index="13"/>
               </aliases>
-              <exclws_cat_materialeAttributesWMS/>
-              <exclws_cat_materialeAttributesWFS/>
+              <exclSCHEMA_NAMEeAttributesWMS/>
+              <exclSCHEMA_NAMEeAttributesWFS/>
               <attributeactions default="-1"/>
               <attributetableconfig actionWidgetStyle="dropDown" sortExpression="&quot;id&quot;" sortOrder="0">
                 <columns>
@@ -28778,7 +28778,7 @@ def my_form_open(dialog, layer, feature):
               <layerGeometryType>1</layerGeometryType>
             </qgis>
           </LayerStyle>
-          <LayerStyle source=" __DATASOURCE__  key='id' srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table=&quot;ws_cat_material&quot;.&quot;v_ext_address&quot; (the_geom)" name="Address" layerid="v_ext_address20180201103159332" provider="postgres">
+          <LayerStyle source=" __DATASOURCE__  key='id' srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_ext_address&quot; (the_geom)" name="Address" layerid="v_ext_address20180201103159332" provider="postgres">
             <qgis simplifyAlgorithm="0" readOnly="0" scaleBasedLabelVisibilityFlag="0" minimumScale="0" maximumScale="1500" simplifyDrawingTol="1" simplifyDrawingHints="0" maxLabelScale="1e+08" hasScaleBasedVisibilityFlag="1" version="2.18.14" simplifyMaxScale="1" minLabelScale="0" simplifyLocal="1">
               <edittypes>
                 <edittype name="id" widgetv2type="TextEdit">
@@ -29038,8 +29038,8 @@ def my_form_open(dialog, layer, feature):
                 <alias name="" field="plot_id" index="5"/>
                 <alias name="" field="expl_id" index="6"/>
               </aliases>
-              <exclws_cat_materialeAttributesWMS/>
-              <exclws_cat_materialeAttributesWFS/>
+              <exclSCHEMA_NAMEeAttributesWMS/>
+              <exclSCHEMA_NAMEeAttributesWFS/>
               <attributeactions default="-1"/>
               <attributetableconfig actionWidgetStyle="dropDown" sortExpression="" sortOrder="0">
                 <columns>
@@ -29094,7 +29094,7 @@ def my_form_open(dialog, layer, feature):
               <layerGeometryType>0</layerGeometryType>
             </qgis>
           </LayerStyle>
-          <LayerStyle source=" __DATASOURCE__  key='muni_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;ws_cat_material&quot;.&quot;v_ext_municipality&quot; (the_geom)" name="Municipality" layerid="v_ext_municipality20171204170633784" provider="postgres">
+          <LayerStyle source=" __DATASOURCE__  key='muni_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_ext_municipality&quot; (the_geom)" name="Municipality" layerid="v_ext_municipality20171204170633784" provider="postgres">
             <qgis simplifyAlgorithm="0" readOnly="0" scaleBasedLabelVisibilityFlag="0" minimumScale="0" maximumScale="1e+08" simplifyDrawingTol="1" simplifyDrawingHints="1" maxLabelScale="1e+08" hasScaleBasedVisibilityFlag="0" version="2.18.14" simplifyMaxScale="1" minLabelScale="0" simplifyLocal="1">
               <edittypes>
                 <edittype name="muni_id" widgetv2type="TextEdit">
@@ -29332,8 +29332,8 @@ def my_form_open(dialog, layer, feature):
                 <alias name="" field="name" index="1"/>
                 <alias name="" field="observ" index="2"/>
               </aliases>
-              <exclws_cat_materialeAttributesWMS/>
-              <exclws_cat_materialeAttributesWFS/>
+              <exclSCHEMA_NAMEeAttributesWMS/>
+              <exclSCHEMA_NAMEeAttributesWFS/>
               <attributeactions default="-1"/>
               <attributetableconfig actionWidgetStyle="dropDown" sortExpression="" sortOrder="0">
                 <columns>
@@ -29380,7 +29380,7 @@ def my_form_open(dialog, layer, feature):
               <layerGeometryType>2</layerGeometryType>
             </qgis>
           </LayerStyle>
-          <LayerStyle source=" __DATASOURCE__  key='id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;ws_cat_material&quot;.&quot;v_ext_plot&quot; (the_geom)" name="Plot" layerid="v_ext_plot20180201103159443" provider="postgres">
+          <LayerStyle source=" __DATASOURCE__  key='id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_ext_plot&quot; (the_geom)" name="Plot" layerid="v_ext_plot20180201103159443" provider="postgres">
             <qgis simplifyAlgorithm="0" readOnly="0" scaleBasedLabelVisibilityFlag="0" minimumScale="0" maximumScale="1e+08" simplifyDrawingTol="1" simplifyDrawingHints="1" maxLabelScale="1e+08" hasScaleBasedVisibilityFlag="0" version="2.18.14" simplifyMaxScale="1" minLabelScale="0" simplifyLocal="1">
               <edittypes>
                 <edittype name="id" widgetv2type="TextEdit">
@@ -29653,8 +29653,8 @@ def my_form_open(dialog, layer, feature):
                 <alias name="" field="text" index="10"/>
                 <alias name="" field="expl_id" index="11"/>
               </aliases>
-              <exclws_cat_materialeAttributesWMS/>
-              <exclws_cat_materialeAttributesWFS/>
+              <exclSCHEMA_NAMEeAttributesWMS/>
+              <exclSCHEMA_NAMEeAttributesWFS/>
               <attributeactions default="-1"/>
               <attributetableconfig actionWidgetStyle="dropDown" sortExpression="" sortOrder="0">
                 <columns/>
@@ -31624,16 +31624,16 @@ def my_form_open(dialog, layer, feature):
         </LayoutObject>
         <Extent ymax="4577793.59810197446495295" xmax="418848.45816674560774118" xmin="418378.05343514133710414" ymin="4577435.4508797088637948"/>
         <LayerSet>
-          <Layer source=" __DATASOURCE__  key='expl_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;ws_cat_material&quot;.&quot;v_edit_exploitation&quot; (the_geom)" name="Exploitation" provider="postgres">v_edit_exploitation_fd06cc08_9e9d_4a22_bfca_586b3919d086</Layer>
-          <Layer source=" __DATASOURCE__  key='node_id' srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table=&quot;ws_cat_material&quot;.&quot;v_edit_node&quot; (the_geom)" name="Node" provider="postgres">v_edit_node_79e9d657_9f6a_4303_b422_e1ba0c998c2f</Layer>
-          <Layer source=" __DATASOURCE__  key='connec_id' srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table=&quot;ws_cat_material&quot;.&quot;v_edit_connec&quot; (the_geom)" name="Connec" provider="postgres">v_edit_connec_decaeb94_529d_4842_9e89_33c065483403</Layer>
-          <Layer source=" __DATASOURCE__  key='arc_id' srid=__SRID__ type=LineString checkPrimaryKeyUnicity='1' table=&quot;ws_cat_material&quot;.&quot;v_edit_arc&quot; (the_geom)" name="Arc" provider="postgres">v_edit_arc_c8e5e4a7_f9e3_4940_b0b2_40bf55f4c3ca</Layer>
-          <Layer source=" __DATASOURCE__  key='pol_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;ws_cat_material&quot;.&quot;ve_pol_connec&quot; (the_geom)" name="Connec polygon" provider="postgres">ve_pol_connec_da965155_3efa_448d_83c5_82ce457fd689</Layer>
-          <Layer source=" __DATASOURCE__  key='pol_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;ws_cat_material&quot;.&quot;ve_pol_node&quot; (the_geom)" name="Node polygon" provider="postgres">ve_pol_node_f56fce40_7d46_402c_b62d_87c0348f9226</Layer>
-          <Layer source=" __DATASOURCE__  key='id' srid=__SRID__ type=LineString checkPrimaryKeyUnicity='1' table=&quot;ws_cat_material&quot;.&quot;v_edit_dimensions&quot; (the_geom)" name="Dimensioning" provider="postgres">v_edit_dimensions20170628134034849</Layer>
-          <Layer source=" __DATASOURCE__  key='muni_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;ws_cat_material&quot;.&quot;v_ext_municipality&quot; (the_geom)" name="Municipality" provider="postgres">v_ext_municipality20171204170633784</Layer>
-          <Layer source=" __DATASOURCE__  key='id' srid=__SRID__ type=MultiLineString checkPrimaryKeyUnicity='1' table=&quot;ws_cat_material&quot;.&quot;v_ext_streetaxis&quot; (the_geom)" name="Streetaxis" provider="postgres">v_ext_streetaxis_4f78944b_a2c1_4f3c_924c_ec36fd045dc7</Layer>
-          <Layer source=" __DATASOURCE__  key='id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;ws_cat_material&quot;.&quot;v_ext_plot&quot; (the_geom)" name="Plot" provider="postgres">v_ext_plot20180201103159443</Layer>
+          <Layer source=" __DATASOURCE__  key='expl_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_exploitation&quot; (the_geom)" name="Exploitation" provider="postgres">v_edit_exploitation_fd06cc08_9e9d_4a22_bfca_586b3919d086</Layer>
+          <Layer source=" __DATASOURCE__  key='node_id' srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_node&quot; (the_geom)" name="Node" provider="postgres">v_edit_node_79e9d657_9f6a_4303_b422_e1ba0c998c2f</Layer>
+          <Layer source=" __DATASOURCE__  key='connec_id' srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_connec&quot; (the_geom)" name="Connec" provider="postgres">v_edit_connec_decaeb94_529d_4842_9e89_33c065483403</Layer>
+          <Layer source=" __DATASOURCE__  key='arc_id' srid=__SRID__ type=LineString checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_arc&quot; (the_geom)" name="Arc" provider="postgres">v_edit_arc_c8e5e4a7_f9e3_4940_b0b2_40bf55f4c3ca</Layer>
+          <Layer source=" __DATASOURCE__  key='pol_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;ve_pol_connec&quot; (the_geom)" name="Connec polygon" provider="postgres">ve_pol_connec_da965155_3efa_448d_83c5_82ce457fd689</Layer>
+          <Layer source=" __DATASOURCE__  key='pol_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;ve_pol_node&quot; (the_geom)" name="Node polygon" provider="postgres">ve_pol_node_f56fce40_7d46_402c_b62d_87c0348f9226</Layer>
+          <Layer source=" __DATASOURCE__  key='id' srid=__SRID__ type=LineString checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_dimensions&quot; (the_geom)" name="Dimensioning" provider="postgres">v_edit_dimensions20170628134034849</Layer>
+          <Layer source=" __DATASOURCE__  key='muni_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_ext_municipality&quot; (the_geom)" name="Municipality" provider="postgres">v_ext_municipality20171204170633784</Layer>
+          <Layer source=" __DATASOURCE__  key='id' srid=__SRID__ type=MultiLineString checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_ext_streetaxis&quot; (the_geom)" name="Streetaxis" provider="postgres">v_ext_streetaxis_4f78944b_a2c1_4f3c_924c_ec36fd045dc7</Layer>
+          <Layer source=" __DATASOURCE__  key='id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_ext_plot&quot; (the_geom)" name="Plot" provider="postgres">v_ext_plot20180201103159443</Layer>
         </LayerSet>
         <ComposerMapOverview blendMode="0" name="Vista general 1" uuid="{be00bcd1-c4c8-4fce-a004-caf6b6bc040b}" frameMap="{1b39d052-8f4d-46d6-8465-e62a5a606830}" centered="1" position="3" inverted="0" show="1">
           <symbol alpha="1" clip_to_extent="1" name="" type="fill" force_rhr="0" frame_rate="10" is_animated="0">
@@ -32551,16 +32551,16 @@ def my_form_open(dialog, layer, feature):
         </LayoutObject>
         <Extent ymax="4577649.73099087737500668" xmax="418658.10930098925018683" xmin="418568.40230089769465849" ymin="4577579.31799080595374107"/>
         <LayerSet>
-          <Layer source=" __DATASOURCE__  key='expl_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;ws_cat_material&quot;.&quot;v_edit_exploitation&quot; (the_geom)" name="Exploitation" provider="postgres">v_edit_exploitation_fd06cc08_9e9d_4a22_bfca_586b3919d086</Layer>
-          <Layer source=" __DATASOURCE__  key='node_id' srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table=&quot;ws_cat_material&quot;.&quot;v_edit_node&quot; (the_geom)" name="Node" provider="postgres">v_edit_node_79e9d657_9f6a_4303_b422_e1ba0c998c2f</Layer>
-          <Layer source=" __DATASOURCE__  key='connec_id' srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table=&quot;ws_cat_material&quot;.&quot;v_edit_connec&quot; (the_geom)" name="Connec" provider="postgres">v_edit_connec_decaeb94_529d_4842_9e89_33c065483403</Layer>
-          <Layer source=" __DATASOURCE__  key='arc_id' srid=__SRID__ type=LineString checkPrimaryKeyUnicity='1' table=&quot;ws_cat_material&quot;.&quot;v_edit_arc&quot; (the_geom)" name="Arc" provider="postgres">v_edit_arc_c8e5e4a7_f9e3_4940_b0b2_40bf55f4c3ca</Layer>
-          <Layer source=" __DATASOURCE__  key='pol_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;ws_cat_material&quot;.&quot;ve_pol_connec&quot; (the_geom)" name="Connec polygon" provider="postgres">ve_pol_connec_da965155_3efa_448d_83c5_82ce457fd689</Layer>
-          <Layer source=" __DATASOURCE__  key='pol_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;ws_cat_material&quot;.&quot;ve_pol_node&quot; (the_geom)" name="Node polygon" provider="postgres">ve_pol_node_f56fce40_7d46_402c_b62d_87c0348f9226</Layer>
-          <Layer source=" __DATASOURCE__  key='id' srid=__SRID__ type=LineString checkPrimaryKeyUnicity='1' table=&quot;ws_cat_material&quot;.&quot;v_edit_dimensions&quot; (the_geom)" name="Dimensioning" provider="postgres">v_edit_dimensions20170628134034849</Layer>
-          <Layer source=" __DATASOURCE__  key='muni_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;ws_cat_material&quot;.&quot;v_ext_municipality&quot; (the_geom)" name="Municipality" provider="postgres">v_ext_municipality20171204170633784</Layer>
-          <Layer source=" __DATASOURCE__  key='id' srid=__SRID__ type=MultiLineString checkPrimaryKeyUnicity='1' table=&quot;ws_cat_material&quot;.&quot;v_ext_streetaxis&quot; (the_geom)" name="Streetaxis" provider="postgres">v_ext_streetaxis_4f78944b_a2c1_4f3c_924c_ec36fd045dc7</Layer>
-          <Layer source=" __DATASOURCE__  key='id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;ws_cat_material&quot;.&quot;v_ext_plot&quot; (the_geom)" name="Plot" provider="postgres">v_ext_plot20180201103159443</Layer>
+          <Layer source=" __DATASOURCE__  key='expl_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_exploitation&quot; (the_geom)" name="Exploitation" provider="postgres">v_edit_exploitation_fd06cc08_9e9d_4a22_bfca_586b3919d086</Layer>
+          <Layer source=" __DATASOURCE__  key='node_id' srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_node&quot; (the_geom)" name="Node" provider="postgres">v_edit_node_79e9d657_9f6a_4303_b422_e1ba0c998c2f</Layer>
+          <Layer source=" __DATASOURCE__  key='connec_id' srid=__SRID__ type=Point checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_connec&quot; (the_geom)" name="Connec" provider="postgres">v_edit_connec_decaeb94_529d_4842_9e89_33c065483403</Layer>
+          <Layer source=" __DATASOURCE__  key='arc_id' srid=__SRID__ type=LineString checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_arc&quot; (the_geom)" name="Arc" provider="postgres">v_edit_arc_c8e5e4a7_f9e3_4940_b0b2_40bf55f4c3ca</Layer>
+          <Layer source=" __DATASOURCE__  key='pol_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;ve_pol_connec&quot; (the_geom)" name="Connec polygon" provider="postgres">ve_pol_connec_da965155_3efa_448d_83c5_82ce457fd689</Layer>
+          <Layer source=" __DATASOURCE__  key='pol_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;ve_pol_node&quot; (the_geom)" name="Node polygon" provider="postgres">ve_pol_node_f56fce40_7d46_402c_b62d_87c0348f9226</Layer>
+          <Layer source=" __DATASOURCE__  key='id' srid=__SRID__ type=LineString checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_dimensions&quot; (the_geom)" name="Dimensioning" provider="postgres">v_edit_dimensions20170628134034849</Layer>
+          <Layer source=" __DATASOURCE__  key='muni_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_ext_municipality&quot; (the_geom)" name="Municipality" provider="postgres">v_ext_municipality20171204170633784</Layer>
+          <Layer source=" __DATASOURCE__  key='id' srid=__SRID__ type=MultiLineString checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_ext_streetaxis&quot; (the_geom)" name="Streetaxis" provider="postgres">v_ext_streetaxis_4f78944b_a2c1_4f3c_924c_ec36fd045dc7</Layer>
+          <Layer source=" __DATASOURCE__  key='id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_ext_plot&quot; (the_geom)" name="Plot" provider="postgres">v_ext_plot20180201103159443</Layer>
         </LayerSet>
         <ComposerMapGrid rightAnnotationDisplay="0" leftAnnotationPosition="1" leftAnnotationDirection="0" topAnnotationDirection="0" gridFrameWidth="2" rightAnnotationPosition="1" rotatedAnnotationsMarginToCorner="0" rotatedTicksLengthMode="0" uuid="{5a1401df-937c-4a3d-9eeb-e516d435f9d6}" position="3" frameFillColor2="0,0,0,255" bottomAnnotationDisplay="0" crossLength="3" leftFrameDivisions="0" maximumIntervalWidth="100" show="0" bottomAnnotationPosition="1" gridStyle="0" leftAnnotationDisplay="0" minimumIntervalWidth="50" topAnnotationDisplay="0" gridFrameSideFlags="15" rotatedTicksMarginToCorner="0" offsetY="0" frameAnnotationDistance="1" frameFillColor1="255,255,255,255" offsetX="0" rotatedTicksMinimumAngle="0" gridFrameMargin="0" gridFramePenThickness="0.5" unit="0" gridFramePenColor="0,0,0,255" rightAnnotationDirection="0" rotatedAnnotationsLengthMode="0" annotationExpression="" topAnnotationPosition="1" bottomAnnotationDirection="0" rotatedAnnotationsMinimumAngle="0" name="Cuadrícula 1" bottomFrameDivisions="0" rotatedAnnotationsEnabled="0" gridFrameStyle="0" rotatedTicksEnabled="0" annotationFormat="0" intervalY="0" topFrameDivisions="0" rightFrameDivisions="0" annotationPrecision="3" showAnnotation="0" intervalX="0" blendMode="0">
           <lineStyle>
@@ -32819,7 +32819,7 @@ def my_form_open(dialog, layer, feature):
       </spatialrefsys>
     </CoordinateCustomCrs>
   </ProjectDisplaySettings>
-  <ProjectGpsSettings destinationLayerProvider="postgres" destinationLayer="v_edit_cat_feature_node_ea70bfb4_8fbc_4012_8ac4_3f3f7b2557ae" autoCommitFeatures="0" destinationLayerSource=" __DATASOURCE__  key='id' checkPrimaryKeyUnicity='1' table=&quot;ws_cat_material&quot;.&quot;v_edit_cat_feature_node&quot;" destinationFollowsActiveLayer="1" autoAddTrackVertices="0" destinationLayerName="Node feature catalog">
+  <ProjectGpsSettings destinationLayerProvider="postgres" destinationLayer="v_edit_cat_feature_node_ea70bfb4_8fbc_4012_8ac4_3f3f7b2557ae" autoCommitFeatures="0" destinationLayerSource=" __DATASOURCE__  key='id' checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_cat_feature_node&quot;" destinationFollowsActiveLayer="1" autoAddTrackVertices="0" destinationLayerName="Node feature catalog">
     <timeStampFields/>
   </ProjectGpsSettings>
 </qgis>
