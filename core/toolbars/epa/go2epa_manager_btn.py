@@ -366,7 +366,7 @@ class GwGo2EpaManagerButton(GwAction):
             col = tools_qt.get_col_index_by_col_name(widget, "iscorporate")
             set_corporate = widget.model().index(row, col).data()
         set_corporate = not tools_os.set_boolean(set_corporate, False)
-        parameter = {"data":{"resultId" : result_id, "isCorporate" : str(set_corporate).lower(), "action_check":False}}
+        parameter = {"data":{"resultId" : result_id, "isCorporate" : str(set_corporate).lower()}}
         result = tools_gw.execute_procedure('gw_fct_epa2data', parameter)
 
         if not result or result.get('status') != 'Accepted':
