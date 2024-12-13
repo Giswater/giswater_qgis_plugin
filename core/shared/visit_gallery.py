@@ -216,6 +216,10 @@ class GwVisitGallery:
         tools_gw.load_settings(self.dlg_gallery_zoom)
         self.lbl_img = self.dlg_gallery_zoom.findChild(QLabel, "lbl_img_zoom")
 
+        # Define a opening size for the picture
+        max_width = 800
+        max_height = 600
+
         # Parse a URL into components
         url = urllib.parse.urlsplit(str(self.img_path_list[self.start_indx][i]))
 
@@ -227,6 +231,10 @@ class GwVisitGallery:
             pixmap.loadFromData(data)
         else:
             pixmap = QPixmap(str(self.img_path_list[self.start_indx][i]))
+
+        # Scale the pixmap to fit within the dialog's constraints while keeping the aspect ratio
+        pixmap = pixmap.scaled(max_width, max_height, aspectRatioMode=Qt.KeepAspectRatio,
+                               transformMode=Qt.SmoothTransformation)
 
         self.lbl_img.setPixmap(pixmap)
 
@@ -263,6 +271,10 @@ class GwVisitGallery:
         # Parse a URL into components
         url = urllib.parse.urlsplit(str(self.img_path_list1D[indx]))
 
+        # Define a opening size for the picture
+        max_width = 800
+        max_height = 600
+
         # Check if path is URL
         if url.scheme == "http" or url.scheme == "https":
             url = str(self.img_path_list1D[indx])
@@ -271,6 +283,10 @@ class GwVisitGallery:
             pixmap.loadFromData(data)
         else:
             pixmap = QPixmap(str(self.img_path_list1D[indx]))
+
+        # Scale the pixmap
+        pixmap = pixmap.scaled(max_width, max_height, aspectRatioMode=Qt.KeepAspectRatio,
+                               transformMode=Qt.SmoothTransformation)
 
         self.lbl_img.setPixmap(pixmap)
         self.i = self.i - 1
@@ -290,6 +306,10 @@ class GwVisitGallery:
         # Parse a URL into components
         url = urllib.parse.urlsplit(str(self.img_path_list1D[indx]))
 
+        # Define a opening size for the picture
+        max_width = 800
+        max_height = 600
+
         # Check if path is URL
         if url.scheme == "http" or url.scheme == "https":
             url = str(self.img_path_list1D[indx])
@@ -299,6 +319,10 @@ class GwVisitGallery:
 
         else:
             pixmap = QPixmap(str(self.img_path_list1D[indx]))
+
+        # Scale the pixmap
+        pixmap = pixmap.scaled(max_width, max_height, aspectRatioMode=Qt.KeepAspectRatio,
+                               transformMode=Qt.SmoothTransformation)
 
         self.lbl_img.setPixmap(pixmap)
         self.i = self.i + 1
