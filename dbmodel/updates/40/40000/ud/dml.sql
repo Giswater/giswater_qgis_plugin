@@ -984,3 +984,6 @@ UPDATE sys_style SET stylevalue = replace(stylevalue,'mfull_dept','mfull_dept_co
 
 DELETE FROM sys_table WHERE id='cat_mat_grate';
 DELETE FROM sys_table WHERE id='cat_mat_gully';
+
+--13/12/2024
+UPDATE sys_style SET stylevalue = replace(stylevalue,'vhmax','vhmax_compare') WHERE layername IN ('v_rpt_comp_subcatchrunoff_sum');

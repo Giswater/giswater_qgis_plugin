@@ -5932,3 +5932,316 @@ SELECT
   main.max_out - compare.max_out AS max_out_diff,
   compare.the_geom
 FROM main RIGHT JOIN compare ON main.node_id = compare.node_id;
+
+--v_rpt_comp_subcatchrunoff_sum source
+DROP VIEW IF EXISTS v_rpt_comp_subcatchrunoff_sum;
+CREATE OR REPLACE VIEW v_rpt_comp_subcatchrunoff_sum
+AS WITH main AS (
+SELECT rpt_subcatchrunoff_sum.id,
+    rpt_subcatchrunoff_sum.result_id,
+    rpt_subcatchrunoff_sum.subc_id,
+    rpt_subcatchrunoff_sum.tot_precip,
+    rpt_subcatchrunoff_sum.tot_runon,
+    rpt_subcatchrunoff_sum.tot_evap,
+    rpt_subcatchrunoff_sum.tot_infil,
+    rpt_subcatchrunoff_sum.tot_runoff,
+    rpt_subcatchrunoff_sum.tot_runofl,
+    rpt_subcatchrunoff_sum.peak_runof,
+    rpt_subcatchrunoff_sum.runoff_coe,
+    rpt_subcatchrunoff_sum.vxmax,
+    rpt_subcatchrunoff_sum.vymax,
+    rpt_subcatchrunoff_sum.depth,
+    rpt_subcatchrunoff_sum.vel,
+    rpt_subcatchrunoff_sum.vhmax,
+    inp_subcatchment.sector_id,
+    inp_subcatchment.the_geom
+   FROM selector_rpt_main,
+    inp_subcatchment
+     JOIN rpt_subcatchrunoff_sum ON rpt_subcatchrunoff_sum.subc_id::text = inp_subcatchment.subc_id::text
+  WHERE rpt_subcatchrunoff_sum.result_id::text = selector_rpt_main.result_id::text AND selector_rpt_main.cur_user = "current_user"()),
+  
+compare AS (
+ SELECT rpt_subcatchrunoff_sum.id,
+    rpt_subcatchrunoff_sum.result_id,
+    rpt_subcatchrunoff_sum.subc_id,
+    rpt_subcatchrunoff_sum.tot_precip,
+    rpt_subcatchrunoff_sum.tot_runon,
+    rpt_subcatchrunoff_sum.tot_evap,
+    rpt_subcatchrunoff_sum.tot_infil,
+    rpt_subcatchrunoff_sum.tot_runoff,
+    rpt_subcatchrunoff_sum.tot_runofl,
+    rpt_subcatchrunoff_sum.peak_runof,
+    rpt_subcatchrunoff_sum.runoff_coe,
+    rpt_subcatchrunoff_sum.vxmax,
+    rpt_subcatchrunoff_sum.vymax,
+    rpt_subcatchrunoff_sum.depth,
+    rpt_subcatchrunoff_sum.vel,
+    rpt_subcatchrunoff_sum.vhmax,
+    inp_subcatchment.sector_id,
+    inp_subcatchment.the_geom
+   FROM selector_rpt_compare,
+    inp_subcatchment
+     JOIN rpt_subcatchrunoff_sum ON rpt_subcatchrunoff_sum.subc_id::text = inp_subcatchment.subc_id::text
+  WHERE rpt_subcatchrunoff_sum.result_id::text = selector_rpt_compare.result_id::text AND selector_rpt_compare.cur_user = "current_user"())
+
+  SELECT  
+  main.subc_id,
+  main.sector_id,
+  main.result_id AS result_id_main,
+  compare.result_id AS result_id_compare,
+  main.tot_precip AS tot_precip_main,
+  compare.tot_precip AS tot_precip_compare,
+  main.tot_precip - compare.tot_precip AS tot_precip_diff,
+  main.tot_runon AS tot_runon_main,
+  compare.tot_runon AS tot_runon_compare,
+  main.tot_runon - compare.tot_runon AS tot_runon_diff,
+  main.tot_evap AS tot_evap_main,
+  compare.tot_evap AS tot_evap_compare,
+  main.tot_evap - compare.tot_evap AS tot_evap_diff,
+  main.tot_infil AS tot_infil_main,
+  compare.tot_infil AS tot_infil_compare,
+  main.tot_infil - compare.tot_infil AS tot_infil_diff,
+  main.tot_runoff AS tot_runoff_main,
+  compare.tot_runoff AS tot_runoff_compare,
+  main.tot_runoff - compare.tot_runoff AS tot_runoff_diff,
+  main.tot_runofl AS tot_runofl_main,
+  compare.tot_runofl AS tot_runofl_compare,
+  main.tot_runofl - compare.tot_runofl AS tot_runofl_diff,
+  main.peak_runof AS peak_runof_main,
+  compare.peak_runof AS peak_runof_compare,
+  main.peak_runof - compare.peak_runof AS peak_runof_diff,
+  main.runoff_coe AS runoff_coe_main,
+  compare.runoff_coe AS runoff_coe_compare,
+  main.runoff_coe - compare.runoff_coe AS runoff_coe_diff,
+  main.vxmax AS vxmax_main,
+  compare.vxmax AS vxmax_compare,
+  main.vxmax - compare.vxmax AS vxmax_diff,
+  main.vymax AS vymax_main,
+  compare.vymax AS vymax_compare,
+  main.vymax - compare.vymax AS vymax_diff,
+  main.depth AS depth_main,
+  compare.depth AS depth_compare,
+  main.depth - compare.depth AS depth_diff,
+  main.vel AS vel_main,
+  compare.vel AS vel_compare,
+  main.vel - compare.vel AS vel_diff,
+  main.vhmax AS vhmax_main,
+  compare.vhmax AS vhmax_compare,
+  main.vhmax - compare.vhmax AS vhmax_diff,
+  main.the_geom
+FROM main LEFT JOIN compare ON main.subc_id = compare.subc_id
+
+UNION
+
+SELECT  
+  compare.subc_id,
+  compare.sector_id,
+  main.result_id AS result_id_main,
+  compare.result_id AS result_id_compare,
+  main.tot_precip AS tot_precip_main,
+  compare.tot_precip AS tot_precip_compare,
+  main.tot_precip - compare.tot_precip AS tot_precip_diff,
+  main.tot_runon AS tot_runon_main,
+  compare.tot_runon AS tot_runon_compare,
+  main.tot_runon - compare.tot_runon AS tot_runon_diff,
+  main.tot_evap AS tot_evap_main,
+  compare.tot_evap AS tot_evap_compare,
+  main.tot_evap - compare.tot_evap AS tot_evap_diff,
+  main.tot_infil AS tot_infil_main,
+  compare.tot_infil AS tot_infil_compare,
+  main.tot_infil - compare.tot_infil AS tot_infil_diff,
+  main.tot_runoff AS tot_runoff_main,
+  compare.tot_runoff AS tot_runoff_compare,
+  main.tot_runoff - compare.tot_runoff AS tot_runoff_diff,
+  main.tot_runofl AS tot_runofl_main,
+  compare.tot_runofl AS tot_runofl_compare,
+  main.tot_runofl - compare.tot_runofl AS tot_runofl_diff,
+  main.peak_runof AS peak_runof_main,
+  compare.peak_runof AS peak_runof_compare,
+  main.peak_runof - compare.peak_runof AS peak_runof_diff,
+  main.runoff_coe AS runoff_coe_main,
+  compare.runoff_coe AS runoff_coe_compare,
+  main.runoff_coe - compare.runoff_coe AS runoff_coe_diff,
+  main.vxmax AS vxmax_main,
+  compare.vxmax AS vxmax_compare,
+  main.vxmax - compare.vxmax AS vxmax_diff,
+  main.vymax AS vymax_main,
+  compare.vymax AS vymax_compare,
+  main.vymax - compare.vymax AS vymax_diff,
+  main.depth AS depth_main,
+  compare.depth AS depth_compare,
+  main.depth - compare.depth AS depth_diff,
+  main.vel AS vel_main,
+  compare.vel AS vel_compare,
+  main.vel - compare.vel AS vel_diff,
+  main.vhmax AS vhmax_main,
+  compare.vhmax AS vhmax_compare,
+  main.vhmax - compare.vhmax AS vhmax_diff,
+  compare.the_geom
+FROM main RIGHT JOIN compare ON main.subc_id = compare.subc_id;
+
+--v_rpt_comp_subcatchwashoff_sum
+DROP VIEW IF EXISTS v_rpt_comp_subcatchwashoff_sum;
+CREATE OR REPLACE VIEW v_rpt_comp_subcatchwashoff_sum
+AS WITH main AS (
+	SELECT rpt_subcatchwashoff_sum.id,
+    rpt_subcatchwashoff_sum.result_id,
+    rpt_subcatchwashoff_sum.subc_id,
+    rpt_subcatchwashoff_sum.poll_id,
+    rpt_subcatchwashoff_sum.value,
+    inp_subcatchment.sector_id,
+    inp_subcatchment.the_geom
+   FROM selector_rpt_main,
+    inp_subcatchment
+     JOIN rpt_subcatchwashoff_sum ON rpt_subcatchwashoff_sum.subc_id::text = inp_subcatchment.subc_id::text
+  WHERE rpt_subcatchwashoff_sum.result_id::text = selector_rpt_main.result_id::text AND selector_rpt_main.cur_user = "current_user"()),
+ 
+compare AS (
+	SELECT rpt_subcatchwashoff_sum.id,
+    rpt_subcatchwashoff_sum.result_id,
+    rpt_subcatchwashoff_sum.subc_id,
+    rpt_subcatchwashoff_sum.poll_id,
+    rpt_subcatchwashoff_sum.value,
+    inp_subcatchment.sector_id,
+    inp_subcatchment.the_geom
+   FROM selector_rpt_compare,
+    inp_subcatchment
+     JOIN rpt_subcatchwashoff_sum ON rpt_subcatchwashoff_sum.subc_id::text = inp_subcatchment.subc_id::text
+  WHERE rpt_subcatchwashoff_sum.result_id::text = selector_rpt_compare.result_id::text AND selector_rpt_compare.cur_user = "current_user"())
+  
+  SELECT  
+  main.subc_id,
+  main.sector_id,
+  main.poll_id,
+  main.result_id AS result_id_main,
+  compare.result_id AS result_id_compare,
+  main.value AS value_main,
+  compare.value AS value_compare,
+  main.value - compare.value AS value_diff,
+  main.the_geom
+FROM main LEFT JOIN compare ON main.subc_id = compare.subc_id AND main.poll_id = compare.poll_id
+
+UNION
+
+SELECT  
+  compare.subc_id,
+  compare.sector_id,
+  compare.poll_id,
+  main.result_id AS result_id_main,
+  compare.result_id AS result_id_compare,
+  main.value AS value_main,
+  compare.value AS value_compare,
+  main.value - compare.value AS value_diff,
+  compare.the_geom
+FROM main RIGHT JOIN compare ON main.subc_id = compare.subc_id AND main.poll_id = compare.poll_id;
+
+--v_rpt_comp_lidperformance_sum
+DROP VIEW IF EXISTS v_rpt_comp_lidperformance_sum;
+CREATE OR REPLACE VIEW v_rpt_comp_lidperformance_sum
+AS WITH main AS (
+SELECT rpt_lidperformance_sum.id,
+    rpt_lidperformance_sum.result_id,
+    rpt_lidperformance_sum.subc_id,
+    rpt_lidperformance_sum.lidco_id,
+    rpt_lidperformance_sum.tot_inflow,
+    rpt_lidperformance_sum.evap_loss,
+    rpt_lidperformance_sum.infil_loss,
+    rpt_lidperformance_sum.surf_outf,
+    rpt_lidperformance_sum.drain_outf,
+    rpt_lidperformance_sum.init_stor,
+    rpt_lidperformance_sum.final_stor,
+    rpt_lidperformance_sum.per_error,
+    inp_subcatchment.sector_id,
+    inp_subcatchment.the_geom
+   FROM selector_rpt_main,
+    inp_subcatchment
+     JOIN rpt_lidperformance_sum ON rpt_lidperformance_sum.subc_id::text = inp_subcatchment.subc_id::text
+  WHERE rpt_lidperformance_sum.result_id::text = selector_rpt_main.result_id::text AND selector_rpt_main.cur_user = "current_user"()),
+  
+ compare AS (
+SELECT rpt_lidperformance_sum.id,
+    rpt_lidperformance_sum.result_id,
+    rpt_lidperformance_sum.subc_id,
+    rpt_lidperformance_sum.lidco_id,
+    rpt_lidperformance_sum.tot_inflow,
+    rpt_lidperformance_sum.evap_loss,
+    rpt_lidperformance_sum.infil_loss,
+    rpt_lidperformance_sum.surf_outf,
+    rpt_lidperformance_sum.drain_outf,
+    rpt_lidperformance_sum.init_stor,
+    rpt_lidperformance_sum.final_stor,
+    rpt_lidperformance_sum.per_error,
+    inp_subcatchment.sector_id,
+    inp_subcatchment.the_geom
+   FROM selector_rpt_compare,
+    inp_subcatchment
+     JOIN rpt_lidperformance_sum ON rpt_lidperformance_sum.subc_id::text = inp_subcatchment.subc_id::text
+  WHERE rpt_lidperformance_sum.result_id::text = selector_rpt_compare.result_id::text AND selector_rpt_compare.cur_user = "current_user"())
+  
+  SELECT
+  main.subc_id,
+  main.sector_id,
+  main.lidco_id,  
+  main.result_id AS result_id_main,
+  compare.result_id AS result_id_compare,
+  main.tot_inflow AS tot_inflow_main,
+  compare.tot_inflow AS tot_inflow_compare,
+  main.tot_inflow - compare.tot_inflow AS tot_inflow_diff,
+  main.evap_loss AS evap_loss_main,
+  compare.evap_loss AS evap_loss_compare,
+  main.evap_loss - compare.evap_loss AS evap_loss_diff,
+  main.infil_loss AS infil_loss_main,
+  compare.infil_loss AS infil_loss_compare,
+  main.infil_loss - compare.infil_loss AS infil_loss_diff,
+  main.surf_outf AS surf_outf_main,
+  compare.surf_outf AS surf_outf_compare,
+  main.surf_outf - compare.surf_outf AS surf_outf_diff,
+  main.drain_outf AS drain_outf_main,
+  compare.drain_outf AS drain_outf_compare,
+  main.drain_outf - compare.drain_outf AS drain_outf_diff,
+  main.init_stor AS init_stor_main,
+  compare.init_stor AS init_stor_compare,
+  main.init_stor - compare.init_stor AS init_stor_diff,
+  main.final_stor AS final_stor_main,
+  compare.final_stor AS final_stor_compare,
+  main.final_stor - compare.final_stor AS final_stor_diff,
+  main.per_error AS per_error_main,
+  compare.per_error AS per_error_compare,
+  main.per_error - compare.per_error AS per_error_diff,
+  main.the_geom
+FROM main LEFT JOIN compare ON main.subc_id = compare.subc_id AND main.lidco_id = compare.lidco_id
+
+UNION
+
+SELECT 
+  compare.subc_id,
+  compare.sector_id,
+  compare.lidco_id,
+  main.result_id AS result_id_main,
+  compare.result_id AS result_id_compare,
+  main.tot_inflow AS tot_inflow_main,
+  compare.tot_inflow AS tot_inflow_compare,
+  main.tot_inflow - compare.tot_inflow AS tot_inflow_diff,
+  main.evap_loss AS evap_loss_main,
+  compare.evap_loss AS evap_loss_compare,
+  main.evap_loss - compare.evap_loss AS evap_loss_diff,
+  main.infil_loss AS infil_loss_main,
+  compare.infil_loss AS infil_loss_compare,
+  main.infil_loss - compare.infil_loss AS infil_loss_diff,
+  main.surf_outf AS surf_outf_main,
+  compare.surf_outf AS surf_outf_compare,
+  main.surf_outf - compare.surf_outf AS surf_outf_diff,
+  main.drain_outf AS drain_outf_main,
+  compare.drain_outf AS drain_outf_compare,
+  main.drain_outf - compare.drain_outf AS drain_outf_diff,
+  main.init_stor AS init_stor_main,
+  compare.init_stor AS init_stor_compare,
+  main.init_stor - compare.init_stor AS init_stor_diff,
+  main.final_stor AS final_stor_main,
+  compare.final_stor AS final_stor_compare,
+  main.final_stor - compare.final_stor AS final_stor_diff,
+  main.per_error AS per_error_main,
+  compare.per_error AS per_error_compare,
+  main.per_error - compare.per_error AS per_error_diff,
+  compare.the_geom
+FROM main RIGHT JOIN compare ON main.subc_id = compare.subc_id AND main.lidco_id = compare.lidco_id; 
