@@ -5425,3 +5425,28 @@ AS SELECT om_mincut_hydrometer.id,
      JOIN connec ON rtc_hydrometer_x_connec.connec_id::text = connec.connec_id::text
      JOIN om_mincut ON om_mincut_hydrometer.result_id = om_mincut.id
   WHERE selector_mincut_result.result_id::text = om_mincut_hydrometer.result_id::text AND selector_mincut_result.cur_user = "current_user"()::text;
+
+CREATE OR REPLACE VIEW v_edit_inp_curve
+AS SELECT DISTINCT c.id,
+    c.curve_type,
+    c.descript,
+    c.expl_id,
+    c.log,
+    c.active
+   FROM selector_expl s,
+    inp_curve c
+  WHERE c.expl_id = s.expl_id AND s.cur_user = "current_user"()::text OR c.expl_id IS NULL
+  ORDER BY c.id;
+
+CREATE OR REPLACE VIEW v_edit_inp_pattern
+AS SELECT DISTINCT p.pattern_id,
+    p.observ,
+    p.tscode,
+    p.tsparameters::text AS tsparameters,
+    p.expl_id,
+    p.log,
+    p.active
+   FROM selector_expl s,
+    inp_pattern p
+  WHERE p.expl_id = s.expl_id AND s.cur_user = "current_user"()::text OR p.expl_id IS NULL
+  ORDER BY p.pattern_id;

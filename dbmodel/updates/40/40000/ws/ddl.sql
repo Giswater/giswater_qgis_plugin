@@ -355,3 +355,6 @@ CREATE INDEX idx_inp_pump_additional_id ON inp_pump_additional USING btree (id);
 CREATE INDEX idx_inp_pump_additional_node_id ON inp_pump_additional USING btree (node_id);
 CREATE INDEX idx_inp_pump_additional_energy_pattern_id ON inp_pump_additional USING btree (energy_pattern_id);
 CREATE INDEX idx_inp_pump_additional_pattern_id ON inp_pump_additional USING btree (pattern_id);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_curve", "column":"active", "dataType":"boolean", "defaultValue":"true"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_pattern", "column":"active", "dataType":"boolean", "defaultValue":"true"}}$$);

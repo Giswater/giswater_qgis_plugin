@@ -12,8 +12,9 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 SELECT plan(6);
 
-INSERT INTO v_edit_inp_curve (id, curve_type)
-VALUES('-901', 'PUMP');
+INSERT INTO v_edit_inp_curve (id, curve_type, descript, expl_id, log, active)
+VALUES('-901', 'PUMP', NULL, 1, NULL, true);
+
 SELECT is((SELECT count(*)::integer FROM v_edit_inp_curve WHERE id = '-901'), 1, 'INSERT: v_edit_inp_curve -901 was inserted');
 SELECT is((SELECT count(*)::integer FROM inp_curve WHERE id = '-901'), 1, 'INSERT: inp_curve -901 was inserted');
 
