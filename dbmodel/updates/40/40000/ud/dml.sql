@@ -980,4 +980,7 @@ INSERT INTO config_param_system ("parameter", value, descript, "label", dv_query
 
 --12/12/2024
 UPDATE sys_style SET stylevalue = replace(stylevalue,'tot_flood','tot_flood_compare') WHERE layername IN ('v_rpt_comp_nodeflooding_sum');
-UPDATE sys_style SET stylevalue = replace(stylevalue,'mfull_dept','mfull_dept_compare') WHERE layername IN ('v_rpt_comp_arcflow_sum');  
+UPDATE sys_style SET stylevalue = replace(stylevalue,'mfull_dept','mfull_dept_compare') WHERE layername IN ('v_rpt_comp_arcflow_sum');
+
+DELETE FROM sys_table WHERE id='cat_mat_grate';
+DELETE FROM sys_table WHERE id='cat_mat_gully';

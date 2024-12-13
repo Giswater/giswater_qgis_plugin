@@ -144,14 +144,15 @@ BEGIN
 		FROM selector_sector, v_edit_arc
 			LEFT JOIN value_state_type ON id=state_type
 			LEFT JOIN cat_arc ON v_edit_arc.arccat_id = cat_arc.id
-			LEFT JOIN cat_mat_arc ON cat_arc.matcat_id = cat_mat_arc.id
+			LEFT JOIN cat_material ON cat_arc.matcat_id = cat_material.id
 			LEFT JOIN inp_pipe ON v_edit_arc.arc_id = inp_pipe.arc_id
 			LEFT JOIN inp_virtualpump ON v_edit_arc.arc_id = inp_virtualpump.arc_id
 			LEFT JOIN inp_virtualvalve ON v_edit_arc.arc_id = inp_virtualvalve.arc_id
-			LEFT JOIN cat_mat_roughness ON cat_mat_roughness.matcat_id = cat_mat_arc.id
+			LEFT JOIN cat_mat_roughness ON cat_mat_roughness.matcat_id = cat_material.id
 			WHERE (now()::date - (CASE WHEN builtdate IS NULL THEN ''1900-01-01''::date ELSE builtdate END))/365 >= cat_mat_roughness.init_age
 			AND (now()::date - (CASE WHEN builtdate IS NULL THEN ''1900-01-01''::date ELSE builtdate END))/365 <= cat_mat_roughness.end_age '
 			||v_statetype||' AND v_edit_arc.sector_id=selector_sector.sector_id AND selector_sector.cur_user=current_user
+			AND ''ARC'' = ANY(cat_material.feature_type)
 			AND epa_type != ''UNDEFINED''
 			AND v_edit_arc.sector_id > 0 AND v_edit_arc.state > 0
 			AND st_length(v_edit_arc.the_geom) >= '||v_minlength;

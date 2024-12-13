@@ -205,3 +205,30 @@ ALTER TABLE inp_backdrop RENAME to _inp_backdrop;
 
 -- 11/12/2024
 ALTER TABLE element ADD COLUMN asset_id varchar(50);
+
+-- 12/12/2024
+CREATE TABLE cat_material (
+    id varchar(30) NOT NULL,
+    descript varchar(512) NULL,
+    feature_type _text NULL,
+    featurecat_id _text NULL,
+    n numeric(12, 4) NULL,
+    link varchar(512) NULL,
+    active bool DEFAULT true NULL,
+    CONSTRAINT cat_mat_pkey PRIMARY KEY (id)
+);
+
+SELECT * FROM gw_fct_admin_transfer_cat_material();
+
+ALTER TABLE cat_arc DROP CONSTRAINT IF EXISTS cat_arc_matcat_id_fkey;
+ALTER TABLE cat_node DROP CONSTRAINT IF EXISTS cat_node_matcat_id_fkey;
+ALTER TABLE cat_connec DROP CONSTRAINT IF EXISTS cat_connec_matcat_id_fkey;
+ALTER TABLE cat_element DROP CONSTRAINT IF EXISTS cat_element_matcat_id_fkey;
+
+ALTER TABLE arc DROP CONSTRAINT IF EXISTS arc_matcat_id_fkey;
+ALTER TABLE node DROP CONSTRAINT IF EXISTS node_matcat_id_fkey;
+ALTER TABLE connec DROP CONSTRAINT IF EXISTS connec_matcat_id_fkey;
+
+ALTER TABLE cat_mat_arc RENAME TO _cat_mat_arc;
+ALTER TABLE cat_mat_node RENAME TO _cat_mat_node;
+ALTER TABLE cat_mat_element RENAME TO _cat_mat_element;

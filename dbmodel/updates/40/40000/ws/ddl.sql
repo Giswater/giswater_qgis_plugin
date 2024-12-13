@@ -345,3 +345,7 @@ CREATE INDEX inp_dscenario_demand_dscenario_id ON inp_dscenario_demand USING btr
 CREATE INDEX inp_dscenario_demand_source ON inp_dscenario_demand USING btree ("source");
 
 ALTER TABLE selector_netscenario RENAME TO _selector_netscenario;
+
+-- 12/12/2024
+ALTER TABLE cat_mat_roughness DROP CONSTRAINT cat_mat_roughness_matcat_id_fkey;
+ALTER TABLE cat_mat_roughness ADD CONSTRAINT cat_mat_roughness_cat_material_fk FOREIGN KEY (matcat_id) REFERENCES cat_material(id);

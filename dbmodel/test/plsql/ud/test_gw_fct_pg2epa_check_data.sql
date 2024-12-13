@@ -14,8 +14,8 @@ SELECT plan(1);
 
 -- Extract and test the "status" field from the function's JSON response
 SELECT is(
-    (SELECT ud_40.gw_fct_pg2epa_check_data($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831}, 
-    "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "parameters":{}, 
+    (gw_fct_pg2epa_check_data($${"client":{"device":4, "lang":"nl_NL", "infoType":1, "epsg":25831},
+    "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "parameters":{},
     "aux_params":null}}$$)::JSON)->>'status',
     'Accepted',
     'Check if gw_fct_pg2epa_check_data returns status "Accepted"'

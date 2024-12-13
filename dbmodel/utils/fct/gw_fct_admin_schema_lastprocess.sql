@@ -295,19 +295,19 @@ BEGIN
 
 			--change widgettype for matcat_id when new empty data project (UD)
 			IF v_projecttype = 'UD' THEN
-				UPDATE config_form_fields SET iseditable=TRUE, widgettype='combo', dv_isnullvalue=TRUE, dv_querytext='SELECT id, id AS idval FROM cat_mat_node'
+				UPDATE config_form_fields SET iseditable=TRUE, widgettype='combo', dv_isnullvalue=TRUE, dv_querytext='SELECT id, id AS idval FROM cat_material WHERE ''NODE'' = ANY(feature_type)'
 				WHERE columnname='matcat_id' AND formname LIKE 've_node%';
 
-				UPDATE config_form_fields SET iseditable=TRUE, widgettype='combo', dv_isnullvalue=TRUE, dv_querytext='SELECT id, id AS idval FROM cat_mat_arc'
+				UPDATE config_form_fields SET iseditable=TRUE, widgettype='combo', dv_isnullvalue=TRUE, dv_querytext='SELECT id, id AS idval FROM cat_material WHERE ''ARC'' = ANY(feature_type)'
 				WHERE columnname='matcat_id' AND formname LIKE 've_connec%';
 
-				UPDATE config_form_fields SET iseditable=TRUE, widgettype='combo', dv_isnullvalue=TRUE, dv_querytext='SELECT id, id AS idval FROM cat_mat_arc'
+				UPDATE config_form_fields SET iseditable=TRUE, widgettype='combo', dv_isnullvalue=TRUE, dv_querytext='SELECT id, id AS idval FROM cat_material WHERE ''ARC'' = ANY(feature_type)'
 				WHERE columnname='matcat_id' AND formname LIKE 've_arc%';
 
-				UPDATE config_form_fields SET iseditable=TRUE, widgettype='combo', dv_isnullvalue=TRUE, dv_querytext='SELECT id, id AS idval FROM cat_mat_node'
+				UPDATE config_form_fields SET iseditable=TRUE, widgettype='combo', dv_isnullvalue=TRUE, dv_querytext='SELECT id, id AS idval FROM cat_material WHERE ''NODE'' = ANY(feature_type)'
 				WHERE columnname='matcat_id' AND formname IN ('v_edit_node');
 
-				UPDATE config_form_fields SET iseditable=TRUE, widgettype='combo', dv_isnullvalue=TRUE, dv_querytext='SELECT id, id AS idval FROM cat_mat_arc'
+				UPDATE config_form_fields SET iseditable=TRUE, widgettype='combo', dv_isnullvalue=TRUE, dv_querytext='SELECT id, id AS idval FROM cat_material WHERE ''ARC'' = ANY(feature_type)'
 				WHERE columnname='matcat_id' AND formname IN ('v_edit_arc', 'v_edit_connec');
 
 			END IF;
@@ -470,6 +470,7 @@ BEGIN
 					DO update set context = concat('{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"', upper(rec_feature.feature_type),'"}');
 				END LOOP;
 			END IF;
+
 		END IF;
 
         -- delete all functions not related to project type

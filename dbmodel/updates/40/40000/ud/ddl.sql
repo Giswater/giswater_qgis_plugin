@@ -72,7 +72,6 @@ CREATE TABLE cat_arc (
 	CONSTRAINT cat_arc_curve_id_fkey FOREIGN KEY (curve_id) REFERENCES inp_curve(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT cat_arc_m2bottom_cost_fkey FOREIGN KEY (m2bottom_cost) REFERENCES plan_price(id) ON DELETE CASCADE ON UPDATE CASCADE,
 	CONSTRAINT cat_arc_m3protec_cost_fkey FOREIGN KEY (m3protec_cost) REFERENCES plan_price(id) ON DELETE CASCADE ON UPDATE CASCADE,
-	CONSTRAINT cat_arc_matcat_id_fkey FOREIGN KEY (matcat_id) REFERENCES cat_mat_arc(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT cat_arc_shape_id_fkey FOREIGN KEY (shape) REFERENCES cat_arc_shape(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT cat_arc_tsect_id_fkey FOREIGN KEY (tsect_id) REFERENCES inp_transects(id) ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT cat_arc_brand_fkey FOREIGN KEY (brand_id) REFERENCES cat_brand(id) ON DELETE CASCADE ON UPDATE CASCADE,
@@ -116,7 +115,6 @@ CREATE TABLE cat_node (
 	CONSTRAINT cat_node_pkey PRIMARY KEY (id),
 	CONSTRAINT cat_node_brand_fkey FOREIGN KEY (brand_id) REFERENCES cat_brand(id) ON DELETE CASCADE ON UPDATE CASCADE,
 	CONSTRAINT cat_node_cost_fkey FOREIGN KEY ("cost") REFERENCES plan_price(id) ON DELETE CASCADE ON UPDATE CASCADE,
-	CONSTRAINT cat_node_matcat_id_fkey FOREIGN KEY (matcat_id) REFERENCES cat_mat_node(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT cat_node_model_fkey FOREIGN KEY (model_id) REFERENCES cat_brand_model(id) ON DELETE CASCADE ON UPDATE CASCADE,
 	CONSTRAINT cat_node_node_type_fkey FOREIGN KEY (node_type) REFERENCES cat_feature_node(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT cat_node_shape_fkey FOREIGN KEY (shape) REFERENCES cat_node_shape(id) ON DELETE RESTRICT ON UPDATE CASCADE
@@ -157,7 +155,6 @@ CREATE TABLE cat_connec (
 	CONSTRAINT cat_connec_pkey PRIMARY KEY (id),
 	CONSTRAINT cat_connec_brand_fkey FOREIGN KEY (brand_id) REFERENCES cat_brand(id) ON DELETE CASCADE ON UPDATE CASCADE,
 	CONSTRAINT cat_connec_connec_type_fkey FOREIGN KEY (connec_type) REFERENCES cat_feature_connec(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT cat_connec_matcat_id_fkey FOREIGN KEY (matcat_id) REFERENCES cat_mat_arc(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT cat_connec_model_fkey FOREIGN KEY (model_id) REFERENCES cat_brand_model(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
@@ -198,7 +195,6 @@ CREATE TABLE cat_gully (
 	CONSTRAINT cat_gully_pkey PRIMARY KEY (id),
 	CONSTRAINT cat_gully_brand_fkey FOREIGN KEY (brand_id) REFERENCES cat_brand(id) ON DELETE CASCADE ON UPDATE CASCADE,
 	CONSTRAINT cat_gully_gully_type_fkey FOREIGN KEY (gully_type) REFERENCES cat_feature_gully(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT cat_gully_matcat_id_fkey FOREIGN KEY (matcat_id) REFERENCES cat_mat_grate(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT cat_gully_model_fkey FOREIGN KEY (model_id) REFERENCES cat_brand_model(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
@@ -256,7 +252,6 @@ ALTER TABLE arc ALTER COLUMN macrominsector_id SET DEFAULT 0;
 ALTER TABLE connec ALTER COLUMN macrominsector_id SET DEFAULT 0;
 ALTER TABLE link ALTER COLUMN macrominsector_id SET DEFAULT 0;
 ALTER TABLE gully ALTER COLUMN macrominsector_id SET DEFAULT 0;
-
 -- 02/12/2024
 DROP VIEW IF EXISTS ve_epa_orifice;
 DROP VIEW IF EXISTS v_edit_inp_orifice;
@@ -298,3 +293,10 @@ ALTER TABLE om_reh_value_loc_condition RENAME TO _om_reh_value_loc_condition;
 ALTER TABLE om_reh_works_x_pcompost RENAME TO _om_reh_works_x_pcompost;
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"man_conduit", "column":"inlet_offset", "newName":"_inlet_offset"}}$$);
+
+-- 12/12/2024
+ALTER TABLE gully DROP CONSTRAINT gully_matcat_id_fkey;
+ALTER TABLE gully DROP CONSTRAINT gully_connec_matcat_id_fkey;
+
+ALTER TABLE cat_mat_grate RENAME TO _cat_mat_grate;
+ALTER TABLE cat_mat_gully RENAME TO _cat_mat_gully;

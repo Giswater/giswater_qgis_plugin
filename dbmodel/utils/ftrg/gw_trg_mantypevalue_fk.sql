@@ -64,7 +64,7 @@ BEGIN
 		ELSE
 			v_columname_value = REPLACE(v_columname_value, '"', '\"');
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"3022", "function":"2744","debug_msg":
+			"data":{"message":"3022", "function":"3346","debug_msg":
 			"'||concat('Catalog: ', v_type_table,', insert table: ',v_table, ', field: ',v_columname,', value: ', v_columname_value)||'"}}$$);';
 		END IF;
 	END LOOP;

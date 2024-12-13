@@ -4,8 +4,10 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
+-- FUNCTION CODE: 3352
+
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_get_epa_selector(json);
--- FUNCTION CODE: 3350
+
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_get_epa_selector(p_data json)
  RETURNS json
  LANGUAGE plpgsql
@@ -191,7 +193,7 @@ BEGIN
 	END IF;
 
 	-- Return JSON
-	RETURN gw_fct_json_create_return((v_response)::json, 3350, null, null, null)::json;
+	RETURN gw_fct_json_create_return((v_response)::json, 3352, null, null, null)::json;
 
 EXCEPTION
     WHEN OTHERS THEN

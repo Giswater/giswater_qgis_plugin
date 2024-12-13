@@ -30,6 +30,36 @@ BEGIN
 
 		IF v_configtable = 'sys_param_user' THEN
 
+		ELSIF v_configtable IN ('cat_material') THEN
+			v_querytext='SELECT * FROM '||v_configtable||';';
+			--check if all feature_type are present on table sys_feature_type
+			IF NEW.feature_type IS NOT NULL THEN
+				FOREACH rec_feature IN array(NEW.feature_type) LOOP
+					IF rec_feature NOT IN (SELECT id FROM sys_feature_type) THEN
+						v_variables = concat('table: ',v_configtable,', feature_type: ',rec_feature);
+						v_message = concat('{"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{"message":"3172",
+						"function":"2816", "debug":null, "variables":"',v_variables,'"}}');
+						PERFORM gw_fct_getmessage(v_message);
+					END IF;
+				END LOOP;
+			END IF;
+
+			IF NEW.featurecat_id IS NOT NULL THEN
+				FOREACH rec_feature IN array(NEW.featurecat_id) LOOP
+					IF rec_feature NOT IN (
+					SELECT id FROM cat_feature
+					WHERE feature_type = ANY (NEW.feature_type)
+					UNION
+					SELECT id FROM element_type
+					) THEN
+						v_variables = concat('table: ',v_configtable,', featurecat: ',rec_feature);
+						v_message = concat('{"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{"message":"3172",
+						"function":"2816", "debug":null, "variables":"',v_variables,'"}}');
+						PERFORM gw_fct_getmessage(v_message);
+					END IF;
+				END LOOP;
+			END IF;
+
 		ELSIF v_configtable IN ('man_type_category', 'man_type_fluid', 'man_type_function', 'man_type_location', 'cat_brand', 'cat_brand_model') THEN
 			v_querytext='SELECT * FROM '||v_configtable||';';
 

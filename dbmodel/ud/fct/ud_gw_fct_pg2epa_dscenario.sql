@@ -80,13 +80,21 @@ BEGIN
 
 		-- n
 		-- when material comes from arccat
-		UPDATE temp_t_arc t SET n = d.n FROM (SELECT * FROM inp_dscenario_conduit a
-		JOIN cat_arc c ON c.id = a.arccat_id
-		JOIN cat_mat_arc b ON c.matcat_id = b.id) d
+		UPDATE temp_t_arc t SET n = d.n FROM (
+			SELECT * FROM inp_dscenario_conduit a
+			JOIN cat_arc c ON c.id = a.arccat_id
+			JOIN cat_material b ON c.matcat_id = b.id
+			WHERE 'ARC' = ANY(b.feature_type)
+		) d
 		WHERE t.arc_id = d.arc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.arccat_id IS NOT NULL;
 
 		-- when material is informed by user
-		UPDATE temp_t_arc t SET n = d.n FROM (SELECT * FROM inp_dscenario_conduit a JOIN cat_mat_arc b ON a.matcat_id = id WHERE a.matcat_id IS NOT NULL)d
+		UPDATE temp_t_arc t SET n = d.n FROM (
+			SELECT * FROM inp_dscenario_conduit a
+			JOIN cat_material b ON a.matcat_id = b.id
+			WHERE 'ARC' = ANY(b.feature_type)
+			AND a.matcat_id IS NOT NULL
+			) d
 		WHERE t.arc_id = d.arc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.matcat_id IS NOT NULL;
 
 		-- when n is informed by user

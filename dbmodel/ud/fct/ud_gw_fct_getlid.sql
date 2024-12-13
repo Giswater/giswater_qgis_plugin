@@ -4,12 +4,15 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
+--FUNCTION CODE: 3354
+
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_getlid(json);
+
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getlid(p_data json)
  RETURNS json
  LANGUAGE plpgsql
 AS $function$
 
---FUNCTION CODE: 3351
 
 DECLARE
 
@@ -277,7 +280,7 @@ BEGIN
                 "fields": ' || v_fieldsjson || '
             }
         }
-    }')::json, 3351, null, null, null)::json;
+    }')::json, 3354, null, null, null)::json;
 
 
 EXCEPTION

@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE: XXXX
+--FUNCTION CODE: 3358
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_admin_transfer_cat_material();
 
@@ -101,8 +101,6 @@ BEGIN
                     EXECUTE v_querytext;
                 END IF;
             END IF;
-
-			IF v_link IS NULL THEN
 
         END LOOP;
     END LOOP;

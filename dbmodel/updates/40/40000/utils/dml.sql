@@ -627,7 +627,7 @@ INSERT INTO sys_function (id, function_name, project_type, function_type, input_
 VALUES (3346, 'gw_trg_mantypevalue_fk', 'utils', 'trigger', NULL, NULL, 'Control foreign keys created in man_type_* tables', 'role_edit', 'core');
 
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, "source")
-VALUES (3347, 'gw_fct_get_dialog', 'utils', 'function', 'json', 'json', 'Function to build dialogs for generic forms', 'role_basic', 'core');
+VALUES (3348, 'gw_fct_get_dialog', 'utils', 'function', 'json', 'json', 'Function to build dialogs for generic forms', 'role_basic', 'core');
 
 UPDATE config_form_fields SET widgetfunction='{"functionName": "open_selected_path", "parameters":{"targetwidget":"tab_hydrometer_tbl_hydrometer", "columnfind": "hydrometer_link"}}'::json WHERE formname='connec' AND formtype='form_feature' AND columnname='btn_link' AND tabname='tab_hydrometer';
 UPDATE config_form_fields SET widgetfunction='{"functionName": "open_selected_path", "parameters":{"targetwidget":"tab_hydrometer_tbl_hydrometer", "columnfind": "hydrometer_link"}}'::json WHERE formname='node' AND formtype='form_feature' AND columnname='btn_link' AND tabname='tab_hydrometer';
@@ -638,13 +638,10 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('connec', 'form_feature', 'tab_elements', 'btn_link', 'lyt_element_1', 12, NULL, 'button', NULL, 'Open link', NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, '{"icon":"70", "size":"24x24"}'::json, '{"saveValue":false, "filterSign":"="}'::json, '{"functionName": "open_selected_path", "parameters":{"targetwidget":"tab_elements_tbl_elements", "columnfind": "link"}}'::json, 'v_edit_connec', false, NULL);
 
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, "source")
-VALUES (3348, 'gw_fct_set_epa_selector', 'utils', 'function', 'json', 'json', 'Function to update tables with new selected values', 'role_basic', 'core');
+VALUES (3350, 'gw_fct_set_epa_selector', 'utils', 'function', 'json', 'json', 'Function to update tables with new selected values', 'role_basic', 'core');
 
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, "source")
-VALUES (3349, 'gw_fct_get_epa_selector', 'ws', 'function', 'json', 'json', 'Function to get epa selector dialog with filled combos', 'role_basic', 'core');
-
-INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, "source")
-VALUES (3350, 'gw_fct_get_epa_selector', 'ud', 'function', 'json', 'json', 'Function to get epa selector dialog with filled combos', 'role_basic', 'core');
+VALUES (3352, 'gw_fct_get_epa_selector', 'utils', 'function', 'json', 'json', 'Function to get epa selector dialog with filled combos', 'role_basic', 'core');
 
 
 INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('layout_name_typevalue', 'lyt_epa_select_1', 'lyt_epa_select_1', 'layoutEpaSelector1', '{"lytOrientation": "vertical"}'::json);
@@ -711,8 +708,6 @@ INSERT INTO config_form_tableview (location_type, project_type, objectname, colu
 INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('epamanager_form', 'utils', 'epa_results', 'inp_options', NULL, false, NULL, NULL, NULL, NULL);
 INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('epamanager_form', 'utils', 'epa_results', 'network_stats', NULL, false, NULL, NULL, NULL, NULL);
 
-
-
 -- 03/12/2024
 UPDATE config_form_fields
 	SET widgetfunction='{"functionName": "btn_accept_featuretype_change", "module": "featuretype_change_btn", "parameters": {}}'::json
@@ -758,10 +753,65 @@ DELETE FROM config_fprocess WHERE fid=141 AND tablename='vi_t_backdrop' AND targ
 
 -- 10/12/2024
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, "source")
-VALUES (3351, 'gw_fct_getlid', 'ud', 'function', 'json', 'json', 'Function to get lid dialog with filled combos', 'role_basic', 'core');
+VALUES (3354, 'gw_fct_getlid', 'ud', 'function', 'json', 'json', 'Function to get lid dialog with filled combos', 'role_basic', 'core');
 
 -- 11/12/24
 INSERT INTO config_param_user ("parameter", value, cur_user) VALUES('edit_arc_automatic_link2netowrk', '{"active":"false", "buffer":"10"}', current_user)
 ON CONFLICT ("parameter", cur_user) DO NOTHING;
 
 UPDATE sys_message SET log_level=2 WHERE id=3268; --get closest address
+
+-- 12/12/2024
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, "source")
+VALUES (3356, 'gw_trg_cat_material_fk', 'utils', 'trigger', NULL, NULL, 'Control foreign keys created in cat_material', 'role_edit', 'core');
+
+DELETE FROM sys_table WHERE id='cat_mat_node';
+DELETE FROM sys_table WHERE id='cat_mat_arc';
+DELETE FROM sys_table WHERE id='cat_mat_element';
+
+INSERT INTO sys_table (id, descript, sys_role, criticity, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam)
+VALUES('cat_material', 'Catalog of materials.', 'role_edit', 2, '{"level_1":"INVENTORY","level_2":"CATALOGS"}', 7, 'Materials catalog', NULL, NULL, NULL, 'core', NULL);
+
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, "source")
+VALUES (3358, 'gw_fct_admin_transfer_cat_material', 'utils', 'function', NULL, NULL, 'Function to transfer all values from old cat_mat_* tables to new one: cat_material', 'role_edit', 'core');
+
+ALTER TABLE config_form_fields DISABLE TRIGGER gw_trg_config_control;
+
+UPDATE config_form_fields SET dv_querytext='SELECT id, id AS idval FROM cat_material WHERE ''ARC'' = ANY(feature_type) AND id IS NOT NULL' WHERE formname='inp_cat_mat_roughness' AND formtype='form_feature' AND columnname='matcat_id' AND tabname='tab_none';
+UPDATE config_form_fields SET dv_querytext='SELECT id, id AS idval FROM cat_material WHERE ''ARC'' = ANY(feature_type) AND id IS NOT NULL' WHERE formname='cat_mat_roughness' AND formtype='form_feature' AND columnname='matcat_id' AND tabname='tab_none';
+UPDATE config_form_fields SET dv_querytext='SELECT id, id as idval FROM cat_material WHERE ''ARC'' = ANY(feature_type) AND id IS NOT NULL' WHERE formname='v_edit_review_arc' AND formtype='form_feature' AND columnname='matcat_id' AND tabname='tab_none';
+UPDATE config_form_fields SET dv_querytext='SELECT id, id as idval FROM cat_material WHERE ''ARC'' = ANY(feature_type) AND id IS NOT NULL' WHERE formname='v_edit_review_audit_arc' AND formtype='form_feature' AND columnname='old_matcat_id' AND tabname='tab_none';
+UPDATE config_form_fields SET dv_querytext='SELECT id, id as idval FROM cat_material WHERE ''ARC'' = ANY(feature_type) AND id IS NOT NULL' WHERE formname='v_edit_review_audit_arc' AND formtype='form_feature' AND columnname='new_matcat_id' AND tabname='tab_none';
+UPDATE config_form_fields SET dv_querytext='SELECT id, descript AS idval FROM cat_material WHERE ''ARC'' = ANY(feature_type) AND id IS NOT NULL' WHERE formname='cat_connec' AND formtype='form_feature' AND columnname='matcat_id' AND tabname='tab_none';
+UPDATE config_form_fields SET dv_querytext='SELECT id, descript AS idval FROM cat_material WHERE ''ARC'' = ANY(feature_type) AND id IS NOT NULL' WHERE formname='cat_arc' AND formtype='form_feature' AND columnname='matcat_id' AND tabname='tab_none';
+UPDATE config_form_fields SET dv_querytext='SELECT id as id, id as idval FROM cat_material WHERE ''ARC'' = ANY(feature_type) AND active' WHERE formname='inp_dscenario_conduit' AND formtype='form_feature' AND columnname='matcat_id' AND tabname='tab_none';
+UPDATE config_form_fields SET dv_querytext='SELECT id, id AS idval FROM cat_material WHERE ''ARC'' = ANY(feature_type) AND active' WHERE formname='v_edit_gully' AND formtype='form_feature' AND columnname='connec_matcat_id' AND tabname='tab_data';
+UPDATE config_form_fields SET dv_querytext='SELECT id, id AS idval FROM cat_material WHERE ''ARC'' = ANY(feature_type) AND active' WHERE formname='ve_gully' AND formtype='form_feature' AND columnname='connec_matcat_id' AND tabname='tab_data';
+UPDATE config_form_fields SET dv_querytext='SELECT id, id AS idval FROM cat_material WHERE ''ARC'' = ANY(feature_type) AND active' WHERE formname='ve_gully_gully' AND formtype='form_feature' AND columnname='connec_matcat_id' AND tabname='tab_data';
+UPDATE config_form_fields SET dv_querytext='SELECT id, id AS idval FROM cat_material WHERE ''ARC'' = ANY(feature_type) AND active' WHERE formname='ve_gully_pgully' AND formtype='form_feature' AND columnname='connec_matcat_id' AND tabname='tab_data';
+UPDATE config_form_fields SET dv_querytext='SELECT id, id AS idval FROM cat_material WHERE ''ARC'' = ANY(feature_type) AND active' WHERE formname='ve_gully_vgully' AND formtype='form_feature' AND columnname='connec_matcat_id' AND tabname='tab_data';
+UPDATE config_form_fields SET dv_querytext='SELECT id as id, id as idval FROM cat_material WHERE ''ARC'' = ANY(feature_type) AND active' WHERE formname='v_edit_inp_dscenario_conduit' AND formtype='form_feature' AND columnname='matcat_id' AND tabname='tab_none';
+
+UPDATE config_form_fields SET dv_querytext='SELECT id, id as idval FROM cat_material WHERE ''NODE'' = ANY(feature_type) AND id IS NOT NULL' WHERE formname='v_edit_review_node' AND formtype='form_feature' AND columnname='matcat_id' AND tabname='tab_none';
+UPDATE config_form_fields SET dv_querytext='SELECT id, id as idval FROM cat_material WHERE ''NODE'' = ANY(feature_type) AND id IS NOT NULL' WHERE formname='v_edit_review_audit_node' AND formtype='form_feature' AND columnname='old_matcat_id' AND tabname='tab_none';
+UPDATE config_form_fields SET dv_querytext='SELECT id, id as idval FROM cat_material WHERE ''NODE'' = ANY(feature_type) AND id IS NOT NULL' WHERE formname='v_edit_review_audit_node' AND formtype='form_feature' AND columnname='new_matcat_id' AND tabname='tab_none';
+UPDATE config_form_fields SET dv_querytext='SELECT id, id as idval FROM cat_material WHERE ''NODE'' = ANY(feature_type) AND id IS NOT NULL' WHERE formname='v_edit_review_connec' AND formtype='form_feature' AND columnname='matcat_id' AND tabname='tab_none';
+UPDATE config_form_fields SET dv_querytext='SELECT id, id as idval FROM cat_material WHERE ''NODE'' = ANY(feature_type) AND id IS NOT NULL' WHERE formname='v_edit_review_audit_connec' AND formtype='form_feature' AND columnname='old_matcat_id' AND tabname='tab_none';
+UPDATE config_form_fields SET dv_querytext='SELECT id, id as idval FROM cat_material WHERE ''NODE'' = ANY(feature_type) AND id IS NOT NULL' WHERE formname='v_edit_review_audit_connec' AND formtype='form_feature' AND columnname='new_matcat_id' AND tabname='tab_none';
+UPDATE config_form_fields SET dv_querytext='SELECT id, descript AS idval FROM cat_material WHERE ''NODE'' = ANY(feature_type) AND id IS NOT NULL' WHERE formname='cat_node' AND formtype='form_feature' AND columnname='matcat_id' AND tabname='tab_none';
+
+UPDATE config_form_fields SET dv_querytext='SELECT id, descript AS idval FROM cat_material WHERE ''ELEMENT'' = ANY(feature_type) AND id IS NOT NULL' WHERE formname='cat_element' AND formtype='form_feature' AND columnname='matcat_id' AND tabname='tab_none';
+
+UPDATE config_form_fields SET dv_querytext='SELECT id, id as idval FROM cat_material WHERE ''GULLY'' = ANY(feature_type) AND id IS NOT NULL' WHERE formname='v_edit_review_gully' AND formtype='form_feature' AND columnname='matcat_id' AND tabname='tab_none';
+UPDATE config_form_fields SET dv_querytext='SELECT id, id as idval FROM cat_material WHERE ''GULLY'' = ANY(feature_type) AND id IS NOT NULL' WHERE formname='v_edit_review_audit_gully' AND formtype='form_feature' AND columnname='old_matcat_id' AND tabname='tab_none';
+UPDATE config_form_fields SET dv_querytext='SELECT id, id as idval FROM cat_material WHERE ''GULLY'' = ANY(feature_type) AND id IS NOT NULL' WHERE formname='v_edit_review_audit_gully' AND formtype='form_feature' AND columnname='new_matcat_id' AND tabname='tab_none';
+UPDATE config_form_fields SET dv_querytext='SELECT id, descript AS idval FROM cat_material WHERE ''GULLY'' = ANY(feature_type) AND id IS NOT NULL' WHERE formname='cat_grate' AND formtype='form_feature' AND columnname='matcat_id' AND tabname='tab_none';
+
+UPDATE config_form_fields SET widgetcontrols = replace(widgetcontrols::TEXT, 'cat_mat_arc', 'cat_material')::json WHERE widgetcontrols::TEXT ILIKE '%cat_mat_arc%';
+UPDATE config_form_fields SET widgetcontrols = replace(widgetcontrols::TEXT, 'cat_mat_node', 'cat_material')::json WHERE widgetcontrols::TEXT ILIKE '%cat_mat_node%';
+UPDATE config_form_fields SET widgetcontrols = replace(widgetcontrols::TEXT, 'cat_mat_grate', 'cat_material')::json WHERE widgetcontrols::TEXT ILIKE '%cat_mat_grate%';
+UPDATE config_form_fields SET widgetcontrols = replace(widgetcontrols::TEXT, 'cat_mat_gully', 'cat_material')::json WHERE widgetcontrols::TEXT ILIKE '%cat_mat_gully%';
+UPDATE config_form_fields SET widgetcontrols = replace(widgetcontrols::TEXT, 'cat_mat_connec', 'cat_material')::json WHERE widgetcontrols::TEXT ILIKE '%cat_mat_connec%';
+UPDATE config_form_fields SET widgetcontrols = replace(widgetcontrols::TEXT, 'cat_mat_element', 'cat_material')::json WHERE widgetcontrols::TEXT ILIKE '%cat_mat_element%';
+
+ALTER TABLE config_form_fields ENABLE TRIGGER gw_trg_config_control;

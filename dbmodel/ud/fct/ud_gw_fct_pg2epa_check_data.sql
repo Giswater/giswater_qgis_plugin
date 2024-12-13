@@ -49,10 +49,10 @@ v_rec record;
 v_addschema text;
 BEGIN
 
-	--  Search path	
+	--  Search path
 	SET search_path = "SCHEMA_NAME", public;
 
-	-- getting input data 	
+	-- getting input data
 	v_result_id := ((p_data ->>'data')::json->>'parameters')::json->>'resultId'::text;
 	v_fid := ((p_data ->>'data')::json->>'parameters')::json->>'fid';
 	v_nodetolerance :=  (SELECT value::json->>'value' FROM config_param_system WHERE parameter = 'edit_node_proximity');
@@ -63,15 +63,15 @@ BEGIN
 
 	-- init variables
 	v_count=0;
-	IF v_fid is null THEN v_fid = 225; END IF;	
+	IF v_fid is null THEN v_fid = 225; END IF;
 
 	IF v_fid IN (101,225) THEN
-		
+
 		CREATE TEMP TABLE temp_anl_arc (LIKE SCHEMA_NAME.anl_arc INCLUDING ALL);
 		CREATE TEMP TABLE temp_anl_node (LIKE SCHEMA_NAME.anl_node INCLUDING ALL);
 		CREATE TEMP TABLE temp_audit_check_data (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
 		CREATE TEMP TABLE temp_anl_polygon (LIKE SCHEMA_NAME.anl_polygon INCLUDING ALL);
-		
+
 		-- Header
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('DATA QUALITY ANALYSIS ACORDING EPA RULES'));
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, '-----------------------------------------------------------');
@@ -84,7 +84,7 @@ BEGIN
 
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 1, 'INFO');
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 1, '-------');
-		
+
 	END IF;
 
 	v_sql = 'select*from sys_fprocess where 
@@ -92,32 +92,32 @@ BEGIN
 		and addparam is null
 		and query_text is not null
 		and function_name ilike ''%pg2epa%'' ';
-	
 
 
-	for v_rec in execute v_sql		
+
+	for v_rec in execute v_sql
 	loop
-		
+
 		-- check que los addschemas existan
 		select (addparam::json ->>'addSchema')::text into v_addschema from sys_fprocess where fid = v_rec.fid;
 
 		if v_addschema is not null then
-		
+
 			-- check if exists
 			select count(*) into v_count from information_schema.tables where table_catalog = current_catalog and table_schema = v_addschema;
-		
+
 			if v_count = 0 then
-			
+
 				continue;
-			
+
 			end if;
-		
+
 		end if;
 
 		--raise notice 'v_rec.fid %', v_rec.fid;
 		execute 'select gw_fct_check_fprocess($${"client":{"device":4, "infoType":1, "lang":"ES"}, 
 	    "form":{},"feature":{},"data":{"parameters":{"functionFid": '||v_fid||', "prefixTable": "", "checkFid":"'||v_rec.fid||'"}}}$$)';
-		
+
    	end loop;
 
 	update temp_audit_check_data set criticity = 1 where error_message ilike 'INFO:%';
@@ -127,9 +127,9 @@ BEGIN
 
 	IF v_result_id IS NULL THEN
 		UPDATE temp_audit_check_data SET result_id = table_id WHERE cur_user="current_user"() AND fid=v_fid AND result_id IS NULL;
-		UPDATE temp_audit_check_data SET table_id = NULL WHERE cur_user="current_user"() AND fid=v_fid; 
+		UPDATE temp_audit_check_data SET table_id = NULL WHERE cur_user="current_user"() AND fid=v_fid;
 	END IF;
-	
+
 	-- Removing isaudit false sys_fprocess
 	FOR v_record IN SELECT * FROM sys_fprocess WHERE isaudit is false
 	LOOP
@@ -143,14 +143,14 @@ BEGIN
 	INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, '');
 	INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 3, '');
 	INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 2, '');
-	INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 1, ''); 
+	INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 1, '');
 
 	-- 101 - checkproject
 	-- 127 - go2epa main
 	-- 225 - triggered alone
-	
+
 	IF v_fid = 225 THEN
-			
+
 		DELETE FROM anl_arc WHERE fid =225 AND cur_user=current_user;
 		DELETE FROM anl_node WHERE fid =225 AND cur_user=current_user;
 		DELETE FROM audit_check_data WHERE fid =225 AND cur_user=current_user;
@@ -160,7 +160,7 @@ BEGIN
 		INSERT INTO audit_check_data SELECT * FROM temp_audit_check_data;
 		INSERT INTO anl_polygon SELECT * FROM temp_anl_polygon;
 
-	ELSIF  v_fid = 101 THEN 
+	ELSIF  v_fid = 101 THEN
 		UPDATE temp_audit_check_data SET fid = 225;
 
 		INSERT INTO project_temp_anl_arc SELECT * FROM temp_anl_arc;
@@ -170,12 +170,12 @@ BEGIN
 
 	-- get results
 	-- info
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
-	FROM (SELECT error_message as message FROM temp_audit_check_data WHERE cur_user="current_user"() 
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
+	FROM (SELECT error_message as message FROM temp_audit_check_data WHERE cur_user="current_user"()
 	AND fid=225 order by criticity desc, id asc) row;
-	v_result := COALESCE(v_result, '{}'); 
+	v_result := COALESCE(v_result, '{}');
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
-	
+
 	--points
 	v_result = null;
 
@@ -188,8 +188,8 @@ BEGIN
 	) AS feature
 	FROM (SELECT node_id, nodecat_id, state, expl_id, descript,fid, the_geom
 	FROM  temp_anl_node WHERE cur_user="current_user"() AND fid IN (106, 107, 111, 113, 164, 187, 294, 379)) row) features;
-	v_result := COALESCE(v_result, '{}'); 
-	v_result_point = concat ('{"geometryType":"Point",  "features":',v_result, '}'); 
+	v_result := COALESCE(v_result, '{}');
+	v_result_point = concat ('{"geometryType":"Point",  "features":',v_result, '}');
 
 	--lines
 	v_result = null;
@@ -203,8 +203,8 @@ BEGIN
 	FROM (SELECT arc_id, arccat_id, state, expl_id, descript, the_geom, fid
 	FROM  temp_anl_arc WHERE cur_user="current_user"() AND fid IN (188, 284, 295, 427,430, 522, 529, 530)) row) features;
 
-	v_result := COALESCE(v_result, '{}'); 
-	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}'); 
+	v_result := COALESCE(v_result, '{}');
+	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result,'}');
 
 	-- polygon
 	v_result = null;
@@ -218,16 +218,16 @@ BEGIN
 	FROM (SELECT pol_id, pol_type, state, expl_id, descript, the_geom, fid
 	FROM  temp_anl_polygon WHERE cur_user="current_user"() AND fid IN (528)) row) features;
 
-	v_result := COALESCE(v_result, '{}'); 
+	v_result := COALESCE(v_result, '{}');
 	v_result_polygon = concat ('{"geometryType":"Polygon", "features":',v_result, '}');
 
 	--    Control nulls
-	v_result_info := COALESCE(v_result_info, '{}'); 
-	v_result_point := COALESCE(v_result_point, '{}'); 
-	v_result_line := COALESCE(v_result_line, '{}'); 
-	v_result_polygon := COALESCE(v_result_polygon, '{}'); 
+	v_result_info := COALESCE(v_result_info, '{}');
+	v_result_point := COALESCE(v_result_point, '{}');
+	v_result_line := COALESCE(v_result_line, '{}');
+	v_result_polygon := COALESCE(v_result_polygon, '{}');
 
-	--drop temp tables 
+	--drop temp tables
 	IF v_fid IN (101,225) THEN
 		DROP TABLE IF EXISTS temp_anl_arc;
 		DROP TABLE IF EXISTS temp_anl_node ;

@@ -6,18 +6,16 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-INSERT INTO cat_mat_arc VALUES ('Brick', 'Brick', 0.0140, NULL, true);
-INSERT INTO cat_mat_arc VALUES ('Concret', 'Concret', 0.0140, NULL, true);
-INSERT INTO cat_mat_arc VALUES ('PEAD', 'PEAD', 0.0110, NULL, true);
-INSERT INTO cat_mat_arc VALUES ('PEC', 'PEC', 0.0120, NULL, true);
-INSERT INTO cat_mat_arc VALUES ('PVC', 'PVC', 0.0110, NULL, true);
-INSERT INTO cat_mat_arc VALUES ('Unknown', 'Unknown', 0.0130, NULL, true);
-INSERT INTO cat_mat_arc VALUES ('Virtual', 'Virtual', 0.0120, NULL, true);
-
-INSERT INTO cat_mat_element VALUES ('Concret', 'Concret', NULL, true);
-INSERT INTO cat_mat_element VALUES ('FD', 'FD', NULL, true);
-INSERT INTO cat_mat_element VALUES ('Iron', 'Iron', NULL, true);
-INSERT INTO cat_mat_element VALUES ('N/I', 'No information', NULL, true);
+INSERT INTO cat_material (id, descript, feature_type, featurecat_id, n, link, active) VALUES('N/I', 'No information', '{NODE,ARC,CONNEC,ELEMENT,GULLY}', NULL, NULL, NULL, true);
+INSERT INTO cat_material (id, descript, feature_type, featurecat_id, n, link, active) VALUES('Unknown', 'Unknown', '{NODE,ARC,CONNEC,ELEMENT,GULLY}', NULL, 0.0130, NULL, true);
+INSERT INTO cat_material (id, descript, feature_type, featurecat_id, n, link, active) VALUES('Concret', 'Concret', '{NODE,ARC,CONNEC,ELEMENT,GULLY}', NULL, 0.0140, NULL, true);
+INSERT INTO cat_material (id, descript, feature_type, featurecat_id, n, link, active) VALUES('Brick', 'Brick', '{NODE,ARC,CONNEC,GULLY}', NULL, 0.0140, NULL, true);
+INSERT INTO cat_material (id, descript, feature_type, featurecat_id, n, link, active) VALUES('PEAD', 'PEAD', '{NODE,ARC,CONNEC,GULLY}', NULL, 0.0110, NULL, true);
+INSERT INTO cat_material (id, descript, feature_type, featurecat_id, n, link, active) VALUES('PEC', 'PEC', '{ARC,CONNEC}', NULL, 0.0120, NULL, true);
+INSERT INTO cat_material (id, descript, feature_type, featurecat_id, n, link, active) VALUES('PVC', 'PVC', '{NODE,ARC,CONNEC,GULLY}', NULL, 0.0110, NULL, true);
+INSERT INTO cat_material (id, descript, feature_type, featurecat_id, n, link, active) VALUES('Virtual', 'Virtual', '{NODE,ARC,CONNEC}', NULL, 0.0120, NULL, true);
+INSERT INTO cat_material (id, descript, feature_type, featurecat_id, n, link, active) VALUES('FD', 'FD', '{NODE,ELEMENT,GULLY}', NULL, NULL, NULL, true);
+INSERT INTO cat_material (id, descript, feature_type, featurecat_id, n, link, active) VALUES('Iron', 'Iron', '{NODE,ELEMENT,GULLY}', NULL, NULL, NULL, true);
 
 INSERT INTO cat_element VALUES ('COVER70', 'COVER', 'FD', '70 cm', 'Cover iron Ø70cm', NULL, NULL, NULL, NULL, NULL, true, NULL, NULL, NULL);
 INSERT INTO cat_element VALUES ('COVER70X70', 'COVER', 'FD', '70x70cm', 'Cover iron 70x70cm', NULL, NULL, NULL, NULL, NULL, true, NULL, NULL, NULL);
@@ -25,29 +23,6 @@ INSERT INTO cat_element VALUES ('STEP200', 'STEP', 'Iron', '20x20X20cm', 'Step i
 INSERT INTO cat_element VALUES ('PUMP_ABS', 'PUMP', 'Iron', NULL, 'Model ABS AFP 1001 M300/4-43', NULL, NULL, NULL, NULL, NULL, true, NULL, NULL, NULL);
 INSERT INTO cat_element VALUES ('HYDROGEN SULFIDE SENSOR', 'IOT SENSOR', 'Iron', '10x10x10cm', 'Hydrogen sulfide sensor', NULL, NULL, NULL, NULL, NULL, true, NULL, NULL, NULL);
 INSERT INTO cat_element VALUES ('WEEL PROTECTOR', 'PROTECTOR', 'Iron', '50x10x5cm', 'Weel protector', NULL, NULL, NULL, NULL, NULL, true, NULL, NULL, NULL);
-
-INSERT INTO cat_mat_node VALUES ('Brick', 'Brick', NULL, true);
-INSERT INTO cat_mat_node VALUES ('Concret', 'Concret', NULL, true);
-INSERT INTO cat_mat_node VALUES ('PEAD', 'PEAD', NULL, true);
-INSERT INTO cat_mat_node VALUES ('PVC', 'PVC', NULL, true);
-INSERT INTO cat_mat_node VALUES ('N/I', 'N/I', NULL, true);
-INSERT INTO cat_mat_node VALUES ('FD', 'FD', NULL, true);
-INSERT INTO cat_mat_node VALUES ('Iron', 'Iron', NULL, true);
-INSERT INTO cat_mat_node VALUES ('Virtual', 'Virtual', NULL, true);
-
-INSERT INTO cat_mat_grate VALUES ('Brick', 'Brick', NULL, true);
-INSERT INTO cat_mat_grate VALUES ('Concret', 'Concret', NULL, true);
-INSERT INTO cat_mat_grate VALUES ('PEAD', 'PEAD', NULL, true);
-INSERT INTO cat_mat_grate VALUES ('PVC', 'PVC', NULL, true);
-INSERT INTO cat_mat_grate VALUES ('N/I', 'N/I', NULL, true);
-INSERT INTO cat_mat_grate VALUES ('FD', 'FD', NULL, true);
-INSERT INTO cat_mat_grate VALUES ('Iron', 'Iron', NULL, true);
-
-INSERT INTO cat_mat_gully VALUES ('N/I', 'N/I', NULL, true);
-INSERT INTO cat_mat_gully VALUES ('FD', 'FD', NULL, true);
-INSERT INTO cat_mat_gully VALUES ('Iron', 'Iron', NULL, true);
-INSERT INTO cat_mat_gully VALUES ('Concret', 'Concret', NULL, true);
-INSERT INTO cat_mat_gully VALUES ('Brick', 'Brick', NULL, true);
 
 INSERT INTO cat_arc VALUES ('SIPHON-CC100', 'SIPHON', NULL, 'CIRCULAR', 1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, NULL, 'Conduit', NULL, NULL, NULL, NULL, 0.10, 0.10, 1.30, 0.7854, 2.20, 0.15, 'm', 'A_CON_DN100', 'S_REP', 'S_NULL', true, NULL, NULL, NULL, NULL, 'N_CONNECTION', NULL);
 INSERT INTO cat_arc VALUES ('WACCEL-CC020', 'WACCEL', NULL, 'CIRCULAR', 0.2000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, NULL, 'Conduit', NULL, NULL, NULL, NULL, 0.10, 0.10, 0.26, 0.0314, 1.40, 0.03, 'm', 'A_PVC_DN20', 'S_REP', 'S_NULL', true, NULL, NULL, NULL, NULL, 'N_CONNECTION', NULL);

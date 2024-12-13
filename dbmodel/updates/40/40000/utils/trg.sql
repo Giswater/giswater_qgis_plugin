@@ -87,3 +87,29 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_psector('plan');
 
 CREATE TRIGGER gw_trg_ui_plan_psector INSTEAD OF INSERT OR DELETE OR UPDATE ON v_ui_plan_psector
 FOR EACH ROW EXECUTE FUNCTION gw_trg_ui_plan_psector();
+
+-- 12/12/2024
+CREATE TRIGGER gw_trg_config_control AFTER INSERT OR UPDATE OF feature_type, featurecat_id ON cat_material
+FOR EACH ROW EXECUTE FUNCTION gw_trg_config_control('cat_material');
+
+CREATE TRIGGER gw_trg_cat_material_fk_insert AFTER INSERT ON cat_arc
+FOR EACH ROW EXECUTE FUNCTION gw_trg_cat_material_fk('arc');
+CREATE TRIGGER gw_trg_cat_material_fk_update AFTER UPDATE OF matcat_id ON cat_arc
+FOR EACH ROW WHEN (((old.matcat_id)::TEXT IS DISTINCT FROM (new.matcat_id)::TEXT)) EXECUTE FUNCTION gw_trg_cat_material_fk('arc');
+
+CREATE TRIGGER gw_trg_cat_material_fk_insert AFTER INSERT ON cat_node
+FOR EACH ROW EXECUTE FUNCTION gw_trg_cat_material_fk('node');
+CREATE TRIGGER gw_trg_cat_material_fk_update AFTER UPDATE OF matcat_id ON cat_node
+FOR EACH ROW WHEN (((old.matcat_id)::TEXT IS DISTINCT FROM (new.matcat_id)::TEXT)) EXECUTE FUNCTION gw_trg_cat_material_fk('node');
+
+CREATE TRIGGER gw_trg_cat_material_fk_insert AFTER INSERT ON cat_connec
+FOR EACH ROW EXECUTE FUNCTION gw_trg_cat_material_fk('connec');
+CREATE TRIGGER gw_trg_cat_material_fk_update AFTER UPDATE OF matcat_id ON cat_connec
+FOR EACH ROW WHEN (((old.matcat_id)::TEXT IS DISTINCT FROM (new.matcat_id)::TEXT)) EXECUTE FUNCTION gw_trg_cat_material_fk('connec');
+
+CREATE TRIGGER gw_trg_cat_material_fk_insert AFTER INSERT ON cat_element
+FOR EACH ROW EXECUTE FUNCTION gw_trg_cat_material_fk('element');
+CREATE TRIGGER gw_trg_cat_material_fk_update AFTER UPDATE OF matcat_id ON cat_element
+FOR EACH ROW WHEN (((old.matcat_id)::TEXT IS DISTINCT FROM (new.matcat_id)::TEXT)) EXECUTE FUNCTION gw_trg_cat_material_fk('element');
+
+

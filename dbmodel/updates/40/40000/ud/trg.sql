@@ -194,3 +194,31 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_dwf('cat_dwf');
 -- 09/12/2024
 CREATE TRIGGER gw_trg_edit_ve_epa_storage INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_epa_storage
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_ve_epa('storage');
+
+-- 12/12/2024
+CREATE TRIGGER gw_trg_cat_material_fk_insert AFTER INSERT ON cat_gully
+FOR EACH ROW EXECUTE FUNCTION gw_trg_cat_material_fk('gully');
+
+CREATE TRIGGER gw_trg_cat_material_fk_update AFTER UPDATE OF matcat_id ON cat_gully
+FOR EACH ROW WHEN (((old.matcat_id)::TEXT IS DISTINCT FROM (new.matcat_id)::TEXT)) EXECUTE FUNCTION gw_trg_cat_material_fk('gully');
+
+CREATE TRIGGER gw_trg_cat_material_fk_insert AFTER INSERT ON arc
+FOR EACH ROW EXECUTE FUNCTION gw_trg_cat_material_fk('arc');
+CREATE TRIGGER gw_trg_cat_material_fk_update AFTER UPDATE OF matcat_id ON arc
+FOR EACH ROW WHEN (((old.matcat_id)::TEXT IS DISTINCT FROM (new.matcat_id)::TEXT)) EXECUTE FUNCTION gw_trg_cat_material_fk('arc');
+
+CREATE TRIGGER gw_trg_cat_material_fk_insert AFTER INSERT ON node
+FOR EACH ROW EXECUTE FUNCTION gw_trg_cat_material_fk('node');
+CREATE TRIGGER gw_trg_cat_material_fk_update AFTER UPDATE OF matcat_id ON node
+FOR EACH ROW WHEN (((old.matcat_id)::TEXT IS DISTINCT FROM (new.matcat_id)::TEXT)) EXECUTE FUNCTION gw_trg_cat_material_fk('node');
+
+CREATE TRIGGER gw_trg_cat_material_fk_insert AFTER INSERT ON connec
+FOR EACH ROW EXECUTE FUNCTION gw_trg_cat_material_fk('connec');
+CREATE TRIGGER gw_trg_cat_material_fk_update AFTER UPDATE OF matcat_id ON connec
+FOR EACH ROW WHEN (((old.matcat_id)::TEXT IS DISTINCT FROM (new.matcat_id)::TEXT)) EXECUTE FUNCTION gw_trg_cat_material_fk('connec');
+
+CREATE TRIGGER gw_trg_cat_material_fk_insert AFTER INSERT ON gully
+FOR EACH ROW EXECUTE FUNCTION gw_trg_cat_material_fk('gully');
+
+CREATE TRIGGER gw_trg_cat_material_fk_update AFTER UPDATE OF matcat_id ON gully
+FOR EACH ROW WHEN (((old.matcat_id)::TEXT IS DISTINCT FROM (new.matcat_id)::TEXT)) EXECUTE FUNCTION gw_trg_cat_material_fk('gully');

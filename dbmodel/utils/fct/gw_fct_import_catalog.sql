@@ -84,58 +84,68 @@ BEGIN
 		IF v_fid = 450 THEN
 			--arc
 			IF v_project_type = 'WS' THEN
-				INSERT INTO cat_mat_arc( id, descript)
-	    	SELECT DISTINCT csv3, csv3 FROM temp_csv WHERE cur_user=current_user AND fid=v_fid AND csv3 IS NOT NULL AND csv3 NOT IN (SELECT id FROM cat_mat_arc);
+				INSERT INTO cat_material (id, descript, feature_type)
+				SELECT DISTINCT (csv3, csv3), '{ARC}'::text[]
+				FROM temp_csv
+				WHERE cur_user = current_user
+				AND fid=v_fid
+				AND csv3 IS NOT NULL
+				ON CONFLICT (id) DO UPDATE SET feature_type = array_append(cat_material.feature_type, 'ARC');
 
-	    	INSERT INTO cat_brand(id)
-	    	SELECT csv10 FROM temp_csv WHERE cur_user=current_user AND fid=v_fid AND csv10 IS NOT NULL ON CONFLICT (id) DO NOTHING;
+				INSERT INTO cat_brand(id)
+				SELECT csv10 FROM temp_csv WHERE cur_user=current_user AND fid=v_fid AND csv10 IS NOT NULL ON CONFLICT (id) DO NOTHING;
 
-	    	INSERT INTO cat_brand_model(id,catbrand_id)
-	    	SELECT csv11, csv10 FROM temp_csv WHERE cur_user=current_user AND fid=v_fid AND csv11 IS NOT NULL ON CONFLICT (id) DO NOTHING;
+				INSERT INTO cat_brand_model(id,catbrand_id)
+				SELECT csv11, csv10 FROM temp_csv WHERE cur_user=current_user AND fid=v_fid AND csv11 IS NOT NULL ON CONFLICT (id) DO NOTHING;
 
-	    	INSERT INTO plan_price(id, unit, descript)
-   			SELECT csv20 ,csv19, csv20 FROM temp_csv WHERE cur_user=current_user AND fid=v_fid AND csv20 IS NOT NULL ON CONFLICT (id) DO NOTHING;
+				INSERT INTO plan_price(id, unit, descript)
+				SELECT csv20 ,csv19, csv20 FROM temp_csv WHERE cur_user=current_user AND fid=v_fid AND csv20 IS NOT NULL ON CONFLICT (id) DO NOTHING;
 
-   			INSERT INTO plan_price(id, unit, descript)
-   			SELECT csv21, 'u', csv21 FROM temp_csv WHERE cur_user=current_user AND fid=v_fid AND csv21 IS NOT NULL ON CONFLICT (id) DO NOTHING;
+				INSERT INTO plan_price(id, unit, descript)
+				SELECT csv21, 'u', csv21 FROM temp_csv WHERE cur_user=current_user AND fid=v_fid AND csv21 IS NOT NULL ON CONFLICT (id) DO NOTHING;
 
-   			INSERT INTO plan_price(id, unit, descript)
-   			SELECT csv22, 'u', csv22 FROM temp_csv WHERE cur_user=current_user AND fid=v_fid AND csv22 IS NOT NULL  ON CONFLICT (id) DO NOTHING;
+				INSERT INTO plan_price(id, unit, descript)
+				SELECT csv22, 'u', csv22 FROM temp_csv WHERE cur_user=current_user AND fid=v_fid AND csv22 IS NOT NULL  ON CONFLICT (id) DO NOTHING;
 
 				INSERT INTO cat_arc(id, arc_type, matcat_id, pnom, dnom, dint, dext, descript, link, brand_id, model_id, svg, z1, z2, width, area, estimated_depth,
-	      bulk, cost_unit, cost, m2bottom_cost, m3protec_cost, active, label, shape, acoeff, connect_cost)
+				bulk, cost_unit, cost, m2bottom_cost, m3protec_cost, active, label, shape, acoeff, connect_cost)
 				SELECT csv1, csv2, csv3, csv4, csv5, csv6::numeric, csv7::numeric, csv8, csv9, csv10, csv11, csv12, csv13::numeric, csv14::numeric, csv15::numeric, csv16::numeric, csv17::numeric,
-	      csv18::numeric, csv19, csv20, csv21, csv22, csv23::boolean, csv24, csv25, csv26::numeric, csv27
+	      		csv18::numeric, csv19, csv20, csv21, csv22, csv23::boolean, csv24, csv25, csv26::numeric, csv27
 				FROM temp_csv WHERE cur_user=current_user AND fid=v_fid ON CONFLICT (id) DO NOTHING;
 
 			ELSIF v_project_type = 'UD' THEN
 
-				INSERT INTO cat_mat_arc( id, descript)
-	    	SELECT csv2, csv2 FROM temp_csv WHERE cur_user=current_user AND fid=v_fid AND csv2 IS NOT NULL ON CONFLICT (id) DO NOTHING;
+				INSERT INTO cat_material (id, descript, feature_type)
+				SELECT DISTINCT (csv2, csv2), '{ARC}'::text[]
+				FROM temp_csv
+				WHERE cur_user = current_user
+				AND fid=v_fid
+				AND csv2 IS NOT NULL
+				ON CONFLICT (id) DO UPDATE SET feature_type = array_append(cat_material.feature_type, 'ARC');
 
-	    	INSERT INTO cat_brand(id)
-	    	SELECT csv15 FROM temp_csv WHERE cur_user=current_user AND fid=v_fid AND csv15 IS NOT NULL ON CONFLICT (id) DO NOTHING;
+				INSERT INTO cat_brand(id)
+				SELECT csv15 FROM temp_csv WHERE cur_user=current_user AND fid=v_fid AND csv15 IS NOT NULL ON CONFLICT (id) DO NOTHING;
 
-	    	INSERT INTO cat_brand_model(id,catbrand_id)
-	    	SELECT csv16, csv15 FROM temp_csv WHERE cur_user=current_user AND fid=v_fid AND csv16 IS NOT NULL ON CONFLICT (id) DO NOTHING;
+				INSERT INTO cat_brand_model(id,catbrand_id)
+				SELECT csv16, csv15 FROM temp_csv WHERE cur_user=current_user AND fid=v_fid AND csv16 IS NOT NULL ON CONFLICT (id) DO NOTHING;
 
-	    	INSERT INTO plan_price(id, unit, descript)
-   			SELECT csv25, csv24, csv25 FROM temp_csv WHERE cur_user=current_user AND fid=v_fid AND csv25 IS NOT NULL ON CONFLICT (id) DO NOTHING;
+				INSERT INTO plan_price(id, unit, descript)
+				SELECT csv25, csv24, csv25 FROM temp_csv WHERE cur_user=current_user AND fid=v_fid AND csv25 IS NOT NULL ON CONFLICT (id) DO NOTHING;
 
-   			INSERT INTO plan_price(id, unit, descript)
-   			SELECT csv26, 'u', csv26 FROM temp_csv WHERE cur_user=current_user AND fid=v_fid AND csv26 IS NOT NULL ON CONFLICT (id) DO NOTHING;
+				INSERT INTO plan_price(id, unit, descript)
+				SELECT csv26, 'u', csv26 FROM temp_csv WHERE cur_user=current_user AND fid=v_fid AND csv26 IS NOT NULL ON CONFLICT (id) DO NOTHING;
 
-   			INSERT INTO plan_price(id, unit, descript)
-   			SELECT csv27, 'u', csv27 FROM temp_csv WHERE cur_user=current_user AND fid=v_fid AND csv27 IS NOT NULL  ON CONFLICT (id) DO NOTHING;
+				INSERT INTO plan_price(id, unit, descript)
+				SELECT csv27, 'u', csv27 FROM temp_csv WHERE cur_user=current_user AND fid=v_fid AND csv27 IS NOT NULL  ON CONFLICT (id) DO NOTHING;
 
 				INSERT INTO cat_arc(id, matcat_id, shape, geom1, geom2, geom3, geom4, geom5, geom6,
-        geom7, geom8, geom_r, descript, link, brand_id, model_id, svg, z1, z2, width,
-        area, estimated_depth, bulk, cost_unit, cost, m2bottom_cost,
-        m3protec_cost, active, label, tsect_id, curve_id, arc_type, acoeff, connect_cost)
-        SELECT csv1, csv2, csv3, csv4::numeric, csv5::numeric, csv6::numeric, csv7::numeric, csv8::numeric, csv9::numeric,
-        csv10::numeric, csv11::numeric, csv12, csv13, csv14, csv15, csv16, csv17, csv18::numeric, csv19::numeric, csv20::numeric,
-	      csv21::numeric, csv22::numeric, csv23::numeric, csv24, csv25, csv26,
-	      csv27, csv28::boolean, csv29, csv30, csv31, csv32, csv33::numeric, csv34
+				geom7, geom8, geom_r, descript, link, brand_id, model_id, svg, z1, z2, width,
+				area, estimated_depth, bulk, cost_unit, cost, m2bottom_cost,
+				m3protec_cost, active, label, tsect_id, curve_id, arc_type, acoeff, connect_cost)
+				SELECT csv1, csv2, csv3, csv4::numeric, csv5::numeric, csv6::numeric, csv7::numeric, csv8::numeric, csv9::numeric,
+				csv10::numeric, csv11::numeric, csv12, csv13, csv14, csv15, csv16, csv17, csv18::numeric, csv19::numeric, csv20::numeric,
+				csv21::numeric, csv22::numeric, csv23::numeric, csv24, csv25, csv26,
+				csv27, csv28::boolean, csv29, csv30, csv31, csv32, csv33::numeric, csv34
 				FROM temp_csv WHERE cur_user=current_user AND fid=v_fid ON CONFLICT (id) DO NOTHING;
 
 			END IF;
@@ -143,50 +153,52 @@ BEGIN
 		ELSIF v_fid=448 THEN
 			--node
 			IF v_project_type = 'WS' THEN
-				INSERT INTO cat_mat_node( id, descript)
-	    	SELECT csv3, csv3 FROM temp_csv WHERE cur_user=current_user AND fid=v_fid AND csv3 IS NOT NULL ON CONFLICT (id) DO NOTHING;
+				INSERT INTO cat_material (id, descript, feature_type)
+				SELECT csv3, csv3, '{NODE}'::text[] FROM temp_csv
+				WHERE cur_user=current_user AND fid=v_fid AND csv3 IS NOT NULL ON CONFLICT (id) DO NOTHING;
 
 				INSERT INTO cat_brand(id)
-		    SELECT csv11 FROM temp_csv WHERE cur_user=current_user AND fid=v_fid AND csv11 IS NOT NULL ON CONFLICT (id) DO NOTHING;
+				SELECT csv11 FROM temp_csv WHERE cur_user=current_user AND fid=v_fid AND csv11 IS NOT NULL ON CONFLICT (id) DO NOTHING;
 
-		    INSERT INTO cat_brand_model(id, catbrand_id)
-		   	SELECT csv12, csv11 FROM temp_csv WHERE cur_user=current_user AND fid=v_fid AND csv12 IS NOT NULL ON CONFLICT (id) DO NOTHING;
+				INSERT INTO cat_brand_model(id, catbrand_id)
+				SELECT csv12, csv11 FROM temp_csv WHERE cur_user=current_user AND fid=v_fid AND csv12 IS NOT NULL ON CONFLICT (id) DO NOTHING;
 
-		   	INSERT INTO plan_price(id, unit, descript)
-   			SELECT csv16, CASE WHEN csv15 IS NULL THEN 'u' ELSE csv15 END , csv16 FROM temp_csv
-   			WHERE cur_user=current_user AND csv16 IS NOT NULL AND fid=v_fid ON CONFLICT (id) DO NOTHING;
+				INSERT INTO plan_price(id, unit, descript)
+				SELECT csv16, CASE WHEN csv15 IS NULL THEN 'u' ELSE csv15 END , csv16 FROM temp_csv
+				WHERE cur_user=current_user AND csv16 IS NOT NULL AND fid=v_fid ON CONFLICT (id) DO NOTHING;
 
 				INSERT INTO cat_node(id, node_type, matcat_id, pnom, dnom, dint, dext, shape, descript,
-        link, brand_id, model_id, svg, estimated_depth, cost_unit, cost, active,
-        label, ischange, acoeff)
+				link, brand_id, model_id, svg, estimated_depth, cost_unit, cost, active,
+				label, ischange, acoeff)
 				SELECT csv1, csv2, csv3, csv4, csv5, csv6::numeric, csv7::numeric, csv8, csv9,
 				csv10, csv11, csv12, csv13, csv14::numeric, csv15, csv16, csv17::boolean,
 				csv18, csv19::integer,csv20::numeric
-		    FROM temp_csv WHERE cur_user=current_user AND fid=v_fid ON CONFLICT (id) DO NOTHING;
+		   		FROM temp_csv WHERE cur_user=current_user AND fid=v_fid ON CONFLICT (id) DO NOTHING;
 
 
 			ELSIF v_project_type = 'UD' THEN
-				INSERT INTO cat_mat_node( id, descript)
-	    	SELECT csv2, csv2 FROM temp_csv WHERE cur_user=current_user AND fid=v_fid AND csv2 IS NOT NULL ON CONFLICT (id) DO NOTHING;
+				INSERT INTO cat_material (id, descript, feature_type)
+				SELECT csv2, csv2, '{NODE}'::text[] FROM temp_csv
+				WHERE cur_user=current_user AND fid=v_fid AND csv2 IS NOT NULL ON CONFLICT (id) DO NOTHING;
 
-	    	INSERT INTO cat_node_shape(id)
-		    SELECT csv3 FROM temp_csv WHERE cur_user=current_user AND fid=v_fid AND csv3 IS NOT NULL ON CONFLICT (id) DO NOTHING;
+				INSERT INTO cat_node_shape(id)
+				SELECT csv3 FROM temp_csv WHERE cur_user=current_user AND fid=v_fid AND csv3 IS NOT NULL ON CONFLICT (id) DO NOTHING;
 
-	    	INSERT INTO cat_brand(id)
-		    SELECT csv9 FROM temp_csv WHERE cur_user=current_user AND fid=v_fid AND csv9 IS NOT NULL ON CONFLICT (id) DO NOTHING;
+				INSERT INTO cat_brand(id)
+				SELECT csv9 FROM temp_csv WHERE cur_user=current_user AND fid=v_fid AND csv9 IS NOT NULL ON CONFLICT (id) DO NOTHING;
 
-		    INSERT INTO cat_brand_model(id, catbrand_id)
-		   	SELECT csv10, csv9 FROM temp_csv WHERE cur_user=current_user AND fid=v_fid AND csv10 IS NOT NULL  ON CONFLICT (id) DO NOTHING;
+				INSERT INTO cat_brand_model(id, catbrand_id)
+				SELECT csv10, csv9 FROM temp_csv WHERE cur_user=current_user AND fid=v_fid AND csv10 IS NOT NULL  ON CONFLICT (id) DO NOTHING;
 
-		   	INSERT INTO plan_price(id, unit, descript)
-   			SELECT csv14, CASE WHEN csv13 IS NULL THEN 'u' ELSE csv13 END , csv14 FROM temp_csv
-   			WHERE cur_user=current_user AND csv14 IS NOT NULL AND fid=v_fid ON CONFLICT (id) DO NOTHING;
+				INSERT INTO plan_price(id, unit, descript)
+				SELECT csv14, CASE WHEN csv13 IS NULL THEN 'u' ELSE csv13 END , csv14 FROM temp_csv
+				WHERE cur_user=current_user AND csv14 IS NOT NULL AND fid=v_fid ON CONFLICT (id) DO NOTHING;
 
 				INSERT INTO cat_node(id, matcat_id, shape, geom1, geom2, geom3, descript, link, brand_id,
-         model_id, svg, estimated_y, cost_unit, cost, active, label, node_type, acoeff)
-   			SELECT csv1, csv2, csv3, csv4::numeric, csv5::numeric, csv6::numeric, csv7, csv8, csv9,
-   			csv10, csv11, csv12::numeric, csv13, csv14, csv15::boolean, csv16, csv17, csv18::numeric
-   			FROM temp_csv WHERE cur_user=current_user AND fid=v_fid ON CONFLICT (id) DO NOTHING;
+				model_id, svg, estimated_y, cost_unit, cost, active, label, node_type, acoeff)
+				SELECT csv1, csv2, csv3, csv4::numeric, csv5::numeric, csv6::numeric, csv7, csv8, csv9,
+				csv10, csv11, csv12::numeric, csv13, csv14, csv15::boolean, csv16, csv17, csv18::numeric
+				FROM temp_csv WHERE cur_user=current_user AND fid=v_fid ON CONFLICT (id) DO NOTHING;
 
 			END IF;
 
@@ -196,35 +208,45 @@ BEGIN
 
 		ELSIF v_project_type = 'UD' THEN
 
-			INSERT INTO cat_mat_arc( id, descript)
-	    SELECT csv2, csv2 FROM temp_csv WHERE cur_user=current_user AND fid=v_fid AND csv2 IS NOT NULL ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_material (id, descript, feature_type)
+			SELECT DISTINCT (csv2, csv2), '{ARC}'::text[]
+			FROM temp_csv
+			WHERE cur_user = current_user
+			AND fid=v_fid
+			AND csv2 IS NOT NULL
+			ON CONFLICT (id) DO UPDATE SET feature_type = array_append(cat_material.feature_type, 'ARC');
 
-	    INSERT INTO cat_brand(id)
-	    SELECT csv11 FROM temp_csv WHERE cur_user=current_user AND fid=v_fid AND csv11 IS NOT NULL ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_brand(id)
+			SELECT csv11 FROM temp_csv WHERE cur_user=current_user AND fid=v_fid AND csv11 IS NOT NULL ON CONFLICT (id) DO NOTHING;
 
-	    INSERT INTO cat_brand_model(id, catbrand_id)
-	   	SELECT csv12, csv11 FROM temp_csv WHERE cur_user=current_user AND fid=v_fid AND csv12 IS NOT NULL ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_brand_model(id, catbrand_id)
+			SELECT csv12, csv11 FROM temp_csv WHERE cur_user=current_user AND fid=v_fid AND csv12 IS NOT NULL ON CONFLICT (id) DO NOTHING;
 
 			INSERT INTO cat_connec (id, matcat_id, shape, geom1, geom2, geom3, geom4, geom_r, descript,
-      link, brand_id, model_id, svg, active, label, connec_type)
+      		link, brand_id, model_id, svg, active, label, connec_type)
 			SELECT csv1, csv2, csv3, csv4::numeric, csv5::numeric, csv6::numeric, csv7::numeric, csv8::numeric, csv9,
 			csv10, csv11, csv12, csv13, csv14::boolean, csv15, csv16
 			FROM temp_csv WHERE cur_user=current_user AND fid=v_fid ON CONFLICT (id) DO NOTHING;
 		END IF;
 
 		ELSIF v_fid=451 THEN
-		--gully
-			INSERT INTO cat_mat_grate( id, descript)
-	    SELECT csv2, csv2 FROM temp_csv WHERE cur_user=current_user AND fid=v_fid AND csv2 IS NOT NULL ON CONFLICT (id) DO NOTHING;
+			--gully
+			INSERT INTO cat_material (id, descript, feature_type)
+			SELECT DISTINCT (csv2, csv2), '{GULLY}'::text[]
+			FROM temp_csv
+			WHERE cur_user = current_user
+			AND fid=v_fid
+			AND csv2 IS NOT NULL
+			ON CONFLICT (id) DO UPDATE SET feature_type = array_append(cat_material.feature_type, 'GULLY');
 
-	    INSERT INTO cat_brand(id)
-	    SELECT csv14 FROM temp_csv WHERE cur_user=current_user AND fid=v_fid AND csv14 IS NOT NULL ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_brand(id)
+			SELECT csv14 FROM temp_csv WHERE cur_user=current_user AND fid=v_fid AND csv14 IS NOT NULL ON CONFLICT (id) DO NOTHING;
 
-	    INSERT INTO cat_brand_model(id, catbrand_id)
-	   	SELECT csv15, csv14 FROM temp_csv WHERE cur_user=current_user AND fid=v_fid AND csv15 IS NOT NULL ON CONFLICT (id) DO NOTHING;
+			INSERT INTO cat_brand_model(id, catbrand_id)
+			SELECT csv15, csv14 FROM temp_csv WHERE cur_user=current_user AND fid=v_fid AND csv15 IS NOT NULL ON CONFLICT (id) DO NOTHING;
 
 			INSERT INTO cat_gully(id, matcat_id, length, width, total_area, effective_area, n_barr_l,
-       n_barr_w, n_barr_diag, a_param, b_param, descript, link, brand_id, model_id, svg, active, label, gully_type)
+      		n_barr_w, n_barr_diag, a_param, b_param, descript, link, brand_id, model_id, svg, active, label, gully_type)
 			SELECT csv1, csv2, csv3::numeric, csv4::numeric, csv5::numeric, csv6::numeric, csv7::numeric,
 			csv8::numeric, csv9::numeric, csv10::numeric, csv11::numeric, csv12, csv13, csv14, csv15, csv16, csv17::boolean, csv18, csv19
 			FROM temp_csv WHERE cur_user=current_user AND fid=v_fid ON CONFLICT (id) DO NOTHING;

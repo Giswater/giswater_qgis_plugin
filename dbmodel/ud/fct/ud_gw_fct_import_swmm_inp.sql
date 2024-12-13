@@ -120,8 +120,7 @@ BEGIN
 			DELETE FROM cat_feature_connec ;
 			DELETE FROM cat_feature_gully ;
 			DELETE FROM cat_feature;
-			DELETE FROM cat_mat_arc;
-			DELETE FROM cat_mat_node;
+			DELETE FROM cat_material;
 			DELETE FROM cat_arc;
 			DELETE FROM cat_node;
 			DELETE FROM cat_dwf;
@@ -304,8 +303,7 @@ BEGIN
 
 			ALTER TABLE cat_feature ENABLE TRIGGER gw_trg_cat_feature_after;
 
-			--cat_mat_node
-			INSERT INTO cat_mat_arc VALUES ('VIRTUAL', 'VIRTUAL');
+			INSERT INTO cat_material (id, descript, feature_type, featurecat_id, n, link, active) VALUES('VIRTUAL', 'VIRTUAL', '{ARC}', NULL, NULL, NULL, true);
 
 			--cat_node
 			INSERT INTO cat_node (id, node_type, active) VALUES ('JUNCTION', 'JUNCTION', TRUE);
@@ -592,8 +590,12 @@ BEGIN
 			update ext_municipality SET the_geom=v_extend_val;
 			UPDATE raingage SET the_geom=ST_Centroid(sector.the_geom) FROM sector WHERE raingage.the_geom IS NULL;
 
-			-- Create cat_mat_arc on import inp function
-			INSERT INTO cat_mat_arc	SELECT DISTINCT matcat_id, matcat_id FROM arc WHERE matcat_id IS NOT NULL;
+			-- Create cat_material ARC on import inp function
+			INSERT INTO cat_material (id, descript, feature_type) SELECT DISTINCT matcat_id, matcat_id, '{ARC}'::text[]
+			FROM arc WHERE matcat_id IS NOT NULL
+			ON CONFLICT DO NOTHING;
+
+
 
 			-- check for integer or varchar id's
 			IF v_count =v_count_total THEN
@@ -619,7 +621,7 @@ BEGIN
 			UPDATE cat_arc SET arc_type = 'CONDUIT' WHERE arc_type IS NULL;
 			UPDATE arc SET custom_length = null where custom_length::numeric(12,2) = (st_length(the_geom))::numeric(12,2);
 			UPDATE cat_hydrology SET name = 'Default';
-			UPDATE cat_mat_arc SET n=id::numeric(12,3) WHERE id !='VIRTUAL';
+			UPDATE cat_material SET n = id::numeric(12,3) WHERE 'ARC' = ANY(feature_type) AND id != 'VIRTUAL';
 			UPDATE node SET code = node_id WHERE code is null;
 			UPDATE arc SET code = arc_id WHERE code is null;
 			UPDATE cat_arc SET shape=UPPER(shape);
@@ -631,8 +633,8 @@ BEGIN
 			DELETE FROM arc WHERE state=0;
 			DELETE FROM cat_arc WHERE id NOT IN (SELECT arccat_id FROM arc);
 			DELETE FROM cat_node WHERE id NOT IN (SELECT nodecat_id FROM node);
-			DELETE FROM cat_mat_arc WHERE id NOT IN (SELECT matcat_id FROM cat_arc);
-			DELETE FROM cat_mat_node WHERE id NOT IN (SELECT matcat_id FROM cat_node);
+			DELETE FROM cat_material WHERE 'ARC' = ANY(feature_type) AND id NOT IN (SELECT matcat_id FROM cat_arc);
+			DELETE FROM cat_material WHERE 'NODE' = ANY(feature_type) AND id NOT IN (SELECT matcat_id FROM cat_node);
 			DELETE FROM cat_feature_arc WHERE id NOT IN (SELECT arc_type FROM arc);
 			DELETE FROM cat_feature_node WHERE id NOT IN (SELECT node_type FROM node);
 			DELETE FROM cat_feature WHERE id NOT IN (SELECT arc_type FROM arc) AND feature_type = 'ARC';

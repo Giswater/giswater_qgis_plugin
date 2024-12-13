@@ -6,26 +6,17 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-INSERT INTO cat_mat_arc VALUES ('N/I', 'Unknown', NULL, true);
-INSERT INTO cat_mat_arc VALUES ('PVC', 'PVC', 'c:\\users\users\catalog.pdf', true);
-INSERT INTO cat_mat_arc VALUES ('FD', 'Iron', 'c:\\users\users\catalog.pdf', true);
-INSERT INTO cat_mat_arc VALUES ('FC', 'Fiberconcret', 'c:\\users\users\catalog.pdf', true);
-INSERT INTO cat_mat_arc VALUES ('PE-HD', 'PE high density', 'c:\\users\users\catalog.pdf', true);
-INSERT INTO cat_mat_arc VALUES ('PE-LD', 'PE low density', 'c:\\users\users\catalog.pdf', true);
-
-INSERT INTO cat_mat_element VALUES ('N/I', 'Unknown', NULL, true);
-INSERT INTO cat_mat_element VALUES ('FD', 'Iron', NULL, true);
-INSERT INTO cat_mat_element VALUES ('CONCRET', 'Concret', NULL, true);
-INSERT INTO cat_mat_element VALUES ('BRICK+IRON', 'Brick and iron', NULL, true);
-INSERT INTO cat_mat_element VALUES ('PVC', 'PVC', NULL, true);
-
-INSERT INTO cat_mat_node VALUES ('N/I', 'Unknown', NULL, true);
-INSERT INTO cat_mat_node VALUES ('PVC', 'PVC', 'c:\\users\users\catalog.pdf', true);
-INSERT INTO cat_mat_node VALUES ('FD', 'Iron', 'c:\\users\users\catalog.pdf', true);
-INSERT INTO cat_mat_node VALUES ('CC', 'Concret', 'c:\\users\users\catalog.pdf', true);
-INSERT INTO cat_mat_node VALUES ('FC-FC-FC', 'Fiberconcret', 'c:\\users\users\catalog.pdf', true);
-INSERT INTO cat_mat_node VALUES ('FC', 'Fiberconcret', 'c:\\users\users\catalog.pdf', true);
-INSERT INTO cat_mat_node VALUES ('FD-FD-PVC', 'Iron-Iron-PVC', 'c:\\users\users\catalog.pdf', true);
+INSERT INTO cat_material (id, descript, feature_type, featurecat_id, link, active) VALUES('N/I', 'No information', '{NODE,ARC,CONNEC,ELEMENT}', NULL, NULL, true);
+INSERT INTO cat_material (id, descript, feature_type, featurecat_id, link, active) VALUES('Unknown', 'Unknown', '{NODE,ARC,CONNEC,ELEMENT}', NULL, NULL, true);
+INSERT INTO cat_material (id, descript, feature_type, featurecat_id, link, active) VALUES('FD', 'Iron', '{NODE,ARC,CONNEC,ELEMENT}', NULL, 'c:\\users\users\catalog.pdf', true);
+INSERT INTO cat_material (id, descript, feature_type, featurecat_id, link, active) VALUES('PVC', 'PVC', '{NODE,ARC,CONNEC,ELEMENT}', NULL, 'c:\\users\users\catalog.pdf', true);
+INSERT INTO cat_material (id, descript, feature_type, featurecat_id, link, active) VALUES('FC', 'Fiberconcret', '{NODE,ARC,CONNEC}', NULL, 'c:\\users\users\catalog.pdf', true);
+INSERT INTO cat_material (id, descript, feature_type, featurecat_id, link, active) VALUES('CONCRET', 'Concret', '{ELEMENT}', NULL, 'c:\\users\users\catalog.pdf', true);
+INSERT INTO cat_material (id, descript, feature_type, featurecat_id, link, active) VALUES('BRICK+IRON', 'Brick and iron', '{ELEMENT}', NULL, 'c:\\users\users\catalog.pdf', true);
+INSERT INTO cat_material (id, descript, feature_type, featurecat_id, link, active) VALUES('PE-HD', 'PE high density', '{ARC,CONNEC}', NULL, 'c:\\users\users\catalog.pdf', true);
+INSERT INTO cat_material (id, descript, feature_type, featurecat_id, link, active) VALUES('PE-LD', 'PE low density', '{ARC,CONNEC}', NULL, 'c:\\users\users\catalog.pdf', true);
+INSERT INTO cat_material (id, descript, feature_type, featurecat_id, link, active) VALUES('FC-FC-FC', 'Fiberconcret', '{NODE}', NULL, 'c:\\users\users\catalog.pdf', true);
+INSERT INTO cat_material (id, descript, feature_type, featurecat_id, link, active) VALUES('FD-FD-PVC', 'Iron-Iron-PVC', '{NODE}', NULL, 'c:\\users\users\catalog.pdf', true);
 
 INSERT INTO cat_arc VALUES ('PVC63-PN10', 'PIPE', 'PVC', '10', '63', 56.70000, 63.00000, 'PVC pipe', 'c:\\users\users\catalog.pdf', NULL, NULL, 'pvc63_pn10.svg', 0.10, 0.10, 0.06, 0.0031, 0.86, 3.15, 'm', 'A_PVC63_PN10', 'S_REP', 'S_NULL', true, NULL, 'CIRCULAR', NULL, 'N_WATER-CONNECT');
 INSERT INTO cat_arc VALUES ('PVC110-PN16', 'PIPE', 'PVC', '16', '110', 99.00000, 110.00000, 'PVC pipe', 'c:\\users\users\catalog.pdf', NULL, NULL, 'pvc110_pn16.svg', 0.10, 0.10, 0.11, 0.0095, 0.91, 5.50, 'm', 'A_PVC110_PN16', 'S_REP', 'S_NULL', true, NULL, 'CIRCULAR', NULL, 'N_WATER-CONNECT');

@@ -127,8 +127,7 @@ BEGIN
 			DELETE FROM cat_feature_node ;
 			DELETE FROM cat_feature_connec ;
 			DELETE FROM cat_feature;
-			DELETE FROM cat_mat_arc;
-			DELETE FROM cat_mat_node;
+			DELETE FROM cat_material;
 			DELETE FROM cat_mat_roughness;
 			DELETE FROM cat_arc;
 			DELETE FROM cat_node;
@@ -342,15 +341,19 @@ BEGIN
 
 			ALTER TABLE cat_feature ENABLE TRIGGER gw_trg_cat_feature_after;
 			--Materials
-			INSERT INTO cat_mat_arc
-			SELECT DISTINCT csv6, csv6 FROM temp_csv WHERE source='[PIPES]' AND csv6 IS NOT NULL;
-			DELETE FROM cat_mat_roughness; -- forcing delete because when new material is inserted on cat_mat_arc automaticly this table is filled
-			INSERT INTO cat_mat_node VALUES ('MAT', 'MAT') ON CONFLICT (id) DO NOTHING;
-			INSERT INTO cat_mat_arc VALUES ('MAT', 'MAT');
+			INSERT INTO cat_material (id, descript, feature_type)
+			SELECT DISTINCT (csv6, csv6), '{ARC}'::text[]
+			FROM temp_csv
+			WHERE source = '[PIPES]'
+			AND csv6 IS NOT NULL
+			ON CONFLICT (id) DO UPDATE SET feature_type = array_append(cat_material.feature_type, 'ARC');
+			DELETE FROM cat_mat_roughness; -- forcing delete because when new material is inserted on cat_material feature_type 'ARC' automatically this table is filled
+			INSERT INTO cat_material (id, descript, feature_type, featurecat_id, n, link, active) VALUES('MAT', 'MAT', '{NODE,ARC}', NULL, NULL, NULL, true) ON CONFLICT (id) DO NOTHING;
+
 
 			--Roughness
 			INSERT INTO cat_mat_roughness (matcat_id, period_id, init_age, end_age, roughness)
-			SELECT id, 'default period',  0, 999, id::float FROM cat_mat_arc WHERE id !='MAT';
+			SELECT id, 'default period',  0, 999, id::float FROM cat_material WHERE id != 'MAT';
 
 			--cat_arc
 			--pipe
@@ -715,8 +718,8 @@ BEGIN
 			-- purge catalog tables
 			DELETE FROM cat_arc WHERE id NOT IN (SELECT DISTINCT(arccat_id) FROM arc);
 			DELETE FROM cat_node WHERE id NOT IN (SELECT DISTINCT(nodecat_id) FROM node);
-			DELETE FROM cat_mat_arc WHERE id NOT IN (SELECT DISTINCT(matcat_id) FROM cat_arc);
-			DELETE FROM cat_mat_node WHERE id NOT IN (SELECT DISTINCT(matcat_id) FROM cat_node);
+			DELETE FROM cat_material WHERE 'ARC' = ANY(feature_type) AND id NOT IN (SELECT matcat_id FROM cat_arc);
+			DELETE FROM cat_material WHERE 'NODE' = ANY(feature_type) AND id NOT IN (SELECT matcat_id FROM cat_node);
 			DELETE FROM cat_feature WHERE id NOT IN (SELECT DISTINCT(arc_type) FROM cat_arc) AND feature_type = 'ARC';
 			DELETE FROM cat_feature WHERE id NOT IN (SELECT DISTINCT(node_type) FROM cat_node) AND feature_type = 'NODE';
 

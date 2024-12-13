@@ -10,7 +10,7 @@ SET client_min_messages TO WARNING;
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-SELECT plan(348);
+SELECT plan(344);
 
 SELECT has_table('anl_arc') AS "Table 'anl_arc' exists";
 SELECT has_table('anl_arc_x_node') AS "Table 'anl_arc_x_node' exists";
@@ -45,11 +45,7 @@ SELECT has_table('cat_feature_node') AS "Table 'cat_feature_node' exists";
 SELECT has_table('cat_gully') AS "Table 'cat_gully' exists";
 SELECT has_table('cat_hydrology') AS "Table 'cat_hydrology' exists";
 SELECT has_table('cat_manager') AS "Table 'cat_manager' exists";
-SELECT has_table('cat_mat_arc') AS "Table 'cat_mat_arc' exists";
-SELECT has_table('cat_mat_element') AS "Table 'cat_mat_element' exists";
-SELECT has_table('cat_mat_grate') AS "Table 'cat_mat_grate' exists";
-SELECT has_table('cat_mat_gully') AS "Table 'cat_mat_gully' exists";
-SELECT has_table('cat_mat_node') AS "Table 'cat_mat_node' exists";
+SELECT has_table('cat_material') AS "Table 'cat_material' exists";
 SELECT has_table('cat_node') AS "Table 'cat_node' exists";
 SELECT has_table('cat_node_shape') AS "Table 'cat_node_shape' exists";
 SELECT has_table('cat_owner') AS "Table 'cat_owner' exists";

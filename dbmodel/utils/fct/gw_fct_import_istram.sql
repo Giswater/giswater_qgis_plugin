@@ -131,8 +131,11 @@ BEGIN
 				INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, descript)
 				VALUES ('CONDUIT','CONDUIT','ARC', 'v_edit_arc', 'Conduit') ON CONFLICT (id) DO NOTHING;
 
-				INSERT INTO cat_mat_arc (id)
-				SELECT DISTINCT csv6 FROM temp_csv WHERE fid=409 ON CONFLICT (id) DO NOTHING;
+				INSERT INTO cat_material (id, feature_type)
+				SELECT DISTINCT (csv6), '{ARC}'::text[]
+				FROM temp_csv
+				AND fid=409
+				ON CONFLICT (id) DO UPDATE SET feature_type = array_append(cat_material.feature_type, 'ARC');
 
 				INSERT INTO cat_arc(id, shape, geom1, geom2)
 		  	SELECT DISTINCT CASE WHEN csv7='CIRCULAR' THEN concat(csv7,csv8::float)

@@ -181,9 +181,10 @@ BEGIN
 	culvert, kentry, kexit, kavg, flap, seepage, (now()::date-a.builtdate)/30
 	FROM selector_sector, v_edit_arc a
 		LEFT JOIN value_state_type ON id=state_type
-		LEFT JOIN cat_mat_arc ON matcat_id = cat_mat_arc.id
+		LEFT JOIN cat_material ON matcat_id = cat_material.id
 		LEFT JOIN inp_conduit ON a.arc_id = inp_conduit.arc_id
-		WHERE epa_type !=''UNDEFINED'' '||v_statetype||' 
+		WHERE epa_type !=''UNDEFINED'' '||v_statetype||'
+		AND ''ARC'' = ANY (cat_material.feature_type)
 		AND a.sector_id > 0
 		AND a.sector_id=selector_sector.sector_id AND selector_sector.cur_user=current_user';
 
