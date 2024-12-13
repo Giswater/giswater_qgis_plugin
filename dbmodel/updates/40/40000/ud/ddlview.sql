@@ -5673,3 +5673,262 @@ SELECT
     main.up_crit - compare.up_crit AS up_crit_diff,
     compare.the_geom
 	FROM main RIGHT JOIN compare ON main.arc_id = compare.arc_id;
+	
+--13/12/2024
+-- v_rpt_comp_outfallflow_sum 
+DROP VIEW IF EXISTS v_rpt_comp_outfallflow_sum;
+CREATE OR REPLACE VIEW v_rpt_comp_outfallflow_sum
+AS WITH main AS (
+SELECT rpt_inp_node.id,
+    rpt_outfallflow_sum.node_id,
+    rpt_outfallflow_sum.result_id,
+    rpt_inp_node.node_type,
+    rpt_inp_node.nodecat_id,
+    rpt_outfallflow_sum.flow_freq,
+    rpt_outfallflow_sum.avg_flow,
+    rpt_outfallflow_sum.max_flow,
+    rpt_outfallflow_sum.total_vol,
+    rpt_inp_node.the_geom,
+    rpt_inp_node.sector_id
+   FROM selector_rpt_main,
+    rpt_inp_node
+     JOIN rpt_outfallflow_sum ON rpt_outfallflow_sum.node_id::text = rpt_inp_node.node_id::text
+  WHERE rpt_outfallflow_sum.result_id::text = selector_rpt_main.result_id::text AND selector_rpt_main.cur_user = "current_user"()::text AND rpt_inp_node.result_id::text = selector_rpt_main.result_id::TEXT),
+
+compare AS (
+ SELECT rpt_outfallflow_sum.id,
+    rpt_outfallflow_sum.result_id,
+    rpt_outfallflow_sum.node_id,
+    rpt_inp_node.node_type,
+    rpt_inp_node.nodecat_id,
+    rpt_outfallflow_sum.flow_freq,
+    rpt_outfallflow_sum.avg_flow,
+    rpt_outfallflow_sum.max_flow,
+    rpt_outfallflow_sum.total_vol,
+    rpt_inp_node.the_geom,
+    rpt_inp_node.sector_id
+   FROM selector_rpt_compare,
+    rpt_inp_node
+     JOIN rpt_outfallflow_sum ON rpt_outfallflow_sum.node_id::text = rpt_inp_node.node_id::text
+  WHERE rpt_outfallflow_sum.result_id::text = selector_rpt_compare.result_id::text AND selector_rpt_compare.cur_user = "current_user"()::text AND rpt_inp_node.result_id::text = selector_rpt_compare.result_id::TEXT)
+ 
+ SELECT  
+  main.node_id,
+  main.sector_id,
+  main.node_type,
+  main.nodecat_id,
+  main.result_id AS result_id_main,
+  compare.result_id AS result_id_compare,
+  main.flow_freq AS flow_freq_main,
+  compare.flow_freq AS flow_freq_compare,
+  main.flow_freq - compare.flow_freq AS flow_freq_diff,
+  main.avg_flow AS avg_flow_main,
+  compare.avg_flow AS avg_flow_compare,
+  main.avg_flow - compare.avg_flow AS avg_flow_diff,
+  main.max_flow AS max_flow_main,
+  compare.max_flow AS max_flow_compare,
+  main.max_flow - compare.max_flow AS max_flow_diff,
+  main.total_vol AS total_vol_main,
+  compare.total_vol AS total_vol_compare,
+  main.total_vol - compare.total_vol AS total_vol_diff,
+  main.the_geom
+  FROM main LEFT JOIN compare ON main.node_id = compare.node_id
+ 
+  UNION
+  
+  SELECT  
+  compare.node_id,
+  compare.sector_id,
+  compare.node_type,
+  compare.nodecat_id,
+  main.result_id AS result_id_main,
+  compare.result_id AS result_id_compare,
+  main.flow_freq AS flow_freq_main,
+  compare.flow_freq AS flow_freq_compare,
+  main.flow_freq - compare.flow_freq AS flow_freq_diff,
+  main.avg_flow AS avg_flow_main,
+  compare.avg_flow AS avg_flow_compare,
+  main.avg_flow - compare.avg_flow AS avg_flow_diff,
+  main.max_flow AS max_flow_main,
+  compare.max_flow AS max_flow_compare,
+  main.max_flow - compare.max_flow AS max_flow_diff,
+  main.total_vol AS total_vol_main,
+  compare.total_vol AS total_vol_compare,
+  main.total_vol - compare.total_vol AS total_vol_diff,
+  compare.the_geom
+  FROM main RIGHT JOIN compare ON main.node_id = compare.node_id;
+ 
+ 
+-- v_rpt_comp_outfallload_sum
+DROP VIEW IF EXISTS v_rpt_comp_outfallload_sum;
+CREATE OR REPLACE VIEW v_rpt_comp_outfallload_sum
+AS WITH main AS (
+	SELECT rpt_inp_node.id,
+    rpt_outfallload_sum.node_id,
+    rpt_outfallload_sum.result_id,
+    rpt_outfallload_sum.poll_id,
+    rpt_inp_node.node_type,
+    rpt_inp_node.nodecat_id,
+    rpt_outfallload_sum.value,
+    rpt_inp_node.sector_id,
+    rpt_inp_node.the_geom
+   FROM selector_rpt_main,
+    rpt_inp_node
+     JOIN rpt_outfallload_sum ON rpt_outfallload_sum.node_id::text = rpt_inp_node.node_id::text
+  WHERE rpt_outfallload_sum.result_id::text = selector_rpt_main.result_id::text AND selector_rpt_main.cur_user = "current_user"()::text AND rpt_inp_node.result_id::text = selector_rpt_main.result_id::text),
+
+  compare AS ( 
+	 SELECT rpt_outfallload_sum.id,
+	    rpt_outfallload_sum.result_id,
+	    rpt_outfallload_sum.poll_id,
+	    rpt_outfallload_sum.node_id,
+	    rpt_inp_node.node_type,
+	    rpt_inp_node.nodecat_id,
+	    rpt_outfallload_sum.value,
+	    rpt_inp_node.sector_id,
+	    rpt_inp_node.the_geom
+	   FROM selector_rpt_compare,
+	    rpt_inp_node
+	     JOIN rpt_outfallload_sum ON rpt_outfallload_sum.node_id::text = rpt_inp_node.node_id::text
+	  WHERE rpt_outfallload_sum.result_id::text = selector_rpt_compare.result_id::text AND selector_rpt_compare.cur_user = "current_user"()::text AND rpt_inp_node.result_id::text = selector_rpt_compare.result_id::TEXT)
+
+SELECT  
+  main.node_id,
+  main.poll_id,
+  main.sector_id,
+  main.node_type,
+  main.nodecat_id,
+  main.result_id AS result_id_main,
+  compare.result_id AS result_id_compare,
+  main.value AS value_main,
+  compare.value AS value_compare,
+  main.value - compare.value AS value_diff,
+  main.the_geom
+  FROM main LEFT JOIN compare ON main.node_id = compare.node_id AND main.poll_id = compare.poll_id
+
+UNION
+
+SELECT  
+  compare.node_id,
+  compare.poll_id,
+  compare.sector_id,
+  compare.node_type,
+  compare.nodecat_id,
+  main.result_id AS result_id_main,
+  compare.result_id AS result_id_compare,
+  main.value AS value_main,
+  compare.value AS value_compare,
+  main.value - compare.value AS value_diff,
+  compare.the_geom
+FROM main RIGHT JOIN compare ON main.node_id = compare.node_id AND main.poll_id = compare.poll_id;
+
+---- v_rpt_comp_storagevol_sum
+DROP VIEW IF EXISTS v_rpt_comp_storagevol_sum;
+CREATE OR REPLACE VIEW v_rpt_comp_storagevol_sum
+AS WITH main AS (
+SELECT rpt_storagevol_sum.id,
+    rpt_storagevol_sum.result_id,
+    rpt_storagevol_sum.node_id,
+    rpt_inp_node.node_type,
+    rpt_inp_node.nodecat_id,
+    rpt_storagevol_sum.aver_vol,
+    rpt_storagevol_sum.avg_full,
+    rpt_storagevol_sum.ei_loss,
+    rpt_storagevol_sum.max_vol,
+    rpt_storagevol_sum.max_full,
+    rpt_storagevol_sum.time_days,
+    rpt_storagevol_sum.time_hour,
+    rpt_storagevol_sum.max_out,
+    rpt_inp_node.sector_id,
+    rpt_inp_node.the_geom
+   FROM selector_rpt_main,
+    rpt_inp_node
+     JOIN rpt_storagevol_sum ON rpt_storagevol_sum.node_id::text = rpt_inp_node.node_id::text
+  WHERE rpt_storagevol_sum.result_id::text = selector_rpt_main.result_id::text AND selector_rpt_main.cur_user = "current_user"()::text AND rpt_inp_node.result_id::text = selector_rpt_main.result_id::TEXT),
+  
+compare AS (
+SELECT rpt_storagevol_sum.id,
+    rpt_storagevol_sum.result_id,
+    rpt_storagevol_sum.node_id,
+    node.node_type,
+    node.nodecat_id,
+    rpt_storagevol_sum.aver_vol,
+    rpt_storagevol_sum.avg_full,
+    rpt_storagevol_sum.ei_loss,
+    rpt_storagevol_sum.max_vol,
+    rpt_storagevol_sum.max_full,
+    rpt_storagevol_sum.time_days,
+    rpt_storagevol_sum.time_hour,
+    rpt_storagevol_sum.max_out,
+    node.sector_id,
+    node.the_geom
+   FROM selector_rpt_compare,
+    rpt_inp_node node
+     JOIN rpt_storagevol_sum ON rpt_storagevol_sum.node_id::text = node.node_id::text
+  WHERE rpt_storagevol_sum.result_id::text = selector_rpt_compare.result_id::text AND selector_rpt_compare.cur_user = "current_user"()::text AND node.result_id::text = selector_rpt_compare.result_id::TEXT)
+  
+ SELECT  
+  main.node_id,
+  main.sector_id,
+  main.node_type,
+  main.nodecat_id,
+  main.result_id AS result_id_main,
+  compare.result_id AS result_id_compare,
+  main.aver_vol AS aver_vol_main,
+  compare.aver_vol AS aver_vol_compare,
+  main.aver_vol - compare.aver_vol AS aver_vol_diff,
+  main.avg_full AS avg_full_main,
+  compare.avg_full AS avg_full_compare,
+  main.avg_full - compare.avg_full AS avg_full_diff,
+  main.ei_loss AS ei_loss_main,
+  compare.ei_loss AS ei_loss_compare,
+  main.ei_loss - compare.ei_loss AS ei_loss_diff,
+  main.max_vol AS max_vol_main,
+  compare.max_vol AS max_vol_compare,
+  main.max_vol - compare.max_vol AS max_vol_diff,
+  main.max_full AS max_full_main,
+  compare.max_full AS max_full_compare,
+  main.max_full - compare.max_full AS max_full_diff,
+  main.time_days AS time_days_main,
+  compare.time_days AS time_days_compare,
+  main.time_hour AS time_hour_main,
+  compare.time_hour AS time_hour_compare,
+  main.max_out AS max_out_main,
+  compare.max_out AS max_out_compare,
+  main.max_out - compare.max_out AS max_out_diff,
+  main.the_geom
+FROM main LEFT JOIN compare ON main.node_id = compare.node_id
+
+UNION
+
+SELECT  
+  compare.node_id,
+  compare.sector_id,
+  compare.node_type,
+  compare.nodecat_id,
+  main.result_id AS result_id_main,
+  compare.result_id AS result_id_compare,
+  main.aver_vol AS aver_vol_main,
+  compare.aver_vol AS aver_vol_compare,
+  main.aver_vol - compare.aver_vol AS aver_vol_diff,
+  main.avg_full AS avg_full_main,
+  compare.avg_full AS avg_full_compare,
+  main.avg_full - compare.avg_full AS avg_full_diff,
+  main.ei_loss AS ei_loss_main,
+  compare.ei_loss AS ei_loss_compare,
+  main.ei_loss - compare.ei_loss AS ei_loss_diff,
+  main.max_vol AS max_vol_main,
+  compare.max_vol AS max_vol_compare,
+  main.max_vol - compare.max_vol AS max_vol_diff,
+  main.max_full AS max_full_main,
+  compare.max_full AS max_full_compare,
+  main.max_full - compare.max_full AS max_full_diff,
+  main.time_days AS time_days_main,
+  compare.time_days AS time_days_compare,
+  main.time_hour AS time_hour_main,
+  compare.time_hour AS time_hour_compare,
+  main.max_out AS max_out_main,
+  compare.max_out AS max_out_compare,
+  main.max_out - compare.max_out AS max_out_diff,
+  compare.the_geom
+FROM main RIGHT JOIN compare ON main.node_id = compare.node_id;
