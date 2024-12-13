@@ -892,8 +892,6 @@ class GwAdminButton:
             tools_qgis.show_warning("GIS folder not set")
             return
 
-        qgis_file_type = self.dlg_create_gis_project.cmb_roletype.currentIndex()
-        tools_gw.set_config_parser('btn_admin', 'qgis_file_type', qgis_file_type, prefix=False)
         tools_gw.set_config_parser('btn_admin', 'qgis_file_path', gis_folder, prefix=False)
         qgis_file_export = self.dlg_create_gis_project.chk_export_passwd.isChecked()
         tools_gw.set_config_parser('btn_admin', 'qgis_file_export', qgis_file_export, prefix=False)
@@ -907,7 +905,7 @@ class GwAdminButton:
         schema_name = tools_qt.get_text(self.dlg_readsql, 'project_schema_name')
 
         # Get roletype and export password
-        roletype = tools_qt.get_text(self.dlg_create_gis_project, 'cmb_roletype')
+        roletype = tools_qt.get_text(self.dlg_create_gis_project, 'txt_roletype')
         export_passwd = tools_qt.is_checked(self.dlg_create_gis_project, 'chk_export_passwd')
 
         if export_passwd and not self.is_service:
@@ -958,15 +956,6 @@ class GwAdminButton:
         self.dlg_create_gis_project = GwAdminGisProjectUi(self)
         tools_gw.load_settings(self.dlg_create_gis_project)
 
-        # Set default values
-        qgis_file_type = tools_gw.get_config_parser('btn_admin', 'qgis_file_type', "user", "session", prefix=False,
-                                                    force_reload=True)
-        if qgis_file_type is not None:
-            try:
-                qgis_file_type = int(qgis_file_type)
-                self.dlg_create_gis_project.cmb_roletype.setCurrentIndex(qgis_file_type)
-            except Exception:
-                pass
         schema_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
         tools_qt.set_widget_text(self.dlg_create_gis_project, 'txt_gis_file', schema_name)
         qgis_file_path = tools_gw.get_config_parser('btn_admin', 'qgis_file_path', "user", "session", prefix=False,
@@ -2152,19 +2141,19 @@ class GwAdminButton:
 
         window_title = ""
         if action == 'create':
-            if is_multi_addfield: 
+            if is_multi_addfield:
                 window_title = f'Create multi field'
             else:
                 window_title = 'Create field on "' + str(form_name_fields) + '"'
             self._manage_create_field(form_name_fields, is_multi_addfield)
         elif action == 'update':
-            if is_multi_addfield: 
+            if is_multi_addfield:
                 window_title = f'Update multi field'
             else:
                 window_title = 'Update field on "' + str(form_name_fields) + '"'
             self._manage_update_field(self.dlg_manage_fields, form_name_fields, is_multi_addfield, tableview='ve_config_addfields')
         elif action == 'delete':
-            if is_multi_addfield: 
+            if is_multi_addfield:
                 window_title = f'Delete multi field'
             else:
                 window_title = 'Delete field on "' + str(form_name_fields) + '"'
@@ -2214,7 +2203,7 @@ class GwAdminButton:
                 tools_qt.remove_tab(self.dlg_manage_fields.tab_add_fields,
                                                self.dlg_manage_fields.tab_add_fields.widget(x).objectName())
 
-        if is_multi_addfield: 
+        if is_multi_addfield:
                 window_title = f'Update multi field'
         else:
             window_title = 'Update field on "' + str(form_name_fields) + '"'
@@ -2242,11 +2231,11 @@ class GwAdminButton:
         """"""
 
         schema_name = tools_qt.get_text(self.dlg_readsql, 'project_schema_name')
-        
+
         # Alter visibility on widget that is only for multicreate action
         self.dlg_manage_fields.lbl_multifeaturetype.setVisible(is_multi_addfield)
         self.dlg_manage_fields.featuretype.setVisible(is_multi_addfield)
-        
+
         if is_multi_addfield:
              # Populate featuretype combo
             rows = [['ALL', 'ALL'], ['NODE', 'NODE'], ['ARC', 'ARC'], ['CONNEC', 'CONNEC']]
@@ -2295,7 +2284,7 @@ class GwAdminButton:
         qtable.setSelectionBehavior(QAbstractItemView.SelectRows)
         if is_multi_addfield:
             expr_filter = f"cat_feature_id IS NULL"
-        else: 
+        else:
             expr_filter = f"cat_feature_id = '{form_name}'"
 
         self._fill_table(qtable, tableview, self.model_update_table, expr_filter)
@@ -2354,9 +2343,9 @@ class GwAdminButton:
         sql = (f"SELECT param_name FROM {schema_name}.sys_addfields "
                f"WHERE param_name = '{param_name}' AND cat_feature_id = '{form_name}' ")
         row = tools_db.get_row(sql)
-        
+
         # Check feature type selected for multi addfields actions
-        if is_multi:  
+        if is_multi:
             feature_type = tools_qt.get_selected_item(self.dlg_manage_fields, self.dlg_manage_fields.featuretype)
 
         if action == 'create':
@@ -2366,7 +2355,7 @@ class GwAdminButton:
             label = tools_qt.get_text(self.dlg_manage_fields, self.dlg_manage_fields.label)
             widget_type = tools_qt.get_text(self.dlg_manage_fields, self.dlg_manage_fields.widgettype)
             dv_query_text = tools_qt.get_text(self.dlg_manage_fields, self.dlg_manage_fields.dv_querytext)
-            
+
             if column_name == 'null' or label == 'null':
                 msg = "Column name and Label fields are mandatory. Please set correct value."
                 tools_qt.show_info_box(msg, "Info")
@@ -2409,7 +2398,7 @@ class GwAdminButton:
             # Create body
             if is_multi:
                 feature = '"featureType":"' + feature_type + '"'
-            else: 
+            else:
                 feature = '"catFeature":"' + form_name + '"'
             extras = '"action":"CREATE", "parameters":' + result_json + ''
             body = tools_gw.create_body(feature=feature, extras=extras)
@@ -2458,7 +2447,7 @@ class GwAdminButton:
             # Create body
             if is_multi:
                 feature = '"featureType":"' + feature_type + '"'
-            else: 
+            else:
                 feature = '"catFeature":"' + form_name + '"'
             extras = '"action":"UPDATE", "parameters":' + result_json + ''
             body = tools_gw.create_body(feature=feature, extras=extras)
@@ -2473,15 +2462,15 @@ class GwAdminButton:
         elif action == 'delete':
 
             field_value = tools_qt.get_text(self.dlg_manage_fields, self.dlg_manage_fields.cmb_fields)
-            
+
             sql = (f"SELECT feature_type FROM {schema_name}.sys_addfields "
                 f"WHERE param_name = '{field_value}'")
             feature_type = tools_db.get_row(sql)[0]
-            
+
             # Create body
             if is_multi:
                 feature = '"featureType":"' + feature_type + '"'
-            else: 
+            else:
                 feature = '"catFeature":"' + form_name + '"'
             extras = '"action":"DELETE", "parameters":{"columnname":"' + field_value + '"}'
             body = tools_gw.create_body(feature=feature, extras=extras)
@@ -2489,7 +2478,7 @@ class GwAdminButton:
             # Execute manage add fields function
             json_result = tools_gw.execute_procedure('gw_fct_admin_manage_addfields', body, schema_name)
             self._manage_json_message(json_result, parameter="Delete function")
-        
+
         # set admin_config_control_trigger with prev user value
         sql = (f"UPDATE {schema_name}.config_param_system "
                f"SET value = '{config_trg_user_value}'"
