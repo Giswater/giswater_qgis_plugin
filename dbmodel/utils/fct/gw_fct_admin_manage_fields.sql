@@ -13,6 +13,7 @@ $BODY$
 
 /*
 SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"addvalue", "dataType":"varchar(16)", "isUtils":"True"}}$$)
+SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"active", "dataType":"bool", "defaultValue":"true"}}$$)
 SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"arc", "column":"addvalue", "newName":"_addvalue_"}}$$)
 SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"arc", "column":"addvalue"}}$$)
 SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"arc", "column":"addvalue", "dataType":"varchar(16)}}$$)
@@ -21,21 +22,22 @@ SELECT SCHEMA_NAME.gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","
 
 DECLARE
 
-v_schemaname varchar = 'SCHEMA_NAME';
-v_target_schemaname varchar;
-v_table text;
-v_target_table text;
-v_action text;
+	v_schemaname varchar = 'SCHEMA_NAME';
+	v_target_schemaname varchar;
+	v_table text;
+	v_target_table text;
+	v_action text;
 
-v_column text;
-v_datatype text;
-v_isutils boolean;
-v_newname text;
-v_querytext text;
-v_layers record;
-v_max_layoutorder numeric;
-v_widgettype text;
-v_count integer;
+	v_column text;
+	v_datatype text;
+	v_defaultvalue text;
+	v_isutils boolean;
+	v_newname text;
+	v_querytext text;
+	v_layers record;
+	v_max_layoutorder numeric;
+	v_widgettype text;
+	v_count integer;
 
 
 BEGIN
@@ -47,6 +49,7 @@ BEGIN
 	v_table = (p_data->>'data')::json->>'table';
 	v_column = (p_data->>'data')::json->>'column';
 	v_datatype = (p_data->>'data')::json->>'dataType';
+	v_defaultvalue = (p_data->>'data')::json->>'defaultValue';
 	v_isutils = (p_data->>'data')::json->>'isUtils';
 	v_newname = (p_data->>'data')::json->>'newName';
 
@@ -70,7 +73,8 @@ BEGIN
 		AND column_name = v_column
 	) THEN
 		v_querytext := 'ALTER TABLE ' || quote_ident(v_target_schemaname) || '.' || quote_ident(v_target_table)
-					|| ' ADD COLUMN ' || quote_ident(v_column) || ' ' || v_datatype;
+					 || ' ADD COLUMN ' || quote_ident(v_column) || ' ' || v_datatype
+					 || CASE WHEN v_defaultvalue IS NOT NULL THEN ' DEFAULT ' || quote_literal(v_defaultvalue) ELSE '' END;
 		EXECUTE v_querytext;
 
 		-- manage config_form_fields only if column has been added to parent tables
