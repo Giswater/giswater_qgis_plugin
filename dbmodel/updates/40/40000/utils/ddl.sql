@@ -209,7 +209,7 @@ ALTER TABLE element ADD COLUMN asset_id varchar(50);
 -- 12/12/2024
 CREATE TABLE cat_material (
     id varchar(30) NOT NULL,
-    descript varchar(512) NULL,
+    descript varchar(512) NOT NULL,
     feature_type _text NULL,
     featurecat_id _text NULL,
     n numeric(12, 4) NULL,
