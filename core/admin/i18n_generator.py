@@ -610,8 +610,6 @@ class GwI18NGenerator:
             # Get values
             table = row['context'] if row['context'] is not None else ""
             form_name = row['formname'] if row['formname'] is not None else ""
-            form_name_lan = row[f'formname_{self.lower_lang}'] if row[f'formname_{self.lower_lang}'] is not None else ""
-            formname = form_name_lan if form_name_lan is not None else form_name
             form_type = row['formtype'] if row['formtype'] is not None else ""
             source = row['source'] if row['source'] is not None else ""
             lbl_value = row[f'lb_{self.lower_lang}'] if row[f'lb_{self.lower_lang}'] is not None else row['lb_en_us']
