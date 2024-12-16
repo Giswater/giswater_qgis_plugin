@@ -222,3 +222,36 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_cat_material_fk('gully');
 
 CREATE TRIGGER gw_trg_cat_material_fk_update AFTER UPDATE OF matcat_id ON gully
 FOR EACH ROW WHEN (((old.matcat_id)::TEXT IS DISTINCT FROM (new.matcat_id)::TEXT)) EXECUTE FUNCTION gw_trg_cat_material_fk('gully');
+
+CREATE TRIGGER gw_trg_vi_xsections INSTEAD OF INSERT OR DELETE OR UPDATE ON vi_options
+FOR EACH ROW EXECUTE FUNCTION gw_trg_vi('vi_options');
+
+CREATE TRIGGER gw_trg_vi_xsections INSTEAD OF INSERT OR DELETE OR UPDATE ON vi_report
+FOR EACH ROW EXECUTE FUNCTION gw_trg_vi('vi_report');
+
+CREATE TRIGGER gw_trg_vi_timeseries INSTEAD OF INSERT OR DELETE OR UPDATE ON vi_timeseries
+FOR EACH ROW EXECUTE FUNCTION gw_trg_vi('vi_timeseries');
+
+CREATE TRIGGER gw_trg_edit_inp_coverage INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_coverage
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_coverage();
+
+CREATE TRIGGER gw_trg_vi_dwf INSTEAD OF INSERT OR DELETE OR UPDATE ON vi_dwf
+FOR EACH ROW EXECUTE FUNCTION gw_trg_vi('vi_dwf');
+
+CREATE TRIGGER gw_trg_edit_inp_subcatchment INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_subcatchment
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_subcatchment('subcatchment');
+
+CREATE TRIGGER gw_trg_vi_gwf INSTEAD OF INSERT OR DELETE OR UPDATE ON vi_gwf
+FOR EACH ROW EXECUTE FUNCTION gw_trg_vi('vi_gwf');
+
+CREATE TRIGGER gw_trg_vi_lid_usage INSTEAD OF INSERT OR DELETE OR UPDATE ON vi_lid_usage
+FOR EACH ROW EXECUTE FUNCTION gw_trg_vi('vi_lid_usage');
+
+CREATE TRIGGER gw_trg_vi_subareas INSTEAD OF INSERT OR DELETE OR UPDATE ON vi_subareas
+FOR EACH ROW EXECUTE FUNCTION gw_trg_vi('vi_subareas');
+
+CREATE TRIGGER gw_trg_edit_inp_subc2outlet INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_subc2outlet
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_subc2outlet();
+
+CREATE TRIGGER gw_trg_vi_loadings INSTEAD OF INSERT OR DELETE OR UPDATE ON vi_loadings
+FOR EACH ROW EXECUTE FUNCTION gw_trg_vi('vi_loadings');

@@ -7,31 +7,6 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
-CREATE OR REPLACE VIEW v_state_arc AS
-WITH
-p AS (SELECT arc_id, psector_id, state FROM plan_psector_x_arc WHERE active),
-cf AS (SELECT value::boolean FROM config_param_user WHERE parameter = 'utils_psector_strategy' AND cur_user = current_user),
-s AS (SELECT * FROM selector_psector WHERE cur_user = current_user),
-a as (SELECT arc_id, state FROM arc)
-SELECT arc.arc_id FROM selector_state,arc WHERE arc.state = selector_state.state_id AND selector_state.cur_user = "current_user"()::text
-	EXCEPT ALL
-SELECT p.arc_id FROM s, p WHERE p.psector_id = s.psector_id AND p.state = 0
-	UNION ALL
-SELECT DISTINCT p.arc_id FROM s, p WHERE p.psector_id = s.psector_id AND p.state = 1;
-
-
-CREATE OR REPLACE VIEW v_state_node AS
-WITH
-p AS (SELECT node_id, psector_id, state FROM plan_psector_x_node WHERE active),
-cf AS (SELECT value::boolean FROM config_param_user WHERE parameter = 'utils_psector_strategy' AND cur_user = current_user),
-s AS (SELECT * FROM selector_psector WHERE cur_user = current_user),
-n AS (SELECT node_id, state FROM node)
-SELECT n.node_id FROM selector_state,n WHERE n.state = selector_state.state_id AND selector_state.cur_user = "current_user"()::text
-	EXCEPT ALL
-SELECT p.node_id FROM s, p, cf WHERE p.psector_id = s.psector_id AND p.state = 0 AND cf.value is TRUE
-	UNION ALL
-SELECT DISTINCT p.node_id FROM s, p, cf WHERE p.psector_id = s.psector_id AND p.state = 1 AND cf.value is TRUE;
-
 -- delete all views to avoid conflicts, then recreate them
 DROP VIEW IF EXISTS v_plan_psector_budget_detail;
 DROP VIEW IF EXISTS v_plan_psector_budget_arc;
@@ -214,6 +189,8 @@ DROP VIEW IF EXISTS v_edit_plan_netscenario_presszone;
 DROP VIEW IF EXISTS v_edit_dqa;
 DROP VIEW IF EXISTS vu_dqa;
 
+DROP VIEW IF EXISTS v_state_arc;
+DROP VIEW IF EXISTS v_state_node;
 DROP VIEW IF EXISTS v_state_link;
 DROP VIEW IF EXISTS v_state_connec;
 
@@ -228,6 +205,38 @@ DROP VIEW IF EXISTS v_ui_dqa;
 DROP VIEW IF EXISTS v_ui_sector;
 DROP VIEW IF EXISTS v_edit_sector;
 DROP VIEW IF EXISTS vu_sector;
+
+DROP VIEW IF EXISTS v_anl_arc;
+DROP VIEW IF EXISTS v_anl_arc_point;
+DROP VIEW IF EXISTS v_anl_arc_x_node;
+DROP VIEW IF EXISTS v_anl_arc_x_node_point;
+DROP VIEW IF EXISTS v_anl_node;
+DROP VIEW IF EXISTS v_edit_anl_hydrant;
+DROP VIEW IF EXISTS v_anl_connec;
+DROP VIEW IF EXISTS vi_options;
+DROP VIEW IF EXISTS vi_report;
+DROP VIEW IF EXISTS vi_times;
+DROP VIEW IF EXISTS vi_timeseries;
+DROP VIEW IF EXISTS vi_reactions;
+DROP VIEW IF EXISTS vi_energy;
+DROP VIEW IF EXISTS vcp_pipes;
+DROP VIEW IF EXISTS vcp_demands;
+
+DROP VIEW IF EXISTS v_edit_inp_coverage;
+DROP VIEW IF EXISTS vi_dwf;
+DROP VIEW IF EXISTS v_edit_inp_dscenario_lid_usage; -- renamed to v_edit_inp_dscenario_lids
+DROP VIEW IF EXISTS vi_gwf;
+DROP VIEW IF EXISTS vi_infiltration;
+DROP VIEW IF EXISTS vi_lid_usage;
+DROP VIEW IF EXISTS vi_subareas;
+DROP VIEW IF EXISTS vi_subcatchcentroid;
+DROP VIEW IF EXISTS vi_subcatchments;
+DROP VIEW IF EXISTS v_edit_inp_subc2outlet;
+DROP VIEW IF EXISTS vi_loadings;
+DROP VIEW IF EXISTS v_edit_inp_subcatchment;
+DROP VIEW IF EXISTS v_ui_drainzone;
+DROP VIEW IF EXISTS vu_drainzone;
+
 
 -- 30/10/2024
 

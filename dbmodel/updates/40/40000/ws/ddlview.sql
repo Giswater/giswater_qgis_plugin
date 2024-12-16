@@ -7,6 +7,31 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
+CREATE OR REPLACE VIEW v_state_arc AS
+WITH
+p AS (SELECT arc_id, psector_id, state FROM plan_psector_x_arc WHERE active),
+cf AS (SELECT value::boolean FROM config_param_user WHERE parameter = 'utils_psector_strategy' AND cur_user = current_user),
+s AS (SELECT * FROM selector_psector WHERE cur_user = current_user),
+a as (SELECT arc_id, state FROM arc)
+SELECT arc.arc_id FROM selector_state,arc WHERE arc.state = selector_state.state_id AND selector_state.cur_user = "current_user"()::text
+	EXCEPT ALL
+SELECT p.arc_id FROM s, p WHERE p.psector_id = s.psector_id AND p.state = 0
+	UNION ALL
+SELECT DISTINCT p.arc_id FROM s, p WHERE p.psector_id = s.psector_id AND p.state = 1;
+
+
+CREATE OR REPLACE VIEW v_state_node AS
+WITH
+p AS (SELECT node_id, psector_id, state FROM plan_psector_x_node WHERE active),
+cf AS (SELECT value::boolean FROM config_param_user WHERE parameter = 'utils_psector_strategy' AND cur_user = current_user),
+s AS (SELECT * FROM selector_psector WHERE cur_user = current_user),
+n AS (SELECT node_id, state FROM node)
+SELECT n.node_id FROM selector_state,n WHERE n.state = selector_state.state_id AND selector_state.cur_user = "current_user"()::text
+	EXCEPT ALL
+SELECT p.node_id FROM s, p, cf WHERE p.psector_id = s.psector_id AND p.state = 0 AND cf.value is TRUE
+	UNION ALL
+SELECT DISTINCT p.node_id FROM s, p, cf WHERE p.psector_id = s.psector_id AND p.state = 1 AND cf.value is TRUE;
+
 CREATE OR REPLACE VIEW v_state_link AS
 WITH
 p AS (SELECT connec_id, psector_id, state, link_id FROM plan_psector_x_connec WHERE active),
@@ -5450,3 +5475,298 @@ AS SELECT DISTINCT p.pattern_id,
     inp_pattern p
   WHERE p.expl_id = s.expl_id AND s.cur_user = "current_user"()::text OR p.expl_id IS NULL
   ORDER BY p.pattern_id;
+
+CREATE OR REPLACE VIEW v_anl_arc
+AS SELECT anl_arc.id,
+    anl_arc.arc_id,
+    anl_arc.arccat_id AS arc_type,
+    anl_arc.state,
+    anl_arc.arc_id_aux,
+    anl_arc.fid AS fprocesscat_id,
+    exploitation.name AS expl_name,
+    anl_arc.the_geom,
+    anl_arc.result_id,
+    anl_arc.descript
+   FROM selector_audit,
+    anl_arc
+     JOIN exploitation ON anl_arc.expl_id = exploitation.expl_id
+  WHERE anl_arc.fid = selector_audit.fid AND selector_audit.cur_user = "current_user"()::text AND anl_arc.cur_user::name = "current_user"();
+
+CREATE OR REPLACE VIEW v_anl_arc_point
+AS SELECT anl_arc.id,
+    anl_arc.arc_id,
+    anl_arc.arccat_id AS arc_type,
+    anl_arc.state,
+    anl_arc.arc_id_aux,
+    anl_arc.fid AS fprocesscat_id,
+    exploitation.name AS expl_name,
+    anl_arc.the_geom_p
+   FROM selector_audit,
+    anl_arc
+     JOIN sys_fprocess ON anl_arc.fid = sys_fprocess.fid
+     JOIN exploitation ON anl_arc.expl_id = exploitation.expl_id
+  WHERE anl_arc.fid = selector_audit.fid AND selector_audit.cur_user = "current_user"()::text AND anl_arc.cur_user::name = "current_user"();
+
+CREATE OR REPLACE VIEW v_anl_arc_x_node
+AS SELECT anl_arc_x_node.id,
+    anl_arc_x_node.arc_id,
+    anl_arc_x_node.arccat_id AS arc_type,
+    anl_arc_x_node.state,
+    anl_arc_x_node.node_id,
+    anl_arc_x_node.fid AS fprocesscat_id,
+    exploitation.name AS expl_name,
+    anl_arc_x_node.the_geom
+   FROM selector_audit,
+    anl_arc_x_node
+     JOIN exploitation ON anl_arc_x_node.expl_id = exploitation.expl_id
+  WHERE anl_arc_x_node.fid = selector_audit.fid AND selector_audit.cur_user = "current_user"()::text AND anl_arc_x_node.cur_user::name = "current_user"();
+
+CREATE OR REPLACE VIEW v_anl_arc_x_node_point
+AS SELECT anl_arc_x_node.id,
+    anl_arc_x_node.arc_id,
+    anl_arc_x_node.arccat_id AS arc_type,
+    anl_arc_x_node.node_id,
+    anl_arc_x_node.fid AS fprocesscat_id,
+    exploitation.name AS expl_name,
+    anl_arc_x_node.the_geom_p
+   FROM selector_audit,
+    anl_arc_x_node
+     JOIN exploitation ON anl_arc_x_node.expl_id = exploitation.expl_id
+  WHERE anl_arc_x_node.fid = selector_audit.fid AND selector_audit.cur_user = "current_user"()::text AND anl_arc_x_node.cur_user::name = "current_user"();
+
+CREATE OR REPLACE VIEW v_anl_connec
+AS SELECT anl_connec.id,
+    anl_connec.connec_id,
+    anl_connec.conneccat_id AS connecat_id,
+    anl_connec.state,
+    anl_connec.connec_id_aux,
+    anl_connec.connecat_id_aux AS state_aux,
+    anl_connec.fid AS fprocesscat_id,
+    exploitation.name AS expl_name,
+    anl_connec.the_geom,
+    anl_connec.result_id,
+    anl_connec.descript
+   FROM selector_audit,
+    anl_connec
+     JOIN exploitation ON anl_connec.expl_id = exploitation.expl_id
+  WHERE anl_connec.fid = selector_audit.fid AND selector_audit.cur_user = "current_user"()::text AND anl_connec.cur_user::name = "current_user"();
+
+CREATE OR REPLACE VIEW v_anl_node
+AS SELECT anl_node.id,
+    anl_node.node_id,
+    anl_node.nodecat_id,
+    anl_node.state,
+    anl_node.node_id_aux,
+    anl_node.nodecat_id_aux AS state_aux,
+    anl_node.num_arcs,
+    anl_node.fid AS fprocesscat_id,
+    exploitation.name AS expl_name,
+    anl_node.the_geom,
+    anl_node.result_id,
+    anl_node.descript
+   FROM selector_audit,
+    anl_node
+     JOIN exploitation ON anl_node.expl_id = exploitation.expl_id
+  WHERE anl_node.fid = selector_audit.fid AND selector_audit.cur_user = "current_user"()::text AND anl_node.cur_user::name = "current_user"();
+
+CREATE OR REPLACE VIEW v_edit_anl_hydrant
+AS SELECT anl_node.node_id,
+    anl_node.nodecat_id,
+    anl_node.expl_id,
+    anl_node.the_geom
+   FROM anl_node
+  WHERE anl_node.fid = 468 AND anl_node.cur_user::name = "current_user"();
+
+CREATE OR REPLACE VIEW vi_options
+AS SELECT a.parameter,
+    a.value
+   FROM ( SELECT a_1.parameter,
+            a_1.value,
+                CASE
+                    WHEN a_1.parameter = 'UNITS'::text THEN 1
+                    ELSE 2
+                END AS t
+           FROM ( SELECT a_1_1.idval AS parameter,
+                        CASE
+                            WHEN a_1_1.idval = 'UNBALANCED'::text AND b.value = 'CONTINUE'::text THEN concat(b.value, ' ', ( SELECT config_param_user.value
+                               FROM config_param_user
+                              WHERE config_param_user.parameter::text = 'inp_options_unbalanced_n'::text AND config_param_user.cur_user::name = "current_user"()))
+                            WHEN a_1_1.idval = 'QUALITY'::text AND b.value = 'TRACE'::text THEN concat(b.value, ' ', ( SELECT config_param_user.value
+                               FROM config_param_user
+                              WHERE config_param_user.parameter::text = 'inp_options_node_id'::text AND config_param_user.cur_user::name = "current_user"()))
+                            WHEN a_1_1.idval = 'HYDRAULICS'::text AND (b.value = 'USE'::text OR b.value = 'SAVE'::text) THEN concat(b.value, ' ', ( SELECT config_param_user.value
+                               FROM config_param_user
+                              WHERE config_param_user.parameter::text = 'inp_options_hydraulics_fname'::text AND config_param_user.cur_user::name = "current_user"()))
+                            WHEN a_1_1.idval = 'HYDRAULICS'::text AND b.value = 'NONE'::text THEN NULL::text
+                            ELSE b.value
+                        END AS value
+                   FROM sys_param_user a_1_1
+                     JOIN config_param_user b ON a_1_1.id = b.parameter::text
+                  WHERE (a_1_1.layoutname = ANY (ARRAY['lyt_general_1'::text, 'lyt_general_2'::text, 'lyt_hydraulics_1'::text, 'lyt_hydraulics_2'::text])) AND (a_1_1.idval <> ALL (ARRAY['UNBALANCED_N'::text, 'NODE_ID'::text, 'HYDRAULICS_FNAME'::text])) AND b.cur_user::name = "current_user"() AND b.value IS NOT NULL AND a_1_1.idval <> 'VALVE_MODE_MINCUT_RESULT'::text AND b.parameter::text <> 'PATTERN'::text AND b.value <> 'NULLVALUE'::text) a_1
+          WHERE a_1.parameter <> 'HYDRAULICS'::text OR a_1.parameter = 'HYDRAULICS'::text AND a_1.value IS NOT NULL) a
+  ORDER BY a.t;
+
+CREATE OR REPLACE VIEW vi_report
+AS SELECT a.idval AS parameter,
+    b.value
+   FROM sys_param_user a
+     JOIN config_param_user b ON a.id = b.parameter::text
+  WHERE (a.layoutname = ANY (ARRAY['lyt_reports_1'::text, 'lyt_reports_2'::text])) AND b.cur_user::name = "current_user"() AND b.value IS NOT NULL;
+
+CREATE OR REPLACE VIEW vi_times
+AS SELECT a.idval AS parameter,
+    b.value
+   FROM sys_param_user a
+     JOIN config_param_user b ON a.id = b.parameter::text
+  WHERE (a.layoutname = ANY (ARRAY['lyt_date_1'::text, 'lyt_date_2'::text])) AND b.cur_user::name = "current_user"() AND b.value IS NOT NULL;
+
+CREATE OR REPLACE VIEW vi_reactions
+AS SELECT 'BULK'::text AS param,
+    inp_pipe.arc_id,
+    inp_pipe.bulk_coeff::text AS coeff
+   FROM inp_pipe
+     LEFT JOIN temp_arc ON inp_pipe.arc_id::text = temp_arc.arc_id::text
+  WHERE inp_pipe.bulk_coeff IS NOT NULL
+UNION
+ SELECT 'WALL'::text AS param,
+    inp_pipe.arc_id,
+    inp_pipe.wall_coeff::text AS coeff
+   FROM inp_pipe
+     JOIN temp_arc ON inp_pipe.arc_id::text = temp_arc.arc_id::text
+  WHERE inp_pipe.wall_coeff IS NOT NULL
+UNION
+ SELECT 'BULK'::text AS param,
+    p.arc_id,
+    p.bulk_coeff::text AS coeff
+   FROM inp_dscenario_pipe p
+     LEFT JOIN temp_arc ON p.arc_id::text = temp_arc.arc_id::text
+  WHERE p.bulk_coeff IS NOT NULL
+UNION
+ SELECT 'WALL'::text AS param,
+    p.arc_id,
+    p.wall_coeff::text AS coeff
+   FROM inp_dscenario_pipe p
+     JOIN temp_arc ON p.arc_id::text = temp_arc.arc_id::text
+  WHERE p.wall_coeff IS NOT NULL
+UNION
+ SELECT sys_param_user.idval AS param,
+    NULL::character varying AS arc_id,
+    config_param_user.value::character varying AS coeff
+   FROM config_param_user
+     JOIN sys_param_user ON sys_param_user.id = config_param_user.parameter::text
+  WHERE (config_param_user.parameter::text = 'inp_reactions_bulk_order'::text OR config_param_user.parameter::text = 'inp_reactions_wall_order'::text OR config_param_user.parameter::text = 'inp_reactions_global_bulk'::text OR config_param_user.parameter::text = 'inp_reactions_global_wall'::text OR config_param_user.parameter::text = 'inp_reactions_limit_concentration'::text OR config_param_user.parameter::text = 'inp_reactions_wall_coeff_correlation'::text) AND config_param_user.value IS NOT NULL AND config_param_user.cur_user::text = CURRENT_USER
+  ORDER BY 1;
+
+CREATE OR REPLACE VIEW vi_energy
+AS SELECT concat('PUMP ', temp_arc.arc_id) AS pump_id,
+    'EFFIC'::text AS idval,
+    inp_pump.effic_curve_id AS energyvalue
+   FROM inp_pump
+     LEFT JOIN temp_arc ON concat(inp_pump.node_id, '_n2a') = temp_arc.arc_id::text
+  WHERE inp_pump.effic_curve_id IS NOT NULL
+UNION
+ SELECT concat('PUMP ', temp_arc.arc_id) AS pump_id,
+    'PRICE'::text AS idval,
+    inp_pump.energy_price::text AS energyvalue
+   FROM inp_pump
+     LEFT JOIN temp_arc ON concat(inp_pump.node_id, '_n2a') = temp_arc.arc_id::text
+  WHERE inp_pump.energy_price IS NOT NULL
+UNION
+ SELECT concat('PUMP ', temp_arc.arc_id) AS pump_id,
+    'PATTERN'::text AS idval,
+    inp_pump.energy_pattern_id AS energyvalue
+   FROM inp_pump
+     LEFT JOIN temp_arc ON concat(inp_pump.node_id, '_n2a') = temp_arc.arc_id::text
+  WHERE inp_pump.energy_pattern_id IS NOT NULL
+UNION
+ SELECT concat('PUMP ', temp_arc.arc_id) AS pump_id,
+    'EFFIC'::text AS idval,
+    inp_pump_additional.effic_curve_id AS energyvalue
+   FROM inp_pump_additional
+     LEFT JOIN temp_arc ON concat(inp_pump_additional.node_id, '_n2a') = temp_arc.arc_id::text
+  WHERE inp_pump_additional.effic_curve_id IS NOT NULL
+UNION
+ SELECT concat('PUMP ', temp_arc.arc_id) AS pump_id,
+    'PRICE'::text AS idval,
+    inp_pump_additional.energy_price::text AS energyvalue
+   FROM inp_pump_additional
+     LEFT JOIN temp_arc ON concat(inp_pump_additional.node_id, '_n2a') = temp_arc.arc_id::text
+  WHERE inp_pump_additional.energy_price IS NOT NULL
+UNION
+ SELECT concat('PUMP ', temp_arc.arc_id) AS pump_id,
+    'PATTERN'::text AS idval,
+    p.energy_pattern_id AS energyvalue
+   FROM inp_pump_additional p
+     LEFT JOIN temp_arc ON concat(p.node_id, '_n2a') = temp_arc.arc_id::text
+  WHERE p.energy_pattern_id IS NOT NULL
+UNION
+ SELECT concat('PUMP ', temp_arc.arc_id) AS pump_id,
+    'EFFIC'::text AS idval,
+    p.effic_curve_id AS energyvalue
+   FROM inp_dscenario_pump p
+     LEFT JOIN temp_arc ON concat(p.node_id, '_n2a') = temp_arc.arc_id::text
+  WHERE p.effic_curve_id IS NOT NULL
+UNION
+ SELECT concat('PUMP ', temp_arc.arc_id) AS pump_id,
+    'PRICE'::text AS idval,
+    p.energy_price::text AS energyvalue
+   FROM inp_dscenario_pump p
+     LEFT JOIN temp_arc ON concat(p.node_id, '_n2a') = temp_arc.arc_id::text
+  WHERE p.energy_price IS NOT NULL
+UNION
+ SELECT concat('PUMP ', temp_arc.arc_id) AS pump_id,
+    'PATTERN'::text AS idval,
+    p.energy_pattern_id AS energyvalue
+   FROM inp_dscenario_pump p
+     LEFT JOIN temp_arc ON concat(p.node_id, '_n2a') = temp_arc.arc_id::text
+  WHERE p.energy_pattern_id IS NOT NULL
+UNION
+ SELECT concat('PUMP ', temp_arc.arc_id) AS pump_id,
+    'EFFIC'::text AS idval,
+    p.effic_curve_id AS energyvalue
+   FROM inp_dscenario_pump_additional p
+     LEFT JOIN temp_arc ON concat(p.node_id, '_n2a') = temp_arc.arc_id::text
+  WHERE p.effic_curve_id IS NOT NULL
+UNION
+ SELECT concat('PUMP ', temp_arc.arc_id) AS pump_id,
+    'PRICE'::text AS idval,
+    p.energy_price::text AS energyvalue
+   FROM inp_dscenario_pump_additional p
+     LEFT JOIN temp_arc ON concat(p.node_id, '_n2a') = temp_arc.arc_id::text
+  WHERE p.energy_price IS NOT NULL
+UNION
+ SELECT concat('PUMP ', temp_arc.arc_id) AS pump_id,
+    'PATTERN'::text AS idval,
+    p.energy_pattern_id AS energyvalue
+   FROM inp_pump_additional p
+     LEFT JOIN temp_arc ON concat(p.node_id, '_n2a') = temp_arc.arc_id::text
+  WHERE p.energy_pattern_id IS NOT NULL
+UNION
+ SELECT sys_param_user.idval AS pump_id,
+    config_param_user.value AS idval,
+    NULL::text AS energyvalue
+   FROM config_param_user
+     JOIN sys_param_user ON sys_param_user.id = config_param_user.parameter::text
+  WHERE (config_param_user.parameter::text = 'inp_energy_price'::text OR config_param_user.parameter::text = 'inp_energy_pump_effic'::text OR config_param_user.parameter::text = 'inp_energy_price_pattern'::text) AND config_param_user.value IS NOT NULL AND config_param_user.cur_user::name = CURRENT_USER
+  ORDER BY 1;
+
+CREATE OR REPLACE VIEW vcp_pipes
+AS SELECT p.arc_id,
+    p.minorloss,
+    p.dint,
+    p.dscenario_id
+   FROM config_param_user c,
+    selector_inp_result r,
+    rpt_inp_arc rpt
+     JOIN inp_dscenario_pipe p ON rpt.arc_id::text = p.arc_id::text
+  WHERE c.parameter::text = 'epatools_calibrator_dscenario_id'::text AND c.value = p.dscenario_id::text AND c.cur_user::text = "current_user"()::text AND r.result_id::text = rpt.result_id::text AND r.cur_user = "current_user"()::text;
+
+CREATE OR REPLACE VIEW vcv_demands
+AS SELECT inp.feature_id,
+    inp.demand,
+    inp.pattern_id,
+    inp.source,
+    inp.dscenario_id
+   FROM config_param_user c,
+    inp_dscenario_demand inp
+  WHERE c.parameter::text = 'epatools_calibrator_dscenario_id'::text AND c.value = inp.dscenario_id::text AND c.cur_user::text = "current_user"()::text;
