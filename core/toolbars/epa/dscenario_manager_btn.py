@@ -512,7 +512,9 @@ class GwDscenarioManagerButton(GwAction):
 
         # Append DWF-specific logic dynamically
         if function == 3292:
-            connect.append(lambda: tools_gw.configure_layers_from_table_name("dwf_id"))
+            connect.append(partial(tools_gw.configure_layers_from_table_name, "dwf_id"))
+        if function == 3290:
+            connect.append(partial(tools_gw.configure_layers_from_table_name, "hydrology_id"))
 
         # Execute the toolbox function with the updated connect list
         dlg_functions = toolbox_btn.open_function_by_id(function, connect_signal=connect, aux_params=aux_params)
