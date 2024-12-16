@@ -193,8 +193,8 @@ class GwLoadProject(QObject):
 
         # Build and Apply filters
         selector = GwSelector()
-        filter = selector._build_filter()
-        selector._apply_filter(filter)
+        muni_filter, expl_filter, sector_filter = selector._build_filter()
+        selector._apply_filter(muni_filter, expl_filter, sector_filter)
 
     # region private functions
 
