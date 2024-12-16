@@ -5770,3 +5770,79 @@ AS SELECT inp.feature_id,
    FROM config_param_user c,
     inp_dscenario_demand inp
   WHERE c.parameter::text = 'epatools_calibrator_dscenario_id'::text AND c.value = inp.dscenario_id::text AND c.cur_user::text = "current_user"()::text;
+
+-- 16/12/24
+
+CREATE OR REPLACE VIEW vu_element_x_node
+AS SELECT element_x_node.id,
+    element_x_node.node_id,
+    element_x_node.element_id,
+    element.elementcat_id,
+    cat_element.descript,
+    element.num_elements,
+    value_state.name AS state,
+    value_state_type.name AS state_type,
+    element.observ,
+    element.comment,
+    element.location_type,
+    element.builtdate,
+    element.enddate,
+    element.link,
+    element.publish,
+    element.inventory
+   FROM element_x_node
+     JOIN element ON element.element_id::text = element_x_node.element_id::text
+     JOIN value_state ON element.state = value_state.id
+     LEFT JOIN value_state_type ON element.state_type = value_state_type.id
+     LEFT JOIN man_type_location ON man_type_location.location_type::text = element.location_type::text AND man_type_location.feature_type::text = 'ELEMENT'::text
+     LEFT JOIN cat_element ON cat_element.id::text = element.elementcat_id::text;
+
+
+CREATE OR REPLACE VIEW vu_element_x_connec
+AS SELECT element_x_connec.id,
+    element_x_connec.connec_id,
+    element_x_connec.element_id,
+    element.elementcat_id,
+    cat_element.descript,
+    element.num_elements,
+    value_state.name AS state,
+    value_state_type.name AS state_type,
+    element.observ,
+    element.comment,
+    element.location_type,
+    element.builtdate,
+    element.enddate,
+    element.link,
+    element.publish,
+    element.inventory
+   FROM element_x_connec
+     JOIN element ON element.element_id::text = element_x_connec.element_id::text
+     JOIN value_state ON element.state = value_state.id
+     LEFT JOIN value_state_type ON element.state_type = value_state_type.id
+     LEFT JOIN man_type_location ON man_type_location.location_type::text = element.location_type::text AND man_type_location.feature_type::text = 'ELEMENT'::text
+     LEFT JOIN cat_element ON cat_element.id::text = element.elementcat_id::text;
+
+
+CREATE OR REPLACE VIEW vu_element_x_arc
+AS SELECT element_x_arc.id,
+    element_x_arc.arc_id,
+    element_x_arc.element_id,
+    element.elementcat_id,
+    cat_element.descript,
+    element.num_elements,
+    value_state.name AS state,
+    value_state_type.name AS state_type,
+    element.observ,
+    element.comment,
+    element.location_type,
+    element.builtdate,
+    element.enddate,
+    element.link,
+    element.publish,
+    element.inventory
+   FROM element_x_arc
+     JOIN element ON element.element_id::text = element_x_arc.element_id::text
+     JOIN value_state ON element.state = value_state.id
+     LEFT JOIN value_state_type ON element.state_type = value_state_type.id
+     LEFT JOIN man_type_location ON man_type_location.location_type::text = element.location_type::text AND man_type_location.feature_type::text = 'ELEMENT'::text
+     LEFT JOIN cat_element ON cat_element.id::text = element.elementcat_id::text;

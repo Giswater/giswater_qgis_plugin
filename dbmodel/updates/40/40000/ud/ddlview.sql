@@ -6165,3 +6165,98 @@ AS SELECT d.drainzone_id,
      LEFT JOIN exploitation e USING (expl_id)
      LEFT JOIN edit_typevalue et ON et.id::text = d.drainzone_type::text AND et.typevalue::text = 'drainzone_type'::text
   ORDER BY d.drainzone_id;
+
+  -- 16/12/24
+
+  CREATE OR REPLACE VIEW vu_element_x_node
+AS SELECT element_x_node.id,
+    element_x_node.node_id,
+    element_x_node.element_id,
+    element.elementcat_id,
+    cat_element.descript,
+    element.num_elements,
+    value_state.name AS state,
+    value_state_type.name AS state_type,
+    element.observ,
+    element.comment,
+    element.location_type,
+    element.builtdate,
+    element.enddate,
+    element.link,
+    element.publish,
+    element.inventory
+   FROM element_x_node
+     JOIN element ON element.element_id::text = element_x_node.element_id::text
+     JOIN value_state ON element.state = value_state.id
+     LEFT JOIN value_state_type ON element.state_type = value_state_type.id
+     LEFT JOIN man_type_location ON man_type_location.location_type::text = element.location_type::text AND man_type_location.feature_type::text = 'ELEMENT'::text
+     LEFT JOIN cat_element ON cat_element.id::text = element.elementcat_id::text;
+
+CREATE OR REPLACE VIEW vu_element_x_connec
+AS SELECT element_x_connec.id,
+    element_x_connec.connec_id,
+    element_x_connec.element_id,
+    element.elementcat_id,
+    cat_element.descript,
+    element.num_elements,
+    value_state.name AS state,
+    value_state_type.name AS state_type,
+    element.observ,
+    element.comment,
+    element.location_type,
+    element.builtdate,
+    element.enddate,
+    element.link,
+    element.publish,
+    element.inventory
+   FROM element_x_connec
+     JOIN element ON element.element_id::text = element_x_connec.element_id::text
+     JOIN value_state ON element.state = value_state.id
+     LEFT JOIN value_state_type ON element.state_type = value_state_type.id
+     LEFT JOIN man_type_location ON man_type_location.location_type::text = element.location_type::text AND man_type_location.feature_type::text = 'ELEMENT'::text
+     LEFT JOIN cat_element ON cat_element.id::text = element.elementcat_id::text;
+
+CREATE OR REPLACE VIEW vu_element_x_arc
+AS SELECT element_x_arc.id,
+    element_x_arc.arc_id,
+    element_x_arc.element_id,
+    element.elementcat_id,
+    cat_element.descript,
+    element.num_elements,
+    value_state.name AS state,
+    value_state_type.name AS state_type,
+    element.observ,
+    element.comment,
+    element.location_type,
+    element.builtdate,
+    element.enddate,
+    element.link,
+    element.publish,
+    element.inventory
+   FROM element_x_arc
+     JOIN element ON element.element_id::text = element_x_arc.element_id::text
+     JOIN value_state ON element.state = value_state.id
+     LEFT JOIN value_state_type ON element.state_type = value_state_type.id
+     LEFT JOIN man_type_location ON man_type_location.location_type::text = element.location_type::text AND man_type_location.feature_type::text = 'ELEMENT'::text
+     LEFT JOIN cat_element ON cat_element.id::text = element.elementcat_id::text;
+
+CREATE OR REPLACE VIEW vu_element_x_gully
+AS SELECT element_x_gully.id,
+    element_x_gully.gully_id,
+    element_x_gully.element_id,
+    element.elementcat_id,
+    cat_element.descript,
+    element.num_elements,
+    value_state.name AS state,
+    value_state_type.name AS state_type,
+    element.observ,
+    element.comment,
+    element.location_type,
+    element.builtdate,
+    element.enddate
+   FROM element_x_gully
+     JOIN element ON element.element_id::text = element_x_gully.element_id::text
+     JOIN value_state ON element.state = value_state.id
+     LEFT JOIN value_state_type ON element.state_type = value_state_type.id
+     LEFT JOIN man_type_location ON man_type_location.location_type::text = element.location_type::text AND man_type_location.feature_type::text = 'ELEMENT'::text
+     LEFT JOIN cat_element ON cat_element.id::text = element.elementcat_id::text;
