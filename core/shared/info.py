@@ -3127,12 +3127,10 @@ class GwInfo(QObject):
                 if str(feat_id) not in ('', None, -1, "None") and widget.property('columnname'):
                         self.my_json[str(widget.property('columnname'))] = str(feat_id)
             elif option == 'set_to_arc':
-                print("entro no simple")
                 # functions called in -> getattr(self, options[option][0])(feat_id, child_type)
                 #       def _set_to_arc(self, dialog, feat_id, child_type, widget_name, simple=False)
                 getattr(self, options[option][1])(dialog, feat_id, child_type, widget_name)
             elif option == 'set_to_arc_simple':
-                print("entro simple")
                 # functions called in -> getattr(self, options[option][0])(feat_id, child_type)
                 #       def _set_to_arc(self, dialog, feat_id, child_type, widget_name, simple=False)
                 getattr(self, options[option][1])(dialog, feat_id, child_type, widget_name, simple=True)
