@@ -116,14 +116,24 @@ BEGIN
 		WHERE '||v_id_column||'='''||v_feature_id||''';';
 	END IF;
 
+	IF EXISTS (
+        SELECT 1
+        FROM information_schema.columns
+        WHERE table_schema = 'SCHEMA_NAME'
+          AND table_name = concat('ve_', v_feature_type, '_', lower(v_feature_type_new))
+          AND column_name = 'to_arc'
+    ) THEN
+    	EXECUTE 'UPDATE '||concat('ve_', v_feature_type, '_', lower(v_feature_type_new))||' SET to_arc= NULL WHERE '||v_feature_type||'_id='||quote_literal(v_feature_id)||';';
+    END IF;
+   
 	-- get log (fid: 143)
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT id, error_message AS message FROM audit_check_data WHERE cur_user="current_user"() AND fid = v_fid) row;
 
 	IF v_audit_result is null THEN
-	v_status = 'Accepted';
-	v_level = 3;
-	v_message = 'Replace feature done successfully';
+		v_status = 'Accepted';
+		v_level = 3;
+		v_message = 'Replace feature done successfully';
     ELSE
 
 		SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'status')::text INTO v_status;
@@ -153,7 +163,6 @@ BEGIN
 	GET STACKED DIAGNOSTICS v_error_context = pg_exception_context;
 	RETURN json_build_object('status', 'Failed', 'NOSQLERR', SQLERRM, 'message', json_build_object('level', right(SQLSTATE, 1), 'text', SQLERRM), 'SQLSTATE', SQLSTATE, 'SQLCONTEXT', v_error_context)::json;
 
-END;
-$BODY$
+END;$BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
