@@ -50,6 +50,9 @@ from ..toolbars.toc import layerstyle_change_btn
 from ... import global_vars
 from ...libs import lib_vars, tools_qgis, tools_qt, tools_log, tools_os, tools_db
 from ...libs.tools_qt import GwHyperLinkLabel, GwHyperLinkLineEdit
+from ...libs.tools_db import check_function
+from ...libs.tools_log import log_info
+from ...libs.tools_qgis import show_warning, get_layer_by_tablename
 
 # These imports are for the add_{widget} functions (modules need to be imported in order to find it by its name)
 # noinspection PyUnresolvedReferences
@@ -863,6 +866,101 @@ def add_layer_temp(dialog, data, layer_name, force_tab=True, reset_text=True, ta
                 global_vars.iface.layerTreeView().refreshLayerSymbology(v_layer.id())
 
     return {'text_result': text_result, 'temp_layers_added': temp_layers_added}
+
+
+def configure_layers_from_table_name(table_name):
+    """
+    Configure layers based on the provided table name, dynamically fetching the relevant tables
+    and applying configurations.
+
+    Args:
+        table_name (str): The name of the table list to be processed.
+
+    Returns:
+        bool: True if all layers configured successfully, False if any errors occurred.
+    """
+    # Define table groups dynamically
+    table_groups = {
+        "curve_id": [
+            "v_edit_inp_pump", "v_edit_inp_pump_additional", "v_edit_inp_virtualpump", "v_edit_inp_virtualvalve",
+            "v_edit_inp_inlet", "v_edit_inp_tank", "v_edit_inp_flgreg_outlet", "v_edit_inp_outlet",
+            "v_edit_inp_flgreg_pump", "v_edit_inp_outfall", "v_edit_inp_storage"
+        ],
+        "curve_id_dscenario": [
+            "v_edit_inp_dscenario_pump", "v_edit_inp_dscenario_pump_additional", "v_edit_inp_dscenario_virtualpump",
+            "v_edit_inp_dscenario_virtualvalve", "v_edit_inp_dscenario_inlet", "v_edit_inp_dscenario_tank",
+            "v_edit_inp_dscenario_flgreg_outlet", "v_edit_inp_dscenario_outlet", "v_edit_inp_dscenario_flgreg_pump",
+            "v_edit_inp_dscenario_outfall", "v_edit_inp_dscenario_storage"
+        ],
+        "pattern_id": [
+            "v_edit_inp_pump", "v_edit_inp_pump_additional", "v_edit_inp_virtualpump", "v_edit_inp_reservoir",
+            "v_edit_inp_demand", "v_edit_inp_junction", "v_edit_inp_inlet", "v_edit_inp_tank", "v_edit_inp_inflows",
+            "v_edit_inp_inflows_poll", "v_edit_inp_dwf"
+        ],
+        "pattern_id_dscenario": [
+            "v_edit_inp_dscenario_pump", "v_edit_inp_dscenario_pump_additional", "v_edit_inp_dscenario_virtualpump",
+            "v_edit_inp_dscenario_reservoir", "v_edit_inp_dscenario_demand", "v_edit_inp_dscenario_junction",
+            "v_edit_inp_dscenario_inlet", "v_edit_inp_dscenario_tank", "v_edit_inp_dscenario_inflows",
+            "v_edit_inp_dscenario_inflows_poll"
+        ],
+        "timeseries": [
+            "v_edit_inp_inflows", "v_edit_inp_outfall", "v_edit_inp_raingage"
+        ],
+        "timeseries_dscenario": [
+            "v_edit_inp_dscenario_inflows", "v_edit_inp_dscenario_outfall", "v_edit_inp_dscenario_raingage"
+        ],
+        "lids": [
+            "v_edit_inp_dscenario_lid_usage"
+        ],
+        "hydrology_id": [
+            "v_edit_inp_subcatchment"
+        ],
+        "dwf_id": [
+            "v_edit_inp_dwf"
+        ]
+    }
+
+    # Validate if the table_name exists in the table_groups
+    if table_name not in table_groups:
+        tools_log.log_info(f"Invalid table_name '{table_name}' provided. No configuration performed.")
+        return False
+
+    # Fetch the corresponding tables for the table_name
+    tables = table_groups[table_name]
+    failed_layers = []
+
+    for table in tables:
+        # Retrieve the layer object for the table
+        layer = tools_qgis.get_layer_by_tablename(table)
+        if not layer:
+            failed_layers.append(table)
+            continue
+
+        # Prepare feature for the API call
+        feature = f'"tableName":"{table}"'
+        body = create_body(feature=feature)
+
+        # Execute the procedure
+        json_result = execute_procedure("gw_fct_getinfofromid", body)
+
+        # Validate the result
+        if not json_result or json_result.get("status") != "Accepted":
+            tools_log.log_info(f"Failed to configure layer '{table}'. Skipping...")
+            failed_layers.append(table)
+            continue
+
+        # Configure the layer attributes
+        try:
+            config_layer_attributes(json_result, layer, table)
+        except Exception:
+            failed_layers.append(table)
+            continue
+
+    # Handle failed layers
+    if failed_layers:
+        return False
+
+    return True
 
 
 def config_layer_attributes(json_result, layer, layer_name, thread=None):

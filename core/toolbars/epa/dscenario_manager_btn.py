@@ -17,6 +17,7 @@ from qgis.PyQt.QtWidgets import QTableView, QAbstractItemView, QMenu, QCheckBox,
     QShortcut, QApplication, QTableWidgetItem, QWidget, QLabel, QGridLayout, QToolButton
 from qgis.PyQt.QtWidgets import QDialog, QLineEdit
 
+from libs import tools_log
 from ..dialog import GwAction
 from ..utilities.toolbox_btn import GwToolBoxButton
 from ...shared.nonvisual import GwNonVisual
@@ -484,7 +485,10 @@ class GwDscenarioManagerButton(GwAction):
 
 
     def _open_toolbox_function(self, function, view, signal=None, connect=None, label=None):
-        """ Execute currently selected function from combobox """
+        """
+        Execute currently selected function from combobox and dynamically append additional logic
+        for specific scenarios without removing defaults.
+        """
 
         if function == 3290 and label == 'Create hydrology scenario values':
             aux_params = '{"aux_fct": 3100}'
@@ -494,11 +498,23 @@ class GwDscenarioManagerButton(GwAction):
             aux_params = "null"
 
         toolbox_btn = GwToolBoxButton(None, None, None, None, None)
+
+        # Default connections
+        default_connect = [partial(self._fill_manager_table, view), partial(tools_gw.refresh_selectors)]
+
+        # Merge connect with defaults
         if connect is None:
-            connect = [partial(self._fill_manager_table, view), partial(tools_gw.refresh_selectors)]
+            connect = default_connect
         else:
-            if type(connect) != list:
+            if not isinstance(connect, list):
                 connect = [connect]
+            connect = default_connect + connect
+
+        # Append DWF-specific logic dynamically
+        if function == 3292:
+            connect.append(lambda: tools_gw.configure_layers_from_table_name("dwf_id"))
+
+        # Execute the toolbox function with the updated connect list
         dlg_functions = toolbox_btn.open_function_by_id(function, connect_signal=connect, aux_params=aux_params)
 
         if function in (3100, 3102):  # hydrology & dwf scenarios
