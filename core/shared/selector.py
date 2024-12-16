@@ -311,9 +311,6 @@ class GwSelector:
 
         :param subset_filter: SQL-like filter string to apply to the layers.
         """
-        print(f"muni_filter -> {muni_filter}")
-        print(f"expl_filter -> {expl_filter}")
-        print(f"sector_filter -> {sector_filter}")
     
         for layer in QgsProject.instance().mapLayers().values():
             # Get the field names once to avoid multiple iterations
@@ -350,7 +347,6 @@ class GwSelector:
                     subset_filter.append("ARRAY[expl_id] && ARRAY[0]")
             # Join the filters with "AND" or use "FALSE" if no filters are found
             filter = " AND ".join(subset_filter) if subset_filter else ""
-            print(f"{filter}")
             layer.setSubsetString(filter)
 
 
