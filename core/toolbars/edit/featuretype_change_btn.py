@@ -288,6 +288,9 @@ def btn_accept_featuretype_change(**kwargs):
     feature_type_new = tools_qt.get_combo_value(dialog, "tab_none_feature_type_new", 1)
     featurecat_id = tools_qt.get_widget_value(dialog, "tab_none_featurecat_id")
 
+    if featurecat_id.startswith('(') and featurecat_id.endswith(')'):
+        tools_qgis.show_warning("Error replacing feature. Chose a valid catalog.")
+        return
     fluid_type = tools_qt.get_combo_value(dialog, 'tab_none_fluid_type', 1)
     if fluid_type is None:
         fluid_type = 'null'
@@ -333,6 +336,8 @@ def btn_accept_featuretype_change(**kwargs):
                 if msg_text is None:
                     msg_text = 'Replace feature done successfully'
                 tools_qgis.show_info(msg_text)
+            elif "Failed" in complet_result['status']:
+                return
 
             tools_gw.set_config_parser("btn_featuretype_change", "feature_type_new", feature_type_new)
             tools_gw.set_config_parser("btn_featuretype_change", "featurecat_id", featurecat_id)
@@ -413,12 +418,14 @@ def cmb_new_featuretype_selection_changed(**kwargs):
         if field['widgettype'] == 'typeahead':
             # Retrieve widget and selected value
             widget = tools_qt.get_widget(dialog, field['widgetname'])
-            selected_value = tools_qt.get_widget_value(dialog, widget)
 
             # Populate rows from comboIds and comboNames
             rows = list(zip(field.get('comboIds', []), field.get('comboNames', [])))
             tools_qt.set_completer_rows(widget, rows)
+            
+            for row in rows:
+                if row[0] == field['value']: 
+                    tools_qt.set_widget_text(dialog, widget, field['value'])
+                    continue
+            tools_qt.set_widget_text(dialog, widget, f"({field['value']})")
 
-            # Update widget text if the selected value does not already appear formatted
-            if not (selected_value.startswith('(') and selected_value.endswith(')')):
-                tools_qt.set_widget_text(dialog, widget, f"{selected_value}")
