@@ -49,7 +49,7 @@ class GwWorkspaceManagerButton(GwAction):
         # Fill table
         self.tbl_wrkspcm = self.dlg_workspace_manager.findChild(QTableView, 'tbl_wrkspcm')
         self._fill_tbl()
-        self._set_labels_current_workspace(dialog=self.dlg_workspace_manager, from_open_dialog=True)
+        self._set_labels_current_workspace(dialog=self.dlg_workspace_manager)
 
         # Disable tab log
         tools_gw.disable_tab_log(self.dlg_workspace_manager)
@@ -220,7 +220,8 @@ class GwWorkspaceManagerButton(GwAction):
         if result and result['status'] == "Accepted":
             tools_gw.fill_tab_log(self.dlg_create_workspace, result['body']['data'])
             self._fill_tbl(self.filter_name.text())
-            self._set_labels_current_workspace(dialog=self.dlg_workspace_manager, from_open_dialog=True)
+            self._set_labels_current_workspace(dialog=self.dlg_workspace_manager)
+
 
     def _set_labels_current_workspace(self, dialog, result=None):
         """Set label for the current workspace."""
@@ -372,7 +373,7 @@ class GwWorkspaceManagerButton(GwAction):
 
                 tools_gw.fill_tab_log(self.dlg_create_workspace, result['body']['data'])
                 self._fill_tbl(self.filter_name.text())
-                self._set_labels_current_workspace(dialog=self.dlg_workspace_manager, from_open_dialog=True)
+                self._set_labels_current_workspace(dialog=self.dlg_workspace_manager)
 
 
     def _delete_workspace(self):
@@ -410,7 +411,7 @@ class GwWorkspaceManagerButton(GwAction):
                     tools_qgis.show_message(message['text'], message['level'], dialog=self.dlg_workspace_manager)
 
             self._fill_tbl(self.filter_name.text())
-            self._set_labels_current_workspace(dialog=self.dlg_workspace_manager, from_open_dialog=True)
+            self._set_labels_current_workspace(dialog=self.dlg_workspace_manager)
 
 
     def _check_exists(self, name=""):
