@@ -3192,6 +3192,11 @@ class GwInfo(QObject):
         widget = dialog.findChild(QWidget, widget_name)
         if widget:
             tools_qt.set_widget_text(dialog, widget, str(feat_id))
+            # Explicitly disable or set read-only state
+            widget.setEnabled(False)  # Completely disables interaction
+            if hasattr(widget, "setReadOnly"):
+                widget.setReadOnly(True)  # For widgets like QLineEdit
+                
             if hasattr(widget, "editingFinished"):
                 widget.editingFinished.emit()  # Emit signal to indicate value has changed
         else:
