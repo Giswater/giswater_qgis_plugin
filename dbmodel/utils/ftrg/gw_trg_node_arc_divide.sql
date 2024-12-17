@@ -65,7 +65,7 @@ BEGIN
 			ELSE
 
 				perform gw_fct_arc_repair(concat('
-				{"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{},
+				{"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":', v_srid, '}, "form":{},
 				"feature":{"tableName":"v_edit_arc", "featureType":"ARC", "id":["',arc_id,'"]},
 				"data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"previousSelection","parameters":{},
 				"aux_params":null}}')::json) from arc a where st_dwithin(a.the_geom, new.the_geom, v_node_proximity);
