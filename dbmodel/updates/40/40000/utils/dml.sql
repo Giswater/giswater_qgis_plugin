@@ -815,3 +815,6 @@ UPDATE config_form_fields SET widgetcontrols = replace(widgetcontrols::TEXT, 'ca
 UPDATE config_form_fields SET widgetcontrols = replace(widgetcontrols::TEXT, 'cat_mat_element', 'cat_material')::json WHERE widgetcontrols::TEXT ILIKE '%cat_mat_element%';
 
 ALTER TABLE config_form_fields ENABLE TRIGGER gw_trg_config_control;
+
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source")
+VALUES(3360, 'gw_fct_create_thyssen_subcatchments', 'ud', 'function', 'json', 'json', 'Calculate subcatchment parameters.', 'role_admin', NULL, 'core');

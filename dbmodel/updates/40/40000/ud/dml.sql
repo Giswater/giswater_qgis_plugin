@@ -1301,3 +1301,9 @@ where id = 3264;
 update sys_message 
 set error_message = left(error_message, length(error_message)-1)
 where error_message ilike '%.';
+INSERT INTO config_toolbox (id, alias, functionparams, inputparams, observ, active, device) VALUES(3360, 'Create Thyssen subcatchments', '{"featureType":[]}'::json, '[
+{"widgetname":"clipLayer", "label":"Clip Layer:","widgettype":"combo","datatype":"text","layoutname":"grl_option_parameters","layoutorder":1,
+"comboIds":["sector","expl", "muni"],
+"comboNames":["SECTOR","EXPL", "MUNICIPALITY"]},
+{"widgetname":"deletePrevious", "label":"Delete previous subcatchments:", "widgettype":"check", "datatype":"boolean", "layoutname":"grl_option_parameters","layoutorder":2, "value":"true"}
+]'::json, NULL, true, '{4}');
