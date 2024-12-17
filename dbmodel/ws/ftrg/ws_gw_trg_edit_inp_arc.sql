@@ -22,7 +22,7 @@ BEGIN
     
     IF TG_OP = 'INSERT' THEN
         EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-        "data":{"message":"1026", "function":"1306","debug_msg":null}}$$);';
+        "data":{"message":"1026", "function":"1306","parameters":null}}$$);';
         RETURN NEW;
 
     ELSIF TG_OP = 'UPDATE' THEN
@@ -67,7 +67,7 @@ BEGIN
     ELSIF TG_OP = 'DELETE' THEN
     
         EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-        "data":{"message":"1028", "function":"1306","debug_msg":null}}$$);';
+        "data":{"message":"1028", "function":"1306","parameters":null}}$$);';
         
         RETURN NEW;
     

@@ -82,7 +82,7 @@ BEGIN
 
 		IF v_update_field NOT IN ('elevation', 'custom_top_elev', 'top_elev') THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"3198", "function":"2760","debug_msg":"", "is_process":true}}$$)'
+			"data":{"message":"3198", "function":"2760","parameters":null, "is_process":true}}$$)'
 			INTO v_audit_result;
 			
 		ELSE

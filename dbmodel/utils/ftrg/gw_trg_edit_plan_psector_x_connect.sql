@@ -246,7 +246,7 @@ BEGIN
 
 		IF NEW.arc_id IS NULL AND OLD.arc_id IS NOT NULL THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"3208", "function":"3174","debug_msg":""}}$$);';
+				"data":{"message":"3208", "function":"3174","parameters":null}}$$);';
 		END IF;
 
 		IF v_table = 'plan_psector_x_connec' then
@@ -261,11 +261,11 @@ BEGIN
 
 			IF NEW.state  = 0 AND OLD.state = 1 AND v_rec.state = 2 THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"3210", "function":"3174","debug_msg":""}}$$);';
+				"data":{"message":"3210", "function":"3174","parameters":null}}$$);';
 
 			ELSIF coalesce(NEW.arc_id,'') !=  coalesce(OLD.arc_id,'') AND v_exit_type IN ('NODE', 'CONNEC', 'GULLY') THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"3212", "function":"3174","debug_msg":""}}$$);';
+				"data":{"message":"3212", "function":"3174","parameters":null}}$$);';
 			END IF;
 
 		ELSIF v_table = 'plan_psector_x_gully' THEN
@@ -280,11 +280,11 @@ BEGIN
 
 			IF NEW.state  = 0 AND OLD.state = 1 AND v_rec.state = 2 THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"3214", "function":"3174","debug_msg":""}}$$);';
+				"data":{"message":"3214", "function":"3174","parameters":null}}$$);';
 
 			ELSIF coalesce(NEW.arc_id,'') !=  coalesce(OLD.arc_id,'') AND v_exit_type IN ('NODE', 'CONNEC', 'GULLY') THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"3216", "function":"3174","debug_msg":""}}$$);';
+				"data":{"message":"3216", "function":"3174","parameters":null}}$$);';
 			END IF;
 
 		END IF;

@@ -27,7 +27,7 @@ BEGIN
 			NEW.name = NEW.id;
 			
 			-- future development of variable for some enviroments who they decide to force to put some name for document. Maybe on future create this variable
-			--EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{"message":"3270", "function":"2686","debug_msg":""}}$$);';
+			--EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{"message":"3270", "function":"2686","parameters":null}}$$);';
 		END IF;
 	END IF;
 

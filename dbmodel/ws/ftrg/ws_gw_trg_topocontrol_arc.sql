@@ -213,7 +213,7 @@ BEGIN
 
     	if v_msg THEN
      			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                "data":{"message":"3236", "function":"1344","debug_msg":"'||v_zone||'"}}$$);';
+                "data":{"message":"3236", "function":"1344","parameters":{"zone":"'||v_zone||'"}}}$$);';
 		end if;
     end if;
 
@@ -228,14 +228,14 @@ BEGIN
             IF (nodeRecord1.node_id = nodeRecord2.node_id) AND (v_samenode_init_end_control IS TRUE) THEN
                 IF v_dsbl_error IS NOT TRUE THEN
                     EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                    "data":{"message":"1040", "function":"1344","debug_msg":"'||nodeRecord1.node_id||'"}}$$);';
+                    "data":{"message":"1040", "function":"1344","parameters":{"node_id":"'||nodeRecord1.node_id||'"}}}$$);';
                 ELSE
                     SELECT concat('ERROR-',id,':',error_message,'.',hint_message) INTO v_message FROM sys_message WHERE id = 1040;
                     INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (103, NEW.arc_id, v_message);
                 END IF;
             ELSIF ((nodeRecord1.state = 2) OR (nodeRecord2.state = 2)) AND (NEW.state = 1) THEN
                 EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                    "data":{"message":"3192", "function":"1344","debug_msg":""}}$$);';
+                    "data":{"message":"3192", "function":"1344","parameters":null}}$$);';
             ELSE
                 -- Update coordinates
                 NEW.the_geom:= ST_SetPoint(NEW.the_geom, 0, nodeRecord1.the_geom);
@@ -272,7 +272,7 @@ BEGIN
         ELSIF ((nodeRecord1.node_id IS NULL) OR (nodeRecord2.node_id IS NULL)) AND (v_arc_searchnodes_control IS TRUE) THEN
             IF v_dsbl_error IS NOT TRUE THEN
                 EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                    "data":{"message":"1042", "function":"1344","debug_msg":""}}$$);';
+                    "data":{"message":"1042", "function":"1344","parameters":null}}$$);';
             ELSE
                 SELECT concat('ERROR-',id,':',error_message,'.',hint_message) INTO v_message FROM sys_message WHERE id = 1042;
                 INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (103, NEW.arc_id, v_message);
@@ -285,7 +285,7 @@ BEGIN
         ELSE
             IF v_dsbl_error IS NOT TRUE THEN
                 EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                    "data":{"message":"1042", "function":"1344","debug_msg":""}}$$);';
+                    "data":{"message":"1042", "function":"1344","parameters":null}}$$);';
             ELSE
                 SELECT concat('ERROR-',id,':',error_message,'.',hint_message) INTO v_message FROM sys_message WHERE id = 1042;
                 INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (103, NEW.arc_id, v_message);

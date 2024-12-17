@@ -170,13 +170,13 @@ BEGIN
 			SELECT value::integer INTO v_statetype_obsolete FROM config_param_user WHERE parameter='edit_statetype_0_vdefault' AND cur_user=current_user;
 			IF v_statetype_obsolete IS NULL THEN
 			        EXECUTE 'SELECT SCHEMA_NAME.gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"3134", "function":"2446","debug_msg":null}}$$);';
+				"data":{"message":"3134", "function":"2446","parameters":null}}$$);';
 			END IF;
 
 			SELECT value::integer INTO v_statetype_onservice FROM config_param_user WHERE parameter='edit_statetype_1_vdefault' AND cur_user=current_user;
 			IF v_statetype_onservice IS NULL THEN
 			        EXECUTE 'SELECT SCHEMA_NAME.gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"3136", "function":"2446","debug_msg":null}}$$);';
+				"data":{"message":"3136", "function":"2446","parameters":null}}$$);';
 			END IF;
 
 			--temporary remove topology control

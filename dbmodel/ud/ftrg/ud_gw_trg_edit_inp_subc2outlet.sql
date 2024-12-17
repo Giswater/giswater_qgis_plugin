@@ -38,7 +38,7 @@ BEGIN
 				update v_edit_inp_subcatchment set outlet_id=v_subc_id where subc_id=new.subc_id;
 	   		ELSE
 	   			execute 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},
-				"feature":{},"data":{"message":"3252", "function":"3300","debug_msg":null, "variables":"value", "is_process":false}}$$);';
+				"feature":{},"data":{"message":"3252", "function":"3300","parameters":null, "variables":"value", "is_process":false}}$$);';
 			END IF;		
 
 	   	END IF; 
@@ -53,7 +53,7 @@ BEGIN
 				update v_edit_inp_subcatchment set outlet_id=v_subc_id where subc_id=old.subc_id;
 			ELSE
 				execute 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},
-				"feature":{},"data":{"message":"3252", "function":"3300","debug_msg":null, "variables":"value", "is_process":false}}$$);';
+				"feature":{},"data":{"message":"3252", "function":"3300","parameters":null, "variables":"value", "is_process":false}}$$);';
 			END IF;
 		END IF;
 	

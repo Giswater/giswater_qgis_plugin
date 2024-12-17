@@ -32,7 +32,7 @@ BEGIN
 		IF (NEW.expl_id IS NULL) THEN
 				IF ((SELECT COUNT(*) FROM exploitation WHERE active IS TRUE ) = 0) THEN
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-       				"data":{"message":"1110", "function":"1118","debug_msg":null}}$$);';
+       				"data":{"message":"1110", "function":"1118","parameters":null}}$$);';
 				END IF;
 				NEW.expl_id := (SELECT expl_id FROM exploitation WHERE active IS TRUE AND ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
 				IF (NEW.expl_id IS NULL) THEN
@@ -40,7 +40,7 @@ BEGIN
 				END IF;
 				IF (NEW.expl_id IS NULL) THEN
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-       				"data":{"message":"2012", "function":"1118","debug_msg":"'||NEW.id||'"}}$$);';
+       				"data":{"message":"2012", "function":"1118","parameters":{"feature_id":"'||NEW.id||'"}}}$$);';
 				END IF;            
 			END IF;
 					

@@ -168,8 +168,8 @@ BEGIN
 	IF type_element_arg = 'arc' OR type_element_arg='ARC' THEN
 	
 		IF (SELECT state FROM arc WHERE (arc_id = element_id_arg))=0 THEN
-			v_querystring = concat('SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"3002", "function":"2304","debug_msg":"',element_id_arg::text,'", "is_process":true}}$$);');
+			v_querystring = 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+			"data":{"message":"3002", "function":"2304","parameters":{"element_id":"'||element_id_arg::text||'"}, "is_process":true}}$$);';
 			v_debug_vars := json_build_object('element_id_arg', element_id_arg);
 			v_debug_sql := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_mincut', 'flag', 10);
 			SELECT gw_fct_debugsql(v_debug_sql) INTO v_msgerr;
@@ -202,8 +202,8 @@ BEGIN
 				SELECT node_1, node_2 INTO node_1_aux, node_2_aux FROM v_edit_arc WHERE arc_id = element_id_arg;
 
 				IF node_1_aux IS NULL OR node_2_aux IS NULL THEN
-					v_querystring = concat('SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-					"data":{"message":"3006", "function":"2304","debug_msg":"',element_id_arg::text,'", "is_process":true}}$$);');
+					v_querystring = 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+					"data":{"message":"3006", "function":"2304","parameters":{"element_id":"'||element_id_arg::text||'"}, "is_process":true}}$$);';
 					v_debug_vars := json_build_object('element_id_arg', element_id_arg);
 					v_debug_sql := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_mincut', 'flag', 20);
 					SELECT gw_fct_debugsql(v_debug_sql) INTO v_msgerr;
@@ -261,8 +261,8 @@ BEGIN
 			
 		-- The arc_id was not found
 		ELSE 
-			v_querystring = concat('SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"1082", "function":"2304","debug_msg":"',element_id_arg::text,'", "is_process":true}}$$);');
+			v_querystring = 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+			"data":{"message":"1082", "function":"2304","parameters":{"arc_id":"'||element_id_arg::text||'"}, "is_process":true}}$$);';
 			v_debug_vars := json_build_object('element_id_arg', element_id_arg);
 			v_debug_sql := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_mincut', 'flag', 30);
 			SELECT gw_fct_debugsql(v_debug_sql) INTO v_msgerr;
@@ -271,7 +271,7 @@ BEGIN
 
 	ELSE
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-		"data":{"message":"3092", "function":"2304","debug_msg":null, "is_process":true}}$$);' INTO v_error_message;
+		"data":{"message":"3092", "function":"2304","parameters":null, "is_process":true}}$$);' INTO v_error_message;
 	END IF;
 
 	IF v_debug THEN	RAISE NOTICE '7-Compute flow trace on network';	END IF;	

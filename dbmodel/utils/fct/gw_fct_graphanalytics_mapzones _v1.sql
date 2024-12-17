@@ -170,7 +170,7 @@ BEGIN
 		v_fid=481;
 	ELSE
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-		"data":{"message":"3090", "function":"2710","debug_msg":null, "is_process":true}}$$);' INTO v_audit_result;
+		"data":{"message":"3090", "function":"2710","parameters":null, "is_process":true}}$$);' INTO v_audit_result;
 	END IF;
 
 	-- Create temporary tables

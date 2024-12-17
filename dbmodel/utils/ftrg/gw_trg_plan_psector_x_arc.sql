@@ -34,7 +34,7 @@ BEGIN
 	-- do not allow to insert features with expl diferent from psector expl
 	IF v_explaux<>v_psector_expl THEN
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-		"data":{"message":"3234", "function":"1130","debug_msg":""}}$$);';
+		"data":{"message":"3234", "function":"1130","parameters":null}}$$);';
 	END IF;
 	
 	IF v_stateaux=1	THEN 
@@ -50,7 +50,7 @@ BEGIN
 	            (SELECT gully_id FROM plan_psector_x_gully WHERE psector_id=NEW.psector_id AND state=0);
 	            IF num_connec > 0 THEN
 	                EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-	                "data":{"message":"3228", "function":"1130","debug_msg":""}}$$);';
+	                "data":{"message":"3228", "function":"1130","parameters":null}}$$);';
 	            END IF;
 	           
 	           	-- do not allow set arc to obsolete when it has on service connecs
@@ -58,7 +58,7 @@ BEGIN
 	            (SELECT connec_id FROM plan_psector_x_connec WHERE psector_id=NEW.psector_id AND state=0);
 	            IF num_connec > 0 THEN
 	                EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-	                "data":{"message":"3228", "function":"1130","debug_msg":""}}$$);';
+	                "data":{"message":"3228", "function":"1130","parameters":null}}$$);';
 	            END IF;
 	        ELSIF v_project_type = 'WS' THEN
 		        -- do not allow set arc to obsolete when it has on service connecs
@@ -66,7 +66,7 @@ BEGIN
 				(SELECT connec_id FROM plan_psector_x_connec WHERE psector_id=NEW.psector_id AND state=0);
 				IF num_connec > 0 THEN
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-					"data":{"message":"3228", "function":"1130","debug_msg":""}}$$);';
+					"data":{"message":"3228", "function":"1130","parameters":null}}$$);';
 				END IF;
 	        END IF;
 	       
@@ -75,7 +75,7 @@ BEGIN
 	ELSIF v_stateaux=2 THEN
 		IF NEW.state = 0 THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"3182", "function":"1130","debug_msg":'||NEW.psector_id||'}}$$);';
+			"data":{"message":"3182", "function":"1130","parameters":{"psector_id":"'||NEW.psector_id||'"}}}$$);';
 		END IF;
 		NEW.state = 1;
 		NEW.doable=true;

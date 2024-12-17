@@ -23,7 +23,7 @@ BEGIN
             RETURN NEW;
         --ELSE
             --PERFORM gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                --"data":{"message":"1102", "function":"1342","debug_msg":null, "variables":null}}$$);
+                --"data":{"message":"1102", "function":"1342","parameters":null, "variables":null}}$$);
         --END IF;
 
     ELSIF TG_OP = 'UPDATE' THEN
@@ -36,7 +36,7 @@ BEGIN
             RETURN OLD;
         --ELSE
             --PERFORM gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                --"data":{"message":"1106", "function":"1342","debug_msg":null, "variables":null}}$$);
+                --"data":{"message":"1106", "function":"1342","parameters":null, "variables":null}}$$);
         --END IF;
     
     END IF;

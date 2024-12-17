@@ -53,7 +53,7 @@ BEGIN
 				EXECUTE 'DELETE FROM "plan_psector_x_'||v_parent||'" WHERE psector_id::text = '||OLD.psector_id||'::text and '||v_parent||'_id::text = '||v_feature||'::text';
 			ELSE
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"3160", "function":"3022","debug_msg":'||OLD.psector_id||'}}$$);';
+				"data":{"message":"3160", "function":"3022","parameters":{"psector_id":"'||OLD.psector_id||'"}}}$$);';
 			END IF;
 		ELSE
 			

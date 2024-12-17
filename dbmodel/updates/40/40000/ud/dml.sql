@@ -987,3 +987,317 @@ DELETE FROM sys_table WHERE id='cat_mat_gully';
 
 --13/12/2024
 UPDATE sys_style SET stylevalue = replace(stylevalue,'vhmax','vhmax_compare') WHERE layername IN ('v_rpt_comp_subcatchrunoff_sum');
+
+--16/12/2024
+
+update sys_message
+set error_message = 'Feature is out of sector, feature_id: %feature_id%'
+where id = 1010;
+
+update sys_message
+set error_message = 'Feature is out of dma, feature_id: %feature_id%'
+where id = 1014;
+
+update sys_message
+set error_message = 'One or more arcs has the same node as Node1 and Node2. Node_id: %node_id%'
+where id = 1040;
+
+update sys_message
+set error_message = 'One or more arcs was not inserted/updated because it has not start/end node. Arc_id: %arc_id%'
+where id = 1042;
+
+update sys_message
+set error_message = 'Exists one o more connecs closer than configured minimum distance, connec_id: %connec_id%'
+where id = 1044;
+
+update sys_message
+set error_message = 'Exists one o more nodes closer than configured minimum distance, node_id: %node_id%'
+where id = 1046;
+
+update sys_message
+set error_message = 'There is at least one arc attached to the deleted feature. (num. arc,feature_id) = %num_arc%, %feature_id%'
+where id = 1056;
+
+update sys_message
+set error_message = 'There is at least one element attached to the deleted feature. (num. element,feature_id) = %num_element%, %feature_id%'
+where id = 1058;
+
+update sys_message
+set error_message = 'There is at least one document attached to the deleted feature. (num. document,feature_id) = %num_document%, %feature_id%'
+where id = 1060;
+
+update sys_message
+set error_message = 'There is at least one visit attached to the deleted feature. (num. visit,feature_id) = %num_visit%, %feature_id%'
+where id = 1062;
+
+update sys_message
+set error_message = 'There is at least one link attached to the deleted feature. (num. link,feature_id) = %num_link%, %feature_id%'
+where id = 1064;
+
+update sys_message
+set error_message = 'There is at least one connec attached to the deleted feature. (num. connec,feature_id) = %num_connec%, %feature_id%'
+where id = 1066;
+
+update sys_message
+set error_message = 'There is at least one gully attached to the deleted feature. (num. gully,feature_id)= %num_gully%, %feature_id%'
+where id = 1068;
+
+update sys_message
+set error_message = 'The feature can''t be replaced, because it''s state is different than 1. State = %state_id%'
+where id = 1070;
+
+update sys_message
+set error_message = 'Before downgrading the node to state 0, disconnect the associated features, node_id: %node_id%'
+where id = 1072;
+
+update sys_message
+set error_message = 'Before downgrading the arc to state 0, disconnect the associated features, arc_id: %arc_id%'
+where id = 1074;
+
+update sys_message
+set error_message = 'Before downgrading the connec to state 0, disconnect the associated features, connec_id: %connec_id%'
+where id = 1076;
+
+update sys_message
+set error_message = 'Before downgrading the gully to state 0, disconnect the associated features, gully_id: %gully_id%'
+where id = 1078;
+
+update sys_message
+set error_message = 'Nonexistent arc_id: %arc_id%'
+where id = 1082;
+
+update sys_message
+set error_message = 'Nonexistent node_id: %node_id%'
+where id = 1084;
+
+update sys_message
+set error_message = 'Node with state 2 over another node with state=2 on same alternative it is not allowed. The node is: %node_id%'
+where id = 1096;
+
+update sys_message
+set error_message = 'It is not allowed to insert/update one node with state(1) over another one with state (1) also. The node is: %node_id%'
+where id = 1097;
+
+update sys_message
+set error_message = 'It is not allowed to insert/update one node with state (2) over another one with state (2). The node is: %node_id%'
+where id = 1100;
+
+update sys_message
+set error_message = 'Feature is out of exploitation, feature_id: %feature_id%'
+where id = 2012;
+
+update sys_message
+set error_message = '(arc_id, geom type) = %arc_id%, %geom_type%'
+where id = 2022;
+
+update sys_message
+set error_message = 'The feature does not have state(1) value to be replaced, state = %state_id%'
+where id = 2028;
+
+update sys_message
+set error_message = 'The feature not have state(2) value to be replaced, state = %state_id%'
+where id = 2030;
+
+update sys_message
+set error_message = 'It is impossible to validate the arc without assigning value of arccat_id, arc_id: %arc_id%'
+where id = 2036;
+
+update sys_message
+set error_message = 'The exit arc must be reversed. Arc = %arc_id%'
+where id = 2038;
+
+update sys_message
+set error_message = 'Reduced geometry is not a Linestring, (arc_id,geom type)= %arc_id%, %geom_type%'
+where id = 2040;
+
+update sys_message
+set error_message = 'Query text = %query_text%'
+where id = 2078;
+
+update sys_message
+set error_message = 'The x value is too large. The total length of the line is %line_length%'
+where id = 2080;
+
+update sys_message
+set error_message = 'The extension does not exists. Extension = %extension%'
+where id = 2082;
+
+update sys_message
+set error_message = 'The module does not exists. Module = %module%'
+where id = 2084;
+
+update sys_message
+set error_message = 'There are [units] values nulls or not defined on price_value_unit table  = %units%'
+where id = 2088;
+
+update sys_message
+set error_message = 'There is at least one node attached to the deleted feature. (num. node,feature_id)= %num_node%, %feature_id%'
+where id = 2108;
+
+update sys_message
+set error_message = 'The selected arc has state=0 (num. node,feature_id)= %element_id%'
+where id = 3002;
+
+update sys_message
+set error_message = 'The minimum arc length of this exportation is: %min_arc_length%'
+where id = 3010;
+
+update sys_message
+set error_message = 'Can''t modify typevalue: %typevalue%'
+where id = 3028;
+
+update sys_message
+set error_message = 'Can''t delete typevalue: %typevalue%'
+where id = 3030;
+
+update sys_message
+set error_message = 'Can''t apply the foreign key %typevalue_name%'
+where id = 3032;
+
+update sys_message
+set error_message = 'Selected state type doesn''t correspond with state %state_id%'
+where id = 3036;
+
+update sys_message
+set error_message = 'Inserted value has unaccepted characters: %characters%'
+where id = 3038;
+
+update sys_message
+set error_message = 'Selected node type doesn''t divide arc. Node type: %node_type%'
+where id = 3046;
+
+update sys_message
+set error_message = 'Connect2network tool is not enabled for connec''s with state=2. Connec_id: %connec_id%'
+where id = 3052;
+
+update sys_message
+set error_message = 'Connect2network tool is not enabled for gullies with state=2. Gully_id: %gully_id%'
+where id = 3054;
+
+update sys_message
+set error_message = 'It is impossible to validate the arc without assigning value of arccat_id. Arc_id: %arc_id%'
+where id = 3056;
+
+update sys_message
+set error_message = 'It is impossible to validate the connec without assigning value of connecat_id. Connec_id: %connec_id%'
+where id = 3058;
+
+update sys_message
+set error_message = 'It is impossible to validate the node without assigning value of nodecat_id. Node_id: %node_id%'
+where id = 3060;
+
+update sys_message
+set error_message = 'Selected gratecat_id has NULL width or length. Gratecat_id: %gratecat_id%'
+where id = 3062;
+
+update sys_message
+set error_message = 'It is not possible to create the link. On inventory mode only one link is enabled for each connec. Connec_id: %connec_id%'
+where id = 3076;
+
+update sys_message
+set error_message = 'It is not possible to create the link. On inventory mode only one link is enabled for each gully. Gully_id: %gully_id%'
+where id = 3078;
+
+update sys_message
+set error_message = 'It is not possible to relate connect with state=1 over network feature with state=2, connect: %connec_id%'
+where id = 3080;
+
+update sys_message
+set error_message = 'Feature is out of any presszone, feature_id: %feature_id%'
+where id = 3108;
+
+update sys_message
+set error_message = '%id% does not exists, impossible to delete it'
+where id = 3116;
+
+update sys_message
+set error_message = 'Node is connected to arc which is involved in psector %psector_list%'
+where id = 3140;
+
+update sys_message
+set error_message = 'Node is involved in psector %psector_list%'
+where id = 3142;
+
+update sys_message
+set error_message = 'Exploitation of the feature is different than the one of the related arc. Arc_id: %arc_id%'
+where id = 3144;
+
+update sys_message
+set error_message = 'Backup name already exists %backup_name%'
+where id = 3148;
+
+update sys_message
+set error_message = 'Backup has no data related to table %table_name%'
+where id = 3150;
+
+update sys_message
+set error_message = 'Null values on geom1 or geom2 fields on element catalog %elementcat_id%'
+where id = 3152;
+
+update sys_message
+set error_message = 'Input parameter has null value %table_name%'
+where id = 3156;
+
+update sys_message
+set error_message = 'This feature with state = 2 is only attached to one psector %psector_id%'
+where id = 3160;
+
+update sys_message
+set error_message = 'Id value for this catalog already exists %value%'
+where id = 3166;
+
+update sys_message
+set error_message = 'It is no possible to relate planned connec/gully over planned connec/gully wich not are on same psector. %debugmsg%'
+where id = 3178;
+
+update sys_message
+set error_message = 'You are trying to modify some network element with related connects (connec / gully) on psector not selected. %psector_id%'
+where id = 3180;
+
+update sys_message
+set error_message = 'It is not possible to downgrade connec because has operative hydrometer associated %feature_id%'
+where id = 3194;
+
+update sys_message
+set error_message = 'Shortcut key is already defined for another feature %shortcut%'
+where id = 3196;
+
+update sys_message
+set error_message = 'It''s not possible to break planned arcs by using operative nodes %arc_id%'
+where id = 3202;
+
+update sys_message
+set error_message = 'The inserted value is not present in a catalog. %catalog%'
+where id = 3022;
+
+update sys_message
+set error_message = 'Inserted feature_id does not exist on node/connec table %feature_id%'
+where id = 3230;
+
+update sys_message
+set error_message = 'It''s not possible to connect to this arc because it exceed the maximum diameter configured: %diameter%'
+where id = 3232;
+
+update sys_message
+set error_message = 'It''s not possible to configure this node as mapzone header, because it''s not an operative nor planified node %zone%'
+where id = 3242;
+
+update sys_message
+set error_message = 'It''s not possible to use selected arcs. They are not connected to node parent %nodeparent%'
+where id = 3244;
+
+update sys_message
+set error_message = 'There is no subcatchment or outlet_id nearby'
+where id = 3252;
+
+update sys_message
+set error_message = 'No arc exists with a smaller diameter than the maximum configuered on edit_link_check_arcdnom: %edit_link_check_arcdnom%'
+where id = 3260;
+
+update sys_message
+set error_message = 'Wrong configuration. Check config_form_fields on column widgetcontrol key ''reloadfields'' for columnname: %parentname%'
+where id = 3264;
+
+update sys_message 
+set error_message = left(error_message, length(error_message)-1)
+where error_message ilike '%.';

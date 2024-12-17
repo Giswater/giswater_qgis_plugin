@@ -118,7 +118,7 @@ SET search_path = "SCHEMA_NAME", public;
 
 	IF v_count = 0 THEN
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-		"data":{"message":"3248", "function":"3160","debug_msg":null, "is_process":true}}$$);' INTO v_audit_result;
+		"data":{"message":"3248", "function":"3160","parameters":null, "is_process":true}}$$);' INTO v_audit_result;
 	END IF;
 
 	IF v_node_array IS NOT NULL THEN

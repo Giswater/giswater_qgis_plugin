@@ -20,7 +20,7 @@ BEGIN
 	ELSE
 
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-		"data":{"message":"3262", "function":"3306","debug_msg":null}}$$);'; 
+		"data":{"message":"3262", "function":"3306","parameters":null}}$$);'; 
 
 	END IF;
 	

@@ -43,7 +43,7 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
 			IF NEW.new_conneccat_id IS NULL THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"3056", "function":"2476","debug_msg":"'||NEW.connec_id||'"}}$$);';
+				"data":{"message":"3056", "function":"2476","parameters":{"arc_id":"'||NEW.connec_id||'"}}}$$);';
 			END IF;
 
 			UPDATE review_audit_connec SET new_conneccat_id=NEW.new_conneccat_id, is_validated=NEW.is_validated WHERE connec_id=NEW.connec_id;

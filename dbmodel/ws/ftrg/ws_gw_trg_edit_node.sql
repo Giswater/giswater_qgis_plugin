@@ -123,7 +123,7 @@ BEGIN
 		-- check if streetname exists
 		IF NEW.streetname IS NOT NULL AND ((NEW.streetname NOT IN (SELECT DISTINCT descript FROM v_ext_streetaxis)) OR (NEW.streetname2 NOT IN (SELECT DISTINCT descript FROM v_ext_streetaxis))) THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"3246", "function":"1320","debug_msg":null}}$$);';
+			"data":{"message":"3246", "function":"1320","parameters":null}}$$);';
 		END IF;
 
 		-- transforming streetaxis name into id
@@ -150,7 +150,7 @@ BEGIN
 		IF (NEW.nodecat_id IS NULL) THEN
 			IF ((SELECT COUNT(*) FROM cat_node WHERE active IS TRUE) = 0) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"1006", "function":"1320","debug_msg":null}}$$);';
+			"data":{"message":"1006", "function":"1320","parameters":null}}$$);';
 			END IF;
 
 			IF v_customfeature IS NOT NULL THEN
@@ -161,7 +161,7 @@ BEGIN
 
 			IF (NEW.nodecat_id IS NULL) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"1090", "function":"1320","debug_msg":null}}$$);';
+			"data":{"message":"1090", "function":"1320","parameters":null}}$$);';
 			END IF;
 		END IF;
 
@@ -170,7 +170,7 @@ BEGIN
 		IF NEW.epa_type IN ('VALVE', 'PUMP') THEN
 			IF NEW.epa_type <> v_feature_class THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"3266", "function":"1320","debug_msg":null, "is_process":true}}$$)';
+				"data":{"message":"3266", "function":"1320","parameters":null, "is_process":true}}$$)';
 			END IF;
 		ELSIF NEW.epa_type IS NULL THEN
 			NEW.epa_type:= (SELECT epa_default FROM cat_node JOIN cat_feature_node ON cat_feature_node.id=cat_node.node_type WHERE cat_node.id=NEW.nodecat_id LIMIT 1)::text;
@@ -183,7 +183,7 @@ BEGIN
 			-- control error without any mapzones defined on the table of mapzone
 			IF ((SELECT COUNT(*) FROM exploitation WHERE active IS TRUE) = 0) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"1110", "function":"1320","debug_msg":null}}$$);';
+			"data":{"message":"1110", "function":"1320","parameters":null}}$$);';
 			END IF;
 
 			-- getting value default
@@ -205,7 +205,7 @@ BEGIN
 			-- control error when no value
 			IF (NEW.expl_id IS NULL) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"2012", "function":"1320","debug_msg":"'||NEW.node_id::text||'"}}$$);';
+				"data":{"message":"2012", "function":"1320","parameters":{"feature_id":"'||NEW.node_id::text||'"}}}$$);';
 			END IF;
 		END IF;
 
@@ -215,7 +215,7 @@ BEGIN
 			-- control error without any mapzones defined on the table of mapzone
 			IF ((SELECT COUNT(*) FROM sector WHERE active IS TRUE ) = 0) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"1008", "function":"1320","debug_msg":null}}$$);';
+				"data":{"message":"1008", "function":"1320","parameters":null}}$$);';
 			END IF;
 
 			-- getting value default
@@ -247,7 +247,7 @@ BEGIN
 			-- control error without any mapzones defined on the table of mapzone
 			IF (SELECT COUNT(*) FROM dma WHERE active IS TRUE ) = 0 THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"1012", "function":"1320","debug_msg":null}}$$);';
+			"data":{"message":"1012", "function":"1320","parameters":null}}$$);';
 			END IF;
 
 			-- getting value default
@@ -278,7 +278,7 @@ BEGIN
 			-- control error without any mapzones defined on the table of mapzone
 			IF ((SELECT COUNT(*) FROM presszone WHERE active IS TRUE ) = 0) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"3106", "function":"1320","debug_msg":null}}$$);';
+			"data":{"message":"3106", "function":"1320","parameters":null}}$$);';
 			END IF;
 
 			-- getting value default
@@ -370,7 +370,7 @@ BEGIN
 			END IF;
 
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"3036", "function":"1320","debug_msg":"'||v_sql::text||'"}}$$);';
+			"data":{"message":"3036", "function":"1320","parameters":{"state_id":"'||v_sql::text||'"}}}$$);';
 
 		END IF;
 
@@ -812,13 +812,13 @@ BEGIN
 		    ELSIF (NEW.epa_type = 'VALVE') THEN
 				IF (SELECT lower(type) FROM cat_feature_node cf JOIN cat_node c ON cf.id=c.node_type WHERE c.id=NEW.nodecat_id)<>'valve' THEN
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-					"data":{"message":"3266", "function":"1320","debug_msg":null, "is_process":true}}$$)';
+					"data":{"message":"3266", "function":"1320","parameters":null, "is_process":true}}$$)';
 				END IF;
 			v_inp_table:= 'inp_valve';
 		    ELSIF (NEW.epa_type = 'PUMP') THEN
 				IF (SELECT lower(type) FROM cat_feature_node cf JOIN cat_node c ON cf.id=c.node_type WHERE c.id=NEW.nodecat_id)<>'pump' THEN
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-					"data":{"message":"3266", "function":"1320","debug_msg":null, "is_process":true}}$$)';
+					"data":{"message":"3266", "function":"1320","parameters":null, "is_process":true}}$$)';
 				END IF;
 			v_inp_table:= 'inp_pump';
 		    ELSIF (NEW.epa_type = 'INLET') THEN
@@ -851,7 +851,7 @@ BEGIN
 				NEW.state_type=(SELECT id from value_state_type WHERE state=0 LIMIT 1);
 					IF NEW.state_type IS NULL THEN
 						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-					"data":{"message":"2110", "function":"1320","debug_msg":null}}$$);';
+					"data":{"message":"2110", "function":"1320","parameters":null}}$$);';
 					END IF;
 				END IF;
 			END IF;
@@ -860,7 +860,7 @@ BEGIN
 		--check relation state - state_type
 		IF (NEW.state_type != OLD.state_type) AND NEW.state_type NOT IN (SELECT id FROM value_state_type WHERE state = NEW.state) THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"3036", "function":"1320","debug_msg":"'||NEW.state::text||'"}}$$);';
+				"data":{"message":"3036", "function":"1320","parameters":{"state_id":"'||NEW.state::text||'"}}}$$);';
 		END IF;
 
 		-- rotation

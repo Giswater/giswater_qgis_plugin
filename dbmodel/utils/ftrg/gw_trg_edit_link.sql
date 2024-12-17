@@ -142,7 +142,7 @@ BEGIN
 			IF v_connect IS NULL THEN
 				IF v_dsbl_error IS NOT TRUE THEN
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-					"data":{"message":"3070", "function":"1116","debug_msg":null}}$$);';
+					"data":{"message":"3070", "function":"1116","parameters":null}}$$);';
 				ELSE
 					SELECT concat('ERROR-',id,':',error_message,'.',hint_message) INTO v_message FROM sys_message WHERE id = 3070;
 					INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (394, NEW.link_id, v_message);
@@ -158,7 +158,7 @@ BEGIN
         IF v_projectype = 'WS' THEN
             IF (SELECT cat_dnom::integer FROM v_edit_arc WHERE arc_id=v_arc.arc_id) >= v_check_arcdnom AND v_check_arcdnom_status IS TRUE THEN
                 EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                "data":{"message":"3232", "function":"1116","debug_msg":'||v_check_arcdnom||'}}$$);';
+                "data":{"message":"3232", "function":"1116","parameters":{"diameter":"'||v_check_arcdnom||'"}}}$$);';
             END IF;
         END IF;
 
@@ -172,7 +172,7 @@ BEGIN
 			IF v_node.node_id IN (SELECT node_id FROM inp_valve UNION SELECT node_id FROM inp_pump) THEN
 				IF v_dsbl_error IS NOT TRUE THEN
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-					"data":{"message":"3072", "function":"1116","debug_msg":null}}$$);';
+					"data":{"message":"3072", "function":"1116","parameters":null}}$$);';
 				ELSE
 					SELECT concat('ERROR-',id,':',error_message,'.',hint_message) INTO v_message FROM sys_message WHERE id = 3072;
 					INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (394, NEW.link_id, v_message);
@@ -239,7 +239,7 @@ BEGIN
 		IF NEW.feature_type IS NULL THEN
 			IF v_dsbl_error IS NOT TRUE THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"3074", "function":"1116","debug_msg":null}}$$);';
+				"data":{"message":"3074", "function":"1116","parameters":null}}$$);';
 			ELSE
 				SELECT concat('ERROR-',id,':',error_message,'.',hint_message) INTO v_message FROM sys_message WHERE id = 3074;
 				INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (394, NEW.link_id, v_message);
@@ -375,7 +375,7 @@ BEGIN
 
 			IF v_dsbl_error IS NOT TRUE THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"2015", "function":"1116","debug_msg":null}}$$);';
+				"data":{"message":"2015", "function":"1116","parameters":null}}$$);';
 			ELSE
 				SELECT concat('ERROR-',id,':',error_message,'.',hint_message) INTO v_message FROM sys_message WHERE id = 2015;
 				INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (394, NEW.link_id, v_message);
@@ -397,7 +397,7 @@ BEGIN
 					IF v_currentpsector NOT IN (SELECT psector_id FROM plan_psector_x_connec WHERE connec_id = NEW.feature_id) THEN
 						IF v_dsbl_error IS NOT TRUE THEN
 							EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-							"data":{"message":"3178", "function":"1116","debug_msg":null}}$$);';
+							"data":{"message":"3178", "function":"1116","parameters":null}}$$);';
 						ELSE
 							SELECT concat('ERROR-',id,':',error_message,'.',hint_message) INTO v_message FROM sys_message WHERE id = 3178;
 							INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (394, NEW.link_id, v_message);
@@ -410,7 +410,7 @@ BEGIN
 					UNION SELECT psector_id FROM plan_psector_x_gully WHERE gully_id = NEW.feature_id) THEN
 						IF v_dsbl_error IS NOT TRUE THEN
 							EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-							"data":{"message":"3178", "function":"1116","debug_msg":null}}$$);';
+							"data":{"message":"3178", "function":"1116","parameters":null}}$$);';
 						ELSE
 							SELECT concat('ERROR-',id,':',error_message,'.',hint_message) INTO v_message FROM sys_message WHERE id = 3178;
 							INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (394, NEW.link_id, v_message);
@@ -425,7 +425,7 @@ BEGIN
 
 			IF NEW.state = 1 AND TG_OP = 'INSERT' THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"3218", "function":"1116","debug_msg":null}}$$);';
+				"data":{"message":"3218", "function":"1116","parameters":null}}$$);';
 
 			ELSIF NEW.state = 1 AND TG_OP = 'UPDATE' THEN
 				-- nothing to do (at least on this moment)
@@ -441,7 +441,7 @@ BEGIN
 								    SELECT psector_id FROM plan_psector_x_connec WHERE connec_id = NEW.exit_id) THEN
 						IF v_dsbl_error IS NOT TRUE THEN
 							EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-							"data":{"message":"3178", "function":"1116","debug_msg":null}}$$);';
+							"data":{"message":"3178", "function":"1116","parameters":null}}$$);';
 						ELSE
 							SELECT concat('ERROR-',id,':',error_message,'.',hint_message) INTO v_message FROM sys_message WHERE id = 3178;
 							INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (394, NEW.link_id, v_message);
@@ -459,7 +459,7 @@ BEGIN
 								    SELECT psector_id FROM plan_psector_x_gully WHERE gully_id = NEW.exit_id) THEN
 						IF v_dsbl_error IS NOT TRUE THEN
 							EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-							"data":{"message":"3178", "function":"1116","debug_msg":null}}$$);';
+							"data":{"message":"3178", "function":"1116","parameters":null}}$$);';
 						ELSE
 							SELECT concat('ERROR-',id,':',error_message,'.',hint_message) INTO v_message FROM sys_message WHERE id = 3178;
 							INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (394, NEW.link_id, v_message);
@@ -474,7 +474,7 @@ BEGIN
 
 			IF TG_OP = 'UPDATE' AND OLD.state = 2 THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"3220", "function":"1116","debug_msg":null}}$$);';
+				"data":{"message":"3220", "function":"1116","parameters":null}}$$);';
 			END IF;
 
 			IF (SELECT feature_id FROM link WHERE feature_id=NEW.feature_id AND link_id::text != NEW.link_id::text AND state = 1 limit 1) IS NOT NULL THEN
@@ -485,7 +485,7 @@ BEGIN
 
 						IF v_dsbl_error IS NOT TRUE THEN
 							EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-							"data":{"message":"3076", "function":"1116","debug_msg":""}}$$);';
+							"data":{"message":"3076", "function":"1116","parameters":null}}$$);';
 						ELSE
 							SELECT concat('ERROR-',id,':',error_message,'.',hint_message) INTO v_message FROM sys_message WHERE id = 3076;
 							INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (394, NEW.link_id, v_message);
@@ -498,7 +498,7 @@ BEGIN
 
 						IF v_dsbl_error IS NOT TRUE THEN
 							EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-							"data":{"message":"3078", "function":"1116","debug_msg":""}}$$);';
+							"data":{"message":"3078", "function":"1116","parameters":null}}$$);';
 						ELSE
 							SELECT concat('ERROR-',id,':',error_message,'.',hint_message) INTO v_message FROM sys_message WHERE id = 3078;
 							INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (394, NEW.link_id, v_message);
@@ -512,13 +512,13 @@ BEGIN
 			IF TG_OP = 'UPDATE' THEN
 				IF OLD.state = 1 THEN
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-					"data":{"message":"3222", "function":"1116","debug_msg":null}}$$);';
+					"data":{"message":"3222", "function":"1116","parameters":null}}$$);';
 				END IF;
 			END IF;
 
 			IF TG_OP = 'INSERT' AND v_connect.state = 1 THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"3224", "function":"1116","debug_msg":null}}$$);';
+				"data":{"message":"3224", "function":"1116","parameters":null}}$$);';
 			END IF;
 
 			-- looking for same psector
@@ -531,7 +531,7 @@ BEGIN
 			IF v_count > 1 THEN
 				IF v_dsbl_error IS NOT TRUE THEN
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-					"data":{"message":"3082", "function":"1116","debug_msg":null}}$$);';
+					"data":{"message":"3082", "function":"1116","parameters":null}}$$);';
 				ELSE
 					SELECT concat('ERROR-',id,':',error_message,'.',hint_message) INTO v_message FROM sys_message WHERE id = 3082;
 					INSERT INTO audit_log_data (fid, feature_id, log_message) VALUES (394, NEW.link_id, v_message);
@@ -640,11 +640,11 @@ BEGIN
 
 		ELSIF NEW.state = 0 AND OLD.state =2 THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"3226", "function":"1116","debug_msg":null}}$$);';
+			"data":{"message":"3226", "function":"1116","parameters":null}}$$);';
 
 		ELSIF NEW.state = 2 AND OLD.state = 1 THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"3222", "function":"1116","debug_msg":null}}$$);';
+			"data":{"message":"3222", "function":"1116","parameters":null}}$$);';
 
 		ELSIF NEW.state = 1 AND st_equals (OLD.the_geom, NEW.the_geom) IS FALSE THEN
 

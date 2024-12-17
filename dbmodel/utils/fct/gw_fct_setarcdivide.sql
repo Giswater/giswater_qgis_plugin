@@ -166,11 +166,11 @@ BEGIN
 	-- State control
 	IF v_state_arc=0 THEN
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-		"data":{"message":"1050", "function":"2114","debug_msg":null, "is_process":true}}$$);' INTO v_audit_result;
+		"data":{"message":"1050", "function":"2114","parameters":null, "is_process":true}}$$);' INTO v_audit_result;
 
 	ELSIF v_state_node=0 THEN
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-		"data":{"message":"1052", "function":"2114","debug_msg":null, "is_process":true}}$$);' INTO v_audit_result;
+		"data":{"message":"1052", "function":"2114","parameters":null, "is_process":true}}$$);' INTO v_audit_result;
 	ELSE
 
 
@@ -220,7 +220,7 @@ BEGIN
 
 					ELSE
 						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-						"data":{"message":"3094", "function":"2114","debug_msg":null, "is_process":true}}$$);' INTO v_audit_result;
+						"data":{"message":"3094", "function":"2114","parameters":null, "is_process":true}}$$);' INTO v_audit_result;
 					END IF;
 
 				ELSE
@@ -228,7 +228,7 @@ BEGIN
 					IF (SELECT count (*) FROM plan_psector_x_connec JOIN plan_psector USING (psector_id)
 					WHERE arc_id = v_arc_id AND state = 1 AND status IN (1,2) AND psector_id NOT IN (SELECT psector_id FROM selector_psector)) > 0 THEN
 						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-						"data":{"message":"3180", "function":"2114","debug_msg":null, "is_process":true}}$$);' INTO v_audit_result;
+						"data":{"message":"3180", "function":"2114","parameters":null, "is_process":true}}$$);' INTO v_audit_result;
 					END IF;
 
 					-- check if there are not-selected psector affecting gullies
@@ -236,7 +236,7 @@ BEGIN
 						IF (SELECT count (*) FROM plan_psector_x_gully JOIN plan_psector USING (psector_id)
 						WHERE arc_id = v_arc_id AND state = 1 AND status IN (1,2) AND psector_id NOT IN (SELECT psector_id FROM selector_psector)) > 0 THEN
 							EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-							"data":{"message":"3180", "function":"2114","debug_msg":null, "is_process":true}}$$);' INTO v_audit_result;
+							"data":{"message":"3180", "function":"2114","parameters":null, "is_process":true}}$$);' INTO v_audit_result;
 						END IF;
 					END IF;
 
@@ -315,7 +315,7 @@ BEGIN
 
 						IF rec_aux1.state = 2 THEN
 							EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-							"data":{"message":"3202", "function":"2114","debug_msg":"'||rec_aux1.arc_id||'", "is_process":true}}$$);' INTO v_audit_result;
+							"data":{"message":"3202", "function":"2114","parameters":{"arc_id":"'||rec_aux1.arc_id||'"}, "is_process":true}}$$);' INTO v_audit_result;
 						END IF;
 
 						INSERT INTO audit_check_data (fid,  criticity, error_message)
@@ -1050,10 +1050,10 @@ BEGIN
 
 					ELSIF (v_state_arc=2 AND v_state_node=1) THEN
 						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-						"data":{"message":"3042", "function":"2114","debug_msg":null, "is_process":true}}$$);' INTO v_audit_result;
+						"data":{"message":"3042", "function":"2114","parameters":null, "is_process":true}}$$);' INTO v_audit_result;
 					ELSE
 						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-						"data":{"message":"3044", "function":"2114","debug_msg":null, "is_process":true}}$$);' INTO v_audit_result;
+						"data":{"message":"3044", "function":"2114","parameters":null, "is_process":true}}$$);' INTO v_audit_result;
 					END IF;
 
 					-- set values of node
@@ -1083,16 +1083,16 @@ BEGIN
 				END IF;
 			ELSE
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-					"data":{"message":"3044", "function":"2114","debug_msg":null, "is_process":true}}$$);' INTO v_audit_result;
+					"data":{"message":"3044", "function":"2114","parameters":null, "is_process":true}}$$);' INTO v_audit_result;
 			END IF;
 		ELSE
 			IF v_node_type IS NOT NULL THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"3046", "function":"2114","debug_msg":"'||v_node_type||'", "is_process":true}}$$);' INTO v_audit_result;
+				"data":{"message":"3046", "function":"2114","parameters":{"node_type":"'||v_node_type||'"}, "is_process":true}}$$);' INTO v_audit_result;
 			ELSE
 
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"3046", "function":"2114","debug_msg":null, "is_process":true}}$$);' INTO v_audit_result;
+				"data":{"message":"3046", "function":"2114","parameters":null, "is_process":true}}$$);' INTO v_audit_result;
 			END IF;
 		END IF;
 	END IF;

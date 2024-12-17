@@ -36,7 +36,7 @@ BEGIN
 			IF NEW.expl_id = 0 THEN 
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},
 				"feature":{},
-				"data":{"message":"3250", "function":"2744","debug_msg":"", "variables":"value", "is_process":true}}$$)';
+				"data":{"message":"3250", "function":"2744","parameters":null, "variables":"value", "is_process":true}}$$)';
 			END IF;
 		END IF;
 				
@@ -75,8 +75,7 @@ BEGIN
 						v_new_field = REPLACE(v_new_field, '"', '\"');
 						
 						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-						"data":{"message":"3022", "function":"2744","debug_msg":
-						"'||concat('Catalog: ', rec.typevalue_table,', insert table: ',v_table, ', field: ',v_field,', value: ', v_new_field)||'"}}$$);';	
+						"data":{"message":"3022", "function":"2744","parameters":{"catalog":"'||concat('Catalog: ', rec.typevalue_table,', insert table: ',v_table, ', field: ',v_field,', value: ', v_new_field)||'"}}}$$);';	
 
 					END IF;
 				END IF;

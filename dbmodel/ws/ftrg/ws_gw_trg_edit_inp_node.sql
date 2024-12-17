@@ -35,7 +35,7 @@ BEGIN
             VALUES (NEW.node_id, NEW.order_id, NEW.power, NEW.curve_id, NEW.speed, NEW.pattern_id, NEW.status, NEW.effic_curve_id, NEW.energy_price, NEW.energy_pattern_id);
         ELSE
             EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-            "data":{"message":"1030", "function":"1310","debug_msg":null}}$$);';
+            "data":{"message":"1030", "function":"1310","parameters":null}}$$);';
         END IF;
 
         RETURN NEW;
@@ -89,7 +89,7 @@ BEGIN
 			v_new_nodetype:= (SELECT cat_feature.feature_class FROM cat_feature JOIN cat_node ON (((cat_feature.id)::text = (cat_node.node_type)::text)) WHERE cat_node.id=NEW.nodecat_id)::text;
 			IF (quote_literal(v_old_nodetype)::text <> quote_literal(v_new_nodetype)::text) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				 "data":{"message":"1016", "function":"1310","debug_msg":null}}$$);';
+				 "data":{"message":"1016", "function":"1310","parameters":null}}$$);';
 				RETURN NULL;
 			END IF;
 		END IF;
@@ -163,7 +163,7 @@ BEGIN
 
     ELSIF TG_OP = 'DELETE' THEN
         EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-        "data":{"message":"1032", "function":"1310","debug_msg":null}}$$);';
+        "data":{"message":"1032", "function":"1310","parameters":null}}$$);';
         RETURN NEW;
 
     END IF;

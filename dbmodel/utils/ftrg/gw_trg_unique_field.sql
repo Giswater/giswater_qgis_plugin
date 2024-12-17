@@ -22,7 +22,7 @@ BEGIN
    
 	   IF (SELECT count(connec_id) FROM connec WHERE state=1 AND customer_code=NEW.customer_code) > 1 THEN
 	       EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-          "data":{"message":"3018", "function":"2702","debug_msg":null}}$$);';
+          "data":{"message":"3018", "function":"2702","parameters":null}}$$);';
 	   END IF;
 	   
     END IF;

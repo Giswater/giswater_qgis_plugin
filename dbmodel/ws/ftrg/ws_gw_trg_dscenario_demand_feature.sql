@@ -18,13 +18,13 @@ BEGIN
 	IF NEW.feature_type='NODE' THEN
 		IF (SELECT count(node_id) FROM node WHERE node_id=NEW.feature_id) = 0 THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-	        "data":{"message":"3230", "function":"3232","debug_msg": "(node_id='||NEW.feature_id||')"}}$$);';
+	        "data":{"message":"3230", "function":"3232","parameters":{"feature_id":"'||NEW.feature_id||'"}}}$$);';
 		END IF;
 	ELSIF NEW.feature_type='CONNEC' THEN
 		IF (SELECT count(connec_id) FROM connec WHERE connec_id=NEW.feature_id) = 0 THEN
 			--RAISE EXCEPTION 'HERE222';
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-	        "data":{"message":"3230", "function":"3232","debug_msg": "(connec_id='||NEW.feature_id||')"}}$$);';
+	        "data":{"message":"3230", "function":"3232","parameters":{"feature_id":"'||NEW.feature_id||'"}}}$$);';
 		END IF;
 	END IF;
 	

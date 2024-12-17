@@ -23,18 +23,18 @@ BEGIN
 	-- check to_arc only to that arcs that have node_1 as the flowregulator node
 	IF NEW.to_arc IS NULL THEN
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-		"data":{"message":"2070", "function":"2420","debug_msg":null}}$$);';
+		"data":{"message":"2070", "function":"2420","parameters":null}}$$);';
 	END IF;
 
 	-- flwreg_length
 	IF NEW.flwreg_length IS NULL THEN
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-		"data":{"message":"2074", "function":"2420","debug_msg":null}}$$);';
+		"data":{"message":"2074", "function":"2420","parameters":null}}$$);';
 	END IF;
 	
 	IF (NEW.flwreg_length) >= (SELECT st_length(arc.the_geom) FROM arc WHERE arc_id=NEW.to_arc) THEN
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-		"data":{"message":"3048", "function":"2420","debug_msg":null}}$$);';
+		"data":{"message":"3048", "function":"2420","parameters":null}}$$);';
 	END IF;
 	
 	-- flowreg_id

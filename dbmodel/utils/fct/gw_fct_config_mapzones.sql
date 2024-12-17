@@ -77,7 +77,7 @@ BEGIN
         IF v_nodeparent IS NOT NULL THEN
             IF (v_netscenario_id IS NULL AND v_nodeparent NOT IN (SELECT node_id FROM node WHERE state = 1)) OR
                (v_netscenario_id IS NOT NULL AND v_nodeparent NOT IN (SELECT node_id FROM node WHERE state > 0)) THEN
-                EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{"message":"3242", "function":"3270","debug_msg": "'||v_zone||'"}}$$);' INTO v_audit_result;
+                EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{"message":"3242", "function":"3270","parameters":{"zone":"'||v_zone||'"}}}$$);' INTO v_audit_result;
             ELSE
                 IF v_netscenario_id IS NULL THEN
                     EXECUTE 'SELECT json_agg(a::integer) FROM json_array_elements_text('''||v_toarc||'''::json) a WHERE a IN (SELECT arc_id FROM arc WHERE state = 1 AND (node_1 ='||quote_literal(v_nodeparent)||' OR node_2 = '||quote_literal(v_nodeparent)||'))' INTO v_toarc;
@@ -87,7 +87,7 @@ BEGIN
 
                 IF v_toarc IS NULL AND v_project_type = 'WS' THEN
                     EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                        "data":{"message":"3244", "function":"3270","debug_msg": "'||v_nodeparent||'"}}$$);'  INTO v_audit_result;
+                        "data":{"message":"3244", "function":"3270","parameters":{"nodeparent":"'||v_nodeparent||'"}}}$$);'  INTO v_audit_result;
                 ELSIF v_project_type = 'WS' THEN
                         v_preview = concat('{"nodeParent":"',v_nodeparent,'", "toArc":',v_toarc,'}');
                 ELSIF v_project_type = 'UD' THEN

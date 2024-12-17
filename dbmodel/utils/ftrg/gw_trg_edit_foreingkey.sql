@@ -40,7 +40,7 @@ BEGIN
       
         IF NEW.subc_id NOT IN (SELECT DISTINCT subc_id FROM inp_subcatchment) THEN
           EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-          "data":{"message":"3194", "function":"2718","debug_msg":"'||NEW.subc_id||'","variables":"inp_subcatchment"}}$$);';
+          "data":{"message":"3194", "function":"2718","parameters":{"feature_id":"'||NEW.subc_id||'"},"variables":"inp_subcatchment"}}$$);';
         END IF;
       END IF;
   	

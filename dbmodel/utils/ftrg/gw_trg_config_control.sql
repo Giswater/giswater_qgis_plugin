@@ -69,7 +69,7 @@ BEGIN
 					IF rec_feature NOT IN (SELECT id FROM cat_feature UNION SELECT id FROM element_type) THEN
 						v_variables = concat('table: ',v_configtable,', featurecat: ',rec_feature);
 						v_message = concat('{"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{"message":"3172",
-						"function":"2816", "debug":null, "variables":"',v_variables,'"}}');
+						"function":"2816", "parameters":null, "variables":"',v_variables,'"}}');
 						PERFORM gw_fct_getmessage(v_message);
 					END IF;
 				END LOOP;
@@ -96,7 +96,7 @@ BEGIN
 						--check if dv_parent_id is not null (only for combo because for typeahead null value means feature_id)
 						IF NEW.dv_parent_id IS null AND NEW.widgettype != 'typeahead' THEN
 							v_message = concat('{"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{"message":"3102", "function":"2816",
-							"debug":null, "variables":"',v_variables,'"}}');
+							"parameters":null, "variables":"',v_variables,'"}}');
 							PERFORM gw_fct_getmessage(v_message);
 
 						elsif NEW.dv_parent_id IS null AND NEW.widgettype = 'typeahead' THEN
@@ -109,7 +109,7 @@ BEGIN
 
 						IF v_widgettype IS NULL and NEW.widgettype != 'typeahead'THEN
 							v_message = concat('{"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{"message":"3104",
-							"function":"2816", "debug":null, "variables":"',v_variables,'"}}');
+							"function":"2816", "parameters":null, "variables":"',v_variables,'"}}');
 							PERFORM gw_fct_getmessage(v_message);
 						END IF;
 					END IF;
@@ -123,7 +123,7 @@ BEGIN
 
 						IF v_count = 0 THEN
 							v_message = concat('{"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{"message":"3168",
-							"function":"2816", "debug":null, "variables":"',v_variables,'"}}');
+							"function":"2816", "parameters":null, "variables":"',v_variables,'"}}');
 							PERFORM gw_fct_getmessage(v_message);
 						END IF;
 				END IF;
@@ -134,7 +134,7 @@ BEGIN
 					-- isautoupdate is FALSE
 					IF NEW.isautoupdate = TRUE THEN
 						PERFORM gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-						"data":{"message":"3096", "function":"2816","debug":null}}$$);
+						"data":{"message":"3096", "function":"2816","parameters":null}}$$);
 					END IF;
 
 					--query text HAS SAME id THAN idval (with the exception of streetname and streename2)
@@ -147,7 +147,7 @@ BEGIN
 
 							IF v_count > 0 THEN
 								v_message = concat('{"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{"message":"3100",
-								"function":"2816", "debug":null, "variables":"',v_variables,'"}}');
+								"function":"2816", "parameters":null, "variables":"',v_variables,'"}}');
 								PERFORM gw_fct_getmessage(v_message);
 							END IF;
 						END IF;
@@ -167,7 +167,7 @@ BEGIN
 
 						IF v_count = 1 THEN
 								v_message = concat('{"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{"message":"3170",
-								"function":"2816", "debug":null, "variables":"',v_variables,'"}}');
+								"function":"2816", "parameters":null, "variables":"',v_variables,'"}}');
 								PERFORM gw_fct_getmessage(v_message);
 						END IF;
 					END IF;

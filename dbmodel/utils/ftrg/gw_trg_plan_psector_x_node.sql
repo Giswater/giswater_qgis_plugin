@@ -27,7 +27,7 @@ BEGIN
 	-- do not allow to insert features with expl diferent from psector expl
 	IF v_explaux<>v_psector_expl THEN
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-		"data":{"message":"3234", "function":"1130","debug_msg":""}}$$);';
+		"data":{"message":"3234", "function":"1130","parameters":null}}$$);';
 	END IF;
 
 	IF v_stateaux=1	THEN 
@@ -36,7 +36,7 @@ BEGIN
 	ELSIF v_stateaux=2 THEN
 		IF NEW.state = 0 THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"3182", "function":"1130","debug_msg":'||OLD.psector_id||'}}$$);';
+			"data":{"message":"3182", "function":"1130","parameters":{"psector_id":"'||OLD.psector_id||'"}}}$$);';
 		END IF;		
 		NEW.state = 1;
 		NEW.doable=true;

@@ -60,8 +60,7 @@ BEGIN
 	ELSE
 		v_matcat_id_value = REPLACE(v_matcat_id_value, '"', '\"');
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-		"data":{"message":"3022", "function":"3352","debug_msg":
-		"'||concat('Catalog: ', v_type_table,', insert table: ',v_insert_table, ', field: ',v_matcat_id,', value: ', v_matcat_id_value)||'"}}$$);';
+		"data":{"message":"3022", "function":"3352","parameters":{"catalog":"'||concat('Catalog: ', v_type_table,', insert table: ',v_insert_table, ', field: ',v_matcat_id,', value: ', v_matcat_id_value)||'"}}}$$);';
 	END IF;
 
 	RETURN NULL;

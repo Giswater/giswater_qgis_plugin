@@ -145,7 +145,7 @@ BEGIN
   	  	IF v_check_arcdnom IS NULL THEN v_check_arcdnom = 2000; END IF;
 		IF v_check_arcdnom <= (SELECT min(cat_dnom::float) FROM vu_arc) THEN
 		  EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-		  "data":{"message":"3260", "function":"3188","debug_msg":'||v_check_arcdnom||', "is_process":true}}$$);';
+		  "data":{"message":"3260", "function":"3188","parameters":{"edit_link_check_arcdnom":"'||v_check_arcdnom||'"}, "is_process":true}}$$);';
 		END IF;
 	END IF;
 
@@ -258,7 +258,7 @@ BEGIN
 			IF v_projecttype = 'WS' then
 				if (SELECT cat_dnom::integer FROM vu_arc WHERE arc_id=v_connect.arc_id) >= v_check_arcdnom AND v_check_status IS TRUE THEN
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-					"data":{"message":"3232", "function":"3188","debug_msg":'||v_check_arcdnom||', "is_process":true}}$$);';
+					"data":{"message":"3232", "function":"3188","parameters"{"diameter":'||v_check_arcdnom||'}:, "is_process":true}}$$);';
 				end if;
 			END IF;
 		END IF;
@@ -307,7 +307,7 @@ BEGIN
 				-- state control
 				IF v_arc.state=2 AND v_connect.state=1 AND v_isarcdivide is false THEN
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-					"data":{"message":"3050", "function":"2124","debug_msg":null, "is_process":true}}$$);' INTO v_audit_result;
+					"data":{"message":"3050", "function":"2124","parameters":null, "is_process":true}}$$);' INTO v_audit_result;
 				END IF;
 
 				-- get endfeature attributes

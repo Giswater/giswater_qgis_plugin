@@ -65,7 +65,7 @@ BEGIN
 
 		IF v_dscenario_id is null THEN 
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-   		"data":{"message":"3238", "function":"3254","debug_msg":null}}$$);';
+   		"data":{"message":"3238", "function":"3254","parameters":null}}$$);';
 		ELSE
 
 			DELETE FROM inp_dscenario_demand WHERE dscenario_id = v_dscenario_id;

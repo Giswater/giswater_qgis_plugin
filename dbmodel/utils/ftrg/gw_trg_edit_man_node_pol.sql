@@ -26,7 +26,7 @@ BEGIN
 			ORDER BY ST_distance(ST_centroid(NEW.the_geom),v_edit_node.the_geom) ASC LIMIT 1);
 			IF (NEW.feature_id IS NULL) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-	       		"data":{"message":"2052", "function":"2462","debug_msg":null}}$$);';
+	       		"data":{"message":"2052", "function":"2462","parameters":null}}$$);';
 			END IF;	
 		END IF;	
 		

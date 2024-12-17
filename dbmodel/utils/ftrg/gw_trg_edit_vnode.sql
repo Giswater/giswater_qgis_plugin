@@ -27,19 +27,19 @@ BEGIN
 	-- Insert
 	IF TG_OP = 'INSERT' THEN
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-       	"data":{"message":"3084", "function":"1126","debug_msg":null}}$$);';
+       	"data":{"message":"3084", "function":"1126","parameters":null}}$$);';
 		RETURN NEW;
 
 	-- Update
 	ELSIF TG_OP = 'UPDATE' THEN
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-       	"data":{"message":"3086", "function":"1126","debug_msg":null}}$$);';
+       	"data":{"message":"3086", "function":"1126","parameters":null}}$$);';
 		RETURN NEW;
 		
 	-- Delete
 	ELSIF TG_OP = 'DELETE' THEN
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-       	"data":{"message":"3088", "function":"1126","debug_msg":null}}$$);';
+       	"data":{"message":"3088", "function":"1126","parameters":null}}$$);';
 		RETURN NULL;
    
 	END IF;

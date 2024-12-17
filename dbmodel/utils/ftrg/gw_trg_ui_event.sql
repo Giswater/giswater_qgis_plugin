@@ -23,7 +23,7 @@ BEGIN
    -- ELSIF TG_OP = 'UPDATE' THEN
         
             --PERFORM gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-            -- "data":{"message":"2", "function":"XXX","debug_msg":null, "variables":null}}$$); 
+            -- "data":{"message":"2", "function":"XXX","parameters":null, "variables":null}}$$); 
         RETURN NEW;
 
     ELSIF TG_OP = 'DELETE' THEN
@@ -32,7 +32,7 @@ BEGIN
             EXECUTE v_sql;
    
         --PERFORM gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-                 -- "data":{"message":"3", "function":"XXX","debug_msg":null, "variables":null}}$$); 
+                 -- "data":{"message":"3", "function":"XXX","parameters":null, "variables":null}}$$); 
         RETURN NULL;
     
     END IF;

@@ -14,7 +14,7 @@ $BODY$
 SELECT SCHEMA_NAME.gw_fct_getmessage($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{},
-"data":{"message":"2", "function":"1312","debug_msg":null, "variables":"value", "is_process":true}}$$)
+"data":{"message":"2", "function":"1312","parameters":{"feature_id": 1, "expl_id": 2}, "variables":"value", "is_process":true}}$$)
 */
 
 DECLARE
@@ -29,12 +29,15 @@ v_result_info json;
 v_projectype text;
 v_version text;
 v_status text;
+v_parameters json;
 v_message_id integer;
 v_function_id integer;
-v_message text;
 v_variables text;
 v_debug Boolean;
 v_isprocess boolean = false;
+
+_key text;
+_value text;
 
 BEGIN
 
@@ -46,7 +49,7 @@ BEGIN
 	-- Get parameters from input json
 	v_message_id = lower(((p_data ->>'data')::json->>'message')::text);
 	v_function_id = lower(((p_data ->>'data')::json->>'function')::text);
-	v_message = lower(((p_data ->>'data')::json->>'debug_msg')::text);
+	v_parameters = lower(((p_data ->>'data')::json->>'parameters')::text);
 	v_variables = lower(((p_data ->>'data')::json->>'variables')::text);
 	v_isprocess = lower(((p_data ->>'data')::json->>'is_process')::text);
 
@@ -54,7 +57,34 @@ BEGIN
 
 	-- get flow parameters
 	SELECT * INTO rec_cat_error FROM sys_message WHERE sys_message.id=v_message_id;
+	
 
+	SELECT * INTO rec_function
+	FROM sys_function WHERE sys_function.id=v_function_id;
+
+	IF rec_function IS NULL THEN
+		RETURN json_build_object('status', 'Failed', 'message', json_build_object('level', 1, 'text', 'Function does not exist'))::json;
+	END IF;
+
+
+	-- compare parameters in message with parameters recieved
+	IF rec_cat_error IS NOT NULL THEN
+		IF (select (select array(SELECT key FROM json_each_text(v_parameters) order by key)) =
+		(select array(select split_part(token, '%', 2) as msg_parameters
+		from string_to_table(rec_cat_error.error_message, ' ') token where token like '%\%%\%%'
+		order by msg_parameters))) THEN
+			-- replace parameter names in message with parameter values recieved
+			FOR _key, _value IN
+				SELECT * FROM json_each_text(v_parameters)
+			LOOP
+				rec_cat_error.error_message = replace(rec_cat_error.error_message, concat('%', _key, '%'), _value);
+			END LOOP;
+		ELSE
+			-- return error parameters aren't the same
+			RETURN json_build_object('status', 'Failed', 'message', json_build_object('level', 1, 'text', 'Error in message parameters'))::json;
+		END IF;
+	END IF;
+	
 	-- message process
 	if v_isprocess then
 
@@ -69,27 +99,20 @@ BEGIN
 			FROM sys_function WHERE sys_function.id=v_function_id;
 		
 			IF v_debug THEN
-				SELECT  concat('Function: ',function_name,' - ',upper(rec_cat_error.error_message),' ',v_message,'. HINT: ', upper(rec_cat_error.hint_message),'.')  INTO v_return_text
+				SELECT  concat('Function: ',function_name,' - ',upper(rec_cat_error.error_message),'. HINT: ', upper(rec_cat_error.hint_message),'.')  INTO v_return_text
 				FROM sys_function WHERE sys_function.id=v_function_id;
 			END IF;
 		
 			RAISE 'Function: [%] - %. HINT: % - %', rec_function.function_name, upper(rec_cat_error.error_message), upper(rec_cat_error.hint_message), v_variables
 			USING ERRCODE  = concat('GW00', rec_cat_error.log_level);
-			v_level = 1;
-			v_status = 'Failed';
 
 		-- log_level of type 'ERROR' (mostly applied to trigger functions)
 		ELSIF rec_cat_error.log_level = 2 THEN
 			SELECT * INTO rec_function
 			FROM sys_function WHERE sys_function.id=v_function_id;
 
-			IF v_message IS NOT NULL THEN
-				RAISE 'Function: [%] - %. HINT: % - % ', rec_function.function_name, concat(upper(rec_cat_error.error_message), ' ',v_message), upper(rec_cat_error.hint_message), v_variables 
-				USING ERRCODE  = concat('GW00', rec_cat_error.log_level);
-			ELSE
-				RAISE 'Function: [%] - %. HINT: % - %', rec_function.function_name, upper(rec_cat_error.error_message), upper(rec_cat_error.hint_message), v_variables
-				USING ERRCODE  = concat('GW00', rec_cat_error.log_level);
-			END IF;
+			RAISE 'Function: [%] - %. HINT: % - %', rec_function.function_name, upper(rec_cat_error.error_message), upper(rec_cat_error.hint_message), v_variables 
+			USING ERRCODE  = concat('GW00', rec_cat_error.log_level);
 		ELSIF rec_cat_error.log_level = 3 THEN
 			IF v_debug THEN
 				SELECT  concat('Function: ',function_name,' - ',upper(rec_cat_error.error_message),'. HINT: ', upper(rec_cat_error.hint_message),'.')  INTO v_return_text
@@ -139,18 +162,10 @@ BEGIN
 			SELECT * INTO rec_function
 			FROM sys_function WHERE sys_function.id=v_function_id;
 
-			IF v_message IS NOT NULL THEN
-				IF v_variables IS NOT NULL and v_variables != '<NULL>' THEN
-					RAISE EXCEPTION 'Function: [%] - %. HINT: % - % ', rec_function.function_name, concat(upper(rec_cat_error.error_message), ' ',v_message), upper(rec_cat_error.hint_message), v_variables ;
-				ELSE
-					RAISE EXCEPTION 'Function: [%] - %. HINT: %', rec_function.function_name, concat(upper(rec_cat_error.error_message), ' ',v_message), upper(rec_cat_error.hint_message);
-				END IF;
+			IF v_variables IS NOT NULL and v_variables != '<NULL>' THEN
+				RAISE EXCEPTION 'Function: [%] - %. HINT: % - %', rec_function.function_name, upper(rec_cat_error.error_message), upper(rec_cat_error.hint_message), v_variables ;
 			ELSE
-				IF v_variables IS NOT NULL and v_variables != '<NULL>'THEN
-					RAISE EXCEPTION 'Function: [%] - %. HINT: % - %', rec_function.function_name, upper(rec_cat_error.error_message), upper(rec_cat_error.hint_message), v_variables ;
-				ELSE
-					RAISE EXCEPTION 'Function: [%] - %. HINT: %', rec_function.function_name, upper(rec_cat_error.error_message), upper(rec_cat_error.hint_message) ;
-				END IF;
+				RAISE EXCEPTION 'Function: [%] - %. HINT: %', rec_function.function_name, upper(rec_cat_error.error_message), upper(rec_cat_error.hint_message);
 			END IF;
 		ELSIF rec_cat_error.log_level = 3 THEN
 

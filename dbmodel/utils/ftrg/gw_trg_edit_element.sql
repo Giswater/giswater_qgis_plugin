@@ -110,8 +110,8 @@ BEGIN
 				NEW.expl_id := (SELECT expl_id FROM exploitation WHERE active IS TRUE AND ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
 				IF (NEW.expl_id IS NULL) THEN
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-       				 "data":{"message":"2012", "function":"1114","debug_msg":"'||NEW.element_id||'"}}$$);';
-				END IF;
+       				 "data":{"message":"2012", "function":"1114","parameters":{"feature_id":"'||NEW.element_id||'"}}}$$);';
+				END IF;		
 			END IF;
 		END IF;
 
@@ -184,7 +184,7 @@ BEGIN
 			IF v_length IS NULL OR v_length = 0 THEN
 
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"3152", "function":"1114","debug_msg":"'||NEW.elementcat_id::text||'"}}$$);';
+				"data":{"message":"3152", "function":"1114","parameters":{"elementcat_id":"'||NEW.elementcat_id::text||'"}}}$$);';
 
 			ELSIF v_length IS NOT NULL AND (v_width IS NULL OR v_width = 0) THEN
 
@@ -345,7 +345,7 @@ BEGIN
 
 			IF v_length IS NULL OR v_length = 0 THEN
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-					"data":{"message":"3152", "function":"1114","debug_msg":"'||NEW.elementcat_id::text||'"}}$$);';
+					"data":{"message":"3152", "function":"1114","parameters":{"elementcat_id":"'||NEW.elementcat_id::text||'"}}}$$);';
 
 			ELSIF v_length IS NOT NULL AND (v_width IS NULL OR v_width = 0) THEN
 

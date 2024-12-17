@@ -46,7 +46,7 @@ BEGIN
 		--if there is a value - error message, if not create a trigger for the defined typevalue 
 		IF v_count > 0 THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-       		"data":{"message":"3032", "function":"2750","debug_msg":"'||NEW.typevalue_name||'"}}$$);';
+       		"data":{"message":"3032", "function":"2750","parameters":{"typevalue_name":"'||NEW.typevalue_name||'"}}}$$);';
 		ELSE 
 			PERFORM gw_fct_admin_manage_triggers('fk', NEW.target_table);
 		END IF;
@@ -59,7 +59,7 @@ BEGIN
 			IF NEW.typevalue != OLD.typevalue OR NEW.id != OLD.id THEN
 
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-       				"data":{"message":"3028", "function":"2750","debug_msg":"'||OLD.typevalue||'"}}$$);';
+       				"data":{"message":"3028", "function":"2750","parameters":{"typevalue":"'||OLD.typevalue||'"}}}$$);';
 			END IF;
 		ELSE
 			v_query =  'SELECT *  FROM sys_foreignkey JOIN '||v_table||' ON '||v_table||'.typevalue = typevalue_name
@@ -89,7 +89,7 @@ BEGIN
 
 		IF v_table = 'sys_typevalue' THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-       		"data":{"message":"3028", "function":"2750","debug_msg":""}}$$);';
+       		"data":{"message":"3028", "function":"2750","parameters":null}}$$);';
 		ELSE
 			--select configuration from the related typevalue table
 			v_query = 'SELECT * FROM SCHEMA_NAME.'||v_table||' WHERE '||v_table||'.typevalue = '''|| OLD.typevalue||''' AND  '||v_table||'.id = '''||OLD.id||''';';
@@ -98,7 +98,7 @@ BEGIN
 		IF OLD.typevalue IN (SELECT typevalue_name FROM sys_typevalue) THEN
 			
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-       		"data":{"message":"3028", "function":"2750","debug_msg":"'||OLD.typevalue||'"}}$$);';
+       		"data":{"message":"3028", "function":"2750","parameters":{"typevalue":"'||OLD.typevalue||'"}}}$$);';
 		ELSE 
 			--select configuration from the sys_foreignkey table
 			v_query = 'SELECT * FROM sys_foreignkey WHERE typevalue_table = '''||v_table||''' AND typevalue_name = '''||OLD.typevalue||''';';
@@ -114,7 +114,7 @@ BEGIN
 				IF v_count > 0 THEN
 
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-       				"data":{"message":"3030", "function":"2750","debug_msg":"'||rec.typevalue_name||'"}}$$);';
+       				"data":{"message":"3030", "function":"2750","parameters":{"typevalue":"'||rec.typevalue_name||'"}}}$$);';
 				END IF;
 				--check if the value is the last one defined for the typevalue, if so delete the configuration from sys_foreignkey
 				EXECUTE 'SELECT count(typevalue) FROM '||v_typevalue_fk.typevalue_table||' WHERE typevalue = '''||v_typevalue_fk.typevalue_name||''''

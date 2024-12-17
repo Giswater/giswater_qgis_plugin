@@ -115,7 +115,7 @@ BEGIN
 		-- managing gully_type
 		IF NEW.gully_type IS NULL THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"3262", "function":"1206","debug_msg":null}}$$);';
+			"data":{"message":"3262", "function":"1206","parameters":null}}$$);';
 		END IF;
 
 		--check if feature is double geom
@@ -126,7 +126,7 @@ BEGIN
 		-- check if streetname exists
 		IF NEW.streetname IS NOT NULL AND ((NEW.streetname NOT IN (SELECT DISTINCT descript FROM v_ext_streetaxis)) OR (NEW.streetname2 NOT IN (SELECT DISTINCT descript FROM v_ext_streetaxis))) THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"3246", "function":"1206","debug_msg":null}}$$);';
+			"data":{"message":"3246", "function":"1206","parameters":null}}$$);';
 		END IF;
 
         -- transforming streetaxis name into id
@@ -136,7 +136,7 @@ BEGIN
 		IF NEW.arc_id IS NOT NULL AND NEW.expl_id IS NOT NULL THEN
 			IF (SELECT expl_id FROM arc WHERE arc_id = NEW.arc_id) != NEW.expl_id THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"3144", "function":"1206","debug_msg":"'||NEW.arc_id::text||'"}}$$);';
+				"data":{"message":"3144", "function":"1206","parameters":{"arc_id":"'||NEW.arc_id::text||'"}}}$$);';
 			END IF;
 		END IF;
 
@@ -173,7 +173,7 @@ BEGIN
 			-- control error without any mapzones defined on the table of mapzone
 			IF ((SELECT COUNT(*) FROM exploitation WHERE active IS TRUE) = 0) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-		       	"data":{"message":"1110", "function":"1206","debug_msg":null}}$$);';
+		       	"data":{"message":"1110", "function":"1206","parameters":null}}$$);';
 			END IF;
 
 			-- getting value default
@@ -195,7 +195,7 @@ BEGIN
 			-- control error when no value
 			IF (NEW.expl_id IS NULL) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"2012", "function":"1206","debug_msg":"'||NEW.gully_id::text||'"}}$$);';
+				"data":{"message":"2012", "function":"1206","parameters":{"feature_id":"'||NEW.gully_id::text||'"}}}$$);';
 			END IF;
 		END IF;
 
@@ -206,7 +206,7 @@ BEGIN
 			-- control error without any mapzones defined on the table of mapzone
 			IF ((SELECT COUNT(*) FROM sector WHERE active IS TRUE ) = 0) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-		       	"data":{"message":"1008", "function":"1206","debug_msg":null}}$$);';
+		       	"data":{"message":"1008", "function":"1206","parameters":null}}$$);';
 			END IF;
 
 			-- getting value default
@@ -238,7 +238,7 @@ BEGIN
 			-- control error without any mapzones defined on the table of mapzone
 			IF ((SELECT COUNT(*) FROM dma WHERE active IS TRUE) = 0) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-		       	"data":{"message":"1012", "function":"1206","debug_msg":null}}$$);';
+		       	"data":{"message":"1012", "function":"1206","parameters":null}}$$);';
 			END IF;
 
 			-- getting value default
@@ -335,7 +335,7 @@ BEGIN
 			END IF;
 
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"3036", "function":"1206","debug_msg":"'||v_sql::text||'"}}$$);';
+			"data":{"message":"3036", "function":"1206","parameters":{"state_id":"'||v_sql::text||'"}}}$$);';
 	   	END IF;
 
 		-- Workcat_id
@@ -528,7 +528,7 @@ BEGIN
 
 			IF v_length*v_width IS NULL THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"3062", "function":"1206","debug_msg":"'||NEW.gullycat_id::text||'"}}$$);';
+				"data":{"message":"3062", "function":"1206","parameters":{"gratecat_id":"'||NEW.gullycat_id::text||'"}}}$$);';
 
 			ELSIF v_length*v_width != 0 THEN
 
@@ -724,7 +724,7 @@ BEGIN
 					IF (SELECT link_id FROM plan_psector_x_gully JOIN selector_psector USING (psector_id)
 						WHERE gully_id=NEW.gully_id AND psector_id = v_psector_vdefault AND cur_user = current_user AND state = 1) IS NOT NULL THEN
 						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-						"data":{"message":"3206", "function":"1204","debug_msg":""}}$$);';
+						"data":{"message":"3206", "function":"1204","parameters":null}}$$);';
 					ELSE
 						UPDATE plan_psector_x_gully SET arc_id = null, link_id = null WHERE gully_id=NEW.gully_id AND psector_id = v_psector_vdefault AND state = 1;
 					END IF;
@@ -751,7 +751,7 @@ BEGIN
 				ELSE
 					IF (SELECT count(*)FROM link WHERE feature_id = NEW.gully_id AND state = 1) > 0 THEN
 						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-						"data":{"message":"3206", "function":"1206","debug_msg":""}}$$);';
+						"data":{"message":"3206", "function":"1206","parameters":null}}$$);';
 					ELSE
 						NEW.sector_id = 0; NEW.dma_id = 0; NEW.pjoint_id = null; NEW.pjoint_type = null;
 					END IF;
@@ -767,7 +767,7 @@ BEGIN
 				NEW.state_type=(SELECT id from value_state_type WHERE state=0 LIMIT 1);
 					IF NEW.state_type IS NULL THEN
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-					"data":{"message":"2110", "function":"1206","debug_msg":null}}$$);';
+					"data":{"message":"2110", "function":"1206","parameters":null}}$$);';
 					END IF;
 				END IF;
 			END IF;
@@ -811,7 +811,7 @@ BEGIN
 		--check relation state - state_type
 		IF (NEW.state_type != OLD.state_type) AND NEW.state_type NOT IN (SELECT id FROM value_state_type WHERE state = NEW.state) THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"3036", "function":"1206","debug_msg":"'||NEW.state::text||'"}}$$);';
+			"data":{"message":"3036", "function":"1206","parameters":{"state_id":"'||NEW.state::text||'"}}}$$);';
 		END IF;
 
 		--link_path
@@ -846,7 +846,7 @@ BEGIN
 				IF v_length*v_width IS NULL THEN
 
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-					"data":{"message":"3062", "function":"1206","debug_msg":"'||NEW.gullycat_id::text||'"}}$$);';
+					"data":{"message":"3062", "function":"1206","parameters":{"gratecat_id":"'||NEW.gullycat_id::text||'"}}}$$);';
 
 				ELSIF v_length*v_width != 0 THEN
 

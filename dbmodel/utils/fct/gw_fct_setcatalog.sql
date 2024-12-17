@@ -171,7 +171,7 @@ BEGIN
 			INTO v_checkpkey; 
 			IF v_checkpkey = 1 THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"3166", "function":"3010","debug_msg":"'||v_value||'", "is_process":true}}$$);'
+				"data":{"message":"3166", "function":"3010","parameters":{"value":"'||v_value||'"}, "is_process":true}}$$);'
 				INTO v_audit_result;
 			END IF;
 		END IF;

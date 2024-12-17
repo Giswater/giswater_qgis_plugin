@@ -26,7 +26,7 @@ BEGIN
 			NEW.feature_id:= (SELECT gully_id FROM v_edit_gully WHERE ST_DWithin(NEW.the_geom, v_edit_gully.the_geom,0.001) LIMIT 1);
 			IF (NEW.feature_id IS NULL) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-      		 	"data":{"message":"2048", "function":"2416","debug_msg":null}}$$);'; 
+      		 	"data":{"message":"2048", "function":"2416","parameters":null}}$$);'; 
 			END IF;
 		END IF;
 
@@ -48,7 +48,7 @@ BEGIN
 		IF (NEW.feature_id != OLD.feature_id) THEN
 			IF (SELECT gully_id FROM gully WHERE gully_id=NEW.feature_id) IS NULL THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-      		 	"data":{"message":"2050", "function":"2416","debug_msg":null}}$$);';
+      		 	"data":{"message":"2050", "function":"2416","parameters":null}}$$);';
 			END IF;
 
 			UPDATE polygon SET feature_id=NEW.feature_id, featurecat_id =gully_type 

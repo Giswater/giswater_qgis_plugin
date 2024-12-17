@@ -31,7 +31,7 @@ BEGIN
             VALUES (NEW.node_id, NEW.order_id, NEW.power, NEW.curve_id, NEW.speed, NEW.pattern_id, NEW.status, NEW.effic_curve_id, NEW.energy_price, NEW.energy_pattern_id);
         ELSE
             EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-            "data":{"message":"1030", "function":"1310","debug_msg":null}}$$);';
+            "data":{"message":"1030", "function":"1310","parameters":null}}$$);';
         END IF;
 
         RETURN NEW;
@@ -141,7 +141,7 @@ BEGIN
 
     ELSIF TG_OP = 'DELETE' THEN
         EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-        "data":{"message":"1032", "function":"1210","debug_msg":null}}$$);';
+        "data":{"message":"1032", "function":"1210","parameters":null}}$$);';
 
     END IF;
 

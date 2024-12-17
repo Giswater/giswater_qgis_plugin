@@ -86,7 +86,7 @@ BEGIN
 	v_get_message_query := 'SELECT gw_fct_getmessage($$' ||
 							'{"client":{"device":4,"infoType":1,"lang":"ES"},' ||
 							'"feature":{},' ||
-							'"data":{"message":"' || v_id || '","function":"","debug_msg":null,"is_process":true}}' ||
+							'"data":{"message":"' || v_id || '","function":"","parameters":null,"is_process":true}}' ||
 							'$$);';
 
 	v_result_json := '{"insert_query": ' || v_insert_query || ', "get_message_query": ' || v_get_message_query || '}';

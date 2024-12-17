@@ -164,7 +164,7 @@ BEGIN
 
 					IF v_psector_id IS NOT NULL THEN
 						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-						"data":{"message":"3142", "function":"3068","debug_msg":"'||v_psector_list||'"}}$$);' INTO v_audit_result;
+						"data":{"message":"3142", "function":"3068","parameters":{"psector_list":"'||v_psector_list||'"}}}$$);' INTO v_audit_result;
 					END IF;
 				END IF;
 
@@ -178,10 +178,8 @@ BEGIN
 
 					EXECUTE v_result INTO v_result;
 
-					v_result=concat(v_feature_id_value,' has associated arcs ',v_result);
-
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-					"data":{"message":"1072", "function":"3068","debug_msg":"'||v_result||'"}}$$);' INTO v_audit_result;
+					"data":{"message":"1072", "function":"3068","parameters":{"node_id":"'||v_feature_id_value||'"}}}$$);' INTO v_audit_result;
 				END IF;
 
 				-- specific log when a node is related to more than 1 node/arc/connec/gully

@@ -26,7 +26,7 @@ BEGIN
 		--Exploitation ID
             IF ((SELECT COUNT(*) FROM exploitation WHERE active IS TRUE) = 0) THEN
                 EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-        		"data":{"message":"1110", "function":"1312","debug_msg":null}}$$);';
+        		"data":{"message":"1110", "function":"1312","parameters":null}}$$);';
 				RETURN NULL;				
             END IF;
             expl_id_int := (SELECT expl_id FROM exploitation WHERE active IS TRUE AND ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
@@ -51,7 +51,7 @@ BEGIN
 			
 	
         EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-        		"data":{"message":"2", "function":"1312","debug_msg":null}}$$);';
+        		"data":{"message":"2", "function":"1312","parameters":null}}$$);';
         RETURN NEW;
 
 		 ELSIF TG_OP = 'DELETE' THEN  		
@@ -60,7 +60,7 @@ BEGIN
 		
 		
         EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-        "data":{"message":"3", "function":"1312","debug_msg":null}}$$);'; 
+        "data":{"message":"3", "function":"1312","parameters":null}}$$);'; 
         RETURN NULL;
      
      END IF;

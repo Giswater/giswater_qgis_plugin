@@ -36,7 +36,7 @@ BEGIN
 			WHERE arc_id = NEW.arc_id AND state = 1 AND status IN (1,2) AND psector_id NOT IN (SELECT psector_id FROM selector_psector WHERE cur_user=current_user);
 
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"3180", "function":"2542","debug_msg":"'||v_debugmsg||'"}}$$);';								
+			"data":{"message":"3180", "function":"2542","parameters":{"debugmsg":"'||v_debugmsg||'"}}}$$);';								
 		END IF;
 		
 		-- Redraw endpoint of link

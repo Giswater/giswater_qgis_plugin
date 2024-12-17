@@ -19,18 +19,18 @@ BEGIN
     doc_table:= TG_ARGV[0];
 
     IF TG_OP = 'INSERT' THEN
-         --EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{}, "data":{"message":"1", "function":"1138","debug_msg":null}}$$);';
+         --EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{}, "data":{"message":"1", "function":"1138","parameters":null}}$$);';
 
         RETURN NEW;
 
     ELSIF TG_OP = 'UPDATE' THEN
-        --EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{}, "data":{"message":"2", "function":"1138","debug_msg":null}}$$);';
+        --EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{}, "data":{"message":"2", "function":"1138","parameters":null}}$$);';
         RETURN NEW;
 
     ELSIF TG_OP = 'DELETE' THEN
         v_sql:= 'DELETE FROM '||doc_table||' WHERE id = '||quote_literal(OLD.id)||';';
         EXECUTE v_sql;
-         --EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{}, "data":{"message":"3", "function":"1138","debug_msg":null}}$$);';
+         --EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{}, "data":{"message":"3", "function":"1138","parameters":null}}$$);';
         RETURN NULL;
     
     END IF;

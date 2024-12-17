@@ -83,7 +83,7 @@ BEGIN
 				NEW.expl_id := (SELECT expl_id FROM exploitation WHERE active IS TRUE AND ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
 				IF (NEW.expl_id IS NULL) THEN
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-					"data":{"message":"2012", "function":"2490","debug_msg":"'||NEW.connec_id::text||'"}}$$);';
+					"data":{"message":"2012", "function":"2490","parameters":{"feature_id":"'||NEW.connec_id::text||'"}}}$$);';
 				END IF;
 			END IF;
 		END IF;

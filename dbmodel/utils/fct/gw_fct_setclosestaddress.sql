@@ -75,7 +75,7 @@ BEGIN
 		execute 'SELECT gw_fct_getmessage($${
 		"client":{"device":4, "infoType":1, "lang":"ES"},
 		"feature":{},
-		"data":{"message":"3268", "function":"3198","debug_msg":null, "variables":"value", "is_process":true}}$$);';
+		"data":{"message":"3268", "function":"3198","parameters":null, "variables":"value", "is_process":true}}$$);';
 
 
 	end if;

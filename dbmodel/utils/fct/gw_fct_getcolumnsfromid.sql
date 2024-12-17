@@ -71,7 +71,7 @@ BEGIN
 			i = i+1;
 		ELSE
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"3264", "function":"2874","debug_msg":"'||v_parentname||'", "is_process":true}}$$);';
+			"data":{"message":"3264", "function":"2874","parameters":{"parentname":"'||v_parentname||'"}, "is_process":true}}$$);';
 		END IF;
 	END LOOP;
 	

@@ -24,7 +24,7 @@ BEGIN
 			NEW.feature_id:= (SELECT connec_id FROM v_edit_connec WHERE ST_DWithin(NEW.the_geom, v_edit_connec.the_geom,0.001) LIMIT 1);
 			IF (NEW.feature_id IS NULL) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"2094", "function":"2460","debug_msg":null}}$$);';
+				"data":{"message":"2094", "function":"2460","parameters":null}}$$);';
 			END IF;	
 		END IF;
 
