@@ -927,6 +927,28 @@ def configure_layers_from_table_name(table_name):
         for key, table_list in table_groups.items():
             if "dscenario" in key:
                 tables.extend(table_list)
+
+    # Dynamically collect all 'curve' tables if 'table_name' is 'curve'
+    elif table_name == "curve":
+        tables = []
+        for key, table_list in table_groups.items():
+            if "curve" in key:
+                tables.extend(table_list)
+
+    # Dynamically collect all 'pattern' tables if 'table_name' is 'pattern'
+    elif table_name == "pattern":
+        tables = []
+        for key, table_list in table_groups.items():
+            if "pattern" in key:
+                tables.extend(table_list)
+
+    # Dynamically collect all 'timeseries' tables if 'table_name' is 'timeseries'
+    elif table_name == "timeseries":
+        tables = []
+        for key, table_list in table_groups.items():
+            if "timeseries" in key:
+                tables.extend(table_list)
+
     else:
         # Validate if the table_name exists in the table_groups
         if table_name not in table_groups:

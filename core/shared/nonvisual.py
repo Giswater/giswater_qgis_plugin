@@ -1164,6 +1164,9 @@ class GwNonVisual:
             # Reload manager table
             self._reload_manager_table()
 
+        # Call configure_layers_from_table_name dynamically for curve tables
+        tools_gw.configure_layers_from_table_name("curve")
+
         self._save_curve_widgets(dialog)
         tools_gw.close_dialog(dialog)
 
@@ -1435,6 +1438,9 @@ class GwNonVisual:
             tools_db.dao.commit()
             # Reload manager table
             self._reload_manager_table()
+
+        # Call configure_layers_from_table_name dynamically for pattern tables
+        tools_gw.configure_layers_from_table_name("pattern")
 
         self._save_ws_pattern_widgets(dialog)
         tools_gw.close_dialog(dialog)
@@ -1744,6 +1750,9 @@ class GwNonVisual:
             tools_db.dao.commit()
             # Reload manager table
             self._reload_manager_table()
+
+        # Call configure_layers_from_table_name dynamically for pattern tables
+        tools_gw.configure_layers_from_table_name("pattern")
 
         self._save_ud_pattern_widgets(dialog)
         tools_gw.close_dialog(dialog)
@@ -2409,6 +2418,9 @@ class GwNonVisual:
             # Reload manager table
             self._reload_manager_table()
 
+        # Call configure_layers_from_table_name dynamically for timeseries tables
+        tools_gw.configure_layers_from_table_name("timeseries")
+
         self._save_timeseries_widgets(dialog)
         tools_gw.close_dialog(dialog)
 
@@ -2819,6 +2831,9 @@ class GwNonVisual:
             tools_db.dao.commit()
             # Reload manager table
             self._reload_manager_table()
+
+        # Call configure_layers_from_table_name dynamically for lids tables
+        tools_gw.configure_layers_from_table_name("lids_dscenario")
 
         self._save_lids_widgets(dialog)
         tools_gw.close_dialog(dialog)
