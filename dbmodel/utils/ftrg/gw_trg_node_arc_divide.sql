@@ -18,12 +18,13 @@ edit_arc_division_dsbl_aux boolean;
 v_project_type varchar;
 v_isarcdivide boolean;
 v_node_proximity double precision;
+v_srid integer;
 
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
-	v_project_type = (SELECT project_type FROM sys_version ORDER BY id DESC LIMIT 1);
+	SELECT project_type, epsg INTO v_project_type, v_srid FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- get node type arc division config
 	IF v_project_type = 'UD' THEN
@@ -53,10 +54,24 @@ BEGIN
 
 		IF node_id_aux IS NULL THEN
 
-			SELECT arc_id INTO arc_id_aux FROM arc JOIN v_edit_arc USING (arc_id) WHERE st_dwithin((NEW.the_geom), arc.the_geom, v_node_proximity) LIMIT 1;
+			SELECT arc_id INTO arc_id_aux FROM arc JOIN v_edit_arc USING (arc_id)
+			WHERE st_dwithin((NEW.the_geom), arc.the_geom, v_node_proximity)
+			AND arc.node_1 is not null and arc.node_2 is not null
+			LIMIT 1;
+
 			IF arc_id_aux IS NOT NULL THEN
 				EXECUTE 'SELECT gw_fct_setarcdivide($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":["'||NEW.node_id||'"]},"data":{}}$$)';
+
+			ELSE
+
+				perform gw_fct_arc_repair(concat('
+				{"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{},
+				"feature":{"tableName":"v_edit_arc", "featureType":"ARC", "id":["',arc_id,'"]},
+				"data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"previousSelection","parameters":{},
+				"aux_params":null}}')::json) from arc a where st_dwithin(a.the_geom, new.the_geom, v_node_proximity);
+
 			END IF;
+
 		END IF;
 
    	END IF;
