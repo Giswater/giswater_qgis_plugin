@@ -8,13 +8,14 @@ import os
 from datetime import datetime
 from functools import partial
 
+from qgis.core import QgsProject
 from qgis.PyQt.QtCore import QPoint
 from qgis.PyQt.QtWidgets import QMenu, QAction, QActionGroup
 from qgis.PyQt.QtGui import QIcon
 
 from ..dialog import GwAction
 from .... import global_vars
-from ....libs import lib_vars
+from ....libs import lib_vars, tools_qgis
 from .epa_tools.anl_add_demand_check import AddDemandCheck
 from .epa_tools.anl_recursive_go2epa import RecursiveEpa
 from .epa_tools.anl_quantized_demands import QuantizedDemands
@@ -23,6 +24,7 @@ from .epa_tools.cal_emitter import EmitterCalibration
 from .epa_tools.cal_static import StaticCalibration
 from .epa_tools.import_epanet import GwImportEpanet
 from .epa_tools.import_swmm import GwImportSwmm
+from .epa_tools.go2iber import Go2Iber
 
 
 class GwEpaTools(GwAction):
@@ -70,6 +72,12 @@ class GwEpaTools(GwAction):
             (cal_menu, ('ws'), 'STATIC CALIBRATION', None),
             (self.menu, ('ud', 'ws'), 'IMPORT INP FILE', QIcon(f"{lib_vars.plugin_dir}{os.sep}icons{os.sep}toolbars{os.sep}epa{os.sep}22.png"))
         ]
+        # Add Go2Iber action if drain plugin is available
+        if tools_qgis.is_plugin_active('drain'):
+            drain_menu = self.menu.addMenu(QIcon(f"{lib_vars.plugin_dir}{os.sep}icons{os.sep}toolbars{os.sep}epa{os.sep}47.png"), "DRAIN")
+            new_actions.append((drain_menu, ('ud'), 'ADD DRAIN GPKG PROJECT', None))
+            new_actions.append((drain_menu, ('ud'), 'GO2IBER', None))
+
         for menu, types, action, icon in new_actions:
             if global_vars.project_type in types:
                 if icon:
@@ -120,3 +128,21 @@ class GwEpaTools(GwAction):
                 import_inp = GwImportSwmm()
                 import_inp.clicked_event()
                 return
+
+        elif name == 'ADD DRAIN GPKG PROJECT':
+            print("add drain layer")
+
+        elif name == 'GO2IBER':
+            go2iber = Go2Iber()
+            go2iber.clicked_event()
+
+    def _check_drain_project(self) -> bool:
+        gpkg_path = tools_qgis.get_project_variable('project_gpkg_path')
+        if not gpkg_path or not os.path.exists(f"{QgsProject.instance().absolutePath()}{os.sep}{gpkg_path}"):
+            return False
+        mandatory_layers = ['roof', 'ground', 'boundary_conditions']
+        for tablename in mandatory_layers:
+            if not tools_qgis.get_layer_by_tablename(tablename):
+                return False
+
+        return True
