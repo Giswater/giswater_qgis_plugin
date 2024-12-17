@@ -57,6 +57,7 @@ from ...libs.tools_qgis import show_warning, get_layer_by_tablename
 # These imports are for the add_{widget} functions (modules need to be imported in order to find it by its name)
 # noinspection PyUnresolvedReferences
 from ..shared import info, mincut_tools
+from ..shared.selector import GwSelector
 from ..toolbars.edit import featuretype_change_btn
 from ..toolbars.epa import go2epa_selector_btn
 
@@ -5030,4 +5031,13 @@ def _manage_tablewidget(**kwargs):
 
     return _manage_tableview(**kwargs)
 
+
+def reload_layers_filters():
+    
+    # Build and Apply filters
+    selector = GwSelector()
+    muni_filter, expl_filter, sector_filter = selector._build_filter()
+    selector._apply_filter(muni_filter, expl_filter, sector_filter)
+
 # endregion
+

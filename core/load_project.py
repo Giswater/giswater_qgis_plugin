@@ -192,9 +192,7 @@ class GwLoadProject(QObject):
         self._config_layers()
 
         # Build and Apply filters
-        selector = GwSelector()
-        muni_filter, expl_filter, sector_filter = selector._build_filter()
-        selector._apply_filter(muni_filter, expl_filter, sector_filter)
+        tools_gw.reload_layers_filters()
 
     # region private functions
 
