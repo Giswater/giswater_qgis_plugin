@@ -909,7 +909,7 @@ def configure_layers_from_table_name(table_name):
         "timeseries_dscenario": [
             "v_edit_inp_dscenario_inflows", "v_edit_inp_dscenario_outfall", "v_edit_inp_dscenario_raingage"
         ],
-        "lids": [
+        "lids_dscenario": [
             "v_edit_inp_dscenario_lid_usage"
         ],
         "hydrology_id": [
@@ -920,13 +920,19 @@ def configure_layers_from_table_name(table_name):
         ]
     }
 
-    # Validate if the table_name exists in the table_groups
-    if table_name not in table_groups:
-        tools_log.log_info(f"Invalid table_name '{table_name}' provided. No configuration performed.")
-        return False
+    # Dynamically collect all 'dscenario' tables if 'table_name' is 'dscenario'
+    if table_name == "dscenario":
+        tables = []
+        for key, table_list in table_groups.items():
+            if "dscenario" in key:
+                tables.extend(table_list)
+    else:
+        # Validate if the table_name exists in the table_groups
+        if table_name not in table_groups:
+            tools_log.log_info(f"Invalid table_name '{table_name}' provided. No configuration performed.")
+            return False
+        tables = table_groups[table_name]
 
-    # Fetch the corresponding tables for the table_name
-    tables = table_groups[table_name]
     failed_layers = []
 
     for table in tables:

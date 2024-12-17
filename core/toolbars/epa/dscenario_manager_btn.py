@@ -490,6 +490,8 @@ class GwDscenarioManagerButton(GwAction):
         for specific scenarios without removing defaults.
         """
 
+        dscenario_functions = [3134, 3110, 3112, 3108, 3158, 3118]
+
         if function == 3290 and label == 'Create hydrology scenario values':
             aux_params = '{"aux_fct": 3100}'
         elif function == 3292 and label == 'Create dwf scenario values':
@@ -510,11 +512,13 @@ class GwDscenarioManagerButton(GwAction):
                 connect = [connect]
             connect = default_connect + connect
 
-        # Append DWF-specific logic dynamically
+        # Append logic dynamically for specific functions
         if function == 3292:
             connect.append(partial(tools_gw.configure_layers_from_table_name, "dwf_id"))
         if function == 3290:
             connect.append(partial(tools_gw.configure_layers_from_table_name, "hydrology_id"))
+        if function in dscenario_functions:
+            connect.append(partial(tools_gw.configure_layers_from_table_name, "dscenario"))
 
         # Execute the toolbox function with the updated connect list
         dlg_functions = toolbox_btn.open_function_by_id(function, connect_signal=connect, aux_params=aux_params)
