@@ -1881,8 +1881,8 @@ class GwInfo(QObject):
             extras = f'"fields":{my_json}, "reload":"{fields_reload}", "afterInsert":"{after_insert}"'
             body = tools_gw.create_body(feature=feature, extras=extras)
 
-            # Get utils_grafanalytics_automatic_trigger param
-            row = tools_gw.get_config_value("utils_grafanalytics_automatic_trigger", table='config_param_system')
+            # Get utils_graphanalytics_automatic_trigger param
+            row = tools_gw.get_config_value("utils_graphanalytics_automatic_trigger", table='config_param_system')
             thread = row[0] if row else None
             if thread:
                 thread = json.loads(thread)
