@@ -10,7 +10,7 @@ import json
 import tempfile
 
 from ...toc.layerstyle_change_btn import apply_styles_to_layers
-from ....ui.ui_manager import GwStyleManagerUi, GwStyleUi
+from ....ui.ui_manager import GwStyleManagerUi, GwStyleUi, GwUpdateStyleGroupUi
 from ....utils import tools_gw
 from .....libs import lib_vars, tools_db, tools_qgis, tools_qt
 from ..... import global_vars
@@ -50,6 +50,7 @@ class GwStyleManager:
 
         # Connect signals to the corresponding methods
         self.style_mng_dlg.btn_add_group.clicked.connect(partial(self._add_style_group, self.style_mng_dlg))
+        self.style_mng_dlg.btn_update_group.clicked.connect(partial(self._update_style_group, self.style_mng_dlg))
         self.style_mng_dlg.btn_delete_group.clicked.connect(self._delete_style_group)
         self.style_mng_dlg.cmb_stylegroup.currentIndexChanged.connect(self._filter_styles)
         self.style_mng_dlg.txt_style_name.textChanged.connect(self._filter_styles)
@@ -121,6 +122,7 @@ class GwStyleManager:
         self._load_sys_roles(dialog_create)
 
         dialog_create.btn_add.clicked.connect(partial(self._handle_add_feature, dialog_create))
+        dialog_create.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, dialog_create))
         dialog_create.feature_id.textChanged.connect(partial(self._check_style_exists, dialog_create))
         dialog_create.idval.textChanged.connect(partial(self._check_style_exists, dialog_create))
 
@@ -259,6 +261,67 @@ class GwStyleManager:
                 dialog_create.idval.setToolTip("")
 
         dialog_create.btn_add.setEnabled(not has_error)
+
+    def _update_style_group(self, dialog):
+        """Logic for updating a style group using the Qt Designer dialog."""
+        selected_stylegroup_name = self.style_mng_dlg.cmb_stylegroup.currentText()
+
+        if not selected_stylegroup_name:
+            tools_qgis.show_warning("Please select a style group to delete.", dialog=self.style_mng_dlg)
+            return
+        
+        dialog_update = GwUpdateStyleGroupUi(self)
+        tools_gw.load_settings(dialog_update)
+
+        dialog_update.btn_accept.clicked.connect(partial(self._handle_update_feature, dialog_update, selected_stylegroup_name))
+        dialog_update.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, dialog_update))
+        dialog_update.category_rename_copy.textChanged.connect(partial(self._check_style_group_exists, dialog_update))
+
+        tools_gw.open_dialog(dialog_update, dlg_name='dlg_update_style_group')
+
+    def _check_style_group_exists(self, dialog_update, idval=""):
+        sql = f"SELECT idval FROM config_style WHERE idval = '{idval}'"
+        row = tools_db.get_row(sql, log_info=False)
+        if row:
+            dialog_update.btn_accept.setEnabled(False)
+            tools_qt.set_stylesheet(dialog_update.category_rename_copy)
+            dialog_update.category_rename_copy.setToolTip("Category name already exists")
+            return
+        dialog_update.btn_accept.setEnabled(True)
+        tools_qt.set_stylesheet(dialog_update.category_rename_copy, style="")
+        dialog_update.category_rename_copy.setToolTip("") 
+
+
+    def _handle_update_feature(self, dialog_update, old_category_name):
+        """Handles the logic when the add button is clicked."""
+
+        # Gather data from the dialog fields
+        new_category_name = dialog_update.category_rename_copy.text()
+
+        # Validate that the mandatory fields are not empty
+        if not new_category_name:
+            tools_qgis.show_warning("Category name cannot be empty.", dialog=self.style_mng_dlg)
+            return
+
+        # Start building the SQL query
+        sql = f"UPDATE config_style SET idval = "
+
+        # Initialize the values part with the mandatory fields
+        new_name = f"'{new_category_name}'"
+        old_name = f"'{old_category_name}'"
+
+        # Close the fields section of the SQL query
+        sql += f"{new_name} WHERE idval = {old_name};"
+
+        try:
+            # Execute the SQL command and retrieve the new ID
+            tools_db.execute_sql(sql)
+            tools_qgis.show_info("Category updated successfully!", dialog=self.style_mng_dlg)
+            self.populate_stylegroup_combobox()
+            tools_gw.close_dialog(dialog_update)
+
+        except Exception as e:
+            tools_qgis.show_warning(f"Failed to update category: {e}", dialog=self.style_mng_dlg)
 
 
     def _delete_style_group(self):
