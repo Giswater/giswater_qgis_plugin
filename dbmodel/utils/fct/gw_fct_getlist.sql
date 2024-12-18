@@ -15,14 +15,6 @@ $BODY$
 
 TOC
 ----------
--- attribute table using custom filters
-SELECT SCHEMA_NAME.gw_fct_getlist($${
-"client":{"device":4, "infoType":1, "lang":"ES"},
-"feature":{"tableName":"v_edit_man_pipe", "idName":"arc_id"},
-"data":{"filterFields":{"arccat_id":"PVC160-PN10", "limit":5},"filterFeatureField":{"arc_id":"2001"},
-        "pageInfo":{"orderBy":"arc_id", "orderType":"DESC", "currentPage":3}}}$$)
-
--- attribute table using canvas filter
 SELECT SCHEMA_NAME.gw_fct_getlist($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{"tableName":"ve_arc_pipe", "idName":"arc_id"},"filterFeatureField":{"arc_id":"2001"},
@@ -43,32 +35,8 @@ SELECT SCHEMA_NAME.gw_fct_getlist($${
 SELECT SCHEMA_NAME.gw_fct_getlist($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{"tableName":"v_ui_om_event" ,"idName":"id"},
-"data":{"filterFields":{"visit_id":232, "limit":10},"filterFeatureField":{"arc_id":"2001"},
+"data":{"filterFields":{"visit_id":232, "limit":10},"filterFeatureField":{"id":"2001"},
     "pageInfo":{"orderBy":"tstamp", "orderType":"DESC", "currentPage":3}}}$$)
-
--- Visit -> files
--- first call
-SELECT SCHEMA_NAME.gw_fct_getlist($${
-"client":{"device":4, "infoType":1, "lang":"ES"},
-"feature":{"tableName":"om_visit_file"},
-"data":{"filterFields":{},
-	"pageInfo":{}}}$$)
-
--- not first call
-SELECT SCHEMA_NAME.gw_fct_getlist($${
-"client":{"device":4, "infoType":1, "lang":"ES"},
-"feature":{"tableName":"om_visit_file"},
-"data":{"filterFields":{"filetype":"jpg","limit":15, "visit_id":1135},"filterFeatureField":{"arc_id":"2001"},
-	"pageInfo":{"orderBy":"tstamp", "orderType":"DESC", "currentPage":3}}}$$)
-
-SELECT SCHEMA_NAME.gw_fct_getlist($$
-{"client":{"device":4, "infoType":1, "lang":"ES"},
-"feature":{"featureType":"visit","tableName":"ve_visit_arc_insp","idname":"visit_id","id":10002},
-"form":{"tabData":{"active":false}, "tabFiles":{"active":true}},
-"data":{"relatedFeature":{"type":"arc"},
-	"pageInfo":{"orderBy":"tstamp", "orderType":"DESC", "currentPage":3},
-	"filterFields":{"filetype":"doc","limit":10,"visit_id":"10002"}}}$$)
-
 
 FEATURE FORMS
 -------------
@@ -78,18 +46,7 @@ SELECT SCHEMA_NAME.gw_fct_getlist($${
 "feature":{"tableName":"v_ui_element_x_arc", "idName":"id"},
 "data":{"filterFields":{"arc_id":"2001"},
     "pageInfo":{"orderBy":"element_id", "orderType":"DESC", "currentPage":3}}}$$)
-
-
-MANAGER FORMS
--------------
--- Lots
-SELECT SCHEMA_NAME.gw_fct_getlist($${
-"client":{"device":4, "infoType":1, "lang":"ES"},
-"feature":{"tableName":"om_visit_lot"},
-"data":{"filterFields":{"limit":10},
-	"pageInfo":{"currentPage":null}}}$$)
 */
-
 
 DECLARE
 
