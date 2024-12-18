@@ -1400,12 +1400,10 @@ INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES
 INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('layout_name_typevalue', 'lyt_raingage_1', 'lyt_raingage_1', 'lytRaingage1', '{"lytOrientation": "vertical"}'::json);
 INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('layout_name_typevalue', 'lyt_weir_1', 'lyt_weir_1', 'lytWeir1', '{"lytOrientation": "vertical"}'::json);
 INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('layout_name_typevalue', 'lyt_outfall_1', 'lyt_outfall_1', 'lytOutfall1', '{"lytOrientation": "vertical"}'::json);
-INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('layout_name_typevalue', 'lyt_storage_1', 'lyt_storage_1', 'lytStorage1', '{"lytOrientation": "vertical"}'::json);
 INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('layout_name_typevalue', 'lyt_inflows_1', 'lyt_inflows_1', 'lytInflows1', '{"lytOrientation": "vertical"}'::json);
 INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('layout_name_typevalue', 'lyt_treatment_1', 'lyt_treatment_1', 'lytTreatment1', '{"lytOrientation": "vertical"}'::json);
 INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('layout_name_typevalue', 'lyt_poll_1', 'lyt_poll_1', 'lytPoll1', '{"lytOrientation": "vertical"}'::json);
 INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('layout_name_typevalue', 'lyt_orifice_1', 'lyt_orifice_1', 'lytOrifice1', '{"lytOrientation": "vertical"}'::json);
-INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('layout_name_typevalue', 'lyt_lids_1', 'lyt_lids_1', 'lytLids1', '{"lytOrientation": "vertical"}'::json);
 INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('layout_name_typevalue', 'lyt_outlet_1', 'lyt_outlet_1', 'lytOutlet1', '{"lytOrientation": "vertical"}'::json);
 
 INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('tabname_typevalue', 'tab_outlet', 'tab_outlet', 'tabOutlet', NULL);
@@ -1414,13 +1412,11 @@ INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES
 INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('tabname_typevalue', 'tab_junction', 'tab_junction', 'tabJunction', NULL);
 INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('tabname_typevalue', 'tab_weir', 'tab_weir', 'tabWeir', NULL);
 INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('tabname_typevalue', 'tab_outfall', 'tab_outfall', 'tabOutfall', NULL);
-INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('tabname_typevalue', 'tab_storage', 'tab_storage', 'tabStorage', NULL);
 INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('tabname_typevalue', 'tab_inflows', 'tab_inflows', 'tabInflows', NULL);
 INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('tabname_typevalue', 'tab_treatment', 'tab_treatment', 'tabTreatment', NULL);
 INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('tabname_typevalue', 'tab_poll', 'tab_poll', 'tabPoll', NULL);
 INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('tabname_typevalue', 'tab_pump', 'tab_pump', 'tabPump', NULL);
 INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('tabname_typevalue', 'tab_orifice', 'tab_orifice', 'tabOrifice', NULL);
-INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('tabname_typevalue', 'tab_lids', 'tab_lids', 'tabLids', NULL);
 
 INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('dscenario', 'tab_conduit', 'Conduit', 'Conduit', 'role_basic', NULL, NULL, 0, '{5}');
 INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('dscenario', 'tab_controls', 'Controls', 'Controls', 'role_basic', NULL, NULL, 0, '{5}');
