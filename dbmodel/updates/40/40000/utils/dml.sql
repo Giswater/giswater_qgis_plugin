@@ -865,3 +865,8 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
   "functionName": "close_dlg"
 }'::json, NULL, false, 1);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'dscenario', 'tab_none', 'spacer', 'lyt_buttons', 0, NULL, 'hspacer', NULL, NULL, NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 0);
+
+
+--18/12/2024
+
+ALTER TABLE IF EXISTS config_style ADD CONSTRAINT idval_chk UNIQUE (idval);
