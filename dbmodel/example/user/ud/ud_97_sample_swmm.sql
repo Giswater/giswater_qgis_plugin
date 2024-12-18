@@ -6,10 +6,10 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-INSERT INTO inp_timeseries VALUES ('T10-5m', 'Rainfall', 'RELATIVE', 'T10-5m', NULL, NULL, 1, NULL, true, NULL);
-INSERT INTO inp_timeseries VALUES ('T5-5m', 'Rainfall', 'RELATIVE', 'T5-5m', NULL, NULL, 1, NULL, true, NULL);
-INSERT INTO inp_timeseries VALUES ('T10-5m-e2', 'Rainfall', 'RELATIVE', 'T10-5m-e2', NULL, NULL, 2, NULL, true, NULL);
-INSERT INTO inp_timeseries VALUES ('T5-5m-e2', 'Rainfall', 'RELATIVE', 'T5-5m-e2', NULL, NULL, 2, NULL, true, NULL);
+INSERT INTO inp_timeseries VALUES ('T10-5m', 'Rainfall', 'RELATIVE', NULL, NULL, 1, NULL, true, NULL);
+INSERT INTO inp_timeseries VALUES ('T5-5m', 'Rainfall', 'RELATIVE', NULL, NULL, 1, NULL, true, NULL);
+INSERT INTO inp_timeseries VALUES ('T10-5m-e2', 'Rainfall', 'RELATIVE', NULL, NULL, 2, NULL, true, NULL);
+INSERT INTO inp_timeseries VALUES ('T5-5m-e2', 'Rainfall', 'RELATIVE', NULL, NULL, 2, NULL, true, NULL);
 
 INSERT INTO raingage VALUES ('RG-01', 'VOLUME', '0:05', 1.0000, 'TIMESERIES', 'T5-5m', NULL, NULL, NULL, 1, '0101000020E764000039A71EA280941941AB5F34D0B8755141', 1);
 
