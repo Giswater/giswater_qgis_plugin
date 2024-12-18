@@ -21,8 +21,8 @@ BEGIN
 	IF TG_OP = 'INSERT' THEN
 		
 		IF v_table = 'inp_timeseries' THEN
-			INSERT INTO inp_timeseries (id, timser_type, times_type, idval,descript, fname, expl_id, log, active) 
-			VALUES (NEW.id, NEW.timser_type, NEW.times_type, NEW.idval, NEW.descript, NEW.fname, NEW.expl_id, NEW.log, NEW.active);
+			INSERT INTO inp_timeseries (id, timser_type, times_type,descript, fname, expl_id, log, active, addparam)
+			VALUES (NEW.id, NEW.timser_type, NEW.times_type, NEW.descript, NEW.fname, NEW.expl_id, NEW.log, NEW.active, NEW.addparam);
 		
 		ELSIF v_table = 'inp_timeseries_value' THEN
 			IF NEW.id IS NULL THEN
@@ -39,8 +39,8 @@ BEGIN
 	ELSIF TG_OP = 'UPDATE' THEN
 		
 		IF v_table = 'inp_timeseries' THEN
-			UPDATE inp_timeseries SET id=NEW.id, timser_type=NEW.timser_type, times_type=NEW.times_type, idval=NEW.idval, 
-			descript=NEW.descript, fname=NEW.fname, expl_id=NEW.expl_id, log=NEW.log, active=NEW.active
+			UPDATE inp_timeseries SET id=NEW.id, timser_type=NEW.timser_type, times_type=NEW.times_type,
+			descript=NEW.descript, fname=NEW.fname, expl_id=NEW.expl_id, log=NEW.log, active=NEW.active, addparam=NEW.addparam
 			WHERE id=OLD.id;
 		END IF;
 

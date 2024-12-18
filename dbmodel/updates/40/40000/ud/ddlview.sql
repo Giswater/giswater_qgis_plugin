@@ -6276,3 +6276,34 @@ AS SELECT element_x_gully.id,
      LEFT JOIN value_state_type ON element.state_type = value_state_type.id
      LEFT JOIN man_type_location ON man_type_location.location_type::text = element.location_type::text AND man_type_location.feature_type::text = 'ELEMENT'::text
      LEFT JOIN cat_element ON cat_element.id::text = element.elementcat_id::text;
+
+CREATE OR REPLACE VIEW v_edit_inp_timeseries
+AS SELECT DISTINCT p.id,
+    p.timser_type,
+    p.times_type,
+    p.descript,
+    p.fname,
+    p.expl_id,
+    p.log,
+    p.active,
+    p.addparam
+   FROM selector_expl s,
+    inp_timeseries p
+  WHERE p.expl_id = s.expl_id AND s.cur_user = "current_user"()::text OR p.expl_id IS NULL
+  ORDER BY p.id;
+
+CREATE OR REPLACE VIEW v_edit_inp_timeseries_value
+AS SELECT DISTINCT p.id,
+    p.timser_id,
+    t.timser_type,
+    t.times_type,
+    t.expl_id,
+    p.date,
+    p.hour,
+    p."time",
+    p.value
+   FROM selector_expl s,
+    inp_timeseries t
+     JOIN inp_timeseries_value p ON t.id::text = p.timser_id::text
+  WHERE t.expl_id = s.expl_id AND s.cur_user = "current_user"()::text OR t.expl_id IS NULL
+  ORDER BY p.id;

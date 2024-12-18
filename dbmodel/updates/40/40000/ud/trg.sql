@@ -255,3 +255,9 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_subc2outlet();
 
 CREATE TRIGGER gw_trg_vi_loadings INSTEAD OF INSERT OR DELETE OR UPDATE ON vi_loadings
 FOR EACH ROW EXECUTE FUNCTION gw_trg_vi('vi_loadings');
+
+CREATE TRIGGER gw_trg_edit_inp_timeseries INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_timeseries
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_timeseries('inp_timeseries');
+
+CREATE TRIGGER gw_trg_edit_inp_timeseries INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_timeseries_value
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_timeseries('inp_timeseries_value');
