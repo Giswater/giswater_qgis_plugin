@@ -26,7 +26,7 @@ SELECT is(
 SELECT is (
     (gw_fct_setfields($${"client":{"device":4, "lang":"", "infoType":1, "epsg":25831}, "form":{},
     "feature":{"id":"T10-5m", "tableName":"v_edit_inp_timeseries" }, "data":{"filterFields":{}, "pageInfo":{},
-    "fields":{"expl_id": 1, "idval": "T10-5m", "timser_type": "Rainfall", "times_type": "RELATIVE", "descript":
+    "fields":{"expl_id": 1, "timser_type": "Rainfall", "times_type": "RELATIVE", "descript":
     "null", "fname": "null"}}}$$)::JSON)->>'status',
     'Accepted',
     'Check if gw_fct_setfields --> "tableName":"v_edit_inp_timeseries" returns status "Accepted"'

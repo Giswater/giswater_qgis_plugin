@@ -294,18 +294,18 @@ BEGIN
 	-- setting for date-time parameters if rainfall has addparam values)
 	select * into v_timeseries from inp_timeseries where id = v_rainfall;
 
-	IF json_extract_path_text(v_timeseries.addparam,'start_date') IS NOT NULL AND json_extract_path_text(v_timeseries.addparam,'start_date') != '' THEN
-		update config_param_user set value = json_extract_path_text(v_timeseries.addparam,'start_date')
+	IF jsonb_extract_path_text(v_timeseries.addparam,'start_date') IS NOT NULL AND jsonb_extract_path_text(v_timeseries.addparam,'start_date') != '' THEN
+		update config_param_user set value = jsonb_extract_path_text(v_timeseries.addparam,'start_date')
 		where cur_user = current_user and parameter = 'inp_options_start_date';
-		update config_param_user set value = json_extract_path_text(v_timeseries.addparam,'start_time')
+		update config_param_user set value = jsonb_extract_path_text(v_timeseries.addparam,'start_time')
 		where cur_user = current_user and parameter = 'inp_options_start_time';
-		update config_param_user set value = json_extract_path_text(v_timeseries.addparam,'end_date')
+		update config_param_user set value = jsonb_extract_path_text(v_timeseries.addparam,'end_date')
 		where cur_user = current_user and parameter = 'inp_options_end_date';
-		update config_param_user set value = json_extract_path_text(v_timeseries.addparam,'end_time')
+		update config_param_user set value = jsonb_extract_path_text(v_timeseries.addparam,'end_time')
 		where cur_user = current_user and parameter = 'inp_options_end_time';
-		update config_param_user set value = json_extract_path_text(v_timeseries.addparam,'start_date')
+		update config_param_user set value = jsonb_extract_path_text(v_timeseries.addparam,'start_date')
 		where cur_user = current_user and parameter = 'inp_options_report_start_date';
-		update config_param_user set value = json_extract_path_text(v_timeseries.addparam,'start_time')
+		update config_param_user set value = jsonb_extract_path_text(v_timeseries.addparam,'start_time')
 		where cur_user = current_user and parameter = 'inp_options_report_start_time';
 
 	END IF;
