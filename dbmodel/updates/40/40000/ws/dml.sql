@@ -1674,6 +1674,1128 @@ update sys_message
 set error_message = 'Wrong configuration. Check config_form_fields on column widgetcontrol key ''reloadfields'' for columnname: %parentname%'
 where id = 3264;
 
-update sys_message 
+update sys_message
 set error_message = left(error_message, length(error_message)-1)
 where error_message ilike '%.';
+
+-- 18/12/2024
+INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('dscenario_results', 'SELECT dscenario_id as id, name, descript, dscenario_type, parent_id, expl_id, active::TEXT, log FROM v_edit_cat_dscenario', 5, 'tab', 'list', '{"orderBy":"1", "orderType": "DESC"}'::json, '{
+  "enableGlobalFilter": false,
+  "enableStickyHeader": true,
+  "positionToolbarAlertBanner": "bottom",
+  "enableGrouping": false,
+  "enablePinning": true,
+  "enableColumnOrdering": true,
+  "enableColumnFilterModes": true,
+  "enableFullScreenToggle": false,
+  "enablePagination": true,
+  "enableExporting": true,
+  "muiTablePaginationProps": {
+    "rowsPerPageOptions": [
+      5,
+      10,
+      15,
+      20,
+      50,
+      100
+    ],
+    "showFirstButton": true,
+    "showLastButton": true
+  },
+  "enableRowSelection": true,
+  "multipleRowSelection": true,
+  "initialState": {
+    "showColumnFilters": false,
+    "pagination": {
+      "pageSize": 5,
+      "pageIndex": 0
+    },
+    "density": "compact",
+    "columnFilters": [
+      {
+        "id": "id",
+        "value": "",
+        "filterVariant": "text"
+      }
+    ],
+    "sorting": [
+      {
+        "id": "id",
+        "desc": false
+      }
+    ]
+  },
+  "modifyTopToolBar": true,
+  "renderTopToolbarCustomActions": [
+    {
+      "name": "btn_toggle_active",
+      "widgetfunction": {
+        "functionName": "toggle_active",
+        "params": {}
+      },
+      "color": "default",
+      "text": "Toggle active",
+      "disableOnSelect": true,
+      "moreThanOneDisable": true
+    },
+    {
+      "name": "btn_create_crm",
+      "widgetfunction": {
+        "functionName": "create_crm",
+        "params": {}
+      },
+      "color": "success",
+      "text": "Create from CRM",
+      "disableOnSelect": false,
+      "moreThanOneDisable": false
+    },
+    {
+      "name": "btn_create_mincut",
+      "widgetfunction": {
+        "functionName": "create_mincut",
+        "params": {}
+      },
+      "color": "success",
+      "text": "Create from Mincut",
+      "disableOnSelect": false,
+      "moreThanOneDisable": false
+    },
+    {
+      "name": "btn_delete",
+      "widgetfunction": {
+        "functionName": "delete",
+        "params": {}
+      },
+      "color": "error",
+      "text": "Delete",
+      "disableOnSelect": true,
+      "moreThanOneDisable": false
+    }
+  ],
+  "enableRowActions": false,
+  "renderRowActionMenuItems": [
+    {
+      "widgetfunction": {
+        "functionName": "open",
+        "params": {}
+      },
+      "icon": "OpenInBrowser",
+      "text": "Open"
+    }
+  ]
+}'::json);
+
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('layout_name_typevalue', 'lyt_pump_1', 'lyt_pump_1', 'lytPump1', '{"lytOrientation": "vertical"}'::json);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('layout_name_typevalue', 'lyt_virtualvalve_1', 'lyt_virtualvalve_1', 'lytVirtualValve1', '{"lytOrientation": "vertical"}'::json);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('layout_name_typevalue', 'lyt_additional_1', 'lyt_additional_1', 'lytAdditional1', '{"lytOrientation": "vertical"}'::json);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('layout_name_typevalue', 'lyt_junction_1', 'lyt_junction_1', 'lytJunction1', '{"lytOrientation": "vertical"}'::json);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('layout_name_typevalue', 'lyt_connec_1', 'lyt_connec_1', 'lytConnec1', '{"lytOrientation": "vertical"}'::json);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('layout_name_typevalue', 'lyt_inlet_1', 'lyt_inlet_1', 'lytInlet1', '{"lytOrientation": "vertical"}'::json);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('layout_name_typevalue', 'lyt_demand_1', 'lyt_demand_1', 'lytDemand1', '{"lytOrientation": "vertical"}'::json);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('layout_name_typevalue', 'lyt_pipe_1', 'lyt_pipe_1', 'lytPipe1', '{"lytOrientation": "vertical"}'::json);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('layout_name_typevalue', 'lyt_virtualpump_1', 'lyt_virtualpump_1', 'lytVirtualPump1', '{"lytOrientation": "vertical"}'::json);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('layout_name_typevalue', 'lyt_shortpipe_1', 'lyt_shortpipe_1', 'lytShortPipe1', '{"lytOrientation": "vertical"}'::json);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('layout_name_typevalue', 'lyt_valve_1', 'lyt_valve_1', 'lytValve1', '{"lytOrientation": "vertical"}'::json);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('layout_name_typevalue', 'lyt_tank_1', 'lyt_tank_1', 'lytTank1', '{"lytOrientation": "vertical"}'::json);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('layout_name_typevalue', 'lyt_reservoir_1', 'lyt_reservoir_1', 'lytReservoir1', '{"lytOrientation": "vertical"}'::json);
+
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('tabname_typevalue', 'tab_virtualvalve', 'tab_virtualvalve', 'tabVirtualValve', NULL);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('tabname_typevalue', 'tab_pump', 'tab_pump', 'tabPump', NULL);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('tabname_typevalue', 'tab_additional', 'tab_additional', 'tabAdditional', NULL);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('tabname_typevalue', 'tab_junction', 'tab_junction', 'tabJunction', NULL);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('tabname_typevalue', 'tab_connec', 'tab_connec', 'tabConnec', NULL);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('tabname_typevalue', 'tab_inlet', 'tab_inlet', 'tabInlet', NULL);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('tabname_typevalue', 'tab_demand', 'tab_demand', 'tabDemand', NULL);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('tabname_typevalue', 'tab_pipe', 'tab_pipe', 'tabPipe', NULL);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('tabname_typevalue', 'tab_virtualpump', 'tab_virtualpump', 'tabVirtualPump', NULL);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('tabname_typevalue', 'tab_shortpipe', 'tab_shortpipe', 'tabShortPipe', NULL);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('tabname_typevalue', 'tab_valve', 'tab_valve', 'tabValve', NULL);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('tabname_typevalue', 'tab_tank', 'tab_tank', 'tabTank', NULL);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('tabname_typevalue', 'tab_reservoir', 'tab_reservoir', 'tabReservoir', NULL);
+
+INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('dscenario', 'tab_pump', 'Pump', 'Pump', 'role_baisc', NULL, NULL, 0, '{5}');
+INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('dscenario', 'tab_virtualvalve', 'Virtualvalve', 'Virtualvalve', 'role_baisc', NULL, NULL, 0, '{5}');
+INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('dscenario', 'tab_additional', 'Additional', 'Additional', 'role_baisc', NULL, NULL, 0, '{5}');
+INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('dscenario', 'tab_junction', 'Junction', 'Junction', 'role_baisc', NULL, NULL, 0, '{5}');
+INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('dscenario', 'tab_connec', 'Connec', 'Connec', 'role_baisc', NULL, NULL, 0, '{5}');
+INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('dscenario', 'tab_inlet', 'Inlet', 'Inlet', 'role_baisc', NULL, NULL, 0, '{5}');
+INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('dscenario', 'tab_demand', 'Demand', 'Demand', 'role_baisc', NULL, NULL, 0, '{5}');
+INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('dscenario', 'tab_pipe', 'Pipe', 'Pipe', 'role_baisc', NULL, NULL, 0, '{5}');
+INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('dscenario', 'tab_virtualpump', 'Virtualpump', 'Virtualpump', 'role_baisc', NULL, NULL, 0, '{5}');
+INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('dscenario', 'tab_shortpipe', 'Shortpipe', 'Shortpipe', 'role_baisc', NULL, NULL, 0, '{5}');
+INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('dscenario', 'tab_valve', 'Valve', 'Valve', 'role_baisc', NULL, NULL, 0, '{5}');
+INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('dscenario', 'tab_tank', 'Tank', 'Tank', 'role_baisc', NULL, NULL, 0, '{5}');
+INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('dscenario', 'tab_reservoir', 'Reservoir', 'Reservoir', 'role_baisc', NULL, NULL, 0, '{5}');
+INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('dscenario', 'tab_controls', 'Controls', 'Controls', 'role_baisc', NULL, NULL, 0, '{5}');
+INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('dscenario', 'tab_rules', 'Rules', 'Rules', 'role_baisc', NULL, NULL, 0, '{5}');
+
+INSERT INTO config_param_system ("parameter", value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, placeholder, standardvalue, layoutname) VALUES('dscenario_tab_pump', '{"layouts":["lyt_pump_1"]}', NULL, NULL, NULL, NULL, false, NULL, 'utils', NULL, NULL, 'string', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_param_system ("parameter", value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, placeholder, standardvalue, layoutname) VALUES('dscenario_tab_virtualvalve', '{"layouts":["lyt_virtualvalve_1"]}', NULL, NULL, NULL, NULL, false, NULL, 'utils', NULL, NULL, 'string', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_param_system ("parameter", value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, placeholder, standardvalue, layoutname) VALUES('dscenario_tab_additional', '{"layouts":["lyt_additional_1"]}', NULL, NULL, NULL, NULL, false, NULL, 'utils', NULL, NULL, 'string', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_param_system ("parameter", value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, placeholder, standardvalue, layoutname) VALUES('dscenario_tab_junction', '{"layouts":["lyt_junction_1"]}', NULL, NULL, NULL, NULL, false, NULL, 'utils', NULL, NULL, 'string', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_param_system ("parameter", value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, placeholder, standardvalue, layoutname) VALUES('dscenario_tab_connec', '{"layouts":["lyt_connec_1"]}', NULL, NULL, NULL, NULL, false, NULL, 'utils', NULL, NULL, 'string', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_param_system ("parameter", value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, placeholder, standardvalue, layoutname) VALUES('dscenario_tab_inlet', '{"layouts":["lyt_inlet_1"]}', NULL, NULL, NULL, NULL, false, NULL, 'utils', NULL, NULL, 'string', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_param_system ("parameter", value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, placeholder, standardvalue, layoutname) VALUES('dscenario_tab_demand', '{"layouts":["lyt_demand_1"]}', NULL, NULL, NULL, NULL, false, NULL, 'utils', NULL, NULL, 'string', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_param_system ("parameter", value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, placeholder, standardvalue, layoutname) VALUES('dscenario_tab_pipe', '{"layouts":["lyt_pipe_1"]}', NULL, NULL, NULL, NULL, false, NULL, 'utils', NULL, NULL, 'string', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_param_system ("parameter", value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, placeholder, standardvalue, layoutname) VALUES('dscenario_tab_virtualpump', '{"layouts":["lyt_virtualpump_1"]}', NULL, NULL, NULL, NULL, false, NULL, 'utils', NULL, NULL, 'string', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_param_system ("parameter", value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, placeholder, standardvalue, layoutname) VALUES('dscenario_tab_shortpipe', '{"layouts":["lyt_shortpipe_1"]}', NULL, NULL, NULL, NULL, false, NULL, 'utils', NULL, NULL, 'string', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_param_system ("parameter", value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, placeholder, standardvalue, layoutname) VALUES('dscenario_tab_valve', '{"layouts":["lyt_valve_1"]}', NULL, NULL, NULL, NULL, false, NULL, 'utils', NULL, NULL, 'string', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_param_system ("parameter", value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, placeholder, standardvalue, layoutname) VALUES('dscenario_tab_tank', '{"layouts":["lyt_tank_1"]}', NULL, NULL, NULL, NULL, false, NULL, 'utils', NULL, NULL, 'string', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_param_system ("parameter", value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, placeholder, standardvalue, layoutname) VALUES('dscenario_tab_reservoir', '{"layouts":["lyt_reservoir_1"]}', NULL, NULL, NULL, NULL, false, NULL, 'utils', NULL, NULL, 'string', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_param_system ("parameter", value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, placeholder, standardvalue, layoutname) VALUES('dscenario_tab_controls', '{"layouts":["lyt_controls"]}', NULL, NULL, NULL, NULL, false, NULL, 'utils', NULL, NULL, 'string', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_param_system ("parameter", value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, placeholder, standardvalue, layoutname) VALUES('dscenario_tab_rules', '{"layouts":["lyt_rules"]}', NULL, NULL, NULL, NULL, false, NULL, 'utils', NULL, NULL, 'string', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'dscenario', 'tab_none', 'tab_main', 'lyt_dscenario_1', 1, NULL, 'tabwidget', NULL, NULL, NULL, false, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{
+  "tabs": [
+    "tab_virtualvalve",
+    "tab_pump",
+    "tab_additional",
+    "tab_controls",
+    "tab_rules",
+    "tab_junction",
+    "tab_connec",
+    "tab_inlet",
+    "tab_demand",
+    "tab_pipe",
+    "tab_virtualpump",
+    "tab_shortpipe",
+    "tab_valve",
+    "tab_tank",
+    "tab_reservoir"
+  ]
+}'::json, NULL, NULL, false, 1);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'dscenario', 'tab_demand', 'table_view_demand', 'lyt_demand_1', 0, NULL, 'tablewidget', '', 'Table', NULL, false, false, true, false, true, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, 'dscenario_demand', false, 0);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'dscenario', 'tab_pipe', 'table_view_pipe', 'lyt_pipe_1', 0, NULL, 'tablewidget', '', 'Table', NULL, false, false, true, false, true, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, 'dscenario_pipe', false, 0);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'dscenario', 'tab_virtualpump', 'table_view_virtualpump', 'lyt_virtualpump_1', 0, NULL, 'tablewidget', '', 'Table', NULL, false, false, true, false, true, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, 'dscenario_virtualpump', false, 0);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'dscenario', 'tab_shortpipe', 'table_view_shortpipe', 'lyt_shortpipe_1', 0, NULL, 'tablewidget', '', 'Table', NULL, false, false, true, false, true, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, 'dscenario_shortpipe', false, 0);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'dscenario', 'tab_valve', 'table_view_valve', 'lyt_valve_1', 0, NULL, 'tablewidget', '', 'Table', NULL, false, false, true, false, true, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, 'dscenario_valve', false, 0);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'dscenario', 'tab_tank', 'table_view_tank', 'lyt_tank_1', 0, NULL, 'tablewidget', '', 'Table', NULL, false, false, true, false, true, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, 'dscenario_tank', false, 0);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'dscenario', 'tab_reservoir', 'table_view_reservoir', 'lyt_reservoir_1', 0, NULL, 'tablewidget', '', 'Table', NULL, false, false, true, false, true, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, 'dscenario_reservoir', false, 0);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'dscenario', 'tab_virtualvalve', 'table_view_virtualvalve', 'lyt_virtualvalve_1', 0, NULL, 'tablewidget', '', 'Table', NULL, false, false, true, false, true, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, 'dscenario_virtualvalve', false, 0);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'dscenario', 'tab_pump', 'table_view_pump', 'lyt_pump_1', 0, NULL, 'tablewidget', '', 'Table', NULL, false, false, true, false, true, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, 'dscenario_pump', false, 0);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'dscenario', 'tab_additional', 'table_view_additional', 'lyt_additional_1', 0, NULL, 'tablewidget', '', 'Table', NULL, false, false, true, false, true, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, 'dscenario_additional', false, 0);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'dscenario', 'tab_controls', 'table_view_controls', 'lyt_controls_1', 0, NULL, 'tablewidget', '', 'Table', NULL, false, false, true, false, true, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, 'dscenario_controls', false, 0);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'dscenario', 'tab_rules', 'table_view_rules', 'lyt_rules_1', 0, NULL, 'tablewidget', '', 'Table', NULL, false, false, true, false, true, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, 'dscenario_rules', false, 0);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'dscenario', 'tab_junction', 'table_view_junction', 'lyt_junction_1', 0, NULL, 'tablewidget', '', 'Table', NULL, false, false, true, false, true, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, 'dscenario_junction', false, 0);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'dscenario', 'tab_connec', 'table_view_connec', 'lyt_connec_1', 0, NULL, 'tablewidget', '', 'Table', NULL, false, false, true, false, true, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, 'dscenario_connec', false, 0);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'dscenario', 'tab_inlet', 'table_view_inlet', 'lyt_inlet_1', 0, NULL, 'tablewidget', '', 'Table', NULL, false, false, true, false, true, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, 'dscenario_inlet', false, 0);
+
+INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('dscenario_pipe', 'SELECT dscenario_id AS id, arc_id, minorloss, status, roughness, dint, bulk_coeff, wall_coeff FROM inp_dscenario_pipe where dscenario_id is not null', 5, 'tab', 'list', '{"orderBy":"1", "orderType": "DESC"}'::json, '{
+  "enableGlobalFilter": false,
+  "enableStickyHeader": false,
+  "positionToolbarAlertBanner": "bottom",
+  "enableGrouping": false,
+  "enablePinning": true,
+  "enableColumnOrdering": true,
+  "enableColumnFilterModes": true,
+  "enableFullScreenToggle": false,
+  "enablePagination": true,
+  "enableExporting": false,
+  "muiTablePaginationProps": {
+    "rowsPerPageOptions": [
+      5,
+      10,
+      15,
+      20,
+      50,
+      100
+    ],
+    "showFirstButton": true,
+    "showLastButton": true
+  },
+  "enableRowSelection": false,
+  "multipleRowSelection": false,
+  "initialState": {
+    "showColumnFilters": false,
+    "pagination": {
+      "pageSize": 5,
+      "pageIndex": 0
+    },
+    "density": "compact",
+    "columnFilters": [
+      {
+        "id": "id",
+        "value": "",
+        "filterVariant": "text"
+      }
+    ],
+    "sorting": [
+      {
+        "id": "id",
+        "desc": false
+      }
+    ]
+  },
+  "renderTopToolbarCustomActions": [],
+  "modifyTopToolBar": true,
+  "enableRowActions": false,
+  "renderRowActionMenuItems": [
+    {
+      "widgetfunction": {
+        "functionName": "open",
+        "params": {}
+      },
+      "icon": "OpenInBrowser",
+      "text": "Open"
+    }
+  ]
+}'::json);
+INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('dscenario_additional', 'SELECT id, node_id, order_id, power, curve_id, speed, pattern_id, status, energy_price, energy_pattern_id, effic_curve_id FROM inp_dscenario_pump_additional where dscenario_id is not null', 5, 'tab', 'list', '{"orderBy":"1", "orderType": "DESC"}'::json, '{
+  "enableGlobalFilter": false,
+  "enableStickyHeader": false,
+  "positionToolbarAlertBanner": "bottom",
+  "enableGrouping": false,
+  "enablePinning": true,
+  "enableColumnOrdering": true,
+  "enableColumnFilterModes": true,
+  "enableFullScreenToggle": false,
+  "enablePagination": true,
+  "enableExporting": false,
+  "muiTablePaginationProps": {
+    "rowsPerPageOptions": [
+      5,
+      10,
+      15,
+      20,
+      50,
+      100
+    ],
+    "showFirstButton": true,
+    "showLastButton": true
+  },
+  "enableRowSelection": false,
+  "multipleRowSelection": false,
+  "initialState": {
+    "showColumnFilters": false,
+    "pagination": {
+      "pageSize": 5,
+      "pageIndex": 0
+    },
+    "density": "compact",
+    "columnFilters": [
+      {
+        "id": "id",
+        "value": "",
+        "filterVariant": "text"
+      }
+    ],
+    "sorting": [
+      {
+        "id": "id",
+        "desc": false
+      }
+    ]
+  },
+  "renderTopToolbarCustomActions": [],
+  "modifyTopToolBar": true,
+  "enableRowActions": false,
+  "renderRowActionMenuItems": [
+    {
+      "widgetfunction": {
+        "functionName": "open",
+        "params": {}
+      },
+      "icon": "OpenInBrowser",
+      "text": "Open"
+    }
+  ]
+}'::json);
+INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('dscenario_rules', 'SELECT id, sector_id, "text", active::text FROM inp_dscenario_rules where dscenario_id is not null', 5, 'tab', 'list', '{"orderBy":"1", "orderType": "DESC"}'::json, '{
+  "enableGlobalFilter": false,
+  "enableStickyHeader": false,
+  "positionToolbarAlertBanner": "bottom",
+  "enableGrouping": false,
+  "enablePinning": true,
+  "enableColumnOrdering": true,
+  "enableColumnFilterModes": true,
+  "enableFullScreenToggle": false,
+  "enablePagination": true,
+  "enableExporting": false,
+  "muiTablePaginationProps": {
+    "rowsPerPageOptions": [
+      5,
+      10,
+      15,
+      20,
+      50,
+      100
+    ],
+    "showFirstButton": true,
+    "showLastButton": true
+  },
+  "enableRowSelection": false,
+  "multipleRowSelection": false,
+  "initialState": {
+    "showColumnFilters": false,
+    "pagination": {
+      "pageSize": 5,
+      "pageIndex": 0
+    },
+    "density": "compact",
+    "columnFilters": [
+      {
+        "id": "id",
+        "value": "",
+        "filterVariant": "text"
+      }
+    ],
+    "sorting": [
+      {
+        "id": "id",
+        "desc": false
+      }
+    ]
+  },
+  "renderTopToolbarCustomActions": [],
+  "modifyTopToolBar": true,
+  "enableRowActions": false,
+  "renderRowActionMenuItems": [
+    {
+      "widgetfunction": {
+        "functionName": "open",
+        "params": {}
+      },
+      "icon": "OpenInBrowser",
+      "text": "Open"
+    }
+  ]
+}'::json);
+INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('dscenario_virtualpump', 'SELECT dscenario_id AS id, arc_id, power, curve_id, speed, pattern_id, status, effic_curve_id, energy_price, energy_pattern_id, pump_type FROM inp_dscenario_virtualpump where dscenario_id is not null', 5, 'tab', 'list', '{"orderBy":"1", "orderType": "DESC"}'::json, '{
+  "enableGlobalFilter": false,
+  "enableStickyHeader": false,
+  "positionToolbarAlertBanner": "bottom",
+  "enableGrouping": false,
+  "enablePinning": true,
+  "enableColumnOrdering": true,
+  "enableColumnFilterModes": true,
+  "enableFullScreenToggle": false,
+  "enablePagination": true,
+  "enableExporting": false,
+  "muiTablePaginationProps": {
+    "rowsPerPageOptions": [
+      5,
+      10,
+      15,
+      20,
+      50,
+      100
+    ],
+    "showFirstButton": true,
+    "showLastButton": true
+  },
+  "enableRowSelection": false,
+  "multipleRowSelection": false,
+  "initialState": {
+    "showColumnFilters": false,
+    "pagination": {
+      "pageSize": 5,
+      "pageIndex": 0
+    },
+    "density": "compact",
+    "columnFilters": [
+      {
+        "id": "id",
+        "value": "",
+        "filterVariant": "text"
+      }
+    ],
+    "sorting": [
+      {
+        "id": "id",
+        "desc": false
+      }
+    ]
+  },
+  "renderTopToolbarCustomActions": [],
+  "modifyTopToolBar": true,
+  "enableRowActions": false,
+  "renderRowActionMenuItems": [
+    {
+      "widgetfunction": {
+        "functionName": "open",
+        "params": {}
+      },
+      "icon": "OpenInBrowser",
+      "text": "Open"
+    }
+  ]
+}'::json);
+INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('dscenario_inlet', 'SELECT dscenario_id AS id, node_id, initlevel, minlevel, maxlevel, diameter, minvol, curve_id, head, pattern_id, overflow, mixing_model, mixing_fraction, reaction_coeff, init_quality, source_type, source_quality, source_pattern_id, demand, demand_pattern_id, emitter_coeff FROM inp_dscenario_inlet where dscenario_id is not null', 5, 'tab', 'list', '{"orderBy":"1", "orderType": "DESC"}'::json, '{
+  "enableGlobalFilter": false,
+  "enableStickyHeader": false,
+  "positionToolbarAlertBanner": "bottom",
+  "enableGrouping": false,
+  "enablePinning": true,
+  "enableColumnOrdering": true,
+  "enableColumnFilterModes": true,
+  "enableFullScreenToggle": false,
+  "enablePagination": true,
+  "enableExporting": false,
+  "muiTablePaginationProps": {
+    "rowsPerPageOptions": [
+      5,
+      10,
+      15,
+      20,
+      50,
+      100
+    ],
+    "showFirstButton": true,
+    "showLastButton": true
+  },
+  "enableRowSelection": false,
+  "multipleRowSelection": false,
+  "initialState": {
+    "showColumnFilters": false,
+    "pagination": {
+      "pageSize": 5,
+      "pageIndex": 0
+    },
+    "density": "compact",
+    "columnFilters": [
+      {
+        "id": "id",
+        "value": "",
+        "filterVariant": "text"
+      }
+    ],
+    "sorting": [
+      {
+        "id": "id",
+        "desc": false
+      }
+    ]
+  },
+  "renderTopToolbarCustomActions": [],
+  "modifyTopToolBar": true,
+  "enableRowActions": false,
+  "renderRowActionMenuItems": [
+    {
+      "widgetfunction": {
+        "functionName": "open",
+        "params": {}
+      },
+      "icon": "OpenInBrowser",
+      "text": "Open"
+    }
+  ]
+}'::json);
+INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('dscenario_shortpipe', 'SELECT dscenario_id AS id, node_id, minorloss, status, bulk_coeff, wall_coeff FROM inp_dscenario_shortpipe where dscenario_id is not null', 5, 'tab', 'list', '{"orderBy":"1", "orderType": "DESC"}'::json, '{
+  "enableGlobalFilter": false,
+  "enableStickyHeader": false,
+  "positionToolbarAlertBanner": "bottom",
+  "enableGrouping": false,
+  "enablePinning": true,
+  "enableColumnOrdering": true,
+  "enableColumnFilterModes": true,
+  "enableFullScreenToggle": false,
+  "enablePagination": true,
+  "enableExporting": false,
+  "muiTablePaginationProps": {
+    "rowsPerPageOptions": [
+      5,
+      10,
+      15,
+      20,
+      50,
+      100
+    ],
+    "showFirstButton": true,
+    "showLastButton": true
+  },
+  "enableRowSelection": false,
+  "multipleRowSelection": false,
+  "initialState": {
+    "showColumnFilters": false,
+    "pagination": {
+      "pageSize": 5,
+      "pageIndex": 0
+    },
+    "density": "compact",
+    "columnFilters": [
+      {
+        "id": "id",
+        "value": "",
+        "filterVariant": "text"
+      }
+    ],
+    "sorting": [
+      {
+        "id": "id",
+        "desc": false
+      }
+    ]
+  },
+  "renderTopToolbarCustomActions": [],
+  "modifyTopToolBar": true,
+  "enableRowActions": false,
+  "renderRowActionMenuItems": [
+    {
+      "widgetfunction": {
+        "functionName": "open",
+        "params": {}
+      },
+      "icon": "OpenInBrowser",
+      "text": "Open"
+    }
+  ]
+}'::json);
+INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('dscenario_reservoir', 'SELECT dscenario_id AS id, node_id, pattern_id, head, init_quality, source_type, source_quality, source_pattern_id FROM inp_dscenario_reservoir where dscenario_id is not null', 5, 'tab', 'list', '{"orderBy":"1", "orderType": "DESC"}'::json, '{
+  "enableGlobalFilter": false,
+  "enableStickyHeader": false,
+  "positionToolbarAlertBanner": "bottom",
+  "enableGrouping": false,
+  "enablePinning": true,
+  "enableColumnOrdering": true,
+  "enableColumnFilterModes": true,
+  "enableFullScreenToggle": false,
+  "enablePagination": true,
+  "enableExporting": false,
+  "muiTablePaginationProps": {
+    "rowsPerPageOptions": [
+      5,
+      10,
+      15,
+      20,
+      50,
+      100
+    ],
+    "showFirstButton": true,
+    "showLastButton": true
+  },
+  "enableRowSelection": false,
+  "multipleRowSelection": false,
+  "initialState": {
+    "showColumnFilters": false,
+    "pagination": {
+      "pageSize": 5,
+      "pageIndex": 0
+    },
+    "density": "compact",
+    "columnFilters": [
+      {
+        "id": "id",
+        "value": "",
+        "filterVariant": "text"
+      }
+    ],
+    "sorting": [
+      {
+        "id": "id",
+        "desc": false
+      }
+    ]
+  },
+  "renderTopToolbarCustomActions": [],
+  "modifyTopToolBar": true,
+  "enableRowActions": false,
+  "renderRowActionMenuItems": [
+    {
+      "widgetfunction": {
+        "functionName": "open",
+        "params": {}
+      },
+      "icon": "OpenInBrowser",
+      "text": "Open"
+    }
+  ]
+}'::json);
+INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('dscenario_virtualvalve', 'SELECT dscenario_id AS id, arc_id, valv_type, pressure, diameter, flow, coef_loss, curve_id, minorloss, status FROM inp_dscenario_virtualvalve where dscenario_id is not null', 5, 'tab', 'list', '{"orderBy":"1", "orderType": "DESC"}'::json, '{
+  "enableGlobalFilter": false,
+  "enableStickyHeader": false,
+  "positionToolbarAlertBanner": "bottom",
+  "enableGrouping": false,
+  "enablePinning": true,
+  "enableColumnOrdering": true,
+  "enableColumnFilterModes": true,
+  "enableFullScreenToggle": false,
+  "enablePagination": true,
+  "enableExporting": false,
+  "muiTablePaginationProps": {
+    "rowsPerPageOptions": [
+      5,
+      10,
+      15,
+      20,
+      50,
+      100
+    ],
+    "showFirstButton": true,
+    "showLastButton": true
+  },
+  "enableRowSelection": false,
+  "multipleRowSelection": false,
+  "initialState": {
+    "showColumnFilters": false,
+    "pagination": {
+      "pageSize": 5,
+      "pageIndex": 0
+    },
+    "density": "compact",
+    "columnFilters": [
+      {
+        "id": "id",
+        "value": "",
+        "filterVariant": "text"
+      }
+    ],
+    "sorting": [
+      {
+        "id": "id",
+        "desc": false
+      }
+    ]
+  },
+  "renderTopToolbarCustomActions": [],
+  "modifyTopToolBar": true,
+  "enableRowActions": false,
+  "renderRowActionMenuItems": [
+    {
+      "widgetfunction": {
+        "functionName": "open",
+        "params": {}
+      },
+      "icon": "OpenInBrowser",
+      "text": "Open"
+    }
+  ]
+}'::json);
+INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('dscenario_controls', 'SELECT id, sector_id, "text", active::text FROM inp_dscenario_controls where id is not null', 5, 'tab', 'list', '{"orderBy":"1", "orderType": "DESC"}'::json, '{
+  "enableGlobalFilter": false,
+  "enableStickyHeader": false,
+  "positionToolbarAlertBanner": "bottom",
+  "enableGrouping": false,
+  "enablePinning": true,
+  "enableColumnOrdering": true,
+  "enableColumnFilterModes": true,
+  "enableFullScreenToggle": false,
+  "enablePagination": true,
+  "enableExporting": false,
+  "muiTablePaginationProps": {
+    "rowsPerPageOptions": [
+      5,
+      10,
+      15,
+      20,
+      50,
+      100
+    ],
+    "showFirstButton": true,
+    "showLastButton": true
+  },
+  "enableRowSelection": false,
+  "multipleRowSelection": false,
+  "initialState": {
+    "showColumnFilters": false,
+    "pagination": {
+      "pageSize": 5,
+      "pageIndex": 0
+    },
+    "density": "compact",
+    "columnFilters": [
+      {
+        "id": "id",
+        "value": "",
+        "filterVariant": "text"
+      }
+    ],
+    "sorting": [
+      {
+        "id": "id",
+        "desc": false
+      }
+    ]
+  },
+  "renderTopToolbarCustomActions": [],
+  "modifyTopToolBar": true,
+  "enableRowActions": false,
+  "renderRowActionMenuItems": [
+    {
+      "widgetfunction": {
+        "functionName": "open",
+        "params": {}
+      },
+      "icon": "OpenInBrowser",
+      "text": "Open"
+    }
+  ]
+}'::json);
+INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('dscenario_junction', 'SELECT dscenario_id AS id, node_id, demand, pattern_id, peak_factor,emitter_coeff,init_quality,source_type,source_quality,source_pattern_id FROM inp_dscenario_junction where dscenario_id is not null', 5, 'tab', 'list', '{"orderBy":"1", "orderType": "DESC"}'::json, '{
+  "enableGlobalFilter": false,
+  "enableStickyHeader": false,
+  "positionToolbarAlertBanner": "bottom",
+  "enableGrouping": false,
+  "enablePinning": true,
+  "enableColumnOrdering": true,
+  "enableColumnFilterModes": true,
+  "enableFullScreenToggle": false,
+  "enablePagination": true,
+  "enableExporting": false,
+  "muiTablePaginationProps": {
+    "rowsPerPageOptions": [
+      5,
+      10,
+      15,
+      20,
+      50,
+      100
+    ],
+    "showFirstButton": true,
+    "showLastButton": true
+  },
+  "enableRowSelection": false,
+  "multipleRowSelection": false,
+  "initialState": {
+    "showColumnFilters": false,
+    "pagination": {
+      "pageSize": 5,
+      "pageIndex": 0
+    },
+    "density": "compact",
+    "columnFilters": [
+      {
+        "id": "id",
+        "value": "",
+        "filterVariant": "text"
+      }
+    ],
+    "sorting": [
+      {
+        "id": "id",
+        "desc": false
+      }
+    ]
+  },
+  "renderTopToolbarCustomActions": [],
+  "modifyTopToolBar": true,
+  "enableRowActions": false,
+  "renderRowActionMenuItems": [
+    {
+      "widgetfunction": {
+        "functionName": "open",
+        "params": {}
+      },
+      "icon": "OpenInBrowser",
+      "text": "Open"
+    }
+  ]
+}'::json);
+INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('dscenario_valve', 'SELECT dscenario_id AS id, node_id, valv_type, pressure, flow, coef_loss, curve_id, minorloss, status, add_settings, init_quality FROM inp_dscenario_valve where dscenario_id is not null', 5, 'tab', 'list', '{"orderBy":"1", "orderType": "DESC"}'::json, '{
+  "enableGlobalFilter": false,
+  "enableStickyHeader": false,
+  "positionToolbarAlertBanner": "bottom",
+  "enableGrouping": false,
+  "enablePinning": true,
+  "enableColumnOrdering": true,
+  "enableColumnFilterModes": true,
+  "enableFullScreenToggle": false,
+  "enablePagination": true,
+  "enableExporting": false,
+  "muiTablePaginationProps": {
+    "rowsPerPageOptions": [
+      5,
+      10,
+      15,
+      20,
+      50,
+      100
+    ],
+    "showFirstButton": true,
+    "showLastButton": true
+  },
+  "enableRowSelection": false,
+  "multipleRowSelection": false,
+  "initialState": {
+    "showColumnFilters": false,
+    "pagination": {
+      "pageSize": 5,
+      "pageIndex": 0
+    },
+    "density": "compact",
+    "columnFilters": [
+      {
+        "id": "id",
+        "value": "",
+        "filterVariant": "text"
+      }
+    ],
+    "sorting": [
+      {
+        "id": "id",
+        "desc": false
+      }
+    ]
+  },
+  "renderTopToolbarCustomActions": [],
+  "modifyTopToolBar": true,
+  "enableRowActions": false,
+  "renderRowActionMenuItems": [
+    {
+      "widgetfunction": {
+        "functionName": "open",
+        "params": {}
+      },
+      "icon": "OpenInBrowser",
+      "text": "Open"
+    }
+  ]
+}'::json);
+INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('dscenario_demand', 'SELECT dscenario_id AS id, feature_id, feature_type,demand,pattern_id,demand_type,"source" FROM inp_dscenario_demand where dscenario_id is not null', 5, 'tab', 'list', '{"orderBy":"1", "orderType": "DESC"}'::json, '{
+  "enableGlobalFilter": false,
+  "enableStickyHeader": false,
+  "positionToolbarAlertBanner": "bottom",
+  "enableGrouping": false,
+  "enablePinning": true,
+  "enableColumnOrdering": true,
+  "enableColumnFilterModes": true,
+  "enableFullScreenToggle": false,
+  "enablePagination": true,
+  "enableExporting": false,
+  "muiTablePaginationProps": {
+    "rowsPerPageOptions": [
+      5,
+      10,
+      15,
+      20,
+      50,
+      100
+    ],
+    "showFirstButton": true,
+    "showLastButton": true
+  },
+  "enableRowSelection": false,
+  "multipleRowSelection": false,
+  "initialState": {
+    "showColumnFilters": false,
+    "pagination": {
+      "pageSize": 5,
+      "pageIndex": 0
+    },
+    "density": "compact",
+    "columnFilters": [
+      {
+        "id": "id",
+        "value": "",
+        "filterVariant": "text"
+      }
+    ],
+    "sorting": [
+      {
+        "id": "id",
+        "desc": false
+      }
+    ]
+  },
+  "renderTopToolbarCustomActions": [],
+  "modifyTopToolBar": true,
+  "enableRowActions": false,
+  "renderRowActionMenuItems": [
+    {
+      "widgetfunction": {
+        "functionName": "open",
+        "params": {}
+      },
+      "icon": "OpenInBrowser",
+      "text": "Open"
+    }
+  ]
+}'::json);
+INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('dscenario_tank', 'SELECT dscenario_id AS id, node_id, initlevel, minlevel, maxlevel, diameter, minvol, curve_id, overflow, mixing_model, mixing_fraction, reaction_coeff, init_quality, source_type, source_quality, source_pattern_id FROM inp_dscenario_tank  where dscenario_id is not null', 5, 'tab', 'list', '{"orderBy":"1", "orderType": "DESC"}'::json, '{
+  "enableGlobalFilter": false,
+  "enableStickyHeader": false,
+  "positionToolbarAlertBanner": "bottom",
+  "enableGrouping": false,
+  "enablePinning": true,
+  "enableColumnOrdering": true,
+  "enableColumnFilterModes": true,
+  "enableFullScreenToggle": false,
+  "enablePagination": true,
+  "enableExporting": false,
+  "muiTablePaginationProps": {
+    "rowsPerPageOptions": [
+      5,
+      10,
+      15,
+      20,
+      50,
+      100
+    ],
+    "showFirstButton": true,
+    "showLastButton": true
+  },
+  "enableRowSelection": false,
+  "multipleRowSelection": false,
+  "initialState": {
+    "showColumnFilters": false,
+    "pagination": {
+      "pageSize": 5,
+      "pageIndex": 0
+    },
+    "density": "compact",
+    "columnFilters": [
+      {
+        "id": "id",
+        "value": "",
+        "filterVariant": "text"
+      }
+    ],
+    "sorting": [
+      {
+        "id": "id",
+        "desc": false
+      }
+    ]
+  },
+  "renderTopToolbarCustomActions": [],
+  "modifyTopToolBar": true,
+  "enableRowActions": false,
+  "renderRowActionMenuItems": [
+    {
+      "widgetfunction": {
+        "functionName": "open",
+        "params": {}
+      },
+      "icon": "OpenInBrowser",
+      "text": "Open"
+    }
+  ]
+}'::json);
+INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('dscenario_pump', 'SELECT dscenario_id AS id, node_id, power, curve_id, speed, pattern_id, status, effic_curve_id, energy_price, energy_pattern_id FROM inp_dscenario_pump where dscenario_id is not null', 5, 'tab', 'list', '{
+  "orderBy": "1",
+  "orderType": "DESC"
+}'::json, '{
+  "enableGlobalFilter": false,
+  "enableStickyHeader": false,
+  "positionToolbarAlertBanner": "bottom",
+  "enableGrouping": false,
+  "enablePinning": true,
+  "enableColumnOrdering": true,
+  "enableColumnFilterModes": true,
+  "enableFullScreenToggle": false,
+  "enablePagination": true,
+  "enableExporting": false,
+  "muiTablePaginationProps": {
+    "rowsPerPageOptions": [
+      5,
+      10,
+      15,
+      20,
+      50,
+      100
+    ],
+    "showFirstButton": true,
+    "showLastButton": true
+  },
+  "enableRowSelection": false,
+  "multipleRowSelection": false,
+  "initialState": {
+    "showColumnFilters": false,
+    "pagination": {
+      "pageSize": 5,
+      "pageIndex": 0
+    },
+    "density": "compact",
+    "columnFilters": [
+      {
+        "id": "id",
+        "value": "",
+        "filterVariant": "text"
+      }
+    ],
+    "sorting": [
+      {
+        "id": "id",
+        "desc": false
+      }
+    ]
+  },
+  "renderTopToolbarCustomActions": [],
+  "modifyTopToolBar": true,
+  "enableRowActions": false,
+  "renderRowActionMenuItems": [
+    {
+      "widgetfunction": {
+        "functionName": "open",
+        "params": {}
+      },
+      "icon": "OpenInBrowser",
+      "text": "Open"
+    }
+  ]
+}'::json);
+INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('dscenario_connec', 'SELECT dscenario_id AS id, connec_id, demand, pattern_id, peak_factor, status, minorloss, custom_roughness, custom_length, custom_dint, emitter_coeff, init_quality, source_type, source_quality, source_pattern_id FROM inp_dscenario_connec where dscenario_id is not null', 5, 'tab', 'list', '{"orderBy":"1", "orderType": "DESC"}'::json, '{
+  "enableGlobalFilter": false,
+  "enableStickyHeader": false,
+  "positionToolbarAlertBanner": "bottom",
+  "enableGrouping": false,
+  "enablePinning": true,
+  "enableColumnOrdering": true,
+  "enableColumnFilterModes": true,
+  "enableFullScreenToggle": false,
+  "enablePagination": true,
+  "enableExporting": false,
+  "muiTablePaginationProps": {
+    "rowsPerPageOptions": [
+      5,
+      10,
+      15,
+      20,
+      50,
+      100
+    ],
+    "showFirstButton": true,
+    "showLastButton": true
+  },
+  "enableRowSelection": false,
+  "multipleRowSelection": false,
+  "initialState": {
+    "showColumnFilters": false,
+    "pagination": {
+      "pageSize": 5,
+      "pageIndex": 0
+    },
+    "density": "compact",
+    "columnFilters": [
+      {
+        "id": "id",
+        "value": "",
+        "filterVariant": "text"
+      }
+    ],
+    "sorting": [
+      {
+        "id": "id",
+        "desc": false
+      }
+    ]
+  },
+  "renderTopToolbarCustomActions": [],
+  "modifyTopToolBar": true,
+  "enableRowActions": false,
+  "renderRowActionMenuItems": [
+    {
+      "widgetfunction": {
+        "functionName": "open",
+        "params": {}
+      },
+      "icon": "OpenInBrowser",
+      "text": "Open"
+    }
+  ]
+}'::json);
+
+INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('dscenariom_form', 'utils', 'dscenario_junction', 'id', NULL, false, NULL, NULL, NULL, NULL);
+INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('dscenariom_form', 'utils', 'dscenario_connec', 'id', NULL, false, NULL, NULL, NULL, NULL);
+INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('dscenariom_form', 'utils', 'dscenario_pump', 'id', NULL, false, NULL, NULL, NULL, NULL);
+INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('dscenariom_form', 'utils', 'dscenario_additional', 'id', NULL, false, NULL, NULL, NULL, NULL);
+INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('dscenariom_form', 'utils', 'dscenario_controls', 'id', NULL, false, NULL, NULL, NULL, NULL);
+INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('dscenariom_form', 'utils', 'dscenario_inlet', 'id', NULL, false, NULL, NULL, NULL, NULL);
+INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('dscenariom_form', 'utils', 'dscenario_rules', 'id', NULL, false, NULL, NULL, NULL, NULL);
+INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('dscenariom_form', 'utils', 'dscenario_demand', 'id', NULL, false, NULL, NULL, NULL, NULL);
+INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('dscenariom_form', 'utils', 'dscenario_pipe', 'id', NULL, false, NULL, NULL, NULL, NULL);
+INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('dscenariom_form', 'utils', 'dscenario_virtualpump', 'id', NULL, false, NULL, NULL, NULL, NULL);
+INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('dscenariom_form', 'utils', 'dscenario_shortpipe', 'id', NULL, false, NULL, NULL, NULL, NULL);
+INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('dscenariom_form', 'utils', 'dscenario_valve', 'id', NULL, false, NULL, NULL, NULL, NULL);
+INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('dscenariom_form', 'utils', 'dscenario_tank', 'id', NULL, false, NULL, NULL, NULL, NULL);
+INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('dscenariom_form', 'utils', 'dscenario_reservoir', 'id', NULL, false, NULL, NULL, NULL, NULL);
+INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('dscenariom_form', 'utils', 'dscenario_virtualvalve', 'id', NULL, false, NULL, NULL, NULL, NULL);
