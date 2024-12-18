@@ -6,6 +6,7 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 import os
+import json
 import webbrowser
 from functools import partial
 
@@ -2230,14 +2231,21 @@ class GwNonVisual:
         """ Fills in all the values for timeseries dialog """
 
         # Variables
+        tableview = self.manager_dlg.main_tab.currentWidget()
+        index = tableview.selectionModel().currentIndex()
+        col_idx = tools_qt.get_col_index_by_col_name(tableview, 'addparam')
+
+        addparam = index.sibling(index.row(), col_idx).data()
+
         txt_id = self.dialog.txt_id
-        txt_idval = self.dialog.txt_idval
+        chk_active = self.dialog.chk_active
         cmb_timeser_type = self.dialog.cmb_timeser_type
         cmb_times_type = self.dialog.cmb_times_type
         txt_descript = self.dialog.txt_descript
         cmb_expl_id = self.dialog.cmb_expl_id
         txt_fname = self.dialog.txt_fname
         tbl_timeseries_value = self.dialog.tbl_timeseries_value
+        txt_addparam = self.dialog.txt_addparam
 
         sql = f"SELECT * FROM v_edit_inp_timeseries WHERE id = '{timser_id}'"
         row = tools_db.get_row(sql)
@@ -2248,12 +2256,14 @@ class GwNonVisual:
         if not duplicate:
             tools_qt.set_widget_text(self.dialog, txt_id, timser_id)
             tools_qt.set_widget_enabled(self.dialog, txt_id, False)
-        tools_qt.set_widget_text(self.dialog, txt_idval, row['idval'])
+        tools_qt.set_widget_text(self.dialog, chk_active, row['active'])
         tools_qt.set_widget_text(self.dialog, cmb_timeser_type, row['timser_type'])
         tools_qt.set_widget_text(self.dialog, cmb_times_type, row['times_type'])
         tools_qt.set_widget_text(self.dialog, txt_descript, row['descript'])
         tools_qt.set_combo_value(cmb_expl_id, str(row['expl_id']), 0)
         tools_qt.set_widget_text(self.dialog, txt_fname, row['fname'])
+        tools_qt.set_widget_text(self.dialog, txt_addparam, addparam)
+
 
         # Populate table timeseries_values
         sql = f"SELECT id, date, hour, time, value FROM v_edit_inp_timeseries_value WHERE timser_id = '{timser_id}'"
@@ -2338,21 +2348,23 @@ class GwNonVisual:
 
         # Variables
         txt_id = dialog.txt_id
-        txt_idval = dialog.txt_idval
+        chk_active = dialog.chk_active
         cmb_timeser_type = dialog.cmb_timeser_type
         cmb_times_type = dialog.cmb_times_type
         txt_descript = dialog.txt_descript
         cmb_expl_id = dialog.cmb_expl_id
         txt_fname = dialog.txt_fname
         tbl_timeseries_value = dialog.tbl_timeseries_value
+        txt_addparam = dialog.txt_addparam
 
         # Get widget values
         timeseries_id = tools_qt.get_text(dialog, txt_id, add_quote=True)
-        idval = tools_qt.get_text(dialog, txt_idval, add_quote=True)
+        active = tools_qt.get_text(dialog, chk_active, add_quote=True)
         timser_type = tools_qt.get_combo_value(dialog, cmb_timeser_type)
         times_type = tools_qt.get_combo_value(dialog, cmb_times_type)
         descript = tools_qt.get_text(dialog, txt_descript, add_quote=True)
         fname = tools_qt.get_text(dialog, txt_fname, add_quote=True)
+        addparam = tools_qt.get_text(dialog, txt_addparam)
         expl_id = tools_qt.get_combo_value(dialog, cmb_expl_id)
         if expl_id in (None, ''):
             expl_id = "null"
@@ -2365,8 +2377,8 @@ class GwNonVisual:
             tools_qt.set_stylesheet(txt_id, style="")
 
             # Insert inp_timeseries
-            sql = f"INSERT INTO inp_timeseries (id, timser_type, times_type, idval, descript, fname, expl_id)" \
-                  f"VALUES({timeseries_id}, '{timser_type}', '{times_type}', {idval}, {descript}, {fname}, {expl_id})"
+            sql = f"INSERT INTO inp_timeseries (id, timser_type, times_type, active, descript, fname, expl_id, addparam)" \
+                  f"VALUES({timeseries_id}, '{timser_type}', '{times_type}', {active}, {descript}, {fname}, {expl_id}, $${addparam}$$)"
             result = tools_db.execute_sql(sql, commit=False)
             if not result:
                 msg = "There was an error inserting timeseries."
@@ -2390,15 +2402,20 @@ class GwNonVisual:
             # Update inp_timeseries
             table_name = 'v_edit_inp_timeseries'
 
-            idval = idval.strip("'")
+            active = active.strip("'")
             timser_type = timser_type.strip("'")
             times_type = times_type.strip("'")
             descript = descript.strip("'")
             fname = fname.strip("'")
-            fields = f"""{{"expl_id": {expl_id}, "idval": "{idval}", "timser_type": "{timser_type}", "times_type": "{times_type}", "descript": "{descript}", "fname": "{fname}"}}"""
+            addparam = addparam.strip("'")
+
+            fields = f"""{{"expl_id": {expl_id}, "active": "{active}", "timser_type": "{timser_type}", 
+            "times_type": "{times_type}", "descript": "{descript}", "fname": "{fname}", "addparam": {json.dumps(addparam)}}}"""
 
             result = self._setfields(timeseries_id.strip("'"), table_name, fields)
             if not result:
+                msg = "Value in addparam must be in a json format"
+                tools_qgis.show_warning(msg, dialog=dialog)
                 return
 
             # Update inp_timeseries_value
