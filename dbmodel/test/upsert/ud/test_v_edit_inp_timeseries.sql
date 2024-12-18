@@ -12,8 +12,8 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 SELECT plan(6);
 
-INSERT INTO v_edit_inp_timeseries (id, timser_type, times_type, idval, descript, fname, expl_id, log, active)
-VALUES('-901', 'Rainfall', 'RELATIVE', 'T10-5m', NULL, NULL, 1, NULL, true);
+INSERT INTO v_edit_inp_timeseries (id, timser_type, times_type, descript, fname, expl_id, log, active)
+VALUES('-901', 'Rainfall', 'RELATIVE', NULL, NULL, 1, NULL, true);
 
 
 
