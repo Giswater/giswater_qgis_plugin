@@ -2203,16 +2203,16 @@ class GwPsector:
             # Retrieve the psector ID for use in the extras configuration
             psector_id = result["body"]["data"]["psector_id"]
         except KeyError:
-            print("Error: 'name' or 'psector_id' field is missing in the result.")
+            tools_log.log_warning("Error: 'name' or 'psector_id' field is missing in the result.")
             return
-
-        # Define `extras` with the retrieved psector ID and other parameters
-        extras = (f'"selectorType":"selector_basic", "tabName":"tab_psector", "id":{psector_id}, '
-                  f'"isAlone":"False", "disableParent":"False", '
-                  f'"value":"True"')
-        body = tools_gw.create_body(extras=extras)
-        result = tools_gw.execute_procedure("gw_fct_getselectors", body)
-        tools_gw.manage_current_selections_docker(result)
+        if psector_id is not None:
+            # Define `extras` with the retrieved psector ID and other parameters
+            extras = (f'"selectorType":"selector_basic", "tabName":"tab_psector", "id":{psector_id}, '
+                      f'"isAlone":"False", "disableParent":"False", '
+                      f'"value":"True"')
+            body = tools_gw.create_body(extras=extras)
+            result = tools_gw.execute_procedure("gw_fct_getselectors", body)
+            tools_gw.manage_current_selections_docker(result)
 
 
     def zoom_to_selected_features(self, layer, feature_type=None, zoom=None):
