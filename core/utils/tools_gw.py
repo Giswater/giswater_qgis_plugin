@@ -3571,12 +3571,14 @@ def set_tablemodel_config(dialog, widget, table_name, sort_order=0, schema_name=
     return widget
 
 
-def add_icon(widget, icon, folder="dialogs", sub_folder="20x20"):
+def add_icon(widget, icon, folder="dialogs"):
     """ Set @icon to selected @widget """
 
     # Get icons folder
     icons_folder = os.path.join(lib_vars.plugin_dir, f"icons{os.sep}{folder}")
     icon_path = os.path.join(icons_folder, str(icon) + ".png")
+    if not os.path.exists(icon_path):
+        icon_path = os.path.join(icons_folder, str(icon) + ".svg")
 
     if os.path.exists(icon_path):
         widget.setIcon(QIcon(icon_path))
@@ -5055,7 +5057,7 @@ def _manage_tablewidget(**kwargs):
 
 
 def reload_layers_filters():
-    
+
     # Build and Apply filters
     selector = GwSelector()
     muni_filter, expl_filter, sector_filter = selector._build_filter()
