@@ -125,7 +125,7 @@ class GwNetscenarioManagerButton(GwAction):
 
         # Ensure a row is selected
         if not selected_list:
-            tools_qgis.show_warning("No record selected", dialog=dialog)
+            tools_qgis.show_warning("Any record selected", dialog=dialog)
             return
 
         # Get ID and active status of the first selected row

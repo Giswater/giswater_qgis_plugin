@@ -336,7 +336,7 @@ class GwDscenarioManagerButton(GwAction):
 
         # Check if any row is selected
         if len(selected_list) == 0:
-            message = "No record selected"
+            message = "Any record selected"
             tools_qgis.show_warning(message, dialog=dialog)
             return
 
