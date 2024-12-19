@@ -147,7 +147,7 @@ class GwNonVisual:
         view = tableview.objectName().replace('tbl_', '').replace('v_ui_', 'v_edit_')
         selected_list = tableview.selectionModel().selectedRows()
         if len(selected_list) == 0:
-            message = "No record selected"
+            message = "Any record selected"
             tools_qgis.show_warning(message, dialog=self.manager_dlg)
             return
 

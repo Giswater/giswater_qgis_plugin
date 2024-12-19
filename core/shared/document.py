@@ -321,7 +321,7 @@ class GwDocument(QObject):
         qtable = dialog.tbl_doc_x_psector
         selected_list = qtable.selectionModel().selectedRows()
         if len(selected_list) == 0:
-            message = "No record selected"
+            message = "Any record selected"
             tools_qgis.show_warning(message, dialog=dialog)
             return
 
@@ -385,7 +385,7 @@ class GwDocument(QObject):
         qtable = dialog.tbl_doc_x_visit
         selected_list = qtable.selectionModel().selectedRows()
         if len(selected_list) == 0:
-            message = "No record selected"
+            message = "Any record selected"
             tools_qgis.show_warning(message, dialog=dialog)
             return
 
