@@ -308,10 +308,11 @@
 			<source>305_text</source>
 			<translation>Unit Planner</translation>
 		</message>
-	</context>
-
+		<message>
+			<source>305_text</source>
+			<translation>Unit Planner</translation>
+		</message>
 	<!-- PYTHON MESSAGES -->
-	<context>
 		<message>
 			<source>Java Runtime executable file not found</source>
 			<translation>Java Runtime executable file not found</translation>
@@ -2287,6 +2288,26 @@
 		<message>
 			<source>Click on feature to replace it with a new one. You can select other layer to snapp diferent feature type.</source>
 			<translation>Click on feature to replace it with a new one. You can select other layer to snap to a different feature type.</translation>
+		</message>
+		<message>
+			<source>Category name already exists</source>
+			<translation>Category name already exists</translation>
+		</message>
+		<message>
+			<source>Category name cannot be empty.</source>
+			<translation>Category name cannot be empty.</translation>
+		</message>
+		<message>
+			<source>Category updated successfully!</source>
+			<translation>Category updated successfully!</translation>
+		</message>
+		<message>
+			<source>Failed to update category:</source>
+			<translation>Failed to update category:</translation>
+		</message>
+		<message>
+			<source>Please select a category to delete.</source>
+			<translation>Please select a category to delete.</translation>
 		</message>
 	</context>
 

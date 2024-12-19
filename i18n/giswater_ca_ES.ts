@@ -308,10 +308,11 @@
 			<source>305_text</source>
 			<translation>Planificador unitari</translation>
 		</message>
-	</context>
-
+		<message>
+			<source>305_text</source>
+			<translation>Planificador unitari</translation>
+		</message>
 	<!-- PYTHON MESSAGES -->
-	<context>
 		<message>
 			<source>Java Runtime executable file not found</source>
 			<translation>No s'ha trobat l'arxiu executable de Java Runtime</translation>
@@ -2286,6 +2287,26 @@
 		<message>
 			<source>Click on feature to replace it with a new one. You can select other layer to snapp diferent feature type.</source>
 			<translation>Feu clic a l'element per substituir-la per una de nova. Podeu seleccionar una altra capa per encaixar diferents tipus d'elements.</translation>
+		</message>
+		<message>
+			<source>Category name already exists</source>
+			<translation>El nom de la categoria ja existeix</translation>
+		</message>
+		<message>
+			<source>Category name cannot be empty.</source>
+			<translation>El nom de la categoria no pot estar buit</translation>
+		</message>
+		<message>
+			<source>Category updated successfully!</source>
+			<translation>Categoria actualitzada correctament</translation>
+		</message>
+		<message>
+			<source>Failed to update category:</source>
+			<translation>Error al actualitzar la categoria</translation>
+		</message>
+		<message>
+			<source>Please select a category to delete.</source>
+			<translation>Si us plau, seleccioni una categoria per a eliminar</translation>
 		</message>
 	</context>
 

@@ -308,10 +308,11 @@
 			<source>305_text</source>
 			<translation>Planificador unitario</translation>
 		</message>
-	</context>
-
+		<message>
+			<source>305_text</source>
+			<translation>Planificador unitario</translation>
+		</message>
 	<!-- PYTHON MESSAGES -->
-	<context>
 		<message>
 			<source>Java Runtime executable file not found</source>
 			<translation>No se encontró el archivo ejecutable de Java Runtime</translation>
@@ -2287,6 +2288,26 @@ Por otro lado, debe saber que la tabla de trazabilidad almacenará información 
 		<message>
 			<source>Click on feature to replace it with a new one. You can select other layer to snapp diferent feature type.</source>
 			<translation>Haga clic en el elemento para reemplazarla por uno nuevo. Puede seleccionar otra capa para encajar diferentes tipos de elementos.</translation>
+		</message>
+		<message>
+			<source>Category name already exists</source>
+			<translation>Category name already exists</translation>
+		</message>
+		<message>
+			<source>Category name cannot be empty.</source>
+			<translation>El nombre de la categoria no puede estar vacío</translation>
+		</message>
+		<message>
+			<source>Category updated successfully!</source>
+			<translation>Categoria actualizada correctamente</translation>
+		</message>
+		<message>
+			<source>Failed to update category:</source>
+			<translation>Error al actualizar la categoria:</translation>
+		</message>
+		<message>
+			<source>Please select a category to delete.</source>
+			<translation>Por favor, seleccione una categoria para eliminar</translation>
 		</message>
 	</context>
 
