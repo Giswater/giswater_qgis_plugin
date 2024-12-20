@@ -870,3 +870,6 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 --18/12/2024
 
 ALTER TABLE IF EXISTS config_style ADD CONSTRAINT idval_chk UNIQUE (idval);
+
+-- 20/12/2024
+UPDATE sys_param_user SET id='plan_psector_current' WHERE id='plan_psector_vdefault';
