@@ -19,7 +19,7 @@ from qgis.PyQt.QtCore import Qt, QItemSelectionModel
 from qgis.PyQt.QtGui import QDoubleValidator, QIntValidator, QKeySequence, QColor, QCursor
 from qgis.PyQt.QtSql import QSqlQueryModel, QSqlTableModel, QSqlError
 from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCheckBox, QComboBox, QDateEdit, QLabel, \
-    QLineEdit, QTableView, QWidget, QDoubleSpinBox, QTextEdit, QPushButton, QGridLayout, QMenu
+    QLineEdit, QTableView, QWidget, QDoubleSpinBox, QTextEdit, QPushButton, QGridLayout, QMenu, QHBoxLayout
 from qgis.core import QgsLayoutExporter, QgsProject, QgsRectangle, QgsPointXY, QgsGeometry, QgsMapToPixel, QgsMapLayer
 from qgis.gui import QgsMapToolEmitPoint
 
@@ -30,6 +30,7 @@ from ..ui.ui_manager import GwPsectorUi, GwPsectorRapportUi, GwPsectorManagerUi,
 from ..utils import tools_gw
 from ...libs import lib_vars, tools_db, tools_qgis, tools_qt, tools_log, tools_os
 from ..utils.snap_manager import GwSnapManager
+from ...global_vars import GwFeatureTypes
 
 
 class GwPsector:
@@ -231,12 +232,7 @@ class GwPsector:
         tools_gw.set_tablemodel_config(self.dlg_plan_psector, self.qtbl_arc, self.tablename_psector_x_arc)
         self.qtbl_arc.setProperty('tablename', self.tablename_psector_x_arc)
 
-        self.qtbl_arc.selectionModel().selectionChanged.connect(partial(
-            tools_qgis.highlight_features_by_id, self.qtbl_arc, "v_edit_arc", "arc_id", self.rubber_band_line, 5
-        ))
-        self.qtbl_arc.selectionModel().selectionChanged.connect(partial(
-            self._highlight_features_by_id, self.qtbl_arc, "arc", "arc_id", self.rubber_band_op, 5
-        ))
+        self._manage_selection_changed_signals(GwFeatureTypes.ARC)
 
         # tbl_psector_x_node
         self.fill_table(self.dlg_plan_psector, self.qtbl_node, self.tablename_psector_x_node,
@@ -244,12 +240,7 @@ class GwPsector:
         tools_gw.set_tablemodel_config(self.dlg_plan_psector, self.qtbl_node, self.tablename_psector_x_node)
         self.qtbl_node.setProperty('tablename', self.tablename_psector_x_node)
 
-        self.qtbl_node.selectionModel().selectionChanged.connect(partial(
-            tools_qgis.highlight_features_by_id, self.qtbl_node, "v_edit_node", "node_id", self.rubber_band_point, 10
-        ))
-        self.qtbl_node.selectionModel().selectionChanged.connect(partial(
-            self._highlight_features_by_id, self.qtbl_node, "node", "node_id", self.rubber_band_op, 5
-        ))
+        self._manage_selection_changed_signals(GwFeatureTypes.NODE)
 
         # tbl_psector_x_connec
         self.fill_table(self.dlg_plan_psector, self.qtbl_connec, self.tablename_psector_x_connec,
@@ -257,17 +248,7 @@ class GwPsector:
         tools_gw.set_tablemodel_config(self.dlg_plan_psector, self.qtbl_connec, self.tablename_psector_x_connec)
         self.qtbl_connec.setProperty('tablename', self.tablename_psector_x_connec)
 
-        self.qtbl_connec.selectionModel().selectionChanged.connect(partial(
-            tools_qgis.highlight_features_by_id, self.qtbl_connec, "v_edit_connec", "connec_id", self.rubber_band_point,
-            10
-        ))
-        self.qtbl_connec.selectionModel().selectionChanged.connect(partial(
-            self._highlight_features_by_id, self.qtbl_connec, "connec", "connec_id", self.rubber_band_op, 5
-        ))
-        self.qtbl_connec.selectionModel().selectionChanged.connect(partial(
-            self._manage_tab_feature_buttons
-        ))
-        self.qtbl_connec.model().flags = lambda index: self.flags(index, self.qtbl_connec.model(), ['arc_id', 'link_id'])
+        self._manage_selection_changed_signals(GwFeatureTypes.CONNEC)
 
         # tbl_psector_x_gully
         if self.project_type.upper() == 'UD':
@@ -276,17 +257,7 @@ class GwPsector:
             tools_gw.set_tablemodel_config(self.dlg_plan_psector, self.qtbl_gully, self.tablename_psector_x_gully)
             self.qtbl_gully.setProperty('tablename', self.tablename_psector_x_gully)
 
-            self.qtbl_gully.selectionModel().selectionChanged.connect(partial(
-                tools_qgis.highlight_features_by_id, self.qtbl_gully, "v_edit_gully", "gully_id",
-                self.rubber_band_point, 10
-            ))
-            self.qtbl_gully.selectionModel().selectionChanged.connect(partial(
-                self._highlight_features_by_id, self.qtbl_gully, "gully", "gully_id", self.rubber_band_op, 5
-            ))
-            self.qtbl_gully.selectionModel().selectionChanged.connect(partial(
-                self._manage_tab_feature_buttons
-            ))
-            self.qtbl_gully.model().flags = lambda index: self.flags(index, self.qtbl_gully.model(), ['arc_id', 'link_id'])
+            self._manage_selection_changed_signals(GwFeatureTypes.GULLY)
 
         if psector_id is not None:
 
@@ -458,6 +429,18 @@ class GwPsector:
         self.dlg_plan_psector.txt_name.textChanged.connect(
             partial(self.query_like_widget_text, self.dlg_plan_psector, self.dlg_plan_psector.txt_name,
                     self.dlg_plan_psector.all_rows, 'v_price_compost', viewname, "id"))
+
+        # Create corner buttons
+        self.corner_widget = QWidget()
+        layout = QHBoxLayout(self.corner_widget)
+        layout.setContentsMargins(0, 1, 0, 0)
+
+        self.zoom_to_selection_button = QPushButton()
+        tools_gw.add_icon(self.zoom_to_selection_button, '176')
+        self.zoom_to_selection_button.clicked.connect(partial(self._zoom_to_selection))
+        layout.addWidget(self.zoom_to_selection_button)
+
+        self.dlg_plan_psector.tab_feature.setCornerWidget(self.corner_widget)
 
         self.dlg_plan_psector.gexpenses.editingFinished.connect(partial(self.calculate_percents, 'plan_psector', 'gexpenses'))
         self.dlg_plan_psector.vat.editingFinished.connect(partial(self.calculate_percents, 'plan_psector', 'vat'))
@@ -2943,7 +2926,7 @@ class GwPsector:
         if layer.selectedFeatureCount() > 0:
             # Get selected features of the layer
             features = layer.selectedFeatures()
-            feature_ids = [feature.attribute(idname) for feature in features]
+            feature_ids = [f"{feature.attribute(idname)}" for feature in features]
 
             # Select in table
             selection_model = tableview.selectionModel()
@@ -2955,13 +2938,76 @@ class GwPsector:
 
             # Loop through the model rows to find matching feature_ids
             for row in range(model.rowCount()):
-                index = model.index(row, model.fieldIndex(idname))
-                feature_id = model.data(index)
+                if isinstance(model, QSqlTableModel):
+                    index = model.index(row, model.fieldIndex(idname))
+                    feature_id = model.data(index)
 
-                index = model.index(row, model.fieldIndex("state"))
-                state = model.data(index)
+                    index = model.index(row, model.fieldIndex("state"))
+                    state = model.data(index)
+                elif isinstance(model, QStandardItemModel):
+                    index = model.index(row, tools_qt.get_col_index_by_col_name(tableview, idname))
+                    feature_id = model.data(index)
 
-                if feature_id in feature_ids and f"{state}" == "1":
+                    index = model.index(row, tools_qt.get_col_index_by_col_name(tableview, "state"))
+                    state = model.data(index)
+                else:
+                    continue
+
+                if f"{feature_id}" in feature_ids and f"{state}" == "1":
                     selection_model.select(index, (QItemSelectionModel.Select | QItemSelectionModel.Rows))
+
+    def _zoom_to_selection(self):
+        """
+        Zoom to the selected features in the tableview
+        """
+        tab_idx = self.dlg_plan_psector.tab_feature.currentIndex()
+        tableview_map = {
+            0: (self.qtbl_arc, "v_edit_arc", "arc_id"),
+            1: (self.qtbl_node, "v_edit_node", "node_id"),
+            2: (self.qtbl_connec, "v_edit_connec", "connec_id"),
+            3: (self.qtbl_gully, "v_edit_gully", "gully_id"),
+        }
+        tableview, tablename, idname = tableview_map.get(tab_idx, (None, None, None))
+        if (tableview, tablename, idname) == (None, None, None):
+            return
+
+        selection_model = tableview.selectionModel()
+        selected_rows = selection_model.selectedRows()
+        feature_ids = []
+        for index in selected_rows:
+            feature_id = tableview.model().record(index.row()).value(idname)
+            if feature_id:
+                feature_ids.append(feature_id)
+        tools_gw.zoom_to_feature_by_id(tablename, idname, feature_ids)
+
+    def _manage_selection_changed_signals(self, feature_type: GwFeatureTypes):
+        """
+        Manage the selection changed signals for the tableview based on the feature type
+        """
+        tableview_map = {
+            GwFeatureTypes.ARC: (self.qtbl_arc, "v_edit_arc", "arc_id", "arc", "arc_id", self.rubber_band_line, 5),
+            GwFeatureTypes.NODE: (self.qtbl_node, "v_edit_node", "node_id", "node", "node_id", self.rubber_band_point, 10),
+            GwFeatureTypes.CONNEC: (self.qtbl_connec, "v_edit_connec", "connec_id", "connec", "connec_id", self.rubber_band_point, 10),
+            GwFeatureTypes.GULLY: (self.qtbl_gully, "v_edit_gully", "gully_id", "gully", "gully_id", self.rubber_band_point, 10),
+        }
+        tableview, tablename, feat_id, tablename_op, feat_id_op, rb, width = tableview_map.get(feature_type, (None, None, None, None, None, None, None))
+        if tableview is None:
+            return
+
+        # Generic selection changed signal
+        tableview.selectionModel().selectionChanged.disconnect()
+
+        tableview.selectionModel().selectionChanged.connect(partial(
+            tools_qgis.highlight_features_by_id, tableview, tablename, feat_id, rb, width
+        ))
+        tableview.selectionModel().selectionChanged.connect(partial(
+            self._highlight_features_by_id, tableview, tablename_op, feat_id_op, self.rubber_band_op, 5
+        ))
+        # Manage connec/gully special cases
+        if feature_type in (GwFeatureTypes.CONNEC, GwFeatureTypes.GULLY):
+            tableview.selectionModel().selectionChanged.connect(partial(
+                self._manage_tab_feature_buttons
+            ))
+            tableview.model().flags = lambda index: self.flags(index, tableview.model(), ['arc_id', 'link_id'])
 
     # endregion

@@ -6,11 +6,25 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 import sys
+from enum import Enum
 
 from qgis.PyQt.QtCore import QSettings
 
 from .libs import lib_vars
 
+
+# region enums
+class GwFeatureTypes(Enum):
+    ARC = "arc"
+    NODE = "node"
+    CONNEC = "connec"
+    GULLY = "gully"
+
+    @classmethod
+    def from_index(cls, index):
+        return list(cls)[index]
+
+# end region
 
 # region system variables (values are initialized on load project without changes during session)
 gw_dev_mode = False

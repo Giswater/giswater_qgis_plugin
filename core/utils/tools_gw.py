@@ -3173,6 +3173,30 @@ def manage_layer_manager(json_result, sql=None):
     except Exception as e:
         tools_qt.manage_exception(None, f"{type(e).__name__}: {e}", sql, lib_vars.schema_name)
 
+def zoom_to_feature_by_id(tablename: str, idname: str, _id, margin: float=15):
+    """ Zoom to feature by id or list of ids """
+
+    layer = tools_qgis.get_layer_by_tablename(tablename)
+    if not layer:
+        return
+
+    if isinstance(_id, list):
+        expr_filter = f"{idname} IN ({', '.join([f'\'{i}\'' for i in _id])})"
+    else:
+        expr_filter = f"{idname} = '{_id}'"
+
+    request = QgsFeatureRequest().setFilterExpression(expr_filter)
+    features = layer.getFeatures(request)
+
+    bbox = None
+    for feature in features:
+        if bbox is None:
+            bbox = feature.geometry().boundingBox()
+        else:
+            bbox.combineExtentWith(feature.geometry().boundingBox())
+
+    if bbox:
+        tools_qgis.zoom_to_rectangle(bbox.xMinimum() - margin, bbox.yMinimum() - margin, bbox.xMaximum() + margin, bbox.yMaximum() + margin)
 
 def selection_init(class_object, dialog, table_object, query=False):
     """ Set canvas map tool to an instance of class 'GwSelectManager' """
