@@ -2915,7 +2915,7 @@ UPDATE config_toolbox SET inputparams='[
 ]'::json WHERE id=3110;
 
 -- 20/12/2024
-DROP FUNCION IF EXISTS gw_fct_import_epanet_inp(p_data json);
+DROP FUNCTION IF EXISTS gw_fct_import_epanet_inp(p_data json);
 
 DELETE FROM config_function
 	WHERE id=2522; --gw_fct_import_epanet_inp
