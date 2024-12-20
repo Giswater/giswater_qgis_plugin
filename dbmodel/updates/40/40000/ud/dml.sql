@@ -2392,3 +2392,10 @@ WHERE formtype = 'form_feature'
     'v_edit_inp_flwreg_weir'
   );
 
+DROP FUNCTION IF EXISTS gw_fct_import_swmm_inp(p_data json)
+
+DELETE FROM config_toolbox
+	WHERE id=2524; --gw_fct_import_swmm_inp
+
+DELETE FROM sys_function
+	WHERE id=2524; --gw_fct_import_swmm_inp
