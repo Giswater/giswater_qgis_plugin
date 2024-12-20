@@ -2379,3 +2379,16 @@ INSERT INTO config_form_tableview (location_type, project_type, objectname, colu
 INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('dscenariom_form', 'utils', 'dscenario_lids', 'id', NULL, false, NULL, NULL, NULL, NULL);
 INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('dscenariom_form', 'utils', 'dscenario_outlet', 'id', NULL, false, NULL, NULL, NULL, NULL);
 
+--20/12/2024
+UPDATE config_form_fields
+SET iseditable = false
+WHERE formtype = 'form_feature'
+  AND columnname = 'to_arc'
+  AND tabname = 'tab_none'
+  AND formname IN (
+    'v_edit_inp_flwreg_orifice',
+    'v_edit_inp_flwreg_outlet',
+    'v_edit_inp_flwreg_pump',
+    'v_edit_inp_flwreg_weir'
+  );
+
