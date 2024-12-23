@@ -584,7 +584,7 @@ BEGIN
 				category_type, fluid_type, location_type, workcat_id, workcat_id_end, workcat_id_plan, buildercat_id, builtdate, enddate, ownercat_id, muni_id,
 				postcode, district_id, streetaxis_id, postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, descript, rotation,
 				link,verified, the_geom, undelete,label_x, label_y,label_rotation, expl_id, publish, inventory,uncertain, num_value,
-				lastupdate, lastupdate_user, asset_id, gratecat2_id, epa_type, units_placement, groove_height, groove_length, drainzone_id, expl_id2, adate, adescript,
+				lastupdate, lastupdate_user, asset_id, gullycat2_id, epa_type, units_placement, groove_height, groove_length, drainzone_id, expl_id2, adate, adescript,
 				siphon_type, odorflap, connec_y2, placement_type, label_quadrant, access_type, streetname, streetname2)
 			VALUES (NEW.gully_id, NEW.code, NEW.top_elev, NEW."ymax",NEW.sandbox, NEW.matcat_id, NEW.gully_type, NEW.gratecat_id, NEW.units, NEW.groove,
 				NEW.connec_arccat_id, NEW.connec_length, NEW.connec_depth, NEW.siphon, NEW.arc_id, NEW.sector_id, NEW."state",
@@ -603,7 +603,7 @@ BEGIN
 				category_type, fluid_type, location_type, workcat_id, workcat_id_end, workcat_id_plan, buildercat_id, builtdate, enddate, ownercat_id, muni_id,
 				postcode, district_id, streetaxis_id, postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, descript, rotation,
 				link,verified, the_geom, undelete,label_x, label_y,label_rotation, expl_id, publish, inventory,uncertain, num_value,
-				lastupdate, lastupdate_user, asset_id, connec_matcat_id, gratecat2_id, epa_type, units_placement, groove_height, groove_length, drainzone_id, expl_id2, adate, adescript,
+				lastupdate, lastupdate_user, asset_id, connec_matcat_id, gullycat2_id, epa_type, units_placement, groove_height, groove_length, drainzone_id, expl_id2, adate, adescript,
 				siphon_type, odorflap, connec_y2, placement_type, label_quadrant, access_type, streetname, streetname2)
 			VALUES (NEW.gully_id, NEW.code, NEW.top_elev, NEW."ymax",NEW.sandbox, NEW.matcat_id, NEW.gully_type, NEW.gratecat_id, NEW.units, NEW.groove,
 				NEW.connec_arccat_id, NEW.connec_length, NEW.connec_depth, NEW.siphon, NEW.arc_id, NEW.sector_id, NEW."state",
@@ -612,7 +612,7 @@ BEGIN
 				NEW.ownercat_id, NEW.muni_id, NEW.postcode, NEW.district_id, v_streetaxis, NEW.postnumber, NEW.postcomplement, v_streetaxis2,
 				NEW.postnumber2, NEW.postcomplement2, NEW.descript, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom, NEW.undelete,
 				NEW.label_x, NEW.label_y, NEW.label_rotation,  NEW.expl_id , NEW.publish, NEW.inventory,
-				NEW.uncertain, NEW.num_value,NEW.lastupdate, NEW.lastupdate_user, NEW.asset_id, NEW.connec_matcat_id, NEW.gratecat2_id,
+				NEW.uncertain, NEW.num_value,NEW.lastupdate, NEW.lastupdate_user, NEW.asset_id, NEW.connec_matcat_id, NEW.gullycat2_id,
 				NEW.epa_type, NEW.units_placement, NEW.groove_height, NEW.groove_length, NEW.drainzone_id,NEW.expl_id2, NEW.adate, NEW.adescript, 
 				NEW.siphon_type, NEW.odorflap, NEW.connec_y2, NEW.placement_type, NEW.label_quadrant, NEW.access_type, NEW.streetname, NEW.streetname2);
 
