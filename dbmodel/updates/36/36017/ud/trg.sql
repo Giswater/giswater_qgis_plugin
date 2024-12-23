@@ -10,10 +10,10 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 23/12/2024
 create trigger gw_trg_edit_link instead of insert or delete or update
-on v_edit_link_connec for each row execute function gw_trg_edit_link()
+on v_edit_link_connec for each row execute function gw_trg_edit_link();
 	
 create trigger gw_trg_edit_link instead of insert or delete or update
-on v_edit_link_gully for each row execute function gw_trg_edit_link()
+on v_edit_link_gully for each row execute function gw_trg_edit_link();
 	
 
 
