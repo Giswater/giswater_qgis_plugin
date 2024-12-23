@@ -353,23 +353,13 @@ CREATE OR REPLACE VIEW v_edit_link AS
 	FROM vu_link
     JOIN v_state_link USING (link_id)) l;
 
-CREATE OR REPLACE VIEW v_edit_link_connec AS
-	SELECT l.* FROM (
-	SELECT l.*
-	FROM vu_link_connec l) l
-	join selector_sector s using (sector_id)
-	LEFT JOIN selector_municipality m using (muni_id)
-	where s.cur_user = current_user and (m.cur_user = current_user or l.muni_id is null);
+CREATE OR REPLACE VIEW v_edit_link_connec 
+as select * from v_edit_link where feature_type = 'CONNEC';
 
-CREATE OR REPLACE VIEW v_edit_link_gully AS
-	SELECT l.* FROM (
-	SELECT l.*
-    FROM vu_link_connec l) l
-	join selector_sector s using (sector_id)
-	LEFT JOIN selector_municipality m using (muni_id)
-	where s.cur_user = current_user and (m.cur_user = current_user or l.muni_id is null);
+CREATE OR REPLACE VIEW v_edit_link_gully 
+as select * from v_edit_link where feature_type = 'GULLY'; 
 
-drop view if exists v_edit_drainzone;
+DROP VIEW IF EXISTS v_edit_drainzone;
 
 CREATE OR REPLACE VIEW v_edit_drainzone
 AS SELECT drainzone.drainzone_id,

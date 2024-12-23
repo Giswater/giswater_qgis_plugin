@@ -892,8 +892,8 @@ with
 	 SELECT gully_selected.*
 	 FROM gully_selected;
 	 
-	 
-	create or replace view v_edit_link as
+
+create or replace view v_edit_link as
 WITH 
 	 typevalue AS 
        (

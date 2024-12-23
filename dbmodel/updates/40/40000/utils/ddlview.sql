@@ -155,9 +155,9 @@ DROP VIEW IF EXISTS vu_node;
 DROP VIEW IF EXISTS ve_connec CASCADE;
 DROP VIEW IF EXISTS vu_connec;
 
-DROP view IF EXISTS v_edit_link;
 DROP view IF EXISTS v_edit_link_connec;
 DROP view IF EXISTS v_edit_link_gully;
+DROP view IF EXISTS v_edit_link;
 
 DROP VIEW IF EXISTS v_edit_minsector;
 DROP VIEW IF EXISTS v_edit_samplepoint;
