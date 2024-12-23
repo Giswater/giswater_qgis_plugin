@@ -9,13 +9,12 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 -- 23/12/2024
-CREATE INDEX arc_streetname ON arc USING btree (streetname);
-CREATE INDEX arc_streetname2 ON arc USING btree (streetname2);
+create trigger gw_trg_edit_link instead of insert or delete or update
+on v_edit_link_connec for each row execute function gw_trg_edit_link()
+	
+create trigger gw_trg_edit_link instead of insert or delete or update
+on v_edit_link_gully for each row execute function gw_trg_edit_link()
+	
 
-CREATE INDEX node_streetname ON node USING btree (streetname);
-CREATE INDEX node_streetname2 ON node USING btree (streetname2);
-
-CREATE INDEX connec_streetname ON connec USING btree (streetname);
-CREATE INDEX connec_streetname2 ON connec USING btree (streetname2);
 
 
