@@ -528,7 +528,7 @@ BEGIN
 
 			IF v_length*v_width IS NULL THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"3062", "function":"1206","parameters":{"gratecat_id":"'||NEW.gullycat_id::text||'"}}}$$);';
+				"data":{"message":"3062", "function":"1206","parameters":{"gullycat_id":"'||NEW.gullycat_id::text||'"}}}$$);';
 
 			ELSIF v_length*v_width != 0 THEN
 
@@ -586,7 +586,7 @@ BEGIN
 				link,verified, the_geom, undelete,label_x, label_y,label_rotation, expl_id, publish, inventory,uncertain, num_value,
 				lastupdate, lastupdate_user, asset_id, gullycat2_id, epa_type, units_placement, groove_height, groove_length, drainzone_id, expl_id2, adate, adescript,
 				siphon_type, odorflap, connec_y2, placement_type, label_quadrant, access_type, streetname, streetname2)
-			VALUES (NEW.gully_id, NEW.code, NEW.top_elev, NEW."ymax",NEW.sandbox, NEW.matcat_id, NEW.gully_type, NEW.gratecat_id, NEW.units, NEW.groove,
+			VALUES (NEW.gully_id, NEW.code, NEW.top_elev, NEW."ymax",NEW.sandbox, NEW.matcat_id, NEW.gully_type, NEW.gullycat_id, NEW.units, NEW.groove,
 				NEW.connec_arccat_id, NEW.connec_length, NEW.connec_depth, NEW.siphon, NEW.arc_id, NEW.sector_id, NEW."state",
 				NEW.state_type, NEW.annotation, NEW."observ", NEW."comment", NEW.dma_id, NEW.soilcat_id, NEW.function_type, NEW.category_type,
 				NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.workcat_id_end, NEW.workcat_id_plan, NEW.buildercat_id, NEW.builtdate, NEW.enddate,
@@ -605,7 +605,7 @@ BEGIN
 				link,verified, the_geom, undelete,label_x, label_y,label_rotation, expl_id, publish, inventory,uncertain, num_value,
 				lastupdate, lastupdate_user, asset_id, connec_matcat_id, gullycat2_id, epa_type, units_placement, groove_height, groove_length, drainzone_id, expl_id2, adate, adescript,
 				siphon_type, odorflap, connec_y2, placement_type, label_quadrant, access_type, streetname, streetname2)
-			VALUES (NEW.gully_id, NEW.code, NEW.top_elev, NEW."ymax",NEW.sandbox, NEW.matcat_id, NEW.gully_type, NEW.gratecat_id, NEW.units, NEW.groove,
+			VALUES (NEW.gully_id, NEW.code, NEW.top_elev, NEW."ymax",NEW.sandbox, NEW.matcat_id, NEW.gully_type, NEW.gullycat_id, NEW.units, NEW.groove,
 				NEW.connec_arccat_id, NEW.connec_length, NEW.connec_depth, NEW.siphon, NEW.arc_id, NEW.sector_id, NEW."state",
 				NEW.state_type, NEW.annotation, NEW."observ", NEW."comment", NEW.dma_id, NEW.soilcat_id, NEW.function_type, NEW.category_type,
 				NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.workcat_id_end, NEW.workcat_id_plan, NEW.buildercat_id, NEW.builtdate, NEW.enddate,
@@ -846,7 +846,7 @@ BEGIN
 				IF v_length*v_width IS NULL THEN
 
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-					"data":{"message":"3062", "function":"1206","parameters":{"gratecat_id":"'||NEW.gullycat_id::text||'"}}}$$);';
+					"data":{"message":"3062", "function":"1206","parameters":{"gullycat_id":"'||NEW.gullycat_id::text||'"}}}$$);';
 
 				ELSIF v_length*v_width != 0 THEN
 

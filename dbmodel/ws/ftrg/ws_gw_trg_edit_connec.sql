@@ -537,7 +537,7 @@ BEGIN
 		publish, inventory,num_value, connec_length, arc_id, minsector_id, dqa_id, pjoint_id, pjoint_type,
 		adate, adescript, accessibility, lastupdate, lastupdate_user, asset_id, epa_type, om_state, conserv_state, priority,
 		valve_location, valve_type, shutoff_valve, access_type, placement_type, crmzone_id, expl_id2, plot_code, brand_id, model_id, serial_number, cat_valve, label_quadrant, streetname, streetname2)
-		VALUES (NEW.connec_id, NEW.code, NEW.elevation, NEW.depth, NEW.connecat_id, NEW.sector_id, NEW.customer_code,  NEW.state, NEW.state_type, NEW.annotation,   NEW.observ, NEW.comment,
+		VALUES (NEW.connec_id, NEW.code, NEW.elevation, NEW.depth, NEW.conneccat_id, NEW.sector_id, NEW.customer_code,  NEW.state, NEW.state_type, NEW.annotation,   NEW.observ, NEW.comment,
 		NEW.dma_id, NEW.presszone_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type,  NEW.location_type, NEW.workcat_id, NEW.workcat_id_end,  NEW.workcat_id_plan, NEW.buildercat_id,
 		NEW.builtdate, NEW.enddate, NEW.ownercat_id, v_streetaxis, NEW.postnumber, NEW.postnumber2, NEW.muni_id, v_streetaxis2, NEW.postcode, NEW.district_id, NEW.postcomplement,
 		NEW.postcomplement2, NEW.descript, NEW.link, NEW.verified, NEW.rotation, NEW.the_geom,NEW.undelete,NEW.label_x, NEW.label_y,NEW.label_rotation,  NEW.expl_id, NEW.publish, NEW.inventory,
