@@ -723,11 +723,11 @@ with
         ),
     gully_state AS
         (
-        SELECT connec_id, arc_id FROM connec c 
-        JOIN selector_state ss ON ss.cur_user =current_user AND c.state =ss.state_id
-        left join (SELECT connec_id, arc_id::varchar(16) FROM connec_psector WHERE p_state = 0) a using (connec_id, arc_id) where a.connec_id is null
+        SELECT gully_id, arc_id FROM gully g 
+        JOIN selector_state ss ON ss.cur_user =current_user AND g.state =ss.state_id
+        left join (SELECT gully_id, arc_id::varchar(16) FROM gully_psector WHERE p_state = 0) a using (gully_id, arc_id) where a.gully_id is null
        	union all
-        SELECT connec_id, arc_id::varchar(16) FROM connec_psector WHERE p_state = 1
+        SELECT gully_id, arc_id::varchar(16) FROM gully_psector WHERE p_state = 1
         ),
     gully_selected AS 
     	(
