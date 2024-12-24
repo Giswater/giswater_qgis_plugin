@@ -120,13 +120,11 @@ AS SELECT element_x_gully.id,
 
 create or replace view v_edit_node as
 WITH 
-   	typevalue AS 
+	typevalue AS 
        (
-         SELECT edit_typevalue.typevalue,
-            edit_typevalue.id,
-            edit_typevalue.idval
-           FROM edit_typevalue
-          WHERE edit_typevalue.typevalue::text = ANY (ARRAY['sector_type'::character varying::text, 'drainzone_type'::character varying::text, 'dma_type'::character varying::text, 'dwfzone_type'::character varying::text])
+        SELECT edit_typevalue.typevalue, edit_typevalue.id,  edit_typevalue.idval
+        FROM edit_typevalue
+        WHERE edit_typevalue.typevalue::text = ANY (ARRAY['sector_type'::character varying::text, 'drainzone_type'::character varying::text, 'dma_type'::character varying::text, 'dwfzone_type'::character varying::text])
         ),
     sector_table as
 		(
@@ -154,145 +152,143 @@ WITH
         SELECT n.node_id 
         FROM node n
         JOIN selector_state s ON s.cur_user =current_user AND n.state =s.state_id
-      --  except ALL
-       -- SELECT node_id FROM node_psector WHERE p_state = 0
-       -- UNION ALL
-       -- SELECT node_id FROM node_psector WHERE p_state = 1
+        JOIN selector_sector se ON se.cur_user =current_user AND n.sector_id =se.sector_id
+		WHERE NOT EXISTS (SELECT node_id FROM node_psector WHERE p_state = 0)
+        UNION ALL
+        SELECT node_id FROM node_psector WHERE p_state = 1
         ),
     node_selected AS 
         ( 
         SELECT node.node_id,
-            node.code,
-            node.top_elev,
-            node.custom_top_elev,
-                CASE
-                    WHEN node.custom_top_elev IS NOT NULL THEN node.custom_top_elev
-                    ELSE node.top_elev
-                END AS sys_top_elev,
-            node.ymax,
-            node.custom_ymax,
-                CASE
-                    WHEN node.custom_ymax IS NOT NULL THEN node.custom_ymax
-                    ELSE node.ymax
-                END AS sys_ymax,
-            node.elev,
-            node.custom_elev,
-                CASE
-                    WHEN node.elev IS NOT NULL AND node.custom_elev IS NULL THEN node.elev
-                    WHEN node.custom_elev IS NOT NULL THEN node.custom_elev
-                    ELSE NULL::numeric(12,3)
-                END AS sys_elev,
-            node.node_type,
-            cat_feature.system_id AS sys_type,
-            node.nodecat_id,
-                CASE
-                    WHEN node.matcat_id IS NULL THEN cat_node.matcat_id
-                    ELSE node.matcat_id
-                END AS matcat_id,
-            node.epa_type,
-            node.state,
-            node.state_type,
-            node.expl_id,
-            exploitation.macroexpl_id,
-            node.sector_id,
-            sector_type,
-            macrosector_id,
-            node.drainzone_id,
-            drainzone_type,
-            node.annotation,
-            node.observ,
-            node.comment,
-            node.dma_id,
-            macrodma_id,
-            node.soilcat_id,
-            node.function_type,
-            node.category_type,
-            node.fluid_type,
-            node.location_type,
-            node.workcat_id,
-            node.workcat_id_end,
-            node.buildercat_id,
-            node.builtdate,
-            node.enddate,
-            node.ownercat_id,
-            node.muni_id,
-            node.postcode,
-            node.district_id,
-            streetname,
-            node.postnumber,
-            node.postcomplement,
-            streetname2,
-            node.postnumber2,
-            node.postcomplement2,
-            mu.region_id,
-            mu.province_id,
-            node.descript,
-            cat_node.svg,
-            node.rotation,
-            concat(cat_feature.link_path, node.link) AS link,
-            node.verified,
-            node.the_geom,
-            node.undelete,
-            cat_node.label,
-            node.label_x,
-            node.label_y,
-            node.label_rotation,
-            node.label_quadrant,
-            node.publish,
-            node.inventory,
-            node.uncertain,
-            node.xyz_date,
-            node.unconnected,
-            node.num_value,
-            date_trunc('second'::text, node.tstamp) AS tstamp,
-            node.insert_user,
-            date_trunc('second'::text, node.lastupdate) AS lastupdate,
-            node.lastupdate_user,            
-            node.workcat_id_plan,          
-            node.asset_id,
-            node.parent_id,
-            node.arc_id,
-            node.expl_id2,
-            vst.is_operative,
-            node.minsector_id,
-            node.macrominsector_id,
-            node.adate,
-            node.adescript,
-            node.placement_type,
-            node.access_type,
-            CASE
-              WHEN node.sector_id > 0 AND vst.is_operative = true AND node.epa_type::text <> 'UNDEFINED'::character varying(16)::text THEN node.epa_type
-              ELSE NULL::character varying(16)
-            END AS inp_type,
-            node.brand_id,
-            node.model_id,
-            node.serial_number
-             FROM node_state nn
-             join node using (node_id)
-             JOIN selector_expl se ON se.cur_user =current_user AND se.expl_id IN (node.expl_id, node.expl_id2)
-       		 JOIN selector_municipality sm ON sm.cur_user = current_user AND sm.muni_id =node.muni_id 
-       		 JOIN selector_sector ss ON ss.cur_user = current_user AND ss.sector_id=node.sector_id
-             JOIN cat_node ON node.nodecat_id::text = cat_node.id::text
-             JOIN cat_feature ON cat_feature.id::text = node.node_type::text
-             JOIN exploitation ON node.expl_id = exploitation.expl_id
-             JOIN ext_municipality mu ON node.muni_id = mu.muni_id
-             JOIN value_state_type vst ON vst.id = node.state_type
-	  		 JOIN sector_table on sector_table.sector_id = node.sector_id
-		     left join dma_table on dma_table.dma_id = node.dma_id 
-	   	     left join drainzone_table ON node.dma_id = drainzone_table.drainzone_id        )
+		node.code,
+		node.top_elev,
+		node.custom_top_elev,
+			CASE
+				WHEN node.custom_top_elev IS NOT NULL THEN node.custom_top_elev
+				ELSE node.top_elev
+			END AS sys_top_elev,
+		node.ymax,
+		node.custom_ymax,
+			CASE
+				WHEN node.custom_ymax IS NOT NULL THEN node.custom_ymax
+				ELSE node.ymax
+			END AS sys_ymax,
+		node.elev,
+		node.custom_elev,
+			CASE
+				WHEN node.elev IS NOT NULL AND node.custom_elev IS NULL THEN node.elev
+				WHEN node.custom_elev IS NOT NULL THEN node.custom_elev
+				ELSE NULL::numeric(12,3)
+			END AS sys_elev,
+		node.node_type,
+		cat_feature.system_id AS sys_type,
+		node.nodecat_id,
+			CASE
+				WHEN node.matcat_id IS NULL THEN cat_node.matcat_id
+				ELSE node.matcat_id
+			END AS matcat_id,
+		node.epa_type,
+		node.state,
+		node.state_type,
+		node.expl_id,
+		exploitation.macroexpl_id,
+		node.sector_id,
+		sector_type,
+		macrosector_id,
+		node.drainzone_id,
+		drainzone_type,
+		node.annotation,
+		node.observ,
+		node.comment,
+		node.dma_id,
+		macrodma_id,
+		node.soilcat_id,
+		node.function_type,
+		node.category_type,
+		node.fluid_type,
+		node.location_type,
+		node.workcat_id,
+		node.workcat_id_end,
+		node.buildercat_id,
+		node.builtdate,
+		node.enddate,
+		node.ownercat_id,
+		node.muni_id,
+		node.postcode,
+		node.district_id,
+		streetname,
+		node.postnumber,
+		node.postcomplement,
+		streetname2,
+		node.postnumber2,
+		node.postcomplement2,
+		mu.region_id,
+		mu.province_id,
+		node.descript,
+		cat_node.svg,
+		node.rotation,
+		concat(cat_feature.link_path, node.link) AS link,
+		node.verified,
+		node.the_geom,
+		node.undelete,
+		cat_node.label,
+		node.label_x,
+		node.label_y,
+		node.label_rotation,
+		node.label_quadrant,
+		node.publish,
+		node.inventory,
+		node.uncertain,
+		node.xyz_date,
+		node.unconnected,
+		node.num_value,
+		date_trunc('second'::text, node.tstamp) AS tstamp,
+		node.insert_user,
+		date_trunc('second'::text, node.lastupdate) AS lastupdate,
+		node.lastupdate_user,            
+		node.workcat_id_plan,          
+		node.asset_id,
+		node.parent_id,
+		node.arc_id,
+		node.expl_id2,
+		vst.is_operative,
+		node.minsector_id,
+		node.macrominsector_id,
+		node.adate,
+		node.adescript,
+		node.placement_type,
+		node.access_type,
+		CASE
+		  WHEN node.sector_id > 0 AND vst.is_operative = true AND node.epa_type::text <> 'UNDEFINED'::character varying(16)::text THEN node.epa_type
+		  ELSE NULL::character varying(16)
+		END AS inp_type,
+		node.brand_id,
+		node.model_id,
+		node.serial_number
+		FROM node_state nn
+		join node using (node_id)
+		JOIN selector_expl se ON se.cur_user =current_user AND se.expl_id IN (node.expl_id, node.expl_id2)
+		JOIN selector_municipality sm ON sm.cur_user = current_user AND sm.muni_id =node.muni_id 
+		JOIN cat_node ON node.nodecat_id::text = cat_node.id::text
+		JOIN cat_feature ON cat_feature.id::text = node.node_type::text
+		JOIN exploitation ON node.expl_id = exploitation.expl_id
+		JOIN ext_municipality mu ON node.muni_id = mu.muni_id
+		JOIN value_state_type vst ON vst.id = node.state_type
+		JOIN sector_table on sector_table.sector_id = node.sector_id
+		left join dma_table on dma_table.dma_id = node.dma_id 
+		left join drainzone_table ON node.dma_id = drainzone_table.drainzone_id
+		)
 SELECT node_selected.*
 FROM node_selected;
 
 
 CREATE OR REPLACE VIEW v_edit_arc
 AS WITH  
- 	typevalue AS 
+	typevalue AS 
        (
-         SELECT edit_typevalue.typevalue,
-            edit_typevalue.id,
-            edit_typevalue.idval
-           FROM edit_typevalue
-          WHERE edit_typevalue.typevalue::text = ANY (ARRAY['sector_type'::character varying::text, 'drainzone_type'::character varying::text, 'dma_type'::character varying::text, 'dwfzone_type'::character varying::text])
+        SELECT edit_typevalue.typevalue, edit_typevalue.id,  edit_typevalue.idval
+        FROM edit_typevalue
+        WHERE edit_typevalue.typevalue::text = ANY (ARRAY['sector_type'::character varying::text, 'drainzone_type'::character varying::text, 'dma_type'::character varying::text, 'dwfzone_type'::character varying::text])
         ),
     sector_table as
 		(
@@ -309,23 +305,25 @@ AS WITH
 		select drainzone_id, name as drainzone_name, stylesheet, id::varchar(16) as drainzone_type from drainzone
 		left JOIN typevalue t ON t.id::text = drainzone.drainzone_type AND t.typevalue::text = 'drainzone_type'::text
 		),
-	arc_psector AS (
-         SELECT pp.arc_id,
-            pp.state AS p_state
-           FROM plan_psector_x_arc pp
-             JOIN selector_psector sp ON sp.cur_user = CURRENT_USER AND sp.psector_id = pp.psector_id
+	arc_psector AS 
+		(
+        SELECT pp.arc_id,  pp.state AS p_state
+        FROM plan_psector_x_arc pp
+        JOIN selector_psector sp ON sp.cur_user = CURRENT_USER AND sp.psector_id = pp.psector_id
         ), 
-    arc_state AS (
-         SELECT n.arc_id
-           FROM arc n
-             JOIN selector_state s ON s.cur_user = CURRENT_USER AND n.state = s.state_id
-          --   except ALL
-       	  --   SELECT arc_id FROM arc_psector WHERE p_state = 0
-       	--	 UNION ALL
-         --    SELECT arc_id FROM arc_psector WHERE p_state = 1
-           ),
-         arc_selected AS (
-          SELECT arc.arc_id,
+    arc_state AS 
+		(
+        SELECT a.arc_id
+        FROM arc a
+        JOIN selector_state s ON s.cur_user = CURRENT_USER AND a.state = s.state_id
+		JOIN selector_sector se ON se.cur_user =current_user AND a.sector_id =se.sector_id
+		WHERE NOT EXISTS (SELECT arc_id FROM arc_psector WHERE p_state = 0)
+		UNION ALL
+        SELECT arc_id FROM arc_psector WHERE p_state = 1
+         ),
+    arc_selected AS 
+		(
+        SELECT arc.arc_id,
 	    arc.code,
 	    arc.node_1,
 	    arc.nodetype_1,
@@ -479,34 +477,30 @@ AS WITH
 	    arc.brand_id,
 	    arc.model_id,
 	    arc.serial_number
-    FROM arc_state
-     join arc using (arc_id)
-     JOIN selector_expl se ON se.cur_user =current_user AND se.expl_id IN (arc.expl_id, arc.expl_id2)
-     JOIN selector_municipality sm ON sm.cur_user = current_user AND sm.muni_id =arc.muni_id 
-     JOIN selector_sector ss ON ss.cur_user = current_user AND ss.sector_id=arc.sector_id
-     JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text
-     JOIN cat_feature ON arc.arc_type::text = cat_feature.id::text
-     JOIN exploitation e on e.expl_id = arc.expl_id
-     JOIN ext_municipality mu ON arc.muni_id = mu.muni_id
-     JOIN value_state_type vst ON vst.id = arc.state_type 
-     JOIN sector_table on sector_table.sector_id = arc.sector_id
-	 left join dma_table on dma_table.dma_id = arc.dma_id 
-	 left join drainzone_table ON arc.dma_id = drainzone_table.drainzone_id
-	 )
+		FROM arc_state
+		join arc using (arc_id)
+		JOIN selector_expl se ON se.cur_user =current_user AND se.expl_id IN (arc.expl_id, arc.expl_id2)
+		JOIN selector_municipality sm ON sm.cur_user = current_user AND sm.muni_id =arc.muni_id 
+		JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text
+		JOIN cat_feature ON arc.arc_type::text = cat_feature.id::text
+		JOIN exploitation e on e.expl_id = arc.expl_id
+		JOIN ext_municipality mu ON arc.muni_id = mu.muni_id
+		JOIN value_state_type vst ON vst.id = arc.state_type 
+		JOIN sector_table on sector_table.sector_id = arc.sector_id
+		left join dma_table on dma_table.dma_id = arc.dma_id 
+		left join drainzone_table ON arc.dma_id = drainzone_table.drainzone_id
+		)
 	SELECT arc_selected.*
 	FROM arc_selected;
 	
-
 create or replace view v_edit_connec as
 with
-	typevalue AS 
+	 typevalue AS 
        (
-         SELECT edit_typevalue.typevalue,
-            edit_typevalue.id,
-            edit_typevalue.idval
-           FROM edit_typevalue
-          WHERE edit_typevalue.typevalue::text = ANY(ARRAY['sector_type'::text, 'drainzone_type'::text, 'dma_type'::text, 'dwfzone_type'::text])
-        ),        
+        SELECT edit_typevalue.typevalue, edit_typevalue.id,  edit_typevalue.idval
+        FROM edit_typevalue
+        WHERE edit_typevalue.typevalue::text = ANY (ARRAY['sector_type'::character varying::text, 'drainzone_type'::character varying::text, 'dma_type'::character varying::text, 'dwfzone_type'::character varying::text])
+        ),       
 	sector_table as
 		(
 		select sector_id, name as sector_name, macrosector_id, stylesheet, id::varchar(16) as sector_type 
@@ -542,142 +536,143 @@ with
         ),
     connec_state AS
         (
-        SELECT connec_id, arc_id FROM connec c JOIN selector_state s ON s.cur_user =current_user AND c.state =s.state_id
-       -- except ALL
-       -- SELECT connec_id, arc_id FROM connec_psector WHERE p_state = 0
-       -- UNION ALL
-       -- SELECT connec_id, arc_id FROM connec_psector WHERE p_state = 1
+        SELECT connec_id, arc_id 
+		FROM connec c 
+		JOIN selector_state s ON s.cur_user =current_user AND c.state =s.state_id
+        JOIN selector_sector se ON se.cur_user =current_user AND c.sector_id =se.sector_id
+		WHERE NOT EXISTS (SELECT connec_id, arc_id FROM connec_psector WHERE p_state = 0)
+        UNION ALL
+        SELECT connec_id, arc_id::varchar(16) FROM connec_psector WHERE p_state = 1
         ),
     connec_selected AS 
     	(
-    	 SELECT connec.connec_id,
-            connec.code,
-            connec.customer_code,
-            connec.top_elev,
-            connec.y1,
-            connec.y2,
-            connec.connecat_id,
-            connec.connec_type,
-            cat_feature.system_id as sys_type,
-            connec.private_connecat_id,
-            connec.matcat_id,
-            connec.state,
-            connec.state_type,
-            connec.expl_id,
-            exploitation.macroexpl_id,
-            CASE
-                WHEN link_planned.sector_id IS NULL THEN connec.sector_id
-                ELSE link_planned.sector_id
-            END AS sector_id,
-            sector_table.sector_type,
-            CASE
-                WHEN link_planned.macrosector_id IS NULL THEN sector_table.macrosector_id
-                ELSE link_planned.macrosector_id
-            END AS macrosector_id,
-            CASE
-                WHEN link_planned.drainzone_id IS NULL THEN connec.drainzone_id
-                ELSE link_planned.drainzone_id
-            END AS drainzone_id,
-            CASE
-                WHEN link_planned.drainzone_type IS NULL THEN drainzone_table.drainzone_type
-                ELSE link_planned.drainzone_type
-            END AS drainzone_type,
-            connec.demand,
-            connec.connec_depth,
-            connec.connec_length,
-            nn.arc_id,
-            connec.annotation,
-            connec.observ,
-            connec.comment,
-                CASE
-                    WHEN link_planned.dma_id IS NULL THEN connec.dma_id
-                    ELSE link_planned.dma_id
-                END AS dma_id,
-                CASE
-                    WHEN link_planned.macrodma_id IS NULL THEN dma_table.macrodma_id
-                    ELSE link_planned.macrodma_id
-                END AS macrodma_id,
-                CASE
-                    WHEN link_planned.dma_type IS NULL THEN dma_table.dma_type
-                    ELSE link_planned.dma_type
-                END AS dma_type,
-            connec.soilcat_id,
-            connec.function_type,
-            connec.category_type,
-            connec.fluid_type,
-            connec.location_type,
-            connec.workcat_id,
-            connec.workcat_id_end,
-            connec.buildercat_id,
-            connec.builtdate,
-            connec.enddate,
-            connec.ownercat_id,
-            connec.muni_id,
-            connec.postcode,
-            connec.district_id,
-            connec.streetname,
-            connec.postnumber,
-            connec.postcomplement,
-            connec.streetname2,
-            connec.postnumber2,
-            connec.postcomplement2,
-            mu.region_id,
-            mu.province_id,
-            connec.descript,
-            cat_connec.svg,
-            connec.rotation,
-            connec.link::text,
-            connec.verified,
-            connec.undelete,
-            cat_connec.label,
-            connec.label_x,
-            connec.label_y,
-            connec.label_rotation,
-            connec.label_quadrant,
-            connec.accessibility,
-            connec.diagonal,
-            connec.publish,
-            connec.inventory,
-            connec.uncertain,
-            connec.num_value,
-                CASE
-                    WHEN link_planned.exit_id IS NULL THEN connec.pjoint_id
-                    ELSE link_planned.exit_id
-                END AS pjoint_id,
-                CASE
-                    WHEN link_planned.exit_type IS NULL THEN connec.pjoint_type
-                    ELSE link_planned.exit_type
-                END AS pjoint_type,
-            connec.tstamp,
-            connec.insert_user,
-            connec.lastupdate,
-            connec.lastupdate_user,
-            connec.the_geom,
-            connec.workcat_id_plan,
-            connec.asset_id,
-            connec.expl_id2,
-            vst.is_operative,
-            connec.minsector_id,
-            connec.macrominsector_id,
-            connec.adate,
-            connec.adescript,
-            connec.plot_code,
-            connec.placement_type,
-            connec.access_type
-		   FROM connec_state nn
-	       JOIN connec ON connec.connec_id = nn.connec_id
-	       JOIN selector_expl se ON se.cur_user =current_user AND se.expl_id IN (connec.expl_id, connec.expl_id2)
-	       JOIN selector_municipality sm ON sm.cur_user = current_user AND sm.muni_id =connec.muni_id 
-	       JOIN selector_sector ss ON ss.cur_user = current_user AND ss.sector_id=connec.sector_id
-	   	   JOIN cat_connec ON cat_connec.id::text = connec.connecat_id::text
-		   JOIN cat_feature ON cat_feature.id::text = connec.connec_type::text
-		   JOIN exploitation ON connec.expl_id = exploitation.expl_id
-		   JOIN ext_municipality mu ON connec.muni_id = mu.muni_id
-		   JOIN value_state_type vst ON vst.id = connec.state_type
-		   JOIN sector_table on sector_table.sector_id = connec.sector_id
-		   left join dma_table on dma_table.dma_id = connec.dma_id 
-	   	   left join drainzone_table ON connec.dma_id = drainzone_table.drainzone_id
-	   	   left join link_planned on connec.connec_id = feature_id
+    	SELECT connec.connec_id,
+		connec.code,
+		connec.customer_code,
+		connec.top_elev,
+		connec.y1,
+		connec.y2,
+		connec.connecat_id,
+		connec.connec_type,
+		cat_feature.system_id as sys_type,
+		connec.private_connecat_id,
+		connec.matcat_id,
+		connec.state,
+		connec.state_type,
+		connec.expl_id,
+		exploitation.macroexpl_id,
+		CASE
+			WHEN link_planned.sector_id IS NULL THEN connec.sector_id
+			ELSE link_planned.sector_id
+		END AS sector_id,
+		sector_table.sector_type,
+		CASE
+			WHEN link_planned.macrosector_id IS NULL THEN sector_table.macrosector_id
+			ELSE link_planned.macrosector_id
+		END AS macrosector_id,
+		CASE
+			WHEN link_planned.drainzone_id IS NULL THEN connec.drainzone_id
+			ELSE link_planned.drainzone_id
+		END AS drainzone_id,
+		CASE
+			WHEN link_planned.drainzone_type IS NULL THEN drainzone_table.drainzone_type
+			ELSE link_planned.drainzone_type
+		END AS drainzone_type,
+		connec.demand,
+		connec.connec_depth,
+		connec.connec_length,
+		nn.arc_id,
+		connec.annotation,
+		connec.observ,
+		connec.comment,
+			CASE
+				WHEN link_planned.dma_id IS NULL THEN connec.dma_id
+				ELSE link_planned.dma_id
+			END AS dma_id,
+			CASE
+				WHEN link_planned.macrodma_id IS NULL THEN dma_table.macrodma_id
+				ELSE link_planned.macrodma_id
+			END AS macrodma_id,
+			CASE
+				WHEN link_planned.dma_type IS NULL THEN dma_table.dma_type
+				ELSE link_planned.dma_type
+			END AS dma_type,
+		connec.soilcat_id,
+		connec.function_type,
+		connec.category_type,
+		connec.fluid_type,
+		connec.location_type,
+		connec.workcat_id,
+		connec.workcat_id_end,
+		connec.buildercat_id,
+		connec.builtdate,
+		connec.enddate,
+		connec.ownercat_id,
+		connec.muni_id,
+		connec.postcode,
+		connec.district_id,
+		connec.streetname,
+		connec.postnumber,
+		connec.postcomplement,
+		connec.streetname2,
+		connec.postnumber2,
+		connec.postcomplement2,
+		mu.region_id,
+		mu.province_id,
+		connec.descript,
+		cat_connec.svg,
+		connec.rotation,
+		connec.link::text,
+		connec.verified,
+		connec.undelete,
+		cat_connec.label,
+		connec.label_x,
+		connec.label_y,
+		connec.label_rotation,
+		connec.label_quadrant,
+		connec.accessibility,
+		connec.diagonal,
+		connec.publish,
+		connec.inventory,
+		connec.uncertain,
+		connec.num_value,
+			CASE
+				WHEN link_planned.exit_id IS NULL THEN connec.pjoint_id
+				ELSE link_planned.exit_id
+			END AS pjoint_id,
+			CASE
+				WHEN link_planned.exit_type IS NULL THEN connec.pjoint_type
+				ELSE link_planned.exit_type
+			END AS pjoint_type,
+		connec.tstamp,
+		connec.insert_user,
+		connec.lastupdate,
+		connec.lastupdate_user,
+		connec.the_geom,
+		connec.workcat_id_plan,
+		connec.asset_id,
+		connec.expl_id2,
+		vst.is_operative,
+		connec.minsector_id,
+		connec.macrominsector_id,
+		connec.adate,
+		connec.adescript,
+		connec.plot_code,
+		connec.placement_type,
+		connec.access_type
+	   FROM connec_state nn
+	   JOIN connec ON connec.connec_id = nn.connec_id
+	   JOIN selector_expl se ON se.cur_user =current_user AND se.expl_id IN (connec.expl_id, connec.expl_id2)
+	   JOIN selector_municipality sm ON sm.cur_user = current_user AND sm.muni_id =connec.muni_id 
+	   JOIN cat_connec ON cat_connec.id::text = connec.connecat_id::text
+	   JOIN cat_feature ON cat_feature.id::text = connec.connec_type::text
+	   JOIN exploitation ON connec.expl_id = exploitation.expl_id
+	   JOIN ext_municipality mu ON connec.muni_id = mu.muni_id
+	   JOIN value_state_type vst ON vst.id = connec.state_type
+	   JOIN sector_table on sector_table.sector_id = connec.sector_id
+	   left join dma_table on dma_table.dma_id = connec.dma_id 
+	   left join drainzone_table ON connec.dma_id = drainzone_table.drainzone_id
+	   left join link_planned on connec.connec_id = feature_id
 	   )
 	 SELECT connec_selected.*
 	 FROM connec_selected;
@@ -686,12 +681,10 @@ create or replace view v_edit_gully as
 with
 	typevalue AS 
        (
-         SELECT edit_typevalue.typevalue,
-            edit_typevalue.id,
-            edit_typevalue.idval
-           FROM edit_typevalue
-          WHERE edit_typevalue.typevalue::text = ANY(ARRAY['sector_type'::text, 'drainzone_type'::text, 'dma_type'::text, 'dwfzone_type'::text])
-        ),        
+        SELECT edit_typevalue.typevalue, edit_typevalue.id,  edit_typevalue.idval
+        FROM edit_typevalue
+        WHERE edit_typevalue.typevalue::text = ANY (ARRAY['sector_type'::character varying::text, 'drainzone_type'::character varying::text, 'dma_type'::character varying::text, 'dwfzone_type'::character varying::text])
+        ),      
 	sector_table as
 		(
 		select sector_id, name as sector_name, macrosector_id, stylesheet, id::varchar(16) as sector_type 
@@ -731,11 +724,13 @@ with
         ),
     gully_state AS
         (
-        SELECT gully_id, arc_id FROM gully c JOIN selector_state s ON s.cur_user =current_user AND c.state =s.state_id
-       -- except ALL
-       -- SELECT gully_id, arc_id FROM gully_psector WHERE p_state = 0
-       -- UNION ALL
-       -- SELECT gully_id, arc_id FROM gully_psector WHERE p_state = 1
+        SELECT gully_id, arc_id 
+		FROM gully g 
+		JOIN selector_state s ON s.cur_user =current_user AND g.state =s.state_id
+        JOIN selector_sector se ON se.cur_user =current_user AND g.sector_id =se.sector_id
+		WHERE NOT EXISTS (SELECT gully_id, arc_id FROM gully_psector WHERE p_state = 0)
+        UNION ALL
+        SELECT gully_id, arc_id::varchar(16) FROM gully_psector WHERE p_state = 1
         ),
     gully_selected AS 
     	(
@@ -877,7 +872,6 @@ with
 	   JOIN gully ON gully.gully_id = nn.gully_id
 	   JOIN selector_expl se ON se.cur_user =current_user AND se.expl_id IN (gully.expl_id, gully.expl_id2)
 	   JOIN selector_municipality sm ON sm.cur_user = current_user AND sm.muni_id =gully.muni_id 
-	   JOIN selector_sector ss ON ss.cur_user = current_user AND ss.sector_id=gully.sector_id
 	   JOIN cat_grate ON gully.gratecat_id::text = cat_grate.id::text
 	   JOIN exploitation ON gully.expl_id = exploitation.expl_id
 	   JOIN cat_feature ON gully.gully_type::text = cat_feature.id::text
@@ -891,17 +885,14 @@ with
 	   )
 	 SELECT gully_selected.*
 	 FROM gully_selected;
-	 
 
 create or replace view v_edit_link as
 WITH 
-	 typevalue AS 
+	typevalue AS 
        (
-         SELECT edit_typevalue.typevalue,
-            edit_typevalue.id,
-            edit_typevalue.idval
-           FROM edit_typevalue
-          WHERE edit_typevalue.typevalue::text = ANY (ARRAY['sector_type'::character varying::text, 'drainzone_type'::character varying::text, 'dma_type'::character varying::text, 'dwfzone_type'::character varying::text])
+        SELECT edit_typevalue.typevalue, edit_typevalue.id,  edit_typevalue.idval
+        FROM edit_typevalue
+        WHERE edit_typevalue.typevalue::text = ANY (ARRAY['sector_type'::character varying::text, 'drainzone_type'::character varying::text, 'dma_type'::character varying::text, 'dwfzone_type'::character varying::text])
         ),
 	sector_table as
 		(
@@ -920,7 +911,7 @@ WITH
 		),
      inp_network_mode AS 
     	(
-         select value FROM config_param_user WHERE parameter::text = 'inp_options_networkmode'::text AND config_param_user.cur_user::text = CURRENT_USER
+        select value FROM config_param_user WHERE parameter::text = 'inp_options_networkmode'::text AND config_param_user.cur_user::text = CURRENT_USER
         ),
      link_psector AS
         (
@@ -936,16 +927,17 @@ WITH
         ),
     link_state AS
         (
-        SELECT n.link_id 
-        FROM link n
-        JOIN selector_state s ON s.cur_user =current_user AND n.state =s.state_id
-       -- except ALL
-       -- SELECT link_id FROM link_psector WHERE p_state = 0
-       -- UNION ALL
-       -- SELECT link_id FROM link_psector WHERE p_state = 1
+        SELECT l.link_id 
+        FROM link l
+        JOIN selector_state s ON s.cur_user =current_user AND l.state =s.state_id
+        JOIN selector_sector se ON se.cur_user =current_user AND l.sector_id =se.sector_id
+		WHERE NOT EXISTS  (SELECT link_id FROM link_psector WHERE p_state = 0)
+        UNION ALL
+        SELECT link_id FROM link_psector WHERE p_state = 1
         ),
     link_selected as
-    	(select DISTINCT ON (l.link_id) l.link_id,
+    	(
+		select DISTINCT ON (l.link_id) l.link_id,
 	    l.feature_type,
 	    l.feature_id,
 	    l.exit_type,
@@ -983,12 +975,12 @@ WITH
 	    JOIN link l using (link_id)
 	    JOIN selector_expl se ON se.cur_user =current_user AND se.expl_id IN (l.expl_id, l.expl_id2)
         JOIN selector_municipality sm ON sm.cur_user = current_user AND sm.muni_id =l.muni_id 
-	    JOIN selector_sector ss ON ss.cur_user = current_user AND ss.sector_id=l.sector_id
 	    JOIN exploitation ON l.expl_id = exploitation.expl_id
 	    JOIN ext_municipality mu ON l.muni_id = mu.muni_id
 	    JOIN sector_table ON l.sector_id = sector_table.sector_id
 	    LEFT JOIN dma_table ON l.dma_id = dma_table.dma_id  
-	    LEFT join drainzone_table ON l.dma_id = drainzone_table.drainzone_id)
+	    LEFT join drainzone_table ON l.dma_id = drainzone_table.drainzone_id
+		)
      SELECT link_selected.*
 	 FROM link_selected;	
   
