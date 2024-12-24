@@ -106,6 +106,17 @@ BEGIN
 		ALTER TABLE utils.municipality DROP CONSTRAINT IF EXISTS municipality_province_region_fk;
 		ALTER TABLE utils.municipality ADD CONSTRAINT municipality_province_region_fk FOREIGN KEY (province_id, region_id)
         REFERENCES utils.region_x_province (province_id, region_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+        
+		-- add region and province to ext_municipality view
+		CREATE OR REPLACE VIEW SCHEMA_NAME.ext_municipality
+		AS SELECT municipality.muni_id,
+			municipality.name,
+			municipality.observ,
+			municipality.the_geom,
+			municipality.active,
+			municipality.region_id,
+			municipality.province_id
+		   FROM utils.municipality;
 
     ELSE
 
