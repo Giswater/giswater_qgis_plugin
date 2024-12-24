@@ -538,7 +538,7 @@ with
         (
         SELECT connec_id, arc_id FROM connec c 
         JOIN selector_state ss ON ss.cur_user =current_user AND c.state =ss.state_id
-        left join (SELECT connec_id, arc_id FROM connec_psector WHERE p_state = 0) a using (connec_id, arc_id) where a.connec_id is null
+        left join (SELECT connec_id, arc_id::varchar(16) FROM connec_psector WHERE p_state = 0) a using (connec_id, arc_id) where a.connec_id is null
        	union all
         SELECT connec_id, arc_id::varchar(16) FROM connec_psector WHERE p_state = 1
         ),
@@ -725,7 +725,7 @@ with
         (
         SELECT connec_id, arc_id FROM connec c 
         JOIN selector_state ss ON ss.cur_user =current_user AND c.state =ss.state_id
-        left join (SELECT connec_id, arc_id FROM connec_psector WHERE p_state = 0) a using (connec_id, arc_id) where a.connec_id is null
+        left join (SELECT connec_id, arc_id::varchar(16) FROM connec_psector WHERE p_state = 0) a using (connec_id, arc_id) where a.connec_id is null
        	union all
         SELECT connec_id, arc_id::varchar(16) FROM connec_psector WHERE p_state = 1
         ),
