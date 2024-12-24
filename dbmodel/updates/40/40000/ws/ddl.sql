@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-ALTER TABLE node DROP CONSTRAINT arc_macrominsector_id_fkey; -- arc_ prefix because wrong name in before version
+ALTER TABLE node DROP CONSTRAINT node_macrominsector_id_fkey;
 ALTER TABLE arc DROP CONSTRAINT arc_macrominsector_id_fkey;
 ALTER TABLE connec DROP CONSTRAINT connec_macrominsector_id_fkey;
 ALTER TABLE link DROP CONSTRAINT link_macrominsector_id_fkey;
