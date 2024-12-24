@@ -205,12 +205,19 @@ BEGIN
 			ELSE
 				v_filterfrominput = concat (' AND expl_id IN (SELECT expl_id FROM config_user_x_expl WHERE username = current_user) ', v_typeahead,' LIKE ''%', lower(v_filterfrominput), '%''');
 			END IF;
-
-		ELSIF v_selector = 'selector_sector' AND v_expl_x_user THEN
+			
+		ELSIF v_selector = 'selector_sector' THEN
 			IF v_filterfrominput IS NULL OR v_filterfrominput = '' THEN
-				v_filterfrominput = ' AND sector_id IN (SELECT sector_id FROM config_user_x_sector WHERE username = current_user)';
+				v_filterfrominput = ' AND sector_id IN (SELECT DISTINCT(sector_id) FROM node WHERE expl_id IN (SELECT expl_id from selector_expl where cur_user = current_user))';
 			ELSE
-				v_filterfrominput = concat (' AND sector_id IN (SELECT sector_id FROM config_user_x_sector WHERE username = current_user) ', v_typeahead,' LIKE ''%', lower(v_filterfrominput), '%''');
+				v_filterfrominput = concat (' AND sector_id IN (SELECT DISTINCT(sector_id) FROM node WHERE expl_id IN (SELECT expl_id from selector_expl where cur_user = current_user)) ', v_typeahead,' LIKE ''%', lower(v_filterfrominput), '%''');
+			END IF;
+
+		ELSIF v_selector = 'selector_municipality' THEN
+			IF v_filterfrominput IS NULL OR v_filterfrominput = '' THEN
+				v_filterfrominput = ' AND muni_id IN (SELECT DISTINCT(muni_id) FROM node WHERE expl_id IN (SELECT expl_id from selector_expl where cur_user = current_user))';
+			ELSE
+				v_filterfrominput = concat (' AND muni_id IN (SELECT DISTINCT(muni_id) FROM node WHERE expl_id IN (SELECT expl_id from selector_expl where cur_user = current_user)) ', v_typeahead,' LIKE ''%', lower(v_filterfrominput), '%''');
 			END IF;
 
 		ELSE

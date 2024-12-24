@@ -12,3 +12,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 update arc set streetname = s.descript from v_ext_streetaxis s where streetaxis_id = id;  
 update node set streetname = s.descript from v_ext_streetaxis s where streetaxis_id = id;  
 update connec set streetname = s.descript from v_ext_streetaxis s where streetaxis_id = id;
+
+UPDATE config_form_tabs SET orderby = orderby+1 where formname = 'selector_basic' and orderby > 1;
+
+UPDATE config_form_tabs SET orderby = 2 where formname = 'selector_basic' and tabname = 'tab_municipality';

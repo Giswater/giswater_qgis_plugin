@@ -406,33 +406,36 @@ BEGIN
 			-- muni
 			DELETE FROM selector_municipality WHERE cur_user = current_user;
 			INSERT INTO selector_municipality
-			SELECT DISTINCT muni_id, current_user FROM node WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user);
+			SELECT DISTINCT muni_id, current_user FROM node WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user);		
 		END IF;
 
 		-- inserting expl and muni from selected sectors
 		IF v_tabname IN ('tab_sector', 'tab_macrosector') THEN
 
 			-- expl
-			DELETE FROM selector_expl WHERE cur_user = current_user;
+			--DELETE FROM selector_expl WHERE cur_user = current_user;
 			INSERT INTO selector_expl
-			SELECT DISTINCT expl_id, current_user FROM node WHERE sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user = current_user AND sector_id > 0);
+			SELECT DISTINCT expl_id, current_user FROM node WHERE sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user = current_user AND sector_id > 0)
+			ON CONFLICT (expl_id, cur_user) DO NOTHING;
 
 			-- muni
-			DELETE FROM selector_municipality WHERE cur_user = current_user;
+			--DELETE FROM selector_municipality WHERE cur_user = current_user;
 			INSERT INTO selector_municipality
-			SELECT DISTINCT muni_id, current_user FROM node WHERE sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user = current_user AND sector_id > 0);
+			SELECT DISTINCT muni_id, current_user FROM node WHERE sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user = current_user AND sector_id > 0)
+			ON CONFLICT (muni_id, cur_user) DO NOTHING;		
 		END IF;
 
 		-- inserting muni_id from selected muni
 		IF v_tabname IN ('tab_municipality') THEN
 
 			-- expl
-			DELETE FROM selector_expl WHERE cur_user = current_user;
+			--DELETE FROM selector_expl WHERE cur_user = current_user;
 			INSERT INTO selector_expl
-			SELECT DISTINCT expl_id, current_user FROM node WHERE muni_id IN (SELECT muni_id FROM selector_municipality WHERE cur_user = current_user);
+			SELECT DISTINCT expl_id, current_user FROM node WHERE muni_id IN (SELECT muni_id FROM selector_municipality WHERE cur_user = current_user)
+			ON CONFLICT (expl_id, cur_user) DO NOTHING;
 
 			-- sector
-			DELETE FROM selector_sector WHERE cur_user = current_user AND sector_id > 0;
+			--DELETE FROM selector_sector WHERE cur_user = current_user AND sector_id > 0;
 			INSERT INTO selector_sector
 			SELECT DISTINCT sector_id, current_user FROM node WHERE muni_id IN (SELECT muni_id FROM selector_municipality WHERE cur_user = current_user)
 			ON CONFLICT (sector_id, cur_user) DO NOTHING;
