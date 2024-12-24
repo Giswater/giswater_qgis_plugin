@@ -480,7 +480,7 @@ AS WITH
 		join arc using (arc_id)
 		JOIN selector_expl se ON se.cur_user =current_user AND se.expl_id IN (arc.expl_id, arc.expl_id2)
 		--JOIN selector_municipality sm ON sm.cur_user = current_user AND sm.muni_id =arc.muni_id 
-        --JOIN selector_sector ss ON ss.cur_user = current_user AND ss.sector_id = arc.sector_id
+        JOIN selector_sector ss ON ss.cur_user = current_user AND ss.sector_id = arc.sector_id
 		JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text
 		JOIN cat_feature ON arc.arc_type::text = cat_feature.id::text
 		JOIN exploitation e on e.expl_id = arc.expl_id
@@ -662,7 +662,7 @@ with
 	   JOIN connec ON connec.connec_id = nn.connec_id
 	   JOIN selector_expl se ON se.cur_user =current_user AND se.expl_id IN (connec.expl_id, connec.expl_id2)
    	   --JOIN selector_municipality sm ON sm.cur_user = current_user AND sm.muni_id =connec.muni_id 
-       --JOIN selector_sector ss ON ss.cur_user = current_user AND ss.sector_id =connec.sector_id
+       JOIN selector_sector ss ON ss.cur_user = current_user AND ss.sector_id =connec.sector_id
 	   JOIN cat_connec ON cat_connec.id::text = connec.connecat_id::text
 	   JOIN cat_feature ON cat_feature.id::text = connec.connec_type::text
 	   JOIN exploitation ON connec.expl_id = exploitation.expl_id
@@ -869,7 +869,7 @@ with
 	   JOIN gully ON gully.gully_id = nn.gully_id
 	   JOIN selector_expl se ON se.cur_user =current_user AND se.expl_id IN (gully.expl_id, gully.expl_id2)
        --JOIN selector_sector ss ON ss.cur_user = current_user AND ss.sector_id =arc.sector_id
-	   --JOIN selector_municipality sm ON sm.cur_user = current_user AND sm.muni_id =gully.muni_id 
+	   JOIN selector_municipality sm ON sm.cur_user = current_user AND sm.muni_id =gully.muni_id 
 	   JOIN cat_grate ON gully.gratecat_id::text = cat_grate.id::text
 	   JOIN exploitation ON gully.expl_id = exploitation.expl_id
 	   JOIN cat_feature ON gully.gully_type::text = cat_feature.id::text
@@ -972,7 +972,7 @@ WITH
 	    from inp_network_mode, link_state
 	    JOIN link l using (link_id)
 	    JOIN selector_expl se ON se.cur_user =current_user AND se.expl_id IN (l.expl_id, l.expl_id2)
-        --JOIN selector_sector ss ON ss.cur_user = current_user AND ss.sector_id =l.sector_id
+        JOIN selector_sector ss ON ss.cur_user = current_user AND ss.sector_id =l.sector_id
         --JOIN selector_municipality sm ON sm.cur_user = current_user AND sm.muni_id =l.muni_id 
 	    JOIN exploitation ON l.expl_id = exploitation.expl_id
 	    JOIN ext_municipality mu ON l.muni_id = mu.muni_id

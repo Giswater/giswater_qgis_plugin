@@ -268,7 +268,7 @@ WITH
         JOIN node ON node.node_id = nn.node_id
         JOIN selector_expl se ON se.cur_user =current_user AND se.expl_id IN (node.expl_id, node.expl_id2)
         --JOIN selector_municipality sm ON sm.cur_user = current_user AND sm.muni_id =node.muni_id 
-        --JOIN selector_sector ss ON ss.cur_user = current_user AND ss.sector_id = node.sector_id 
+        JOIN selector_sector ss ON ss.cur_user = current_user AND ss.sector_id = node.sector_id 
         JOIN cat_node ON cat_node.id::text = node.nodecat_id::text
 	    JOIN cat_feature ON cat_feature.id::text = cat_node.nodetype_id::text
 		JOIN value_state_type vst ON vst.id = node.state_type
@@ -451,7 +451,7 @@ AS WITH
 		JOIN arc ON arc.arc_id::text = nn.arc_id::text
 		JOIN selector_expl se ON se.cur_user = CURRENT_USER AND (se.expl_id = arc.expl_id OR se.expl_id = arc.expl_id2)
 		--JOIN selector_municipality sm ON sm.cur_user = CURRENT_USER AND sm.muni_id = arc.muni_id
-        --JOIN selector_sector ss ON ss.cur_user = current_user AND ss.sector_id = arc.sector_id 
+        JOIN selector_sector ss ON ss.cur_user = current_user AND ss.sector_id = arc.sector_id 
 		JOIN cat_arc ON cat_arc.id::text = arc.arccat_id::text
 		JOIN cat_feature ON cat_feature.id::text = cat_arc.arctype_id::text
 		JOIN exploitation ON arc.expl_id = exploitation.expl_id
@@ -725,7 +725,7 @@ WITH
         JOIN connec ON connec.connec_id = nn.connec_id
         JOIN selector_expl se ON se.cur_user =current_user AND se.expl_id IN (connec.expl_id, connec.expl_id2)
         --JOIN selector_municipality sm ON sm.cur_user = current_user AND sm.muni_id =connec.muni_id 
-        --JOIN selector_sector ss ON ss.cur_user = current_user AND ss.sector_id =connec.sector_id
+        JOIN selector_sector ss ON ss.cur_user = current_user AND ss.sector_id =connec.sector_id
    	    JOIN cat_connec ON cat_connec.id::text = connec.connecat_id::text
 	    JOIN cat_feature ON cat_feature.id::text = cat_connec.connectype_id::text
 	    JOIN exploitation ON connec.expl_id = exploitation.expl_id
@@ -844,7 +844,7 @@ WITH
 		FROM inp_network_mode, link_state
 	    JOIN link l using (link_id)
 	    JOIN selector_expl se ON se.cur_user =current_user AND se.expl_id IN (l.expl_id, l.expl_id2)
-        --JOIN selector_sector ss ON ss.cur_user = current_user AND ss.sector_id = l.sector_id 
+        JOIN selector_sector ss ON ss.cur_user = current_user AND ss.sector_id = l.sector_id 
         --JOIN selector_municipality sm ON sm.cur_user = current_user AND sm.muni_id =l.muni_id 
 		JOIN sector_table ON sector_table.sector_id = l.sector_id
 	    LEFT JOIN presszone_table ON presszone_table.presszone_id = l.presszone_id
