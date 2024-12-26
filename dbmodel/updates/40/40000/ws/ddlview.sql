@@ -61,146 +61,6 @@ AND p.state = 0 AND cf.value is TRUE
 SELECT DISTINCT ON (p.connec_id) p.connec_id, p.arc_id FROM cf, s, p WHERE p.psector_id = s.psector_id AND s.cur_user = "current_user"()::text
 AND p.state = 1 AND cf.value is TRUE;
 
--- recreate all deleted views: arc, node, connec and dependencies
------------------------------------
-/*
-CREATE OR REPLACE VIEW vu_arc AS
-WITH
-streetaxis as (SELECT id, descript FROM v_ext_streetaxis),
-typevalue as (SELECT typevalue, id, idval FROM edit_typevalue WHERE typevalue in ('sector_type','presszone_type','dma_type','dqa_type'))
-SELECT arc.arc_id,
-    arc.code,
-    arc.node_1,
-    arc.nodetype_1,
-    arc.elevation1,
-    arc.depth1,
-    arc.staticpress1,
-    arc.node_2,
-    arc.nodetype_2,
-    arc.staticpress2,
-    arc.elevation2,
-    arc.depth2,
-    ((coalesce(depth1)+coalesce(depth2))/2)::numeric(12,2) as depth,
-    arc.arccat_id,
-    cat_arc.arc_type,
-    cat_feature.feature_class AS sys_type,
-    cat_arc.matcat_id AS cat_matcat_id,
-    cat_arc.pnom AS cat_pnom,
-    cat_arc.dnom AS cat_dnom,
-    cat_arc.dint AS cat_dint,
-    arc.epa_type,
-    arc.state,
-    arc.state_type,
-    arc.expl_id,
-    exploitation.macroexpl_id,
-    arc.sector_id,
-    sector.name as sector_name,
-    sector.macrosector_id,
-    et1.idval::varchar(16) as sector_type,
-    arc.presszone_id,
-    presszone.name as preszone_name,
-    et2.idval::varchar(16) as presszone_type,
-    presszone.head as presszone_head,
-    arc.dma_id,
-    dma.name as dma_name,
-    et3.idval::varchar(16) as dma_type,
-    dma.macrodma_id,
-    arc.dqa_id,
-    dqa.name as dqa_name,
-    et4.idval::varchar(16) as dqa_type,
-    dqa.macrodqa_id,
-    arc.annotation,
-    arc.observ,
-    arc.comment,
-    st_length2d(arc.the_geom)::numeric(12,2) AS gis_length,
-    arc.custom_length,
-    arc.soilcat_id,
-    arc.function_type,
-    arc.category_type,
-    arc.fluid_type,
-    arc.location_type,
-    arc.workcat_id,
-    arc.workcat_id_end,
-    arc.workcat_id_plan,
-    arc.buildercat_id,
-    arc.builtdate,
-    arc.enddate,
-    arc.ownercat_id,
-    arc.muni_id,
-    arc.postcode,
-    arc.district_id,
-    c.descript::character varying(100) AS streetname,
-    arc.postnumber,
-    arc.postcomplement,
-    d.descript::character varying(100) AS streetname2,
-    arc.postnumber2,
-    arc.postcomplement2,
-    mu.region_id,
-    mu.province_id,
-    arc.descript,
-    concat(cat_feature.link_path, arc.link) AS link,
-    arc.verified,
-    arc.undelete,
-    cat_arc.label,
-    arc.label_x,
-    arc.label_y,
-    arc.label_rotation,
-    arc.label_quadrant,
-    arc.publish,
-    arc.inventory,
-    arc.num_value,
-    arc.adate,
-    arc.adescript,
-    dma.stylesheet ->> 'featureColor'::text AS dma_style,
-    presszone.stylesheet ->> 'featureColor'::text AS presszone_style,
-    arc.asset_id,
-    arc.pavcat_id,
-    arc.om_state,
-    arc.conserv_state,
-    arc.parent_id,
-    arc.expl_id2,
-    vst.is_operative,
-    CASE
-        WHEN arc.brand_id IS NULL THEN cat_arc.brand_id
-        ELSE arc.brand_id
-    END AS brand_id,
-    CASE
-        WHEN arc.model_id IS NULL THEN cat_arc.model_id
-        ELSE arc.model_id
-    END AS model_id,
-    arc.serial_number,
-	arc.minsector_id,
-	arc.macrominsector_id,
-	e.flow_max,
-    e.flow_min,
-    e.flow_avg,
-    e.vel_max,
-    e.vel_min,
-    e.vel_avg,
-	date_trunc('second'::text, arc.tstamp) AS tstamp,
-    arc.insert_user,
-    date_trunc('second'::text, arc.lastupdate) AS lastupdate,
-    arc.lastupdate_user,
-    arc.the_geom,
-	case when arc.sector_id > 0 and is_operative = true and epa_type !='UNDEFINED'::varchar(16) THEN epa_type else NULL::varchar(16) end as inp_type
-   FROM arc
-     LEFT JOIN sector ON arc.sector_id = sector.sector_id
-     LEFT JOIN exploitation ON arc.expl_id = exploitation.expl_id
-     LEFT JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text
-     JOIN cat_feature ON cat_feature.id::text = cat_arc.arc_type::text
-     LEFT JOIN dma ON arc.dma_id = dma.dma_id
-     LEFT JOIN dqa ON arc.dqa_id = dqa.dqa_id
-     LEFT JOIN presszone ON presszone.presszone_id = arc.presszone_id
-     LEFT JOIN streetaxis c ON c.id::text = arc.streetaxis_id::text
-     LEFT JOIN streetaxis d ON d.id::text = arc.streetaxis2_id::text
-     LEFT JOIN arc_add e ON arc.arc_id::text = e.arc_id::text
-     LEFT JOIN value_state_type vst ON vst.id = arc.state_type
-     LEFT JOIN ext_municipality mu ON arc.muni_id = mu.muni_id
-     LEFT JOIN typevalue et1 on et1.id = sector.sector_type AND et1.typevalue = 'sector_type'
-     LEFT JOIN typevalue et2 on et2.id = presszone.presszone_type AND et2.typevalue = 'presszone_type'
-     LEFT JOIN typevalue et3 on et3.id = dma.dma_type AND et3.typevalue = 'dma_type'
-     LEFT JOIN typevalue et4 on et4.id = dqa.dqa_type AND et4.typevalue = 'dqa_type';
-*/
 
 CREATE OR REPLACE VIEW vu_arc
 AS WITH streetaxis AS (
@@ -350,161 +210,12 @@ AS WITH streetaxis AS (
      LEFT JOIN typevalue et3 ON et3.id::text = dma.dma_type::text AND et3.typevalue::text = 'dma_type'::text
      LEFT JOIN typevalue et4 ON et4.id::text = dqa.dqa_type::text AND et4.typevalue::text = 'dqa_type'::text;
 
-/*
-create or replace view v_edit_arc as
-select a.* FROM (
-select a.* FROM ( SELECT selector_expl.expl_id FROM selector_expl WHERE selector_expl.cur_user = CURRENT_USER) s, vu_arc a
-JOIN v_state_arc USING (arc_id)
-WHERE a.expl_id = s.expl_id OR a.expl_id2 = s.expl_id) a
-join selector_sector s using (sector_id)
-LEFT JOIN selector_municipality m using (muni_id)
-where s.cur_user = current_user
-and (m.cur_user = current_user or a.muni_id is null);
-*/
-
 CREATE OR REPLACE VIEW v_edit_arc
 AS SELECT a.*
    FROM vu_arc a
-     JOIN v_state_arc USING (arc_id);
-/*
-CREATE OR REPLACE VIEW vu_node AS
-WITH
-streetaxis as (SELECT id, descript FROM v_ext_streetaxis),
-typevalue as (SELECT typevalue, id, idval FROM edit_typevalue WHERE typevalue in ('sector_type','presszone_type','dma_type','dqa_type'))
-SELECT node.node_id,
-    node.code,
-    node.elevation,
-    node.depth,
-    cat_node.node_type,
-    cat_feature.feature_class AS sys_type,
-    node.nodecat_id,
-    cat_node.matcat_id AS cat_matcat_id,
-    cat_node.pnom AS cat_pnom,
-    cat_node.dnom AS cat_dnom,
-    cat_node.dint AS cat_dint,
-    node.epa_type,
-    node.state,
-    node.state_type,
-    node.expl_id,
-    exploitation.macroexpl_id,
-    node.sector_id,
-    sector.name as sector_name,
-    sector.macrosector_id,
-    et1.idval::varchar(16) as sector_type,
-    node.presszone_id,
-    presszone.name as preszone_name,
-    et2.idval::varchar(16) as presszone_type,
-    presszone.head as presszone_head,
-    node.dma_id,
-    dma.name as dma_name,
-    et3.idval::varchar(16) as dma_type,
-    dma.macrodma_id,
-    node.dqa_id,
-    dqa.name as dqa_name,
-    et4.idval::varchar(16) as dqa_type,
-    dqa.macrodqa_id,
-    node.arc_id,
-    node.parent_id,
-    node.annotation,
-    node.observ,
-    node.comment,
-    node.staticpressure,
-    node.soilcat_id,
-    node.function_type,
-    node.category_type,
-    node.fluid_type,
-    node.location_type,
-    node.workcat_id,
-    node.workcat_id_end,
-    node.workcat_id_plan,
-    node.builtdate,
-    node.enddate,
-    node.buildercat_id,
-    node.ownercat_id,
-    node.muni_id,
-    node.postcode,
-    node.district_id,
-    a.descript::character varying(100) AS streetname,
-    node.postnumber,
-    node.postcomplement,
-    b.descript::character varying(100) AS streetname2,
-    node.postnumber2,
-    node.postcomplement2,
-    mu.region_id,
-    mu.province_id,
-    node.descript,
-    cat_node.svg,
-    node.rotation,
-    concat(cat_feature.link_path, node.link) AS link,
-    node.verified,
-    node.undelete,
-    cat_node.label,
-    node.label_x,
-    node.label_y,
-    node.label_rotation,
-    node.label_quadrant,
-    node.publish,
-    node.inventory,
-    node.hemisphere,
-    node.num_value,
-    node.adate,
-    node.adescript,
-    node.accessibility,
-    dma.stylesheet ->> 'featureColor'::text AS dma_style,
-    presszone.stylesheet ->> 'featureColor'::text AS presszone_style,
-    node.asset_id,
-    node.om_state,
-    node.conserv_state,
-    node.access_type,
-    node.placement_type,
-    node.expl_id2,
-    vst.is_operative,
-    CASE
-    WHEN node.brand_id IS NULL THEN cat_node.brand_id
-    ELSE node.brand_id
-    END AS brand_id,
-    CASE
-        WHEN node.model_id IS NULL THEN cat_node.model_id
-        ELSE node.model_id
-    END AS model_id,
-    node.serial_number,
-    node.minsector_id,
-    node.macrominsector_id,
-    e.demand_max,
-    e.demand_min,
-    e.demand_avg,
-    e.press_max,
-    e.press_min,
-    e.press_avg,
-    e.head_max,
-    e.head_min,
-    e.head_avg,
-    e.quality_max,
-    e.quality_min,
-    e.quality_avg,
-    date_trunc('second'::text, node.tstamp) AS tstamp,
-    node.insert_user,
-    date_trunc('second'::text, node.lastupdate) AS lastupdate,
-    node.lastupdate_user,
-    node.the_geom
-    FROM node
-     LEFT JOIN cat_node ON cat_node.id::text = node.nodecat_id::text
-     JOIN cat_feature ON cat_feature.id::text = cat_node.node_type::text
-     LEFT JOIN dma ON node.dma_id = dma.dma_id
-     LEFT JOIN sector ON node.sector_id = sector.sector_id
-     LEFT JOIN exploitation ON node.expl_id = exploitation.expl_id
-     LEFT JOIN dqa ON node.dqa_id = dqa.dqa_id
-     LEFT JOIN presszone ON presszone.presszone_id = node.presszone_id
-     LEFT JOIN streetaxis a ON a.id::text = node.streetaxis_id::text
-     LEFT JOIN streetaxis b ON b.id::text = node.streetaxis2_id::text
-     LEFT JOIN node_add e ON e.node_id::text = node.node_id::text
-     LEFT JOIN value_state_type vst ON vst.id = node.state_type
-     LEFT JOIN ext_municipality mu ON node.muni_id = mu.muni_id
-     LEFT JOIN typevalue et1 on et1.id = sector.sector_type AND et1.typevalue = 'sector_type'
-     LEFT JOIN typevalue et2 on et2.id = presszone.presszone_type AND et2.typevalue = 'presszone_type'
-     LEFT JOIN typevalue et3 on et3.id = dma.dma_type AND et3.typevalue = 'dma_type'
-     LEFT JOIN typevalue et4 on et4.id = dqa.dqa_type AND et4.typevalue = 'dqa_type';
-*/
+     JOIN v_state_arc USING (arc_id)
+	 JOIN selector_expl se ON (se.cur_user =current_user AND se.expl_id = a.expl_id) or (se.cur_user =current_user and se.expl_id = a.expl_id2);
+
 
 CREATE OR REPLACE VIEW vu_node
 AS WITH streetaxis AS (
@@ -656,26 +367,16 @@ AS WITH streetaxis AS (
      LEFT JOIN typevalue et3 ON et3.id::text = dma.dma_type::text AND et3.typevalue::text = 'dma_type'::text
      LEFT JOIN typevalue et4 ON et4.id::text = dqa.dqa_type::text AND et4.typevalue::text = 'dqa_type'::text;
 
-/*
-create or replace view v_edit_node as
-select a.*, case when a.sector_id > 0 and is_operative = true and epa_type !='UNDEFINED'::varchar(16) THEN epa_type else NULL::varchar(16) end as inp_type,
-v.closed as closed_valve, v.broken as broken_valve
- FROM (select n.* FROM
-( SELECT selector_expl.expl_id FROM selector_expl WHERE selector_expl.cur_user = CURRENT_USER) s, vu_node n
-JOIN v_state_node USING (node_id)
-WHERE n.expl_id = s.expl_id OR n.expl_id2 = s.expl_id) a
-LEFT JOIN man_valve v USING (node_id)
-LEFT JOIN selector_municipality m using (muni_id)
-where (m.cur_user = current_user or a.muni_id is null);
-*/
 
 CREATE OR REPLACE VIEW v_edit_node
-AS SELECT a.*,
+AS SELECT n.*,
     v.closed AS closed_valve,
     v.broken AS broken_valve
-   FROM vu_node a
+   FROM vu_node n
    LEFT JOIN man_valve v USING (node_id)
+   JOIN selector_expl se ON (se.cur_user =current_user AND se.expl_id =  n.expl_id) or (se.cur_user =current_user and se.expl_id = n.expl_id2)
    JOIN v_state_node USING (node_id);
+
 
 CREATE OR REPLACE VIEW vu_link AS
  WITH typevalue AS (
@@ -699,7 +400,6 @@ CREATE OR REPLACE VIEW vu_link AS
                 END AS value
            FROM inp_netw_mode_aux
         )
-
  SELECT l.link_id,
     l.feature_type,
     l.feature_id,
@@ -756,22 +456,15 @@ CREATE OR REPLACE VIEW vu_link AS
      LEFT JOIN typevalue et2 ON et2.id::text = p.presszone_type AND et2.typevalue::text = 'presszone_type'::text
      LEFT JOIN typevalue et3 ON et3.id::text = d.dma_type::text AND et3.typevalue::text = 'dma_type'::text
      LEFT JOIN typevalue et4 ON et4.id::text = q.dqa_type::text AND et4.typevalue::text = 'dqa_type'::text;
-/*
-CREATE OR REPLACE VIEW v_edit_link AS
-	SELECT l.* FROM (
-	SELECT *
-	FROM vu_link
-	JOIN v_state_link USING (link_id)) l
-	join selector_sector s using (sector_id)
-	LEFT JOIN selector_municipality m using (muni_id)
-	where s.cur_user = current_user and (m.cur_user = current_user or l.muni_id is null);
-*/
+
+
 CREATE OR REPLACE VIEW v_edit_link
 AS SELECT l.*
    FROM vu_link l
-   JOIN v_state_link USING (link_id);
+   JOIN v_state_link USING (link_id)
+   JOIN selector_expl se ON (se.cur_user =current_user AND se.expl_id = l.expl_id) or (se.cur_user =current_user and se.expl_id = l.expl_id2);
 
-
+  
 CREATE OR REPLACE VIEW vu_connec AS
  WITH streetaxis AS (
          SELECT v_ext_streetaxis.id,
@@ -952,235 +645,7 @@ CREATE OR REPLACE VIEW vu_connec AS
      LEFT JOIN typevalue et2 ON et2.id::text = presszone.presszone_type AND et2.typevalue::text = 'presszone_type'::text
      LEFT JOIN typevalue et3 ON et3.id::text = dma.dma_type::text AND et3.typevalue::text = 'dma_type'::text
      LEFT JOIN typevalue et4 ON et4.id::text = dqa.dqa_type::text AND et4.typevalue::text = 'dqa_type'::text;
-/*
-CREATE OR REPLACE VIEW v_edit_connec AS
-SELECT  c.* FROM (
-    WITH s AS (
-    SELECT selector_expl.expl_id
-   FROM selector_expl
-  WHERE selector_expl.cur_user = CURRENT_USER
-)
-SELECT vu_connec.connec_id,
-    vu_connec.code,
-    vu_connec.elevation,
-    vu_connec.depth,
-    vu_connec.connec_type,
-    vu_connec.sys_type,
-    vu_connec.conneccat_id,
-	vu_connec.cat_matcat_id,
-    vu_connec.cat_pnom,
-    vu_connec.cat_dnom,
-	vu_connec.cat_dint,
-	vu_connec.epa_type,
-	vu_connec.inp_type,
-	vu_connec.state,
-    vu_connec.state_type,
-    vu_connec.expl_id,
-    vu_connec.macroexpl_id,
-	CASE
-		WHEN a.sector_id IS NULL THEN vu_connec.sector_id
-		ELSE a.sector_id
-	END AS sector_id,
-	CASE
-		WHEN a.sector_name IS NULL THEN vu_connec.sector_name
-		ELSE a.sector_name
-	END AS sector_name,
-    vu_connec.macrosector_id,
-	CASE
-		WHEN a.presszone_id IS NULL THEN vu_connec.presszone_id
-		ELSE a.presszone_id
-	END AS presszone_id,
-	CASE
-		WHEN a.presszone_name IS NULL THEN vu_connec.presszone_name
-		ELSE a.presszone_name
-	END AS presszone_name,
-	CASE
-		WHEN a.presszone_type IS NULL THEN vu_connec.presszone_type
-		ELSE a.presszone_type
-	END AS presszone_type,
-	CASE
-		WHEN a.presszone_head IS NULL THEN vu_connec.presszone_head
-		ELSE a.presszone_head
-	END AS presszone_head,
-	CASE
-		WHEN a.dma_id IS NULL THEN vu_connec.dma_id
-		ELSE a.dma_id
-	END AS dma_id,
-	CASE
-		WHEN a.dma_name IS NULL THEN vu_connec.dma_name
-		ELSE a.dma_name
-	END AS dma_name,
-	CASE
-		WHEN a.dma_type IS NULL THEN vu_connec.dma_type
-		ELSE a.dma_type::character varying(30)
-	END AS dma_type,
-	CASE
-		WHEN a.macrodma_id IS NULL THEN vu_connec.macrodma_id
-		ELSE a.macrodma_id
-	END AS macrodma_id,
-	CASE
-		WHEN a.dqa_id IS NULL THEN vu_connec.dqa_id
-		ELSE a.dqa_id
-	END AS dqa_id,
-	CASE
-		WHEN a.dqa_name IS NULL THEN vu_connec.dqa_name
-		ELSE a.dqa_name
-	END AS dqa_name,
-	CASE
-		WHEN a.dqa_type IS NULL THEN vu_connec.dqa_type
-		ELSE a.dqa_type
-	END AS dqa_type,
-	CASE
-		WHEN a.macrodqa_id IS NULL THEN vu_connec.macrodqa_id
-		ELSE a.macrodqa_id
-	END AS macrodqa_id,
-	vu_connec.crmzone_id,
-    vu_connec.crmzone_name,
-    vu_connec.customer_code,
-    vu_connec.connec_length,
-    vu_connec.n_hydrometer,
-    v_state_connec.arc_id,
-    vu_connec.annotation,
-    vu_connec.observ,
-    vu_connec.comment,
-    CASE
-	WHEN a.staticpressure IS NULL THEN vu_connec.staticpressure
-	ELSE a.staticpressure
-    END AS staticpressure,
-    vu_connec.soilcat_id,
-    vu_connec.function_type,
-    vu_connec.category_type,
-    vu_connec.fluid_type,
-    vu_connec.location_type,
-    vu_connec.workcat_id,
-    vu_connec.workcat_id_end,
-    vu_connec.workcat_id_plan,
-    vu_connec.buildercat_id,
-    vu_connec.builtdate,
-    vu_connec.enddate,
-    vu_connec.ownercat_id,
-    vu_connec.muni_id,
-    vu_connec.postcode,
-    vu_connec.district_id,
-    vu_connec.streetname,
-    vu_connec.postnumber,
-    vu_connec.postcomplement,
-    vu_connec.streetname2,
-    vu_connec.postnumber2,
-    vu_connec.postcomplement2,
-    vu_connec.region_id,
-    vu_connec.province_id,
-    vu_connec.descript,
-    vu_connec.svg,
-    vu_connec.rotation,
-    vu_connec.link,
-    vu_connec.verified,
-    vu_connec.undelete,
-    vu_connec.label,
-    vu_connec.label_x,
-    vu_connec.label_y,
-    vu_connec.label_rotation,
-    vu_connec.label_quadrant,
-    vu_connec.publish,
-    vu_connec.inventory,
-    vu_connec.num_value,
-    CASE
-	WHEN a.exit_id IS NULL THEN vu_connec.pjoint_id
-	ELSE a.exit_id
-    END AS pjoint_id,
-    CASE
-	WHEN a.exit_type IS NULL THEN vu_connec.pjoint_type
-	ELSE a.exit_type
-    END AS pjoint_type,
-    vu_connec.adate,
-    vu_connec.adescript,
-    vu_connec.accessibility,
-    vu_connec.asset_id,
-    vu_connec.dma_style,
-    vu_connec.presszone_style,
-    vu_connec.priority,
-    vu_connec.valve_location,
-    vu_connec.valve_type,
-    vu_connec.shutoff_valve,
-    vu_connec.access_type,
-    vu_connec.placement_type,
-    vu_connec.om_state,
-    vu_connec.conserv_state,
-    vu_connec.expl_id2,
-    vu_connec.is_operative,
-    vu_connec.plot_code,
-    vu_connec.brand_id,
-    vu_connec.model_id,
-    vu_connec.serial_number,
-    vu_connec.cat_valve,
-    CASE
-	WHEN a.minsector_id IS NULL THEN vu_connec.minsector_id
-	ELSE a.minsector_id
-    END AS minsector_id,
-    vu_connec.macrominsector_id,
-    vu_connec.demand_base,
-    vu_connec.demand_max,
-    vu_connec.demand_min,
-    vu_connec.demand_avg,
-    vu_connec.press_max,
-    vu_connec.press_min,
-    vu_connec.press_avg,
-	vu_connec.quality_max,
-    vu_connec.quality_min,
-    vu_connec.quality_avg,
-    vu_connec.flow_max,
-    vu_connec.flow_min,
-    vu_connec.flow_avg,
-    vu_connec.vel_max,
-    vu_connec.vel_min,
-    vu_connec.vel_avg,
-    vu_connec.result_id,
-	vu_connec.tstamp,
-    vu_connec.insert_user,
-    vu_connec.lastupdate,
-    vu_connec.lastupdate_user,
-    vu_connec.the_geom
-   FROM s, vu_connec
-     JOIN v_state_connec USING (connec_id)
-     LEFT JOIN ( SELECT DISTINCT ON (vu_link.feature_id) vu_link.link_id,
-            vu_link.feature_type,
-            vu_link.feature_id,
-            vu_link.exit_type,
-            vu_link.exit_id,
-            vu_link.state,
-            vu_link.expl_id,
-            vu_link.sector_id,
-            vu_link.sector_type,
-            vu_link.dma_id,
-            vu_link.dma_type,
-            vu_link.presszone_id,
-	    vu_link.presszone_head,
-	    vu_link.presszone_type,
-            vu_link.dqa_id,
-            vu_link.dqa_type,
-            vu_link.minsector_id,
-            vu_link.exit_topelev,
-            vu_link.exit_elev,
-            vu_link.fluid_type,
-            vu_link.gis_length,
-            vu_link.the_geom,
-            vu_link.sector_name,
-            vu_link.dma_name,
-            vu_link.dqa_name,
-            vu_link.presszone_name,
-            vu_link.macrosector_id,
-            vu_link.macrodma_id,
-            vu_link.macrodqa_id,
-            vu_link.expl_id2,
-            vu_link.staticpressure
-           FROM v_edit_link vu_link, s s_1
-          WHERE (vu_link.expl_id = s_1.expl_id OR vu_link.expl_id2 = s_1.expl_id) AND vu_link.state = 2) a ON a.feature_id::text = vu_connec.connec_id::text
-	WHERE vu_connec.expl_id = s.expl_id OR vu_connec.expl_id2 = s.expl_id) c
-	join selector_sector s using (sector_id)
-	LEFT JOIN selector_municipality m using (muni_id)
-	where s.cur_user = current_user
-	and (m.cur_user = current_user or c.muni_id is null);
-*/
+
 
 CREATE OR REPLACE VIEW v_edit_connec
 AS SELECT connec_id,
@@ -1496,6 +961,7 @@ AS SELECT connec_id,
             vu_connec.the_geom
            FROM vu_connec
              JOIN v_state_connec USING (connec_id)
+			 JOIN selector_expl se ON (se.cur_user =current_user AND se.expl_id = vu_connec.expl_id) or (se.cur_user =current_user and se.expl_id = vu_connec.expl_id2)
              LEFT JOIN ( SELECT v_edit_link.link_id,
                     v_edit_link.feature_type,
                     v_edit_link.feature_id,
@@ -1542,6 +1008,7 @@ AS SELECT connec_id,
                     v_edit_link.inp_type
                    FROM v_edit_link
                   WHERE v_edit_link.state = 2) a ON a.feature_id::text = vu_connec.connec_id::text) c;
+
 
 CREATE OR REPLACE VIEW vu_presszone
 AS SELECT p.presszone_id,

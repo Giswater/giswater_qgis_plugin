@@ -336,22 +336,14 @@ CREATE OR REPLACE VIEW vu_link_gully AS
 	FROM link l
     WHERE l.feature_type::text = 'GULLY'::text;
 
-/*
-CREATE OR REPLACE VIEW v_edit_link AS
-	SELECT l.* FROM (
-	SELECT *
-	FROM vu_link
-    JOIN v_state_link USING (link_id)) l
-	join selector_sector s using (sector_id)
-	LEFT JOIN selector_municipality m using (muni_id)
-	where s.cur_user = current_user and (m.cur_user = current_user or l.muni_id is null);
-*/
 
 CREATE OR REPLACE VIEW v_edit_link AS
 	SELECT l.* FROM (
-	SELECT *
+	SELECT vu_link.*
 	FROM vu_link
-    JOIN v_state_link USING (link_id)) l;
+    JOIN v_state_link USING (link_id)
+    JOIN selector_expl se ON (se.cur_user =current_user AND se.expl_id = vu_link.expl_id) or (se.cur_user =current_user and se.expl_id = vu_link.expl_id2)) l;  
+   
 
 CREATE OR REPLACE VIEW v_edit_link_connec 
 as select * from v_edit_link where feature_type = 'CONNEC';
@@ -545,21 +537,12 @@ SELECT arc.arc_id,
      LEFT JOIN value_state_type vst ON vst.id = arc.state_type
      LEFT JOIN ext_municipality mu ON arc.muni_id = mu.muni_id
      LEFT JOIN drainzone USING (drainzone_id);
-/*
-create or replace view v_edit_arc as
-select a.* FROM (
-select a.* FROM ( SELECT selector_expl.expl_id FROM selector_expl WHERE selector_expl.cur_user = CURRENT_USER) s, vu_arc a
-JOIN v_state_arc USING (arc_id)
-WHERE a.expl_id = s.expl_id OR a.expl_id2 = s.expl_id) a
-join selector_sector s using (sector_id)
-LEFT JOIN selector_municipality m using (muni_id)
-where s.cur_user = current_user
-and (m.cur_user = current_user or a.muni_id is null);
-*/
+
 
 create or replace view v_edit_arc as
 select a.* FROM vu_arc a
-JOIN v_state_arc USING (arc_id);
+JOIN v_state_arc USING (arc_id)
+JOIN selector_expl se ON ((se.cur_user = CURRENT_USER AND se.expl_id = a.expl_id) OR (se.cur_user = CURRENT_USER and se.expl_id = a.expl_id2));
 
 
 CREATE OR REPLACE VIEW vu_node AS
@@ -775,22 +758,13 @@ WITH vu_node AS (SELECT node.node_id,
     model_id,
     serial_number
    FROM vu_node;
-/*
-create or replace view v_edit_node as
-select a.*,
-case when a.sector_id > 0 and is_operative = true and epa_type !='UNDEFINED'::varchar(16) THEN epa_type else NULL::varchar(16) end as inp_type
-FROM
-( select n.* FROM ( SELECT selector_expl.expl_id FROM selector_expl WHERE selector_expl.cur_user = CURRENT_USER) s, vu_node n
-JOIN v_state_node USING (node_id)
-WHERE n.expl_id = s.expl_id OR n.expl_id2 = s.expl_id) a
-LEFT JOIN selector_municipality m using (muni_id)
-where (m.cur_user = current_user or a.muni_id is null);
-*/
+
 
 create or replace view v_edit_node as
-select a.*,
+select vu_node.*,
 case when is_operative = true and epa_type !='UNDEFINED'::varchar(16) THEN epa_type else NULL::varchar(16) end as inp_type
-FROM vu_node a;
+FROM vu_node 
+JOIN selector_expl se ON ((se.cur_user = CURRENT_USER AND se.expl_id = vu_node.expl_id) OR (se.cur_user = CURRENT_USER and se.expl_id = vu_node.expl_id2));
 
 
 CREATE OR REPLACE VIEW vu_connec AS
@@ -900,148 +874,6 @@ SELECT connec.connec_id,
      LEFT JOIN value_state_type vst ON vst.id = connec.state_type
      LEFT JOIN ext_municipality mu ON connec.muni_id = mu.muni_id
      LEFT JOIN drainzone USING (drainzone_id);
-/*
-CREATE OR REPLACE VIEW v_edit_connec AS
-SELECT  c.* FROM (
-WITH s AS (
-         SELECT selector_expl.expl_id
-           FROM selector_expl
-          WHERE selector_expl.cur_user = CURRENT_USER
-        )
- SELECT vu_connec.connec_id,
-    vu_connec.code,
-    vu_connec.customer_code,
-    vu_connec.top_elev,
-    vu_connec.y1,
-    vu_connec.y2,
-    vu_connec.conneccat_id,
-    vu_connec.connec_type,
-    vu_connec.sys_type,
-    vu_connec.private_conneccat_id,
-    vu_connec.matcat_id,
-	vu_connec.state,
-    vu_connec.state_type,
-    vu_connec.expl_id,
-    vu_connec.macroexpl_id,
-        CASE
-            WHEN a.sector_id IS NULL THEN vu_connec.sector_id
-            ELSE a.sector_id
-        END AS sector_id,
-    vu_connec.sector_type,
-        CASE
-            WHEN a.macrosector_id IS NULL THEN vu_connec.macrosector_id
-            ELSE a.macrosector_id
-        END AS macrosector_id,
-    vu_connec.drainzone_id,
-    vu_connec.drainzone_type,
-    vu_connec.demand,
-    vu_connec.connec_depth,
-    vu_connec.connec_length,
-    v_state_connec.arc_id,
-    vu_connec.annotation,
-    vu_connec.observ,
-    vu_connec.comment,
-        CASE
-            WHEN a.dma_id IS NULL THEN vu_connec.dma_id
-            ELSE a.dma_id
-        END AS dma_id,
-        CASE
-            WHEN a.macrodma_id IS NULL THEN vu_connec.macrodma_id
-            ELSE a.macrodma_id
-        END AS macrodma_id,
-    vu_connec.dma_type,
-    vu_connec.soilcat_id,
-    vu_connec.function_type,
-    vu_connec.category_type,
-    vu_connec.fluid_type,
-    vu_connec.location_type,
-    vu_connec.workcat_id,
-    vu_connec.workcat_id_end,
-    vu_connec.buildercat_id,
-    vu_connec.builtdate,
-    vu_connec.enddate,
-    vu_connec.ownercat_id,
-    vu_connec.muni_id,
-    vu_connec.postcode,
-    vu_connec.district_id,
-    vu_connec.streetname,
-    vu_connec.postnumber,
-    vu_connec.postcomplement,
-    vu_connec.streetname2,
-    vu_connec.postnumber2,
-    vu_connec.postcomplement2,
-	vu_connec.region_id,
-    vu_connec.province_id,
-    vu_connec.descript,
-    vu_connec.svg,
-    vu_connec.rotation,
-    vu_connec.link,
-    vu_connec.verified,
-    vu_connec.undelete,
-    vu_connec.label,
-    vu_connec.label_x,
-    vu_connec.label_y,
-    vu_connec.label_rotation,
-    vu_connec.label_quadrant,
-    vu_connec.accessibility,
-    vu_connec.diagonal,
-    vu_connec.publish,
-    vu_connec.inventory,
-    vu_connec.uncertain,
-    vu_connec.num_value,
-        CASE
-            WHEN a.exit_id IS NULL THEN vu_connec.pjoint_id
-            ELSE a.exit_id
-        END AS pjoint_id,
-        CASE
-            WHEN a.exit_type IS NULL THEN vu_connec.pjoint_type
-            ELSE a.exit_type
-        END AS pjoint_type,
-    vu_connec.tstamp,
-    vu_connec.insert_user,
-    vu_connec.lastupdate,
-    vu_connec.lastupdate_user,
-    vu_connec.the_geom,
-    vu_connec.workcat_id_plan,
-    vu_connec.asset_id,
-    vu_connec.expl_id2,
-    vu_connec.is_operative,
-    vu_connec.minsector_id,
-    vu_connec.macrominsector_id,
-    vu_connec.adate,
-    vu_connec.adescript,
-    vu_connec.plot_code,
-    vu_connec.placement_type,
-    vu_connec.access_type
-   FROM s,
-    vu_connec
-     JOIN v_state_connec USING (connec_id)
-     LEFT JOIN ( SELECT DISTINCT ON (vu_link.feature_id) vu_link.link_id,
-            vu_link.feature_type,
-            vu_link.feature_id,
-            vu_link.exit_type,
-            vu_link.exit_id,
-            vu_link.state,
-            vu_link.expl_id,
-            vu_link.sector_id,
-            vu_link.dma_id,
-            vu_link.exit_topelev,
-            vu_link.exit_elev,
-            vu_link.fluid_type,
-            vu_link.gis_length,
-            vu_link.the_geom,
-            vu_link.sector_name,
-            vu_link.macrosector_id,
-            vu_link.macrodma_id
-           FROM v_edit_link vu_link,
-            s s_1
-          WHERE (vu_link.expl_id = s_1.expl_id OR vu_link.expl_id2 = s_1.expl_id) AND vu_link.state = 2) a ON a.feature_id::text = vu_connec.connec_id::text
-	WHERE vu_connec.expl_id = s.expl_id OR vu_connec.expl_id2 = s.expl_id) c
-	join selector_sector s using (sector_id)
-	LEFT JOIN selector_municipality m using (muni_id)
-	where s.cur_user = current_user
-	and (m.cur_user = current_user or c.muni_id is null);
-*/
 
 CREATE OR REPLACE VIEW v_edit_connec AS
 SELECT  c.* FROM (
@@ -1152,6 +984,7 @@ SELECT  c.* FROM (
     vu_connec.access_type
    FROM vu_connec
      JOIN v_state_connec USING (connec_id)
+     JOIN selector_expl se ON (se.cur_user =current_user AND se.expl_id = vu_connec.expl_id) or (se.cur_user =current_user and se.expl_id = vu_connec.expl_id2)
      LEFT JOIN ( SELECT DISTINCT ON (vu_link.feature_id) vu_link.link_id,
             vu_link.feature_type,
             vu_link.feature_id,
@@ -1433,6 +1266,7 @@ SELECT g.* FROM (
     vu_gully.the_geom
    FROM vu_gully
      JOIN v_state_gully USING (gully_id)
+	 JOIN selector_expl se ON (se.cur_user =current_user AND se.expl_id = vu_gully.expl_id) or (se.cur_user =current_user and se.expl_id = vu_gully.expl_id2)
      LEFT JOIN ( SELECT DISTINCT ON (vu_link.feature_id) vu_link.link_id,
             vu_link.feature_type,
             vu_link.feature_id,
