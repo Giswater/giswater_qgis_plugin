@@ -132,12 +132,13 @@ WITH
         FROM plan_psector_x_node pp
         JOIN selector_psector sp ON sp.cur_user = current_user AND sp.psector_id = pp.psector_id
         ),
-    node_state AS
+    node_selector AS
         (
-        SELECT n.node_id 
-        FROM node n
-        JOIN selector_state s ON s.cur_user =current_user AND n.state =s.state_id
-        left JOIN (SELECT node_id FROM node_psector WHERE p_state = 0) a using (node_id) where a.node_id is null
+        SELECT node_id 
+        FROM node
+        JOIN selector_expl se ON (se.cur_user =current_user AND se.expl_id = node.expl_id) or (se.cur_user = current_user AND se.expl_id = node.expl_id2)
+        JOIN selector_state s ON s.cur_user =current_user AND node.state =s.state_id
+        LEFT JOIN (SELECT node_id FROM node_psector WHERE p_state = 0) a using (node_id) where a.node_id is null
         union all 
         SELECT node_id FROM node_psector WHERE p_state = 1
         ),
@@ -264,11 +265,8 @@ WITH
         END AS inp_type,
 	    m.closed as closed_valve,
 	    m.broken as broken_valve
-        FROM node_state nn
-        JOIN node ON node.node_id = nn.node_id
-        JOIN selector_expl se ON se.cur_user =current_user AND se.expl_id IN (node.expl_id, node.expl_id2)
-        --JOIN selector_municipality sm ON sm.cur_user = current_user AND sm.muni_id =node.muni_id 
-        --JOIN selector_sector ss ON ss.cur_user = current_user AND ss.sector_id = node.sector_id 
+        FROM node_selector
+        JOIN node ON node.node_id = node_selector.node_id
         JOIN cat_node ON cat_node.id::text = node.nodecat_id::text
 	    JOIN cat_feature ON cat_feature.id::text = cat_node.nodetype_id::text
 		JOIN value_state_type vst ON vst.id = node.state_type
@@ -279,7 +277,7 @@ WITH
 	    LEFT JOIN dma_table ON dma_table.dma_id = node.dma_id
 	    LEFT JOIN dqa_table ON dqa_table.dqa_id = node.dqa_id 
 	    LEFT JOIN node_add e ON e.node_id::text = node.node_id::text
-        LEFT JOIN man_valve m ON m.node_id = nn.node_id
+        LEFT JOIN man_valve m ON m.node_id = node.node_id
         )
 	SELECT n.*
 	FROM node_selected n;
@@ -319,10 +317,11 @@ AS WITH
         FROM plan_psector_x_arc pp
         JOIN selector_psector sp ON sp.cur_user = CURRENT_USER AND sp.psector_id = pp.psector_id
         ), 
-    arc_state AS 
+    arc_selector AS 
 		(
         SELECT arc.arc_id
-        FROM arc
+        FROM arc 
+   		JOIN selector_expl se ON ((se.cur_user = CURRENT_USER AND se.expl_id = arc.expl_id) OR (se.cur_user = CURRENT_USER and se.expl_id = arc.expl_id2))
         JOIN selector_state s ON s.cur_user = CURRENT_USER AND arc.state = s.state_id
         left JOIN (SELECT arc_id FROM arc_psector WHERE p_state = 0) a using (arc_id)  where a.arc_id is null
         union all 
@@ -447,11 +446,8 @@ AS WITH
 			WHEN arc.sector_id > 0 AND vst.is_operative = true AND arc.epa_type::text <> 'UNDEFINED'::character varying(16)::text THEN arc.epa_type
 			ELSE NULL::character varying(16)
 		END AS inp_type
-	    FROM arc_state nn
-		JOIN arc ON arc.arc_id::text = nn.arc_id::text
-		JOIN selector_expl se ON se.cur_user = CURRENT_USER AND (se.expl_id = arc.expl_id OR se.expl_id = arc.expl_id2)
-		--JOIN selector_municipality sm ON sm.cur_user = CURRENT_USER AND sm.muni_id = arc.muni_id
-        --JOIN selector_sector ss ON ss.cur_user = current_user AND ss.sector_id = arc.sector_id 
+	    FROM arc_selector
+		JOIN arc ON arc.arc_id::text = arc_selector.arc_id::text
 		JOIN cat_arc ON cat_arc.id::text = arc.arccat_id::text
 		JOIN cat_feature ON cat_feature.id::text = cat_arc.arctype_id::text
 		JOIN exploitation ON arc.expl_id = exploitation.expl_id
@@ -519,10 +515,12 @@ WITH
         FROM plan_psector_x_connec pp
         JOIN selector_psector sp ON sp.cur_user = current_user AND sp.psector_id = pp.psector_id
         ),
-    connec_state AS
+    connec_selector AS
         (
-        SELECT connec_id, arc_id FROM connec c 
-        JOIN selector_state ss ON ss.cur_user =current_user AND c.state =ss.state_id
+        SELECT connec_id, arc_id 
+        FROM connec
+        JOIN selector_expl se ON (se.cur_user =current_user AND se.expl_id = connec.expl_id) or (se.cur_user =current_user and se.expl_id = connec.expl_id2)
+        JOIN selector_state ss ON ss.cur_user =current_user AND connec.state =ss.state_id
         left join (SELECT connec_id, arc_id FROM connec_psector WHERE p_state = 0) a using (connec_id, arc_id) where a.connec_id is null
        	union all
         SELECT connec_id, arc_id::varchar(16) FROM connec_psector WHERE p_state = 1
@@ -721,11 +719,8 @@ WITH
 		date_trunc('second'::text, connec.lastupdate) AS lastupdate,
 		connec.lastupdate_user,
 		connec.the_geom
-	    FROM inp_network_mode, connec_state nn
+	    FROM inp_network_mode, connec_selector nn
         JOIN connec ON connec.connec_id = nn.connec_id
-        JOIN selector_expl se ON se.cur_user =current_user AND se.expl_id IN (connec.expl_id, connec.expl_id2)
-        --JOIN selector_sector ss ON ss.cur_user = current_user AND ss.sector_id =connec.sector_id
-        --JOIN selector_municipality sm ON sm.cur_user = current_user AND sm.muni_id =connec.muni_id 
         JOIN cat_connec ON cat_connec.id::text = connec.connecat_id::text
 	    JOIN cat_feature ON cat_feature.id::text = cat_connec.connectype_id::text
 	    JOIN exploitation ON connec.expl_id = exploitation.expl_id
@@ -782,7 +777,7 @@ WITH
         FROM plan_psector_x_connec pp
         JOIN selector_psector sp ON sp.cur_user = current_user AND sp.psector_id = pp.psector_id
         ),
-    link_state AS
+    link_selector as
         (
         SELECT l.link_id 
         FROM link l
@@ -790,7 +785,7 @@ WITH
         left join (SELECT link_id FROM link_psector WHERE p_state = 0) a using (link_id) where a.link_id is null
         UNION ALL
         SELECT link_id FROM link_psector WHERE p_state = 1
-        ),
+        ),                
     link_selected as
     	(
 		SELECT l.link_id,
@@ -841,11 +836,9 @@ WITH
 	       THEN l.epa_type::character varying
 	       ELSE NULL::character varying(16)
 	    END AS inp_type
-		FROM inp_network_mode, link_state
+		FROM inp_network_mode, link_selector
 	    JOIN link l using (link_id)
-	    JOIN selector_expl se ON se.cur_user =current_user AND se.expl_id IN (l.expl_id, l.expl_id2)
-       -- JOIN selector_sector ss ON ss.cur_user = current_user AND ss.sector_id = l.sector_id 
-        --JOIN selector_municipality sm ON sm.cur_user = current_user AND sm.muni_id =l.muni_id 
+        JOIN selector_expl se ON ((se.cur_user =current_user AND se.expl_id = l.expl_id) or (se.cur_user =current_user AND se.expl_id = l.expl_id2))
 		JOIN sector_table ON sector_table.sector_id = l.sector_id
 	    LEFT JOIN presszone_table ON presszone_table.presszone_id = l.presszone_id
 	    LEFT JOIN dma_table ON dma_table.dma_id = l.dma_id

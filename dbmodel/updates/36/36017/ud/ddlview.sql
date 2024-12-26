@@ -147,10 +147,11 @@ WITH
         FROM plan_psector_x_node pp
         JOIN selector_psector sp ON sp.cur_user = current_user AND sp.psector_id = pp.psector_id
         ),
-    node_state AS
+    node_selector AS
         (
-        SELECT n.node_id 
-        FROM node n
+        SELECT node.node_id 
+        FROM node
+        JOIN selector_expl se ON (se.cur_user =current_user AND se.expl_id = node.expl_id) or (se.cur_user = current_user AND se.expl_id = node.expl_id2)
         JOIN selector_state s ON s.cur_user =current_user AND n.state =s.state_id
         left JOIN (SELECT node_id FROM node_psector WHERE p_state = 0) a using (node_id) where a.node_id is null
         union all 
@@ -266,9 +267,6 @@ WITH
 		node.serial_number
 		FROM node_state nn
 		join node using (node_id)
-		JOIN selector_expl se ON se.cur_user =current_user AND se.expl_id IN (node.expl_id, node.expl_id2)
-		--JOIN selector_sector ss ON ss.cur_user = current_user AND ss.sector_id =node.sector_id
-		--JOIN selector_municipality sm ON sm.cur_user = current_user AND sm.muni_id =node.muni_id 
 		JOIN cat_node ON node.nodecat_id::text = cat_node.id::text
 		JOIN cat_feature ON cat_feature.id::text = node.node_type::text
 		JOIN exploitation ON node.expl_id = exploitation.expl_id
@@ -311,10 +309,11 @@ AS WITH
         FROM plan_psector_x_arc pp
         JOIN selector_psector sp ON sp.cur_user = CURRENT_USER AND sp.psector_id = pp.psector_id
         ), 
-    arc_state AS 
+    arc_selector AS 
 		(
         SELECT arc.arc_id
         FROM arc
+   		JOIN selector_expl se ON ((se.cur_user = CURRENT_USER AND se.expl_id = arc.expl_id) OR (se.cur_user = CURRENT_USER and se.expl_id = arc.expl_id2))
         JOIN selector_state s ON s.cur_user = CURRENT_USER AND arc.state = s.state_id
         left JOIN (SELECT arc_id FROM arc_psector WHERE p_state = 0) a using (arc_id)  where a.arc_id is null
         union all 
@@ -476,11 +475,8 @@ AS WITH
 	    arc.brand_id,
 	    arc.model_id,
 	    arc.serial_number
-		FROM arc_state
-		join arc using (arc_id)
-		JOIN selector_expl se ON se.cur_user =current_user AND se.expl_id IN (arc.expl_id, arc.expl_id2)
-		--JOIN selector_municipality sm ON sm.cur_user = current_user AND sm.muni_id =arc.muni_id 
-        JOIN selector_sector ss ON ss.cur_user = current_user AND ss.sector_id = arc.sector_id
+		FROM arc_selector
+		JOIN arc using (arc_id)
 		JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text
 		JOIN cat_feature ON arc.arc_type::text = cat_feature.id::text
 		JOIN exploitation e on e.expl_id = arc.expl_id
@@ -534,9 +530,10 @@ with
         FROM plan_psector_x_connec pp
         JOIN selector_psector sp ON sp.cur_user = current_user AND sp.psector_id = pp.psector_id
         ),
-    connec_state AS
+    connec_selector AS
         (
         SELECT connec_id, arc_id FROM connec c 
+        JOIN selector_expl se ON (se.cur_user =current_user AND se.expl_id = connec.expl_id) or (se.cur_user =current_user and se.expl_id = connec.expl_id2)
         JOIN selector_state ss ON ss.cur_user =current_user AND c.state =ss.state_id
         left join (SELECT connec_id, arc_id::varchar(16) FROM connec_psector WHERE p_state = 0) a using (connec_id, arc_id) where a.connec_id is null
        	union all
@@ -658,11 +655,8 @@ with
 		connec.plot_code,
 		connec.placement_type,
 		connec.access_type
-	   FROM connec_state nn
-	   JOIN connec ON connec.connec_id = nn.connec_id
-	   JOIN selector_expl se ON se.cur_user =current_user AND se.expl_id IN (connec.expl_id, connec.expl_id2)
-   	   --JOIN selector_municipality sm ON sm.cur_user = current_user AND sm.muni_id =connec.muni_id 
-       JOIN selector_sector ss ON ss.cur_user = current_user AND ss.sector_id =connec.sector_id
+	   FROM connec_state
+	   JOIN connec USING (connec_id)
 	   JOIN cat_connec ON cat_connec.id::text = connec.connecat_id::text
 	   JOIN cat_feature ON cat_feature.id::text = connec.connec_type::text
 	   JOIN exploitation ON connec.expl_id = exploitation.expl_id
@@ -721,9 +715,10 @@ with
         FROM plan_psector_x_gully pp
         JOIN selector_psector sp ON sp.cur_user = current_user AND sp.psector_id = pp.psector_id
         ),
-    gully_state AS
+    gully_selector AS
         (
         SELECT gully_id, arc_id FROM gully g 
+		JOIN selector_expl se ON (se.cur_user = current_user AND se.expl_id=gully.expl_id) OR se.cur_user = current_user AND se.expl_id=gully.expl_id2)
         JOIN selector_state ss ON ss.cur_user =current_user AND g.state =ss.state_id
         left join (SELECT gully_id, arc_id::varchar(16) FROM gully_psector WHERE p_state = 0) a using (gully_id, arc_id) where a.gully_id is null
        	union all
@@ -867,9 +862,6 @@ with
 	    gully.the_geom
 	   FROM inp_network_mode, gully_state nn
 	   JOIN gully ON gully.gully_id = nn.gully_id
-	   JOIN selector_expl se ON se.cur_user =current_user AND se.expl_id IN (gully.expl_id, gully.expl_id2)
-       --JOIN selector_sector ss ON ss.cur_user = current_user AND ss.sector_id =arc.sector_id
-	   JOIN selector_municipality sm ON sm.cur_user = current_user AND sm.muni_id =gully.muni_id 
 	   JOIN cat_grate ON gully.gratecat_id::text = cat_grate.id::text
 	   JOIN exploitation ON gully.expl_id = exploitation.expl_id
 	   JOIN cat_feature ON gully.gully_type::text = cat_feature.id::text
@@ -928,8 +920,7 @@ WITH
         SELECT l.link_id 
         FROM link l
         JOIN selector_state s ON s.cur_user =current_user AND l.state =s.state_id
-        JOIN selector_sector se ON se.cur_user =current_user AND l.sector_id =se.sector_id
-		WHERE NOT EXISTS  (SELECT link_id FROM link_psector WHERE p_state = 0)
+        left join (SELECT link_id FROM link_psector WHERE p_state = 0) a using (link_id) where a.link_id is null
         UNION ALL
         SELECT link_id FROM link_psector WHERE p_state = 1
         ),
@@ -971,9 +962,7 @@ WITH
 	    l.uncertain
 	    from inp_network_mode, link_state
 	    JOIN link l using (link_id)
-	    JOIN selector_expl se ON se.cur_user =current_user AND se.expl_id IN (l.expl_id, l.expl_id2)
-        JOIN selector_sector ss ON ss.cur_user = current_user AND ss.sector_id =l.sector_id
-        --JOIN selector_municipality sm ON sm.cur_user = current_user AND sm.muni_id =l.muni_id 
+	    JOIN selector_expl se ON (se.cur_user =current_user AND se.expl_id = l.expl_id) OR (se.cur_user =current_user AND se.expl_id = l.expl_id2)
 	    JOIN exploitation ON l.expl_id = exploitation.expl_id
 	    JOIN ext_municipality mu ON l.muni_id = mu.muni_id
 	    JOIN sector_table ON l.sector_id = sector_table.sector_id

@@ -18,4 +18,6 @@ CREATE INDEX node_streetname2 ON node USING btree (streetname2);
 CREATE INDEX connec_streetname ON connec USING btree (streetname);
 CREATE INDEX connec_streetname2 ON connec USING btree (streetname2);
 
+CREATE INDEX link_expl_id2 ON link USING btree (expl_id2);
+
 
