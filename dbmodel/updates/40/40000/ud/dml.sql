@@ -28,6 +28,8 @@ UPDATE sys_param_user SET dv_querytext='SELECT id AS id, id AS idval FROM cat_gu
 -- 30/10/2024
 DELETE FROM sys_foreignkey WHERE typevalue_table='inp_typevalue' AND typevalue_name='inp_typevalue_snow' AND target_table='inp_snowpack' AND target_field='snow_type ';
 
+
+ALTER TABLE config_form_fields ENABLE TRIGGER gw_trg_config_control;
 --04/11/2024
 ALTER TABLE inp_typevalue DISABLE TRIGGER gw_trg_typevalue_config_fk;
 DELETE FROM inp_typevalue WHERE typevalue='inp_typevalue_snow' AND id='PLOWABLE';
@@ -40,6 +42,12 @@ DELETE FROM config_form_fields
 	WHERE formname='upsert_catalog_gully' AND formtype='form_catalog' AND columnname='geom1' AND tabname='tab_none';
 DELETE FROM config_form_fields
 	WHERE formname='upsert_catalog_gully' AND formtype='form_catalog' AND columnname='shape' AND tabname='tab_none';
+	
+	
+ALTER TABLE config_form_fields DISABLE TRIGGER gw_trg_config_control;
+UPDATE config_form_fields set dv_querytext = replace(dv_querytext, 'cat_grate', 'cat_gully');
+UPDATE config_form_fields set dv_querytext_filterc = replace(dv_querytext_filterc, 'cat_grate', 'cat_gully');
+ALTER TABLE config_form_fields ENABLE TRIGGER gw_trg_config_control;
 
 -- 05/11/2024
 

@@ -7,8 +7,11 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- 11/10/2024
+ALTER TABLE config_form_fields DISABLE TRIGGER gw_trg_config_control;
+
 ALTER TABLE cat_feature_gully DROP CONSTRAINT IF EXISTS cat_feature_gully_type_fkey;
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"cat_feature_gully", "column":"type", "newName":"_type"}}$$);
+
 
 -- 15/10/2024
 ALTER TABLE cat_arc RENAME TO _cat_arc;
@@ -325,4 +328,7 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"sect
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP", "table":"inp_timeseries", "column":"idval"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE", "table":"inp_timeseries", "column":"addparam", "dataType":"jsonb"}}$$);
+
+ALTER TABLE config_form_fields ENABLE TRIGGER gw_trg_config_control;
+
 
