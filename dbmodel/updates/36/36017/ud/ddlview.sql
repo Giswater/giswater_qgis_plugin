@@ -152,7 +152,7 @@ WITH
         SELECT node.node_id 
         FROM node
         JOIN selector_expl se ON (se.cur_user =current_user AND se.expl_id = node.expl_id) or (se.cur_user = current_user AND se.expl_id = node.expl_id2)
-        JOIN selector_state s ON s.cur_user =current_user AND n.state =s.state_id
+        JOIN selector_state s ON s.cur_user =current_user AND node.state =s.state_id
         left JOIN (SELECT node_id FROM node_psector WHERE p_state = 0) a using (node_id) where a.node_id is null
         union all 
         SELECT node_id FROM node_psector WHERE p_state = 11
@@ -265,7 +265,7 @@ WITH
 		node.brand_id,
 		node.model_id,
 		node.serial_number
-		FROM node_state nn
+		FROM node_selector
 		join node using (node_id)
 		JOIN cat_node ON node.nodecat_id::text = cat_node.id::text
 		JOIN cat_feature ON cat_feature.id::text = node.node_type::text
@@ -532,9 +532,9 @@ with
         ),
     connec_selector AS
         (
-        SELECT connec_id, arc_id FROM connec c 
+        SELECT connec_id, arc_id FROM connec
         JOIN selector_expl se ON (se.cur_user =current_user AND se.expl_id = connec.expl_id) or (se.cur_user =current_user and se.expl_id = connec.expl_id2)
-        JOIN selector_state ss ON ss.cur_user =current_user AND c.state =ss.state_id
+        JOIN selector_state ss ON ss.cur_user =current_user AND connec.state =ss.state_id
         left join (SELECT connec_id, arc_id::varchar(16) FROM connec_psector WHERE p_state = 0) a using (connec_id, arc_id) where a.connec_id is null
        	union all
         SELECT connec_id, arc_id::varchar(16) FROM connec_psector WHERE p_state = 1
@@ -576,7 +576,7 @@ with
 		connec.demand,
 		connec.connec_depth,
 		connec.connec_length,
-		nn.arc_id,
+		connec_selector.arc_id,
 		connec.annotation,
 		connec.observ,
 		connec.comment,
@@ -655,7 +655,7 @@ with
 		connec.plot_code,
 		connec.placement_type,
 		connec.access_type
-	   FROM connec_state
+	   FROM connec_selector
 	   JOIN connec USING (connec_id)
 	   JOIN cat_connec ON cat_connec.id::text = connec.connecat_id::text
 	   JOIN cat_feature ON cat_feature.id::text = connec.connec_type::text
@@ -717,9 +717,9 @@ with
         ),
     gully_selector AS
         (
-        SELECT gully_id, arc_id FROM gully g 
+        SELECT gully_id, arc_id FROM gully
 		JOIN selector_expl se ON (se.cur_user = current_user AND se.expl_id=gully.expl_id) OR (se.cur_user = current_user AND se.expl_id=gully.expl_id2)
-        JOIN selector_state ss ON ss.cur_user =current_user AND g.state =ss.state_id
+        JOIN selector_state ss ON ss.cur_user =current_user AND gully.state =ss.state_id
         left join (SELECT gully_id, arc_id::varchar(16) FROM gully_psector WHERE p_state = 0) a using (gully_id, arc_id) where a.gully_id is null
        	union all
         SELECT gully_id, arc_id::varchar(16) FROM gully_psector WHERE p_state = 1
@@ -860,8 +860,8 @@ with
 	    date_trunc('second'::text, gully.lastupdate) AS lastupdate,
 	    gully.lastupdate_user,
 	    gully.the_geom
-	   FROM inp_network_mode, gully_state nn
-	   JOIN gully ON gully.gully_id = nn.gully_id
+	   FROM inp_network_mode, gully_selector
+	   JOIN gully using (gully_id)
 	   JOIN cat_grate ON gully.gratecat_id::text = cat_grate.id::text
 	   JOIN exploitation ON gully.expl_id = exploitation.expl_id
 	   JOIN cat_feature ON gully.gully_type::text = cat_feature.id::text
