@@ -718,7 +718,7 @@ with
     gully_selector AS
         (
         SELECT gully_id, arc_id FROM gully g 
-		JOIN selector_expl se ON (se.cur_user = current_user AND se.expl_id=gully.expl_id) OR se.cur_user = current_user AND se.expl_id=gully.expl_id2)
+		JOIN selector_expl se ON (se.cur_user = current_user AND se.expl_id=gully.expl_id) OR (se.cur_user = current_user AND se.expl_id=gully.expl_id2)
         JOIN selector_state ss ON ss.cur_user =current_user AND g.state =ss.state_id
         left join (SELECT gully_id, arc_id::varchar(16) FROM gully_psector WHERE p_state = 0) a using (gully_id, arc_id) where a.gully_id is null
        	union all
