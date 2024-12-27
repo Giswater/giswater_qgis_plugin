@@ -6131,3 +6131,154 @@ AS SELECT DISTINCT p.id,
      JOIN inp_timeseries_value p ON t.id::text = p.timser_id::text
   WHERE t.expl_id = s.expl_id AND s.cur_user = "current_user"()::text OR t.expl_id IS NULL
   ORDER BY p.id;
+  
+  
+ -- Drop the view if it already exists
+DROP VIEW IF EXISTS v_edit_inp_flwreg;
+
+CREATE OR REPLACE VIEW v_edit_inp_flwreg AS
+WITH 
+-- Orifice
+orifice AS (
+    SELECT 
+        f.nodarc_id,
+        f.node_id,
+        f.order_id,
+        f.to_arc,
+        f.flwreg_length,
+        'orifice' AS flwreg_type,
+        f.ori_type AS orifice_type,
+        f.offsetval AS orifice_offsetval,
+        f.cd AS orifice_cd,
+        f.orate AS orifice_orate,
+        f.flap AS orifice_flap,
+        f.shape AS orifice_shape,
+        f.geom1 AS orifice_geom1,
+        f.geom2 AS orifice_geom2,
+        f.geom3 AS orifice_geom3,
+        f.geom4 AS orifice_geom4,
+        st_setsrid(st_makeline(n.the_geom, st_lineinterpolatepoint(a.the_geom, f.flwreg_length / st_length(a.the_geom))), 25831)::geometry(LineString,25831) AS the_geom
+    FROM inp_flwreg_orifice f
+    JOIN v_edit_node n USING (node_id)
+    JOIN value_state_type vs ON vs.id = n.state_type
+    LEFT JOIN arc a ON a.arc_id::text = f.to_arc::text
+    WHERE vs.is_operative IS TRUE
+),
+-- Outlet
+outlet AS (
+   SELECT f.nodarc_id,
+    f.node_id,
+    f.order_id,
+    f.to_arc,
+    f.flwreg_length,
+    'outlet' AS flwreg_type,
+    f.outlet_type,
+    f.offsetval AS outlet_offsetval,
+    f.curve_id AS outlet_curve_id,
+    f.cd1 AS outlet_cd1,
+    f.cd2 AS outlet_cd2,
+    f.flap AS outlet_flap,
+    st_setsrid(st_makeline(n.the_geom, st_lineinterpolatepoint(a.the_geom, f.flwreg_length / st_length(a.the_geom))), 25831)::geometry(LineString,25831) AS the_geom
+   FROM inp_flwreg_outlet f
+     JOIN v_edit_node n USING (node_id)
+     JOIN value_state_type vs ON vs.id = n.state_type
+     LEFT JOIN arc a ON a.arc_id::text = f.to_arc::text
+  WHERE vs.is_operative IS TRUE
+),
+-- Pump
+pump AS (SELECT f.nodarc_id,
+    f.node_id,
+    f.order_id,
+    f.to_arc,
+    f.flwreg_length,
+    'pump' AS flwreg_type,
+    f.curve_id AS pump_curve_id,
+    f.status AS pump_status,
+    f.startup AS pump_startup,
+    f.shutoff AS pump_shutoff,
+    st_setsrid(st_makeline(n.the_geom, st_lineinterpolatepoint(a.the_geom, f.flwreg_length / st_length(a.the_geom))), 25831)::geometry(LineString,25831) AS the_geom
+   FROM inp_flwreg_pump f
+     JOIN v_edit_node n USING (node_id)
+     JOIN value_state_type vs ON vs.id = n.state_type
+     LEFT JOIN arc a ON a.arc_id::text = f.to_arc::text
+  WHERE vs.is_operative IS TRUE),
+-- Weir
+ weir AS (
+  SELECT f.nodarc_id,
+    f.node_id,
+    f.order_id,
+    f.to_arc,
+    f.flwreg_length,
+    'weir' AS flwreg_type,
+    f.weir_type,
+    f.offsetval AS weir_offsetval,
+    f.cd AS weir_cd,
+    f.ec AS weir_ec,
+    f.cd2 AS weir_cd2,
+    f.flap AS weir_flap,
+    f.geom1 AS weir_geom1,
+    f.geom2 AS weir_geom2,
+    f.geom3 AS weir_geom3,
+    f.geom4 AS weir_geom4,
+    f.surcharge AS weir_surcharge,
+    f.road_width AS weir_road_width,
+    f.road_surf AS weir_road_surf,
+    f.coef_curve AS weir_coef_curve,
+    st_setsrid(st_makeline(n.the_geom, st_lineinterpolatepoint(a.the_geom, f.flwreg_length / st_length(a.the_geom))), 25831)::geometry(LineString,25831) AS the_geom
+   FROM inp_flwreg_weir f
+     JOIN v_edit_node n USING (node_id)
+     JOIN value_state_type vs ON vs.id = n.state_type
+     LEFT JOIN arc a ON a.arc_id::text = f.to_arc::text
+  WHERE vs.is_operative IS TRUE)
+  SELECT 
+    COALESCE(o.nodarc_id, ou.nodarc_id, p.nodarc_id, w.nodarc_id) AS nodarc_id,
+    COALESCE(o.node_id, ou.node_id, p.node_id, w.node_id) AS node_id,
+    COALESCE(o.order_id, ou.order_id, p.order_id, w.order_id) AS order_id,
+    COALESCE(o.to_arc, ou.to_arc, p.to_arc, w.to_arc) AS to_arc,
+    COALESCE(o.flwreg_length, ou.flwreg_length, p.flwreg_length, w.flwreg_length) AS flwreg_length,
+    COALESCE(o.flwreg_type, ou.flwreg_type, p.flwreg_type, w.flwreg_type) AS flwreg_type,
+        -- Orifice Columns
+    o.orifice_type,
+    o.orifice_offsetval,
+    o.orifice_cd,
+    o.orifice_orate,
+    o.orifice_flap,
+    o.orifice_shape,
+    o.orifice_geom1,
+    o.orifice_geom2,
+    o.orifice_geom3,
+    o.orifice_geom4,
+    -- Outlet Columns
+    ou.outlet_type,
+    ou.outlet_offsetval,
+    ou.outlet_curve_id,
+    ou.outlet_cd1,
+    ou.outlet_cd2,
+    ou.outlet_flap,
+    --Pump Columns
+    p.pump_curve_id,
+    p.pump_status,
+    p.pump_startup,
+    p.pump_shutoff,
+    --Weir Columns
+    w.weir_type,
+    w.weir_offsetval,
+    w.weir_cd,
+    w.weir_ec,
+    w.weir_cd2,
+    w.weir_flap,
+    w.weir_geom1,
+    w.weir_geom2,
+    w.weir_geom3,
+    w.weir_geom4,
+    w.weir_surcharge,
+    w.weir_road_width,
+    w.weir_road_surf,
+    w.weir_coef_curve,
+    -- Geometry
+    COALESCE(o.the_geom, ou.the_geom, p.the_geom, w.the_geom) AS the_geom
+FROM 
+    orifice o
+FULL OUTER JOIN outlet ou USING (nodarc_id, node_id)
+FULL OUTER JOIN pump p USING (nodarc_id, node_id)
+FULL OUTER JOIN weir w USING (nodarc_id, node_id);
