@@ -116,6 +116,10 @@ BEGIN
 			UPDATE cat_feature_gully SET double_geom=NEW.double_geom::json WHERE id=NEW.id;
 
 		END IF;
+	
+		-- manage mandatory values of config_param_user where feature is deprecated
+		DELETE FROM sys_param_user WHERE id IN (SELECT sys_param_user.id FROM sys_param_user, cat_feature 
+		WHERE active=false AND concat(lower(cat_feature.id),'_vdefault') = sys_param_user.id);
 
 		RETURN NEW;
 

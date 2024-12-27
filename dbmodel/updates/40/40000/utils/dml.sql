@@ -873,3 +873,15 @@ ALTER TABLE IF EXISTS config_style ADD CONSTRAINT idval_chk UNIQUE (idval);
 
 -- 20/12/2024
 UPDATE sys_param_user SET id='plan_psector_current' WHERE id='plan_psector_vdefault';
+
+-- 26/12/2024
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source")
+VALUES(3362, 'gw_fct_create_checktables', 'utils', 'function', 'json', 'json', 'Create temporal tables for check process.', 'role_basic', NULL, 'core');
+
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source")
+VALUES(3364, 'gw_fct_setcheckdatabase', 'utils', 'function', 'json', 'json', 'Check database exceptions.', 'role_basic', NULL, 'core');
+
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source")
+VALUES(3366, 'gw_fct_create_logreturn', 'utils', 'function', 'json', 'json', 'Create log return for check functions.', 'role_basic', NULL, 'core');
+
+update sys_fprocess set query_text = replace(query_text,'v_prefix_', 't_');
