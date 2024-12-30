@@ -193,7 +193,7 @@ AS WITH streetaxis AS (
             ELSE NULL::character varying(16)
         END AS inp_type
    FROM arc
-     LEFT JOIN sector ON arc.sector_id = sector.sector_id
+   
      LEFT JOIN exploitation ON arc.expl_id = exploitation.expl_id
      LEFT JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text
      JOIN cat_feature ON cat_feature.id::text = cat_arc.arc_type::text

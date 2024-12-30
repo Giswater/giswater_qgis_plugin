@@ -659,3 +659,55 @@ INSERT INTO sys_fprocess (fid, fprocess_name, "source", fprocess_type, project_t
 		SELECT a.arc_id, a.arccat_id,  concat(epa_type, '' using inp_virtualvalve table'') AS epa_table, a.the_geom, a.sector_id FROM v_edit_inp_pipe JOIN arc a USING (arc_id) WHERE epa_type !=''PIPE''
 ) select*from sub1', 'Epa type for arcs features checked. No inconsistencies aganints epa table found.Epa type for connec features checked. No inconsistencies aganints epa table found.', '[gw_fct_pg2epa_check_data]');
 INSERT INTO sys_fprocess (fid, fprocess_name, "source", fprocess_type, project_type, except_level, except_msg, query_text, info_msg, function_name) VALUES(603, 'Check that EPA OBJECTS (patterns) name do not contain spaces', 'core', 'Check epa-config', 'utils', 3, 'patterns name with spaces. Please fix it!', 'SELECT * FROM inp_pattern WHERE pattern_id like''% %''', 'All patterns checked have names without spaces.', '[gw_fct_pg2epa_check_data]');
+
+update sys_fprocess set query_text = replace(query_text,'v_prefix_', 't_');
+
+UPDATE sys_fprocess set query_text = 'SELECT * FROM 
+(SELECT DISTINCT t1.node_id, t1.nodecat_id, t1.state as state1, 
+t2.node_id AS node_2, t2.nodecat_id AS nodecat_2, t2.state as state2, t1.expl_id, 106, t1.the_geom 
+FROM t_node AS t1 JOIN node AS t2 ON ST_Dwithin(t1.the_geom, t2.the_geom, 0.01) 
+WHERE t1.node_id != t2.node_id ORDER BY t1.node_id ) a where a.state1 = 1 AND a.state2 = 1' WHERE fid = 106;
+
+UPDATE sys_fprocess set query_text = 'with c as 
+(select t_connec.connec_id, arc_id as arc, 
+t_connec.conneccat_id, the_geom, t_connec.expl_id from t_connec)     
+select c1.connec_id, c1.conneccat_id, c1.the_geom, c1.expl_id from link a 
+left join c c1 on a.feature_id = c1.connec_id
+left join c c2 on a.exit_id = c2.connec_id
+where (a.exit_type =''CONNEC'') and c1.arc <> c2.arc'  WHERE fid = 205;
+
+UPDATE sys_fprocess set query_text = 
+'with a as (SELECT arc_id, node_1, node_2, arccat_id, expl_id, state, the_geom FROM arc WHERE state = 1),
+n1 as (SELECT arc.arc_id, node.node_id, min(ST_Distance(node.the_geom, ST_startpoint(arc.the_geom))) as d FROM node, arc 
+WHERE arc.state = 1 and node.state = 1 and ST_DWithin(ST_startpoint(arc.the_geom), node.the_geom, 0.02) group by 1,2 ORDER BY 1 DESC,3 DESC
+), 
+n2 as (	SELECT arc.arc_id, node.node_id, min(ST_Distance(node.the_geom, ST_endpoint(arc.the_geom))) as d FROM node, arc 
+WHERE arc.state = 1 and node.state = 1 and ST_DWithin(ST_endpoint(arc.the_geom), node.the_geom, 0.02) group by 1,2 ORDER BY 1 DESC,3 DESC
+)
+select a.* from a 
+left join n1 on a.arc_id = n1.arc_id
+left join n2 on a.arc_id = n2.arc_id 
+where (a.node_1 != n1.node_id) or (a.node_2 != n2.node_id)' WHERE fid = 372;
+
+UPDATE sys_fprocess set query_text = 
+'with
+mec as ( -- links with startpoint close to connec
+SELECT l.link_id as arc_id, c.conneccat_id as arccat_id, l.the_geom, l.expl_id FROM connec c, link l
+WHERE l.state = 1 and c.state = 1 and ST_DWithin(ST_startpoint(l.the_geom), c.the_geom, 0.01) group by 1,2 ORDER BY 1 DESC
+), 
+moc as ( -- links connected to connec
+SELECT link_id, feature_id, ''417'', l.state, l.the_geom 
+FROM link l JOIN connec c ON feature_id = connec_id WHERE l.state = 1 and l.feature_type = ''CONNEC'') 
+select * from mec where arc_id not in (select link_id from moc)'  WHERE fid = 417;
+
+UPDATE sys_fprocess set query_text = 
+'SELECT * FROM (SELECT DISTINCT t1.node_id, t1.nodecat_id, t1.state as state1, 
+t2.node_id AS node_2, t2.nodecat_id AS nodecat_2, t2.state as state2, t1.expl_id, 453, t1.the_geom 
+FROM t_node AS t1 JOIN t_node AS t2 ON ST_Dwithin(t1.the_geom, t2.the_geom, 0.01) 
+WHERE t1.node_id != t2.node_id ORDER BY t1.node_id ) a where a.state1 = 2 AND a.state2 = 2' WHERE fid = 453;
+
+INSERT INTO sys_fprocess (fid, fprocess_name, "source", fprocess_type, project_type)
+VALUES (604, 'Check DB data', 'core', 'Function process', 'utils');
+
+
+

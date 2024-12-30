@@ -6,14 +6,14 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE:2670
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_om_check_data(json);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_om_check_data(p_data json)
+DROP FUNCTION IF EXISTS ws40000.gw_fct_om_check_data(json);
+CREATE OR REPLACE FUNCTION ws40000.gw_fct_om_check_data(p_data json)
   RETURNS json AS
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_om_check_data($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{"parameters":{"selectionMode":"userSelectors"}}}$$)
-SELECT SCHEMA_NAME.gw_fct_om_check_data($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{"parameters":{"selectionMode":"userDomain"}}}$$)
+SELECT ws40000.gw_fct_om_check_data($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{"parameters":{"selectionMode":"userSelectors"}}}$$)
+SELECT ws40000.gw_fct_om_check_data($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{"parameters":{"selectionMode":"userDomain"}}}$$)
 */
 
 DECLARE
@@ -35,7 +35,7 @@ v_checkpsectors text;
 BEGIN
 
 	--  Search path
-	SET search_path = "SCHEMA_NAME", public;
+	SET search_path = "ws40000", public;
 
 	-- select config values
 	SELECT project_type, giswater INTO v_project_type, v_version FROM sys_version order by id desc limit 1;
@@ -47,35 +47,35 @@ BEGIN
 	v_fid := (((p_data ->>'data')::json->>'parameters')::json->>'fid');
 
 	-- control of fid
-	IF v_fid is null or v_fid <> 101 THEN v_fid = 125; end if;
+	IF v_fid is null or v_fid <> 604 THEN v_fid = 125; end if;
 
 	-- create temp tables
 	IF v_fid = 125 THEN
-		EXECUTE 'SELECT gw_fct_create_checktables($${"data":{"ignoreVerifiedExceptions":'||v_ignore_verified_exceptions||',
-		 "selectionMode":"'||v_selection_mode||'", "checkPsectors":"'||v_checkpsectors||'"}}$$::json)';
+		EXECUTE 'SELECT gw_fct_create_checktables($${"data":{"ignoreVerifiedExceptions":'||v_ignore_verified_exceptions||'}}$$::json)';
 	END IF;
 
 	-- getting sys_fprocess to be executed
-	v_querytext = 'select * from sys_fprocess where project_type in (lower('||quote_literal(v_project_type)||'), ''utils'')
-		     and addparam is null and query_text is not null and function_name ilike ''%om_check%'' order by fid asc';
+	v_querytext = 'select * from sys_fprocess where project_type in (lower('||quote_literal(v_project_type)||'), ''utils'') and addparam is null and query_text is not null and function_name ilike ''%om_check%'' order by fid asc';
+
+	raise notice '%', v_querytext;
 	
 	for v_rec in execute v_querytext		
 	loop
-		execute 'select gw_fct_check_fprocess($${"client":{"device":4, "infoType":1, "lang":"ES"}, 
+		EXECUTE 'select gw_fct_check_fprocess($${"client":{"device":4, "infoType":1, "lang":"ES"}, 
 	    "form":{},"feature":{},"data":{"parameters":{"functionFid": '||v_fid||', "checkFid":"'||v_rec.fid||'"}}}$$)';
 	end loop;
 
 	-- built return
 	IF v_fid = 125 THEN
 
-		-- fill exception tables (anl_node, arc, connec, gully and polygon) to make queryable for end user
-		EXECUTE 'SELECT gw_fct_create_logreturn($${"data":{"type":"fillExcepTables", queryText":"'||v_querytext||'"}}$$::json)';
+		-- materialize tables
+		PERFORM gw_fct_create_logreturn($${"data":{"parameters":{"type":"fillExcepTables"}}}$$::json);
 
 		-- create json return to send client
-		EXECUTE 'SELECT gw_fct_create_logreturn($${"data":{"type":"info"}}$$::json)' INTO v_result_info;
-		EXECUTE 'SELECT gw_fct_create_logreturn($${"data":{"type":"point"}}$$::json)' INTO v_result_point;
-		EXECUTE 'SELECT gw_fct_create_logreturn($${"data":{"type":"line"}}$$::json)' INTO v_result_line;
-		EXECUTE 'SELECT gw_fct_create_logreturn($${"data":{"type":"polygon"}}$$::json)' INTO v_result_polygon;
+		EXECUTE 'SELECT gw_fct_create_logreturn($${"data":{"parameters":{"type":"info"}}}$$::json)' INTO v_result_info;
+		EXECUTE 'SELECT gw_fct_create_logreturn($${"data":{"parameters":{"type":"point"}}}$$::json)' INTO v_result_point;
+		EXECUTE 'SELECT gw_fct_create_logreturn($${"data":{"parameters":{"type":"line"}}}$$::json)' INTO v_result_line;
+		EXECUTE 'SELECT gw_fct_create_logreturn($${"data":{"parameters":{"type":"polygon"}}}$$::json)' INTO v_result_polygon;
 
 		-- Return
 		RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'"'||

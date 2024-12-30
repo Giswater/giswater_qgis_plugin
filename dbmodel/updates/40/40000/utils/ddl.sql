@@ -186,7 +186,8 @@ END; $$;
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sys_fprocess", "column":"except_level", "dataType":"integer"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sys_fprocess", "column":"except_msg", "dataType":"text"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sys_fprocess", "column":"fprocess_name", "dataType":"text"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sys_fprocess", "column":"except_table", "dataType":"text"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sys_fprocess", "column":"except_table_msg", "dataType":"text"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sys_fprocess", "column":"query_text", "dataType":"text"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sys_fprocess", "column":"info_msg", "dataType":"text"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sys_fprocess", "column":"function_name", "dataType":"text"}}$$);
@@ -231,3 +232,7 @@ ALTER TABLE connec DROP CONSTRAINT IF EXISTS connec_matcat_id_fkey;
 ALTER TABLE cat_mat_arc RENAME TO _cat_mat_arc;
 ALTER TABLE cat_mat_node RENAME TO _cat_mat_node;
 ALTER TABLE cat_mat_element RENAME TO _cat_mat_element;
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"element", "column":"verified", "dataType":"varchar(20)", "isUtils":"False"}}$$);
+
+DROP INDEX if exists plan_psector_psector_id;

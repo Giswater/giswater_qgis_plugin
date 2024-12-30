@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 3366
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_create_logreturn (p_data json)
+CREATE OR REPLACE FUNCTION ws40000.gw_fct_create_logreturn (p_data json)
   RETURNS json AS
 $BODY$
 
@@ -27,8 +27,8 @@ v_rec record;
 BEGIN
 
 	-- search path
-	SET search_path = "SCHEMA_NAME", public;
-	v_schemaname = 'SCHEMA_NAME';
+	SET search_path = "ws40000", public;
+	v_schemaname = 'ws40000';
 
 	-- get input parameters
 	v_returntype := ((p_data->>'data')::json->>'parameters')::json->>'type';
@@ -36,11 +36,20 @@ BEGIN
 
 	IF v_returntype = 'fillExcepTables' THEN -- delete and insert on anl tables
 
-		for v_rec in execute v_querytext		
-		loop
-			execute 'select gw_fct_check_fprocess($${"client":{"device":4, "infoType":1, "lang":"ES"}, 
-		    "form":{},"feature":{},"data":{"parameters":{"process":"finish", "functionFid": '||v_fid||', "checkFid":"'||v_rec.fid||'"}}}$$)';
-		end loop;
+		DELETE FROM audit_check_data WHERE fid in (select fid from t_audit_check_data) and cur_user=current_user;
+		INSERT INTO audit_check_data SELECT * FROM t_audit_check_data;
+
+		DELETE FROM anl_node WHERE fid in (select fid from t_anl_node) and cur_user=current_user;
+		INSERT INTO anl_node SELECT * FROM t_anl_node;
+
+		DELETE FROM anl_connec WHERE fid in (select fid from t_anl_connec) and cur_user=current_user;
+		INSERT INTO anl_connec SELECT * FROM t_anl_connec;
+
+		DELETE FROM anl_arc WHERE fid in (select fid from t_anl_arc) and cur_user=current_user;
+		INSERT INTO anl_arc SELECT * FROM t_anl_arc;
+
+		DELETE FROM anl_polygon WHERE fid in (select fid from t_anl_polygon) and cur_user=current_user;
+		INSERT INTO anl_polygon SELECT * FROM t_anl_polygon;
 
 	ELSIF v_returntype = 'info' THEN
 
@@ -48,7 +57,7 @@ BEGIN
 		FROM (SELECT id, error_message as message FROM t_audit_check_data order by criticity desc, id asc) row;
 		v_result := COALESCE(v_result, '{}');
 		v_result := concat ('{"geometryType":"", "values":',v_result, '}');
-	
+
 	ELSIF v_returntype = 'point' THEN
 
 		v_result = null;

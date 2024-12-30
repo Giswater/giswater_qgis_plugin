@@ -884,4 +884,8 @@ VALUES(3364, 'gw_fct_setcheckdatabase', 'utils', 'function', 'json', 'json', 'Ch
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source")
 VALUES(3366, 'gw_fct_create_logreturn', 'utils', 'function', 'json', 'json', 'Create log return for check functions.', 'role_basic', NULL, 'core');
 
-update sys_fprocess set query_text = replace(query_text,'v_prefix_', 't_');
+
+DELETE FROM sys_param_user where id='utils_checkproject_database';
+DELETE FROM sys_param_user where id='utils_checkproject_qgislayer';
+DELETE FROM sys_param_user where id='qgis_form_initproject_hidden';
+DELETE FROM config_param_system WHERE parameter = 'admin_checkproject';
