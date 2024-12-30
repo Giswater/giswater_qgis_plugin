@@ -135,12 +135,12 @@ WITH
     node_selector AS
         (
         SELECT node_id 
-        FROM node
-        JOIN selector_expl se ON (se.cur_user =current_user AND se.expl_id = node.expl_id) or (se.cur_user = current_user AND se.expl_id = node.expl_id2)
+        FROM node 
         JOIN selector_state s ON s.cur_user =current_user AND node.state =s.state_id
         LEFT JOIN (SELECT node_id FROM node_psector WHERE p_state = 0) a using (node_id) where a.node_id is null
         union all 
-        SELECT node_id FROM node_psector WHERE p_state = 1
+        SELECT node_id FROM node_psector
+        WHERE p_state = 1
         ),
     node_selected AS 
         ( SELECT node.node_id,
@@ -264,9 +264,12 @@ WITH
             ELSE NULL::character varying(16)
         END AS inp_type,
 	    m.closed as closed_valve,
-	    m.broken as broken_valve
+	    m.broken as broken_valve,
+  		sector_table.stylesheet ->> 'featureColor'::text AS sector_style
         FROM node_selector
         JOIN node ON node.node_id = node_selector.node_id
+        JOIN selector_expl se ON (se.cur_user =current_user AND se.expl_id = node.expl_id) or (se.cur_user = current_user AND se.expl_id = node.expl_id2)
+        JOIN selector_sector sc ON (sc.cur_user = CURRENT_USER AND sc.sector_id = node.sector_id) 
         JOIN cat_node ON cat_node.id::text = node.nodecat_id::text
 	    JOIN cat_feature ON cat_feature.id::text = cat_node.nodetype_id::text
 		JOIN value_state_type vst ON vst.id = node.state_type
@@ -315,17 +318,17 @@ AS WITH
 		(
 		SELECT pp.arc_id, pp.state AS p_state
         FROM plan_psector_x_arc pp
-        JOIN selector_psector sp ON sp.cur_user = CURRENT_USER AND sp.psector_id = pp.psector_id
-        ), 
+        JOIN selector_psector sp ON sp.cur_user = CURRENT_USER AND sp.psector_id = pp.psector_id 
+		),
     arc_selector AS 
 		(
         SELECT arc.arc_id
-        FROM arc 
-   		JOIN selector_expl se ON ((se.cur_user = CURRENT_USER AND se.expl_id = arc.expl_id) OR (se.cur_user = CURRENT_USER and se.expl_id = arc.expl_id2))
+        FROM arc
         JOIN selector_state s ON s.cur_user = CURRENT_USER AND arc.state = s.state_id
         left JOIN (SELECT arc_id FROM arc_psector WHERE p_state = 0) a using (arc_id)  where a.arc_id is null
         union all 
-        SELECT arc_id FROM arc_psector WHERE p_state = 0
+        SELECT arc_id FROM arc_psector 
+        WHERE p_state = 1
         ),
     arc_selected AS (
         SELECT arc.arc_id,
@@ -445,9 +448,12 @@ AS WITH
 		CASE
 			WHEN arc.sector_id > 0 AND vst.is_operative = true AND arc.epa_type::text <> 'UNDEFINED'::character varying(16)::text THEN arc.epa_type
 			ELSE NULL::character varying(16)
-		END AS inp_type
+		END AS inp_type,
+		sector_table.stylesheet ->> 'featureColor'::text AS sector_style
 	    FROM arc_selector
-		JOIN arc ON arc.arc_id::text = arc_selector.arc_id::text
+   		JOIN arc ON arc.arc_id::text = arc_selector.arc_id::text
+   		JOIN selector_expl se ON ((se.cur_user = CURRENT_USER AND se.expl_id = arc.expl_id) OR (se.cur_user = CURRENT_USER and se.expl_id = arc.expl_id2))
+        JOIN selector_sector sc ON (sc.cur_user = CURRENT_USER AND sc.sector_id = arc.sector_id) 
 		JOIN cat_arc ON cat_arc.id::text = arc.arccat_id::text
 		JOIN cat_feature ON cat_feature.id::text = cat_arc.arctype_id::text
 		JOIN exploitation ON arc.expl_id = exploitation.expl_id
@@ -511,19 +517,21 @@ WITH
     	),   	
     connec_psector AS
         (
-        SELECT pp.connec_id, pp.psector_id, pp.state AS p_state, FIRST_VALUE(pp.arc_id) OVER (PARTITION BY pp.connec_id, pp.state ORDER BY link_id DESC NULLS LAST, arc_id::int DESC NULLS LAST) AS arc_id 
+        SELECT pp.connec_id, pp.psector_id, pp.state AS p_state, 
+        FIRST_VALUE(pp.link_id) OVER (PARTITION BY pp.connec_id, pp.state ORDER BY link_id DESC NULLS LAST, arc_id::int DESC NULLS LAST) AS link_id,
+        FIRST_VALUE(pp.arc_id) OVER (PARTITION BY pp.connec_id, pp.state ORDER BY link_id DESC NULLS LAST, arc_id::int DESC NULLS LAST) AS arc_id 
         FROM plan_psector_x_connec pp
         JOIN selector_psector sp ON sp.cur_user = current_user AND sp.psector_id = pp.psector_id
         ),
     connec_selector AS
         (
-        SELECT connec_id, arc_id 
-        FROM connec
-        JOIN selector_expl se ON (se.cur_user =current_user AND se.expl_id = connec.expl_id) or (se.cur_user =current_user and se.expl_id = connec.expl_id2)
+        SELECT connec_id, arc_id::varchar(16), null::integer as link_id 
+        FROM connec 
         JOIN selector_state ss ON ss.cur_user =current_user AND connec.state =ss.state_id
         left join (SELECT connec_id, arc_id FROM connec_psector WHERE p_state = 0) a using (connec_id, arc_id) where a.connec_id is null
        	union all
-        SELECT connec_id, arc_id::varchar(16) FROM connec_psector WHERE p_state = 1
+        SELECT DISTINCT connec_id, connec_psector.arc_id::varchar(16), link_id FROM connec_psector
+        WHERE p_state = 1
         ),
     connec_selected AS 
     	(
@@ -616,7 +624,7 @@ WITH
 		connec.customer_code,
 		connec.connec_length,
 		connec.n_hydrometer,
-		connec.arc_id,
+		connec_selector.arc_id,
 		connec.annotation,
 		connec.observ,
 		connec.comment,
@@ -718,9 +726,12 @@ WITH
 		connec.insert_user,
 		date_trunc('second'::text, connec.lastupdate) AS lastupdate,
 		connec.lastupdate_user,
-		connec.the_geom
-	    FROM inp_network_mode, connec_selector nn
-        JOIN connec ON connec.connec_id = nn.connec_id
+		connec.the_geom,
+		sector_table.stylesheet ->> 'featureColor'::text AS sector_style
+	    FROM inp_network_mode, connec_selector
+        JOIN connec ON connec.connec_id = connec_selector.connec_id
+        JOIN selector_expl se ON (se.cur_user =current_user AND se.expl_id = connec.expl_id) or (se.cur_user =current_user and se.expl_id = connec.expl_id2)
+        JOIN selector_sector sc ON (sc.cur_user = CURRENT_USER AND sc.sector_id = connec.sector_id) 
         JOIN cat_connec ON cat_connec.id::text = connec.connecat_id::text
 	    JOIN cat_feature ON cat_feature.id::text = cat_connec.connectype_id::text
 	    JOIN exploitation ON connec.expl_id = exploitation.expl_id
@@ -730,7 +741,7 @@ WITH
 	    LEFT JOIN dma_table ON dma_table.dma_id = connec.dma_id
 	    LEFT JOIN dqa_table ON dqa_table.dqa_id = connec.dqa_id     
 	    LEFT JOIN crm_zone ON crm_zone.id::text = connec.crmzone_id::text
-   	    LEFT JOIN link_planned on connec.connec_id = feature_id
+   	    LEFT JOIN link_planned using (link_id)
 	    LEFT JOIN connec_add e ON e.connec_id::text = connec.connec_id::text
 	    LEFT JOIN value_state_type vst ON vst.id = connec.state_type        
 	    )
@@ -784,7 +795,8 @@ WITH
         JOIN selector_state s ON s.cur_user =current_user AND l.state =s.state_id
         left join (SELECT link_id FROM link_psector WHERE p_state = 0) a using (link_id) where a.link_id is null
         UNION ALL
-        SELECT link_id FROM link_psector WHERE p_state = 1
+        SELECT link_id FROM link_psector 
+        WHERE p_state = 1
         ),                
     link_selected as
     	(
@@ -838,7 +850,8 @@ WITH
 	    END AS inp_type
 		FROM inp_network_mode, link_selector
 	    JOIN link l using (link_id)
-        JOIN selector_expl se ON ((se.cur_user =current_user AND se.expl_id = l.expl_id) or (se.cur_user =current_user AND se.expl_id = l.expl_id2))
+	    JOIN selector_expl se ON ((se.cur_user =current_user AND se.expl_id = l.expl_id) or (se.cur_user =current_user AND se.expl_id = l.expl_id2))
+        JOIN selector_sector sc ON (sc.cur_user = CURRENT_USER AND sc.sector_id = l.sector_id)  
 		JOIN sector_table ON sector_table.sector_id = l.sector_id
 	    LEFT JOIN presszone_table ON presszone_table.presszone_id = l.presszone_id
 	    LEFT JOIN dma_table ON dma_table.dma_id = l.dma_id
