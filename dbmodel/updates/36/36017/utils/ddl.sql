@@ -18,3 +18,18 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node", "col
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"streetname", "dataType":"varchar(100)"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"streetname2", "dataType":"varchar(100)"}}$$);
 
+CREATE TABLE selector_macroexpl (
+macroexpl_id integer,
+cur_user text default current_user);
+
+ALTER TABLE selector_macroexpl ADD CONSTRAINT selector_macroexpl_pkey PRIMARY KEY (macroexpl_id,cur_user);
+
+CREATE TABLE selector_macrosector (
+macrosector_id integer,
+cur_user text default current_user);
+
+ALTER TABLE selector_macrosector ADD CONSTRAINT selector_macrosector_pkey PRIMARY KEY (macrosector_id,cur_user);
+
+
+
+

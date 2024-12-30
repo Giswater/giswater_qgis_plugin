@@ -178,3 +178,6 @@ update cat_feature_node set isexitupperintro=2 where id in ('VIRTUAL_NODE', 'REC
 delete from element where element_id in ('787', '791', '794', '983', '987', '990', '1650', '1653', '1662');
 
 delete from om_visit where id in (386, 389, 390, 575);
+
+update macroexploitation set name ='macroexpl-01', undelete = true where macroexpl_id = 1;
+insert into macroexploitation values (2, 'Other', 'Macroexploitation used for test', true, true);

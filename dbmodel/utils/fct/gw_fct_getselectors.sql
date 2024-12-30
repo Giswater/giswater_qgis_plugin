@@ -98,6 +98,9 @@ v_mincut_node json;
 v_mincut_connec json;
 v_mincut_arc json;
 v_exclude_tab text='';
+v_orderby_query text;
+v_sectorfromexpl boolean;
+
 BEGIN
 
 	-- Set search path to local schema
@@ -106,9 +109,6 @@ BEGIN
 	--  get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
 		INTO v_version;
-
-	raise notice 'GET SELECTORS %', p_data;
-
 
 	-- Get input parameters:
 	v_selector_type := (p_data ->> 'data')::json->> 'selectorType';
@@ -142,6 +142,7 @@ BEGIN
 
 	-- get system variables:
 	v_expl_x_user = (SELECT value FROM config_param_system WHERE parameter = 'admin_exploitation_x_user');
+	v_sectorfromexpl = (SELECT value::json->>'sectorfromexpl' FROM config_param_system WHERE parameter = 'basic_selector_options');
 	v_stylesheet = (SELECT value FROM config_param_system WHERE parameter = 'qgis_form_selector_stylesheet');
 
 	-- when typeahead only one tab is executed
@@ -197,27 +198,130 @@ BEGIN
 		IF v_selectionMode = '' OR v_selectionMode is null then
 			v_selectionMode = 'keepPrevious';
 		END IF;
+	
+		-- order by
+		IF v_tab.tabname != v_currenttab AND v_tab.tabname not like '%acro%' THEN
+			
+			IF v_tab.tabname = 'tab_sector' AND v_sectorfromexpl IS FALSE THEN 
+				v_orderby_query = 'ORDER BY value DESC, orderby';
+			ELSIF v_tab.tabname = 'tab_sector' AND v_sectorfromexpl IS TRUE THEN
+				v_orderby_query = 'ORDER BY orderby';
+			ELSE 
+				v_orderby_query = 'ORDER BY value DESC, orderby';
+			END IF;
+		ELSE 
+			v_orderby_query = 'ORDER BY orderby';
+		END IF;
 
-		-- getting from v_expl_x_user variable to setup v_filterfrominput
-		IF v_selector = 'selector_expl' AND v_expl_x_user THEN
+		-- start process
+		IF v_tab.tabname = 'tab_exploitation_add' AND v_addschema is not null THEN
+			IF v_expl_x_user THEN
+				IF v_filterfrominput IS NULL OR v_filterfrominput = '' THEN
+					v_filterfrominput = ' AND expl_id IN (SELECT expl_id FROM '||v_addschema||'.config_user_x_expl WHERE username = current_user)';
+				ELSE
+					v_filterfrominput = concat (' AND expl_id IN (SELECT expl_id FROM '||v_addschema||'.config_user_x_expl WHERE username = current_user) ', v_typeahead,' LIKE ''%', lower(v_filterfrominput), '%''');
+				END IF;
+			ELSE
+				IF v_filterfrominput IS NULL OR v_filterfrominput = '' THEN
+					v_filterfrominput = ' ';
+				ELSE
+					v_filterfrominput = concat (' ', v_typeahead,' LIKE ''%', lower(v_filterfrominput), '%''');
+				END IF;			
+			END IF;
+
+		ELSIF v_tab.tabname = 'tab_macroexploitation_add'  AND v_addschema is not null THEN
+			IF v_expl_x_user THEN
+				IF v_filterfrominput IS NULL OR v_filterfrominput = '' THEN
+					v_filterfrominput = ' AND macroexpl_id IN (SELECT macroexpl_id FROM '||v_addschema||'.exploitation JOIN config_user_x_expl USING(expl_id) WHERE username = current_user)';
+				ELSE
+					v_filterfrominput = concat (' AND expl_id IN (SELECT macroexpl_id FROM '||v_addschema||'.exploitation JOIN config_user_x_expl USING(expl_id) WHERE username = current_user) ', v_typeahead,' LIKE ''%', lower(v_filterfrominput), '%''');
+				END IF;
+			ELSE
+				IF v_filterfrominput IS NULL OR v_filterfrominput = '' THEN
+					v_filterfrominput = ' ';
+				ELSE
+					v_filterfrominput = concat (' ', v_typeahead,' LIKE ''%', lower(v_filterfrominput), '%''');
+				END IF;			
+			END IF;			
+
+		ELSIF v_selector = 'selector_expl' AND v_expl_x_user THEN
 			IF v_filterfrominput IS NULL OR v_filterfrominput = '' THEN
 				v_filterfrominput = ' AND expl_id IN (SELECT expl_id FROM config_user_x_expl WHERE username = current_user)';
 			ELSE
 				v_filterfrominput = concat (' AND expl_id IN (SELECT expl_id FROM config_user_x_expl WHERE username = current_user) ', v_typeahead,' LIKE ''%', lower(v_filterfrominput), '%''');
 			END IF;
+
+		ELSIF v_selector = 'selector_macroexpl' AND v_expl_x_user THEN
+			IF v_filterfrominput IS NULL OR v_filterfrominput = '' THEN
+				v_filterfrominput = ' AND macroexpl_id IN (SELECT macroexpl_id FROM exploitation JOIN config_user_x_expl USING (expl_id) WHERE username = current_user)';
+			ELSE
+				v_filterfrominput = concat (' AND macroexpl_id IN (SELECT macroexpl_id FROM exploitation JOIN config_user_x_expl USING (expl_id) WHERE username = current_user)) ', v_typeahead,' LIKE ''%', lower(v_filterfrominput), '%''');
+			END IF;
 			
 		ELSIF v_selector = 'selector_sector' THEN
-			IF v_filterfrominput IS NULL OR v_filterfrominput = '' THEN
-				v_filterfrominput = ' AND sector_id IN (SELECT DISTINCT(sector_id) FROM node WHERE expl_id IN (SELECT expl_id from selector_expl where cur_user = current_user))';
+
+			IF v_sectorfromexpl THEN
+				IF v_filterfrominput IS NULL OR v_filterfrominput = '' THEN
+					v_filterfrominput = ' AND sector_id IN (SELECT DISTINCT(sector_id) FROM node WHERE state=1 AND expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user))';
+				ELSE
+					v_filterfrominput = concat (' AND sector_id IN (SELECT DISTINCT(sector_id) FROM node WHERE state=1 AND expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user)) ', v_typeahead,' LIKE ''%', lower(v_filterfrominput), '%''');
+				END IF;
+
 			ELSE
-				v_filterfrominput = concat (' AND sector_id IN (SELECT DISTINCT(sector_id) FROM node WHERE expl_id IN (SELECT expl_id from selector_expl where cur_user = current_user)) ', v_typeahead,' LIKE ''%', lower(v_filterfrominput), '%''');
+				IF v_expl_x_user THEN
+					IF v_filterfrominput IS NULL OR v_filterfrominput = '' THEN
+						v_filterfrominput = ' AND sector_id IN (SELECT DISTINCT(sector_id) FROM node WHERE state=1 AND expl_id IN (SELECT expl_id FROM config_user_x_expl WHERE username = current_user))';
+					ELSE
+						v_filterfrominput = concat (' AND sector_id IN (SELECT DISTINCT(sector_id) FROM node WHERE state=1 AND expl_id IN (SELECT expl_id FROM config_user_x_expl WHERE username = current_user)) ', v_typeahead,' LIKE ''%', lower(v_filterfrominput), '%''');
+					END IF;
+				ELSE
+					IF v_filterfrominput IS NULL OR v_filterfrominput = '' THEN
+						v_filterfrominput = ' ';
+					ELSE
+						v_filterfrominput = concat (' ', v_typeahead,' LIKE ''%', lower(v_filterfrominput), '%''');	
+					END IF;
+				END IF;
 			END IF;
 
-		ELSIF v_selector = 'selector_municipality' THEN
-			IF v_filterfrominput IS NULL OR v_filterfrominput = '' THEN
-				v_filterfrominput = ' AND muni_id IN (SELECT DISTINCT(muni_id) FROM node WHERE expl_id IN (SELECT expl_id from selector_expl where cur_user = current_user))';
+		ELSIF v_selector = 'selector_macrosector' THEN
+
+			IF v_sectorfromexpl THEN
+				IF v_filterfrominput IS NULL OR v_filterfrominput = '' THEN
+					v_filterfrominput = ' AND macrosector_id IN (SELECT DISTINCT(macrosector_id) FROM v_edit_node WHERE state>0 AND expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user))';
+				ELSE
+					v_filterfrominput = concat (' AND macrosector_id IN (SELECT DISTINCT(macrosector_id) FROM v_edit_node WHERE state=1 AND expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user)) ', v_typeahead,' LIKE ''%', lower(v_filterfrominput), '%''');
+				END IF;
+
 			ELSE
-				v_filterfrominput = concat (' AND muni_id IN (SELECT DISTINCT(muni_id) FROM node WHERE expl_id IN (SELECT expl_id from selector_expl where cur_user = current_user)) ', v_typeahead,' LIKE ''%', lower(v_filterfrominput), '%''');
+				IF v_expl_x_user THEN
+					IF v_filterfrominput IS NULL OR v_filterfrominput = '' THEN
+						v_filterfrominput = ' AND macrosector_id IN (SELECT DISTINCT(macrosector_id) FROM v_edit_node WHERE state>0 AND expl_id IN (SELECT expl_id FROM config_user_x_expl WHERE username = current_user))';
+					ELSE
+						v_filterfrominput = concat (' AND macrosector_id IN (SELECT DISTINCT(macrosector_id) FROM v_edit_node WHERE state>0 AND expl_id IN (SELECT expl_id FROM config_user_x_expl WHERE username = current_user)) ', v_typeahead,' LIKE ''%', lower(v_filterfrominput), '%''');
+					END IF;
+				ELSE
+					IF v_filterfrominput IS NULL OR v_filterfrominput = '' THEN
+						v_filterfrominput = ' ';
+					ELSE
+						v_filterfrominput = concat (' ', v_typeahead,' LIKE ''%', lower(v_filterfrominput), '%''');	
+					END IF;
+				END IF;
+			END IF;
+
+		ELSIF v_selector = 'selector_municipality' THEN 
+
+			IF v_expl_x_user THEN
+				IF v_filterfrominput IS NULL OR v_filterfrominput = '' THEN
+					v_filterfrominput = ' AND muni_id IN (SELECT DISTINCT(muni_id) FROM node WHERE state=1 AND expl_id IN (SELECT expl_id FROM config_user_x_expl WHERE username = current_user))';
+				ELSE
+					v_filterfrominput = concat (' AND muni_id IN (SELECT DISTINCT(muni_id) FROM node WHERE state=1 AND expl_id IN (SELECT expl_id FROM config_user_x_expl WHERE username = current_user)) ', v_typeahead,' LIKE ''%', lower(v_filterfrominput), '%''');
+				END IF;
+			ELSE
+				IF v_filterfrominput IS NULL OR v_filterfrominput = '' THEN
+					v_filterfrominput = ' ';
+				ELSE
+					v_filterfrominput = concat (' ', v_typeahead,' LIKE ''%', lower(v_filterfrominput), '%''');
+				END IF;
 			END IF;
 
 		ELSE
@@ -237,7 +341,6 @@ BEGIN
 			END IF;
 		END IF;
 
-
 		-- built full filter
 		v_fullfilter = concat(v_filterfromids, v_filterfromconfig, v_filterfrominput);
 
@@ -249,116 +352,24 @@ BEGIN
 
 		-- profilactic null control
 		v_fullfilter := COALESCE(v_fullfilter, '');
-		IF v_tab.tabname ='tab_macroexploitation' OR v_tab.tabname='tab_macrosector'  or v_tab.tabname ='tab_macroexploitation_add' THEN
 
-			IF v_tab.tabname ='tab_macroexploitation' or v_tab.tabname ='tab_macroexploitation_add' THEN
-				v_zonetable='exploitation';
-				v_zoneid = 'expl_id';
-				v_macroid = 'macroexpl_id';
-				v_macrotable = 'macroexploitation';
-				v_macroselector = 'selector_expl';
-				--EXECUTE 'SELECT array_agg(macroexpl_id) FROM macroexploitation' INTO v_ids;
-			ELSIF v_tab.tabname='tab_macrosector' THEN
-				v_zonetable='sector';
-				v_zoneid = 'sector_id';
-				v_macroid = 'macrosector_id';
-				v_macrotable = 'macrosector';
-				v_macroselector = 'selector_sector';
-				--EXECUTE 'SELECT array_agg(macrosector_id) FROM v_edit_macrosector' INTO v_ids;
-			END IF;
-
-
-			if v_addschema is NULL then
-				v_query = 'SELECT '||v_macroid||' FROM '||v_macrotable||'';
-			else
-				v_query = 'SELECT '||v_macroid||' FROM '||v_addschema||'.'||v_macrotable||'';
-			end if;
-
-				FOR rec_macro IN EXECUTE v_query LOOP
-
-					IF v_tab.tabname ='tab_macroexploitation_add' and (v_addschema IS NOT NULL) THEN
-
-						EXECUTE 'SELECT count('||v_zoneid||') as count  FROM '||v_addschema||'.'||v_zonetable||' 
-						WHERE '||v_macroid||'='||rec_macro||' and active IS TRUE group by '||v_macroid||''
-						INTO v_count_zone;
-
-						EXECUTE 'SELECT count(*) FROM '||v_addschema||'.'||v_macroselector||' JOIN '||v_addschema||'.'||v_zonetable||' USING ('||v_zoneid||') 
-						WHERE '||v_macroid||'='||rec_macro||'  AND active IS TRUE AND cur_user=current_user'
-						INTO v_count_selector;
-					ELSE
-
-						EXECUTE 'SELECT count('||v_zoneid||') as count  FROM '||v_zonetable||' WHERE '||v_macroid||'='||rec_macro||' and active IS TRUE group by '||v_macroid||''
-						INTO v_count_zone;
-
-						EXECUTE 'SELECT count(*) FROM '||v_macroselector||' JOIN '||v_zonetable||' USING ('||v_zoneid||') 
-						WHERE '||v_macroid||'='||rec_macro||'  AND active IS TRUE AND cur_user=current_user'
-						INTO v_count_selector;
-					END IF;
-
-					IF v_count_zone = v_count_selector THEN
-
-						IF v_ids IS NULL THEN
-							v_ids = rec_macro::text;
-						ELSE
-							v_ids = concat(v_ids,',',rec_macro::text );
-						END IF;
-					END IF;
-				 END LOOP;
-
-			v_ids = replace(v_ids,'{','');
-			v_ids = replace(v_ids,'}','');
-
-			IF v_ids IS NULL THEN v_ids='0'; END IF;
-				IF v_tab.tabname ='tab_macroexploitation_add' and v_addschema IS NOT NULL THEN
-					v_finalquery = concat('SELECT array_to_json(array_agg(row_to_json(a))) FROM (
-						SELECT ',quote_ident(v_table_id),', concat(' , v_label , ') AS label, ',v_orderby,' as orderby , ',v_name,' as name, ', v_table_id , '::text as widgetname, ''' ,
-						v_selector_id , ''' as columnname, ''check'' as type, ''boolean'' as "dataType", true as "value" 
-						FROM ',v_addschema,'.' , v_table , ' m JOIN  ',v_addschema,'.', v_zonetable , '  USING (',v_table_id,') 
-						WHERE ',v_table_id ,' IN (' , v_ids, ') ', v_fullfilter ,' UNION 
-						SELECT ',quote_ident(v_table_id),', concat(' , v_label , ') AS label, ',v_orderby,' as orderby , ',v_name,' as name, ', v_table_id , '::text as widgetname, ''' ,
-						v_selector_id , ''' as columnname, ''check'' as type, ''boolean'' as "dataType", false as "value" 
-						FROM ',v_addschema,'.', v_table , ' m JOIN   ',v_addschema,'.', v_zonetable , '    USING (',v_table_id,')
-						WHERE ',v_table_id ,' NOT IN (' , v_ids, ') ',
-						 v_fullfilter ,' ORDER BY orderby asc) a');
-				ELSE
-
-				v_finalquery = concat('SELECT array_to_json(array_agg(row_to_json(a))) FROM (
-						SELECT ',quote_ident(v_table_id),', concat(' , v_label , ') AS label, ',v_orderby,' as orderby , ',v_name,' as name, ', v_table_id , '::text as widgetname, ''' ,
-						v_selector_id , ''' as columnname, ''check'' as type, ''boolean'' as "dataType", true as "value" 
-						FROM ' , v_table , ' m JOIN  ' , v_zonetable , '  USING (',v_table_id,') 
-						WHERE ',v_table_id ,' IN (' , v_ids, ') ', v_fullfilter ,' UNION 
-						SELECT ',quote_ident(v_table_id),', concat(' , v_label , ') AS label, ',v_orderby,' as orderby , ',v_name,' as name, ', v_table_id , '::text as widgetname, ''' ,
-						v_selector_id , ''' as columnname, ''check'' as type, ''boolean'' as "dataType", false as "value" 
-						FROM ' , v_table , ' m JOIN   ' , v_zonetable , '    USING (',v_table_id,')
-						WHERE ',v_table_id ,' NOT IN (' , v_ids, ') ',
-						 v_fullfilter ,' ORDER BY orderby asc) a');
-				END IF;
-		ELSIF v_tab.tabname ='tab_exploitation_add' and v_addschema IS NOT NULL THEN
-			v_finalquery = concat('SELECT array_to_json(array_agg(row_to_json(a))) FROM (
-						SELECT ',quote_ident(v_table_id),', concat(' , v_label , ') AS label, ',v_orderby,' as orderby , ',v_name,' as name, ', v_table_id , '::text as widgetname, ''' ,
-						v_selector_id , ''' as columnname, ''check'' as type, ''boolean'' as "dataType", true as "value" 
-						FROM ',v_addschema,'.' , v_table , ' m 
-						WHERE ',v_table_id ,' NOT IN (SELECT ',v_table_id ,' FROM  ws36007.', v_table , ') AND ' ,
-						v_table_id , ' IN (SELECT ' , v_selector_id , ' FROM ',v_addschema,'.' , v_selector ,' WHERE cur_user=' , quote_literal(current_user) , ') ', v_fullfilter ,' UNION 
-						SELECT ',quote_ident(v_table_id),', concat(' , v_label , ') AS label, ',v_orderby,' as orderby , ',v_name,' as name, ', v_table_id , '::text as widgetname, ''' ,
-						v_selector_id , ''' as columnname, ''check'' as type, ''boolean'' as "dataType", false as "value" 
-						FROM ',v_addschema,'.', v_table , ' m
-						WHERE ',v_table_id ,' NOT IN (SELECT ',v_table_id ,' FROM  ws36007.', v_table , ') AND ' ,
-						v_table_id , ' NOT IN (SELECT ' , v_selector_id , ' FROM ',v_addschema,'.' , v_selector ,' WHERE cur_user=' , quote_literal(current_user) , ') ', v_fullfilter ,' ORDER BY orderby asc) a');
-
-		ELSE
-
-			v_finalquery = concat('SELECT array_to_json(array_agg(row_to_json(b))) FROM (
-					select *, row_number() OVER (ORDER BY orderby) as orderby from (
-					SELECT ',quote_ident(v_table_id),', concat(' , v_label , ') AS label, ',v_name,' as name, ', v_table_id , '::text as widgetname, ' ,
-					v_orderby, ' as orderby , ''', v_selector_id , ''' as columnname, ''check'' as type, ''boolean'' as "dataType", true as "value" 
-					FROM ', v_table ,' WHERE ' , v_table_id , ' IN (SELECT ' , v_selector_id , ' FROM ', v_selector ,' WHERE cur_user=' , quote_literal(current_user) , ') ', v_fullfilter ,' UNION 
-					SELECT ',quote_ident(v_table_id),', concat(' , v_label , ') AS label, ',v_name,' as name, ', v_table_id , '::text as widgetname, ' ,
-					v_orderby, ' , ''',v_selector_id , ''' as columnname, ''check'' as type, ''boolean'' as "dataType", false as "value" 
-					FROM ', v_table ,' WHERE ' , v_table_id , ' NOT IN (SELECT ' , v_selector_id , ' FROM ', v_selector ,' WHERE cur_user=' , quote_literal(current_user) , ') ',
-					 v_fullfilter ,') a)b');
-
+		-- setting schema add
+		IF v_tab.tabname like '%add%' AND v_addschema IS NOT  NULL THEN
+			v_table = concat(v_addschema,'.',v_table);
+			v_selector = concat(v_addschema,'.',v_selector);
 		END IF;
+
+		-- final query
+		v_finalquery = concat('SELECT array_to_json(array_agg(row_to_json(b))) FROM (
+				select *, row_number() OVER (',v_orderby_query,') as orderby from (
+				SELECT ',quote_ident(v_table_id),', concat(' , v_label , ') AS label, ',v_name,' as name, ', v_table_id , '::text as widgetname, ' ,
+				v_orderby, ' as orderby , ''', v_selector_id , ''' as columnname, ''check'' as type, ''boolean'' as "dataType", true as "value" 
+				FROM ', v_table ,' WHERE ' , v_table_id , ' IN (SELECT ' , v_selector_id , ' FROM ', v_selector ,' WHERE cur_user=' , quote_literal(current_user) , ') ', v_fullfilter ,' UNION 
+				SELECT ',quote_ident(v_table_id),', concat(' , v_label , ') AS label, ',v_name,' as name, ', v_table_id , '::text as widgetname, ' ,
+				v_orderby, ' , ''',v_selector_id , ''' as columnname, ''check'' as type, ''boolean'' as "dataType", false as "value" 
+				FROM ', v_table ,' WHERE ' , v_table_id , ' NOT IN (SELECT ' , v_selector_id , ' FROM ', v_selector ,' WHERE cur_user=' , quote_literal(current_user) , ') ',
+				 v_fullfilter ,') a)b');
+
 		v_debug_vars := json_build_object('v_table_id', v_table_id, 'v_label', v_label, 'v_orderby', v_orderby, 'v_name', v_name, 'v_selector_id', v_selector_id,
 						  'v_table', v_table, 'v_selector', v_selector, 'current_user', current_user, 'v_fullfilter', v_fullfilter);
 		v_debug := json_build_object('querystring', v_finalquery, 'vars', v_debug_vars, 'funcname', 'gw_fct_getselectors', 'flag', 30);

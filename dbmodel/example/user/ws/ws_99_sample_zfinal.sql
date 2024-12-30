@@ -124,3 +124,6 @@ UPDATE om_visit SET ext_code = concat('EXT', 1000 + id);
 UPDATE ext_plot set muni_id = 2 where id::integer < 40;
 
 UPDATE config_form_fields SET dv_querytext = 'SELECT muni_id as id, name as idval from v_ext_municipality WHERE muni_id IS NOT NULL' WHERE columnname  = 'muni_id' AND widgettype = 'combo';
+
+update macroexploitation set name ='macroexpl-01', undelete = true where macroexpl_id = 1;
+insert into macroexploitation values (2, 'Other', 'Macroexploitation used for test', true, true);
