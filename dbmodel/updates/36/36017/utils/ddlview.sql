@@ -16,8 +16,6 @@ JOIN config_user_x_expl USING (expl_id)
 where username = current_user and expl_id > 0
 order by 1;
 
-select * from config_user_x_expl
-
 CREATE OR REPLACE VIEW vu_macroexploitation as
 select distinct on (macroexpl_id) m.* from macroexploitation m
 join exploitation using (macroexpl_id)

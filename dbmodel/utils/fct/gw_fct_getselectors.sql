@@ -224,7 +224,9 @@ BEGIN
 		IF v_sectorfromexpl THEN
 			IF v_tab.tabname = 'tab_sector' THEN
 				v_filterfrominput = concat (COALESCE(v_filterfrominput),
-				' AND sector_id IN (SELECT DISTINCT sector_id FROM node JOIN selector_expl USING (expl_id) WHERE cur_user = current_user) ');
+				' AND sector_id IN (SELECT DISTINCT sector_id FROM node JOIN selector_expl USING (expl_id) WHERE cur_user = current_user
+									UNION
+									SELECT sector_id FROM sector LEFT JOIN node USING (sector_id) WHERE node.sector_id is null)');
 
 			ELSIF v_tab.tabname = 'tab_macrosector' THEN
 				v_filterfrominput = concat (COALESCE(v_filterfrominput),
@@ -250,6 +252,11 @@ BEGIN
 			IF v_selector_list != '' THEN
 				v_filterfromids = ' AND ' || v_table_id || ' IN '|| v_selector_list || ' ';
 			END IF;
+		END IF;
+
+		-- manage active mapzones
+		IF v_tab.tabname IN ('tab_sector', 'tab_exploitation', 'tab_macroexploitation', 'tab_macrosector') THEN
+			v_filterfrominput = CONCAT (v_filterfrominput, ' AND active ');
 		END IF;
 
 		-- built full filter 

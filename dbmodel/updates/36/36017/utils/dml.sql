@@ -54,7 +54,7 @@ INSERT INTO sys_table (id, descript, sys_role, source) VALUES ('vu_ext_municipal
 INSERT INTO sys_table (id, descript, sys_role, source) VALUES ('vu_om_mincut','View of all mincuts related to user', 'role_basic', 'core');
 
 update config_param_system
-set value = '{"table":"vu_sector","selector":"selector_sector","table_id":"sector_id","selector_id":"sector_id","label":"sector_id, '' - '', name","orderBy":"sector_id","manageAll":true,"query_filter":"","typeaheadFilter":" AND lower(concat(sector_id, '' - '', name))","typeaheadForced":true, "orderbyCheck":false}'
+set value = '{"table":"vu_sector","selector":"selector_sector","table_id":"sector_id","selector_id":"sector_id","label":"sector_id, '' - '', name","orderBy":"sector_id","manageAll":true,"query_filter":"","typeaheadFilter":" AND lower(concat(sector_id, '' - '', name))", "selectionMode":"keepPreviousUsingShift", "orderbyCheck":false}'
 where parameter = 'basic_selector_tab_sector';	
 
 update config_param_system
@@ -66,7 +66,7 @@ set value = '{"table":"vu_ext_municipality","selector":"selector_municipality","
 where parameter = 'basic_selector_tab_municipality';	
 
 update config_param_system
-set value = '{"table":"vu_macroexploitation","selector":"selector_expl","table_id":"macroexpl_id","selector_id":"expl_id","label":"macroexpl_id, '' - '', name","orderBy":"macroexpl_id","manageAll":true,"query_filter":"","typeaheadFilter":" AND lower(concat(macroexpl_id, '' - '', name))", "sectorFromMacroexpl":true, "orderbyCheck":false}'
+set value = '{"table":"vu_macroexploitation","selector":"selector_expl","table_id":"macroexpl_id","selector_id":"expl_id","label":"macroexpl_id, '' - '', name","orderBy":"macroexpl_id","manageAll":true,"query_filter":"","typeaheadFilter":" AND lower(concat(macroexpl_id, '' - '', name))", "selectionMode":"keepPreviousUsingShift", "orderbyCheck":false}'
 where parameter = 'basic_selector_tab_macroexploitation_add';	
 
 update config_param_system
