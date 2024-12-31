@@ -866,10 +866,9 @@ select distinct on (m.id) m.* from om_mincut m
 JOIN config_user_x_expl USING (expl_id)
 where username = current_user and m.id > 0;
 
-
 CREATE OR REPLACE VIEW vu_sector as
-SELECT distinct on (sector_id) s.sector_id,
-	s.name,
+SELECT DISTINCT ON (s.sector_id) s.sector_id,
+    s.name,
     s.macrosector_id,
     m.name AS macrosector_name,
     et.idval,
@@ -888,12 +887,61 @@ SELECT distinct on (sector_id) s.sector_id,
     s.lastupdate_user,
     s.the_geom
    FROM sector s
-	 JOIN (SELECT DISTINCT sector_id, expl_id FROM node WHERE state > 0) a USING (sector_id)
-	 JOIN config_user_x_expl USING (expl_id)
+     JOIN ( SELECT DISTINCT node.sector_id, node.expl_id FROM node  WHERE node.state > 0) a USING (sector_id)
+     JOIN config_user_x_expl USING (expl_id)
      LEFT JOIN macrosector m USING (macrosector_id)
      LEFT JOIN edit_typevalue et ON et.id::text = s.sector_type::text AND et.typevalue::text = 'sector_type'::text
-     where username = current_user and s.active and sector_id > 0
-  ORDER BY 1;
- 
- 
- 
+  WHERE config_user_x_expl.username::text = CURRENT_USER AND s.sector_id > 0
+  UNION
+  select s.sector_id,
+    s.name,
+    s.macrosector_id,
+    m.name AS macrosector_name,
+    et.idval,
+    s.descript,
+    s.parent_id,
+    s.pattern_id,
+    s.graphconfig::text AS graphconfig,
+    s.stylesheet::text AS stylesheet,
+    s.link,
+    s.avg_press,
+    s.active,
+    s.undelete,
+    s.tstamp,
+    s.insert_user,
+    s.lastupdate,
+    s.lastupdate_user,
+    s.the_geom
+   FROM sector s
+     LEFT JOIN ( SELECT DISTINCT node.sector_id, node.expl_id FROM node  WHERE node.state > 0) a USING (sector_id)
+     LEFT JOIN macrosector m USING (macrosector_id)
+     LEFT JOIN edit_typevalue et ON et.id::text = s.sector_type::text AND et.typevalue::text = 'sector_type'::text
+  where s.sector_id > 0 and a.sector_id is null  
+   ORDER BY 1;
+   
+  
+  CREATE OR REPLACE VIEW v_edit_sector
+AS SELECT vu_sector.sector_id,
+    vu_sector.name,
+    vu_sector.macrosector_id,
+    vu_sector.macrosector_name,
+    vu_sector.idval,
+    vu_sector.descript,
+    vu_sector.parent_id,
+    vu_sector.pattern_id,
+    vu_sector.graphconfig,
+    vu_sector.stylesheet,
+    vu_sector.link,
+    vu_sector.avg_press,
+    vu_sector.active,
+    vu_sector.undelete,
+    vu_sector.tstamp,
+    vu_sector.insert_user,
+    vu_sector.lastupdate,
+    vu_sector.lastupdate_user,
+    vu_sector.the_geom
+   FROM vu_sector,
+    selector_sector
+  WHERE vu_sector.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text
+  and active is true;
+  

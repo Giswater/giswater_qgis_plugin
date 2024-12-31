@@ -1014,7 +1014,44 @@ SELECT distinct on (sector_id) s.sector_id,
 	 JOIN config_user_x_expl USING (expl_id)
      LEFT JOIN macrosector m USING (macrosector_id)
      LEFT JOIN edit_typevalue et ON et.id::text = s.sector_type::text AND et.typevalue::text = 'sector_type'::text
-     where username = current_user and s.active and sector_id > 0
-  ORDER BY 1;
-	
-	
+     where username = current_user and sector_id > 0
+     union 
+     SELECT distinct on (sector_id) s.sector_id,
+	s.name,
+    s.macrosector_id,
+    m.name AS macrosector_name,
+    et.idval,
+    s.descript,
+    s.parent_id,
+    s.graphconfig::text AS graphconfig,
+    s.stylesheet::text AS stylesheet,
+    s.link,
+    s.active,
+    s.undelete,
+    s.tstamp,
+    s.insert_user,
+    s.lastupdate,
+    s.lastupdate_user,
+    s.the_geom
+	FROM sector s
+     LEFT JOIN ( SELECT DISTINCT node.sector_id, node.expl_id FROM node  WHERE node.state > 0) a USING (sector_id)
+     LEFT JOIN macrosector m USING (macrosector_id)
+     LEFT JOIN edit_typevalue et ON et.id::text = s.sector_type::text AND et.typevalue::text = 'sector_type'::text
+  where s.sector_id > 0 and a.sector_id is null  
+  ORDER BY 1;	
+  
+ 
+CREATE OR REPLACE VIEW v_edit_sector
+AS SELECT sector.sector_id,
+    sector.name,
+    sector.descript,
+    sector.macrosector_id,
+    sector.sector_type,
+    sector.the_geom,
+    sector.undelete,
+    sector.active,
+    sector.parent_id,
+    sector.graphconfig::text AS graphconfig,
+    sector.stylesheet
+   FROM selector_sector, sector
+  WHERE sector.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text and active is true;
