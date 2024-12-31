@@ -20,4 +20,8 @@ CREATE INDEX connec_streetname2 ON connec USING btree (streetname2);
 
 CREATE INDEX link_expl_id2 ON link USING btree (expl_id2);
 
+ALTER TABLE config_user_x_expl DROP CONSTRAINT config_user_x_expl_expl_id_fkey;
+ALTER TABLE config_user_x_expl ADD CONSTRAINT config_user_x_expl_expl_id_fkey 
+FOREIGN KEY (expl_id) REFERENCES ws36017_1.exploitation(expl_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
 
