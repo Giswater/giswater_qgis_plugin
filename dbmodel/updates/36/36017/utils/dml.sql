@@ -73,6 +73,10 @@ update config_param_system
 set value = '{"table":"vu_om_mincut","table_id":"id","selector":"selector_mincut_result","selector_id":"result_id","label":"id, ''('', CASE WHEN work_order IS NULL THEN ''N/I'' ELSE work_order END, '') on '', forecast_start::date, '' at '', forecast_start::time, ''H-'', forecast_end::time,''H''","query_filter":"","manageAll":true}'
 where parameter = 'basic_selector_tab_mincut';	
 
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source")
+VALUES(3368, 'gw_trg_exploitation', 'utils', 'trigger function', null, null, 'Manage insert into config_user_x_expl table.', 'role_basic', NULL, 'core');
+
+
 
 
 
