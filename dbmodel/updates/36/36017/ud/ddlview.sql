@@ -536,12 +536,12 @@ with
         ),
     connec_selector AS
         (
-        SELECT connec_id, arc_id, NULL::integer as link_id 
+        SELECT connec_id, arc_id::varchar(16), NULL::integer as link_id 
         FROM connec 
         JOIN selector_state ss ON ss.cur_user =current_user AND connec.state =ss.state_id
-        left join (SELECT connec_id, arc_id FROM connec_psector WHERE p_state = 0) a using (connec_id, arc_id) where a.connec_id is null
+        left join (SELECT connec_id, arc_id::varchar(16) FROM connec_psector WHERE p_state = 0) a using (connec_id, arc_id) where a.connec_id is null
        	union all
-        SELECT DISTINCT connec_id, connec_psector.arc_id, link_id FROM connec_psector
+        SELECT DISTINCT connec_id, connec_psector.arc_id::varchar(16), link_id FROM connec_psector
         WHERE p_state = 1
         ),
     connec_selected AS 

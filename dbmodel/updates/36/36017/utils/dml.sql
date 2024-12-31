@@ -44,8 +44,8 @@ values ('basic_selector_options', '{"sectorFromExpl":true, "explFromMacro":true,
 
 UPDATE config_param_system set isenabled = false where parameter = 'basic_selector_tab_municipality';
 
-INSERT INTO sys_table ('selector_macroexpl',);
-INSERT INTO sys_table ('selector_macrosector',);
+INSERT INTO sys_table (id, descript, sys_role, source) VALUES ('selector_macroexpl','Selector for macroexploitations', 'role_basic', 'core');
+INSERT INTO sys_table (id, descript, sys_role, source) VALUES ('selector_macrosector','Selector for macroexploitations', 'role_basic', 'core');
 
 INSERT INTO sys_table (id, descript, sys_role, source) VALUES ('vu_exploitation','View of all exploitations related to user', 'role_basic', 'core');
 INSERT INTO sys_table (id, descript, sys_role, source) VALUES ('vu_macroexploitation','View of all macroexploitations related to user', 'role_basic', 'core');
