@@ -504,8 +504,8 @@ class GwSelector:
             pass
         
         # Build and Apply filters
-        muni_filter, expl_filter, sector_filter = self._build_filter()
-        self._apply_filter(muni_filter, expl_filter, sector_filter)
+        # muni_filter, expl_filter, sector_filter = self._build_filter()
+        # self._apply_filter(muni_filter, expl_filter, sector_filter)
 
         # Refresh canvas
         tools_qgis.set_layer_index('v_edit_arc')

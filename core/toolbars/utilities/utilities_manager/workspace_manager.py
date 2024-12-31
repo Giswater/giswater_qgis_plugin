@@ -290,7 +290,7 @@ class GwWorkspaceManagerButton(GwAction):
             self._check_goe2pa_options()
 
             # Build and Apply filters
-            tools_gw.reload_layers_filters()
+            # tools_gw.reload_layers_filters()
 
 
     def _check_goe2pa_options(self, tab_name=None):
