@@ -1014,7 +1014,7 @@ SELECT distinct on (sector_id) s.sector_id,
 	 JOIN config_user_x_expl USING (expl_id)
      LEFT JOIN macrosector m USING (macrosector_id)
      LEFT JOIN edit_typevalue et ON et.id::text = s.sector_type::text AND et.typevalue::text = 'sector_type'::text
-     where username = current_user and sector_id > 0
+     where username = current_user and (sector_id > 0 or sector <-9)
      union 
      SELECT distinct on (sector_id) s.sector_id,
 	s.name,
@@ -1037,7 +1037,7 @@ SELECT distinct on (sector_id) s.sector_id,
      LEFT JOIN ( SELECT DISTINCT node.sector_id, node.expl_id FROM node  WHERE node.state > 0) a USING (sector_id)
      LEFT JOIN macrosector m USING (macrosector_id)
      LEFT JOIN edit_typevalue et ON et.id::text = s.sector_type::text AND et.typevalue::text = 'sector_type'::text
-  where s.sector_id > 0 and a.sector_id is null  
+  where  (s.sector_id > 0 or s.sector <-9) and a.sector_id is null  
   ORDER BY 1;	
   
  
