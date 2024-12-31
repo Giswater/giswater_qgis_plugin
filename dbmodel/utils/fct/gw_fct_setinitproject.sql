@@ -33,6 +33,7 @@ v_epsg integer;
 v_message text;
 v_return json;
 v_addschema text;
+v_expl_x_user boolean;
 
 BEGIN
 
@@ -40,7 +41,10 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 	v_schemaname = 'SCHEMA_NAME';
 
+	-- get system parameters
 	SELECT project_type, giswater, epsg INTO v_project_type, v_version, v_epsg FROM sys_version order by id desc limit 1;
+	v_expl_x_user = (SELECT value FROM config_param_system WHERE parameter = 'admin_exploitation_x_user');
+
 
 	-- Get input parameters
    	v_user := (p_data ->> 'client')::json->> 'cur_user';
@@ -81,6 +85,11 @@ BEGIN
 	-- delete on config_param_user fron updated values on sys_param_user
 	DELETE FROM config_param_user WHERE parameter NOT IN (SELECT id FROM sys_param_user) AND cur_user = current_user;
 
+	-- insert expl_x_user
+	IF v_expl_x_user IS FALSE THEN
+		INSERT INTO config_user_x_expl SELECT distinct ON (expl_id) expl_id, current_user 
+		from config_user_x_expl ON CONFLICT (expl_id, username) DO NOTHING;
+	END IF;
 
 	-- Force exploitation selector in case of null values
 	IF v_qgis_init_guide_map AND (v_isaudit IS NULL OR v_isaudit = 'false') THEN

@@ -858,4 +858,42 @@ WITH
 	    LEFT JOIN dqa_table ON dqa_table.dqa_id = l.dqa_id
 		)
     SELECT l.*
-	FROM link_selected l;	 
+	FROM link_selected l;
+	
+
+CREATE OR REPLACE VIEW vu_om_mincut as
+select distinct on (m.id) m.* from om_mincut m
+JOIN config_user_x_expl USING (expl_id)
+where username = current_user and m.id > 0;
+
+
+CREATE OR REPLACE VIEW vu_sector as
+SELECT distinct on (sector_id) s.sector_id,
+	s.name,
+    s.macrosector_id,
+    m.name AS macrosector_name,
+    et.idval,
+    s.descript,
+    s.parent_id,
+    s.pattern_id,
+    s.graphconfig::text AS graphconfig,
+    s.stylesheet::text AS stylesheet,
+    s.link,
+    s.avg_press,
+    s.active,
+    s.undelete,
+    s.tstamp,
+    s.insert_user,
+    s.lastupdate,
+    s.lastupdate_user,
+    s.the_geom
+   FROM sector s
+	 JOIN (SELECT DISTINCT sector_id, expl_id FROM node WHERE state > 0) a USING (sector_id)
+	 JOIN config_user_x_expl USING (expl_id)
+     LEFT JOIN macrosector m USING (macrosector_id)
+     LEFT JOIN edit_typevalue et ON et.id::text = s.sector_type::text AND et.typevalue::text = 'sector_type'::text
+     where username = current_user and s.active and sector_id > 0
+  ORDER BY 1;
+ 
+ 
+ 

@@ -984,10 +984,37 @@ WITH
      SELECT link_selected.*
 	 FROM link_selected;	
   
-	drop view v_edit_link_connec;
-	create or replace view v_edit_link_connec as select * from v_edit_link where feature_type = 'CONNEC';
+drop view v_edit_link_connec;
+create or replace view v_edit_link_connec as select * from v_edit_link where feature_type = 'CONNEC';
 
-	drop view v_edit_link_gully;
-	create or replace view v_edit_link_gully as select * from v_edit_link where feature_type = 'GULLY'; 
+drop view v_edit_link_gully;
+create or replace view v_edit_link_gully as select * from v_edit_link where feature_type = 'GULLY'; 
+	
+-- 31/12/2024	
+CREATE OR REPLACE VIEW vu_sector as
+SELECT distinct on (sector_id) s.sector_id,
+	s.name,
+    s.macrosector_id,
+    m.name AS macrosector_name,
+    et.idval,
+    s.descript,
+    s.parent_id,
+    s.graphconfig::text AS graphconfig,
+    s.stylesheet::text AS stylesheet,
+    s.link,
+    s.active,
+    s.undelete,
+    s.tstamp,
+    s.insert_user,
+    s.lastupdate,
+    s.lastupdate_user,
+    s.the_geom
+   FROM sector s
+	 JOIN (SELECT DISTINCT sector_id, expl_id FROM node WHERE state > 0) a USING (sector_id)
+	 JOIN config_user_x_expl USING (expl_id)
+     LEFT JOIN macrosector m USING (macrosector_id)
+     LEFT JOIN edit_typevalue et ON et.id::text = s.sector_type::text AND et.typevalue::text = 'sector_type'::text
+     where username = current_user and s.active and sector_id > 0
+  ORDER BY 1;
 	
 	

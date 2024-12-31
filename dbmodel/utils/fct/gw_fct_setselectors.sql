@@ -73,7 +73,8 @@ v_result_node json;
 v_result_connec json;
 v_result_arc json;
 v_sectorfromexpl boolean;
-
+v_sectorfrommacro boolean;
+v_explfrommacro boolean;
 
 BEGIN
 
@@ -87,6 +88,8 @@ BEGIN
 
 	-- get system variables
 	v_sectorfromexpl = (SELECT value::json->>'sectorfromexpl' FROM config_param_system WHERE parameter = 'basic_selector_options');
+	v_sectorfrommacro = (SELECT value::json->>'sectorFromMacro' FROM config_param_system WHERE parameter = 'basic_selector_options');
+	v_explfrommacro = (SELECT value::json->>'explFromNacro' FROM config_param_system WHERE parameter = 'basic_selector_options');
 
 	-- Get input parameters:
 	v_tabname := (p_data ->> 'data')::json->> 'tabName';
@@ -143,57 +146,21 @@ BEGIN
 
 	-- manage check all
 	IF v_checkall THEN
-
-		IF v_tabname = 'tab_psector' THEN -- to manage only those psectors related to selected exploitations
-			EXECUTE 'INSERT INTO ' || v_tablename || ' ('|| v_columnname ||', cur_user) SELECT '||v_tableid||', current_user FROM '||v_table||
-			' WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user=current_user) AND active = true ON CONFLICT DO NOTHING';
-		ELSE
-			IF (SELECT value::boolean FROM config_param_system WHERE parameter = 'admin_exploitation_x_user') IS TRUE THEN
-
-				IF v_tabname = 'tab_macroexpl' THEN
-					EXECUTE 'INSERT INTO selector_macroexpl SELECT macroexpl_id, current_user from macroexploitation where expl_id in 
-							(select expl_id from config_user_x_expl where username = current_user) 
-							ON CONFLICT (macroexpl_id, cur_user) DO NOTHING';
- 
-				ELSIF v_tabname = 'tab_exploitation' THEN
-					EXECUTE 'INSERT INTO selector_expl SELECT expl_id, current_user FROM config_user_x_expl 
- 		  					 WHERE username = current_user 
-							 ON CONFLICT (expl_id, cur_user) DO NOTHING';
-
-				ELSIF  v_tabname = 'tab_macrosector' THEN
-					EXECUTE 'INSERT INTO selector_macrosector SELECT macrosector_id, current_user from macrosector where sector_id (select DISTINCT(sector_id) 
-							 from node where state>0 and expl_id in (select expl_id from config_user_x_expl where username = current_user)
-            				 ON CONFLICT (macrosector_id, cur_user) DO NOTHING';
-
-				ELSIF  v_tabname = 'tab_sector' THEN
-					EXECUTE 'INSERT INTO selector_sector SELECT DISTINCT sector_id, current_user from node where state>0 and expl_id
-							 in (select expl_id from config_user_x_expl where username = current_user) 
-							 ON CONFLICT (sector_id, cur_user) DO NOTHING';
-
-				ELSIF v_tabname='tab_municipality' THEN
-					EXECUTE 'INSERT INTO selector_municipality SELECT DISTINCT (muni_id), current_user FROM node where state > 0 and expl_id
-							 in (select expl_id from config_user_x_expl where username = current_user) 
-							 ON CONFLICT (muni_id, cur_user) DO NOTHING';
-				END IF;
-
-			ELSIF v_tabname='tab_hydro_state' THEN
-
+			IF v_tabname = 'tab_psector' THEN -- to manage only those psectors related to selected exploitations
+				EXECUTE 'INSERT INTO ' || v_tablename || ' ('|| v_columnname ||', cur_user) SELECT '||v_tableid||', current_user FROM '||v_table||
+				' WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user=current_user) AND active = true ON CONFLICT DO NOTHING';
+			
+			ELSIF v_tabname in ('tab_hydro_state', 'tab_mincut') THEN
 				EXECUTE concat('INSERT INTO ',v_tablename,' (',v_columnname,', cur_user) SELECT ',v_tableid,', current_user FROM ',v_table,'
 				',(CASE when v_ids is not null then concat(' WHERE id = ANY(ARRAY',v_ids,') ') end),' 
 				ON CONFLICT (',v_columnname,', cur_user) DO NOTHING;');
-
-
-			ELSIF v_tabname='tab_mincut' THEN
-				EXECUTE concat('INSERT INTO ',v_tablename,' (',v_columnname,', cur_user) SELECT ',v_tableid,', current_user FROM ',v_table,'
-				',(CASE when v_ids is not null then concat(' WHERE id = ANY(ARRAY',v_ids,')') end),' ON CONFLICT (',v_columnname,', cur_user) DO NOTHING;');
 
 			ELSE
 				EXECUTE concat('INSERT INTO ',v_tablename,' (',v_columnname,', cur_user) SELECT ',v_tableid,', current_user FROM ',v_table,'
 				',(CASE when v_ids is not null then concat(' WHERE id = ANY(ARRAY',v_ids,')') end),' WHERE active
 				ON CONFLICT (',v_columnname,', cur_user) DO NOTHING;');
 			END IF;
-		END IF;
-
+	
 	ELSIF v_checkall IS FALSE THEN
 		EXECUTE 'DELETE FROM ' || v_tablename || ' WHERE cur_user = current_user';
 
@@ -287,66 +254,19 @@ BEGIN
 
 	-- trigger getmapzones
 	IF v_tabname IN('tab_exploitation', 'tab_macroexploitation') THEN
-
-		-- force mapzones
 		v_action = '[{"funcName": "set_style_mapzones", "params": {}}]';
-
 	END IF;
 
 	-- manage cross-reference tables
 	select count(*) into v_count from node;
 	IF v_count > 0 THEN
-
-		IF v_tabname IN ('tab_exploitation_add', 'tab_macroexploitation_add') THEN
-
-			EXECUTE 'SET search_path = '||v_addschema||', public';
-
-			IF v_tabname = 'tab_exploitation_add' THEN
-				DELETE FROM selector_macroexpl WHERE cur_user = current_user;
-				INSERT INTO selector_macroexpl
-				SELECT DISTINCT macroexpl_id, current_user FROM exploitation WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user)
-				ON CONFLICT (macroexpl_id, cur_user) DO NOTHING;
-
-			ELSIF v_tabname = 'tab_macroexploitation_add' THEN
-				DELETE FROM selector_expl WHERE cur_user = current_user;
-				INSERT INTO selector_expl
-				SELECT DISTINCT expl_id, current_user FROM exploitation WHERE macroexpl_id IN (SELECT macroexpl_id FROM selector_macroexpl WHERE cur_user = current_user)
-				ON CONFLICT (expl_id, cur_user) DO NOTHING;
-			END IF;	
-
-			-- macrosector
-			DELETE FROM selector_macrosector WHERE cur_user = current_user;
-			INSERT INTO selector_macrosector
-			SELECT DISTINCT macrosector_id, current_user FROM sector WHERE sector_id IN (SELECT DISTINCT (sector_id) FROM node JOIN selector_expl 
-			using (expl_id) where cur_user = current_user);
-
-			-- sector
-			DELETE FROM selector_sector WHERE cur_user = current_user AND sector_id > 0;
-			INSERT INTO selector_sector
-			SELECT DISTINCT sector_id, current_user FROM node WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user)
-			ON CONFLICT (sector_id, cur_user) DO NOTHING;
-
-			-- sector for those objects wich has expl_id2 and expl_id2 is not selected but yes one
-			INSERT INTO selector_sector
-			SELECT DISTINCT sector_id,current_user FROM arc WHERE expl_id2 IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user) AND sector_id > 0
-			UNION
-			SELECT DISTINCT sector_id,current_user FROM node WHERE expl_id2 IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user) AND sector_id > 0
-			ON CONFLICT (sector_id, cur_user) DO NOTHING;
-
-			-- muni
-			DELETE FROM selector_municipality WHERE cur_user = current_user;
-			INSERT INTO selector_municipality
-			SELECT DISTINCT muni_id, current_user FROM node WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user);
-
-			EXECUTE 'SET search_path = '||v_schemaname||', public';	
-
-		END IF;
-
-
 		IF v_tabname IN ('tab_exploitation', 'tab_macroexploitation') THEN
 
 			IF v_tabname = 'tab_exploitation' THEN
-				DELETE FROM selector_macroexpl WHERE cur_user = current_user;
+
+				IF v_explfrommacro is false THEN
+					DELETE FROM selector_macroexpl WHERE cur_user = current_user;
+				end if;
 				INSERT INTO selector_macroexpl
 				SELECT DISTINCT macroexpl_id, current_user FROM exploitation WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user)
 				ON CONFLICT (macroexpl_id, cur_user) DO NOTHING;
@@ -382,12 +302,12 @@ BEGIN
 			INSERT INTO selector_municipality
 			SELECT DISTINCT muni_id, current_user FROM node WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user);		
 
-		END IF;
-
-		IF v_tabname IN ('tab_sector', 'tab_macrosector') THEN
+		ELSIF v_tabname IN ('tab_sector', 'tab_macrosector') THEN
 
 			IF v_tabname = 'tab_sector' THEN
-				DELETE FROM selector_macrosector WHERE cur_user = current_user;
+				IF v_sectorfrommacro is false THEN
+					DELETE FROM selector_macrosector WHERE cur_user = current_user;
+				end if;
 				INSERT INTO selector_macrosector
 				SELECT DISTINCT macrosector_id, current_user FROM sector WHERE sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user = current_user)
 				ON CONFLICT (macrosector_id, cur_user) DO NOTHING;
@@ -416,10 +336,8 @@ BEGIN
 			SELECT DISTINCT muni_id, current_user FROM node WHERE sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user = current_user AND sector_id > 0)
 			ON CONFLICT (muni_id, cur_user) DO NOTHING;		
 
-		END IF;
-
 		-- inserting muni_id from selected muni
-		IF v_tabname IN ('tab_municipality') THEN
+		ELSIF v_tabname IN ('tab_municipality') THEN
 
 			-- macroexpl
 			DELETE FROM selector_macroexpl WHERE cur_user = current_user;
@@ -452,9 +370,54 @@ BEGIN
 			UNION
 			SELECT DISTINCT sector_id,current_user FROM node WHERE expl_id2 IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user) AND sector_id > 0
 			ON CONFLICT (sector_id, cur_user) DO NOTHING;
-
 		END IF;
+	END IF;
+		
+	-- manage addschema
+	IF v_addschema IS NOT NULL THEN
 
+		EXECUTE 'SET search_path = '||v_addschema||', public';
+
+		-- manage cross-reference tables
+		select count(*) into v_count from node;
+		IF v_count > 0 THEN
+
+			-- use muni as link between both schemas
+			DELETE FROM selector_municipality WHERE cur_user = current_user;
+			INSERT INTO selector_municipality
+			SELECT DISTINCT muni_id, current_user FROM SCHEMA_NAME.selector_municipality
+			ON CONFLICT (muni_id, cur_user) DO NOTHING;
+
+			-- expl
+			DELETE FROM selector_expl WHERE cur_user = current_user;
+			INSERT INTO selector_expl
+			SELECT DISTINCT expl_id, current_user FROM node JOIN vu_exploitation USING (expl_id) 
+			WHERE muni_id IN (SELECT muni_id FROM selector_municipality WHERE cur_user = current_user)
+			ON CONFLICT (expl_id, cur_user) DO NOTHING;
+	
+			-- macroexpl
+			DELETE FROM selector_macroexpl WHERE cur_user = current_user;
+			INSERT INTO selector_macroexpl
+			SELECT DISTINCT macroexpl_id, current_user FROM exploitation
+		 	WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user)
+			ON CONFLICT (macroexpl_id, cur_user) DO NOTHING;
+	
+			-- sector
+			DELETE FROM selector_sector WHERE cur_user = current_user AND sector_id > 0;
+			INSERT INTO selector_sector
+			SELECT DISTINCT sector_id, current_user FROM node JOIN vu_sector USING (sector_id)
+			WHERE muni_id IN (SELECT muni_id FROM selector_municipality WHERE cur_user = current_user)
+			ON CONFLICT (sector_id, cur_user) DO NOTHING;
+	
+			-- macrosector
+			DELETE FROM selector_macrosector WHERE cur_user = current_user;
+			INSERT INTO selector_macrosector
+			SELECT DISTINCT macrosector_id, current_user FROM sector 
+			WHERE sector_id IN (SELECT sector_id FROM selector_sector where cur_user = current_user)
+			ON CONFLICT (macrosector_id, cur_user) DO NOTHING;
+		
+		END IF;
+			EXECUTE 'SET search_path = '||v_schemaname||', public';	
 	END IF;
 	
 	-- get envelope

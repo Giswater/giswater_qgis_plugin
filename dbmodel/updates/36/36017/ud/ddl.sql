@@ -10,3 +10,5 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 --23/12/2024
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"gully", "column":"streetname", "dataType":"varchar(100)"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"gully", "column":"streetname2", "dataType":"varchar(100)"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sector", "column":"link", "dataType":"text"}}$$);

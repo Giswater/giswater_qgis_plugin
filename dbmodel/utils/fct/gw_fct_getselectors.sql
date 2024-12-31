@@ -100,6 +100,9 @@ v_mincut_arc json;
 v_exclude_tab text='';
 v_orderby_query text;
 v_sectorfromexpl boolean;
+v_orderby_check boolean;
+v_sectorfrommacro boolean;
+v_explfrommacro boolean;
 
 BEGIN
 
@@ -142,7 +145,10 @@ BEGIN
 
 	-- get system variables:
 	v_expl_x_user = (SELECT value FROM config_param_system WHERE parameter = 'admin_exploitation_x_user');
-	v_sectorfromexpl = (SELECT value::json->>'sectorfromexpl' FROM config_param_system WHERE parameter = 'basic_selector_options');
+	v_sectorfromexpl = (SELECT value::json->>'sectorFromExpl' FROM config_param_system WHERE parameter = 'basic_selector_options');
+	v_sectorfrommacro = (SELECT value::json->>'sectorFromMacro' FROM config_param_system WHERE parameter = 'basic_selector_options');
+	v_explfrommacro = (SELECT value::json->>'explFromNacro' FROM config_param_system WHERE parameter = 'basic_selector_options');
+
 	v_stylesheet = (SELECT value FROM config_param_system WHERE parameter = 'qgis_form_selector_stylesheet');
 
 	-- when typeahead only one tab is executed
@@ -184,6 +190,7 @@ BEGIN
 		v_orderby = v_tab.value::json->>'orderBy';
 		v_name = v_tab.value::json->>'name';
 		v_typeaheadForced = v_tab.value::json->>'typeaheadForced';
+		v_orderby_check = v_tab.value::json->>'orderbyCheck';
 
 		-- profilactic control of v_orderby
 		v_querystring = concat('SELECT gw_fct_getpkeyfield(''',v_table,''');');
@@ -199,138 +206,42 @@ BEGIN
 			v_selectionMode = 'keepPrevious';
 		END IF;
 	
-		-- order by
-		IF v_tab.tabname != v_currenttab AND v_tab.tabname not like '%acro%' THEN
-			
-			IF v_tab.tabname = 'tab_sector' AND v_sectorfromexpl IS FALSE THEN 
-				v_orderby_query = 'ORDER BY value DESC, orderby';
-			ELSIF v_tab.tabname = 'tab_sector' AND v_sectorfromexpl IS TRUE THEN
-				v_orderby_query = 'ORDER BY orderby';
-			ELSE 
-				v_orderby_query = 'ORDER BY value DESC, orderby';
-			END IF;
+		-- order by heck. This enables to put checked rows on the top. Useful when there are lots of rows and you need to use the scrollbar to kwow what is checked
+		IF v_orderby_check AND v_tab.tabname != v_currenttab THEN		
+			v_orderby_query = 'ORDER BY value DESC, orderby';
 		ELSE 
 			v_orderby_query = 'ORDER BY orderby';
 		END IF;
 
-		-- start process
-		IF v_tab.tabname = 'tab_exploitation_add' AND v_addschema is not null THEN
-			IF v_expl_x_user THEN
-				IF v_filterfrominput IS NULL OR v_filterfrominput = '' THEN
-					v_filterfrominput = ' AND expl_id IN (SELECT expl_id FROM '||v_addschema||'.config_user_x_expl WHERE username = current_user)';
-				ELSE
-					v_filterfrominput = concat (' AND expl_id IN (SELECT expl_id FROM '||v_addschema||'.config_user_x_expl WHERE username = current_user) ', v_typeahead,' LIKE ''%', lower(v_filterfrominput), '%''');
-				END IF;
-			ELSE
-				IF v_filterfrominput IS NULL OR v_filterfrominput = '' THEN
-					v_filterfrominput = ' ';
-				ELSE
-					v_filterfrominput = concat (' ', v_typeahead,' LIKE ''%', lower(v_filterfrominput), '%''');
-				END IF;			
+		-- built filter from input
+		IF v_filterfrominput IS NULL OR v_filterfrominput = '' OR lower(v_filterfrominput) ='None' or lower(v_filterfrominput) = 'null' THEN
+			v_filterfrominput := NULL;
+		ELSE 
+			v_filterfrominput = concat (v_typeahead,' LIKE ''%', lower(v_filterfrominput), '%''');
+		END IF;
+
+		-- built additional filter for only those sector related to selected exploitation
+		IF v_sectorfromexpl THEN
+			IF v_tab.tabname = 'tab_sector' THEN
+				v_filterfrominput = concat (COALESCE(v_filterfrominput),
+				' AND sector_id IN (SELECT DISTINCT sector_id FROM node JOIN selector_expl USING (expl_id) WHERE cur_user = current_user) ');
+
+			ELSIF v_tab.tabname = 'tab_macrosector' THEN
+				v_filterfrominput = concat (COALESCE(v_filterfrominput),
+				' AND macrosector_id IN (SELECT DISTINCT macrosector_id FROM vu_sector JOIN node USING (sector_id) JOIN selector_expl USING (expl_id) WHERE cur_user = current_user)');
 			END IF;
+		END IF;
 
-		ELSIF v_tab.tabname = 'tab_macroexploitation_add'  AND v_addschema is not null THEN
-			IF v_expl_x_user THEN
-				IF v_filterfrominput IS NULL OR v_filterfrominput = '' THEN
-					v_filterfrominput = ' AND macroexpl_id IN (SELECT macroexpl_id FROM '||v_addschema||'.exploitation JOIN config_user_x_expl USING(expl_id) WHERE username = current_user)';
-				ELSE
-					v_filterfrominput = concat (' AND expl_id IN (SELECT macroexpl_id FROM '||v_addschema||'.exploitation JOIN config_user_x_expl USING(expl_id) WHERE username = current_user) ', v_typeahead,' LIKE ''%', lower(v_filterfrominput), '%''');
-				END IF;
-			ELSE
-				IF v_filterfrominput IS NULL OR v_filterfrominput = '' THEN
-					v_filterfrominput = ' ';
-				ELSE
-					v_filterfrominput = concat (' ', v_typeahead,' LIKE ''%', lower(v_filterfrominput), '%''');
-				END IF;			
-			END IF;			
+		-- built additional filter for only those sectors related to selected macrosector
+		IF  v_sectorfrommacro AND v_tab.tabname = 'tab_sector' THEN
+			v_filterfrominput = concat (COALESCE(v_filterfrominput),
+			' AND macrosector_id IN (SELECT macrosector_id FROM selector_macrosector WHERE cur_user = current_user) ');
+		END IF;
 
-		ELSIF v_selector = 'selector_expl' AND v_expl_x_user THEN
-			IF v_filterfrominput IS NULL OR v_filterfrominput = '' THEN
-				v_filterfrominput = ' AND expl_id IN (SELECT expl_id FROM config_user_x_expl WHERE username = current_user)';
-			ELSE
-				v_filterfrominput = concat (' AND expl_id IN (SELECT expl_id FROM config_user_x_expl WHERE username = current_user) ', v_typeahead,' LIKE ''%', lower(v_filterfrominput), '%''');
-			END IF;
-
-		ELSIF v_selector = 'selector_macroexpl' AND v_expl_x_user THEN
-			IF v_filterfrominput IS NULL OR v_filterfrominput = '' THEN
-				v_filterfrominput = ' AND macroexpl_id IN (SELECT macroexpl_id FROM exploitation JOIN config_user_x_expl USING (expl_id) WHERE username = current_user)';
-			ELSE
-				v_filterfrominput = concat (' AND macroexpl_id IN (SELECT macroexpl_id FROM exploitation JOIN config_user_x_expl USING (expl_id) WHERE username = current_user)) ', v_typeahead,' LIKE ''%', lower(v_filterfrominput), '%''');
-			END IF;
-			
-		ELSIF v_selector = 'selector_sector' THEN
-
-			IF v_sectorfromexpl THEN
-				IF v_filterfrominput IS NULL OR v_filterfrominput = '' THEN
-					v_filterfrominput = ' AND sector_id IN (SELECT DISTINCT(sector_id) FROM node WHERE state=1 AND expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user))';
-				ELSE
-					v_filterfrominput = concat (' AND sector_id IN (SELECT DISTINCT(sector_id) FROM node WHERE state=1 AND expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user)) ', v_typeahead,' LIKE ''%', lower(v_filterfrominput), '%''');
-				END IF;
-
-			ELSE
-				IF v_expl_x_user THEN
-					IF v_filterfrominput IS NULL OR v_filterfrominput = '' THEN
-						v_filterfrominput = ' AND sector_id IN (SELECT DISTINCT(sector_id) FROM node WHERE state=1 AND expl_id IN (SELECT expl_id FROM config_user_x_expl WHERE username = current_user))';
-					ELSE
-						v_filterfrominput = concat (' AND sector_id IN (SELECT DISTINCT(sector_id) FROM node WHERE state=1 AND expl_id IN (SELECT expl_id FROM config_user_x_expl WHERE username = current_user)) ', v_typeahead,' LIKE ''%', lower(v_filterfrominput), '%''');
-					END IF;
-				ELSE
-					IF v_filterfrominput IS NULL OR v_filterfrominput = '' THEN
-						v_filterfrominput = ' ';
-					ELSE
-						v_filterfrominput = concat (' ', v_typeahead,' LIKE ''%', lower(v_filterfrominput), '%''');	
-					END IF;
-				END IF;
-			END IF;
-
-		ELSIF v_selector = 'selector_macrosector' THEN
-
-			IF v_sectorfromexpl THEN
-				IF v_filterfrominput IS NULL OR v_filterfrominput = '' THEN
-					v_filterfrominput = ' AND macrosector_id IN (SELECT DISTINCT(macrosector_id) FROM v_edit_node WHERE state>0 AND expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user))';
-				ELSE
-					v_filterfrominput = concat (' AND macrosector_id IN (SELECT DISTINCT(macrosector_id) FROM v_edit_node WHERE state=1 AND expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user)) ', v_typeahead,' LIKE ''%', lower(v_filterfrominput), '%''');
-				END IF;
-
-			ELSE
-				IF v_expl_x_user THEN
-					IF v_filterfrominput IS NULL OR v_filterfrominput = '' THEN
-						v_filterfrominput = ' AND macrosector_id IN (SELECT DISTINCT(macrosector_id) FROM v_edit_node WHERE state>0 AND expl_id IN (SELECT expl_id FROM config_user_x_expl WHERE username = current_user))';
-					ELSE
-						v_filterfrominput = concat (' AND macrosector_id IN (SELECT DISTINCT(macrosector_id) FROM v_edit_node WHERE state>0 AND expl_id IN (SELECT expl_id FROM config_user_x_expl WHERE username = current_user)) ', v_typeahead,' LIKE ''%', lower(v_filterfrominput), '%''');
-					END IF;
-				ELSE
-					IF v_filterfrominput IS NULL OR v_filterfrominput = '' THEN
-						v_filterfrominput = ' ';
-					ELSE
-						v_filterfrominput = concat (' ', v_typeahead,' LIKE ''%', lower(v_filterfrominput), '%''');	
-					END IF;
-				END IF;
-			END IF;
-
-		ELSIF v_selector = 'selector_municipality' THEN 
-
-			IF v_expl_x_user THEN
-				IF v_filterfrominput IS NULL OR v_filterfrominput = '' THEN
-					v_filterfrominput = ' AND muni_id IN (SELECT DISTINCT(muni_id) FROM node WHERE state=1 AND expl_id IN (SELECT expl_id FROM config_user_x_expl WHERE username = current_user))';
-				ELSE
-					v_filterfrominput = concat (' AND muni_id IN (SELECT DISTINCT(muni_id) FROM node WHERE state=1 AND expl_id IN (SELECT expl_id FROM config_user_x_expl WHERE username = current_user)) ', v_typeahead,' LIKE ''%', lower(v_filterfrominput), '%''');
-				END IF;
-			ELSE
-				IF v_filterfrominput IS NULL OR v_filterfrominput = '' THEN
-					v_filterfrominput = ' ';
-				ELSE
-					v_filterfrominput = concat (' ', v_typeahead,' LIKE ''%', lower(v_filterfrominput), '%''');
-				END IF;
-			END IF;
-
-		ELSE
-			-- built filter from input (recalled from typeahead)
-			IF v_filterfrominput IS NULL OR v_filterfrominput = '' OR lower(v_filterfrominput) ='None' or lower(v_filterfrominput) = 'null' THEN
-				v_filterfrominput := NULL;
-			ELSE
-				v_filterfrominput = concat (v_typeahead,' LIKE ''%', lower(v_filterfrominput), '%''');
-			END IF;
+		-- built additional filter for only those expl related to selected macroexpl
+		IF v_explfrommacro AND v_tab.tabname = 'tab_exploitation' THEN
+			v_filterfrominput = concat (COALESCE(v_filterfrominput),
+			' AND macroexpl_id IN (SELECT macroexpl_id FROM selector_macroexpl WHERE cur_user = current_user) ');
 		END IF;
 
 		-- Manage filters from ids (only mincut)
@@ -341,7 +252,7 @@ BEGIN
 			END IF;
 		END IF;
 
-		-- built full filter
+		-- built full filter 
 		v_fullfilter = concat(v_filterfromids, v_filterfromconfig, v_filterfrominput);
 
 		-- use atlas on psector selector
@@ -415,7 +326,7 @@ BEGIN
 
 	END LOOP;
 
-	-- Manage QWC
+	-- Manage web client
 	IF v_device = 5 THEN
 
 		-- Get active exploitations geometry (to zoom on them)
