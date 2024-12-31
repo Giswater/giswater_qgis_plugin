@@ -1014,7 +1014,7 @@ SELECT distinct on (sector_id) s.sector_id,
 	 JOIN config_user_x_expl USING (expl_id)
      LEFT JOIN macrosector m USING (macrosector_id)
      LEFT JOIN edit_typevalue et ON et.id::text = s.sector_type::text AND et.typevalue::text = 'sector_type'::text
-     where username = current_user and (sector_id > 0 or sector <-9)
+     where username = current_user and (s.sector_id > 0 or s.sector <-9)
      union 
      SELECT distinct on (sector_id) s.sector_id,
 	s.name,
