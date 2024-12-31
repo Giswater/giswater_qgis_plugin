@@ -13,19 +13,19 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 SELECT plan(12);
 
 -- Subtest 1: Testing macroexplotation operations
-INSERT INTO macroexploitation (macroexpl_id, "name", descript, undelete, active) VALUES(2, 'Test', 'Test macroexploitation', NULL, true);
-SELECT is((SELECT count(*)::integer FROM macroexploitation WHERE macroexpl_id = 2), 1, 'INSERT: macroexploitation "2" was inserted');
+INSERT INTO macroexploitation (macroexpl_id, "name", descript, undelete, active) VALUES(-999, 'Test', 'Test macroexploitation', NULL, true);
+SELECT is((SELECT count(*)::integer FROM macroexploitation WHERE macroexpl_id = -999), 1, 'INSERT: macroexploitation "2" was inserted');
 
-UPDATE macroexploitation SET descript = 'updated test' WHERE macroexpl_id = 2;
-SELECT is((SELECT descript FROM macroexploitation WHERE macroexpl_id = 2), 'updated test', 'UPDATE: descript was updated to "updated test"');
+UPDATE macroexploitation SET descript = 'updated test' WHERE macroexpl_id = -999;
+SELECT is((SELECT descript FROM macroexploitation WHERE macroexpl_id = -999), 'updated test', 'UPDATE: descript was updated to "updated test"');
 
-DELETE FROM macroexploitation WHERE macroexpl_id = 2;
-SELECT is((SELECT count(*)::integer FROM macroexploitation WHERE macroexpl_id = 2), 0, 'DELETE: macroexploitation 2 was deleted');
+DELETE FROM macroexploitation WHERE macroexpl_id = -999;
+SELECT is((SELECT count(*)::integer FROM macroexploitation WHERE macroexpl_id = -999), 0, 'DELETE: macroexploitation 2 was deleted');
 
 
--- Subtest 2: Testing macrosecto operations
+-- Subtest 2: Testing macrosector operations
 INSERT INTO macrosector (macrosector_id, "name", descript, undelete, the_geom, active)
-VALUES(3, 'macrosector_03', 'macrosector_project_ud', NULL, 'SRID=25831;MULTIPOLYGON (((418661.46939954103 4578015.45745487, 418647.37730746274 4578106.685208859, 
+VALUES(-999, 'macrosector_03', 'macrosector_project_ud', NULL, 'SRID=25831;MULTIPOLYGON (((418661.46939954103 4578015.45745487, 418647.37730746274 4578106.685208859, 
 418536.61840831034 4578081.220551241, 418457.5049089153 4578046.113935886, 418401.13654059684 4578007.051645559, 418347.73492850515 4577966.505977117, 
 418307.6837194355 4577934.366117985, 418280.9829133909 4577912.609905655, 418294.82777578407 4577893.820449547, 418303.72804446577 4577879.481127782, 
 418316.08952874615 4577811.740193926, 418323.50641931436 4577792.456278448, 418334.38452548115 4577771.688984857, 418348.7238472465 4577744.49371944, 
@@ -34,35 +34,35 @@ VALUES(3, 'macrosector_03', 'macrosector_project_ud', NULL, 'SRID=25831;MULTIPOL
 418633.53244507004 4577577.366451968, 418697.31770395674 4577586.761180022, 418734.4021567978 4577592.200233106, 418728.9631037145 4577622.36225475, 
 418722.04067251686 4577665.380220048, 418709.67918823694 4577732.132235162, 418695.8343258427 4577809.267897072, 418688.91189464426 4577848.330187399, 
 418676.05595099396 4577926.45476805, 418661.46939954103 4578015.45745487)))'::public.geometry, true);
-SELECT is((SELECT count(*)::integer FROM macrosector WHERE macrosector_id = 3), 1, 'INSERT: macrosector "3" was inserted');
+SELECT is((SELECT count(*)::integer FROM macrosector WHERE macrosector_id = -999), 1, 'INSERT: macrosector "3" was inserted');
 
-UPDATE macrosector SET descript = 'updated test' WHERE macrosector_id = 3;
-SELECT is((SELECT descript FROM macrosector WHERE macrosector_id = 3), 'updated test', 'UPDATE: descript was updated to "updated test"');
+UPDATE macrosector SET descript = 'updated test' WHERE macrosector_id = -999;
+SELECT is((SELECT descript FROM macrosector WHERE macrosector_id = -999), 'updated test', 'UPDATE: descript was updated to "updated test"');
 
-DELETE FROM macrosector WHERE macrosector_id = 3;
-SELECT is((SELECT count(*)::integer FROM macrosector WHERE macrosector_id = 3), 0, 'DELETE: macrosector 3 was deleted');
+DELETE FROM macrosector WHERE macrosector_id = -999;
+SELECT is((SELECT count(*)::integer FROM macrosector WHERE macrosector_id = -999), 0, 'DELETE: macrosector 3 was deleted');
 
 
 -- Subtest 3: Testing macrodma operations
-INSERT INTO macrodma (macrodma_id, "name", expl_id, descript, undelete, the_geom, active) VALUES(3, 'macrodma_03', 0, NULL, NULL, NULL, true);
-SELECT is((SELECT count(*)::integer FROM macrodma WHERE macrodma_id = 3), 1, 'INSERT: macrodma "3" was inserted');
+INSERT INTO macrodma (macrodma_id, "name", expl_id, descript, undelete, the_geom, active) VALUES(-999, 'macrodma_03', 0, NULL, NULL, NULL, true);
+SELECT is((SELECT count(*)::integer FROM macrodma WHERE macrodma_id = -999), 1, 'INSERT: macrodma "3" was inserted');
 
-UPDATE macrodma SET descript = 'updated test' WHERE macrodma_id = 3;
-SELECT is((SELECT descript FROM macrodma WHERE macrodma_id = 3), 'updated test', 'UPDATE: descript was updated to "updated test"');
+UPDATE macrodma SET descript = 'updated test' WHERE macrodma_id = -999;
+SELECT is((SELECT descript FROM macrodma WHERE macrodma_id = -999), 'updated test', 'UPDATE: descript was updated to "updated test"');
 
-DELETE FROM macrodma WHERE macrodma_id = 3;
-SELECT is((SELECT count(*)::integer FROM macrodma WHERE macrodma_id = 3), 0, 'DELETE: macrodma 3 was deleted');
+DELETE FROM macrodma WHERE macrodma_id = -999;
+SELECT is((SELECT count(*)::integer FROM macrodma WHERE macrodma_id = -999), 0, 'DELETE: macrodma 3 was deleted');
 
 
 -- Subtest 4: Testing macrodqa operations
-INSERT INTO macrodqa (macrodqa_id, "name", expl_id, descript, undelete, the_geom, active) VALUES(1, 'macrodqa_01', 0, NULL, NULL, NULL, true);
-SELECT is((SELECT count(*)::integer FROM macrodqa WHERE macrodqa_id = 1), 1, 'INSERT: macrodqa "1" was inserted');
+INSERT INTO macrodqa (macrodqa_id, "name", expl_id, descript, undelete, the_geom, active) VALUES(-999, 'macrodqa_01', 0, NULL, NULL, NULL, true);
+SELECT is((SELECT count(*)::integer FROM macrodqa WHERE macrodqa_id = -999), 1, 'INSERT: macrodqa "1" was inserted');
 
-UPDATE macrodqa SET descript = 'updated test' WHERE macrodqa_id = 1;
-SELECT is((SELECT descript FROM macrodqa WHERE macrodqa_id = 1), 'updated test', 'UPDATE: descript was updated to "updated test"');
+UPDATE macrodqa SET descript = 'updated test' WHERE macrodqa_id = -999;
+SELECT is((SELECT descript FROM macrodqa WHERE macrodqa_id = -999), 'updated test', 'UPDATE: descript was updated to "updated test"');
 
-DELETE FROM macrodqa WHERE macrodqa_id = 1;
-SELECT is((SELECT count(*)::integer FROM macrodqa WHERE macrodqa_id = 1), 0, 'DELETE: macrodqa 1 was deleted');
+DELETE FROM macrodqa WHERE macrodqa_id = -999;
+SELECT is((SELECT count(*)::integer FROM macrodqa WHERE macrodqa_id = -999), 0, 'DELETE: macrodqa 1 was deleted');
 
 
 SELECT * FROM finish();
