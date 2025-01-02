@@ -348,7 +348,7 @@ BEGIN
 						ELSIF v_noderecord2.presszone_id = 0 THEN
 							v_presszone_id = v_noderecord1.presszone_id;
 						ELSIF v_noderecord1.presszone_id != v_noderecord2.presszone_id THEN
-							v_presszone_id = v_noderecord1.presszone_id;
+							v_presszone_id = 0;
 						END IF;
 
 						-- getting dqa_id by heritage from nodes
@@ -359,13 +359,23 @@ BEGIN
 						ELSIF v_noderecord2.dqa_id = 0 THEN
 							v_dqa_id = v_noderecord1.dqa_id;
 						ELSIF v_noderecord1.dqa_id::text != v_noderecord2.dqa_id::text THEN
-							v_dqa_id = v_noderecord1.dqa_id;
+							v_dqa_id = 0;
 						END IF;
 
 						-- getting macrominsector_id by heritage from nodes
 						IF v_noderecord1.macrominsector_id = v_noderecord2.macrominsector_id THEN
 							v_macrominsector_id = v_noderecord1.macrominsector_id;
 						END IF;
+	
+						-- getting supplyzone by heritage from nodes: TODO
+
+					
+					ELSE
+					
+						-- getting dwfzone by heritage from nodes: TODO
+					
+						-- getting drainzone by heritage from nodes: TODO
+					
 
 					END IF;
 
@@ -377,7 +387,7 @@ BEGIN
 					ELSIF v_noderecord2.sector_id = 0 THEN
 						v_sector_id = v_noderecord1.sector_id;
 					ELSIF v_noderecord1.sector_id::text != v_noderecord2.sector_id::text THEN
-						v_sector_id = v_noderecord1.sector_id;
+						v_sector_id = 0;
 					END IF;
 
 					-- getting dma_id by heritage from nodes
@@ -388,7 +398,7 @@ BEGIN
 					ELSIF v_noderecord2.dma_id = 0 THEN
 						v_dma_id = v_noderecord1.dma_id;
 					ELSIF v_noderecord1.dma_id::text != v_noderecord2.dma_id::text THEN
-						v_dma_id = v_noderecord1.dma_id;
+						v_dma_id = 0;
 					END IF;
 
 					-- getting expl_id by heritage from nodes
@@ -399,12 +409,14 @@ BEGIN
 					ELSIF v_noderecord2.expl_id = 0 THEN
 						v_expl_id = v_noderecord1.expl_id;
 					ELSIF v_noderecord1.expl_id::text != v_noderecord2.expl_id::text THEN
-						v_expl_id = v_noderecord1.expl_id;
+						v_expl_id = 0;
 					END IF;
 
 					-- getting muni_id by heritage from nodes
 					IF v_noderecord1.muni_id = v_noderecord2.muni_id THEN
 						v_muni_id = v_noderecord1.muni_id;
+					ELSE 
+						v_muni_id = 0;
 					END IF;
 
 					-- getting node values in case of arcs (insert)
@@ -440,13 +452,12 @@ BEGIN
 			END IF;
 		END IF;
 
-		-- get vdefaults user's mapzones only for nodes (for arcs is disabled because values are taken using heritage from nodes. For connect also because they takes from arc)
+		-- get NODE vdefaults user's mapzones only for nodes (for arcs is disabled because values are taken using heritage from nodes. For connect also because they takes from arc)
 		IF upper(v_catfeature.feature_type) = 'NODE' THEN
 			SELECT value INTO v_sector_id FROM config_param_user WHERE parameter = 'edit_sector_vdefault' and cur_user = current_user;
-			SELECT value INTO v_dma_id FROM config_param_user WHERE parameter = 'edit_dma_vdefault' and cur_user = current_user;
 			SELECT value INTO v_expl_id FROM config_param_user WHERE parameter = 'edit_exploitation_vdefault' and cur_user = current_user;
 			SELECT value INTO v_muni_id FROM config_param_user WHERE parameter = 'edit_municipality_vdefault' and cur_user = current_user;
-			SELECT value INTO v_presszone_id FROM config_param_user WHERE parameter = 'edit_presszone_vdefault' and cur_user = current_user;
+
 		END IF;
 
 		-- Presszone
@@ -492,6 +503,13 @@ BEGIN
 				order by ST_Distance (p_reduced_geometry, v_edit_arc.the_geom) LIMIT 1);
 			END IF;
 		END IF;
+	
+		-- supplyzone: TODO
+				
+		-- dwfzone: TODO
+					
+		-- drainzone: TODO
+	
 
 		-- Macrodma
 		v_macrodma_id := (SELECT macrodma_id FROM dma WHERE dma_id=v_dma_id);
