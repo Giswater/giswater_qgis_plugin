@@ -859,19 +859,14 @@ WITH
 		)
     SELECT l.*
 	FROM link_selected l;
-	
 
-CREATE OR REPLACE VIEW vu_om_mincut as
-select distinct on (m.id) m.* from om_mincut m
-JOIN config_user_x_expl USING (expl_id)
-where username = current_user and m.id > 0;
-
-CREATE OR REPLACE VIEW vu_sector as
-SELECT DISTINCT ON (s.sector_id) s.sector_id,
+DROP VIEW IF EXISTS v_edit_sector;
+DROP VIEW IF EXISTS vu_sector;
+CREATE OR REPLACE VIEW vu_sector
+AS SELECT s.sector_id,
     s.name,
     s.macrosector_id,
-    m.name AS macrosector_name,
-    et.idval,
+    et.idval as sector_type,
     s.descript,
     s.parent_id,
     s.pattern_id,
@@ -887,61 +882,38 @@ SELECT DISTINCT ON (s.sector_id) s.sector_id,
     s.lastupdate_user,
     s.the_geom
    FROM sector s
-     JOIN ( SELECT DISTINCT node.sector_id, node.expl_id FROM node  WHERE node.state > 0) a USING (sector_id)
-     JOIN config_user_x_expl USING (expl_id)
-     LEFT JOIN macrosector m USING (macrosector_id)
      LEFT JOIN edit_typevalue et ON et.id::text = s.sector_type::text AND et.typevalue::text = 'sector_type'::text
-  WHERE config_user_x_expl.username::text = CURRENT_USER AND (s.sector_id > 0 or s.sector_id < -9)
-  UNION
-  select s.sector_id,
-    s.name,
-    s.macrosector_id,
-    m.name AS macrosector_name,
-    et.idval,
-    s.descript,
-    s.parent_id,
-    s.pattern_id,
-    s.graphconfig::text AS graphconfig,
-    s.stylesheet::text AS stylesheet,
-    s.link,
-    s.avg_press,
-    s.active,
-    s.undelete,
-    s.tstamp,
-    s.insert_user,
-    s.lastupdate,
-    s.lastupdate_user,
-    s.the_geom
-   FROM sector s
-     LEFT JOIN ( SELECT DISTINCT node.sector_id, node.expl_id FROM node  WHERE node.state > 0) a USING (sector_id)
-     LEFT JOIN macrosector m USING (macrosector_id)
-     LEFT JOIN edit_typevalue et ON et.id::text = s.sector_type::text AND et.typevalue::text = 'sector_type'::text
-  where (s.sector_id > 0 or s.sector_id < -9) and a.sector_id is null  
-   ORDER BY 1;
-   
-  
-  CREATE OR REPLACE VIEW v_edit_sector
-AS SELECT vu_sector.sector_id,
-    vu_sector.name,
-    vu_sector.macrosector_id,
-    vu_sector.macrosector_name,
-    vu_sector.idval,
-    vu_sector.descript,
-    vu_sector.parent_id,
-    vu_sector.pattern_id,
-    vu_sector.graphconfig,
-    vu_sector.stylesheet,
-    vu_sector.link,
-    vu_sector.avg_press,
-    vu_sector.active,
-    vu_sector.undelete,
-    vu_sector.tstamp,
-    vu_sector.insert_user,
-    vu_sector.lastupdate,
-    vu_sector.lastupdate_user,
-    vu_sector.the_geom
-   FROM vu_sector,
-    selector_sector
-  WHERE vu_sector.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text
-  and active is true;
-  
+  ORDER BY s.sector_id;
+
+DROP VIEW IF EXISTS v_edit_sector;
+CREATE OR REPLACE VIEW v_edit_sector
+AS SELECT s.* 
+FROM vu_sector s, selector_sector
+WHERE s.sector_id = selector_sector.sector_id and active AND selector_sector.cur_user = "current_user"()::text;
+ 
+create trigger gw_trg_edit_sector instead of insert or delete or update on v_edit_sector 
+for each row execute function gw_trg_edit_sector('sector');
+
+create or replace view v_edit_presszone as
+select vu.* from vu_presszone vu,  selector_expl
+WHERE vu.expl_id = selector_expl.expl_id and active AND selector_expl.cur_user = "current_user"()::text OR vu.expl_id IS NULL
+ORDER BY vu.presszone_id;
+
+create or replace view v_edit_dma as
+select vu.* from vu_dma vu,  selector_expl
+WHERE vu.expl_id = selector_expl.expl_id and active AND selector_expl.cur_user = "current_user"()::text OR vu.expl_id IS NULL
+ORDER BY vu.dma_id;
+
+create or replace view v_edit_dma as
+select vu.* from vu_dma vu,  selector_expl
+WHERE vu.expl_id = selector_expl.expl_id and active AND selector_expl.cur_user = "current_user"()::text OR vu.expl_id IS NULL
+ORDER BY vu.dma_id;
+
+create or replace view v_edit_dqa as
+select vu.* from vu_dqa vu,  selector_expl
+WHERE vu.expl_id = selector_expl.expl_id and active AND selector_expl.cur_user = "current_user"()::text OR vu.expl_id IS NULL
+ORDER BY vu.dqa_id;
+
+
+
+

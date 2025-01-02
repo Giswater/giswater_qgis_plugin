@@ -7,7 +7,6 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2796
 
--- DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_getselectors(p_data json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getselectors(p_data json)
   RETURNS json AS
 $BODY$
@@ -103,15 +102,18 @@ v_sectorfromexpl boolean;
 v_orderby_check boolean;
 v_sectorfrommacro boolean;
 v_explfrommacro boolean;
+v_project_type text;
 
 BEGIN
 
 	-- Set search path to local schema
 	SET search_path = "SCHEMA_NAME", public;
 
-	--  get api version
+	--  get system values
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
 		INTO v_version;
+
+	v_project_type = (SELECT project_type FROM sys_version LIMIT 1);
 
 	-- Get input parameters:
 	v_selector_type := (p_data ->> 'data')::json->> 'selectorType';
@@ -170,6 +172,53 @@ BEGIN
 	v_debug := json_build_object('querystring', v_query, 'vars', v_debug_vars, 'funcname', 'gw_fct_getselectors', 'flag', 10);
 	SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 
+	-- create temp tables related to expl x user variable
+	DROP TABLE IF EXISTS temp_exploitation;
+	DROP TABLE IF EXISTS temp_macroexploitation;
+	DROP TABLE IF EXISTS temp_sector;
+	DROP TABLE IF EXISTS temp_macrosector;
+	DROP TABLE IF EXISTS temp_mincut;
+
+	IF v_expl_x_user is false then
+		CREATE TEMP TABLE temp_exploitation as select e.* from exploitation e WHERE active and expl_id > 0 order by 1;
+		CREATE TEMP TABLE temp_macroexploitation as select e.* from macroexploitation e WHERE active and macroexpl_id > 0 order by 1;
+		CREATE TEMP TABLE temp_sector as select e.* from sector e WHERE active and sector_id > 0 order by 1;
+		CREATE TEMP TABLE temp_macrosector as select e.* from macrosector e WHERE active and macrosector_id > 0 order by 1;
+
+		IF v_project_type = 'WS' THEN
+			CREATE TEMP TABLE temp_mincut as select e.* from om_mincut e WHERE id > 0 order by 1;
+		END IF;
+	ELSE 
+		CREATE TEMP TABLE temp_exploitation as select e.* from exploitation e 
+		JOIN config_user_x_expl USING (expl_id)	WHERE e.active and expl_id > 0 and username = current_user order by 1;
+
+		CREATE TEMP TABLE temp_macroexploitation as select distinct on (m.macroexpl_id) m.* from macroexploitation m
+		JOIN temp_exploitation e USING (macroexpl_id)
+		WHERE m.active and m.macroexpl_id > 0 order by 1;
+
+		CREATE TEMP TABLE temp_sector as 
+		select distinct on (s.sector_id) s.sector_id, s.name, s.macrosector_id, s.descript, s.active from sector s
+		JOIN (SELECT DISTINCT node.sector_id, node.expl_id FROM node WHERE node.state > 0)n USING (sector_id)
+		JOIN exploitation e ON e.expl_id=n.expl_id 
+		JOIN config_user_x_expl c ON c.expl_id=n.expl_id WHERE s.active and s.sector_id > 0 and username = current_user
+ 			UNION
+		select distinct on (s.sector_id) s.sector_id, s.name, s.macrosector_id, s.descript, s.active from sector s
+		JOIN (SELECT DISTINCT node.sector_id, node.expl_id FROM node WHERE node.state > 0)n USING (sector_id)
+		WHERE n.sector_id is null AND s.active and s.sector_id > 0
+		order by 1;
+
+		CREATE TEMP TABLE temp_macrosector as select distinct on (m.macrosector_id) m.* from macrosector m
+		JOIN temp_sector e USING (macrosector_id) 
+		WHERE m.active and m.macrosector_id > 0;
+
+		IF v_project_type = 'WS' THEN
+			CREATE TEMP TABLE temp_mincut AS select distinct on (m.id) m.* from om_mincut m
+			JOIN config_user_x_expl USING (expl_id)
+			where username = current_user and m.id > 0;
+		END IF;
+	END IF;
+
+	-- starting loop for tabs	
 	FOR v_tab IN EXECUTE v_query
 ​
 	LOOP
@@ -252,11 +301,6 @@ BEGIN
 			IF v_selector_list != '' THEN
 				v_filterfromids = ' AND ' || v_table_id || ' IN '|| v_selector_list || ' ';
 			END IF;
-		END IF;
-
-		-- manage active mapzones
-		IF v_tab.tabname IN ('tab_sector', 'tab_exploitation', 'tab_macroexploitation', 'tab_macrosector') THEN
-			v_filterfrominput = CONCAT (v_filterfrominput, ' AND active ');
 		END IF;
 
 		-- built full filter 

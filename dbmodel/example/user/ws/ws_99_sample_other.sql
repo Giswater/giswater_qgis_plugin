@@ -446,11 +446,6 @@ UPDATE cat_mat_roughness SET roughness = 0.025 WHERE matcat_id IN ('FC');
 
 SELECT setval('SCHEMA_NAME.urn_id_seq', gw_fct_setvalurn(),true);
 
-UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'sectorFromExpl', false) WHERE parameter = 'basic_selector_tab_exploitation';
-UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'explFromSector', false) WHERE parameter = 'basic_selector_tab_sector';
-UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json,'explFromMacroexpl', false) WHERE parameter = 'basic_selector_tab_macroexploitation';
-
-
 INSERT INTO config_param_user VALUES ('edit_pavement_vdefault','Asphalt',current_user);
 
 INSERT INTO plan_arc_x_pavement (arc_id, pavcat_id, percent) VALUES ('2001', 'Slab', 0.5);

@@ -87,7 +87,7 @@ BEGIN
 		INTO v_version;
 
 	-- get system variables
-	v_sectorfromexpl = (SELECT value::json->>'sectorfromexpl' FROM config_param_system WHERE parameter = 'basic_selector_options');
+	v_sectorfromexpl = (SELECT value::json->>'sectorFromExpl' FROM config_param_system WHERE parameter = 'basic_selector_options');
 	v_sectorfrommacro = (SELECT value::json->>'sectorFromMacro' FROM config_param_system WHERE parameter = 'basic_selector_options');
 	v_explfrommacro = (SELECT value::json->>'explFromNacro' FROM config_param_system WHERE parameter = 'basic_selector_options');
 

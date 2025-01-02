@@ -77,7 +77,6 @@ UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, '
 UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'sys_geom', 's.the_geom'::text)
 	WHERE parameter ='basic_search_v2_tab_address';
 
-UPDATE config_param_system SET isenabled = true WHERE parameter = 'basic_selector_tab_municipality';
 
 UPDATE link SET muni_id = c.muni_id FROM connec c WHERE connec_id =  feature_id;
 

@@ -85,12 +85,6 @@ BEGIN
 	-- delete on config_param_user fron updated values on sys_param_user
 	DELETE FROM config_param_user WHERE parameter NOT IN (SELECT id FROM sys_param_user) AND cur_user = current_user;
 
-	-- insert expl_x_user
-	IF v_expl_x_user IS FALSE THEN
-		INSERT INTO config_user_x_expl SELECT distinct ON (expl_id) expl_id, current_user 
-		from config_user_x_expl ON CONFLICT (expl_id, username) DO NOTHING;
-	END IF;
-
 	-- Force exploitation selector in case of null values
 	IF v_qgis_init_guide_map AND (v_isaudit IS NULL OR v_isaudit = 'false') THEN
 		DELETE FROM selector_expl WHERE cur_user = current_user;
