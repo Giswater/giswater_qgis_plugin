@@ -529,10 +529,11 @@ with
     connec_psector AS
         (
         SELECT pp.connec_id, pp.psector_id, pp.state AS p_state, 
-        FIRST_VALUE(pp.link_id) OVER (PARTITION BY pp.connec_id, pp.state ORDER BY link_id DESC NULLS LAST, arc_id::int DESC NULLS LAST) AS link_id,
-        FIRST_VALUE(pp.arc_id) OVER (PARTITION BY pp.connec_id, pp.state ORDER BY link_id DESC NULLS LAST, arc_id::int DESC NULLS LAST) AS arc_id 
+        FIRST_VALUE(pp.link_id) OVER w AS link_id,
+        FIRST_VALUE(pp.arc_id) OVER w AS arc_id 
         FROM plan_psector_x_connec pp
         JOIN selector_psector sp ON sp.cur_user = current_user AND sp.psector_id = pp.psector_id
+		WINDOW w AS (PARTITION BY pp.connec_id, pp.state ORDER BY insert_tstamp DESC)
         ),
     connec_selector AS
         (
@@ -717,12 +718,13 @@ with
     	where l.state = 2
     	),   	
     gully_psector AS
-        (
-        SELECT pp.gully_id, pp.psector_id, pp.state AS p_state, 
-        FIRST_VALUE(pp.link_id) OVER (PARTITION BY pp.gully_id, pp.state ORDER BY link_id DESC NULLS LAST, arc_id::int DESC NULLS LAST) AS link_id,
-        FIRST_VALUE(pp.arc_id) OVER (PARTITION BY pp.gully_id, pp.state ORDER BY link_id DESC NULLS LAST, arc_id::int DESC NULLS LAST) AS arc_id 
+        (	
+		SELECT pp.gully_id, pp.psector_id, pp.state AS p_state, 
+        FIRST_VALUE(pp.link_id) OVER w AS link_id,
+        FIRST_VALUE(pp.arc_id) OVER w AS arc_id 
         FROM plan_psector_x_gully pp
         JOIN selector_psector sp ON sp.cur_user = current_user AND sp.psector_id = pp.psector_id
+		WINDOW w AS (PARTITION BY pp.gully_id, pp.state ORDER BY insert_tstamp DESC)
         ),
     gully_selector AS
         (
@@ -918,12 +920,12 @@ WITH
      link_psector AS
         (
         SELECT pp.connec_id AS feature_id, 'CONNEC' AS feature_type, pp.psector_id, pp.state AS p_state, pp.arc_id as arc_id_original, pp.link_id as link_id_original, 
-        FIRST_VALUE(pp.link_id) OVER (PARTITION BY pp.connec_id, pp.state ORDER BY link_id DESC NULLS LAST, arc_id::int DESC NULLS LAST) AS link_id   
+		FIRST_VALUE(pp.link_id) OVER (PARTITION BY pp.connec_id, pp.state ORDER BY  insert_tstamp DESC) AS link_id  
         FROM plan_psector_x_connec pp
         JOIN selector_psector sp ON sp.cur_user = current_user AND sp.psector_id = pp.psector_id
         UNION ALL 
         SELECT pp.gully_id AS feature_id, 'GULLY' AS feature_type, pp.psector_id, pp.state AS p_state, pp.arc_id as arc_id_original, pp.link_id as link_id_original, 
-        FIRST_VALUE(pp.link_id) OVER (PARTITION BY pp.gully_id, pp.state ORDER BY link_id DESC NULLS LAST, arc_id::int DESC NULLS LAST) AS link_id
+		FIRST_VALUE(pp.link_id) OVER (PARTITION BY pp.gully_id, pp.state ORDER BY  insert_tstamp DESC) AS link_id  
         FROM plan_psector_x_gully pp
         JOIN selector_psector sp ON sp.cur_user = current_user AND sp.psector_id = pp.psector_id
         ),

@@ -518,10 +518,11 @@ WITH
     connec_psector AS
         (
         SELECT pp.connec_id, pp.psector_id, pp.state AS p_state, 
-        FIRST_VALUE(pp.link_id) OVER (PARTITION BY pp.connec_id, pp.state ORDER BY link_id DESC NULLS LAST, arc_id::int DESC NULLS LAST) AS link_id,
-        FIRST_VALUE(pp.arc_id) OVER (PARTITION BY pp.connec_id, pp.state ORDER BY link_id DESC NULLS LAST, arc_id::int DESC NULLS LAST) AS arc_id 
+        FIRST_VALUE(pp.link_id) OVER w AS link_id,
+        FIRST_VALUE(pp.arc_id) OVER w AS arc_id 
         FROM plan_psector_x_connec pp
         JOIN selector_psector sp ON sp.cur_user = current_user AND sp.psector_id = pp.psector_id
+		WINDOW w AS (PARTITION BY pp.connec_id, pp.state ORDER BY insert_tstamp DESC)
         ),
     connec_selector AS
         (
@@ -674,11 +675,11 @@ WITH
 		connec.num_value,
 		CASE
 			WHEN link_planned.link_id IS NULL THEN connec.pjoint_id
-			ELSE connec.arc_id
+			ELSE link_planned.exit_id
 		END AS pjoint_id,
 		CASE
 			WHEN link_planned.link_id IS NULL THEN connec.pjoint_type
-			ELSE 'ARC'::character varying(16)
+			ELSE link_planned.exit_type
 		END AS pjoint_type,
 		connec.adate,
 		connec.adescript,
@@ -783,8 +784,8 @@ WITH
         ),
     link_psector AS
         (
-        SELECT pp.connec_id AS feature_id, 'CONNEC' AS feature_type, pp.psector_id, pp.state AS p_state, FIRST_VALUE(pp.link_id)
-        OVER (PARTITION BY pp.connec_id, pp.state ORDER BY link_id DESC NULLS LAST, arc_id::int DESC NULLS LAST) AS link_id  
+        SELECT pp.connec_id AS feature_id, 'CONNEC' AS feature_type, pp.psector_id, pp.state AS p_state, 
+		FIRST_VALUE(pp.link_id) OVER (PARTITION BY pp.connec_id, pp.state ORDER BY  insert_tstamp DESC) AS link_id  
         FROM plan_psector_x_connec pp
         JOIN selector_psector sp ON sp.cur_user = current_user AND sp.psector_id = pp.psector_id
         ),
