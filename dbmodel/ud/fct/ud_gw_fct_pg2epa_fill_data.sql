@@ -206,9 +206,9 @@ BEGIN
 		case when custom_a_param is null then a_param else custom_a_param end,
 		case when custom_b_param is null then b_param else custom_b_param end,
 		efficiency, the_geom
-		FROM v_edit_inp_netgully g 
+		FROM selector_sector s, v_edit_inp_netgully g 
 		LEFT JOIN value_state_type ON id=g.state_type
-		WHERE g.sector_id > 0 '||v_statetype||';';
+		WHERE g.sector_id > 0 '||v_statetype||' AND s.cur_user = current_user and s.sector_id = g.sector_id;';
 
 		-- gully
 		EXECUTE 'INSERT INTO temp_t_gully 
@@ -225,11 +225,11 @@ BEGIN
 		case when custom_a_param is null then a_param else custom_a_param end,
 		case when custom_b_param is null then b_param else custom_b_param end,
 		efficiency, g.the_geom
-		FROM v_edit_inp_gully g
+		FROM selector_sector s, v_edit_inp_gully g
 		LEFT JOIN arc a USING (arc_id)
 		LEFT JOIN value_state_type ON id=g.state_type
-		WHERE arc_id IS NOT NULL AND g.sector_id > 0 '||v_statetype||';';
-
+		WHERE arc_id IS NOT NULL AND g.sector_id > 0 '||v_statetype||' AND s.cur_user = current_user and s.sector_id = g.sector_id;';
+		
 	END IF;
 
 	-- orifice
