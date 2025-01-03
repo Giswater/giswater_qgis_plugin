@@ -876,13 +876,17 @@ UPDATE sys_param_user SET id='plan_psector_current' WHERE id='plan_psector_vdefa
 
 -- 26/12/2024
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source")
-VALUES(3362, 'gw_fct_create_checktables', 'utils', 'function', 'json', 'json', 'Create temporal tables for check process.', 'role_basic', NULL, 'core');
+VALUES(3362, 'gw_fct_create_logtables', 'utils', 'function', 'json', 'json', 'Create temporal tables for check process.', 'role_basic', NULL, 'core');
 
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source")
 VALUES(3364, 'gw_fct_setcheckdatabase', 'utils', 'function', 'json', 'json', 'Check database exceptions.', 'role_basic', NULL, 'core');
 
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source")
 VALUES(3366, 'gw_fct_create_logreturn', 'utils', 'function', 'json', 'json', 'Create log return for check functions.', 'role_basic', NULL, 'core');
+
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source")
+VALUES(3368, 'gw_fct_create_querytables', 'utils', 'function', 'json', 'json', 'Create temporal tables for check process.', 'role_basic', NULL, 'core');
+
 
 
 DELETE FROM sys_param_user where id='utils_checkproject_database';

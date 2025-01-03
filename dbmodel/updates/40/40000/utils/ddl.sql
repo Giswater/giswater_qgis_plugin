@@ -233,6 +233,13 @@ ALTER TABLE cat_mat_arc RENAME TO _cat_mat_arc;
 ALTER TABLE cat_mat_node RENAME TO _cat_mat_node;
 ALTER TABLE cat_mat_element RENAME TO _cat_mat_element;
 
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"element", "column":"verified", "dataType":"varchar(20)", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"element", "column":"verified", "dataType":"int2", "isUtils":"False"}}$$);
 
 DROP INDEX if exists plan_psector_psector_id;
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"link", "column":"verified", "dataType":"int2", "isUtils":"False"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"sys_fprocess", "column":"active", "dataType":"boolean", "isUtils":"False"}}$$);
+
+update sys_fprocess set active = true;
+

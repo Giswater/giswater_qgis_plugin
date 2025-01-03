@@ -6,18 +6,17 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE:2670
 
-CREATE OR REPLACE FUNCTION ws40000.gw_fct_pg2epa_check_data(p_data json)
+DROP FUNCTION IF EXISTS ws40000.gw_fct_om_check_data(json);
+CREATE OR REPLACE FUNCTION ws40000.gw_fct_om_check_data(p_data json)
   RETURNS json AS
 $BODY$
 
 /*EXAMPLE
-SELECT ws40000.gw_fct_setcheckdatabase($${"data":{"parameters":{"omCheck":false, "graphCheck":false, "epaCheck":true, "planCheck":false, "adminCheck":false, "ignoreVerifiedExceptions":false}}}$$);
--- v_fid: 604 check from checkproject
-
--- v_fid: 227 check from pg2epa
+SELECT ws40000.gw_fct_setcheckdatabase($${"data":{"parameters":{"omCheck":true, "graphCheck":false, "epaCheck":false, "planCheck":false, "adminCheck":false, "ignoreVerifiedExceptions":false}}}$$);
 */
 
 DECLARE
+
 v_rec record;
 v_project_type text;
 v_querytext text;
@@ -37,7 +36,7 @@ BEGIN
 
 	-- getting sys_fprocess to be executed
 	v_querytext = 'select * from sys_fprocess where project_type in (lower('||quote_literal(v_project_type)||'), ''utils'') 
-	and addparam is null and query_text is not null and function_name ilike ''%pg2epa_check%'' and active order by fid asc';
+	and addparam is null and query_text is not null and function_name ilike ''%om_check%'' and active order by fid asc';
 
 	-- loop for checks
 	for v_rec in execute v_querytext		

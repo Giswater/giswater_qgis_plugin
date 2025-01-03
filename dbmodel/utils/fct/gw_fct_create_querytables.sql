@@ -1,0 +1,92 @@
+/*
+This file is part of Giswater 3
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+This version of Giswater is provided by Giswater Association
+*/
+
+--FUNCTION CODE: 3368
+
+CREATE OR REPLACE FUNCTION ws40000.gw_fct_create_querytables (p_data json)
+  RETURNS json AS
+$BODY$
+
+/*
+SELECT ws40000.gw_fct_setcheckdatabase($${"data":{"parameters":{"omCheck":true, "graphCheck":false, "epaCheck":false, "planCheck":false, "adminCheck":false, "ignoreVerifiedExceptions":true}}}$$);
+
+*/
+
+DECLARE
+v_fid integer; 
+v_project_type text;
+v_ignore_verified_exceptions boolean = true;
+v_fprocessname text;
+v_filter text;
+v_omcheck boolean;
+v_graphcheck boolean;
+v_epacheck boolean;
+v_plancheck boolean;
+v_admincheck boolean;
+
+BEGIN
+
+	-- search path
+	SET search_path = "ws40000", public;
+
+	-- get system parameters
+	v_project_type = (SELECT project_type FROM sys_version order by id desc limit 1);
+
+	-- Get input parameters
+	v_ignore_verified_exceptions := ((p_data ->>'data')::json->>'parameters')::json->>'ignoreVerifiedExceptions';
+	v_fid := (((p_data ->>'data')::json->>'parameters')::json->>'fid');
+	v_omcheck :=  ((p_data ->> 'data')::json->>'parameters')::json->> 'omCheck';
+	v_graphcheck :=  ((p_data ->> 'data')::json->>'parameters')::json->> 'graphCheck';
+	v_epacheck :=  ((p_data ->> 'data')::json->>'parameters')::json->> 'epaCheck';
+	v_plancheck :=  ((p_data ->> 'data')::json->>'parameters')::json->> 'planCheck';
+	v_admincheck :=  ((p_data ->> 'data')::json->>'parameters')::json->> 'adminCheck';
+	
+	-- setting verified options
+	IF v_ignore_verified_exceptions THEN
+		v_filter = ' WHERE state is not null ';
+	ELSE
+		v_filter = ' WHERE (verified is null or verified::INTEGER IN (0,1))';
+	END IF;
+
+	-- create query tables for om
+	DROP TABLE IF EXISTS t_arc;	EXECUTE 'CREATE TEMP TABLE t_arc AS SELECT * FROM v_edit_arc'||v_filter;
+	DROP TABLE IF EXISTS t_node;EXECUTE 'CREATE TEMP TABLE  t_node AS SELECT * FROM v_edit_node'||v_filter;
+	DROP TABLE IF EXISTS t_connec;EXECUTE 'CREATE TEMP TABLE t_connec AS SELECT * FROM v_edit_connec'||v_filter;
+	DROP TABLE IF EXISTS t_element;	EXECUTE 'CREATE TEMP TABLE t_element AS SELECT * FROM v_edit_element'||v_filter;
+	DROP TABLE IF EXISTS t_link;EXECUTE 'CREATE TEMP TABLE t_link AS SELECT * FROM v_edit_link'||v_filter;
+	DROP TABLE IF EXISTS t_dma;	CREATE TEMP TABLE t_dma AS SELECT * FROM v_edit_dma;
+	IF v_project_type  = 'UD' THEN
+		DROP TABLE IF EXISTS t_gully;EXECUTE 'CREATE TEMP TABLE t_gully AS SELECT * FROM v_edit_gully'||v_filter;
+	END IF;	
+
+	-- create query table for epa
+	IF v_epacheck THEN
+		v_filter = concat(v_filter, ' AND sector_id IN (select sector_id from selector_sector where cur_user = current_user)');
+	
+		IF v_project_type = 'WS' THEN
+			DROP TABLE IF EXISTS t_inp_pipe; EXECUTE 'CREATE TEMP TABLE t_inp_pipe AS SELECT * FROM v_edit_inp_pipe'||v_filter;
+			DROP TABLE IF EXISTS t_inp_pump; EXECUTE 'CREATE TEMP TABLE t_inp_pump AS SELECT * FROM v_edit_inp_pump'||v_filter;
+			DROP TABLE IF EXISTS t_inp_valve; EXECUTE 'CREATE TEMP TABLE t_inp_valve AS SELECT * FROM v_edit_inp_valve'||v_filter;
+			DROP TABLE IF EXISTS t_inp_junction; EXECUTE 'CREATE TEMP TABLE t_inp_junction AS SELECT * FROM v_edit_inp_junction'||v_filter;
+			DROP TABLE IF EXISTS t_inp_reservoir; EXECUTE 'CREATE TEMP TABLE t_inp_reservoir AS SELECT * FROM v_edit_inp_reservoir'||v_filter;
+			DROP TABLE IF EXISTS t_inp_tank; EXECUTE 'CREATE TEMP TABLE t_inp_tank AS SELECT * FROM v_edit_inp_tank'||v_filter;
+			DROP TABLE IF EXISTS t_inp_inlet; EXECUTE 'CREATE TEMP TABLE t_inp_inlet AS SELECT * FROM v_edit_inp_inlet'||v_filter;
+			DROP TABLE IF EXISTS t_inp_virtualvalve; EXECUTE 'CREATE TEMP TABLE t_inp_virtualvalve AS SELECT * FROM v_edit_inp_virtualvalve'||v_filter;
+			DROP TABLE IF EXISTS t_inp_virtualpump; EXECUTE 'CREATE TEMP TABLE t_inp_virtualpump AS SELECT * FROM v_edit_inp_virtualpump'||v_filter;
+		
+		ELSIF  v_project_type  = 'UD' THEN
+			DROP TABLE IF EXISTS t_inp_gully;EXECUTE 'CREATE TEMP TABLE t_inp_gully AS SELECT * FROM v_edit_inp_gully'||v_filter;
+		END IF;	
+	END IF;
+	
+	--  Return
+	RETURN '{"status":"ok"}';
+
+END;
+
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;

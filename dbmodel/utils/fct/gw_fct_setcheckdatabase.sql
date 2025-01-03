@@ -11,7 +11,7 @@ CREATE OR REPLACE FUNCTION ws40000.gw_fct_setcheckdatabase (p_data json)
 $BODY$
 
 /*
-SELECT ws40000.gw_fct_setcheckdatabase($${"data":{"parameters":{"ignoreVerifiedExceptions":false}}}$$);
+SELECT ws40000.gw_fct_setcheckdatabase($${"data":{"parameters":{"omCheck":true, "graphCheck":false, "epaCheck":false, "planCheck":false, "adminCheck":false, "ignoreVerifiedExceptions":false}}}$$);
 
 fid  =604
 */
@@ -34,9 +34,11 @@ v_projectrole text;
 v_infotype text;
 v_insert_fields json;
 v_uservalues json;
-v_ignoregraphanalytics boolean;
-v_ignoreepa boolean;
-v_ignoreplan boolean;
+v_omcheck boolean = true;
+v_graphcheck boolean = true;
+v_epacheck boolean = true;
+v_plancheck boolean = true;
+v_admincheck boolean = true;
 v_ignore_verified_exceptions boolean = true;
 v_fid integer = 604;
 
@@ -50,44 +52,44 @@ BEGIN
 
 	-- Get input parameters
 	v_ignore_verified_exceptions := ((p_data ->> 'data')::json->>'parameters')::json->> 'ignoreVerifiedExceptions';
+	v_omcheck :=  ((p_data ->> 'data')::json->>'parameters')::json->> 'omCheck';
+	v_graphcheck :=  ((p_data ->> 'data')::json->>'parameters')::json->> 'omCheck';
+	v_epacheck :=  ((p_data ->> 'data')::json->>'parameters')::json->> 'epaCheck';
+	v_plancheck :=  ((p_data ->> 'data')::json->>'parameters')::json->> 'planCheck';
+	v_admincheck :=  ((p_data ->> 'data')::json->>'parameters')::json->> 'adminCheck';
 
-	-- get system parameters
-	SELECT value::json->>'ignoreGraphanalytics' INTO v_ignoregraphanalytics FROM config_param_system WHERE parameter = 'admin_checkproject';
-	SELECT value::json->>'ignorePlan' INTO v_ignoreplan FROM config_param_system WHERE parameter = 'admin_checkproject';
-	SELECT value::json->>'ignoreEpa' INTO v_ignoreepa FROM config_param_system WHERE parameter = 'admin_checkproject';
-	IF v_ignoregraphanalytics IS NULL THEN v_ignoregraphanalytics = FALSE; END IF;
-	IF v_ignoreepa IS NULL THEN v_ignoreepa = FALSE; END IF;
-	IF v_ignoreplan IS NULL THEN v_ignoreplan = FALSE; END IF;
+	-- get system parameters in case input parameter is null
+	IF v_ignore_verified_exceptions IS NULL THEN SELECT value::json->>'ignoreVerifiedExceptions' INTO v_ignore_verified_exceptions 
+	   FROM config_param_system WHERE parameter = 'admin_checkproject'; END IF;
+	IF v_omcheck IS NULL THEN SELECT value::json->>'omCheck' INTO v_omcheck FROM config_param_system WHERE parameter = 'admin_checkproject'; END IF;
+	IF v_graphcheck IS NULL THEN SELECT value::json->>'graphCheck' INTO v_graphcheck FROM config_param_system WHERE parameter = 'admin_checkproject'; END IF;
+	IF v_epacheck IS NULL THEN SELECT value::json->>'epaCheck' INTO v_epacheck FROM config_param_system WHERE parameter = 'admin_checkproject'; END IF;
+	IF v_plancheck IS NULL THEN SELECT value::json->>'planCheck' INTO v_plancheck FROM config_param_system WHERE parameter = 'admin_checkproject'; END IF;
+	IF v_admincheck IS NULL THEN SELECT value::json->>'adminCheck' INTO v_admincheck FROM config_param_system WHERE parameter = 'admin_checkproject'; END IF;
 
-	-- create temp tables
-	EXECUTE 'SELECT gw_fct_create_checktables($${"data":{"parameters":{"fid":'||v_fid||',"ignoreVerifiedExceptions":'||v_ignore_verified_exceptions||'"}}}$$::json)';
+	-- create log tables
+	EXECUTE 'SELECT gw_fct_create_logtables($${"data":{"parameters":{"fid":604}}}$$::json)';
 
-	-- trigger check functions
-	--IF 'role_om' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
+	-- create query tables
+	EXECUTE 'SELECT gw_fct_create_querytables($${"data":{"parameters":{"fid":604, 
+				"omCheck":'||v_omcheck||', "graphCheck":'||v_graphcheck||', "epaCheck":'||v_epacheck||', "planCheck":'||
+				v_plancheck||', "adminCheck":'||v_omcheck||', "ignoreVerifiedExceptions":'||v_ignore_verified_exceptions||'}}}$$::json)';
+
+	-- starting check process
+	IF 'role_om' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) AND v_omcheck THEN
 		EXECUTE 'SELECT gw_fct_om_check_data($${"data":{"parameters":{"fid":'||v_fid||'}}}$$)';
-/*
-		IF v_ignoregraphanalytics IS FALSE THEN 
-			IF v_project_type = 'WS' THEN
-				EXECUTE 'SELECT gw_fct_graphanalytics_check_data($${"data":{"parameters":{"fid":'||v_fid||'}}}$$)';
-			END IF;
-		END IF;
 	END IF;
-	
-	IF 'role_epa' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
-		IF v_ignoreepa IS FALSE THEN
-			EXECUTE 'SELECT gw_fct_pg2epa_check_data($${"data":{"parameters":{"fid":'||v_fid||'}}}$$)';
-		END IF;
+
+	IF 'role_epa' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) AND v_epacheck THEN
+		EXECUTE 'SELECT gw_fct_pg2epa_check_data($${"data":{"parameters":{"fid":'||v_fid||'}}}$$)';
 	END IF;
-	IF 'role_master' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN		IF v_ignoreplan IS FALSE THEN
-			EXECUTE 'SELECT gw_fct_plan_check_data($${"data":{"parameters":{"fid":'||v_fid||'}}}$$)';
-		END IF;
+	IF 'role_master' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) AND v_plancheck THEN		EXECUTE 'SELECT gw_fct_plan_check_data($${"data":{"parameters":{"fid":'||v_fid||'}}}$$)';
 	END IF;	
-	IF 'role_admin' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
+	IF 'role_admin' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) AND v_admincheck THEN
 		EXECUTE 'SELECT gw_fct_admin_check_data($${"data":{"parameters":{"fid":'||v_fid||'}}}$$)';
 	END IF; 
 
 	EXECUTE 'SELECT gw_fct_user_check_data($${"data":{"parameters":{"fid":'||v_fid||'}}}$$)';
-	*/	
 
 	-- materialize tables
 	PERFORM gw_fct_create_logreturn($${"data":{"parameters":{"type":"fillExcepTables"}}}$$::json);
@@ -98,7 +100,7 @@ BEGIN
 	EXECUTE 'SELECT gw_fct_create_logreturn($${"data":{"parameters":{"type":"line"}}}$$::json)' INTO v_result_line;
 	EXECUTE 'SELECT gw_fct_create_logreturn($${"data":{"parameters":{"type":"polygon"}}}$$::json)' INTO v_result_polygon;
 
-	--return definition for v_audit_check_result
+	--return definition
 	v_return= ('{"status":"Accepted", "message":{"level":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'"
 		,"body":{"form":{}'||
 			',"data":{ "epsg":'||v_epsg||

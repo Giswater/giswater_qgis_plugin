@@ -709,5 +709,66 @@ WHERE t1.node_id != t2.node_id ORDER BY t1.node_id ) a where a.state1 = 2 AND a.
 INSERT INTO sys_fprocess (fid, fprocess_name, "source", fprocess_type, project_type)
 VALUES (604, 'Check DB data', 'core', 'Function process', 'utils');
 
+UPDATE config_param_system SET value= '{"omCheck":true, "graphCheck":true, "epaCheck":true, "planCheck":true, "adminCheck":true, "ignoreVerifiedExceptions":false}' 
+WHERE parameter = 'admin_checkproject';
 
+update sys_fprocess set query_text = replace(query_text,'v_edit_', 't_');
+
+update sys_fprocess set query_text = 'SELECT * FROM t_inp_inlet WHERE initlevel is null or minlevel is null or maxlevel is null or diameter is null or minvol is null'
+where fid  =153;
+
+update sys_fprocess set query_text = '
+SELECT * FROM (
+SELECT node_id, nodecat_id, n.the_geom, n.expl_id FROM t_node n JOIN selector_sector USING (sector_id) 
+JOIN t_arc a1 ON node_id=a1.node_1  AND n.epa_type IN (''SHORTPIPE'', ''VALVE'', ''PUMP'') WHERE current_user=cur_user 
+UNION ALL 
+SELECT node_id, nodecat_id, n.the_geom, n.expl_id FROM t_node n JOIN selector_sector USING (sector_id) 
+JOIN t_arc a1 ON node_id=a1.node_2  AND n.epa_type IN (''SHORTPIPE'', ''VALVE'', ''PUMP'') WHERE current_user=cur_user)a 
+GROUP by node_id, nodecat_id, the_geom, expl_id HAVING count(*) > 2'
+where fid = 166
+
+update sys_fprocess set query_text = 'SELECT arc_id, arccat_id, the_geom, expl_id FROM t_inp_pipe WHERE status =''CV''' 
+where fid = 169;
+
+update sys_fprocess set query_text = '
+select node_id, nodecat_id, n.the_geom,  n.expl_id
+from man_valve join t_node n using (node_id) JOIN t_arc v on v.arc_id = to_arc
+where node_id not in (node_1, node_2)' 
+where fid = 170;
+
+update sys_fprocess set query_text = '
+select node_id, nodecat_id, n.the_geom,  n.expl_id
+from man_pump join t_node n using (node_id) JOIN t_arc v on v.arc_id = to_arc
+where node_id not in (node_1, node_2)' 
+where fid = 171;
+
+update sys_fprocess set query_text = 'SELECT * FROM t_inp_tank WHERE initlevel is null or minlevel is null or maxlevel is null or diameter is null or minvol is null'
+where fid = 198;
+
+update sys_fprocess set query_text = '
+SELECT DISTINCT t1.node_id, t1.nodecat_id, t1.the_geom, t1.expl_id,  st_distance(t1.the_geom, t2.the_geom) as dist
+FROM t_node AS t1 JOIN t_node AS t2 ON ST_Dwithin(t1.the_geom, t2.the_geom, 0.01) 
+WHERE t1.node_id != t2.node_id AND ((t1.epa_type IN (''PUMP'', ''VALVE'') AND t2.epa_type !=''UNDEFINED'') OR 
+(t2.epa_type IN (''PUMP'', ''VALVE'') AND t1.epa_type !=''UNDEFINED''))  ORDER BY dist'
+where fid = 411;
+
+update sys_fprocess set query_text = '
+SELECT DISTINCT t1.node_id, t1.nodecat_id, t1.the_geom, t1.expl_id,  st_distance(t1.the_geom, t2.the_geom) as dist
+FROM t_node AS t1 JOIN t_node AS t2 ON ST_Dwithin(t1.the_geom, t2.the_geom, 0.01) 
+WHERE t1.node_id != t2.node_id AND ((t1.epa_type IN (''SHORTPIPE'') AND t2.epa_type !=''UNDEFINED'') OR 
+(t2.epa_type IN (''SHORTPIPE'') AND t1.epa_type !=''UNDEFINED''))  ORDER BY dist'
+where fid = 412;
+
+update sys_fprocess set function_name ='[gw_fct_pg2epa_check_data]', query_text = '
+SELECT  count(*), node_id, nodecat_id, the_geom, expl_id FROM (
+SELECT node_id, nodecat_id, n.the_geom, n.expl_id FROM t_node n
+JOIN arc ON node_id=node_1 WHERE n.epa_type IN (''SHORTPIPE'')
+UNION all
+SELECT node_id, nodecat_id, n.the_geom, n.expl_id FROM t_node n
+JOIN arc ON node_id=node_2 WHERE n.epa_type IN (''SHORTPIPE''))a
+GROUP by node_id, nodecat_id, the_geom, expl_id
+HAVING count(*) < 2'
+WHERE fid = 292
+
+delete from sys_fprocess where fid = 533;
 
