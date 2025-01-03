@@ -11,14 +11,14 @@ CREATE OR REPLACE FUNCTION ws40000.gw_fct_create_querytables (p_data json)
 $BODY$
 
 /*
-SELECT ws40000.gw_fct_setcheckdatabase($${"data":{"parameters":{"omCheck":true, "graphCheck":false, "epaCheck":false, "planCheck":false, "adminCheck":false, "ignoreVerifiedExceptions":true}}}$$);
+SELECT ws40000.gw_fct_setcheckdatabase($${"data":{"parameters":{"omCheck":true, "graphCheck":false, "epaCheck":false, "planCheck":false, "adminCheck":false, "verifiedExceptions":false}}}$$);
 
 */
 
 DECLARE
 v_fid integer; 
 v_project_type text;
-v_ignore_verified_exceptions boolean = true;
+v_verified_exceptions boolean = true;
 v_fprocessname text;
 v_filter text;
 v_omcheck boolean;
@@ -36,7 +36,7 @@ BEGIN
 	v_project_type = (SELECT project_type FROM sys_version order by id desc limit 1);
 
 	-- Get input parameters
-	v_ignore_verified_exceptions := ((p_data ->>'data')::json->>'parameters')::json->>'ignoreVerifiedExceptions';
+	v_verified_exceptions := ((p_data ->>'data')::json->>'parameters')::json->>'verifiedExceptions';
 	v_fid := (((p_data ->>'data')::json->>'parameters')::json->>'fid');
 	v_omcheck :=  ((p_data ->> 'data')::json->>'parameters')::json->> 'omCheck';
 	v_graphcheck :=  ((p_data ->> 'data')::json->>'parameters')::json->> 'graphCheck';
@@ -45,10 +45,10 @@ BEGIN
 	v_admincheck :=  ((p_data ->> 'data')::json->>'parameters')::json->> 'adminCheck';
 	
 	-- setting verified options
-	IF v_ignore_verified_exceptions THEN
-		v_filter = ' WHERE state is not null ';
-	ELSE
+	IF v_verified_exceptions THEN
 		v_filter = ' WHERE (verified is null or verified::INTEGER IN (0,1))';
+	ELSE
+		v_filter = ' WHERE state is not null ';
 	END IF;
 
 	-- create query tables for om
@@ -62,7 +62,8 @@ BEGIN
 		DROP TABLE IF EXISTS t_gully;EXECUTE 'CREATE TEMP TABLE t_gully AS SELECT * FROM v_edit_gully'||v_filter;
 	END IF;	
 
-	-- create query table for epa
+
+	-- create query table for check-epa
 	IF v_epacheck THEN
 		v_filter = concat(v_filter, ' AND sector_id IN (select sector_id from selector_sector where cur_user = current_user)');
 	

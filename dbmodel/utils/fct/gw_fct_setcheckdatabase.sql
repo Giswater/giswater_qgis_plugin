@@ -24,11 +24,6 @@ v_version text;
 v_epsg integer;
 v_return json;
 v_schemaname text;
-v_result_point json;
-v_result_line json;
-v_result_polygon json;
-v_result json;
-v_result_info json;
 v_error_context text;
 v_projectrole text;
 v_infotype text;
@@ -39,7 +34,7 @@ v_graphcheck boolean = true;
 v_epacheck boolean = true;
 v_plancheck boolean = true;
 v_admincheck boolean = true;
-v_ignore_verified_exceptions boolean = true;
+v_verified_exceptions boolean = true;
 v_fid integer = 604;
 
 BEGIN
@@ -51,7 +46,7 @@ BEGIN
 	SELECT project_type, giswater, epsg INTO v_project_type, v_version, v_epsg FROM sys_version order by id desc limit 1;
 
 	-- Get input parameters
-	v_ignore_verified_exceptions := ((p_data ->> 'data')::json->>'parameters')::json->> 'ignoreVerifiedExceptions';
+	v_verified_exceptions := ((p_data ->> 'data')::json->>'parameters')::json->> 'verifiedExceptions';
 	v_omcheck :=  ((p_data ->> 'data')::json->>'parameters')::json->> 'omCheck';
 	v_graphcheck :=  ((p_data ->> 'data')::json->>'parameters')::json->> 'omCheck';
 	v_epacheck :=  ((p_data ->> 'data')::json->>'parameters')::json->> 'epaCheck';
@@ -59,7 +54,7 @@ BEGIN
 	v_admincheck :=  ((p_data ->> 'data')::json->>'parameters')::json->> 'adminCheck';
 
 	-- get system parameters in case input parameter is null
-	IF v_ignore_verified_exceptions IS NULL THEN SELECT value::json->>'ignoreVerifiedExceptions' INTO v_ignore_verified_exceptions 
+	IF v_verified_exceptions IS NULL THEN SELECT value::json->>'verifiedExceptions' INTO v_verified_exceptions 
 	   FROM config_param_system WHERE parameter = 'admin_checkproject'; END IF;
 	IF v_omcheck IS NULL THEN SELECT value::json->>'omCheck' INTO v_omcheck FROM config_param_system WHERE parameter = 'admin_checkproject'; END IF;
 	IF v_graphcheck IS NULL THEN SELECT value::json->>'graphCheck' INTO v_graphcheck FROM config_param_system WHERE parameter = 'admin_checkproject'; END IF;
@@ -73,43 +68,26 @@ BEGIN
 	-- create query tables
 	EXECUTE 'SELECT gw_fct_create_querytables($${"data":{"parameters":{"fid":604, 
 				"omCheck":'||v_omcheck||', "graphCheck":'||v_graphcheck||', "epaCheck":'||v_epacheck||', "planCheck":'||
-				v_plancheck||', "adminCheck":'||v_omcheck||', "ignoreVerifiedExceptions":'||v_ignore_verified_exceptions||'}}}$$::json)';
+				v_plancheck||', "adminCheck":'||v_omcheck||', "verifiedExceptions":'||v_verified_exceptions||'}}}$$::json)';
 
 	-- starting check process
 	IF 'role_om' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) AND v_omcheck THEN
-		EXECUTE 'SELECT gw_fct_om_check_data($${"data":{"parameters":{"fid":'||v_fid||'}}}$$)';
+		EXECUTE 'SELECT gw_fct_om_check_data($${"data":{"parameters":{"fid":'||v_fid||', "isEmbebed":true}}}$$)';
 	END IF;
 
 	IF 'role_epa' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) AND v_epacheck THEN
-		EXECUTE 'SELECT gw_fct_pg2epa_check_data($${"data":{"parameters":{"fid":'||v_fid||'}}}$$)';
+		EXECUTE 'SELECT gw_fct_pg2epa_check_data($${"data":{"parameters":{"fid":'||v_fid||', "isEmbebed":true}}}$$)';
 	END IF;
-	IF 'role_master' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) AND v_plancheck THEN		EXECUTE 'SELECT gw_fct_plan_check_data($${"data":{"parameters":{"fid":'||v_fid||'}}}$$)';
+	IF 'role_master' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) AND v_plancheck THEN		EXECUTE 'SELECT gw_fct_plan_check_data($${"data":{"parameters":{"fid":'||v_fid||', "isEmbebed":true}}}$$)';
 	END IF;	
 	IF 'role_admin' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) AND v_admincheck THEN
-		EXECUTE 'SELECT gw_fct_admin_check_data($${"data":{"parameters":{"fid":'||v_fid||'}}}$$)';
+		EXECUTE 'SELECT gw_fct_admin_check_data($${"data":{"parameters":{"fid":'||v_fid||', "isEmbebed":true}}}$$)';
 	END IF; 
 
-	EXECUTE 'SELECT gw_fct_user_check_data($${"data":{"parameters":{"fid":'||v_fid||'}}}$$)';
+	EXECUTE 'SELECT gw_fct_user_check_data($${"data":{"parameters":{"fid":'||v_fid||', "isEmbebed":true}}}$$)';
 
-	-- materialize tables
-	PERFORM gw_fct_create_logreturn($${"data":{"parameters":{"type":"fillExcepTables"}}}$$::json);
-
-	-- create json return to send client
-	EXECUTE 'SELECT gw_fct_create_logreturn($${"data":{"parameters":{"type":"info"}}}$$::json)' INTO v_result_info;
-	EXECUTE 'SELECT gw_fct_create_logreturn($${"data":{"parameters":{"type":"point"}}}$$::json)' INTO v_result_point;
-	EXECUTE 'SELECT gw_fct_create_logreturn($${"data":{"parameters":{"type":"line"}}}$$::json)' INTO v_result_line;
-	EXECUTE 'SELECT gw_fct_create_logreturn($${"data":{"parameters":{"type":"polygon"}}}$$::json)' INTO v_result_polygon;
-
-	--return definition
-	v_return= ('{"status":"Accepted", "message":{"level":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'"
-		,"body":{"form":{}'||
-			',"data":{ "epsg":'||v_epsg||
-			    ',"info":'||v_result_info||','||
-					'"point":'||v_result_point||','||
-					'"line":'||v_result_line||','||
-					'"polygon":'||v_result_polygon||'}}}')::json;
-
-	--  Return
+	-- create return
+	EXECUTE 'SELECT gw_fct_create_return($${"data":{"parameters":{"functionId":3364, "isEmbebed":false}}}$$::json)' INTO v_return;
 	RETURN v_return;
 
 	--  Exception handling

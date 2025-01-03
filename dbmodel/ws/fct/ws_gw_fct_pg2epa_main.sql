@@ -6,21 +6,21 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2646
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_pg2epa(character varying, boolean, boolean);
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_pg2epa(character varying, boolean);
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_pg2epa(json);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_main(p_data json)
+DROP FUNCTION IF EXISTS ws40000.gw_fct_pg2epa(character varying, boolean, boolean);
+DROP FUNCTION IF EXISTS ws40000.gw_fct_pg2epa(character varying, boolean);
+DROP FUNCTION IF EXISTS ws40000.gw_fct_pg2epa(json);
+CREATE OR REPLACE FUNCTION ws40000.gw_fct_pg2epa_main(p_data json)
 RETURNS json AS
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "step":"1"}}$$); -- PRE-PROCESS
-SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "step":"2"}}$$); -- AUTOREPAIR
-SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "step":"3"}}$$); -- CHECK DATA
-SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "step":"4"}}$$); -- STRUCTURE DATA
-SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "step":"5"}}$$); -- CHECK GRAPH
-SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "step":"6"}}$$); -- BUILD INP
-SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "step":"7"}}$$); -- POST-PROCESS
+SELECT ws40000.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "step":"1"}}$$); -- PRE-PROCESS
+SELECT ws40000.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "step":"2"}}$$); -- AUTOREPAIR
+SELECT ws40000.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "step":"3"}}$$); -- CHECK DATA
+SELECT ws40000.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "step":"4"}}$$); -- STRUCTURE DATA
+SELECT ws40000.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "step":"5"}}$$); -- CHECK GRAPH
+SELECT ws40000.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "step":"6"}}$$); -- BUILD INP
+SELECT ws40000.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "step":"7"}}$$); -- POST-PROCESS
 
 select * from temp_audit_check_data order by 1 asc
 
@@ -65,12 +65,12 @@ v_epa_maxresults integer;
 BEGIN
 
 	-- set search path
-	SET search_path = "SCHEMA_NAME", public;
+	SET search_path = "ws40000", public;
 
 	-- get input data
 	v_result = (p_data->>'data')::json->>'resultId';
 	v_step = (p_data->>'data')::json->>'step';  -- use network previously defined
-	v_input = concat('{"data":{"parameters":{"resultId":"',v_result,'", "fid":227}}}')::json;
+	v_input = concat('{"data":{"parameters":{"isEmbebed":true, "verifiedExceptions":true, "resultId":"',v_result,'", "fid":227}}}')::json;
 
 	-- step 0: Manage epa max results variable
 	select value into v_epa_maxresults from config_param_user where parameter = 'epa_maxresults_peruser' and cur_user=current_user;
@@ -92,6 +92,27 @@ BEGIN
 		DELETE FROM selector_state WHERE cur_user=current_user;
 		INSERT INTO selector_state (state_id, cur_user) VALUES (1, current_user);
 
+		-- drop temp tables
+		DROP TABLE IF EXISTS temp_vnode;
+		DROP TABLE IF EXISTS temp_link;
+		DROP TABLE IF EXISTS temp_link_x_arc;
+
+		DROP TABLE IF EXISTS temp_t_csv;
+		DROP TABLE IF EXISTS temp_audit_check_data;
+		DROP TABLE IF EXISTS temp_audit_log_data;
+		DROP TABLE IF EXISTS temp_t_table;
+		DROP TABLE IF EXISTS temp_t_node;
+		DROP TABLE IF EXISTS temp_t_arc;
+		DROP TABLE IF EXISTS temp_t_demand;
+		DROP TABLE IF EXISTS temp_t_anlgraph;
+
+		DROP TABLE IF EXISTS temp_anl_arc;
+		DROP TABLE IF EXISTS temp_anl_node;
+		DROP TABLE IF EXISTS temp_anl_connec;
+
+		DROP TABLE IF EXISTS temp_rpt_inp_pattern_value;
+		DROP TABLE IF EXISTS temp_t_go2epa;
+		DROP TABLE IF EXISTS temp_t_arc_endpoint;
 
 		-- create temp tables
 		CREATE TEMP TABLE temp_vnode(
@@ -116,8 +137,8 @@ BEGIN
 		  dma_id integer,
 		  exit_topelev double precision,
 		  exit_elev double precision,
-		  the_geom geometry(LineString,SRID_VALUE),
-		  the_geom_endpoint geometry(Point,SRID_VALUE),
+		  the_geom geometry(LineString,25831),
+		  the_geom_endpoint geometry(Point,25831),
 		  flag boolean,
 		  CONSTRAINT temp_link_pkey PRIMARY KEY (link_id));
 
@@ -136,22 +157,28 @@ BEGIN
 		  exit_elev numeric(12,3),
 		  CONSTRAINT temp_link_x_arc_pkey PRIMARY KEY (link_id));
 
-		CREATE TEMP TABLE temp_t_csv (LIKE SCHEMA_NAME.temp_csv INCLUDING ALL);
-		CREATE TEMP TABLE temp_audit_check_data (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
-		CREATE TEMP TABLE temp_audit_log_data (LIKE SCHEMA_NAME.audit_log_data INCLUDING ALL);
-		CREATE TEMP TABLE temp_t_table (LIKE SCHEMA_NAME.temp_table INCLUDING ALL);
-		CREATE TEMP TABLE temp_t_node (LIKE SCHEMA_NAME.temp_node INCLUDING ALL);
-		CREATE TEMP TABLE temp_t_arc (LIKE SCHEMA_NAME.temp_arc INCLUDING ALL);
-		CREATE TEMP TABLE temp_t_demand (LIKE SCHEMA_NAME.temp_demand INCLUDING ALL);
-		CREATE TEMP TABLE temp_t_anlgraph (LIKE SCHEMA_NAME.temp_anlgraph INCLUDING ALL);
+		CREATE TEMP TABLE temp_t_csv (LIKE ws40000.temp_csv INCLUDING ALL);
+		CREATE TEMP TABLE temp_audit_check_data (LIKE ws40000.audit_check_data INCLUDING ALL);
+		CREATE TEMP TABLE temp_audit_log_data (LIKE ws40000.audit_log_data INCLUDING ALL);
+		CREATE TEMP TABLE temp_t_table (LIKE ws40000.temp_table INCLUDING ALL);
+		CREATE TEMP TABLE temp_t_node (LIKE ws40000.temp_node INCLUDING ALL);
+		CREATE TEMP TABLE temp_t_arc (LIKE ws40000.temp_arc INCLUDING ALL);
+		CREATE TEMP TABLE temp_t_demand (LIKE ws40000.temp_demand INCLUDING ALL);
+		CREATE TEMP TABLE temp_t_anlgraph (LIKE ws40000.temp_anlgraph INCLUDING ALL);
 
-		CREATE TEMP TABLE temp_anl_arc (LIKE SCHEMA_NAME.anl_arc INCLUDING ALL);
-		CREATE TEMP TABLE temp_anl_node (LIKE SCHEMA_NAME.anl_node INCLUDING ALL);
-		CREATE TEMP TABLE temp_anl_connec (LIKE SCHEMA_NAME.anl_connec INCLUDING ALL);
+		CREATE TEMP TABLE temp_anl_arc (LIKE ws40000.anl_arc INCLUDING ALL);
+		CREATE TEMP TABLE temp_anl_node (LIKE ws40000.anl_node INCLUDING ALL);
+		CREATE TEMP TABLE temp_anl_connec (LIKE ws40000.anl_connec INCLUDING ALL);
 
-		CREATE TEMP TABLE temp_rpt_inp_pattern_value (LIKE SCHEMA_NAME.rpt_inp_pattern_value INCLUDING ALL);
+		CREATE TEMP TABLE temp_rpt_inp_pattern_value (LIKE ws40000.rpt_inp_pattern_value INCLUDING ALL);
 
-		CREATE TEMP TABLE temp_t_go2epa (LIKE SCHEMA_NAME.temp_go2epa INCLUDING ALL);
+		CREATE TEMP TABLE temp_t_go2epa (LIKE ws40000.temp_go2epa INCLUDING ALL);
+	
+		-- create log tables		
+		EXECUTE 'SELECT gw_fct_create_logtables($${"data":{"parameters":{"fid":'||v_fid||'}}}$$::json)';
+		-- create query tables
+		EXECUTE 'SELECT gw_fct_create_querytables($${"data":{"parameters":{"fid":'||v_fid||', 
+				"epaCheck":true, "verifiedExceptions":false}}}$$::json)';
 
 		-- getting selectors
 		SELECT array_agg(expl_id) INTO v_expl_id FROM selector_expl WHERE expl_id > 0 AND cur_user = current_user;
@@ -388,20 +415,6 @@ BEGIN
 		status, the_geom, expl_id, flw_code, minorloss, addparam, arcparent,dma_id, presszone_id, dqa_id, minsector_id
 		FROM temp_t_arc;
 
-		-- move log data
-		DELETE FROM anl_arc WHERE cur_user = current_user AND fid IN (107,153,164,165,166,167,169,170,171,188,198,227,229,230,292,294,295,371,379,433,411,412,430,432,480,	-- CHECK DATA
-									       172,375,377,413,414,415,400,297,373,396,402,407,								-- CHECK RESULT
-									       228,454,290,404,231,139,232,233,431);									-- CHECK NETWORK
-
-		DELETE FROM anl_node WHERE cur_user = current_user AND fid IN (107,153,164,165,166,167,169,170,171,188,198,227,229,230,292,294,295,371,379,433,411,412,430,432,480,	-- CHECK DATA
-									       172,375,377,413,414,415,400,297,373,396,402,407,								-- CHECK RESULT
-									       228,454,290,404,231,139,232,233,431);									-- CHECK NETWORK
-
-		DELETE FROM anl_connec WHERE cur_user = current_user AND fid IN (107,153,164,165,166,167,169,170,171,188,198,227,229,230,292,294,295,371,379,433,411,412,430,432,480,	-- CHECK DATA
-									       172,375,377,413,414,415,400,297,373,396,402,407,								-- CHECK RESULT
-									       228,454,290,404,231,139,232,233,431);									-- CHECK NETWORK
-
-
 		-- move patterns data
 		INSERT INTO rpt_inp_pattern_value SELECT * FROM temp_rpt_inp_pattern_value;
 
@@ -411,35 +424,15 @@ BEGIN
 		select unnest(text_column::integer[]), current_user from temp_table where fid=435 and cur_user=current_user
 		ON CONFLICT (state_id, cur_user) DO NOTHING;
 
-		-- drop temp tables
-		DROP TABLE IF EXISTS temp_vnode;
-		DROP TABLE IF EXISTS temp_link;
-		DROP TABLE IF EXISTS temp_link_x_arc;
-
-		DROP TABLE IF EXISTS temp_t_csv;
-		DROP TABLE IF EXISTS temp_audit_check_data;
-		DROP TABLE IF EXISTS temp_audit_log_data;
-		DROP TABLE IF EXISTS temp_t_table;
-		DROP TABLE IF EXISTS temp_t_node;
-		DROP TABLE IF EXISTS temp_t_arc;
-		DROP TABLE IF EXISTS temp_t_demand;
-		DROP TABLE IF EXISTS temp_t_anlgraph;
-
-		DROP TABLE IF EXISTS temp_anl_arc;
-		DROP TABLE IF EXISTS temp_anl_node;
-		DROP TABLE IF EXISTS temp_anl_connec;
-
-		DROP TABLE IF EXISTS temp_rpt_inp_pattern_value;
-		DROP TABLE IF EXISTS temp_t_go2epa;
-
 		v_return = '{"status": "Accepted", "message":{"level":1, "text":"Export INP file 7/7 - Postprocess workflow...... done succesfully"}}'::json;
 		RETURN v_return;
+
 	END IF;
 
 	-- Exception handling
-	EXCEPTION WHEN OTHERS THEN
-	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	RETURN json_build_object('status', 'Failed', 'NOSQLERR', SQLERRM, 'message', json_build_object('level', right(SQLSTATE, 1), 'text', SQLERRM), 'SQLSTATE', SQLSTATE, 'SQLCONTEXT', v_error_context)::json;
+	--EXCEPTION WHEN OTHERS THEN
+	--GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	--RETURN json_build_object('status', 'Failed', 'NOSQLERR', SQLERRM, 'message', json_build_object('level', right(SQLSTATE, 1), 'text', SQLERRM), 'SQLSTATE', SQLSTATE, 'SQLCONTEXT', v_error_context)::json;
 
 END;
 $BODY$

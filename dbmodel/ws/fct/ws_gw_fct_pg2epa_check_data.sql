@@ -11,7 +11,7 @@ CREATE OR REPLACE FUNCTION ws40000.gw_fct_pg2epa_check_data(p_data json)
 $BODY$
 
 /*EXAMPLE
-SELECT ws40000.gw_fct_setcheckdatabase($${"data":{"parameters":{"omCheck":false, "graphCheck":false, "epaCheck":true, "planCheck":false, "adminCheck":false, "ignoreVerifiedExceptions":false}}}$$);
+SELECT ws40000.gw_fct_pg2epa_check_data($${"data":{"parameters":{"ignoreVerifiedExceptions":true}}}$$);
 -- v_fid: 604 check from checkproject
 
 -- v_fid: 227 check from pg2epa
@@ -21,8 +21,10 @@ DECLARE
 v_rec record;
 v_project_type text;
 v_querytext text;
-v_ignore_verified_exceptions boolean = true;
-v_fid integer;
+v_verified_exceptions boolean = true;
+v_fid integer = 225;
+v_isembebed boolean;
+v_return json;
 
 BEGIN
 
@@ -34,6 +36,18 @@ BEGIN
 
 	-- getting input parameters
 	v_fid :=  ((p_data ->> 'data')::json->>'parameters')::json->> 'fid';
+	v_isembebed :=  ((p_data ->> 'data')::json->>'parameters')::json->> 'isEmbebed';
+	v_verified_exceptions :=  ((p_data ->> 'data')::json->>'parameters')::json->> 'verifiedExceptions';
+
+	IF v_isembebed is null then v_isembebed = false; end if;
+	IF v_fid is null then v_fid = 225; end if;
+	
+	IF v_isembebed IS false then -- create temporal tables if function is not embebed
+		-- create log tables		
+		EXECUTE 'SELECT gw_fct_create_logtables($${"data":{"parameters":{"fid":'||v_fid||'}}}$$::json)';
+		-- create query tables
+		EXECUTE 'SELECT gw_fct_create_querytables($${"data":{"parameters":{"fid":'||v_fid||', "epaCheck":true, "ignoreVerifiedExceptions":'||v_verified_exceptions||'}}}$$::json)';
+	END IF;
 
 	-- getting sys_fprocess to be executed
 	v_querytext = 'select * from sys_fprocess where project_type in (lower('||quote_literal(v_project_type)||'), ''utils'') 
@@ -47,7 +61,8 @@ BEGIN
 	end loop;
 
 	--  Return
-	RETURN '{"status":"ok"}';
+	EXECUTE 'SELECT gw_fct_create_return($${"data":{"parameters":{"functionId":3364, "isEmbebed":'||v_isembebed||'}}}$$::json)' INTO v_return;
+	RETURN v_return;
 
 END;
 $BODY$

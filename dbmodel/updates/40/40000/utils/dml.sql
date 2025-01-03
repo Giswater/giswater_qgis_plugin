@@ -887,9 +887,14 @@ VALUES(3366, 'gw_fct_create_logreturn', 'utils', 'function', 'json', 'json', 'Cr
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source")
 VALUES(3368, 'gw_fct_create_querytables', 'utils', 'function', 'json', 'json', 'Create temporal tables for check process.', 'role_basic', NULL, 'core');
 
-
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source")
+VALUES(3370, 'gw_fct_create_return', 'utils', 'function', 'json', 'json', 'Create return for all fucntions.', 'role_basic', NULL, 'core');
 
 DELETE FROM sys_param_user where id='utils_checkproject_database';
 DELETE FROM sys_param_user where id='utils_checkproject_qgislayer';
 DELETE FROM sys_param_user where id='qgis_form_initproject_hidden';
-DELETE FROM config_param_system WHERE parameter = 'admin_checkproject';
+
+UPDATE config_param_system SET value = '
+{"omCheck":true, "graphCheck":false, "epaCheck":false, "planCheck":false, "adminCheck":false, "ignoreVerifiedExceptions":false}'
+WHERE parameter = 'admin_checkproject';
+

@@ -116,7 +116,7 @@ BEGIN
 	SELECT row_to_json(row) FROM (SELECT inp_options_interval_from, inp_options_interval_to
 			FROM crosstab('SELECT cur_user, parameter, value
 			FROM config_param_user WHERE parameter IN (''inp_options_interval_from'',''inp_options_interval_to'') 
-			AND cur_user = current_user'::text) as ct(cur_user varchar(30), inp_options_interval_from text, inp_options_interval_to text))row
+			AND cur_user = current_user'::text) as ct(cur_user varchar(50), inp_options_interval_from text, inp_options_interval_to text))row
 	INTO v_options;		
 			
 	SELECT  count(*) INTO v_doublen2a FROM v_edit_inp_pump 	WHERE pump_type = 'PRESSPUMP';

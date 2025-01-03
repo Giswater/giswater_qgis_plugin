@@ -6,8 +6,8 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE:2526
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_utils_csv2pg_export_epanet_inp(character varying, text);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_export_inp(p_data json)
+DROP FUNCTION IF EXISTS ws40000.gw_fct_utils_csv2pg_export_epanet_inp(character varying, text);
+CREATE OR REPLACE FUNCTION ws40000.gw_fct_pg2epa_export_inp(p_data json)
 RETURNS json AS
 $BODY$
 
@@ -42,7 +42,7 @@ v_client_epsg integer;
 BEGIN
 
 	-- Search path
-	SET search_path = "SCHEMA_NAME", public;
+	SET search_path = "ws40000", public;
 
 	-- get input parameters
 	v_result = (p_data->>'data')::json->>'resultId';
@@ -590,6 +590,7 @@ BEGIN
 			FROM crosstab('SELECT table_name::text,  data_type::text, column_name::text FROM information_schema.columns WHERE column_name!=''the_geom'' and table_name='''||
 			rec_table.tablename||'''::text order by ordinal_position')
 			AS rpt(table_name text, c1 text, c2 text, c3 text, c4 text, c5 text, c6 text, c7 text, c8 text, c9 text, c10 text, c11 text, c12 text, c13 text);
+
 
 			SELECT count(*)::text INTO num_column from information_schema.columns where table_name=rec_table.tablename AND column_name!='the_geom';
 		END IF;
