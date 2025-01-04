@@ -660,6 +660,15 @@ INSERT INTO sys_fprocess (fid, fprocess_name, "source", fprocess_type, project_t
 ) select*from sub1', 'Epa type for arcs features checked. No inconsistencies aganints epa table found.Epa type for connec features checked. No inconsistencies aganints epa table found.', '[gw_fct_pg2epa_check_data]');
 INSERT INTO sys_fprocess (fid, fprocess_name, "source", fprocess_type, project_type, except_level, except_msg, query_text, info_msg, function_name) VALUES(603, 'Check that EPA OBJECTS (patterns) name do not contain spaces', 'core', 'Check epa-config', 'utils', 3, 'patterns name with spaces. Please fix it!', 'SELECT * FROM inp_pattern WHERE pattern_id like''% %''', 'All patterns checked have names without spaces.', '[gw_fct_pg2epa_check_data]');
 
+
+-- xtr (from 26/12/2024)
+------------------------
+
+-- pending 
+-- UPDATE sys_fprocess SET except_table = 'anl_loquesea' from discord
+-- UPDATE sys_fprocess SET fprocess_name ='name normalizado' from discord
+
+
 update sys_fprocess set query_text = replace(query_text,'v_prefix_', 't_');
 
 UPDATE sys_fprocess set query_text = 'SELECT * FROM 
@@ -770,5 +779,101 @@ GROUP by node_id, nodecat_id, the_geom, expl_id
 HAVING count(*) < 2'
 WHERE fid = 292
 
-delete from sys_fprocess where fid = 533;
+UPDATE sys_fprocess SET
+fprocess_name = 'Arc without node_1/node_2 (go2epa)',
+except_level = 3,
+except_msg = 'arcs without some node_1 or node_2 (go2epa)',
+query_text = 'SELECT arc_id, arccat_id, the_geom, expl_id FROM temp_t_arc WHERE node_1 IS NULL UNION SELECT arc_id,	arccat_id, the_geom, expl_id FROM temp_t_arc WHERE node_2 IS NULL',
+info_msg = 'No arcs without node_1 / node_2 found (goepa)',
+except_table = 'anl_arc',
+function_name = '[gw_fct_plan_check_network]',
+active = true
+WHERE fid = 454;
+
+UPDATE sys_fprocess SET
+fprocess_name = 'Duplicated nodes (go2epa)',
+except_level = 3,
+except_msg = 'nodes duplicated (go2epa)',
+query_text = 'SELECT DISTINCT ON(the_geom) n1.node_id as n1, n2.node_id as n2, n1.the_geom FROM temp_t_node n1, temp_t_node n2 WHERE st_dwithin(n1.the_geom, n2.the_geom, 0.00001) AND n1.node_id != n2.node_id',
+info_msg = 'No nodes duplicated found (goepa)',
+except_table = 'anl_node',
+function_name = '[gw_fct_plan_check_network]',
+active = true
+WHERE fid = 290;
+
+
+UPDATE sys_fprocess SET
+fprocess_name = 'Link over nodarc (go2epa)',
+except_level = 3,
+except_msg = 'links over nodarc (go2epa)',
+query_text = 'select link_id as arc_id, conneccat_id as arccat_id, a.expl_id, l.the_geom FROM t_link l, temp_t_arc a WHERE st_dwithin(st_endpoint(l.the_geom), a.the_geom, 0.001) AND a.epa_type NOT IN (''CONDUIT'', ''PIPE'', ''VIRTUALVALVE'', ''VIRTUALPUMP'')',
+info_msg = 'No links over nodarc found',
+except_table = 'anl_node',
+function_name = '[gw_fct_plan_check_network]',
+active = true
+WHERE fid = 404;
+
+
+UPDATE sys_fprocess SET
+fprocess_name = 'Arc disconnected from any inlet (go2epa)',
+except_level = 3,
+project_type = 'ws',
+except_msg = 'arcs disconnected from any inlet which have been removed on the go2epa process',
+query_text = 'SELECT arc_id, arccat_id, expl_id, the_geom FROM t_pgr_go2epa_arc where sector_id = 0',
+info_msg = 'No arcs disconnected from any inlet found',
+except_table = 'anl_node',
+function_name = '[gw_fct_plan_check_network]',
+active = true
+WHERE fid = 139;
+
+
+UPDATE sys_fprocess SET
+fprocess_name = 'Arc disconnected from any outfall (go2epa)',
+except_level = 3,
+project_type = 'ud',
+except_msg = 'arcs disconnected from any outfall which have been removed on the go2epa process',
+query_text = 'SELECT arc_id, arccat_id, expl_id, the_geom FROM t_pgr_go2epa_arc where sector_id = 0',
+info_msg = 'No arcs disconnected from any outfall found',
+except_table = 'anl_arc',
+function_name = '[gw_fct_plan_check_network]',
+active = true
+WHERE fid = 231;
+
+UPDATE sys_fprocess SET
+fprocess_name = 'Dry arc because closed elements (go2epa)',
+except_level = 2,
+project_type = 'ws',
+except_msg = 'dry arcs because closed elements (go2epa)',
+query_text = 'SELECT arc_id, arccat_id, expl_id, the_geom FROM t_pgr_go2epa_arc WHERE dma_id = 0',
+info_msg = 'No arcs dry because closed elements found',
+except_table = 'anl_arc',
+function_name = '[gw_fct_plan_check_network]',
+active = true
+WHERE fid = 232;
+
+
+UPDATE sys_fprocess SET
+fprocess_name = 'Dry node/connec with associated demand (go2epa)',
+except_level = 3,
+project_type = 'ws',
+except_msg = 'dry nodes/connecs with demand which have been set to cero on the go2epa process',
+query_text = 'SELECT node_id, nodecat_id, expl_id, the_geom FROM temp_t_node WHERE demand > 0 and dma_id = 0',
+info_msg = 'No connecs dry with associated demand found',
+except_table = 'anl_node',
+function_name = '[gw_fct_plan_check_network]',
+active = true
+WHERE fid = 233;
+
+
+UPDATE sys_fprocess SET
+fprocess_name = 'Arc with less length than minimum configured (go2epa)',
+except_level = 2,
+project_type = 'ud',
+except_msg = 'arcs with less length than minimum configured (go2epa)',
+query_text = 'SELECT arc_id, arccat_id, expl_id, the_geom FROM temp_t_arc WHERE st_length(the_geom) < ''||v_minlength||'' AND epa_type = ''CONDUIT'';',
+info_msg = 'No arcs with less length than minimum configured found',
+except_table = 'anl_arc',
+function_name = '[gw_fct_plan_check_network]',
+active = false
+WHERE fid = 431;
 
