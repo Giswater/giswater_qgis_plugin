@@ -522,12 +522,7 @@ WITH
         FIRST_VALUE(pp.arc_id) OVER w AS arc_id 
         FROM plan_psector_x_connec pp
         JOIN selector_psector sp ON sp.cur_user = current_user AND sp.psector_id = pp.psector_id
-		WINDOW w AS (PARTITION BY pp.connec_id, pp.state ORDER BY insert_tstamp DESC)
-		--SELECT DISTINCT ON (pp.connec_id, pp.state) pp.connec_id, pp.state AS p_state, pp.psector_id, pp.arc_id, pp.link_id
-        --FROM plan_psector_x_connec pp
-        --JOIN selector_psector sp ON sp.cur_user = current_user AND sp.psector_id = pp.psector_id
-        --ORDER BY pp.connec_id, pp.state, insert_tstamp DESC
-		
+		WINDOW w AS (PARTITION BY pp.connec_id, pp.state ORDER BY insert_tstamp DESC)		
         ),
     connec_selector AS
         (
