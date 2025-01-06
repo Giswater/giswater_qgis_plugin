@@ -34,7 +34,7 @@ BEGIN
 
     -- Create temporary tables
     CREATE TEMP TABLE temp_pgr_node (
-        pgr_node_id INT NOT NULL,
+        pgr_node_id SERIAL NOT NULL,
         node_id VARCHAR(16),
         zone_id INTEGER DEFAULT 0,
         modif BOOL DEFAULT FALSE,  -- True if nodes have to be disconnected - closed valves, starts of mapzones
@@ -46,7 +46,7 @@ BEGIN
 
 
     CREATE TEMP TABLE temp_pgr_arc (
-        pgr_arc_id INT NOT NULL,
+        pgr_arc_id SERIAL NOT NULL,
         arc_id VARCHAR(16),
         pgr_node_1 INT,
         pgr_node_2 INT,
@@ -72,7 +72,6 @@ BEGIN
         connec_id varchar(16),
         arc_id varchar(16),
         zone_id INTEGER DEFAULT 0,
-        minsector_id INTEGER DEFAULT 0,
         CONSTRAINT temp_pgr_connec_pkey PRIMARY KEY (connec_id)
     );
     CREATE INDEX temp_pgr_connec_connec_id ON temp_pgr_connec USING btree (connec_id);
@@ -84,7 +83,6 @@ BEGIN
         feature_id varchar(16),
         feature_type varchar(16),
         zone_id INTEGER DEFAULT 0,
-        minsector_id INTEGER DEFAULT 0,
         CONSTRAINT temp_pgr_link_pkey PRIMARY KEY (link_id)
     );
     CREATE INDEX temp_pgr_link_link_id ON temp_pgr_link USING btree (link_id);
@@ -130,22 +128,7 @@ BEGIN
         CREATE INDEX temp_pgr_connectedcomponents_node ON temp_pgr_connectedcomponents USING btree (node);
         GRANT UPDATE, INSERT, REFERENCES, SELECT, DELETE, TRUNCATE, TRIGGER ON TABLE temp_pgr_connectedcomponents TO role_basic;
 
-
-        CREATE TEMP TABLE temp_pgr_minsector (
-            pgr_arc_id INT NOT NULL,
-            node_id VARCHAR(16),
-            minsector_id_1 INTEGER NOT NULL,
-            minsector_id_2 INTEGER NOT NULL,
-            graph_delimiter VARCHAR(30),
-            cost INT DEFAULT 1,
-            reverse_cost INT DEFAULT 1,
-            CONSTRAINT temp_pgr_minsector_pkey PRIMARY KEY (pgr_arc_id)
-        );
-        CREATE INDEX temp_pgr_minsector_node_id ON temp_pgr_minsector USING btree (node_id);
-        CREATE INDEX temp_pgr_minsector_minsector_id_1 ON temp_pgr_minsector USING btree (minsector_id_1);
-        CREATE INDEX temp_pgr_minsector_minsector_id_2 ON temp_pgr_minsector USING btree (minsector_id_2);
-        GRANT UPDATE, INSERT, REFERENCES, SELECT, DELETE, TRUNCATE, TRIGGER ON TABLE temp_pgr_minsector TO role_basic;
-
+        CREATE TEMP TABLE temp_minsector_graph (LIKE SCHEMA_NAME.minsector_graph INCLUDING ALL);
  	    CREATE TEMP TABLE temp_minsector (LIKE SCHEMA_NAME.minsector INCLUDING ALL);
     ELSE
         CREATE TEMP TABLE temp_pgr_drivingdistance (
