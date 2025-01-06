@@ -70,25 +70,30 @@ BEGIN
         AND a.expl_id::TEXT = ANY(string_to_array(v_expl_id, ','));
     END IF;
 
-    INSERT INTO temp_pgr_arc (pgr_arc_id, arc_id, pgr_node_1, pgr_node_2, node_1, node_2, cost, reverse_cost)
+    INSERT INTO temp_pgr_arc (arc_id, node_1, node_2, cost, reverse_cost)
     (
-        SELECT a.arc_id::INT, a.arc_id, a.node_1::INT, a.node_2::INT, a.node_1, a.node_2, v_cost, v_reverse_cost
+        SELECT a.arc_id, a.node_1, a.node_2, v_cost, v_reverse_cost
         FROM arc a
         JOIN value_state_type s ON s.id = a.state_type
         WHERE a.state = 1 AND s.is_operative = TRUE
-        AND a.node_1 IS NOT NULL AND a.node_2 IS NOT NULL -- Avoids the crash of pgrouting functions
         AND a.macrominsector_id::TEXT = ANY(string_to_array(v_macrominsector_id_arc, ','))
     );
 
-    -- TODO: add macrominsector_id 0 with the logic of the exploitation (to catch isolated nodes)
-    INSERT INTO temp_pgr_node (pgr_node_id, node_id)
+    INSERT INTO temp_pgr_node (node_id)
     (
-        SELECT DISTINCT node_id::INT, node_id
+        SELECT DISTINCT node_id
         FROM node n
         JOIN temp_pgr_arc a ON n.node_id IN (a.node_1, a.node_2)
         JOIN value_state_type s ON s.id = n.state_type
         WHERE n.state = 1 AND s.is_operative = TRUE
     );
+
+    UPDATE temp_pgr_arc a SET pgr_node_1 = n.pgr_node_id
+    FROM temp_pgr_node n 
+    WHERE a.node_1 = n.node_id;
+    UPDATE temp_pgr_arc a SET pgr_node_2 = n.pgr_node_id
+    FROM temp_pgr_node n 
+    WHERE a.node_2 = n.node_id;
 
     INSERT INTO temp_pgr_connec (connec_id, arc_id)
     (
