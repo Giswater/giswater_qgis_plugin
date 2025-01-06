@@ -86,14 +86,13 @@ BEGIN
         RETURN v_response;
     END IF;
 
-    -- Nodes at the limits of minsectors: nodes with "graph_delimiter" = 'MINSECTOR'
-    -- Also, nodes that appear as starts in the "sector" table and have "graph_delimiter" = 'SECTOR' and have InletArcs (<>toArc)
+    -- Nodes at the limits of minsectors: nodes with "graph_delimiter" = 'MINSECTOR' or "graph_delimiter" = 'SECTOR'
 
     UPDATE temp_pgr_node t SET graph_delimiter = LOWER(cf.graph_delimiter)
     FROM node n
     JOIN cat_node cn ON cn.id = n.nodecat_id
     JOIN cat_feature_node cf ON cf.id = cn.nodetype_id
-    WHERE t.node_id = n.node_id AND (cf.graph_delimiter = 'MINSECTOR' OR cf.graph_delimiter = 'SECTOR');
+    WHERE t.node_id = n.node_id AND cf.graph_delimiter = 'MINSECTOR';
 
     -- Set modif = TRUE for nodes where "graph_delimiter" = 'minsector'
 
@@ -108,71 +107,27 @@ BEGIN
     END IF;
 
     -- Arcs to be disconnected: one of the two arcs that reach the valve
+
+    WITH 
+    arcs_selected AS (
+        SELECT DISTINCT ON (n.pgr_node_id)  a.pgr_arc_id, n.pgr_node_id, a.pgr_node_1, a.pgr_node_2
+        FROM temp_pgr_node n 
+        JOIN temp_pgr_arc a ON n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
+        WHERE n.modif = TRUE
+    )
     UPDATE temp_pgr_arc a
-    SET
-        modif1 = CASE WHEN s.node_id = s.node_1 THEN TRUE ELSE modif1 END,
-        modif2 = CASE WHEN s.node_id = s.node_2 THEN TRUE ELSE modif2 END
+    SET 
+        modif1 = s.modif1, 
+        modif2 = s.modif2 
     FROM (
-        SELECT DISTINCT ON (n.pgr_node_id) n.pgr_node_id, a.pgr_arc_id, a.node_1, a.node_2
-        FROM temp_pgr_node n
-        JOIN temp_pgr_arc a ON n.pgr_node_id IN (a.node_1, a.node_2)
-        WHERE n.modif = TRUE -- Nodes that are minsectors
+        SELECT 
+            pgr_arc_id, 
+            bool_or(pgr_node_id = pgr_node_1) AS modif1, 
+            bool_or( pgr_node_id = pgr_node_2) AS modif2
+        FROM arcs_selected 
+        GROUP BY pgr_arc_id
     ) s
-    WHERE a.arc_id = s.arc_id;
-
-    /*
-    -- nodes SECTOR:
-    -- Nodes that are the starting points of mapzones, have "graph_delimiter"='sector'  and have InletArcs (arcs that are not toArc)
-    UPDATE temp_pgr_node n SET modif = TRUE
-    FROM (
-	    SELECT distinct  n.node_id
-	    FROM temp_pgr_node n
-	    JOIN temp_pgr_arc a ON n.node_id IN (a.node_1, a.node_2)
-	    LEFT JOIN (
-		    SELECT json_array_elements_text(((json_array_elements_text((graphconfig->>'use')::json))::json->>'toArc')::json) AS to_arc
-		    FROM sector
-		    WHERE graphconfig IS NOT NULL AND active IS TRUE
-	    ) sa ON sa.to_arc = a.arc_id
-	    WHERE n.graph_delimiter = 'sector' AND sa.to_arc IS NULL
-    ) s
-    WHERE n.node_id = s.node_id;
-
-    -- Disconnect the InletArc (those that are not to_arc)
-    UPDATE temp_pgr_arc a
-    SET
-	    modif1= case when s.node_id = s.node_1 then true else modif1 end,
-	    modif2= case when s.node_id = s.node_2 then true else modif2 end
-    FROM (
-	    SELECT a.arc_id, n.node_id, a.node_1, a.node_2
-	    FROM temp_pgr_node n
-	    JOIN temp_pgr_arc a ON n.node_id IN (a.node_1, a.node_2)
-	    LEFT JOIN (
-		    SELECT json_array_elements_text(((json_array_elements_text((graphconfig->>'use')::json))::json->>'toArc')::json) AS to_arc
-		    FROM sector
-		    WHERE graphconfig IS NOT NULL AND active IS TRUE
-	    ) sa ON sa.to_arc = a.arc_id
-	    WHERE n.graph_delimiter = 'sector' AND sa.to_arc IS NULL
-    ) s
-    WHERE a.arc_id = s.arc_id;
-    */
-
-    -- disconnect all the nodes that are SECTOR and all the arcs that connect to nodes SECTOR
-    UPDATE temp_pgr_node n
-    SET
-	    modif = TRUE
-    WHERE n.graph_delimiter = 'sector';
-
-    UPDATE 	temp_pgr_arc t
-    SET
-	    modif1 = CASE WHEN s.node_id = s.node_1 THEN TRUE ELSE modif1 END,
-	    modif2 = CASE WHEN s.node_id = s.node_2 THEN TRUE ELSE modif2 END
-    FROM (
-	    SELECT n.node_id, a.arc_id, a.node_1, a.node_2
-		FROM temp_pgr_node n
-		JOIN temp_pgr_arc a ON n.node_id IN (a.node_1, node_2)
-		WHERE n.graph_delimiter = 'sector'
-	) s
-    WHERE t.arc_id = s.arc_id;
+    WHERE a.pgr_arc_id = s.pgr_arc_id;
 
     -- Generate new arcs and disconnect arcs with modif1 = TRUE OR modif2 = TRUE
 	-- =======================
@@ -183,7 +138,11 @@ BEGIN
     END IF;
 
     -- Generate the minsectors
-    v_query := 'SELECT pgr_arc_id AS id, pgr_node_1 AS source, pgr_node_2 AS target, cost, reverse_cost FROM temp_pgr_arc a';
+    v_query := 
+    'SELECT pgr_arc_id AS id, pgr_node_1 AS source, pgr_node_2 AS target, 1 as cost 
+    FROM temp_pgr_arc a
+    WHERE a.arc_id IS NOT NULL
+    AND a.pgr_node_1 IS NOT NULL AND a.pgr_node_2 IS NOT NULL'; -- Avoids the crash of pgrouting function
     INSERT INTO temp_pgr_connectedcomponents(seq, component, node)
     SELECT seq, component, node FROM pgr_connectedcomponents(v_query);
 
@@ -194,28 +153,32 @@ BEGIN
 
     UPDATE temp_pgr_arc a SET zone_id = c.component
     FROM temp_pgr_connectedcomponents c
-    WHERE a.pgr_node_1 = c.node AND (a.cost >= 0 OR a.reverse_cost >= 0);
+    WHERE a.pgr_node_1 = c.node 
+    AND a.arc_id IS NOT NULL
+    AND a.pgr_node_1 IS NOT NULL AND a.pgr_node_2 IS NOT NULL;
 
-    INSERT INTO temp_pgr_minsector (pgr_arc_id, node_id, minsector_id_1, minsector_id_2, graph_delimiter)
-    SELECT a.pgr_arc_id, n1.node_id, n1.zone_id, n2.zone_id, n1.graph_delimiter
+    INSERT INTO temp_minsector_graph (node_id, minsector_1, minsector_2)
+    SELECT COALESCE(n1.node_id, n2.node_id), n1.zone_id, n2.zone_id
     FROM temp_pgr_arc a
     JOIN temp_pgr_node n1 ON a.pgr_node_1 = n1.pgr_node_id
     JOIN temp_pgr_node n2 ON a.pgr_node_2 = n2.pgr_node_id
-    WHERE a.node_1 = a.node_2;
+    WHERE a.arc_id IS NULL
+    AND n1.zone_id <> 0 AND n2.zone_id <> 0 
+    AND n1.zone_id <> n2.zone_id;
 
-    -- Set zone_id to '0' for nodes at the border of minsectors
-    UPDATE temp_pgr_node n SET zone_id = '0'
-    FROM (
-        SELECT node_id, COUNT(DISTINCT zone_id)
-        FROM temp_pgr_node
-        GROUP BY node_id
-        HAVING COUNT(DISTINCT zone_id) > 1
-    ) s
+    -- Set zone_id to 0 for nodes at the border of minsectors
+    UPDATE temp_pgr_node n SET zone_id = 0
+    FROM temp_minsector_graph s
     WHERE n.node_id = s.node_id;
 
     -- Update feature temporary tables
-    UPDATE temp_pgr_connec c SET minsector_id = a.minsector_id FROM arc a WHERE c.arc_id = a.arc_id;
-    UPDATE temp_pgr_link l SET minsector_id = c.minsector_id FROM connec c WHERE c.connec_id = l.feature_id;
+    UPDATE temp_pgr_connec c SET zone_id = a.zone_id 
+    FROM arc a 
+    WHERE c.arc_id = a.arc_id AND a.zone_id<>0;
+
+    UPDATE temp_pgr_link l SET zone_id = c.zone_id 
+    FROM connec c 
+    WHERE c.connec_id = l.feature_id AND c.zone_id<>0;
 
     -- Insert into minsector temporary table
     INSERT INTO temp_minsector SELECT DISTINCT zone_id FROM temp_pgr_arc;
@@ -341,7 +304,7 @@ BEGIN
         END IF;
 
         INSERT INTO minsector_graph (node_id, minsector_1, minsector_2)
-        SELECT DISTINCT ON (node_id) node_id, minsector_id_1, minsector_id_2 FROM temp_pgr_minsector;
+        SELECT node_id, minsector_1, minsector_2 FROM temp_minsector_graph;
 
         -- Update minsector_id set to '0'
         EXECUTE 'UPDATE arc SET minsector_id = 0 WHERE minsector_id <> 0 AND macrominsector_id::TEXT = ANY(string_to_array('''||v_macrominsector_id_arc||''', '',''))';
@@ -352,8 +315,8 @@ BEGIN
         -- Update minsector_id only for the elements that are in the temporary tables
         EXECUTE 'UPDATE arc a SET minsector_id = t.zone_id FROM temp_pgr_arc t WHERE a.arc_id = t.arc_id';
         EXECUTE 'UPDATE node n SET minsector_id = t.zone_id FROM temp_pgr_node t WHERE n.node_id = t.node_id';
-        EXECUTE 'UPDATE connec c SET minsector_id = t.minsector_id FROM temp_pgr_connec t WHERE c.connec_id = t.connec_id';
-        EXECUTE 'UPDATE link l SET minsector_id = t.minsector_id FROM temp_pgr_link t WHERE l.link_id = t.link_id';
+        EXECUTE 'UPDATE connec c SET minsector_id = t.zone_id FROM temp_pgr_connec t WHERE c.connec_id = t.connec_id';
+        EXECUTE 'UPDATE link l SET minsector_id = t.zone_id FROM temp_pgr_link t WHERE l.link_id = t.link_id';
 
         v_result := NULL;
         v_result := COALESCE(v_result, '{}');
