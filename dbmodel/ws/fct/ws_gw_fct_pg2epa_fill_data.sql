@@ -24,11 +24,13 @@ v_networkmode integer;
 v_minlength float;
 v_forcereservoirsoninlets boolean;
 v_forcetanksoninlets boolean;
+v_count integer;
 
 BEGIN
 
 	--  Search path
 	SET search_path = "SCHEMA_NAME", public;
+
 
 	--  Get system & user variables
 	v_usedmapattern = (SELECT value FROM config_param_user WHERE parameter='inp_options_use_dma_pattern' AND cur_user=current_user);
@@ -152,7 +154,6 @@ BEGIN
 			WHERE (now()::date - (CASE WHEN builtdate IS NULL THEN ''1900-01-01''::date ELSE builtdate END))/365 >= cat_mat_roughness.init_age
 			AND (now()::date - (CASE WHEN builtdate IS NULL THEN ''1900-01-01''::date ELSE builtdate END))/365 <= cat_mat_roughness.end_age '
 			||v_statetype||' AND v_edit_arc.sector_id=selector_sector.sector_id AND selector_sector.cur_user=current_user
-			AND ''ARC'' = ANY(cat_material.feature_type)
 			AND epa_type != ''UNDEFINED''
 			AND v_edit_arc.sector_id > 0 AND v_edit_arc.state > 0
 			AND st_length(v_edit_arc.the_geom) >= '||v_minlength;
@@ -218,6 +219,7 @@ BEGIN
 	FROM v_edit_inp_shortpipe JOIN man_valve USING (node_id)
 	JOIN (SELECT node_2 as node_id, diameter, roughness FROM temp_t_arc) a USING (node_id)
 	WHERE temp_t_node.node_id=v_edit_inp_shortpipe.node_id;
+
 
 	RETURN 1;
 

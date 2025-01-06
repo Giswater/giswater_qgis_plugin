@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 --FUNCTION CODE: 3370
 
-CREATE OR REPLACE FUNCTION ws40000.gw_fct_create_return(p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_create_return(p_data json)
 RETURNS json AS
 $BODY$
 
@@ -23,7 +23,7 @@ v_version text;
 
 BEGIN
 	-- Search path
-	SET search_path = 'ws40000', public;
+	SET search_path = 'SCHEMA_NAME', public;
 
 	-- get system variables
 	SELECT project_type, epsg, giswater INTO v_project_type, v_epsg, v_version FROM sys_version order by id desc limit 1;

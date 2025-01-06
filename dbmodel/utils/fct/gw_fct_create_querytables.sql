@@ -6,12 +6,12 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 3368
 
-CREATE OR REPLACE FUNCTION ws40000.gw_fct_create_querytables (p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_create_querytables (p_data json)
   RETURNS json AS
 $BODY$
 
 /*
-SELECT ws40000.gw_fct_setcheckdatabase($${"data":{"parameters":{"omCheck":true, "graphCheck":false, "epaCheck":false, "planCheck":false, "adminCheck":false, "verifiedExceptions":false}}}$$);
+SELECT SCHEMA_NAME.gw_fct_setcheckdatabase($${"data":{"parameters":{"omCheck":true, "graphCheck":false, "epaCheck":false, "planCheck":false, "adminCheck":false, "verifiedExceptions":false}}}$$);
 
 */
 
@@ -30,7 +30,7 @@ v_admincheck boolean;
 BEGIN
 
 	-- search path
-	SET search_path = "ws40000", public;
+	SET search_path = "SCHEMA_NAME", public;
 
 	-- get system parameters
 	v_project_type = (SELECT project_type FROM sys_version order by id desc limit 1);

@@ -6,12 +6,12 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 3364
 
-CREATE OR REPLACE FUNCTION ws40000.gw_fct_setcheckdatabase (p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_setcheckdatabase (p_data json)
   RETURNS json AS
 $BODY$
 
 /*
-SELECT ws40000.gw_fct_setcheckdatabase($${"data":{"parameters":{"omCheck":true, "graphCheck":false, "epaCheck":false, "planCheck":false, "adminCheck":false, "ignoreVerifiedExceptions":false}}}$$);
+SELECT SCHEMA_NAME.gw_fct_setcheckdatabase($${"data":{"parameters":{"omCheck":true, "graphCheck":false, "epaCheck":false, "planCheck":false, "adminCheck":false, "ignoreVerifiedExceptions":false}}}$$);
 
 fid  =604
 */
@@ -40,8 +40,8 @@ v_fid integer = 604;
 BEGIN
 
 	-- search path
-	SET search_path = "ws40000", public;
-	v_schemaname = 'ws40000';
+	SET search_path = "SCHEMA_NAME", public;
+	v_schemaname = 'SCHEMA_NAME';
 
 	SELECT project_type, giswater, epsg INTO v_project_type, v_version, v_epsg FROM sys_version order by id desc limit 1;
 

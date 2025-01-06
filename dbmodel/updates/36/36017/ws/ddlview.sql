@@ -523,6 +523,11 @@ WITH
         FROM plan_psector_x_connec pp
         JOIN selector_psector sp ON sp.cur_user = current_user AND sp.psector_id = pp.psector_id
 		WINDOW w AS (PARTITION BY pp.connec_id, pp.state ORDER BY insert_tstamp DESC)
+		--SELECT DISTINCT ON (pp.connec_id, pp.state) pp.connec_id, pp.state AS p_state, pp.psector_id, pp.arc_id, pp.link_id
+        --FROM plan_psector_x_connec pp
+        --JOIN selector_psector sp ON sp.cur_user = current_user AND sp.psector_id = pp.psector_id
+        --ORDER BY pp.connec_id, pp.state, insert_tstamp DESC
+		
         ),
     connec_selector AS
         (
@@ -532,6 +537,7 @@ WITH
         left join (SELECT connec_id, arc_id FROM connec_psector WHERE p_state = 0) a using (connec_id, arc_id) where a.connec_id is null
        	union all
         SELECT DISTINCT connec_id, connec_psector.arc_id::varchar(16), link_id FROM connec_psector
+		--SELECT DISTINCT connec_id, connec_psector.arc_id::varchar(16), link_id FROM connec_psector
         WHERE p_state = 1
         ),
     connec_selected AS 

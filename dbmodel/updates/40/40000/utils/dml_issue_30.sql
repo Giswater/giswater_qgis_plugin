@@ -786,7 +786,7 @@ except_msg = 'arcs without some node_1 or node_2 (go2epa)',
 query_text = 'SELECT arc_id, arccat_id, the_geom, expl_id FROM temp_t_arc WHERE node_1 IS NULL UNION SELECT arc_id,	arccat_id, the_geom, expl_id FROM temp_t_arc WHERE node_2 IS NULL',
 info_msg = 'No arcs without node_1 / node_2 found (goepa)',
 except_table = 'anl_arc',
-function_name = '[gw_fct_plan_check_network]',
+function_name = '[gw_fct_pg2epa_check_network]',
 active = true
 WHERE fid = 454;
 
@@ -797,7 +797,7 @@ except_msg = 'nodes duplicated (go2epa)',
 query_text = 'SELECT DISTINCT ON(the_geom) n1.node_id as n1, n2.node_id as n2, n1.the_geom FROM temp_t_node n1, temp_t_node n2 WHERE st_dwithin(n1.the_geom, n2.the_geom, 0.00001) AND n1.node_id != n2.node_id',
 info_msg = 'No nodes duplicated found (goepa)',
 except_table = 'anl_node',
-function_name = '[gw_fct_plan_check_network]',
+function_name = '[gw_fct_pg2epa_check_network]',
 active = true
 WHERE fid = 290;
 
@@ -809,7 +809,7 @@ except_msg = 'links over nodarc (go2epa)',
 query_text = 'select link_id as arc_id, conneccat_id as arccat_id, a.expl_id, l.the_geom FROM t_link l, temp_t_arc a WHERE st_dwithin(st_endpoint(l.the_geom), a.the_geom, 0.001) AND a.epa_type NOT IN (''CONDUIT'', ''PIPE'', ''VIRTUALVALVE'', ''VIRTUALPUMP'')',
 info_msg = 'No links over nodarc found',
 except_table = 'anl_node',
-function_name = '[gw_fct_plan_check_network]',
+function_name = '[gw_fct_pg2epa_check_network]',
 active = true
 WHERE fid = 404;
 
@@ -822,7 +822,7 @@ except_msg = 'arcs disconnected from any inlet which have been removed on the go
 query_text = 'SELECT arc_id, arccat_id, expl_id, the_geom FROM t_pgr_go2epa_arc where sector_id = 0',
 info_msg = 'No arcs disconnected from any inlet found',
 except_table = 'anl_node',
-function_name = '[gw_fct_plan_check_network]',
+function_name = '[gw_fct_pg2epa_check_network]',
 active = true
 WHERE fid = 139;
 
@@ -835,7 +835,7 @@ except_msg = 'arcs disconnected from any outfall which have been removed on the 
 query_text = 'SELECT arc_id, arccat_id, expl_id, the_geom FROM t_pgr_go2epa_arc where sector_id = 0',
 info_msg = 'No arcs disconnected from any outfall found',
 except_table = 'anl_arc',
-function_name = '[gw_fct_plan_check_network]',
+function_name = '[gw_fct_pg2epa_check_network]',
 active = true
 WHERE fid = 231;
 
@@ -844,10 +844,10 @@ fprocess_name = 'Dry arc because closed elements (go2epa)',
 except_level = 2,
 project_type = 'ws',
 except_msg = 'dry arcs because closed elements (go2epa)',
-query_text = 'SELECT arc_id, arccat_id, expl_id, the_geom FROM t_pgr_go2epa_arc WHERE dma_id = 0',
+query_text = 'SELECT arc_id, arccat_id, expl_id, the_geom FROM t_pgr_go2epa_arc WHERE dma_id = 0 and sector_id > 0',
 info_msg = 'No arcs dry because closed elements found',
 except_table = 'anl_arc',
-function_name = '[gw_fct_plan_check_network]',
+function_name = '[gw_fct_pg2epa_check_network]',
 active = true
 WHERE fid = 232;
 
@@ -860,7 +860,7 @@ except_msg = 'dry nodes/connecs with demand which have been set to cero on the g
 query_text = 'SELECT node_id, nodecat_id, expl_id, the_geom FROM temp_t_node WHERE demand > 0 and dma_id = 0',
 info_msg = 'No connecs dry with associated demand found',
 except_table = 'anl_node',
-function_name = '[gw_fct_plan_check_network]',
+function_name = '[gw_fct_pg2epa_check_network]',
 active = true
 WHERE fid = 233;
 
@@ -870,10 +870,217 @@ fprocess_name = 'Arc with less length than minimum configured (go2epa)',
 except_level = 2,
 project_type = 'ud',
 except_msg = 'arcs with less length than minimum configured (go2epa)',
-query_text = 'SELECT arc_id, arccat_id, expl_id, the_geom FROM temp_t_arc WHERE st_length(the_geom) < ''||v_minlength||'' AND epa_type = ''CONDUIT'';',
+query_text = '
+	WITH 
+	minlength AS (SELECT value::numeric FROM config_param_system WHERE parameter = ''epa_arc_minlength'')
+	SELECT * FROM temp_t_arc, minlength WHERE st_length(the_geom) < value',
 info_msg = 'No arcs with less length than minimum configured found',
 except_table = 'anl_arc',
-function_name = '[gw_fct_plan_check_network]',
-active = false
+function_name = '[gw_fct_pg2epa_check_network]',
+active = true
 WHERE fid = 431;
 
+
+UPDATE sys_fprocess SET
+fprocess_name = 'Check pumps with 3-point curves',
+except_level = 2,
+project_type = 'ud',
+except_msg = 'pumps with curve defined by 3 points found. Check if this 3-points has thresholds defined (133%) acording EPANET user''s manual',
+query_text = ' SELECT count(*) FROM (select curve_id, count(*) as ct from (select * from inp_curve_value 
+			   join (select distinct curve_id FROM t_inp_pump)a using (curve_id)) b group by curve_id having count(*)=3)c',
+info_msg = 'No curves with 3-points found',
+except_table = null,
+function_name = '[gw_fct_pg2epa_check_result]',
+active = true
+WHERE fid = 172;
+
+
+UPDATE sys_fprocess SET
+fprocess_name = 'Nodarc length control (go2epa)',
+except_level = 2,
+project_type = 'ud',
+except_msg = 'arcs with less length than minimum configured (go2epa)',
+query_text = '
+	WITH 
+	minlength AS (SELECT value::numeric FROM config_param_system WHERE parameter = ''epa_arc_minlength'')
+	SELECT * FROM temp_t_arc, minlength WHERE st_length(the_geom) < value',
+info_msg = 'No arcs with less length than minimum configured found',
+except_table = 'anl_arc',
+function_name = '[gw_fct_pg2epa_check_result]',
+active = true
+WHERE fid = 375;
+
+
+UPDATE sys_fprocess SET
+fprocess_name = 'Arc with less length than minimum configured (go2epa)',
+except_level = 3,
+except_msg = 'value of roughness out of range acording headloss formula used',
+query_text = '
+	SELECT * FROM (WITH 
+		rgh as (SELECT min(roughness), max(roughness) FROM cat_mat_roughness),
+		hdl as (SELECT value FROM config_param_user WHERE cur_user=current_user AND parameter=''inp_options_headloss'')
+		SELECT 
+			case when value = ''D-W'' and min < 0.0025 or max > 0.15 then 1 
+				 when value = ''H-W'' and min < 110 or max > 150 then 1
+				 when value = ''C-M'' and min < 0.011 or max > 0.017 then 1
+				 else 0 END roughness
+		 from rgh, hdl) a WHERE roughness = 1',
+info_msg = 'Roughness values have been checked against head-loss formula using the minimum and maximum EPANET user''s manual values. Any out-of-range values have been detected.',
+except_table = null,
+function_name = '[gw_fct_pg2epa_check_result]',
+active = true
+WHERE fid = 377;
+
+
+UPDATE sys_fprocess SET
+fprocess_name = 'Connec/node with outlayer value on elevation',
+except_level = 3,
+except_msg = ' connecs/nodes found with outlayer values on elevation',
+info_msg = 'All connec/nodes with elevation values according system tresholds',
+query_text = '
+	WITH 
+	outlayer AS (SELECT ((value::json->>''elevation'')::json->>''max'')::numeric as max_elev, 
+    ((value::json->>''elevation'')::json->>''min'')::numeric as min_elev FROM config_param_system WHERE parameter = ''epa_outlayer_values'')
+	select node_id, nodecat_id from outlayer, node where elevation < min_elev or elevation > max_elev
+	union
+	select connec_id, conneccat_id from outlayer, connec where elevation < min_elev or elevation > max_elev',
+except_table = null,
+function_name = '[gw_fct_pg2epa_check_result]',
+active = true
+WHERE fid = 407;
+
+
+insert into sys_fprocess (fid, fprocess_name, except_level, except_msg, info_msg, query_text, function_name, active) values
+(605, 'Check EPA outlayer depth', 3, 'nodes/connecs found with outlayers values for depth', 'All nodes/connecs has depth values according system tresholds', 
+	'WITH 
+	outlayer AS (SELECT ((value::json->>''depth'')::json->>''max'')::numeric as max_depth, 
+    ((value::json->>''depth'')::json->>''min'')::numeric as min_depth FROM config_param_system WHERE parameter = ''epa_outlayer_values'')
+	select node_id, nodecat_id from outlayer, node where coalesce(depth,0) < min_depth or coalesce(depth,0) > max_depth
+	union
+	select connec_id, conneccat_id from outlayer, connec where coalesce(depth,0) < min_depth or coalesce(depth,0) > max_depth',
+	'[gw_fct_pg2epa_check_result]', true) on conflict (fid) do NOTHING;
+
+
+
+--- NO SE COM RESOLDRE: networkmode AS (SELECT value::integer FROM config_param_user WHERE parameter = ''inp_options_networkmode'' AND cur_user = current_user)
+	--> es podria crear una funció nova que fos gw_fct_pg2epa_check_networkmode_connec
+	----------------------
+UPDATE sys_fprocess SET
+fprocess_name = 'EPA connec over EPA node (goe2pa)',
+except_level = 3,
+except_msg = 'EPA connecs over EPA nodes',
+query_text = ' 
+	SELECT connec_id, conneccat_id, expl_id, the_geom FROM (
+	SELECT DISTINCT t2.connec_id, t2.conneccat_id , t2.expl_id, t1.the_geom, st_distance(t1.the_geom, t2.the_geom) as dist, t1.state as state1, t2.state as state2 
+	FROM temp_t_node AS t1 JOIN temp_t_connec AS t2 ON ST_Dwithin(t1.the_geom, t2.the_geom, 0.1) 
+	WHERE t1.epa_type != ''UNDEFINED''
+	AND t2.epa_type = ''JUNCTION'') a 
+    WHERE a.state1 > 0 AND a.state2 > 0 AND value = 4 ORDER BY dist',
+except_table = 'anl_connec',
+function_name = '[gw_fct_pg2epa_check_networkmode_connec]',
+info_msg = 'No EPA connecs over EPA node have been detected.',
+active = true
+WHERE fid = 413;
+
+UPDATE sys_fprocess SET
+fprocess_name = 'Check pjoint_id/ pjoint_type on connec',
+except_level = 3,
+except_msg = 'Connec without pjoint_id/pjoint_type',
+query_text = 'SELECT connec_id, conneccat_id, expl_id, the_geom FROM t_connec WHERE pjoint_id IS NULL OR pjoint_type IS NULL',
+except_table = 'anl_connec',
+function_name = '[gw_fct_pg2epa_check_networkmode_connec]',
+active = true
+WHERE fid = 415;
+
+UPDATE sys_fprocess SET
+fprocess_name = 'Check dint on connec catalog',
+except_level = 3,
+except_msg = 'Connec catalog without dint defined',
+info_msg = 'All connec catalog registers has dint defined',
+query_text = 'SELECT * FROM cat_connec WHERE dint is null',
+except_table = null,
+function_name = '[gw_fct_pg2epa_check_networkmode_connec]',
+active = true
+WHERE fid = 400;
+
+
+UPDATE sys_fprocess SET
+fprocess_name = 'Check material on connec catalog',
+except_level = 3,
+except_msg = 'Connec catalog without material defined',
+info_msg = 'All connec catalog registers has material defined',
+query_text = 'SELECT * FROM cat_connec, networkmode n WHERE matcat_id IS NULL',
+except_table = null,
+function_name = '[gw_fct_pg2epa_check_networkmode_connec]',
+active = true
+WHERE fid = 414;
+
+
+UPDATE sys_fprocess SET
+fprocess_name = 'Check controls for ARC',
+except_level = 3,
+except_msg = 'Controls with links (arc o nodarc) are not present on this result',
+info_msg = 'All Controls has correct link id (arc or nodarc) values.',
+query_text = '
+		(SELECT a.id, a.arc_id as controls, b.arc_id as templayer FROM 
+		(SELECT substring(split_part(text,''LINK '', 2) FROM ''[^ ]+''::text) arc_id, id, sector_id FROM inp_controls WHERE active is true)a
+		LEFT JOIN temp_t_arc b USING (arc_id)
+		WHERE b.arc_id IS NULL AND a.arc_id IS NOT NULL 
+		AND a.sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user=current_user) AND a.sector_id IS NOT NULL
+		OR a.sector_id::text != b.sector_id::text) a',
+except_table = null,
+function_name = '[gw_fct_pg2epa_check_result]',
+active = true
+WHERE fid = 402;
+
+
+insert into sys_fprocess values (606, 'Check controls for NODE');
+
+UPDATE sys_fprocess SET
+fprocess_name = 'Check controls for NODE',
+except_level = 3,
+except_msg = 'Controls with nodes are not present on this result',
+info_msg = 'All Controls has correct node id values.',
+query_text = '
+		(SELECT a.id, a.node_id as controls, b.node_id as templayer FROM 
+		(SELECT substring(split_part(text,''NODE '', 2) FROM ''[^ ]+''::text) node_id, id, sector_id FROM inp_controls WHERE active is true)a
+		LEFT JOIN temp_t_node b USING (node_id)
+		WHERE b.node_id IS NULL AND a.node_id IS NOT NULL 
+		AND a.sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user=current_user) AND a.sector_id IS NOT NULL
+		OR a.sector_id::text != b.sector_id::text) a',
+except_table = null,
+function_name = '[gw_fct_pg2epa_check_result]',
+active = true
+WHERE fid = 406;
+
+insert into sys_fprocess values (607, 'Check rules for NODE','ws');
+insert into sys_fprocess values (608, 'Check rules for JUNCTION','ws');
+insert into sys_fprocess values (609, 'Check rules for RESERVOIR','ws');
+insert into sys_fprocess values (610, 'Check rules for TANK','ws');
+insert into sys_fprocess values (611, 'Check rules for LINK','ws');
+insert into sys_fprocess values (612, 'Check rules for PIPE','ws');
+insert into sys_fprocess values (613, 'Check rules for VALVE','ws');
+insert into sys_fprocess values (614, 'Check rules for PUMP','ws');
+
+insert into sys_fprocess values (615, 'Tank present in more than one enabled scenario','ws');
+insert into sys_fprocess values (616, 'Reservoir present in more than one enabled scenario','ws');
+insert into sys_fprocess values (617, 'Junction present in more than one enabled scenario','ws');
+insert into sys_fprocess values (618, 'Pipe present in more than one enabled scenario','ws');
+insert into sys_fprocess values (619, 'Pump present in more than one enabled scenario','ws');
+insert into sys_fprocess values (620, 'Pump additional present in more than one enabled scenario','ws');
+insert into sys_fprocess values (621, 'Valve present in more than one enabled scenario','ws');
+insert into sys_fprocess values (622, 'Virtualvalve present in more than one enabled scenario','ws');
+insert into sys_fprocess values (623, 'Virtualpump present in more than one enabled scenario','ws');
+insert into sys_fprocess values (624, 'Inlet present in more than one enabled scenario','ws');
+insert into sys_fprocess values (625, 'Connec present in more than one enabled scenario','ws');
+
+insert into sys_fprocess values (626, 'Outfall present in more than one enabled scenario','ud');
+insert into sys_fprocess values (627, 'Outlet present in more than one enabled scenario','ud');
+insert into sys_fprocess values (628, 'Storage present in more than one enabled scenario','ud');
+insert into sys_fprocess values (629, 'Rainage present in more than one enabled scenario','ud');
+insert into sys_fprocess values (630, 'Conduit present in more than one enabled scenario','ud');
+insert into sys_fprocess values (631, 'Pump additional present in more than one enabled scenario','ud');
+insert into sys_fprocess values (632, 'Orifice present in more than one enabled scenario','ud');
+insert into sys_fprocess values (633, 'Pump present in more than one enabled scenario','ud');
+insert into sys_fprocess values (634, 'Weir present in more than one enabled scenario','ud');
+insert into sys_fprocess values (635, 'Junction present in more than one enabled scenario','ud');

@@ -84,6 +84,30 @@ BEGIN
 		IF v_count = 0 THEN
 			RETURN ('{"status":"Failed","message":{"level":1, "text":"There is no sector selected. Please select at least one"}}')::json;
 		END IF;
+	
+		-- drop temp tables
+		DROP TABLE IF EXISTS temp_t_arc_flowregulator;
+		DROP TABLE IF EXISTS temp_t_lid_usage;
+		DROP TABLE IF EXISTS temp_t_node_other;
+
+		DROP TABLE IF EXISTS temp_t_csv;
+		DROP TABLE IF EXISTS temp_t_table;
+		DROP TABLE IF EXISTS temp_audit_check_data;
+		DROP TABLE IF EXISTS temp_audit_log_data;
+		DROP TABLE IF EXISTS temp_t_node;
+		DROP TABLE IF EXISTS temp_t_arc;
+		DROP TABLE IF EXISTS temp_t_gully;
+		DROP TABLE IF EXISTS temp_t_anlgraph;
+
+		DROP TABLE IF EXISTS temp_anl_arc;
+		DROP TABLE IF EXISTS temp_anl_node;
+		DROP TABLE IF EXISTS temp_anl_gully;
+		DROP TABLE IF EXISTS temp_rpt_inp_raingage;
+		DROP TABLE IF EXISTS temp_rpt_inp_node;
+		DROP TABLE IF EXISTS temp_rpt_inp_arc;
+		DROP TABLE IF EXISTS temp_t_go2epa;
+
+		DROP TABLE IF EXISTS temp_t_rpt_cat_result;
 
 		-- force only state 1 selector
 		DELETE FROM selector_state WHERE cur_user=current_user;
@@ -111,6 +135,8 @@ BEGIN
 		CREATE TEMP TABLE temp_rpt_inp_arc (LIKE SCHEMA_NAME.rpt_inp_arc INCLUDING ALL);
 
 		CREATE TEMP TABLE temp_t_go2epa (LIKE SCHEMA_NAME.temp_go2epa INCLUDING ALL);
+		CREATE TEMP TABLE temp_t_rpt_cat_result (LIKE SCHEMA_NAME.rpt_cat_result INCLUDING ALL);
+
 
 		-- getting selectors
 		SELECT array_agg(expl_id) INTO v_expl_id FROM selector_expl WHERE expl_id > 0 AND cur_user = current_user;
@@ -193,7 +219,23 @@ BEGIN
 	-- step 6: create json return
 	ELSIF v_step=6 THEN
 
-		SELECT gw_fct_pg2epa_check_result(v_input) INTO v_return;
+		PERFORM gw_fct_pg2epa_check_result(v_input);
+		
+		-- deleting arcs without nodes
+		UPDATE temp_t_arc t SET epa_type = 'TODELETE' FROM (SELECT a.id FROM temp_t_arc a LEFT JOIN temp_t_node ON node_1=node_id WHERE temp_t_node.node_id is null) a WHERE t.id = a.id;
+		UPDATE temp_t_arc t SET epa_type = 'TODELETE' FROM (SELECT a.id FROM temp_t_arc a LEFT JOIN temp_t_node ON node_2=node_id WHERE temp_t_node.node_id is null) a WHERE t.id = a.id;
+		DELETE FROM temp_t_arc WHERE epa_type = 'TODELETE';
+		UPDATE temp_t_arc SET result_id = v_result WHERE result_id IS NULL;
+		UPDATE temp_t_node SET result_id = v_result WHERE result_id IS NULL;
+
+		-- deleting nodes without arcs
+		UPDATE temp_t_node t SET epa_type = 'TODELETE' FROM
+		(SELECT id FROM temp_t_node LEFT JOIN (SELECT node_1 as node_id FROM temp_t_arc UNION SELECT node_2 FROM temp_t_arc) a USING (node_id) WHERE a.node_id IS NULL) a
+		WHERE t.id = a.id;
+		DELETE FROM temp_t_node WHERE epa_type = 'TODELETE';
+		
+		-- create return
+		EXECUTE 'SELECT gw_fct_create_return($${"data":{"parameters":{"functionId":2646, "isEmbebed":false}}}$$::json)' INTO v_return;		
 		SELECT gw_fct_pg2epa_export_inp(p_data) INTO v_file;
 		v_body = gw_fct_json_object_set_key((v_return->>'body')::json, 'file', v_file);
 		v_return = gw_fct_json_object_set_key(v_return, 'body', v_body);
@@ -219,49 +261,10 @@ BEGIN
 		SELECT result_id, node_id, top_elev, ymax, elev, node_type, nodecat_id, epa_type,
 		sector_id, state, state_type, annotation, y0, ysur, apond, the_geom, expl_id, addparam, parent, arcposition, fusioned_node
 		FROM temp_t_node;
+	
+		-- move result data
+		UPDATE rpt_cat_result r set network_stats = t.network_stats FROM temp_t_rpt_cat_result t WHERE r.result_id = t.result_id;
 
-		-- move log data
-		DELETE FROM anl_arc WHERE cur_user = current_user AND fid IN (106,107,111,113,164,175,187,188,294,295,379,427,430,440,480,522,528,529,530,		  		-- CHECK DATA
-									       369,370,396,401,402,455,456,457,458,									-- CHECK RESULT
-									       228,454,290,404,231,139,232,233,431);									-- CHECK NETWORK
-
-		DELETE FROM anl_node WHERE cur_user = current_user AND fid IN (106,107,111,113,164,175,187,188,294,295,379,427,430,440,480,522,528,529,530,		  		-- CHECK DATA
-									       369,370,396,401,402,455,456,457,458,									-- CHECK RESULT
-									       228,454,290,404,231,139,232,233,431);									-- CHECK NETWORK
-
-		DELETE FROM anl_gully WHERE cur_user = current_user AND fid IN (106,107,111,113,164,175,187,188,294,295,379,427,430,440,480,522,528,529,530,		  		-- CHECK DATA
-									       369,370,396,401,402,455,456,457,458,									-- CHECK RESULT
-									       228,454,290,404,231,139,232,233,431);									-- CHECK NETWORK
-
-
-		INSERT INTO anl_arc SELECT * FROM temp_anl_arc;
-		INSERT INTO anl_node SELECT * FROM temp_anl_node;
-		INSERT INTO anl_gully SELECT * FROM temp_anl_gully;
-
-		-- drop temp tables
-		DROP TABLE IF EXISTS temp_t_arc_flowregulator;
-		DROP TABLE IF EXISTS temp_t_lid_usage;
-		DROP TABLE IF EXISTS temp_t_node_other;
-
-		DROP TABLE IF EXISTS temp_t_csv;
-		DROP TABLE IF EXISTS temp_t_table;
-		DROP TABLE IF EXISTS temp_audit_check_data;
-		DROP TABLE IF EXISTS temp_audit_log_data;
-		DROP TABLE IF EXISTS temp_t_node;
-		DROP TABLE IF EXISTS temp_t_arc;
-		DROP TABLE IF EXISTS temp_t_gully;
-		DROP TABLE IF EXISTS temp_t_anlgraph;
-
-		DROP TABLE IF EXISTS temp_anl_arc;
-		DROP TABLE IF EXISTS temp_anl_node;
-		DROP TABLE IF EXISTS temp_anl_gully;
-		DROP TABLE IF EXISTS temp_rpt_inp_raingage;
-		DROP TABLE IF EXISTS temp_rpt_inp_node;
-		DROP TABLE IF EXISTS temp_rpt_inp_arc;
-
-		DROP TABLE IF EXISTS temp_t_go2epa;
-
-		v_return = '{"status": "Accepted", "message":{"level":1, "text":"Export INP file 7/7 - Postprocess workflow...... done succesfully"}}'::json;
 		RETURN v_return;
 
 	END IF;

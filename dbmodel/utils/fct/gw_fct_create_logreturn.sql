@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 3366
 
-CREATE OR REPLACE FUNCTION ws40000.gw_fct_create_logreturn (p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_create_logreturn (p_data json)
   RETURNS json AS
 $BODY$
 
@@ -27,8 +27,8 @@ v_rec record;
 BEGIN
 
 	-- search path
-	SET search_path = "ws40000", public;
-	v_schemaname = 'ws40000';
+	SET search_path = "SCHEMA_NAME", public;
+	v_schemaname = 'SCHEMA_NAME';
 
 	-- get input parameters
 	v_returntype := ((p_data->>'data')::json->>'parameters')::json->>'type';

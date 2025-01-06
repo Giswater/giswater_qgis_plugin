@@ -1,6 +1,6 @@
--- DROP FUNCTION ws40000.gw_fct_check_fprocess(json);
+-- DROP FUNCTION SCHEMA_NAME.gw_fct_check_fprocess(json);
 
-CREATE OR REPLACE FUNCTION ws40000.gw_fct_check_fprocess(p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_check_fprocess(p_data json)
   RETURNS json AS
 $BODY$
 /*
@@ -38,8 +38,6 @@ BEGIN
 	select * into v_rec from sys_fprocess where fid = v_check_fid;
 	v_exceptable_id = concat(replace (v_rec.except_table, 'anl_', ''), '_id');
 	v_exceptable_catalog = concat(replace (v_rec.except_table, 'anl_', ''), 'cat_id');
-
-	raise notice ' fid % ', v_rec.fid;
 
 	-- manage query count
 	if v_rec.query_text ilike '%string_agg%' and v_rec.fid <> 317 then		

@@ -6,23 +6,26 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2646
 
-DROP FUNCTION IF EXISTS ws40000.gw_fct_pg2epa(character varying, boolean, boolean);
-DROP FUNCTION IF EXISTS ws40000.gw_fct_pg2epa(character varying, boolean);
-DROP FUNCTION IF EXISTS ws40000.gw_fct_pg2epa(json);
-CREATE OR REPLACE FUNCTION ws40000.gw_fct_pg2epa_main(p_data json)
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_pg2epa(character varying, boolean, boolean);
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_pg2epa(character varying, boolean);
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_pg2epa(json);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_main(p_data json)
 RETURNS json AS
 $BODY$
 
 /*EXAMPLE
-SELECT ws40000.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "step":"1"}}$$); -- PRE-PROCESS
-SELECT ws40000.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "step":"2"}}$$); -- AUTOREPAIR
-SELECT ws40000.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "step":"3"}}$$); -- CHECK DATA
-SELECT ws40000.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "step":"4"}}$$); -- STRUCTURE DATA
-SELECT ws40000.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "step":"5"}}$$); -- CHECK GRAPH
-SELECT ws40000.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "step":"6"}}$$); -- BUILD INP
-SELECT ws40000.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "step":"7"}}$$); -- POST-PROCESS
+SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "step":"1"}}$$); -- PRE-PROCESS
+SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "step":"2"}}$$); -- AUTOREPAIR
+SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "step":"3"}}$$); -- CHECK DATA
+SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "step":"4"}}$$); -- STRUCTURE DATA
+SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "step":"5"}}$$); -- CHECK GRAPH
+SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "step":"6"}}$$); -- BUILD INP
+SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"resultId":"test1", "step":"7"}}$$); -- POST-PROCESS
 
 select * from temp_audit_check_data order by 1 asc
+
+
+select * from temp_t_arc
 
 
 --fid: 227
@@ -65,7 +68,7 @@ v_epa_maxresults integer;
 BEGIN
 
 	-- set search path
-	SET search_path = "ws40000", public;
+	SET search_path = "SCHEMA_NAME", public;
 
 	-- get input data
 	v_result = (p_data->>'data')::json->>'resultId';
@@ -113,6 +116,8 @@ BEGIN
 		DROP TABLE IF EXISTS temp_rpt_inp_pattern_value;
 		DROP TABLE IF EXISTS temp_t_go2epa;
 		DROP TABLE IF EXISTS temp_t_arc_endpoint;
+		DROP TABLE IF EXISTS temp_t_rpt_cat_result;
+
 
 		-- create temp tables
 		CREATE TEMP TABLE temp_vnode(
@@ -157,22 +162,20 @@ BEGIN
 		  exit_elev numeric(12,3),
 		  CONSTRAINT temp_link_x_arc_pkey PRIMARY KEY (link_id));
 
-		CREATE TEMP TABLE temp_t_csv (LIKE ws40000.temp_csv INCLUDING ALL);
-		CREATE TEMP TABLE temp_audit_check_data (LIKE ws40000.audit_check_data INCLUDING ALL);
-		CREATE TEMP TABLE temp_audit_log_data (LIKE ws40000.audit_log_data INCLUDING ALL);
-		CREATE TEMP TABLE temp_t_table (LIKE ws40000.temp_table INCLUDING ALL);
-		CREATE TEMP TABLE temp_t_node (LIKE ws40000.temp_node INCLUDING ALL);
-		CREATE TEMP TABLE temp_t_arc (LIKE ws40000.temp_arc INCLUDING ALL);
-		CREATE TEMP TABLE temp_t_demand (LIKE ws40000.temp_demand INCLUDING ALL);
-		CREATE TEMP TABLE temp_t_anlgraph (LIKE ws40000.temp_anlgraph INCLUDING ALL);
-
-		CREATE TEMP TABLE temp_anl_arc (LIKE ws40000.anl_arc INCLUDING ALL);
-		CREATE TEMP TABLE temp_anl_node (LIKE ws40000.anl_node INCLUDING ALL);
-		CREATE TEMP TABLE temp_anl_connec (LIKE ws40000.anl_connec INCLUDING ALL);
-
-		CREATE TEMP TABLE temp_rpt_inp_pattern_value (LIKE ws40000.rpt_inp_pattern_value INCLUDING ALL);
-
-		CREATE TEMP TABLE temp_t_go2epa (LIKE ws40000.temp_go2epa INCLUDING ALL);
+		CREATE TEMP TABLE temp_t_csv (LIKE SCHEMA_NAME.temp_csv INCLUDING ALL);
+		CREATE TEMP TABLE temp_audit_check_data (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
+		CREATE TEMP TABLE temp_audit_log_data (LIKE SCHEMA_NAME.audit_log_data INCLUDING ALL);
+		CREATE TEMP TABLE temp_t_table (LIKE SCHEMA_NAME.temp_table INCLUDING ALL);
+		CREATE TEMP TABLE temp_t_node (LIKE SCHEMA_NAME.temp_node INCLUDING ALL);
+		CREATE TEMP TABLE temp_t_arc (LIKE SCHEMA_NAME.temp_arc INCLUDING ALL);
+		CREATE TEMP TABLE temp_t_demand (LIKE SCHEMA_NAME.temp_demand INCLUDING ALL);
+		CREATE TEMP TABLE temp_t_anlgraph (LIKE SCHEMA_NAME.temp_anlgraph INCLUDING ALL);
+		CREATE TEMP TABLE temp_anl_arc (LIKE SCHEMA_NAME.anl_arc INCLUDING ALL);
+		CREATE TEMP TABLE temp_anl_node (LIKE SCHEMA_NAME.anl_node INCLUDING ALL);
+		CREATE TEMP TABLE temp_anl_connec (LIKE SCHEMA_NAME.anl_connec INCLUDING ALL);
+		CREATE TEMP TABLE temp_rpt_inp_pattern_value (LIKE SCHEMA_NAME.rpt_inp_pattern_value INCLUDING ALL);
+		CREATE TEMP TABLE temp_t_go2epa (LIKE SCHEMA_NAME.temp_go2epa INCLUDING ALL);
+		CREATE TEMP TABLE temp_t_rpt_cat_result (LIKE SCHEMA_NAME.rpt_cat_result INCLUDING ALL);
 	
 		-- create log tables		
 		EXECUTE 'SELECT gw_fct_create_logtables($${"data":{"parameters":{"fid":'||v_fid||'}}}$$::json)';
@@ -365,17 +368,12 @@ BEGIN
 	-- step 6: create json return
 	ELSIF v_step=6 THEN
 
-		SELECT gw_fct_pg2epa_check_result(v_input) INTO v_return ;
+		PERFORM gw_fct_pg2epa_check_result(v_input);
 
 		-- deleting arcs without nodes
 		UPDATE temp_t_arc t SET epa_type = 'TODELETE' FROM (SELECT a.id FROM temp_t_arc a LEFT JOIN temp_t_node ON node_1=node_id WHERE temp_t_node.node_id is null) a WHERE t.id = a.id;
 		UPDATE temp_t_arc t SET epa_type = 'TODELETE' FROM (SELECT a.id FROM temp_t_arc a LEFT JOIN temp_t_node ON node_2=node_id WHERE temp_t_node.node_id is null) a WHERE t.id = a.id;
-
-		INSERT INTO temp_audit_log_data (fid, feature_id, feature_type, log_message)
-		SELECT v_fid, arc_id, 'ARC', '23 - Profilactic last delete' FROM temp_t_arc WHERE epa_type  ='TODELETE';
-
 		DELETE FROM temp_t_arc WHERE epa_type = 'TODELETE';
-
 		UPDATE temp_t_arc SET result_id = v_result WHERE result_id IS NULL;
 		UPDATE temp_t_node SET result_id = v_result WHERE result_id IS NULL;
 
@@ -383,12 +381,10 @@ BEGIN
 		UPDATE temp_t_node t SET epa_type = 'TODELETE' FROM
 		(SELECT id FROM temp_t_node LEFT JOIN (SELECT node_1 as node_id FROM temp_t_arc UNION SELECT node_2 FROM temp_t_arc) a USING (node_id) WHERE a.node_id IS NULL) a
 		WHERE t.id = a.id;
-
-		INSERT INTO temp_audit_log_data (fid, feature_id, feature_type, log_message)
-		SELECT v_fid, node_id, 'NODE', '23 - Profilactic last delete' FROM temp_t_node WHERE epa_type  ='TODELETE';
-
 		DELETE FROM temp_t_node WHERE epa_type = 'TODELETE';
-
+		
+		-- create return
+		EXECUTE 'SELECT gw_fct_create_return($${"data":{"parameters":{"functionId":2646, "isEmbebed":false}}}$$::json)' INTO v_return;
 		SELECT gw_fct_pg2epa_export_inp(p_data) INTO v_file;
 		v_body = gw_fct_json_object_set_key((v_return->>'body')::json, 'file', v_file);
 		v_return = gw_fct_json_object_set_key(v_return, 'body', v_body);
@@ -414,6 +410,9 @@ BEGIN
 		SELECT result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, diameter, roughness, length,
 		status, the_geom, expl_id, flw_code, minorloss, addparam, arcparent,dma_id, presszone_id, dqa_id, minsector_id
 		FROM temp_t_arc;
+
+		-- move result data
+		UPDATE rpt_cat_result r set network_stats = t.network_stats FROM temp_t_rpt_cat_result t WHERE r.result_id = t.result_id;
 
 		-- move patterns data
 		INSERT INTO rpt_inp_pattern_value SELECT * FROM temp_rpt_inp_pattern_value;

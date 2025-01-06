@@ -6,12 +6,12 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE:2670
 
-CREATE OR REPLACE FUNCTION ws40000.gw_fct_pg2epa_check_data(p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_check_data(p_data json)
   RETURNS json AS
 $BODY$
 
 /*EXAMPLE
-SELECT ws40000.gw_fct_pg2epa_check_data($${"data":{"parameters":{"ignoreVerifiedExceptions":true}}}$$);
+SELECT SCHEMA_NAME.gw_fct_pg2epa_check_data($${"data":{"parameters":{"ignoreVerifiedExceptions":true}}}$$);
 -- v_fid: 604 check from checkproject
 
 -- v_fid: 227 check from pg2epa
@@ -29,7 +29,7 @@ v_return json;
 BEGIN
 
 	--  Search path
-	SET search_path = "ws40000", public;
+	SET search_path = "SCHEMA_NAME", public;
 
 	-- select config values
 	SELECT project_type INTO v_project_type FROM sys_version order by id desc limit 1;

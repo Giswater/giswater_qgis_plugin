@@ -6,14 +6,14 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE:2670
 
-DROP FUNCTION IF EXISTS ws40000.gw_fct_om_check_data(json);
-CREATE OR REPLACE FUNCTION ws40000.gw_fct_om_check_data(p_data json)
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_om_check_data(json);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_om_check_data(p_data json)
   RETURNS json AS
 $BODY$
 
 /*EXAMPLE
-SELECT ws40000.gw_fct_om_check_data($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{"parameters":{"selectionMode":"userSelectors"}}}$$)
-SELECT ws40000.gw_fct_om_check_data($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{"parameters":{"selectionMode":"userDomain"}}}$$)
+SELECT SCHEMA_NAME.gw_fct_om_check_data($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{"parameters":{"selectionMode":"userSelectors"}}}$$)
+SELECT SCHEMA_NAME.gw_fct_om_check_data($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},"data":{"parameters":{"selectionMode":"userDomain"}}}$$)
 */
 
 DECLARE
@@ -35,7 +35,7 @@ v_checkpsectors text;
 BEGIN
 
 	--  Search path
-	SET search_path = "ws40000", public;
+	SET search_path = "SCHEMA_NAME", public;
 
 	-- select config values
 	SELECT project_type, giswater INTO v_project_type, v_version FROM sys_version order by id desc limit 1;

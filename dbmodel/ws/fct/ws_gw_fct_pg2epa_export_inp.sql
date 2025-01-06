@@ -6,8 +6,8 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE:2526
 
-DROP FUNCTION IF EXISTS ws40000.gw_fct_utils_csv2pg_export_epanet_inp(character varying, text);
-CREATE OR REPLACE FUNCTION ws40000.gw_fct_pg2epa_export_inp(p_data json)
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_utils_csv2pg_export_epanet_inp(character varying, text);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_export_inp(p_data json)
 RETURNS json AS
 $BODY$
 
@@ -42,7 +42,7 @@ v_client_epsg integer;
 BEGIN
 
 	-- Search path
-	SET search_path = "ws40000", public;
+	SET search_path = "SCHEMA_NAME", public;
 
 	-- get input parameters
 	v_result = (p_data->>'data')::json->>'resultId';

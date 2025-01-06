@@ -6,13 +6,13 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE:2670
 
-DROP FUNCTION IF EXISTS ws40000.gw_fct_om_check_data(json);
-CREATE OR REPLACE FUNCTION ws40000.gw_fct_om_check_data(p_data json)
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_om_check_data(json);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_om_check_data(p_data json)
   RETURNS json AS
 $BODY$
 
 /*EXAMPLE
-SELECT ws40000.gw_fct_setcheckdatabase($${"data":{"parameters":{"omCheck":true, "graphCheck":false, "epaCheck":false, "planCheck":false, "adminCheck":false, "ignoreVerifiedExceptions":false}}}$$);
+SELECT SCHEMA_NAME.gw_fct_setcheckdatabase($${"data":{"parameters":{"omCheck":true, "graphCheck":false, "epaCheck":false, "planCheck":false, "adminCheck":false, "ignoreVerifiedExceptions":false}}}$$);
 */
 
 DECLARE
@@ -28,7 +28,7 @@ v_return json;
 BEGIN
 
 	--  Search path
-	SET search_path = "ws40000", public;
+	SET search_path = "SCHEMA_NAME", public;
 
 	-- select config values
 	SELECT project_type INTO v_project_type FROM sys_version order by id desc limit 1;
