@@ -49,24 +49,32 @@ SELECT gw_fct_graphanalytics_mapzones('
 Query to visualize arcs with their geometries:
 
 SELECT p.*, a.the_geom
-FROM temp_pgr_arc p JOIN arc a ON p.arc_id = a.arc_id
-WHERE p.pgr_arc_id = p.arc_id::INT;
+FROM temp_pgr_arc p 
+JOIN arc a ON p.arc_id = a.arc_id;
 
 Query to visualize nodes with their geometries:
 
-SELECT p.*, n.the_geom FROM temp_pgr_node p
-JOIN node n ON p.node_id = n.node_id
-WHERE p.pgr_node_id = p.node_id::INT;
+SELECT p.*, n.the_geom 
+FROM temp_pgr_node p
+JOIN node n ON p.node_id = n.node_id;
 
 Query to calculate the factor for adding/subtracting flow in a DMA:
 
-SELECT a.zone_id AS dma_id, d.name, d.descript, n.zone_id AS node_zone_id,
-CASE WHEN n.zone_id = a.zone_id THEN 1 ELSE -1 END AS flow_sign, n.node_id
-FROM temp_pgr_node n
-JOIN temp_pgr_arc a ON n.node_id IN (a.node_1, a.node_2)
-JOIN dma d ON d.dma_id = a.zone_id::INT
-WHERE n.graph_delimiter = 'dma' AND a.zone_id::INT > 0 AND a.pgr_arc_id = a.arc_id::INT AND n.pgr_node_id = n.node_id::INT
-ORDER BY a.zone_id, n.zone_id;
+WITH 
+temp_dma_graph AS (
+	SELECT 
+		COALESCE (a.node_1, a.node_2) AS node_id,
+		n.zone_id AS dma_id, 
+		CASE WHEN n.node_id IS NOT NULL THEN 1 ELSE -1 END AS flow_sign
+	FROM temp_pgr_node n
+	JOIN temp_pgr_arc a ON n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2) 
+	WHERE n.graph_delimiter = 'dma' 
+	AND a.graph_delimiter ='dma'
+	AND n.zone_id::int > 0
+	)
+SELECT DISTINCT ON (node_id, dma_id) node_id, dma_id, flow_sign
+FROM temp_dma_graph
+ORDER BY node_id, dma_id;
 */
 
 DECLARE
@@ -224,25 +232,23 @@ BEGIN
 	-- NODES TO MODIFY
 	IF v_project_type = 'WS' THEN
 		-- NODES VALVES
-		UPDATE temp_pgr_node t SET graph_delimiter = LOWER(cf.graph_delimiter)
-		FROM node n
-		JOIN cat_node cn ON cn.id = n.nodecat_id
-		JOIN cat_feature_node cf ON cf.id = cn.node_type
-		WHERE t.node_id=n.node_id AND cf.graph_delimiter = 'MINSECTOR';
 
 		-- UPDATE "closed", "broken", "to_arc" only if the values make sense - check the explanations/rules for the possible valve scenarios MINSECTOR/to_arc/closed/broken
-		-- valves to modify:
+		
 		-- closed valves
-		UPDATE temp_pgr_node n SET closed = v.closed, broken = v.broken, modif = TRUE
-		FROM man_valve v
-		WHERE n.node_id = v.node_id AND n.graph_delimiter = 'minsector' AND v.closed;
+		UPDATE temp_pgr_node t SET graph_delimiter = 'valve', closed = v.closed, broken = v.broken, modif = TRUE
+		FROM node n
+		JOIN man_valve v ON n.node_id = v.node_id
+		JOIN cat_node cn ON cn.id = n.nodecat_id
+		JOIN cat_feature_node cf ON cf.id = cn.nodetype_id
+		WHERE t.node_id = n.node_id AND cf.graph_delimiter = 'MINSECTOR' AND v.closed = TRUE;
 
 		-- valves with to_arc NOT NULL
-		UPDATE temp_pgr_node n SET to_arc = v.to_arc, broken = v.broken, modif = TRUE
+		UPDATE temp_pgr_node n SET graph_delimiter = 'valve', to_arc = v.to_arc, broken = v.broken, modif = TRUE
 		FROM man_valve v
 		WHERE n.node_id = v.node_id AND v.to_arc IS NOT NULL AND v.broken = FALSE;
 
-	-- cost/reverse_cost for the open valves with to_arc will be update after gw_fct_graphanalytics_arrangenetwork with the correct values
+		-- cost/reverse_cost for the open valves with to_arc will be update after gw_fct_graphanalytics_arrangenetwork with the correct values
 	END IF;
 
 	-- get mapzone field name
@@ -297,48 +303,63 @@ BEGIN
 	-- ARCS TO MODIFY
 	IF v_project_type = 'WS' THEN
 		-- ARCS VALVES
-		-- for the closed valves ('minsector', with or without to_arc), one of the arcs that connect to the valve
+		-- for the closed valves (WHEN "closed" IS TRUE), one of the arcs that connect to the valve
+		WITH 
+		arcs_selected AS (
+			SELECT DISTINCT ON (n.pgr_node_id)  a.pgr_arc_id, n.pgr_node_id, a.pgr_node_1, a.pgr_node_2
+			FROM temp_pgr_node n 
+			JOIN temp_pgr_arc a ON n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
+			WHERE n.graph_delimiter = 'valve' AND n.closed = TRUE
+		)
 		UPDATE temp_pgr_arc t
-		SET
-		    modif1 = CASE WHEN s.node_id = s.node_1 THEN TRUE ELSE modif1 END,
-        	modif2 = CASE WHEN s.node_id = s.node_2 THEN TRUE ELSE modif2 END
-		FROM
-		(
-			SELECT DISTINCT ON (n.node_id) n.node_id, a.arc_id, a.node_1, a.node_2
-			FROM temp_pgr_node n
-			join temp_pgr_arc a ON n.node_id IN (a.node_1, a.node_2)
-			WHERE n.graph_delimiter = 'minsector' AND n.closed = TRUE
+		SET 
+			modif1 = s.modif1, 
+			modif2 = s.modif2 
+		FROM (
+			SELECT 
+				pgr_arc_id, 
+				bool_or(pgr_node_id = pgr_node_1) AS modif1, 
+				bool_or( pgr_node_id = pgr_node_2) AS modif2
+			FROM arcs_selected 
+			GROUP BY pgr_arc_id
 		) s
-		WHERE t.arc_id = s.arc_id;
+		WHERE t.pgr_arc_id = s.pgr_arc_id;
 
-        -- for the valves with to_arc NOT NULL that are not closed ('minsector' or 'none'); the InletArc - the one that is not to_arc
-  		UPDATE temp_pgr_arc t
-		SET
-			modif1 = CASE WHEN s.node_id = s.node_1 THEN TRUE ELSE modif1 END,
-        	modif2 = CASE WHEN s.node_id = s.node_2 THEN TRUE ELSE modif2 END
-		FROM
-		(
-			SELECT a.arc_id, n.node_id, n.to_arc, a.node_1, a.node_2
-			FROM  temp_pgr_node n
-			JOIN temp_pgr_arc a ON n.node_id IN (a.node_1, a.node_2)
-			WHERE (n.graph_delimiter = 'minsector' OR n.graph_delimiter = 'none') AND n.closed IS NULL AND a.arc_id <> n.to_arc
+        -- for the valves with to_arc NOT NULL that are not closed ('valve'); the InletArc - the one that is not to_arc
+  		WITH 
+		arcs_selected AS (
+			SELECT a.pgr_arc_id, n.pgr_node_id, a.pgr_node_1, a.pgr_node_2
+			FROM  temp_pgr_node n 
+			JOIN temp_pgr_arc a on n.pgr_node_id in (a.pgr_node_1, a.pgr_node_2)
+			WHERE n.graph_delimiter ='valve' AND n.closed IS NULL AND a.arc_id <> n.to_arc
+		)
+		UPDATE temp_pgr_arc t 
+		SET modif1= s.modif1,
+			modif2= s.modif2
+		FROM (
+			SELECT 
+				pgr_arc_id, 
+				bool_or(pgr_node_id = pgr_node_1) AS modif1, 
+				bool_or( pgr_node_id = pgr_node_2) AS modif2
+			FROM arcs_selected 
+			GROUP BY pgr_arc_id
 		) s
-		WHERE t.arc_id= s.arc_id;
+		WHERE t.pgr_arc_id= s.pgr_arc_id; 
 
-	-- cost/reverse_cost for the open valves with to_arc will be update after gw_fct_graphanalytics_arrangenetwork with the correct values
+		-- cost/reverse_cost for the open valves with to_arc will be update after gw_fct_graphanalytics_arrangenetwork with the correct values
 	END IF;
 
 	-- ARCS MAPZONES
 	-- Disconnect the InletArc (those that are not to_arc)
     v_querytext =
-		'UPDATE temp_pgr_arc a 
+		'UPDATE temp_pgr_arc t 
 		SET
-			modif1 = CASE WHEN s.node_id = s.node_1 THEN TRUE ELSE modif1 END,
-        	modif2 = CASE WHEN s.node_id = s.node_2 THEN TRUE ELSE modif2 END
+			modif1 = CASE WHEN s.pgr_node_id = s.pgr_node_1 THEN TRUE ELSE modif1 END,
+        	modif2 = CASE WHEN s.pgr_node_id = s.pgr_node_2 THEN TRUE ELSE modif2 END
 		FROM (
-			SELECT a.arc_id, n.node_id, a.node_1, a.node_2
+			SELECT a.pgr_arc_id, n.pgr_node_id, a.pgr_node_1, a.pgr_node_2
 			FROM temp_pgr_node n
-			JOIN temp_pgr_arc a ON n.node_id IN (a.node_1, a.node_2) 
+			JOIN temp_pgr_arc a ON n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2) 
 			LEFT JOIN (
 				SELECT json_array_elements_text(((json_array_elements_text((graphconfig->>''use'')::json))::json->>''toArc'')::json) AS to_arc
 				FROM ' || v_mapzone_name || ' 
@@ -348,23 +369,30 @@ BEGIN
 			WHERE n.graph_delimiter = ''' || v_mapzone_name || '''
 			AND sa.to_arc IS NULL
 		) s
-		WHERE a.arc_id = s.arc_id';
+		WHERE t.pgr_arc_id = s.pgr_arc_id';
 	EXECUTE v_querytext;
 
 	-- Arcs forceClosed - all arcs that are connected to forceClosed nodes
-    v_querytext =
-		'UPDATE temp_pgr_arc a 
-		SET
-			modif1 = CASE WHEN s.node_id = s.node_1 THEN TRUE ELSE modif1 END,
-        	modif2 = CASE WHEN s.node_id = s.node_2 THEN TRUE ELSE modif2 END
-		FROM (
-			SELECT n.node_id, a.arc_id, a.node_1, a.node_2
+	WITH 
+		arcs_selected AS (
+			SELECT a.pgr_arc_id, n.pgr_node_id, a.pgr_node_1, a.pgr_node_2
 			FROM temp_pgr_node n 
-			JOIN temp_pgr_arc a ON n.node_id IN (a.node_1, node_2)
-			WHERE n.graph_delimiter = ''forceClosed''
+			JOIN temp_pgr_arc a ON n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
+			WHERE n.graph_delimiter = 'forceClosed'
+		)
+	UPDATE temp_pgr_arc a
+	SET 
+		modif1 = s.modif1, 
+		modif2 = s.modif2 
+	FROM (
+		SELECT 
+			pgr_arc_id, 
+			bool_or(pgr_node_id = pgr_node_1) AS modif1, 
+			bool_or( pgr_node_id = pgr_node_2) AS modif2
+		FROM arcs_selected 
+		GROUP BY pgr_arc_id
 		) s
-	WHERE a.arc_id= s.arc_id';
-    EXECUTE v_querytext;
+	WHERE a.pgr_arc_id = s.pgr_arc_id;
 
 	-- Generate new arcs and disconnect arcs with modif = TRUE
 	-- =======================
@@ -374,22 +402,21 @@ BEGIN
         RETURN v_response;
     END IF;
 
-	-- Note: node_1 = node_2 for the new arcs generated at the nodes
+	-- Note: node_id IS NULL AND arc_id IS NULL for the new nodes/arcs generated
+	-- Update cost/reverse_cost=-1 for the new arcs: 
+	UPDATE temp_pgr_arc 
+	SET cost = -1, reverse_cost = -1
+	WHERE arc_id IS NULL;
+
     IF v_project_type = 'WS' THEN
 		-- Update the cost/reverse_cost with the correct values for the open valves with to_arc NOT NULL
-		-- and graph_delimiter 'minsector' or 'none' (it wasn't changed for 'forceClosed' or 'ignore' for example)
-        UPDATE temp_pgr_arc a SET
-			reverse_cost = CASE WHEN a.pgr_node_1 = a.node_1::INT THEN 0 ELSE a.reverse_cost END, -- for inundation process, better to be 0 instead of 1; these arcs don't exist
-			cost = CASE WHEN a.pgr_node_2 = a.node_2::INT THEN 0 ELSE a.cost END -- for inundation process, better to be 0 instead of 1; these arcs don't exist
+		-- and graph_delimiter 'valve' (it wasn't changed for 'forceClosed' or 'ignore' for example)
+		UPDATE temp_pgr_arc a 
+		SET reverse_cost = CASE WHEN a.pgr_node_1=n.pgr_node_id THEN 0 ELSE a.reverse_cost END, -- for inundation process, better to be 0 instead of 1; these arcs don't exist
+			cost = CASE WHEN a.pgr_node_2=n.pgr_node_id THEN 0 ELSE a.cost END -- for inundation process, better to be 0 instead of 1; these arcs don't exist
 		FROM temp_pgr_node n
 		WHERE n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
-		AND a.node_1 = a.node_2
-		AND (
-			a.graph_delimiter = 'minsector'
-			OR a.graph_delimiter = 'none'
-		)
-		AND n.to_arc IS NOT NULL
-		AND n.closed IS NULL;
+		AND a.graph_delimiter = 'valve' AND n.to_arc IS NOT NULL AND n.closed IS NULL;
     END IF;
 
     EXECUTE 'SELECT COUNT(*)::INT FROM temp_pgr_arc'
@@ -398,11 +425,14 @@ BEGIN
 	EXECUTE 'SELECT array_agg(pgr_node_id)::INT[] 
 			FROM temp_pgr_node 
 			WHERE graph_delimiter = ''' || v_mapzone_name || ''' 
-			AND pgr_node_id = node_id::INT'
+			AND node_id IS NOT NULL'
 	INTO v_pgr_root_vids;
 
 	-- Execute pgr_drivingDistance function
-    v_querytext = 'SELECT pgr_arc_id AS id, pgr_node_1 AS source, pgr_node_2 AS target, cost, reverse_cost FROM temp_pgr_arc a';
+    v_querytext = 'SELECT pgr_arc_id AS id, pgr_node_1 AS source, pgr_node_2 AS target, cost, reverse_cost 
+		FROM temp_pgr_arc a
+		WHERE a.pgr_node_1 IS NOT NULL AND a.pgr_node_2 IS NOT NULL
+		AND (cost<> -1 OR reverse_cost <> -1)';
     INSERT INTO temp_pgr_drivingdistance(seq, "depth", start_vid, pred, node, edge, "cost", agg_cost)
     (
 		SELECT seq, "depth", start_vid, pred, node, edge, "cost", agg_cost
@@ -444,19 +474,23 @@ BEGIN
 	OR (a.pgr_node_2 = n.pgr_node_id AND reverse_cost >= 0))
 	AND n.zone_id <> 0;
 
-	-- Now set to '0' the nodes that connect arcs with different zone_id
+	-- Now set to 0 the nodes that connect arcs with different zone_id
 	-- Note: if a closed valve, for example, is between sector 2 and sector 3, it means it is a boundary, it will have '0' as zone_id; if it is between -1 and 2 it will also have 0;
 	-- However, if a closed valve is between arcs with the same sector, it retains it; if it is between 1 and 1, it retains 1, meaning it is not a boundary; if it is between -1 and -1, it does not change, it retains Conflict
 
-	-- Set to '0' the boundary nodes of mapzones
-    UPDATE temp_pgr_node n SET zone_id = 0
-    FROM (
-		SELECT node_id, COUNT(DISTINCT zone_id)
-    	FROM temp_pgr_node
-    	GROUP BY node_id
-   		HAVING COUNT(DISTINCT zone_id) > 1
-	) s
-	WHERE n.node_id = s.node_id AND n.graph_delimiter <> 'sector';
+	-- Set to 0 the boundary nodes of mapzones
+	WITH boundary AS (
+		SELECT COALESCE(n1.node_id, n2.node_id) AS node_id
+		FROM temp_pgr_arc a
+		JOIN temp_pgr_node n1 on a.pgr_node_1 =n1.pgr_node_id 
+		JOIN temp_pgr_node n2 on a.pgr_node_2 =n2.pgr_node_id 
+		WHERE a.graph_delimiter = 'valve'
+		AND n1.zone_id <> 0 AND n2.zone_id <> 0 
+		AND n1.zone_id <> n2.zone_id
+		)
+	UPDATE temp_pgr_node n SET zone_id =0
+	FROM boundary AS s 
+	WHERE n.node_id =s.node_id AND n.graph_delimiter='valve';
 
 	-- The connecs take the zone_id of the arc they are associated with and the link takes the zone_id of the gully
     UPDATE temp_pgr_connec c SET zone_id = a.zone_id
