@@ -2289,6 +2289,10 @@
 			<translation>Feu clic a l'element per substituir-la per una de nova. Podeu seleccionar una altra capa per encaixar diferents tipus d'elements.</translation>
 		</message>
 		<message>
+			<source>Please select a category to update.</source>
+			<translation>Si us plau, seleccioni una categoria per a actualitzar</translation>
+		</message>
+		<message>
 			<source>Failed to update category:</source>
 			<translation>Error al actualitzar la categoria:</translation>
 		</message>
@@ -2303,10 +2307,6 @@
 		<message>
 			<source>Category name already exists</source>
 			<translation>El nom de la categoria ja existeix</translation>
-		</message>
-		<message>
-			<source>Please select a category to delete.</source>
-			<translation>Si us plau, seleccioni una categoria per a eliminar</translation>
 		</message>
 	</context>
 

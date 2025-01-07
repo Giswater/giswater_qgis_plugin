@@ -267,7 +267,7 @@ class GwStyleManager:
         selected_stylegroup_name = self.style_mng_dlg.cmb_stylegroup.currentText()
 
         if not selected_stylegroup_name:
-            tools_qgis.show_warning(tools_qt.tr("Please select a category to delete."), dialog=self.style_mng_dlg)
+            tools_qgis.show_warning("Please select a category to update.", dialog=self.style_mng_dlg)
             return
         
         dialog_update = GwUpdateStyleGroupUi(self)
@@ -300,7 +300,7 @@ class GwStyleManager:
 
         # Validate that the mandatory fields are not empty
         if not new_category_name:
-            tools_qgis.show_warning(tools_qt.tr("Category name cannot be empty."), dialog=self.style_mng_dlg)
+            tools_qgis.show_warning("Category name cannot be empty.", dialog=self.style_mng_dlg)
             return
 
         # Start building the SQL query
@@ -316,7 +316,7 @@ class GwStyleManager:
         try:
             # Execute the SQL command and retrieve the new ID
             tools_db.execute_sql(sql)
-            tools_qgis.show_info(tools_qt.tr("Category updated successfully!"), dialog=self.style_mng_dlg)
+            tools_qgis.show_info("Category updated successfully!", dialog=self.style_mng_dlg)
             self.populate_stylegroup_combobox()
             tools_gw.close_dialog(dialog_update)
 
