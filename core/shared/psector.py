@@ -16,7 +16,7 @@ from functools import partial
 from sip import isdeleted
 
 from qgis.PyQt.QtCore import Qt, QItemSelectionModel
-from qgis.PyQt.QtGui import QDoubleValidator, QIntValidator, QKeySequence, QColor, QCursor
+from qgis.PyQt.QtGui import QDoubleValidator, QIntValidator, QKeySequence, QColor, QCursor, QStandardItemModel, QStandardItem
 from qgis.PyQt.QtSql import QSqlQueryModel, QSqlTableModel, QSqlError
 from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCheckBox, QComboBox, QDateEdit, QLabel, \
     QLineEdit, QTableView, QWidget, QDoubleSpinBox, QTextEdit, QPushButton, QGridLayout, QMenu, QHBoxLayout
@@ -59,6 +59,9 @@ class GwPsector:
         self.qtbl_arc = None
         self.qtbl_connec = None
         self.qtbl_gully = None
+
+        self.relations_og_models = {}
+        self.show_on_top_button = None
 
         self.previous_map_tool = self.canvas.mapTool()
 
@@ -435,6 +438,12 @@ class GwPsector:
         layout = QHBoxLayout(self.corner_widget)
         layout.setContentsMargins(0, 1, 0, 0)
 
+        self.show_on_top_button = QPushButton()
+        self.show_on_top_button.setCheckable(True)
+        tools_gw.add_icon(self.show_on_top_button, '175')
+        self.show_on_top_button.clicked.connect(partial(self._show_selection_on_top, self.show_on_top_button))
+        layout.addWidget(self.show_on_top_button)
+
         self.zoom_to_selection_button = QPushButton()
         tools_gw.add_icon(self.zoom_to_selection_button, '176')
         self.zoom_to_selection_button.clicked.connect(partial(self._zoom_to_selection))
@@ -512,7 +521,10 @@ class GwPsector:
             flags = Qt.ItemIsSelectable | Qt.ItemIsEnabled
             return flags
 
-        return QSqlTableModel.flags(model, index)
+        if isinstance(model, QSqlTableModel):
+            return QSqlTableModel.flags(model, index)
+
+        return QStandardItemModel.flags(model, index)
 
 
     def fill_widget(self, dialog, widget, row):
@@ -2708,11 +2720,22 @@ class GwPsector:
 
     def _manage_tab_feature_buttons(self):
         tab_idx = self.dlg_plan_psector.tab_feature.currentIndex()
+        tablename_map = {0: self.qtbl_arc, 1: self.qtbl_node, 2: self.qtbl_connec, 3: self.qtbl_gully}
+        try:
+            table_name = tablename_map.get(tab_idx).objectName()
+        except AttributeError:
+            table_name = None
 
         # Disable all by default
         self.dlg_plan_psector.btn_select_arc.setEnabled(False)
         self.dlg_plan_psector.btn_arc_fusion.setEnabled(False)
         self.dlg_plan_psector.btn_set_to_arc.setEnabled(False)
+
+        # Set "show on top" button not checked
+        if self.show_on_top_button is not None:
+            # If the tableview's model is stored, it means that the selected rows are shown on top, therefore the button should be checked
+            active = bool(self.relations_og_models.get(table_name))
+            self.show_on_top_button.setChecked(active)
 
         if tab_idx == 0:
             # Enable btn select_arc
@@ -2956,6 +2979,97 @@ class GwPsector:
                 if f"{feature_id}" in feature_ids and f"{state}" == "1":
                     selection_model.select(index, (QItemSelectionModel.Select | QItemSelectionModel.Rows))
 
+    def _show_selection_on_top(self, button: QPushButton):
+        """
+        Show the selected features on top of the tableview
+        """
+
+        cur_idx = self.dlg_plan_psector.tab_feature.currentIndex()
+        tableviews = [self.qtbl_arc, self.qtbl_node, self.qtbl_connec, self.qtbl_gully]
+        tableview = tableviews[cur_idx]
+        if not tableview:
+            return
+
+        model = tableview.model()
+        selection_model = tableview.selectionModel()
+        selected_rows = selection_model.selectedRows()
+
+        # Store the IDs of the selected rows
+        selected_ids = [f"{model.data(model.index(index.row(), 0))}" for index in selected_rows]
+
+        if button.isChecked():
+            if not selected_rows:
+                button.blockSignals(True)
+                button.setChecked(False)
+                button.blockSignals(False)
+                return
+
+            # If the original model is stored, don't do anything (already on top)
+            if tableview.objectName() in self.relations_og_models:
+                return
+
+            # Disconnect the selection changed signal
+            self._manage_selection_changed_signals(GwFeatureTypes.from_index(cur_idx), connect=False)
+
+            self.relations_og_models[tableview.objectName()] = tableview.model()
+            # Create a temporary in-memory model
+            temp_model = QStandardItemModel()
+            temp_model.setHorizontalHeaderLabels(
+                [model.headerData(i, Qt.Horizontal) for i in range(model.columnCount())]
+            )
+
+            # Add selected rows to the temporary model
+            selected_data = []
+            for index in selected_rows:
+                row_data = []
+                for column in range(model.columnCount()):
+                    row_data.append(QStandardItem(str(model.data(model.index(index.row(), column)))))
+                selected_data.append(row_data)
+
+            # Add selected data to the temporary model
+            for row_data in selected_data:
+                temp_model.appendRow(row_data)
+
+            # Add remaining rows to the temporary model
+            for row in range(model.rowCount()):
+                if any(row == index.row() for index in selected_rows):
+                    continue
+                row_data = []
+                for column in range(model.columnCount()):
+                    row_data.append(QStandardItem(str(model.data(model.index(row, column)))))
+                temp_model.appendRow(row_data)
+
+            # Set the temporary model to the tableview
+            tableview.setModel(temp_model)
+            # Reapply the selection based on IDs
+            new_selection_model = tableview.selectionModel()
+            for row in range(temp_model.rowCount()):
+                _id = temp_model.data(temp_model.index(row, 0))
+                if f"{_id}" in selected_ids:
+                    new_index = tableview.model().index(row, 0)
+                    new_selection_model.select(new_index, QItemSelectionModel.Select | QItemSelectionModel.Rows)
+        else:
+            # Disconnect the selection changed signal
+            self._manage_selection_changed_signals(GwFeatureTypes.from_index(cur_idx), connect=False)
+
+            # Restore the original model
+            original_model = self.relations_og_models.pop(tableview.objectName(), None)
+            if original_model:
+                tableview.setModel(original_model)
+            # Reapply the selection based on IDs
+            new_selection_model = tableview.selectionModel()
+            for row in range(original_model.rowCount()):
+                _id = original_model.data(original_model.index(row, 0))
+                if f"{_id}" in selected_ids:
+                    new_index = tableview.model().index(row, 0)
+                    new_selection_model.select(new_index, QItemSelectionModel.Select | QItemSelectionModel.Rows)
+
+        # Connect the selection changed signal
+        self._manage_selection_changed_signals(GwFeatureTypes.from_index(cur_idx))
+
+        # Set the focus on the tableview
+        tableview.setFocus()
+
     def _zoom_to_selection(self):
         """
         Zoom to the selected features in the tableview
@@ -2973,14 +3087,19 @@ class GwPsector:
 
         selection_model = tableview.selectionModel()
         selected_rows = selection_model.selectedRows()
+        model = tableview.model()
         feature_ids = []
         for index in selected_rows:
-            feature_id = tableview.model().record(index.row()).value(idname)
-            if feature_id:
+            feature_id = None
+            if isinstance(model, QSqlTableModel):
+                feature_id = model.record(index.row()).value(idname)
+            elif isinstance(model, QStandardItemModel):
+                feature_id = model.data(model.index(index.row(), tools_qt.get_col_index_by_col_name(tableview, idname)))
+            if feature_id not in (None, ''):
                 feature_ids.append(feature_id)
         tools_gw.zoom_to_feature_by_id(tablename, idname, feature_ids)
 
-    def _manage_selection_changed_signals(self, feature_type: GwFeatureTypes):
+    def _manage_selection_changed_signals(self, feature_type: GwFeatureTypes, connect=True, disconnect=True):
         """
         Manage the selection changed signals for the tableview based on the feature type
         """
@@ -2994,10 +3113,14 @@ class GwPsector:
         if tableview is None:
             return
 
-        # Generic selection changed signal
-        tools_gw.disconnect_signal('psector', f"highlight_features_by_id_{tablename}")
-        tools_gw.disconnect_signal('psector', f"highlight_features_by_id_{tablename_op}_op")
-        tools_gw.disconnect_signal('psector', f"manage_tab_feature_buttons_{tablename}")
+        if disconnect:
+            # Generic selection changed signal
+            tools_gw.disconnect_signal('psector', f"highlight_features_by_id_{tablename}")
+            tools_gw.disconnect_signal('psector', f"highlight_features_by_id_{tablename_op}_op")
+            tools_gw.disconnect_signal('psector', f"manage_tab_feature_buttons_{tablename}")
+
+        if not connect:
+            return
 
         # Highlight features by id
         tools_gw.connect_signal(tableview.selectionModel().selectionChanged, partial(
