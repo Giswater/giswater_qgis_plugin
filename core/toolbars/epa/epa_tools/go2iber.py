@@ -5,6 +5,8 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
+import importlib
+
 from datetime import timedelta
 from functools import partial
 from pathlib import Path
@@ -64,7 +66,10 @@ class Go2Iber:
         self.go2epa_btn._go2epa_options()
 
     def _btn_iber_options_clicked(self):
-        pass
+        drain_folder = tools_qgis.get_plugin_folder("drain")
+        dr_options = importlib.import_module('.options', package=f'{drain_folder}.core.shared')
+        self.dr_options = dr_options.DrOptions(tabs_to_show=["tab_main", "tab_rpt_iber", "tab_plugins"])
+        self.dr_options.open_options_dlg()
 
     def _btn_accept_clicked(self):
         """ Save INP, RPT and result name"""
