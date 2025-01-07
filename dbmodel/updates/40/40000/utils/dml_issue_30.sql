@@ -664,7 +664,7 @@ INSERT INTO sys_fprocess (fid, fprocess_name, "source", fprocess_type, project_t
 -- xtr (from 26/12/2024)
 ------------------------
 
--- pending 
+-- pending
 -- UPDATE sys_fprocess SET except_table = 'anl_loquesea' from discord
 -- UPDATE sys_fprocess SET fprocess_name ='name normalizado' from discord
 
@@ -685,7 +685,7 @@ left join c c1 on a.feature_id = c1.connec_id
 left join c c2 on a.exit_id = c2.connec_id
 where (a.exit_type =''CONNEC'') and c1.arc <> c2.arc'  WHERE fid = 205;
 
-UPDATE sys_fprocess set query_text = 
+UPDATE sys_fprocess set query_text =
 'with a as (SELECT arc_id, node_1, node_2, arccat_id, expl_id, state, the_geom FROM arc WHERE state = 1),
 n1 as (SELECT arc.arc_id, node.node_id, min(ST_Distance(node.the_geom, ST_startpoint(arc.the_geom))) as d FROM node, arc 
 WHERE arc.state = 1 and node.state = 1 and ST_DWithin(ST_startpoint(arc.the_geom), node.the_geom, 0.02) group by 1,2 ORDER BY 1 DESC,3 DESC
@@ -698,7 +698,7 @@ left join n1 on a.arc_id = n1.arc_id
 left join n2 on a.arc_id = n2.arc_id 
 where (a.node_1 != n1.node_id) or (a.node_2 != n2.node_id)' WHERE fid = 372;
 
-UPDATE sys_fprocess set query_text = 
+UPDATE sys_fprocess set query_text =
 'with
 mec as ( -- links with startpoint close to connec
 SELECT l.link_id as arc_id, c.conneccat_id as arccat_id, l.the_geom, l.expl_id FROM connec c, link l
@@ -709,7 +709,7 @@ SELECT link_id, feature_id, ''417'', l.state, l.the_geom
 FROM link l JOIN connec c ON feature_id = connec_id WHERE l.state = 1 and l.feature_type = ''CONNEC'') 
 select * from mec where arc_id not in (select link_id from moc)'  WHERE fid = 417;
 
-UPDATE sys_fprocess set query_text = 
+UPDATE sys_fprocess set query_text =
 'SELECT * FROM (SELECT DISTINCT t1.node_id, t1.nodecat_id, t1.state as state1, 
 t2.node_id AS node_2, t2.nodecat_id AS nodecat_2, t2.state as state2, t1.expl_id, 453, t1.the_geom 
 FROM t_node AS t1 JOIN t_node AS t2 ON ST_Dwithin(t1.the_geom, t2.the_geom, 0.01) 
@@ -718,7 +718,7 @@ WHERE t1.node_id != t2.node_id ORDER BY t1.node_id ) a where a.state1 = 2 AND a.
 INSERT INTO sys_fprocess (fid, fprocess_name, "source", fprocess_type, project_type)
 VALUES (604, 'Check DB data', 'core', 'Function process', 'utils');
 
-UPDATE config_param_system SET value= '{"omCheck":true, "graphCheck":true, "epaCheck":true, "planCheck":true, "adminCheck":true, "ignoreVerifiedExceptions":false}' 
+UPDATE config_param_system SET value= '{"omCheck":true, "graphCheck":true, "epaCheck":true, "planCheck":true, "adminCheck":true, "ignoreVerifiedExceptions":false}'
 WHERE parameter = 'admin_checkproject';
 
 update sys_fprocess set query_text = replace(query_text,'v_edit_', 't_');
@@ -734,21 +734,21 @@ UNION ALL
 SELECT node_id, nodecat_id, n.the_geom, n.expl_id FROM t_node n JOIN selector_sector USING (sector_id) 
 JOIN t_arc a1 ON node_id=a1.node_2  AND n.epa_type IN (''SHORTPIPE'', ''VALVE'', ''PUMP'') WHERE current_user=cur_user)a 
 GROUP by node_id, nodecat_id, the_geom, expl_id HAVING count(*) > 2'
-where fid = 166
+where fid = 166;
 
-update sys_fprocess set query_text = 'SELECT arc_id, arccat_id, the_geom, expl_id FROM t_inp_pipe WHERE status =''CV''' 
+update sys_fprocess set query_text = 'SELECT arc_id, arccat_id, the_geom, expl_id FROM t_inp_pipe WHERE status =''CV'''
 where fid = 169;
 
 update sys_fprocess set query_text = '
 select node_id, nodecat_id, n.the_geom,  n.expl_id
 from man_valve join t_node n using (node_id) JOIN t_arc v on v.arc_id = to_arc
-where node_id not in (node_1, node_2)' 
+where node_id not in (node_1, node_2)'
 where fid = 170;
 
 update sys_fprocess set query_text = '
 select node_id, nodecat_id, n.the_geom,  n.expl_id
 from man_pump join t_node n using (node_id) JOIN t_arc v on v.arc_id = to_arc
-where node_id not in (node_1, node_2)' 
+where node_id not in (node_1, node_2)'
 where fid = 171;
 
 update sys_fprocess set query_text = 'SELECT * FROM t_inp_tank WHERE initlevel is null or minlevel is null or maxlevel is null or diameter is null or minvol is null'
@@ -777,7 +777,7 @@ SELECT node_id, nodecat_id, n.the_geom, n.expl_id FROM t_node n
 JOIN arc ON node_id=node_2 WHERE n.epa_type IN (''SHORTPIPE''))a
 GROUP by node_id, nodecat_id, the_geom, expl_id
 HAVING count(*) < 2'
-WHERE fid = 292
+WHERE fid = 292;
 
 UPDATE sys_fprocess SET
 fprocess_name = 'Arc without node_1/node_2 (go2epa)',
@@ -951,7 +951,7 @@ WHERE fid = 407;
 
 
 insert into sys_fprocess (fid, fprocess_name, except_level, except_msg, info_msg, query_text, function_name, active) values
-(605, 'Check EPA outlayer depth', 3, 'nodes/connecs found with outlayers values for depth', 'All nodes/connecs has depth values according system tresholds', 
+(605, 'Check EPA outlayer depth', 3, 'nodes/connecs found with outlayers values for depth', 'All nodes/connecs has depth values according system tresholds',
 	'WITH 
 	outlayer AS (SELECT ((value::json->>''depth'')::json->>''max'')::numeric as max_depth, 
     ((value::json->>''depth'')::json->>''min'')::numeric as min_depth FROM config_param_system WHERE parameter = ''epa_outlayer_values'')
