@@ -2995,19 +2995,25 @@ class GwPsector:
             return
 
         # Generic selection changed signal
-        tableview.selectionModel().selectionChanged.disconnect()
+        tools_gw.disconnect_signal('psector', f"highlight_features_by_id_{tablename}")
+        tools_gw.disconnect_signal('psector', f"highlight_features_by_id_{tablename_op}_op")
+        tools_gw.disconnect_signal('psector', f"manage_tab_feature_buttons_{tablename}")
 
-        tableview.selectionModel().selectionChanged.connect(partial(
+        # Highlight features by id
+        tools_gw.connect_signal(tableview.selectionModel().selectionChanged, partial(
             tools_qgis.highlight_features_by_id, tableview, tablename, feat_id, rb, width
-        ))
-        tableview.selectionModel().selectionChanged.connect(partial(
+        ), 'psector', f"highlight_features_by_id_{tablename}")
+        # Higlight features by id (obsolete features)
+        tools_gw.connect_signal(tableview.selectionModel().selectionChanged, partial(
             self._highlight_features_by_id, tableview, tablename_op, feat_id_op, self.rubber_band_op, 5
-        ))
+        ), 'psector', f"highlight_features_by_id_{tablename_op}_op")
+
         # Manage connec/gully special cases
         if feature_type in (GwFeatureTypes.CONNEC, GwFeatureTypes.GULLY):
-            tableview.selectionModel().selectionChanged.connect(partial(
+            tools_gw.connect_signal(tableview.selectionModel().selectionChanged, partial(
                 self._manage_tab_feature_buttons
-            ))
+            ), 'psector', f"manage_tab_feature_buttons_{tablename}")
+
             tableview.model().flags = lambda index: self.flags(index, tableview.model(), ['arc_id', 'link_id'])
 
     # endregion
