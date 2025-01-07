@@ -584,9 +584,9 @@ class GwStyleUi(GwDialog, FORM_CLASS):
     CONTEXT = CONTEXT
     UINAME = UINAME
 
-UINAME = "update_style_group"
+UINAME = "style_update_category"
 FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
-class GwUpdateStyleGroupUi(GwMainWindow, FORM_CLASS):
+class GwUpdateStyleGroupUi(GwDialog, FORM_CLASS):
     CONTEXT = CONTEXT
     UINAME = UINAME
 
