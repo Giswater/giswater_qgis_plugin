@@ -2407,3 +2407,6 @@ DELETE FROM config_toolbox
 
 DELETE FROM sys_function
 	WHERE id=2524; --gw_fct_import_swmm_inp
+
+update config_form_fields set dv_querytext_filterc = null 
+where formname in ('v_edit_inp_flwreg_pump','v_edit_inp_flwreg_orifice','v_edit_inp_flwreg_weir','v_edit_inp_flwreg_outlet');
