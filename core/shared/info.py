@@ -427,8 +427,11 @@ class GwInfo(QObject):
         self.action_edit = self.dlg_generic.findChild(QAction, "actionEdit")
         tools_gw.add_icon(self.action_edit, "101")
 
-        for tab in complet_result['body']['form']['visibleTabs']:
-            self.visible_tabs[tab['tabName']] = tab
+        try:
+            for tab in complet_result['body']['form']['visibleTabs']:
+                self.visible_tabs[tab['tabName']] = tab
+        except (KeyError, TypeError):
+            pass
 
         is_enabled = False
         try:
@@ -662,8 +665,8 @@ class GwInfo(QObject):
         # Set actions icon
         tools_gw.add_icon(self.action_edit, "101")
         tools_gw.add_icon(self.action_copy_paste, "106")
-        tools_gw.add_icon(self.action_rotation, "110")      
-        tools_gw.add_icon(self.action_catalog, "152")                  
+        tools_gw.add_icon(self.action_rotation, "110")
+        tools_gw.add_icon(self.action_catalog, "152")
         tools_gw.add_icon(self.action_workcat, "150")
         tools_gw.add_icon(self.action_mapzone, "158")
         tools_gw.add_icon(self.action_set_to_arc, "157")
@@ -3197,7 +3200,7 @@ class GwInfo(QObject):
             widget.setEnabled(False)  # Completely disables interaction
             if hasattr(widget, "setReadOnly"):
                 widget.setReadOnly(True)  # For widgets like QLineEdit
-                
+
             if hasattr(widget, "editingFinished"):
                 widget.editingFinished.emit()  # Emit signal to indicate value has changed
         else:
