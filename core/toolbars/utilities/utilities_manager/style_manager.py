@@ -270,7 +270,7 @@ class GwStyleManager:
             tools_qgis.show_warning("Please select a category to update.", dialog=self.style_mng_dlg)
             return
         
-        dialog_update = GwUpdateStyleGroupUi(self)
+        dialog_update = GwUpdateStyleGroupUi(self, parent=dialog)
         tools_gw.load_settings(dialog_update)
 
         dialog_update.btn_accept.clicked.connect(partial(self._handle_update_feature, dialog_update, selected_stylegroup_name))

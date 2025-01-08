@@ -12,6 +12,7 @@ from qgis.PyQt.QtWidgets import QMainWindow, QShortcut, QSizePolicy, QStackedLay
 from qgis.PyQt.QtGui import QKeySequence, QIcon
 
 from qgis.gui import QgsMessageBar
+from qgis.utils import iface
 
 from ... import global_vars
 from ...libs import lib_vars
@@ -24,9 +25,9 @@ class GwMainWindow(QMainWindow):
     key_escape = QtCore.pyqtSignal()
     key_enter = QtCore.pyqtSignal()
 
-    def __init__(self, class_obj, subtag=None):
+    def __init__(self, class_obj, subtag=None, parent=None):
 
-        super().__init__()
+        super().__init__(parent or iface.mainWindow())
         self.setupUi(self)
 
         # Check if CONTEXT and UINAME are defined and set properties accordingly

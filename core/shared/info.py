@@ -599,14 +599,15 @@ class GwInfo(QObject):
             dlg_cf.dlg_closed.connect(self._manage_prev_action)
             dlg_cf.key_escape.connect(partial(tools_gw.close_dialog, dlg_cf))
             btn_cancel.clicked.connect(partial(self._manage_info_close, dlg_cf))
-        btn_accept.clicked.connect(
+            btn_accept.clicked.connect(
             partial(self._accept_from_btn, dlg_cf, self.action_edit, new_feature, self.my_json, complet_result, False))
-        dlg_cf.key_enter.connect(
+            dlg_cf.key_enter.connect(
             partial(self._accept_from_btn, dlg_cf, self.action_edit, new_feature, self.my_json, complet_result, False))
+            # Open dialog
+            tools_gw.open_dialog(self.dlg_cf, dlg_name='info_feature')
+            self.dlg_cf.setWindowTitle(title)
 
-        # Open dialog
-        tools_gw.open_dialog(self.dlg_cf, dlg_name='info_feature')
-        self.dlg_cf.setWindowTitle(title)
+        
 
         return self.complet_result, self.dlg_cf
 

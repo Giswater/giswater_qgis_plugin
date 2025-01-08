@@ -326,7 +326,7 @@ def open_help_link(context, uiname, tabname=None):
     tools_os.open_file(file_path)
 
 
-def open_dialog(dlg, dlg_name=None, stay_on_top=True, title=None, hide_config_widgets=False, plugin_dir=lib_vars.plugin_dir, plugin_name=lib_vars.plugin_name):
+def open_dialog(dlg, dlg_name=None, stay_on_top=False, title=None, hide_config_widgets=False, plugin_dir=lib_vars.plugin_dir, plugin_name=lib_vars.plugin_name):
 
     """ Open dialog """
 
@@ -343,12 +343,14 @@ def open_dialog(dlg, dlg_name=None, stay_on_top=True, title=None, hide_config_wi
         dlg.setWindowTitle(title)
 
     # Manage stay on top, maximize/minimize button and information button
-    flags = Qt.WindowCloseButtonHint | Qt.WindowMinMaxButtonsHint
+    flags = Qt.WindowCloseButtonHint | Qt.WindowMinMaxButtonsHint | Qt.Window
 
     if stay_on_top:
         flags |= Qt.WindowStaysOnTopHint
 
     dlg.setWindowFlags(flags)
+    if issubclass(type(dlg), GwDialog):
+        dlg.setModal(False)
 
     if hide_config_widgets:
         hide_widgets_form(dlg, dlg_name)
@@ -362,6 +364,7 @@ def open_dialog(dlg, dlg_name=None, stay_on_top=True, title=None, hide_config_wi
     # Create btn_help
     add_btn_help(dlg)
 
+    dlg.show()
     # Open dialog
     if issubclass(type(dlg), GwDialog):
         dlg.open()

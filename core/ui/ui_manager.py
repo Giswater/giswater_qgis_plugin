@@ -54,6 +54,8 @@ FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
 class GwInfoFeatureUi(GwMainWindow, FORM_CLASS):
     CONTEXT = CONTEXT
     UINAME = UINAME
+    def __init__(self, class_obj, sub_tag):
+        super().__init__(class_obj)
 
 
 UINAME = "info_epa_demand"

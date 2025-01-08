@@ -105,7 +105,7 @@ class GwWorkspaceManagerButton(GwAction):
         tools_qt.set_checked(self.dlg_create_workspace, self.new_workspace_chk, row['private'])
 
         # Open the dialog
-        tools_gw.open_dialog(self.dlg_create_workspace, 'workspace_create', stay_on_top=True)
+        tools_gw.open_dialog(self.dlg_create_workspace, 'workspace_create')
 
 
     def _open_create_workspace_dlg(self):
@@ -125,7 +125,7 @@ class GwWorkspaceManagerButton(GwAction):
         self.dlg_create_workspace.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_create_workspace))
 
         # Open the dialog
-        tools_gw.open_dialog(self.dlg_create_workspace, 'workspace_create', stay_on_top=True)
+        tools_gw.open_dialog(self.dlg_create_workspace, 'workspace_create')
 
 
     def _get_list(self, table_name='v_ui_workspace', filter_name=""):
