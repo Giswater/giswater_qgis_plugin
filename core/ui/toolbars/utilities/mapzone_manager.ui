@@ -26,17 +26,30 @@
       <string/>
      </property>
      <layout class="QGridLayout" name="verticalLayout_3">
-      <item row="6" column="0" colspan="13">
-       <widget class="QTabWidget" name="main_tab"/>
-      </item>
-      <item row="4" column="0" colspan="2">
-       <widget class="QLabel" name="lbl_mapzone_name">
+      <item row="5" column="5">
+       <widget class="QPushButton" name="btn_execute">
         <property name="text">
-         <string>Filter by: Mapzone name</string>
+         <string/>
         </property>
        </widget>
       </item>
-      <item row="5" column="4">
+      <item row="5" column="7">
+       <widget class="QPushButton" name="btn_config">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Config</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="0" colspan="12">
+       <widget class="QTabWidget" name="main_tab"/>
+      </item>
+      <item row="5" column="3">
        <widget class="QLabel" name="lbl_vdefault_workspace">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
@@ -44,62 +57,6 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="9">
-       <widget class="QPushButton" name="btn_toggle_active">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string>Toggle active</string>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="10">
-       <widget class="QPushButton" name="btn_create">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string>Create</string>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="11">
-       <widget class="QPushButton" name="btn_update">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string>Update</string>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="2">
-       <widget class="QCheckBox" name="chk_show_all">
-        <property name="toolTip">
-         <string>Show all mapzones without user selection</string>
-        </property>
-        <property name="text">
-         <string>Show all mapzones</string>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="6">
-       <widget class="QPushButton" name="btn_execute">
         <property name="text">
          <string/>
         </property>
@@ -118,7 +75,48 @@
         </property>
        </widget>
       </item>
-      <item row="5" column="3">
+      <item row="5" column="4">
+       <widget class="QPushButton" name="btn_flood">
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="8">
+       <widget class="QPushButton" name="btn_toggle_active">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Toggle active</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="1">
+       <widget class="QCheckBox" name="chk_active">
+        <property name="text">
+         <string>Show inactive</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="6">
+       <widget class="QPushButton" name="btn_flood_from_node">
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0" colspan="2">
+       <widget class="QLabel" name="lbl_mapzone_name">
+        <property name="text">
+         <string>Filter by: Mapzone name</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="2">
        <spacer name="horizontalSpacer_2">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -131,14 +129,20 @@
         </property>
        </spacer>
       </item>
-      <item row="5" column="1">
-       <widget class="QCheckBox" name="chk_active">
+      <item row="5" column="9">
+       <widget class="QPushButton" name="btn_create">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="text">
-         <string>Show inactive</string>
+         <string>Create</string>
         </property>
        </widget>
       </item>
-      <item row="5" column="12">
+      <item row="5" column="11">
        <widget class="QPushButton" name="btn_delete">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -151,15 +155,8 @@
         </property>
        </widget>
       </item>
-      <item row="5" column="5">
-       <widget class="QPushButton" name="btn_flood">
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="8">
-       <widget class="QPushButton" name="btn_config">
+      <item row="5" column="10">
+       <widget class="QPushButton" name="btn_update">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -167,14 +164,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Config</string>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="7">
-       <widget class="QPushButton" name="btn_flood_from_node">
-        <property name="text">
-         <string/>
+         <string>Update</string>
         </property>
        </widget>
       </item>
@@ -213,7 +203,6 @@
  <tabstops>
   <tabstop>txt_name</tabstop>
   <tabstop>chk_active</tabstop>
-  <tabstop>chk_show_all</tabstop>
   <tabstop>btn_flood</tabstop>
   <tabstop>btn_execute</tabstop>
   <tabstop>btn_flood_from_node</tabstop>
