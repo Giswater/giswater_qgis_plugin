@@ -34,7 +34,7 @@ jobs:
       - name: Update apt-get and Install PostgreSQL, PostGIS, pgRouting, and pgTAP
         run: |
           sudo apt-get update
-          sudo apt-get install -y postgresql-15 postgresql-15-postgis-3 postgresql-15-pgrouting postgresql-15-pgtap postgis
+          sudo apt-get install -y postgresql-16 postgresql-16-postgis-3 postgresql-16-pgrouting postgresql-16-pgtap postgis
 
       - name: Start PostgreSQL service
         run: |
