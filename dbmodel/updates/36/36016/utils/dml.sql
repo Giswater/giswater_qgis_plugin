@@ -25,11 +25,17 @@ UPDATE config_form_fields SET widgetcontrols='{
 }'::json WHERE formname='generic' AND formtype='form_featuretype_change' AND columnname='feature_type_new' AND tabname='tab_none';
 
 -- 3/12/24
-update arc set muni_id  = 0 WHERE muni_id is null;
-update node set muni_id  = 0 WHERE muni_id is null;
-update connec set muni_id  = 0 WHERE muni_id is null;
-update element set muni_id  = 0 WHERE muni_id is null;
-update dimensions set muni_id  = 0 WHERE muni_id is null;
+UPDATE arc SET muni_id = 0 WHERE muni_id IS NULL;
+UPDATE node SET muni_id = 0 WHERE muni_id IS NULL;
+UPDATE connec SET muni_id = 0 WHERE muni_id IS NULL;
+UPDATE element SET muni_id = 0 WHERE muni_id IS NULL;
+UPDATE dimensions SET muni_id = 0 WHERE muni_id IS NULL;
+
+ALTER TABLE arc ALTER COLUMN muni_id SET NOT NULL;
+ALTER TABLE node ALTER COLUMN muni_id SET NOT NULL;
+ALTER TABLE connec ALTER COLUMN muni_id SET NOT NULL;
+ALTER TABLE element ALTER COLUMN muni_id SET NOT NULL;
+ALTER TABLE dimensions ALTER COLUMN muni_id SET NOT NULL;
 
 INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('label_quadrant', 'TL', 'TL', NULL, NULL);
 INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('label_quadrant', 'TR', 'TR', NULL, NULL);

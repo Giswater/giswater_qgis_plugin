@@ -1058,7 +1058,7 @@ update sys_style set stylevalue =
     </config>
    </editWidget>
   </field>
-  <field name="preszone_name" configurationFlags="None">
+  <field name="presszone_name" configurationFlags="None">
    <editWidget type="TextEdit">
     <config>
      <Option/>
@@ -1839,7 +1839,7 @@ update sys_style set stylevalue =
   <alias field="macrosector_id" index="27" name="macrosector"/>
   <alias field="sector_type" index="28" name=""/>
   <alias field="presszone_id" index="29" name="Presszone"/>
-  <alias field="preszone_name" index="30" name=""/>
+  <alias field="presszone_name" index="30" name=""/>
   <alias field="presszone_type" index="31" name=""/>
   <alias field="presszone_head" index="32" name=""/>
   <alias field="dma_id" index="33" name="dma"/>
@@ -1949,7 +1949,7 @@ update sys_style set stylevalue =
   <default field="macrosector_id" expression="" applyOnUpdate="0"/>
   <default field="sector_type" expression="" applyOnUpdate="0"/>
   <default field="presszone_id" expression="" applyOnUpdate="0"/>
-  <default field="preszone_name" expression="" applyOnUpdate="0"/>
+  <default field="presszone_name" expression="" applyOnUpdate="0"/>
   <default field="presszone_type" expression="" applyOnUpdate="0"/>
   <default field="presszone_head" expression="" applyOnUpdate="0"/>
   <default field="dma_id" expression="" applyOnUpdate="0"/>
@@ -2059,7 +2059,7 @@ update sys_style set stylevalue =
   <constraint field="macrosector_id" unique_strength="0" notnull_strength="0" exp_strength="0" constraints="0"/>
   <constraint field="sector_type" unique_strength="0" notnull_strength="0" exp_strength="0" constraints="0"/>
   <constraint field="presszone_id" unique_strength="0" notnull_strength="0" exp_strength="0" constraints="0"/>
-  <constraint field="preszone_name" unique_strength="0" notnull_strength="0" exp_strength="0" constraints="0"/>
+  <constraint field="presszone_name" unique_strength="0" notnull_strength="0" exp_strength="0" constraints="0"/>
   <constraint field="presszone_type" unique_strength="0" notnull_strength="0" exp_strength="0" constraints="0"/>
   <constraint field="presszone_head" unique_strength="0" notnull_strength="0" exp_strength="0" constraints="0"/>
   <constraint field="dma_id" unique_strength="0" notnull_strength="0" exp_strength="0" constraints="0"/>
@@ -2169,7 +2169,7 @@ update sys_style set stylevalue =
   <constraint field="macrosector_id" desc="" exp=""/>
   <constraint field="sector_type" desc="" exp=""/>
   <constraint field="presszone_id" desc="" exp=""/>
-  <constraint field="preszone_name" desc="" exp=""/>
+  <constraint field="presszone_name" desc="" exp=""/>
   <constraint field="presszone_type" desc="" exp=""/>
   <constraint field="presszone_head" desc="" exp=""/>
   <constraint field="dma_id" desc="" exp=""/>
@@ -2284,7 +2284,7 @@ update sys_style set stylevalue =
    <column hidden="0" width="-1" name="macrosector_id" type="field"/>
    <column hidden="0" width="-1" name="sector_type" type="field"/>
    <column hidden="0" width="-1" name="presszone_id" type="field"/>
-   <column hidden="0" width="-1" name="preszone_name" type="field"/>
+   <column hidden="0" width="-1" name="presszone_name" type="field"/>
    <column hidden="0" width="-1" name="presszone_type" type="field"/>
    <column hidden="0" width="-1" name="presszone_head" type="field"/>
    <column hidden="0" width="-1" name="dma_id" type="field"/>
@@ -2477,7 +2477,7 @@ def my_form_open(dialog, layer, feature):
   <field name="presszone_id" editable="1"/>
   <field name="presszone_style" editable="1"/>
   <field name="presszone_type" editable="1"/>
-  <field name="preszone_name" editable="1"/>
+  <field name="presszone_name" editable="1"/>
   <field name="province_id" editable="1"/>
   <field name="publish" editable="1"/>
   <field name="region_id" editable="1"/>
@@ -2587,7 +2587,7 @@ def my_form_open(dialog, layer, feature):
   <field labelOnTop="0" name="presszone_id"/>
   <field labelOnTop="0" name="presszone_style"/>
   <field labelOnTop="0" name="presszone_type"/>
-  <field labelOnTop="0" name="preszone_name"/>
+  <field labelOnTop="0" name="presszone_name"/>
   <field labelOnTop="0" name="province_id"/>
   <field labelOnTop="0" name="publish"/>
   <field labelOnTop="0" name="region_id"/>
@@ -2697,7 +2697,7 @@ def my_form_open(dialog, layer, feature):
   <field name="presszone_id" reuseLastValue="0"/>
   <field name="presszone_style" reuseLastValue="0"/>
   <field name="presszone_type" reuseLastValue="0"/>
-  <field name="preszone_name" reuseLastValue="0"/>
+  <field name="presszone_name" reuseLastValue="0"/>
   <field name="province_id" reuseLastValue="0"/>
   <field name="publish" reuseLastValue="0"/>
   <field name="region_id" reuseLastValue="0"/>
@@ -2730,7 +2730,7 @@ def my_form_open(dialog, layer, feature):
  <layerGeometryType>1</layerGeometryType>
 </qgis>' where layername = 'v_edit_arc' and styleconfig_id = 102;
 
-update sys_style set stylevalue = 
+update sys_style set stylevalue =
 '<!DOCTYPE qgis PUBLIC ''http://mrcc.com/qgis.dtd'' ''SYSTEM''>
 <qgis simplifyMaxScale="1" hasScaleBasedVisibilityFlag="1" readOnly="0" maxScale="0" simplifyDrawingTol="1" simplifyAlgorithm="0" symbologyReferenceScale="-1" version="3.28.5-Firenze" styleCategories="AllStyleCategories" minScale="2500" labelsEnabled="0" simplifyLocal="1" simplifyDrawingHints="0">
  <flags>

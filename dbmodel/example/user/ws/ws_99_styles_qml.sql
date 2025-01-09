@@ -964,7 +964,7 @@ UPDATE sys_style SET stylevalue='<!DOCTYPE qgis PUBLIC ''http://mrcc.com/qgis.dt
 
 UPDATE sys_style SET stylevalue='<!DOCTYPE qgis PUBLIC ''http://mrcc.com/qgis.dtd'' ''SYSTEM''>
 <qgis version="3.28.4-Firenze" labelsEnabled="1" styleCategories="Symbology|Labeling">
-  <renderer-v2 referencescale="-1" type="categorizedSymbol" symbollevels="0" attr="preszone_name" forceraster="0" enableorderby="0">
+  <renderer-v2 referencescale="-1" type="categorizedSymbol" symbollevels="0" attr="presszone_name" forceraster="0" enableorderby="0">
     <categories>
       <category value="pzone1-1d" type="string" render="true" label="pzone1-1d" symbol="0"/>
       <category value="pzone1-1s" type="string" render="true" label="pzone1-1s" symbol="1"/>

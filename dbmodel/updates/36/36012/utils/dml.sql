@@ -349,6 +349,7 @@ select d.id, s.sector_id, e.muni_id from dimensions d
 	left join ext_municipality e on st_dwithin(e.the_geom, d.the_geom, 0.01)
 )a where d.id = a.id;
 
+UPDATE dimensions SET sector_id = 0 WHERE sector_id IS NULL;
 
 update om_visit e set muni_id = a.muni_id, sector_id = a.sector_id from (
 select visit_id, node_id, n.muni_id, n.sector_id from om_visit_x_node

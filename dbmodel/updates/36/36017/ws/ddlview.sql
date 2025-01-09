@@ -95,12 +95,12 @@ AS SELECT element_x_arc.id,
      LEFT JOIN value_state_type ON element.state_type = value_state_type.id
      LEFT JOIN man_type_location ON man_type_location.location_type::text = element.location_type::text AND man_type_location.feature_type::text = 'ELEMENT'::text
      LEFT JOIN cat_element ON cat_element.id::text = element.elementcat_id::text;
-	 
+
 
 --23/12/2024
 create or replace view v_edit_node as
-WITH 
-    typevalue AS 
+WITH
+    typevalue AS
         (
         SELECT edit_typevalue.typevalue, edit_typevalue.id, edit_typevalue.idval
         FROM edit_typevalue
@@ -108,41 +108,41 @@ WITH
         ),
 	sector_table as
 		(
-		select sector_id, name as sector_name, macrosector_id, stylesheet, id::varchar(16) as sector_type 
+		select sector_id, name as sector_name, macrosector_id, stylesheet, id::varchar(16) as sector_type
 		from sector left JOIN typevalue t ON t.id::text = sector.sector_type AND t.typevalue::text = 'sector_type'::text
 		),
 	dma_table as
 		(
-		select dma_id, name as dma_name, macrodma_id, stylesheet, id::varchar(16) as dma_type from dma 
+		select dma_id, name as dma_name, macrodma_id, stylesheet, id::varchar(16) as dma_type from dma
 		left JOIN typevalue t ON t.id::text = dma.dma_type AND t.typevalue::text = 'dma_type'::text
 		),
 	presszone_table as
 		(
-		select presszone_id, name as presszone_name, head as presszone_head, stylesheet, id::varchar(16) as presszone_type 
+		select presszone_id, name as presszone_name, head as presszone_head, stylesheet, id::varchar(16) as presszone_type
 		from presszone left JOIN typevalue t ON t.id::text = presszone.presszone_type AND t.typevalue::text = 'presszone_type'::text
 		),
 	dqa_table as
 		(
-		select dqa_id, name as dqa_name, stylesheet, id::varchar(16) as dqa_type, macrodqa_id from dqa 
+		select dqa_id, name as dqa_name, stylesheet, id::varchar(16) as dqa_type, macrodqa_id from dqa
 		left JOIN typevalue t ON t.id::text = dqa.dqa_type AND t.typevalue::text = 'dqa_type'::text
-		),	
+		),
     node_psector AS
         (
-        SELECT pp.node_id, pp.state AS p_state 
+        SELECT pp.node_id, pp.state AS p_state
         FROM plan_psector_x_node pp
         JOIN selector_psector sp ON sp.cur_user = current_user AND sp.psector_id = pp.psector_id
         ),
     node_selector AS
         (
-        SELECT node_id 
-        FROM node 
+        SELECT node_id
+        FROM node
         JOIN selector_state s ON s.cur_user =current_user AND node.state =s.state_id
         LEFT JOIN (SELECT node_id FROM node_psector WHERE p_state = 0) a using (node_id) where a.node_id is null
-        union all 
+        union all
         SELECT node_id FROM node_psector
         WHERE p_state = 1
         ),
-    node_selected AS 
+    node_selected AS
         ( SELECT node.node_id,
 	    node.code,
 	    node.elevation,
@@ -164,8 +164,8 @@ WITH
 	    macrosector_id,
 	    sector_type,
 	    node.presszone_id,
-	    presszone_name as preszone_name,
-	    presszone_type, 
+	    presszone_name,
+	    presszone_type,
 	    presszone_head,
 	    node.dma_id,
 	    dma_name,
@@ -269,7 +269,7 @@ WITH
         FROM node_selector
         JOIN node ON node.node_id = node_selector.node_id
         JOIN selector_expl se ON (se.cur_user =current_user AND se.expl_id = node.expl_id) or (se.cur_user = current_user AND se.expl_id = node.expl_id2)
-        JOIN selector_sector sc ON (sc.cur_user = CURRENT_USER AND sc.sector_id = node.sector_id) 
+        JOIN selector_sector sc ON (sc.cur_user = CURRENT_USER AND sc.sector_id = node.sector_id)
         JOIN cat_node ON cat_node.id::text = node.nodecat_id::text
 	    JOIN cat_feature ON cat_feature.id::text = cat_node.nodetype_id::text
 		JOIN value_state_type vst ON vst.id = node.state_type
@@ -278,7 +278,7 @@ WITH
 		JOIN sector_table ON sector_table.sector_id = node.sector_id
 	    LEFT JOIN presszone_table ON presszone_table.presszone_id = node.presszone_id
 	    LEFT JOIN dma_table ON dma_table.dma_id = node.dma_id
-	    LEFT JOIN dqa_table ON dqa_table.dqa_id = node.dqa_id 
+	    LEFT JOIN dqa_table ON dqa_table.dqa_id = node.dqa_id
 	    LEFT JOIN node_add e ON e.node_id::text = node.node_id::text
         LEFT JOIN man_valve m ON m.node_id = node.node_id
         )
@@ -287,8 +287,8 @@ WITH
 
 
 CREATE OR REPLACE VIEW v_edit_arc
-AS WITH  
-	typevalue AS 
+AS WITH
+	typevalue AS
         (
         SELECT edit_typevalue.typevalue, edit_typevalue.id, edit_typevalue.idval
         FROM edit_typevalue
@@ -296,38 +296,38 @@ AS WITH
         ),
 	sector_table as
 		(
-		select sector_id, name as sector_name, macrosector_id, stylesheet, id::varchar(16) as sector_type 
+		select sector_id, name as sector_name, macrosector_id, stylesheet, id::varchar(16) as sector_type
 		from sector left JOIN typevalue t ON t.id::text = sector.sector_type AND t.typevalue::text = 'sector_type'::text
 		),
 	dma_table as
 		(
-		select dma_id, name as dma_name, macrodma_id, stylesheet, id::varchar(16) as dma_type from dma 
+		select dma_id, name as dma_name, macrodma_id, stylesheet, id::varchar(16) as dma_type from dma
 		left JOIN typevalue t ON t.id::text = dma.dma_type AND t.typevalue::text = 'dma_type'::text
 		),
 	presszone_table as
 		(
-		select presszone_id, name as presszone_name, head as presszone_head, stylesheet, id::varchar(16) as presszone_type 
+		select presszone_id, name as presszone_name, head as presszone_head, stylesheet, id::varchar(16) as presszone_type
 		from presszone left JOIN typevalue t ON t.id::text = presszone.presszone_type AND t.typevalue::text = 'presszone_type'::text
 		),
 	dqa_table as
 		(
-		select dqa_id, name as dqa_name, stylesheet, id::varchar(16) as dqa_type, macrodqa_id from dqa 
+		select dqa_id, name as dqa_name, stylesheet, id::varchar(16) as dqa_type, macrodqa_id from dqa
 		left JOIN typevalue t ON t.id::text = dqa.dqa_type AND t.typevalue::text = 'dqa_type'::text
-		),	
-	arc_psector AS 
+		),
+	arc_psector AS
 		(
 		SELECT pp.arc_id, pp.state AS p_state
         FROM plan_psector_x_arc pp
-        JOIN selector_psector sp ON sp.cur_user = CURRENT_USER AND sp.psector_id = pp.psector_id 
+        JOIN selector_psector sp ON sp.cur_user = CURRENT_USER AND sp.psector_id = pp.psector_id
 		),
-    arc_selector AS 
+    arc_selector AS
 		(
         SELECT arc.arc_id
         FROM arc
         JOIN selector_state s ON s.cur_user = CURRENT_USER AND arc.state = s.state_id
         left JOIN (SELECT arc_id FROM arc_psector WHERE p_state = 0) a using (arc_id)  where a.arc_id is null
-        union all 
-        SELECT arc_id FROM arc_psector 
+        union all
+        SELECT arc_id FROM arc_psector
         WHERE p_state = 1
         ),
     arc_selected AS (
@@ -361,7 +361,7 @@ AS WITH
 		macrosector_id,
 		sector_type,
 		arc.presszone_id,
-		presszone_name as preszone_name,
+		presszone_name,
 		presszone_type,
 		presszone_head,
 		arc.dma_id,
@@ -453,7 +453,7 @@ AS WITH
 	    FROM arc_selector
    		JOIN arc ON arc.arc_id::text = arc_selector.arc_id::text
    		JOIN selector_expl se ON ((se.cur_user = CURRENT_USER AND se.expl_id = arc.expl_id) OR (se.cur_user = CURRENT_USER and se.expl_id = arc.expl_id2))
-        JOIN selector_sector sc ON (sc.cur_user = CURRENT_USER AND sc.sector_id = arc.sector_id) 
+        JOIN selector_sector sc ON (sc.cur_user = CURRENT_USER AND sc.sector_id = arc.sector_id)
 		JOIN cat_arc ON cat_arc.id::text = arc.arccat_id::text
 		JOIN cat_feature ON cat_feature.id::text = cat_arc.arctype_id::text
 		JOIN exploitation ON arc.expl_id = exploitation.expl_id
@@ -461,17 +461,17 @@ AS WITH
 		JOIN sector_table ON sector_table.sector_id = arc.sector_id
 	    LEFT JOIN presszone_table ON presszone_table.presszone_id = arc.presszone_id
 	    LEFT JOIN dma_table ON dma_table.dma_id = arc.dma_id
-	    LEFT JOIN dqa_table ON dqa_table.dqa_id = arc.dqa_id 
+	    LEFT JOIN dqa_table ON dqa_table.dqa_id = arc.dqa_id
 		LEFT JOIN arc_add e ON e.arc_id::text = arc.arc_id::text
 		LEFT JOIN value_state_type vst ON vst.id = arc.state_type
         )
 	SELECT arc_selected.*
 	FROM arc_selected;
 
-	
+
 create or replace view v_edit_connec as
-WITH 
-    typevalue AS 
+WITH
+    typevalue AS
         (
         SELECT edit_typevalue.typevalue, edit_typevalue.id, edit_typevalue.idval
         FROM edit_typevalue
@@ -479,34 +479,34 @@ WITH
         ),
 	sector_table as
 		(
-		select sector_id, name as sector_name, macrosector_id, stylesheet, id::varchar(16) as sector_type 
+		select sector_id, name as sector_name, macrosector_id, stylesheet, id::varchar(16) as sector_type
 		from sector left JOIN typevalue t ON t.id::text = sector.sector_type AND t.typevalue::text = 'sector_type'::text
 		),
 	dma_table as
 		(
-		select dma_id, name as dma_name, macrodma_id, stylesheet, id::varchar(16) as dma_type from dma 
+		select dma_id, name as dma_name, macrodma_id, stylesheet, id::varchar(16) as dma_type from dma
 		left JOIN typevalue t ON t.id::text = dma.dma_type AND t.typevalue::text = 'dma_type'::text
 		),
 	presszone_table as
 		(
-		select presszone_id, name as presszone_name, head as presszone_head, stylesheet, id::varchar(16) as presszone_type 
+		select presszone_id, name as presszone_name, head as presszone_head, stylesheet, id::varchar(16) as presszone_type
 		from presszone left JOIN typevalue t ON t.id::text = presszone.presszone_type AND t.typevalue::text = 'presszone_type'::text
 		),
 	dqa_table as
 		(
-		select dqa_id, name as dqa_name, stylesheet, id::varchar(16) as dqa_type, macrodqa_id from dqa 
+		select dqa_id, name as dqa_name, stylesheet, id::varchar(16) as dqa_type, macrodqa_id from dqa
 		left JOIN typevalue t ON t.id::text = dqa.dqa_type AND t.typevalue::text = 'dqa_type'::text
-		),	
-    inp_network_mode AS 
+		),
+    inp_network_mode AS
     	(
          select value FROM config_param_user WHERE parameter::text = 'inp_options_networkmode'::text AND config_param_user.cur_user::text = CURRENT_USER
-        ),        
-    link_planned as 
-    	(   	   	
-    	select link_id, feature_id, feature_type, exit_id, exit_type, l.expl_id, macroexpl_id, l.sector_id, sector_name, macrosector_id, l.dma_id, dma_name, macrodma_id, 
+        ),
+    link_planned as
+    	(
+    	select link_id, feature_id, feature_type, exit_id, exit_type, l.expl_id, macroexpl_id, l.sector_id, sector_name, macrosector_id, l.dma_id, dma_name, macrodma_id,
     	l.presszone_id, presszone_name, presszone_head, l.dqa_id, dqa_name, dqa_table.macrodqa_id, fluid_type,
     	minsector_id, staticpressure, null::integer as macrominsector_id ,
-    	sector_type, presszone_type,  dma_type, dqa_type    	
+    	sector_type, presszone_type,  dma_type, dqa_type
     	from link l
     	join exploitation using (expl_id)
 		JOIN sector_table ON sector_table.sector_id = l.sector_id
@@ -514,7 +514,7 @@ WITH
 		LEFT JOIN dma_table ON dma_table.dma_id = l.dma_id
 		LEFT JOIN dqa_table ON dqa_table.dqa_id = l.dqa_id
 		where l.state = 2
-    	),   	
+    	),
     connec_psector AS
         (
      	SELECT DISTINCT ON (pp.connec_id, pp.state) pp.connec_id, pp.state AS p_state, pp.psector_id, pp.arc_id, pp.link_id
@@ -524,15 +524,15 @@ WITH
         ),
     connec_selector AS
         (
-        SELECT connec_id, arc_id::varchar(16), null::integer as link_id 
-        FROM connec 
+        SELECT connec_id, arc_id::varchar(16), null::integer as link_id
+        FROM connec
         JOIN selector_state ss ON ss.cur_user =current_user AND connec.state =ss.state_id
         left join (SELECT connec_id, arc_id FROM connec_psector WHERE p_state = 0) a using (connec_id, arc_id) where a.connec_id is null
        	union all
         SELECT connec_id, connec_psector.arc_id::varchar(16), link_id FROM connec_psector
         WHERE p_state = 1
         ),
-    connec_selected AS 
+    connec_selected AS
     	(
 		select connec.connec_id,
 		connec.code,
@@ -567,7 +567,7 @@ WITH
 			ELSE link_planned.macrosector_id
 		END AS macrosector_id,
 		--CASE
-		  --  WHEN link_planned.sector_type IS NULL THEN sector.sector_type 
+		  --  WHEN link_planned.sector_type IS NULL THEN sector.sector_type
 		   -- ELSE link_planned.sector_type
 		--END AS sector_type,
 		CASE
@@ -579,7 +579,7 @@ WITH
 			ELSE link_planned.presszone_name
 		END AS presszone_name,
 		CASE
-			WHEN link_planned.presszone_type IS NULL THEN presszone_table.presszone_type 
+			WHEN link_planned.presszone_type IS NULL THEN presszone_table.presszone_type
 			ELSE link_planned.presszone_type
 		END AS presszone_type,
 		CASE
@@ -730,7 +730,7 @@ WITH
 	    FROM inp_network_mode, connec_selector
         JOIN connec ON connec.connec_id = connec_selector.connec_id
         JOIN selector_expl se ON (se.cur_user =current_user AND se.expl_id = connec.expl_id) or (se.cur_user =current_user and se.expl_id = connec.expl_id2)
-        JOIN selector_sector sc ON (sc.cur_user = CURRENT_USER AND sc.sector_id = connec.sector_id) 
+        JOIN selector_sector sc ON (sc.cur_user = CURRENT_USER AND sc.sector_id = connec.sector_id)
         JOIN cat_connec ON cat_connec.id::text = connec.connecat_id::text
 	    JOIN cat_feature ON cat_feature.id::text = cat_connec.connectype_id::text
 	    JOIN exploitation ON connec.expl_id = exploitation.expl_id
@@ -738,19 +738,19 @@ WITH
 	    JOIN sector_table ON sector_table.sector_id = connec.sector_id
 	    LEFT JOIN presszone_table ON presszone_table.presszone_id = connec.presszone_id
 	    LEFT JOIN dma_table ON dma_table.dma_id = connec.dma_id
-	    LEFT JOIN dqa_table ON dqa_table.dqa_id = connec.dqa_id     
+	    LEFT JOIN dqa_table ON dqa_table.dqa_id = connec.dqa_id
 	    LEFT JOIN crm_zone ON crm_zone.id::text = connec.crmzone_id::text
    	    LEFT JOIN link_planned using (link_id)
 	    LEFT JOIN connec_add e ON e.connec_id::text = connec.connec_id::text
-	    LEFT JOIN value_state_type vst ON vst.id = connec.state_type        
+	    LEFT JOIN value_state_type vst ON vst.id = connec.state_type
 	    )
 	SELECT c.*
 	FROM connec_selected c;
 
 
 create or replace view v_edit_link as
-WITH 
-	typevalue AS 
+WITH
+	typevalue AS
         (
         SELECT edit_typevalue.typevalue, edit_typevalue.id, edit_typevalue.idval
         FROM edit_typevalue
@@ -758,25 +758,25 @@ WITH
         ),
 	sector_table as
 		(
-		select sector_id, name as sector_name, macrosector_id, stylesheet, id::varchar(16) as sector_type 
+		select sector_id, name as sector_name, macrosector_id, stylesheet, id::varchar(16) as sector_type
 		from sector left JOIN typevalue t ON t.id::text = sector.sector_type AND t.typevalue::text = 'sector_type'::text
 		),
 	dma_table as
 		(
-		select dma_id, name as dma_name, macrodma_id, stylesheet, id::varchar(16) as dma_type from dma 
+		select dma_id, name as dma_name, macrodma_id, stylesheet, id::varchar(16) as dma_type from dma
 		left JOIN typevalue t ON t.id::text = dma.dma_type AND t.typevalue::text = 'dma_type'::text
 		),
 	presszone_table as
 		(
-		select presszone_id, name as presszone_name, head as presszone_head, stylesheet, id::varchar(16) as presszone_type 
+		select presszone_id, name as presszone_name, head as presszone_head, stylesheet, id::varchar(16) as presszone_type
 		from presszone left JOIN typevalue t ON t.id::text = presszone.presszone_type AND t.typevalue::text = 'presszone_type'::text
 		),
 	dqa_table as
 		(
-		select dqa_id, name as dqa_name, stylesheet, id::varchar(16) as dqa_type, macrodqa_id from dqa 
+		select dqa_id, name as dqa_name, stylesheet, id::varchar(16) as dqa_type, macrodqa_id from dqa
 		left JOIN typevalue t ON t.id::text = dqa.dqa_type AND t.typevalue::text = 'dqa_type'::text
-		),	
-    inp_network_mode AS 
+		),
+    inp_network_mode AS
     	(
          select value FROM config_param_user WHERE parameter::text = 'inp_options_networkmode'::text AND config_param_user.cur_user::text = CURRENT_USER
         ),
@@ -789,14 +789,14 @@ WITH
         ),
     link_selector as
         (
-        SELECT l.link_id 
+        SELECT l.link_id
         FROM link l
         JOIN selector_state s ON s.cur_user =current_user AND l.state =s.state_id
         left join (SELECT link_id FROM link_psector WHERE p_state = 0) a using (link_id) where a.link_id is null
         UNION ALL
-        SELECT link_id FROM link_psector 
+        SELECT link_id FROM link_psector
         WHERE p_state = 1
-        ),                
+        ),
     link_selected as
     	(
 		SELECT l.link_id,
@@ -843,14 +843,14 @@ WITH
 	    l.minsector_id,
 	    l.macrominsector_id,
 	   	CASE
-	       WHEN l.sector_id > 0 AND l.is_operative = true AND l.epa_type = 'JUNCTION'::character varying(16)::text AND inp_network_mode.value = '4'::text 
+	       WHEN l.sector_id > 0 AND l.is_operative = true AND l.epa_type = 'JUNCTION'::character varying(16)::text AND inp_network_mode.value = '4'::text
 	       THEN l.epa_type::character varying
 	       ELSE NULL::character varying(16)
 	    END AS inp_type
 		FROM inp_network_mode, link_selector
 	    JOIN link l using (link_id)
 	    JOIN selector_expl se ON ((se.cur_user =current_user AND se.expl_id = l.expl_id) or (se.cur_user =current_user AND se.expl_id = l.expl_id2))
-        JOIN selector_sector sc ON (sc.cur_user = CURRENT_USER AND sc.sector_id = l.sector_id)  
+        JOIN selector_sector sc ON (sc.cur_user = CURRENT_USER AND sc.sector_id = l.sector_id)
 		JOIN sector_table ON sector_table.sector_id = l.sector_id
 	    LEFT JOIN presszone_table ON presszone_table.presszone_id = l.presszone_id
 	    LEFT JOIN dma_table ON dma_table.dma_id = l.dma_id
@@ -886,11 +886,11 @@ AS SELECT s.sector_id,
 
 DROP VIEW IF EXISTS v_edit_sector;
 CREATE OR REPLACE VIEW v_edit_sector
-AS SELECT s.* 
+AS SELECT s.*
 FROM vu_sector s, selector_sector
 WHERE s.sector_id = selector_sector.sector_id and active AND selector_sector.cur_user = "current_user"()::text;
- 
-create trigger gw_trg_edit_sector instead of insert or delete or update on v_edit_sector 
+
+create trigger gw_trg_edit_sector instead of insert or delete or update on v_edit_sector
 for each row execute function gw_trg_edit_sector('sector');
 
 create or replace view v_edit_presszone as

@@ -20,7 +20,7 @@ AS SELECT s.sector_id,
 	s.pattern_id,
 	s.graphconfig::text AS graphconfig,
 	s.stylesheet::text AS stylesheet,
-	s.link, 
+	s.link,
 	s.avg_press,
 	s.active,
 	s.undelete,
@@ -103,21 +103,21 @@ AS SELECT d.dqa_id,
 
 
 DROP VIEW IF EXISTS v_edit_sector;
-CREATE OR REPLACE VIEW v_edit_sector as 
+CREATE OR REPLACE VIEW v_edit_sector as
 select vu_sector.* from vu_sector, selector_sector
 WHERE (vu_sector.sector_id = selector_sector.sector_id) AND selector_sector.cur_user = "current_user"()::text;
 
-CREATE OR REPLACE VIEW v_edit_dma as 
+CREATE OR REPLACE VIEW v_edit_dma as
 select vu_dma.* from vu_dma, selector_expl
 WHERE ((vu_dma.expl_id = selector_expl.expl_id) AND selector_expl.cur_user = "current_user"()::text) OR vu_dma.expl_id is null
 order by 1 asc;
 
-CREATE OR REPLACE VIEW v_edit_presszone as 
+CREATE OR REPLACE VIEW v_edit_presszone as
 select vu_presszone.* from vu_presszone, selector_expl
 WHERE ((vu_presszone.expl_id = selector_expl.expl_id) AND selector_expl.cur_user = "current_user"()::text) OR vu_presszone.expl_id is null
 order by 1 asc;
 
-CREATE OR REPLACE VIEW v_edit_dqa as 
+CREATE OR REPLACE VIEW v_edit_dqa as
 select vu_dqa.* from vu_dqa, selector_expl
 WHERE ((vu_dqa.expl_id = selector_expl.expl_id) AND selector_expl.cur_user = "current_user"()::text) OR vu_dqa.expl_id is null
 order by 1 asc;
@@ -142,7 +142,7 @@ AS SELECT DISTINCT ON (rpt_cat_result.result_id) rpt_cat_result.result_id,
    FROM selector_expl s, rpt_cat_result
      LEFT JOIN inp_typevalue t1 ON rpt_cat_result.status::text = t1.id::text
      LEFT JOIN inp_typevalue t2 ON rpt_cat_result.network_type::text = t2.id::text
-  WHERE t1.typevalue::text = 'inp_result_status'::text AND t2.typevalue::text = 'inp_options_networkmode'::text 
+  WHERE t1.typevalue::text = 'inp_result_status'::text AND t2.typevalue::text = 'inp_options_networkmode'::text
   AND ((s.expl_id = ANY (rpt_cat_result.expl_id)) AND s.cur_user = CURRENT_USER OR rpt_cat_result.expl_id = ARRAY[NULL]::INTEGER[]);
 
 DROP VIEW IF EXISTS v_edit_minsector;
@@ -151,7 +151,19 @@ DROP VIEW IF EXISTS v_edit_element;
 DROP VIEW IF EXISTS v_edit_samplepoint;
 
 DROP VIEW IF EXISTS v_ext_municipality;
+DROP VIEW IF EXISTS v_ext_address;
 DROP VIEW IF EXISTS v_ext_streetaxis;
+DO $$
+BEGIN
+    IF EXISTS (
+        SELECT 1
+        FROM information_schema.views
+        WHERE table_schema = 'SCHEMA_NAME'
+          AND table_name = 'ext_streetaxis'
+    ) THEN
+        DROP VIEW ext_streetaxis;
+    END IF;
+END $$;
 
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"minsector", "column":"code", "dataType":"text"}}$$);
@@ -232,7 +244,7 @@ SELECT e.* FROM ( SELECT element.element_id,
   WHERE element.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text) e
   join selector_sector s using (sector_id)
   LEFT JOIN selector_municipality m using (muni_id)
-  where s.cur_user = current_user 
+  where s.cur_user = current_user
   and (m.cur_user = current_user or e.muni_id is null);
 
 
@@ -274,9 +286,43 @@ SELECT sm.* FROM ( SELECT samplepoint.sample_id,
 	WHERE samplepoint.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text) sm
 	join selector_sector s using (sector_id)
     LEFT JOIN selector_municipality m using (muni_id)
-    where s.cur_user = current_user 
+    where s.cur_user = current_user
     and (m.cur_user = current_user or sm.muni_id is null);
-	
+
+DO $$
+DECLARE
+    v_utils boolean;
+BEGIN
+     SELECT value::boolean INTO v_utils FROM config_param_system WHERE parameter='admin_utils_schema';
+
+	 IF v_utils IS true THEN
+        CREATE OR REPLACE VIEW ext_streetaxis
+        AS SELECT streetaxis.id,
+            streetaxis.code,
+            streetaxis.type,
+            streetaxis.name,
+            streetaxis.text,
+            streetaxis.the_geom,
+            streetaxis.ws_expl_id AS expl_id,
+            streetaxis.muni_id
+        FROM utils.streetaxis;
+    END IF;
+END; $$;
+
+CREATE OR REPLACE VIEW v_ext_address
+AS SELECT ext_address.id,
+    ext_address.muni_id,
+    ext_address.postcode,
+    ext_address.streetaxis_id,
+    ext_address.postnumber,
+    ext_address.plot_id,
+    ext_address.expl_id,
+    ext_streetaxis.name,
+    ext_address.the_geom
+   FROM selector_expl,
+    ext_address
+     LEFT JOIN ext_streetaxis ON ext_streetaxis.id::text = ext_address.streetaxis_id::text
+  WHERE ext_address.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
 
 CREATE OR REPLACE VIEW v_ext_streetaxis
 AS SELECT ext_streetaxis.id,
@@ -308,9 +354,9 @@ AS SELECT DISTINCT m.muni_id,
 
 -- recreate all deleted views: arc, node, connec and dependencies
 -----------------------------------
-CREATE OR REPLACE VIEW vu_arc AS 
-WITH 
-streetaxis as (SELECT id, descript FROM v_ext_streetaxis), 
+CREATE OR REPLACE VIEW vu_arc AS
+WITH
+streetaxis as (SELECT id, descript FROM v_ext_streetaxis),
 typevalue as (SELECT typevalue, id, idval FROM edit_typevalue WHERE typevalue in ('sector_type','presszone_type','dma_type','dqa_type'))
 SELECT arc.arc_id,
     arc.code,
@@ -342,7 +388,7 @@ SELECT arc.arc_id,
     sector.macrosector_id,
     et1.idval::varchar(16) as sector_type,
     arc.presszone_id,
-    presszone.name as preszone_name,
+    presszone.name as presszone_name,
     et2.idval::varchar(16) as presszone_type,
     presszone.head as presszone_head,
     arc.dma_id,
@@ -380,7 +426,7 @@ SELECT arc.arc_id,
     arc.postnumber2,
     arc.postcomplement2,
     mu.region_id,
-    mu.province_id,   
+    mu.province_id,
     arc.descript,
     concat(cat_feature.link_path, arc.link) AS link,
     arc.verified,
@@ -452,13 +498,13 @@ JOIN v_state_arc USING (arc_id)
 WHERE a.expl_id = s.expl_id OR a.expl_id2 = s.expl_id) a
 join selector_sector s using (sector_id)
 LEFT JOIN selector_municipality m using (muni_id)
-where s.cur_user = current_user 
+where s.cur_user = current_user
 and (m.cur_user = current_user or a.muni_id is null);
 
 
 CREATE OR REPLACE VIEW vu_node AS
-WITH 
-streetaxis as (SELECT id, descript FROM v_ext_streetaxis), 
+WITH
+streetaxis as (SELECT id, descript FROM v_ext_streetaxis),
 typevalue as (SELECT typevalue, id, idval FROM edit_typevalue WHERE typevalue in ('sector_type','presszone_type','dma_type','dqa_type'))
 SELECT node.node_id,
     node.code,
@@ -477,20 +523,20 @@ SELECT node.node_id,
     node.expl_id,
     exploitation.macroexpl_id,
     node.sector_id,
-    sector.name as sector_name,
+    sector.name AS sector_name,
     sector.macrosector_id,
-    et1.idval::varchar(16) as sector_type,
+    et1.idval::varchar(16) AS sector_type,
     node.presszone_id,
-    presszone.name as preszone_name,
-    et2.idval::varchar(16) as presszone_type,
-    presszone.head as presszone_head,
+    presszone.name AS presszone_name,
+    et2.idval::varchar(16) AS presszone_type,
+    presszone.head AS presszone_head,
     node.dma_id,
-    dma.name as dma_name,
-    et3.idval::varchar(16) as dma_type,
+    dma.name AS dma_name,
+    et3.idval::varchar(16) AS dma_type,
     dma.macrodma_id,
     node.dqa_id,
-    dqa.name as dqa_name,
-    et4.idval::varchar(16) as dqa_type,
+    dqa.name AS dqa_name,
+    et4.idval::varchar(16) AS dqa_type,
     dqa.macrodqa_id,
     node.arc_id,
     node.parent_id,
@@ -597,7 +643,7 @@ SELECT node.node_id,
 create or replace view v_edit_node as
 select a.*, case when s.sector_id > 0 and is_operative = true and epa_type !='UNDEFINED'::varchar(16) THEN epa_type else NULL::varchar(16) end as inp_type,
 v.closed as closed_valve, v.broken as broken_valve
- FROM (select n.* FROM 
+ FROM (select n.* FROM
 ( SELECT selector_expl.expl_id FROM selector_expl WHERE selector_expl.cur_user = CURRENT_USER) s, vu_node n
 JOIN v_state_node USING (node_id)
 WHERE n.expl_id = s.expl_id OR n.expl_id2 = s.expl_id) a
@@ -608,8 +654,8 @@ where (m.cur_user = current_user or a.muni_id is null);
 
 
 CREATE OR REPLACE VIEW vu_connec AS
-WITH 
-streetaxis as (SELECT id, descript FROM v_ext_streetaxis), 
+WITH
+streetaxis as (SELECT id, descript FROM v_ext_streetaxis),
 typevalue as (SELECT typevalue, id, idval FROM edit_typevalue WHERE typevalue in ('sector_type','presszone_type','dma_type','dqa_type'))
 	SELECT connec.connec_id,
     connec.code,
@@ -760,7 +806,7 @@ DROP view if exists vu_link;
 
 -- link views
 CREATE OR REPLACE VIEW vu_link AS
-WITH 
+WITH
 typevalue as (SELECT typevalue, id, idval FROM edit_typevalue WHERE typevalue in ('sector_type','presszone_type','dma_type','dqa_type'))
 	SELECT l.link_id,
 	l.feature_type,
@@ -770,19 +816,19 @@ typevalue as (SELECT typevalue, id, idval FROM edit_typevalue WHERE typevalue in
 	l.state,
 	l.expl_id,
 	l.sector_id,
-	s.name as sector_name,        
+	s.name as sector_name,
 	et1.idval::varchar(16) as sector_type,
 	s.macrosector_id,
 	presszone_id::character varying(16) AS presszone_id,
-	p.name as presszone_name,        
+	p.name as presszone_name,
 	et2.idval::varchar(16) as presszone_type,
 	p.head as presszone_head,
 	l.dma_id,
-	d.name as dma_name,        
+	d.name as dma_name,
 	et3.idval::varchar(16) as dma_type,
 	d.macrodma_id,
 	l.dqa_id,
-	q.name as dqa_name,        
+	q.name as dqa_name,
 	et4.idval::varchar(16) as dqa_type,
 	q.macrodqa_id,
 	l.exit_topelev,
@@ -815,7 +861,7 @@ typevalue as (SELECT typevalue, id, idval FROM edit_typevalue WHERE typevalue in
 	LEFT JOIN typevalue et3 on et3.id = d.dma_type AND et3.typevalue = 'dma_type'
 	LEFT JOIN typevalue et4 on et4.id = q.dqa_type AND et4.typevalue = 'dqa_type';
 
-CREATE OR REPLACE VIEW v_edit_link AS 
+CREATE OR REPLACE VIEW v_edit_link AS
 	SELECT l.* FROM (
 	SELECT *
 	FROM vu_link
@@ -825,7 +871,7 @@ CREATE OR REPLACE VIEW v_edit_link AS
 	where s.cur_user = current_user and (m.cur_user = current_user or l.muni_id is null);
 
 
-CREATE OR REPLACE VIEW v_edit_connec AS 
+CREATE OR REPLACE VIEW v_edit_connec AS
 SELECT  c.* FROM (
     WITH s AS (
     SELECT selector_expl.expl_id
@@ -914,7 +960,7 @@ SELECT vu_connec.connec_id,
     v_state_connec.arc_id,
     vu_connec.annotation,
     vu_connec.observ,
-    vu_connec.comment,   
+    vu_connec.comment,
     CASE
 	WHEN a.staticpressure IS NULL THEN vu_connec.staticpressure
 	ELSE a.staticpressure
@@ -1040,7 +1086,7 @@ SELECT vu_connec.connec_id,
 	WHERE vu_connec.expl_id = s.expl_id OR vu_connec.expl_id2 = s.expl_id) c
 	join selector_sector s using (sector_id)
 	LEFT JOIN selector_municipality m using (muni_id)
-	where s.cur_user = current_user 
+	where s.cur_user = current_user
 	and (m.cur_user = current_user or c.muni_id is null);
 
 
@@ -1865,7 +1911,7 @@ AS SELECT n.node_id,
     n.the_geom
 	FROM v_edit_node n
 	JOIN inp_pump USING (node_id)
-	JOIN man_pump USING (node_id)	
+	JOIN man_pump USING (node_id)
 	WHERE n.is_operative IS TRUE;
 
 CREATE OR REPLACE VIEW v_edit_inp_pipe
@@ -1889,16 +1935,16 @@ AS SELECT a.arc_id,
     inp_pipe.bulk_coeff,
     inp_pipe.wall_coeff,
     a.the_geom
-	FROM v_edit_arc a	
+	FROM v_edit_arc a
 	JOIN inp_pipe USING (arc_id)
 	LEFT JOIN cat_mat_roughness r ON cat_matcat_id = matcat_id
 	WHERE a.is_operative IS TRUE
 	AND (now()::date - (CASE WHEN builtdate IS NULL THEN '1900-01-01'::date ELSE builtdate END))/365 >= r.init_age
 	AND (now()::date - (CASE WHEN builtdate IS NULL THEN '1900-01-01'::date ELSE builtdate END))/365 < r.end_age AND r.active is true;
-    
-    
+
+
 DROP VIEW IF EXISTS ve_epa_pipe;
-CREATE OR REPLACE VIEW ve_epa_pipe AS 
+CREATE OR REPLACE VIEW ve_epa_pipe AS
 SELECT inp_pipe.arc_id,
     inp_pipe.minorloss,
     inp_pipe.status,
@@ -1967,7 +2013,7 @@ AS SELECT a.arc_id,
 	WHERE a.is_operative IS TRUE;
 
 -- ve_epa_virtualpump is not neeed to reformulate
-	
+
 
 CREATE OR REPLACE VIEW v_edit_inp_virtualvalve
 AS SELECT v_edit_arc.arc_id,
@@ -1995,7 +2041,7 @@ AS SELECT v_edit_arc.arc_id,
 	WHERE v_edit_arc.is_operative IS TRUE;
 
 DROP VIEW ve_epa_virtualvalve;
-CREATE OR REPLACE VIEW ve_epa_virtualvalve AS 
+CREATE OR REPLACE VIEW ve_epa_virtualvalve AS
  SELECT inp_virtualvalve.arc_id,
     inp_virtualvalve.valv_type,
     inp_virtualvalve.pressure,
@@ -2023,7 +2069,7 @@ CREATE OR REPLACE VIEW ve_epa_virtualvalve AS
     v_rpt_arc.ffactor_min
     FROM inp_virtualvalve
     LEFT JOIN v_rpt_arc USING (arc_id);
-	
+
 
 CREATE OR REPLACE VIEW v_edit_inp_dscenario_pipe
 AS SELECT d.dscenario_id,
@@ -2038,7 +2084,7 @@ AS SELECT d.dscenario_id,
 	FROM selector_inp_dscenario, v_edit_arc a
     JOIN inp_dscenario_pipe p USING (arc_id)
 	JOIN cat_dscenario d USING (dscenario_id)
-	WHERE p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text 
+	WHERE p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text
 	AND a.is_operative IS TRUE;
 
 CREATE OR REPLACE VIEW v_edit_inp_dscenario_virtualvalve
@@ -2057,7 +2103,7 @@ AS SELECT d.dscenario_id,
     FROM selector_inp_dscenario, v_edit_arc a
     JOIN inp_dscenario_virtualvalve p USING (arc_id)
     JOIN cat_dscenario d USING (dscenario_id)
-	WHERE p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text 
+	WHERE p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text
 	AND a.is_operative IS TRUE;
 
 CREATE OR REPLACE VIEW v_edit_inp_dscenario_virtualpump
@@ -2146,7 +2192,7 @@ SELECT d.dscenario_id,
     FROM selector_inp_dscenario, v_edit_node n
     JOIN inp_dscenario_pump p USING (node_id)
     JOIN cat_dscenario d USING (dscenario_id)
-	WHERE p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text 
+	WHERE p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text
 	AND n.is_operative IS TRUE;
 
 CREATE OR REPLACE VIEW v_edit_inp_pump_additional
@@ -2190,7 +2236,7 @@ AS SELECT d.dscenario_id,
 	FROM selector_inp_dscenario, v_edit_node n
 	JOIN inp_dscenario_pump_additional p USING (node_id)
     JOIN cat_dscenario d USING (dscenario_id)
-	WHERE p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text 
+	WHERE p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text
 	AND n.is_operative IS TRUE;
 
 CREATE OR REPLACE VIEW v_edit_inp_dscenario_shortpipe
@@ -2204,7 +2250,7 @@ AS SELECT d.dscenario_id,
     FROM selector_inp_dscenario, v_edit_node n
     JOIN inp_dscenario_shortpipe p USING (node_id)
     JOIN cat_dscenario d USING (dscenario_id)
-	WHERE p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text 
+	WHERE p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text
 	AND n.is_operative IS TRUE;
 
 CREATE OR REPLACE VIEW v_edit_inp_dscenario_connec
@@ -2327,7 +2373,7 @@ AS SELECT d.dscenario_id,
     FROM selector_inp_dscenario, v_edit_node n
     JOIN inp_dscenario_reservoir p USING (node_id)
     JOIN cat_dscenario d USING (dscenario_id)
-	WHERE p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text 
+	WHERE p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text
 	AND n.is_operative IS TRUE;
 
 
@@ -2370,7 +2416,7 @@ AS SELECT d.dscenario_id,
 	FROM selector_inp_dscenario, v_edit_node n
 	JOIN inp_dscenario_valve p USING (node_id)
 	JOIN cat_dscenario d USING (dscenario_id)
-	WHERE p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text 
+	WHERE p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text
 	AND n.is_operative IS TRUE;
 
 CREATE OR REPLACE VIEW v_edit_inp_valve
@@ -3716,7 +3762,7 @@ AS SELECT om_mincut_hydrometer.id,
   WHERE selector_mincut_result.result_id::text = om_mincut_hydrometer.result_id::text AND selector_mincut_result.cur_user = "current_user"()::text;
 
 drop view ve_epa_inlet;
-CREATE OR REPLACE VIEW ve_epa_inlet AS 
+CREATE OR REPLACE VIEW ve_epa_inlet AS
  SELECT inp_inlet.node_id,
     inp_inlet.initlevel,
     inp_inlet.minlevel,
@@ -3752,10 +3798,10 @@ CREATE OR REPLACE VIEW ve_epa_inlet AS
     v_rpt_node.quality_avg AS qualavg
     FROM inp_inlet
     LEFT JOIN v_rpt_node USING (node_id);
-	 
-	 
+
+
 drop view ve_epa_shortpipe;
-CREATE OR REPLACE VIEW ve_epa_shortpipe AS 
+CREATE OR REPLACE VIEW ve_epa_shortpipe AS
  SELECT inp_shortpipe.node_id,
     inp_shortpipe.minorloss,
     cat_dint,
@@ -3789,10 +3835,10 @@ CREATE OR REPLACE VIEW ve_epa_shortpipe AS
     JOIN inp_shortpipe USING (node_id)
     LEFT JOIN v_rpt_arc ON concat(inp_shortpipe.node_id, '_n2a') = v_rpt_arc.arc_id::text
     LEFT JOIN man_valve v ON v.node_id::text = inp_shortpipe.node_id::text;
-	 
+
 
 drop view ve_epa_valve;
-CREATE OR REPLACE VIEW ve_epa_valve AS 
+CREATE OR REPLACE VIEW ve_epa_valve AS
  SELECT inp_valve.node_id,
     inp_valve.valv_type,
     inp_valve.pressure,
@@ -3808,7 +3854,7 @@ CREATE OR REPLACE VIEW ve_epa_valve AS
         WHEN v.closed IS FALSE AND v.active IS TRUE THEN 'ACTIVE'::character varying(12)
         WHEN v.closed IS FALSE AND active IS FALSE THEN 'OPEN'::character varying(12)
         ELSE NULL::character varying(12)
-    END AS status,	
+    END AS status,
     inp_valve.add_settings,
     inp_valve.init_quality,
     concat(inp_valve.node_id, '_n2a') AS nodarc_id,
@@ -3833,7 +3879,7 @@ CREATE OR REPLACE VIEW ve_epa_valve AS
     LEFT JOIN man_valve v ON v.node_id::text = inp_valve.node_id::text;
 
 
-CREATE OR REPLACE VIEW ve_epa_pump AS 
+CREATE OR REPLACE VIEW ve_epa_pump AS
  SELECT inp_pump.node_id,
     inp_pump.power,
     inp_pump.curve_id,
@@ -3866,8 +3912,8 @@ CREATE OR REPLACE VIEW ve_epa_pump AS
     FROM inp_pump
     LEFT JOIN v_rpt_arc ON concat(inp_pump.node_id, '_n2a') = v_rpt_arc.arc_id::text
 	LEFT JOIN man_pump p ON p.node_id::text = inp_pump.node_id::text;
-	
-CREATE OR REPLACE VIEW v_edit_pond AS 
+
+CREATE OR REPLACE VIEW v_edit_pond AS
 	SELECT pond.pond_id,
     pond.connec_id,
     pond.dma_id,
@@ -3879,11 +3925,11 @@ CREATE OR REPLACE VIEW v_edit_pond AS
     FROM selector_expl,   pond
     LEFT JOIN dma ON pond.dma_id = dma.dma_id
 	LEFT JOIN selector_municipality m using (muni_id)
-	where (m.cur_user = current_user or pond.muni_id is null) and 
+	where (m.cur_user = current_user or pond.muni_id is null) and
     pond.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
-  
-  
-CREATE OR REPLACE VIEW v_edit_pool AS 
+
+
+CREATE OR REPLACE VIEW v_edit_pool AS
 	SELECT pool.pool_id,
     pool.connec_id,
     pool.dma_id,

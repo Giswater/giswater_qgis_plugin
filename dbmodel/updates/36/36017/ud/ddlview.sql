@@ -119,8 +119,8 @@ AS SELECT element_x_gully.id,
 
 
 create or replace view v_edit_node as
-WITH 
-	typevalue AS 
+WITH
+	typevalue AS
        (
         SELECT edit_typevalue.typevalue, edit_typevalue.id,  edit_typevalue.idval
         FROM edit_typevalue
@@ -128,12 +128,12 @@ WITH
         ),
     sector_table as
 		(
-		select sector_id, name as sector_name, macrosector_id, stylesheet, id::varchar(16) as sector_type 
+		select sector_id, name as sector_name, macrosector_id, stylesheet, id::varchar(16) as sector_type
 		from sector left JOIN typevalue t ON t.id::text = sector.sector_type AND t.typevalue::text = 'sector_type'::text
 		),
 	dma_table as
 		(
-		select dma_id, name as dma_name, macrodma_id, stylesheet, id::varchar(16) as dma_type from dma 
+		select dma_id, name as dma_name, macrodma_id, stylesheet, id::varchar(16) as dma_type from dma
 		left JOIN typevalue t ON t.id::text = dma.dma_type AND t.typevalue::text = 'dma_type'::text
 		),
 	drainzone_table as
@@ -143,21 +143,21 @@ WITH
 		),
     node_psector AS
         (
-        SELECT pp.node_id, pp.state AS p_state 
+        SELECT pp.node_id, pp.state AS p_state
         FROM plan_psector_x_node pp
         JOIN selector_psector sp ON sp.cur_user = current_user AND sp.psector_id = pp.psector_id
         ),
     node_selector AS
         (
-        SELECT node.node_id 
+        SELECT node.node_id
         FROM node
         JOIN selector_state s ON s.cur_user =current_user AND node.state =s.state_id
         left JOIN (SELECT node_id FROM node_psector WHERE p_state = 0) a using (node_id) where a.node_id is null
-        union all 
+        union all
         SELECT node_id FROM node_psector WHERE p_state = 1
         ),
-    node_selected AS 
-        ( 
+    node_selected AS
+        (
         SELECT node.node_id,
 		node.code,
 		node.top_elev,
@@ -244,8 +244,8 @@ WITH
 		date_trunc('second'::text, node.tstamp) AS tstamp,
 		node.insert_user,
 		date_trunc('second'::text, node.lastupdate) AS lastupdate,
-		node.lastupdate_user,            
-		node.workcat_id_plan,          
+		node.lastupdate_user,
+		node.workcat_id_plan,
 		node.asset_id,
 		node.parent_id,
 		node.arc_id,
@@ -267,14 +267,14 @@ WITH
 		FROM node_selector
 		join node using (node_id)
         JOIN selector_expl se ON (se.cur_user =current_user AND se.expl_id = node.expl_id) or (se.cur_user = current_user AND se.expl_id = node.expl_id2)
-        JOIN selector_sector sc ON (sc.cur_user = CURRENT_USER AND sc.sector_id = node.sector_id) 
+        JOIN selector_sector sc ON (sc.cur_user = CURRENT_USER AND sc.sector_id = node.sector_id)
         JOIN cat_node ON node.nodecat_id::text = cat_node.id::text
 		JOIN cat_feature ON cat_feature.id::text = node.node_type::text
 		JOIN exploitation ON node.expl_id = exploitation.expl_id
 		JOIN ext_municipality mu ON node.muni_id = mu.muni_id
 		JOIN value_state_type vst ON vst.id = node.state_type
 		JOIN sector_table on sector_table.sector_id = node.sector_id
-		left join dma_table on dma_table.dma_id = node.dma_id 
+		left join dma_table on dma_table.dma_id = node.dma_id
 		left join drainzone_table ON node.dma_id = drainzone_table.drainzone_id
 		)
 SELECT node_selected.*
@@ -282,8 +282,8 @@ FROM node_selected;
 
 
 CREATE OR REPLACE VIEW v_edit_arc
-AS WITH  
-	typevalue AS 
+AS WITH
+	typevalue AS
        (
         SELECT edit_typevalue.typevalue, edit_typevalue.id,  edit_typevalue.idval
         FROM edit_typevalue
@@ -291,12 +291,12 @@ AS WITH
         ),
     sector_table as
 		(
-		select sector_id, name as sector_name, macrosector_id, stylesheet, id::varchar(16) as sector_type 
+		select sector_id, name as sector_name, macrosector_id, stylesheet, id::varchar(16) as sector_type
 		from sector left JOIN typevalue t ON t.id::text = sector.sector_type AND t.typevalue::text = 'sector_type'::text
 		),
 	dma_table as
 		(
-		select dma_id, name as dma_name, macrodma_id, stylesheet, id::varchar(16) as dma_type from dma 
+		select dma_id, name as dma_name, macrodma_id, stylesheet, id::varchar(16) as dma_type from dma
 		left JOIN typevalue t ON t.id::text = dma.dma_type AND t.typevalue::text = 'dma_type'::text
 		),
 	drainzone_table as
@@ -304,22 +304,22 @@ AS WITH
 		select drainzone_id, name as drainzone_name, stylesheet, id::varchar(16) as drainzone_type from drainzone
 		left JOIN typevalue t ON t.id::text = drainzone.drainzone_type AND t.typevalue::text = 'drainzone_type'::text
 		),
-	arc_psector AS 
+	arc_psector AS
 		(
         SELECT pp.arc_id,  pp.state AS p_state
         FROM plan_psector_x_arc pp
         JOIN selector_psector sp ON sp.cur_user = CURRENT_USER AND sp.psector_id = pp.psector_id
-        ), 
-    arc_selector AS 
+        ),
+    arc_selector AS
 		(
         SELECT arc.arc_id
         FROM arc
         JOIN selector_state s ON s.cur_user = CURRENT_USER AND arc.state = s.state_id
         left JOIN (SELECT arc_id FROM arc_psector WHERE p_state = 0) a using (arc_id)  where a.arc_id is null
-        union all 
+        union all
         SELECT arc_id FROM arc_psector WHERE p_state = 0
          ),
-    arc_selected AS 
+    arc_selected AS
 		(
         SELECT arc.arc_id,
 	    arc.code,
@@ -478,35 +478,35 @@ AS WITH
 		FROM arc_selector
 		JOIN arc using (arc_id)
         JOIN selector_expl se ON (se.cur_user =current_user AND se.expl_id = arc.expl_id) or (se.cur_user = current_user AND se.expl_id = arc.expl_id2)
-        JOIN selector_sector sc ON (sc.cur_user = CURRENT_USER AND sc.sector_id = arc.sector_id) 
+        JOIN selector_sector sc ON (sc.cur_user = CURRENT_USER AND sc.sector_id = arc.sector_id)
 		JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text
 		JOIN cat_feature ON arc.arc_type::text = cat_feature.id::text
 		JOIN exploitation e on e.expl_id = arc.expl_id
 		JOIN ext_municipality mu ON arc.muni_id = mu.muni_id
-		JOIN value_state_type vst ON vst.id = arc.state_type 
+		JOIN value_state_type vst ON vst.id = arc.state_type
 		JOIN sector_table on sector_table.sector_id = arc.sector_id
-		left join dma_table on dma_table.dma_id = arc.dma_id 
+		left join dma_table on dma_table.dma_id = arc.dma_id
 		left join drainzone_table ON arc.dma_id = drainzone_table.drainzone_id
 		)
 	SELECT arc_selected.*
 	FROM arc_selected;
-	
+
 create or replace view v_edit_connec as
 with
-	 typevalue AS 
+	 typevalue AS
        (
         SELECT edit_typevalue.typevalue, edit_typevalue.id,  edit_typevalue.idval
         FROM edit_typevalue
         WHERE edit_typevalue.typevalue::text = ANY (ARRAY['sector_type'::character varying::text, 'drainzone_type'::character varying::text, 'dma_type'::character varying::text, 'dwfzone_type'::character varying::text])
-        ),       
+        ),
 	sector_table as
 		(
-		select sector_id, name as sector_name, macrosector_id, stylesheet, id::varchar(16) as sector_type 
+		select sector_id, name as sector_name, macrosector_id, stylesheet, id::varchar(16) as sector_type
 		from sector left JOIN typevalue t ON t.id::text = sector.sector_type AND t.typevalue::text = 'sector_type'::text
 		),
 	dma_table as
 		(
-		select dma_id, name as dma_name, macrodma_id, stylesheet, id::varchar(16) as dma_type from dma 
+		select dma_id, name as dma_name, macrodma_id, stylesheet, id::varchar(16) as dma_type from dma
 		left JOIN typevalue t ON t.id::text = dma.dma_type AND t.typevalue::text = 'dma_type'::text
 		),
 	drainzone_table as
@@ -514,18 +514,18 @@ with
 		select drainzone_id, name as drainzone_name, stylesheet, id::varchar(16) as drainzone_type from drainzone
 		left JOIN typevalue t ON t.id::text = drainzone.drainzone_type AND t.typevalue::text = 'drainzone_type'::text
 		),
-    link_planned as 
-    	(   	   	
-    	select link_id, feature_id, feature_type, exit_id, exit_type, l.expl_id, macroexpl_id, l.sector_id, sector_name, macrosector_id, l.dma_id, dma_name, macrodma_id, 
+    link_planned as
+    	(
+    	select link_id, feature_id, feature_type, exit_id, exit_type, l.expl_id, macroexpl_id, l.sector_id, sector_name, macrosector_id, l.dma_id, dma_name, macrodma_id,
     	l.drainzone_id, drainzone_name, fluid_type,
-    	sector_type, drainzone_type, dma_type    	
+    	sector_type, drainzone_type, dma_type
     	from link l
     	join exploitation using (expl_id)
 		JOIN sector_table ON l.sector_id = sector_table.sector_id
 		left JOIN dma_table ON l.dma_id = dma_table.dma_id
 	    left join drainzone_table ON l.dma_id = drainzone_table.drainzone_id
     	where l.state = 2
-    	),   	
+    	),
     connec_psector AS
         (
      	SELECT DISTINCT ON (pp.connec_id, pp.state) pp.connec_id, pp.state AS p_state, pp.psector_id, pp.arc_id, pp.link_id
@@ -535,15 +535,15 @@ with
         ),
     connec_selector AS
         (
-        SELECT connec_id, arc_id::varchar(16), NULL::integer as link_id 
-        FROM connec 
+        SELECT connec_id, arc_id::varchar(16), NULL::integer as link_id
+        FROM connec
         JOIN selector_state ss ON ss.cur_user =current_user AND connec.state =ss.state_id
         left join (SELECT connec_id, arc_id::varchar(16) FROM connec_psector WHERE p_state = 0) a using (connec_id, arc_id) where a.connec_id is null
        	union all
         SELECT connec_id, connec_psector.arc_id::varchar(16), link_id FROM connec_psector
         WHERE p_state = 1
         ),
-    connec_selected AS 
+    connec_selected AS
     	(
     	SELECT connec.connec_id,
 		connec.code,
@@ -662,36 +662,36 @@ with
 	   FROM connec_selector
 	   JOIN connec USING (connec_id)
        JOIN selector_expl se ON (se.cur_user =current_user AND se.expl_id = connec.expl_id) or (se.cur_user =current_user and se.expl_id = connec.expl_id2)
-       JOIN selector_sector sc ON (sc.cur_user = CURRENT_USER AND sc.sector_id = connec.sector_id) 
+       JOIN selector_sector sc ON (sc.cur_user = CURRENT_USER AND sc.sector_id = connec.sector_id)
 	   JOIN cat_connec ON cat_connec.id::text = connec.connecat_id::text
 	   JOIN cat_feature ON cat_feature.id::text = connec.connec_type::text
 	   JOIN exploitation ON connec.expl_id = exploitation.expl_id
 	   JOIN ext_municipality mu ON connec.muni_id = mu.muni_id
 	   JOIN value_state_type vst ON vst.id = connec.state_type
 	   JOIN sector_table on sector_table.sector_id = connec.sector_id
-	   left join dma_table on dma_table.dma_id = connec.dma_id 
+	   left join dma_table on dma_table.dma_id = connec.dma_id
 	   left join drainzone_table ON connec.dma_id = drainzone_table.drainzone_id
 	   left join link_planned using (link_id)
 	   )
 	 SELECT connec_selected.*
 	 FROM connec_selected;
-	 
+
 create or replace view v_edit_gully as
 with
-	typevalue AS 
+	typevalue AS
        (
         SELECT edit_typevalue.typevalue, edit_typevalue.id,  edit_typevalue.idval
         FROM edit_typevalue
         WHERE edit_typevalue.typevalue::text = ANY (ARRAY['sector_type'::character varying::text, 'drainzone_type'::character varying::text, 'dma_type'::character varying::text, 'dwfzone_type'::character varying::text])
-        ),      
+        ),
 	sector_table as
 		(
-		select sector_id, name as sector_name, macrosector_id, stylesheet, id::varchar(16) as sector_type 
+		select sector_id, name as sector_name, macrosector_id, stylesheet, id::varchar(16) as sector_type
 		from sector left JOIN typevalue t ON t.id::text = sector.sector_type AND t.typevalue::text = 'sector_type'::text
 		),
 	dma_table as
 		(
-		select dma_id, name as dma_name, macrodma_id, stylesheet, id::varchar(16) as dma_type from dma 
+		select dma_id, name as dma_name, macrodma_id, stylesheet, id::varchar(16) as dma_type from dma
 		left JOIN typevalue t ON t.id::text = dma.dma_type AND t.typevalue::text = 'dma_type'::text
 		),
 	drainzone_table as
@@ -699,24 +699,24 @@ with
 		select drainzone_id, name as drainzone_name, stylesheet, id::varchar(16) as drainzone_type from drainzone
 		left JOIN typevalue t ON t.id::text = drainzone.drainzone_type AND t.typevalue::text = 'drainzone_type'::text
 		),
-	inp_network_mode AS 
+	inp_network_mode AS
     	(
          select value FROM config_param_user WHERE parameter::text = 'inp_options_networkmode'::text AND config_param_user.cur_user::text = CURRENT_USER
-        ),  
-    link_planned as 
-    	(   	   	
-    	select link_id, feature_id, feature_type, exit_id, exit_type, l.expl_id, macroexpl_id, l.sector_id, sector_name, macrosector_id, l.dma_id, dma_name, macrodma_id, 
+        ),
+    link_planned as
+    	(
+    	select link_id, feature_id, feature_type, exit_id, exit_type, l.expl_id, macroexpl_id, l.sector_id, sector_name, macrosector_id, l.dma_id, dma_name, macrodma_id,
     	l.drainzone_id, drainzone_name, fluid_type,
-    	sector_type, drainzone_type, dma_type    	
+    	sector_type, drainzone_type, dma_type
     	from link l
     	join exploitation using (expl_id)
 		JOIN sector_table ON l.sector_id = sector_table.sector_id
 		left JOIN dma_table ON l.dma_id = dma_table.dma_id
 	    left join drainzone_table ON l.dma_id = drainzone_table.drainzone_id
     	where l.state = 2
-    	),   	
+    	),
     gully_psector AS
-        (	
+        (
 		SELECT DISTINCT ON (pp.gully_id, pp.state) pp.gully_id, pp.state AS p_state, pp.psector_id, pp.arc_id, pp.link_id
         FROM plan_psector_x_gully pp
         JOIN selector_psector sp ON sp.cur_user = current_user AND sp.psector_id = pp.psector_id
@@ -724,15 +724,15 @@ with
         ),
     gully_selector AS
         (
-        SELECT gully_id, arc_id::varchar(16), null::integer as link_id 
-        FROM gully 
+        SELECT gully_id, arc_id::varchar(16), null::integer as link_id
+        FROM gully
         JOIN selector_state ss ON ss.cur_user =current_user AND gully.state =ss.state_id
         left join (SELECT gully_id, arc_id FROM gully_psector WHERE p_state = 0) a using (gully_id, arc_id) where a.gully_id is null
        	union all
         SELECT gully_id, gully_psector.arc_id::varchar(16), link_id FROM gully_psector
         WHERE p_state = 1
-        ),  
-    gully_selected AS 
+        ),
+    gully_selected AS
     	(
 	    SELECT gully.gully_id,
 	    gully.code,
@@ -744,7 +744,7 @@ with
 	    cat_feature.system_id AS sys_type,
 	    gully.gratecat_id,
 	    cat_grate.matcat_id AS cat_grate_matcat,
-	    gully.units,	    
+	    gully.units,
 	    gully.groove,
 	    gully.groove_height,
 	    gully.groove_length,
@@ -760,7 +760,7 @@ with
             ELSE gully.connec_matcat_id
         END AS connec_matcat_id,
 	    gully.top_elev - gully.ymax + gully.sandbox AS connec_y1,
-	    gully.connec_y2,   
+	    gully.connec_y2,
 	    cat_grate.width AS grate_width,
 	    cat_grate.length AS grate_length,
 	    gully.arc_id,
@@ -770,7 +770,7 @@ with
 	       ELSE NULL::character varying(16)
 	    END AS inp_type,
 		gully.state,
-	    gully.state_type,    
+	    gully.state_type,
  		gully.expl_id,
         exploitation.macroexpl_id,
 		CASE
@@ -796,11 +796,11 @@ with
 		CASE
 			WHEN link_planned.dma_id IS NULL THEN dma_table.dma_id
 			ELSE link_planned.dma_id
-		END AS dma_id,           
+		END AS dma_id,
 		CASE
 			WHEN link_planned.macrodma_id IS NULL THEN dma_table.macrodma_id
 			ELSE link_planned.macrodma_id
-		END AS macrodma_id,  
+		END AS macrodma_id,
 	    gully.annotation,
 	    gully.observ,
 	    gully.comment,
@@ -849,10 +849,10 @@ with
        CASE
            WHEN link_planned.exit_type IS NULL THEN gully.pjoint_type
            ELSE link_planned.exit_type
-       END AS pjoint_type,    
+       END AS pjoint_type,
 	    gully.asset_id,
 	    gully.gratecat2_id,
-	    gully.units_placement,    
+	    gully.units_placement,
 	    gully.expl_id2,
 	    vst.is_operative,
 	    gully.minsector_id,
@@ -871,7 +871,7 @@ with
 	   FROM inp_network_mode, gully_selector
 	   JOIN gully using (gully_id)
 	   JOIN selector_expl se ON (se.cur_user = current_user AND se.expl_id=gully.expl_id) OR (se.cur_user = current_user AND se.expl_id=gully.expl_id2)
-       JOIN selector_sector sc ON (sc.cur_user = CURRENT_USER AND sc.sector_id = gully.sector_id) 
+       JOIN selector_sector sc ON (sc.cur_user = CURRENT_USER AND sc.sector_id = gully.sector_id)
 	   JOIN cat_grate ON gully.gratecat_id::text = cat_grate.id::text
 	   JOIN exploitation ON gully.expl_id = exploitation.expl_id
 	   JOIN cat_feature ON gully.gully_type::text = cat_feature.id::text
@@ -879,7 +879,7 @@ with
 	   JOIN value_state_type vst ON vst.id = gully.state_type
 	   JOIN ext_municipality mu ON gully.muni_id = mu.muni_id
 	   JOIN sector_table ON gully.sector_id = sector_table.sector_id
-	   LEFT JOIN dma_table ON gully.dma_id = dma_table.dma_id  
+	   LEFT JOIN dma_table ON gully.dma_id = dma_table.dma_id
 	   LEFT JOIN drainzone_table ON gully.dma_id = drainzone_table.drainzone_id
 	   LEFT JOIN link_planned on gully.gully_id = feature_id
 	   )
@@ -887,8 +887,8 @@ with
 	 FROM gully_selected;
 
 create or replace view v_edit_link as
-WITH 
-	typevalue AS 
+WITH
+	typevalue AS
        (
         SELECT edit_typevalue.typevalue, edit_typevalue.id,  edit_typevalue.idval
         FROM edit_typevalue
@@ -896,12 +896,12 @@ WITH
         ),
 	sector_table as
 		(
-		select sector_id, name as sector_name, macrosector_id, stylesheet, id::varchar(16) as sector_type 
+		select sector_id, name as sector_name, macrosector_id, stylesheet, id::varchar(16) as sector_type
 		from sector left JOIN typevalue t ON t.id::text = sector.sector_type AND t.typevalue::text = 'sector_type'::text
 		),
 	dma_table as
 		(
-		select dma_id, name as dma_name, macrodma_id, stylesheet, id::varchar(16) as dma_type from dma 
+		select dma_id, name as dma_name, macrodma_id, stylesheet, id::varchar(16) as dma_type from dma
 		left JOIN typevalue t ON t.id::text = dma.dma_type AND t.typevalue::text = 'dma_type'::text
 		),
 	drainzone_table as
@@ -909,24 +909,29 @@ WITH
 		select drainzone_id, name as drainzone_name, stylesheet, id::varchar(16) as drainzone_type from drainzone
 		left JOIN typevalue t ON t.id::text = drainzone.drainzone_type AND t.typevalue::text = 'drainzone_type'::text
 		),
-     inp_network_mode AS 
+     inp_network_mode AS
     	(
         select value FROM config_param_user WHERE parameter::text = 'inp_options_networkmode'::text AND config_param_user.cur_user::text = CURRENT_USER
         ),
      link_psector AS
         (
-        SELECT DISTINCT ON (pp.connec_id, pp.state) 'CONNEC' AS feature_type, pp.connec_id AS feature_id, pp.state AS p_state, pp.psector_id, pp.link_id
-        FROM plan_psector_x_connec pp
-        JOIN selector_psector sp ON sp.cur_user = current_user AND sp.psector_id = pp.psector_id
-		UNION ALL
-		SELECT DISTINCT ON (pp.gully_id, pp.state) 'GULLY' AS feature_type, pp.gully_id AS feature_id, pp.state AS p_state, pp.psector_id, pp.link_id
-        FROM plan_psector_x_gully pp
-        JOIN selector_psector sp ON sp.cur_user = current_user AND sp.psector_id = pp.psector_id
-        ORDER BY pp.connec_id, pp.state, pp.link_id DESC NULLS LAST
+			(
+				SELECT DISTINCT ON (pp.connec_id, pp.state) 'CONNEC' AS feature_type, pp.connec_id AS feature_id, pp.state AS p_state, pp.psector_id, pp.link_id
+				FROM plan_psector_x_connec pp
+				JOIN selector_psector sp ON sp.cur_user = current_user AND sp.psector_id = pp.psector_id
+				ORDER BY pp.connec_id, pp.state, pp.link_id DESC NULLS LAST
+			)
+			UNION ALL
+			(
+				SELECT DISTINCT ON (pp.gully_id, pp.state) 'GULLY' AS feature_type, pp.gully_id AS feature_id, pp.state AS p_state, pp.psector_id, pp.link_id
+				FROM plan_psector_x_gully pp
+				JOIN selector_psector sp ON sp.cur_user = current_user AND sp.psector_id = pp.psector_id
+				ORDER BY pp.gully_id, pp.state, pp.link_id DESC NULLS LAST
+			)
         ),
     link_state AS
         (
-        SELECT l.link_id 
+        SELECT l.link_id
         FROM link l
         JOIN selector_state s ON s.cur_user =current_user AND l.state =s.state_id
         left join (SELECT link_id FROM link_psector WHERE p_state = 0) a using (link_id) where a.link_id is null
@@ -975,12 +980,12 @@ WITH
 	    JOIN exploitation ON l.expl_id = exploitation.expl_id
 	    JOIN ext_municipality mu ON l.muni_id = mu.muni_id
 	    JOIN sector_table ON l.sector_id = sector_table.sector_id
-	    LEFT JOIN dma_table ON l.dma_id = dma_table.dma_id  
+	    LEFT JOIN dma_table ON l.dma_id = dma_table.dma_id
 	    LEFT join drainzone_table ON l.dma_id = drainzone_table.drainzone_id
 		)
      SELECT link_selected.*
-	 FROM link_selected;	
-  
+	 FROM link_selected;
+
 drop view v_edit_link_connec;
 create or replace view v_edit_link_connec as select * from v_edit_link where feature_type = 'CONNEC';
 

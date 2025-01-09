@@ -128,7 +128,19 @@ DROP VIEW IF EXISTS vu_gully;
 DROP VIEW IF EXISTS v_edit_samplepoint;
 
 DROP VIEW IF EXISTS v_ext_municipality;
+DROP VIEW IF EXISTS v_ext_address;
 DROP VIEW IF EXISTS v_ext_streetaxis;
+DO $$
+BEGIN
+    IF EXISTS (
+        SELECT 1
+        FROM information_schema.views
+        WHERE table_schema = 'SCHEMA_NAME'
+          AND table_name = 'ext_streetaxis'
+    ) THEN
+        DROP VIEW ext_streetaxis;
+    END IF;
+END $$;
 
 DROP view if exists v_edit_link;
 DROP view if exists v_edit_link_connec;
@@ -259,6 +271,40 @@ SELECT
     where s.cur_user = current_user
     and (m.cur_user = current_user or sm.muni_id is null);
 
+DO $$
+DECLARE
+    v_utils boolean;
+BEGIN
+     SELECT value::boolean INTO v_utils FROM config_param_system WHERE parameter='admin_utils_schema';
+
+	 IF v_utils IS true THEN
+        CREATE OR REPLACE VIEW ext_streetaxis
+        AS SELECT streetaxis.id,
+            streetaxis.code,
+            streetaxis.type,
+            streetaxis.name,
+            streetaxis.text,
+            streetaxis.the_geom,
+            streetaxis.ud_expl_id AS expl_id,
+            streetaxis.muni_id
+        FROM utils.streetaxis;
+    END IF;
+END; $$;
+
+CREATE OR REPLACE VIEW v_ext_address
+AS SELECT ext_address.id,
+    ext_address.muni_id,
+    ext_address.postcode,
+    ext_address.streetaxis_id,
+    ext_address.postnumber,
+    ext_address.plot_id,
+    ext_address.expl_id,
+    ext_streetaxis.name,
+    ext_address.the_geom
+   FROM selector_expl,
+    ext_address
+     LEFT JOIN ext_streetaxis ON ext_streetaxis.id::text = ext_address.streetaxis_id::text
+  WHERE ext_address.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
 
 CREATE OR REPLACE VIEW v_ext_streetaxis
 AS SELECT ext_streetaxis.id,
