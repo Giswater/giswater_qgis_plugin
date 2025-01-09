@@ -26,6 +26,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r test/requirements.txt
 
+      - name: Add PostgreSQL repository
+        run: |
+          sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+          wget -qO - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+
       - name: Update apt-get and Install PostgreSQL, PostGIS, pgRouting, and pgTAP
         run: |
           sudo apt-get update
