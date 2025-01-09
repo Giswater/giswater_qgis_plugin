@@ -100,9 +100,6 @@ AS WITH streetaxis AS (
     arc.expl_id,
     exploitation.macroexpl_id,
     arc.sector_id,
-    sector.name AS sector_name,
-    sector.macrosector_id,
-    et1.idval::character varying(16) AS sector_type,
     arc.presszone_id,
     presszone.name AS preszone_name,
     et2.idval::character varying(16) AS presszone_type,
@@ -205,7 +202,6 @@ AS WITH streetaxis AS (
      LEFT JOIN arc_add e ON arc.arc_id::text = e.arc_id::text
      LEFT JOIN value_state_type vst ON vst.id = arc.state_type
      LEFT JOIN ext_municipality mu ON arc.muni_id = mu.muni_id
-     LEFT JOIN typevalue et1 ON et1.id::text = sector.sector_type::text AND et1.typevalue::text = 'sector_type'::text
      LEFT JOIN typevalue et2 ON et2.id::text = presszone.presszone_type AND et2.typevalue::text = 'presszone_type'::text
      LEFT JOIN typevalue et3 ON et3.id::text = dma.dma_type::text AND et3.typevalue::text = 'dma_type'::text
      LEFT JOIN typevalue et4 ON et4.id::text = dqa.dqa_type::text AND et4.typevalue::text = 'dqa_type'::text;
@@ -246,9 +242,6 @@ AS WITH streetaxis AS (
     node.expl_id,
     exploitation.macroexpl_id,
     node.sector_id,
-    sector.name AS sector_name,
-    sector.macrosector_id,
-    et1.idval::character varying(16) AS sector_type,
     node.presszone_id,
     presszone.name AS preszone_name,
     et2.idval::character varying(16) AS presszone_type,
@@ -353,7 +346,6 @@ AS WITH streetaxis AS (
      LEFT JOIN cat_node ON cat_node.id::text = node.nodecat_id::text
      JOIN cat_feature ON cat_feature.id::text = cat_node.node_type::text
      LEFT JOIN dma ON node.dma_id = dma.dma_id
-     LEFT JOIN sector ON node.sector_id = sector.sector_id
      LEFT JOIN exploitation ON node.expl_id = exploitation.expl_id
      LEFT JOIN dqa ON node.dqa_id = dqa.dqa_id
      LEFT JOIN presszone ON presszone.presszone_id = node.presszone_id
@@ -362,7 +354,6 @@ AS WITH streetaxis AS (
      LEFT JOIN node_add e ON e.node_id::text = node.node_id::text
      LEFT JOIN value_state_type vst ON vst.id = node.state_type
      LEFT JOIN ext_municipality mu ON node.muni_id = mu.muni_id
-     LEFT JOIN typevalue et1 ON et1.id::text = sector.sector_type::text AND et1.typevalue::text = 'sector_type'::text
      LEFT JOIN typevalue et2 ON et2.id::text = presszone.presszone_type AND et2.typevalue::text = 'presszone_type'::text
      LEFT JOIN typevalue et3 ON et3.id::text = dma.dma_type::text AND et3.typevalue::text = 'dma_type'::text
      LEFT JOIN typevalue et4 ON et4.id::text = dqa.dqa_type::text AND et4.typevalue::text = 'dqa_type'::text;
@@ -508,9 +499,6 @@ CREATE OR REPLACE VIEW vu_connec AS
     connec.expl_id,
     exploitation.macroexpl_id,
     connec.sector_id,
-    sector.name AS sector_name,
-    sector.macrosector_id,
-    et1.idval::character varying(16) AS sector_type,
     connec.presszone_id,
     presszone.name AS presszone_name,
     et2.idval::character varying(16) AS presszone_type,
@@ -631,7 +619,6 @@ CREATE OR REPLACE VIEW vu_connec AS
      JOIN cat_connec ON connec.conneccat_id::text = cat_connec.id::text
      JOIN cat_feature ON cat_feature.id::text = cat_connec.connec_type::text
      LEFT JOIN dma ON connec.dma_id = dma.dma_id
-     LEFT JOIN sector ON connec.sector_id = sector.sector_id
      LEFT JOIN exploitation ON connec.expl_id = exploitation.expl_id
      LEFT JOIN dqa ON connec.dqa_id = dqa.dqa_id
      LEFT JOIN presszone ON presszone.presszone_id = connec.presszone_id
@@ -641,7 +628,6 @@ CREATE OR REPLACE VIEW vu_connec AS
      LEFT JOIN connec_add e ON e.connec_id::text = connec.connec_id::text
      LEFT JOIN value_state_type vst ON vst.id = connec.state_type
      LEFT JOIN ext_municipality mu ON connec.muni_id = mu.muni_id
-     LEFT JOIN typevalue et1 ON et1.id::text = sector.sector_type::text AND et1.typevalue::text = 'sector_type'::text
      LEFT JOIN typevalue et2 ON et2.id::text = presszone.presszone_type AND et2.typevalue::text = 'presszone_type'::text
      LEFT JOIN typevalue et3 ON et3.id::text = dma.dma_type::text AND et3.typevalue::text = 'dma_type'::text
      LEFT JOIN typevalue et4 ON et4.id::text = dqa.dqa_type::text AND et4.typevalue::text = 'dqa_type'::text;
@@ -666,8 +652,6 @@ AS SELECT connec_id,
     expl_id,
     macroexpl_id,
     sector_id,
-    sector_name,
-    macrosector_id,
     presszone_id,
     presszone_name,
     presszone_type,
@@ -800,11 +784,6 @@ AS SELECT connec_id,
                     WHEN a.sector_id IS NULL THEN vu_connec.sector_id
                     ELSE a.sector_id
                 END AS sector_id,
-                CASE
-                    WHEN a.sector_name IS NULL THEN vu_connec.sector_name
-                    ELSE a.sector_name
-                END AS sector_name,
-            vu_connec.macrosector_id,
                 CASE
                     WHEN a.presszone_id IS NULL THEN vu_connec.presszone_id
                     ELSE a.presszone_id
