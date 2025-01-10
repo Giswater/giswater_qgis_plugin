@@ -6295,8 +6295,10 @@ AS SELECT b.nodarc_id,
     b.flwreg_type,
     cf.id as featurecat_id,
     b.flwreg_length,
-    st_setsrid(st_makeline(n.the_geom, st_lineinterpolatepoint(CASE WHEN ST_Equals(ST_StartPoint(a.the_geom), n.the_geom) THEN a.the_geom ELSE ST_Reverse(a.the_geom)
-                END, b.flwreg_length / st_length(a.the_geom))), SRID_VALUE)::geometry(LineString,SRID_VALUE) AS the_geom
+    st_setsrid(st_linesubstring(CASE WHEN ST_Equals(ST_StartPoint(a.the_geom), n.the_geom)
+                    THEN a.the_geom
+                    ELSE ST_Reverse(a.the_geom) end, 0,  b.flwreg_length / st_length(a.the_geom)),SRID_VALUE)::geometry(LineString,SRID_VALUE) 
+                AS the_geom
    FROM ( SELECT inp_flwreg_orifice.nodarc_id,
             inp_flwreg_orifice.node_id,
             inp_flwreg_orifice.order_id,
@@ -6342,8 +6344,10 @@ AS SELECT nodarc_id AS nid,
 -- Create child views for flowregulators.
 DROP VIEW IF EXISTS v_edit_flwreg_frorifice;
 CREATE OR REPLACE VIEW v_edit_flwreg_frorifice as 
-SELECT fr.*, st_setsrid(st_makeline(n.the_geom, st_lineinterpolatepoint(CASE WHEN ST_Equals(ST_StartPoint(a.the_geom), n.the_geom) THEN a.the_geom ELSE ST_Reverse(a.the_geom)
-                END, fr.flwreg_length / st_length(a.the_geom))), SRID_VALUE)::geometry(LineString,SRID_VALUE) AS the_geom 
+SELECT fr.*, st_setsrid(st_linesubstring(CASE WHEN ST_Equals(ST_StartPoint(a.the_geom), n.the_geom)
+                    THEN a.the_geom
+                    ELSE ST_Reverse(a.the_geom) end, 0,  b.flwreg_length / st_length(a.the_geom)),SRID_VALUE)::geometry(LineString,SRID_VALUE) 
+                AS the_geom 
 FROM inp_flwreg_orifice fr 
 JOIN v_edit_node n ON fr.node_id::text = n.node_id::TEXT 
 JOIN v_edit_arc a ON a.arc_id::text = fr.to_arc::TEXT 
@@ -6354,9 +6358,10 @@ WHERE expl.cur_user = CURRENT_USER AND s.cur_user = CURRENT_USER AND (m.cur_user
 
 DROP VIEW IF EXISTS v_edit_flwreg_frweir;
 CREATE OR REPLACE VIEW v_edit_flwreg_frweir AS 
-SELECT fr.*, st_setsrid(st_makeline(n.the_geom, st_lineinterpolatepoint(CASE
-                    WHEN ST_Equals(ST_StartPoint(a.the_geom), n.the_geom) THEN a.the_geom
-                    ELSE ST_Reverse(a.the_geom) END, fr.flwreg_length / st_length(a.the_geom))), SRID_VALUE)::geometry(LineString,SRID_VALUE) AS the_geom 
+SELECT fr.*, st_setsrid(st_linesubstring(CASE WHEN ST_Equals(ST_StartPoint(a.the_geom), n.the_geom)
+                    THEN a.the_geom
+                    ELSE ST_Reverse(a.the_geom) end, 0,  b.flwreg_length / st_length(a.the_geom)),SRID_VALUE)::geometry(LineString,SRID_VALUE) 
+                AS the_geom
 FROM inp_flwreg_weir fr 
 JOIN v_edit_node n ON fr.node_id::text = n.node_id::TEXT 
 JOIN v_edit_arc a ON a.arc_id::text = fr.to_arc::TEXT 
@@ -6367,9 +6372,10 @@ WHERE expl.cur_user = CURRENT_USER AND s.cur_user = CURRENT_USER AND (m.cur_user
 
 DROP VIEW IF EXISTS v_edit_flwreg_froutlet;
 CREATE OR REPLACE VIEW v_edit_flwreg_froutlet AS 
-SELECT fr.*, st_setsrid(st_makeline(n.the_geom, st_lineinterpolatepoint(CASE
-                    WHEN ST_Equals(ST_StartPoint(a.the_geom), n.the_geom) THEN a.the_geom
-                    ELSE ST_Reverse(a.the_geom) END,  fr.flwreg_length / st_length(a.the_geom))), SRID_VALUE)::geometry(LineString,SRID_VALUE) AS the_geom 
+SELECT fr.*, st_setsrid(st_linesubstring(CASE WHEN ST_Equals(ST_StartPoint(a.the_geom), n.the_geom)
+                    THEN a.the_geom
+                    ELSE ST_Reverse(a.the_geom) end, 0,  b.flwreg_length / st_length(a.the_geom)),SRID_VALUE)::geometry(LineString,SRID_VALUE) 
+                AS the_geom
 FROM inp_flwreg_outlet fr 
 JOIN v_edit_node n ON fr.node_id::text = n.node_id::TEXT 
 JOIN v_edit_arc a ON a.arc_id::text = fr.to_arc::TEXT 
@@ -6381,9 +6387,10 @@ WHERE expl.cur_user = CURRENT_USER AND s.cur_user = CURRENT_USER AND (m.cur_user
 
 DROP VIEW IF EXISTS v_edit_flwreg_frpump;
 CREATE OR REPLACE VIEW v_edit_flwreg_frpump AS 
-SELECT fr.*, st_setsrid(st_makeline(n.the_geom, st_lineinterpolatepoint(CASE
-                    WHEN ST_Equals(ST_StartPoint(a.the_geom), n.the_geom) THEN a.the_geom
-                    ELSE ST_Reverse(a.the_geom) END, fr.flwreg_length / st_length(a.the_geom))), SRID_VALUE)::geometry(LineString,SRID_VALUE) AS the_geom 
+SELECT fr.*, st_setsrid(st_linesubstring(CASE WHEN ST_Equals(ST_StartPoint(a.the_geom), n.the_geom)
+                    THEN a.the_geom
+                    ELSE ST_Reverse(a.the_geom) end, 0,  b.flwreg_length / st_length(a.the_geom)),SRID_VALUE)::geometry(LineString,SRID_VALUE) 
+                AS the_geom 
 FROM inp_flwreg_pump fr 
 JOIN v_edit_node n ON fr.node_id::text = n.node_id::TEXT 
 JOIN v_edit_arc a ON a.arc_id::text = fr.to_arc::TEXT 
