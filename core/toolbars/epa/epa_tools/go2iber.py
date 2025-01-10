@@ -40,7 +40,8 @@ class Go2Iber:
     """Button 47: Go2Iber"""
 
     def __init__(self) -> None:
-        pass
+        self.drain_folder = tools_qgis.get_plugin_folder("drain")
+        self.dr_options_class = importlib.import_module('.options', package=f'{self.drain_folder}.core.shared') if self.drain_folder else None
 
     def clicked_event(self) -> None:
         """Start the Import INP workflow"""
@@ -66,9 +67,7 @@ class Go2Iber:
         self.go2epa_btn._go2epa_options()
 
     def _btn_iber_options_clicked(self):
-        drain_folder = tools_qgis.get_plugin_folder("drain")
-        dr_options = importlib.import_module('.options', package=f'{drain_folder}.core.shared')
-        self.dr_options = dr_options.DrOptions(tabs_to_show=["tab_main", "tab_rpt_iber", "tab_plugins"])
+        self.dr_options = self.dr_options_class.DrOptions(tabs_to_show=["tab_main", "tab_rpt_iber", "tab_plugins"])
         self.dr_options.open_options_dlg()
 
     def _btn_accept_clicked(self):
