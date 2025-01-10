@@ -154,7 +154,7 @@ UPDATE inp_subcatchment SET outlet_id = 95 where subc_id IN ('S91','S92','S94');
 
 UPDATE ext_plot set muni_id = 2 where id::integer < 40;
 
-UPDATE config_form_fields SET iseditable = true where columnname = 'to_arc';
+UPDATE config_form_fields SET iseditable = true where columnname = 'to_arc' and formname not like 'v_edit_flwreg_%';
 
 UPDATE config_form_fields SET iseditable = true where columnname like '%road%';
 

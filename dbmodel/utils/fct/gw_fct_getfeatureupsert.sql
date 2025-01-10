@@ -166,6 +166,13 @@ v_schemaname text;
 
 v_idname_aux text;
 
+v_nodarc_id varchar;
+v_toarc varchar; 
+v_order_id integer;
+v_flwreg_type text;
+v_flwreg_length numeric(14,2);
+v_toarc_geom public.geometry;
+
 BEGIN
 
 	-- get basic parameters
@@ -449,6 +456,29 @@ BEGIN
 					v_message = (SELECT concat('ERROR-1045:',error_message, p_id,'. ',hint_message) FROM sys_message WHERE id=1045);
 					v_status = false;
 				END IF;
+				
+			--- get Flowreg Defaults 
+            ELSIF upper(v_catfeature.feature_type) = 'FLWREG' THEN
+                -- Get toarc
+                SELECT arc_id , the_geom into v_toarc, v_toarc_geom FROM v_edit_arc WHERE ST_DWithin(ST_endpoint(p_reduced_geometry), v_edit_arc.the_geom, 0.001) LIMIT 1;
+                -- Get flwreg_length
+                SELECT abs(ST_LineLocatePoint(v_toarc_geom, ST_startpoint(p_reduced_geometry)) - ST_LineLocatePoint(v_toarc_geom, ST_endpoint(p_reduced_geometry))) * ST_Length(v_toarc_geom) 
+                INTO v_flwreg_length;
+
+                -- WARNING: this code is also in gw_fct_infofromid. If it needs to be changed here, it will most likely have to be changed there too.
+                -- Get node id from initial clicked point
+                SELECT * INTO v_noderecord1 FROM v_edit_node WHERE ST_DWithin(ST_startpoint(p_reduced_geometry), v_edit_node.the_geom, v_arc_searchnodes)
+                ORDER BY ST_Distance(v_edit_node.the_geom, ST_startpoint(p_reduced_geometry)) LIMIT 1;
+                -- Get flowreg_type  
+                v_querystring = concat('SELECT feature_class FROM cat_feature WHERE child_layer = ' , quote_nullable(p_table_id) ,' LIMIT 1');
+                v_debug_vars := json_build_object('p_table_id', p_table_id);
+                v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getfeatureupsert', 'flag', 70);
+                SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+                EXECUTE v_querystring INTO v_flwreg_type;
+				-- Get order_id
+                SELECT COALESCE(MAX(order_id), 0) + 1 INTO v_order_id FROM v_edit_flwreg WHERE node_id = v_noderecord1.node_id ::text AND flwreg_type = v_flwreg_type;
+                -- Set nodarc_id
+                v_nodarc_id = concat(v_noderecord1.node_id,upper(substring(v_flwreg_type FROM 1 FOR 2)), v_order_id);
 			END IF;
 		END IF;
 
@@ -673,7 +703,7 @@ BEGIN
 			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 			EXECUTE v_querystring INTO v_pnom, v_dnom, v_matcat_id;
 
-		ELSIF v_project_type ='UD' AND v_catfeature.feature_type IS NOT NULL AND v_catfeature.feature_type != 'LINK'THEN
+		ELSIF v_project_type ='UD' AND v_catfeature.feature_type IS NOT NULL AND v_catfeature.feature_type not in ('LINK', 'FLWREG') THEN
 			IF (v_catfeature.feature_type) ='GULLY' THEN
 				v_querystring = concat('SELECT matcat_id FROM cat_gully WHERE id=',quote_nullable(v_catalog));
 				v_debug_vars := json_build_object('v_catalog', v_catalog);
@@ -925,9 +955,29 @@ BEGIN
 					WHEN 'gullycat_id' THEN
 						SELECT (a->>'vdef') INTO field_value FROM json_array_elements(v_values_array) AS a
 						WHERE a->>'parameter' = concat('feat_', lower(v_catfeature.id), '_vdefault');
-					ELSE
-					END CASE;
-				END IF;
+					WHEN 'node_id' THEN
+                        IF v_catfeature.feature_type = 'FLWREG' THEN
+                            field_value = v_noderecord1.node_id;
+                        END IF;
+                     WHEN 'to_arc' THEN
+                        IF v_catfeature.feature_type = 'FLWREG' THEN
+                            field_value = v_toarc;
+                        END IF;             
+                    WHEN 'order_id' THEN
+                        IF v_catfeature.feature_type = 'FLWREG' THEN
+                            field_value = v_order_id;
+                        END IF;
+                    WHEN 'nodarc_id' THEN
+                        IF v_catfeature.feature_type = 'FLWREG' THEN
+                            field_value = v_nodarc_id;
+                        END IF;
+                    when 'flwreg_type' then 
+                        field_value = v_flwreg_type;
+                    when 'flwreg_length' then 
+                        field_value = v_flwreg_length;
+                    ELSE
+                    END CASE;
+                END IF;
 
 
 			ELSIF  p_tg_op ='UPDATE' OR p_tg_op ='SELECT' THEN

@@ -331,4 +331,29 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE", "table":"inp
 
 ALTER TABLE config_form_fields ENABLE TRIGGER gw_trg_config_control;
 
+--10/01/2025
+-- Add flwreg as system type
+ALTER TABLE sys_feature_type DROP CONSTRAINT sys_feature_type_check;
+INSERT INTO sys_feature_type VALUES ('FLWREG', 5);
+ALTER TABLE sys_feature_type ADD CONSTRAINT sys_feature_type_check CHECK (((id)::text =
+ANY (ARRAY[('ARC'::character varying)::text, ('CONNEC'::character varying)::text, ('ELEMENT'::character varying)::text, 
+('GULLY'::character varying)::text, ('LINK'::character varying)::text, ('NODE'::character varying)::text, ('VNODE'::character varying)::text,
+('FLWREG'::character varying)::text])));
+
+-- Add flwregulators childs as feature_class
+ALTER TABLE sys_feature_class DROP CONSTRAINT sys_feature_cat_check;
+INSERT INTO sys_feature_class VALUES ('ORIFICE', 'FLWREG', 'ORIFICE', '');
+INSERT INTO sys_feature_class VALUES ('WEIR', 'FLWREG', 'WEIR', '');
+INSERT INTO sys_feature_class VALUES ('PUMP', 'FLWREG', 'PUMP', '');
+INSERT INTO sys_feature_class VALUES ('OUTLET', 'FLWREG', 'OUTLET', '');
+ALTER TABLE sys_feature_class ADD CONSTRAINT sys_feature_cat_check CHECK (((id)::text = ANY (ARRAY[('CHAMBER'::character varying)::text, 
+('CONDUIT'::character varying)::text, ('CONNEC'::character varying)::text, ('GULLY'::character varying)::text, 
+('JUNCTION'::character varying)::text, ('MANHOLE'::character varying)::text, ('NETELEMENT'::character varying)::text,
+('NETGULLY'::character varying)::text, ('NETINIT'::character varying)::text, ('OUTFALL'::character varying)::text, 
+('SIPHON'::character varying)::text, ('STORAGE'::character varying)::text, ('VALVE'::character varying)::text, 
+('VARC'::character varying)::text, ('WACCEL'::character varying)::text, ('WJUMP'::character varying)::text, 
+('WWTP'::character varying)::text, ('ELEMENT'::character varying)::text, ('LINK'::character varying)::text,
+('ORIFICE'::character varying)::text, ('WEIR'::character varying)::text, ('PUMP'::character varying)::text, ('OUTLET'::character varying)::text])));
+
+
 

@@ -5930,7 +5930,7 @@ AS SELECT a.subc_id,
             s1.outlet_id,
             'JUNCTION'::text AS outlet_type,
             s1.hydrology_id,
-            st_makeline(st_centroid(s1.the_geom), node.the_geom)::geometry(LineString,25831) AS the_geom
+            st_makeline(st_centroid(s1.the_geom), node.the_geom)::geometry(LineString,SRID_VALUE) AS the_geom
            FROM v_edit_inp_subcatchment s1
              JOIN node ON node.node_id::text = s1.outlet_id::text
         UNION
@@ -5938,7 +5938,7 @@ AS SELECT a.subc_id,
             s1.outlet_id,
             'SUBCATCHMENT'::text AS outlet_type,
             s1.hydrology_id,
-            st_makeline(st_centroid(s1.the_geom), st_centroid(s2.the_geom))::geometry(LineString,25831) AS the_geom
+            st_makeline(st_centroid(s1.the_geom), st_centroid(s2.the_geom))::geometry(LineString,SRID_VALUE) AS the_geom
            FROM v_edit_inp_subcatchment s1
              JOIN v_edit_inp_subcatchment s2 ON s1.outlet_id::text = s2.subc_id::text) a;
 
@@ -6157,7 +6157,7 @@ orifice AS (
         f.geom2 AS orifice_geom2,
         f.geom3 AS orifice_geom3,
         f.geom4 AS orifice_geom4,
-        st_setsrid(st_makeline(n.the_geom, st_lineinterpolatepoint(a.the_geom, f.flwreg_length / st_length(a.the_geom))), 25831)::geometry(LineString,25831) AS the_geom
+        st_setsrid(st_makeline(n.the_geom, st_lineinterpolatepoint(a.the_geom, f.flwreg_length / st_length(a.the_geom))), SRID_VALUE)::geometry(LineString,SRID_VALUE) AS the_geom
     FROM inp_flwreg_orifice f
     JOIN v_edit_node n USING (node_id)
     JOIN value_state_type vs ON vs.id = n.state_type
@@ -6178,7 +6178,7 @@ outlet AS (
     f.cd1 AS outlet_cd1,
     f.cd2 AS outlet_cd2,
     f.flap AS outlet_flap,
-    st_setsrid(st_makeline(n.the_geom, st_lineinterpolatepoint(a.the_geom, f.flwreg_length / st_length(a.the_geom))), 25831)::geometry(LineString,25831) AS the_geom
+    st_setsrid(st_makeline(n.the_geom, st_lineinterpolatepoint(a.the_geom, f.flwreg_length / st_length(a.the_geom))), SRID_VALUE)::geometry(LineString,SRID_VALUE) AS the_geom
    FROM inp_flwreg_outlet f
      JOIN v_edit_node n USING (node_id)
      JOIN value_state_type vs ON vs.id = n.state_type
@@ -6196,7 +6196,7 @@ pump AS (SELECT f.nodarc_id,
     f.status AS pump_status,
     f.startup AS pump_startup,
     f.shutoff AS pump_shutoff,
-    st_setsrid(st_makeline(n.the_geom, st_lineinterpolatepoint(a.the_geom, f.flwreg_length / st_length(a.the_geom))), 25831)::geometry(LineString,25831) AS the_geom
+    st_setsrid(st_makeline(n.the_geom, st_lineinterpolatepoint(a.the_geom, f.flwreg_length / st_length(a.the_geom))), SRID_VALUE)::geometry(LineString,SRID_VALUE) AS the_geom
    FROM inp_flwreg_pump f
      JOIN v_edit_node n USING (node_id)
      JOIN value_state_type vs ON vs.id = n.state_type
@@ -6224,7 +6224,7 @@ pump AS (SELECT f.nodarc_id,
     f.road_width AS weir_road_width,
     f.road_surf AS weir_road_surf,
     f.coef_curve AS weir_coef_curve,
-    st_setsrid(st_makeline(n.the_geom, st_lineinterpolatepoint(a.the_geom, f.flwreg_length / st_length(a.the_geom))), 25831)::geometry(LineString,25831) AS the_geom
+    st_setsrid(st_makeline(n.the_geom, st_lineinterpolatepoint(a.the_geom, f.flwreg_length / st_length(a.the_geom))), SRID_VALUE)::geometry(LineString,SRID_VALUE) AS the_geom
    FROM inp_flwreg_weir f
      JOIN v_edit_node n USING (node_id)
      JOIN value_state_type vs ON vs.id = n.state_type
@@ -6282,3 +6282,113 @@ FROM
 FULL OUTER JOIN outlet ou USING (nodarc_id, node_id)
 FULL OUTER JOIN pump p USING (nodarc_id, node_id)
 FULL OUTER JOIN weir w USING (nodarc_id, node_id);
+
+--10/01/2025
+
+-- Create parent view for flow regulators.
+DROP VIEW IF EXISTS v_edit_flwreg;
+CREATE OR REPLACE VIEW v_edit_flwreg
+AS SELECT b.nodarc_id,
+    b.node_id,
+    b.order_id,
+    b.to_arc,
+    b.flwreg_type,
+    cf.id as featurecat_id,
+    b.flwreg_length,
+    st_setsrid(st_makeline(n.the_geom, st_lineinterpolatepoint(CASE WHEN ST_Equals(ST_StartPoint(a.the_geom), n.the_geom) THEN a.the_geom ELSE ST_Reverse(a.the_geom)
+                END, b.flwreg_length / st_length(a.the_geom))), SRID_VALUE)::geometry(LineString,SRID_VALUE) AS the_geom
+   FROM ( SELECT inp_flwreg_orifice.nodarc_id,
+            inp_flwreg_orifice.node_id,
+            inp_flwreg_orifice.order_id,
+            inp_flwreg_orifice.to_arc,
+            'ORIFICE'::text AS flwreg_type,
+            inp_flwreg_orifice.flwreg_length
+           FROM inp_flwreg_orifice
+        UNION
+         SELECT inp_flwreg_weir.nodarc_id,
+            inp_flwreg_weir.node_id,
+            inp_flwreg_weir.order_id,
+            inp_flwreg_weir.to_arc,
+            'WEIR'::text AS flwreg_type,
+            inp_flwreg_weir.flwreg_length
+           FROM inp_flwreg_weir
+        UNION
+         SELECT inp_flwreg_pump.nodarc_id,
+            inp_flwreg_pump.node_id,
+            inp_flwreg_pump.order_id,
+            inp_flwreg_pump.to_arc,
+            'PUMP'::text AS flwreg_type,
+            inp_flwreg_pump.flwreg_length
+           FROM inp_flwreg_pump
+        UNION
+         SELECT inp_flwreg_outlet.nodarc_id,
+            inp_flwreg_outlet.node_id,
+            inp_flwreg_outlet.order_id,
+            inp_flwreg_outlet.to_arc,
+            'OUTLET'::text AS flwreg_type,
+            inp_flwreg_outlet.flwreg_length
+           FROM inp_flwreg_outlet) b
+     JOIN node n USING (node_id)
+     JOIN arc a ON a.arc_id::text = b.to_arc::text
+    JOIN cat_feature cf ON b.flwreg_type = cf.feature_class;
+	
+-- Create parent table for flowregulators (as we have for v_parent_node, arc, connec, gully) 
+
+CREATE OR REPLACE VIEW vp_basic_flwreg
+AS SELECT nodarc_id AS nid,
+    featurecat_id AS custom_type
+   FROM v_edit_flwreg;	
+   
+-- Create child views for flowregulators.
+DROP VIEW IF EXISTS v_edit_flwreg_frorifice;
+CREATE OR REPLACE VIEW v_edit_flwreg_frorifice as 
+SELECT fr.*, st_setsrid(st_makeline(n.the_geom, st_lineinterpolatepoint(CASE WHEN ST_Equals(ST_StartPoint(a.the_geom), n.the_geom) THEN a.the_geom ELSE ST_Reverse(a.the_geom)
+                END, fr.flwreg_length / st_length(a.the_geom))), SRID_VALUE)::geometry(LineString,SRID_VALUE) AS the_geom 
+FROM inp_flwreg_orifice fr 
+JOIN v_edit_node n ON fr.node_id::text = n.node_id::TEXT 
+JOIN v_edit_arc a ON a.arc_id::text = fr.to_arc::TEXT 
+JOIN selector_expl expl ON n.expl_id = expl.expl_id OR n.expl_id2 = expl.expl_id 
+JOIN selector_sector s ON n.sector_id = s.sector_id 
+LEFT JOIN selector_municipality m ON n.muni_id = m.muni_id 
+WHERE expl.cur_user = CURRENT_USER AND s.cur_user = CURRENT_USER AND (m.cur_user = CURRENT_USER OR n.muni_id IS NULL);
+
+DROP VIEW IF EXISTS v_edit_flwreg_frweir;
+CREATE OR REPLACE VIEW v_edit_flwreg_frweir AS 
+SELECT fr.*, st_setsrid(st_makeline(n.the_geom, st_lineinterpolatepoint(CASE
+                    WHEN ST_Equals(ST_StartPoint(a.the_geom), n.the_geom) THEN a.the_geom
+                    ELSE ST_Reverse(a.the_geom) END, fr.flwreg_length / st_length(a.the_geom))), SRID_VALUE)::geometry(LineString,SRID_VALUE) AS the_geom 
+FROM inp_flwreg_weir fr 
+JOIN v_edit_node n ON fr.node_id::text = n.node_id::TEXT 
+JOIN v_edit_arc a ON a.arc_id::text = fr.to_arc::TEXT 
+JOIN selector_expl expl ON n.expl_id = expl.expl_id OR n.expl_id2 = expl.expl_id 
+JOIN selector_sector s ON n.sector_id = s.sector_id 
+LEFT JOIN selector_municipality m ON n.muni_id = m.muni_id 
+WHERE expl.cur_user = CURRENT_USER AND s.cur_user = CURRENT_USER AND (m.cur_user = CURRENT_USER OR n.muni_id IS NULL);
+
+DROP VIEW IF EXISTS v_edit_flwreg_froutlet;
+CREATE OR REPLACE VIEW v_edit_flwreg_froutlet AS 
+SELECT fr.*, st_setsrid(st_makeline(n.the_geom, st_lineinterpolatepoint(CASE
+                    WHEN ST_Equals(ST_StartPoint(a.the_geom), n.the_geom) THEN a.the_geom
+                    ELSE ST_Reverse(a.the_geom) END,  fr.flwreg_length / st_length(a.the_geom))), SRID_VALUE)::geometry(LineString,SRID_VALUE) AS the_geom 
+FROM inp_flwreg_outlet fr 
+JOIN v_edit_node n ON fr.node_id::text = n.node_id::TEXT 
+JOIN v_edit_arc a ON a.arc_id::text = fr.to_arc::TEXT 
+JOIN selector_expl expl ON n.expl_id = expl.expl_id OR n.expl_id2 = expl.expl_id 
+JOIN selector_sector s ON n.sector_id = s.sector_id 
+LEFT JOIN selector_municipality m ON n.muni_id = m.muni_id 
+WHERE expl.cur_user = CURRENT_USER AND s.cur_user = CURRENT_USER AND (m.cur_user = CURRENT_USER OR n.muni_id IS NULL);
+
+
+DROP VIEW IF EXISTS v_edit_flwreg_frpump;
+CREATE OR REPLACE VIEW v_edit_flwreg_frpump AS 
+SELECT fr.*, st_setsrid(st_makeline(n.the_geom, st_lineinterpolatepoint(CASE
+                    WHEN ST_Equals(ST_StartPoint(a.the_geom), n.the_geom) THEN a.the_geom
+                    ELSE ST_Reverse(a.the_geom) END, fr.flwreg_length / st_length(a.the_geom))), SRID_VALUE)::geometry(LineString,SRID_VALUE) AS the_geom 
+FROM inp_flwreg_pump fr 
+JOIN v_edit_node n ON fr.node_id::text = n.node_id::TEXT 
+JOIN v_edit_arc a ON a.arc_id::text = fr.to_arc::TEXT 
+JOIN selector_expl expl ON n.expl_id = expl.expl_id OR n.expl_id2 = expl.expl_id 
+JOIN selector_sector s ON n.sector_id = s.sector_id 
+LEFT JOIN selector_municipality m ON n.muni_id = m.muni_id 
+WHERE expl.cur_user = CURRENT_USER AND s.cur_user = CURRENT_USER AND (m.cur_user = CURRENT_USER OR n.muni_id IS NULL);   
+

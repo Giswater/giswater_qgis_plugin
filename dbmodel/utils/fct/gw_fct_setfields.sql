@@ -119,6 +119,9 @@ BEGIN
 
 		v_id_array := string_to_array(v_id, ', ');
 		IF v_idname_array IS NOT NULL then
+			if array_length(v_idname_array, 1) = 1 then
+                v_idname = v_idname_array[1];
+            end if;
 
 			FOREACH idname IN ARRAY v_idname_array LOOP
 				EXECUTE 'SELECT pg_catalog.format_type(a.atttypid, a.atttypmod) FROM pg_attribute a

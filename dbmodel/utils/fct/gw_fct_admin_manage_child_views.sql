@@ -193,7 +193,7 @@ BEGIN
 
 	ELSIF v_action = 'MULTI-CREATE' THEN
 
-		v_querytext = 'SELECT cat_feature.* FROM cat_feature WHERE feature_class <> ''LINK'' ORDER BY id';
+		v_querytext = 'SELECT cat_feature.* FROM cat_feature WHERE feature_type not in (''LINK'', ''FLWREG'') ORDER BY id';
 
 		FOR rec IN EXECUTE v_querytext LOOP
 

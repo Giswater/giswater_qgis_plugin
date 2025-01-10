@@ -146,6 +146,10 @@ v_querytext text;
 idname text;
 v_addparam json;
 
+v_noderecord1 record;
+v_order_id integer;
+v_flwreg_type text;
+v_arc_searchnodes double precision;
 
 
 BEGIN
@@ -179,6 +183,8 @@ BEGIN
 	-- Get values from config
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
 		INTO v_version;
+
+    SELECT ((value::json)->>'value') INTO v_arc_searchnodes FROM config_param_system WHERE parameter='edit_arc_searchnodes';
 
 	-- control strange null
 	IF lower(v_addschema) = 'none' or v_addschema = '' THEN
@@ -384,12 +390,12 @@ BEGIN
 
     -- IF v_forminfo is null and it's layer it's child layer --> parent form info is used
     IF v_forminfo IS NULL AND v_table_parent IS NOT NULL THEN
-	v_querystring = concat('SELECT row_to_json(row) FROM (SELECT formtemplate AS template , headertext AS "headerText"
-				FROM config_info_layer WHERE layer_id = ',quote_nullable(v_table_parent),' LIMIT 1) row');
-	v_debug_vars := json_build_object('v_table_parent', v_table_parent);
-	v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_infofromid', 'flag', 50);
-	SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
-	EXECUTE v_querystring INTO v_forminfo;
+    	v_querystring = concat('SELECT row_to_json(row) FROM (SELECT formtemplate AS template , headertext AS "headerText"
+    				FROM config_info_layer WHERE layer_id = ',quote_nullable(v_table_parent),' LIMIT 1) row');
+    	v_debug_vars := json_build_object('v_table_parent', v_table_parent);
+    	v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_infofromid', 'flag', 50);
+    	SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+    	EXECUTE v_querystring INTO v_forminfo;
     END IF;
 
 	-- Get feature type
@@ -421,7 +427,8 @@ BEGIN
 	-- getting source table in order to enhance performance
 	IF v_tablename LIKE 'v_edit_cad%' THEN v_sourcetable = v_tablename;
 	ELSIF v_tablename LIKE '%link_connec%' OR v_tablename LIKE '%link_gully%' THEN v_sourcetable = 'link';
-	ELSIF v_tablename LIKE 'v_edit_%' THEN v_sourcetable = replace (v_tablename, 'v_edit_', '');
+    ELSIF v_tablename LIKE 'v_edit_flwreg_%' THEN v_sourcetable = replace(v_tablename, 'v_edit_', 'inp_');
+	ELSIF v_tablename LIKE 'v_edit_%' AND v_tablename != 'v_edit_flwreg' THEN v_sourcetable = replace (v_tablename, 'v_edit_', '');
 	ELSIF v_tablename LIKE 've_node_%' THEN v_sourcetable = 'node';
 	ELSIF v_tablename LIKE 've_arc_%' THEN v_sourcetable = 'arc';
 	ELSIF v_tablename LIKE 've_connec_%' THEN v_sourcetable = 'connec';
@@ -531,10 +538,12 @@ BEGIN
 
 	IF v_tablename != v_sourcetable THEN
 
-		-- get id column for tablename
-		execute 'select a.attname from pg_index i join pg_attribute a on a.attrelid = i.indrelid and a.attnum = any(i.indkey) where  i.indrelid = $1::regclass and i.indisprimary'
-			into v_idname
-			using v_tablename;
+        if v_idname isnull then
+    		-- get id column for tablename
+    		execute 'select a.attname from pg_index i join pg_attribute a on a.attrelid = i.indrelid and a.attnum = any(i.indkey) where  i.indrelid = $1::regclass and i.indisprimary'
+    			into v_idname
+    			using v_tablename;
+        end if;
 
 		-- for views it suposse pk is the first column
 		if v_idname isnull then
@@ -743,6 +752,21 @@ BEGIN
 				v_id = (SELECT nextval(concat('SCHEMA_NAME.',v_zone,'_',v_zone,'_id_seq')));
 			ELSIF v_id IS NULL AND v_tablename = 'v_edit_presszone' THEN
 				 select max(presszone_id::integer)+1 INTO v_id from presszone where presszone_id ~ '^[0-9]+$';
+            ELSIF v_id IS NULL AND v_featuretype = 'flwreg' THEN
+                -- WARNING: this code is also in gw_fct_getfeatureupsert. If it needs to be changed here, it will most likely have to be changed there too.
+                -- Get node id from initial clicked point
+                SELECT * INTO v_noderecord1 FROM v_edit_node WHERE ST_DWithin(ST_startpoint(v_inputgeometry), v_edit_node.the_geom, v_arc_searchnodes)
+                ORDER BY ST_Distance(v_edit_node.the_geom, ST_startpoint(v_inputgeometry)) LIMIT 1;
+                -- Get order_id
+                SELECT COALESCE(MAX(order_id), 0) + 1 INTO v_order_id FROM v_edit_flwreg WHERE node_id = v_noderecord1.node_id ::text; -- afegir flwreg_type
+                -- Get flowreg_type  
+                v_querystring = concat('SELECT feature_class FROM cat_feature WHERE child_layer = ' , quote_nullable(v_tablename) ,' LIMIT 1');
+                v_debug_vars := json_build_object('v_tablename', v_tablename);
+                v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getfeatureupsert', 'flag', 70);
+                SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
+                EXECUTE v_querystring INTO v_flwreg_type;
+                -- Set nodarc_id
+                v_id = concat(v_noderecord1.node_id,upper(substring(v_flwreg_type FROM 1 FOR 2)), v_order_id);
 			ELSIF v_id IS NULL AND v_islayer is not true then
 				v_id = (SELECT nextval('SCHEMA_NAME.urn_id_seq'));
 			END IF;
@@ -832,6 +856,7 @@ BEGIN
 	v_parentfields := COALESCE(v_parentfields, '{}');
 	v_fields := COALESCE(v_fields, '{}');
 	v_message := COALESCE(v_message, '{}');
+    v_editable := COALESCE(v_editable, 'false');
 
 	v_forminfo := gw_fct_json_object_set_key(v_forminfo,'headerText',v_headertext);
 	v_tabdata_lytname = (SELECT value::json->>'custom_form_tab_labels' FROM config_param_system WHERE parameter='admin_customform_param')::text;
