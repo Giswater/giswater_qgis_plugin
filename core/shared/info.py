@@ -3413,30 +3413,14 @@ def open_epa_dlg(windowtitle, **kwargs):
     if windowtitle == "DWF & INFLOWS":
         pages = ["page_base", "page_dscenario"]
         remove_toolbox_page(info.dlg.toolBox, pages)
-
-        '''info.dlg.toolBox.widget(tools_qt.get_page_index_by_page_name(info.dlg.toolBox, "page_base")).deleteLater()
-        info.dlg.toolBox.removeItem(tools_qt.get_page_index_by_page_name(info.dlg.toolBox, "page_base"))
-        info.dlg.toolBox.widget(tools_qt.get_page_index_by_page_name(info.dlg.toolBox, "page_dscenario")).deleteLater()
-        info.dlg.toolBox.removeItem(tools_qt.get_page_index_by_page_name(info.dlg.toolBox, "page_dscenario"))'''
         info.dlg.repaint()
     elif windowtitle == "Demand":
         pages = ["page_base", "page_dwf", "page_inflows"]
         remove_toolbox_page(info.dlg.toolBox, pages)
-
-        '''info.dlg.toolBox.widget(tools_qt.get_page_index_by_page_name(info.dlg.toolBox, "page_base")).deleteLater()
-        info.dlg.toolBox.removeItem(tools_qt.get_page_index_by_page_name(info.dlg.toolBox, "page_base"))
-        info.dlg.toolBox.widget(tools_qt.get_page_index_by_page_name(info.dlg.toolBox, "page_dwf")).deleteLater()
-        info.dlg.toolBox.removeItem(tools_qt.get_page_index_by_page_name(info.dlg.toolBox, "page_dwf"))
-        info.dlg.toolBox.widget(tools_qt.get_page_index_by_page_name(info.dlg.toolBox, "page_inflows")).deleteLater()
-        info.dlg.toolBox.removeItem(tools_qt.get_page_index_by_page_name(info.dlg.toolBox, "page_inflows"))'''
         info.dlg.repaint()
     else:
         pages = ["page_dwf", "page_inflows"]
         remove_toolbox_page(info.dlg.toolBox, pages)
-        '''info.dlg.toolBox.widget(tools_qt.get_page_index_by_page_name(info.dlg.toolBox, "page_dwf")).deleteLater()
-        info.dlg.toolBox.removeItem(tools_qt.get_page_index_by_page_name(info.dlg.toolBox, "page_dwf"))
-        info.dlg.toolBox.widget(tools_qt.get_page_index_by_page_name(info.dlg.toolBox, "page_inflows")).deleteLater()
-        info.dlg.toolBox.removeItem(tools_qt.get_page_index_by_page_name(info.dlg.toolBox, "page_inflows"))'''
         info.dlg.repaint()
         
 
