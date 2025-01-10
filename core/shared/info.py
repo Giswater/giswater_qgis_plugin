@@ -41,8 +41,7 @@ from ..ui.ui_manager import GwInfoGenericUi, GwInfoFeatureUi, GwVisitEventFullUi
     GwInfoCrossectUi, GwInterpolate, GwPsectorUi
 # WARNING: DO NOT REMOVE THESE IMPORTS, THEY ARE USED BY EPA ACTIONS
 # noinspection PyUnresolvedReferences
-from ..ui.ui_manager import GwInfoEpaDemandUi, GwInfoEpaOrificeUi, GwInfoEpaOutletUi, GwInfoEpaPumpUi, \
-    GwInfoEpaWeirUi, GwInfoEpaDwfUi
+from ..ui.ui_manager import GwInfoEpaUi
 from ... import global_vars
 from ...libs import lib_vars, tools_qgis, tools_qt, tools_log, tools_db, tools_os
 from ...libs.tools_qt import GwHyperLinkLineEdit
@@ -888,78 +887,78 @@ class GwInfo(QObject):
 
     def _open_orifice_dlg(self):
         # kwargs
-        func_params = {"ui": "GwInfoEpaOrificeUi", "uiName": "info_epa_orifice",
+        func_params = {"ui": "GwInfoEpaUi", "uiName": "info_epa",
                        "tableviews": [
-                        {"tbl": "tbl_orifice", "view": "inp_flwreg_orifice", "add_view": "v_edit_inp_flwreg_orifice", "pk": "nodarc_id", "add_dlg_title": "Orifice - Base"},
-                        {"tbl": "tbl_dscenario_orifice", "view": "inp_dscenario_flwreg_orifice", "add_view": "v_edit_inp_dscenario_flwreg_orifice", "pk": ["dscenario_id", "nodarc_id"], "add_dlg_title": "Orifice - Dscenario"}
+                        {"tbl": "tbl", "view": "inp_flwreg_orifice", "add_view": "v_edit_inp_flwreg_orifice", "pk": "nodarc_id", "add_dlg_title": "Orifice - Base"},
+                        {"tbl": "tbl_dscenario", "view": "inp_dscenario_flwreg_orifice", "add_view": "v_edit_inp_dscenario_flwreg_orifice", "pk": ["dscenario_id", "nodarc_id"], "add_dlg_title": "Orifice - Dscenario"}
                        ]}
         kwargs = {"complet_result": self.complet_result, "class": self, "func_params": func_params}
-        open_epa_dlg(**kwargs)
+        open_epa_dlg("Orifice", **kwargs)
 
 
     def _open_outlet_dlg(self):
         # kwargs
-        func_params = {"ui": "GwInfoEpaOutletUi", "uiName": "info_epa_outlet",
+        func_params = {"ui": "GwInfoEpaUi", "uiName": "info_epa",
                        "tableviews": [
-                        {"tbl": "tbl_outlet", "view": "inp_flwreg_outlet", "add_view": "v_edit_inp_flwreg_outlet", "pk": "nodarc_id", "add_dlg_title": "Outlet - Base"},
-                        {"tbl": "tbl_dscenario_outlet", "view": "inp_dscenario_flwreg_outlet", "add_view": "v_edit_inp_dscenario_flwreg_outlet", "pk": ["dscenario_id", "nodarc_id"], "add_dlg_title": "Outlet - Dscenario"}
+                        {"tbl": "tbl", "view": "inp_flwreg_outlet", "add_view": "v_edit_inp_flwreg_outlet", "pk": "nodarc_id", "add_dlg_title": "Outlet - Base"},
+                        {"tbl": "tbl_dscenario", "view": "inp_dscenario_flwreg_outlet", "add_view": "v_edit_inp_dscenario_flwreg_outlet", "pk": ["dscenario_id", "nodarc_id"], "add_dlg_title": "Outlet - Dscenario"}
                        ]}
         kwargs = {"complet_result": self.complet_result, "class": self, "func_params": func_params}
-        open_epa_dlg(**kwargs)
+        open_epa_dlg("Outlet" ,**kwargs)
 
 
     def _open_pump_dlg(self):
         # kwargs
-        func_params = {"ui": "GwInfoEpaPumpUi", "uiName": "info_epa_pump",
+        func_params = {"ui": "GwInfoEpaUi", "uiName": "info_epa",
                        "tableviews": [
-                        {"tbl": "tbl_pump", "view": "inp_flwreg_pump", "add_view": "v_edit_inp_flwreg_pump", "pk": "nodarc_id", "add_dlg_title": "Pump - Base"},
-                        {"tbl": "tbl_dscenario_pump", "view": "inp_dscenario_flwreg_pump", "add_view": "v_edit_inp_dscenario_flwreg_pump", "pk": ["dscenario_id", "nodarc_id"], "add_dlg_title": "Pump - Dscenario"}
+                        {"tbl": "tbl", "view": "inp_flwreg_pump", "add_view": "v_edit_inp_flwreg_pump", "pk": "nodarc_id", "add_dlg_title": "Pump - Base"},
+                        {"tbl": "tbl_dscenario", "view": "inp_dscenario_flwreg_pump", "add_view": "v_edit_inp_dscenario_flwreg_pump", "pk": ["dscenario_id", "nodarc_id"], "add_dlg_title": "Pump - Dscenario"}
                        ]}
         kwargs = {"complet_result": self.complet_result, "class": self, "func_params": func_params}
-        open_epa_dlg(**kwargs)
+        open_epa_dlg("Pump", **kwargs)
 
 
     def _open_pump_additional_dlg(self):
         # kwargs
-        func_params = {"ui": "GwInfoEpaPumpUi", "uiName": "info_epa_pump",
+        func_params = {"ui": "GwInfoEpaUi", "uiName": "info_epa",
                        "tableviews": [
-                        {"tbl": "tbl_pump", "view": "inp_pump_additional", "add_view": "v_edit_inp_pump_additional", "pk": ["node_id", "order_id"], "add_dlg_title": "Pump Additional - Base"},
-                        {"tbl": "tbl_dscenario_pump", "view": "inp_dscenario_pump_additional", "add_view": "v_edit_inp_dscenario_pump_additional", "pk": ["dscenario_id", "node_id", "order_id"], "add_dlg_title": "Pump Additional - Dscenario"}
+                        {"tbl": "tbl", "view": "inp_pump_additional", "add_view": "v_edit_inp_pump_additional", "pk": ["node_id", "order_id"], "add_dlg_title": "Pump Additional - Base"},
+                        {"tbl": "tbl_dscenario", "view": "inp_dscenario_pump_additional", "add_view": "v_edit_inp_dscenario_pump_additional", "pk": ["dscenario_id", "node_id", "order_id"], "add_dlg_title": "Pump Additional - Dscenario"}
                        ]}
         kwargs = {"complet_result": self.complet_result, "class": self, "func_params": func_params}
-        open_epa_dlg(**kwargs)
+        open_epa_dlg("Additional Pump", **kwargs)
 
 
     def _open_weir_dlg(self):
         # kwargs
-        func_params = {"ui": "GwInfoEpaWeirUi", "uiName": "info_epa_weir",
+        func_params = {"ui": "GwInfoEpaUi", "uiName": "info_epa",
                        "tableviews": [
-                        {"tbl": "tbl_weir", "view": "inp_flwreg_weir", "add_view": "v_edit_inp_flwreg_weir", "pk": "nodarc_id", "add_dlg_title": "Weir - Base"},
-                        {"tbl": "tbl_dscenario_weir", "view": "inp_dscenario_flwreg_weir", "add_view": "v_edit_inp_dscenario_flwreg_weir", "pk": ["dscenario_id", "nodarc_id"], "add_dlg_title": "Weir - Dscenario"}
+                        {"tbl": "tbl", "view": "inp_flwreg_weir", "add_view": "v_edit_inp_flwreg_weir", "pk": "nodarc_id", "add_dlg_title": "Weir - Base"},
+                        {"tbl": "tbl_dscenario", "view": "inp_dscenario_flwreg_weir", "add_view": "v_edit_inp_dscenario_flwreg_weir", "pk": ["dscenario_id", "nodarc_id"], "add_dlg_title": "Weir - Dscenario"}
                        ]}
         kwargs = {"complet_result": self.complet_result, "class": self, "func_params": func_params}
-        open_epa_dlg(**kwargs)
+        open_epa_dlg("Weir", **kwargs)
 
 
     def _open_demand_dlg(self):
         # kwargs
-        func_params = {"ui": "GwInfoEpaDemandUi", "uiName": "info_epa_demand",
+        func_params = {"ui": "GwInfoEpaUi", "uiName": "info_epa",
                        "tableviews": [
-                        {"tbl": "tbl_dscenario_demand", "view": "inp_dscenario_demand", "add_view": "v_edit_inp_dscenario_demand", "id_name": "feature_id", "pk": ["dscenario_id", "feature_id"], "add_dlg_title": "Demand - Dscenario"}
+                        {"tbl": "tbl_dscenario", "view": "inp_dscenario_demand", "add_view": "v_edit_inp_dscenario_demand", "id_name": "feature_id", "pk": ["dscenario_id", "feature_id"], "add_dlg_title": "Demand - Dscenario"}
                        ]}
         kwargs = {"complet_result": self.complet_result, "class": self, "func_params": func_params}
-        open_epa_dlg(**kwargs)
+        open_epa_dlg("Demand", **kwargs)
 
 
     def _open_dwf_dlg(self):
         # kwargs
-        func_params = {"ui": "GwInfoEpaDwfUi", "uiName": "info_epa_dwf",
+        func_params = {"ui": "GwInfoEpaUi", "uiName": "info_epa",
                        "tableviews": [
                         {"tbl": "tbl_dwf", "view": "inp_dwf", "pk": ["node_id", "dwfscenario_id"], "add_view": "v_edit_inp_dwf", "add_dlg_title": "DWF"},
-                        {"tbl": "tbl_dscenario_inflows", "view": "inp_dscenario_inflows", "pk": ["dscenario_id", "node_id", "order_id"], "add_view": "v_edit_inp_dscenario_inflows", "add_dlg_title": "INFLOWS - Dscenario"}
+                        {"tbl": "tbl_inflows", "view": "inp_dscenario_inflows", "pk": ["dscenario_id", "node_id", "order_id"], "add_view": "v_edit_inp_dscenario_inflows", "add_dlg_title": "INFLOWS - Dscenario"}
                        ]}
         kwargs = {"complet_result": self.complet_result, "class": self, "func_params": func_params}
-        open_epa_dlg(**kwargs)
+        open_epa_dlg("DWF & INFLOWS", **kwargs)
 
 
     def action_open_link(self):
@@ -3390,7 +3389,7 @@ def epa_tbl_flags(index, model, non_editable_columns=None):
 # region Tab epa
 
 
-def open_epa_dlg(**kwargs):
+def open_epa_dlg(windowtitle, **kwargs):
     # Get variables
     complet_result = kwargs['complet_result']
     info = kwargs['class']
@@ -3402,12 +3401,44 @@ def open_epa_dlg(**kwargs):
     widgets_tablename = func_params.get('widgetsTablename')
     widgets_table_pk = func_params.get('widgetsTablePk')
 
+
     feature_id = complet_result['body']['feature']['id']
     id_name = complet_result['body']['feature']['idName']
 
     # Build dlg
     info.dlg = globals()[ui](info)
     tools_gw.load_settings(info.dlg)
+    info.dlg.setWindowTitle(windowtitle)
+    
+    if windowtitle == "DWF & INFLOWS":
+        pages = ["page_base", "page_dscenario"]
+        remove_toolbox_page(info.dlg.toolBox, pages)
+
+        '''info.dlg.toolBox.widget(tools_qt.get_page_index_by_page_name(info.dlg.toolBox, "page_base")).deleteLater()
+        info.dlg.toolBox.removeItem(tools_qt.get_page_index_by_page_name(info.dlg.toolBox, "page_base"))
+        info.dlg.toolBox.widget(tools_qt.get_page_index_by_page_name(info.dlg.toolBox, "page_dscenario")).deleteLater()
+        info.dlg.toolBox.removeItem(tools_qt.get_page_index_by_page_name(info.dlg.toolBox, "page_dscenario"))'''
+        info.dlg.repaint()
+    elif windowtitle == "Demand":
+        pages = ["page_base", "page_dwf", "page_inflows"]
+        remove_toolbox_page(info.dlg.toolBox, pages)
+
+        '''info.dlg.toolBox.widget(tools_qt.get_page_index_by_page_name(info.dlg.toolBox, "page_base")).deleteLater()
+        info.dlg.toolBox.removeItem(tools_qt.get_page_index_by_page_name(info.dlg.toolBox, "page_base"))
+        info.dlg.toolBox.widget(tools_qt.get_page_index_by_page_name(info.dlg.toolBox, "page_dwf")).deleteLater()
+        info.dlg.toolBox.removeItem(tools_qt.get_page_index_by_page_name(info.dlg.toolBox, "page_dwf"))
+        info.dlg.toolBox.widget(tools_qt.get_page_index_by_page_name(info.dlg.toolBox, "page_inflows")).deleteLater()
+        info.dlg.toolBox.removeItem(tools_qt.get_page_index_by_page_name(info.dlg.toolBox, "page_inflows"))'''
+        info.dlg.repaint()
+    else:
+        pages = ["page_dwf", "page_inflows"]
+        remove_toolbox_page(info.dlg.toolBox, pages)
+        '''info.dlg.toolBox.widget(tools_qt.get_page_index_by_page_name(info.dlg.toolBox, "page_dwf")).deleteLater()
+        info.dlg.toolBox.removeItem(tools_qt.get_page_index_by_page_name(info.dlg.toolBox, "page_dwf"))
+        info.dlg.toolBox.widget(tools_qt.get_page_index_by_page_name(info.dlg.toolBox, "page_inflows")).deleteLater()
+        info.dlg.toolBox.removeItem(tools_qt.get_page_index_by_page_name(info.dlg.toolBox, "page_inflows"))'''
+        info.dlg.repaint()
+        
 
     # Fill widgets
     if widgets and widgets_tablename:
@@ -3445,20 +3476,7 @@ def open_epa_dlg(**kwargs):
         info.dlg.btn_accept.clicked.connect(partial(save_tbl_changes, view, info, info.dlg, pk))
 
         # Add & Delete buttons
-        if 'dscenario' not in view:
-            btn_add_base = info.dlg.findChild(QPushButton, 'btn_add_base')
-            if btn_add_base:
-                tools_gw.add_icon(btn_add_base, '113')
-                btn_add_base.clicked.connect(partial(add_row_epa, tbl, view, add_view, pk, info.dlg, add_dlg_title, "INSERT", **kwargs))
-            btn_edit_base = info.dlg.findChild(QPushButton, 'btn_edit_base')
-            if btn_edit_base:
-                tools_gw.add_icon(btn_edit_base, '101')
-                btn_edit_base.clicked.connect(partial(edit_row_epa, tbl, view, add_view, pk, info.dlg, add_dlg_title, **kwargs))
-            btn_delete_base = info.dlg.findChild(QPushButton, 'btn_delete_base')
-            if btn_delete_base:
-                tools_gw.add_icon(btn_delete_base, '114')
-                btn_delete_base.clicked.connect(partial(delete_tbl_row, tbl, view, pk, info.dlg, tablename=tableview['tbl'], tableview=tableview['view'], id_name=id_name, feature_id=feature_id, **kwargs))
-        else:
+        if 'dscenario' in view and 'inflows' not in view:
             btn_add_dscenario = info.dlg.findChild(QPushButton, 'btn_add_dscenario')
             if btn_add_dscenario:
                 tools_gw.add_icon(btn_add_dscenario, '113')
@@ -3471,11 +3489,57 @@ def open_epa_dlg(**kwargs):
             if btn_edit_dscenario:
                 tools_gw.add_icon(btn_edit_dscenario, '101')
                 btn_edit_dscenario.clicked.connect(partial(edit_row_epa, tbl, view, add_view, pk, info.dlg, add_dlg_title, **kwargs))
+        elif 'dwf' in view:
+            btn_add_dwf = info.dlg.findChild(QPushButton, 'btn_add_dwf')
+            if btn_add_dwf:
+                tools_gw.add_icon(btn_add_dwf, '113')
+                btn_add_dwf.clicked.connect(partial(add_row_epa, tbl, view, add_view, pk, info.dlg, add_dlg_title, "INSERT", **kwargs))
+            btn_edit_dwf = info.dlg.findChild(QPushButton, 'btn_edit_dwf')
+            if btn_edit_dwf:
+                tools_gw.add_icon(btn_edit_dwf, '101')
+                btn_edit_dwf.clicked.connect(partial(edit_row_epa, tbl, view, add_view, pk, info.dlg, add_dlg_title, **kwargs))
+            btn_delete_dwf = info.dlg.findChild(QPushButton, 'btn_delete_dwf')
+            if btn_delete_dwf:
+                tools_gw.add_icon(btn_delete_dwf, '114')
+                btn_delete_dwf.clicked.connect(partial(delete_tbl_row, tbl, view, pk, info.dlg, tablename=tableview['tbl'], tableview=tableview['view'], id_name=id_name, feature_id=feature_id, **kwargs))
+        elif 'inflows' in view:
+            btn_add_inflows = info.dlg.findChild(QPushButton, 'btn_add_inflows')
+            if btn_add_inflows:
+                tools_gw.add_icon(btn_add_inflows, '113')
+                btn_add_inflows.clicked.connect(partial(add_row_epa, tbl, view, add_view, pk, info.dlg, add_dlg_title, "INSERT", **kwargs))
+            btn_edit_inflows = info.dlg.findChild(QPushButton, 'btn_edit_inflows')
+            if btn_edit_inflows:
+                tools_gw.add_icon(btn_edit_inflows, '101')
+                btn_edit_inflows.clicked.connect(partial(edit_row_epa, tbl, view, add_view, pk, info.dlg, add_dlg_title, **kwargs))
+            btn_delete_inflows = info.dlg.findChild(QPushButton, 'btn_delete_inflows')
+            if btn_delete_inflows:
+                tools_gw.add_icon(btn_delete_inflows, '114')
+                btn_delete_inflows.clicked.connect(partial(delete_tbl_row, tbl, view, pk, info.dlg, tablename=tableview['tbl'], tableview=tableview['view'], id_name=id_name, feature_id=feature_id, **kwargs))
+        else:
+            btn_add_base = info.dlg.findChild(QPushButton, 'btn_add_base')
+            if btn_add_base:
+                tools_gw.add_icon(btn_add_base, '113')
+                btn_add_base.clicked.connect(partial(add_row_epa, tbl, view, add_view, pk, info.dlg, add_dlg_title, "INSERT", **kwargs))
+            btn_edit_base = info.dlg.findChild(QPushButton, 'btn_edit_base')
+            if btn_edit_base:
+                tools_gw.add_icon(btn_edit_base, '101')
+                btn_edit_base.clicked.connect(partial(edit_row_epa, tbl, view, add_view, pk, info.dlg, add_dlg_title, **kwargs))
+            btn_delete_base = info.dlg.findChild(QPushButton, 'btn_delete_base')
+            if btn_delete_base:
+                tools_gw.add_icon(btn_delete_base, '114')
+                btn_delete_base.clicked.connect(partial(delete_tbl_row, tbl, view, pk, info.dlg, tablename=tableview['tbl'], tableview=tableview['view'], id_name=id_name, feature_id=feature_id, **kwargs))
+            
 
     info.dlg.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, info.dlg, True))
     info.dlg.finished.connect(partial(tools_gw.save_settings, info.dlg))
     # Open dlg
     tools_gw.open_dialog(info.dlg, dlg_name=ui_name)
+
+def remove_toolbox_page(toolbox, pages):
+    for page in pages:
+        toolbox.widget(tools_qt.get_page_index_by_page_name(toolbox, page)).deleteLater()
+        toolbox.removeItem(tools_qt.get_page_index_by_page_name(toolbox, page))
+    
 
 
 

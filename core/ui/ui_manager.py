@@ -57,45 +57,9 @@ class GwInfoFeatureUi(GwMainWindow, FORM_CLASS):
     def __init__(self, class_obj, sub_tag):
         super().__init__(class_obj)
 
-
-UINAME = "info_epa_demand"
+UINAME = "info_epa"
 FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
-class GwInfoEpaDemandUi(GwDialog, FORM_CLASS):
-    CONTEXT = CONTEXT
-    UINAME = UINAME
-
-
-UINAME = "info_epa_dwf"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
-class GwInfoEpaDwfUi(GwDialog, FORM_CLASS):
-    CONTEXT = CONTEXT
-    UINAME = UINAME
-
-
-UINAME = "info_epa_orifice"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
-class GwInfoEpaOrificeUi(GwDialog, FORM_CLASS):
-    CONTEXT = CONTEXT
-    UINAME = UINAME
-
-
-UINAME = "info_epa_outlet"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
-class GwInfoEpaOutletUi(GwDialog, FORM_CLASS):
-    CONTEXT = CONTEXT
-    UINAME = UINAME
-
-
-UINAME = "info_epa_pump"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
-class GwInfoEpaPumpUi(GwDialog, FORM_CLASS):
-    CONTEXT = CONTEXT
-    UINAME = UINAME
-
-
-UINAME = "info_epa_weir"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
-class GwInfoEpaWeirUi(GwDialog, FORM_CLASS):
+class GwInfoEpaUi(GwDialog, FORM_CLASS):
     CONTEXT = CONTEXT
     UINAME = UINAME
 
