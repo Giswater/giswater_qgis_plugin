@@ -13,7 +13,7 @@ from qgis.core import QgsProject
 from qgis.PyQt.QtGui import QRegExpValidator, QStandardItemModel, QCursor
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtCore import Qt, QRegExp, QPoint
-from qgis.PyQt.QtWidgets import QTableView, QAbstractItemView, QMenu, QCheckBox, QWidgetAction, QComboBox, QCompleter
+from qgis.PyQt.QtWidgets import QTableView, QAbstractItemView, QMenu, QCheckBox, QWidgetAction, QComboBox, QCompleter, QAction
 from qgis.PyQt.QtWidgets import QDialog, QLineEdit, QDateEdit
 
 from ..dialog import GwAction
@@ -72,6 +72,10 @@ class GwNetscenarioManagerButton(GwAction):
         self._fill_manager_table()
         self._set_label_current_netscenario(self.dlg_netscenario_manager, from_open_dialog=True)
 
+        # Populate custom context menu
+        self.dlg_netscenario_manager.tbl_netscenario.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.dlg_netscenario_manager.tbl_netscenario.customContextMenuRequested.connect(partial(self._show_context_menu_right_click, self.dlg_netscenario_manager.findChild(QTableView, 'tbl_netscenario')))
+
         # Connect main dialog signals
         self.dlg_netscenario_manager.txt_name.textChanged.connect(partial(self._fill_manager_table))
         self.dlg_netscenario_manager.btn_toc.clicked.connect(partial(self._manage_add_layers))
@@ -83,7 +87,7 @@ class GwNetscenarioManagerButton(GwAction):
         self.tbl_netscenario.doubleClicked.connect(self._open_netscenario)
         self.dlg_netscenario_manager.btn_update_netscenario.clicked.connect(
             partial(self._update_current_netscenario, self.dlg_netscenario_manager, self.tbl_netscenario))
-
+        
         self.dlg_netscenario_manager.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_netscenario_manager))
         self.dlg_netscenario_manager.finished.connect(partial(tools_gw.save_settings, self.dlg_netscenario_manager))
         self.dlg_netscenario_manager.finished.connect(partial(self.save_user_values))
@@ -94,6 +98,50 @@ class GwNetscenarioManagerButton(GwAction):
 
         # Open dialog
         tools_gw.open_dialog(self.dlg_netscenario_manager, 'netscenario_manager')
+
+    
+    def _show_context_menu_right_click(self, qtableview, pos):
+        """ Show custom context menu """
+        menu = QMenu(qtableview)
+
+        action_open = QAction("Open", self.tbl_netscenario)
+        action_open.triggered.connect(partial(self._open_netscenario, self.tbl_netscenario.indexAt(pos)))
+        menu.addAction(action_open)
+
+        action_current = QAction("Current netscenario", self.dlg_netscenario_manager.tbl_netscenario)
+        action_current.triggered.connect(partial(self._update_current_netscenario, self.dlg_netscenario_manager, self.tbl_netscenario))
+        menu.addAction(action_current)
+
+        action_toggle = QAction("Toggle active", self.dlg_netscenario_manager.tbl_netscenario)
+        action_toggle.triggered.connect(partial(self._manage_toggle_active, self.tbl_netscenario, 'plan_netscenario', is_manager=True))
+        menu.addAction(action_toggle)
+
+        action_execute = QAction("Execute", self.tbl_netscenario)
+        action_execute.triggered.connect(self._execute_current_netscenario)
+        menu.addAction(action_execute)
+
+        menu_create = QMenu("Create", self.dlg_netscenario_manager.tbl_netscenario)
+        values = [[3260, "Create empty Netscenario"], [3262, "Create Netscenario from ToC"]]
+        for value in values:
+            num = value[0]
+            label = value[1]
+            action = menu_create.addAction(f"{label}")
+            action.triggered.connect(partial(self._open_toolbox_function, num))
+        menu.addMenu(menu_create)
+
+        action_duplicate = QAction("Duplicate", self.dlg_netscenario_manager.tbl_netscenario)
+        action_duplicate.triggered.connect(partial(self._duplicate_selected_netscenario))
+        menu.addAction(action_duplicate)
+
+        action_update = QAction("Update", self.dlg_netscenario_manager.tbl_netscenario)
+        action_update.triggered.connect(partial(self._manage_properties))
+        menu.addAction(action_update)
+
+        action_delete = QAction("Delete", self.dlg_netscenario_manager.tbl_netscenario)
+        action_delete.triggered.connect(partial(self._delete_selected_netscenario))
+        menu.addAction(action_delete)
+
+        menu.exec(QCursor.pos())
 
 
     def _filter_table(self, dialog, table, widget_txt, widget_chk, tablename):
@@ -339,6 +387,13 @@ class GwNetscenarioManagerButton(GwAction):
 
     def _open_netscenario(self, index):
         """ Create custom dialog for selected netscenario and fill initial table """
+
+        # Check if there are selected rows
+        selected_list = self.tbl_netscenario.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            tools_qgis.show_warning(message, dialog=self.dlg_netscenario_manager)
+            return
 
         # Get selected netscenario_id
         row = index.row()

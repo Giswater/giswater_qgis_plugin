@@ -18,6 +18,7 @@ from ..... import global_vars
 from qgis.PyQt.QtWidgets import QDialog, QLabel, QHeaderView, QTableView, QMenu, QAction, QMessageBox
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtSql import QSqlTableModel
+from qgis.PyQt.QtGui import QCursor
 
 
 class GwStyleManager:
@@ -48,6 +49,10 @@ class GwStyleManager:
         self.populate_stylegroup_combobox()
         self._load_styles()
 
+        # Populate custom context menu
+        self.style_mng_dlg.tbl_style.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.style_mng_dlg.tbl_style.customContextMenuRequested.connect(partial(self._show_context_menu, self.style_mng_dlg.tbl_style))
+
         # Connect signals to the corresponding methods
         self.style_mng_dlg.btn_add_group.clicked.connect(partial(self._add_style_group, self.style_mng_dlg))
         self.style_mng_dlg.btn_update_group.clicked.connect(partial(self._update_style_group, self.style_mng_dlg))
@@ -64,6 +69,69 @@ class GwStyleManager:
 
         # Open the style management dialog
         tools_gw.open_dialog(self.style_mng_dlg, 'style_manager')
+
+    
+    def _show_context_menu(self, qtableview, pos):
+        """ Show custom context menu """
+        menu = QMenu(qtableview)
+
+        menu_styles = QMenu("Add style", self.style_mng_dlg.tbl_style)
+        try:
+            dict_menu = {}
+            layers = self._load_layers_with_geom()
+            for layer in layers:
+                # Filter only layers that have a geometry field
+                if layer['geomField'] == "None" or not layer['geomField']:
+                    continue  # Skip layers without a geometry field
+
+                context = json.loads(layer['context'])
+
+                # Level 1 of the context
+                if 'level_1' in context and context['level_1'] not in dict_menu:
+                    menu_level_1 = menu_styles.addMenu(f"{context['level_1']}")
+                    dict_menu[context['level_1']] = menu_level_1
+
+                # Level 2 of the context
+                if 'level_2' in context and f"{context['level_1']}_{context['level_2']}" not in dict_menu:
+                    menu_level_2 = dict_menu[context['level_1']].addMenu(f"{context['level_2']}")
+                    dict_menu[f"{context['level_1']}_{context['level_2']}"] = menu_level_2
+
+                # Level 3 of the context
+                if 'level_3' in context and f"{context['level_1']}_{context['level_2']}_{context['level_3']}" not in dict_menu:
+                    menu_level_3 = dict_menu[f"{context['level_1']}_{context['level_2']}"].addMenu(
+                        f"{context['level_3']}")
+                    dict_menu[f"{context['level_1']}_{context['level_2']}_{context['level_3']}"] = menu_level_3
+
+                alias = layer['layerName'] if layer['layerName'] is not None else layer['tableName']
+                alias = f"{alias}     "
+
+                # Add actions and submenus at the appropriate context level
+                if 'level_3' in context:
+                    sub_menu = dict_menu[f"{context['level_1']}_{context['level_2']}_{context['level_3']}"]
+                else:
+                    sub_menu = dict_menu[f"{context['level_1']}_{context['level_2']}"]
+
+                action = QAction(alias, self.style_mng_dlg.btn_add_style)
+                action.triggered.connect(partial(self._add_layer_style, layer['tableName'], layer['geomField']))
+                sub_menu.addAction(action)
+
+        except Exception as e:
+            tools_qgis.show_warning(f"Failed to load layers: {e}", dialog=self.style_mng_dlg)
+        menu.addMenu(menu_styles)
+
+        action_update = QAction("Update style", self.style_mng_dlg.tbl_style)
+        action_update.triggered.connect(self._update_selected_style)
+        menu.addAction(action_update)
+
+        action_delete = QAction("Delete style", self.style_mng_dlg.tbl_style)
+        action_delete.triggered.connect(self._delete_selected_styles)
+        menu.addAction(action_delete)
+
+        action_refresh = QAction("Refresh all", self.style_mng_dlg.tbl_style)
+        action_refresh.triggered.connect(partial(self._refresh_all_styles, self.style_mng_dlg))
+        menu.addAction(action_refresh)
+
+        menu.exec(QCursor.pos())
 
 
     def populate_stylegroup_combobox(self):
@@ -270,7 +338,7 @@ class GwStyleManager:
             tools_qgis.show_warning("Please select a category to update.", dialog=self.style_mng_dlg)
             return
         
-        dialog_update = GwUpdateStyleGroupUi(self, parent=dialog)
+        dialog_update = GwUpdateStyleGroupUi(self)
         tools_gw.load_settings(dialog_update)
 
         dialog_update.btn_accept.clicked.connect(partial(self._handle_update_feature, dialog_update, selected_stylegroup_name))

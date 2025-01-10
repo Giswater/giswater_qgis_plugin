@@ -737,6 +737,10 @@ class GwMapzoneManager:
         """ Show custom context menu """
         menu = QMenu(qtableview)
 
+        action_open = QAction("Open", qtableview)
+        action_open.triggered.connect(partial(self.manage_update, self.mapzone_mng_dlg, None))
+        menu.addAction(action_open)
+
         action_create = QAction("Create", qtableview)
         action_create.triggered.connect(partial(self.manage_create, self.mapzone_mng_dlg, qtableview))
         menu.addAction(action_create)

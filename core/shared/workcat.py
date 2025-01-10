@@ -516,6 +516,10 @@ class GwWorkcat:
         """ Show custom context menu """
         menu = QMenu(self.dlg_man.tbl_workcat)
 
+        action_open = QAction("Open", self.dlg_man.tbl_workcat)
+        action_open.triggered.connect(partial(self._open_selected_workcat, self.dlg_man, self.dlg_man.tbl_workcat))
+        menu.addAction(action_open)
+
         action_create = QAction("Create", self.dlg_man.tbl_workcat)
         action_create.triggered.connect(partial(self.create_workcat))
         menu.addAction(action_create)

@@ -10,8 +10,8 @@ import json
 from functools import partial
 
 from qgis.PyQt.QtCore import Qt, QRegExp
-from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QDialog
-from qgis.PyQt.QtGui import QRegExpValidator, QStandardItemModel
+from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QDialog, QAction, QMenu
+from qgis.PyQt.QtGui import QRegExpValidator, QStandardItemModel, QCursor
 
 from ..dialog import GwAction
 from ...ui.ui_manager import GwEpaManagerUi
@@ -51,8 +51,12 @@ class GwGo2EpaManagerButton(GwAction):
         # Fill combo box and table view
         # self._fill_combo_result_id()
         self.dlg_manager.tbl_rpt_cat_result.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self._fill_manager_table()
+        self._fill_manager_table()    
 
+        # Populate custom context menu
+        self.dlg_manager.tbl_rpt_cat_result.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.dlg_manager.tbl_rpt_cat_result.customContextMenuRequested.connect(partial(self._show_context_menu, self.dlg_manager.tbl_rpt_cat_result))    
+        
         # Set signals
         self.dlg_manager.btn_edit.clicked.connect(partial(self._manage_edit_row, self.dlg_manager, self.dlg_manager.tbl_rpt_cat_result))
         self.dlg_manager.btn_show_inp_data.clicked.connect(partial(self._show_inp_data, self.dlg_manager, self.dlg_manager.tbl_rpt_cat_result))
@@ -67,10 +71,41 @@ class GwGo2EpaManagerButton(GwAction):
         selection_model.selectionChanged.connect(partial(self._enable_buttons))
         self.dlg_manager.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_manager))
         self.dlg_manager.rejected.connect(partial(tools_gw.close_dialog, self.dlg_manager))
-        self.dlg_manager.txt_result_id.textChanged.connect(partial(self._fill_manager_table))
+        self.dlg_manager.txt_result_id.textChanged.connect(partial(self._fill_manager_table))   
 
         # Open form
         tools_gw.open_dialog(self.dlg_manager, dlg_name='go2epa_manager')
+
+
+    def _show_context_menu(self, qtableview):        
+        """ Show custom context menu """                        
+        menu = QMenu(qtableview)
+
+        action_edit = QAction("Edit", self.dlg_manager.tbl_rpt_cat_result)
+        action_edit.triggered.connect(partial(self._manage_edit_row, self.dlg_manager, self.dlg_manager.tbl_rpt_cat_result))
+        menu.addAction(action_edit)
+
+        action_show_inp_data = QAction("Show inp data", self.dlg_manager.tbl_rpt_cat_result)
+        action_show_inp_data.triggered.connect(partial(self._show_inp_data, self.dlg_manager, self.dlg_manager.tbl_rpt_cat_result))
+        menu.addAction(action_show_inp_data)
+
+        action_toggle_active = QAction("Toggle active", self.dlg_manager.tbl_rpt_cat_result)
+        action_toggle_active.triggered.connect(partial(self._toggle_rpt_archived, self.dlg_manager.tbl_rpt_cat_result, 'result_id'))
+        action_toggle_active.setEnabled(self.dlg_manager.btn_archive.isEnabled())
+        menu.addAction(action_toggle_active)
+        
+        action_set_corporate = QAction("Set corporate", self.dlg_manager.tbl_rpt_cat_result)
+        action_set_corporate.triggered.connect(partial(self._epa2data, self.dlg_manager.tbl_rpt_cat_result, 'result_id'))
+        action_set_corporate.setEnabled(self.dlg_manager.btn_set_corporate.isEnabled())
+        menu.addAction(action_set_corporate)  
+
+        action_delete = QAction("Delete", self.dlg_manager.tbl_rpt_cat_result)
+        action_delete.triggered.connect(partial(self._multi_rows_delete, self.dlg_manager.tbl_rpt_cat_result, 'v_ui_rpt_cat_result', 'result_id'))
+        menu.addAction(action_delete)
+
+        menu.exec(QCursor.pos())
+                       
+
 
 
     def _fill_manager_table(self, filter_id=None):

@@ -10,9 +10,10 @@ import webbrowser
 from functools import partial
 from osgeo import gdal
 from pyproj import CRS, Transformer
+from sip import isdeleted
 
-from qgis.PyQt.QtGui import QStandardItemModel, QStandardItem
-from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QFileDialog, QCompleter, QWidget
+from qgis.PyQt.QtGui import QStandardItemModel, QStandardItem, QCursor
+from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QFileDialog, QCompleter, QWidget, QAction, QMenu
 from qgis.PyQt.QtCore import pyqtSignal, QObject, Qt
 
 from ..utils import tools_gw
@@ -424,12 +425,16 @@ class GwDocument(QObject):
         self.dlg_man = GwDocManagerUi(self)
         self.dlg_man.setProperty('class_obj', self)
         tools_gw.load_settings(self.dlg_man)
-        self.dlg_man.tbl_document.setSelectionBehavior(QAbstractItemView.SelectRows)
-        tools_qt.set_tableview_config(self.dlg_man.tbl_document)
+        tools_qt.set_tableview_config(self.dlg_man.tbl_document, sectionResizeMode=0)
+        tools_qt.set_tableview_config(self.dlg_man.tbl_document)        
 
         # Adding auto-completion to a QLineEdit
         table_object = "doc"
         tools_gw.set_completer_object(self.dlg_man, table_object, field_id="name")
+
+        # Populate custom context menu
+        self.dlg_man.tbl_document.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.dlg_man.tbl_document.customContextMenuRequested.connect(partial(self._show_context_menu, table_object))
 
         status = self._fill_table()
         if not status:
@@ -446,6 +451,24 @@ class GwDocument(QObject):
 
         # Open form
         tools_gw.open_dialog(self.dlg_man, dlg_name='doc_manager')
+
+    def _show_context_menu(self, qtableview):
+        """ Show custom context menu """
+        menu = QMenu(qtableview)
+
+        action_open = QAction("Open", self.dlg_man.tbl_document)
+        action_open.triggered.connect(partial(self._open_selected_object_document, self.dlg_man, self.dlg_man.tbl_document, qtableview))
+        menu.addAction(action_open)
+
+        action_create = QAction("Create", self.dlg_man.tbl_document)
+        action_create.triggered.connect(partial(self.open_document_dialog))
+        menu.addAction(action_create)
+
+        action_delete = QAction("Delete", self.dlg_man.tbl_document)
+        action_delete.triggered.connect(partial(self._handle_delete))
+        menu.addAction(action_delete)
+
+        menu.exec(QCursor.pos())
 
 
     def _handle_delete(self):
@@ -741,6 +764,10 @@ class GwDocument(QObject):
 
 
     def _open_selected_object_document(self, dialog, widget, table_object):
+
+        # Check if there is a dlg_doc already open
+        if hasattr(self, 'dlg_add_doc') and not isdeleted(self.dlg_add_doc) and self.dlg_add_doc.isVisible():
+            return
 
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:

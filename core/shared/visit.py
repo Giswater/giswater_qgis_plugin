@@ -8,12 +8,13 @@ or (at your option) any later version.
 import os
 from datetime import datetime
 from functools import partial
+from sip import isdeleted
 
 from qgis.PyQt.QtCore import Qt, QDate, QStringListModel, pyqtSignal, QDateTime, QObject
-from qgis.PyQt.QtGui import QStandardItemModel, QStandardItem
+from qgis.PyQt.QtGui import QStandardItemModel, QStandardItem, QCursor
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAbstractItemView, QCompleter, QLineEdit, QFileDialog, QTableView, \
-    QTextEdit, QPushButton, QComboBox, QTabWidget, QDateEdit, QDateTimeEdit
+    QTextEdit, QPushButton, QComboBox, QTabWidget, QDateEdit, QDateTimeEdit, QAction, QMenu
 
 from .document import GwDocument
 from ..models.om_visit import GwOmVisit
@@ -265,8 +266,8 @@ class GwVisit(QObject):
 
         # Create the dialog
         self.dlg_visit_manager = GwVisitManagerUi(self)
-        tools_gw.load_settings(self.dlg_visit_manager)
-        self.dlg_visit_manager.tbl_visit.setSelectionBehavior(QAbstractItemView.SelectRows)
+        tools_gw.load_settings(self.dlg_visit_manager)        
+        tools_qt.set_tableview_config(self.dlg_visit_manager.tbl_visit, sectionResizeMode=0)
 
         if feature_type is None:
             # Set a model with selected filter. Attach that model to selected table
@@ -289,6 +290,10 @@ class GwVisit(QObject):
             if message:
                 tools_qgis.show_warning(message)
             tools_gw.set_tablemodel_config(self.dlg_visit_manager, self.dlg_visit_manager.tbl_visit, table_object)
+
+        # Populate custom context menu
+        self.dlg_visit_manager.tbl_visit.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.dlg_visit_manager.tbl_visit.customContextMenuRequested.connect(partial(self._show_context_menu, table_object))
 
         # manage save and rollback when closing the dialog
         self.dlg_visit_manager.rejected.connect(partial(tools_gw.close_dialog, self.dlg_visit_manager))
@@ -321,6 +326,25 @@ class GwVisit(QObject):
 
         # Open form
         tools_gw.open_dialog(self.dlg_visit_manager, dlg_name="lot_visitmanager")
+ 
+
+    def _show_context_menu(self, qtableview, pos):
+        """ Show custom context menu """
+        menu = QMenu(qtableview)
+
+        action_open = QAction("Open", self.dlg_visit_manager.tbl_visit)
+        action_open.triggered.connect(partial(self._open_selected_object_visit, self.dlg_visit_manager, self.dlg_visit_manager.tbl_visit, qtableview))
+        menu.addAction(action_open)
+
+        action_create = QAction("Create", self.dlg_visit_manager.tbl_visit)
+        action_create.triggered.connect(partial(self.create_visit))
+        menu.addAction(action_create)
+
+        action_delete = QAction("Delete", self.dlg_visit_manager.tbl_visit)
+        action_delete.triggered.connect(partial(tools_gw.delete_selected_rows, self.dlg_visit_manager.tbl_visit, qtableview))
+        menu.addAction(action_delete)
+
+        menu.exec(QCursor.pos())
 
 
     def get_visit_dialog(self):
@@ -437,6 +461,10 @@ class GwVisit(QObject):
 
     def _open_selected_object_visit(self, dialog, widget, table_object):
 
+        # Check if there is a dlg_visit already open
+        if hasattr(self, 'dlg_add_visit') and not isdeleted(self.dlg_add_visit) and self.dlg_add_visit.isVisible():
+            return
+
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
@@ -457,35 +485,14 @@ class GwVisit(QObject):
             dialog.close()
 
         if table_object == "v_ui_om_visit" or "v_ui_om_visitman_x_" in table_object:
-            self.get_visit(visit_id=selected_object_id)
-
-        # Disconnect open visit from table_visit once there opened
-        self.dlg_visit_manager.tbl_visit.doubleClicked.disconnect()
-        self.dlg_visit_manager.btn_open.clicked.disconnect()
-        self.dlg_add_visit.rejected.connect(partial(self._reconnect_table_signals, table_object))
-        self.dlg_add_visit.accepted.connect(partial(self._reconnect_table_signals, table_object))
-
-
-    def _reconnect_table_signals(self, table_object):
-        try:
-            self.dlg_visit_manager.tbl_visit.doubleClicked.connect(
-                partial(self._open_selected_object_visit, self.dlg_visit_manager, self.dlg_visit_manager.tbl_visit,
-                        table_object))
-        except RuntimeError:
-            pass
-        try:
-            self.dlg_visit_manager.btn_open.clicked.connect(
-                partial(self._open_selected_object_visit, self.dlg_visit_manager, self.dlg_visit_manager.tbl_visit,
-                        table_object))
-        except RuntimeError:
-            pass
+            self.get_visit(visit_id=selected_object_id)        
 
 
     def _set_signals(self):
 
         self.dlg_add_visit.rejected.connect(self._manage_rejected)
         self.dlg_add_visit.rejected.connect(partial(tools_gw.close_dialog, self.dlg_add_visit))
-        self.dlg_add_visit.rejected.connect(lambda: tools_gw.reset_rubberband(self.rubber_band))
+        self.dlg_add_visit.rejected.connect(lambda: tools_gw.reset_rubberband(self.rubber_band))     
         self.dlg_add_visit.accepted.connect(partial(self._update_relations, self.dlg_add_visit))
         self.dlg_add_visit.accepted.connect(partial(self._manage_accepted))
 

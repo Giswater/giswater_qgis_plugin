@@ -116,9 +116,40 @@ class GwNonVisual:
             function_name = f"get_{dict_views_project[key]}"
             _id = 0
 
+            # Populate custom context menu
+            qtableview.setContextMenuPolicy(Qt.CustomContextMenu)
+            qtableview.customContextMenuRequested.connect(partial(self._show_context_menu, qtableview, function_name))
+
             self._fill_manager_table(qtableview, key, expr='active is true')
 
             qtableview.doubleClicked.connect(partial(self._get_nonvisual_object, qtableview, function_name))
+            
+
+    def _show_context_menu(self, qtableview, function_name):
+        """ Show custom context menu """
+        menu = QMenu(qtableview)
+
+        action_open = QAction("Open", qtableview)
+        action_open.triggered.connect(partial(self._get_nonvisual_object, qtableview, function_name))
+        menu.addAction(action_open)
+
+        action_toggle = QAction("Toggle active", qtableview)
+        action_toggle.triggered.connect(self._manage_toggle_active)
+        menu.addAction(action_toggle)
+
+        action_duplicate = QAction("Duplicate", qtableview)
+        action_duplicate.triggered.connect(partial(self._duplicate_object, self.manager_dlg))
+        menu.addAction(action_duplicate)
+
+        action_create = QAction("Create", qtableview)
+        action_create.triggered.connect(partial(self._create_object, self.manager_dlg))
+        menu.addAction(action_create)
+
+        action_delete = QAction("Delete", qtableview)
+        action_delete.triggered.connect(partial(self._delete_object, self.manager_dlg))
+        menu.addAction(action_delete)
+
+        menu.exec(QCursor.pos())
 
 
     def _populate_filter_combos(self):
@@ -205,6 +236,13 @@ class GwNonVisual:
 
     def _get_nonvisual_object(self, tbl_view, function_name):
         """ Opens Non-Visual object dialog. Called from manager tables. """
+
+        # Check if there are selected rows
+        selected_list = tbl_view.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            tools_qgis.show_warning(message, dialog=self.manager_dlg)
+            return
 
         object_id = tbl_view.selectionModel().selectedRows()[0].data()
         if hasattr(self, function_name):

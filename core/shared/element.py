@@ -8,10 +8,11 @@ or (at your option) any later version.
 import webbrowser
 
 from functools import partial
+from sip import isdeleted
 
-from qgis.PyQt.QtCore import QRegExp
-from qgis.PyQt.QtGui import QRegExpValidator
-from qgis.PyQt.QtWidgets import QAbstractItemView, QPushButton, QTableView, QComboBox
+from qgis.PyQt.QtCore import QRegExp, Qt
+from qgis.PyQt.QtGui import QRegExpValidator, QCursor
+from qgis.PyQt.QtWidgets import QAbstractItemView, QPushButton, QTableView, QComboBox, QAction, QMenu
 
 from ..utils import tools_gw
 from ..ui.ui_manager import GwElementUi, GwElementManagerUi
@@ -279,11 +280,15 @@ class GwElement:
         # Create the dialog
         self.dlg_man = GwElementManagerUi(self)
         tools_gw.load_settings(self.dlg_man)
-        self.dlg_man.tbl_element.setSelectionBehavior(QAbstractItemView.SelectRows)
+        tools_qt.set_tableview_config(self.dlg_man.tbl_element, sectionResizeMode=0)
 
         # Adding auto-completion to a QLineEdit
         table_object = "v_edit_element"
         tools_gw.set_completer_object(self.dlg_man, table_object, field_id='element_id')
+
+        # Populate custom context menu
+        self.dlg_man.tbl_element.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.dlg_man.tbl_element.customContextMenuRequested.connect(partial(self._show_context_menu, table_object))
 
         # Set a model with selected filter. Attach that model to selected table
         message = tools_qt.fill_table(self.dlg_man.tbl_element, f"{self.schema_name}.{table_object}")
@@ -304,6 +309,25 @@ class GwElement:
 
         # Open form
         tools_gw.open_dialog(self.dlg_man, dlg_name='element_manager')
+
+    
+    def _show_context_menu(self, qtableview, pos):
+        """ Show custom context menu """
+        menu = QMenu(qtableview)
+
+        action_open = QAction("Open", self.dlg_man.tbl_element)
+        action_open.triggered.connect(partial(self._open_selected_object_element, self.dlg_man, self.dlg_man.tbl_element, qtableview))
+        menu.addAction(action_open)
+
+        action_create = QAction("Create", self.dlg_man.tbl_element)
+        action_create.triggered.connect(partial(self.open_element_dialog))
+        menu.addAction(action_create)
+
+        action_delete = QAction("Delete", self.dlg_man.tbl_element)
+        action_delete.triggered.connect(partial(tools_gw.delete_selected_rows, self.dlg_man.tbl_element, qtableview))
+        menu.addAction(action_delete)
+
+        menu.exec(QCursor.pos())
 
 
     # region private functions
@@ -587,6 +611,11 @@ class GwElement:
 
     def _open_selected_object_element(self, dialog, widget, table_object):
 
+        # Check if there is a dlg_element already open
+        if hasattr(self, 'dlg_add_element') and self.dlg_add_element is not None and not isdeleted(self.dlg_add_element) and self.dlg_add_element.isVisible():
+            return
+
+        # Check if there are selected rows
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"

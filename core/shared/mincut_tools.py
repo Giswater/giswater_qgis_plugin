@@ -12,7 +12,8 @@ from functools import partial
 from qgis.PyQt.QtCore import QStringListModel, QSize, QDateTime, QDate, Qt, QRegExp
 from qgis.PyQt.QtWidgets import QAction, QAbstractItemView, QCheckBox, QComboBox, QCompleter, QDoubleSpinBox, \
     QDateEdit, QGridLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QPushButton, QSizePolicy, \
-    QSpinBox, QSpacerItem, QTableView, QTabWidget, QWidget, QTextEdit, QRadioButton, QDateTimeEdit
+    QSpinBox, QSpacerItem, QTableView, QTabWidget, QWidget, QTextEdit, QRadioButton, QDateTimeEdit, QMenu
+from qgis.PyQt.QtGui import QCursor
 from qgis.gui import QgsDateTimeEdit
 from qgis.core import QgsWkbTypes
 
@@ -65,6 +66,26 @@ class GwMincutTools:
 
         self.tbl_mincut_edit = self.dlg_mincut_man.findChild(QTableView, "tab_none_tbl_mincut_edit")
         tools_gw.open_dialog(self.dlg_mincut_man, dlg_name='mincut_manager_dinamic')
+
+        # Populate custom context menu
+        self.tbl_mincut_edit.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.tbl_mincut_edit.customContextMenuRequested.connect(partial(self._show_context_menu, "tab_none_tbl_mincut_edit"))
+
+
+    def _show_context_menu(self, qtableview, pos):
+        """Show custom context menu"""
+        menu = QMenu(qtableview)
+
+        action_cancel = QAction("Cancel mincut", self.tbl_mincut_edit)
+        action_cancel.triggered.connect(partial(cancel_mincut, dialog=self.dlg_mincut_man))
+        menu.addAction(action_cancel)
+
+        action_delete = QAction("Delete", self.tbl_mincut_edit)
+        action_delete.triggered.connect(partial(delete_mincut, dialog=self.dlg_mincut_man, complet_result=self.complet_result))
+        menu.addAction(action_delete)
+
+        menu.exec(QCursor.pos())
+
 
     def load_connections(self, complet_result, filter_fields=''):
         list_tables = self.dlg_mincut_man.findChildren(QTableView)
@@ -219,7 +240,7 @@ def delete_mincut(**kwargs):
     widget = dialog.findChild(QTableView, "tab_none_tbl_mincut_edit")
     table_name = "om_mincut"
     column_id = "id"
-    complet_result = kwargs['complet_result']
+    complet_result = kwargs['complet_result']    
     # Get selected rows
     selected_list = widget.selectionModel().selectedRows()
     if len(selected_list) == 0:
