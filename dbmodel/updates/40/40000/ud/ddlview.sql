@@ -6346,7 +6346,7 @@ DROP VIEW IF EXISTS v_edit_flwreg_frorifice;
 CREATE OR REPLACE VIEW v_edit_flwreg_frorifice as 
 SELECT fr.*, st_setsrid(st_linesubstring(CASE WHEN ST_Equals(ST_StartPoint(a.the_geom), n.the_geom)
                     THEN a.the_geom
-                    ELSE ST_Reverse(a.the_geom) end, 0,  b.flwreg_length / st_length(a.the_geom)),SRID_VALUE)::geometry(LineString,SRID_VALUE) 
+                    ELSE ST_Reverse(a.the_geom) end, 0,  fr.flwreg_length / st_length(a.the_geom)),SRID_VALUE)::geometry(LineString,SRID_VALUE) 
                 AS the_geom 
 FROM inp_flwreg_orifice fr 
 JOIN v_edit_node n ON fr.node_id::text = n.node_id::TEXT 
@@ -6360,7 +6360,7 @@ DROP VIEW IF EXISTS v_edit_flwreg_frweir;
 CREATE OR REPLACE VIEW v_edit_flwreg_frweir AS 
 SELECT fr.*, st_setsrid(st_linesubstring(CASE WHEN ST_Equals(ST_StartPoint(a.the_geom), n.the_geom)
                     THEN a.the_geom
-                    ELSE ST_Reverse(a.the_geom) end, 0,  b.flwreg_length / st_length(a.the_geom)),SRID_VALUE)::geometry(LineString,SRID_VALUE) 
+                    ELSE ST_Reverse(a.the_geom) end, 0,  fr.flwreg_length / st_length(a.the_geom)),SRID_VALUE)::geometry(LineString,SRID_VALUE) 
                 AS the_geom
 FROM inp_flwreg_weir fr 
 JOIN v_edit_node n ON fr.node_id::text = n.node_id::TEXT 
@@ -6374,7 +6374,7 @@ DROP VIEW IF EXISTS v_edit_flwreg_froutlet;
 CREATE OR REPLACE VIEW v_edit_flwreg_froutlet AS 
 SELECT fr.*, st_setsrid(st_linesubstring(CASE WHEN ST_Equals(ST_StartPoint(a.the_geom), n.the_geom)
                     THEN a.the_geom
-                    ELSE ST_Reverse(a.the_geom) end, 0,  b.flwreg_length / st_length(a.the_geom)),SRID_VALUE)::geometry(LineString,SRID_VALUE) 
+                    ELSE ST_Reverse(a.the_geom) end, 0,  fr.flwreg_length / st_length(a.the_geom)),SRID_VALUE)::geometry(LineString,SRID_VALUE) 
                 AS the_geom
 FROM inp_flwreg_outlet fr 
 JOIN v_edit_node n ON fr.node_id::text = n.node_id::TEXT 
@@ -6389,7 +6389,7 @@ DROP VIEW IF EXISTS v_edit_flwreg_frpump;
 CREATE OR REPLACE VIEW v_edit_flwreg_frpump AS 
 SELECT fr.*, st_setsrid(st_linesubstring(CASE WHEN ST_Equals(ST_StartPoint(a.the_geom), n.the_geom)
                     THEN a.the_geom
-                    ELSE ST_Reverse(a.the_geom) end, 0,  b.flwreg_length / st_length(a.the_geom)),SRID_VALUE)::geometry(LineString,SRID_VALUE) 
+                    ELSE ST_Reverse(a.the_geom) end, 0,  fr.flwreg_length / st_length(a.the_geom)),SRID_VALUE)::geometry(LineString,SRID_VALUE) 
                 AS the_geom 
 FROM inp_flwreg_pump fr 
 JOIN v_edit_node n ON fr.node_id::text = n.node_id::TEXT 
