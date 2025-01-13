@@ -747,10 +747,10 @@ BEGIN
 			-- getting id from URN
 			IF v_id IS NULL AND v_isepa IS true THEN
 			    v_id = '';
-			ELSIF v_id IS NULL AND v_tablename in  ('v_edit_dma', 'v_edit_dqa', 'v_edit_sector', 'v_edit_drainzone') THEN
-				v_zone = replace(v_tablename,'v_edit_','');
+			ELSIF v_id IS NULL AND v_tablename in  ('v_ui_dma', 'v_ui_dqa', 'v_ui_sector', 'v_ui_drainzone') THEN
+				v_zone = replace(v_tablename,'v_ui_','');
 				v_id = (SELECT nextval(concat('SCHEMA_NAME.',v_zone,'_',v_zone,'_id_seq')));
-			ELSIF v_id IS NULL AND v_tablename = 'v_edit_presszone' THEN
+			ELSIF v_id IS NULL AND v_tablename = 'v_ui_presszone' THEN
 				 select max(presszone_id::integer)+1 INTO v_id from presszone where presszone_id ~ '^[0-9]+$';
             ELSIF v_id IS NULL AND v_featuretype = 'flwreg' THEN
                 -- WARNING: this code is also in gw_fct_getfeatureupsert. If it needs to be changed here, it will most likely have to be changed there too.

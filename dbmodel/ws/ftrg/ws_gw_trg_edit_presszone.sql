@@ -10,10 +10,14 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_presszone()  RETURNS trigge
 $BODY$
 
 DECLARE
+view_name TEXT;
 
 BEGIN
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
+
+	-- Arg will be or 'edit' or 'ui'
+	view_name = TG_ARGV[0];
 
 	IF TG_OP = 'INSERT' THEN
 
@@ -28,23 +32,41 @@ BEGIN
 		END IF;
 
 		-- active
-		IF NEW.active IS NULL THEN
-			NEW.active = TRUE;
+		IF view_name = 'ui'THEN
+			IF NEW.active IS NULL THEN
+				NEW.active = TRUE;
+			END IF;
 		END IF;
 
-		INSERT INTO presszone (presszone_id, name, muni_id, expl_id, sector_id, the_geom, graphconfig, head, stylesheet, active, descript, avg_press, presszone_type)
-		VALUES (NEW.presszone_id, NEW.name, NEW.muni_id, NEW.expl_id, NEW.sector_id, NEW.the_geom, NEW.graphconfig::json, NEW.head, NEW.stylesheet::json, NEW.active, NEW.descript,
+		INSERT INTO presszone (presszone_id, name, expl_id, graphconfig, head, stylesheet, descript, avg_press, presszone_type)
+		VALUES (NEW.presszone_id, NEW.name, NEW.expl_id, NEW.graphconfig::json, NEW.head, NEW.stylesheet::json, NEW.descript,
 		NEW.avg_press, NEW.presszone_type);
+
+		IF view_name = 'ui' THEN
+			UPDATE presszone SET active = NEW.active WHERE presszone_id = NEW.presszone_id;
+
+		ELSIF view_name = 'edit' THEN
+			UPDATE presszone SET the_geom = NEW.the_geom WHERE presszone_id = NEW.presszone_id;
+
+		END IF;
 
 		RETURN NEW;
 
 	ELSIF TG_OP = 'UPDATE' THEN
 
 		UPDATE presszone
-		SET presszone_id=NEW.presszone_id, name=NEW.name, muni_id=NEW.muni_id, expl_id=NEW.expl_id, sector_id=NEW.sector_id, the_geom=NEW.the_geom,
-		graphconfig=NEW.graphconfig::json, head = NEW.head, stylesheet=NEW.stylesheet::json, active=NEW.active, descript=NEW.descript, lastupdate=now(),
-		lastupdate_user = current_user, avg_press = NEW.avg_press, presszone_type = NEW.presszone_type
+		SET presszone_id=NEW.presszone_id, name=NEW.name, expl_id=NEW.expl_id, graphconfig=NEW.graphconfig::json,
+		head = NEW.head, stylesheet=NEW.stylesheet::json, descript=NEW.descript, lastupdate=now(), lastupdate_user = current_user,
+		avg_press = NEW.avg_press, presszone_type = NEW.presszone_type
 		WHERE presszone_id=OLD.presszone_id;
+
+		IF view_name = 'ui' THEN
+			UPDATE presszone SET active = NEW.active WHERE presszone_id = OLD.presszone_id;
+
+		ELSIF view_name = 'edit' THEN
+			UPDATE presszone SET the_geom = NEW.the_geom WHERE presszone_id = OLD.presszone_id;
+
+		END IF;
 
 		RETURN NEW;
 

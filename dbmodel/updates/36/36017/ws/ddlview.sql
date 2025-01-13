@@ -884,35 +884,203 @@ AS SELECT s.sector_id,
      LEFT JOIN edit_typevalue et ON et.id::text = s.sector_type::text AND et.typevalue::text = 'sector_type'::text
   ORDER BY s.sector_id;
 
+-- 10/01/2025
+DROP VIEW IF EXISTS v_ui_sector;
+CREATE OR REPLACE VIEW v_ui_sector
+AS SELECT s.sector_id,
+    s.name,
+    s.sector_type,
+    ms.name AS macrosector,
+    s.descript,
+    s.active,
+    s.undelete,
+    s.graphconfig,
+    s.stylesheet,
+    s.parent_id,
+    s.pattern_id,
+    s.tstamp,
+    s.insert_user,
+    s.lastupdate,
+    s.lastupdate_user,
+	s.avg_press,
+	s.link
+   FROM selector_sector ss,
+    sector s
+     LEFT JOIN macrosector ms ON ms.macrosector_id = s.macrosector_id
+  WHERE s.sector_id > 0 AND ss.sector_id = s.sector_id AND ss.cur_user = CURRENT_USER
+  ORDER BY s.sector_id;
+
 DROP VIEW IF EXISTS v_edit_sector;
 CREATE OR REPLACE VIEW v_edit_sector
-AS SELECT s.*
-FROM vu_sector s, selector_sector
-WHERE s.sector_id = selector_sector.sector_id and active AND selector_sector.cur_user = "current_user"()::text;
+AS SELECT s.sector_id,
+    s.name,
+    s.sector_type,
+    ms.name AS macrosector,
+    s.descript,
+    s.undelete,
+    s.graphconfig::text AS graphconfig,
+    s.stylesheet,
+    s.parent_id,
+    s.pattern_id,
+    s.tstamp,
+    s.insert_user,
+    s.lastupdate,
+    s.lastupdate_user,
+	s.avg_press,
+	s.link,
+	s.the_geom
+   FROM selector_sector,
+    sector s
+    LEFT JOIN macrosector ms ON ms.macrosector_id = s.macrosector_id
+  WHERE s.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
 
-create trigger gw_trg_edit_sector instead of insert or delete or update on v_edit_sector
-for each row execute function gw_trg_edit_sector('sector');
+DROP VIEW IF EXISTS v_ui_dma;
+CREATE OR REPLACE VIEW v_ui_dma
+AS SELECT d.dma_id,
+    d.name,
+    d.dma_type,
+    md.name AS macrodma,
+    d.descript,
+    d.active,
+    d.undelete,
+    d.expl_id,
+    d.minc,
+    d.maxc,
+    d.effc,
+    d.pattern_id,
+    d.link,
+    d.graphconfig,
+    d.stylesheet,
+    d.avg_press,
+    d.tstamp,
+    d.insert_user,
+    d.lastupdate,
+    d.lastupdate_user
+   FROM selector_expl s,
+    dma d
+     LEFT JOIN macrodma md ON md.macrodma_id = d.macrodma_id
+  WHERE d.dma_id > 0 AND s.expl_id = d.expl_id AND s.cur_user = CURRENT_USER
+  ORDER BY d.dma_id;
 
-create or replace view v_edit_presszone as
-select vu.* from vu_presszone vu,  selector_expl
-WHERE vu.expl_id = selector_expl.expl_id and active AND selector_expl.cur_user = "current_user"()::text OR vu.expl_id IS NULL
-ORDER BY vu.presszone_id;
+DROP VIEW IF EXISTS v_edit_dma;
+CREATE OR REPLACE VIEW v_edit_dma
+AS SELECT d.dma_id,
+    d.name,
+    d.dma_type,
+    md.name AS macrodma,
+    d.descript,
+    d.undelete,
+    d.expl_id,
+    d.minc,
+    d.maxc,
+    d.effc,
+    d.pattern_id,
+    d.link,
+    d.graphconfig,
+    d.stylesheet,
+    d,avg_press,
+    d.tstamp,
+    d.insert_user,
+    d.lastupdate,
+    d.lastupdate_user,
+    d.the_geom
+   FROM
+    selector_expl,
+    dma d
+    LEFT JOIN macrodma md ON md.macrodma_id = d.macrodma_id
+  WHERE d.expl_id = selector_expl.expl_id AND d.active AND selector_expl.cur_user = "current_user"()::text OR d.expl_id IS NULL
+  ORDER BY d.dma_id;
 
-create or replace view v_edit_dma as
-select vu.* from vu_dma vu,  selector_expl
-WHERE vu.expl_id = selector_expl.expl_id and active AND selector_expl.cur_user = "current_user"()::text OR vu.expl_id IS NULL
-ORDER BY vu.dma_id;
+DROP VIEW IF EXISTS v_ui_presszone;
+CREATE OR REPLACE VIEW v_ui_presszone
+AS SELECT p.presszone_id,
+    p.name,
+    p.presszone_type,
+    p.descript,
+    p.active,
+    p.expl_id,
+    p.link,
+    p.head,
+    p.graphconfig,
+    p.stylesheet,
+    p.tstamp,
+    p.insert_user,
+    p.lastupdate,
+    p.lastupdate_user
+   FROM selector_expl s,
+    presszone p
+  WHERE (p.presszone_id::text <> ALL (ARRAY['0'::character varying::text, '-1'::character varying::text])) AND s.expl_id = p.expl_id AND s.cur_user = CURRENT_USER
+  ORDER BY p.presszone_id;
 
-create or replace view v_edit_dma as
-select vu.* from vu_dma vu,  selector_expl
-WHERE vu.expl_id = selector_expl.expl_id and active AND selector_expl.cur_user = "current_user"()::text OR vu.expl_id IS NULL
-ORDER BY vu.dma_id;
 
-create or replace view v_edit_dqa as
-select vu.* from vu_dqa vu,  selector_expl
-WHERE vu.expl_id = selector_expl.expl_id and active AND selector_expl.cur_user = "current_user"()::text OR vu.expl_id IS NULL
-ORDER BY vu.dqa_id;
+DROP VIEW IF EXISTS v_edit_presszone;
+CREATE OR REPLACE VIEW v_edit_presszone
+AS SELECT p.presszone_id,
+    p.name,
+    p.presszone_type,
+    p.descript,
+    p.expl_id,
+    p.link,
+    p.head,
+    p.graphconfig,
+    p.stylesheet,
+    p.tstamp,
+    p.insert_user,
+    p.lastupdate,
+    p.lastupdate_user,
+    p.the_geom
+   FROM
+    selector_expl,
+    vu_presszone p
+  WHERE p.expl_id = selector_expl.expl_id AND p.active AND selector_expl.cur_user = "current_user"()::text OR p.expl_id IS NULL
+  ORDER BY p.presszone_id;
 
 
+DROP VIEW IF EXISTS v_ui_dqa;
+CREATE OR REPLACE VIEW v_ui_dqa
+AS SELECT d.dqa_id,
+    d.name,
+    d.dqa_type,
+    md.name AS macrodqa_id,
+    d.descript,
+    d.active,
+    d.undelete,
+    d.expl_id,
+    d.pattern_id,
+    d.link,
+    d.graphconfig,
+    d.stylesheet,
+    d.tstamp,
+    d.insert_user,
+    d.lastupdate,
+    d.lastupdate_user
+   FROM selector_expl s,
+    vu_dqa d
+     LEFT JOIN macrodqa md ON md.macrodqa_id = d.macrodqa_id
+  WHERE d.dqa_id > 0 AND s.expl_id = d.expl_id AND s.cur_user = CURRENT_USER
+  ORDER BY d.dqa_id;
 
 
+DROP VIEW IF EXISTS v_edit_dqa;
+CREATE OR REPLACE VIEW v_edit_dqa
+AS SELECT d.dqa_id,
+    d.name,
+    d.dqa_type,
+    md.name AS macrodqa_id,
+    d.descript,
+    d.undelete,
+    d.expl_id,
+    d.pattern_id,
+    d.link,
+    d.graphconfig,
+    d.stylesheet,
+    d.tstamp,
+    d.insert_user,
+    d.lastupdate,
+    d.lastupdate_user,
+    d.the_geom
+   FROM selector_expl,
+    vu_dqa d
+    LEFT JOIN macrodqa md ON md.macrodqa_id = d.macrodqa_id
+  WHERE d.expl_id = selector_expl.expl_id AND d.active AND selector_expl.cur_user = "current_user"()::text OR d.expl_id IS NULL
+  ORDER BY d.dqa_id;
