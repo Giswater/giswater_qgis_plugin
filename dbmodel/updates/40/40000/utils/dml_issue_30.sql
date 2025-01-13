@@ -1084,3 +1084,18 @@ insert into sys_fprocess values (632, 'Orifice present in more than one enabled 
 insert into sys_fprocess values (633, 'Pump present in more than one enabled scenario','ud');
 insert into sys_fprocess values (634, 'Weir present in more than one enabled scenario','ud');
 insert into sys_fprocess values (635, 'Junction present in more than one enabled scenario','ud');
+
+UPDATE sys_fprocess SET except_table='anl_arc' WHERE fid=103;
+UPDATE sys_fprocess SET except_table='anl_node' WHERE fid=106;
+UPDATE sys_fprocess SET except_table='anl_node' WHERE fid=107;
+UPDATE sys_fprocess SET except_table='anl_node' WHERE fid=111;
+UPDATE sys_fprocess SET except_table='anl_node' WHERE fid=113;
+UPDATE sys_fprocess SET fprocess_name='Inlet with null mandatory values', except_table='anl_node' WHERE fid=153;
+UPDATE sys_fprocess SET fprocess_name='Node without elevation', except_table='anl_node' WHERE fid=164;
+UPDATE sys_fprocess SET fprocess_name='Node with elevation=0', except_table='anl_node' WHERE fid=165;
+UPDATE sys_fprocess SET except_table='anl_node' WHERE fid=166;
+UPDATE sys_fprocess SET except_table='anl_node' WHERE fid=167;
+UPDATE sys_fprocess SET fprocess_name='Pipe with status CV', except_table='anl_arc' WHERE fid=169;
+UPDATE sys_fprocess SET fprocess_name='Valve with wrong to_arc', except_table='anl_node' WHERE fid=170;
+UPDATE sys_fprocess SET fprocess_name='Pump with wrong to_arc', except_table='anl_node' WHERE fid=171;
+UPDATE sys_fprocess SET fprocess_name='Valve with null values closed/broken', except_table='anl_node' WHERE fid=176;
