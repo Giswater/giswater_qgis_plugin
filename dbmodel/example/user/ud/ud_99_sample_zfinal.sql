@@ -58,15 +58,7 @@ DELETE FROM arc WHERE node_1 = '250';
 DELETE FROM arc WHERE node_2 = '250';
 DELETE FROM node WHERE node_id  = '250';
 
-INSERT INTO arc VALUES ('100014','300','237','239',3.150,2.700,null,null,null,null,null,null,15.200,17.050,'CONDUIT','RC200','Virtual','CONDUIT',1,1,2,null,null,
-null,-0.0446,FALSE,null,1,'soil1','St. Function','St. Category','St. Fluid','St. Location','work2',null,'builder1','1993-05-23',null,'owner1',1,'08830','1-10000C',null,null,null,null,null,null
-,'https://www.giswater.org','0','0102000020E76400000300000040CF5EE0369C1941973AF7283375514195560A733A9C19410D57FE0533755141DE1F148CC49C19412135B3BE2D755141',
-null,null,null,null,null,TRUE,null,1,null,'ARC','2021-09-05 15:42:47.93697',null,null,'postgres',1,null,null,'Asphalt',1,'CHAMBER',19.750,16.750,'RECT_MANHOLE',18.350,15.200);
-INSERT INTO man_conduit VALUES ('100014');
-INSERT INTO inp_conduit VALUES ('100014');
-
-
-INSERT INTO inp_flwreg_weir VALUES(1,'237', '100014',1,0.5,'TRANSVERSE', 16.35,1.5,null,null, 'NO', 2,1,0,0,null,null,null,null,'237WE1');
+INSERT INTO inp_flwreg_weir VALUES (1,'237', '100014', 1, 0.5, 'TRANSVERSE', 16.3500, 1.5000, NULL, NULL, 'NO', 2.0000, 1.0000, 0.0000, 0.0000, NULL, NULL, NULL, NULL,'237WE1');
 
 
 UPDATE config_param_user SET value ='PARTIAL' WHERE parameter = 'inp_options_inertial_damping';
