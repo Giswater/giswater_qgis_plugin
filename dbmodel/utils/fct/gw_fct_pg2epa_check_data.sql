@@ -11,7 +11,7 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_check_data(p_data json)
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_pg2epa_check_data($${"data":{"parameters":{"ignoreVerifiedExceptions":true}}}$$);
+SELECT SCHEMA_NAME.gw_fct_pg2epa_check_data($${"data":{"parameters":{"verifiedExceptions":true}}}$$);
 -- v_fid: 604 check from checkproject
 
 -- v_fid: 227 check from pg2epa
@@ -39,14 +39,13 @@ BEGIN
 	v_isembebed :=  ((p_data ->> 'data')::json->>'parameters')::json->> 'isEmbebed';
 	v_verified_exceptions :=  ((p_data ->> 'data')::json->>'parameters')::json->> 'verifiedExceptions';
 
-	IF v_isembebed is null then v_isembebed = false; end if;
 	IF v_fid is null then v_fid = 225; end if;
 	
-	IF v_isembebed IS false then -- create temporal tables if function is not embebed
+	IF v_isembebed IS false or v_isembebed is null then -- create temporal tables if function is not embebed
 		-- create log tables		
 		EXECUTE 'SELECT gw_fct_create_logtables($${"data":{"parameters":{"fid":'||v_fid||'}}}$$::json)';
 		-- create query tables
-		EXECUTE 'SELECT gw_fct_create_querytables($${"data":{"parameters":{"fid":'||v_fid||', "epaCheck":true, "ignoreVerifiedExceptions":'||v_verified_exceptions||'}}}$$::json)';
+		EXECUTE 'SELECT gw_fct_create_querytables($${"data":{"parameters":{"fid":'||v_fid||', "epaCheck":true, "verifiedExceptions":'||v_verified_exceptions||'}}}$$::json)';
 	END IF;
 
 	-- getting sys_fprocess to be executed
@@ -59,6 +58,34 @@ BEGIN
 		EXECUTE 'select gw_fct_check_fprocess($${"client":{"device":4, "infoType":1, "lang":"ES"}, 
 	    "form":{},"feature":{},"data":{"parameters":{"functionFid":'||v_fid||', "checkFid":"'||v_rec.fid||'"}}}$$)';
 	end loop;
+	
+	
+	-- built return
+	IF v_fid = 225 THEN
+
+		-- materialize tables
+		PERFORM gw_fct_create_logreturn($${"data":{"parameters":{"type":"fillExcepTables"}}}$$::json);
+
+		-- create json return to send client
+		EXECUTE 'SELECT gw_fct_create_logreturn($${"data":{"parameters":{"type":"info"}}}$$::json)' INTO v_result_info;
+		EXECUTE 'SELECT gw_fct_create_logreturn($${"data":{"parameters":{"type":"point"}}}$$::json)' INTO v_result_point;
+		EXECUTE 'SELECT gw_fct_create_logreturn($${"data":{"parameters":{"type":"line"}}}$$::json)' INTO v_result_line;
+		EXECUTE 'SELECT gw_fct_create_logreturn($${"data":{"parameters":{"type":"polygon"}}}$$::json)' INTO v_result_polygon;
+
+		-- Return
+		RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'"'||
+	             ',"body":{"form":{}'||
+			     ',"data":{ "info":'||v_result_info||','||
+					'"point":'||v_result_point||','||
+					'"line":'||v_result_line||','||
+					'"polygon":'||v_result_polygon||
+			       '}'||
+		    '}}')::json, 2430, null, null, null);
+	ELSE
+		--  Return
+		RETURN '{"status":"ok"}';
+
+	END IF;
 
 	--  Return
 	EXECUTE 'SELECT gw_fct_create_return($${"data":{"parameters":{"functionId":3364, "isEmbebed":'||v_isembebed||'}}}$$::json)' INTO v_return;

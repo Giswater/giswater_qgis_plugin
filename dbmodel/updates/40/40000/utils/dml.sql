@@ -898,3 +898,4 @@ UPDATE config_param_system SET value = '
 {"omCheck":true, "graphCheck":false, "epaCheck":false, "planCheck":false, "adminCheck":false, "verifiedExceptions":false}'
 WHERE parameter = 'admin_checkproject';
 
+UPDATE sys_function SET project_type = 'utils' WHERE id = 2430;
