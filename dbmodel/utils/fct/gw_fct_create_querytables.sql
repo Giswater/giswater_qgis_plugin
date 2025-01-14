@@ -6,6 +6,19 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 3368
 
+/*
+
+-- Source execution
+SELECT SCHEMA_NAME.gw_fct_setcheckdatabase($${"data":{"parameters":{"omCheck":true, "graphCheck":false, "epaCheck":false, "planCheck":false, "adminCheck":false, "verifiedExceptions":true}}}$$);
+
+-- Executed by gw_fct_setcheckdatabase
+SELECT SCHEMA_NAME.gw_fct_create_querytables($${"data":{"parameters":{"fid":604, "omCheck":false, "graphCheck":true, "epaCheck":false, "planCheck":false, "adminCheck":false, "verifiedExceptions":true}}}$$);
+
+-- Executed via Go2EPA
+SELECT SCHEMA_NAME.gw_fct_create_querytables($${"data":{"parameters":{"fid":604, "omCheck":false, "graphCheck":false, "epaCheck":true, "planCheck":false, "adminCheck":false, "verifiedExceptions":false}}}$$);
+
+*/
+
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_create_querytables (p_data json)
   RETURNS json AS
 $BODY$
@@ -56,7 +69,7 @@ BEGIN
 	DROP TABLE IF EXISTS t_node;EXECUTE 'CREATE TEMP TABLE  t_node AS SELECT * FROM v_edit_node'||v_filter;
 	DROP TABLE IF EXISTS t_connec;EXECUTE 'CREATE TEMP TABLE t_connec AS SELECT * FROM v_edit_connec'||v_filter;
 	DROP TABLE IF EXISTS t_element;	EXECUTE 'CREATE TEMP TABLE t_element AS SELECT * FROM v_edit_element'||v_filter;
-	DROP TABLE IF EXISTS t_link;EXECUTE 'CREATE TEMP TABLE t_link AS SELECT * FROM v_edit_link'||v_filter;
+	DROP TABLE IF EXISTS t_link;EXECUTE 'CREATE TEMP TABLE t_link AS SELECT * FROM v_edit_link';
 	DROP TABLE IF EXISTS t_dma;	CREATE TEMP TABLE t_dma AS SELECT * FROM v_edit_dma;
 	IF v_project_type  = 'UD' THEN
 		DROP TABLE IF EXISTS t_gully;EXECUTE 'CREATE TEMP TABLE t_gully AS SELECT * FROM v_edit_gully'||v_filter;
