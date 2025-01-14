@@ -9,53 +9,77 @@ This version of Giswater is provided by Giswater Association
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_drainzone()  RETURNS trigger AS
 $BODY$
 
-DECLARE 
-
+DECLARE
+view_name TEXT;
 
 BEGIN
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
-	
+
+	-- Arg will be or 'edit' or 'ui'
+	view_name = TG_ARGV[0];
+
 	IF TG_OP = 'INSERT' THEN
-		
-		-- expl_id		
+
+		-- expl_id
 		IF ((SELECT COUNT(*) FROM exploitation WHERE active IS TRUE) = 0) THEN
-			RETURN NULL;				
+			RETURN NULL;
 		END IF;
-		IF NEW.the_geom IS NOT NULL THEN
-			IF NEW.expl_id IS NULL THEN
-				NEW.expl_id := (SELECT expl_id FROM exploitation WHERE active IS TRUE AND ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
+
+		IF view_name = 'edit'THEN
+			IF NEW.the_geom IS NOT NULL THEN
+				IF NEW.expl_id IS NULL THEN
+					NEW.expl_id := (SELECT expl_id FROM exploitation WHERE active IS TRUE AND ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
+				END IF;
 			END IF;
 		END IF;
 
 		-- active
-		IF NEW.active IS NULL THEN
-			NEW.active = TRUE;
+		IF view_name = 'ui'THEN
+			IF NEW.active IS NULL THEN
+				NEW.active = TRUE;
+			END IF;
 		END IF;
-	
-		INSERT INTO drainzone (drainzone_id, "name", expl_id, descript, undelete, the_geom, link, graphconfig, stylesheet, active, drainzone_type)
-		VALUES (NEW.drainzone_id, NEW.name, NEW.expl_id, NEW.descript, NEW.undelete, NEW.the_geom, 
-		NEW.link, NEW.graphconfig::json, NEW.stylesheet::json, NEW.active, NEW.drainzone_type);
+
+		INSERT INTO drainzone (drainzone_id, "name", expl_id, descript, undelete, link, graphconfig, stylesheet, drainzone_type)
+		VALUES (NEW.drainzone_id, NEW.name, NEW.expl_id, NEW.descript, NEW.undelete,
+		NEW.link, NEW.graphconfig::json, NEW.stylesheet::json, NEW.drainzone_type);
+
+		IF view_name = 'ui' THEN
+			UPDATE drainzone SET active = NEW.active WHERE drainzone_id = NEW.drainzone_id;
+
+		ELSIF view_name = 'edit' THEN
+			UPDATE drainzone SET the_geom = NEW.the_geom WHERE drainzone_id = NEW.drainzone_id;
+
+		END IF;
 
 		RETURN NEW;
-		
+
 	ELSIF TG_OP = 'UPDATE' THEN
-   	
-		UPDATE drainzone 
-		SET drainzone_id=NEW.drainzone_id, name=NEW.name, expl_id=NEW.expl_id, descript=NEW.descript, undelete=NEW.undelete, the_geom=NEW.the_geom, 
-		link=NEW.link, graphconfig=NEW.graphconfig::json, stylesheet=NEW.stylesheet::json,
-		active=NEW.active, lastupdate=now(), lastupdate_user = current_user, drainzone_type=NEW.drainzone_type
+
+		UPDATE drainzone
+		SET drainzone_id=NEW.drainzone_id, name=NEW.name, expl_id=NEW.expl_id, descript=NEW.descript, undelete=NEW.undelete,
+		link=NEW.link, graphconfig=NEW.graphconfig::json, stylesheet=NEW.stylesheet::json, lastupdate=now(),
+		lastupdate_user = current_user, drainzone_type=NEW.drainzone_type
 		WHERE drainzone_id=OLD.drainzone_id;
-		
+
+		IF view_name = 'ui' THEN
+			UPDATE drainzone SET active = NEW.active WHERE drainzone_id = OLD.drainzone_id;
+
+		ELSIF view_name = 'edit' THEN
+			UPDATE drainzone SET the_geom = NEW.the_geom WHERE drainzone_id = OLD.drainzone_id;
+
+		END IF;
+
 		RETURN NEW;
-		
-	ELSIF TG_OP = 'DELETE' THEN  
-	 
-		DELETE FROM drainzone WHERE drainzone_id = OLD.drainzone_id;		
+
+	ELSIF TG_OP = 'DELETE' THEN
+
+		DELETE FROM drainzone WHERE drainzone_id = OLD.drainzone_id;
 		RETURN NULL;
 	END IF;
 END;
-	
+
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;

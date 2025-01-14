@@ -14,7 +14,10 @@ on v_edit_link_connec for each row execute function gw_trg_edit_link();
 	
 create trigger gw_trg_edit_link instead of insert or delete or update
 on v_edit_link_gully for each row execute function gw_trg_edit_link();
-	
 
+-- 14/01/2025
+CREATE TRIGGER gw_trg_v_ui_drainzone INSTEAD OF INSERT OR DELETE OR UPDATE
+ON v_ui_drainzone FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_drainzone('ui');
 
-
+CREATE TRIGGER gw_trg_edit_drainzone INSTEAD OF INSERT OR DELETE OR UPDATE
+ON v_edit_drainzone FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_drainzone('edit');

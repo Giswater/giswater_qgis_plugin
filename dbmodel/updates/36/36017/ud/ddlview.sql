@@ -991,3 +991,44 @@ create or replace view v_edit_link_connec as select * from v_edit_link where fea
 
 drop view v_edit_link_gully;
 create or replace view v_edit_link_gully as select * from v_edit_link where feature_type = 'GULLY';
+
+-- 14/01/2025
+DROP VIEW IF EXISTS v_ui_drainzone;
+CREATE OR REPLACE VIEW v_ui_drainzone
+AS SELECT d.drainzone_id,
+    d.name,
+    d.drainzone_type,
+    d.descript,
+    d.active,
+    d.undelete,
+    d.expl_id,
+    d.link,
+    d.graphconfig,
+    d.stylesheet,
+    d.tstamp,
+    d.insert_user,
+    d.lastupdate,
+    d.lastupdate_user
+   FROM drainzone d
+  WHERE d.drainzone_id > 0
+  ORDER BY d.drainzone_id;
+
+DROP VIEW IF EXISTS v_edit_drainzone;
+CREATE OR REPLACE VIEW v_edit_drainzone
+AS SELECT d.drainzone_id,
+    d.name,
+    d.drainzone_type,
+    d.descript,
+    d.undelete,
+    d.expl_id,
+    d.link,
+    d.graphconfig,
+    d.stylesheet,
+    d.tstamp,
+    d.insert_user,
+    d.lastupdate,
+    d.lastupdate_user,
+    d.the_geom
+   FROM selector_expl,
+    drainzone d
+  WHERE d.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
