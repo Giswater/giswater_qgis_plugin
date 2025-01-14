@@ -1006,7 +1006,8 @@ AS SELECT p.presszone_id,
     p.tstamp,
     p.insert_user,
     p.lastupdate,
-    p.lastupdate_user
+    p.lastupdate_user,
+    p.avg_press
    FROM selector_expl s,
     presszone p
   WHERE (p.presszone_id::text <> ALL (ARRAY['0'::character varying::text, '-1'::character varying::text])) AND s.expl_id = p.expl_id AND s.cur_user = CURRENT_USER
@@ -1028,6 +1029,7 @@ AS SELECT p.presszone_id,
     p.insert_user,
     p.lastupdate,
     p.lastupdate_user,
+    p.avg_press,
     p.the_geom
    FROM
     selector_expl,

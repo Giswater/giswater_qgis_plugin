@@ -23,7 +23,7 @@ SELECT is (
 
 SELECT is (
     (gw_fct_upsertfields($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{"id":"1",
-    "tableName":"v_edit_drainzone"}, "data":{"filterFields":{}, "pageInfo":{}, "fields":{"drainzone_id": "1", "active": "false",
+    "tableName":"v_edit_drainzone"}, "data":{"filterFields":{}, "pageInfo":{}, "fields":{"drainzone_id": "1",
     "expl_id": "0", "name": "2"}, "force_action":"UPDATE"}}$$)::JSON)->>'status',
     'Accepted',
     'Check if gw_fct_upsertfields --> "tableName":"v_edit_drainzone" returns status "Accepted"'
