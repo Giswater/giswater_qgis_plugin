@@ -317,7 +317,7 @@ AS WITH
         JOIN selector_state s ON s.cur_user = CURRENT_USER AND arc.state = s.state_id
         left JOIN (SELECT arc_id FROM arc_psector WHERE p_state = 0) a using (arc_id)  where a.arc_id is null
         union all
-        SELECT arc_id FROM arc_psector WHERE p_state = 0
+        SELECT arc_id FROM arc_psector WHERE p_state = 1
          ),
     arc_selected AS
 		(
