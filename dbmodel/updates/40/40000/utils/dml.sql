@@ -895,6 +895,6 @@ DELETE FROM sys_param_user where id='utils_checkproject_qgislayer';
 DELETE FROM sys_param_user where id='qgis_form_initproject_hidden';
 
 UPDATE config_param_system SET value = '
-{"omCheck":true, "graphCheck":false, "epaCheck":false, "planCheck":false, "adminCheck":false, "ignoreVerifiedExceptions":false}'
+{"omCheck":true, "graphCheck":false, "epaCheck":false, "planCheck":false, "adminCheck":false, "verifiedExceptions":false}'
 WHERE parameter = 'admin_checkproject';
 
