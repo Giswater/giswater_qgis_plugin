@@ -42,8 +42,8 @@ DELETE FROM config_form_fields
 	WHERE formname='upsert_catalog_gully' AND formtype='form_catalog' AND columnname='geom1' AND tabname='tab_none';
 DELETE FROM config_form_fields
 	WHERE formname='upsert_catalog_gully' AND formtype='form_catalog' AND columnname='shape' AND tabname='tab_none';
-	
-	
+
+
 ALTER TABLE config_form_fields DISABLE TRIGGER gw_trg_config_control;
 UPDATE config_form_fields set dv_querytext = replace(dv_querytext, 'cat_grate', 'cat_gully');
 UPDATE config_form_fields set dv_querytext_filterc = replace(dv_querytext_filterc, 'cat_grate', 'cat_gully');
@@ -1456,20 +1456,20 @@ INSERT INTO config_param_system ("parameter", value, descript, "label", dv_query
 INSERT INTO config_param_system ("parameter", value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, placeholder, standardvalue, layoutname) VALUES('dscenario_tab_lids', '{"layouts":["lyt_lids_1"]}', NULL, NULL, NULL, NULL, false, NULL, 'utils', NULL, NULL, 'string', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO config_param_system ("parameter", value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, placeholder, standardvalue, layoutname) VALUES('dscenario_tab_outlet', '{"layouts":["lyt_outlet_1"]}', NULL, NULL, NULL, NULL, false, NULL, 'utils', NULL, NULL, 'string', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
-INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'dscenario', 'tab_controls', 'table_view_controls', 'lyt_controls_1', 0, NULL, 'tablewidget', '', 'Table', NULL, false, false, true, false, true, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, 'dscenario_controls', false, 0);
-INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'dscenario', 'tab_conduit', 'table_view_conduit', 'lyt_conduit_1', 0, NULL, 'tablewidget', '', 'Table', NULL, false, false, true, false, true, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, 'dscenario_conduit', false, 0);
-INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'dscenario', 'tab_raingage', 'table_view_raingage', 'lyt_raingage_1', 0, NULL, 'tablewidget', '', 'Table', NULL, false, false, true, false, true, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, 'dscenario_raingage', false, 0);
-INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'dscenario', 'tab_weir', 'table_view_weir', 'lyt_weir_1', 0, NULL, 'tablewidget', '', 'Table', NULL, false, false, true, false, true, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, 'dscenario_weir', false, 0);
-INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'dscenario', 'tab_outfall', 'table_view_outfall', 'lyt_outfall_1', 0, NULL, 'tablewidget', '', 'Table', NULL, false, false, true, false, true, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, 'dscenario_outfall', false, 0);
-INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'dscenario', 'tab_storage', 'table_view_storage', 'lyt_storage_1', 0, NULL, 'tablewidget', '', 'Table', NULL, false, false, true, false, true, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, 'dscenario_storage', false, 0);
-INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'dscenario', 'tab_inflows', 'table_view_inflows', 'lyt_inflows_1', 0, NULL, 'tablewidget', '', 'Table', NULL, false, false, true, false, true, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, 'dscenario_inflows', false, 0);
-INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'dscenario', 'tab_treatment', 'table_view_treatment', 'lyt_treatment_1', 0, NULL, 'tablewidget', '', 'Table', NULL, false, false, true, false, true, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, 'dscenario_treatment', false, 0);
-INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'dscenario', 'tab_orifice', 'table_view_orifice', 'lyt_orifice_1', 0, NULL, 'tablewidget', '', 'Table', NULL, false, false, true, false, true, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, 'dscenario_orifice', false, 0);
-INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'dscenario', 'tab_lids', 'table_view_lids', 'lyt_lids_1', 0, NULL, 'tablewidget', '', 'Table', NULL, false, false, true, false, true, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, 'dscenario_lids', false, 0);
-INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'dscenario', 'tab_outlet', 'table_view_outlet', 'lyt_outlet_1', 0, NULL, 'tablewidget', '', 'Table', NULL, false, false, true, false, true, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, 'dscenario_outlet', false, 0);
-INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'dscenario', 'tab_poll', 'table_view_poll', 'lyt_poll_1', 0, NULL, 'tablewidget', '', 'Table', NULL, false, false, true, false, true, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, 'dscenario_poll', false, 0);
-INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'dscenario', 'tab_pump', 'table_view_pump', 'lyt_pump_1', 0, NULL, 'tablewidget', '', 'Table', NULL, false, false, true, false, true, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, 'dscenario_pump', false, 0);
-INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'dscenario', 'tab_junction', 'table_view_junction', 'lyt_junction_1', 0, NULL, 'tablewidget', '', 'Table', NULL, false, false, true, false, true, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, 'dscenario_junction', false, 0);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'dscenario', 'tab_controls', 'tbl_controls', 'lyt_controls_1', 0, NULL, 'tablewidget', '', 'Table', NULL, false, false, true, false, true, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, 'dscenario_controls', false, 0);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'dscenario', 'tab_conduit', 'tbl_conduit', 'lyt_conduit_1', 0, NULL, 'tablewidget', '', 'Table', NULL, false, false, true, false, true, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, 'dscenario_conduit', false, 0);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'dscenario', 'tab_raingage', 'tbl_raingage', 'lyt_raingage_1', 0, NULL, 'tablewidget', '', 'Table', NULL, false, false, true, false, true, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, 'dscenario_raingage', false, 0);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'dscenario', 'tab_weir', 'tbl_weir', 'lyt_weir_1', 0, NULL, 'tablewidget', '', 'Table', NULL, false, false, true, false, true, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, 'dscenario_weir', false, 0);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'dscenario', 'tab_outfall', 'tbl_outfall', 'lyt_outfall_1', 0, NULL, 'tablewidget', '', 'Table', NULL, false, false, true, false, true, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, 'dscenario_outfall', false, 0);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'dscenario', 'tab_storage', 'tbl_storage', 'lyt_storage_1', 0, NULL, 'tablewidget', '', 'Table', NULL, false, false, true, false, true, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, 'dscenario_storage', false, 0);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'dscenario', 'tab_inflows', 'tbl_inflows', 'lyt_inflows_1', 0, NULL, 'tablewidget', '', 'Table', NULL, false, false, true, false, true, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, 'dscenario_inflows', false, 0);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'dscenario', 'tab_treatment', 'tbl_treatment', 'lyt_treatment_1', 0, NULL, 'tablewidget', '', 'Table', NULL, false, false, true, false, true, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, 'dscenario_treatment', false, 0);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'dscenario', 'tab_orifice', 'tbl_orifice', 'lyt_orifice_1', 0, NULL, 'tablewidget', '', 'Table', NULL, false, false, true, false, true, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, 'dscenario_orifice', false, 0);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'dscenario', 'tab_lids', 'tbl_lids', 'lyt_lids_1', 0, NULL, 'tablewidget', '', 'Table', NULL, false, false, true, false, true, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, 'dscenario_lids', false, 0);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'dscenario', 'tab_outlet', 'tbl_outlet', 'lyt_outlet_1', 0, NULL, 'tablewidget', '', 'Table', NULL, false, false, true, false, true, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, 'dscenario_outlet', false, 0);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'dscenario', 'tab_poll', 'tbl_poll', 'lyt_poll_1', 0, NULL, 'tablewidget', '', 'Table', NULL, false, false, true, false, true, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, 'dscenario_poll', false, 0);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'dscenario', 'tab_pump', 'tbl_pump', 'lyt_pump_1', 0, NULL, 'tablewidget', '', 'Table', NULL, false, false, true, false, true, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, 'dscenario_pump', false, 0);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'dscenario', 'tab_junction', 'tbl_junction', 'lyt_junction_1', 0, NULL, 'tablewidget', '', 'Table', NULL, false, false, true, false, true, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, 'dscenario_junction', false, 0);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'dscenario', 'tab_none', 'tab_main', 'lyt_dscenario_1', 1, NULL, 'tabwidget', NULL, NULL, NULL, false, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{
   "tabs": [
     "tab_pump",
@@ -2408,26 +2408,26 @@ DELETE FROM config_toolbox
 DELETE FROM sys_function
 	WHERE id=2524; --gw_fct_import_swmm_inp
 
-update config_form_fields set dv_querytext_filterc = null 
+update config_form_fields set dv_querytext_filterc = null
 where formname in ('v_edit_inp_flwreg_pump','v_edit_inp_flwreg_orifice','v_edit_inp_flwreg_weir','v_edit_inp_flwreg_outlet');
 
 --10/01/2025
 -- Adding flowregulator objects on cat_feature
 DROP TRIGGER gw_trg_cat_feature_after ON cat_feature;
-INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) 
+INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active)
 VALUES ('FRORIFICE', 'ORIFICE','FLWREG', 'v_edit_flwreg', 'v_edit_flwreg_frorifice', true);
-INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) 
+INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active)
 VALUES ('FRWEIR', 'WEIR','FLWREG', 'v_edit_flwreg', 'v_edit_flwreg_frweir', true);
-INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) 
+INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active)
 VALUES ('FRPUMP', 'PUMP','FLWREG', 'v_edit_flwreg', 'v_edit_flwreg_frpump', true);
-INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) 
+INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active)
 VALUES ('FROUTLET', 'OUTLET','FLWREG', 'v_edit_flwreg', 'v_edit_flwreg_froutlet', true);
-CREATE TRIGGER gw_trg_cat_feature_after AFTER INSERT OR DELETE OR UPDATE ON 
+CREATE TRIGGER gw_trg_cat_feature_after AFTER INSERT OR DELETE OR UPDATE ON
 cat_feature FOR EACH ROW EXECUTE FUNCTION gw_trg_cat_feature();
 
--- Adding objects on config_info_layer and config_info_layer_x_type (this both tables controls the button info) 
+-- Adding objects on config_info_layer and config_info_layer_x_type (this both tables controls the button info)
 
-INSERT INTO config_info_layer VALUES ('v_edit_flwreg', TRUE, 'vp_basic_flwreg', TRUE, 'info_generic', 'Flow regulator', 4); 
+INSERT INTO config_info_layer VALUES ('v_edit_flwreg', TRUE, 'vp_basic_flwreg', TRUE, 'info_generic', 'Flow regulator', 4);
 INSERT INTO config_info_layer_x_type VALUES ('v_edit_flwreg_frorifice',1, 'v_edit_flwreg_frorifice');
 INSERT INTO config_info_layer_x_type VALUES ('v_edit_flwreg_frweir',1, 'v_edit_flwreg_frweir');
 INSERT INTO config_info_layer_x_type VALUES ('v_edit_flwreg_froutlet',1, 'v_edit_flwreg_froutlet');
@@ -2436,84 +2436,84 @@ INSERT INTO config_info_layer_x_type VALUES ('v_edit_flwreg_frpump',1, 'v_edit_f
 -- Insert on config_form_fields for parent view
 -- copying columns from some random child (all childs has same columns that parent)
 INSERT INTO config_form_fields
-SELECT 'v_edit_flwreg', formtype, tabname, columnname, layoutname, layoutorder , "datatype", widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, 
+SELECT 'v_edit_flwreg', formtype, tabname, columnname, layoutname, layoutorder , "datatype", widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter,
 dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols , widgetfunction, linkedobject, hidden, web_layoutorder
 FROM config_form_fields WHERE formname = 'v_edit_inp_flwreg_pump' AND columnname IN ('nodarc_id','order_id','to_arc','flwreg_length');
 
 -- Insert on config_form_fields for child views
 INSERT INTO config_form_fields
-SELECT 'v_edit_flwreg_frorifice', formtype, tabname, columnname, layoutname, layoutorder , "datatype", widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, 
+SELECT 'v_edit_flwreg_frorifice', formtype, tabname, columnname, layoutname, layoutorder , "datatype", widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter,
 dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols , widgetfunction, linkedobject, hidden, web_layoutorder
 FROM config_form_fields WHERE formname = 'v_edit_inp_flwreg_orifice' AND columnname != 'close_time';
 
 INSERT INTO config_form_fields
-SELECT 'v_edit_flwreg_frweir', formtype, tabname, columnname, layoutname, layoutorder , "datatype", widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, 
+SELECT 'v_edit_flwreg_frweir', formtype, tabname, columnname, layoutname, layoutorder , "datatype", widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter,
 dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols , widgetfunction, linkedobject, hidden, web_layoutorder
 FROM config_form_fields WHERE formname = 'v_edit_inp_flwreg_weir';
 
 INSERT INTO config_form_fields
-SELECT 'v_edit_flwreg_froutlet', formtype, tabname, columnname, layoutname, layoutorder , "datatype", widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, 
+SELECT 'v_edit_flwreg_froutlet', formtype, tabname, columnname, layoutname, layoutorder , "datatype", widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter,
 dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols , widgetfunction, linkedobject, hidden, web_layoutorder
 FROM config_form_fields WHERE formname = 'v_edit_inp_flwreg_outlet';
 
 INSERT INTO config_form_fields
-SELECT 'v_edit_flwreg_frpump', formtype, tabname, columnname, layoutname, layoutorder , "datatype", widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, 
+SELECT 'v_edit_flwreg_frpump', formtype, tabname, columnname, layoutname, layoutorder , "datatype", widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter,
 dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols , widgetfunction, linkedobject, hidden, web_layoutorder
 FROM config_form_fields WHERE formname = 'v_edit_inp_flwreg_pump';
 
 --Adding flwregtype on forms for flowregulators
-INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, 
-iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) 
-VALUES('v_edit_flwreg_frorifice', 'form_feature', 'tab_none', 'flwreg_type', NULL, 16, 'string', 'text', 'flwreg_type', 'flwreg_type', NULL, false, false, false, false, NULL, 
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent,
+iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('v_edit_flwreg_frorifice', 'form_feature', 'tab_none', 'flwreg_type', NULL, 16, 'string', 'text', 'flwreg_type', 'flwreg_type', NULL, false, false, false, false, NULL,
 NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, NULL);
 
-INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname,layoutorder,   "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, 
-iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) 
-VALUES('v_edit_flwreg_frweir', 'form_feature', 'tab_none', 'flwreg_type', NULL,20, 'string', 'text', 'flwreg_type', 'flwreg_type', NULL, false, false, false, false, NULL, 
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname,layoutorder,   "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent,
+iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('v_edit_flwreg_frweir', 'form_feature', 'tab_none', 'flwreg_type', NULL,20, 'string', 'text', 'flwreg_type', 'flwreg_type', NULL, false, false, false, false, NULL,
 NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, NULL);
 
-INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname,layoutorder,   "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, 
-iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) 
-VALUES('v_edit_flwreg_froutlet', 'form_feature', 'tab_none', 'flwreg_type', NULL,12, 'string', 'text', 'flwreg_type', 'flwreg_type', NULL, false, false, false, false, NULL, 
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname,layoutorder,   "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent,
+iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('v_edit_flwreg_froutlet', 'form_feature', 'tab_none', 'flwreg_type', NULL,12, 'string', 'text', 'flwreg_type', 'flwreg_type', NULL, false, false, false, false, NULL,
 NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, NULL);
 
-INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname,layoutorder,   "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, 
-iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) 
-VALUES('v_edit_flwreg_frpump', 'form_feature', 'tab_none', 'flwreg_type', NULL,10, 'string', 'text', 'flwreg_type', 'flwreg_type', NULL, false, false, false, false, NULL, 
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname,layoutorder,   "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent,
+iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('v_edit_flwreg_frpump', 'form_feature', 'tab_none', 'flwreg_type', NULL,10, 'string', 'text', 'flwreg_type', 'flwreg_type', NULL, false, false, false, false, NULL,
 NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, NULL);
 
 --Default parameters uneditable for flow regulators
 
-UPDATE config_form_fields  set iseditable = FALSE where columnname IN ('nodarc_id', 'node_id', 'order_id', 'to_arc' ) 
+UPDATE config_form_fields  set iseditable = FALSE where columnname IN ('nodarc_id', 'node_id', 'order_id', 'to_arc' )
 AND formname IN ('v_edit_flwreg_frorifice','v_edit_flwreg_frweir', 'v_edit_flwreg_froutlet' ,'v_edit_flwreg_frpump');
 
 --Trigger function for editing flowregulators.
-INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source") 
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source")
 VALUES(3372, 'gw_trg_edit_flwreg', 'ud', 'function', 'json', 'json', 'Trigger to insert the flowregulators.', 'role_epa', NULL, 'core');
 
---Add flowregulators in inventory 
-INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) 
-VALUES('sys_table_context', '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"FLOW REGULATORS"}', 
+--Add flowregulators in inventory
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam)
+VALUES('sys_table_context', '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"FLOW REGULATORS"}',
 NULL, NULL, '{"orderBy":9}'::json);
 
 --Adding flowregulators ibnto network group
-INSERT INTO sys_table (id, descript, sys_role, criticity, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam) 
+INSERT INTO sys_table (id, descript, sys_role, criticity, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam)
 VALUES('v_edit_flwreg', 'View to edit flowregulators.', 'role_epa', NULL, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"FLOW REGULATORS"}', 1, 'Flow regulator (parent)', NULL, NULL, NULL, 'core', '{
   "pkey": "nodarc_id"
 }'::json);
-INSERT INTO sys_table (id, descript, sys_role, criticity, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam) 
+INSERT INTO sys_table (id, descript, sys_role, criticity, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam)
 VALUES('v_edit_flwreg_frweir', 'View to edit flowregulators for weir.', 'role_epa', NULL, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"FLOW REGULATORS"}', 5, 'Weir', NULL, NULL, NULL, 'core', '{
   "pkey": "nodarc_id"
 }'::json);
-INSERT INTO sys_table (id, descript, sys_role, criticity, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam) 
+INSERT INTO sys_table (id, descript, sys_role, criticity, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam)
 VALUES('v_edit_flwreg_froutlet', 'View to edit flowregulators for outlet.', 'role_epa', NULL, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"FLOW REGULATORS"}', 3, 'Outlet', NULL, NULL, NULL, 'core', '{
   "pkey": "nodarc_id"
 }'::json);
-INSERT INTO sys_table (id, descript, sys_role, criticity, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam) 
+INSERT INTO sys_table (id, descript, sys_role, criticity, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam)
 VALUES('v_edit_flwreg_frpump', 'View to edit flowregulators for pumps.', 'role_epa', NULL, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"FLOW REGULATORS"}', 4, 'Pump', NULL, NULL, NULL, 'core', '{
   "pkey": "nodarc_id"
 }'::json);
-INSERT INTO sys_table (id, descript, sys_role, criticity, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam) 
+INSERT INTO sys_table (id, descript, sys_role, criticity, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam)
 VALUES('v_edit_flwreg_frorifice', 'View to edit flowregulators for orifice.', 'role_epa', NULL, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"FLOW REGULATORS"}', 2, 'Orifice', NULL, NULL, NULL, 'core', '{
   "pkey": "nodarc_id"
 }'::json);
