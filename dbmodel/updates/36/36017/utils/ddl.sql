@@ -31,5 +31,13 @@ cur_user text default current_user);
 ALTER TABLE selector_macrosector ADD CONSTRAINT selector_macrosector_pkey PRIMARY KEY (macrosector_id,cur_user);
 
 
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_psector_arc_traceability", "column":"streetname", "dataType":"varchar(100)"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_psector_arc_traceability", "column":"streetname2", "dataType":"varchar(100)"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_psector_node_traceability", "column":"streetname", "dataType":"varchar(100)"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_psector_node_traceability", "column":"streetname2", "dataType":"varchar(100)"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_psector_connec_traceability", "column":"streetname", "dataType":"varchar(100)"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_psector_connec_traceability", "column":"streetname2", "dataType":"varchar(100)"}}$$);
 
 

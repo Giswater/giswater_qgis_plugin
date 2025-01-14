@@ -12,3 +12,6 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"gully", "co
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"gully", "column":"streetname2", "dataType":"varchar(100)"}}$$);
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sector", "column":"link", "dataType":"text"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_psector_gully_traceability", "column":"streetname", "dataType":"varchar(100)"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_psector_gully_traceability", "column":"streetname2", "dataType":"varchar(100)"}}$$);

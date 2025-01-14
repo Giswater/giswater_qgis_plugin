@@ -110,7 +110,7 @@ BEGIN
 				c.muni_id, postcode, streetaxis_id, postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, c.descript, link, verified, rotation, c.the_geom, undelete,
 				label_x, label_y, label_rotation, publish, inventory, c.expl_id, num_value, c.feature_type, c.tstamp, pjoint_type, pjoint_id, c.lastupdate, c.lastupdate_user, c.insert_user,
 				c.minsector_id, c.dqa_id, c.staticpressure, district_id,adate, adescript, accessibility,workcat_id_plan,asset_id, c.epa_type, om_state, conserv_state, priority, valve_location,
-				valve_type, shutoff_valve, access_type, placement_type, crmzone_id,c.expl_id2,plot_code,brand_id,model_id,serial_number,label_quadrant,macrominsector_id
+				valve_type, shutoff_valve, access_type, placement_type, crmzone_id,c.expl_id2,plot_code,brand_id,model_id,serial_number,label_quadrant,c.macrominsector_id, streetname, streetname2
 				FROM plan_psector_x_connec pc JOIN connec c USING (connec_id)
 				JOIN link l USING (link_id)
 				WHERE psector_id=NEW.psector_id;
@@ -137,7 +137,8 @@ BEGIN
 				postcode,streetaxis_id,postnumber,postcomplement,streetaxis2_id,postnumber2,postcomplement2,a.descript,link,verified,the_geom,undelete,
 				label_x,label_y,label_rotation,publish,inventory,uncertain,expl_id,num_value,feature_type,tstamp,lastupdate,lastupdate_user,a.insert_user,
 				district_id,workcat_id_plan,asset_id,pavcat_id,drainzone_id,nodetype_1,node_sys_top_elev_1,node_sys_elev_1,nodetype_2,node_sys_top_elev_2,
-				node_sys_elev_2,parent_id,expl_id2,adate,adescript,visitability,label_quadrant,minsector_id,macrominsector_id,brand_id,model_id,serial_number
+				node_sys_elev_2,parent_id,expl_id2,adate,adescript,visitability,label_quadrant,minsector_id,macrominsector_id,brand_id,model_id,serial_number,
+				streetname, streetname2
 				FROM plan_psector_x_arc pa JOIN arc a USING (arc_id)
 				WHERE psector_id=NEW.psector_id;
 
@@ -148,7 +149,7 @@ BEGIN
 				muni_id,postcode,streetaxis_id,postnumber,postcomplement,streetaxis2_id,postnumber2,postcomplement2,n.descript,rotation,link,verified,the_geom,undelete,
 				label_x,label_y,label_rotation,publish,inventory,xyz_date,uncertain,unconnected,expl_id,num_value,feature_type,tstamp,arc_id,lastupdate,lastupdate_user,
 				n.insert_user,matcat_id,district_id,workcat_id_plan,asset_id,drainzone_id,parent_id,expl_id2,adate,adescript,placement_type,access_type,
-				label_quadrant,minsector_id,macrominsector_id,brand_id,model_id,serial_number
+				label_quadrant,minsector_id,macrominsector_id,brand_id,model_id,serial_number,streetname,streetname2
 				FROM plan_psector_x_node pn JOIN node n USING (node_id)
 				WHERE psector_id=NEW.psector_id;
 
@@ -327,7 +328,7 @@ BEGIN
 				c.muni_id, postcode, streetaxis_id, postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, c.descript, link, verified, rotation, c.the_geom, undelete,
 				label_x, label_y, label_rotation, publish, inventory, c.expl_id, num_value, c.feature_type, c.tstamp, pjoint_type, pjoint_id, c.lastupdate, c.lastupdate_user, c.insert_user,
 				c.minsector_id, c.dqa_id, c.staticpressure, district_id,adate, adescript, accessibility,workcat_id_plan,asset_id, c.epa_type, om_state, conserv_state, priority, valve_location,
-				valve_type, shutoff_valve, access_type, placement_type, crmzone_id,c.expl_id2, plot_code,brand_id,model_id,serial_number,label_quadrant,macrominsector_id
+				valve_type, shutoff_valve, access_type, placement_type, crmzone_id,c.expl_id2, plot_code,brand_id,model_id,serial_number,label_quadrant,c.macrominsector_id, streetname, streetname2
 				FROM plan_psector_x_connec pc JOIN connec c USING (connec_id)
 				JOIN link l USING (link_id)
 				WHERE psector_id=NEW.psector_id;
@@ -354,8 +355,9 @@ BEGIN
 				postcode,streetaxis_id,postnumber,postcomplement,streetaxis2_id,postnumber2,postcomplement2,a.descript,link,verified,the_geom,undelete,
 				label_x,label_y,label_rotation,publish,inventory,uncertain,expl_id,num_value,feature_type,tstamp,lastupdate,lastupdate_user,a.insert_user,
 				district_id,workcat_id_plan,asset_id,pavcat_id,drainzone_id,nodetype_1,node_sys_top_elev_1,node_sys_elev_1,nodetype_2,node_sys_top_elev_2,
-				node_sys_elev_2,parent_id,expl_id2, adate, adescript,visitability,label_quadrant,minsector_id,macrominsector_id,brand_id,model_id,serial_number
-				FROM plan_psector_x_arc pa JOIN arc a USING (arc_id)
+				node_sys_elev_2,parent_id,expl_id2, adate, adescript,visitability,label_quadrant,minsector_id,macrominsector_id,brand_id,model_id,serial_number,
+				streetname,streetname2
+				FROM plan_psector_x_arc pa JOIN arc a USING (arc_id) 
 				WHERE psector_id=NEW.psector_id;
 
 				INSERT INTO archived_psector_node_traceability
@@ -365,8 +367,8 @@ BEGIN
 				muni_id,postcode,streetaxis_id,postnumber,postcomplement,streetaxis2_id,postnumber2,postcomplement2,n.descript,rotation,link,verified,the_geom,undelete,
 				label_x,label_y,label_rotation,publish,inventory,xyz_date,uncertain,unconnected,expl_id,num_value,feature_type,tstamp,arc_id,lastupdate,lastupdate_user,
 				n.insert_user,matcat_id,district_id,workcat_id_plan,asset_id,drainzone_id,parent_id,expl_id2, adate, adescript,placement_type,access_type,
-				label_quadrant,minsector_id,macrominsector_id,brand_id,model_id,serial_number
-				FROM plan_psector_x_node pn JOIN node n USING (node_id)
+				label_quadrant,minsector_id,macrominsector_id,brand_id,model_id,serial_number,streetname,streetname2
+				FROM plan_psector_x_node pn JOIN node n USING (node_id) 
 				WHERE psector_id=NEW.psector_id;
 
 				INSERT INTO archived_psector_connec_traceability
