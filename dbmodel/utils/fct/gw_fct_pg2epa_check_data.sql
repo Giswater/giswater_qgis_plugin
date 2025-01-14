@@ -25,6 +25,10 @@ v_verified_exceptions boolean = true;
 v_fid integer = 225;
 v_isembebed boolean;
 v_return json;
+v_result_info json;
+v_result_point json;
+v_result_line json;
+v_result_polygon json;
 
 BEGIN
 
