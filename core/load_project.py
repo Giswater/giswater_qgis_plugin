@@ -192,7 +192,7 @@ class GwLoadProject(QObject):
         self._config_layers()
 
         # Build and Apply filters
-        # tools_gw.reload_layers_filters()
+        tools_gw.reload_layers_filters()
 
     # region private functions
 

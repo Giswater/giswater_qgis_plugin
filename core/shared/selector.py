@@ -305,49 +305,37 @@ class GwSelector:
         return filter_layers
         #return self.arc_layers, self.node_layers, self.connec_layers, self.gully_layers, self.link_layers
                 
-    def _apply_filter(self, muni_filter: str, expl_filter: str, sector_filter: str) -> None:
+    def _apply_filter(self, muni_filter: str, sector_filter: str) -> None:
         """
         Apply a subset filter to layers based on the project type.
 
         :param subset_filter: SQL-like filter string to apply to the layers.
         """
-    
+
+        # Iterate over all layers in the current QGIS project
         for layer in QgsProject.instance().mapLayers().values():
             # Get the field names once to avoid multiple iterations
             field_names = {field.name() for field in layer.fields()}
             
-            if not any([muni_filter, expl_filter, sector_filter]) and any(field in field_names for field in ['muni_id', 'expl_id', 'sector_id']):
-                layer.setSubsetString("FALSE")
+            # If neither filter is set and the layer contains 'muni_id' or 'sector_id' fields, remove any existing subset string
+            if not any([muni_filter, sector_filter]) and any(field in field_names for field in ['muni_id', 'sector_id']):
+                layer.setSubsetString(None)
                 continue
 
-            # Initialize the filter list
+            # Initialize the list to hold the subset filters
             subset_filter = []
 
-            # Add municipality filter if the field exists
-            if "muni_id" in field_names:
-                if muni_filter:
-                    subset_filter.append(muni_filter)
-                else:
-                    subset_filter.append("ARRAY[muni_id] && ARRAY[0]")
-            
-            # Add exploitation filter
-            if "expl_id" in field_names:
-                if expl_filter:
-                    expl_filter_aux = expl_filter
-                    if "expl_id2" in field_names:
-                        expl_filter_aux = f"({expl_filter} OR {expl_filter.replace('expl_id', 'expl_id2')})"
-                    subset_filter.append(expl_filter_aux)
-                else:
-                    subset_filter.append("ARRAY[expl_id] && ARRAY[0]")
-            # Add sector filter if the field exists
-            if "sector_id" in field_names:
-                if sector_filter:
-                    subset_filter.append(sector_filter)
-                else:
-                    subset_filter.append("ARRAY[expl_id] && ARRAY[0]")
-            # Join the filters with "AND" or use "FALSE" if no filters are found
-            filter = " AND ".join(subset_filter) if subset_filter else ""
-            layer.setSubsetString(filter)
+            # Add 'muni_filter' to the subset filter if the 'muni_id' field exists and 'muni_filter' is set
+            subset_filter = [
+                muni_filter if "muni_id" in field_names and muni_filter else None,
+                sector_filter if "sector_id" in field_names and sector_filter else None,
+            ]
+
+            # Remove any 'None' values from the subset filter list
+            subset_filter = [f for f in subset_filter if f]
+
+            # Apply the subset filter to the layer; if the list is empty, set it to None
+            layer.setSubsetString(" AND ".join(subset_filter) if subset_filter else None)
 
 
     def _build_filter(self) -> str:
@@ -358,7 +346,6 @@ class GwSelector:
         json_result = tools_gw.execute_procedure('gw_fct_getselectors', body)
 
         muni_filter = ''
-        expl_filter = ''
         sector_filter = ''
 
         if json_result is not None:
@@ -375,16 +362,6 @@ class GwSelector:
                         if filter:
                             muni_filter = (f"ARRAY[muni_id] && ARRAY[{ ','.join(filter) }]")
 
-                    elif selector.get('tableName') == 'selector_expl':
-                        filter = []  
-                        for field in selector.get('fields', []):
-                            if field.get('value'):
-                                column_name = field.get('columnname')
-                                if column_name:
-                                    filter.append(f"{field[column_name]}")
-                        if filter:
-                            expl_filter = (f"ARRAY[expl_id] && ARRAY[{ ','.join(filter) }]")
-
                     elif selector.get('tableName') == 'selector_sector':
                         filter = []  
                         for field in selector.get('fields', []):
@@ -398,7 +375,7 @@ class GwSelector:
             except KeyError as e:
                 print(f"KeyError encountered: {e}")
 
-        return muni_filter, expl_filter, sector_filter
+        return muni_filter, sector_filter
 
 
     # region private functions
@@ -502,10 +479,9 @@ class GwSelector:
                 tools_qgis.zoom_to_rectangle(x1, y1, x2, y2, margin=0)
         except KeyError:
             pass
-        
+
         # Build and Apply filters
-        # muni_filter, expl_filter, sector_filter = self._build_filter()
-        # self._apply_filter(muni_filter, expl_filter, sector_filter)
+        tools_gw.reload_layers_filters()
 
         # Refresh canvas
         tools_qgis.set_layer_index('v_edit_arc')
