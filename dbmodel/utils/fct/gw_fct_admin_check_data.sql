@@ -42,6 +42,9 @@ v_fid integer;
 v_sql text;
 v_rec record;
 v_addschema text;
+v_isembebed boolean;
+v_verified_exceptions boolean = true;
+v_return json;
 
 BEGIN
 
@@ -49,117 +52,41 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 
 	v_schemaname = 'SCHEMA_NAME';
-
-	-- select config values
+	
 	SELECT project_type, giswater INTO v_project_type, v_version FROM sys_version order by id desc limit 1;
+
+	-- getting input parameters
+	v_fid :=  ((p_data ->> 'data')::json->>'parameters')::json->> 'fid';
+	v_isembebed :=  ((p_data ->> 'data')::json->>'parameters')::json->> 'isEmbebed';
+	v_verified_exceptions :=  ((p_data ->> 'data')::json->>'parameters')::json->> 'verifiedExceptions';
 
 	-- init variables
 	v_count=0;
 	v_fid := ((p_data ->>'data')::json->>'parameters')::json->>'fid'::text;
+	
+	IF v_fid is null then v_fid = 195; end if;
 
-	IF v_fid is null THEN
-		v_fid = 195;
+	IF v_isembebed IS false of v_isembebed is null then -- create temporal tables if function is not embebed
+		-- create log tables		
+		EXECUTE 'SELECT gw_fct_create_logtables($${"data":{"parameters":{"fid":'||v_fid||'}}}$$::json)';
+		-- create query tables
+		EXECUTE 'SELECT gw_fct_create_querytables($${"data":{"parameters":{"fid":'||v_fid||', "epaCheck":true, "verifiedExceptions":'||v_verified_exceptions||'}}}$$::json)';
 	END IF;
 
+	-- getting sys_fprocess to be executed
+	v_querytext = 'select * from sys_fprocess where project_type in (lower('||quote_literal(v_project_type)||'), ''utils'') 
+	and addparam is null and query_text is not null and function_name ilike ''%admin_check%'' and active order by fid asc';
 
-	CREATE TEMP TABLE temp_audit_check_data (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
-	IF v_fid IN (101,225) THEN
-		--create temp tables
-		CREATE TEMP TABLE temp_anl_arc (LIKE SCHEMA_NAME.anl_arc INCLUDING ALL);
-		CREATE TEMP TABLE temp_anl_node (LIKE SCHEMA_NAME.anl_node INCLUDING ALL);
-		CREATE TEMP TABLE temp_anl_connec (LIKE SCHEMA_NAME.anl_connec INCLUDING ALL);
-
-	END IF;
-
-
-	-- Starting process
-	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('CHECK ADMIN CONFIGURATION'));
-	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '-------------------------------------------------------------');
-
-	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 3, 'CRITICAL ERRORS');
-	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 3, '----------------------');
-
-	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 2, 'WARNINGS');
-	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 2, '--------------');
-
-	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, 'INFO');
-	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, '-------');
-
-
-	v_sql = 'select*from sys_fprocess where 
-		project_type in (lower('||quote_literal(v_project_type)||'), ''utils'')
-		and addparam is null
-		and query_text is not null
-		and function_name ilike ''%admin%'' ';
-
-
-
-	for v_rec in execute v_sql
+	-- loop for checks
+	for v_rec in execute v_querytext		
 	loop
+		EXECUTE 'select gw_fct_check_fprocess($${"client":{"device":4, "infoType":1, "lang":"ES"}, 
+	    "form":{},"feature":{},"data":{"parameters":{"functionFid":'||v_fid||', "checkFid":"'||v_rec.fid||'"}}}$$)';
+	end loop;
 
-		-- check que los addschemas existan
-		select (addparam::json ->>'addSchema')::text into v_addschema from sys_fprocess where fid = v_rec.fid;
-
-		if v_addschema is not null then
-
-			-- check if exists
-			select count(*) into v_count from information_schema.tables where table_catalog = current_catalog and table_schema = v_addschema;
-
-			if v_count = 0 then
-
-				continue;
-
-			end if;
-
-		end if;
-
-		--raise notice 'v_rec.fid %', v_rec.fid;
-		execute 'select gw_fct_check_fprocess($${"client":{"device":4, "infoType":1, "lang":"ES"}, 
-	    "form":{},"feature":{},"data":{"parameters":{"functionFid": '||v_fid||', "prefixTable": "", "checkFid":"'||v_rec.fid||'","graphClass":"SECTOR"}}}$$)';
-
-   	end loop;
-
-
-	update temp_audit_check_data set criticity = 1 where error_message ilike 'INFO:%';
-   	update temp_audit_check_data set criticity = 2 where error_message ilike 'WARNING-%';
-   	update temp_audit_check_data set criticity = 3 where error_message ilike 'ERROR-%';
-
-	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, '');
-	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 3, '');
-	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 2, '');
-	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 1, '');
-
-	IF v_fid = 195 THEN
-		-- delete old values on result table
-		DELETE FROM audit_check_data WHERE fid=195 AND cur_user=current_user;
-
-		INSERT INTO audit_check_data SELECT * FROM temp_audit_check_data;
-
-	ELSIF  v_fid = 101 THEN
-		UPDATE temp_audit_check_data SET fid = 195;
-
-		INSERT INTO project_temp_audit_check_data SELECT * FROM temp_audit_check_data;
-
-	END IF;
-
-	-- get results
-	-- info
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
-	FROM (SELECT id, error_message as message FROM temp_audit_check_data WHERE cur_user="current_user"() AND fid=195 order by criticity desc, id asc) row;
-	v_result := COALESCE(v_result, '{}');
-	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
-
---DROP temp tables
-	DROP TABLE IF EXISTS temp_audit_check_data;
-
-	-- Control nulls
-	v_result_info := COALESCE(v_result_info, '{}');
-
-	-- Return
-	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'"'||
-			 ',"body":{"form":{}'||
-			 ',"data":{ "info":'||v_result_info||'}}'||
-		'}')::json, 2776, null, null, null);
+	--  Return
+	EXECUTE 'SELECT gw_fct_create_return($${"data":{"parameters":{"functionId":3364, "isEmbebed":'||v_isembebed||'}}}$$::json)' INTO v_return;
+	RETURN v_return;
 
 END;
 $BODY$
