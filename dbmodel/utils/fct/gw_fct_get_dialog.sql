@@ -55,6 +55,11 @@ v_id text;
 v_idname_array text[];
 v_id_array text[];
 v_values_array json;
+v_field jsonb;
+v_result jsonb;
+v_tabsjson jsonb := '[]';
+v_tabnames_to_remove text[];
+v_layouts_to_remove text[];
 
 BEGIN
     -- Set search path to local schema
@@ -90,7 +95,7 @@ BEGIN
 	IF array_length(v_fields_array, 1) IS NULL THEN
     	RAISE EXCEPTION 'Variable v_fields_array is empty. Check the "formName" or "formType" parameters: %', v_fields_array;
 	END IF;
-	IF v_tablename IS NOT NULL AND v_idname IS NOT NULL OR v_id IS NOT NULL THEN
+	IF v_tablename IS NOT NULL AND (v_idname IS NOT NULL OR v_id IS NOT NULL) THEN
 
 		-- Accept multiple idnames and ids
 	    IF v_idname IS NOT NULL AND v_id IS NOT NULL THEN
@@ -130,24 +135,6 @@ BEGIN
 
 		END LOOP;
 	END IF;
-	-- Create JSON from layouts
-	SELECT array_agg(distinct layoutname) into v_layouts FROM config_form_fields  WHERE formtype = v_formtype;
-
-	v_form:= '"layouts": {';
-
-	-- Add form layout
-	SELECT addparam INTO v_addparam FROM config_typevalue WHERE id = v_formtype;
-	v_form := concat(v_form, '"', v_formtype, '":', coalesce(v_addparam, '{}'), ',');
-
-	FOREACH v_layout IN ARRAY v_layouts
-	LOOP
-		select addparam into v_addparam from config_typevalue where id = v_layout;
-		v_form:= concat(v_form,  '"', v_layout, '":',coalesce(v_addparam, '{}'),',');
-	END LOOP;
-
-	v_form := left(v_form, length(v_form) - 1);
-	v_form:= concat(v_form,'}' );
-
 
     -- Loop through widgets
     FOR i IN 1 .. array_length(v_fields_array, 1) LOOP
@@ -225,6 +212,74 @@ BEGIN
 	-- Manage null
 	v_version := COALESCE(v_version, '');
  	v_fieldsjson := COALESCE(v_fieldsjson, '[]');
+
+	-- If there are tabs in dialog:
+	IF jsonb_path_exists(v_fieldsjson, '$.**.tabs') THEN
+		-- REMOVE EMPTY TABS (WITH EMPTY TABLEWIDGETS)
+		-- Get tabnames to remove with empty table widgets
+	    FOREACH v_field IN ARRAY ARRAY(SELECT jsonb_array_elements(v_fieldsjson)) LOOP
+			IF v_field->>'widgettype' IN ('tablewidget', 'tableview') THEN
+
+				v_result := gw_fct_getlist(
+			        json_build_object(
+			            'client', p_data ->>'client',
+			            'form', '{}',
+			            'feature', json_build_object('tableName', v_field->>'linkedobject'),
+			            'data', p_data ->>'data'
+			        )
+			    )::jsonb #>> '{body, data, fields, 0, value}';
+
+	            IF v_result IS NULL THEN
+					v_tabnames_to_remove := array_append(v_tabnames_to_remove, v_field->>'tabname');
+					v_layouts_to_remove := array_append(v_layouts_to_remove, v_field->>'layoutname');
+	            END IF;
+			END IF;
+	    END LOOP;
+
+		-- Include tabs where tabName is not in v_tabnames (tab to remove)
+		v_tabsjson := (
+	        SELECT jsonb_agg(tab) FROM jsonb_array_elements(v_fieldsjson) AS field,
+	        jsonb_array_elements(field->'tabs') AS tab
+	    	WHERE tab->>'tabName' NOT IN (SELECT unnest(v_tabnames_to_remove))
+	    );
+
+		 -- Update tabs when the key is 'tabs'
+		 v_fieldsjson := (
+	        SELECT jsonb_agg(
+	            CASE
+	                WHEN field->>'tabs' IS NOT NULL THEN
+						jsonb_set(field, '{tabs}', to_jsonb(v_tabsjson))
+	            ELSE
+					field
+	            END
+	        )
+	        FROM jsonb_array_elements(v_fieldsjson) AS field
+		  );
+
+		-- Remove empty table_views
+		v_fieldsjson := (
+			SELECT json_agg(field) FROM jsonb_array_elements(v_fieldsjson)
+			AS field WHERE field->>'tabs' IS NOT NULL OR field->>'tabname' NOT IN (SELECT unnest(v_tabnames_to_remove))
+		);
+	END IF;
+
+	-- Create JSON from layouts
+	SELECT array_agg(distinct layoutname) into v_layouts FROM config_form_fields  WHERE formtype = v_formtype;
+
+	v_form:= '"layouts": {';
+
+	-- Add form layout
+	SELECT addparam INTO v_addparam FROM config_typevalue WHERE id = v_formtype;
+	v_form := concat(v_form, '"', v_formtype, '":', coalesce(v_addparam, '{}'), ',');
+
+	FOREACH v_layout IN ARRAY v_layouts
+	LOOP
+		select addparam into v_addparam from config_typevalue where id = v_layout;
+		v_form:= concat(v_form,  '"', v_layout, '":',coalesce(v_addparam, '{}'),',');
+	END LOOP;
+
+	v_form := left(v_form, length(v_form) - 1);
+	v_form:= concat(v_form,'}' );
 
 	-- Return JSON
 	RETURN gw_fct_json_create_return(('{
