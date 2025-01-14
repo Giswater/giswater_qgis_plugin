@@ -29,7 +29,7 @@ v_querytext	text;
 v_selection_mode text;
 v_error_context text;
 v_fid integer = 125;
-v_ignore_verified_exceptions boolean = true;
+v_verified_exceptions boolean = true;
 v_checkpsectors text;
 
 BEGIN
@@ -41,7 +41,7 @@ BEGIN
 	SELECT project_type, giswater INTO v_project_type, v_version FROM sys_version order by id desc limit 1;
 
 	-- getting input data
-	v_ignore_verified_exceptions := ((p_data ->>'data')::json->>'parameters')::json->>'ignoreVerifiedExceptions';
+	v_verified_exceptions := ((p_data ->>'data')::json->>'parameters')::json->>'verifiedExceptions';
 	v_selection_mode := ((p_data ->>'data')::json->>'parameters')::json->>'selectionMode'::text;
 	v_checkpsectors := ((p_data ->>'data')::json->>'parameters')::json->>'checkPsectors'::text;
 	v_fid := (((p_data ->>'data')::json->>'parameters')::json->>'fid');
@@ -51,7 +51,7 @@ BEGIN
 
 	-- create temp tables
 	IF v_fid = 125 THEN
-		EXECUTE 'SELECT gw_fct_create_checktables($${"data":{"ignoreVerifiedExceptions":'||v_ignore_verified_exceptions||'}}$$::json)';
+		EXECUTE 'SELECT gw_fct_create_querytables($${"data":{"verifiedExceptions":'||v_verified_exceptions||'}}$$::json)';
 	END IF;
 
 	-- getting sys_fprocess to be executed
