@@ -225,7 +225,14 @@ BEGIN
 			            'client', p_data ->>'client',
 			            'form', '{}',
 			            'feature', json_build_object('tableName', v_field->>'linkedobject'),
-			            'data', p_data ->>'data'
+			            'data', json_build_object(
+				            'filterFields', json_build_object(
+				                ((p_data ->>'form')::json->>'idname'), json_build_object(
+				                    'value',  ((p_data ->>'form')::json->>'id'),
+				                    'filterSign', '='
+				                )
+				            )
+				        )
 			        )
 			    )::jsonb #>> '{body, data, fields, 0, value}';
 
