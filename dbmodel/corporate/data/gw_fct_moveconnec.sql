@@ -4,15 +4,39 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_moveconnec(p_data json)
+ RETURNS json
+ LANGUAGE plpgsql
+AS $function$
+
 --FUNCTION CODE: 
+ *  FOR INDIVIDUAL CONNECS
+SELECT SCHEMA_NAME.gw_fct_moveconnec ($${"client":{"device":4, "infoType":1, "lang":"ES"}, 
+"form":{}, 
+"feature":{"connecId":"124915"}, 
+"data":{"distance":1}}$$);
+
+ *  FOR MASSIVE CONNECS
+SELECT SCHEMA_NAME.gw_fct_moveconnec (CONCAT('{"client":{"device":4, "infoType":1, "lang":"ES"}, 
+"form":{}, "feature":{"connecId":"', connec_id, '"}, 
+"data":{"distance":4, "plotLayer":"migra_alhencin.parcels_alhendin", "ramalLayer":"migra.alhencin.ramal"}}')::json) from connec
+where connec_id in ('125552', '125553');
 
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_moveconnec(p_data json)
-RETURNS json AS
+ *  TAKE INTO ACCOUNT CADASTRAL PLOT LAYER
+SELECT SCHEMA_NAME.gw_fct_moveconnec ($${"client":{"device":4, "infoType":1, "lang":"ES"}, 
+"form":{}, 
+"feature":{"connecId":"124915"}, 
+"data":{"distance":1, "plotLayer":"null"}}$$);
 
-$BODY$
-/*
-SELECT gw_fct_moveconnec ($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"connecId":"114466"}, "data":{"distance":1}}$$);
+
+ *  TAKE INTO ACCOUNT CADASTRAL PLOT LAYER AND RAMALES
+SELECT SCHEMA_NAME.gw_fct_moveconnec ($${"client":{"device":4, "infoType":1, "lang":"ES"}, 
+"form":{}, "feature":{"connecId":"125943"}, 
+"data":{"distance":4, "plotLayer":"migra_alhencin.parcels_alhendin", "ramalLayer":"migra.alhencin.ramal"}}$$);
+
+
+
 
 
  
@@ -157,8 +181,8 @@ BEGIN
 	--execute 'select count(*) from ('||v_sql_ramal||')a' into v_count;
 	if v_sql_ramal is not null then
 	--if v_count > 0 then --existe una capa de ramal con geometria
-	
-		execute v_sql into v_ramal_table, v_ramal_geom;
+		
+		execute v_sql_ramal into v_ramal_table, v_ramal_geom;
 	
 		-- busca els connecs que tocan a un ramal y a un tramo
 		v_sql = 'select c.connec_id, c.the_geom as connec_geom, a.arc_id, a.the_geom as arc_geom, r.geom as ramal_geom from connec c, '||v_ramal_layer||' r, arc a 
@@ -180,7 +204,7 @@ BEGIN
 				update connec c set the_geom = st_startpoint(a.ramal_geom) from ('||v_sql||')a
 				where c.connec_id = a.connec_id and c.connec_id = '||quote_literal(v_connec)||'';
 		
-			elsif v_percent <= 0.6 then -- el connec está en el startpoint del ramal -> hay que updatear su geometrai para que sea el endpoint del ramal
+			elsif v_percent_ramal <= 0.6 then -- el connec está en el startpoint del ramal -> hay que updatear su geometrai para que sea el endpoint del ramal
 			
 				EXECUTE '
 				update connec c set the_geom = st_endpoint(a.ramal_geom) from ('||v_sql||')a
@@ -337,6 +361,5 @@ BEGIN
 
 
 END;
-$BODY$
-  LANGUAGE plpgsql VOLATILE
-  COST 100;
+$function$
+;
