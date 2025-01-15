@@ -137,10 +137,25 @@ DROP VIEW IF EXISTS v_edit_review_gully;
 SELECT gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
  "data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-DELETE" }}$$);
 
-DROP VIEW IF EXISTS ve_epa_pipe;
-DROP VIEW IF EXISTS ve_epa_shortpipe;
-DROP VIEW IF EXISTS ve_epa_virtualvalve;
+DROP VIEW IF EXISTS ve_epa_junction;
+DROP VIEW IF EXISTS ve_epa_tank;
+DROP VIEW IF EXISTS ve_epa_reservoir;
+DROP VIEW IF EXISTS ve_epa_connec;
+DROP VIEW IF EXISTS ve_epa_inlet;
+
+DROP VIEW IF EXISTS v_rpt_node;
+DROP VIEW IF EXISTS v_rpt_node_all;
+
+DROP VIEW IF EXISTS ve_epa_pump;
+DROP VIEW IF EXISTS ve_epa_pump_additional;
 DROP VIEW IF EXISTS ve_epa_valve;
+DROP VIEW IF EXISTS ve_epa_shortpipe;
+DROP VIEW IF EXISTS ve_epa_pipe;
+DROP VIEW IF EXISTS ve_epa_virtualvalve;
+DROP VIEW IF EXISTS ve_epa_virtualpump;
+
+DROP VIEW IF EXISTS v_rpt_arc;
+DROP VIEW IF EXISTS v_rpt_arc_all;
 
 DROP VIEW IF EXISTS v_edit_arc;
 DROP VIEW IF EXISTS v_edit_node;

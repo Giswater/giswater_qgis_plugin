@@ -88,9 +88,6 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_dscenario('SHORTPIPE');
 CREATE TRIGGER gw_trg_edit_inp_node_shortpipe INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_shortpipe
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_node('inp_shortpipe');
 
-CREATE TRIGGER gw_trg_edit_ve_epa_pipe INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_epa_pipe
-FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_ve_epa('pipe');
-
 CREATE TRIGGER gw_trg_edit_inp_dscenario_connec INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_dscenario_connec
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_dscenario('CONNEC');
 
@@ -124,14 +121,6 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_dscenario('INLET');
 CREATE TRIGGER gw_trg_edit_inp_node_inlet INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_inlet
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_node('inp_inlet');
 
-CREATE TRIGGER gw_trg_edit_ve_epa_virtualvalve INSTEAD OF INSERT OR UPDATE OR DELETE ON ve_epa_virtualvalve
-FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_ve_epa('virtualvalve');
-
-CREATE TRIGGER gw_trg_edit_ve_epa_shorpipe INSTEAD OF INSERT OR UPDATE OR DELETE ON ve_epa_shortpipe
-FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_ve_epa('shortpipe');
-
-CREATE TRIGGER gw_trg_edit_ve_epa_valve INSTEAD OF INSERT OR UPDATE OR DELETE ON ve_epa_valve
-FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_ve_epa('valve');
 
 CREATE TRIGGER gw_trg_edit_link INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_link
 FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_link();
@@ -163,10 +152,6 @@ sector FOR EACH ROW EXECUTE FUNCTION gw_trg_typevalue_fk('sector');
 CREATE TRIGGER gw_trg_edit_review_connec INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_review_connec
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_review_connec();
 
--- 12/11/24
-CREATE TRIGGER gw_trg_edit_ve_epa_virtualpump INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_epa_virtualpump
- FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_ve_epa('virtualpump');
-
 -- 05/12/24
 CREATE TRIGGER gw_trg_dscenario_demand_feature AFTER INSERT ON inp_dscenario_demand
 FOR EACH ROW EXECUTE FUNCTION gw_trg_dscenario_demand_feature();
@@ -175,56 +160,69 @@ CREATE TRIGGER gw_trg_typevalue_fk AFTER INSERT OR UPDATE ON inp_dscenario_deman
 FOR EACH ROW EXECUTE FUNCTION gw_trg_typevalue_fk('inp_dscenario_demand');
 
 -- 13/12/24
-CREATE TRIGGER gw_trg_edit_anl_hydrant INSTEAD OF
-INSERT
-    OR
-DELETE
-    OR
-UPDATE
-    ON
-    v_edit_anl_hydrant FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_anl_hydrant();
+CREATE TRIGGER gw_trg_edit_anl_hydrant INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_anl_hydrant
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_anl_hydrant();
 
-CREATE TRIGGER gw_trg_vi_options INSTEAD OF
-INSERT
-    OR
-DELETE
-    OR
-UPDATE
-    ON
-    vi_options FOR EACH ROW EXECUTE FUNCTION gw_trg_vi('vi_options');
+CREATE TRIGGER gw_trg_vi_options INSTEAD OF INSERT OR DELETE OR UPDATE ON vi_options
+FOR EACH ROW EXECUTE FUNCTION gw_trg_vi('vi_options');
 
-CREATE TRIGGER gw_trg_vi_report INSTEAD OF
-INSERT
-    OR
-DELETE
-    OR
-UPDATE
-    ON
-    vi_report FOR EACH ROW EXECUTE FUNCTION gw_trg_vi('vi_report');
+CREATE TRIGGER gw_trg_vi_report INSTEAD OF INSERT OR DELETE OR UPDATE ON vi_report
+FOR EACH ROW EXECUTE FUNCTION gw_trg_vi('vi_report');
 
-CREATE TRIGGER gw_trg_vi_times INSTEAD OF
-INSERT
-    OR
-DELETE
-    OR
-UPDATE
-    ON
-    vi_times FOR EACH ROW EXECUTE FUNCTION gw_trg_vi('vi_times');
+CREATE TRIGGER gw_trg_vi_times INSTEAD OF INSERT OR DELETE OR UPDATE ON vi_times
+FOR EACH ROW EXECUTE FUNCTION gw_trg_vi('vi_times');
 
-CREATE TRIGGER gw_trg_vi_reactions INSTEAD OF
-INSERT
-    OR
-DELETE
-    OR
-UPDATE
-    ON
-    vi_reactions FOR EACH ROW EXECUTE FUNCTION gw_trg_vi('vi_reactions');
+CREATE TRIGGER gw_trg_vi_reactions INSTEAD OF INSERT OR DELETE OR UPDATE ON vi_reactions
+FOR EACH ROW EXECUTE FUNCTION gw_trg_vi('vi_reactions');
 
-CREATE TRIGGER gw_trg_vi_energy INSTEAD OF
-INSERT
-    OR
-DELETE
-    OR
-UPDATE
-    ON
-    vi_energy FOR EACH ROW EXECUTE FUNCTION gw_trg_vi('vi_energy');
+CREATE TRIGGER gw_trg_vi_energy INSTEAD OF INSERT OR DELETE OR UPDATE ON vi_energy
+FOR EACH ROW EXECUTE FUNCTION gw_trg_vi('vi_energy');
+
+
+CREATE TRIGGER gw_trg_edit_ve_epa_junction INSTEAD OF INSERT OR DELETE OR UPDATE ON
+ve_epa_junction FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_ve_epa('junction');
+
+CREATE TRIGGER gw_trg_edit_ve_epa_tank INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_epa_tank
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_ve_epa('tank');
+
+CREATE TRIGGER gw_trg_edit_ve_epa_reservoir INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_epa_reservoir
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_ve_epa('reservoir');
+
+CREATE TRIGGER gw_trg_edit_ve_epa_connec INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_epa_connec
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_ve_epa('connec');
+
+CREATE TRIGGER gw_trg_edit_ve_epa_inlet INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_epa_inlet
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_ve_epa('inlet');
+
+
+CREATE TRIGGER gw_trg_edit_ve_epa_pump INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_epa_pump
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_ve_epa('pump');
+
+CREATE TRIGGER gw_trg_edit_ve_epa_pump_additional INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_epa_pump_additional
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_ve_epa('pump_additional');
+
+CREATE TRIGGER gw_trg_edit_ve_epa_valve INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_epa_valve
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_ve_epa('valve');
+
+CREATE TRIGGER gw_trg_edit_ve_epa_shortpipe INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_epa_shortpipe
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_ve_epa('shortpipe');
+
+CREATE TRIGGER gw_trg_edit_ve_epa_pipe INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_epa_pipe
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_ve_epa('pipe');
+
+CREATE TRIGGER gw_trg_edit_ve_epa_virtualvalve INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_epa_virtualvalve
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_ve_epa('virtualvalve');
+
+CREATE TRIGGER gw_trg_edit_ve_epa_virtualpump INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_epa_virtualpump
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_ve_epa('virtualpump');
+
+
+
+
+
+
+
+
+
+
+

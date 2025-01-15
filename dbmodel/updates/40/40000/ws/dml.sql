@@ -2925,3 +2925,6 @@ DELETE FROM config_toolbox
 
 DELETE FROM sys_function
 	WHERE id=2522; --gw_fct_import_epanet_inp
+
+UPDATE config_form_fields SET formname = 'v_rpt_node_stats' WHERE formname = 'v_rpt_node';
+UPDATE config_form_fields SET formname = 'v_rpt_node' WHERE formname = 'v_rpt_node_all';
