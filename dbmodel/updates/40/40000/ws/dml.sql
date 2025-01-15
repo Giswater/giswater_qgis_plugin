@@ -1914,14 +1914,14 @@ INSERT INTO config_form_list (listname, query_text, device, listtype, listclass,
     "density": "compact",
     "columnFilters": [
       {
-        "id": "id",
+        "id": "arc_id",
         "value": "",
         "filterVariant": "text"
       }
     ],
     "sorting": [
       {
-        "id": "id",
+        "id": "arc_id",
         "desc": false
       }
     ]
@@ -1974,14 +1974,14 @@ INSERT INTO config_form_list (listname, query_text, device, listtype, listclass,
     "density": "compact",
     "columnFilters": [
       {
-        "id": "id",
+        "id": "node_id",
         "value": "",
         "filterVariant": "text"
       }
     ],
     "sorting": [
       {
-        "id": "id",
+        "id": "node_id",
         "desc": false
       }
     ]
@@ -2034,14 +2034,14 @@ INSERT INTO config_form_list (listname, query_text, device, listtype, listclass,
     "density": "compact",
     "columnFilters": [
       {
-        "id": "id",
+        "id": "sector_id",
         "value": "",
         "filterVariant": "text"
       }
     ],
     "sorting": [
       {
-        "id": "id",
+        "id": "sector_id",
         "desc": false
       }
     ]
@@ -2094,14 +2094,14 @@ INSERT INTO config_form_list (listname, query_text, device, listtype, listclass,
     "density": "compact",
     "columnFilters": [
       {
-        "id": "id",
+        "id": "arc_id",
         "value": "",
         "filterVariant": "text"
       }
     ],
     "sorting": [
       {
-        "id": "id",
+        "id": "arc_id",
         "desc": false
       }
     ]
@@ -2154,14 +2154,14 @@ INSERT INTO config_form_list (listname, query_text, device, listtype, listclass,
     "density": "compact",
     "columnFilters": [
       {
-        "id": "id",
+        "id": "node_id",
         "value": "",
         "filterVariant": "text"
       }
     ],
     "sorting": [
       {
-        "id": "id",
+        "id": "node_id",
         "desc": false
       }
     ]
@@ -2214,14 +2214,14 @@ INSERT INTO config_form_list (listname, query_text, device, listtype, listclass,
     "density": "compact",
     "columnFilters": [
       {
-        "id": "id",
+        "id": "node_id",
         "value": "",
         "filterVariant": "text"
       }
     ],
     "sorting": [
       {
-        "id": "id",
+        "id": "node_id",
         "desc": false
       }
     ]
@@ -2274,14 +2274,14 @@ INSERT INTO config_form_list (listname, query_text, device, listtype, listclass,
     "density": "compact",
     "columnFilters": [
       {
-        "id": "id",
+        "id": "node_id",
         "value": "",
         "filterVariant": "text"
       }
     ],
     "sorting": [
       {
-        "id": "id",
+        "id": "node_id",
         "desc": false
       }
     ]
@@ -2334,14 +2334,14 @@ INSERT INTO config_form_list (listname, query_text, device, listtype, listclass,
     "density": "compact",
     "columnFilters": [
       {
-        "id": "id",
+        "id": "arc_id",
         "value": "",
         "filterVariant": "text"
       }
     ],
     "sorting": [
       {
-        "id": "id",
+        "id": "arc_id",
         "desc": false
       }
     ]
@@ -2394,14 +2394,14 @@ INSERT INTO config_form_list (listname, query_text, device, listtype, listclass,
     "density": "compact",
     "columnFilters": [
       {
-        "id": "id",
+        "id": "sector_id",
         "value": "",
         "filterVariant": "text"
       }
     ],
     "sorting": [
       {
-        "id": "id",
+        "id": "sector_id",
         "desc": false
       }
     ]
@@ -2454,14 +2454,14 @@ INSERT INTO config_form_list (listname, query_text, device, listtype, listclass,
     "density": "compact",
     "columnFilters": [
       {
-        "id": "id",
+        "id": "node_id",
         "value": "",
         "filterVariant": "text"
       }
     ],
     "sorting": [
       {
-        "id": "id",
+        "id": "node_id",
         "desc": false
       }
     ]
@@ -2514,14 +2514,14 @@ INSERT INTO config_form_list (listname, query_text, device, listtype, listclass,
     "density": "compact",
     "columnFilters": [
       {
-        "id": "id",
+        "id": "node_id",
         "value": "",
         "filterVariant": "text"
       }
     ],
     "sorting": [
       {
-        "id": "id",
+        "id": "node_id",
         "desc": false
       }
     ]
@@ -2574,14 +2574,14 @@ INSERT INTO config_form_list (listname, query_text, device, listtype, listclass,
     "density": "compact",
     "columnFilters": [
       {
-        "id": "id",
+        "id": "feature_id",
         "value": "",
         "filterVariant": "text"
       }
     ],
     "sorting": [
       {
-        "id": "id",
+        "id": "feature_id",
         "desc": false
       }
     ]
@@ -2634,14 +2634,14 @@ INSERT INTO config_form_list (listname, query_text, device, listtype, listclass,
     "density": "compact",
     "columnFilters": [
       {
-        "id": "id",
+        "id": "node_id",
         "value": "",
         "filterVariant": "text"
       }
     ],
     "sorting": [
       {
-        "id": "id",
+        "id": "node_id",
         "desc": false
       }
     ]
@@ -2697,14 +2697,14 @@ INSERT INTO config_form_list (listname, query_text, device, listtype, listclass,
     "density": "compact",
     "columnFilters": [
       {
-        "id": "id",
+        "id": "node_id",
         "value": "",
         "filterVariant": "text"
       }
     ],
     "sorting": [
       {
-        "id": "id",
+        "id": "node_id",
         "desc": false
       }
     ]
@@ -2757,14 +2757,14 @@ INSERT INTO config_form_list (listname, query_text, device, listtype, listclass,
     "density": "compact",
     "columnFilters": [
       {
-        "id": "id",
+        "id": "connec_id",
         "value": "",
         "filterVariant": "text"
       }
     ],
     "sorting": [
       {
-        "id": "id",
+        "id": "connec_id",
         "desc": false
       }
     ]
