@@ -6110,7 +6110,7 @@ AS SELECT DISTINCT p.id,
     p.expl_id,
     p.log,
     p.active,
-    p.addparam
+    p.addparam::text
    FROM selector_expl s,
     inp_timeseries p
   WHERE p.expl_id = s.expl_id AND s.cur_user = "current_user"()::text OR p.expl_id IS NULL

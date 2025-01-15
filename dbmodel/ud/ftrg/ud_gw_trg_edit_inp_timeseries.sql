@@ -22,7 +22,7 @@ BEGIN
 		
 		IF v_table = 'inp_timeseries' THEN
 			INSERT INTO inp_timeseries (id, timser_type, times_type,descript, fname, expl_id, log, active, addparam)
-			VALUES (NEW.id, NEW.timser_type, NEW.times_type, NEW.descript, NEW.fname, NEW.expl_id, NEW.log, NEW.active, NEW.addparam);
+			VALUES (NEW.id, NEW.timser_type, NEW.times_type, NEW.descript, NEW.fname, NEW.expl_id, NEW.log, NEW.active, NEW.addparam::json);
 		
 		ELSIF v_table = 'inp_timeseries_value' THEN
 			IF NEW.id IS NULL THEN
@@ -40,7 +40,7 @@ BEGIN
 		
 		IF v_table = 'inp_timeseries' THEN
 			UPDATE inp_timeseries SET id=NEW.id, timser_type=NEW.timser_type, times_type=NEW.times_type,
-			descript=NEW.descript, fname=NEW.fname, expl_id=NEW.expl_id, log=NEW.log, active=NEW.active, addparam=NEW.addparam
+			descript=NEW.descript, fname=NEW.fname, expl_id=NEW.expl_id, log=NEW.log, active=NEW.active, addparam=NEW.addparam::json
 			WHERE id=OLD.id;
 		END IF;
 
