@@ -274,8 +274,10 @@ BEGIN
 
 	FOREACH v_layout IN ARRAY v_layouts
 	LOOP
-		select addparam into v_addparam from config_typevalue where id = v_layout;
-		v_form:= concat(v_form,  '"', v_layout, '":',coalesce(v_addparam, '{}'),',');
+		IF v_layout NOT IN (SELECT unnest(v_layouts_to_remove)) THEN
+			select addparam into v_addparam from config_typevalue where id = v_layout;
+			v_form:= concat(v_form,  '"', v_layout, '":',coalesce(v_addparam, '{}'),',');
+		END IF;
 	END LOOP;
 
 	v_form := left(v_form, length(v_form) - 1);
