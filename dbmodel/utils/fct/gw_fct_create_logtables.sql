@@ -60,25 +60,25 @@ BEGIN
 	-- get input parameters
 	v_fid := (((p_data ->>'data')::json->>'parameters')::json->>'fid');
 
-	-- get system parameters	
+	-- get system parameters
 	v_fprocessname = (SELECT UPPER(fprocess_name) FROM sys_fprocess where fid = v_fid);
 	v_project_type = (SELECT project_type FROM sys_version order by id desc limit 1);
-	
+
 	-- create log tables
 	DROP TABLE IF EXISTS t_audit_check_data; CREATE TEMP TABLE t_audit_check_data (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
 	DROP TABLE IF EXISTS t_audit_check_project;	CREATE TEMP TABLE t_audit_check_project (LIKE SCHEMA_NAME.audit_check_project INCLUDING ALL);
 	DROP TABLE IF EXISTS t_anl_node;CREATE TEMP TABLE  t_anl_node (LIKE SCHEMA_NAME.anl_node INCLUDING ALL);
 	DROP TABLE IF EXISTS t_anl_arc; CREATE TEMP TABLE t_anl_arc (LIKE SCHEMA_NAME.anl_arc INCLUDING ALL);
 	DROP TABLE IF EXISTS t_anl_connec;CREATE TEMP TABLE t_anl_connec (LIKE SCHEMA_NAME.anl_connec INCLUDING ALL);
-	DROP TABLE IF EXISTS t_anl_polygon; CREATE TEMP TABLE t_anl_polygon (LIKE SCHEMA_NAME.anl_polygon INCLUDING ALL);	
-		
+	DROP TABLE IF EXISTS t_anl_polygon; CREATE TEMP TABLE t_anl_polygon (LIKE SCHEMA_NAME.anl_polygon INCLUDING ALL);
+
 	IF v_project_type  = 'UD' THEN
-		DROP TABLE IF EXISTS t_anl_gully;CREATE TEMP TABLE t_anl_gully (LIKE SCHEMA_NAME.anl_gully INCLUDING ALL);	
-	END IF;	
+		DROP TABLE IF EXISTS t_anl_gully;CREATE TEMP TABLE t_anl_gully (LIKE SCHEMA_NAME.anl_gully INCLUDING ALL);
+	END IF;
 
 	INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 2, NULL);
 	INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 1, NULL);
-		
+
 	-- fill log table
 	INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, v_fprocessname);
 	INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, '------------------------------');
@@ -89,7 +89,7 @@ BEGIN
 	INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 1, 'INFO');
 	INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 1, '-------');
 	INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, '');
-	
+
 	IF v_fid = 604 THEN -- check dbproject
 
 		INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, '-----------------------------------------------------------');
@@ -108,86 +108,86 @@ BEGIN
 				FROM crosstab('SELECT cur_user, parameter, value
 				FROM config_param_user WHERE parameter IN (''inp_options_interval_from'',''inp_options_interval_to'') 
 				AND cur_user = current_user'::text) as ct(cur_user varchar(50), inp_options_interval_from text, inp_options_interval_to text))row
-		INTO v_options;		
-				
+		INTO v_options;
+
 		SELECT  count(*) INTO v_doublen2a FROM v_edit_inp_pump 	WHERE pump_type = 'PRESSPUMP';
-	
+
 		SELECT value INTO v_patternmethod FROM config_param_user WHERE parameter = 'inp_options_patternmethod' AND cur_user=current_user;
 		SELECT value INTO v_dscenario FROM config_param_user WHERE parameter = 'inp_options_dscenario_priority' AND cur_user=current_user;
 		SELECT value INTO v_networkmode FROM config_param_user WHERE parameter = 'inp_options_networkmode' AND cur_user=current_user;
 		SELECT value INTO v_qualitymode FROM config_param_user WHERE parameter = 'inp_options_quality_mode' AND cur_user=current_user;
 		SELECT value INTO v_buildupmode FROM config_param_user WHERE parameter = 'inp_options_buildup_mode' AND cur_user=current_user;
 		SELECT name INTO v_workspace FROM config_param_user c JOIN cat_workspace ON value = id::text WHERE parameter = 'utils_workspace_vdefault' AND c.cur_user=current_user;
-	
+
 		SELECT idval INTO v_dscenarioval FROM inp_typevalue WHERE id=v_dscenario::text AND typevalue ='inp_options_dscenario_priority';
 		SELECT idval INTO v_patternmethodval FROM inp_typevalue WHERE id=v_patternmethod::text AND typevalue ='inp_value_patternmethod';
 		SELECT idval INTO v_networkmodeval FROM inp_typevalue WHERE id=v_networkmode::text AND typevalue ='inp_options_networkmode';
 		SELECT idval INTO v_qualmodeval FROM inp_typevalue WHERE id=v_qualitymode::text AND typevalue ='inp_value_opti_qual';
 		SELECT idval INTO v_buildmodeval FROM inp_typevalue WHERE id=v_buildupmode::text AND typevalue ='inp_options_buildup_mode';
-	
+
 		-- get buildup mode parameters
 		IF v_buildupmode = 1 THEN
 			v_values = (SELECT value FROM config_param_user WHERE parameter = 'inp_options_buildup_supply' AND cur_user=current_user);
 		ELSIF v_buildupmode = 2 THEN
 			v_values = (SELECT value FROM config_param_user WHERE parameter = 'inp_options_buildup_transport' AND cur_user=current_user);
 		END IF;
-	
+
 		-- get settings values
 		v_default = (SELECT value::json->>'status' FROM config_param_user WHERE parameter = 'inp_options_vdefault' AND cur_user=current_user);
 		v_defaultval = (SELECT value::json->>'parameters' FROM config_param_user WHERE parameter = 'inp_options_vdefault' AND cur_user=current_user);
-	
+
 		v_advanced = (SELECT value::json->>'status' FROM config_param_user WHERE parameter = 'inp_options_advancedsettings' AND cur_user=current_user);
 		v_advancedval = (SELECT value::json->>'parameters' FROM config_param_user WHERE parameter = 'inp_options_advancedsettings' AND cur_user=current_user);
-	
+
 		v_debug = (SELECT value::json->>'showLog' FROM config_param_user WHERE parameter = 'inp_options_debug' AND cur_user=current_user);
 		v_debugval = (SELECT value FROM config_param_user WHERE parameter = 'inp_options_debug' AND cur_user=current_user);
 		v_dscenarioused = (SELECT count(dscenario_id) FROM selector_inp_dscenario WHERE cur_user = current_user);
 		v_psectorused = (SELECT count(psector_id) FROM selector_psector WHERE cur_user = current_user);
-	
-	
+
+
 		-- Header
-		INSERT INTO temp_audit_check_data (id, fid, result_id, criticity, error_message)
+		INSERT INTO t_audit_check_data (id, fid, result_id, criticity, error_message)
 		VALUES (-10, v_fid, v_result_id, 4, concat('CHECK RESULT WITH CURRENT USER-OPTIONS ACORDING EPA RULES'));
-		INSERT INTO temp_audit_check_data (id, fid, result_id, criticity, error_message)
+		INSERT INTO t_audit_check_data (id, fid, result_id, criticity, error_message)
 		VALUES (-9, v_fid, v_result_id, 4, '-------------------------------------------------------------------------------------');
-	
-		INSERT INTO temp_audit_check_data (id, fid, result_id, criticity, error_message) VALUES (-8, v_fid, v_result_id, 3, 'CRITICAL ERRORS');
-		INSERT INTO temp_audit_check_data (id, fid, result_id, criticity, error_message) VALUES (-7, v_fid, v_result_id, 3, '----------------------');
-	
-		INSERT INTO temp_audit_check_data (id, fid, result_id, criticity, error_message) VALUES (-6, v_fid, v_result_id, 2, 'WARNINGS');
-		INSERT INTO temp_audit_check_data (id, fid, result_id, criticity, error_message) VALUES (-5, v_fid, v_result_id, 2, '--------------');
-	
-		INSERT INTO temp_audit_check_data (id, fid, result_id, criticity, error_message) VALUES (-4, v_fid, v_result_id, 1, 'INFO');
-		INSERT INTO temp_audit_check_data (id, fid, result_id, criticity, error_message) VALUES (-3, v_fid, v_result_id, 1, '-------');
-	
-		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Result id: ', v_result_id));
-		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Created by: ', current_user, ', on ', to_char(now(),'YYYY/MM/DD - HH:MM:SS')));
-		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Network export mode: ', v_networkmodeval));
-		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Pattern method: ', v_patternmethodval));
-		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Quality mode: ', v_qualmodeval));
-		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Number of Presspump (Double-n2a): ', v_doublen2a));
-		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Buildup mode: ', v_buildmodeval, '. Parameters:', v_values));
-		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Active Workspace: ', v_workspace));
-		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Number of dscenarios used: ', v_dscenarioused));
+
+		INSERT INTO t_audit_check_data (id, fid, result_id, criticity, error_message) VALUES (-8, v_fid, v_result_id, 3, 'CRITICAL ERRORS');
+		INSERT INTO t_audit_check_data (id, fid, result_id, criticity, error_message) VALUES (-7, v_fid, v_result_id, 3, '----------------------');
+
+		INSERT INTO t_audit_check_data (id, fid, result_id, criticity, error_message) VALUES (-6, v_fid, v_result_id, 2, 'WARNINGS');
+		INSERT INTO t_audit_check_data (id, fid, result_id, criticity, error_message) VALUES (-5, v_fid, v_result_id, 2, '--------------');
+
+		INSERT INTO t_audit_check_data (id, fid, result_id, criticity, error_message) VALUES (-4, v_fid, v_result_id, 1, 'INFO');
+		INSERT INTO t_audit_check_data (id, fid, result_id, criticity, error_message) VALUES (-3, v_fid, v_result_id, 1, '-------');
+
+		INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Result id: ', v_result_id));
+		INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Created by: ', current_user, ', on ', to_char(now(),'YYYY/MM/DD - HH:MM:SS')));
+		INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Network export mode: ', v_networkmodeval));
+		INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Pattern method: ', v_patternmethodval));
+		INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Quality mode: ', v_qualmodeval));
+		INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Number of Presspump (Double-n2a): ', v_doublen2a));
+		INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Buildup mode: ', v_buildmodeval, '. Parameters:', v_values));
+		INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Active Workspace: ', v_workspace));
+		INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Number of dscenarios used: ', v_dscenarioused));
 		IF v_dscenarioused > 0 THEN
-			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Demand dscenario priority: ', v_dscenarioval));
+			INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Demand dscenario priority: ', v_dscenarioval));
 		END IF;
-		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Number of psectors used: ', v_psectorused));
-	
+		INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Number of psectors used: ', v_psectorused));
+
 		IF v_default::boolean THEN
-			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Default values: ', v_defaultval));
+			INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Default values: ', v_defaultval));
 		ELSE
-			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Default values: No default values used'));
+			INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Default values: No default values used'));
 		END IF;
-	
+
 		IF v_advanced::boolean THEN
-			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Advanced settings: ', v_advancedval));
+			INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Advanced settings: ', v_advancedval));
 		ELSE
-			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Advanced settings: No advanced settings used'));
+			INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Advanced settings: No advanced settings used'));
 		END IF;
-	
+
 		IF v_debug::boolean THEN
-			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Debug: ', v_defaultval));
+			INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, concat('Debug: ', v_defaultval));
 		END IF;
 
 	END IF;
