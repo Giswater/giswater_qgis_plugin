@@ -4776,6 +4776,9 @@ def manage_dlg_widgets(class_object, dialog, complet_result):
 
     # Loop through fields to add them to the appropriate layout
     for field in complet_result['body']['data']['fields']:
+        # Avoid error when field is None
+        if field is None:
+            continue
         # Skip hidden fields based on conditions
         if field.get('hidden'):
             continue
