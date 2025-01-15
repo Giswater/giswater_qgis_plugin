@@ -51,7 +51,7 @@ BEGIN
 
 	-- create temp tables
 	IF v_fid = 125 THEN
-		EXECUTE 'SELECT gw_fct_create_querytables($${"data":{"verifiedExceptions":'||v_verified_exceptions||'}}$$::json)';
+		EXECUTE 'SELECT gw_fct_create_querytables($${"data":{"verifiedExceptions":'||v_verified_exceptions||',"selectionMode":"'||v_selection_mode||'", "checkPsectors":"'||v_checkpsectors||'"}}$$::json)';
 	END IF;
 
 	-- getting sys_fprocess to be executed
