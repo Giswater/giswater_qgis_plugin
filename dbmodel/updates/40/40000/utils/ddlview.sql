@@ -184,9 +184,11 @@ DROP VIEW IF EXISTS vu_presszone;
 DROP VIEW IF EXISTS v_om_mincut_hydrometer;
 
 DROP VIEW IF EXISTS v_edit_dma;
+DROP VIEW IF EXISTS v_ui_dma;
 DROP VIEW IF EXISTS vu_dma;
 DROP VIEW IF EXISTS v_edit_plan_netscenario_presszone;
 DROP VIEW IF EXISTS v_edit_dqa;
+DROP VIEW IF EXISTS v_ui_dqa;
 DROP VIEW IF EXISTS vu_dqa;
 
 DROP VIEW IF EXISTS v_state_arc;
@@ -197,10 +199,9 @@ DROP VIEW IF EXISTS v_state_connec;
 DROP VIEW IF EXISTS v_edit_pond;
 DROP VIEW IF EXISTS v_edit_pool;
 DROP VIEW IF EXISTS v_om_waterbalance_report;
-DROP VIEW IF EXISTS v_ui_dma;
+
 DROP VIEW IF EXISTS v_om_waterbalance;
 
-DROP VIEW IF EXISTS v_ui_dqa;
 
 DROP VIEW IF EXISTS v_ui_sector;
 DROP VIEW IF EXISTS v_edit_sector;
