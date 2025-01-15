@@ -25,9 +25,12 @@ BEGIN
 		IF ((SELECT COUNT(*) FROM exploitation WHERE active IS TRUE) = 0) THEN
 			RETURN NULL;
 		END IF;
-		IF NEW.the_geom IS NOT NULL THEN
-			IF NEW.expl_id IS NULL THEN
-				NEW.expl_id := (SELECT ARRAY[expl_id] FROM exploitation WHERE active IS TRUE AND ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
+
+		IF view_name = 'edit'THEN
+			IF NEW.the_geom IS NOT NULL THEN
+				IF NEW.expl_id IS NULL THEN
+					NEW.expl_id := (SELECT ARRAY[expl_id] FROM exploitation WHERE active IS TRUE AND ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
+				END IF;
 			END IF;
 		END IF;
 
