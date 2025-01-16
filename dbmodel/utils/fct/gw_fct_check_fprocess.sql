@@ -14,19 +14,22 @@ DECLARE
 	v_function_fid integer;
 	v_check_fid integer;
 
-	v_rec record;
-	v_rec_anl record;
 	v_count integer;
-	v_geom_type text;
-	v_sql text;
 	v_text_aux text;
-	v_exc_msg text;
-	v_iscount boolean;
 	v_process text;
 	v_exceptable_id text;
 	v_exceptable_catalog text;
 	v_querytext text;
 	v_graphClass text;
+
+	--
+	v_process_name text;
+	v_process_except_table text;
+	v_process_query_text text;
+	v_process_info_msg text;
+	v_process_except_msg text;
+	v_process_fid integer;
+	v_process_except_level integer;
 BEGIN
 
 	-- get input params
@@ -36,59 +39,78 @@ BEGIN
 	v_graphClass := (((p_data ->> 'data')::json->>'parameters')::json->> 'graphClass');
 
 	-- get fprocess data
-	select * into v_rec from sys_fprocess where fid = v_check_fid;
-	v_exceptable_id = concat(replace (v_rec.except_table, 'anl_', ''), '_id');
-	v_exceptable_catalog = concat(replace (v_rec.except_table, 'anl_', ''), 'cat_id');
+	SELECT
+		fprocess_name,
+		except_table,
+		query_text,
+		info_msg,
+		except_msg,
+		fid,
+		except_level
+	INTO
+		v_process_name,
+		v_process_except_table,
+		v_process_query_text,
+		v_process_info_msg,
+		v_process_except_msg,
+		v_process_fid,
+		v_process_except_level
+	FROM sys_fprocess WHERE fid = v_check_fid;
 
-	-- replace graphClass in query_text, info_msg and except_msg: v_graphClass -> dma, dqa, sector, presszone and drainzone.
-	v_rec.query_text = replace(v_rec.query_text, 'v_graphClass', v_graphClass);
-	v_rec.info_msg = replace(v_rec.info_msg, 'v_graphClass', v_graphClass);
-	v_rec.except_msg = replace(v_rec.except_msg, 'v_graphClass', v_graphClass);
+	RAISE NOTICE 'v_process_query_text ANTES:::::::: %',v_process_query_text;
+
+	-- replace variables (usando COALESCE para evitar NULLs)
+	v_exceptable_id = concat(replace (v_process_except_table, 'anl_', ''), '_id');
+	v_exceptable_catalog = concat(replace (v_process_except_table, 'anl_', ''), 'cat_id');
+	v_process_query_text = COALESCE(replace(v_process_query_text, 'v_graphClass', COALESCE(v_graphClass, '')), v_process_query_text);
+	v_process_info_msg = COALESCE(replace(v_process_info_msg, 'v_graphClass', COALESCE(v_graphClass, '')), v_process_info_msg);
+	v_process_except_msg = COALESCE(replace(v_process_except_msg, 'v_graphClass', COALESCE(v_graphClass, '')), v_process_except_msg);
+
+	RAISE NOTICE 'v_process_query_text DESPUÉS:::::::: %',v_process_query_text;
 
 	-- manage query count
-	if v_rec.query_text ilike '%string_agg%' and v_rec.fid <> 317 then
-		execute 'with mec as ('||v_rec.query_text||'),
-		b as (select unnest(string_to_array("string_agg", ''; '')) as "string_agg" from mec)
-		select count(*) from b'
-		into v_count;
-	else
-		execute 'select count(*) from ('||v_rec.query_text||')a'
-		into v_count;
-	end if;
+	IF v_process_query_text ILIKE '%string_agg%' AND v_process_fid <> 317 THEN
+		EXECUTE 'WITH mec AS ('||v_process_query_text||'),
+		b AS (SELECT unnest(string_to_array("string_agg", ''; '')) AS "string_agg" FROM mec)
+		SELECT count(*) FROM b'
+		INTO v_count;
+	ELSE
+		EXECUTE 'SELECT count(*) FROM ('||v_process_query_text||')a'
+		INTO v_count;
+	END IF;
 
 	-- get text variables according to singular/plural values
-	v_exc_msg = v_rec.except_msg;
-	if v_count = 1 then
+	IF v_count = 1 THEN
 		v_text_aux = 'There is ';
-		v_exc_msg =
+		v_process_except_msg =
 		concat(
-			substring(split_part(v_rec.except_msg, ' ', 1) FROM 1 FOR length(split_part(v_rec.except_msg, ' ', 1)) - 1),
+			substring(split_part(v_process_except_msg, ' ', 1) FROM 1 FOR length(split_part(v_process_except_msg, ' ', 1)) - 1),
 			' ',
-			substring(v_rec.except_msg FROM length(split_part(v_rec.except_msg, ' ', 1)) + 2)
+			substring(v_process_except_msg FROM length(split_part(v_process_except_msg, ' ', 1)) + 2)
 		);
-	elsif v_count > 1 then
+	ELSIF v_count > 1 THEN
 		v_text_aux = 'There are ';
-	end if;
+	END IF;
 
 	-- manage result (audit_check_data)
-	IF v_count > 0 and v_rec.except_level > 1 then
+	IF v_count > 0 AND v_process_except_level > 1 THEN
 
-		IF v_rec.except_table is null then
+		IF v_process_except_table IS NULL THEN
 
 			INSERT INTO t_audit_check_data (fid, criticity, result_id, error_message, fcount)
-			values (v_function_fid, v_rec.except_level, v_check_fid, concat(
-			case when v_rec.except_level = 2 then 'WARNING-' when v_rec.except_level = 3 then 'ERROR-' end ,
-			v_check_fid, ': ', concat(v_text_aux, v_count, ' ', v_exc_msg)), v_count);
+			VALUES (v_function_fid, v_process_except_level, v_check_fid, concat(
+			CASE WHEN v_process_except_level = 2 THEN 'WARNING-' WHEN v_process_except_level = 3 THEN 'ERROR-' END,
+			v_check_fid, ': ', concat(v_text_aux, v_count, ' ', v_process_except_msg)), v_count);
 
 		ELSE
 			INSERT INTO t_audit_check_data (fid, criticity, result_id, error_message, fcount)
-			values (v_function_fid, v_rec.except_level, v_check_fid, concat(
-			case when v_rec.except_level = 2 then 'WARNING-' when v_rec.except_level = 3 then 'ERROR-' end ,
-			v_check_fid, ' (',v_rec.except_table,'): ', concat(v_text_aux, v_count, ' ', v_exc_msg)), v_count);
+			VALUES (v_function_fid, v_process_except_level, v_check_fid, concat(
+			CASE WHEN v_process_except_level = 2 THEN 'WARNING-' WHEN v_process_except_level = 3 THEN 'ERROR-' END,
+			v_check_fid, ' (',v_process_except_table,'): ', concat(v_text_aux, v_count, ' ', v_process_except_msg)), v_count);
 
-			v_querytext = 'INSERT INTO t_'||v_rec.except_table||' ('||v_exceptable_id||', '||v_exceptable_catalog||', 
+			v_querytext = 'INSERT INTO t_'||v_process_except_table||' ('||v_exceptable_id||', '||v_exceptable_catalog||', 
 					expl_id, fid, the_geom, descript)	SELECT '||v_exceptable_id||', '||v_exceptable_catalog||', 
-					expl_id, '||v_check_fid||', the_geom, '||quote_literal(v_rec.fprocess_name)||' FROM ('||v_rec.query_text||')a';
+					expl_id, '||v_check_fid||', the_geom, '||quote_literal(v_process_name)||' FROM ('||v_process_query_text||')a';
 
 			RAISE NOTICE 'v_querytext %', v_querytext;
 			EXECUTE v_querytext;
@@ -97,13 +119,13 @@ BEGIN
 
 	ELSE
 		INSERT INTO t_audit_check_data (fid, criticity, result_id, error_message, fcount)
-		values (v_function_fid, 1, v_check_fid, concat('INFO: ', v_rec.info_msg), 0);
+		VALUES (v_function_fid, 1, v_check_fid, concat('INFO: ', v_process_info_msg), 0);
 
-		IF v_rec.except_table is not null then
+		IF v_process_except_table IS NOT NULL THEN
 
-			v_querytext = 'INSERT INTO t_'||v_rec.except_table||' ('||v_exceptable_id||', '||v_exceptable_catalog||', 
+			v_querytext = 'INSERT INTO t_'||v_process_except_table||' ('||v_exceptable_id||', '||v_exceptable_catalog||', 
 					expl_id, fid, the_geom, descript)	SELECT '||v_exceptable_id||', '||v_exceptable_catalog||', 
-					expl_id, '||v_check_fid||', the_geom, '||quote_literal(v_rec.fprocess_name)||' FROM ('||v_rec.query_text||')a';
+					expl_id, '||v_check_fid||', the_geom, '||quote_literal(v_process_name)||' FROM ('||v_process_query_text||')a';
 
 			RAISE NOTICE 'v_querytext %', v_querytext;
 			EXECUTE v_querytext;
