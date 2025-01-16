@@ -131,7 +131,6 @@ class GwWorkcat:
         dialog.builtdate.setDate(QDate.currentDate())
         dialog.raise_()
         dialog.activateWindow()
-        dialog.setWindowFlags(dialog.windowFlags() | Qt.WindowStaysOnTopHint)
         dialog.btn_accept.clicked.connect(partial(self._save_new_workcat, dialog))
         dialog.btn_cancel.clicked.connect(dialog.reject)
 

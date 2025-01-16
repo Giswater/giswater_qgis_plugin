@@ -98,7 +98,6 @@ class GwProfileButton(GwAction):
         # Set dialog
         self.dlg_draw_profile = GwProfileUi(self)
         tools_gw.load_settings(self.dlg_draw_profile)
-        self.dlg_draw_profile.setWindowFlags(Qt.WindowStaysOnTopHint)
 
         # Declare composer path widget
         self.composers_path = self.dlg_draw_profile.findChild(QLineEdit, "composers_path")

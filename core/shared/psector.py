@@ -1718,7 +1718,6 @@ class GwPsector:
         selection_model.selectionChanged.connect(partial(self._fill_txt_infolog))
         self.set_label_current_psector(self.dlg_psector_mng, scenario_type="psector", from_open_dialog=True)
         # Open form
-        self.dlg_psector_mng.setWindowFlags(Qt.WindowStaysOnTopHint)
         tools_gw.open_dialog(self.dlg_psector_mng, dlg_name="psector_manager")
         self.dlg_psector_mng.btn_create.clicked.connect(partial(self.open_psector_dlg))
 

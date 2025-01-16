@@ -1357,7 +1357,6 @@ class GwVisit(QObject):
 
         self.dlg_event.btn_accept.clicked.connect(self.dlg_event.accept)
         self.dlg_event.btn_cancel.clicked.connect(self.dlg_event.reject)
-        self.dlg_event.setWindowFlags(Qt.WindowStaysOnTopHint)
         tools_gw.add_btn_help(self.dlg_event)
         tools_qt.manage_translation(dlg_name, self.dlg_event)
         ret = self.dlg_event.exec_()
@@ -1654,7 +1653,6 @@ class GwVisit(QObject):
         # set fixed values
         self.dlg_event.parameter_id.setText(parameter_id)
 
-        self.dlg_event.setWindowFlags(Qt.WindowStaysOnTopHint)
         tools_qt.manage_translation(dlg_name, self.dlg_event)
         if self.dlg_event.exec_():
 

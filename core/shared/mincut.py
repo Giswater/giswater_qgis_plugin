@@ -339,7 +339,6 @@ class GwMincut:
         tools_qgis.remove_layer_from_toc('Overlap affected connecs', 'GW Temporal Layers')
 
         tools_gw.load_settings(self.dlg_mincut)
-        self.dlg_mincut.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.dlg_mincut.btn_cancel_task.hide()
         self.dlg_mincut.btn_cancel.show()
 
