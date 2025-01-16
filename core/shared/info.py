@@ -3196,6 +3196,7 @@ class GwInfo(QObject):
         if widget:
             tools_qt.set_widget_text(dialog, widget, str(feat_id))
             if hasattr(widget, "editingFinished"):
+                widget.setReadOnly(False)
                 widget.editingFinished.emit()  # Emit signal to indicate value has changed
         else:
             tools_qgis.show_warning(f"Widget '{widget_name}' not found in the dialog.")
