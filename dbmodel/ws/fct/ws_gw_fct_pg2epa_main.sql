@@ -77,8 +77,8 @@ BEGIN
 
 	-- step 0: Manage epa max results variable
 	select value into v_epa_maxresults from config_param_user where parameter = 'epa_maxresults_peruser' and cur_user=current_user;
-	
-	if (select count(*) from rpt_cat_result where cur_user = current_user) > v_epa_maxresults then 
+
+	if (select count(*) from rpt_cat_result where cur_user = current_user) > v_epa_maxresults then
 		RETURN ('{"status":"Failed","message":{"level":1, "text":"You have reached the maximum results limit."}}')::json;
 	end if;
 
@@ -117,6 +117,9 @@ BEGIN
 		DROP TABLE IF EXISTS temp_t_go2epa;
 		DROP TABLE IF EXISTS temp_t_arc_endpoint;
 		DROP TABLE IF EXISTS temp_t_rpt_cat_result;
+
+		DROP TABLE IF EXISTS t_pgr_go2epa_arc;
+		DROP TABLE IF EXISTS t_pgr_go2epa_node;
 
 
 		-- create temp tables
@@ -176,8 +179,11 @@ BEGIN
 		CREATE TEMP TABLE temp_rpt_inp_pattern_value (LIKE SCHEMA_NAME.rpt_inp_pattern_value INCLUDING ALL);
 		CREATE TEMP TABLE temp_t_go2epa (LIKE SCHEMA_NAME.temp_go2epa INCLUDING ALL);
 		CREATE TEMP TABLE temp_t_rpt_cat_result (LIKE SCHEMA_NAME.rpt_cat_result INCLUDING ALL);
-	
-		-- create log tables		
+
+		CREATE TEMP TABLE t_pgr_go2epa_arc AS SELECT * FROM temp_t_arc;
+		CREATE TEMP TABLE t_pgr_go2epa_node AS SELECT * FROM temp_t_node;
+
+		-- create log tables
 		EXECUTE 'SELECT gw_fct_create_logtables($${"data":{"parameters":{"fid":'||v_fid||'}}}$$::json)';
 		-- create query tables
 		EXECUTE 'SELECT gw_fct_create_querytables($${"data":{"parameters":{"fid":'||v_fid||', 
@@ -382,7 +388,7 @@ BEGIN
 		(SELECT id FROM temp_t_node LEFT JOIN (SELECT node_1 as node_id FROM temp_t_arc UNION SELECT node_2 FROM temp_t_arc) a USING (node_id) WHERE a.node_id IS NULL) a
 		WHERE t.id = a.id;
 		DELETE FROM temp_t_node WHERE epa_type = 'TODELETE';
-		
+
 		-- create return
 		EXECUTE 'SELECT gw_fct_create_return($${"data":{"parameters":{"functionId":2646, "isEmbebed":false}}}$$::json)' INTO v_return;
 		SELECT gw_fct_pg2epa_export_inp(p_data) INTO v_file;

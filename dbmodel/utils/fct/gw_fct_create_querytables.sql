@@ -29,7 +29,7 @@ SELECT SCHEMA_NAME.gw_fct_setcheckdatabase($${"data":{"parameters":{"omCheck":tr
 */
 
 DECLARE
-v_fid integer; 
+v_fid integer;
 v_project_type text;
 v_verified_exceptions boolean = true;
 v_fprocessname text;
@@ -56,7 +56,7 @@ BEGIN
 	v_epacheck :=  ((p_data ->> 'data')::json->>'parameters')::json->> 'epaCheck';
 	v_plancheck :=  ((p_data ->> 'data')::json->>'parameters')::json->> 'planCheck';
 	v_admincheck :=  ((p_data ->> 'data')::json->>'parameters')::json->> 'adminCheck';
-	
+
 	-- setting verified options
 	IF v_verified_exceptions THEN
 		v_filter = ' WHERE (verified is null or verified::INTEGER IN (0,1))';
@@ -71,15 +71,20 @@ BEGIN
 	DROP TABLE IF EXISTS t_element;	EXECUTE 'CREATE TEMP TABLE t_element AS SELECT * FROM v_edit_element'||v_filter;
 	DROP TABLE IF EXISTS t_link;EXECUTE 'CREATE TEMP TABLE t_link AS SELECT * FROM v_edit_link';
 	DROP TABLE IF EXISTS t_dma;	CREATE TEMP TABLE t_dma AS SELECT * FROM v_edit_dma;
-	IF v_project_type  = 'UD' THEN
+	IF v_project_type = 'WS' THEN
+		DROP TABLE IF EXISTS t_dqa;	CREATE TEMP TABLE t_dqa AS SELECT * FROM v_edit_dqa;
+		DROP TABLE IF EXISTS t_presszone; CREATE TEMP TABLE t_presszone AS SELECT * FROM v_edit_presszone;
+		DROP TABLE IF EXISTS t_sector; CREATE TEMP TABLE t_sector AS SELECT * FROM v_edit_sector;
+	ELSIF v_project_type  = 'UD' THEN
 		DROP TABLE IF EXISTS t_gully;EXECUTE 'CREATE TEMP TABLE t_gully AS SELECT * FROM v_edit_gully'||v_filter;
-	END IF;	
+		DROP TABLE IF EXISTS t_drainzone; CREATE TEMP TABLE t_drainzone AS SELECT * FROM v_edit_drainzone;
+	END IF;
 
 
 	-- create query table for check-epa
 	IF v_epacheck THEN
 		v_filter = concat(v_filter, ' AND sector_id IN (select sector_id from selector_sector where cur_user = current_user)');
-	
+
 		IF v_project_type = 'WS' THEN
 			DROP TABLE IF EXISTS t_inp_pipe; EXECUTE 'CREATE TEMP TABLE t_inp_pipe AS SELECT * FROM v_edit_inp_pipe'||v_filter;
 			DROP TABLE IF EXISTS t_inp_pump; EXECUTE 'CREATE TEMP TABLE t_inp_pump AS SELECT * FROM v_edit_inp_pump'||v_filter;
@@ -90,12 +95,12 @@ BEGIN
 			DROP TABLE IF EXISTS t_inp_inlet; EXECUTE 'CREATE TEMP TABLE t_inp_inlet AS SELECT * FROM v_edit_inp_inlet'||v_filter;
 			DROP TABLE IF EXISTS t_inp_virtualvalve; EXECUTE 'CREATE TEMP TABLE t_inp_virtualvalve AS SELECT * FROM v_edit_inp_virtualvalve'||v_filter;
 			DROP TABLE IF EXISTS t_inp_virtualpump; EXECUTE 'CREATE TEMP TABLE t_inp_virtualpump AS SELECT * FROM v_edit_inp_virtualpump'||v_filter;
-		
+
 		ELSIF  v_project_type  = 'UD' THEN
 			DROP TABLE IF EXISTS t_inp_gully;EXECUTE 'CREATE TEMP TABLE t_inp_gully AS SELECT * FROM v_edit_inp_gully'||v_filter;
-		END IF;	
+		END IF;
 	END IF;
-	
+
 	--  Return
 	RETURN '{"status":"ok"}';
 

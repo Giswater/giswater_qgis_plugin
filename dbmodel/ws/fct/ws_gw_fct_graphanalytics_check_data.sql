@@ -20,7 +20,7 @@ SELECT SCHEMA_NAME.gw_fct_graphanalytics_check_data($${
 -- fid: main:v_fid,
 	other: 176,180,181,192,208,209,367
 
-select * FROM temp_audit_check_data WHERE fid=v_fid AND cur_user=current_user; 
+select * FROM temp_audit_check_data WHERE fid=v_fid AND cur_user=current_user;
 
 */
 
@@ -88,6 +88,12 @@ BEGIN
 		v_edit = 'v_edit_';
 	END IF;
 
+	-- create log tables
+	EXECUTE 'SELECT gw_fct_create_logtables($${"data":{"parameters":{"fid":'||v_fid||'}}}$$::json)';
+	-- create query tables
+	EXECUTE 'SELECT gw_fct_create_querytables($${"data":{"parameters":{"fid":'||v_fid||', 
+			"epaCheck":false, "verifiedExceptions":false}}}$$::json)';
+
 	IF v_fid = 211 OR v_fid = 101 THEN
 		CREATE TEMP TABLE temp_anl_node (LIKE SCHEMA_NAME.anl_node INCLUDING ALL);
 		CREATE TEMP TABLE temp_audit_check_data (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
@@ -113,32 +119,32 @@ BEGIN
 		and query_text is not null
 		and function_name ilike ''%graphanalytics%''
 		and (parameters::text ilike ''%'||v_graphclass||'%'' or parameters is null)';
-	
 
-	for v_rec in execute v_sql		
+
+	for v_rec in execute v_sql
 	loop
-		
+
 		-- check que los addschemas existan
 		select (addparam::json ->>'addSchema')::text into v_addschema from sys_fprocess where fid = v_rec.fid;
 
 		if v_addschema is not null then
-		
+
 			-- check if exists
 			select count(*) into v_count from information_schema.tables where table_catalog = current_catalog and table_schema = v_addschema;
-		
+
 			if v_count = 0 then
-			
+
 				continue;
-			
+
 			end if;
-		
+
 		end if;
 
 		--raise notice 'v_rec.fid %', v_rec.fid;
 		execute 'select gw_fct_check_fprocess($${"client":{"device":4, "infoType":1, "lang":"ES"}, 
 	    "form":{},"feature":{},"data":{"parameters":{"functionFid": '||v_fid||', 
 		"prefixTable": "'||v_edit||'", "checkFid":"'||v_rec.fid||'", "graphClass":"'||lower(v_graphclass)||'"}}}$$)';
-		
+
    	end loop;
 
 
