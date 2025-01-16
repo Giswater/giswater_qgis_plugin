@@ -57,8 +57,6 @@ BEGIN
 		v_process_except_level
 	FROM sys_fprocess WHERE fid = v_check_fid;
 
-	RAISE NOTICE 'v_process_query_text ANTES:::::::: %',v_process_query_text;
-
 	-- replace variables (usando COALESCE para evitar NULLs)
 	v_exceptable_id = concat(replace (v_process_except_table, 'anl_', ''), '_id');
 	v_exceptable_catalog = concat(replace (v_process_except_table, 'anl_', ''), 'cat_id');
@@ -66,7 +64,6 @@ BEGIN
 	v_process_info_msg = COALESCE(replace(v_process_info_msg, 'v_graphClass', COALESCE(v_graphClass, '')), v_process_info_msg);
 	v_process_except_msg = COALESCE(replace(v_process_except_msg, 'v_graphClass', COALESCE(v_graphClass, '')), v_process_except_msg);
 
-	RAISE NOTICE 'v_process_query_text DESPUÉS:::::::: %',v_process_query_text;
 
 	-- manage query count
 	IF v_process_query_text ILIKE '%string_agg%' AND v_process_fid <> 317 THEN
