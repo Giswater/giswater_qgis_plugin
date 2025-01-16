@@ -51,15 +51,15 @@ BEGIN
 
 	-- create temp tables
 	IF v_fid = 125 THEN
-		EXECUTE 'SELECT gw_fct_create_querytables($${"data":{"verifiedExceptions":'||v_verified_exceptions||',"selectionMode":"'||v_selection_mode||'", "checkPsectors":"'||v_checkpsectors||'"}}$$::json)';
+		EXECUTE 'SELECT gw_fct_create_querytables($${"data":{"verifiedExceptions":'||COALESCE(v_verified_exceptions, 'false')||',"selectionMode":"'||COALESCE(v_selection_mode, 'userSelectors')||'", "checkPsectors":"'||COALESCE(v_checkpsectors, 'false')||'"}}$$::json)';
 	END IF;
 
 	-- getting sys_fprocess to be executed
 	v_querytext = 'select * from sys_fprocess where project_type in (lower('||quote_literal(v_project_type)||'), ''utils'') and addparam is null and query_text is not null and function_name ilike ''%om_check%'' order by fid asc';
 
 	raise notice '%', v_querytext;
-	
-	for v_rec in execute v_querytext		
+
+	for v_rec in execute v_querytext
 	loop
 		EXECUTE 'select gw_fct_check_fprocess($${"client":{"device":4, "infoType":1, "lang":"ES"}, 
 	    "form":{},"feature":{},"data":{"parameters":{"functionFid": '||v_fid||', "checkFid":"'||v_rec.fid||'"}}}$$)';
@@ -95,7 +95,7 @@ BEGIN
 	--  Exception handling
 	--EXCEPTION WHEN OTHERS THEN
 	--GET STACKED DIAGNOSTICS v_error_context = pg_exception_context;
-	--RETURN json_build_object('status', 'Failed', 'NOSQLERR', SQLERRM, 'message', json_build_object('level', right(SQLSTATE, 1), 'text', SQLERRM), 'SQLSTATE', 
+	--RETURN json_build_object('status', 'Failed', 'NOSQLERR', SQLERRM, 'message', json_build_object('level', right(SQLSTATE, 1), 'text', SQLERRM), 'SQLSTATE',
 	--SQLSTATE, 'SQLCONTEXT', v_error_context)::json;
 
 END;
