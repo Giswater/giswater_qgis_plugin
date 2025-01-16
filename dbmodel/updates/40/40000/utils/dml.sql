@@ -899,3 +899,8 @@ UPDATE config_param_system SET value = '
 WHERE parameter = 'admin_checkproject';
 
 UPDATE sys_function SET project_type = 'utils' WHERE id = 2430;
+
+-- 16/01/2025
+UPDATE config_form_fields
+	SET stylesheet='{"icon":"173"}'::json
+	WHERE formtype='form_feature' AND columnname='btn_link' AND tabname='tab_elements';
