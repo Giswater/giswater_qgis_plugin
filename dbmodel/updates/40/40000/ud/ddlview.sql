@@ -342,14 +342,14 @@ CREATE OR REPLACE VIEW v_edit_link AS
 	SELECT vu_link.*
 	FROM vu_link
     JOIN v_state_link USING (link_id)
-    JOIN selector_expl se ON (se.cur_user =current_user AND se.expl_id = vu_link.expl_id) or (se.cur_user =current_user and se.expl_id = vu_link.expl_id2)) l;  
-   
+    JOIN selector_expl se ON (se.cur_user =current_user AND se.expl_id = vu_link.expl_id) or (se.cur_user =current_user and se.expl_id = vu_link.expl_id2)) l;
 
-CREATE OR REPLACE VIEW v_edit_link_connec 
+
+CREATE OR REPLACE VIEW v_edit_link_connec
 as select * from v_edit_link where feature_type = 'CONNEC';
 
-CREATE OR REPLACE VIEW v_edit_link_gully 
-as select * from v_edit_link where feature_type = 'GULLY'; 
+CREATE OR REPLACE VIEW v_edit_link_gully
+as select * from v_edit_link where feature_type = 'GULLY';
 
 DROP VIEW IF EXISTS v_edit_drainzone;
 
@@ -763,7 +763,7 @@ WITH vu_node AS (SELECT node.node_id,
 create or replace view v_edit_node as
 select vu_node.*,
 case when is_operative = true and epa_type !='UNDEFINED'::varchar(16) THEN epa_type else NULL::varchar(16) end as inp_type
-FROM vu_node 
+FROM vu_node
 JOIN selector_expl se ON ((se.cur_user = CURRENT_USER AND se.expl_id = vu_node.expl_id) OR (se.cur_user = CURRENT_USER and se.expl_id = vu_node.expl_id2));
 
 
@@ -6131,16 +6131,16 @@ AS SELECT DISTINCT p.id,
      JOIN inp_timeseries_value p ON t.id::text = p.timser_id::text
   WHERE t.expl_id = s.expl_id AND s.cur_user = "current_user"()::text OR t.expl_id IS NULL
   ORDER BY p.id;
-  
-  
+
+
  -- Drop the view if it already exists
 DROP VIEW IF EXISTS v_edit_inp_flwreg;
 
 CREATE OR REPLACE VIEW v_edit_inp_flwreg AS
-WITH 
+WITH
 -- Orifice
 orifice AS (
-    SELECT 
+    SELECT
         f.nodarc_id,
         f.node_id,
         f.order_id,
@@ -6230,7 +6230,7 @@ pump AS (SELECT f.nodarc_id,
      JOIN value_state_type vs ON vs.id = n.state_type
      LEFT JOIN arc a ON a.arc_id::text = f.to_arc::text
   WHERE vs.is_operative IS TRUE)
-  SELECT 
+  SELECT
     COALESCE(o.nodarc_id, ou.nodarc_id, p.nodarc_id, w.nodarc_id) AS nodarc_id,
     COALESCE(o.node_id, ou.node_id, p.node_id, w.node_id) AS node_id,
     COALESCE(o.order_id, ou.order_id, p.order_id, w.order_id) AS order_id,
@@ -6277,7 +6277,7 @@ pump AS (SELECT f.nodarc_id,
     w.weir_coef_curve,
     -- Geometry
     COALESCE(o.the_geom, ou.the_geom, p.the_geom, w.the_geom) AS the_geom
-FROM 
+FROM
     orifice o
 FULL OUTER JOIN outlet ou USING (nodarc_id, node_id)
 FULL OUTER JOIN pump p USING (nodarc_id, node_id)
@@ -6297,7 +6297,7 @@ AS SELECT b.nodarc_id,
     b.flwreg_length,
     st_setsrid(st_linesubstring(CASE WHEN ST_Equals(ST_StartPoint(a.the_geom), n.the_geom)
                     THEN a.the_geom
-                    ELSE ST_Reverse(a.the_geom) end, 0,  b.flwreg_length / st_length(a.the_geom)),SRID_VALUE)::geometry(LineString,SRID_VALUE) 
+                    ELSE ST_Reverse(a.the_geom) end, 0,  b.flwreg_length / st_length(a.the_geom)),SRID_VALUE)::geometry(LineString,SRID_VALUE)
                 AS the_geom
    FROM ( SELECT inp_flwreg_orifice.nodarc_id,
             inp_flwreg_orifice.node_id,
@@ -6333,69 +6333,148 @@ AS SELECT b.nodarc_id,
      JOIN node n USING (node_id)
      JOIN arc a ON a.arc_id::text = b.to_arc::text
     JOIN cat_feature cf ON b.flwreg_type = cf.feature_class;
-	
--- Create parent table for flowregulators (as we have for v_parent_node, arc, connec, gully) 
+
+-- Create parent table for flowregulators (as we have for v_parent_node, arc, connec, gully)
 
 CREATE OR REPLACE VIEW vp_basic_flwreg
 AS SELECT nodarc_id AS nid,
     featurecat_id AS custom_type
-   FROM v_edit_flwreg;	
-   
+   FROM v_edit_flwreg;
+
 -- Create child views for flowregulators.
 DROP VIEW IF EXISTS v_edit_flwreg_frorifice;
-CREATE OR REPLACE VIEW v_edit_flwreg_frorifice as 
+CREATE OR REPLACE VIEW v_edit_flwreg_frorifice as
 SELECT fr.*, st_setsrid(st_linesubstring(CASE WHEN ST_Equals(ST_StartPoint(a.the_geom), n.the_geom)
                     THEN a.the_geom
-                    ELSE ST_Reverse(a.the_geom) end, 0,  fr.flwreg_length / st_length(a.the_geom)),SRID_VALUE)::geometry(LineString,SRID_VALUE) 
-                AS the_geom 
-FROM inp_flwreg_orifice fr 
-JOIN v_edit_node n ON fr.node_id::text = n.node_id::TEXT 
-JOIN v_edit_arc a ON a.arc_id::text = fr.to_arc::TEXT 
-JOIN selector_expl expl ON n.expl_id = expl.expl_id OR n.expl_id2 = expl.expl_id 
-JOIN selector_sector s ON n.sector_id = s.sector_id 
-LEFT JOIN selector_municipality m ON n.muni_id = m.muni_id 
+                    ELSE ST_Reverse(a.the_geom) end, 0,  fr.flwreg_length / st_length(a.the_geom)),SRID_VALUE)::geometry(LineString,SRID_VALUE)
+                AS the_geom
+FROM inp_flwreg_orifice fr
+JOIN v_edit_node n ON fr.node_id::text = n.node_id::TEXT
+JOIN v_edit_arc a ON a.arc_id::text = fr.to_arc::TEXT
+JOIN selector_expl expl ON n.expl_id = expl.expl_id OR n.expl_id2 = expl.expl_id
+JOIN selector_sector s ON n.sector_id = s.sector_id
+LEFT JOIN selector_municipality m ON n.muni_id = m.muni_id
 WHERE expl.cur_user = CURRENT_USER AND s.cur_user = CURRENT_USER AND (m.cur_user = CURRENT_USER OR n.muni_id IS NULL);
 
 DROP VIEW IF EXISTS v_edit_flwreg_frweir;
-CREATE OR REPLACE VIEW v_edit_flwreg_frweir AS 
+CREATE OR REPLACE VIEW v_edit_flwreg_frweir AS
 SELECT fr.*, st_setsrid(st_linesubstring(CASE WHEN ST_Equals(ST_StartPoint(a.the_geom), n.the_geom)
                     THEN a.the_geom
-                    ELSE ST_Reverse(a.the_geom) end, 0,  fr.flwreg_length / st_length(a.the_geom)),SRID_VALUE)::geometry(LineString,SRID_VALUE) 
+                    ELSE ST_Reverse(a.the_geom) end, 0,  fr.flwreg_length / st_length(a.the_geom)),SRID_VALUE)::geometry(LineString,SRID_VALUE)
                 AS the_geom
-FROM inp_flwreg_weir fr 
-JOIN v_edit_node n ON fr.node_id::text = n.node_id::TEXT 
-JOIN v_edit_arc a ON a.arc_id::text = fr.to_arc::TEXT 
-JOIN selector_expl expl ON n.expl_id = expl.expl_id OR n.expl_id2 = expl.expl_id 
-JOIN selector_sector s ON n.sector_id = s.sector_id 
-LEFT JOIN selector_municipality m ON n.muni_id = m.muni_id 
+FROM inp_flwreg_weir fr
+JOIN v_edit_node n ON fr.node_id::text = n.node_id::TEXT
+JOIN v_edit_arc a ON a.arc_id::text = fr.to_arc::TEXT
+JOIN selector_expl expl ON n.expl_id = expl.expl_id OR n.expl_id2 = expl.expl_id
+JOIN selector_sector s ON n.sector_id = s.sector_id
+LEFT JOIN selector_municipality m ON n.muni_id = m.muni_id
 WHERE expl.cur_user = CURRENT_USER AND s.cur_user = CURRENT_USER AND (m.cur_user = CURRENT_USER OR n.muni_id IS NULL);
 
 DROP VIEW IF EXISTS v_edit_flwreg_froutlet;
-CREATE OR REPLACE VIEW v_edit_flwreg_froutlet AS 
+CREATE OR REPLACE VIEW v_edit_flwreg_froutlet AS
 SELECT fr.*, st_setsrid(st_linesubstring(CASE WHEN ST_Equals(ST_StartPoint(a.the_geom), n.the_geom)
                     THEN a.the_geom
-                    ELSE ST_Reverse(a.the_geom) end, 0,  fr.flwreg_length / st_length(a.the_geom)),SRID_VALUE)::geometry(LineString,SRID_VALUE) 
+                    ELSE ST_Reverse(a.the_geom) end, 0,  fr.flwreg_length / st_length(a.the_geom)),SRID_VALUE)::geometry(LineString,SRID_VALUE)
                 AS the_geom
-FROM inp_flwreg_outlet fr 
-JOIN v_edit_node n ON fr.node_id::text = n.node_id::TEXT 
-JOIN v_edit_arc a ON a.arc_id::text = fr.to_arc::TEXT 
-JOIN selector_expl expl ON n.expl_id = expl.expl_id OR n.expl_id2 = expl.expl_id 
-JOIN selector_sector s ON n.sector_id = s.sector_id 
-LEFT JOIN selector_municipality m ON n.muni_id = m.muni_id 
+FROM inp_flwreg_outlet fr
+JOIN v_edit_node n ON fr.node_id::text = n.node_id::TEXT
+JOIN v_edit_arc a ON a.arc_id::text = fr.to_arc::TEXT
+JOIN selector_expl expl ON n.expl_id = expl.expl_id OR n.expl_id2 = expl.expl_id
+JOIN selector_sector s ON n.sector_id = s.sector_id
+LEFT JOIN selector_municipality m ON n.muni_id = m.muni_id
 WHERE expl.cur_user = CURRENT_USER AND s.cur_user = CURRENT_USER AND (m.cur_user = CURRENT_USER OR n.muni_id IS NULL);
 
 
 DROP VIEW IF EXISTS v_edit_flwreg_frpump;
-CREATE OR REPLACE VIEW v_edit_flwreg_frpump AS 
+CREATE OR REPLACE VIEW v_edit_flwreg_frpump AS
 SELECT fr.*, st_setsrid(st_linesubstring(CASE WHEN ST_Equals(ST_StartPoint(a.the_geom), n.the_geom)
                     THEN a.the_geom
-                    ELSE ST_Reverse(a.the_geom) end, 0,  fr.flwreg_length / st_length(a.the_geom)),SRID_VALUE)::geometry(LineString,SRID_VALUE) 
-                AS the_geom 
-FROM inp_flwreg_pump fr 
-JOIN v_edit_node n ON fr.node_id::text = n.node_id::TEXT 
-JOIN v_edit_arc a ON a.arc_id::text = fr.to_arc::TEXT 
-JOIN selector_expl expl ON n.expl_id = expl.expl_id OR n.expl_id2 = expl.expl_id 
-JOIN selector_sector s ON n.sector_id = s.sector_id 
-LEFT JOIN selector_municipality m ON n.muni_id = m.muni_id 
-WHERE expl.cur_user = CURRENT_USER AND s.cur_user = CURRENT_USER AND (m.cur_user = CURRENT_USER OR n.muni_id IS NULL);   
+                    ELSE ST_Reverse(a.the_geom) end, 0,  fr.flwreg_length / st_length(a.the_geom)),SRID_VALUE)::geometry(LineString,SRID_VALUE)
+                AS the_geom
+FROM inp_flwreg_pump fr
+JOIN v_edit_node n ON fr.node_id::text = n.node_id::TEXT
+JOIN v_edit_arc a ON a.arc_id::text = fr.to_arc::TEXT
+JOIN selector_expl expl ON n.expl_id = expl.expl_id OR n.expl_id2 = expl.expl_id
+JOIN selector_sector s ON n.sector_id = s.sector_id
+LEFT JOIN selector_municipality m ON n.muni_id = m.muni_id
+WHERE expl.cur_user = CURRENT_USER AND s.cur_user = CURRENT_USER AND (m.cur_user = CURRENT_USER OR n.muni_id IS NULL);
 
+
+CREATE OR REPLACE VIEW v_rpt_node
+AS SELECT rpt_node.id,
+    node.node_id,
+    selector_rpt_main.result_id,
+    node.node_type,
+    node.nodecat_id,
+    rpt_node.resultdate,
+    rpt_node.resulttime,
+    rpt_node.flooding,
+    rpt_node.depth,
+    rpt_node.head,
+    node.the_geom
+   FROM selector_rpt_main,
+    rpt_inp_node node
+     JOIN rpt_node ON rpt_node.node_id::text = node.node_id::text
+  WHERE rpt_node.result_id::text = selector_rpt_main.result_id::text AND selector_rpt_main.cur_user = "current_user"()::text AND node.result_id::text = selector_rpt_main.result_id::text
+  GROUP BY rpt_node.id, node.node_id, node.node_type, node.nodecat_id, selector_rpt_main.result_id, node.the_geom
+  ORDER BY node.node_id;
+
+CREATE OR REPLACE VIEW v_rpt_arc
+AS SELECT rpt_arc.id,
+    arc.arc_id,
+    selector_rpt_main.result_id,
+    arc.arc_type,
+    arc.arccat_id,
+    rpt_arc.flow,
+    rpt_arc.velocity,
+    rpt_arc.fullpercent,
+    rpt_arc.resultdate,
+    rpt_arc.resulttime,
+    arc.the_geom
+   FROM selector_rpt_main,
+    rpt_inp_arc arc
+     JOIN rpt_arc ON rpt_arc.arc_id::text = arc.arc_id::text
+  WHERE rpt_arc.result_id::text = selector_rpt_main.result_id::text AND selector_rpt_main.cur_user = "current_user"()::text AND arc.result_id::text = selector_rpt_main.result_id::text
+  ORDER BY arc.arc_id;
+
+
+CREATE OR REPLACE VIEW ve_epa_junction
+AS SELECT inp_junction.node_id,
+    inp_junction.y0,
+    inp_junction.ysur,
+    inp_junction.apond,
+    inp_junction.outfallparam,
+    d.aver_depth AS depth_average,
+    d.max_depth AS depth_max,
+    d.time_days AS depth_max_day,
+    d.time_hour AS depth_max_hour,
+    s.hour_surch AS surcharge_hour,
+    s.max_height AS surgarge_max_height,
+    f.hour_flood AS flood_hour,
+    f.max_rate AS flood_max_rate,
+    f.time_days AS time_day,
+    f.time_hour,
+    f.tot_flood AS flood_total,
+    f.max_ponded AS flood_max_ponded
+   FROM inp_junction
+     LEFT JOIN v_rpt_nodedepth_sum d USING (node_id)
+     LEFT JOIN v_rpt_nodesurcharge_sum s USING (node_id)
+     LEFT JOIN v_rpt_nodeflooding_sum f USING (node_id);
+
+CREATE OR REPLACE VIEW ve_epa_pump
+AS SELECT inp_pump.arc_id,
+    inp_pump.curve_id,
+    inp_pump.status,
+    inp_pump.startup,
+    inp_pump.shutoff,
+    v_rpt_pumping_sum.percent,
+    v_rpt_pumping_sum.num_startup,
+    v_rpt_pumping_sum.min_flow,
+    v_rpt_pumping_sum.avg_flow,
+    v_rpt_pumping_sum.max_flow,
+    v_rpt_pumping_sum.vol_ltr,
+    v_rpt_pumping_sum.powus_kwh,
+    v_rpt_pumping_sum.timoff_min,
+    v_rpt_pumping_sum.timoff_max
+   FROM inp_pump
+     LEFT JOIN v_rpt_pumping_sum USING (arc_id);
