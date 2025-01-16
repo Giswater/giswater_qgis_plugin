@@ -24,4 +24,7 @@ ALTER TABLE config_user_x_expl DROP CONSTRAINT config_user_x_expl_expl_id_fkey;
 ALTER TABLE config_user_x_expl ADD CONSTRAINT config_user_x_expl_expl_id_fkey 
 FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
+CREATE INDEX rpt_arc_arc_id ON rpt_arc USING btree (arc_id);
+CREATE INDEX rpt_arc_result_id ON rpt_arc USING btree (result_id);
+
 
