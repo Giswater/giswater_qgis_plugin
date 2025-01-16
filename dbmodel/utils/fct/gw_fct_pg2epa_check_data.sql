@@ -43,13 +43,11 @@ BEGIN
 	v_isembebed :=  ((p_data ->> 'data')::json->>'parameters')::json->> 'isEmbebed';
 	v_verified_exceptions :=  ((p_data ->> 'data')::json->>'parameters')::json->> 'verifiedExceptions';
 
-	IF v_fid is null then v_fid = 225; end if;
-	
-	IF v_isembebed IS false or v_isembebed is null then -- create temporal tables if function is not embebed
-		-- create log tables		
-		EXECUTE 'SELECT gw_fct_create_logtables($${"data":{"parameters":{"fid":'||v_fid||'}}}$$::json)';
+	IF v_isembebed IS FALSE OR v_isembebed IS NULL THEN -- create temporal tables if function is not embebed
+		-- create log tables
+		EXECUTE 'SELECT gw_fct_create_logtables($${"data":{"parameters":{"fid":'||COALESCE(v_fid, 225)||'}}}$$::json)';
 		-- create query tables
-		EXECUTE 'SELECT gw_fct_create_querytables($${"data":{"parameters":{"fid":'||v_fid||', "epaCheck":true, "verifiedExceptions":'||v_verified_exceptions||'}}}$$::json)';
+		EXECUTE 'SELECT gw_fct_create_querytables($${"data":{"parameters":{"fid":'||COALESCE(v_fid, 225)||', "epaCheck":true, "verifiedExceptions":'||COALESCE(v_verified_exceptions, 'false')||'}}}$$::json)';
 	END IF;
 
 	-- getting sys_fprocess to be executed
@@ -57,13 +55,13 @@ BEGIN
 	and addparam is null and query_text is not null and function_name ilike ''%pg2epa_check%'' and active order by fid asc';
 
 	-- loop for checks
-	for v_rec in execute v_querytext		
+	for v_rec in execute v_querytext
 	loop
 		EXECUTE 'select gw_fct_check_fprocess($${"client":{"device":4, "infoType":1, "lang":"ES"}, 
 	    "form":{},"feature":{},"data":{"parameters":{"functionFid":'||v_fid||', "checkFid":"'||v_rec.fid||'"}}}$$)';
 	end loop;
-	
-	
+
+
 	-- built return
 	IF v_fid = 225 THEN
 
