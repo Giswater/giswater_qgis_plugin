@@ -64,14 +64,6 @@ BEGIN
 	v_fprocessname = (SELECT UPPER(fprocess_name) FROM sys_fprocess where fid = v_fid);
 	v_project_type = (SELECT project_type FROM sys_version order by id desc limit 1);
 
-	-- create log tables
-	DROP TABLE IF EXISTS t_audit_check_data; CREATE TEMP TABLE t_audit_check_data (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
-	DROP TABLE IF EXISTS t_audit_check_project;	CREATE TEMP TABLE t_audit_check_project (LIKE SCHEMA_NAME.audit_check_project INCLUDING ALL);
-	DROP TABLE IF EXISTS t_anl_node;CREATE TEMP TABLE  t_anl_node (LIKE SCHEMA_NAME.anl_node INCLUDING ALL);
-	DROP TABLE IF EXISTS t_anl_arc; CREATE TEMP TABLE t_anl_arc (LIKE SCHEMA_NAME.anl_arc INCLUDING ALL);
-	DROP TABLE IF EXISTS t_anl_connec;CREATE TEMP TABLE t_anl_connec (LIKE SCHEMA_NAME.anl_connec INCLUDING ALL);
-	DROP TABLE IF EXISTS t_anl_polygon; CREATE TEMP TABLE t_anl_polygon (LIKE SCHEMA_NAME.anl_polygon INCLUDING ALL);
-
 	IF v_project_type  = 'UD' THEN
 		DROP TABLE IF EXISTS t_anl_gully;CREATE TEMP TABLE t_anl_gully (LIKE SCHEMA_NAME.anl_gully INCLUDING ALL);
 	END IF;
