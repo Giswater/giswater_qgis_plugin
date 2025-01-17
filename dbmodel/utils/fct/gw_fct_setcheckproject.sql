@@ -102,7 +102,7 @@ BEGIN
 	IF v_qgis_layers_setpropierties IS NULL THEN v_qgis_layers_setpropierties = TRUE; END IF;
 
 	-- create temp tables
-	PERFORM gw_fct_create_checktables($${"client":{}, "form":{},"feature":{}, "data":{"parameters":{"selectionMode":"ignore"}}}$$);
+	PERFORM gw_fct_create_querytables($${"client":{}, "form":{},"feature":{}, "data":{"parameters":{"selectionMode":"ignore"}}}$$);
 
 	--check plugin and db version and other system parameters
 	IF v_qgis_version = v_version THEN
@@ -128,7 +128,7 @@ BEGIN
 	-- check layers from project and insert on log table 
 	v_querytext=NULL;
 	FOR v_field in SELECT * FROM json_array_elements(v_insert_fields) LOOP
-		select into v_querytext concat(v_querytext, 'INSERT INTO '||v_schemaname||'.t_audit_check_project (table_schema, table_id, table_dbname, table_host, fid, table_user) ') ;
+		select into v_querytext concat(v_querytext, 'INSERT INTO t_audit_check_project (table_schema, table_id, table_dbname, table_host, fid, table_user) ') ;
 		select into v_querytext concat(v_querytext, 'VALUES('||quote_literal((v_field->>'table_schema'))||', '||quote_literal((v_field->>'table_id'))||', '||quote_literal((v_field->>'table_dbname'))||', 
 		'||quote_literal((v_field->>'table_host'))||'') ;
 		select into v_querytext concat(v_querytext, ', '||quote_literal((v_field->>'fid'))||', '||quote_literal((v_field->>'table_user'))||');') ;

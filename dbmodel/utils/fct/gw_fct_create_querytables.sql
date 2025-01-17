@@ -101,6 +101,18 @@ BEGIN
 		END IF;
 	END IF;
 
+	-- create log tables
+	DROP TABLE IF EXISTS t_audit_check_data; EXECUTE 'CREATE TEMP TABLE t_audit_check_data AS SELECT * FROM audit_check_data';
+	DROP TABLE IF EXISTS t_audit_check_project;	EXECUTE 'CREATE TEMP TABLE t_audit_check_project AS SELECT * FROM audit_check_project';
+
+
+	-- create anl tables
+	DROP TABLE IF EXISTS t_anl_node; EXECUTE 'CREATE TEMP TABLE  t_anl_node AS SELECT * FROM anl_node WHERE cur_user = current_user';
+	DROP TABLE IF EXISTS t_anl_arc;	EXECUTE 'CREATE TEMP TABLE t_anl_arc AS SELECT * FROM anl_arc WHERE cur_user = current_user';
+	DROP TABLE IF EXISTS t_anl_connec; EXECUTE 'CREATE TEMP TABLE t_anl_connec AS SELECT * FROM anl_connec WHERE cur_user = current_user';
+	DROP TABLE IF EXISTS t_anl_polygon; EXECUTE 'CREATE TEMP TABLE t_anl_polygon AS SELECT * FROM anl_polygon WHERE cur_user = current_user';
+
+
 	--  Return
 	RETURN '{"status":"ok"}';
 
