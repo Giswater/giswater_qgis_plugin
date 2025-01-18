@@ -1086,3 +1086,58 @@ AS SELECT d.dqa_id,
     LEFT JOIN macrodqa md ON md.macrodqa_id = d.macrodqa_id
   WHERE d.expl_id = selector_expl.expl_id AND d.active AND selector_expl.cur_user = "current_user"()::text OR d.expl_id IS NULL
   ORDER BY d.dqa_id;
+  
+ -- 18/01/2025
+drop view v_rpt_arc;
+CREATE OR REPLACE VIEW v_rpt_arc as
+select arc.arc_id,
+    selector_rpt_main.result_id,
+    arc.arc_type,
+    arc.sector_id,
+    arc.arccat_id,
+    max(rpt_arc.flow) AS flow_max,
+    min(rpt_arc.flow) AS flow_min,
+    avg(rpt_arc.flow)::numeric(12,2) AS flow_avg,
+    max(rpt_arc.vel) AS vel_max,
+    min(rpt_arc.vel) AS vel_min,
+    avg(rpt_arc.vel)::numeric(12,2) AS vel_avg,
+    max(rpt_arc.headloss) AS headloss_max,
+    min(rpt_arc.headloss) AS headloss_min,
+    max(rpt_arc.setting) AS setting_max,
+    min(rpt_arc.setting) AS setting_min,
+    max(rpt_arc.reaction) AS reaction_max,
+    min(rpt_arc.reaction) AS reaction_min,
+    max(rpt_arc.ffactor) AS ffactor_max,
+    min(rpt_arc.ffactor) AS ffactor_min,
+    rpt_arc.length,
+    max(rpt_arc.headloss*rpt_arc.length/1000)::numeric(12,2) AS tot_headloss_max,
+    min(rpt_arc.headloss*rpt_arc.length/1000)::numeric(12,2) AS tot_headloss_min,
+    arc.the_geom
+   FROM selector_rpt_main,
+    rpt_inp_arc arc
+     JOIN rpt_arc ON rpt_arc.arc_id::text = arc.arc_id::text
+  WHERE rpt_arc.result_id::text = selector_rpt_main.result_id::text AND selector_rpt_main.cur_user = "current_user"()::text AND arc.result_id::text = selector_rpt_main.result_id::text
+  GROUP BY arc.arc_id, arc.arc_type, arc.sector_id, arc.arccat_id, selector_rpt_main.result_id, arc.the_geom, rpt_arc.length
+    
+drop  VIEW v_rpt_arc_all;
+CREATE OR REPLACE VIEW v_rpt_arc_all as
+SELECT rpt_arc.id,
+    arc.arc_id,
+    selector_rpt_main.result_id,
+    arc.arc_type,
+    arc.sector_id,
+    arc.arccat_id,
+    rpt_arc.flow,
+    rpt_arc.vel,
+    rpt_arc.headloss,
+    rpt_arc.setting,
+    rpt_arc.ffactor,
+    now()::date + rpt_arc."time"::interval AS "time",
+    rpt_arc.length,
+    rpt_arc.headloss*rpt_arc.length/1000 as tot_headloss,
+    arc.the_geom
+   FROM selector_rpt_main,
+    rpt_inp_arc arc
+     JOIN rpt_arc ON rpt_arc.arc_id::text = arc.arc_id::text
+  WHERE rpt_arc.result_id::text = selector_rpt_main.result_id::text AND selector_rpt_main.cur_user = "current_user"()::text AND arc.result_id::text = selector_rpt_main.result_id::text
+  ORDER BY rpt_arc.setting, arc.arc_id;
