@@ -74,10 +74,12 @@ BEGIN
 		-- inserting on archived_rpt_arc_stats
 		EXECUTE 'INSERT INTO archived_rpt_arc_stats(
 			arc_id, result_id, arc_type, sector_id, arccat_id, flow_max, flow_min, flow_avg, vel_max, vel_min, vel_avg,
-			headloss_max, headloss_min, setting_max, setting_min, reaction_max, reaction_min, ffactor_max, ffactor_min, the_geom)
+			headloss_max, headloss_min, setting_max, setting_min, reaction_max, reaction_min, ffactor_max, ffactor_min, length,
+			tot_headloss_max, tot_headloss_min, the_geom)
 		SELECT
 			arc_id, result_id, arc_type, sector_id, arccat_id, flow_max, flow_min, flow_avg, vel_max, vel_min, vel_avg,
-			headloss_max, headloss_min, setting_max, setting_min, reaction_max, reaction_min, ffactor_max, ffactor_min, the_geom
+			headloss_max, headloss_min, setting_max, setting_min, reaction_max, reaction_min, ffactor_max, ffactor_min, length,
+			tot_headloss_max, tot_headloss_min, the_geom
 		FROM rpt_arc_stats
 		WHERE result_id = '||quote_literal(v_result_id)||';';
 
@@ -180,10 +182,12 @@ BEGIN
 		-- inserting on archived_rpt_arc_stats
 		EXECUTE 'INSERT INTO rpt_arc_stats(
 			arc_id, result_id, arc_type, sector_id, arccat_id, flow_max, flow_min, flow_avg, vel_max, vel_min, vel_avg,
-			headloss_max, headloss_min, setting_max, setting_min, reaction_max, reaction_min, ffactor_max, ffactor_min, the_geom)
+			headloss_max, headloss_min, setting_max, setting_min, reaction_max, reaction_min, ffactor_max, ffactor_min, length,
+			tot_headloss_max, tot_headloss_min, the_geom)
 		SELECT
 			arc_id, result_id, arc_type, sector_id, arccat_id, flow_max, flow_min, flow_avg, vel_max, vel_min, vel_avg,
-			headloss_max, headloss_min, setting_max, setting_min, reaction_max, reaction_min, ffactor_max, ffactor_min, the_geom
+			headloss_max, headloss_min, setting_max, setting_min, reaction_max, reaction_min, ffactor_max, ffactor_min, length,
+			tot_headloss_max, tot_headloss_min, the_geom
 		FROM archived_rpt_arc_stats
 		WHERE result_id = '||quote_literal(v_result_id)||';';
 

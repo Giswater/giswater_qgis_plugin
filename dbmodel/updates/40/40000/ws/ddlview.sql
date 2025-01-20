@@ -2273,6 +2273,9 @@ AS SELECT r.arc_id,
     r.reaction_min,
     r.ffactor_max,
     r.ffactor_min,
+    r.length,
+    r.tot_headloss_max,
+    r.tot_headloss_min,
     r.the_geom
    FROM rpt_arc_stats r,
     selector_rpt_main s
@@ -2290,13 +2293,15 @@ AS SELECT rpt_arc.id,
     rpt_arc.headloss,
     rpt_arc.setting,
     rpt_arc.ffactor,
-    '2001-01-01'::date + rpt_arc."time"::interval AS "time",
+    now()::date + rpt_arc."time"::interval AS "time",
+    rpt_arc.length,
+    rpt_arc.headloss * rpt_arc.length / 1000 AS tot_headloss,
     arc.the_geom
    FROM selector_rpt_main,
-    rpt_inp_arc arc
-     JOIN rpt_arc ON rpt_arc.arc_id::text = arc.arc_id::text
-  WHERE rpt_arc.result_id::text = selector_rpt_main.result_id::text AND selector_rpt_main.cur_user = "current_user"()::text AND arc.result_id::text = selector_rpt_main.result_id::text
-  ORDER BY rpt_arc.setting, arc.arc_id;
+   rpt_inp_arc arc
+   JOIN rpt_arc ON rpt_arc.arc_id::text = arc.arc_id::text
+   WHERE rpt_arc.result_id::text = selector_rpt_main.result_id::text AND selector_rpt_main.cur_user = "current_user"()::text AND arc.result_id::text = selector_rpt_main.result_id::text
+   ORDER BY rpt_arc.setting, arc.arc_id;
 
 
 CREATE OR REPLACE VIEW ve_epa_junction
@@ -2599,7 +2604,7 @@ CREATE OR REPLACE VIEW ve_epa_pipe AS
     a.builtdate,
     r.roughness AS cat_roughness,
     inp_pipe.custom_roughness,
-	a.cat_dint,
+	  a.cat_dint,
     inp_pipe.custom_dint,
     inp_pipe.reactionparam,
     inp_pipe.reactionvalue,
@@ -2619,7 +2624,9 @@ CREATE OR REPLACE VIEW ve_epa_pipe AS
     v_rpt_arc_stats.reaction_max,
     v_rpt_arc_stats.reaction_min,
     v_rpt_arc_stats.ffactor_max,
-    v_rpt_arc_stats.ffactor_min
+    v_rpt_arc_stats.ffactor_min,
+    v_rpt_arc_stats.tot_headloss_max,
+    v_rpt_arc_stats.tot_headloss_min
    FROM vu_arc a
      JOIN inp_pipe USING (arc_id)
      LEFT JOIN v_rpt_arc_stats ON split_part(v_rpt_arc_stats.arc_id::text, 'P'::text, 1) = inp_pipe.arc_id::text

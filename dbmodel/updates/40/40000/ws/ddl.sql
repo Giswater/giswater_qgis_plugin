@@ -382,3 +382,78 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"pres
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"presszone", "column":"lastupdate_user", "dataType":"varchar(50)"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"sector", "column":"insert_user", "dataType":"varchar(50)"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"sector", "column":"lastupdate_user", "dataType":"varchar(50)"}}$$);
+
+-- 20/01/2025
+ALTER TABLE rpt_arc_stats RENAME TO _rpt_arc_stats;
+ALTER TABLE _rpt_arc_stats RENAME CONSTRAINT rpt_arc_stats_pkey TO _rpt_arc_stats_pkey;
+DROP INDEX IF EXISTS rpt_arc_stats_flow_avg;
+DROP INDEX IF EXISTS rpt_arc_stats_flow_max;
+DROP INDEX IF EXISTS rpt_arc_stats_flow_min;
+DROP INDEX IF EXISTS rpt_arc_stats_geom;
+DROP INDEX IF EXISTS rpt_arc_stats_vel_avg;
+DROP INDEX IF EXISTS rpt_arc_stats_vel_max;
+DROP INDEX IF EXISTS rpt_arc_stats_vel_min;
+
+ALTER TABLE archived_rpt_arc_stats RENAME TO _archived_rpt_arc_stats;
+ALTER TABLE _archived_rpt_arc_stats RENAME CONSTRAINT archived_rpt_arc_stats_pkey TO _archived_rpt_arc_stats_pkey;
+
+CREATE TABLE rpt_arc_stats (
+	arc_id varchar(16) NOT NULL,
+	result_id varchar(30) NOT NULL,
+	arc_type varchar(30) NULL,
+	sector_id int4 NULL,
+	arccat_id varchar(30) NULL,
+	flow_max numeric NULL,
+	flow_min numeric NULL,
+	flow_avg numeric(12, 2) NULL,
+	vel_max numeric NULL,
+	vel_min numeric NULL,
+	vel_avg numeric(12, 2) NULL,
+	headloss_max numeric NULL,
+	headloss_min numeric NULL,
+	setting_max numeric NULL,
+	setting_min numeric NULL,
+	reaction_max numeric NULL,
+	reaction_min numeric NULL,
+	ffactor_max numeric NULL,
+	ffactor_min numeric NULL,
+	length numeric NULL,
+	tot_headloss_max numeric(12, 2) NULL,
+	tot_headloss_min numeric(12, 2) NULL,
+	the_geom public.geometry(linestring, 25831) NULL,
+	CONSTRAINT rpt_arc_stats_pkey PRIMARY KEY (arc_id, result_id)
+);
+CREATE INDEX rpt_arc_stats_flow_avg ON rpt_arc_stats USING btree (flow_avg);
+CREATE INDEX rpt_arc_stats_flow_max ON rpt_arc_stats USING btree (flow_max);
+CREATE INDEX rpt_arc_stats_flow_min ON rpt_arc_stats USING btree (flow_min);
+CREATE INDEX rpt_arc_stats_geom ON rpt_arc_stats USING gist (the_geom);
+CREATE INDEX rpt_arc_stats_vel_avg ON rpt_arc_stats USING btree (vel_avg);
+CREATE INDEX rpt_arc_stats_vel_max ON rpt_arc_stats USING btree (vel_max);
+CREATE INDEX rpt_arc_stats_vel_min ON rpt_arc_stats USING btree (vel_min);
+
+CREATE TABLE archived_rpt_arc_stats (
+	arc_id varchar(16) NOT NULL,
+	result_id varchar(30) NOT NULL,
+	arc_type varchar(30) NULL,
+	sector_id int4 NULL,
+	arccat_id varchar(30) NULL,
+	flow_max numeric NULL,
+	flow_min numeric NULL,
+	flow_avg numeric(12, 2) NULL,
+	vel_max numeric NULL,
+	vel_min numeric NULL,
+	vel_avg numeric(12, 2) NULL,
+	headloss_max numeric NULL,
+	headloss_min numeric NULL,
+	setting_max numeric NULL,
+	setting_min numeric NULL,
+	reaction_max numeric NULL,
+	reaction_min numeric NULL,
+	ffactor_max numeric NULL,
+	ffactor_min numeric NULL,
+	length numeric NULL,
+	tot_headloss_max numeric(12, 2) NULL,
+	tot_headloss_min numeric(12, 2) NULL,
+	the_geom public.geometry(linestring, 25831) NULL,
+	CONSTRAINT archived_rpt_arc_stats_pkey PRIMARY KEY (arc_id, result_id)
+);

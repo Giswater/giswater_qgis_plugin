@@ -8,8 +8,8 @@ This version of Giswater is provided by Giswater Association
 
 DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_rpt2pg(character varying );
 DROP FUNCTION IF EXISTS "SCHEMA_NAME".gw_fct_rpt2pg(json);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_rpt2pg_main(p_data json)  
-RETURNS json AS 
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_rpt2pg_main(p_data json)
+RETURNS json AS
 $BODY$
 
 /*EXAMPLE
@@ -38,13 +38,13 @@ BEGIN
 	v_file  = (p_data ->>'data')::json->>'file';
 	v_step = (p_data->>'data')::json->>'step';
 
-	-- 
+	--
 	IF v_step = 1 THEN
 
 		RAISE NOTICE 'Starting rpt2pg process.';
 		CREATE TEMP TABLE temp_t_csv (LIKE SCHEMA_NAME.temp_csv INCLUDING ALL);
 		CREATE TEMP TABLE temp_audit_check_data (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
-		
+
 		-- inserting file into temp table
 		INSERT INTO temp_t_csv (fid, cur_user, source, csv1, csv2, csv3, csv4, csv5, csv6, csv7, csv8, csv9, csv10, csv11, csv12, csv13, csv14, csv15, csv16, csv17, csv18, csv19, csv20, csv40)
 		SELECT 140 , current_user, replace(a::json->>'target','''',''), a::json->>'col1', a::json->>'col2',a::json->>'col3',a::json->>'col4',a::json->>'col5',a::json->>'col6',a::json->>'col7',
@@ -54,25 +54,25 @@ BEGIN
 
 		v_return = '{"status": "Accepted", "message":{"level":1, "text":"Import RPT file 1/2:Import data...... done succesfully"}}'::json;
 		RETURN v_return;
-		
+
 	ELSIF v_step = 2 THEN
 
 		-- reordening data from temp table to rpt tables
 		p_data = concat('{"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"resultId":"'||v_result||'"}}');
 		SELECT gw_fct_rpt2pg_import_rpt(p_data) INTO v_import;
-	
+
 		-- Reverse geometries where flow is negative and updating flow values with absolute value
 		UPDATE rpt_inp_arc SET the_geom=st_reverse(the_geom) FROM rpt_arc WHERE rpt_arc.arc_id=rpt_inp_arc.arc_id AND flow<0 AND rpt_inp_arc.result_id=v_result;
 		UPDATE rpt_arc SET flow=(-1)*flow WHERE flow<0 and result_id=v_result;
-	
+
 		-- set result on result selector
 		-- NOTE: In spite of there are four selectors tables () only it's setted one
 		DELETE FROM selector_rpt_main WHERE cur_user=current_user;
 		INSERT INTO selector_rpt_main (result_id, cur_user) VALUES (v_result, current_user);
-	
+
 		-- update rpt_cat_result
 		UPDATE rpt_cat_result SET exec_date = now(), cur_user = current_user , status = 2 WHERE result_id = v_result;
-	
+
 		-- delete wrong VALUES
 		UPDATE rpt_node SET time='0:00' where time ='null' and result_id = v_result;
 		UPDATE rpt_arc SET time='0:00' where time ='null' and result_id = v_result;
@@ -98,6 +98,9 @@ BEGIN
 		    min(rpt_arc.reaction) AS reaction_min,
 		    max(rpt_arc.ffactor) AS ffactor_max,
 		    min(rpt_arc.ffactor) AS ffactor_min,
+			rpt_arc.length,
+			max(rpt_arc.headloss * rpt_arc.length / 1000)::numeric(12, 2) AS tot_headloss_max,
+			min(rpt_arc.headloss * rpt_arc.length / 1000)::numeric(12, 2) AS tot_headloss_min,
 		    arc.the_geom
 		   FROM selector_rpt_main,
 		   rpt_inp_arc arc
@@ -106,7 +109,7 @@ BEGIN
 		   GROUP BY arc.arc_id, arc.arc_type, arc.sector_id, arc.arccat_id, selector_rpt_main.result_id, arc.the_geom
 		   ORDER BY arc.arc_id;
 
-		INSERT INTO rpt_node_stats 
+		INSERT INTO rpt_node_stats
 		SELECT node.node_id,
 		    selector_rpt_main.result_id,
 		    node.node_type,

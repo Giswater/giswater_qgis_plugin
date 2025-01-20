@@ -2928,3 +2928,28 @@ DELETE FROM sys_function
 
 UPDATE config_form_fields SET formname = 'v_rpt_node_stats' WHERE formname = 'v_rpt_node';
 UPDATE config_form_fields SET formname = 'v_rpt_node' WHERE formname = 'v_rpt_node_all';
+
+-- recover data from old tables
+INSERT INTO rpt_arc_stats
+SELECT arc_id, result_id, arc_type, sector_id, arccat_id, flow_max, flow_min, flow_avg, vel_max, vel_min, vel_avg,
+headloss_max, headloss_min, setting_max, setting_min, reaction_max, reaction_min, ffactor_max, ffactor_min, NULL,
+NULL, NULL, the_geom
+FROM _rpt_arc_stats;
+
+INSERT INTO archived_rpt_arc_stats
+SELECT arc_id, result_id, arc_type, sector_id, arccat_id, flow_max, flow_min, flow_avg, vel_max, vel_min, vel_avg,
+headloss_max, headloss_min, setting_max, setting_min, reaction_max, reaction_min, ffactor_max, ffactor_min, NULL,
+NULL, NULL, the_geom
+FROM _archived_rpt_arc_stats;
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder,
+ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet,
+widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('ve_epa_pipe', 'form_feature', 'tab_epa', 'tot_headloss_max', 'lyt_epa_data_2', 21, 'string', 'text', 'Max Tot Headloss:', 'Max Tot Headloss', NULL,
+false, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"filterSign":"ILIKE"}'::json, NULL, NULL, false, NULL);
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder,
+ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet,
+widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('ve_epa_pipe', 'form_feature', 'tab_epa', 'tot_headloss_min', 'lyt_epa_data_2', 22, 'string', 'text', 'Min Tot Headloss:', 'Min Tot Headloss', NULL,
+false, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"filterSign":"ILIKE"}'::json, NULL, NULL, false, NULL);
