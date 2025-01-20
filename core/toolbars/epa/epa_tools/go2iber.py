@@ -49,6 +49,9 @@ class Go2Iber:
         print("go2iber")
         self.dlg_go2iber = GwGo2IberUi(self)
         tools_gw.load_settings(self.dlg_go2iber)
+        if self.dr_options_class is None:
+            tools_qgis.show_warning("DRAIN plugin not found")
+            return
 
         # Connect signals
         self.dlg_go2iber.btn_path.clicked.connect(partial(tools_qt.get_folder_path, self.dlg_go2iber, self.dlg_go2iber.txt_path))
@@ -67,6 +70,9 @@ class Go2Iber:
         self.go2epa_btn._go2epa_options()
 
     def _btn_iber_options_clicked(self):
+        if self.dr_options_class is None:
+            tools_qgis.show_warning("DRAIN plugin not found")
+            return
         self.dr_options = self.dr_options_class.DrOptions(tabs_to_show=["tab_main", "tab_rpt_iber", "tab_plugins"])
         self.dr_options.open_options_dlg()
 
