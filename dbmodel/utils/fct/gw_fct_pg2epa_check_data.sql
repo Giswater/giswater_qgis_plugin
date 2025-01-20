@@ -29,6 +29,7 @@ v_result_info json;
 v_result_point json;
 v_result_line json;
 v_result_polygon json;
+v_version text;
 
 BEGIN
 
@@ -36,19 +37,23 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 
 	-- select config values
-	SELECT project_type INTO v_project_type FROM sys_version order by id desc limit 1;
+	SELECT project_type, giswater INTO v_project_type, v_version FROM sys_version order by id desc limit 1;
 
 	-- getting input parameters
 	v_fid :=  ((p_data ->> 'data')::json->>'parameters')::json->> 'fid';
 	v_isembebed :=  ((p_data ->> 'data')::json->>'parameters')::json->> 'isEmbebed';
 	v_verified_exceptions :=  ((p_data ->> 'data')::json->>'parameters')::json->> 'verifiedExceptions';
 
+	IF v_fid IS NULL THEN v_fid = 225; END IF;
+	IF v_verified_exceptions IS NULL THEN v_verified_exceptions = false; END IF;
+
 	IF v_isembebed IS FALSE OR v_isembebed IS NULL THEN -- create temporal tables if function is not embebed
 		-- create query tables
-		EXECUTE 'SELECT gw_fct_create_querytables($${"data":{"parameters":{"fid":'||COALESCE(v_fid, 225)||', "epaCheck":true, "verifiedExceptions":'||COALESCE(v_verified_exceptions, 'false')||'}}}$$::json)';
-
+		--raise exception 'v_verified_exceptions %', v_verified_exceptions;
+		EXECUTE'SELECT gw_fct_create_querytables($${"data":{"parameters":{"fid":'||v_fid||', "epaCheck":true, "verifiedExceptions":'||v_verified_exceptions||'}}}$$::json)';
+		--raise exception 'v_sql %', v_sql;
 		-- create log tables
-		EXECUTE 'SELECT gw_fct_create_logtables($${"data":{"parameters":{"fid":'||COALESCE(v_fid, 225)||'}}}$$::json)';
+		EXECUTE 'SELECT gw_fct_create_logtables($${"data":{"parameters":{"fid":'||v_fid||'}}}$$::json)';
 		
 	END IF;
 

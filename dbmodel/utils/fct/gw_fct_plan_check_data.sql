@@ -65,8 +65,13 @@ BEGIN
 	v_global_count:=0;
 	
 	IF v_fid is null then v_fid = 115; end if;
+	IF v_verified_exceptions is null then v_verified_exceptions = FALSE; end if;
+
+	--raise exception 'v_isembebed %', v_isembebed;
 	
 	IF v_isembebed IS false OR v_isembebed IS null then -- create temporal tables if function is not embebed
+	
+		v_isembebed = false;
 	
 		-- create query tables
 		EXECUTE 'SELECT gw_fct_create_querytables($${"data":{"parameters":{"fid":'||v_fid||', "planCheck":true, "verifiedExceptions":'||v_verified_exceptions||'}}}$$::json)';
