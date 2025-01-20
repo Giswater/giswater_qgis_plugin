@@ -88,11 +88,11 @@ BEGIN
 		v_edit = 'v_edit_';
 	END IF;
 
+
+	-- create query tables
+	EXECUTE 'SELECT gw_fct_create_querytables($${"data":{"parameters":{"fid":'||v_fid||', "epaCheck":false, "verifiedExceptions":false}}}$$::json)';
 	-- create log tables
 	EXECUTE 'SELECT gw_fct_create_logtables($${"data":{"parameters":{"fid":'||v_fid||'}}}$$::json)';
-	-- create query tables
-	EXECUTE 'SELECT gw_fct_create_querytables($${"data":{"parameters":{"fid":'||v_fid||', 
-			"epaCheck":false, "verifiedExceptions":false}}}$$::json)';
 
 	IF v_fid = 211 OR v_fid = 101 THEN
 		CREATE TEMP TABLE temp_anl_node (LIKE SCHEMA_NAME.anl_node INCLUDING ALL);

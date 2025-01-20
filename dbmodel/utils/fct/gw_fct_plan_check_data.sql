@@ -67,10 +67,12 @@ BEGIN
 	IF v_fid is null then v_fid = 115; end if;
 	
 	IF v_isembebed IS false OR v_isembebed IS null then -- create temporal tables if function is not embebed
-		-- create log tables		
-		EXECUTE 'SELECT gw_fct_create_logtables($${"data":{"parameters":{"fid":'||v_fid||'}}}$$::json)';
+	
 		-- create query tables
 		EXECUTE 'SELECT gw_fct_create_querytables($${"data":{"parameters":{"fid":'||v_fid||', "planCheck":true, "verifiedExceptions":'||v_verified_exceptions||'}}}$$::json)';
+	
+		-- create log tables		
+		EXECUTE 'SELECT gw_fct_create_logtables($${"data":{"parameters":{"fid":'||v_fid||'}}}$$::json)';
 	
 	END IF;
 

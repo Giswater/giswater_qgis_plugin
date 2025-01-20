@@ -51,8 +51,8 @@ BEGIN
 
 	-- create temp tables
 	IF v_fid = 125 THEN
-		EXECUTE 'SELECT gw_fct_create_logtables($${"data":{"parameters":{"fid":'||v_fid||'}}}$$::json)';
 		EXECUTE 'SELECT gw_fct_create_querytables($${"data":{"verifiedExceptions":'||COALESCE(v_verified_exceptions, 'false')||',"selectionMode":"'||COALESCE(v_selection_mode, 'userSelectors')||'", "checkPsectors":"'||COALESCE(v_checkpsectors, 'false')||'"}}$$::json)';
+		EXECUTE 'SELECT gw_fct_create_logtables($${"data":{"parameters":{"fid":'||v_fid||'}}}$$::json)';
 	END IF;
 
 	-- getting sys_fprocess to be executed
