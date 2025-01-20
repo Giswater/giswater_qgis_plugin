@@ -105,6 +105,8 @@ BEGIN
 	DROP TABLE IF EXISTS t_audit_check_data; EXECUTE 'CREATE TEMP TABLE t_audit_check_data AS SELECT * FROM audit_check_data';
 	DROP TABLE IF EXISTS t_audit_check_project;	EXECUTE 'CREATE TEMP TABLE t_audit_check_project AS SELECT * FROM audit_check_project';
 
+	ALTER TABLE t_audit_check_data ALTER COLUMN id SET DEFAULT nextval('SCHEMA_NAME.audit_check_data_id_seq'::regclass);
+
 
 	-- create anl tables
 	DROP TABLE IF EXISTS t_anl_node; EXECUTE 'CREATE TEMP TABLE  t_anl_node AS SELECT * FROM anl_node WHERE cur_user = current_user';

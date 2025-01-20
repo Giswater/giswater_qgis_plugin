@@ -94,16 +94,16 @@ BEGIN
 
 		IF v_process_except_table IS NULL THEN
 
-			INSERT INTO t_audit_check_data (fid, criticity, result_id, error_message, fcount)
+			INSERT INTO t_audit_check_data (fid, criticity, result_id, error_message, fcount, cur_user)
 			VALUES (v_function_fid, v_process_except_level, v_check_fid, concat(
 			CASE WHEN v_process_except_level = 2 THEN 'WARNING-' WHEN v_process_except_level = 3 THEN 'ERROR-' END,
-			v_check_fid, ': ', concat(v_text_aux, v_count, ' ', v_process_except_msg)), v_count);
+			v_check_fid, ': ', concat(v_text_aux, v_count, ' ', v_process_except_msg)), v_count, current_user);
 
 		ELSE
-			INSERT INTO t_audit_check_data (fid, criticity, result_id, error_message, fcount)
+			INSERT INTO t_audit_check_data (fid, criticity, result_id, error_message, fcount, cur_user)
 			VALUES (v_function_fid, v_process_except_level, v_check_fid, concat(
 			CASE WHEN v_process_except_level = 2 THEN 'WARNING-' WHEN v_process_except_level = 3 THEN 'ERROR-' END,
-			v_check_fid, ' (',v_process_except_table,'): ', concat(v_text_aux, v_count, ' ', v_process_except_msg)), v_count);
+			v_check_fid, ' (',v_process_except_table,'): ', concat(v_text_aux, v_count, ' ', v_process_except_msg)), v_count, current_user);
 
 			v_querytext = 'INSERT INTO t_'||v_process_except_table||' ('||v_exceptable_id||', '||v_exceptable_catalog||', 
 					expl_id, fid, the_geom, descript)	SELECT '||v_exceptable_id||', '||v_exceptable_catalog||', 
@@ -115,8 +115,8 @@ BEGIN
 		END IF;
 
 	ELSE
-		INSERT INTO t_audit_check_data (fid, criticity, result_id, error_message, fcount)
-		VALUES (v_function_fid, 1, v_check_fid, concat('INFO: ', v_process_info_msg), 0);
+		INSERT INTO t_audit_check_data (fid, criticity, result_id, error_message, fcount, cur_user)
+		VALUES (v_function_fid, 1, v_check_fid, concat('INFO: ', v_process_info_msg), 0, current_user);
 
 		IF v_process_except_table IS NOT NULL THEN
 
