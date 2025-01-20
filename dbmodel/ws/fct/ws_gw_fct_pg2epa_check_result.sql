@@ -42,7 +42,7 @@ BEGIN
 
 	-- getting sys_fprocess to be executed
 	v_querytext = 'select * from sys_fprocess where project_type in (lower('||quote_literal(v_project_type)||'), ''utils'') 
-	and addparam is null and query_text is not null and function_name ilike ''%pg2epa_check%'' and active order by fid asc';
+	and addparam is null and query_text is not null and function_name ilike ''%pg2epa_check_network%'' and active order by fid asc';
 
 	-- loop for checks
 	for v_rec in execute v_querytext		

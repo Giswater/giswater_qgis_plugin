@@ -29,7 +29,7 @@ v_project_type 	text;
 v_table_count integer;
 v_count integer;
 v_global_count	integer;
-v_return integer;
+v_return json;
 v_version text;
 v_result json;
 v_result_info json;
