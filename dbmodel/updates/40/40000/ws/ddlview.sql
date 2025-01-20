@@ -2233,7 +2233,7 @@ AS SELECT r.node_id,
     selector_rpt_main s
   WHERE r.result_id::text = s.result_id::text AND s.cur_user = "current_user"()::text;
 
-CREATE OR REPLACE VIEW v_rpt_node_all
+CREATE OR REPLACE VIEW v_rpt_node
 AS SELECT rpt_node.id,
     node.node_id,
     node.node_type,
