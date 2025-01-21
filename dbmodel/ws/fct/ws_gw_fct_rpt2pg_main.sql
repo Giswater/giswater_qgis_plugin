@@ -106,7 +106,7 @@ BEGIN
 		   rpt_inp_arc arc
 		   JOIN rpt_arc ON rpt_arc.arc_id::text = arc.arc_id::text
 		   WHERE rpt_arc.result_id::text = selector_rpt_main.result_id::text AND selector_rpt_main.cur_user = "current_user"()::text AND arc.result_id::text = selector_rpt_main.result_id::text
-		   GROUP BY arc.arc_id, arc.arc_type, arc.sector_id, arc.arccat_id, selector_rpt_main.result_id, arc.the_geom
+		   GROUP BY arc.arc_id, arc.arc_type, arc.sector_id, arc.arccat_id, selector_rpt_main.result_id, arc.the_geom, rpt_arc.length
 		   ORDER BY arc.arc_id;
 
 		INSERT INTO rpt_node_stats
