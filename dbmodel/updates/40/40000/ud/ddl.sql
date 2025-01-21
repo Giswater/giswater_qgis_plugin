@@ -409,7 +409,7 @@ CREATE INDEX temp_node_result_id ON temp_node USING btree (result_id);
 CREATE INDEX temp_node_dma_id ON temp_node USING btree (dma_id);
 
 ALTER TABLE temp_arc RENAME TO _temp_arc;
-ALTER TABLE temp_arc RENAME CONSTRAINT temp_arc_pkey TO _temp_arc_pkey;
+ALTER TABLE _temp_arc RENAME CONSTRAINT temp_arc_pkey TO _temp_arc_pkey;
 
 DROP INDEX IF EXISTS temp_arc_arc_id;
 DROP INDEX IF EXISTS temp_arc_arc_type;
