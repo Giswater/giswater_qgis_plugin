@@ -460,7 +460,7 @@ CREATE TABLE archived_rpt_arc_stats (
 
 
 -- 21/01/2025
-ALTER TABLE arc_add RENAME TO _arc_add;
+ALTER TABLE arc_add RENAME TO _arc_add_;
 ALTER TABLE _arc_add_ DROP CONSTRAINT arc_add_pkey;
 
 CREATE TABLE arc_add (

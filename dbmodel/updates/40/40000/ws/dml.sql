@@ -2989,4 +2989,4 @@ NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, 
 -- 21/01/2025
 INSERT INTO arc_add (arc_id, flow_max, flow_min, flow_avg, vel_max, vel_min, vel_avg, tot_headloss_max, tot_headloss_min, result_id)
 SELECT arc_id, flow_max, flow_min, flow_avg, vel_max, vel_min, vel_avg, NULL, NULL, result_id
-FROM _arc_add
+FROM _arc_add_;
