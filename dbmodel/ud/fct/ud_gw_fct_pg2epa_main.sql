@@ -265,7 +265,7 @@ BEGIN
 
 		-- move result data
 		UPDATE rpt_cat_result r set network_stats = t.network_stats FROM temp_t_rpt_cat_result t WHERE r.result_id = t.result_id;
-
+		v_return = '{"status": "Accepted", "message":{"level":1, "text":"Export INP file 7/7 - Check according EPA rules...... done succesfully"}}'::json;
 		RETURN v_return;
 
 	END IF;
