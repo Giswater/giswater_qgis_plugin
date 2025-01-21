@@ -457,3 +457,22 @@ CREATE TABLE archived_rpt_arc_stats (
 	the_geom public.geometry(linestring, 25831) NULL,
 	CONSTRAINT archived_rpt_arc_stats_pkey PRIMARY KEY (arc_id, result_id)
 );
+
+
+-- 21/01/2025
+ALTER TABLE arc_add RENAME TO _arc_add;
+ALTER TABLE _arc_add_ DROP CONSTRAINT arc_add_pkey;
+
+CREATE TABLE arc_add (
+	arc_id varchar(16) NOT NULL,
+	flow_max numeric(12, 2) NULL,
+	flow_min numeric(12, 2) NULL,
+	flow_avg numeric(12, 2) NULL,
+	vel_max numeric(12, 2) NULL,
+	vel_min numeric(12, 2) NULL,
+	vel_avg numeric(12, 2) NULL,
+	tot_headloss_max numeric(12, 2) NULL,
+	tot_headloss_min numeric(12, 2) NULL,
+	result_id text NULL,
+	CONSTRAINT arc_add_pkey PRIMARY KEY (arc_id)
+);

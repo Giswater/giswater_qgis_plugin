@@ -2985,3 +2985,8 @@ ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orde
 widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
 VALUES('v_rpt_arc_stats', 'form_feature', 'tab_none', 'tot_headloss_min', NULL, NULL, 'double', 'text', 'tot_headloss_min', 'tot_headloss_min', NULL, false, false, false, false, NULL,
 NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, NULL);
+
+-- 21/01/2025
+INSERT INTO arc_add (arc_id, flow_max, flow_min, flow_avg, vel_max, vel_min, vel_avg, tot_headloss_max, tot_headloss_min, result_id)
+SELECT arc_id, flow_max, flow_min, flow_avg, vel_max, vel_min, vel_avg, NULL, NULL, result_id
+FROM _arc_add

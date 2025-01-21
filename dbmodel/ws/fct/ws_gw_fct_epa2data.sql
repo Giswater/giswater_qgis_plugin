@@ -38,7 +38,7 @@ v_network_type integer;
 v_sectors text;
 v_sql text;
 v_results record;
-v_message_text text; 
+v_message_text text;
 v_action_update boolean = false;
 v_network_name text;
 
@@ -71,10 +71,10 @@ BEGIN
 	SELECT sector_id INTO v_sectors FROM rpt_cat_result WHERE result_id = v_result_id;
 
 	IF v_iscorporate then
-	
-		if (SELECT count(*)  FROM rpt_cat_result r WHERE r.network_type = v_network_type::text AND v_sectors::integer[] @> r.sector_id AND iscorporate IS TRUE) > 0 then 
+
+		if (SELECT count(*)  FROM rpt_cat_result r WHERE r.network_type = v_network_type::text AND v_sectors::integer[] @> r.sector_id AND iscorporate IS TRUE) > 0 then
 			-- The result includes the same network type and sectors. Proceed with updating the corporate entity.
-			if v_action_update is true then 
+			if v_action_update is true then
 				UPDATE rpt_cat_result SET iscorporate = FALSE WHERE result_id in (SELECT result_id FROM rpt_cat_result r WHERE r.network_type = v_network_type::text AND v_sectors::integer[] @> r.sector_id AND iscorporate IS TRUE AND result_id != v_result_id);
 				v_message_text = 'Epa corporate updated';
 			else
@@ -87,9 +87,9 @@ BEGIN
 				        )
 				    ) AS msg
 				FROM (
-				    SELECT 
-				        result_id, 
-				        network_type, 
+				    SELECT
+				        result_id,
+				        network_type,
 				        sector_id::text
 				    FROM rpt_cat_result r
 				    WHERE r.network_type = v_network_type::text
@@ -102,19 +102,19 @@ BEGIN
 						'}}'||
 					'}')::json, 3180, null, null, null);
 			end if;
-			
-			
-		elsif (SELECT count(*)  FROM rpt_cat_result r WHERE r.network_type = v_network_type::text AND r.sector_id && v_sectors::integer[] and iscorporate is true) > 0 then 
+
+
+		elsif (SELECT count(*)  FROM rpt_cat_result r WHERE r.network_type = v_network_type::text AND r.sector_id && v_sectors::integer[] and iscorporate is true) > 0 then
 			-- The result contains the same network type with one or more sectors already associated with another corporate entity. It is not possible to create a new corporate entity under these circumstances.
 			RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":2, "text":"It is impossible to proceed. You need to fix the current corporate result for the following sectors: '||(v_sectors)||'"}, "version":"'||v_version||'"'||
 			 ',"body":{"form":{}'||
 			 ',"data":{}}'||
 			 '}')::json, 3180, null, null, null);
-			
+
 		else
 			-- The result has a different network type or distinct sectors. Proceed with creating a new corporate entity.
 		end if;
-	
+
 		UPDATE rpt_cat_result SET iscorporate=v_iscorporate WHERE result_id = v_result_id;
 
 		SELECT result_id INTO v_current_selector FROM selector_rpt_main WHERE cur_user=current_user;
@@ -135,13 +135,14 @@ BEGIN
 		head_max = EXCLUDED.head_max, head_min = EXCLUDED.head_min, head_avg = EXCLUDED.head_avg,
 		quality_max = EXCLUDED.quality_max, quality_min = EXCLUDED.quality_min, quality_avg=EXCLUDED.quality_avg, result_id=EXCLUDED.result_id;
 
-		INSERT INTO arc_add (arc_id, flow_max, flow_min, flow_avg, vel_max, vel_min, vel_avg, result_id)
-		SELECT arc_id, avg(flow_max)::numeric(12,2), avg(flow_min)::numeric(12,2), avg(flow_avg)::numeric(12,2), avg(vel_max)::numeric(12,2), avg(vel_min)::numeric(12,2), avg(vel_avg)::numeric(12,2), result_id FROM
-		(SELECT split_part(arc_id, 'P',1) as arc_id, flow_max, flow_min, flow_avg, vel_max, vel_min, vel_avg, result_id FROM v_rpt_arc a WHERE result_id=v_result_id)a
+		INSERT INTO arc_add (arc_id, flow_max, flow_min, flow_avg, vel_max, vel_min, vel_avg, tot_headloss_max, tot_headloss_min result_id)
+		SELECT arc_id, avg(flow_max)::numeric(12,2), avg(flow_min)::numeric(12,2), avg(flow_avg)::numeric(12,2), avg(vel_max)::numeric(12,2), avg(vel_min)::numeric(12,2), avg(vel_avg)::numeric(12,2), avg(tot_headloss_max)::numeric(12,2), avg(tot_headloss_min)::numeric(12,2), result_id FROM
+		(SELECT split_part(arc_id, 'P',1) as arc_id, flow_max, flow_min, flow_avg, vel_max, vel_min, vel_avg, tot_headloss_max, tot_headloss_min, result_id FROM v_rpt_arc a WHERE result_id=v_result_id)a
 		GROUP by arc_id, result_id
 		ON CONFLICT (arc_id) DO UPDATE SET
 		flow_max = EXCLUDED.flow_max, flow_min = EXCLUDED.flow_min, flow_avg = EXCLUDED.flow_avg,
-		vel_max = EXCLUDED.vel_max, vel_min = EXCLUDED.vel_min, vel_avg = EXCLUDED.vel_avg, result_id=EXCLUDED.result_id;
+		vel_max = EXCLUDED.vel_max, vel_min = EXCLUDED.vel_min, vel_avg = EXCLUDED.vel_avg,
+		tot_headloss_max = EXCLUDED.tot_headloss_max, tot_headloss_min = EXCLUDED.tot_headloss_min, result_id=EXCLUDED.result_id;
 
 		INSERT INTO connec_add (connec_id, press_max, press_min, press_avg, quality_max, quality_min, quality_avg, result_id)
 		SELECT node_id, press_max::numeric(12,2), press_min::numeric(12,2), press_avg::numeric(12,2),
@@ -187,11 +188,11 @@ BEGIN
 			DELETE FROM selector_rpt_main WHERE cur_user=current_user;
 			INSERT INTO selector_rpt_main(result_id, cur_user) VALUES (v_current_selector, current_user);
 		END IF;
-		
+
 	else
-	
+
 		UPDATE rpt_cat_result SET iscorporate=v_iscorporate WHERE result_id = v_result_id;
-	
+
 		DELETE FROM node_add WHERE result_id = v_result_id;
 		DELETE FROM arc_add WHERE result_id = v_result_id;
 		DELETE FROM connec_add WHERE result_id = v_result_id;
@@ -215,7 +216,7 @@ BEGIN
 
 		end loop;
 	END IF;
-	
+
 	-- Manage v_message_text
 	if v_message_text is null then
 		v_message_text = 'Process done successfully';
