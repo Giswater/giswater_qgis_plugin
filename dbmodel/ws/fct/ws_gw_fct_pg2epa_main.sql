@@ -180,8 +180,8 @@ BEGIN
 		CREATE TEMP TABLE temp_t_go2epa (LIKE SCHEMA_NAME.temp_go2epa INCLUDING ALL);
 		CREATE TEMP TABLE temp_t_rpt_cat_result (LIKE SCHEMA_NAME.rpt_cat_result INCLUDING ALL);
 
-		CREATE TEMP TABLE t_pgr_go2epa_arc AS SELECT * FROM temp_t_arc;
-		CREATE TEMP TABLE t_pgr_go2epa_node AS SELECT * FROM temp_t_node;
+		CREATE TEMP TABLE t_pgr_go2epa_arc (LIKE SCHEMA_NAME.temp_arc INCLUDING ALL);
+		CREATE TEMP TABLE t_pgr_go2epa_node (LIKE SCHEMA_NAME.temp_node INCLUDING ALL);
 
 		-- create log tables
 		EXECUTE 'SELECT gw_fct_create_logtables($${"data":{"parameters":{"fid":'||v_fid||'}}}$$::json)';
