@@ -29,6 +29,7 @@ from ..go2epa_btn import GwGo2EpaButton
 from ....ui.dialog import GwDialog
 from ....ui.ui_manager import GwGo2IberUi, GwGo2EpaUI
 from ....threads.import_inp.import_epanet_task import GwImportInpTask
+from ....threads.go2iber_task import GwGo2IberTask
 from ....utils import tools_gw
 from .....libs import tools_db, tools_qgis, tools_qt
 
@@ -93,28 +94,23 @@ class Go2Iber:
         self._save_user_values()
 
         self.dlg_go2iber.txt_infolog.clear()
-        self.dlg_go2iber.txt_file_rpt.setStyleSheet(None)
+        self.dlg_go2iber.txt_result_name.setStyleSheet(None)
+        self.dlg_go2iber.txt_path.setStyleSheet(None)
         status = self._check_fields()
         if status is False:
             return
 
         # Get widgets values
         self.result_name = tools_qt.get_text(self.dlg_go2iber, self.dlg_go2iber.txt_result_name, False, False)
-        self.export_inp = tools_qt.is_checked(self.dlg_go2iber, self.dlg_go2iber.chk_export)
-        self.export_subcatch = tools_qt.is_checked(self.dlg_go2iber, self.dlg_go2iber.chk_export_subcatch)
-        self.file_inp = tools_qt.get_text(self.dlg_go2iber, self.dlg_go2iber.txt_file_inp)
-        self.exec_epa = tools_qt.is_checked(self.dlg_go2iber, self.dlg_go2iber.chk_exec)
-        self.file_rpt = tools_qt.get_text(self.dlg_go2iber, self.dlg_go2iber.txt_file_rpt)
-        self.import_result = tools_qt.is_checked(self.dlg_go2iber, self.dlg_go2iber.chk_import_result)
+        self.folder_path = tools_qt.get_text(self.dlg_go2iber, self.dlg_go2iber.txt_path)
 
         # Check for sector selector
-        if self.export_inp:
-            sql = "SELECT sector_id FROM selector_sector WHERE sector_id > 0 LIMIT 1"
-            row = tools_db.get_row(sql)
-            if row is None:
-                msg = "You need to select some sector"
-                tools_qt.show_info_box(msg)
-                return
+        sql = "SELECT sector_id FROM selector_sector WHERE sector_id > 0 LIMIT 1"
+        row = tools_db.get_row(sql)
+        if row is None:
+            msg = "You need to select some sector"
+            tools_qt.show_info_box(msg)
+            return
 
         self.dlg_go2iber.btn_accept.setEnabled(False)
         self.dlg_go2iber.btn_cancel.setEnabled(True)
@@ -131,8 +127,8 @@ class Go2Iber:
         #         - Generate INP file with Giswater (go2iber)
         #         - Execute model with DRAIN plugin
         #         - Import results to DRAIN mainly, but rpt to Giswater
-        self.go2iber_task = GwEpaFileManager(description, self, timer=self.timer)
-        self.go2iber_task.step_completed.connect(self.step_completed)
+        self.go2iber_task = GwGo2IberTask(description, self, timer=self.timer)
+        # self.go2iber_task.step_completed.connect(self.step_completed)
         QgsApplication.taskManager().addTask(self.go2iber_task)
         QgsApplication.taskManager().triggerTask(self.go2iber_task)
 
@@ -189,3 +185,18 @@ class Go2Iber:
                 return False
 
         return True
+
+    def _calculate_elapsed_time(self, dialog):
+
+        tf = time()  # Final time
+        td = tf - self.t0  # Delta time
+        self._update_time_elapsed(f"Exec. time: {timedelta(seconds=round(td))}", dialog)
+
+    def _update_time_elapsed(self, text, dialog):
+
+        if isdeleted(dialog):
+            self.timer.stop()
+            return
+
+        lbl_time = dialog.findChild(QLabel, 'lbl_time')
+        lbl_time.setText(text)

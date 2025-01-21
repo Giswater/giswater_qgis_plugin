@@ -51,14 +51,14 @@ class GwEpaFileManager(GwTask):
     def set_variables_from_go2epa(self):
         """ Set variables from object Go2Epa """
 
-        self.dlg_go2epa = self.go2epa.dlg_go2epa
-        self.result_name = self.go2epa.result_name
-        self.file_inp = self.go2epa.file_inp
-        self.file_rpt = self.go2epa.file_rpt
-        self.go2epa_export_inp = self.go2epa.export_inp
-        self.go2epa_execute_epa = self.go2epa.exec_epa
-        self.go2epa_import_result = self.go2epa.import_result
-        self.export_subcatch = self.go2epa.export_subcatch
+        self.dlg_go2epa = getattr(self.go2epa, 'dlg_go2epa', None)
+        self.result_name = getattr(self.go2epa, 'result_name', None)
+        self.file_inp = getattr(self.go2epa, 'file_inp', None)
+        self.file_rpt = getattr(self.go2epa, 'file_rpt', None)
+        self.go2epa_export_inp = getattr(self.go2epa, 'export_inp', None)
+        self.go2epa_execute_epa = getattr(self.go2epa, 'exec_epa', None)
+        self.go2epa_import_result = getattr(self.go2epa, 'import_result', None)
+        self.export_subcatch = getattr(self.go2epa, 'export_subcatch', True)
 
 
     def run(self):
@@ -69,6 +69,12 @@ class GwEpaFileManager(GwTask):
         self.step_completed.emit({"message": {"level": 1, "text": "-------------------------"}}, "\n")
 
         self.initialize_variables()
+
+        status = self.main_process()
+
+        return status
+
+    def main_process(self) -> bool:
         status = True
         if self.go2epa_export_inp or self.go2epa_execute_epa:
             tools_log.log_info(f"Task 'Go2Epa' execute function 'def _exec_function_pg2epa'")
@@ -97,8 +103,9 @@ class GwEpaFileManager(GwTask):
 
         super().finished(result)
 
-        self.dlg_go2epa.btn_cancel.setEnabled(False)
-        self.dlg_go2epa.btn_accept.setEnabled(True)
+        if self.dlg_go2epa is not None:
+            self.dlg_go2epa.btn_cancel.setEnabled(False)
+            self.dlg_go2epa.btn_accept.setEnabled(True)
 
         self._close_file()
         if self.timer:
