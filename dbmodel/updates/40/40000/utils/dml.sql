@@ -933,7 +933,7 @@ VALUES('generic', 'workspace_manager', 'tab_none', 'txt_info', 'lyt_workspace_mn
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
 VALUES('generic', 'workspace_manager', 'tab_none', 'table_view', 'lyt_workspace_mngr_1', 0, NULL, 'tablewidget', '', 'Table', NULL, false, false, true, false, true, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, 'workspace_results', false, 0);
 
-INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('tbl_workspace_manager', 'SELECT id, "name", private, descript, config::text FROM v_ui_workspace', 5, 'tab', 'list', '{"orderBy":"1", "orderType": "ASC"}'::json, '{
+INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('tbl_workspace_manager', 'SELECT id, "name", private::text, descript, config::text FROM v_ui_workspace', 5, 'tab', 'list', '{"orderBy":"1", "orderType": "ASC"}'::json, '{
 "enableGlobalFilter": false,
 "enableStickyHeader": true,
 "positionToolbarAlertBanner": "bottom",
