@@ -904,3 +904,179 @@ UPDATE sys_function SET project_type = 'utils' WHERE id = 2430;
 UPDATE config_form_fields
 	SET stylesheet='{"icon":"173"}'::json
 	WHERE formtype='form_feature' AND columnname='btn_link' AND tabname='tab_elements';
+
+-- 21/01/2025
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam)
+VALUES('layout_name_typevalue', 'lyt_workspace_mngr_3', 'lyt_workspace_mngr_3', 'layoutWorkspaceManager3', '{"lytOrientation": "vertical"}'::json);
+
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam)
+VALUES('layout_name_typevalue', 'lyt_workspace_mngr_1', 'lyt_workspace_mngr_1', 'layoutWorkspaceManager1', '{
+"lytOrientation": "horizontal"
+}'::json);
+
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam)
+VALUES('layout_name_typevalue', 'lyt_workspace_mngr_2', 'lyt_workspace_mngr_2', 'layoutWorkspaceManager2', '{
+"lytOrientation": "horizontal"
+}'::json);
+
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam)
+VALUES('formtype_typevalue', 'workspace_manager', 'workspace_manager', 'workspaceManager', NULL);
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('generic', 'workspace_manager', 'tab_none', 'btn_close', 'lyt_buttons', 1, NULL, 'button', NULL, 'Close', NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{
+"text": "Close"
+}'::json, '{"functionName": "closeDlg"}'::json, NULL, false, 0);
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('generic', 'workspace_manager', 'tab_none', 'txt_info', 'lyt_workspace_mngr_1', 1, NULL, 'textarea', 'Info:', 'Table', NULL, false, false, true, false, true, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, 0);
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('generic', 'workspace_manager', 'tab_none', 'table_view', 'lyt_workspace_mngr_1', 0, NULL, 'tablewidget', '', 'Table', NULL, false, false, true, false, true, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, 'workspace_results', false, 0);
+
+INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('tbl_workspace_manager', 'SELECT id, "name", private, descript, config::text FROM v_ui_workspace', 5, 'tab', 'list', '{"orderBy":"1", "orderType": "ASC"}'::json, '{
+"enableGlobalFilter": false,
+"enableStickyHeader": true,
+"positionToolbarAlertBanner": "bottom",
+"enableGrouping": false,
+"enablePinning": true,
+"enableColumnOrdering": true,
+"enableColumnFilterModes": true,
+"enableFullScreenToggle": false,
+"enablePagination": true,
+"enableExporting": true,
+"muiTablePaginationProps": {
+"rowsPerPageOptions": [
+5,
+10,
+15,
+20,
+50,
+100
+],
+"showFirstButton": true,
+"showLastButton": true
+},
+"enableRowSelection": true,
+"multipleRowSelection": true,
+"initialState": {
+"showColumnFilters": false,
+"pagination": {
+"pageSize": 5,
+"pageIndex": 0
+},
+"density": "compact",
+"columnFilters": [
+{
+"id": "id",
+"value": "",
+"filterVariant": "text"
+}
+],
+"sorting": [
+{
+"id": "id",
+"desc": true
+}
+]
+},
+"modifyTopToolBar": true,
+"renderTopToolbarCustomActions": [
+{
+"widgetfunction": {
+"functionName": "setCurrent",
+"params": {}
+},
+"color": "default",
+"text": "Set Current",
+"disableOnSelect": true,
+"moreThanOneDisable": true
+},
+{
+"widgetfunction": {
+"functionName": "togglePrivacy",
+"params": {}
+},
+"color": "default",
+"text": "Toggle privacy",
+"disableOnSelect": true,
+"moreThanOneDisable": false
+},
+{
+"widgetfunction": {
+"functionName": "create",
+"params": {}
+},
+"color": "success",
+"text": "Create",
+"disableOnSelect": false,
+"moreThanOneDisable": false
+},
+{
+"widgetfunction": {
+"functionName": "edit",
+"params": {}
+},
+"color": "info",
+"text": "Edit",
+"disableOnSelect": true,
+"moreThanOneDisable": true
+},
+{
+"widgetfunction": {
+"functionName": "delete",
+"params": {}
+},
+"color": "error",
+"text": "Delete",
+"disableOnSelect": true,
+"moreThanOneDisable": false
+}
+],
+"enableRowActions": false,
+"renderRowActionMenuItems": [
+{
+"widgetfunction": {
+"functionName": "open",
+"params": {}
+},
+"icon": "OpenInBrowser",
+"text": "Open"
+}
+]
+}'::json);
+
+INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('workspace_form', 'utils', 'tbl_workspace_manager', 'id', 0, true, NULL, NULL, NULL, NULL);
+INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('workspace_form', 'utils', 'tbl_workspace_manager', 'name', 1, true, NULL, NULL, NULL, '{
+"accessorKey": "name",
+"header": "Name",
+"filterVariant": "text",
+"enableSorting": true,
+"enableColumnOrdering": true,
+"enableColumnFilter": true,
+"enableClickToCopy": false
+}'::json);
+INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('workspace_form', 'utils', 'tbl_workspace_manager', 'private', 2, true, NULL, NULL, NULL, NULL);
+INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('workspace_form', 'utils', 'tbl_workspace_manager', 'descript', 3, true, NULL, NULL, NULL, NULL);
+INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('workspace_form', 'utils', 'tbl_workspace_manager', 'config', 4, false, NULL, NULL, NULL, NULL);
+
+INSERT INTO config_typevalue (typevalue,id,idval,camelstyle,addparam)
+VALUES ('layout_name_typevalue','lyt_workspace_open_1','lyt_workspace_open_1','layoutWorkspaceOpen1','{
+"lytOrientation": "vertical"
+}'::json);
+
+INSERT INTO config_typevalue (typevalue,id,idval,camelstyle)
+VALUES ('formtype_typevalue','workspace_open','workspace_open','workspaceOpen');
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'workspace_open', 'tab_none', 'name', 'lyt_workspace_open_1', 0, NULL, 'text', 'Workspace name: ', NULL, NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, 0);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'workspace_open', 'tab_none', 'private', 'lyt_workspace_open_1', 2, NULL, 'check', 'Private Workspace:', NULL, NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, 2);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'workspace_open', 'tab_none', 'descript', 'lyt_workspace_open_1', 1, NULL, 'textarea', 'Description: ', NULL, NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, 1);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'workspace_open', 'tab_none', 'btn_accept', 'lyt_buttons', 0, NULL, 'button', '', NULL, NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{
+"text": "Save"
+}'::json, '{
+"functionName": "saveFeat"
+}'::json, NULL, false, 0);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'workspace_open', 'tab_none', 'btn_close', 'lyt_buttons', 1, NULL, 'button', '', NULL, NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{
+"text": "Close"
+}'::json, '{
+"functionName": "closeDlg"
+}'::json, NULL, false, 0);
