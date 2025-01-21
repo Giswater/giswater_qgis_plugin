@@ -23,7 +23,7 @@ VALUES('-903', '-903', 43.2300, NULL, 'SHTFF-VALVE160-PN16', 'SHORTPIPE', 3, NUL
 
 INSERT INTO ve_arc_varc (arc_id, code, node_1, nodetype_1, elevation1, depth1, staticpress1, node_2, nodetype_2, staticpress2, elevation2, depth2, "depth",
 arccat_id, arc_type, sys_type, cat_matcat_id, cat_pnom, cat_dnom, cat_dint, epa_type, state, state_type, expl_id, macroexpl_id, sector_id, presszone_id,
-preszone_name, presszone_type, presszone_head, dma_id, dma_name, dma_type, macrodma_id, dqa_id, dqa_name, dqa_type, macrodqa_id, annotation, observ, "comment",
+presszone_name, presszone_type, presszone_head, dma_id, dma_name, dma_type, macrodma_id, dqa_id, dqa_name, dqa_type, macrodqa_id, annotation, observ, "comment",
 gis_length, custom_length, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, workcat_id_plan, buildercat_id,
 builtdate, enddate, ownercat_id, muni_id, postcode, district_id, streetname, postnumber, postcomplement, streetname2, postnumber2, postcomplement2, region_id,
 province_id, descript, link, verified, undelete, "label", label_x, label_y, label_rotation, label_quadrant, publish, inventory, num_value, adate, adescript,
