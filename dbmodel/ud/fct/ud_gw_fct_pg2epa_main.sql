@@ -84,7 +84,7 @@ BEGIN
 		IF v_count = 0 THEN
 			RETURN ('{"status":"Failed","message":{"level":1, "text":"There is no sector selected. Please select at least one"}}')::json;
 		END IF;
-	
+
 		-- drop temp tables
 		DROP TABLE IF EXISTS temp_t_arc_flowregulator;
 		DROP TABLE IF EXISTS temp_t_lid_usage;
@@ -102,6 +102,7 @@ BEGIN
 		DROP TABLE IF EXISTS temp_anl_arc;
 		DROP TABLE IF EXISTS temp_anl_node;
 		DROP TABLE IF EXISTS temp_anl_gully;
+		DROP TABLE IF EXISTS temp_anl_polygon;
 		DROP TABLE IF EXISTS temp_rpt_inp_raingage;
 		DROP TABLE IF EXISTS temp_rpt_inp_node;
 		DROP TABLE IF EXISTS temp_rpt_inp_arc;
@@ -220,7 +221,7 @@ BEGIN
 	ELSIF v_step=6 THEN
 
 		PERFORM gw_fct_pg2epa_check_result(v_input);
-		
+
 		-- deleting arcs without nodes
 		UPDATE temp_t_arc t SET epa_type = 'TODELETE' FROM (SELECT a.id FROM temp_t_arc a LEFT JOIN temp_t_node ON node_1=node_id WHERE temp_t_node.node_id is null) a WHERE t.id = a.id;
 		UPDATE temp_t_arc t SET epa_type = 'TODELETE' FROM (SELECT a.id FROM temp_t_arc a LEFT JOIN temp_t_node ON node_2=node_id WHERE temp_t_node.node_id is null) a WHERE t.id = a.id;
@@ -233,9 +234,9 @@ BEGIN
 		(SELECT id FROM temp_t_node LEFT JOIN (SELECT node_1 as node_id FROM temp_t_arc UNION SELECT node_2 FROM temp_t_arc) a USING (node_id) WHERE a.node_id IS NULL) a
 		WHERE t.id = a.id;
 		DELETE FROM temp_t_node WHERE epa_type = 'TODELETE';
-		
+
 		-- create return
-		EXECUTE 'SELECT gw_fct_create_return($${"data":{"parameters":{"functionId":2646, "isEmbebed":false}}}$$::json)' INTO v_return;		
+		EXECUTE 'SELECT gw_fct_create_return($${"data":{"parameters":{"functionId":2646, "isEmbebed":false}}}$$::json)' INTO v_return;
 		SELECT gw_fct_pg2epa_export_inp(p_data) INTO v_file;
 		v_body = gw_fct_json_object_set_key((v_return->>'body')::json, 'file', v_file);
 		v_return = gw_fct_json_object_set_key(v_return, 'body', v_body);
@@ -261,7 +262,7 @@ BEGIN
 		SELECT result_id, node_id, top_elev, ymax, elev, node_type, nodecat_id, epa_type,
 		sector_id, state, state_type, annotation, y0, ysur, apond, the_geom, expl_id, addparam, parent, arcposition, fusioned_node
 		FROM temp_t_node;
-	
+
 		-- move result data
 		UPDATE rpt_cat_result r set network_stats = t.network_stats FROM temp_t_rpt_cat_result t WHERE r.result_id = t.result_id;
 

@@ -85,9 +85,9 @@ BEGIN
 	IF v_epacheck THEN
 		v_filter = concat(v_filter, ' AND sector_id IN (select sector_id from selector_sector where cur_user = current_user)');
 
+		DROP TABLE IF EXISTS t_inp_pump; EXECUTE 'CREATE TEMP TABLE t_inp_pump AS SELECT * FROM v_edit_inp_pump'||v_filter;
 		IF v_project_type = 'WS' THEN
 			DROP TABLE IF EXISTS t_inp_pipe; EXECUTE 'CREATE TEMP TABLE t_inp_pipe AS SELECT * FROM v_edit_inp_pipe'||v_filter;
-			DROP TABLE IF EXISTS t_inp_pump; EXECUTE 'CREATE TEMP TABLE t_inp_pump AS SELECT * FROM v_edit_inp_pump'||v_filter;
 			DROP TABLE IF EXISTS t_inp_valve; EXECUTE 'CREATE TEMP TABLE t_inp_valve AS SELECT * FROM v_edit_inp_valve'||v_filter;
 			DROP TABLE IF EXISTS t_inp_junction; EXECUTE 'CREATE TEMP TABLE t_inp_junction AS SELECT * FROM v_edit_inp_junction'||v_filter;
 			DROP TABLE IF EXISTS t_inp_reservoir; EXECUTE 'CREATE TEMP TABLE t_inp_reservoir AS SELECT * FROM v_edit_inp_reservoir'||v_filter;
@@ -97,7 +97,20 @@ BEGIN
 			DROP TABLE IF EXISTS t_inp_virtualpump; EXECUTE 'CREATE TEMP TABLE t_inp_virtualpump AS SELECT * FROM v_edit_inp_virtualpump'||v_filter;
 
 		ELSIF  v_project_type  = 'UD' THEN
-			DROP TABLE IF EXISTS t_inp_gully;EXECUTE 'CREATE TEMP TABLE t_inp_gully AS SELECT * FROM v_edit_inp_gully'||v_filter;
+			DROP TABLE IF EXISTS t_inp_conduit; EXECUTE 'CREATE TEMP TABLE t_inp_conduit AS SELECT * FROM v_edit_inp_conduit'||v_filter;
+			DROP TABLE IF EXISTS t_inp_outlet; EXECUTE 'CREATE TEMP TABLE t_inp_outlet AS SELECT * FROM v_edit_inp_outlet'||v_filter;
+			DROP TABLE IF EXISTS t_inp_orifice; EXECUTE 'CREATE TEMP TABLE t_inp_orifice AS SELECT * FROM v_edit_inp_orifice'||v_filter;
+			DROP TABLE IF EXISTS t_inp_weir; EXECUTE 'CREATE TEMP TABLE t_inp_weir AS SELECT * FROM v_edit_inp_weir'||v_filter;
+			DROP TABLE IF EXISTS t_inp_virtual; EXECUTE 'CREATE TEMP TABLE t_inp_virtual AS SELECT * FROM v_edit_inp_virtual'||v_filter;
+			DROP TABLE IF EXISTS t_inp_storage; EXECUTE 'CREATE TEMP TABLE t_inp_storage AS SELECT * FROM v_edit_inp_storage'||v_filter;
+			DROP TABLE IF EXISTS t_inp_subcatchment; EXECUTE 'CREATE TEMP TABLE t_inp_subcatchment AS SELECT * FROM v_edit_inp_subcatchment';
+			DROP TABLE IF EXISTS t_inp_junction; EXECUTE 'CREATE TEMP TABLE t_inp_junction AS SELECT * FROM v_edit_inp_junction'||v_filter;
+			DROP TABLE IF EXISTS t_inp_outfall; EXECUTE 'CREATE TEMP TABLE t_inp_outfall AS SELECT * FROM v_edit_inp_outfall'||v_filter;
+			DROP TABLE IF EXISTS t_inp_divider; EXECUTE 'CREATE TEMP TABLE t_inp_divider AS SELECT * FROM v_edit_inp_divider'||v_filter;
+			DROP TABLE IF EXISTS t_inp_subc2outlet; EXECUTE 'CREATE TEMP TABLE t_inp_subc2outlet AS SELECT * FROM v_edit_inp_subc2outlet';
+			DROP TABLE IF EXISTS t_inp_netgully; EXECUTE 'CREATE TEMP TABLE t_inp_netgully AS SELECT * FROM v_edit_inp_netgully'||v_filter;
+			DROP TABLE IF EXISTS t_inp_gully; EXECUTE 'CREATE TEMP TABLE t_inp_gully AS SELECT * FROM v_edit_inp_gully'||v_filter;
+			DROP TABLE IF EXISTS t_raingage; EXECUTE 'CREATE TEMP TABLE t_raingage AS SELECT * FROM v_edit_raingage';
 		END IF;
 	END IF;
 
@@ -105,14 +118,23 @@ BEGIN
 	DROP TABLE IF EXISTS t_audit_check_data; EXECUTE 'CREATE TEMP TABLE t_audit_check_data AS SELECT * FROM audit_check_data';
 	DROP TABLE IF EXISTS t_audit_check_project;	EXECUTE 'CREATE TEMP TABLE t_audit_check_project AS SELECT * FROM audit_check_project';
 
-	ALTER TABLE t_audit_check_data ALTER COLUMN id SET DEFAULT nextval('SCHEMA_NAME.audit_check_data_id_seq'::regclass);
 
 
 	-- create anl tables
-	DROP TABLE IF EXISTS t_anl_node; EXECUTE 'CREATE TEMP TABLE  t_anl_node AS SELECT * FROM anl_node WHERE cur_user = current_user';
+	DROP TABLE IF EXISTS t_anl_node; EXECUTE 'CREATE TEMP TABLE t_anl_node AS SELECT * FROM anl_node WHERE cur_user = current_user';
 	DROP TABLE IF EXISTS t_anl_arc;	EXECUTE 'CREATE TEMP TABLE t_anl_arc AS SELECT * FROM anl_arc WHERE cur_user = current_user';
 	DROP TABLE IF EXISTS t_anl_connec; EXECUTE 'CREATE TEMP TABLE t_anl_connec AS SELECT * FROM anl_connec WHERE cur_user = current_user';
 	DROP TABLE IF EXISTS t_anl_polygon; EXECUTE 'CREATE TEMP TABLE t_anl_polygon AS SELECT * FROM anl_polygon WHERE cur_user = current_user';
+
+	ALTER TABLE t_audit_check_data ALTER COLUMN id SET DEFAULT nextval('SCHEMA_NAME.audit_check_data_id_seq'::regclass);
+	ALTER TABLE t_anl_node ALTER COLUMN id SET DEFAULT nextval('SCHEMA_NAME.anl_node_id_seq'::regclass);
+	ALTER TABLE t_anl_node ALTER COLUMN cur_user SET DEFAULT '"current_user"()';
+	ALTER TABLE t_anl_arc ALTER COLUMN id SET DEFAULT nextval('SCHEMA_NAME.anl_arc_id_seq'::regclass);
+	ALTER TABLE t_anl_arc ALTER COLUMN cur_user SET DEFAULT '"current_user"()';
+	ALTER TABLE t_anl_connec ALTER COLUMN id SET DEFAULT nextval('SCHEMA_NAME.anl_connec_id_seq'::regclass);
+	ALTER TABLE t_anl_connec ALTER COLUMN cur_user SET DEFAULT '"current_user"()';
+	ALTER TABLE t_anl_polygon ALTER COLUMN id SET DEFAULT nextval('SCHEMA_NAME.anl_polygon_id_seq'::regclass);
+	ALTER TABLE t_anl_polygon ALTER COLUMN cur_user SET DEFAULT '"current_user"()';
 
 
 	--  Return

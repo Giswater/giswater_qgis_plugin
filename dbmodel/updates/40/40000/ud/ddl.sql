@@ -339,7 +339,7 @@ ALTER TABLE config_form_fields ENABLE TRIGGER gw_trg_config_control;
 ALTER TABLE sys_feature_type DROP CONSTRAINT sys_feature_type_check;
 INSERT INTO sys_feature_type VALUES ('FLWREG', 5);
 ALTER TABLE sys_feature_type ADD CONSTRAINT sys_feature_type_check CHECK (((id)::text =
-ANY (ARRAY[('ARC'::character varying)::text, ('CONNEC'::character varying)::text, ('ELEMENT'::character varying)::text, 
+ANY (ARRAY[('ARC'::character varying)::text, ('CONNEC'::character varying)::text, ('ELEMENT'::character varying)::text,
 ('GULLY'::character varying)::text, ('LINK'::character varying)::text, ('NODE'::character varying)::text, ('VNODE'::character varying)::text,
 ('FLWREG'::character varying)::text])));
 
@@ -349,14 +349,118 @@ INSERT INTO sys_feature_class VALUES ('ORIFICE', 'FLWREG', 'ORIFICE', '');
 INSERT INTO sys_feature_class VALUES ('WEIR', 'FLWREG', 'WEIR', '');
 INSERT INTO sys_feature_class VALUES ('PUMP', 'FLWREG', 'PUMP', '');
 INSERT INTO sys_feature_class VALUES ('OUTLET', 'FLWREG', 'OUTLET', '');
-ALTER TABLE sys_feature_class ADD CONSTRAINT sys_feature_cat_check CHECK (((id)::text = ANY (ARRAY[('CHAMBER'::character varying)::text, 
-('CONDUIT'::character varying)::text, ('CONNEC'::character varying)::text, ('GULLY'::character varying)::text, 
+ALTER TABLE sys_feature_class ADD CONSTRAINT sys_feature_cat_check CHECK (((id)::text = ANY (ARRAY[('CHAMBER'::character varying)::text,
+('CONDUIT'::character varying)::text, ('CONNEC'::character varying)::text, ('GULLY'::character varying)::text,
 ('JUNCTION'::character varying)::text, ('MANHOLE'::character varying)::text, ('NETELEMENT'::character varying)::text,
-('NETGULLY'::character varying)::text, ('NETINIT'::character varying)::text, ('OUTFALL'::character varying)::text, 
-('SIPHON'::character varying)::text, ('STORAGE'::character varying)::text, ('VALVE'::character varying)::text, 
-('VARC'::character varying)::text, ('WACCEL'::character varying)::text, ('WJUMP'::character varying)::text, 
+('NETGULLY'::character varying)::text, ('NETINIT'::character varying)::text, ('OUTFALL'::character varying)::text,
+('SIPHON'::character varying)::text, ('STORAGE'::character varying)::text, ('VALVE'::character varying)::text,
+('VARC'::character varying)::text, ('WACCEL'::character varying)::text, ('WJUMP'::character varying)::text,
 ('WWTP'::character varying)::text, ('ELEMENT'::character varying)::text, ('LINK'::character varying)::text,
 ('ORIFICE'::character varying)::text, ('WEIR'::character varying)::text, ('PUMP'::character varying)::text, ('OUTLET'::character varying)::text])));
 
 
 
+-- 21/01/2025
+ALTER TABLE temp_node RENAME TO _temp_node;
+ALTER TABLE _temp_node RENAME CONSTRAINT temp_node_pkey TO _temp_node_pkey;
+ALTER TABLE _temp_node RENAME CONSTRAINT temp_node_node_id_unique TO _temp_node_node_id_unique;
+
+DROP INDEX IF EXISTS temp_node_epa_type;
+DROP INDEX IF EXISTS temp_node_index;
+DROP INDEX IF EXISTS temp_node_node_id;
+DROP INDEX IF EXISTS temp_node_node_type;
+DROP INDEX IF EXISTS temp_node_nodeparent;
+DROP INDEX IF EXISTS temp_node_result_id;
+
+CREATE TABLE temp_node (
+	id serial4 NOT NULL,
+	result_id varchar(30) NULL,
+	node_id varchar(16) NOT NULL,
+	top_elev numeric(12, 3) NULL,
+	ymax numeric(12, 3) NULL,
+	elev numeric(12, 3) NULL,
+	node_type varchar(30) NULL,
+	nodecat_id varchar(30) NULL,
+	epa_type varchar(16) NULL,
+	sector_id int4 NULL,
+	state int2 NULL,
+	state_type int2 NULL,
+	annotation varchar(254) NULL,
+	dma_id int4 NULL,
+	y0 numeric(12, 4) NULL,
+	ysur numeric(12, 4) NULL,
+	apond numeric(12, 4) NULL,
+	the_geom public.geometry(point, 25831) NULL,
+	expl_id int4 NULL,
+	addparam text NULL,
+	parent varchar(16) NULL,
+	arcposition int2 NULL,
+	fusioned_node text NULL,
+	age int4 NULL,
+	CONSTRAINT temp_node_node_id_unique UNIQUE (node_id),
+	CONSTRAINT temp_node_pkey PRIMARY KEY (id)
+);
+CREATE INDEX temp_node_epa_type ON temp_node USING btree (epa_type);
+CREATE INDEX temp_node_index ON temp_node USING gist (the_geom);
+CREATE INDEX temp_node_node_id ON temp_node USING btree (node_id);
+CREATE INDEX temp_node_node_type ON temp_node USING btree (node_type);
+CREATE INDEX temp_node_nodeparent ON temp_node USING btree (parent);
+CREATE INDEX temp_node_result_id ON temp_node USING btree (result_id);
+CREATE INDEX temp_node_dma_id ON temp_node USING btree (dma_id);
+
+ALTER TABLE temp_arc RENAME TO _temp_arc;
+ALTER TABLE temp_arc RENAME CONSTRAINT temp_arc_pkey TO _temp_arc_pkey;
+
+DROP INDEX IF EXISTS temp_arc_arc_id;
+DROP INDEX IF EXISTS temp_arc_arc_type;
+DROP INDEX IF EXISTS temp_arc_epa_type;
+DROP INDEX IF EXISTS temp_arc_index;
+DROP INDEX IF EXISTS temp_arc_node_1_type;
+DROP INDEX IF EXISTS temp_arc_node_2_type;
+DROP INDEX IF EXISTS temp_arc_result_id;
+
+
+CREATE TABLE temp_arc (
+	id serial4 NOT NULL,
+	result_id varchar(30) NULL,
+	arc_id varchar(16) NOT NULL,
+	node_1 varchar(16) NULL,
+	node_2 varchar(16) NULL,
+	elevmax1 numeric(12, 3) NULL,
+	elevmax2 numeric(12, 3) NULL,
+	arc_type varchar(30) NULL,
+	arccat_id varchar(30) NULL,
+	epa_type varchar(16) NULL,
+	sector_id int4 NULL,
+	state int2 NULL,
+	state_type int2 NULL,
+	annotation varchar(254) NULL,
+	dma_id int4 NULL,
+	length numeric(12, 3) NULL,
+	n numeric(12, 3) NULL,
+	the_geom public.geometry(linestring, 25831) NULL,
+	expl_id int4 NULL,
+	addparam text NULL,
+	arcparent varchar(16) NULL,
+	q0 float8 NULL,
+	qmax float8 NULL,
+	barrels int4 NULL,
+	slope float8 NULL,
+	flag bool NULL,
+	culvert varchar(10) NULL,
+	kentry numeric(12, 4) NULL,
+	kexit numeric(12, 4) NULL,
+	kavg numeric(12, 4) NULL,
+	flap varchar(3) NULL,
+	seepage numeric(12, 4) NULL,
+	age int4 NULL,
+	CONSTRAINT temp_arc_pkey PRIMARY KEY (id)
+);
+CREATE INDEX temp_arc_arc_id ON temp_arc USING btree (arc_id);
+CREATE INDEX temp_arc_arc_type ON temp_arc USING btree (arc_type);
+CREATE INDEX temp_arc_epa_type ON temp_arc USING btree (epa_type);
+CREATE INDEX temp_arc_index ON temp_arc USING gist (the_geom);
+CREATE INDEX temp_arc_node_1_type ON temp_arc USING btree (node_1);
+CREATE INDEX temp_arc_node_2_type ON temp_arc USING btree (node_2);
+CREATE INDEX temp_arc_dma_id ON temp_arc USING btree (dma_id);
+CREATE INDEX temp_arc_result_id ON temp_arc USING btree (result_id);

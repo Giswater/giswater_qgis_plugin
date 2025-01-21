@@ -812,7 +812,7 @@ except_msg = 'links over nodarc (go2epa)',
 query_text = 'select link_id as arc_id, conneccat_id as arccat_id, a.expl_id, l.the_geom FROM t_link l, temp_t_arc a WHERE st_dwithin(st_endpoint(l.the_geom), a.the_geom, 0.001) AND a.epa_type NOT IN (''CONDUIT'', ''PIPE'', ''VIRTUALVALVE'', ''VIRTUALPUMP'')',
 info_msg = 'No links over nodarc found',
 project_type = 'ud',
-except_table = 'anl_node',
+except_table = 'anl_arc'
 function_name = '[gw_fct_pg2epa_check_network]',
 active = true
 WHERE fid = 404;
@@ -945,9 +945,9 @@ query_text = '
 	WITH 
 	outlayer AS (SELECT ((value::json->>''elevation'')::json->>''max'')::numeric as max_elev, 
     ((value::json->>''elevation'')::json->>''min'')::numeric as min_elev FROM config_param_system WHERE parameter = ''epa_outlayer_values'')
-	select node_id, nodecat_id from outlayer, node where elevation < min_elev or elevation > max_elev
+	select node_id, nodecat_id from outlayer, node where top_elev < min_elev or top_elev > max_elev
 	union
-	select connec_id, conneccat_id from outlayer, connec where elevation < min_elev or elevation > max_elev',
+	select connec_id, conneccat_id from outlayer, connec where top_elev < min_elev or top_elev > max_elev',
 except_table = null,
 function_name = '[gw_fct_pg2epa_check_result]',
 active = true
@@ -1026,7 +1026,7 @@ except_level = 3,
 except_msg = 'Controls with links (arc o nodarc) are not present on this result',
 info_msg = 'All Controls has correct link id (arc or nodarc) values.',
 query_text = '
-		(SELECT a.id, a.arc_id as controls, b.arc_id as templayer FROM 
+		SELECT * FROM (SELECT a.id, a.arc_id as controls, b.arc_id as templayer FROM 
 		(SELECT substring(split_part(text,''LINK '', 2) FROM ''[^ ]+''::text) arc_id, id, sector_id FROM inp_controls WHERE active is true)a
 		LEFT JOIN temp_t_arc b USING (arc_id)
 		WHERE b.arc_id IS NULL AND a.arc_id IS NOT NULL 

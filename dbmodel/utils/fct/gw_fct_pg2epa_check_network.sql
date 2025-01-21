@@ -54,11 +54,11 @@ BEGIN
 	-- get input data
 	v_result_id = ((p_data->>'data')::json->>'parameters')::json->>'resultId';
 	v_fid := ((p_data ->>'data')::json->>'parameters')::json->>'fid';
-	
+
 	-- get project type
 	v_project_type = (SELECT project_type FROM sys_version ORDER BY id DESC LIMIT 1);
 	v_version = (SELECT giswater FROM sys_version ORDER BY id DESC LIMIT 1);
-	
+
 	-- get options data
 	SELECT value INTO v_linkoffsets FROM config_param_user WHERE parameter = 'inp_options_link_offsets' AND cur_user = current_user;
 	SELECT value INTO v_minlength FROM config_param_user WHERE parameter = 'inp_options_minlength' AND cur_user = current_user;
@@ -68,7 +68,7 @@ BEGIN
 	v_deldisconnetwork = (SELECT value::json->>'delDisconnNetwork' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
 	v_deldrynetwork = (SELECT value::json->>'delDryNetwork' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
 	v_removedemands = (SELECT value::json->>'removeDemandOnDryNodes' FROM config_param_user WHERE parameter='inp_options_debug' AND cur_user=current_user)::boolean;
-	
+
 	-- preparing table for check disconnected/dry network (139/232)
 	DROP TABLE IF EXISTS t_pgr_go2epa_arc; CREATE TEMP TABLE t_pgr_go2epa_arc AS SELECT * FROM temp_t_arc;
 	DROP TABLE IF EXISTS t_pgr_go2epa_node; CREATE TEMP TABLE t_pgr_go2epa_node AS SELECT * FROM temp_t_node;
@@ -85,17 +85,17 @@ BEGIN
 			join t_pgr_go2epa_node n2 on n2.node_id = node_2
         ') c
     WHERE n.id::int = c.node;
-	
+
 	-- setting those node with sectors without inlet to sector_id = 0
-	UPDATE t_pgr_go2epa_node SET sector_id = 0 WHERE sector_id NOT IN 
+	UPDATE t_pgr_go2epa_node SET sector_id = 0 WHERE sector_id NOT IN
 	(SELECT DISTINCT sector_id FROM (SELECT DISTINCT sector_id, epa_type FROM t_pgr_go2epa_node WHERE epa_type IN ('INLET', 'RESERVOIR', 'TANK'))a);
 
 	-- update arc graph
 	UPDATE t_pgr_go2epa_arc SET sector_id = n.sector_id FROM t_pgr_go2epa_node n WHERE node_id =  node_1;
 	UPDATE t_pgr_go2epa_arc SET sector_id = n.sector_id FROM t_pgr_go2epa_node n WHERE node_id =  node_2;
 
-	IF v_project_type = 'WS' THEN 
-	
+	IF v_project_type = 'WS' THEN
+
 		-- update arc graph for dry (232)
 		DELETE FROM t_pgr_go2epa_arc WHERE status = 'CLOSED';
 
@@ -108,9 +108,9 @@ BEGIN
 			join t_pgr_go2epa_node n2 on n2.node_id = node_2
 	        ') c
 	    WHERE n.id::int = c.node;
-		
+
 		-- setting those node with dma_id without inlet to dma_id = 0
-		UPDATE t_pgr_go2epa_node SET dma_id = 0 WHERE dma_id NOT IN 
+		UPDATE t_pgr_go2epa_node SET dma_id = 0 WHERE dma_id NOT IN
 		(SELECT DISTINCT dma_id FROM (SELECT DISTINCT dma_id, epa_type FROM t_pgr_go2epa_node WHERE epa_type IN ('INLET', 'RESERVOIR', 'TANK'))a);
 
 		-- update arc graph
@@ -124,7 +124,7 @@ BEGIN
 	and addparam is null and query_text is not null and function_name ilike ''%pg2epa_check%'' and active order by fid asc';
 
 	-- loop for checks
-	for v_rec in execute v_querytext		
+	for v_rec in execute v_querytext
 	loop
 		EXECUTE 'select gw_fct_check_fprocess($${"client":{"device":4, "infoType":1, "lang":"ES"}, 
 	    "form":{},"feature":{},"data":{"parameters":{"functionFid":'||v_fid||', "checkFid":"'||v_rec.fid||'"}}}$$)';
@@ -132,20 +132,20 @@ BEGIN
 
 	-- remove disconnected network
 	IF v_deldisconnetwork THEN
-		
-		UPDATE temp_t_arc a SET sector_id = sector_id FROM t_pgr_go2epa_arc t WHERE t.sector_id = 0 AND t.arc_id = a.arc_id;
-		UPDATE temp_t_node a SET sector_id = sector_id FROM t_pgr_go2epa_node t WHERE t.sector_id = 0 AND t.arc_id = a.arc_id;
+
+		UPDATE temp_t_arc a SET sector_id = t.sector_id FROM t_pgr_go2epa_arc t WHERE t.sector_id = 0 AND t.id = a.id;
+		UPDATE temp_t_node a SET sector_id = t.sector_id FROM t_pgr_go2epa_node t WHERE t.sector_id = 0 AND t.id = a.id;
 		DELETE FROM temp_t_arc WHERE sector_id = 0;
 		DELETE FROM temp_t_node WHERE sector_id = 0;
 		GET DIAGNOSTICS v_count = row_count;
 
 		IF v_count > 0 THEN
 			INSERT INTO temp_audit_check_data (fid, criticity, error_message)
-			VALUES (v_fid, 2, 
+			VALUES (v_fid, 2,
 			concat('WARNING-227: {delDisconnectNetwork} is enabled and ',v_count,' arcs have been removed.'));
 		ELSE
 			INSERT INTO temp_audit_check_data (fid, criticity, error_message)
-			VALUES (v_fid, 1, 
+			VALUES (v_fid, 1,
 			concat('INFO: {delDisconnectNetwork} is enabled but nothing have been removed.'));
 		END IF;
 	END IF;
@@ -158,24 +158,24 @@ BEGIN
 		DELETE FROM temp_t_arc WHERE dma_id = 0;
 		DELETE FROM temp_t_node WHERE dma_id = 0;
 		GET DIAGNOSTICS v_count = row_count;
-		
+
 		IF v_count > 0 THEN
 			INSERT INTO temp_audit_check_data (fid, criticity, error_message)
-			VALUES (v_fid, 2, 
+			VALUES (v_fid, 2,
 			concat('WARNING-227: {delDryNetwork} is enabled and ',v_count,' arcs have been removed.'));
 		ELSE
 			INSERT INTO temp_audit_check_data (fid, criticity, error_message)
-			VALUES (v_fid, 1, 
+			VALUES (v_fid, 1,
 			concat('INFO: {delDryNetwork} is enabled but nothing have been removed.'));
 		END IF;
 	END IF;
-	
+
 	-- remove dry demands
 	IF v_removedemands THEN
-		UPDATE temp_t_node n SET demand = 0, addparam = gw_fct_json_object_set_key(a.addparam::json, 'removedDemand'::text, true::boolean) 
+		UPDATE temp_t_node n SET demand = 0, addparam = gw_fct_json_object_set_key(a.addparam::json, 'removedDemand'::text, true::boolean)
 		FROM t_pgr_go2epa_node a WHERE a.node_id = n.node_id;
 		GET DIAGNOSTICS v_count = row_count;
-		
+
 		IF v_count > 0 THEN
 			INSERT INTO temp_audit_check_data (fid, criticity, error_message)
 			VALUES (v_fid, 2, concat(
@@ -186,27 +186,27 @@ BEGIN
 		END IF;
 		DELETE FROM temp_audit_check_data WHERE fid = 227 AND error_message like '%Dry node(s) with demand%' AND cur_user = current_user;
 	END IF;
-	
+
 
 	RAISE NOTICE '7 - Stats';
 	INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 0,concat(''));
 	INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 0,concat('BASIC STATS'));
 	INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 0,concat('-------------------'));
-	
+
 	IF v_project_type =  'WS' THEN
 
 		SELECT sum(length)/1000 INTO v_sumlength FROM temp_t_arc;
 		INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 0,
 		concat('Total length (Km) : ',v_sumlength,'.'));
-	
+
 		SELECT min(elevation), max(elevation) INTO v_min, v_max FROM temp_t_node;
 		INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 0,
 		concat('Data analysis for node elevation. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));
-		
+
 		SELECT min(length), max(length) INTO v_min, v_max FROM temp_t_arc WHERE epa_type = 'PIPE';
 		INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 0,
 		concat('Data analysis for pipe length. Minimun and maximum values are: (',v_min,' - ',v_max,' ).'));
-		
+
 		SELECT min(diameter), max(diameter) INTO v_min, v_max FROM temp_t_arc WHERE epa_type = 'PIPE';
 		INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 0,
 		concat('Data analysis for pipe diameter. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));
@@ -223,17 +223,17 @@ BEGIN
 		SELECT sum(length)/1000 INTO v_sumlength FROM temp_t_arc;
 		INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 0,
 		concat('Total length (Km) : ',coalesce(v_sumlength,0::numeric),'.'));
-		
+
 		IF v_linkoffsets  = 'ELEVATION' THEN
-		
+
 			UPDATE temp_t_arc SET length = null where length = 0;
-		
-			SELECT min(((elevmax1-elevmax2)/coalesce(length,0.1))::numeric(12,4)), max(((elevmax1-elevmax2)/coalesce(length,0.1)::numeric(12,4))) 
+
+			SELECT min(((elevmax1-elevmax2)/coalesce(length,0.1))::numeric(12,4)), max(((elevmax1-elevmax2)/coalesce(length,0.1)::numeric(12,4)))
 			INTO v_min, v_max FROM temp_t_arc;
 			INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 0,
 			concat('Data analysis for conduit slope. Values from [',v_min,'] to [',v_max,'] have been found.'));
 		END IF;
-		
+
 		SELECT min(length), max(length) INTO v_min, v_max FROM temp_t_arc WHERE epa_type = 'CONDUIT';
 		INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 0,
 		concat('Data analysis for conduit length. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));
@@ -245,27 +245,27 @@ BEGIN
 		SELECT min(elevmax1), max(elevmax1) INTO v_min, v_max FROM temp_t_arc WHERE epa_type = 'CONDUIT';
 		INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 0,
 		concat('Data analysis for conduit z1. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));
-		
+
 		SELECT min(elevmax2), max(elevmax2) INTO v_min, v_max FROM temp_t_arc WHERE epa_type = 'CONDUIT';
 		INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 0,
 		concat('Data analysis for conduit z2. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));
-	
+
 		SELECT min(slope), max(slope) INTO v_min, v_max FROM temp_t_arc WHERE epa_type = 'CONDUIT';
 		INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 0,
 		concat('Data analysis for conduit slope. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));
-		
+
 		SELECT min(elev), max(elev) INTO v_min, v_max FROM temp_t_node;
 		INSERT INTO temp_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 0,
-		concat('Data analysis for node elevation. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));	
+		concat('Data analysis for node elevation. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));
 
-		v_networkstats = gw_fct_json_object_set_key((select json_build_object('sector', array_agg(sector_id)) 
+		v_networkstats = gw_fct_json_object_set_key((select json_build_object('sector', array_agg(sector_id))
 		FROM selector_sector where cur_user=current_user and sector_id > 0),
 		'Total Length (Km)', v_sumlength);
 	END IF;
-	
+
 	-- set rpt_cat_result table with network stats
 	INSERT INTO temp_t_rpt_cat_result (result_id, network_stats) VALUES (v_result_id, v_networkstats);
-	
+
 	--  Return
 	RETURN '{"status":"ok"}';
 

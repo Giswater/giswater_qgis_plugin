@@ -2525,3 +2525,13 @@ INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tab
     "disabled": false
   }
 ]'::json, 0, '{4,5}');
+
+INSERT INTO temp_node (id, result_id, node_id, top_elev, ymax, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, dma_id, y0, ysur, apond, the_geom, expl_id, addparam, parent, arcposition, fusioned_node, age)
+SELECT id, result_id, node_id, top_elev, ymax, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, NULL, y0, ysur, apond, the_geom, expl_id, addparam, parent, arcposition, fusioned_node, age
+FROM _temp_node;
+
+INSERT INTO temp_arc (id, result_id, arc_id, node_1, node_2, elevmax1, elevmax2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, dma_id, length, n, the_geom, expl_id,
+addparam, arcparent, q0, qmax, barrels, slope, flag, culvert, kentry, kexit, kavg, flap, seepage, age)
+SELECT id, result_id, arc_id, node_1, node_2, elevmax1, elevmax2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, NULL, length, n, the_geom, expl_id,
+addparam, arcparent, q0, qmax, barrels, slope, flag, culvert, kentry, kexit, kavg, flap, seepage, age
+FROM _temp_arc;

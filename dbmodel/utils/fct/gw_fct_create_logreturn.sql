@@ -76,7 +76,7 @@ BEGIN
 		v_result := concat ('{"geometryType":"Point", "features":',v_result,',"category_field":"descript"}');
 
 	ELSIF v_returntype = 'line' THEN
-		
+
 		v_result = null;
 		SELECT jsonb_agg(features.feature) INTO v_result
 		FROM (
@@ -89,9 +89,9 @@ BEGIN
 		) row) features;
 		v_result := COALESCE(v_result, '{}');
 		v_result = concat ('{"geometryType":"LineString", "features":',v_result, ',"category_field":"descript"}');
-	
+
 	ELSIF v_returntype = 'polygon' THEN
-	
+
 		SELECT jsonb_agg(features.feature) INTO v_result
 		FROM (
 		SELECT jsonb_build_object(

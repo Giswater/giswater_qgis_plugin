@@ -54,12 +54,12 @@ BEGIN
 		--raise exception 'v_sql %', v_sql;
 		-- create log tables
 		EXECUTE 'SELECT gw_fct_create_logtables($${"data":{"parameters":{"fid":'||v_fid||'}}}$$::json)';
-		
+
 	END IF;
 
 	-- getting sys_fprocess to be executed
-	v_querytext = 'select * from sys_fprocess where project_type in (lower('||quote_literal(v_project_type)||'), ''utils'') 
-	and addparam is null and query_text is not null and function_name ilike ''%pg2epa_check_data%'' and active order by fid asc';
+	v_querytext = 'SELECT * FROM sys_fprocess WHERE project_type IN (LOWER('||quote_literal(v_project_type)||'), ''utils'') 
+	AND addparam IS NULL AND (query_text IS NOT NULL AND query_text <> '''') AND function_name ILIKE ''%pg2epa_check_data%'' AND active ORDER BY fid ASC';
 
 	-- loop for checks
 	for v_rec in execute v_querytext

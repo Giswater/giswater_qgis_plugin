@@ -102,7 +102,9 @@ BEGIN
 				AND cur_user = current_user'::text) as ct(cur_user varchar(50), inp_options_interval_from text, inp_options_interval_to text))row
 		INTO v_options;
 
-		SELECT  count(*) INTO v_doublen2a FROM v_edit_inp_pump 	WHERE pump_type = 'PRESSPUMP';
+		IF v_project_type = 'WS' THEN
+			SELECT count(*) INTO v_doublen2a FROM v_edit_inp_pump WHERE pump_type = 'PRESSPUMP';
+		END IF;
 
 		SELECT value INTO v_patternmethod FROM config_param_user WHERE parameter = 'inp_options_patternmethod' AND cur_user=current_user;
 		SELECT value INTO v_dscenario FROM config_param_user WHERE parameter = 'inp_options_dscenario_priority' AND cur_user=current_user;
