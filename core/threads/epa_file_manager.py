@@ -224,11 +224,11 @@ class GwEpaFileManager(GwTask):
             tools_log.log_info(f"Task 'Go2Epa' execute procedure 'gw_fct_pg2epa_main' step {step}")
             json_result = tools_gw.execute_procedure('gw_fct_pg2epa_main', self.body,
                                                      aux_conn=self.aux_conn, is_thread=True)
-            self.step_completed.emit(json_result, "\n")
             if step == 6:
                 main_json_result = json_result
             if self.isCanceled() or json_result is None:
                 return False
+            self.step_completed.emit(json_result, "\n")
             if json_result.get('status') == 'Failed':
                 tools_log.log_warning(json_result)
                 self.function_failed = True
