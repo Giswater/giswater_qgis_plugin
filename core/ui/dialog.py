@@ -25,7 +25,8 @@ class GwDialog(QDialog):
 
     def __init__(self, class_obj, subtag=None, parent=None):
 
-        super().__init__(parent or iface.mainWindow())
+        # If parent is not null the dialog is integrated into parent
+        super().__init__(parent)
         self.setupUi(self)
 
         # Check if CONTEXT and UINAME are defined and set properties accordingly
