@@ -187,11 +187,11 @@ BEGIN
 		CREATE TEMP TABLE t_pgr_go2epa_arc (LIKE SCHEMA_NAME.temp_arc INCLUDING ALL);
 		CREATE TEMP TABLE t_pgr_go2epa_node (LIKE SCHEMA_NAME.temp_node INCLUDING ALL);
 
-		-- create log tables
-		EXECUTE 'SELECT gw_fct_create_logtables($${"data":{"parameters":{"fid":'||v_fid||'}}}$$::json)';
 		-- create query tables
 		EXECUTE 'SELECT gw_fct_create_querytables($${"data":{"parameters":{"fid":'||v_fid||', 
 				"epaCheck":true, "verifiedExceptions":false}}}$$::json)';
+		-- create log tables
+		EXECUTE 'SELECT gw_fct_create_logtables($${"data":{"parameters":{"fid":'||v_fid||'}}}$$::json)';
 
 		-- getting selectors
 		SELECT array_agg(expl_id) INTO v_expl_id FROM selector_expl WHERE expl_id > 0 AND cur_user = current_user;

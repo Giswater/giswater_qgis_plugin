@@ -115,7 +115,9 @@ BEGIN
 	END IF;
 
 	-- create log tables
+	DELETE FROM audit_check_data WHERE fid in (select fid from t_audit_check_data) and cur_user=current_user;
 	DROP TABLE IF EXISTS t_audit_check_data; EXECUTE 'CREATE TEMP TABLE t_audit_check_data AS SELECT * FROM audit_check_data';
+	DELETE FROM audit_check_project WHERE fid in (select fid from t_audit_check_project) and cur_user=current_user;
 	DROP TABLE IF EXISTS t_audit_check_project;	EXECUTE 'CREATE TEMP TABLE t_audit_check_project AS SELECT * FROM audit_check_project';
 
 
