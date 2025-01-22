@@ -98,6 +98,8 @@ class GwImportEpanet:
 
         self.dlg_config = GwInpConfigImportUi(self)
         tools_gw.load_settings(self.dlg_config)
+
+        # Manage signals
         self.dlg_config.rejected.connect(
             partial(tools_gw.save_settings, self.dlg_config)
         )
@@ -272,6 +274,10 @@ class GwImportEpanet:
         tools_gw.open_dialog(self.dlg_config, dlg_name="dlg_inp_config_import")
 
     def _manage_widgets_visibility(self):
+        # Hide 'Default Raingage' widget for WS
+        tools_qt.set_widget_visible(self.dlg_config, "lbl_raingage", False)
+        tools_qt.set_widget_visible(self.dlg_config, "txt_raingage", False)
+
         # Disable the whole dialog if testing mode
         if TESTING_MODE:
             tools_gw.set_tabs_enabled(self.dlg_config, hide_btn_accept=False, change_btn_cancel=False)

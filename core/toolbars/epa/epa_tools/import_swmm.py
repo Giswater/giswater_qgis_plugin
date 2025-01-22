@@ -300,6 +300,10 @@ class GwImportSwmm:
         tools_gw.open_dialog(self.dlg_config, dlg_name="dlg_inp_config_import")
 
     def _manage_widgets_visibility(self):
+        # Hide 'Demand dscenario' widget for UD
+        tools_qt.set_widget_visible(self.dlg_config, "lbl_dscenario", False)
+        tools_qt.set_widget_visible(self.dlg_config, "txt_dscenario", False)
+
         # Disable the whole dialog if testing mode
         if TESTING_MODE:
             tools_gw.set_tabs_enabled(self.dlg_config)
