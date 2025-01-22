@@ -115,8 +115,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>684</width>
-              <height>644</height>
+              <width>676</width>
+              <height>628</height>
              </rect>
             </property>
             <layout class="QGridLayout" name="gridLayout_2">
@@ -481,7 +481,11 @@
           </widget>
          </item>
          <item row="0" column="0">
-          <widget class="QTextEdit" name="txt_infolog"/>
+          <widget class="QTextEdit" name="txt_infolog">
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+          </widget>
          </item>
         </layout>
        </widget>
