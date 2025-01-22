@@ -24,7 +24,7 @@ BEGIN
 	IF TG_OP = 'INSERT' THEN
 
 		INSERT INTO sector (sector_id, name, descript, macrosector_id, sector_type, undelete, graphconfig, stylesheet, parent_id, pattern_id, avg_press)
-		VALUES (NEW.sector_id, NEW.name, NEW.descript, (SELECT macrosector_id FROM macrosector WHERE name = NEW.macrosector), NEW.sector_type, NEW.undelete,
+		VALUES (NEW.sector_id, NEW.name, NEW.descript, (SELECT macrosector_id FROM macrosector WHERE name = NEW.macrosector_name), null, NEW.undelete,
 		NEW.graphconfig::json, NEW.stylesheet::json, NEW.parent_id, NEW.pattern_id, NEW.avg_press);
 
 		IF view_name = 'ui' THEN
@@ -42,7 +42,7 @@ BEGIN
 	ELSIF TG_OP = 'UPDATE' THEN
 
 		UPDATE sector
-		SET sector_id=NEW.sector_id, name=NEW.name, descript=NEW.descript, sector_type = NEW.sector_type, macrosector_id=(SELECT macrosector_id FROM macrosector WHERE name = NEW.macrosector),
+		SET sector_id=NEW.sector_id, name=NEW.name, descript=NEW.descript, macrosector_id=(SELECT macrosector_id FROM macrosector WHERE name = NEW.macrosector_name),
 		undelete=NEW.undelete, graphconfig=NEW.graphconfig::json, stylesheet = NEW.stylesheet::json, parent_id = NEW.parent_id, pattern_id = NEW.pattern_id,
 		lastupdate=now(), lastupdate_user = current_user, avg_press = NEW.avg_press
 		WHERE sector_id=OLD.sector_id;

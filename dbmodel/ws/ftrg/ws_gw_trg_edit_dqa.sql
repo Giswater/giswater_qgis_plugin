@@ -41,7 +41,7 @@ BEGIN
 		END IF;
 
 		INSERT INTO dqa (dqa_id, name, expl_id, macrodqa_id, descript, undelete, pattern_id, dqa_type, link, graphconfig, stylesheet)
-		VALUES (NEW.dqa_id, NEW.name, NEW.expl_id, (SELECT macrodqa_id FROM macrodqa WHERE name = NEW.macrodqa_id), NEW.descript, NEW.undelete, NEW.pattern_id, NEW.dqa_type,
+		VALUES (NEW.dqa_id, NEW.name, NEW.expl_id, NEW.macrodqa_id, NEW.descript, NEW.undelete, NEW.pattern_id, NEW.dqa_type,
 		NEW.link, NEW.graphconfig::json, NEW.stylesheet::json);
 
 		IF view_name = 'ui' THEN
