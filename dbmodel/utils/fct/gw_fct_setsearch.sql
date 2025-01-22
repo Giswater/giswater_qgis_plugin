@@ -21,7 +21,7 @@ SELECT gw_fct_setsearch($${"client":{"device":4, "infoType":1, "lang":"ES"}, "fo
 
 SELECT gw_fct_setsearch($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{"tabName":"addNetwork"}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "net_type":{"id":"", "name":""}, "net_code":{"text":"3"}, "addSchema":"ud"}}$$);
 
- SELECT gw_fct_setsearch($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{"tabName":"network"}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "searchType":"None", "net_type":{"id":"", "name":""}, "net_code":{"text":"3"}, "addSchema":"ud"}}$$);
+SELECT gw_fct_setsearch($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{"tabName":"network"}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "searchType":"None", "net_type":{"id":"", "name":""}, "net_code":{"text":"3"}, "addSchema":"ud"}}$$);
 
 SELECT gw_fct_setsearch($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{"tabName":"network"}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "searchType":"None", "net_type":{"id":"", "name":""}, "net_code":{"text":"3"}, "addSchema":"None"}}$$);
 
@@ -436,13 +436,14 @@ BEGIN
 
 			-- Get hydrometer 
 			EXECUTE 'SELECT array_to_json(array_agg(row_to_json(a))) FROM (
-				SELECT '||quote_ident(v_hydro_layer)||'.'||quote_ident(v_hydro_id_field)||' AS sys_id, ST_X(connec.the_geom) AS sys_x, ST_Y(connec.the_geom) AS sys_y, 
+				SELECT '||quote_ident(v_hydro_layer)||'.'||quote_ident(v_hydro_id_field)||' AS sys_id, COALESCE(ST_X(connec.the_geom), ST_X(node.the_geom)) AS sys_x, COALESCE(ST_Y(connec.the_geom), ST_Y(node.the_geom)) AS sys_y,
 				concat ('||quote_ident(v_hydro_layer)||'.'||quote_ident(v_hydro_search_field_1)||','' - '',
 				'||quote_ident(v_hydro_layer)||'.'||quote_ident(v_hydro_search_field_2)||','' - '',
 				'||quote_ident(v_hydro_layer)||'.'||quote_ident(v_hydro_search_field_3)||')
 				 AS display_name, '||quote_literal(v_hydro_layer)||' AS sys_table_id, '||quote_literal(v_hydro_id_field)||' AS sys_idname, '||quote_ident(v_hydro_feature_field)||' AS sys_connec_id
 				FROM '||quote_ident(v_hydro_layer)||'
-				JOIN connec ON (connec.connec_id = '||quote_ident(v_hydro_layer)||'.'||quote_ident(v_hydro_feature_field)||')
+				LEFT JOIN connec ON (connec.connec_id = '||quote_ident(v_hydro_layer)||'.'||quote_ident(v_hydro_feature_field)||')
+				LEFT JOIN node ON (node.node_id = '||quote_ident(v_hydro_layer)||'.'||quote_ident(v_hydro_feature_field)||')
 				WHERE '||quote_ident(v_hydro_layer)||'.'||quote_ident(v_exploitation_display_field)||' = '||quote_literal(v_name)||'
 						AND concat ('||quote_ident(v_hydro_layer)||'.'||quote_ident(v_hydro_search_field_1)||','' - '',
 						'||quote_ident(v_hydro_layer)||'.'||quote_ident(v_hydro_search_field_2)||','' - '',
