@@ -16,18 +16,18 @@ SELECT SCHEMA_NAME.gw_fct_pg2epa_check_result($${"data":{"parameters":{"resultId
 
 DECLARE
 
-v_rec record;
-v_project_type text;
-v_querytext text;
-v_verified_exceptions boolean = true;
-v_fid integer;
-v_isembebed boolean;
-v_return json;
+	v_rec record;
+	v_project_type text;
+	v_querytext text;
+	v_verified_exceptions boolean = true;
+	v_fid integer;
+	v_isembebed boolean;
+	v_return json;
+	v_result_id text;
 
-
-object_rec record;
-v_count integer;
-i integer;
+	object_rec record;
+	v_count integer;
+	i integer;
 
 BEGIN
 
@@ -35,26 +35,26 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 
 	-- select config values
-	SELECT project_type INTO v_project_type FROM sys_version order by id desc limit 1;
+	SELECT project_type INTO v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- getting input parameters
+	v_result_id := ((p_data ->>'data')::json->>'parameters')::json->>'resultId'::text;
 	v_fid :=  ((p_data ->> 'data')::json->>'parameters')::json->> 'fid';
 
 	-- getting sys_fprocess to be executed
-	v_querytext = 'select * from sys_fprocess where project_type in (lower('||quote_literal(v_project_type)||'), ''utils'') 
-	and addparam is null and query_text is not null and function_name ilike ''%pg2epa_check_network%'' and active order by fid asc';
+	v_querytext = 'SELECT * FROM sys_fprocess WHERE project_type IN (LOWER('||quote_literal(v_project_type)||'), ''utils'') 
+	AND addparam IS NULL AND query_text IS NOT NULL AND function_name ILIKE ''%pg2epa_check_network%'' AND active ORDER BY fid ASC';
 
 	-- loop for checks
-	for v_rec in execute v_querytext		
-	loop
-		EXECUTE 'select gw_fct_check_fprocess($${"client":{"device":4, "infoType":1, "lang":"ES"}, 
+	FOR v_rec IN EXECUTE v_querytext
+	LOOP
+		EXECUTE 'SELECT gw_fct_check_fprocess($${"client":{"device":4, "infoType":1, "lang":"ES"}, 
 	    "form":{},"feature":{},"data":{"parameters":{"functionFid":'||v_fid||', "checkFid":"'||v_rec.fid||'"}}}$$)';
-	end loop;
+	END LOOP;
 
 
-
--------------------- to be replaced
-
+	-- TODO
+	-------------------- to be replaced
 	RAISE NOTICE 'Check if there are conflicts with dscenarios (396)';
 	IF (SELECT count(*) FROM selector_inp_dscenario WHERE cur_user = current_user) > 0 THEN
 
@@ -136,7 +136,6 @@ BEGIN
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message)
 		VALUES (v_fid, v_result_id, 1, concat('INFO: All RULES has correct link id values.'));
 	END IF;
-
 	------- to be replaced
 
 	--  Return

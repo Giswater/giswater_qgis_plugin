@@ -965,10 +965,10 @@ insert into sys_fprocess (fid, fprocess_name, except_level, except_msg, info_msg
 	'[gw_fct_pg2epa_check_result]', true) on conflict (fid) do NOTHING;
 
 
-
+-- TODO
 --- NO SE COM RESOLDRE: networkmode AS (SELECT value::integer FROM config_param_user WHERE parameter = ''inp_options_networkmode'' AND cur_user = current_user)
-	--> es podria crear una funció nova que fos gw_fct_pg2epa_check_networkmode_connec
-	----------------------
+--> es podria crear una funció nova que fos gw_fct_pg2epa_check_networkmode_connec
+----------------------
 UPDATE sys_fprocess SET
 fprocess_name = 'EPA connec over EPA node (goe2pa)',
 except_level = 3,
@@ -983,7 +983,7 @@ query_text = '
 except_table = 'anl_connec',
 function_name = '[gw_fct_pg2epa_check_networkmode_connec]',
 info_msg = 'No EPA connecs over EPA node have been detected.',
-active = true
+active = false
 WHERE fid = 413;
 
 UPDATE sys_fprocess SET
@@ -1007,7 +1007,7 @@ function_name = '[gw_fct_pg2epa_check_networkmode_connec]',
 active = true
 WHERE fid = 400;
 
-
+-- TODO
 UPDATE sys_fprocess SET
 fprocess_name = 'Check material on connec catalog',
 except_level = 3,
@@ -1016,7 +1016,7 @@ info_msg = 'All connec catalog registers has material defined',
 query_text = 'SELECT * FROM cat_connec, networkmode n WHERE matcat_id IS NULL',
 except_table = null,
 function_name = '[gw_fct_pg2epa_check_networkmode_connec]',
-active = true
+active = false
 WHERE fid = 414;
 
 
@@ -1046,12 +1046,12 @@ except_level = 3,
 except_msg = 'Controls with nodes are not present on this result',
 info_msg = 'All Controls has correct node id values.',
 query_text = '
-		(SELECT a.id, a.node_id as controls, b.node_id as templayer FROM 
-		(SELECT substring(split_part(text,''NODE '', 2) FROM ''[^ ]+''::text) node_id, id, sector_id FROM inp_controls WHERE active is true)a
-		LEFT JOIN temp_t_node b USING (node_id)
-		WHERE b.node_id IS NULL AND a.node_id IS NOT NULL 
-		AND a.sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user=current_user) AND a.sector_id IS NOT NULL
-		OR a.sector_id::text != b.sector_id::text) a',
+SELECT * FROM (SELECT a.id, a.node_id as controls, b.node_id as templayer FROM 
+(SELECT substring(split_part(text,''NODE '', 2) FROM ''[^ ]+''::text) node_id, id, sector_id FROM inp_controls WHERE active is true)a
+LEFT JOIN temp_t_node b USING (node_id)
+WHERE b.node_id IS NULL AND a.node_id IS NOT NULL 
+AND a.sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user=current_user) AND a.sector_id IS NOT NULL
+OR a.sector_id::text != b.sector_id::text) a',
 except_table = null,
 function_name = '[gw_fct_pg2epa_check_result]',
 active = true

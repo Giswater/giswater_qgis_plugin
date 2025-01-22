@@ -106,6 +106,8 @@ BEGIN
 		DROP TABLE IF EXISTS temp_t_table;
 		DROP TABLE IF EXISTS temp_t_node;
 		DROP TABLE IF EXISTS temp_t_arc;
+		-- TODO
+		--DROP TABLE IF EXISTS temp_t_connec;
 		DROP TABLE IF EXISTS temp_t_demand;
 		DROP TABLE IF EXISTS temp_t_anlgraph;
 
@@ -171,6 +173,8 @@ BEGIN
 		CREATE TEMP TABLE temp_t_table (LIKE SCHEMA_NAME.temp_table INCLUDING ALL);
 		CREATE TEMP TABLE temp_t_node (LIKE SCHEMA_NAME.temp_node INCLUDING ALL);
 		CREATE TEMP TABLE temp_t_arc (LIKE SCHEMA_NAME.temp_arc INCLUDING ALL);
+		-- TODO
+		-- CREATE TEMP TABLE temp_t_connec (LIKE SCHEMA_NAME.temp_connec INCLUDING ALL);
 		CREATE TEMP TABLE temp_t_demand (LIKE SCHEMA_NAME.temp_demand INCLUDING ALL);
 		CREATE TEMP TABLE temp_t_anlgraph (LIKE SCHEMA_NAME.temp_anlgraph INCLUDING ALL);
 		CREATE TEMP TABLE temp_anl_arc (LIKE SCHEMA_NAME.anl_arc INCLUDING ALL);
