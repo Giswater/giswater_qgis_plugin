@@ -423,11 +423,11 @@ class GwImportInpTask(GwTask):
             # So, we perform a conditional INSERT here.
             execute_sql(
                 """
-                INSERT INTO cat_mat_arc (id, descript)
-                SELECT 'UNKNOWN', 'Unknown'
+                INSERT INTO cat_material (id, descript, feature_type)
+                SELECT 'UNKNOWN', 'Unknown', '{NODE,ARC,CONNEC,ELEMENT}'
                 WHERE NOT EXISTS (
                     SELECT 1
-                    FROM cat_mat_arc
+                    FROM cat_material
                     WHERE id = 'UNKNOWN'
                 );
                 """,

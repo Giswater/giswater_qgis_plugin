@@ -108,7 +108,7 @@ class Catalogs:
         # Get roughness catalog
         rows = tools_db.get_rows("""
                 SELECT id, n
-                FROM cat_mat_arc
+                FROM cat_material
             """)
         db_mat_roughness_cat: dict[str, float] = {}
         if rows:
