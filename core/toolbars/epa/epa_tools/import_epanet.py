@@ -274,7 +274,7 @@ class GwImportEpanet:
     def _manage_widgets_visibility(self):
         # Disable the whole dialog if testing mode
         if TESTING_MODE:
-            tools_gw.set_tabs_enabled(self.dlg_config)
+            tools_gw.set_tabs_enabled(self.dlg_config, hide_btn_accept=False, change_btn_cancel=False)
 
     def _importinp_accept(self):
         self.dlg_config.mainTab.setCurrentIndex(self.dlg_config.mainTab.count()-1)

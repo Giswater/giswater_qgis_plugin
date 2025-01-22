@@ -1365,7 +1365,7 @@ def delete_selected_rows(widget, table_object):
             widget.model().select()  # Refresh if it's a QSqlTableModel
 
 
-def set_tabs_enabled(dialog):
+def set_tabs_enabled(dialog, hide_btn_accept=True, change_btn_cancel=True):
     """ Disable all tabs in the dialog except the log one and change the state of the buttons
     :param dialog: Dialog where tabs are disabled (QDialog)
     :return:
@@ -1377,11 +1377,11 @@ def set_tabs_enabled(dialog):
     qtabwidget.setTabEnabled(qtabwidget.count()-1, True)
 
     btn_accept = dialog.findChild(QPushButton, 'btn_accept')
-    if btn_accept:
+    if btn_accept and hide_btn_accept:
         btn_accept.hide()
 
     btn_cancel = dialog.findChild(QPushButton, 'btn_cancel')
-    if btn_cancel:
+    if btn_cancel and change_btn_cancel:
         tools_qt.set_widget_text(dialog, btn_accept, 'Close')
 
 
