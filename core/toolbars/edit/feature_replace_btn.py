@@ -137,7 +137,7 @@ class GwFeatureReplaceButton(GwMaptool):
             self.geom_view = tablename
             self.cat_table = f'cat_{self.feature_type}'
             self.feature_edit_type = f'{self.feature_type}_type'
-            self.feature_type_cat = f'{self.feature_type}type_id'
+            self.feature_type_cat = f'{self.feature_type}_type'
             self.feature_id = snapped_feat.attribute(f'{self.feature_type}_id')
             self._init_replace_feature_form(snapped_feat)
 
