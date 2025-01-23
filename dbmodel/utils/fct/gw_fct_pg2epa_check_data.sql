@@ -47,7 +47,7 @@ BEGIN
 	IF v_verified_exceptions IS NULL THEN v_verified_exceptions = false; END IF;
 
 	IF v_isembebed IS FALSE OR v_isembebed IS NULL THEN -- create temporal tables if function is not embebed
-		PERFORM gw_fct_manage_temp_tables('{"data":{"parameters":{"fid":'||v_fid||', "project_type":"'||v_project_type||'", "action":"CREATE", "group":"EPAMAIN"}}}');
+		EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"fid":'||v_fid||', "project_type":"'||v_project_type||'", "action":"CREATE", "group":"EPAMAIN"}}}$$)';
 	END IF;
 
 	-- getting sys_fprocess to be executed
@@ -80,7 +80,7 @@ BEGIN
 		EXECUTE 'SELECT gw_fct_create_logreturn($${"data":{"parameters":{"type":"polygon"}}}$$::json)' INTO v_result_polygon;
 
 		IF v_isembebed IS FALSE OR v_isembebed IS NULL THEN -- drop temporal tables if function is not embebed
-			PERFORM gw_fct_manage_temp_tables('{"data":{"parameters":{"fid":'||v_fid||', "project_type":"'||v_project_type||'", "action":"DROP", "group":"EPAMAIN"}}}');
+			EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"fid":'||v_fid||', "project_type":"'||v_project_type||'", "action":"DROP", "group":"EPAMAIN"}}}$$)';
 		END IF;
 
 		-- Return

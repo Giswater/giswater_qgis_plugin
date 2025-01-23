@@ -102,7 +102,7 @@ BEGIN
 	IF v_qgis_layers_setpropierties IS NULL THEN v_qgis_layers_setpropierties = TRUE; END IF;
 
 	-- create temp tables
-	PERFORM gw_fct_create_querytables($${"client":{}, "form":{},"feature":{}, "data":{"parameters":{"selectionMode":"ignore"}}}$$);
+	EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"fid":'||v_fid||', "project_type":"'||v_project_type||'", "action":"CREATE", "group":"CHECKPROJECT"}}}$$)';
 
 	--check plugin and db version and other system parameters
 	IF v_qgis_version = v_version THEN
@@ -125,7 +125,7 @@ BEGIN
 	v_errortext=concat('Logged as ', current_user,' on ', now());
 	INSERT INTO t_audit_check_data (fid,  criticity, error_message) VALUES (101, 4, v_errortext);
 
-	-- check layers from project and insert on log table 
+	-- check layers from project and insert on log table
 	v_querytext=NULL;
 	FOR v_field in SELECT * FROM json_array_elements(v_insert_fields) LOOP
 		select into v_querytext concat(v_querytext, 'INSERT INTO t_audit_check_project (table_schema, table_id, table_dbname, table_host, fid, table_user) ') ;
@@ -215,12 +215,14 @@ BEGIN
 		INSERT INTO t_audit_check_data (fid,  criticity, result_id, error_message)
 		VALUES (101, 1, '353','INFO (QGIS PROJ): All layers have been added by current user');
 	END IF;
-	
+
 	-- built return
 	EXECUTE 'SELECT gw_fct_create_logreturn($${"data":{"parameters":{"type":"info"}}}$$::json)' INTO v_result_info;
 	EXECUTE 'SELECT gw_fct_create_logreturn($${"data":{"parameters":{"type":"point"}}}$$::json)' INTO v_result_point;
 	EXECUTE 'SELECT gw_fct_create_logreturn($${"data":{"parameters":{"type":"line"}}}$$::json)' INTO v_result_line;
 	EXECUTE 'SELECT gw_fct_create_logreturn($${"data":{"parameters":{"type":"polygon"}}}$$::json)' INTO v_result_polygon;
+
+	EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"fid":'||v_fid||', "project_type":"'||v_project_type||'", "action":"DROP", "group":"CHECKPROJECT"}}}$$)';
 
 	-- Control null
 	v_uservalues:=COALESCE(v_uservalues,'{}');
@@ -246,7 +248,7 @@ BEGIN
 	--  Exception handling
 	--EXCEPTION WHEN OTHERS THEN
 	--GET STACKED DIAGNOSTICS v_error_context = pg_exception_context;
-	--RETURN json_build_object('status', 'Failed', 'NOSQLERR', SQLERRM, 'message', json_build_object('level', right(SQLSTATE, 1), 'text', SQLERRM), 'SQLSTATE', 
+	--RETURN json_build_object('status', 'Failed', 'NOSQLERR', SQLERRM, 'message', json_build_object('level', right(SQLSTATE, 1), 'text', SQLERRM), 'SQLSTATE',
 	--SQLSTATE, 'SQLCONTEXT', v_error_context)::json;
 
 END;

@@ -12,10 +12,10 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_featurechanges(p_data json)
 AS $function$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_featurechanges('{"client":{"device":6, "epsg":25831}, "feature":{"feature_type": "FEATURE"}, "data": {"action":"INSERT", "lastFeeding":"2024-11-11"}}'); 
-SELECT SCHEMA_NAME.gw_fct_featurechanges('{"client":{"device":6, "epsg":25831}, "feature":{"feature_type": "ELEMENT"}, "data": {"action":"INSERT", "lastFeeding":"2024-11-11"}}'); 
-SELECT SCHEMA_NAME.gw_fct_featurechanges('{"client":{"device":6, "epsg":25831}, "feature":{"feature_type": "FEATURE"}, "data": {"action":"UPDATE", "lastFeeding":"2024-11-11"}}'); 
-SELECT SCHEMA_NAME.gw_fct_featurechanges('{"client":{"device":6, "epsg":25831}, "feature":{"feature_type": "ELEMENT"}, "data": {"action":"UPDATE", "lastFeeding":"2024-11-11"}}'); 
+SELECT SCHEMA_NAME.gw_fct_featurechanges('{"client":{"device":6, "epsg":25831}, "feature":{"feature_type": "FEATURE"}, "data": {"action":"INSERT", "lastFeeding":"2024-11-11"}}');
+SELECT SCHEMA_NAME.gw_fct_featurechanges('{"client":{"device":6, "epsg":25831}, "feature":{"feature_type": "ELEMENT"}, "data": {"action":"INSERT", "lastFeeding":"2024-11-11"}}');
+SELECT SCHEMA_NAME.gw_fct_featurechanges('{"client":{"device":6, "epsg":25831}, "feature":{"feature_type": "FEATURE"}, "data": {"action":"UPDATE", "lastFeeding":"2024-11-11"}}');
+SELECT SCHEMA_NAME.gw_fct_featurechanges('{"client":{"device":6, "epsg":25831}, "feature":{"feature_type": "ELEMENT"}, "data": {"action":"UPDATE", "lastFeeding":"2024-11-11"}}');
 **/
 
 DECLARE
@@ -39,14 +39,14 @@ BEGIN
 
 	--  Search path
 	SET search_path = "SCHEMA_NAME", public;
-	
+
 	SELECT giswater INTO v_version FROM sys_version order by id desc limit 1;
 
 	-- getting parameters
 	v_featuretype = (p_data->>'feature')::json->>'feature_type';
 	v_action = (p_data->>'data')::json->>'action';
 	v_lastfeeding = (p_data->>'data')::json->>'lastFeeding';
-	
+
 	CASE v_action
 		WHEN 'INSERT' THEN
 			-- Dynamic query construction based on the feature type
@@ -57,12 +57,12 @@ BEGIN
 					v_feature = 'node';
 			        v_select_node = 'SELECT '||v_feature||'_id as "'||lower(v_feature)||'Id", '||
 			                          lower(v_feature)||'cat_id as "featureClass", macrosector_id as "macroSector", asset_id as "assetId", state FROM vu_'||v_feature|| ' WHERE lastupdate >= '''||v_lastfeeding||'''';
-					
+
 					-- CONNEC
 					v_feature = 'connec';
 					v_select_connec = 'SELECT '||v_feature||'_id as "'||lower(v_feature)||'Id", '||
 			                          lower(v_feature)||'cat_id as "featureClass", macrosector_id as "macroSector", asset_id as "assetId", state FROM vu_'||v_feature|| ' WHERE lastupdate >= '''||v_lastfeeding||'''';
-					
+
 					-- Combine the query parts and execute it
 					EXECUTE format('SELECT array_agg(row_to_json(a)) FROM (%s UNION ALL %s) a',
 					               v_select_node, v_select_connec)
@@ -80,7 +80,7 @@ BEGIN
 			        v_select_element_connec = 'SELECT element_id as "elementId", '||
 			                          'elementcat_id as featureClass, connec_id as "connecId", serial_number as "serialNumber", '||
 			                          'brand_id as brand, model_id as model, descript as descript FROM vu_element_x_'||v_feature|| ' WHERE lastupdate >= '''||v_lastfeeding||'''';
-					
+
 					-- Combine the query parts and execute it
 					EXECUTE format('SELECT array_agg(row_to_json(a)) FROM (%s UNION ALL %s) a',
 					               v_select_element_node, v_select_element_connec)
@@ -100,7 +100,7 @@ BEGIN
 					v_feature = 'connec';
 					v_select_connec = 'SELECT '||v_feature||'_id as "'||lower(v_feature)||'Id", '||
 		                   lower(v_feature)||'cat_id as "featureClass", macrosector_id as "macroSector", asset_id as "assetId", state FROM vu_'||v_feature|| ' WHERE lastupdate >= '''||v_lastfeeding||''' and '||v_feature||'_id IN (SELECT newdata->>''connec_id'' as id FROM audit.log WHERE exists (SELECT 1 FROM unnest(array[''macrosector_id'', ''state'', ''nodecat_id'', ''asset_id'']) AS key WHERE olddata->key IS NOT NULL AND newdata->key IS NOT NULL and table_name ilike ''%_element_x_%'' AND schema = ''SCHEMA_NAME''))';
-					
+
 					-- Combine the query parts and execute it
 					EXECUTE format('SELECT array_agg(row_to_json(a)) FROM (%s UNION ALL %s) a',
 					               v_select_node, v_select_connec)
@@ -117,7 +117,7 @@ BEGIN
 			        v_select_element_connec = 'SELECT element_id as "elementId", '||
 			                          'elementcat_id as featureClass, connec_id as "connecId", serial_number as "serialNumber", '||
 			                          'brand_id as brand, model_id as model, descript as descript FROM vu_element_x_'||v_feature|| ' WHERE lastupdate >= '''||v_lastfeeding||'''and element_id IN (SELECT newdata->>''connec_id'' as id FROM audit.log WHERE exists (SELECT 1 FROM unnest(array[''macrosector_id'', ''state'', ''nodecat_id'', ''asset_id'']) AS key WHERE olddata->key IS NOT NULL AND newdata->key IS NOT NULL and table_name ilike ''%_'||v_feature||'%'' AND schema = ''SCHEMA_NAME''))';
-					
+
 					-- Combine the query parts and execute it
 					EXECUTE format('SELECT array_agg(row_to_json(a)) FROM (%s UNION ALL %s) a',
 					               v_select_element_node, v_select_element_connec)
@@ -129,9 +129,9 @@ BEGIN
 	END CASE;
 
 	v_fields := array_to_json(v_fields_array);
-	
+
 	-- Control nulls
-	v_fields := COALESCE(v_fields, '{}'); 
+	v_fields := COALESCE(v_fields, '{}');
 
 	-- Return
 	RETURN ('{"status":"Accepted", "message":{"level":1, "text":"Process done sucessfully"}, "version":"'||v_version||'"'||
@@ -142,10 +142,3 @@ BEGIN
 END;
 $function$
 ;
-
--- Permissions
-
-ALTER FUNCTION SCHEMA_NAME.gw_fct_featurechanges(json) OWNER TO postgres;
-GRANT ALL ON FUNCTION SCHEMA_NAME.gw_fct_featurechanges(json) TO public;
-GRANT ALL ON FUNCTION SCHEMA_NAME.gw_fct_featurechanges(json) TO postgres;
-GRANT ALL ON FUNCTION SCHEMA_NAME.gw_fct_featurechanges(json) TO role_basic;

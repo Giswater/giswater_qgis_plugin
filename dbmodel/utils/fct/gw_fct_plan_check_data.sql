@@ -70,7 +70,7 @@ BEGIN
 	IF v_isembebed IS FALSE OR v_isembebed IS NULL THEN -- create temporal tables if function is not embebed
 		v_isembebed = FALSE;
 		-- create temporal tables
-		EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"fid":'||v_fid||', "project_type":'||v_project_type||', "action":"CREATE", "group":"PLANCHECK", "verifiedExceptions":'||v_verified_exceptions||'}}}$$::json)';
+		EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"fid":'||v_fid||', "project_type":"'||v_project_type||'", "action":"DROP", "group":"PLANCHECK", "verifiedExceptions":'||v_verified_exceptions||'}}}$$::json)';
 	END IF;
 
 	-- getting sys_fprocess to be executed
@@ -90,7 +90,7 @@ BEGIN
 	END LOOP;
 
 	IF v_isembebed IS FALSE OR v_isembebed IS NULL THEN -- drop temporal tables if function is not embebed
-		EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"fid":'||v_fid||', "project_type":'||v_project_type||', "action":"DROP", "group":"PLANCHECK"}}}$$)';
+		EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"fid":'||v_fid||', "project_type":"'||v_project_type||'", "action":"DROP", "group":"PLANCHECK"}}}$$)';
 	END IF;
 
 	--  Return
@@ -99,7 +99,7 @@ BEGIN
 
 	EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_error_context = pg_exception_context;
-	EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"fid":'||v_fid||', "project_type":'||v_project_type||', "action":"DROP", "group":"PLANCHECK"}}}$$)';
+	EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"fid":'||v_fid||', "project_type":"'||v_project_type||'", "action":"DROP", "group":"PLANCHECK"}}}$$)';
 	RETURN json_build_object('status', 'Failed', 'NOSQLERR', SQLERRM, 'message', json_build_object('level', right(SQLSTATE, 1), 'text', SQLERRM), 'SQLSTATE',
 	SQLSTATE, 'SQLCONTEXT', v_error_context)::json;
 

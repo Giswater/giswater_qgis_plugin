@@ -18,7 +18,7 @@ $BODY$
  * * project_type: string -> 'WS' | 'UD' (mandatory)
  * * action: string -> 'CREATE' | 'DROP' (mandatory)
  * * verifiedExceptions: boolean (optional)
- * * group: string -> 'LOG' | 'ANL' | 'MAPZONES' | 'EPA' | 'OMCHECK' | 'ADMIN' | 'GRAPH' | 'PLAN' | 'EPAMAIN' | 'CHECKPROJECT' | 'GRAPHANALYTICSCHECK', 'USERCHECK' (mandatory)
+ * * group: string -> 'LOG' | 'ANL' | 'MAPZONES' | 'EPA' | 'OMCHECK' | 'ADMIN' | 'PLANCHECK' | 'EPAMAIN' | 'CHECKPROJECT' | 'GRAPHANALYTICSCHECK', 'USERCHECK' (mandatory)
  * * subGroup: string[] -> ['ALL' | 'DMA' | 'DQA' | 'PRESSZONE' | 'SECTOR' | 'DRAINZONE'] (optional)
 
  * EXAMPLE CALLS:
@@ -96,7 +96,7 @@ BEGIN
     END IF;
 
     -- validate group
-    IF v_group NOT IN ('LOG', 'ANL', 'MAPZONES', 'EPA', 'OMCHECK', 'ADMIN', 'GRAPH', 'PLAN', 'EPAMAIN', 'CHECKPROJECT', 'GRAPHANALYTICSCHECK', 'USERCHECK') THEN
+    IF v_group NOT IN ('LOG', 'ANL', 'MAPZONES', 'EPA', 'OMCHECK', 'ADMIN', 'PLANCHECK', 'EPAMAIN', 'CHECKPROJECT', 'GRAPHANALYTICSCHECK', 'USERCHECK') THEN
         RETURN ('{"status":"Failed","message":{"level":1, "text":"group is invalid"}}')::json;
     END IF;
 
@@ -107,7 +107,7 @@ BEGIN
 
     -- test
     IF v_group = 'EPAMAIN' THEN
-        v_group_array = ARRAY['LOG', 'ANL', 'MAPZONES', 'EPA', 'OMCHECK', 'ADMIN', 'GRAPH', 'PLAN'];
+        v_group_array = ARRAY['LOG', 'ANL', 'MAPZONES', 'EPA', 'OMCHECK', 'ADMIN'];
         IF v_project_type = 'WS' THEN
             v_subGroup_array = ARRAY['DMA', 'DQA', 'PRESSZONE', 'SECTOR'];
         ELSIF v_project_type = 'UD' THEN
@@ -119,7 +119,9 @@ BEGIN
     ELSIF v_group = 'USERCHECK' THEN
         v_group_array = ARRAY['LOG', 'ANL'];
     ELSIF v_group = 'CHECKPROJECT' THEN
-        v_group_array = ARRAY['LOG'];
+        v_group_array = ARRAY['LOG', 'ANL'];
+    ELSIF v_group = 'PLANCHECK' THEN
+        v_group_array = ARRAY['LOG', 'ANL', 'OMCHECK'];
     ELSE
         v_group_array = ARRAY[v_group];
         v_subGroup_array = ARRAY[v_subGroup];
@@ -359,11 +361,7 @@ BEGIN
         DROP TABLE IF EXISTS t_link;
         DROP TABLE IF EXISTS t_gully;
 
-        -- TODO: add admin tables
-
-        -- TODO: add graph tables
-
-        -- TODO: add plan tables
+        RETURN '{"status":"Accepted", "message":"'||UPPER(LEFT(v_group,1))||LOWER(SUBSTRING(v_group,2))||' tables deleted"}';
     END IF;
 
     RETURN ('{"status":"Failed","message":{"level":1, "text":"Something went wrong"}}')::json;
