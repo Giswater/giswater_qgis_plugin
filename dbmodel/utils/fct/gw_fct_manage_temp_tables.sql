@@ -150,24 +150,26 @@ BEGIN
         END IF;
 
         IF 'MAPZONES' = ANY(v_group_array) THEN
-            IF 'DMA' = ANY(v_subGroup_array) THEN
+            IF 'DMA' = ANY(v_subGroup_array) OR 'ALL' = ANY(v_subGroup_array) THEN
                 CREATE TEMP TABLE t_dma AS SELECT * FROM v_edit_dma;
+               --raise exception 'aaaa';
             END IF;
-
+           
+            IF 'SECTOR' = ANY(v_subGroup_array) OR 'ALL' = ANY(v_subGroup_array) THEN
+                CREATE TEMP TABLE t_sector AS SELECT * FROM v_edit_sector;
+            END IF;
+			
             IF v_project_type = 'WS' THEN
-                IF 'DQA' = ANY(v_subGroup_array) THEN
-                    CREATE TEMP TABLE t_dqa AS SELECT * FROM v_edit_dqa;
-                END IF;
-
-                IF 'PRESSZONE' = ANY(v_subGroup_array) THEN
-                    CREATE TEMP TABLE t_presszone AS SELECT * FROM v_edit_presszone;
-                END IF;
-
-                IF 'SECTOR' = ANY(v_subGroup_array) THEN
-                    CREATE TEMP TABLE t_sector AS SELECT * FROM v_edit_sector;
-                END IF;
+            	IF 'PRESSZONE' = ANY(v_subGroup_array) OR 'ALL' = ANY(v_subGroup_array) THEN
+                CREATE TEMP TABLE t_presszone AS SELECT * FROM v_edit_presszone;
+            	END IF;
+            
+	            IF 'DQA' = ANY(v_subGroup_array) OR 'ALL' = ANY(v_subGroup_array)THEN
+	                CREATE TEMP TABLE t_dqa AS SELECT * FROM v_edit_dqa;
+	            END IF;
+                
             ELSIF v_project_type = 'UD' THEN
-                IF 'DRAINZONE' = ANY(v_subGroup_array) THEN
+                IF 'DRAINZONE' = ANY(v_subGroup_array) OR 'ALL' = ANY(v_subGroup_array) THEN
                     CREATE TEMP TABLE t_drainzone AS SELECT * FROM v_edit_drainzone;
                 END IF;
             END IF;
