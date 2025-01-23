@@ -69,22 +69,7 @@ class GwMincutTools:
 
         # Populate custom context menu
         self.tbl_mincut_edit.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.tbl_mincut_edit.customContextMenuRequested.connect(partial(self._show_context_menu, "tab_none_tbl_mincut_edit"))
-
-
-    def _show_context_menu(self, qtableview, pos):
-        """Show custom context menu"""
-        menu = QMenu(qtableview)
-
-        action_cancel = QAction("Cancel mincut", self.tbl_mincut_edit)
-        action_cancel.triggered.connect(partial(cancel_mincut, dialog=self.dlg_mincut_man))
-        menu.addAction(action_cancel)
-
-        action_delete = QAction("Delete", self.tbl_mincut_edit)
-        action_delete.triggered.connect(partial(delete_mincut, dialog=self.dlg_mincut_man, complet_result=self.complet_result))
-        menu.addAction(action_delete)
-
-        menu.exec(QCursor.pos())
+        self.tbl_mincut_edit.customContextMenuRequested.connect(partial(tools_gw._show_context_menu, self.tbl_mincut_edit, self.dlg_mincut_man))
 
 
     def load_connections(self, complet_result, filter_fields=''):

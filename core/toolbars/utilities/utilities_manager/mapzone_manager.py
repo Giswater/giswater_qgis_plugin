@@ -723,32 +723,24 @@ class GwMapzoneManager:
                                 'mapzone_manager_snapping', 'get_snapped_feature_id_ep_canvasClicked_get_id')
 
 
-    def _show_context_menu(self, qtableview, pos):
+    def _show_context_menu(self, qtableview):
         """ Show custom context menu """
         menu = QMenu(qtableview)
 
-        action_open = QAction("Open", qtableview)
-        action_open.triggered.connect(partial(self.manage_update, self.mapzone_mng_dlg, None))
-        menu.addAction(action_open)
-
-        action_create = QAction("Create", qtableview)
-        action_create.triggered.connect(partial(self.manage_create, self.mapzone_mng_dlg, qtableview))
-        menu.addAction(action_create)
-
         action_update = QAction("Update", qtableview)
-        action_update.triggered.connect(partial(self.manage_update, self.mapzone_mng_dlg, qtableview))
+        action_update.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_update"))
         menu.addAction(action_update)
 
         action_delete = QAction("Delete", qtableview)
-        action_delete.triggered.connect(partial(self._manage_delete))
+        action_delete.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_delete"))
         menu.addAction(action_delete)
 
         action_toggle_active = QAction("Toggle Active", qtableview)
-        action_toggle_active.triggered.connect(self._manage_toggle_active)
+        action_toggle_active.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_toggle_active"))
         menu.addAction(action_toggle_active)
 
         action_config = QAction("Config", qtableview)
-        action_config.triggered.connect(partial(self.manage_config, self.mapzone_mng_dlg, qtableview))
+        action_config.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_config"))
         menu.addAction(action_config)
 
         menu.exec(QCursor.pos())

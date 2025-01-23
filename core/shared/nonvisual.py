@@ -18,7 +18,7 @@ try:
 except ImportError:
     scipy_imported = False
 
-from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QTableWidget, QTableWidgetItem, QSizePolicy, QLineEdit, QGridLayout, QComboBox, QWidget, QShortcut,QApplication, QMenu, QAction
+from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QTableWidget, QTableWidgetItem, QSizePolicy, QLineEdit, QGridLayout, QComboBox, QWidget, QShortcut,QApplication, QMenu, QAction, QPushButton
 from qgis.PyQt.QtGui import QKeySequence, QCursor
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtCore import Qt
@@ -118,35 +118,31 @@ class GwNonVisual:
 
             # Populate custom context menu
             qtableview.setContextMenuPolicy(Qt.CustomContextMenu)
-            qtableview.customContextMenuRequested.connect(partial(self._show_context_menu, qtableview, function_name))
+            qtableview.customContextMenuRequested.connect(partial(self._show_context_menu, qtableview))
 
             self._fill_manager_table(qtableview, key, expr='active is true')
 
             qtableview.doubleClicked.connect(partial(self._get_nonvisual_object, qtableview, function_name))
             
 
-    def _show_context_menu(self, qtableview, function_name):
+    def _show_context_menu(self, qtableview, pos):
         """ Show custom context menu """
         menu = QMenu(qtableview)
 
         action_open = QAction("Open", qtableview)
-        action_open.triggered.connect(partial(self._get_nonvisual_object, qtableview, function_name))
+        action_open.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QTableView, qtableview.objectName(), pos))
         menu.addAction(action_open)
 
         action_toggle = QAction("Toggle active", qtableview)
-        action_toggle.triggered.connect(self._manage_toggle_active)
+        action_toggle.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_toggle_active"))
         menu.addAction(action_toggle)
 
         action_duplicate = QAction("Duplicate", qtableview)
-        action_duplicate.triggered.connect(partial(self._duplicate_object, self.manager_dlg))
+        action_duplicate.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_duplicate"))
         menu.addAction(action_duplicate)
 
-        action_create = QAction("Create", qtableview)
-        action_create.triggered.connect(partial(self._create_object, self.manager_dlg))
-        menu.addAction(action_create)
-
         action_delete = QAction("Delete", qtableview)
-        action_delete.triggered.connect(partial(self._delete_object, self.manager_dlg))
+        action_delete.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_delete"))
         menu.addAction(action_delete)
 
         menu.exec(QCursor.pos())

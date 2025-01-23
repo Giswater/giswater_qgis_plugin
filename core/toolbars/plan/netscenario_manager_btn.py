@@ -13,7 +13,7 @@ from qgis.core import QgsProject
 from qgis.PyQt.QtGui import QRegExpValidator, QStandardItemModel, QCursor
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtCore import Qt, QRegExp, QPoint
-from qgis.PyQt.QtWidgets import QTableView, QAbstractItemView, QMenu, QCheckBox, QWidgetAction, QComboBox, QCompleter, QAction
+from qgis.PyQt.QtWidgets import QTableView, QAbstractItemView, QMenu, QCheckBox, QWidgetAction, QComboBox, QCompleter, QAction, QPushButton
 from qgis.PyQt.QtWidgets import QDialog, QLineEdit, QDateEdit
 
 from ..dialog import GwAction
@@ -104,41 +104,32 @@ class GwNetscenarioManagerButton(GwAction):
         """ Show custom context menu """
         menu = QMenu(qtableview)
 
-        action_open = QAction("Open", self.tbl_netscenario)
-        action_open.triggered.connect(partial(self._open_netscenario, self.tbl_netscenario.indexAt(pos)))
+        action_open = QAction("Open", qtableview)
+        action_open.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QTableView, qtableview.objectName(), pos))
         menu.addAction(action_open)
 
-        action_current = QAction("Current netscenario", self.dlg_netscenario_manager.tbl_netscenario)
-        action_current.triggered.connect(partial(self._update_current_netscenario, self.dlg_netscenario_manager, self.tbl_netscenario))
+        action_current = QAction("Current netscenario", qtableview)
+        action_current.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_update_netscenario"))
         menu.addAction(action_current)
 
-        action_toggle = QAction("Toggle active", self.dlg_netscenario_manager.tbl_netscenario)
-        action_toggle.triggered.connect(partial(self._manage_toggle_active, self.tbl_netscenario, 'plan_netscenario', is_manager=True))
+        action_toggle = QAction("Toggle active", qtableview)
+        action_toggle.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_toggle_active"))
         menu.addAction(action_toggle)
 
-        action_execute = QAction("Execute", self.tbl_netscenario)
-        action_execute.triggered.connect(self._execute_current_netscenario)
-        menu.addAction(action_execute)
+        action_execute = QAction("Execute", qtableview)
+        action_execute.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_execute"))
+        menu.addAction(action_execute)        
 
-        menu_create = QMenu("Create", self.dlg_netscenario_manager.tbl_netscenario)
-        values = [[3260, "Create empty Netscenario"], [3262, "Create Netscenario from ToC"]]
-        for value in values:
-            num = value[0]
-            label = value[1]
-            action = menu_create.addAction(f"{label}")
-            action.triggered.connect(partial(self._open_toolbox_function, num))
-        menu.addMenu(menu_create)
-
-        action_duplicate = QAction("Duplicate", self.dlg_netscenario_manager.tbl_netscenario)
-        action_duplicate.triggered.connect(partial(self._duplicate_selected_netscenario))
+        action_duplicate = QAction("Duplicate", qtableview)
+        action_duplicate.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_duplicate"))
         menu.addAction(action_duplicate)
 
-        action_update = QAction("Update", self.dlg_netscenario_manager.tbl_netscenario)
-        action_update.triggered.connect(partial(self._manage_properties))
+        action_update = QAction("Update", qtableview)
+        action_update.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_update"))
         menu.addAction(action_update)
 
-        action_delete = QAction("Delete", self.dlg_netscenario_manager.tbl_netscenario)
-        action_delete.triggered.connect(partial(self._delete_selected_netscenario))
+        action_delete = QAction("Delete", qtableview)
+        action_delete.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_delete"))
         menu.addAction(action_delete)
 
         menu.exec(QCursor.pos())

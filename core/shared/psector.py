@@ -1686,7 +1686,7 @@ class GwPsector:
 
         # Populate custom context menu
         self.dlg_psector_mng.tbl_psm.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.dlg_psector_mng.tbl_psm.customContextMenuRequested.connect(partial(self._show_context_menu_right_click, table_name))
+        self.dlg_psector_mng.tbl_psm.customContextMenuRequested.connect(partial(self._show_context_menu_right_click, self.dlg_psector_mng.tbl_psm))
 
         # Set signals
         self.dlg_psector_mng.chk_active.stateChanged.connect(partial(self._filter_table, self.dlg_psector_mng,
@@ -1726,36 +1726,32 @@ class GwPsector:
         """ Show custom context menu """
         menu = QMenu(qtableview)
 
-        action_open = QAction("Open", self.dlg_psector_mng.tbl_psm)
-        action_open.triggered.connect(partial(self.charge_psector, self.qtbl_psm))
+        action_open = QAction("Open", qtableview)
+        action_open.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QTableView, qtableview.objectName(), pos))
         menu.addAction(action_open)
 
-        action_actual_psector = QAction("Psector actual", self.dlg_psector_mng.tbl_psm)
-        action_actual_psector.triggered.connect(partial(self.update_current_psector, self.dlg_psector_mng, qtbl=self.qtbl_psm, scenario_type="psector", col_id_name="psector_id", view_name="v_edit_plan_psector"))
+        action_actual_psector = QAction("Psector actual", qtableview)
+        action_actual_psector.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_update_psector"))
         menu.addAction(action_actual_psector)
 
-        action_show = QAction("Show", self.dlg_psector_mng.tbl_psm)
-        action_show.triggered.connect(self._show_psector)
+        action_show = QAction("Show", qtableview)
+        action_show.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_show_psector"))
         menu.addAction(action_show)
 
-        action_toggle_active = QAction("Toggle active", self.dlg_psector_mng.tbl_psm)
-        action_toggle_active.triggered.connect(partial(self.set_toggle_active, self.dlg_psector_mng, self.qtbl_psm))
+        action_toggle_active = QAction("Toggle active", qtableview)
+        action_toggle_active.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_toggle_active"))
         menu.addAction(action_toggle_active)
 
-        action_create = QAction("Create", self.dlg_psector_mng.tbl_psm)
-        action_create.triggered.connect(partial(self.open_psector_dlg))
-        menu.addAction(action_create)
-
-        action_merge = QAction("Merge", self.dlg_psector_mng.tbl_psm)
-        action_merge.triggered.connect(self.psector_merge)
+        action_merge = QAction("Merge", qtableview)
+        action_merge.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_merge"))
         menu.addAction(action_merge)
 
-        action_duplicate = QAction("Duplicate", self.dlg_psector_mng.tbl_psm)
-        action_duplicate.triggered.connect(self.psector_duplicate)
+        action_duplicate = QAction("Duplicate", qtableview)
+        action_duplicate.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_duplicate"))
         menu.addAction(action_duplicate)
 
-        action_delete = QAction("Delete", self.dlg_psector_mng.tbl_psm)
-        action_delete.triggered.connect(partial(self.multi_rows_delete, self.dlg_psector_mng, self.qtbl_psm, qtableview, 'psector_id', 'lbl_vdefault_psector', 'psector'))
+        action_delete = QAction("Delete", qtableview)
+        action_delete.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_delete"))
         menu.addAction(action_delete)
 
         menu.exec(QCursor.pos())

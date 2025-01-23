@@ -10,7 +10,7 @@ import json
 from functools import partial
 
 from qgis.PyQt.QtCore import Qt, QRegExp
-from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QDialog, QAction, QMenu
+from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QDialog, QAction, QMenu, QPushButton
 from qgis.PyQt.QtGui import QRegExpValidator, QStandardItemModel, QCursor
 
 from ..dialog import GwAction
@@ -81,32 +81,30 @@ class GwGo2EpaManagerButton(GwAction):
         """ Show custom context menu """                        
         menu = QMenu(qtableview)
 
-        action_edit = QAction("Edit", self.dlg_manager.tbl_rpt_cat_result)
-        action_edit.triggered.connect(partial(self._manage_edit_row, self.dlg_manager, self.dlg_manager.tbl_rpt_cat_result))
+        action_edit = QAction("Edit", qtableview)
+        action_edit.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_edit"))
         menu.addAction(action_edit)
 
-        action_show_inp_data = QAction("Show inp data", self.dlg_manager.tbl_rpt_cat_result)
-        action_show_inp_data.triggered.connect(partial(self._show_inp_data, self.dlg_manager, self.dlg_manager.tbl_rpt_cat_result))
+        action_show_inp_data = QAction("Show inp data", qtableview)
+        action_show_inp_data.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_show_inp_data"))
         menu.addAction(action_show_inp_data)
 
-        action_toggle_active = QAction("Toggle active", self.dlg_manager.tbl_rpt_cat_result)
-        action_toggle_active.triggered.connect(partial(self._toggle_rpt_archived, self.dlg_manager.tbl_rpt_cat_result, 'result_id'))
-        action_toggle_active.setEnabled(self.dlg_manager.btn_archive.isEnabled())
+        action_toggle_active = QAction("Toggle active", qtableview)
+        action_toggle_active.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_archive"))
+        action_toggle_active.setEnabled(qtableview.window().btn_archive.isEnabled())
         menu.addAction(action_toggle_active)
         
-        action_set_corporate = QAction("Set corporate", self.dlg_manager.tbl_rpt_cat_result)
-        action_set_corporate.triggered.connect(partial(self._epa2data, self.dlg_manager.tbl_rpt_cat_result, 'result_id'))
-        action_set_corporate.setEnabled(self.dlg_manager.btn_set_corporate.isEnabled())
+        action_set_corporate = QAction("Set corporate", qtableview)
+        action_set_corporate.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_set_corporate"))
+        action_set_corporate.setEnabled(qtableview.window().btn_set_corporate.isEnabled())
         menu.addAction(action_set_corporate)  
 
-        action_delete = QAction("Delete", self.dlg_manager.tbl_rpt_cat_result)
-        action_delete.triggered.connect(partial(self._multi_rows_delete, self.dlg_manager.tbl_rpt_cat_result, 'v_ui_rpt_cat_result', 'result_id'))
+        action_delete = QAction("Delete", qtableview)
+        action_delete.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_delete"))
         menu.addAction(action_delete)
 
         menu.exec(QCursor.pos())
                        
-
-
 
     def _fill_manager_table(self, filter_id=None):
         """ Fill dscenario manager table with data from v_edit_cat_dscenario """

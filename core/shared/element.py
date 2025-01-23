@@ -288,7 +288,7 @@ class GwElement:
 
         # Populate custom context menu
         self.dlg_man.tbl_element.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.dlg_man.tbl_element.customContextMenuRequested.connect(partial(self._show_context_menu, table_object))
+        self.dlg_man.tbl_element.customContextMenuRequested.connect(partial(self._show_context_menu, self.dlg_man.tbl_element))
 
         # Set a model with selected filter. Attach that model to selected table
         message = tools_qt.fill_table(self.dlg_man.tbl_element, f"{self.schema_name}.{table_object}")
@@ -315,16 +315,12 @@ class GwElement:
         """ Show custom context menu """
         menu = QMenu(qtableview)
 
-        action_open = QAction("Open", self.dlg_man.tbl_element)
-        action_open.triggered.connect(partial(self._open_selected_object_element, self.dlg_man, self.dlg_man.tbl_element, qtableview))
+        action_open = QAction("Open", qtableview)
+        action_open.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QTableView, qtableview.objectName(), pos))
         menu.addAction(action_open)
 
-        action_create = QAction("Create", self.dlg_man.tbl_element)
-        action_create.triggered.connect(partial(self.open_element_dialog))
-        menu.addAction(action_create)
-
-        action_delete = QAction("Delete", self.dlg_man.tbl_element)
-        action_delete.triggered.connect(partial(tools_gw.delete_selected_rows, self.dlg_man.tbl_element, qtableview))
+        action_delete = QAction("Delete", qtableview)
+        action_delete.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_delete"))
         menu.addAction(action_delete)
 
         menu.exec(QCursor.pos())

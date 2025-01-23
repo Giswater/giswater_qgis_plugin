@@ -14,7 +14,7 @@ from qgis.PyQt.QtGui import QRegExpValidator, QStandardItemModel, QCursor, QKeyS
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtCore import Qt, QRegExp, QPoint
 from qgis.PyQt.QtWidgets import QTableView, QAbstractItemView, QMenu, QCheckBox, QWidgetAction, QComboBox, QAction, \
-    QShortcut, QApplication, QTableWidgetItem, QWidget, QLabel, QGridLayout, QToolButton
+    QShortcut, QApplication, QTableWidgetItem, QWidget, QLabel, QGridLayout, QToolButton, QPushButton
 from qgis.PyQt.QtWidgets import QDialog, QLineEdit
 
 from libs import tools_log
@@ -145,7 +145,7 @@ class GwDscenarioManagerButton(GwAction):
 
         # Populate custom context menu
         self.dlg_hydrology_manager.tbl_dscenario.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.dlg_hydrology_manager.tbl_dscenario.customContextMenuRequested.connect(partial(self._show_context_menu_hydrology, 'v_edit_cat_hydrology'))
+        self.dlg_hydrology_manager.tbl_dscenario.customContextMenuRequested.connect(partial(self._show_context_menu, self.dlg_hydrology_manager.tbl_dscenario))
 
         # Connect main dialog signals
         self.dlg_hydrology_manager.btn_toc.clicked.connect(partial(self._manage_add_layers, 'v_edit_cat_hydrology', 'Catalogs'))
@@ -178,70 +178,7 @@ class GwDscenarioManagerButton(GwAction):
 
         # Open dialog
         self.dlg_hydrology_manager.setWindowTitle(f'Hydrology scenario manager')
-        tools_gw.open_dialog(self.dlg_hydrology_manager, 'dscenario_manager')
-
-    
-    def _show_context_menu_hydrology(self, qtableview, pos):
-        """ Show custom context menu """
-        menu = QMenu(qtableview)
-
-        action_open = QAction("Open", self.tbl_dscenario)
-        action_open.triggered.connect(partial(self._manage_properties, self.dlg_hydrology_manager, 'v_edit_cat_hydrology'))
-        menu.addAction(action_open)
-
-        action_current_dscenario = QAction("Current Dscenario", self.dlg_hydrology_manager.tbl_dscenario)
-        action_current_dscenario.triggered.connect(partial(self.update_current_scenario, self.dlg_hydrology_manager, qtbl=self.tbl_dscenario, scenario_type="hydrology", col_id_name="hydrology_id", view_name="v_edit_cat_hydrology",))
-        menu.addAction(action_current_dscenario)
-
-        action_toggle = QAction("Toggle active", self.dlg_hydrology_manager.tbl_dscenario)
-        action_toggle.triggered.connect(partial(self._manage_toggle_active, self.dlg_hydrology_manager, self.tbl_dscenario, 'v_edit_cat_hydrology'))
-        menu.addAction(action_toggle)
-
-        menu_create = QMenu("Create", self.dlg_hydrology_manager.tbl_dscenario)
-        values = []
-        if global_vars.project_type == 'ws':
-            values.append([3134, "Create empty dscenario"])
-            values.append([3110, "Create from CRM"])
-            values.append([3112, "Create demand from ToC"])
-            values.append([3108, "Create network from ToC"])
-            values.append([3158, "Create from Mincut"])
-        if global_vars.project_type == 'ud':
-            if qtableview == 'v_edit_cat_hydrology':
-                values.append([3290, "Create empty hydrology scenario"])
-                # values.append([3290, "Create hydrology scenario values"])
-            elif qtableview == 'v_edit_cat_dwf':
-                values.append([3292, "Create empty dwf scenario"])
-                # values.append([3292, "Create dwf scenario values"])
-            elif qtableview == 'v_edit_cat_dscenario':
-                values.append([3134, "Create empty dscenario"])
-                values.append([3118, "Create from ToC"])
-
-        # Create and populate QMenu
-        for value in values:
-            num = value[0]
-            label = value[1]
-            action = menu_create.addAction(f"{label}")
-            action.triggered.connect(partial(self._open_toolbox_function, num, qtableview, label=label))
-        menu.addMenu(menu_create)
-
-
-        action_duplicate = QAction("Duplicate", self.dlg_hydrology_manager.tbl_dscenario)
-        action_duplicate.triggered.connect(partial(self._duplicate_selected_dscenario, self.dlg_hydrology_manager, 'v_edit_cat_hydrology', 3294))
-        menu.addAction(action_duplicate)
-
-        action_update = QAction("Update", self.dlg_hydrology_manager.tbl_dscenario)
-        action_update.triggered.connect(partial(self._manage_properties, self.dlg_hydrology_manager, 'v_edit_cat_hydrology', True))
-        menu.addAction(action_update)
-
-        action_toolbox = QAction("Toolbox", self.dlg_hydrology_manager.tbl_dscenario)
-        action_toolbox.triggered.connect(partial(self._open_toolbox_function, 3100, 'v_edit_cat_hydrology'))
-        menu.addAction(action_toolbox)
-
-        action_delete = QAction("Delete", self.dlg_hydrology_manager.tbl_dscenario)
-        action_delete.triggered.connect(partial(self._delete_selected_dscenario, self.dlg_hydrology_manager, 'v_edit_cat_hydrology'))
-        menu.addAction(action_delete)
-
-        menu.exec(QCursor.pos())
+        tools_gw.open_dialog(self.dlg_hydrology_manager, 'dscenario_manager')        
 
 
     def _open_dwf_manager(self):
@@ -270,7 +207,7 @@ class GwDscenarioManagerButton(GwAction):
 
         # Populate custom context menu
         self.dlg_dwf_manager.tbl_dscenario.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.dlg_dwf_manager.tbl_dscenario.customContextMenuRequested.connect(partial(self._show_context_menu_dwf, 'v_edit_cat_dwf'))
+        self.dlg_dwf_manager.tbl_dscenario.customContextMenuRequested.connect(partial(self._show_context_menu, self.dlg_dwf_manager.tbl_dscenario))
 
         # Connect main dialog signals
         self.dlg_dwf_manager.btn_toc.clicked.connect(partial(self._manage_add_layers, 'v_edit_cat_dwf', 'Catalogs'))
@@ -303,70 +240,7 @@ class GwDscenarioManagerButton(GwAction):
 
         # Open dialog
         self.dlg_dwf_manager.setWindowTitle(f'DWF scenario manager')
-        tools_gw.open_dialog(self.dlg_dwf_manager, 'dscenario_manager')
-
-
-    def _show_context_menu_dwf(self, qtableview, pos):
-        """ Show custom context menu """
-        menu = QMenu(qtableview)
-
-        action_open = QAction("Open", self.tbl_dscenario)
-        action_open.triggered.connect(partial(self._manage_properties, self.dlg_dwf_manager, 'v_edit_cat_dwf'))
-        menu.addAction(action_open)
-
-        action_current_dscenario = QAction("Current Dscenario", self.dlg_dwf_manager.tbl_dscenario)
-        action_current_dscenario.triggered.connect(partial(self.update_current_scenario, self.dlg_dwf_manager, qtbl=self.tbl_dscenario, scenario_type="dwf", col_id_name="id", view_name="v_edit_cat_dwf"))
-        menu.addAction(action_current_dscenario)
-
-        action_toggle = QAction("Toggle active", self.dlg_dwf_manager.tbl_dscenario)
-        action_toggle.triggered.connect(partial(self._manage_toggle_active, self.dlg_dwf_manager, self.tbl_dscenario, 'v_edit_cat_dwf'))
-        menu.addAction(action_toggle)
-
-        menu_create = QMenu("Create", self.dlg_dwf_manager.tbl_dscenario)
-        values = []
-        if global_vars.project_type == 'ws':
-            values.append([3134, "Create empty dscenario"])
-            values.append([3110, "Create from CRM"])
-            values.append([3112, "Create demand from ToC"])
-            values.append([3108, "Create network from ToC"])
-            values.append([3158, "Create from Mincut"])
-        if global_vars.project_type == 'ud':
-            if qtableview == 'v_edit_cat_hydrology':
-                values.append([3290, "Create empty hydrology scenario"])
-                # values.append([3290, "Create hydrology scenario values"])
-            elif qtableview == 'v_edit_cat_dwf':
-                values.append([3292, "Create empty dwf scenario"])
-                # values.append([3292, "Create dwf scenario values"])
-            elif qtableview == 'v_edit_cat_dscenario':
-                values.append([3134, "Create empty dscenario"])
-                values.append([3118, "Create from ToC"])
-
-        # Create and populate QMenu
-        for value in values:
-            num = value[0]
-            label = value[1]
-            action = menu_create.addAction(f"{label}")
-            action.triggered.connect(partial(self._open_toolbox_function, num, qtableview, label=label))
-        menu.addMenu(menu_create)
-
-
-        action_duplicate = QAction("Duplicate", self.dlg_dwf_manager.tbl_dscenario)
-        action_duplicate.triggered.connect(partial(self._duplicate_selected_dscenario, self.dlg_dwf_manager, 'v_edit_cat_dwf', 3296))
-        menu.addAction(action_duplicate)
-
-        action_update = QAction("Update", self.dlg_dwf_manager.tbl_dscenario)
-        action_update.triggered.connect(partial(self._manage_properties, self.dlg_dwf_manager, 'v_edit_cat_dwf', True))
-        menu.addAction(action_update)
-
-        action_toolbox = QAction("Toolbox", self.dlg_dwf_manager.tbl_dscenario)
-        action_toolbox.triggered.connect(partial(self._open_toolbox_function, 3102, 'v_edit_cat_dwf'))
-        menu.addAction(action_toolbox)
-
-        action_delete = QAction("Delete", self.dlg_dwf_manager.tbl_dscenario)
-        action_delete.triggered.connect(partial(self._delete_selected_dscenario, self.dlg_dwf_manager, 'v_edit_cat_dwf'))
-        menu.addAction(action_delete)
-
-        menu.exec(QCursor.pos())
+        tools_gw.open_dialog(self.dlg_dwf_manager, 'dscenario_manager')    
 
 
     def _open_dscenario_manager(self):
@@ -402,7 +276,7 @@ class GwDscenarioManagerButton(GwAction):
 
         # Populate custom context menu
         self.dlg_dscenario_manager.tbl_dscenario.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.dlg_dscenario_manager.tbl_dscenario.customContextMenuRequested.connect(partial(self._show_context_menu_dscenario, 'v_edit_cat_dscenario'))
+        self.dlg_dscenario_manager.tbl_dscenario.customContextMenuRequested.connect(partial(self._show_context_menu, self.dlg_dscenario_manager.tbl_dscenario))
 
         # Connect main dialog signals
         self.dlg_dscenario_manager.txt_name.textChanged.connect(partial(self._fill_manager_table,
@@ -431,61 +305,37 @@ class GwDscenarioManagerButton(GwAction):
         tools_gw.open_dialog(self.dlg_dscenario_manager, 'dscenario_manager')
 
     
-    def _show_context_menu_dscenario(self, qtableview, pos):
+    def _show_context_menu(self, qtableview, pos):
         """ Show custom context menu """
         menu = QMenu(qtableview)
 
         action_open = QAction("Open", self.tbl_dscenario)
-        action_open.triggered.connect(partial(self._open_dscenario, self.tbl_dscenario.indexAt(pos)))
+        action_open.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QTableView, qtableview.objectName(), pos))
         menu.addAction(action_open)
 
-        action_toggle = QAction("Toggle active", self.dlg_dscenario_manager.tbl_dscenario)
-        action_toggle.triggered.connect(partial(self._manage_toggle_active, self.dlg_dscenario_manager, self.tbl_dscenario, qtableview))
-        menu.addAction(action_toggle)
+        if qtableview.objectName() in ('v_edit_cat_hydrology', 'v_edit_cat_dwf'):
+            action_toggle = QAction("Current dscenario", qtableview)
+            action_toggle.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_update_dscenario"))
+            menu.addAction(action_toggle)
 
+        action_toggle = QAction("Toggle active", qtableview)
+        action_toggle.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_toggle_active"))
+        menu.addAction(action_toggle)        
 
-        menu_create = QMenu("Create", self.dlg_dscenario_manager.tbl_dscenario)
-        values = []
-        if global_vars.project_type == 'ws':
-            values.append([3134, "Create empty dscenario"])
-            values.append([3110, "Create from CRM"])
-            values.append([3112, "Create demand from ToC"])
-            values.append([3108, "Create network from ToC"])
-            values.append([3158, "Create from Mincut"])
-        if global_vars.project_type == 'ud':
-            if qtableview == 'v_edit_cat_hydrology':
-                values.append([3290, "Create empty hydrology scenario"])
-                # values.append([3290, "Create hydrology scenario values"])
-            elif qtableview == 'v_edit_cat_dwf':
-                values.append([3292, "Create empty dwf scenario"])
-                # values.append([3292, "Create dwf scenario values"])
-            elif qtableview == 'v_edit_cat_dscenario':
-                values.append([3134, "Create empty dscenario"])
-                values.append([3118, "Create from ToC"])
-
-        # Create and populate QMenu
-        for value in values:
-            num = value[0]
-            label = value[1]
-            action = menu_create.addAction(f"{label}")
-            action.triggered.connect(partial(self._open_toolbox_function, num, qtableview, label=label))
-        menu.addMenu(menu_create)
-
-
-        action_duplicate = QAction("Duplicate", self.dlg_dscenario_manager.tbl_dscenario)
-        action_duplicate.triggered.connect(partial(self._duplicate_selected_dscenario, self.dlg_dscenario_manager, 'v_edit_cat_dscenario', 3156))
+        action_duplicate = QAction("Duplicate", qtableview)
+        action_duplicate.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_duplicate"))
         menu.addAction(action_duplicate)
 
-        action_update = QAction("Update", self.dlg_dscenario_manager.tbl_dscenario)
-        action_update.triggered.connect(partial(self._manage_properties, self.dlg_dscenario_manager, 'v_edit_cat_dscenario', True))
+        action_update = QAction("Update", qtableview)
+        action_update.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_update"))
         menu.addAction(action_update)
 
-        action_toolbox = QAction("Toolbox", self.dlg_dscenario_manager.tbl_dscenario)
-        action_toolbox.triggered.connect(partial(self._open_toolbox_function, 3042, 'v_edit_cat_dscenario'))
+        action_toolbox = QAction("Toolbox", qtableview)
+        action_toolbox.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_toolbox"))
         menu.addAction(action_toolbox)
 
-        action_delete = QAction("Delete", self.dlg_dscenario_manager.tbl_dscenario)
-        action_delete.triggered.connect(partial(self._delete_selected_dscenario, self.dlg_dscenario_manager, 'v_edit_cat_dscenario'))
+        action_delete = QAction("Delete", qtableview)
+        action_delete.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_delete"))
         menu.addAction(action_delete)
 
         menu.exec(QCursor.pos())

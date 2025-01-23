@@ -13,7 +13,7 @@ from functools import partial
 from qgis.PyQt.QtCore import QDate, Qt
 from qgis.PyQt.QtGui import QColor, QStandardItemModel, QCursor
 from qgis.PyQt.QtSql import QSqlTableModel
-from qgis.PyQt.QtWidgets import QAbstractItemView, QComboBox, QFileDialog, QLabel, QHeaderView, QTableView, QMenu, QAction
+from qgis.PyQt.QtWidgets import QAbstractItemView, QComboBox, QFileDialog, QLabel, QHeaderView, QTableView, QMenu, QAction, QPushButton
 
 from .document import GwDocument
 from ..ui.ui_manager import GwWorkcatManagerUi, GwInfoWorkcatUi, GwSearchWorkcatUi
@@ -41,7 +41,7 @@ class GwWorkcat:
 
         # Populate custom context menu
         self.dlg_man.tbl_workcat.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.dlg_man.tbl_workcat.customContextMenuRequested.connect(self._show_context_menu)
+        self.dlg_man.tbl_workcat.customContextMenuRequested.connect(partial(self._show_context_menu, self.dlg_man.tbl_workcat))
 
         # Auto-completion
         table_object = "workcat"
@@ -511,20 +511,16 @@ class GwWorkcat:
             widget.setModel(model)
 
 
-    def _show_context_menu(self):
+    def _show_context_menu(self, qtableview, pos):
         """ Show custom context menu """
-        menu = QMenu(self.dlg_man.tbl_workcat)
+        menu = QMenu(qtableview)
 
-        action_open = QAction("Open", self.dlg_man.tbl_workcat)
-        action_open.triggered.connect(partial(self._open_selected_workcat, self.dlg_man, self.dlg_man.tbl_workcat))
+        action_open = QAction("Open", qtableview)
+        action_open.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QTableView, qtableview.objectName(), pos))
         menu.addAction(action_open)
 
-        action_create = QAction("Create", self.dlg_man.tbl_workcat)
-        action_create.triggered.connect(partial(self.create_workcat))
-        menu.addAction(action_create)
-
-        action_delete = QAction("Delete", self.dlg_man.tbl_workcat)
-        action_delete.triggered.connect(partial(self._handle_delete))
+        action_delete = QAction("Delete", qtableview)
+        action_delete.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_delete"))
         menu.addAction(action_delete)
 
         # Show menu

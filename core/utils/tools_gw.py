@@ -1900,7 +1900,7 @@ def add_button(**kwargs):
 
     func_params = ""
     if field.get('widgetfunction'):
-        if 'module' in field['widgetfunction']:
+        if 'module' in field['widgetfunction']:            
             module = globals()[field['widgetfunction']['module']]
         function_name = field['widgetfunction'].get('functionName')
         if function_name is not None:
@@ -1922,7 +1922,6 @@ def add_button(**kwargs):
     kwargs['func_params'] = func_params
     if function_name:
         widget.clicked.connect(partial(getattr(module, function_name), **kwargs))
-
     return widget
 
 
@@ -4651,8 +4650,7 @@ def get_list(table_name, filter_name="", filter_id=None, filter_active=None, id_
     return complet_list
 
 
-# startregion
-# Info buttons
+# region Info buttons
 
 
 def set_filter_listeners(complet_result, dialog, widget_list, columnname, widgetname, feature_id=None):
@@ -4986,7 +4984,7 @@ def _manage_button(**kwargs):
 
     field = kwargs['field']
     stylesheet = field.get('stylesheet') or {}
-    info_class = kwargs['class']
+    info_class = kwargs['class']    
     # If button text is empty it's because node_1/2 is not present.
     # Then we create a QLineEdit to input a node to be connected.
     if not field.get('value') and stylesheet.get('icon') is None:
@@ -5109,3 +5107,35 @@ def reload_layers_filters():
 
 # endregion
 
+# region Right Click TableView Menu
+
+def _force_button_click(dlg, obj, name, pos):
+    if obj == QTableView:
+        tab = dlg.findChild(obj, name)
+        tab.doubleClicked.emit(tab.indexAt(pos))
+    else:
+        dlg.findChild(obj, name).click()
+
+
+def _show_context_menu(self, qtableview):
+        """Show custom context menu"""
+        
+        menu = QMenu(qtableview)
+
+        buttons = qtableview.window().findChildren(QPushButton)
+        for btn in buttons:            
+            if btn.property('widgetcontrols') is not None:
+                if btn.property('widgetcontrols').get('onContextMenu') is not None:  
+                    parents = list()
+                    par = btn
+                    while hasattr(par, 'objectName'):
+                        parents.append(par.objectName())
+                        par = par.parentWidget()
+                    if qtableview.objectName() in parents:
+                        action = QAction(btn.property('widgetcontrols').get('onContextMenu'), qtableview)
+                        action.triggered.connect(partial(_force_button_click, qtableview.window(), QPushButton, btn.objectName()))                    
+                        menu.addAction(action)                                                      
+
+        menu.exec(QCursor.pos())
+
+# endregion

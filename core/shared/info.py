@@ -17,11 +17,11 @@ from qgis.core import QgsEditFormConfig
 from sip import isdeleted
 
 from qgis.PyQt.QtCore import pyqtSignal, QDate, QObject, QRegExp, QStringListModel, Qt, QSettings, QRegularExpression
-from qgis.PyQt.QtGui import QColor, QRegExpValidator, QStandardItem, QStandardItemModel
+from qgis.PyQt.QtGui import QColor, QRegExpValidator, QStandardItem, QStandardItemModel, QCursor
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QAction, QAbstractItemView, QCheckBox, QComboBox, QCompleter, QDoubleSpinBox, \
     QDateEdit, QGridLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QPushButton, QSizePolicy, \
-    QSpinBox, QSpacerItem, QTableView, QTabWidget, QWidget, QTextEdit, QRadioButton, QToolBox
+    QSpinBox, QSpacerItem, QTableView, QTabWidget, QWidget, QTextEdit, QRadioButton, QToolBox, QMenu
 from qgis.core import Qgis, QgsApplication, QgsMapToPixel, QgsVectorLayer, QgsExpression, QgsFeatureRequest, \
     QgsPointXY, QgsProject, QgsWkbTypes
 from qgis.gui import QgsDateTimeEdit, QgsMapToolEmitPoint
@@ -2298,8 +2298,8 @@ class GwInfo(QObject):
                 tools_gw.enable_all(dialog, complet_result['body']['data'])
             else:
                 tools_gw.enable_widgets(dialog, complet_result['body']['data'], False)
-            self._reset_my_json_epa()
-            dialog.show()
+            self._reset_my_json_epa()                                    
+            dialog.show()        
 
 
     def _set_auto_update_combobox(self, field, dialog, widget, new_feature):
@@ -2804,8 +2804,8 @@ class GwInfo(QObject):
             complet_list, widget_list = self._fill_tbl(complet_result, self.dlg_cf, widgetname, linkedobject, filter_fields, id_name)
             if complet_list is False:
                 return False
-            tools_gw.set_filter_listeners(complet_result, self.dlg_cf, widget_list, columnname, widgetname, self.feature_id)
-        return complet_list
+            tools_gw.set_filter_listeners(complet_result, self.dlg_cf, widget_list, columnname, widgetname, self.feature_id)            
+        return complet_list        
 
 
     def _fill_tbl(self, complet_result, dialog, widgetname, linkedobject, filter_fields, id_name=None):
@@ -2843,6 +2843,10 @@ class GwInfo(QObject):
                         addparam = addparam.get('pkey')
                 model.dataChanged.connect(partial(tbl_data_changed, self, tbl_upsert, widget, model, addparam))
                 dialog.btn_accept.clicked.connect(partial(save_tbl_changes, tbl_upsert, self, dialog, addparam))
+
+            # Populate custom context menu
+            widget.setContextMenuPolicy(Qt.CustomContextMenu)
+            widget.customContextMenuRequested.connect(partial(tools_gw._show_context_menu, widget, self.tab_main.widget(index_tab)))
 
         widget_list = []
         widget_list.extend(self.tab_main.widget(index_tab).findChildren(QComboBox, QRegularExpression(f"{tab_name}_")))
@@ -3508,12 +3512,57 @@ def open_epa_dlg(windowtitle, **kwargs):
             if btn_delete_base:
                 tools_gw.add_icon(btn_delete_base, '114')
                 btn_delete_base.clicked.connect(partial(delete_tbl_row, tbl, view, pk, info.dlg, tablename=tableview['tbl'], tableview=tableview['view'], id_name=id_name, feature_id=feature_id, **kwargs))
+
+        # Populate custom context menu
+        tbl.setContextMenuPolicy(Qt.CustomContextMenu)
+        tbl.customContextMenuRequested.connect(partial(_show_context_menu, tbl, tableview))
             
 
     info.dlg.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, info.dlg, True))
     info.dlg.finished.connect(partial(tools_gw.save_settings, info.dlg))
     # Open dlg
     tools_gw.open_dialog(info.dlg, dlg_name=ui_name)
+
+
+def _show_context_menu(qtableview, tableview):
+        """ Show custom context menu """
+
+        menu = QMenu(qtableview)        
+        if 'dscenario' in tableview['view'] and 'inflows' not in tableview['view']: 
+            action_delete = QAction("Delete dscenario", qtableview)
+            action_delete.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_delete_dscenario"))
+            menu.addAction(action_delete)  
+
+            action_edit = QAction("Edit dscenario", qtableview)
+            action_edit.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_edit_dscenario"))
+            menu.addAction(action_edit)    
+        elif 'dwf' in tableview['view']:
+            action_delete = QAction("Delete dwf", qtableview)
+            action_delete.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_delete_dwf"))
+            menu.addAction(action_delete)  
+
+            action_edit = QAction("Edit dwf", qtableview)
+            action_edit.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_edit_dwf"))
+            menu.addAction(action_edit)
+        elif 'inflows' in tableview['view']:
+            action_delete = QAction("Delete inflows", qtableview)
+            action_delete.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_delete_inflows"))
+            menu.addAction(action_delete)  
+
+            action_edit = QAction("Edit inflows", qtableview)
+            action_edit.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_edit_inflows"))
+            menu.addAction(action_edit)
+        else:
+            action_delete = QAction("Delete base", qtableview)
+            action_delete.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_delete_base"))
+            menu.addAction(action_delete)  
+
+            action_edit = QAction("Edit base", qtableview)
+            action_edit.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_edit_base"))
+            menu.addAction(action_edit)
+            
+        menu.exec(QCursor.pos())
+
 
 def remove_toolbox_page(toolbox, pages):
     for page in pages:
@@ -4028,7 +4077,7 @@ def open_selected_element(**kwargs):
     element_id = index.sibling(row, column_index).data()
 
     # Open selected element
-    manage_element(element_id,  **kwargs)
+    manage_element(element_id,  **kwargs)    
 
 
 def manage_element(element_id, **kwargs):

@@ -293,7 +293,7 @@ class GwVisit(QObject):
 
         # Populate custom context menu
         self.dlg_visit_manager.tbl_visit.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.dlg_visit_manager.tbl_visit.customContextMenuRequested.connect(partial(self._show_context_menu, table_object))
+        self.dlg_visit_manager.tbl_visit.customContextMenuRequested.connect(partial(self._show_context_menu, self.dlg_visit_manager.tbl_visit))
 
         # manage save and rollback when closing the dialog
         self.dlg_visit_manager.rejected.connect(partial(tools_gw.close_dialog, self.dlg_visit_manager))
@@ -332,16 +332,12 @@ class GwVisit(QObject):
         """ Show custom context menu """
         menu = QMenu(qtableview)
 
-        action_open = QAction("Open", self.dlg_visit_manager.tbl_visit)
-        action_open.triggered.connect(partial(self._open_selected_object_visit, self.dlg_visit_manager, self.dlg_visit_manager.tbl_visit, qtableview))
+        action_open = QAction("Open", qtableview)
+        action_open.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QTableView, qtableview.objectName(), pos))
         menu.addAction(action_open)
 
-        action_create = QAction("Create", self.dlg_visit_manager.tbl_visit)
-        action_create.triggered.connect(partial(self.create_visit))
-        menu.addAction(action_create)
-
-        action_delete = QAction("Delete", self.dlg_visit_manager.tbl_visit)
-        action_delete.triggered.connect(partial(tools_gw.delete_selected_rows, self.dlg_visit_manager.tbl_visit, qtableview))
+        action_delete = QAction("Delete", qtableview)
+        action_delete.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_delete"))
         menu.addAction(action_delete)
 
         menu.exec(QCursor.pos())
