@@ -31,15 +31,6 @@ BEGIN
 		RETURN NULL;
 	ELSE
 
-		-- Do no allow to insert or update value '0' for exploitation
-		IF v_table IN ('arc', 'node', 'connec', 'gully', 'element', 'link') AND TG_OP IN ('INSERT', 'UPDATE') THEN
-			IF NEW.expl_id = 0 THEN 
-				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},
-				"feature":{},
-				"data":{"message":"3250", "function":"2744","parameters":null, "variables":"value", "is_process":true}}$$)';
-			END IF;
-		END IF;
-				
 		--select typevalue for the table
 		v_typevalue_fk = 'SELECT * FROM sys_foreignkey WHERE target_table='''||v_table||''' AND active IS TRUE';
 		
