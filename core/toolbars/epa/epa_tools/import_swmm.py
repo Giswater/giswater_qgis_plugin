@@ -359,9 +359,9 @@ class GwImportSwmm:
                 "DELETE FROM ext_municipality WHERE muni_id = 1;",
                 "DELETE FROM exploitation WHERE expl_id = 1;",
                 "INSERT INTO cat_material (id, feature_type, n) VALUES ('PVC', '{ARC}', 0.011), ('Brick', '{ARC}', 0.014);",
-                "INSERT INTO exploitation (expl_id, name, macroexpl_id, descript, active) VALUES (1, 'expl_1_import_inp_test', 0, 'Created by import inp in TESTING MODE', true);",
-                "INSERT INTO ext_municipality (muni_id, name, observ, active) VALUES (1, 'muni_1_import_inp_test', 'Created by import inp in TESTING MODE', true);",
-                "INSERT INTO sector (sector_id, name, macrosector_id, descript, active) VALUES (1, 'sector_1_import_inp_test', 0, 'Created by import inp in TESTING MODE', true);"
+                # "INSERT INTO exploitation (expl_id, name, macroexpl_id, descript, active) VALUES (1, 'expl_1_import_inp_test', 0, 'Created by import inp in TESTING MODE', true);",
+                # "INSERT INTO ext_municipality (muni_id, name, observ, active) VALUES (1, 'muni_1_import_inp_test', 'Created by import inp in TESTING MODE', true);",
+                # "INSERT INTO sector (sector_id, name, macrosector_id, descript, active) VALUES (1, 'sector_1_import_inp_test', 0, 'Created by import inp in TESTING MODE', true);"
             ]
             for sql in queries:
                 result = tools_db.execute_sql(sql, commit=force_commit)
@@ -371,9 +371,9 @@ class GwImportSwmm:
 
             # Set variables
             workcat = "import_inp_test"
-            exploitation = 1
-            sector = 1
-            municipality = 1
+            exploitation = 0
+            sector = 0
+            municipality = 0
             raingage = None
             catalogs = {
                 'conduits': {

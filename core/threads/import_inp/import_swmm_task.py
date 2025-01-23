@@ -315,22 +315,19 @@ class GwImportInpTask(GwTask):
             self._save_subcatchments()
 
     def _validate_inputs(self) -> None:
-        if not self.workcat:
+        if self.workcat in (None, ""):
             message = "Please enter a Workcat_id to proceed with this import."
             raise ValueError(message)
 
-        if not self.exploitation:
+        if self.exploitation in (None, ""):
             message = "Please select an exploitation to proceed with this import."
             raise ValueError(message)
-        if self.exploitation == 0:
-            message = "Please select an exploitation that is not 0 (Undefined) to proceed with this import."
-            raise ValueError(message)
 
-        if not self.sector:
+        if self.sector in (None, ""):
             message = "Please select a sector to proceed with this import."
             raise ValueError(message)
 
-        if not self.municipality:
+        if self.municipality in (None, ""):
             message = "Please select a municipality to proceed with this import."
             raise ValueError(message)
 
