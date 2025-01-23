@@ -1080,3 +1080,6 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 }'::json, '{
 "functionName": "closeDlg"
 }'::json, NULL, false, 0);
+
+-- 23/01/2025
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source") VALUES(3372, 'gw_fct_featurechanges', 'utils', 'function', 'json', 'json', 'Upsert assets in gis', 'role_basic', NULL, 'core');
