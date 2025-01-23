@@ -3000,3 +3000,38 @@ UPDATE config_form_fields
 UPDATE config_form_fields
 	SET widgetcontrols='{"saveValue":false,"text":"Cancel mincut", "onContextMenu":"Delete mincut"}'::json
 	WHERE formname='mincut_manager' AND formtype='form_mincut' AND columnname='delete';
+
+UPDATE config_function SET "style"='{
+  "style": {
+    "point": {
+      "style": "unique",
+      "values": {
+        "width": 3.5,
+        "color": [
+          255,
+          165,
+          1
+        ],
+        "transparency": 1
+      }
+    },
+    "line": {
+      "style": "categorized",
+      "field": "hydrant_id",
+      "width": 2,
+      "transparency": 0.5
+    },
+    "polygon": {
+      "style": "unique",
+      "values": {
+        "width": 3,
+        "color": [
+          255,
+          1,
+          1
+        ],
+        "transparency": 0.5
+      }
+    }
+  }
+}'::json WHERE id=3160;
