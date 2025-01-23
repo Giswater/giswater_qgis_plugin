@@ -1083,3 +1083,44 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 
 -- 23/01/2025
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source") VALUES(3372, 'gw_fct_featurechanges', 'utils', 'function', 'json', 'json', 'Upsert assets in gis', 'role_basic', NULL, 'core');
+
+
+UPDATE config_form_fields
+	SET widgetcontrols='{"saveValue":false, "filterSign":"=", "onContextMenu":"Open element"}'::json
+	WHERE formtype='form_feature' AND columnname='open_element' AND tabname='tab_elements';
+	
+UPDATE config_form_fields
+	SET widgetcontrols='{"saveValue":false, "filterSign":"=", "onContextMenu":"Open link"}'::json
+	WHERE formtype='form_feature' AND columnname='btn_link' AND tabname='tab_elements';
+
+UPDATE config_form_fields
+	SET widgetcontrols='{"saveValue":false, "filterSign":"=", "onContextMenu":"Delete element"}'::json
+	WHERE formtype='form_feature' AND columnname='delete_element' AND tabname='tab_elements';
+	
+UPDATE config_form_fields
+	SET widgetcontrols='{"onContextMenu":"Open gallery"}'::json
+	WHERE formtype='form_feature' AND columnname='btn_open_gallery' AND tabname='tab_event';
+	
+UPDATE config_form_fields
+	SET widgetcontrols='{"saveValue":false, "filterSign":"=", "onContextMenu":"Open visit event"}'::json
+	WHERE formtype='form_feature' AND columnname='btn_open_visit_event' AND tabname='tab_event';
+	
+UPDATE config_form_fields
+	SET widgetcontrols='{"saveValue":false, "filterSign":"=", "onContextMenu":"Open visit document"}'::json
+	WHERE formtype='form_feature' AND columnname='btn_open_visit_doc' AND tabname='tab_event';
+	
+UPDATE config_form_fields
+	SET widgetcontrols='{"saveValue":false, "filterSign":"=", "onContextMenu":"Delete document"}'::json
+	WHERE formtype='form_feature' AND columnname='btn_doc_delete' AND tabname='tab_documents';
+	
+UPDATE config_form_fields
+	SET widgetcontrols='{"saveValue":false, "filterSign":"=", "onContextMenu":"Open document"}'::json
+	WHERE formtype='form_feature' AND columnname='open_doc' AND tabname='tab_documents';
+
+UPDATE config_form_fields
+	SET widgetcontrols='{"saveValue":false, "onContextMenu":"Edit dscenario"}'::json
+	WHERE formtype='form_feature' AND tabname='tab_epa' AND columnname='edit_dscenario';
+	
+UPDATE config_form_fields
+	SET widgetcontrols='{"saveValue":false, "onContextMenu":"Delete dscenario"}'::json
+	WHERE formtype='form_feature' AND tabname='tab_epa' AND columnname='remove_from_dscenario';

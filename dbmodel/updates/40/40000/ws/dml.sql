@@ -2990,3 +2990,13 @@ NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, 
 INSERT INTO arc_add (arc_id, flow_max, flow_min, flow_avg, vel_max, vel_min, vel_avg, tot_headloss_max, tot_headloss_min, result_id)
 SELECT arc_id, flow_max, flow_min, flow_avg, vel_max, vel_min, vel_avg, NULL, NULL, result_id
 FROM _arc_add_;
+
+
+-- 23/01/2025
+UPDATE config_form_fields
+	SET widgetcontrols='{"saveValue":false,"text":"Cancel mincut", "onContextMenu":"Cancel mincut"}'::json
+	WHERE formname='mincut_manager' AND formtype='form_mincut' AND columnname='cancel_mincut';
+
+UPDATE config_form_fields
+	SET widgetcontrols='{"saveValue":false,"text":"Cancel mincut", "onContextMenu":"Delete mincut"}'::json
+	WHERE formname='mincut_manager' AND formtype='form_mincut' AND columnname='delete';
