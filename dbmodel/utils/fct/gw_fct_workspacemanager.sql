@@ -71,6 +71,7 @@ v_deleted_psector text;
 v_deleted_sector text;
 v_deleted_result text;
 v_deleted_muni text;
+v_geometry text;
 
 BEGIN
 
@@ -452,10 +453,16 @@ BEGIN
 	v_result_info := COALESCE(v_result_info, '{}');
 	v_uservalues := COALESCE(v_uservalues, '{}');
 
+	EXECUTE 'SELECT row_to_json (a) 
+			FROM (SELECT st_xmin(the_geom)::numeric(12,2) as x1, st_ymin(the_geom)::numeric(12,2) as y1, st_xmax(the_geom)::numeric(12,2) as x2, st_ymax(the_geom)::numeric(12,2) as y2 
+			FROM (SELECT st_expand(st_collect(the_geom), 50.0) as the_geom FROM exploitation where expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user)
+			union SELECT st_expand(st_collect(the_geom), 50.0) as the_geom FROM exploitation where expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user)) b) a'
+			INTO v_geometry;
+
 	-- Return
 	RETURN gw_fct_json_create_return(('{"status":"'||v_return_status||'", "message":{"level":'||v_return_level||', "text":"'||v_return_msg||'"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
-		     ',"data":{ "userValues":'||v_uservalues||', "info":'||v_result_info||
+		     ',"data":{ "userValues":'||v_uservalues||', "info":'||v_result_info||', "geometry":'||v_geometry||
 		       '}'||
 	    '}}')::json, 3078, null, null, null);
 
