@@ -246,6 +246,9 @@ class GwImportInpTask(GwTask):
         if not self.exploitation:
             message = "Please select an exploitation to proceed with this import."
             raise ValueError(message)
+        if self.exploitation == 0:
+            message = "Please select an exploitation that is not 0 (Undefined) to proceed with this import."
+            raise ValueError(message)
 
         if not self.sector:
             message = "Please select a sector to proceed with this import."
