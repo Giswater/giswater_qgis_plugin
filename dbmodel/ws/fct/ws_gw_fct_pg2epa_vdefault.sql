@@ -8,7 +8,7 @@ This version of Giswater is provided by Giswater Association
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_pg2epa_vdefault(p_data json);
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_vdefault(p_data json)
-RETURNS integer 
+RETURNS integer
 AS $BODY$
 
 /*example
@@ -36,7 +36,7 @@ BEGIN
 
 	-- get values
 	SELECT epsg INTO v_srid FROM sys_version ORDER BY id DESC LIMIT 1;
-	
+
 	-- get input data
 	v_result = ((p_data->>'data')::json->>'parameters')::json->>'resultId';
 
@@ -58,13 +58,13 @@ BEGIN
 
 	RAISE NOTICE 'setting null elevation values using closest points values';
 	UPDATE temp_t_node SET elevation = d.elevation FROM
-		(SELECT c.n1 as node_id, e2 as elevation FROM (SELECT DISTINCT ON (a.node_id) a.node_id as n1, a.elevation as e1, a.the_geom as n1_geom, b.node_id as n2, b.elevation as e2, b.the_geom as n2_geom FROM node a, node b 
+		(SELECT c.n1 as node_id, e2 as elevation FROM (SELECT DISTINCT ON (a.node_id) a.node_id as n1, a.elevation as e1, a.the_geom as n1_geom, b.node_id as n2, b.elevation as e2, b.the_geom as n2_geom FROM node a, node b
 		WHERE st_dwithin (a.the_geom, b.the_geom, v_nullbuffer) AND a.node_id != b.node_id AND a.elevation IS NULL AND b.elevation IS NOT NULL) c order by st_distance (n1_geom, n2_geom))d
 		WHERE temp_t_node.elevation IS NULL AND d.node_id=temp_t_node.node_id;
 
 	RAISE NOTICE 'setting cero elevation values using closest points values';
 	UPDATE temp_t_node SET elevation = d.elevation FROM
-		(SELECT c.n1 as node_id, e2 as elevation FROM (SELECT DISTINCT ON (a.node_id) a.node_id as n1, a.elevation as e1, a.the_geom as n1_geom, b.node_id as n2, b.elevation as e2, b.the_geom as n2_geom FROM node a, node b 
+		(SELECT c.n1 as node_id, e2 as elevation FROM (SELECT DISTINCT ON (a.node_id) a.node_id as n1, a.elevation as e1, a.the_geom as n1_geom, b.node_id as n2, b.elevation as e2, b.the_geom as n2_geom FROM node a, node b
 		WHERE st_dwithin (a.the_geom, b.the_geom, v_cerobuffer) AND a.node_id != b.node_id AND a.elevation = 0 AND b.elevation > 0) c order by st_distance (n1_geom, n2_geom))d
 		WHERE temp_t_node.elevation IS NULL AND d.node_id=temp_t_node.node_id;
 

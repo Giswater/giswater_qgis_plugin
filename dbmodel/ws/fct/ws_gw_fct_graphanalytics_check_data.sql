@@ -20,7 +20,7 @@ SELECT SCHEMA_NAME.gw_fct_graphanalytics_check_data($${
 -- fid: main:v_fid,
 	other: 176,180,181,192,208,209,367
 
-select * FROM temp_audit_check_data WHERE fid=v_fid AND cur_user=current_user;
+select * FROM t_audit_check_data WHERE fid=v_fid AND cur_user=current_user;
 
 */
 
@@ -65,131 +65,119 @@ BEGIN
 	v_fid := ((p_data ->>'data')::json->>'parameters')::json->>'fid'::text;
 
 	-- select config values
-	SELECT project_type, giswater INTO v_project_type, v_version FROM sys_version order by id desc limit 1;
+	SELECT project_type, giswater INTO v_project_type, v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- select config values
-	v_sector  := (SELECT (value::json->>'SECTOR')::boolean FROM config_param_system WHERE parameter='utils_graphanalytics_status');
-	v_dma  := (SELECT (value::json->>'DMA')::boolean FROM config_param_system WHERE parameter='utils_graphanalytics_status');
-	v_dqa  := (SELECT (value::json->>'DQA')::boolean FROM config_param_system WHERE parameter='utils_graphanalytics_status');
-	v_presszone  := (SELECT (value::json->>'PRESSZONE')::boolean FROM config_param_system WHERE parameter='utils_graphanalytics_status');
-	v_minsector  := (SELECT (value::json->>'MINSECTOR')::boolean FROM config_param_system WHERE parameter='utils_graphanalytics_status');
+	v_sector := (SELECT (value::json->>'SECTOR')::boolean FROM config_param_system WHERE parameter='utils_graphanalytics_status');
+	v_dma := (SELECT (value::json->>'DMA')::boolean FROM config_param_system WHERE parameter='utils_graphanalytics_status');
+	v_dqa := (SELECT (value::json->>'DQA')::boolean FROM config_param_system WHERE parameter='utils_graphanalytics_status');
+	v_presszone := (SELECT (value::json->>'PRESSZONE')::boolean FROM config_param_system WHERE parameter='utils_graphanalytics_status');
+	v_minsector := (SELECT (value::json->>'MINSECTOR')::boolean FROM config_param_system WHERE parameter='utils_graphanalytics_status');
 
 	-- init variables
 	v_count=0;
 
-	IF v_fid is null THEN
+	IF v_fid IS NULL THEN
 		v_fid = 211;
 	END IF;
 
 	-- set v_edit_ variable
-	IF v_selectionmode='wholeSystem' THEN
+	IF v_selectionmode = 'wholeSystem' THEN
 		v_edit = '';
-	ELSIF v_selectionmode='userSelectors' THEN
+	ELSIF v_selectionmode = 'userSelectors' THEN
 		v_edit = 'v_edit_';
 	END IF;
 
-
-	-- create query tables
-	EXECUTE 'SELECT gw_fct_create_querytables($${"data":{"parameters":{"fid":'||v_fid||', "epaCheck":false, "verifiedExceptions":false}}}$$::json)';
-	-- create log tables
-	EXECUTE 'SELECT gw_fct_create_logtables($${"data":{"parameters":{"fid":'||v_fid||'}}}$$::json)';
-
 	IF v_fid = 211 OR v_fid = 101 THEN
-		CREATE TEMP TABLE temp_anl_node (LIKE SCHEMA_NAME.anl_node INCLUDING ALL);
-		CREATE TEMP TABLE temp_audit_check_data (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
+		-- create temporal tables
+		EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"fid":'||v_fid||', "project_type":'||v_project_type||', "action":"CREATE", "group":"GRAPHANALYTICSCHECK", "verifiedExceptions":false}}}$$::json)';
 	END IF;
 
 	-- Starting process
-	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('DATA QUALITY ANALYSIS ACORDING graph ANALYTICS RULES'));
-	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '-------------------------------------------------------------');
+	INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('DATA QUALITY ANALYSIS ACORDING graph ANALYTICS RULES'));
+	INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, '-------------------------------------------------------------');
 
-	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 3, 'CRITICAL ERRORS');
-	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 3, '----------------------');
+	INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 3, 'CRITICAL ERRORS');
+	INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 3, '----------------------');
 
-	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 2, 'WARNINGS');
-	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 2, '--------------');
+	INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 2, 'WARNINGS');
+	INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 2, '--------------');
 
-	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, 'INFO');
-	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, '-------');
-
-
-	v_sql = 'select*from sys_fprocess where 
-		project_type in (lower('||quote_literal(v_project_type)||'), ''utils'')
-				and addparam is null
-		and query_text is not null
-		and function_name ilike ''%graphanalytics%''
-		and (parameters::text ilike ''%'||v_graphclass||'%'' or parameters is null)';
+	INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, 'INFO');
+	INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, '-------');
 
 
-	for v_rec in execute v_sql
-	loop
+	v_sql = '
+		SELECT * FROM sys_fprocess 
+		WHERE project_type IN (LOWER('||quote_literal(v_project_type)||'), ''utils'')
+		AND addparam IS NULL
+		AND query_text IS NOT NULL
+		AND function_name ILIKE ''%graphanalytics%''
+		AND (parameters::text ILIKE ''%'||v_graphclass||'%'' OR parameters IS NULL)
+	';
+
+
+	FOR v_rec IN EXECUTE v_sql
+	LOOP
 
 		-- check que los addschemas existan
-		select (addparam::json ->>'addSchema')::text into v_addschema from sys_fprocess where fid = v_rec.fid;
+		SELECT (addparam::json ->>'addSchema')::text INTO v_addschema FROM sys_fprocess WHERE fid = v_rec.fid;
 
-		if v_addschema is not null then
-
+		IF v_addschema IS NOT NULL THEN
 			-- check if exists
-			select count(*) into v_count from information_schema.tables where table_catalog = current_catalog and table_schema = v_addschema;
+			SELECT count(*) INTO v_count FROM information_schema.tables WHERE table_catalog = current_catalog AND table_schema = v_addschema;
 
-			if v_count = 0 then
-
+			IF v_count = 0 THEN
 				continue;
+			END IF;
 
-			end if;
+		END IF;
 
-		end if;
-
-		--raise notice 'v_rec.fid %', v_rec.fid;
-		execute 'select gw_fct_check_fprocess($${"client":{"device":4, "infoType":1, "lang":"ES"}, 
+		EXECUTE 'SELECT gw_fct_check_fprocess($${"client":{"device":4, "infoType":1, "lang":"ES"}, 
 	    "form":{},"feature":{},"data":{"parameters":{"functionFid": '||v_fid||', 
 		"prefixTable": "'||v_edit||'", "checkFid":"'||v_rec.fid||'", "graphClass":"'||lower(v_graphclass)||'"}}}$$)';
 
-   	end loop;
+	END LOOP;
 
-
-	update temp_audit_check_data set criticity = 1 where error_message ilike 'INFO:%';
-   	update temp_audit_check_data set criticity = 2 where error_message ilike 'WARNING-%';
-   	update temp_audit_check_data set criticity = 3 where error_message ilike 'ERROR-%';
-
-
+	UPDATE t_audit_check_data SET criticity = 1 WHERE error_message ILIKE 'INFO:%';
+	UPDATE t_audit_check_data SET criticity = 2 WHERE error_message ILIKE 'WARNING-%';
+	UPDATE t_audit_check_data SET criticity = 3 WHERE error_message ILIKE 'ERROR-%';
 
 	-- Removing isaudit false sys_fprocess
-	FOR v_record IN SELECT * FROM sys_fprocess WHERE isaudit is false
+	FOR v_record IN SELECT * FROM sys_fprocess WHERE isaudit IS FALSE
 	LOOP
 		-- remove anl tables
-		DELETE FROM temp_anl_node WHERE fid = v_record.fid AND cur_user = current_user;
+		DELETE FROM t_anl_node WHERE fid = v_record.fid AND cur_user = current_user;
 
-		DELETE FROM temp_audit_check_data WHERE result_id::text = v_record.fid::text AND cur_user = current_user AND fid = v_fid;
+		DELETE FROM t_audit_check_data WHERE result_id::text = v_record.fid::text AND cur_user = current_user AND fid = v_fid;
 	END LOOP;
 
 
-	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, '');
-	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 3, '');
-	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 2, '');
-	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 1, '');
+	INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 4, '');
+	INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 3, '');
+	INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 2, '');
+	INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, v_result_id, 1, '');
 
 	IF v_fid = 211 THEN
-
 		-- delete old values on result table
 		DELETE FROM audit_check_data WHERE fid=211 AND cur_user=current_user;
 		DELETE FROM anl_node WHERE cur_user=current_user AND fid IN (176,180,181,182,208,209);
 
-		INSERT INTO anl_node SELECT * FROM temp_anl_node;
-		INSERT INTO audit_check_data SELECT * FROM temp_audit_check_data;
+		INSERT INTO anl_node SELECT * FROM t_anl_node;
+		INSERT INTO audit_check_data SELECT * FROM t_audit_check_data;
 
-	ELSIF  v_fid = 101 THEN
-		UPDATE temp_audit_check_data SET fid = 211;
+	ELSIF v_fid = 101 THEN
+		UPDATE t_audit_check_data SET fid = 211;
 
-		INSERT INTO project_temp_audit_check_data SELECT * FROM temp_audit_check_data;
-		INSERT INTO project_temp_anl_node SELECT * FROM temp_anl_node;
-
+		-- TODO: check if this is correct
+		INSERT INTO project_t_audit_check_data SELECT * FROM t_audit_check_data;
+		INSERT INTO project_t_anl_node SELECT * FROM t_anl_node;
 	END IF;
 
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
-	FROM (SELECT id, error_message as message FROM temp_audit_check_data WHERE cur_user="current_user"() AND
+	FROM (SELECT id, error_message as message FROM t_audit_check_data WHERE cur_user="current_user"() AND
 	fid=211 order by criticity desc, id asc) row;
 	v_result := COALESCE(v_result, '{}');
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
@@ -204,7 +192,7 @@ BEGIN
     'properties', to_jsonb(row) - 'the_geom'
   	) AS feature
   	FROM (SELECT id, node_id as feature_id, nodecat_id as feature_catalog, state, expl_id, descript,fid, the_geom
-  	FROM  temp_anl_node WHERE cur_user="current_user"() AND fid IN (176,180,181,182,208,209)) row) features;
+  	FROM  t_anl_node WHERE cur_user="current_user"() AND fid IN (176,180,181,182,208,209)) row) features;
 
 	v_result := COALESCE(v_result, '{}');
 
@@ -215,16 +203,14 @@ BEGIN
 		v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}');
 	END IF;
 
-	--    Control nulls
+	-- Control nulls
 	v_result_info := COALESCE(v_result_info, '{}');
 	v_result_point := COALESCE(v_result_point, '{}');
 	v_result_line := COALESCE(v_result_line, '{}');
 	v_result_polygon := COALESCE(v_result_polygon, '{}');
 
 	IF v_fid = 211 OR v_fid = 101 THEN
-		--DROP temp tables
-		DROP TABLE IF EXISTS temp_anl_node ;
-		DROP TABLE IF EXISTS temp_audit_check_data;
+	   EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"fid":'||v_fid||', "project_type":'||v_project_type||', "action":"DROP", "group":"GRAPHANALYTICSCHECK"}}}$$)';
 	END IF;
 
 	-- Return

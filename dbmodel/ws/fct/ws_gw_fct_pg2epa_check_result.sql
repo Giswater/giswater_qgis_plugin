@@ -42,8 +42,14 @@ BEGIN
 	v_fid :=  ((p_data ->> 'data')::json->>'parameters')::json->> 'fid';
 
 	-- getting sys_fprocess to be executed
-	v_querytext = 'SELECT * FROM sys_fprocess WHERE project_type IN (LOWER('||quote_literal(v_project_type)||'), ''utils'') 
-	AND addparam IS NULL AND query_text IS NOT NULL AND function_name ILIKE ''%pg2epa_check_network%'' AND active ORDER BY fid ASC';
+	v_querytext = '
+		SELECT * FROM sys_fprocess 
+		WHERE project_type IN (LOWER('||quote_literal(v_project_type)||'), ''utils'') 
+		AND addparam IS NULL 
+		AND query_text IS NOT NULL 
+		AND function_name ILIKE ''%pg2epa_check_network%'' 
+		AND active ORDER BY fid ASC
+	';
 
 	-- loop for checks
 	FOR v_rec IN EXECUTE v_querytext
@@ -73,18 +79,18 @@ BEGIN
 					BY '||object_rec.colname||'_id, v_edit_inp_dscenario_'||object_rec.tabname||'.the_geom having count(arc_id) > 1';
 
 
-					INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message)
+					INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message)
 					VALUES (v_fid, v_result_id, 3, concat('ERROR-396 (anl_',object_rec.colname,'): There is/are ', v_count, ' ',
 					object_rec.colname,'(s) for ',upper(object_rec.tabname),' used on more than one enabled dscenarios.'));
 				ELSE
-					INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message)
+					INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message)
 					VALUES (v_fid, v_result_id, 3, concat('ERROR-396: There is/are ', v_count, ' ',
 					object_rec.colname,'(s) for ',upper(object_rec.tabname),' used on more than one enabled dscenarios.'));
 				END IF;
 			END IF;
 		END LOOP;
 	ELSE
-		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message)
+		INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message)
 		VALUES (v_fid, v_result_id, 1, concat('INFO: There are not dscenarios selected.'));
 	END IF;
 
@@ -93,7 +99,7 @@ BEGIN
 	LOOP
 		v_querytext = '(SELECT a.id, a.node_id as controls, b.node_id as templayer FROM 
 		(SELECT substring(split_part(text,'||quote_literal(object_rec.tabname)||', 2) FROM ''[^ ]+''::text) node_id, id, sector_id FROM inp_rules WHERE active is true)a
-		LEFT JOIN temp_t_node b USING (node_id)
+		LEFT JOIN t_node b USING (node_id)
 		WHERE b.node_id IS NULL AND a.node_id IS NOT NULL 
 		AND a.sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user=current_user) AND a.sector_id IS NOT NULL
 		OR a.sector_id::text != b.sector_id::text) a';
@@ -102,13 +108,13 @@ BEGIN
 		IF v_count > 0 THEN
 			i = i+1;
 			EXECUTE concat ('SELECT array_agg(id) FROM ',v_querytext) INTO v_querytext;
-			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message)
+			INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (v_fid, v_result_id, 3, concat('ERROR-402: There is/are ', v_count, ' RULES with ',lower(object_rec.tabname),' not present on this result. Rule id''s:',v_querytext));
 		END IF;
 	END LOOP;
 
 	IF v_count = 0 AND i = 0 THEN
-		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message)
+		INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message)
 		VALUES (v_fid, v_result_id, 1, concat('INFO: All RULES has correct node id values.'));
 	END IF;
 
@@ -118,7 +124,7 @@ BEGIN
 	LOOP
 		v_querytext = '(SELECT a.id, a.arc_id as controls, b.arc_id as templayer FROM 
 		(SELECT substring(split_part(text,'||quote_literal(object_rec.tabname)||', 2) FROM ''[^ ]+''::text) arc_id, id, sector_id FROM inp_rules WHERE active is true)a
-		LEFT JOIN temp_t_arc b USING (arc_id)
+		LEFT JOIN t_arc b USING (arc_id)
 		WHERE b.arc_id IS NULL AND a.arc_id IS NOT NULL 
 		AND a.sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user=current_user) AND a.sector_id IS NOT NULL
 		OR a.sector_id::text != b.sector_id::text) a';
@@ -127,13 +133,13 @@ BEGIN
 		IF v_count > 0 THEN
 			i = i+1;
 			EXECUTE concat ('SELECT array_agg(id) FROM ',v_querytext) INTO v_querytext;
-			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message)
+			INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (v_fid, v_result_id, 3, concat('ERROR-402: There is/are ', v_count, ' RULES with ',lower(object_rec.tabname),' not present on this result. Rule id''s:',v_querytext));
 		END IF;
 	END LOOP;
 
 	IF v_count = 0 AND i = 0 THEN
-		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message)
+		INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message)
 		VALUES (v_fid, v_result_id, 1, concat('INFO: All RULES has correct link id values.'));
 	END IF;
 	------- to be replaced

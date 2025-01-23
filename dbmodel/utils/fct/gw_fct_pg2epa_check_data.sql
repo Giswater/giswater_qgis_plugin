@@ -18,19 +18,18 @@ SELECT SCHEMA_NAME.gw_fct_pg2epa_check_data($${"data":{"parameters":{"verifiedEx
 */
 
 DECLARE
-v_rec record;
-v_project_type text;
-v_querytext text;
-v_verified_exceptions boolean = true;
-v_fid integer = 225;
-v_isembebed boolean;
-v_return json;
-v_result_info json;
-v_result_point json;
-v_result_line json;
-v_result_polygon json;
-v_version text;
-
+	v_rec record;
+	v_project_type text;
+	v_querytext text;
+	v_verified_exceptions boolean = true;
+	v_fid integer = 225;
+	v_isembebed boolean;
+	v_return json;
+	v_result_info json;
+	v_result_point json;
+	v_result_line json;
+	v_result_polygon json;
+	v_version text;
 BEGIN
 
 	--  Search path
@@ -48,26 +47,24 @@ BEGIN
 	IF v_verified_exceptions IS NULL THEN v_verified_exceptions = false; END IF;
 
 	IF v_isembebed IS FALSE OR v_isembebed IS NULL THEN -- create temporal tables if function is not embebed
-		-- create query tables
-		--raise exception 'v_verified_exceptions %', v_verified_exceptions;
-		EXECUTE'SELECT gw_fct_create_querytables($${"data":{"parameters":{"fid":'||v_fid||', "epaCheck":true, "verifiedExceptions":'||v_verified_exceptions||'}}}$$::json)';
-		--raise exception 'v_sql %', v_sql;
-		-- create log tables
-		EXECUTE 'SELECT gw_fct_create_logtables($${"data":{"parameters":{"fid":'||v_fid||'}}}$$::json)';
-
+		PERFORM gw_fct_manage_temp_tables('{"data":{"parameters":{"fid":'||v_fid||', "project_type":"'||v_project_type||'", "action":"CREATE", "group":"EPAMAIN"}}}');
 	END IF;
 
 	-- getting sys_fprocess to be executed
-	v_querytext = 'SELECT * FROM sys_fprocess WHERE project_type IN (LOWER('||quote_literal(v_project_type)||'), ''utils'') 
-	AND addparam IS NULL AND (query_text IS NOT NULL AND query_text <> '''') AND function_name ILIKE ''%pg2epa_check_data%'' AND active ORDER BY fid ASC';
+	v_querytext = '
+		SELECT * FROM sys_fprocess 
+		WHERE project_type IN (LOWER('||quote_literal(v_project_type)||'), ''utils'') 
+		AND addparam IS NULL 
+		AND (query_text IS NOT NULL AND query_text <> '''') 
+		AND function_name ILIKE ''%pg2epa_check_data%'' 
+		AND active ORDER BY fid ASC
+	';
 
 	-- loop for checks
-	for v_rec in execute v_querytext
-	loop
-		raise notice 'v_rec.fid %', v_rec.fid;
-		EXECUTE 'select gw_fct_check_fprocess($${"client":{"device":4, "infoType":1, "lang":"ES"}, 
+	FOR v_rec IN EXECUTE v_querytext LOOP
+		EXECUTE 'SELECT gw_fct_check_fprocess($${"client":{"device":4, "infoType":1, "lang":"ES"}, 
 	    "form":{},"feature":{},"data":{"parameters":{"functionFid":'||v_fid||', "checkFid":"'||v_rec.fid||'"}}}$$)';
-	end loop;
+	END LOOP;
 
 
 	-- built return
@@ -81,6 +78,10 @@ BEGIN
 		EXECUTE 'SELECT gw_fct_create_logreturn($${"data":{"parameters":{"type":"point"}}}$$::json)' INTO v_result_point;
 		EXECUTE 'SELECT gw_fct_create_logreturn($${"data":{"parameters":{"type":"line"}}}$$::json)' INTO v_result_line;
 		EXECUTE 'SELECT gw_fct_create_logreturn($${"data":{"parameters":{"type":"polygon"}}}$$::json)' INTO v_result_polygon;
+
+		IF v_isembebed IS FALSE OR v_isembebed IS NULL THEN -- drop temporal tables if function is not embebed
+			PERFORM gw_fct_manage_temp_tables('{"data":{"parameters":{"fid":'||v_fid||', "project_type":"'||v_project_type||'", "action":"DROP", "group":"EPAMAIN"}}}');
+		END IF;
 
 		-- Return
 		RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'"'||

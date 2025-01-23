@@ -6,8 +6,8 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 3106
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_check_nodarc(p_data json)  
-RETURNS json AS 
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_check_nodarc(p_data json)
+RETURNS json AS
 $BODY$
 
 /*EXAMPLE
@@ -44,7 +44,7 @@ BEGIN
 
 	-- get system data
 	SELECT giswater  INTO v_version FROM sys_version ORDER BY id DESC LIMIT 1;
-	
+
 	-- Reset values
 	DELETE FROM anl_node WHERE cur_user="current_user"() AND fid=v_fid;
 	DELETE FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid;
@@ -57,9 +57,9 @@ BEGIN
 	DELETE FROM selector_state WHERE cur_user=current_user;
 	INSERT INTO selector_state (state_id, cur_user) VALUES (1, current_user);
 
-	INSERT INTO rpt_cat_result values (-1) 
+	INSERT INTO rpt_cat_result values (-1)
 	ON CONFLICT DO NOTHING;
-	
+
 	-- Upsert on rpt_cat_table and set selectors';
 	DELETE FROM selector_inp_result WHERE cur_user=current_user;
 	INSERT INTO selector_inp_result (result_id, cur_user) VALUES (v_result, current_user);
@@ -71,18 +71,18 @@ BEGIN
 	SELECT gw_fct_pg2epa_nod2arc(v_result, false, true) INTO v_response;
 
 	IF v_response = 0 THEN
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) 
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 		VALUES (v_fid, v_result, 1, 'INFO: All nodarcs have been analyzed Check results');
 
 	ELSIF v_response = 1 THEN
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) 
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 		VALUES (v_fid, v_result, 3,'HINT: Read the error message and redraw arc_id. Then execute again this function.');
 	END IF;
 
 	-- info
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=417 order by  id asc) row;
-	v_result := COALESCE(v_result, '{}'); 
+	v_result := COALESCE(v_result, '{}');
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
 	--points
@@ -97,12 +97,12 @@ BEGIN
 	FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript,fid, the_geom
 	FROM  anl_node WHERE cur_user="current_user"() AND fid=v_fid) row) features;
 
-  	v_result := COALESCE(v_result, '{}'); 
-  	v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}'); 
-	
+  	v_result := COALESCE(v_result, '{}');
+  	v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}');
+
 	-- Control nulls
-	v_result_info := COALESCE(v_result_info, '{}'); 
-	v_result_point := COALESCE(v_result_point, '{}'); 
+	v_result_info := COALESCE(v_result_info, '{}');
+	v_result_point := COALESCE(v_result_point, '{}');
 
 	-- Return
 	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Analysis done successfully"}, "version":"'||v_version||'"'||

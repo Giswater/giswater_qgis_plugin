@@ -174,7 +174,7 @@ BEGIN
 			l.the_geom,
 			c.expl_id, c.dma_id, c.presszone_id, c.dqa_id, c.minsector_id, inp_connec.status, inp_connec.minorloss,
 			(case when c.builtdate is not null then (now()::date-c.builtdate)/30 else 0 end)
-			FROM selector_sector, temp_link l 
+			FROM selector_sector, temp_t_link l 
 			JOIN connec c ON connec_id = feature_id
 			JOIN value_state_type ON value_state_type.id = state_type
 			JOIN cat_connec ON cat_connec.id = conneccat_id

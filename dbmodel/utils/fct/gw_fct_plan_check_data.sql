@@ -52,7 +52,7 @@ BEGIN
 
 	-- init function
 	SET search_path="SCHEMA_NAME", public;
-	
+
 	SELECT project_type, giswater  INTO v_project_type, v_version FROM sys_version ORDER BY id DESC LIMIT 1;
 
 	-- getting input data
@@ -61,40 +61,47 @@ BEGIN
 	v_verified_exceptions :=  ((p_data ->> 'data')::json->>'parameters')::json->> 'verifiedExceptions';
 
 	-- init variables
-	v_return:=0;
-	v_global_count:=0;
-	
-	IF v_fid is null then v_fid = 115; end if;
-	IF v_verified_exceptions is null then v_verified_exceptions = FALSE; end if;
+	v_return := 0;
+	v_global_count := 0;
 
-	--raise exception 'v_isembebed %', v_isembebed;
-	
-	IF v_isembebed IS false OR v_isembebed IS null then -- create temporal tables if function is not embebed
-	
-		v_isembebed = false;
-	
-		-- create query tables
-		EXECUTE 'SELECT gw_fct_create_querytables($${"data":{"parameters":{"fid":'||v_fid||', "planCheck":true, "verifiedExceptions":'||v_verified_exceptions||'}}}$$::json)';
-	
-		-- create log tables		
-		EXECUTE 'SELECT gw_fct_create_logtables($${"data":{"parameters":{"fid":'||v_fid||'}}}$$::json)';
-	
+	IF v_fid IS NULL THEN v_fid = 115; END IF;
+	IF v_verified_exceptions IS NULL THEN v_verified_exceptions = FALSE; END IF;
+
+	IF v_isembebed IS FALSE OR v_isembebed IS NULL THEN -- create temporal tables if function is not embebed
+		v_isembebed = FALSE;
+		-- create temporal tables
+		EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"fid":'||v_fid||', "project_type":'||v_project_type||', "action":"CREATE", "group":"PLANCHECK", "verifiedExceptions":'||v_verified_exceptions||'}}}$$::json)';
 	END IF;
 
 	-- getting sys_fprocess to be executed
-	v_querytext = 'select * from sys_fprocess where project_type in (lower('||quote_literal(v_project_type)||'), ''utils'') 
-	and addparam is null and query_text is not null and function_name ilike ''%plan_check_data%'' and active order by fid asc';
+	v_querytext = '
+		SELECT * FROM sys_fprocess 
+		WHERE project_type IN (LOWER('||quote_literal(v_project_type)||'), ''utils'') 
+		AND addparam IS NULL 
+		AND query_text IS NOT NULL 
+		AND function_name ILIKE ''%plan_check_data%'' 
+		AND active ORDER BY fid ASC
+	';
 
 	-- loop for checks
-	for v_rec in execute v_querytext
-	loop
-		EXECUTE 'select gw_fct_check_fprocess($${"client":{"device":4, "infoType":1, "lang":"ES"}, 
+	FOR v_rec IN EXECUTE v_querytext LOOP
+		EXECUTE 'SELECT gw_fct_check_fprocess($${"client":{"device":4, "infoType":1, "lang":"ES"}, 
 	    "form":{},"feature":{},"data":{"parameters":{"functionFid":'||v_fid||', "checkFid":"'||v_rec.fid||'"}}}$$)';
-	end loop;
+	END LOOP;
+
+	IF v_isembebed IS FALSE OR v_isembebed IS NULL THEN -- drop temporal tables if function is not embebed
+		EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"fid":'||v_fid||', "project_type":'||v_project_type||', "action":"DROP", "group":"PLANCHECK"}}}$$)';
+	END IF;
 
 	--  Return
 	EXECUTE 'SELECT gw_fct_create_return($${"data":{"parameters":{"functionId":3364, "isEmbebed":'||v_isembebed||'}}}$$::json)' INTO v_return;
 	RETURN v_return;
+
+	EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_error_context = pg_exception_context;
+	EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"fid":'||v_fid||', "project_type":'||v_project_type||', "action":"DROP", "group":"PLANCHECK"}}}$$)';
+	RETURN json_build_object('status', 'Failed', 'NOSQLERR', SQLERRM, 'message', json_build_object('level', right(SQLSTATE, 1), 'text', SQLERRM), 'SQLSTATE',
+	SQLSTATE, 'SQLCONTEXT', v_error_context)::json;
 
 END;
 $BODY$

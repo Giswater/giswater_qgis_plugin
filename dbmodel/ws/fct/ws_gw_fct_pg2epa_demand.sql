@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2330
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_demand(result_id_var character varying)  RETURNS integer AS 
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_demand(result_id_var character varying)  RETURNS integer AS
 $BODY$
 
 /*
@@ -24,7 +24,7 @@ v_patternmethod integer;
 v_queryfrom text;
 v_networkmode integer;
 v_deafultpattern text;
-      
+
 BEGIN
 
 	--  Search path
@@ -32,9 +32,9 @@ BEGIN
 
 	-- get user values
 	v_units =  (SELECT value FROM config_param_user WHERE parameter='inp_options_units' AND cur_user=current_user);
-	v_patternmethod = (SELECT value FROM config_param_user WHERE parameter='inp_options_patternmethod' AND cur_user=current_user); 
-	v_networkmode = (SELECT value FROM config_param_user WHERE parameter='inp_options_networkmode' AND cur_user=current_user); 
-	v_deafultpattern = Coalesce((SELECT value FROM config_param_user WHERE parameter='inp_options_pattern' AND cur_user=current_user),''); 
+	v_patternmethod = (SELECT value FROM config_param_user WHERE parameter='inp_options_patternmethod' AND cur_user=current_user);
+	v_networkmode = (SELECT value FROM config_param_user WHERE parameter='inp_options_networkmode' AND cur_user=current_user);
+	v_deafultpattern = Coalesce((SELECT value FROM config_param_user WHERE parameter='inp_options_pattern' AND cur_user=current_user),'');
 
 
 	EXECUTE 'SELECT (value::json->>'||quote_literal(v_units)||')::float FROM config_param_system WHERE parameter=''epa_units_factor'''
@@ -43,32 +43,32 @@ BEGIN
 	-- Reset values
 	UPDATE temp_t_node t SET demand = 0 FROM node n WHERE n.node_id = t.node_id AND n.epa_type != 'INLET';
 	UPDATE temp_t_node t SET pattern_id = null FROM node n WHERE n.node_id = t.node_id AND n.epa_type != 'INLET';
-	
+
 	IF v_networkmode IN (2) THEN -- NODE ESTIMATED
 
 		-- update patterns for nodes
 		UPDATE temp_t_node SET pattern_id=a.pattern_id FROM v_edit_inp_junction a WHERE temp_t_node.node_id=a.node_id;
 
 		-- demand on nodes
-		UPDATE temp_t_node SET demand=inp_junction.demand FROM inp_junction WHERE temp_t_node.node_id=inp_junction.node_id;	
+		UPDATE temp_t_node SET demand=inp_junction.demand FROM inp_junction WHERE temp_t_node.node_id=inp_junction.node_id;
 
 		-- pattern
 		IF v_patternmethod = 11 THEN -- GLOBAL PATTERN
 			UPDATE temp_t_node SET pattern_id=v_deafultpattern WHERE pattern_id IS NULL AND epa_type ='JUNCTION';
-		
+
 		ELSIF v_patternmethod = 12 THEN -- SECTOR PATTERN (NODE)
-			UPDATE temp_t_node SET pattern_id=sector.pattern_id FROM node JOIN sector ON sector.sector_id=node.sector_id 
+			UPDATE temp_t_node SET pattern_id=sector.pattern_id FROM node JOIN sector ON sector.sector_id=node.sector_id
 			WHERE temp_t_node.node_id=node.node_id AND temp_t_node.pattern_id IS NULL AND temp_t_node.epa_type ='JUNCTION';
-		
+
 		ELSIF v_patternmethod = 13 THEN -- DMA PATTERN (NODE)
-			UPDATE temp_t_node SET pattern_id=dma.pattern_id FROM node JOIN dma ON dma.dma_id=node.dma_id 
+			UPDATE temp_t_node SET pattern_id=dma.pattern_id FROM node JOIN dma ON dma.dma_id=node.dma_id
 			WHERE temp_t_node.node_id=node.node_id AND temp_t_node.pattern_id IS NULL AND temp_t_node.epa_type ='JUNCTION';
-		
+
 		ELSIF v_patternmethod = 14 THEN -- FEATURE PATTERN (NODE)
 			-- do nothing
 		END IF;
-		
-	ELSIF v_networkmode = 4 THEN 
+
+	ELSIF v_networkmode = 4 THEN
 
 		-- update patterns for connecs with associated link
 		UPDATE temp_t_node SET pattern_id=c.pattern_id FROM v_edit_inp_connec c WHERE connec_id = node_id  AND temp_t_node.epa_type ='JUNCTION';
@@ -78,42 +78,42 @@ BEGIN
 
 		-- demand on connecs with associated link
 		UPDATE temp_t_node SET demand=v.demand FROM v_edit_inp_connec v WHERE connec_id = node_id  AND temp_t_node.epa_type ='JUNCTION';
-		
+
 		-- demand on connecs over arc
 		UPDATE temp_t_node SET demand=v.demand FROM v_edit_inp_connec v WHERE concat('VC',connec_id) = node_id  AND temp_t_node.epa_type ='JUNCTION';
 
 		-- pattern
 		IF v_patternmethod = 11 THEN -- GLOBAL PATTERN
 			UPDATE temp_t_node SET pattern_id=v_deafultpattern WHERE temp_t_node.pattern_id IS NULL AND temp_t_node.epa_type ='JUNCTION';
-				
+
 		ELSIF v_patternmethod  = 12 THEN -- SECTOR PATTERN (CONNEC)
 
 			-- pattern on connecs with associated link
-			UPDATE temp_t_node SET pattern_id=sector.pattern_id 
+			UPDATE temp_t_node SET pattern_id=sector.pattern_id
 			FROM v_edit_inp_connec JOIN sector USING (sector_id) WHERE connec_id = node_id  AND temp_t_node.pattern_id IS NULL AND temp_t_node.epa_type ='JUNCTION';
 
 			-- pattern on connecs over arc
-			UPDATE temp_t_node SET pattern_id=sector.pattern_id 
+			UPDATE temp_t_node SET pattern_id=sector.pattern_id
 			FROM v_edit_inp_connec JOIN sector USING (sector_id) WHERE concat('VC',connec_id) = node_id  AND temp_t_node.pattern_id IS NULL AND temp_t_node.epa_type ='JUNCTION';
 
 		ELSIF v_patternmethod  = 13 THEN -- DMA PATTERN (CONNEC)
 
 			-- pattern on connecs with associated link
-			UPDATE temp_t_node SET pattern_id=dma.pattern_id 
+			UPDATE temp_t_node SET pattern_id=dma.pattern_id
 			FROM v_edit_inp_connec JOIN dma USING (dma_id) WHERE connec_id = node_id  AND temp_t_node.pattern_id IS NULL AND temp_t_node.epa_type ='JUNCTION';
-			
+
 			-- pattern on connecs over arc
-			UPDATE temp_t_node SET pattern_id=dma.pattern_id 
+			UPDATE temp_t_node SET pattern_id=dma.pattern_id
 			FROM v_edit_inp_connec JOIN dma USING (dma_id) WHERE concat('VC',connec_id) = node_id AND temp_t_node.pattern_id IS NULL AND temp_t_node.epa_type ='JUNCTION';
 
 		ELSIF v_patternmethod = 14 THEN -- FEATURE PATTERN (CONNEC)
 
 			-- do nothing
-		END IF;	
+		END IF;
 	END IF;
-	
+
 	UPDATE temp_t_node SET demand = 0 WHERE demand is null;
-	
+
 RETURN 0;
 END;
 $BODY$

@@ -85,59 +85,12 @@ BEGIN
 			RETURN ('{"status":"Failed","message":{"level":1, "text":"There is no sector selected. Please select at least one"}}')::json;
 		END IF;
 
-		-- drop temp tables
-		DROP TABLE IF EXISTS temp_t_arc_flowregulator;
-		DROP TABLE IF EXISTS temp_t_lid_usage;
-		DROP TABLE IF EXISTS temp_t_node_other;
-
-		DROP TABLE IF EXISTS temp_t_csv;
-		DROP TABLE IF EXISTS temp_t_table;
-		DROP TABLE IF EXISTS temp_audit_check_data;
-		DROP TABLE IF EXISTS temp_audit_log_data;
-		DROP TABLE IF EXISTS temp_t_node;
-		DROP TABLE IF EXISTS temp_t_arc;
-		DROP TABLE IF EXISTS temp_t_gully;
-		DROP TABLE IF EXISTS temp_t_anlgraph;
-
-		DROP TABLE IF EXISTS temp_anl_arc;
-		DROP TABLE IF EXISTS temp_anl_node;
-		DROP TABLE IF EXISTS temp_anl_gully;
-		DROP TABLE IF EXISTS temp_anl_polygon;
-		DROP TABLE IF EXISTS temp_rpt_inp_raingage;
-		DROP TABLE IF EXISTS temp_rpt_inp_node;
-		DROP TABLE IF EXISTS temp_rpt_inp_arc;
-		DROP TABLE IF EXISTS temp_t_go2epa;
-
-		DROP TABLE IF EXISTS temp_t_rpt_cat_result;
-
 		-- force only state 1 selector
 		DELETE FROM selector_state WHERE cur_user=current_user;
 		INSERT INTO selector_state (state_id, cur_user) VALUES (1, current_user);
 
-		CREATE TEMP TABLE temp_t_arc_flowregulator (LIKE SCHEMA_NAME.temp_arc_flowregulator INCLUDING ALL);
-		CREATE TEMP TABLE temp_t_lid_usage (LIKE SCHEMA_NAME.temp_lid_usage INCLUDING ALL);
-		CREATE TEMP TABLE temp_t_node_other (LIKE SCHEMA_NAME.temp_node_other INCLUDING ALL);
-
-		CREATE TEMP TABLE temp_t_csv (LIKE SCHEMA_NAME.temp_csv INCLUDING ALL);
-		CREATE TEMP TABLE temp_t_table (LIKE SCHEMA_NAME.temp_table INCLUDING ALL);
-		CREATE TEMP TABLE temp_audit_check_data (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
-		CREATE TEMP TABLE temp_audit_log_data (LIKE SCHEMA_NAME.audit_log_data INCLUDING ALL);
-		CREATE TEMP TABLE temp_t_node (LIKE SCHEMA_NAME.temp_node INCLUDING ALL);
-		CREATE TEMP TABLE temp_t_arc (LIKE SCHEMA_NAME.temp_arc INCLUDING ALL);
-		CREATE TEMP TABLE temp_t_gully (LIKE SCHEMA_NAME.temp_gully INCLUDING ALL);
-		CREATE TEMP TABLE temp_t_anlgraph (LIKE SCHEMA_NAME.temp_anlgraph INCLUDING ALL);
-
-		CREATE TEMP TABLE temp_anl_arc (LIKE SCHEMA_NAME.anl_arc INCLUDING ALL);
-		CREATE TEMP TABLE temp_anl_node (LIKE SCHEMA_NAME.anl_node INCLUDING ALL);
-		CREATE TEMP TABLE temp_anl_gully (LIKE SCHEMA_NAME.anl_gully INCLUDING ALL);
-		CREATE TEMP TABLE temp_anl_polygon (LIKE SCHEMA_NAME.anl_polygon INCLUDING ALL);
-		CREATE TEMP TABLE temp_rpt_inp_raingage (LIKE SCHEMA_NAME.rpt_inp_raingage INCLUDING ALL);
-		CREATE TEMP TABLE temp_rpt_inp_node (LIKE SCHEMA_NAME.rpt_inp_node INCLUDING ALL);
-		CREATE TEMP TABLE temp_rpt_inp_arc (LIKE SCHEMA_NAME.rpt_inp_arc INCLUDING ALL);
-
-		CREATE TEMP TABLE temp_t_go2epa (LIKE SCHEMA_NAME.temp_go2epa INCLUDING ALL);
-		CREATE TEMP TABLE temp_t_rpt_cat_result (LIKE SCHEMA_NAME.rpt_cat_result INCLUDING ALL);
-
+		-- create temp tables
+		PERFORM gw_fct_manage_temp_tables('{"data":{"parameters":{"fid":227, "project_type":"UD", "action":"CREATE", "group":"EPAMAIN"}}}');
 
 		-- getting selectors
 		SELECT array_agg(expl_id) INTO v_expl_id FROM selector_expl WHERE expl_id > 0 AND cur_user = current_user;
@@ -203,8 +156,8 @@ BEGIN
 		END IF;
 
 		RAISE NOTICE '4.8 - Update values for temp table';
-		UPDATE temp_t_arc SET result_id  = v_result;
-		UPDATE temp_t_node SET result_id  = v_result;
+		UPDATE t_arc SET result_id  = v_result;
+		UPDATE t_node SET result_id  = v_result;
 
 		v_return = '{"status": "Accepted", "message":{"level":1, "text":"Export INP file 4/7 - Structure data...... done succesfully"}}'::json;
 		RETURN v_return;
@@ -223,17 +176,17 @@ BEGIN
 		PERFORM gw_fct_pg2epa_check_result(v_input);
 
 		-- deleting arcs without nodes
-		UPDATE temp_t_arc t SET epa_type = 'TODELETE' FROM (SELECT a.id FROM temp_t_arc a LEFT JOIN temp_t_node ON node_1=node_id WHERE temp_t_node.node_id is null) a WHERE t.id = a.id;
-		UPDATE temp_t_arc t SET epa_type = 'TODELETE' FROM (SELECT a.id FROM temp_t_arc a LEFT JOIN temp_t_node ON node_2=node_id WHERE temp_t_node.node_id is null) a WHERE t.id = a.id;
-		DELETE FROM temp_t_arc WHERE epa_type = 'TODELETE';
-		UPDATE temp_t_arc SET result_id = v_result WHERE result_id IS NULL;
-		UPDATE temp_t_node SET result_id = v_result WHERE result_id IS NULL;
+		UPDATE t_arc t SET epa_type = 'TODELETE' FROM (SELECT a.id FROM t_arc a LEFT JOIN t_node ON node_1=node_id WHERE t_node.node_id is null) a WHERE t.id = a.id;
+		UPDATE t_arc t SET epa_type = 'TODELETE' FROM (SELECT a.id FROM t_arc a LEFT JOIN t_node ON node_2=node_id WHERE t_node.node_id is null) a WHERE t.id = a.id;
+		DELETE FROM t_arc WHERE epa_type = 'TODELETE';
+		UPDATE t_arc SET result_id = v_result WHERE result_id IS NULL;
+		UPDATE t_node SET result_id = v_result WHERE result_id IS NULL;
 
 		-- deleting nodes without arcs
-		UPDATE temp_t_node t SET epa_type = 'TODELETE' FROM
-		(SELECT id FROM temp_t_node LEFT JOIN (SELECT node_1 as node_id FROM temp_t_arc UNION SELECT node_2 FROM temp_t_arc) a USING (node_id) WHERE a.node_id IS NULL) a
+		UPDATE t_node t SET epa_type = 'TODELETE' FROM
+		(SELECT id FROM t_node LEFT JOIN (SELECT node_1 as node_id FROM t_arc UNION SELECT node_2 FROM t_arc) a USING (node_id) WHERE a.node_id IS NULL) a
 		WHERE t.id = a.id;
-		DELETE FROM temp_t_node WHERE epa_type = 'TODELETE';
+		DELETE FROM t_node WHERE epa_type = 'TODELETE';
 
 		-- create return
 		EXECUTE 'SELECT gw_fct_create_return($${"data":{"parameters":{"functionId":2646, "isEmbebed":false}}}$$::json)' INTO v_return;
@@ -254,25 +207,29 @@ BEGIN
 		SELECT
 		result_id, arc_id, node_1, node_2, elevmax1, elevmax2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation,
 		length, n, the_geom, expl_id, addparam, arcparent, q0, qmax, barrels, slope, culvert, kentry, kexit, kavg, flap, seepage
-		FROM temp_t_arc;
+		FROM t_arc;
 
 		-- move nodes data
 		INSERT INTO rpt_inp_node (result_id, node_id, top_elev, ymax, elev, node_type, nodecat_id,
 		epa_type, sector_id, state, state_type, annotation, y0, ysur, apond, the_geom, expl_id, addparam, parent, arcposition, fusioned_node)
 		SELECT result_id, node_id, top_elev, ymax, elev, node_type, nodecat_id, epa_type,
 		sector_id, state, state_type, annotation, y0, ysur, apond, the_geom, expl_id, addparam, parent, arcposition, fusioned_node
-		FROM temp_t_node;
+		FROM t_node;
 
 		-- move result data
-		UPDATE rpt_cat_result r set network_stats = t.network_stats FROM temp_t_rpt_cat_result t WHERE r.result_id = t.result_id;
+		UPDATE rpt_cat_result r set network_stats = t.network_stats FROM t_rpt_cat_result t WHERE r.result_id = t.result_id;
+
+		-- drop temp tables
+		PERFORM gw_fct_manage_temp_tables('{"data":{"parameters":{"fid":227, "project_type":"UD", "action":"DROP", "group":"EPAMAIN"}}}');
+
 		v_return = '{"status": "Accepted", "message":{"level":1, "text":"Export INP file 7/7 - Check according EPA rules...... done succesfully"}}'::json;
 		RETURN v_return;
-
 	END IF;
 
 	--  Exception handling
 	EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	PERFORM gw_fct_manage_temp_tables('{"data":{"parameters":{"fid":227, "project_type":"UD", "action":"DROP", "group":"EPAMAIN"}}}');
 	RETURN ('{"status":"Failed", "level": ' || to_json(right(SQLSTATE, 1)) || ',"text": ' || to_json(SQLERRM) || ', "body":{"data":{"info":{"values":[{"message":'||to_json(SQLERRM)||'}]}}}, "NOSQLERR":' ||
 	to_json(SQLERRM) || ',"SQLSTATE":' || to_json(SQLSTATE) ||',"SQLCONTEXT":' || to_json(v_error_context) || '}')::json;
 

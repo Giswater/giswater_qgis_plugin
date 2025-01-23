@@ -51,20 +51,23 @@ BEGIN
 
 	-- create temp tables
 	IF v_fid = 125 THEN
-		EXECUTE 'SELECT gw_fct_create_querytables($${"data":{"verifiedExceptions":'||COALESCE(v_verified_exceptions, 'false')||',"selectionMode":"'||COALESCE(v_selection_mode, 'userSelectors')||'", "checkPsectors":"'||COALESCE(v_checkpsectors, 'false')||'"}}$$::json)';
-		EXECUTE 'SELECT gw_fct_create_logtables($${"data":{"parameters":{"fid":'||v_fid||'}}}$$::json)';
+		EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"fid":'||v_fid||', "project_type":'||v_project_type||', "action":"CREATE", "group":"OMCHECK"}}}$$)';
 	END IF;
 
 	-- getting sys_fprocess to be executed
-	v_querytext = 'select * from sys_fprocess where project_type in (lower('||quote_literal(v_project_type)||'), ''utils'') and addparam is null and query_text is not null and function_name ilike ''%om_check%'' order by fid asc';
+	v_querytext = '
+		SELECT * FROM sys_fprocess 
+		WHERE project_type IN (LOWER('||quote_literal(v_project_type)||'), ''utils'') 
+		AND addparam IS NULL 
+		AND query_text IS NOT NULL 
+		AND function_name ILIKE ''%om_check%'' 
+		ORDER BY fid ASC
+	';
 
-	raise notice '%', v_querytext;
-
-	for v_rec in execute v_querytext
-	loop
-		EXECUTE 'select gw_fct_check_fprocess($${"client":{"device":4, "infoType":1, "lang":"ES"}, 
+	FOR v_rec IN EXECUTE v_querytext LOOP
+		EXECUTE 'SELECT gw_fct_check_fprocess($${"client":{"device":4, "infoType":1, "lang":"ES"}, 
 	    "form":{},"feature":{},"data":{"parameters":{"functionFid": '||v_fid||', "checkFid":"'||v_rec.fid||'"}}}$$)';
-	end loop;
+	END LOOP;
 
 	-- built return
 	IF v_fid = 125 THEN
@@ -77,6 +80,8 @@ BEGIN
 		EXECUTE 'SELECT gw_fct_create_logreturn($${"data":{"parameters":{"type":"point"}}}$$::json)' INTO v_result_point;
 		EXECUTE 'SELECT gw_fct_create_logreturn($${"data":{"parameters":{"type":"line"}}}$$::json)' INTO v_result_line;
 		EXECUTE 'SELECT gw_fct_create_logreturn($${"data":{"parameters":{"type":"polygon"}}}$$::json)' INTO v_result_polygon;
+
+		EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"fid":'||v_fid||', "project_type":'||v_project_type||', "action":"DROP", "group":"OMCHECK"}}}$$)';
 
 		-- Return
 		RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'"'||
@@ -93,11 +98,12 @@ BEGIN
 
 	END IF;
 
-	--  Exception handling
-	--EXCEPTION WHEN OTHERS THEN
-	--GET STACKED DIAGNOSTICS v_error_context = pg_exception_context;
-	--RETURN json_build_object('status', 'Failed', 'NOSQLERR', SQLERRM, 'message', json_build_object('level', right(SQLSTATE, 1), 'text', SQLERRM), 'SQLSTATE',
-	--SQLSTATE, 'SQLCONTEXT', v_error_context)::json;
+	-- Exception handling
+	EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_error_context = pg_exception_context;
+	EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"fid":'||v_fid||', "project_type":'||v_project_type||', "action":"DROP", "group":"OMCHECK"}}}$$)';
+	RETURN json_build_object('status', 'Failed', 'NOSQLERR', SQLERRM, 'message', json_build_object('level', right(SQLSTATE, 1), 'text', SQLERRM), 'SQLSTATE',
+	SQLSTATE, 'SQLCONTEXT', v_error_context)::json;
 
 END;
 $BODY$

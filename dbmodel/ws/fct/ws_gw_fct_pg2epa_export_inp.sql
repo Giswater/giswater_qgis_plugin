@@ -244,7 +244,7 @@ BEGIN
 	CREATE OR REPLACE TEMP VIEW vi_t_patterns AS
 	   SELECT a.pattern_id, a.factor_1, a.factor_2, a.factor_3, a.factor_4,  a.factor_5, a.factor_6, a.factor_7, a.factor_8, a.factor_9,
 	   a.factor_10,  a.factor_11, a.factor_12, a.factor_13, a.factor_14, a.factor_15, a.factor_16, a.factor_17, a.factor_18
-	   FROM temp_rpt_inp_pattern_value a ORDER BY a.id;
+	   FROM t_rpt_inp_pattern_value a ORDER BY a.id;
 
 
 	CREATE OR REPLACE TEMP VIEW vi_t_pipes AS

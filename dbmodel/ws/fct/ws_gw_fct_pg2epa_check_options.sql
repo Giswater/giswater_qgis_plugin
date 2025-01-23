@@ -30,16 +30,16 @@ v_return json = '{"status":"accepted"}';
 
 BEGIN
 
-	--  Search path	
+	--  Search path
 	SET search_path = "SCHEMA_NAME", public;
 
-	-- getting input data 	
+	-- getting input data
 	v_result_id := ((p_data ->>'data')::json->>'parameters')::json->>'resultId'::text;
 	v_fid := ((p_data ->>'data')::json->>'parameters')::json->>'fid';
 
 	-- select system values
 	SELECT project_type, giswater  INTO v_project_type, v_version FROM sys_version ORDER BY id DESC LIMIT 1;
-	
+
 	--  Return
 	RETURN gw_fct_json_create_return(v_return, 2850, null, null, null);
 
@@ -47,4 +47,4 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-	
+

@@ -6,8 +6,8 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 3268
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_pg2epa_setinitvalues(p_data json) 
-RETURNS json AS 
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_pg2epa_setinitvalues(p_data json)
+RETURNS json AS
 $BODY$
 
 /*EXAMPLE
@@ -34,8 +34,8 @@ BEGIN
 
 	-- select version
 	SELECT giswater, project_type INTO v_version, v_projecttype FROM sys_version ORDER BY id DESC LIMIT 1;
-	
-	-- getting input data	
+
+	-- getting input data
 	v_result_id :=  json_extract_path_text(p_data, 'data', 'parameters', 'resultId')::text;
 
 	-- Reset values
@@ -60,29 +60,29 @@ BEGIN
 
 	EXECUTE 'UPDATE inp_tank SET initlevel = press FROM rpt_node WHERE inp_tank.node_id = rpt_node.node_id AND result_id='||quote_literal(v_result_id)||' AND time ='||quote_literal(v_time)||';';
 
-	
+
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 4, concat('Initlevel of ',v_count,' tanks has been updated.'));
-	
+
 	-- insert spacers
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 3, concat(''));
 	INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 2, concat(''));
-	
+
 	-- get results
 	-- info
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=v_fid order by criticity desc, id asc) row;
-	v_result := COALESCE(v_result, '{}'); 
+	v_result := COALESCE(v_result, '{}');
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
 
 	-- Control nulls
-	v_result_info := COALESCE(v_result_info, '{}'); 
+	v_result_info := COALESCE(v_result_info, '{}');
 
 	-- Return
 	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Process done successfully"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{ "info":'||v_result_info||
 			'}}'||
-	    '}')::json, 3268, null, null, null); 
+	    '}')::json, 3268, null, null, null);
 
 END;
 $BODY$

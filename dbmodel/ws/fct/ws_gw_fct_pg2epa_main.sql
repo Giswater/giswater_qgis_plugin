@@ -25,7 +25,7 @@ SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "la
 select * from temp_audit_check_data order by 1 asc
 
 
-select * from temp_t_arc
+select * from t__arc
 
 
 --fid: 227
@@ -95,103 +95,8 @@ BEGIN
 		DELETE FROM selector_state WHERE cur_user=current_user;
 		INSERT INTO selector_state (state_id, cur_user) VALUES (1, current_user);
 
-		-- drop temp tables
-		DROP TABLE IF EXISTS temp_vnode;
-		DROP TABLE IF EXISTS temp_link;
-		DROP TABLE IF EXISTS temp_link_x_arc;
-
-		DROP TABLE IF EXISTS temp_t_csv;
-		DROP TABLE IF EXISTS temp_audit_check_data;
-		DROP TABLE IF EXISTS temp_audit_log_data;
-		DROP TABLE IF EXISTS temp_t_table;
-		DROP TABLE IF EXISTS temp_t_node;
-		DROP TABLE IF EXISTS temp_t_arc;
-		-- TODO
-		--DROP TABLE IF EXISTS temp_t_connec;
-		DROP TABLE IF EXISTS temp_t_demand;
-		DROP TABLE IF EXISTS temp_t_anlgraph;
-
-		DROP TABLE IF EXISTS temp_anl_arc;
-		DROP TABLE IF EXISTS temp_anl_node;
-		DROP TABLE IF EXISTS temp_anl_connec;
-
-		DROP TABLE IF EXISTS temp_rpt_inp_pattern_value;
-		DROP TABLE IF EXISTS temp_t_go2epa;
-		DROP TABLE IF EXISTS temp_t_arc_endpoint;
-		DROP TABLE IF EXISTS temp_t_rpt_cat_result;
-
-		DROP TABLE IF EXISTS t_pgr_go2epa_arc;
-		DROP TABLE IF EXISTS t_pgr_go2epa_node;
-
-
 		-- create temp tables
-		CREATE TEMP TABLE temp_vnode(
-		  id serial NOT NULL,
-		  l1 integer,
-		  v1 integer,
-		  l2 integer,
-		  v2 integer,
-		  CONSTRAINT temp_vnode_pkey PRIMARY KEY (id));
-
-		CREATE TEMP TABLE temp_link(
-		  link_id integer NOT NULL,
-		  vnode_id integer,
-		  vnode_type text,
-		  feature_id character varying(16),
-		  feature_type character varying(16),
-		  exit_id character varying(16),
-		  exit_type character varying(16),
-		  state smallint,
-		  expl_id integer,
-		  sector_id integer,
-		  dma_id integer,
-		  exit_topelev double precision,
-		  exit_elev double precision,
-		  the_geom geometry(LineString,25831),
-		  the_geom_endpoint geometry(Point,25831),
-		  flag boolean,
-		  CONSTRAINT temp_link_pkey PRIMARY KEY (link_id));
-
-		CREATE TEMP TABLE temp_link_x_arc(
-		  link_id integer NOT NULL,
-		  vnode_id integer,
-		  arc_id character varying(16),
-		  feature_type character varying(16),
-		  feature_id character varying(16),
-		  node_1 character varying(16),
-		  node_2 character varying(16),
-		  vnode_distfromnode1 numeric(12,3),
-		  vnode_distfromnode2 numeric(12,3),
-		  exit_topelev double precision,
-		  exit_ymax numeric(12,3),
-		  exit_elev numeric(12,3),
-		  CONSTRAINT temp_link_x_arc_pkey PRIMARY KEY (link_id));
-
-		CREATE TEMP TABLE temp_t_csv (LIKE SCHEMA_NAME.temp_csv INCLUDING ALL);
-		CREATE TEMP TABLE temp_audit_check_data (LIKE SCHEMA_NAME.audit_check_data INCLUDING ALL);
-		CREATE TEMP TABLE temp_audit_log_data (LIKE SCHEMA_NAME.audit_log_data INCLUDING ALL);
-		CREATE TEMP TABLE temp_t_table (LIKE SCHEMA_NAME.temp_table INCLUDING ALL);
-		CREATE TEMP TABLE temp_t_node (LIKE SCHEMA_NAME.temp_node INCLUDING ALL);
-		CREATE TEMP TABLE temp_t_arc (LIKE SCHEMA_NAME.temp_arc INCLUDING ALL);
-		-- TODO
-		-- CREATE TEMP TABLE temp_t_connec (LIKE SCHEMA_NAME.temp_connec INCLUDING ALL);
-		CREATE TEMP TABLE temp_t_demand (LIKE SCHEMA_NAME.temp_demand INCLUDING ALL);
-		CREATE TEMP TABLE temp_t_anlgraph (LIKE SCHEMA_NAME.temp_anlgraph INCLUDING ALL);
-		CREATE TEMP TABLE temp_anl_arc (LIKE SCHEMA_NAME.anl_arc INCLUDING ALL);
-		CREATE TEMP TABLE temp_anl_node (LIKE SCHEMA_NAME.anl_node INCLUDING ALL);
-		CREATE TEMP TABLE temp_anl_connec (LIKE SCHEMA_NAME.anl_connec INCLUDING ALL);
-		CREATE TEMP TABLE temp_rpt_inp_pattern_value (LIKE SCHEMA_NAME.rpt_inp_pattern_value INCLUDING ALL);
-		CREATE TEMP TABLE temp_t_go2epa (LIKE SCHEMA_NAME.temp_go2epa INCLUDING ALL);
-		CREATE TEMP TABLE temp_t_rpt_cat_result (LIKE SCHEMA_NAME.rpt_cat_result INCLUDING ALL);
-
-		CREATE TEMP TABLE t_pgr_go2epa_arc (LIKE SCHEMA_NAME.temp_arc INCLUDING ALL);
-		CREATE TEMP TABLE t_pgr_go2epa_node (LIKE SCHEMA_NAME.temp_node INCLUDING ALL);
-
-		-- create query tables
-		EXECUTE 'SELECT gw_fct_create_querytables($${"data":{"parameters":{"fid":'||v_fid||', 
-				"epaCheck":true, "verifiedExceptions":false}}}$$::json)';
-		-- create log tables
-		EXECUTE 'SELECT gw_fct_create_logtables($${"data":{"parameters":{"fid":'||v_fid||'}}}$$::json)';
+		PERFORM gw_fct_manage_temp_tables('{"data":{"parameters":{"fid":227, "project_type":"WS", "action":"CREATE", "group":"EPAMAIN"}}}');
 
 		-- getting selectors
 		SELECT array_agg(expl_id) INTO v_expl_id FROM selector_expl WHERE expl_id > 0 AND cur_user = current_user;
@@ -211,8 +116,8 @@ BEGIN
 		INSERT INTO selector_inp_result (result_id, cur_user) VALUES (v_result, current_user);
 
 		-- save previous values to set hydrometer selector
-		DELETE FROM temp_table WHERE fid=435 AND cur_user=current_user;
-		INSERT INTO temp_table (fid, text_column)
+		DELETE FROM temp_t_table WHERE fid=435 AND cur_user=current_user;
+		INSERT INTO temp_t_table (fid, text_column)
 		SELECT 435, (array_agg(state_id)) FROM selector_hydrometer WHERE cur_user=current_user;
 
 		-- reset selector
@@ -355,7 +260,7 @@ BEGIN
 		PERFORM gw_fct_pg2epa_dscenario(v_result);
 
 		-- move patterns used
-		INSERT INTO temp_rpt_inp_pattern_value (result_id, pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8,
+		INSERT INTO t_rpt_inp_pattern_value (result_id, pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8,
 			factor_9, factor_10, factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18)
 		SELECT  v_result, pattern_id, factor_1, factor_2, factor_3, factor_4, factor_5, factor_6, factor_7, factor_8,
 			factor_9, factor_10, factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18
@@ -422,10 +327,10 @@ BEGIN
 		FROM temp_t_arc;
 
 		-- move result data
-		UPDATE rpt_cat_result r set network_stats = t.network_stats FROM temp_t_rpt_cat_result t WHERE r.result_id = t.result_id;
+		UPDATE rpt_cat_result r set network_stats = t.network_stats FROM t_rpt_cat_result t WHERE r.result_id = t.result_id;
 
 		-- move patterns data
-		INSERT INTO rpt_inp_pattern_value SELECT * FROM temp_rpt_inp_pattern_value;
+		INSERT INTO rpt_inp_pattern_value SELECT * FROM t_rpt_inp_pattern_value;
 
 		-- restore hydrometer selector
 		DELETE FROM selector_hydrometer WHERE cur_user = current_user;
@@ -433,15 +338,19 @@ BEGIN
 		select unnest(text_column::integer[]), current_user from temp_table where fid=435 and cur_user=current_user
 		ON CONFLICT (state_id, cur_user) DO NOTHING;
 
+		-- drop temp tables
+		PERFORM gw_fct_manage_temp_tables('{"data":{"parameters":{"fid":227, "project_type":"WS", "action":"DROP", "group":"EPAMAIN"}}}');
+
 		v_return = '{"status": "Accepted", "message":{"level":1, "text":"Export INP file 7/7 - Postprocess workflow...... done succesfully"}}'::json;
 		RETURN v_return;
 
 	END IF;
 
 	-- Exception handling
-	--EXCEPTION WHEN OTHERS THEN
-	--GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	--RETURN json_build_object('status', 'Failed', 'NOSQLERR', SQLERRM, 'message', json_build_object('level', right(SQLSTATE, 1), 'text', SQLERRM), 'SQLSTATE', SQLSTATE, 'SQLCONTEXT', v_error_context)::json;
+	EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	PERFORM gw_fct_manage_temp_tables('{"data":{"parameters":{"fid":227, "project_type":"WS", "action":"DROP", "group":"EPAMAIN"}}}');
+	RETURN json_build_object('status', 'Failed', 'NOSQLERR', SQLERRM, 'message', json_build_object('level', right(SQLSTATE, 1), 'text', SQLERRM), 'SQLSTATE', SQLSTATE, 'SQLCONTEXT', v_error_context)::json;
 
 END;
 $BODY$

@@ -6,8 +6,8 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: XXXX
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_temp_tables(json);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_temp_tables(p_data json)
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_manage_temp_tables(json);
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_manage_temp_tables(p_data json)
 RETURNS json AS
 $BODY$
 
@@ -16,22 +16,22 @@ $BODY$
  * PARAMETERS OPTIONS:
  * * fid: integer (mandatory)
  * * project_type: string -> 'WS' | 'UD' (mandatory)
- * * action: string -> 'CREATE' | 'RETURN' | 'DROP' (mandatory)
+ * * action: string -> 'CREATE' | 'DROP' (mandatory)
  * * verifiedExceptions: boolean (optional)
- * * group: string -> 'LOG' | 'ANL' | 'MAPZONES' | 'EPA' | 'OM' | 'ADMIN' | 'GRAPH' | 'PLAN' | 'EPAMAIN' | 'CHECKPROJECT' (mandatory)
+ * * group: string -> 'LOG' | 'ANL' | 'MAPZONES' | 'EPA' | 'OMCHECK' | 'ADMIN' | 'GRAPH' | 'PLAN' | 'EPAMAIN' | 'CHECKPROJECT' | 'GRAPHANALYTICSCHECK', 'USERCHECK' (mandatory)
  * * subGroup: string[] -> ['ALL' | 'DMA' | 'DQA' | 'PRESSZONE' | 'SECTOR' | 'DRAINZONE'] (optional)
 
  * EXAMPLE CALLS:
- * * SELECT SCHEMA_NAME.gw_fct_temp_tables('{"data":{"parameters":{"fid":XXX, "project_type":"UD", "action":"CREATE", "group":"LOG"}}}');
- * * SELECT SCHEMA_NAME.gw_fct_temp_tables('{"data":{"parameters":{"fid":XXX, "project_type":"UD", "action":"DROP", "group":"ADMIN"}}}');
+ * * SELECT SCHEMA_NAME.gw_fct_manage_temp_tables('{"data":{"parameters":{"fid":XXX, "project_type":"UD", "action":"CREATE", "group":"LOG"}}}');
+ * * SELECT SCHEMA_NAME.gw_fct_manage_temp_tables('{"data":{"parameters":{"fid":XXX, "project_type":"UD", "action":"DROP", "group":"ADMIN"}}}');
  * GROUPS THAT REQUIERE A SUBGROUP:
- * * SELECT SCHEMA_NAME.gw_fct_temp_tables('{"data":{"parameters":{"fid":XXX, "project_type":"UD", "action":"CREATE", "group":"MAPZONES", "subGroup":"DMA"}}}');
- * * SELECT SCHEMA_NAME.gw_fct_temp_tables('{"data":{"parameters":{"fid":XXX, "project_type":"WS", "action":"CREATE", "group":"MAPZONES", "subGroup":"DQA"}}}');
+ * * SELECT SCHEMA_NAME.gw_fct_manage_temp_tables('{"data":{"parameters":{"fid":XXX, "project_type":"UD", "action":"CREATE", "group":"MAPZONES", "subGroup":"DMA"}}}');
+ * * SELECT SCHEMA_NAME.gw_fct_manage_temp_tables('{"data":{"parameters":{"fid":XXX, "project_type":"WS", "action":"CREATE", "group":"MAPZONES", "subGroup":"DQA"}}}');
  * * WITH SUBGROUP 'ALL' (ONLY FOR MAPZONES):
- * * * SELECT SCHEMA_NAME.gw_fct_temp_tables('{"data":{"parameters":{"fid":XXX, "project_type":"WS", "action":"CREATE", "group":"MAPZONES", "subGroup":"ALL"}}}');
+ * * * SELECT SCHEMA_NAME.gw_fct_manage_temp_tables('{"data":{"parameters":{"fid":XXX, "project_type":"WS", "action":"CREATE", "group":"MAPZONES", "subGroup":"ALL"}}}');
  * GROUPS THAT CREATE A GROUP OF TABLES:
- * * SELECT SCHEMA_NAME.gw_fct_temp_tables('{"data":{"parameters":{"fid":XXX, "project_type":"UD", "action":"CREATE", "group":"CHECKPROJECT"}}}');
- * * SELECT SCHEMA_NAME.gw_fct_temp_tables('{"data":{"parameters":{"fid":XXX, "project_type":"UD", "action":"CREATE", "group":"EPAMAIN"}}}');
+ * * SELECT SCHEMA_NAME.gw_fct_manage_temp_tables('{"data":{"parameters":{"fid":XXX, "project_type":"UD", "action":"CREATE", "group":"CHECKPROJECT"}}}');
+ * * SELECT SCHEMA_NAME.gw_fct_manage_temp_tables('{"data":{"parameters":{"fid":XXX, "project_type":"UD", "action":"CREATE", "group":"EPAMAIN"}}}');
 
 */
 
@@ -96,7 +96,7 @@ BEGIN
     END IF;
 
     -- validate group
-    IF v_group NOT IN ('LOG', 'ANL', 'MAPZONES', 'EPA', 'OM', 'ADMIN', 'GRAPH', 'PLAN', 'EPAMAIN', 'CHECKPROJECT') THEN
+    IF v_group NOT IN ('LOG', 'ANL', 'MAPZONES', 'EPA', 'OMCHECK', 'ADMIN', 'GRAPH', 'PLAN', 'EPAMAIN', 'CHECKPROJECT', 'GRAPHANALYTICSCHECK', 'USERCHECK') THEN
         RETURN ('{"status":"Failed","message":{"level":1, "text":"group is invalid"}}')::json;
     END IF;
 
@@ -107,12 +107,17 @@ BEGIN
 
     -- test
     IF v_group = 'EPAMAIN' THEN
-        v_group_array = ARRAY['LOG', 'ANL', 'MAPZONES', 'EPA', 'OM', 'ADMIN', 'GRAPH', 'PLAN'];
+        v_group_array = ARRAY['LOG', 'ANL', 'MAPZONES', 'EPA', 'OMCHECK', 'ADMIN', 'GRAPH', 'PLAN'];
         IF v_project_type = 'WS' THEN
-            v_subGroup_array = ARRAY['DMA', 'DQA', 'PRESSZONE', 'SECTOR', 'DRAINZONE'];
+            v_subGroup_array = ARRAY['DMA', 'DQA', 'PRESSZONE', 'SECTOR'];
         ELSIF v_project_type = 'UD' THEN
             v_subGroup_array = ARRAY['DMA', 'DRAINZONE'];
         END IF;
+    ELSIF v_group = 'GRAPHANALYTICSCHECK' THEN
+        v_group_array = ARRAY['LOG', 'ANL', 'MAPZONES'];
+        v_subGroup_array = ARRAY['DMA', 'DQA', 'PRESSZONE', 'SECTOR'];
+    ELSIF v_group = 'USERCHECK' THEN
+        v_group_array = ARRAY['LOG', 'ANL'];
     ELSIF v_group = 'CHECKPROJECT' THEN
         v_group_array = ARRAY['LOG'];
     ELSE
@@ -169,67 +174,78 @@ BEGIN
         IF 'EPA' = ANY(v_group_array) THEN
             v_filter = concat(v_filter, ' AND sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user = current_user)');
 
-            -- Revise these definitions
-            CREATE TEMP TABLE t_vnode(
-                id serial NOT NULL,
-                l1 integer,
-                v1 integer,
-                l2 integer,
-                v2 integer,
-                CONSTRAINT t_vnode_pkey PRIMARY KEY (id)
-            );
+            IF v_project_type = 'WS' THEN
+                CREATE TEMP TABLE temp_vnode(
+                    id serial NOT NULL,
+                    l1 integer,
+                    v1 integer,
+                    l2 integer,
+                    v2 integer,
+                    CONSTRAINT temp_vnode_pkey PRIMARY KEY (id)
+                );
 
-            CREATE TEMP TABLE t_link(
-                link_id integer NOT NULL,
-                vnode_id integer,
-                vnode_type text,
-                feature_id character varying(16),
-                feature_type character varying(16),
-                exit_id character varying(16),
-                exit_type character varying(16),
-                state smallint,
-                expl_id integer,
-                sector_id integer,
-                dma_id integer,
-                exit_topelev double precision,
-                exit_elev double precision,
-                the_geom geometry(LineString,25831),
-                the_geom_endpoint geometry(Point,25831),
-                flag boolean,
-                CONSTRAINT t_link_pkey PRIMARY KEY (link_id)
-            );
+                CREATE TEMP TABLE temp_link(
+                    link_id integer NOT NULL,
+                    vnode_id integer,
+                    vnode_type text,
+                    feature_id character varying(16),
+                    feature_type character varying(16),
+                    exit_id character varying(16),
+                    exit_type character varying(16),
+                    state smallint,
+                    expl_id integer,
+                    sector_id integer,
+                    dma_id integer,
+                    exit_topelev double precision,
+                    exit_elev double precision,
+                    the_geom geometry(LineString,25831),
+                    the_geom_endpoint geometry(Point,25831),
+                    flag boolean,
+                    CONSTRAINT temp_link_pkey PRIMARY KEY (link_id)
+                );
 
-            CREATE TEMP TABLE t_link_x_arc(
-                link_id integer NOT NULL,
-                vnode_id integer,
-                arc_id character varying(16),
-                feature_type character varying(16),
-                feature_id character varying(16),
-                node_1 character varying(16),
-                node_2 character varying(16),
-                vnode_distfromnode1 numeric(12,3),
-                vnode_distfromnode2 numeric(12,3),
-                exit_topelev double precision,
-                exit_ymax numeric(12,3),
-                exit_elev numeric(12,3),
-                CONSTRAINT t_link_x_arc_pkey PRIMARY KEY (link_id)
-            );
+                CREATE TEMP TABLE temp_link_x_arc(
+                    link_id integer NOT NULL,
+                    vnode_id integer,
+                    arc_id character varying(16),
+                    feature_type character varying(16),
+                    feature_id character varying(16),
+                    node_1 character varying(16),
+                    node_2 character varying(16),
+                    vnode_distfromnode1 numeric(12,3),
+                    vnode_distfromnode2 numeric(12,3),
+                    exit_topelev double precision,
+                    exit_ymax numeric(12,3),
+                    exit_elev numeric(12,3),
+                    CONSTRAINT temp_link_x_arc_pkey PRIMARY KEY (link_id)
+                );
 
-            CREATE TEMP TABLE t_csv (LIKE temp_csv INCLUDING ALL);
-            CREATE TEMP TABLE t_table (LIKE temp_table INCLUDING ALL);
-            CREATE TEMP TABLE t_node (LIKE node INCLUDING ALL);
-            CREATE TEMP TABLE t_arc (LIKE arc INCLUDING ALL);
-            CREATE TEMP TABLE t_connec (LIKE connec INCLUDING ALL);
-            CREATE TEMP TABLE t_demand (LIKE demand INCLUDING ALL);
-            CREATE TEMP TABLE t_anlgraph (LIKE anlgraph INCLUDING ALL);
+                CREATE TEMP TABLE temp_t_demand (LIKE temp_demand INCLUDING ALL);
 
-            CREATE TEMP TABLE t_rpt_inp_pattern_value (LIKE rpt_inp_pattern_value INCLUDING ALL);
-            CREATE TEMP TABLE t_go2epa (LIKE temp_go2epa INCLUDING ALL);
-            CREATE TEMP TABLE t_rpt_cat_result (LIKE rpt_cat_result INCLUDING ALL);
+                CREATE TEMP TABLE temp_t_pgr_go2epa_arc (LIKE temp_arc INCLUDING ALL);
+                CREATE TEMP TABLE temp_t_pgr_go2epa_node (LIKE temp_node INCLUDING ALL);
 
-            CREATE TEMP TABLE t_pgr_go2epa_arc (LIKE arc INCLUDING ALL);
-            CREATE TEMP TABLE t_pgr_go2epa_node (LIKE node INCLUDING ALL);
+                CREATE TEMP TABLE t_rpt_inp_pattern_value (LIKE rpt_inp_pattern_value INCLUDING ALL);
+                CREATE TEMP TABLE t_rpt_cat_result (LIKE rpt_cat_result INCLUDING ALL);
 
+            ELSIF v_project_type = 'UD' THEN
+                CREATE TEMP TABLE temp_t_arc_flowregulator (LIKE temp_arc_flowregulator INCLUDING ALL);
+                CREATE TEMP TABLE temp_t_lid_usage (LIKE temp_lid_usage INCLUDING ALL);
+                CREATE TEMP TABLE temp_t_node_other (LIKE temp_node_other INCLUDING ALL);
+
+                CREATE TEMP TABLE temp_t_gully (LIKE temp_gully INCLUDING ALL);
+
+                CREATE TEMP TABLE t_rpt_inp_raingage (LIKE rpt_inp_raingage INCLUDING ALL);
+                CREATE TEMP TABLE t_rpt_inp_node (LIKE rpt_inp_node INCLUDING ALL);
+                CREATE TEMP TABLE t_rpt_inp_arc (LIKE rpt_inp_arc INCLUDING ALL);
+            END IF;
+
+            CREATE TEMP TABLE temp_t_csv (LIKE temp_csv INCLUDING ALL);
+            CREATE TEMP TABLE temp_t_table (LIKE temp_table INCLUDING ALL);
+            CREATE TEMP TABLE temp_t_node (LIKE temp_node INCLUDING ALL);
+            CREATE TEMP TABLE temp_t_arc (LIKE temp_arc INCLUDING ALL);
+            CREATE TEMP TABLE temp_t_anlgraph (LIKE temp_anlgraph INCLUDING ALL);
+            CREATE TEMP TABLE temp_t_go2epa (LIKE temp_go2epa INCLUDING ALL);
 
             EXECUTE 'CREATE TEMP TABLE t_inp_pump AS SELECT * FROM v_edit_inp_pump'||v_filter;
             IF v_project_type = 'WS' THEN
@@ -260,7 +276,7 @@ BEGIN
 		    END IF;
         END IF;
 
-        IF 'OM' = ANY(v_group_array) THEN
+        IF 'OMCHECK' = ANY(v_group_array) THEN
             EXECUTE 'CREATE TEMP TABLE t_arc AS SELECT * FROM v_edit_arc'||v_filter;
             EXECUTE 'CREATE TEMP TABLE t_node AS SELECT * FROM v_edit_node'||v_filter;
             EXECUTE 'CREATE TEMP TABLE t_connec AS SELECT * FROM v_edit_connec'||v_filter;
@@ -271,24 +287,12 @@ BEGIN
                 EXECUTE 'CREATE TEMP TABLE t_gully AS SELECT * FROM v_edit_gully'||v_filter;
             END IF;
         END IF;
-
-        IF 'ADMIN' = ANY(v_group_array) THEN
-            -- TODO: add admin tables
-        END IF;
-
-        IF 'GRAPH' = ANY(v_group_array) THEN
-            -- TODO: add graph tables
-        END IF;
-
-        IF 'PLAN' = ANY(v_group_array) THEN
-            -- TODO: add plan tables
-        END IF;
-
         -- return message:: 'Log tables created' or 'Anl tables created' ...
         RETURN '{"status":"Accepted", "message":"'||UPPER(LEFT(v_group,1))||LOWER(SUBSTRING(v_group,2))||' tables created"}';
     ELSIF v_action = 'DROP' THEN
         DROP TABLE IF EXISTS t_audit_check_data;
         DROP TABLE IF EXISTS t_audit_check_project;
+        DROP TABLE IF EXISTS t_audit_log_data;
 
         DROP TABLE IF EXISTS t_anl_node;
         DROP TABLE IF EXISTS t_anl_arc;
@@ -300,6 +304,29 @@ BEGIN
         DROP TABLE IF EXISTS t_presszone;
         DROP TABLE IF EXISTS t_sector;
         DROP TABLE IF EXISTS t_drainzone;
+
+        DROP TABLE IF EXISTS temp_vnode;
+        DROP TABLE IF EXISTS temp_link;
+        DROP TABLE IF EXISTS temp_link_x_arc;
+        DROP TABLE IF EXISTS temp_t_csv;
+        DROP TABLE IF EXISTS temp_t_table;
+        DROP TABLE IF EXISTS temp_t_node;
+        DROP TABLE IF EXISTS temp_t_arc;
+        DROP TABLE IF EXISTS temp_t_gully;
+        DROP TABLE IF EXISTS temp_t_demand;
+        DROP TABLE IF EXISTS temp_t_anlgraph;
+        DROP TABLE IF EXISTS temp_t_go2epa;
+        DROP TABLE IF EXISTS temp_t_pgr_go2epa_arc;
+        DROP TABLE IF EXISTS temp_t_pgr_go2epa_node;
+        DROP TABLE IF EXISTS temp_t_arc_flowregulator;
+        DROP TABLE IF EXISTS temp_t_lid_usage;
+        DROP TABLE IF EXISTS temp_t_node_other;
+
+        DROP TABLE IF EXISTS t_rpt_inp_pattern_value;
+        DROP TABLE IF EXISTS t_rpt_inp_raingage;
+        DROP TABLE IF EXISTS t_rpt_inp_node;
+        DROP TABLE IF EXISTS t_rpt_inp_arc;
+        DROP TABLE IF EXISTS t_rpt_cat_result;
 
         DROP TABLE IF EXISTS t_inp_pump;
         DROP TABLE IF EXISTS t_inp_pipe;
@@ -337,8 +364,6 @@ BEGIN
         -- TODO: add graph tables
 
         -- TODO: add plan tables
-    ELSIF v_action = 'RETURN' THEN
-        -- TODO: add return tables
     END IF;
 
     RETURN ('{"status":"Failed","message":{"level":1, "text":"Something went wrong"}}')::json;

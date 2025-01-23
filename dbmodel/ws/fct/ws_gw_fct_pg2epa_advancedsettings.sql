@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2798
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_pg2epa_advancedsettings(p_result text)
-RETURNS integer 
+RETURNS integer
 AS $BODY$
 
 /*example
@@ -32,8 +32,8 @@ BEGIN
 	SELECT ((value::json->>'parameters')::json->>'reservoir')::json INTO v_reservoir FROM config_param_user WHERE parameter = 'inp_options_advancedsettings' AND cur_user=current_user;
 	SELECT ((value::json->>'parameters')::json->>'tank')::json INTO v_tank FROM config_param_user WHERE parameter = 'inp_options_advancedsettings' AND cur_user=current_user;
 	SELECT ((value::json->>'parameters')::json->>'pump')::json INTO v_pump FROM config_param_user WHERE parameter = 'inp_options_advancedsettings' AND cur_user=current_user;
-	SELECT value INTO v_headloss FROM config_param_user WHERE parameter = 'inp_options_headloss' AND cur_user=current_user;	
-	SELECT ((value::json->>'junction')::json)->>'baseDemand' INTO v_basedemand FROM config_param_user WHERE parameter = 'inp_options_advancedsettings' AND cur_user=current_user;	
+	SELECT value INTO v_headloss FROM config_param_user WHERE parameter = 'inp_options_headloss' AND cur_user=current_user;
+	SELECT ((value::json->>'junction')::json)->>'baseDemand' INTO v_basedemand FROM config_param_user WHERE parameter = 'inp_options_advancedsettings' AND cur_user=current_user;
 
 	-- update values for valves
 	RAISE NOTICE 'v_valve %',v_valve;
@@ -41,7 +41,7 @@ BEGIN
 	UPDATE temp_arc SET roughness = ((v_valve->>'roughness')::json->>v_headloss)::float	WHERE epa_type='VALVE' AND (roughness = 0 OR roughness is null);
 	UPDATE temp_arc SET length = (v_valve->>'length')::float WHERE epa_type='VALVE';
 	UPDATE temp_arc SET diameter = (v_valve->>'diameter')::float WHERE epa_type='VALVE' AND (diameter = 0 OR diameter is null);
-	
+
 	-- update values for reservoirs
 	UPDATE temp_node SET elevation = elevation + (v_reservoir->>'addElevation')::float WHERE epa_type='RESERVOIR';
 
@@ -49,13 +49,13 @@ BEGIN
 	UPDATE temp_node SET elevation = elevation + (v_tank->>'addElevation')::float WHERE epa_type='TANK';
 
 	-- update values for pumps
-	UPDATE temp_arc SET length = (v_pump->>'length')::float, diameter = (v_pump ->>'diameter')::float, roughness = ((v_pump->>'roughness')::json->>v_headloss)::float 
+	UPDATE temp_arc SET length = (v_pump->>'length')::float, diameter = (v_pump ->>'diameter')::float, roughness = ((v_pump->>'roughness')::json->>v_headloss)::float
 	WHERE epa_type='PUMP';
 
 	IF v_basedemand IS NOT NULL THEN
 		UPDATE temp_node SET demand = demand + v_basedemand WHERE epa_type  = 'JUNCTION';
 	END IF;
-		
+
     RETURN 1;
 
 END;
