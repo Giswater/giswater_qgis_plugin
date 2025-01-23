@@ -130,6 +130,7 @@ class GwImportInpTask(GwTask):
         municipality,
         dscenario,
         catalogs,
+        force_commit: bool = False,
     ) -> None:
         super().__init__(description)
         self.filepath = filepath
@@ -141,6 +142,7 @@ class GwImportInpTask(GwTask):
         self.dscenario: str = dscenario
         self.dscenario_id: int = None
         self.catalogs: dict[str, Any] = catalogs
+        self.force_commit: bool = force_commit
         self.log: list[str] = []
         self.mappings: dict[str, dict[str, str]] = {"curves": {}, "patterns": {}}
         self.arccat_db: list[str] = []
@@ -192,7 +194,7 @@ class GwImportInpTask(GwTask):
         self._create_new_node_catalogs()
 
         # Get existing catalogs in DB
-        cat_arc_ids = get_rows("SELECT id FROM cat_arc", commit=False)
+        cat_arc_ids = get_rows("SELECT id FROM cat_arc", commit=self.force_commit)
         if cat_arc_ids:
             self.arccat_db += [x[0] for x in cat_arc_ids]
 
@@ -344,7 +346,7 @@ class GwImportInpTask(GwTask):
         print(update_params)
 
         # Execute batch update
-        toolsdb_execute_values(sql, update_params, template, fetch=False, commit=False)
+        toolsdb_execute_values(sql, update_params, template, fetch=False, commit=self.force_commit)
 
     def _create_workcat_id(self):
         sql = """
@@ -357,7 +359,7 @@ class GwImportInpTask(GwTask):
         execute_sql(
             sql,
             (self.workcat, description, builtdate),
-            commit=False,
+            commit=self.force_commit,
         )
 
     def _create_demand_dscenario(self):
@@ -370,7 +372,7 @@ class GwImportInpTask(GwTask):
         extras += f'"expl": "{self.exploitation}"'
         extras += '}'
         body = tools_gw.create_body(extras=extras)
-        json_result = tools_gw.execute_procedure('gw_fct_create_dscenario_empty', body, commit=False, is_thread=True)
+        json_result = tools_gw.execute_procedure('gw_fct_create_dscenario_empty', body, commit=self.force_commit, is_thread=True)
         if not json_result or json_result.get('status') != 'Accepted':
             message = "Error executing gw_fct_create_dscenario_empty"
             raise ValueError(message)
@@ -381,7 +383,7 @@ class GwImportInpTask(GwTask):
             raise ValueError(message)
 
     def _create_new_node_catalogs(self):
-        cat_node_ids = get_rows("SELECT id FROM cat_node", commit=False)
+        cat_node_ids = get_rows("SELECT id FROM cat_node", commit=self.force_commit)
         nodecat_db: list[str] = []
         if cat_node_ids:
             nodecat_db = [x[0] for x in cat_node_ids]
@@ -404,7 +406,7 @@ class GwImportInpTask(GwTask):
             execute_sql(
                 sql,
                 (self.catalogs[node_type], nodetype_id),
-                commit=False,
+                commit=self.force_commit,
             )
             nodecat_db.append(self.catalogs[node_type])
 
@@ -431,7 +433,7 @@ class GwImportInpTask(GwTask):
                     WHERE id = 'UNKNOWN'
                 );
                 """,
-                commit=False,
+                commit=self.force_commit,
             )
 
             sql = """
@@ -440,7 +442,7 @@ class GwImportInpTask(GwTask):
             """
             _id = self.catalogs[varc_type]
             arctype_id = self.catalogs["features"][varc_type]
-            execute_sql(sql, (_id, arctype_id), commit=False)
+            execute_sql(sql, (_id, arctype_id), commit=self.force_commit)
             self.arccat_db.append(_id)
 
     def _create_new_pipe_catalogs(self):
@@ -459,12 +461,12 @@ class GwImportInpTask(GwTask):
                     VALUES (%s, %s, %s, %s);
                 """
                 execute_sql(
-                    sql, (catalog, arctype_id, material, pipe_dint), commit=False
+                    sql, (catalog, arctype_id, material, pipe_dint), commit=self.force_commit
                 )
                 self.arccat_db.append(catalog)
 
     def _save_patterns(self):
-        pattern_rows = get_rows("SELECT pattern_id FROM inp_pattern", commit=False)
+        pattern_rows = get_rows("SELECT pattern_id FROM inp_pattern", commit=self.force_commit)
         patterns_db: list[str] = []
         if pattern_rows:
             patterns_db = [x[0] for x in pattern_rows]
@@ -484,7 +486,7 @@ class GwImportInpTask(GwTask):
             execute_sql(
                 "INSERT INTO inp_pattern (pattern_id) VALUES (%s)",
                 (pattern_name,),
-                commit=False,
+                commit=self.force_commit,
             )
 
             sql = (
@@ -496,10 +498,10 @@ class GwImportInpTask(GwTask):
                 while len(b) < 12:
                     b: tuple[Any] = b + (None,)
                 values = (pattern_name,) + b
-                execute_sql(sql, values, commit=False)
+                execute_sql(sql, values, commit=self.force_commit)
 
     def _save_curves(self) -> None:
-        curve_rows = get_rows("SELECT id FROM inp_curve", commit=False)
+        curve_rows = get_rows("SELECT id FROM inp_curve", commit=self.force_commit)
         curves_db: set[str] = set()
         if curve_rows:
             curves_db = {x[0] for x in curve_rows}
@@ -526,7 +528,7 @@ class GwImportInpTask(GwTask):
             execute_sql(
                 "INSERT INTO inp_curve (id, curve_type) VALUES (%s, %s)",
                 (curve_name, curve_type),
-                commit=False,
+                commit=self.force_commit,
             )
 
             for x, y in curve.points:
@@ -535,18 +537,18 @@ class GwImportInpTask(GwTask):
                 execute_sql(
                     "INSERT INTO inp_curve_value (curve_id, x_value, y_value) VALUES (%s, %s, %s)",
                     (curve_name, x, y),
-                    commit=False,
+                    commit=self.force_commit,
                 )
 
     def _save_controls_and_rules(self) -> None:
         from wntr.network.controls import Control, Rule
 
-        controls_rows = get_rows("SELECT text FROM inp_controls", commit=False)
+        controls_rows = get_rows("SELECT text FROM inp_controls", commit=self.force_commit)
         controls_db: set[str] = set()
         if controls_rows:
             controls_db = {x[0] for x in controls_rows}
 
-        rules_rows = get_rows("SELECT text FROM inp_rules", commit=False)
+        rules_rows = get_rows("SELECT text FROM inp_rules", commit=self.force_commit)
         rules_db: set[str] = set()
         if rules_rows:
             rules_db = {x[0] for x in rules_rows}
@@ -566,7 +568,7 @@ class GwImportInpTask(GwTask):
 
                 sql = "INSERT INTO inp_controls (sector_id, text, active) VALUES (%s, %s, true)"
                 params = (self.sector, text)
-                execute_sql(sql, params, commit=False)
+                execute_sql(sql, params, commit=self.force_commit)
             elif type(control) is Rule:
                 text = f"RULE {control.name}\nIF {condition}\nTHEN {'\nAND '.join(then_actions)}"
                 if else_actions:
@@ -579,7 +581,7 @@ class GwImportInpTask(GwTask):
 
                 sql = "INSERT INTO inp_rules (sector_id, text, active) VALUES (%s, %s, true)"
                 params = (self.sector, text)
-                execute_sql(sql, params, commit=False)
+                execute_sql(sql, params, commit=self.force_commit)
 
 
     def _save_junctions(self) -> None:
@@ -676,7 +678,7 @@ class GwImportInpTask(GwTask):
 
         # Insert into parent table
         junctions = toolsdb_execute_values(
-            node_sql, node_params, node_template, fetch=True, commit=False
+            node_sql, node_params, node_template, fetch=True, commit=self.force_commit
         )
         print(junctions)
         if not junctions:
@@ -712,15 +714,15 @@ class GwImportInpTask(GwTask):
 
         # Insert into inp table
         toolsdb_execute_values(
-            inp_sql, inp_params, inp_template, fetch=False, commit=False
+            inp_sql, inp_params, inp_template, fetch=False, commit=self.force_commit
         )
         # Insert into man table
         toolsdb_execute_values(
-            man_sql, man_params, man_template, fetch=False, commit=False
+            man_sql, man_params, man_template, fetch=False, commit=self.force_commit
         )
         # Insert demands into dscenario table
         toolsdb_execute_values(
-            demands_sql, demands_params, demands_template, fetch=False, commit=False
+            demands_sql, demands_params, demands_template, fetch=False, commit=self.force_commit
         )
 
 
@@ -793,7 +795,7 @@ class GwImportInpTask(GwTask):
 
         # Insert into parent table
         reservoirs = toolsdb_execute_values(
-            node_sql, node_params, node_template, fetch=True, commit=False
+            node_sql, node_params, node_template, fetch=True, commit=self.force_commit
         )
         print(reservoirs)
         if not reservoirs:
@@ -820,11 +822,11 @@ class GwImportInpTask(GwTask):
 
         # Insert into inp table
         toolsdb_execute_values(
-            inp_sql, inp_params, inp_template, fetch=False, commit=False
+            inp_sql, inp_params, inp_template, fetch=False, commit=self.force_commit
         )
         # Insert into man table
         toolsdb_execute_values(
-            man_sql, man_params, man_template, fetch=False, commit=False
+            man_sql, man_params, man_template, fetch=False, commit=self.force_commit
         )
 
     def _save_tanks(self) -> None:
@@ -906,7 +908,7 @@ class GwImportInpTask(GwTask):
 
         # Insert into parent table
         tanks = toolsdb_execute_values(
-            node_sql, node_params, node_template, fetch=True, commit=False
+            node_sql, node_params, node_template, fetch=True, commit=self.force_commit
         )
         print(tanks)
         if not tanks:
@@ -935,11 +937,11 @@ class GwImportInpTask(GwTask):
 
         # Insert into inp table
         toolsdb_execute_values(
-            inp_sql, inp_params, inp_template, fetch=False, commit=False
+            inp_sql, inp_params, inp_template, fetch=False, commit=self.force_commit
         )
         # Insert into man table
         toolsdb_execute_values(
-            man_sql, man_params, man_template, fetch=False, commit=False
+            man_sql, man_params, man_template, fetch=False, commit=self.force_commit
         )
 
     def _save_pumps(self) -> None:
@@ -1029,7 +1031,7 @@ class GwImportInpTask(GwTask):
 
         # Insert into parent table
         pumps = toolsdb_execute_values(
-            arc_sql, arc_params, arc_template, fetch=True, commit=False
+            arc_sql, arc_params, arc_template, fetch=True, commit=self.force_commit
         )
         print(pumps)
         if not pumps:
@@ -1055,11 +1057,11 @@ class GwImportInpTask(GwTask):
 
         # Insert into inp table
         toolsdb_execute_values(
-            inp_sql, inp_params, inp_template, fetch=False, commit=False
+            inp_sql, inp_params, inp_template, fetch=False, commit=self.force_commit
         )
         # Insert into man table
         toolsdb_execute_values(
-            man_sql, man_params, man_template, fetch=False, commit=False
+            man_sql, man_params, man_template, fetch=False, commit=self.force_commit
         )
 
     def _save_valves(self) -> None:
@@ -1156,7 +1158,7 @@ class GwImportInpTask(GwTask):
 
         # Insert into parent table
         valves = toolsdb_execute_values(
-            arc_sql, arc_params, arc_template, fetch=True, commit=False
+            arc_sql, arc_params, arc_template, fetch=True, commit=self.force_commit
         )
         print(valves)
         if not valves:
@@ -1183,11 +1185,11 @@ class GwImportInpTask(GwTask):
 
         # Insert into inp table
         toolsdb_execute_values(
-            inp_sql, inp_params, inp_template, fetch=False, commit=False
+            inp_sql, inp_params, inp_template, fetch=False, commit=self.force_commit
         )
         # Insert into man table
         toolsdb_execute_values(
-            man_sql, man_params, man_template, fetch=False, commit=False
+            man_sql, man_params, man_template, fetch=False, commit=self.force_commit
         )
 
     def _save_pipes(self) -> None:
@@ -1271,7 +1273,7 @@ class GwImportInpTask(GwTask):
 
         # Insert into parent table
         pipes = toolsdb_execute_values(
-            arc_sql, arc_params, arc_template, fetch=True, commit=False
+            arc_sql, arc_params, arc_template, fetch=True, commit=self.force_commit
         )
         print(pipes)
         if not pipes:
@@ -1298,11 +1300,11 @@ class GwImportInpTask(GwTask):
 
         # Insert into inp table
         toolsdb_execute_values(
-            inp_sql, inp_params, inp_template, fetch=False, commit=False
+            inp_sql, inp_params, inp_template, fetch=False, commit=self.force_commit
         )
         # Insert into man table
         toolsdb_execute_values(
-            man_sql, man_params, man_template, fetch=False, commit=False
+            man_sql, man_params, man_template, fetch=False, commit=self.force_commit
         )
 
     def _save_sources(self):

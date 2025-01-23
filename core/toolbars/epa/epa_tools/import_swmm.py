@@ -317,6 +317,11 @@ class GwImportSwmm:
             tools_qt.set_widget_visible(self.dlg_config, 'txt_raingage', False)
 
     def _importinp_accept(self):
+        # Manage force commit mode
+        force_commit = tools_qt.is_checked(self.dlg_config, "chk_force_commit")
+        if force_commit is None:
+            force_commit = False
+
         if TESTING_MODE:
 
             # Delete the network before importing
@@ -359,7 +364,7 @@ class GwImportSwmm:
                 "INSERT INTO sector (sector_id, name, macrosector_id, descript, active) VALUES (1, 'sector_1_import_inp_test', 0, 'Created by import inp in TESTING MODE', true);"
             ]
             for sql in queries:
-                result = tools_db.execute_sql(sql, commit=False)
+                result = tools_db.execute_sql(sql, commit=force_commit)
                 if not result:
                     return
 
@@ -427,6 +432,7 @@ class GwImportSwmm:
                 municipality,
                 raingage,
                 catalogs,
+                force_commit=force_commit
             )
 
             # Create timer
@@ -543,6 +549,7 @@ class GwImportSwmm:
             municipality,
             raingage,
             catalogs,
+            force_commit=force_commit
         )
 
         # Create timer

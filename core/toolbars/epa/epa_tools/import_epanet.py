@@ -283,6 +283,11 @@ class GwImportEpanet:
             tools_gw.set_tabs_enabled(self.dlg_config, hide_btn_accept=False, change_btn_cancel=False)
 
     def _importinp_accept(self):
+        # Manage force commit mode
+        force_commit = tools_qt.is_checked(self.dlg_config, "chk_force_commit")
+        if force_commit is None:
+            force_commit = False
+
         self.dlg_config.mainTab.setCurrentIndex(self.dlg_config.mainTab.count()-1)
         if TESTING_MODE:
 
@@ -321,7 +326,7 @@ class GwImportEpanet:
                 "INSERT INTO sector (sector_id, name, muni_id, expl_id, macrosector_id, descript, active) VALUES (1, 'sector_1_import_inp_test', '{1}'::int[], '{1}'::int[], 0, 'Created by import inp in TESTING MODE', true);"
             ]
             for sql in queries:
-                result = tools_db.execute_sql(sql, commit=False)
+                result = tools_db.execute_sql(sql, commit=force_commit)
                 if not result:
                     return
 
@@ -353,6 +358,7 @@ class GwImportEpanet:
                 municipality,
                 dscenario,
                 catalogs,
+                force_commit=force_commit
             )
 
             # Create timer
@@ -466,6 +472,7 @@ class GwImportEpanet:
             municipality,
             dscenario,
             catalogs,
+            force_commit=force_commit,
         )
 
         # Create timer
