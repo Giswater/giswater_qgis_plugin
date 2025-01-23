@@ -134,7 +134,7 @@ BEGIN
 				INSERT INTO cat_material (id, feature_type)
 				SELECT DISTINCT (csv6), '{ARC}'::text[]
 				FROM temp_csv
-				AND fid=409
+				WHERE fid=409
 				ON CONFLICT (id) DO UPDATE SET feature_type = array_append(cat_material.feature_type, 'ARC');
 
 				INSERT INTO cat_arc(id, shape, geom1, geom2)

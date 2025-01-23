@@ -135,7 +135,7 @@ BEGIN
 		head_max = EXCLUDED.head_max, head_min = EXCLUDED.head_min, head_avg = EXCLUDED.head_avg,
 		quality_max = EXCLUDED.quality_max, quality_min = EXCLUDED.quality_min, quality_avg=EXCLUDED.quality_avg, result_id=EXCLUDED.result_id;
 
-		INSERT INTO arc_add (arc_id, flow_max, flow_min, flow_avg, vel_max, vel_min, vel_avg, tot_headloss_max, tot_headloss_min result_id)
+		INSERT INTO arc_add (arc_id, flow_max, flow_min, flow_avg, vel_max, vel_min, vel_avg, tot_headloss_max, tot_headloss_min, result_id)
 		SELECT arc_id, avg(flow_max)::numeric(12,2), avg(flow_min)::numeric(12,2), avg(flow_avg)::numeric(12,2), avg(vel_max)::numeric(12,2), avg(vel_min)::numeric(12,2), avg(vel_avg)::numeric(12,2), avg(tot_headloss_max)::numeric(12,2), avg(tot_headloss_min)::numeric(12,2), result_id FROM
 		(SELECT split_part(arc_id, 'P',1) as arc_id, flow_max, flow_min, flow_avg, vel_max, vel_min, vel_avg, tot_headloss_max, tot_headloss_min, result_id FROM v_rpt_arc a WHERE result_id=v_result_id)a
 		GROUP by arc_id, result_id

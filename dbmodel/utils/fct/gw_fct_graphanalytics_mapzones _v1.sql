@@ -532,7 +532,6 @@ BEGIN
 				END IF;
 
 				-- TODO: update mapzone geometry
-			END IF;
 		END IF;
 	END IF;
 
