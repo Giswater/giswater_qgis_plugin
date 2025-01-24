@@ -79,7 +79,7 @@ jobs:
       # Use the secret password here
       - name: Set postgres password
         run: |
-          sudo -u postgres psql -c "ALTER USER postgres PASSWORD '${{ secrets.POSTGRES_PASSWORD }}';"
+          sudo -u postgres psql -c "ALTER USER postgres PASSWORD 'postgres';"
 
       - name: Create PostgreSQL Database
         run: |
