@@ -9,12 +9,20 @@ on:
 jobs:
   ci_test_ws_db:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        pg_version: [16, 17]
+
     env:
-      PGPASSWORD: postgres
+      PGPASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
+
+      - name: Show which PG version we're testing
+        run: echo "Testing on PostgreSQL version ${{ matrix.pg_version }}"
 
       - name: Set up Python
         uses: actions/setup-python@v2
@@ -31,27 +39,58 @@ jobs:
           sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
           wget -qO - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
 
-      - name: Update apt-get and Install PostgreSQL, PostGIS, pgRouting, and pgTAP
+      - name: Update apt-get & install PostgreSQL
         run: |
           sudo apt-get update
-          sudo apt-get install -y postgresql-17 postgresql-17-postgis-3 postgresql-17-pgrouting postgresql-17-pgtap postgis
+          sudo apt-get install -y \
+            postgresql-${{ matrix.pg_version }} \
+            postgresql-${{ matrix.pg_version }}-postgis-3 \
+            postgresql-${{ matrix.pg_version }}-pgrouting \
+            postgresql-${{ matrix.pg_version }}-pgtap \
+            postgis
 
-      - name: Start PostgreSQL service
+      - name: Remove default Postgres clusters
         run: |
-          sudo service postgresql start
-          sudo -u postgres psql -c "ALTER USER postgres PASSWORD 'postgres';"
+          for cluster in $(pg_lsclusters --no-header | awk '{print $1 ":" $2}'); do
+            ver=$(echo $cluster | cut -d':' -f1)
+            name=$(echo $cluster | cut -d':' -f2)
+            sudo pg_dropcluster --stop $ver $name || true
+          done
+
+      - name: Create & start PG cluster
+        run: |
+          # Choose a port based on matrix.pg_version
+          if [ "${{ matrix.pg_version }}" = "16" ]; then
+            PORT=55432
+          else
+            PORT=55433
+          fi
+
+          sudo pg_createcluster ${{ matrix.pg_version }} main --port=$PORT
+          sudo pg_ctlcluster ${{ matrix.pg_version }} main start
+
+          # Make the port visible to subsequent steps
+          echo "PORT=$PORT" >> $GITHUB_ENV
+
+      - name: Show running clusters
+        run: sudo pg_lsclusters
+
+      # Use the secret password here
+      - name: Set postgres password
+        run: |
+          sudo -u postgres psql -c "ALTER USER postgres PASSWORD '${{ secrets.POSTGRES_PASSWORD }}';"
 
       - name: Create PostgreSQL Database
         run: |
-          psql -h localhost -U postgres -c 'CREATE DATABASE gw_db;'
+          psql -h localhost -p ${{ env.PORT }} -U postgres -c "CREATE DATABASE gw_db;"
 
       - name: Setup PostgreSQL extensions
         run: |
-          psql -h localhost -U postgres -d gw_db -c 'CREATE EXTENSION postgis;'
-          psql -h localhost -U postgres -d gw_db -c 'CREATE EXTENSION pgrouting;'
-          psql -h localhost -U postgres -d gw_db -c 'CREATE EXTENSION postgis_raster;'
-          psql -h localhost -U postgres -d gw_db -c 'CREATE EXTENSION postgis_topology;'
-          psql -h localhost -U postgres -d gw_db -c 'CREATE EXTENSION pgtap;'
+          psql -h localhost -p ${{ env.PORT }} -U postgres -d gw_db -c 'CREATE EXTENSION postgis;'
+          psql -h localhost -p ${{ env.PORT }} -U postgres -d gw_db -c 'CREATE EXTENSION pgrouting;'
+          psql -h localhost -p ${{ env.PORT }} -U postgres -d gw_db -c 'CREATE EXTENSION postgis_raster;'
+          psql -h localhost -p ${{ env.PORT }} -U postgres -d gw_db -c 'CREATE EXTENSION postgis_topology;'
+          psql -h localhost -p ${{ env.PORT }} -U postgres -d gw_db -c 'CREATE EXTENSION pgtap;'
 
       - name: Replace variables in SQL files
         run: python test/replace_vars.py ws
@@ -59,14 +98,17 @@ jobs:
       - name: Create Sample Schema
         run: python test/execute_sql_files.py ws
 
-      - name: Run SQL Tests with pgTAP and pg_prove (PL/SQL)
+      - name: Run all SQL tests in sequence
         run: |
-          pg_prove -h localhost -U postgres -d gw_db test/plsql/ws/*.sql
+          EXIT_CODE=0
 
-      - name: Run SQL Tests with pgTAP and pg_prove (UPSERT)
-        run: |
-          pg_prove -h localhost -U postgres -d gw_db test/upsert/ws/*.sql
+          echo "Running PL/SQL tests..."
+          pg_prove -h localhost -p ${{ env.PORT }} -U postgres -d gw_db test/plsql/ws/*.sql || EXIT_CODE=1
 
-      - name: Run SQL Tests with pgTAP and pg_prove (STRUCTURE)
-        run: |
-          pg_prove -h localhost -U postgres -d gw_db test/structure/ws/*.sql
+          echo "Running UPSERT tests..."
+          pg_prove -h localhost -p ${{ env.PORT }} -U postgres -d gw_db test/upsert/ws/*.sql || EXIT_CODE=1
+
+          echo "Running STRUCTURE tests..."
+          pg_prove -h localhost -p ${{ env.PORT }} -U postgres -d gw_db test/structure/ws/*.sql || EXIT_CODE=1
+
+          exit $EXIT_CODE

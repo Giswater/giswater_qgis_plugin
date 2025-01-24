@@ -12,11 +12,12 @@ from typing import Optional, Any, List, Dict
 from custom_logger import logger
 
 
-def connect_to_db(password: str = 'postgres') -> connection:
+def connect_to_db(password: str = 'postgres', port: int = 55432) -> connection:
     """
     Connects to the PostgreSQL database using provided credentials.
 
     :param password: The password for the PostgreSQL user.
+    :param port: The port for the PostgreSQL connection.
     :return: A connection object to the PostgreSQL database.
     """
     db_params = {
@@ -24,7 +25,7 @@ def connect_to_db(password: str = 'postgres') -> connection:
         'user': 'postgres',
         'password': password,
         'host': 'localhost',
-        'port': 5432
+        'port': port
     }
 
     conn = psycopg2.connect(**db_params)

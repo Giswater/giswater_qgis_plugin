@@ -14,7 +14,7 @@ from custom_logger import logger
 def main(project_type: str) -> None:
     logger.info(f"Project type: {project_type}")
 
-    conn = connect_to_db(os.getenv('PGPASSWORD', 'postgres'))
+    conn = connect_to_db(os.getenv('PGPASSWORD', 'postgres'), int(os.getenv('PORT', 55432)))
 
     # Define the root directories to process
     root_directories = ["utils/ddl", f"{project_type}/schema_model", "utils/fct", "utils/ftrg", f"{project_type}/fct", f"{project_type}/ftrg"]
