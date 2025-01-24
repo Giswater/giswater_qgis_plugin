@@ -918,3 +918,4 @@ UPDATE config_form_fields SET layoutname='lyt_data_1', layoutorder=7 WHERE formn
 UPDATE config_form_fields SET layoutname='lyt_data_1', layoutorder=8 WHERE formname='v_ui_drainzone' AND formtype='form_feature' AND columnname='stylesheet' AND tabname='tab_none';
 UPDATE config_form_fields SET layoutname='lyt_data_1', layoutorder=9 WHERE formname='v_ui_drainzone' AND formtype='form_feature' AND columnname='link' AND tabname='tab_none';
 
+UPDATE config_form_fields SET layoutname='lyt_workspace_open_1', layoutorder= 1, stylesheet= NULL WHERE formtype='workspace_open' AND columnname = 'descript';

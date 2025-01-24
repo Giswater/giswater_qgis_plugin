@@ -721,3 +721,4 @@ UPDATE config_form_fields SET layoutname='lyt_data_1', layoutorder=12 WHERE form
 UPDATE config_form_fields SET layoutname='lyt_data_1', layoutorder=13 WHERE formname='v_ui_dma' AND formtype='form_feature' AND columnname='graphconfig' AND tabname='tab_none';
 UPDATE config_form_fields SET layoutname='lyt_data_1', layoutorder=14 WHERE formname='v_ui_dma' AND formtype='form_feature' AND columnname='stylesheet' AND tabname='tab_none';
 
+UPDATE config_form_fields SET layoutname='lyt_workspace_open_1', layoutorder= 1, stylesheet= NULL WHERE formtype='workspace_open' AND columnname = 'descript';
