@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
--- FUNCTION CODE: 3372
+-- FUNCTION CODE: 3376
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getwidgets_checkproject(p_data json)
  RETURNS json
@@ -17,7 +17,7 @@ SELECT SCHEMA_NAME.gw_fct_getrolewidgets($${"client":{"device":4, "infoType":1, 
 
 */
 
-DECLARE 
+DECLARE
 v_version TEXT;
 v_role TEXT;
 v_widget_verified TEXT;
@@ -52,23 +52,23 @@ BEGIN
 	v_widget_epa = '{"widgetname":"epaCheck", "label":"Check EPA data:", "widgettype":"check","datatype":"boolean","layoutname":"grl_option_parameters","layoutorder":"3", "value":""}';
 	v_widget_plan = '{"widgetname":"planCheck", "label":"Check plan data:", "widgettype":"check","datatype":"boolean","layoutname":"grl_option_parameters","layoutorder":"4", "value":""}';
 	v_widget_admin = '{"widgetname":"adminCheck", "label":"Check admin data:", "widgettype":"check","datatype":"boolean","layoutname":"grl_option_parameters","layoutorder":"5", "value":""}';
-	
+
 	IF v_role in ('role_basic', 'role_edit', 'role_om') THEN
-	
+
 		v_return_widgets = concat(v_widget_om);
-	
+
 	ELSIF v_role = 'role_epa' THEN
-	
+
 		v_return_widgets = concat(v_widget_om, ',', v_widget_epa);
-	
+
 	ELSIF v_role = 'role_plan' THEN
-		
+
 		v_return_widgets = concat(v_widget_om, ',', v_widget_epa, ',', v_widget_plan);
-	
+
 	ELSIF v_role = 'role_admin' THEN
-	
+
 		v_return_widgets = concat(v_widget_om, ',', v_widget_epa, ',', v_widget_plan, ',', v_widget_admin);
-	
+
 	END IF;
 
 	--  Return
