@@ -90,7 +90,7 @@ BEGIN
 
 	IF v_fid = 211 OR v_fid = 101 THEN
 		-- create temporal tables
-		EXECUTE gw_fct_manage_temp_tables('{"data":{"parameters":{"fid":'||v_fid||', "project_type":"'||v_project_type||'", "action":"CREATE", "group":"GRAPHANALYTICSCHECK", "verifiedExceptions":false}}}');
+		EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"fid":'||v_fid||', "project_type":"'||v_project_type||'", "action":"CREATE", "group":"GRAPHANALYTICSCHECK", "verifiedExceptions":false}}}$$)';
 	END IF;
 
 	-- Starting process
