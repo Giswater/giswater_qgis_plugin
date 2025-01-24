@@ -15,7 +15,8 @@ jobs:
         pg_version: [16, 17]
 
     env:
-      PGPASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+      # PGPASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+      PGPASSWORD: postgres
 
     steps:
       - name: Checkout repository
