@@ -935,7 +935,7 @@ function_name = '[gw_fct_pg2epa_check_result]',
 active = true
 WHERE fid = 377;
 
-
+-- TODO: Activate this process once 'top_elev' is added to 'ws.node'.
 UPDATE sys_fprocess SET
 fprocess_name = 'Connec/node with outlayer value on elevation',
 except_level = 3,
@@ -945,12 +945,12 @@ query_text = '
 	WITH 
 	outlayer AS (SELECT ((value::json->>''elevation'')::json->>''max'')::numeric as max_elev, 
     ((value::json->>''elevation'')::json->>''min'')::numeric as min_elev FROM config_param_system WHERE parameter = ''epa_outlayer_values'')
-	select node_id, nodecat_id from outlayer, node where elevation < min_elev or elevation > max_elev
+	select node_id, nodecat_id from outlayer, node where top_elev < min_elev or top_elev > max_elev
 	union
-	select connec_id, conneccat_id from outlayer, connec where elevation < min_elev or elevation > max_elev',
+	select connec_id, conneccat_id from outlayer, connec where top_elev < min_elev or top_elev > max_elev',
 except_table = null,
 function_name = '[gw_fct_pg2epa_check_result]',
-active = true
+active = false
 WHERE fid = 407;
 
 

@@ -230,7 +230,6 @@ BEGIN
                 CREATE TEMP TABLE temp_t_pgr_go2epa_node (LIKE temp_node INCLUDING ALL);
 
                 CREATE TEMP TABLE t_rpt_inp_pattern_value (LIKE rpt_inp_pattern_value INCLUDING ALL);
-                CREATE TEMP TABLE t_rpt_cat_result (LIKE rpt_cat_result INCLUDING ALL);
 
             ELSIF v_project_type = 'UD' THEN
                 CREATE TEMP TABLE temp_t_arc_flowregulator (LIKE temp_arc_flowregulator INCLUDING ALL);
@@ -243,6 +242,8 @@ BEGIN
                 CREATE TEMP TABLE t_rpt_inp_node (LIKE rpt_inp_node INCLUDING ALL);
                 CREATE TEMP TABLE t_rpt_inp_arc (LIKE rpt_inp_arc INCLUDING ALL);
             END IF;
+
+            CREATE TEMP TABLE t_rpt_cat_result (LIKE rpt_cat_result INCLUDING ALL);
 
             CREATE TEMP TABLE temp_t_csv (LIKE temp_csv INCLUDING ALL);
             CREATE TEMP TABLE temp_t_table (LIKE temp_table INCLUDING ALL);

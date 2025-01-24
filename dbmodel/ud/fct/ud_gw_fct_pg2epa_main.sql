@@ -58,7 +58,7 @@ BEGIN
 	v_result =  (p_data->>'data')::json->>'resultId';
 	v_dumpsubcatch =  (p_data->>'data')::json->>'dumpSubcatch';
 	v_step = (p_data->>'data')::json->>'step';
-	v_input = concat('{"data":{"parameters":{"resultId":"',v_result,'", "dumpSubcatch":"',v_dumpsubcatch,'", "fid":227}}}')::json;
+	v_input = concat('{"data":{"parameters":{"isEmbebed":true, "resultId":"',v_result,'", "dumpSubcatch":"',v_dumpsubcatch,'", "fid":227}}}')::json;
 
 
 	-- get user parameters
@@ -156,8 +156,8 @@ BEGIN
 		END IF;
 
 		RAISE NOTICE '4.8 - Update values for temp table';
-		UPDATE t_arc SET result_id  = v_result;
-		UPDATE t_node SET result_id  = v_result;
+		UPDATE temp_t_arc SET result_id  = v_result;
+		UPDATE temp_t_node SET result_id  = v_result;
 
 		v_return = '{"status": "Accepted", "message":{"level":1, "text":"Export INP file 4/7 - Structure data...... done succesfully"}}'::json;
 		RETURN v_return;
@@ -176,17 +176,17 @@ BEGIN
 		PERFORM gw_fct_pg2epa_check_result(v_input);
 
 		-- deleting arcs without nodes
-		UPDATE t_arc t SET epa_type = 'TODELETE' FROM (SELECT a.id FROM t_arc a LEFT JOIN t_node ON node_1=node_id WHERE t_node.node_id is null) a WHERE t.id = a.id;
-		UPDATE t_arc t SET epa_type = 'TODELETE' FROM (SELECT a.id FROM t_arc a LEFT JOIN t_node ON node_2=node_id WHERE t_node.node_id is null) a WHERE t.id = a.id;
-		DELETE FROM t_arc WHERE epa_type = 'TODELETE';
-		UPDATE t_arc SET result_id = v_result WHERE result_id IS NULL;
-		UPDATE t_node SET result_id = v_result WHERE result_id IS NULL;
+		UPDATE temp_t_arc t SET epa_type = 'TODELETE' FROM (SELECT a.id FROM temp_t_arc a LEFT JOIN temp_t_node ON node_1=node_id WHERE temp_t_node.node_id is null) a WHERE t.id = a.id;
+		UPDATE temp_t_arc t SET epa_type = 'TODELETE' FROM (SELECT a.id FROM temp_t_arc a LEFT JOIN temp_t_node ON node_2=node_id WHERE temp_t_node.node_id is null) a WHERE t.id = a.id;
+		DELETE FROM temp_t_arc WHERE epa_type = 'TODELETE';
+		UPDATE temp_t_arc SET result_id = v_result WHERE result_id IS NULL;
+		UPDATE temp_t_node SET result_id = v_result WHERE result_id IS NULL;
 
 		-- deleting nodes without arcs
-		UPDATE t_node t SET epa_type = 'TODELETE' FROM
-		(SELECT id FROM t_node LEFT JOIN (SELECT node_1 as node_id FROM t_arc UNION SELECT node_2 FROM t_arc) a USING (node_id) WHERE a.node_id IS NULL) a
+		UPDATE temp_t_node t SET epa_type = 'TODELETE' FROM
+		(SELECT id FROM temp_t_node LEFT JOIN (SELECT node_1 as node_id FROM temp_t_arc UNION SELECT node_2 FROM temp_t_arc) a USING (node_id) WHERE a.node_id IS NULL) a
 		WHERE t.id = a.id;
-		DELETE FROM t_node WHERE epa_type = 'TODELETE';
+		DELETE FROM temp_t_node WHERE epa_type = 'TODELETE';
 
 		-- create return
 		EXECUTE 'SELECT gw_fct_create_return($${"data":{"parameters":{"functionId":2646, "isEmbebed":false}}}$$::json)' INTO v_return;
@@ -207,14 +207,14 @@ BEGIN
 		SELECT
 		result_id, arc_id, node_1, node_2, elevmax1, elevmax2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation,
 		length, n, the_geom, expl_id, addparam, arcparent, q0, qmax, barrels, slope, culvert, kentry, kexit, kavg, flap, seepage
-		FROM t_arc;
+		FROM temp_t_arc;
 
 		-- move nodes data
 		INSERT INTO rpt_inp_node (result_id, node_id, top_elev, ymax, elev, node_type, nodecat_id,
 		epa_type, sector_id, state, state_type, annotation, y0, ysur, apond, the_geom, expl_id, addparam, parent, arcposition, fusioned_node)
 		SELECT result_id, node_id, top_elev, ymax, elev, node_type, nodecat_id, epa_type,
 		sector_id, state, state_type, annotation, y0, ysur, apond, the_geom, expl_id, addparam, parent, arcposition, fusioned_node
-		FROM t_node;
+		FROM temp_t_node;
 
 		-- move result data
 		UPDATE rpt_cat_result r set network_stats = t.network_stats FROM t_rpt_cat_result t WHERE r.result_id = t.result_id;

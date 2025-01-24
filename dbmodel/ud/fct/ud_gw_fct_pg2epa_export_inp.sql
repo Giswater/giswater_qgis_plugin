@@ -780,7 +780,7 @@ BEGIN
 	    NULL::character varying AS other2,
 	    NULL::character varying AS other3
 	   FROM selector_inp_result s,
-	    temp_rpt_inp_raingage r
+	    t_rpt_inp_raingage r
 	     LEFT JOIN inp_typevalue ON inp_typevalue.id::text = r.rgage_type::text
 	  WHERE inp_typevalue.typevalue::text = 'inp_typevalue_raingage'::text AND r.rgage_type::text = 'TIMESERIES'::text AND s.result_id::text = r.result_id::text AND s.cur_user = CURRENT_USER
 	UNION
@@ -793,7 +793,7 @@ BEGIN
 	    r.sta AS other2,
 	    r.units AS other3
 	   FROM selector_inp_result s,
-	    temp_rpt_inp_raingage r
+	    t_rpt_inp_raingage r
 	     LEFT JOIN inp_typevalue ON inp_typevalue.id::text = r.rgage_type::text
 	  WHERE inp_typevalue.typevalue::text = 'inp_typevalue_raingage'::text AND r.rgage_type::text = 'FILE'::text AND s.result_id::text = r.result_id::text AND s.cur_user = CURRENT_USER;
 
@@ -1224,7 +1224,7 @@ BEGIN
 		  WHERE t.expl_id is NULL) b
   	ORDER BY b.id) c
 	JOIN inp_timeseries ON id = timser_id
-	WHERE (timser_type = 'Rainfall' and timser_id IN (SELECT timser_id FROM temp_rpt_inp_raingage)) or timser_type != 'Rainfall'::text 
+	WHERE (timser_type = 'Rainfall' and timser_id IN (SELECT timser_id FROM t_rpt_inp_raingage)) or timser_type != 'Rainfall'::text
 	ORDER BY timser_id, other2;
 
 

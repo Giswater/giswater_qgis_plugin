@@ -43,7 +43,7 @@ BEGIN
 	TRUNCATE temp_t_arc;
 	TRUNCATE temp_t_arc_flowregulator;
 	TRUNCATE temp_t_gully;
-	TRUNCATE temp_rpt_inp_raingage;
+	TRUNCATE t_rpt_inp_raingage;
 	DELETE FROM rpt_inp_raingage WHERE result_id = result_id_var;
 	TRUNCATE temp_t_lid_usage;
 
@@ -229,7 +229,7 @@ BEGIN
 		LEFT JOIN arc a USING (arc_id)
 		LEFT JOIN value_state_type ON id=g.state_type
 		WHERE arc_id IS NOT NULL AND g.sector_id > 0 '||v_statetype||' AND s.cur_user = current_user and s.sector_id = g.sector_id;';
-		
+
 	END IF;
 
 	-- orifice
@@ -283,12 +283,12 @@ BEGIN
 	UPDATE temp_t_arc SET q0=0 where q0 IS NULL;
 
 	-- rpt_inp_raingage
-	INSERT INTO temp_rpt_inp_raingage
+	INSERT INTO t_rpt_inp_raingage
 	SELECT result_id_var, * FROM v_edit_raingage;
 
 	-- setting same rainfall for all raingage
 	IF v_rainfall IS NOT NULL THEN
-		UPDATE temp_rpt_inp_raingage SET timser_id=v_rainfall, rgage_type='TIMESERIES';
+		UPDATE t_rpt_inp_raingage SET timser_id=v_rainfall, rgage_type='TIMESERIES';
 	END IF;
 
 	-- setting for date-time parameters if rainfall has addparam values)
