@@ -70,7 +70,7 @@ BEGIN
 	IF v_isembebed IS FALSE OR v_isembebed IS NULL THEN -- create temporal tables if function is not embebed
 		v_isembebed = FALSE;
 		-- create temporal tables
-		EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"fid":'||v_fid||', "project_type":"'||v_project_type||'", "action":"DROP", "group":"PLANCHECK", "verifiedExceptions":'||v_verified_exceptions||'}}}$$::json)';
+		EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"fid":'||v_fid||', "project_type":"'||v_project_type||'", "action":"CREATE", "group":"PLANCHECK", "verifiedExceptions":'||v_verified_exceptions||'}}}$$::json)';
 	END IF;
 
 	-- getting sys_fprocess to be executed
