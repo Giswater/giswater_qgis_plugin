@@ -59,7 +59,7 @@ class GwMapzoneManager:
         self.mapzone_mng_dlg.btn_flood.setEnabled(False)
 
         default_tab_idx = 0
-        tabs = ['sector', 'dma', 'presszone', 'dqa']
+        tabs = ['sector', 'dma', 'presszone', 'dqa', 'supplyzone', 'macrodma', 'macrosector']
         if global_vars.project_type == 'ud':
             tabs = ['drainzone']
         for tab in tabs:
@@ -149,6 +149,16 @@ class GwMapzoneManager:
 
         # Fill current table
         self._fill_mapzone_table(expr=expr)
+
+        # Enable/Disable config button on macrodma and macrosector
+        list_tabs_no_config = []
+        list_tabs_no_config.append(tools_qt.get_tab_index_by_tab_name(self.mapzone_mng_dlg.main_tab, 'v_ui_macrodma'))
+        list_tabs_no_config.append(tools_qt.get_tab_index_by_tab_name(self.mapzone_mng_dlg.main_tab, 'v_ui_macrosector'))
+        if self.mapzone_mng_dlg.main_tab.currentIndex() in list_tabs_no_config:
+            self.mapzone_mng_dlg.btn_config.setEnabled(False)
+        else:
+            self.mapzone_mng_dlg.btn_config.setEnabled(True)
+        
 
 
     def _fill_mapzone_table(self, set_edit_triggers=QTableView.NoEditTriggers, expr=None):
@@ -1167,12 +1177,11 @@ class GwMapzoneManager:
 
 
     def manage_create(self, dialog, tableview=None):
-
         if tableview is None:
             tableview = dialog.main_tab.currentWidget()
         tablename = tableview.objectName().replace('tbl_', '')
         field_id = tableview.model().headerData(0, Qt.Horizontal)
-
+        
         # Execute getinfofromid
         feature = f'"tableName":"{tablename}"'
         body = tools_gw.create_body(feature=feature)
@@ -1299,8 +1308,23 @@ class GwMapzoneManager:
 
 
     def _accept_add_dlg(self, dialog, tablename, pkey, feature_id, my_json, complet_result, force_action):
+
         if not my_json:
             return
+
+        # Change format when expl_id is an array
+        if tablename != 'v_ui_macrodma':
+            if 'expl_id' in my_json:
+                expl_id = my_json['expl_id']
+                if expl_id is not None:
+                    expl_id = expl_id.replace('[', '{')
+                    expl_id = expl_id.replace(']', '}')
+
+                    if not expl_id[0] == '{':
+                        expl_id = '{'+expl_id
+                    if not expl_id[len(expl_id)-1]=='}':
+                        expl_id = expl_id+'}'
+                    my_json['expl_id'] = expl_id
 
         list_mandatory = []
         list_filter = []
