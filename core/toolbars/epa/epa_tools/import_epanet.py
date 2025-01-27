@@ -23,8 +23,8 @@ from ....threads.import_inp.import_epanet_task import GwImportInpTask
 from ....utils import tools_gw
 
 CREATE_NEW = "Create new"
-TESTING_MODE = False
 SPATIAL_INTERSECT = "Get from spatial intersect"
+TESTING_MODE = False
 
 
 class GwImportEpanet:

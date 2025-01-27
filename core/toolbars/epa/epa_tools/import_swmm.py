@@ -29,6 +29,7 @@ from ...dialog import GwAction
 from ....threads.import_inp import parse_swmm_task
 
 CREATE_NEW = "Create new"
+SPATIAL_INTERSECT = "Get from spatial intersect"
 TESTING_MODE = False
 
 
@@ -355,11 +356,11 @@ class GwImportSwmm:
                 "DELETE FROM cat_dscenario WHERE expl_id = 1;",
                 "DELETE FROM cat_arc CASCADE;"
                 "DELETE FROM cat_material CASCADE;",
-                "DELETE FROM sector WHERE sector_id = 1;",
-                "DELETE FROM ext_municipality WHERE muni_id = 1;",
+                # "DELETE FROM sector WHERE sector_id = 1;",
+                # "DELETE FROM ext_municipality WHERE muni_id = 1;",
                 "DELETE FROM exploitation WHERE expl_id = 1;",
                 "INSERT INTO cat_material (id, feature_type, n) VALUES ('PVC', '{ARC}', 0.011), ('Brick', '{ARC}', 0.014);",
-                # "INSERT INTO exploitation (expl_id, name, macroexpl_id, descript, active) VALUES (1, 'expl_1_import_inp_test', 0, 'Created by import inp in TESTING MODE', true);",
+                "INSERT INTO exploitation (expl_id, name, macroexpl_id, descript, active) VALUES (1, 'expl_1_import_inp_test', 0, 'Created by import inp in TESTING MODE', true);",
                 # "INSERT INTO ext_municipality (muni_id, name, observ, active) VALUES (1, 'muni_1_import_inp_test', 'Created by import inp in TESTING MODE', true);",
                 # "INSERT INTO sector (sector_id, name, macrosector_id, descript, active) VALUES (1, 'sector_1_import_inp_test', 0, 'Created by import inp in TESTING MODE', true);"
             ]
@@ -371,9 +372,9 @@ class GwImportSwmm:
 
             # Set variables
             workcat = "import_inp_test"
-            exploitation = 0
+            exploitation = 1
             sector = 0
-            municipality = 0
+            municipality = 999999  # Spatial intersect
             raingage = None
             catalogs = {
                 'conduits': {
@@ -604,6 +605,9 @@ class GwImportSwmm:
         """)
         cmb_muni.clear()
         tools_qt.fill_combo_values(cmb_muni, rows, add_empty=True)
+        # Add a separator and a "Get from spatial intersect" option
+        cmb_muni.insertSeparator(cmb_muni.count())
+        cmb_muni.addItem(SPATIAL_INTERSECT)
         cmb_muni.setCurrentText(muni_value)
 
         self.catalogs = Catalogs.from_network_model(self.parse_inp_task.network)
