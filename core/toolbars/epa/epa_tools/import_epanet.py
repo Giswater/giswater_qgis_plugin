@@ -24,6 +24,7 @@ from ....utils import tools_gw
 
 CREATE_NEW = "Create new"
 TESTING_MODE = False
+SPATIAL_INTERSECT = "Get from spatial intersect"
 
 
 class GwImportEpanet:
@@ -290,6 +291,15 @@ class GwImportEpanet:
 
         self.dlg_config.mainTab.setCurrentIndex(self.dlg_config.mainTab.count()-1)
         if TESTING_MODE:
+            # Show warning message
+            message = "You are about to import the INP file in TESTING MODE. This will delete all the data in the database related to the network you are importing. Are you sure you want to proceed?"
+            res = tools_qt.show_question(message, title="WARNING", force_action=True)
+            if not res:
+                return
+            message = "!!!!! THIS WILL DELETE ALL DATA IN THE DATABASE !!!!!\nARE YOU SURE YOU WANT TO PROCEED?"
+            res = tools_qt.show_question(message, title="WARNING", force_action=True)
+            if not res:
+                return
 
             # Delete the network before importing
             queries = [
@@ -321,7 +331,7 @@ class GwImportEpanet:
                 "UPDATE cat_mat_roughness SET roughness = 0.025 WHERE matcat_id = 'FC';",
                 "UPDATE cat_mat_roughness SET roughness = 0.0025 WHERE matcat_id = 'PVC';",
                 "UPDATE cat_mat_roughness SET roughness = 0.03 WHERE matcat_id = 'FD';",
-                # "INSERT INTO exploitation (expl_id, name, macroexpl_id, descript, active) VALUES (1, 'expl_1_import_inp_test', 0, 'Created by import inp in TESTING MODE', true);",
+                "INSERT INTO exploitation (expl_id, name, macroexpl_id, descript, active) VALUES (1, 'expl_1_import_inp_test', 0, 'Created by import inp in TESTING MODE', true);",
                 # "INSERT INTO ext_municipality (muni_id, name, observ, active) VALUES (1, 'muni_1_import_inp_test', 'Created by import inp in TESTING MODE', true);",
                 # "INSERT INTO sector (sector_id, name, muni_id, expl_id, macrosector_id, descript, active) VALUES (1, 'sector_1_import_inp_test', '{1}'::int[], '{1}'::int[], 0, 'Created by import inp in TESTING MODE', true);"
             ]
@@ -333,9 +343,9 @@ class GwImportEpanet:
 
             # Set variables
             workcat = "import_inp_test"
-            exploitation = 0
+            exploitation = 1
             sector = 0
-            municipality = 0
+            municipality = 999999  # Spatial intersect
             dscenario = "import_inp_demands"
             catalogs = {'pipes': {(57.0, 0.0025): 'INP-PIPE01', (57.0, 0.025): 'INP-PIPE02', (99.0, 0.0025): 'PELD110-PN10', (99.0, 0.025): 'FC110-PN10', (144.0, 0.0025): 'PVC160-PN16', (144.0, 0.025): 'FC160-PN10', (153.0, 0.03): 'INP-PIPE03', (204.0, 0.03): 'INP-PIPE04'},
                         'materials': {0.025: 'FC', 0.0025: 'PVC', 0.03: 'FD'},
@@ -416,6 +426,9 @@ class GwImportEpanet:
             tools_qt.show_info_box(message)
             return
 
+        if municipality == SPATIAL_INTERSECT:
+            municipality = 999999
+
         # Demands dscenario
         dscenario = tools_qt.get_text(self.dlg_config, "txt_dscenario")
 
@@ -492,13 +505,12 @@ class GwImportEpanet:
     def _fill_combo_boxes(self):
         # Fill exploitation combo
         cmb_expl: QComboBox = self.dlg_config.cmb_expl
-        cmb_expl.setToolTip("Will be set based on elements positions")
         expl_value: str = cmb_expl.currentText()
 
         rows = tools_db.get_rows("""
             SELECT expl_id, name
             FROM exploitation
-            WHERE expl_id = 0
+            WHERE expl_id > 0
         """)
         cmb_expl.clear()
         tools_qt.fill_combo_values(cmb_expl, rows, add_empty=False)
@@ -519,16 +531,18 @@ class GwImportEpanet:
 
         # Fill municipality combo
         cmb_muni: QComboBox = self.dlg_config.cmb_muni
-        cmb_muni.setToolTip("Will be set based on elements positions")
         muni_value: str = cmb_muni.currentText()
 
         rows = tools_db.get_rows("""
             SELECT muni_id, name
             FROM ext_municipality
-            WHERE muni_id = 0
+            WHERE muni_id > 0
         """)
         cmb_muni.clear()
         tools_qt.fill_combo_values(cmb_muni, rows, add_empty=False)
+        # Add a separator and a "Get from spatial intersect" option
+        cmb_muni.insertSeparator(cmb_muni.count())
+        cmb_muni.addItem(SPATIAL_INTERSECT)
         cmb_muni.setCurrentText(muni_value)
 
         self.catalogs = Catalogs.from_network_model(self.parse_inp_task.network)

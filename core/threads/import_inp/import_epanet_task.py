@@ -143,6 +143,7 @@ class GwImportInpTask(GwTask):
         self.dscenario_id: int = None
         self.catalogs: dict[str, Any] = catalogs
         self.force_commit: bool = force_commit
+        self.update_municipality: bool = False
         self.log: list[str] = []
         self.mappings: dict[str, dict[str, str]] = {"curves": {}, "patterns": {}}
         self.arccat_db: list[str] = []
@@ -171,6 +172,9 @@ class GwImportInpTask(GwTask):
             self._manage_nonvisual()
 
             self._manage_visual()
+
+            if self.update_municipality:
+                self._update_municipality()
 
             self.progress_changed.emit("Sources", self.PROGRESS_VISUAL, "Importing sources...", False)
             self._save_sources()
@@ -254,6 +258,9 @@ class GwImportInpTask(GwTask):
         if self.municipality in (None, ""):
             message = "Please select a municipality to proceed with this import."
             raise ValueError(message)
+        if self.municipality == 999999:
+            self.municipality = 0
+            self.update_municipality = True
 
     def _save_options(self):
         """
@@ -1319,6 +1326,15 @@ class GwImportInpTask(GwTask):
             """
             params = (source_type, source_quality, source_pattern_id, node_id)
             execute_sql(sql, params)
+
+    def _update_municipality(self):
+        """ Update the muni_id of all features getting the spatial intersection with the municipality """
+
+        sql = """
+            UPDATE node n SET muni_id = (SELECT m.muni_id FROM ext_municipality m WHERE ST_Intersects(m.the_geom, n.the_geom) LIMIT 1) WHERE EXISTS (SELECT 1 FROM ext_municipality m WHERE ST_Intersects(m.the_geom, n.the_geom));
+            UPDATE arc a SET muni_id = (SELECT m.muni_id FROM ext_municipality m WHERE ST_Intersects(m.the_geom, a.the_geom) LIMIT 1) WHERE EXISTS (SELECT 1 FROM ext_municipality m WHERE ST_Intersects(m.the_geom, a.the_geom));
+        """
+        execute_sql(sql, commit=self.force_commit)
 
     def _log_message(self, message: str):
         self.log.append(message)
