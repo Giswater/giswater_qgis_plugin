@@ -1169,9 +1169,8 @@ class GwImportInpTask(GwTask):
 
             inp_data = inp_dict[code]
             inp_params.append(
-                (arc_id, inp_data["valv_type"], inp_data["pressure"], inp_data["diameter"], inp_data["flow"],
-                 inp_data["coef_loss"], inp_data["curve_id"], inp_data["minorloss"], inp_data["status"],
-                 inp_data["init_quality"])
+                (arc_id, inp_data["valv_type"], inp_data["setting"], inp_data["diameter"], inp_data["curve_id"],
+                 inp_data["minorloss"], inp_data["status"], inp_data["init_quality"])
             )
             print(inp_params)
 
