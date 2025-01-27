@@ -286,3 +286,13 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_ve_epa('junction');
 
 CREATE TRIGGER gw_trg_edit_ve_epa_pump INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_epa_pump
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_ve_epa('pump');
+
+-- delete duplicated triggers
+DROP TRIGGER IF EXISTS gw_trg_edit_macrosector ON v_edit_macrosector;
+DROP TRIGGER IF EXISTS gw_trg_edit_macrodma ON v_edit_macrodma;
+
+CREATE TRIGGER gw_trg_v_edit_macrodma INSTEAD OF INSERT OR DELETE OR UPDATE
+ON v_edit_macrodma FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_macrodma('EDIT');
+
+CREATE TRIGGER gw_trg_v_edit_macrosector INSTEAD OF INSERT OR DELETE OR UPDATE
+ON v_edit_macrosector FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_macrosector('EDIT');
