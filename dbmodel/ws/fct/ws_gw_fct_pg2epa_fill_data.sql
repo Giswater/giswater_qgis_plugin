@@ -200,7 +200,7 @@ BEGIN
 	minorloss = inp_virtualvalve.minorloss,
 	diameter = inp_virtualvalve.diameter,
 	status = inp_virtualvalve.status,
-	addparam=concat('{"valv_type":"',valv_type,'", "pressure":"',pressure,'", "flow":"',flow,'", "coef_loss":"',coef_loss,'", "curve_id":"',curve_id,'"}')
+	addparam=concat('{"valv_type":"',valv_type,'", "setting":"',setting,'", "curve_id":"',curve_id,'"}')
 	FROM inp_virtualvalve WHERE temp_t_arc.arc_id=inp_virtualvalve.arc_id;
 
 	-- update addparam for inp_virtualpump
