@@ -1086,11 +1086,11 @@ class GwImportInpTask(GwTask):
 
         inp_sql = """
             INSERT INTO inp_virtualvalve (
-                arc_id, valv_type, pressure, diameter, flow, coef_loss, curve_id, minorloss, status, init_quality
+                arc_id, valv_type, setting, diameter, curve_id, minorloss, status, init_quality
             ) VALUES %s
         """  # --
         inp_template = (
-            "(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+            "(%s, %s, %s, %s, %s, %s, %s, %s)"
         )
 
         arc_params = []
@@ -1133,28 +1133,13 @@ class GwImportInpTask(GwTask):
             )
             inp_dict[v_name] = {
                 "valv_type": v.valve_type,
-                "pressure": None,
                 "diameter": v.diameter,
-                "flow": None,
-                "coef_loss": None,
+                "setting": v.initial_setting,
                 "curve_id": None,
                 "minorloss": v.minor_loss,
                 "status": v.initial_status.name.upper(),
                 "init_quality": None,
             }
-
-            # TODO: refactor this so all values go to one 'setting' column (except curve_id).
-            valve_key_map = {
-                "PRV": "pressure",
-                "PSV": "pressure",
-                "PBV": "pressure",
-                "FCV": "flow",
-                "TCV": "coef_loss",
-                "GPV": "curve_id",
-            }
-            key = valve_key_map.get(v.valve_type)
-            if key:
-                inp_dict[v_name][key] = v.initial_setting
 
         # Insert into parent table
         valves = toolsdb_execute_values(
