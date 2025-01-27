@@ -6,40 +6,47 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2926
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_presszone()  RETURNS trigger AS
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_presszone()
+  RETURNS trigger AS
 $BODY$
 
 DECLARE
-view_name TEXT;
+
+	v_view_name TEXT; -- EDIT | UI
+	v_mapzone_id INTEGER;
 
 BEGIN
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
-	-- Arg will be or 'edit' or 'ui'
-	view_name = TG_ARGV[0];
+	-- Get parameters
+	v_view_name = UPPER(TG_ARGV[0]);
+
+	-- Validate parameters
+	IF v_view_name IS NULL THEN
+		RAISE EXCEPTION 'Param ''v_view_name'' is requiered';
+    END IF;
+
+	IF v_view_name NOT IN ('EDIT', 'UI') THEN
+		RAISE EXCEPTION 'Param ''v_view_name'' is wrong, need to be: ''EDIT'' or ''UI''.';
+	END IF;
 
 	IF NOT (SELECT array_agg(expl_id ORDER BY expl_id) @> NEW.expl_id FROM exploitation) THEN
 		RAISE EXCEPTION 'Some exploitation ids don''t exist';
 	END IF;
 
 	IF TG_OP = 'INSERT' THEN
-
-		-- expl_id
 		IF ((SELECT COUNT(*) FROM exploitation WHERE active IS TRUE) = 0) THEN
 			RETURN NULL;
 		END IF;
 
-		IF view_name = 'edit'THEN
+		IF v_view_name = 'EDIT' THEN
 			IF NEW.the_geom IS NOT NULL THEN
 				IF NEW.expl_id IS NULL THEN
-					NEW.expl_id := (SELECT ARRAY[expl_id] FROM exploitation WHERE active IS TRUE AND ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
+					NEW.expl_id := (SELECT array_agg(expl_id) FROM exploitation WHERE active IS TRUE AND ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
 				END IF;
 			END IF;
-		END IF;
-
-		-- active
-		IF view_name = 'ui'THEN
+		ELSIF v_view_name = 'UI' THEN
 			IF NEW.active IS NULL THEN
 				NEW.active = TRUE;
 			END IF;
@@ -49,12 +56,10 @@ BEGIN
 		VALUES (NEW.presszone_id, NEW.name, NEW.expl_id, NEW.graphconfig::json, NEW.head, NEW.stylesheet::json, NEW.descript,
 		NEW.avg_press, NEW.presszone_type, NEW.link, NEW.muni_id, NEW.sector_id);
 
-		IF view_name = 'ui' THEN
+		IF v_view_name = 'UI' THEN
 			UPDATE presszone SET active = NEW.active WHERE presszone_id = NEW.presszone_id;
-
-		ELSIF view_name = 'edit' THEN
+		ELSIF v_view_name = 'EDIT' THEN
 			UPDATE presszone SET the_geom = NEW.the_geom WHERE presszone_id = NEW.presszone_id;
-
 		END IF;
 
 		RETURN NEW;
@@ -67,12 +72,10 @@ BEGIN
 		avg_press = NEW.avg_press, presszone_type = NEW.presszone_type, link = NEW.link, muni_id = NEW.muni_id, sector_id = NEW.sector_id
 		WHERE presszone_id=OLD.presszone_id;
 
-		IF view_name = 'ui' THEN
+		IF v_view_name = 'UI' THEN
 			UPDATE presszone SET active = NEW.active WHERE presszone_id = OLD.presszone_id;
-
-		ELSIF view_name = 'edit' THEN
+		ELSIF v_view_name = 'EDIT' THEN
 			UPDATE presszone SET the_geom = NEW.the_geom WHERE presszone_id = OLD.presszone_id;
-
 		END IF;
 
 		RETURN NEW;

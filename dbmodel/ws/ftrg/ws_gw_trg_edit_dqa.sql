@@ -6,74 +6,87 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 2924
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_dqa()  RETURNS trigger AS
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_dqa()
+  RETURNS trigger AS
 $BODY$
 
 DECLARE
 
-	view_name TEXT;
-	
+	v_view_name TEXT; -- EDIT | UI
+	v_mapzone_id INTEGER;
+
 
 BEGIN
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
-	-- Arg will be or 'edit' or 'ui'
-	view_name = TG_ARGV[0];
+	-- Get parameters
+	v_view_name = UPPER(TG_ARGV[0]);
+
+	-- Validate parameters
+	IF v_view_name IS NULL THEN
+		RAISE EXCEPTION 'Param ''v_view_name'' is requiered';
+    END IF;
+
+	IF v_view_name NOT IN ('EDIT', 'UI') THEN
+		RAISE EXCEPTION 'Param ''v_view_name'' is wrong, need to be: ''EDIT'' or ''UI''.';
+	END IF;
 
 	IF NOT (SELECT array_agg(expl_id ORDER BY expl_id) @> NEW.expl_id FROM exploitation) THEN
 		RAISE EXCEPTION 'Some exploitation ids don''t exist';
 	END IF;
 
 	IF TG_OP = 'INSERT' THEN
-
-		-- expl_id
 		IF ((SELECT COUNT(*) FROM exploitation WHERE active IS TRUE) = 0) THEN
 			RETURN NULL;
 		END IF;
 
-		IF view_name = 'edit' THEN
+		IF v_view_name = 'EDIT' THEN
 			IF NEW.the_geom IS NOT NULL THEN
 				IF NEW.expl_id IS NULL THEN
-					NEW.expl_id := (SELECT expl_id FROM exploitation WHERE active IS TRUE AND ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
+					NEW.expl_id := (SELECT array_agg(expl_id) FROM exploitation WHERE active IS TRUE AND ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
 				END IF;
 			END IF;
-		END IF;
-		-- active
-		IF view_name = 'ui'THEN
+
+			v_mapzone_id = NEW.macrodqa_id;
+		ELSIF v_view_name = 'UI' THEN
 			IF NEW.active IS NULL THEN
 				NEW.active = TRUE;
 			END IF;
+
+			SELECT macrodqa_id INTO v_mapzone_id FROM macrodqa WHERE name = NEW.macrodqa_id;
 		END IF;
 
 		INSERT INTO dqa (dqa_id, name, expl_id, macrodqa_id, descript, undelete, pattern_id, dqa_type, link, graphconfig, stylesheet, muni_id, sector_id)
-		VALUES (NEW.dqa_id, NEW.name, NEW.expl_id, (SELECT macrodqa_id FROM macrodqa WHERE name = NEW.macrodqa_id), NEW.descript, NEW.undelete, NEW.pattern_id, NEW.dqa_type,
+		VALUES (NEW.dqa_id, NEW.name, NEW.expl_id, v_mapzone_id, NEW.descript, NEW.undelete, NEW.pattern_id, NEW.dqa_type,
 		NEW.link, NEW.graphconfig::json, NEW.stylesheet::json, NEW.muni_id, NEW.sector_id);
 
-		IF view_name = 'ui' THEN
+		IF v_view_name = 'UI' THEN
 			UPDATE dqa SET active = NEW.active WHERE dqa_id = NEW.dqa_id;
-
-		ELSIF view_name = 'edit' THEN
+		ELSIF v_view_name = 'EDIT' THEN
 			UPDATE dqa SET the_geom = NEW.the_geom WHERE dqa_id = NEW.dqa_id;
-
 		END IF;
 
 		RETURN NEW;
 
 	ELSIF TG_OP = 'UPDATE' THEN
 
+		IF v_view_name = 'EDIT' THEN
+			v_mapzone_id = NEW.macrodqa_id;
+		ELSIF v_view_name = 'UI' THEN
+			SELECT macrodqa_id INTO v_mapzone_id FROM macrodqa WHERE name = NEW.macrodqa_id;
+		END IF;
+
 		UPDATE dqa
-		SET dqa_id=NEW.dqa_id, name=NEW.name, expl_id=NEW.expl_id, macrodqa_id=(SELECT macrodqa_id FROM macrodqa WHERE name = NEW.macrodqa_id), descript=NEW.descript, undelete=NEW.undelete,
+		SET dqa_id=NEW.dqa_id, name=NEW.name, expl_id=NEW.expl_id, macrodqa_id=v_mapzone_id, descript=NEW.descript, undelete=NEW.undelete,
 		pattern_id=NEW.pattern_id, dqa_type=NEW.dqa_type, link=NEW.link, graphconfig=NEW.graphconfig::json,
 		stylesheet = NEW.stylesheet::json, lastupdate=now(), lastupdate_user = current_user, muni_id = NEW.muni_id, sector_id = NEW.sector_id
 		WHERE dqa_id=OLD.dqa_id;
 
-		IF view_name = 'ui' THEN
+		IF v_view_name = 'UI' THEN
 			UPDATE dqa SET active = NEW.active WHERE dqa_id = OLD.dqa_id;
-
-		ELSIF view_name = 'edit' THEN
+		ELSIF v_view_name = 'EDIT' THEN
 			UPDATE dqa SET the_geom = NEW.the_geom WHERE dqa_id = OLD.dqa_id;
-
 		END IF;
 
 		RETURN NEW;
@@ -82,6 +95,7 @@ BEGIN
 
 		DELETE FROM dqa WHERE dqa_id = OLD.dqa_id;
 		RETURN NULL;
+
 	END IF;
 END;
 

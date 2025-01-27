@@ -123,25 +123,25 @@ CREATE TRIGGER gw_trg_edit_link INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_
 FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_link();
 
 CREATE TRIGGER gw_trg_v_ui_supplyzone INSTEAD OF INSERT OR DELETE OR UPDATE
-ON v_edit_supplyzone FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_supplyzone('edit');
+ON v_edit_supplyzone FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_supplyzone('EDIT');
 
 CREATE TRIGGER gw_trg_edit_sector INSTEAD OF INSERT OR DELETE OR UPDATE
-ON v_edit_sector FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_sector('edit');
+ON v_edit_sector FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_sector('EDIT');
 
 CREATE TRIGGER gw_trg_v_edit_macrodma INSTEAD OF INSERT OR DELETE OR UPDATE
-ON v_edit_macrodma FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_macrodma('edit');
+ON v_edit_macrodma FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_macrodma('EDIT');
 
 CREATE TRIGGER gw_trg_v_edit_macrosector INSTEAD OF INSERT OR DELETE OR UPDATE
-ON v_edit_macrosector FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_macrosector('edit');
+ON v_edit_macrosector FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_macrosector('EDIT');
 
 CREATE TRIGGER gw_trg_edit_dma INSTEAD OF INSERT OR DELETE OR UPDATE
-ON v_edit_dma FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_dma('edit');
+ON v_edit_dma FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_dma('EDIT');
 
 CREATE TRIGGER gw_trg_edit_presszone INSTEAD OF INSERT OR DELETE OR UPDATE
-ON v_edit_presszone FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_presszone('edit');
+ON v_edit_presszone FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_presszone('EDIT');
 
 CREATE TRIGGER gw_trg_edit_dqa INSTEAD OF INSERT OR DELETE OR UPDATE
-ON v_edit_dqa FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_dqa('edit');
+ON v_edit_dqa FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_dqa('EDIT');
 
 CREATE TRIGGER gw_trg_edit_plan_netscenario INSTEAD OF INSERT OR DELETE OR UPDATE ON
 v_edit_plan_netscenario_presszone FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_plan_netscenario('PRESSZONE');
@@ -226,22 +226,26 @@ CREATE TRIGGER gw_trg_edit_ve_epa_virtualpump INSTEAD OF INSERT OR DELETE OR UPD
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_ve_epa('virtualpump');
 
 CREATE TRIGGER gw_trg_v_ui_supplyzone INSTEAD OF INSERT OR DELETE OR UPDATE
-ON v_ui_supplyzone FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_supplyzone('ui');
+ON v_ui_supplyzone FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_supplyzone('UI');
 
 CREATE TRIGGER gw_trg_v_ui_macrodma INSTEAD OF INSERT OR DELETE OR UPDATE
-ON v_ui_macrodma FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_macrodma('ui');
+ON v_ui_macrodma FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_macrodma('UI');
 
 CREATE TRIGGER gw_trg_v_ui_macrosector INSTEAD OF INSERT OR DELETE OR UPDATE
-ON v_ui_macrosector FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_macrosector('ui');
+ON v_ui_macrosector FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_macrosector('UI');
 
 CREATE TRIGGER gw_trg_v_ui_dqa INSTEAD OF INSERT OR DELETE OR UPDATE
-ON v_ui_dqa FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_dqa('ui');
+ON v_ui_dqa FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_dqa('UI');
 
 CREATE TRIGGER gw_trg_v_ui_presszone INSTEAD OF INSERT OR DELETE OR UPDATE
-ON v_ui_presszone FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_presszone('ui');
+ON v_ui_presszone FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_presszone('UI');
 
 CREATE TRIGGER gw_trg_v_ui_dma INSTEAD OF INSERT OR DELETE OR UPDATE
-ON v_ui_dma FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_dma('ui');
+ON v_ui_dma FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_dma('UI');
 
 CREATE TRIGGER gw_trg_v_ui_sector INSTEAD OF INSERT OR DELETE OR UPDATE
-ON v_ui_sector FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_sector('ui');
+ON v_ui_sector FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_sector('UI');
+
+-- delete duplicated triggers
+DROP TRIGGER IF EXISTS gw_trg_edit_macrosector ON v_edit_macrosector;
+DROP TRIGGER IF EXISTS gw_trg_edit_macrodma ON v_edit_macrodma;
