@@ -86,7 +86,7 @@ BEGIN
     END IF;
 
     -- validate action
-    IF v_action NOT IN ('CREATE', 'RETURN', 'DROP') THEN
+    IF v_action NOT IN ('CREATE', 'DROP') THEN
         RETURN ('{"status":"Failed","message":{"level":1, "text":"action is invalid"}}')::json;
     END IF;
 
