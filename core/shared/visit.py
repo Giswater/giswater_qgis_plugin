@@ -266,7 +266,7 @@ class GwVisit(QObject):
 
         # Create the dialog
         self.dlg_visit_manager = GwVisitManagerUi(self)
-        tools_gw.load_settings(self.dlg_visit_manager)        
+        tools_gw.load_settings(self.dlg_visit_manager)
         tools_qt.set_tableview_config(self.dlg_visit_manager.tbl_visit, sectionResizeMode=0)
 
         if feature_type is None:
@@ -326,7 +326,7 @@ class GwVisit(QObject):
 
         # Open form
         tools_gw.open_dialog(self.dlg_visit_manager, dlg_name="lot_visitmanager")
- 
+
 
     def _show_context_menu(self, qtableview, pos):
         """ Show custom context menu """
@@ -481,14 +481,14 @@ class GwVisit(QObject):
             dialog.close()
 
         if table_object == "v_ui_om_visit" or "v_ui_om_visitman_x_" in table_object:
-            self.get_visit(visit_id=selected_object_id)        
+            self.get_visit(visit_id=selected_object_id)
 
 
     def _set_signals(self):
 
         self.dlg_add_visit.rejected.connect(self._manage_rejected)
         self.dlg_add_visit.rejected.connect(partial(tools_gw.close_dialog, self.dlg_add_visit))
-        self.dlg_add_visit.rejected.connect(lambda: tools_gw.reset_rubberband(self.rubber_band))     
+        self.dlg_add_visit.rejected.connect(lambda: tools_gw.reset_rubberband(self.rubber_band))
         self.dlg_add_visit.accepted.connect(partial(self._update_relations, self.dlg_add_visit))
         self.dlg_add_visit.accepted.connect(partial(self._manage_accepted))
 
