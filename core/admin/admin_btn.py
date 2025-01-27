@@ -1065,23 +1065,18 @@ class GwAdminButton:
             else:
                 continue
 
-        self.task1 = GwTask('Manage schema')
-        QgsApplication.taskManager().addTask(self.task1)
-        self.task1.setProgress(0)
         # Change schema name
         sql = f'ALTER SCHEMA {schema} RENAME TO {self.schema}'
         status = tools_db.execute_sql(sql, commit=False)
         if status:
             # Reload fcts
             self._reload_fct_ftrg()
-            self.task1.setProgress(40)
             # Call fct gw_fct_admin_rename_fixviews
             sql = ('SELECT ' + str(self.schema) + '.gw_fct_admin_rename_fixviews($${"data":{"currentSchemaName":"'
                    + self.schema + '","oldSchemaName":"' + str(schema) + '"}}$$)::text')
             tools_db.execute_sql(sql, commit=False)
             # Execute last_process
             self.execute_last_process(schema_name=self.schema, locale=True)
-        self.task1.setProgress(100)
 
         # Show message
         status = (self.error_count == 0)
@@ -1551,12 +1546,7 @@ class GwAdminButton:
     def _reload_fct_ftrg(self):
         """"""
 
-        self.task1 = GwTask('Manage schema')
-        QgsApplication.taskManager().addTask(self.task1)
-        self.task1.setProgress(50)
         self._load_fct_ftrg()
-        self.task1.setProgress(100)
-
         status = (self.error_count == 0)
         if status:
             tools_qt.show_info_box("Reload completed successfully", title="Success")
