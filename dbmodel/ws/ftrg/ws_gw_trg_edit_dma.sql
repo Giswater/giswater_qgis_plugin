@@ -22,6 +22,10 @@ BEGIN
 	-- Arg will be or 'edit' or 'ui'
 	view_name = TG_ARGV[0];
 
+	IF NOT (SELECT array_agg(expl_id ORDER BY expl_id) @> NEW.expl_id FROM exploitation) THEN
+		RAISE EXCEPTION 'Some exploitation ids don''t exist';
+	END IF;
+
 	IF TG_OP = 'INSERT' THEN
 
 		v_newpattern = (SELECT value::json->>'forcePatternOnNewDma' FROM config_param_system WHERE parameter = 'epa_patterns');
@@ -61,9 +65,9 @@ BEGIN
 			ON CONFLICT (pattern_id) DO NOTHING;
 		END IF;
 
-		INSERT INTO dma (dma_id, name, descript,  macrodma_id, undelete, expl_id, pattern_id, link, effc, graphconfig, stylesheet, avg_press, dma_type)
-		VALUES (NEW.dma_id, NEW.name, NEW.descript, NEW.macrodma_id, NEW.undelete, NEW.expl_id, NEW.pattern_id, NEW.link,
-		NEW.effc, NEW.graphconfig::json, NEW.stylesheet::json, NEW.avg_press, NEW.dma_type);
+		INSERT INTO dma (dma_id, name, descript,  macrodma_id, undelete, expl_id, pattern_id, link, effc, graphconfig, stylesheet, avg_press, dma_type, minc, maxc, muni_id, sector_id)
+		VALUES (NEW.dma_id, NEW.name, NEW.descript, (SELECT macrodma_id FROM macrodma WHERE name = NEW.macrodma), NEW.undelete, NEW.expl_id, NEW.pattern_id, NEW.link,
+		NEW.effc, NEW.graphconfig::json, NEW.stylesheet::json, NEW.avg_press, NEW.dma_type, NEW.minc, NEW.maxc, NEW.muni_id, NEW.sector_id);
 
 		IF view_name = 'ui' THEN
 			UPDATE dma SET active = NEW.active WHERE dma_id = NEW.dma_id;
@@ -78,9 +82,10 @@ BEGIN
 	ELSIF TG_OP = 'UPDATE' THEN
 
 		UPDATE dma
-		SET dma_id=NEW.dma_id, name=NEW.name, descript=NEW.descript, undelete=NEW.undelete, expl_id=NEW.expl_id,
+		SET dma_id=NEW.dma_id, name=NEW.name, descript=NEW.descript, undelete=NEW.undelete, macrodma_id=(SELECT macrodma_id FROM macrodma WHERE name = NEW.macrodma), expl_id=NEW.expl_id,
 		pattern_id=NEW.pattern_id, link=NEW.link, effc=NEW.effc, graphconfig=NEW.graphconfig::json, dma_type=NEW.dma_type,
-		stylesheet = NEW.stylesheet::json, avg_press=NEW.avg_press, macrodma_id = NEW.macrodma_id, lastupdate=now(), lastupdate_user = current_user
+		stylesheet = NEW.stylesheet::json, avg_press=NEW.avg_press, lastupdate=now(), lastupdate_user = current_user,
+		minc = NEW.minc, maxc = NEW.maxc, muni_id = NEW.muni_id, sector_id = NEW.sector_id
 		WHERE dma_id=OLD.dma_id;
 
 		IF view_name = 'ui' THEN

@@ -989,156 +989,111 @@ AS SELECT connec_id,
                   WHERE v_edit_link.state = 2) a ON a.feature_id::text = vu_connec.connec_id::text) c;
 
 
-CREATE OR REPLACE VIEW vu_presszone
+CREATE OR REPLACE VIEW v_edit_presszone
 AS SELECT p.presszone_id,
     p.name,
-    et.idval AS presszone_type,
-    p.muni_id,
-    p.expl_id,
-    p.sector_id,
+    p.presszone_type,
     p.descript,
-    p.head,
-    p.graphconfig::text AS graphconfig,
-    p.stylesheet::text AS stylesheet,
+    p.expl_id,
     p.link,
-    p.avg_press,
-    p.active,
+    p.head,
+    p.graphconfig,
+    p.stylesheet,
     p.tstamp,
     p.insert_user,
     p.lastupdate,
     p.lastupdate_user,
-    p.the_geom
-   FROM presszone p
-     LEFT JOIN edit_typevalue et ON et.id::text = p.presszone_type AND et.typevalue::text = 'presszone_type'::text
+    p.avg_press,
+    p.the_geom,
+    p.muni_id,
+    p.sector_id
+   FROM presszone p,
+    selector_expl
+  WHERE selector_expl.expl_id = ANY(p.expl_id) AND selector_expl.cur_user = "current_user"()::text OR p.expl_id IS NULL
   ORDER BY p.presszone_id;
 
-CREATE OR REPLACE VIEW v_edit_presszone
-AS SELECT vu_presszone.presszone_id,
-    vu_presszone.name,
-    vu_presszone.presszone_type,
-    vu_presszone.muni_id,
-    vu_presszone.expl_id,
-    vu_presszone.sector_id,
-    vu_presszone.descript,
-    vu_presszone.head,
-    vu_presszone.graphconfig,
-    vu_presszone.stylesheet,
-    vu_presszone.link,
-    vu_presszone.avg_press,
-    vu_presszone.active,
-    vu_presszone.tstamp,
-    vu_presszone.insert_user,
-    vu_presszone.lastupdate,
-    vu_presszone.lastupdate_user,
-    vu_presszone.the_geom
-   FROM vu_presszone,
-    selector_expl
-  WHERE selector_expl.expl_id = ANY(vu_presszone.expl_id) AND selector_expl.cur_user = "current_user"()::text OR vu_presszone.expl_id IS NULL
-  ORDER BY vu_presszone.presszone_id;
-
-
-CREATE OR REPLACE VIEW vu_dma
-AS SELECT d.dma_id,
-    d.name,
-    d.macrodma_id,
-    et.idval AS dma_type,
-    d.muni_id,
-    d.expl_id,
-    d.sector_id,
-    d.descript,
-    d.pattern_id,
-    d.graphconfig::text AS graphconfig,
-    d.stylesheet::text AS stylesheet,
-    d.link,
-    d.avg_press,
-    d.effc,
-    d.active,
-    d.undelete,
-    d.tstamp,
-    d.insert_user,
-    d.lastupdate,
-    d.lastupdate_user,
-    d.the_geom
-   FROM dma d
-     LEFT JOIN edit_typevalue et ON et.id::text = d.dma_type::text AND et.typevalue::text = 'dma_type'::text
-  ORDER BY d.dma_id;
 
 CREATE OR REPLACE VIEW v_edit_dma
-AS SELECT vu_dma.dma_id,
-    vu_dma.name,
-    vu_dma.macrodma_id,
-    vu_dma.muni_id,
-    vu_dma.expl_id,
-    vu_dma.sector_id,
-    vu_dma.dma_type,
-    vu_dma.descript,
-    vu_dma.pattern_id,
-    vu_dma.graphconfig,
-    vu_dma.stylesheet,
-    vu_dma.link,
-    vu_dma.avg_press,
-    vu_dma.effc,
-    vu_dma.active,
-    vu_dma.undelete,
-    vu_dma.tstamp,
-    vu_dma.insert_user,
-    vu_dma.lastupdate,
-    vu_dma.lastupdate_user,
-    vu_dma.the_geom
-   FROM vu_dma,
-    selector_expl
-  WHERE selector_expl.expl_id = ANY(vu_dma.expl_id) AND selector_expl.cur_user = "current_user"()::text OR vu_dma.expl_id IS NULL
-  ORDER BY vu_dma.dma_id;
-
-
-CREATE OR REPLACE VIEW vu_dqa
-AS SELECT d.dqa_id,
+AS SELECT d.dma_id,
     d.name,
-    d.macrodqa_id,
+    d.dma_type,
+    d.macrodma_id,
     d.descript,
-    d.muni_id,
-    d.expl_id,
-    d.sector_id,
-    et.idval AS dqa_type,
-    d.pattern_id,
-    d.graphconfig::text AS graphconfig,
-    d.stylesheet::text AS stylesheet,
-    d.link,
-    d.active,
     d.undelete,
+    d.expl_id,
+    d.minc,
+    d.maxc,
+    d.effc,
+    d.pattern_id,
+    d.link,
+    d.graphconfig,
+    d.stylesheet,
+    d.avg_press,
     d.tstamp,
     d.insert_user,
     d.lastupdate,
     d.lastupdate_user,
-    d.the_geom
-   FROM dqa d
-     LEFT JOIN edit_typevalue et ON et.id::text = d.dqa_type::text AND et.typevalue::text = 'dqa_type'::text
-  ORDER BY d.dqa_id;
+    d.the_geom,
+    d.muni_id,
+    d.sector_id
+   FROM dma d,
+    selector_expl
+  WHERE selector_expl.expl_id = ANY(d.expl_id) AND selector_expl.cur_user = "current_user"()::text OR d.expl_id IS NULL
+  ORDER BY d.dma_id;
+
+CREATE OR REPLACE VIEW v_edit_supplyzone
+ AS
+ SELECT s.supplyzone_id,
+    s.name,
+    s.supplyzone_type,
+    ms.name AS macrosector,
+    s.descript,
+    s.undelete,
+    s.graphconfig::text AS graphconfig,
+    s.stylesheet,
+    s.parent_id,
+    s.pattern_id,
+    s.tstamp,
+    s.insert_user,
+    s.lastupdate,
+    s.lastupdate_user,
+	  s.avg_press,
+	  s.link,
+	  s.the_geom,
+    s.muni_id,
+    s.expl_id,
+    et.idval
+   FROM selector_supplyzone,
+    supplyzone s
+    LEFT JOIN macrosector ms ON ms.macrosector_id = s.macrosector_id
+    LEFT JOIN edit_typevalue et ON et.id::text = s.supplyzone_type::text AND et.typevalue::text = 'supplyzone_type'::text
+  WHERE s.supplyzone_id = selector_supplyzone.supplyzone_id AND selector_supplyzone.cur_user = "current_user"()::text;
+
 
 CREATE OR REPLACE VIEW v_edit_dqa
-AS SELECT vu_dqa.dqa_id,
-    vu_dqa.name,
-    vu_dqa.macrodqa_id,
-    vu_dqa.descript,
-    vu_dqa.muni_id,
-    vu_dqa.expl_id,
-    vu_dqa.sector_id,
-    vu_dqa.dqa_type,
-    vu_dqa.pattern_id,
-    vu_dqa.graphconfig,
-    vu_dqa.stylesheet,
-    vu_dqa.link,
-    vu_dqa.active,
-    vu_dqa.undelete,
-    vu_dqa.tstamp,
-    vu_dqa.insert_user,
-    vu_dqa.lastupdate,
-    vu_dqa.lastupdate_user,
-    vu_dqa.the_geom
-   FROM vu_dqa,
+AS SELECT d.dqa_id,
+    d.name,
+    d.dqa_type,
+    d.macrodqa_id,
+    d.descript,
+    d.undelete,
+    d.expl_id,
+    d.pattern_id,
+    d.link,
+    d.graphconfig,
+    d.stylesheet,
+    d.tstamp,
+    d.insert_user,
+    d.lastupdate,
+    d.lastupdate_user,
+    d.the_geom,
+    d.muni_id,
+    d.sector_id
+   FROM dqa d,
     selector_expl
-  WHERE selector_expl.expl_id = ANY(vu_dqa.expl_id) AND selector_expl.cur_user = "current_user"()::text OR vu_dqa.expl_id IS NULL
-  ORDER BY vu_dqa.dqa_id;
+  WHERE selector_expl.expl_id = ANY(d.expl_id) AND selector_expl.cur_user = "current_user"()::text OR d.expl_id IS NULL
+  ORDER BY d.dqa_id;
+
 
 CREATE OR REPLACE VIEW v_edit_element AS
 SELECT e.* FROM ( SELECT element.element_id,
@@ -1639,18 +1594,23 @@ AS SELECT e.pol_id,
 CREATE OR REPLACE VIEW v_ui_presszone
 AS SELECT p.presszone_id,
     p.name,
+    p.presszone_type,
     p.descript,
+    p.active,
     p.expl_id,
     p.link,
     p.head,
-    p.active,
     p.graphconfig,
     p.stylesheet,
     p.tstamp,
     p.insert_user,
     p.lastupdate,
-    p.lastupdate_user
-   FROM presszone p
+    p.lastupdate_user,
+    p.avg_press,
+    p.muni_id,
+    p.sector_id
+   FROM selector_expl s,
+    presszone p
   WHERE p.presszone_id <> ALL (ARRAY[0, -1]::integer[])
   ORDER BY p.presszone_id;
 
@@ -4564,24 +4524,28 @@ AS WITH expl_data AS (
 CREATE OR REPLACE VIEW v_ui_dma
 AS SELECT d.dma_id,
     d.name,
-    d.descript,
-    d.expl_id,
+    d.dma_type,
     md.name AS macrodma,
+    d.descript,
     d.active,
     d.undelete,
+    d.expl_id,
     d.minc,
     d.maxc,
     d.effc,
-    d.avg_press,
     d.pattern_id,
     d.link,
     d.graphconfig,
     d.stylesheet,
+    d.avg_press,
     d.tstamp,
     d.insert_user,
     d.lastupdate,
-    d.lastupdate_user
-   FROM dma d
+    d.lastupdate_user,
+    d.muni_id,
+    d.sector_id
+   FROM selector_expl s,
+    dma d
      LEFT JOIN macrodma md ON md.macrodma_id = d.macrodma_id
   WHERE d.dma_id > 0
   ORDER BY d.dma_id;
@@ -4621,103 +4585,139 @@ AS SELECT e.name AS exploitation,
      JOIN ext_cat_period p ON p.id::text = om_waterbalance.cat_period_id::text;
 
 
+CREATE OR REPLACE VIEW v_ui_supplyzone
+ AS
+ SELECT s.supplyzone_id,
+    s.name,
+    s.supplyzone_type,
+    ms.name AS macrosector,
+    s.descript,
+    s.active,
+    s.undelete,
+    s.graphconfig,
+    s.stylesheet,
+    s.parent_id,
+    s.pattern_id,
+    s.tstamp,
+    s.insert_user,
+    s.lastupdate,
+    s.lastupdate_user,
+	  s.avg_press,
+	  s.link,
+    s.muni_id,
+    s.expl_id
+   FROM selector_supplyzone ss,
+    supplyzone s
+     LEFT JOIN macrosector ms ON ms.macrosector_id = s.macrosector_id
+  WHERE s.supplyzone_id > 0 AND ss.supplyzone_id = s.supplyzone_id AND ss.cur_user = CURRENT_USER
+  ORDER BY s.supplyzone_id;
+
+CREATE OR REPLACE VIEW v_ui_macrodma
+ AS
+ SELECT m.macrodma_id,
+  m.name,
+	m.descript,
+	m.undelete,
+	m.active,
+	m.expl_id
+   FROM selector_expl s,
+    macrodma m
+	WHERE macrodma_id > 0 AND m.expl_id = s.expl_id AND s.cur_user = "current_user"()::text
+  ORDER BY m.macrodma_id;
+
+
+CREATE OR REPLACE VIEW v_ui_macrosector
+  AS
+  SELECT m.macrosector_id,
+    m.name,
+    m.descript,
+    m.undelete,
+    m.active
+    FROM macrosector m
+    WHERE m.macrosector_id > 0
+  ORDER BY m.macrosector_id;
+
+
 CREATE OR REPLACE VIEW v_ui_dqa
 AS SELECT d.dqa_id,
     d.name,
+    d.dqa_type,
+    md.name AS macrodqa_id,
     d.descript,
-    d.expl_id,
-    md.name AS macrodma,
     d.active,
     d.undelete,
-    d.the_geom,
+    d.expl_id,
     d.pattern_id,
-    d.dqa_type,
     d.link,
     d.graphconfig,
     d.stylesheet,
     d.tstamp,
     d.insert_user,
     d.lastupdate,
-    d.lastupdate_user
-   FROM dqa d
+    d.lastupdate_user,
+    d.muni_id,
+    d.sector_id
+   FROM selector_expl s,
+    dqa d
      LEFT JOIN macrodqa md ON md.macrodqa_id = d.macrodqa_id
   WHERE d.dqa_id > 0
   ORDER BY d.dqa_id;
 
+ 
+
 CREATE OR REPLACE VIEW v_ui_sector
 AS SELECT s.sector_id,
     s.name,
+    s.sector_type,
     ms.name AS macrosector,
     s.descript,
-    s.undelete,
-    s.sector_type,
     s.active,
-    s.parent_id,
-    s.pattern_id,
-    s.tstamp,
-    s.insert_user,
-    s.lastupdate,
-    s.lastupdate_user,
+    s.undelete,
     s.graphconfig,
-    s.stylesheet
-   FROM sector s
-     LEFT JOIN macrosector ms ON ms.macrosector_id = s.macrosector_id
-  WHERE s.sector_id > 0
-  ORDER BY s.sector_id;
-
-CREATE OR REPLACE VIEW vu_sector
-AS SELECT s.sector_id,
-    s.name,
-    s.macrosector_id,
-    m.name AS macrosector_name,
-    s.muni_id,
-    s.expl_id,
-    et.idval,
-    s.descript,
+    s.stylesheet,
     s.parent_id,
     s.pattern_id,
-    s.graphconfig::text AS graphconfig,
-    s.stylesheet::text AS stylesheet,
-    s.link,
-    s.avg_press,
-    s.active,
-    s.undelete,
     s.tstamp,
     s.insert_user,
     s.lastupdate,
     s.lastupdate_user,
-    s.the_geom
-   FROM sector s
-     JOIN macrosector m USING (macrosector_id)
-     LEFT JOIN edit_typevalue et ON et.id::text = s.sector_type::text AND et.typevalue::text = 'sector_type'::text
+    s.avg_press,
+    s.link,
+    s.muni_id,
+    s.expl_id
+   FROM selector_sector ss,
+    sector s
+     LEFT JOIN macrosector ms ON ms.macrosector_id = s.macrosector_id
+  WHERE s.sector_id > 0 AND ss.sector_id = s.sector_id AND ss.cur_user = CURRENT_USER
   ORDER BY s.sector_id;
 
 
 CREATE OR REPLACE VIEW v_edit_sector
-AS SELECT vu_sector.sector_id,
-    vu_sector.name,
-    vu_sector.macrosector_id,
-    vu_sector.macrosector_name,
-    vu_sector.muni_id,
-    vu_sector.expl_id,
-    vu_sector.idval,
-    vu_sector.descript,
-    vu_sector.parent_id,
-    vu_sector.pattern_id,
-    vu_sector.graphconfig,
-    vu_sector.stylesheet,
-    vu_sector.link,
-    vu_sector.avg_press,
-    vu_sector.active,
-    vu_sector.undelete,
-    vu_sector.tstamp,
-    vu_sector.insert_user,
-    vu_sector.lastupdate,
-    vu_sector.lastupdate_user,
-    vu_sector.the_geom
-   FROM vu_sector,
-    selector_sector
-  WHERE vu_sector.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
+AS SELECT s.sector_id,
+    s.name,
+    s.sector_type,
+    s.macrosector_id,
+    s.descript,
+    s.undelete,
+    s.graphconfig,
+    s.stylesheet,
+    s.parent_id,
+    s.pattern_id,
+    s.tstamp,
+    s.insert_user,
+    s.lastupdate,
+    s.lastupdate_user,
+    s.avg_press,
+    s.link,
+    s.the_geom,
+    s.muni_id,
+    s.expl_id,
+    et.idval
+   FROM sector s
+   LEFT JOIN edit_typevalue et ON et.id::text = s.sector_type::text AND et.typevalue::text = 'sector_type'::text,
+    selector_sector ss
+  WHERE s.sector_id = ss.sector_id AND ss.cur_user = "current_user"()::text;
+
 
 CREATE OR REPLACE VIEW v_value_cat_node
 AS SELECT cat_node.id,

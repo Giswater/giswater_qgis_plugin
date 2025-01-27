@@ -15,9 +15,13 @@ $BODY$
 DECLARE 
 	expl_id_int integer;
 
+  view_name TEXT;
+
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
+
+    view_name = TG_ARGV[0];
 
 	
     IF TG_OP = 'INSERT' THEN
@@ -36,19 +40,41 @@ BEGIN
             END IF;            
         END IF;
 		*/
-			
+			IF view_name = 'ui'THEN
+        IF NEW.active IS NULL THEN
+          NEW.active = TRUE;
+        END IF;
+		  END IF;
+
+
+
         -- FEATURE INSERT
-				INSERT INTO macrosector (macrosector_id, name, descript,  the_geom, undelete, active)
-				VALUES (NEW.macrosector_id, NEW.name, NEW.descript, NEW.the_geom, NEW.undelete, NEW.active);
+				INSERT INTO macrosector (macrosector_id, name, descript, undelete) VALUES (NEW.macrosector_id, NEW.name, NEW.descript, NEW.undelete);
+
+        IF view_name = 'ui' THEN
+			    UPDATE macrosector SET active = NEW.active WHERE macrosector_id = NEW.macrosector_id;
+
+		    ELSIF view_name = 'edit' THEN
+			    UPDATE macrosector SET the_geom = NEW.the_geom WHERE macrosector_id = NEW.macrosector_id;
+
+		    END IF;
 
 		RETURN NEW;
 		
     ELSIF TG_OP = 'UPDATE' THEN
    	-- FEATURE UPDATE
 			UPDATE macrosector 
-			SET macrosector_id=NEW.macrosector_id, name=NEW.name, descript=NEW.descript, the_geom=NEW.the_geom, undelete=NEW.undelete,
-      active=NEW.active
+			SET macrosector_id=NEW.macrosector_id, name=NEW.name, descript=NEW.descript, undelete=NEW.undelete
 			WHERE macrosector_id=NEW.macrosector_id;
+
+
+      IF view_name = 'ui' THEN
+			  UPDATE macrosector SET active = NEW.active WHERE macrosector_id = OLD.macrosector_id;
+
+		  ELSIF view_name = 'edit' THEN
+			  UPDATE macrosector SET the_geom = NEW.the_geom WHERE macrosector_id = OLD.macrosector_id;
+
+		  END IF;
 		
         RETURN NEW;
 

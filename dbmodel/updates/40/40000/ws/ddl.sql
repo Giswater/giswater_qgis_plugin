@@ -588,3 +588,61 @@ ALTER TABLE inp_virtualvalve ADD CONSTRAINT inp_virtualvalve_curve_id_fkey FOREI
 ALTER TABLE inp_dscenario_virtualvalve ADD CONSTRAINT inp_dscenario_virtualvalve_arc_id_fkey FOREIGN KEY (arc_id) REFERENCES inp_virtualvalve(arc_id) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE inp_dscenario_virtualvalve ADD CONSTRAINT inp_dscenario_virtualvalve_curve_id_fkey FOREIGN KEY (curve_id) REFERENCES inp_curve(id) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE inp_dscenario_virtualvalve ADD CONSTRAINT inp_dscenario_virtualvalve_dscenario_id_fkey FOREIGN KEY (dscenario_id) REFERENCES cat_dscenario(dscenario_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+
+-- 27/01/2025
+
+CREATE SEQUENCE IF NOT EXISTS supplyzone_supplyzone_id_seq
+    INCREMENT 1
+    START 1
+    MINVALUE 1
+    MAXVALUE 9223372036854775807
+    CACHE 1;
+
+CREATE TABLE IF NOT EXISTS supplyzone
+(
+    supplyzone_id integer NOT NULL DEFAULT nextval('supplyzone_supplyzone_id_seq'::regclass),
+    name character varying(50) COLLATE pg_catalog."default" NOT NULL,
+    supplyzone_type character varying(16) COLLATE pg_catalog."default",
+    muni_id integer[],
+    expl_id integer[],
+    macrosector_id integer,
+    descript text COLLATE pg_catalog."default",
+    undelete boolean,
+    the_geom geometry(MultiPolygon,25831),
+    graphconfig json DEFAULT '{"use":[{"nodeParent":"", "toArc":[]}], "ignore":[], "forceClosed":[]}'::json,
+    stylesheet json,
+    active boolean DEFAULT true,
+    parent_id integer,
+    pattern_id character varying(20) COLLATE pg_catalog."default",
+    tstamp timestamp without time zone DEFAULT now(),
+    insert_user character varying(50) COLLATE pg_catalog."default" DEFAULT CURRENT_USER,
+    lastupdate timestamp without time zone,
+    lastupdate_user character varying(50) COLLATE pg_catalog."default",
+    avg_press double precision,
+    link text COLLATE pg_catalog."default",
+    CONSTRAINT supplyzone_pkey PRIMARY KEY (supplyzone_id),
+    CONSTRAINT supplyzone_macrosector_id_fkey FOREIGN KEY (macrosector_id)
+        REFERENCES macrosector (macrosector_id) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT,
+    CONSTRAINT supplyzone_parent_id_fkey FOREIGN KEY (parent_id)
+        REFERENCES supplyzone (supplyzone_id) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT,
+    CONSTRAINT supplyzone_pattern_id_fkey FOREIGN KEY (pattern_id)
+        REFERENCES inp_pattern (pattern_id) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT
+);
+
+CREATE TABLE IF NOT EXISTS selector_supplyzone
+(
+    supplyzone_id integer NOT NULL,
+    cur_user text COLLATE pg_catalog."default" NOT NULL DEFAULT "current_user"(),
+    CONSTRAINT selector_supplyzone_pkey PRIMARY KEY (supplyzone_id, cur_user),
+    CONSTRAINT inp_selector_supplyzone_id_fkey FOREIGN KEY (supplyzone_id)
+        REFERENCES supplyzone (supplyzone_id) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+);

@@ -10,7 +10,9 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_dqa()  RETURNS trigger AS
 $BODY$
 
 DECLARE
-view_name TEXT;
+
+	view_name TEXT;
+	
 
 BEGIN
 
@@ -19,6 +21,10 @@ BEGIN
 	-- Arg will be or 'edit' or 'ui'
 	view_name = TG_ARGV[0];
 
+	IF NOT (SELECT array_agg(expl_id ORDER BY expl_id) @> NEW.expl_id FROM exploitation) THEN
+		RAISE EXCEPTION 'Some exploitation ids don''t exist';
+	END IF;
+
 	IF TG_OP = 'INSERT' THEN
 
 		-- expl_id
@@ -26,7 +32,7 @@ BEGIN
 			RETURN NULL;
 		END IF;
 
-		IF view_name = 'edit'THEN
+		IF view_name = 'edit' THEN
 			IF NEW.the_geom IS NOT NULL THEN
 				IF NEW.expl_id IS NULL THEN
 					NEW.expl_id := (SELECT expl_id FROM exploitation WHERE active IS TRUE AND ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
@@ -40,9 +46,9 @@ BEGIN
 			END IF;
 		END IF;
 
-		INSERT INTO dqa (dqa_id, name, expl_id, macrodqa_id, descript, undelete, pattern_id, dqa_type, link, graphconfig, stylesheet)
-		VALUES (NEW.dqa_id, NEW.name, NEW.expl_id, NEW.macrodqa_id, NEW.descript, NEW.undelete, NEW.pattern_id, NEW.dqa_type,
-		NEW.link, NEW.graphconfig::json, NEW.stylesheet::json);
+		INSERT INTO dqa (dqa_id, name, expl_id, macrodqa_id, descript, undelete, pattern_id, dqa_type, link, graphconfig, stylesheet, muni_id, sector_id)
+		VALUES (NEW.dqa_id, NEW.name, NEW.expl_id, (SELECT macrodqa_id FROM macrodqa WHERE name = NEW.macrodqa_id), NEW.descript, NEW.undelete, NEW.pattern_id, NEW.dqa_type,
+		NEW.link, NEW.graphconfig::json, NEW.stylesheet::json, NEW.muni_id, NEW.sector_id);
 
 		IF view_name = 'ui' THEN
 			UPDATE dqa SET active = NEW.active WHERE dqa_id = NEW.dqa_id;
@@ -57,9 +63,9 @@ BEGIN
 	ELSIF TG_OP = 'UPDATE' THEN
 
 		UPDATE dqa
-		SET dqa_id=NEW.dqa_id, name=NEW.name, expl_id=NEW.expl_id, macrodqa_id=NEW.macrodqa_id, descript=NEW.descript, undelete=NEW.undelete,
+		SET dqa_id=NEW.dqa_id, name=NEW.name, expl_id=NEW.expl_id, macrodqa_id=(SELECT macrodqa_id FROM macrodqa WHERE name = NEW.macrodqa_id), descript=NEW.descript, undelete=NEW.undelete,
 		pattern_id=NEW.pattern_id, dqa_type=NEW.dqa_type, link=NEW.link, graphconfig=NEW.graphconfig::json,
-		stylesheet = NEW.stylesheet::json, lastupdate=now(), lastupdate_user = current_user
+		stylesheet = NEW.stylesheet::json, lastupdate=now(), lastupdate_user = current_user, muni_id = NEW.muni_id, sector_id = NEW.sector_id
 		WHERE dqa_id=OLD.dqa_id;
 
 		IF view_name = 'ui' THEN

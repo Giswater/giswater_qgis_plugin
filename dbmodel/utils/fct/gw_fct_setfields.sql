@@ -191,7 +191,7 @@ BEGIN
 			END IF;
 
 			-- Get column type
-			EXECUTE 'SELECT data_type FROM information_schema.columns  WHERE table_schema = $1 AND table_name = ' || quote_literal(v_tablename) || ' AND column_name = $2'
+			EXECUTE 'SELECT udt_name::regtype as data_type FROM information_schema.columns  WHERE table_schema = $1 AND table_name = ' || quote_literal(v_tablename) || ' AND column_name = $2'
 				USING v_schemaname, v_field
 				INTO v_columntype;
 
