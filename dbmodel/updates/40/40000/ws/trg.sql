@@ -215,14 +215,3 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_ve_epa('virtualvalve');
 
 CREATE TRIGGER gw_trg_edit_ve_epa_virtualpump INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_epa_virtualpump
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_ve_epa('virtualpump');
-
-
-
-
-
-
-
-
-
-
-
