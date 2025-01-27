@@ -1355,6 +1355,7 @@ class GwVisit(QObject):
         self.dlg_event.btn_cancel.clicked.connect(self.dlg_event.reject)
         tools_gw.add_btn_help(self.dlg_event)
         tools_qt.manage_translation(dlg_name, self.dlg_event)
+        self.dlg_event.messageBar().hide()
         ret = self.dlg_event.exec_()
 
         # check return
