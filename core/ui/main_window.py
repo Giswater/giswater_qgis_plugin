@@ -27,7 +27,7 @@ class GwMainWindow(QMainWindow):
 
     def __init__(self, class_obj, subtag=None, parent=None):
 
-        super().__init__(parent or iface.mainWindow())
+        super().__init__(parent)
         self.setupUi(self)
 
         # Check if CONTEXT and UINAME are defined and set properties accordingly
