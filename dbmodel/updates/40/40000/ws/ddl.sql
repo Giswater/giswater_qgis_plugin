@@ -476,3 +476,178 @@ CREATE TABLE arc_add (
 	result_id text NULL,
 	CONSTRAINT arc_add_pkey PRIMARY KEY (arc_id)
 );
+
+-- 27/01/25
+-- Drop views
+DROP VIEW IF EXISTS v_edit_inp_dscenario_virtualvalve;
+DROP VIEW IF EXISTS v_edit_inp_virtualvalve;
+
+-- Rename constraints
+ALTER TABLE inp_dscenario_virtualvalve RENAME CONSTRAINT inp_dscenario_virtualvalve_pkey TO _inp_dscenario_virtualvalve_pkey_;
+ALTER TABLE inp_dscenario_virtualvalve RENAME CONSTRAINT inp_dscenario_virtualvalve_arc_id_fkey TO _inp_dscenario_virtualvalve_arc_id_fkey_;
+ALTER TABLE inp_dscenario_virtualvalve RENAME CONSTRAINT inp_dscenario_virtualvalve_curve_id_fkey TO _inp_dscenario_virtualvalve_curve_id_fkey_;
+ALTER TABLE inp_dscenario_virtualvalve RENAME CONSTRAINT inp_dscenario_virtualvalve_dscenario_id_fkey TO _inp_dscenario_virtualvalve_dscenario_id_fkey_;
+
+ALTER TABLE inp_virtualvalve RENAME CONSTRAINT inp_virtualvalve_pkey TO _inp_virtualvalve_pkey_;
+ALTER TABLE inp_virtualvalve RENAME CONSTRAINT inp_virtualvalve_status_check TO _inp_virtualvalve_status_check_;
+ALTER TABLE inp_virtualvalve RENAME CONSTRAINT inp_virtualvalve_valv_type_check TO _inp_virtualvalve_valv_type_check_;
+ALTER TABLE inp_virtualvalve RENAME CONSTRAINT inp_virtualvalve_arc_id_fkey TO _inp_virtualvalve_arc_id_fkey_;
+ALTER TABLE inp_virtualvalve RENAME CONSTRAINT inp_virtualvalve_curve_id_fkey TO _inp_virtualvalve_curve_id_fkey_;
+
+-- Rename tables
+ALTER TABLE inp_dscenario_virtualvalve RENAME TO _inp_dscenario_virtualvalve_;
+ALTER TABLE inp_virtualvalve RENAME TO _inp_virtualvalve_;
+
+-- Create tables with "setting" column
+CREATE TABLE inp_dscenario_virtualvalve (
+    dscenario_id int4 NOT NULL,
+    arc_id varchar(16) NOT NULL,
+    valv_type varchar(18) NULL,
+    diameter numeric(12, 4) NULL,
+    setting numeric(12, 4) NULL,
+    curve_id varchar(16) NULL,
+    minorloss numeric(12, 4) NULL,
+    status varchar(12) NULL,
+    init_quality float8 NULL,
+    CONSTRAINT inp_dscenario_virtualvalve_pkey PRIMARY KEY (dscenario_id, arc_id)
+);
+
+CREATE TABLE inp_virtualvalve (
+    arc_id varchar(16) NOT NULL,
+    valv_type varchar(18) NULL,
+    diameter numeric(12, 4) NULL,
+    setting numeric(12, 4) NULL,
+    curve_id varchar(16) NULL,
+    minorloss numeric(12, 4) NULL,
+    status varchar(12) NULL,
+    init_quality float8 NULL,
+    CONSTRAINT inp_virtualvalve_pkey PRIMARY KEY (arc_id)
+);
+
+-- Move previous flow/coef_loss/pressure to new "setting" column
+INSERT INTO inp_dscenario_virtualvalve (dscenario_id, arc_id, valv_type, diameter, setting, curve_id, minorloss, status, init_quality)
+SELECT dscenario_id, arc_id, valv_type, diameter,
+       CASE
+           WHEN valv_type = 'FCV' THEN flow
+           WHEN valv_type = 'TCV' THEN coef_loss
+           ELSE pressure
+       END,
+       curve_id, minorloss, status, init_quality
+FROM _inp_dscenario_virtualvalve_;
+
+INSERT INTO inp_virtualvalve (arc_id, valv_type, diameter, setting, curve_id, minorloss, status, init_quality)
+SELECT arc_id, valv_type, diameter,
+       CASE
+           WHEN valv_type = 'FCV' THEN flow
+           WHEN valv_type = 'TCV' THEN coef_loss
+           ELSE pressure
+       END,
+       curve_id, minorloss, status, init_quality
+FROM _inp_virtualvalve_;
+
+-- Table Triggers
+
+create trigger gw_trg_typevalue_fk_insert after
+insert
+    on
+    inp_dscenario_virtualvalve for each row execute function gw_trg_typevalue_fk('inp_dscenario_virtualvalve');
+create trigger gw_trg_typevalue_fk_update after
+update
+    of valv_type,
+    status on
+    inp_dscenario_virtualvalve for each row
+    when ((((old.valv_type)::text is distinct
+from
+    (new.valv_type)::text)
+        or ((old.status)::text is distinct
+    from
+        (new.status)::text))) execute function gw_trg_typevalue_fk('inp_dscenario_virtualvalve');
+
+create trigger gw_trg_typevalue_fk_insert after
+insert
+    on
+    inp_virtualvalve for each row execute function gw_trg_typevalue_fk('inp_virtualvalve');
+create trigger gw_trg_typevalue_fk_update after
+update
+    of valv_type,
+    status on
+    inp_virtualvalve for each row
+    when ((((old.valv_type)::text is distinct
+from
+    (new.valv_type)::text)
+        or ((old.status)::text is distinct
+    from
+        (new.status)::text))) execute function gw_trg_typevalue_fk('inp_virtualvalve');
+
+-- Add constraints
+ALTER TABLE inp_virtualvalve ADD CONSTRAINT inp_virtualvalve_status_check CHECK (((status)::text = ANY (ARRAY[('ACTIVE'::character varying)::text, ('CLOSED'::character varying)::text, ('OPEN'::character varying)::text])));
+ALTER TABLE inp_virtualvalve ADD CONSTRAINT inp_virtualvalve_valv_type_check CHECK (((valv_type)::text = ANY (ARRAY[('FCV'::character varying)::text, ('GPV'::character varying)::text, ('PBV'::character varying)::text, ('PRV'::character varying)::text, ('PSV'::character varying)::text, ('TCV'::character varying)::text])));
+ALTER TABLE inp_virtualvalve ADD CONSTRAINT inp_virtualvalve_arc_id_fkey FOREIGN KEY (arc_id) REFERENCES arc(arc_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE inp_virtualvalve ADD CONSTRAINT inp_virtualvalve_curve_id_fkey FOREIGN KEY (curve_id) REFERENCES inp_curve(id) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+ALTER TABLE inp_dscenario_virtualvalve ADD CONSTRAINT inp_dscenario_virtualvalve_arc_id_fkey FOREIGN KEY (arc_id) REFERENCES inp_virtualvalve(arc_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE inp_dscenario_virtualvalve ADD CONSTRAINT inp_dscenario_virtualvalve_curve_id_fkey FOREIGN KEY (curve_id) REFERENCES inp_curve(id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE inp_dscenario_virtualvalve ADD CONSTRAINT inp_dscenario_virtualvalve_dscenario_id_fkey FOREIGN KEY (dscenario_id) REFERENCES cat_dscenario(dscenario_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- Recreate v_edit_inp_virtualvalve
+CREATE OR REPLACE VIEW v_edit_inp_virtualvalve
+AS SELECT v_edit_arc.arc_id,
+    v_edit_arc.node_1,
+    v_edit_arc.node_2,
+    v_edit_arc.arccat_id,
+    v_edit_arc.expl_id,
+    v_edit_arc.sector_id,
+    v_edit_arc.dma_id,
+    v_edit_arc.state,
+    v_edit_arc.state_type,
+    v_edit_arc.custom_length,
+    v_edit_arc.annotation,
+    v.valv_type,
+    v.setting,
+    v.curve_id,
+    v.minorloss,
+    v.status,
+    v.init_quality,
+    v_edit_arc.the_geom
+   FROM v_edit_arc
+     JOIN inp_virtualvalve v USING (arc_id)
+  WHERE v_edit_arc.is_operative IS TRUE;
+
+-- Recreate v_edit_inp_dscenario_virtualvalve
+CREATE OR REPLACE VIEW v_edit_inp_dscenario_virtualvalve
+AS SELECT d.dscenario_id,
+    p.arc_id,
+    p.valv_type,
+    p.diameter,
+    p.setting,
+    p.curve_id,
+    p.minorloss,
+    p.status,
+    p.init_quality,
+    a.the_geom
+   FROM selector_inp_dscenario,
+    v_edit_arc a
+     JOIN inp_dscenario_virtualvalve p USING (arc_id)
+     JOIN cat_dscenario d USING (dscenario_id)
+  WHERE p.dscenario_id = selector_inp_dscenario.dscenario_id AND selector_inp_dscenario.cur_user = "current_user"()::text AND a.is_operative IS TRUE;
+
+
+-- Views Triggers
+
+create trigger gw_trg_edit_inp_arc_virtualvalve instead of
+insert
+    or
+delete
+    or
+update
+    on
+    v_edit_inp_virtualvalve for each row execute function gw_trg_edit_inp_arc('inp_virtualvalve');
+
+create trigger gw_trg_edit_inp_dscenario_virtualvalve instead of
+insert
+    or
+delete
+    or
+update
+    on
+    v_edit_inp_dscenario_virtualvalve for each row execute function gw_trg_edit_inp_dscenario('VIRTUALVALVE');
