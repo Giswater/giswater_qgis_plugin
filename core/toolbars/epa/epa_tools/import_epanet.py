@@ -519,8 +519,7 @@ class GwImportEpanet:
             WHERE expl_id > 0
         """)
         cmb_expl.clear()
-        tools_qt.fill_combo_values(cmb_expl, rows, add_empty=False)
-        cmb_expl.setCurrentText(expl_value)
+        tools_qt.fill_combo_values(cmb_expl, rows, add_empty=False, selected_id=expl_value, index_to_compare=1)
 
         # Fill sector combo
         cmb_sector: QComboBox = self.dlg_config.cmb_sector
@@ -532,8 +531,7 @@ class GwImportEpanet:
             WHERE sector_id = 0
         """)
         cmb_sector.clear()
-        tools_qt.fill_combo_values(cmb_sector, rows, add_empty=False)
-        cmb_sector.setCurrentText(sector_value)
+        tools_qt.fill_combo_values(cmb_sector, rows, add_empty=False, selected_id=sector_value, index_to_compare=1)
 
         # Fill municipality combo
         cmb_muni: QComboBox = self.dlg_config.cmb_muni
@@ -545,11 +543,10 @@ class GwImportEpanet:
             WHERE muni_id > 0
         """)
         cmb_muni.clear()
-        tools_qt.fill_combo_values(cmb_muni, rows, add_empty=False)
+        tools_qt.fill_combo_values(cmb_muni, rows, add_empty=False, selected_id=muni_value, index_to_compare=1)
         # Add a separator and a "Get from spatial intersect" option
         cmb_muni.insertSeparator(cmb_muni.count())
-        cmb_muni.addItem(SPATIAL_INTERSECT)
-        cmb_muni.setCurrentText(muni_value)
+        cmb_muni.addItem(SPATIAL_INTERSECT, [999999, SPATIAL_INTERSECT])
 
         self.catalogs = Catalogs.from_network_model(self.parse_inp_task.network)
 
