@@ -127,26 +127,21 @@ BEGIN
 		EXECUTE v_querytext;
 
 		-- manage config_form_fields
-		if v_table in ('node', 'arc', 'connec', 'gully') then
+		IF v_table IN ('node', 'arc', 'connec', 'gully') THEN
 
-			for v_layers in select distinct parent_layer, child_layer from cat_feature where feature_type = upper(v_table)
-			loop
+			FOR v_layers IN SELECT DISTINCT parent_layer, child_layer FROM cat_feature WHERE feature_type = upper(v_table)
+			LOOP
 
-				execute '
-				update config_form_fields 
-				set	columnname = '||quote_literal(v_newname)||', tooltip = '||quote_literal(v_newname)||', label = '||quote_literal(concat(upper(left(v_newname, 1)), substring(v_newname, 2)))||' 
-				where formname = '||quote_literal(v_layers.child_layer)||'
-				and columnname = '||quote_literal(v_column)||'';
+				-- edit all rows that have the old columname with the correct one, ve_*, v_edit_* ...
+				EXECUTE '
+				UPDATE config_form_fields 
+				SET	columnname = '||quote_literal(v_newname)||', tooltip = '||quote_literal(v_newname)||', label = '||quote_literal(concat(upper(left(v_newname, 1)), substring(v_newname, 2)))||' 
+				WHERE formname ILIKE ''%'||v_table||'%''
+				AND columnname = '||quote_literal(v_column)||'';
 
-				execute '
-				update config_form_fields 
-				set	columnname = '||quote_literal(v_newname)||', tooltip = '||quote_literal(v_newname)||', label = '||quote_literal(concat(upper(left(v_newname, 1)), substring(v_newname, 2)))||' 
-				where formname = '||quote_literal(v_layers.parent_layer)||'
-				and columnname = '||quote_literal(v_column)||'';
+			END LOOP;
 
-			end loop;
-
-		end if;
+		END IF;
 
 	ELSIF v_action='DROP' AND (SELECT column_name FROM information_schema.columns WHERE table_schema=v_schemaname and table_name = v_table AND column_name = v_column) IS NOT NULL THEN
 
