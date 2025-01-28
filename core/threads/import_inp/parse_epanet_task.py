@@ -80,7 +80,7 @@ class Catalogs:
         rows = tools_db.get_rows("""
                 SELECT a.id, a.dint, r.roughness
                 FROM cat_arc AS a
-                JOIN cat_mat_roughness AS r USING (matcat_id)
+                LEFT JOIN cat_mat_roughness AS r USING (matcat_id)
             """)
 
         def tofloat(x):
@@ -89,7 +89,7 @@ class Catalogs:
         db_arc_catalog: dict[str, tuple[float, float]] = {}
         if rows:
             unsorted_dict = {
-                _id: (float(dint), tofloat(float(roughness))) for _id, dint, roughness in rows
+                _id: (tofloat(dint), tofloat(roughness)) for _id, dint, roughness in rows
             }
             db_arc_catalog = dict(sorted(unsorted_dict.items()))
 
