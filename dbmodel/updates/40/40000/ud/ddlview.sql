@@ -6284,120 +6284,177 @@ FULL OUTER JOIN pump p USING (nodarc_id, node_id)
 FULL OUTER JOIN weir w USING (nodarc_id, node_id);
 
 --10/01/2025
+--28/01/2025 [Modified]
+--create view for cat_feature_flwreg
+DROP VIEW IF EXISTS v_edit_cat_feature_flwreg;
+CREATE OR REPLACE VIEW v_edit_cat_feature_flwreg
+AS SELECT 
+	cat_feature.id,
+    cat_feature.feature_class AS system_id,
+    cat_feature_flwreg.epa_default,
+    cat_feature.code_autofill,
+    cat_feature.link_path,
+    cat_feature.descript,
+    cat_feature.active
+   FROM cat_feature
+     JOIN cat_feature_flwreg USING (id);
+
+--create parent table for flow regulators	 
+DROP TABLE IF EXISTS flwreg;
+CREATE TABLE flwreg (
+	flwreg_id varchar(16) DEFAULT nextval('urn_id_seq'::regclass) NOT NULL,
+	node_id varchar(16) NOT NULL,
+	order_id int2 NOT NULL,
+	to_arc varchar(16) NOT NULL,
+	flwreg_type varchar(18) NOT NULL,
+	flwreg_length float8 NOT NULL,
+	epa_type varchar(16) NOT NULL,  --(ORIFICE / WEIR / OUTLET / PUMP)
+	state int2 NOT NULL,
+	state_type int2 NOT NULL,
+	annotation text NULL,
+	observ text NULL,
+	the_geom public.geometry(linestring, SRID_VALUE) NOT NULL,
+	CONSTRAINT flwreg_epa_type_check CHECK (((epa_type)::text = ANY (ARRAY['WEIR'::text, 'ORIFICE'::text, 'PUMP'::text, 'OUTLET'::text, 'UNDEFINED'::text]))),
+	CONSTRAINT flwreg_pkey PRIMARY KEY (flwreg_id),
+	CONSTRAINT flwreg_type_fkey FOREIGN KEY (flwreg_type) REFERENCES cat_feature(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT flwreg_node_id_fkey FOREIGN KEY (node_id) REFERENCES node(node_id) ON DELETE RESTRICT ON UPDATE CASCADE
+	);
+
+CREATE INDEX flwreg_node_id ON flwreg USING btree (node_id);	
+CREATE INDEX flwreg_flwreg_type ON flwreg USING btree (flwreg_type);
 
 -- Create parent view for flow regulators.
 DROP VIEW IF EXISTS v_edit_flwreg;
-CREATE OR REPLACE VIEW v_edit_flwreg
-AS SELECT b.nodarc_id,
-    b.node_id,
-    b.order_id,
-    b.to_arc,
-    b.flwreg_type,
-    cf.id as featurecat_id,
-    b.flwreg_length,
-    st_setsrid(st_linesubstring(CASE WHEN ST_Equals(ST_StartPoint(a.the_geom), n.the_geom)
+CREATE OR REPLACE VIEW v_edit_flwreg 
+AS SELECT 
+	f.flwreg_id,
+	f.node_id,
+	f.order_id,
+	f.to_arc,
+	f.flwreg_type,
+	cf.feature_class AS flwreg_class,
+	f.flwreg_length,
+	f.epa_type,
+	f.state ,
+	f.state_type,
+	f.annotation,
+	f.observ,
+	st_setsrid(st_linesubstring(CASE WHEN ST_Equals(ST_StartPoint(a.the_geom), n.the_geom)
                     THEN a.the_geom
-                    ELSE ST_Reverse(a.the_geom) end, 0,  b.flwreg_length / st_length(a.the_geom)),SRID_VALUE)::geometry(LineString,SRID_VALUE)
+                    ELSE ST_Reverse(a.the_geom) end, 0,  f.flwreg_length / st_length(a.the_geom)),SRID_VALUE)::geometry(LineString,SRID_VALUE)
                 AS the_geom
-   FROM ( SELECT inp_flwreg_orifice.nodarc_id,
-            inp_flwreg_orifice.node_id,
-            inp_flwreg_orifice.order_id,
-            inp_flwreg_orifice.to_arc,
-            'ORIFICE'::text AS flwreg_type,
-            inp_flwreg_orifice.flwreg_length
-           FROM inp_flwreg_orifice
-        UNION
-         SELECT inp_flwreg_weir.nodarc_id,
-            inp_flwreg_weir.node_id,
-            inp_flwreg_weir.order_id,
-            inp_flwreg_weir.to_arc,
-            'WEIR'::text AS flwreg_type,
-            inp_flwreg_weir.flwreg_length
-           FROM inp_flwreg_weir
-        UNION
-         SELECT inp_flwreg_pump.nodarc_id,
-            inp_flwreg_pump.node_id,
-            inp_flwreg_pump.order_id,
-            inp_flwreg_pump.to_arc,
-            'PUMP'::text AS flwreg_type,
-            inp_flwreg_pump.flwreg_length
-           FROM inp_flwreg_pump
-        UNION
-         SELECT inp_flwreg_outlet.nodarc_id,
-            inp_flwreg_outlet.node_id,
-            inp_flwreg_outlet.order_id,
-            inp_flwreg_outlet.to_arc,
-            'OUTLET'::text AS flwreg_type,
-            inp_flwreg_outlet.flwreg_length
-           FROM inp_flwreg_outlet) b
-     JOIN node n USING (node_id)
-     JOIN arc a ON a.arc_id::text = b.to_arc::text
-    JOIN cat_feature cf ON b.flwreg_type = cf.feature_class;
+    FROM flwreg f
+    JOIN node n USING (node_id)
+    JOIN arc a ON a.arc_id::text = f.to_arc::text
+	JOIN sys_epa_type et ON f.flwreg_type = et.id
+	JOIN cat_feature cf ON cf.feature_type = et.feature_type;
 
--- Create parent table for flowregulators (as we have for v_parent_node, arc, connec, gully)
 
-CREATE OR REPLACE VIEW vp_basic_flwreg
-AS SELECT nodarc_id AS nid,
-    featurecat_id AS custom_type
-   FROM v_edit_flwreg;
+--Create child views using man tables for flow regulators
 
--- Create child views for flowregulators.
-DROP VIEW IF EXISTS v_edit_flwreg_frorifice;
-CREATE OR REPLACE VIEW v_edit_flwreg_frorifice as
-SELECT fr.*, st_setsrid(st_linesubstring(CASE WHEN ST_Equals(ST_StartPoint(a.the_geom), n.the_geom)
+CREATE VIEW ve_flwreg_frweir
+AS SELECT 
+	f.flwreg_id,
+	f.node_id,
+	f.order_id,
+	f.to_arc,
+	f.flwreg_type,
+	cf.feature_class AS flwreg_class,
+	f.flwreg_length,
+	f.epa_type,
+	mf.weir_type,
+	f.state ,
+	f.state_type,
+	f.annotation,
+	f.observ,
+	st_setsrid(st_linesubstring(CASE WHEN ST_Equals(ST_StartPoint(a.the_geom), n.the_geom)
                     THEN a.the_geom
-                    ELSE ST_Reverse(a.the_geom) end, 0,  fr.flwreg_length / st_length(a.the_geom)),SRID_VALUE)::geometry(LineString,SRID_VALUE)
+                    ELSE ST_Reverse(a.the_geom) end, 0,  f.flwreg_length / st_length(a.the_geom)),SRID_VALUE)::geometry(LineString,SRID_VALUE)
                 AS the_geom
-FROM inp_flwreg_orifice fr
-JOIN v_edit_node n ON fr.node_id::text = n.node_id::TEXT
-JOIN v_edit_arc a ON a.arc_id::text = fr.to_arc::TEXT
-JOIN selector_expl expl ON n.expl_id = expl.expl_id OR n.expl_id2 = expl.expl_id
-JOIN selector_sector s ON n.sector_id = s.sector_id
-LEFT JOIN selector_municipality m ON n.muni_id = m.muni_id
-WHERE expl.cur_user = CURRENT_USER AND s.cur_user = CURRENT_USER AND (m.cur_user = CURRENT_USER OR n.muni_id IS NULL);
+	FROM flwreg f  
+	JOIN node n USING (node_id)
+	JOIN arc a ON a.arc_id::text = f.to_arc::TEXT
+	JOIN sys_epa_type et ON f.flwreg_type = et.id
+	JOIN cat_feature cf ON cf.feature_type = et.feature_type
+	JOIN man_weir mf ON f.flwreg_id = mf.flwreg_id ;
 
-DROP VIEW IF EXISTS v_edit_flwreg_frweir;
-CREATE OR REPLACE VIEW v_edit_flwreg_frweir AS
-SELECT fr.*, st_setsrid(st_linesubstring(CASE WHEN ST_Equals(ST_StartPoint(a.the_geom), n.the_geom)
+
+CREATE VIEW ve_flwreg_frpump
+AS SELECT 
+f.flwreg_id,
+	f.node_id,
+	f.order_id,
+	f.to_arc,
+	f.flwreg_type,
+	cf.feature_class AS flwreg_class,
+	f.flwreg_length,
+	f.epa_type,
+	mf.pump_type,
+	f.state,
+	f.state_type,
+	f.annotation,
+	f.observ,
+	st_setsrid(st_linesubstring(CASE WHEN ST_Equals(ST_StartPoint(a.the_geom), n.the_geom)
                     THEN a.the_geom
-                    ELSE ST_Reverse(a.the_geom) end, 0,  fr.flwreg_length / st_length(a.the_geom)),SRID_VALUE)::geometry(LineString,SRID_VALUE)
+                    ELSE ST_Reverse(a.the_geom) end, 0,  f.flwreg_length / st_length(a.the_geom)),SRID_VALUE)::geometry(LineString,SRID_VALUE)
                 AS the_geom
-FROM inp_flwreg_weir fr
-JOIN v_edit_node n ON fr.node_id::text = n.node_id::TEXT
-JOIN v_edit_arc a ON a.arc_id::text = fr.to_arc::TEXT
-JOIN selector_expl expl ON n.expl_id = expl.expl_id OR n.expl_id2 = expl.expl_id
-JOIN selector_sector s ON n.sector_id = s.sector_id
-LEFT JOIN selector_municipality m ON n.muni_id = m.muni_id
-WHERE expl.cur_user = CURRENT_USER AND s.cur_user = CURRENT_USER AND (m.cur_user = CURRENT_USER OR n.muni_id IS NULL);
+	FROM flwreg f 
+	JOIN node n USING (node_id)
+	JOIN arc a ON a.arc_id::text = f.to_arc::TEXT
+	JOIN sys_epa_type et ON f.flwreg_type = et.id
+	JOIN cat_feature cf ON cf.feature_type = et.feature_type
+	JOIN man_pump mf ON f.flwreg_id = mf.flwreg_id;
 
-DROP VIEW IF EXISTS v_edit_flwreg_froutlet;
-CREATE OR REPLACE VIEW v_edit_flwreg_froutlet AS
-SELECT fr.*, st_setsrid(st_linesubstring(CASE WHEN ST_Equals(ST_StartPoint(a.the_geom), n.the_geom)
+CREATE VIEW ve_flwreg_frorifice 
+AS SELECT 
+	f.flwreg_id,
+	f.node_id,
+	f.order_id,
+	f.to_arc,
+	f.flwreg_type,
+	cf.feature_class AS flwreg_class,
+	f.flwreg_length,
+	f.epa_type,
+	f.state,
+	f.state_type,
+	f.annotation,
+	f.observ,
+	st_setsrid(st_linesubstring(CASE WHEN ST_Equals(ST_StartPoint(a.the_geom), n.the_geom)
                     THEN a.the_geom
-                    ELSE ST_Reverse(a.the_geom) end, 0,  fr.flwreg_length / st_length(a.the_geom)),SRID_VALUE)::geometry(LineString,SRID_VALUE)
+                    ELSE ST_Reverse(a.the_geom) end, 0,  f.flwreg_length / st_length(a.the_geom)),SRID_VALUE)::geometry(LineString,SRID_VALUE)
                 AS the_geom
-FROM inp_flwreg_outlet fr
-JOIN v_edit_node n ON fr.node_id::text = n.node_id::TEXT
-JOIN v_edit_arc a ON a.arc_id::text = fr.to_arc::TEXT
-JOIN selector_expl expl ON n.expl_id = expl.expl_id OR n.expl_id2 = expl.expl_id
-JOIN selector_sector s ON n.sector_id = s.sector_id
-LEFT JOIN selector_municipality m ON n.muni_id = m.muni_id
-WHERE expl.cur_user = CURRENT_USER AND s.cur_user = CURRENT_USER AND (m.cur_user = CURRENT_USER OR n.muni_id IS NULL);
+	FROM flwreg f 
+	JOIN node n USING (node_id)
+	JOIN arc a ON a.arc_id::text = f.to_arc::TEXT
+	JOIN sys_epa_type et ON f.flwreg_type = et.id
+	JOIN cat_feature cf ON cf.feature_type = et.feature_type
+	JOIN man_vflwreg mf ON f.flwreg_id = mf.flwreg_id ;
 
 
-DROP VIEW IF EXISTS v_edit_flwreg_frpump;
-CREATE OR REPLACE VIEW v_edit_flwreg_frpump AS
-SELECT fr.*, st_setsrid(st_linesubstring(CASE WHEN ST_Equals(ST_StartPoint(a.the_geom), n.the_geom)
+CREATE VIEW ve_flwreg_froutlet
+AS SELECT 
+	f.flwreg_id,
+	f.node_id,
+	f.order_id,
+	f.to_arc,
+	f.flwreg_type,
+	cf.feature_class AS flwreg_class,
+	f.flwreg_length,
+	f.epa_type,
+	f.state,
+	f.state_type,
+	f.annotation,
+	f.observ,
+	st_setsrid(st_linesubstring(CASE WHEN ST_Equals(ST_StartPoint(a.the_geom), n.the_geom)
                     THEN a.the_geom
-                    ELSE ST_Reverse(a.the_geom) end, 0,  fr.flwreg_length / st_length(a.the_geom)),SRID_VALUE)::geometry(LineString,SRID_VALUE)
+                    ELSE ST_Reverse(a.the_geom) end, 0,  f.flwreg_length / st_length(a.the_geom)),SRID_VALUE)::geometry(LineString,SRID_VALUE)
                 AS the_geom
-FROM inp_flwreg_pump fr
-JOIN v_edit_node n ON fr.node_id::text = n.node_id::TEXT
-JOIN v_edit_arc a ON a.arc_id::text = fr.to_arc::TEXT
-JOIN selector_expl expl ON n.expl_id = expl.expl_id OR n.expl_id2 = expl.expl_id
-JOIN selector_sector s ON n.sector_id = s.sector_id
-LEFT JOIN selector_municipality m ON n.muni_id = m.muni_id
-WHERE expl.cur_user = CURRENT_USER AND s.cur_user = CURRENT_USER AND (m.cur_user = CURRENT_USER OR n.muni_id IS NULL);
+	FROM flwreg f 
+	JOIN node n USING (node_id)
+	JOIN arc a ON a.arc_id::text = f.to_arc::TEXT
+	JOIN sys_epa_type et ON f.flwreg_type = et.id
+	JOIN cat_feature cf ON cf.feature_type = et.feature_type
+	JOIN man_vflwreg mf ON f.flwreg_id = mf.flwreg_id ;
 
 
 CREATE OR REPLACE VIEW v_rpt_node

@@ -79,6 +79,10 @@ BEGIN
 			IF NEW.double_geom IS NULL THEN NEW.double_geom='{"activated":false,"value":1}'; END IF;
 
 			UPDATE cat_feature_gully SET double_geom=NEW.double_geom::json, epa_default=NEW.epa_default WHERE id=NEW.id;
+
+		ELSIF v_table='flwreg' THEN
+
+			UPDATE cat_feature_flwreg SET epa_default=NEW.epa_default WHERE id=NEW.id;
 		END IF;
 
 		RETURN NEW;
@@ -114,6 +118,11 @@ BEGIN
 		ELSIF v_table='gully' THEN
 
 			UPDATE cat_feature_gully SET double_geom=NEW.double_geom::json WHERE id=NEW.id;
+		
+		ELSIF v_table='flwreg' THEN
+
+			UPDATE cat_feature_flwreg SET epa_default=NEW.epa_default WHERE id=NEW.id;
+
 
 		END IF;
 	
@@ -136,6 +145,10 @@ BEGIN
 		ELSIF v_table='node' THEN
 
 			DELETE FROM cat_feature_node WHERE id = OLD.id;
+		
+		ELSIF v_table='flwreg' THEN
+
+			DELETE FROM cat_feature_arc WHERE id = OLD.id;
 		END IF;
 
 		DELETE FROM cat_feature WHERE id = OLD.id;

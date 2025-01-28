@@ -263,22 +263,28 @@ CREATE TRIGGER gw_trg_edit_inp_timeseries INSTEAD OF INSERT OR DELETE OR UPDATE 
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_timeseries('inp_timeseries_value');
 
 --10/01/2025
+--28/01/2025
+
+-- Create trigger for cat_feature_flwreg
+CREATE TRIGGER gw_trg_edit_cat_feature INSTEAD OF
+INSERT OR DELETE OR UPDATE ON v_edit_cat_feature_flwreg FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_cat_feature('flwreg');
+
 --Create trigger for parent view by passing parameter 'parent'
 CREATE TRIGGER gw_trg_edit_flwreg INSTEAD OF INSERT OR DELETE OR UPDATE
 ON v_edit_flwreg FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_flwreg('parent');
 
 --Create trigger for child views by passing different parameters each one for their view
 CREATE TRIGGER gw_trg_edit_flwreg INSTEAD OF INSERT OR DELETE OR UPDATE
-ON v_edit_flwreg_frorifice FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_flwreg('orifice');
+ON ve_flwreg_frorifice FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_flwreg('orifice');
 
 CREATE TRIGGER gw_trg_edit_flwreg INSTEAD OF INSERT OR DELETE OR UPDATE
-ON v_edit_flwreg_frweir FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_flwreg('weir');
+ON ve_flwreg_frweir FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_flwreg('weir');
 
 CREATE TRIGGER gw_trg_edit_flwreg INSTEAD OF INSERT OR DELETE OR UPDATE
-ON v_edit_flwreg_frpump FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_flwreg('pump');
+ON ve_flwreg_frpump FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_flwreg('pump');
 
 CREATE TRIGGER gw_trg_edit_flwreg INSTEAD OF INSERT OR DELETE OR UPDATE
-ON v_edit_flwreg_froutlet FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_flwreg('outlet');
+ON ve_flwreg_froutlet FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_flwreg('outlet');
 
 
 CREATE TRIGGER gw_trg_edit_ve_epa_junction INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_epa_junction

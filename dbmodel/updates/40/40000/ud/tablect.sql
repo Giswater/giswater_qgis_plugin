@@ -40,3 +40,21 @@ CREATE RULE insert_plan_psector_x_node AS
            FROM config_param_user
           WHERE (((config_param_user.parameter)::text = 'plan_psector_current'::text) AND ((config_param_user.cur_user)::name = "current_user"()))
          LIMIT 1), 1, true);
+
+--28/01/2025
+--Altering the inp tables for the flowregulators for constraints.
+--ORIFICE
+ALTER TABLE inp_flwreg_orifice ADD CONSTRAINT inp_flwreg_orifice_pkey PRIMARY KEY (flwreg_id);
+ALTER TABLE inp_flwreg_orifice ADD CONSTRAINT inp_flwreg_orifice_flwreg_id_fkey FOREIGN KEY (flwreg_id) REFERENCES flwreg(flwreg_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--OUTLET
+ALTER TABLE inp_flwreg_outlet ADD CONSTRAINT inp_flwreg_outlet_pkey PRIMARY KEY (flwreg_id);
+ALTER TABLE inp_flwreg_outlet ADD CONSTRAINT inp_flwreg_outlet_flwreg_id_fkey FOREIGN KEY (flwreg_id) REFERENCES flwreg(flwreg_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--WEIR
+ALTER TABLE inp_flwreg_weir ADD CONSTRAINT inp_flwreg_weir_pkey PRIMARY KEY (flwreg_id);
+ALTER TABLE inp_flwreg_weir ADD CONSTRAINT inp_flwreg_weir_flwreg_id_fkey FOREIGN KEY (flwreg_id) REFERENCES flwreg(flwreg_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--PUMP 
+ALTER TABLE inp_flwreg_pump ADD CONSTRAINT inp_flwreg_pump_pkey PRIMARY KEY (flwreg_id);
+ALTER TABLE inp_flwreg_pump ADD CONSTRAINT inp_flwreg_pump_flwreg_id_fkey FOREIGN KEY (flwreg_id) REFERENCES flwreg(flwreg_id) ON DELETE CASCADE ON UPDATE CASCADE;
