@@ -1126,3 +1126,6 @@ UPDATE config_form_fields
 	WHERE formtype='form_feature' AND tabname='tab_epa' AND columnname='remove_from_dscenario';
 
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source") VALUES(3376, 'gw_fct_getwidgets_checkproject', 'utils', 'function', 'json', 'json', 'Set widgets to show in check project button according to user''s role.', 'role_basic', NULL, 'core');
+
+-- 29/01/2025
+UPDATE config_form_tabs SET device='{4,5}' WHERE formname='selector_basic' AND tabname='tab_sector';
