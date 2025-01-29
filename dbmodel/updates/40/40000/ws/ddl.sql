@@ -646,3 +646,9 @@ CREATE TABLE IF NOT EXISTS selector_supplyzone
         ON UPDATE CASCADE
         ON DELETE CASCADE
 );
+
+
+-- 29/01/2025
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"supplyzone_id", "dataType":"int4"}}$$);
+ALTER TABLE supplyzone ADD CONSTRAINT arc_supplyzone_id_fkey FOREIGN KEY (supplyzone_id) REFERENCES supplyzone(supplyzone_id) ON DELETE RESTRICT ON UPDATE CASCADE;
