@@ -3128,3 +3128,6 @@ INSERT INTO sys_message (id,error_message,hint_message,log_level,show_user,proje
 INSERT INTO sys_function
 (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source")
 VALUES(3378, 'gw_trg_edit_supplyzone', 'ws', 'trigger', NULL, NULL, 'Trigger to insert, update or delete elements in supplyzone from v_ui_supplyzone or v_edit_supplyzone', 'role_edit', NULL, 'core');
+
+-- 29/01/2025
+UPDATE config_param_system SET value='{"sys_display_name":"concat(connec_id, '' : '', conneccat_id)","sys_tablename":"v_edit_connec","sys_pk":"connec_id","sys_fct":"gw_fct_getinfofromid","sys_filter":"","sys_geom":"the_geom"}' WHERE "parameter"='basic_search_v2_tab_network_connec';
