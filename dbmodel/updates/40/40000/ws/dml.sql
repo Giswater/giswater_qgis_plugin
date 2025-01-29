@@ -3111,7 +3111,20 @@ INSERT INTO config_form_fields VALUES('v_ui_macrosector', 'form_feature', 'tab_n
 INSERT INTO config_form_fields VALUES('v_ui_macrosector', 'form_feature', 'tab_none', 'active', 'lyt_data_1', 4, 'boolean', 'check', 'active', 'active', NULL, false, false, true, false, false, NULL, NULL, false, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL);
 INSERT INTO config_form_fields VALUES('v_ui_macrosector', 'form_feature', 'tab_none', 'undelete', 'lyt_data_1', 5, 'boolean', 'check', 'undelete', 'undelete', NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, NULL);
 
+-- 28/01/2025
 
+-- Insert new error messages
+INSERT INTO sys_message
+(id, error_message, hint_message, log_level, show_user, project_type, "source")
+VALUES(3276, 'Some exploitation ids don''t exist', 'Insert exploitation ids that exist', 1, true, 'utils', 'core');
 
+INSERT INTO sys_message (id,error_message,hint_message,log_level,show_user,project_type,"source")
+	VALUES (3278,'Some municipality ids don''t exist','Insert municipality ids that exist',1,true,'utils','core');
 
+INSERT INTO sys_message (id,error_message,hint_message,log_level,show_user,project_type,"source")
+	VALUES (3280,'Some sector ids don''t exist','Insert sector ids that exist',1,true,'utils','core');
 
+-- Insert new supplyzone trigger to sys_function
+INSERT INTO sys_function
+(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source")
+VALUES(3378, 'gw_trg_edit_supplyzone', 'ws', 'trigger', NULL, NULL, 'Trigger to insert, update or delete elements in supplyzone from v_ui_supplyzone or v_edit_supplyzone', 'role_edit', NULL, 'core');
