@@ -135,9 +135,7 @@ class GwProjectCheckButton(GwAction):
         """Executes `gw_fct_setcheckdatabase` if any checkboxes are selected after `GwProjectCheckTask` completes."""
 
         # Collect selected checkboxes
-        print("hola")
         check_parameters = self._get_selected_checks()
-        print(check_parameters)
         # If no checkboxes are selected, do nothing
         if not any(check_parameters.values()):
             print("No checkboxes selected. Skipping gw_fct_setcheckdatabase.")
@@ -146,13 +144,11 @@ class GwProjectCheckButton(GwAction):
         # Format parameters properly as a string
         parameters = ', '.join([f'"{key}": {str(value).lower()}' for key, value in check_parameters.items()])
         extras = f'"parameters": {{{parameters}}}'
-        print(extras)
         # Create the request body in the correct format
         body = tools_gw.create_body(extras=extras)
 
         # Execute procedure
         json_result = tools_gw.execute_procedure('gw_fct_setcheckdatabase', body)
-        print("execute procedure: ", json_result)
         if not json_result or json_result.get("status") != "Accepted":
             print(f"Failed to execute gw_fct_setcheckdatabase: {json_result}")
         else:

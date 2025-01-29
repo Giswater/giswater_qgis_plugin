@@ -2073,17 +2073,6 @@ def add_textarea(field):
         widget.setText(field['value'])
         widget.setProperty('value', field['value'])
 
-    # Set height as a function of text lines
-    font = widget.document().defaultFont()
-    fm = QFontMetrics(font)
-    text_size = fm.size(0, widget.toPlainText())
-    if text_size.height() < 26:
-        widget.setMinimumHeight(36)
-        widget.setMaximumHeight(36)
-    else:
-        # Need to modify to avoid scroll
-        widget.setMaximumHeight(text_size.height() + 10)
-
     if 'iseditable' in field:
         widget.setReadOnly(not field['iseditable'])
         if not field['iseditable']:
