@@ -214,7 +214,7 @@ BEGIN
  	v_fieldsjson := COALESCE(v_fieldsjson, '[]');
 
 	-- If there are tabs in dialog:
-	IF jsonb_path_exists(v_fieldsjson, '$.**.tabs') THEN
+	IF jsonb_path_exists(v_fieldsjson, '$.**.tabs') AND ((p_data ->>'form')::json->>'id') IS NOT NULL THEN
 		-- REMOVE EMPTY TABS (WITH EMPTY TABLEWIDGETS)
 		-- Get tabnames to remove with empty table widgets
 	    FOREACH v_field IN ARRAY ARRAY(SELECT jsonb_array_elements(v_fieldsjson)) LOOP
