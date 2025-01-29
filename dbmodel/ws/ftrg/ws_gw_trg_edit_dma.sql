@@ -37,7 +37,18 @@ BEGIN
 
 	-- Other validations
 	IF NOT (SELECT array_agg(expl_id ORDER BY expl_id) @> NEW.expl_id FROM exploitation) THEN
-		RAISE EXCEPTION 'Some exploitation ids don''t exist';
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+		"data":{"message":"3276", "function":"1112","parameters":null, "is_process":true}}$$);';
+	END IF;
+
+	IF NOT (SELECT array_agg(muni_id ORDER BY muni_id) @> NEW.muni_id FROM ext_municipality) THEN
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+		"data":{"message":"3278", "function":"1112","parameters":null, "is_process":true}}$$);';
+	END IF;
+
+	IF NOT (SELECT array_agg(sector_id ORDER BY sector_id) @> NEW.sector_id FROM sector) THEN
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+		"data":{"message":"3280", "function":"1112","parameters":null, "is_process":true}}$$);';
 	END IF;
 
 	IF TG_OP = 'INSERT' THEN

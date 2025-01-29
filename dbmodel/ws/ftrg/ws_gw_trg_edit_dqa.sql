@@ -32,8 +32,20 @@ BEGIN
 		RAISE EXCEPTION 'Param ''v_view_name'' is wrong, need to be: ''EDIT'' or ''UI''.';
 	END IF;
 
+	-- Other validations
 	IF NOT (SELECT array_agg(expl_id ORDER BY expl_id) @> NEW.expl_id FROM exploitation) THEN
-		RAISE EXCEPTION 'Some exploitation ids don''t exist';
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+		"data":{"message":"3276", "function":"2924","parameters":null, "is_process":true}}$$);';
+	END IF;
+
+	IF NOT (SELECT array_agg(muni_id ORDER BY muni_id) @> NEW.muni_id FROM ext_municipality) THEN
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+		"data":{"message":"3278", "function":"2924","parameters":null, "is_process":true}}$$);';
+	END IF;
+
+	IF NOT (SELECT array_agg(sector_id ORDER BY sector_id) @> NEW.sector_id FROM sector) THEN
+		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+		"data":{"message":"3280", "function":"2924","parameters":null, "is_process":true}}$$);';
 	END IF;
 
 	IF TG_OP = 'INSERT' THEN
@@ -54,7 +66,7 @@ BEGIN
 				NEW.active = TRUE;
 			END IF;
 
-			SELECT macrodqa_id INTO v_mapzone_id FROM macrodqa WHERE name = NEW.macrodqa_id;
+			SELECT macrodqa_id INTO v_mapzone_id FROM macrodqa WHERE name = NEW.macrodqa;
 		END IF;
 
 		INSERT INTO dqa (dqa_id, name, expl_id, macrodqa_id, descript, undelete, pattern_id, dqa_type, link, graphconfig, stylesheet, muni_id, sector_id)
@@ -74,7 +86,7 @@ BEGIN
 		IF v_view_name = 'EDIT' THEN
 			v_mapzone_id = NEW.macrodqa_id;
 		ELSIF v_view_name = 'UI' THEN
-			SELECT macrodqa_id INTO v_mapzone_id FROM macrodqa WHERE name = NEW.macrodqa_id;
+			SELECT macrodqa_id INTO v_mapzone_id FROM macrodqa WHERE name = NEW.macrodqa;
 		END IF;
 
 		UPDATE dqa
