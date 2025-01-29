@@ -119,7 +119,7 @@ class GwProjectLayersConfig(GwTask):
                 Column names as alias, combos as ValueMap, typeahead as textedit"""
 
         # Check only once if function 'gw_fct_getinfofromid' exists
-        row = tools_db.check_function('gw_fct_getinfofromid')
+        row = tools_db.check_function('gw_fct_getinfofromid', aux_conn=self.aux_conn, is_thread=True)
         if row in (None, ''):
             tools_qgis.show_warning("Function not found in database", parameter='gw_fct_getinfofromid')
             return False
