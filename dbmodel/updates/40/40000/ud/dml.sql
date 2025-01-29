@@ -2414,68 +2414,35 @@ where formname in ('v_edit_inp_flwreg_pump','v_edit_inp_flwreg_orifice','v_edit_
 --10/01/2025
 --edited 28/01/2025
 
--- Insert into sys_feature_epa_type 
+-- Insert into sys_feature_epa_type
 INSERT INTO sys_feature_epa_type VALUES ('ORIFICE', 'FLWREG', 'inp_flwreg_orifice', null, true) ON CONFLICT (id, feature_type) DO NOTHING;
 INSERT INTO sys_feature_epa_type VALUES ('PUMP', 'FLWREG', 'inp_flwreg_pump', null, true) ON CONFLICT (id, feature_type) DO NOTHING;
 INSERT INTO sys_feature_epa_type VALUES ('WEIR', 'FLWREG', 'inp_flwreg_weir', null, true) ON CONFLICT (id, feature_type) DO NOTHING;
 INSERT INTO sys_feature_epa_type VALUES ('OUTLET', 'FLWREG', 'inp_flwreg_outlet', null, true) ON CONFLICT (id, feature_type) DO NOTHING;
 
 -- Adding flowregulator objects on cat_feature [Modified from first version]
-DROP TRIGGER gw_trg_cat_feature_after ON cat_feature;
+ALTER TABLE cat_feature DISABLE TRIGGER gw_trg_cat_feature_after;
 
-INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer,  active) 
-VALUES ('FRORIFICE', 'VFLWREG','FLWREG', 'v_edit_flwreg', true);  
+INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer,  active)
+VALUES ('FRORIFICE', 'VFLWREG','FLWREG', 'v_edit_flwreg', true);
 
-INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer,  active) 
-VALUES ('FROUTLET', 'VFLWREG','FLWREG', 'v_edit_flwreg', true);  
+INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer,  active)
+VALUES ('FROUTLET', 'VFLWREG','FLWREG', 'v_edit_flwreg', true);
 
-INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, active) 
+INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, active)
 VALUES ('FRWEIR', 'WEIR','FLWREG', 'v_edit_flwreg',  true);
 
-INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer,  active) 
-VALUES ('FRPUMP', 'PUMP','FLWREG', 'v_edit_flwreg',  true); 
+INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer,  active)
+VALUES ('FRPUMP', 'PUMP','FLWREG', 'v_edit_flwreg',  true);
 
-CREATE TRIGGER gw_trg_cat_feature_after AFTER INSERT OR DELETE  OR UPDATE ON 
-cat_feature FOR EACH ROW EXECUTE FUNCTION gw_trg_cat_feature();
-
--- Add table for cat_feature_flwreg
-DROP TABLE IF EXISTS cat_feature_flwreg;
-CREATE TABLE cat_feature_flwreg (
-	id varchar(30) NOT NULL,
-	epa_default varchar(30) NOT NULL,
-	CONSTRAINT cat_feature_flwreg_pkey PRIMARY KEY (id),
-	CONSTRAINT cat_feature_flwreg_fkey FOREIGN KEY (id) REFERENCES cat_feature(id) ON DELETE CASCADE ON UPDATE CASCADE,
-	CONSTRAINT cat_feature_flwreg_inp_check CHECK (((epa_default)::text = ANY (ARRAY['WEIR'::text, 'ORIFICE'::text, 'PUMP'::text, 'OUTLET'::text, 'UNDEFINED'::text])))	
-);
-
--- Create man table for flow regulators
-DROP TABLE IF EXISTS man_pump;
-CREATE TABLE man_pump (
-	flwreg_id varchar(16) NOT NULL,
-	pump_type varchar(16) NOT NULL,
-	CONSTRAINT man_pump_pkey PRIMARY KEY (flwreg_id),
-	CONSTRAINT man_pump_flwreg_id_fk FOREIGN KEY (flwreg_id) REFERENCES flwreg(flwreg_id) ON DELETE CASCADE);
-
-DROP TABLE IF EXISTS man_weir;
-CREATE TABLE man_weir(
-	flwreg_id varchar(16) NOT NULL,
-	weir_type varchar(16) NOT NULL,
-	CONSTRAINT man_weir_pkey PRIMARY KEY (flwreg_id),
-	CONSTRAINT man_weir_flwreg_id_fk FOREIGN KEY (flwreg_id) REFERENCES flwreg(flwreg_id) ON DELETE CASCADE);
-
-DROP TABLE IF EXISTS man_vflwreg;
-CREATE TABLE man_vflwreg (
-	flwreg_id varchar(16) NOT NULL,
-	CONSTRAINT man_vflwreg_pkey PRIMARY KEY (flwreg_id),
-	CONSTRAINT man_vflwreg_flwreg_id_fk FOREIGN KEY (flwreg_id) REFERENCES flwreg(flwreg_id) ON DELETE CASCADE);
+ALTER TABLE cat_feature ENABLE TRIGGER gw_trg_cat_feature_after;
 
 -- Adding objects on config_info_layer and config_info_layer_x_type (this both tables controls the button info)
-
 INSERT INTO config_info_layer VALUES ('v_edit_flwreg', TRUE, 'flwreg', TRUE, 'info_generic', 'Flow regulator', 4);
-INSERT INTO config_info_layer_x_type VALUES ('ve_flwreg_frorifice',1, 've_flwreg_frorifice');
-INSERT INTO config_info_layer_x_type VALUES ('ve_flwreg_frweir',1, 've_flwreg_frweir');
-INSERT INTO config_info_layer_x_type VALUES ('ve_flwreg_froutlet',1, 've_flwreg_froutlet');
-INSERT INTO config_info_layer_x_type VALUES ('ve_flwreg_frpump',1, 've_flwreg_frpump');
+INSERT INTO config_info_layer_x_type VALUES ('ve_flwreg_frorifice', 1, 've_flwreg_frorifice');
+INSERT INTO config_info_layer_x_type VALUES ('ve_flwreg_frweir', 1, 've_flwreg_frweir');
+INSERT INTO config_info_layer_x_type VALUES ('ve_flwreg_froutlet', 1, 've_flwreg_froutlet');
+INSERT INTO config_info_layer_x_type VALUES ('ve_flwreg_frpump', 1, 've_flwreg_frpump');
 
 -- Insert on config_form_fields for parent view
 -- copying columns from some random child (all childs has same columns that parent)

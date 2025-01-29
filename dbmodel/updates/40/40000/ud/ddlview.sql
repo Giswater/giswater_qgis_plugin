@@ -6288,7 +6288,7 @@ FULL OUTER JOIN weir w USING (nodarc_id, node_id);
 --create view for cat_feature_flwreg
 DROP VIEW IF EXISTS v_edit_cat_feature_flwreg;
 CREATE OR REPLACE VIEW v_edit_cat_feature_flwreg
-AS SELECT 
+AS SELECT
 	cat_feature.id,
     cat_feature.feature_class AS system_id,
     cat_feature_flwreg.epa_default,
@@ -6299,34 +6299,10 @@ AS SELECT
    FROM cat_feature
      JOIN cat_feature_flwreg USING (id);
 
---create parent table for flow regulators	 
-DROP TABLE IF EXISTS flwreg;
-CREATE TABLE flwreg (
-	flwreg_id varchar(16) DEFAULT nextval('urn_id_seq'::regclass) NOT NULL,
-	node_id varchar(16) NOT NULL,
-	order_id int2 NOT NULL,
-	to_arc varchar(16) NOT NULL,
-	flwreg_type varchar(18) NOT NULL,
-	flwreg_length float8 NOT NULL,
-	epa_type varchar(16) NOT NULL,  --(ORIFICE / WEIR / OUTLET / PUMP)
-	state int2 NOT NULL,
-	state_type int2 NOT NULL,
-	annotation text NULL,
-	observ text NULL,
-	the_geom public.geometry(linestring, SRID_VALUE) NOT NULL,
-	CONSTRAINT flwreg_epa_type_check CHECK (((epa_type)::text = ANY (ARRAY['WEIR'::text, 'ORIFICE'::text, 'PUMP'::text, 'OUTLET'::text, 'UNDEFINED'::text]))),
-	CONSTRAINT flwreg_pkey PRIMARY KEY (flwreg_id),
-	CONSTRAINT flwreg_type_fkey FOREIGN KEY (flwreg_type) REFERENCES cat_feature(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT flwreg_node_id_fkey FOREIGN KEY (node_id) REFERENCES node(node_id) ON DELETE RESTRICT ON UPDATE CASCADE
-	);
-
-CREATE INDEX flwreg_node_id ON flwreg USING btree (node_id);	
-CREATE INDEX flwreg_flwreg_type ON flwreg USING btree (flwreg_type);
-
 -- Create parent view for flow regulators.
 DROP VIEW IF EXISTS v_edit_flwreg;
-CREATE OR REPLACE VIEW v_edit_flwreg 
-AS SELECT 
+CREATE OR REPLACE VIEW v_edit_flwreg
+AS SELECT
 	f.flwreg_id,
 	f.node_id,
 	f.order_id,
@@ -6346,14 +6322,14 @@ AS SELECT
     FROM flwreg f
     JOIN node n USING (node_id)
     JOIN arc a ON a.arc_id::text = f.to_arc::text
-	JOIN sys_epa_type et ON f.flwreg_type = et.id
+	JOIN sys_feature_epa_type et ON f.flwreg_type = et.id
 	JOIN cat_feature cf ON cf.feature_type = et.feature_type;
 
 
 --Create child views using man tables for flow regulators
 
 CREATE VIEW ve_flwreg_frweir
-AS SELECT 
+AS SELECT
 	f.flwreg_id,
 	f.node_id,
 	f.order_id,
@@ -6371,16 +6347,16 @@ AS SELECT
                     THEN a.the_geom
                     ELSE ST_Reverse(a.the_geom) end, 0,  f.flwreg_length / st_length(a.the_geom)),SRID_VALUE)::geometry(LineString,SRID_VALUE)
                 AS the_geom
-	FROM flwreg f  
+	FROM flwreg f
 	JOIN node n USING (node_id)
 	JOIN arc a ON a.arc_id::text = f.to_arc::TEXT
-	JOIN sys_epa_type et ON f.flwreg_type = et.id
+	JOIN sys_feature_epa_type et ON f.flwreg_type = et.id
 	JOIN cat_feature cf ON cf.feature_type = et.feature_type
 	JOIN man_weir mf ON f.flwreg_id = mf.flwreg_id ;
 
 
 CREATE VIEW ve_flwreg_frpump
-AS SELECT 
+AS SELECT
 f.flwreg_id,
 	f.node_id,
 	f.order_id,
@@ -6398,15 +6374,15 @@ f.flwreg_id,
                     THEN a.the_geom
                     ELSE ST_Reverse(a.the_geom) end, 0,  f.flwreg_length / st_length(a.the_geom)),SRID_VALUE)::geometry(LineString,SRID_VALUE)
                 AS the_geom
-	FROM flwreg f 
+	FROM flwreg f
 	JOIN node n USING (node_id)
 	JOIN arc a ON a.arc_id::text = f.to_arc::TEXT
-	JOIN sys_epa_type et ON f.flwreg_type = et.id
+	JOIN sys_feature_epa_type et ON f.flwreg_type = et.id
 	JOIN cat_feature cf ON cf.feature_type = et.feature_type
 	JOIN man_pump mf ON f.flwreg_id = mf.flwreg_id;
 
-CREATE VIEW ve_flwreg_frorifice 
-AS SELECT 
+CREATE VIEW ve_flwreg_frorifice
+AS SELECT
 	f.flwreg_id,
 	f.node_id,
 	f.order_id,
@@ -6423,16 +6399,16 @@ AS SELECT
                     THEN a.the_geom
                     ELSE ST_Reverse(a.the_geom) end, 0,  f.flwreg_length / st_length(a.the_geom)),SRID_VALUE)::geometry(LineString,SRID_VALUE)
                 AS the_geom
-	FROM flwreg f 
+	FROM flwreg f
 	JOIN node n USING (node_id)
 	JOIN arc a ON a.arc_id::text = f.to_arc::TEXT
-	JOIN sys_epa_type et ON f.flwreg_type = et.id
+	JOIN sys_feature_epa_type et ON f.flwreg_type = et.id
 	JOIN cat_feature cf ON cf.feature_type = et.feature_type
 	JOIN man_vflwreg mf ON f.flwreg_id = mf.flwreg_id ;
 
 
 CREATE VIEW ve_flwreg_froutlet
-AS SELECT 
+AS SELECT
 	f.flwreg_id,
 	f.node_id,
 	f.order_id,
@@ -6449,10 +6425,10 @@ AS SELECT
                     THEN a.the_geom
                     ELSE ST_Reverse(a.the_geom) end, 0,  f.flwreg_length / st_length(a.the_geom)),SRID_VALUE)::geometry(LineString,SRID_VALUE)
                 AS the_geom
-	FROM flwreg f 
+	FROM flwreg f
 	JOIN node n USING (node_id)
 	JOIN arc a ON a.arc_id::text = f.to_arc::TEXT
-	JOIN sys_epa_type et ON f.flwreg_type = et.id
+	JOIN sys_feature_epa_type et ON f.flwreg_type = et.id
 	JOIN cat_feature cf ON cf.feature_type = et.feature_type
 	JOIN man_vflwreg mf ON f.flwreg_id = mf.flwreg_id ;
 
