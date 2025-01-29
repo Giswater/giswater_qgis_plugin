@@ -262,7 +262,7 @@ class EmitterCalibration:
                 qtabwidget.setTabEnabled(qtabwidget.count() - 1, True)
                 if qtabwidget is not None:
                     qtabwidget.setCurrentIndex(qtabwidget.count() - 1)
-            tools_qt.set_widget_text(self.dlg_vol_cal, "txt_infolog", signal[1] + "\n")
+            tools_qt.set_widget_text(self.dlg_vol_cal, "tab_log_txt_infolog", signal[1] + "\n")
 
     def _select_file_inp(self):
         """Select INP file"""

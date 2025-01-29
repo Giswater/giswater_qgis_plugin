@@ -509,7 +509,7 @@ class GwToolboxReportsUi(GwDialog, FORM_CLASS):
     UINAME = UINAME
 
 
-UINAME = "project_check"
+UINAME = "check_project"
 FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
 class GwProjectCheckUi(GwDialog, FORM_CLASS):
     CONTEXT = CONTEXT

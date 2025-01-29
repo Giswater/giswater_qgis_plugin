@@ -74,7 +74,7 @@ class StaticCalibration:
 
         dlg = self.dlg_epa
         tools_gw.disable_tab_log(dlg)
-        dlg.txt_infolog.setText("")
+        dlg.tab_log_txt_infolog.setText("")
         dlg.progress_bar.show()
 
         self.thread = GwStaticCalibration(
@@ -137,7 +137,7 @@ class StaticCalibration:
                 txt += "\n"
 
         dlg = self.dlg_epa
-        dlg.txt_infolog.setText(txt)
+        dlg.tab_log_txt_infolog.setText(txt)
         dlg.progress_bar.hide()
         index = dlg.mainTab.indexOf(dlg.tab_infolog)
         dlg.mainTab.setTabEnabled(index, True)

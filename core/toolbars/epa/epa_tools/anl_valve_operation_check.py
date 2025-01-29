@@ -149,8 +149,8 @@ class ValveOperationCheck:
             close=False,
             call_set_tabs_enabled=False,
         )
-        dlg.txt_infolog.verticalScrollBar().setValue(
-            dlg.txt_infolog.verticalScrollBar().maximum()
+        dlg.tab_log_txt_infolog.verticalScrollBar().setValue(
+            dlg.tab_log_txt_infolog.verticalScrollBar().maximum()
         )
 
         # Update progress bar

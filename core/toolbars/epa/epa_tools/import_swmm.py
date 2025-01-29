@@ -801,7 +801,7 @@ class GwImportSwmm:
             self.dlg_config.progressBar.setValue(progress)
 
         # TextEdit log
-        txt_infolog = self.dlg_config.findChild(QTextEdit, 'txt_infolog')
+        txt_infolog = self.dlg_config.findChild(QTextEdit, 'tab_log_txt_infolog')
         cur_text = tools_qt.get_text(self.dlg_config, txt_infolog, return_string_null=False)
         if process and process not in (self.cur_process, "Generate INP algorithm"):
             cur_text = f"{cur_text}\n" \

@@ -94,7 +94,7 @@ class GwFeatureDeleteButton(GwAction):
     def _delete_another_feature(self):
 
         # Reset delete feature form
-        self.dlg_feature_delete.txt_infolog.clear()
+        self.dlg_feature_delete.tab_log_txt_infolog.clear()
         feature_type = tools_qt.get_text(self.dlg_feature_delete, self.dlg_feature_delete.feature_type).lower()
         tools_qt.set_combo_value(self.dlg_feature_delete.feature_type, feature_type.upper(), 1)
         self.dlg_feature_delete.feature_id.clear()

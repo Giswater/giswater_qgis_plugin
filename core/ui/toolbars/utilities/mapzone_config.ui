@@ -57,7 +57,7 @@
     </layout>
    </item>
    <item row="0" column="2" rowspan="11">
-    <widget class="QTextEdit" name="txt_infolog">
+    <widget class="QTextEdit" name="tab_log_txt_infolog">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
        <horstretch>0</horstretch>
@@ -266,7 +266,7 @@ p, li { white-space: pre-wrap; }
   </layout>
  </widget>
  <tabstops>
-  <tabstop>txt_infolog</tabstop>
+  <tabstop>tab_log_txt_infolog</tabstop>
   <tabstop>btn_snapping_nodeParent</tabstop>
   <tabstop>txt_nodeParent</tabstop>
   <tabstop>btn_snapping_toArc</tabstop>

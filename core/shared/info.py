@@ -1127,7 +1127,7 @@ class GwInfo(QObject):
         self.msg_infolog = ('Interpolate tool.\n'
                'To modify columns (top_elev, ymax, elev among others) to be interpolated set variable '
                'edit_node_interpolate on table config_param_user')
-        tools_qt.set_widget_text(dlg_interpolate, dlg_interpolate.txt_infolog, self.msg_infolog)
+        tools_qt.set_widget_text(dlg_interpolate, dlg_interpolate.tab_log_txt_infolog, self.msg_infolog)
 
         self.msg_text = "Please, use the cursor to select two nodes to proceed with the interpolation\nNode1: \nNode2:"
         dlg_interpolate.lbl_text.setText(self.msg_text)

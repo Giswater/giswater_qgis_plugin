@@ -182,7 +182,7 @@ class GwWorkspaceManagerButton(GwAction):
             if deselected.indexes():
                 self.dlg_workspace_manager.tbl_wrkspcm.selectionModel().select(deselected, QItemSelectionModel.Select)
                 return
-            tools_qt.set_widget_text(self.dlg_workspace_manager, 'txt_infolog', "")
+            tools_qt.set_widget_text(self.dlg_workspace_manager, 'tab_log_txt_infolog', "")
             return
         col_ind = tools_qt.get_col_index_by_col_name(self.dlg_workspace_manager.tbl_wrkspcm, 'id')
         workspace_id = json.loads(cols[col_ind].data())

@@ -93,7 +93,7 @@ class Go2Iber:
         # Save user values
         self._save_user_values()
 
-        self.dlg_go2iber.txt_infolog.clear()
+        self.dlg_go2iber.tab_log_txt_infolog.clear()
         self.dlg_go2iber.txt_result_name.setStyleSheet(None)
         self.dlg_go2iber.txt_path.setStyleSheet(None)
         status = self._check_fields()

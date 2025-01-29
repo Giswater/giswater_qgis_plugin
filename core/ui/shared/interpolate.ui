@@ -15,7 +15,7 @@
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="2" column="0" colspan="2">
-    <widget class="QTextEdit" name="txt_infolog">
+    <widget class="QTextEdit" name="tab_log_txt_infolog">
      <property name="documentTitle">
       <string/>
      </property>
@@ -100,7 +100,7 @@
  <tabstops>
   <tabstop>rb_interpolate</tabstop>
   <tabstop>rb_extrapolate</tabstop>
-  <tabstop>txt_infolog</tabstop>
+  <tabstop>tab_log_txt_infolog</tabstop>
   <tabstop>btn_accept</tabstop>
   <tabstop>btn_close</tabstop>
  </tabstops>

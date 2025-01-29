@@ -922,7 +922,7 @@
            </attribute>
            <layout class="QGridLayout" name="gridLayout">
             <item row="0" column="0">
-             <widget class="QTextEdit" name="txt_infolog"/>
+             <widget class="QTextEdit" name="tab_log_txt_infolog"/>
             </item>
            </layout>
           </widget>
@@ -1162,7 +1162,7 @@
   <tabstop>cbx_hours_end</tabstop>
   <tabstop>btn_end</tabstop>
   <tabstop>tbl_hydro</tabstop>
-  <tabstop>txt_infolog</tabstop>
+  <tabstop>tab_log_txt_infolog</tabstop>
   <tabstop>btn_accept</tabstop>
   <tabstop>btn_cancel_task</tabstop>
   <tabstop>btn_cancel</tabstop>

@@ -150,7 +150,7 @@
           </property>
           <layout class="QGridLayout" name="gridLayout_5">
            <item row="0" column="0">
-            <widget class="QTextEdit" name="txt_infolog"/>
+            <widget class="QTextEdit" name="tab_log_txt_infolog"/>
            </item>
           </layout>
          </widget>
@@ -210,7 +210,7 @@
   <tabstop>btn_push_output_folder</tabstop>
   <tabstop>txt_filename</tabstop>
   <tabstop>scrollArea</tabstop>
-  <tabstop>txt_infolog</tabstop>
+  <tabstop>tab_log_txt_infolog</tabstop>
   <tabstop>btn_accept</tabstop>
   <tabstop>btn_close</tabstop>
  </tabstops>

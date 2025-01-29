@@ -49,7 +49,7 @@
     </layout>
    </item>
    <item row="1" column="0">
-    <widget class="QTextEdit" name="txt_infolog">
+    <widget class="QTextEdit" name="tab_log_txt_infolog">
      <property name="documentTitle">
       <string/>
      </property>

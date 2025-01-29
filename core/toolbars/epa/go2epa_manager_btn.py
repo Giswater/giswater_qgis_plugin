@@ -44,7 +44,7 @@ class GwGo2EpaManagerButton(GwAction):
         # Manage widgets
         reg_exp = QRegExp("^[A-Za-z0-9_]{1,16}$")
         self.dlg_manager.txt_result_id.setValidator(QRegExpValidator(reg_exp))
-        self.dlg_manager.txt_infolog.setReadOnly(True)
+        self.dlg_manager.tab_log_txt_infolog.setReadOnly(True)
         self.dlg_manager.btn_set_corporate.setEnabled(False)
         self.dlg_manager.btn_archive.setEnabled(False)
 
@@ -169,7 +169,7 @@ class GwGo2EpaManagerButton(GwAction):
         # Get id of selected row
         row = selected.indexes()
         if not row:
-            tools_qt.set_widget_text(self.dlg_manager, 'txt_infolog', '')
+            tools_qt.set_widget_text(self.dlg_manager, 'tab_log_txt_infolog', '')
             return
 
         msg = ""
@@ -237,7 +237,7 @@ class GwGo2EpaManagerButton(GwAction):
             pass
 
         # Set message text into widget
-        tools_qt.set_widget_text(self.dlg_manager, 'txt_infolog', msg)
+        tools_qt.set_widget_text(self.dlg_manager, 'tab_log_txt_infolog', msg)
 
 
     def _enable_buttons(self, selected):

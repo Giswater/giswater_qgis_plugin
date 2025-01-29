@@ -273,7 +273,7 @@ class GwAdminButton:
             main_tab = self.dlg_readsql_show_info.findChild(QTabWidget, 'mainTab')
             main_tab.setCurrentWidget(main_tab.findChild(QWidget, "tab_loginfo"))
             main_tab.setTabEnabled(main_tab.currentIndex(), True)
-            self.infolog_updates = self.dlg_readsql_show_info.findChild(QTextEdit, 'txt_infolog')
+            self.infolog_updates = self.dlg_readsql_show_info.findChild(QTextEdit, 'tab_log_txt_infolog')
             self.infolog_updates.setReadOnly(True)
             self.message_infolog = ''
             self.infolog_updates.setText(self.message_infolog)

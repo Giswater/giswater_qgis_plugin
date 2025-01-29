@@ -344,7 +344,7 @@
          </attribute>
          <layout class="QGridLayout" name="gridLayout_4">
           <item row="0" column="0">
-           <widget class="QTextEdit" name="txt_infolog">
+           <widget class="QTextEdit" name="tab_log_txt_infolog">
             <property name="enabled">
              <bool>true</bool>
             </property>
@@ -411,7 +411,7 @@
   <tabstop>tbl_cat_work_x_gully</tabstop>
   <tabstop>tbl_cat_work_x_element</tabstop>
   <tabstop>tbl_cat_work_x_link</tabstop>
-  <tabstop>txt_infolog</tabstop>
+  <tabstop>tab_log_txt_infolog</tabstop>
   <tabstop>btn_accept</tabstop>
   <tabstop>btn_cancel</tabstop>
  </tabstops>

@@ -1156,7 +1156,7 @@ def fill_tab_log(dialog, data, force_tab=True, reset_text=True, tab_idx=1, call_
     """
 
     change_tab = False
-    text = tools_qt.get_text(dialog, dialog.txt_infolog, return_string_null=False)
+    text = tools_qt.get_text(dialog, 'tab_log_txt_infolog', return_string_null=False)
     if text is None:
         text = ""
 
@@ -1172,7 +1172,7 @@ def fill_tab_log(dialog, data, force_tab=True, reset_text=True, tab_idx=1, call_
                 else:
                     text += end
 
-    tools_qt.set_widget_text(dialog, 'txt_infolog', text + end)
+    tools_qt.set_widget_text(dialog, 'tab_log_txt_infolog', text + end)
     qtabwidget = dialog.findChild(QTabWidget, 'mainTab')
     if qtabwidget is not None:
         qtabwidget.setTabEnabled(qtabwidget.count() - 1, True)
@@ -1205,7 +1205,7 @@ def fill_tab_log(dialog, data, force_tab=True, reset_text=True, tab_idx=1, call_
 
 def disable_tab_log(dialog):
     qtabwidget = dialog.findChild(QTabWidget, 'mainTab')
-    if qtabwidget and qtabwidget.widget(qtabwidget.count() - 1).objectName() in ('tab_info', 'tab_infolog', 'tab_loginfo', 'tab_info_log'):
+    if qtabwidget and qtabwidget.widget(qtabwidget.count() - 1).objectName() in ('tab_info', 'tab_infolog', 'tab_loginfo', 'tab_info_log', 'tab_log'):
         qtabwidget.setTabEnabled(qtabwidget.count() - 1, False)
 
 

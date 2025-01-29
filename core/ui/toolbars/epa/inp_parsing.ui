@@ -49,7 +49,7 @@
       </attribute>
       <layout class="QGridLayout" name="gridLayout_2">
        <item row="0" column="0">
-        <widget class="QTextEdit" name="txt_infolog"/>
+        <widget class="QTextEdit" name="tab_log_txt_infolog"/>
        </item>
       </layout>
      </widget>

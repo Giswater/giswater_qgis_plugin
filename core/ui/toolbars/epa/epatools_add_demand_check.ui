@@ -164,7 +164,7 @@
       </attribute>
       <layout class="QGridLayout" name="gridLayout_5" columnstretch="0,0">
        <item row="0" column="0" colspan="2">
-        <widget class="QTextEdit" name="txt_infolog">
+        <widget class="QTextEdit" name="tab_log_txt_infolog">
          <property name="font">
           <font>
            <family>Courier New</family>
@@ -212,7 +212,7 @@
   <tabstop>data_output_folder</tabstop>
   <tabstop>btn_push_output_folder</tabstop>
   <tabstop>txt_filename</tabstop>
-  <tabstop>txt_infolog</tabstop>
+  <tabstop>tab_log_txt_infolog</tabstop>
   <tabstop>btn_ok</tabstop>
   <tabstop>btn_cancel</tabstop>
  </tabstops>

@@ -2346,7 +2346,7 @@ class GwPsector:
             msg += f"<b>{col}: </b><br>{text}<br><br>"
 
         # Set message text into widget
-        tools_qt.set_widget_text(self.dlg_psector_mng, 'txt_infolog', msg)
+        tools_qt.set_widget_text(self.dlg_psector_mng, 'tab_log_txt_infolog', msg)
 
 
     def _enable_layers(self, is_cheked):

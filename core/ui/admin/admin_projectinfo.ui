@@ -105,7 +105,7 @@
        </attribute>
        <layout class="QGridLayout" name="gridLayout_3">
         <item row="0" column="0">
-         <widget class="QTextEdit" name="txt_infolog"/>
+         <widget class="QTextEdit" name="tab_log_txt_infolog"/>
         </item>
        </layout>
       </widget>
@@ -130,7 +130,7 @@
   <tabstop>info_updates</tabstop>
   <tabstop>btn_update</tabstop>
   <tabstop>btn_close</tabstop>
-  <tabstop>txt_infolog</tabstop>
+  <tabstop>tab_log_txt_infolog</tabstop>
  </tabstops>
  <resources/>
  <connections/>

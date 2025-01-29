@@ -34,7 +34,7 @@
        </widget>
       </item>
       <item row="1" column="0">
-       <widget class="QTextEdit" name="txt_infolog"/>
+       <widget class="QTextEdit" name="tab_log_txt_infolog"/>
       </item>
      </layout>
     </widget>
@@ -237,7 +237,7 @@
   <tabstop>btn_duplicate</tabstop>
   <tabstop>btn_delete</tabstop>
   <tabstop>tbl_psm</tabstop>
-  <tabstop>txt_infolog</tabstop>
+  <tabstop>tab_log_txt_infolog</tabstop>
   <tabstop>btn_cancel</tabstop>
  </tabstops>
  <resources/>
