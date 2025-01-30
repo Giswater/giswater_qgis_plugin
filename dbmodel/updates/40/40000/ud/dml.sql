@@ -2556,5 +2556,16 @@ dv_orderby_id = true, dv_isnullvalue = true, widgetcontrols = '{"setMultiline": 
 -- 30/01/2025
 INSERT INTO man_manhole (node_id, length, width, sander_depth, prot_surface, inlet, bottom_channel, accessibility, bottom_mat)
 SELECT node_id, length, width, sander_depth, prot_surface, inlet, bottom_channel, accessibility, bottom_mat
-FROM _man_manhole
+FROM _man_manhole;
 
+INSERT INTO review_node (node_id, top_elev, ymax, node_type, matcat_id, nodecat_id, annotation, observ, review_obs, expl_id, the_geom,
+field_checked, is_validated, field_date)
+SELECT node_id, top_elev, ymax, node_type, matcat_id, nodecat_id, annotation, observ, review_obs, expl_id, the_geom,
+field_checked, is_validated, field_date
+FROM _review_node;
+
+INSERT INTO review_audit_node (id, node_id, old_top_elev, new_top_elev, old_ymax, new_ymax, old_node_type, new_node_type, old_matcat_id, new_matcat_id, old_nodecat_id, new_nodecat_id,
+old_annotation, new_annotation, old_observ, new_observ, review_obs, expl_id, the_geom, review_status_id, field_date, field_user, is_validated)
+SELECT id, node_id, old_top_elev, new_top_elev, old_ymax, new_ymax, old_node_type, new_node_type, old_matcat_id, new_matcat_id, old_nodecat_id, new_nodecat_id,
+old_annotation, new_annotation, old_observ, new_observ, review_obs, expl_id, the_geom, review_status_id, field_date, field_user, is_validated
+FROM _review_audit_node;

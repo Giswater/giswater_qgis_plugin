@@ -557,7 +557,62 @@ CREATE TABLE man_manhole (
 	bottom_channel bool NULL,
 	accessibility varchar(16) NULL,
 	bottom_mat text NULL,
+	height numeric(12,4),
 	CONSTRAINT man_manhole_pkey PRIMARY KEY (node_id),
 	CONSTRAINT man_manhole_node_id_fkey FOREIGN KEY (node_id) REFERENCES node(node_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+ALTER TABLE review_node RENAME TO _review_node;
+ALTER TABLE _review_node DROP CONSTRAINT IF EXISTS review_node_pkey;
+
+CREATE TABLE review_node (
+	node_id varchar(16) NOT NULL,
+	top_elev numeric(12, 3) NULL,
+	ymax numeric(12, 3) NULL,
+	node_type varchar(18) NULL,
+	matcat_id varchar(30) NULL,
+	nodecat_id varchar(30) NULL,
+	annotation text NULL,
+	observ text NULL,
+	review_obs text NULL,
+	expl_id int4 NULL,
+	the_geom public.geometry(point, 25831) NULL,
+	field_checked bool NULL,
+	is_validated int4 NULL,
+	field_date timestamp(6) NULL,
+	CONSTRAINT review_node_pkey PRIMARY KEY (node_id)
+);
+
+ALTER TABLE review_audit_node RENAME TO _review_audit_node;
+ALTER TABLE _review_audit_node DROP CONSTRAINT IF EXISTS review_audit_node_pkey;
+
+CREATE TABLE review_audit_node (
+	id serial4 NOT NULL,
+	node_id varchar(16) NOT NULL,
+	old_top_elev numeric(12, 3) NULL,
+	new_top_elev numeric(12, 3) NULL,
+	old_ymax numeric(12, 3) NULL,
+	new_ymax numeric(12, 3) NULL,
+	old_node_type varchar(18) NULL,
+	new_node_type varchar(18) NULL,
+	old_matcat_id varchar(30) NULL,
+	new_matcat_id varchar(30) NULL,
+	old_nodecat_id varchar(30) NULL,
+	new_nodecat_id varchar(30) NULL,
+	old_annotation text NULL,
+	new_annotation text NULL,
+	old_observ text NULL,
+	new_observ text NULL,
+	review_obs text NULL,
+	expl_id int4 NULL,
+	the_geom public.geometry(point, 25831) NULL,
+	review_status_id int2 NULL,
+	field_date timestamp(6) NULL,
+	field_user text NULL,
+	is_validated int4 NULL,
+	CONSTRAINT review_audit_node_pkey PRIMARY KEY (id)
+);
+
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_chamber", "column":"height", "dataType":"numeric(12,4)"}}$$);
 

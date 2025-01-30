@@ -657,21 +657,21 @@ BEGIN
 
 		ELSIF v_man_table='man_netgully' THEN
 
-			INSERT INTO man_netgully (node_id,  sander_depth, gullycat_id, units, groove, siphon, gullycat2_id, groove_length, groove_height, units_placement )
+			INSERT INTO man_netgully (node_id,  sander_depth, gullycat_id, units, groove, siphon, gullycat2_id, groove_length, groove_height, units_placement)
 			VALUES(NEW.node_id,  NEW.sander_depth, NEW.gullycat_id, NEW.units,
 			NEW.groove, NEW.siphon, NEW.gullycat2_id, NEW.groove_length, NEW.groove_height, NEW.units_placement);
 
 		ELSIF v_man_table='man_chamber' THEN
 
-			INSERT INTO man_chamber (node_id, length, width, sander_depth, max_volume, util_volume, inlet, bottom_channel, accessibility, name, bottom_mat, slope)
+			INSERT INTO man_chamber (node_id, length, width, sander_depth, max_volume, util_volume, inlet, bottom_channel, accessibility, name, bottom_mat, slope, height)
 			VALUES (NEW.node_id, NEW.length,NEW.width, NEW.sander_depth, NEW.max_volume, NEW.util_volume,
-			NEW.inlet, NEW.bottom_channel, NEW.accessibility,NEW.name, NEW.bottom_mat, NEW.slope);
+			NEW.inlet, NEW.bottom_channel, NEW.accessibility,NEW.name, NEW.bottom_mat, NEW.slope, NEW.height);
 
 		ELSIF v_man_table='man_manhole' THEN
 
-			INSERT INTO man_manhole (node_id,length, width, sander_depth, prot_surface, inlet, bottom_channel, accessibility, step_pp, step_fe, step_replace, cover, bottom_mat)
-			VALUES (NEW.node_id,NEW.length, NEW.width, NEW.sander_depth,NEW.prot_surface, NEW.inlet, NEW.bottom_channel, NEW.accessibility, NEW.step_pp, NEW.step_fe,
-			NEW.step_replace, NEW.cover, NEW.bottom_mat);
+			INSERT INTO man_manhole (node_id,length, width, sander_depth, prot_surface, inlet, bottom_channel, accessibility, bottom_mat, height)
+			VALUES (NEW.node_id,NEW.length, NEW.width, NEW.sander_depth,NEW.prot_surface, NEW.inlet, NEW.bottom_channel, NEW.accessibility,
+			NEW.bottom_mat, NEW.height);
 
 		ELSIF v_man_table='man_netinit' THEN
 
@@ -948,13 +948,14 @@ BEGIN
 
 		ELSIF v_man_table='man_chamber' THEN
 			UPDATE man_chamber SET length=NEW.length, width=NEW.width, sander_depth=NEW.sander_depth, max_volume=NEW.max_volume, util_volume=NEW.util_volume,
-			inlet=NEW.inlet, bottom_channel=NEW.bottom_channel, accessibility=NEW.accessibility, name=NEW.name, bottom_mat=NEW.bottom_mat, slope=NEW.slope
+			inlet=NEW.inlet, bottom_channel=NEW.bottom_channel, accessibility=NEW.accessibility, name=NEW.name, bottom_mat=NEW.bottom_mat, slope=NEW.slope,
+			height=NEW.height
 			WHERE node_id=OLD.node_id;
 
 		ELSIF v_man_table='man_manhole' THEN
 			UPDATE man_manhole SET length=NEW.length, width=NEW.width, sander_depth=NEW.sander_depth, prot_surface=NEW.prot_surface,
 			inlet=NEW.inlet, bottom_channel=NEW.bottom_channel, accessibility=NEW.accessibility,
-			step_pp=NEW.step_pp, step_fe=NEW.step_fe, step_replace=NEW.step_replace, cover=NEW.cover, bottom_mat=NEW.bottom_mat
+			bottom_mat=NEW.bottom_mat, height=NEW.height
 			WHERE node_id=OLD.node_id;
 
 		ELSIF v_man_table='man_netinit' THEN

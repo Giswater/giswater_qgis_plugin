@@ -376,9 +376,6 @@ BEGIN
 				WHERE id = 2768;
 
 			ELSIF v_projecttype = 'UD' THEN
-				UPDATE config_form_fields SET hidden = false where
-				columnname IN ('step_pp', 'step_fe', 'step_replace', 'cover') AND formname ilike 've_node%';
-
 				UPDATE config_form_fields SET layoutorder=30 WHERE formname = 'v_edit_arc' AND columnname='pavcat_id';
 				UPDATE config_form_fields SET layoutorder=30 WHERE formname like 've_arc%' AND columnname='pavcat_id';
 			END IF;
