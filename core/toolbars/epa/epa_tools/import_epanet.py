@@ -21,6 +21,9 @@ from qgis.PyQt.QtWidgets import (
     QTableWidget,
     QTableWidgetItem,
     QTextEdit,
+    QPushButton,
+    QMenu,
+    QAction,
 )
 from sip import isdeleted
 
@@ -109,6 +112,12 @@ class GwImportEpanet:
         self.dlg_config = GwInpConfigImportUi(self)
         tools_gw.load_settings(self.dlg_config)
 
+        # Manage save/load buttons
+        self.dlg_config.btn_save.clicked.connect(self._save_config_to_file)
+        # Make btn_load a drop-down button with the options: Load last, Load from file
+        menu = self._create_load_menu()
+        self.dlg_config.btn_load.setMenu(menu)
+
         # Manage signals
         self.dlg_config.rejected.connect(
             partial(tools_gw.save_settings, self.dlg_config)
@@ -121,6 +130,239 @@ class GwImportEpanet:
         global Catalogs
         self.catalogs: Catalogs = self.parse_inp_task.catalogs
 
+        self._fill_tables()
+
+        self._fill_combo_boxes()
+
+        self._manage_widgets_visibility()
+
+        self._load_config()
+
+        tools_gw.open_dialog(self.dlg_config, dlg_name="dlg_inp_config_import")
+
+    def _manage_widgets_visibility(self):
+        # Hide 'Default Raingage' widget for WS
+        tools_qt.set_widget_visible(self.dlg_config, "lbl_raingage", False)
+        tools_qt.set_widget_visible(self.dlg_config, "txt_raingage", False)
+
+        # Disable the whole dialog if testing mode
+        if TESTING_MODE:
+            tools_gw.set_tabs_enabled(self.dlg_config, hide_btn_accept=False, change_btn_cancel=False)
+
+    def _importinp_accept(self):
+        # Manage force commit mode
+        force_commit = tools_qt.is_checked(self.dlg_config, "chk_force_commit")
+        if force_commit is None:
+            force_commit = False
+
+        self.dlg_config.mainTab.setCurrentIndex(self.dlg_config.mainTab.count()-1)
+        if TESTING_MODE:
+            # Show warning message
+            message = "You are about to import the INP file in TESTING MODE. This will delete all the data in the database related to the network you are importing. Are you sure you want to proceed?"
+            res = tools_qt.show_question(message, title="WARNING", force_action=True)
+            if not res:
+                return
+            message = "!!!!! THIS WILL DELETE ALL DATA IN THE DATABASE !!!!!\nARE YOU SURE YOU WANT TO PROCEED?"
+            res = tools_qt.show_question(message, title="WARNING", force_action=True)
+            if not res:
+                return
+
+            # Delete the network before importing
+            queries = [
+                'SELECT gw_fct_admin_manage_migra($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"action":"TRUE"}, "aux_params":null}}$$);',
+                'UPDATE arc SET node_1 = NULL, node_2 = NULL;',
+                'DELETE FROM ext_rtc_scada_x_data;',
+                'DELETE FROM config_graph_checkvalve;',
+                'DELETE FROM connec CASCADE;',
+                'DELETE FROM node CASCADE;',
+                'DELETE FROM inp_pump CASCADE;',
+                'DELETE FROM inp_virtualpump CASCADE;',
+                'DELETE FROM inp_virtualvalve CASCADE;',
+                'DELETE FROM inp_dscenario_demand CASCADE;',
+                'DELETE FROM inp_curve CASCADE;',
+                'DELETE FROM inp_pattern_value CASCADE;',
+                'DELETE FROM inp_pattern CASCADE;',
+                'DELETE FROM inp_controls CASCADE;',
+                'DELETE FROM inp_rules CASCADE;',
+                'DELETE FROM arc CASCADE;',
+                "DELETE FROM cat_work WHERE id = 'import_inp_test';",
+                "DELETE FROM cat_dscenario WHERE expl_id = 1;",
+                "DELETE FROM cat_arc CASCADE;",
+                "DELETE FROM cat_mat_roughness CASCADE;",
+                "DELETE FROM cat_material CASCADE;",
+                "DELETE FROM sector WHERE sector_id = 1;",
+                "DELETE FROM ext_municipality WHERE muni_id = 1;",
+                "DELETE FROM exploitation WHERE expl_id = 1;",
+                "INSERT INTO cat_material (id, descript, feature_type, active) VALUES ('FC', 'FC', '{ARC}', true), ('PVC', 'PVC', '{ARC}', true), ('FD', 'FD', '{ARC}', true);",
+                "UPDATE cat_mat_roughness SET roughness = 0.025 WHERE matcat_id = 'FC';",
+                "UPDATE cat_mat_roughness SET roughness = 0.0025 WHERE matcat_id = 'PVC';",
+                "UPDATE cat_mat_roughness SET roughness = 0.03 WHERE matcat_id = 'FD';",
+                "INSERT INTO exploitation (expl_id, name, macroexpl_id, descript, active) VALUES (1, 'expl_1_import_inp_test', 0, 'Created by import inp in TESTING MODE', true);",
+                # "INSERT INTO ext_municipality (muni_id, name, observ, active) VALUES (1, 'muni_1_import_inp_test', 'Created by import inp in TESTING MODE', true);",
+                # "INSERT INTO sector (sector_id, name, muni_id, expl_id, macrosector_id, descript, active) VALUES (1, 'sector_1_import_inp_test', '{1}'::int[], '{1}'::int[], 0, 'Created by import inp in TESTING MODE', true);"
+            ]
+            for sql in queries:
+                result = tools_db.execute_sql(sql, commit=force_commit)
+                if not result:
+                    return
+
+
+            # Set variables
+            workcat = "import_inp_test"
+            exploitation = 1
+            sector = 0
+            municipality = 999999  # Spatial intersect
+            dscenario = "import_inp_demands"
+            catalogs = {'pipes': {(57.0, 0.0025): 'INP-PIPE01', (57.0, 0.025): 'INP-PIPE02', (99.0, 0.0025): 'PELD110-PN10', (99.0, 0.025): 'FC110-PN10', (144.0, 0.0025): 'PVC160-PN16', (144.0, 0.025): 'FC160-PN10', (153.0, 0.03): 'INP-PIPE03', (204.0, 0.03): 'INP-PIPE04'},
+                        'materials': {0.025: 'FC', 0.0025: 'PVC', 0.03: 'FD'},
+                        'features': {'junctions': 'JUNCTION', 'pipes': 'PIPE', 'pumps': 'VARC', 'reservoirs': 'SOURCE', 'tanks': 'TANK', 'valves': 'VARC'},
+                        'junctions': 'JUNCTION DN110',
+                        'reservoirs': 'SOURCE-01',
+                        'tanks': 'TANK_01',
+                        'pumps': 'INP-PUMP',
+                        'valves': 'INP-VALVE'}
+
+            self._save_config(workcat, exploitation, sector, municipality, dscenario, catalogs)
+
+            # Set background task 'Import INP'
+            description = "Import INP (TESTING MODE)"
+            self.import_inp_task = GwImportInpTask(
+                description,
+                self.file_path,
+                self.parse_inp_task.network,
+                workcat,
+                exploitation,
+                sector,
+                municipality,
+                dscenario,
+                catalogs,
+                force_commit=force_commit
+            )
+
+            # Create timer
+            self.t0: float = time()
+            self.timer: QTimer = QTimer()
+            self.timer.timeout.connect(
+                partial(self._update_config_dialog, self.dlg_config)
+            )
+            self.timer.start(1000)
+            self.import_inp_task.message_logged.connect(self._message_logged)
+            self.import_inp_task.progress_changed.connect(self._progress_changed)
+            self.import_inp_task.taskCompleted.connect(self.timer.stop)
+
+            # Run task
+            QgsApplication.taskManager().addTask(self.import_inp_task)
+            QgsApplication.taskManager().triggerTask(self.import_inp_task)
+            return
+
+        # Get the configuration values from the dialog
+        workcat, exploitation, sector, municipality, dscenario, _ = self._get_config_values()
+        # Workcat
+        if workcat == "":
+            message = "Please enter a Workcat_id to proceed with this import."
+            tools_qt.show_info_box(message)
+            return
+
+        sql: str = "SELECT id FROM cat_work WHERE id = %s"
+        row = tools_db.get_row(sql, params=(workcat,))
+        if row is not None:
+            message = f'The Workcat_id "{workcat}" is already in use. Please enter a different ID.'
+            tools_qt.show_info_box(message)
+            return
+
+        # Exploitation
+        if exploitation == "":
+            message = "Please select an exploitation to proceed with this import."
+            tools_qt.show_info_box(message)
+            return
+
+        # Sector
+        if sector == "":
+            message = "Please select a sector to proceed with this import."
+            tools_qt.show_info_box(message)
+            return
+
+        # Municipality
+        if municipality == "":
+            message = "Please select a municipality to proceed with this import."
+            tools_qt.show_info_box(message)
+            return
+
+        # Demands dscenario
+        if dscenario in ("", "null", None):
+            message = "Please enter a demands dscenario name to proceed with this import."
+            tools_qt.show_info_box(message)
+            return
+
+        # Tables (Arcs and Nodes)
+        catalogs = {"pipes": {}, "materials": {}, "features": {}}
+
+        for _input, result in [
+            (self.tbl_elements, catalogs),
+            (self.tbl_elements["pipes"], catalogs["pipes"]),
+            (self.tbl_elements["materials"], catalogs["materials"]),
+            (self.tbl_elements["features"], catalogs["features"]),
+        ]:
+            for element in _input:
+                if type(_input[element]) is not tuple:
+                    continue
+
+                combo = _input[element][0]
+                combo_value = combo.currentText()
+
+                if combo_value == "":
+                    message = "Please select a catalog item for all elements in the tabs: Nodes, Arcs, Materials, Features."
+                    tools_qt.show_info_box(message)
+                    return
+
+                new_catalog = None
+
+                if len(_input[element]) > 1:
+                    new_catalog_cell = _input[element][1]
+                    new_catalog = new_catalog_cell.text().strip()
+
+                    if combo_value == CREATE_NEW and new_catalog == "":
+                        message = f'Please enter a new catalog name when the "{CREATE_NEW}" option is selected.'
+                        tools_qt.show_info_box(message)
+                        return
+
+                result[element] = (
+                    new_catalog if combo_value == CREATE_NEW else combo_value
+                )
+
+        # Save options to the configuration file
+        self._save_config(workcat, exploitation, sector, municipality, dscenario, catalogs)
+
+        # Set background task 'Import INP'
+        description = "Import INP"
+        self.import_inp_task = GwImportInpTask(
+            description,
+            self.file_path,
+            self.parse_inp_task.network,
+            workcat,
+            exploitation,
+            sector,
+            municipality,
+            dscenario,
+            catalogs,
+            force_commit=force_commit,
+        )
+
+        # Create timer
+        self.t0: float = time()
+        self.timer: QTimer = QTimer()
+        self.timer.timeout.connect(
+            partial(self._update_config_dialog, self.dlg_config)
+        )
+        self.timer.start(1000)
+        self.import_inp_task.message_logged.connect(self._message_logged)
+        self.import_inp_task.progress_changed.connect(self._progress_changed)
+        self.import_inp_task.taskCompleted.connect(self.timer.stop)
+
+        QgsApplication.taskManager().addTask(self.import_inp_task)
+        QgsApplication.taskManager().triggerTask(self.import_inp_task)
+
+    def _fill_tables(self):
         # Fill nodes table
         tbl_nodes: QTableWidget = self.dlg_config.tbl_nodes
 
@@ -276,247 +518,6 @@ class GwImportEpanet:
             tbl_feature.setCellWidget(row, 1, combo_feat)
 
             self.tbl_elements["features"][tag.lower()] = (combo_feat,)
-
-        self._fill_combo_boxes()
-
-        self._manage_widgets_visibility()
-
-        self._load_config()
-
-        tools_gw.open_dialog(self.dlg_config, dlg_name="dlg_inp_config_import")
-
-    def _manage_widgets_visibility(self):
-        # Hide 'Default Raingage' widget for WS
-        tools_qt.set_widget_visible(self.dlg_config, "lbl_raingage", False)
-        tools_qt.set_widget_visible(self.dlg_config, "txt_raingage", False)
-
-        # Disable the whole dialog if testing mode
-        if TESTING_MODE:
-            tools_gw.set_tabs_enabled(self.dlg_config, hide_btn_accept=False, change_btn_cancel=False)
-
-    def _importinp_accept(self):
-        # Manage force commit mode
-        force_commit = tools_qt.is_checked(self.dlg_config, "chk_force_commit")
-        if force_commit is None:
-            force_commit = False
-
-        self.dlg_config.mainTab.setCurrentIndex(self.dlg_config.mainTab.count()-1)
-        if TESTING_MODE:
-            # Show warning message
-            message = "You are about to import the INP file in TESTING MODE. This will delete all the data in the database related to the network you are importing. Are you sure you want to proceed?"
-            res = tools_qt.show_question(message, title="WARNING", force_action=True)
-            if not res:
-                return
-            message = "!!!!! THIS WILL DELETE ALL DATA IN THE DATABASE !!!!!\nARE YOU SURE YOU WANT TO PROCEED?"
-            res = tools_qt.show_question(message, title="WARNING", force_action=True)
-            if not res:
-                return
-
-            # Delete the network before importing
-            queries = [
-                'SELECT gw_fct_admin_manage_migra($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"action":"TRUE"}, "aux_params":null}}$$);',
-                'UPDATE arc SET node_1 = NULL, node_2 = NULL;',
-                'DELETE FROM ext_rtc_scada_x_data;',
-                'DELETE FROM config_graph_checkvalve;',
-                'DELETE FROM connec CASCADE;',
-                'DELETE FROM node CASCADE;',
-                'DELETE FROM inp_pump CASCADE;',
-                'DELETE FROM inp_virtualpump CASCADE;',
-                'DELETE FROM inp_virtualvalve CASCADE;',
-                'DELETE FROM inp_dscenario_demand CASCADE;',
-                'DELETE FROM inp_curve CASCADE;',
-                'DELETE FROM inp_pattern_value CASCADE;',
-                'DELETE FROM inp_pattern CASCADE;',
-                'DELETE FROM inp_controls CASCADE;',
-                'DELETE FROM inp_rules CASCADE;',
-                'DELETE FROM arc CASCADE;',
-                "DELETE FROM cat_work WHERE id = 'import_inp_test';",
-                "DELETE FROM cat_dscenario WHERE expl_id = 1;",
-                "DELETE FROM cat_arc CASCADE;",
-                "DELETE FROM cat_mat_roughness CASCADE;",
-                "DELETE FROM cat_material CASCADE;",
-                "DELETE FROM sector WHERE sector_id = 1;",
-                "DELETE FROM ext_municipality WHERE muni_id = 1;",
-                "DELETE FROM exploitation WHERE expl_id = 1;",
-                "INSERT INTO cat_material (id, descript, feature_type, active) VALUES ('FC', 'FC', '{ARC}', true), ('PVC', 'PVC', '{ARC}', true), ('FD', 'FD', '{ARC}', true);",
-                "UPDATE cat_mat_roughness SET roughness = 0.025 WHERE matcat_id = 'FC';",
-                "UPDATE cat_mat_roughness SET roughness = 0.0025 WHERE matcat_id = 'PVC';",
-                "UPDATE cat_mat_roughness SET roughness = 0.03 WHERE matcat_id = 'FD';",
-                "INSERT INTO exploitation (expl_id, name, macroexpl_id, descript, active) VALUES (1, 'expl_1_import_inp_test', 0, 'Created by import inp in TESTING MODE', true);",
-                # "INSERT INTO ext_municipality (muni_id, name, observ, active) VALUES (1, 'muni_1_import_inp_test', 'Created by import inp in TESTING MODE', true);",
-                # "INSERT INTO sector (sector_id, name, muni_id, expl_id, macrosector_id, descript, active) VALUES (1, 'sector_1_import_inp_test', '{1}'::int[], '{1}'::int[], 0, 'Created by import inp in TESTING MODE', true);"
-            ]
-            for sql in queries:
-                result = tools_db.execute_sql(sql, commit=force_commit)
-                if not result:
-                    return
-
-
-            # Set variables
-            workcat = "import_inp_test"
-            exploitation = 1
-            sector = 0
-            municipality = 999999  # Spatial intersect
-            dscenario = "import_inp_demands"
-            catalogs = {'pipes': {(57.0, 0.0025): 'INP-PIPE01', (57.0, 0.025): 'INP-PIPE02', (99.0, 0.0025): 'PELD110-PN10', (99.0, 0.025): 'FC110-PN10', (144.0, 0.0025): 'PVC160-PN16', (144.0, 0.025): 'FC160-PN10', (153.0, 0.03): 'INP-PIPE03', (204.0, 0.03): 'INP-PIPE04'},
-                        'materials': {0.025: 'FC', 0.0025: 'PVC', 0.03: 'FD'},
-                        'features': {'junctions': 'JUNCTION', 'pipes': 'PIPE', 'pumps': 'VARC', 'reservoirs': 'SOURCE', 'tanks': 'TANK', 'valves': 'VARC'},
-                        'junctions': 'JUNCTION DN110',
-                        'reservoirs': 'SOURCE-01',
-                        'tanks': 'TANK_01',
-                        'pumps': 'INP-PUMP',
-                        'valves': 'INP-VALVE'}
-
-            self._save_config(workcat, exploitation, sector, municipality, dscenario, catalogs)
-
-            # Set background task 'Import INP'
-            description = "Import INP (TESTING MODE)"
-            self.import_inp_task = GwImportInpTask(
-                description,
-                self.file_path,
-                self.parse_inp_task.network,
-                workcat,
-                exploitation,
-                sector,
-                municipality,
-                dscenario,
-                catalogs,
-                force_commit=force_commit
-            )
-
-            # Create timer
-            self.t0: float = time()
-            self.timer: QTimer = QTimer()
-            self.timer.timeout.connect(
-                partial(self._update_config_dialog, self.dlg_config)
-            )
-            self.timer.start(1000)
-            self.import_inp_task.message_logged.connect(self._message_logged)
-            self.import_inp_task.progress_changed.connect(self._progress_changed)
-            self.import_inp_task.taskCompleted.connect(self.timer.stop)
-
-            # Run task
-            QgsApplication.taskManager().addTask(self.import_inp_task)
-            QgsApplication.taskManager().triggerTask(self.import_inp_task)
-            return
-
-        # Workcat
-        workcat: str = self.dlg_config.txt_workcat.text().strip()
-
-        if workcat == "":
-            message = "Please enter a Workcat_id to proceed with this import."
-            tools_qt.show_info_box(message)
-            return
-
-        sql: str = "SELECT id FROM cat_work WHERE id = %s"
-        row = tools_db.get_row(sql, params=(workcat,))
-        if row is not None:
-            message = f'The Workcat_id "{workcat}" is already in use. Please enter a different ID.'
-            tools_qt.show_info_box(message)
-            return
-
-        # Exploitation
-        exploitation = tools_qt.get_combo_value(self.dlg_config, "cmb_expl")
-
-        if exploitation == "":
-            message = "Please select an exploitation to proceed with this import."
-            tools_qt.show_info_box(message)
-            return
-
-        # Sector
-        sector = tools_qt.get_combo_value(self.dlg_config, "cmb_sector")
-
-        if sector == "":
-            message = "Please select a sector to proceed with this import."
-            tools_qt.show_info_box(message)
-            return
-
-        # Municipality
-        municipality = tools_qt.get_combo_value(self.dlg_config, "cmb_muni")
-
-        if municipality == "":
-            message = "Please select a municipality to proceed with this import."
-            tools_qt.show_info_box(message)
-            return
-
-        if municipality == SPATIAL_INTERSECT:
-            municipality = 999999
-
-        # Demands dscenario
-        dscenario = tools_qt.get_text(self.dlg_config, "txt_dscenario")
-
-        if dscenario in ("", "null", None):
-            message = "Please enter a demands dscenario name to proceed with this import."
-            tools_qt.show_info_box(message)
-            return
-
-        # Tables (Arcs and Nodes)
-        catalogs = {"pipes": {}, "materials": {}, "features": {}}
-
-        for _input, result in [
-            (self.tbl_elements, catalogs),
-            (self.tbl_elements["pipes"], catalogs["pipes"]),
-            (self.tbl_elements["materials"], catalogs["materials"]),
-            (self.tbl_elements["features"], catalogs["features"]),
-        ]:
-            for element in _input:
-                if type(_input[element]) is not tuple:
-                    continue
-
-                combo = _input[element][0]
-                combo_value = combo.currentText()
-
-                if combo_value == "":
-                    message = "Please select a catalog item for all elements in the tabs: Nodes, Arcs, Materials, Features."
-                    tools_qt.show_info_box(message)
-                    return
-
-                new_catalog = None
-
-                if len(_input[element]) > 1:
-                    new_catalog_cell = _input[element][1]
-                    new_catalog = new_catalog_cell.text().strip()
-
-                    if combo_value == CREATE_NEW and new_catalog == "":
-                        message = f'Please enter a new catalog name when the "{CREATE_NEW}" option is selected.'
-                        tools_qt.show_info_box(message)
-                        return
-
-                result[element] = (
-                    new_catalog if combo_value == CREATE_NEW else combo_value
-                )
-
-        # Save options to the configuration file
-        self._save_config(workcat, exploitation, sector, municipality, dscenario, catalogs)
-
-        # Set background task 'Import INP'
-        description = "Import INP"
-        self.import_inp_task = GwImportInpTask(
-            description,
-            self.file_path,
-            self.parse_inp_task.network,
-            workcat,
-            exploitation,
-            sector,
-            municipality,
-            dscenario,
-            catalogs,
-            force_commit=force_commit,
-        )
-
-        # Create timer
-        self.t0: float = time()
-        self.timer: QTimer = QTimer()
-        self.timer.timeout.connect(
-            partial(self._update_config_dialog, self.dlg_config)
-        )
-        self.timer.start(1000)
-        self.import_inp_task.message_logged.connect(self._message_logged)
-        self.import_inp_task.progress_changed.connect(self._progress_changed)
-        self.import_inp_task.taskCompleted.connect(self.timer.stop)
-
-        QgsApplication.taskManager().addTask(self.import_inp_task)
-        QgsApplication.taskManager().triggerTask(self.import_inp_task)
 
     def _fill_combo_boxes(self):
         # Fill exploitation combo
@@ -682,6 +683,47 @@ class GwImportEpanet:
                 )
             combo.setCurrentText(old_value)
 
+    def _get_config_values(self):
+        workcat = tools_qt.get_text(self.dlg_config, "txt_workcat")
+        exploitation = tools_qt.get_combo_value(self.dlg_config, "cmb_expl")
+        sector = tools_qt.get_combo_value(self.dlg_config, "cmb_sector")
+        municipality = tools_qt.get_combo_value(self.dlg_config, "cmb_muni")
+        dscenario = tools_qt.get_text(self.dlg_config, "txt_dscenario")
+
+        # Tables (Arcs and Nodes)
+        catalogs = {"pipes": {}, "materials": {}, "features": {}}
+
+        for _input, result in [
+            (self.tbl_elements, catalogs),
+            (self.tbl_elements["pipes"], catalogs["pipes"]),
+            (self.tbl_elements["materials"], catalogs["materials"]),
+            (self.tbl_elements["features"], catalogs["features"]),
+        ]:
+            for element in _input:
+                if type(_input[element]) is not tuple:
+                    continue
+
+                combo = _input[element][0]
+                combo_value = combo.currentText()
+
+                if combo_value == "":
+                    continue
+
+                new_catalog = None
+
+                if len(_input[element]) > 1:
+                    new_catalog_cell = _input[element][1]
+                    new_catalog = new_catalog_cell.text().strip()
+
+                    if combo_value == CREATE_NEW and new_catalog == "":
+                        continue
+
+                result[element] = (
+                    new_catalog if combo_value == CREATE_NEW else combo_value
+                )
+
+        return workcat, exploitation, sector, municipality, dscenario, catalogs
+
     def _toggle_enabled_new_catalog_field(
         self, field: QTableWidgetItem, text: str
     ) -> None:
@@ -691,15 +733,62 @@ class GwImportEpanet:
             else Qt.NoItemFlags
         )
 
+    def _create_load_menu(self):
+        """Create a drop-down menu for the load button"""
+
+        menu = QMenu(self.dlg_config)
+        action_load_last = menu.addAction("Load last")
+        action_load_from_file = menu.addAction("Load from file")
+
+        # Connect actions to their respective slots
+        action_load_last.triggered.connect(self._load_last_config)
+        action_load_from_file.triggered.connect(self._load_config_from_file)
+
+        return menu
+
+    def _load_last_config(self):
+        """Load the last saved configuration"""
+
+        self._load_config()
+
+    def _load_config_from_file(self):
+        """Load configuration from a file"""
+
+        config_folder = f'{lib_vars.user_folder_dir}{os.sep}core{os.sep}temp'
+        result: Tuple[str, str] = QFileDialog.getOpenFileName(
+            None, "Select a configuration file", config_folder, "JSON files (*.json)"
+        )
+        file_path_str: str = result[0]
+        if file_path_str:
+            config_path: Path = Path(file_path_str)
+            config = GwInpConfig()
+            config.read_from_file(config_path)
+            self._load_config(config)
+
+    def _save_config_to_file(self):
+        """Save configuration to a file"""
+
+        result: Tuple[str, str] = QFileDialog.getSaveFileName(
+            None, "Save configuration file", "", "JSON files (*.json)"
+        )
+        file_path_str: str = result[0]
+        if file_path_str:
+            config_path: Path = Path(file_path_str)
+            workcat, exploitation, sector, municipality, dscenario, catalogs = self._get_config_values()
+            self._save_config(workcat=workcat, exploitation=exploitation, sector=sector, municipality=municipality, dscenario=dscenario, catalogs=catalogs, _config_path=config_path)
+
     def _save_config(self, workcat: Optional[str] = None, exploitation: Optional[int] = None, sector: Optional[int] = None,
-                     municipality: Optional[int] = None, dscenario: Optional[str] = None, catalogs: Optional[dict] = None) -> None:
+                     municipality: Optional[int] = None, dscenario: Optional[str] = None, catalogs: Optional[dict] = None, _config_path: Optional[Path] = None) -> None:
 
         try:
-            config_folder = f'{lib_vars.user_folder_dir}{os.sep}core{os.sep}temp'
-            if not os.path.exists(config_folder):
-                os.makedirs(config_folder)
-            path_temp_file = f"{config_folder}{os.sep}import_epanet_config.json"
-            config_path: Path = Path(path_temp_file)
+            if _config_path is None:
+                config_folder = f'{lib_vars.user_folder_dir}{os.sep}core{os.sep}temp'
+                if not os.path.exists(config_folder):
+                    os.makedirs(config_folder)
+                path_temp_file = f"{config_folder}{os.sep}import_epanet_config.json"
+                config_path: Path = Path(path_temp_file)
+            else:
+                config_path = _config_path
             config = GwInpConfig(file_path=self.file_path, workcat=workcat, exploitation=exploitation, sector=sector,
                                  municipality=municipality, dscenario=dscenario, catalogs=catalogs)
             config.write_to_file(config_path)
@@ -707,15 +796,16 @@ class GwImportEpanet:
         except Exception as e:
             tools_qgis.show_warning(f"Error saving the configuration: {e}", dialog=self.dlg_config)
 
-    def _load_config(self) -> Optional[GwInpConfig]:
+    def _load_config(self, config: Optional[GwInpConfig] = None) -> Optional[GwInpConfig]:
 
-        config_folder = f'{lib_vars.user_folder_dir}{os.sep}core{os.sep}temp'
-        path_temp_file = f"{config_folder}{os.sep}import_epanet_config.json"
-        config_path: Path = Path(path_temp_file)
-        if not os.path.exists(config_path):
-            return None
-        config = GwInpConfig()
-        config.read_from_file(config_path)
+        if config is None:
+            config_folder = f'{lib_vars.user_folder_dir}{os.sep}core{os.sep}temp'
+            path_temp_file = f"{config_folder}{os.sep}import_epanet_config.json"
+            config_path: Path = Path(path_temp_file)
+            if not os.path.exists(config_path):
+                return None
+            config = GwInpConfig()
+            config.read_from_file(config_path)
         if not config.file_path:
             return None
 
