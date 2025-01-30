@@ -90,7 +90,7 @@ BEGIN
 
 		-- Verified
 		IF (NEW.verified IS NULL) THEN
-			NEW.verified := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_verified_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+			NEW.verified := (SELECT "value"::INTEGER FROM config_param_user WHERE "parameter"='edit_verified_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 		END IF;
 
 		-- State
@@ -111,7 +111,7 @@ BEGIN
 				IF (NEW.expl_id IS NULL) THEN
 					EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
        				 "data":{"message":"2012", "function":"1114","parameters":{"feature_id":"'||NEW.element_id||'"}}}$$);';
-				END IF;		
+				END IF;
 			END IF;
 		END IF;
 

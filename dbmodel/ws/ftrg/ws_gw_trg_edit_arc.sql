@@ -368,7 +368,7 @@ BEGIN
 
 		-- Verified
 		IF (NEW.verified IS NULL) THEN
-			NEW.verified := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_verified_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+			NEW.verified := (SELECT "value"::INTEGER FROM config_param_user WHERE "parameter"='edit_verified_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 		END IF;
 
 		-- LINK
@@ -428,7 +428,7 @@ BEGIN
 					NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.workcat_id_end, NEW.workcat_id_plan, NEW.buildercat_id, NEW.builtdate,NEW.enddate, NEW.ownercat_id,
 					NEW.muni_id, NEW.postcode, NEW.district_id,v_streetaxis,NEW.postnumber, NEW.postcomplement, v_streetaxis2, NEW.postnumber2, NEW.postcomplement2, NEW.descript,NEW.link, NEW.verified,
 					NEW.the_geom,NEW.undelete,NEW.label_x,NEW.label_y,NEW.label_rotation, NEW.publish, NEW.inventory, NEW.expl_id, NEW.num_value,
-					NEW.adate, NEW.adescript, NEW.lastupdate, NEW.lastupdate_user, NEW.asset_id, NEW.pavcat_id, NEW.om_state, NEW.conserv_state, 
+					NEW.adate, NEW.adescript, NEW.lastupdate, NEW.lastupdate_user, NEW.asset_id, NEW.pavcat_id, NEW.om_state, NEW.conserv_state,
 					NEW.parent_id, NEW.expl_id2, NEW.brand_id, NEW.model_id, NEW.serial_number, NEW.label_quadrant, NEW.streetname, NEW.streetname2);
 
 		-- this overwrites triger topocontrol arc values (triggered before insertion) just in that moment: In order to make more profilactic this issue only will be overwrited in case of NEW.node_* not nulls
@@ -507,30 +507,30 @@ BEGIN
 					"state":"'||NEW.state::text||'","stateType":"'||NEW.state_type::text||'", "arcId":"'||NEW.arc_id||'" }}$$);';
 			END IF;
 		END IF;
-	
-	
+
+
 		-- automatic connection of closest connecs to the arc
-		SELECT 
+		SELECT
 		("value"::json->>'active')::boolean as v_active,
 		("value"::json->>'buffer')::numeric as v_buffer
 		INTO rec_param_link
-		FROM config_param_user 
-		WHERE "parameter" ilike 'edit_arc_automatic_link2netowrk' 
+		FROM config_param_user
+		WHERE "parameter" ilike 'edit_arc_automatic_link2netowrk'
 		AND cur_user = current_user;
-	
+
 		IF rec_param_link.v_active is true THEN
-		
-			SELECT string_agg(connec_id::text, ',') 
+
+			SELECT string_agg(connec_id::text, ',')
 			INTO v_connecs
-			FROM v_edit_connec c 
-			WHERE st_dwithin (new.the_geom, c.the_geom, rec_param_link.v_buffer) 
+			FROM v_edit_connec c
+			WHERE st_dwithin (new.the_geom, c.the_geom, rec_param_link.v_buffer)
 			AND c.connec_id not in (select feature_id from v_edit_link);
-						
+
 			execute 'SELECT ws_link2net.gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1,"lang":"ES"},"feature":
 			{"id":"['||v_connecs||']"}, "data":{"feature_type":"CONNEC", "forcedArcs":["'||new.arc_id||'"]}}$$)';
-	
+
 		END IF;
-	
+
 
         RETURN NEW;
 

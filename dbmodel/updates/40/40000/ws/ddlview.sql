@@ -432,6 +432,7 @@ CREATE OR REPLACE VIEW vu_link AS
     date_trunc('second'::text, l.lastupdate) AS lastupdate,
     l.lastupdate_user,
     l.uncertain,
+    l.verified,
     l.minsector_id,
     l.macrominsector_id,
     CASE
@@ -4664,7 +4665,7 @@ AS SELECT d.dqa_id,
   WHERE d.dqa_id > 0
   ORDER BY d.dqa_id;
 
- 
+
 
 CREATE OR REPLACE VIEW v_ui_sector
 AS SELECT s.sector_id,

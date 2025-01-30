@@ -406,7 +406,7 @@ BEGIN
 
 		-- Verified
 		IF (NEW.verified IS NULL) THEN
-			NEW.verified := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_verified_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+			NEW.verified := (SELECT "value"::INTEGER FROM config_param_user WHERE "parameter"='edit_verified_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 		END IF;
 
 		-- State
@@ -623,7 +623,7 @@ BEGIN
 			NEW.muni_id, v_streetaxis, NEW.postcode, NEW.district_id, v_streetaxis2,NEW.postnumber,NEW.postnumber2, NEW.postcomplement, NEW.postcomplement2,
 			NEW.descript, NEW.rotation,NEW.link, NEW.verified, NEW.undelete, NEW.label_x,NEW.label_y,NEW.label_rotation,NEW.the_geom,
 			NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.xyz_date, NEW.unconnected, NEW.num_value,  NEW.lastupdate, NEW.lastupdate_user,NEW.matcat_id,
-			NEW.asset_id, NEW.drainzone_id, NEW.parent_id, NEW.arc_id, NEW.expl_id2, NEW.adate, NEW.adescript, NEW.placement_type, 
+			NEW.asset_id, NEW.drainzone_id, NEW.parent_id, NEW.arc_id, NEW.expl_id2, NEW.adate, NEW.adescript, NEW.placement_type,
 			NEW.label_quadrant, NEW.access_type, NEW.brand_id, NEW.model_id, NEW.serial_number, NEW.streetname, NEW.streetname2);
 		END IF;
 
@@ -911,8 +911,8 @@ BEGIN
 			streetaxis2_id=v_streetaxis2, postnumber=NEW.postnumber, postnumber2=NEW.postnumber2, descript=NEW.descript, link=NEW.link, verified=NEW.verified, undelete=NEW.undelete,
 			label_x=NEW.label_x, label_y=NEW.label_y, label_rotation=NEW.label_rotation, publish=NEW.publish, inventory=NEW.inventory, rotation=NEW.rotation, uncertain=NEW.uncertain,
 			xyz_date=NEW.xyz_date, unconnected=NEW.unconnected, expl_id=NEW.expl_id, num_value=NEW.num_value, lastupdate=now(), lastupdate_user=current_user, matcat_id = NEW.matcat_id,
-			asset_id=NEW.asset_id, drainzone_id=NEW.drainzone_id, parent_id=NEW.parent_id, arc_id = NEW.arc_id, expl_id2=NEW.expl_id2, adate=NEW.adate, adescript=NEW.adescript, 
-			placement_type=NEW.placement_type, label_quadrant=NEW.label_quadrant, access_type=NEW.access_type, brand_id=NEW.brand_id, model_id=NEW.model_id, serial_number=NEW.serial_number, 
+			asset_id=NEW.asset_id, drainzone_id=NEW.drainzone_id, parent_id=NEW.parent_id, arc_id = NEW.arc_id, expl_id2=NEW.expl_id2, adate=NEW.adate, adescript=NEW.adescript,
+			placement_type=NEW.placement_type, label_quadrant=NEW.label_quadrant, access_type=NEW.access_type, brand_id=NEW.brand_id, model_id=NEW.model_id, serial_number=NEW.serial_number,
 			streetname = NEW.streetname, streetname2 = NEW.streetname2
 			WHERE node_id = OLD.node_id;
 		END IF;
@@ -1007,38 +1007,38 @@ BEGIN
 				END IF;
 			END LOOP;
 		END IF;
-		
+
 		-- set label_quadrant, label_x and label_y according to cat_feature
 
 		EXECUTE '
 		SELECT addparam->''labelPosition''->''dist''->>0  
 		FROM cat_feature WHERE id = '||quote_literal(new.node_type)||'					
 		' INTO v_dist_xlab;
-	
+
 		EXECUTE '
 		SELECT addparam->''labelPosition''->''dist''->>1  
 		FROM cat_feature WHERE id = '||quote_literal(new.node_type)||'					
 		' INTO v_dist_ylab;
-		
 
-		if v_dist_ylab is not null and v_dist_xlab is not null and 
-		(SELECT value::boolean FROM config_param_user WHERE parameter='edit_noderotation_update_dsbl' AND cur_user=current_user) IS FALSE 
+
+		if v_dist_ylab is not null and v_dist_xlab is not null and
+		(SELECT value::boolean FROM config_param_user WHERE parameter='edit_noderotation_update_dsbl' AND cur_user=current_user) IS FALSE
 		then -- only start the process with not-null values
-	
-		
+
+
 			-- prev calc: intermediate rotations according to dist_x and dist_y from cat_feature
 			if (v_dist_xlab > 0 and v_dist_ylab > 0) -- top right
 			or (v_dist_xlab < 0 and v_dist_ylab < 0) -- bottom left
-			then 
-				v_rot1 = 90+new.rotation; 
-				v_rot2 = 0+new.rotation; 
-			
+			then
+				v_rot1 = 90+new.rotation;
+				v_rot2 = 0+new.rotation;
+
 			elsif (v_dist_xlab > 0 and v_dist_ylab < 0) -- bottom right
 			or 	  (v_dist_xlab < 0 and v_dist_ylab > 0) -- top left
-			then 
+			then
 				v_rot1 = 0+new.rotation;
-				v_rot2 = 90+new.rotation;			
-			
+				v_rot2 = 90+new.rotation;
+
 			end if;
 
 			-- prev calc: label position according to cat_feature
@@ -1049,8 +1049,8 @@ BEGIN
 			SELECT ST_Project(ST_Transform(eee::geometry, 4326)::geography, '||v_dist_xlab||', radians('||v_rot2||')) as fff
 			from mec)
 			select st_transform(fff::geometry, '||v_srid||') as label_p from lab_point';
-		
-			execute v_sql into v_label_point;	
+
+			execute v_sql into v_label_point;
 
 			-- prev calc: diagonal distance between node and label position (Pitagoras)
 			v_label_dist = sqrt(v_dist_xlab^2 + v_dist_ylab^2);
@@ -1068,10 +1068,10 @@ BEGIN
 			)
 			select degrees(ST_Azimuth(vertex_point, point1))
 			from mec';
-	
+
 			execute v_sql into v_cur_rotation using v_label_point, new.node_id;
-		
-				
+
+
 			-- prev calc: current label_quadrant according to cat_feature
 			if v_dist_xlab > 0 and v_dist_ylab > 0 then -- top right
 				v_cur_quadrant = 'TR';
@@ -1082,87 +1082,87 @@ BEGIN
 			elsif v_dist_xlab < 0 and v_dist_ylab < 0 then -- bottom left
 				v_cur_quadrant = 'BL';
 			end if;
-		
-		end if;	
-	
+
+		end if;
+
 
 		-- set label_x and label_y according to cat_feature
 		update node set label_x = st_x(v_label_point) where node_id = new.node_id;
 		update node set label_y = st_y(v_label_point) where node_id = new.node_id;
-	
+
 		update node set label_quadrant = v_cur_quadrant where node_id = new.node_id;
 
 
 		-- CASE: if label_quadrant changes
 		if new.label_quadrant != old.label_quadrant then
-		
+
 			if new.label_quadrant ilike 'B%' then
-		
+
 				v_dist_sign = -1;
-			
+
 				if new.label_quadrant ilike '%L' then
-				
+
 					v_rot1 = 45;
-				
+
 				elsif new.label_quadrant ilike '%R' then
-			
+
 					v_rot1 = -45;
-			
+
 				end if;
-			
+
 			end if;
-		
-			
+
+
 			if new.label_quadrant ilike 'T%' then
-				
+
 				v_dist_sign = 1;
-			
+
 				if new.label_quadrant ilike '%L' then
-				
+
 					v_rot1 = -45;
-				
+
 				elsif new.label_quadrant ilike '%R' then
-					
+
 					v_rot1 = 45;
-				
+
 				end if;
-			
+
 			end if;
-				
-				
+
+
 			-- calc new label position
 			with mec as (
-				select 
+				select
 				n.the_geom as geom_node,
 				n.rotation as rot_node
-				from node n, arc a 
+				from node n, arc a
 				where n.node_id = new.node_id
-				and st_dwithin(a.the_geom, n.the_geom, 5) 
+				and st_dwithin(a.the_geom, n.the_geom, 5)
 				order by st_distance(a.the_geom, n.the_geom) limit 1
 			)
-			select st_transform(st_project(st_transform(geom_node::geometry, 4326), v_dist_sign * v_label_dist, radians(v_rot1+rot_node))::geometry, v_srid) 
+			select st_transform(st_project(st_transform(geom_node::geometry, 4326), v_dist_sign * v_label_dist, radians(v_rot1+rot_node))::geometry, v_srid)
 			into v_new_lab_position from mec;
-		
-			
+
+
 			-- update label position
 			update node set label_x = st_x(v_new_lab_position) where node_id = new.node_id;
 			update node set label_y = st_y(v_new_lab_position) where node_id = new.node_id;
-		
+
 			update node set label_quadrant = new.label_quadrant where node_id = new.node_id;
 
 
 		end if;
-	
-		
+
+
 		-- CASE: if rotation of the node changes
 		if new.rotation != old.rotation then
-		
+
 			-- prev calc: current label position
 			select st_setsrid(st_makepoint(label_x::numeric, label_y::numeric), v_srid) into v_label_point from node where node_id = new.node_id;
-		
+
 			-- prev calc: geom of the node
 			execute 'select the_geom from node where node_id = '||quote_literal(new.node_id)||''  into v_geom;
-			
+
 			-- prev calc: current angle between node and its label
 			v_sql = '
 			with mec as (
@@ -1175,25 +1175,25 @@ BEGIN
 			)
 			select degrees(ST_Azimuth(vertex_point, point1))
 			from mec';
-		
+
 			execute v_sql into v_cur_rotation using v_label_point, new.node_id;
-		
-		
-			-- prev calc: intermediate rotations according to dist_x and dist_y   		
+
+
+			-- prev calc: intermediate rotations according to dist_x and dist_y
 		   	if (v_dist_xlab > 0 and v_dist_ylab > 0) -- top right
 			or (v_dist_xlab < 0 and v_dist_ylab < 0) -- bottom left
-			then 
-				v_rot1 = 90+new.rotation; 
-				v_rot2 = 0+new.rotation; 
-			
+			then
+				v_rot1 = 90+new.rotation;
+				v_rot2 = 0+new.rotation;
+
 			elsif (v_dist_xlab > 0 and v_dist_ylab < 0) -- bottom right
 			or 	  (v_dist_xlab < 0 and v_dist_ylab > 0) -- top left
-			then 
+			then
 				v_rot1 = 0+new.rotation;
-				v_rot2 = 90+new.rotation; 
-			
+				v_rot2 = 90+new.rotation;
+
 			end if;
-		   
+
 
 			-- label position
 			v_sql = '
@@ -1203,17 +1203,17 @@ BEGIN
 			SELECT ST_Project(ST_Transform(eee::geometry, 4326)::geography, '||v_dist_xlab||', radians('||v_rot2||')) as fff
 			from mec)
 			select st_transform(fff::geometry, '||v_srid||') as label_p from lab_point';
-		
+
 			execute v_sql into v_label_point;
 
 			update node set label_rotation = new.rotation where node_id = new.node_id;
-		
+
 			update node set label_x = st_x(v_label_point) where node_id = new.node_id;
 			update node set label_y = st_y(v_label_point) where node_id = new.node_id;
-		
-		
+
+
 		end if;
-	
+
 
 		-- man2inp_values
 		PERFORM gw_fct_man2inp_values(v_input);

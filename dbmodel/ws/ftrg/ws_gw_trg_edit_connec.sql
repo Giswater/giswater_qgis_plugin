@@ -418,7 +418,7 @@ BEGIN
 
 		-- Verified
 		IF (NEW.verified IS NULL) THEN
-			NEW.verified := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_verified_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+			NEW.verified := (SELECT "value"::INTEGER FROM config_param_user WHERE "parameter"='edit_verified_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 		END IF;
 
 		-- Code
@@ -543,7 +543,7 @@ BEGIN
 		NEW.postcomplement2, NEW.descript, NEW.link, NEW.verified, NEW.rotation, NEW.the_geom,NEW.undelete,NEW.label_x, NEW.label_y,NEW.label_rotation,  NEW.expl_id, NEW.publish, NEW.inventory,
 		NEW.num_value, NEW.connec_length, NEW.arc_id, NEW.minsector_id, NEW.dqa_id, NEW.pjoint_id, NEW.pjoint_type,
 		NEW.adate, NEW.adescript, NEW.accessibility, NEW.lastupdate, NEW.lastupdate_user, NEW.asset_id, NEW.epa_type, NEW.om_state, NEW.conserv_state, NEW.priority,
-		NEW.valve_location, NEW.valve_type, NEW.shutoff_valve, NEW.access_type, NEW.placement_type, NEW.crmzone_id, NEW.expl_id2, NEW.plot_code, NEW.brand_id, NEW.model_id, NEW.serial_number, 
+		NEW.valve_location, NEW.valve_type, NEW.shutoff_valve, NEW.access_type, NEW.placement_type, NEW.crmzone_id, NEW.expl_id2, NEW.plot_code, NEW.brand_id, NEW.model_id, NEW.serial_number,
 		NEW.cat_valve, NEW.label_quadrant, NEW.streetname, NEW.streetname2);
 
 		SELECT feature_class, cat_feature.id INTO v_feature_class, v_featurecat_id FROM cat_feature

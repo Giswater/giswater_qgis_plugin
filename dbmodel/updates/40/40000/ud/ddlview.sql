@@ -318,7 +318,8 @@ AS SELECT DISTINCT ON (link_id)
     l.enddate,
     date_trunc('second'::text, l.lastupdate) AS lastupdate,
     l.lastupdate_user,
-    l.uncertain
+    l.uncertain,
+    l.verified
    FROM link l
 	 LEFT JOIN exploitation e USING (expl_id)
      LEFT JOIN sector s USING (sector_id)

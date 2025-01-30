@@ -540,6 +540,11 @@ BEGIN
 		END IF;
 	END IF;
 
+	-- Verified
+	IF (NEW.verified IS NULL) THEN
+		NEW.verified := (SELECT "value"::INTEGER FROM config_param_user WHERE "parameter"='edit_verified_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+	END IF;
+
 	-- upsert process
 	IF TG_OP ='INSERT' THEN
 
@@ -552,17 +557,18 @@ BEGIN
 		IF v_projectype = 'WS' THEN
 
 			INSERT INTO link (link_id, feature_type, feature_id, expl_id, exit_id, exit_type, userdefined_geom, state, the_geom, sector_id,
-			 fluid_type, dma_id, dqa_id, presszone_id, minsector_id, conneccat_id, workcat_id, workcat_id_end, builtdate, enddate, exit_elev, exit_topelev, uncertain, muni_id)
+			 fluid_type, dma_id, dqa_id, presszone_id, minsector_id, conneccat_id, workcat_id, workcat_id_end, builtdate, enddate, exit_elev, exit_topelev,
+			 uncertain, muni_id, verified)
 			VALUES (NEW.link_id, NEW.feature_type, NEW.feature_id, v_expl, NEW.exit_id, NEW.exit_type, TRUE, NEW.state, NEW.the_geom, v_sector,
 			v_fluidtype, v_dma, v_dqa, v_presszone, v_minsector, NEW.conneccat_id, NEW.workcat_id, NEW.workcat_id_end, NEW.builtdate, NEW.enddate,
-			NEW.exit_elev, NEW.exit_topelev, NEW.uncertain, NEW.muni_id);
+			NEW.exit_elev, NEW.exit_topelev, NEW.uncertain, NEW.muni_id, NEW.verified);
 
 		ELSIF  v_projectype = 'UD' THEN
 
 			INSERT INTO link (link_id, feature_type, feature_id, expl_id, exit_id, exit_type, userdefined_geom, state, the_geom, sector_id, fluid_type, dma_id,
-				conneccat_id, workcat_id, workcat_id_end, builtdate, enddate, exit_elev, exit_topelev, uncertain, muni_id)
+				conneccat_id, workcat_id, workcat_id_end, builtdate, enddate, exit_elev, exit_topelev, uncertain, muni_id, verified)
 			VALUES (NEW.link_id, NEW.feature_type, NEW.feature_id, v_expl, NEW.exit_id, NEW.exit_type, TRUE, NEW.state, NEW.the_geom, v_sector, v_fluidtype, v_dma,
-				NEW.conneccat_id, NEW.workcat_id, NEW.workcat_id_end, NEW.builtdate, NEW.enddate, NEW.exit_elev, NEW.exit_topelev, NEW.uncertain, NEW.muni_id);
+				NEW.conneccat_id, NEW.workcat_id, NEW.workcat_id_end, NEW.builtdate, NEW.enddate, NEW.exit_elev, NEW.exit_topelev, NEW.uncertain, NEW.muni_id, NEW.verified);
 		END IF;
 
 		-- update feature
@@ -694,7 +700,8 @@ BEGIN
 
 		-- update link parameters
 		UPDATE link SET state = NEW.state, the_geom = NEW.the_geom, workcat_id = NEW.workcat_id, workcat_id_end = NEW.workcat_id_end, builtdate = NEW.builtdate,
-		enddate = NEW.enddate, exit_elev = NEW.exit_elev, exit_topelev = NEW.exit_topelev, uncertain = NEW.uncertain, muni_id = NEW.muni_id, sector_id=v_sector
+		enddate = NEW.enddate, exit_elev = NEW.exit_elev, exit_topelev = NEW.exit_topelev, uncertain = NEW.uncertain, muni_id = NEW.muni_id, sector_id=v_sector,
+		verified = NEW.verified
 		WHERE link_id=NEW.link_id;
 
 		-- Update state_type if edit_connect_update_statetype is TRUE

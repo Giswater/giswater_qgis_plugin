@@ -130,9 +130,9 @@ BEGIN
     -- LOGIC FOR THE DIFFERENT ACTIONS
     IF v_action = 'CREATE' THEN
         IF v_verifiedExceptions THEN
-            v_filter = ' WHERE (verified is null or verified::INTEGER IN (0,1))';
+            v_filter = ' WHERE (verified IS NULL OR verified IN (0,1))';
         ELSE
-            v_filter = ' WHERE state is not null ';
+            v_filter = ' WHERE state IS NOT NULL ';
         END IF;
 
 

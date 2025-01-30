@@ -274,7 +274,7 @@ BEGIN
 
 		-- Verified
 		IF (NEW.verified IS NULL) THEN
-			NEW.verified := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_verified_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+			NEW.verified := (SELECT "value"::INTEGER FROM config_param_user WHERE "parameter"='edit_verified_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 		END IF;
 
 		-- State
@@ -490,7 +490,7 @@ BEGIN
 			v_streetaxis2, v_streetaxis, NEW.postnumber, NEW.postnumber2, NEW.postcomplement, NEW.postcomplement2,
 			NEW.descript, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom, NEW.undelete, NEW.label_x, NEW.label_y, NEW.label_rotation,
 			NEW.accessibility, NEW.diagonal, NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.num_value, NEW.private_conneccat_id,
-			NEW.lastupdate, NEW.lastupdate_user, NEW.asset_id, NEW.drainzone_id, NEW.expl_id2, NEW.adate, NEW.adescript, NEW.plot_code, NEW.placement_type, 
+			NEW.lastupdate, NEW.lastupdate_user, NEW.asset_id, NEW.drainzone_id, NEW.expl_id2, NEW.adate, NEW.adescript, NEW.plot_code, NEW.placement_type,
 			NEW.label_quadrant, NEW.access_type, NEW.streetname, NEW.streetname2);
 		ELSE
 			INSERT INTO connec (connec_id, code, customer_code, top_elev, y1, y2,conneccat_id, connec_type, sector_id, demand, "state",  state_type, connec_depth, connec_length, arc_id, annotation,
@@ -505,7 +505,7 @@ BEGIN
 			v_streetaxis2, v_streetaxis, NEW.postnumber, NEW.postnumber2, NEW.postcomplement, NEW.postcomplement2,
 			NEW.descript, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom, NEW.undelete, NEW.label_x, NEW.label_y, NEW.label_rotation,
 			NEW.accessibility, NEW.diagonal, NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.num_value, NEW.private_conneccat_id, NEW.matcat_id,
-			NEW.lastupdate, NEW.lastupdate_user, NEW.asset_id, NEW.drainzone_id, NEW.expl_id2, NEW.adate, NEW.adescript, NEW.plot_code, NEW.placement_type, 
+			NEW.lastupdate, NEW.lastupdate_user, NEW.asset_id, NEW.drainzone_id, NEW.expl_id2, NEW.adate, NEW.adescript, NEW.plot_code, NEW.placement_type,
 			NEW.label_quadrant, NEW.access_type, NEW.streetname, NEW.streetname2);
 		END IF;
 
