@@ -74,6 +74,8 @@ v_msgerr json;
 v_featuretype text;
 v_currency text;
 v_filter_widgets text = '';
+v_user_roles TEXT[];
+v_min_role TEXT;
 
 BEGIN
 
@@ -435,6 +437,30 @@ BEGIN
 			'queryText', 'orderById', 'parentId', 'queryTextFilter');
 		END IF;
 
+	END LOOP;
+
+	-- add logic to deal with min_roles and widgets to show
+	-- Extract current user roles (ensuring it's never NULL)
+	SELECT ARRAY_AGG(rolname) INTO v_user_roles FROM pg_roles
+	WHERE pg_has_role(current_user, oid, 'member');
+
+	--RAISE NOTICE 'User Roles: %', v_user_roles;
+
+	-- Filter fields based on minRole
+	FOR aux_json IN SELECT * FROM json_array_elements(array_to_json(fields_array)) AS a WHERE a->'widgetcontrols'->>'minRole' IS NOT NULL OR a->'widgetcontrols'->>'minRole' <> ''
+	LOOP
+	    v_min_role := aux_json->'widgetcontrols'->>'minRole';
+
+	    --RAISE NOTICE 'Field % has minRole: %', aux_json->>'columnname', v_min_role;
+
+	    IF NOT EXISTS (
+	        SELECT 1 FROM unnest(v_user_roles) AS user_role WHERE user_role = v_min_role
+	    ) THEN
+	        fields_array[(aux_json->>'orderby')::INT] :=
+	            gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'hidden', true);
+
+	        --RAISE NOTICE 'Hiding field % - user lacks required role', aux_json->>'columnname';
+	    END IF;
 	END LOOP;
 
 	-- for the rest of widgets removing not used keys

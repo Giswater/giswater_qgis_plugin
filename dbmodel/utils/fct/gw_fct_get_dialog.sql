@@ -95,74 +95,6 @@ BEGIN
         NULL
     ) INTO v_fields_array;
 
-    -- Extract user role dynamically
-	SELECT array_agg(role.rolname) INTO v_role
-	FROM pg_auth_members m
-	JOIN pg_roles grantee ON m.member = grantee.oid
-	JOIN pg_roles role ON m.roleid = role.oid
-	WHERE grantee.rolname = current_user;
-
-	RAISE NOTICE 'v_role %', v_role;
-
-	IF v_role IS NULL THEN
-		RAISE EXCEPTION 'USER HAS NO ROLE';
-	END IF;
-
-
-	-- Only apply role-based filtering for 'check_project'
-	IF v_formtype = 'check_project' THEN
-	    -- Initialize empty filtered array
-		v_filtered_fields_array := '[]'::jsonb;
-
-		-- Loop through widgets and filter based on role (ONLY for tab_data)
-		FOR i IN 1 .. array_length(v_fields_array, 1) LOOP
-		    v_widget := v_fields_array[i];
-
-		    -- Extract column name and tab name
-		    v_field_value := v_widget->>'columnname';
-		    v_tab_name := v_widget->>'tabname';
-
-		    -- Debugging
-		    RAISE NOTICE 'Checking field: % in tab: % for role: %', v_field_value, v_tab_name, v_role;
-
-		    -- Apply role-based filtering ONLY for tab_data
-			IF v_tab_name = 'tab_data' THEN
-			    -- Role-based filtering logic using array intersection
-			    IF v_role && ARRAY['role_basic', 'role_edit', 'role_om'] AND v_field_value IN ('om_check') THEN
-			        v_filtered_fields_array := v_filtered_fields_array || v_widget;
-
-			    ELSIF v_role && ARRAY['role_epa'] AND v_field_value IN ('om_check', 'epa_check') THEN
-			        v_filtered_fields_array := v_filtered_fields_array || v_widget;
-
-			    ELSIF v_role && ARRAY['role_plan'] AND v_field_value IN ('om_check', 'epa_check', 'plan_check') THEN
-			        v_filtered_fields_array := v_filtered_fields_array || v_widget;
-
-			    ELSIF v_role && ARRAY['role_admin'] AND v_field_value IN ('om_check', 'epa_check', 'plan_check', 'admin_check') THEN
-			        v_filtered_fields_array := v_filtered_fields_array || v_widget;
-			    END IF;
-			ELSE
-			    -- Keep everything else
-			    v_filtered_fields_array := v_filtered_fields_array || v_widget;
-			END IF;
-
-		END LOOP;
-
-		-- Debugging: Show final filtered list before conversion
-		RAISE NOTICE 'Filtered fields array: %', v_filtered_fields_array;
-
-		-- Convert filtered widgets to JSON
-		v_fieldsjson := COALESCE(to_jsonb(v_filtered_fields_array), '[]'::jsonb);
-
-		-- Debugging: Show final JSON before returning
-		RAISE NOTICE 'Final JSON before return: %', v_fieldsjson;
-
-	ELSE
-	    -- If not 'check_project', return all widgets without filtering
-	    v_fieldsjson := COALESCE(to_jsonb(v_fields_array), '[]'::jsonb);
-	END IF;
-
-
-
 	IF array_length(v_fields_array, 1) IS NULL THEN
     	RAISE EXCEPTION 'Variable v_fields_array is empty. Check the "formName" or "formType" parameters: %', v_fields_array;
 	END IF;
@@ -278,9 +210,7 @@ BEGIN
 
 	END LOOP;
 
-	IF v_formtype != 'check_project' THEN
-    	v_fieldsjson := to_jsonb(v_fields_array);
-	END IF;
+    v_fieldsjson := to_jsonb(v_fields_array);
 
 	-- Manage null
 	v_version := COALESCE(v_version, '');
