@@ -33,7 +33,7 @@ from ....ui.dialog import GwDialog
 from ....ui.ui_manager import GwInpConfigImportUi, GwInpParsingUi
 from ....threads.import_inp.import_swmm_task import GwImportInpTask
 from ....utils import tools_gw
-from ....utils.import_inp import GwInpConfig
+from ....utils.import_inp import GwInpConfig, create_load_menu, load_config, save_config, save_config_to_file
 from ...dialog import GwAction
 from ....threads.import_inp import parse_swmm_task
 
@@ -130,6 +130,14 @@ class GwImportSwmm:
 
         self.dlg_config = GwInpConfigImportUi(self)
         tools_gw.load_settings(self.dlg_config)
+
+        # Manage save/load buttons
+        self.dlg_config.btn_save.clicked.connect(partial(save_config_to_file, self))
+        # Make btn_load a drop-down button with the options: Load last, Load from file
+        menu = create_load_menu(self)
+        self.dlg_config.btn_load.setMenu(menu)
+
+        # Manage signals
         self.dlg_config.rejected.connect(
             partial(tools_gw.save_settings, self.dlg_config)
         )
@@ -141,6 +149,283 @@ class GwImportSwmm:
         # global Catalogs
         self.catalogs: parse_swmm_task.Catalogs = self.parse_inp_task.catalogs
 
+        self._fill_tables()
+
+        self._fill_combo_boxes()
+
+        self._manage_widgets_visibility()
+
+        load_config(self)
+
+        tools_gw.open_dialog(self.dlg_config, dlg_name="dlg_inp_config_import")
+
+    def _manage_widgets_visibility(self):
+        # Hide 'Demand dscenario' widget for UD
+        tools_qt.set_widget_visible(self.dlg_config, "lbl_dscenario", False)
+        tools_qt.set_widget_visible(self.dlg_config, "txt_dscenario", False)
+
+        # Disable the whole dialog if testing mode
+        if TESTING_MODE:
+            tools_gw.set_tabs_enabled(self.dlg_config, hide_btn_accept=False, change_btn_cancel=False)
+
+        # Default raingage widget
+        subcatchments = self.catalogs.inp_subcatchments
+        print(subcatchments)
+        has_empty = any([x[1] for x in subcatchments if x[1] == '*'] if subcatchments else [])
+        if not has_empty:
+            tools_qt.set_widget_visible(self.dlg_config, 'lbl_raingage', False)
+            tools_qt.set_widget_visible(self.dlg_config, 'txt_raingage', False)
+
+    def _importinp_accept(self):
+        # Manage force commit mode
+        force_commit = tools_qt.is_checked(self.dlg_config, "chk_force_commit")
+        if force_commit is None:
+            force_commit = False
+
+        if TESTING_MODE:
+
+            # Delete the network before importing
+            queries = [
+                'SELECT gw_fct_admin_manage_migra($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"action":"TRUE"}, "aux_params":null}}$$);',
+                'UPDATE arc SET node_1 = NULL, node_2 = NULL;',
+                'DELETE FROM ext_rtc_scada_x_data;',
+                'DELETE FROM inp_inflows CASCADE;',
+                'DELETE FROM inp_dwf CASCADE;',
+                'DELETE FROM connec CASCADE;',
+                'DELETE FROM node CASCADE;',
+                'DELETE FROM gully CASCADE;',
+                'DELETE FROM inp_subcatchment CASCADE;',
+                'DELETE FROM raingage CASCADE;',
+                'DELETE FROM inp_conduit CASCADE;',
+                'DELETE FROM inp_pump CASCADE;',
+                'DELETE FROM inp_orifice CASCADE;',
+                'DELETE FROM inp_outlet CASCADE;',
+                'DELETE FROM inp_outfall CASCADE;',
+                'DELETE FROM inp_storage CASCADE;',
+                'DELETE FROM inp_curve_value CASCADE;',
+                'DELETE FROM inp_curve CASCADE;',
+                'DELETE FROM inp_pattern_value CASCADE;',
+                'DELETE FROM inp_pattern CASCADE;',
+                'DELETE FROM inp_timeseries_value CASCADE;',
+                'DELETE FROM inp_timeseries CASCADE;',
+                'DELETE FROM inp_controls CASCADE;',
+                'DELETE FROM inp_files CASCADE;',
+                'DELETE FROM arc CASCADE;',
+                "DELETE FROM cat_work WHERE id = 'import_inp_test';",
+                "DELETE FROM cat_dscenario WHERE expl_id = 1;",
+                "DELETE FROM cat_arc CASCADE;"
+                "DELETE FROM cat_material CASCADE;",
+                # "DELETE FROM sector WHERE sector_id = 1;",
+                # "DELETE FROM ext_municipality WHERE muni_id = 1;",
+                "DELETE FROM exploitation WHERE expl_id = 1;",
+                "INSERT INTO cat_material (id, feature_type, n) VALUES ('PVC', '{ARC}', 0.011), ('Brick', '{ARC}', 0.014);",
+                "INSERT INTO exploitation (expl_id, name, macroexpl_id, descript, active) VALUES (1, 'expl_1_import_inp_test', 0, 'Created by import inp in TESTING MODE', true);",
+                # "INSERT INTO ext_municipality (muni_id, name, observ, active) VALUES (1, 'muni_1_import_inp_test', 'Created by import inp in TESTING MODE', true);",
+                # "INSERT INTO sector (sector_id, name, macrosector_id, descript, active) VALUES (1, 'sector_1_import_inp_test', 0, 'Created by import inp in TESTING MODE', true);"
+            ]
+            for sql in queries:
+                result = tools_db.execute_sql(sql, commit=force_commit)
+                if not result:
+                    return
+
+
+            # Set variables
+            workcat = "import_inp_test"
+            exploitation = 1
+            sector = 0
+            municipality = 999999  # Spatial intersect
+            raingage = None
+            catalogs = {
+                'conduits': {
+                    ('CIRCULAR', 0.2, 0.0, 0.0, 0.0): 'CC020',
+                    ('CIRCULAR', 0.315, 0.0, 0.0, 0.0): 'CC0315',
+                    ('CIRCULAR', 0.4, 0.0, 0.0, 0.0): 'CC040',
+                    ('CIRCULAR', 0.6, 0.0, 0.0, 0.0): 'CC060',
+                    ('CIRCULAR', 0.8, 0.0, 0.0, 0.0): 'CC080',
+                    ('CIRCULAR', 1.0, 0.0, 0.0, 0.0): 'CC100',
+                    ('EGG', 1.5, 0.0, 0.0, 0.0): 'EGG150',
+                    ('EGG', 1.5, 1.0, 0.0, 0.0): 'EGG150-1',
+                    ('FORCE_MAIN', 0.18, 100.0, 0.0, 0.0): 'FM18',
+                    ('FORCE_MAIN', 0.25, 100.0, 0.0, 0.0): 'FM25',
+                    ('RECT_CLOSED', 1.5, 1.5, 0.0, 0.0): 'RC150',
+                    ('RECT_CLOSED', 2.0, 2.0, 0.0, 0.0): 'RC200',
+                    ('RECT_OPEN', 1.0, 1.0, 0.0, 0.0): 'RO100',
+                    ('RECT_OPEN', 2.0, 2.0, 0.0, 0.0): 'RO200'
+                },
+                'materials': {
+                    0.011: 'PVC',
+                    0.014: 'Brick'
+                },
+                'features': {
+                    'junctions': 'CIRC_MANHOLE',
+                    'outfalls': 'RECT_MANHOLE',
+                    'storage': 'SEWER_STORAGE',
+                    'dividers': 'JUNCTION',
+                    'conduits': 'CONDUIT',
+                    'pumps': 'VARC',
+                    'weirs': 'VARC',
+                    'orifices': 'VARC',
+                    'outlets': 'VARC'
+                },
+                'junctions': 'C_MANHOLE_100',
+                'outfalls': 'R_MANHOLE_100',
+                'storage': 'SEW_STORAGE-01',
+                'dividers': 'INP-DIVIDER',
+                'pumps': 'INP-PUMP',
+                'weirs': 'INP-WEIR',
+                'orifices': 'INP-ORIFICE',
+                'outlets': 'INP-OUTLET'
+            }
+
+            # Save options to the configuration file
+            save_config(self, workcat=workcat, exploitation=exploitation, sector=sector, municipality=municipality, raingage=raingage, catalogs=catalogs)
+
+            # Show tab log
+            self.dlg_config.mainTab.setCurrentIndex(self.dlg_config.mainTab.count()-1)
+
+            # Set background task 'Import INP'
+            description = "Import INP (TESTING MODE)"
+            self.import_inp_task = GwImportInpTask(
+                description,
+                self.file_path,
+                self.parse_inp_task.network,
+                workcat,
+                exploitation,
+                sector,
+                municipality,
+                raingage,
+                catalogs,
+                force_commit=force_commit
+            )
+
+            # Create timer
+            self.t0: float = time()
+            self.timer: QTimer = QTimer()
+            self.timer.timeout.connect(
+                partial(self._update_config_dialog, self.dlg_config)
+            )
+            self.timer.start(1000)
+            self.import_inp_task.message_logged.connect(self._message_logged)
+            self.import_inp_task.progress_changed.connect(self._progress_changed)
+            self.import_inp_task.taskCompleted.connect(self.timer.stop)
+
+            # Run task
+            QgsApplication.taskManager().addTask(self.import_inp_task)
+            QgsApplication.taskManager().triggerTask(self.import_inp_task)
+            return
+
+        # Get the configuration values from the dialog
+        workcat, exploitation, sector, municipality, raingage, _ = self._get_config_values()
+
+        # Workcat
+        if workcat == "":
+            message = "Please enter a Workcat_id to proceed with this import."
+            tools_qt.show_info_box(message)
+            return
+
+        sql: str = "SELECT id FROM cat_work WHERE id = %s"
+        row = tools_db.get_row(sql, params=(workcat,))
+        if row is not None:
+            message = f'The Workcat_id "{workcat}" is already in use. Please enter a different ID.'
+            tools_qt.show_info_box(message)
+            return
+
+        # Exploitation
+        if exploitation == "":
+            message = "Please select an exploitation to proceed with this import."
+            tools_qt.show_info_box(message)
+            return
+
+        # Sector
+        if sector == "":
+            message = "Please select a sector to proceed with this import."
+            tools_qt.show_info_box(message)
+            return
+
+        # Municipality
+        if municipality == "":
+            message = "Please select a municipality to proceed with this import."
+            tools_qt.show_info_box(message)
+            return
+
+        # Raingage
+        if self.dlg_config.txt_raingage.isVisible() and raingage in ("", "null", None):
+            message = "Please select a default raingage to proceed with this import."
+            tools_qt.show_info_box(message)
+            return
+
+        # Tables (Arcs and Nodes)
+        catalogs = {"conduits": {}, "materials": {}, "features": {}}
+
+        for _input, result in [
+            (self.tbl_elements, catalogs),
+            (self.tbl_elements["conduits"], catalogs["conduits"]),
+            (self.tbl_elements["materials"], catalogs["materials"]),
+            (self.tbl_elements["features"], catalogs["features"]),
+        ]:
+            for element in _input:
+                if type(_input[element]) is not tuple:
+                    continue
+
+                combo = _input[element][0]
+                combo_value = combo.currentText()
+
+                if combo_value == "":
+                    message = "Please select a catalog item for all elements in the tabs: Features, Nodes, Arcs, Materials."
+                    tools_qt.show_info_box(message)
+                    return
+
+                new_catalog = None
+
+                if len(_input[element]) > 1:
+                    new_catalog_cell = _input[element][1]
+                    new_catalog = new_catalog_cell.text().strip()
+
+                    if combo_value == CREATE_NEW and new_catalog == "":
+                        message = f'Please enter a new catalog name when the "{CREATE_NEW}" option is selected.'
+                        tools_qt.show_info_box(message)
+                        return
+
+                result[element] = (
+                    new_catalog if combo_value == CREATE_NEW else combo_value
+                )
+
+        # Save options to the configuration file
+        save_config(self, workcat=workcat, exploitation=exploitation, sector=sector, municipality=municipality, raingage=raingage, catalogs=catalogs)
+
+        # Show tab log
+        self.dlg_config.mainTab.setCurrentIndex(self.dlg_config.mainTab.count()-1)
+
+        # Set background task 'Import INP'
+        description = "Import INP"
+        self.import_inp_task = GwImportInpTask(
+            description,
+            self.file_path,
+            self.parse_inp_task.network,
+            workcat,
+            exploitation,
+            sector,
+            municipality,
+            raingage,
+            catalogs,
+            force_commit=force_commit
+        )
+
+        # Create timer
+        self.t0: float = time()
+        self.timer: QTimer = QTimer()
+        self.timer.timeout.connect(
+            partial(self._update_config_dialog, self.dlg_config)
+        )
+        self.timer.start(1000)
+        self.import_inp_task.message_logged.connect(self._message_logged)
+        self.import_inp_task.progress_changed.connect(self._progress_changed)
+        self.import_inp_task.taskCompleted.connect(self.timer.stop)
+
+        QgsApplication.taskManager().addTask(self.import_inp_task)
+        QgsApplication.taskManager().triggerTask(self.import_inp_task)
+
+    def _fill_tables(self):
         # Fill nodes table
         tbl_nodes: QTableWidget = self.dlg_config.tbl_nodes
 
@@ -297,281 +582,6 @@ class GwImportSwmm:
             tbl_feature.setCellWidget(row, 1, combo_feat)
 
             self.tbl_elements["features"][tag.lower()] = (combo_feat,)
-
-        self._fill_combo_boxes()
-
-        self._manage_widgets_visibility()
-
-        self._load_config()
-
-        tools_gw.open_dialog(self.dlg_config, dlg_name="dlg_inp_config_import")
-
-    def _manage_widgets_visibility(self):
-        # Hide 'Demand dscenario' widget for UD
-        tools_qt.set_widget_visible(self.dlg_config, "lbl_dscenario", False)
-        tools_qt.set_widget_visible(self.dlg_config, "txt_dscenario", False)
-
-        # Disable the whole dialog if testing mode
-        if TESTING_MODE:
-            tools_gw.set_tabs_enabled(self.dlg_config, hide_btn_accept=False, change_btn_cancel=False)
-
-        # Default raingage widget
-        subcatchments = self.catalogs.inp_subcatchments
-        print(subcatchments)
-        has_empty = any([x[1] for x in subcatchments if x[1] == '*'] if subcatchments else [])
-        if not has_empty:
-            tools_qt.set_widget_visible(self.dlg_config, 'lbl_raingage', False)
-            tools_qt.set_widget_visible(self.dlg_config, 'txt_raingage', False)
-
-    def _importinp_accept(self):
-        # Manage force commit mode
-        force_commit = tools_qt.is_checked(self.dlg_config, "chk_force_commit")
-        if force_commit is None:
-            force_commit = False
-
-        if TESTING_MODE:
-
-            # Delete the network before importing
-            queries = [
-                'SELECT gw_fct_admin_manage_migra($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"action":"TRUE"}, "aux_params":null}}$$);',
-                'UPDATE arc SET node_1 = NULL, node_2 = NULL;',
-                'DELETE FROM ext_rtc_scada_x_data;',
-                'DELETE FROM inp_inflows CASCADE;',
-                'DELETE FROM inp_dwf CASCADE;',
-                'DELETE FROM connec CASCADE;',
-                'DELETE FROM node CASCADE;',
-                'DELETE FROM gully CASCADE;',
-                'DELETE FROM inp_subcatchment CASCADE;',
-                'DELETE FROM raingage CASCADE;',
-                'DELETE FROM inp_conduit CASCADE;',
-                'DELETE FROM inp_pump CASCADE;',
-                'DELETE FROM inp_orifice CASCADE;',
-                'DELETE FROM inp_outlet CASCADE;',
-                'DELETE FROM inp_outfall CASCADE;',
-                'DELETE FROM inp_storage CASCADE;',
-                'DELETE FROM inp_curve_value CASCADE;',
-                'DELETE FROM inp_curve CASCADE;',
-                'DELETE FROM inp_pattern_value CASCADE;',
-                'DELETE FROM inp_pattern CASCADE;',
-                'DELETE FROM inp_timeseries_value CASCADE;',
-                'DELETE FROM inp_timeseries CASCADE;',
-                'DELETE FROM inp_controls CASCADE;',
-                'DELETE FROM inp_files CASCADE;',
-                'DELETE FROM arc CASCADE;',
-                "DELETE FROM cat_work WHERE id = 'import_inp_test';",
-                "DELETE FROM cat_dscenario WHERE expl_id = 1;",
-                "DELETE FROM cat_arc CASCADE;"
-                "DELETE FROM cat_material CASCADE;",
-                # "DELETE FROM sector WHERE sector_id = 1;",
-                # "DELETE FROM ext_municipality WHERE muni_id = 1;",
-                "DELETE FROM exploitation WHERE expl_id = 1;",
-                "INSERT INTO cat_material (id, feature_type, n) VALUES ('PVC', '{ARC}', 0.011), ('Brick', '{ARC}', 0.014);",
-                "INSERT INTO exploitation (expl_id, name, macroexpl_id, descript, active) VALUES (1, 'expl_1_import_inp_test', 0, 'Created by import inp in TESTING MODE', true);",
-                # "INSERT INTO ext_municipality (muni_id, name, observ, active) VALUES (1, 'muni_1_import_inp_test', 'Created by import inp in TESTING MODE', true);",
-                # "INSERT INTO sector (sector_id, name, macrosector_id, descript, active) VALUES (1, 'sector_1_import_inp_test', 0, 'Created by import inp in TESTING MODE', true);"
-            ]
-            for sql in queries:
-                result = tools_db.execute_sql(sql, commit=force_commit)
-                if not result:
-                    return
-
-
-            # Set variables
-            workcat = "import_inp_test"
-            exploitation = 1
-            sector = 0
-            municipality = 999999  # Spatial intersect
-            raingage = None
-            catalogs = {
-                'conduits': {
-                    ('CIRCULAR', 0.2, 0.0, 0.0, 0.0): 'CC020',
-                    ('CIRCULAR', 0.315, 0.0, 0.0, 0.0): 'CC0315',
-                    ('CIRCULAR', 0.4, 0.0, 0.0, 0.0): 'CC040',
-                    ('CIRCULAR', 0.6, 0.0, 0.0, 0.0): 'CC060',
-                    ('CIRCULAR', 0.8, 0.0, 0.0, 0.0): 'CC080',
-                    ('CIRCULAR', 1.0, 0.0, 0.0, 0.0): 'CC100',
-                    ('EGG', 1.5, 0.0, 0.0, 0.0): 'EGG150',
-                    ('EGG', 1.5, 1.0, 0.0, 0.0): 'EGG150-1',
-                    ('FORCE_MAIN', 0.18, 100.0, 0.0, 0.0): 'FM18',
-                    ('FORCE_MAIN', 0.25, 100.0, 0.0, 0.0): 'FM25',
-                    ('RECT_CLOSED', 1.5, 1.5, 0.0, 0.0): 'RC150',
-                    ('RECT_CLOSED', 2.0, 2.0, 0.0, 0.0): 'RC200',
-                    ('RECT_OPEN', 1.0, 1.0, 0.0, 0.0): 'RO100',
-                    ('RECT_OPEN', 2.0, 2.0, 0.0, 0.0): 'RO200'
-                },
-                'materials': {
-                    0.011: 'PVC',
-                    0.014: 'Brick'
-                },
-                'features': {
-                    'junctions': 'CIRC_MANHOLE',
-                    'outfalls': 'RECT_MANHOLE',
-                    'storage': 'SEWER_STORAGE',
-                    'dividers': 'JUNCTION',
-                    'conduits': 'CONDUIT',
-                    'pumps': 'VARC',
-                    'weirs': 'VARC',
-                    'orifices': 'VARC',
-                    'outlets': 'VARC'
-                },
-                'junctions': 'C_MANHOLE_100',
-                'outfalls': 'R_MANHOLE_100',
-                'storage': 'SEW_STORAGE-01',
-                'dividers': 'INP-DIVIDER',
-                'pumps': 'INP-PUMP',
-                'weirs': 'INP-WEIR',
-                'orifices': 'INP-ORIFICE',
-                'outlets': 'INP-OUTLET'
-            }
-
-            # Show tab log
-            self.dlg_config.mainTab.setCurrentIndex(self.dlg_config.mainTab.count()-1)
-
-            # Set background task 'Import INP'
-            description = "Import INP (TESTING MODE)"
-            self.import_inp_task = GwImportInpTask(
-                description,
-                self.file_path,
-                self.parse_inp_task.network,
-                workcat,
-                exploitation,
-                sector,
-                municipality,
-                raingage,
-                catalogs,
-                force_commit=force_commit
-            )
-
-            # Create timer
-            self.t0: float = time()
-            self.timer: QTimer = QTimer()
-            self.timer.timeout.connect(
-                partial(self._update_config_dialog, self.dlg_config)
-            )
-            self.timer.start(1000)
-            self.import_inp_task.message_logged.connect(self._message_logged)
-            self.import_inp_task.progress_changed.connect(self._progress_changed)
-            self.import_inp_task.taskCompleted.connect(self.timer.stop)
-
-            # Run task
-            QgsApplication.taskManager().addTask(self.import_inp_task)
-            QgsApplication.taskManager().triggerTask(self.import_inp_task)
-            return
-
-        # Workcat
-        workcat: str = self.dlg_config.txt_workcat.text().strip()
-
-        if workcat == "":
-            message = "Please enter a Workcat_id to proceed with this import."
-            tools_qt.show_info_box(message)
-            return
-
-        sql: str = "SELECT id FROM cat_work WHERE id = %s"
-        row = tools_db.get_row(sql, params=(workcat,))
-        if row is not None:
-            message = f'The Workcat_id "{workcat}" is already in use. Please enter a different ID.'
-            tools_qt.show_info_box(message)
-            return
-
-        # Exploitation
-        exploitation = tools_qt.get_combo_value(self.dlg_config, "cmb_expl")
-
-        if exploitation == "":
-            message = "Please select an exploitation to proceed with this import."
-            tools_qt.show_info_box(message)
-            return
-
-        # Sector
-        sector = tools_qt.get_combo_value(self.dlg_config, "cmb_sector")
-
-        if sector == "":
-            message = "Please select a sector to proceed with this import."
-            tools_qt.show_info_box(message)
-            return
-
-        # Municipality
-        municipality = tools_qt.get_combo_value(self.dlg_config, "cmb_muni")
-
-        if municipality == "":
-            message = "Please select a municipality to proceed with this import."
-            tools_qt.show_info_box(message)
-            return
-
-        # Raingage
-        raingage = tools_qt.get_text(self.dlg_config, "txt_raingage")
-
-        if self.dlg_config.txt_raingage.isVisible() and raingage in ("", "null", None):
-            message = "Please select a default raingage to proceed with this import."
-            tools_qt.show_info_box(message)
-            return
-
-        # Tables (Arcs and Nodes)
-        catalogs = {"conduits": {}, "materials": {}, "features": {}}
-
-        for _input, result in [
-            (self.tbl_elements, catalogs),
-            (self.tbl_elements["conduits"], catalogs["conduits"]),
-            (self.tbl_elements["materials"], catalogs["materials"]),
-            (self.tbl_elements["features"], catalogs["features"]),
-        ]:
-            for element in _input:
-                if type(_input[element]) is not tuple:
-                    continue
-
-                combo = _input[element][0]
-                combo_value = combo.currentText()
-
-                if combo_value == "":
-                    message = "Please select a catalog item for all elements in the tabs: Features, Nodes, Arcs, Materials."
-                    tools_qt.show_info_box(message)
-                    return
-
-                new_catalog = None
-
-                if len(_input[element]) > 1:
-                    new_catalog_cell = _input[element][1]
-                    new_catalog = new_catalog_cell.text().strip()
-
-                    if combo_value == CREATE_NEW and new_catalog == "":
-                        message = f'Please enter a new catalog name when the "{CREATE_NEW}" option is selected.'
-                        tools_qt.show_info_box(message)
-                        return
-
-                result[element] = (
-                    new_catalog if combo_value == CREATE_NEW else combo_value
-                )
-
-        # Show tab log
-        self.dlg_config.mainTab.setCurrentIndex(self.dlg_config.mainTab.count()-1)
-
-        # Set background task 'Import INP'
-        description = "Import INP"
-        self.import_inp_task = GwImportInpTask(
-            description,
-            self.file_path,
-            self.parse_inp_task.network,
-            workcat,
-            exploitation,
-            sector,
-            municipality,
-            raingage,
-            catalogs,
-            force_commit=force_commit
-        )
-
-        # Create timer
-        self.t0: float = time()
-        self.timer: QTimer = QTimer()
-        self.timer.timeout.connect(
-            partial(self._update_config_dialog, self.dlg_config)
-        )
-        self.timer.start(1000)
-        self.import_inp_task.message_logged.connect(self._message_logged)
-        self.import_inp_task.progress_changed.connect(self._progress_changed)
-        self.import_inp_task.taskCompleted.connect(self.timer.stop)
-
-        QgsApplication.taskManager().addTask(self.import_inp_task)
-        QgsApplication.taskManager().triggerTask(self.import_inp_task)
 
     def _fill_combo_boxes(self):
         # Fill exploitation combo
@@ -745,6 +755,48 @@ class GwImportSwmm:
                 )
             combo.setCurrentText(old_value)
 
+    def _get_config_values(self):
+        workcat = tools_qt.get_text(self.dlg_config, "txt_workcat")
+        exploitation = tools_qt.get_combo_value(self.dlg_config, "cmb_expl")
+        sector = tools_qt.get_combo_value(self.dlg_config, "cmb_sector")
+        municipality = tools_qt.get_combo_value(self.dlg_config, "cmb_muni")
+        raingage = tools_qt.get_text(self.dlg_config, "txt_raingage")
+
+        # Tables (Arcs and Nodes)
+        catalogs = {"conduits": {}, "materials": {}, "features": {}}
+
+        for _input, result in [
+            (self.tbl_elements, catalogs),
+            (self.tbl_elements["conduits"], catalogs["conduits"]),
+            (self.tbl_elements["materials"], catalogs["materials"]),
+            (self.tbl_elements["features"], catalogs["features"]),
+        ]:
+            for element in _input:
+                if type(_input[element]) is not tuple:
+                    continue
+
+                combo = _input[element][0]
+                combo_value = combo.currentText()
+
+                if combo_value == "":
+                    continue
+
+                new_catalog = None
+
+                if len(_input[element]) > 1:
+                    new_catalog_cell = _input[element][1]
+                    new_catalog = new_catalog_cell.text().strip()
+
+                    if combo_value == CREATE_NEW and new_catalog == "":
+                        continue
+
+                result[element] = (
+                    new_catalog if combo_value == CREATE_NEW else combo_value
+                )
+
+        return workcat, exploitation, sector, municipality, raingage, catalogs
+
+
     def _toggle_enabled_new_catalog_field(
         self, field: QTableWidgetItem, text: str
     ) -> None:
@@ -753,95 +805,6 @@ class GwImportSwmm:
             if text == CREATE_NEW
             else Qt.NoItemFlags
         )
-
-    def _save_config(self, workcat: Optional[str] = None, exploitation: Optional[int] = None, sector: Optional[int] = None,
-                     municipality: Optional[int] = None, raingage: Optional[str] = None, catalogs: Optional[dict] = None) -> None:
-
-        try:
-            config_folder = f'{lib_vars.user_folder_dir}{os.sep}core{os.sep}temp'
-            if not os.path.exists(config_folder):
-                os.makedirs(config_folder)
-            path_temp_file = f"{config_folder}{os.sep}import_swmm_config.json"
-            config_path: Path = Path(path_temp_file)
-            config = GwInpConfig(file_path=self.file_path, workcat=workcat, exploitation=exploitation, sector=sector,
-                                 municipality=municipality, raingage=raingage, catalogs=catalogs)
-            config.write_to_file(config_path)
-            tools_log.log_info(f"Configuration saved to {config_path}")
-        except Exception as e:
-            tools_qgis.show_warning(f"Error saving the configuration: {e}", dialog=self.dlg_config)
-
-    def _load_config(self) -> Optional[GwInpConfig]:
-
-        config_folder = f'{lib_vars.user_folder_dir}{os.sep}core{os.sep}temp'
-        path_temp_file = f"{config_folder}{os.sep}import_swmm_config.json"
-        config_path: Path = Path(path_temp_file)
-        if not os.path.exists(config_path):
-            return None
-        config = GwInpConfig()
-        config.read_from_file(config_path)
-        if not config.file_path:
-            return None
-
-        # Fill 'Basic' tab widgets
-        tools_qt.set_widget_text(self.dlg_config, 'txt_workcat', config.workcat)
-        tools_qt.set_widget_text(self.dlg_config, 'txt_raingage', config.raingage)
-        tools_qt.set_combo_value(self.dlg_config.cmb_expl, config.exploitation, 0)
-        tools_qt.set_combo_value(self.dlg_config.cmb_sector, config.sector, 0)
-        tools_qt.set_combo_value(self.dlg_config.cmb_muni, config.municipality, 0)
-
-        # Fill tables from catalogs
-        self._set_combo_values_from_catalogs(config.catalogs)
-
-        if str(self.file_path) != str(config.file_path):
-            tools_qgis.show_warning("The configuration file doesn't match the selected INP file. Some options may not be loaded.", dialog=self.dlg_config)
-        else:
-            tools_qgis.show_success("Configuration loaded successfully", dialog=self.dlg_config)
-
-        return config
-
-    def _set_combo_values_from_catalogs(self, catalogs):
-        # Set features
-        for feature_type, (combo,) in self.tbl_elements["features"].items():
-            feat_catalog = catalogs.get("features", {}).get(str(feature_type))
-            if feat_catalog:
-                combo.setCurrentText(feat_catalog)
-
-        # Set materials
-        for roughness, (combo,) in self.tbl_elements["materials"].items():
-            material_catalog = catalogs.get("materials", {}).get(str(roughness))
-            if material_catalog:
-                combo.setCurrentText(material_catalog)
-
-        # Set nodes and arcs tables
-        elements = [
-            ("junctions", catalogs.get("junctions")),
-            ("reservoirs", catalogs.get("reservoirs")),
-            ("tanks", catalogs.get("tanks")),
-            ("pumps", catalogs.get("pumps")),
-            ("valves", catalogs.get("valves")),
-        ]
-
-        for element_type, element_catalog in elements:
-            if element_type == "pipes":
-                continue
-
-            if element_type not in self.tbl_elements:
-                continue
-
-            combo: QComboBox = self.tbl_elements[element_type][0]
-            if element_catalog:
-                combo.setCurrentText(element_catalog)
-                # TODO: manage CREATE_NEW option (the widget is in self.tbl_elements[element_type][1])
-
-        if catalogs.get("pipes") is not None:
-            for dint_rough_str, pipe_catalog in catalogs["pipes"].items():
-                dint_rough_tuple = tuple(map(float, dint_rough_str.strip("()").split(", ")))
-                if dint_rough_tuple not in self.tbl_elements["pipes"]:
-                    continue
-
-                combo: QComboBox = self.tbl_elements["pipes"][dint_rough_tuple][0]
-                if pipe_catalog:
-                    combo.setCurrentText(pipe_catalog)
 
     def _update_parsing_dialog(self, dialog: GwDialog) -> None:
         if not dialog.isVisible():

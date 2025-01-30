@@ -7,6 +7,7 @@ or (at your option) any later version.
 import json
 import os
 
+from enum import Enum
 from functools import partial
 from pathlib import Path
 from typing import Optional, Tuple
@@ -16,6 +17,11 @@ from qgis.PyQt.QtWidgets import QMenu, QFileDialog, QComboBox
 from ...libs import tools_log, tools_qgis, tools_qt, lib_vars
 from ... import global_vars
 
+
+
+class ProjectType(Enum):
+    WS = "ws"
+    UD = "ud"
 
 class GwInpConfig:
     """ Class to store the configuration of the import INP process, as well as serializing/deserializing it """
@@ -127,20 +133,20 @@ def save_config_to_file(self_cls):
         save_config(self_cls, workcat=workcat, exploitation=exploitation, sector=sector, municipality=municipality, dscenario=dscenario, catalogs=catalogs, _config_path=config_path)
 
 def save_config(self_cls, workcat: Optional[str] = None, exploitation: Optional[int] = None, sector: Optional[int] = None,
-                    municipality: Optional[int] = None, dscenario: Optional[str] = None, catalogs: Optional[dict] = None, _config_path: Optional[Path] = None) -> None:
+                    municipality: Optional[int] = None, dscenario: Optional[str] = None, raingage: Optional[str] = None, catalogs: Optional[dict] = None, _config_path: Optional[Path] = None) -> None:
 
     try:
         if _config_path is None:
             config_folder = f'{lib_vars.user_folder_dir}{os.sep}core{os.sep}temp'
             if not os.path.exists(config_folder):
                 os.makedirs(config_folder)
-            file_name = "import_epanet_config.json" if global_vars.project_type == 'ws' else "import_swmm_config.json"
+            file_name = "import_epanet_config.json" if global_vars.project_type == ProjectType.WS else "import_swmm_config.json"
             path_temp_file = f"{config_folder}{os.sep}{file_name}"
             config_path: Path = Path(path_temp_file)
         else:
             config_path = _config_path
         config = GwInpConfig(file_path=self_cls.file_path, workcat=workcat, exploitation=exploitation, sector=sector,
-                                municipality=municipality, dscenario=dscenario, catalogs=catalogs)
+                                municipality=municipality, dscenario=dscenario, raingage=raingage, catalogs=catalogs)
         config.write_to_file(config_path)
         tools_log.log_info(f"Configuration saved to {config_path}")
     except Exception as e:
@@ -150,7 +156,7 @@ def load_config(self_cls, config: Optional[GwInpConfig] = None) -> Optional[GwIn
 
     if config is None:
         config_folder = f'{lib_vars.user_folder_dir}{os.sep}core{os.sep}temp'
-        file_name = "import_epanet_config.json" if global_vars.project_type == 'ws' else "import_swmm_config.json"
+        file_name = "import_epanet_config.json" if global_vars.project_type == ProjectType.WS else "import_swmm_config.json"
         path_temp_file = f"{config_folder}{os.sep}{file_name}"
         config_path: Path = Path(path_temp_file)
         if not os.path.exists(config_path):
@@ -162,16 +168,19 @@ def load_config(self_cls, config: Optional[GwInpConfig] = None) -> Optional[GwIn
 
     # Fill 'Basic' tab widgets
     tools_qt.set_widget_text(self_cls.dlg_config, 'txt_workcat', config.workcat)
-    if global_vars.project_type == 'ws':
+    if global_vars.project_type == ProjectType.WS:
         tools_qt.set_widget_text(self_cls.dlg_config, 'txt_dscenario', config.dscenario)
-    elif global_vars.project_type == 'ud':
+    elif global_vars.project_type == ProjectType.UD:
         tools_qt.set_widget_text(self_cls.dlg_config, 'txt_raingage', config.raingage)
     tools_qt.set_combo_value(self_cls.dlg_config.cmb_expl, config.exploitation, 0)
     tools_qt.set_combo_value(self_cls.dlg_config.cmb_sector, config.sector, 0)
     tools_qt.set_combo_value(self_cls.dlg_config.cmb_muni, config.municipality, 0)
 
     # Fill tables from catalogs
-    _set_combo_values_from_catalogs(self_cls, config.catalogs)
+    if global_vars.project_type == ProjectType.WS:
+        _set_combo_values_from_epanet_catalogs(self_cls, config.catalogs)
+    elif global_vars.project_type == ProjectType.UD:
+        _set_combo_values_from_swmm_catalogs(self_cls, config.catalogs)
 
     if str(self_cls.file_path) != str(config.file_path):
         tools_qgis.show_warning("The configuration file doesn't match the selected INP file. Some options may not be loaded.", dialog=self_cls.dlg_config)
@@ -180,7 +189,7 @@ def load_config(self_cls, config: Optional[GwInpConfig] = None) -> Optional[GwIn
 
     return config
 
-def _set_combo_values_from_catalogs(self_cls, catalogs):
+def _set_combo_values_from_epanet_catalogs(self_cls, catalogs):
     # Set features
     for feature_type, (combo,) in self_cls.tbl_elements["features"].items():
         feat_catalog = catalogs.get("features", {}).get(str(feature_type))
@@ -223,3 +232,6 @@ def _set_combo_values_from_catalogs(self_cls, catalogs):
             combo: QComboBox = self_cls.tbl_elements["pipes"][dint_rough_tuple][0]
             if pipe_catalog:
                 combo.setCurrentText(pipe_catalog)
+
+def _set_combo_values_from_swmm_catalogs(self_cls, catalogs):
+    tools_qgis.show_warning("Catalogs are not implemented for SWMM yet", dialog=self_cls.dlg_config)
