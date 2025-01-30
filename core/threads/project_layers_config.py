@@ -121,7 +121,7 @@ class GwProjectLayersConfig(GwTask):
         # Check only once if function 'gw_fct_getinfofromid' exists
         row = tools_db.check_function('gw_fct_getinfofromid', aux_conn=self.aux_conn, is_thread=True)
         if row in (None, ''):
-            tools_qgis.show_warning("Function not found in database", parameter='gw_fct_getinfofromid')
+            tools_log.log_warning("Function not found in database: gw_fct_getinfofromid")
             return False
 
         msg_failed = ""
