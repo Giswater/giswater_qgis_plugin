@@ -42,11 +42,6 @@ SPATIAL_INTERSECT = "Get from spatial intersect"
 TESTING_MODE = False
 
 
-class ProjectType(Enum):
-    WS = "ws"
-    UD = "ud"
-
-
 class GwImportSwmm:
     """Button 22: Import INP"""
 
