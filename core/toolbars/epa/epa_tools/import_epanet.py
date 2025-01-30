@@ -32,7 +32,7 @@ from ....ui.dialog import GwDialog
 from ....ui.ui_manager import GwInpConfigImportUi, GwInpParsingUi
 from ....threads.import_inp.import_epanet_task import GwImportInpTask
 from ....utils import tools_gw
-from ....utils.import_inp import GwInpConfig
+from ....utils.import_inp import GwInpConfig, create_load_menu, load_config, save_config, save_config_to_file
 
 CREATE_NEW = "Create new"
 SPATIAL_INTERSECT = "Get from spatial intersect"
@@ -113,9 +113,9 @@ class GwImportEpanet:
         tools_gw.load_settings(self.dlg_config)
 
         # Manage save/load buttons
-        self.dlg_config.btn_save.clicked.connect(self._save_config_to_file)
+        self.dlg_config.btn_save.clicked.connect(partial(save_config_to_file, self))
         # Make btn_load a drop-down button with the options: Load last, Load from file
-        menu = self._create_load_menu()
+        menu = create_load_menu(self)
         self.dlg_config.btn_load.setMenu(menu)
 
         # Manage signals
@@ -136,7 +136,7 @@ class GwImportEpanet:
 
         self._manage_widgets_visibility()
 
-        self._load_config()
+        load_config(self)
 
         tools_gw.open_dialog(self.dlg_config, dlg_name="dlg_inp_config_import")
 
@@ -222,7 +222,7 @@ class GwImportEpanet:
                         'pumps': 'INP-PUMP',
                         'valves': 'INP-VALVE'}
 
-            self._save_config(workcat, exploitation, sector, municipality, dscenario, catalogs)
+            save_config(self, workcat=workcat, exploitation=exploitation, sector=sector, municipality=municipality, dscenario=dscenario, catalogs=catalogs)
 
             # Set background task 'Import INP'
             description = "Import INP (TESTING MODE)"
@@ -331,7 +331,7 @@ class GwImportEpanet:
                 )
 
         # Save options to the configuration file
-        self._save_config(workcat, exploitation, sector, municipality, dscenario, catalogs)
+        save_config(self, workcat=workcat, exploitation=exploitation, sector=sector, municipality=municipality, dscenario=dscenario, catalogs=catalogs)
 
         # Set background task 'Import INP'
         description = "Import INP"
@@ -732,143 +732,6 @@ class GwImportEpanet:
             if text == CREATE_NEW
             else Qt.NoItemFlags
         )
-
-    def _create_load_menu(self):
-        """Create a drop-down menu for the load button"""
-
-        menu = QMenu(self.dlg_config)
-        action_load_last = menu.addAction("Load last")
-        action_load_from_file = menu.addAction("Load from file")
-
-        # Connect actions to their respective slots
-        action_load_last.triggered.connect(self._load_last_config)
-        action_load_from_file.triggered.connect(self._load_config_from_file)
-
-        return menu
-
-    def _load_last_config(self):
-        """Load the last saved configuration"""
-
-        self._load_config()
-
-    def _load_config_from_file(self):
-        """Load configuration from a file"""
-
-        config_folder = f'{lib_vars.user_folder_dir}{os.sep}core{os.sep}temp'
-        result: Tuple[str, str] = QFileDialog.getOpenFileName(
-            None, "Select a configuration file", config_folder, "JSON files (*.json)"
-        )
-        file_path_str: str = result[0]
-        if file_path_str:
-            config_path: Path = Path(file_path_str)
-            config = GwInpConfig()
-            config.read_from_file(config_path)
-            self._load_config(config)
-
-    def _save_config_to_file(self):
-        """Save configuration to a file"""
-
-        result: Tuple[str, str] = QFileDialog.getSaveFileName(
-            None, "Save configuration file", "", "JSON files (*.json)"
-        )
-        file_path_str: str = result[0]
-        if file_path_str:
-            config_path: Path = Path(file_path_str)
-            workcat, exploitation, sector, municipality, dscenario, catalogs = self._get_config_values()
-            self._save_config(workcat=workcat, exploitation=exploitation, sector=sector, municipality=municipality, dscenario=dscenario, catalogs=catalogs, _config_path=config_path)
-
-    def _save_config(self, workcat: Optional[str] = None, exploitation: Optional[int] = None, sector: Optional[int] = None,
-                     municipality: Optional[int] = None, dscenario: Optional[str] = None, catalogs: Optional[dict] = None, _config_path: Optional[Path] = None) -> None:
-
-        try:
-            if _config_path is None:
-                config_folder = f'{lib_vars.user_folder_dir}{os.sep}core{os.sep}temp'
-                if not os.path.exists(config_folder):
-                    os.makedirs(config_folder)
-                path_temp_file = f"{config_folder}{os.sep}import_epanet_config.json"
-                config_path: Path = Path(path_temp_file)
-            else:
-                config_path = _config_path
-            config = GwInpConfig(file_path=self.file_path, workcat=workcat, exploitation=exploitation, sector=sector,
-                                 municipality=municipality, dscenario=dscenario, catalogs=catalogs)
-            config.write_to_file(config_path)
-            tools_log.log_info(f"Configuration saved to {config_path}")
-        except Exception as e:
-            tools_qgis.show_warning(f"Error saving the configuration: {e}", dialog=self.dlg_config)
-
-    def _load_config(self, config: Optional[GwInpConfig] = None) -> Optional[GwInpConfig]:
-
-        if config is None:
-            config_folder = f'{lib_vars.user_folder_dir}{os.sep}core{os.sep}temp'
-            path_temp_file = f"{config_folder}{os.sep}import_epanet_config.json"
-            config_path: Path = Path(path_temp_file)
-            if not os.path.exists(config_path):
-                return None
-            config = GwInpConfig()
-            config.read_from_file(config_path)
-        if not config.file_path:
-            return None
-
-        # Fill 'Basic' tab widgets
-        tools_qt.set_widget_text(self.dlg_config, 'txt_workcat', config.workcat)
-        tools_qt.set_widget_text(self.dlg_config, 'txt_dscenario', config.dscenario)
-        tools_qt.set_combo_value(self.dlg_config.cmb_expl, config.exploitation, 0)
-        tools_qt.set_combo_value(self.dlg_config.cmb_sector, config.sector, 0)
-        tools_qt.set_combo_value(self.dlg_config.cmb_muni, config.municipality, 0)
-
-        # Fill tables from catalogs
-        self._set_combo_values_from_catalogs(config.catalogs)
-
-        if str(self.file_path) != str(config.file_path):
-            tools_qgis.show_warning("The configuration file doesn't match the selected INP file. Some options may not be loaded.", dialog=self.dlg_config)
-        else:
-            tools_qgis.show_success("Configuration loaded successfully", dialog=self.dlg_config)
-
-        return config
-
-    def _set_combo_values_from_catalogs(self, catalogs):
-        # Set features
-        for feature_type, (combo,) in self.tbl_elements["features"].items():
-            feat_catalog = catalogs.get("features", {}).get(str(feature_type))
-            if feat_catalog:
-                combo.setCurrentText(feat_catalog)
-
-        # Set materials
-        for roughness, (combo,) in self.tbl_elements["materials"].items():
-            material_catalog = catalogs.get("materials", {}).get(str(roughness))
-            if material_catalog:
-                combo.setCurrentText(material_catalog)
-
-        # Set nodes and arcs tables
-        elements = [
-            ("junctions", catalogs.get("junctions")),
-            ("reservoirs", catalogs.get("reservoirs")),
-            ("tanks", catalogs.get("tanks")),
-            ("pumps", catalogs.get("pumps")),
-            ("valves", catalogs.get("valves")),
-        ]
-
-        for element_type, element_catalog in elements:
-            if element_type == "pipes":
-                continue
-
-            if element_type not in self.tbl_elements:
-                continue
-
-            combo: QComboBox = self.tbl_elements[element_type][0]
-            if element_catalog:
-                combo.setCurrentText(element_catalog)
-                # TODO: manage CREATE_NEW option (the widget is in self.tbl_elements[element_type][1])
-
-        if catalogs.get("pipes") is not None:
-            for dint_rough_str, pipe_catalog in catalogs["pipes"].items():
-                dint_rough_tuple = tuple(map(float, dint_rough_str.strip("()").split(", ")))
-                if dint_rough_tuple not in self.tbl_elements["pipes"]:
-                    continue
-
-                combo: QComboBox = self.tbl_elements["pipes"][dint_rough_tuple][0]
-                if pipe_catalog:
-                    combo.setCurrentText(pipe_catalog)
 
     def _update_parsing_dialog(self, dialog: GwDialog) -> None:
         if not dialog.isVisible():
