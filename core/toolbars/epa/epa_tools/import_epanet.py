@@ -5,7 +5,6 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 import os
-import json
 
 from datetime import timedelta
 from functools import partial
@@ -30,67 +29,11 @@ from ....ui.dialog import GwDialog
 from ....ui.ui_manager import GwInpConfigImportUi, GwInpParsingUi
 from ....threads.import_inp.import_epanet_task import GwImportInpTask
 from ....utils import tools_gw
+from ....utils.import_inp import GwInpConfig
 
 CREATE_NEW = "Create new"
 SPATIAL_INTERSECT = "Get from spatial intersect"
 TESTING_MODE = False
-
-
-class GwEpanetConfig:
-    """ Class to store the configuration of the import INP process, as well as serializing/deserializing it """
-
-    def __init__(self, file_path: Optional[Path], workcat: Optional[str], exploitation: Optional[int], sector: Optional[int], municipality: Optional[int], dscenario: Optional[str], catalogs: Optional[dict]) -> None:
-        self.file_path: Optional[Path] = file_path
-        self.workcat: Optional[str] = workcat
-        self.exploitation: Optional[int] = exploitation
-        self.sector: Optional[int] = sector
-        self.municipality: Optional[int] = municipality
-        self.dscenario: Optional[str] = dscenario
-        self.catalogs: Optional[dict] = catalogs
-
-    def serialize(self) -> dict:
-        return {
-            "file_path": str(self.file_path),
-            "workcat": self.workcat,
-            "exploitation": self.exploitation,
-            "sector": self.sector,
-            "municipality": self.municipality,
-            "dscenario": self.dscenario,
-            "catalogs": self.catalogs
-        }
-
-    def deserialize(self, data: dict) -> None:
-        self.file_path = data.get("file_path")
-        self.workcat = data.get("workcat")
-        self.exploitation = data.get("exploitation")
-        self.sector = data.get("sector")
-        self.municipality = data.get("municipality")
-        self.dscenario = data.get("dscenario")
-        self.catalogs = data.get("catalogs")
-
-    def write_to_file(self, file_path: Path) -> None:
-        """Write the serialized configuration to a file."""
-        data = self.serialize()
-        # Convert tuple keys to strings
-        data_serializable = self.convert_keys(data)
-        with file_path.open("w") as file:
-            json.dump(data_serializable, file, indent=4)
-
-    def read_from_file(self, file_path: Path) -> None:
-        """Read the configuration from a file and deserialize it."""
-        with file_path.open("r") as file:
-            try:
-                data = json.load(file)
-            except json.JSONDecodeError as e:
-                tools_log.log_error(f"Error reading configuration file: {e}")
-                return
-        self.deserialize(data)
-
-    def convert_keys(self, obj):
-        """ Recursively converts keys to strings in a dictionary. """
-        if isinstance(obj, dict):
-            return {str(k): self.convert_keys(v) for k, v in obj.items()}
-        return obj
 
 
 class GwImportEpanet:
@@ -757,20 +700,20 @@ class GwImportEpanet:
                 os.makedirs(config_folder)
             path_temp_file = f"{config_folder}{os.sep}import_epanet_config.json"
             config_path: Path = Path(path_temp_file)
-            config = GwEpanetConfig(self.file_path, workcat, exploitation, sector, municipality, dscenario, catalogs)
+            config = GwInpConfig(self.file_path, workcat, exploitation, sector, municipality, dscenario, catalogs)
             config.write_to_file(config_path)
             tools_log.log_info(f"Configuration saved to {config_path}")
         except Exception as e:
             tools_qgis.show_warning(f"Error saving the configuration: {e}", dialog=self.dlg_config)
 
-    def _load_config(self) -> Optional[GwEpanetConfig]:
+    def _load_config(self) -> Optional[GwInpConfig]:
 
         config_folder = f'{lib_vars.user_folder_dir}{os.sep}core{os.sep}temp'
         path_temp_file = f"{config_folder}{os.sep}import_epanet_config.json"
         config_path: Path = Path(path_temp_file)
         if not os.path.exists(config_path):
             return None
-        config = GwEpanetConfig(None, None, None, None, None, None, None)
+        config = GwInpConfig()
         config.read_from_file(config_path)
         if not config.file_path:
             return None
