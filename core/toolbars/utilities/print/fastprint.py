@@ -65,17 +65,16 @@ class GwFastprint:
             # At the moment, u can set column widgetfunction with 'gw_fct_setprint' or open_composer
             self._create_dialog(self.dlg_composer, fields)
         tools_qt.hide_void_groupbox(self.dlg_composer)
-
         # Set current values from canvas
         rotation = self.canvas.rotation()
         scale = int(self.canvas.scale())
-
-        w_rotation = self.dlg_composer.findChild(QLineEdit, "data_rotation")
+        # 'tab_none' + '_' +  <widgetname>
+        w_rotation = self.dlg_composer.findChild(QLineEdit, "tab_none_rotation")
         if w_rotation:
             w_rotation.editingFinished.connect(partial(self._set_rotation, w_rotation))
             tools_qt.set_widget_text(self.dlg_composer, w_rotation, rotation)
 
-        w_scale = self.dlg_composer.findChild(QLineEdit, "data_scale")
+        w_scale = self.dlg_composer.findChild(QLineEdit, "tab_none_scale")
         if w_scale:
             w_scale.editingFinished.connect(partial(self._set_scale, w_scale))
             reg_exp = QRegExp("\d{0,8}[\r]?")
