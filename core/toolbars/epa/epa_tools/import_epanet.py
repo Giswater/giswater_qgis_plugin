@@ -377,9 +377,9 @@ class GwImportEpanet:
                 'DELETE FROM arc CASCADE;',
                 "DELETE FROM cat_work WHERE id = 'import_inp_test';",
                 "DELETE FROM cat_dscenario WHERE expl_id = 1;",
-                "DELETE FROM cat_arc CASCADE;"
-                "DELETE FROM cat_material CASCADE;",
+                "DELETE FROM cat_arc CASCADE;",
                 "DELETE FROM cat_mat_roughness CASCADE;",
+                "DELETE FROM cat_material CASCADE;",
                 "DELETE FROM sector WHERE sector_id = 1;",
                 "DELETE FROM ext_municipality WHERE muni_id = 1;",
                 "DELETE FROM exploitation WHERE expl_id = 1;",
