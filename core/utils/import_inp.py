@@ -16,25 +16,31 @@ class GwInpConfig:
 
     def __init__(self, file_path: Optional[Path] = None, workcat: Optional[str] = None, exploitation: Optional[int] = None,
                  sector: Optional[int] = None, municipality: Optional[int] = None, dscenario: Optional[str] = None,
-                 catalogs: Optional[dict] = None) -> None:
+                 raingage: Optional[str] = None, catalogs: Optional[dict] = None) -> None:
         self.file_path: Optional[Path] = file_path
         self.workcat: Optional[str] = workcat
         self.exploitation: Optional[int] = exploitation
         self.sector: Optional[int] = sector
         self.municipality: Optional[int] = municipality
         self.dscenario: Optional[str] = dscenario
+        self.raingage: Optional[str] = raingage
         self.catalogs: Optional[dict] = catalogs
 
     def serialize(self) -> dict:
-        return {
+        return_dict = {
             "file_path": str(self.file_path),
             "workcat": self.workcat,
             "exploitation": self.exploitation,
             "sector": self.sector,
             "municipality": self.municipality,
-            "dscenario": self.dscenario,
             "catalogs": self.catalogs
         }
+        if self.dscenario:
+            return_dict["dscenario"] = self.dscenario
+        if self.raingage:
+            return_dict["raingage"] = self.raingage
+
+        return return_dict
 
     def deserialize(self, data: dict) -> None:
         self.file_path = data.get("file_path")

@@ -4,6 +4,8 @@ The program is free software: you can redistribute it and/or modify it under the
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
 """
+import os
+
 from datetime import timedelta
 from enum import Enum
 from functools import partial
@@ -25,12 +27,13 @@ from qgis.PyQt.QtWidgets import (
 from sip import isdeleted
 
 from ..... import global_vars
-from .....libs import tools_db, tools_qgis, tools_qt
+from .....libs import tools_db, tools_qgis, tools_qt, tools_log, lib_vars
 from ....models.plugin_toolbar import GwPluginToolbar
 from ....ui.dialog import GwDialog
 from ....ui.ui_manager import GwInpConfigImportUi, GwInpParsingUi
 from ....threads.import_inp.import_swmm_task import GwImportInpTask
 from ....utils import tools_gw
+from ....utils.import_inp import GwInpConfig
 from ...dialog import GwAction
 from ....threads.import_inp import parse_swmm_task
 
@@ -304,6 +307,8 @@ class GwImportSwmm:
 
         self._manage_widgets_visibility()
 
+        self._load_config()
+
         tools_gw.open_dialog(self.dlg_config, dlg_name="dlg_inp_config_import")
 
     def _manage_widgets_visibility(self):
@@ -313,7 +318,7 @@ class GwImportSwmm:
 
         # Disable the whole dialog if testing mode
         if TESTING_MODE:
-            tools_gw.set_tabs_enabled(self.dlg_config)
+            tools_gw.set_tabs_enabled(self.dlg_config, hide_btn_accept=False, change_btn_cancel=False)
 
         # Default raingage widget
         subcatchments = self.catalogs.inp_subcatchments
@@ -753,6 +758,95 @@ class GwImportSwmm:
             if text == CREATE_NEW
             else Qt.NoItemFlags
         )
+
+    def _save_config(self, workcat: Optional[str] = None, exploitation: Optional[int] = None, sector: Optional[int] = None,
+                     municipality: Optional[int] = None, raingage: Optional[str] = None, catalogs: Optional[dict] = None) -> None:
+
+        try:
+            config_folder = f'{lib_vars.user_folder_dir}{os.sep}core{os.sep}temp'
+            if not os.path.exists(config_folder):
+                os.makedirs(config_folder)
+            path_temp_file = f"{config_folder}{os.sep}import_swmm_config.json"
+            config_path: Path = Path(path_temp_file)
+            config = GwInpConfig(file_path=self.file_path, workcat=workcat, exploitation=exploitation, sector=sector,
+                                 municipality=municipality, raingage=raingage, catalogs=catalogs)
+            config.write_to_file(config_path)
+            tools_log.log_info(f"Configuration saved to {config_path}")
+        except Exception as e:
+            tools_qgis.show_warning(f"Error saving the configuration: {e}", dialog=self.dlg_config)
+
+    def _load_config(self) -> Optional[GwInpConfig]:
+
+        config_folder = f'{lib_vars.user_folder_dir}{os.sep}core{os.sep}temp'
+        path_temp_file = f"{config_folder}{os.sep}import_swmm_config.json"
+        config_path: Path = Path(path_temp_file)
+        if not os.path.exists(config_path):
+            return None
+        config = GwInpConfig()
+        config.read_from_file(config_path)
+        if not config.file_path:
+            return None
+
+        # Fill 'Basic' tab widgets
+        tools_qt.set_widget_text(self.dlg_config, 'txt_workcat', config.workcat)
+        tools_qt.set_widget_text(self.dlg_config, 'txt_raingage', config.raingage)
+        tools_qt.set_combo_value(self.dlg_config.cmb_expl, config.exploitation, 0)
+        tools_qt.set_combo_value(self.dlg_config.cmb_sector, config.sector, 0)
+        tools_qt.set_combo_value(self.dlg_config.cmb_muni, config.municipality, 0)
+
+        # Fill tables from catalogs
+        self._set_combo_values_from_catalogs(config.catalogs)
+
+        if str(self.file_path) != str(config.file_path):
+            tools_qgis.show_warning("The configuration file doesn't match the selected INP file. Some options may not be loaded.", dialog=self.dlg_config)
+        else:
+            tools_qgis.show_success("Configuration loaded successfully", dialog=self.dlg_config)
+
+        return config
+
+    def _set_combo_values_from_catalogs(self, catalogs):
+        # Set features
+        for feature_type, (combo,) in self.tbl_elements["features"].items():
+            feat_catalog = catalogs.get("features", {}).get(str(feature_type))
+            if feat_catalog:
+                combo.setCurrentText(feat_catalog)
+
+        # Set materials
+        for roughness, (combo,) in self.tbl_elements["materials"].items():
+            material_catalog = catalogs.get("materials", {}).get(str(roughness))
+            if material_catalog:
+                combo.setCurrentText(material_catalog)
+
+        # Set nodes and arcs tables
+        elements = [
+            ("junctions", catalogs.get("junctions")),
+            ("reservoirs", catalogs.get("reservoirs")),
+            ("tanks", catalogs.get("tanks")),
+            ("pumps", catalogs.get("pumps")),
+            ("valves", catalogs.get("valves")),
+        ]
+
+        for element_type, element_catalog in elements:
+            if element_type == "pipes":
+                continue
+
+            if element_type not in self.tbl_elements:
+                continue
+
+            combo: QComboBox = self.tbl_elements[element_type][0]
+            if element_catalog:
+                combo.setCurrentText(element_catalog)
+                # TODO: manage CREATE_NEW option (the widget is in self.tbl_elements[element_type][1])
+
+        if catalogs.get("pipes") is not None:
+            for dint_rough_str, pipe_catalog in catalogs["pipes"].items():
+                dint_rough_tuple = tuple(map(float, dint_rough_str.strip("()").split(", ")))
+                if dint_rough_tuple not in self.tbl_elements["pipes"]:
+                    continue
+
+                combo: QComboBox = self.tbl_elements["pipes"][dint_rough_tuple][0]
+                if pipe_catalog:
+                    combo.setCurrentText(pipe_catalog)
 
     def _update_parsing_dialog(self, dialog: GwDialog) -> None:
         if not dialog.isVisible():

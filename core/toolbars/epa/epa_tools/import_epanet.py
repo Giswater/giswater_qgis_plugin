@@ -700,7 +700,8 @@ class GwImportEpanet:
                 os.makedirs(config_folder)
             path_temp_file = f"{config_folder}{os.sep}import_epanet_config.json"
             config_path: Path = Path(path_temp_file)
-            config = GwInpConfig(self.file_path, workcat, exploitation, sector, municipality, dscenario, catalogs)
+            config = GwInpConfig(file_path=self.file_path, workcat=workcat, exploitation=exploitation, sector=sector,
+                                 municipality=municipality, dscenario=dscenario, catalogs=catalogs)
             config.write_to_file(config_path)
             tools_log.log_info(f"Configuration saved to {config_path}")
         except Exception as e:
