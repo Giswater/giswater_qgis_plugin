@@ -44,17 +44,21 @@ CREATE RULE insert_plan_psector_x_node AS
 --28/01/2025
 --Altering the inp tables for the flowregulators for constraints.
 --ORIFICE
-ALTER TABLE inp_flwreg_orifice ADD CONSTRAINT inp_flwreg_orifice_pkey PRIMARY KEY (flwreg_id);
-ALTER TABLE inp_flwreg_orifice ADD CONSTRAINT inp_flwreg_orifice_flwreg_id_fkey FOREIGN KEY (flwreg_id) REFERENCES flwreg(flwreg_id) ON DELETE CASCADE ON UPDATE CASCADE;
+/*
+ALTER TABLE inp_flwreg_orifice ADD CONSTRAINT FOREIGN KEY (flwreg_id) REFERENCES flwreg(flwreg_id) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --OUTLET
-ALTER TABLE inp_flwreg_outlet ADD CONSTRAINT inp_flwreg_outlet_pkey PRIMARY KEY (flwreg_id);
 ALTER TABLE inp_flwreg_outlet ADD CONSTRAINT inp_flwreg_outlet_flwreg_id_fkey FOREIGN KEY (flwreg_id) REFERENCES flwreg(flwreg_id) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --WEIR
-ALTER TABLE inp_flwreg_weir ADD CONSTRAINT inp_flwreg_weir_pkey PRIMARY KEY (flwreg_id);
 ALTER TABLE inp_flwreg_weir ADD CONSTRAINT inp_flwreg_weir_flwreg_id_fkey FOREIGN KEY (flwreg_id) REFERENCES flwreg(flwreg_id) ON DELETE CASCADE ON UPDATE CASCADE;
 
---PUMP 
-ALTER TABLE inp_flwreg_pump ADD CONSTRAINT inp_flwreg_pump_pkey PRIMARY KEY (flwreg_id);
+--PUMP
 ALTER TABLE inp_flwreg_pump ADD CONSTRAINT inp_flwreg_pump_flwreg_id_fkey FOREIGN KEY (flwreg_id) REFERENCES flwreg(flwreg_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+
+ALTER TABLE inp_dscenario_flwreg_pump ADD CONSTRAINT inp_dscenario_flwreg_pump_nodarc_id_fkey FOREIGN KEY (nodarc_id) REFERENCES inp_flwreg_pump(nodarc_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE inp_dscenario_flwreg_outlet ADD CONSTRAINT inp_dscenario_flwreg_outlet_nodarc_id_fkey FOREIGN KEY (nodarc_id) REFERENCES inp_flwreg_outlet(nodarc_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE inp_dscenario_flwreg_orifice ADD CONSTRAINT inp_dscenario_flwreg_orifice_nodarc_id_fkey FOREIGN KEY (nodarc_id) REFERENCES inp_flwreg_orifice(nodarc_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE inp_dscenario_flwreg_weir ADD CONSTRAINT inp_dscenario_flwreg_weir_nodarc_id_fkey FOREIGN KEY (nodarc_id) REFERENCES inp_flwreg_weir(nodarc_id) ON DELETE CASCADE ON UPDATE CASCADE;
+*/

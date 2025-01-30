@@ -2707,14 +2707,15 @@ AS SELECT f.nodarc_id,
     f.order_id,
     f.to_arc,
     f.flwreg_length,
-    f.outlet_type,
-    f.offsetval,
-    f.curve_id,
-    f.cd1,
-    f.cd2,
-    f.flap,
-    st_setsrid(st_makeline(n.the_geom, st_lineinterpolatepoint(a.the_geom, f.flwreg_length / st_length(a.the_geom))), SRID_VALUE)::geometry(LineString,SRID_VALUE) AS the_geom
-    FROM inp_flwreg_outlet f
+    ou.outlet_type,
+    ou.offsetval,
+    ou.curve_id,
+    ou.cd1,
+    ou.cd2,
+    ou.flap,
+    f.the_geom
+    FROM flwreg f
+    JOIN inp_flwreg_outlet ou USING (flwreg_id)
     JOIN v_edit_node n USING (node_id)
     JOIN value_state_type vs ON vs.id = n.state_type
     LEFT JOIN arc a ON a.arc_id::text = f.to_arc::text
@@ -2726,22 +2727,23 @@ AS SELECT f.nodarc_id,
     f.order_id,
     f.to_arc,
     f.flwreg_length,
-    f.weir_type,
-    f.offsetval,
-    f.cd,
-    f.ec,
-    f.cd2,
-    f.flap,
-    f.geom1,
-    f.geom2,
-    f.geom3,
-    f.geom4,
-    f.surcharge,
-    f.road_width,
-    f.road_surf,
-    f.coef_curve,
-    st_setsrid(st_makeline(n.the_geom, st_lineinterpolatepoint(a.the_geom, f.flwreg_length / st_length(a.the_geom))), SRID_VALUE)::geometry(LineString,SRID_VALUE) AS the_geom
-    FROM inp_flwreg_weir f
+    w.weir_type,
+    w.offsetval,
+    w.cd,
+    w.ec,
+    w.cd2,
+    w.flap,
+    w.geom1,
+    w.geom2,
+    w.geom3,
+    w.geom4,
+    w.surcharge,
+    w.road_width,
+    w.road_surf,
+    w.coef_curve,
+    f.the_geom
+    FROM flwreg f
+    JOIN inp_flwreg_weir w USING (flwreg_id)
     JOIN v_edit_node n USING (node_id)
     JOIN value_state_type vs ON vs.id = n.state_type
     LEFT JOIN arc a ON a.arc_id::text = f.to_arc::text
@@ -2753,12 +2755,13 @@ AS SELECT f.nodarc_id,
     f.order_id,
     f.to_arc,
     f.flwreg_length,
-    f.curve_id,
-    f.status,
-    f.startup,
-    f.shutoff,
-    st_setsrid(st_makeline(n.the_geom, st_lineinterpolatepoint(a.the_geom, f.flwreg_length / st_length(a.the_geom))), SRID_VALUE)::geometry(LineString,SRID_VALUE) AS the_geom
-    FROM inp_flwreg_pump f
+    p.curve_id,
+    p.status,
+    p.startup,
+    p.shutoff,
+    f.the_geom
+    FROM flwreg f
+    JOIN inp_flwreg_pump p USING (flwreg_id)
     JOIN v_edit_node n USING (node_id)
     JOIN value_state_type vs ON vs.id = n.state_type
     LEFT JOIN arc a ON a.arc_id::text = f.to_arc::text
@@ -2770,18 +2773,19 @@ AS SELECT f.nodarc_id,
     f.order_id,
     f.to_arc,
     f.flwreg_length,
-    f.ori_type,
-    f.offsetval,
-    f.cd,
-    f.orate,
-    f.flap,
-    f.shape,
-    f.geom1,
-    f.geom2,
-    f.geom3,
-    f.geom4,
-    st_setsrid(st_makeline(n.the_geom, st_lineinterpolatepoint(a.the_geom, f.flwreg_length / st_length(a.the_geom))), SRID_VALUE)::geometry(LineString,SRID_VALUE) AS the_geom
-    FROM inp_flwreg_orifice f
+    ori.ori_type,
+    ori.offsetval,
+    ori.cd,
+    ori.orate,
+    ori.flap,
+    ori.shape,
+    ori.geom1,
+    ori.geom2,
+    ori.geom3,
+    ori.geom4,
+    f.the_geom
+    FROM flwreg f
+    JOIN inp_flwreg_orifice ori USING (flwreg_id)
     JOIN v_edit_node n USING (node_id)
     JOIN value_state_type vs ON vs.id = n.state_type
     LEFT JOIN arc a ON a.arc_id::text = f.to_arc::text
@@ -6135,154 +6139,61 @@ AS SELECT DISTINCT p.id,
 
 
  -- Drop the view if it already exists
-DROP VIEW IF EXISTS v_edit_inp_flwreg;
-
 CREATE OR REPLACE VIEW v_edit_inp_flwreg AS
-WITH
--- Orifice
-orifice AS (
-    SELECT
-        f.nodarc_id,
-        f.node_id,
-        f.order_id,
-        f.to_arc,
-        f.flwreg_length,
-        'orifice' AS flwreg_type,
-        f.ori_type AS orifice_type,
-        f.offsetval AS orifice_offsetval,
-        f.cd AS orifice_cd,
-        f.orate AS orifice_orate,
-        f.flap AS orifice_flap,
-        f.shape AS orifice_shape,
-        f.geom1 AS orifice_geom1,
-        f.geom2 AS orifice_geom2,
-        f.geom3 AS orifice_geom3,
-        f.geom4 AS orifice_geom4,
-        st_setsrid(st_makeline(n.the_geom, st_lineinterpolatepoint(a.the_geom, f.flwreg_length / st_length(a.the_geom))), SRID_VALUE)::geometry(LineString,SRID_VALUE) AS the_geom
-    FROM inp_flwreg_orifice f
-    JOIN v_edit_node n USING (node_id)
-    JOIN value_state_type vs ON vs.id = n.state_type
-    LEFT JOIN arc a ON a.arc_id::text = f.to_arc::text
-    WHERE vs.is_operative IS TRUE
-),
--- Outlet
-outlet AS (
-   SELECT f.nodarc_id,
+SELECT
+    f.nodarc_id,
     f.node_id,
     f.order_id,
-    f.to_arc,
+   	f.to_arc,
     f.flwreg_length,
-    'outlet' AS flwreg_type,
-    f.outlet_type,
-    f.offsetval AS outlet_offsetval,
-    f.curve_id AS outlet_curve_id,
-    f.cd1 AS outlet_cd1,
-    f.cd2 AS outlet_cd2,
-    f.flap AS outlet_flap,
-    st_setsrid(st_makeline(n.the_geom, st_lineinterpolatepoint(a.the_geom, f.flwreg_length / st_length(a.the_geom))), SRID_VALUE)::geometry(LineString,SRID_VALUE) AS the_geom
-   FROM inp_flwreg_outlet f
-     JOIN v_edit_node n USING (node_id)
-     JOIN value_state_type vs ON vs.id = n.state_type
-     LEFT JOIN arc a ON a.arc_id::text = f.to_arc::text
-  WHERE vs.is_operative IS TRUE
-),
--- Pump
-pump AS (SELECT f.nodarc_id,
-    f.node_id,
-    f.order_id,
-    f.to_arc,
-    f.flwreg_length,
-    'pump' AS flwreg_type,
-    f.curve_id AS pump_curve_id,
-    f.status AS pump_status,
-    f.startup AS pump_startup,
-    f.shutoff AS pump_shutoff,
-    st_setsrid(st_makeline(n.the_geom, st_lineinterpolatepoint(a.the_geom, f.flwreg_length / st_length(a.the_geom))), SRID_VALUE)::geometry(LineString,SRID_VALUE) AS the_geom
-   FROM inp_flwreg_pump f
-     JOIN v_edit_node n USING (node_id)
-     JOIN value_state_type vs ON vs.id = n.state_type
-     LEFT JOIN arc a ON a.arc_id::text = f.to_arc::text
-  WHERE vs.is_operative IS TRUE),
--- Weir
- weir AS (
-  SELECT f.nodarc_id,
-    f.node_id,
-    f.order_id,
-    f.to_arc,
-    f.flwreg_length,
-    'weir' AS flwreg_type,
-    f.weir_type,
-    f.offsetval AS weir_offsetval,
-    f.cd AS weir_cd,
-    f.ec AS weir_ec,
-    f.cd2 AS weir_cd2,
-    f.flap AS weir_flap,
-    f.geom1 AS weir_geom1,
-    f.geom2 AS weir_geom2,
-    f.geom3 AS weir_geom3,
-    f.geom4 AS weir_geom4,
-    f.surcharge AS weir_surcharge,
-    f.road_width AS weir_road_width,
-    f.road_surf AS weir_road_surf,
-    f.coef_curve AS weir_coef_curve,
-    st_setsrid(st_makeline(n.the_geom, st_lineinterpolatepoint(a.the_geom, f.flwreg_length / st_length(a.the_geom))), SRID_VALUE)::geometry(LineString,SRID_VALUE) AS the_geom
-   FROM inp_flwreg_weir f
-     JOIN v_edit_node n USING (node_id)
-     JOIN value_state_type vs ON vs.id = n.state_type
-     LEFT JOIN arc a ON a.arc_id::text = f.to_arc::text
-  WHERE vs.is_operative IS TRUE)
-  SELECT
-    COALESCE(o.nodarc_id, ou.nodarc_id, p.nodarc_id, w.nodarc_id) AS nodarc_id,
-    COALESCE(o.node_id, ou.node_id, p.node_id, w.node_id) AS node_id,
-    COALESCE(o.order_id, ou.order_id, p.order_id, w.order_id) AS order_id,
-    COALESCE(o.to_arc, ou.to_arc, p.to_arc, w.to_arc) AS to_arc,
-    COALESCE(o.flwreg_length, ou.flwreg_length, p.flwreg_length, w.flwreg_length) AS flwreg_length,
-    COALESCE(o.flwreg_type, ou.flwreg_type, p.flwreg_type, w.flwreg_type) AS flwreg_type,
-        -- Orifice Columns
-    o.orifice_type,
-    o.orifice_offsetval,
-    o.orifice_cd,
-    o.orifice_orate,
-    o.orifice_flap,
-    o.orifice_shape,
-    o.orifice_geom1,
-    o.orifice_geom2,
-    o.orifice_geom3,
-    o.orifice_geom4,
+    f.flwreg_type,
+    -- Orifice Columns
+    o.ori_type,
+    o.offsetval as orifice_offsetval,
+    o.cd as orifice_cd,
+    o.orate as orifice_orate,
+    o.flap as orifice_flap,
+    o.shape as orifice_shape,
+    o.geom1 as orifice_geom1,
+    o.geom2 as orifice_geom2,
+    o.geom3 as orifice_geom3,
+    o.geom4 as orifice_geom4,
     -- Outlet Columns
     ou.outlet_type,
-    ou.outlet_offsetval,
-    ou.outlet_curve_id,
-    ou.outlet_cd1,
-    ou.outlet_cd2,
-    ou.outlet_flap,
+    ou.offsetval as outlet_offsetval,
+    ou.curve_id as outlet_curve_id,
+    ou.cd1 as outlet_cd1,
+    ou.cd2 as outlet_cd2,
+    ou.flap as outlet_flap,
     --Pump Columns
-    p.pump_curve_id,
-    p.pump_status,
-    p.pump_startup,
-    p.pump_shutoff,
+    p.pump_type,
+    p.curve_id as pump_curve_id,
+    p.status as pump_status,
+    p.startup as pump_startup,
+    p.shutoff as pump_shutoff,
     --Weir Columns
     w.weir_type,
-    w.weir_offsetval,
-    w.weir_cd,
-    w.weir_ec,
-    w.weir_cd2,
-    w.weir_flap,
-    w.weir_geom1,
-    w.weir_geom2,
-    w.weir_geom3,
-    w.weir_geom4,
-    w.weir_surcharge,
-    w.weir_road_width,
-    w.weir_road_surf,
-    w.weir_coef_curve,
+    w.offsetval as weir_offsetval,
+    w.cd as weir_cd,
+    w.ec as weir_ec,
+    w.cd2 as weir_cd2,
+    w.flap as weir_flap,
+    w.geom1 as weir_geom1,
+    w.geom2 as weir_geom2,
+    w.geom3 as weir_geom3,
+    w.geom4 as weir_geom4,
+    w.surcharge as weir_surcharge,
+    w.road_width as weir_road_width,
+    w.road_surf as weir_road_surf,
+    w.coef_curve as weir_coef_curve,
     -- Geometry
-    COALESCE(o.the_geom, ou.the_geom, p.the_geom, w.the_geom) AS the_geom
+    f.the_geom
 FROM
-    orifice o
-FULL OUTER JOIN outlet ou USING (nodarc_id, node_id)
-FULL OUTER JOIN pump p USING (nodarc_id, node_id)
-FULL OUTER JOIN weir w USING (nodarc_id, node_id);
+    flwreg f
+left join inp_flwreg_orifice o using (flwreg_id)
+left join inp_flwreg_outlet ou using (flwreg_id)
+left join inp_flwreg_pump p using (flwreg_id)
+left join inp_flwreg_weir w using (flwreg_id);
 
 --10/01/2025
 --28/01/2025 [Modified]
@@ -6301,7 +6212,6 @@ AS SELECT
      JOIN cat_feature_flwreg USING (id);
 
 -- Create parent view for flow regulators.
-DROP VIEW IF EXISTS v_edit_flwreg;
 CREATE OR REPLACE VIEW v_edit_flwreg
 AS SELECT
 	f.flwreg_id,
@@ -6316,123 +6226,12 @@ AS SELECT
 	f.state_type,
 	f.annotation,
 	f.observ,
-	st_setsrid(st_linesubstring(CASE WHEN ST_Equals(ST_StartPoint(a.the_geom), n.the_geom)
-                    THEN a.the_geom
-                    ELSE ST_Reverse(a.the_geom) end, 0,  f.flwreg_length / st_length(a.the_geom)),SRID_VALUE)::geometry(LineString,SRID_VALUE)
-                AS the_geom
+    f.the_geom
     FROM flwreg f
     JOIN node n USING (node_id)
     JOIN arc a ON a.arc_id::text = f.to_arc::text
 	JOIN sys_feature_epa_type et ON f.flwreg_type = et.id
 	JOIN cat_feature cf ON cf.feature_type = et.feature_type;
-
-
---Create child views using man tables for flow regulators
-
-CREATE VIEW ve_flwreg_frweir
-AS SELECT
-	f.flwreg_id,
-	f.node_id,
-	f.order_id,
-	f.to_arc,
-	f.flwreg_type,
-	cf.feature_class AS flwreg_class,
-	f.flwreg_length,
-	f.epa_type,
-	mf.weir_type,
-	f.state ,
-	f.state_type,
-	f.annotation,
-	f.observ,
-	st_setsrid(st_linesubstring(CASE WHEN ST_Equals(ST_StartPoint(a.the_geom), n.the_geom)
-                    THEN a.the_geom
-                    ELSE ST_Reverse(a.the_geom) end, 0,  f.flwreg_length / st_length(a.the_geom)),SRID_VALUE)::geometry(LineString,SRID_VALUE)
-                AS the_geom
-	FROM flwreg f
-	JOIN node n USING (node_id)
-	JOIN arc a ON a.arc_id::text = f.to_arc::TEXT
-	JOIN sys_feature_epa_type et ON f.flwreg_type = et.id
-	JOIN cat_feature cf ON cf.feature_type = et.feature_type
-	JOIN man_weir mf ON f.flwreg_id = mf.flwreg_id ;
-
-
-CREATE VIEW ve_flwreg_frpump
-AS SELECT
-f.flwreg_id,
-	f.node_id,
-	f.order_id,
-	f.to_arc,
-	f.flwreg_type,
-	cf.feature_class AS flwreg_class,
-	f.flwreg_length,
-	f.epa_type,
-	mf.pump_type,
-	f.state,
-	f.state_type,
-	f.annotation,
-	f.observ,
-	st_setsrid(st_linesubstring(CASE WHEN ST_Equals(ST_StartPoint(a.the_geom), n.the_geom)
-                    THEN a.the_geom
-                    ELSE ST_Reverse(a.the_geom) end, 0,  f.flwreg_length / st_length(a.the_geom)),SRID_VALUE)::geometry(LineString,SRID_VALUE)
-                AS the_geom
-	FROM flwreg f
-	JOIN node n USING (node_id)
-	JOIN arc a ON a.arc_id::text = f.to_arc::TEXT
-	JOIN sys_feature_epa_type et ON f.flwreg_type = et.id
-	JOIN cat_feature cf ON cf.feature_type = et.feature_type
-	JOIN man_pump mf ON f.flwreg_id = mf.flwreg_id;
-
-CREATE VIEW ve_flwreg_frorifice
-AS SELECT
-	f.flwreg_id,
-	f.node_id,
-	f.order_id,
-	f.to_arc,
-	f.flwreg_type,
-	cf.feature_class AS flwreg_class,
-	f.flwreg_length,
-	f.epa_type,
-	f.state,
-	f.state_type,
-	f.annotation,
-	f.observ,
-	st_setsrid(st_linesubstring(CASE WHEN ST_Equals(ST_StartPoint(a.the_geom), n.the_geom)
-                    THEN a.the_geom
-                    ELSE ST_Reverse(a.the_geom) end, 0,  f.flwreg_length / st_length(a.the_geom)),SRID_VALUE)::geometry(LineString,SRID_VALUE)
-                AS the_geom
-	FROM flwreg f
-	JOIN node n USING (node_id)
-	JOIN arc a ON a.arc_id::text = f.to_arc::TEXT
-	JOIN sys_feature_epa_type et ON f.flwreg_type = et.id
-	JOIN cat_feature cf ON cf.feature_type = et.feature_type
-	JOIN man_vflwreg mf ON f.flwreg_id = mf.flwreg_id ;
-
-
-CREATE VIEW ve_flwreg_froutlet
-AS SELECT
-	f.flwreg_id,
-	f.node_id,
-	f.order_id,
-	f.to_arc,
-	f.flwreg_type,
-	cf.feature_class AS flwreg_class,
-	f.flwreg_length,
-	f.epa_type,
-	f.state,
-	f.state_type,
-	f.annotation,
-	f.observ,
-	st_setsrid(st_linesubstring(CASE WHEN ST_Equals(ST_StartPoint(a.the_geom), n.the_geom)
-                    THEN a.the_geom
-                    ELSE ST_Reverse(a.the_geom) end, 0,  f.flwreg_length / st_length(a.the_geom)),SRID_VALUE)::geometry(LineString,SRID_VALUE)
-                AS the_geom
-	FROM flwreg f
-	JOIN node n USING (node_id)
-	JOIN arc a ON a.arc_id::text = f.to_arc::TEXT
-	JOIN sys_feature_epa_type et ON f.flwreg_type = et.id
-	JOIN cat_feature cf ON cf.feature_type = et.feature_type
-	JOIN man_vflwreg mf ON f.flwreg_id = mf.flwreg_id ;
-
 
 CREATE OR REPLACE VIEW v_rpt_node
 AS SELECT rpt_node.id,

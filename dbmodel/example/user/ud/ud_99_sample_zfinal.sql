@@ -58,7 +58,11 @@ DELETE FROM arc WHERE node_1 = '250';
 DELETE FROM arc WHERE node_2 = '250';
 DELETE FROM node WHERE node_id  = '250';
 
+
 -- INSERT INTO inp_flwreg_weir VALUES ('237', '100014', 1, 0.5, 'TRANSVERSE', 16.3500, 1.5000, NULL, NULL, 'NO', 2.0000, 1.0000, 0.0000, 0.0000, NULL, NULL, NULL, NULL,'237WE1');
+
+--INSERT INTO inp_flwreg_weir VALUES (1,'237', '100014', 1, 0.5, 'TRANSVERSE', 16.3500, 1.5000, NULL, NULL, 'NO', 2.0000, 1.0000, 0.0000, 0.0000, NULL, NULL, NULL, NULL,'237WE1');
+
 
 
 UPDATE config_param_user SET value ='PARTIAL' WHERE parameter = 'inp_options_inertial_damping';

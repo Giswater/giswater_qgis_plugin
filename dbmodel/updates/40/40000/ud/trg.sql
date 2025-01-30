@@ -133,10 +133,10 @@ FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_link();
 CREATE TRIGGER gw_trg_edit_dma INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_dma
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_dma('dma');
 
-CREATE trigger gw_trg_edit_drainzone INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_drainzone
+CREATE TRIGGER gw_trg_edit_drainzone INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_drainzone
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_drainzone();
 
-CREATE trigger gw_trg_edit_sector INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_sector
+CREATE TRIGGER gw_trg_edit_sector INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_sector
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_sector('sector');
 
 CREATE TRIGGER gw_trg_edit_review_gully INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_review_gully
@@ -265,27 +265,6 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_timeseries('inp_timeseries_value')
 --10/01/2025
 --28/01/2025
 
--- Create trigger for cat_feature_flwreg
-CREATE TRIGGER gw_trg_edit_cat_feature INSTEAD OF
-INSERT OR DELETE OR UPDATE ON v_edit_cat_feature_flwreg FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_cat_feature('flwreg');
-
---Create trigger for parent view by passing parameter 'parent'
-CREATE TRIGGER gw_trg_edit_flwreg INSTEAD OF INSERT OR DELETE OR UPDATE
-ON v_edit_flwreg FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_flwreg('parent');
-
---Create trigger for child views by passing different parameters each one for their view
-CREATE TRIGGER gw_trg_edit_flwreg INSTEAD OF INSERT OR DELETE OR UPDATE
-ON ve_flwreg_frorifice FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_flwreg('orifice');
-
-CREATE TRIGGER gw_trg_edit_flwreg INSTEAD OF INSERT OR DELETE OR UPDATE
-ON ve_flwreg_frweir FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_flwreg('weir');
-
-CREATE TRIGGER gw_trg_edit_flwreg INSTEAD OF INSERT OR DELETE OR UPDATE
-ON ve_flwreg_frpump FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_flwreg('pump');
-
-CREATE TRIGGER gw_trg_edit_flwreg INSTEAD OF INSERT OR DELETE OR UPDATE
-ON ve_flwreg_froutlet FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_flwreg('outlet');
-
 
 CREATE TRIGGER gw_trg_edit_ve_epa_junction INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_epa_junction
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_ve_epa('junction');
@@ -293,12 +272,59 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_ve_epa('junction');
 CREATE TRIGGER gw_trg_edit_ve_epa_pump INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_epa_pump
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_ve_epa('pump');
 
+
+-- CREATE TRIGGER for cat_feature_flwreg
+CREATE TRIGGER gw_trg_edit_cat_feature INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_cat_feature_flwreg
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_cat_feature('flwreg');
+
+--CREATE TRIGGER for parent view by passing parameter 'parent'
+CREATE TRIGGER gw_trg_edit_flwreg INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_flwreg
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_flwreg('parent');
+
+CREATE TRIGGER gw_trg_flw_regulator BEFORE INSERT OR UPDATE ON inp_flwreg_orifice FOR EACH ROW EXECUTE FUNCTION gw_trg_flw_regulator('orifice');
+
+CREATE TRIGGER gw_trg_flw_regulator BEFORE INSERT OR UPDATE ON inp_flwreg_weir
+FOR EACH ROW EXECUTE FUNCTION gw_trg_flw_regulator('weir');
+
+CREATE TRIGGER gw_trg_typevalue_fk_insert AFTER INSERT ON inp_flwreg_weir
+FOR EACH ROW EXECUTE FUNCTION gw_trg_typevalue_fk('inp_flwreg_weir');
+
+CREATE TRIGGER gw_trg_typevalue_fk_update AFTER UPDATE of weir_type, flap on inp_flwreg_weir
+FOR EACH ROW WHEN (((old.weir_type)::TEXT IS DISTINCT FROM (new.weir_type)::text OR ((old.flap)::TEXT IS DISTINCT FROM (new.flap)::text))) EXECUTE FUNCTION gw_trg_typevalue_fk('inp_flwreg_weir');
+
+
+CREATE TRIGGER gw_trg_flw_regulator BEFORE INSERT OR UPDATE ON inp_flwreg_pump
+FOR EACH ROW EXECUTE FUNCTION gw_trg_flw_regulator('pump');
+
+CREATE TRIGGER gw_trg_typevalue_fk_insert AFTER INSERT ON inp_flwreg_pump
+FOR EACH ROW EXECUTE FUNCTION gw_trg_typevalue_fk('inp_flwreg_pump');
+
+CREATE TRIGGER gw_trg_typevalue_fk_update AFTER UPDATE of status ON inp_flwreg_pump
+FOR EACH ROW WHEN (((old.status)::TEXT IS DISTINCT FROM (new.status)::text)) EXECUTE FUNCTION gw_trg_typevalue_fk('inp_flwreg_pump');
+
+
+--CREATE TRIGGER gw_trg_flw_regulator BEFORE INSERT OR UPDATE ON inp_flwreg_orifice
+--FOR EACH ROW EXECUTE FUNCTION gw_trg_flw_regulator('orifice');
+
+
+CREATE TRIGGER gw_trg_flw_regulator BEFORE INSERT OR UPDATE ON inp_flwreg_outlet
+FOR EACH ROW EXECUTE FUNCTION gw_trg_flw_regulator('outlet');
+
+CREATE TRIGGER gw_trg_typevalue_fk_insert AFTER INSERT ON inp_flwreg_outlet
+FOR EACH ROW EXECUTE FUNCTION gw_trg_typevalue_fk('inp_flwreg_outlet');
+
+CREATE TRIGGER gw_trg_typevalue_fk_update AFTER UPDATE of outlet_type, flap on inp_flwreg_outlet
+FOR EACH ROW WHEN ((((old.outlet_type)::TEXT IS DISTINCT FROM (new.outlet_type)::text) or ((old.flap)::TEXT IS DISTINCT FROM (new.flap)::text))) EXECUTE FUNCTION gw_trg_typevalue_fk('inp_flwreg_outlet');
+
+
 -- delete duplicated triggers
 DROP TRIGGER IF EXISTS gw_trg_edit_macrosector ON v_edit_macrosector;
 DROP TRIGGER IF EXISTS gw_trg_edit_macrodma ON v_edit_macrodma;
 
 CREATE TRIGGER gw_trg_v_edit_macrodma INSTEAD OF INSERT OR DELETE OR UPDATE
-ON v_edit_macrodma FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_macrodma('EDIT');
+ON v_edit_macrodma
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_macrodma('EDIT');
 
 CREATE TRIGGER gw_trg_v_edit_macrosector INSTEAD OF INSERT OR DELETE OR UPDATE
-ON v_edit_macrosector FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_macrosector('EDIT');
+ON v_edit_macrosector
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_macrosector('EDIT');

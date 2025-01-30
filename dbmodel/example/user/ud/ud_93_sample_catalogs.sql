@@ -194,3 +194,8 @@ UPDATE cat_feature SET shortcut_key='Alt+N' WHERE id = 'EMBORNAL_FICTICI';
 UPDATE cat_feature SET shortcut_key='Alt+Z' WHERE id = 'ESCOMESA_FICTICIA';
 UPDATE cat_feature SET shortcut_key='Alt+1' WHERE id = 'VGULLY';
 UPDATE cat_feature SET shortcut_key='Alt+2' WHERE id = 'VCONNEC';
+
+INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) VALUES ('FRORIFICE', 'ORIFICE','FLWREG', 'v_edit_flwreg', 've_flwreg_frorifice', true) ON CONFLICT (id) DO NOTHING;
+INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) VALUES ('FROUTLET', 'OUTLET','FLWREG', 'v_edit_flwreg', 've_flwreg_froutlet', true) ON CONFLICT (id) DO NOTHING;
+INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) VALUES ('FRWEIR', 'WEIR','FLWREG', 'v_edit_flwreg', 've_flwreg_frweir', true) ON CONFLICT (id) DO NOTHING;
+INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) VALUES ('FRPUMP', 'PUMP','FLWREG', 'v_edit_flwreg', 've_flwreg_frpump', true) ON CONFLICT (id) DO NOTHING;
