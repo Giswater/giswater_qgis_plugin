@@ -533,3 +533,6 @@ CREATE TABLE man_vflwreg (
 	CONSTRAINT man_vflwreg_pkey PRIMARY KEY (flwreg_id),
 	CONSTRAINT man_vflwreg_flwreg_id_fk FOREIGN KEY (flwreg_id) REFERENCES flwreg(flwreg_id) ON DELETE CASCADE
 );
+
+-- 30/01/2025
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"gully", "column":"verified", "dataType":"integer"}}$$);
