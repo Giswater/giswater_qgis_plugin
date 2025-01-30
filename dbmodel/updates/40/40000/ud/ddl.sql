@@ -542,3 +542,22 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"gull
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"samplepoint", "column":"verified", "dataType":"integer"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"element", "column":"verified", "dataType":"integer"}}$$);
+
+ALTER TABLE man_manhole RENAME TO _man_manhole;
+ALTER TABLE _man_manhole DROP CONSTRAINT IF EXISTS man_manhole_pkey;
+ALTER TABLE _man_manhole DROP CONSTRAINT IF EXISTS man_manhole_node_id_fkey;
+
+CREATE TABLE man_manhole (
+	node_id varchar(16) NOT NULL,
+	length numeric(12, 3) DEFAULT 0 NULL,
+	width numeric(12, 3) DEFAULT 0 NULL,
+	sander_depth numeric(12, 3) NULL,
+	prot_surface bool NULL,
+	inlet bool NULL,
+	bottom_channel bool NULL,
+	accessibility varchar(16) NULL,
+	bottom_mat text NULL,
+	CONSTRAINT man_manhole_pkey PRIMARY KEY (node_id),
+	CONSTRAINT man_manhole_node_id_fkey FOREIGN KEY (node_id) REFERENCES node(node_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+

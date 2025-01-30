@@ -2552,3 +2552,9 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 UPDATE config_form_fields SET datatype = 'integer', widgettype = 'combo', label = 'Verified', tooltip = 'verified', iseditable = true,
 dv_querytext = 'SELECT id, idval FROM edit_typevalue WHERE typevalue = ''value_verified''',
 dv_orderby_id = true, dv_isnullvalue = true, widgetcontrols = '{"setMultiline": false, "labelPosition": "top"}'::json WHERE columnname = 'verified';
+
+-- 30/01/2025
+INSERT INTO man_manhole (node_id, length, width, sander_depth, prot_surface, inlet, bottom_channel, accessibility, bottom_mat)
+SELECT node_id, length, width, sander_depth, prot_surface, inlet, bottom_channel, accessibility, bottom_mat
+FROM _man_manhole
+
