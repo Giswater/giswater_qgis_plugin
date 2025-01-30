@@ -39,18 +39,18 @@ TESTING_MODE = False
 class GwEpanetConfig:
     """ Class to store the configuration of the import INP process, as well as serializing/deserializing it """
 
-    def __init__(self, file_path: Optional[Path], workcat: Optional[str], exploitation: Optional[str], sector: Optional[str], municipality: Optional[str], dscenario: Optional[str], catalogs: Optional[dict]) -> None:
+    def __init__(self, file_path: Optional[Path], workcat: Optional[str], exploitation: Optional[int], sector: Optional[int], municipality: Optional[int], dscenario: Optional[str], catalogs: Optional[dict]) -> None:
         self.file_path: Optional[Path] = file_path
         self.workcat: Optional[str] = workcat
-        self.exploitation: Optional[str] = exploitation
-        self.sector: Optional[str] = sector
-        self.municipality: Optional[str] = municipality
+        self.exploitation: Optional[int] = exploitation
+        self.sector: Optional[int] = sector
+        self.municipality: Optional[int] = municipality
         self.dscenario: Optional[str] = dscenario
         self.catalogs: Optional[dict] = catalogs
 
     def serialize(self) -> dict:
         return {
-            "file_path": self.file_path,
+            "file_path": str(self.file_path),
             "workcat": self.workcat,
             "exploitation": self.exploitation,
             "sector": self.sector,
@@ -71,14 +71,26 @@ class GwEpanetConfig:
     def write_to_file(self, file_path: Path) -> None:
         """Write the serialized configuration to a file."""
         data = self.serialize()
+        # Convert tuple keys to strings
+        data_serializable = self.convert_keys(data)
         with file_path.open("w") as file:
-            json.dump(data, file, indent=4)
+            json.dump(data_serializable, file, indent=4)
 
     def read_from_file(self, file_path: Path) -> None:
         """Read the configuration from a file and deserialize it."""
         with file_path.open("r") as file:
-            data = json.load(file)
+            try:
+                data = json.load(file)
+            except json.JSONDecodeError as e:
+                tools_log.log_error(f"Error reading configuration file: {e}")
+                return
         self.deserialize(data)
+
+    def convert_keys(self, obj):
+        """ Recursively converts keys to strings in a dictionary. """
+        if isinstance(obj, dict):
+            return {str(k): self.convert_keys(v) for k, v in obj.items()}
+        return obj
 
 
 class GwImportEpanet:
@@ -412,6 +424,8 @@ class GwImportEpanet:
                         'pumps': 'INP-PUMP',
                         'valves': 'INP-VALVE'}
 
+            self._save_config(workcat, exploitation, sector, municipality, dscenario, catalogs)
+
             # Set background task 'Import INP'
             description = "Import INP (TESTING MODE)"
             self.import_inp_task = GwImportInpTask(
@@ -530,7 +544,7 @@ class GwImportEpanet:
                 )
 
         # Save options to the configuration file
-        self._save_config()
+        self._save_config(workcat, exploitation, sector, municipality, dscenario, catalogs)
 
         # Set background task 'Import INP'
         description = "Import INP"
@@ -734,8 +748,8 @@ class GwImportEpanet:
             else Qt.NoItemFlags
         )
 
-    def _save_config(self, workcat: Optional[str] = None, exploitation: Optional[str] = None, sector: Optional[str] = None,
-                     municipality: Optional[str] = None, dscenario: Optional[str] = None, catalogs: Optional[dict] = None) -> None:
+    def _save_config(self, workcat: Optional[str] = None, exploitation: Optional[int] = None, sector: Optional[int] = None,
+                     municipality: Optional[int] = None, dscenario: Optional[str] = None, catalogs: Optional[dict] = None) -> None:
 
         try:
             config_folder = f'{lib_vars.user_folder_dir}{os.sep}core{os.sep}temp'
@@ -747,18 +761,19 @@ class GwImportEpanet:
             config.write_to_file(config_path)
             tools_log.log_info(f"Configuration saved to {config_path}")
         except Exception as e:
-            tools_qgis.show_warning(f"Error saving the configuration: {e}")
+            tools_qgis.show_warning(f"Error saving the configuration: {e}", dialog=self.dlg_config)
 
-    def _load_config(self) -> GwEpanetConfig:
+    def _load_config(self) -> Optional[GwEpanetConfig]:
 
         config_folder = f'{lib_vars.user_folder_dir}{os.sep}core{os.sep}temp'
         path_temp_file = f"{config_folder}{os.sep}import_epanet_config.json"
         config_path: Path = Path(path_temp_file)
+        if not os.path.exists(config_path):
+            return None
         config = GwEpanetConfig(None, None, None, None, None, None, None)
         config.read_from_file(config_path)
-
-        if str(self.file_path) != str(config.file_path):
-            tools_qgis.show_warning("The configuration file doesn't match the selected INP file. Some options may not be loaded.")
+        if not config.file_path:
+            return None
 
         # Fill 'Basic' tab widgets
         tools_qt.set_widget_text(self.dlg_config, 'txt_workcat', config.workcat)
@@ -769,6 +784,11 @@ class GwImportEpanet:
 
         # Fill tables from catalogs
         self._set_combo_values_from_catalogs(config.catalogs)
+
+        if str(self.file_path) != str(config.file_path):
+            tools_qgis.show_warning("The configuration file doesn't match the selected INP file. Some options may not be loaded.", dialog=self.dlg_config)
+        else:
+            tools_qgis.show_success("Configuration loaded successfully", dialog=self.dlg_config)
 
         return config
 
