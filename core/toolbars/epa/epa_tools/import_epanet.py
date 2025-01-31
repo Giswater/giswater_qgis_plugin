@@ -432,35 +432,6 @@ class GwImportEpanet:
                     new_cat_name,
                 )
 
-        # Fill arcs table with pumps and valves
-        arc_elements = [
-            ("pumps", self.catalogs.inp_pumps, "PUMP"),
-            ("valves", self.catalogs.inp_valves, "VALVE"),
-        ]
-
-        for element, rec_catalog, tag in arc_elements:
-            if rec_catalog is None:
-                continue
-
-            row: int = tbl_arcs.rowCount()
-            tbl_arcs.setRowCount(row + 1)
-
-            first_column = QTableWidgetItem(tag)
-            first_column.setFlags(Qt.ItemIsEnabled)
-            tbl_arcs.setItem(row, 0, first_column)
-
-            combo_cat = QComboBox()
-            tbl_arcs.setCellWidget(row, 3, combo_cat)
-
-            new_cat_name = QTableWidgetItem("")
-            new_cat_name.setFlags(Qt.NoItemFlags)
-            tbl_arcs.setItem(row, 4, new_cat_name)
-            combo_cat.currentTextChanged.connect(
-                partial(self._toggle_enabled_new_catalog_field, new_cat_name)
-            )
-
-            self.tbl_elements[element] = (combo_cat, new_cat_name)
-
         # Fill materials table
         tbl_material: QTableWidget = self.dlg_config.tbl_material
 
@@ -649,10 +620,10 @@ class GwImportEpanet:
         feature_types = {
             "junctions": ("NODE", ("JUNCTION",)),
             "pipes": ("ARC", ("PIPE",)),
-            "pumps": ("ARC", ("VARC",)),
+            "pumps": (("ARC", "NODE"), ("VARC", "PUMP")),
             "reservoirs": ("NODE", ("SOURCE", "WATERWELL", "WTP")),
             "tanks": ("NODE", ("TANK",)),
-            "valves": ("ARC", ("VARC",)),
+            "valves": (("ARC", "NODE"), ("VARC",)),
         }
         for element_type, (combo,) in self.tbl_elements["features"].items():
             system_catalog = [
@@ -666,6 +637,7 @@ class GwImportEpanet:
                 if feat_type in feature_types[element_type][1]
             ]
 
+            combo.blockSignals(True)
             old_value: str = combo.currentText()
             combo.clear()
             combo.addItem("")
@@ -682,6 +654,73 @@ class GwImportEpanet:
                     feat for feat in system_catalog if feat not in feat_catalog
                 )
             combo.setCurrentText(old_value)
+            combo.blockSignals(False)
+            # Connect a signal to set pumps and valves in the corresponding table
+            if element_type in ("pumps", "valves"):
+                tools_gw.connect_signal(combo.currentTextChanged,
+                                        partial(self._update_table_based_on_feature_type, element_type, combo),
+                                        'import_inp', f'cmb_{element_type.lower()}_update_table_based_on_feature_type')
+
+    def _update_table_based_on_feature_type(self, element_type: str, combo: QComboBox):
+        if element_type not in ("pumps", "valves"):
+            return
+
+        feature_type = combo.currentText()
+        if feature_type == "":
+            return
+
+        sql = f"""
+            SELECT feature_type FROM cat_feature WHERE id = '{feature_type.upper()}';
+        """
+        feature_type = tools_db.get_row(sql)
+        if feature_type is None:
+            return
+        feature_type = feature_type[0]
+        tbl = self.dlg_config.tbl_arcs if feature_type == "ARC" else self.dlg_config.tbl_nodes
+
+        # TODO: remove row from other table
+
+        # Fill table with pumps and valves
+        elements = [
+            ("pumps", self.catalogs.inp_pumps, "PUMP"),
+            ("valves", self.catalogs.inp_valves, "VALVE"),
+        ]
+
+        for element, rec_catalog, tag in elements:
+            if element != element_type:
+                continue
+
+            if rec_catalog is None:
+                continue
+
+            # Disconnect old combo signal
+            tools_gw.disconnect_signal('import_inp', f'tbl_{element.lower()}_cmb_{element.lower()}_toggle_enabled_new_catalog_field')
+
+            # Add a new row
+            row: int = tbl.rowCount()
+            tbl.setRowCount(row + 1)
+
+            # Fill the first column
+            first_column = QTableWidgetItem(tag)
+            first_column.setFlags(Qt.ItemIsEnabled)
+            tbl.setItem(row, 0, first_column)
+
+            # Create the combo box and put it in the second or fourth column
+            combo_cat = QComboBox()
+            combo_idx = 3 if feature_type == "ARC" else 1
+            tbl.setCellWidget(row, combo_idx, combo_cat)
+
+            # Fill the "NEW CATALOG" column
+            new_cat_name = QTableWidgetItem("")
+            new_cat_name.setFlags(Qt.NoItemFlags)
+            tbl.setItem(row, combo_idx+1, new_cat_name)
+
+            # Connect signal to the new combo
+            tools_gw.connect_signal(combo_cat.currentTextChanged,
+                                    partial(self._toggle_enabled_new_catalog_field, new_cat_name),
+                                    'import_inp', f'tbl_{feature_type.lower()}_cmb_{element.lower()}_toggle_enabled_new_catalog_field')
+
+            self.tbl_elements[element] = (combo_cat, new_cat_name)
 
     def _get_config_values(self):
         workcat = tools_qt.get_text(self.dlg_config, "txt_workcat")
