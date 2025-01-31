@@ -13,8 +13,8 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 SELECT plan(6);
 
 
-INSERT INTO v_edit_review_node (node_id, top_elev, ymax, node_type, matcat_id, nodecat_id, annotation, observ, review_obs, expl_id, the_geom, field_date, field_checked, is_validated)
-VALUES('-901', 0, 0, '', '', '', '', '', '', 0, null, null, false, 0);
+INSERT INTO v_edit_review_node (node_id, top_elev, ymax, node_type, matcat_id, nodecat_id, annotation, observ, expl_id, the_geom, field_date, field_checked, is_validated)
+VALUES('-901', 0, 0, '', '', '', '', '', 0, null, null, false, 0);
 
 SELECT is((SELECT count(*)::integer FROM v_edit_review_node  WHERE node_id = '-901'), 1, 'INSERT: v_edit_review_node  -901 was inserted');
 SELECT is((SELECT count(*)::integer FROM review_node WHERE node_id = '-901'), 1, 'INSERT: review_node -901 was inserted');

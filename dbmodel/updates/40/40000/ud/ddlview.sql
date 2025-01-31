@@ -6313,6 +6313,8 @@ AS SELECT inp_pump.arc_id,
      LEFT JOIN v_rpt_pumping_sum USING (arc_id);
 	 
 	 
+DROP VIEW IF EXISTS v_edit_review_node;
+
 CREATE OR REPLACE VIEW v_edit_review_node
 AS SELECT review_node.node_id,
     review_node.top_elev,
@@ -6320,13 +6322,8 @@ AS SELECT review_node.node_id,
     review_node.node_type,
     review_node.matcat_id,
     review_node.nodecat_id,
-    review_node.step_pp,
-    review_node.step_fe,
-    review_node.step_replace,
-    review_node.cover,
     review_node.annotation,
     review_node.observ,
-    review_node.review_obs,
     review_node.expl_id,
     review_node.the_geom,
     review_node.field_date,
