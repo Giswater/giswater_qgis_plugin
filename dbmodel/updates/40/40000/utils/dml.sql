@@ -1140,3 +1140,9 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'check_project', 'tab_data', 'admin_check', 'lyt_data_1', 4, NULL, 'check', 'Check admin data:', NULL, NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"minRole": "role_admin"}'::json, NULL, NULL, false, 1);
 
 UPDATE config_form_fields SET columnname='conneccat_id' WHERE formname='v_edit_link' AND formtype='form_feature' AND columnname='connecat_id' AND tabname='tab_none';
+
+
+-- 31/01/2025
+INSERT INTO sys_function
+(id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source")
+VALUES(3380, 'gw_fct_getlayerstofilter', 'utils', 'function', 'json', 'json', 'Function to filter WMS layers with imported columns', 'role_basic', NULL, 'core');
