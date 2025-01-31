@@ -3135,3 +3135,8 @@ UPDATE config_param_system SET value='{"sys_display_name":"concat(connec_id, '' 
 UPDATE config_form_fields SET datatype = 'integer', widgettype = 'combo', label = 'Verified', tooltip = 'verified', iseditable = true,
 dv_querytext = 'SELECT id, idval FROM edit_typevalue WHERE typevalue = ''value_verified''',
 dv_orderby_id = true, dv_isnullvalue = true, widgetcontrols = '{"setMultiline": false, "labelPosition": "top"}'::json WHERE columnname = 'verified';
+
+-- 31/01/2025
+
+UPDATE config_csv SET descript='The csv file must have the following fields:
+dscenario_name, feature_id, feature_type, value, demand_type, pattern_id, source' WHERE fid=501;
