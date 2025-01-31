@@ -6332,7 +6332,7 @@ AS SELECT review_node.node_id,
     review_node.field_date,
     review_node.field_checked,
     review_node.is_validated
-   FROM flwregreview_node,
-    flwregselector_expl
+   FROM review_node,
+    selector_expl
   WHERE selector_expl.cur_user = "current_user"()::text AND review_node.expl_id = selector_expl.expl_id;
 
