@@ -6313,7 +6313,7 @@ AS SELECT inp_pump.arc_id,
      LEFT JOIN v_rpt_pumping_sum USING (arc_id);
 	 
 	 
-CREATE OR REPLACE VIEW flwregv_edit_review_node
+CREATE OR REPLACE VIEW v_edit_review_node
 AS SELECT review_node.node_id,
     review_node.top_elev,
     review_node.ymax,

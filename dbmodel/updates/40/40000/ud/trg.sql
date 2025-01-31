@@ -330,4 +330,4 @@ ON v_edit_macrosector
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_macrosector('EDIT');
 
 CREATE TRIGGER gw_trg_edit_review_node instead OF INSERT OR DELETE OR UPDATE
-ON flwregv_edit_review_node FOR EACH ROW EXECUTE FUNCTION flwreggw_trg_edit_review_node();
+ON v_edit_review_node FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_review_node();
