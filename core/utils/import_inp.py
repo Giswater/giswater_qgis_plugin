@@ -234,4 +234,35 @@ def _set_combo_values_from_epanet_catalogs(self_cls, catalogs):
                 combo.setCurrentText(pipe_catalog)
 
 def _set_combo_values_from_swmm_catalogs(self_cls, catalogs):
-    tools_qgis.show_warning("Catalogs are not implemented for SWMM yet", dialog=self_cls.dlg_config)
+    # Set features
+    for feature_type, (combo,) in self_cls.tbl_elements["features"].items():
+        feat_catalog = catalogs.get("features", {}).get(str(feature_type))
+        if feat_catalog:
+            combo.setCurrentText(feat_catalog)
+
+    # Set materials
+    for roughness, (combo,) in self_cls.tbl_elements["materials"].items():
+        material_catalog = catalogs.get("materials", {}).get(str(roughness))
+        if material_catalog:
+            combo.setCurrentText(material_catalog)
+
+    # Set nodes and arcs tables
+    elements = [
+        ("junctions", catalogs.get("junctions")),
+        ("outfalls", catalogs.get("outfalls")),
+        ("storage", catalogs.get("storage")),
+        ("dividers", catalogs.get("dividers")),
+        ("conduits", catalogs.get("conduits")),
+        ("pumps", catalogs.get("pumps")),
+        ("weirs", catalogs.get("weirs")),
+        ("orifices", catalogs.get("orifices")),
+        ("outlets", catalogs.get("outlets")),
+    ]
+
+    for element_type, element_catalog in elements:
+        if element_type not in self_cls.tbl_elements:
+            continue
+
+        combo: QComboBox = self_cls.tbl_elements[element_type][0]
+        if element_catalog:
+            combo.setCurrentText(element_catalog)
