@@ -503,27 +503,23 @@ class GwDscenarioManagerButton(GwAction):
         """ Fill btn_create QMenu """
 
         # Functions
-        values = []
+        sql = "SELECT id, alias FROM config_toolbox WHERE "
+
         if global_vars.project_type == 'ws':
-            values.append([3134, "Create empty dscenario"])
-            values.append([3110, "Create from CRM"])
-            values.append([3112, "Create demand from ToC"])
-            values.append([3108, "Create network from ToC"])
-            values.append([3158, "Create from Mincut"])
+            sql += "id IN (3134, 3110, 3112, 3108, 3158)"
         if global_vars.project_type == 'ud':
             if view == 'v_edit_cat_hydrology':
-                values.append([3290, "Create empty hydrology scenario"])
-                # values.append([3290, "Create hydrology scenario values"])
+                sql += "id IN (3290)"
             elif view == 'v_edit_cat_dwf':
-                values.append([3292, "Create empty dwf scenario"])
-                # values.append([3292, "Create dwf scenario values"])
+                sql += "id IN (3292)"
             elif view == 'v_edit_cat_dscenario':
-                values.append([3134, "Create empty dscenario"])
-                values.append([3118, "Create from ToC"])
+                sql += "id IN (3134, 3118)"
 
+        sql += " AND active"
+        rows = tools_db.get_rows(sql)
         # Create and populate QMenu
         create_menu = QMenu()
-        for value in values:
+        for value in rows:
             num = value[0]
             label = value[1]
             action = create_menu.addAction(f"{label}")
