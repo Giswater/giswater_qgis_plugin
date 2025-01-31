@@ -1271,7 +1271,7 @@ def enable_widgets(dialog, result, enable):
                         widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(110, 110, 110)}")
                         if type(widget) == GwHyperLinkLineEdit:
                             widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242); color:blue; text-decoration: underline; border: none;}")
-                    elif type(widget) in (QComboBox, QCheckBox, QgsDateTimeEdit):
+                    elif type(widget) in (QComboBox, QCheckBox, QgsDateTimeEdit) or isinstance(widget, QComboBox) or isinstance(widget, QgsDateTimeEdit):
                         widget.setEnabled(enable)
                         widget.setStyleSheet("QWidget {color: rgb(110, 110, 110)}")
                     elif type(widget) is QPushButton:
@@ -1305,7 +1305,7 @@ def enable_all(dialog, result):
                         else:
                             widget.setFocusPolicy(Qt.StrongFocus)
                             widget.setStyleSheet(None)
-                    elif type(widget) in (QComboBox, QgsDateTimeEdit):
+                    elif type(widget) in (QComboBox, QgsDateTimeEdit) or isinstance(widget, QComboBox) or isinstance(widget, QgsDateTimeEdit):
                         widget.setEnabled(field['iseditable'])
                         widget.setStyleSheet(None)
                         widget.setFocusPolicy(Qt.StrongFocus if field['iseditable'] else Qt.NoFocus)
@@ -1679,7 +1679,7 @@ def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None, module
                     widget.stateChanged.connect(partial(get_dialog_changed_values, dialog, None, widget, field, _json))
                     widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
                 elif field['widgettype'] == 'datetime':
-                    widget = QgsDateTimeEdit()
+                    widget = CustomQgsDateTimeEdit()
                     widget.setAllowNull(True)
                     widget.setCalendarPopup(True)
                     widget.setDisplayFormat('yyyy/MM/dd')
@@ -1723,7 +1723,7 @@ def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None, module
                     if type(widget) == QLineEdit:
                         if 'placeholder' in field:
                             widget.setPlaceholderText(field['placeholder'])
-                elif type(widget) in (QComboBox, QCheckBox):
+                elif type(widget) in (QComboBox, QCheckBox) or isinstance(widget, QComboBox):
                     if iseditable in (False, "False"):
                         widget.setEnabled(False)
                 widget.setObjectName(field['widgetname'])
@@ -1817,7 +1817,7 @@ def get_dialog_changed_values(dialog, chk, widget, field, list, value=None):
     elem = {}
     if type(widget) is QLineEdit:
         value = tools_qt.get_text(dialog, widget, return_string_null=False)
-    elif type(widget) is QComboBox:
+    elif type(widget) is QComboBox or isinstance(widget, QComboBox):
         value = tools_qt.get_combo_value(dialog, widget, 0)
     elif type(widget) is QCheckBox:
         value = tools_qt.is_checked(dialog, widget)
@@ -1967,7 +1967,7 @@ def get_values(dialog, widget, _json=None, ignore_editability=False):
         if widget.isReadOnly() and not ignore_editability:
             return _json
         value = tools_qt.get_text(dialog, widget, return_string_null=False)
-    elif type(widget) is QComboBox:
+    elif type(widget) is QComboBox or isinstance(widget, QComboBox):
         if not widget.isEnabled() and not ignore_editability:
             return _json
         value = tools_qt.get_combo_value(dialog, widget, 0)
@@ -1977,7 +1977,7 @@ def get_values(dialog, widget, _json=None, ignore_editability=False):
         value = tools_qt.is_checked(dialog, widget)
         if value is not None:
             value = str(value).lower()
-    elif type(widget) is QgsDateTimeEdit:
+    elif type(widget) is QgsDateTimeEdit or isinstance(widget, QgsDateTimeEdit):
         if not widget.isEnabled() and not ignore_editability:
             return _json
         value = tools_qt.get_calendar_date(dialog, widget)
@@ -2135,7 +2135,7 @@ def add_hyperlink(field):
 def add_calendar(dlg, fld, **kwargs):
 
     module = tools_backend_calls
-    widget = QgsDateTimeEdit()
+    widget = CustomQgsDateTimeEdit()
     widget.setObjectName(fld['widgetname'])
     if 'widgetcontrols' in fld and fld['widgetcontrols']:
         widget.setProperty('widgetcontrols', fld['widgetcontrols'])
@@ -2366,7 +2366,7 @@ def add_frame(field, x=None):
 
 
 def add_combo(field, dialog=None, complet_result=None, ignore_function=False, class_info=None):
-    widget = QComboBox()
+    widget = CustomQComboBox()
     widget.setObjectName(field['widgetname'])
     if 'widgetcontrols' in field and field['widgetcontrols']:
         widget.setProperty('widgetcontrols', field['widgetcontrols'])
@@ -4730,9 +4730,9 @@ def set_filter_listeners(complet_result, dialog, widget_list, columnname, widget
             if function_name:
                 if type(widget) is QLineEdit:
                     widget.textChanged.connect(partial(getattr(module, function_name), **kwargs))
-                elif type(widget) is QComboBox:
+                elif type(widget) is QComboBox or isinstance(widget, QComboBox):
                     widget.currentIndexChanged.connect(partial(getattr(module, function_name), **kwargs))
-                elif type(widget) is QgsDateTimeEdit:
+                elif type(widget) is QgsDateTimeEdit or isinstance(widget, QgsDateTimeEdit):
                     widget.setDate(QDate.currentDate())
                     widget.dateChanged.connect(partial(getattr(module, function_name), **kwargs))
                 elif type(widget) is QSpinBox:
@@ -4747,7 +4747,7 @@ def set_filter_listeners(complet_result, dialog, widget_list, columnname, widget
         if type(last_widget) is QLineEdit:
             text = tools_qt.get_text(dialog, last_widget, False, False)
             last_widget.textChanged.emit(text)
-        elif type(last_widget) is QComboBox:
+        elif type(last_widget) is QComboBox or isinstance(last_widget, QComboBox):
             last_widget.currentIndexChanged.emit(last_widget.currentIndex())
 
 def manage_dlg_widgets(class_object, dialog, complet_result):
@@ -5126,5 +5126,34 @@ def _show_context_menu(self, qtableview):
                         menu.addAction(action)                                                      
 
         menu.exec(QCursor.pos())
+
+# endregion
+
+
+# region Custom Classes
+
+""" Custom classes to disable wheel scroll event when the widget is not fucused """
+
+class CustomQComboBox(QComboBox):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)          
+        self.setFocusPolicy(Qt.StrongFocus)
+
+    def wheelEvent(self, *args, **kwargs):
+        if self.hasFocus():
+            return QComboBox.wheelEvent(self, *args, **kwargs)
+        else:
+            return
+        
+class CustomQgsDateTimeEdit(QgsDateTimeEdit):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)          
+        self.setFocusPolicy(Qt.StrongFocus)
+
+    def wheelEvent(self, *args, **kwargs):
+        if self.hasFocus():
+            return QgsDateTimeEdit.wheelEvent(self, *args, **kwargs)
+        else:
+            return
 
 # endregion
