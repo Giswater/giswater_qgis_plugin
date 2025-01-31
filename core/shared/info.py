@@ -386,11 +386,11 @@ class GwInfo(QObject):
             value = None
             if type(widget) in (QLineEdit, QPushButton, QSpinBox, QDoubleSpinBox):
                 value = tools_qt.get_text(dialog, widget, return_string_null=False)
-            elif type(widget) is QComboBox or isinstance(widget, QComboBox):
+            elif isinstance(widget, QComboBox):
                 value = tools_qt.get_combo_value(dialog, widget, 0)
             elif type(widget) is QCheckBox:
                 value = tools_qt.is_checked(dialog, widget)
-            elif type(widget) is QgsDateTimeEdit or isinstance(widget, QgsDateTimeEdit):
+            elif isinstance(widget, QgsDateTimeEdit):
                 value = tools_qt.get_calendar_date(dialog, widget)
             else:
                 if widget is None:
@@ -1507,7 +1507,7 @@ class GwInfo(QObject):
                 widget = dialog.findChild(QWidget, tab_type + "_" + fields_aux[i])
                 if tools_qt.get_widget_type(dialog, widget) is QLineEdit:
                     tools_qt.set_widget_text(dialog, widget, str(snapped_feature_attr_aux[i]))
-                elif tools_qt.get_widget_type(dialog, widget) is QComboBox or isinstance(tools_qt.get_widget_type(dialog, widget), QComboBox):
+                elif isinstance(tools_qt.get_widget_type(dialog, widget), QComboBox):
                     tools_qt.set_combo_value(widget, str(snapped_feature_attr_aux[i]), 0)
 
         self._manage_disable_copy_paste(dialog, emit_point)
@@ -2895,9 +2895,9 @@ class GwInfo(QObject):
                       "feature_id": self.feature_id, "func_params": func_params, "field_id": field_id}
             if type(widget) is QLineEdit:
                 widget.textChanged.connect(partial(getattr(tools_backend_calls, widgetfunction), **kwargs))
-            elif type(widget) is QComboBox or isinstance(widget, QComboBox):
+            elif isinstance(widget, QComboBox):
                 widget.currentIndexChanged.connect(partial(getattr(tools_backend_calls, widgetfunction), **kwargs))
-            elif type(widget) is QgsDateTimeEdit or isinstance(widget, QgsDateTimeEdit):
+            elif isinstance(widget, QgsDateTimeEdit):
                 widget.setDate(QDate.currentDate())
                 widget.dateChanged.connect(partial(getattr(tools_backend_calls, widgetfunction), **kwargs))
 
@@ -2910,7 +2910,7 @@ class GwInfo(QObject):
             if type(last_widget) is QLineEdit:
                 text = tools_qt.get_text(dialog, last_widget, False, False)
                 last_widget.textChanged.emit(text)
-            elif type(last_widget) is QComboBox or isinstance(last_widget, QComboBox):
+            elif isinstance(last_widget, QComboBox):
                 last_widget.currentIndexChanged.emit(last_widget.currentIndex())
 
 
@@ -3066,7 +3066,7 @@ class GwInfo(QObject):
                 tools_qt.set_completer_object(QCompleter(), QStringListModel(), widget, field['comboIds'])
                 tools_qt.set_widget_text(self.dlg_cf, widget, field['selectedId'])
                 self.my_json[str(widget.property('columnname'))] = field['selectedId']
-            elif type(widget) == QComboBox or isinstance(widget, QComboBox):
+            elif isinstance(widget, QComboBox):
                 widget = tools_gw.fill_combo(widget, field)
                 widget.setProperty('selectedId', field['selectedId'])
                 self.my_json[str(widget.property('columnname'))] = field['selectedId']

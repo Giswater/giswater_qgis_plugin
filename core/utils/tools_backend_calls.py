@@ -16,7 +16,6 @@ from qgis.PyQt.QtGui import QStandardItemModel
 from qgis.PyQt.QtWidgets import QComboBox, QDateEdit, QLineEdit, QMessageBox, QTableView, QWidget, QDoubleSpinBox, QSpinBox
 from qgis.core import QgsEditorWidgetSetup, QgsFieldConstraints, QgsMessageLog, QgsLayerTreeLayer, QgsVectorLayer, QgsDataSourceUri
 from qgis.gui import QgsDateTimeEdit
-from qgis.PyQt.QtWidgets import QComboBox
 
 from ... import global_vars
 from ..shared.document import GwDocument
@@ -842,11 +841,11 @@ def get_filter_qtableview(dialog, widget_list, complet_result, filter_fields = '
             if widget.property('widgetcontrols') is not None and 'columnId' in widget.property('widgetcontrols'):
                 if widget.property('widgetcontrols')['columnId'] is not None:
                     column_id = widget.property('widgetcontrols')['columnId']
-            if type(widget) == QComboBox or isinstance(widget, QComboBox):
+            if isinstance(widget, QComboBox):
                 value = tools_qt.get_combo_value(dialog, widget, column_id)
                 if value == -1:
                     value = None
-            elif type(widget) is QgsDateTimeEdit or isinstance(widget, QgsDateTimeEdit):
+            elif isinstance(widget, QgsDateTimeEdit):
                 value = tools_qt.get_calendar_date(dialog, widget, date_format='yyyy-MM-dd')
             else:
                 value = tools_qt.get_text(dialog, widget, False, False)
@@ -890,11 +889,11 @@ def get_filter_qtableview_mincut(dialog, widget_list, func_params, filter_fields
                     if widget.property('widgetcontrols') is not None and 'columnId' in widget.property('widgetcontrols'):
                         if widget.property('widgetcontrols')['columnId'] is not None:
                             column_id = widget.property('widgetcontrols')['columnId']
-                    if type(widget) == QComboBox or isinstance(widget, QComboBox):
+                    if isinstance(widget, QComboBox):
                         value = tools_qt.get_combo_value(dialog, widget, column_id)
                         if value == -1:
                             value = None
-                    elif type(widget) is QgsDateTimeEdit or isinstance(widget, QgsDateTimeEdit):
+                    elif isinstance(widget, QgsDateTimeEdit):
                         value = tools_qt.get_calendar_date(dialog, widget, date_format='yyyy-MM-dd')
                     else:
                         value = tools_qt.get_text(dialog, widget, False, False)
@@ -902,13 +901,13 @@ def get_filter_qtableview_mincut(dialog, widget_list, func_params, filter_fields
                     if value in (None, ''):
                         continue
 
-                    if type(widget) in (QDoubleSpinBox, QSpinBox, QgsDateTimeEdit) or isinstance(widget, QgsDateTimeEdit):
+                    if isinstance(widget, (QDoubleSpinBox, QSpinBox, QgsDateTimeEdit)):
                         if not widget.isEnabled():
                             continue
 
                     if widget.objectName() == "tab_none_spm_next_days":
                         filter_fields += filter_by_days(dialog, widget)
-                    elif type(widget) is QgsDateTimeEdit or isinstance(widget, QgsDateTimeEdit):
+                    elif isinstance(widget, QgsDateTimeEdit):
                         filter_fields += filter_by_dates(dialog, widget)
                     else:
                         filter_fields += f'"{columnname}":{{"value":"{value}","filterSign":"{filter_sign}"}}, '
