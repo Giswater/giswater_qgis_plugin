@@ -29,14 +29,13 @@ v_layers jsonb;
 v_cur_user text;
 v_layersFiltered text[] := ARRAY[]::text[];
 v_columns jsonb;
-v_schemaname text;
+v_schemaname text = 'SCHEMA_NAME';
 v_filter jsonb;
 
 BEGIN
 
 	-- Set search path to local schema
 	SET search_path = "SCHEMA_NAME", public;
-	v_schemaname = "SCHEMA_NAME";
 
 	--  get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row' INTO v_version;
