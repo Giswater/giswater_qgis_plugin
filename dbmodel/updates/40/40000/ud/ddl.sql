@@ -339,24 +339,18 @@ ALTER TABLE config_form_fields ENABLE TRIGGER gw_trg_config_control;
 -- Add flwreg as system type
 ALTER TABLE sys_feature_type DROP CONSTRAINT sys_feature_type_check;
 INSERT INTO sys_feature_type VALUES ('FLWREG', 5);
-ALTER TABLE sys_feature_type ADD CONSTRAINT sys_feature_type_check CHECK (((id)::text =
-ANY (ARRAY[('ARC'::character varying)::text, ('CONNEC'::character varying)::text, ('ELEMENT'::character varying)::text,
-('GULLY'::character varying)::text, ('LINK'::character varying)::text, ('NODE'::character varying)::text, ('VNODE'::character varying)::text,
-('FLWREG'::character varying)::text])));
+ALTER TABLE sys_feature_type ADD CONSTRAINT sys_feature_type_check CHECK (((id)::text =ANY (ARRAY['ARC'::text, 'CONNEC'::text, 'ELEMENT'::text,
+'GULLY'::text, 'LINK'::text, 'NODE'::text, 'VNODE'::text, 'FLWREG'::text])));
 
 -- Add flwregulators childs as feature_class
 ALTER TABLE sys_feature_class DROP CONSTRAINT sys_feature_cat_check;
-INSERT INTO sys_feature_class VALUES ('VFLWREG', 'FLWREG', 'ORIFICE', 'man_vflwreg');
-INSERT INTO sys_feature_class VALUES ('WEIR', 'FLWREG', 'WEIR', 'man_weir');
-INSERT INTO sys_feature_class VALUES ('PUMP', 'FLWREG', 'PUMP', 'man_pump');
-ALTER TABLE sys_feature_class ADD CONSTRAINT sys_feature_cat_check CHECK (((id)::text = ANY (ARRAY[('CHAMBER'::character varying)::text,
-('CONDUIT'::character varying)::text, ('CONNEC'::character varying)::text, ('GULLY'::character varying)::text,
-('JUNCTION'::character varying)::text, ('MANHOLE'::character varying)::text, ('NETELEMENT'::character varying)::text,
-('NETGULLY'::character varying)::text, ('NETINIT'::character varying)::text, ('OUTFALL'::character varying)::text,
-('SIPHON'::character varying)::text, ('STORAGE'::character varying)::text, ('VALVE'::character varying)::text,
-('VARC'::character varying)::text, ('WACCEL'::character varying)::text, ('WJUMP'::character varying)::text,
-('WWTP'::character varying)::text, ('ELEMENT'::character varying)::text, ('LINK'::character varying)::text,
-('VFLWREG'::character varying)::text, ('WEIR'::character varying)::text, ('PUMP'::character varying)::text])));
+INSERT INTO sys_feature_class VALUES ('FRORIFICE', 'FLWREG', 'ORIFICE', 'man_frorifice');
+INSERT INTO sys_feature_class VALUES ('FROUTLET', 'FLWREG', 'OUTLET', 'man_froutlet');
+INSERT INTO sys_feature_class VALUES ('FRWEIR', 'FLWREG', 'WEIR', 'man_frweir');
+INSERT INTO sys_feature_class VALUES ('FRPUMP', 'FLWREG', 'PUMP', 'man_frpump');
+ALTER TABLE sys_feature_class ADD CONSTRAINT sys_feature_cat_check CHECK (((id)::text = ANY (ARRAY['CHAMBER'::text, 'CONDUIT'::text, 'CONNEC'::text, 'GULLY'::text,
+'JUNCTION'::text, 'MANHOLE'::text, 'NETELEMENT'::text, 'NETGULLY'::text, 'NETINIT'::text, 'OUTFALL'::text, 'SIPHON'::text, 'STORAGE'::text, 'VALVE'::text,
+'VARC'::text, 'WACCEL'::text, 'WJUMP'::text, 'WWTP'::text, 'ELEMENT'::text, 'LINK'::text, 'FRORIFICE'::text, 'FROUTLET'::text, 'FRWEIR'::text, 'FRPUMP'::text])));
 
 -- 21/01/2025
 ALTER TABLE temp_node RENAME TO _temp_node;
@@ -464,6 +458,14 @@ CREATE INDEX temp_arc_dma_id ON temp_arc USING btree (dma_id);
 CREATE INDEX temp_arc_result_id ON temp_arc USING btree (result_id);
 
 -- 29/01/2025
+-- Add table for cat_feature_flwreg
+CREATE TABLE cat_feature_flwreg (
+	id varchar(30) NOT NULL,
+	epa_default varchar(30) NOT NULL,
+	CONSTRAINT cat_feature_flwreg_pkey PRIMARY KEY (id),
+	CONSTRAINT cat_feature_flwreg_fkey FOREIGN KEY (id) REFERENCES cat_feature(id) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT cat_feature_flwreg_inp_check CHECK (((epa_default)::text = ANY (ARRAY['WEIR'::text, 'ORIFICE'::text, 'PUMP'::text, 'OUTLET'::text, 'UNDEFINED'::text])))
+);
 --create parent table for flow regulators
 CREATE TABLE flwreg (
 	flwreg_id varchar(16) DEFAULT nextval('urn_id_seq'::regclass) NOT NULL,
@@ -481,7 +483,7 @@ CREATE TABLE flwreg (
 	the_geom public.geometry(linestring, SRID_VALUE) NOT NULL,
 	CONSTRAINT flwreg_epa_type_check CHECK (((epa_type)::text = ANY (ARRAY['WEIR'::text, 'ORIFICE'::text, 'PUMP'::text, 'OUTLET'::text, 'UNDEFINED'::text]))),
 	CONSTRAINT flwreg_pkey PRIMARY KEY (flwreg_id),
-	CONSTRAINT flwreg_type_fkey FOREIGN KEY (flwreg_type) REFERENCES cat_feature(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT flwreg_type_fkey FOREIGN KEY (flwreg_type) REFERENCES cat_feature_flwreg(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT flwreg_node_id_fkey FOREIGN KEY (node_id) REFERENCES node(node_id) ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
@@ -513,15 +515,6 @@ DROP TABLE IF EXISTS inp_flwreg_pump;
 DROP TABLE IF EXISTS inp_flwreg_outlet;
 DROP TABLE IF EXISTS inp_flwreg_orifice;
 DROP TABLE IF EXISTS inp_flwreg_weir;
-
--- Add table for cat_feature_flwreg
-CREATE TABLE cat_feature_flwreg (
-	id varchar(30) NOT NULL,
-	epa_default varchar(30) NOT NULL,
-	CONSTRAINT cat_feature_flwreg_pkey PRIMARY KEY (id),
-	CONSTRAINT cat_feature_flwreg_fkey FOREIGN KEY (id) REFERENCES cat_feature(id) ON DELETE CASCADE ON UPDATE CASCADE,
-	CONSTRAINT cat_feature_flwreg_inp_check CHECK (((epa_default)::text = ANY (ARRAY['WEIR'::text, 'ORIFICE'::text, 'PUMP'::text, 'OUTLET'::text, 'UNDEFINED'::text])))
-);
 
 CREATE TABLE inp_flwreg_outlet (
 	flwreg_id varchar(16) NOT NULL,
@@ -594,32 +587,32 @@ DROP TABLE IF EXISTS _inp_flwreg_weir;
 
 
 -- Create man table for flow regulators
-CREATE TABLE man_pump (
+CREATE TABLE man_frpump (
 	flwreg_id varchar(16) NOT NULL,
 	pump_class varchar(16) NOT NULL,
-	CONSTRAINT man_pump_pkey PRIMARY KEY (flwreg_id),
-	CONSTRAINT man_pump_flwreg_id_fk FOREIGN KEY (flwreg_id) REFERENCES flwreg(flwreg_id) ON DELETE CASCADE
+	CONSTRAINT man_frpump_pkey PRIMARY KEY (flwreg_id),
+	CONSTRAINT man_frpump_flwreg_id_fk FOREIGN KEY (flwreg_id) REFERENCES flwreg(flwreg_id) ON DELETE CASCADE
 );
 
-CREATE TABLE man_weir(
+CREATE TABLE man_frweir(
 	flwreg_id varchar(16) NOT NULL,
 	weir_class varchar(16) NOT NULL,
-	CONSTRAINT man_weir_pkey PRIMARY KEY (flwreg_id),
-	CONSTRAINT man_weir_flwreg_id_fk FOREIGN KEY (flwreg_id) REFERENCES flwreg(flwreg_id) ON DELETE CASCADE
+	CONSTRAINT man_frweir_pkey PRIMARY KEY (flwreg_id),
+	CONSTRAINT man_frweir_flwreg_id_fk FOREIGN KEY (flwreg_id) REFERENCES flwreg(flwreg_id) ON DELETE CASCADE
 );
 
-CREATE TABLE man_outlet (
+CREATE TABLE man_froutlet (
 	flwreg_id varchar(16) NOT NULL,
 	outlet_class varchar(16) NOT NULL,
 	CONSTRAINT outlet_type_pkey PRIMARY KEY (flwreg_id),
 	CONSTRAINT outlet_type_flwreg_id_fk FOREIGN KEY (flwreg_id) REFERENCES flwreg(flwreg_id) ON DELETE CASCADE
 );
 
-CREATE TABLE man_orifice (
+CREATE TABLE man_frorifice (
 	flwreg_id varchar(16) NOT NULL,
 	orifice_class varchar(16) NOT NULL,
-	CONSTRAINT man_orifice_pkey PRIMARY KEY (flwreg_id),
-	CONSTRAINT man_orifice_flwreg_id_fk FOREIGN KEY (flwreg_id) REFERENCES flwreg(flwreg_id) ON DELETE CASCADE
+	CONSTRAINT man_frorifice_pkey PRIMARY KEY (flwreg_id),
+	CONSTRAINT man_frorifice_flwreg_id_fk FOREIGN KEY (flwreg_id) REFERENCES flwreg(flwreg_id) ON DELETE CASCADE
 );
 
 -- 30/01/2025
@@ -705,4 +698,20 @@ CREATE TABLE review_audit_node (
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_chamber", "column":"height", "dataType":"numeric(12,4)"}}$$);
 
-
+CREATE TABLE cat_flwreg (
+	id varchar(30) NOT NULL,
+	flwreg_type text NULL,
+	matcat_id varchar(16) NULL,
+	descript varchar(255) NULL,
+	link varchar(512) NULL,
+	brand_id varchar(30) NULL,
+	model_id varchar(30) NULL,
+	cost_unit varchar(3) DEFAULT 'u'::character varying NULL,
+	"cost" varchar(16) NULL,
+	active bool DEFAULT true NULL,
+	CONSTRAINT cat_flwreg_pkey PRIMARY KEY (id),
+	CONSTRAINT cat_flwreg_brand_fkey FOREIGN KEY (brand_id) REFERENCES cat_brand(id) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT cat_flwreg_cost_fkey FOREIGN KEY ("cost") REFERENCES plan_price(id) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT cat_flwreg_model_fkey FOREIGN KEY (model_id) REFERENCES cat_brand_model(id) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT cat_flwreg_flwreg_type_fkey FOREIGN KEY (flwreg_type) REFERENCES cat_feature_flwreg(id) ON DELETE RESTRICT ON UPDATE CASCADE
+);

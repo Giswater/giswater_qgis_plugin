@@ -75,7 +75,7 @@ BEGIN
 	END IF;
 
 	-- check if to_arc is connected with node
-	IF v_arc_id NOT IN (SELECT arc_id FROM arc WHERE node_1 = v_feature_id AND state > 0 UNION SELECT arc_id FROM arc WHERE node_2 = v_feature_id AND state > 0) THEN				
+	IF v_arc_id NOT IN (SELECT arc_id FROM arc WHERE node_1 = v_feature_id AND state > 0 UNION SELECT arc_id FROM arc WHERE node_2 = v_feature_id AND state > 0) THEN
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                     "data":{"message":"3272", "function":"3006","parameters":null}}$$);';
 	END IF;
@@ -86,7 +86,7 @@ BEGIN
 		INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (359,1,
 		concat('Set to_arc for pump, ', v_feature_id, ' with value ',v_arc_id, '.'));
 
-		UPDATE man_pump SET to_arc = v_arc_id WHERE node_id = v_feature_id;
+		UPDATE man_frpump SET to_arc = v_arc_id WHERE node_id = v_feature_id;
 
 	ELSIF v_feature_class = 'VALVE' THEN
 

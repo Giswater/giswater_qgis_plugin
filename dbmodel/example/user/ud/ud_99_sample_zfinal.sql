@@ -39,8 +39,8 @@ UPDATE cat_arc SET geom2 = null WHERE id = 'EG150';
 
 
 -- refactoring flowregulators for node pump station on expl_1
-DELETE FROM inp_flwreg_weir where node_id = '238';
-DELETE FROM inp_flwreg_pump where node_id = '238';
+DELETE FROM inp_flwreg_weir where flwreg_id = (SELECT flwreg_id FROM flwreg WHERE node_id = '238');
+DELETE FROM inp_flwreg_pump where flwreg_id = (SELECT flwreg_id FROM flwreg WHERE node_id = '238');
 UPDATE v_edit_arc SET epa_type = 'PUMP' WHERE arc_id = '303';
 UPDATE inp_pump set curve_id = 'PUMP-01', status='OFF', startup=2, shutoff=0.4 WHERE arc_id = '303';
 UPDATE v_edit_arc SET epa_type = 'WEIR' WHERE arc_id = '342';
@@ -48,7 +48,7 @@ UPDATE inp_weir SET weir_type ='TRANSVERSE', offsetval = 17, cd=1.5, geom1=1, ge
 
 
 -- refactoring flowregulators form node weir of expl_1
-DELETE FROM inp_flwreg_weir where to_arc = '242';
+DELETE FROM inp_flwreg_weir where flwreg_id = (SELECT flwreg_id FROM flwreg WHERE to_arc = '242');;
 SELECT gw_fct_setarcfusion('{"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":[20587]},
 "data":{"workcatId":"work1","enddate":"2020-02-05", "arccat_id":"RC200", "action_mode": 2, "arc_type":"CONDUIT"}}'::json);
 SELECT gw_fct_setarcfusion('{"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":[20590]},
@@ -57,13 +57,6 @@ SELECT gw_fct_setarcfusion('{"client":{"device":4, "infoType":1, "lang":"ES"},"f
 DELETE FROM arc WHERE node_1 = '250';
 DELETE FROM arc WHERE node_2 = '250';
 DELETE FROM node WHERE node_id  = '250';
-
-
--- INSERT INTO inp_flwreg_weir VALUES ('237', '100014', 1, 0.5, 'TRANSVERSE', 16.3500, 1.5000, NULL, NULL, 'NO', 2.0000, 1.0000, 0.0000, 0.0000, NULL, NULL, NULL, NULL,'237WE1');
-
---INSERT INTO inp_flwreg_weir VALUES (1,'237', '100014', 1, 0.5, 'TRANSVERSE', 16.3500, 1.5000, NULL, NULL, 'NO', 2.0000, 1.0000, 0.0000, 0.0000, NULL, NULL, NULL, NULL,'237WE1');
-
-
 
 UPDATE config_param_user SET value ='PARTIAL' WHERE parameter = 'inp_options_inertial_damping';
 

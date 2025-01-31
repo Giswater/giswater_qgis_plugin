@@ -73,7 +73,7 @@ BEGIN
 		IF v_project_type = 'WS' THEN
 
 			-- mapzones
-			FOREACH v_zone IN ARRAY '{sector, dma, presszone, dqa}'::text[] 
+			FOREACH v_zone IN ARRAY '{sector, dma, presszone, dqa}'::text[]
 			LOOP
 
 				--update toArc value with newly created arc id
@@ -85,9 +85,9 @@ BEGIN
 				AND (elem::json->>''toArc'') ilike ''%'||v_arc_id_old||'%'')a';
 				raise notice ' %', v_querytext;
 				EXECUTE v_querytext;
-				
+
 			END LOOP;
-		
+
 			-- man values
 			UPDATE man_pump SET to_arc = v_arc_id_new WHERE to_arc = v_arc_id_old AND node_id = v_node_id_old;
 			UPDATE man_valve SET to_arc = v_arc_id_new WHERE to_arc = v_arc_id_old AND node_id = v_node_id_old;
@@ -101,10 +101,10 @@ BEGIN
 
 
 		END IF;
-			
+
 
 	ELSIF v_action = 'updateNode' THEN
-	
+
 		IF v_project_type='WS' THEN
 
 			-- mapzones
@@ -117,17 +117,17 @@ BEGIN
 				cross join json_array_elements((graphconfig->>''use'')::json) elem
 				where elem->>''nodeParent'' = '||quote_literal(v_node_id_old)||')a';
 			END LOOP;
-			
+
 		ELSIF  v_project_type='UD' THEN
-		
+
 				--update nodeParent value with newly created node
 				EXECUTE 'UPDATE drainzone set graphconfig = replace(graphconfig::text,a.nodeparent,'||v_node_id_new||'::text)::json FROM (
 				select json_array_elements_text((elem->>''toArc'')::json) as toarc, elem->>''nodeParent'' as nodeparent
 				from drainzone
 				cross join json_array_elements((graphconfig->>''use'')::json) elem
-				where elem->>''nodeParent'' = '||quote_literal(v_node_id_old)||')a';		
+				where elem->>''nodeParent'' = '||quote_literal(v_node_id_old)||')a';
 		END IF;
-		
+
 	END IF;
 
 	IF v_audit_result is null THEN
@@ -136,21 +136,21 @@ BEGIN
 	    v_message = 'Process done successfully';
 	ELSE
 
-	    SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'status')::text INTO v_status; 
+	    SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'status')::text INTO v_status;
 	    SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'level')::integer INTO v_level;
 	    SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'message')::text INTO v_message;
 	END IF;
 
-	v_result_info := COALESCE(v_result, '{}'); 
+	v_result_info := COALESCE(v_result, '{}');
 	v_result_info = concat ('{"geometryType":"", "values":',v_result_info, '}');
 
 	v_result_point = '{"geometryType":"", "features":[]}';
 	v_result_line = '{"geometryType":"", "features":[]}';
 	v_result_polygon = '{"geometryType":"", "features":[]}';
 
-	v_status := COALESCE(v_status, '{}'); 
-	v_level := COALESCE(v_level, '0'); 
-	v_message := COALESCE(v_message, '{}'); 
+	v_status := COALESCE(v_status, '{}');
+	v_level := COALESCE(v_level, '0');
+	v_message := COALESCE(v_message, '{}');
 
 	--  Return
 	RETURN gw_fct_json_create_return(('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||

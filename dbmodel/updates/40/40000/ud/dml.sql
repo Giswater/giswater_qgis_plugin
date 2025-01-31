@@ -2421,56 +2421,42 @@ INSERT INTO sys_feature_epa_type VALUES ('WEIR', 'FLWREG', 'inp_flwreg_weir', nu
 INSERT INTO sys_feature_epa_type VALUES ('OUTLET', 'FLWREG', 'inp_flwreg_outlet', null, true) ON CONFLICT (id, feature_type) DO NOTHING;
 
 -- Adding flowregulator objects on cat_feature [Modified from first version]
-ALTER TABLE cat_feature DISABLE TRIGGER gw_trg_cat_feature_after;
 
-INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer,  active)
-VALUES ('FRORIFICE', 'VFLWREG','FLWREG', 'v_edit_flwreg', true);
-
-INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer,  active)
-VALUES ('FROUTLET', 'VFLWREG','FLWREG', 'v_edit_flwreg', true);
-
-INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, active)
-VALUES ('FRWEIR', 'WEIR','FLWREG', 'v_edit_flwreg',  true);
-
-INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer,  active)
-VALUES ('FRPUMP', 'PUMP','FLWREG', 'v_edit_flwreg',  true);
-
-ALTER TABLE cat_feature ENABLE TRIGGER gw_trg_cat_feature_after;
+INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) VALUES ('FRORIFICE', 'FRORIFICE', 'FLWREG', 'v_edit_flwreg', 've_flwreg_frorifice', true) ON CONFLICT (id) DO NOTHING;
+INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) VALUES ('FROUTLET', 'FROUTLET', 'FLWREG', 'v_edit_flwreg', 've_flwreg_froutlet', true) ON CONFLICT (id) DO NOTHING;
+INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) VALUES ('FRWEIR', 'FRWEIR', 'FLWREG', 'v_edit_flwreg', 've_flwreg_frweir', true) ON CONFLICT (id) DO NOTHING;
+INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) VALUES ('FRPUMP', 'FRPUMP', 'FLWREG', 'v_edit_flwreg', 've_flwreg_frpump', true) ON CONFLICT (id) DO NOTHING;
 
 -- Adding objects on config_info_layer and config_info_layer_x_type (this both tables controls the button info)
 INSERT INTO config_info_layer VALUES ('v_edit_flwreg', TRUE, 'flwreg', TRUE, 'info_generic', 'Flow regulator', 4);
-INSERT INTO config_info_layer_x_type VALUES ('ve_flwreg_frorifice', 1, 've_flwreg_frorifice');
-INSERT INTO config_info_layer_x_type VALUES ('ve_flwreg_frweir', 1, 've_flwreg_frweir');
-INSERT INTO config_info_layer_x_type VALUES ('ve_flwreg_froutlet', 1, 've_flwreg_froutlet');
-INSERT INTO config_info_layer_x_type VALUES ('ve_flwreg_frpump', 1, 've_flwreg_frpump');
 
 -- Insert on config_form_fields for parent view
 -- copying columns from some random child (all childs has same columns that parent)
 INSERT INTO config_form_fields
 SELECT 'v_edit_flwreg', formtype, tabname, columnname, layoutname, layoutorder , "datatype", widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter,
 dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols , widgetfunction, linkedobject, hidden, web_layoutorder
-FROM config_form_fields WHERE formname = 'v_edit_inp_flwreg_pump' AND columnname IN ('nodarc_id','order_id','to_arc','flwreg_length');
+FROM config_form_fields WHERE formname = 'v_edit_inp_flwreg_frpump' AND columnname IN ('nodarc_id','order_id','to_arc','flwreg_length');
 
 -- Insert on config_form_fields for child views
 INSERT INTO config_form_fields
 SELECT 've_flwreg_frorifice', formtype, tabname, columnname, layoutname, layoutorder , "datatype", widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter,
 dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols , widgetfunction, linkedobject, hidden, web_layoutorder
-FROM config_form_fields WHERE formname = 'v_edit_inp_flwreg_orifice' AND columnname != 'close_time';
+FROM config_form_fields WHERE formname = 'v_edit_inp_flwreg_frorifice' AND columnname != 'close_time';
 
 INSERT INTO config_form_fields
 SELECT 've_flwreg_frweir', formtype, tabname, columnname, layoutname, layoutorder , "datatype", widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter,
 dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols , widgetfunction, linkedobject, hidden, web_layoutorder
-FROM config_form_fields WHERE formname = 'v_edit_inp_flwreg_weir';
+FROM config_form_fields WHERE formname = 'v_edit_inp_flwreg_frweir';
 
 INSERT INTO config_form_fields
 SELECT 've_flwreg_froutlet', formtype, tabname, columnname, layoutname, layoutorder , "datatype", widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter,
 dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols , widgetfunction, linkedobject, hidden, web_layoutorder
-FROM config_form_fields WHERE formname = 'v_edit_inp_flwreg_outlet';
+FROM config_form_fields WHERE formname = 'v_edit_inp_flwreg_froutlet';
 
 INSERT INTO config_form_fields
 SELECT 've_flwreg_frpump', formtype, tabname, columnname, layoutname, layoutorder , "datatype", widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter,
 dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols , widgetfunction, linkedobject, hidden, web_layoutorder
-FROM config_form_fields WHERE formname = 'v_edit_inp_flwreg_pump';
+FROM config_form_fields WHERE formname = 'v_edit_inp_flwreg_frpump';
 
 --Adding flwregtype on forms for flowregulators
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent,
@@ -2512,22 +2498,22 @@ INSERT INTO sys_table (id, descript, sys_role, criticity, context, orderby, alia
 VALUES('v_edit_flwreg', 'View to edit flowregulators.', 'role_epa', NULL, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"FLOW REGULATORS"}', 1, 'Flow regulator (parent)', NULL, NULL, NULL, 'core', '{
   "pkey": "nodarc_id"
 }'::json);
-INSERT INTO sys_table (id, descript, sys_role, criticity, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam)
-VALUES('ve_flwreg_frweir', 'View to edit flowregulators for weir.', 'role_epa', NULL, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"FLOW REGULATORS"}', 5, 'Weir', NULL, NULL, NULL, 'core', '{
-  "pkey": "nodarc_id"
-}'::json);
-INSERT INTO sys_table (id, descript, sys_role, criticity, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam)
-VALUES('v_edit_flwreg_froutlet', 'View to edit flowregulators for outlet.', 'role_epa', NULL, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"FLOW REGULATORS"}', 3, 'Outlet', NULL, NULL, NULL, 'core', '{
-  "pkey": "nodarc_id"
-}'::json);
-INSERT INTO sys_table (id, descript, sys_role, criticity, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam)
-VALUES('ve_flwreg_frpump', 'View to edit flowregulators for pumps.', 'role_epa', NULL, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"FLOW REGULATORS"}', 4, 'Pump', NULL, NULL, NULL, 'core', '{
-  "pkey": "nodarc_id"
-}'::json);
-INSERT INTO sys_table (id, descript, sys_role, criticity, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam)
-VALUES('ve_flwreg_frorifice', 'View to edit flowregulators for orifice.', 'role_epa', NULL, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"FLOW REGULATORS"}', 2, 'Orifice', NULL, NULL, NULL, 'core', '{
-  "pkey": "nodarc_id"
-}'::json);
+-- INSERT INTO sys_table (id, descript, sys_role, criticity, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam)
+-- VALUES('ve_flwreg_frweir', 'View to edit flowregulators for weir.', 'role_epa', NULL, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"FLOW REGULATORS"}', 5, 'Weir', NULL, NULL, NULL, 'core', '{
+--   "pkey": "nodarc_id"
+-- }'::json);
+-- INSERT INTO sys_table (id, descript, sys_role, criticity, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam)
+-- VALUES('v_edit_flwreg_froutlet', 'View to edit flowregulators for outlet.', 'role_epa', NULL, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"FLOW REGULATORS"}', 3, 'Outlet', NULL, NULL, NULL, 'core', '{
+--   "pkey": "nodarc_id"
+-- }'::json);
+-- INSERT INTO sys_table (id, descript, sys_role, criticity, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam)
+-- VALUES('ve_flwreg_frpump', 'View to edit flowregulators for pumps.', 'role_epa', NULL, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"FLOW REGULATORS"}', 4, 'Pump', NULL, NULL, NULL, 'core', '{
+--   "pkey": "nodarc_id"
+-- }'::json);
+-- INSERT INTO sys_table (id, descript, sys_role, criticity, context, orderby, alias, notify_action, isaudit, keepauditdays, "source", addparam)
+-- VALUES('ve_flwreg_frorifice', 'View to edit flowregulators for orifice.', 'role_epa', NULL, '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"FLOW REGULATORS"}', 2, 'Orifice', NULL, NULL, NULL, 'core', '{
+--   "pkey": "nodarc_id"
+-- }'::json);
 
 --Edit button for flwreg
 INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('v_edit_flwreg', 'tab_none', NULL, NULL, 'role_epa', NULL, '[
@@ -2569,3 +2555,15 @@ old_annotation, new_annotation, old_observ, new_observ, review_obs, expl_id, the
 SELECT id, node_id, old_top_elev, new_top_elev, old_ymax, new_ymax, old_node_type, new_node_type, old_matcat_id, new_matcat_id, old_nodecat_id, new_nodecat_id,
 old_annotation, new_annotation, old_observ, new_observ, review_obs, expl_id, the_geom, review_status_id, field_date, field_user, is_validated
 FROM _review_audit_node;
+
+UPDATE config_form_fields SET dv_querytext='SELECT nodarc_id as id, nodarc_id as idval FROM flwreg WHERE flwreg_type = ''FRORIFICE'' AND nodarc_id IS NOT NULL'
+WHERE formname='v_edit_inp_dscenario_flwreg_orifice' AND columnname='nodarc_id';
+
+UPDATE config_form_fields SET dv_querytext='SELECT nodarc_id as id, nodarc_id as idval FROM flwreg WHERE flwreg_type = ''FROUTLET'' AND nodarc_id IS NOT NULL'
+WHERE formname='v_edit_inp_dscenario_flwreg_outlet' AND columnname='nodarc_id';
+
+UPDATE config_form_fields SET dv_querytext='SELECT nodarc_id as id, nodarc_id as idval FROM flwreg WHERE flwreg_type = ''FRPUMP'' AND nodarc_id IS NOT NULL'
+WHERE formname='v_edit_inp_dscenario_flwreg_pump' AND columnname='nodarc_id';
+
+UPDATE config_form_fields SET dv_querytext='SELECT nodarc_id as id, nodarc_id as idval FROM flwreg WHERE flwreg_type = ''FRWEIR'' AND nodarc_id IS NOT NULL'
+WHERE formname='v_edit_inp_dscenario_flwreg_weir' AND columnname='nodarc_id';
