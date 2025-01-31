@@ -6311,3 +6311,28 @@ AS SELECT inp_pump.arc_id,
     v_rpt_pumping_sum.timoff_max
    FROM inp_pump
      LEFT JOIN v_rpt_pumping_sum USING (arc_id);
+	 
+	 
+CREATE OR REPLACE VIEW flwregv_edit_review_node
+AS SELECT review_node.node_id,
+    review_node.top_elev,
+    review_node.ymax,
+    review_node.node_type,
+    review_node.matcat_id,
+    review_node.nodecat_id,
+    review_node.step_pp,
+    review_node.step_fe,
+    review_node.step_replace,
+    review_node.cover,
+    review_node.annotation,
+    review_node.observ,
+    review_node.review_obs,
+    review_node.expl_id,
+    review_node.the_geom,
+    review_node.field_date,
+    review_node.field_checked,
+    review_node.is_validated
+   FROM flwregreview_node,
+    flwregselector_expl
+  WHERE selector_expl.cur_user = "current_user"()::text AND review_node.expl_id = selector_expl.expl_id;
+
