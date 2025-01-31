@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 3380
 
-DROP FUNCTION SCHEMA_NAME.gw_fct_getlayerstofilter(json);
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_fct_getlayerstofilter(json);
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getlayerstofilter(p_data json)
  RETURNS json
