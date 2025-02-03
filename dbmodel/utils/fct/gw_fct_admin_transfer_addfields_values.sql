@@ -67,13 +67,14 @@ BEGIN
         -- check cat_feature_id null on sys_addfields
         FOR rec_sa_featurestypes IN
             SELECT sa.param_name, sa.feature_type, sa.datatype_id FROM sys_addfields sa
-            WHERE sa.feature_type != 'CHILD'
+            WHERE sa.feature_type != 'CHILD' AND sa.active
         LOOP
             IF rec_sa_featurestypes.feature_type = 'ALL' THEN
                 -- create all addfields tables for everything in cat_feature
                 FOR rec_sa IN
                     SELECT cf.id, cf.feature_type FROM cat_feature cf
                     WHERE feature_class <> 'LINK' AND child_layer IS NOT NULL
+                    AND cf.active
                 LOOP
                     v_feature_childtable_name := 'man_' || lower(rec_sa.feature_type) || '_' || lower(rec_sa.id);
 
@@ -211,6 +212,7 @@ BEGIN
                 SELECT sa.param_name, sa.datatype_id, cf.id, cf.feature_type FROM sys_addfields sa
                 INNER JOIN cat_feature cf ON cf.id = sa.cat_feature_id
                 WHERE sa.feature_type = 'CHILD'
+                AND sa.active AND cf.active
                 ORDER BY sa.orderby
             LOOP
                 v_feature_childtable_name := 'man_' || lower(rec_sa.feature_type) || '_' || lower(rec_sa.id);
@@ -246,7 +248,8 @@ BEGIN
             FROM _man_addfields_value_ mav
             INNER JOIN sys_addfields sa ON sa.id = mav.parameter_id
             INNER JOIN cat_feature cf ON cf.id = sa.cat_feature_id
-            WHERE mav.value_param is not null
+            WHERE mav.value_param IS NOT NULL
+            AND sa.active AND cf.active
             ORDER BY sa.param_name
         LOOP
             v_feature_childtable_name := 'man_' || lower(rec_mav.feature_type) || '_' || lower(rec_mav.id);
