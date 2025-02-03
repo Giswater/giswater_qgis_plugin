@@ -249,3 +249,10 @@ ON v_ui_sector FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_sector('UI');
 -- delete duplicated triggers
 DROP TRIGGER IF EXISTS gw_trg_edit_macrosector ON v_edit_macrosector;
 DROP TRIGGER IF EXISTS gw_trg_edit_macrodma ON v_edit_macrodma;
+
+CREATE TRIGGER gw_trg_typevalue_fk_insert AFTER INSERT
+ON supplyzone FOR EACH ROW EXECUTE FUNCTION gw_trg_typevalue_fk('supplyzone');
+
+CREATE TRIGGER gw_trg_typevalue_fk_update AFTER UPDATE OF supplyzone_type
+ON supplyzone FOR EACH ROW WHEN (((old.supplyzone_type)::TEXT IS DISTINCT
+FROM (new.supplyzone_type)::TEXT)) EXECUTE FUNCTION gw_trg_typevalue_fk('supplyzone');

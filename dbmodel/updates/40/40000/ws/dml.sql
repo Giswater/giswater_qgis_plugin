@@ -3045,6 +3045,9 @@ INSERT INTO config_form_fields VALUES ('v_ui_sector','form_feature','tab_none','
 INSERT INTO config_form_fields VALUES ('v_ui_sector','form_feature','tab_none','avg_press','lyt_data_1',14,'numeric','text','average pressure','avg_press', NULL,false,false,true,false,false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL);
 INSERT INTO config_form_fields VALUES ('v_ui_sector','form_feature','tab_none','link','lyt_data_1',15,'text','text','link','link', NULL,false,false,true,false, NULL, NULL, NULL, NULL, NULL, NULL, NULL,'{"setMultiline":false}'::json, NULL, NULL,false, NULL);
 
+-- Update mapzone sector widgets
+UPDATE config_form_fields SET label='macrosector', tooltip='macrosector' WHERE formname='v_ui_sector' AND formtype='form_feature' AND columnname='macrosector' AND tabname='tab_none';
+
 -- Insert missing mapzone dma widgets
 INSERT INTO config_form_fields VALUES ('v_ui_dma','form_feature','tab_none','muni_id','lyt_data_1',4,'text','text','muni_id','muni_id','1,2',false,false,true,false, NULL,'SELECT muni_id as id, name as idval FROM ext_municipality WHERE muni_id IS NOT NULL',true,false, NULL, NULL,'{"label":"color:red; font-weight:bold"}'::json,'{"setMultiline": false, "valueRelation":{"nullValue":false, "layer": "v_edit_exploitation", "activated": true, "keyColumn": "expl_id", "valueColumn": "name", "filterExpression": null}}'::json, NULL, NULL,false, NULL);
 INSERT INTO config_form_fields VALUES ('v_ui_dma','form_feature','tab_none','sector_id','lyt_data_1',6,'text','text','sector_id','sector_id','1,2',false,false,true,false, NULL,'SELECT sector_id as id, name as idval FROM sector WHERE sector_id IS NOT NULL',true,false, NULL, NULL,'{"label":"color:red; font-weight:bold"}'::json,'{"setMultiline": false, "valueRelation":{"nullValue":false, "layer": "v_edit_exploitation", "activated": true, "keyColumn": "expl_id", "valueColumn": "name", "filterExpression": null}}'::json, NULL, NULL,false, NULL);
