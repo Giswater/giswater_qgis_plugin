@@ -79,7 +79,6 @@ class GwMapzoneManager:
 
         # Connect signals
         self.mapzone_mng_dlg.txt_name.textChanged.connect(partial(self._txt_name_changed))
-        self.mapzone_mng_dlg.chk_show_all.toggled.connect(partial(self._manage_current_changed))
         self.mapzone_mng_dlg.btn_execute.clicked.connect(partial(self._open_mapzones_analysis))
         self.mapzone_mng_dlg.btn_config.clicked.connect(partial(self.manage_config, self.mapzone_mng_dlg, None))
         self.mapzone_mng_dlg.btn_toggle_active.clicked.connect(partial(self._manage_toggle_active))
@@ -102,7 +101,7 @@ class GwMapzoneManager:
         """ Creates rubberband to indicate which feature is selected """
 
         tools_gw.reset_rubberband(self.rubber_band)
-        table = view.replace("v_ui", "v_edit")
+        table = view
         feature_type = 'feature_id'
 
         for x in self.feature_types:
@@ -111,7 +110,7 @@ class GwMapzoneManager:
                 feature_type = x
                 break
         if feature_type != 'feature_id':
-            table = f"v_edit_{feature_type.split('_')[0]}"
+            table = f"v_ui_{feature_type.split('_')[0]}"
         tools_qgis.highlight_feature_by_id(qtableview, table, feature_type, self.rubber_band, 5, index)
 
     def _txt_name_changed(self, text):
@@ -146,30 +145,19 @@ class GwMapzoneManager:
         if self.mapzone_mng_dlg is None or isdeleted(self.mapzone_mng_dlg):
             return
 
+        # Get the table name
         self.table_name = f"{self.mapzone_mng_dlg.main_tab.currentWidget().objectName()}"
         widget = self.mapzone_mng_dlg.main_tab.currentWidget()
 
         if self.schema_name not in self.table_name:
             self.table_name = self.schema_name + "." + self.table_name
 
-        show_all = tools_qt.is_checked(self.mapzone_mng_dlg, 'chk_show_all')
         # Set model
         model = QSqlTableModel(db=lib_vars.qgis_db_credentials)
-        table_name = self.table_name
-        if show_all:
-            table_name = table_name.replace('v_ui_', 'vu_')
-        model.setTable(table_name)
-        # model.setFilter(f"dscenario_id = {self.selected_dscenario_id}")
+        model.setTable(self.table_name)
         model.setEditStrategy(QSqlTableModel.OnFieldChange)
         model.setSort(0, 0)
         model.select()
-        # # Set item delegates
-        # readonly_delegate = ReadOnlyDelegate(widget)
-        # widget.setItemDelegateForColumn(0, readonly_delegate)
-        # widget.setItemDelegateForColumn(1, readonly_delegate)
-        # editable_delegate = EditableDelegate(widget)
-        # for x in range(2, model.columnCount()):
-        #     widget.setItemDelegateForColumn(x, editable_delegate)
 
         # Check for errors
         if model.lastError().isValid():
@@ -177,6 +165,8 @@ class GwMapzoneManager:
                 tools_db.reset_qsqldatabase_connection(self.mapzone_mng_dlg)
             else:
                 tools_qgis.show_warning(model.lastError().text(), dialog=self.mapzone_mng_dlg)
+            return
+
         # Attach model to table view
         if expr:
             widget.setModel(model)
@@ -803,7 +793,7 @@ class GwMapzoneManager:
     def _manage_toggle_active(self):
         # Get selected row
         tableview = self.mapzone_mng_dlg.main_tab.currentWidget()
-        view = tableview.objectName().replace('tbl_', '').replace('v_ui_', 'v_edit_')
+        view = tableview.objectName().replace('tbl_', '')
         selected_list = tableview.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
@@ -828,7 +818,7 @@ class GwMapzoneManager:
 
         if tableview is None:
             tableview = dialog.main_tab.currentWidget()
-        tablename = tableview.objectName().replace('tbl_', '').replace('v_ui_', 'v_edit_')
+        tablename = tableview.objectName().replace('tbl_', '')
         field_id = tableview.model().headerData(0, Qt.Horizontal)
 
         # Execute getinfofromid
@@ -848,7 +838,7 @@ class GwMapzoneManager:
         # Get selected row
         if tableview is None:
             tableview = dialog.main_tab.currentWidget()
-        tablename = tableview.objectName().replace('tbl_', '').replace('v_ui_', 'v_edit_')
+        tablename = tableview.objectName().replace('tbl_', '')
         selected_list = tableview.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
@@ -884,7 +874,7 @@ class GwMapzoneManager:
     def _manage_delete(self):
         # Get selected row
         tableview = self.mapzone_mng_dlg.main_tab.currentWidget()
-        view = tableview.objectName().replace('tbl_', '').replace('v_ui_', 'v_edit_')
+        view = tableview.objectName().replace('tbl_', '')
         selected_list = tableview.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1003</width>
+    <width>1089</width>
     <height>786</height>
    </rect>
   </property>
@@ -26,8 +26,8 @@
       <string/>
      </property>
      <layout class="QGridLayout" name="verticalLayout_3">
-      <item row="5" column="10">
-       <widget class="QPushButton" name="btn_delete">
+      <item row="5" column="7">
+       <widget class="QPushButton" name="btn_create">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -35,11 +35,37 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Delete</string>
+         <string>Create</string>
         </property>
        </widget>
       </item>
-      <item row="5" column="7">
+      <item row="5" column="5">
+       <widget class="QPushButton" name="btn_config">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Config</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="8">
+       <widget class="QPushButton" name="btn_update">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Update</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="6">
        <widget class="QPushButton" name="btn_toggle_active">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -52,8 +78,32 @@
         </property>
        </widget>
       </item>
-      <item row="6" column="0" colspan="11">
-       <widget class="QTabWidget" name="main_tab"/>
+      <item row="5" column="4">
+       <widget class="QPushButton" name="btn_execute">
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="2">
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>80</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="4" column="0" colspan="2">
+       <widget class="QLabel" name="lbl_mapzone_name">
+        <property name="text">
+         <string>Filter by: Mapzone name</string>
+        </property>
+       </widget>
       </item>
       <item row="5" column="0">
        <widget class="QLineEdit" name="txt_name">
@@ -68,59 +118,10 @@
         </property>
        </widget>
       </item>
-      <item row="5" column="6">
-       <widget class="QPushButton" name="btn_config">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string>Config</string>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="9">
-       <widget class="QPushButton" name="btn_update">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string>Update</string>
-        </property>
-       </widget>
+      <item row="6" column="0" colspan="10">
+       <widget class="QTabWidget" name="main_tab"/>
       </item>
       <item row="5" column="3">
-       <spacer name="horizontalSpacer_2">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>80</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item row="5" column="8">
-       <widget class="QPushButton" name="btn_create">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string>Create</string>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="4">
        <widget class="QLabel" name="lbl_vdefault_workspace">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
@@ -133,13 +134,6 @@
         </property>
        </widget>
       </item>
-      <item row="5" column="5">
-       <widget class="QPushButton" name="btn_execute">
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
       <item row="5" column="1">
        <widget class="QCheckBox" name="chk_active">
         <property name="text">
@@ -147,20 +141,16 @@
         </property>
        </widget>
       </item>
-      <item row="4" column="0" colspan="2">
-       <widget class="QLabel" name="lbl_mapzone_name">
-        <property name="text">
-         <string>Filter by: Mapzone name</string>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="2">
-       <widget class="QCheckBox" name="chk_show_all">
-        <property name="toolTip">
-         <string>Show all mapzones without user selection</string>
+      <item row="5" column="9">
+       <widget class="QPushButton" name="btn_delete">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
         </property>
         <property name="text">
-         <string>Show all mapzones</string>
+         <string>Delete</string>
         </property>
        </widget>
       </item>

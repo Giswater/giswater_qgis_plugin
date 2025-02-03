@@ -814,29 +814,6 @@ class GwAdminButton:
                 self.dlg_readsql.btn_info.setEnabled(False)
             tools_qt.enable_dialog(self.dlg_readsql, True)
 
-        # Check postgis extension and create if not exist
-        postgis_extension = tools_db.check_postgis_version()
-        if postgis_extension and self.form_enabled:
-            sql = "CREATE EXTENSION IF NOT EXISTS POSTGIS;"
-            tools_db.execute_sql(sql)
-            self.postgis_version = tools_db.get_postgis_version()
-            # Check postGis version
-            major_version = self.postgis_version.split(".")
-            if int(major_version[0]) >= 3:
-                sql = f"CREATE EXTENSION IF NOT EXISTS postgis_raster;"
-                tools_db.execute_sql(sql)
-        elif self.form_enabled:
-            self.form_enabled = False
-            message = "Unable to create Postgis extension. Packages must be installed, consult your administrator."
-        # Check fuzzystrmatch extension and create if not exist
-        fuzzystrmatch_extension = tools_db.check_pg_extension('fuzzystrmatch')
-        if fuzzystrmatch_extension and self.form_enabled:
-            sql = "CREATE EXTENSION IF NOT EXISTS fuzzystrmatch;"
-            tools_db.execute_sql(sql)
-        elif self.form_enabled:
-            self.form_enabled = False
-            message = "Unable to create fuzzystrmatch extension. Packages must be installed, consult your administrator."
-
         if self.form_enabled is False:
             ignore_widgets =  ['cmb_connection', 'btn_gis_create', 'cmb_project_type', 'project_schema_name']
             tools_qt.enable_dialog(self.dlg_readsql, False, ignore_widgets)
@@ -1289,23 +1266,6 @@ class GwAdminButton:
                 message = "Incompatible version of PostgreSQL"
                 self.form_enabled = False
 
-            # Check postgis extension and create if not exist
-            postgis_extension = tools_db.check_postgis_version()
-            if postgis_extension and self.form_enabled:
-                sql = "CREATE EXTENSION IF NOT EXISTS POSTGIS;"
-                tools_db.execute_sql(sql)
-            elif self.form_enabled:
-                message = "Unable to create Postgis extension. Packages must be installed, consult your administrator."
-                self.form_enabled = False
-            # Check fuzzystrmatch extension and create if not exist
-            fuzzystrmatch_extension = tools_db.check_pg_extension('fuzzystrmatch')
-            if fuzzystrmatch_extension and self.form_enabled:
-                sql = "CREATE EXTENSION IF NOT EXISTS fuzzystrmatch;"
-                tools_db.execute_sql(sql)
-            elif self.form_enabled:
-                self.form_enabled = False
-                message = "Unable to create fuzzystrmatch extension. Packages must be installed, consult your administrator."
-
             if self.form_enabled is False:
                 ignore_widgets = ['cmb_connection', 'btn_gis_create', 'cmb_project_type', 'project_schema_name']
                 tools_qt.enable_dialog(self.dlg_readsql, False, ignore_widgets)
@@ -1561,16 +1521,28 @@ class GwAdminButton:
         if schema_name == 'null' and self.form_enabled:
             tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
             tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_schema_name, '')
+
         elif str(plugin_version) > str(project_version) and self.form_enabled:
             self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
             tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
                                      '(Schema version is lower than plugin version, please update schema)')
             self.dlg_readsql.btn_info.setEnabled(True)
+
         elif str(plugin_version) < str(project_version) and self.form_enabled:
             self.dlg_readsql.lbl_status.setPixmap(self.status_no_update)
             tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
                                      '(Schema version is higher than plugin version, please update plugin)')
             self.dlg_readsql.btn_info.setEnabled(False)
+
+        elif self.postgresql_version is None or self.postgis_version is None or self.pgrouting_version is None:
+            ignore_widgets = ['cmb_connection', 'btn_gis_create', 'cmb_project_type', 'project_schema_name']
+            tools_qt.enable_dialog(self.dlg_readsql, False, ignore_widgets)
+            self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
+            tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text,
+                                      '(Unable to create one extension. Packages must be installed, consult your administrator)')
+            tools_qt.set_widget_text(self.dlg_readsql, 'lbl_schema_name', '')
+
+
         elif self.form_enabled:
             self.dlg_readsql.lbl_status.setPixmap(self.status_ok)
             tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
