@@ -46,6 +46,10 @@ class GwImportEpanet:
         self.file_path: Optional[Path] = None
         self.cur_process = None
         self.cur_text = None
+        self.catalog_source = {
+            "pumps": "db_arcs",
+            "valves": "db_arcs"
+        }
 
     def clicked_event(self) -> None:
         """Start the Import INP workflow"""
@@ -532,13 +536,20 @@ class GwImportEpanet:
 
         self.catalogs = Catalogs.from_network_model(self.parse_inp_task.network)
 
+        # Get pumps and valves catalog source
+        catalog_source = self.catalog_source.get("pumps", "db_arcs")
+        pump_catalog = getattr(self.catalogs, catalog_source)
+
+        catalog_source = self.catalog_source.get("valves", "db_arcs")
+        valve_catalog = getattr(self.catalogs, catalog_source)
+
         # Fill nodes and arcs tables
         elements = [
             ("junctions", self.catalogs.inp_junctions, self.catalogs.db_nodes),
             ("reservoirs", self.catalogs.inp_reservoirs, self.catalogs.db_nodes),
             ("tanks", self.catalogs.inp_tanks, self.catalogs.db_nodes),
-            ("pumps", self.catalogs.inp_pumps, self.catalogs.db_arcs),
-            ("valves", self.catalogs.inp_valves, self.catalogs.db_arcs),
+            ("pumps", self.catalogs.inp_pumps, pump_catalog),
+            ("valves", self.catalogs.inp_valves, valve_catalog),
         ]
 
         for element_type, element_catalog, db_catalog in elements:
@@ -679,6 +690,9 @@ class GwImportEpanet:
         tbl = self.dlg_config.tbl_arcs if feature_type == "ARC" else self.dlg_config.tbl_nodes
         other_tbl = self.dlg_config.tbl_nodes if feature_type == "ARC" else self.dlg_config.tbl_arcs
 
+        # Update the catalog source based on the feature type
+        self.catalog_source[element_type] = "db_arcs" if feature_type == "ARC" else "db_nodes"
+
         # Fill table with pumps and valves
         elements = [
             ("pumps", self.catalogs.inp_pumps, "PUMP"),
@@ -735,6 +749,9 @@ class GwImportEpanet:
                                     'import_inp', f'tbl_{feature_type.lower()}_cmb_{element.lower()}_toggle_enabled_new_catalog_field')
 
             self.tbl_elements[element] = (combo_cat, new_cat_name)
+
+        # Reload the combo boxes
+        self._fill_combo_boxes()
 
     def _get_config_values(self):
         workcat = tools_qt.get_text(self.dlg_config, "txt_workcat")
