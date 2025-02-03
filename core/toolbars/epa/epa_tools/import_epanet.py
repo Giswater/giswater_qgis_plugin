@@ -677,14 +677,28 @@ class GwImportEpanet:
             return
         feature_type = feature_type[0]
         tbl = self.dlg_config.tbl_arcs if feature_type == "ARC" else self.dlg_config.tbl_nodes
-
-        # TODO: remove row from other table
+        other_tbl = self.dlg_config.tbl_nodes if feature_type == "ARC" else self.dlg_config.tbl_arcs
 
         # Fill table with pumps and valves
         elements = [
             ("pumps", self.catalogs.inp_pumps, "PUMP"),
             ("valves", self.catalogs.inp_valves, "VALVE"),
         ]
+
+        # Find the tag for the given element_type
+        tag = None
+        for element, rec_catalog, element_tag in elements:
+            if element == element_type:
+                tag = element_tag
+                break
+        if tag is None:
+            return
+
+        # Remove existing row for the element
+        for row in range(other_tbl.rowCount()):
+            if other_tbl.item(row, 0) and other_tbl.item(row, 0).text() == tag:
+                other_tbl.removeRow(row)
+                break
 
         for element, rec_catalog, tag in elements:
             if element != element_type:
