@@ -61,7 +61,7 @@ class GwMapzoneManager:
         default_tab_idx = 0
         tabs = ['sector', 'dma', 'presszone', 'dqa', 'supplyzone', 'macrodma', 'macrosector']
         if global_vars.project_type == 'ud':
-            tabs = ['drainzone']
+            tabs = ['drainzone', 'macrosector', 'sector', 'dwfzone']
         for tab in tabs:
             view = f'v_ui_{tab}'
             qtableview = QTableView()
@@ -1313,7 +1313,7 @@ class GwMapzoneManager:
             return
 
         # Change format when expl_id is an array
-        if tablename != 'v_ui_macrodma':
+        if tablename != 'v_ui_macrodma' and tablename != 'v_ui_drainzone' and tablename != 'v_ui_dwfzone':
             if 'expl_id' in my_json:
                 expl_id = my_json['expl_id']
                 if expl_id is not None:
