@@ -47,12 +47,12 @@ class GwMenuLoad(QObject):
         if project_loaded:
 
             # region Actions
-            actions_menu = QMenu(f"Actions", self.iface.mainWindow().menuBar())
+            actions_menu = QMenu(tools_qt.tr("Actions"), self.iface.mainWindow().menuBar())
             actions_menu.setIcon(config_icon)
             self.main_menu.addMenu(actions_menu)
 
             # Action 'Get help'
-            action_help = actions_menu.addAction(f"Get help")
+            action_help = actions_menu.addAction(tools_qt.tr("Get help"))
             action_help_shortcut = tools_gw.get_config_parser("actions_shortcuts", f"shortcut_help", "user", "init", prefix=False)
             if not action_help_shortcut:
                 tools_gw.set_config_parser("actions_shortcuts", f"shortcut_help", f"{action_help_shortcut}", "user", "init",
@@ -61,11 +61,11 @@ class GwMenuLoad(QObject):
             action_help.triggered.connect(tools_gw.open_dlg_help)
 
             # Action 'Reset dialogs'
-            action_reset_dialogs = actions_menu.addAction(f"Reset dialogs")
+            action_reset_dialogs = actions_menu.addAction(tools_qt.tr("Reset dialogs"))
             action_reset_dialogs.triggered.connect(self._reset_position_dialog)
 
             # Action 'Reset plugin
-            action_reset_plugin = actions_menu.addAction(f"Reset plugin")
+            action_reset_plugin = actions_menu.addAction(tools_qt.tr("Reset plugin"))
             action_reset_plugin_shortcut = tools_gw.get_config_parser("actions_shortcuts", f"shortcut_reset_plugin",
                 "user", "init", prefix=False)
             if not action_reset_plugin_shortcut:
@@ -75,7 +75,7 @@ class GwMenuLoad(QObject):
             action_reset_plugin.triggered.connect(self._reset_plugin)
 
             # Action 'Show current selectors'
-            action_open_selections = actions_menu.addAction(f"Show current selectors")
+            action_open_selections = actions_menu.addAction(tools_qt.tr("Show current selectors"))
             action_open_selections_shortcut = tools_gw.get_config_parser("actions_shortcuts",
                 f"shortcut_open_curselectors", "user", "init", prefix=False)
             if not action_open_selections_shortcut:
@@ -85,7 +85,7 @@ class GwMenuLoad(QObject):
             action_open_selections.triggered.connect(self._open_current_selections)
 
             # Action 'Toggle Log DB'
-            action_set_log_sql = actions_menu.addAction(f"Toggle Log DB")
+            action_set_log_sql = actions_menu.addAction(tools_qt.tr("Toggle Log DB"))
             log_sql_shortcut = tools_gw.get_config_parser("actions_shortcuts", f"shortcut_toggle_log_db", "user", "init", prefix=False)
             if not log_sql_shortcut:
                 tools_gw.set_config_parser("actions_shortcuts", f"shortcut_toggle_log_db", f"{log_sql_shortcut}", "user",
@@ -99,13 +99,13 @@ class GwMenuLoad(QObject):
         if lib_vars.plugin_dir:
             icon_path = f"{icon_folder}{os.sep}dialogs{os.sep}108.png"
             folder_icon = QIcon(icon_path)
-            action_open_plugin_path = self.main_menu.addAction(f"Open plugin folder")
+            action_open_plugin_path = self.main_menu.addAction(tools_qt.tr("Open plugin folder"))
             action_open_plugin_path.setIcon(folder_icon)
             action_open_plugin_path.triggered.connect(self._open_plugin_path)
         # endregion
 
         # region Advanced
-        action_manage_file = self.main_menu.addAction(f"Advanced")
+        action_manage_file = self.main_menu.addAction(tools_qt.tr("Advanced"))
         action_manage_file.triggered.connect(self._open_manage_file)
         icon_path = f"{icon_folder}{os.sep}dialogs{os.sep}105.png"
         folder_icon = QIcon(icon_path)
@@ -119,7 +119,8 @@ class GwMenuLoad(QObject):
             log_folder_volume = f"{round(size / (1024 * 1024), 2)} MB"
             icon_path = f"{icon_folder}{os.sep}dialogs{os.sep}102.png"
             folder_icon = QIcon(icon_path)
-            action_open_path = self.main_menu.addAction(f"Open user folder ({log_folder_volume})")
+            open_user_folder = tools_qt.tr("Open user folder")
+            action_open_path = self.main_menu.addAction(f"{open_user_folder} ({log_folder_volume})")
             action_open_path.setIcon(folder_icon)
             action_open_path.triggered.connect(self._open_config_path)
         # endregion
