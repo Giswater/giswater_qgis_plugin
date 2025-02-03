@@ -665,3 +665,6 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"conn
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"samplepoint", "column":"verified", "dataType":"integer"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"element", "column":"verified", "dataType":"integer"}}$$);
+
+-- 31/01/2025
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"presszone", "column":"undelete", "dataType":"boolean"}}$$);
