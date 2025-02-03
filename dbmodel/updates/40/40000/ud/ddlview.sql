@@ -156,6 +156,29 @@ AS SELECT sector.sector_id,
     sector
   WHERE sector.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
 
+CREATE OR REPLACE VIEW v_ui_sector
+AS SELECT s.sector_id,
+    s.name,
+    s.sector_type,
+    ms.name AS macrosector,
+    s.descript,
+    s.active,
+    s.undelete,
+    s.graphconfig,
+    s.stylesheet,
+    s.parent_id,
+    s.tstamp,
+    s.insert_user,
+    s.lastupdate,
+    s.lastupdate_user,
+    s.link
+    FROM selector_sector ss,
+    sector s
+     LEFT JOIN macrosector ms ON ms.macrosector_id = s.macrosector_id
+  WHERE s.sector_id > 0 AND ss.sector_id = s.sector_id AND ss.cur_user = CURRENT_USER
+  ORDER BY s.sector_id;
+
+
 
 -- recreate v_edit_element, v_edit_samplepoint, v_ext_streetaxis, v_ext_municipality views
 -----------------------------------
@@ -370,6 +393,23 @@ AS SELECT drainzone.drainzone_id,
     drainzone
     LEFT JOIN edit_typevalue et ON et.id::text = drainzone.drainzone_type::text AND et.typevalue::text = 'drainzone_type'::text
   WHERE drainzone.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
+
+CREATE OR REPLACE VIEW v_edit_dwfzone
+AS SELECT d.dwfzone_id,
+    d.name,
+    d.expl_id,
+    d.descript,
+    d.undelete,
+    et.idval as dwfzone_type,
+    d.link,
+    d.graphconfig::text AS graphconfig,
+    d.stylesheet::text AS stylesheet,
+    d.active,
+    d.the_geom
+   FROM selector_expl e,
+    dwfzone d
+    LEFT JOIN edit_typevalue et ON et.id::text = d.dwfzone_type::text AND et.typevalue::text = 'dwfzone_type'::text
+  WHERE d.expl_id = e.expl_id AND e.cur_user = "current_user"()::text;
 
 
 -- recreate all deleted views: arc, node, connec, gully and dependencies
@@ -5958,43 +5998,52 @@ AS SELECT inp_loadings.subc_id,
 CREATE OR REPLACE VIEW v_ui_drainzone
 AS SELECT d.drainzone_id,
     d.name,
-    d.expl_id,
+    et.idval AS drainzone_type,
     d.descript,
     d.active,
     d.undelete,
-    d.link,
     d.graphconfig,
     d.stylesheet,
     d.tstamp,
     d.insert_user,
     d.lastupdate,
-    d.lastupdate_user
+    d.lastupdate_user,
+    d.link,
+    d.expl_id
    FROM drainzone d
+   LEFT JOIN edit_typevalue et ON et.id::text = d.drainzone_type::text AND et.typevalue::text = 'drainzone_type'::text
   WHERE d.drainzone_id > 0
   ORDER BY d.drainzone_id;
 
-CREATE OR REPLACE VIEW vu_drainzone
-AS SELECT d.drainzone_id,
+CREATE OR REPLACE VIEW v_ui_dwfzone
+AS SELECT d.dwfzone_id,
     d.name,
-    d.expl_id,
-    e.name AS exploitation_name,
-    et.idval AS drainzone_type,
+    et.idval AS dwfzone_type,
     d.descript,
     d.active,
     d.undelete,
-    d.link,
-    d.graphconfig::text AS graphconfig,
-    d.stylesheet::text AS stylesheet,
+    d.graphconfig,
+    d.stylesheet,
     d.tstamp,
     d.insert_user,
     d.lastupdate,
     d.lastupdate_user,
-    d.the_geom
-   FROM drainzone d
-     LEFT JOIN exploitation e USING (expl_id)
-     LEFT JOIN edit_typevalue et ON et.id::text = d.drainzone_type::text AND et.typevalue::text = 'drainzone_type'::text
-  ORDER BY d.drainzone_id;
+    d.link,
+    d.expl_id
+   FROM dwfzone d
+   LEFT JOIN edit_typevalue et ON et.id::text = d.dwfzone_type::text AND et.typevalue::text = 'dwfzone_type'::text
+  WHERE d.dwfzone_id > 0
+  ORDER BY d.dwfzone_id;
 
+CREATE OR REPLACE VIEW v_ui_macrosector
+AS SELECT m.macrosector_id,
+    m.name,
+    m.descript,
+    m.active,
+    m.undelete
+    FROM macrosector m
+    WHERE m.macrosector_id > 0
+    ORDER BY m.macrosector_id;
   -- 16/12/24
 
 CREATE OR REPLACE VIEW vu_element_x_node

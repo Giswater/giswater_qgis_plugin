@@ -715,3 +715,35 @@ CREATE TABLE cat_flwreg (
 	CONSTRAINT cat_flwreg_model_fkey FOREIGN KEY (model_id) REFERENCES cat_brand_model(id) ON DELETE CASCADE ON UPDATE CASCADE,
 	CONSTRAINT cat_flwreg_flwreg_type_fkey FOREIGN KEY (flwreg_type) REFERENCES cat_feature_flwreg(id) ON DELETE RESTRICT ON UPDATE CASCADE
 );
+
+-- 30/01/2025
+
+CREATE SEQUENCE IF NOT EXISTS dwfzone_dwfzone_id_seq
+    INCREMENT 1
+    START 1
+    MINVALUE 1
+    MAXVALUE 9223372036854775807
+    CACHE 1;
+
+CREATE TABLE dwfzone (
+	dwfzone_id serial4 NOT NULL,
+	"name" varchar(30) NULL,
+	expl_id int4 NULL,
+	descript text NULL,
+	undelete bool NULL,
+	the_geom public.geometry(multipolygon, 25831) NULL,
+	link text NULL,
+	graphconfig json DEFAULT '{"use":[{"nodeParent":""}], "ignore":[], "forceClosed":[]}'::json NULL,
+	stylesheet json NULL,
+	active bool DEFAULT true NULL,
+	tstamp timestamp DEFAULT now() NULL,
+	insert_user varchar(50) DEFAULT CURRENT_USER NULL,
+	lastupdate timestamp NULL,
+	lastupdate_user varchar(50) NULL,
+	dwfzone_type varchar(16) NULL,
+	CONSTRAINT dwfzone_pkey PRIMARY KEY (dwfzone_id)
+);
+
+-- 31/01/2025
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"sector", "column":"sector_type", "dataType":"varchar(50)"}}$$);

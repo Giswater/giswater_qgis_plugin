@@ -747,7 +747,7 @@ BEGIN
 			-- getting id from URN
 			IF v_id IS NULL AND v_isepa IS true THEN
 			    v_id = '';
-			ELSIF v_id IS NULL AND v_tablename in  ('v_ui_dma', 'v_ui_dqa', 'v_ui_sector', 'v_ui_drainzone', 'v_ui_supplyzone', 'v_ui_macrodma', 'v_ui_macrosector') THEN
+			ELSIF v_id IS NULL AND v_tablename in  ('v_ui_dma', 'v_ui_dqa', 'v_ui_sector', 'v_ui_drainzone', 'v_ui_supplyzone', 'v_ui_macrodma', 'v_ui_macrosector', 'v_ui_dwfzone') THEN
 				v_zone = replace(v_tablename,'v_ui_','');
 				v_id = (SELECT nextval(concat('SCHEMA_NAME.',v_zone,'_',v_zone,'_id_seq')));
 			ELSIF v_id IS NULL AND v_tablename = 'v_ui_presszone' THEN

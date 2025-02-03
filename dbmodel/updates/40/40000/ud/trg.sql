@@ -133,11 +133,14 @@ FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_link();
 CREATE TRIGGER gw_trg_edit_dma INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_dma
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_dma('dma');
 
-CREATE TRIGGER gw_trg_edit_drainzone INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_drainzone
-FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_drainzone();
+CREATE trigger gw_trg_edit_drainzone INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_drainzone
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_drainzone('EDIT');
 
-CREATE TRIGGER gw_trg_edit_sector INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_sector
-FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_sector('sector');
+CREATE trigger gw_trg_edit_sector INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_sector
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_sector('EDIT');
+
+CREATE TRIGGER gw_trg_v_edit_dwfzone INSTEAD OF INSERT OR DELETE OR UPDATE
+ON v_edit_dwfzone FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_dwfzone('EDIT');
 
 CREATE TRIGGER gw_trg_edit_review_gully INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_review_gully
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_review_gully();
@@ -316,6 +319,17 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_typevalue_fk('inp_flwreg_outlet');
 CREATE TRIGGER gw_trg_typevalue_fk_update AFTER UPDATE of outlet_type, flap on inp_flwreg_outlet
 FOR EACH ROW WHEN ((((old.outlet_type)::TEXT IS DISTINCT FROM (new.outlet_type)::text) or ((old.flap)::TEXT IS DISTINCT FROM (new.flap)::text))) EXECUTE FUNCTION gw_trg_typevalue_fk('inp_flwreg_outlet');
 
+CREATE trigger gw_trg_v_ui_drainzone INSTEAD OF INSERT OR UPDATE OR DELETE ON v_ui_drainzone
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_drainzone('UI');
+
+CREATE trigger gw_trg_v_ui_sector INSTEAD OF INSERT OR UPDATE OR DELETE ON v_ui_sector
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_sector('UI');
+
+CREATE trigger gw_trg_v_ui_macrosector INSTEAD OF INSERT OR UPDATE OR DELETE ON v_ui_macrosector
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_macrosector('UI');
+
+CREATE trigger gw_trg_v_ui_dwfzone INSTEAD OF INSERT OR UPDATE OR DELETE ON v_ui_dwfzone
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_dwfzone('UI');
 
 -- delete duplicated triggers
 DROP TRIGGER IF EXISTS gw_trg_edit_macrosector ON v_edit_macrosector;
@@ -331,3 +345,9 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_macrosector('EDIT');
 
 CREATE TRIGGER gw_trg_edit_review_node instead OF INSERT OR DELETE OR UPDATE
 ON v_edit_review_node FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_review_node();
+CREATE TRIGGER gw_trg_typevalue_fk_insert AFTER INSERT
+ON dwfzone FOR EACH ROW EXECUTE FUNCTION gw_trg_typevalue_fk('dwfzone');
+
+CREATE TRIGGER gw_trg_typevalue_fk_update AFTER UPDATE OF dwfzone_type
+ON dwfzone FOR EACH ROW WHEN (((old.dwfzone_type)::TEXT IS DISTINCT
+FROM (new.dwfzone_type)::TEXT)) EXECUTE FUNCTION gw_trg_typevalue_fk('dwfzone');

@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 3178
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_drainzone()  RETURNS trigger AS
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_dwfzone()  RETURNS trigger AS
 $BODY$
 
 DECLARE
@@ -41,15 +41,15 @@ BEGIN
 			END IF;
 		END IF;
 
-		INSERT INTO drainzone (drainzone_id, "name", expl_id, descript, undelete, link, graphconfig, stylesheet, drainzone_type)
-		VALUES (NEW.drainzone_id, NEW.name, NEW.expl_id, NEW.descript, NEW.undelete,
-		NEW.link, NEW.graphconfig::json, NEW.stylesheet::json, NEW.drainzone_type);
+		INSERT INTO dwfzone (dwfzone_id, "name", expl_id, descript, undelete, link, graphconfig, stylesheet, dwfzone_type)
+		VALUES (NEW.dwfzone_id, NEW.name, NEW.expl_id, NEW.descript, NEW.undelete,
+		NEW.link, NEW.graphconfig::json, NEW.stylesheet::json, NEW.dwfzone_type);
 
 		IF view_name = 'UI' THEN
-			UPDATE drainzone SET active = NEW.active WHERE drainzone_id = NEW.drainzone_id;
+			UPDATE dwfzone SET active = NEW.active WHERE dwfzone_id = NEW.dwfzone_id;
 
 		ELSIF view_name = 'EDIT' THEN
-			UPDATE drainzone SET the_geom = NEW.the_geom WHERE drainzone_id = NEW.drainzone_id;
+			UPDATE dwfzone SET the_geom = NEW.the_geom WHERE dwfzone_id = NEW.dwfzone_id;
 
 		END IF;
 
@@ -57,17 +57,17 @@ BEGIN
 
 	ELSIF TG_OP = 'UPDATE' THEN
 
-		UPDATE drainzone
-		SET drainzone_id=NEW.drainzone_id, name=NEW.name, expl_id=NEW.expl_id, descript=NEW.descript, undelete=NEW.undelete,
+		UPDATE dwfzone
+		SET dwfzone_id=NEW.dwfzone_id, name=NEW.name, expl_id=NEW.expl_id, descript=NEW.descript, undelete=NEW.undelete,
 		link=NEW.link, graphconfig=NEW.graphconfig::json, stylesheet=NEW.stylesheet::json, lastupdate=now(),
-		lastupdate_user = current_user, drainzone_type=NEW.drainzone_type
-		WHERE drainzone_id=OLD.drainzone_id;
+		lastupdate_user = current_user, dwfzone_type=NEW.dwfzone_type
+		WHERE dwfzone_id=OLD.dwfzone_id;
 
 		IF view_name = 'UI' THEN
-			UPDATE drainzone SET active = NEW.active WHERE drainzone_id = OLD.drainzone_id;
+			UPDATE dwfzone SET active = NEW.active WHERE dwfzone_id = OLD.dwfzone_id;
 
 		ELSIF view_name = 'EDIT' THEN
-			UPDATE drainzone SET the_geom = NEW.the_geom WHERE drainzone_id = OLD.drainzone_id;
+			UPDATE dwfzone SET the_geom = NEW.the_geom WHERE dwfzone_id = OLD.dwfzone_id;
 
 		END IF;
 
@@ -75,7 +75,7 @@ BEGIN
 
 	ELSIF TG_OP = 'DELETE' THEN
 
-		DELETE FROM drainzone WHERE drainzone_id = OLD.drainzone_id;
+		DELETE FROM dwfzone WHERE dwfzone_id = OLD.dwfzone_id;
 		RETURN NULL;
 	END IF;
 END;
@@ -83,5 +83,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-
-
