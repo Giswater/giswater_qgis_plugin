@@ -155,9 +155,9 @@ class GwImportSwmm:
 
         self._manage_widgets_visibility()
 
-        load_config(self)
-
         tools_gw.open_dialog(self.dlg_config, dlg_name="dlg_inp_config_import")
+
+        load_config(self)
 
     def _manage_widgets_visibility(self):
         # Hide 'Demand dscenario' widget for UD

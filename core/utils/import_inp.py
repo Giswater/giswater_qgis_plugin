@@ -177,9 +177,9 @@ def load_config(self_cls, config: Optional[GwInpConfig] = None) -> Optional[GwIn
     tools_qt.set_combo_value(self_cls.dlg_config.cmb_muni, config.municipality, 0)
 
     # Fill tables from catalogs
-    if global_vars.project_type == ProjectType.WS:
+    if global_vars.project_type == ProjectType.WS.value:
         _set_combo_values_from_epanet_catalogs(self_cls, config.catalogs)
-    elif global_vars.project_type == ProjectType.UD:
+    elif global_vars.project_type == ProjectType.UD.value:
         _set_combo_values_from_swmm_catalogs(self_cls, config.catalogs)
 
     if str(self_cls.file_path) != str(config.file_path):
