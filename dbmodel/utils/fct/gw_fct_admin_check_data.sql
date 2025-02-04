@@ -45,6 +45,11 @@ v_addschema text;
 v_isembebed boolean;
 v_verified_exceptions boolean = true;
 v_return json;
+v_result_point json;
+v_result_line json;
+v_result_polygon json;
+v_error_context text;
+v_graph text;
 
 BEGIN
 
@@ -65,13 +70,15 @@ BEGIN
 	v_fid := ((p_data ->>'data')::json->>'parameters')::json->>'fid'::text;
 	
 	IF v_fid is null then v_fid = 195; end if;
-
-	IF v_isembebed IS false or v_isembebed is null then -- create temporal tables if function is not embebed
-		-- create query tables
-		EXECUTE 'SELECT gw_fct_create_querytables($${"data":{"parameters":{"fid":'||v_fid||', "epaCheck":true, "verifiedExceptions":'||v_verified_exceptions||'}}}$$::json)';
-		-- create log tables		
-		EXECUTE 'SELECT gw_fct_create_logtables($${"data":{"parameters":{"fid":'||v_fid||'}}}$$::json)';
 	
+
+	-- create temp tables
+	IF v_fid = 195 THEN
+		EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"fid":'||v_fid||', "project_type":"'||v_project_type||'", "action":"CREATE", "group":"LOG"}}}$$)';
+		EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"fid":'||v_fid||', "project_type":"'||v_project_type||'", "action":"CREATE", "group":"ANL"}}}$$)';
+		EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"fid":'||v_fid||', "project_type":"'||v_project_type||'", "action":"CREATE", "group":"OMCHECK"}}}$$)';
+		EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"fid":'||v_fid||', "project_type":"'||v_project_type||'", "action":"CREATE", "group":"MAPZONES", "subGroup":"ALL"}}}$$)';
+
 	END IF;
 
 	-- getting sys_fprocess to be executed
@@ -81,14 +88,65 @@ BEGIN
 	-- loop for checks
 	for v_rec in execute v_querytext		
 	loop
-		EXECUTE 'select gw_fct_check_fprocess($${"client":{"device":4, "infoType":1, "lang":"ES"}, 
-	    "form":{},"feature":{},"data":{"parameters":{"functionFid":'||v_fid||', "checkFid":"'||v_rec.fid||'"}}}$$)';
+		--raise exception 'v_rec %', v_rec;
+		if v_rec.query_text ilike '%graph%' then
+		
+			for v_graph in SELECT unnest(array['dma', 'sector'])
+			LOOP
+				--raise exception 'v_graph %', v_graph;
+				EXECUTE 'select gw_fct_check_fprocess($${"client":{"device":4, "infoType":1, "lang":"ES"}, 
+			    "form":{},"feature":{},"data":{"parameters":{"functionFid":'||v_fid||', "checkFid":"'||v_rec.fid||'", "graphClass":"'||v_graph||'"}}}$$)';
+			   
+			end loop;
+		
+		else
+		
+			EXECUTE 'select gw_fct_check_fprocess($${"client":{"device":4, "infoType":1, "lang":"ES"}, 
+		    "form":{},"feature":{},"data":{"parameters":{"functionFid":'||v_fid||', "checkFid":"'||v_rec.fid||'"}}}$$)';
+		end if;
+		   
 	end loop;
 
-	--  Return
-	EXECUTE 'SELECT gw_fct_create_return($${"data":{"parameters":{"functionId":3364, "isEmbebed":'||v_isembebed||'}}}$$::json)' INTO v_return;
-	RETURN v_return;
 
+	IF v_fid = 195 THEN
+
+		-- materialize tables
+		PERFORM gw_fct_create_logreturn($${"data":{"parameters":{"type":"fillExcepTables"}}}$$::json);
+
+		-- create json return to send client
+		EXECUTE 'SELECT gw_fct_create_logreturn($${"data":{"parameters":{"type":"info"}}}$$::json)' INTO v_result_info;
+		EXECUTE 'SELECT gw_fct_create_logreturn($${"data":{"parameters":{"type":"point"}}}$$::json)' INTO v_result_point;
+		EXECUTE 'SELECT gw_fct_create_logreturn($${"data":{"parameters":{"type":"line"}}}$$::json)' INTO v_result_line;
+		EXECUTE 'SELECT gw_fct_create_logreturn($${"data":{"parameters":{"type":"polygon"}}}$$::json)' INTO v_result_polygon;
+
+		-- drop temp tables
+		EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"fid":'||v_fid||', "project_type":"'||v_project_type||'", "action":"DROP", "group":"LOG"}}}$$)';
+		EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"fid":'||v_fid||', "project_type":"'||v_project_type||'", "action":"DROP", "group":"ANL"}}}$$)';
+		EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"fid":'||v_fid||', "project_type":"'||v_project_type||'", "action":"DROP", "group":"OMCHECK"}}}$$)';
+		EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"fid":'||v_fid||', "project_type":"'||v_project_type||'", "action":"DROP", "group":"MAPZONES", "subGroup":"ALL"}}}$$)';
+
+		-- Return
+		RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'"'||
+	             ',"body":{"form":{}'||
+			     ',"data":{ "info":'||v_result_info||','||
+					'"point":'||v_result_point||','||
+					'"line":'||v_result_line||','||
+					'"polygon":'||v_result_polygon||
+			       '}'||
+		    '}}')::json, 2670, null, null, null);
+	ELSE
+		--  Return
+		RETURN '{"status":"ok"}';
+
+	END IF;
+
+
+	-- Exception handling
+	EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_error_context = pg_exception_context;
+	EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"fid":'||v_fid||', "project_type":"'||v_project_type||'", "action":"DROP", "group":"ADMINCHECK"}}}$$)';
+	RETURN json_build_object('status', 'Failed', 'NOSQLERR', SQLERRM, 'message', json_build_object('level', right(SQLSTATE, 1), 'text', SQLERRM), 'SQLSTATE',
+	SQLSTATE, 'SQLCONTEXT', v_error_context)::json;
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
