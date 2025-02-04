@@ -23,14 +23,14 @@ VALUES('-903', '-903', 43.2300, NULL, 'SHTFF-VALVE160-PN16', 'SHORTPIPE', 3, NUL
 
 INSERT INTO ve_arc_varc (arc_id, code, node_1, nodetype_1, elevation1, depth1, staticpress1, node_2, nodetype_2, staticpress2, elevation2, depth2, "depth",
 arccat_id, arc_type, sys_type, cat_matcat_id, cat_pnom, cat_dnom, cat_dint, epa_type, state, state_type, expl_id, macroexpl_id, sector_id, presszone_id,
-presszone_name, presszone_type, presszone_head, dma_id, dma_name, dma_type, macrodma_id, dqa_id, dqa_name, dqa_type, macrodqa_id, annotation, observ, "comment",
+presszone_type, presszone_head, dma_id, dma_type, macrodma_id, dqa_id, dqa_type, macrodqa_id, annotation, observ, "comment",
 gis_length, custom_length, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, workcat_id_plan, buildercat_id,
 builtdate, enddate, ownercat_id, muni_id, postcode, district_id, streetname, postnumber, postcomplement, streetname2, postnumber2, postcomplement2, region_id,
 province_id, descript, link, verified, undelete, "label", label_x, label_y, label_rotation, label_quadrant, publish, inventory, num_value, adate, adescript,
 dma_style, presszone_style, asset_id, pavcat_id, om_state, conserv_state, parent_id, expl_id2, is_operative, brand_id, model_id, serial_number, minsector_id,
 macrominsector_id, flow_max, flow_min, flow_avg, vel_max, vel_min, vel_avg, tstamp, insert_user, lastupdate, lastupdate_user, the_geom, inp_type)
 VALUES('-904', '-904', '-902', 'SHUTOFF_VALVE', 51.5000, 0.0000, 0.000, '-901', 'SHUTOFF_VALVE', 3.500, 81.5000, 0.0000, 0.00, 'VIRTUAL', 'VARC', 'VARC', 'PE-HD',
-NULL, NULL, 999.00000, 'PIPE', 1, 2, 2, 1, 4, 5, 'pzone2-1s', NULL, 119.69, 5, 'source-2', NULL, NULL, 4, 'dma1-1d', NULL, NULL, NULL, NULL, NULL, 10.05,
+NULL, NULL, 999.00000, 'PIPE', 1, 2, 2, 1, 4, 5, NULL, 119.69, 5, 'source-2', NULL, 4, NULL, NULL, NULL, NULL, NULL, 10.05,
 NULL, 'soil1', 'St. Function', 'St. Category', 'St. Fluid', 'St. Location', 'work3', NULL, NULL, 'builder1', '1994-07-24', NULL, 'owner1', 2, '08830', 2,
 NULL, NULL, NULL, NULL, NULL, NULL, 1, 1, NULL, 'https://www.giswater.org', '0', NULL, NULL, NULL, NULL, NULL, NULL, NULL, true, NULL, NULL, NULL,
 '255,255,204', '254,217,166', NULL, 'Asphalt', NULL, NULL, NULL, NULL, true, NULL, NULL, NULL, NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL,

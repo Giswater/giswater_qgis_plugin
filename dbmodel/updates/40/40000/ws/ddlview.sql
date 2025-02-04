@@ -935,7 +935,8 @@ AS WITH
           WHEN l.sector_id > 0 AND l.is_operative = true AND l.epa_type = 'JUNCTION'::character varying(16)::text AND inp_network_mode.value = '4'::text
           THEN l.epa_type::character varying
           ELSE NULL::character varying(16)
-        END AS inp_type
+        END AS inp_type,
+        l.verified
         FROM inp_network_mode, link_selector
         JOIN link l using (link_id)
         JOIN selector_expl se ON ((se.cur_user =current_user AND se.expl_id = l.expl_id) or (se.cur_user =current_user AND se.expl_id = l.expl_id2))
