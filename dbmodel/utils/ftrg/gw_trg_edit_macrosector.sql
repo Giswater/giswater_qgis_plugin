@@ -64,6 +64,7 @@ BEGIN
 
 	ELSIF TG_OP = 'DELETE' THEN
 
+		UPDATE sector SET macrosector_id=NULL WHERE macrosector_id = OLD.macrosector_id;
 		DELETE FROM macrosector WHERE macrosector_id = OLD.macrosector_id;
 		RETURN NULL;
 

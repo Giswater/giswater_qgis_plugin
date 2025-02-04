@@ -13,9 +13,11 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 SELECT plan(6);
 
 
-INSERT INTO v_edit_macrosector (macrosector_id, "name", descript, the_geom, undelete, active)
-VALUES(-901, 'Undefined', 'Undefined', NULL, NULL, true);
-
+INSERT INTO v_edit_macrosector (macrosector_id, "name", descript, the_geom, undelete)
+VALUES(-901, 'macrosector_901', 'macrosector_ud_901', NULL, NULL);
+INSERT INTO sector (sector_id, "name", macrosector_id, descript, undelete, the_geom, active, parent_id, tstamp, insert_user, lastupdate, lastupdate_user, stylesheet, sector_type, graphconfig, link)
+VALUES(-901, 'sector_901', -901, 'sector_project_ud', NULL, NULL, true, NULL, '2025-02-04 14:54:56.592', 'postgres', NULL, NULL, NULL, NULL, '{"use":[{"nodeParent":"", "toArc":[]}], "ignore":[], "forceClosed":[]}'::json, NULL);
+INSERT INTO selector_sector (sector_id, cur_user) VALUES (-901, 'postgres');
 
 
 SELECT is((SELECT count(*)::integer FROM v_edit_macrosector WHERE macrosector_id = -901), 1, 'INSERT: v_edit_macrosector -901 was inserted');
