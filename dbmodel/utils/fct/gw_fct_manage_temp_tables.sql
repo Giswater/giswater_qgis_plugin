@@ -179,7 +179,7 @@ BEGIN
             v_filter = concat(v_filter, ' AND sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user = current_user)');
 
             IF v_project_type = 'WS' THEN
-                CREATE TEMP TABLE temp_vnode(
+                CREATE TEMP TABLE IF NOT EXISTS temp_vnode(
                     id serial NOT NULL,
                     l1 integer,
                     v1 integer,
@@ -188,7 +188,7 @@ BEGIN
                     CONSTRAINT temp_vnode_pkey PRIMARY KEY (id)
                 );
 
-                CREATE TEMP TABLE temp_link(
+                CREATE TEMP TABLE IF NOT EXISTS temp_link(
                     link_id integer NOT NULL,
                     vnode_id integer,
                     vnode_type text,
@@ -208,7 +208,7 @@ BEGIN
                     CONSTRAINT temp_link_pkey PRIMARY KEY (link_id)
                 );
 
-                CREATE TEMP TABLE temp_link_x_arc(
+                CREATE TEMP TABLE IF NOT EXISTS temp_link_x_arc(
                     link_id integer NOT NULL,
                     vnode_id integer,
                     arc_id character varying(16),
@@ -224,72 +224,72 @@ BEGIN
                     CONSTRAINT temp_link_x_arc_pkey PRIMARY KEY (link_id)
                 );
 
-                CREATE TEMP TABLE temp_t_demand (LIKE temp_demand INCLUDING ALL);
+                CREATE TEMP TABLE IF NOT EXISTS temp_t_demand (LIKE temp_demand INCLUDING ALL);
 
-                CREATE TEMP TABLE temp_t_pgr_go2epa_arc (LIKE temp_arc INCLUDING ALL);
-                CREATE TEMP TABLE temp_t_pgr_go2epa_node (LIKE temp_node INCLUDING ALL);
+                CREATE TEMP TABLE IF NOT EXISTS temp_t_pgr_go2epa_arc (LIKE temp_arc INCLUDING ALL);
+                CREATE TEMP TABLE IF NOT EXISTS temp_t_pgr_go2epa_node (LIKE temp_node INCLUDING ALL);
 
-                CREATE TEMP TABLE t_rpt_inp_pattern_value (LIKE rpt_inp_pattern_value INCLUDING ALL);
+                CREATE TEMP TABLE IF NOT EXISTS t_rpt_inp_pattern_value (LIKE rpt_inp_pattern_value INCLUDING ALL);
 
             ELSIF v_project_type = 'UD' THEN
-                CREATE TEMP TABLE temp_t_arc_flowregulator (LIKE temp_arc_flowregulator INCLUDING ALL);
-                CREATE TEMP TABLE temp_t_lid_usage (LIKE temp_lid_usage INCLUDING ALL);
-                CREATE TEMP TABLE temp_t_node_other (LIKE temp_node_other INCLUDING ALL);
+                CREATE TEMP TABLE IF NOT EXISTS temp_t_arc_flowregulator (LIKE temp_arc_flowregulator INCLUDING ALL);
+                CREATE TEMP TABLE IF NOT EXISTS temp_t_lid_usage (LIKE temp_lid_usage INCLUDING ALL);
+                CREATE TEMP TABLE IF NOT EXISTS temp_t_node_other (LIKE temp_node_other INCLUDING ALL);
 
-                CREATE TEMP TABLE temp_t_gully (LIKE temp_gully INCLUDING ALL);
+                CREATE TEMP TABLE IF NOT EXISTS temp_t_gully (LIKE temp_gully INCLUDING ALL);
 
-                CREATE TEMP TABLE t_rpt_inp_raingage (LIKE rpt_inp_raingage INCLUDING ALL);
-                CREATE TEMP TABLE t_rpt_inp_node (LIKE rpt_inp_node INCLUDING ALL);
-                CREATE TEMP TABLE t_rpt_inp_arc (LIKE rpt_inp_arc INCLUDING ALL);
+                CREATE TEMP TABLE IF NOT EXISTS t_rpt_inp_raingage (LIKE rpt_inp_raingage INCLUDING ALL);
+                CREATE TEMP TABLE IF NOT EXISTS t_rpt_inp_node (LIKE rpt_inp_node INCLUDING ALL);
+                CREATE TEMP TABLE IF NOT EXISTS t_rpt_inp_arc (LIKE rpt_inp_arc INCLUDING ALL);
             END IF;
 
-            CREATE TEMP TABLE t_rpt_cat_result (LIKE rpt_cat_result INCLUDING ALL);
+            CREATE TEMP TABLE IF NOT EXISTS t_rpt_cat_result (LIKE rpt_cat_result INCLUDING ALL);
 
-            CREATE TEMP TABLE temp_t_csv (LIKE temp_csv INCLUDING ALL);
-            CREATE TEMP TABLE temp_t_table (LIKE temp_table INCLUDING ALL);
-            CREATE TEMP TABLE temp_t_node (LIKE temp_node INCLUDING ALL);
-            CREATE TEMP TABLE temp_t_arc (LIKE temp_arc INCLUDING ALL);
-            CREATE TEMP TABLE temp_t_anlgraph (LIKE temp_anlgraph INCLUDING ALL);
-            CREATE TEMP TABLE temp_t_go2epa (LIKE temp_go2epa INCLUDING ALL);
+            CREATE TEMP TABLE IF NOT EXISTS temp_t_csv (LIKE temp_csv INCLUDING ALL);
+            CREATE TEMP TABLE IF NOT EXISTS temp_t_table (LIKE temp_table INCLUDING ALL);
+            CREATE TEMP TABLE IF NOT EXISTS temp_t_node (LIKE temp_node INCLUDING ALL);
+            CREATE TEMP TABLE IF NOT EXISTS temp_t_arc (LIKE temp_arc INCLUDING ALL);
+            CREATE TEMP TABLE IF NOT EXISTS temp_t_anlgraph (LIKE temp_anlgraph INCLUDING ALL);
+            CREATE TEMP TABLE IF NOT EXISTS temp_t_go2epa (LIKE temp_go2epa INCLUDING ALL);
 
-            EXECUTE 'CREATE TEMP TABLE t_inp_pump AS SELECT * FROM v_edit_inp_pump'||v_filter;
+            EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_inp_pump AS SELECT * FROM v_edit_inp_pump'||v_filter;
             IF v_project_type = 'WS' THEN
-			    EXECUTE 'CREATE TEMP TABLE t_inp_pipe AS SELECT * FROM v_edit_inp_pipe'||v_filter;
-			    EXECUTE 'CREATE TEMP TABLE t_inp_valve AS SELECT * FROM v_edit_inp_valve'||v_filter;
-			    EXECUTE 'CREATE TEMP TABLE t_inp_junction AS SELECT * FROM v_edit_inp_junction'||v_filter;
-			    EXECUTE 'CREATE TEMP TABLE t_inp_reservoir AS SELECT * FROM v_edit_inp_reservoir'||v_filter;
-			    EXECUTE 'CREATE TEMP TABLE t_inp_tank AS SELECT * FROM v_edit_inp_tank'||v_filter;
-			    EXECUTE 'CREATE TEMP TABLE t_inp_inlet AS SELECT * FROM v_edit_inp_inlet'||v_filter;
-			    EXECUTE 'CREATE TEMP TABLE t_inp_virtualvalve AS SELECT * FROM v_edit_inp_virtualvalve'||v_filter;
-			    EXECUTE 'CREATE TEMP TABLE t_inp_virtualpump AS SELECT * FROM v_edit_inp_virtualpump'||v_filter;
+			    EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_inp_pipe AS SELECT * FROM v_edit_inp_pipe'||v_filter;
+			    EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_inp_valve AS SELECT * FROM v_edit_inp_valve'||v_filter;
+			    EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_inp_junction AS SELECT * FROM v_edit_inp_junction'||v_filter;
+			    EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_inp_reservoir AS SELECT * FROM v_edit_inp_reservoir'||v_filter;
+			    EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_inp_tank AS SELECT * FROM v_edit_inp_tank'||v_filter;
+			    EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_inp_inlet AS SELECT * FROM v_edit_inp_inlet'||v_filter;
+			    EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_inp_virtualvalve AS SELECT * FROM v_edit_inp_virtualvalve'||v_filter;
+			    EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_inp_virtualpump AS SELECT * FROM v_edit_inp_virtualpump'||v_filter;
 		    ELSIF v_project_type  = 'UD' THEN
-			    EXECUTE 'CREATE TEMP TABLE t_inp_conduit AS SELECT * FROM v_edit_inp_conduit'||v_filter;
-			    EXECUTE 'CREATE TEMP TABLE t_inp_outlet AS SELECT * FROM v_edit_inp_outlet'||v_filter;
-			    EXECUTE 'CREATE TEMP TABLE t_inp_orifice AS SELECT * FROM v_edit_inp_orifice'||v_filter;
-			    EXECUTE 'CREATE TEMP TABLE t_inp_weir AS SELECT * FROM v_edit_inp_weir'||v_filter;
-			    EXECUTE 'CREATE TEMP TABLE t_inp_virtual AS SELECT * FROM v_edit_inp_virtual'||v_filter;
-			    EXECUTE 'CREATE TEMP TABLE t_inp_storage AS SELECT * FROM v_edit_inp_storage'||v_filter;
-			    EXECUTE 'CREATE TEMP TABLE t_inp_junction AS SELECT * FROM v_edit_inp_junction'||v_filter;
-			    EXECUTE 'CREATE TEMP TABLE t_inp_outfall AS SELECT * FROM v_edit_inp_outfall'||v_filter;
-			    EXECUTE 'CREATE TEMP TABLE t_inp_divider AS SELECT * FROM v_edit_inp_divider'||v_filter;
-			    EXECUTE 'CREATE TEMP TABLE t_inp_netgully AS SELECT * FROM v_edit_inp_netgully'||v_filter;
-			    EXECUTE 'CREATE TEMP TABLE t_inp_gully AS SELECT * FROM v_edit_inp_gully'||v_filter;
+			    EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_inp_conduit AS SELECT * FROM v_edit_inp_conduit'||v_filter;
+			    EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_inp_outlet AS SELECT * FROM v_edit_inp_outlet'||v_filter;
+			    EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_inp_orifice AS SELECT * FROM v_edit_inp_orifice'||v_filter;
+			    EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_inp_weir AS SELECT * FROM v_edit_inp_weir'||v_filter;
+			    EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_inp_virtual AS SELECT * FROM v_edit_inp_virtual'||v_filter;
+			    EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_inp_storage AS SELECT * FROM v_edit_inp_storage'||v_filter;
+			    EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_inp_junction AS SELECT * FROM v_edit_inp_junction'||v_filter;
+			    EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_inp_outfall AS SELECT * FROM v_edit_inp_outfall'||v_filter;
+			    EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_inp_divider AS SELECT * FROM v_edit_inp_divider'||v_filter;
+			    EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_inp_netgully AS SELECT * FROM v_edit_inp_netgully'||v_filter;
+			    EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_inp_gully AS SELECT * FROM v_edit_inp_gully'||v_filter;
                 -- note: don't need filter for these temporal tables
-			    EXECUTE 'CREATE TEMP TABLE t_inp_subcatchment AS SELECT * FROM v_edit_inp_subcatchment';
-			    EXECUTE 'CREATE TEMP TABLE t_inp_subc2outlet AS SELECT * FROM v_edit_inp_subc2outlet';
-			    EXECUTE 'CREATE TEMP TABLE t_raingage AS SELECT * FROM v_edit_raingage';
+			    EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_inp_subcatchment AS SELECT * FROM v_edit_inp_subcatchment';
+			    EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_inp_subc2outlet AS SELECT * FROM v_edit_inp_subc2outlet';
+			    EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_raingage AS SELECT * FROM v_edit_raingage';
 		    END IF;
         END IF;
 
         IF 'OMCHECK' = ANY(v_group_array) THEN
-            EXECUTE 'CREATE TEMP TABLE t_arc AS SELECT * FROM v_edit_arc'||v_filter;
-            EXECUTE 'CREATE TEMP TABLE t_node AS SELECT * FROM v_edit_node'||v_filter;
-            EXECUTE 'CREATE TEMP TABLE t_connec AS SELECT * FROM v_edit_connec'||v_filter;
-            EXECUTE 'CREATE TEMP TABLE t_element AS SELECT * FROM v_edit_element'||v_filter;
-            EXECUTE 'CREATE TEMP TABLE t_link AS SELECT * FROM v_edit_link'; -- TODO: add filter
+            EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_arc AS SELECT * FROM v_edit_arc'||v_filter;
+            EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_node AS SELECT * FROM v_edit_node'||v_filter;
+            EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_connec AS SELECT * FROM v_edit_connec'||v_filter;
+            EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_element AS SELECT * FROM v_edit_element'||v_filter;
+            EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_link AS SELECT * FROM v_edit_link'; -- TODO: add filter
 
             IF v_project_type = 'UD' THEN
-                EXECUTE 'CREATE TEMP TABLE t_gully AS SELECT * FROM v_edit_gully'||v_filter;
+                EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_gully AS SELECT * FROM v_edit_gully'||v_filter;
             END IF;
         END IF;
         -- return message:: 'Log tables created' or 'Anl tables created' ...
