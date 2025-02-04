@@ -62,14 +62,14 @@ BEGIN
 	IF v_plancheck IS NULL THEN SELECT value::json->>'planCheck' INTO v_plancheck FROM config_param_system WHERE parameter = 'admin_checkproject'; END IF;
 	IF v_admincheck IS NULL THEN SELECT value::json->>'adminCheck' INTO v_admincheck FROM config_param_system WHERE parameter = 'admin_checkproject'; END IF;
 
-	-- create log tables
-	EXECUTE 'SELECT gw_fct_create_logtables($${"data":{"parameters":{"fid":604}}}$$::json)';
-
 	-- create temp tables
 	EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"fid":'||v_fid||', "project_type":"'||v_project_type||'", "action":"CREATE", "group":"LOG"}}}$$)';
 	EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"fid":'||v_fid||', "project_type":"'||v_project_type||'", "action":"CREATE", "group":"ANL"}}}$$)';
 	EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"fid":'||v_fid||', "project_type":"'||v_project_type||'", "action":"CREATE", "group":"OMCHECK"}}}$$)';
 	EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"fid":'||v_fid||', "project_type":"'||v_project_type||'", "action":"CREATE", "group":"MAPZONES", "subGroup":"ALL"}}}$$)';
+
+	-- create log tables
+	EXECUTE 'SELECT gw_fct_create_logtables($${"data":{"parameters":{"fid":604}}}$$::json)';
 
 	-- starting check process
 	IF 'role_om' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) AND v_omcheck THEN
