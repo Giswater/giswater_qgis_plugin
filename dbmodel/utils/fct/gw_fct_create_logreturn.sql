@@ -34,6 +34,7 @@ BEGIN
 	v_returntype := ((p_data->>'data')::json->>'parameters')::json->>'type';
 	v_querytext := ((p_data->>'data')::json->>'parameters')::json->>'queryText';
 
+	v_result = NULL;
 	IF v_returntype = 'fillExcepTables' THEN -- delete and insert on anl tables
 
 		DELETE FROM audit_check_data WHERE fid in (select fid from t_audit_check_data) and cur_user=current_user;
@@ -60,7 +61,6 @@ BEGIN
 
 	ELSIF v_returntype = 'point' THEN
 
-		v_result = null;
 		SELECT jsonb_agg(features.feature) INTO v_result
 		FROM (
 		SELECT jsonb_build_object(
@@ -73,11 +73,10 @@ BEGIN
 		SELECT id, connec_id, conneccat_id, state, expl_id, descript,fid, the_geom FROM t_anl_connec
 		) row) features;
 		v_result := COALESCE(v_result, '{}');
-		v_result := concat ('{"geometryType":"Point", "features":',v_result,',"category_field":"descript"}');
+		v_result := concat ('{"geometryType":"Point", "features":',v_result,'}');
 
 	ELSIF v_returntype = 'line' THEN
 
-		v_result = null;
 		SELECT jsonb_agg(features.feature) INTO v_result
 		FROM (
 		SELECT jsonb_build_object(
@@ -88,7 +87,7 @@ BEGIN
 		FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript, fid, the_geom FROM t_anl_arc
 		) row) features;
 		v_result := COALESCE(v_result, '{}');
-		v_result = concat ('{"geometryType":"LineString", "features":',v_result, ',"category_field":"descript"}');
+		v_result = concat ('{"geometryType":"LineString", "features":',v_result,'}');
 
 	ELSIF v_returntype = 'polygon' THEN
 
@@ -102,7 +101,7 @@ BEGIN
 		FROM (SELECT pol_id, descript, the_geom
 		FROM  t_anl_polygon WHERE cur_user="current_user"() AND fid=216) row) features;
 		v_result := COALESCE(v_result, '{}');
-		v_result := concat ('{"geometryType":"MultiPolygon", "features":',v_result,', "category_field":"descript"}');
+		v_result := concat ('{"geometryType":"MultiPolygon", "features":',v_result,'}');
 
 	END IF;
 

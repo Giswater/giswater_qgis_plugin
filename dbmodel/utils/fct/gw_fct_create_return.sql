@@ -31,11 +31,11 @@ BEGIN
 	-- get input variables
 	v_function_id :=  ((p_data ->> 'data')::json->>'parameters')::json->> 'fid';
 	v_isembebed :=  ((p_data ->> 'data')::json->>'parameters')::json->> 'isEmbebed';
-	
+
 	IF v_isembebed THEN
 		RETURN '{"status":"ok"}';
 	END IF;
-	
+
 	-- materialize tables
 	PERFORM gw_fct_create_logreturn($${"data":{"parameters":{"type":"fillExcepTables"}}}$$::json);
 
@@ -46,16 +46,16 @@ BEGIN
 	EXECUTE 'SELECT gw_fct_create_logreturn($${"data":{"parameters":{"type":"polygon"}}}$$::json)' INTO v_result_polygon;
 
 	--  Return
-	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Analysis done successfully"}, "version":"'||v_version||'"'||
+	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'"'||
              ',"body":{"form":{}'||
 		     ',"data":{"epsg":'||v_epsg||','||
 			    '"info":'||v_result_info||','||
 				'"point":'||v_result_point||','||
 				'"line":'||v_result_line||','||
-				'"polygon":'||v_result_polygon||				
+				'"polygon":'||v_result_polygon||
 		       '}}'||
 	    '}')::json, v_function_id, null, null, null);
- 
+
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
