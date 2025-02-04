@@ -141,20 +141,24 @@ WHERE ((vu_dma.expl_id = selector_expl.expl_id) AND selector_expl.cur_user = "cu
 order by 1 asc;
 
 CREATE OR REPLACE VIEW v_edit_sector
-AS SELECT sector.sector_id,
-    sector.name,
-    sector.descript,
-    sector.macrosector_id,
-    sector.sector_type,
-    sector.the_geom,
-    sector.undelete,
-    sector.active,
-    sector.parent_id,
-    sector.graphconfig::text,
-    sector.stylesheet
+AS SELECT s.sector_id,
+    s.name,
+    s.sector_type,
+    s.macrosector_id,
+    s.descript,
+    s.undelete,
+    s.graphconfig::text,
+    s.stylesheet,
+    s.parent_id,
+    s.tstamp,
+    s.insert_user,
+    s.lastupdate,
+    s.lastupdate_user,
+    s.link,
+    s.the_geom
    FROM selector_sector,
-    sector
-  WHERE sector.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
+    sector s
+  WHERE s.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
 
 CREATE OR REPLACE VIEW v_ui_sector
 AS SELECT s.sector_id,
@@ -378,34 +382,40 @@ as select * from v_edit_link where feature_type = 'GULLY';
 DROP VIEW IF EXISTS v_edit_drainzone;
 
 CREATE OR REPLACE VIEW v_edit_drainzone
-AS SELECT drainzone.drainzone_id,
-    drainzone.name,
-    drainzone.expl_id,
-    drainzone.descript,
-    drainzone.undelete,
+AS SELECT d.drainzone_id,
+    d.name,
     et.idval as drainzone_type,
-    drainzone.link,
-    drainzone.graphconfig::text AS graphconfig,
-    drainzone.stylesheet::text AS stylesheet,
-    drainzone.active,
-    drainzone.the_geom
+    d.descript,
+    d.undelete,
+    d.graphconfig::text AS graphconfig,
+    d.stylesheet::text AS stylesheet,
+    d.tstamp,
+    d.insert_user,
+    d.lastupdate,
+    d.lastupdate_user,
+    d.link,
+    d.the_geom,
+    d.expl_id
    FROM selector_expl,
-    drainzone
-    LEFT JOIN edit_typevalue et ON et.id::text = drainzone.drainzone_type::text AND et.typevalue::text = 'drainzone_type'::text
-  WHERE drainzone.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
+    drainzone d
+    LEFT JOIN edit_typevalue et ON et.id::text = d.drainzone_type::text AND et.typevalue::text = 'drainzone_type'::text
+  WHERE d.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
 
 CREATE OR REPLACE VIEW v_edit_dwfzone
 AS SELECT d.dwfzone_id,
     d.name,
-    d.expl_id,
+    et.idval as dwfzone_type,
     d.descript,
     d.undelete,
-    et.idval as dwfzone_type,
-    d.link,
     d.graphconfig::text AS graphconfig,
     d.stylesheet::text AS stylesheet,
-    d.active,
-    d.the_geom
+    d.tstamp,
+    d.insert_user,
+    d.lastupdate,
+    d.lastupdate_user,
+    d.link,
+    d.the_geom,
+    d.expl_id
    FROM selector_expl e,
     dwfzone d
     LEFT JOIN edit_typevalue et ON et.id::text = d.dwfzone_type::text AND et.typevalue::text = 'dwfzone_type'::text
@@ -6044,6 +6054,17 @@ AS SELECT m.macrosector_id,
     FROM macrosector m
     WHERE m.macrosector_id > 0
     ORDER BY m.macrosector_id;
+
+DROP VIEW IF EXISTS v_edit_macrosector;
+CREATE OR REPLACE VIEW v_edit_macrosector AS 
+ SELECT DISTINCT ON (m.macrosector_id) m.macrosector_id,
+    m.name,
+    m.descript,
+    m.the_geom,
+    m.undelete
+   FROM selector_sector, sector
+     JOIN macrosector m ON m.macrosector_id = sector.macrosector_id
+  WHERE sector.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
   -- 16/12/24
 
 CREATE OR REPLACE VIEW vu_element_x_node

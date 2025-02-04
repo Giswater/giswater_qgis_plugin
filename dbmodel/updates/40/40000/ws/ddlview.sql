@@ -995,18 +995,19 @@ AS SELECT p.presszone_id,
     p.name,
     p.presszone_type,
     p.descript,
-    p.expl_id,
-    p.link,
-    p.head,
+    p.undelete,
     p.graphconfig,
     p.stylesheet,
+    p.head,
     p.tstamp,
     p.insert_user,
     p.lastupdate,
     p.lastupdate_user,
     p.avg_press,
+    p.link,
     p.the_geom,
     p.muni_id,
+    p.expl_id,
     p.sector_id
    FROM presszone p,
     selector_expl
@@ -1021,21 +1022,21 @@ AS SELECT d.dma_id,
     d.macrodma_id,
     d.descript,
     d.undelete,
-    d.expl_id,
+    d.graphconfig,
+    d.stylesheet,
+    d.pattern_id,
     d.minc,
     d.maxc,
     d.effc,
-    d.pattern_id,
-    d.link,
-    d.graphconfig,
-    d.stylesheet,
-    d.avg_press,
     d.tstamp,
     d.insert_user,
     d.lastupdate,
     d.lastupdate_user,
+    d.avg_press,
+    d.link,
     d.the_geom,
     d.muni_id,
+    d.expl_id,
     d.sector_id
    FROM dma d,
     selector_expl
@@ -1078,17 +1079,18 @@ AS SELECT d.dqa_id,
     d.macrodqa_id,
     d.descript,
     d.undelete,
-    d.expl_id,
-    d.pattern_id,
-    d.link,
     d.graphconfig,
     d.stylesheet,
+    d.pattern_id,
     d.tstamp,
     d.insert_user,
     d.lastupdate,
     d.lastupdate_user,
+    d.avg_press,
+    d.link,
     d.the_geom,
     d.muni_id,
+    d.expl_id,
     d.sector_id
    FROM dqa d,
     selector_expl
@@ -4806,16 +4808,27 @@ CREATE OR REPLACE VIEW vcv_dma_log
 
 
 -- 19/11/24
+DROP VIEW IF EXISTS v_edit_macrosector;
 CREATE OR REPLACE VIEW v_edit_macrosector
 AS SELECT DISTINCT ON (macrosector_id) macrosector_id,
     m.name,
     m.descript,
     m.the_geom,
-    m.undelete,
-    m.active
+    m.undelete
    FROM selector_sector ss, macrosector m LEFT JOIN sector s USING (macrosector_id)
    WHERE (ss.sector_id = s.sector_id AND cur_user = current_user OR s.macrosector_id IS NULL)
    AND m.active IS true;
+
+DROP VIEW IF EXISTS v_edit_macrodma;
+CREATE OR REPLACE VIEW v_edit_macrodma
+AS SELECT DISTINCT ON (macrodma_id) macrodma_id,
+    m.name,
+    m.descript,
+    m.the_geom,
+    m.undelete,
+    m.expl_id
+   FROM selector_expl ss, macrodma m
+    WHERE m.expl_id = ss.expl_id AND ss.cur_user = "current_user"()::text AND m.active IS true;
 
 
 CREATE OR REPLACE VIEW v_edit_macroexploitation
