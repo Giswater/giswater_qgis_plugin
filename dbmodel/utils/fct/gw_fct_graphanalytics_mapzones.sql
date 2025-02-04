@@ -216,8 +216,8 @@ BEGIN
 		v_visible_layer ='"v_edit_drainzone"';
 		v_mapzonename = 'name';
 	ELSE
-		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-		"data":{"message":"3090", "function":"2710","parameters":null, "is_process":true}}$$);'  INTO v_audit_result;
+		RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Process done sucessfully"}, "version":"'||v_version||'", 
+		"body":{"form":{},"data":{"info":""}}}')::json, 2710, NULL, NULL, NULL);
 	END IF;
 
 
