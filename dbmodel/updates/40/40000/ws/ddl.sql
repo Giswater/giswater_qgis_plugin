@@ -650,13 +650,13 @@ CREATE TABLE IF NOT EXISTS selector_supplyzone
 
 -- 29/01/2025
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"supplyzone_id", "dataType":"int4"}}$$);
-ALTER TABLE supplyzone ADD CONSTRAINT arc_supplyzone_id_fkey FOREIGN KEY (supplyzone_id) REFERENCES supplyzone(supplyzone_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE arc ADD CONSTRAINT arc_supplyzone_id_fkey FOREIGN KEY (supplyzone_id) REFERENCES supplyzone(supplyzone_id) ON DELETE RESTRICT ON UPDATE CASCADE;
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node", "column":"supplyzone_id", "dataType":"int4"}}$$);
-ALTER TABLE supplyzone ADD CONSTRAINT node_supplyzone_id_fkey FOREIGN KEY (supplyzone_id) REFERENCES supplyzone(supplyzone_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE node ADD CONSTRAINT node_supplyzone_id_fkey FOREIGN KEY (supplyzone_id) REFERENCES supplyzone(supplyzone_id) ON DELETE RESTRICT ON UPDATE CASCADE;
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"supplyzone_id", "dataType":"int4"}}$$);
-ALTER TABLE supplyzone ADD CONSTRAINT connec_supplyzone_id_fkey FOREIGN KEY (supplyzone_id) REFERENCES supplyzone(supplyzone_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE connec ADD CONSTRAINT connec_supplyzone_id_fkey FOREIGN KEY (supplyzone_id) REFERENCES supplyzone(supplyzone_id) ON DELETE RESTRICT ON UPDATE CASCADE;
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"link", "column":"supplyzone_id", "dataType":"int4"}}$$);
-ALTER TABLE supplyzone ADD CONSTRAINT link_supplyzone_id_fkey FOREIGN KEY (supplyzone_id) REFERENCES supplyzone(supplyzone_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE link ADD CONSTRAINT link_supplyzone_id_fkey FOREIGN KEY (supplyzone_id) REFERENCES supplyzone(supplyzone_id) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- 30/01/2025
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"arc", "column":"verified", "dataType":"integer"}}$$);
