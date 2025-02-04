@@ -64,6 +64,7 @@ BEGIN
 	v_process_info_msg = COALESCE(replace(v_process_info_msg, 'v_graphClass', COALESCE(v_graphClass, '')), v_process_info_msg);
 	v_process_except_msg = COALESCE(replace(v_process_except_msg, 'v_graphClass', COALESCE(v_graphClass, '')), v_process_except_msg);
 
+	RAISE NOTICE 'Check % - %', v_check_fid, v_process_name;
 
 	-- manage query count
 	IF v_process_query_text ILIKE '%string_agg%' AND v_process_fid <> 317 THEN
