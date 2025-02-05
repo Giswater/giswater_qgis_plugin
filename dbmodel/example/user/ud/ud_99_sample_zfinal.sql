@@ -170,4 +170,6 @@ update macroexploitation set name ='macroexpl-01', undelete = true where macroex
 insert into macroexploitation values (2, 'Other', 'Macroexploitation used for test', true, true);
 
 -- update descript for cat_feature
-update cat_feature set descript = concat(left(id,1), substring(lower(id), 2,99))
+update cat_feature set descript = concat(left(id,1), substring(lower(id), 2,99));
+
+UPDATE config_param_system SET isenabled = false where parameter = ' basic_selector_tab_municipality';

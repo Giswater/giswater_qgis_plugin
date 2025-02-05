@@ -126,3 +126,10 @@ UPDATE config_form_fields SET dv_querytext = 'SELECT muni_id as id, name as idva
 
 update macroexploitation set name ='macroexpl-01', undelete = true where macroexpl_id = 1;
 insert into macroexploitation values (2, 'Other', 'Macroexploitation used for test', true, true);
+
+UPDATE config_param_system SET isenabled = false where parameter = ' basic_selector_tab_municipality';
+
+insert into sys_style select 'v_edit_node', 106, 'qml', stylevalue, true from sys_style where layername = 'v_edit_node' and styleconfig_id = 101;
+insert into sys_style select 'v_edit_node', 107, 'qml', stylevalue, true from sys_style where layername = 'v_edit_node' and styleconfig_id = 101;
+insert into sys_style select 'v_edit_node', 108, 'qml', stylevalue, true from sys_style where layername = 'v_edit_node' and styleconfig_id = 101;
+

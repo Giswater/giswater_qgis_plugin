@@ -81,4 +81,12 @@ widgetcontrols = '{"setMultiline": false, "valueRelation":{"nullValue":true, "la
 WHERE formname = 'v_edit_sector' AND formtype = 'form_feature' AND tabname = 'tab_none' AND columnname = 'parent_id';
 
 
+UPDATE config_param_system SET isenabled = false where parameter = ' basic_selector_tab_municipality';
+
+insert into sys_style select 'v_edit_node', 106, 'qml', stylevalue, true from sys_style where layername = 'v_edit_node' and styleconfig_id = 101;
+insert into sys_style select 'v_edit_node', 107, 'qml', stylevalue, true from sys_style where layername = 'v_edit_node' and styleconfig_id = 101;
+insert into sys_style select 'v_edit_node', 108, 'qml', stylevalue, true from sys_style where layername = 'v_edit_node' and styleconfig_id = 101;
+
+
+
 
