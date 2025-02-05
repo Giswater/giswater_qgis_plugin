@@ -177,7 +177,7 @@ BEGIN
 	DROP TABLE IF EXISTS temp_macroexploitation;
 	DROP TABLE IF EXISTS temp_sector;
 	DROP TABLE IF EXISTS temp_macrosector;
-	DROP TABLE IF EXISTS temp_mincut;
+	DROP TABLE IF EXISTS temp_t_mincut;
 
 	IF v_expl_x_user is false then
 		CREATE TEMP TABLE temp_exploitation as select e.* from exploitation e WHERE active and expl_id > 0 order by 1;
@@ -186,7 +186,7 @@ BEGIN
 		CREATE TEMP TABLE temp_macrosector as select e.* from macrosector e WHERE active and macrosector_id > 0 order by 1;
 
 		IF v_project_type = 'WS' THEN
-			CREATE TEMP TABLE temp_mincut as select e.* from om_mincut e WHERE id > 0 order by 1;
+			CREATE TEMP TABLE temp_t_mincut as select e.* from om_mincut e WHERE id > 0 order by 1;
 		END IF;
 	ELSE 
 		CREATE TEMP TABLE temp_exploitation as select e.* from exploitation e 
@@ -212,7 +212,7 @@ BEGIN
 		WHERE m.active and m.macrosector_id > 0;
 
 		IF v_project_type = 'WS' THEN
-			CREATE TEMP TABLE temp_mincut AS select distinct on (m.id) m.* from om_mincut m
+			CREATE TEMP TABLE temp_t_mincut AS select distinct on (m.id) m.* from om_mincut m
 			JOIN config_user_x_expl USING (expl_id)
 			where username = current_user and m.id > 0;
 		END IF;

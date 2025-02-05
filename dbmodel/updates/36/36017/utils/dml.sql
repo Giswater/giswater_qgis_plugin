@@ -71,8 +71,8 @@ set value = '{"table":"macroexploitation","selector":"selector_expl","table_id":
 where parameter = 'basic_selector_tab_macroexploitation_add';
 
 update config_param_system
-set value = '{"table":"temp_mincut","table_id":"id","selector":"selector_mincut_result","selector_id":"result_id","label":"id, ''('', CASE WHEN work_order IS NULL THEN ''N/I'' ELSE work_order END, '') on '', forecast_start::date, '' at '', forecast_start::time, ''H-'', forecast_end::time,''H''","query_filter":"","manageAll":true}'
-where parameter = 'basic_selector_tab_mincut';
+set value = '{"table":"temp_t_mincut","table_id":"id","selector":"selector_mincut_result","selector_id":"result_id","label":"id, ''('', CASE WHEN work_order IS NULL THEN ''N/I'' ELSE work_order END, '') on '', forecast_start::date, '' at '', forecast_start::time, ''H-'', forecast_end::time,''H''","query_filter":"","manageAll":true}'
+where parameter = 'basic_selector_tab_mincut';	
 
 -- 13/01/2025
 UPDATE config_form_fields SET dv_querytext = 'SELECT sector_id as id,name as idval FROM v_edit_sector WHERE sector_id > -1',
