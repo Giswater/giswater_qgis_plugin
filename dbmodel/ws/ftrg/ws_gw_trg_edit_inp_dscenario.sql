@@ -38,8 +38,8 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 			IF NEW.add_settings IS NULL THEN NEW.add_settings = (SELECT add_settings FROM v_edit_inp_valve WHERE node_id = NEW.node_id);END IF;
 			IF NEW.init_quality IS NULL THEN NEW.init_quality = (SELECT init_quality FROM v_edit_inp_valve WHERE node_id = NEW.node_id);END IF;
 
-			INSERT INTO inp_dscenario_valve (dscenario_id, node_id, valv_type, pressure, flow, coef_loss, curve_id, minorloss, status, add_settings, init_quality)
-			VALUES (NEW.dscenario_id, NEW.node_id, NEW.valv_type, NEW.pressure, NEW.flow, NEW.coef_loss, NEW.curve_id, NEW.minorloss, NEW.status, NEW.add_settings, NEW.init_quality);
+			INSERT INTO inp_dscenario_valve (dscenario_id, node_id, valv_type, setting, curve_id, minorloss, status, add_settings, init_quality)
+			VALUES (NEW.dscenario_id, NEW.node_id, NEW.valv_type, NEW.setting, NEW.curve_id, NEW.minorloss, NEW.status, NEW.add_settings, NEW.init_quality);
 
 		ELSIF v_dscenario_type = 'TANK' THEN
 
@@ -209,8 +209,8 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 			IF NEW.status IS NULL OR NEW.status='' THEN NEW.status = (SELECT status FROM v_edit_inp_virtualvalve WHERE arc_id = NEW.arc_id);END IF;
 			IF NEW.init_quality IS NULL THEN NEW.init_quality = (SELECT init_quality FROM v_edit_inp_virtualvalve WHERE arc_id = NEW.arc_id);END IF;
 
-			INSERT INTO inp_dscenario_virtualvalve (dscenario_id, arc_id, valv_type, pressure, flow, coef_loss, curve_id, minorloss, status, init_quality)
-			VALUES (NEW.dscenario_id, NEW.arc_id, NEW.valv_type, NEW.pressure, NEW.flow, NEW.coef_loss, NEW.curve_id, NEW.minorloss, NEW.status, NEW.init_quality);
+			INSERT INTO inp_dscenario_virtualvalve (dscenario_id, arc_id, valv_type, setting, curve_id, minorloss, status, init_quality)
+			VALUES (NEW.dscenario_id, NEW.arc_id, NEW.valv_type, NEW.setting, NEW.curve_id, NEW.minorloss, NEW.status, NEW.init_quality);
 
 		ELSIF v_dscenario_type = 'PUMP_ADDITIONAL' THEN
 
@@ -241,8 +241,8 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 	ELSIF TG_OP = 'UPDATE' THEN
 
 		IF v_dscenario_type = 'VALVE' THEN
-			UPDATE inp_dscenario_valve SET dscenario_id=NEW.dscenario_id, node_id=NEW.node_id, valv_type=NEW.valv_type, pressure=NEW.pressure,
-			flow=NEW.flow, coef_loss=NEW.coef_loss, curve_id=NEW.curve_id, minorloss=NEW.minorloss, status=NEW.status, add_settings=NEW.add_settings,
+			UPDATE inp_dscenario_valve SET dscenario_id=NEW.dscenario_id, node_id=NEW.node_id, valv_type=NEW.valv_type, setting=NEW.setting,
+			curve_id=NEW.curve_id, minorloss=NEW.minorloss, status=NEW.status, add_settings=NEW.add_settings,
 			init_quality=NEW.init_quality
 			WHERE dscenario_id=OLD.dscenario_id AND node_id=OLD.node_id;
 
@@ -301,8 +301,8 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 			WHERE dscenario_id=OLD.dscenario_id AND arc_id=OLD.arc_id;
 
 		ELSIF v_dscenario_type = 'VIRTUALVALVE' THEN
-			UPDATE inp_dscenario_virtualvalve SET dscenario_id=NEW.dscenario_id, arc_id=NEW.arc_id, valv_type=NEW.valv_type, pressure=NEW.pressure,
-			flow=NEW.flow, coef_loss=NEW.coef_loss, curve_id=NEW.curve_id, minorloss=NEW.minorloss, status=NEW.status, init_quality=NEW.init_quality
+			UPDATE inp_dscenario_virtualvalve SET dscenario_id=NEW.dscenario_id, arc_id=NEW.arc_id, valv_type=NEW.valv_type, setting=NEW.setting,
+			curve_id=NEW.curve_id, minorloss=NEW.minorloss, status=NEW.status, init_quality=NEW.init_quality
 			WHERE dscenario_id=OLD.dscenario_id AND arc_id=OLD.arc_id;
 
 		ELSIF v_dscenario_type = 'PUMP_ADDITIONAL' THEN

@@ -121,8 +121,8 @@ BEGIN
 	FROM inp_connec WHERE temp_t_node.node_id=inp_connec.connec_id;
 
 	-- update child param for inp_valve
-	UPDATE temp_t_node SET addparam=concat('{"valv_type":"',valv_type,'", "pressure":"',pressure,'", "diameter":"',custom_dint,'", "flow":"',
-	flow,'", "coef_loss":"',coef_loss,'", "curve_id":"',curve_id,'", "minorloss":"',minorloss,'", "status":"',status,
+	UPDATE temp_t_node SET addparam=concat('{"valv_type":"',valv_type,'", "setting":"',setting,'", "diameter":"',custom_dint,
+	'", "curve_id":"',curve_id,'", "minorloss":"',minorloss,'", "status":"',status,
 	'", "to_arc":"',to_arc,'", "add_settings":"',add_settings,'"}')
 	FROM v_edit_inp_valve v WHERE temp_t_node.node_id=v.node_id;
 
