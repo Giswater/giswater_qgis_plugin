@@ -10,10 +10,10 @@ This version of Giswater is provided by Giswater Association
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_inp_dscenario()
   RETURNS trigger AS
 $BODY$
-DECLARE 
+DECLARE
 
 v_dscenario_type text;
-  
+
 BEGIN
 
 --Get schema name
@@ -26,23 +26,21 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
 		-- force selector
 		INSERT INTO selector_inp_dscenario VALUES (NEW.dscenario_id, current_user) ON CONFLICT (dscenario_id, cur_user) DO NOTHING;
-  
+
 		IF v_dscenario_type = 'VALVE' THEN
 
 			-- default values
 			IF NEW.valv_type IS NULL OR NEW.valv_type='' THEN NEW.valv_type = (SELECT valv_type FROM v_edit_inp_valve WHERE node_id = NEW.node_id);END IF;
-			IF NEW.pressure IS NULL THEN NEW.pressure = (SELECT pressure FROM v_edit_inp_valve WHERE node_id = NEW.node_id);END IF;
-			IF NEW.flow IS NULL THEN NEW.flow = (SELECT flow FROM v_edit_inp_valve WHERE node_id = NEW.node_id);END IF;
-			IF NEW.coef_loss IS NULL THEN NEW.coef_loss = (SELECT coef_loss FROM v_edit_inp_valve WHERE node_id = NEW.node_id);END IF;
+			IF NEW.setting IS NULL THEN NEW.setting = (SELECT setting FROM v_edit_inp_valve WHERE node_id = NEW.node_id);END IF;
 			IF NEW.curve_id IS NULL OR NEW.curve_id='' THEN NEW.curve_id = (SELECT curve_id FROM v_edit_inp_valve WHERE node_id = NEW.node_id);END IF;
 			IF NEW.minorloss IS NULL THEN NEW.minorloss = (SELECT minorloss FROM v_edit_inp_valve WHERE node_id = NEW.node_id);END IF;
 			IF NEW.status IS NULL OR NEW.status='' THEN NEW.status = (SELECT status FROM v_edit_inp_valve WHERE node_id = NEW.node_id);END IF;
 			IF NEW.add_settings IS NULL THEN NEW.add_settings = (SELECT add_settings FROM v_edit_inp_valve WHERE node_id = NEW.node_id);END IF;
 			IF NEW.init_quality IS NULL THEN NEW.init_quality = (SELECT init_quality FROM v_edit_inp_valve WHERE node_id = NEW.node_id);END IF;
-			
+
 			INSERT INTO inp_dscenario_valve (dscenario_id, node_id, valv_type, pressure, flow, coef_loss, curve_id, minorloss, status, add_settings, init_quality)
 			VALUES (NEW.dscenario_id, NEW.node_id, NEW.valv_type, NEW.pressure, NEW.flow, NEW.coef_loss, NEW.curve_id, NEW.minorloss, NEW.status, NEW.add_settings, NEW.init_quality);
-		  
+
 		ELSIF v_dscenario_type = 'TANK' THEN
 
 			-- default values
@@ -53,7 +51,7 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 			IF NEW.minvol IS NULL THEN NEW.minvol = (SELECT minvol FROM v_edit_inp_tank WHERE node_id = NEW.node_id);END IF;
 			IF NEW.curve_id IS NULL OR NEW.curve_id='' THEN NEW.curve_id = (SELECT curve_id FROM v_edit_inp_tank WHERE node_id = NEW.node_id);END IF;
 			IF NEW.overflow IS NULL OR NEW.overflow='' THEN NEW.overflow = (SELECT overflow FROM v_edit_inp_tank WHERE node_id = NEW.node_id);END IF;
-			
+
 			IF NEW.mixing_model IS NULL OR NEW.mixing_model='' THEN NEW.mixing_model = (SELECT mixing_model FROM v_edit_inp_tank WHERE node_id = NEW.node_id);END IF;
 			IF NEW.mixing_fraction IS NULL THEN NEW.mixing_fraction = (SELECT mixing_fraction FROM v_edit_inp_tank WHERE node_id = NEW.node_id);END IF;
 			IF NEW.reaction_coeff IS NULL THEN NEW.reaction_coeff = (SELECT reaction_coeff FROM v_edit_inp_tank WHERE node_id = NEW.node_id);END IF;
@@ -62,22 +60,22 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 			IF NEW.source_quality IS NULL THEN NEW.source_quality = (SELECT source_quality FROM v_edit_inp_tank WHERE node_id = NEW.node_id);END IF;
 			IF NEW.source_pattern_id IS NULL OR NEW.source_pattern_id='' THEN NEW.source_pattern_id = (SELECT source_pattern_id FROM v_edit_inp_tank WHERE node_id = NEW.node_id);END IF;
 
-			INSERT INTO inp_dscenario_tank (dscenario_id, node_id, initlevel, minlevel, maxlevel, diameter, minvol, curve_id, overflow, 
+			INSERT INTO inp_dscenario_tank (dscenario_id, node_id, initlevel, minlevel, maxlevel, diameter, minvol, curve_id, overflow,
 			mixing_model, mixing_fraction, reaction_coeff, init_quality, source_type, source_quality, source_pattern_id)
 			VALUES (NEW.dscenario_id, NEW.node_id, NEW.initlevel, NEW.minlevel, NEW.maxlevel, NEW.diameter, NEW.minvol, NEW.curve_id, NEW.overflow,
 			NEW.mixing_model, NEW.mixing_fraction, NEW.reaction_coeff, NEW.init_quality, NEW.source_type, NEW.source_quality, NEW.source_pattern_id);
-			
+
 		ELSIF v_dscenario_type = 'SHORTPIPE' THEN
 
 			-- default values
 			IF NEW.minorloss IS NULL THEN NEW.minorloss = (SELECT minorloss FROM v_edit_inp_shortpipe WHERE node_id = NEW.node_id);END IF;
-			IF NEW.status IS NULL OR NEW.status='' THEN 
+			IF NEW.status IS NULL OR NEW.status='' THEN
 				NEW.status = (SELECT CASE WHEN closed = false THEN 'CLOSED' WHEN closed = true THEN 'OPEN' END FROM man_valve WHERE node_id = NEW.node_id);
 			END IF;
-			
+
 			IF NEW.bulk_coeff IS NULL THEN NEW.bulk_coeff = (SELECT bulk_coeff FROM v_edit_inp_shortpipe WHERE node_id = NEW.node_id);END IF;
 			IF NEW.wall_coeff IS NULL THEN NEW.wall_coeff = (SELECT wall_coeff FROM v_edit_inp_shortpipe WHERE node_id = NEW.node_id);END IF;
-		
+
 			INSERT INTO inp_dscenario_shortpipe(dscenario_id, node_id, minorloss, status, bulk_coeff, wall_coeff )
 			VALUES (NEW.dscenario_id, NEW.node_id, NEW.minorloss, NEW.status, NEW.bulk_coeff, NEW.wall_coeff);
 
@@ -200,14 +198,12 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 			mixing_model, mixing_fraction, reaction_coeff, init_quality, source_type, source_quality, source_pattern_id, demand, demand_pattern_id, emitter_coeff)
 			VALUES (NEW.dscenario_id, NEW.node_id, NEW.initlevel, NEW.minlevel, NEW.maxlevel, NEW.diameter, NEW.minvol, NEW.curve_id, NEW.overflow, NEW.pattern_id, NEW.head,
 			NEW.mixing_model, NEW.mixing_fraction, NEW.reaction_coeff, NEW.init_quality, NEW.source_type, NEW.source_quality, NEW.source_pattern_id, NEW.demand, NEW.demand_pattern_id, NEW.emitter_coeff);
-			
+
 		ELSIF v_dscenario_type = 'VIRTUALVALVE' THEN
 
 			-- default values
 			IF NEW.valv_type IS NULL OR NEW.valv_type='' THEN NEW.valv_type = (SELECT valv_type FROM v_edit_inp_virtualvalve WHERE arc_id = NEW.arc_id);END IF;
-			IF NEW.pressure IS NULL THEN NEW.pressure = (SELECT pressure FROM v_edit_inp_virtualvalve WHERE arc_id = NEW.arc_id);END IF;
-			IF NEW.flow IS NULL THEN NEW.flow = (SELECT flow FROM v_edit_inp_virtualvalve WHERE arc_id = NEW.arc_id);END IF;
-			IF NEW.coef_loss IS NULL THEN NEW.coef_loss = (SELECT coef_loss FROM v_edit_inp_virtualvalve WHERE arc_id = NEW.arc_id);END IF;
+			IF NEW.setting IS NULL THEN NEW.setting = (SELECT setting FROM v_edit_inp_virtualvalve WHERE arc_id = NEW.arc_id);END IF;
 			IF NEW.curve_id IS NULL OR NEW.curve_id='' THEN NEW.curve_id = (SELECT curve_id FROM v_edit_inp_virtualvalve WHERE arc_id = NEW.arc_id);END IF;
 			IF NEW.minorloss IS NULL THEN NEW.minorloss = (SELECT minorloss FROM v_edit_inp_virtualvalve WHERE arc_id = NEW.arc_id);END IF;
 			IF NEW.status IS NULL OR NEW.status='' THEN NEW.status = (SELECT status FROM v_edit_inp_virtualvalve WHERE arc_id = NEW.arc_id);END IF;
