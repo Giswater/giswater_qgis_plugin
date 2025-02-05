@@ -48,7 +48,7 @@ BEGIN
 
 	IF v_client_epsg IS NULL THEN v_client_epsg = v_epsg; END IF;
 
-	IF v_node IS NULL AND v_xcoord IS NOT NULL THEN 
+	IF v_node IS NULL AND v_xcoord IS NOT NULL THEN
 		EXECUTE 'SELECT (value::json->>''web'')::float FROM config_param_system WHERE parameter=''basic_info_sensibility_factor'''
 		INTO v_sensibility_f;
 		v_sensibility = (v_zoomratio / 500 * v_sensibility_f);
@@ -58,11 +58,10 @@ BEGIN
 
 		SELECT node_id INTO v_node FROM v_edit_node WHERE ST_DWithin(the_geom, v_point,v_sensibility) LIMIT 1;
 	END IF;
-	raise notice 'node_id %', v_node;
-	
-	IF (SELECT count(*) FROM ve_node_shutoff_valve WHERE node_id  = v_node) > 0 THEN
 
-		UPDATE ve_node_shutoff_valve SET closed = NOT closed WHERE node_id = v_node;
+	IF (SELECT count(*) FROM man_valve WHERE node_id  = v_node) > 0 THEN
+
+		UPDATE man_valve SET closed = NOT closed WHERE node_id = v_node;
 		--v_message = 'Change valve status done successfully. You can continue by clicking on more valves or finish the process by executing Refresh Mincut';
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 		"data":{"message":"3176", "function":"3026","parameters":null, "is_process":true}}$$)'
@@ -77,7 +76,7 @@ BEGIN
 	v_message = json_extract_path(v_getmessage, 'message');
 	v_status = 'Accepted';
 	v_level = 3;
-	
+
 
 	RETURN ('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":'||v_message||'}}')::json;
 
