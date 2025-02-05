@@ -466,6 +466,26 @@ CREATE TABLE cat_feature_flwreg (
 	CONSTRAINT cat_feature_flwreg_fkey FOREIGN KEY (id) REFERENCES cat_feature(id) ON DELETE CASCADE ON UPDATE CASCADE,
 	CONSTRAINT cat_feature_flwreg_inp_check CHECK (((epa_default)::text = ANY (ARRAY['WEIR'::text, 'ORIFICE'::text, 'PUMP'::text, 'OUTLET'::text, 'UNDEFINED'::text])))
 );
+
+CREATE TABLE cat_flwreg (
+	id varchar(30) NOT NULL,
+	flwreg_type text NULL,
+	matcat_id varchar(16) NULL,
+	descript varchar(255) NULL,
+	link varchar(512) NULL,
+	brand_id varchar(30) NULL,
+	model_id varchar(30) NULL,
+	cost_unit varchar(3) DEFAULT 'u'::character varying NULL,
+	"cost" varchar(16) NULL,
+	active bool DEFAULT true NULL,
+	CONSTRAINT cat_flwreg_pkey PRIMARY KEY (id),
+	CONSTRAINT cat_flwreg_brand_fkey FOREIGN KEY (brand_id) REFERENCES cat_brand(id) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT cat_flwreg_cost_fkey FOREIGN KEY ("cost") REFERENCES plan_price(id) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT cat_flwreg_model_fkey FOREIGN KEY (model_id) REFERENCES cat_brand_model(id) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT cat_flwreg_flwreg_type_fkey FOREIGN KEY (flwreg_type) REFERENCES cat_feature_flwreg(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT cat_flwreg_matcat_id_fkey FOREIGN KEY (matcat_id) REFERENCES cat_material(id) ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
 --create parent table for flow regulators
 CREATE TABLE flwreg (
 	flwreg_id varchar(16) DEFAULT nextval('urn_id_seq'::regclass) NOT NULL,
@@ -473,7 +493,7 @@ CREATE TABLE flwreg (
 	order_id int2 NOT NULL,
 	to_arc varchar(16) NOT NULL,
 	nodarc_id character varying(20),
-	flwreg_type varchar(18) NOT NULL,
+	flwregcat_id varchar(18) NOT NULL,
 	flwreg_length float8 NOT NULL,
 	epa_type varchar(16) NOT NULL,  --(ORIFICE / WEIR / OUTLET / PUMP)
 	state int2 NOT NULL,
@@ -483,8 +503,12 @@ CREATE TABLE flwreg (
 	the_geom public.geometry(linestring, SRID_VALUE) NOT NULL,
 	CONSTRAINT flwreg_epa_type_check CHECK (((epa_type)::text = ANY (ARRAY['WEIR'::text, 'ORIFICE'::text, 'PUMP'::text, 'OUTLET'::text, 'UNDEFINED'::text]))),
 	CONSTRAINT flwreg_pkey PRIMARY KEY (flwreg_id),
-	CONSTRAINT flwreg_type_fkey FOREIGN KEY (flwreg_type) REFERENCES cat_feature_flwreg(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT flwreg_node_id_fkey FOREIGN KEY (node_id) REFERENCES node(node_id) ON DELETE RESTRICT ON UPDATE CASCADE
+	CONSTRAINT flwregcat_id_fkey FOREIGN KEY (flwregcat_id) REFERENCES cat_flwreg(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT flwreg_node_id_fkey FOREIGN KEY (node_id) REFERENCES node(node_id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT flwreg_to_arc_fkey FOREIGN KEY (to_arc) REFERENCES arc(arc_id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT flwreg_state_fkey FOREIGN KEY (state) REFERENCES value_state(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT flwreg_state_type_fkey FOREIGN KEY (state_type) REFERENCES value_state_type(id) ON DELETE RESTRICT ON UPDATE CASCADE
+
 );
 
 CREATE INDEX flwreg_node_id ON flwreg USING btree (node_id);
@@ -530,7 +554,7 @@ CREATE TABLE inp_flwreg_outlet (
 
 CREATE TABLE inp_flwreg_orifice (
 	flwreg_id varchar(16) NOT NULL,
-	ori_type varchar(18) NOT NULL,
+	orifice_type varchar(18) NOT NULL,
 	offsetval numeric(12, 4) NULL,
 	cd numeric(12, 4) NOT NULL,
 	orate numeric(12, 4) NULL,
@@ -698,23 +722,7 @@ CREATE TABLE review_audit_node (
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_chamber", "column":"height", "dataType":"numeric(12,4)"}}$$);
 
-CREATE TABLE cat_flwreg (
-	id varchar(30) NOT NULL,
-	flwreg_type text NULL,
-	matcat_id varchar(16) NULL,
-	descript varchar(255) NULL,
-	link varchar(512) NULL,
-	brand_id varchar(30) NULL,
-	model_id varchar(30) NULL,
-	cost_unit varchar(3) DEFAULT 'u'::character varying NULL,
-	"cost" varchar(16) NULL,
-	active bool DEFAULT true NULL,
-	CONSTRAINT cat_flwreg_pkey PRIMARY KEY (id),
-	CONSTRAINT cat_flwreg_brand_fkey FOREIGN KEY (brand_id) REFERENCES cat_brand(id) ON DELETE CASCADE ON UPDATE CASCADE,
-	CONSTRAINT cat_flwreg_cost_fkey FOREIGN KEY ("cost") REFERENCES plan_price(id) ON DELETE CASCADE ON UPDATE CASCADE,
-	CONSTRAINT cat_flwreg_model_fkey FOREIGN KEY (model_id) REFERENCES cat_brand_model(id) ON DELETE CASCADE ON UPDATE CASCADE,
-	CONSTRAINT cat_flwreg_flwreg_type_fkey FOREIGN KEY (flwreg_type) REFERENCES cat_feature_flwreg(id) ON DELETE RESTRICT ON UPDATE CASCADE
-);
+
 
 -- 30/01/2025
 

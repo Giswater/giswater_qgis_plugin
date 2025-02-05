@@ -6959,20 +6959,21 @@ AS SELECT
 	f.node_id,
 	f.order_id,
 	f.to_arc,
+    f.flwregcat_id,
 	f.flwreg_type,
-	cf.feature_class AS flwreg_class,
-	f.flwreg_length,
+	cf.feature_class AS sys_type,
+	round(f.flwreg_length::numeric, 2) as flwreg_length,
 	f.epa_type,
-	f.state ,
+	f.state,
 	f.state_type,
+    n.muni_id,
+    n.expl_id,
 	f.annotation,
 	f.observ,
     f.the_geom
     FROM flwreg f
-    JOIN node n USING (node_id)
-    JOIN arc a ON a.arc_id::text = f.to_arc::text
-	JOIN sys_feature_epa_type et ON f.flwreg_type = et.id
-	JOIN cat_feature cf ON cf.feature_type = et.feature_type;
+	LEFT JOIN cat_feature cf ON cf.id = f.flwreg_type
+	LEFT JOIN v_edit_node n USING (node_id);
 
 CREATE OR REPLACE VIEW v_rpt_node
 AS SELECT rpt_node.id,
