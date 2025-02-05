@@ -61,3 +61,14 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('v_ui_dqa', 'form_feature', 'tab_none', 'link', 'lyt_data_1', 10, 'text', 'text', 'link', 'link', NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, NULL);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('v_ui_dqa', 'form_feature', 'tab_none', 'graphconfig', 'lyt_data_1', 11, 'string', 'text', 'graphconfig', 'graphconfig', NULL, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, NULL);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('v_ui_dqa', 'form_feature', 'tab_none', 'stylesheet', 'lyt_data_1', 12, 'string', 'text', 'stylesheet', 'stylesheet', NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, NULL);
+
+
+INSERT INTO config_style VALUES (106, 'GwSector', NULL, 'role_basic', '{"orderBy":3}', false, true);
+INSERT INTO config_style VALUES (107, 'GwDma', NULL, 'role_basic', '{"orderBy":4}', false, true);
+INSERT INTO config_style VALUES (108, 'GwPresszone', NULL, 'role_basic', '{"orderBy":5}', false, true);
+
+insert into sys_style select 'v_edit_node', 106, 'qml', stylevalue, true from sys_style where layername = 'v_edit_node' and styleconfig_id = 101;
+insert into sys_style select 'v_edit_node', 107, 'qml', stylevalue, true from sys_style where layername = 'v_edit_node' and styleconfig_id = 101;
+insert into sys_style select 'v_edit_node', 108, 'qml', stylevalue, true from sys_style where layername = 'v_edit_node' and styleconfig_id = 101;
+
+
