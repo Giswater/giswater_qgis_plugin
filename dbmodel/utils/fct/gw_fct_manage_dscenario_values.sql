@@ -150,7 +150,7 @@ BEGIN
 						json_array_elements_text('["", "node_id", "node_id", "node_id", "arc_id", "node_id", "node_id"]'::json) as pk,
 						json_array_elements_text('["", "node_id, minorloss, status", "node_id, initlevel, minlevel, maxlevel, diameter, minvol, curve_id", 
 						 "node_id, pattern_id, head", "arc_id, minorloss, status, roughness, dint", "node_id, power, curve_id, speed, pattern_id, status", 
-						 "node_id, valv_type, pressure, flow, coef_loss, curve_id, minorloss, status, add_settings"]'::json) as column
+						 "node_id, valv_type, setting, curve_id, minorloss, status, add_settings"]'::json) as column
 			LOOP
 				IF v_action = 'DELETE-COPY' THEN
 

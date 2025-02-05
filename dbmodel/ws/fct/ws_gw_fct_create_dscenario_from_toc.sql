@@ -112,7 +112,7 @@ BEGIN
 		ELSIF v_table  = 'inp_dscenario_connec' THEN
 			v_columns = v_scenarioid||', connec_id, demand, pattern_id';
 		ELSIF v_table  = 'inp_dscenario_valve' THEN
-			v_columns = v_scenarioid||', node_id, valv_type, pressure, flow, coef_loss, curve_id, minorloss, status, add_settings';
+			v_columns = v_scenarioid||', node_id, valv_type, setting, curve_id, minorloss, status, add_settings';
 		ELSIF v_table  = 'inp_dscenario_tank' THEN
 			v_columns = v_scenarioid||', node_id, initlevel, minlevel, maxlevel, diameter, minvol, curve_id, overflow';
 		ELSIF v_table  = 'inp_dscenario_reservoir' THEN
