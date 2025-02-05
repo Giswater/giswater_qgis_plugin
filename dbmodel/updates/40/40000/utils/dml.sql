@@ -1146,3 +1146,160 @@ UPDATE config_form_fields SET columnname='conneccat_id' WHERE formname='v_edit_l
 INSERT INTO sys_function
 (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source")
 VALUES(3380, 'gw_fct_getlayerstofilter', 'utils', 'function', 'json', 'json', 'Function to filter WMS layers with imported columns', 'role_basic', NULL, 'core');
+
+-- 05/02/2025
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('formtype_typevalue', 'psector_manager', 'psector_manager', 'psectorManager', NULL);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('layout_name_typevalue', 'lyt_psector_mngr_1', 'lyt_psector_mngr_1', 'layoutPsectorManager1', '{
+  "lytOrientation": "horizontal"
+}'::json);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('layout_name_typevalue', 'lyt_psector_mngr_2', 'lyt_psector_mngr_2', 'layoutPsectorManager2', '{
+  "lytOrientation": "horizontal"
+}'::json);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('layout_name_typevalue', 'lyt_psector_mngr_3', 'lyt_psector_mngr_3', 'layoutPsectorManager3', '{
+  "lytOrientation": "horizontal"
+}'::json);
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'psector_manager', 'tab_none', 'btn_close', 'lyt_buttons', 1, NULL, 'button', NULL, 'Close', NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{
+  "text": "Close"
+}'::json, '{"functionName": "closeDlg"}'::json, NULL, false, 0);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'psector_manager', 'tab_none', 'txt_info', 'lyt_psector_mngr_1', 1, NULL, 'textarea', 'Info:', 'Table', NULL, false, false, true, false, true, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, 0);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'psector_manager', 'tab_none', 'table_view', 'lyt_psector_mngr_1', 0, NULL, 'tablewidget', '', 'Table', NULL, false, false, true, false, true, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, 'psector_results', false, 0);
+
+INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('psector_results', 'SELECT psector_id AS id, ext_code, name, descript, priority, status, text1, text2, observ, vat, other, expl_id, psector_type, active::text, workcat_id, parent_id FROM plan_psector', 5, 'tab', 'list', '{"orderBy":"1", "orderType": "DESC"}'::json, '{
+  "enableGlobalFilter": false,
+  "enableStickyHeader": true,
+  "positionToolbarAlertBanner": "bottom",
+  "enableGrouping": false,
+  "enablePinning": true,
+  "enableColumnOrdering": true,
+  "enableColumnFilterModes": true,
+  "enableFullScreenToggle": false,
+  "enablePagination": true,
+  "enableExporting": true,
+  "muiTablePaginationProps": {
+    "rowsPerPageOptions": [
+      5,
+      10,
+      15,
+      20,
+      50,
+      100
+    ],
+    "showFirstButton": true,
+    "showLastButton": true
+  },
+  "enableRowSelection": true,
+  "multipleRowSelection": true,
+  "initialState": {
+    "showColumnFilters": false,
+    "pagination": {
+      "pageSize": 5,
+      "pageIndex": 0
+    },
+    "density": "compact",
+    "columnFilters": [
+      {
+        "id": "id",
+        "value": "",
+        "filterVariant": "text"
+      }
+    ],
+    "sorting": [
+      {
+        "id": "id",
+        "desc": true
+      }
+    ]
+  },
+  "modifyTopToolBar": true,
+  "renderTopToolbarCustomActions": [
+    {
+      "name": "btn_current_psector",
+      "widgetfunction": {
+        "functionName": "currentPsector",
+        "params": {}
+      },
+      "color": "default",
+      "text": "Current psector",
+      "disableOnSelect": true,
+      "moreThanOneDisable": true
+    },
+    {
+      "name": "btn_show_psector",
+      "widgetfunction": {
+        "functionName": "showPsector",
+        "params": {}
+      },
+      "color": "default",
+      "text": "Show psector",
+      "disableOnSelect": true,
+      "moreThanOneDisable": true
+    },
+    {
+      "name": "btn_toggle_active",
+      "widgetfunction": {
+        "functionName": "toggleActive",
+        "params": {}
+      },
+      "color": "default",
+      "text": "Toggle active",
+      "disableOnSelect": true,
+      "moreThanOneDisable": true
+    },
+    {
+      "name": "btn_create",
+      "widgetfunction": {
+        "functionName": "create",
+        "params": {}
+      },
+      "color": "default",
+      "text": "Create",
+      "disableOnSelect": true,
+      "moreThanOneDisable": true
+    },
+    {
+      "name": "btn_merge",
+      "widgetfunction": {
+        "functionName": "merge",
+        "params": {}
+      },
+      "color": "default",
+      "text": "Merge",
+      "disableOnSelect": true,
+      "moreThanOneDisable": false
+    },
+    {
+      "name": "btn_duplicate",
+      "widgetfunction": {
+        "functionName": "duplicate",
+        "params": {}
+      },
+      "color": "default",
+      "text": "Duplicate",
+      "disableOnSelect": true,
+      "moreThanOneDisable": true
+    },
+    {
+      "name": "btn_delete",
+      "widgetfunction": {
+        "functionName": "delete",
+        "params": {}
+      },
+      "color": "error",
+      "text": "Delete",
+      "disableOnSelect": true,
+      "moreThanOneDisable": false
+    }
+  ],
+  "enableRowActions": false,
+  "renderRowActionMenuItems": [
+    {
+      "widgetfunction": {
+        "functionName": "open",
+        "params": {}
+      },
+      "icon": "OpenInBrowser",
+      "text": "Open"
+    }
+  ]
+}'::json);
