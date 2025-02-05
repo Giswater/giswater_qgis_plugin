@@ -3494,7 +3494,7 @@ AS SELECT f.nodarc_id,
     f.order_id,
     f.to_arc,
     f.flwreg_length,
-    ori.ori_type,
+    ori.orifice_type,
     ori.offsetval,
     ori.cd,
     ori.orate,
@@ -6887,9 +6887,9 @@ SELECT
     f.order_id,
    	f.to_arc,
     f.flwreg_length,
-    f.flwreg_type,
+    f.flwregcat_id,
     -- Orifice Columns
-    o.ori_type,
+    o.orifice_type,
     o.offsetval as orifice_offsetval,
     o.cd as orifice_cd,
     o.orate as orifice_orate,
@@ -6959,9 +6959,9 @@ AS SELECT
 	f.node_id,
 	f.order_id,
 	f.to_arc,
+	f.nodarc_id,
     f.flwregcat_id,
-	f.flwreg_type,
-	cf.feature_class AS sys_type,
+	cf.flwreg_type,
 	round(f.flwreg_length::numeric, 2) as flwreg_length,
 	f.epa_type,
 	f.state,
@@ -6972,7 +6972,7 @@ AS SELECT
 	f.observ,
     f.the_geom
     FROM flwreg f
-	LEFT JOIN cat_feature cf ON cf.id = f.flwreg_type
+	LEFT JOIN cat_flwreg cf ON cf.id = f.flwregcat_id
 	LEFT JOIN v_edit_node n USING (node_id);
 
 CREATE OR REPLACE VIEW v_rpt_node

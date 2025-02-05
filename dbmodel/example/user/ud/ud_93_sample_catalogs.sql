@@ -199,3 +199,8 @@ INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_la
 INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) VALUES ('FROUTLET', 'FROUTLET','FLWREG', 'v_edit_flwreg', 've_flwreg_froutlet', true) ON CONFLICT (id) DO NOTHING;
 INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) VALUES ('FRWEIR', 'FRWEIR','FLWREG', 'v_edit_flwreg', 've_flwreg_frweir', true) ON CONFLICT (id) DO NOTHING;
 INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) VALUES ('FRPUMP', 'FRPUMP','FLWREG', 'v_edit_flwreg', 've_flwreg_frpump', true) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO cat_flwreg (id, flwreg_type, active) VALUES ('FRORIFICE-01', 'FRORIFICE', TRUE) ON CONFLICT (id) DO NOTHING;
+INSERT INTO cat_flwreg (id, flwreg_type, active) VALUES ('FROUTLET-01', 'FROUTLET', TRUE) ON CONFLICT (id) DO NOTHING;
+INSERT INTO cat_flwreg (id, flwreg_type, active) VALUES ('FRWEIR-01', 'FRWEIR', TRUE) ON CONFLICT (id) DO NOTHING;
+INSERT INTO cat_flwreg (id, flwreg_type, active) VALUES ('FRPUMP-01', 'FRPUMP', TRUE) ON CONFLICT (id) DO NOTHING;

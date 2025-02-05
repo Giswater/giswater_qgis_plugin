@@ -512,7 +512,7 @@ CREATE TABLE flwreg (
 );
 
 CREATE INDEX flwreg_node_id ON flwreg USING btree (node_id);
-CREATE INDEX flwreg_flwreg_type ON flwreg USING btree (flwreg_type);
+CREATE INDEX flwreg_flwregcat_id ON flwreg USING btree (flwregcat_id);
 
 
 CREATE TABLE _inp_flwreg_pump AS SELECT * FROM inp_flwreg_pump;
@@ -564,7 +564,7 @@ CREATE TABLE inp_flwreg_orifice (
 	geom2 numeric(12, 4) DEFAULT 0.00 NOT NULL,
 	geom3 numeric(12, 4) DEFAULT 0.00 NULL,
 	geom4 numeric(12, 4) DEFAULT 0.00 NULL,
-	CONSTRAINT inp_flwreg_orifice_check_ory_type CHECK (((ori_type)::text = ANY (ARRAY[('SIDE'::character varying)::text, ('BOTTOM'::character varying)::text]))),
+	CONSTRAINT inp_flwreg_orifice_check_ory_type CHECK (((orifice_type)::text = ANY (ARRAY[('SIDE'::character varying)::text, ('BOTTOM'::character varying)::text]))),
 	CONSTRAINT inp_flwreg_orifice_check_shape CHECK (((shape)::text = ANY (ARRAY[('CIRCULAR'::character varying)::text, ('RECT_CLOSED'::character varying)::text]))),
 	CONSTRAINT inp_flwreg_orifice_pkey PRIMARY KEY (flwreg_id),
 	CONSTRAINT inp_flwreg_orifice_flwreg_id_fkey FOREIGN KEY (flwreg_id) REFERENCES flwreg(flwreg_id) ON DELETE CASCADE ON UPDATE CASCADE
