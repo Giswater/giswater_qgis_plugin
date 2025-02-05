@@ -40,6 +40,7 @@ from ..threads.project_schema_create import GwCreateSchemaTask
 from ..threads.project_schema_utils_create import GwCreateSchemaUtilsTask
 from ..threads.project_schema_update import GwUpdateSchemaTask
 from ..threads.project_schema_copy import GwCopySchemaTask
+from ..threads.project_schema_rename import GwRenameSchemaTask
 
 
 class GwAdminButton:
@@ -169,7 +170,17 @@ class GwAdminButton:
                     tools_qt.set_combo_value(self.cmb_locale, 'en_US', 0)
                 else:
                     return
+                
+        params = {'is_test': is_test, 'project_type': project_type, 'exec_last_process': exec_last_process,
+                  'project_name_schema': project_name_schema, 'project_locale': project_locale,
+                  'project_srid': project_srid, 'example_data': example_data}
 
+        if hasattr(self, 'task_rename_schema') and not isdeleted(self.task_rename_schema):
+            self.task_rename_schema.task_finished.connect(partial(self.start_create_project_data_schema_task, project_name_schema, params))
+        else:
+            self.start_create_project_data_schema_task(project_name_schema, params)
+
+    def start_create_project_data_schema_task(self, project_name_schema, params):
         self.error_count = 0
         # We retrieve the desired name of the schema, since in case there had been a schema with the same name, we had
         # changed the value of self.schema in the function _rename_project_data_schema or _execute_last_process
@@ -182,13 +193,9 @@ class GwAdminButton:
         self.timer.start(1000)
 
         description = f"Create schema"
-        params = {'is_test': is_test, 'project_type': project_type, 'exec_last_process': exec_last_process,
-                  'project_name_schema': project_name_schema, 'project_locale': project_locale,
-                  'project_srid': project_srid, 'example_data': example_data}
         self.task_create_schema = GwCreateSchemaTask(self, description, params, timer=self.timer)
         QgsApplication.taskManager().addTask(self.task_create_schema)
         QgsApplication.taskManager().triggerTask(self.task_create_schema)
-
 
     def manage_process_result(self, project_name, project_type, is_test=False, is_utils=False, dlg=None):
         """"""
@@ -1024,8 +1031,8 @@ class GwAdminButton:
 
         msg = f"This 'Project_name' is already exist. Do you want rename old schema to '{new_name}"
         result = tools_qt.show_question(msg, "Info", force_action=True)
-        if result:
-            self._rename_project_data_schema(str(project_name), str(new_name))
+        if result:                    
+            self._rename_project_data_schema(str(project_name), str(new_name))            
             return True
         else:
             return False
@@ -1042,16 +1049,13 @@ class GwAdminButton:
 
     def _rename_project_data_schema(self, schema, create_project=None):
         """"""
-
         if create_project is None:
-            close_dlg_rename = True
             self.schema = tools_qt.get_text(self.dlg_readsql_rename, self.dlg_readsql_rename.schema_rename_copy)
             if str(self.schema) == str(schema):
                 msg = "Please, select a diferent project name than current."
                 tools_qt.show_info_box(msg, "Info")
                 return
         else:
-            close_dlg_rename = False
             self.schema = str(create_project)
 
         # Check if the new project name already exists
@@ -1065,35 +1069,19 @@ class GwAdminButton:
             else:
                 continue
 
-        # Change schema name
-        sql = f'ALTER SCHEMA {schema} RENAME TO {self.schema}'
-        status = tools_db.execute_sql(sql, commit=False)
-        if status:
-            # Reload fcts
-            self._reload_fct_ftrg()
-            # Call fct gw_fct_admin_rename_fixviews
-            sql = ('SELECT ' + str(self.schema) + '.gw_fct_admin_rename_fixviews($${"data":{"currentSchemaName":"'
-                   + self.schema + '","oldSchemaName":"' + str(schema) + '"}}$$)::text')
-            tools_db.execute_sql(sql, commit=False)
-            # Execute last_process
-            self.execute_last_process(schema_name=self.schema, locale=True)
+        # Create timer
+        self.t0 = time()
+        self.timer = QTimer()
+        if hasattr(self, 'dlg_readsql_rename') and not isdeleted(self.dlg_readsql_rename) and self.dlg_readsql_rename.isVisible():
+            self.timer.timeout.connect(partial(self._calculate_elapsed_time, self.dlg_readsql_rename))
+        self.timer.start(1000)
 
-        # Show message
-        status = (self.error_count == 0)
-        self._manage_result_message(status, parameter="Rename project")
-        if status:
-            tools_db.dao.commit()
-            # Populate schema name combo and info panel
-            self._populate_data_schema_name(self.cmb_project_type)
-            tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.project_schema_name, str(self.schema))
-            self._set_info_project()
-            if close_dlg_rename:
-                self._close_dialog_admin(self.dlg_readsql_rename)
-        else:
-            tools_db.dao.rollback()
-
-        # Reset count error variable to 0
-        self.error_count = 0
+        # Set background task 'GwRenameSchemaTask'
+        description = f"Rename schema"
+        params = {'schema': schema, 'new_schema_name': self.schema}
+        self.task_rename_schema = GwRenameSchemaTask(self, description, params, timer=self.timer)
+        QgsApplication.taskManager().addTask(self.task_rename_schema)
+        QgsApplication.taskManager().triggerTask(self.task_rename_schema)
 
 
     def _load_custom_sql_files(self, dialog, widget):
@@ -1544,21 +1532,16 @@ class GwAdminButton:
 
 
     def _reload_fct_ftrg(self):
-        """"""
-
+        """"""            
         self._load_fct_ftrg()
         status = (self.error_count == 0)
         if status:
-            tools_qt.show_info_box("Reload completed successfully", title="Success")
             tools_db.dao.commit()
         else:
             tools_qt.show_info_box("Reload failed", title="Error")
             tools_db.dao.rollback()
-
-        if status:
-            tools_db.dao.commit()
-        else:
-            tools_db.dao.rollback()
+            if hasattr(self, 'task_rename_schema'):                
+                self.task_rename_schema.cancel()
 
         # Reset count error variable to 0
         self.error_count = 0
@@ -1623,6 +1606,7 @@ class GwAdminButton:
 
         # Open dialog
         self.dlg_readsql_rename.setWindowTitle(f'Rename project - {schema}')
+        self.dlg_readsql_rename.schema_rename_copy.setText(schema)
         tools_gw.open_dialog(self.dlg_readsql_rename, dlg_name='admin_renameproj')
 
 
