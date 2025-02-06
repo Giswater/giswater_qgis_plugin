@@ -238,7 +238,7 @@ BEGIN
 	FROM v_edit_inp_orifice;
 
 	INSERT INTO temp_t_arc_flowregulator (arc_id, type, ori_type, offsetval, cd, orate, flap, shape, geom1, geom2, geom3, geom4)
-	SELECT nodarc_id, 'ORIFICE', ori_type, offsetval, cd, orate, flap, shape, geom1, geom2, 0, 0
+	SELECT nodarc_id, 'ORIFICE', orifice_type, offsetval, cd, orate, flap, shape, geom1, geom2, 0, 0
 	FROM v_edit_inp_flwreg_orifice;
 
 	-- outlet
