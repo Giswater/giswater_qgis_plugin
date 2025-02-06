@@ -41,8 +41,8 @@ UPDATE cat_feature_node SET graph_delimiter ='PRESSZONE' WHERE id in('PUMP', 'PR
 -- 01/05/2024
 UPDATE config_param_system SET value =
 '{"status":true, "values":[
-{"sourceTable":"ve_node_pr_reduc_valve", "query":"UPDATE presszone t SET head=elevation + pression_exit FROM ve_node_pr_reduc_valve s "},
-{"sourceTable":"ve_node_tank", "query":"UPDATE presszone t SET head=elevation + hmax/2  FROM ve_node_tank s "}]}'
+{"sourceTable":"ve_node_pr_reduc_valve", "query":"UPDATE presszone t SET head=top_elev + pression_exit FROM ve_node_pr_reduc_valve s "},
+{"sourceTable":"ve_node_tank", "query":"UPDATE presszone t SET head=top_elev + hmax/2  FROM ve_node_tank s "}]}'
 WHERE parameter = 'epa_automatic_man2graph_values';
 
 

@@ -3150,3 +3150,26 @@ dscenario_name, feature_id, feature_type, value, demand_type, pattern_id, source
 UPDATE config_form_fields
 	SET widgetcontrols='{"saveValue":false, "filterSign":"=", "onContextMenu":"Open link"}'::json
 	WHERE formname='node' AND formtype='form_feature' AND columnname='btn_link' AND tabname='tab_hydrometer';
+
+
+
+-- 14/01/2025
+INSERT INTO node(node_id, code, top_elev, depth, nodecat_id, epa_type, sector_id, arc_id, parent_id, state, state_type, annotation, observ, comment, dma_id, presszone_id,
+soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, ownercat_id, muni_id, postcode,
+streetaxis_id, postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, descript, link, verified, rotation, the_geom, undelete, label_x, label_y,
+label_rotation, publish, inventory, hemisphere, expl_id, num_value, feature_type, tstamp, lastupdate, lastupdate_user, insert_user, minsector_id, dqa_id, supplyzone_id, staticpressure,
+district_id, adate, adescript, accessibility, workcat_id_plan, asset_id, om_state, conserv_state, access_type, placement_type, expl_id2, brand_id, model_id,
+serial_number, label_quadrant, macrominsector_id, streetname, streetname2)
+SELECT node_id, code, elevation, depth, nodecat_id, epa_type, sector_id, arc_id, parent_id, state, state_type, annotation, observ, comment, dma_id, presszone_id,
+soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, ownercat_id, muni_id, postcode,
+streetaxis_id, postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, descript, link, verified, rotation, the_geom, undelete, label_x, label_y,
+label_rotation, publish, inventory, hemisphere, expl_id, num_value, feature_type, tstamp, lastupdate, lastupdate_user, insert_user, minsector_id, dqa_id, supplyzone_id, staticpressure,
+district_id, adate, adescript, accessibility, workcat_id_plan, asset_id, om_state, conserv_state, access_type, placement_type, expl_id2, brand_id, model_id,
+serial_number, label_quadrant, macrominsector_id, streetname, streetname2
+FROM _node;
+
+-- sys_foreignkey
+INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, parameter_id, active) VALUES('edit_typevalue', 'value_datasource', 'node', 'datasource', NULL, true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field) DO NOTHING;
+INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, parameter_id, active) VALUES('edit_typevalue', 'value_datasource', 'arc', 'datasource', NULL, true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field) DO NOTHING;
+INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, parameter_id, active) VALUES('edit_typevalue', 'value_datasource', 'connec', 'datasource', NULL, true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field) DO NOTHING;
+INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, parameter_id, active) VALUES('edit_typevalue', 'value_datasource', 'element', 'datasource', NULL, true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field) DO NOTHING;

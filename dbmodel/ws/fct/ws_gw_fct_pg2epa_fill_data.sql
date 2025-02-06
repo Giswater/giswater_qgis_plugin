@@ -55,14 +55,14 @@ BEGIN
 	raise notice 'Inserting nodes on temp_t_node table';
 
 	-- the strategy of selector_sector is not used for nodes. The reason is to enable the posibility to export the sector=-1. In addition using this it's impossible to export orphan nodes
-	EXECUTE ' INSERT INTO temp_t_node (node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, the_geom, expl_id, dma_id, presszone_id, dqa_id, minsector_id, age)
+	EXECUTE ' INSERT INTO temp_t_node (node_id, top_elev, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, the_geom, expl_id, dma_id, presszone_id, dqa_id, minsector_id, age)
 		WITH b AS (SELECT v_edit_arc.* FROM selector_sector, v_edit_arc
 		JOIN value_state_type ON v_edit_arc.state_type = value_state_type.id
 		WHERE v_edit_arc.sector_id = selector_sector.sector_id AND epa_type !=''UNDEFINED'' AND selector_sector.cur_user = "current_user"()::text 
 		AND v_edit_arc.sector_id > 0 AND v_edit_arc.state > 0'
 		||v_statetype||')
 		SELECT DISTINCT ON (n.node_id)
-		n.node_id, elevation, elevation-depth as elev, node_type, nodecat_id, epa_type, a.sector_id, n.state, n.state_type, n.annotation, n.the_geom, n.expl_id, dma_id, presszone_id, dqa_id, minsector_id,
+		n.node_id, top_elev, top_elev-depth as elev, node_type, nodecat_id, epa_type, a.sector_id, n.state, n.state_type, n.annotation, n.the_geom, n.expl_id, dma_id, presszone_id, dqa_id, minsector_id,
 		(case when n.builtdate is not null then (now()::date-n.builtdate)/30 else 0 end)
 		FROM node n 
 		JOIN (SELECT node_1 AS node_id, sector_id FROM b UNION SELECT node_2, sector_id FROM b)a USING (node_id)
@@ -75,10 +75,10 @@ BEGIN
 
 	IF v_networkmode = 4 THEN
 
-		EXECUTE ' INSERT INTO temp_t_node (node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, the_geom, expl_id, 
+		EXECUTE ' INSERT INTO temp_t_node (node_id, top_elev, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, the_geom, expl_id, 
 			dma_id, presszone_id, dqa_id, minsector_id, age)
 			SELECT DISTINCT ON (c.connec_id)
-			c.connec_id, elevation, elevation-depth as elev, ''CONNEC'', conneccat_id, epa_type, c.sector_id, c.state, c.state_type, c.annotation, c.the_geom, c.expl_id, 
+			c.connec_id, top_elev, top_elev-depth as elev, ''CONNEC'', conneccat_id, epa_type, c.sector_id, c.state, c.state_type, c.annotation, c.the_geom, c.expl_id, 
 			c.dma_id, c.presszone_id, c.dqa_id, c.minsector_id,
 			(case when c.builtdate is not null then (now()::date-c.builtdate)/30 else 0 end)
 			FROM selector_sector, v_edit_connec c
@@ -95,10 +95,10 @@ BEGIN
 	UPDATE temp_t_node SET pattern_id=inp_reservoir.pattern_id FROM inp_reservoir WHERE temp_t_node.node_id=inp_reservoir.node_id;
 
 	-- update head for those reservoirs head is not null
-	UPDATE temp_t_node SET elevation = head, elev = head FROM inp_reservoir WHERE temp_t_node.node_id=inp_reservoir.node_id AND head is not null;
+	UPDATE temp_t_node SET top_elev = head, elev = head FROM inp_reservoir WHERE temp_t_node.node_id=inp_reservoir.node_id AND head is not null;
 
 	-- update head for those inlet acting as reservoir with head not null
-	UPDATE temp_t_node SET elevation = head, elev = head FROM inp_inlet WHERE temp_t_node.node_id=inp_inlet.node_id AND head is not null AND epa_type = 'RESERVOIR';
+	UPDATE temp_t_node SET top_elev = head, elev = head FROM inp_inlet WHERE temp_t_node.node_id=inp_inlet.node_id AND head is not null AND epa_type = 'RESERVOIR';
 
 	-- update child param for inp_tank
 	UPDATE temp_t_node SET addparam=concat('{"initlevel":"',initlevel,'", "minlevel":"',minlevel,'", "maxlevel":"',maxlevel,'", "diameter":"'

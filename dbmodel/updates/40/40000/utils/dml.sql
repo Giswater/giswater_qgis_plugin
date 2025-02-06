@@ -1250,8 +1250,3 @@ INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('va
 INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('value_datasource', '2', 'CRM', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
 INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('value_datasource', '3', 'DEM', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
 INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('value_datasource', '4', 'TOPO', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
--- sys_foreignkey
-INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, parameter_id, active) VALUES('edit_typevalue', 'value_datasource', 'node', 'datasource', NULL, true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field) DO NOTHING;
-INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, parameter_id, active) VALUES('edit_typevalue', 'value_datasource', 'arc', 'datasource', NULL, true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field) DO NOTHING;
-INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, parameter_id, active) VALUES('edit_typevalue', 'value_datasource', 'connec', 'datasource', NULL, true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field) DO NOTHING;
-INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, parameter_id, active) VALUES('edit_typevalue', 'value_datasource', 'element', 'datasource', NULL, true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field) DO NOTHING;

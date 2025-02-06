@@ -305,8 +305,8 @@ BEGIN
 
 		ELSIF v_project_type = 'WS' THEN
 
-			v_fcatgeom = 'cat_dnom::float*0.001'; v_ftopelev = 'elevation'; v_fymax = 'depth'; v_fslope = '100*(elevation1 - depth1 - elevation2 + depth2)/gis_length';
-			v_fsyselev = 'elevation - depth'; v_fsystopelev = v_ftopelev; v_fsysymax = v_fymax;
+			v_fcatgeom = 'cat_dnom::float*0.001'; v_ftopelev = 'top_elev'; v_fymax = 'depth'; v_fslope = '100*(elevation1 - depth1 - elevation2 + depth2)/gis_length';
+			v_fsyselev = 'top_elev - depth'; v_fsystopelev = v_ftopelev; v_fsysymax = v_fymax;
 			v_querytext = '';
 			v_querytext1 = '';
 			v_querytext2 = '';
@@ -384,7 +384,7 @@ BEGIN
 		IF v_project_type = 'UD' THEN
 			SELECT count(*) INTO v_count FROM temp_anl_node WHERE (elev IS NULL or ymax is null OR top_elev is null);
 		ELSIF v_project_type = 'WS' THEN
-			SELECT count(*) INTO v_count FROM temp_anl_node WHERE (elevation IS NULL or depth is null);
+			SELECT count(*) INTO v_count FROM temp_anl_node WHERE (top_elev IS NULL or depth is null);
 		END IF;
 
 		IF v_linksdistance > 0 AND v_count = 0 and v_vnode_status IS NOT False THEN

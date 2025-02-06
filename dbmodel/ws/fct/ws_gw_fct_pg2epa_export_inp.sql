@@ -165,7 +165,7 @@ BEGIN
 	 SELECT temp_t_node.node_id,
 		CASE
 		    WHEN temp_t_node.elev IS NOT NULL THEN temp_t_node.elev
-		    ELSE temp_t_node.elevation
+		    ELSE temp_t_node.top_elev
 		END AS elevation,
 	    temp_t_node.demand,
 	    temp_t_node.pattern_id,
@@ -410,7 +410,7 @@ BEGIN
 	 SELECT node_id,
 		CASE
 		    WHEN elev IS NOT NULL THEN elev
-		    ELSE elevation
+		    ELSE top_elev
 		END AS head,
 	    pattern_id,
 	    concat(';', sector_id, ' ', dma_id, ' ', presszone_id, ' ', dqa_id, ' ', minsector_id, ' ', node_type) AS other
@@ -507,7 +507,7 @@ BEGIN
 	 SELECT node_id,
 		CASE
 		    WHEN elev IS NOT NULL THEN elev
-		    ELSE elevation
+		    ELSE top_elev
 		END AS elevation,
 	    (addparam::json ->> 'initlevel'::text)::numeric AS initlevel,
 	    (addparam::json ->> 'minlevel'::text)::numeric AS minlevel,

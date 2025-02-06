@@ -541,7 +541,7 @@ BEGIN
 							-- update specific fields for ws projects
 							IF v_projecttype = 'WS' THEN
 								UPDATE connec SET dqa_id=v_arc.dqa_id, minsector_id=v_arc.minsector_id,presszone_id=v_arc.presszone_id,
-								staticpressure = ((SELECT head from presszone WHERE presszone_id = v_arc.presszone_id)- v_connect.elevation)
+								staticpressure = ((SELECT head from presszone WHERE presszone_id = v_arc.presszone_id)- v_connect.top_elev)
 								WHERE connec_id = v_connect_id;
 							END IF;
 

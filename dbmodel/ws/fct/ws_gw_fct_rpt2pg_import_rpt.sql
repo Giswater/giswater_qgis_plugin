@@ -130,7 +130,7 @@ BEGIN
 		UPDATE temp_t_csv SET csv6=null WHERE source='rpt_node' AND (csv6='Reservoir' OR csv6='Tank'); -- delete Reservoir AND tank word when quality is not enabled
 		DELETE FROM temp_t_csv WHERE source='rpt_node' AND (csv1='Node' or csv1='Elevation' or csv1='MINIMUM' or csv1='MAXIMUM' or csv1='DIFFERENTIAL' or csv1='AVERAGE');
 
-		INSERT INTO rpt_node (node_id, result_id, "time", elevation, demand, head, press, quality)
+		INSERT INTO rpt_node (node_id, result_id, "time", top_elev, demand, head, press, quality)
 		SELECT csv1, v_result_id, (case when csv40 is null then '00:00' else csv40 end), csv2::numeric, csv3::numeric, csv4::numeric, csv5::numeric, csv6::numeric
 		FROM temp_t_csv WHERE source='rpt_node' AND fid = 140 AND cur_user=current_user ORDER BY id;
 

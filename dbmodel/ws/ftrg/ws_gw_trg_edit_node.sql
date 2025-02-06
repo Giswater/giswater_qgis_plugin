@@ -526,21 +526,21 @@ BEGIN
 			NEW.function_type = (SELECT value FROM config_param_user WHERE parameter = 'node_function_vdefault' AND cur_user = current_user);
 		END IF;
 
-		--elevation from raster
+		--top_elev from raster
 		IF (SELECT json_extract_path_text(value::json,'activated')::boolean FROM config_param_system WHERE parameter='admin_raster_dem') IS TRUE
-		AND (NEW.elevation IS NULL) AND
+		AND (NEW.top_elev IS NULL) AND
 		(SELECT upper(value)  FROM config_param_user WHERE parameter = 'edit_insert_elevation_from_dem' and cur_user = current_user) = 'TRUE' THEN
-			NEW.elevation = (SELECT ST_Value(rast,1,NEW.the_geom,true) FROM ext_raster_dem WHERE id =
+			NEW.top_elev = (SELECT ST_Value(rast,1,NEW.the_geom,true) FROM ext_raster_dem WHERE id =
 				(SELECT id FROM ext_raster_dem WHERE st_dwithin (envelope, NEW.the_geom, 1) LIMIT 1));
 		END IF;
 
 		-- FEATURE INSERT
-		INSERT INTO node (node_id, code, elevation, depth, nodecat_id, epa_type, sector_id, arc_id, parent_id, state, state_type, annotation, observ,comment, dma_id, presszone_id,
+		INSERT INTO node (node_id, code, top_elev, custom_top_elev, depth, nodecat_id, epa_type, sector_id, arc_id, parent_id, state, state_type, annotation, observ,comment, dma_id, presszone_id,
 		soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, workcat_id_plan, buildercat_id, builtdate, enddate, ownercat_id, muni_id,streetaxis_id,
 		streetaxis2_id, postcode, postnumber, postnumber2, postcomplement, district_id,	postcomplement2, descript, link, rotation,verified, undelete,label_x,label_y,label_rotation,
 		expl_id, publish, inventory, the_geom, hemisphere, num_value, adate, adescript, accessibility, lastupdate, lastupdate_user, asset_id,
 		om_state, conserv_state, access_type, placement_type, expl_id2, brand_id, model_id, serial_number, label_quadrant, streetname, streetname2)
-		VALUES (NEW.node_id, NEW.code, NEW.elevation, NEW.depth, NEW.nodecat_id, NEW.epa_type, NEW.sector_id, NEW.arc_id, NEW.parent_id, NEW.state, NEW.state_type, NEW.annotation, NEW.observ,
+		VALUES (NEW.node_id, NEW.code, NEW.top_elev, NEW.custom_top_elev, NEW.depth, NEW.nodecat_id, NEW.epa_type, NEW.sector_id, NEW.arc_id, NEW.parent_id, NEW.state, NEW.state_type, NEW.annotation, NEW.observ,
 		NEW.comment,NEW.dma_id, NEW.presszone_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type, NEW.location_type,NEW.workcat_id, NEW.workcat_id_end, NEW.workcat_id_plan, NEW.buildercat_id,
 		NEW.builtdate, NEW.enddate, NEW.ownercat_id, NEW.muni_id, v_streetaxis, v_streetaxis2, NEW.postcode, NEW.postnumber ,NEW.postnumber2, NEW.postcomplement, NEW.district_id,
 		NEW.postcomplement2, NEW.descript, NEW.link, NEW.rotation, NEW.verified, NEW.undelete,NEW.label_x,NEW.label_y,NEW.label_rotation,
@@ -733,7 +733,7 @@ BEGIN
 
 		-- static pressure
 		IF v_ispresszone AND NEW.presszone_id IS NOT NULL THEN
-			UPDATE node SET staticpressure = (SELECT head from presszone WHERE presszone_id = NEW.presszone_id)-elevation WHERE node_id = NEW.node_id;
+			UPDATE node SET staticpressure = (SELECT head from presszone WHERE presszone_id = NEW.presszone_id)-top_elev WHERE node_id = NEW.node_id;
 		END IF;
 
 		-- man2inp_values
@@ -746,7 +746,7 @@ BEGIN
 
 	-- static pressure
 		IF v_ispresszone AND (NEW.presszone_id != OLD.presszone_id) THEN
-			UPDATE node SET staticpressure = (SELECT head from presszone WHERE presszone_id = NEW.presszone_id)-elevation
+			UPDATE node SET staticpressure = (SELECT head from presszone WHERE presszone_id = NEW.presszone_id)-top_elev
 			WHERE node_id = NEW.node_id;
 		END IF;
 
@@ -884,11 +884,11 @@ BEGIN
 				NEW.parent_id=v_node_id;
 			END IF;
 
-			--update elevation from raster
+			--update top_elev from raster
 			IF (SELECT json_extract_path_text(value::json,'activated')::boolean FROM config_param_system WHERE parameter='admin_raster_dem') IS TRUE
-			AND (NEW.elevation = OLD.elevation) AND
+			AND (NEW.top_elev = OLD.top_elev) AND
 				(SELECT upper(value)  FROM config_param_user WHERE parameter = 'edit_update_elevation_from_dem' and cur_user = current_user) = 'TRUE' THEN
-				NEW.elevation = (SELECT ST_Value(rast,1,NEW.the_geom,true) FROM ext_raster_dem WHERE id =
+				NEW.top_elev = (SELECT ST_Value(rast,1,NEW.the_geom,true) FROM ext_raster_dem WHERE id =
 							(SELECT id FROM ext_raster_dem WHERE st_dwithin (envelope, NEW.the_geom, 1) LIMIT 1));
 			END IF;
 
@@ -945,7 +945,7 @@ BEGIN
 		END IF;
 
 		UPDATE node
-		SET code=NEW.code, elevation=NEW.elevation, "depth"=NEW."depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, arc_id=NEW.arc_id, parent_id=NEW.parent_id,
+		SET code=NEW.code, top_elev=NEW.top_elev, custom_top_elev=NEW.custom_top_elev, "depth"=NEW."depth", nodecat_id=NEW.nodecat_id, epa_type=NEW.epa_type, sector_id=NEW.sector_id, arc_id=NEW.arc_id, parent_id=NEW.parent_id,
 		state_type=NEW.state_type, annotation=NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", dma_id=NEW.dma_id, presszone_id=NEW.presszone_id, soilcat_id=NEW.soilcat_id,
 		function_type=NEW.function_type, category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id, workcat_id_end=NEW.workcat_id_end,
 		workcat_id_plan=NEW.workcat_id_plan,buildercat_id=NEW.buildercat_id,builtdate=NEW.builtdate, enddate=NEW.enddate, ownercat_id=NEW.ownercat_id, muni_id=NEW.muni_id, streetaxis_id=v_streetaxis,
@@ -1090,8 +1090,8 @@ BEGIN
 
 		v_new_node_type= (SELECT node_type FROM  cat_node where cat_node.id=NEW.nodecat_id);
 
-		UPDATE arc SET nodetype_1 = v_new_node_type, elevation1=NEW.elevation, depth1=NEW.depth, staticpress1 = NEW.staticpressure WHERE node_1 = NEW.node_id;
-		UPDATE arc SET nodetype_2 = v_new_node_type, elevation2=NEW.elevation, depth2=NEW.depth, staticpress2 = NEW.staticpressure WHERE node_2 = NEW.node_id;
+		UPDATE arc SET nodetype_1 = v_new_node_type, elevation1=NEW.top_elev, depth1=NEW.depth, staticpress1 = NEW.staticpressure WHERE node_1 = NEW.node_id;
+		UPDATE arc SET nodetype_2 = v_new_node_type, elevation2=NEW.top_elev, depth2=NEW.depth, staticpress2 = NEW.staticpressure WHERE node_2 = NEW.node_id;
 
 
 

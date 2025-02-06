@@ -115,7 +115,7 @@ BEGIN
 		    node.node_type,
 		    node.sector_id,
 		    node.nodecat_id,
-		    max(rpt_node.elevation) AS elevation,
+		    max(rpt_node.top_elev) AS top_elev,
 		    max(rpt_node.demand) AS demand_max,
 		    min(rpt_node.demand) AS demand_min,
 		    avg(rpt_node.demand)::numeric(12,2) AS demand_avg,

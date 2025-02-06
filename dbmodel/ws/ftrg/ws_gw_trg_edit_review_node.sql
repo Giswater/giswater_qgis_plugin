@@ -35,13 +35,13 @@ BEGIN
 	END IF;
 
 	--getting original values
-	SELECT node_id, elevation, depth, node_type, nodecat_id, annotation, observ, expl_id, the_geom INTO rec_node
+	SELECT node_id, top_elev, depth, node_type, nodecat_id, annotation, observ, expl_id, the_geom INTO rec_node
 	FROM node JOIN cat_node ON cat_node.id=node.nodecat_id WHERE node_id=NEW.node_id;
 
 	IF NEW.field_checked=TRUE THEN
 		--looking for insert/update/delete values on audit table
 		IF
-			abs(rec_node.elevation-NEW.elevation)>v_rev_node_elevation_tol OR  (rec_node.elevation IS NULL AND NEW.elevation IS NOT NULL) OR
+			abs(rec_node.top_elev-NEW.top_elev)>v_rev_node_elevation_tol OR  (rec_node.top_elev IS NULL AND NEW.top_elev IS NOT NULL) OR
 			abs(rec_node.depth-NEW.depth)>v_rev_node_depth_tol OR  (rec_node.depth IS NULL AND NEW.depth IS NOT NULL) OR
 			rec_node.nodecat_id!= NEW.nodecat_id OR  (rec_node.nodecat_id IS NULL AND NEW.nodecat_id IS NOT NULL) OR
 			rec_node.annotation != NEW.annotation	OR  (rec_node.annotation IS NULL AND NEW.annotation IS NOT NULL) OR
@@ -97,8 +97,8 @@ BEGIN
 
 
 		-- insert values on review table
-		INSERT INTO review_node (node_id, elevation, depth, nodecat_id, annotation, observ, review_obs, expl_id, the_geom, field_checked, field_date)
-		VALUES (NEW.node_id, NEW.elevation, NEW.depth, NEW.nodecat_id, NEW.annotation, NEW.observ, NEW.review_obs, NEW.expl_id, NEW.the_geom, NEW.field_checked,NEW.field_date);
+		INSERT INTO review_node (node_id, top_elev, depth, nodecat_id, annotation, observ, review_obs, expl_id, the_geom, field_checked, field_date)
+		VALUES (NEW.node_id, NEW.top_elev, NEW.depth, NEW.nodecat_id, NEW.annotation, NEW.observ, NEW.review_obs, NEW.expl_id, NEW.the_geom, NEW.field_checked,NEW.field_date);
 
 
 		--looking for insert values on audit table
@@ -106,7 +106,7 @@ BEGIN
 
 			INSERT INTO review_audit_node(node_id, old_elevation, new_elevation, old_depth, new_depth,
 			old_nodecat_id, new_nodecat_id, old_annotation, new_annotation, old_observ, new_observ, review_obs, expl_id ,the_geom ,review_status_id, field_date, field_user)
-			VALUES (NEW.node_id, rec_node.elevation, NEW.elevation, rec_node.depth,
+			VALUES (NEW.node_id, rec_node.top_elev, NEW.top_elev, rec_node.depth,
 			NEW.depth, rec_node.nodecat_id, NEW.nodecat_id, rec_node.annotation, NEW.annotation, rec_node.observ, NEW.observ, NEW.review_obs, NEW.expl_id,
 			NEW.the_geom, v_review_status, NEW.field_date, current_user);
 
@@ -117,7 +117,7 @@ BEGIN
     ELSIF TG_OP = 'UPDATE' THEN
 
 		-- update values on review table
-		UPDATE review_node SET elevation=NEW.elevation, depth=NEW.depth, nodecat_id=NEW.nodecat_id, annotation=NEW.annotation,
+		UPDATE review_node SET top_elev=NEW.top_elev, depth=NEW.depth, nodecat_id=NEW.nodecat_id, annotation=NEW.annotation,
 		observ=NEW.observ, review_obs=NEW.review_obs, expl_id=NEW.expl_id, the_geom=NEW.the_geom, field_checked=NEW.field_checked
 		WHERE node_id=NEW.node_id;
 
@@ -125,7 +125,7 @@ BEGIN
 		IF (NEW.field_checked is TRUE) THEN
 			-- upserting values on review_audit_node node table
 			IF EXISTS (SELECT node_id FROM review_audit_node WHERE node_id=NEW.node_id) THEN
-				UPDATE review_audit_node SET old_elevation=rec_node.elevation, new_elevation=NEW.elevation, old_depth=rec_node.depth, new_depth=NEW.depth,
+				UPDATE review_audit_node SET old_top_elev=rec_node.top_elev, new_top_elev=NEW.top_elev, old_depth=rec_node.depth, new_depth=NEW.depth,
 				old_nodecat_id=rec_node.nodecat_id, new_nodecat_id=NEW.nodecat_id, old_annotation=rec_node.annotation, new_annotation=NEW.annotation,
 				old_observ=rec_node.observ, new_observ=NEW.observ, review_obs=NEW.review_obs, expl_id=NEW.expl_id, the_geom=NEW.the_geom, review_status_id=v_review_status,
 				field_date=NEW.field_date, field_user=current_user WHERE node_id=NEW.node_id;
@@ -133,7 +133,7 @@ BEGIN
 
 				INSERT INTO review_audit_node(node_id, old_elevation, new_elevation, old_depth, new_depth,
 				old_nodecat_id, new_nodecat_id, old_annotation, new_annotation, old_observ, new_observ, review_obs, expl_id ,the_geom ,review_status_id, field_date, field_user)
-				VALUES (NEW.node_id, rec_node.elevation, NEW.elevation, rec_node.depth,
+				VALUES (NEW.node_id, rec_node.top_elev, NEW.top_elev, rec_node.depth,
 				NEW.depth, rec_node.nodecat_id, NEW.nodecat_id, rec_node.annotation, NEW.annotation, rec_node.observ, NEW.observ, NEW.review_obs, NEW.expl_id,
 				NEW.the_geom, v_review_status, NEW.field_date, current_user);
 			END IF;

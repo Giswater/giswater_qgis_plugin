@@ -205,7 +205,7 @@ BEGIN
 		INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 0,
 		concat('Total length (Km) : ',v_sumlength,'.'));
 
-		SELECT min(elevation), max(elevation) INTO v_min, v_max FROM temp_t_node;
+		SELECT min(top_elev), max(top_elev) INTO v_min, v_max FROM temp_t_node;
 		INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 0,
 		concat('Data analysis for node elevation. Minimun and maximum values are: ( ',v_min,' - ',v_max,' ).'));
 

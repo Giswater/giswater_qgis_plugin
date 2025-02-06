@@ -56,17 +56,17 @@ BEGIN
 	RAISE NOTICE 'setting diameter for null values';
 	UPDATE temp_t_arc SET diameter = v_diameter WHERE diameter IS NULL;
 
-	RAISE NOTICE 'setting null elevation values using closest points values';
-	UPDATE temp_t_node SET elevation = d.elevation FROM
-		(SELECT c.n1 as node_id, e2 as elevation FROM (SELECT DISTINCT ON (a.node_id) a.node_id as n1, a.elevation as e1, a.the_geom as n1_geom, b.node_id as n2, b.elevation as e2, b.the_geom as n2_geom FROM node a, node b
-		WHERE st_dwithin (a.the_geom, b.the_geom, v_nullbuffer) AND a.node_id != b.node_id AND a.elevation IS NULL AND b.elevation IS NOT NULL) c order by st_distance (n1_geom, n2_geom))d
-		WHERE temp_t_node.elevation IS NULL AND d.node_id=temp_t_node.node_id;
+	RAISE NOTICE 'setting null top_elev values using closest points values';
+	UPDATE temp_t_node SET top_elev = d.top_elev FROM
+		(SELECT c.n1 as node_id, e2 as top_elev FROM (SELECT DISTINCT ON (a.node_id) a.node_id as n1, a.top_elev as e1, a.the_geom as n1_geom, b.node_id as n2, b.top_elev as e2, b.the_geom as n2_geom FROM node a, node b
+		WHERE st_dwithin (a.the_geom, b.the_geom, v_nullbuffer) AND a.node_id != b.node_id AND a.top_elev IS NULL AND b.top_elev IS NOT NULL) c order by st_distance (n1_geom, n2_geom))d
+		WHERE temp_t_node.top_elev IS NULL AND d.node_id=temp_t_node.node_id;
 
-	RAISE NOTICE 'setting cero elevation values using closest points values';
-	UPDATE temp_t_node SET elevation = d.elevation FROM
-		(SELECT c.n1 as node_id, e2 as elevation FROM (SELECT DISTINCT ON (a.node_id) a.node_id as n1, a.elevation as e1, a.the_geom as n1_geom, b.node_id as n2, b.elevation as e2, b.the_geom as n2_geom FROM node a, node b
-		WHERE st_dwithin (a.the_geom, b.the_geom, v_cerobuffer) AND a.node_id != b.node_id AND a.elevation = 0 AND b.elevation > 0) c order by st_distance (n1_geom, n2_geom))d
-		WHERE temp_t_node.elevation IS NULL AND d.node_id=temp_t_node.node_id;
+	RAISE NOTICE 'setting cero top_elev values using closest points values';
+	UPDATE temp_t_node SET top_elev = d.top_elev FROM
+		(SELECT c.n1 as node_id, e2 as top_elev FROM (SELECT DISTINCT ON (a.node_id) a.node_id as n1, a.top_elev as e1, a.the_geom as n1_geom, b.node_id as n2, b.top_elev as e2, b.the_geom as n2_geom FROM node a, node b
+		WHERE st_dwithin (a.the_geom, b.the_geom, v_cerobuffer) AND a.node_id != b.node_id AND a.top_elev = 0 AND b.top_elev > 0) c order by st_distance (n1_geom, n2_geom))d
+		WHERE temp_t_node.top_elev IS NULL AND d.node_id=temp_t_node.node_id;
 
     RETURN 1;
 

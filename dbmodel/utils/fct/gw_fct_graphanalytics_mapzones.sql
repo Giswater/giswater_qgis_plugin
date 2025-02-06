@@ -789,8 +789,8 @@ BEGIN
 
 			INSERT INTO temp_t_data (fid, feature_type, feature_id, log_message)
 			SELECT 147, 'node', n.node_id,
-			concat('{"staticpressure":',case when (pz.head - n.elevation::float + (case when n.depth is null then 0 else n.depth end)::float) is null
-			then 0 ELSE (pz.head - n.elevation::float + (case when n.depth is null then 0 else n.depth end)) END, '}')
+			concat('{"staticpressure":',case when (pz.head - n.top_elev::float + (case when n.depth is null then 0 else n.depth end)::float) is null
+			then 0 ELSE (pz.head - n.top_elev::float + (case when n.depth is null then 0 else n.depth end)) END, '}')
 			FROM temp_t_node n
 			JOIN
 				(SELECT distinct on(node) node as node_id, trace as presszone_id FROM(
@@ -819,14 +819,14 @@ BEGIN
 			*/
 
 			-- update connec table
-			EXECUTE 'UPDATE temp_t_connec SET staticpressure =(b.head - b.elevation + (case when b.depth is null then 0 else b.depth end)::float) FROM 
-				(SELECT connec_id, head, elevation, depth FROM temp_t_connec c JOIN temp_t_link ON feature_id = connec_id
+			EXECUTE 'UPDATE temp_t_connec SET staticpressure =(b.head - b.top_elev + (case when b.depth is null then 0 else b.depth end)::float) FROM 
+				(SELECT connec_id, head, top_elev, depth FROM temp_t_connec c JOIN temp_t_link ON feature_id = connec_id
 				JOIN temp_presszone p ON c.presszone_id = p.presszone_id) b
 				WHERE temp_t_connec.connec_id=b.connec_id;';
 
 			-- update link table
-			EXECUTE 'UPDATE temp_t_link SET staticpressure =(b.head - b.elevation + (case when b.depth is null then 0 else b.depth end)::float) FROM 
-				(SELECT link_id, head, elevation, depth FROM temp_t_connec c JOIN temp_t_link ON feature_id = connec_id
+			EXECUTE 'UPDATE temp_t_link SET staticpressure =(b.head - b.top_elev + (case when b.depth is null then 0 else b.depth end)::float) FROM 
+				(SELECT link_id, head, top_elev, depth FROM temp_t_connec c JOIN temp_t_link ON feature_id = connec_id
 				JOIN temp_presszone p ON c.presszone_id = p.presszone_id) b
 				WHERE temp_t_link.link_id=b.link_id;';
 

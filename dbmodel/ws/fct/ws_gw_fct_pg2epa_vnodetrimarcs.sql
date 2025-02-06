@@ -82,7 +82,7 @@ BEGIN
 		when st_linelocatepoint (t_arc.the_geom , vnode.the_geom) > 0.9999 then 0.9999
 		when st_linelocatepoint (t_arc.the_geom , vnode.the_geom) < 0.0001 then 0.0001
 		else (st_linelocatepoint (t_arc.the_geom , vnode.the_geom))::numeric(12,4) end as locate,
-	vnode.elevation
+	vnode.top_elev
 	FROM t_arc, t_node AS vnode
 	WHERE node_type = 'CONNEC' AND st_dwithin ( t_arc.the_geom, vnode.the_geom, 0.01)
 	AND vnode.state > 0 AND t_arc.arc_type NOT IN ('NODE2ARC', 'LINK');
@@ -91,7 +91,7 @@ BEGIN
 	RAISE NOTICE 'vnodetrimarcs 7 - insert previous data into data on temp_table';
 	INSERT INTO t_go2epa (arc_id, vnode_id, locate, elevation, depth)
 	SELECT  arc.arc_id, vnode_id, locate,
-	case when t.elevation is null then (n1.elevation - locate*(n1.elevation-n2.elevation))::numeric(12,3) ELSE t.elevation END as elevation,
+	case when t.elevation is null then (n1.top_elev - locate*(n1.top_elev-n2.top_elev))::numeric(12,3) ELSE t.elevation END as elevation,
 	(CASE WHEN (n1.depth - locate*(n1.depth-n2.depth)) IS NULL THEN 0 ELSE (n1.depth - locate*(n1.depth-n2.depth)) END)::numeric (12,3) as depth
 	FROM t_t_go2epa t
 	JOIN arc USING (arc_id)

@@ -41,9 +41,9 @@ BEGIN
 		SELECT * INTO v_record FROM temp_t_node WHERE node_id = v_node_1;
 		v_record.node_id = concat (reverse(substring(reverse(v_record.node_id),2)), '3');
 		v_record.the_geom := ST_LineInterpolatePoint(v_geom, 0.5);
-		INSERT INTO temp_t_node (result_id, node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, demand,
+		INSERT INTO temp_t_node (result_id, node_id, top_elev, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, demand,
 		the_geom, expl_id, pattern_id, dma_id, presszone_id, dqa_id, minsector_id)
-		VALUES (v_record.result_id, v_record.node_id, v_record.elevation, v_record.elev, v_record.node_type, v_record.nodecat_id, v_record.epa_type,
+		VALUES (v_record.result_id, v_record.node_id, v_record.top_elev, v_record.elev, v_record.node_type, v_record.nodecat_id, v_record.epa_type,
 		v_record.sector_id, v_record.state, v_record.state_type, v_record.annotation, v_record.demand, v_record.the_geom, v_record.expl_id,
 		v_record.pattern_id, v_record.dma_id, v_record.presszone_id, v_record.dqa_id, v_record.minsector_id);
 
@@ -93,9 +93,9 @@ BEGIN
 		SELECT * INTO v_record FROM temp_t_node WHERE node_id = v_node_1;
 		v_record.node_id = concat (reverse(substring(reverse(v_record.node_id),2)), '3');
 		v_record.the_geom := ST_LineInterpolatePoint(v_geom, 0.5);
-		INSERT INTO temp_t_node (result_id, node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, demand, the_geom, expl_id,
+		INSERT INTO temp_t_node (result_id, node_id, top_elev, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, demand, the_geom, expl_id,
 		pattern_id, dma_id, presszone_id, dqa_id, minsector_id)
-		VALUES (v_record.result_id, v_record.node_id, v_record.elevation, v_record.elev, v_record.node_type, v_record.nodecat_id, v_record.epa_type, v_record.sector_id, v_record.state,
+		VALUES (v_record.result_id, v_record.node_id, v_record.top_elev, v_record.elev, v_record.node_type, v_record.nodecat_id, v_record.epa_type, v_record.sector_id, v_record.state,
 		v_record.state_type, v_record.annotation, v_record.demand, v_record.the_geom, v_record.expl_id, v_record.pattern_id, v_record.dma_id, v_record.presszone_id, v_record.dqa_id, v_record.minsector_id);
 
 		-- New arc (PSV)

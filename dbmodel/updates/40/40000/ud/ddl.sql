@@ -767,3 +767,7 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"gully", "co
 ALTER TABLE gully ADD CONSTRAINT gully_dwfzone_id_fkey FOREIGN KEY (dwfzone_id) REFERENCES dwfzone(dwfzone_id) ON DELETE RESTRICT ON UPDATE CASCADE;
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"link", "column":"dwfzone_id", "dataType":"int4"}}$$);
 ALTER TABLE link ADD CONSTRAINT link_dwfzone_id_fkey FOREIGN KEY (dwfzone_id) REFERENCES dwfzone(dwfzone_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- 06/02/2025
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"datasource", "dataType":"integer"}}$$);
+

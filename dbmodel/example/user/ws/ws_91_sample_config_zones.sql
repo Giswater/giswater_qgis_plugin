@@ -62,7 +62,7 @@ INSERT INTO config_param_user VALUES ('om_profile_stylesheet', '{"title":{"text"
 "grid":{"boundary":{"color":"gray","style":"solid", "width":1}, "lines":{"color":"lightgray","style":"solid", "width":1},"text":{"color":"black", "weight":"normal"}},
 "guitar":{"lines":{"color":"black", "style":"solid", "width":1}, "auxiliarlines":{"color":"gray","style":"solid", "width":1}, "text":{"color":"black", "weight":"normal"}}}', current_user);
 INSERT INTO config_param_user VALUES ('inp_options_rtc_period_id', NULL, current_user);
-INSERT INTO config_param_user VALUES ('edit_node_interpolate', '{"elevation":{"status":true, "column":"elevation"}, "depth":{"status":true, "column":"depth"}}', current_user);
+INSERT INTO config_param_user VALUES ('edit_node_interpolate', '{"elevation":{"status":true, "column":"top_elev"}, "depth":{"status":true, "column":"depth"}}', current_user);
 INSERT INTO config_param_user VALUES ('edit_disable_topocontrol', 'false', current_user);
 INSERT INTO config_param_user VALUES ('inp_options_debug', '{"forceReservoirsOnInlets":false, "forceTanksOnInlets":false, "setDemand":true,"checkResult":true,"onlyIsOperative":true,"delDisconnNetwork":false,"removeDemandOnDryNodes":false,"breakPipes":{"status":false, "maxLength":10, "removeVnodeBuffer":1},"graphicLog":"true","steps":0,"autoRepair":true}', current_user);
 INSERT INTO config_param_user VALUES ('edit_typevalue_fk_disable', 'FALSE', current_user);

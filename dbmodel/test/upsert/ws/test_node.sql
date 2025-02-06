@@ -13,14 +13,14 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 SELECT plan(84);
 
 -- node -> airvalve
-INSERT INTO node (node_id, code, elevation, "depth", nodecat_id, epa_type, sector_id, arc_id, parent_id, state,
+INSERT INTO node (node_id, code, top_elev, custom_top_elev,"depth", nodecat_id, epa_type, sector_id, arc_id, parent_id, state,
 state_type, annotation, observ, "comment", dma_id, presszone_id, soilcat_id, function_type, category_type, fluid_type,
 location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, muni_id, postcode, streetaxis_id,
 postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, descript, link, verified, rotation, the_geom,
 undelete, label_x, label_y, label_rotation, publish, inventory, hemisphere, expl_id, num_value, feature_type, tstamp,
 lastupdate, lastupdate_user, insert_user, minsector_id, dqa_id, staticpressure, district_id, adate, adescript, accessibility,
 workcat_id_plan, asset_id, om_state, conserv_state, access_type, placement_type, expl_id2, brand_id, model_id, serial_number, macrominsector_id)
-VALUES('-901', '-901', 32.8800, NULL, 'AIR VALVE DN50', 'UNDEFINED', 5, NULL, NULL, 1, 2, NULL, NULL, NULL, 3, '3', 'soil1', NULL, NULL, NULL,
+VALUES('-901', '-901', 32.8800, NULL, NULL, 'AIR VALVE DN50', 'UNDEFINED', 5, NULL, NULL, 1, 2, NULL, NULL, NULL, 3, '3', 'soil1', NULL, NULL, NULL,
 NULL, 'work1', NULL, NULL, '2024-08-22', NULL, 'owner1', 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '', '1', NULL,
 'SRID=25831;POINT (418464.27187965554 4577996.645015663)'::public.geometry, NULL, NULL, NULL, NULL, true, true, NULL, 2, NULL, 'NODE',
 '2024-08-22 14:17:21.141', '2024-08-22 14:17:21.238', 'postgres', 'postgres', NULL, NULL, 38.870, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
@@ -35,14 +35,14 @@ SELECT is((SELECT count(*)::integer FROM node WHERE node_id = '-901'), 0, 'DELET
 
 
 -- node -> checkvalve
-INSERT INTO node (node_id, code, elevation, "depth", nodecat_id, epa_type, sector_id, arc_id, parent_id, state,
+INSERT INTO node (node_id, code, top_elev, custom_top_elev, "depth", nodecat_id, epa_type, sector_id, arc_id, parent_id, state,
 state_type, annotation, observ, "comment", dma_id, presszone_id, soilcat_id, function_type, category_type, fluid_type,
 location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, muni_id, postcode, streetaxis_id,
 postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, descript, link, verified, rotation, the_geom,
 undelete, label_x, label_y, label_rotation, publish, inventory, hemisphere, expl_id, num_value, feature_type, tstamp,
 lastupdate, lastupdate_user, insert_user, minsector_id, dqa_id, staticpressure, district_id, adate, adescript, accessibility,
 workcat_id_plan, asset_id, om_state, conserv_state, access_type, placement_type, expl_id2, brand_id, model_id, serial_number, macrominsector_id)
-VALUES('-902', '-902', 32.8800, NULL, 'CHK-VALVE63-PN16', 'SHORTPIPE', 5, NULL, NULL, 1, 2, NULL, NULL, NULL, 3, '3', 'soil1', NULL, NULL, NULL
+VALUES('-902', '-902', 32.8800, NULL, NULL, 'CHK-VALVE63-PN16', 'SHORTPIPE', 5, NULL, NULL, 1, 2, NULL, NULL, NULL, 3, '3', 'soil1', NULL, NULL, NULL
 , NULL, 'work1', NULL, NULL, '2024-08-22', NULL, 'owner1', 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '', '1', NULL,
 'SRID=25831;POINT (418464.49079948553 4577995.057846895)'::public.geometry, NULL, NULL, NULL, NULL, true, true, NULL, 2, NULL, 'NODE',
 '2024-08-22 14:28:10.079', '2024-08-22 14:28:10.131', 'postgres', 'postgres', NULL, NULL, 38.870, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
@@ -57,7 +57,7 @@ SELECT is((SELECT count(*)::integer FROM node WHERE node_id = '-902'), 0, 'DELET
 
 
 -- node -> control register
-INSERT INTO node (node_id, code, elevation, "depth", nodecat_id, epa_type, sector_id, arc_id, parent_id, state,
+INSERT INTO node (node_id, code, top_elev, "depth", nodecat_id, epa_type, sector_id, arc_id, parent_id, state,
 state_type, annotation, observ, "comment", dma_id, presszone_id, soilcat_id, function_type, category_type, fluid_type,
 location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, muni_id, postcode, streetaxis_id,
 postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, descript, link, verified, rotation, the_geom,
@@ -79,7 +79,7 @@ SELECT is((SELECT count(*)::integer FROM node WHERE node_id = '-903'), 0, 'DELET
 
 
 -- node -> curve
-INSERT INTO node (node_id, code, elevation, "depth", nodecat_id, epa_type, sector_id, arc_id, parent_id, state,
+INSERT INTO node (node_id, code, top_elev, "depth", nodecat_id, epa_type, sector_id, arc_id, parent_id, state,
 state_type, annotation, observ, "comment", dma_id, presszone_id, soilcat_id, function_type, category_type, fluid_type,
 location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, muni_id, postcode, streetaxis_id,
 postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, descript, link, verified, rotation, the_geom,
@@ -101,7 +101,7 @@ SELECT is((SELECT count(*)::integer FROM node WHERE node_id = '-904'), 0, 'DELET
 
 
 -- node -> endline
-INSERT INTO node (node_id, code, elevation, "depth", nodecat_id, epa_type, sector_id, arc_id, parent_id, state,
+INSERT INTO node (node_id, code, top_elev, "depth", nodecat_id, epa_type, sector_id, arc_id, parent_id, state,
 state_type, annotation, observ, "comment", dma_id, presszone_id, soilcat_id, function_type, category_type, fluid_type,
 location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, muni_id, postcode, streetaxis_id,
 postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, descript, link, verified, rotation, the_geom,
@@ -123,7 +123,7 @@ SELECT is((SELECT count(*)::integer FROM node WHERE node_id = '-905'), 0, 'DELET
 
 
 -- node -> expantank
-INSERT INTO node (node_id, code, elevation, "depth", nodecat_id, epa_type, sector_id, arc_id, parent_id, state,
+INSERT INTO node (node_id, code, top_elev, "depth", nodecat_id, epa_type, sector_id, arc_id, parent_id, state,
 state_type, annotation, observ, "comment", dma_id, presszone_id, soilcat_id, function_type, category_type, fluid_type,
 location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, muni_id, postcode, streetaxis_id,
 postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, descript, link, verified, rotation, the_geom,
@@ -145,7 +145,7 @@ SELECT is((SELECT count(*)::integer FROM node WHERE node_id = '-906'), 0, 'DELET
 
 
 -- node -> filter
-INSERT INTO node (node_id, code, elevation, "depth", nodecat_id, epa_type, sector_id, arc_id, parent_id, state,
+INSERT INTO node (node_id, code, top_elev, "depth", nodecat_id, epa_type, sector_id, arc_id, parent_id, state,
 state_type, annotation, observ, "comment", dma_id, presszone_id, soilcat_id, function_type, category_type, fluid_type,
 location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, muni_id, postcode, streetaxis_id,
 postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, descript, link, verified, rotation, the_geom,
@@ -167,7 +167,7 @@ SELECT is((SELECT count(*)::integer FROM node WHERE node_id = '-907'), 0, 'DELET
 
 
 -- node -> flexunion
-INSERT INTO node (node_id, code, elevation, "depth", nodecat_id, epa_type, sector_id, arc_id, parent_id, state,
+INSERT INTO node (node_id, code, top_elev, "depth", nodecat_id, epa_type, sector_id, arc_id, parent_id, state,
 state_type, annotation, observ, "comment", dma_id, presszone_id, soilcat_id, function_type, category_type, fluid_type,
 location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, muni_id, postcode, streetaxis_id,
 postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, descript, link, verified, rotation, the_geom,
@@ -188,7 +188,7 @@ DELETE FROM node WHERE node_id = '-908';
 SELECT is((SELECT count(*)::integer FROM node WHERE node_id = '-908'), 0, 'DELETE: node:flexunion "-908" was deleted');
 
 -- node -> flowmeter
-INSERT INTO node (node_id, code, elevation, "depth", nodecat_id, epa_type, sector_id, arc_id, parent_id, state,
+INSERT INTO node (node_id, code, top_elev, "depth", nodecat_id, epa_type, sector_id, arc_id, parent_id, state,
 state_type, annotation, observ, "comment", dma_id, presszone_id, soilcat_id, function_type, category_type, fluid_type,
 location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, muni_id, postcode, streetaxis_id,
 postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, descript, link, verified, rotation, the_geom,
@@ -210,7 +210,7 @@ SELECT is((SELECT count(*)::integer FROM node WHERE node_id = '-909'), 0, 'DELET
 
 
 -- node -> greenvalve
-INSERT INTO node (node_id, code, elevation, "depth", nodecat_id, epa_type, sector_id, arc_id, parent_id, state,
+INSERT INTO node (node_id, code, top_elev, "depth", nodecat_id, epa_type, sector_id, arc_id, parent_id, state,
 state_type, annotation, observ, "comment", dma_id, presszone_id, soilcat_id, function_type, category_type, fluid_type,
 location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, muni_id, postcode, streetaxis_id,
 postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, descript, link, verified, rotation, the_geom,
@@ -232,7 +232,7 @@ SELECT is((SELECT count(*)::integer FROM node WHERE node_id = '-910'), 0, 'DELET
 
 
 -- node -> hydrant
-INSERT INTO node (node_id, code, elevation, "depth", nodecat_id, epa_type, sector_id, arc_id, parent_id, state,
+INSERT INTO node (node_id, code, top_elev, "depth", nodecat_id, epa_type, sector_id, arc_id, parent_id, state,
 state_type, annotation, observ, "comment", dma_id, presszone_id, soilcat_id, function_type, category_type, fluid_type,
 location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, muni_id, postcode, streetaxis_id,
 postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, descript, link, verified, rotation, the_geom,
@@ -254,7 +254,7 @@ SELECT is((SELECT count(*)::integer FROM node WHERE node_id = '-911'), 0, 'DELET
 
 
 -- node -> junction
-INSERT INTO node (node_id, code, elevation, "depth", nodecat_id, epa_type, sector_id, arc_id, parent_id, state,
+INSERT INTO node (node_id, code, top_elev, "depth", nodecat_id, epa_type, sector_id, arc_id, parent_id, state,
 state_type, annotation, observ, "comment", dma_id, presszone_id, soilcat_id, function_type, category_type, fluid_type,
 location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, muni_id, postcode, streetaxis_id,
 postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, descript, link, verified, rotation, the_geom,
@@ -276,7 +276,7 @@ SELECT is((SELECT count(*)::integer FROM node WHERE node_id = '-912'), 0, 'DELET
 
 
 -- node -> manhole
-INSERT INTO node (node_id, code, elevation, "depth", nodecat_id, epa_type, sector_id, arc_id, parent_id, state,
+INSERT INTO node (node_id, code, top_elev, "depth", nodecat_id, epa_type, sector_id, arc_id, parent_id, state,
 state_type, annotation, observ, "comment", dma_id, presszone_id, soilcat_id, function_type, category_type, fluid_type,
 location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, muni_id, postcode, streetaxis_id,
 postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, descript, link, verified, rotation, the_geom,
@@ -298,7 +298,7 @@ SELECT is((SELECT count(*)::integer FROM node WHERE node_id = '-913'), 0, 'DELET
 
 
 -- node -> netsamplepoint
-INSERT INTO node (node_id, code, elevation, "depth", nodecat_id, epa_type, sector_id, arc_id, parent_id, state,
+INSERT INTO node (node_id, code, top_elev, "depth", nodecat_id, epa_type, sector_id, arc_id, parent_id, state,
 state_type, annotation, observ, "comment", dma_id, presszone_id, soilcat_id, function_type, category_type, fluid_type,
 location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, muni_id, postcode, streetaxis_id,
 postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, descript, link, verified, rotation, the_geom,
@@ -320,7 +320,7 @@ SELECT is((SELECT count(*)::integer FROM node WHERE node_id = '-914'), 0, 'DELET
 
 
 -- node -> netelement
-INSERT INTO node (node_id, code, elevation, "depth", nodecat_id, epa_type, sector_id, arc_id, parent_id, state,
+INSERT INTO node (node_id, code, top_elev, "depth", nodecat_id, epa_type, sector_id, arc_id, parent_id, state,
 state_type, annotation, observ, "comment", dma_id, presszone_id, soilcat_id, function_type, category_type, fluid_type,
 location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, muni_id, postcode, streetaxis_id,
 postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, descript, link, verified, rotation, the_geom,
@@ -342,7 +342,7 @@ SELECT is((SELECT count(*)::integer FROM node WHERE node_id = '-915'), 0, 'DELET
 
 
 -- node -> pressuremeter
-INSERT INTO node (node_id, code, elevation, "depth", nodecat_id, epa_type, sector_id, arc_id, parent_id, state,
+INSERT INTO node (node_id, code, top_elev, "depth", nodecat_id, epa_type, sector_id, arc_id, parent_id, state,
 state_type, annotation, observ, "comment", dma_id, presszone_id, soilcat_id, function_type, category_type, fluid_type,
 location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, muni_id, postcode, streetaxis_id,
 postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, descript, link, verified, rotation, the_geom,
@@ -364,7 +364,7 @@ SELECT is((SELECT count(*)::integer FROM node WHERE node_id = '-916'), 0, 'DELET
 
 
 -- node -> outfall valve
-INSERT INTO node (node_id, code, elevation, "depth", nodecat_id, epa_type, sector_id, arc_id, parent_id, state,
+INSERT INTO node (node_id, code, top_elev, "depth", nodecat_id, epa_type, sector_id, arc_id, parent_id, state,
 state_type, annotation, observ, "comment", dma_id, presszone_id, soilcat_id, function_type, category_type, fluid_type,
 location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, muni_id, postcode, streetaxis_id,
 postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, descript, link, verified, rotation, the_geom,
@@ -386,7 +386,7 @@ SELECT is((SELECT count(*)::integer FROM node WHERE node_id = '-917'), 0, 'DELET
 
 
 -- node -> pump
-INSERT INTO node (node_id, code, elevation, "depth", nodecat_id, epa_type, sector_id, arc_id, parent_id, state,
+INSERT INTO node (node_id, code, top_elev, "depth", nodecat_id, epa_type, sector_id, arc_id, parent_id, state,
 state_type, annotation, observ, "comment", dma_id, presszone_id, soilcat_id, function_type, category_type, fluid_type,
 location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, muni_id, postcode, streetaxis_id,
 postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, descript, link, verified, rotation, the_geom,
@@ -408,7 +408,7 @@ SELECT is((SELECT count(*)::integer FROM node WHERE node_id = '-918'), 0, 'DELET
 
 
 -- node -> reduction
-INSERT INTO node (node_id, code, elevation, "depth", nodecat_id, epa_type, sector_id, arc_id, parent_id, state,
+INSERT INTO node (node_id, code, top_elev, "depth", nodecat_id, epa_type, sector_id, arc_id, parent_id, state,
 state_type, annotation, observ, "comment", dma_id, presszone_id, soilcat_id, function_type, category_type, fluid_type,
 location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, muni_id, postcode, streetaxis_id,
 postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, descript, link, verified, rotation, the_geom,
@@ -429,7 +429,7 @@ DELETE FROM node WHERE node_id = '-919';
 SELECT is((SELECT count(*)::integer FROM node WHERE node_id = '-919'), 0, 'DELETE: node:reduction "-919" was deleted');
 
 -- node -> register
-INSERT INTO node (node_id, code, elevation, "depth", nodecat_id, epa_type, sector_id, arc_id, parent_id, state,
+INSERT INTO node (node_id, code, top_elev, "depth", nodecat_id, epa_type, sector_id, arc_id, parent_id, state,
 state_type, annotation, observ, "comment", dma_id, presszone_id, soilcat_id, function_type, category_type, fluid_type,
 location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, muni_id, postcode, streetaxis_id,
 postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, descript, link, verified, rotation, the_geom,
@@ -451,7 +451,7 @@ SELECT is((SELECT count(*)::integer FROM node WHERE node_id = '-920'), 0, 'DELET
 
 
 -- node -> shutoff_valve
-INSERT INTO node (node_id, code, elevation, "depth", nodecat_id, epa_type, sector_id, arc_id, parent_id, state,
+INSERT INTO node (node_id, code, top_elev, "depth", nodecat_id, epa_type, sector_id, arc_id, parent_id, state,
 state_type, annotation, observ, "comment", dma_id, presszone_id, soilcat_id, function_type, category_type, fluid_type,
 location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, muni_id, postcode, streetaxis_id,
 postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, descript, link, verified, rotation, the_geom,
@@ -473,7 +473,7 @@ SELECT is((SELECT count(*)::integer FROM node WHERE node_id = '-921'), 0, 'DELET
 
 
 -- node -> source
-INSERT INTO node (node_id, code, elevation, "depth", nodecat_id, epa_type, sector_id, arc_id, parent_id, state,
+INSERT INTO node (node_id, code, top_elev, "depth", nodecat_id, epa_type, sector_id, arc_id, parent_id, state,
 state_type, annotation, observ, "comment", dma_id, presszone_id, soilcat_id, function_type, category_type, fluid_type,
 location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, muni_id, postcode, streetaxis_id,
 postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, descript, link, verified, rotation, the_geom,
@@ -495,7 +495,7 @@ SELECT is((SELECT count(*)::integer FROM node WHERE node_id = '-922'), 0, 'DELET
 
 
 -- node -> t
-INSERT INTO node (node_id, code, elevation, "depth", nodecat_id, epa_type, sector_id, arc_id, parent_id, state,
+INSERT INTO node (node_id, code, top_elev, "depth", nodecat_id, epa_type, sector_id, arc_id, parent_id, state,
 state_type, annotation, observ, "comment", dma_id, presszone_id, soilcat_id, function_type, category_type, fluid_type,
 location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, muni_id, postcode, streetaxis_id,
 postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, descript, link, verified, rotation, the_geom,
@@ -517,7 +517,7 @@ SELECT is((SELECT count(*)::integer FROM node WHERE node_id = '-923'), 0, 'DELET
 
 
 -- node -> tank
-INSERT INTO node (node_id, code, elevation, "depth", nodecat_id, epa_type, sector_id, arc_id, parent_id, state,
+INSERT INTO node (node_id, code, top_elev, "depth", nodecat_id, epa_type, sector_id, arc_id, parent_id, state,
 state_type, annotation, observ, "comment", dma_id, presszone_id, soilcat_id, function_type, category_type, fluid_type,
 location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, muni_id, postcode, streetaxis_id,
 postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, descript, link, verified, rotation, the_geom,
@@ -539,7 +539,7 @@ SELECT is((SELECT count(*)::integer FROM node WHERE node_id = '-924'), 0, 'DELET
 
 
 -- node -> water_connection
-INSERT INTO node (node_id, code, elevation, "depth", nodecat_id, epa_type, sector_id, arc_id, parent_id, state,
+INSERT INTO node (node_id, code, top_elev, "depth", nodecat_id, epa_type, sector_id, arc_id, parent_id, state,
 state_type, annotation, observ, "comment", dma_id, presszone_id, soilcat_id, function_type, category_type, fluid_type,
 location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, muni_id, postcode, streetaxis_id,
 postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, descript, link, verified, rotation, the_geom,
@@ -561,7 +561,7 @@ SELECT is((SELECT count(*)::integer FROM node WHERE node_id = '-925'), 0, 'DELET
 
 
 -- node -> waterwell
-INSERT INTO node (node_id, code, elevation, "depth", nodecat_id, epa_type, sector_id, arc_id, parent_id, state,
+INSERT INTO node (node_id, code, top_elev, "depth", nodecat_id, epa_type, sector_id, arc_id, parent_id, state,
 state_type, annotation, observ, "comment", dma_id, presszone_id, soilcat_id, function_type, category_type, fluid_type,
 location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, muni_id, postcode, streetaxis_id,
 postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, descript, link, verified, rotation, the_geom,
@@ -583,7 +583,7 @@ SELECT is((SELECT count(*)::integer FROM node WHERE node_id = '-926'), 0, 'DELET
 
 
 -- node -> wtp
-INSERT INTO node (node_id, code, elevation, "depth", nodecat_id, epa_type, sector_id, arc_id, parent_id, state,
+INSERT INTO node (node_id, code, top_elev, "depth", nodecat_id, epa_type, sector_id, arc_id, parent_id, state,
 state_type, annotation, observ, "comment", dma_id, presszone_id, soilcat_id, function_type, category_type, fluid_type,
 location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, muni_id, postcode, streetaxis_id,
 postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, descript, link, verified, rotation, the_geom,
@@ -605,7 +605,7 @@ SELECT is((SELECT count(*)::integer FROM node WHERE node_id = '-927'), 0, 'DELET
 
 
 -- node -> x
-INSERT INTO node (node_id, code, elevation, "depth", nodecat_id, epa_type, sector_id, arc_id, parent_id, state,
+INSERT INTO node (node_id, code, top_elev, "depth", nodecat_id, epa_type, sector_id, arc_id, parent_id, state,
 state_type, annotation, observ, "comment", dma_id, presszone_id, soilcat_id, function_type, category_type, fluid_type,
 location_type, workcat_id, workcat_id_end, buildercat_id, builtdate, enddate, ownercat_id, muni_id, postcode, streetaxis_id,
 postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, descript, link, verified, rotation, the_geom,

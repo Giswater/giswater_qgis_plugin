@@ -43,10 +43,10 @@ BEGIN
 	UPDATE temp_arc SET diameter = (v_valve->>'diameter')::float WHERE epa_type='VALVE' AND (diameter = 0 OR diameter is null);
 
 	-- update values for reservoirs
-	UPDATE temp_node SET elevation = elevation + (v_reservoir->>'addElevation')::float WHERE epa_type='RESERVOIR';
+	UPDATE temp_node SET top_elev = top_elev + (v_reservoir->>'addElevation')::float WHERE epa_type='RESERVOIR';
 
 	-- update values for tanks
-	UPDATE temp_node SET elevation = elevation + (v_tank->>'addElevation')::float WHERE epa_type='TANK';
+	UPDATE temp_node SET top_elev = top_elev + (v_tank->>'addElevation')::float WHERE epa_type='TANK';
 
 	-- update values for pumps
 	UPDATE temp_arc SET length = (v_pump->>'length')::float, diameter = (v_pump ->>'diameter')::float, roughness = ((v_pump->>'roughness')::json->>v_headloss)::float

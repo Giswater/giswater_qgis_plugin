@@ -256,3 +256,46 @@ ON supplyzone FOR EACH ROW EXECUTE FUNCTION gw_trg_typevalue_fk('supplyzone');
 CREATE TRIGGER gw_trg_typevalue_fk_update AFTER UPDATE OF supplyzone_type
 ON supplyzone FOR EACH ROW WHEN (((old.supplyzone_type)::TEXT IS DISTINCT
 FROM (new.supplyzone_type)::TEXT)) EXECUTE FUNCTION gw_trg_typevalue_fk('supplyzone');
+
+-- 06/02/2025
+CREATE TRIGGER gw_trg_edit_foreignkey AFTER DELETE OR UPDATE OF node_id ON node
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_foreignkey('node_id');
+
+CREATE TRIGGER gw_trg_mantypevalue_fk_insert AFTER INSERT ON node
+FOR EACH ROW EXECUTE FUNCTION gw_trg_mantypevalue_fk('node');
+
+CREATE TRIGGER gw_trg_mantypevalue_fk_update AFTER UPDATE OF function_type, category_type, fluid_type, location_type ON node
+FOR EACH ROW WHEN ((((old.function_type)::TEXT IS DISTINCT
+FROM
+    (new.function_type)::TEXT)
+        OR ((old.category_type)::TEXT IS DISTINCT
+    FROM
+        (new.category_type)::TEXT)
+            OR ((old.fluid_type)::TEXT IS DISTINCT
+        FROM
+            (new.fluid_type)::TEXT)
+                OR ((old.location_type)::TEXT IS DISTINCT
+            FROM
+                (new.location_type)::TEXT))) EXECUTE FUNCTION gw_trg_mantypevalue_fk('node');
+
+CREATE TRIGGER gw_trg_node_arc_divide AFTER INSERT ON node
+FOR EACH ROW EXECUTE FUNCTION gw_trg_node_arc_divide();
+
+CREATE TRIGGER gw_trg_node_rotation_update AFTER INSERT OR UPDATE OF hemisphere, the_geom ON node
+FOR EACH ROW EXECUTE FUNCTION gw_trg_node_rotation_update();
+
+CREATE TRIGGER gw_trg_node_statecontrol BEFORE INSERT OR UPDATE OF state ON node
+FOR EACH ROW EXECUTE FUNCTION gw_trg_node_statecontrol();
+
+CREATE TRIGGER gw_trg_topocontrol_node AFTER INSERT OR UPDATE OF the_geom, custom_top_elev, state ON node
+FOR EACH ROW EXECUTE FUNCTION gw_trg_topocontrol_node();
+
+CREATE TRIGGER gw_trg_typevalue_fk_insert AFTER INSERT ON node
+FOR EACH ROW EXECUTE FUNCTION gw_trg_typevalue_fk('node');
+
+CREATE TRIGGER gw_trg_typevalue_fk_update AFTER UPDATE OF verified ON node
+FOR EACH ROW WHEN (((old.verified)::TEXT IS DISTINCT
+FROM (new.verified)::TEXT)) EXECUTE FUNCTION gw_trg_typevalue_fk('node');
+
+CREATE TRIGGER gw_trg_edit_review_node INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_review_node
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_review_node();

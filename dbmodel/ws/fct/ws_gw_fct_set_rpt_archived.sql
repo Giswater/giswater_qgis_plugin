@@ -90,11 +90,11 @@ BEGIN
 
 		-- insert on archived_rpt_inp_node
 		EXECUTE 'INSERT INTO archived_rpt_inp_node(
-			result_id, node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation,
+			result_id, node_id, top_elev, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation,
 			demand, the_geom, expl_id, pattern_id, addparam, nodeparent, arcposition, dma_id, presszone_id, dqa_id,
 			minsector_id, age)
 		SELECT
-			result_id, node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation,
+			result_id, node_id, top_elev, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation,
 			demand, the_geom, expl_id, pattern_id, addparam, nodeparent, arcposition, dma_id, presszone_id, dqa_id,
 			minsector_id, age
 		FROM rpt_inp_node
@@ -102,18 +102,18 @@ BEGIN
 
 		-- insert on archived_rpt_node
 		EXECUTE 'INSERT INTO archived_rpt_node(
-			result_id, node_id, elevation, demand, head, press, other, time, quality)
+			result_id, node_id, top_elev, demand, head, press, other, time, quality)
 		SELECT
-			result_id, node_id, elevation, demand, head, press, other, time, quality
+			result_id, node_id, top_elev, demand, head, press, other, time, quality
 		FROM rpt_node
 		WHERE result_id = '||quote_literal(v_result_id)||';';
 
 		-- insert on archived_rpt_node_stats
 		EXECUTE 'INSERT INTO archived_rpt_node_stats(
-			node_id, result_id, node_type, sector_id, nodecat_id, elevation, demand_max, demand_min, demand_avg, head_max,
+			node_id, result_id, node_type, sector_id, nodecat_id, top_elev, demand_max, demand_min, demand_avg, head_max,
 			head_min, head_avg, press_max, press_min, press_avg, quality_max, quality_min, quality_avg, the_geom)
 		SELECT
-			node_id, result_id, node_type, sector_id, nodecat_id, elevation, demand_max, demand_min, demand_avg, head_max,
+			node_id, result_id, node_type, sector_id, nodecat_id, top_elev, demand_max, demand_min, demand_avg, head_max,
 			head_min, head_avg, press_max, press_min, press_avg, quality_max, quality_min, quality_avg, the_geom
 		FROM rpt_node_stats
 		WHERE result_id = '||quote_literal(v_result_id)||';';
@@ -198,11 +198,11 @@ BEGIN
 
 		-- insert on archived_rpt_inp_node
 		EXECUTE 'INSERT INTO rpt_inp_node(
-			result_id, node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation,
+			result_id, node_id, top_elev, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation,
 			demand, the_geom, expl_id, pattern_id, addparam, nodeparent, arcposition, dma_id, presszone_id, dqa_id,
 			minsector_id, age)
 		SELECT
-			result_id, node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation,
+			result_id, node_id, top_elev, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation,
 			demand, the_geom, expl_id, pattern_id, addparam, nodeparent, arcposition, dma_id, presszone_id, dqa_id,
 			minsector_id, age
 		FROM archived_rpt_inp_node
@@ -210,18 +210,18 @@ BEGIN
 
 		-- insert on archived_rpt_node
 		EXECUTE 'INSERT INTO rpt_node(
-			result_id, node_id, elevation, demand, head, press, other, time, quality)
+			result_id, node_id, top_elev, demand, head, press, other, time, quality)
 		SELECT
-			result_id, node_id, elevation, demand, head, press, other, time, quality
+			result_id, node_id, top_elev, demand, head, press, other, time, quality
 		FROM archived_rpt_node
 		WHERE result_id = '||quote_literal(v_result_id)||';';
 
 		-- insert on archived_rpt_node_stats
 		EXECUTE 'INSERT INTO rpt_node_stats(
-			node_id, result_id, node_type, sector_id, nodecat_id, elevation, demand_max, demand_min, demand_avg, head_max,
+			node_id, result_id, node_type, sector_id, nodecat_id, top_elev, demand_max, demand_min, demand_avg, head_max,
 			head_min, head_avg, press_max, press_min, press_avg, quality_max, quality_min, quality_avg, the_geom)
 		SELECT
-			node_id, result_id, node_type, sector_id, nodecat_id, elevation, demand_max, demand_min, demand_avg, head_max,
+			node_id, result_id, node_type, sector_id, nodecat_id, top_elev, demand_max, demand_min, demand_avg, head_max,
 			head_min, head_avg, press_max, press_min, press_avg, quality_max, quality_min, quality_avg, the_geom
 		FROM archived_rpt_node_stats
 		WHERE result_id = '||quote_literal(v_result_id)||';';

@@ -19,10 +19,10 @@ SELECT SCHEMA_NAME.gw_fct_node_interpolate ($${"client":{"device":4, "infoType":
 SELECT SCHEMA_NAME.gw_fct_node_interpolate ($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
  "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"action":"EXTRAPOLATE", "x":419161.98499003565, "y":4576782.72778585, "node1":"117", "node2":"119"}}}$$);
 
-SELECT * FROM audit_check_data WHERE fid=213 
+SELECT * FROM audit_check_data WHERE fid=213
 
 --fid: 213
- 
+
 */
 
 DECLARE
@@ -78,7 +78,7 @@ v_ymax_status boolean;
 
 v_col_top text;
 v_col_ymax text;
-v_col_elev text; 
+v_col_elev text;
 
 v_node text;
 v_querytext text;
@@ -106,18 +106,18 @@ BEGIN
 		v_top_status := (v_value->>'topElev')::json->>'status';
 		v_elev_status := (v_value->>'elev')::json->>'status';
 		v_ymax_status := (v_value->>'ymax')::json->>'status';
-		
+
 		v_col_top = (v_value->>'topElev')::json->>'column';
 		v_col_ymax = (v_value->>'ymax')::json->>'column';
 		v_col_elev = (v_value->>'elev')::json->>'column';
 	ELSE
-		v_top_status := (v_value->>'elevation')::json->>'status';
+		v_top_status := (v_value->>'topElev')::json->>'status';
 		v_ymax_status := (v_value->>'depth')::json->>'status';
-		v_col_top = (v_value->>'elevation')::json->>'column';
+		v_col_top = (v_value->>'topElev')::json->>'column';
 		v_col_ymax = (v_value->>'depth')::json->>'column';
 	END IF;
-	
-	IF p_action IS NULL THEN 
+
+	IF p_action IS NULL THEN
 		p_action = 'INTERPOLATE';
 	END IF;
 
@@ -125,10 +125,10 @@ BEGIN
 	DELETE FROM audit_check_data WHERE fid=213 AND cur_user=current_user;
 	INSERT INTO audit_check_data (fid, error_message) VALUES (213,  concat('NODE ',upper(p_action),' TOOL'));
 	INSERT INTO audit_check_data (fid, error_message) VALUES (213,  concat('--------------------------------'));
-	
-	if v_node is not null and v_node !='' then 
+
+	if v_node is not null and v_node !='' then
 		v_geom0:= (select the_geom from node where node_id = v_node);
-	else 
+	else
 		-- Make geom point
 		v_geom0:= (SELECT ST_SetSRID(ST_MakePoint(p_x, p_y), v_srid));
 		--getting node_id
@@ -144,14 +144,14 @@ BEGIN
 		INSERT INTO audit_check_data (fid,  criticity, error_message)
 		VALUES (213, 4, concat('System values of node 1 (',p_node1,') - top elev:',v_top1 , ', elev:', v_elev1));
 	ELSE
-		v_top1:= (SELECT elevation FROM v_edit_node WHERE node_id=p_node1);
-		v_elev1:= (SELECT elevation - depth FROM v_edit_node WHERE node_id=p_node1);
+		v_top1:= (SELECT sys_top_elev FROM v_edit_node WHERE node_id=p_node1);
+		v_elev1:= (SELECT top_elev - depth FROM v_edit_node WHERE node_id=p_node1);
 		v_depth1:= (SELECT depth FROM v_edit_node WHERE node_id=p_node1);
 		INSERT INTO audit_check_data (fid,  criticity, error_message)
-		VALUES (213, 4, concat('System values of node 1 (',p_node1,') - elevation:',v_top1 , ', depth:', v_depth1));
+		VALUES (213, 4, concat('System values of node 1 (',p_node1,') - top elev:',v_top1 , ', depth:', v_depth1));
 
 	END IF;
-	
+
 
 	-- Get node2 system values
 	v_geom2:= (SELECT the_geom FROM node WHERE node_id=p_node2);
@@ -161,11 +161,11 @@ BEGIN
 		INSERT INTO audit_check_data (fid,  criticity, error_message)
 		VALUES (213, 4, concat('System values of node 2 (',p_node2,') - top elev:',v_top2 , ', elev:', v_elev2));
 	ELSE
-		v_top2:= (SELECT elevation FROM v_edit_node WHERE node_id=p_node2);
-		v_elev2:= (SELECT elevation - depth FROM v_edit_node WHERE node_id=p_node2);
+		v_top2:= (SELECT sys_top_elev FROM v_edit_node WHERE node_id=p_node2);
+		v_elev2:= (SELECT top_elev - depth FROM v_edit_node WHERE node_id=p_node2);
 		v_depth2:= (SELECT depth FROM v_edit_node WHERE node_id=p_node2);
 		INSERT INTO audit_check_data (fid,  criticity, error_message)
-		VALUES (213, 4, concat('System values of node 2 (',p_node2,') - elevation:',v_top2 , ', depth:', v_depth2));
+		VALUES (213, 4, concat('System values of node 2 (',p_node2,') - top elev:',v_top2 , ', depth:', v_depth2));
 	END IF;
 
 	-- Calculate distances
@@ -179,9 +179,9 @@ BEGIN
 	IF p_action =  'INTERPOLATE' OR  p_action =  'MASSIVE-INTERPOLATE' THEN
 		-- Calculate interpolation values
 		v_top0 = v_top1 + (v_top2 - v_top1)* v_proportion1;
-		v_elev0 = v_elev1 + (v_elev2 - v_elev1)* v_proportion1;	
-	ELSE 	
-		IF v_distance01 < v_distance02 THEN  
+		v_elev0 = v_elev1 + (v_elev2 - v_elev1)* v_proportion1;
+	ELSE
+		IF v_distance01 < v_distance02 THEN
 			-- Calculate extrapolation values (from node1)
 			v_top0 = v_top1 + (v_top1 - v_top2)* v_proportion1;
 			v_elev0 = v_elev1 + (v_elev1 - v_elev2)* v_proportion1;
@@ -189,7 +189,7 @@ BEGIN
 			-- Calculate extrapolation values (from node2)
 			v_top0 = v_top2 + (v_top2 - v_top1)* v_proportion2;
 			v_elev0 = v_elev2 + (v_elev2 - v_elev1)* v_proportion2;
-		END IF;	
+		END IF;
 	END IF;
 
 	-- update values
@@ -204,7 +204,7 @@ BEGIN
 				EXECUTE v_querytext;
 			END IF;
 		END IF;
-		
+
 		IF v_ymax_status THEN
 			v_ymax = (SELECT to_json((v_top0-v_elev0)::numeric(12,3)::text));
 			INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (213, 4, concat('Ymax:',(v_top0-v_elev0)::numeric(12,3)::text));
@@ -214,7 +214,7 @@ BEGIN
 				EXECUTE v_querytext;
 			END IF;
 		END IF;
-		
+
 		IF v_elev_status THEN
 			v_elev:= (SELECT to_json(v_elev0::numeric(12,3)::text));
 			INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (213, 4, concat('Elev:',v_elev0::numeric(12,3)::text));
@@ -224,7 +224,7 @@ BEGIN
 				EXECUTE v_querytext;
 			END IF;
 		END IF;
-		
+
 	ELSE
 		IF v_top_status THEN
 			v_top:= (SELECT to_json(v_top0::numeric(12,3)::text));
@@ -236,18 +236,18 @@ BEGIN
 			INSERT INTO audit_check_data (fid,  criticity, error_message) VALUES (213, 4, concat('Depth:',(v_top0-v_elev0)::numeric(12,3)::text));
 		END IF;
 
-		
+
 	END IF;
 
-	INSERT INTO audit_check_data (fid,  criticity, error_message) 
+	INSERT INTO audit_check_data (fid,  criticity, error_message)
 	VALUES (213, 4, 'INFO: In order to configure columns updated by the process upsert user variable edit_node_interpolate');
 
 	-- get results
 	-- info
 	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT id, error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=213 order by
-	criticity desc, id asc) row; 
-	v_result := COALESCE(v_result, '{}'); 
+	criticity desc, id asc) row;
+	v_result := COALESCE(v_result, '{}');
 	v_result_info = concat ('{"geometryType":"", "values":',v_result,'}');
 
 	-- control nulls
@@ -257,7 +257,7 @@ BEGIN
 	v_result_top= COALESCE(v_top::text,'""');
 	v_result_ymax = COALESCE(v_ymax::text,'""');
 	v_result_elev = COALESCE(v_elev::text,'""');
-	
+
 	IF v_project='UD' THEN
 		v_result_fields = concat('[{"tab_data_',v_col_top,'":',v_result_top,',"tab_data_',v_col_ymax,'":',v_result_ymax, ',"tab_data_',v_col_elev,'":',v_result_elev,'}]');
 	ELSE
@@ -287,9 +287,9 @@ BEGIN
 
 	--  Exception handling
 	EXCEPTION WHEN OTHERS THEN
-	GET STACKED DIAGNOSTICS v_error_context = pg_exception_context;  
+	GET STACKED DIAGNOSTICS v_error_context = pg_exception_context;
 	RETURN json_build_object('status', 'Failed', 'NOSQLERR', SQLERRM, 'message', json_build_object('level', right(SQLSTATE, 1), 'text', SQLERRM), 'SQLSTATE', SQLSTATE, 'SQLCONTEXT', v_error_context)::json;
-	  
+
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE

@@ -198,7 +198,7 @@ BEGIN
 		END IF;
 
 		RAISE NOTICE '4.9 - Set ceros';
-		UPDATE temp_t_node SET elevation = 0 WHERE elevation IS NULL;
+		UPDATE temp_t_node SET top_elev = 0 WHERE top_elev IS NULL;
 		UPDATE temp_t_node SET addparam = replace (addparam, '""','null');
 
 		RAISE NOTICE '4.10 - Set length > 0.05 when length is 0';
@@ -312,9 +312,9 @@ BEGIN
 	ELSIF v_step=7 THEN
 
 		-- move nodes data
-		INSERT INTO rpt_inp_node (result_id, node_id, elevation, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, demand,
+		INSERT INTO rpt_inp_node (result_id, node_id, top_elev, elev, node_type, nodecat_id, epa_type, sector_id, state, state_type, annotation, demand,
 		the_geom, expl_id, pattern_id, addparam, nodeparent, arcposition,dma_id, presszone_id, dqa_id, minsector_id)
-		SELECT result_id, node_id, elevation, case when elev is null then elevation else elev end, node_type, nodecat_id, epa_type, sector_id, state,
+		SELECT result_id, node_id, top_elev, case when elev is null then top_elev else elev end, node_type, nodecat_id, epa_type, sector_id, state,
 		state_type, annotation, demand, the_geom, expl_id, pattern_id, addparam, nodeparent, arcposition,dma_id, presszone_id, dqa_id, minsector_id
 		FROM temp_t_node;
 

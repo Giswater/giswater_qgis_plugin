@@ -42,9 +42,9 @@ BEGIN
 
     ELSIF TG_OP = 'UPDATE' THEN
 
-		-- elevation
-		IF (NEW.elevation != OLD.elevation) OR (NEW.elevation IS NULL AND OLD.elevation IS NOT NULL) OR (NEW.elevation IS NOT NULL AND OLD.elevation IS NULL) THEN
-			UPDATE node SET elevation=NEW.elevation WHERE node_id = OLD.node_id;
+		-- top_elev
+		IF (NEW.top_elev <> OLD.top_elev) OR (NEW.custom_top_elev <> OLD.custom_top_elev) THEN
+			UPDATE node SET top_elev=NEW.top_elev, custom_top_elev=NEW.custom_top_elev WHERE node_id = OLD.node_id;
 		END IF;
 
 		-- depth
@@ -73,11 +73,11 @@ BEGIN
 				NEW.parent_id=v_node_id;
 			END IF;
 
-			--update elevation from raster
+			--update top_elev from raster
 			IF (SELECT json_extract_path_text(value::json,'activated')::boolean FROM config_param_system WHERE parameter='admin_raster_dem') IS TRUE
-			AND (NEW.elevation IS NULL) AND
+			AND (NEW.top_elev IS NULL) AND
 			(SELECT upper(value)  FROM config_param_user WHERE parameter = 'edit_update_elevation_from_dem' and cur_user = current_user) = 'TRUE' THEN
-					NEW.elevation = (SELECT ST_Value(rast,1,NEW.the_geom,true) FROM ext_raster_dem WHERE id =
+					NEW.top_elev = (SELECT ST_Value(rast,1,NEW.the_geom,true) FROM ext_raster_dem WHERE id =
 					(SELECT id FROM ext_raster_dem WHERE st_dwithin (envelope, NEW.the_geom, 1) LIMIT 1));
 			END IF;
 

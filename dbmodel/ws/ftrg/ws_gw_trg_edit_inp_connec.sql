@@ -29,12 +29,12 @@ BEGIN
 		IF (ST_equals (NEW.the_geom, OLD.the_geom)) IS FALSE THEN
 			UPDATE connec SET the_geom=NEW.the_geom WHERE connec_id = OLD.connec_id;
 
-			--update elevation from raster
+			--update top_elev from raster
 			IF (SELECT json_extract_path_text(value::json,'activated')::boolean FROM config_param_system WHERE parameter='admin_raster_dem') IS TRUE
-			 AND (NEW.elevation IS NULL) AND
+			 AND (NEW.top_elev IS NULL) AND
 			(SELECT upper(value)  FROM config_param_user WHERE parameter = 'edit_update_elevation_from_dem' and cur_user = current_user) = 'TRUE' THEN
-					NEW.elevation = (SELECT ST_Value(rast,1,NEW.the_geom,true) FROM ext_raster_dem WHERE id =
-					(SELECT id FROM ext_raster_dem WHERE st_dwithin (envelope, NEW.the_geom, 1) LIMIT 1));		
+					NEW.top_elev = (SELECT ST_Value(rast,1,NEW.the_geom,true) FROM ext_raster_dem WHERE id =
+					(SELECT id FROM ext_raster_dem WHERE st_dwithin (envelope, NEW.the_geom, 1) LIMIT 1));
 			END IF;
 		END IF;
 
@@ -44,9 +44,9 @@ BEGIN
 			source_pattern_id= NEW.source_pattern_id
 			WHERE connec_id=OLD.connec_id;
 
-		IF (OLD.elevation::TEXT!=NEW.elevation::TEXT) or (OLD.depth::TEXT!=NEW.depth::TEXT) OR (OLD.conneccat_id!=NEW.conneccat_id) OR (OLD.annotation!=NEW.annotation) THEN
+		IF (OLD.top_elev::TEXT!=NEW.top_elev::TEXT) or (OLD.depth::TEXT!=NEW.depth::TEXT) OR (OLD.conneccat_id!=NEW.conneccat_id) OR (OLD.annotation!=NEW.annotation) THEN
 			UPDATE connec
-			SET elevation=NEW.elevation, "depth"=NEW."depth", conneccat_id=NEW.conneccat_id, annotation=NEW.annotation
+			SET top_elev=NEW.top_elev, "depth"=NEW."depth", conneccat_id=NEW.conneccat_id, annotation=NEW.annotation
 			WHERE connec_id=OLD.connec_id;
 		END IF;
 

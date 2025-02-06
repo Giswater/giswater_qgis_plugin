@@ -27,14 +27,14 @@ If is_validated=1, depending on review_status the trigger do diferent actions:
 
 DECLARE
 	v_review_status integer;
-	
+
 BEGIN
 EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
 	IF TG_OP = 'UPDATE' THEN
-	
+
 		SELECT review_status_id INTO v_review_status FROM review_audit_node WHERE node_id=NEW.node_id;
-		
+
 		IF NEW.is_validated = 0 THEN
 
 			DELETE FROM review_node WHERE node_id = NEW.node_id;
@@ -46,37 +46,37 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
         			"data":{"message":"3060", "function":"2484","parameters":{"node_id":"'||NEW.node_id||'"}}}$$);';
 			END IF;
-			
-			UPDATE review_audit_node SET new_nodecat_id=NEW.new_nodecat_id, is_validated=NEW.is_validated WHERE node_id=NEW.node_id;
-			
-			IF v_review_status=1 AND NEW.node_id NOT IN (SELECT node_id FROM node) THEN 
 
-				INSERT INTO v_edit_node (node_id, elevation, depth,  nodecat_id, annotation, observ, expl_id, the_geom)
-				VALUES (NEW.node_id, NEW.new_elevation, NEW.new_depth, NEW.new_nodecat_id, NEW.new_annotation, NEW.new_observ, NEW.expl_id, NEW.the_geom); 
-				
-		
+			UPDATE review_audit_node SET new_nodecat_id=NEW.new_nodecat_id, is_validated=NEW.is_validated WHERE node_id=NEW.node_id;
+
+			IF v_review_status=1 AND NEW.node_id NOT IN (SELECT node_id FROM node) THEN
+
+				INSERT INTO v_edit_node (node_id, top_elev, depth,  nodecat_id, annotation, observ, expl_id, the_geom)
+				VALUES (NEW.node_id, NEW.new_top_elev, NEW.new_depth, NEW.new_nodecat_id, NEW.new_annotation, NEW.new_observ, NEW.expl_id, NEW.the_geom);
+
+
 			ELSIF v_review_status=2 THEN
-				UPDATE v_edit_node SET the_geom=NEW.the_geom, elevation=NEW.new_elevation, depth=NEW.new_depth, nodecat_id=NEW.new_nodecat_id, annotation=NEW.new_annotation, observ=NEW.new_observ WHERE node_id=NEW.node_id;
-					
+				UPDATE v_edit_node SET the_geom=NEW.the_geom, top_elev=NEW.new_top_elev, depth=NEW.new_depth, nodecat_id=NEW.new_nodecat_id, annotation=NEW.new_annotation, observ=NEW.new_observ WHERE node_id=NEW.node_id;
+
 			ELSIF v_review_status=3 THEN
 
-				UPDATE v_edit_node SET elevation=NEW.new_elevation, depth=NEW.new_depth, nodecat_id=NEW.new_nodecat_id,
+				UPDATE v_edit_node SET top_elev=NEW.new_top_elev, depth=NEW.new_depth, nodecat_id=NEW.new_nodecat_id,
 				annotation=NEW.new_annotation, observ=NEW.new_observ WHERE node_id=NEW.node_id;
-	
-			END IF;	
-			
-			
+
+			END IF;
+
+
 			DELETE FROM review_node WHERE node_id = NEW.node_id;
-		
+
 		ELSIF NEW.is_validated = 2 THEN
-			
+
 			UPDATE review_node SET field_checked=FALSE, is_validated=2 WHERE node_id=NEW.node_id;
 			UPDATE review_audit_node SET is_validated=NEW.is_validated WHERE node_id=NEW.node_id;
 
 		END IF;
 	ELSIF TG_OP = 'DELETE' THEN
-		DELETE from review_audit_node WHERE node_id=OLD.node_id;	
-	END IF;	
+		DELETE from review_audit_node WHERE node_id=OLD.node_id;
+	END IF;
 
 RETURN NEW;
 

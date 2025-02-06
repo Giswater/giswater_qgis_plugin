@@ -415,7 +415,12 @@ AS WITH streetaxis AS (
         )
  SELECT node.node_id,
     node.code,
-    node.elevation,
+    node.top_elev,
+    node.custom_top_elev,
+    CASE
+        WHEN node.custom_top_elev IS NOT NULL THEN node.custom_top_elev
+        ELSE node.top_elev
+    END AS sys_top_elev,
     node.depth,
     cat_node.node_type,
     cat_feature.feature_class AS sys_type,
@@ -605,7 +610,12 @@ AS WITH
       (
         SELECT node.node_id,
         node.code,
-        node.elevation,
+        node.top_elev,
+        node.custom_top_elev,
+        CASE
+            WHEN node.custom_top_elev IS NOT NULL THEN node.custom_top_elev
+            ELSE node.top_elev
+        END AS sys_top_elev,
         node.depth,
         cat_node.node_type,
         cat_feature.feature_class AS sys_type,
@@ -979,7 +989,7 @@ CREATE OR REPLACE VIEW vu_connec AS
         )
  SELECT connec.connec_id,
     connec.code,
-    connec.elevation,
+    connec.top_elev,
     connec.depth,
     cat_connec.connec_type,
     cat_feature.feature_class AS sys_type,
@@ -1206,7 +1216,7 @@ AS WITH
       (
         select connec.connec_id,
         connec.code,
-        connec.elevation,
+        connec.top_elev,
         connec.depth,
         cat_connec.connec_type,
         cat_feature.feature_class AS sys_type,
@@ -1556,7 +1566,7 @@ SELECT e.* FROM ( SELECT element.element_id,
     element.pol_id,
     element.lastupdate,
     element.lastupdate_user,
-    element.elevation,
+    element.top_elev,
     element.expl_id2,
     element.trace_featuregeom,
     element.muni_id,
@@ -2362,8 +2372,9 @@ AS SELECT a.node_id,
    FROM ( SELECT v_edit_node.node_id,
             v_edit_node.nodecat_id,
             v_edit_node.sys_type AS node_type,
-            v_edit_node.elevation AS top_elev,
-            v_edit_node.elevation - v_edit_node.depth AS elev,
+            v_edit_node.top_elev,
+            v_edit_node.custom_top_elev,
+            v_edit_node.top_elev - v_edit_node.depth AS elev,
             v_edit_node.epa_type,
             v_edit_node.state,
             v_edit_node.sector_id,
@@ -2501,7 +2512,8 @@ UNION
 
 CREATE OR REPLACE VIEW v_edit_inp_junction
 AS SELECT n.node_id,
-    n.elevation,
+    n.top_elev,
+    n.custom_top_elev,
     n.depth,
     n.nodecat_id,
     n.expl_id,
@@ -2542,7 +2554,8 @@ AS SELECT p.dscenario_id,
 
 CREATE OR REPLACE VIEW v_edit_inp_pump
 AS SELECT n.node_id,
-    n.elevation,
+    n.top_elev,
+    n.custom_top_elev,
     n.depth,
     n.nodecat_id,
     n.expl_id,
@@ -2600,7 +2613,7 @@ AS SELECT r.node_id,
     r.node_type,
     r.sector_id,
     r.nodecat_id,
-    r.elevation,
+    r.top_elev,
     r.demand_max,
     r.demand_min,
     r.demand_avg,
@@ -2625,7 +2638,7 @@ AS SELECT rpt_node.id,
     node.sector_id,
     node.nodecat_id,
     selector_rpt_main.result_id,
-    rpt_node.elevation,
+    rpt_node.top_elev,
     rpt_node.demand,
     rpt_node.head,
     rpt_node.press,
@@ -3219,7 +3232,7 @@ AS SELECT v.dscenario_id,
 
 CREATE OR REPLACE VIEW v_edit_inp_connec
 AS SELECT v_edit_connec.connec_id,
-    v_edit_connec.elevation,
+    v_edit_connec.top_elev,
     v_edit_connec.depth,
     v_edit_connec.conneccat_id,
     v_edit_connec.arc_id,
@@ -3291,7 +3304,8 @@ SELECT d.dscenario_id,
 
 CREATE OR REPLACE VIEW v_edit_inp_pump_additional
 AS SELECT n.node_id,
-    n.elevation,
+    n.top_elev,
+    n.custom_top_elev,
     n.depth,
     n.nodecat_id,
     n.expl_id,
@@ -3373,7 +3387,8 @@ AS SELECT d.dscenario_id,
 
 CREATE OR REPLACE VIEW v_edit_inp_shortpipe
 AS SELECT n.node_id,
-    n.elevation,
+    n.top_elev,
+    n.custom_top_elev,
     n.depth,
     n.nodecat_id,
     n.expl_id,
@@ -3424,7 +3439,8 @@ AS SELECT d.dscenario_id,
 
 CREATE OR REPLACE VIEW v_edit_inp_tank
 AS SELECT n.node_id,
-    n.elevation,
+    n.top_elev,
+    n.custom_top_elev,
     n.depth,
     n.nodecat_id,
     n.expl_id,
@@ -3472,7 +3488,8 @@ AS SELECT d.dscenario_id,
 
 CREATE OR REPLACE VIEW v_edit_inp_reservoir
 AS SELECT n.node_id,
-    n.elevation,
+    n.top_elev,
+    n.custom_top_elev,
     n.depth,
     n.nodecat_id,
     n.expl_id,
@@ -3512,7 +3529,8 @@ AS SELECT d.dscenario_id,
 
 CREATE OR REPLACE VIEW v_edit_inp_valve
 AS SELECT n.node_id,
-    n.elevation,
+    n.top_elev,
+    n.custom_top_elev,
     n.depth,
     n.nodecat_id,
     n.expl_id,
@@ -3573,7 +3591,8 @@ AS SELECT p.dscenario_id,
 
 CREATE OR REPLACE VIEW v_edit_inp_inlet
 AS SELECT n.node_id,
-    n.elevation,
+    n.top_elev,
+    n.custom_top_elev,
     n.depth,
     n.nodecat_id,
     n.expl_id,
@@ -5382,7 +5401,7 @@ SELECT r.node_id,
     r.node_type,
     r.sector_id,
     r.nodecat_id,
-    r.elevation,
+    r.top_elev,
     r.demand_max,
     r.demand_min,
     r.demand_avg,
@@ -5406,7 +5425,7 @@ SELECT r.node_id,
     r.node_type,
     r.sector_id,
     r.nodecat_id,
-    r.elevation,
+    r.top_elev,
     r.demand_max,
     r.demand_min,
     r.demand_avg,
@@ -5430,7 +5449,7 @@ SELECT r.node_id,
      main.nodecat_id,
      main.result_id AS result_id_main,
      compare.result_id AS result_id_compare,
-     main.elevation,
+     main.top_elev,
      main.demand_max AS demand_max_main,
      compare.demand_max AS demand_max_compare,
      main.demand_max - compare.demand_max AS demand_max_diff,
@@ -5479,7 +5498,7 @@ CREATE OR REPLACE VIEW v_rpt_comp_node_hourly  AS
          node.node_id,
          node.sector_id,
          selector_rpt_main.result_id,
-         rpt_node.elevation,
+         rpt_node.top_elev,
          rpt_node.demand,
          rpt_node.head,
          rpt_node.press,
@@ -5501,7 +5520,7 @@ compare AS (
          node.node_id,
          node.sector_id,
          selector_rpt_compare.result_id,
-         rpt_node.elevation,
+         rpt_node.top_elev,
          rpt_node.demand,
          rpt_node.head,
          rpt_node.press,
@@ -5520,7 +5539,7 @@ compare AS (
 )
 SELECT main.node_id,
        main.sector_id,
-       main.elevation,
+       main.top_elev,
        main.result_id AS result_id_main,
        compare.result_id AS result_id_compare,
        main.time AS time_main,
@@ -6038,3 +6057,190 @@ AS SELECT element_x_arc.id,
      LEFT JOIN value_state_type ON element.state_type = value_state_type.id
      LEFT JOIN man_type_location ON man_type_location.location_type::text = element.location_type::text AND man_type_location.feature_type::text = 'ELEMENT'::text
      LEFT JOIN cat_element ON cat_element.id::text = element.elementcat_id::text;
+
+DROP VIEW IF EXISTS v_edit_review_node;
+CREATE OR REPLACE VIEW v_edit_review_node
+AS SELECT review_node.node_id,
+    review_node.top_elev,
+    review_node.depth,
+    review_node.nodecat_id,
+    review_node.annotation,
+    review_node.observ,
+    review_node.review_obs,
+    review_node.expl_id,
+    review_node.the_geom,
+    review_node.field_date,
+    review_node.field_checked,
+    review_node.is_validated
+   FROM review_node,
+    selector_expl
+  WHERE selector_expl.cur_user = "current_user"()::text AND review_node.expl_id = selector_expl.expl_id;
+
+CREATE OR REPLACE VIEW vp_basic_node AS
+SELECT node_id AS nid,
+node_type AS custom_type
+FROM node
+JOIN cat_node ON id=nodecat_id;
+
+CREATE OR REPLACE VIEW v_rtc_hydrometer
+AS SELECT ext_rtc_hydrometer.id::text AS hydrometer_id,
+    ext_rtc_hydrometer.code AS hydrometer_customer_code,
+        CASE
+            WHEN connec.connec_id IS NULL THEN 'XXXX'::character varying
+            ELSE connec.connec_id
+        END AS feature_id,
+    'CONNEC'::text AS feature_type,
+        CASE
+            WHEN ext_rtc_hydrometer.connec_id::text IS NULL THEN 'XXXX'::text
+            ELSE ext_rtc_hydrometer.connec_id::text
+        END AS customer_code,
+    ext_rtc_hydrometer_state.name AS state,
+    ext_municipality.name AS muni_name,
+    connec.expl_id,
+    exploitation.name AS expl_name,
+    ext_rtc_hydrometer.plot_code,
+    ext_rtc_hydrometer.priority_id,
+    ext_rtc_hydrometer.catalog_id,
+    ext_rtc_hydrometer.category_id,
+    ext_rtc_hydrometer.hydro_number,
+    ext_rtc_hydrometer.hydro_man_date,
+    ext_rtc_hydrometer.crm_number,
+    ext_rtc_hydrometer.customer_name,
+    ext_rtc_hydrometer.address1,
+    ext_rtc_hydrometer.address2,
+    ext_rtc_hydrometer.address3,
+    ext_rtc_hydrometer.address2_1,
+    ext_rtc_hydrometer.address2_2,
+    ext_rtc_hydrometer.address2_3,
+    ext_rtc_hydrometer.m3_volume,
+    ext_rtc_hydrometer.start_date,
+    ext_rtc_hydrometer.end_date,
+    ext_rtc_hydrometer.update_date,
+        CASE
+            WHEN (( SELECT config_param_system.value
+               FROM config_param_system
+              WHERE config_param_system.parameter::text = 'edit_hydro_link_absolute_path'::text)) IS NULL THEN rtc_hydrometer.link
+            ELSE concat(( SELECT config_param_system.value
+               FROM config_param_system
+              WHERE config_param_system.parameter::text = 'edit_hydro_link_absolute_path'::text), rtc_hydrometer.link)
+        END AS hydrometer_link,
+    ext_rtc_hydrometer_state.is_operative,
+    ext_rtc_hydrometer.shutdown_date
+   FROM selector_hydrometer,
+    selector_expl,
+    rtc_hydrometer
+     LEFT JOIN ext_rtc_hydrometer ON ext_rtc_hydrometer.id::text = rtc_hydrometer.hydrometer_id::text
+     JOIN ext_rtc_hydrometer_state ON ext_rtc_hydrometer_state.id = ext_rtc_hydrometer.state_id
+     JOIN connec ON connec.customer_code::text = ext_rtc_hydrometer.connec_id::text
+     LEFT JOIN ext_municipality ON ext_municipality.muni_id = connec.muni_id
+     LEFT JOIN exploitation ON exploitation.expl_id = connec.expl_id
+  WHERE selector_hydrometer.state_id = ext_rtc_hydrometer.state_id AND selector_hydrometer.cur_user = "current_user"()::text AND selector_expl.expl_id = connec.expl_id AND selector_expl.cur_user = "current_user"()::text
+UNION
+ SELECT ext_rtc_hydrometer.id::text AS hydrometer_id,
+    ext_rtc_hydrometer.code AS hydrometer_customer_code,
+        CASE
+            WHEN node.node_id IS NULL THEN 'XXXX'::character varying
+            ELSE node.node_id
+        END AS feature_id,
+    'NODE'::text AS feature_type,
+        CASE
+            WHEN ext_rtc_hydrometer.connec_id::text IS NULL THEN 'XXXX'::text
+            ELSE ext_rtc_hydrometer.connec_id::text
+        END AS customer_code,
+    ext_rtc_hydrometer_state.name AS state,
+    ext_municipality.name AS muni_name,
+    node.expl_id,
+    exploitation.name AS expl_name,
+    ext_rtc_hydrometer.plot_code,
+    ext_rtc_hydrometer.priority_id,
+    ext_rtc_hydrometer.catalog_id,
+    ext_rtc_hydrometer.category_id,
+    ext_rtc_hydrometer.hydro_number,
+    ext_rtc_hydrometer.hydro_man_date,
+    ext_rtc_hydrometer.crm_number,
+    ext_rtc_hydrometer.customer_name,
+    ext_rtc_hydrometer.address1,
+    ext_rtc_hydrometer.address2,
+    ext_rtc_hydrometer.address3,
+    ext_rtc_hydrometer.address2_1,
+    ext_rtc_hydrometer.address2_2,
+    ext_rtc_hydrometer.address2_3,
+    ext_rtc_hydrometer.m3_volume,
+    ext_rtc_hydrometer.start_date,
+    ext_rtc_hydrometer.end_date,
+    ext_rtc_hydrometer.update_date,
+        CASE
+            WHEN (( SELECT config_param_system.value
+               FROM config_param_system
+              WHERE config_param_system.parameter::text = 'edit_hydro_link_absolute_path'::text)) IS NULL THEN rtc_hydrometer.link
+            ELSE concat(( SELECT config_param_system.value
+               FROM config_param_system
+              WHERE config_param_system.parameter::text = 'edit_hydro_link_absolute_path'::text), rtc_hydrometer.link)
+        END AS hydrometer_link,
+    ext_rtc_hydrometer_state.is_operative,
+    ext_rtc_hydrometer.shutdown_date
+   FROM selector_hydrometer,
+    selector_expl,
+    rtc_hydrometer
+     LEFT JOIN ext_rtc_hydrometer ON ext_rtc_hydrometer.id::text = rtc_hydrometer.hydrometer_id::text
+     JOIN ext_rtc_hydrometer_state ON ext_rtc_hydrometer_state.id = ext_rtc_hydrometer.state_id
+     JOIN man_netwjoin ON man_netwjoin.customer_code::text = ext_rtc_hydrometer.connec_id::text
+     JOIN node ON node.node_id::text = man_netwjoin.node_id::text
+     LEFT JOIN ext_municipality ON ext_municipality.muni_id = node.muni_id
+     LEFT JOIN exploitation ON exploitation.expl_id = node.expl_id
+  WHERE selector_hydrometer.state_id = ext_rtc_hydrometer.state_id AND selector_hydrometer.cur_user = "current_user"()::text AND selector_expl.expl_id = node.expl_id AND selector_expl.cur_user = "current_user"()::text;
+
+
+CREATE OR REPLACE VIEW v_rtc_hydrometer_x_node
+AS SELECT ext_rtc_hydrometer.id::text AS hydrometer_id,
+    ext_rtc_hydrometer.code AS hydrometer_customer_code,
+        CASE
+            WHEN node.node_id IS NULL THEN 'XXXX'::character varying
+            ELSE node.node_id
+        END AS node_id,
+        CASE
+            WHEN ext_rtc_hydrometer.connec_id::text IS NULL THEN 'XXXX'::text
+            ELSE ext_rtc_hydrometer.connec_id::text
+        END AS node_customer_code,
+    ext_rtc_hydrometer_state.name AS state,
+    ext_municipality.name AS muni_name,
+    node.expl_id,
+    exploitation.name AS expl_name,
+    ext_rtc_hydrometer.plot_code,
+    ext_rtc_hydrometer.priority_id,
+    ext_rtc_hydrometer.catalog_id,
+    ext_rtc_hydrometer.category_id,
+    ext_rtc_hydrometer.hydro_number,
+    ext_rtc_hydrometer.hydro_man_date,
+    ext_rtc_hydrometer.crm_number,
+    ext_rtc_hydrometer.customer_name,
+    ext_rtc_hydrometer.address1,
+    ext_rtc_hydrometer.address2,
+    ext_rtc_hydrometer.address3,
+    ext_rtc_hydrometer.address2_1,
+    ext_rtc_hydrometer.address2_2,
+    ext_rtc_hydrometer.address2_3,
+    ext_rtc_hydrometer.m3_volume,
+    ext_rtc_hydrometer.start_date,
+    ext_rtc_hydrometer.end_date,
+    ext_rtc_hydrometer.update_date,
+        CASE
+            WHEN (( SELECT config_param_system.value
+               FROM config_param_system
+              WHERE config_param_system.parameter::text = 'edit_hydro_link_absolute_path'::text)) IS NULL THEN rtc_hydrometer.link
+            ELSE concat(( SELECT config_param_system.value
+               FROM config_param_system
+              WHERE config_param_system.parameter::text = 'edit_hydro_link_absolute_path'::text), rtc_hydrometer.link)
+        END AS hydrometer_link,
+    ext_rtc_hydrometer_state.is_operative,
+    ext_rtc_hydrometer.shutdown_date
+   FROM selector_hydrometer,
+    selector_expl,
+    rtc_hydrometer
+     LEFT JOIN ext_rtc_hydrometer ON ext_rtc_hydrometer.id::text = rtc_hydrometer.hydrometer_id::text
+     JOIN ext_rtc_hydrometer_state ON ext_rtc_hydrometer_state.id = ext_rtc_hydrometer.state_id
+     JOIN man_netwjoin ON man_netwjoin.customer_code::text = ext_rtc_hydrometer.connec_id::text
+     JOIN node ON node.node_id::text = man_netwjoin.node_id::text
+     LEFT JOIN ext_municipality ON ext_municipality.muni_id = node.muni_id
+     LEFT JOIN exploitation ON exploitation.expl_id = node.expl_id
+  WHERE selector_hydrometer.state_id = ext_rtc_hydrometer.state_id AND selector_hydrometer.cur_user = "current_user"()::text AND selector_expl.expl_id = node.expl_id AND selector_expl.cur_user = "current_user"()::text;

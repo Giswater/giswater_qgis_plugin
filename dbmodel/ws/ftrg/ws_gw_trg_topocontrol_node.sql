@@ -46,7 +46,7 @@ v_linkrec record;
 v_message text;
 v_nodetype text;
 v_staticpress double precision;
-v_elevation double precision;
+v_sys_top_elev double precision;
 v_depth double precision;
 v_elev  double precision;
 v_trace_featuregeom boolean;
@@ -299,8 +299,15 @@ BEGIN
 				-- values of node
 				v_nodetype = (SELECT node_type FROM cat_node WHERE NEW.nodecat_id = id);
 				v_staticpress = coalesce(NEW.staticpressure,0);
-				v_elevation = NEW.elevation;
 				v_depth = coalesce(NEW.depth,0);
+
+				IF NEW.custom_top_elev IS NOT NULL THEN
+					v_sys_top_elev = NEW.custom_top_elev;
+				ELSIF NEW.top_elev IS NOT NULL THEN
+					v_sys_top_elev = NEW.top_elev;
+				ELSE
+					v_sys_top_elev = NULL;
+				END IF;
 
 				-- Select arcs with start-end on the updated node
 				v_querytext := 'SELECT * FROM arc WHERE arc.node_1 = ' || quote_literal(NEW.node_id) || ' OR arc.node_2 = ' || quote_literal(NEW.node_id);
@@ -317,9 +324,9 @@ BEGIN
 						IF (nodeRecord1.node_id = NEW.node_id) THEN
 
 							-- update arc
-							IF v_elevation IS NOT NULL THEN
+							IF v_sys_top_elev IS NOT NULL THEN
 								EXECUTE 'UPDATE arc SET
-									elevation1 = '|| v_elevation ||',
+									elevation1 = '|| v_sys_top_elev ||',
 									depth1 = '|| v_depth||',
 									staticpress1 = '|| v_staticpress ||' 
 									WHERE arc_id = ' || quote_literal(arcrec."arc_id");
@@ -332,9 +339,9 @@ BEGIN
 						ELSIF (nodeRecord2.node_id = NEW.node_id) THEN
 
 							-- update arc
-							IF v_elevation IS NOT NULL THEN
+							IF v_sys_top_elev IS NOT NULL THEN
 								EXECUTE 'UPDATE arc SET
-									elevation2 = '|| v_elevation ||',
+									elevation2 = '|| v_sys_top_elev ||',
 									depth2 = '|| v_depth||',
 									staticpress2 = '|| v_staticpress ||' 
 									WHERE arc_id = ' || quote_literal(arcrec."arc_id");
