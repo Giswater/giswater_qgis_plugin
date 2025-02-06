@@ -600,7 +600,7 @@ class GwImportInpTask(GwTask):
     def _save_junctions(self) -> None:
         node_sql = """ 
             INSERT INTO node (
-                the_geom, code, nodecat_id, epa_type, expl_id, sector_id, muni_id, state, state_type, workcat_id, elevation
+                the_geom, code, nodecat_id, epa_type, expl_id, sector_id, muni_id, state, state_type, workcat_id, top_elev
             ) VALUES %s
             RETURNING node_id, code
         """  # --"depth", arc_id, annotation, observ, "comment", label_x, label_y, label_rotation, staticpressure, feature_type
@@ -660,7 +660,7 @@ class GwImportInpTask(GwTask):
                     state,
                     state_type,
                     workcat_id,
-                    j.elevation,
+                    j.top_elev,
                 )
             )
             inp_dict[j_name] = {
@@ -847,7 +847,7 @@ class GwImportInpTask(GwTask):
 
         node_sql = """ 
             INSERT INTO node (
-                the_geom, code, nodecat_id, epa_type, expl_id, sector_id, muni_id, state, state_type, workcat_id, elevation
+                the_geom, code, nodecat_id, epa_type, expl_id, sector_id, muni_id, state, state_type, workcat_id, top_elev
             ) VALUES %s
             RETURNING node_id, code
         """  # --"depth", arc_id, annotation, observ, "comment", label_x, label_y, label_rotation, staticpressure, feature_type
@@ -886,7 +886,7 @@ class GwImportInpTask(GwTask):
             state = 1
             state_type = 2
             workcat_id = self.workcat
-            elevation = t.elevation
+            elevation = t.top_elev
             node_params.append(
                 (
                     x, y, srid,  # the_geom

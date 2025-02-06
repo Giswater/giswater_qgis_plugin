@@ -828,7 +828,7 @@ class GwImportInpTask(GwTask):
                     state,
                     state_type,
                     workcat_id,
-                    j.elevation,
+                    j.top_elev,
                     j.depth_max,
                 )
             )
@@ -923,7 +923,7 @@ class GwImportInpTask(GwTask):
             state = 1
             state_type = 2
             workcat_id = self.workcat
-            elevation = o.elevation
+            elevation = o.top_elev
             node_params.append(
                 (
                     x, y, srid,  # the_geom
@@ -1033,7 +1033,7 @@ class GwImportInpTask(GwTask):
             state = 1
             state_type = 2
             workcat_id = self.workcat
-            elevation = d.elevation
+            elevation = d.top_elev
             node_params.append(
                 (
                     x, y, srid,  # the_geom
@@ -1147,7 +1147,7 @@ class GwImportInpTask(GwTask):
             state = 1
             state_type = 2
             workcat_id = self.workcat
-            elevation = s.elevation
+            elevation = s.top_elev
             node_params.append(
                 (
                     x, y, srid,  # the_geom
