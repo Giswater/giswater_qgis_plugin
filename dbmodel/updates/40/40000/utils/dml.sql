@@ -1207,23 +1207,12 @@ INSERT INTO config_form_list (listname, query_text, device, listtype, listclass,
     "sorting": [
       {
         "id": "id",
-        "desc": true
+        "desc": false
       }
     ]
   },
   "modifyTopToolBar": true,
   "renderTopToolbarCustomActions": [
-    {
-      "name": "btn_current_psector",
-      "widgetfunction": {
-        "functionName": "currentPsector",
-        "params": {}
-      },
-      "color": "default",
-      "text": "Current psector",
-      "disableOnSelect": true,
-      "moreThanOneDisable": true
-    },
     {
       "name": "btn_show_psector",
       "widgetfunction": {
@@ -1234,61 +1223,6 @@ INSERT INTO config_form_list (listname, query_text, device, listtype, listclass,
       "text": "Show psector",
       "disableOnSelect": true,
       "moreThanOneDisable": true
-    },
-    {
-      "name": "btn_toggle_active",
-      "widgetfunction": {
-        "functionName": "toggleActive",
-        "params": {}
-      },
-      "color": "default",
-      "text": "Toggle active",
-      "disableOnSelect": true,
-      "moreThanOneDisable": true
-    },
-    {
-      "name": "btn_create",
-      "widgetfunction": {
-        "functionName": "create",
-        "params": {}
-      },
-      "color": "default",
-      "text": "Create",
-      "disableOnSelect": true,
-      "moreThanOneDisable": true
-    },
-    {
-      "name": "btn_merge",
-      "widgetfunction": {
-        "functionName": "merge",
-        "params": {}
-      },
-      "color": "default",
-      "text": "Merge",
-      "disableOnSelect": true,
-      "moreThanOneDisable": false
-    },
-    {
-      "name": "btn_duplicate",
-      "widgetfunction": {
-        "functionName": "duplicate",
-        "params": {}
-      },
-      "color": "default",
-      "text": "Duplicate",
-      "disableOnSelect": true,
-      "moreThanOneDisable": true
-    },
-    {
-      "name": "btn_delete",
-      "widgetfunction": {
-        "functionName": "delete",
-        "params": {}
-      },
-      "color": "error",
-      "text": "Delete",
-      "disableOnSelect": true,
-      "moreThanOneDisable": false
     }
   ],
   "enableRowActions": false,
