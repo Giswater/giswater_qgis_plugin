@@ -19,12 +19,12 @@ from qgis.core import QgsWkbTypes
 
 class GwSelectManager(QgsMapTool):
 
-    def __init__(self, class_object, table_object=None, dialog=None, query=None):
+    def __init__(self, class_object, table_object=None, dialog=None, is_psector=None):
         """
         :param table_object: Class where we will look for @layers, @feature_type, @list_ids, etc
         :param table_object: (String)
         :param dialog: (QDialog)
-        :param query: Used only for psectors
+        :param is_psector: Used only for psectors
         """
 
         self.class_object = class_object
@@ -32,7 +32,7 @@ class GwSelectManager(QgsMapTool):
         self.canvas = global_vars.canvas
         self.table_object = table_object
         self.dialog = dialog
-        self.query = query
+        self.is_psector = is_psector
 
         # Call superclass constructor and set current action
         QgsMapTool.__init__(self, self.canvas)
@@ -71,7 +71,7 @@ class GwSelectManager(QgsMapTool):
 
         # Reconnect signal to enhance process
         tools_qgis.disconnect_signal_selection_changed()
-        tools_gw.connect_signal_selection_changed(self.class_object, self.dialog, self.table_object, query=self.query)
+        tools_gw.connect_signal_selection_changed(self.class_object, self.dialog, self.table_object, is_psector=self.is_psector)
         for i, layer in enumerate(self.class_object.layers[self.class_object.feature_type]):
             # Selection by rectangle
             if rectangle:

@@ -24,13 +24,13 @@ from collections import OrderedDict
 from functools import partial
 from datetime import datetime
 
-from qgis.PyQt.QtCore import Qt, QStringListModel, QVariant, QDate, QSettings, QLocale, QRegularExpression, QRegExp
+from qgis.PyQt.QtCore import Qt, QStringListModel, QVariant, QDate, QSettings, QLocale, QRegularExpression, QRegExp, QItemSelectionModel
 from qgis.PyQt.QtGui import QCursor, QPixmap, QColor, QFontMetrics, QStandardItemModel, QIcon, QStandardItem, \
     QIntValidator, QDoubleValidator, QRegExpValidator
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QSpacerItem, QSizePolicy, QLineEdit, QLabel, QComboBox, QGridLayout, QTabWidget, \
     QCompleter, QPushButton, QTableView, QFrame, QCheckBox, QDoubleSpinBox, QSpinBox, QDateEdit, QTextEdit, \
-    QToolButton, QWidget, QApplication, QDockWidget, QMenu, QAction
+    QToolButton, QWidget, QApplication, QDockWidget, QMenu, QAction, QAbstractItemView
 from qgis.core import Qgis, QgsProject, QgsPointXY, QgsVectorLayer, QgsField, QgsFeature, QgsSymbol, \
     QgsFeatureRequest, QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer, QgsPointLocator, \
     QgsSnappingConfig, QgsCoordinateTransform, QgsCoordinateReferenceSystem, QgsApplication, QgsVectorFileWriter, \
@@ -2518,7 +2518,7 @@ def get_expression_filter(feature_type, list_ids=None, layers=None):
         return None
 
     # Select features of layers applying @expr
-    tools_qgis.select_features_by_ids(feature_type, expr, layers=layers)
+    #tools_qgis.select_features_by_ids(feature_type, expr, layers=layers)
 
     return expr_filter
 
@@ -3189,7 +3189,7 @@ def zoom_to_feature_by_id(tablename: str, idname: str, _id, margin: float=15):
     if bbox:
         tools_qgis.zoom_to_rectangle(bbox.xMinimum() - margin, bbox.yMinimum() - margin, bbox.xMaximum() + margin, bbox.yMaximum() + margin)
 
-def selection_init(class_object, dialog, table_object, query=False):
+def selection_init(class_object, dialog, table_object, is_psector=False):
     """ Set canvas map tool to an instance of class 'GwSelectManager' """
 
     try:
@@ -3201,53 +3201,68 @@ def selection_init(class_object, dialog, table_object, query=False):
     if class_object.feature_type in ('all', None):
         class_object.feature_type = 'arc'
 
-    select_manager = GwSelectManager(class_object, table_object, dialog, query)
+    select_manager = GwSelectManager(class_object, table_object, dialog, is_psector)
     global_vars.canvas.setMapTool(select_manager)
     cursor = get_cursor_multiple_selection()
     global_vars.canvas.setCursor(cursor)
 
 
-def selection_changed(class_object, dialog, table_object, query=False, lazy_widget=None, lazy_init_function=None):
-    """ Slot function for signal 'canvas.selectionChanged' """
+def selection_changed(class_object, dialog, table_object, is_psector=False, lazy_widget=None, lazy_init_function=None):
+    """Handles selections from the map while keeping stored table values and allowing new selections from snapping."""
 
     tools_qgis.disconnect_signal_selection_changed()
     field_id = f"{class_object.feature_type}_id"
+    expected_table_name = f"tbl_{table_object}_x_{class_object.feature_type}"
 
-    ids = []
-    if class_object.layers is None:
+    # Retrieve the correct table widget
+    table_widget = dialog.findChild(QTableView, expected_table_name)
+    if not table_widget:
         return
 
-    # Iterate over all layers of the group
-    for layer in class_object.layers[class_object.feature_type]:
-        if layer.selectedFeatureCount() > 0:
-            # Get selected features of the layer
-            features = layer.selectedFeatures()
-            for feature in features:
-                # Append 'feature_id' into the list
-                selected_id = feature.attribute(field_id)
-                if selected_id not in ids:
-                    ids.append(selected_id)
+    model = table_widget.model()
+    selection_model = table_widget.selectionModel()
 
-    class_object.list_ids[class_object.feature_type] = ids
+    # Handle cases where the table is empty
+    table_ids = []
+    if model:
+        table_ids = [
+            str(model.index(row, model.fieldIndex(field_id)).data()) for row in range(model.rowCount())
+        ]
 
-    expr_filter = None
-    if len(ids) > 0:
-        # Set 'expr_filter' with features that are in the list
-        expr_filter = f'"{field_id}" IN ('
-        for i in range(len(ids)):
-            expr_filter += f"'{ids[i]}', "
-        expr_filter = expr_filter[:-2] + ")"
+    # Ensure dictionary and list exist for storing feature IDs per feature type
+    if not hasattr(class_object, "list_ids"):
+        class_object.list_ids = {}
 
-        # Check expression
-        (is_valid, expr) = tools_qt.check_expression_filter(expr_filter)  # @UnusedVariable
-        if not is_valid:
-            return
+    if class_object.feature_type not in class_object.list_ids:
+        class_object.list_ids[class_object.feature_type] = []
 
-        tools_qgis.select_features_by_ids(class_object.feature_type, expr, class_object.layers)
+    # Store current table feature IDs
+    if table_ids:
+        class_object.list_ids[class_object.feature_type] = table_ids
+    elif not class_object.list_ids[class_object.feature_type]:
+        class_object.list_ids[class_object.feature_type] = []
 
-    # Reload contents of table 'tbl_@table_object_x_@feature_type'
-    if query:
-        _insert_feature_psector(dialog, class_object.feature_type, ids=ids)
+    # Collect selected features from the map
+    selected_ids = []
+    if class_object.layers:
+        for layer in class_object.layers[class_object.feature_type]:
+            if layer.selectedFeatureCount() > 0:
+                for feature in layer.selectedFeatures():
+                    selected_id = str(feature.attribute(field_id))
+                    if selected_id and selected_id not in class_object.list_ids[class_object.feature_type]:
+                        selected_ids.append(selected_id)
+                        class_object.list_ids[class_object.feature_type].append(selected_id)
+
+    # Ensure selections are added even if the table was initially empty
+    if not table_ids and selected_ids:
+        class_object.list_ids[class_object.feature_type] = selected_ids
+
+    # Prevent UI interference while updating the table
+    table_widget.blockSignals(True)
+    expr_filter = f'"{field_id}" IN (' + ", ".join(f"'{i}'" for i in class_object.list_ids[class_object.feature_type]) + ")"
+
+    if is_psector:
+        _insert_feature_psector(dialog, class_object.feature_type, ids=class_object.list_ids[class_object.feature_type])
         remove_selection()
         load_tableview_psector(dialog, class_object.feature_type)
         set_model_signals(class_object)
@@ -3255,8 +3270,31 @@ def selection_changed(class_object, dialog, table_object, query=False, lazy_widg
         load_tablename(dialog, table_object, class_object.feature_type, expr_filter)
         tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
 
-    enable_feature_type(dialog, widget_table=table_object, ids=ids)
-    class_object.ids = ids
+    table_widget.blockSignals(False)
+
+    # Ensure selection of rows in the table based on the selected feature IDs from the map
+    if selection_model and selected_ids:
+        selection_model.clearSelection()
+        selection_flags = QItemSelectionModel.Select | QItemSelectionModel.Rows | QItemSelectionModel.Current
+
+        for row in range(model.rowCount()):
+            index = model.index(row, model.fieldIndex(field_id))
+            row_value = str(index.data())
+
+            if row_value in selected_ids:
+                selection_model.select(index, selection_flags)
+                table_widget.setCurrentIndex(index)
+                table_widget.scrollTo(index, QAbstractItemView.PositionAtCenter)
+                table_widget.selectionModel().setCurrentIndex(index,
+                                                              QItemSelectionModel.Select | QItemSelectionModel.Rows)
+
+    # Ensure proper table refresh
+    table_widget.setSelectionBehavior(QAbstractItemView.SelectRows)
+    table_widget.viewport().update()
+    table_widget.repaint()
+
+
+    enable_feature_type(dialog, widget_table=table_object, ids=class_object.list_ids[class_object.feature_type])
 
 
 def set_model_signals(class_object):
@@ -3417,12 +3455,12 @@ def remove_selection(remove_groups=True, layers=None):
     return layers
 
 
-def connect_signal_selection_changed(class_object, dialog, table_object, query=False):
+def connect_signal_selection_changed(class_object, dialog, table_object, is_psector=False):
     """ Connect signal selectionChanged """
 
     try:
         global_vars.canvas.selectionChanged.connect(
-            partial(selection_changed, class_object, dialog, table_object, query))
+            partial(selection_changed, class_object, dialog, table_object, is_psector))
     except Exception as e:
         tools_log.log_info(f"connect_signal_selection_changed: {e}")
 
