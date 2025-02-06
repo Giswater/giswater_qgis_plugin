@@ -3144,3 +3144,9 @@ dv_orderby_id = true, dv_isnullvalue = true, widgetcontrols = '{"setMultiline": 
 
 UPDATE config_csv SET descript='The csv file must have the following fields:
 dscenario_name, feature_id, feature_type, value, demand_type, pattern_id, source' WHERE fid=501;
+
+
+-- 06/02/2025
+UPDATE config_form_fields
+	SET widgetcontrols='{"saveValue":false, "filterSign":"=", "onContextMenu":"Open link"}'::json
+	WHERE formname='node' AND formtype='form_feature' AND columnname='btn_link' AND tabname='tab_hydrometer';

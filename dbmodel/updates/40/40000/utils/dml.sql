@@ -1237,3 +1237,9 @@ INSERT INTO config_form_list (listname, query_text, device, listtype, listclass,
     }
   ]
 }'::json);
+
+
+-- 06/02/2025
+UPDATE config_form_fields
+	SET widgetcontrols='{"saveValue":false, "filterSign":"=", "onContextMenu":"Open link"}'::json
+	WHERE formname='connec' AND formtype='form_feature' AND columnname='btn_link' AND tabname='tab_hydrometer';
