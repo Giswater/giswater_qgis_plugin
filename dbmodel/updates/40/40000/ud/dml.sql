@@ -2618,3 +2618,6 @@ INSERT INTO config_form_fields VALUES('v_ui_dwfzone', 'form_feature', 'tab_none'
 INSERT INTO config_form_fields VALUES('v_ui_dwfzone', 'form_feature', 'tab_none', 'stylesheet', 'lyt_data_1', 8, 'string', 'text', 'stylesheet', 'stylesheet', NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, NULL);
 INSERT INTO config_form_fields VALUES('v_ui_dwfzone', 'form_feature', 'tab_none', 'link', 'lyt_data_1', 9, 'string', 'text', 'link', 'link', NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, NULL);
 INSERT INTO config_form_fields VALUES('v_ui_dwfzone', 'form_feature', 'tab_none', 'expl_id', 'lyt_data_1', 10, 'text', 'text', 'expl_id', 'expl_id', '1', false, false, true, false, false, 'SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id IS NOT NULL', NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, NULL);
+
+-- 06/02/2025
+INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, parameter_id, active) VALUES('edit_typevalue', 'value_datasource', 'element', 'datasource', NULL, true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field) DO NOTHING;
