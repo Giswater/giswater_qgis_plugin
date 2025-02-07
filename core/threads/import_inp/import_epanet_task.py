@@ -660,7 +660,7 @@ class GwImportInpTask(GwTask):
                     state,
                     state_type,
                     workcat_id,
-                    j.top_elev,
+                    j.elevation,
                 )
             )
             inp_dict[j_name] = {
@@ -886,7 +886,7 @@ class GwImportInpTask(GwTask):
             state = 1
             state_type = 2
             workcat_id = self.workcat
-            elevation = t.top_elev
+            elevation = t.elevation
             node_params.append(
                 (
                     x, y, srid,  # the_geom

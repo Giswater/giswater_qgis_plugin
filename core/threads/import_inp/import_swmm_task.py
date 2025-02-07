@@ -828,7 +828,7 @@ class GwImportInpTask(GwTask):
                     state,
                     state_type,
                     workcat_id,
-                    j.top_elev,
+                    j.elevation,
                     j.depth_max,
                 )
             )
@@ -923,7 +923,7 @@ class GwImportInpTask(GwTask):
             state = 1
             state_type = 2
             workcat_id = self.workcat
-            elevation = o.top_elev
+            elevation = o.elevation
             node_params.append(
                 (
                     x, y, srid,  # the_geom
@@ -1033,7 +1033,7 @@ class GwImportInpTask(GwTask):
             state = 1
             state_type = 2
             workcat_id = self.workcat
-            elevation = d.top_elev
+            elevation = d.elevation
             node_params.append(
                 (
                     x, y, srid,  # the_geom
@@ -1122,11 +1122,11 @@ class GwImportInpTask(GwTask):
 
         inp_sql = """
             INSERT INTO inp_storage (
-                node_id, storage_type, curve_id, a1, a2, a0, fevap, sh, hc, imd, y0, ysur, apond
+                node_id, storage_type, curve_id, a1, a2, a0, fevap, sh, hc, imd, y0, ysur
             ) VALUES %s
         """  # --
         inp_template = (
-            "(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+            "(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
         )
 
         node_params = []
@@ -1147,7 +1147,7 @@ class GwImportInpTask(GwTask):
             state = 1
             state_type = 2
             workcat_id = self.workcat
-            elevation = s.top_elev
+            elevation = s.elevation
             node_params.append(
                 (
                     x, y, srid,  # the_geom
@@ -1176,7 +1176,6 @@ class GwImportInpTask(GwTask):
                 "imd": s.moisture_deficit_init,
                 "y0": s.depth_init,
                 "ysur": s.depth_surcharge,
-                "apond": None,
             }
 
         # Insert into parent table
@@ -1206,7 +1205,7 @@ class GwImportInpTask(GwTask):
             inp_params.append(
                 (node_id, inp_data["storage_type"], inp_data["curve_id"], inp_data["a1"], inp_data["a2"], inp_data["a0"],
                  inp_data["fevap"], inp_data["sh"], inp_data["hc"], inp_data["imd"], inp_data["y0"], inp_data["ysur"],
-                 inp_data["apond"])
+                )
             )
 
         # Insert into inp table
@@ -1928,7 +1927,7 @@ class GwImportInpTask(GwTask):
         def get_adjustment(attr: str, subc_name: str):
             try:
                 return self.network[ADJUSTMENTS][(attr, subc_name)]
-            except KeyError:
+            except (KeyError, AttributeError):
                 return None
 
         def get_subc_geom(subc):
