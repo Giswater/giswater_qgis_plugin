@@ -81,7 +81,7 @@ class GwI18NGenerator:
         sql = "SELECT id, idval FROM i18n.cat_language"
         rows = self._get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_qm.cmb_language, rows)
-        language = tools_gw.get_config_parser('i18n_generator', 'qm_lang_language', "user", "init", False)
+        language = tools_gw.get_config_parser('i18n_generator', 'qm_lang_language', "user", "session", False)
 
         tools_qt.set_combo_value(self.dlg_qm.cmb_language, language, 0)
 
@@ -718,13 +718,13 @@ class GwI18NGenerator:
         language = tools_qt.get_combo_value(self.dlg_qm, self.dlg_qm.cmb_language, 0)
         py_msg = tools_qt.is_checked(self.dlg_qm, self.dlg_qm.chk_py_msg)
         db_msg = tools_qt.is_checked(self.dlg_qm, self.dlg_qm.chk_db_msg)
-        tools_gw.set_config_parser('i18n_generator', 'qm_lang_host', f"{host}", "user", "init", prefix=False)
-        tools_gw.set_config_parser('i18n_generator', 'qm_lang_port', f"{port}", "user", "init", prefix=False)
-        tools_gw.set_config_parser('i18n_generator', 'qm_lang_db', f"{db}", "user", "init", prefix=False)
-        tools_gw.set_config_parser('i18n_generator', 'qm_lang_user', f"{user}", "user", "init", prefix=False)
-        tools_gw.set_config_parser('i18n_generator', 'qm_lang_language', f"{language}", "user", "init", prefix=False)
-        tools_gw.set_config_parser('i18n_generator', 'qm_lang_py_msg', f"{py_msg}", "user", "init", prefix=False)
-        tools_gw.set_config_parser('i18n_generator', 'qm_lang_db_msg', f"{db_msg}", "user", "init", prefix=False)
+        tools_gw.set_config_parser('i18n_generator', 'qm_lang_host', f"{host}", "user", "session", prefix=False)
+        tools_gw.set_config_parser('i18n_generator', 'qm_lang_port', f"{port}", "user", "session", prefix=False)
+        tools_gw.set_config_parser('i18n_generator', 'qm_lang_db', f"{db}", "user", "session", prefix=False)
+        tools_gw.set_config_parser('i18n_generator', 'qm_lang_user', f"{user}", "user", "session", prefix=False)
+        tools_gw.set_config_parser('i18n_generator', 'qm_lang_language', f"{language}", "user", "session", prefix=False)
+        tools_gw.set_config_parser('i18n_generator', 'qm_lang_py_msg', f"{py_msg}", "user", "session", prefix=False)
+        tools_gw.set_config_parser('i18n_generator', 'qm_lang_db_msg', f"{db_msg}", "user", "session", prefix=False)
 
 
     def _load_user_values(self):
@@ -733,12 +733,12 @@ class GwI18NGenerator:
             :return: Dictionary with values
         """
 
-        host = tools_gw.get_config_parser('i18n_generator', 'qm_lang_host', "user", "init", False)
-        port = tools_gw.get_config_parser('i18n_generator', 'qm_lang_port', "user", "init", False)
-        db = tools_gw.get_config_parser('i18n_generator', 'qm_lang_db', "user", "init", False)
-        user = tools_gw.get_config_parser('i18n_generator', 'qm_lang_user', "user", "init", False)
-        py_msg = tools_gw.get_config_parser('i18n_generator', 'qm_lang_py_msg', "user", "init", False)
-        db_msg = tools_gw.get_config_parser('i18n_generator', 'qm_lang_db_msg', "user", "init", False)
+        host = tools_gw.get_config_parser('i18n_generator', 'qm_lang_host', "user", "session", False)
+        port = tools_gw.get_config_parser('i18n_generator', 'qm_lang_port', "user", "session", False)
+        db = tools_gw.get_config_parser('i18n_generator', 'qm_lang_db', "user", "session", False)
+        user = tools_gw.get_config_parser('i18n_generator', 'qm_lang_user', "user", "session", False)
+        py_msg = tools_gw.get_config_parser('i18n_generator', 'qm_lang_py_msg', "user", "session", False)
+        db_msg = tools_gw.get_config_parser('i18n_generator', 'qm_lang_db_msg', "user", "session", False)
         tools_qt.set_widget_text(self.dlg_qm, 'txt_host', host)
         tools_qt.set_widget_text(self.dlg_qm, 'txt_port', port)
         tools_qt.set_widget_text(self.dlg_qm, 'txt_db', db)
