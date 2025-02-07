@@ -40,4 +40,7 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_psect
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_psector_connec_traceability", "column":"streetname", "dataType":"varchar(100)"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_psector_connec_traceability", "column":"streetname2", "dataType":"varchar(100)"}}$$);
 
+-- 07/02/2025
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"dimensions", "column":"visit_id", "dataType":"int4", "isUtils":"False"}}$$);
+ALTER TABLE dimensions ADD CONSTRAINT dimensions_visit_id_fkey FOREIGN KEY (visit_id) REFERENCES om_visit(id) ON UPDATE CASCADE ON DELETE RESTRICT;
 

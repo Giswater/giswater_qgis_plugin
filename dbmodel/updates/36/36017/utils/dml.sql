@@ -72,7 +72,7 @@ where parameter = 'basic_selector_tab_macroexploitation_add';
 
 update config_param_system
 set value = '{"table":"temp_t_mincut","table_id":"id","selector":"selector_mincut_result","selector_id":"result_id","label":"id, ''('', CASE WHEN work_order IS NULL THEN ''N/I'' ELSE work_order END, '') on '', forecast_start::date, '' at '', forecast_start::time, ''H-'', forecast_end::time,''H''","query_filter":"","manageAll":true}'
-where parameter = 'basic_selector_tab_mincut';	
+where parameter = 'basic_selector_tab_mincut';
 
 -- 13/01/2025
 UPDATE config_form_fields SET dv_querytext = 'SELECT sector_id as id,name as idval FROM v_edit_sector WHERE sector_id > -1',
@@ -83,4 +83,5 @@ WHERE formname = 'v_edit_sector' AND formtype = 'form_feature' AND tabname = 'ta
 
 UPDATE config_param_system SET isenabled = false where parameter = ' basic_selector_tab_municipality';
 
-
+-- 07/02/2025
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('v_edit_dimensions', 'form_feature', 'tab_none', 'visit_id', 'lyt_other', 13, 'integer', 'typeahead', 'visit_id', 'visit_id', NULL, false, false, true, false, NULL, 'SELECT id::text, id::text as idval FROM om_visit WHERE id IS NOT NULL', true, true, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, true, NULL);
