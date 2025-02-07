@@ -242,3 +242,6 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"link", "co
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"sys_fprocess", "column":"active", "dataType":"boolean", "isUtils":"False"}}$$);
 
 update sys_fprocess set active = true;
+
+-- 07/02/2025
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"rpt_cat_result", "column":"inp_file", "dataType":"bytea", "isUtils":"False"}}$$);
