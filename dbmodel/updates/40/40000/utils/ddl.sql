@@ -245,3 +245,6 @@ update sys_fprocess set active = true;
 
 -- 07/02/2025
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"rpt_cat_result", "column":"inp_file", "dataType":"bytea", "isUtils":"False"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"dimensions", "column":"visit_id", "dataType":"int4", "isUtils":"False"}}$$);
+ALTER TABLE dimensions ADD CONSTRAINT dimensions_visit_id_fkey FOREIGN KEY (visit_id) REFERENCES om_visit(id) ON UPDATE CASCADE ON DELETE RESTRICT;

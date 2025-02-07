@@ -1250,3 +1250,6 @@ INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('va
 INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('value_datasource', '2', 'CRM', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
 INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('value_datasource', '3', 'DEM', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
 INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('value_datasource', '4', 'TOPO', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
+
+-- 07/02/2025
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('v_edit_dimensions', 'form_feature', 'tab_none', 'visit_id', 'lyt_other', 13, 'integer', 'typeahead', 'visit_id', 'visit_id', NULL, false, false, true, false, NULL, 'SELECT id::text, id::text as idval FROM om_visit WHERE id IS NOT NULL', true, true, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, true, NULL);
