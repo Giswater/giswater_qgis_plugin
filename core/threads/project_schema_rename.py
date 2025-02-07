@@ -59,7 +59,7 @@ class GwRenameSchemaTask(GwTask):
                    + self.new_schema_name + '","oldSchemaName":"' + str(schema) + '"}}$$)::text')
             tools_db.execute_sql(sql, commit=False)
             # Execute last_process
-            self.admin.execute_last_process(schema_name=self.new_schema_name, locale=True)
+            self.admin.execute_last_process(schema_name=self.new_schema_name, locale=True, schema_type=self.admin.project_type)
 
         # Show message
         status = (self.admin.error_count == 0)
