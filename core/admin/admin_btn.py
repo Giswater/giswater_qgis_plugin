@@ -386,7 +386,7 @@ class GwAdminButton:
         list_locale = self._select_active_locales(sqlite_cur)
         tools_qt.fill_combo_values(self.cmb_locale, list_locale)
         locale = tools_gw.get_config_parser('btn_admin', 'project_locale', 'user', 'session', False, force_reload=True)
-        tools_qt.set_combo_value(self.cmb_locale, locale, 0)
+        tools_qt.set_combo_value(self.cmb_locale, locale, 0, add_new=False)
 
         # Set shortcut keys
         self.dlg_readsql_create_project.key_escape.connect(partial(tools_gw.close_dialog, self.dlg_readsql_create_project, False))

@@ -83,7 +83,7 @@ class GwI18NGenerator:
         tools_qt.fill_combo_values(self.dlg_qm.cmb_language, rows)
         language = tools_gw.get_config_parser('i18n_generator', 'qm_lang_language', "user", "session", False)
 
-        tools_qt.set_combo_value(self.dlg_qm.cmb_language, language, 0)
+        tools_qt.set_combo_value(self.dlg_qm.cmb_language, language, 0, add_new=False)
 
 
     def _check_translate_options(self):

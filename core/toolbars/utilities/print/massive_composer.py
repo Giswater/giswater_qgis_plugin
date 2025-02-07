@@ -99,7 +99,7 @@ class GwMassiveComposer:
             index = index + 1
         tools_qt.fill_combo_values(combo, records, 1, add_empty=True)
         last_composer = tools_gw.get_config_parser('composer_pages', 'last_composer', 'user', 'session')
-        tools_qt.set_combo_value(combo, f'{last_composer}', 0)
+        tools_qt.set_combo_value(combo, f'{last_composer}', 0, add_new=False)
 
 
     def generate_pdfs(self, dialog):

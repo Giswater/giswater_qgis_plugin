@@ -545,12 +545,13 @@ class GwToolBoxButton(GwAction):
                                                       "session")
         else:
             feature_type = dialog.cmb_feature_type.property('selectedId')
-        tools_qt.set_combo_value(dialog.cmb_feature_type, feature_type, 0)
+        tools_qt.set_combo_value(dialog.cmb_feature_type, feature_type, 0, add_new=False)
         if dialog.cmb_layers.property('selectedId') in (None, '', 'NULL'):
             layer = tools_gw.get_config_parser('btn_toolbox', f"{function_name}_cmb_layers", "user", "session")
+            tools_qt.set_combo_value(dialog.cmb_layers, layer, 0, add_new=False)
         else:
             layer = dialog.cmb_layers.property('selectedId')
-        tools_qt.set_combo_value(dialog.cmb_layers, layer, 0)
+            tools_qt.set_combo_value(dialog.cmb_layers, layer, 0)
 
         if tools_gw.get_config_parser('btn_toolbox', f"{function_name}_rbt_previous", "user", "session") == 'True':
             tools_qt.set_checked(dialog, 'rbt_previous', True)

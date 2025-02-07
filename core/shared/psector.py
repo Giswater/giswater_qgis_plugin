@@ -2616,7 +2616,7 @@ class GwPsector:
 
         vdefault = tools_gw.get_config_parser('dlg_replace_arc', 'cmb_newarccat', "user", "session")
         if vdefault:
-            tools_qt.set_combo_value(self.dlg_replace_arc.cmb_newarccat, vdefault, 0)
+            tools_qt.set_combo_value(self.dlg_replace_arc.cmb_newarccat, vdefault, 0, add_new=False)
 
         # Set text current arccat
         self.dlg_replace_arc.txt_current_arccat.setText(self.arc_cat_id)

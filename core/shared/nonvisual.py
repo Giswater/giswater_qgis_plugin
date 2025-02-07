@@ -580,7 +580,7 @@ class GwNonVisual:
         descript = tools_gw.get_config_parser('nonvisual_roughness', 'txt_descript', "user", "session")
 
         # Populate widgets
-        tools_qt.set_combo_value(cmb_matcat_id, str(matcat_id), 0)
+        tools_qt.set_combo_value(cmb_matcat_id, str(matcat_id), 0, add_new=False)
         tools_qt.set_checked(dialog, chk_active, active)
         tools_qt.set_widget_text(dialog, txt_period_id, period_id)
         tools_qt.set_widget_text(dialog, txt_init_age, init_age)
@@ -863,7 +863,7 @@ class GwNonVisual:
         curve_type = tools_gw.get_config_parser('nonvisual_curves', 'cmb_curve_type', "user", "session")
 
         # Populate widgets
-        tools_qt.set_combo_value(cmb_expl_id, str(expl_id), 0)
+        tools_qt.set_combo_value(cmb_expl_id, str(expl_id), 0, add_new=False)
         tools_qt.set_widget_text(dialog, cmb_curve_type, curve_type)
 
 
@@ -1388,7 +1388,7 @@ class GwNonVisual:
         expl_id = tools_gw.get_config_parser('nonvisual_patterns', 'cmb_expl_id', "user", "session")
 
         # Populate widgets
-        tools_qt.set_combo_value(cmb_expl_id, str(expl_id), 0)
+        tools_qt.set_combo_value(cmb_expl_id, str(expl_id), 0, add_new=False)
 
 
     def _save_ws_pattern_widgets(self, dialog):
@@ -1665,8 +1665,8 @@ class GwNonVisual:
         pattern_type = tools_gw.get_config_parser('nonvisual_patterns', 'cmb_pattern_type', "user", "session")
 
         # Populate widgets
-        tools_qt.set_combo_value(cmb_expl_id, str(expl_id), 0)
-        tools_qt.set_combo_value(cmb_pattern_type, str(pattern_type), 0)
+        tools_qt.set_combo_value(cmb_expl_id, str(expl_id), 0, add_new=False)
+        tools_qt.set_combo_value(cmb_pattern_type, str(pattern_type), 0, add_new=False)
 
 
     def _save_ud_pattern_widgets(self, dialog):
@@ -1944,7 +1944,7 @@ class GwNonVisual:
         active = tools_gw.get_config_parser('nonvisual_controls', 'chk_active', "user", "session")
 
         # Populate widgets
-        tools_qt.set_combo_value(cmb_sector_id, str(sector_id), 0)
+        tools_qt.set_combo_value(cmb_sector_id, str(sector_id), 0, add_new=False)
         tools_qt.set_checked(dialog, chk_active, active)
 
 
@@ -2084,7 +2084,7 @@ class GwNonVisual:
         active = tools_gw.get_config_parser('nonvisual_rules', 'chk_active', "user", "session")
 
         # Populate widgets
-        tools_qt.set_combo_value(cmb_sector_id, str(sector_id), 0)
+        tools_qt.set_combo_value(cmb_sector_id, str(sector_id), 0, add_new=False)
         tools_qt.set_checked(dialog, chk_active, active)
 
 
@@ -2353,9 +2353,9 @@ class GwNonVisual:
         times_type = tools_gw.get_config_parser('nonvisual_timeseries', 'cmb_times_type', "user", "session")
 
         # Populate widgets
-        tools_qt.set_combo_value(cmb_expl_id, str(expl_id), 0)
-        tools_qt.set_combo_value(cmb_timeser_type, str(timeser_type), 0)
-        tools_qt.set_combo_value(cmb_times_type, str(times_type), 0)
+        tools_qt.set_combo_value(cmb_expl_id, str(expl_id), 0, add_new=False)
+        tools_qt.set_combo_value(cmb_timeser_type, str(timeser_type), 0, add_new=False)
+        tools_qt.set_combo_value(cmb_times_type, str(times_type), 0, add_new=False)
 
 
     def _save_timeseries_widgets(self, dialog):
@@ -2660,7 +2660,7 @@ class GwNonVisual:
         lidtype = tools_gw.get_config_parser('nonvisual_lids', 'cmb_lidtype', "user", "session")
 
         # Populate widgets
-        tools_qt.set_combo_value(cmb_lidtype, str(lidtype), 0)
+        tools_qt.set_combo_value(cmb_lidtype, str(lidtype), 0, add_new=False)
 
         for i in range(dialog.tab_lidlayers.count()):
             if Qgis.QGIS_VERSION_INT >= 32000:
@@ -2682,7 +2682,7 @@ class GwNonVisual:
                     if type(widget) == QLineEdit:
                         tools_qt.set_widget_text(dialog, widget, str(value))
                     else:
-                        tools_qt.set_combo_value(widget, str(value), 0)
+                        tools_qt.set_combo_value(widget, str(value), 0, add_new=False)
 
 
     def _save_lids_widgets(self, dialog):
