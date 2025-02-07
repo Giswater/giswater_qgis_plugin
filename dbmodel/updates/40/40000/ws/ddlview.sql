@@ -264,6 +264,7 @@ AS WITH
     (
       SELECT arc.arc_id,
       arc.code,
+      arc.datasource,
       arc.node_1,
       arc.nodetype_1,
       arc.elevation1,
@@ -616,6 +617,7 @@ AS WITH
             WHEN node.custom_top_elev IS NOT NULL THEN node.custom_top_elev
             ELSE node.top_elev
         END AS sys_top_elev,
+        node.datasource,
         node.depth,
         cat_node.node_type,
         cat_feature.feature_class AS sys_type,
@@ -1217,6 +1219,7 @@ AS WITH
         select connec.connec_id,
         connec.code,
         connec.top_elev,
+        connec.datasource,
         connec.depth,
         cat_connec.connec_type,
         cat_feature.feature_class AS sys_type,
@@ -1532,6 +1535,7 @@ AS SELECT d.dqa_id,
 CREATE OR REPLACE VIEW v_edit_element AS
 SELECT e.* FROM ( SELECT element.element_id,
     element.code,
+    element.datasource,
     element.elementcat_id,
     cat_element.element_type,
     element.brand_id,
