@@ -9,6 +9,7 @@ import json
 import os
 import re
 import subprocess
+import psycopg2
 
 from qgis.PyQt.QtCore import pyqtSignal
 
@@ -296,6 +297,13 @@ class GwEpaFileManager(GwTask):
                 file_inp.write(line)
 
         self._close_file(file_inp)
+
+        # Save INP file into database
+        with open(folder_path, "rb") as file_inp:
+            file_binary = file_inp.read()
+
+        sql = f"UPDATE rpt_cat_result SET inp_file = {psycopg2.Binary(file_binary)} WHERE result_id = '{self.result_name}';"
+        tools_db.execute_sql(sql, log_sql=True)
 
         networkmode = tools_gw.get_config_value('inp_options_networkmode')
         if global_vars.project_type == 'ud' and networkmode and networkmode[0] == "2":
