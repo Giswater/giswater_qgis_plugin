@@ -266,7 +266,7 @@
        <xmax>__XMAX__</xmax>
        <ymax>__YMAX__</ymax>
     </extent>
-    <rotation>35</rotation>
+    <rotation>0</rotation>
     <destinationsrs>
       <spatialrefsys nativeFormat="Wkt">
 
