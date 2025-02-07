@@ -1250,3 +1250,10 @@ INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('va
 INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('value_datasource', '2', 'CRM', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
 INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('value_datasource', '3', 'DEM', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
 INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('value_datasource', '4', 'TOPO', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
+
+-- 07/02/2025
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source")
+VALUES (3382, 'gw_fct_import_epanet_nodarcs', 'ws', 'function', 'json', 'json', 'Function to manage nodarcs after importing INP file', 'role_epa', NULL, 'core');
+
+INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source")
+VALUES (3384, 'gw_fct_import_swmm_nodarcs', 'ud', 'function', 'json', 'json', 'Function to manage nodarcs after importing INP file', 'role_epa', NULL, 'core');
