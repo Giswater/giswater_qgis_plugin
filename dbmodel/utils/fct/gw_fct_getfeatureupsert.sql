@@ -986,6 +986,22 @@ BEGIN
 
 			-- setting values
 			IF (aux_json->>'widgettype')='combo' THEN
+
+				-- Set default value if exist when inserting and feild_value is null
+				IF p_tg_op ='INSERT' AND (field_value IS NULL OR field_value = '') THEN
+					IF (aux_json->>'widgetcontrols') IS NOT NULL THEN
+						IF ((aux_json->>'widgetcontrols')::jsonb ? 'vdefault_value') THEN
+							IF (aux_json->>'widgetcontrols')::json->>'vdefault_value'::text in  (select a from json_array_elements_text(json_extract_path(v_fields_array[array_index],'comboIds'))a) THEN
+								field_value = (aux_json->>'widgetcontrols')::json->>'vdefault_value';
+							END IF;
+						ELSEIF ((aux_json->>'widgetcontrols')::jsonb ? 'vdefault_querytext') THEN
+							IF EXECUTE (aux_json->>'widgetcontrols')::json->>'vdefault_querytext'::text in  (select a from json_array_elements_text(json_extract_path(v_fields_array[array_index],'comboIds'))a) THEN
+								EXECUTE (aux_json->>'widgetcontrols')::json->>'vdefault_querytext' INTO field_value;
+							END iF;
+						END IF;
+					END IF;
+				END IF;
+				
 				--check if selected id is on combo list
 				IF field_value::text not in  (select a from json_array_elements_text(json_extract_path(v_fields_array[array_index],'comboIds'))a) AND field_value IS NOT NULL then
 					--find dvquerytext for combo
@@ -1051,8 +1067,19 @@ BEGIN
                 ELSE
                     v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'value', COALESCE(field_value, ''));
                 END IF;
+				
 			ELSIF (aux_json->>'widgettype') !='button' THEN
-
+				
+				-- Set default value if exist when inserting and feild_value is null
+				IF p_tg_op ='INSERT' AND (field_value IS NULL OR field_value = '') THEN
+					IF (aux_json->>'widgetcontrols') IS NOT NULL THEN
+						IF ((aux_json->>'widgetcontrols')::jsonb ? 'vdefault_value') THEN
+							field_value = (aux_json->>'widgetcontrols')::json->>'vdefault_value';
+						ELSEIF ((aux_json->>'widgetcontrols')::jsonb ? 'vdefault_querytext') THEN
+							EXECUTE (aux_json->>'widgetcontrols')::json->>'vdefault_querytext' INTO field_value;
+						END IF;
+					END IF;
+				END IF;
 				v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'value', COALESCE(field_value, ''));
 
 			END IF;
