@@ -49,6 +49,12 @@ class GwImportSwmm:
         self.file_path: Optional[Path] = None
         self.cur_process = None
         self.cur_text = None
+        self.catalog_source = {
+            "pumps": "db_arcs",
+            "orifices": "db_arcs",
+            "weirs": "db_arcs",
+            "outlets": "db_arcs"
+        }
 
     def clicked_event(self) -> None:
         """Start the Import INP workflow"""
@@ -496,37 +502,6 @@ class GwImportSwmm:
                     new_cat_name,
                 )
 
-        # Fill arcs table with pumps and valves
-        arc_elements = [
-            ("pumps", self.catalogs.inp_pumps, "PUMP"),
-            ("orifices", self.catalogs.inp_orifice, "ORIFICE"),
-            ("weirs", self.catalogs.inp_weir, "WEIR"),
-            ("outlets", self.catalogs.inp_outlet, "OUTLET"),
-        ]
-
-        for element, rec_catalog, tag in arc_elements:
-            if rec_catalog is None:
-                continue
-
-            row: int = tbl_arcs.rowCount()
-            tbl_arcs.setRowCount(row + 1)
-
-            first_column = QTableWidgetItem(tag)
-            first_column.setFlags(Qt.ItemIsEnabled)
-            tbl_arcs.setItem(row, 0, first_column)
-
-            combo_cat = QComboBox()
-            tbl_arcs.setCellWidget(row, 6, combo_cat)
-
-            new_cat_name = QTableWidgetItem("")
-            new_cat_name.setFlags(Qt.NoItemFlags)
-            tbl_arcs.setItem(row, 7, new_cat_name)
-            combo_cat.currentTextChanged.connect(
-                partial(self._toggle_enabled_new_catalog_field, new_cat_name)
-            )
-
-            self.tbl_elements[element] = (combo_cat, new_cat_name)
-
         # Fill materials table
         tbl_material: QTableWidget = self.dlg_config.tbl_material
 
@@ -556,10 +531,10 @@ class GwImportSwmm:
             ("DIVIDERS", self.catalogs.inp_dividers, ("MANHOLE",), "NODE"),
             ("STORAGE", self.catalogs.inp_storage, ("STORAGE",), "NODE"),
             ("CONDUITS", self.catalogs.inp_conduits, ("CONDUIT",), "ARC"),
-            ("PUMPS", self.catalogs.inp_pumps, ("VARC",), "ARC"),
-            ("ORIFICES", self.catalogs.inp_orifice, ("VARC",), "ARC"),
-            ("WEIRS", self.catalogs.inp_weir, ("VARC",), "ARC"),
-            ("OUTLETS", self.catalogs.inp_outlet, ("VARC",), "ARC"),
+            ("PUMPS", self.catalogs.inp_pumps, ("VARC","FRPUMP"), ("ARC", "FLWREG")),
+            ("ORIFICES", self.catalogs.inp_orifice, ("VARC","FRORIFICE"), ("ARC", "FLWREG")),
+            ("WEIRS", self.catalogs.inp_weir, ("VARC","FRWEIR"), ("ARC", "FLWREG")),
+            ("OUTLETS", self.catalogs.inp_outlet, ("VARC","FROUTLET"), ("ARC", "FLWREG")),
         ]
 
         self.tbl_elements["features"] = {}
@@ -625,6 +600,16 @@ class GwImportSwmm:
 
         self.catalogs = Catalogs.from_network_model(self.parse_inp_task.network)
 
+        # Get flow regulators catalog source
+        catalog_source = self.catalog_source.get("pumps", "db_arcs")
+        pump_catalog = getattr(self.catalogs, catalog_source)
+        catalog_source = self.catalog_source.get("orifices", "db_arcs")
+        orifice_catalog = getattr(self.catalogs, catalog_source)
+        catalog_source = self.catalog_source.get("weirs", "db_arcs")
+        weir_catalog = getattr(self.catalogs, catalog_source)
+        catalog_source = self.catalog_source.get("outlets", "db_arcs")
+        outlet_catalog = getattr(self.catalogs, catalog_source)
+
         # Fill nodes and arcs tables
         elements = [
             ("junctions", self.catalogs.inp_junctions, self.catalogs.db_nodes),
@@ -632,10 +617,10 @@ class GwImportSwmm:
             ("dividers", self.catalogs.inp_dividers, self.catalogs.db_nodes),
             ("storage", self.catalogs.inp_storage, self.catalogs.db_nodes),
             ("conduits", self.catalogs.inp_conduits, self.catalogs.db_arcs),
-            ("pumps", self.catalogs.inp_pumps, self.catalogs.db_arcs),
-            ("orifices", self.catalogs.inp_orifice, self.catalogs.db_arcs),
-            ("weirs", self.catalogs.inp_weir, self.catalogs.db_arcs),
-            ("outlets", self.catalogs.inp_outlet, self.catalogs.db_arcs),
+            ("pumps", self.catalogs.inp_pumps, pump_catalog),
+            ("orifices", self.catalogs.inp_orifice, orifice_catalog),
+            ("weirs", self.catalogs.inp_weir, weir_catalog),
+            ("outlets", self.catalogs.inp_outlet, outlet_catalog),
         ]
 
         for element_type, element_catalog, db_catalog in elements:
@@ -720,11 +705,10 @@ class GwImportSwmm:
             "dividers": ("NODE", ("MANHOLE",)),
             "storage": ("NODE", ("STORAGE",)),
             "conduits": ("ARC", ("CONDUIT",)),
-            "pumps": ("ARC", ("VARC",)),
-            "valves": ("ARC", ("VARC",)),
-            "orifices": ("ARC", ("VARC",)),
-            "weirs": ("ARC", ("VARC",)),
-            "outlets": ("ARC", ("VARC",)),
+            "pumps": (("ARC", "FLWREG"), ("VARC","FRPUMP")),
+            "orifices": (("ARC", "FLWREG"), ("VARC","FRORIFICE")),
+            "weirs": (("ARC", "FLWREG"), ("VARC","FRWEIR")),
+            "outlets": (("ARC", "FLWREG"), ("VARC","FROUTLET")),
         }
         for element_type, (combo,) in self.tbl_elements["features"].items():
             system_catalog = [
@@ -738,6 +722,7 @@ class GwImportSwmm:
                 if feat_type in feature_types[element_type][1]
             ]
 
+            combo.blockSignals(True)
             old_value: str = combo.currentText()
             combo.clear()
             combo.addItem("")
@@ -754,6 +739,97 @@ class GwImportSwmm:
                     feat for feat in system_catalog if feat not in feat_catalog
                 )
             combo.setCurrentText(old_value)
+            combo.blockSignals(False)
+
+            # Connect a signal to set flow regulators in the corresponding table
+            if element_type in ("pumps", "orifices", "weirs", "outlets"):
+                tools_gw.connect_signal(combo.currentTextChanged,
+                                        partial(self._update_table_based_on_feature_type, element_type, combo),
+                                        'import_inp', f'cmb_{element_type.lower()}_update_table_based_on_feature_type')
+
+    def _update_table_based_on_feature_type(self, element_type: str, combo: QComboBox):
+        if element_type not in ("pumps", "orifices", "weirs", "outlets"):
+            return
+
+        feature_type = combo.currentText()
+        if feature_type == "":
+            return
+
+        sql = f"""
+            SELECT feature_type FROM cat_feature WHERE id = '{feature_type.upper()}';
+        """
+        feature_type = tools_db.get_row(sql)
+        if feature_type is None:
+            return
+
+        feature_type = feature_type[0]
+        tbl = self.dlg_config.tbl_arcs if feature_type == "ARC" else self.dlg_config.tbl_flwreg
+        other_tbl = self.dlg_config.tbl_flwreg if feature_type == "ARC" else self.dlg_config.tbl_arcs
+
+        # Update the catalog source based on the feature type
+        self.catalog_source[element_type] = "db_arcs" if feature_type == "ARC" else "db_flwreg"
+
+        # Fill table with pumps and valves
+        elements = [
+            ("pumps", self.catalogs.inp_pumps, "PUMP"),
+            ("orifices", self.catalogs.inp_orifice, "ORIFICE"),
+            ("weirs", self.catalogs.inp_weir, "WEIR"),
+            ("outlets", self.catalogs.inp_outlet, "OUTLET"),
+        ]
+
+        # Find the tag for the given element_type
+        tag = None
+        for element, rec_catalog, element_tag in elements:
+            if element == element_type:
+                tag = element_tag
+                break
+        if tag is None:
+            return
+
+        # Remove existing row for the element
+        for row in range(other_tbl.rowCount()):
+            if other_tbl.item(row, 0) and other_tbl.item(row, 0).text() == tag:
+                other_tbl.removeRow(row)
+                break
+
+        for element, rec_catalog, tag in elements:
+            if element != element_type:
+                continue
+
+            if rec_catalog is None:
+                continue
+
+            # Disconnect old combo signal
+            tools_gw.disconnect_signal('import_inp', f'tbl_{element.lower()}_cmb_{element.lower()}_toggle_enabled_new_catalog_field')
+
+            # Add a new row
+            row: int = tbl.rowCount()
+            tbl.setRowCount(row + 1)
+
+            # Fill the first column
+            first_column = QTableWidgetItem(tag)
+            first_column.setFlags(Qt.ItemIsEnabled)
+            tbl.setItem(row, 0, first_column)
+
+            # Create the combo box and put it in the second or fourth column
+            combo_cat = QComboBox()
+            combo_idx = 6 if feature_type == "ARC" else 1
+            tbl.setCellWidget(row, combo_idx, combo_cat)
+
+            # Fill the "NEW CATALOG" column
+            new_cat_name = QTableWidgetItem("")
+            new_cat_name.setFlags(Qt.NoItemFlags)
+            tbl.setItem(row, combo_idx+1, new_cat_name)
+
+            # Connect signal to the new combo
+            tools_gw.connect_signal(combo_cat.currentTextChanged,
+                                    partial(self._toggle_enabled_new_catalog_field, new_cat_name),
+                                    'import_inp', f'tbl_{feature_type.lower()}_cmb_{element.lower()}_toggle_enabled_new_catalog_field')
+
+            self.tbl_elements[element] = (combo_cat, new_cat_name)
+
+        # Reload the combo boxes
+        self._fill_combo_boxes()
 
     def _get_config_values(self):
         workcat = tools_qt.get_text(self.dlg_config, "txt_workcat")

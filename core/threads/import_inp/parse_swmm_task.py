@@ -63,6 +63,7 @@ class Catalogs:
     db_features: dict[str, tuple[str, str]]
     db_materials: dict[str, float]
     db_nodes: dict[str, str]
+    db_flwreg: Optional[dict[str, str]]
     inp_junctions: Optional[list[str]]
     inp_outfalls: Optional[list[str]]
     inp_dividers: Optional[list[str]]
@@ -104,6 +105,18 @@ class Catalogs:
                 _id: (str(shape), tofloat(geom1), tofloat(geom2), tofloat(geom3), tofloat(geom4)) for _id, shape, geom1, geom2, geom3, geom4 in rows
             }
             db_arc_catalog = dict(sorted(unsorted_dict.items()))
+
+        # Get flwreg catalog from DB
+        rows = tools_db.get_rows("""
+                SELECT id, flwreg_type
+                FROM cat_flwreg
+            """)
+        db_flwreg_catalog: dict[str, str] = {}
+        if rows:
+            unsorted_dict = {
+                _id: flwreg_type for _id, flwreg_type in rows
+            }
+            db_flwreg_catalog = dict(sorted(unsorted_dict.items()))
 
         # Get roughness catalog
         rows = tools_db.get_rows("""
@@ -214,6 +227,7 @@ class Catalogs:
             db_feat_cat,
             db_mat_roughness_cat,
             db_node_catalog,
+            db_flwreg_catalog,
             junction_catalogs,
             outfall_catalogs,
             divider_catalogs,
