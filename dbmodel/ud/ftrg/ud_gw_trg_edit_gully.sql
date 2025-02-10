@@ -822,7 +822,7 @@ BEGIN
 
 
 		-- calculate rotation
-		IF v_doublegeometry AND (ST_equals(NEW.the_geom, OLD.the_geom) IS FALSE) OR (NEW.gullycat_id != OLD.gullycat_id) OR (NEW.units <> OLD.units) THEN
+		IF v_doublegeometry AND ((ST_equals(NEW.the_geom, OLD.the_geom) IS FALSE) OR (NEW.gullycat_id != OLD.gullycat_id) OR (NEW.units <> OLD.units)) THEN
 			WITH index_query AS(
 			SELECT ST_Distance(the_geom, NEW.the_geom) as distance, the_geom FROM arc WHERE state=1 ORDER BY the_geom <-> NEW.the_geom LIMIT 10)
 			SELECT St_linelocatepoint(the_geom, St_closestpoint(the_geom, NEW.the_geom)), the_geom INTO v_linelocatepoint, v_thegeom FROM index_query ORDER BY distance LIMIT 1;
@@ -838,7 +838,7 @@ BEGIN
 		END IF;
 
 		-- double geometry catalog update
-		IF v_doublegeometry AND (NEW.gullycat_id != OLD.gullycat_id) OR (NEW.units <> OLD.units) THEN
+		IF v_doublegeometry AND ((NEW.gullycat_id != OLD.gullycat_id) OR (NEW.units <> OLD.units)) THEN
 
 			v_length = (SELECT length FROM cat_gully WHERE id=NEW.gullycat_id);
 			v_width = (SELECT width FROM cat_gully WHERE id=NEW.gullycat_id);
