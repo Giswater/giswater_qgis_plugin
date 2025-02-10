@@ -1260,3 +1260,9 @@ VALUES (3384, 'gw_fct_import_swmm_nodarcs', 'ud', 'function', 'json', 'json', 'F
 
 -- 10/02/2025
 UPDATE config_form_list SET listname='v_ui_hydrometer' WHERE listname='tbl_hydrometer';
+
+UPDATE config_form_fields SET dv_querytext='SELECT id, id AS idval FROM inp_curve WHERE id IS NOT NULL AND curve_type = ''STORAGE'''
+WHERE formname='ve_epa_storage' AND formtype='form_feature' AND columnname='curve_id' AND tabname='tab_epa';
+
+UPDATE config_form_fields SET dv_querytext='SELECT id, id AS idval FROM inp_curve WHERE id IS NOT NULL AND curve_type IN (''PUMP'', ''PUMP1'', ''PUMP2'', ''PUMP3'', ''PUMP4'')'
+WHERE formname='ve_epa_pump' AND formtype='form_feature' AND columnname='curve_id' AND tabname='tab_epa';
