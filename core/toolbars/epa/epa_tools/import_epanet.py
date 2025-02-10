@@ -32,7 +32,7 @@ from ....ui.dialog import GwDialog
 from ....ui.ui_manager import GwInpConfigImportUi, GwInpParsingUi
 from ....threads.import_inp.import_epanet_task import GwImportInpTask
 from ....utils import tools_gw
-from ....utils.import_inp import GwInpConfig, create_load_menu, load_config, save_config, save_config_to_file
+from ....utils.import_inp import GwInpConfig, create_load_menu, load_config, save_config, save_config_to_file, fill_txt_info
 
 CREATE_NEW = "Create new"
 SPATIAL_INTERSECT = "Get from spatial intersect"
@@ -133,6 +133,8 @@ class GwImportEpanet:
         # Get catalogs from thread
         global Catalogs
         self.catalogs: Catalogs = self.parse_inp_task.catalogs
+
+        fill_txt_info(self, self.dlg_config)
 
         self._fill_tables()
 

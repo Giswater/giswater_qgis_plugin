@@ -189,6 +189,32 @@ def load_config(self_cls, config: Optional[GwInpConfig] = None) -> Optional[GwIn
 
     return config
 
+def fill_txt_info(self_cls, dialog):
+    """Fill the text information in the dialog"""
+
+    epa_software = "EPANET" if global_vars.project_type == ProjectType.WS else "SWMM"
+    info_str = f"<h3>IMPORT INP ({epa_software})</h3>"
+    info_str += "<p>"
+    info_str += f"This wizard will help with the process of importing a network from a {epa_software} INP file into the Giswater database.<br><br>"
+    info_str += "There are multple tabs in order to configure all the necessary catalogs.<br><br>"
+    info_str += "The first tab is the 'Basic' tab, where you can select the exploitation, sector, municipality, and other basic information.<br><br>"
+    info_str += "The second tab is the 'Features' tab, where you can select the corresponding feature classes for each type of feature on the network.<br>"
+    if epa_software == "EPANET":
+        info_str += "Here you can choose how the pumps and valves will be imported, either left as arcs (virual arcs) or converted to nodes.<br><br>"
+        info_str += "The third tab is the 'Materials' tab, where you can select the corresponding material for each roughness value.<br><br>"
+    elif epa_software == "SWMM":
+        info_str += "Here you can choose how the pumps, weirs, orifices, and outlets will be imported, either left as arcs (virual arcs) or converted to flwreg.<br><br>"
+        info_str += "The third tab is the 'Materials' tab, where you can select the corresponding roughness value for each material.<br><br>"
+    info_str += "The fourth tab is the 'Nodes' tab, where you can select the catalog for each type of node on the network.<br><br>"
+    info_str += "The fifth tab is the 'Arcs' tab, where you can select the catalog for each type of arc on the network.<br><br>"
+    if epa_software == "SWMM":
+        info_str += "If you chose to import the flow regulators as flwreg objects, the sixth tab is where you can select the catalog for each flow regulator (pumps, weirs, orifices, outlets) on the network.<br>If not, you can ignore the tab.<br><br>"
+    info_str += "Once you have configured all the necessary catalogs, you can click on the 'Accept' button to start the import process.<br>It will then show the log of the process in the last tab.<br><br>"
+    info_str += "You can save the current configuration to a file and load it later, or load the last saved configuration.<br><br>"
+    info_str += "If you have any questions, please contact the Giswater team via <a href='https://github.com/Giswater/giswater_qgis_plugin/issues'>GitHub Issues</a> or <a href='https://giswater.org/contact/'>our website</a>.<br>"
+    info_str += "</p>"
+    tools_qt.set_widget_text(dialog, 'txt_info', info_str)
+
 def _set_combo_values_from_epanet_catalogs(self_cls, catalogs):
     # Set features
     for feature_type, (combo,) in self_cls.tbl_elements["features"].items():

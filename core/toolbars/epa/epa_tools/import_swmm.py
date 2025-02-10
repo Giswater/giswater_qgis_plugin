@@ -33,7 +33,7 @@ from ....ui.dialog import GwDialog
 from ....ui.ui_manager import GwInpConfigImportUi, GwInpParsingUi
 from ....threads.import_inp.import_swmm_task import GwImportInpTask
 from ....utils import tools_gw
-from ....utils.import_inp import GwInpConfig, create_load_menu, load_config, save_config, save_config_to_file
+from ....utils.import_inp import GwInpConfig, create_load_menu, load_config, save_config, save_config_to_file, fill_txt_info
 from ...dialog import GwAction
 from ....threads.import_inp import parse_swmm_task
 
@@ -146,9 +146,9 @@ class GwImportSwmm:
         self.dlg_config.btn_accept.clicked.connect(self._importinp_accept)
 
         # Get catalogs from thread
-        # global Catalogs
         self.catalogs: parse_swmm_task.Catalogs = self.parse_inp_task.catalogs
 
+        fill_txt_info(self, self.dlg_config)
         self._fill_tables()
 
         self._fill_combo_boxes()
@@ -157,7 +157,7 @@ class GwImportSwmm:
 
         tools_gw.open_dialog(self.dlg_config, dlg_name="dlg_inp_config_import")
 
-        load_config(self)
+        # load_config(self)
 
     def _manage_widgets_visibility(self):
         # Hide 'Demand dscenario' widget for UD
