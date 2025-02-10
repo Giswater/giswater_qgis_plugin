@@ -21,8 +21,6 @@ v_data record;
 v_nodecat text;
 v_epatype text;
 v_type text;
-v_arc_ids text;
-v_arc_ids_aux text;
 v_pumptype text;
 v_mantablename text;
 v_valves_type text;
@@ -33,6 +31,7 @@ v_epsg integer;
 v_point_geom public.geometry;
 v_thegeom public.geometry;
 v_node_id text;
+v_toarc text;
 v_node1 text;
 v_node2 text;
 v_elevation float;
@@ -105,9 +104,8 @@ BEGIN
         v_thegeom = ST_LineInterpolatePoint(v_data.the_geom, 0.5);
 
         -- defining new node parameters
-        --        v_node_id = replace(v_data.arc_id, '_n2a_5', '');
-        --        v_node_id = replace(v_node_id, '_n2a', '');
         v_node_id = v_data.arc_id;
+        SELECT arc_id INTO v_toarc FROM arc WHERE node_1=v_data.node_2 LIMIT 1;
 
         -- Introducing new node transforming line into point
         INSERT INTO node (node_id, nodecat_id, epa_type, sector_id, dma_id, expl_id, muni_id, state, state_type, the_geom)
@@ -119,9 +117,13 @@ BEGIN
             INSERT INTO inp_pump (node_id, power, curve_id, speed, pattern_id, status, pump_type) -- TODO: there is no energyvalue in inp_virtualpump
             SELECT v_node_id, power, curve_id, speed, pattern_id, status, v_pumptype FROM inp_virtualpump WHERE arc_id=v_data.arc_id;
 
+            UPDATE man_pump SET to_arc = v_toarc WHERE node_id = v_node_id;
+
         ELSIF v_epatablename = 'inp_valve' THEN
             INSERT INTO inp_valve (node_id, valv_type, custom_dint, setting, curve_id, minorloss) -- TODO: there is no status in inp_valve, but there wasn't in 3.6 either...
             SELECT v_node_id, valv_type, diameter, setting, curve_id, minorloss FROM inp_virtualvalve WHERE arc_id=v_data.arc_id;
+
+            UPDATE man_valve SET to_arc = v_toarc WHERE node_id = v_node_id;
         ELSE
             INSERT INTO inp_shortpipe (node_id, status) SELECT v_node_id, status FROM inp_pipe WHERE arc_id=v_data.arc_id;
         END IF;
@@ -140,15 +142,10 @@ BEGIN
         UPDATE arc SET state=0,state_type=2 WHERE arc_id=v_data.arc_id;
         UPDATE node SET state=0,state_type=2 WHERE node_id IN (v_node1, v_node2);
 
-        SELECT string_agg('"' || arc_id || '"', ',') INTO v_arc_ids_aux
-        FROM arc WHERE state=1 AND (node_1=v_node_id OR node_2=v_node_id);
-        v_arc_ids = concat(v_arc_ids, v_arc_ids_aux, ',');
         -- update elevation of new node
         UPDATE node SET elevation = v_elevation, the_geom = the_geom WHERE node_id=v_node_id;
 
     END LOOP;
-
-    SELECT LEFT(v_arc_ids, LENGTH(v_arc_ids) - 1) INTO v_arc_ids;
 
     --     to_arc on shortpipes
     --    UPDATE inp_shortpipe SET to_arc = b.to_arc FROM
