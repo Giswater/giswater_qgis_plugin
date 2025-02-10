@@ -100,6 +100,9 @@ AS WITH streetaxis AS (
     arc.expl_id,
     exploitation.macroexpl_id,
     arc.sector_id,
+    sector.name as sector_name,
+    sector.macrosector_id,
+    et1.idval::varchar(16) as sector_type,
     arc.presszone_id,
     presszone.name AS presszone_name,
     et2.idval::character varying(16) AS presszone_type,
@@ -190,7 +193,6 @@ AS WITH streetaxis AS (
             ELSE NULL::character varying(16)
         END AS inp_type
    FROM arc
-
      LEFT JOIN exploitation ON arc.expl_id = exploitation.expl_id
      LEFT JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text
      JOIN cat_feature ON cat_feature.id::text = cat_arc.arc_type::text
@@ -202,6 +204,7 @@ AS WITH streetaxis AS (
      LEFT JOIN arc_add e ON arc.arc_id::text = e.arc_id::text
      LEFT JOIN value_state_type vst ON vst.id = arc.state_type
      LEFT JOIN ext_municipality mu ON arc.muni_id = mu.muni_id
+     LEFT JOIN typevalue et1 ON et1.id::text = sector.sector_type::text AND et1.typevalue::text = 'sector_type'::text
      LEFT JOIN typevalue et2 ON et2.id::text = presszone.presszone_type AND et2.typevalue::text = 'presszone_type'::text
      LEFT JOIN typevalue et3 ON et3.id::text = dma.dma_type::text AND et3.typevalue::text = 'dma_type'::text
      LEFT JOIN typevalue et4 ON et4.id::text = dqa.dqa_type::text AND et4.typevalue::text = 'dqa_type'::text;
