@@ -196,6 +196,7 @@ AS WITH streetaxis AS (
      LEFT JOIN exploitation ON arc.expl_id = exploitation.expl_id
      LEFT JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text
      JOIN cat_feature ON cat_feature.id::text = cat_arc.arc_type::text
+     LEFT JOIN sector ON arc.sector_id = sector.sector_id
      LEFT JOIN dma ON arc.dma_id = dma.dma_id
      LEFT JOIN dqa ON arc.dqa_id = dqa.dqa_id
      LEFT JOIN presszone ON presszone.presszone_id = arc.presszone_id
