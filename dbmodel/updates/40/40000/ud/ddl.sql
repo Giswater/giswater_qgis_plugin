@@ -777,3 +777,11 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"gully", "co
 
 -- 10/02/2025
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"initoverflowpath", "dataType":"boolean"}}$$);
+
+-- TODO: add logic to calculate this field
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"omunit_id", "dataType":"int4"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node", "column":"omunit_id", "dataType":"int4"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"omunit_id", "dataType":"int4"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"element", "column":"omunit_id", "dataType":"int4"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"gully", "column":"omunit_id", "dataType":"int4"}}$$);
+
