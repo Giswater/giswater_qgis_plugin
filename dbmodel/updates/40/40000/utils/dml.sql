@@ -1257,3 +1257,6 @@ VALUES (3382, 'gw_fct_import_epanet_nodarcs', 'ws', 'function', 'json', 'json', 
 
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source")
 VALUES (3384, 'gw_fct_import_swmm_nodarcs', 'ud', 'function', 'json', 'json', 'Function to manage nodarcs after importing INP file', 'role_epa', NULL, 'core');
+
+-- 10/02/2025
+UPDATE config_form_list SET listname='v_ui_hydrometer' WHERE listname='tbl_hydrometer';
