@@ -906,7 +906,8 @@ AS WITH
 	        END AS inp_type,
 			arc.brand_id,
 			arc.model_id,
-			arc.serial_number
+			arc.serial_number,
+            arc.initoverflowpath
 			FROM arc_selector
 			JOIN arc using (arc_id)
 			JOIN selector_expl se ON (se.cur_user =current_user AND se.expl_id = arc.expl_id) or (se.cur_user = current_user AND se.expl_id = arc.expl_id2)

@@ -775,3 +775,5 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "c
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"element", "column":"datasource", "dataType":"integer"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"gully", "column":"datasource", "dataType":"integer"}}$$);
 
+-- 10/02/2025
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"initoverflowpath", "dataType":"boolean"}}$$);
