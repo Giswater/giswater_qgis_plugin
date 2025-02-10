@@ -173,6 +173,8 @@ v_flwreg_type text;
 v_flwreg_length numeric(14,2);
 v_toarc_geom public.geometry;
 
+vdefault_querytext text;
+
 BEGIN
 
 	-- get basic parameters
@@ -995,8 +997,9 @@ BEGIN
 								field_value = (aux_json->>'widgetcontrols')::json->>'vdefault_value';
 							END IF;
 						ELSEIF ((aux_json->>'widgetcontrols')::jsonb ? 'vdefault_querytext') THEN
-							IF EXECUTE (aux_json->>'widgetcontrols')::json->>'vdefault_querytext'::text in  (select a from json_array_elements_text(json_extract_path(v_fields_array[array_index],'comboIds'))a) THEN
-								EXECUTE (aux_json->>'widgetcontrols')::json->>'vdefault_querytext' INTO field_value;
+							EXECUTE (aux_json->>'widgetcontrols')::json->>'vdefault_querytext'::text INTO vdefault_querytext;
+							IF vdefault_querytext in  (select a from json_array_elements_text(json_extract_path(v_fields_array[array_index],'comboIds'))a) THEN
+								field_value = vdefault_querytext;
 							END iF;
 						END IF;
 					END IF;
@@ -1067,7 +1070,7 @@ BEGIN
                 ELSE
                     v_fields_array[array_index] := gw_fct_json_object_set_key(v_fields_array[array_index], 'value', COALESCE(field_value, ''));
                 END IF;
-				
+
 			ELSIF (aux_json->>'widgettype') !='button' THEN
 				
 				-- Set default value if exist when inserting and feild_value is null
