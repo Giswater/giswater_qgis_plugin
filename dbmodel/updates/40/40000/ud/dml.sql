@@ -2626,3 +2626,14 @@ INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, targe
 INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, parameter_id, active) VALUES('edit_typevalue', 'value_datasource', 'connec', 'datasource', NULL, true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field) DO NOTHING;
 INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, parameter_id, active) VALUES('edit_typevalue', 'value_datasource', 'element', 'datasource', NULL, true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field) DO NOTHING;
 INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, parameter_id, active) VALUES('edit_typevalue', 'value_datasource', 'gully', 'datasource', NULL, true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field) DO NOTHING;
+
+-- 10/02/2025
+INSERT INTO arc_add (arc_id, result_id, max_flow, max_veloc, mfull_flow, mfull_depth) 
+SELECT arc_id, result_id, max_flow, max_veloc, mfull_flow, mfull_depth
+FROM rpt_arcflow_sum;
+
+INSERT INTO node_add (node_id, result_id, max_depth, max_height, flooding_rate, flooding_vol) 
+select d.node_id, result_id, max_depth, max_height, f.max_rate, f.tot_flood
+from rpt_nodedepth_sum d 
+join rpt_nodesurcharge_sum c using (result_id)
+join rpt_nodeflooding_sum f using (result_id)

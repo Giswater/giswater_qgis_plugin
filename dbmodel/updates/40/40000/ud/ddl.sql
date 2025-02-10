@@ -785,3 +785,22 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "c
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"element", "column":"omunit_id", "dataType":"int4"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"gully", "column":"omunit_id", "dataType":"int4"}}$$);
 
+CREATE TABLE arc_add (
+	arc_id varchar(16) NOT NULL,
+	result_id text NULL,
+	max_flow numeric(12, 2) NULL,
+	max_veloc numeric(12, 2) NULL,
+	mfull_flow numeric(12, 2) NULL,
+	mfull_depth numeric(12, 2) NULL,
+	CONSTRAINT arc_add_pkey PRIMARY KEY (arc_id)
+);
+
+CREATE TABLE node_add (
+	node_id varchar(16) NOT NULL,
+	result_id text NULL,
+	max_depth  numeric(12, 2) NULL,
+	max_height  numeric(12, 2) NULL,
+	flooding_rate  numeric(12, 2) NULL,
+	flooding_vol  numeric(12, 2) null,
+	CONSTRAINT node_add_pkey PRIMARY KEY (node_id)
+);

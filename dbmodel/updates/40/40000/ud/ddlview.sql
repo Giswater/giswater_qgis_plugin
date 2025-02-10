@@ -921,6 +921,7 @@ AS WITH
 			LEFT JOIN dma_table on dma_table.dma_id = arc.dma_id
 			LEFT JOIN drainzone_table ON arc.dma_id = drainzone_table.drainzone_id
 			LEFT JOIN dwfzone_table ON arc.dwfzone_id = dwfzone_table.dwfzone_id
+            LEFT JOIN arc_add a ON a.arc_id::text = arc.arc_id::text
 		)
 	SELECT arc_selected.*
 	FROM arc_selected;
@@ -1315,6 +1316,7 @@ AS WITH
 			LEFT JOIN dma_table ON dma_table.dma_id = node.dma_id
 			LEFT JOIN drainzone_table ON node.dma_id = drainzone_table.drainzone_id
 			LEFT JOIN dwfzone_table ON node.dwfzone_id = dwfzone_table.dwfzone_id
+            LEFT JOIN node_add e ON e.node_id::text = node.node_id::text
 		)
 	SELECT node_selected.*
 	FROM node_selected;
