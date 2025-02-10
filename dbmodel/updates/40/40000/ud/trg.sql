@@ -351,3 +351,19 @@ ON dwfzone FOR EACH ROW EXECUTE FUNCTION gw_trg_typevalue_fk('dwfzone');
 CREATE TRIGGER gw_trg_typevalue_fk_update AFTER UPDATE OF dwfzone_type
 ON dwfzone FOR EACH ROW WHEN (((old.dwfzone_type)::TEXT IS DISTINCT
 FROM (new.dwfzone_type)::TEXT)) EXECUTE FUNCTION gw_trg_typevalue_fk('dwfzone');
+
+-- 10/02/2025
+CREATE TRIGGER gw_trg_ui_doc_x_arc INSTEAD OF INSERT OR DELETE OR UPDATE ON v_ui_doc_x_arc
+FOR EACH ROW EXECUTE FUNCTION gw_trg_ui_doc('doc_x_arc');
+
+CREATE TRIGGER gw_trg_ui_doc_x_connec INSTEAD OF INSERT OR DELETE OR UPDATE ON v_ui_doc_x_connec
+FOR EACH ROW EXECUTE FUNCTION gw_trg_ui_doc('doc_x_connec');
+
+CREATE TRIGGER gw_trg_ui_doc_x_gully INSTEAD OF INSERT OR DELETE OR UPDATE ON v_ui_doc_x_gully
+FOR EACH ROW EXECUTE FUNCTION gw_trg_ui_doc('doc_x_gully');
+
+CREATE TRIGGER gw_trg_ui_doc_x_node INSTEAD OF INSERT OR DELETE OR UPDATE ON v_ui_doc_x_node
+FOR EACH ROW EXECUTE FUNCTION gw_trg_ui_doc('doc_x_node');
+
+CREATE TRIGGER gw_trg_ui_doc_x_visit INSTEAD OF INSERT OR DELETE OR UPDATE ON v_ui_doc_x_visit
+FOR EACH ROW EXECUTE FUNCTION gw_trg_ui_doc('doc_x_visit');

@@ -205,7 +205,7 @@ BEGIN
 				v_new_record.node_1 := (SELECT node_id FROM v_edit_node WHERE ST_DWithin(ST_StartPoint(v_arc_geom), v_edit_node.the_geom, 0.01) LIMIT 1);
 				v_new_record.node_2 := (SELECT node_id FROM v_edit_node WHERE ST_DWithin(ST_EndPoint(v_arc_geom), v_edit_node.the_geom, 0.01) LIMIT 1);
 				v_new_record.arc_id := (SELECT nextval('urn_id_seq'));
-			
+
 				INSERT INTO audit_check_data (fid,  criticity, error_message)
 				VALUES (214, 1, concat('New arc have been inserted: ', v_new_record.arc_id, '.'));
 
@@ -217,12 +217,12 @@ BEGIN
 					v_new_record.elev1 := (SELECT elev1 FROM arc WHERE arc_id = v_record1.arc_id);
 					v_new_record.custom_elev1 := (SELECT custom_elev1 FROM arc WHERE arc_id = v_record1.arc_id);
 					v_new_record.sys_elev1 := (SELECT sys_elev1 FROM arc WHERE arc_id = v_record1.arc_id);
-				
+
 					v_new_record.y2 := (SELECT y2 FROM arc WHERE arc_id = v_record2.arc_id);
 					v_new_record.custom_y2 := (SELECT custom_y2 FROM arc where arc_id = v_record2.arc_id);
 					v_new_record.elev2 := (SELECT elev2 FROM arc WHERE arc_id = v_record2.arc_id);
 					v_new_record.sys_elev2 := (SELECT sys_elev2 FROM arc where arc_id = v_record2.arc_id);
-				
+
 				END IF;
 
 				-- get man and epa tables
@@ -244,23 +244,23 @@ BEGIN
 
 				-- remove duplicated vertex on new arc because of the fusion
 				UPDATE arc SET the_geom=ST_RemoveRepeatedPoints(the_geom) WHERE arc_id=v_new_record.arc_id;
-			
+
 				UPDATE arc SET node_1=v_new_record.node_1, node_2=v_new_record.node_2 where arc_id=v_new_record.arc_id;
-				
+
 				IF v_project_type = 'UD' THEN
 
-					UPDATE arc SET sys_elev1=v_new_record.sys_elev1, y1 = v_new_record.y1, 	custom_y1 = v_new_record.custom_y1 , 
+					UPDATE arc SET sys_elev1=v_new_record.sys_elev1, y1 = v_new_record.y1, 	custom_y1 = v_new_record.custom_y1 ,
 					elev1 = v_new_record.elev1, custom_elev1 = v_new_record.custom_elev1
 					where arc_id=v_new_record.arc_id;
-				
-					UPDATE arc SET sys_elev2=v_new_record.sys_elev2, y2 = v_new_record.y2, 	custom_y2 = v_new_record.custom_y2 , 
+
+					UPDATE arc SET sys_elev2=v_new_record.sys_elev2, y2 = v_new_record.y2, 	custom_y2 = v_new_record.custom_y2 ,
 					elev2 = v_new_record.elev2, custom_elev2 = v_new_record.custom_elev2
 					where arc_id=v_new_record.arc_id;
-					
+
 				END IF;
 
 				UPDATE config_param_system SET value = gw_fct_json_object_set_key(value::json, 'activated', true) WHERE parameter = 'edit_arc_searchnodes';
-			
+
 				v_arc_childtable_name := 'man_arc_' || lower(v_arc_type);
 
 				IF (SELECT EXISTS ( SELECT 1 FROM information_schema.tables WHERE table_schema = v_schemaname AND table_name = v_arc_childtable_name)) IS TRUE THEN
@@ -390,7 +390,7 @@ BEGIN
 					IF v_state_node = 1 THEN
 
 						-- update elements
-						SELECT count(id) INTO v_count FROM element_x_arc WHERE arc_id=v_record1.arc_id OR arc_id=v_record2.arc_id;
+						SELECT count(*) INTO v_count FROM element_x_arc WHERE arc_id=v_record1.arc_id OR arc_id=v_record2.arc_id;
 						IF v_count > 0 THEN
 							UPDATE element_x_arc SET arc_id=v_new_record.arc_id WHERE arc_id=v_record1.arc_id OR arc_id=v_record2.arc_id
 							AND element_id not in (select element_id FROM element_x_arc WHERE arc_id=v_record1.arc_id OR arc_id=v_record2.arc_id);
@@ -400,16 +400,23 @@ BEGIN
 						END IF;
 
 						-- update documents
-						SELECT count(id) INTO v_count FROM doc_x_arc WHERE arc_id=v_record1.arc_id OR arc_id=v_record2.arc_id;
+						SELECT count(*) INTO v_count FROM doc_x_arc WHERE arc_id=v_record1.arc_id OR arc_id=v_record2.arc_id;
 						IF v_count > 0 THEN
-							UPDATE doc_x_arc SET arc_id=v_new_record.arc_id WHERE arc_id=v_record1.arc_id OR arc_id=v_record2.arc_id;
+							INSERT INTO doc_x_arc (doc_id, arc_id)
+							SELECT doc_id, v_new_record.arc_id
+							FROM doc_x_arc
+							WHERE arc_id IN (v_record1.arc_id, v_record2.arc_id)
+							ON CONFLICT DO NOTHING;
+
+							DELETE FROM doc_x_arc
+							WHERE arc_id IN (v_record1.arc_id, v_record2.arc_id);
 
 							INSERT INTO audit_check_data (fid,  criticity, error_message)
 							VALUES (214, 1, concat('Copy ',v_count,' documents from old arcs to new one.'));
 						END IF;
 
 						-- update visits
-						SELECT count(id) INTO v_count FROM om_visit_x_arc WHERE arc_id=v_record1.arc_id OR arc_id=v_record2.arc_id;
+						SELECT count(*) INTO v_count FROM om_visit_x_arc WHERE arc_id=v_record1.arc_id OR arc_id=v_record2.arc_id;
 						IF v_count > 0 THEN
 							UPDATE om_visit_x_arc SET arc_id=v_new_record.arc_id WHERE arc_id=v_record1.arc_id OR arc_id=v_record2.arc_id;
 

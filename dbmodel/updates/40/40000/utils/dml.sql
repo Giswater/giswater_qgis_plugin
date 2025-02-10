@@ -1266,3 +1266,15 @@ WHERE formname='ve_epa_storage' AND formtype='form_feature' AND columnname='curv
 
 UPDATE config_form_fields SET dv_querytext='SELECT id, id AS idval FROM inp_curve WHERE id IS NOT NULL AND curve_type IN (''PUMP'', ''PUMP1'', ''PUMP2'', ''PUMP3'', ''PUMP4'')'
 WHERE formname='ve_epa_pump' AND formtype='form_feature' AND columnname='curve_id' AND tabname='tab_epa';
+
+UPDATE config_form_list SET query_text='SELECT * FROM v_ui_doc_x_node WHERE node_id IS NOT NULL', vdefault=NULL WHERE listname='tbl_doc_x_node' AND device=4;
+UPDATE config_form_list SET query_text='SELECT * FROM v_ui_doc_x_arc WHERE arc_id IS NOT NULL', vdefault=NULL WHERE listname='tbl_doc_x_arc' AND device=4;
+UPDATE config_form_list SET query_text='SELECT * FROM v_ui_doc_x_connec WHERE connec_id IS NOT NULL', vdefault=NULL WHERE listname='tbl_doc_x_connec' AND device=4;
+UPDATE config_form_list SET query_text='SELECT * FROM v_ui_doc_x_gully WHERE gully_id IS NOT NULL', vdefault=NULL WHERE listname='tbl_doc_x_gully' AND device=4;
+
+UPDATE config_form_list SET query_text='SELECT * FROM v_ui_element_x_arc WHERE arc_id IS NOT NULL', vdefault=NULL WHERE listname='tbl_element_x_arc' AND device=4;
+UPDATE config_form_list SET query_text='SELECT * FROM v_ui_element_x_node WHERE node_id IS NOT NULL', vdefault=NULL WHERE listname='tbl_element_x_node' AND device=4;
+UPDATE config_form_list SET query_text='SELECT * FROM v_ui_element_x_connec WHERE connec_id IS NOT NULL', vdefault=NULL WHERE listname='tbl_element_x_connec' AND device=4;
+UPDATE config_form_list SET query_text='SELECT * FROM v_ui_element_x_gully WHERE gully_id IS NOT NULL', vdefault=NULL WHERE listname='tbl_element_x_gully' AND device=4;
+
+UPDATE config_form_list SET query_text='SELECT * FROM v_ui_element_x_arc WHERE arc_id IS NOT NULL', vdefault=NULL WHERE listname='v_ui_element_x_arc' AND device=3;

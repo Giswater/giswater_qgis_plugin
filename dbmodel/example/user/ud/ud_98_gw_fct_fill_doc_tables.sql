@@ -35,30 +35,30 @@ BEGIN
             --Insert arc
             FOR rec_arc IN SELECT * FROM arc
             LOOP
-            INSERT INTO doc_x_arc (doc_id, arc_id) VALUES(rec_doc.id, rec_arc.arc_id);
+            INSERT INTO doc_x_arc (doc_id, arc_id) VALUES(rec_doc.id, rec_arc.arc_id) ON CONFLICT (doc_id, arc_id) DO NOTHING;
             END LOOP;
 
             --Insert connec
             FOR rec_connec IN SELECT * FROM connec
             LOOP
-            INSERT INTO doc_x_connec (doc_id, connec_id) VALUES(rec_doc.id, rec_connec.connec_id);
+            INSERT INTO doc_x_connec (doc_id, connec_id) VALUES(rec_doc.id, rec_connec.connec_id) ON CONFLICT (doc_id, connec_id) DO NOTHING;
             END LOOP;
 
             --Insert node
             FOR rec_node IN SELECT * FROM node
             LOOP
-            INSERT INTO doc_x_node (doc_id, node_id) VALUES(rec_doc.id, rec_node.node_id);
+            INSERT INTO doc_x_node (doc_id, node_id) VALUES(rec_doc.id, rec_node.node_id) ON CONFLICT (doc_id, node_id) DO NOTHING;
             END LOOP;
 
             --Insert gully
             FOR rec_gully IN SELECT * FROM gully
             LOOP
-            INSERT INTO doc_x_gully (doc_id, gully_id) VALUES(rec_doc.id, rec_gully.gully_id);
-            END LOOP;           
+            INSERT INTO doc_x_gully (doc_id, gully_id) VALUES(rec_doc.id, rec_gully.gully_id) ON CONFLICT (doc_id, gully_id) DO NOTHING;
+            END LOOP;
         END LOOP;
 
 	RETURN;
-        
+
 END;$BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;

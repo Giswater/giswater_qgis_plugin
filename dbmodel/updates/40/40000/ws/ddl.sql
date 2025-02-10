@@ -996,3 +996,53 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "colu
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"datasource", "dataType":"integer"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"element", "column":"datasource", "dataType":"integer"}}$$);
 
+-- 10/02/2025
+
+-- element_x_arc
+ALTER TABLE element_x_arc DROP CONSTRAINT element_x_arc_pkey;
+ALTER TABLE element_x_arc DROP CONSTRAINT element_x_arc_unique;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP", "table":"element_x_arc", "column":"id"}}$$);
+ALTER TABLE element_x_arc ADD CONSTRAINT element_x_arc_pkey PRIMARY KEY (element_id, arc_id);
+
+-- element_x_connec
+ALTER TABLE element_x_connec DROP CONSTRAINT element_x_connec_pkey;
+ALTER TABLE element_x_connec DROP CONSTRAINT element_x_connec_unique;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP", "table":"element_x_connec", "column":"id"}}$$);
+ALTER TABLE element_x_connec ADD CONSTRAINT element_x_connec_pkey PRIMARY KEY (element_id, connec_id);
+
+-- element_x_node
+ALTER TABLE element_x_node DROP CONSTRAINT element_x_node_pkey;
+ALTER TABLE element_x_node DROP CONSTRAINT element_x_node_unique;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP", "table":"element_x_node", "column":"id"}}$$);
+ALTER TABLE element_x_node ADD CONSTRAINT element_x_node_pkey PRIMARY KEY (element_id, node_id);
+
+-- doc_x_arc
+ALTER TABLE doc_x_arc DROP CONSTRAINT doc_x_arc_pkey;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP", "table":"doc_x_arc", "column":"id"}}$$);
+ALTER TABLE doc_x_arc ADD CONSTRAINT doc_x_arc_pkey PRIMARY KEY (doc_id, arc_id);
+
+-- doc_x_connec
+ALTER TABLE doc_x_connec DROP CONSTRAINT doc_x_connec_pkey;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP", "table":"doc_x_connec", "column":"id"}}$$);
+ALTER TABLE doc_x_connec ADD CONSTRAINT doc_x_connec_pkey PRIMARY KEY (doc_id, connec_id);
+
+-- doc_x_node
+ALTER TABLE doc_x_node DROP CONSTRAINT doc_x_node_pkey;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP", "table":"doc_x_node", "column":"id"}}$$);
+ALTER TABLE doc_x_node ADD CONSTRAINT doc_x_node_pkey PRIMARY KEY (doc_id, node_id);
+
+-- doc_x_psector
+ALTER TABLE doc_x_psector DROP CONSTRAINT doc_x_psector_pkey;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP", "table":"doc_x_psector", "column":"id"}}$$);
+ALTER TABLE doc_x_psector ADD CONSTRAINT doc_x_psector_pkey PRIMARY KEY (doc_id, psector_id);
+
+-- doc_x_visit
+ALTER TABLE doc_x_visit DROP CONSTRAINT doc_x_visit_pkey;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP", "table":"doc_x_visit", "column":"id"}}$$);
+ALTER TABLE doc_x_visit ADD CONSTRAINT doc_x_visit_pkey PRIMARY KEY (doc_id, visit_id);
+
+-- doc_x_workcat
+ALTER TABLE doc_x_workcat DROP CONSTRAINT doc_x_workcat_pkey;
+ALTER TABLE doc_x_workcat DROP CONSTRAINT unique_doc_id_workcat_id;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP", "table":"doc_x_workcat", "column":"id"}}$$);
+ALTER TABLE doc_x_workcat ADD CONSTRAINT doc_x_workcat_pkey PRIMARY KEY (doc_id, workcat_id);

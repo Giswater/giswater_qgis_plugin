@@ -2325,8 +2325,119 @@ AS SELECT e.pol_id,
     FROM v_edit_element e
     JOIN polygon USING (pol_id);
 
+CREATE OR REPLACE VIEW vu_element_x_arc
+AS SELECT
+    element_x_arc.arc_id,
+    element_x_arc.element_id,
+    element.elementcat_id,
+    cat_element.descript,
+    element.num_elements,
+    value_state.name AS state,
+    value_state_type.name AS state_type,
+    element.observ,
+    element.comment,
+    element.location_type,
+    element.builtdate,
+    element.enddate,
+    element.link,
+    element.publish,
+    element.inventory,
+    element.serial_number,
+    element.brand_id,
+    element.model_id,
+    element.lastupdate
+   FROM element_x_arc
+     JOIN element ON element.element_id::text = element_x_arc.element_id::text
+     JOIN value_state ON element.state = value_state.id
+     LEFT JOIN value_state_type ON element.state_type = value_state_type.id
+     LEFT JOIN man_type_location ON man_type_location.location_type::text = element.location_type::text AND man_type_location.feature_type::text = 'ELEMENT'::text
+     LEFT JOIN cat_element ON cat_element.id::text = element.elementcat_id::text;
+
+
+CREATE OR REPLACE VIEW vu_element_x_connec
+AS SELECT
+    element_x_connec.connec_id,
+    element_x_connec.element_id,
+    element.elementcat_id,
+    cat_element.descript,
+    element.num_elements,
+    value_state.name AS state,
+    value_state_type.name AS state_type,
+    element.observ,
+    element.comment,
+    element.location_type,
+    element.builtdate,
+    element.enddate,
+    element.link,
+    element.publish,
+    element.inventory,
+    element.serial_number,
+    element.brand_id,
+    element.model_id,
+    element.lastupdate
+   FROM element_x_connec
+     JOIN element ON element.element_id::text = element_x_connec.element_id::text
+     JOIN value_state ON element.state = value_state.id
+     LEFT JOIN value_state_type ON element.state_type = value_state_type.id
+     LEFT JOIN man_type_location ON man_type_location.location_type::text = element.location_type::text AND man_type_location.feature_type::text = 'ELEMENT'::text
+     LEFT JOIN cat_element ON cat_element.id::text = element.elementcat_id::text;
+
+
+CREATE OR REPLACE VIEW vu_element_x_gully
+AS SELECT
+    element_x_gully.gully_id,
+    element_x_gully.element_id,
+    element.elementcat_id,
+    cat_element.descript,
+    element.num_elements,
+    value_state.name AS state,
+    value_state_type.name AS state_type,
+    element.observ,
+    element.comment,
+    element.location_type,
+    element.builtdate,
+    element.enddate,
+    element.serial_number,
+    element.brand_id,
+    element.model_id,
+    element.lastupdate
+   FROM element_x_gully
+     JOIN element ON element.element_id::text = element_x_gully.element_id::text
+     JOIN value_state ON element.state = value_state.id
+     LEFT JOIN value_state_type ON element.state_type = value_state_type.id
+     LEFT JOIN man_type_location ON man_type_location.location_type::text = element.location_type::text AND man_type_location.feature_type::text = 'ELEMENT'::text
+     LEFT JOIN cat_element ON cat_element.id::text = element.elementcat_id::text;
+
+CREATE OR REPLACE VIEW vu_element_x_node
+AS SELECT
+    element_x_node.node_id,
+    element_x_node.element_id,
+    element.elementcat_id,
+    cat_element.descript,
+    element.num_elements,
+    value_state.name AS state,
+    value_state_type.name AS state_type,
+    element.observ,
+    element.comment,
+    element.location_type,
+    element.builtdate,
+    element.enddate,
+    element.link,
+    element.publish,
+    element.inventory,
+    element.serial_number,
+    element.brand_id,
+    element.model_id,
+    element.lastupdate
+   FROM element_x_node
+     JOIN element ON element.element_id::text = element_x_node.element_id::text
+     JOIN value_state ON element.state = value_state.id
+     LEFT JOIN value_state_type ON element.state_type = value_state_type.id
+     LEFT JOIN man_type_location ON man_type_location.location_type::text = element.location_type::text AND man_type_location.feature_type::text = 'ELEMENT'::text
+     LEFT JOIN cat_element ON cat_element.id::text = element.elementcat_id::text;
+
 CREATE OR REPLACE VIEW v_ui_element_x_node
-AS SELECT element_x_node.id,
+AS SELECT
     element_x_node.node_id,
     element_x_node.element_id,
     v_edit_element.elementcat_id,
@@ -2350,7 +2461,7 @@ AS SELECT element_x_node.id,
      LEFT JOIN cat_element ON cat_element.id::text = v_edit_element.elementcat_id::text;
 
 CREATE OR REPLACE VIEW v_ui_element_x_connec
-AS SELECT element_x_connec.id,
+AS SELECT
     element_x_connec.connec_id,
     element_x_connec.element_id,
     v_edit_element.elementcat_id,
@@ -2374,7 +2485,7 @@ AS SELECT element_x_connec.id,
      LEFT JOIN cat_element ON cat_element.id::text = v_edit_element.elementcat_id::text;
 
 CREATE OR REPLACE VIEW v_ui_element_x_arc
-AS SELECT element_x_arc.id,
+AS SELECT
     element_x_arc.arc_id,
     element_x_arc.element_id,
     v_edit_element.elementcat_id,
@@ -2398,7 +2509,7 @@ AS SELECT element_x_arc.id,
      LEFT JOIN cat_element ON cat_element.id::text = v_edit_element.elementcat_id::text;
 
 CREATE OR REPLACE VIEW v_ui_element_x_gully
-AS SELECT element_x_gully.id,
+AS SELECT
     element_x_gully.gully_id,
     element_x_gully.element_id,
     v_edit_element.elementcat_id,
@@ -5379,19 +5490,6 @@ AS SELECT DISTINCT ON (c.id) c.id,
     selector_expl s
   WHERE s.expl_id = c.expl_id AND s.cur_user = CURRENT_USER OR c.expl_id IS NULL;
 
-CREATE OR REPLACE VIEW v_ui_doc_x_gully
-AS SELECT doc_x_gully.id,
-    doc_x_gully.gully_id,
-    doc.name AS doc_name,
-    doc.doc_type,
-    doc.path,
-    doc.observ,
-    doc.date,
-    doc.user_name
-   FROM doc_x_gully
-     JOIN doc ON doc.id::text = doc_x_gully.doc_id::text;
-
-
 CREATE OR REPLACE VIEW ve_epa_storage
 AS SELECT inp_storage.node_id,
     inp_storage.storage_type,
@@ -6739,116 +6837,6 @@ CREATE OR REPLACE VIEW v_edit_macrosector AS
    FROM selector_sector, sector
      JOIN macrosector m ON m.macrosector_id = sector.macrosector_id
   WHERE sector.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
-  -- 16/12/24
-
-CREATE OR REPLACE VIEW vu_element_x_node
-AS SELECT element_x_node.id,
-    element_x_node.node_id,
-    element_x_node.element_id,
-    element.elementcat_id,
-    cat_element.descript,
-    element.num_elements,
-    value_state.name AS state,
-    value_state_type.name AS state_type,
-    element.observ,
-    element.comment,
-    element.location_type,
-    element.builtdate,
-    element.enddate,
-    element.link,
-    element.publish,
-    element.inventory,
-    element.serial_number,
-    element.brand_id,
-    element.model_id,
-    element.lastupdate
-   FROM element_x_node
-     JOIN element ON element.element_id::text = element_x_node.element_id::text
-     JOIN value_state ON element.state = value_state.id
-     LEFT JOIN value_state_type ON element.state_type = value_state_type.id
-     LEFT JOIN man_type_location ON man_type_location.location_type::text = element.location_type::text AND man_type_location.feature_type::text = 'ELEMENT'::text
-     LEFT JOIN cat_element ON cat_element.id::text = element.elementcat_id::text;
-
-CREATE OR REPLACE VIEW vu_element_x_connec
-AS SELECT element_x_connec.id,
-    element_x_connec.connec_id,
-    element_x_connec.element_id,
-    element.elementcat_id,
-    cat_element.descript,
-    element.num_elements,
-    value_state.name AS state,
-    value_state_type.name AS state_type,
-    element.observ,
-    element.comment,
-    element.location_type,
-    element.builtdate,
-    element.enddate,
-    element.link,
-    element.publish,
-    element.inventory,
-    element.serial_number,
-    element.brand_id,
-    element.model_id,
-    element.lastupdate
-   FROM element_x_connec
-     JOIN element ON element.element_id::text = element_x_connec.element_id::text
-     JOIN value_state ON element.state = value_state.id
-     LEFT JOIN value_state_type ON element.state_type = value_state_type.id
-     LEFT JOIN man_type_location ON man_type_location.location_type::text = element.location_type::text AND man_type_location.feature_type::text = 'ELEMENT'::text
-     LEFT JOIN cat_element ON cat_element.id::text = element.elementcat_id::text;
-
-CREATE OR REPLACE VIEW vu_element_x_arc
-AS SELECT element_x_arc.id,
-    element_x_arc.arc_id,
-    element_x_arc.element_id,
-    element.elementcat_id,
-    cat_element.descript,
-    element.num_elements,
-    value_state.name AS state,
-    value_state_type.name AS state_type,
-    element.observ,
-    element.comment,
-    element.location_type,
-    element.builtdate,
-    element.enddate,
-    element.link,
-    element.publish,
-    element.inventory,
-    element.serial_number,
-    element.brand_id,
-    element.model_id,
-    element.lastupdate
-   FROM element_x_arc
-     JOIN element ON element.element_id::text = element_x_arc.element_id::text
-     JOIN value_state ON element.state = value_state.id
-     LEFT JOIN value_state_type ON element.state_type = value_state_type.id
-     LEFT JOIN man_type_location ON man_type_location.location_type::text = element.location_type::text AND man_type_location.feature_type::text = 'ELEMENT'::text
-     LEFT JOIN cat_element ON cat_element.id::text = element.elementcat_id::text;
-
-CREATE OR REPLACE VIEW vu_element_x_gully
-AS SELECT element_x_gully.id,
-    element_x_gully.gully_id,
-    element_x_gully.element_id,
-    element.elementcat_id,
-    cat_element.descript,
-    element.num_elements,
-    value_state.name AS state,
-    value_state_type.name AS state_type,
-    element.observ,
-    element.comment,
-    element.location_type,
-    element.builtdate,
-    element.enddate,
-    element.serial_number,
-    element.brand_id,
-    element.model_id,
-    element.lastupdate
-   FROM element_x_gully
-     JOIN element ON element.element_id::text = element_x_gully.element_id::text
-     JOIN value_state ON element.state = value_state.id
-     LEFT JOIN value_state_type ON element.state_type = value_state_type.id
-     LEFT JOIN man_type_location ON man_type_location.location_type::text = element.location_type::text AND man_type_location.feature_type::text = 'ELEMENT'::text
-     LEFT JOIN cat_element ON cat_element.id::text = element.elementcat_id::text;
 
 CREATE OR REPLACE VIEW v_edit_inp_timeseries
 AS SELECT DISTINCT p.id,
@@ -7079,3 +7067,95 @@ AS SELECT review_node.node_id,
     selector_expl
   WHERE selector_expl.cur_user = "current_user"()::text AND review_node.expl_id = selector_expl.expl_id;
 
+-- 10/02/2025
+CREATE OR REPLACE VIEW v_ui_doc_x_arc
+AS SELECT
+    doc_x_arc.arc_id,
+    doc.name AS doc_name,
+    doc.doc_type,
+    doc.path,
+    doc.observ,
+    doc.date,
+    doc.user_name
+   FROM doc_x_arc
+     JOIN doc ON doc.id::text = doc_x_arc.doc_id::text;
+
+CREATE OR REPLACE VIEW v_ui_doc_x_connec
+AS SELECT
+    doc_x_connec.connec_id,
+    doc.name AS doc_name,
+    doc.doc_type,
+    doc.path,
+    doc.observ,
+    doc.date,
+    doc.user_name
+   FROM doc_x_connec
+     JOIN doc ON doc.id::text = doc_x_connec.doc_id::text;
+
+CREATE OR REPLACE VIEW v_ui_doc_x_gully
+AS SELECT
+    doc_x_gully.gully_id,
+    doc.name AS doc_name,
+    doc.doc_type,
+    doc.path,
+    doc.observ,
+    doc.date,
+    doc.user_name
+   FROM doc_x_gully
+     JOIN doc ON doc.id::text = doc_x_gully.doc_id::text;
+
+
+CREATE OR REPLACE VIEW v_ui_doc_x_node
+AS SELECT
+    doc_x_node.node_id,
+    doc.name AS doc_name,
+    doc.doc_type,
+    doc.path,
+    doc.observ,
+    doc.date,
+    doc.user_name
+   FROM doc_x_node
+     JOIN doc ON doc.id::text = doc_x_node.doc_id::text;
+
+CREATE OR REPLACE VIEW v_ui_doc_x_psector
+AS SELECT
+    plan_psector.name AS psector_name,
+    doc.name AS doc_name,
+    doc.doc_type,
+    doc.path,
+    doc.observ,
+    doc.date,
+    doc.user_name
+   FROM doc_x_psector
+     JOIN doc ON doc.id::text = doc_x_psector.doc_id::text
+     JOIN plan_psector ON plan_psector.psector_id::text = doc_x_psector.psector_id::text;
+
+CREATE OR REPLACE VIEW v_ui_doc_x_visit
+AS SELECT
+    doc_x_visit.visit_id,
+    doc.name AS doc_name,
+    doc.doc_type,
+    doc.path,
+    doc.observ,
+    doc.date,
+    doc.user_name
+   FROM doc_x_visit
+     JOIN doc ON doc.id::text = doc_x_visit.doc_id::text;
+
+CREATE OR REPLACE VIEW v_ui_doc_x_workcat
+AS SELECT
+    doc_x_workcat.workcat_id,
+    doc.name,
+    doc.doc_type,
+    doc.path,
+    doc.observ,
+    doc.date,
+    doc.user_name
+   FROM doc_x_workcat
+     JOIN doc ON doc.id::text = doc_x_workcat.doc_id::text;
+
+CREATE OR REPLACE VIEW v_ui_om_visit_x_doc
+AS SELECT
+    doc_x_visit.doc_id,
+    doc_x_visit.visit_id
+   FROM doc_x_visit;

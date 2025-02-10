@@ -441,7 +441,7 @@ BEGIN
 						VALUES ('DIVIDE ARC',  v_arc_id, v_code, rec_aux1.arc_id, rec_aux2.arc_id, v_node_id,CURRENT_TIMESTAMP,CURRENT_USER);
 
 						-- Update elements from old arc to new arcs
-						SELECT count(id) into v_count FROM element_x_arc WHERE arc_id=v_arc_id;
+						SELECT count(*) into v_count FROM element_x_arc WHERE arc_id=v_arc_id;
 
 						IF v_count > 0 THEN
 							FOR rec_aux IN SELECT * FROM element_x_arc WHERE arc_id=v_arc_id  LOOP
@@ -455,7 +455,7 @@ BEGIN
 						END IF;
 
 						-- Update documents from old arc to the new arcs
-						SELECT count(id) into v_count FROM doc_x_arc WHERE arc_id=v_arc_id;
+						SELECT count(*) into v_count FROM doc_x_arc WHERE arc_id=v_arc_id;
 						IF v_count > 0 THEN
 							FOR rec_aux IN SELECT * FROM doc_x_arc WHERE arc_id=v_arc_id  LOOP
 								INSERT INTO doc_x_arc (id, doc_id, arc_id) VALUES (nextval('doc_x_arc_id_seq'),rec_aux.doc_id, rec_aux1.arc_id);
@@ -468,7 +468,7 @@ BEGIN
 						END IF;
 
 						-- Update visits from old arc to the new arcs (only for state=1, state=1)
-						SELECT count(id) INTO v_count FROM om_visit_x_arc WHERE arc_id=v_arc_id;
+						SELECT count(*) INTO v_count FROM om_visit_x_arc WHERE arc_id=v_arc_id;
 
 						IF v_count > 0 THEN
 							FOR rec_visit IN SELECT om_visit.* FROM om_visit_x_arc JOIN om_visit ON om_visit.id=visit_id WHERE arc_id=v_arc_id

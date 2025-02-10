@@ -87,11 +87,25 @@ DROP VIEW IF EXISTS v_ui_arc_x_relations;
 DROP VIEW IF EXISTS v_ui_arc_x_node;
 DROP VIEW IF EXISTS v_ui_node_x_relations;
 
+DROP VIEW IF EXISTS vu_element_x_node;
+DROP VIEW IF EXISTS vu_element_x_connec;
+DROP VIEW IF EXISTS vu_element_x_arc;
+DROP VIEW IF EXISTS vu_element_x_gully;
+
 DROP VIEW IF EXISTS v_ui_element;
 DROP VIEW IF EXISTS v_ui_element_x_arc;
 DROP VIEW IF EXISTS v_ui_element_x_connec;
 DROP VIEW IF EXISTS v_ui_element_x_node;
 DROP VIEW IF EXISTS ve_pol_element;
+
+DROP VIEW IF EXISTS v_ui_doc_x_arc;
+DROP VIEW IF EXISTS v_ui_doc_x_connec;
+DROP VIEW IF EXISTS v_ui_doc_x_gully;
+DROP VIEW IF EXISTS v_ui_doc_x_node;
+DROP VIEW IF EXISTS v_ui_doc_x_psector;
+DROP VIEW IF EXISTS v_ui_doc_x_visit;
+DROP VIEW IF EXISTS v_ui_doc_x_workcat;
+DROP VIEW IF EXISTS v_ui_om_visit_x_doc;
 
 DROP VIEW IF EXISTS v_ext_raster_dem;
 
@@ -363,85 +377,6 @@ AS SELECT doc.id,
     doc.user_name,
     doc.tstamp
    FROM doc;
-
-CREATE OR REPLACE VIEW v_ui_doc_x_arc
-AS SELECT doc_x_arc.id,
-    doc_x_arc.arc_id,
-    doc.name AS doc_name,
-    doc.doc_type,
-    doc.path,
-    doc.observ,
-    doc.date,
-    doc.user_name
-   FROM doc_x_arc
-     JOIN doc ON doc.id::text = doc_x_arc.doc_id::text;
-
-CREATE OR REPLACE VIEW v_ui_doc_x_connec
-AS SELECT doc_x_connec.id,
-    doc_x_connec.connec_id,
-    doc.name AS doc_name,
-    doc.doc_type,
-    doc.path,
-    doc.observ,
-    doc.date,
-    doc.user_name
-   FROM doc_x_connec
-     JOIN doc ON doc.id::text = doc_x_connec.doc_id::text;
-
-CREATE OR REPLACE VIEW v_ui_doc_x_node
-AS SELECT doc_x_node.id,
-    doc_x_node.node_id,
-    doc.name AS doc_name,
-    doc.doc_type,
-    doc.path,
-    doc.observ,
-    doc.date,
-    doc.user_name
-   FROM doc_x_node
-     JOIN doc ON doc.id::text = doc_x_node.doc_id::text;
-
-CREATE OR REPLACE VIEW v_ui_doc_x_psector
-AS SELECT doc_x_psector.id,
-    plan_psector.name AS psector_name,
-    doc.name AS doc_name,
-    doc.doc_type,
-    doc.path,
-    doc.observ,
-    doc.date,
-    doc.user_name
-   FROM doc_x_psector
-     JOIN doc ON doc.id::text = doc_x_psector.doc_id::text
-     JOIN plan_psector ON plan_psector.psector_id::text = doc_x_psector.psector_id::text;
-
-CREATE OR REPLACE VIEW v_ui_doc_x_visit
-AS SELECT doc_x_visit.id,
-    doc_x_visit.visit_id,
-    doc.name AS doc_name,
-    doc.doc_type,
-    doc.path,
-    doc.observ,
-    doc.date,
-    doc.user_name
-   FROM doc_x_visit
-     JOIN doc ON doc.id::text = doc_x_visit.doc_id::text;
-
-CREATE OR REPLACE VIEW v_ui_doc_x_workcat
-AS SELECT doc_x_workcat.id,
-    doc_x_workcat.workcat_id,
-    doc.name,
-    doc.doc_type,
-    doc.path,
-    doc.observ,
-    doc.date,
-    doc.user_name
-   FROM doc_x_workcat
-     JOIN doc ON doc.id::text = doc_x_workcat.doc_id::text;
-
-CREATE OR REPLACE VIEW v_ui_om_visit_x_doc
-AS SELECT doc_x_visit.id,
-    doc_x_visit.doc_id,
-    doc_x_visit.visit_id
-   FROM doc_x_visit;
 
 -- 05/12/2024
 CREATE OR REPLACE VIEW v_ext_address
