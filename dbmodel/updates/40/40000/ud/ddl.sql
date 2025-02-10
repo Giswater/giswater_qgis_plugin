@@ -804,3 +804,6 @@ CREATE TABLE node_add (
 	flooding_vol  numeric(12, 2) null,
 	CONSTRAINT node_add_pkey PRIMARY KEY (node_id)
 );
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"rpt_arcflow_sum", "column":"mfull_dept", "newName":"mfull_depth"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"archived_rpt_inp_arc", "column":"mfull_dept", "newName":"mfull_depth"}}$$);

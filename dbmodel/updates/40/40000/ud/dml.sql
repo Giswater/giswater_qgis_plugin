@@ -988,7 +988,7 @@ INSERT INTO config_param_system ("parameter", value, descript, "label", dv_query
 
 --12/12/2024
 UPDATE sys_style SET stylevalue = replace(stylevalue,'tot_flood','tot_flood_compare') WHERE layername IN ('v_rpt_comp_nodeflooding_sum');
-UPDATE sys_style SET stylevalue = replace(stylevalue,'mfull_dept','mfull_dept_compare') WHERE layername IN ('v_rpt_comp_arcflow_sum');
+UPDATE sys_style SET stylevalue = replace(stylevalue,'mfull_depth','mfull_depth_compare') WHERE layername IN ('v_rpt_comp_arcflow_sum');
 
 DELETE FROM sys_table WHERE id='cat_mat_grate';
 DELETE FROM sys_table WHERE id='cat_mat_gully';
@@ -2628,12 +2628,14 @@ INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, targe
 INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, parameter_id, active) VALUES('edit_typevalue', 'value_datasource', 'gully', 'datasource', NULL, true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field) DO NOTHING;
 
 -- 10/02/2025
-INSERT INTO arc_add (arc_id, result_id, max_flow, max_veloc, mfull_flow, mfull_depth) 
+INSERT INTO arc_add (arc_id, result_id, max_flow, max_veloc, mfull_flow, mfull_depth)
 SELECT arc_id, result_id, max_flow, max_veloc, mfull_flow, mfull_depth
 FROM rpt_arcflow_sum;
 
-INSERT INTO node_add (node_id, result_id, max_depth, max_height, flooding_rate, flooding_vol) 
+INSERT INTO node_add (node_id, result_id, max_depth, max_height, flooding_rate, flooding_vol)
 select d.node_id, result_id, max_depth, max_height, f.max_rate, f.tot_flood
-from rpt_nodedepth_sum d 
+from rpt_nodedepth_sum d
 join rpt_nodesurcharge_sum c using (result_id)
 join rpt_nodeflooding_sum f using (result_id)
+
+UPDATE config_form_fields SET columnname = 'mfull_depth', label = 'mfull_depth', tooltip = 'mfull_depth' WHERE columnname = 'mfull_dept';

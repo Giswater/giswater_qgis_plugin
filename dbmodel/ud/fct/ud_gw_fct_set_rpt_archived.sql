@@ -58,7 +58,7 @@ BEGIN
 			-- rpt_inp_arc
 			result_id, arc_id, node_1, node_2, elevmax1, elevmax2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation, length, n, the_geom, expl_id, addparam, arcparent, q0, qmax, barrels, slope, culvert, kentry, kexit, kavg, flap, seepage, age,
 			-- rpt_arcflow_sum
-			max_flow, time_days, time_hour, max_veloc, mfull_flow, mfull_dept, max_shear, max_hr, max_slope, day_max, time_max, min_shear, day_min, time_min,
+			max_flow, time_days, time_hour, max_veloc, mfull_flow, mfull_depth, max_shear, max_hr, max_slope, day_max, time_max, min_shear, day_min, time_min,
 			-- rpt_arcpolload_sum
 			poll_id,
 			-- rpt_condsurcharge_sum
@@ -71,8 +71,9 @@ BEGIN
 			-- rpt_inp_arc
 			r.result_id, r.arc_id, r.node_1, r.node_2, r.elevmax1, r.elevmax2, r.arc_type, r.arccat_id, r.epa_type, r.sector_id, r.state, r.state_type, r.annotation, r.length, r.n, r.the_geom, r.expl_id, r.addparam, r.arcparent, r.q0, r.qmax, r.barrels, r.slope, r.culvert, r.kentry, r.kexit, r.kavg, r.flap, r.seepage, r.age,
 			-- rpt_arcflow_sum
-			af.max_flow, af.time_days, af.time_hour, af.max_veloc, af.mfull_flow, af.mfull_dept, af.max_shear, af.max_hr, af.max_slope, af.day_max, af.time_max, af.min_shear, af.day_min, af.time_min,
+			af.max_flow, af.time_days, af.time_hour, af.max_veloc, af.mfull_flow, af.mfull_depth, af.max_shear, af.max_hr, af.max_slope, af.day_max, af.time_max, af.min_shear, af.day_min, af.time_min,
 			-- rpt_arcpolload_sum
+
 			ap.poll_id,
 			-- rpt_condsurcharge_sum
 			cc.both_ends, cc.upstream, cc.dnstream, cc.hour_nflow, cc.hour_limit,
@@ -242,10 +243,10 @@ BEGIN
 
 		-- Recover data for rpt_arcflow_sum
 		EXECUTE 'INSERT INTO rpt_arcflow_sum (
-			result_id, arc_id, max_flow, time_days, time_hour, max_veloc, mfull_flow, mfull_dept, max_shear, max_hr, max_slope, day_max, time_max, min_shear, day_min, time_min
+			result_id, arc_id, max_flow, time_days, time_hour, max_veloc, mfull_flow, mfull_depth, max_shear, max_hr, max_slope, day_max, time_max, min_shear, day_min, time_min
 		)
 		SELECT DISTINCT
-			'||quote_literal(v_result_id)||', arc_id, max_flow, time_days, time_hour, max_veloc, mfull_flow, mfull_dept, max_shear, max_hr, max_slope, day_max, time_max, min_shear, day_min, time_min
+			'||quote_literal(v_result_id)||', arc_id, max_flow, time_days, time_hour, max_veloc, mfull_flow, mfull_depth, max_shear, max_hr, max_slope, day_max, time_max, min_shear, day_min, time_min
 		FROM archived_rpt_inp_arc
 		WHERE result_id = '||quote_literal(v_result_id)||'
 		AND max_flow IS NOT NULL;';

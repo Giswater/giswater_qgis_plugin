@@ -33,12 +33,12 @@ v_status text = 'Accepted';
 
 BEGIN
 
-	--  Search path	
+	--  Search path
 	SET search_path = "SCHEMA_NAME", public;
-	
+
 	-- select config values
 	SELECT project_type, giswater  INTO v_project_type, v_version FROM sys_version ORDER BY id DESC LIMIT 1;
-	
+
 	-- Header
 	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 4, concat('IMPORT RPT FILE LOG'));
 	INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 4, '----------------------------');
@@ -52,15 +52,15 @@ BEGIN
 
 			-- errors
 			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 4, '------------------------------------------------------------------');
-			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) 
+			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (114, p_result, 3, UPPER('CRITICAL ERROR: The import file have been failed.'));
 			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 3, '');
-			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) 
+			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (114, p_result, 3, 'HINT: Take a look on the RPT file OR Export INP file again without ''Execute EPA software'' & ''Import Results'' in order to check and fix errors.');
 
 			v_status = 'Failed';
-		ELSE	
-					
+		ELSE
+
 			-- basic statistics
 			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 1, 'BASIC STATISTICS');
 			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 1, '-----------------------');
@@ -84,23 +84,23 @@ BEGIN
 			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message)
 			SELECT 114, p_result, 2, concat (time, ' ', text) FROM rpt_hydraulic_status WHERE result_id = p_result AND time = 'WARNING:';
 			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 2, '');
-	
+
 		END IF;
 
 	ELSIF v_project_type = 'UD' THEN
 
 		IF (SELECT count(*) FROM rpt_arcflow_sum WHERE result_id = p_result) < 1 THEN
-		
+
 			-- errors
 			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 4, '------------------------------------------------------------------');
-			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) 
+			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (114, p_result, 3, UPPER('CRITICAL ERROR: The import file have been failed.'));
 			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 3, '');
-			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) 
+			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message)
 			VALUES (114, p_result, 3, 'HINT: Take a look on the RPT file OR Export INP file again without ''Execute EPA software'' & ''Import Results'' in order to check and fix errors.');
 
 			v_status = 'Failed';
-			
+
 		ELSE
 			-- basic statistics
 			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 1, 'BASIC STATISTICS');
@@ -115,15 +115,15 @@ BEGIN
 			, ') , Min.(', min (max_veloc)::numeric(12,3),').') FROM rpt_arcflow_sum WHERE result_id = p_result;
 
 			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message)
-			SELECT 114, p_result, 1, concat ('FULL PERCENT. : Max.(',max(mfull_dept)::numeric(12,3), ') , Avg.(', avg(mfull_dept)::numeric(12,3), ') , Standard dev.(', stddev(mfull_dept)::numeric(12,3)
-			, ') , Min.(', min (mfull_dept)::numeric(12,3),').') FROM rpt_arcflow_sum WHERE result_id = p_result;
+			SELECT 114, p_result, 1, concat ('FULL PERCENT. : Max.(',max(mfull_depth)::numeric(12,3), ') , Avg.(', avg(mfull_depth)::numeric(12,3), ') , Standard dev.(', stddev(mfull_depth)::numeric(12,3)
+			, ') , Min.(', min (mfull_depth)::numeric(12,3),').') FROM rpt_arcflow_sum WHERE result_id = p_result;
 
 			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message)
-			SELECT 114, p_result, 1, concat ('NODE SURCHARGE : Number of nodes (', count(*)::integer,').') 
+			SELECT 114, p_result, 1, concat ('NODE SURCHARGE : Number of nodes (', count(*)::integer,').')
 			FROM rpt_nodesurcharge_sum WHERE result_id = p_result;
 
 			INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message)
-			SELECT 114, p_result, 1, concat ('NODE FLOODING: Number of nodes (', count(*)::integer,'), Max. rate (',max(max_rate)::numeric(12,3), '), Total flood (' ,sum(tot_flood), 
+			SELECT 114, p_result, 1, concat ('NODE FLOODING: Number of nodes (', count(*)::integer,'), Max. rate (',max(max_rate)::numeric(12,3), '), Total flood (' ,sum(tot_flood),
 			'), Max. flood (', max(tot_flood),').')
 			FROM rpt_nodeflooding_sum WHERE result_id = p_result;
 
@@ -157,23 +157,23 @@ BEGIN
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 1, 'DETAILED USER INPUT OPTIONS');
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message) VALUES (114, p_result, 1, '----------------------------------------');
 		INSERT INTO temp_audit_check_data (fid, result_id, criticity, error_message)
-		SELECT 114, p_result, 1, concat (label, ' : ', value) FROM config_param_user 
+		SELECT 114, p_result, 1, concat (label, ' : ', value) FROM config_param_user
 		JOIN sys_param_user a ON a.id=parameter WHERE cur_user=current_user AND formname='epaoptions' AND value is not null;
 
 	END IF;
-	
+
 	-- get results
 	-- info
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT id, error_message as message FROM temp_audit_check_data WHERE cur_user="current_user"() AND fid=114 order by criticity desc, id asc) row;
-	v_result := COALESCE(v_result, '{}'); 
+	v_result := COALESCE(v_result, '{}');
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
-	
+
 	-- Control nulls
-	v_result_info := COALESCE(v_result_info, '{}'); 
-	v_result_point := COALESCE(v_result_point, '{}'); 
-	v_result_line := COALESCE(v_result_line, '{}'); 
-	v_result_polygon := COALESCE(v_result_polygon, '{}'); 
+	v_result_info := COALESCE(v_result_info, '{}');
+	v_result_point := COALESCE(v_result_point, '{}');
+	v_result_line := COALESCE(v_result_line, '{}');
+	v_result_polygon := COALESCE(v_result_polygon, '{}');
 
 	-- drop tables
 	DROP TABLE IF EXISTS temp_audit_check_data;

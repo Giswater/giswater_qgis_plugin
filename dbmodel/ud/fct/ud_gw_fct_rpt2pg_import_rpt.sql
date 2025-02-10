@@ -66,7 +66,7 @@ BEGIN
 	-- Starting process
 	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (140, v_result_id, concat('IMPORT RPT FILE'));
 	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (140, v_result_id, concat('-----------------------------'));
-	
+
 	--remove data from with the same result_id
 	FOR rpt_rec IN SELECT tablename FROM config_fprocess WHERE fid=v_fid EXCEPT SELECT tablename FROM config_fprocess WHERE tablename='rpt_cat_result'
 	LOOP
@@ -75,13 +75,13 @@ BEGIN
 
 	-- setting rpt_subcatchrunoff_sum
 	SELECT id into v_count1 FROM temp_t_csv WHERE source ='rpt_subcatchrunoff_sum' and csv1 = 'LID';
-	IF v_count1 > 0 THEN 
+	IF v_count1 > 0 THEN
 		UPDATE temp_t_csv SET source ='rpt_lidperformance_sum' WHERE source ='rpt_subcatchrunoff_sum' and id > v_count1;
 	END IF;
 
 	-- setting rpt_flowrouting_cont
 	SELECT id into v_count1 FROM temp_t_csv WHERE source ='rpt_runoff_quant' and csv1 = 'Continuity';
-	IF v_count1 > 0 THEN 
+	IF v_count1 > 0 THEN
 		UPDATE temp_t_csv SET source ='rpt_flowrouting_cont' WHERE source ='rpt_runoff_quant ' and id > v_count1;
 	END IF;
 
@@ -90,7 +90,7 @@ BEGIN
 
 	-- delete trash rows
 	DELETE FROM temp_t_csv WHERE source ='rpt_controls_actions_taken' and csv1='Control' and csv2='Actions';
-		
+
 	DELETE FROM temp_t_csv WHERE csv1='Analysis' and csv2='begun';
 	DELETE FROM temp_t_csv WHERE csv1='Analysis' and csv2='ended';
 	DELETE FROM temp_t_csv WHERE csv1='Total' and csv2='elapsed';
@@ -112,12 +112,12 @@ BEGIN
 	DELETE FROM temp_t_csv WHERE source ='rpt_subcatchwashoff_sum' and csv1='Subcatchment' and csv2='Washoff';
 	DELETE FROM temp_t_csv WHERE source ='rpt_subcatchwashoff_sum' and csv1='Subcatchment' and csv2='kg';
 	DELETE FROM temp_t_csv WHERE source ='rpt_subcatchwashoff_sum' and csv1=(SELECT poll_id FROM vi_pollutants LIMIT 1);
-	
+
 	DELETE FROM temp_t_csv WHERE source ='rpt_nodedepth_sum' and csv1='Node' and csv2='Depth';
 	DELETE FROM temp_t_csv WHERE source ='rpt_nodedepth_sum' and csv1='Average' and csv2='Maximum';
 	DELETE FROM temp_t_csv WHERE source ='rpt_nodedepth_sum' and csv1='Depth' and csv2='Depth';
 	DELETE FROM temp_t_csv WHERE source ='rpt_nodedepth_sum' and csv1='Node' and csv2='Type';
-	
+
 	DELETE FROM temp_t_csv WHERE source ='rpt_nodeinflow_sum' and csv1='Node' and csv2='Inflow';
 	DELETE FROM temp_t_csv WHERE source ='rpt_nodeinflow_sum' and csv1='Maximum' and csv2='Maximum';
 	DELETE FROM temp_t_csv WHERE source ='rpt_nodeinflow_sum' and csv1='Lateral' and csv2='Total';
@@ -155,13 +155,13 @@ BEGIN
 	DELETE FROM temp_t_csv WHERE source ='rpt_outfallflow_sum' and csv1 like 'Flow%' and csv2 like 'Avg%';
 	DELETE FROM temp_t_csv WHERE source ='rpt_outfallflow_sum' and csv1 like 'Freq%' and csv2 like 'Flow%';
 	DELETE FROM temp_t_csv WHERE source ='rpt_outfallflow_sum' and csv1='Outfall' and csv2='Node';
-	
+
 	DELETE FROM temp_t_csv WHERE source ='rpt_arcflow_sum' and csv1='Link' and csv2='Flow';
 	DELETE FROM temp_t_csv WHERE source ='rpt_arcflow_sum' and csv1='Maximum' and csv2='Occurrence';
 	DELETE FROM temp_t_csv WHERE source ='rpt_arcflow_sum' and csv1='|Flow|' and csv2='Occurrence';
 	DELETE FROM temp_t_csv WHERE source ='rpt_arcflow_sum' and csv1='Link' and csv2='Type';
 	DELETE FROM temp_t_csv WHERE source ='rpt_arcflow_sum' and csv1='Maximum' and csv2='Time';
-	
+
 	DELETE FROM temp_t_csv WHERE source ='rpt_flowclass_sum' and csv1='Flow' and csv2='Classification';
 	DELETE FROM temp_t_csv WHERE source ='rpt_flowclass_sum' and csv1='/Actual' and csv2='Up';
 	DELETE FROM temp_t_csv WHERE source ='rpt_flowclass_sum' and csv1='Conduit' and csv2='Length';
@@ -173,7 +173,7 @@ BEGIN
 	DELETE FROM temp_t_csv WHERE source ='rpt_condsurcharge_sum' and csv1='Pollutant';
 	DELETE FROM temp_t_csv WHERE source ='rpt_condsurcharge_sum' and csv1='No' and csv2='conduits';
 	DELETE FROM temp_t_csv WHERE id >= (SELECT id FROM temp_t_csv WHERE source ='rpt_condsurcharge_sum' and csv2='Pollutant'and csv3='Load')
-				AND id <= (SELECT id FROM temp_t_csv WHERE source ='rpt_condsurcharge_sum' and csv1='Link'and csv2='kg');	
+				AND id <= (SELECT id FROM temp_t_csv WHERE source ='rpt_condsurcharge_sum' and csv1='Link'and csv2='kg');
 
 	DELETE FROM temp_t_csv WHERE id >= (SELECT id FROM temp_t_csv WHERE source ='rpt_arcpollutant_sum' and csv2='Pollutant'and csv3='Load')
 				AND id <= (SELECT id FROM temp_t_csv WHERE source ='rpt_arcpollutant_sum' and csv1='Link'and csv2='kg');
@@ -183,20 +183,20 @@ BEGIN
 	DELETE FROM temp_t_csv WHERE source ='rpt_pumping_sum' and csv1='Percent' and csv2='Number';
 	DELETE FROM temp_t_csv WHERE source ='rpt_pumping_sum' and csv1='Pump' and csv2='Utilized';
 
-	
-	
+
+
 	FOR rpt_rec IN SELECT * FROM temp_t_csv order by id
 	LOOP
 		i = 0;
 		IF rpt_rec.csv1 = 'WARNING' THEN
 			type_aux = 'rpt_warning_summary';
-			
+
 		--ELSIF rpt_rec.csv1 = 'LID' THEN
 			--type_aux = 'rpt_lidperformance_sum';
 		ELSE
 			type_aux = rpt_rec.source;
 		END IF;
-								
+
 		IF type_aux='rpt_cat_result' THEN
 			UPDATE rpt_cat_result set flow_units=SUBSTRING(rpt_rec.csv4,1,3) WHERE concat(rpt_rec.csv1,' ',rpt_rec.csv2) ilike 'Flow Units%' and result_id=v_result_id;
 			UPDATE rpt_cat_result set rain_runof=SUBSTRING(rpt_rec.csv3,1,3) WHERE rpt_rec.csv1 ilike 'Rainfall/Runoff%' and result_id=v_result_id;
@@ -217,41 +217,41 @@ BEGIN
 
 		ELSIF type_aux='rpt_timestep_subcatchment' THEN
 
-			IF rpt_rec.csv1 ='<<<' THEN 
+			IF rpt_rec.csv1 ='<<<' THEN
 				v_id= rpt_rec.csv3;
 			END IF;
 
-			IF rpt_rec.csv1 IS NOT NULL AND rpt_rec.csv1='<<<' or rpt_rec.csv1='Date' or rpt_rec.csv1='mm/hr' THEN 
+			IF rpt_rec.csv1 IS NOT NULL AND rpt_rec.csv1='<<<' or rpt_rec.csv1='Date' or rpt_rec.csv1='mm/hr' THEN
 			ELSE
 				INSERT INTO rpt_subcatchment (result_id, subc_id, resultdate, resulttime, precip, losses, runoff) VALUES (v_result_id, v_id, rpt_rec.csv1, rpt_rec.csv2, rpt_rec.csv3::float, rpt_rec.csv4::float, rpt_rec.csv5::float);
 			END IF;
 
 		ELSIF type_aux='rpt_node' THEN
 
-			IF rpt_rec.csv1 ='<<<' THEN 
+			IF rpt_rec.csv1 ='<<<' THEN
 				v_id= rpt_rec.csv3;
 			END IF;
-			IF rpt_rec.csv1 IS NOT NULL AND rpt_rec.csv1='<<<' or rpt_rec.csv1='Date' or rpt_rec.csv1='Inflow' or  rpt_rec.csv2='Node' or rpt_rec.csv1='Node' THEN 
+			IF rpt_rec.csv1 IS NOT NULL AND rpt_rec.csv1='<<<' or rpt_rec.csv1='Date' or rpt_rec.csv1='Inflow' or  rpt_rec.csv2='Node' or rpt_rec.csv1='Node' THEN
 			ELSE
-				INSERT INTO rpt_node (result_id, node_id, resultdate, resulttime, flooding, depth, head, inflow) 
+				INSERT INTO rpt_node (result_id, node_id, resultdate, resulttime, flooding, depth, head, inflow)
 				VALUES (v_result_id, v_id, rpt_rec.csv1, rpt_rec.csv2, rpt_rec.csv4::float, rpt_rec.csv5::float, rpt_rec.csv6::float, rpt_rec.csv3::float);
 			END IF;
 
 		ELSIF type_aux='rpt_arc' THEN
 
-			IF rpt_rec.csv1 ='<<<' THEN 
+			IF rpt_rec.csv1 ='<<<' THEN
 				v_id= rpt_rec.csv3;
 			END IF;
 			IF rpt_rec.csv1 IS NOT NULL AND rpt_rec.csv1='<<<' or rpt_rec.csv1='Date' or rpt_rec.csv1='Flow' or rpt_rec.csv1='Analysis' or rpt_rec.csv1='Total' or rpt_rec.csv1='Link'  THEN
 			ELSE
 				INSERT INTO rpt_arc (result_id, arc_id, resultdate, resulttime, flow, velocity, fullpercent) VALUES (v_result_id, v_id, rpt_rec.csv1, rpt_rec.csv2, rpt_rec.csv3::float, rpt_rec.csv4::float, rpt_rec.csv5::float);
 			END IF;
-	
+
 		--there are still 3 empty fields on rpt_cat_results, where does the data come from? -- ok
-		ELSIF type_aux='rpt_runoff_quant' then 					
+		ELSIF type_aux='rpt_runoff_quant' then
 			INSERT INTO rpt_runoff_quant(result_id) VALUES (v_result_id)
 			ON CONFLICT (result_id) DO NOTHING;
-			
+
 			IF (rpt_rec.csv4 ~ '^([0-9]+[.]?[0-9]*|[.][0-9]+)$') THEN
 				UPDATE rpt_runoff_quant set total_prec=rpt_rec.csv4::numeric WHERE result_id=v_result_id AND rpt_rec.csv1='Total';
 				UPDATE rpt_runoff_quant set evap_loss=rpt_rec.csv4::numeric WHERE result_id=v_result_id AND rpt_rec.csv1='Evaporation';
@@ -277,48 +277,48 @@ BEGIN
 			IF rpt_rec.csv1 ='Initial'THEN UPDATE rpt_flowrouting_cont set initst_vol=rpt_rec.csv5::numeric WHERE result_id=v_result_id; END IF;
 			IF rpt_rec.csv1 ='Final'THEN UPDATE rpt_flowrouting_cont set finst_vol=rpt_rec.csv5::numeric WHERE result_id=v_result_id; END IF;
 
-			
-		ELSIF type_aux='rpt_high_conterrors' AND rpt_rec.csv1 = 'Node' then 
+
+		ELSIF type_aux='rpt_high_conterrors' AND rpt_rec.csv1 = 'Node' then
 			INSERT INTO rpt_high_conterrors(result_id, text)
 			VALUES (v_result_id,CONCAT(rpt_rec.csv1,' ',rpt_rec.csv2,' ',rpt_rec.csv3));
-					
-		ELSIF type_aux='rpt_timestep_critelem' AND (rpt_rec.csv1 = 'Node' or rpt_rec.csv1 = 'Link') then 
+
+		ELSIF type_aux='rpt_timestep_critelem' AND (rpt_rec.csv1 = 'Node' or rpt_rec.csv1 = 'Link') then
 			INSERT INTO rpt_timestep_critelem(result_id, text)
 			VALUES (v_result_id,CONCAT(rpt_rec.csv1,' ',rpt_rec.csv2,' ',rpt_rec.csv3));
 
-		ELSIF type_aux='rpt_high_flowinest_ind' AND rpt_rec.csv1 = 'Link' then 
+		ELSIF type_aux='rpt_high_flowinest_ind' AND rpt_rec.csv1 = 'Link' then
 			INSERT INTO rpt_high_flowinest_ind(result_id, text)
 			VALUES (v_result_id,CONCAT(rpt_rec.csv1,' ',rpt_rec.csv2,' ',rpt_rec.csv3));
 
-		ELSIF type_aux='rpt_routing_timestep' AND (rpt_rec.csv4 = ':' OR rpt_rec.csv5 = ':') then 
+		ELSIF type_aux='rpt_routing_timestep' AND (rpt_rec.csv4 = ':' OR rpt_rec.csv5 = ':') then
 			INSERT INTO rpt_routing_timestep(result_id, text)
 			VALUES (v_result_id,CONCAT(rpt_rec.csv1,' ',rpt_rec.csv2,' ',rpt_rec.csv3,' ',rpt_rec.csv4,' ',rpt_rec.csv5,' ',
 			rpt_rec.csv6,' ',rpt_rec.csv7));
 
-		ELSIF type_aux='rpt_subcatchrunoff_sum' then 
+		ELSIF type_aux='rpt_subcatchrunoff_sum' then
 
 			IF v_epaversion = '5.1' then
 
-				INSERT INTO rpt_subcatchrunoff_sum(result_id, subc_id, tot_precip, tot_runon, tot_evap, tot_infil, tot_runoff, tot_runofl, peak_runof, runoff_coe, vxmax, vymax, depth, vel, vhmax) 
+				INSERT INTO rpt_subcatchrunoff_sum(result_id, subc_id, tot_precip, tot_runon, tot_evap, tot_infil, tot_runoff, tot_runofl, peak_runof, runoff_coe, vxmax, vymax, depth, vel, vhmax)
 				VALUES (v_result_id, rpt_rec.csv1, rpt_rec.csv2::numeric, rpt_rec.csv3::numeric, rpt_rec.csv4::numeric, rpt_rec.csv5::numeric, rpt_rec.csv8::numeric,
 				rpt_rec.csv9::numeric,rpt_rec.csv10::numeric,rpt_rec.csv11::numeric,rpt_rec.csv12::numeric,rpt_rec.csv13::numeric,rpt_rec.csv14::numeric,
 				rpt_rec.csv15::numeric,rpt_rec.csv16::numeric);
 			ELSE
-				INSERT INTO rpt_subcatchrunoff_sum(result_id, subc_id, tot_precip, tot_runon, tot_evap, tot_infil,tot_runoff, tot_runofl, peak_runof, runoff_coe, vxmax, vymax, depth, vel, vhmax) 
+				INSERT INTO rpt_subcatchrunoff_sum(result_id, subc_id, tot_precip, tot_runon, tot_evap, tot_infil,tot_runoff, tot_runofl, peak_runof, runoff_coe, vxmax, vymax, depth, vel, vhmax)
 				VALUES (v_result_id,rpt_rec.csv1,rpt_rec.csv2::numeric,rpt_rec.csv3::numeric,rpt_rec.csv4::numeric,rpt_rec.csv5::numeric,rpt_rec.csv6::numeric,
 				rpt_rec.csv7::numeric,rpt_rec.csv8::numeric,rpt_rec.csv9::numeric,rpt_rec.csv10::numeric,rpt_rec.csv11::numeric,rpt_rec.csv12::numeric,
 				rpt_rec.csv13::numeric,rpt_rec.csv14::numeric);
 			END IF;
 
 		ELSIF type_aux='rpt_lidperformance_sum' then
-		
+
 			INSERT INTO rpt_lidperformance_sum(result_id, subc_id, lidco_id, tot_inflow, evap_loss, infil_loss, surf_outf, drain_outf, init_stor, final_stor, per_error)
 			VALUES  (v_result_id,rpt_rec.csv1,rpt_rec.csv2,rpt_rec.csv3::numeric,rpt_rec.csv4::numeric,rpt_rec.csv5::numeric,rpt_rec.csv6::numeric,rpt_rec.csv7::numeric,
 			rpt_rec.csv8::numeric,rpt_rec.csv9::numeric,rpt_rec.csv10::numeric);
 
-		ELSIF  type_aux='rpt_subcatchwashoff_sum' then 
-		
-			LOOP		
+		ELSIF  type_aux='rpt_subcatchwashoff_sum' then
+
+			LOOP
 				v_poll := (SELECT poll_id FROM vi_pollutants LIMIT 1 OFFSET i);
 				i = i+1;
 
@@ -330,7 +330,7 @@ BEGIN
 					INSERT INTO rpt_subcatchwashoff_sum (result_id, subc_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv3::numeric;
 				ELSIF i = 3 THEN
 					INSERT INTO rpt_subcatchwashoff_sum (result_id, subc_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv4::numeric;
-				ELSIF i = 4 THEN	
+				ELSIF i = 4 THEN
 					INSERT INTO rpt_subcatchwashoff_sum (result_id, subc_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv5::numeric;
 				ELSIF i = 5 THEN
 					INSERT INTO rpt_subcatchwashoff_sum (result_id, subc_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv6::numeric;
@@ -349,13 +349,13 @@ BEGIN
 				ELSIF i = 12 THEN
 					INSERT INTO rpt_subcatchwashoff_sum (result_id, subc_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv13::numeric;
 				END IF;
-			END LOOP;	
-			
+			END LOOP;
+
 		ELSIF type_aux='rpt_arcpollutant_sum' then
 
 			i = 0;
-	
-			LOOP		
+
+			LOOP
 				v_poll := (SELECT poll_id FROM vi_pollutants LIMIT 1 OFFSET i);
 				i = i+1;
 
@@ -367,7 +367,7 @@ BEGIN
 					INSERT INTO rpt_arcpollutant_sum (result_id, arc_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv3::numeric;
 				ELSIF i = 3 THEN
 					INSERT INTO rpt_arcpollutant_sum (result_id, arc_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv4::numeric;
-				ELSIF i = 4 THEN	
+				ELSIF i = 4 THEN
 					INSERT INTO rpt_arcpollutant_sum (result_id, arc_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv5::numeric;
 				ELSIF i = 5 THEN
 					INSERT INTO rpt_arcpollutant_sum (result_id, arc_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv6::numeric;
@@ -386,16 +386,16 @@ BEGIN
 				ELSIF i = 12 THEN
 					INSERT INTO rpt_arcpollutant_sum (result_id, arc_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv13::numeric;
 				END IF;
-			END LOOP;	
+			END LOOP;
 
 
 		ELSIF type_aux='rpt_nodedepth_sum' then
 			INSERT INTO rpt_nodedepth_sum(result_id, node_id, swnod_type, aver_depth, max_depth, max_hgl,time_days, time_hour)
 			VALUES (v_result_id,rpt_rec.csv1,rpt_rec.csv2,rpt_rec.csv3::numeric,rpt_rec.csv4::numeric,rpt_rec.csv5::numeric,rpt_rec.csv6,
 			rpt_rec.csv7);
-			
+
 		ELSIF type_aux='rpt_nodeinflow_sum' then
-			INSERT INTO rpt_nodeinflow_sum(result_id, node_id, swnod_type, max_latinf, max_totinf, time_days, 
+			INSERT INTO rpt_nodeinflow_sum(result_id, node_id, swnod_type, max_latinf, max_totinf, time_days,
 			time_hour, flow_balance_error, other_info)
 			VALUES (v_result_id,rpt_rec.csv1,rpt_rec.csv2,rpt_rec.csv3::numeric,rpt_rec.csv4::numeric,rpt_rec.csv5,rpt_rec.csv6,
 			rpt_rec.csv9::numeric,rpt_rec.csv10);
@@ -418,7 +418,7 @@ BEGIN
 			LOOP
 				v_poll := (SELECT poll_id FROM vi_pollutants LIMIT 1 OFFSET i);
 				i = i+1;
-				
+
 				EXIT WHEN v_poll IS NULL;
 
 				IF i = 1 THEN
@@ -427,8 +427,8 @@ BEGIN
 					INSERT INTO rpt_outfallload_sum (result_id, node_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv7::numeric;
 				ELSIF i = 3 THEN
 					INSERT INTO rpt_outfallload_sum (result_id, node_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv8::numeric;
-				ELSIF i = 4 THEN	
-					INSERT INTO rpt_outfallload_sum (result_id, node_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv9::numeric;	
+				ELSIF i = 4 THEN
+					INSERT INTO rpt_outfallload_sum (result_id, node_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv9::numeric;
 				ELSIF i = 5 THEN
 					INSERT INTO rpt_outfallload_sum (result_id, node_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv10::numeric;
 				ELSIF i = 6 THEN
@@ -447,7 +447,7 @@ BEGIN
 					INSERT INTO rpt_outfallload_sum (result_id, node_id, poll_id, value) SELECT v_result_id, rpt_rec.csv1, v_poll, rpt_rec.csv17::numeric;
 				END IF;
 			END LOOP;
-		
+
 		ELSIF type_aux='rpt_storagevol_sum' then
 
 			IF v_epaversion = '5.1' then
@@ -464,11 +464,11 @@ BEGIN
 				rpt_rec.csv7,rpt_rec.csv8,rpt_rec.csv9::numeric);
 
 			END IF;
-				
+
 		ELSIF type_aux='rpt_arcflow_sum' then
 			CASE WHEN rpt_rec.csv6='>50.00' THEN rpt_rec.csv6='50.00'; else end case;
-			INSERT INTO rpt_arcflow_sum(result_id, arc_id, arc_type, max_flow, time_days, time_hour, max_veloc, 
-			mfull_flow, mfull_dept, max_shear, max_hr, max_slope, day_max, time_max, min_shear, day_min, time_min)
+			INSERT INTO rpt_arcflow_sum(result_id, arc_id, arc_type, max_flow, time_days, time_hour, max_veloc,
+			mfull_flow, mfull_depth, max_shear, max_hr, max_slope, day_max, time_max, min_shear, day_min, time_min)
 			VALUES (v_result_id,rpt_rec.csv1,rpt_rec.csv2,rpt_rec.csv3::numeric,rpt_rec.csv4,rpt_rec.csv5,rpt_rec.csv6::numeric,
 			rpt_rec.csv7::numeric,rpt_rec.csv8::numeric,rpt_rec.csv9::numeric,rpt_rec.csv10::numeric,rpt_rec.csv11::numeric,rpt_rec.csv12,
 			rpt_rec.csv13,rpt_rec.csv14::numeric,rpt_rec.csv15::numeric,rpt_rec.csv16::numeric);
@@ -502,22 +502,22 @@ BEGIN
 		ELSIF type_aux='rpt_instability_index' THEN
 			INSERT INTO rpt_instability_index(result_id, text)
    			VALUES (v_result_id,  concat(rpt_rec.csv1,' ',rpt_rec.csv2,'',rpt_rec.csv3));
-   		
+
 		ELSIF type_aux='rpt_outfallload_sum' THEN
    			INSERT INTO rpt_outfallload_sum(result_id, poll_id, node_id, value)
-			VALUES (v_result_id, rpt_rec.csv1,null,null);-- update poll_id, que es el value? compare rpt and table	
+			VALUES (v_result_id, rpt_rec.csv1,null,null);-- update poll_id, que es el value? compare rpt and table
 		END IF;
 	END LOOP;
-	
+
 	INSERT INTO audit_check_data (fid, error_message) VALUES (140, 'Rpt file import process -> Finished. Check your data');
 
 	-- get results
 	-- info
-	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result 
+	SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result
 	FROM (SELECT error_message as message FROM audit_check_data WHERE cur_user="current_user"() AND fid=140  order by id) row;
-	v_result := COALESCE(v_result, '{}'); 
+	v_result := COALESCE(v_result, '{}');
 	v_result_info = concat ('{"geometryType":"", "values":',v_result, '}');
-	
+
 	--points
 	v_result = null;
 	SELECT jsonb_agg(features.feature) INTO v_result
@@ -530,8 +530,8 @@ BEGIN
   	FROM (SELECT id, node_id, nodecat_id, state, expl_id, descript, the_geom
   	FROM  anl_node WHERE cur_user="current_user"() AND fid=140) row) features;
 
-	v_result := COALESCE(v_result, '{}'); 
-	v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}'); 
+	v_result := COALESCE(v_result, '{}');
+	v_result_point = concat ('{"geometryType":"Point", "features":',v_result, '}');
 
 	--lines
 	v_result = null;
@@ -545,14 +545,14 @@ BEGIN
   	FROM (SELECT id, arc_id, arccat_id, state, expl_id, descript, the_geom
   	FROM  anl_arc WHERE cur_user="current_user"() AND fid=140) row) features;
 
-	v_result := COALESCE(v_result, '{}'); 
-	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result, '}'); 
+	v_result := COALESCE(v_result, '{}');
+	v_result_line = concat ('{"geometryType":"LineString", "features":',v_result, '}');
 
 	--Control nulls
-	v_version := COALESCE(v_version, '{}'); 
-	v_result_info := COALESCE(v_result_info, '{}'); 
-	v_result_point := COALESCE(v_result_point, '{}'); 
-	v_result_line := COALESCE(v_result_line, '{}'); 	
+	v_version := COALESCE(v_version, '{}');
+	v_result_info := COALESCE(v_result_info, '{}');
+	v_result_point := COALESCE(v_result_point, '{}');
+	v_result_line := COALESCE(v_result_line, '{}');
 
 	-- 	Return
 	RETURN ('{"status":"Accepted", "message":{"level":1, "text":"Import rpt done successfully"}, "version":"'||v_version||'"'||
@@ -561,7 +561,7 @@ BEGIN
 				'"point":'||v_result_point||','||
 				'"line":'||v_result_line||
 		       '}}'||
-	    '}')::json;	
+	    '}')::json;
 
 END;
 $BODY$
