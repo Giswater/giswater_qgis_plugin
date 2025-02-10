@@ -245,3 +245,16 @@ update sys_fprocess set active = true;
 
 -- 07/02/2025
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"rpt_cat_result", "column":"inp_file", "dataType":"bytea", "isUtils":"False"}}$$);
+
+-- 10/02/2025
+DROP VIEW IF EXISTS v_ui_workspace;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP", "table":"cat_workspace", "column":"cur_user"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"cat_workspace", "column":"insert_user", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"cat_workspace", "column":"insert_timestamp", "dataType":"timestamp", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"cat_workspace", "column":"lastupdate_user", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"cat_workspace", "column":"lastupdate_timestamp", "dataType":"timestamp", "isUtils":"False"}}$$);
+
+ALTER TABLE cat_workspace ALTER COLUMN insert_user SET DEFAULT current_user;
+ALTER TABLE cat_workspace ALTER COLUMN insert_timestamp SET DEFAULT now();
+ALTER TABLE cat_workspace ALTER COLUMN lastupdate_user SET DEFAULT current_user;
+ALTER TABLE cat_workspace ALTER COLUMN lastupdate_timestamp SET DEFAULT now();

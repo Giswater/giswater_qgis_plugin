@@ -540,3 +540,19 @@ AS SELECT plan_psector.psector_id,
      LEFT JOIN plan_typevalue t ON t.id::integer = plan_psector.psector_type AND t.typevalue = 'psector_type'::text
   WHERE plan_psector.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
 
+-- 10/02/2025
+CREATE OR REPLACE VIEW v_ui_workspace
+AS SELECT cat_workspace.id,
+    cat_workspace.name,
+    cat_workspace.private,
+    cat_workspace.descript,
+    cat_workspace.config,
+    cat_workspace.insert_user,
+    cat_workspace.insert_timestamp,
+    cat_workspace.lastupdate_user,
+    cat_workspace.lastupdate_timestamp
+   FROM cat_workspace
+  WHERE
+  cat_workspace.private IS FALSE
+  OR cat_workspace.private IS TRUE
+  AND (cat_workspace.insert_user = CURRENT_USER::text OR cat_workspace.lastupdate_user = CURRENT_USER::text);
