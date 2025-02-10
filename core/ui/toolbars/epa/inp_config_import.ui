@@ -304,7 +304,7 @@
                </property>
                <layout class="QGridLayout" name="gridLayout_9">
                 <item row="0" column="0">
-                 <widget class="QTextEdit" name="txt_info">
+                 <widget class="QTextBrowser" name="txt_info">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
                     <horstretch>0</horstretch>
@@ -322,6 +322,9 @@
                   </property>
                   <property name="textInteractionFlags">
                    <set>Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse|Qt::TextBrowserInteraction|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
+                  </property>
+                  <property name="openExternalLinks">
+                   <bool>true</bool>
                   </property>
                  </widget>
                 </item>
