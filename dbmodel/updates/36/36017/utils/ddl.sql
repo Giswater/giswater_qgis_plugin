@@ -41,5 +41,5 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_psect
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_psector_connec_traceability", "column":"streetname2", "dataType":"varchar(100)"}}$$);
 
 -- 07/02/2025
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"dimensions", "column":"workcat_id", "dataType":"int4", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"dimensions", "column":"workcat_id", "dataType":"varchar(255)", "isUtils":"False"}}$$);
 ALTER TABLE dimensions ADD CONSTRAINT dimensions_workcat_id_fkey FOREIGN KEY (workcat_id) REFERENCES cat_work(id) ON UPDATE CASCADE ON DELETE RESTRICT;
