@@ -1,14 +1,14 @@
 -- Function code: 3384
 
--- DROP FUNCTION SCHEMA_NAME.gw_fct_import_swmm_nodarcs(json);
+-- DROP FUNCTION SCHEMA_NAME.gw_fct_import_swmm_flwreg(json);
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_import_swmm_nodarcs(p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_import_swmm_flwreg(p_data json)
  RETURNS json
  LANGUAGE plpgsql
 AS $function$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_import_swmm_nodarcs($${"data": {
+SELECT SCHEMA_NAME.gw_fct_import_swmm_flwreg($${"data": {
     "pump": {
         "featureClass": "FRPUMP",
         "catalog": "FRPUMP-01"
