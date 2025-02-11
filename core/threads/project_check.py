@@ -26,7 +26,7 @@ class GwProjectCheckTask(GwTask):
     def __init__(self, description='', params=None, timer=None):
 
         super().__init__(description)
-        self.params = params
+        self.params = params if params else {}
         self.result = None
         self.dlg_audit_project = None
         self.timer = timer
@@ -117,7 +117,10 @@ class GwProjectCheckTask(GwTask):
 
 
     def _execute_check_project_function(self, init_project, fields_to_insert):
-        """ Execute function 'gw_fct_setcheckproject' """
+        """ Execute function 'gw_fct_setcheckproject' with checkbox selections passed from project_check_btn.py """
+        # Retrieve checkbox values from params
+        show_versions = self.params.get("show_versions", False)
+        show_qgis_project = self.params.get("show_qgis_project", False)
 
         # Get project variables
         add_schema = lib_vars.project_vars['add_schema']
@@ -150,7 +153,10 @@ class GwProjectCheckTask(GwTask):
         extras += f', "qgisVersion":"{Qgis.QGIS_VERSION}"'
         extras += f', "osVersion":"{platform.system()} {platform.release()}"'
         extras += f', {fields_to_insert}'
+        if show_versions or show_qgis_project:
+            extras += f', "parameters": {{"showVersions": {str(show_versions).lower()}, "showQgisProject": {str(show_qgis_project).lower()}}}'
 
+        # Execute procedure
         body = tools_gw.create_body(extras=extras)
         result = tools_gw.execute_procedure('gw_fct_setcheckproject', body, is_thread=True, aux_conn=self.aux_conn)
         if result:
@@ -170,19 +176,13 @@ class GwProjectCheckTask(GwTask):
     def _show_check_project_result(self, result):
         """ Show dialog with audit check project results """
 
-        # Populate info_log and missing layers
-        critical_level = 0
+        # Handle failed results
         if result.get('status') == 'Failed':
             tools_gw.manage_json_exception(result)
             return False
-        text_result = tools_gw.add_layer_temp(self.dlg_audit_project, result['body']['data'],
-                                              'gw_fct_setcheckproject_result', True, False, 0, True,
-                                              call_set_tabs_enabled=False)
 
-        tools_qt.hide_void_groupbox(self.dlg_audit_project)
-        if int(critical_level) > 0 or text_result:
-            self.dlg_audit_project.btn_accept.clicked.connect(partial(self._add_selected_layers, self.dlg_audit_project,
-                                                                      result['body']['data']['missingLayers']))
+        # Call `fill_tab_log()` directly, no need to store variables
+        tools_gw.fill_tab_log(self.dlg_audit_project, result['body']['data'], reset_text=False)
 
 
     def _add_selected_layers(self, dialog, m_layers):

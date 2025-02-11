@@ -120,8 +120,13 @@ class GwProjectCheckButton(GwAction):
         # Retrieve layers in the same order as listed in TOC
         layers = tools_qgis.get_project_layers()
 
+        show_versions = tools_qt.is_checked(self.dialog, "tab_data_versions_check")
+        show_qgis_project = tools_qt.is_checked(self.dialog, "tab_data_qgisproj_check")
+
         # Set parameters and re-run the project check task
-        params = {"layers": layers, "init_project": "false", "dialog": self.dialog}
+        params = {"layers": layers, "init_project": "false", "dialog": self.dialog,
+                  "show_versions": show_versions, "show_qgis_project": show_qgis_project}
+
         self.project_check_task = GwProjectCheckTask('check_project', params)
 
         # After `GwProjectCheckTask` completes, execute `gw_fct_setcheckdatabase`
@@ -132,30 +137,31 @@ class GwProjectCheckButton(GwAction):
 
 
     def _execute_checkdatabase(self):
-        """Executes `gw_fct_setcheckdatabase` if any checkboxes are selected after `GwProjectCheckTask` completes."""
+        """Executes `gw_fct_setcheckdatabase` and updates the Log tab with results."""
 
         # Collect selected checkboxes
         check_parameters = self._get_selected_checks()
-        # If no checkboxes are selected, do nothing
         if not any(check_parameters.values()):
             print("No checkboxes selected. Skipping gw_fct_setcheckdatabase.")
             return
 
-        # Format parameters properly as a string
+        # Format parameters properly
         parameters = ', '.join([f'"{key}": {str(value).lower()}' for key, value in check_parameters.items()])
         extras = f'"parameters": {{{parameters}}}'
-        # Create the request body in the correct format
         body = tools_gw.create_body(extras=extras)
 
         # Execute procedure
         json_result = tools_gw.execute_procedure('gw_fct_setcheckdatabase', body)
+
         if not json_result or json_result.get("status") != "Accepted":
             print(f"Failed to execute gw_fct_setcheckdatabase: {json_result}")
-        else:
-            print("Database check successfully executed!")
+            return
+        tools_gw.fill_tab_log(self.dialog, json_result['body']['data'], reset_text=False)
 
     def _get_selected_checks(self):
-        """Returns a dictionary of the selected checkboxes using `is_checked` from tools_qt."""
+        """Returns a dictionary of the selected checkboxes using `is_checked` from tools_qt,
+        excluding system health checkboxes.
+        """
         result_json = {}
 
         # Find all QCheckBox widgets inside the dialog
@@ -165,11 +171,14 @@ class GwProjectCheckButton(GwAction):
             widget_name = widget.objectName()  # Get the checkbox name
             checked_value = tools_qt.is_checked(self.dialog, widget)
 
+            # Exclude "versions_check" and "qgisproj_check"
+            if widget_name in ["tab_data_versions_check", "tab_data_qgisproj_check"]:
+                continue  # Skip these checkboxes
+
             # Store only checkboxes with valid names
             if widget_name and checked_value:
                 result_json[widget_name] = checked_value
 
-        print("Checkbox Values:", result_json)  # Debugging output
         return result_json
 
     def _on_task_finished(self):

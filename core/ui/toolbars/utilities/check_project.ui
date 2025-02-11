@@ -14,33 +14,6 @@
    <string>Check project</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="1">
-    <widget class="QTabWidget" name="mainTab">
-     <property name="currentIndex">
-      <number>0</number>
-     </property>
-     <widget class="QWidget" name="tab_data">
-      <attribute name="title">
-       <string>Database log</string>
-      </attribute>
-      <layout class="QGridLayout" name="gridLayout_2">
-       <item row="0" column="0">
-        <layout class="QGridLayout" name="lyt_data_1"/>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="tab_log">
-      <attribute name="title">
-       <string>Logs</string>
-      </attribute>
-      <layout class="QGridLayout" name="gridLayout_4">
-       <item row="0" column="0">
-        <layout class="QGridLayout" name="lyt_data_2" rowstretch="0" columnstretch="0"/>
-       </item>
-      </layout>
-     </widget>
-    </widget>
-   </item>
    <item row="2" column="1">
     <layout class="QGridLayout" name="lyt_buttons">
      <property name="topMargin">
@@ -70,6 +43,13 @@
    </item>
    <item row="1" column="1">
     <layout class="QGridLayout" name="lyt_progress">
+     <item row="0" column="0" rowspan="2">
+      <widget class="QLabel" name="lbl_time">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
      <item row="0" column="1" rowspan="2">
       <widget class="QProgressBar" name="progressBar">
        <property name="sizePolicy">
@@ -89,14 +69,67 @@
        </property>
       </widget>
      </item>
-     <item row="0" column="0" rowspan="2">
-      <widget class="QLabel" name="lbl_time">
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
-     </item>
     </layout>
+   </item>
+   <item row="0" column="1">
+    <widget class="QTabWidget" name="mainTab">
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="tab_data">
+      <attribute name="title">
+       <string>Database log</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_2">
+       <item row="1" column="0">
+        <widget class="QGroupBox" name="groupBox_2">
+         <property name="title">
+          <string>Database health check:</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_5">
+          <item row="0" column="0">
+           <layout class="QGridLayout" name="lyt_data_2"/>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QGroupBox" name="groupBox">
+         <property name="title">
+          <string>System health check:</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_3">
+          <item row="0" column="0">
+           <layout class="QGridLayout" name="lyt_data_1"/>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="0" column="1" rowspan="2">
+        <widget class="QGroupBox" name="groupBox_3">
+         <property name="title">
+          <string>Info:</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_6">
+          <item row="0" column="0">
+           <layout class="QGridLayout" name="lyt_data_3"/>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab_log">
+      <attribute name="title">
+       <string>Logs</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_4">
+       <item row="0" column="0">
+        <layout class="QGridLayout" name="lyt_log_1" rowstretch="0" columnstretch="0"/>
+       </item>
+      </layout>
+     </widget>
+    </widget>
    </item>
   </layout>
  </widget>
