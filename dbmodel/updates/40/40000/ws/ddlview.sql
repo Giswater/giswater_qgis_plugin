@@ -94,6 +94,7 @@ AS WITH streetaxis AS (
     cat_arc.pnom AS cat_pnom,
     cat_arc.dnom AS cat_dnom,
     cat_arc.dint AS cat_dint,
+    cat_arc.dr AS cat_dr,
     arc.epa_type,
     arc.state,
     arc.state_type,
@@ -287,6 +288,7 @@ AS WITH
       cat_arc.pnom AS cat_pnom,
       cat_arc.dnom AS cat_dnom,
       cat_arc.dint AS cat_dint,
+      cat_arc.dr AS cat_dr,
       arc.epa_type,
       arc.state,
       arc.state_type,
@@ -539,7 +541,8 @@ AS WITH streetaxis AS (
     CASE
         WHEN vst.is_operative = true AND node.epa_type::text <> 'UNDEFINED'::character varying(16)::text THEN node.epa_type
         ELSE NULL::character varying(16)
-	END AS inp_type
+	END AS inp_type,
+  node.pavcat_id
    FROM node
      LEFT JOIN cat_node ON cat_node.id::text = node.nodecat_id::text
      JOIN cat_feature ON cat_feature.id::text = cat_node.node_type::text
@@ -741,7 +744,8 @@ AS WITH
           ELSE NULL::character varying(16)
         END AS inp_type,
         m.closed as closed_valve,
-        m.broken as broken_valve
+        m.broken as broken_valve,
+        node.pavcat_id
         FROM node_selector
         JOIN node ON node.node_id = node_selector.node_id
         JOIN selector_expl se ON (se.cur_user =current_user AND se.expl_id = node.expl_id) or (se.cur_user = current_user AND se.expl_id = node.expl_id2)

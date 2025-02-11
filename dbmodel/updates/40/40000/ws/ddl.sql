@@ -1046,3 +1046,9 @@ ALTER TABLE doc_x_workcat DROP CONSTRAINT doc_x_workcat_pkey;
 ALTER TABLE doc_x_workcat DROP CONSTRAINT unique_doc_id_workcat_id;
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP", "table":"doc_x_workcat", "column":"id"}}$$);
 ALTER TABLE doc_x_workcat ADD CONSTRAINT doc_x_workcat_pkey PRIMARY KEY (doc_id, workcat_id);
+
+-- 10/02/2025
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node", "column":"pavcat_id", "dataType":"text", "isUtils":"False"}}$$);
+ALTER TABLE node ADD CONSTRAINT cat_pavement_id_fkey FOREIGN KEY (pavcat_id) REFERENCES cat_pavement(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_arc", "column":"dr", "dataType":"integer", "isUtils":"False"}}$$);
