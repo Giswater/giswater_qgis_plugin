@@ -56,6 +56,8 @@ v_field json;
 v_qgis_project_type text;
 v_logfoldervolume text;
 v_uservalues json;
+v_show_versions boolean=True;
+v_show_qgis_project boolean=True;
 
 BEGIN
 
@@ -78,6 +80,8 @@ BEGIN
 	v_insert_fields := (p_data ->> 'data')::json->> 'fields';
 	v_qgis_project_type := (p_data ->> 'data')::json->> 'projectType';
 	v_logfoldervolume := (p_data ->> 'data')::json->> 'logFolderVolume';
+	v_show_versions :=  ((p_data ->> 'data')::json->>'parameters')::json->> 'showVersions';
+	v_show_qgis_project :=  ((p_data ->> 'data')::json->>'parameters')::json->> 'showQgisProject';
 
 	-- profilactic control of qgis variables
 	IF lower(v_mainschema) = 'none' OR v_mainschema = '' OR lower(v_mainschema) ='null' THEN v_mainschema = null; END IF;
@@ -104,32 +108,37 @@ BEGIN
 	-- create temp tables
 	EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"fid":'||v_fid||', "project_type":"'||v_project_type||'", "action":"CREATE", "group":"CHECKPROJECT"}}}$$)';
 
-	--check plugin and db version and other system parameters
-	IF v_qgis_version = v_version THEN
-		v_errortext=concat('Giswater version: ',v_version,'.');
-		INSERT INTO t_audit_check_data (fid,  criticity, error_message,fcount)
-		VALUES (101, 4, v_errortext,0);
-	ELSE
-		v_errortext=concat('ERROR-349: Version of plugin is different than the database version. DB: ',v_version,', plugin: ',v_qgis_version,'.');
-		INSERT INTO t_audit_check_data (fid,  criticity, result_id, error_message, fcount)
-		VALUES (101, 3, '349',v_errortext, 1);
+	IF v_show_versions THEN
+		--check plugin and db version and other system parameters
+		IF v_qgis_version = v_version THEN
+			v_errortext=concat('Giswater version: ',v_version,'.');
+			INSERT INTO t_audit_check_data (fid,  criticity, error_message,fcount)
+			VALUES (101, 4, v_errortext,0);
+		ELSE
+			v_errortext=concat('ERROR-349: Version of plugin is different than the database version. DB: ',v_version,', plugin: ',v_qgis_version,'.');
+			INSERT INTO t_audit_check_data (fid,  criticity, result_id, error_message, fcount)
+			VALUES (101, 3, '349',v_errortext, 1);
+		END IF;
+
+		INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (101, 4, concat ('PostgreSQL version: ',(SELECT version())));
+		INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (101, 4, concat ('PostGIS version: ',(SELECT postgis_version())));
+		INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (101, 4, concat ('QGIS version: ', v_qgisversion));
+		INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (101, 4, concat ('O/S version: ', v_osversion));
 	END IF;
 
-	INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (101, 4, concat ('PostgreSQL version: ',(SELECT version())));
-	INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (101, 4, concat ('PostGIS version: ',(SELECT postgis_version())));
-	INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (101, 4, concat ('QGIS version: ', v_qgisversion));
-	INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (101, 4, concat ('O/S version: ', v_osversion));
-	INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (101, 4, concat ('Log volume (User folder): ', v_logfoldervolume));
-	INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (101, 4, concat ('QGIS variables: gwProjectType:',quote_nullable(v_qgis_project_type),', gwInfoType:',
-	quote_nullable(v_infotype),', gwProjectRole:', quote_nullable(v_projectrole),', gwMainSchema:',quote_nullable(v_mainschema),', gwAddSchema:',quote_nullable(v_addschema)));
-	v_errortext=concat('Logged as ', current_user,' on ', now());
-	INSERT INTO t_audit_check_data (fid,  criticity, error_message) VALUES (101, 4, v_errortext);
+	IF v_show_qgis_project THEN
+		INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (101, 4, concat ('Log volume (User folder): ', v_logfoldervolume));
+		INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (101, 4, concat ('QGIS variables: gwProjectType:',quote_nullable(v_qgis_project_type),', gwInfoType:',
+		quote_nullable(v_infotype),', gwProjectRole:', quote_nullable(v_projectrole),', gwMainSchema:',quote_nullable(v_mainschema),', gwAddSchema:',quote_nullable(v_addschema)));
+		v_errortext=concat('Logged as ', current_user,' on ', now());
+		INSERT INTO t_audit_check_data (fid,  criticity, error_message) VALUES (101, 4, v_errortext);
+	END IF;
 
 	-- check layers from project and insert on log table
 	v_querytext=NULL;
 	FOR v_field in SELECT * FROM json_array_elements(v_insert_fields) LOOP
 		select into v_querytext concat(v_querytext, 'INSERT INTO t_audit_check_project (table_schema, table_id, table_dbname, table_host, fid, table_user) ') ;
-		select into v_querytext concat(v_querytext, 'VALUES('||quote_literal((v_field->>'table_schema'))||', '||quote_literal((v_field->>'table_id'))||', '||quote_literal((v_field->>'table_dbname'))||', 
+		select into v_querytext concat(v_querytext, 'VALUES('||quote_literal((v_field->>'table_schema'))||', '||quote_literal((v_field->>'table_id'))||', '||quote_literal((v_field->>'table_dbname'))||',
 		'||quote_literal((v_field->>'table_host'))||'') ;
 		select into v_querytext concat(v_querytext, ', '||quote_literal((v_field->>'fid'))||', '||quote_literal((v_field->>'table_user'))||');') ;
 	END LOOP;
