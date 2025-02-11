@@ -332,7 +332,7 @@ class GwImportInpTask(GwTask):
             self._save_subcatchments()
 
     def _manage_flwreg(self) -> None:
-        """ Execute database function 'gw_fct_import_swmm_nodarcs' """
+        """ Execute database function 'gw_fct_import_swmm_flwreg' """
 
         extras = ""
         if self.manage_flwreg["pumps"]:
@@ -360,10 +360,10 @@ class GwImportInpTask(GwTask):
             extras = extras[:-1]
 
             body = tools_gw.create_body(extras=extras)
-            json_result = tools_gw.execute_procedure('gw_fct_import_swmm_nodarcs', body, commit=self.force_commit,
+            json_result = tools_gw.execute_procedure('gw_fct_import_swmm_flwreg', body, commit=self.force_commit,
                                                     is_thread=True, aux_conn=self.aux_conn)
             if not json_result or json_result.get('status') != 'Accepted':
-                message = "Error executing gw_fct_import_swmm_nodarcs"
+                message = "Error executing gw_fct_import_swmm_flwreg"
                 raise ValueError(message)
 
     def _validate_inputs(self) -> None:
