@@ -177,6 +177,7 @@ class GwImportInpTask(GwTask):
         municipality,
         raingage,
         catalogs,
+        manage_flwreg: dict[str, bool] = {"pumps": False, "orifices": False, "weirs": False, "outlets": False},
         force_commit: bool = False,
     ) -> None:
         super().__init__(description)
@@ -189,6 +190,7 @@ class GwImportInpTask(GwTask):
         self.dscenario_id: Optional[int] = None
         self.default_raingage: Optional[str] = raingage
         self.catalogs: dict[str, Any] = catalogs
+        self.manage_flwreg: dict[str, bool] = manage_flwreg
         self.force_commit: bool = force_commit
         self.update_municipality: bool = False
         self.log: list[str] = []
@@ -231,6 +233,11 @@ class GwImportInpTask(GwTask):
                 self._update_municipality()
 
             self._manage_others()
+
+            if any(self.manage_flwreg.values()):
+                self.progress_changed.emit("Flow regulators", self.PROGRESS_SOURCES, "Converting to flwreg...", False)
+                self._manage_flwreg()
+                self.progress_changed.emit("Flow regulators", self.PROGRESS_END, "done!", True)
 
             execute_sql("select 1", commit=True)
             report_message = '\n'.join([f"{k.upper()} imported: {v}" for k, v in self.results.items()])
@@ -323,6 +330,39 @@ class GwImportInpTask(GwTask):
         if SUBCATCHMENTS in self.network:
             self.progress_changed.emit("Others", lerp_progress(40, self.PROGRESS_VISUAL, self.PROGRESS_END), "Importing subcatchments", True)
             self._save_subcatchments()
+
+    def _manage_flwreg(self) -> None:
+        """ Execute database function 'gw_fct_import_swmm_nodarcs' """
+
+        extras = ""
+        if self.manage_flwreg["pumps"]:
+            extras += f'''"pump": {{
+                "featureClass": "{self.catalogs['features']['pumps']}",
+                "catalog": "{self.catalogs['pumps']}"
+            }},'''
+        if self.manage_flwreg["orifices"]:
+            extras += f'''"orifice": {{
+                "featureClass": "{self.catalogs['features']['orifices']}",
+                "catalog": "{self.catalogs['orifices']}"
+            }},'''
+        if self.manage_flwreg["weirs"]:
+            extras += f'''"weir": {{
+                "featureClass": "{self.catalogs['features']['weirs']}",
+                "catalog": "{self.catalogs['weirs']}"
+            }},'''
+        if self.manage_flwreg["outlets"]:
+            extras += f'''"outlet": {{
+                "featureClass": "{self.catalogs['features']['outlets']}",
+                "catalog": "{self.catalogs['outlets']}"
+            }},'''
+        extras = extras[:-1]
+
+        body = tools_gw.create_body(extras=extras)
+        json_result = tools_gw.execute_procedure('gw_fct_import_swmm_nodarcs', body, commit=self.force_commit,
+                                                 is_thread=True, aux_conn=self.aux_conn)
+        if not json_result or json_result.get('status') != 'Accepted':
+            message = "Error executing gw_fct_import_swmm_nodarcs"
+            raise ValueError(message)
 
     def _validate_inputs(self) -> None:
         if self.workcat in (None, ""):

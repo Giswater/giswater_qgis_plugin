@@ -188,6 +188,12 @@ class GwImportSwmm:
         if force_commit is None:
             force_commit = False
 
+        manage_flwreg = {
+            "pumps": self.catalog_source["pumps"] == "db_flwreg",
+            "orifices": self.catalog_source["orifices"] == "db_flwreg",
+            "weirs": self.catalog_source["weirs"] == "db_flwreg",
+            "outlets": self.catalog_source["outlets"] == "db_flwreg"
+        }
         if TESTING_MODE:
 
             # Delete the network before importing
@@ -301,6 +307,7 @@ class GwImportSwmm:
                 municipality,
                 raingage,
                 catalogs,
+                manage_flwreg=manage_flwreg,
                 force_commit=force_commit
             )
 
@@ -414,6 +421,7 @@ class GwImportSwmm:
             municipality,
             raingage,
             catalogs,
+            manage_flwreg=manage_flwreg,
             force_commit=force_commit
         )
 
