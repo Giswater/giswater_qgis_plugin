@@ -262,7 +262,20 @@ BEGIN
 
 			-- control of dma and fluidtype automatic values
 			IF v_dma_autoupdate is true or v_dma_autoupdate is null THEN v_dma = v_arc.dma_id; ELSE v_dma = NEW.dma_id; END IF;
-			IF v_fluidtype_autoupdate is true or v_fluidtype_autoupdate is null THEN v_fluidtype = v_arc.fluid_type; ELSE v_fluidtype = NEW.fluid_type; END IF;
+			IF v_fluidtype_autoupdate is true or v_fluidtype_autoupdate is null 
+				THEN v_fluidtype = v_arc.fluid_type; 
+			ELSE
+				-- if no automatic values, take the value from the feature_id or the NEW.fluid_type
+				IF NEW.fluid_type is NULL then
+					IF NEW.feature_type='GULLY' THEN
+						v_fluidtype = (SELECT fluid_type FROM gully WHERE gully_id=NEW.feature_id);
+					ELSIF NEW.feature_type='CONNEC' THEN
+						v_fluidtype = (SELECT fluid_type FROM connec WHERE connec_id=NEW.feature_id);
+					END IF;
+				ELSE
+					v_fluidtype = NEW.fluid_type;
+				END IF;
+			END IF;
 
 
 			IF v_projectype='WS' THEN
@@ -296,7 +309,20 @@ BEGIN
 
 			-- control of dma and fluidtype automatic values
 			IF v_dma_autoupdate is true or v_dma_autoupdate is null THEN v_dma = v_node.dma_id; ELSE v_dma = NEW.dma_id; END IF;
-			IF v_fluidtype_autoupdate is true or v_fluidtype_autoupdate is null THEN v_fluidtype = v_node.fluid_type; ELSE v_fluidtype = NEW.fluid_type; END IF;
+			IF v_fluidtype_autoupdate is true or v_fluidtype_autoupdate is null 
+				THEN v_fluidtype = v_node.fluid_type; 
+			ELSE
+				-- if no automatic values, take the value from the feature_id or the NEW.fluid_type
+				IF NEW.fluid_type is NULL then
+					IF NEW.feature_type='GULLY' THEN
+						v_fluidtype = (SELECT fluid_type FROM gully WHERE gully_id=NEW.feature_id);
+					ELSIF NEW.feature_type='CONNEC' THEN
+						v_fluidtype = (SELECT fluid_type FROM connec WHERE connec_id=NEW.feature_id);
+					END IF;
+				ELSE
+					v_fluidtype = NEW.fluid_type;
+				END IF;
+			END IF;
 
 			IF v_projectype='WS' THEN
 				v_presszone = v_node.presszone_id;
@@ -333,7 +359,20 @@ BEGIN
 
             -- control of dma and fluidtype automatic values
 			IF v_dma_autoupdate is true or v_dma_autoupdate is null THEN v_dma = v_connec2.dma_id; ELSE v_dma = NEW.dma_id; END IF;
-			IF v_fluidtype_autoupdate is true or v_fluidtype_autoupdate is null THEN v_fluidtype = v_connec2.fluid_type; ELSE v_fluidtype = NEW.fluid_type; END IF;
+			IF v_fluidtype_autoupdate is true or v_fluidtype_autoupdate is null THEN 
+				v_fluidtype = v_connec2.fluid_type; 
+			ELSE
+				-- if no automatic values, take the value from the feature_id or the NEW.fluid_type
+				IF NEW.fluid_type is NULL then
+					IF NEW.feature_type='GULLY' THEN
+						v_fluidtype = (SELECT fluid_type FROM gully WHERE gully_id=NEW.feature_id);
+					ELSIF NEW.feature_type='CONNEC' THEN
+						v_fluidtype = (SELECT fluid_type FROM connec WHERE connec_id=NEW.feature_id);
+					END IF;
+				ELSE
+					v_fluidtype = NEW.fluid_type;
+				END IF;
+			END IF;
 
 			IF v_projectype='WS' THEN
 				v_presszone = v_connec2.presszone_id;
@@ -363,7 +402,20 @@ BEGIN
 
                 -- control of dma and fluidtype automatic values
                 IF v_dma_autoupdate is true or v_dma_autoupdate is null THEN v_dma = v_gully2.dma_id; ELSE v_dma = NEW.dma_id; END IF;
-                IF v_fluidtype_autoupdate is true or v_fluidtype_autoupdate is null THEN v_fluidtype = v_gully2.fluid_type; ELSE v_fluidtype = NEW.fluid_type; END IF;
+                IF v_fluidtype_autoupdate is true or v_fluidtype_autoupdate is null THEN 
+					v_fluidtype = v_gully2.fluid_type; 
+				ELSE
+					-- if no automatic values, take the value from the feature_id or the NEW.fluid_type
+					IF NEW.fluid_type is NULL then
+						IF NEW.feature_type='GULLY' THEN
+							v_fluidtype = (SELECT fluid_type FROM gully WHERE gully_id=NEW.feature_id);
+						ELSIF NEW.feature_type='CONNEC' THEN
+							v_fluidtype = (SELECT fluid_type FROM connec WHERE connec_id=NEW.feature_id);
+						END IF;
+					ELSE
+						v_fluidtype = NEW.fluid_type;
+					END IF;
+				END IF;
 
 				-- others
 				v_end_state= v_gully2.state;
