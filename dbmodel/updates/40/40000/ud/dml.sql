@@ -2639,3 +2639,7 @@ JOIN rpt_nodesurcharge_sum c USING (result_id)
 JOIN rpt_nodeflooding_sum f USING (result_id);
 
 UPDATE config_form_fields SET columnname = 'mfull_depth', label = 'mfull_depth', tooltip = 'mfull_depth' WHERE columnname = 'mfull_dept';
+
+-- 11/02/2025
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('layout_name_typevalue', 'lyt_log_1', 'lyt_log_1', 'lytLog1', NULL);
+
