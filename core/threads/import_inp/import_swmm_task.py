@@ -1240,6 +1240,11 @@ class GwImportInpTask(GwTask):
 
     def _save_pumps(self) -> None:
         feature_class = self.catalogs['features']['pumps']
+        arccat_id = self.catalogs["pumps"]
+        # Set 'fake' catalogs if it will be converted to flwreg
+        if self.manage_flwreg["pumps"]:
+            feature_class = "VARC"
+            arccat_id = "VIRTUAL"
 
         arc_sql = """ 
             INSERT INTO arc (
@@ -1281,7 +1286,6 @@ class GwImportInpTask(GwTask):
             except KeyError as e:
                 self._log_message(f"Node not found: {e}")
                 continue
-            arccat_id = self.catalogs["pumps"]
             epa_type = "PUMP"
             expl_id = self.exploitation
             sector_id = self.sector
@@ -1349,6 +1353,11 @@ class GwImportInpTask(GwTask):
 
     def _save_orifices(self) -> None:
         feature_class = self.catalogs['features']['orifices']
+        arccat_id = self.catalogs["orifices"]
+        # Set 'fake' catalogs if it will be converted to flwreg
+        if self.manage_flwreg["orifices"]:
+            feature_class = "VARC"
+            arccat_id = "VIRTUAL"
 
         arc_sql = """ 
             INSERT INTO arc (
@@ -1391,7 +1400,6 @@ class GwImportInpTask(GwTask):
                 self._log_message(f"Node not found: {e}")
                 continue
             xs = self.network[XSECTIONS][o_name]
-            arccat_id = self.catalogs["orifices"]
             epa_type = "ORIFICE"
             expl_id = self.exploitation
             sector_id = self.sector
@@ -1467,6 +1475,11 @@ class GwImportInpTask(GwTask):
 
     def _save_weirs(self) -> None:
         feature_class = self.catalogs['features']['weirs']
+        arccat_id = self.catalogs["weirs"]
+        # Set 'fake' catalogs if it will be converted to flwreg
+        if self.manage_flwreg["weirs"]:
+            feature_class = "VARC"
+            arccat_id = "VIRTUAL"
 
         arc_sql = """ 
             INSERT INTO arc (
@@ -1509,7 +1522,6 @@ class GwImportInpTask(GwTask):
                 self._log_message(f"Node not found: {e}")
                 continue
             xs = self.network[XSECTIONS][w_name]
-            arccat_id = self.catalogs["weirs"]
             epa_type = "WEIR"
             expl_id = self.exploitation
             sector_id = self.sector
@@ -1590,6 +1602,11 @@ class GwImportInpTask(GwTask):
 
     def _save_outlets(self) -> None:
         feature_class = self.catalogs['features']['outlets']
+        arccat_id = self.catalogs["outlets"]
+        # Set 'fake' catalogs if it will be converted to flwreg
+        if self.manage_flwreg["outlets"]:
+            feature_class = "VARC"
+            arccat_id = "VIRTUAL"
 
         arc_sql = """ 
             INSERT INTO arc (
@@ -1631,7 +1648,6 @@ class GwImportInpTask(GwTask):
             except KeyError as e:
                 self._log_message(f"Node not found: {e}")
                 continue
-            arccat_id = self.catalogs["outlets"]
             epa_type = "OUTLET"
             expl_id = self.exploitation
             sector_id = self.sector
