@@ -140,7 +140,7 @@ def save_config(self_cls, workcat: Optional[str] = None, exploitation: Optional[
             config_folder = f'{lib_vars.user_folder_dir}{os.sep}core{os.sep}temp'
             if not os.path.exists(config_folder):
                 os.makedirs(config_folder)
-            file_name = "import_epanet_config.json" if global_vars.project_type == ProjectType.WS else "import_swmm_config.json"
+            file_name = "import_epanet_config.json" if global_vars.project_type == ProjectType.WS.value else "import_swmm_config.json"
             path_temp_file = f"{config_folder}{os.sep}{file_name}"
             config_path: Path = Path(path_temp_file)
         else:
@@ -156,7 +156,7 @@ def load_config(self_cls, config: Optional[GwInpConfig] = None) -> Optional[GwIn
 
     if config is None:
         config_folder = f'{lib_vars.user_folder_dir}{os.sep}core{os.sep}temp'
-        file_name = "import_epanet_config.json" if global_vars.project_type == ProjectType.WS else "import_swmm_config.json"
+        file_name = "import_epanet_config.json" if global_vars.project_type == ProjectType.WS.value else "import_swmm_config.json"
         path_temp_file = f"{config_folder}{os.sep}{file_name}"
         config_path: Path = Path(path_temp_file)
         if not os.path.exists(config_path):
@@ -168,9 +168,9 @@ def load_config(self_cls, config: Optional[GwInpConfig] = None) -> Optional[GwIn
 
     # Fill 'Basic' tab widgets
     tools_qt.set_widget_text(self_cls.dlg_config, 'txt_workcat', config.workcat)
-    if global_vars.project_type == ProjectType.WS:
+    if global_vars.project_type == ProjectType.WS.value:
         tools_qt.set_widget_text(self_cls.dlg_config, 'txt_dscenario', config.dscenario)
-    elif global_vars.project_type == ProjectType.UD:
+    elif global_vars.project_type == ProjectType.UD.value:
         tools_qt.set_widget_text(self_cls.dlg_config, 'txt_raingage', config.raingage)
     tools_qt.set_combo_value(self_cls.dlg_config.cmb_expl, config.exploitation, 0)
     tools_qt.set_combo_value(self_cls.dlg_config.cmb_sector, config.sector, 0)
@@ -192,7 +192,7 @@ def load_config(self_cls, config: Optional[GwInpConfig] = None) -> Optional[GwIn
 def fill_txt_info(self_cls, dialog):
     """Fill the text information in the dialog"""
 
-    epa_software = "EPANET" if global_vars.project_type == ProjectType.WS else "SWMM"
+    epa_software = "EPANET" if global_vars.project_type == ProjectType.WS.value else "SWMM"
     info_str = f"<h3>IMPORT INP ({epa_software})</h3>"
     info_str += "<p>"
     info_str += f"This wizard will help with the process of importing a network from a {epa_software} INP file into the Giswater database.<br><br>"
