@@ -187,7 +187,6 @@ class GwImportInpTask(GwTask):
         self.exploitation: int = exploitation
         self.sector: int = sector
         self.municipality: int = municipality
-        self.dscenario_id: Optional[int] = None
         self.default_raingage: Optional[str] = raingage
         self.catalogs: dict[str, Any] = catalogs
         self.manage_flwreg: dict[str, bool] = manage_flwreg
@@ -482,26 +481,6 @@ class GwImportInpTask(GwTask):
             (self.workcat, description, builtdate),
             commit=self.force_commit,
         )
-
-    def _create_demand_dscenario(self):
-        extras = '"parameters": {'
-        extras += '"name": "demands_import_inp",'  # TODO: ask user for name?
-        extras += '"descript": "Demand dscenario used when importing INP file",'
-        extras += '"parent": null,'
-        extras += '"type": "DEMAND",'
-        extras += '"active": "true",'
-        extras += f'"expl": "{self.exploitation}"'
-        extras += '}'
-        body = tools_gw.create_body(extras=extras)
-        json_result = tools_gw.execute_procedure('gw_fct_create_dscenario_empty', body, commit=self.force_commit, is_thread=True)
-        if not json_result or json_result.get('status') != 'Accepted':
-            message = "Error executing gw_fct_create_dscenario_empty"
-            raise ValueError(message)
-
-        self.dscenario_id = json_result['body']['data'].get('dscenario_id')
-        if self.dscenario_id is None:
-            message = "Function gw_fct_create_dscenario_empty returned no dscenario_id"
-            raise ValueError(message)
 
     def _create_new_node_catalogs(self):
         cat_node_ids = get_rows("SELECT id FROM cat_node", commit=self.force_commit)
