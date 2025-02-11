@@ -355,14 +355,16 @@ class GwImportInpTask(GwTask):
                 "featureClass": "{self.catalogs['features']['outlets']}",
                 "catalog": "{self.catalogs['outlets']}"
             }},'''
-        extras = extras[:-1]
 
-        body = tools_gw.create_body(extras=extras)
-        json_result = tools_gw.execute_procedure('gw_fct_import_swmm_nodarcs', body, commit=self.force_commit,
-                                                 is_thread=True, aux_conn=self.aux_conn)
-        if not json_result or json_result.get('status') != 'Accepted':
-            message = "Error executing gw_fct_import_swmm_nodarcs"
-            raise ValueError(message)
+        if extras:
+            extras = extras[:-1]
+
+            body = tools_gw.create_body(extras=extras)
+            json_result = tools_gw.execute_procedure('gw_fct_import_swmm_nodarcs', body, commit=self.force_commit,
+                                                    is_thread=True, aux_conn=self.aux_conn)
+            if not json_result or json_result.get('status') != 'Accepted':
+                message = "Error executing gw_fct_import_swmm_nodarcs"
+                raise ValueError(message)
 
     def _validate_inputs(self) -> None:
         if self.workcat in (None, ""):
