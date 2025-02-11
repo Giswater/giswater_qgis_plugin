@@ -147,9 +147,10 @@ class GwImportEpanet:
         load_config(self)
 
     def _manage_widgets_visibility(self):
-        # Hide 'Default Raingage' widget for WS
+        # Hide widgets for WS
         tools_qt.set_widget_visible(self.dlg_config, "lbl_raingage", False)
         tools_qt.set_widget_visible(self.dlg_config, "txt_raingage", False)
+        tools_qt.remove_tab(self.dlg_config.mainTab, "tab_flwreg")
 
         # Disable the whole dialog if testing mode
         if TESTING_MODE:
