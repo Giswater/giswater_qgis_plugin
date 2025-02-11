@@ -97,7 +97,12 @@ BEGIN
     FOR v_data IN
         SELECT *
         FROM arc
-        WHERE epa_type IN ('PUMP', 'ORIFICE', 'WEIR', 'OUTLET') AND state = 1
+        WHERE epa_type IN ('PUMP', 'ORIFICE', 'WEIR', 'OUTLET') AND state = 1 AND (
+            (epa_type = 'PUMP' AND v_pump_featureclass IS NOT NULL) OR
+            (epa_type = 'ORIFICE' AND v_orifice_featureclass IS NOT NULL) OR
+            (epa_type = 'WEIR' AND v_weir_featureclass IS NOT NULL) OR
+            (epa_type = 'OUTLET' AND v_outlet_featureclass IS NOT NULL)
+        )
     LOOP
         raise notice 'processing arc -> arc_id=% epa_type=%', v_data.arc_id, v_data.epa_type;
         -- getting man_table to work with
