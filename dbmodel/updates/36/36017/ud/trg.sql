@@ -21,3 +21,11 @@ ON v_ui_drainzone FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_drainzone('ui');
 
 CREATE TRIGGER gw_trg_edit_drainzone INSTEAD OF INSERT OR DELETE OR UPDATE
 ON v_edit_drainzone FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_drainzone('edit');
+
+DROP TRIGGER IF EXISTS gw_trg_edit_pol_connec ON ve_pol_connec;
+CREATE TRIGGER gw_trg_edit_pol_connec INSTEAD OF INSERT OR DELETE OR UPDATE 
+ON ve_pol_connec FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_man_connec_pol();
+
+DROP TRIGGER IF EXISTS gw_trg_edit_pol_node ON ve_pol_node;
+CREATE TRIGGER gw_trg_edit_pol_node INSTEAD OF INSERT OR DELETE OR UPDATE 
+ON ve_pol_node FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_man_node_pol();
