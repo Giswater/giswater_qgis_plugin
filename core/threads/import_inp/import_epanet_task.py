@@ -136,6 +136,7 @@ class GwImportInpTask(GwTask):
         municipality,
         dscenario,
         catalogs,
+        manage_nodarcs: dict[str, bool] = {"pumps": False, "valves": False},
         force_commit: bool = False,
     ) -> None:
         super().__init__(description)
@@ -150,6 +151,7 @@ class GwImportInpTask(GwTask):
         self.catalogs: dict[str, Any] = catalogs
         self.force_commit: bool = force_commit
         self.update_municipality: bool = False
+        self.manage_nodarcs: dict[str, bool] = manage_nodarcs
         self.log: list[str] = []
         self.mappings: dict[str, dict[str, str]] = {"curves": {}, "patterns": {}}
         self.arccat_db: list[str] = []
@@ -185,6 +187,11 @@ class GwImportInpTask(GwTask):
             self.progress_changed.emit("Sources", self.PROGRESS_VISUAL, "Importing sources...", False)
             self._save_sources()
             self.progress_changed.emit("Sources", self.PROGRESS_SOURCES, "done!", True)
+
+            if any(self.manage_nodarcs.values()):
+                self.progress_changed.emit("Nodarcs", self.PROGRESS_SOURCES, "Managing nodarcs (pumps/valves as nodes)...", False)
+                self._manage_nodarcs()
+                self.progress_changed.emit("Nodarcs", self.PROGRESS_END, "done!", True)
 
             execute_sql("select 1", commit=True)
             self.progress_changed.emit("", self.PROGRESS_END, "ALL DONE! INP successfully imported.", True)
@@ -1331,6 +1338,20 @@ class GwImportInpTask(GwTask):
             """
             params = (source_type, source_quality, source_pattern_id, node_id)
             execute_sql(sql, params)
+
+    def _manage_nodarcs(self):
+        """ Transform pumps and valves into nodes """
+
+        extras = ""
+        if self.manage_nodarcs["valves"]:
+            extras += f'"valvesType": "{self.catalogs["features"]["valves"]}",'
+        if self.manage_nodarcs["pumps"]:
+            extras += f'"pumpsType": "{self.catalogs["features"]["pumps"]}",'
+        if extras:
+            extras = extras[:-1]
+            body = tools_gw.create_body(extras=extras)
+            tools_gw.execute_procedure("gw_fct_import_epanet_nodarcs", body, commit=self.force_commit,
+                                       is_thread=True, aux_conn=self.aux_conn)
 
     def _update_municipality(self):
         """ Update the muni_id of all features getting the spatial intersection with the municipality """

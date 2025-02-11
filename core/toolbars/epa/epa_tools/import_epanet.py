@@ -162,6 +162,11 @@ class GwImportEpanet:
         if force_commit is None:
             force_commit = False
 
+        manage_nodarcs = {
+            "pumps": self.catalog_source["pumps"] == "db_nodes",
+            "valves": self.catalog_source["valves"] == "db_nodes"
+        }
+
         self.dlg_config.mainTab.setCurrentIndex(self.dlg_config.mainTab.count()-1)
         if TESTING_MODE:
             # Show warning message
@@ -243,6 +248,7 @@ class GwImportEpanet:
                 municipality,
                 dscenario,
                 catalogs,
+                manage_nodarcs=manage_nodarcs,
                 force_commit=force_commit
             )
 
@@ -352,6 +358,7 @@ class GwImportEpanet:
             municipality,
             dscenario,
             catalogs,
+            manage_nodarcs=manage_nodarcs,
             force_commit=force_commit,
         )
 
