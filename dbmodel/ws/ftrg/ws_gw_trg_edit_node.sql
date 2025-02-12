@@ -163,6 +163,11 @@ BEGIN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 			"data":{"message":"1090", "function":"1320","parameters":null}}$$);';
 			END IF;
+		ELSE
+			IF (SELECT true from cat_node where id=NEW.nodecat_id) IS NULL THEN
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+				"data":{"message":"3282", "function":"1320","debug_msg":"'||NEW.nodecat_id||'"}}$$);';
+			END IF;
 		END IF;
 
 

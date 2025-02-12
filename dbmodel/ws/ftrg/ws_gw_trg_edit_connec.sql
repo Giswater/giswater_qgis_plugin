@@ -157,6 +157,11 @@ BEGIN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 				 "data":{"message":"1086", "function":"1304","parameters":null, "variables":null}}$$);';
 			END IF;
+		ELSE
+			IF (SELECT true from cat_connec where id=NEW.connecat_id) IS NULL THEN
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+				"data":{"message":"3282", "function":"1304","debug_msg":"'||NEW.connecat_id||'"}}$$);';
+			END IF;
 		END IF;
 
 		-- Exploitation

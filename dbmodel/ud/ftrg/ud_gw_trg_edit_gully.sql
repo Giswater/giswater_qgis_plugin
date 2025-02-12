@@ -159,6 +159,11 @@ BEGIN
 		-- Gully Catalog ID
 		IF (NEW.gullycat_id IS NULL OR NEW.gullycat_id = '') THEN
 				NEW.gullycat_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_gullycat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+		ELSE
+			IF (SELECT true from cat_gully where id=NEW.gullycat_id) IS NULL THEN
+				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+				"data":{"message":"3282", "function":"1206","debug_msg":"'||NEW.gullycat_id||'"}}$$);';
+			END IF;
 		END IF;
 
 		-- Arc Catalog ID

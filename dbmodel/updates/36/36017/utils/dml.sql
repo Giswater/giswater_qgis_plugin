@@ -85,3 +85,6 @@ UPDATE config_param_system SET isenabled = false where parameter = ' basic_selec
 
 -- 07/02/2025
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('v_edit_dimensions', 'form_feature', 'tab_none', 'workcat_id', 'lyt_other', 13, 'integer', 'typeahead', 'workcat_id', 'workcat_id', NULL, false, false, true, false, NULL, 'SELECT id, id as idval FROM cat_work WHERE id IS NOT NULL', true, true, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, true, NULL);
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source") 
+VALUES(3282, 'The inserted catalog value does not exist -->', 'Please review and insert it into the related catalog table', 2, true, 'utils', 'core');
