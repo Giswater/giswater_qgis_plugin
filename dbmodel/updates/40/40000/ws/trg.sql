@@ -312,3 +312,6 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_ui_doc('doc_x_node');
 
 CREATE TRIGGER gw_trg_ui_doc_x_visit INSTEAD OF INSERT OR DELETE OR UPDATE ON v_ui_doc_x_visit
 FOR EACH ROW EXECUTE FUNCTION gw_trg_ui_doc('doc_x_visit');
+
+CREATE TRIGGER gw_trg_edit_element INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_element
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_element('element');
