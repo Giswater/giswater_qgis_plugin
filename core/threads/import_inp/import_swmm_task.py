@@ -235,8 +235,9 @@ class GwImportInpTask(GwTask):
 
             if any(self.manage_flwreg.values()):
                 self.progress_changed.emit("Flow regulators", self.PROGRESS_SOURCES, "Converting to flwreg...", False)
-                self._manage_flwreg()
+                log_str = self._manage_flwreg()
                 self.progress_changed.emit("Flow regulators", self.PROGRESS_END, "done!", True)
+                self.progress_changed.emit("Flow regulators", self.PROGRESS_END, log_str, True)
 
             execute_sql("select 1", commit=True)
             report_message = '\n'.join([f"{k.upper()} imported: {v}" for k, v in self.results.items()])
@@ -264,6 +265,9 @@ class GwImportInpTask(GwTask):
         self._create_new_varc_catalogs()
         self.progress_changed.emit("Create catalogs", lerp_progress(70, self.PROGRESS_OPTIONS, self.PROGRESS_CATALOGS), "Creating new pipe catalogs", True)
         self._create_new_conduit_catalogs()
+        if any(self.manage_flwreg.values()):
+            self.progress_changed.emit("Create catalogs", lerp_progress(90, self.PROGRESS_OPTIONS, self.PROGRESS_CATALOGS), "Creating new flwreg catalogs", True)
+            self._create_new_flwreg_catalogs()
 
     def _manage_nonvisual(self) -> None:
         if self.network.get(PATTERNS):
@@ -340,7 +344,7 @@ class GwImportInpTask(GwTask):
             self.progress_changed.emit("Others", lerp_progress(40, self.PROGRESS_VISUAL, self.PROGRESS_END), "Importing subcatchments", True)
             self._save_subcatchments()
 
-    def _manage_flwreg(self) -> None:
+    def _manage_flwreg(self) -> str:
         """ Execute database function 'gw_fct_import_swmm_flwreg' """
 
         extras = ""
@@ -370,10 +374,17 @@ class GwImportInpTask(GwTask):
 
             body = tools_gw.create_body(extras=extras)
             json_result = tools_gw.execute_procedure('gw_fct_import_swmm_flwreg', body, commit=self.force_commit,
-                                                    is_thread=True, aux_conn=self.aux_conn)
+                                                    is_thread=True)
             if not json_result or json_result.get('status') != 'Accepted':
                 message = "Error executing gw_fct_import_swmm_flwreg"
                 raise ValueError(message)
+            if json_result['body']['data']['info']:
+                info = json_result['body']['data']['info']
+                if isinstance(info, list):
+                    logs = [x.get('message') for x in info]
+                    logs_str = '\n'.join(logs)
+                    return logs_str
+        return "No flowregs to manage"
 
     def _validate_inputs(self) -> None:
         if self.workcat in (None, ""):
@@ -523,28 +534,38 @@ class GwImportInpTask(GwTask):
     def _create_new_varc_catalogs(self) -> None:
         varc_catalogs: list[str] = ["pumps", "orifices", "weirs", "outlets"]
 
+        # cat_mat_arc has an INSERT rule.
+        # So it's not possible to use ON CONFLICT.
+        # So, we perform a conditional INSERT here.
+        execute_sql(
+            """
+            INSERT INTO cat_material (id, descript, feature_type, n)
+            SELECT 'Unknown', 'Unknown', '{NODE,ARC,CONNEC,ELEMENT,GULLY}', 0.013
+            WHERE NOT EXISTS (
+                SELECT 1
+                FROM cat_material
+                WHERE id = 'Unknown'
+            );
+            """,
+            commit=self.force_commit,
+        )
+
         for varc_type in varc_catalogs:
             if varc_type not in self.catalogs:
                 continue
 
-            if self.catalogs[varc_type] in self.arccat_db:
+            if self.manage_flwreg.get(varc_type):
+                # Just create the 'VARC' catalog to temporarly insert them as varcs
+                execute_sql("""
+                    INSERT INTO cat_arc (id, arc_type, shape, geom1)
+                    VALUES ('VARC', 'VARC', 'VIRTUAL', 0) ON CONFLICT DO NOTHING;
+                """,
+                commit=self.force_commit
+                )
                 continue
 
-            # cat_mat_arc has an INSERT rule.
-            # So it's not possible to use ON CONFLICT.
-            # So, we perform a conditional INSERT here.
-            execute_sql(
-                """
-                INSERT INTO cat_material (id, descript, feature_type, n)
-                SELECT 'Unknown', 'Unknown', '{NODE,ARC,CONNEC,ELEMENT,GULLY}', 0.013
-                WHERE NOT EXISTS (
-                    SELECT 1
-                    FROM cat_material
-                    WHERE id = 'Unknown'
-                );
-                """,
-                commit=self.force_commit,
-            )
+            if self.catalogs[varc_type] in self.arccat_db:
+                continue
 
             sql = """
                 INSERT INTO cat_arc (id, arc_type, shape, geom1)
@@ -572,6 +593,35 @@ class GwImportInpTask(GwTask):
                     sql, (catalog, arctype_id, shape, geom1, geom2, geom3, geom4), commit=self.force_commit
                 )
                 self.arccat_db.append(catalog)
+
+    def _create_new_flwreg_catalogs(self):
+        cat_flwreg_ids = get_rows("SELECT id FROM cat_flwreg", commit=self.force_commit)
+        flwregcat_db: list[str] = []
+        if cat_flwreg_ids:
+            flwregcat_db = [x[0] for x in cat_flwreg_ids]
+
+        flwreg_catalogs: list[str] = ["pumps", "orifices", "weirs", "outlets"]
+        for flwreg_type in flwreg_catalogs:
+            if flwreg_type not in self.catalogs:
+                continue
+
+            if not self.manage_flwreg.get(flwreg_type):
+                continue
+
+            if self.catalogs[flwreg_type] in flwregcat_db:
+                continue
+
+            flwregtype_id: str = self.catalogs["features"][flwreg_type]
+            sql = """
+                INSERT INTO cat_flwreg (id, flwreg_type)
+                VALUES (%s, %s)
+            """
+            execute_sql(
+                sql,
+                (self.catalogs[flwreg_type], flwregtype_id),
+                commit=self.force_commit
+            )
+            flwregcat_db.append(self.catalogs[flwreg_type])
 
     def _save_patterns(self):
         pattern_rows = get_rows("SELECT pattern_id FROM inp_pattern", commit=self.force_commit)
@@ -1254,7 +1304,7 @@ class GwImportInpTask(GwTask):
         # Set 'fake' catalogs if it will be converted to flwreg
         if self.manage_flwreg["pumps"]:
             feature_class = "VARC"
-            arccat_id = "VIRTUAL"
+            arccat_id = "VARC"
 
         arc_sql = """ 
             INSERT INTO arc (
@@ -1367,7 +1417,7 @@ class GwImportInpTask(GwTask):
         # Set 'fake' catalogs if it will be converted to flwreg
         if self.manage_flwreg["orifices"]:
             feature_class = "VARC"
-            arccat_id = "VIRTUAL"
+            arccat_id = "VARC"
 
         arc_sql = """ 
             INSERT INTO arc (
@@ -1489,7 +1539,7 @@ class GwImportInpTask(GwTask):
         # Set 'fake' catalogs if it will be converted to flwreg
         if self.manage_flwreg["weirs"]:
             feature_class = "VARC"
-            arccat_id = "VIRTUAL"
+            arccat_id = "VARC"
 
         arc_sql = """ 
             INSERT INTO arc (
@@ -1616,7 +1666,7 @@ class GwImportInpTask(GwTask):
         # Set 'fake' catalogs if it will be converted to flwreg
         if self.manage_flwreg["outlets"]:
             feature_class = "VARC"
-            arccat_id = "VIRTUAL"
+            arccat_id = "VARC"
 
         arc_sql = """ 
             INSERT INTO arc (
