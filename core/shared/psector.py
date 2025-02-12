@@ -1252,8 +1252,11 @@ class GwPsector:
         layout = dialog.findChild(QGridLayout, 'lyt_price')
 
         for i in reversed(range(layout.count())):
-            if layout.itemAt(i).widget():
-                layout.itemAt(i).widget().deleteLater()
+            widget = layout.itemAt(i).widget()
+            if widget:
+                if 'widget_total' in widget.objectName():
+                    widget.setObjectName(f"{widget.objectName().replace('widget_total', '_old')}")
+                widget.deleteLater()
         self._add_price_widgets(dialog, tableright, psector_id, print_all_rows=print_all_rows, print_headers=print_headers)
         self.update_total(dialog)
         self._manage_buttons_price(dialog)
@@ -1309,15 +1312,10 @@ class GwPsector:
                         else:
                             widget = QLineEdit()
                             widget.setObjectName(f"widget_{key}_{field['price_id']}")
-                            if f"widget_{key}_{field['price_id']}" in self.dict_to_update:
-                                text = self.dict_to_update[f"widget_{key}_{field['price_id']}"][key]
-                            else:
-                                text = field.get(key) if field.get(key) is not None else ''
-
+                            text = field.get(key) if field.get(key) is not None else ''
                             widget.setText(f"{text}")
                             widget.editingFinished.connect(partial(self._manage_updates_prices, widget, key, field['price_id']))
                             widget.editingFinished.connect(partial(self._manage_widgets_price, dialog, tableright, psector_id, print_all_rows=True ))
-                            widget.editingFinished.connect(partial(self.update_total, dialog))
 
                         layout = dialog.findChild(QGridLayout, 'lyt_price')
                         layout.addWidget(widget, self.count, pos)
