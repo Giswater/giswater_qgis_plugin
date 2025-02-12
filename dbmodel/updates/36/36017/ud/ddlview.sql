@@ -158,127 +158,232 @@ WITH
         ),
     node_selected AS
         (
-        SELECT node.node_id,
-		node.code,
-		node.top_elev,
-		node.custom_top_elev,
+			SELECT node.node_id,
+			node.code,
+			node.top_elev,
+			node.custom_top_elev,
 			CASE
 				WHEN node.custom_top_elev IS NOT NULL THEN node.custom_top_elev
 				ELSE node.top_elev
 			END AS sys_top_elev,
-		node.ymax,
-		node.custom_ymax,
+			node.ymax,
+			node.custom_ymax,
 			CASE
 				WHEN node.custom_ymax IS NOT NULL THEN node.custom_ymax
 				ELSE node.ymax
 			END AS sys_ymax,
-		node.elev,
-		node.custom_elev,
+			node.elev,
+			node.custom_elev,
 			CASE
 				WHEN node.elev IS NOT NULL AND node.custom_elev IS NULL THEN node.elev
 				WHEN node.custom_elev IS NOT NULL THEN node.custom_elev
 				ELSE NULL::numeric(12,3)
 			END AS sys_elev,
-		node.node_type,
-		cat_feature.system_id AS sys_type,
-		node.nodecat_id,
+			node.node_type,
+			cat_feature.system_id AS sys_type,
+			node.nodecat_id,
 			CASE
 				WHEN node.matcat_id IS NULL THEN cat_node.matcat_id
 				ELSE node.matcat_id
 			END AS matcat_id,
-		node.epa_type,
-		node.state,
-		node.state_type,
-		node.expl_id,
-		exploitation.macroexpl_id,
-		node.sector_id,
-		sector_type,
-		macrosector_id,
-		node.drainzone_id,
-		drainzone_type,
-		node.annotation,
-		node.observ,
-		node.comment,
-		node.dma_id,
-		macrodma_id,
-		node.soilcat_id,
-		node.function_type,
-		node.category_type,
-		node.fluid_type,
-		node.location_type,
-		node.workcat_id,
-		node.workcat_id_end,
-		node.buildercat_id,
-		node.builtdate,
-		node.enddate,
-		node.ownercat_id,
-		node.muni_id,
-		node.postcode,
-		node.district_id,
-		streetname,
-		node.postnumber,
-		node.postcomplement,
-		streetname2,
-		node.postnumber2,
-		node.postcomplement2,
-		mu.region_id,
-		mu.province_id,
-		node.descript,
-		cat_node.svg,
-		node.rotation,
-		concat(cat_feature.link_path, node.link) AS link,
-		node.verified,
-		node.the_geom,
-		node.undelete,
-		cat_node.label,
-		node.label_x,
-		node.label_y,
-		node.label_rotation,
-		node.label_quadrant,
-		node.publish,
-		node.inventory,
-		node.uncertain,
-		node.xyz_date,
-		node.unconnected,
-		node.num_value,
-		date_trunc('second'::text, node.tstamp) AS tstamp,
-		node.insert_user,
-		date_trunc('second'::text, node.lastupdate) AS lastupdate,
-		node.lastupdate_user,
-		node.workcat_id_plan,
-		node.asset_id,
-		node.parent_id,
-		node.arc_id,
-		node.expl_id2,
-		vst.is_operative,
-		node.minsector_id,
-		node.macrominsector_id,
-		node.adate,
-		node.adescript,
-		node.placement_type,
-		node.access_type,
-		CASE
-		  WHEN node.sector_id > 0 AND vst.is_operative = true AND node.epa_type::text <> 'UNDEFINED'::character varying(16)::text THEN node.epa_type
-		  ELSE NULL::character varying(16)
-		END AS inp_type,
-		node.brand_id,
-		node.model_id,
-		node.serial_number
-		FROM node_selector
-		join node using (node_id)
-        JOIN selector_expl se ON (se.cur_user =current_user AND se.expl_id = node.expl_id) or (se.cur_user = current_user AND se.expl_id = node.expl_id2)
-        JOIN selector_sector sc ON (sc.cur_user = CURRENT_USER AND sc.sector_id = node.sector_id)
-        JOIN cat_node ON node.nodecat_id::text = cat_node.id::text
-		JOIN cat_feature ON cat_feature.id::text = node.node_type::text
-		JOIN exploitation ON node.expl_id = exploitation.expl_id
-		JOIN ext_municipality mu ON node.muni_id = mu.muni_id
-		JOIN value_state_type vst ON vst.id = node.state_type
-		JOIN sector_table on sector_table.sector_id = node.sector_id
-		left join dma_table on dma_table.dma_id = node.dma_id
-		left join drainzone_table ON node.dma_id = drainzone_table.drainzone_id
+			node.epa_type,
+			node.state,
+			node.state_type,
+			node.expl_id,
+			exploitation.macroexpl_id,
+			node.sector_id,
+			sector_type,
+			macrosector_id,
+			node.drainzone_id,
+			drainzone_type,
+			node.annotation,
+			node.observ,
+			node.comment,
+			node.dma_id,
+			macrodma_id,
+			node.soilcat_id,
+			node.function_type,
+			node.category_type,
+			node.fluid_type,
+			node.location_type,
+			node.workcat_id,
+			node.workcat_id_end,
+			node.buildercat_id,
+			node.builtdate,
+			node.enddate,
+			node.ownercat_id,
+			node.muni_id,
+			node.postcode,
+			node.district_id,
+			streetname,
+			node.postnumber,
+			node.postcomplement,
+			streetname2,
+			node.postnumber2,
+			node.postcomplement2,
+			mu.region_id,
+			mu.province_id,
+			node.descript,
+			cat_node.svg,
+			node.rotation,
+			concat(cat_feature.link_path, node.link) AS link,
+			node.verified,
+			node.the_geom,
+			node.undelete,
+			cat_node.label,
+			node.label_x,
+			node.label_y,
+			node.label_rotation,
+			node.label_quadrant,
+			node.publish,
+			node.inventory,
+			node.uncertain,
+			node.xyz_date,
+			node.unconnected,
+			node.num_value,
+			date_trunc('second'::text, node.tstamp) AS tstamp,
+			node.insert_user,
+			date_trunc('second'::text, node.lastupdate) AS lastupdate,
+			node.lastupdate_user,
+			node.workcat_id_plan,
+			node.asset_id,
+			node.parent_id,
+			node.arc_id,
+			node.expl_id2,
+			vst.is_operative,
+			node.minsector_id,
+			node.macrominsector_id,
+			node.adate,
+			node.adescript,
+			node.placement_type,
+			node.access_type,
+			CASE
+				WHEN node.sector_id > 0 AND vst.is_operative = true AND node.epa_type::text <> 'UNDEFINED'::character varying(16)::text THEN node.epa_type
+				ELSE NULL::character varying(16)
+			END AS inp_type,
+			node.brand_id,
+			node.model_id,
+			node.serial_number
+			FROM node_selector
+			JOIN node USING (node_id)
+			JOIN selector_expl se ON (se.cur_user =current_user AND se.expl_id = node.expl_id) or (se.cur_user = current_user AND se.expl_id = node.expl_id2)
+			JOIN selector_sector sc ON (sc.cur_user = CURRENT_USER AND sc.sector_id = node.sector_id)
+			JOIN cat_node ON node.nodecat_id::text = cat_node.id::text
+			JOIN cat_feature ON cat_feature.id::text = node.node_type::text
+			JOIN exploitation ON node.expl_id = exploitation.expl_id
+			JOIN ext_municipality mu ON node.muni_id = mu.muni_id
+			JOIN value_state_type vst ON vst.id = node.state_type
+			JOIN sector_table ON sector_table.sector_id = node.sector_id
+			LEFT JOIN dma_table ON dma_table.dma_id = node.dma_id
+			LEFT JOIN drainzone_table ON node.dma_id = drainzone_table.drainzone_id
+	),
+	node_base AS
+		(
+			SELECT
+			node_id,
+			code,
+			top_elev,
+			custom_top_elev,
+			sys_top_elev,
+			ymax,
+			custom_ymax,
+			CASE
+				WHEN sys_ymax IS NOT NULL THEN sys_ymax
+				ELSE (sys_top_elev - sys_elev)::numeric(12,3)
+			END AS sys_ymax,
+			elev,
+			custom_elev,
+			CASE
+				WHEN elev IS NOT NULL AND custom_elev IS NULL THEN elev
+				WHEN custom_elev IS NOT NULL THEN custom_elev
+				ELSE (sys_top_elev - sys_ymax)::numeric(12,3)
+			END AS sys_elev,
+			node_type,
+			sys_type,
+			nodecat_id,
+			matcat_id,
+			epa_type,
+			state,
+			state_type,
+			expl_id,
+			macroexpl_id,
+			sector_id,
+			sector_type,
+			macrosector_id,
+			drainzone_id,
+			drainzone_type,
+			annotation,
+			observ,
+			comment,
+			dma_id,
+			macrodma_id,
+			soilcat_id,
+			function_type,
+			category_type,
+			fluid_type,
+			location_type,
+			sector_style,
+			dma_style,
+			drainzone_style,
+			workcat_id,
+			workcat_id_end,
+			buildercat_id,
+			builtdate,
+			enddate,
+			ownercat_id,
+			muni_id,
+			postcode,
+			district_id,
+			streetname,
+			postnumber,
+			postcomplement,
+			streetname2,
+			postnumber2,
+			postcomplement2,
+			region_id,
+			province_id,
+			descript,
+			svg,
+			rotation,
+			link,
+			verified,
+			the_geom,
+			undelete,
+			label,
+			label_x,
+			label_y,
+			label_rotation,
+			label_quadrant,
+			publish,
+			inventory,
+			uncertain,
+			xyz_date,
+			unconnected,
+			num_value,
+			tstamp,
+			insert_user,
+			lastupdate,
+			lastupdate_user,
+			workcat_id_plan,
+			asset_id,
+			parent_id,
+			arc_id,
+			expl_id2,
+			is_operative,
+			minsector_id,
+			macrominsector_id,
+			adate,
+			adescript,
+			placement_type,
+			access_type,
+			inp_type,
+			brand_id,
+			model_id,
+			serial_number
+			FROM node_selected
 		)
-SELECT node_selected.*
-FROM node_selected;
+	SELECT node_base.*
+	FROM node_base;
 
 
 CREATE OR REPLACE VIEW v_edit_arc
