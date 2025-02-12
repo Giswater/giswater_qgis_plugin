@@ -1210,7 +1210,7 @@ AS WITH
 			CASE
 				WHEN node.elev IS NOT NULL AND node.custom_elev IS NULL THEN node.elev
 				WHEN node.custom_elev IS NOT NULL THEN node.custom_elev
-				ELSE NULL::numeric(12,3)
+				ELSE (node.sys_top_elev - node.sys_ymax)::numeric(12,3)
 			END AS sys_elev,
 			node.node_type,
 			cat_feature.feature_class AS sys_type,
