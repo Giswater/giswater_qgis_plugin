@@ -440,7 +440,8 @@ BEGIN
 				concat ('||quote_ident(v_hydro_layer)||'.'||quote_ident(v_hydro_search_field_1)||','' - '',
 				'||quote_ident(v_hydro_layer)||'.'||quote_ident(v_hydro_search_field_2)||','' - '',
 				'||quote_ident(v_hydro_layer)||'.'||quote_ident(v_hydro_search_field_3)||')
-				 AS display_name, '||quote_literal(v_hydro_layer)||' AS sys_table_id, '||quote_literal(v_hydro_id_field)||' AS sys_idname, '||quote_ident(v_hydro_feature_field)||' AS sys_connec_id
+				 AS display_name, '||quote_literal(v_hydro_layer)||' AS sys_table_id, '||quote_literal(v_hydro_id_field)||' AS sys_idname, '||quote_ident(v_hydro_feature_field)||' AS sys_feature_type_id,
+				CASE WHEN feature_id IN (SELECT connec_id FROM connec) THEN ''v_edit_connec'' ELSE ''v_edit_node'' END AS sys_feature
 				FROM '||quote_ident(v_hydro_layer)||'
 				LEFT JOIN connec ON (connec.connec_id = '||quote_ident(v_hydro_layer)||'.'||quote_ident(v_hydro_feature_field)||')
 				LEFT JOIN node ON (node.node_id = '||quote_ident(v_hydro_layer)||'.'||quote_ident(v_hydro_feature_field)||')
