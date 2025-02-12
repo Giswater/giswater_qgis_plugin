@@ -340,7 +340,10 @@ class GwSearch:
                 point = QgsPointXY(float(x1), float(y1))
                 tools_qgis.draw_point(point, self.rubber_band)
                 tools_qgis.zoom_to_rectangle(x1, y1, x1, y1, margin=100)
-            self._open_hydrometer_dialog(table_name=item['sys_table_id'], feature_id=item['sys_id'], connec_id=item['sys_connec_id'], basic_search_hydrometer=basic_search_hydrometer)
+            self._open_hydrometer_dialog(table_name=item['sys_table_id'], feature_id=item['sys_id'],
+                                         sys_feature_type_id=item['sys_feature_type_id'],
+                                         basic_search_hydrometer=basic_search_hydrometer,
+                                         feature_type=item['sys_feature'])
 
         # Tab 'workcat'
         elif tab_selected == 'workcat':
@@ -497,14 +500,14 @@ class GwSearch:
         for widget in self.lineedit_list:
             tools_qt.set_widget_text(self.dlg_search, widget, '')
 
-
-    def _open_hydrometer_dialog(self, table_name=None, feature_id=None, connec_id=None, basic_search_hydrometer=False):
+    def _open_hydrometer_dialog(self, table_name=None, feature_id=None, sys_feature_type_id=None,
+                                basic_search_hydrometer=False, feature_type=None):
 
         if basic_search_hydrometer:
             self.customForm = GwInfo(tab_type='data')
-            # v_edit_connec is the exact view to see the details of connec
+            # feature_type (v_edit_connec or v_edit_node) is the exact view to see the details of the feature
             complet_result, dialog = self.customForm.get_info_from_id(
-                "v_edit_connec", tab_type='data', feature_id=connec_id, is_add_schema=False)
+                feature_type, tab_type='data', feature_id=sys_feature_type_id, is_add_schema=False)
 
             if not complet_result:
                 return
