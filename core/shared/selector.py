@@ -8,7 +8,7 @@ or (at your option) any later version.
 import json
 from functools import partial
 
-from qgis.core import QgsProject
+from qgis.core import QgsProject, QgsVectorLayer
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QCheckBox, QGridLayout, QLabel, QLineEdit, QSizePolicy, QSpacerItem, QTabWidget,\
     QWidget, QApplication, QDockWidget, QToolButton, QAction, QScrollArea
@@ -314,28 +314,29 @@ class GwSelector:
 
         # Iterate over all layers in the current QGIS project
         for layer in QgsProject.instance().mapLayers().values():
-            # Get the field names once to avoid multiple iterations
-            field_names = {field.name() for field in layer.fields()}
-            
-            # If neither filter is set and the layer contains 'muni_id' or 'sector_id' fields, remove any existing subset string
-            if not any([muni_filter, sector_filter]) and any(field in field_names for field in ['muni_id', 'sector_id']):
-                layer.setSubsetString(None)
-                continue
+            if isinstance(layer, QgsVectorLayer):
+                # Get the field names once to avoid multiple iterations
+                field_names = {field.name() for field in layer.fields()}
+                
+                # If neither filter is set and the layer contains 'muni_id' or 'sector_id' fields, remove any existing subset string
+                if not any([muni_filter, sector_filter]) and any(field in field_names for field in ['muni_id', 'sector_id']):
+                    layer.setSubsetString(None)
+                    continue
 
-            # Initialize the list to hold the subset filters
-            subset_filter = []
+                # Initialize the list to hold the subset filters
+                subset_filter = []
 
-            # Add 'muni_filter' to the subset filter if the 'muni_id' field exists and 'muni_filter' is set
-            subset_filter = [
-                muni_filter if "muni_id" in field_names and muni_filter else None,
-                sector_filter if "sector_id" in field_names and sector_filter else None,
-            ]
+                # Add 'muni_filter' to the subset filter if the 'muni_id' field exists and 'muni_filter' is set
+                subset_filter = [
+                    muni_filter if "muni_id" in field_names and muni_filter else None,
+                    sector_filter if "sector_id" in field_names and sector_filter else None,
+                ]
 
-            # Remove any 'None' values from the subset filter list
-            subset_filter = [f for f in subset_filter if f]
+                # Remove any 'None' values from the subset filter list
+                subset_filter = [f for f in subset_filter if f]
 
-            # Apply the subset filter to the layer; if the list is empty, set it to None
-            layer.setSubsetString(" AND ".join(subset_filter) if subset_filter else None)
+                # Apply the subset filter to the layer; if the list is empty, set it to None
+                layer.setSubsetString(" AND ".join(subset_filter) if subset_filter else None)
 
 
     def _build_filter(self) -> str:
