@@ -2606,9 +2606,12 @@ def execute_procedure(function_name, parameters=None, schema_name=None, commit=T
 
     # Check if function exists
     if check_function:
-        row = tools_db.check_function(function_name, schema_name, commit, aux_conn=aux_conn)
+        row = tools_db.check_function(function_name, schema_name, commit, aux_conn=aux_conn, is_thread=is_thread)
         if row in (None, ''):
-            tools_qgis.show_warning("Function not found in database", parameter=function_name)
+            msg = "Function not found in database"
+            if not is_thread:
+                tools_qgis.show_warning(msg, parameter=function_name)
+            tools_log.log_warning(msg)
             return None
 
     # Manage schema_name and parameters
