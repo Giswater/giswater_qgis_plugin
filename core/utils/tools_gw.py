@@ -1900,7 +1900,7 @@ def add_button(**kwargs):
 
     func_params = ""
     if field.get('widgetfunction'):
-        if 'module' in field['widgetfunction']:            
+        if 'module' in field['widgetfunction']:
             module = globals()[field['widgetfunction']['module']]
         function_name = field['widgetfunction'].get('functionName')
         if function_name is not None:
@@ -5014,7 +5014,7 @@ def _manage_button(**kwargs):
 
     field = kwargs['field']
     stylesheet = field.get('stylesheet') or {}
-    info_class = kwargs['class']    
+    info_class = kwargs['class']
     # If button text is empty it's because node_1/2 is not present.
     # Then we create a QLineEdit to input a node to be connected.
     if not field.get('value') and stylesheet.get('icon') is None:
@@ -5149,13 +5149,13 @@ def _force_button_click(dlg, obj, name, pos):
 
 def _show_context_menu(self, qtableview):
         """Show custom context menu"""
-        
+
         menu = QMenu(qtableview)
 
         buttons = qtableview.window().findChildren(QPushButton)
-        for btn in buttons:            
+        for btn in buttons:
             if btn.property('widgetcontrols') is not None:
-                if btn.property('widgetcontrols').get('onContextMenu') is not None:  
+                if btn.property('widgetcontrols').get('onContextMenu') is not None:
                     parents = list()
                     par = btn
                     while hasattr(par, 'objectName'):
@@ -5163,8 +5163,8 @@ def _show_context_menu(self, qtableview):
                         par = par.parentWidget()
                     if qtableview.objectName() in parents:
                         action = QAction(btn.property('widgetcontrols').get('onContextMenu'), qtableview)
-                        action.triggered.connect(partial(_force_button_click, qtableview.window(), QPushButton, btn.objectName()))                    
-                        menu.addAction(action)                                                      
+                        action.triggered.connect(partial(_force_button_click, qtableview.window(), QPushButton, btn.objectName()))
+                        menu.addAction(action)
 
         menu.exec(QCursor.pos())
 
@@ -5177,7 +5177,7 @@ def _show_context_menu(self, qtableview):
 
 class CustomQComboBox(QComboBox):
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)          
+        super().__init__(*args, **kwargs)
         self.setFocusPolicy(Qt.StrongFocus)
 
     def wheelEvent(self, *args, **kwargs):
@@ -5185,10 +5185,10 @@ class CustomQComboBox(QComboBox):
             return QComboBox.wheelEvent(self, *args, **kwargs)
         else:
             return
-        
+
 class CustomQgsDateTimeEdit(QgsDateTimeEdit):
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)          
+        super().__init__(*args, **kwargs)
         self.setFocusPolicy(Qt.StrongFocus)
 
     def wheelEvent(self, *args, **kwargs):
