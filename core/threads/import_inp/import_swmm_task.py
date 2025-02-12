@@ -212,12 +212,12 @@ class GwImportInpTask(GwTask):
             self._save_options()
             self.progress_changed.emit("Getting options", self.PROGRESS_OPTIONS, "done!", True)
 
-            if TITLE in self.network:
+            if self.network.get(TITLE):
                 self.progress_changed.emit("Getting options", self.PROGRESS_OPTIONS, "Importing title...", False)
                 self._save_title()
                 self.progress_changed.emit("Getting options", self.PROGRESS_OPTIONS, "done!", True)
 
-            if FILES in self.network:
+            if self.network.get(FILES):
                 self.progress_changed.emit("Getting options", self.PROGRESS_OPTIONS, "Importing files...", False)
                 self._save_files()
                 self.progress_changed.emit("Getting options", self.PROGRESS_OPTIONS, "done!", True)
@@ -266,67 +266,77 @@ class GwImportInpTask(GwTask):
         self._create_new_conduit_catalogs()
 
     def _manage_nonvisual(self) -> None:
-        if PATTERNS in self.network:
+        if self.network.get(PATTERNS):
             self.progress_changed.emit("Non-visual objects", lerp_progress(0, self.PROGRESS_CATALOGS, self.PROGRESS_NONVISUAL), "Importing patterns", True)
             self._save_patterns()
 
-        if CURVES in self.network:
+        if self.network.get(CURVES):
             self.progress_changed.emit("Non-visual objects", lerp_progress(40, self.PROGRESS_CATALOGS, self.PROGRESS_NONVISUAL), "Importing curves", True)
             self._save_curves()
 
-        if TIMESERIES in self.network:
+        if self.network.get(TIMESERIES):
             self.progress_changed.emit("Non-visual objects", lerp_progress(60, self.PROGRESS_CATALOGS, self.PROGRESS_NONVISUAL), "Importing timeseries", True)
             self._save_timeseries()
 
-        if CONTROLS in self.network:
+        if self.network.get(CONTROLS):
             self.progress_changed.emit("Non-visual objects", lerp_progress(80, self.PROGRESS_CATALOGS, self.PROGRESS_NONVISUAL), "Importing controls", True)
             self._save_controls()
 
-        if LID_CONTROLS in self.network:
+        if self.network.get(LID_CONTROLS):
             self.progress_changed.emit("Non-visual objects", lerp_progress(80, self.PROGRESS_CATALOGS, self.PROGRESS_NONVISUAL), "Importing LIDs", True)
             self._save_lids()
 
     def _manage_visual(self) -> None:
-        self.progress_changed.emit("Visual objects", lerp_progress(0, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing junctions", True)
-        self._save_junctions()
+        if self.network.get(JUNCTIONS):
+            self.progress_changed.emit("Visual objects", lerp_progress(0, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing junctions", True)
+            self._save_junctions()
 
-        self.progress_changed.emit("Visual objects", lerp_progress(30, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing outfalls", True)
-        self._save_outfalls()
+        if self.network.get(OUTFALLS):
+            self.progress_changed.emit("Visual objects", lerp_progress(30, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing outfalls", True)
+            self._save_outfalls()
 
-        self.progress_changed.emit("Visual objects", lerp_progress(40, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing dividers", True)
-        self._save_dividers()
+        if self.network.get(DIVIDERS):
+            self.progress_changed.emit("Visual objects", lerp_progress(40, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing dividers", True)
+            self._save_dividers()
 
-        self.progress_changed.emit("Visual objects", lerp_progress(45, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing storage units", True)
-        self._save_storage()
+        if self.network.get(STORAGE):
+            self.progress_changed.emit("Visual objects", lerp_progress(45, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing storage units", True)
+            self._save_storage()
 
-        self.progress_changed.emit("Visual objects", lerp_progress(50, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing pumps", True)
-        self._save_pumps()
+        if self.network.get(PUMPS):
+            self.progress_changed.emit("Visual objects", lerp_progress(50, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing pumps", True)
+            self._save_pumps()
 
-        self.progress_changed.emit("Visual objects", lerp_progress(60, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing orifices", True)
-        self._save_orifices()
+        if self.network.get(ORIFICES):
+            self.progress_changed.emit("Visual objects", lerp_progress(60, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing orifices", True)
+            self._save_orifices()
 
-        self.progress_changed.emit("Visual objects", lerp_progress(65, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing weirs", True)
-        self._save_weirs()
+        if self.network.get(WEIRS):
+            self.progress_changed.emit("Visual objects", lerp_progress(65, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing weirs", True)
+            self._save_weirs()
 
-        self.progress_changed.emit("Visual objects", lerp_progress(70, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing outlets", True)
-        self._save_outlets()
+        if self.network.get(OUTLETS):
+            self.progress_changed.emit("Visual objects", lerp_progress(70, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing outlets", True)
+            self._save_outlets()
 
-        self.progress_changed.emit("Visual objects", lerp_progress(80, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing conduits", True)
-        self._save_conduits()
+        if self.network.get(CONDUITS):
+            self.progress_changed.emit("Visual objects", lerp_progress(80, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing conduits", True)
+            self._save_conduits()
 
-        self.progress_changed.emit("Visual objects", lerp_progress(95, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing raingages", True)
-        self._save_raingages()
+        if self.network.get(RAINGAGES):
+            self.progress_changed.emit("Visual objects", lerp_progress(95, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing raingages", True)
+            self._save_raingages()
 
     def _manage_others(self) -> None:
-        if INFLOWS in self.network:
+        if self.network.get(INFLOWS):
             self.progress_changed.emit("Others", lerp_progress(0, self.PROGRESS_VISUAL, self.PROGRESS_END), "Importing inflows", True)
             self._save_inflows()
 
-        if DWF in self.network:
+        if self.network.get(DWF):
             self.progress_changed.emit("Others", lerp_progress(20, self.PROGRESS_VISUAL, self.PROGRESS_END), "Importing DWF", True)
             self._save_dwf()
 
-        if SUBCATCHMENTS in self.network:
+        if self.network.get(SUBCATCHMENTS):
             self.progress_changed.emit("Others", lerp_progress(40, self.PROGRESS_VISUAL, self.PROGRESS_END), "Importing subcatchments", True)
             self._save_subcatchments()
 
