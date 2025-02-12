@@ -1297,3 +1297,7 @@ UPDATE config_form_fields SET layoutname='lyt_log_1', layoutorder=0, "datatype"=
 -- 12/02/2025
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source")
 VALUES (3386, 'gw_fct_manage_relations', 'utils', 'function', 'json', 'json', 'Function to manage relations between elements and documents', 'role_edit', NULL, 'core');
+
+UPDATE sys_message
+SET error_message = 'The inserted catalog value does not exist --> %catalog_value%'
+WHERE id = 3282;

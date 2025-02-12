@@ -275,7 +275,7 @@ BEGIN
 		ELSE
 			IF (SELECT true from cat_node where id=NEW.nodecat_id) IS NULL THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-				"data":{"message":"3282", "function":"1220","debug_msg":"'||NEW.nodecat_id||'"}}$$);';
+				"data":{"message":"3282", "function":"1220","parameters":{"catalog_value":"'||NEW.nodecat_id||'"}}})$$);';
 			END IF;
 		END IF;
 
