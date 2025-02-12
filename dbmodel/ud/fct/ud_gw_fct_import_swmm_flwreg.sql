@@ -85,26 +85,26 @@ BEGIN
     v_weir_catalog := ((p_data ->>'data')::json->>'weir')::json->>'catalog'::text;
     v_outlet_featureclass := ((p_data ->>'data')::json->>'outlet')::json->>'featureClass'::text;
     v_outlet_catalog := ((p_data ->>'data')::json->>'outlet')::json->>'catalog'::text;
-    raise notice 'featureClass -> pumps=%, orifices=%, weirs=%, outlets=%', v_pump_featureclass, v_orifice_featureclass, v_weir_featureclass, v_outlet_featureclass;
-    raise notice 'catalog -> pumps=%, orifices=%, weirs=%, outlets=%', v_pump_catalog, v_orifice_catalog, v_weir_catalog, v_outlet_catalog;
     -- Starting process
+    PERFORM gw_fct_manage_temp_tables(('{"data":{"parameters":{"fid": '||v_fid||', "project_type": "UD", "action": "CREATE", "group": "LOG"}}}')::json);
 
     -- set node topocontrol=false
     UPDATE config_param_system SET value='{"activated":false,"value":0.1}' WHERE "parameter"='edit_node_proximity';
+    INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, 'INFO: Deactivated node proximity check.');
 
     -- loop all arcs that need to be flowregulators
     -- TODO: add where to only transform those on the current import inp
     FOR v_data IN
         SELECT *
         FROM arc
-        WHERE epa_type IN ('PUMP', 'ORIFICE', 'WEIR', 'OUTLET') AND state = 1 AND (
-            (epa_type = 'PUMP' AND v_pump_featureclass IS NOT NULL) OR
-            (epa_type = 'ORIFICE' AND v_orifice_featureclass IS NOT NULL) OR
-            (epa_type = 'WEIR' AND v_weir_featureclass IS NOT NULL) OR
-            (epa_type = 'OUTLET' AND v_outlet_featureclass IS NOT NULL)
-        )
+        WHERE epa_type IN ('PUMP', 'ORIFICE', 'WEIR', 'OUTLET') AND state = 1
     LOOP
-        raise notice 'processing arc -> arc_id=% epa_type=%', v_data.arc_id, v_data.epa_type;
+        CONTINUE WHEN v_data.epa_type = 'PUMP' AND v_pump_featureclass IS NULL;
+        CONTINUE WHEN v_data.epa_type = 'ORIFICE' AND v_orifice_featureclass IS NULL;
+        CONTINUE WHEN v_data.epa_type = 'WEIR' AND v_weir_featureclass IS NULL;
+        CONTINUE WHEN v_data.epa_type = 'OUTLET' AND v_outlet_featureclass IS NULL;
+
+        INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, 'INFO: Processing arc "'||v_data.arc_id||'" ('||v_data.epa_type||').');
         -- getting man_table to work with
         SELECT man_table, epa_table INTO v_mantablename, v_epatablename
         FROM cat_feature cf
@@ -117,23 +117,18 @@ BEGIN
             WHEN 'OUTLET' THEN v_outlet_featureclass
             ELSE NULL
         END;
-        raise notice 'v_mantablename=% v_epatablename=%', v_mantablename, v_epatablename;
         -- Get flwreg_length
         SELECT ST_Length(v_data.the_geom) INTO v_flwreg_length;
-        raise notice 'v_flwreg_length=%', v_flwreg_length;
         -- Get node_id
         v_node_id := v_data.node_1;
-        raise notice 'v_node_id=%', v_node_id;
         -- Get to_arc (arc that has node_1 = flwreg.node_2 or node_2 = flwreg.node_2 (and is not itself OR another flwreg))
         SELECT arc_id INTO v_toarc
         FROM arc
         WHERE (node_1 = v_data.node_2) OR (node_2 = v_data.node_2 AND arc_id != v_data.arc_id AND epa_type NOT IN ('PUMP', 'ORIFICE', 'WEIR', 'OUTLET')); -- AND epa_type != v_data.arc_id
-        raise notice 'v_toarc=%', v_toarc;
         -- Get order_id
         SELECT coalesce(max(order_id), 0)+1 INTO v_order_id
         FROM flwreg
         WHERE node_id = v_node_id AND to_arc = v_toarc;
-        raise notice 'v_order_id=%', v_order_id;
 
         v_flwregcat_id := CASE v_data.epa_type
             WHEN 'PUMP' THEN v_pump_catalog
@@ -142,16 +137,21 @@ BEGIN
             WHEN 'OUTLET' THEN v_outlet_catalog
             ELSE NULL
         END;
+
         -- Insert into flwreg
         INSERT INTO flwreg (node_id, order_id, to_arc, nodarc_id, flwregcat_id, flwreg_length,
                             epa_type, state, state_type, annotation, observ, the_geom)
         VALUES (v_node_id, v_order_id, v_toarc, concat(v_node_id, LEFT(v_data.epa_type, 2), v_order_id), v_flwregcat_id, v_flwreg_length,
                 v_data.epa_type, v_data.state, v_data.state_type, v_data.annotation, v_data.observ, v_data.the_geom)
         RETURNING flwreg_id INTO v_flwreg_id;
-        raise notice 'inserted into flwreg -> %', v_flwreg_id;
+        INSERT INTO t_audit_check_data (fid, criticity, error_message)
+        VALUES (v_fid, 4, '    Inserted into flwreg with flwreg_id='||v_flwreg_id||'.');
+
         -- Insert into man table
         EXECUTE 'INSERT INTO '||v_mantablename||' VALUES ('||quote_literal(v_flwreg_id)||', '||quote_literal(v_data.epa_type)||')';
-        raise notice 'inserted into man table';
+        INSERT INTO t_audit_check_data (fid, criticity, error_message)
+        VALUES (v_fid, 4, '    Inserted into '||v_mantablename||'.');
+
         -- Insert into inp table
         IF v_epatablename = 'inp_flwreg_pump' THEN
             INSERT INTO inp_flwreg_pump (flwreg_id, pump_type, curve_id, status, startup, shutoff)
@@ -176,36 +176,48 @@ BEGIN
             SELECT v_flwreg_id, outlet_type, offsetval, curve_id, cd1, cd2, flap FROM inp_outlet WHERE arc_id = v_data.arc_id;
 
         END IF;
-        raise notice 'inserted into %', v_epatablename;
+        INSERT INTO t_audit_check_data (fid, criticity, error_message)
+        VALUES (v_fid, 4, '    Inserted into '||v_epatablename||'.');
 
         -- manage if there are other flowregs
         SELECT count(*) INTO v_count FROM arc WHERE state=1 AND node_1=v_data.node_1 AND node_2=v_data.node_2;
 
         -- downgrade to obsolete the flowreg in the table arc
         UPDATE arc SET state=0,state_type=2 WHERE arc_id = v_data.arc_id;
-        raise notice 'downgraded flowreg in table arc';
+        INSERT INTO t_audit_check_data (fid, criticity, error_message)
+        VALUES (v_fid, 4, '    Downgraded flowreg in table arc.');
 
         -- if there are multiple flwregs connected to the same nodes, only reconnect arc if it's the last one
         IF v_count <= 1 THEN
             -- reconnect topology
             UPDATE arc SET node_1=v_data.node_1 WHERE node_1=v_data.node_2 AND epa_type NOT IN ('PUMP', 'ORIFICE', 'WEIR', 'OUTLET');
             UPDATE arc SET node_2=v_data.node_1 WHERE node_2=v_data.node_2 AND epa_type NOT IN ('PUMP', 'ORIFICE', 'WEIR', 'OUTLET');
-            raise notice 'reconnected topology';
-
+            INSERT INTO t_audit_check_data (fid, criticity, error_message)
+            VALUES (v_fid, 4, '    Reconnected topology (moved extremal nodes of arcs connected to flwreg).');
             -- update the_geom of node_1 for the arc to be reconnected
             UPDATE node SET the_geom = the_geom WHERE node_id=v_data.node_1;
-            raise notice 'updated the_geom of node_1';
+            INSERT INTO t_audit_check_data (fid, criticity, error_message)
+            VALUES (v_fid, 4, '    Updated the_geom of node_1 (for the arc to be reconnected).');
             -- downgrade to obsolete node_2 of flowreg
             UPDATE node SET state=0,state_type=2 WHERE node_id = v_data.node_2;
-            raise notice 'downgraded node_2 of flowreg';
+            INSERT INTO t_audit_check_data (fid, criticity, error_message)
+            VALUES (v_fid, 4, '    Downgraded node_2 of flwreg.');
         END IF;
     END LOOP;
 
-    INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1,
-    'INFO: Link geometries from VALVES AND PUMPS have been transformed using reverse nod2arc strategy as nodes. Geometry from arcs and nodes are saved using state=0');
+    INSERT INTO t_audit_check_data (fid, criticity, error_message)
+    VALUES (v_fid, 4, 'Process finished.');
 
     -- set node topocontrol=true
     UPDATE config_param_system SET value='{"activated":true,"value":0.1}' WHERE "parameter"='edit_node_proximity';
+    INSERT INTO t_audit_check_data (fid, criticity, error_message)
+    VALUES (v_fid, 4, 'Reactivated node proximity check.');
+
+    -- collect log messages
+    SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result_info
+    FROM (SELECT id, error_message as message FROM t_audit_check_data WHERE cur_user="current_user"() AND fid=v_fid AND criticity > 1 order by criticity desc, id asc) row;
+
+    PERFORM gw_fct_manage_temp_tables(('{"data":{"parameters":{"fid":'||v_fid||', "project_type":"UD", "action":"DROP", "group":"LOG"}}}')::json);
 
     --Control nulls
     v_version := COALESCE(v_version, '{}');
