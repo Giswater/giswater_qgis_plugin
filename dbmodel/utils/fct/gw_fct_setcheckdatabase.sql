@@ -46,12 +46,12 @@ BEGIN
 	SELECT project_type, giswater, epsg INTO v_project_type, v_version, v_epsg FROM sys_version order by id desc limit 1;
 
 	-- Get input parameters
-	v_verified_exceptions := ((p_data ->> 'data')::json->>'parameters')::json->> 'verifiedExceptions';
-	v_omcheck :=  ((p_data ->> 'data')::json->>'parameters')::json->> 'omCheck';
-	v_graphcheck :=  ((p_data ->> 'data')::json->>'parameters')::json->> 'omCheck';
-	v_epacheck :=  ((p_data ->> 'data')::json->>'parameters')::json->> 'epaCheck';
-	v_plancheck :=  ((p_data ->> 'data')::json->>'parameters')::json->> 'planCheck';
-	v_admincheck :=  ((p_data ->> 'data')::json->>'parameters')::json->> 'adminCheck';
+	v_verified_exceptions := ((p_data ->> 'data')::json->>'parameters')::json->> 'tab_data_verified_exceptions';
+	v_omcheck :=  ((p_data ->> 'data')::json->>'parameters')::json->> 'tab_data_om_check';
+	v_graphcheck :=  ((p_data ->> 'data')::json->>'parameters')::json->> 'tab_data_graph_check';
+	v_epacheck :=  ((p_data ->> 'data')::json->>'parameters')::json->> 'tab_data_epa_check';
+	v_plancheck :=  ((p_data ->> 'data')::json->>'parameters')::json->> 'tab_data_master_check';
+	v_admincheck :=  ((p_data ->> 'data')::json->>'parameters')::json->> 'tab_data_admin_check';
 
 	-- get system parameters in case input parameter is null
 	IF v_verified_exceptions IS NULL THEN SELECT value::json->>'verifiedExceptions' INTO v_verified_exceptions 
@@ -78,9 +78,12 @@ BEGIN
 
 	IF 'role_epa' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) AND v_epacheck THEN
 		EXECUTE 'SELECT gw_fct_pg2epa_check_data($${"data":{"parameters":{"fid":'||v_fid||', "isEmbebed":true}}}$$)';
-	END IF;
-	IF 'role_master' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) AND v_plancheck THEN		EXECUTE 'SELECT gw_fct_plan_check_data($${"data":{"parameters":{"fid":'||v_fid||', "isEmbebed":true}}}$$)';
-	END IF;	
+	END IF;
+
+	IF 'role_master' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) AND v_plancheck THEN
+		EXECUTE 'SELECT gw_fct_plan_check_data($${"data":{"parameters":{"fid":'||v_fid||', "isEmbebed":true}}}$$)';
+	END IF;
+	
 	IF 'role_admin' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) AND v_admincheck THEN
 		EXECUTE 'SELECT gw_fct_admin_check_data($${"data":{"parameters":{"fid":'||v_fid||', "isEmbebed":true}}}$$)';
 	END IF; 

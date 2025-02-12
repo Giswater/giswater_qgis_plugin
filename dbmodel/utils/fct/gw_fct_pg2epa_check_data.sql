@@ -48,6 +48,8 @@ BEGIN
 
 	IF v_isembebed IS FALSE OR v_isembebed IS NULL THEN -- create temporal tables if function is not embebed
 		EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"fid":'||v_fid||', "project_type":"'||v_project_type||'", "action":"CREATE", "group":"EPAMAIN"}}}$$)';
+	ELSE
+		EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"fid":'||v_fid||', "project_type":"'||v_project_type||'", "action":"CREATE", "group":"EPA"}}}$$)';
 	END IF;
 
 	-- getting sys_fprocess to be executed
@@ -81,6 +83,8 @@ BEGIN
 
 		IF v_isembebed IS FALSE OR v_isembebed IS NULL THEN -- drop temporal tables if function is not embebed
 			EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"fid":'||v_fid||', "project_type":"'||v_project_type||'", "action":"DROP", "group":"EPAMAIN"}}}$$)';
+		ELSE
+			EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"fid":'||v_fid||', "project_type":"'||v_project_type||'", "action":"DROP", "group":"EPA"}}}$$)';
 		END IF;
 
 		-- Return
