@@ -1190,8 +1190,8 @@ AS WITH
 			SELECT node_id FROM node_psector WHERE p_state = 1
         ),
     node_selected AS
-        (
-			SELECT node.node_id,
+    	(
+    		SELECT node.node_id,
 			node.code,
 			node.top_elev,
 			node.custom_top_elev,
@@ -1210,7 +1210,7 @@ AS WITH
 			CASE
 				WHEN node.elev IS NOT NULL AND node.custom_elev IS NULL THEN node.elev
 				WHEN node.custom_elev IS NOT NULL THEN node.custom_elev
-				ELSE (node.sys_top_elev - node.sys_ymax)::numeric(12,3)
+				ELSE NULL::numeric(12,3)
 			END AS sys_elev,
 			node.node_type,
 			cat_feature.feature_class AS sys_type,
@@ -1317,9 +1317,117 @@ AS WITH
 			LEFT JOIN drainzone_table ON node.dma_id = drainzone_table.drainzone_id
 			LEFT JOIN dwfzone_table ON node.dwfzone_id = dwfzone_table.dwfzone_id
             LEFT JOIN node_add e ON e.node_id::text = node.node_id::text
+    	),
+    node_base AS
+        (
+			SELECT
+			node_id,
+			code,
+			top_elev,
+			custom_top_elev,
+			sys_top_elev,
+			ymax,
+			custom_ymax,
+			CASE
+				WHEN sys_ymax IS NOT NULL THEN sys_ymax
+				ELSE (sys_top_elev - sys_elev)::numeric(12,3)
+			END AS sys_ymax,
+			elev,
+			custom_elev,
+			CASE
+				WHEN elev IS NOT NULL AND custom_elev IS NULL THEN elev
+				WHEN custom_elev IS NOT NULL THEN custom_elev
+				ELSE (sys_top_elev - sys_ymax)::numeric(12,3)
+			END AS sys_elev,
+			node_type,
+			sys_type,
+			nodecat_id,
+			matcat_id,
+			epa_type,
+			state,
+			state_type,
+			expl_id,
+			macroexpl_id,
+			sector_id,
+			sector_type,
+			macrosector_id,
+			drainzone_id,
+			drainzone_type,
+			annotation,
+			observ,
+			comment,
+			dma_id,
+			macrodma_id,
+			dwfzone_id,
+			dwfzone_type,
+			soilcat_id,
+			function_type,
+			category_type,
+			fluid_type,
+			location_type,
+			sector_style,
+			dma_style,
+			drainzone_style,
+			dwfzone_style,
+			workcat_id,
+			workcat_id_end,
+			buildercat_id,
+			builtdate,
+			enddate,
+			ownercat_id,
+			muni_id,
+			postcode,
+			district_id,
+			streetname,
+			postnumber,
+			postcomplement,
+			streetname2,
+			postnumber2,
+			postcomplement2,
+			region_id,
+			province_id,
+			descript,
+			svg,
+			rotation,
+			link,
+			verified,
+			the_geom,
+			undelete,
+			label,
+			label_x,
+			label_y,
+			label_rotation,
+			label_quadrant,
+			publish,
+			inventory,
+			uncertain,
+			xyz_date,
+			unconnected,
+			num_value,
+			tstamp,
+			insert_user,
+			lastupdate,
+			lastupdate_user,
+			workcat_id_plan,
+			asset_id,
+			parent_id,
+			arc_id,
+			expl_id2,
+			is_operative,
+			minsector_id,
+			macrominsector_id,
+			adate,
+			adescript,
+			placement_type,
+			access_type,
+			inp_type,
+			brand_id,
+			model_id,
+			serial_number
+			FROM node_selected
 		)
-	SELECT node_selected.*
-	FROM node_selected;
+	SELECT node_base.*
+	FROM node_base;
 
 
 CREATE OR REPLACE VIEW vu_connec AS
