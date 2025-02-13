@@ -1410,7 +1410,8 @@ AS WITH
         connec.insert_user,
         date_trunc('second'::text, connec.lastupdate) AS lastupdate,
         connec.lastupdate_user,
-        connec.the_geom
+        connec.the_geom,
+        connec.n_inhabitants
         FROM inp_network_mode, connec_selector
         JOIN connec ON connec.connec_id = connec_selector.connec_id
         JOIN selector_expl se ON (se.cur_user =current_user AND se.expl_id = connec.expl_id) or (se.cur_user =current_user and se.expl_id = connec.expl_id2)
@@ -5047,7 +5048,9 @@ AS WITH expl_data AS (
     ed.expl_nrw_eff,
     ed.expl_nightvol,
     ed.expl_ili,
-    ed.expl_m4day
+    ed.expl_m4day,
+    w.n_inhabitants,
+    w.avg_press
    FROM om_waterbalance w
      JOIN exploitation e USING (expl_id)
      JOIN dma d USING (dma_id)
@@ -5113,7 +5116,9 @@ AS SELECT e.name AS exploitation,
             WHEN om_waterbalance.total > 0::double precision THEN (100::numeric::double precision * om_waterbalance.auth_bill / om_waterbalance.total)::numeric(20,2)
             ELSE 0::numeric(20,2)
         END AS nrw_eff,
-    d.the_geom
+    d.the_geom,
+    om_waterbalance.n_inhabitants,
+    om_waterbalance.avg_press
    FROM om_waterbalance
      JOIN exploitation e USING (expl_id)
      JOIN dma d USING (dma_id)
