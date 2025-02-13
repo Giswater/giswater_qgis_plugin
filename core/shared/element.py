@@ -310,7 +310,7 @@ class GwElement:
         # Open form
         tools_gw.open_dialog(self.dlg_man, dlg_name='element_manager')
 
-    
+
     def _show_context_menu(self, qtableview, pos):
         """ Show custom context menu """
         menu = QMenu(qtableview)
@@ -514,7 +514,7 @@ class GwElement:
             answer = tools_qt.show_question(message)
             if not answer:
                 return
-            sql = (f"UPDATE element"
+            sql = (f"UPDATE v_edit_element"
                    f" SET elementcat_id = '{elementcat_id}', num_elements = '{num_elements}', state = '{state}'"
                    f", state_type = '{state_type}', expl_id = '{expl_id}', rotation = '{rotation}'"
                    f", comment = $${comment}$$, observ = $${observ}$$"
