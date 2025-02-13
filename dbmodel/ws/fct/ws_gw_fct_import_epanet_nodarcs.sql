@@ -10,7 +10,7 @@ AS $function$
 /*EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_import_epanet_nodarcs($${"data": {"valvesType": "PR_REDUC_VALVE", "pumpsType": "PUMP"}}$$);
 
--- fid:
+-- fid: 239
 
 */
 
@@ -35,16 +35,10 @@ v_toarc text;
 v_node1 text;
 v_node2 text;
 v_elevation float;
-v_querytext text;
 v_errcontext text;
+v_msgerr json;
 
-v_isgwproject boolean = FALSE; -- MOST IMPORTANT variable of this function. When true importation will be used making and arc2node reverse transformation for pumps and valves. Only works using Giswater sintaxis of additional pumps
-v_delete_prev boolean = true; -- used on dev mode to
-i integer=1;
-v_result json;
 v_result_info json;
-v_debugmode boolean;
-v_status text = 'Accepted';
 
 BEGIN
 
@@ -59,10 +53,13 @@ BEGIN
     v_pumps_type := (p_data ->>'data')::json->>'pumpsType'::text;
 
     -- Starting process
+    PERFORM gw_fct_manage_temp_tables(('{"data":{"parameters":{"fid": '||v_fid||', "project_type": "WS", "action": "CREATE", "group": "LOG"}}}')::json);
 
     -- set node topocontrol=false
     UPDATE config_param_system SET value='{"activated":false,"value":0.1}' WHERE "parameter"='edit_node_proximity';
+    INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, 'INFO: Deactivated node proximity check.');
     ALTER TABLE node DISABLE TRIGGER gw_trg_node_arc_divide;
+    INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, 'INFO: Disabled node trigger ''gw_trg_node_arc_divide''.');
 
     -- loop all arcs that need to be nodes
     -- TODO: add where to only transform those on the current import inp
@@ -90,7 +87,7 @@ BEGIN
             v_nodecat = 'SHORTPIPE';
             v_epatype = 'SHORTPIPE';
         END IF;
-
+        INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, concat('INFO: Processing nodarc ',v_data.arc_id,' (',v_epatype,').'));
         -- getting man_table to work with
         SELECT man_table, epa_table INTO v_mantablename, v_epatablename
         FROM cat_feature cf
@@ -111,39 +108,57 @@ BEGIN
         INSERT INTO node (node_id, nodecat_id, epa_type, sector_id, dma_id, expl_id, muni_id, state, state_type, the_geom)
         VALUES (v_node_id, v_nodecat, v_epatype, 0, 0, v_data.expl_id, v_data.muni_id, 1, 2, v_thegeom);
 
+        INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, '    Inserted into node.');
+
         EXECUTE 'INSERT INTO '||v_mantablename||' VALUES ('||quote_literal(v_node_id)||')';
+
+        INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, concat('    Inserted into ',v_mantablename,'.'));
 
         IF v_epatablename = 'inp_pump' THEN
             INSERT INTO inp_pump (node_id, power, curve_id, speed, pattern_id, status, pump_type) -- TODO: there is no energyvalue in inp_virtualpump
             SELECT v_node_id, power, curve_id, speed, pattern_id, status, v_pumptype FROM inp_virtualpump WHERE arc_id=v_data.arc_id;
 
+            INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, '    Inserted into inp_pump.');
+
             UPDATE man_pump SET to_arc = v_toarc WHERE node_id = v_node_id;
+
+            INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, concat('    Updated to_arc=',v_toarc,'.'));
 
         ELSIF v_epatablename = 'inp_valve' THEN
             INSERT INTO inp_valve (node_id, valv_type, custom_dint, setting, curve_id, minorloss) -- TODO: there is no status in inp_valve, but there wasn't in 3.6 either...
             SELECT v_node_id, valv_type, diameter, setting, curve_id, minorloss FROM inp_virtualvalve WHERE arc_id=v_data.arc_id;
 
+            INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, '    Inserted into inp_valve.');
+
             UPDATE man_valve SET to_arc = v_toarc WHERE node_id = v_node_id;
+
+            INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, concat('    Updated to_arc=',v_toarc,'.'));
         ELSE
             INSERT INTO inp_shortpipe (node_id, status) SELECT v_node_id, status FROM inp_pipe WHERE arc_id=v_data.arc_id;
+
+            INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, '    Inserted into inp_shortpipe.');
         END IF;
 
         -- get old nodes
         SELECT node_1, node_2 INTO v_node1, v_node2 FROM arc WHERE arc_id=v_data.arc_id;
 
         -- calculate elevation from old nodes
-        v_elevation = ((SELECT elevation FROM node WHERE node_id=v_node1) + (SELECT elevation FROM node WHERE node_id=v_node2))/2;
+        v_elevation = ((SELECT top_elev FROM node WHERE node_id=v_node1) + (SELECT top_elev FROM node WHERE node_id=v_node2))/2;
 
         -- reconnect topology
         UPDATE arc SET node_1=v_node_id WHERE node_1=v_node1 OR node_1=v_node2;
         UPDATE arc SET node_2=v_node_id WHERE node_2=v_node1 OR node_2=v_node2;
+        INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, '    Reconnected node_1 & node_2.');
 
         -- downgrade to obsolete arcs and nodes
         UPDATE arc SET state=0,state_type=2 WHERE arc_id=v_data.arc_id;
+        INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, '    Downgraded arc.');
         UPDATE node SET state=0,state_type=2 WHERE node_id IN (v_node1, v_node2);
+        INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, '    Downgraded old nodes.');
 
         -- update elevation of new node
-        UPDATE node SET elevation = v_elevation, the_geom = the_geom WHERE node_id=v_node_id;
+        UPDATE node SET top_elev = v_elevation, the_geom = the_geom WHERE node_id=v_node_id;
+        INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, '    Updated node elevation and geometry.');
 
     END LOOP;
 
@@ -171,12 +186,18 @@ BEGIN
     -- delete objects;
     --    DELETE FROM inp_pipe WHERE substring(reverse(arc_id),0,5) = 'a2n_'; -- pumps/valves don't get inserted into inp_pipe...
 
-    INSERT INTO audit_check_data (fid, criticity, error_message) VALUES (239, 1,
-    'INFO: Link geometries from VALVES AND PUMPS have been transformed using reverse nod2arc strategy as nodes. Geometry from arcs and nodes are saved using state=0');
 
     -- set node topocontrol=true
     UPDATE config_param_system SET value='{"activated":true,"value":0.1}' WHERE "parameter"='edit_node_proximity';
+    INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, 'INFO: Activated node proximity check.');
     ALTER TABLE node ENABLE TRIGGER gw_trg_node_arc_divide;
+    INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, 'INFO: Enabled node trigger ''gw_trg_node_arc_divide''.');
+
+    -- collect log messages
+    SELECT array_to_json(array_agg(row_to_json(row))) INTO v_result_info
+    FROM (SELECT id, error_message as message FROM t_audit_check_data WHERE cur_user="current_user"() AND fid=v_fid AND criticity > 1 order by criticity desc, id asc) row;
+
+    PERFORM gw_fct_manage_temp_tables(('{"data":{"parameters":{"fid":'||v_fid||', "project_type":"WS", "action":"DROP", "group":"LOG"}}}')::json);
 
     --Control nulls
     v_version := COALESCE(v_version, '{}');
