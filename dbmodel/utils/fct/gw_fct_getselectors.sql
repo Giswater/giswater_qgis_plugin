@@ -188,18 +188,18 @@ BEGIN
 		IF v_project_type = 'WS' THEN
 			CREATE TEMP TABLE temp_t_mincut as select e.* from om_mincut e WHERE id > 0 order by 1;
 		END IF;
-	ELSE 
-		CREATE TEMP TABLE temp_exploitation as select e.* from exploitation e 
+	ELSE
+		CREATE TEMP TABLE temp_exploitation as select e.* from exploitation e
 		JOIN config_user_x_expl USING (expl_id)	WHERE e.active and expl_id > 0 and username = current_user order by 1;
 
 		CREATE TEMP TABLE temp_macroexploitation as select distinct on (m.macroexpl_id) m.* from macroexploitation m
 		JOIN temp_exploitation e USING (macroexpl_id)
 		WHERE m.active and m.macroexpl_id > 0 order by 1;
 
-		CREATE TEMP TABLE temp_sector as 
+		CREATE TEMP TABLE temp_sector as
 		select distinct on (s.sector_id) s.sector_id, s.name, s.macrosector_id, s.descript, s.active from sector s
 		JOIN (SELECT DISTINCT node.sector_id, node.expl_id FROM node WHERE node.state > 0)n USING (sector_id)
-		JOIN exploitation e ON e.expl_id=n.expl_id 
+		JOIN exploitation e ON e.expl_id=n.expl_id
 		JOIN config_user_x_expl c ON c.expl_id=n.expl_id WHERE s.active and s.sector_id > 0 and username = current_user
  			UNION
 		select distinct on (s.sector_id) s.sector_id, s.name, s.macrosector_id, s.descript, s.active from sector s
@@ -208,7 +208,7 @@ BEGIN
 		order by 1;
 
 		CREATE TEMP TABLE temp_macrosector as select distinct on (m.macrosector_id) m.* from macrosector m
-		JOIN temp_sector e USING (macrosector_id) 
+		JOIN temp_sector e USING (macrosector_id)
 		WHERE m.active and m.macrosector_id > 0;
 
 		IF v_project_type = 'WS' THEN
@@ -218,9 +218,9 @@ BEGIN
 		END IF;
 	END IF;
 
-	-- starting loop for tabs	
+	-- starting loop for tabs
 	FOR v_tab IN EXECUTE v_query
-​
+
 	LOOP
 		-- get variables form input
 		v_selector_list := (p_data ->> 'data')::json->> 'ids';
@@ -254,18 +254,18 @@ BEGIN
 		IF v_selectionMode = '' OR v_selectionMode is null then
 			v_selectionMode = 'keepPrevious';
 		END IF;
-	
+
 		-- order by heck. This enables to put checked rows on the top. Useful when there are lots of rows and you need to use the scrollbar to kwow what is checked
-		IF v_orderby_check AND v_tab.tabname != v_currenttab THEN		
+		IF v_orderby_check AND v_tab.tabname != v_currenttab THEN
 			v_orderby_query = 'ORDER BY value DESC, orderby';
-		ELSE 
+		ELSE
 			v_orderby_query = 'ORDER BY orderby';
 		END IF;
 
 		-- built filter from input
 		IF v_filterfrominput IS NULL OR v_filterfrominput = '' OR lower(v_filterfrominput) ='None' or lower(v_filterfrominput) = 'null' THEN
 			v_filterfrominput := NULL;
-		ELSE 
+		ELSE
 			v_filterfrominput = concat (v_typeahead,' LIKE ''%', lower(v_filterfrominput), '%''');
 		END IF;
 
@@ -303,7 +303,7 @@ BEGIN
 			END IF;
 		END IF;
 
-		-- built full filter 
+		-- built full filter
 		v_fullfilter = concat(v_filterfromids, v_filterfromconfig, v_filterfrominput);
 
 		-- use atlas on psector selector

@@ -368,7 +368,7 @@ BEGIN
 		ELSIF v_infiltration='GREEN_AMPT' THEN
 
 			SELECT count(*) INTO v_count FROM v_edit_inp_subcatchment where (suction is null)
-			OR (conduct_ยก is null) OR (initdef is null);
+			OR (conduct_2 is null) OR (initdef is null);
 
 			IF v_count > 0 THEN
 				INSERT INTO t_audit_check_data (fid, result_id, criticity, error_message)
