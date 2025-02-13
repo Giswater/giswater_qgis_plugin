@@ -352,7 +352,7 @@
            </attribute>
            <column>
             <property name="text">
-             <string>EPA type</string>
+             <string>EPA object</string>
             </property>
            </column>
            <column>
@@ -426,7 +426,7 @@
            </attribute>
            <column>
             <property name="text">
-             <string>EPA type</string>
+             <string>EPA object</string>
             </property>
            </column>
            <column>
@@ -468,7 +468,7 @@
            </attribute>
            <column>
             <property name="text">
-             <string>EPA type</string>
+             <string>EPA object</string>
             </property>
            </column>
            <column>
@@ -530,7 +530,7 @@
            </attribute>
            <column>
             <property name="text">
-             <string>EPA type</string>
+             <string>EPA object</string>
             </property>
            </column>
            <column>

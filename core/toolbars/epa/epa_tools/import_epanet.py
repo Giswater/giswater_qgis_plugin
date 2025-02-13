@@ -48,7 +48,12 @@ class GwImportEpanet:
         self.cur_text = None
         self.catalog_source = {
             "pumps": "db_arcs",
-            "valves": "db_arcs"
+            "prv": "db_arcs",
+            "psv": "db_arcs",
+            "pbv": "db_arcs",
+            "fcv": "db_arcs",
+            "tcv": "db_arcs",
+            "gpv": "db_arcs",
         }
 
     def clicked_event(self) -> None:
@@ -143,8 +148,6 @@ class GwImportEpanet:
         self._manage_widgets_visibility()
 
         tools_gw.open_dialog(self.dlg_config, dlg_name="dlg_inp_config_import")
-
-        load_config(self)
 
     def _manage_widgets_visibility(self):
         # Hide widgets for WS
@@ -480,7 +483,12 @@ class GwImportEpanet:
                 "NODE",
             ),
             ("TANKS", self.catalogs.inp_tanks, ("TANK",), "NODE"),
-            ("VALVES", self.catalogs.inp_valves, ("VARC",), "ARC"),
+            ("PRV", self.catalogs.inp_valves_prv, ("VARC","PR_REDUC_VALVE"), ("ARC","NODE")),
+            ("PSV", self.catalogs.inp_valves_psv, ("VARC","PR_SUSTA_VALVE"), ("ARC","NODE")),
+            ("PBV", self.catalogs.inp_valves_pbv, ("VARC","PR_BREAK_VALVE"), ("ARC","NODE")),
+            ("FCV", self.catalogs.inp_valves_fcv, ("VARC","FL_CONTR_VALVE"), ("ARC","NODE")),
+            ("TCV", self.catalogs.inp_valves_tcv, ("VARC","THROTTLE_VALVE"), ("ARC","NODE")),
+            ("GPV", self.catalogs.inp_valves_gpv, ("VARC","GEN_PURP_VALVE"), ("ARC","NODE")),
         ]
 
         self.tbl_elements["features"] = {}
@@ -550,8 +558,23 @@ class GwImportEpanet:
         catalog_source = self.catalog_source.get("pumps", "db_arcs")
         pump_catalog = getattr(self.catalogs, catalog_source)
 
-        catalog_source = self.catalog_source.get("valves", "db_arcs")
-        valve_catalog = getattr(self.catalogs, catalog_source)
+        catalog_source = self.catalog_source.get("prv", "db_arcs")
+        prv_catalog = getattr(self.catalogs, catalog_source)
+
+        catalog_source = self.catalog_source.get("psv", "db_arcs")
+        psv_catalog = getattr(self.catalogs, catalog_source)
+
+        catalog_source = self.catalog_source.get("pbv", "db_arcs")
+        pbv_catalog = getattr(self.catalogs, catalog_source)
+
+        catalog_source = self.catalog_source.get("fcv", "db_arcs")
+        fcv_catalog = getattr(self.catalogs, catalog_source)
+
+        catalog_source = self.catalog_source.get("tcv", "db_arcs")
+        tcv_catalog = getattr(self.catalogs, catalog_source)
+
+        catalog_source = self.catalog_source.get("gpv", "db_arcs")
+        gpv_catalog = getattr(self.catalogs, catalog_source)
 
         # Fill nodes and arcs tables
         elements = [
@@ -559,7 +582,12 @@ class GwImportEpanet:
             ("reservoirs", self.catalogs.inp_reservoirs, self.catalogs.db_nodes),
             ("tanks", self.catalogs.inp_tanks, self.catalogs.db_nodes),
             ("pumps", self.catalogs.inp_pumps, pump_catalog),
-            ("valves", self.catalogs.inp_valves, valve_catalog),
+            ("prv", self.catalogs.inp_valves_prv, prv_catalog),
+            ("psv", self.catalogs.inp_valves_psv, psv_catalog),
+            ("pbv", self.catalogs.inp_valves_pbv, pbv_catalog),
+            ("fcv", self.catalogs.inp_valves_fcv, fcv_catalog),
+            ("tcv", self.catalogs.inp_valves_tcv, tcv_catalog),
+            ("gpv", self.catalogs.inp_valves_gpv, gpv_catalog),
         ]
 
         for element_type, element_catalog, db_catalog in elements:
@@ -645,6 +673,12 @@ class GwImportEpanet:
             "reservoirs": ("NODE", ("SOURCE", "WATERWELL", "WTP")),
             "tanks": ("NODE", ("TANK",)),
             "valves": (("ARC", "NODE"), ("VARC",)),
+            "prv": (("ARC","NODE"), ("VARC","PR_REDUC_VALVE")),
+            "psv": (("ARC","NODE"), ("VARC","PR_SUSTA_VALVE")),
+            "pbv": (("ARC","NODE"), ("VARC","PR_BREAK_VALVE")),
+            "fcv": (("ARC","NODE"), ("VARC","FL_CONTR_VALVE")),
+            "tcv": (("ARC","NODE"), ("VARC","THROTTLE_VALVE")),
+            "gpv": (("ARC","NODE"), ("VARC","GEN_PURP_VALVE")),
         }
         for element_type, (combo,) in self.tbl_elements["features"].items():
             system_catalog = [
@@ -677,13 +711,13 @@ class GwImportEpanet:
             combo.setCurrentText(old_value)
             combo.blockSignals(False)
             # Connect a signal to set pumps and valves in the corresponding table
-            if element_type in ("pumps", "valves"):
+            if element_type in ("pumps", "prv", "psv", "pbv", "fcv", "tcv", "gpv"):
                 tools_gw.connect_signal(combo.currentTextChanged,
                                         partial(self._update_table_based_on_feature_type, element_type, combo),
                                         'import_inp', f'cmb_{element_type.lower()}_update_table_based_on_feature_type')
 
     def _update_table_based_on_feature_type(self, element_type: str, combo: QComboBox):
-        if element_type not in ("pumps", "valves"):
+        if element_type not in ("pumps", "prv", "psv", "pbv", "fcv", "tcv", "gpv"):
             return
 
         feature_type = combo.currentText()
@@ -706,7 +740,12 @@ class GwImportEpanet:
         # Fill table with pumps and valves
         elements = [
             ("pumps", self.catalogs.inp_pumps, "PUMP"),
-            ("valves", self.catalogs.inp_valves, "VALVE"),
+            ("prv", self.catalogs.inp_valves_prv, "PRV"),
+            ("psv", self.catalogs.inp_valves_psv, "PSV"),
+            ("pbv", self.catalogs.inp_valves_pbv, "PBV"),
+            ("fcv", self.catalogs.inp_valves_fcv, "FCV"),
+            ("tcv", self.catalogs.inp_valves_tcv, "TCV"),
+            ("gpv", self.catalogs.inp_valves_gpv, "GPV"),
         ]
 
         # Find the tag for the given element_type

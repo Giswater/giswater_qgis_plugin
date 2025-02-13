@@ -59,7 +59,12 @@ class Catalogs:
     inp_pumps: Optional[list[str]]
     inp_reservoirs: Optional[list[str]]
     inp_tanks: Optional[list[str]]
-    inp_valves: Optional[list[str]]
+    inp_valves_prv: Optional[list[str]]
+    inp_valves_psv: Optional[list[str]]
+    inp_valves_pbv: Optional[list[str]]
+    inp_valves_fcv: Optional[list[str]]
+    inp_valves_tcv: Optional[list[str]]
+    inp_valves_gpv: Optional[list[str]]
 
     @classmethod
     def from_network_model(cls, wn: wntr.network.WaterNetworkModel):
@@ -164,7 +169,23 @@ class Catalogs:
 
         pump_catalogs: Optional[list[str]] = [] if wn.num_pumps > 0 else None
 
-        valve_catalogs: Optional[list[str]] = [] if wn.num_valves > 0 else None
+        n_valves = len([v for _, v in wn.valves() if v.valve_type == "PRV"])
+        prv_catalogs: Optional[list[str]] = [] if n_valves > 0 else None
+
+        n_valves = len([v for _, v in wn.valves() if v.valve_type == "PSV"])
+        psv_catalogs: Optional[list[str]] = [] if n_valves > 0 else None
+
+        n_valves = len([v for _, v in wn.valves() if v.valve_type == "PBV"])
+        pbv_catalogs: Optional[list[str]] = [] if n_valves > 0 else None
+
+        n_valves = len([v for _, v in wn.valves() if v.valve_type == "FCV"])
+        fcv_catalogs: Optional[list[str]] = [] if n_valves > 0 else None
+
+        n_valves = len([v for _, v in wn.valves() if v.valve_type == "TCV"])
+        tcv_catalogs: Optional[list[str]] = [] if n_valves > 0 else None
+
+        n_valves = len([v for _, v in wn.valves() if v.valve_type == "GPV"])
+        gpv_catalogs: Optional[list[str]] = [] if n_valves > 0 else None
 
         return cls(
             db_arc_catalog,
@@ -176,5 +197,10 @@ class Catalogs:
             pump_catalogs,
             reservoir_catalogs,
             tank_catalogs,
-            valve_catalogs,
+            prv_catalogs,
+            psv_catalogs,
+            pbv_catalogs,
+            fcv_catalogs,
+            tcv_catalogs,
+            gpv_catalogs,
         )

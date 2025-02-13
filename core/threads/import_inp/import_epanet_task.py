@@ -190,8 +190,9 @@ class GwImportInpTask(GwTask):
 
             if any(self.manage_nodarcs.values()):
                 self.progress_changed.emit("Nodarcs", self.PROGRESS_SOURCES, "Managing nodarcs (pumps/valves as nodes)...", False)
-                self._manage_nodarcs()
+                log_str = self._manage_nodarcs()
                 self.progress_changed.emit("Nodarcs", self.PROGRESS_END, "done!", True)
+                self.progress_changed.emit("Nodarcs", self.PROGRESS_END, log_str, True)
 
             execute_sql("select 1", commit=True)
             self.progress_changed.emit("", self.PROGRESS_END, "ALL DONE! INP successfully imported.", True)
@@ -433,8 +434,32 @@ class GwImportInpTask(GwTask):
     def _create_new_varc_catalogs(self) -> None:
         varc_catalogs: list[str] = ["pumps", "valves"]
 
+        # cat_mat_arc has an INSERT rule.
+        # So it's not possible to use ON CONFLICT.
+        # So, we perform a conditional INSERT here.
+        execute_sql(
+            """
+            INSERT INTO cat_material (id, descript, feature_type)
+            SELECT 'UNKNOWN', 'Unknown', '{NODE,ARC,CONNEC,ELEMENT}'
+            WHERE NOT EXISTS (
+                SELECT 1
+                FROM cat_material
+                WHERE id = 'UNKNOWN'
+            );
+            """,
+            commit=self.force_commit,
+        )
+
         for varc_type in varc_catalogs:
             if varc_type not in self.catalogs:
+                continue
+
+            if self.manage_nodarcs.get(varc_type):
+                # Just create the 'VARC' catalog to temporarly insert them as varcs
+                execute_sql("""
+                    INSERT INTO cat_arc (id, arc_type, matcat_id, dint)
+                    VALUES ('VARC', 'VARC', 'UNKNOWN', 999) ON CONFLICT DO NOTHING;
+                """)
                 continue
 
             if self.catalogs[varc_type] in self.arccat_db:
@@ -458,7 +483,7 @@ class GwImportInpTask(GwTask):
 
             sql = """
                 INSERT INTO cat_arc (id, arc_type, matcat_id, dint)
-                VALUES (%s, %s, 'UNKNOWN', 999)
+                VALUES (%s, %s, 'UNKNOWN', 999) ON CONFLICT DO NOTHING;
             """
             _id = self.catalogs[varc_type]
             arctype_id = self.catalogs["features"][varc_type]
@@ -966,6 +991,11 @@ class GwImportInpTask(GwTask):
 
     def _save_pumps(self) -> None:
         feature_class = self.catalogs['features']['pumps'].lower()
+        arccat_id = self.catalogs["pumps"]
+        # Set 'fake' catalogs if it will be converted to flwreg
+        if self.manage_nodarcs["pumps"]:
+            feature_class = "VARC"
+            arccat_id = "VARC"
 
         arc_sql = """ 
             INSERT INTO arc (
@@ -1007,7 +1037,6 @@ class GwImportInpTask(GwTask):
             except KeyError as e:
                 self._log_message(f"Node not found: {e}")
                 continue
-            arccat_id = self.catalogs["pumps"]
             epa_type = "VIRTUALPUMP"
             expl_id = self.exploitation
             sector_id = self.sector
@@ -1086,6 +1115,11 @@ class GwImportInpTask(GwTask):
 
     def _save_valves(self) -> None:
         feature_class = self.catalogs['features']['valves'].lower()
+        arccat_id = self.catalogs["valves"]
+        # Set 'fake' catalogs if it will be converted to flwreg
+        if self.manage_nodarcs["valves"]:
+            feature_class = "VARC"
+            arccat_id = "VARC"
 
         arc_sql = """ 
             INSERT INTO arc (
@@ -1127,7 +1161,6 @@ class GwImportInpTask(GwTask):
             except KeyError as e:
                 self._log_message(f"Node not found: {e}")
                 continue
-            arccat_id = self.catalogs["valves"]
             epa_type = "VIRTUALVALVE"
             expl_id = self.exploitation
             sector_id = self.sector
@@ -1339,7 +1372,7 @@ class GwImportInpTask(GwTask):
             params = (source_type, source_quality, source_pattern_id, node_id)
             execute_sql(sql, params)
 
-    def _manage_nodarcs(self):
+    def _manage_nodarcs(self) -> str:
         """ Transform pumps and valves into nodes """
 
         extras = ""
@@ -1348,10 +1381,25 @@ class GwImportInpTask(GwTask):
         if self.manage_nodarcs["pumps"]:
             extras += f'"pumpsType": "{self.catalogs["features"]["pumps"]}",'
         if extras:
+            fct_name = "gw_fct_import_epanet_nodarcs"
             extras = extras[:-1]
             body = tools_gw.create_body(extras=extras)
-            tools_gw.execute_procedure("gw_fct_import_epanet_nodarcs", body, commit=self.force_commit,
-                                       is_thread=True, aux_conn=self.aux_conn)
+            json_result = tools_gw.execute_procedure(fct_name, body, commit=self.force_commit,
+                                       is_thread=True)
+            if not json_result or json_result.get('status') != 'Accepted':
+                message = f"Error executing {fct_name}"
+                raise ValueError(message)
+            try:
+                if json_result['body']['data']['info']:
+                    info = json_result['body']['data']['info']
+                    if isinstance(info, list):
+                        logs = [x.get('message') for x in info]
+                        logs_str = '\n'.join(logs)
+                        return logs_str
+            except KeyError:
+                pass
+            return ""
+        return "No nodarcs to manage"
 
     def _update_municipality(self):
         """ Update the muni_id of all features getting the spatial intersection with the municipality """
