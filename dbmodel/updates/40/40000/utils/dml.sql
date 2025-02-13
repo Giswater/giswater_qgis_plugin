@@ -1303,3 +1303,10 @@ VALUES (3386, 'gw_fct_manage_relations', 'utils', 'function', 'json', 'json', 'F
 UPDATE sys_message
 SET error_message = 'The inserted catalog value does not exist --> %catalog_value%'
 WHERE id = 3282;
+
+UPDATE sys_fprocess SET fprocess_name='EPA connec over EPA node (goe2pa)', project_type='ws', parameters=NULL, "source"='core', isaudit=true, fprocess_type='Check epa-result', addparam=NULL, except_level=3, except_msg='EPA connecs over EPA nodes', except_table='anl_connec', except_table_msg=NULL, query_text='	SELECT connec_id, conneccat_id, expl_id, the_geom FROM (
+	SELECT DISTINCT t2.connec_id, t2.conneccat_id , t2.expl_id, t1.the_geom, st_distance(t1.the_geom, t2.the_geom) as dist, t1.state as state1, t2.state as state2 
+	FROM v_edit_node AS t1 JOIN v_edit_connec AS t2 ON ST_Dwithin(t1.the_geom, t2.the_geom, 0.1) 
+	WHERE t1.epa_type != ''UNDEFINED''
+	AND t2.epa_type = ''JUNCTION'') a 
+    WHERE a.state1 > 0 AND a.state2 > 0 ', info_msg='No EPA connecs over EPA node have been detected.', function_name='[gw_fct_pg2epa_check_networkmode_connec]', active=false WHERE fid=413;

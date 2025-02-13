@@ -19,23 +19,30 @@ fid  =604
 DECLARE
 
 v_project_type text;
-v_rectable record;
 v_version text;
 v_epsg integer;
 v_return json;
 v_schemaname text;
 v_error_context text;
-v_projectrole text;
-v_infotype text;
-v_insert_fields json;
-v_uservalues json;
+
+v_verified_exceptions boolean = true;
 v_omcheck boolean = true;
 v_graphcheck boolean = true;
 v_epacheck boolean = true;
 v_plancheck boolean = true;
 v_admincheck boolean = true;
-v_verified_exceptions boolean = true;
+
 v_fid integer = 604;
+
+v_querytext TEXT;
+v_rec record;
+v_result_info JSON;
+v_result_point JSON;
+v_result_line JSON;
+v_result_polygon JSON;
+v_rec_mapzone record;
+v_rec_check record;
+v_mapzones TEXT;
 
 BEGIN
 
@@ -54,6 +61,7 @@ BEGIN
 	v_admincheck :=  ((p_data ->> 'data')::json->>'parameters')::json->> 'tab_data_admin_check';
 
 	-- get system parameters in case input parameter is null
+/*
 	IF v_verified_exceptions IS NULL THEN SELECT value::json->>'verifiedExceptions' INTO v_verified_exceptions 
 	   FROM config_param_system WHERE parameter = 'admin_checkproject'; END IF;
 	IF v_omcheck IS NULL THEN SELECT value::json->>'omCheck' INTO v_omcheck FROM config_param_system WHERE parameter = 'admin_checkproject'; END IF;
@@ -62,7 +70,9 @@ BEGIN
 	IF v_plancheck IS NULL THEN SELECT value::json->>'planCheck' INTO v_plancheck FROM config_param_system WHERE parameter = 'admin_checkproject'; END IF;
 	IF v_admincheck IS NULL THEN SELECT value::json->>'adminCheck' INTO v_admincheck FROM config_param_system WHERE parameter = 'admin_checkproject'; END IF;
 
+*/
 	-- create temp tables
+	EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"fid":'||v_fid||', "project_type":"'||v_project_type||'", "action":"CREATE", "group":"EPA"}}}$$)';
 	EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"fid":'||v_fid||', "project_type":"'||v_project_type||'", "action":"CREATE", "group":"LOG"}}}$$)';
 	EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"fid":'||v_fid||', "project_type":"'||v_project_type||'", "action":"CREATE", "group":"ANL"}}}$$)';
 	EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"fid":'||v_fid||', "project_type":"'||v_project_type||'", "action":"CREATE", "group":"OMCHECK"}}}$$)';
@@ -71,36 +81,100 @@ BEGIN
 	-- create log tables
 	EXECUTE 'SELECT gw_fct_create_logtables($${"data":{"parameters":{"fid":604}}}$$::json)';
 
-	-- starting check process
-	IF 'role_om' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) AND v_omcheck THEN
-		EXECUTE 'SELECT gw_fct_om_check_data($${"data":{"parameters":{"fid":'||v_fid||', "isEmbebed":true}}}$$)';
-	END IF;
-
-	IF 'role_epa' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) AND v_epacheck THEN
-		EXECUTE 'SELECT gw_fct_pg2epa_check_data($${"data":{"parameters":{"fid":'||v_fid||', "isEmbebed":true}}}$$)';
-	END IF;
-
-	IF 'role_master' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) AND v_plancheck THEN
-		EXECUTE 'SELECT gw_fct_plan_check_data($${"data":{"parameters":{"fid":'||v_fid||', "isEmbebed":true}}}$$)';
-	END IF;
 	
-	IF 'role_admin' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) AND v_admincheck THEN
-		EXECUTE 'SELECT gw_fct_admin_check_data($${"data":{"parameters":{"fid":'||v_fid||', "isEmbebed":true}}}$$)';
-	END IF; 
+	CREATE TEMP TABLE t_temp_values AS 
+	SELECT 'v_omcheck', 'om_check' AS check_data, v_omcheck AS val UNION
+	SELECT 'v_graphcheck', 'graph_check' AS check_data, v_graphcheck AS val UNION
+	SELECT 'v_epacheck', 'pg2epa_check' as check_data, v_epacheck AS val UNION
+	SELECT 'v_plancheck', 'plan_check' as check_data, v_plancheck AS val UNION
+	SELECT 'v_admincheck', 'admin_check' AS check_data, v_admincheck AS val;
+
+
+	-- build query for generic cases
+	FOR v_rec_check IN SELECT check_data FROM t_temp_values WHERE val IS TRUE
+	LOOP 
+		
+		v_querytext = '
+			SELECT * FROM sys_fprocess 
+			WHERE project_type IN (LOWER('||quote_literal(v_project_type)||'), ''utils'') 
+			AND query_text NOT ILIKE ''%v_graphClass%''
+			AND (addparam IS NULL 
+			AND query_text IS NOT NULL 
+			AND function_name ILIKE ''%'||v_rec_check.check_data||'%'') 
+			ORDER BY fid ASC';
+	
+		FOR v_rec IN EXECUTE v_querytext 
+		LOOP
+		
+			EXECUTE 'SELECT gw_fct_check_fprocess($${"client":{"device":4, "infoType":1, "lang":"ES"}, 
+		    "form":{},"feature":{},"data":{"parameters":{"functionFid": '||v_fid||', "checkFid":"'||v_rec.fid||'"}}}$$)';
+		   
+		END LOOP;
+	
+	END LOOP;
+	
+	-- build query for (mapzones)
+	IF v_graphcheck THEN
+		
+		v_querytext = '
+		SELECT * FROM sys_fprocess 
+		WHERE project_type IN (LOWER('||quote_literal(v_project_type)||'), ''utils'') 
+		AND (addparam IS NULL 
+		AND query_text ILIKE ''%v_graphClass%'')
+		ORDER BY fid ASC
+		';
+	
+		IF lower(v_project_type) = 'ws' THEN 
+			v_mapzones = 'SELECT unnest(ARRAY[''sector'', ''dma'', ''dqa'', ''presszone'']) AS mec';
+		
+		ELSIF lower(v_project_type) = 'ud' THEN 
+			v_mapzones = 'SELECT unnest(ARRAY[''sector'', ''drainzone'']) AS mec';
+		
+		END IF;
+
+	
+		FOR v_rec IN EXECUTE v_querytext 
+		LOOP
+			
+			FOR v_rec_mapzone IN EXECUTE v_mapzones
+			LOOP
+				
+				EXECUTE 'SELECT gw_fct_check_fprocess($${"client":{"device":4, "infoType":1, "lang":"ES"}, 
+		    	"form":{},"feature":{},"data":{"parameters":{"functionFid": '||v_fid||', "checkFid":"'||v_rec.fid||'", "graphClass":"'||v_rec_mapzone.mec||'"}}}$$)';
+				
+			END LOOP;
+		   
+		END LOOP;
+
+	END IF;
 
 	--EXECUTE 'SELECT gw_fct_user_check_data($${"data":{"parameters":{"fid":'||v_fid||', "isEmbebed":true}}}$$)';
 	
-	-- create return
-	EXECUTE 'SELECT gw_fct_create_return($${"data":{"parameters":{"functionId":3364, "isEmbebed":false}}}$$::json)' INTO v_return;
-	
+	-- create json return to send client
+	EXECUTE 'SELECT gw_fct_create_logreturn($${"data":{"parameters":{"type":"info"}}}$$::json)' INTO v_result_info;
+	EXECUTE 'SELECT gw_fct_create_logreturn($${"data":{"parameters":{"type":"point"}}}$$::json)' INTO v_result_point;
+	EXECUTE 'SELECT gw_fct_create_logreturn($${"data":{"parameters":{"type":"line"}}}$$::json)' INTO v_result_line;
+	EXECUTE 'SELECT gw_fct_create_logreturn($${"data":{"parameters":{"type":"polygon"}}}$$::json)' INTO v_result_polygon;
+
 	-- drop temp tables
+	EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"fid":'||v_fid||', "project_type":"'||v_project_type||'", "action":"DROP", "group":"EPA"}}}$$)';
 	EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"fid":'||v_fid||', "project_type":"'||v_project_type||'", "action":"DROP", "group":"LOG"}}}$$)';
 	EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"fid":'||v_fid||', "project_type":"'||v_project_type||'", "action":"DROP", "group":"ANL"}}}$$)';
 	EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"fid":'||v_fid||', "project_type":"'||v_project_type||'", "action":"DROP", "group":"OMCHECK"}}}$$)';
-	EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"fid":'||v_fid||', "project_type":"'||v_project_type||'", "action":"DROP", "group":"EPAMAIN"}}}$$)';
 	EXECUTE 'SELECT gw_fct_manage_temp_tables($${"data":{"parameters":{"fid":'||v_fid||', "project_type":"'||v_project_type||'", "action":"DROP", "group":"MAPZONES", "subGroup":"ALL"}}}$$)';
 
-	RETURN v_return;
+	DROP TABLE IF EXISTS t_temp_values;
+
+
+	-- Return
+	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":{"level":1, "text":"Data quality analysis done succesfully"}, "version":"'||v_version||'"'||
+             ',"body":{"form":{}'||
+		     ',"data":{ "info":'||v_result_info||','||
+				'"point":'||v_result_point||','||
+				'"line":'||v_result_line||','||
+				'"polygon":'||v_result_polygon||
+		       '}'||
+	    '}}')::json, 2670, null, null, null);
 
 	--  Exception handling
 	--EXCEPTION WHEN OTHERS THEN
