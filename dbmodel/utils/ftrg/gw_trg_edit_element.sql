@@ -116,19 +116,14 @@ BEGIN
 		END IF;
 
 		-- Sector
-		IF (NEW.sector_id IS NULL) THEN
+		IF (NEW.sector_id IS NULL AND NEW.the_geom IS NOT NULL) THEN
 			NEW.sector_id := (SELECT sector_id FROM sector WHERE ST_intersects(NEW.the_geom, sector.the_geom) AND active IS TRUE limit 1);
-
-			IF (NEW.sector_id IS NULL) THEN
-				NEW.sector_id := 0;
-			END IF;
 		END IF;
 
 		-- Municipality
-		IF (NEW.muni_id IS NULL) THEN
+		IF (NEW.muni_id IS NULL AND NEW.the_geom IS NOT NULL) THEN
 			NEW.muni_id := (SELECT m.muni_id FROM ext_municipality m WHERE ST_intersects(NEW.the_geom, m.the_geom) AND active IS TRUE limit 1);
 		END IF;
-
 
 		-- Enddate
 		IF (NEW.state > 0) THEN
@@ -190,6 +185,7 @@ BEGIN
 
 				-- get element dimensions to generate CIRCULARE geometry
 				v_pol_id:= (SELECT nextval('urn_id_seq'));
+
 				INSERT INTO polygon(sys_type, the_geom, pol_id, featurecat_id, feature_id)
 				VALUES ('ELEMENT', St_Multi(ST_buffer(NEW.the_geom, v_length*0.01*v_unitsfactor/2)),v_pol_id, v_element_type, NEW.element_id);
 
@@ -249,14 +245,26 @@ BEGIN
 			('||v_tablefeature||'_id, element_id) DO NOTHING';
 		END IF;
 
+		IF v_project_type = 'WS' THEN
 
-		--elevation from raster
-		IF (SELECT json_extract_path_text(value::json,'activated')::boolean FROM config_param_system WHERE parameter='admin_raster_dem') IS TRUE
-		AND (NEW.top_elev IS NULL) AND
-		(SELECT upper(value)  FROM config_param_user WHERE parameter = 'edit_insert_elevation_from_dem' and cur_user = current_user) = 'TRUE' THEN
-			NEW.top_elev = (SELECT ST_Value(rast,1,NEW.the_geom,true) FROM ext_raster_dem WHERE id =
-				(SELECT id FROM ext_raster_dem WHERE st_dwithin (envelope, NEW.the_geom, 1) LIMIT 1));
-		END IF;
+			--elevation from raster
+			IF (SELECT json_extract_path_text(value::json,'activated')::boolean FROM config_param_system WHERE parameter='admin_raster_dem') IS TRUE
+			 AND (NEW.elevation IS NULL) AND
+			(SELECT upper(value)  FROM config_param_user WHERE parameter = 'edit_insert_elevation_from_dem' and cur_user = current_user) = 'TRUE' THEN
+				NEW.elevation = (SELECT ST_Value(rast,1,NEW.the_geom,true) FROM ext_raster_dem WHERE id =
+					(SELECT id FROM ext_raster_dem WHERE st_dwithin (envelope, NEW.the_geom, 1) LIMIT 1));
+			END IF;
+
+			UPDATE element SET elevation = NEW.elevation WHERE element_id = NEW.element_id;
+		ELSIF v_project_type = 'UD' THEN
+
+				--elevation from raster
+			IF (SELECT json_extract_path_text(value::json,'activated')::boolean FROM config_param_system WHERE parameter='admin_raster_dem') IS TRUE
+			AND (NEW.top_elev IS NULL) AND
+			(SELECT upper(value)  FROM config_param_user WHERE parameter = 'edit_insert_elevation_from_dem' and cur_user = current_user) = 'TRUE' THEN
+				NEW.top_elev = (SELECT ST_Value(rast,1,NEW.the_geom,true) FROM ext_raster_dem WHERE id =
+					(SELECT id FROM ext_raster_dem WHERE st_dwithin (envelope, NEW.the_geom, 1) LIMIT 1));
+			END IF;
 
 		UPDATE element SET top_elev = NEW.top_elev WHERE element_id = NEW.element_id;
 
@@ -265,6 +273,16 @@ BEGIN
 
 	-- UPDATE
 	ELSIF TG_OP = 'UPDATE' THEN
+
+		-- Sector
+		IF (NEW.sector_id IS NULL AND NEW.the_geom IS NOT NULL) THEN
+			NEW.sector_id := (SELECT sector_id FROM sector WHERE ST_intersects(NEW.the_geom, sector.the_geom) AND active IS TRUE limit 1);
+		END IF;
+
+		-- Municipality
+		IF (NEW.muni_id IS NULL AND NEW.the_geom IS NOT NULL) THEN
+			NEW.muni_id := (SELECT m.muni_id FROM ext_municipality m WHERE ST_intersects(NEW.the_geom, m.the_geom) AND active IS TRUE limit 1);
+		END IF;
 
 		UPDATE element
 		SET element_id=NEW.element_id, code=NEW.code, datasource=NEW.datasource, elementcat_id=NEW.elementcat_id, model_id=NEW.model_id, brand_id=NEW.brand_id, serial_number=NEW.serial_number, "state"=NEW."state", state_type=NEW.state_type, observ=NEW.observ, "comment"=NEW."comment",

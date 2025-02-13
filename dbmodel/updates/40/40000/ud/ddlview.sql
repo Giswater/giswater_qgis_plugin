@@ -234,10 +234,10 @@ SELECT element.element_id,
      JOIN cat_element ON element.elementcat_id::text = cat_element.id::text
      JOIN element_type ON element_type.id::text = cat_element.element_type::text
   WHERE element.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text) e
-  join selector_sector s using (sector_id)
-  LEFT JOIN selector_municipality m using (muni_id)
-  where s.cur_user = current_user
-  and (m.cur_user = current_user or e.muni_id is null);
+  LEFT JOIN selector_sector s USING (sector_id)
+  LEFT JOIN selector_municipality m USING (muni_id)
+  WHERE (s.cur_user = current_user OR s.sector_id IS NULL)
+  AND (m.cur_user = current_user OR e.muni_id IS NULL);
 
 CREATE OR REPLACE VIEW v_edit_samplepoint AS
 SELECT sm.* FROM (

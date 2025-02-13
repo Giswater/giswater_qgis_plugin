@@ -43,3 +43,7 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"audit_psect
 -- 07/02/2025
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"dimensions", "column":"workcat_id", "dataType":"varchar(255)", "isUtils":"False"}}$$);
 ALTER TABLE dimensions ADD CONSTRAINT dimensions_workcat_id_fkey FOREIGN KEY (workcat_id) REFERENCES cat_work(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+-- 12/02/2025
+ALTER TABLE element ALTER COLUMN muni_id DROP NOT NULL;
+ALTER TABLE element ALTER COLUMN sector_id DROP NOT NULL;
