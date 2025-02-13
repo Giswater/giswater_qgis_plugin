@@ -161,7 +161,7 @@ class GwElement:
         self.dlg_add_element.tbl_element_x_gully.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
                                                                          self.dlg_add_element.tbl_element_x_gully, "v_edit_gully", "gully_id", self.rubber_band, 10))
         self.dlg_add_element.btn_path_url.clicked.connect(partial(self._open_web_browser, self.dlg_add_element, "link"))
-        
+
         # Fill combo boxes of the form and related events
         self.dlg_add_element.element_type.currentIndexChanged.connect(partial(self._filter_elementcat_id))
         self.dlg_add_element.element_type.currentIndexChanged.connect(partial(self._update_location_cmb))
@@ -494,7 +494,7 @@ class GwElement:
             answer = tools_qt.show_question(message)
             if not answer:
                 return
-            sql = (f"UPDATE element"
+            sql = (f"UPDATE v_edit_element"
                    f" SET elementcat_id = '{elementcat_id}', num_elements = '{num_elements}', state = '{state}'"
                    f", state_type = '{state_type}', expl_id = '{expl_id}', rotation = '{rotation}'"
                    f", comment = $${comment}$$, observ = $${observ}$$"
