@@ -378,12 +378,16 @@ class GwImportInpTask(GwTask):
             if not json_result or json_result.get('status') != 'Accepted':
                 message = "Error executing gw_fct_import_swmm_flwreg"
                 raise ValueError(message)
-            if json_result['body']['data']['info']:
-                info = json_result['body']['data']['info']
-                if isinstance(info, list):
-                    logs = [x.get('message') for x in info]
-                    logs_str = '\n'.join(logs)
-                    return logs_str
+            try:
+                if json_result['body']['data']['info']:
+                    info = json_result['body']['data']['info']
+                    if isinstance(info, list):
+                        logs = [x.get('message') for x in info]
+                        logs_str = '\n'.join(logs)
+                        return logs_str
+            except KeyError:
+                pass
+            return ""
         return "No flowregs to manage"
 
     def _validate_inputs(self) -> None:
