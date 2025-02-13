@@ -28,7 +28,7 @@ SELECT SCHEMA_NAME.gw_fct_get_dialog($${"client":{"device":5, "lang":"es_ES", "c
 DECLARE
 
 v_array_index integer DEFAULT 0;
-v_field_value character varying;
+v_field_value text;
 v_aux_json json;
 v_form text;
 v_device integer;
@@ -206,6 +206,42 @@ BEGIN
 	        -- Replace tabwidget json with updated values
 	        v_fields_array[i] := v_widget;
 
+	    ELSE
+			-- If inserting and field_value is NULL or empty, check widget controls for defaults
+			IF (p_data->>'form')::json->>'id' IS NULL AND (v_field_value IS NULL OR v_field_value = '') THEN
+			    IF (v_widget->>'widgetcontrols') IS NOT NULL THEN
+			        -- Handle combo box default value logic
+			        IF (v_widget->>'widgettype') = 'combo' THEN
+			            IF ((v_widget->'widgetcontrols')::jsonb ? 'vdefault_value') THEN
+			                IF ((v_widget->'widgetcontrols')::json->>'vdefault_value') IN
+			                    (SELECT a FROM json_array_elements_text(json_extract_path(v_fields_array[v_array_index], 'comboIds')) a)
+			                THEN
+			                    v_field_value := (v_widget->'widgetcontrols')::json->>'vdefault_value';
+			                END IF;
+			            ELSIF ((v_widget->'widgetcontrols')::jsonb ? 'vdefault_querytext') THEN
+			                EXECUTE (v_widget->'widgetcontrols')::json->>'vdefault_querytext' INTO v_field_value;
+			                IF v_field_value IN
+			                    (SELECT a FROM json_array_elements_text(json_extract_path(v_fields_array[v_array_index], 'comboIds')) a)
+			                THEN
+			                    -- Assign default query text if valid
+			                    v_field_value := v_field_value;
+			                END IF;
+			            END IF;
+			        ELSE
+			            -- Handle non-combo default values
+			            IF ((v_widget->'widgetcontrols')::jsonb ? 'vdefault_value') THEN
+			                v_field_value := (v_widget->'widgetcontrols')::json->>'vdefault_value';
+			            ELSIF ((v_widget->'widgetcontrols')::jsonb ? 'vdefault_querytext') THEN
+			                EXECUTE (v_widget->'widgetcontrols')::json->>'vdefault_querytext' INTO v_field_value;
+			            END IF;
+			        END IF;
+			    END IF;
+
+			END IF;
+	        v_widget := jsonb_set(v_widget, '{value}', to_jsonb(COALESCE(v_field_value, '')));
+			v_widget := v_widget - 'widgetcontrols';
+	        v_fields_array[i] := v_widget;
+			v_field_value := '';
 	    END IF;
 
 	END LOOP;
