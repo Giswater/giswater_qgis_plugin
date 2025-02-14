@@ -265,6 +265,10 @@ BEGIN
             IF (SELECT EXISTS ( SELECT 1 FROM   information_schema.tables WHERE  table_schema = v_schemaname AND table_name = v_feature_childtable_name)) IS TRUE THEN
                 -- add new addfield columname
                 EXECUTE 'ALTER TABLE ' || v_feature_childtable_name || ' ADD COLUMN ' || v_param_name || ' '||v_config_datatype||'';
+
+                -- log
+                INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+            	VALUES (218, null, 4, concat('Add column ', v_param_name, ' to table ', v_feature_childtable_name, '.'));
             ELSE
                 -- create child table with the new addfield column
                 EXECUTE 'CREATE TABLE IF NOT EXISTS ' || v_feature_childtable_name || ' (
@@ -274,10 +278,23 @@ BEGIN
                         )';
 
                 EXECUTE 'CREATE INDEX ' || v_feature_childtable_name || '_'|| v_feature_type|| '_id_index ON ' || v_feature_childtable_name || ' USING btree ('|| v_feature_type|| '_id)';
+                -- log
+                INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+            	VALUES (218, null, 4, concat('Create table ', v_feature_childtable_name));
 
                 EXECUTE 'INSERT INTO sys_table (id, descript, sys_role) VALUES (''' || v_feature_childtable_name || ''', '''', ''role_edit'') ON CONFLICT (id) DO NOTHING;';
-
+                -- log
+                INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+            	VALUES (218, null, 4, concat('Add table ', v_feature_childtable_name, ' to sys_table.'));
             END IF;
+
+            v_query = concat('{"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"catFeature":"',v_cat_feature,
+			'"},"data":{"filterFields":{}, "pageInfo":{}, "action":"SINGLE-CREATE"}}');
+			PERFORM gw_fct_admin_manage_child_views(v_query::json);
+
+            -- log
+            INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+            VALUES (218, null, 4, concat('Create child view: ', v_viewname));
 
             EXECUTE 'SELECT max(layoutorder) + 1 FROM config_form_fields WHERE formname='''||v_viewname||''' AND layoutname = '''||v_layoutname||''';'
             INTO v_layoutorder;
@@ -296,8 +313,9 @@ BEGIN
             v_parentid, v_querytextfilterc, v_querytext,  v_linkedobject, v_hidden)
             ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
+            -- log
             INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-            VALUES (218, null, 4, 'Insert parameter definition into config_form_fields.');
+            VALUES (218, null, 4, concat('Insert parameter definition for ', v_param_name, ' into config_form_fields.'));
 
             SELECT max(layoutorder) + 1 INTO v_param_user_id FROM sys_param_user WHERE layoutname='lyt_addfields';
 
@@ -312,16 +330,18 @@ BEGIN
             'role_edit', concat(v_param_name,':'), 'lyt_addfields', v_param_user_id, lower(v_project_type), false, false, v_audit_datatype,
             v_audit_widgettype, false, v_querytext, v_querytextfilterc, v_param_name, true);
 
+            -- log
             INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-            VALUES (218, null, 4, concat('Create new vdefault: ', concat('edit_addfield_p', v_idaddparam,'_vdefault'),'.'));
+            VALUES (218, null, 4, concat('Created new vdefault parameter: edit_addfield_p', v_idaddparam, '_vdefault'));
 
         ELSIF v_action = 'UPDATE' THEN
             UPDATE sys_addfields SET  is_mandatory=v_ismandatory, datatype_id=v_add_datatype,
             active=v_active, orderby=v_orderby,iseditable=v_iseditable
             WHERE param_name=v_param_name AND cat_feature_id=v_cat_feature;
 
+            -- log
             INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-            VALUES (218, null, 4, 'Update parameter definition in sys_addfields.');
+            VALUES (218, null, 4, concat('Updated parameter definition for ', v_param_name, ' in sys_addfields.'));
 
             IF (SELECT cat_feature_id FROM sys_addfields WHERE param_name=v_param_name) IS NOT NULL THEN
                 UPDATE config_form_fields SET layoutname=v_layoutname, datatype=v_config_datatype,
@@ -334,16 +354,18 @@ BEGIN
                 hidden = v_hidden
                 WHERE columnname=v_param_name AND formname=v_viewname;
 
+                -- log
                 INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-                VALUES (218, null, 4, 'Update parameter definition in config_form_fields.');
+                VALUES (218, null, 4, concat('Updated parameter definition for ', v_param_name, ' in config_form_fields.'));
 
             END IF;
 
             UPDATE sys_param_user SET datatype = v_audit_datatype, widgettype=v_audit_widgettype, dv_querytext = v_querytext,
             dv_querytext_filterc = v_querytextfilterc WHERE id = concat('edit_addfield_p', v_idaddparam,'_vdefault');
 
+            -- log
             INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-            VALUES (218, null, 4, concat('Update definition of vdefault: ', concat('edit_addfield_p', v_idaddparam,'_vdefault'),'.'));
+            VALUES (218, null, 4, concat('Updated parameter definition for ', v_param_name, ' in sys_param_user.'));
 
         ELSIF v_action = 'DELETE' THEN
 
@@ -356,15 +378,23 @@ BEGIN
                 EXECUTE 'ALTER TABLE ' || v_feature_childtable_name || ' DROP COLUMN ' || v_param_name || '';
             END IF;
 
-            DELETE FROM sys_param_user WHERE id = concat('edit_addfield_p', v_idaddparam,'_vdefault');
+            v_query = concat('{"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"catFeature":"',v_cat_feature,
+			'"},"data":{"filterFields":{}, "pageInfo":{}, "action":"SINGLE-CREATE"}}');
+			PERFORM gw_fct_admin_manage_child_views(v_query::json);
 
+            -- log
             INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-            VALUES (218, null, 4, 'Delete values from config_form_fields related to parameter.');
+            VALUES (218, null, 4, concat('Re-create child view: ', v_viewname));
+
+            DELETE FROM sys_param_user WHERE id = concat('edit_addfield_p', v_idaddparam,'_vdefault');
+            -- log
+            INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+            VALUES (218, null, 4, concat('Delete values from config_form_fields related to parameter: ', v_param_name));
 
             DELETE FROM config_form_fields WHERE formname=v_viewname AND columnname=v_param_name;
-
+            -- log
             INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-            VALUES (218, null, 4, concat('Delete definition of vdefault: ', concat('edit_addfield_p', v_idaddparam,'_vdefault')));
+            VALUES (218, null, 4, concat('Deleted default value definition for parameter ', v_param_name));
 
         ELSIF v_action='DEACTIVATE' THEN
             IF v_istrg IS FALSE OR v_istrg IS NULL THEN
@@ -375,6 +405,10 @@ BEGIN
             UPDATE config_form_fields SET hidden=TRUE FROM cat_feature WHERE columnname=v_param_name AND id=v_cat_feature
             AND	formname = child_layer;
 
+            -- log
+            INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+            VALUES (218, null, 4, concat('Deactivated parameter: ', v_param_name));
+
         ELSIF v_action='ACTIVATE' THEN
             IF v_istrg IS FALSE OR v_istrg IS NULL THEN
                 UPDATE sys_addfields SET active=TRUE
@@ -384,6 +418,9 @@ BEGIN
             UPDATE config_form_fields SET hidden=FALSE FROM cat_feature WHERE columnname=v_param_name AND id=v_cat_feature
             AND	formname = child_layer;
 
+            -- log
+            INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+            VALUES (218, null, 4, concat('Activated parameter: ', v_param_name));
         END IF;
 
     -- MULTI ADDFIELD
@@ -411,6 +448,7 @@ BEGIN
             IF (SELECT child_layer FROM cat_feature WHERE id=rec.id AND (position('-' IN child_layer)>0 OR position(' ' IN child_layer)>0
                 OR position('.' IN child_layer)>0)) IS NOT NULL  THEN
 
+                -- log
                 INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
                 VALUES (218, null, 4, concat('Remove unwanted characters from child view name: ',rec.id));
 
@@ -440,8 +478,9 @@ BEGIN
                 VALUES (v_param_name, NULL, v_ismandatory, v_add_datatype,
                 v_active, v_orderby, v_iseditable, v_addfield_type) RETURNING id INTO v_idaddparam;
 
+                -- log
                 INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-                VALUES (218, null, 4, 'Insert parameter definition into sys_addfields.');
+                VALUES (218, null, 4, concat('Insert parameter definition into sys_addfields: ', v_param_name));
 
                 SELECT max(layoutorder) + 1 INTO v_param_user_id FROM sys_param_user WHERE layoutname='lyt_addfields';
 
@@ -456,8 +495,9 @@ BEGIN
                     'lyt_addfields', v_param_user_id, lower(v_project_type), false, false, v_audit_datatype, v_audit_widgettype, false,
                     v_querytext, v_querytextfilterc,v_param_name, true);
 
+                    -- log
                     INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-                    VALUES (218, null, 4, concat('Create new vdefault: ', concat('edit_addfield_p', v_idaddparam,'_vdefault')));
+                    VALUES (218, null, 4, concat('Create new vdefault: edit_addfield_p', v_idaddparam,'_vdefault'));
 
                 END IF;
 
@@ -466,15 +506,16 @@ BEGIN
                 active=v_active, orderby=v_orderby, iseditable=v_iseditable
                 WHERE param_name=v_param_name and cat_feature_id IS NULL;
 
+                -- log
                 INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-                VALUES (218, null, 4, 'Update parameter definition in sys_addfields.');
+                VALUES (218, null, 4, concat('Update parameter definition in sys_addfields: ', v_param_name));
 
                 UPDATE sys_param_user SET datatype = v_audit_datatype, widgettype=v_audit_widgettype, dv_querytext = v_querytext,
                 dv_querytext_filterc = v_querytextfilterc WHERE id = concat('edit_addfield_p', v_idaddparam,'_vdefault');
 
-
+                -- log
                 INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-                VALUES (218, null, 4, concat('Update definition of vdefault: ', concat('edit_addfield_p', v_idaddparam,'_vdefault')));
+                VALUES (218, null, 4, concat('Update definition of vdefault: edit_addfield_p', v_idaddparam,'_vdefault'));
 
             ELSIF v_action = 'DELETE' THEN
 
@@ -484,20 +525,30 @@ BEGIN
 
                 DELETE FROM config_form_fields WHERE formname=v_viewname AND columnname=v_param_name;
 
+                EXECUTE  'DROP VIEW IF EXISTS '||v_schemaname||'.'||v_viewname||';';
+                IF (SELECT EXISTS ( SELECT 1 FROM   information_schema.tables WHERE  table_schema = v_schemaname AND table_name = v_feature_childtable_name)) IS TRUE THEN
+                    EXECUTE 'ALTER TABLE ' || v_feature_childtable_name || ' DROP COLUMN ' || v_param_name || '';
+                END IF;
+
+                -- log
                 INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-                VALUES (218, null, 4, 'Delete values from config_form_fields related to parameter.');
+                VALUES (218, null, 4, concat('Delete values from config_form_fields related to parameter: ', v_param_name));
 
                 DELETE FROM sys_param_user WHERE id = concat('edit_addfield_p', v_idaddparam,'_vdefault');
 
+                -- log
                 INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-                VALUES (218, null, 4, concat('Delete definition of vdefault: ', concat('edit_addfield_p', v_idaddparam,'_vdefault')));
-
+                VALUES (218, null, 4, concat('Delete definition of vdefault: edit_addfield_p', v_idaddparam,'_vdefault'));
             END IF;
 
             IF v_action = 'CREATE' THEN
                 IF (SELECT EXISTS ( SELECT 1 FROM information_schema.tables WHERE  table_schema = v_schemaname AND table_name = v_feature_childtable_name)) IS TRUE THEN
                 -- add new addfield columname
                     EXECUTE 'ALTER TABLE ' || v_feature_childtable_name || ' ADD COLUMN ' || v_param_name || ' '||v_config_datatype||'';
+
+                    -- log
+                    INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+                    VALUES (218, null, 4, concat('Add column ', v_param_name, ' to table ', v_feature_childtable_name, '.'));
                 ELSE
                     -- create child table with the new addfield column
                     EXECUTE 'CREATE TABLE IF NOT EXISTS ' || v_feature_childtable_name || ' (
@@ -508,7 +559,15 @@ BEGIN
 
                     EXECUTE 'CREATE INDEX ' || v_feature_childtable_name || '_'|| v_feature_type|| '_id_index ON ' || v_feature_childtable_name || ' USING btree ('|| v_feature_type|| '_id)';
 
+                    -- log
+                    INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+                    VALUES (218, null, 4, concat('Create table ', v_feature_childtable_name));
+
                     EXECUTE 'INSERT INTO sys_table (id, descript, sys_role) VALUES (''' || v_feature_childtable_name || ''', '''', ''role_edit'') ON CONFLICT (id) DO NOTHING;';
+
+                    -- log
+                    INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+                    VALUES (218, null, 4, concat('Add table ', v_feature_childtable_name, ' to sys_table.'));
 
                 END IF;
 
@@ -530,7 +589,7 @@ BEGIN
                 ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
 
                 INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-                VALUES (218, null, 4, 'Insert parameter into config_form_fields.');
+                VALUES (218, null, 4, concat('Insert parameter into config_form_fields: ', v_param_name));
 
             ELSIF v_action = 'UPDATE' THEN
 
@@ -547,11 +606,16 @@ BEGIN
                 WHERE columnname=v_param_name AND formname=v_viewname;
 
                 INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
-                VALUES (218, null, 4, 'Update parameter in config_form_fields.');
-
+                VALUES (218, null, 4, concat('Update parameter in config_form_fields: ', v_param_name));
             END IF;
-        END LOOP;
+            v_query = concat('{"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"catFeature":"',rec.id,
+	        '"},"data":{"filterFields":{}, "pageInfo":{}, "action":"SINGLE-UPDATE"}}');
+	        PERFORM gw_fct_admin_manage_child_views(v_query::json);
 
+	        -- log
+	        INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+	        VALUES (218, null, 4, concat('Re-create child view: ', v_viewname));
+        END LOOP;
     END IF;
 
 	-- get results
