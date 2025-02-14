@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>632</width>
-    <height>672</height>
+    <width>585</width>
+    <height>395</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -88,7 +88,28 @@
          </property>
          <layout class="QGridLayout" name="gridLayout_5">
           <item row="0" column="0">
-           <layout class="QGridLayout" name="lyt_data_2"/>
+           <widget class="QGroupBox" name="groupBox_5">
+            <property name="title">
+             <string/>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_9">
+             <item row="0" column="0">
+              <layout class="QGridLayout" name="lyt_data_2"/>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QGroupBox" name="groupBox_4">
+            <property name="title">
+             <string/>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_8">
+             <item row="0" column="0">
+              <layout class="QGridLayout" name="lyt_data_3"/>
+             </item>
+            </layout>
+           </widget>
           </item>
          </layout>
         </widget>
@@ -112,7 +133,7 @@
          </property>
          <layout class="QGridLayout" name="gridLayout_6">
           <item row="0" column="0">
-           <layout class="QGridLayout" name="lyt_data_3"/>
+           <layout class="QGridLayout" name="lyt_data_4"/>
           </item>
          </layout>
         </widget>
