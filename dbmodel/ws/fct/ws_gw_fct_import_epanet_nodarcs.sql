@@ -8,9 +8,9 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_import_epanet_nodarcs(p_data json)
 AS $function$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_import_epanet_nodarcs($${"data": {"valvesType": "PR_REDUC_VALVE", "pumpsType": "PUMP"}}$$);
+SELECT SCHEMA_NAME.gw_fct_import_epanet_nodarcs($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "pumps": {"featureClass": "PUMP", "catalog": "PUMP"},"fcv": {"featureClass": "FL_CONTR_VALVE", "catalog": "FCV"},"tcv": {"featureClass": "THROTTLE_VALVE", "catalog": "TCV"}}}$$);
 
--- fid: 239
+-- fid:
 
 */
 
@@ -18,13 +18,11 @@ DECLARE
 v_fid integer = 239;
 v_version text;
 v_data record;
+v_json_aux json;
+v_feature_class text;
 v_nodecat text;
 v_epatype text;
-v_type text;
-v_pumptype text;
 v_mantablename text;
-v_valves_type text;
-v_pumps_type text;
 v_epatablename text;
 rpt_rec record;
 v_epsg integer;
@@ -48,10 +46,6 @@ BEGIN
     -- get system parameters
     SELECT giswater, epsg INTO v_version, v_epsg FROM sys_version ORDER BY id DESC LIMIT 1;
 
-    -- get input data
-    v_valves_type := (p_data ->>'data')::json->>'valvesType'::text;
-    v_pumps_type := (p_data ->>'data')::json->>'pumpsType'::text;
-
     -- Starting process
     PERFORM gw_fct_manage_temp_tables(('{"data":{"parameters":{"fid": '||v_fid||', "project_type": "WS", "action": "CREATE", "group": "LOG"}}}')::json);
 
@@ -74,26 +68,30 @@ BEGIN
     LOOP
         -- Get nodecat & epatype
         IF v_data.epa_type = 'VIRTUALVALVE' THEN
-            v_nodecat = (SELECT valv_type FROM inp_virtualvalve WHERE arc_id = v_data.arc_id);
             v_epatype = 'VALVE';
-            v_type = v_valves_type;
-        ELSIF v_data.epa_type = 'VIRTUALPUMP' THEN
-            v_pumptype = (SELECT pump_type FROM inp_virtualpump WHERE arc_id = v_data.arc_id);
 
-            v_nodecat = 'PUMP';
+            v_nodecat = (SELECT valv_type FROM inp_virtualvalve WHERE arc_id = v_data.arc_id);
+            v_json_aux = ((p_data ->>'data')::json->>lower(v_nodecat))::json;
+            v_nodecat = (v_json_aux->>'catalog')::text;
+            v_feature_class = (v_json_aux->>'featureClass')::text;
+        ELSIF v_data.epa_type = 'VIRTUALPUMP' THEN
             v_epatype = 'PUMP';
-            v_type = v_pumps_type;
+
+            v_json_aux = ((p_data ->>'data')::json->>'pumps')::json;
+            v_nodecat = (v_json_aux->>'catalog')::text;
+            v_feature_class = (v_json_aux->>'featureClass')::text;
         ELSE
             v_nodecat = 'SHORTPIPE';
             v_epatype = 'SHORTPIPE';
         END IF;
         INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, concat('INFO: Processing nodarc ',v_data.arc_id,' (',v_epatype,').'));
+
         -- getting man_table to work with
         SELECT man_table, epa_table INTO v_mantablename, v_epatablename
         FROM cat_feature cf
         JOIN sys_feature_class sf ON cf.feature_class = sf.id
         JOIN sys_feature_epa_type se ON sf.epa_default = se.id
-        WHERE cf.id = v_type;
+        WHERE cf.id = v_feature_class;
 
         -- defining geometry of new node
 
@@ -116,7 +114,7 @@ BEGIN
 
         IF v_epatablename = 'inp_pump' THEN
             INSERT INTO inp_pump (node_id, power, curve_id, speed, pattern_id, status, pump_type) -- TODO: there is no energyvalue in inp_virtualpump
-            SELECT v_node_id, power, curve_id, speed, pattern_id, status, v_pumptype FROM inp_virtualpump WHERE arc_id=v_data.arc_id;
+            SELECT v_node_id, power, curve_id, speed, pattern_id, status, pump_type FROM inp_virtualpump WHERE arc_id=v_data.arc_id;
 
             INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, '    Inserted into inp_pump.');
 
