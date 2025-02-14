@@ -910,7 +910,6 @@ class GwImportEpanet:
 
     def _message_logged(self, message: str, end: str="\n"):
 
-        print(f"message: {message}")
         data = {"info": {"values": [{"message": message}]}}
         tools_gw.fill_tab_log(self.dlg_config, data, reset_text=True, close=False, end=end, call_set_tabs_enabled=False)
 
