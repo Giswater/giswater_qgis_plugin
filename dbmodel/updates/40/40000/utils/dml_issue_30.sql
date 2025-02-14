@@ -822,7 +822,7 @@ UPDATE sys_fprocess SET
 fprocess_name = 'Arc disconnected from any inlet (go2epa)',
 except_level = 3,
 project_type = 'ws',
-except_msg = 'arcs disconnected from any inlet which have been removed on the go2epa process',
+except_msg = 'arcs disconnected from any inlet which have been removed on the go2epa process. The reason may be: state_type, epa_type, sector_id, init age material of cat_roughness, or expl_id or some node not connected',
 query_text = 'SELECT arc_id, arccat_id, expl_id, the_geom FROM temp_t_pgr_go2epa_arc where sector_id = 0',
 info_msg = 'No arcs disconnected from any inlet found',
 except_table = 'anl_arc',
