@@ -112,6 +112,8 @@ v_message text;
 v_version text;
 v_idaddparam integer;
 v_istrg boolean;
+
+v_query text;
 BEGIN
 
 	-- search path
