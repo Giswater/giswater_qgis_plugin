@@ -551,11 +551,14 @@ class GwImportEpanet:
             FROM ext_municipality
             WHERE muni_id > 0
         """)
-        cmb_muni.clear()
-        tools_qt.fill_combo_values(cmb_muni, rows, add_empty=False, selected_id=muni_value, index_to_compare=1)
+        tools_qt.fill_combo_values(cmb_muni, rows)
         # Add a separator and a "Get from spatial intersect" option
         cmb_muni.insertSeparator(cmb_muni.count())
         cmb_muni.addItem(SPATIAL_INTERSECT, [999999, SPATIAL_INTERSECT])
+        # Restore the selection if it still exists
+        index = cmb_muni.findText(muni_value)
+        if index >= 0:
+            cmb_muni.setCurrentIndex(index)
 
         self.catalogs = Catalogs.from_network_model(self.parse_inp_task.network)
 
