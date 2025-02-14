@@ -435,7 +435,7 @@ INSERT INTO config_form_list (listname, query_text, device, listtype, listclass,
       "moreThanOneDisable": true
     },
     {
-      "name":"btn_show_inp_data",		
+      "name":"btn_show_inp_data",
       "widgetfunction": {
         "functionName": "showInpData",
         "params": {}
@@ -446,7 +446,7 @@ INSERT INTO config_form_list (listname, query_text, device, listtype, listclass,
       "moreThanOneDisable": false
     },
     {
-      "name":"btn_toggle_archive",	
+      "name":"btn_toggle_archive",
       "widgetfunction": {
         "functionName": "toggleArchive",
         "params": {}
@@ -2643,3 +2643,4 @@ UPDATE config_form_fields SET columnname = 'mfull_depth', label = 'mfull_depth',
 -- 11/02/2025
 INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('layout_name_typevalue', 'lyt_log_1', 'lyt_log_1', 'lytLog1', NULL);
 
+DELETE FROM config_form_fields WHERE formname = 've_epa_valve' AND columnname = 'to_arc';
