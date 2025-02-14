@@ -70,17 +70,17 @@
         <customproperties>
           <Option/>
         </customproperties>
-        <layer-tree-layer providerKey="postgres" name="Macrosector" patch_size="-1,-1" id="v_edit_macrosector_9c5bf37a_cfe2_4f90_bcbe_0e3094cd8246" source=" __DATASOURCE__ authcfg=re29f5s key='macrosector_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_macrosector&quot; (the_geom)" expanded="1" checked="Qt::Checked" legend_exp="" legend_split_behavior="0">
+        <layer-tree-layer providerKey="postgres" name="Macrosector" patch_size="-1,-1" id="v_edit_macrosector_9c5bf37a_cfe2_4f90_bcbe_0e3094cd8246" source=" __DATASOURCE__ key='macrosector_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_macrosector&quot; (the_geom)" expanded="1" checked="Qt::Checked" legend_exp="" legend_split_behavior="0">
           <customproperties>
             <Option/>
           </customproperties>
         </layer-tree-layer>
-        <layer-tree-layer providerKey="postgres" name="Macrodma" patch_size="-1,-1" id="v_edit_macrodma_ed5582bf_bddc_45fe_9e3d_f04a97a4792d" source=" __DATASOURCE__ authcfg=re29f5s key='macrodma_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_macrodma&quot; (the_geom)" expanded="1" checked="Qt::Checked" legend_exp="" legend_split_behavior="0">
+        <layer-tree-layer providerKey="postgres" name="Macrodma" patch_size="-1,-1" id="v_edit_macrodma_ed5582bf_bddc_45fe_9e3d_f04a97a4792d" source=" __DATASOURCE__ key='macrodma_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_macrodma&quot; (the_geom)" expanded="1" checked="Qt::Checked" legend_exp="" legend_split_behavior="0">
           <customproperties>
             <Option/>
           </customproperties>
         </layer-tree-layer>
-        <layer-tree-layer providerKey="postgres" name="Supplyzone" patch_size="-1,-1" id="v_edit_supplyzone_ce157f9c_bf42_4148_8b6e_08af089e67b4" source=" __DATASOURCE__ authcfg=re29f5s key='supplyzone_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_supplyzone&quot; (the_geom)" expanded="1" checked="Qt::Checked" legend_exp="" legend_split_behavior="0">
+        <layer-tree-layer providerKey="postgres" name="Supplyzone" patch_size="-1,-1" id="v_edit_supplyzone_ce157f9c_bf42_4148_8b6e_08af089e67b4" source=" __DATASOURCE__ key='supplyzone_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_supplyzone&quot; (the_geom)" expanded="1" checked="Qt::Checked" legend_exp="" legend_split_behavior="0">
           <customproperties>
             <Option/>
           </customproperties>
@@ -16670,7 +16670,7 @@ def my_form_open(dialog, layer, feature):
          <ymax>__YMAX__</ymax>
       </wgs84extent>
       <id>v_edit_macrodma_ed5582bf_bddc_45fe_9e3d_f04a97a4792d</id>
-      <datasource> __DATASOURCE__ authcfg=re29f5s key='macrodma_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_macrodma" (the_geom)</datasource>
+      <datasource> __DATASOURCE__ key='macrodma_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_macrodma" (the_geom)</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -17211,7 +17211,7 @@ def my_form_open(dialog, layer, feature):
          <ymax>__YMAX__</ymax>
       </wgs84extent>
       <id>v_edit_macrosector_9c5bf37a_cfe2_4f90_bcbe_0e3094cd8246</id>
-      <datasource> __DATASOURCE__ authcfg=re29f5s key='macrosector_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_macrosector" (the_geom)</datasource>
+      <datasource> __DATASOURCE__ key='macrosector_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_macrosector" (the_geom)</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -23163,7 +23163,7 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer simplifyAlgorithm="0" symbologyReferenceScale="-1" legendPlaceholderImage="" wkbType="MultiPolygon" simplifyDrawingTol="1" geometry="Polygon" minScale="100000000" autoRefreshTime="0" type="vector" hasScaleBasedVisibilityFlag="0" styleCategories="AllStyleCategories" simplifyMaxScale="1" refreshOnNotifyEnabled="0" simplifyLocal="1" simplifyDrawingHints="1" maxScale="0" autoRefreshMode="Disabled" refreshOnNotifyMessage="" labelsEnabled="0" readOnly="0">
       <id>v_edit_supplyzone_ce157f9c_bf42_4148_8b6e_08af089e67b4</id>
-      <datasource> __DATASOURCE__ authcfg=re29f5s key='supplyzone_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_supplyzone" (the_geom)</datasource>
+      <datasource> __DATASOURCE__ key='supplyzone_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_supplyzone" (the_geom)</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -34485,7 +34485,7 @@ def my_form_open(dialog, layer, feature):
       </spatialrefsys>
     </CoordinateCustomCrs>
   </ProjectDisplaySettings>
-  <ProjectGpsSettings destinationFollowsActiveLayer="1" destinationLayerProvider="postgres" destinationLayer="v_edit_supplyzone_ce157f9c_bf42_4148_8b6e_08af089e67b4" autoAddTrackVertices="0" destinationLayerSource=" __DATASOURCE__ authcfg=re29f5s key='supplyzone_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_supplyzone&quot; (the_geom)" autoCommitFeatures="0" destinationLayerName="v_edit_supplyzone">
+  <ProjectGpsSettings destinationFollowsActiveLayer="1" destinationLayerProvider="postgres" destinationLayer="v_edit_supplyzone_ce157f9c_bf42_4148_8b6e_08af089e67b4" autoAddTrackVertices="0" destinationLayerSource=" __DATASOURCE__ key='supplyzone_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_supplyzone&quot; (the_geom)" autoCommitFeatures="0" destinationLayerName="v_edit_supplyzone">
     <timeStampFields/>
   </ProjectGpsSettings>
 </qgis>

@@ -80,12 +80,12 @@
         <customproperties>
           <Option/>
         </customproperties>
-        <layer-tree-layer id="v_edit_macrosector_5128c18b_e26a_454d_9be2_36be84f8ffcb" expanded="1" patch_size="-1,-1" legend_exp="" name="Macrosector" source=" __DATASOURCE__ authcfg=re29f5s key='macrosector_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_macrosector&quot; (the_geom)" providerKey="postgres" checked="Qt::Checked" legend_split_behavior="0">
+        <layer-tree-layer id="v_edit_macrosector_5128c18b_e26a_454d_9be2_36be84f8ffcb" expanded="1" patch_size="-1,-1" legend_exp="" name="Macrosector" source=" __DATASOURCE__ key='macrosector_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_macrosector&quot; (the_geom)" providerKey="postgres" checked="Qt::Checked" legend_split_behavior="0">
           <customproperties>
             <Option/>
           </customproperties>
         </layer-tree-layer>
-        <layer-tree-layer id="v_edit_dwfzone_3637d31c_0100_4a22_aba1_a21755b8c50c" expanded="1" patch_size="-1,-1" legend_exp="" name="Dwfzone" source=" __DATASOURCE__ authcfg=re29f5s key='dwfzone_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_dwfzone&quot; (the_geom)" providerKey="postgres" checked="Qt::Checked" legend_split_behavior="0">
+        <layer-tree-layer id="v_edit_dwfzone_3637d31c_0100_4a22_aba1_a21755b8c50c" expanded="1" patch_size="-1,-1" legend_exp="" name="Dwfzone" source=" __DATASOURCE__ key='dwfzone_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_dwfzone&quot; (the_geom)" providerKey="postgres" checked="Qt::Checked" legend_split_behavior="0">
           <customproperties>
             <Option/>
           </customproperties>
@@ -12951,7 +12951,7 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer hasScaleBasedVisibilityFlag="0" simplifyAlgorithm="0" minScale="100000000" symbologyReferenceScale="-1" autoRefreshMode="Disabled" refreshOnNotifyMessage="" styleCategories="AllStyleCategories" simplifyDrawingHints="1" maxScale="0" refreshOnNotifyEnabled="0" geometry="Polygon" labelsEnabled="0" simplifyMaxScale="1" readOnly="0" legendPlaceholderImage="" simplifyDrawingTol="1" simplifyLocal="1" autoRefreshTime="0" wkbType="MultiPolygon" type="vector">
       <id>v_edit_dwfzone_3637d31c_0100_4a22_aba1_a21755b8c50c</id>
-      <datasource> __DATASOURCE__ authcfg=re29f5s key='dwfzone_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_dwfzone" (the_geom)</datasource>
+      <datasource> __DATASOURCE__ key='dwfzone_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_dwfzone" (the_geom)</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -19918,7 +19918,7 @@ def my_form_open(dialog, layer, feature):
          <ymax>__YMAX__</ymax>
       </wgs84extent>
       <id>v_edit_macrosector_5128c18b_e26a_454d_9be2_36be84f8ffcb</id>
-      <datasource> __DATASOURCE__ authcfg=re29f5s key='macrosector_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_macrosector" (the_geom)</datasource>
+      <datasource> __DATASOURCE__ key='macrosector_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_macrosector" (the_geom)</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -44131,7 +44131,7 @@ def my_form_open(dialog, layer, feature):
       </spatialrefsys>
     </CoordinateCustomCrs>
   </ProjectDisplaySettings>
-  <ProjectGpsSettings autoCommitFeatures="0" destinationLayerSource=" __DATASOURCE__ authcfg=re29f5s key='dwfzone_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_dwfzone&quot; (the_geom)" autoAddTrackVertices="0" destinationLayer="v_edit_dwfzone_3637d31c_0100_4a22_aba1_a21755b8c50c" destinationLayerProvider="postgres" destinationLayerName="v_edit_dwfzone" destinationFollowsActiveLayer="1">
+  <ProjectGpsSettings autoCommitFeatures="0" destinationLayerSource=" __DATASOURCE__ key='dwfzone_id' srid=__SRID__ type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_dwfzone&quot; (the_geom)" autoAddTrackVertices="0" destinationLayer="v_edit_dwfzone_3637d31c_0100_4a22_aba1_a21755b8c50c" destinationLayerProvider="postgres" destinationLayerName="v_edit_dwfzone" destinationFollowsActiveLayer="1">
     <timeStampFields/>
   </ProjectGpsSettings>
 </qgis>
