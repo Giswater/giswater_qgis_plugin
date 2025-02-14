@@ -167,7 +167,12 @@ class GwImportEpanet:
 
         manage_nodarcs = {
             "pumps": self.catalog_source["pumps"] == "db_nodes",
-            "valves": self.catalog_source["valves"] == "db_nodes"
+            "prv": self.catalog_source["prv"] == "db_nodes",
+            "psv": self.catalog_source["psv"] == "db_nodes",
+            "pbv": self.catalog_source["pbv"] == "db_nodes",
+            "fcv": self.catalog_source["fcv"] == "db_nodes",
+            "tcv": self.catalog_source["tcv"] == "db_nodes",
+            "gpv": self.catalog_source["gpv"] == "db_nodes",
         }
 
         self.dlg_config.mainTab.setCurrentIndex(self.dlg_config.mainTab.count()-1)

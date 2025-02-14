@@ -1115,24 +1115,17 @@ class GwImportInpTask(GwTask):
         )
 
     def _save_valves(self) -> None:
-        feature_class = self.catalogs['features']['valves'].lower()
-        arccat_id = self.catalogs["valves"]
-        # Set 'fake' catalogs if it will be converted to flwreg
-        if self.manage_nodarcs["valves"]:
-            feature_class = "VARC"
-            arccat_id = "VARC"
-
         arc_sql = """ 
             INSERT INTO arc (
                 the_geom, code, node_1, node_2, arccat_id, epa_type, expl_id, sector_id, muni_id, state, state_type, workcat_id
             ) VALUES %s
             RETURNING arc_id, code
-        """  # --"depth", arc_id, annotation, observ, "comment", label_x, label_y, label_rotation, staticpressure, feature_type
+        """
         arc_template = (
             "(ST_GeomFromText(%s, %s), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
         )
 
-        man_sql = f"""
+        man_sql_template = """
             INSERT INTO man_{feature_class} (
                 arc_id
             ) VALUES %s
@@ -1143,13 +1136,10 @@ class GwImportInpTask(GwTask):
             INSERT INTO inp_virtualvalve (
                 arc_id, valv_type, setting, diameter, curve_id, minorloss, status, init_quality
             ) VALUES %s
-        """  # --
-        inp_template = (
-            "(%s, %s, %s, %s, %s, %s, %s, %s)"
-        )
+        """
+        inp_template = "(%s, %s, %s, %s, %s, %s, %s, %s)"
 
         arc_params = []
-
         inp_dict = {}
 
         for v_name, v in self.network.valves():
@@ -1162,13 +1152,17 @@ class GwImportInpTask(GwTask):
             except KeyError as e:
                 self._log_message(f"Node not found: {e}")
                 continue
-            epa_type = "VIRTUALVALVE"
-            expl_id = self.exploitation
-            sector_id = self.sector
-            muni_id = self.municipality
-            state = 1
-            state_type = 2
-            workcat_id = self.workcat
+
+            valve_type = v.valve_type.lower()
+            # Get valve-specific feature class and arccat_id
+            feature_class = self.catalogs["features"][valve_type]
+            arccat_id = self.catalogs[valve_type]
+
+            # Convert to node if required
+            if self.manage_nodarcs.get(valve_type, False):
+                feature_class = "VARC"
+                arccat_id = "VARC"
+
             arc_params.append(
                 (
                     geometry, srid,  # the_geom
@@ -1176,15 +1170,16 @@ class GwImportInpTask(GwTask):
                     node_1,
                     node_2,
                     arccat_id,
-                    epa_type,
-                    expl_id,
-                    sector_id,
-                    muni_id,
-                    state,
-                    state_type,
-                    workcat_id,
+                    "VIRTUALVALVE",
+                    self.exploitation,
+                    self.sector,
+                    self.municipality,
+                    1,  # state
+                    2,  # state_type
+                    self.workcat,
                 )
             )
+
             inp_dict[v_name] = {
                 "valv_type": v.valve_type,
                 "diameter": v.diameter,
@@ -1193,42 +1188,46 @@ class GwImportInpTask(GwTask):
                 "minorloss": v.minor_loss,
                 "status": v.initial_status.name.upper(),
                 "init_quality": None,
+                "feature_class": feature_class,  # Store feature_class for later use
             }
 
         # Insert into parent table
         valves = toolsdb_execute_values(
             arc_sql, arc_params, arc_template, fetch=True, commit=self.force_commit
         )
-        print(valves)
         if not valves:
             self._log_message("Valves couldn't be inserted!")
             return
 
-        man_params = []
+        man_params = {}
         inp_params = []
 
         for v in valves:
             arc_id = v[0]
             code = v[1]
-            man_params.append(
-                (arc_id,)
-            )
+            feature_class = inp_dict[code]["feature_class"]
+
+            if feature_class not in man_params:
+                man_params[feature_class] = []
+            man_params[feature_class].append((arc_id,))
 
             inp_data = inp_dict[code]
             inp_params.append(
                 (arc_id, inp_data["valv_type"], inp_data["setting"], inp_data["diameter"], inp_data["curve_id"],
-                 inp_data["minorloss"], inp_data["status"], inp_data["init_quality"])
+                inp_data["minorloss"], inp_data["status"], inp_data["init_quality"])
             )
-            print(inp_params)
 
         # Insert into inp table
         toolsdb_execute_values(
             inp_sql, inp_params, inp_template, fetch=False, commit=self.force_commit
         )
-        # Insert into man table
-        toolsdb_execute_values(
-            man_sql, man_params, man_template, fetch=False, commit=self.force_commit
-        )
+
+        # Insert into each man table separately
+        for feature_class, params in man_params.items():
+            man_sql = man_sql_template.format(feature_class=feature_class)
+            toolsdb_execute_values(
+                man_sql, params, man_template, fetch=False, commit=self.force_commit
+            )
 
     def _save_pipes(self) -> None:
         feature_class = self.catalogs['features']['pipes'].lower()
@@ -1377,10 +1376,15 @@ class GwImportInpTask(GwTask):
         """ Transform pumps and valves into nodes """
 
         extras = ""
-        if self.manage_nodarcs["valves"]:
-            extras += f'"valvesType": "{self.catalogs["features"]["valves"]}",'
-        if self.manage_nodarcs["pumps"]:
-            extras += f'"pumpsType": "{self.catalogs["features"]["pumps"]}",'
+        # if self.manage_nodarcs["valves"]:
+        #     extras += f'"valvesType": "{self.catalogs["features"]["valves"]}",'
+        # if self.manage_nodarcs["pumps"]:
+        #     extras += f'"pumpsType": "{self.catalogs["features"]["pumps"]}",'
+        for k, v in self.manage_nodarcs.items():
+            if not v:
+                continue
+            extras += f'"{k}": {{"featureClass": "{self.catalogs["features"][k]}", "catalog": "{self.catalogs[k]}"}},'
+
         if extras:
             fct_name = "gw_fct_import_epanet_nodarcs"
             extras = extras[:-1]
