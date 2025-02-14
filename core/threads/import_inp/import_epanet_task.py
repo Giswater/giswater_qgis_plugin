@@ -195,7 +195,7 @@ class GwImportInpTask(GwTask):
                 self.progress_changed.emit("Nodarcs", self.PROGRESS_END, log_str, True)
 
             execute_sql("select 1", commit=True)
-            self.progress_changed.emit("", self.PROGRESS_END, "ALL DONE! INP successfully imported.", True)
+            self.progress_changed.emit("", self.PROGRESS_END, "\n\nALL DONE! INP successfully imported.", True)
             return True
         except Exception as e:
             self.exception = traceback.format_exc()
@@ -459,7 +459,8 @@ class GwImportInpTask(GwTask):
                 execute_sql("""
                     INSERT INTO cat_arc (id, arc_type, matcat_id, dint)
                     VALUES ('VARC', 'VARC', 'UNKNOWN', 999) ON CONFLICT DO NOTHING;
-                """)
+                """,
+                commit=self.force_commit)
                 continue
 
             if self.catalogs[varc_type] in self.arccat_db:
@@ -1357,7 +1358,7 @@ class GwImportInpTask(GwTask):
                 SELECT node_id, epa_type FROM node WHERE code = %s
             """
             params = (node_name,)
-            row = get_row(sql, params)
+            row = get_row(sql, params, commit=self.force_commit)
             if not row:
                 self._log_message(f"Couldn't find node '{node_name}' for source '{s_name}'.")
                 continue
@@ -1370,7 +1371,7 @@ class GwImportInpTask(GwTask):
                 WHERE node_id = %s;
             """
             params = (source_type, source_quality, source_pattern_id, node_id)
-            execute_sql(sql, params)
+            execute_sql(sql, params, commit=self.force_commit)
 
     def _manage_nodarcs(self) -> str:
         """ Transform pumps and valves into nodes """
@@ -1384,8 +1385,7 @@ class GwImportInpTask(GwTask):
             fct_name = "gw_fct_import_epanet_nodarcs"
             extras = extras[:-1]
             body = tools_gw.create_body(extras=extras)
-            json_result = tools_gw.execute_procedure(fct_name, body, commit=self.force_commit,
-                                       is_thread=True)
+            json_result = tools_gw.execute_procedure(fct_name, body, commit=self.force_commit, is_thread=True)
             if not json_result or json_result.get('status') != 'Accepted':
                 message = f"Error executing {fct_name}"
                 raise ValueError(message)
