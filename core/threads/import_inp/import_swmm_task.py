@@ -197,6 +197,7 @@ class GwImportInpTask(GwTask):
         self.arccat_db: list[str] = []
         self.db_units = None
         self.exception: str = ""
+        self.debug_mode: bool = False  # TODO: add checkbox or something to manage debug_mode, and put logs into tab_log
 
         self.node_ids: dict[str, str] = {}
         self.results: dict[str, int] = {}
@@ -452,8 +453,9 @@ class GwImportInpTask(GwTask):
         """
         template = "(%s, %s)"
 
-        print("OPTIONS:")
-        print(update_params)
+        if self.debug_mode:
+            print("OPTIONS:")
+            print(update_params)
 
         # Execute batch update
         toolsdb_execute_values(sql, update_params, template, fetch=False, commit=self.force_commit)
@@ -860,7 +862,7 @@ class GwImportInpTask(GwTask):
                 the_geom, code, node_type, nodecat_id, epa_type, expl_id, sector_id, muni_id, state, state_type, workcat_id, elev, ymax
             ) VALUES %s
             RETURNING node_id, code
-        """  # --"depth", arc_id, annotation, observ, "comment", label_x, label_y, label_rotation, staticpressure, feature_type
+        """
         node_template = (
             "(ST_SetSRID(ST_Point(%s, %s),%s), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
         )
@@ -876,7 +878,7 @@ class GwImportInpTask(GwTask):
             INSERT INTO inp_junction (
                 node_id, y0, ysur, apond
             ) VALUES %s
-        """  # --outfallparam
+        """
         inp_template = (
             "(%s, %s, %s, %s)"
         )
@@ -928,7 +930,8 @@ class GwImportInpTask(GwTask):
         junctions = toolsdb_execute_values(
             node_sql, node_params, node_template, fetch=True, commit=self.force_commit
         )
-        print(junctions)
+        if self.debug_mode:
+            print(junctions)
         self.results["junctions"] = len(junctions) if junctions else 0
         if not junctions:
             self._log_message("Junctions couldn't be inserted!")
@@ -969,7 +972,7 @@ class GwImportInpTask(GwTask):
                 the_geom, code, node_type, nodecat_id, epa_type, expl_id, sector_id, muni_id, state, state_type, workcat_id, elev
             ) VALUES %s
             RETURNING node_id, code
-        """  # --"depth", arc_id, annotation, observ, "comment", label_x, label_y, label_rotation, staticpressure, feature_type
+        """
         node_template = (
             "(ST_SetSRID(ST_Point(%s, %s),%s), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
         )
@@ -985,7 +988,7 @@ class GwImportInpTask(GwTask):
             INSERT INTO inp_outfall (
                 node_id, outfall_type, stage, curve_id, timser_id, gate, route_to
             ) VALUES %s
-        """  # --pattern_id, peak_factor, source_type, source_quality, source_pattern_id
+        """
         inp_template = (
             "(%s, %s, %s, %s, %s, %s, %s)"
         )
@@ -1038,7 +1041,8 @@ class GwImportInpTask(GwTask):
         outfalls = toolsdb_execute_values(
             node_sql, node_params, node_template, fetch=True, commit=self.force_commit
         )
-        print(outfalls)
+        if self.debug_mode:
+            print(outfalls)
         self.results["outfalls"] = len(outfalls) if outfalls else 0
         if not outfalls:
             self._log_message("Outfalls couldn't be inserted!")
@@ -1079,7 +1083,7 @@ class GwImportInpTask(GwTask):
                 the_geom, code, node_type, nodecat_id, epa_type, expl_id, sector_id, muni_id, state, state_type, workcat_id, elev
             ) VALUES %s
             RETURNING node_id, code
-        """  # --"depth", arc_id, annotation, observ, "comment", label_x, label_y, label_rotation, staticpressure, feature_type
+        """
         node_template = (
             "(ST_SetSRID(ST_Point(%s, %s),%s), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
         )
@@ -1095,7 +1099,7 @@ class GwImportInpTask(GwTask):
             INSERT INTO inp_divider (
                 node_id, divider_type, arc_id, curve_id, qmin, ht, cd, y0, ysur, apond
             ) VALUES %s
-        """  # --
+        """
         inp_template = (
             "(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
         )
@@ -1151,7 +1155,8 @@ class GwImportInpTask(GwTask):
         dividers = toolsdb_execute_values(
             node_sql, node_params, node_template, fetch=True, commit=self.force_commit
         )
-        print(dividers)
+        if self.debug_mode:
+            print(dividers)
         self.results["dividers"] = len(dividers) if dividers else 0
         if not dividers:
             self._log_message("Dividers couldn't be inserted!")
@@ -1193,7 +1198,7 @@ class GwImportInpTask(GwTask):
                 the_geom, code, node_type, nodecat_id, epa_type, expl_id, sector_id, muni_id, state, state_type, workcat_id, elev
             ) VALUES %s
             RETURNING node_id, code
-        """  # --"depth", arc_id, annotation, observ, "comment", label_x, label_y, label_rotation, staticpressure, feature_type
+        """
         node_template = (
             "(ST_SetSRID(ST_Point(%s, %s),%s), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
         )
@@ -1209,7 +1214,7 @@ class GwImportInpTask(GwTask):
             INSERT INTO inp_storage (
                 node_id, storage_type, curve_id, a1, a2, a0, fevap, sh, hc, imd, y0, ysur
             ) VALUES %s
-        """  # --
+        """
         inp_template = (
             "(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
         )
@@ -1267,7 +1272,8 @@ class GwImportInpTask(GwTask):
         storage = toolsdb_execute_values(
             node_sql, node_params, node_template, fetch=True, commit=self.force_commit
         )
-        print(storage)
+        if self.debug_mode:
+            print(storage)
         self.results["storage"] = len(storage) if storage else 0
         if not storage:
             self._log_message("Dividers couldn't be inserted!")
@@ -1315,7 +1321,7 @@ class GwImportInpTask(GwTask):
                 the_geom, code, node_1, node_2, arc_type, arccat_id, epa_type, expl_id, sector_id, muni_id, state, state_type, workcat_id, dma_id
             ) VALUES %s
             RETURNING arc_id, code
-        """  # --"depth", arc_id, annotation, observ, "comment", label_x, label_y, label_rotation, staticpressure, feature_type
+        """
         arc_template = (
             "(ST_GeomFromText(%s, %s), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 0)"
         )
@@ -1331,7 +1337,7 @@ class GwImportInpTask(GwTask):
             INSERT INTO inp_pump (
                 arc_id, curve_id, status, startup, shutoff
             ) VALUES %s
-        """  # --
+        """
         inp_template = (
             "(%s, %s, %s, %s, %s)"
         )
@@ -1385,7 +1391,8 @@ class GwImportInpTask(GwTask):
         pumps = toolsdb_execute_values(
             arc_sql, arc_params, arc_template, fetch=True, commit=self.force_commit
         )
-        print(pumps)
+        if self.debug_mode:
+            print(pumps)
         self.results["pumps"] = len(pumps) if pumps else 0
         if not pumps:
             self._log_message("Pumps couldn't be inserted!")
@@ -1428,7 +1435,7 @@ class GwImportInpTask(GwTask):
                 the_geom, code, node_1, node_2, arc_type, arccat_id, epa_type, expl_id, sector_id, muni_id, state, state_type, workcat_id, dma_id
             ) VALUES %s
             RETURNING arc_id, code
-        """  # --"depth", arc_id, annotation, observ, "comment", label_x, label_y, label_rotation, staticpressure, feature_type
+        """
         arc_template = (
             "(ST_GeomFromText(%s, %s), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 0)"
         )
@@ -1444,7 +1451,7 @@ class GwImportInpTask(GwTask):
             INSERT INTO inp_orifice (
                 arc_id, ori_type, offsetval, cd, orate, flap, shape, geom1, geom2, geom3, geom4
             ) VALUES %s
-        """  # --
+        """
         inp_template = (
             "(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
         )
@@ -1505,7 +1512,8 @@ class GwImportInpTask(GwTask):
         orifices = toolsdb_execute_values(
             arc_sql, arc_params, arc_template, fetch=True, commit=self.force_commit
         )
-        print(orifices)
+        if self.debug_mode:
+            print(orifices)
         self.results["orifices"] = len(orifices) if orifices else 0
         if not orifices:
             self._log_message("Orifices couldn't be inserted!")
@@ -1631,7 +1639,8 @@ class GwImportInpTask(GwTask):
         weirs = toolsdb_execute_values(
             arc_sql, arc_params, arc_template, fetch=True, commit=self.force_commit
         )
-        print(weirs)
+        if self.debug_mode:
+            print(weirs)
         self.results["weirs"] = len(weirs) if weirs else 0
         if not weirs:
             self._log_message("Weirs couldn't be inserted!")
@@ -1677,7 +1686,7 @@ class GwImportInpTask(GwTask):
                 the_geom, code, node_1, node_2, arc_type, arccat_id, epa_type, expl_id, sector_id, muni_id, state, state_type, workcat_id, dma_id
             ) VALUES %s
             RETURNING arc_id, code
-        """  # --"depth", arc_id, annotation, observ, "comment", label_x, label_y, label_rotation, staticpressure, feature_type
+        """
         arc_template = (
             "(ST_GeomFromText(%s, %s), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 0)"
         )
@@ -1693,7 +1702,7 @@ class GwImportInpTask(GwTask):
             INSERT INTO inp_outlet (
                 arc_id, outlet_type, offsetval, curve_id, cd1, cd2, flap
             ) VALUES %s
-        """  # --
+        """
         inp_template = (
             "(%s, %s, %s, %s, %s, %s, %s)"
         )
@@ -1749,7 +1758,8 @@ class GwImportInpTask(GwTask):
         outlets = toolsdb_execute_values(
             arc_sql, arc_params, arc_template, fetch=True, commit=self.force_commit
         )
-        print(outlets)
+        if self.debug_mode:
+            print(outlets)
         self.results["outlets"] = len(outlets) if outlets else 0
         if not outlets:
             self._log_message("Outlets couldn't be inserted!")
@@ -1789,7 +1799,7 @@ class GwImportInpTask(GwTask):
                 the_geom, code, node_1, node_2, arc_type, arccat_id, epa_type, expl_id, sector_id, muni_id, state, state_type, workcat_id, dma_id
             ) VALUES %s
             RETURNING arc_id, code
-        """  # --"depth", arc_id, annotation, observ, "comment", label_x, label_y, label_rotation, staticpressure, feature_type
+        """
         arc_template = (
             "(ST_GeomFromText(%s, %s), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
         )
@@ -1805,7 +1815,7 @@ class GwImportInpTask(GwTask):
             INSERT INTO inp_conduit (
                 arc_id, barrels, culvert, kentry, kexit, kavg, flap, q0, qmax, seepage, custom_n
             ) VALUES %s
-        """  # --
+        """
         inp_template = (
             "(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
         )
@@ -1877,7 +1887,8 @@ class GwImportInpTask(GwTask):
         conduits = toolsdb_execute_values(
             arc_sql, arc_params, arc_template, fetch=True, commit=self.force_commit
         )
-        print(conduits)
+        if self.debug_mode:
+            print(conduits)
         self.results["conduits"] = len(conduits) if conduits else 0
         if not conduits:
             self._log_message("Conduits couldn't be inserted!")
@@ -1959,7 +1970,8 @@ class GwImportInpTask(GwTask):
         raingages = toolsdb_execute_values(
             node_sql, node_params, node_template, fetch=True, commit=self.force_commit
         )
-        print(raingages)
+        if self.debug_mode:
+            print(raingages)
         self.results["raingages"] = len(raingages) if raingages else 0
         if not raingages:
             self._log_message("Raingages couldn't be inserted!")

@@ -174,7 +174,6 @@ class GwImportSwmm:
 
         # Default raingage widget
         subcatchments = self.catalogs.inp_subcatchments
-        print(subcatchments)
         has_empty = any([x[1] for x in subcatchments if x[1] == '*'] if subcatchments else [])
         if not has_empty:
             tools_qt.set_widget_visible(self.dlg_config, 'lbl_raingage', False)
@@ -925,7 +924,6 @@ class GwImportSwmm:
 
     def _message_logged(self, message: str, end: str="\n"):
 
-        print(f"message: {message}")
         data = {"info": {"values": [{"message": message}]}}
         tools_gw.fill_tab_log(self.dlg_config, data, reset_text=True, close=False, end=end, call_set_tabs_enabled=False)
 
