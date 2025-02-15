@@ -266,8 +266,9 @@ BEGIN
 			factor_9, factor_10, factor_11, factor_12, factor_13, factor_14, factor_15, factor_16, factor_17, factor_18
 			from inp_pattern_value p
 			WHERE
-			pattern_id IN (SELECT distinct (pattern_id) FROM inp_dscenario_demand d, selector_inp_dscenario s WHERE cur_user = current_user AND d.dscenario_id = s.dscenario_id
-						   AND pattern_id IS NOT NULL UNION SELECT distinct (pattern_id) FROM temp_t_node WHERE pattern_id IS NOT NULL)
+			pattern_id IN (SELECT distinct (pattern_id) FROM temp_t_demand WHERE pattern_id IS NOT NULL 
+						   UNION 
+						   SELECT distinct (pattern_id) FROM temp_t_node WHERE pattern_id IS NOT NULL)
 			order by pattern_id, id;
 
 		v_return = '{"status": "Accepted", "message":{"level":1, "text":"Export INP file 4/7 - Structure data...... done succesfully"}}'::json;
