@@ -226,6 +226,7 @@ BEGIN
 
                 CREATE TEMP TABLE IF NOT EXISTS temp_t_demand (LIKE temp_demand INCLUDING ALL);
 
+
                 CREATE TEMP TABLE IF NOT EXISTS temp_t_pgr_go2epa_arc (LIKE temp_arc INCLUDING ALL);
                 CREATE TEMP TABLE IF NOT EXISTS temp_t_pgr_go2epa_node (LIKE temp_node INCLUDING ALL);
 
@@ -249,6 +250,7 @@ BEGIN
             CREATE TEMP TABLE IF NOT EXISTS temp_t_table (LIKE temp_table INCLUDING ALL);
             CREATE TEMP TABLE IF NOT EXISTS temp_t_node (LIKE temp_node INCLUDING ALL);
             CREATE TEMP TABLE IF NOT EXISTS temp_t_arc (LIKE temp_arc INCLUDING ALL);
+			CREATE TEMP TABLE IF NOT EXISTS temp_t_link (LIKE link INCLUDING ALL);
             CREATE TEMP TABLE IF NOT EXISTS temp_t_anlgraph (LIKE temp_anlgraph INCLUDING ALL);
             CREATE TEMP TABLE IF NOT EXISTS temp_t_go2epa (LIKE temp_go2epa INCLUDING ALL);
 
@@ -294,7 +296,8 @@ BEGIN
         END IF;
         -- return message:: 'Log tables created' or 'Anl tables created' ...
         RETURN '{"status":"Accepted", "message":"'||UPPER(LEFT(v_group,1))||LOWER(SUBSTRING(v_group,2))||' tables created"}';
-    ELSIF v_action = 'DROP' THEN
+    
+	ELSIF v_action = 'DROP' THEN
         DROP TABLE IF EXISTS t_audit_check_data;
         DROP TABLE IF EXISTS t_audit_check_project;
         DROP TABLE IF EXISTS t_audit_log_data;
@@ -317,6 +320,7 @@ BEGIN
         DROP TABLE IF EXISTS temp_t_table;
         DROP TABLE IF EXISTS temp_t_node;
         DROP TABLE IF EXISTS temp_t_arc;
+        DROP TABLE IF EXISTS temp_t_link;
         DROP TABLE IF EXISTS temp_t_gully;
         DROP TABLE IF EXISTS temp_t_demand;
         DROP TABLE IF EXISTS temp_t_anlgraph;
