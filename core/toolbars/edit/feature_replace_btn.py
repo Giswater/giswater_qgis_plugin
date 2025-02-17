@@ -254,6 +254,9 @@ class GwFeatureReplaceButton(GwMaptool):
         keep_epa_values = tools_gw.get_config_parser('btn_feature_replace', 'keep_epa_values', "user", "session")
         tools_qt.set_checked(self.dlg_replace, 'keep_epa_values', tools_os.set_boolean(keep_epa_values))
 
+        keep_asset_id = tools_gw.get_config_parser('btn_feature_replace', 'chk_keep_asset_id', "user", "session")
+        tools_qt.set_checked(self.dlg_replace, 'chk_keep_asset_id', tools_os.set_boolean(keep_asset_id))
+
         self.dlg_replace.feature_type_new.currentIndexChanged.connect(self._edit_change_elem_type_get_value)
         self.dlg_replace.btn_catalog.clicked.connect(partial(self._open_catalog, self.feature_type))
         self.dlg_replace.workcat_id_end.currentIndexChanged.connect(self._update_date)
@@ -401,7 +404,9 @@ class GwFeatureReplaceButton(GwMaptool):
         feature_type_new = tools_qt.get_text(dialog, dialog.feature_type_new)
         featurecat_id = tools_qt.get_text(dialog, dialog.featurecat_id)
         keep_epa_values = tools_qt.is_checked(self.dlg_replace, 'keep_epa_values')
+        keep_asset_id = tools_qt.is_checked(self.dlg_replace, 'chk_keep_asset_id')
         tools_gw.set_config_parser('btn_feature_replace', 'keep_epa_values', str(tools_os.set_boolean(keep_epa_values)), "user", "session")
+        tools_gw.set_config_parser('btn_feature_replace', 'chk_keep_asset_id', str(tools_os.set_boolean(keep_asset_id)), "user", "session")
 
         # Check null values
         if feature_type_new in (None, 'null'):
@@ -429,6 +434,7 @@ class GwFeatureReplaceButton(GwMaptool):
             extras += f', "enddate":"{self.enddate_aux}"'
             extras += f', "keep_elements":"{tools_qt.is_checked(dialog, "keep_elements")}"'
             extras += f', "keep_epa_values":"{tools_qt.is_checked(dialog, "keep_epa_values")}"'
+            extras += f', "keep_asset_id":"{tools_qt.is_checked(dialog, "chk_keep_asset_id")}"'
             body = tools_gw.create_body(feature=feature, extras=extras)
 
             # Execute SQL function and show result to the user
