@@ -143,7 +143,7 @@ CREATE TABLE dma (
 	macrodma_id int4 NULL,
 	descript text NULL,
 	undelete bool NULL,
-	the_geom public.geometry(multipolygon, 25831) NULL,
+	the_geom public.geometry(multipolygon, SRID_VALUE) NULL,
 	minc float8 NULL,
 	maxc float8 NULL,
 	effc float8 NULL,
@@ -170,7 +170,7 @@ CREATE TABLE presszone (
 	expl_id int4[] NOT NULL,
     sector_id int4[] NULL,
 	link varchar(512) NULL,
-	the_geom public.geometry(multipolygon, 25831) NULL,
+	the_geom public.geometry(multipolygon, SRID_VALUE) NULL,
 	graphconfig json DEFAULT '{"use":[{"nodeParent":"", "toArc":[]}], "ignore":[], "forceClosed":[]}'::json NULL,
 	stylesheet json NULL,
 	head numeric(12, 2) NULL,
@@ -194,7 +194,7 @@ CREATE TABLE dqa (
 	macrodqa_id int4 NULL,
 	descript text NULL,
 	undelete bool NULL,
-	the_geom public.geometry(multipolygon, 25831) NULL,
+	the_geom public.geometry(multipolygon, SRID_VALUE) NULL,
 	pattern_id varchar(16) NULL,
 	link text NULL,
 	graphconfig json DEFAULT '{"use":[{"nodeParent":"", "toArc":[]}], "ignore":[], "forceClosed":[]}'::json NULL,
@@ -219,7 +219,7 @@ CREATE TABLE sector (
 	macrosector_id int4 NULL,
 	descript text NULL,
 	undelete bool NULL,
-	the_geom public.geometry(multipolygon, 25831) NULL,
+	the_geom public.geometry(multipolygon, SRID_VALUE) NULL,
 	graphconfig json DEFAULT '{"use":[{"nodeParent":"", "toArc":[]}], "ignore":[], "forceClosed":[]}'::json NULL,
 	stylesheet json NULL,
 	active bool DEFAULT true NULL,
@@ -420,7 +420,7 @@ CREATE TABLE rpt_arc_stats (
 	length numeric NULL,
 	tot_headloss_max numeric(12, 2) NULL,
 	tot_headloss_min numeric(12, 2) NULL,
-	the_geom public.geometry(linestring, 25831) NULL,
+	the_geom public.geometry(linestring, SRID_VALUE) NULL,
 	CONSTRAINT rpt_arc_stats_pkey PRIMARY KEY (arc_id, result_id)
 );
 CREATE INDEX rpt_arc_stats_flow_avg ON rpt_arc_stats USING btree (flow_avg);
@@ -454,7 +454,7 @@ CREATE TABLE archived_rpt_arc_stats (
 	length numeric NULL,
 	tot_headloss_max numeric(12, 2) NULL,
 	tot_headloss_min numeric(12, 2) NULL,
-	the_geom public.geometry(linestring, 25831) NULL,
+	the_geom public.geometry(linestring, SRID_VALUE) NULL,
 	CONSTRAINT archived_rpt_arc_stats_pkey PRIMARY KEY (arc_id, result_id)
 );
 
@@ -707,7 +707,7 @@ CREATE TABLE IF NOT EXISTS supplyzone
     macrosector_id integer,
     descript text COLLATE pg_catalog."default",
     undelete boolean,
-    the_geom geometry(MultiPolygon,25831),
+    the_geom geometry(MultiPolygon,SRID_VALUE),
     graphconfig json DEFAULT '{"use":[{"nodeParent":"", "toArc":[]}], "ignore":[], "forceClosed":[]}'::json,
     stylesheet json,
     active boolean DEFAULT true,
@@ -900,7 +900,7 @@ CREATE TABLE node (
 	link varchar(512) NULL,
 	verified int4 NULL,
 	rotation numeric(6, 3) NULL,
-	the_geom public.geometry(point, 25831) NULL,
+	the_geom public.geometry(point, SRID_VALUE) NULL,
 	undelete bool NULL,
 	label_x varchar(30) NULL,
 	label_y varchar(30) NULL,

@@ -202,8 +202,8 @@ BEGIN
                     dma_id integer,
                     exit_topelev double precision,
                     exit_elev double precision,
-                    the_geom geometry(LineString,25831),
-                    the_geom_endpoint geometry(Point,25831),
+                    the_geom geometry(LineString,SRID_VALUE),
+                    the_geom_endpoint geometry(Point,SRID_VALUE),
                     flag boolean,
                     CONSTRAINT temp_link_pkey PRIMARY KEY (link_id)
                 );

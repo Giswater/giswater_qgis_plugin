@@ -12,7 +12,7 @@ $BODY$
 
 /*
 SELECT SCHEMA_NAME.gw_fct_psector_merge($${
-"client":{"device":4, "lang":"ca_ES", "infoType":1, "epsg":25831},
+"client":{"device":4, "lang":"ca_ES", "infoType":1, "epsg":SRID_VALUE},
 "form":{}, "feature":{},
 "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"psector_ids":"1, 3", "new_psector_name":"merged_psector"}}}$$);
 

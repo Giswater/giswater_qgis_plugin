@@ -13,7 +13,7 @@ $BODY$
 /*EXAMPLE
 
 -- fid: 461
-SELECT SCHEMA_NAME.gw_fct_create_dscenario_from_mincut($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831},"data":{"parameters":{"name":"TEST", "descript":"TEST", "mincutId":"3"}}}$$);
+SELECT SCHEMA_NAME.gw_fct_create_dscenario_from_mincut($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":SRID_VALUE},"data":{"parameters":{"name":"TEST", "descript":"TEST", "mincutId":"3"}}}$$);
 */
 
 

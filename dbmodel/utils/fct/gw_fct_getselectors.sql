@@ -13,13 +13,13 @@ $BODY$
 
 /*example
 
-SELECT SCHEMA_NAME.gw_fct_getselectors($${"client":{"lang":"en_US", "infoType":1, "epsg":25831}, "form":{"currentTab":"tab_exploitation"}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"selector_basic" ,"filterText":"1"}}$$);
+SELECT SCHEMA_NAME.gw_fct_getselectors($${"client":{"lang":"en_US", "infoType":1, "epsg":SRID_VALUE}, "form":{"currentTab":"tab_exploitation"}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"selector_basic" ,"filterText":"1"}}$$);
 
-SELECT SCHEMA_NAME.gw_fct_getselectors($${"client":{"lang":"en_US", "infoType":1, "epsg":25831}, "form":{"currentTab":"tab_exploitation"}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"selector_basic", "filterText":""}}$$);
+SELECT SCHEMA_NAME.gw_fct_getselectors($${"client":{"lang":"en_US", "infoType":1, "epsg":SRID_VALUE}, "form":{"currentTab":"tab_exploitation"}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"selector_basic", "filterText":""}}$$);
 
-SELECT SCHEMA_NAME.gw_fct_getselectors($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831}, "form":{"currentTab":"tab_exploitation"}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"selector_basic", "filterText":""}}$$);
+SELECT SCHEMA_NAME.gw_fct_getselectors($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":SRID_VALUE}, "form":{"currentTab":"tab_exploitation"}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"selector_basic", "filterText":""}}$$);
 
-SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"selector_basic", "tabName":"tab_exploitation", "id":"1", "isAlone":"True", "disableParent":"False", "value":"True", "addSchema":"NULL"}}$$)
+SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":SRID_VALUE}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"selector_basic", "tabName":"tab_exploitation", "id":"1", "isAlone":"True", "disableParent":"False", "value":"True", "addSchema":"NULL"}}$$)
 
 */
 

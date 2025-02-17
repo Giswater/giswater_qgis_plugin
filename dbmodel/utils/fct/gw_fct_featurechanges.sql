@@ -12,10 +12,10 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_featurechanges(p_data json)
 AS $function$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_featurechanges('{"client":{"device":6, "epsg":25831}, "feature":{"feature_type": "FEATURE"}, "data": {"action":"INSERT", "lastFeeding":"2024-11-11"}}');
-SELECT SCHEMA_NAME.gw_fct_featurechanges('{"client":{"device":6, "epsg":25831}, "feature":{"feature_type": "ELEMENT"}, "data": {"action":"INSERT", "lastFeeding":"2024-11-11"}}');
-SELECT SCHEMA_NAME.gw_fct_featurechanges('{"client":{"device":6, "epsg":25831}, "feature":{"feature_type": "FEATURE"}, "data": {"action":"UPDATE", "lastFeeding":"2024-11-11"}}');
-SELECT SCHEMA_NAME.gw_fct_featurechanges('{"client":{"device":6, "epsg":25831}, "feature":{"feature_type": "ELEMENT"}, "data": {"action":"UPDATE", "lastFeeding":"2024-11-11"}}');
+SELECT SCHEMA_NAME.gw_fct_featurechanges('{"client":{"device":6, "epsg":SRID_VALUE}, "feature":{"feature_type": "FEATURE"}, "data": {"action":"INSERT", "lastFeeding":"2024-11-11"}}');
+SELECT SCHEMA_NAME.gw_fct_featurechanges('{"client":{"device":6, "epsg":SRID_VALUE}, "feature":{"feature_type": "ELEMENT"}, "data": {"action":"INSERT", "lastFeeding":"2024-11-11"}}');
+SELECT SCHEMA_NAME.gw_fct_featurechanges('{"client":{"device":6, "epsg":SRID_VALUE}, "feature":{"feature_type": "FEATURE"}, "data": {"action":"UPDATE", "lastFeeding":"2024-11-11"}}');
+SELECT SCHEMA_NAME.gw_fct_featurechanges('{"client":{"device":6, "epsg":SRID_VALUE}, "feature":{"feature_type": "ELEMENT"}, "data": {"action":"UPDATE", "lastFeeding":"2024-11-11"}}');
 **/
 
 DECLARE

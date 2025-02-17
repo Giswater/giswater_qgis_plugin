@@ -12,7 +12,7 @@ RETURNS integer AS
 $BODY$
 
 /*
-SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES","epsg":25831}, "data":{"resultId":"test1", "dumpSubcatch":"true","step":"0"}}$$) -- FULL PROCESS
+SELECT SCHEMA_NAME.gw_fct_pg2epa_main($${"client":{"device":4, "infoType":1, "lang":"ES","epsg":SRID_VALUE}, "data":{"resultId":"test1", "dumpSubcatch":"true","step":"0"}}$$) -- FULL PROCESS
 INSERT INTO SCHEMA_NAME.rpt_cat_result VALUES ('r1');
 SELECT "SCHEMA_NAME".gw_fct_pg2epa_fill_data ('r1');
 

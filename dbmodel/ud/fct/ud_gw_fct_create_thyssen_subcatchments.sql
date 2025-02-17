@@ -6,7 +6,7 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_create_thyssen_subcatchments(p_dat
 AS $function$
 /*
 
-SELECT SCHEMA_NAME.gw_fct_create_thyssen_subcatchments($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831},
+SELECT SCHEMA_NAME.gw_fct_create_thyssen_subcatchments($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":SRID_VALUE},
 "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"clipLayer":"sector", "deletePrevious":"true"}, "aux_params":null}}$$);
 
 */

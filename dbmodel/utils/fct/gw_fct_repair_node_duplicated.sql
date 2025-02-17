@@ -10,7 +10,7 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_repair_node_duplicated(p_data js
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_repair_node_duplicated($${"client":{"device":4, "lang":"ca_ES", "infoType":1, "epsg":25831}, 
+SELECT SCHEMA_NAME.gw_fct_repair_node_duplicated($${"client":{"device":4, "lang":"ca_ES", "infoType":1, "epsg":SRID_VALUE}, 
 "data":{"parameters":{"node":"11473", "action":"MOVE-LOSE-TOPO", "targetNode":"11474", "dx":"22", "dy":"22"}}}$$);
 -- fid: 405
 

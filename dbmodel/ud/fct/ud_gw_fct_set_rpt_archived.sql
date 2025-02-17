@@ -13,9 +13,9 @@ $BODY$
 /*EXAMPLE
 
 -- fid: 508
-SELECT SCHEMA_NAME.gw_fct_set_rpt_archived($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "result_id":"result1"}}$$);
-SELECT SCHEMA_NAME.gw_fct_set_rpt_archived($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "action": "ARCHIVE", "result_id":"result1"}}$$);
-SELECT SCHEMA_NAME.gw_fct_set_rpt_archived($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "action": "RESTORE", "result_id":"result1"}}$$);
+SELECT SCHEMA_NAME.gw_fct_set_rpt_archived($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":SRID_VALUE}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "result_id":"result1"}}$$);
+SELECT SCHEMA_NAME.gw_fct_set_rpt_archived($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":SRID_VALUE}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "action": "ARCHIVE", "result_id":"result1"}}$$);
+SELECT SCHEMA_NAME.gw_fct_set_rpt_archived($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":SRID_VALUE}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "action": "RESTORE", "result_id":"result1"}}$$);
 */
 
 DECLARE

@@ -13,12 +13,12 @@ $BODY$
 
 /*EXAMPLE:
 SELECT SCHEMA_NAME.gw_fct_getlayersfromcoordinates($${
-"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831},
+"client":{"device":4, "infoType":1, "lang":"ES", "epsg":SRID_VALUE},
 "form":{},
 "feature":{},
 "data":{"pointClickCoords":{"xcoord":419195.116315, "ycoord":4576615.43122},
     "visibleLayers":["ve_arc","ve_node","ve_connec", "ve_link", "ve_vnode"],
-    "epsg":25831,
+    "epsg":SRID_VALUE,
     "zoomScale":500}}$$)
 */
 

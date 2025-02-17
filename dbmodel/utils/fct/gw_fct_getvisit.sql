@@ -13,7 +13,7 @@ AS $function$
 
 /*EXAMPLE:
 
-SELECT SCHEMA_NAME.gw_fct_getvisit($${"client":{"device":5, "lang":"es_ES", "cur_user": "bgeo", "infoType":1, "epsg":25831}, "form":{"visit_id": null, "visit_type": 1}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "coordinates": {"xcoord": 418980.68916666665, "ycoord": 4576904.783750001, "zoomRatio": 10000}}}$$);
+SELECT SCHEMA_NAME.gw_fct_getvisit($${"client":{"device":5, "lang":"es_ES", "cur_user": "bgeo", "infoType":1, "epsg":SRID_VALUE}, "form":{"visit_id": null, "visit_type": 1}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "coordinates": {"xcoord": 418980.68916666665, "ycoord": 4576904.783750001, "zoomRatio": 10000}}}$$);
 
 
 */

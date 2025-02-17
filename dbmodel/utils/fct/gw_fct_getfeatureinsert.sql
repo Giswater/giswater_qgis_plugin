@@ -16,7 +16,7 @@ DEFINITION:
 Function called wheh new geometry is inserted
 EXAMPLE:
 SELECT SCHEMA_NAME.gw_fct_getfeatureinsert($${
-"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831},
+"client":{"device":4, "infoType":1, "lang":"ES", "epsg":SRID_VALUE},
 "form":{},
 "feature":{"tableName":"ve_arc_pipe"},
 "data":{"coordinates":{"x1":418924.6, "y1":4576556.2, "x2":419034.8, "y2":4576634.0}}}$$)

@@ -122,7 +122,7 @@ BEGIN
 
 	-- Execute aux_func
 	if v_aux_params->>'aux_fct'::text = '3100' then
-		EXECUTE 'SELECT gw_fct_manage_hydrology_values($${"client":{"device":4, "lang":"", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"target":"'||v_scenarioid||'", "sector":"-999", "action":"KEEP-COPY", "copyFrom":"'||v_inp_hydrology||'"}}}$$);';
+		EXECUTE 'SELECT gw_fct_manage_hydrology_values($${"client":{"device":4, "lang":"", "infoType":1, "epsg":SRID_VALUE}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"target":"'||v_scenarioid||'", "sector":"-999", "action":"KEEP-COPY", "copyFrom":"'||v_inp_hydrology||'"}}}$$);';
 	end if;
 
 	-- Control nulls

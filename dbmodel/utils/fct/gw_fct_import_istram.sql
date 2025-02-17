@@ -14,7 +14,7 @@ $BODY$
 SELECT SCHEMA_NAME.gw_fct_import_istram($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
 "feature":{},"data":{}}$$)
- SELECT SCHEMA_NAME.gw_fct_import_istram($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "importParam":"n1", "fid":"408"}}$$);
+ SELECT SCHEMA_NAME.gw_fct_import_istram($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":SRID_VALUE}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "importParam":"n1", "fid":"408"}}$$);
 --fid:234
 
 */

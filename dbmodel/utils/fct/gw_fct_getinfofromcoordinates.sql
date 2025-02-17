@@ -13,7 +13,7 @@ $BODY$
 
 /*EXAMPLE:
 SELECT SCHEMA_NAME.gw_fct_getinfofromcoordinates($${
-		"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831},
+		"client":{"device":4, "infoType":1, "lang":"ES", "epsg":SRID_VALUE},
 		"form":{},
 		"feature":{},
 		"data":{"activeLayer":"ve_node",
@@ -22,22 +22,22 @@ SELECT SCHEMA_NAME.gw_fct_getinfofromcoordinates($${
 			"infoType":"full",
 			"projecRole":"role_admin",
 			"toolBar":"basic",
-			"coordinates":{"epsg":25831, "xcoord":419204.96, "ycoord":4576509.27, "zoomRatio":1000}}}$$)
+			"coordinates":{"epsg":SRID_VALUE, "xcoord":419204.96, "ycoord":4576509.27, "zoomRatio":1000}}}$$)
 SELECT SCHEMA_NAME.gw_fct_getinfofromcoordinates($${
-		"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831},
+		"client":{"device":4, "infoType":1, "lang":"ES", "epsg":SRID_VALUE},
 		"form":{},
 		"feature":{},
 		"data":{"activeLayer":"ve_node",
 			"visibleLayer":["ve_node","ve_arc"],
 			"toolBar":"epa",
-			"coordinates":{"epsg":25831, "xcoord":419204.96, "ycoord":4576509.27, "zoomRatio":1000}}}$$)
+			"coordinates":{"epsg":SRID_VALUE, "xcoord":419204.96, "ycoord":4576509.27, "zoomRatio":1000}}}$$)
 
 SELECT SCHEMA_NAME.gw_fct_getinfofromcoordinates($${
-		"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831},
+		"client":{"device":4, "infoType":1, "lang":"ES", "epsg":SRID_VALUE},
 		"form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "toolBar":"basic", "activeLayer":"", "featureDialog":["PIPE"],
 		"visibleLayer":["v_om_mincut_valve", "v_om_mincut_arc", "v_edit_dma", "v_edit_node", "v_edit_node", "v_edit_arc", "v_edit_connec", "v_edit_link", "ve_pol_fountain", "ve_pol_register", "ve_pol_tank", "v_edit_inp_connec", 
 		"v_edit_inp_inlet", "v_edit_inp_junction", "v_edit_inp_pipe", "v_edit_inp_pump", "v_edit_inp_reservoir", "v_edit_inp_shortpipe", "v_edit_inp_tank", "v_edit_inp_valve", "v_edit_inp_virtualvalve"],
-		"mainSchema":"NULL", "addSchema":"NULL", "infoType":"full", "projecRole":"role_admin", "epsg":25831, "coordinates":{"xcoord":418930.4280605118,"ycoord":4576587.621989262, "zoomRatio":1341.590797402754}}}$$);
+		"mainSchema":"NULL", "addSchema":"NULL", "infoType":"full", "projecRole":"role_admin", "epsg":SRID_VALUE, "coordinates":{"xcoord":418930.4280605118,"ycoord":4576587.621989262, "zoomRatio":1341.590797402754}}}$$);
 
  SELECT gw_fct_getinfofromcoordinates($${
 		"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "toolBar":"basic", "editable":"false", "activeLayer":"",

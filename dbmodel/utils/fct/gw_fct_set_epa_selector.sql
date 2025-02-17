@@ -14,7 +14,7 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_set_epa_selector(p_data json)
 AS $function$
 /*EXAMPLE:
 
-SELECT SCHEMA_NAME.gw_fct_set_epa_selector($${"client":{"device":5, "lang":"es_ES", "cur_user": "bgeo", "infoType":1, "epsg":25831},
+SELECT SCHEMA_NAME.gw_fct_set_epa_selector($${"client":{"device":5, "lang":"es_ES", "cur_user": "bgeo", "infoType":1, "epsg":SRID_VALUE},
 "form":{"resultNameShow": "test1","resultNameCompare":"test2","selectorDate":"test3","compareDate":"test4","selectorTime":"test5","compareTime":"test6"},
 "feature":{}, "data":{"filterFields":{}, "pageInfo":{}}}$$);
 

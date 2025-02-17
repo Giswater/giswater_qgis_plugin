@@ -9,9 +9,9 @@ This version of Giswater is provided by Giswater Association
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_arc_noderotation_update()
   RETURNS trigger AS
 $BODY$
-DECLARE 
-rec_arc Record; 
-rec_node Record; 
+DECLARE
+rec_arc Record;
+rec_node Record;
 rec_config record;
 
 hemisphere_rotation_bool boolean;
@@ -41,11 +41,11 @@ v_cur_rotation numeric;
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
-   
+
    	v_srid = (SELECT epsg FROM sys_version ORDER BY id DESC LIMIT 1);
-	
-	IF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_noderotation_update_dsbl' AND cur_user=current_user) IS NOT TRUE THEN 
-    
+
+	IF (SELECT value::boolean FROM config_param_user WHERE parameter='edit_noderotation_update_dsbl' AND cur_user=current_user) IS NOT TRUE THEN
+
 		IF TG_OP='INSERT' THEN
 
 			FOR rec_node IN SELECT * FROM v_edit_node WHERE NEW.node_1 = node_id OR NEW.node_2 = node_id
@@ -157,23 +157,23 @@ BEGIN
 					UPDATE node set rotation = rotation -360 where node_id =  rec_node.node_id;
 				END IF;
 
-			
+
 			-- set label_quadrant, label_x and label_y according to cat_Feature
-			
+
 				EXECUTE '
 				SELECT addparam->''labelPosition''->''dist''->>0  from cat_feature WHERE id = '||quote_literal(rec_node.node_type)||'					
 				' INTO v_dist_xlab;
-			
+
 				EXECUTE '
 				SELECT addparam->''labelPosition''->''dist''->>1  from cat_feature WHERE id = '||quote_literal(rec_node.node_type)||'					
 				' INTO v_dist_ylab;
-				
-				if v_dist_ylab is not null and v_dist_xlab is not null and 
-				(SELECT value::boolean FROM config_param_user WHERE parameter='edit_noderotation_update_dsbl' AND cur_user=current_user) IS FALSE 
+
+				if v_dist_ylab is not null and v_dist_xlab is not null and
+				(SELECT value::boolean FROM config_param_user WHERE parameter='edit_noderotation_update_dsbl' AND cur_user=current_user) IS FALSE
 				then --continue only with when having not-null values
-				
+
 					-- prev calc: current label position
-					select st_setsrid(st_makepoint(label_x::numeric, label_y::numeric), 25831) 
+					select st_setsrid(st_makepoint(label_x::numeric, label_y::numeric), SRID_VALUE) 
 					into v_label_point from node where node_id = rec_node.node_id;
 				
 					-- prev calc: geom of the rec_node
@@ -218,7 +218,7 @@ BEGIN
 					FROM node WHERE node_id = '||QUOTE_LITERAL(rec_node.node_id)||'), lab_point as (
 					SELECT ST_Project(ST_Transform(eee::geometry, 4326)::geography, '||v_dist_xlab||', radians('||v_rot2||')) as fff
 					from mec)
-					select st_transform(fff::geometry, 25831) as label_p from lab_point';
+					select st_transform(fff::geometry, SRID_VALUE) as label_p from lab_point';
 								
 					execute v_sql into v_label_point;
 										

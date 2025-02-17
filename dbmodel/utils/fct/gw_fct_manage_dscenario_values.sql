@@ -12,7 +12,7 @@ $BODY$
 
 /*EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_manage_dscenario_values($${"client":{"device":4, "infoType":1, "lang":"ES"}, "data":{"parameters":{"target":"1", "copyFrom":"2", "action":"DELETE-COPY"}}}$$)
-SELECT SCHEMA_NAME.gw_fct_manage_dscenario_values($${"client":{"device":4, "lang":"EN", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"source":"1", "action":"DELETE-COPY", "copyFrom":"2"}}}$$);
+SELECT SCHEMA_NAME.gw_fct_manage_dscenario_values($${"client":{"device":4, "lang":"EN", "infoType":1, "epsg":SRID_VALUE}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"source":"1", "action":"DELETE-COPY", "copyFrom":"2"}}}$$);
 SELECT SCHEMA_NAME.gw_fct_manage_dscenario_values($${"client":{"device":4, "infoType":1, "lang":"ES"}, "data":{"parameters":{"target":2, "copyFrom":1, "action":"KEEP-COPY"}}}$$)
 SELECT SCHEMA_NAME.gw_fct_manage_dscenario_values($${"client":{"device":4, "infoType":1, "lang":"ES"}, "data":{"parameters":{"target":2, "copyFrom":1, "action":"DELETE-ONLY}}}$$)
 

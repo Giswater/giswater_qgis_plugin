@@ -12,7 +12,7 @@ RETURNS json AS
 $BODY$
 
 /*
-SELECT gw_fct_setchangefeaturetype($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831},
+SELECT gw_fct_setchangefeaturetype($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":SRID_VALUE},
 "form":{}, "feature":{"type":"node"}, "data":{"filterFields":{}, "pageInfo":{},"feature_id":"1109", "feature_type_new":"HYDRANT", "featurecat_id":"HYDRANT 1X110"}}$$);
 
 SELECT gw_fct_setchangefeaturetype(concat('{"client":{}, "feature":{"type":"node"},"data":{"filterFields":{}, "pageInfo":{},

@@ -11,7 +11,7 @@ RETURNS json AS
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_duplicate_dwf_scenario($${"client":{"device":4, "lang":"ca_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{},
+SELECT SCHEMA_NAME.gw_fct_duplicate_dwf_scenario($${"client":{"device":4, "lang":"ca_ES", "infoType":1, "epsg":SRID_VALUE}, "form":{}, "feature":{}, "data":{"filterFields":{},
 "pageInfo":{}, "parameters":{"copyFrom":"2", "idval":"SGASGA", "startdate":"2024/10/16", "enddate":"2024/10/16", "observ":"SDGA", "expl":"1", "active":"true"}, "aux_params":null}}$$);
 
 -- fid: 459

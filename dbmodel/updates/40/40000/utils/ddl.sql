@@ -112,7 +112,7 @@ CREATE TABLE doc (
     "date" timestamp(6) DEFAULT now() NULL,
     user_name varchar(50) DEFAULT USER NULL,
     tstamp timestamp DEFAULT now() NULL,
-    the_geom public.geometry(point, 25831) NULL,
+    the_geom public.geometry(point, SRID_VALUE) NULL,
     CONSTRAINT doc_pkey PRIMARY KEY (id),
     CONSTRAINT name_chk UNIQUE ("name"),
     CONSTRAINT doc_doc_type_fkey FOREIGN KEY (doc_type) REFERENCES doc_type(id) ON DELETE RESTRICT ON UPDATE CASCADE

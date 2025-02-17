@@ -6,12 +6,12 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_setfeaturereplace(p_data json)
 AS $function$
 
 /*
-SELECT gw_fct_setfeaturereplace($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831},
+SELECT gw_fct_setfeaturereplace($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":SRID_VALUE},
 "form":{}, "feature":{"type":"node"}, "data":{"filterFields":{}, "pageInfo":{},"feature_id":"1109",
 "feature_type_new":"HYDRANT", "featurecat_id":"HYDRANT 1X110", "function_type":"St. Function",
 "location_type":"St. Location", "category_type":"St. Category", "fluid_type":"St. Fluid"}}$$);
 
-SELECT gw_fct_setfeaturereplace($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831},
+SELECT gw_fct_setfeaturereplace($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":SRID_VALUE},
 "form":{}, "feature":{"type":"node"}, "data":{"filterFields":{}, "pageInfo":{},"feature_id":"1109", "feature_type_new":"HYDRANT", "featurecat_id":"HYDRANT 1X110"}}$$);
 
 SELECT gw_fct_setfeaturereplace(concat('{"client":{}, "feature":{"type":"node"},"data":{"filterFields":{}, "pageInfo":{},

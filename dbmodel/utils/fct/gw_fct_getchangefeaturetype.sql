@@ -13,7 +13,7 @@ $BODY$
 /*
 -- Button GwFeatureTypeChangeButton
 
-SELECT gw_fct_getchangefeaturetype($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831},"form":{},"feature":{"tableName":"v_edit_node", "id":"1058"},"data":{"newFeatureCat":"HYDRANT"}}$$);
+SELECT gw_fct_getchangefeaturetype($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":SRID_VALUE},"form":{},"feature":{"tableName":"v_edit_node", "id":"1058"},"data":{"newFeatureCat":"HYDRANT"}}$$);
 
 fid = 216
 

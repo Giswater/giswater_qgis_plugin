@@ -15,7 +15,7 @@ $BODY$
 	
 -- MAPZONES
 
- SELECT SCHEMA_NAME.gw_fct_setmapzonestrigger($${"client":{"device":4, "lang":"ca_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{"id":"1088", 
+ SELECT SCHEMA_NAME.gw_fct_setmapzonestrigger($${"client":{"device":4, "lang":"ca_ES", "infoType":1, "epsg":SRID_VALUE}, "form":{}, "feature":{"id":"1088", 
  "tableName":"ve_node_shutoff_valve", "featureType":"node" }, "data":{"filterFields":{}, "pageInfo":{}, "fields":{"closed": "false"}}}$$);
 update SCHEMA_NAME.man_valve set closed = false where node_id = '1088'
 

@@ -15,7 +15,7 @@ $BODY$
 
 /* Example:
 SELECT gw_fct_graphanalytics_settempgeom('{"data":{"fid": 1, "updatemapzgeom":0, "geomparamupdate":2,
-"table":"minsector", "field":"zone_id", "fieldmp":"minisector_id", "srid":25831}}');
+"table":"minsector", "field":"zone_id", "fieldmp":"minisector_id", "srid":SRID_VALUE}}');
 
 Function to update the geometry of the mapzones in the temp_minsector table.
 */
@@ -31,7 +31,7 @@ DECLARE
     v_table TEXT; -- minsector | mapzone
     v_field TEXT; -- zone_id
     v_fieldmp TEXT; -- minisector_id
-    v_srid INTEGER; -- 25831
+    v_srid INTEGER; -- SRID_VALUE
 
 BEGIN
 

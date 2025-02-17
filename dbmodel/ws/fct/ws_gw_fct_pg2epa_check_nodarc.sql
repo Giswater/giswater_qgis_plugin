@@ -11,7 +11,7 @@ RETURNS json AS
 $BODY$
 
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_pg2epa_check_nodarc($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831}, "data":{"parameters":{"resultId":"test1"}}}$$)
+SELECT SCHEMA_NAME.gw_fct_pg2epa_check_nodarc($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":SRID_VALUE}, "data":{"parameters":{"resultId":"test1"}}}$$)
 SELECT SCHEMA_NAME.gw_fct_pg2epa_nod2arc('-1', false, true);
 
 

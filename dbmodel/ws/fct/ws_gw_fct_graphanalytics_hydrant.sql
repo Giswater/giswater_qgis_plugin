@@ -13,7 +13,7 @@ $BODY$
 
 /*
 example:
-SELECT SCHEMA_NAME.gw_fct_graphanalytics_hydrant($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":25831},
+SELECT SCHEMA_NAME.gw_fct_graphanalytics_hydrant($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":SRID_VALUE},
 "form":{}, "feature":{"tableName":"ve_node_hydrant", "featureType":"NODE", "id":["1054"]}, 
 "data":{"filterFields":{}, "pageInfo":{}, "selectionMode":"previousSelection","parameters":{"distance":"50"}}}$$);
 

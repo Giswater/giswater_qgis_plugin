@@ -16,10 +16,10 @@ AS $function$
 
 /*EXAMPLE:
 
-SELECT SCHEMA_NAME.gw_fct_get_dialog($${"client":{"device":5, "lang":"es_ES", "cur_user": "bgeo", "infoType":1, "epsg":25831},
+SELECT SCHEMA_NAME.gw_fct_get_dialog($${"client":{"device":5, "lang":"es_ES", "cur_user": "bgeo", "infoType":1, "epsg":SRID_VALUE},
 "form":{"formName": "generic","formType":"nvo_manager"}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}}}$$);
 
-SELECT SCHEMA_NAME.gw_fct_get_dialog($${"client":{"device":5, "lang":"es_ES", "cur_user": "bgeo", "infoType":1, "epsg":25831},
+SELECT SCHEMA_NAME.gw_fct_get_dialog($${"client":{"device":5, "lang":"es_ES", "cur_user": "bgeo", "infoType":1, "epsg":SRID_VALUE},
 "form":{"formName": "generic","formType":"nvo_roughness", "tableName":"cat_mat_roughness", "id":"id", "idval":1},
  "feature":{}, "data":{"filterFields":{}, "pageInfo":{}}}$$);
 

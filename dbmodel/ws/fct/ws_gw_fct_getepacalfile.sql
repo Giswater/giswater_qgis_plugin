@@ -15,7 +15,7 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getepacalfile(
     VOLATILE 
 AS $BODY$
 /*EXAMPLE
-SELECT SCHEMA_NAME.gw_fct_getepacalfile($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":25831},
+SELECT SCHEMA_NAME.gw_fct_getepacalfile($${"client":{"device":4, "infoType":1, "lang":"ES", "epsg":SRID_VALUE},
 "data":{"type":"pressure", "resultType":"dint", "resultValue":0.22, "inputFile":"file_name", "outputFile":"out_file_name", "dscenarioId":"2", "resultId":"test1", "nodeId":"1001", "pressure":"34", "duration":"3600", "Accuaracy":"1", "trials":"30"}}$$)
 --fid:474/475/476
 */
