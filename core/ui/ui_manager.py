@@ -23,7 +23,7 @@ def _get_ui_class(ui_file_name, subfolder='shared'):
     """ Get UI Python class from @ui_file_name """
 
     # Folder that contains UI files
-    if subfolder in ('basic', 'edit', 'epa', 'om', 'plan', 'utilities', 'toc'):
+    if subfolder in ('basic', 'edit', 'epa', 'om', 'plan', 'utilities', 'toc', 'assetmanage'):
         ui_folder_path = os.path.dirname(__file__) + os.sep + 'toolbars' + os.sep + subfolder
     else:
         ui_folder_path = os.path.dirname(__file__) + os.sep + subfolder
@@ -649,6 +649,12 @@ class GwAdminDbProjectUi(GwMainWindow, FORM_CLASS):
     CONTEXT = CONTEXT
     UINAME = UINAME
 
+UINAME = "admin_assetdbproject"
+FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+class GwAdminDbProjectAssetUi(GwMainWindow, FORM_CLASS):
+    CONTEXT = CONTEXT
+    UINAME = UINAME
+
 
 UINAME = "admin_translation"
 FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
@@ -854,6 +860,45 @@ class GwInterpolate(GwDialog, FORM_CLASS):
 UINAME = "replace_in_file"
 FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
 class GwReplaceInFileUi(GwDialog, FORM_CLASS):
+    CONTEXT = CONTEXT
+    UINAME = UINAME
+# endregion
+
+# region assetmanage
+CONTEXT = "assetmanage"
+
+UINAME = "result_selector"
+FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+class GwResultSelectorUi(GwDialog, FORM_CLASS):
+    CONTEXT = CONTEXT
+    UINAME = UINAME
+
+UINAME = "assignation"
+FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+class GwAssignationUi(GwDialog, FORM_CLASS):
+    CONTEXT = CONTEXT
+    UINAME = UINAME
+
+UINAME = "priority"
+FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+class GwPriorityUi(GwDialog, FORM_CLASS):
+    CONTEXT = CONTEXT
+    UINAME = UINAME
+    # def closeEvent(self, event):
+    #     if self.executing:
+    #         event.ignore()
+    #     else:
+    #         event.accept()
+
+UINAME = "priority_manager"
+FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+class GwPriorityManagerUi(GwDialog, FORM_CLASS):
+    CONTEXT = CONTEXT
+    UINAME = UINAME
+
+UINAME = "status_selector"
+FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+class GwStatusSelectorUi(GwDialog, FORM_CLASS):
     CONTEXT = CONTEXT
     UINAME = UINAME
 # endregion

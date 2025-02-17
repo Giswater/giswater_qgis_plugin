@@ -265,6 +265,10 @@
 			<translation>Giswater - Utilities</translation>
 		</message>
 		<message>
+			<source>toolbar_assetmanage_name</source>
+			<translation>Giswater - AssetManage</translation>
+		</message>
+		<message>
 			<source>305_text</source>
 			<translation>Unit Planner</translation>
 		</message>

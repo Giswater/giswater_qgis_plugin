@@ -301,6 +301,10 @@
 			<translation>Giswater - Utilities</translation>
 		</message>
 		<message>
+			<source>toolbar_assetmanage_name</source>
+			<translation>Giswater - AssetManage</translation>
+		</message>
+		<message>
 			<source>GwAuxCircleAddButton</source>
 			<translation>Create circle</translation>
 		</message>
@@ -1138,11 +1142,15 @@
 			<translation>An arccat_id is considered invalid if it is not listed in the catalog configuration table. As a result, these pipes will NOT be assigned a priority value.</translation>
 		</message>
 		<message>
-			<source>The procedure will delete features on database unless it is a node that doesn't divide arc.\n
- Please ensure that features has no undelete value on true.\n
+			<source>The procedure will delete features on database unless it is a node that doesn't divide arc.\n
+
+ Please ensure that features has no undelete value on true.\n
+
  On the other hand you must know that traceability table will storage precedent information.</source>
-			<translation>The procedure will delete features on database unless it is a node that doesn't divide arc.\n
- Please ensure that features has no undelete value on true.\n
+			<translation>The procedure will delete features on database unless it is a node that doesn't divide arc.\n
+
+ Please ensure that features has no undelete value on true.\n
+
  On the other hand you must know that traceability table will storage precedent information.</translation>
 		</message>
 		<message>

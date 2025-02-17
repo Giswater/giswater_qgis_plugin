@@ -64,3 +64,9 @@ from .utilities.utils_manager_btn import GwUtilsManagerButton
 # ToC
 from .toc.add_child_layer_btn import GwAddChildLayerButton
 from .toc.layerstyle_change_btn import GwLayerStyleChangeButton
+
+# Assetmanage
+from .am.breakage_btn import GwAmBreakageButton
+from .am.priority_btn import GwAmPriorityButton
+from .am.result_manager_btn import GwResultManagerButton
+from .am.result_selector_btn import GwResultSelectorButton
