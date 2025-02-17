@@ -23,7 +23,7 @@ SELECT is (
 );
 
 SELECT is (
-    (gw_fct_upsertfields($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{"id":"1, None", "tableName":"inp_dscenario_demand"},
+    (gw_fct_upsertfields($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{"id":"2", "tableName":"inp_dscenario_demand"},
     "data":{"filterFields":{}, "pageInfo":{}, "fields":{"dscenario_id": "1", "feature_type": "NODE", "demand": "8.000000", "pattern_id": "PTN-HYDRANT", "demand_type": "3",
     "source": "NODE 1012"}, "force_action":"UPDATE"}}$$)::JSON)->>'status',
     'Accepted',
