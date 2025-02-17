@@ -649,6 +649,12 @@ class GwAdminDbProjectUi(GwMainWindow, FORM_CLASS):
     CONTEXT = CONTEXT
     UINAME = UINAME
 
+UINAME = "admin_assetdbproject"
+FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+class GwAdminDbProjectAssetUi(GwMainWindow, FORM_CLASS):
+    CONTEXT = CONTEXT
+    UINAME = UINAME
+
 
 UINAME = "admin_translation"
 FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
@@ -863,19 +869,19 @@ CONTEXT = "assetmanage"
 
 UINAME = "result_selector"
 FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
-class ResultSelectorUi(GwDialog, FORM_CLASS):
+class GwResultSelectorUi(GwDialog, FORM_CLASS):
     CONTEXT = CONTEXT
     UINAME = UINAME
 
 UINAME = "assignation"
 FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
-class AssignationUi(GwDialog, FORM_CLASS):
+class GwAssignationUi(GwDialog, FORM_CLASS):
     CONTEXT = CONTEXT
     UINAME = UINAME
 
 UINAME = "priority"
 FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
-class PriorityUi(GwDialog, FORM_CLASS):
+class GwPriorityUi(GwDialog, FORM_CLASS):
     CONTEXT = CONTEXT
     UINAME = UINAME
     # def closeEvent(self, event):
@@ -886,13 +892,13 @@ class PriorityUi(GwDialog, FORM_CLASS):
 
 UINAME = "priority_manager"
 FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
-class PriorityManagerUi(GwDialog, FORM_CLASS):
+class GwPriorityManagerUi(GwDialog, FORM_CLASS):
     CONTEXT = CONTEXT
     UINAME = UINAME
 
 UINAME = "status_selector"
 FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
-class StatusSelectorUi(GwDialog, FORM_CLASS):
+class GwStatusSelectorUi(GwDialog, FORM_CLASS):
     CONTEXT = CONTEXT
     UINAME = UINAME
 # endregion
