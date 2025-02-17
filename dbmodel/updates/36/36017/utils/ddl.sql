@@ -47,3 +47,6 @@ ALTER TABLE dimensions ADD CONSTRAINT dimensions_workcat_id_fkey FOREIGN KEY (wo
 -- 12/02/2025
 ALTER TABLE element ALTER COLUMN muni_id DROP NOT NULL;
 ALTER TABLE element ALTER COLUMN sector_id DROP NOT NULL;
+
+-- 17/02/2025
+DROP FUNCTION IF EXISTS gw_trg_edit_foreignkey() CASCADE;

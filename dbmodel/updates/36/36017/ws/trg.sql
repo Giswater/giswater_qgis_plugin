@@ -32,3 +32,15 @@ ON v_edit_dqa FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_dqa('edit');
 
 CREATE TRIGGER gw_trg_v_ui_dqa INSTEAD OF INSERT OR DELETE OR UPDATE
 ON v_ui_dqa FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_dqa('ui');
+
+CREATE TRIGGER gw_trg_edit_controls AFTER DELETE OR UPDATE OF arc_id ON arc
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_controls('arc_id');
+
+CREATE TRIGGER gw_trg_edit_controls AFTER DELETE OR UPDATE OF node_id ON node
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_controls('node_id');
+
+CREATE TRIGGER gw_trg_edit_controls AFTER DELETE OR UPDATE OF connec_id ON connec
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_controls('connec_id');
+
+CREATE TRIGGER gw_trg_edit_controls AFTER DELETE OR UPDATE ON element
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_controls('element_id');
