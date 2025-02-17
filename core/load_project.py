@@ -449,10 +449,17 @@ class GwLoadProject(QObject):
         # Enable toolbars: 'basic', 'utilities', 'toc'
         self._enable_toolbar("basic")
         self._enable_toolbar("utilities")
-        self._enable_toolbar("assetmanage")
         self._enable_toolbar("toc")
         self._hide_button("72")
 
+
+        # Check is project name already exists
+        project_name = "asset"
+        sql = (f"SELECT schema_name, schema_name FROM information_schema.schemata "
+               f"WHERE schema_name ILIKE '%{project_name}%'ORDER BY schema_name")
+        rows = tools_db.get_rows(sql, commit=False)
+        if rows is not None:
+            self._enable_toolbar("assetmanage")
 
     def _create_toolbar(self, toolbar_id):
 
