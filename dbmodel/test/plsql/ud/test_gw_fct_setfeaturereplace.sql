@@ -10,14 +10,22 @@ SET client_min_messages TO WARNING;
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
--- Plan for 1 test
-SELECT plan(1);
+-- Plan for 2 test
+SELECT plan(2);
 
 -- Extract and test the "status" field from the function's JSON response
 SELECT is(
     (gw_fct_setfeaturereplace($${"client":{"device":4, "lang":"", "infoType":1, "epsg":25831}, "form":{}, "feature":{"type":"arc"},
     "data":{"filterFields":{}, "pageInfo":{}, "old_feature_id":"154", "feature_type_new":"WACCEL", "featurecat_id":"WACCEL-CC020",
-    "workcat_id_end":"work1", "enddate":"2024-08-27", "keep_elements":"False", "keep_epa_values":"True"}}$$)::JSON)->>'status',
+    "workcat_id_end":"work1", "enddate":"2024-08-27", "keep_elements":"False", "keep_epa_values":"True", "keep_asset_id":"True"}}$$)::JSON)->>'status',
+    'Accepted',
+    'Check if gw_fct_setfeaturereplace returns status "Accepted"'
+);
+
+SELECT is(
+    (gw_fct_setfeaturereplace($${"client":{"device":4, "lang":"", "infoType":1, "epsg":25831}, "form":{}, "feature":{"type":"arc"},
+    "data":{"filterFields":{}, "pageInfo":{}, "old_feature_id":"154", "feature_type_new":"WACCEL", "featurecat_id":"WACCEL-CC020",
+    "workcat_id_end":"work1", "enddate":"2024-08-27", "keep_elements":"False", "keep_epa_values":"True", "keep_asset_id":"False"}}$$)::JSON)->>'status',
     'Accepted',
     'Check if gw_fct_setfeaturereplace returns status "Accepted"'
 );

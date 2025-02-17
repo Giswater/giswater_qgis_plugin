@@ -54,6 +54,7 @@ v_message text;
 v_sql text;
 v_count integer;
 v_rec record;
+v_keep_asset_id boolean;
 
 BEGIN
 
@@ -84,6 +85,8 @@ BEGIN
 	else
 		v_feature_id = ((p_data ->>'data')::json->>'old_feature_id')::text;
 	end if;
+	
+	v_keep_asset_id = ((p_data ->>'data')::json->>'keep_asset_id')::text;
 
 	--define columns used for feature_cat
 	v_feature_layer = concat('v_edit_',v_feature_type);
@@ -122,9 +125,11 @@ BEGIN
 		EXECUTE 'UPDATE '||v_feature_layer||' SET location_type=NULL WHERE '||v_feature_type||'_id='||quote_literal(v_feature_id)||';';
 	END IF;
 
+	IF v_keep_asset_id IS false THEN
+		EXECUTE 'UPDATE '||v_feature_layer||' SET asset_id=NULL WHERE '||v_feature_type||'_id='||quote_literal(v_feature_id)||';';
+	END IF;
 
 	-- update only the not null-man_type_new values
-
 	for v_rec in execute
 	'WITH json_man_type AS (
 	SELECT json_build_object(
