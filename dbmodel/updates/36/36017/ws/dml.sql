@@ -72,3 +72,7 @@ insert into sys_style select 'v_edit_node', 108, 'qml', stylevalue, true from sy
 
 UPDATE inp_typevalue set typevalue = 'inp_options_networkmode', idval ='TRIMED NETWORK' where id = '3' and typevalue ='_inp_options_networkmode';
 
+-- 17/20/2025
+UPDATE sys_table
+	SET addparam=NULL
+	WHERE id IN ('inp_dscenario_demand', 'v_edit_inp_dscenario_demand');
