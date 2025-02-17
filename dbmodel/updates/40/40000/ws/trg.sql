@@ -312,16 +312,3 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_ui_doc('doc_x_visit');
 
 CREATE TRIGGER gw_trg_edit_element INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_element
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_element('element');
-
--- 17/02/2025
-CREATE TRIGGER gw_trg_edit_controls AFTER DELETE OR UPDATE ON arc
-FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_controls('arc_id');
-
-CREATE TRIGGER gw_trg_edit_controls AFTER DELETE OR UPDATE ON node
-FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_controls('node_id');
-
-CREATE TRIGGER gw_trg_edit_controls AFTER DELETE OR UPDATE ON connec
-FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_controls('connec_id');
-
-CREATE TRIGGER gw_trg_edit_controls AFTER DELETE OR UPDATE ON element
-FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_controls('element_id');

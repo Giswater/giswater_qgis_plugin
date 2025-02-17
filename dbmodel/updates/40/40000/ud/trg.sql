@@ -367,25 +367,3 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_ui_doc('doc_x_node');
 
 CREATE TRIGGER gw_trg_ui_doc_x_visit INSTEAD OF INSERT OR DELETE OR UPDATE ON v_ui_doc_x_visit
 FOR EACH ROW EXECUTE FUNCTION gw_trg_ui_doc('doc_x_visit');
-
--- 17/02/2025
-CREATE TRIGGER gw_trg_edit_controls AFTER INSERT OR UPDATE OF subc_id OR DELETE ON inp_dscenario_lid_usage
-FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_controls('inp_dscenario_lid_usage');
-
-CREATE TRIGGER gw_trg_edit_controls AFTER INSERT OR UPDATE OF subc_id OR DELETE ON inp_subcatchment
-FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_controls('inp_subcatchment');
-
-CREATE TRIGGER gw_trg_edit_controls AFTER DELETE OR UPDATE ON arc
-FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_controls('arc_id');
-
-CREATE TRIGGER gw_trg_edit_controls AFTER DELETE OR UPDATE ON node
-FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_controls('node_id');
-
-CREATE TRIGGER gw_trg_edit_controls AFTER DELETE OR UPDATE ON connec
-FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_controls('connec_id');
-
-CREATE TRIGGER gw_trg_edit_controls AFTER DELETE OR UPDATE ON gully
-FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_controls('gully_id');
-
-CREATE TRIGGER gw_trg_edit_controls AFTER DELETE OR UPDATE ON element
-FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_controls('element_id');
