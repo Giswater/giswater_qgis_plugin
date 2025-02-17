@@ -1052,3 +1052,9 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node", "col
 ALTER TABLE node ADD CONSTRAINT cat_pavement_id_fkey FOREIGN KEY (pavcat_id) REFERENCES cat_pavement(id) ON UPDATE CASCADE ON DELETE RESTRICT;
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_arc", "column":"dr", "dataType":"integer", "isUtils":"False"}}$$);
+
+-- 17/02/2025
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node", "column":"lock_level", "dataType":"int4", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"lock_level", "dataType":"int4", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"lock_level", "dataType":"int4", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"element", "column":"lock_level", "dataType":"int4", "isUtils":"False"}}$$);

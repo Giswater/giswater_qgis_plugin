@@ -1312,3 +1312,15 @@ UPDATE sys_fprocess SET fprocess_name='EPA connec over EPA node (goe2pa)', proje
 	WHERE t1.epa_type != ''UNDEFINED''
 	AND t2.epa_type = ''JUNCTION'') a 
     WHERE a.state1 > 0 AND a.state2 > 0 ', info_msg='No EPA connecs over EPA node have been detected.', function_name='[gw_fct_pg2epa_check_networkmode_connec]', active=false WHERE fid=413;
+
+-- 17/02/2025
+UPDATE sys_message
+SET error_message = 'Cannot do this operation because the lock level is set to %lock_level%',
+    hint_message = 'Please review the lock level'
+WHERE id = 3284;
+
+-- edit_typevalue
+INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('value_lock_level', '0', 'ALLOW EVERYTHING', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('value_lock_level', '1', 'BLOCK UPDATE', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('value_lock_level', '2', 'BLOCK DELETE', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('value_lock_level', '3', 'BLOCK UPDATE AND DELETE', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;

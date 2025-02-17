@@ -2644,3 +2644,15 @@ UPDATE config_form_fields SET columnname = 'mfull_depth', label = 'mfull_depth',
 INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('layout_name_typevalue', 'lyt_log_1', 'lyt_log_1', 'lytLog1', NULL);
 
 DELETE FROM config_form_fields WHERE formname = 've_epa_valve' AND columnname = 'to_arc';
+
+-- 17/02/2025
+INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, parameter_id, active) VALUES('edit_typevalue', 'value_lock_level', 'node', 'lock_level', NULL, true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field) DO NOTHING;
+INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, parameter_id, active) VALUES('edit_typevalue', 'value_lock_level', 'arc', 'lock_level', NULL, true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field) DO NOTHING;
+INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, parameter_id, active) VALUES('edit_typevalue', 'value_lock_level', 'connec', 'lock_level', NULL, true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field) DO NOTHING;
+INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, parameter_id, active) VALUES('edit_typevalue', 'value_lock_level', 'element', 'lock_level', NULL, true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field) DO NOTHING;
+INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, parameter_id, active) VALUES('edit_typevalue', 'value_lock_level', 'gully', 'lock_level', NULL, true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field) DO NOTHING;
+
+UPDATE config_form_fields SET "datatype"='integer', widgettype='combo', dv_querytext='SELECT id, idval FROM edit_typevalue WHERE typevalue = ''value_lock_level''', dv_orderby_id=true, dv_isnullvalue=true, dv_querytext_filterc=NULL
+WHERE (formname='v_edit_arc' OR formname ILIKE 've_arc_%' OR formname='v_edit_connec' OR formname ILIKE 've_connec_%' OR formname='v_edit_node' OR formname ILIKE 've_node_%' OR formname='v_edit_element' OR formname ILIKE 've_element_%' OR formname='v_edit_gully' OR formname ILIKE 've_gully_%')
+AND formtype='form_feature' AND columnname='lock_level' AND tabname='tab_data';
+

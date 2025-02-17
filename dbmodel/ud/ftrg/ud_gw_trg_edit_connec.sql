@@ -488,7 +488,7 @@ BEGIN
 			builtdate, enddate, ownercat_id, muni_id, postcode, district_id,
 			streetaxis2_id, streetaxis_id, postnumber, postnumber2, postcomplement, postcomplement2, descript, rotation, link, verified, the_geom,  undelete,  label_x, label_y,
 			label_rotation, accessibility,diagonal, expl_id, publish, inventory, uncertain, num_value, private_conneccat_id,
-			lastupdate, lastupdate_user, asset_id, drainzone_id, expl_id2, adate, adescript, plot_code, placement_type, label_quadrant, access_type, streetname, streetname2)
+			lastupdate, lastupdate_user, asset_id, drainzone_id, expl_id2, adate, adescript, plot_code, placement_type, label_quadrant, access_type, streetname, streetname2, lock_level)
 			VALUES (NEW.connec_id, NEW.code, NEW.customer_code, NEW.top_elev, NEW.y1, NEW.y2, NEW.conneccat_id, NEW.connec_type, NEW.sector_id, NEW.demand,NEW."state", NEW.state_type, NEW.connec_depth,
 			NEW.connec_length, NEW.arc_id, NEW.annotation, NEW."observ", NEW."comment", NEW.dma_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type, NEW.location_type,
 			NEW.workcat_id, NEW.workcat_id_end, NEW.workcat_id_plan, NEW.buildercat_id, NEW.builtdate, NEW.enddate, NEW.ownercat_id, NEW.muni_id, NEW.postcode, NEW.district_id,
@@ -496,14 +496,14 @@ BEGIN
 			NEW.descript, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom, NEW.undelete, NEW.label_x, NEW.label_y, NEW.label_rotation,
 			NEW.accessibility, NEW.diagonal, NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.num_value, NEW.private_conneccat_id,
 			NEW.lastupdate, NEW.lastupdate_user, NEW.asset_id, NEW.drainzone_id, NEW.expl_id2, NEW.adate, NEW.adescript, NEW.plot_code, NEW.placement_type,
-			NEW.label_quadrant, NEW.access_type, NEW.streetname, NEW.streetname2);
+			NEW.label_quadrant, NEW.access_type, NEW.streetname, NEW.streetname2, NEW.lock_level);
 		ELSE
 			INSERT INTO connec (connec_id, code, customer_code, top_elev, y1, y2,conneccat_id, connec_type, sector_id, demand, "state",  state_type, connec_depth, connec_length, arc_id, annotation,
 			"observ","comment",  dma_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, workcat_id_plan, buildercat_id,
 			builtdate, enddate, ownercat_id, muni_id,postcode,district_id,
 			streetaxis2_id, streetaxis_id, postnumber, postnumber2, postcomplement, postcomplement2, descript, rotation, link, verified, the_geom,  undelete, label_x, label_y,
 			label_rotation, accessibility,diagonal, expl_id, publish, inventory, uncertain, num_value, private_conneccat_id, matcat_id,
-			lastupdate, lastupdate_user, asset_id, drainzone_id, expl_id2, adate, adescript, plot_code, placement_type, label_quadrant, access_type, streetname, streetname2)
+			lastupdate, lastupdate_user, asset_id, drainzone_id, expl_id2, adate, adescript, plot_code, placement_type, label_quadrant, access_type, streetname, streetname2, lock_level)
 			VALUES (NEW.connec_id, NEW.code, NEW.customer_code, NEW.top_elev, NEW.y1, NEW.y2, NEW.conneccat_id, NEW.connec_type, NEW.sector_id, NEW.demand,NEW."state", NEW.state_type, NEW.connec_depth,
 			NEW.connec_length, NEW.arc_id, NEW.annotation, NEW."observ", NEW."comment", NEW.dma_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type, NEW.location_type,
 			NEW.workcat_id, NEW.workcat_id_end, NEW.workcat_id_plan, NEW.buildercat_id, NEW.builtdate, NEW.enddate, NEW.ownercat_id, NEW.muni_id, NEW.postcode, NEW.district_id,
@@ -511,7 +511,7 @@ BEGIN
 			NEW.descript, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom, NEW.undelete, NEW.label_x, NEW.label_y, NEW.label_rotation,
 			NEW.accessibility, NEW.diagonal, NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.num_value, NEW.private_conneccat_id, NEW.matcat_id,
 			NEW.lastupdate, NEW.lastupdate_user, NEW.asset_id, NEW.drainzone_id, NEW.expl_id2, NEW.adate, NEW.adescript, NEW.plot_code, NEW.placement_type,
-			NEW.label_quadrant, NEW.access_type, NEW.streetname, NEW.streetname2);
+			NEW.label_quadrant, NEW.access_type, NEW.streetname, NEW.streetname2, NEW.lock_level);
 		END IF;
 
 		--check if feature is double geom
@@ -763,7 +763,7 @@ BEGIN
 			rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, undelete=NEW.undelete,
 			label_x=NEW.label_x, label_y=NEW.label_y, label_rotation=NEW.label_rotation, accessibility=NEW.accessibility, diagonal=NEW.diagonal, publish=NEW.publish, pjoint_id=NEW.pjoint_id, pjoint_type = NEW.pjoint_type,
 			inventory=NEW.inventory, uncertain=NEW.uncertain, expl_id=NEW.expl_id,num_value=NEW.num_value, private_conneccat_id=NEW.private_conneccat_id, lastupdate=now(), lastupdate_user=current_user, asset_id=NEW.asset_id, drainzone_id=NEW.drainzone_id, expl_id2=NEW.expl_id2, adate=NEW.adate, adescript=NEW.adescript,
-			plot_code=NEW.plot_code, placement_type=NEW.placement_type, label_quadrant=NEW.label_quadrant, access_type=NEW.access_type, streetname = NEW.streetname, streetname2 = NEW.streetname2
+			plot_code=NEW.plot_code, placement_type=NEW.placement_type, label_quadrant=NEW.label_quadrant, access_type=NEW.access_type, streetname = NEW.streetname, streetname2 = NEW.streetname2, lock_level=NEW.lock_level
 			WHERE connec_id = OLD.connec_id;
 		ELSE
 			UPDATE connec
@@ -776,7 +776,7 @@ BEGIN
 			label_x=NEW.label_x, label_y=NEW.label_y, label_rotation=NEW.label_rotation, accessibility=NEW.accessibility, diagonal=NEW.diagonal, publish=NEW.publish, pjoint_id=NEW.pjoint_id, pjoint_type = NEW.pjoint_type,
 			inventory=NEW.inventory, uncertain=NEW.uncertain, expl_id=NEW.expl_id,num_value=NEW.num_value, private_conneccat_id=NEW.private_conneccat_id, lastupdate=now(),
 			lastupdate_user=current_user, matcat_id = NEW.matcat_id, asset_id=NEW.asset_id, drainzone_id=NEW.drainzone_id, expl_id2=NEW.expl_id2, adate=NEW.adate, adescript=NEW.adescript,
-			plot_code=NEW.plot_code, placement_type=NEW.placement_type, label_quadrant=NEW.label_quadrant, access_type=NEW.access_type, streetname = NEW.streetname, streetname2 = NEW.streetname2
+			plot_code=NEW.plot_code, placement_type=NEW.placement_type, label_quadrant=NEW.label_quadrant, access_type=NEW.access_type, streetname = NEW.streetname, streetname2 = NEW.streetname2, lock_level=NEW.lock_level
 			WHERE connec_id = OLD.connec_id;
 		END IF;
 

@@ -228,7 +228,8 @@ SELECT element.element_id,
     element.expl_id2,
     element.trace_featuregeom,
 	element.muni_id,
-	element.sector_id
+	element.sector_id,
+    element.lock_level
    FROM selector_expl, element
      JOIN v_state_element ON element.element_id::text = v_state_element.element_id::text
      JOIN cat_element ON element.elementcat_id::text = cat_element.id::text
@@ -907,7 +908,8 @@ AS WITH
 			arc.brand_id,
 			arc.model_id,
 			arc.serial_number,
-            arc.initoverflowpath
+            arc.initoverflowpath,
+            arc.lock_level
 			FROM arc_selector
 			JOIN arc using (arc_id)
 			JOIN selector_expl se ON (se.cur_user =current_user AND se.expl_id = arc.expl_id) or (se.cur_user = current_user AND se.expl_id = arc.expl_id2)
@@ -1302,7 +1304,8 @@ AS WITH
 			END AS inp_type,
 			node.brand_id,
 			node.model_id,
-			node.serial_number
+			node.serial_number,
+            node.lock_level
 			FROM node_selector
 			JOIN node USING (node_id)
 			JOIN selector_expl se ON (se.cur_user = current_user AND se.expl_id = node.expl_id) OR (se.cur_user = current_user AND se.expl_id = node.expl_id2)
@@ -1423,7 +1426,8 @@ AS WITH
 			inp_type,
 			brand_id,
 			model_id,
-			serial_number
+			serial_number,
+            lock_level
 			FROM node_selected
 		)
 	SELECT node_base.*
@@ -1723,7 +1727,8 @@ AS WITH
 			connec.adescript,
 			connec.plot_code,
 			connec.placement_type,
-			connec.access_type
+			connec.access_type,
+			connec.lock_level
 			FROM connec_selector
 			JOIN connec USING (connec_id)
 			JOIN selector_expl se ON (se.cur_user = current_user AND se.expl_id = connec.expl_id) OR (se.cur_user = current_user AND se.expl_id = connec.expl_id2)
@@ -2100,7 +2105,8 @@ AS WITH
 			gully.insert_user,
 			date_trunc('second'::text, gully.lastupdate) AS lastupdate,
 			gully.lastupdate_user,
-			gully.the_geom
+			gully.the_geom,
+			gully.lock_level
 			FROM inp_network_mode, gully_selector
 			JOIN gully using (gully_id)
 			JOIN selector_expl se ON (se.cur_user = current_user AND se.expl_id = gully.expl_id) OR (se.cur_user = current_user AND se.expl_id = gully.expl_id2)

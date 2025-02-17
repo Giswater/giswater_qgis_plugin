@@ -384,6 +384,7 @@ AS WITH
       date_trunc('second'::text, arc.lastupdate) AS lastupdate,
       arc.lastupdate_user,
       arc.the_geom,
+      arc.lock_level,
       CASE
         WHEN arc.sector_id > 0 AND vst.is_operative = true AND arc.epa_type::text <> 'UNDEFINED'::character varying(16)::text THEN arc.epa_type
         ELSE NULL::character varying(16)
@@ -745,7 +746,8 @@ AS WITH
         END AS inp_type,
         m.closed as closed_valve,
         m.broken as broken_valve,
-        node.pavcat_id
+        node.pavcat_id,
+        node.lock_level
         FROM node_selector
         JOIN node ON node.node_id = node_selector.node_id
         JOIN selector_expl se ON (se.cur_user =current_user AND se.expl_id = node.expl_id) or (se.cur_user = current_user AND se.expl_id = node.expl_id2)
@@ -1411,7 +1413,8 @@ AS WITH
         date_trunc('second'::text, connec.lastupdate) AS lastupdate,
         connec.lastupdate_user,
         connec.the_geom,
-        connec.n_inhabitants
+        connec.n_inhabitants,
+        connec.lock_level
         FROM inp_network_mode, connec_selector
         JOIN connec ON connec.connec_id = connec_selector.connec_id
         JOIN selector_expl se ON (se.cur_user =current_user AND se.expl_id = connec.expl_id) or (se.cur_user =current_user and se.expl_id = connec.expl_id2)
@@ -1583,7 +1586,8 @@ SELECT e.* FROM ( SELECT element.element_id,
     element.expl_id2,
     element.trace_featuregeom,
     element.muni_id,
-    element.sector_id
+    element.sector_id,
+    element.lock_level
    FROM selector_expl, element
      JOIN v_state_element ON element.element_id::text = v_state_element.element_id::text
      JOIN cat_element ON element.elementcat_id::text = cat_element.id::text

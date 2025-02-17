@@ -25,9 +25,17 @@ BEGIN
   v_featurefield:= TG_ARGV[0];
 
   IF TG_OP = 'UPDATE' OR TG_OP = 'DELETE' THEN
-		IF OLD.undelete IS TRUE AND NEW.undelete IS TRUE THEN
+		IF (OLD.lock_level = 1 AND NEW.lock_level = 1) AND TG_OP = 'UPDATE' THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-			"data":{"message":"3284", "function":"2718","debug_msg":null}}$$);';
+			"data":{"message":"3284", "function":"2718","parameters":{"lock_level":'||NEW.lock_level||'}}}$$);';
+			RETURN NULL;
+		ELSIF (OLD.lock_level = 2 AND NEW.lock_level = 2) AND TG_OP = 'DELETE' THEN
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+			"data":{"message":"3284", "function":"2718","parameters":{"lock_level":'||NEW.lock_level||'}}}$$);';
+			RETURN NULL;
+		ELSIF (OLD.lock_level = 3 AND NEW.lock_level = 3) THEN
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+			"data":{"message":"3284", "function":"2718","parameters":{"lock_level":'||NEW.lock_level||'}}}$$);';
 			RETURN NULL;
 		END IF;
 	END IF;
@@ -48,7 +56,7 @@ BEGIN
 
       IF NEW.subc_id NOT IN (SELECT DISTINCT subc_id FROM inp_subcatchment) THEN
         EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-        "data":{"message":"3194", "function":"2718","debug_msg":"'||NEW.subc_id||'","variables":"inp_subcatchment"}}$$);';
+        "data":{"message":"3194", "function":"2718","parameters":{"subc_id":"'||NEW.subc_id||'"}}}$$);';
       END IF;
     END IF;
 
