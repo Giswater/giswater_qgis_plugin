@@ -951,7 +951,7 @@ class GwDscenarioManagerButton(GwAction):
         col_name = 'feature_id'
         col_idx = None
 
-        if tablename in ('inp_dscenario_controls', 'inp_dscenario_rules'):
+        if tablename in ('inp_dscenario_controls', 'inp_dscenario_rules', 'inp_dscenario_demand'):
             col_name = 'id'
             col_idx = tools_qt.get_col_index_by_col_name(tableview, col_name)
         else:
@@ -971,7 +971,7 @@ class GwDscenarioManagerButton(GwAction):
 
         # Execute getinfofromid
         _id = f"{feature_id}"
-        if self.selected_dscenario_id is not None:
+        if self.selected_dscenario_id is not None and col_name != 'id':
             _id = f"{self.selected_dscenario_id}, {feature_id}"
             if tablename == "inp_dscenario_pump_additional":
                 col_idx = tools_qt.get_col_index_by_col_name(tableview, 'order_id')
@@ -1405,7 +1405,7 @@ class GwDscenarioManagerButton(GwAction):
             field_id = ['dscenario_id', field_id]
             if tablename == "inp_dscenario_pump_additional":
                 field_id.append('order_id')
-        if tablename in ('inp_dscenario_controls', 'inp_dscenario_rules'):
+        if tablename in ('inp_dscenario_controls', 'inp_dscenario_rules', 'inp_dscenario_demand'):
             field_id = 'id'
 
         # Get every widget in the layout
@@ -1476,8 +1476,8 @@ class GwDscenarioManagerButton(GwAction):
                     value = tools_qt.get_widget_value(dialog, widget_name)
                     id_val += f"{value}, "
             id_val = id_val[:-2]
-        # if id_val in (None, '', 'None'):
-        #     id_val = feature_id
+        if id_val in (None, '', 'None'):
+            id_val = complet_result['body']['feature']['id']
         feature = f'"id":"{id_val}", '
         feature += f'"tableName":"{tablename}"'
         extras = f'"fields":{fields}'
