@@ -105,7 +105,7 @@ class GwCalculatePriority(GwTask):
         self.config_material = config_material
         self.config_engine = config_engine
 
-        config_path = Path(lib_vars.plugin_dir) / "config" / "config.config"
+        config_path = Path(lib_vars.plugin_dir) / "config" / "giswater.config"
         config = configparser.ConfigParser()
         config.read(config_path)
         self.method = config.get("general", "engine_method")

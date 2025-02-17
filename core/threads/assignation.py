@@ -42,7 +42,7 @@ class GwAssignation(GwTask):
         self.diameter_range = diameter_range
         self.builtdate_range = builtdate_range
 
-        config_path = Path(lib_vars.plugin_dir) / "config" / "config.config"
+        config_path = Path(lib_vars.plugin_dir) / "config" / "giswater.config"
         config = configparser.ConfigParser()
         config.read(config_path)
         self.unknown_material = config.get("general", "unknown_material")

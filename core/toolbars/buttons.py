@@ -66,7 +66,7 @@ from .toc.add_child_layer_btn import GwAddChildLayerButton
 from .toc.layerstyle_change_btn import GwLayerStyleChangeButton
 
 # Assetmanage
-from .assetmanage.breakage_btn import GwAmBreakageButton
-from .assetmanage.priority_btn import GwAmPriorityButton
-from .assetmanage.result_manager_btn import GwResultManagerButton
-from .assetmanage.result_selector_btn import GwResultSelectorButton
+from .am.breakage_btn import GwAmBreakageButton
+from .am.priority_btn import GwAmPriorityButton
+from .am.result_manager_btn import GwResultManagerButton
+from .am.result_selector_btn import GwResultSelectorButton
