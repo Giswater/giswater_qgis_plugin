@@ -8,8 +8,8 @@ __license__ = "MIT"
 from pathlib import Path
 
 import pandas as pd
-from swmm_api.external_files.following_values import remove_following_zeros
-from swmm_api.input_file._type_converter import str_to_datetime
+from .following_values import remove_following_zeros
+from ..input_file._type_converter import str_to_datetime
 
 
 def write_swmm_timeseries_data(series, filename, drop_zeros=True):
@@ -228,5 +228,5 @@ def read_calibration_file(filename):
                 value = float(args[-1])
                 di_ts[current_label][date_time] = value
             else:
-                print('UNKOWN')
+                print('UNKNOWN')
     return pd.DataFrame(di_ts)

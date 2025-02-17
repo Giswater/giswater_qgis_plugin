@@ -1,11 +1,10 @@
 import geopandas as gpd
 
-from swmm_api.input_file.macros import get_link_tags, complete_vertices, get_node_tags
-from swmm_api.input_file.macros.gis import (
-    subcatchment_geo_data_frame,
-)
-from swmm_api.input_file.section_labels import *
-from swmm_api.input_file.section_lists import LINK_SECTIONS, NODE_SECTIONS
+from .tags import get_link_tags, get_node_tags
+from .geo import complete_vertices
+from .gis import subcatchment_geo_data_frame
+from ..section_labels import *
+from ..section_lists import LINK_SECTIONS, NODE_SECTIONS
 
 # import xyzservices
 # xyzservices.providers

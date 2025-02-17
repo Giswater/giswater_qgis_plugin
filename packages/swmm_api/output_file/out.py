@@ -460,6 +460,91 @@ class SwmmOutput(SwmmOutExtract):
         if parq_writer:
             parq_writer.close()
 
+    def to_parquet_chunks_fast(self, fn, rows_at_a_time=1000, show_progress=True, kind=None, label=None, variable=None, slim=False):
+        import pyarrow as pa
+        import pyarrow.parquet as pq
+
+        # Use a ParquetWriter for faster writes
+        parq_writer = None
+
+        # Prepare the writer in a more efficient loop
+        for df in self._iter_chunks(rows_at_a_time=rows_at_a_time,
+                                    show_progress=show_progress,
+                                    kind=kind, label=label, variable=variable,
+                                    slim=slim):  # type: pandas.DataFrame
+
+            # Convert the DataFrame to a PyArrow Table
+            table = pa.Table.from_pandas(df, preserve_index=False)  # Avoid writing index for efficiency
+
+            if parq_writer is None:
+                # Initialize the ParquetWriter on the first chunk
+                parq_writer = pq.ParquetWriter(fn, schema=table.schema, compression='zstd', use_dictionary=True)
+
+            # Write the table to the file
+            parq_writer.write_table(table)
+
+        # Ensure the writer is properly closed
+        if parq_writer:
+            parq_writer.close()
+
+    def to_hdf5_chunks_pandas(self, fn, rows_at_a_time=1000, show_progress=True, kind=None, label=None, variable=None, slim=False, sep='/', complib=None, complevel=None):
+        # Iterate through DataFrame chunks
+        for i, df in enumerate(self._iter_chunks(rows_at_a_time=rows_at_a_time,
+                                                 show_progress=show_progress,
+                                                 kind=kind, label=label, variable=variable,
+                                                 slim=slim, sep=sep)):  # type: pandas.DataFrame
+            df.columns = pd.MultiIndex.from_tuples([col.split(sep) for col in df.columns])
+            for obj_kind in self.variables:
+                for var_label in self.variables[obj_kind]:
+                    # print(obj_kind, var_label)
+                    df_sel = df[obj_kind].xs(var_label, level=1, axis=1).rename(columns=lambda s: s.replace('/', '_'))
+                    # print(df_sel)
+                    # break
+                    mode = 'w' if i == 0 else 'a'  # Write mode for the first chunk, append mode otherwise
+                    # Write chunk to HDF5 file
+                    df_sel.to_hdf(fn, key=f'{obj_kind}/{var_label}', mode=mode, format='table', append=True, complib=complib, complevel=complevel)
+            # if i == 3:
+            #     break
+
+    def to_hdf5_chunks(self, fn, rows_at_a_time=1000, show_progress=True, kind=None, label=None, variable=None, slim=False):
+        import pandas as pd
+        import h5py
+        import numpy as np
+
+        # Open HDF5 file in append mode
+        with h5py.File(fn, 'a') as h5file:
+            dataset_created = False  # Track if the dataset is already created
+
+            for df in self._iter_chunks(rows_at_a_time=rows_at_a_time,
+                                        show_progress=show_progress,
+                                        kind=kind, label=label, variable=variable,
+                                        slim=slim):  # type: pandas.DataFrame
+
+                # Convert DataFrame to numpy array for HDF5 compatibility
+                data = df.to_numpy()
+                columns = df.columns.tolist()  # Column names
+                num_rows, num_cols = data.shape
+
+                if not dataset_created:
+                    # Create dataset on first chunk
+                    dataset = h5file.create_dataset(
+                        'data',  # Dataset name
+                        shape=(0, num_cols),  # Initial shape with zero rows
+                        maxshape=(None, num_cols),  # Allow unlimited rows
+                        dtype=data.dtype  # Use inferred data type
+                    )
+
+                    # Store column names as an attribute
+                    h5file.attrs['columns'] = np.string_(columns)
+
+                    dataset_created = True
+
+                # Resize dataset to accommodate new data
+                dataset.resize(dataset.shape[0] + num_rows, axis=0)
+
+                # Append new data to dataset
+                dataset[-num_rows:] = data
+
     # def to_netcdf(self, fn_nc):
     #     import xarray as xr
     #     df = self.to_frame()

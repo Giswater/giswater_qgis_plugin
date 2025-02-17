@@ -1,6 +1,7 @@
 import pandas as pd
 
-from swmm_api.input_file.helpers import BaseSectionObject, InpSection, COMMENT_EMPTY_SECTION, dataframe_to_inp_string
+from .._io_helpers._config import CONFIG
+from .helpers import BaseSectionObject, InpSection, dataframe_to_inp_string
 
 
 class InpSectionDummy(InpSection):
@@ -54,7 +55,7 @@ class InpSectionDummy(InpSection):
              str: lines of the ``.inp``-file section
         """
         if not self:  # if empty
-            return COMMENT_EMPTY_SECTION
+            return CONFIG.comment_empty_section
 
         if fast or not self._table_inp_export:
             return '\n'.join(self.iter_inp_lines(sort_objects_alphabetical)) + '\n'

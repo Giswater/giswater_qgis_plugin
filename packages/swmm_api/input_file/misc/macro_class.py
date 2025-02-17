@@ -4,17 +4,18 @@ from warnings import warn
 
 from pandas import to_datetime
 
-from swmm_api import read_inp_file, swmm5_run
-from swmm_api.input_file import SwmmInput, section_labels as sec
-from swmm_api.input_file._type_converter import offset2delta
-from swmm_api.input_file.macros import (find_node,
+from ..inp import SwmmInput
+from .. import SEC
+from .._type_converter import offset2delta
+from ..macros import (find_node,
                                         find_link, calc_slope, conduit_iter_over_inp, combined_subcatchment_frame, )
-from swmm_api.input_file.macros.convert_object import junction_to_storage, junction_to_outfall
-from swmm_api.input_file.macros.edit import delete_node, combine_conduits
-from swmm_api.input_file.macros.reduce_unneeded import reduce_curves, reduce_raingages
-from swmm_api.input_file.section_types import SECTION_TYPES
-from swmm_api.output_file import parquet_helpers as parquet
-from swmm_api.output_file.out import read_out_file
+from ..macros.convert_object import junction_to_storage, junction_to_outfall
+from ..macros.edit import delete_node, combine_conduits
+from ..macros.reduce_unneeded import reduce_curves, reduce_raingages
+from ..section_types import SECTION_TYPES
+from ...output_file import parquet_helpers as parquet
+from ...output_file.out import read_out_file
+from ...run_swmm import swmm5_run
 
 
 class InpMacros(SwmmInput):
@@ -45,7 +46,7 @@ class InpMacros(SwmmInput):
         return self.to_string()
 
     def read_file(self, **kwargs):
-        data = read_inp_file(self.filename, **kwargs)
+        data = SwmmInput(self.filename, **kwargs)
         SwmmInput.__init__(self, data)
 
     @classmethod
@@ -132,47 +133,47 @@ class InpMacros(SwmmInput):
     def set_start(self, start):
         if isinstance(start, str):
             start = to_datetime(start)
-        self[sec.OPTIONS]['START_DATE'] = start.date()
-        self[sec.OPTIONS]['START_TIME'] = start.time()
+        self[SEC.OPTIONS]['START_DATE'] = start.date()
+        self[SEC.OPTIONS]['START_TIME'] = start.time()
 
     def set_start_report(self, start):
         if isinstance(start, str):
             start = to_datetime(start)
-        self[sec.OPTIONS]['REPORT_START_DATE'] = start.date()
-        self[sec.OPTIONS]['REPORT_START_TIME'] = start.time()
+        self[SEC.OPTIONS]['REPORT_START_DATE'] = start.date()
+        self[SEC.OPTIONS]['REPORT_START_TIME'] = start.time()
 
     def set_end(self, end):
         if isinstance(end, str):
             end = to_datetime(end)
-        self[sec.OPTIONS]['END_DATE'] = end.date()
-        self[sec.OPTIONS]['END_TIME'] = end.time()
+        self[SEC.OPTIONS]['END_DATE'] = end.date()
+        self[SEC.OPTIONS]['END_TIME'] = end.time()
 
     def set_threads(self, num):
-        self[sec.OPTIONS]['THREADS'] = num
+        self[SEC.OPTIONS]['THREADS'] = num
 
     def ignore_rainfall(self, on=True):
-        self[sec.OPTIONS]['IGNORE_RAINFALL'] = on
+        self[SEC.OPTIONS]['IGNORE_RAINFALL'] = on
 
     def ignore_snowmelt(self, on=True):
-        self[sec.OPTIONS]['IGNORE_SNOWMELT'] = on
+        self[SEC.OPTIONS]['IGNORE_SNOWMELT'] = on
 
     def ignore_groundwater(self, on=True):
-        self[sec.OPTIONS]['IGNORE_GROUNDWATER'] = on
+        self[SEC.OPTIONS]['IGNORE_GROUNDWATER'] = on
 
     def ignore_quality(self, on=True):
-        self[sec.OPTIONS]['IGNORE_QUALITY'] = on
+        self[SEC.OPTIONS]['IGNORE_QUALITY'] = on
 
     def set_intervals(self, freq):
         new_step = offset2delta(freq)
-        self[sec.OPTIONS]['REPORT_STEP'] = new_step
-        self[sec.OPTIONS]['WET_STEP'] = new_step
-        self[sec.OPTIONS]['DRY_STEP'] = new_step
+        self[SEC.OPTIONS]['REPORT_STEP'] = new_step
+        self[SEC.OPTIONS]['WET_STEP'] = new_step
+        self[SEC.OPTIONS]['DRY_STEP'] = new_step
 
     def activate_report(self, input=False, continuity=True, flowstats=True, controls=False):
-        self[sec.REPORT]['INPUT'] = input
-        self[sec.REPORT]['CONTINUITY'] = continuity
-        self[sec.REPORT]['FLOWSTATS'] = flowstats
-        self[sec.REPORT]['CONTROLS'] = controls
+        self[SEC.REPORT]['INPUT'] = input
+        self[SEC.REPORT]['CONTINUITY'] = continuity
+        self[SEC.REPORT]['FLOWSTATS'] = flowstats
+        self[SEC.REPORT]['CONTROLS'] = controls
 
     def add_obj_to_report(self, obj_kind, new_obj):
         if isinstance(new_obj, str):
@@ -182,7 +183,7 @@ class InpMacros(SwmmInput):
         else:
             raise NotImplementedError(f'Type: {type(new_obj)} not implemented!')
 
-        old_obj = self[sec.REPORT][obj_kind]
+        old_obj = self[SEC.REPORT][obj_kind]
         if isinstance(old_obj, str):
             old_obj = [old_obj]
         elif isinstance(old_obj, (int, float)):
@@ -194,7 +195,7 @@ class InpMacros(SwmmInput):
         else:
             raise NotImplementedError(f'Type: {type(new_obj)} not implemented!')
 
-        self[sec.REPORT][obj_kind] = old_obj + new_obj
+        self[SEC.REPORT][obj_kind] = old_obj + new_obj
 
     def add_nodes_to_report(self, new_nodes):
         self.add_obj_to_report('NODES', new_nodes)
@@ -203,12 +204,12 @@ class InpMacros(SwmmInput):
         self.add_obj_to_report('LINKS', new_links)
 
     # def add_timeseries_file(self, fn):
-    #     if 'Files' not in self[sec.TIMESERIES]:
-    #         self[sec.TIMESERIES]['Files'] = DataFrame(columns=['Type', 'Fname'])
+    #     if 'Files' not in self[SEC.TIMESERIES]:
+    #         self[SEC.TIMESERIES]['Files'] = DataFrame(columns=['Type', 'Fname'])
     #
-    #     self[sec.TIMESERIES]['Files'] = self[sec.TIMESERIES]['Files'].append(
+    #     self[SEC.TIMESERIES]['Files'] = self[SEC.TIMESERIES]['Files'].append(
     #         Series({'Fname': '"' + fn + '.dat"'}, name=path.basename(fn)))
-    #     self[sec.TIMESERIES]['Files']['Type'] = 'FILE'
+    #     self[SEC.TIMESERIES]['Files']['Type'] = 'FILE'
 
     def reduce_curves(self):
         reduce_curves(self)

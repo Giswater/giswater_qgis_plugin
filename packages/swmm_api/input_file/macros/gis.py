@@ -501,7 +501,7 @@ def _create_gpkg_style_table(fn_gpkg):
 
 
 def apply_gis_style_to_gpkg(fn_gpkg):
-    from swmm_api.input_file.macros.gis_styles import GIS_STYLE_PATH
+    from .gis_styles import GIS_STYLE_PATH
     import sqlite3
 
     _create_gpkg_style_table(fn_gpkg)

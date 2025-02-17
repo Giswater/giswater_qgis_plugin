@@ -8,7 +8,7 @@ __license__ = "MIT"
 import os
 from pathlib import Path
 
-from swmm_api import SwmmReport
+from ..report_file.rpt import SwmmReport
 
 
 class SWMMRunError(UserWarning):

@@ -1,4 +1,4 @@
-from numpy import nan, isnan
+import numpy as np
 
 from ._identifiers import IDENTIFIERS
 from .._type_converter import convert_string, get_gis_inp_decimals
@@ -39,7 +39,7 @@ class DryWeatherFlow(BaseSectionObject):
     class TYPES:
         FLOW = 'FLOW'
 
-    def __init__(self, node, constituent, base_value, pattern1=nan, pattern2=nan, pattern3=nan, pattern4=nan, *_patterns):
+    def __init__(self, node, constituent, base_value, pattern1=np.nan, pattern2=np.nan, pattern3=np.nan, pattern4=np.nan, *_patterns):
         """
         Baseline dry weather sanitary inflow at nodes.
 
@@ -119,7 +119,7 @@ class Inflow(BaseSectionObject):
         MASS = 'MASS'
 
     def __init__(self, node, constituent=TYPES.FLOW, time_series=None, kind=TYPES.FLOW, mass_unit_factor=1.0,
-                 scale_factor=1.0, base_value=0., pattern=nan):
+                 scale_factor=1.0, base_value=0., pattern=np.nan):
         """
         External hydrograph/pollutograph inflow at nodes.
 

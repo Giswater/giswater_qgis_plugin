@@ -3,8 +3,8 @@ from itertools import groupby
 import pandas as pd
 import numpy as np
 
-from swmm_api import SwmmInput
-from swmm_api.input_file.sections import Pattern, DryWeatherFlow
+from ..inp import SwmmInput
+from ..sections import Pattern, DryWeatherFlow
 
 
 def get_pattern_time_frame(index, pattern_section):

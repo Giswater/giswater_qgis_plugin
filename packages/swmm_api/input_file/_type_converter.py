@@ -74,7 +74,7 @@ def infer_offset_elevation(x):
     Returns:
         float | str: converted output
     """
-    if isinstance(x, str) and x == '*':
+    if is_placeholder(x):
         return x
     else:
         return float(x)
@@ -237,8 +237,30 @@ def type2str(x):
         return str(x)
 
 
+def is_nan(x):
+    return isinstance(x, float) and np.isnan(x)
+
+
+def is_placeholder(x):
+    return isinstance(x, str) and (x == '*')
+
+
+def is_not_set(x):
+    return is_nan(x) or is_placeholder(x)
+
+
+def is_set(x):
+    return not is_not_set(x)
+
+
+def get_default_if_not_set(x, default):
+    if is_not_set(x):
+        return default
+    return x
+
+
 def is_equal(x1, x2, precision=3):
-    if isinstance(x1, float) and np.isnan(x1) and isinstance(x2, float) and np.isnan(x2):
+    if is_nan(x1) and is_nan(x2):
         return True
     else:
         if isinstance(x1, float):
@@ -271,7 +293,7 @@ def convert_args(args):
 
 
 def get_gis_inp_decimals():
-    return CONFIG['gis_decimals']
+    return CONFIG.gis_decimals
 
 
 def format_inp_geo_number(x):

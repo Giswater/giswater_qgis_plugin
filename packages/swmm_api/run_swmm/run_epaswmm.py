@@ -25,8 +25,8 @@ def get_swmm_command_line(swmm_path, inp, rpt, out):
 
 def infer_swmm_path():
     # if an exe/bin is already configured, use it
-    if CONFIG['exe_path'] is not None:
-        return CONFIG['exe_path']
+    if CONFIG.exe_path is not None:
+        return CONFIG.exe_path
 
     # UNIX
     fn_base = ('runswmm', 'swmm5')
@@ -45,8 +45,8 @@ def infer_swmm_path():
 
     # if found set it as default and return it
     if possible_exe:
-        CONFIG['exe_path'] = str(possible_exe[0])
-        return CONFIG['exe_path']
+        CONFIG.exe_path = str(possible_exe[0])
+        return CONFIG.exe_path
 
     # look for swmm in default installation path
     if _platform.startswith("win"):
@@ -65,8 +65,8 @@ def infer_swmm_path():
 
         biggest_version = sorted(swmm_paths, reverse=True)[0]
 
-        CONFIG['exe_path'] = swmm_paths[biggest_version]
-        return CONFIG['exe_path']
+        CONFIG.exe_path = swmm_paths[biggest_version]
+        return CONFIG.exe_path
 
 
 def text_swmm_path(swmm_path):
@@ -170,7 +170,7 @@ def run_swmm_custom(command_line, working_dir=None):
     return shell_output
 
 
-def swmm5_run_epa(inp, rpt_dir=None, out_dir=None, init_print=False, create_out=True, swmm_path=None, working_dir=None):
+def swmm5_run_epa(inp, rpt_dir=None, out_dir=None, init_print=None, create_out=True, swmm_path=None, working_dir=None):
     r"""
     Run a simulation with EPA-SWMM.
 
@@ -197,6 +197,9 @@ def swmm5_run_epa(inp, rpt_dir=None, out_dir=None, init_print=False, create_out=
     fn_inp, fn_rpt, fn_out, working_dir = resolve_paths(inp, rpt_dir, out_dir, working_dir)
 
     command_line = get_swmm_command_line_auto(fn_inp, fn_rpt, fn_out, create_out=create_out, swmm_path=swmm_path)
+
+    if init_print is None:
+        init_print = CONFIG.init_print_epa_swmm_run  # default=False
 
     if init_print:
         run_swmm_stdout(command_line, working_dir=working_dir)

@@ -19,11 +19,11 @@ def get_default_encoding(encoding='', filename=None):
     if encoding is None:
         if filename is None:
             warnings.warn(f'Could not find correct encoding. Please set encoding manually.')
-            return CONFIG['encoding']
+            return CONFIG.encoding
         return detect_encoding(filename)
     elif isinstance(encoding, str):
         if encoding == '':
-            return CONFIG['encoding']
+            return CONFIG.encoding
         else:
             return encoding
 

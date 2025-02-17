@@ -2,6 +2,8 @@ import os
 import warnings
 from pathlib import Path
 
+from ._config import CONFIG
+
 
 def read_txt_file(filename, encoding):
     """
@@ -28,9 +30,9 @@ def read_txt_file(filename, encoding):
         try:
             binary = filename.read()
         except AttributeError:
-            raise IOError('Provided file can\'t be read')
+            raise IOError("Provided file can't be read")
 
-    for e in (encoding, 'utf8', 'iso-8859-1', 'windows-1252'):
+    for e in (encoding, CONFIG.encoding, 'utf8', 'iso-8859-1', 'windows-1252'):
         try:
             return binary.decode(encoding=e).replace('\r', '')
         except UnicodeDecodeError:

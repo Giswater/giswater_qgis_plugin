@@ -1,4 +1,4 @@
-from numpy import nan
+import numpy as np
 
 from ._identifiers import IDENTIFIERS
 from ..helpers import BaseSectionObject
@@ -109,7 +109,7 @@ class Outfall(_Node):
         TIDAL = 'TIDAL'
         TIMESERIES = 'TIMESERIES'
 
-    def __init__(self, name, elevation, kind, *args, data=nan, has_flap_gate=False, route_to=nan): # Outfall node information.
+    def __init__(self, name, elevation, kind, *args, data=np.nan, has_flap_gate=False, route_to=np.nan): # Outfall node information.
         """
         Outfall node information.
 
@@ -129,7 +129,7 @@ class Outfall(_Node):
         """
         _Node.__init__(self, name, elevation)
         self.kind = kind
-        self.data = nan
+        self.data = np.nan
 
         if args:
             if (kind in [Outfall.TYPES.FIXED, Outfall.TYPES.TIDAL, Outfall.TYPES.TIMESERIES]) or (len(args) == 3):
@@ -141,7 +141,7 @@ class Outfall(_Node):
             self.has_flap_gate = to_bool(has_flap_gate)
             self.route_to = route_to
 
-    def _no_data_init(self, has_flap_gate=False, route_to=nan):
+    def _no_data_init(self, has_flap_gate=False, route_to=np.nan):
         """
         Init function if no keyword arguments were used and outfall has no data.
 
@@ -152,7 +152,7 @@ class Outfall(_Node):
         self.has_flap_gate = to_bool(has_flap_gate)
         self.route_to = route_to
 
-    def _data_init(self, data=nan, has_flap_gate=False, route_to=nan):
+    def _data_init(self, data=np.nan, has_flap_gate=False, route_to=np.nan):
         """
         Init function if no keyword arguments were used and outfall has data.
 
@@ -278,7 +278,7 @@ class Storage(_Node):
 
     def __init__(self, name, elevation, depth_max, depth_init, kind, *args, data=None,
                  depth_surcharge=0., frac_evaporation=0.,
-                 suction_head=nan, hydraulic_conductivity=nan, moisture_deficit_init=nan):
+                 suction_head=np.nan, hydraulic_conductivity=np.nan, moisture_deficit_init=np.nan):
         """
         Storage node information.
 
@@ -392,7 +392,7 @@ class Storage(_Node):
         self.frac_evaporation = float(frac_evaporation)
         self._exfiltration_args(*exfiltration_args, **exfiltration_kwargs)
 
-    def _exfiltration_args(self, suction_head=nan, hydraulic_conductivity=nan, moisture_deficit_init=nan):
+    def _exfiltration_args(self, suction_head=np.nan, hydraulic_conductivity=np.nan, moisture_deficit_init=np.nan):
         """
         Optional seepage parameters for soil surrounding the storage unit:
 

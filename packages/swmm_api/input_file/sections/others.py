@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 
 from ._identifiers import IDENTIFIERS
-from .._type_converter import infer_type, to_bool, str_to_datetime, datetime_to_str, type2str, convert_string
+from .._type_converter import infer_type, to_bool, str_to_datetime, datetime_to_str, type2str, convert_string, is_nan
 from ..helpers import BaseSectionObject
 from ..section_labels import *
 
@@ -872,7 +872,7 @@ class Control(BaseSectionObject):
                 self.value = value
 
         def involves_variable_or_expression(self):
-            return isinstance(self.object_kind, float) and np.isnan(self.object_kind)
+            return is_nan(self.object_kind)
 
     class _Action(BaseSectionObject):
         """

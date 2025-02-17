@@ -40,6 +40,8 @@ class CompareSections:
         # self.label = section_1._label
 
         for key in sorted(self.set_labels_1 & self.set_labels_2):
+            # obj_1 = section_1[key]
+            # obj_2 = section_2[key]
             if section_1[key] == section_2[key]:
                 self.set_labels_equal.add(key)
             else:
@@ -47,17 +49,7 @@ class CompareSections:
                     if not isinstance(section_1[key], BaseSectionObject):
                         self.dict_not_equal[key] = f'{section_1[key]} != {section_2[key]}'
                     else:
-                        diff = []
-                        if type(section_1[key]) is not type(section_2[key]):
-                            diff.append(f'{type(section_1[key]).__name__} != {type(section_2[key]).__name__}')
-                        else:
-                            for param in section_1[key].to_dict_():
-                                if not is_equal(section_1[key][param], section_2[key][param], precision=precision):
-                                    diff.append(f'{param}=({section_1[key][param]} != {section_2[key][param]})')
-                        if diff:
-                            self.dict_not_equal[key] = ' | '.join(diff)
-                        else:
-                            self.set_labels_equal.add(key)
+                        self._compare_base_section_object(section_1[key], section_2[key],  key, precision=precision)
                 except:
                     self.dict_not_equal[key] = 'can not compare'
 
@@ -67,6 +59,25 @@ class CompareSections:
     @property
     def len_full(self):
         return len(self.set_labels_1 | self.set_labels_2)
+
+    def _compare_base_section_object(self, obj_1, obj_2,  label, precision=3):
+        diff = []
+        if type(obj_1) is not type(obj_2):
+            diff.append(f'{type(obj_1).__name__} != {type(obj_2).__name__}')
+        else:
+            for param in obj_1.to_dict_():
+                if isinstance(obj_1[param], dict):  # LID_CONTROLS -> layer_dict
+                    # check keys
+                    for k, v in obj_1[param].items():
+                        self._compare_base_section_object(obj_1[param][k], obj_2[param][k],  label + ' | ' + k, precision=precision)
+                else:
+                    if not is_equal(obj_1[param], obj_2[param], precision=precision):
+                        diff.append(f'{param}=({obj_1[param]} != {obj_2[param]})')
+        if diff:
+            self.dict_not_equal[label] = ' | '.join(diff)
+        else:
+            self.set_labels_equal.add(label)
+        pass
 
     def get_diff_string(self):
         """
@@ -147,8 +158,8 @@ def compare_inp_files(fn1, fn2, precision=2, skip_section=None, sep='\n' + '#' *
     compare two inp files and get the differences as string output
 
     Args:
-        fn1 (str): filename for the first inp file
-        fn2 (str): filename for the second inp file
+        fn1 (str or os.PathLike): filename for the first inp file
+        fn2 (str or os.PathLike): filename for the second inp file
         precision (int): number of relevant decimal places
         skip_section (list): skip sections if you don't care for specific changes
         show_progressbar (bool): show progress bar

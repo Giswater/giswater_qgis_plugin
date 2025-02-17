@@ -692,7 +692,7 @@ class SwmmReport:
         """
         if self._lid_performance_summary is None:
             p = self._get_converted_part('LID Performance Summary')
-            self._lid_performance_summary = _part_to_frame(p)
+            self._lid_performance_summary = _part_to_frame(p, replace_parts=('LID Control', 'LID_Control'))
         return self._lid_performance_summary
 
     @property

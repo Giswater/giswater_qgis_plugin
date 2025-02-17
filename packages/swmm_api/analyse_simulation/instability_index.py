@@ -1,7 +1,6 @@
 from matplotlib import pyplot as plt
 
-from swmm_api.output_file import OBJECTS, VARIABLES
-from swmm_api.output_file.definitions import di_flow_unit_label
+from ..output_file.definitions import OBJECTS, VARIABLES, di_flow_unit_label
 
 
 def plot_time_series_instabile_links(inp, rpt, out):

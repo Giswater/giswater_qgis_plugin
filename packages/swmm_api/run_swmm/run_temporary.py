@@ -2,16 +2,17 @@ import shutil
 import tempfile
 from pathlib import Path
 
-import numpy as np
-
+from .run_pyswmm import swmm5_run_progress
+from .run_swmm_toolkit import swmm5_run_owa
 from .run_epaswmm import swmm5_run_epa
 from .run import swmm5_run
 from ._run_helpers import get_result_filenames
-from .. import SwmmInput
+from .._io_helpers import CONFIG
+from ..input_file._type_converter import is_nan, is_placeholder, is_not_set
 from ..input_file.sections import TimeseriesFile
 from ..output_file import SwmmOutput
 from ..report_file import SwmmReport, read_lid_report
-from ..input_file import SEC
+from ..input_file import SEC, SwmmInput
 from ..input_file.section_lists import GEO_SECTIONS, GUI_SECTIONS
 
 
@@ -48,7 +49,7 @@ class SwmmResults:
             # get list of LID report files in inp data
             if SEC.LID_USAGE in self.inp:
                 for lid_usage in self.inp.LID_USAGE.values():
-                    if (isinstance(lid_usage.fn_lid_report, float) and np.isnan(lid_usage.fn_lid_report)) or (isinstance(lid_usage.fn_lid_report, str) and lid_usage.fn_lid_report == '*'):
+                    if is_not_set(lid_usage.fn_lid_report):
                         continue  # no name defined -> no file will be written
                     pth = Path(lid_usage.fn_lid_report)
 
@@ -57,7 +58,7 @@ class SwmmResults:
 
 
 class swmm5_run_temporary:
-    def __init__(self, inp: SwmmInput, cleanup=True, run=swmm5_run, label='temp', set_saved_files_relative=False, **kwargs):
+    def __init__(self, inp: SwmmInput, cleanup=True, run=None, label='temp', set_saved_files_relative=False, base_path=None, **kwargs):
         """
         Run SWMM with an input file in a temporary directory.
 
@@ -72,9 +73,10 @@ class swmm5_run_temporary:
         Args:
             inp (swmm_api.SwmmInput): SWMM input-file data.
             cleanup (bool): if temporary folder should be deleted after with-statement.
-            run (function): function for running SWMM. The function should only have one positional argument: input_file_name.
+            run (function): function for running SWMM. The function should only have one positional argument: input_file_name. default from CONFIG.
             label (str): name for temporary files.
             set_saved_files_relative (bool): if all saved files should be set as relative path to be saved in the temporary folder.
+            base_path (str or pathlib.Path): path where the files used (linked with relative paths) in the inp file are stored. default=current working directory.
         """
         self.inp = inp
         self.cleanup = cleanup
@@ -86,7 +88,10 @@ class swmm5_run_temporary:
 
         # ---
         # files used
-        pth_current = Path.cwd()
+        if base_path is None:
+            pth_current = Path.cwd()
+        else:
+            pth_current = Path(base_path)
 
         # where to look:
         # when relative - look in current dir
@@ -128,6 +133,11 @@ class swmm5_run_temporary:
         if (SEC.BACKDROP in self.inp) and 'FILE' in inp.BACKDROP:
             inp.BACKDROP['FILE'] = _handle_files(inp.BACKDROP['FILE'])
 
+        # FILES
+        if (SEC.FILES in self.inp) and inp.FILES:
+            for k, v in inp.FILES.items():
+                inp.FILES[k] = _handle_files(v)
+
         # ---
         if set_saved_files_relative:
             # Remove write hotstart file when in relative path?
@@ -145,11 +155,22 @@ class swmm5_run_temporary:
             # Using an absolute path will save the LID report into the given folder and will not be deleted.
             if SEC.LID_USAGE in inp:
                 for lid_usage in inp.LID_USAGE.values():
-                    if isinstance(lid_usage.fn_lid_report, float) and np.isnan(lid_usage.fn_lid_report):
+                    if is_nan(lid_usage.fn_lid_report):
                         continue  # no name defined -> no file will be written
                     lid_usage.fn_lid_report = f'lid_rpt_{lid_usage.subcatchment}_{lid_usage.lid}.txt'
 
-        inp.write_file(self.fn_inp, fast=True, encoding='utf-8')
+        inp.write_file(self.fn_inp, fast=True, encoding=CONFIG.encoding)
+
+        if _ := 0:  # this code is not for running but to keep the imports, which are needed to enable the "eval" function below.
+            swmm5_run_progress
+            swmm5_run_owa
+            swmm5_run
+
+        if run is None:
+            if isinstance(CONFIG.default_temp_run, str):
+                run = eval(CONFIG.default_temp_run)
+            else:
+                run = CONFIG.default_temp_run  # type: function
         run(self.fn_inp, **kwargs)
 
     def __enter__(self):

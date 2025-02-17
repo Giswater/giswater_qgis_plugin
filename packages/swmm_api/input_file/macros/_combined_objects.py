@@ -1,8 +1,10 @@
-from swmm_api.input_file import SEC
-from swmm_api.input_file.macros import calc_slope, get_link_tags, nodes_dict
-from swmm_api.input_file.sections import CrossSection, Loss, Vertices
-from swmm_api.input_file.sections.link import _Link, Conduit, Orifice, Outlet, Pump, Weir
-from swmm_api import SwmmInput
+from .. import SEC
+from ..inp import SwmmInput
+from .macros import nodes_dict, calc_slope
+from .tags import get_link_tags
+from ..sections import CrossSection, Loss, Vertices
+from ..sections import Junction, Storage, Outfall, Coordinate, DryWeatherFlow, Inflow, RainfallDependentInfiltrationInflow, Treatment
+from ..sections.link import _Link, Conduit, Orifice, Outlet, Pump, Weir
 import shape_generator
 
 
@@ -83,9 +85,6 @@ class SuperConduit(Conduit, CrossSection, Loss, Vertices):
     def slope(self):
         return (self.from_node.elevation + self.offset_upstream - (
                 self.to_node.elevation + self.offset_downstream)) / self.length
-
-
-from swmm_api.input_file.sections import Junction, Storage, Outfall, Coordinate, DryWeatherFlow, Inflow, RainfallDependentInfiltrationInflow, Treatment
 
 
 class Node(Junction, Storage, Outfall, Coordinate, DryWeatherFlow, Inflow, RainfallDependentInfiltrationInflow, Treatment):

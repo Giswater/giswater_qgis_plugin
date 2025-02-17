@@ -205,7 +205,7 @@ class Infiltration(BaseSectionObject):
 
         # _____________________________________
         sub_class_id = None
-        if (CONFIG['swmm_version'] == '5.1.015') or CONFIG['swmm_version'].startswith('5.2.'):
+        if (CONFIG.swmm_version == '5.1.015') or CONFIG.swmm_version.startswith('5.2.'):
             # NEU in swmm 5.1.015
             last_arg = args[-1]
             if last_arg in Infiltration._CONVERSION_DICT:

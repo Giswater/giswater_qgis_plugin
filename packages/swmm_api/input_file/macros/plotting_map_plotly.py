@@ -1,8 +1,8 @@
 import plotly.graph_objects as go
 
-from swmm_api import SwmmInput
-from swmm_api.input_file.macros import complete_vertices
-from swmm_api.input_file.section_labels import (
+from ..inp import SwmmInput
+from .geo import complete_vertices
+from ..section_labels import (
     MAP,
     VERTICES,
     POLYGONS,
@@ -12,7 +12,7 @@ from swmm_api.input_file.section_labels import (
     STORAGE,
     OUTFALLS, ORIFICES, PUMPS, WEIRS,
 )
-from swmm_api.input_file.sections import Polygon, SubCatchment
+from ..sections import Polygon, SubCatchment
 
 # TODO
 #   plot all links in one scatter

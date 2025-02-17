@@ -317,7 +317,7 @@ def convert_cms_to_lps(inp: SwmmInput):
 
     if SEC.CURVES in inp:
         for c in inp.CURVES.values():
-            from swmm_api.input_file.sections import Curve
+            from ..sections import Curve
             if c.kind in {Curve.TYPES.DIVERSION, Curve.TYPES.PUMP1, Curve.TYPES.PUMP2, Curve.TYPES.PUMP3, Curve.TYPES.PUMP4, Curve.TYPES.RATING}:
                 for row in range(len(c.points)):
                     c.points[row][1] *= 1000

@@ -3,7 +3,8 @@ from .check import (check_for_nodes, check_for_duplicates, check_for_duplicate_l
 from .collection import nodes_dict, links_dict, subcatchments_per_node_dict, nodes_subcatchments_dict
 from .compare import CompareSections, compare_inp_files, compare_sections, compare_inp_objects
 from .convert_model import to_kinematic_wave
-from .convert_object import junction_to_storage, junction_to_outfall, conduit_to_orifice, storage_to_outfall, junction_to_divider, orifice_to_conduit, storage_to_junction, convert_base_obj
+from .convert_object import (junction_to_storage, junction_to_outfall, conduit_to_orifice, storage_to_outfall,
+                             junction_to_divider, orifice_to_conduit, storage_to_junction, convert_base_obj)
 from .curve import curve_figure
 from .edit import (combine_conduits, combine_conduits_keep_slope, combine_vertices, delete_link, delete_node,
                    delete_subcatchment, dissolve_conduit, flip_link_direction, move_flows, rename_link, rename_node,
@@ -35,7 +36,8 @@ from .macros import (find_node, find_link, calc_slope, conduit_slopes, conduits_
                      set_absolute_file_paths)
 from .plotting_longitudinal import plot_longitudinal, animated_plot_longitudinal
 from .plotting_map import (plot_map, init_empty_map_plot, add_node_map, add_link_map, add_subcatchment_map,
-                           add_node_labels, set_inp_dimensions, add_backdrop, add_link_labels, add_labels, add_subcatchments_labels, PlottingMap)
+                           add_node_labels, set_inp_dimensions, add_backdrop, add_link_labels, add_labels,
+                           add_subcatchments_labels, PlottingMap)
 from .reduce_unneeded import (reduce_curves, reduce_controls, simplify_curves, reduce_raingages,
                               remove_empty_sections, reduce_timeseries, reduce_pattern, reduce_snowpacks,
                               reduce_hydrographs, reduce_report_objects)

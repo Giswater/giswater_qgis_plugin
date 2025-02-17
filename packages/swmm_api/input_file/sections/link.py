@@ -1,8 +1,9 @@
-from numpy import nan, isnan
+import numpy as np
 
 from ._identifiers import IDENTIFIERS
 from ..helpers import BaseSectionObject
-from .._type_converter import to_bool, infer_offset_elevation, convert_args
+from .._type_converter import to_bool, infer_offset_elevation, convert_args, is_nan, is_not_set, get_default_if_not_set, \
+    is_placeholder
 from ..section_labels import CONDUITS, ORIFICES, OUTLETS, PUMPS, WEIRS
 
 
@@ -46,7 +47,7 @@ class Conduit(_Link):
     _section_label = CONDUITS
 
     def __init__(self, name, from_node, to_node, length, roughness, offset_upstream=0, offset_downstream=0,
-                 flow_initial=0, flow_max=nan):
+                 flow_initial=0, flow_max=np.nan):
         """
         Conduit link information.
 
@@ -71,7 +72,7 @@ class Conduit(_Link):
         self.flow_initial = float(flow_initial)
         self.flow_max = float(flow_max)
         if self.flow_max == 0:
-            self.flow_max = nan
+            self.flow_max = np.nan
 
 
 class Orifice(_Link):
@@ -390,8 +391,8 @@ class Weir(_Link):
         GRAVEL = 'GRAVEL'
 
     def __init__(self, name, from_node, to_node, form, height_crest, discharge_coefficient, has_flap_gate=False,
-                 n_end_contractions=0, discharge_coefficient_end=nan, can_surcharge=True,
-                 road_width=nan, road_surface=nan, coefficient_curve=nan):
+                 n_end_contractions=0, discharge_coefficient_end=0, can_surcharge=True,
+                 road_width=np.nan, road_surface=np.nan, coefficient_curve=np.nan):
         """
         Weir link information.
 
@@ -405,54 +406,81 @@ class Weir(_Link):
             has_flap_gate (bool): ``YES`` (:obj:`True`) if flap gate present to prevent reverse flow, ``NO`` (:obj:`False`) if not (default is ``NO``).
             n_end_contractions (float): Number of end contractions for ``TRANSVERSE`` or ``TRAPEZOIDAL`` weir (default is 0).
             discharge_coefficient_end (float): Discharge coefficient for triangular ends of a ``TRAPEZOIDAL`` weir (for ``CFS`` if using US flow units or ``CMS`` if using metric flow units) (default is value of ``discharge_coefficient``).
-            can_surcharge (bool): ``YES`` (:obj:`True`) if the weir can surcharge (have an upstream water level
-            higher than the height of the opening); ``NO`` (:obj:`False`) if it cannot (default is ``YES``).
+            can_surcharge (bool): ``YES`` (:obj:`True`) if the weir can surcharge (have an upstream water level higher than the height of the opening); ``NO`` (:obj:`False`) if it cannot (default is ``YES``).
             road_width (float): Width of road lanes and shoulders for ``ROADWAY`` weir (ft or m).
             road_surface (str): Type of road surface for ``ROADWAY`` weir: ``PAVED`` or ``GRAVEL``.
             coefficient_curve (str): Name of an optional Weir Curve that allows the central Discharge Coeff. to vary with head (ft or m) across the weir. Does not apply to Roadway weirs. Available curves are listed in the [``CURVES``] section (:class:`Curve`) of the input.
         """
         _Link.__init__(self, name, from_node, to_node)
-        self.form = str(form)
+        self.form = str(form).upper()
         self.height_crest = infer_offset_elevation(height_crest)
         self.discharge_coefficient = float(discharge_coefficient)
-        self.has_flap_gate = to_bool(has_flap_gate)
-        self.n_end_contractions = n_end_contractions
-        if not isinstance(discharge_coefficient_end, str) and isnan(discharge_coefficient_end):
-            discharge_coefficient_end = discharge_coefficient
-        self.discharge_coefficient_end = float(discharge_coefficient_end)
-        self.can_surcharge = to_bool(can_surcharge)
+
+        # optional parameters (due to defaults)
+        # set * if one of the following parameters is used
+        # set default if one exists
+        # set nan if none of the following parameters is used
+
+        # ---
+        self.has_flap_gate = to_bool(get_default_if_not_set(has_flap_gate, False))  # YES | NO | np.nan | *
+
+        # ---
+        self.n_end_contractions = int(get_default_if_not_set(n_end_contractions, 0))
+
+        # ---
+        self.discharge_coefficient_end = float(get_default_if_not_set(discharge_coefficient_end, self.discharge_coefficient if self.form == self.FORMS.TRAPEZOIDAL else 0))
+
+        # ---
+        self.can_surcharge = to_bool(get_default_if_not_set(can_surcharge, True))  # YES | NO | np.nan | *
 
         # road_width and road_surface will be marked as '*' in epa-swmm GUI
-        # either '*', NaN or a float
-        self.road_width = nan if isinstance(road_width, str) and road_width == '*' else float(road_width)
-        # either '*', NaN or a string
+        # value will be ignored
+
+        # ---
+        # either: '*', np.nan or a float
+        # change '*' to np.nan - convert everything else to float
+        self.road_width = np.nan if is_placeholder(road_width) else float(road_width)
+
+        # ---
+        # either '*', np.nan or a string
         if isinstance(road_surface, str):
             if road_surface.lower() in {'*', 'nan'}:
-                self.road_surface = nan
+                self.road_surface = np.nan
             elif road_surface.upper() in (self.ROAD_SURFACES.PAVED, self.ROAD_SURFACES.GRAVEL):
                 self.road_surface = road_surface.upper()
             else:
-                raise NotImplementedError(f'The parameter road_surface takes either "*", np.nan, "{self.ROAD_SURFACES.PAVED}" or "{self.ROAD_SURFACES.GRAVEL}"')
-        elif isinstance(road_surface, (float, int)) and isnan(road_surface):
+                raise NotImplementedError(f'The parameter road_surface takes either "*", np.nan, "{self.ROAD_SURFACES.PAVED}" or "{self.ROAD_SURFACES.GRAVEL}" but "{road_surface}" is given.')
+        elif is_nan(road_surface):
             self.road_surface = road_surface  # = nan
         else:
-            raise NotImplementedError(f'The parameter road_surface takes either "*", np.nan, "{self.ROAD_SURFACES.PAVED}" or "{self.ROAD_SURFACES.GRAVEL}"')
-        # either NaN or a string
-        self.coefficient_curve = coefficient_curve
+            raise NotImplementedError(f'The parameter road_surface takes either "*", np.nan, "{self.ROAD_SURFACES.PAVED}" or "{self.ROAD_SURFACES.GRAVEL}" but "{road_surface}" with type {type(road_surface)} is given.')
+
+        # ---
+        # either np.nan or a string or '*'
+        self.coefficient_curve = get_default_if_not_set(coefficient_curve, np.nan)
+
         self._set_unused_parameters_stars()
 
     def _set_unused_parameters_stars(self):
-        """Set "*" for the parameters ``road_width`` and ``road_surface`` when both are unused and ``coefficient_curve`` is set."""
+        """
+        Set "*" for the parameters ``road_width`` and ``road_surface``
+
+        when both are unused and ``coefficient_curve`` is set.
+        """
         if isinstance(self.coefficient_curve, str):
-            if isinstance(self.road_width, float) and isnan(self.road_width):
+            if is_nan(self.road_width):
                 self.road_width = '*'
-            if isinstance(self.road_surface, float) and isnan(self.road_surface):
+            if is_nan(self.road_surface):
                 self.road_surface = '*'
 
     @property
     def curve_name(self):
         if isinstance(self.coefficient_curve, str):
             return self.coefficient_curve
+
+    def to_dict_(self):
+        self._set_unused_parameters_stars()
+        return super().to_dict_()
 
     def to_inp_line(self):
         self._set_unused_parameters_stars()

@@ -1,7 +1,7 @@
-from numpy import nan
+import numpy as np
 
 from ._identifiers import IDENTIFIERS
-from .._type_converter import to_bool, convert_string
+from .._type_converter import to_bool, convert_string, is_placeholder, is_nan, is_not_set, is_set
 from ..helpers import BaseSectionObject
 from ..section_labels import LID_USAGE, LID_CONTROLS
 
@@ -252,7 +252,7 @@ class LIDControl(BaseSectionObject):
         class Pavement(BaseSectionObject):
             _LABEL = 'PAVEMENT'
 
-            def __init__(self, Thick, Vratio, FracImp, Perm, Vclog, regeneration_interval=nan, regeneration_fraction=nan):
+            def __init__(self, Thick, Vratio, FracImp, Perm, Vclog, regeneration_interval=np.nan, regeneration_fraction=np.nan):
                 """
                 Used:
                     permeable pavement
@@ -313,7 +313,7 @@ class LIDControl(BaseSectionObject):
         class Drain(BaseSectionObject):
             _LABEL = 'DRAIN'
 
-            def __init__(self, Coeff, Expon, Offset, Delay, open_level=nan, close_level=nan, Qcurve=nan):
+            def __init__(self, Coeff, Expon, Offset, Delay, open_level=np.nan, close_level=np.nan, Qcurve=np.nan):
                 """
 
                 Used:
@@ -502,7 +502,7 @@ class LIDUsage(BaseSectionObject):
     _identifier = (IDENTIFIERS.subcatchment, 'lid')
     _section_label = LID_USAGE
 
-    def __init__(self, subcatchment, lid, n_replicate, area, width, saturation_init, impervious_portion, route_to_pervious=0, fn_lid_report=nan, drain_to=nan, from_pervious=nan):
+    def __init__(self, subcatchment, lid, n_replicate, area, width, saturation_init, impervious_portion, route_to_pervious=0, fn_lid_report=np.nan, drain_to=np.nan, from_pervious=np.nan):
         """
         Assignment of LID controls to subcatchments.
 
@@ -545,12 +545,36 @@ class LIDUsage(BaseSectionObject):
         """
         self.subcatchment = str(subcatchment)
         self.lid = str(lid)
-        self.n_replicate = n_replicate
+        self.n_replicate = int(n_replicate)
         self.area = float(area)
         self.width = float(width)
         self.saturation_init = float(saturation_init)
         self.impervious_portion = float(impervious_portion)
         self.route_to_pervious = int(route_to_pervious)
-        self.fn_lid_report = convert_string(fn_lid_report)
-        self.drain_to = drain_to
-        self.from_pervious = from_pervious
+
+        # '*', np.nan or string
+        self.fn_lid_report = np.nan if is_not_set(fn_lid_report) else convert_string(fn_lid_report)  # when blow used -> *
+        # '*', np.nan or string
+        self.drain_to = np.nan if is_not_set(drain_to) else str(drain_to)  # when blow used -> *
+        # '*', np.nan or float
+        self.from_pervious = np.nan if is_placeholder(from_pervious) else float(from_pervious)
+
+        self._set_unused_parameters_stars()
+
+    def _set_unused_parameters_stars(self):
+        if is_set(self.from_pervious):
+            if is_nan(self.drain_to):
+                self.drain_to = '*'
+            if is_nan(self.fn_lid_report):
+                self.fn_lid_report = '*'
+        elif is_set(self.drain_to):
+            if is_nan(self.fn_lid_report):
+                self.fn_lid_report = '*'
+
+    def to_dict_(self):
+        self._set_unused_parameters_stars()
+        return super().to_dict_()
+
+    def to_inp_line(self):
+        self._set_unused_parameters_stars()
+        return super().to_inp_line()

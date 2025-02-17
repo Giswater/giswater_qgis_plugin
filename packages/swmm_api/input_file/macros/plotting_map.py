@@ -157,8 +157,8 @@ def add_link_map(ax: plt.Axes, inp: SwmmInput,
 
         if add_arrows:
             x_mid, y_mid, angle = _get_mid_point_angle(x, y)
-            ax.plot(x_mid, y_mid, markeredgewidth=0.35, markersize=style['linewidth'] * 4,
-                    marker=(3, 0, angle - 90), c=style['color'], markeredgecolor=line_border_color)
+            ax.plot(x_mid, y_mid, markeredgewidth=0.35 if add_border_line else 0, markersize=style['linewidth'] * 4,
+                    marker=(3, 0, angle - 90), c=kwargs.get('color', style['color']), markeredgecolor=line_border_color)
 
     if colorbar_kwargs is not None:
         if discrete:
@@ -195,6 +195,7 @@ def add_subcatchment_map(ax: plt.Axes, inp: SwmmInput,
 
                          cmap='cividis',
                          colorbar_kwargs=None,
+                         color_nan='black',
 
                          value_min=None,
                          value_max=None,
@@ -218,6 +219,7 @@ def add_subcatchment_map(ax: plt.Axes, inp: SwmmInput,
         values_dict ():
         cmap ():
         colorbar_kwargs ():
+        color_nan (str): color for invalide (nan) values
         value_min ():
         value_max ():
         discrete ():
@@ -256,6 +258,9 @@ def add_subcatchment_map(ax: plt.Axes, inp: SwmmInput,
             values_convert = {v: i for i, v in enumerate(sorted(set(values)))}
             values_dict = {k: values_convert[v] for k, v in values_dict.items()}
             values = values_dict.values()
+            if len(set(values)) == 1:
+                value_min = -0.1
+                value_max = 0.1
 
         if value_min is None:
             value_min = min(values)
@@ -263,7 +268,7 @@ def add_subcatchment_map(ax: plt.Axes, inp: SwmmInput,
         if value_max is None:
             value_max = max(values)
 
-        get_color_from_value = _custom_color_mapper(cmap, vmin=value_min, vmax=value_max)
+        get_color_from_value = _custom_color_mapper(cmap, vmin=value_min, vmax=value_max, set_bad=color_nan)
 
     for label, poly in inp[POLYGONS].items():  # type: Polygon
 

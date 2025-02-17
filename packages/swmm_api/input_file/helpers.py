@@ -12,25 +12,22 @@ import pandas as pd
 import numpy as np
 from tqdm.auto import tqdm
 
-from ._type_converter import type2str, is_equal, txt_to_lines
+from ._type_converter import type2str, is_equal, txt_to_lines, is_nan
 from .section_labels import *
 from .section_lists import LINK_SECTIONS, NODE_SECTIONS
+from .._io_helpers import CONFIG
 
-COMMENT_STR = ';;'
-
-SEP_INP = COMMENT_STR + "_" * 100
-COMMENT_EMPTY_SECTION = COMMENT_STR + ' No Data'
 
 _TYPES_NO_COPY = (type(None), int, float, str, datetime.date, datetime.time, datetime.timedelta)
 
-DEFAULT_NOT_SPECIFIED = np.nan
+# _DEFAULT_NOT_SPECIFIED = np.nan  # not used
 
 
 class SwmmInputWarning(UserWarning): ...
 
 
 def head_to_str(head):
-    return f'\n\n{SEP_INP}\n[{head}]\n'
+    return f'\n\n{CONFIG.comment_prefix + CONFIG.section_separator}\n[{head}]\n'
 
 
 ########################################################################################################################
@@ -243,7 +240,7 @@ class InpSectionGeneric(InpSectionABC, ABC):
         """
         # size of the longest key (number of characters)
         if not self:
-            return COMMENT_EMPTY_SECTION
+            return CONFIG.comment_empty_section
         max_len = len(max(self.keys(), key=len))
         return '\n'.join(f'{(key if isinstance(key, str) else " ".join(key)).ljust(max_len)}  {type2str(value)}' for key, value in self.items())
 
@@ -411,7 +408,7 @@ class InpSection(InpSectionABC):
              str: lines of the ``.inp``-file section
         """
         if not self:  # if empty
-            return COMMENT_EMPTY_SECTION
+            return CONFIG.comment_empty_section
 
         if fast or not self._table_inp_export:
             return '\n'.join(self.iter_inp_lines(sort_objects_alphabetical)) + '\n'
@@ -419,7 +416,7 @@ class InpSection(InpSectionABC):
             if self._label == INFILTRATION:
                 # mixed object class
                 if not self:  # if empty
-                    return COMMENT_EMPTY_SECTION
+                    return CONFIG.comment_empty_section
 
                 split = {}
                 keys = self.keys()
@@ -477,7 +474,7 @@ class InpSection(InpSectionABC):
             for o in _iterable:
                 yield o.to_inp_line()
         else:  # if empty
-            yield COMMENT_EMPTY_SECTION
+            yield CONFIG.comment_empty_section
 
     @property
     def frame(self):
@@ -746,7 +743,7 @@ class BaseSectionObject(ABC):
         Returns:
             tuple[any]: Attribute values used for the object
         """
-        return tuple(v for v in self.values if not (isinstance(v, float) and np.isnan(v)))
+        return tuple(v for v in self.values if not is_nan(v))
 
     def __iter__(self):
         for k, v in self.to_dict_().items():
@@ -916,31 +913,31 @@ def dataframe_to_inp_string(df, index=True):
         str: .inp file conform string for one section
     """
     if df.empty:
-        return COMMENT_EMPTY_SECTION
+        return CONFIG.comment_empty_section
 
     if isinstance(df, pd.Series):
         return df.apply(type2str).to_string()
 
     c = df.copy()
     if c.columns.name is None:
-        c.columns.name = COMMENT_STR
+        c.columns.name = CONFIG.comment_prefix
     else:
-        if not c.columns.name.startswith(COMMENT_STR):
-            c.columns.name = COMMENT_STR + c.columns.name
+        if not c.columns.name.startswith(CONFIG.comment_prefix):
+            c.columns.name = CONFIG.comment_prefix + c.columns.name
 
     if c.index.name is not None:
-        if not c.index.name.startswith(COMMENT_STR):
-            c.index.name = COMMENT_STR + c.index.name
+        if not c.index.name.startswith(CONFIG.comment_prefix):
+            c.index.name = CONFIG.comment_prefix + c.index.name
 
     if isinstance(c.index, pd.MultiIndex):
         if c.index.names is not None:
-            if not c.index.levels[0].name.startswith(COMMENT_STR):
+            if not c.index.levels[0].name.startswith(CONFIG.comment_prefix):
                 c.index.set_names(f';{c.index.names[0]}', level=0, inplace=True)
                 # because pandas 1.0
                 # c.index.levels[0].name = f';{c.index.names[0].name}'
 
     if not index:
-        c.columns = [COMMENT_STR + c.columns[0]] + list(c.columns)[1:]
+        c.columns = [CONFIG.comment_prefix + c.columns[0]] + list(c.columns)[1:]
 
     from packaging import version
     if version.parse(pd.__version__) >= version.parse('2.1'):
@@ -987,15 +984,15 @@ def convert_section(head, lines, converter):
         else:
             # warnings.warn(f'Type of converter ({type(section_)}) for Section "{head}" not implemented. Section will not be converted.', SwmmInputWarning)
             warnings.warn(f'Type of converter ({type(section_)}) for Section "{head}" not implemented. Section will be converted using the DummySectionObject.', SwmmInputWarning)
-            from swmm_api.input_file.helpers_dummy import DummySectionObject
+            from .helpers_dummy import DummySectionObject
             return DummySectionObject.from_inp_lines(lines)
     else:
         # warnings.warn(f'Section "{head}" not implemented. Section will not be converted.', SwmmInputWarning)
         warnings.warn(f'Section "{head}" not implemented. Section will be converted using the DummySectionObject.', SwmmInputWarning)
-        from swmm_api.input_file.helpers_dummy import DummySectionObject
+        from .helpers_dummy import DummySectionObject
         return DummySectionObject.from_inp_lines(lines)
 
-    return lines.replace(SEP_INP, '').strip()
+    return lines.replace(CONFIG.comment_prefix + CONFIG.section_separator, '').strip()
 
 
 ########################################################################################################################
@@ -1131,7 +1128,7 @@ def section_to_string(section, fast=True, sort_objects_alphabetical=False):
         str: string of the ``.inp``-file section
     """
     if isinstance(section, str):  # Title
-        return section.replace(SEP_INP, '').strip()
+        return section.replace(CONFIG.comment_prefix + CONFIG.section_separator, '').strip()
 
     # ----------------------
     elif isinstance(section, list):  # V1
@@ -1152,7 +1149,7 @@ def section_to_string(section, fast=True, sort_objects_alphabetical=False):
     # ----------------------
     elif isinstance(section, InpSectionGeneric):  # V4
         if not section:
-            return COMMENT_EMPTY_SECTION
+            return CONFIG.comment_empty_section
         return section.to_inp_lines(fast=fast)
 
     elif isinstance(section, InpSection):  # V4
@@ -1167,7 +1164,7 @@ def section_to_string(section, fast=True, sort_objects_alphabetical=False):
 
 def iter_section_lines(section, sort_objects_alphabetical=False):
     if isinstance(section, str):  # Title
-        yield section.replace(SEP_INP, '').strip()
+        yield section.replace(CONFIG.comment_prefix + CONFIG.section_separator, '').strip()
 
     # ----------------------
     elif isinstance(section, list):  # V1

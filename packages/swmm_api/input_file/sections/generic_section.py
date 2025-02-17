@@ -3,9 +3,13 @@ import logging
 import warnings
 from typing import Literal
 
+import numpy as np
+import pandas as pd
+
 from .._type_converter import infer_type, type2str, get_line_splitter, convert_string
-from ..helpers import InpSectionGeneric, SEP_INP, COMMENT_EMPTY_SECTION
+from ..helpers import InpSectionGeneric
 from ..section_labels import TITLE, OPTIONS, REPORT, EVAPORATION, TEMPERATURE, MAP, FILES, ADJUSTMENTS, BACKDROP
+from ..._io_helpers import CONFIG
 
 logger = logging.getLogger(__name__)
 
@@ -64,7 +68,7 @@ class TitleSection(InpSectionGeneric):
         Returns:
             TitleSection: string-like
         """
-        return cls(lines.replace(SEP_INP, '').strip())
+        return cls(lines.replace(CONFIG.comment_prefix + CONFIG.section_separator, '').strip())
 
     def to_inp_lines(self, fast=False, sort_objects_alphabetical=False):
         return self.txt
@@ -827,8 +831,10 @@ class OptionSection(InpSectionGeneric):
         Set the date and time when the simulation begins.
 
         Args:
-            dt (datetime.datetime): date and the time when the simulation begins.
+            dt (datetime.datetime or str): date and the time when the simulation begins.
         """
+        if isinstance(dt, str):
+            dt = pd.to_datetime(dt)
         self.set_start_date(dt.date())
         self.set_start_time(dt.time())
 
@@ -837,8 +843,10 @@ class OptionSection(InpSectionGeneric):
         Set the date and time when the simulation is to end.
 
         Args:
-            dt (datetime.datetime): date and time when the simulation is to end.
+            dt (datetime.datetime or str): date and time when the simulation is to end.
         """
+        if isinstance(dt, str):
+            dt = pd.to_datetime(dt)
         self.set_end_date(dt.date())
         self.set_end_time(dt.time())
 
@@ -847,8 +855,10 @@ class OptionSection(InpSectionGeneric):
         Set the date and time when reporting of results is to begin.
 
         Args:
-            dt (datetime.datetime): date and time when reporting of results is to begin.
+            dt (datetime.datetime or str): date and time when reporting of results is to begin.
         """
+        if isinstance(dt, str):
+            dt = pd.to_datetime(dt)
         self.set_report_start_date(dt.date())
         self.set_report_start_time(dt.time())
 
@@ -1017,7 +1027,7 @@ class ReportSection(InpSectionGeneric):
     def to_inp_lines(self, fast=False, sort_objects_alphabetical=False):
         f = ''
         if not self:
-            return COMMENT_EMPTY_SECTION
+            return CONFIG.comment_empty_section
         max_len = len(max(self.keys(), key=len)) + 2
 
         def _dict_format(key, value):
@@ -1377,9 +1387,10 @@ class TemperatureSection(InpSectionGeneric):
 
             elif key == cls.KEYS.FILE:
                 if n_options == 1:
-                    value = line[0]
+                    # strip quotes
+                    value = convert_string(line[0])
                 else:
-                    value = line
+                    value = convert_string(line[0]), *line[1:]
 
             elif key == cls.KEYS._WINDSPEED:
                 key += ' ' + line.pop(0)
@@ -1409,6 +1420,42 @@ class TemperatureSection(InpSectionGeneric):
             data[key] = value
 
         return data
+
+    def set_timeseries(self, label):
+        """
+        read air temperature from a time series.
+
+        Args:
+            label (str): name of time series in ``[TIMESERIES]`` section with temperature data.
+        """
+        self[self.KEYS.TIMESERIES] = label
+
+    def set_file(self, label, start=np.nan):
+        """
+        read air temperature from an external Climate file.
+
+        Climate files are discussed in Section 11.4 Climate Files in the EPA SWMM Users Manual.
+
+        Args:
+            label (str): name of external Climate file with temperature data.
+            start (): date to begin reading from the file in month/day/year format (default is the beginning of the file).
+        """
+        self[self.KEYS.TIMESERIES] = label
+        if not np.isnan(start):
+            self[self.KEYS.TIMESERIES] += ' ' + start
+
+    def set_snowmelt(self, Stemp, ATIwt, RNM, Elev, Lat, DTLong):
+        """
+
+        Args:
+            Stemp (float): air temperature at which precipitation falls as snow (deg F or C). 34°F = 1.1°C | 32°F = 0°C
+            ATIwt (float): antecedent temperature index weight (default is 0.5).
+            RNM (float): negative melt ratio (default is 0.6).
+            Elev (float): average elevation of study area above mean sea level (ft or m) (default is 0).
+            Lat (float): latitude of the study area in degrees North (default is 50).
+            DTLong (float): correction, in minutes of time, between true solar time and the standard clock time (default is 0).
+        """
+        self[self.KEYS.TIMESERIES] = (Stemp, ATIwt, RNM, Elev, Lat, DTLong)
 
 
 class MapSection(InpSectionGeneric):

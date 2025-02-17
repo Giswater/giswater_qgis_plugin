@@ -2,6 +2,7 @@ import warnings
 import logging
 from functools import wraps
 
+from .._type_converter import is_placeholder
 from ..section_labels import STORAGE, OUTFALLS, OUTLETS, PUMPS, XSECTIONS, POLLUTANTS
 from ..sections import Inflow
 
@@ -21,7 +22,7 @@ def get_used_curves(inp):
         if section in inp:
             for name in inp[section]:
                 if isinstance(inp[section][name].curve_name, str):
-                    if (section == PUMPS) and (inp[section][name].curve_name == '*'):
+                    if (section == PUMPS) and is_placeholder(inp[section][name].curve_name):
                         continue
                     used_curves.add(inp[section][name].curve_name)
     return used_curves

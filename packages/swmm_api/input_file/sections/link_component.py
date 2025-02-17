@@ -1,7 +1,6 @@
 from typing import NamedTuple
 
 import numpy as np
-from numpy import nan, isnan
 from pandas import DataFrame
 
 from ._identifiers import IDENTIFIERS
@@ -87,7 +86,7 @@ class CrossSection(BaseSectionObject):
         BASKETHANDLE = 'BASKETHANDLE'  # Full Height
         SEMICIRCULAR = 'SEMICIRCULAR'  # Full Height
 
-    def __init__(self, link, shape, height=0, parameter_2=0, parameter_3=0, parameter_4=0, n_barrels=1, culvert=nan,
+    def __init__(self, link, shape, height=0, parameter_2=0, parameter_3=0, parameter_4=0, n_barrels=1, culvert=np.nan,
                  transect=None, curve_name=None, street=None):
         """
         Conduit, orifice, and weir cross-section geometry.
@@ -107,26 +106,26 @@ class CrossSection(BaseSectionObject):
         """
         # in SWMM C-code function "link_readXsectParams"
         self.link = str(link)
-        self.shape = shape
+        self.shape = str(shape).upper()
 
-        self.height = nan
-        self.transect = nan
-        self.street = nan
+        self.height = np.nan
+        self.transect = np.nan
+        self.street = np.nan
 
-        self.parameter_2 = nan
-        self.curve_name = nan
+        self.parameter_2 = np.nan
+        self.curve_name = np.nan
 
-        if shape == self.SHAPES.IRREGULAR:
+        if self.shape == self.SHAPES.IRREGULAR:
             if transect is None:
                 # read inp file
                 transect = height
             self.transect = str(transect)  # name of TransectCoordinates
-        elif shape == self.SHAPES.STREET:
+        elif self.shape == self.SHAPES.STREET:
             if street is None:
                 # read inp file
                 street = height
             self.street = str(street)  # name of Street section
-        elif shape == self.SHAPES.CUSTOM:
+        elif self.shape == self.SHAPES.CUSTOM:
             if curve_name is None:
                 curve_name = parameter_2
             self.curve_name = str(curve_name)
@@ -137,10 +136,13 @@ class CrossSection(BaseSectionObject):
 
         self.parameter_3 = float(parameter_3)
         self.parameter_4 = float(parameter_4)
-        self.n_barrels = int(n_barrels)
+
         # according to the c code 6 arguments are needed to not raise an error / nonsense, but you have to
-        if n_barrels != 1 or not isinstance(n_barrels, str) and ~isnan(n_barrels):
+        try:
             self.n_barrels = int(n_barrels)
+        except ValueError:
+            self.n_barrels = 1
+
         self.culvert = culvert
 
     @classmethod

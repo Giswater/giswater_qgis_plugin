@@ -135,7 +135,6 @@ def _part_to_frame(part, replace_parts=None):
             for r in replace_parts:
                 part = part.replace(*r)
 
-
     subs = re.split(r"\s*-+\n", part)
     if len(subs) == 4:
         notes, header, data, sytem = subs
@@ -185,7 +184,7 @@ def _part_to_frame(part, replace_parts=None):
 
     for col in df:
         if 'days hr:min' in col:
-            df[col] = pd.to_timedelta(df[col].str.replace('  ', ' days ') + ':00')
+            df[col] = pd.to_timedelta(df[col].str.replace(r'\s+', ' days ', regex=True) + ':00')
         else:
             try:
                 df[col] = pd.to_numeric(df[col])

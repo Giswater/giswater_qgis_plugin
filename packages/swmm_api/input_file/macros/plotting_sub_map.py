@@ -1,6 +1,7 @@
 import networkx as nx
 
-from swmm_api.input_file.macros import inp_to_graph, create_sub_inp, plot_map, add_node_labels
+from .graph import inp_to_graph, create_sub_inp
+from .plotting_map import plot_map, add_node_labels
 
 
 def plot_sub_map(inp, node, depth=2):
