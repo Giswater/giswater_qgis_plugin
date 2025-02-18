@@ -94,15 +94,6 @@ BEGIN
 		v_cat_feature = (SELECT id FROM cat_feature LIMIT 1);
 	END IF;
 
-
-	v_feature_inp_table := (
-		SELECT c.epa_table FROM cat_feature a
-		LEFT JOIN sys_feature_class b ON a.feature_class=b.id
-		left JOIN sys_feature_epa_type c ON concat(b.TYPE, b.epa_default)=concat(c.feature_type, c.id)
-		WHERE a.id = v_cat_feature LIMIT 1
-	);
-
-
 	IF v_action = 'MULTI-DELETE' THEN
 
 		FOR v_childview IN SELECT child_layer FROM cat_feature WHERE feature_type <> 'LINK' AND child_layer IS NOT NULL
