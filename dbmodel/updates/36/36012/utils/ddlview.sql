@@ -236,8 +236,8 @@ DROP VIEW IF EXISTS v_edit_inp_virtualvalve;
 DROP VIEW IF EXISTS v_edit_inp_virtualpump;
 DROP VIEW IF EXISTS v_edit_inp_pipe;
 
-SELECT gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
- "data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-DELETE" }}$$);
+--SELECT gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
+ --"data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-DELETE" }}$$);
 
 DROP VIEW IF EXISTS v_edit_arc;
 DROP VIEW IF EXISTS v_edit_node;
