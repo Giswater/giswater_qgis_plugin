@@ -71,7 +71,7 @@ v_newcolumn text;
 v_query json;
 v_sys_feature_class text;
 v_inp_fields TEXT;
-v_feature_inp_childtable_name TEXT;
+v_feature_inp_table TEXT;
 
 BEGIN
 
@@ -94,6 +94,15 @@ BEGIN
 	IF v_cat_feature IS NULL THEN
 		v_cat_feature = (SELECT id FROM cat_feature LIMIT 1);
 	END IF;
+
+
+	v_feature_inp_table := (
+		SELECT c.epa_table FROM cat_feature a
+		LEFT JOIN sys_feature_class b ON a.feature_class=b.id
+		left JOIN sys_feature_epa_type c ON concat(b.TYPE, b.epa_default)=concat(c.feature_type, c.id)
+		WHERE a.id = v_cat_feature LIMIT 1
+	);
+
 
 	IF v_action = 'MULTI-DELETE' THEN
 
@@ -207,7 +216,6 @@ BEGIN
 			v_feature_class  = lower(rec.feature_class);
 			v_cat_feature = rec.id;
 			v_feature_childtable_name := 'man_' || v_feature_type || '_' || lower(v_cat_feature);
-			v_feature_inp_childtable_name := 'inp_' || v_feature_type || '_' || lower(v_cat_feature);
 
 
 			--create a child view name if doesnt exist
@@ -240,8 +248,8 @@ BEGIN
 
 			RAISE NOTICE '4/addfields=1,v_man_fields,%',v_man_fields;
 			--select columns from inp_* table without repeating the identifier
-			EXECUTE 'SELECT DISTINCT string_agg(concat(''man_'||v_feature_class||'.'',column_name)::text,'', '')
-			FROM information_schema.columns where table_name='||quote_literal(v_feature_inp_childtable_name)||' and table_schema='''||v_schemaname||'''
+			EXECUTE 'SELECT DISTINCT string_agg(concat('''||v_feature_inp_table||'.'',column_name)::text,'', '')
+			FROM information_schema.columns where table_name='||quote_literal(v_feature_inp_table)||' and table_schema='''||v_schemaname||'''
 			and column_name!='''||v_feature_type||'_id'''
 			INTO v_inp_fields;
 
@@ -303,7 +311,7 @@ BEGIN
 					"feature_childtable_name":"'||v_feature_childtable_name||'",
 					"feature_childtable_fields":"'||v_feature_childtable_fields||'",
 					"man_fields":"'||v_man_fields||'",
-					"inp_fields:"'||v_inp_fields||'",
+					"inp_fields":"'||v_inp_fields||'",
 					"view_type":"'||v_view_type||'"
 					}
 				}';
@@ -339,7 +347,7 @@ BEGIN
 					"feature_childtable_name":"'||v_feature_childtable_name||'",
 					"feature_childtable_fields":"'||v_feature_childtable_fields||'",
 					"man_fields":"'||v_man_fields||'",
-					"inp_fields:"'||v_inp_fields||'",
+					"inp_fields":"'||v_inp_fields||'",
 					"view_type":"'||v_view_type||'"
 					}
 				}';
@@ -371,14 +379,7 @@ BEGIN
 		v_feature_type = (SELECT lower(feature_type) FROM cat_feature where id=v_cat_feature);
 		v_feature_class  = (SELECT lower(feature_class) FROM cat_feature where id=v_cat_feature);
 		v_feature_childtable_name := 'man_' || v_feature_type || '_' || lower(v_cat_feature);
-		v_feature_inp_childtable_name := 'inp_' || v_feature_type || '_' || lower(v_cat_feature);
 
-		v_feature_inp_childtable_name := (
-			SELECT c.epa_table FROM cat_feature a
-			LEFT JOIN sys_feature_class b ON a.feature_class=b.id
-			left JOIN sys_feature_epa_type c ON concat(b.TYPE, b.epa_default)=concat(c.feature_type, c.id)
-			WHERE a.id = v_cat_feature LIMIT 1
-		);
 
 		--create a child view name if doesnt exist
 		IF (SELECT child_layer FROM cat_feature WHERE id=v_cat_feature) IS NULL THEN
@@ -411,15 +412,15 @@ BEGIN
 		RAISE NOTICE 'v_man_fields,%',v_man_fields;
 		--select columns from inp_* table without repeating the identifier
 
-		IF v_feature_inp_childtable_name IS NOT NULL THEN
+	
 
-			EXECUTE
-			'SELECT DISTINCT string_agg(concat('''||v_feature_inp_childtable_name||'.'',column_name)::text,'', '')
-			FROM information_schema.columns where table_name='||quote_literal(v_feature_inp_childtable_name)||' and table_schema='''||v_schemaname||'''
-			and column_name!='''||v_feature_type||'_id'''
-			INTO v_inp_fields;
+		EXECUTE
+		'SELECT DISTINCT string_agg(concat('''||v_feature_inp_table||'.'',column_name)::text,'', '')
+		FROM information_schema.columns where table_name='||quote_literal(v_feature_inp_table)||' and table_schema='''||v_schemaname||'''
+		and column_name!='''||v_feature_type||'_id'''
+		INTO v_inp_fields;
 
-		END IF;
+
 
 		--select columns from v_feature_childtable_name.* table without repeating the identifiers
 		EXECUTE 'SELECT DISTINCT string_agg(concat('''||v_feature_childtable_name||'.'',column_name)::text,'', '')
