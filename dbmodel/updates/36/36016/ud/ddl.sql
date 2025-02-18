@@ -19,8 +19,8 @@ update node n set serial_number = a.serial_number from (
 select node_id, serial_number from man_netelement
 )a where n.node_id = a.node_id;
 
---SELECT gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
--- "data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-DELETE" }}$$);
+SELECT gw_fct_admin_manage_child_views($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
+ "data":{"filterFields":{}, "pageInfo":{}, "action":"MULTI-DELETE" }}$$);
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_netelement", "column":"serial_number"}}$$);
 
