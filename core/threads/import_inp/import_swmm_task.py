@@ -1748,7 +1748,7 @@ class GwImportInpTask(GwTask):
             )
             inp_dict[o_name] = {
                 "outlet_type": o.curve_type,
-                "offsetval": o.offset,
+                "offsetval": o.offset if o.offset != '*' else self.network[JUNCTIONS][o.from_node].elevation,
                 "curve_id": o.curve_description if o.curve_type in ("TABULAR/DEPTH", "TABULAR/HEAD") else None,  # TODO: use enum
                 "cd1": o.curve_description[0] if o.curve_type in ("FUNCTIONAL/DEPTH", "FUNCTIONAL/HEAD") else None,
                 "cd2": o.curve_description[1] if o.curve_type in ("FUNCTIONAL/DEPTH", "FUNCTIONAL/HEAD") else None,
