@@ -899,7 +899,7 @@ class GwAdminButton:
             schema_name = tools_qt.get_text(self.dlg_readsql, 'project_schema_name')
             if any(x in str(tools_db.dao_db_credentials['db']) for x in ('.', ',')):
                 message = "Database name contains special characters that are not supported"
-                self.form_enabled = False
+                self.form_enabled = False            
             if schema_name == 'null':
                 tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
                 tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_schema_name, '')
@@ -1103,7 +1103,8 @@ class GwAdminButton:
         elif [project_name] in pg_keywords:
             msg = "The project name can't be a PostgreSQL reserved keyword"
             tools_qt.show_info_box(msg, "Info")
-            return False
+            return False           
+
         if project_descript == 'null':
             msg = "The 'Description' field is required."
             tools_qt.show_info_box(msg, "Info")
@@ -2273,24 +2274,29 @@ class GwAdminButton:
         is_multi_addfield = tools_qt.is_checked(self.dlg_readsql, self.dlg_readsql.chk_add_fields_multi)
 
         window_title = ""
-        if action == 'create':
-            if is_multi_addfield:
-                window_title = f'Create multi field'
-            else:
-                window_title = 'Create field on "' + str(form_name_fields) + '"'
-            self._manage_create_field(form_name_fields, is_multi_addfield)
-        elif action == 'update':
-            if is_multi_addfield:
-                window_title = f'Update multi field'
-            else:
-                window_title = 'Update field on "' + str(form_name_fields) + '"'
-            self._manage_update_field(self.dlg_manage_fields, form_name_fields, is_multi_addfield, tableview='ve_config_addfields')
-        elif action == 'delete':
-            if is_multi_addfield:
-                window_title = f'Delete multi field'
-            else:
-                window_title = 'Delete field on "' + str(form_name_fields) + '"'
-            self._manage_delete_field(form_name_fields, is_multi_addfield)
+
+        match action:
+            case 'create':
+                if is_multi_addfield:
+                    window_title = f'Create multi field'
+                else:
+                    window_title = 'Create field on "' + str(form_name_fields) + '"'
+                self._manage_create_field(form_name_fields, is_multi_addfield)
+            case 'update':
+                if is_multi_addfield:
+                    window_title = f'Update multi field'
+                else:
+                    window_title = 'Update field on "' + str(form_name_fields) + '"'
+                self._manage_update_field(self.dlg_manage_fields, form_name_fields, is_multi_addfield, tableview='ve_config_addfields')
+            case 'delete':
+                if is_multi_addfield:
+                    window_title = f'Delete multi field'
+                else:
+                    window_title = 'Delete field on "' + str(form_name_fields) + '"'
+                self._manage_delete_field(form_name_fields, is_multi_addfield)
+            case _:
+                tools_qgis.show_warning("No action detected")
+            
 
         # Set listeners
         self.dlg_manage_fields.btn_accept.clicked.connect(
@@ -2513,6 +2519,7 @@ class GwAdminButton:
                         and widget.objectName() != 'qt_spinbox_lineedit':
 
                     value = None
+
                     if type(widget) in (QLineEdit, QSpinBox, QDoubleSpinBox):
                         value = tools_qt.get_text(self.dlg_manage_fields, widget, return_string_null=False)
                     elif type(widget) is QComboBox:

@@ -207,71 +207,68 @@ class GwInfo(QObject):
             except Exception as e:
                 tools_log.log_info(str(e))
                 return False, None
-
-            if template == 'info_generic':
-                result, dialog = self._open_generic_form(self.complet_result)
-                # Fill self.my_json for new qgis_feature
-                if feature_cat is not None:
-                    self._manage_new_feature(self.complet_result, dialog)
-                return result, dialog
-
-            elif template == 'dimensioning':
-                self.lyr_dim = tools_qgis.get_layer_by_tablename("v_edit_dimensions", show_warning_=True)
-                if self.lyr_dim:
-                    self.dimensioning = GwDimensioning()
-                    feature_id = self.complet_result['body']['feature']['id']
-                    result, dialog = self.dimensioning.open_dimensioning_form(None, self.lyr_dim, self.complet_result,
-                        feature_id, self.rubber_band)
+            
+            match template:
+                case 'info_generic':
+                    result, dialog = self._open_generic_form(self.complet_result)
+                    # Fill self.my_json for new qgis_feature
+                    if feature_cat is not None:
+                        self._manage_new_feature(self.complet_result, dialog)
                     return result, dialog
+                case 'dimensioning':
+                    self.lyr_dim = tools_qgis.get_layer_by_tablename("v_edit_dimensions", show_warning_=True)
+                    if self.lyr_dim:
+                        self.dimensioning = GwDimensioning()
+                        feature_id = self.complet_result['body']['feature']['id']
+                        result, dialog = self.dimensioning.open_dimensioning_form(None, self.lyr_dim, self.complet_result,
+                            feature_id, self.rubber_band)
+                        return result, dialog
+                case 'info_feature':
+                    sub_tag = None
+                    if feature_cat:
+                        if feature_cat.feature_type.lower() == 'arc':
+                            sub_tag = 'arc'
+                        else:
+                            sub_tag = 'node'
 
-            elif template == 'info_feature':
-                sub_tag = None
-                if feature_cat:
-                    if feature_cat.feature_type.lower() == 'arc':
-                        sub_tag = 'arc'
-                    else:
-                        sub_tag = 'node'
+                    # Comes from QPushButtons node1 or node2
+                    if feature_id:
+                        x1 = self.complet_result['body']['feature']['geometry']['x']
+                        y1 = self.complet_result['body']['feature']['geometry']['y']
 
-                # Comes from QPushButtons node1 or node2
-                if feature_id:
-                    x1 = self.complet_result['body']['feature']['geometry']['x']
-                    y1 = self.complet_result['body']['feature']['geometry']['y']
+                        current_extent = global_vars.canvas.extent()
 
-                    current_extent = global_vars.canvas.extent()
+                        feature_point = QgsPointXY(x1, y1)
 
-                    feature_point = QgsPointXY(x1, y1)
+                        if not current_extent.contains(feature_point):
+                            global_vars.canvas.setCenter(feature_point)
+                            global_vars.canvas.refresh()
 
-                    if not current_extent.contains(feature_point):
-                        global_vars.canvas.setCenter(feature_point)
-                        global_vars.canvas.refresh()
+                    feature_id = self.complet_result['body']['feature']['id']
 
-                feature_id = self.complet_result['body']['feature']['id']
-
-                result, dialog = self._open_custom_form(feature_id, self.complet_result, tab_type, sub_tag, is_docker,
-                    new_feature=new_feature)
-                if feature_cat is not None:
-                    self._manage_new_feature(self.complet_result, dialog)
-                return result, dialog
-
-            elif template == 'visit':
-                visit_id = self.complet_result['body']['feature']['id']
-                manage_visit = GwVisit()
-                manage_visit.get_visit(visit_id=visit_id, tag='info')
-                dlg_add_visit = manage_visit.get_visit_dialog()
-                dlg_add_visit.rejected.connect(lambda: tools_gw.reset_rubberband(self.rubber_band))
-                return self.complet_result, dlg_add_visit
-
-            elif template == 'element':
-                element_id = self.complet_result['body']['feature']['id']
-                manage_element = GwElement()
-                manage_element.get_element(new_element_id=False, selected_object_id=element_id)
-                dlg_add_element = manage_element.get_element_dialog()
-                dlg_add_element.rejected.connect(lambda: tools_gw.reset_rubberband(self.rubber_band))
-                return self.complet_result, dlg_add_element
-
-            else:
-                tools_log.log_warning(f"template not managed: {template}")
-                return False, None
+                    result, dialog = self._open_custom_form(feature_id, self.complet_result, tab_type, sub_tag, is_docker,
+                        new_feature=new_feature)
+                    if feature_cat is not None:
+                        self._manage_new_feature(self.complet_result, dialog)
+                    return result, dialog
+                case 'visit':
+                    visit_id = self.complet_result['body']['feature']['id']
+                    manage_visit = GwVisit()
+                    manage_visit.get_visit(visit_id=visit_id, tag='info')
+                    dlg_add_visit = manage_visit.get_visit_dialog()
+                    dlg_add_visit.rejected.connect(lambda: tools_gw.reset_rubberband(self.rubber_band))
+                    return self.complet_result, dlg_add_visit
+                case 'element':
+                    element_id = self.complet_result['body']['feature']['id']
+                    manage_element = GwElement()
+                    manage_element.get_element(new_element_id=False, selected_object_id=element_id)
+                    dlg_add_element = manage_element.get_element_dialog()
+                    dlg_add_element.rejected.connect(lambda: tools_gw.reset_rubberband(self.rubber_band))
+                    return self.complet_result, dlg_add_element
+                case _:
+                    tools_log.log_warning(f"template not managed: {template}")
+                    return False, None
+                
         except Exception as e:
             tools_qgis.show_warning("Exception in info", parameter=e)
             tools_log.log_error(f"{traceback.format_exc()}")
@@ -313,10 +310,7 @@ class GwInfo(QObject):
 
             config = self.info_layer.editFormConfig()
             self.conf_supp = config.suppress()
-            if Qgis.QGIS_VERSION_INT >= 33200:
-                config.setSuppress(QgsEditFormConfig.FeatureFormSuppress.SuppressOn)
-            else:
-                config.setSuppress(1)
+            config.setSuppress(QgsEditFormConfig.FeatureFormSuppress.SuppressOn)
             self.info_layer.setEditFormConfig(config)
             self.iface.setActiveLayer(self.info_layer)
             self.info_layer.startEditing()
@@ -2722,68 +2716,69 @@ class GwInfo(QObject):
         index_tab = self.tab_main.currentIndex()
         tab_name = self.tab_main.widget(index_tab).objectName()
         self._show_actions(dialog, tab_name)
-
-        # Tab 'Elements'
-        if self.tab_main.widget(index_tab).objectName() == 'tab_elements' and not self.tab_element_loaded:
-            self._manage_dlg_widgets(self.complet_result, self.complet_result['body']['data'], False, tab='tab_elements')
-            filter_fields = f'"{self.field_id}":{{"value":"{self.feature_id}","filterSign":"="}}'
-            self._init_tab(self.complet_result, filter_fields)
-            self.tab_element_loaded = True
-        # Tab 'EPA'
-        elif self.tab_main.widget(index_tab).objectName() == 'tab_epa' and not self.tab_epa_loaded:
-            self._reload_epa_tab(dialog)
-            filter_fields = f'"{self.field_id}":{{"value":"{self.feature_id}","filterSign":"="}}'
-            self._init_tab(self.complet_result, filter_fields)
-            self.tab_epa_loaded = True
-        # Tab 'Relations'
-        elif self.tab_main.widget(index_tab).objectName() == 'tab_relations' and not self.tab_relations_loaded:
-            self._manage_dlg_widgets(self.complet_result, self.complet_result['body']['data'], False, tab='tab_relations')
-            filter_fields = f'"{self.field_id}":{{"value":"{self.feature_id}","filterSign":"="}}'
-            self._init_tab(self.complet_result, filter_fields)
-            self.tab_relations_loaded = True
-        # Tab 'Connections'
-        elif self.tab_main.widget(index_tab).objectName() == 'tab_connections' and not self.tab_connections_loaded:
-            self._manage_dlg_widgets(self.complet_result, self.complet_result['body']['data'], False, tab='tab_connections')
-            filter_fields = f'"{self.field_id}":{{"value":"{self.feature_id}","filterSign":"="}}'
-            self._init_tab(self.complet_result, filter_fields)
-            self.tab_connections_loaded = True
-        # Tab 'Hydrometer'
-        elif self.tab_main.widget(index_tab).objectName() == 'tab_hydrometer' and not self.tab_hydrometer_loaded:
-            self._manage_dlg_widgets(self.complet_result, self.complet_result['body']['data'], False, tab='tab_hydrometer')
-            filter_fields = f'"feature_id":{{"value":"{self.feature_id}","filterSign":"="}}'
-            self._init_tab(self.complet_result, filter_fields, id_name="feature_id")
-            self.tab_hydrometer_loaded = True
-        # Tab 'Hydrometer values'
-        elif self.tab_main.widget(index_tab).objectName() == 'tab_hydrometer_val' and not self.tab_hydrometer_val_loaded:
-            self._manage_dlg_widgets(self.complet_result, self.complet_result['body']['data'], False, tab='tab_hydrometer_val')
-            filter_fields = f'"feature_id":{{"value":"{self.feature_id}","filterSign":"="}}'
-            self._init_tab(self.complet_result, filter_fields, id_name="feature_id")
-            self.tab_hydrometer_val_loaded = True
-        # Tab 'Visit'
-        elif self.tab_main.widget(index_tab).objectName() == 'tab_visit' and not self.tab_visit_loaded:
-            self._manage_dlg_widgets(self.complet_result, self.complet_result['body']['data'], False, tab='tab_visit')
-            filter_fields = f'"{self.field_id}":{{"value":"{self.feature_id}","filterSign":"="}}'
-            self._init_tab(self.complet_result, filter_fields)
-            cmb_visit_class = self.dlg_cf.findChild(QComboBox, 'tab_visit_visit_class')
-            current_index = cmb_visit_class.currentIndex()
-            cmb_visit_class.currentIndexChanged.emit(current_index)
-            self.tab_visit_loaded = True
-        # Tab 'Event'
-        elif self.tab_main.widget(index_tab).objectName() == 'tab_event' and not self.tab_event_loaded:
-            self._manage_dlg_widgets(self.complet_result, self.complet_result['body']['data'], False, tab='tab_event')
-            filter_fields = f'"{self.field_id}":{{"value":"{self.feature_id}","filterSign":"="}}'
-            self._init_tab(self.complet_result, filter_fields)
-            self.tab_event_loaded = True
-        # Tab 'Documents'
-        elif self.tab_main.widget(index_tab).objectName() == 'tab_documents' and not self.tab_document_loaded:
-            self._manage_dlg_widgets(self.complet_result, self.complet_result['body']['data'], False, tab='tab_documents')
-            filter_fields = f'"{self.field_id}":{{"value":"{self.feature_id}","filterSign":"="}}'
-            self._init_tab(self.complet_result, filter_fields)
-            self.tab_document_loaded = True
-        # Tab 'Plan'
-        elif self.tab_main.widget(index_tab).objectName() == 'tab_plan' and not self.tab_plan_loaded:
-            self._fill_tab_plan(self.complet_result)
-            self.tab_plan_loaded = True
+        
+        match self.tab_main.widget(index_tab).objectName():
+            # Tab 'Elements'
+            case 'tab_elements' if not self.tab_element_loaded:
+                self._manage_dlg_widgets(self.complet_result, self.complet_result['body']['data'], False, tab='tab_elements')
+                filter_fields = f'"{self.field_id}":{{"value":"{self.feature_id}","filterSign":"="}}'
+                self._init_tab(self.complet_result, filter_fields)
+                self.tab_element_loaded = True
+            # Tab 'EPA
+            case 'tab_epa' if not self.tab_epa_loaded:
+                self._reload_epa_tab(dialog)
+                filter_fields = f'"{self.field_id}":{{"value":"{self.feature_id}","filterSign":"="}}'
+                self._init_tab(self.complet_result, filter_fields)
+                self.tab_epa_loaded = True
+            # Tab 'Relations'
+            case 'tab_relations' if not self.tab_relations_loaded:
+                self._manage_dlg_widgets(self.complet_result, self.complet_result['body']['data'], False, tab='tab_relations')
+                filter_fields = f'"{self.field_id}":{{"value":"{self.feature_id}","filterSign":"="}}'
+                self._init_tab(self.complet_result, filter_fields)
+                self.tab_relations_loaded = True
+            # Tab 'Connections'
+            case 'tab_connections' if not self.tab_connections_loaded:
+                self._manage_dlg_widgets(self.complet_result, self.complet_result['body']['data'], False, tab='tab_connections')
+                filter_fields = f'"{self.field_id}":{{"value":"{self.feature_id}","filterSign":"="}}'
+                self._init_tab(self.complet_result, filter_fields)
+                self.tab_connections_loaded = True
+            # Tab 'Hydrometer'
+            case 'tab_hydrometer' if not self.tab_hydrometer_loaded:
+                self._manage_dlg_widgets(self.complet_result, self.complet_result['body']['data'], False, tab='tab_hydrometer')
+                filter_fields = f'"feature_id":{{"value":"{self.feature_id}","filterSign":"="}}'
+                self._init_tab(self.complet_result, filter_fields, id_name="feature_id")
+                self.tab_hydrometer_loaded = True
+            # Tab 'Hydrometer values'
+            case 'tab_hydrometer_val' if not self.tab_hydrometer_val_loaded:
+                self._manage_dlg_widgets(self.complet_result, self.complet_result['body']['data'], False, tab='tab_hydrometer_val')
+                filter_fields = f'"feature_id":{{"value":"{self.feature_id}","filterSign":"="}}'
+                self._init_tab(self.complet_result, filter_fields, id_name="feature_id")
+                self.tab_hydrometer_val_loaded = True
+            # Tab 'Visit'
+            case 'tab_visit' if not self.tab_visit_loaded:
+                self._manage_dlg_widgets(self.complet_result, self.complet_result['body']['data'], False, tab='tab_visit')
+                filter_fields = f'"{self.field_id}":{{"value":"{self.feature_id}","filterSign":"="}}'
+                self._init_tab(self.complet_result, filter_fields)
+                cmb_visit_class = self.dlg_cf.findChild(QComboBox, 'tab_visit_visit_class')
+                current_index = cmb_visit_class.currentIndex()
+                cmb_visit_class.currentIndexChanged.emit(current_index)
+                self.tab_visit_loaded = True
+            # Tab 'Event'
+            case 'tab_event' if not self.tab_event_loaded:
+                self._manage_dlg_widgets(self.complet_result, self.complet_result['body']['data'], False, tab='tab_event')
+                filter_fields = f'"{self.field_id}":{{"value":"{self.feature_id}","filterSign":"="}}'
+                self._init_tab(self.complet_result, filter_fields)
+                self.tab_event_loaded = True
+            # Tab 'Documents'
+            case 'tab_documents' if not self.tab_document_loaded:
+                self._manage_dlg_widgets(self.complet_result, self.complet_result['body']['data'], False, tab='tab_documents')
+                filter_fields = f'"{self.field_id}":{{"value":"{self.feature_id}","filterSign":"="}}'
+                self._init_tab(self.complet_result, filter_fields)
+                self.tab_document_loaded = True
+            # Tab 'Plan'
+            case 'tab_plan' if not self.tab_plan_loaded:
+                self._fill_tab_plan(self.complet_result)
+                self.tab_plan_loaded = True
 
 
     def _init_tab(self, complet_result, filter_fields='', id_name=None):
@@ -3127,20 +3122,23 @@ class GwInfo(QObject):
             # Get the point. Leave selection
             snapped_feat = self.snapper_manager.get_snapped_feature(result)
             feat_id = snapped_feat.attribute(f'{options[option][0]}')
-            if option in ('arc', 'node'):
-                widget = dialog.findChild(QWidget, f"{options[option][1]}")
-                widget.setFocus()
-                tools_qt.set_widget_text(dialog, widget, str(feat_id))
-                if str(feat_id) not in ('', None, -1, "None") and widget.property('columnname'):
-                        self.my_json[str(widget.property('columnname'))] = str(feat_id)
-            elif option == 'set_to_arc':
-                # functions called in -> getattr(self, options[option][0])(feat_id, child_type)
-                #       def _set_to_arc(self, dialog, feat_id, child_type, widget_name, simple=False)
-                getattr(self, options[option][1])(dialog, feat_id, child_type, widget_name)
-            elif option == 'set_to_arc_simple':
-                # functions called in -> getattr(self, options[option][0])(feat_id, child_type)
-                #       def _set_to_arc(self, dialog, feat_id, child_type, widget_name, simple=False)
-                getattr(self, options[option][1])(dialog, feat_id, child_type, widget_name, simple=True)
+
+            match option:
+                case 'arc' | 'node':
+                    widget = dialog.findChild(QWidget, f"{options[option][1]}")
+                    widget.setFocus()
+                    tools_qt.set_widget_text(dialog, widget, str(feat_id))
+                    if str(feat_id) not in ('', None, -1, "None") and widget.property('columnname'):
+                            self.my_json[str(widget.property('columnname'))] = str(feat_id)
+                case 'set_to_arc':
+                    # functions called in -> getattr(self, options[option][0])(feat_id, child_type)
+                    #       def _set_to_arc(self, dialog, feat_id, child_type, widget_name, simple=False)
+                    getattr(self, options[option][1])(dialog, feat_id, child_type, widget_name)
+                case 'set_to_arc_simple':
+                    # functions called in -> getattr(self, options[option][0])(feat_id, child_type)
+                    #       def _set_to_arc(self, dialog, feat_id, child_type, widget_name, simple=False)
+                    getattr(self, options[option][1])(dialog, feat_id, child_type, widget_name, simple=True)            
+                
         except Exception as e:
             tools_qgis.show_warning(f"Exception in info (def _get_id)", parameter=e)
         finally:

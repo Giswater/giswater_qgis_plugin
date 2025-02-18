@@ -498,32 +498,31 @@ class GwLoadProject(QObject):
     def _check_user_roles(self):
         """ Check roles of this user to show or hide toolbars """
 
-        if lib_vars.project_vars['project_role'] == 'role_basic':
-            return
-
-        elif lib_vars.project_vars['project_role'] == 'role_om':
-            self._enable_toolbar("om")
-            return
-
-        elif lib_vars.project_vars['project_role'] == 'role_edit':
-            self._enable_toolbar("om")
-            self._enable_toolbar("edit")
-
-        elif lib_vars.project_vars['project_role'] == 'role_epa':
-            self._enable_toolbar("om")
-            self._enable_toolbar("edit")
-            self._enable_toolbar("epa")
-            self._hide_button("72", False)
-
-        elif lib_vars.project_vars['project_role'] == 'role_master' or lib_vars.project_vars['project_role'] == 'role_admin' or lib_vars.project_vars['project_role'] == 'role_system':
-            self._enable_toolbar("om")
-            self._enable_toolbar("edit")
-            self._enable_toolbar("epa")
-            self._enable_toolbar("plan")
-            self._hide_button("72", False)
-
+        match lib_vars.project_vars['project_role']:
+            case 'role_basic':
+                return
+            case 'role_om':
+                self._enable_toolbar("om")
+                return
+            case 'role_edit':
+                self._enable_toolbar("om")
+                self._enable_toolbar("edit")
+            case 'role_epa':
+                self._enable_toolbar("om")
+                self._enable_toolbar("edit")
+                self._enable_toolbar("epa")
+                self._hide_button("72", False)
+            case 'role_master' | 'role_admin' | 'role_system':                
+                self._enable_toolbar("om")
+                self._enable_toolbar("edit")
+                self._enable_toolbar("epa")
+                self._enable_toolbar("plan")
+                self._hide_button("72", False)
+            case _:
+                tools_qgis.show_warning("No user roles found")
+            
         # Check if exist some feature_cat with active True on cat_feature table
-        if global_vars.feature_cat is None:
+        if global_vars.feature_cat is None:            
             self._enable_button("21", False)
             self._enable_button("22", False)
 

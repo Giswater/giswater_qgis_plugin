@@ -99,8 +99,7 @@ class GwSnapManager(object):
 
         if global_vars.use_gw_snapping is not True:
             return
-        if Qgis.QGIS_VERSION_INT >= 32600:
-            mode = Qgis.SnappingMode.AdvancedConfiguration
+        mode = Qgis.SnappingMode.AdvancedConfiguration
         snapping_options = self.get_snapping_options()
         if snapping_options:
             QgsProject.instance().blockSignals(True)

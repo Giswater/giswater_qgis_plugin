@@ -516,18 +516,21 @@ class GwI18NGenerator:
                 line += f'SET label = \'{lbl_value}\', tooltip = \'{tt_value}\' '
 
             # Clause WHERE for each context
-            if row['context'] == 'config_form_fields':
-                line += f'WHERE formname = \'{formname}\' AND formtype = \'{form_type}\' AND columnname = \'{source}\' '
-            elif row['context'] == 'config_form_tabs':
-                line += f'WHERE formname = \'{formname}\' AND formtype = \'{form_type}\' AND columnname = \'{source}\' '
-            elif row['context'] == 'config_form_groupbox':
-                line += f'WHERE formname = \'{formname}\' AND layout_if = \'{source}\' '
-            elif row['context'] == 'config_typevalue':
-                line += f'WHERE id = \'{source}\' '
-            elif row['context'] == 'config_param_system':
-                line += f'WHERE parameter = \'{source}\' '
-            elif row['context'] == 'sys_param_user':
-                line += f'WHERE id = \'{source}\' '
+            match row['context']:
+                case 'config_form_fields':
+                    line += f'WHERE formname = \'{formname}\' AND formtype = \'{form_type}\' AND columnname = \'{source}\' '
+                case 'config_form_tabs':
+                    line += f'WHERE formname = \'{formname}\' AND formtype = \'{form_type}\' AND columnname = \'{source}\' '
+                case 'config_form_groupbox':
+                    line += f'WHERE formname = \'{formname}\' AND layout_if = \'{source}\' '
+                case 'config_typevalue':
+                    line += f'WHERE id = \'{source}\' '
+                case 'config_param_system':
+                    line += f'WHERE parameter = \'{source}\' '
+                case 'sys_param_user':
+                    line += f'WHERE id = \'{source}\' '
+                case _:
+                    tools_qgis.show_warning("No WHERE conditions found")
 
             line += f';\n'
             file.write(line)
@@ -646,21 +649,24 @@ class GwI18NGenerator:
                          f'"tooltip":{{"column":"tooltip", "value":"{tt_value}"}}')
 
             # Clause WHERE for each context
-            if row['context'] == 'config_form_fields':
-                line += (f', "clause":"WHERE columnname = \'{source}\' '
+            match row['context']:
+                case 'config_form_fields':
+                    line += (f', "clause":"WHERE columnname = \'{source}\' '
                          f'AND formname = \'{form_name}\' AND formtype = \'{form_type}\'"')
-            elif row['context'] == 'config_form_tabs':
-                line += (f', "clause":"WHERE formname = \'{form_name}\' '
+                case 'config_form_tabs':
+                    line += (f', "clause":"WHERE formname = \'{form_name}\' '
                          f'AND columnname = \'{source}\' AND formtype = \'{form_type}\'"')
-            elif row['context'] == 'config_form_groupbox':
-                line += (f', "clause":"WHERE formname = \'{form_name}\' '
+                case 'config_form_groupbox':
+                    line += (f', "clause":"WHERE formname = \'{form_name}\' '
                          f'AND layout_id  = \'{source}\'"')
-            elif row['context'] == 'config_typevalue':
-                line += f', "clause":"WHERE typevalue = \'{form_name}\' AND id  = \'{source}\'"'
-            elif row['context'] == 'config_param_system':
-                line += f', "clause":"WHERE parameter = \'{source}\'"'
-            elif row['context'] == 'sys_param_user':
-                line += f', "clause":"WHERE id = \'{source}\'"'
+                case 'config_typevalue':
+                    line += f', "clause":"WHERE typevalue = \'{form_name}\' AND id  = \'{source}\'"'
+                case 'config_param_system':
+                    line += f', "clause":"WHERE parameter = \'{source}\'"'
+                case 'sys_param_user':
+                    line += f', "clause":"WHERE id = \'{source}\'"'
+                case _:
+                    tools_qgis.show_warning("No WHERE conditions found")
 
             line += f'}}}}$$);\n'
             file.write(line)

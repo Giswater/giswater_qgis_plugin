@@ -2663,26 +2663,8 @@ class GwNonVisual:
         tools_qt.set_combo_value(cmb_lidtype, str(lidtype), 0, add_new=False)
 
         for i in range(dialog.tab_lidlayers.count()):
-            if Qgis.QGIS_VERSION_INT >= 32000:
-                if not dialog.tab_lidlayers.isTabVisible(i):
-                    continue
-            else:
-                if not dialog.tab_lidlayers.isTabEnabled(i):
-                    continue
-
-                # List with all QLineEdit children
-                child_list = dialog.tab_lidlayers.widget(i).children()
-                visible_widgets = [widget for widget in child_list if
-                                   type(widget) == QLineEdit or type(widget) == QComboBox]
-                visible_widgets = self._order_list(visible_widgets)
-
-                for y, widget in enumerate(visible_widgets):
-                    value = tools_gw.get_config_parser('nonvisual_lids', f"{widget.objectName()}", "user", "session")
-
-                    if type(widget) == QLineEdit:
-                        tools_qt.set_widget_text(dialog, widget, str(value))
-                    else:
-                        tools_qt.set_combo_value(widget, str(value), 0, add_new=False)
+            if not dialog.tab_lidlayers.isTabVisible(i):
+                continue
 
 
     def _save_lids_widgets(self, dialog):
@@ -2742,16 +2724,10 @@ class GwNonVisual:
                 tab_lidlayers.setCurrentIndex(i)
 
             if tab_name not in lidtabs:
-                if Qgis.QGIS_VERSION_INT >= 32000:
-                    tab_lidlayers.setTabVisible(i, False)
-                else:
-                    tab_lidlayers.setTabEnabled(i, False)
+                tab_lidlayers.setTabVisible(i, False)
 
             else:
-                if Qgis.QGIS_VERSION_INT >= 32000:
-                    tab_lidlayers.setTabVisible(i, True)
-                else:
-                    tab_lidlayers.setTabEnabled(i, True)
+                tab_lidlayers.setTabVisible(i, True)
 
                 if tab_name == 'DRAIN':
                     if lid_id == 'RD':
@@ -2782,12 +2758,8 @@ class GwNonVisual:
 
         # Hide widgets in list
         for i in range(dialog.tab_lidlayers.count()):
-            if Qgis.QGIS_VERSION_INT >= 32000:
-                if not dialog.tab_lidlayers.isTabVisible(i):
-                    continue
-            else:
-                if not dialog.tab_lidlayers.isTabEnabled(i):
-                    continue
+            if not dialog.tab_lidlayers.isTabVisible(i):
+                continue
 
             # List of children
             list = dialog.tab_lidlayers.widget(i).children()
