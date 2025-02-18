@@ -245,7 +245,6 @@ BEGIN
 			and column_name!='''||v_feature_type||'_id'''
 			INTO v_inp_fields;
 
-			RAISE EXCEPTION 'v_inp_fields,%',v_inp_fields;
 
 
 			--select columns from v_feature_childtable_name.* table without repeating the identifiers
