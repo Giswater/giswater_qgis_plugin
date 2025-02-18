@@ -912,7 +912,7 @@ class GwImportSwmm:
 
         self._calculate_elapsed_time(dialog)
 
-        if isdeleted(self.parse_inp_task) or not self.parse_inp_task.isActive():
+        if isdeleted(self.import_inp_task) or not self.import_inp_task.isActive():
             self.timer.stop()
             self.dlg_config.progressBar.setVisible(False)
 
