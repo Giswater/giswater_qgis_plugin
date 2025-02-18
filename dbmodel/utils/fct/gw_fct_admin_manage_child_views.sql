@@ -70,8 +70,7 @@ v_error_context text;
 v_newcolumn text;
 v_query json;
 v_sys_feature_class text;
-v_inp_fields TEXT;
-v_feature_inp_table TEXT;
+
 
 BEGIN
 
@@ -204,7 +203,7 @@ BEGIN
 
 	ELSIF v_action = 'MULTI-CREATE' THEN
 
-		v_querytext = 'SELECT cat_feature.* FROM cat_feature WHERE feature_type NOT IN (''LINK'') ORDER BY id';
+		v_querytext = 'SELECT cat_feature.* FROM cat_feature WHERE feature_type NOT IN (''LINK'', ''FLWREG'') ORDER BY id';
 
 		FOR rec IN EXECUTE v_querytext LOOP
 
@@ -247,12 +246,6 @@ BEGIN
 			INTO v_man_fields;
 
 			RAISE NOTICE '4/addfields=1,v_man_fields,%',v_man_fields;
-			--select columns from inp_* table without repeating the identifier
-			EXECUTE 'SELECT DISTINCT string_agg(concat('''||v_feature_inp_table||'.'',column_name)::text,'', '')
-			FROM information_schema.columns where table_name='||quote_literal(v_feature_inp_table)||' and table_schema='''||v_schemaname||'''
-			and column_name!='''||v_feature_type||'_id'''
-			INTO v_inp_fields;
-
 
 
 			--select columns from v_feature_childtable_name.* table without repeating the identifiers
@@ -311,7 +304,6 @@ BEGIN
 					"feature_childtable_name":"'||v_feature_childtable_name||'",
 					"feature_childtable_fields":"'||v_feature_childtable_fields||'",
 					"man_fields":"'||v_man_fields||'",
-					"inp_fields":"'||v_inp_fields||'",
 					"view_type":"'||v_view_type||'"
 					}
 				}';
@@ -347,7 +339,6 @@ BEGIN
 					"feature_childtable_name":"'||v_feature_childtable_name||'",
 					"feature_childtable_fields":"'||v_feature_childtable_fields||'",
 					"man_fields":"'||v_man_fields||'",
-					"inp_fields":"'||v_inp_fields||'",
 					"view_type":"'||v_view_type||'"
 					}
 				}';
@@ -380,7 +371,6 @@ BEGIN
 		v_feature_class  = (SELECT lower(feature_class) FROM cat_feature where id=v_cat_feature);
 		v_feature_childtable_name := 'man_' || v_feature_type || '_' || lower(v_cat_feature);
 
-
 		--create a child view name if doesnt exist
 		IF (SELECT child_layer FROM cat_feature WHERE id=v_cat_feature) IS NULL THEN
 			UPDATE cat_feature SET child_layer=concat('ve_',lower(feature_type),'_',lower(id)) WHERE id=v_cat_feature;
@@ -410,16 +400,6 @@ BEGIN
 		INTO v_man_fields;
 
 		RAISE NOTICE 'v_man_fields,%',v_man_fields;
-		--select columns from inp_* table without repeating the identifier
-
-	
-
-		EXECUTE
-		'SELECT DISTINCT string_agg(concat('''||v_feature_inp_table||'.'',column_name)::text,'', '')
-		FROM information_schema.columns where table_name='||quote_literal(v_feature_inp_table)||' and table_schema='''||v_schemaname||'''
-		and column_name!='''||v_feature_type||'_id'''
-		INTO v_inp_fields;
-
 
 
 		--select columns from v_feature_childtable_name.* table without repeating the identifiers
@@ -481,7 +461,6 @@ BEGIN
 				"feature_childtable_name":"'||v_feature_childtable_name||'",
 				"feature_childtable_fields":"'||v_feature_childtable_fields||'",
 				"man_fields":"'||v_man_fields||'",
-				"inp_fields:"'||v_inp_fields||'",
 				"view_type":"'||v_view_type||'"
 				}
 			}';
@@ -509,7 +488,6 @@ BEGIN
 			RAISE NOTICE 'SIMPLE - VIEW TYPE  ,%', v_view_type;
 
 			v_man_fields := COALESCE(v_man_fields, 'null');
-			v_inp_fields := COALESCE(v_inp_fields, 'null');
 			v_feature_childtable_fields := COALESCE(v_feature_childtable_fields, 'null');
 
 			v_data_view = '{
@@ -521,7 +499,6 @@ BEGIN
 				"feature_childtable_name":"'||v_feature_childtable_name||'",
 				"feature_childtable_fields":"'||v_feature_childtable_fields||'",
 				"man_fields":"'||v_man_fields||'",
-				"inp_fields":"'||v_inp_fields||'",
 				"view_type":"'||v_view_type||'"
 				}
 			}';
