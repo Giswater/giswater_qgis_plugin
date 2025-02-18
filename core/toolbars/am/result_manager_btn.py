@@ -50,7 +50,7 @@ class GwResultManagerButton(GwAction):
         self.dlg_priority_manager = GwPriorityManagerUi(self)
 
         # Fill filters
-        rows = tools_db.get_rows("SELECT id, idval FROM asset.value_result_type")
+        rows = tools_db.get_rows("SELECT id, idval FROM am.value_result_type")
         tools_qt.fill_combo_values(
             self.dlg_priority_manager.cmb_type, rows, 1, add_empty=True
         )
@@ -62,7 +62,7 @@ class GwResultManagerButton(GwAction):
             self.dlg_priority_manager.cmb_expl, rows, 1, add_empty=True
         )
 
-        rows = tools_db.get_rows("SELECT id, idval FROM asset.value_status")
+        rows = tools_db.get_rows("SELECT id, idval FROM am.value_status")
         tools_qt.fill_combo_values(
             self.dlg_priority_manager.cmb_status, rows, 1, add_empty=True
         )
@@ -71,11 +71,11 @@ class GwResultManagerButton(GwAction):
         self._fill_table(
             self.dlg_priority_manager,
             self.dlg_priority_manager.tbl_results,
-            "asset.cat_result",
+            "am.cat_result",
             [
-                (2, "asset.value_result_type", "id", "idval"),
+                (2, "am.value_result_type", "id", "idval"),
                 (5, f"{lib_vars.schema_name}.exploitation", "expl_id", "name"),
-                (10, "asset.value_status", "id", "idval"),
+                (10, "am.value_status", "id", "idval"),
             ],
         )
         tools_gw.set_tablemodel_config(
@@ -87,7 +87,7 @@ class GwResultManagerButton(GwAction):
         rows = tools_db.get_rows(
             """
             select columnname, alias
-            from asset.config_form_tableview
+            from am.config_form_tableview
             where objectname = 'cat_result'
             """
         )
@@ -102,12 +102,12 @@ class GwResultManagerButton(GwAction):
 
         # Create dicts for i18n labels:
         self._value_status = {}
-        for id, idval in tools_db.get_rows("select id, idval from asset.value_status"):
+        for id, idval in tools_db.get_rows("select id, idval from am.value_status"):
             self._value_status[idval] = id
 
         self._value_result_type = {}
         for id, idval in tools_db.get_rows(
-            "select id, idval from asset.value_result_type"
+            "select id, idval from am.value_result_type"
         ):
             self._value_result_type[idval] = id
 
@@ -214,7 +214,7 @@ class GwResultManagerButton(GwAction):
             row = tools_db.get_row(
                 f"""
                 SELECT result_name, status 
-                FROM asset.cat_result 
+                FROM am.cat_result 
                 WHERE result_id = {result_id}
                 """
             )
@@ -232,7 +232,7 @@ class GwResultManagerButton(GwAction):
                 ):
                     tools_db.execute_sql(
                         f"""
-                        DELETE FROM asset.cat_result
+                        DELETE FROM am.cat_result
                         WHERE result_id = {result_id}
                         """
                     )
@@ -252,7 +252,7 @@ class GwResultManagerButton(GwAction):
         new_status = tools_qt.get_combo_value(self.dlg_status, "cmb_status")
         tools_db.execute_sql(
             f"""
-            UPDATE asset.cat_result
+            UPDATE am.cat_result
             SET status = '{new_status}'
             WHERE result_id = {result_id}
             """
@@ -351,7 +351,7 @@ class GwResultManagerButton(GwAction):
         row = tools_db.get_row(
             f"""
             SELECT result_id, result_name, status
-            FROM asset.cat_result
+            FROM am.cat_result
             WHERE result_id = {selected[0]}
             """
         )
@@ -366,7 +366,7 @@ class GwResultManagerButton(GwAction):
 
         self.dlg_status = GwStatusSelectorUi(self)
         self.dlg_status.lbl_result.setText(f"{result_id}: {result_name}")
-        rows = tools_db.get_rows("SELECT id, idval FROM asset.value_status")
+        rows = tools_db.get_rows("SELECT id, idval FROM am.value_status")
         tools_qt.fill_combo_values(self.dlg_status.cmb_status, rows, 1)
         tools_qt.set_combo_value(self.dlg_status.cmb_status, status, 0, add_new=False)
         self.dlg_status.btn_accept.clicked.connect(
@@ -394,7 +394,7 @@ class GwResultManagerButton(GwAction):
         if iscorporate:
             tools_db.execute_sql(
                 f"""
-                UPDATE asset.cat_result
+                UPDATE am.cat_result
                 SET iscorporate = FALSE
                 WHERE result_id = {result_id}
                 """
@@ -404,7 +404,7 @@ class GwResultManagerButton(GwAction):
 
         # Get the exploitations of result_id
         sql = (
-            f"SELECT DISTINCT expl_id FROM asset.arc_output WHERE result_id={result_id}"
+            f"SELECT DISTINCT expl_id FROM am.arc_output WHERE result_id={result_id}"
         )
         rows = tools_db.get_rows(sql)
         result_expl = set()
@@ -412,7 +412,7 @@ class GwResultManagerButton(GwAction):
             result_expl = {row[0] for row in rows}
 
         # get the result_ids that arecorporate and it exploitations
-        sql = "SELECT DISTINCT result_id, expl_id FROM asset.v_asset_arc_corporate"
+        sql = "SELECT DISTINCT result_id, expl_id FROM am.v_asset_arc_corporate"
         rows = tools_db.get_rows(sql)
         corporate_expl = {}
         if rows:
@@ -433,7 +433,7 @@ class GwResultManagerButton(GwAction):
         if not conflict_results:
             tools_db.execute_sql(
                 f"""
-                UPDATE asset.cat_result
+                UPDATE am.cat_result
                 SET iscorporate = TRUE
                 WHERE result_id = {result_id}
                 """
@@ -457,11 +457,11 @@ class GwResultManagerButton(GwAction):
 
         tools_db.execute_sql(
             f"""
-            UPDATE asset.cat_result
+            UPDATE am.cat_result
             SET iscorporate = FALSE
             WHERE result_id IN ({conflict_results_str});
 
-            UPDATE asset.cat_result
+            UPDATE am.cat_result
             SET iscorporate = TRUE
             WHERE result_id = {result_id};
             """

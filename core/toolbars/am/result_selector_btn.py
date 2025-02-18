@@ -44,7 +44,7 @@ class GwResultSelectorButton(GwAction):
         results = tools_db.get_rows(
             """
             select result_id id, result_name idval, descript
-            from asset.cat_result
+            from am.cat_result
             """
         )
         if not results:
@@ -57,7 +57,7 @@ class GwResultSelectorButton(GwAction):
         selected_main = tools_db.get_row(
             """
             select result_id
-            from asset.selector_result_main
+            from am.selector_result_main
             where cur_user = current_user
             """
         )
@@ -71,7 +71,7 @@ class GwResultSelectorButton(GwAction):
         selected_compare = tools_db.get_row(
             """
             select result_id
-            from asset.selector_result_compare
+            from am.selector_result_compare
             where cur_user = current_user
             """
         )
@@ -88,14 +88,14 @@ class GwResultSelectorButton(GwAction):
         result_compare = tools_qt.get_combo_value(dlg, dlg.cmb_result_compare)
         tools_db.execute_sql(
             f"""
-            delete from asset.selector_result_main
+            delete from am.selector_result_main
                 where cur_user = current_user;
-            delete from asset.selector_result_compare
+            delete from am.selector_result_compare
                 where cur_user = current_user;
-            insert into asset.selector_result_main
+            insert into am.selector_result_main
                 (result_id, cur_user)
                 values ({result_main}, current_user);
-            insert into asset.selector_result_compare
+            insert into am.selector_result_compare
                 (result_id, cur_user)
                 values ({result_compare}, current_user);
             """

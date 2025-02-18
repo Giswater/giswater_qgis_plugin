@@ -89,8 +89,8 @@ class GwConfigCatalogButton:
 
     def save(self, result_id):
         sql = f"""
-            delete from asset.config_catalog where result_id = {result_id};
-            insert into asset.config_catalog
+            delete from am.config_catalog where result_id = {result_id};
+            insert into am.config_catalog
                 (result_id, arccat_id, dnom, cost_constr, cost_repmain, compliance)
             values
         """
@@ -179,8 +179,8 @@ class ConfigMaterial:
 
     def save(self, result_id):
         sql = f"""
-            delete from asset.config_material where result_id = {result_id};
-            insert into asset.config_material
+            delete from am.config_material where result_id = {result_id};
+            insert into am.config_material
                 (result_id, material, pleak,
                 age_max, age_med, age_min,
                 builtdate_vdef, compliance)
@@ -347,7 +347,7 @@ class CalculatePriority:
                     material_id,
                     features,
                     dnom
-                FROM asset.cat_result
+                FROM am.cat_result
                 WHERE result_id = {result_id}
                 """
             )
@@ -402,9 +402,9 @@ class CalculatePriority:
         self.qtbl_catalog.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.qtbl_catalog.setSortingEnabled(True)
         if self.mode == "new":
-            sql = "select * from asset.config_catalog_def"
+            sql = "select * from am.config_catalog_def"
         else:
-            sql = f"select * from asset.config_catalog where result_id = {self.result['id']}"
+            sql = f"select * from am.config_catalog where result_id = {self.result['id']}"
         key = "arccat_id" if self.config.method == "WM" else "dnom"
 
         configcatalog = GwConfigCatalogButton(tools_db.get_rows(sql), key)
@@ -421,9 +421,9 @@ class CalculatePriority:
         self.qtbl_material = self.dlg_priority.findChild(QTableWidget, "tbl_material")
         self.qtbl_material.setSelectionBehavior(QAbstractItemView.SelectRows)
         if self.mode == "new":
-            sql = "select * from asset.config_material_def"
+            sql = "select * from am.config_material_def"
         else:
-            sql = f"select * from asset.config_material where result_id = {self.result['id']}"
+            sql = f"select * from am.config_material where result_id = {self.result['id']}"
         configmaterial = configmaterial_from_sql(sql, self.config.unknown_material)
         configmaterial.fill_table_widget(self.qtbl_material)
         self.qtbl_material.horizontalHeader().setSectionResizeMode(
@@ -493,7 +493,7 @@ class CalculatePriority:
                     label,
                     datatype,
                     widgettype
-                from asset.config_engine_def
+                from am.config_engine_def
                 where method = '{self.config.method}'
                 """
             )
@@ -508,8 +508,8 @@ class CalculatePriority:
                     d.label,
                     d.datatype,
                     d.widgettype
-                from asset.config_engine as c
-                join asset.config_engine_def as d using (parameter)
+                from am.config_engine as c
+                join am.config_engine_def as d using (parameter)
                 where c.result_id = {self.result["id"]}
                 and d.method = '{self.config.method}'
                 """
@@ -576,7 +576,7 @@ class CalculatePriority:
                 self.dlg_priority.cmb_material.setVisible(False)
             # Hide Explotation filter if there's arcs without expl_id
             null_expl = tools_db.get_row(
-                "SELECT 1 FROM asset.ext_arc_asset WHERE expl_id IS NULL"
+                "SELECT 1 FROM am.ext_arc_asset WHERE expl_id IS NULL"
             )
             if not self.result["expl_id"] and (
                 self.config.show_exploitation is not True or null_expl
@@ -585,7 +585,7 @@ class CalculatePriority:
                 self.dlg_priority.cmb_expl_selection.setVisible(False)
             # Hide Presszone filter if there's arcs without presszone_id
             null_presszone = tools_db.get_row(
-                "SELECT 1 FROM asset.ext_arc_asset WHERE presszone_id IS NULL"
+                "SELECT 1 FROM am.ext_arc_asset WHERE presszone_id IS NULL"
             )
             if not self.result["presszone_id"] and (
                 self.config.show_presszone is not True or null_presszone
@@ -647,7 +647,7 @@ class CalculatePriority:
         data_checks = tools_db.get_rows(
             f"""
             with assets as (
-                select * from asset.ext_arc_asset {filters}),
+                select * from am.ext_arc_asset {filters}),
             list_invalid_arccat_ids as (
                 select count(*), coalesce(arccat_id, 'NULL')
                 from assets
@@ -1013,7 +1013,7 @@ class CalculatePriority:
             return
         if self.mode != "edit" and tools_db.get_row(
             f"""
-            select * from asset.cat_result
+            select * from am.cat_result
             where result_name = '{result_name}'
             """
         ):
@@ -1116,7 +1116,7 @@ class CalculatePriority:
         dlg = self.dlg_priority
 
         # Combo status
-        rows = tools_db.get_rows("SELECT id, idval FROM asset.value_status")
+        rows = tools_db.get_rows("SELECT id, idval FROM am.value_status")
         tools_qt.fill_combo_values(dlg.cmb_status, rows, 1)
         tools_qt.set_combo_value(dlg.cmb_status, "ON PLANNING", 0, add_new=False)
         tools_qt.set_combo_item_select_unselectable(

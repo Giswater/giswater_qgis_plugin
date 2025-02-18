@@ -23,7 +23,7 @@ def _get_ui_class(ui_file_name, subfolder='shared'):
     """ Get UI Python class from @ui_file_name """
 
     # Folder that contains UI files
-    if subfolder in ('basic', 'edit', 'epa', 'om', 'plan', 'utilities', 'toc', 'assetmanage'):
+    if subfolder in ('basic', 'edit', 'epa', 'om', 'plan', 'utilities', 'toc', 'am'):
         ui_folder_path = os.path.dirname(__file__) + os.sep + 'toolbars' + os.sep + subfolder
     else:
         ui_folder_path = os.path.dirname(__file__) + os.sep + subfolder
@@ -864,8 +864,8 @@ class GwReplaceInFileUi(GwDialog, FORM_CLASS):
     UINAME = UINAME
 # endregion
 
-# region assetmanage
-CONTEXT = "assetmanage"
+# region am
+CONTEXT = "am"
 
 UINAME = "result_selector"
 FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')

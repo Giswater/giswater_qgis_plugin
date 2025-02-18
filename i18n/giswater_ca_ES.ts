@@ -137,7 +137,7 @@
 			<translation>Giswater - OM</translation>
 		</message>
 		<message>
-			<source>toolbar_assetmanage_name</source>
+			<source>toolbar_am_name</source>
 			<translation>Giswater - Asset Manager</translation>
 		</message>
 		<message>
@@ -707,7 +707,8 @@
 		</message>
 		<message>
 			<source>No results found. Please check values set on selector of state and exploitation</source>
-			<translation>No s'han trobat resultats. Si us plau, comproveu els valors establerts al selector d'estat i explotació
+			<translation>No s'han trobat resultats. Si us plau, comproveu els valors establerts al selector d'estat i explotació
+
 </translation>
 		</message>
 		<message>
@@ -1367,8 +1368,10 @@
 			<translation>Calculant valors</translation>
 		</message>
 		<message>
-			<source>The procedure will delete features on database unless it is a node that doesn't divide arc.\n
- Please ensure that features has no undelete value on true.\n
+			<source>The procedure will delete features on database unless it is a node that doesn't divide arc.\n
+
+ Please ensure that features has no undelete value on true.\n
+
  On the other hand you must know that traceability table will storage precedent information.</source>
 			<translation>El procediment eliminarà elements de xaraxa en la base de dades a menys que sigui un node que no divideix l'arc. \ N Assegureu-vos que els elements de la xarxa no tinguin un valor de recuperació vertader.\ NPer altra banda, ha de saber que la traçabilitat emmagatzemarà informació precedent.</translation>
 		</message>

@@ -459,7 +459,7 @@ class GwLoadProject(QObject):
                f"WHERE schema_name ILIKE '%{project_name}%'ORDER BY schema_name")
         rows = tools_db.get_rows(sql, commit=False)
         if rows is not None:
-            self._enable_toolbar("assetmanage")
+            self._enable_toolbar("am")
 
     def _create_toolbar(self, toolbar_id):
 
