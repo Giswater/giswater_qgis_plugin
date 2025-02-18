@@ -14,7 +14,7 @@ RETURNS json AS
 $BODY$
 
 /* EXAMPLE OF CALL
-    SELECT SCHEMA_NAME.gw_fct_grafanalytics_macrominsector('{"data":{"parameters":{}}}');
+    SELECT SCHEMA_NAME.gw_fct_graphanalytics_macrominsector('{"data":{"parameters":{}}}');
 */
 
 DECLARE
@@ -53,31 +53,108 @@ BEGIN
     UPDATE node n SET macrominsector_id = c.component
     FROM pgr_connectedcomponents('
             SELECT arc_id::int AS id, node_1::int AS source, node_2::int AS target, 1 AS cost 
-            FROM arc WHERE node_1 IS NOT NULL AND node_2 IS NOT NULL AND state = 1
+            FROM arc 
+            WHERE state = 1  
+            AND node_1 IS NOT NULL AND node_2 IS NOT NULL
+            UNION ALL
+            SELECT a.arc_id::int AS id, a.node_1::int AS source, a.node_2::int AS target, 1 AS cost 
+            FROM arc a 
+            JOIN plan_psector_x_arc pa ON pa.arc_id = a.arc_id 
+            JOIN plan_psector p ON p.psector_id = pa.psector_id 
+            WHERE p.active = TRUE AND a.state = 2
+            AND a.node_1 IS NOT NULL AND a.node_2 IS NOT NULL
         ') c
     WHERE n.node_id::int = c.node;
 
-    UPDATE arc a SET macrominsector_id = n.macrominsector_id
-    FROM node n
-    WHERE a.node_2 = n.node_id AND n.macrominsector_id <> 0 AND a.state = 1;
+    WITH selected_arcs AS 
+    (SELECT arc_id, node_1
+    FROM arc 
+    WHERE state = 1  
+    AND node_1 IS NOT NULL AND node_2 IS NOT NULL
+    UNION ALL
+    SELECT a.arc_id, a.node_1
+    FROM arc a 
+    JOIN plan_psector_x_arc pa ON pa.arc_id = a.arc_id 
+    JOIN plan_psector p ON p.psector_id = pa.psector_id 
+    WHERE p.active = TRUE AND a.state = 2
+    AND a.node_1 IS NOT NULL AND a.node_2 IS NOT NULL
+    )
+    UPDATE arc a SET macrominsector_id =n.macrominsector_id
+    FROM selected_arcs sa 
+    JOIN node n ON sa.node_1 = n.node_id 
+    WHERE a.arc_id = sa.arc_id AND n.macrominsector_id <> 0
+    ;
 
+    WITH selected_connec AS 
+    (SELECT connec_id, arc_id
+    FROM connec 
+    WHERE state = 1  
+    UNION ALL
+    SELECT c.connec_id, c.arc_id
+    FROM connec c 
+    JOIN plan_psector_x_connec pc ON pc.connec_id = c.connec_id 
+    JOIN plan_psector p ON p.psector_id = pc.psector_id 
+    WHERE p.active = TRUE AND c.state = 2
+    )
     UPDATE connec c SET macrominsector_id = a.macrominsector_id
-    FROM arc a
-    WHERE c.arc_id = a.arc_id AND a.macrominsector_id <> 0 AND c.state = 1;
+    FROM selected_connec sa 
+    JOIN arc a ON sa.arc_id = a.arc_id
+    WHERE c.connec_id = sa.connec_id AND a.macrominsector_id <> 0
+    ;
 
-
-    UPDATE link l SET macrominsector_id = c.macrominsector_id
-    FROM connec c
-    WHERE c.connec_id = l.feature_id AND c.feature_type = 'CONNEC' AND c.macrominsector_id <> 0 AND l.state = 1;
+    WITH selected_link AS 
+    (SELECT l.link_id, c.arc_id
+    FROM link l
+    JOIN connec c ON l.feature_id = c.connec_id 
+    WHERE l.state = 1 AND l.feature_type = 'CONNEC' 
+    UNION ALL
+    SELECT l.link_id, pc.arc_id
+    FROM link l 
+    JOIN plan_psector_x_connec pc ON pc.link_id = l.link_id 
+    JOIN plan_psector p ON p.psector_id = pc.psector_id 
+    WHERE p.active = TRUE AND l.state = 2 AND l.feature_type = 'CONNEC'
+    )
+    UPDATE link l SET macrominsector_id = a.macrominsector_id
+    FROM selected_link sa 
+    JOIN arc a ON sa.arc_id = a.arc_id
+    WHERE l.link_id = sa.link_id AND a.macrominsector_id <> 0
+    ;
 
     IF v_project_type = 'UD' THEN
-        UPDATE gully g SET macrominsector_id = a.macrominsector_id
-        FROM arc a
-        WHERE g.arc_id = a.arc_id AND a.macrominsector_id <> 0 AND g.state = 1;
+        WITH selected_gully AS 
+        (SELECT gully_id, arc_id
+        FROM gully 
+        WHERE state = 1  
+        UNION ALL
+        SELECT c.gully_id, c.arc_id
+        FROM gully c 
+        JOIN plan_psector_x_gully pc ON pc.gully_id = c.gully_id 
+        JOIN plan_psector p ON p.psector_id = pc.psector_id 
+        WHERE p.active = TRUE AND c.state = 2
+        )
+        UPDATE gully c SET macrominsector_id = a.macrominsector_id
+        FROM selected_gully sa 
+        JOIN arc a ON sa.arc_id = a.arc_id
+        WHERE c.gully_id = sa.gully_id AND a.macrominsector_id <> 0
+        ;
 
-        UPDATE link l SET macrominsector_id = g.macrominsector_id
-        FROM gully g
-        WHERE g.gully_id = l.feature_id AND g.feature_type = 'GULLY' AND g.macrominsector_id <> 0 AND l.state = 1;
+        WITH selected_link AS 
+        (SELECT l.link_id, c.arc_id
+        FROM link l
+        JOIN gully c ON l.feature_id = c.gully_id 
+        WHERE l.state = 1 AND l.feature_type = 'GULLY' 
+        UNION ALL
+        SELECT l.link_id, pc.arc_id
+        FROM link l 
+        JOIN plan_psector_x_gully pc ON pc.link_id = l.link_id 
+        JOIN plan_psector p ON p.psector_id = pc.psector_id 
+        WHERE p.active = TRUE AND l.state = 2 AND l.feature_type = 'GULLY'
+        )
+        UPDATE link l SET macrominsector_id = a.macrominsector_id
+        FROM selected_link sa 
+        JOIN arc a ON sa.arc_id = a.arc_id
+        WHERE l.link_id = sa.link_id AND a.macrominsector_id <> 0
+        ;
      ELSIF v_project_type = 'WS' THEN
         UPDATE minsector_graph m SET macrominsector_id = n.macrominsector_id
         FROM node n
