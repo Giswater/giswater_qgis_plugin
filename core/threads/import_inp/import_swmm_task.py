@@ -841,7 +841,7 @@ class GwImportInpTask(GwTask):
                 elif k == 'SOIL':
                     lid_values = (lid_name, k, v.Thick, v.Por, v.FC, v.WP, v.Ksat, v.Kcoeff, v.Suct)
                 elif k == 'PAVEMENT':
-                    lid_values = (lid_name, k, v.Thick, v.Vratio, v.FracImp, v.Perm, v.Vclog, v.Treg, v.Freg)
+                    lid_values = (lid_name, k, v.Thick, v.Vratio, v.FracImp, v.Perm, v.Vclog, v.regeneration_interval, v.regeneration_fraction)
                 elif k == 'STORAGE':
                     lid_values = (lid_name, k, v.Height, v.Vratio, v.Seepage, v.Vclog, v.Covrd, None, None)
                 elif k == 'DRAIN':
