@@ -312,9 +312,11 @@ class GwAdminButton:
         return result
 
 
-    def cancel_task(self):
-        if hasattr(self, 'task_create_schema') and not isdeleted(self.task_create_schema):
-            self.task_create_schema.cancel()
+    def cancel_task(self, task_name: str):
+        if hasattr(self, task_name):
+            task = getattr(self, task_name)
+            if not isdeleted(task):
+                task.cancel()
 
 
     # TODO: Rename this function => Update all versions from changelog file.
@@ -472,7 +474,7 @@ class GwAdminButton:
         self.dlg_readsql_create_asset_project.key_escape.connect(partial(tools_gw.close_dialog, self.dlg_readsql_create_asset_project, False))
 
         # Set signals
-        #self.dlg_readsql_create_asset_project.btn_cancel_task.clicked.connect(self.cancel_task)
+        self.dlg_readsql_create_asset_project.btn_cancel_task.clicked.connect(partial(self.cancel_task, 'task_create_asset_schema'))
         self.dlg_readsql_create_asset_project.btn_accept.clicked.connect(partial(self.create_project_data_asset_schema))
         self.dlg_readsql_create_asset_project.btn_close.clicked.connect(
                 partial(tools_gw.close_dialog, self.dlg_readsql_create_asset_project, False))
@@ -1645,8 +1647,7 @@ class GwAdminButton:
 
     def _set_signals_create_project(self):
         """"""
-
-        self.dlg_readsql_create_project.btn_cancel_task.clicked.connect(self.cancel_task)
+        self.dlg_readsql_create_project.btn_cancel_task.clicked.connect(partial(self.cancel_task, 'task_create_schema'))
         self.dlg_readsql_create_project.btn_accept.clicked.connect(partial(self.create_project_data_schema))
         self.dlg_readsql_create_project.btn_close.clicked.connect(
             partial(self._close_dialog_admin, self.dlg_readsql_create_project))
