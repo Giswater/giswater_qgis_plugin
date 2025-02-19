@@ -30,10 +30,12 @@ from qgis.utils import reloadPlugin
 from .gis_file_create import GwGisFileCreate
 from ..threads.task import GwTask
 from ..ui.ui_manager import GwAdminUi, GwAdminDbProjectUi, GwAdminRenameProjUi, GwAdminProjectInfoUi, \
-    GwAdminGisProjectUi, GwAdminFieldsUi, GwCredentialsUi, GwReplaceInFileUi, GwAdminDbProjectAssetUi
+    GwAdminGisProjectUi, GwAdminFieldsUi, GwCredentialsUi, GwReplaceInFileUi, GwAdminDbProjectAssetUi, GwSchemaI18NUpdateUi
+
 from ..utils import tools_gw
 from ... import global_vars
 from .i18n_generator import GwI18NGenerator
+from .schema_i18n_update import GwSchemaI18NUpdate
 from ...libs import lib_vars, tools_qt, tools_qgis, tools_log, tools_db, tools_os
 from ..ui.docker import GwDocker
 from ..threads.project_schema_create import GwCreateSchemaTask
@@ -781,6 +783,7 @@ class GwAdminButton:
         self.dlg_readsql.btn_create_field.clicked.connect(partial(self._open_manage_field, 'create'))
         self.dlg_readsql.btn_update_field.clicked.connect(partial(self._open_manage_field, 'update'))
         self.dlg_readsql.btn_delete_field.clicked.connect(partial(self._open_manage_field, 'delete'))
+        self.dlg_readsql.btn_update_translation.clicked.connect(partial(self._update_translations))
 
         self.dlg_readsql.btn_create_asset.clicked.connect(partial(self._open_create_asset_project))
 
@@ -791,6 +794,14 @@ class GwAdminButton:
         qm_gen.init_dialog()
         dict_info = tools_gw.get_project_info(self._get_schema_name())
         qm_gen.pass_schema_info(dict_info, self._get_schema_name())
+
+    def _update_translations(self):
+        """ Initialize the translation functionalities """
+
+        qm_i18n_up = GwSchemaI18NUpdate()
+        qm_i18n_up.init_dialog()
+        dict_info = tools_gw.get_project_info(self._get_schema_name())
+        qm_i18n_up.pass_schema_info(dict_info, self._get_schema_name())
 
 
     def _info_show_database(self, connection_status=True, username=None, show_dialog=False):

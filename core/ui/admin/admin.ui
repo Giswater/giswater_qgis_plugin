@@ -36,7 +36,7 @@
        <bool>true</bool>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab_general">
        <attribute name="title">
@@ -395,31 +395,60 @@
             </rect>
            </property>
            <layout class="QGridLayout" name="gridLayout_12">
-            <item row="3" column="0" colspan="2">
-             <widget class="QGroupBox" name="grb_schema_reload">
+            <item row="0" column="0" colspan="2">
+             <widget class="QGroupBox" name="grb_load_cf">
               <property name="title">
-               <string>Reload</string>
+               <string>Load custom file</string>
               </property>
-              <layout class="QGridLayout" name="gridLayout_9">
-               <item row="0" column="0">
-                <widget class="QLabel" name="lbl_reload_fct_ftrg">
-                 <property name="text">
-                  <string>Reload functions &amp; function triggers</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="1">
-                <widget class="QPushButton" name="btn_reload_fct_ftrg">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="text">
-                  <string>Execute</string>
-                 </property>
-                </widget>
+              <layout class="QGridLayout" name="gridLayout_10">
+               <item row="0" column="1" colspan="2">
+                <layout class="QGridLayout" name="gridLayout_24">
+                 <item row="0" column="1">
+                  <widget class="QPushButton" name="btn_custom_select_file">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="maximumSize">
+                    <size>
+                     <width>30</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>...</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="0" colspan="2">
+                  <widget class="QPushButton" name="btn_custom_load_file">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="font">
+                    <font>
+                     <weight>50</weight>
+                     <bold>false</bold>
+                    </font>
+                   </property>
+                   <property name="text">
+                    <string>Load SQL files</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="0">
+                  <widget class="QLineEdit" name="custom_path_folder">
+                   <property name="enabled">
+                    <bool>false</bool>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
                </item>
               </layout>
              </widget>
@@ -493,73 +522,31 @@
               </layout>
              </widget>
             </item>
-            <item row="6" column="0" colspan="2">
-             <spacer name="verticalSpacer_3">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>20</width>
-                <height>40</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item row="0" column="0" colspan="2">
-             <widget class="QGroupBox" name="grb_load_cf">
+            <item row="3" column="0" colspan="2">
+             <widget class="QGroupBox" name="grb_schema_reload">
               <property name="title">
-               <string>Load custom file</string>
+               <string>Reload</string>
               </property>
-              <layout class="QGridLayout" name="gridLayout_10">
-               <item row="0" column="1" colspan="2">
-                <layout class="QGridLayout" name="gridLayout_24">
-                 <item row="0" column="1">
-                  <widget class="QPushButton" name="btn_custom_select_file">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>30</width>
-                     <height>16777215</height>
-                    </size>
-                   </property>
-                   <property name="text">
-                    <string>...</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="1" column="0" colspan="2">
-                  <widget class="QPushButton" name="btn_custom_load_file">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="font">
-                    <font>
-                     <weight>50</weight>
-                     <bold>false</bold>
-                    </font>
-                   </property>
-                   <property name="text">
-                    <string>Load SQL files</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="0" column="0">
-                  <widget class="QLineEdit" name="custom_path_folder">
-                   <property name="enabled">
-                    <bool>false</bool>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
+              <layout class="QGridLayout" name="gridLayout_9">
+               <item row="0" column="0">
+                <widget class="QLabel" name="lbl_reload_fct_ftrg">
+                 <property name="text">
+                  <string>Reload functions &amp; function triggers</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1">
+                <widget class="QPushButton" name="btn_reload_fct_ftrg">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="text">
+                  <string>Execute</string>
+                 </property>
+                </widget>
                </item>
               </layout>
              </widget>
@@ -593,6 +580,35 @@
               </layout>
              </widget>
             </item>
+            <item row="6" column="0" colspan="2">
+             <widget class="QGroupBox" name="grp_i18n_update">
+              <property name="title">
+               <string>Schema i18n update</string>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_2">
+               <item>
+                <widget class="QPushButton" name="btn_update_translation">
+                 <property name="text">
+                  <string>Instant update i18n</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item row="7" column="0">
+             <spacer name="verticalSpacer_2">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
            </layout>
           </widget>
          </widget>
@@ -614,8 +630,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>199</width>
-             <height>294</height>
+             <width>501</width>
+             <height>827</height>
             </rect>
            </property>
            <layout class="QGridLayout" name="gridLayout_20">
@@ -732,7 +748,6 @@
   <tabstop>btn_copy</tabstop>
   <tabstop>btn_schema_create</tabstop>
   <tabstop>btn_gis_create</tabstop>
-  <tabstop>scrollArea_2</tabstop>
   <tabstop>custom_path_folder</tabstop>
   <tabstop>btn_custom_select_file</tabstop>
   <tabstop>btn_custom_load_file</tabstop>

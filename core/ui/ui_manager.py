@@ -692,6 +692,64 @@ class GwAdminTranslationUi(GwDialog, FORM_CLASS):
             self.action.setIcon(icon)
             self.action.setText(text)
 
+UINAME = "admin_update_translation"
+FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+class GwSchemaI18NUpdateUi(GwDialog, FORM_CLASS):
+    CONTEXT = CONTEXT
+    UINAME = UINAME
+
+    def __init__(self, class_obj=None, subtag=None):
+        super().__init__(class_obj, subtag)
+        self.txt_pass.setClearButtonEnabled(True)
+        icon_path = os.path.dirname(__file__) + os.sep + '..' + os.sep + '..' + os.sep + 'icons' + os.sep + 'dialogs' + os.sep + '142.png'
+        self.action = QAction("show")
+        if os.path.exists(icon_path):
+            icon = QIcon(icon_path)
+            self.action = QAction(icon, "show")
+        self.action.triggered.connect(self.show_pass)
+        self.txt_pass.addAction(self.action, QLineEdit.TrailingPosition)
+
+        self.txt_pass_dest.setClearButtonEnabled(True)
+        self.action_dest = QAction("show")
+        if os.path.exists(icon_path):
+            icon_dest = QIcon(icon_path)
+            self.action_dest = QAction(icon_dest, "show")
+        self.action_dest.triggered.connect(self.show_pass_dest)
+        self.txt_pass_dest.addAction(self.action_dest, QLineEdit.TrailingPosition)
+
+
+    def show_pass(self):
+        icon_path = ""
+        text = ""
+        if self.txt_pass.echoMode() == 0:
+            self.txt_pass.setEchoMode(QLineEdit.Password)
+            icon_path = os.path.dirname(__file__) + os.sep + '..' + os.sep + '..' + os.sep + 'icons' + os.sep + 'dialogs' + os.sep + '142.png'
+            text = "Show password"
+        elif self.txt_pass.echoMode() == 2:
+            self.txt_pass.setEchoMode(QLineEdit.Normal)
+            icon_path = os.path.dirname(__file__) + os.sep + '..' + os.sep + '..' + os.sep + 'icons' + os.sep + 'dialogs' + os.sep + '141.png'
+            text = "Hide password"
+        if os.path.exists(icon_path):
+            icon = QIcon(icon_path)
+            self.action.setIcon(icon)
+            self.action.setText(text)
+
+    def show_pass_dest(self):
+        icon_path = ""
+        text = ""
+        if self.txt_pass_dest.echoMode() == 0:
+            self.txt_pass_dest.setEchoMode(QLineEdit.Password)
+            icon_path = os.path.dirname(__file__) + os.sep + '..' + os.sep + '..' + os.sep + 'icons' + os.sep + 'dialogs' + os.sep + '142.png'
+            text = "Show password"
+        elif self.txt_pass_dest.echoMode() == 2:
+            self.txt_pass_dest.setEchoMode(QLineEdit.Normal)
+            icon_path = os.path.dirname(__file__) + os.sep + '..' + os.sep + '..' + os.sep + 'icons' + os.sep + 'dialogs' + os.sep + '141.png'
+            text = "Hide password"
+        if os.path.exists(icon_path):
+            icon_dest = QIcon(icon_path)
+            self.action_dest.setIcon(icon_dest)
+            self.action_dest.setText(text)
+
 
 UINAME = "admin_gisproject"
 FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
