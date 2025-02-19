@@ -236,12 +236,11 @@ BEGIN
 			            END IF;
 			        END IF;
 			    END IF;
-
-			END IF;
-	        v_widget := jsonb_set(v_widget, '{value}', to_jsonb(COALESCE(v_field_value, '')));
+			v_widget := jsonb_set(v_widget, '{value}', to_jsonb(COALESCE(v_field_value, '')));
 			v_widget := v_widget - 'widgetcontrols';
 	        v_fields_array[i] := v_widget;
 			v_field_value := '';
+			END IF;
 	    END IF;
 
 	END LOOP;
@@ -257,7 +256,8 @@ BEGIN
 		-- REMOVE EMPTY TABS (WITH EMPTY TABLEWIDGETS)
 		-- Get tabnames to remove with empty table widgets
 	    FOREACH v_field IN ARRAY ARRAY(SELECT jsonb_array_elements(v_fieldsjson)) LOOP
-			IF v_field->>'widgettype' IN ('tablewidget', 'tableview') THEN
+			IF v_field->>'widgettype' IN ('tablewidget', 'tableview') AND
+				(v_field->>'widgetcontrols')::json->>'filter' IS DISTINCT FROM 'false' THEN
 
 				v_result := gw_fct_getlist(
 			        json_build_object(
