@@ -956,3 +956,5 @@ UPDATE config_toolbox SET alias='Mapzones analysis', functionparams='{"featureTy
 UPDATE config_form_fields SET "datatype"='integer', widgettype='combo', dv_querytext='SELECT id, idval FROM edit_typevalue WHERE typevalue = ''value_lock_level''', dv_orderby_id=true, dv_isnullvalue=true, dv_querytext_filterc=NULL
 WHERE (formname='v_edit_arc' OR formname ILIKE 've_arc_%' OR formname='v_edit_connec' OR formname ILIKE 've_connec_%' OR formname='v_edit_node' OR formname ILIKE 've_node_%' OR formname='v_edit_element' OR formname ILIKE 've_element_%' OR formname='v_edit_gully' OR formname ILIKE 've_gully_%')
 AND formtype='form_feature' AND columnname='lock_level' AND tabname='tab_data';
+-- 18/02/2025.
+UPDATE config_form_fields SET widgetcontrols= '{"setMultiline": false, "valueRelation": {"layer": "v_edit_exploitation", "activated": true, "keyColumn": "expl_id", "nullValue": false, "valueColumn": "name", "filterExpression": null}}' where columnname ='expl_id' AND (formname LIKE '%_connec_%' OR formname LIKE '%_node_%' OR formname LIKE '%_arc_%');

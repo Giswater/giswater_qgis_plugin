@@ -264,7 +264,7 @@ UPDATE config_form_fields SET layoutname = 'lyt_bot_1' where columnname ='state'
 UPDATE config_form_fields SET layoutname = 'lyt_bot_1' where columnname ='state_type';
 UPDATE config_form_fields SET layoutname = 'lyt_bot_1' where columnname ='sector_id' AND (formname not in ('v_edit_link','v_edit_dimensions'));
 UPDATE config_form_fields SET layoutname = 'lyt_data_1',layoutorder = 997 where columnname ='hemisphere';
-UPDATE config_form_fields SET layoutorder = 2 where columnname ='dma_id' AND (formname not in ('v_edit_link','v_edit_dimensions'));
+--UPDATE config_form_fields SET layoutorder = 2 where columnname ='dma_id' AND (formname not in ('v_edit_link','v_edit_dimensions'));
 
 
 UPDATE config_form_fields SET layoutname = 'lyt_data_2', layoutorder = 30 where columnname ='verified' AND (formname LIKE '%_connec_%' OR formname LIKE '%_node_%' OR formname LIKE '%_arc_%');
@@ -1023,3 +1023,11 @@ UPDATE config_form_fields SET "datatype"='integer', widgettype='combo', dv_query
 UPDATE config_form_fields SET "datatype"='integer', widgettype='combo', dv_querytext='SELECT id, idval FROM edit_typevalue WHERE typevalue = ''value_lock_level''', dv_orderby_id=true, dv_isnullvalue=true, dv_querytext_filterc=NULL
 WHERE (formname='v_edit_arc' OR formname ILIKE 've_arc_%' OR formname='v_edit_connec' OR formname ILIKE 've_connec_%' OR formname='v_edit_node' OR formname ILIKE 've_node_%' OR formname='v_edit_element' OR formname ILIKE 've_element_%' )
 AND formtype='form_feature' AND columnname='lock_level' AND tabname='tab_data';
+-- 18/02/2025
+UPDATE config_form_fields SET widgetcontrols= '{"setMultiline": false}' WHERE columnname ='verified' AND (formname LIKE '%_connec_%' OR formname LIKE '%_node_%' OR formname LIKE '%_arc_%');
+UPDATE config_form_fields SET widgetcontrols= '{"setMultiline": false, "valueRelation": {"layer": "v_edit_presszone", "activated": true, "keyColumn": "presszone_id", "nullValue": false, "valueColumn": "name", "filterExpression": null}}' WHERE columnname ='presszone_id' AND (formname LIKE '%_connec_%' OR formname LIKE '%_node_%' OR formname LIKE '%_arc_%');
+UPDATE config_form_fields SET widgetcontrols= '{"setMultiline": false, "valueRelation":{"nullValue":false, "layer": "v_edit_dqa", "activated": true, "keyColumn": "dqa_id", "valueColumn": "name", "filterExpression": null}}' WHERE columnname ='dqa_id' AND (formname LIKE '%_connec_%' OR formname LIKE '%_node_%' OR formname LIKE '%_arc_%');
+UPDATE config_form_fields SET widgetcontrols= '{"setMultiline": false, "valueRelation": {"layer": "v_edit_exploitation", "activated": true, "keyColumn": "expl_id", "nullValue": false, "valueColumn": "name", "filterExpression": null}}' WHERE columnname ='expl_id' AND (formname LIKE '%_connec_%' OR formname LIKE '%_node_%' OR formname LIKE '%_arc_%');
+
+UPDATE config_form_fields SET layoutorder = 5 WHERE columnname='state' AND formname LIKE '%ve_connec_%';
+UPDATE config_form_fields SET layoutorder = 6 WHERE columnname='state_type' AND formname LIKE '%ve_connec_%';

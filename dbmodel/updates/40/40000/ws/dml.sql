@@ -3214,3 +3214,24 @@ INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, targe
 UPDATE config_form_fields SET "datatype"='integer', widgettype='combo', dv_querytext='SELECT id, idval FROM edit_typevalue WHERE typevalue = ''value_lock_level''', dv_orderby_id=true, dv_isnullvalue=true, dv_querytext_filterc=NULL
 WHERE (formname='v_edit_arc' OR formname ILIKE 've_arc_%' OR formname='v_edit_connec' OR formname ILIKE 've_connec_%' OR formname='v_edit_node' OR formname ILIKE 've_node_%' OR formname='v_edit_element' OR formname ILIKE 've_element_%' )
 AND formtype='form_feature' AND columnname='lock_level' AND tabname='tab_data';
+--19/02/2025
+
+UPDATE config_form_fields SET layoutname='lyt_bot_1', layoutorder=1 WHERE (formname = 've_node' OR formname = 've_arc' OR formname = 've_connec') AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+UPDATE config_form_fields SET layoutname='lyt_bot_1', layoutorder=2 WHERE (formname = 've_node' OR formname = 've_arc' OR formname = 've_connec') AND formtype='form_feature' AND columnname='presszone_id' AND tabname='tab_data';
+UPDATE config_form_fields SET layoutname='lyt_bot_1', layoutorder=3 WHERE (formname = 've_node' OR formname = 've_arc' OR formname = 've_connec') AND formtype='form_feature' AND columnname='dma_id' AND tabname='tab_data';
+UPDATE config_form_fields SET layoutname='lyt_bot_1', layoutorder=4 WHERE (formname = 've_node' OR formname = 've_arc' OR formname = 've_connec') AND formtype='form_feature' AND columnname='dqa_id' AND tabname='tab_data';
+UPDATE config_form_fields SET layoutname='lyt_bot_1', layoutorder=5 WHERE (formname = 've_node' OR formname = 've_arc' OR formname = 've_connec') AND formtype='form_feature' AND columnname='state' AND tabname='tab_data';
+UPDATE config_form_fields SET layoutname='lyt_bot_1', layoutorder=6 WHERE (formname = 've_node' OR formname = 've_arc' OR formname = 've_connec') AND formtype='form_feature' AND columnname='state_type' AND tabname='tab_data';
+
+
+UPDATE config_form_fields SET layoutorder=1 WHERE (formname ILIKE '%_node_%' OR formname ILIKE '%_arc_%' OR formname ILIKE '%_connec_%') AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+UPDATE config_form_fields SET layoutorder=3 WHERE (formname ILIKE '%_node_%' OR formname ILIKE '%_arc_%' OR formname ILIKE '%_connec_%') AND formtype='form_feature' AND columnname='dma_id' AND tabname='tab_data';
+UPDATE config_form_fields SET layoutorder=5 WHERE (formname ILIKE '%_node_%' OR formname ILIKE '%_arc_%' OR formname ILIKE '%_connec_%') AND formtype='form_feature' AND columnname='state' AND tabname='tab_data';
+UPDATE config_form_fields SET layoutorder=6 WHERE (formname ILIKE '%_node_%' OR formname ILIKE '%_arc_%' OR formname ILIKE '%_connec_%') AND formtype='form_feature' AND columnname='state_type' AND tabname='tab_data';
+
+UPDATE config_form_fields SET layoutname='lyt_bot_1', layoutorder=1 WHERE (formname = 'v_edit_node' OR formname = 'v_edit_arc' OR formname = 'v_edit_connec') AND formtype='form_feature' AND columnname='sector_id' AND tabname='tab_data';
+UPDATE config_form_fields SET layoutname='lyt_bot_1', layoutorder=2 WHERE (formname = 'v_edit_node' OR formname = 'v_edit_arc' OR formname = 'v_edit_connec') AND formtype='form_feature' AND columnname='presszone_id' AND tabname='tab_data';
+UPDATE config_form_fields SET layoutname='lyt_bot_1', layoutorder=3 WHERE (formname = 'v_edit_node' OR formname = 'v_edit_arc' OR formname = 'v_edit_connec') AND formtype='form_feature' AND columnname='dma_id' AND tabname='tab_data';
+UPDATE config_form_fields SET layoutname='lyt_bot_1', layoutorder=4 WHERE (formname = 'v_edit_node' OR formname = 'v_edit_arc' OR formname = 'v_edit_connec') AND formtype='form_feature' AND columnname='dqa_id' AND tabname='tab_data';
+UPDATE config_form_fields SET layoutname='lyt_bot_1', layoutorder=5 WHERE (formname = 'v_edit_node' OR formname = 'v_edit_arc' OR formname = 'v_edit_connec') AND formtype='form_feature' AND columnname='state' AND tabname='tab_data';
+UPDATE config_form_fields SET layoutname='lyt_bot_1', layoutorder=6 WHERE (formname = 'v_edit_node' OR formname = 'v_edit_arc' OR formname = 'v_edit_connec') AND formtype='form_feature' AND columnname='state_type' AND tabname='tab_data';

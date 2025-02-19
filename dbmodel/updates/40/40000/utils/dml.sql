@@ -1825,3 +1825,24 @@ INSERT INTO config_form_list (listname, query_text, device, listtype, listclass,
     }
   ]
 }'::json);
+
+
+-- 19/02/2025
+UPDATE config_typevalue SET idval='lyt_bot_1', camelstyle='layoutBottom1', addparam='{"createAddfield":"TRUE","lytOrientation":"horizontal"}'::json WHERE typevalue='layout_name_typevalue' AND id='lyt_bot_1';
+UPDATE config_typevalue SET idval='lyt_top_1', camelstyle='layoutTop1', addparam='{"createAddfield":"TRUE","lytOrientation":"horizontal"}'::json WHERE typevalue='layout_name_typevalue' AND id='lyt_top_1';
+UPDATE config_typevalue SET idval='lyt_element_1', camelstyle='lytElements1', addparam='{"createAddfield":"TRUE","lytOrientation":"horizontal"}'::json WHERE typevalue='layout_name_typevalue' AND id='lyt_element_1';
+UPDATE config_typevalue SET idval='lyt_event_1', camelstyle='lytEvents1', addparam='{"createAddfield":"TRUE","lytOrientation":"horizontal"}'::json WHERE typevalue='layout_name_typevalue' AND id='lyt_event_1';
+UPDATE config_typevalue SET idval='lyt_epa_dsc_1', camelstyle='lytEpaDsc1', addparam='{"lytOrientation": "horizontal"}'::json WHERE typevalue='layout_name_typevalue' AND id='lyt_epa_dsc_1';
+UPDATE config_typevalue SET idval='lyt_event_2', camelstyle='lytEvents2', addparam='{"lytOrientation":"horizontal"}'::json WHERE typevalue='layout_name_typevalue' AND id='lyt_event_2';
+UPDATE config_typevalue SET idval='lyt_document_1', camelstyle='lytDocuments1', addparam='{"lytOrientation":"horizontal"}'::json WHERE typevalue='layout_name_typevalue' AND id='lyt_document_1';
+UPDATE config_typevalue SET idval='lyt_document_2', camelstyle='lytDocuments2', addparam='{"lytOrientation":"horizontal"}'::json WHERE typevalue='layout_name_typevalue' AND id='lyt_document_2';
+UPDATE config_typevalue SET idval='lyt_hydro_val_1', camelstyle='lytHydroVal1', addparam='{"lytOrientation":"horizontal"}'::json WHERE typevalue='layout_name_typevalue' AND id='lyt_hydro_val_1';
+UPDATE config_typevalue SET idval='lyt_hydrometer_1', camelstyle='lytHydrometer1', addparam='{"lytOrientation":"horizontal"}'::json WHERE typevalue='layout_name_typevalue' AND id='lyt_hydrometer_1';
+
+
+UPDATE config_form_fields	SET widgetcontrols='{"setMultiline": false, "valueRelation": {"layer": "v_edit_presszone", "activated": true, "keyColumn": "presszone_id", "nullValue": false, "valueColumn": "name", "filterExpression": null}}'::json, layoutname='lyt_data_2' WHERE columnname ='presszone_id' AND formtype='form_feature' AND tabname='tab_data' AND (formname LIKE '%_connec_%' OR formname LIKE '%_node_%' OR formname LIKE '%_arc_%');
+UPDATE config_form_fields	SET widgetcontrols='{"setMultiline": false, "valueRelation": {"layer": "v_edit_dqa", "activated": true, "keyColumn": "dqa_id", "nullValue": false, "valueColumn": "name", "filterExpression": null}}'::json, layoutname='lyt_data_2' WHERE columnname ='dqa_id' AND formtype='form_feature' AND tabname='tab_data' AND (formname LIKE '%_connec_%' OR formname LIKE '%_node_%' OR formname LIKE '%_arc_%');
+UPDATE config_form_fields	SET widgetcontrols='{"setMultiline": false}'::json, layoutname='lyt_data_2'	WHERE columnname ='verified' AND formtype='form_feature' AND tabname='tab_data' AND (formname LIKE '%_connec_%' OR formname LIKE '%_node_%' OR formname LIKE '%_arc_%');
+UPDATE config_form_fields	SET widgetcontrols='{"setMultiline": false, "valueRelation": {"layer": "v_edit_exploitation", "activated": true, "keyColumn": "expl_id", "nullValue": false, "valueColumn": "name", "filterExpression": null}}'::json, layoutname='lyt_data_2' WHERE columnname ='expl_id' AND formtype='form_feature' AND tabname='tab_data' AND (formname LIKE '%_connec_%' OR formname LIKE '%_node_%' OR formname LIKE '%_arc_%');
+
+UPDATE config_form_fields SET "label"='Customer code:', tooltip='Customer code' WHERE formname='connec' AND formtype='form_feature' AND columnname='hydrometer_id' AND tabname='tab_hydrometer';

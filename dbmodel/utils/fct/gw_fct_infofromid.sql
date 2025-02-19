@@ -60,6 +60,12 @@ SELECT SCHEMA_NAME.gw_fct_getfeatureinsert($${"client":{"device":4, "infoType":1
 
 DECLARE
 
+v_layouts text[];
+v_layout text;
+add_param_orientation json;
+v_form_orientation text;
+layout_orientation_exist boolean;
+
 v_tablename character varying;
 v_sourcetable character varying;
 v_tablename_original character varying;
@@ -397,6 +403,29 @@ BEGIN
     	SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
     	EXECUTE v_querystring INTO v_forminfo;
     END IF;
+
+	
+	-- Set layouts orientation
+	v_form_orientation = '"layouts": {';
+    
+	SELECT array_agg(distinct layoutname) INTO v_layouts FROM config_form_fields  WHERE formtype = 'form_feature';
+	layout_orientation_exist = false;
+
+	IF v_layouts IS NOT NULL THEN
+		FOREACH v_layout IN ARRAY v_layouts
+		LOOP
+			IF (SELECT addparam->'lytOrientation' FROM config_typevalue WHERE id = v_layout) IS NOT NULL THEN
+				SELECT json_build_object('lytOrientation', addparam->'lytOrientation') INTO add_param_orientation FROM config_typevalue WHERE id = v_layout;
+				v_form_orientation:= concat(v_form_orientation,  '"', v_layout, '":',coalesce(add_param_orientation, '{}'),',');
+				layout_orientation_exist = true;
+			END IF;
+		END LOOP;
+	END IF;
+	IF layout_orientation_exist IS TRUE THEN
+		v_form_orientation := left(v_form_orientation, length(v_form_orientation) - 1);
+	END iF;
+    v_form_orientation:= concat(v_form_orientation,'}' );
+
 
 	-- Get feature type
 	v_querystring = concat('SELECT lower(feature_type) FROM cat_feature WHERE  (parent_layer = ',quote_nullable(v_tablename),' OR child_layer = ',quote_nullable(v_tablename),') LIMIT 1');
@@ -837,9 +866,8 @@ BEGIN
 		'featureType',v_featuretype, 'childType', v_childtype, 'tableParent',v_table_parent, 'schemaName', v_schemaname,
 		'geometry', v_geometry, 'zoomCanvasMargin',concat('{"mts":"',v_canvasmargin,'"}')::json);
 
-	v_tablename:= (to_json(v_tablename));
-	v_table_parent:= (to_json(v_table_parent));
-
+	
+	
 	IF (v_fields->>'status')='Failed' THEN
 		v_message = (v_fields->>'message');
 		v_status = 'Failed';
@@ -866,6 +894,10 @@ BEGIN
 		v_tabdata_lytname_result := gw_fct_json_object_set_key(v_tabdata_lytname_result,concat('index_', v_record.index), v_record.text);
 	END LOOP;
 	v_forminfo := gw_fct_json_object_set_key(v_forminfo,'tabDataLytNames', v_tabdata_lytname_result);
+	
+
+	v_forminfo:= concat(left(v_forminfo::text, length(v_forminfo::text) - 1), ',', v_form_orientation, '}');
+	
 
 	EXECUTE 'SET ROLE "'||v_prev_cur_user||'"';
 
