@@ -5,7 +5,7 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-import os
+import os, re
 from functools import partial
 
 from qgis.core import QgsProject, Qgis, QgsApplication, QgsSnappingUtils
@@ -221,7 +221,7 @@ class GwLoadProject(QObject):
     def _check_version_compatibility(self):
 
         # Get current QGIS and PostgreSQL versions
-        qgis_version = Qgis.QGIS_VERSION[:4]
+        qgis_version = self._convert_qgis_version(Qgis.QGIS_VERSION) # Converting qgis-version to compare
         postgresql_version = tools_db.get_pg_version()
 
         # Get version compatiblity from metadata.txt
@@ -229,6 +229,9 @@ class GwLoadProject(QObject):
         majorQgisVersion = tools_qgis.get_plugin_metadata('majorQgisVersion', '3.99', lib_vars.plugin_dir)
         minorPgVersion = tools_qgis.get_plugin_metadata('minorPgVersion', '9.5', lib_vars.plugin_dir).replace('.', '')
         majorPgVersion = tools_qgis.get_plugin_metadata('majorPgVersion', '11.99', lib_vars.plugin_dir).replace('.', '')
+
+        minorQgisVersion = self._convert_qgis_version(minorQgisVersion) # Converting minorQgisVersion to compare
+        majorQgisVersion = self._convert_qgis_version(majorQgisVersion) # Converting majorQgisVersion to compare
 
         url_wiki = "https://github.com/Giswater/giswater_dbmodel/wiki/Version-compatibility"
         if qgis_version is not None and minorQgisVersion is not None and majorQgisVersion is not None:
@@ -239,6 +242,54 @@ class GwLoadProject(QObject):
             if int(postgresql_version) < int(minorPgVersion) or int(postgresql_version) > int(majorPgVersion):
                 msg = "PostgreSQL version is not compatible with Giswater. Please check wiki"
                 tools_qgis.show_message_link(f"{msg}", url_wiki, message_level=1, btn_text="Open wiki")
+
+    def _convert_qgis_version(self, qgis_version):
+        """ Convert version to compare. 
+                Examples: 
+                - from 3.34.5-Prizren to 3.34.05 
+                - from 3.34.5 to 3.34.05
+                - from 3.34.15-Prizren to 3.34.15
+                - from 3.34.15 to 3.34.15
+        """
+
+        # Split qgis_version by "." and "-" into string[]
+        splited_version = re.split("-|\.", qgis_version)
+        
+        converted_version = ""
+
+        # Iterate splited_version to build the converted_version
+        for index in range(len(splited_version)):
+            # Check if string is a number
+            if splited_version[index].isnumeric():
+                match index:                    
+                    case 2:
+                        # Check if number has 1 or 2 digits
+                        if len(splited_version[index]) < 2:
+                            # Add 0 before the number and add it as last
+                            converted_version += "0" + splited_version[index]
+                        else:
+                            # Add number as last
+                            converted_version += splited_version[index]                    
+                    case 1:                        
+                        if len(splited_version) < 3:
+                            # Add number as last
+                            converted_version += splited_version[index]
+                        else:
+                            try:
+                                # Check if next splited item is numeric
+                                if splited_version[index+1].isnumeric():
+                                    # Add number
+                                    converted_version += splited_version[index] + "."
+                                else:
+                                    # Add number as last
+                                    converted_version += splited_version[index]
+                            except: # splited_version[index+1] = OUT OF RANGE
+                                # Add number as last
+                                converted_version += splited_version[index]
+                    case _:
+                        # Add number  
+                        converted_version += splited_version[index] + "."
+        return converted_version     
 
 
     def _get_project_variables(self):
