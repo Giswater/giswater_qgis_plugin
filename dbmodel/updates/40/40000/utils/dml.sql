@@ -1363,7 +1363,6 @@ INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES
   "lytOrientation": "horizontal"
 }'::json);
 INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('tabname_typevalue', 'tab_other_prices', 'tab_other_prices', 'tabOtherPrices', NULL);
-INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('tabname_typevalue', 'tab_relations', 'tab_relations', 'tabRelations', NULL);
 INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('tabname_typevalue', 'tab_relations_arc', 'tab_relations_arc', 'tabRelationsArc', NULL);
 
 
@@ -1461,26 +1460,6 @@ INSERT INTO config_param_system ("parameter", value, descript, "label", dv_query
 INSERT INTO config_param_system ("parameter", value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, placeholder, standardvalue, layoutname) VALUES('psector_tab_relations_arc', '{"layouts":["lyt_relations_arc_1"]}', NULL, NULL, NULL, NULL, false, NULL, 'utils', NULL, NULL, 'string', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO config_param_system ("parameter", value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, placeholder, standardvalue, layoutname) VALUES('psector_tab_other_prices', '{"layouts":["lyt_other_prices_1"]}', NULL, NULL, NULL, NULL, false, NULL, 'utils', NULL, NULL, 'string', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO config_param_system ("parameter", value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, placeholder, standardvalue, layoutname) VALUES('psector_tab_budget', '{"layouts":["lyt_budget_1"]}', NULL, NULL, NULL, NULL, false, NULL, 'utils', NULL, NULL, 'string', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-
-INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('dscenariomanager_form', 'utils', 'dscenario_results', 'active', 6, true, NULL, NULL, NULL, NULL);
-INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('dscenariomanager_form', 'utils', 'dscenario_results', 'descript', 2, true, NULL, NULL, NULL, NULL);
-INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('dscenariomanager_form', 'utils', 'dscenario_results', 'dscenario_type', 3, true, NULL, NULL, NULL, NULL);
-INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('dscenariomanager_form', 'utils', 'dscenario_results', 'expl_id', 5, true, NULL, NULL, NULL, NULL);
-INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('dscenariomanager_form', 'utils', 'dscenario_results', 'id', 0, true, NULL, NULL, NULL, '{
-  "header": "dscenario_id",
-  "accessorKey": "id"
-}'::json);
-INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('dscenariomanager_form', 'utils', 'dscenario_results', 'log', 7, true, NULL, NULL, NULL, NULL);
-INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('dscenariomanager_form', 'utils', 'dscenario_results', 'name', 1, true, NULL, NULL, NULL, '{
-  "accessorKey": "name",
-  "header": "name",
-  "filterVariant": "text",
-  "enableSorting": true,
-  "enableColumnOrdering": true,
-  "enableColumnFilter": true,
-  "enableClickToCopy": false
-}'::json);
-INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('dscenariomanager_form', 'utils', 'dscenario_results', 'parent_id', 4, true, NULL, NULL, NULL, NULL);
 
 
 INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('prices_results', 'SELECT id, unit, descript, price FROM v_price_compost', 5, 'tab', 'list', '{"orderBy":"1", "orderType": "DESC"}'::json, '{
