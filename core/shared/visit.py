@@ -1166,7 +1166,7 @@ class GwVisit(QObject):
         self._fill_visitcat(visit_id)
 
         # Fill ComboBox status
-        rows = self._get_values_from_catalog('om_typevalue', 'visit_status')
+        rows = tools_db.get_values_from_catalog('om_typevalue', 'visit_status')
         if rows:
             tools_qt.fill_combo_values(self.dlg_add_visit.status, rows, sort_combo=True)
             status = tools_gw.get_config_value('om_visit_status_vdefault')
@@ -1928,15 +1928,5 @@ class GwVisit(QObject):
                 if index >= 0:
                     widget.setCurrentIndex(index)
                     continue
-
-
-    def _get_values_from_catalog(self, table_name, typevalue, order_by='id'):
-
-        sql = (f"SELECT id, idval"
-               f" FROM {table_name}"
-               f" WHERE typevalue = '{typevalue}'"
-               f" ORDER BY {order_by}")
-        rows = tools_db.get_rows(sql)
-        return rows
 
     # endregion

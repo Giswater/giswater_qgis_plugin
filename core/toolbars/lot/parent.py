@@ -345,12 +345,12 @@ class ParentAction(object):
         self.fill_table_by_query(qtable, query)
         self.refresh_map_canvas()
 
-
+    # QUE ES ESTO, no hay ninguna parecida?
     def hide_colums(self, widget, comuns_to_hide):
         for i in range(0, len(comuns_to_hide)):
             widget.hideColumn(comuns_to_hide[i])
 
-
+    # QUE ES ESTO, no hay ninguna parecida?
     def unselector(self, qtable_left, qtable_right, query_delete, query_left, query_right, field_id_right, add_sort=True):
 
         selected_list = qtable_right.selectionModel().selectedRows()
@@ -382,7 +382,7 @@ class ParentAction(object):
         self.fill_table_by_query(qtable_right, query_right)
         self.refresh_map_canvas()
 
-
+    # QUE ES ESTO, no hay ninguna parecida?
     def multi_rows_selector(self, qtable_left, qtable_right, id_ori,
                             tablename_des, id_des, query_left, query_right, field_id, add_sort=True):
         """
@@ -484,6 +484,7 @@ class ParentAction(object):
             self.controller.show_warning(model.lastError().text())
 
 
+    # QUE ES ESTO, hay una con el mismo nombre en psector pero no tiene el mismo sql, alomejor juntar i crear condicion?
     def query_like_widget_text(self, dialog, text_line, qtable, tableleft, tableright, field_id_r, field_id_l, name='name', aql=''):
         """ Fill the QTableView by filtering through the QLineEdit"""
 
@@ -792,7 +793,7 @@ class ParentAction(object):
         self.canvas.setExtent(rect)
         self.canvas.refresh()
 
-
+    # QUE ES ESTO, no hay alguna parecida
     def create_action(self, action_name, action_group, icon_num=None, text=None):
         """ Creates a new action with selected parameters """
 

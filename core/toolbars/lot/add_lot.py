@@ -69,8 +69,8 @@ class AddNewLot(ParentManage):
 
         self.srid = lib_vars.data_epsg
         # Get layers of every geom_type
-        self.reset_lists()
-        self.reset_layers()
+        tools_gw.reset_feature_list()
+        tools_gw.reset_layers()
         self.layers['arc'] = [tools_qgis.get_layer_by_tablename('v_edit_arc')]
         self.layers['node'] = [tools_qgis.get_layer_by_tablename('v_edit_node')]
         self.layers['connec'] = [tools_qgis.get_layer_by_tablename('v_edit_connec')]
@@ -80,7 +80,7 @@ class AddNewLot(ParentManage):
             self.layers['gully'] = [self.tools_qgis.get_layer_by_tablename('v_edit_gully')]
 
         self.dlg_lot = AddLot()
-        self.load_settings(self.dlg_lot)
+        tools_gw.load_settings(self.dlg_lot)
         self.load_user_values(self.dlg_lot)
         self.dropdown = self.dlg_lot.findChild(QToolButton, 'action_selector')
         self.dropdown.setPopupMode(QToolButton.MenuButtonPopup)
@@ -138,7 +138,7 @@ class AddNewLot(ParentManage):
 
         if self.geom_type != '':
             viewname = "v_edit_" + self.geom_type
-            self.set_completer_feature_id(self.dlg_lot.feature_id, self.geom_type, viewname)
+            tools_gw.set_completer_feature_id(self.dlg_lot.feature_id, self.geom_type, viewname)
         else:
             self.geom_type = 'arc'
         self.clear_selection()
@@ -198,7 +198,7 @@ class AddNewLot(ParentManage):
             tools_qt.set_combo_value(self.dlg_lot.cmb_visit_class, visitclass_id, 1)
             table_name = tools_qt.get_combo_value(self.dlg_lot, self.dlg_lot.cmb_visit_class, 3)
 
-            self.set_dates_from_to(self.dlg_lot.date_event_from, self.dlg_lot.date_event_to, table_name,
+            tools_gw.set_dates_from_to(self.dlg_lot.date_event_from, self.dlg_lot.date_event_to, table_name,
                                    'startdate', 'enddate')
             self.reload_table_visit()
             self.manage_cmb_status()
@@ -254,7 +254,7 @@ class AddNewLot(ParentManage):
         self.check_for_ids()
 
         # Open the dialog
-        self.open_dialog(self.dlg_lot, dlg_name="add_lot")
+        tools_gw.open_dialog(self.dlg_lot, dlg_name="add_lot")
 
 
     def manage_cmb_status(self):
@@ -333,17 +333,17 @@ class AddNewLot(ParentManage):
 
     def create_team(self):
         self.dlg_create_team = TeamCreate()
-        self.load_settings(self.dlg_create_team)
+        tools_gw.load_settings(self.dlg_create_team)
 
-        self.dlg_create_team.rejected.connect(partial(self.close_dialog, self.dlg_create_team))
-        self.dlg_create_team.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_create_team))
+        self.dlg_create_team.rejected.connect(partial(tools_gw.close_dialog, self.dlg_create_team))
+        self.dlg_create_team.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_create_team))
         self.dlg_create_team.btn_accept.clicked.connect(partial(self.save_team))
 
         # Fill cmb active
         values = [[0, "False"], [1, "True"]]
         tools_qt.get_combo_value(self.dlg_create_team.cmb_active, values, 1)
 
-        self.open_dialog(self.dlg_create_team)
+        tools_gw.open_dialog(self.dlg_create_team)
 
 
     def save_team(self):
@@ -374,18 +374,18 @@ class AddNewLot(ParentManage):
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_resources_man.cmb_team, rows)
 
-        self.close_dialog(self.dlg_create_team)
+        tools_gw.close_dialog(self.dlg_create_team)
 
 
     def create_vehicle(self):
         self.dlg_create_vehicle = VehicleCreate()
-        self.load_settings(self.dlg_create_vehicle)
+        tools_gw.load_settings(self.dlg_create_vehicle)
 
-        self.dlg_create_vehicle.rejected.connect(partial(self.close_dialog, self.dlg_create_vehicle))
-        self.dlg_create_vehicle.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_create_vehicle))
+        self.dlg_create_vehicle.rejected.connect(partial(tools_gw.close_dialog, self.dlg_create_vehicle))
+        self.dlg_create_vehicle.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_create_vehicle))
         self.dlg_create_vehicle.btn_accept.clicked.connect(partial(self.save_vehicle))
 
-        self.open_dialog(self.dlg_create_vehicle)
+        tools_gw.open_dialog(self.dlg_create_vehicle)
 
 
     def save_vehicle(self):
@@ -420,25 +420,25 @@ class AddNewLot(ParentManage):
         # Populate table_view vehicle
         self.populate_vehicle_views()
 
-        self.close_dialog(self.dlg_create_vehicle)
+        tools_gw.close_dialog(self.dlg_create_vehicle)
 
 
     def manage_team(self):
         """ Open dialog of teams """
 
         self.dlg_basic_table = BasicTable()
-        self.load_settings(self.dlg_basic_table)
+        tools_gw.load_settings(self.dlg_basic_table)
         self.dlg_basic_table.setWindowTitle("Administrador d'equips")
         table_name = 'v_edit_cat_team'
 
         # @setEditStrategy: 0: OnFieldChange, 1: OnRowChange, 2: OnManualSubmit
-        self.fill_table(self.dlg_basic_table.tbl_basic, table_name, QSqlTableModel.OnManualSubmit)
-        self.set_table_columns(self.dlg_basic_table, self.dlg_basic_table.tbl_basic, table_name)
+        tools_qt.fill_table(self.dlg_basic_table.tbl_basic, table_name, QSqlTableModel.OnManualSubmit)
+        tools_gw.set_tablemodel_config(self.dlg_basic_table, self.dlg_basic_table.tbl_basic, table_name)
         self.dlg_basic_table.btn_cancel.clicked.connect(partial(self.cancel_changes, self.dlg_basic_table.tbl_basic))
-        self.dlg_basic_table.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_basic_table))
+        self.dlg_basic_table.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_basic_table))
         self.dlg_basic_table.btn_accept.clicked.connect(partial(self.save_table, self.dlg_basic_table, self.dlg_basic_table.tbl_basic, manage_type='team_selector'))
-        self.dlg_basic_table.btn_accept.clicked.connect(partial(self.close_dialog, self.dlg_basic_table))
-        self.dlg_basic_table.rejected.connect(partial(self.save_settings, self.dlg_basic_table))
+        self.dlg_basic_table.btn_accept.clicked.connect(partial(tools_gw.close_dialog, self.dlg_basic_table))
+        self.dlg_basic_table.rejected.connect(partial(tools_gw.save_settings, self.dlg_basic_table))
 
         # Rename widgets labels
         self.dlg_basic_table.btn_accept.setText('Acceptar')
@@ -446,7 +446,7 @@ class AddNewLot(ParentManage):
 
         self.dlg_basic_table.btn_add_row.setVisible(False)
 
-        self.open_dialog(self.dlg_basic_table)
+        tools_gw.open_dialog(self.dlg_basic_table)
 
 
     def filter_cmb_team(self):
@@ -762,7 +762,7 @@ class AddNewLot(ParentManage):
         self.populate_cmb_visitclass()
 
         # Fill ComboBox cmb_status
-        rows = self.get_values_from_catalog('om_typevalue', 'lot_cat_status')
+        rows = tools_db.get_values_from_catalog('om_typevalue', 'lot_cat_status')
         if rows:
             tools_qt.fill_combo_values(self.dlg_lot.cmb_status, rows, 1, sort_combo=False)
             tools_qt.set_combo_item_select_unselectable(self.dlg_lot.cmb_status, ['4', '5', '6'], 0)
@@ -803,7 +803,7 @@ class AddNewLot(ParentManage):
         self.sys_type = json.loads(sys_type, object_pairs_hook=OrderedDict)
 
         viewname = "v_edit_" + self.geom_type
-        self.set_completer_feature_id(dialog.feature_id, self.geom_type, viewname)
+        tools_gw.set_completer_feature_id(dialog.feature_id, self.geom_type, viewname)
 
 
     def clear_selection(self, remove_groups=True):
@@ -928,7 +928,7 @@ class AddNewLot(ParentManage):
 
         self.set_active_layer()
         self.dropdown.setDefaultAction(action)
-        self.disconnect_signal_selection_changed()
+        tools_qgis.disconnect_signal_selection_changed()
         self.geom_type = tools_qt.fill_combo_values(self.dlg_lot, self.dlg_lot.cmb_visit_class, 2)
         if self.signal_selectionChanged is False:
             self.iface.mainWindow().findChild(QAction, action_name).triggered.connect(
@@ -991,11 +991,11 @@ class AddNewLot(ParentManage):
             expr_filter = expr_filter[:-2] + ")"
 
         # Check expression
-        (is_valid, expr) = self.check_expression(expr_filter)  # @UnusedVariable
+        (is_valid, expr) = tools_qt.check_expression_filter(expr_filter)  # @UnusedVariable
         if not is_valid:
             return
 
-        self.reload_table(self.dlg_lot, self.tbl_relation, feature_type, expr_filter)
+        tools_gw.load_tablename(self.dlg_lot, self.tbl_relation, feature_type, expr_filter)
         self.hilight_features(self.rb_list, feature_type)
 
 
@@ -1050,7 +1050,7 @@ class AddNewLot(ParentManage):
 
     def remove_selection(self, dialog, qtable):
 
-        self.disconnect_signal_selection_changed()
+        tools_qgis.disconnect_signal_selection_changed()
         feature_type = tools_qt.fill_combo_values(self.dlg_lot, self.dlg_lot.feature_type, 0).lower()
         table_name = tools_qt.fill_combo_values(self.dlg_lot, self.dlg_lot.cmb_visit_class, 3)
         # Get selected rows
@@ -1083,7 +1083,7 @@ class AddNewLot(ParentManage):
         self.reload_table_relations()
 
         self.check_for_ids()
-        self.set_dates_from_to(self.dlg_lot.date_event_from, self.dlg_lot.date_event_to, table_name,
+        tools_gw.set_dates_from_to(self.dlg_lot.date_event_from, self.dlg_lot.date_event_to, table_name,
                                'startdate', 'enddate')
         self.reload_table_visit()
         self.reload_table_visit()
@@ -1106,7 +1106,7 @@ class AddNewLot(ParentManage):
     def selection_init(self, dialog):
         """ Set canvas map tool to an instance of class 'MultipleSelection' """
 
-        self.disconnect_signal_selection_changed()
+        tools_qgis.disconnect_signal_selection_changed()
         self.iface.actionSelect().trigger()
         self.connect_signal_selection_changed(dialog)
 
@@ -1190,7 +1190,7 @@ class AddNewLot(ParentManage):
         standard_model.setHorizontalHeaderLabels(headers)
 
         # Hide columns
-        self.set_table_columns(self.dlg_lot, self.dlg_lot.tbl_visit, table_name, isQStandardItemModel=True)
+        tools_gw.set_tablemodel_config(self.dlg_lot, self.dlg_lot.tbl_visit, table_name, isQStandardItemModel=True)
 
         # Populate model visit
         sql = ("SELECT * FROM " + str(table_name) +""
@@ -1213,7 +1213,7 @@ class AddNewLot(ParentManage):
             if len(row) > 0:
                 standard_model.appendRow(item)
 
-        combo_values = self.get_values_from_catalog('om_typevalue', 'visit_status')
+        combo_values = tools_db.get_values_from_catalog('om_typevalue', 'visit_status')
         if combo_values is None:
             return
         #self.put_combobox(self.dlg_lot.tbl_visit, rows, 'status', 17, combo_values)
@@ -1340,7 +1340,7 @@ class AddNewLot(ParentManage):
             sql = ("INSERT INTO selector_lot "
                    "(lot_id, cur_user) VALUES("+str(lot_id)+", current_user);")
             tools_db.execute_sql(sql)
-            self.refresh_map_canvas()
+            tools_qgis.refresh_map_canvas()
         else:
             lot_id = tools_qt.get_text(self.dlg_lot, 'lot_id', False, False)
             sql = ("UPDATE om_visit_lot "
@@ -1491,9 +1491,9 @@ class AddNewLot(ParentManage):
         expr_filter = "\""+str(feature_type)+"_id\" IN ('"+str(feature_id)+"')"
 
         # Check expression
-        (is_valid, expr) = self.check_expression(expr_filter)
+        (is_valid, expr) = tools_qt.check_expression_filter(expr_filter)
 
-        self.select_features_by_ids(feature_type, expr)
+        tools_qgis.select_features_by_ids(feature_type, expr)
         self.iface.actionZoomActualSize().trigger()
 
         layer = self.iface.activeLayer()
@@ -1517,14 +1517,14 @@ class AddNewLot(ParentManage):
 
     def manage_rejected(self):
 
-        self.disconnect_signal_selection_changed()
+        tools_qgis.disconnect_signal_selection_changed()
         layer = self.iface.activeLayer()
         if layer:
             layer.removeSelection()
-        self.save_settings(self.dlg_lot)
+        tools_gw.save_settings(self.dlg_lot)
         self.save_user_values(self.dlg_lot)
         self.iface.actionPan().trigger()
-        self.close_dialog(self.dlg_lot)
+        tools_gw.close_dialog(self.dlg_lot)
 
 
     def draw_polyline(self, points, color=QColor(255, 0, 0, 100), width=5, duration_time=None):
@@ -1573,11 +1573,11 @@ class AddNewLot(ParentManage):
         # Create the dialog
         self.autocommit = True
         self.dlg_lot_man = LotManagement()
-        self.load_settings(self.dlg_lot_man)
+        tools_gw.load_settings(self.dlg_lot_man)
         self.load_user_values(self.dlg_lot_man)
         self.dlg_lot_man.tbl_lots.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.populate_combo_filters(self.dlg_lot_man.cmb_actuacio, 'ext_workorder_type')
-        rows = self.get_values_from_catalog('om_typevalue', 'lot_cat_status')
+        rows = tools_db.get_values_from_catalog('om_typevalue', 'lot_cat_status')
         if rows:
             rows.insert(0, ['', ''])
             tools_qt.fill_combo_values(self.dlg_lot_man.cmb_estat, rows, 1, sort_combo=False)
@@ -1612,7 +1612,7 @@ class AddNewLot(ParentManage):
 
         # manage open and close the dialog
         self.dlg_lot_man.rejected.connect(partial(self.save_user_values, self.dlg_lot_man))
-        self.dlg_lot_man.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_lot_man))
+        self.dlg_lot_man.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_lot_man))
 
         # Set signals
         self.dlg_lot_man.btn_path.clicked.connect(partial(self.select_path, self.dlg_lot_man, 'txt_path'))
@@ -1657,13 +1657,13 @@ class AddNewLot(ParentManage):
         if date_event_to:
             tools_qt.set_calendar(self.dlg_lot_man, self.dlg_lot_man.date_event_to, date_event_to)
 
-        self.open_dialog(self.dlg_lot_man, dlg_name="visit_management")
+        tools_gw.open_dialog(self.dlg_lot_man, dlg_name="visit_management")
 
 
     def open_load_manage(self):
 
         self.dlg_load_manager = LoadManagement()
-        self.load_settings(self.dlg_load_manager)
+        tools_gw.load_settings(self.dlg_load_manager)
         self.dlg_load_manager.tbl_loads.setSelectionBehavior(QAbstractItemView.SelectRows)
 
         # Tab 'Loads'
@@ -1680,14 +1680,14 @@ class AddNewLot(ParentManage):
         self.dlg_load_manager.cmb_filter_vehicle.addItem('', '')
         tools_qt.fill_combo_values(self.dlg_load_manager.cmb_filter_vehicle, combo_values, 1, combo_clear=False)
 
-        self.set_icon(self.dlg_load_manager.btn_open_image, "136b")
+        tools_gw.add_icon(self.dlg_load_manager.btn_open_image, "136b")
         self.dlg_load_manager.btn_open_image.clicked.connect(partial(self.open_load_image, self.tbl_load, 'v_ui_om_vehicle_x_parameters'))
 
         # @setEditStrategy: 0: OnFieldChange, 1: OnRowChange, 2: OnManualSubmit
-        self.fill_table(self.dlg_load_manager.tbl_loads, 'v_ui_om_vehicle_x_parameters', QSqlTableModel.OnManualSubmit)
-        self.set_table_columns(self.dlg_load_manager, self.dlg_load_manager.tbl_loads, 'v_ui_om_vehicle_x_parameters')
-        self.dlg_load_manager.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_load_manager))
-        self.dlg_load_manager.rejected.connect(partial(self.save_settings, self.dlg_load_manager))
+        tools_qt.fill_table(self.dlg_load_manager.tbl_loads, 'v_ui_om_vehicle_x_parameters', QSqlTableModel.OnManualSubmit)
+        tools_gw.set_tablemodel_config(self.dlg_load_manager, self.dlg_load_manager.tbl_loads, 'v_ui_om_vehicle_x_parameters')
+        self.dlg_load_manager.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_load_manager))
+        self.dlg_load_manager.rejected.connect(partial(tools_gw.save_settings, self.dlg_load_manager))
         self.dlg_load_manager.cmb_filter_vehicle.currentIndexChanged.connect(partial(self.filter_loads))
         self.dlg_load_manager.btn_path.clicked.connect(partial(self.select_path, self.dlg_load_manager, 'txt_path'))
 
@@ -1697,13 +1697,13 @@ class AddNewLot(ParentManage):
         self.hide_colums(self.dlg_load_manager.tbl_loads, [0])
 
         # Open dialog
-        self.open_dialog(self.dlg_load_manager)
+        tools_gw.open_dialog(self.dlg_load_manager)
 
 
     def open_work_register(self):
 
         self.dlg_work_register = WorkManagement()
-        self.load_settings(self.dlg_work_register)
+        tools_gw.load_settings(self.dlg_work_register)
         self.dlg_work_register.tbl_work.setSelectionBehavior(QAbstractItemView.SelectRows)
 
         # Set a model with selected filter. Attach that model to selected table
@@ -1755,7 +1755,7 @@ class AddNewLot(ParentManage):
             return
 
         # Close dialog
-        self.close_dialog(self.dlg_work_register)
+        tools_gw.close_dialog(self.dlg_work_register)
 
 
     def filter_team(self):
@@ -1801,11 +1801,11 @@ class AddNewLot(ParentManage):
     def lot_selector(self):
 
         self.dlg_lot_sel = Lot_selector()
-        self.load_settings(self.dlg_lot_sel)
+        tools_gw.load_settings(self.dlg_lot_sel)
 
-        self.dlg_lot_sel.btn_ok.clicked.connect(partial(self.close_dialog, self.dlg_lot_sel))
-        self.dlg_lot_sel.rejected.connect(partial(self.close_dialog, self.dlg_lot_sel))
-        self.dlg_lot_sel.rejected.connect(partial(self.save_settings, self.dlg_lot_sel))
+        self.dlg_lot_sel.btn_ok.clicked.connect(partial(tools_gw.close_dialog, self.dlg_lot_sel))
+        self.dlg_lot_sel.rejected.connect(partial(tools_gw.close_dialog, self.dlg_lot_sel))
+        self.dlg_lot_sel.rejected.connect(partial(tools_gw.save_settings, self.dlg_lot_sel))
         self.dlg_lot_sel.setWindowTitle("Selector de lots")
         tools_qt.set_widget_text(self.dlg_lot_sel, 'lbl_filter',
                                      self.controller.tr('Filtrar per: Lot id', context_name='labels'))
@@ -1828,7 +1828,7 @@ class AddNewLot(ParentManage):
         self.dlg_lot_sel.btn_unselect.clicked.connect(partial(self.set_visible_lot_layers, True))
 
         # Open dialog
-        self.open_dialog(self.dlg_lot_sel, maximize_button=False)
+        tools_gw.open_dialog(self.dlg_lot_sel)
 
 
     def populate_lot_selector(self, dialog, tableleft, tableright, field_id_left, field_id_right, hide_left, hide_right):
@@ -1928,7 +1928,7 @@ class AddNewLot(ParentManage):
         col_to_sort = qtable.model().headerData(idx, Qt.Horizontal)
         query +=" ORDER BY " +col_to_sort + " " + oder_by[sort_order]+""
         tools_db.fill_table_by_query(qtable, query)
-        self.refresh_map_canvas()
+        tools_qgis.refresh_map_canvas()
 
 
     def set_visible_lot_layers(self, zoom=False):
@@ -2279,7 +2279,7 @@ class AddNewLot(ParentManage):
 
         # Create the dialog
         self.dlg_resources_man = ResourcesManagement()
-        self.load_settings(self.dlg_resources_man)
+        tools_gw.load_settings(self.dlg_resources_man)
 
         # Populate combos
         sql = ("SELECT id, idval FROM cat_team WHERE active is True ORDER BY idval")
@@ -2308,11 +2308,11 @@ class AddNewLot(ParentManage):
         self.dlg_resources_man.btn_vehicle_update.clicked.connect(partial(self.manage_vehicle))
         self.dlg_resources_man.btn_vehicle_delete.clicked.connect(partial(self.delete_vehicle))
 
-        self.dlg_resources_man.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_resources_man))
-        self.dlg_resources_man.rejected.connect(partial(self.save_settings, self.dlg_resources_man))
+        self.dlg_resources_man.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_resources_man))
+        self.dlg_resources_man.rejected.connect(partial(tools_gw.save_settings, self.dlg_resources_man))
 
         # Open form
-        self.open_dialog(self.dlg_resources_man)
+        tools_gw.open_dialog(self.dlg_resources_man)
 
 
     def populate_team_views(self):
@@ -2346,11 +2346,11 @@ class AddNewLot(ParentManage):
 
         # Create the dialog
         self.dlg_team_man = TeamManagement()
-        self.load_settings(self.dlg_team_man)
+        tools_gw.load_settings(self.dlg_team_man)
 
         # Set signals
-        self.dlg_team_man.btn_close.clicked.connect(partial(self.close_dialog, self.dlg_team_man))
-        self.dlg_team_man.rejected.connect(partial(self.save_settings, self.dlg_team_man))
+        self.dlg_team_man.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_team_man))
+        self.dlg_team_man.rejected.connect(partial(tools_gw.save_settings, self.dlg_team_man))
         self.dlg_team_man.btn_close.clicked.connect(partial(self.populate_team_views))
         self.dlg_team_man.rejected.connect(partial(self.populate_team_views))
 
@@ -2370,7 +2370,7 @@ class AddNewLot(ParentManage):
                                      "btn_visitclass_unselect", 'idval AS "Classe visita", descript AS "Descripcio"',
                                      'idval AS "Classe visita", descript AS "Descripcio"')
         # Open forms
-        self.open_dialog(self.dlg_team_man)
+        tools_gw.open_dialog(self.dlg_team_man)
 
 
     def populate_team_selectors(self, dialog, tableleft, tableright, field_id_left, field_id_right, alias,
@@ -2542,19 +2542,19 @@ class AddNewLot(ParentManage):
         """ Open dialog of teams """
 
         self.dlg_basic_table = BasicTable()
-        self.load_settings(self.dlg_basic_table)
+        tools_gw.load_settings(self.dlg_basic_table)
         self.dlg_basic_table.setWindowTitle("Administrador de vehicles")
         table_name = 'v_ext_cat_vehicle'
 
         # @setEditStrategy: 0: OnFieldChange, 1: OnRowChange, 2: OnManualSubmit
-        self.fill_table(self.dlg_basic_table.tbl_basic, table_name, QSqlTableModel.OnManualSubmit)
-        self.set_table_columns(self.dlg_basic_table, self.dlg_basic_table.tbl_basic, table_name)
+        tools_qt.fill_table(self.dlg_basic_table.tbl_basic, table_name, QSqlTableModel.OnManualSubmit)
+        tools_gw.set_tablemodel_config(self.dlg_basic_table, self.dlg_basic_table.tbl_basic, table_name)
         self.dlg_basic_table.btn_cancel.clicked.connect(partial(self.cancel_changes, self.dlg_basic_table.tbl_basic))
-        self.dlg_basic_table.btn_cancel.clicked.connect(partial(self.close_dialog, self.dlg_basic_table))
+        self.dlg_basic_table.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_basic_table))
         self.dlg_basic_table.btn_accept.clicked.connect(
             partial(self.save_table, self.dlg_basic_table, self.dlg_basic_table.tbl_basic, manage_type='vehicle'))
-        self.dlg_basic_table.btn_accept.clicked.connect(partial(self.close_dialog, self.dlg_basic_table))
-        self.dlg_basic_table.rejected.connect(partial(self.save_settings, self.dlg_basic_table))
+        self.dlg_basic_table.btn_accept.clicked.connect(partial(tools_gw.close_dialog, self.dlg_basic_table))
+        self.dlg_basic_table.rejected.connect(partial(tools_gw.save_settings, self.dlg_basic_table))
 
         # Rename widgets labels
         self.dlg_basic_table.btn_accept.setText('Acceptar')
@@ -2562,7 +2562,7 @@ class AddNewLot(ParentManage):
 
         self.dlg_basic_table.btn_add_row.setVisible(False)
 
-        self.open_dialog(self.dlg_basic_table)
+        tools_gw.open_dialog(self.dlg_basic_table)
 
 
     def manage_date_filter(self):

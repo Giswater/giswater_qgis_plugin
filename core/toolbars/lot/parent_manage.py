@@ -1194,7 +1194,7 @@ class ParentManage(ParentAction, object):
                     widget.setCurrentIndex(index)
                     continue
 
-
+    # QUE ES ESTO, hay algunas funciones parecidas buscando: Set a model with selected filter. Attach that model to selected table
     def set_model_to_table(self, widget, table_name, expr_filter):
         """ Set a model with selected filter.
         Attach that model to selected table """
