@@ -205,6 +205,9 @@ class GwImportInpTask(GwTask):
     def run(self) -> bool:
         super().run()
         try:
+            # Disable triggers
+            self._enable_triggers(False)
+
             self.progress_changed.emit("Validate inputs", self.PROGRESS_INIT, "Validating inputs...", False)
             self._validate_inputs()
             self.progress_changed.emit("Validate inputs", self.PROGRESS_VALIDATE, "done!", True)
@@ -239,6 +242,9 @@ class GwImportInpTask(GwTask):
                 log_str = self._manage_flwreg()
                 self.progress_changed.emit("Flow regulators", self.PROGRESS_END, "done!", True)
                 self.progress_changed.emit("Flow regulators", self.PROGRESS_END, log_str, True)
+
+            # Enable triggers
+            self._enable_triggers(True)
 
             execute_sql("select 1", commit=True)
             report_message = '\n'.join([f"{k.upper()} imported: {v}" for k, v in self.results.items()])
@@ -344,6 +350,38 @@ class GwImportInpTask(GwTask):
         if self.network.get(SUBCATCHMENTS):
             self.progress_changed.emit("Others", lerp_progress(40, self.PROGRESS_VISUAL, self.PROGRESS_END), "Importing subcatchments", True)
             self._save_subcatchments()
+
+    def _enable_triggers(self, enable: bool) -> None:
+        op = "ENABLE" if enable else "DISABLE"
+        queries = [
+            f'ALTER TABLE arc {op} TRIGGER gw_trg_arc_link_update;',
+            f'ALTER TABLE arc {op} TRIGGER gw_trg_arc_node_values;',
+            f'ALTER TABLE arc {op} TRIGGER gw_trg_arc_noderotation_update;',
+            f'ALTER TABLE arc {op} TRIGGER gw_trg_topocontrol_arc;',
+            f'ALTER TABLE arc {op} TRIGGER gw_trg_edit_controls;',
+            f'ALTER TABLE arc {op} TRIGGER gw_trg_mantypevalue_fk_insert;',
+            f'ALTER TABLE arc {op} TRIGGER gw_trg_mantypevalue_fk_update;',
+            f'ALTER TABLE arc {op} TRIGGER gw_trg_cat_material_fk_insert;',
+            f'ALTER TABLE arc {op} TRIGGER gw_trg_cat_material_fk_update;',
+            f'ALTER TABLE arc {op} TRIGGER gw_trg_typevalue_fk_insert;',
+            f'ALTER TABLE arc {op} TRIGGER gw_trg_typevalue_fk_update;',
+
+            f'ALTER TABLE node {op} TRIGGER gw_trg_node_arc_divide;',
+            f'ALTER TABLE node {op} TRIGGER gw_trg_node_statecontrol;',
+            f'ALTER TABLE node {op} TRIGGER gw_trg_topocontrol_node;',
+            f'ALTER TABLE node {op} TRIGGER gw_trg_node_rotation_update;',
+            f'ALTER TABLE node {op} TRIGGER gw_trg_edit_controls;',
+            f'ALTER TABLE node {op} TRIGGER gw_trg_mantypevalue_fk_insert;',
+            f'ALTER TABLE node {op} TRIGGER gw_trg_mantypevalue_fk_update;',
+            f'ALTER TABLE node {op} TRIGGER gw_trg_cat_material_fk_insert;',
+            f'ALTER TABLE node {op} TRIGGER gw_trg_cat_material_fk_update;',
+            f'ALTER TABLE node {op} TRIGGER gw_trg_typevalue_fk_insert;',
+            f'ALTER TABLE node {op} TRIGGER gw_trg_typevalue_fk_update;',
+        ]
+        for sql in queries:
+            result = tools_db.execute_sql(sql, commit=self.force_commit)
+            if not result:
+                return
 
     def _manage_flwreg(self) -> str:
         """ Execute database function 'gw_fct_import_swmm_flwreg' """
