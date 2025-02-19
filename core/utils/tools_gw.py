@@ -1773,7 +1773,7 @@ def add_widget(dialog, field, lbl, widget):
         layout.setColumnStretch(col, 1)
 
 
-def add_widget_combined(dialog, field, label, widget):
+def add_widget_combined(dialog, field, label, widget, old_widget_pos):
     """ Insert widget into layout based on orientation and label position """
     layout = dialog.findChild(QGridLayout, field['layoutname'])
 
@@ -1784,26 +1784,32 @@ def add_widget_combined(dialog, field, label, widget):
     label_pos = field['widgetcontrols']['labelPosition'] if (
                             'widgetcontrols' in field and field['widgetcontrols'] and 'labelPosition' in field['widgetcontrols']) else None
     if label:
-        layout.addWidget(label, row, col)
         if orientation == "horizontal":
+            layout.addWidget(label, row, col)
             if label_pos == 'top':
                 row += 1
             else:
                 col += 1
         else:
             if label_pos == 'top':
+                row= old_widget_pos+1
+                layout.addWidget(label, row, col)
                 row += 1
             else:
+                layout.addWidget(label, row, col)
                 col = 1
             layout.setColumnStretch(col, 1)
 
     if isinstance(widget, QSpacerItem):
         layout.addItem(widget, row, col)
+        layout.setColumnStretch(col, 1)
     else:
         layout.addWidget(widget, row, col)
 
     if label and orientation == "horizontal":
         layout.setColumnStretch(col, 1)
+    
+    return row
 
 def get_dialog_changed_values(dialog, chk, widget, field, list, value=None):
 

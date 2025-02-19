@@ -680,12 +680,19 @@ class GwInfo(QObject):
     def _manage_dlg_widgets(self, complet_result, result, new_feature, reload_epa=False, tab='tab_data'):
         """ Creates and populates all the widgets """
 
+        layout_orientations = {}
+        old_widget_pos = 0
         layout_list = []
-        widget_offset = 0
         prev_layout = ""
         widget_dict = {'text': 'lineedit', 'typeahead': 'lineedit', 'textarea': 'textarea', 'combo': 'combobox',
                        'check': 'checkbox', 'datetime': 'dateedit', 'hyperlink': 'hyperlink', 'spinbox': 'spinbox',
                        'doublespinbox': 'spinbox'}
+        
+        for layout_name, layout_info in complet_result['body']['form']['layouts'].items():
+            orientation = layout_info.get('lytOrientation')
+            if orientation:
+                layout_orientations[layout_name] = orientation
+
         for field in complet_result['body']['data']['fields']:
             if field.get('hidden'):
                 continue
@@ -708,8 +715,9 @@ class GwInfo(QObject):
 
             layout = self.dlg_cf.findChild(QGridLayout, field['layoutname'])
             if layout is not None:
+                orientation = layout_orientations.get(layout.objectName(), "vertical")
+                layout.setProperty('lytOrientation', orientation)
                 if layout.objectName() != prev_layout:
-                    widget_offset = 0
                     prev_layout = layout.objectName()
                 # Take the QGridLayout with the intention of adding a QSpacerItem later
                 if layout not in layout_list and layout.objectName() in ('lyt_data_1', 'lyt_data_2', 'lyt_data_3',
@@ -727,50 +735,12 @@ class GwInfo(QObject):
                     tools_qgis.show_message(message, 2, parameter=msg, dialog=self.dlg_cf)
                     continue
 
-                # Manage widget and label positions
-                label_pos = field['widgetcontrols']['labelPosition'] if (
-                            'widgetcontrols' in field and field['widgetcontrols'] and 'labelPosition' in field[
-                             'widgetcontrols']) else None
-                widget_pos = field['layoutorder'] + widget_offset
-
                 # The data tab is somewhat special (it has 2 columns)
                 if 'lyt_data' in layout.objectName() or 'lyt_epa_data' in layout.objectName():
                     tools_gw.add_widget(self.dlg_cf, field, label, widget)
-                # If the widget has a label
-                elif label:
-                    # If it has a labelPosition configured
-                    if label_pos is not None:
-                        if label_pos == 'top':
-                            layout.addWidget(label, 0, widget_pos)
-                            if type(widget) is QSpacerItem:
-                                layout.addItem(widget, 1, widget_pos)
-                            else:
-                                layout.addWidget(widget, 1, widget_pos)
-                        elif label_pos == 'left':
-                            layout.addWidget(label, 0, widget_pos)
-                            if type(widget) is QSpacerItem:
-                                layout.addItem(widget, 0, widget_pos + 1)
-                            else:
-                                layout.addWidget(widget, 0, widget_pos + 1)
-                            widget_offset += 1
-                        else:
-                            if type(widget) is QSpacerItem:
-                                layout.addItem(widget, 0, widget_pos)
-                            else:
-                                layout.addWidget(widget, 0, widget_pos)
-                    # If widget has label but labelPosition is not configured (put it on the left by default)
-                    else:
-                        layout.addWidget(label, 0, widget_pos)
-                        if type(widget) is QSpacerItem:
-                            layout.addItem(widget, 0, widget_pos + 1)
-                        else:
-                            layout.addWidget(widget, 0, widget_pos + 1)
-                # If the widget has no label
-                else:
-                    if type(widget) is QSpacerItem:
-                        layout.addItem(widget, 0, widget_pos)
-                    else:
-                        layout.addWidget(widget, 0, widget_pos)
+                
+                # Populate dialog widgets using lytOrientation field
+                old_widget_pos=tools_gw.add_widget_combined(self.dlg_cf, field, label, widget, old_widget_pos)
 
             elif field['layoutname'] != 'lyt_none':
                 message = "The field layoutname is not configured for"

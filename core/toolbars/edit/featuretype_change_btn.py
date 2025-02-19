@@ -187,6 +187,7 @@ class GwFeatureTypeChangeButton(GwMaptool):
         """ Creates and populates all the widgets, preserving original layout logic while ensuring two-column alignment """
 
         layout_orientations = {}
+        old_widget_pos = 0
         # Define a fixed width for labels to ensure alignment
         label_fixed_width = 100
 
@@ -227,7 +228,7 @@ class GwFeatureTypeChangeButton(GwMaptool):
                 layout.addWidget(widget, field['layoutorder'] - 1, 1)
             else:
                 # Use add_widget_combined for other fields
-                tools_gw.add_widget_combined(dialog, field, label, widget)
+                old_widget_pos=tools_gw.add_widget_combined(dialog, field, label, widget, old_widget_pos)
 
             # Apply consistent column stretch across all layouts
             layout.setColumnStretch(0, 1)  # Label column stretch (keep this compact)
