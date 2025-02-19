@@ -1162,8 +1162,11 @@ INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'psector_manager', 'tab_none', 'btn_close', 'lyt_buttons', 1, NULL, 'button', NULL, 'Close', NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{
   "text": "Close"
 }'::json, '{"functionName": "closeDlg"}'::json, NULL, false, 0);
-INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'psector_manager', 'tab_none', 'txt_info', 'lyt_psector_mngr_1', 1, NULL, 'textarea', 'Info:', 'Table', NULL, false, false, true, false, true, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, 0);
-INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'psector_manager', 'tab_none', 'table_view', 'lyt_psector_mngr_1', 0, NULL, 'tablewidget', '', 'Table', NULL, false, false, true, false, true, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, 'psector_results', false, 0);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'psector_manager', 'tab_none', 'chk_show_inactive', 'lyt_psector_mngr_1', 0, 'boolean', 'check', 'Show inactive', 'Show inactive', NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{
+  "functionName": "showInactive"
+}'::json, NULL, false, 0);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'psector_manager', 'tab_none', 'table_view', 'lyt_psector_mngr_2', 0, NULL, 'tablewidget', '', 'Table', NULL, false, false, true, false, true, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, 'psector_results', false, 0);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'psector_manager', 'tab_none', 'txt_info', 'lyt_psector_mngr_2', 1, NULL, 'textarea', 'Info:', 'Table', NULL, false, false, true, false, true, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, 0);
 
 INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('psector_results', 'SELECT psector_id AS id, ext_code, name, descript, priority, status, text1, text2, observ, vat, other, expl_id, psector_type, active::text, workcat_id, parent_id FROM plan_psector', 5, 'tab', 'list', '{"orderBy":"1", "orderType": "DESC"}'::json, '{
   "enableGlobalFilter": false,
@@ -1206,7 +1209,7 @@ INSERT INTO config_form_list (listname, query_text, device, listtype, listclass,
     ],
     "sorting": [
       {
-        "id": "id",
+        "id": "name",
         "desc": false
       }
     ]
@@ -1324,3 +1327,522 @@ INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('va
 INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('value_lock_level', '1', 'BLOCK UPDATE', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
 INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('value_lock_level', '2', 'BLOCK DELETE', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
 INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('value_lock_level', '3', 'BLOCK UPDATE AND DELETE', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
+
+-- 19/02/2025
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('layout_name_typevalue', 'lyt_add_info_1', 'lyt_add_info_1', 'layoutAddInfo1', NULL);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('layout_name_typevalue', 'lyt_budget_1', 'lyt_budget_1', 'layoutBudget1', '{
+  "lytOrientation": "horizontal"
+}'::json);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('layout_name_typevalue', 'lyt_general_1', 'lyt_general_1', 'layoutGeneral1', '{
+  "lytOrientation": "horizontal"
+}'::json);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('layout_name_typevalue', 'lyt_general_2', 'lyt_general_2', 'layoutGeneral2', '{
+  "lytOrientation": "horizontal"
+}'::json);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('layout_name_typevalue', 'lyt_other_prices_1', 'lyt_other_prices_1', 'layoutOtherPrices1', NULL);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('layout_name_typevalue', 'lyt_psector_1', 'lyt_psector_1', 'layoutPsector1', '{
+  "lytOrientation": "horizontal"
+}'::json);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('layout_name_typevalue', 'lyt_psector_2', 'lyt_psector_2', 'layoutPsector2', '{
+  "lytOrientation": "vertical"
+}'::json);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('layout_name_typevalue', 'lyt_psector_3', 'lyt_psector_3', 'layoutPsector3', '{
+  "lytOrientation": "vertical"
+}'::json);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('layout_name_typevalue', 'lyt_relations_1', 'lyt_relations_1', 'layoutRelations1', NULL);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('layout_name_typevalue', 'lyt_relations_arc_1', 'lyt_relations_arc_1', 'layoutRelationsArc1', '{
+  "lytOrientation": "horizontal"
+}'::json);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('formtype_typevalue', 'psector', 'psector', 'psector', NULL);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('tabname_typevalue', 'tab_add_info', 'tab_add_info', 'tabAddInfo', NULL);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('tabname_typevalue', 'tab_budget', 'tab_budget', 'tabBudget', '{
+  "lytOrientation": "horizontal"
+}'::json);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('tabname_typevalue', 'tab_document', 'tab_document', 'tabDocument', NULL);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('tabname_typevalue', 'tab_general', 'tab_general', 'tabGeneral', '{
+  "lytOrientation": "horizontal"
+}'::json);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('tabname_typevalue', 'tab_other_prices', 'tab_other_prices', 'tabOtherPrices', NULL);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('tabname_typevalue', 'tab_relations', 'tab_relations', 'tabRelations', NULL);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('tabname_typevalue', 'tab_relations_arc', 'tab_relations_arc', 'tabRelationsArc', NULL);
+
+
+INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('psector', 'tab_add_info', 'Additional info', 'Additional info', 'role_baisc', NULL, NULL, 0, '{5}');
+INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('psector', 'tab_budget', 'Budget', 'Budget', 'role_baisc', NULL, NULL, 0, '{5}');
+INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('psector', 'tab_document', 'Document', 'Document', 'role_baisc', NULL, NULL, 0, '{5}');
+INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('psector', 'tab_general', 'General', 'General', 'role_baisc', NULL, NULL, 0, '{5}');
+INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('psector', 'tab_other_prices', 'Other prices', 'Other prices', 'role_baisc', NULL, NULL, 0, '{5}');
+INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('psector', 'tab_relations', 'Relations', 'Relations', 'role_baisc', NULL, NULL, 0, '{5}');
+INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('psector', 'tab_relations_arc', 'Arc', 'Arc', 'role_baisc', NULL, NULL, 0, '{5}');
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'psector', 'tab_general', 'atlas_id', 'lyt_general_1', 7, 'text', 'text', 'Atlas id:', 'Atlas id', NULL, false, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, '{
+  "functionName": "enable"
+}'::json, NULL, false, 7);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'psector', 'tab_none', 'btn_close', 'lyt_buttons', 1, NULL, 'button', NULL, 'Close', NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{
+  "text": "Close"
+}'::json, '{
+  "functionName": "close_dlg"
+}'::json, NULL, false, 1);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'psector', 'tab_general', 'chk_enable_all', 'lyt_general_2', 7, 'boolean', 'check', 'Enable all', 'Enable all (visualize obsolete state on features related to psector)', NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, 7);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'psector', 'tab_general', 'descript', 'lyt_general_1', 4, 'text', 'text', 'Descript:', 'Descript', NULL, false, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, 4);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'psector', 'tab_budget', 'divider1', 'lyt_budget_1', 4, NULL, 'divider', NULL, NULL, NULL, false, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, 4);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'psector', 'tab_budget', 'divider2', 'lyt_budget_1', 11, NULL, 'divider', NULL, NULL, NULL, false, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, 11);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'psector', 'tab_general', 'expl_id', 'lyt_general_2', 0, 'string', 'combo', 'Exploitation:', 'Exploitation', NULL, false, false, false, false, false, 'SELECT expl_id as id, name as idval FROM exploitation WHERE expl_id != 0', NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, 0);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'psector', 'tab_general', 'ext_code', 'lyt_general_1', 2, 'text', 'text', 'Ext code:', 'Ext code', NULL, false, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, 2);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'psector', 'tab_budget', 'gexpenses', 'lyt_budget_1', 6, 'text', 'text', 'General expenses %', 'General expenses %', NULL, false, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, 6);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'psector', 'tab_budget', 'gexpenses_total', 'lyt_budget_1', 7, 'text', 'text', NULL, NULL, NULL, false, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, 7);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'psector', 'tab_general', 'name', 'lyt_general_1', 1, 'text', 'text', 'Name:', 'Name', NULL, false, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, 1);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'psector', 'tab_add_info', 'num_value', 'lyt_add_info_1', 0, 'text', 'text', 'Num value:', 'Num value', NULL, false, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, 0);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'psector', 'tab_general', 'observ', 'lyt_general_2', 4, 'text', 'text', 'Observation', 'Observation', NULL, false, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, 4);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'psector', 'tab_budget', 'other', 'lyt_budget_1', 13, 'text', 'text', 'Other expenses %', 'Other expenses %', NULL, false, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, 13);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'psector', 'tab_budget', 'other_total', 'lyt_budget_1', 14, 'text', 'text', NULL, NULL, NULL, false, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, 14);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'psector', 'tab_general', 'parent_id', 'lyt_general_2', 3, 'text', 'text', 'Parent id:', 'Parent id', NULL, false, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, 3);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'psector', 'tab_budget', 'pca', 'lyt_budget_1', 15, 'text', 'text', 'Total:', 'Total:', NULL, false, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, 15);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'psector', 'tab_budget', 'pec', 'lyt_budget_1', 8, 'text', 'text', 'Total:', 'Total:', NULL, false, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, 8);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'psector', 'tab_budget', 'pec_vat', 'lyt_budget_1', 12, 'text', 'text', 'Total:', 'Total:', NULL, false, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, 12);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'psector', 'tab_budget', 'pem', 'lyt_budget_1', 5, 'text', 'text', 'Total:', 'Total:', NULL, false, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, 5);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'psector', 'tab_general', 'priority', 'lyt_general_2', 1, 'string', 'combo', 'Priority:', 'Priority', NULL, false, false, false, false, false, 'SELECT id, idval FROM plan_typevalue WHERE typevalue = ''value_priority''', NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, 1);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'psector', 'tab_general', 'psector_id', 'lyt_general_1', 0, 'text', 'text', 'Psector id:', 'Psector id', NULL, false, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, 0);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'psector', 'tab_general', 'rotation', 'lyt_general_2', 6, 'text', 'text', 'Rotation:', 'Rotation', NULL, false, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, 6);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'psector', 'tab_general', 'scale', 'lyt_general_1', 6, 'text', 'text', 'Scale:', 'Scale', NULL, false, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, 6);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'psector', 'tab_none', 'spacer', 'lyt_buttons', 0, NULL, 'hspacer', NULL, NULL, NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 0);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'psector', 'tab_general', 'status', 'lyt_general_2', 2, 'string', 'combo', 'Status:', 'Status', NULL, false, false, false, false, false, 'SELECT id, idval FROM plan_typevalue WHERE typevalue = ''psector_status''', NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, 2);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'psector', 'tab_relations', 'table_view_arc', 'lyt_relations_1', 0, NULL, 'tablewidget', '', 'Table', NULL, false, false, true, false, true, NULL, NULL, NULL, NULL, NULL, NULL, '{
+  "setMultiline": false,
+  "filter": false
+}'::json, NULL, 'relations_arc_results', false, 0);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'psector', 'tab_relations', 'table_view_connec', 'lyt_relations_1', 0, NULL, 'tablewidget', '', 'Table', NULL, false, false, true, false, true, NULL, NULL, NULL, NULL, NULL, NULL, '{
+  "setMultiline": false,
+  "filter": false
+}'::json, NULL, 'relations_connec_results', false, 0);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'psector', 'tab_document', 'table_view_docs', 'lyt_document_1', 0, NULL, 'tablewidget', '', 'Table', NULL, false, false, true, false, true, NULL, NULL, NULL, NULL, NULL, NULL, '{
+  "setMultiline": false,
+  "filter": false
+}'::json, NULL, 'doc_results', false, 0);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'psector', 'tab_relations', 'table_view_node', 'lyt_relations_1', 0, NULL, 'tablewidget', '', 'Table', NULL, false, false, true, false, true, NULL, NULL, NULL, NULL, NULL, NULL, '{
+  "setMultiline": false,
+  "filter": false
+}'::json, NULL, 'relations_node_results', false, 0);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'psector', 'tab_none', 'tab_main', 'lyt_psector_1', 0, NULL, 'tabwidget', NULL, NULL, NULL, false, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{
+  "tabs": [
+    "tab_general",
+    "tab_add_info",
+    "tab_relations",
+    "tab_other_prices",
+    "tab_budget",
+    "tab_document"
+  ]
+}'::json, NULL, NULL, false, 0);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'psector', 'tab_other_prices', 'tbl_prices', 'lyt_other_prices_1', 1, NULL, 'tablewidget', '', 'Table', NULL, false, false, true, false, true, NULL, NULL, NULL, NULL, NULL, NULL, '{
+  "setMultiline": false,
+  "filter": false
+}'::json, NULL, 'prices_results', false, 1);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'psector', 'tab_other_prices', 'tbl_prices_plan', 'lyt_other_prices_1', 0, NULL, 'tablewidget', '', 'Table', NULL, false, false, true, false, true, NULL, NULL, NULL, NULL, NULL, NULL, '{
+  "setMultiline": false,
+  "filter": false
+}'::json, NULL, 'prices_psector_results', false, 0);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'psector', 'tab_general', 'text1', 'lyt_general_1', 5, 'text', 'text', 'Text 1:', 'Text 1:', NULL, false, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, 5);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'psector', 'tab_general', 'text2', 'lyt_general_2', 5, 'text', 'text', 'Text 2:', 'Text 2:', NULL, false, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, 5);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'psector', 'tab_add_info', 'text3', 'lyt_add_info_1', 1, 'string', 'textarea', 'Text 3:', 'Text 3:', NULL, false, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, 1);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'psector', 'tab_add_info', 'text4', 'lyt_add_info_1', 2, 'string', 'textarea', 'Text 4:', 'Text 4:', NULL, false, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, 2);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'psector', 'tab_add_info', 'text5', 'lyt_add_info_1', 3, 'string', 'textarea', 'Text 5:', 'Text 5:', NULL, false, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, 3);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'psector', 'tab_add_info', 'text6', 'lyt_add_info_1', 4, 'string', 'textarea', 'Text 6:', 'Text 6:', NULL, false, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, 4);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'psector', 'tab_budget', 'total_arc', 'lyt_budget_1', 1, 'text', 'text', 'Total arcs:', 'Total arcs', NULL, false, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, 1);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'psector', 'tab_budget', 'total_node', 'lyt_budget_1', 2, 'text', 'text', 'Total nodes:', 'Total nodes', NULL, false, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, 2);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'psector', 'tab_budget', 'total_other', 'lyt_budget_1', 3, 'text', 'text', 'Total other prices:', 'Total other prices:', NULL, false, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, 3);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'psector', 'tab_budget', 'vat', 'lyt_budget_1', 9, 'text', 'text', 'VAT: %', 'VAT: %', NULL, false, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, 9);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'psector', 'tab_budget', 'vat_total', 'lyt_budget_1', 10, 'text', 'text', NULL, NULL, NULL, false, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, 10);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'psector', 'tab_general', 'workcat_id', 'lyt_general_1', 3, 'string', 'combo', 'Worcat id:', 'Worcat id', NULL, false, false, false, false, false, 'SELECT id, id as idval  FROM cat_work', NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, NULL, false, 3);
+
+INSERT INTO config_param_system ("parameter", value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, placeholder, standardvalue, layoutname) VALUES('psector_tab_add_info', '{"layouts":["lyt_add_info_1"]}', NULL, NULL, NULL, NULL, false, NULL, 'utils', NULL, NULL, 'string', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_param_system ("parameter", value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, placeholder, standardvalue, layoutname) VALUES('psector_tab_document', '{"layouts":["lyt_document_1"]}', NULL, NULL, NULL, NULL, false, NULL, 'utils', NULL, NULL, 'string', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_param_system ("parameter", value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, placeholder, standardvalue, layoutname) VALUES('psector_tab_relations', '{"layouts":["lyt_relations_1"]}', NULL, NULL, NULL, NULL, false, NULL, 'utils', NULL, NULL, 'string', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_param_system ("parameter", value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, placeholder, standardvalue, layoutname) VALUES('psector_tab_general', '{"layouts":["lyt_general_1","lyt_general_2"]}', NULL, NULL, NULL, NULL, false, NULL, 'utils', NULL, NULL, 'string', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_param_system ("parameter", value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, placeholder, standardvalue, layoutname) VALUES('psector_tab_relations_arc', '{"layouts":["lyt_relations_arc_1"]}', NULL, NULL, NULL, NULL, false, NULL, 'utils', NULL, NULL, 'string', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_param_system ("parameter", value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, placeholder, standardvalue, layoutname) VALUES('psector_tab_other_prices', '{"layouts":["lyt_other_prices_1"]}', NULL, NULL, NULL, NULL, false, NULL, 'utils', NULL, NULL, 'string', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO config_param_system ("parameter", value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, placeholder, standardvalue, layoutname) VALUES('psector_tab_budget', '{"layouts":["lyt_budget_1"]}', NULL, NULL, NULL, NULL, false, NULL, 'utils', NULL, NULL, 'string', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+
+INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('dscenariomanager_form', 'utils', 'dscenario_results', 'active', 6, true, NULL, NULL, NULL, NULL);
+INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('dscenariomanager_form', 'utils', 'dscenario_results', 'descript', 2, true, NULL, NULL, NULL, NULL);
+INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('dscenariomanager_form', 'utils', 'dscenario_results', 'dscenario_type', 3, true, NULL, NULL, NULL, NULL);
+INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('dscenariomanager_form', 'utils', 'dscenario_results', 'expl_id', 5, true, NULL, NULL, NULL, NULL);
+INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('dscenariomanager_form', 'utils', 'dscenario_results', 'id', 0, true, NULL, NULL, NULL, '{
+  "header": "dscenario_id",
+  "accessorKey": "id"
+}'::json);
+INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('dscenariomanager_form', 'utils', 'dscenario_results', 'log', 7, true, NULL, NULL, NULL, NULL);
+INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('dscenariomanager_form', 'utils', 'dscenario_results', 'name', 1, true, NULL, NULL, NULL, '{
+  "accessorKey": "name",
+  "header": "name",
+  "filterVariant": "text",
+  "enableSorting": true,
+  "enableColumnOrdering": true,
+  "enableColumnFilter": true,
+  "enableClickToCopy": false
+}'::json);
+INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('dscenariomanager_form', 'utils', 'dscenario_results', 'parent_id', 4, true, NULL, NULL, NULL, NULL);
+
+
+INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('prices_results', 'SELECT id, unit, descript, price FROM v_price_compost', 5, 'tab', 'list', '{"orderBy":"1", "orderType": "DESC"}'::json, '{
+  "enableGlobalFilter": false,
+  "enableStickyHeader": true,
+  "positionToolbarAlertBanner": "bottom",
+  "enableGrouping": false,
+  "enablePinning": true,
+  "enableColumnOrdering": true,
+  "enableColumnFilterModes": true,
+  "enableFullScreenToggle": false,
+  "enablePagination": true,
+  "enableExporting": true,
+  "muiTablePaginationProps": {
+    "rowsPerPageOptions": [
+      5,
+      10,
+      15,
+      20,
+      50,
+      100
+    ],
+    "showFirstButton": true,
+    "showLastButton": true
+  },
+  "enableRowSelection": true,
+  "multipleRowSelection": true,
+  "initialState": {
+    "showColumnFilters": false,
+    "pagination": {
+      "pageSize": 5,
+      "pageIndex": 0
+    },
+    "density": "compact",
+    "columnFilters": [
+      {
+        "id": "id",
+        "value": "",
+        "filterVariant": "text"
+      }
+    ],
+    "sorting": [
+      {
+        "id": "id",
+        "desc": false
+      }
+    ]
+  },
+  "modifyTopToolBar": true,
+  "renderTopToolbarCustomActions": [
+  ],
+  "enableRowActions": false,
+  "renderRowActionMenuItems": [
+    {
+      "widgetfunction": {
+        "functionName": "open",
+        "params": {}
+      },
+      "icon": "OpenInBrowser",
+      "text": "Open"
+    }
+  ]
+}'::json);
+INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('doc_results', 'SELECT id, psector_name, doc_name, doc_type, "path", observ, "date", user_name FROM v_ui_doc_x_psector', 5, 'tab', 'list', '{"orderBy":"1", "orderType": "DESC"}'::json, '{
+  "enableGlobalFilter": false,
+  "enableStickyHeader": true,
+  "positionToolbarAlertBanner": "bottom",
+  "enableGrouping": false,
+  "enablePinning": true,
+  "enableColumnOrdering": true,
+  "enableColumnFilterModes": true,
+  "enableFullScreenToggle": false,
+  "enablePagination": true,
+  "enableExporting": true,
+  "muiTablePaginationProps": {
+    "rowsPerPageOptions": [
+      5,
+      10,
+      15,
+      20,
+      50,
+      100
+    ],
+    "showFirstButton": true,
+    "showLastButton": true
+  },
+  "enableRowSelection": true,
+  "multipleRowSelection": true,
+  "initialState": {
+    "showColumnFilters": false,
+    "pagination": {
+      "pageSize": 5,
+      "pageIndex": 0
+    },
+    "density": "compact",
+    "columnFilters": [
+      {
+        "id": "id",
+        "value": "",
+        "filterVariant": "text"
+      }
+    ],
+    "sorting": [
+      {
+        "id": "id",
+        "desc": false
+      }
+    ]
+  },
+  "modifyTopToolBar": true,
+  "renderTopToolbarCustomActions": [
+  ],
+  "enableRowActions": false,
+  "renderRowActionMenuItems": [
+    {
+      "widgetfunction": {
+        "functionName": "open",
+        "params": {}
+      },
+      "icon": "OpenInBrowser",
+      "text": "Open"
+    }
+  ]
+}'::json);
+INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('prices_psector_results', 'SELECT id, price_id, unit, price_descript, price, measurement, observ, total_budget FROM v_edit_plan_psector_x_other', 5, 'tab', 'list', '{"orderBy":"1", "orderType": "DESC"}'::json, '{
+  "enableGlobalFilter": false,
+  "enableStickyHeader": true,
+  "positionToolbarAlertBanner": "bottom",
+  "enableGrouping": false,
+  "enablePinning": true,
+  "enableColumnOrdering": true,
+  "enableColumnFilterModes": true,
+  "enableFullScreenToggle": false,
+  "enablePagination": true,
+  "enableExporting": true,
+  "muiTablePaginationProps": {
+    "rowsPerPageOptions": [
+      5,
+      10,
+      15,
+      20,
+      50,
+      100
+    ],
+    "showFirstButton": true,
+    "showLastButton": true
+  },
+  "enableRowSelection": true,
+  "multipleRowSelection": true,
+  "initialState": {
+    "showColumnFilters": false,
+    "pagination": {
+      "pageSize": 5,
+      "pageIndex": 0
+    },
+    "density": "compact",
+    "columnFilters": [
+      {
+        "id": "id",
+        "value": "",
+        "filterVariant": "text"
+      }
+    ],
+    "sorting": [
+      {
+        "id": "id",
+        "desc": false
+      }
+    ]
+  },
+  "modifyTopToolBar": true,
+  "renderTopToolbarCustomActions": [
+  ],
+  "enableRowActions": false,
+  "renderRowActionMenuItems": [
+    {
+      "widgetfunction": {
+        "functionName": "open",
+        "params": {}
+      },
+      "icon": "OpenInBrowser",
+      "text": "Open"
+    }
+  ]
+}'::json);
+INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('relations_arc_results', 'SELECT id, arc_id, state, doable::text, addparam::text FROM plan_psector_x_arc', 5, 'tab', 'list', '{"orderBy":"1", "orderType": "DESC"}'::json, '{
+  "enableGlobalFilter": false,
+  "enableStickyHeader": true,
+  "positionToolbarAlertBanner": "bottom",
+  "enableGrouping": false,
+  "enablePinning": true,
+  "enableColumnOrdering": true,
+  "enableColumnFilterModes": true,
+  "enableFullScreenToggle": false,
+  "enablePagination": true,
+  "enableExporting": true,
+  "muiTablePaginationProps": {
+    "rowsPerPageOptions": [
+      5,
+      10,
+      15,
+      20,
+      50,
+      100
+    ],
+    "showFirstButton": true,
+    "showLastButton": true
+  },
+  "enableRowSelection": false,
+  "multipleRowSelection": true,
+  "initialState": {
+    "showColumnFilters": false,
+    "pagination": {
+      "pageSize": 5,
+      "pageIndex": 0
+    },
+    "density": "compact",
+    "columnFilters": [
+      {
+        "id": "id",
+        "value": "",
+        "filterVariant": "text"
+      }
+    ],
+    "sorting": [
+      {
+        "id": "id",
+        "desc": false
+      }
+    ]
+  },
+  "modifyTopToolBar": true,
+  "renderTopToolbarCustomActions": [],
+  "enableRowActions": false,
+  "renderRowActionMenuItems": [
+    {
+      "widgetfunction": {
+        "functionName": "open",
+        "params": {}
+      },
+      "icon": "OpenInBrowser",
+      "text": "Open"
+    }
+  ]
+}'::json);
+INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('relations_connec_results', 'SELECT id, connec_id, arc_id, state, doable::text FROM plan_psector_x_connec', 5, 'tab', 'list', '{"orderBy":"1", "orderType": "DESC"}'::json, '{
+  "enableGlobalFilter": false,
+  "enableStickyHeader": true,
+  "positionToolbarAlertBanner": "bottom",
+  "enableGrouping": false,
+  "enablePinning": true,
+  "enableColumnOrdering": true,
+  "enableColumnFilterModes": true,
+  "enableFullScreenToggle": false,
+  "enablePagination": true,
+  "enableExporting": true,
+  "muiTablePaginationProps": {
+    "rowsPerPageOptions": [
+      5,
+      10,
+      15,
+      20,
+      50,
+      100
+    ],
+    "showFirstButton": true,
+    "showLastButton": true
+  },
+  "enableRowSelection": false,
+  "multipleRowSelection": true,
+  "initialState": {
+    "showColumnFilters": false,
+    "pagination": {
+      "pageSize": 5,
+      "pageIndex": 0
+    },
+    "density": "compact",
+    "columnFilters": [
+      {
+        "id": "id",
+        "value": "",
+        "filterVariant": "text"
+      }
+    ],
+    "sorting": [
+      {
+        "id": "id",
+        "desc": false
+      }
+    ]
+  },
+  "modifyTopToolBar": true,
+  "renderTopToolbarCustomActions": [],
+  "enableRowActions": false,
+  "renderRowActionMenuItems": [
+    {
+      "widgetfunction": {
+        "functionName": "open",
+        "params": {}
+      },
+      "icon": "OpenInBrowser",
+      "text": "Open"
+    }
+  ]
+}'::json);
+INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('relations_node_results', 'SELECT id, node_id, state, doable::text, addparam::text FROM plan_psector_x_node', 5, 'tab', 'list', '{"orderBy":"1", "orderType": "DESC"}'::json, '{
+  "enableGlobalFilter": false,
+  "enableStickyHeader": true,
+  "positionToolbarAlertBanner": "bottom",
+  "enableGrouping": false,
+  "enablePinning": true,
+  "enableColumnOrdering": true,
+  "enableColumnFilterModes": true,
+  "enableFullScreenToggle": false,
+  "enablePagination": true,
+  "enableExporting": true,
+  "muiTablePaginationProps": {
+    "rowsPerPageOptions": [
+      5,
+      10,
+      15,
+      20,
+      50,
+      100
+    ],
+    "showFirstButton": true,
+    "showLastButton": true
+  },
+  "enableRowSelection": false,
+  "multipleRowSelection": true,
+  "initialState": {
+    "showColumnFilters": false,
+    "pagination": {
+      "pageSize": 5,
+      "pageIndex": 0
+    },
+    "density": "compact",
+    "columnFilters": [
+      {
+        "id": "id",
+        "value": "",
+        "filterVariant": "text"
+      }
+    ],
+    "sorting": [
+      {
+        "id": "id",
+        "desc": false
+      }
+    ]
+  },
+  "modifyTopToolBar": true,
+  "renderTopToolbarCustomActions": [],
+  "enableRowActions": false,
+  "renderRowActionMenuItems": [
+    {
+      "widgetfunction": {
+        "functionName": "open",
+        "params": {}
+      },
+      "icon": "OpenInBrowser",
+      "text": "Open"
+    }
+  ]
+}'::json);
