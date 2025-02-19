@@ -42,7 +42,7 @@ class GwParseInpTask(GwTask):
 
             self.log.append("Analyzing catalogs...")
 
-            self.catalogs: Catalogs = Catalogs.from_network_model(self.network)
+            self.catalogs: Catalogs = Catalogs.from_network_model(self.network, self.log)
 
             return True
         except Exception as e:
@@ -77,10 +77,12 @@ class Catalogs:
     roughness_catalog: Optional[list[float]]
 
     @classmethod
-    def from_network_model(cls, wn: SwmmInput):
+    def from_network_model(cls, wn: SwmmInput, log: Optional[list[str]] = None):
         def tofloat(x):
             return 0.0 if x is None else float(x)
         # Get node catalog from DB
+        if log:
+            log.append("Getting node catalog from DB...")
         rows = tools_db.get_rows("""
                 SELECT n.id, f.epa_default
                 FROM cat_node AS n
@@ -94,6 +96,8 @@ class Catalogs:
             )
 
         # Get arc catalog from DB
+        if log:
+            log.append("Getting arc catalog from DB...")
         rows = tools_db.get_rows("""
                 SELECT id, shape, geom1, geom2, geom3, geom4
                 FROM cat_arc
@@ -107,6 +111,8 @@ class Catalogs:
             db_arc_catalog = dict(sorted(unsorted_dict.items()))
 
         # Get flwreg catalog from DB
+        if log:
+            log.append("Getting flwreg catalog from DB...")
         rows = tools_db.get_rows("""
                 SELECT id, flwreg_type
                 FROM cat_flwreg
@@ -119,6 +125,8 @@ class Catalogs:
             db_flwreg_catalog = dict(sorted(unsorted_dict.items()))
 
         # Get roughness catalog
+        if log:
+            log.append("Getting roughness catalog from DB...")
         rows = tools_db.get_rows("""
                 SELECT id, n
                 FROM cat_material
@@ -131,6 +139,8 @@ class Catalogs:
             db_mat_roughness_cat = dict(sorted(unsorted_dict.items()))
 
         # Get feature catalog
+        if log:
+            log.append("Getting feature catalog from DB...")
         rows = tools_db.get_rows("""
                 SELECT id, feature_class, feature_type
                 FROM cat_feature
@@ -143,6 +153,8 @@ class Catalogs:
             db_feat_cat = dict(sorted(unsorted_dict.items()))
 
         # Get possible catalogs of the network
+        if log:
+            log.append("Getting junction catalog from INP file...")
         junction_catalogs: Optional[list[str]] = (
             [
                 _id
@@ -152,6 +164,9 @@ class Catalogs:
             if JUNCTIONS in wn and len(wn[JUNCTIONS]) > 0
             else None
         )
+
+        if log:
+            log.append("Getting outfall catalog from INP file...")
 
         outfall_catalogs: Optional[list[str]] = (
             [
@@ -163,6 +178,9 @@ class Catalogs:
             else None
         )
 
+        if log:
+            log.append("Getting divider catalog from DB...")
+
         divider_catalogs: Optional[list[str]] = (
             [
                 _id
@@ -173,6 +191,9 @@ class Catalogs:
             else None
         )
 
+        if log:
+            log.append("Getting storage catalog from DB...")
+
         storage_catalogs: Optional[list[str]] = (
             [
                 _id
@@ -182,6 +203,9 @@ class Catalogs:
             if STORAGE in wn and len(wn[STORAGE]) > 0
             else None
         )
+
+        if log:
+            log.append("Getting conduit types catalog from INP file...")
 
         conduit_types = set()
         for _, xs in wn[XSECTIONS].items():
@@ -198,6 +222,9 @@ class Catalogs:
 
             conduit_types.add((shape, geom1, geom2, geom3, geom4))
 
+        if log:
+            log.append("Getting conduit roughness from INP file...")
+
         conduit_roughness = set()
         for _, c in wn[CONDUITS].items():
             c: Conduit
@@ -206,19 +233,37 @@ class Catalogs:
 
         roughness_catalog: Optional[list[float]] = [roughness for roughness in sorted(conduit_roughness)] if conduit_roughness else None
 
+        if log:
+            log.append("Getting conduit catalogs...")
+
         conduit_catalogs: dict[tuple[str, Optional[float], Optional[float], Optional[float], Optional[float]], list[str]] = {}
         for conduit_type in sorted(conduit_types):
             conduit_catalogs[conduit_type] = [
                 _id for _id, dr_pair in db_arc_catalog.items() if dr_pair == conduit_type
             ]
 
+        if log:
+            log.append("Getting pump catalog from INP file...")
+
         pump_catalogs: Optional[list[str]] = [] if PUMPS in wn and len(wn[PUMPS]) > 0 else None
+
+        if log:
+            log.append("Getting orifice catalog from INP file...")
 
         orifice_catalogs: Optional[list[str]] = [] if ORIFICES in wn and len(wn[ORIFICES]) > 0 else None
 
+        if log:
+            log.append("Getting weir catalog from INP file...")
+
         weir_catalogs: Optional[list[str]] = [] if WEIRS in wn and len(wn[WEIRS]) > 0 else None
 
+        if log:
+            log.append("Getting outlet catalog from INP file...")
+
         outlet_catalogs: Optional[list[str]] = [] if OUTLETS in wn and len(wn[OUTLETS]) > 0 else None
+
+        if log:
+            log.append("Getting subcatchments from INP file...")
 
         inp_subcatchments: Optional[list[tuple[str, str]]] = [(f"{s.outlet}", f"{s.rain_gage}") for s in wn[SUBCATCHMENTS].values()] if SUBCATCHMENTS in wn else None
 
