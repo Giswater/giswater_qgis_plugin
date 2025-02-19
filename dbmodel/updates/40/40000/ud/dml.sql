@@ -2415,17 +2415,17 @@ where formname in ('v_edit_inp_flwreg_pump','v_edit_inp_flwreg_orifice','v_edit_
 --edited 28/01/2025
 
 -- Insert into sys_feature_epa_type
-INSERT INTO sys_feature_epa_type VALUES ('ORIFICE', 'FLWREG', 'inp_flwreg_orifice', null, true) ON CONFLICT (id, feature_type) DO NOTHING;
-INSERT INTO sys_feature_epa_type VALUES ('PUMP', 'FLWREG', 'inp_flwreg_pump', null, true) ON CONFLICT (id, feature_type) DO NOTHING;
-INSERT INTO sys_feature_epa_type VALUES ('WEIR', 'FLWREG', 'inp_flwreg_weir', null, true) ON CONFLICT (id, feature_type) DO NOTHING;
-INSERT INTO sys_feature_epa_type VALUES ('OUTLET', 'FLWREG', 'inp_flwreg_outlet', null, true) ON CONFLICT (id, feature_type) DO NOTHING;
+INSERT INTO sys_feature_epa_type (id, feature_type, epa_table, descript, active) VALUES('PUMP', 'FLWREG', 'inp_flwreg_pump', NULL, true);
+INSERT INTO sys_feature_epa_type (id, feature_type, epa_table, descript, active) VALUES('WEIR', 'FLWREG', 'inp_flwreg_weir', NULL, true);
+INSERT INTO sys_feature_epa_type (id, feature_type, epa_table, descript, active) VALUES('ORIFICE', 'FLWREG', 'inp_flwreg_orifice', NULL, true);
+INSERT INTO sys_feature_epa_type (id, feature_type, epa_table, descript, active) VALUES('OUTLET', 'FLWREG', 'inp_flwreg_outlet', NULL, true);
 
 -- Adding flowregulator objects on cat_feature [Modified from first version]
 
-INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) VALUES ('FRORIFICE', 'FRORIFICE', 'FLWREG', 'v_edit_flwreg', 've_flwreg_frorifice', true) ON CONFLICT (id) DO NOTHING;
-INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) VALUES ('FROUTLET', 'FROUTLET', 'FLWREG', 'v_edit_flwreg', 've_flwreg_froutlet', true) ON CONFLICT (id) DO NOTHING;
-INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) VALUES ('FRWEIR', 'FRWEIR', 'FLWREG', 'v_edit_flwreg', 've_flwreg_frweir', true) ON CONFLICT (id) DO NOTHING;
-INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) VALUES ('FRPUMP', 'FRPUMP', 'FLWREG', 'v_edit_flwreg', 've_flwreg_frpump', true) ON CONFLICT (id) DO NOTHING;
+INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, active) VALUES ('FRORIFICE', 'ORIFICE', 'FLWREG', 'v_edit_flwreg', true) ON CONFLICT (id) DO NOTHING;
+INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, active) VALUES ('FROUTLET', 'VFLWREG', 'FLWREG', 'v_edit_flwreg', true) ON CONFLICT (id) DO NOTHING;
+INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, active) VALUES ('FRWEIR', 'WEIR', 'FLWREG', 'v_edit_flwreg', true) ON CONFLICT (id) DO NOTHING;
+INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, active) VALUES ('FRPUMP', 'PUMP', 'FLWREG', 'v_edit_flwreg', true) ON CONFLICT (id) DO NOTHING;
 
 -- Adding objects on config_info_layer and config_info_layer_x_type (this both tables controls the button info)
 INSERT INTO config_info_layer VALUES ('v_edit_flwreg', TRUE, 'flwreg', TRUE, 'info_generic', 'Flow regulator', 4);
@@ -2655,4 +2655,3 @@ INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, targe
 UPDATE config_form_fields SET "datatype"='integer', widgettype='combo', dv_querytext='SELECT id, idval FROM edit_typevalue WHERE typevalue = ''value_lock_level''', dv_orderby_id=true, dv_isnullvalue=true, dv_querytext_filterc=NULL
 WHERE (formname='v_edit_arc' OR formname ILIKE 've_arc_%' OR formname='v_edit_connec' OR formname ILIKE 've_connec_%' OR formname='v_edit_node' OR formname ILIKE 've_node_%' OR formname='v_edit_element' OR formname ILIKE 've_element_%' OR formname='v_edit_gully' OR formname ILIKE 've_gully_%')
 AND formtype='form_feature' AND columnname='lock_level' AND tabname='tab_data';
-

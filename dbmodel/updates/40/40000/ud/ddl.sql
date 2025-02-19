@@ -344,13 +344,15 @@ ALTER TABLE sys_feature_type ADD CONSTRAINT sys_feature_type_check CHECK (((id):
 
 -- Add flwregulators childs as feature_class
 ALTER TABLE sys_feature_class DROP CONSTRAINT sys_feature_cat_check;
-INSERT INTO sys_feature_class VALUES ('FRORIFICE', 'FLWREG', 'ORIFICE', 'man_frorifice');
-INSERT INTO sys_feature_class VALUES ('FROUTLET', 'FLWREG', 'OUTLET', 'man_froutlet');
-INSERT INTO sys_feature_class VALUES ('FRWEIR', 'FLWREG', 'WEIR', 'man_frweir');
-INSERT INTO sys_feature_class VALUES ('FRPUMP', 'FLWREG', 'PUMP', 'man_frpump');
+
+INSERT INTO sys_feature_class (id, "type", epa_default, man_table) VALUES('ORIFICE', 'FLWREG', 'ORIFICE', 'man_orifice') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_feature_class (id, "type", epa_default, man_table) VALUES('VFLWREG', 'FLWREG', 'OUTLET', 'man_vflwreg') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_feature_class (id, "type", epa_default, man_table) VALUES('WEIR', 'FLWREG', 'WEIR', 'man_weir') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_feature_class (id, "type", epa_default, man_table) VALUES('PUMP', 'FLWREG', 'PUMP', 'man_pump') ON CONFLICT (id) DO NOTHING;
+
 ALTER TABLE sys_feature_class ADD CONSTRAINT sys_feature_cat_check CHECK (((id)::text = ANY (ARRAY['CHAMBER'::text, 'CONDUIT'::text, 'CONNEC'::text, 'GULLY'::text,
 'JUNCTION'::text, 'MANHOLE'::text, 'NETELEMENT'::text, 'NETGULLY'::text, 'NETINIT'::text, 'OUTFALL'::text, 'SIPHON'::text, 'STORAGE'::text, 'VALVE'::text,
-'VARC'::text, 'WACCEL'::text, 'WJUMP'::text, 'WWTP'::text, 'ELEMENT'::text, 'LINK'::text, 'FRORIFICE'::text, 'FROUTLET'::text, 'FRWEIR'::text, 'FRPUMP'::text])));
+'VARC'::text, 'WACCEL'::text, 'WJUMP'::text, 'WWTP'::text, 'ELEMENT'::text, 'LINK'::text, 'ORIFICE'::text, 'VFLWREG'::text, 'WEIR'::text, 'PUMP'::text])));
 
 -- 21/01/2025
 ALTER TABLE temp_node RENAME TO _temp_node;
@@ -611,28 +613,28 @@ DROP TABLE IF EXISTS _inp_flwreg_weir;
 
 
 -- Create man table for flow regulators
-CREATE TABLE man_frpump (
+CREATE TABLE man_pump (
 	flwreg_id varchar(16) NOT NULL,
 	pump_class varchar(16) NOT NULL,
 	CONSTRAINT man_frpump_pkey PRIMARY KEY (flwreg_id),
 	CONSTRAINT man_frpump_flwreg_id_fk FOREIGN KEY (flwreg_id) REFERENCES flwreg(flwreg_id) ON DELETE CASCADE
 );
 
-CREATE TABLE man_frweir(
+CREATE TABLE man_weir(
 	flwreg_id varchar(16) NOT NULL,
 	weir_class varchar(16) NOT NULL,
 	CONSTRAINT man_frweir_pkey PRIMARY KEY (flwreg_id),
 	CONSTRAINT man_frweir_flwreg_id_fk FOREIGN KEY (flwreg_id) REFERENCES flwreg(flwreg_id) ON DELETE CASCADE
 );
 
-CREATE TABLE man_froutlet (
+CREATE TABLE man_vflwreg (
 	flwreg_id varchar(16) NOT NULL,
 	outlet_class varchar(16) NOT NULL,
 	CONSTRAINT outlet_type_pkey PRIMARY KEY (flwreg_id),
 	CONSTRAINT outlet_type_flwreg_id_fk FOREIGN KEY (flwreg_id) REFERENCES flwreg(flwreg_id) ON DELETE CASCADE
 );
 
-CREATE TABLE man_frorifice (
+CREATE TABLE man_orifice (
 	flwreg_id varchar(16) NOT NULL,
 	orifice_class varchar(16) NOT NULL,
 	CONSTRAINT man_frorifice_pkey PRIMARY KEY (flwreg_id),
