@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 2718
 
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_trg_edit_controls();
+DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_trg_edit_controls() CASCADE;
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_edit_controls()
   RETURNS trigger AS
 $BODY$
