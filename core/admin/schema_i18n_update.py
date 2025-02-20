@@ -28,17 +28,17 @@ class GwSchemaI18NUpdate:
 
     def init_dialog(self):
         """ Constructor """
-
-        self.dlg_qm = GwSchemaI18NUpdateUi(self)
+    
+        self.dlg_qm = GwSchemaI18NUpdateUi(self) #Initialize the UI
         tools_gw.load_settings(self.dlg_qm)
-        self._load_user_values()
+        self._load_user_values() #keep values
         self.dev_commit = tools_gw.get_config_parser('system', 'force_commit', "user", "init", prefix=True)
-        self._set_signals()
+        self._set_signals() #Set all the signals to wait for response
 
         self.dlg_qm.btn_translate.setEnabled(False)
-        # Mysteriously without the partial the function check_connection is not called
     
-        self.project_types = tools_gw.get_config_parser('system', 'project_types_translation', "project", "giswater", False,
+        #Get the project_types (ws, ud)
+        self.project_types = tools_gw.get_config_parser('system', 'project_types', "project", "giswater", False,
                                                         force_reload=True)
         self.project_types = self.project_types.split(',')
 
@@ -60,21 +60,23 @@ class GwSchemaI18NUpdate:
     # region private functions
 
     def _set_signals(self):
+        # Mysteriously without the partial the function check_connection is not called
         self.dlg_qm.btn_connection.clicked.connect(partial(self._check_connection))
         self.dlg_qm.btn_connection_dest.clicked.connect(partial(self._check_connection_dest))
+        self.dlg_qm.btn_connection.clicked.connect(partial(self._populate_cmb_language))
         self.dlg_qm.btn_translate.clicked.connect(self.schema_i18n_update)
         self.dlg_qm.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_qm))
         self.dlg_qm.rejected.connect(self._save_user_values)
         self.dlg_qm.rejected.connect(self._close_db)
         self.dlg_qm.rejected.connect(self._close_db_dest)
 
+        #Populate schema names
         self.dlg_qm.cmb_projecttype.currentIndexChanged.connect(partial(self._populate_data_schema_name, self.dlg_qm.cmb_projecttype))
 
 
     def _check_connection(self):
         """ Check connection to database """
 
-        self.dlg_qm.cmb_language.clear()
         self.dlg_qm.lbl_info.clear()
         self._close_db()
         # Connection with origin db
@@ -83,9 +85,9 @@ class GwSchemaI18NUpdate:
         db_org = tools_qt.get_text(self.dlg_qm, self.dlg_qm.txt_db)
         user_org = tools_qt.get_text(self.dlg_qm, self.dlg_qm.txt_user)
         password_org = tools_qt.get_text(self.dlg_qm, self.dlg_qm.txt_pass)
-        print(f'host:{host_org}, port: {port_org}, db: {db_org}, user:{user_org}, pass: {password_org}')
         status_org = self._init_db_org(host_org, port_org, db_org, user_org, password_org)
 
+        #Send messages
         if host_org != '188.245.226.42' and port_org != '5432' and db_org != 'giswater':
             self.dlg_qm.btn_translate.setEnabled(False)
             tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', self.last_error)
@@ -95,23 +97,20 @@ class GwSchemaI18NUpdate:
             self.dlg_qm.btn_translate.setEnabled(False)
             tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', self.last_error)
             return
-        
-        self._populate_cmb_language()
 
     def _check_connection_dest(self):
         """ Check connection to database """
-
+        # Connection with destiny db
         self.dlg_qm.lbl_info.clear()
         self._close_db_dest()
-        
-        # Connection with destiny db
+        #Connect to the desttiny datbase
         host_dest = tools_qt.get_text(self.dlg_qm, self.dlg_qm.txt_host_dest)
         port_dest = tools_qt.get_text(self.dlg_qm, self.dlg_qm.txt_port_dest)
         db_dest = tools_qt.get_text(self.dlg_qm, self.dlg_qm.txt_db_dest)
         user_dest = tools_qt.get_text(self.dlg_qm, self.dlg_qm.txt_user_dest)
         password_dest = tools_qt.get_text(self.dlg_qm, self.dlg_qm.txt_pass_dest)
         status_dest = self._init_db_dest(host_dest, port_dest, db_dest, user_dest, password_dest)
-
+        #Send messages
         if not status_dest:
             tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', self.last_error)
             return
@@ -120,7 +119,7 @@ class GwSchemaI18NUpdate:
         
     def _populate_cmb_language(self):
         """ Populate combo with languages values """
-
+        self.dlg_qm.cmb_language.clear()
         self.dlg_qm.btn_translate.setEnabled(True)
         host_org = tools_qt.get_text(self.dlg_qm, self.dlg_qm.txt_host)
         tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', f'Connected to {host_org}')
@@ -170,22 +169,29 @@ class GwSchemaI18NUpdate:
         self.project_type_selected = tools_qt.get_text(self.dlg_qm, widget)
 
     def schema_i18n_update(self):
+        #Connect in case of repeated actions
+        self._check_connection()
+        self._check_connection_dest()
+        #Initalize the language and the message (for errors,etc)
         self.language = tools_qt.get_combo_value(self.dlg_qm, self.dlg_qm.cmb_language, 0)
         self.lower_lang = self.language.lower()
         msg = ''
 
+        # Run the updater of db_files and look at the result 
         status_cfg_msg, errors = self._copy_db_files()
         if status_cfg_msg is True:
-            msg += "Database translation successful\n"
+            msg += f"Database translation successful to {self.lower_lang}\n"
             self._commit_dest()
         elif status_cfg_msg is False:
             msg += "Database translation failed\n"
         elif status_cfg_msg is None:
             msg += "Database translation canceled\n"
 
+        #Look for errors
         if errors:
             msg += f'. There have been errors translating: {', '.join(errors)}'
         
+        #Close connections
         self._close_db_dest()
         self._close_db()
 
@@ -235,28 +241,31 @@ class GwSchemaI18NUpdate:
     def _get_dbdialog_values(self):
         """ Get db dialog values """
 
+        # Make the query
         sql = (f"SELECT source, formname, formtype, project_type, context, lb_en_us, lb_{self.lower_lang}, auto_lb_{self.lower_lang}, tt_en_us, "
                f"tt_{self.lower_lang}, auto_tt_{self.lower_lang} "
                f"FROM i18n.dbdialog "
                f"ORDER BY context, formname;")
         rows = self._get_rows(sql, self.cursor_org)
 
-        tools_qt.set_widget_text(self.dlg_qm, 'lbl_info_2', f"Updating db_dialog...")
+        # Update the part the of the program in process
+        self.dlg_qm.lbl_info.clear()
+        tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', f"Updating db_dialog...")
         
+        # Return the corresponding information
         if not rows:
             return False
         return rows
     
     def _write_dbdialog_values(self, db_dialogs):
-        status = True
-        errors = []
         i=0
         j=0
-        for db_dialog in db_dialogs:
+        for db_dialog in db_dialogs: #(For row in rows)
             i+=1
-            if db_dialog['project_type'] == self.project_type or db_dialog['project_type'] == 'utils':
+            if db_dialog['project_type'] == self.project_type or db_dialog['project_type'] == 'utils': # Avoid the unwnated project_types
                 j+=1
-                source = [db_dialog['formname'], db_dialog['formtype'], db_dialog['source']]
+                source = [db_dialog['formname'], db_dialog['formtype'], db_dialog['source']] #Take all the possible source from db_dialog
+                #Define the label taking into account the different possibilities by priority level
                 label = db_dialog[f'lb_{self.lower_lang}']
                 if label is None:
                     label = db_dialog[f'auto_lb_{self.lower_lang}']
@@ -266,6 +275,7 @@ class GwSchemaI18NUpdate:
                             label = source[2]
                             if label is None:
                                 label = ""
+                #Define the tooltip taking into account the different possibilities by priority level
                 tooltip = db_dialog[f'tt_{self.lower_lang}']
                 if tooltip is None:
                     tooltip = db_dialog[f'auto_tt_{self.lower_lang}']
@@ -275,20 +285,23 @@ class GwSchemaI18NUpdate:
                             tooltip = db_dialog['lb_en_us']
                             if tooltip is None:
                                 tooltip = ""
-
+                #Replace unwanted characters
                 tooltip = tooltip.replace("'", "''") 
                 label = label.replace("'", "''")
                 
+                #Define the query depending on the table
                 sql_text = None
-
                 if db_dialog['context'] == 'config_form_fields':
+                    #Avoid sql problems with config_form_fields
                     sql_1 = f"UPDATE {self.schema}.config_param_system SET value = TRUE WHERE parameter = 'admin_config_control_trigger'"
                     self.cursor_dest.execute(sql_1)
                     self.conn_dest.commit()
 
+                    # Main query
                     sql_text = (f"UPDATE {self.schema}.{db_dialog['context']} SET label = '{label}', tooltip = '{tooltip}' "
                         f"WHERE formname = '{source[0]}' and formtype = '{source[1]}' and columnname = '{source[2]}'")
                     
+                    #Return config_form_fields to normal
                     sql_2 = f"UPDATE {self.schema}.config_param_system SET value = FALSE WHERE parameter = 'admin_config_control_trigger'"
                     self.cursor_dest.execute(sql_2)
                     self.conn_dest.commit()
@@ -306,6 +319,7 @@ class GwSchemaI18NUpdate:
                     sql_text = (f"UPDATE {self.schema}.{db_dialog['context']} SET idval = '{tooltip}' "
                         f"WHERE id = '{source[2]}' and typevalue = '{source[0]}'")
 
+                #Execute the corresponding query
                 try:
                     self.cursor_dest.execute(sql_text)
                     self.conn_dest.commit()
@@ -316,12 +330,17 @@ class GwSchemaI18NUpdate:
     
     def _get_dbmessages_values(self):
         """ Get db messages values """
-
+        # Make the query
         sql = (f"SELECT source, project_type, context, ms_en_us, ms_{self.lower_lang}, auto_ms_{self.lower_lang}, ht_en_us, ht_{self.lower_lang}, auto_ht_{self.lower_lang}"
                f" FROM i18n.dbmessage "
                f" ORDER BY project_type;")
         rows = self._get_rows(sql, self.cursor_org)
-        tools_qt.set_widget_text(self.dlg_qm, 'lbl_info_2', f"Updating db_messages...")
+
+        # Update the part the of the program in process
+        self.dlg_qm.lbl_info.clear()
+        tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', f"Updating db_messages...")
+
+        # Return the corresponding information
         if not rows:
             return False
         return rows
@@ -329,11 +348,12 @@ class GwSchemaI18NUpdate:
     def _write_dbmessages_values(self, db_messages):
         i = 0
         j = 0
-        for db_message in db_messages:
+        for db_message in db_messages: #(For row in rows)
             i += 1
-            if db_message['project_type'] == self.project_type or db_message['project_type'] == 'utils':
+            if db_message['project_type'] == self.project_type or db_message['project_type'] == 'utils': # Avoid the unwnated project_types
                 j += 1
-                source = db_message['source']
+                source = db_message['source'] # Take all the possible source from db_messages
+                #Define the error_ms taking into account the different possibilities by priority level
                 error_ms = db_message[f'ms_{self.lower_lang}']
                 if error_ms is None:
                     error_ms = db_message[f'auto_ms_{self.lower_lang}']
@@ -341,6 +361,7 @@ class GwSchemaI18NUpdate:
                         error_ms = db_message['ms_en_us']
                         if error_ms is None:
                             error_ms = ""
+                #Define the hint_ms taking into account the different possibilities by priority level
                 hint_ms = db_message[f'ht_{self.lower_lang}']
                 if hint_ms is None:
                     hint_ms = db_message[f'auto_ht_{self.lower_lang}']
@@ -348,10 +369,12 @@ class GwSchemaI18NUpdate:
                         hint_ms = db_message['ht_en_us']
                         if hint_ms is None:
                             hint_ms = ""
-
+                #Replace unwanted characters
                 error_ms = error_ms.replace("'", "''") 
                 hint_ms = hint_ms.replace("'", "''")
                 print(f'Total:{i}, {db_message['project_type']}: {j}')
+
+                #Define and execute the corresponding query
                 try:
                     sql = (f"UPDATE {self.schema}.sys_message "
                         f"SET error_message = '{error_ms}',  hint_message = '{hint_ms}'"
@@ -364,12 +387,16 @@ class GwSchemaI18NUpdate:
     
     def _get_dbfprocess_values(self):
         """ Get db messages values """
-
+        # Make the query
         sql = (f"SELECT source, project_type, context, ex_en_us, ex_{self.lower_lang}, auto_ex_{self.lower_lang}, in_en_us, in_{self.lower_lang}, auto_in_{self.lower_lang}"
                f" FROM i18n.dbfprocess "
                f" ORDER BY context;")
         rows = self._get_rows(sql, self.cursor_org)
-        tools_qt.set_widget_text(self.dlg_qm, 'lbl_info_2', f"Updating db_fprocess...")
+        # Update the part the of the program in process
+        self.dlg_qm.lbl_info.clear()
+        tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', f"Updating db_fprocess...")
+
+        # Return the corresponding information
         if not rows:
             return False
         return rows
@@ -377,11 +404,12 @@ class GwSchemaI18NUpdate:
     def _write_dbfprocess_values(self, db_fprocesses):
         i = 0
         j = 0
-        for db_fprocess in db_fprocesses:
+        for db_fprocess in db_fprocesses: #(For row in rows)
             i += 1
-            if db_fprocess['project_type'] == self.project_type or db_fprocess['project_type'] == 'utils':
+            if db_fprocess['project_type'] == self.project_type or db_fprocess['project_type'] == 'utils':# Avoid the unwnated project_types
                 j += 1
-                source = db_fprocess['source']
+                source = db_fprocess['source']# Take all the possible source from db_fprocesses
+                #Define the ex_msg taking into account the different possibilities by priority level
                 ex_msg = db_fprocess[f'ex_{self.lower_lang}']
                 if ex_msg is None:
                     ex_msg = db_fprocess[f'auto_ex_{self.lower_lang}']
@@ -389,6 +417,7 @@ class GwSchemaI18NUpdate:
                         ex_msg = db_fprocess['ex_en_us']
                         if ex_msg is None:
                             ex_msg = ""
+                #Define the in_msg taking into account the different possibilities by priority level
                 in_msg = db_fprocess[f'in_{self.lower_lang}']
                 if in_msg is None:
                     in_msg = db_fprocess[f'auto_in_{self.lower_lang}']
@@ -396,10 +425,12 @@ class GwSchemaI18NUpdate:
                         in_msg = db_fprocess['in_en_us']
                         if in_msg is None:
                             in_msg = ""
-
+                #Replace unwanted characters
                 ex_msg = ex_msg.replace("'", "''") 
                 in_msg = in_msg.replace("'", "''")
                 print(f'Total:{i}, {db_fprocess['project_type']}: {j}')
+
+                #Define and execute the corresponding query
                 try:
                     sql = (f"UPDATE {self.schema}.sys_fprocess "
                         f"SET except_msg = '{ex_msg}', info_msg = '{in_msg}' "
