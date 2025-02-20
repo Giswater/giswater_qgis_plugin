@@ -254,23 +254,23 @@ class GwLoadProject(QObject):
 
         # Split qgis_version by "." and "-" into string[]
         splited_version = re.split("-|\.", qgis_version)
-        
+
         converted_version = ""
 
         # Iterate splited_version to build the converted_version
         for index in range(len(splited_version)):
             # Check if string is a number
             if splited_version[index].isnumeric():
-                match index:                    
-                    case 2:
+                match index:
+                    case 2:  # Third number
                         # Check if number has 1 or 2 digits
                         if len(splited_version[index]) < 2:
                             # Add 0 before the number and add it as last
                             converted_version += "0" + splited_version[index]
                         else:
                             # Add number as last
-                            converted_version += splited_version[index]                    
-                    case 1:                        
+                            converted_version += splited_version[index]
+                    case 1:  # Second number
                         if len(splited_version) < 3:
                             # Add number as last
                             converted_version += splited_version[index]
@@ -286,10 +286,10 @@ class GwLoadProject(QObject):
                             except: # splited_version[index+1] = OUT OF RANGE
                                 # Add number as last
                                 converted_version += splited_version[index]
-                    case _:
-                        # Add number  
+                    case _:  # First number
+                        # Add number
                         converted_version += splited_version[index] + "."
-        return converted_version     
+        return converted_version
 
 
     def _get_project_variables(self):
@@ -563,7 +563,7 @@ class GwLoadProject(QObject):
                 self._enable_toolbar("edit")
                 self._enable_toolbar("epa")
                 self._hide_button("72", False)
-            case 'role_master' | 'role_admin' | 'role_system':                
+            case 'role_master' | 'role_admin' | 'role_system':
                 self._enable_toolbar("om")
                 self._enable_toolbar("edit")
                 self._enable_toolbar("epa")
@@ -571,9 +571,9 @@ class GwLoadProject(QObject):
                 self._hide_button("72", False)
             case _:
                 tools_qgis.show_warning("No user roles found")
-            
+
         # Check if exist some feature_cat with active True on cat_feature table
-        if global_vars.feature_cat is None:            
+        if global_vars.feature_cat is None:
             self._enable_button("21", False)
             self._enable_button("22", False)
 
