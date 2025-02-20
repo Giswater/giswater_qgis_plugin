@@ -32,7 +32,5 @@ icon=icons/dialogs/136.png
 experimental=False
 
 # Compatibility versions
-minorQgisVersion=3.34.5
-majorQgisVersion=3.40
 minorPgVersion=9.5.00
 majorPgVersion=17.99.99
