@@ -6,12 +6,10 @@ or (at your option) any later version.
 """
 import traceback
 from datetime import date
-from itertools import count, islice
+from itertools import count
 from typing import Any
 from datetime import datetime
-from math import isnan
 from typing import Optional
-from psycopg2.extras import execute_values
 
 try:
     from swmm_api import SwmmInput
@@ -45,89 +43,10 @@ except ImportError:
 
 from qgis.PyQt.QtCore import pyqtSignal
 
-from ....libs import lib_vars, tools_db, tools_log
+from ....libs import lib_vars, tools_db
 from ...utils import tools_gw
+from ...utils.import_inp import lerp_progress, to_yesno, nan_to_none, get_rows, execute_sql, toolsdb_execute_values
 from ..task import GwTask
-
-
-def lerp_progress(subtask_progress: int, global_min: int, global_max: int) -> int:
-    global_progress = global_min + ((subtask_progress - 0) / (100 - 0)) * (global_max - global_min)
-
-    return int(global_progress)
-
-
-def batched(iterable, n):
-    # batched('ABCDEFG', 3) --> ABC DEF G
-    if n < 1:
-        raise ValueError("n must be at least one")
-    it = iter(iterable)
-    while batch := tuple(islice(it, n)):
-        yield batch
-
-
-def to_yesno(x: bool):
-    return "YES" if x else "NO"
-
-
-def nan_to_none(x):
-    return None if (isinstance(x, float) and isnan(x)) else x
-
-
-def execute_sql(sql, params=None, /, log_sql=False, **kwargs) -> bool:
-    sql = tools_db._get_sql(sql, log_sql, params)
-    result: bool = tools_db.execute_sql(
-        sql,
-        log_sql=log_sql,
-        is_thread=True,
-        **kwargs,
-    )
-    if lib_vars.session_vars.get("last_error"):
-        raise lib_vars.session_vars["last_error"]
-    return result
-
-
-def get_row(sql, params=None, /, **kwargs):
-    result = tools_db.get_row(sql, params=params, is_thread=True, **kwargs)
-    if lib_vars.session_vars.get("last_error"):
-        raise lib_vars.session_vars["last_error"]
-    return result
-
-
-def get_rows(sql, params=None, /, **kwargs):
-    result = tools_db.get_rows(sql, params=params, is_thread=True, **kwargs)
-    if lib_vars.session_vars.get("last_error"):
-        raise lib_vars.session_vars["last_error"]
-    return result
-
-
-# TODO: refactor into toolsdb and tools_pgdao
-def toolsdb_execute_values(
-    sql, argslist, template=None, page_size=100, fetch=False, commit=True
-):
-    if tools_db.dao is None:
-        tools_log.log_warning(
-            "The connection to the database is broken.", parameter=sql
-        )
-        return None
-
-    tools_db.dao.last_error = None
-    result = None
-
-    try:
-        cur = tools_db.dao.get_cursor()
-        result = execute_values(cur, sql, argslist, template, page_size, fetch)
-        if commit:
-            tools_db.dao.commit()
-    except Exception as e:
-        tools_db.dao.last_error = e
-        if commit:
-            tools_db.dao.rollback()
-
-    lib_vars.session_vars["last_error"] = tools_db.dao.last_error
-    if lib_vars.session_vars.get("last_error"):
-        raise lib_vars.session_vars["last_error"]
-
-    return result
 
 
 def get_geometry_from_link(inp, link) -> str:
