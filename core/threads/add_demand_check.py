@@ -11,20 +11,25 @@ import json
 import math
 import subprocess
 import uuid
+import traceback
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 from qgis.core import QgsTask
 
 from .task import GwTask
-from ...libs import tools_db, tools_log
+from ...libs import tools_db, tools_qgis
+
+WNTR_IMPORT_ERROR = "Couldn't import WNTR Python package. Please check if the Giswater plugin is installed and it has a 'packages' folder in it with 'wntr'. Also note that WNTR only works with Python 3.12 (QGIS >3.34.5)."
 
 try:
     import wntr
     from wntr.epanet.util import from_si, to_si, FlowUnits, HydParam
 except ImportError:
-        tools_log.log_error("Couldn't import WNTR Python package. Please check if the Giswater plugin is installed and it has a 'packages' folder in it with 'wntr'.")
-
+    wntr = None
+    error_traceback = traceback.format_exc()
+    tools_qgis.show_critical(title="Epatools Plugin", text=WNTR_IMPORT_ERROR)
+    tools_qgis.show_critical(title="Epatools Plugin", text=error_traceback)
 
 class GwAddDemandCheck(GwTask):
     def __init__(
@@ -197,6 +202,9 @@ class GwAddDemandCheck(GwTask):
         return True
 
     def _create_network(self):
+        if wntr is None:
+            self.cur_step = WNTR_IMPORT_ERROR
+            raise ImportError(WNTR_IMPORT_ERROR)
         self.cur_step = "Preparing network model..."
         wn = wntr.network.read_inpfile(self.input_file)
         self.adjusted_demands = wntr.metrics.hydraulic.average_expected_demand(wn)
