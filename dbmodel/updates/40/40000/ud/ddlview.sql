@@ -685,7 +685,8 @@ SELECT arc.arc_id,
     case when arc.sector_id > 0 and is_operative = true and epa_type !='UNDEFINED'::varchar(16) THEN epa_type else NULL::varchar(16) end as inp_type,
     arc.brand_id,
     arc.model_id,
-    arc.serial_number
+    arc.serial_number,
+    arc.is_scadamap
    FROM arc
      JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text
      JOIN cat_feature ON arc.arc_type::text = cat_feature.id::text
@@ -909,7 +910,8 @@ AS WITH
 			arc.model_id,
 			arc.serial_number,
             arc.initoverflowpath,
-            arc.lock_level
+            arc.lock_level,
+            arc.is_scadamap
 			FROM arc_selector
 			JOIN arc using (arc_id)
 			JOIN selector_expl se ON (se.cur_user =current_user AND se.expl_id = arc.expl_id) or (se.cur_user = current_user AND se.expl_id = arc.expl_id2)
@@ -1032,7 +1034,8 @@ WITH vu_node AS (SELECT node.node_id,
             node.the_geom,
             node.brand_id,
             node.model_id,
-            node.serial_number
+            node.serial_number,
+            node.is_scadamap
            FROM node
              LEFT JOIN cat_node ON node.nodecat_id::text = cat_node.id::text
              LEFT JOIN cat_feature ON cat_feature.id::text = node.node_type::text
@@ -1305,7 +1308,8 @@ AS WITH
 			node.brand_id,
 			node.model_id,
 			node.serial_number,
-            node.lock_level
+            node.lock_level,
+            node.is_scadamap
 			FROM node_selector
 			JOIN node USING (node_id)
 			JOIN selector_expl se ON (se.cur_user = current_user AND se.expl_id = node.expl_id) OR (se.cur_user = current_user AND se.expl_id = node.expl_id2)

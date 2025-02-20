@@ -1058,3 +1058,7 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node", "col
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"lock_level", "dataType":"int4", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"lock_level", "dataType":"int4", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"element", "column":"lock_level", "dataType":"int4", "isUtils":"False"}}$$);
+
+-- 19/02/2025
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"arc", "column":"is_scadamap", "dataType":"boolean", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"node", "column":"is_scadamap", "dataType":"boolean", "isUtils":"False"}}$$);

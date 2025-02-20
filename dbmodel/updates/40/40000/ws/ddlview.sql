@@ -192,7 +192,8 @@ AS WITH streetaxis AS (
         CASE
             WHEN vst.is_operative = true AND arc.epa_type::text <> 'UNDEFINED'::character varying(16)::text THEN arc.epa_type
             ELSE NULL::character varying(16)
-        END AS inp_type
+        END AS inp_type,
+    arc.is_scadamap
    FROM arc
      LEFT JOIN exploitation ON arc.expl_id = exploitation.expl_id
      LEFT JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text
@@ -388,7 +389,8 @@ AS WITH
       CASE
         WHEN arc.sector_id > 0 AND vst.is_operative = true AND arc.epa_type::text <> 'UNDEFINED'::character varying(16)::text THEN arc.epa_type
         ELSE NULL::character varying(16)
-      END AS inp_type
+      END AS inp_type,
+      arc.is_scadamap
       FROM arc_selector
       JOIN arc ON arc.arc_id::text = arc_selector.arc_id::text
       JOIN selector_expl se ON ((se.cur_user = CURRENT_USER AND se.expl_id = arc.expl_id) OR (se.cur_user = CURRENT_USER and se.expl_id = arc.expl_id2))
@@ -543,7 +545,8 @@ AS WITH streetaxis AS (
         WHEN vst.is_operative = true AND node.epa_type::text <> 'UNDEFINED'::character varying(16)::text THEN node.epa_type
         ELSE NULL::character varying(16)
 	END AS inp_type,
-  node.pavcat_id
+  node.pavcat_id,
+  node.is_scadamap
    FROM node
      LEFT JOIN cat_node ON cat_node.id::text = node.nodecat_id::text
      JOIN cat_feature ON cat_feature.id::text = cat_node.node_type::text
@@ -747,7 +750,8 @@ AS WITH
         m.closed as closed_valve,
         m.broken as broken_valve,
         node.pavcat_id,
-        node.lock_level
+        node.lock_level,
+        node.is_scadamap
         FROM node_selector
         JOIN node ON node.node_id = node_selector.node_id
         JOIN selector_expl se ON (se.cur_user =current_user AND se.expl_id = node.expl_id) or (se.cur_user = current_user AND se.expl_id = node.expl_id2)
