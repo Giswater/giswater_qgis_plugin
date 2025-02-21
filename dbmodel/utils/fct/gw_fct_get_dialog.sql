@@ -201,7 +201,7 @@ BEGIN
 	        END LOOP;
 
 	        -- Update widget JSON with tabs in form_tabs_json
-	        v_widget := jsonb_set(v_widget, '{tabs}', v_form_tabs_json::jsonb);
+	        v_widget := jsonb_set(v_widget, format('{tabs_%s}', v_widget->>'columnname')::text[], v_form_tabs_json::jsonb, true);
 
 			-- Remove wdgetcontrols
 			v_widget := v_widget - 'widgetcontrols';
