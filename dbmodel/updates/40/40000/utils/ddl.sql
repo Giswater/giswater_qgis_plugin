@@ -258,3 +258,7 @@ ALTER TABLE cat_workspace ALTER COLUMN insert_user SET DEFAULT current_user;
 ALTER TABLE cat_workspace ALTER COLUMN insert_timestamp SET DEFAULT now();
 ALTER TABLE cat_workspace ALTER COLUMN lastupdate_user SET DEFAULT current_user;
 ALTER TABLE cat_workspace ALTER COLUMN lastupdate_timestamp SET DEFAULT now();
+
+--20/02/2025
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"config_user_x_expl", "column":"active"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"config_user_x_expl", "column":"manager_id"}}$$);
