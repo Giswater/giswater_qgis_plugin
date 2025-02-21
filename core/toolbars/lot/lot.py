@@ -12,12 +12,14 @@ from datetime import datetime
 from functools import partial
 
 from .add_lot import AddNewLot
+from ..dialog import GwAction
 
 
-class Lot():
+class Lot(GwAction):
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
         """ Class to control toolbar 'om_ws' """
+        super().__init__(icon_path, action_name, text, toolbar, action_group)
         self.new_lot = AddNewLot(icon_path, action_name, text, toolbar, action_group)
 
 
