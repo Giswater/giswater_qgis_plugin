@@ -552,8 +552,17 @@ class GwImportInpTask(GwTask):
                     INSERT INTO cat_arc (id, arc_type, shape, geom1, geom2, geom3, geom4)
                     VALUES (%s, %s, %s, %s, %s, %s, %s);
                 """
+                params = (catalog, arctype_id, shape, geom1, geom2, geom3, geom4)
+
+                if shape == 'CUSTOM':
+                    sql = """
+                        INSERT INTO cat_arc (id, arc_type, shape, geom1, curve_id)
+                        VALUES (%s, %s, %s, %s, %s);
+                    """
+                    params = (catalog, arctype_id, shape, geom1, geom2)
+
                 execute_sql(
-                    sql, (catalog, arctype_id, shape, geom1, geom2, geom3, geom4), commit=self.force_commit
+                    sql, params, commit=self.force_commit
                 )
                 self.arccat_db.append(catalog)
 

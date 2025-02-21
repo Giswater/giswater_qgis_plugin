@@ -59,7 +59,7 @@ class Catalogs:
     If a INP file doesn't have a type of node, its property receives `None`.
     """
 
-    db_arcs: dict[str, tuple[str, Optional[float], Optional[float], Optional[float], Optional[float]]]
+    db_arcs: dict[str, tuple[str, Optional[float], Optional[float | str], Optional[float], Optional[float]]]
     db_features: dict[str, tuple[str, str]]
     db_materials: dict[str, float]
     db_nodes: dict[str, str]
@@ -68,7 +68,7 @@ class Catalogs:
     inp_outfalls: Optional[list[str]]
     inp_dividers: Optional[list[str]]
     inp_storage: Optional[list[str]]
-    inp_conduits: dict[tuple[str, Optional[float], Optional[float], Optional[float], Optional[float]], list[str]]
+    inp_conduits: dict[tuple[str, Optional[float], Optional[float | str], Optional[float], Optional[float]], list[str]]
     inp_pumps: Optional[list[str]]
     inp_orifice: Optional[list[str]]
     inp_weir: Optional[list[str]]
@@ -99,14 +99,14 @@ class Catalogs:
         if log:
             log.append("Getting arc catalog from DB...")
         rows = tools_db.get_rows("""
-                SELECT id, shape, geom1, geom2, geom3, geom4
+                SELECT id, shape, geom1, CASE WHEN shape = 'CUSTOM' THEN curve_id::text ELSE geom2::text END AS geom2, geom3, geom4
                 FROM cat_arc
             """)
 
-        db_arc_catalog: dict[str, tuple[str, Optional[float], Optional[float], Optional[float], Optional[float]]] = {}
+        db_arc_catalog: dict[str, tuple[str, Optional[float], Optional[float | str], Optional[float], Optional[float]]] = {}
         if rows:
             unsorted_dict = {
-                _id: (str(shape), tofloat(geom1), tofloat(geom2), tofloat(geom3), tofloat(geom4)) for _id, shape, geom1, geom2, geom3, geom4 in rows
+                _id: (str(shape), tofloat(geom1), tofloat(geom2) if shape != 'CUSTOM' else str(geom2), tofloat(geom3), tofloat(geom4)) for _id, shape, geom1, geom2, geom3, geom4 in rows
             }
             db_arc_catalog = dict(sorted(unsorted_dict.items()))
 
@@ -219,6 +219,8 @@ class Catalogs:
             culvert = xs.culvert
             transect = xs.transect
             curve_name = xs.curve_name
+            if shape == 'CUSTOM':
+                geom2 = curve_name
 
             conduit_types.add((shape, geom1, geom2, geom3, geom4))
 
@@ -236,7 +238,7 @@ class Catalogs:
         if log:
             log.append("Getting conduit catalogs...")
 
-        conduit_catalogs: dict[tuple[str, Optional[float], Optional[float], Optional[float], Optional[float]], list[str]] = {}
+        conduit_catalogs: dict[tuple[str, Optional[float], Optional[float | str], Optional[float], Optional[float]], list[str]] = {}
         for conduit_type in sorted(conduit_types):
             conduit_catalogs[conduit_type] = [
                 _id for _id, dr_pair in db_arc_catalog.items() if dr_pair == conduit_type
