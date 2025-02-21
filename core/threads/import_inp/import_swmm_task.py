@@ -273,29 +273,8 @@ class GwImportInpTask(GwTask):
     def _enable_triggers(self, enable: bool) -> None:
         op = "ENABLE" if enable else "DISABLE"
         queries = [
-            f'ALTER TABLE arc {op} TRIGGER gw_trg_arc_link_update;',
-            f'ALTER TABLE arc {op} TRIGGER gw_trg_arc_node_values;',
-            f'ALTER TABLE arc {op} TRIGGER gw_trg_arc_noderotation_update;',
-            f'ALTER TABLE arc {op} TRIGGER gw_trg_topocontrol_arc;',
-            f'ALTER TABLE arc {op} TRIGGER gw_trg_edit_controls;',
-            f'ALTER TABLE arc {op} TRIGGER gw_trg_mantypevalue_fk_insert;',
-            f'ALTER TABLE arc {op} TRIGGER gw_trg_mantypevalue_fk_update;',
-            f'ALTER TABLE arc {op} TRIGGER gw_trg_cat_material_fk_insert;',
-            f'ALTER TABLE arc {op} TRIGGER gw_trg_cat_material_fk_update;',
-            f'ALTER TABLE arc {op} TRIGGER gw_trg_typevalue_fk_insert;',
-            f'ALTER TABLE arc {op} TRIGGER gw_trg_typevalue_fk_update;',
-
-            f'ALTER TABLE node {op} TRIGGER gw_trg_node_arc_divide;',
-            f'ALTER TABLE node {op} TRIGGER gw_trg_node_statecontrol;',
-            f'ALTER TABLE node {op} TRIGGER gw_trg_topocontrol_node;',
-            f'ALTER TABLE node {op} TRIGGER gw_trg_node_rotation_update;',
-            f'ALTER TABLE node {op} TRIGGER gw_trg_edit_controls;',
-            f'ALTER TABLE node {op} TRIGGER gw_trg_mantypevalue_fk_insert;',
-            f'ALTER TABLE node {op} TRIGGER gw_trg_mantypevalue_fk_update;',
-            f'ALTER TABLE node {op} TRIGGER gw_trg_cat_material_fk_insert;',
-            f'ALTER TABLE node {op} TRIGGER gw_trg_cat_material_fk_update;',
-            f'ALTER TABLE node {op} TRIGGER gw_trg_typevalue_fk_insert;',
-            f'ALTER TABLE node {op} TRIGGER gw_trg_typevalue_fk_update;',
+            f'ALTER TABLE arc {op} TRIGGER ALL;',
+            f'ALTER TABLE node {op} TRIGGER ALL;',
         ]
         for sql in queries:
             result = tools_db.execute_sql(sql, commit=self.force_commit)

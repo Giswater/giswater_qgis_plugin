@@ -91,6 +91,9 @@ class GwImportInpTask(GwTask):
     def run(self) -> bool:
         super().run()
         try:
+            # Disable triggers
+            self._enable_triggers(False)
+
             self.progress_changed.emit("Validate inputs", self.PROGRESS_INIT, "Validating inputs...", False)
             self._validate_inputs()
             self.progress_changed.emit("Validate inputs", self.PROGRESS_VALIDATE, "done!", True)
@@ -121,6 +124,9 @@ class GwImportInpTask(GwTask):
                 log_str = self._manage_nodarcs()
                 self.progress_changed.emit("Nodarcs", self.PROGRESS_END, "done!", True)
                 self.progress_changed.emit("Nodarcs", self.PROGRESS_END, log_str, True)
+
+            # Enable triggers
+            self._enable_triggers(True)
 
             execute_sql("select 1", commit=True)
             self.progress_changed.emit("", self.PROGRESS_END, "\n\nALL DONE! INP successfully imported.", True)
@@ -177,6 +183,17 @@ class GwImportInpTask(GwTask):
 
         self.progress_changed.emit("Visual objects", lerp_progress(70, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing pipes", True)
         self._save_pipes()
+
+    def _enable_triggers(self, enable: bool) -> None:
+        op = "ENABLE" if enable else "DISABLE"
+        queries = [
+            f"ALTER TABLE node {op} TRIGGER ALL;",
+            f"ALTER TABLE arc {op} TRIGGER ALL;",
+        ]
+        for sql in queries:
+            result = tools_db.execute_sql(sql, commit=self.force_commit)
+            if not result:
+                return
 
     def _get_units(self) -> None:
         units = self.network.options.hydraulic.inpfile_units
@@ -435,6 +452,7 @@ class GwImportInpTask(GwTask):
                     INSERT INTO cat_arc (id, arc_type, matcat_id, dint)
                     VALUES (%s, %s, %s, %s);
                 """
+                print(catalog, arctype_id, material, pipe_dint)
                 execute_sql(
                     sql, (catalog, arctype_id, material, pipe_dint), commit=self.force_commit
                 )
