@@ -72,12 +72,14 @@ BEGIN
 
             v_nodecat = (SELECT valv_type FROM inp_virtualvalve WHERE arc_id = v_data.arc_id);
             v_json_aux = ((p_data ->>'data')::json->>lower(v_nodecat))::json;
+            CONTINUE WHEN v_json_aux IS NULL;
             v_nodecat = (v_json_aux->>'catalog')::text;
             v_feature_class = (v_json_aux->>'featureClass')::text;
         ELSIF v_data.epa_type = 'VIRTUALPUMP' THEN
             v_epatype = 'PUMP';
 
             v_json_aux = ((p_data ->>'data')::json->>'pumps')::json;
+            CONTINUE WHEN v_json_aux IS NULL;
             v_nodecat = (v_json_aux->>'catalog')::text;
             v_feature_class = (v_json_aux->>'featureClass')::text;
         ELSE
