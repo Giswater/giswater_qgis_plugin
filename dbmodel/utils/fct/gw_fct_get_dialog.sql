@@ -156,14 +156,17 @@ BEGIN
 	        LOOP
 	            -- Get tab information from config_form_tabs
 	           v_querystring := concat(
-			    'SELECT row_to_json(a) FROM (',
-			    'SELECT DISTINCT ON (tabname, orderby) ',
-			    'tabname as "tabName", label as "tabLabel", tooltip as "tooltip", ',
-			    'NULL as "tabFunction", NULL AS "tabactions", orderby ',
-			    'FROM config_form_tabs WHERE tabname = ''', v_tab_name, ''' ',
-			    'AND formname = ''', v_formtype, ''' AND ', v_device,
-			    ' = ANY(device) AND orderby IS NOT NULL ',
-			    'ORDER BY orderby, tabname) a'
+				    'SELECT row_to_json(a) FROM (',
+				    'SELECT DISTINCT ON (t.tabname, t.orderby) ',
+				    't.tabname as "tabName", t.label as "tabLabel", t.tooltip as "tooltip", ',
+				    'NULL as "tabFunction", NULL AS "tabactions", t.orderby, ',
+				    'ct.addparam as "addparam" ',
+				    'FROM config_form_tabs t ',
+				    'LEFT JOIN config_typevalue ct ON ct.typevalue = ''tabname_typevalue'' AND ct.id = t.tabname ',
+				    'WHERE t.tabname = ''', v_tab_name, ''' ',
+				    'AND t.formname = ''', v_formtype, ''' AND ', v_device,
+				    ' = ANY(t.device) AND t.orderby IS NOT NULL ',
+				    'ORDER BY t.orderby, t.tabname) a'
 				);
 
 				EXECUTE v_querystring INTO v_tab_data;
