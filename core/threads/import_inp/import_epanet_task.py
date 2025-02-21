@@ -115,9 +115,10 @@ class GwImportInpTask(GwTask):
             if self.update_municipality:
                 self._update_municipality()
 
-            self.progress_changed.emit("Sources", self.PROGRESS_VISUAL, "Importing sources...", False)
-            self._save_sources()
-            self.progress_changed.emit("Sources", self.PROGRESS_SOURCES, "done!", True)
+            if self.network.num_sources > 0:
+                self.progress_changed.emit("Sources", self.PROGRESS_VISUAL, "Importing sources...", False)
+                self._save_sources()
+                self.progress_changed.emit("Sources", self.PROGRESS_SOURCES, "done!", True)
 
             if any(self.manage_nodarcs.values()):
                 self.progress_changed.emit("Nodarcs", self.PROGRESS_SOURCES, "Managing nodarcs (pumps/valves as nodes)...", False)
@@ -156,33 +157,42 @@ class GwImportInpTask(GwTask):
         self._create_new_pipe_catalogs()
 
     def _manage_nonvisual(self) -> None:
-        self.progress_changed.emit("Non-visual objects", lerp_progress(0, self.PROGRESS_CATALOGS, self.PROGRESS_NONVISUAL), "Importing patterns", True)
-        self._save_patterns()
+        if self.network.num_patterns > 0:
+            self.progress_changed.emit("Non-visual objects", lerp_progress(0, self.PROGRESS_CATALOGS, self.PROGRESS_NONVISUAL), "Importing patterns", True)
+            self._save_patterns()
 
-        self.progress_changed.emit("Non-visual objects", lerp_progress(40, self.PROGRESS_CATALOGS, self.PROGRESS_NONVISUAL), "Importing curves", True)
-        self._save_curves()
+        if self.network.num_curves > 0:
+            self.progress_changed.emit("Non-visual objects", lerp_progress(40, self.PROGRESS_CATALOGS, self.PROGRESS_NONVISUAL), "Importing curves", True)
+            self._save_curves()
 
-        self.progress_changed.emit("Non-visual objects", lerp_progress(80, self.PROGRESS_CATALOGS, self.PROGRESS_NONVISUAL), "Importing controls and rules", True)
-        self._save_controls_and_rules()
+        if self.network.num_controls > 0:
+            self.progress_changed.emit("Non-visual objects", lerp_progress(80, self.PROGRESS_CATALOGS, self.PROGRESS_NONVISUAL), "Importing controls and rules", True)
+            self._save_controls_and_rules()
 
     def _manage_visual(self) -> None:
-        self.progress_changed.emit("Visual objects", lerp_progress(0, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing junctions", True)
-        self._save_junctions()
+        if self.network.num_junctions > 0:
+            self.progress_changed.emit("Visual objects", lerp_progress(0, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing junctions", True)
+            self._save_junctions()
 
-        self.progress_changed.emit("Visual objects", lerp_progress(30, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing reservoirs", True)
-        self._save_reservoirs()
+        if self.network.num_reservoirs > 0:
+            self.progress_changed.emit("Visual objects", lerp_progress(30, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing reservoirs", True)
+            self._save_reservoirs()
 
-        self.progress_changed.emit("Visual objects", lerp_progress(40, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing tanks", True)
-        self._save_tanks()
+        if self.network.num_tanks > 0:
+            self.progress_changed.emit("Visual objects", lerp_progress(40, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing tanks", True)
+            self._save_tanks()
 
-        self.progress_changed.emit("Visual objects", lerp_progress(50, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing pumps", True)
-        self._save_pumps()
+        if self.network.num_pumps > 0:
+            self.progress_changed.emit("Visual objects", lerp_progress(50, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing pumps", True)
+            self._save_pumps()
 
-        self.progress_changed.emit("Visual objects", lerp_progress(60, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing valves", True)
-        self._save_valves()
+        if self.network.num_valves > 0:
+            self.progress_changed.emit("Visual objects", lerp_progress(60, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing valves", True)
+            self._save_valves()
 
-        self.progress_changed.emit("Visual objects", lerp_progress(70, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing pipes", True)
-        self._save_pipes()
+        if self.network.num_pipes > 0:
+            self.progress_changed.emit("Visual objects", lerp_progress(70, self.PROGRESS_NONVISUAL, self.PROGRESS_VISUAL), "Importing pipes", True)
+            self._save_pipes()
 
     def _enable_triggers(self, enable: bool) -> None:
         op = "ENABLE" if enable else "DISABLE"
