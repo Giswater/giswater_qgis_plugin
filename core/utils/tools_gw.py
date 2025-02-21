@@ -638,9 +638,9 @@ def reset_feature_list():
     return ids, list_ids
 
 
-def reset_layers(self):
+def reset_layers():
     """ Reestablecer la lista de capas """
-    self.layers = {key: [] for key in ['arc', 'node', 'connec', 'gully', 'element']}
+    layers = {key: [] for key in ['arc', 'node', 'connec', 'gully', 'element']}
 
 
 def get_signal_change_tab(dialog, excluded_layers=[]):

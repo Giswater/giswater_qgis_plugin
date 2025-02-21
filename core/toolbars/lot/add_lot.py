@@ -24,39 +24,38 @@ import webbrowser
 import json
 from collections import OrderedDict
 
-from .. import utils_giswater
-from .manage_visit import ManageVisit
-from .parent_manage import ParentManage
-from ..ui_manager import AddLot
-from ..ui_manager import Lot_selector
-from ..ui_manager import BasicTable
-from ..ui_manager import LoadManagement
-from ..ui_manager import LotManagement
-from ..ui_manager import WorkManagement
-from ..ui_manager import ResourcesManagement
-from ..ui_manager import TeamManagement
-from ..ui_manager import TeamCreate
-from ..ui_manager import VehicleCreate
+#from ...ui.ui_manager import ManageVisit
+from ...ui.ui_manager import AddLotUi
+from ...ui.ui_manager import LotSelectorUi
+from ...ui.ui_manager import DialogTableUi
+from ...ui.ui_manager import LoadManagementUi
+from ...ui.ui_manager import LotManagementUi
+from ...ui.ui_manager import WorkManagementUi
+from ...ui.ui_manager import ResourcesManagementUi
+from ...ui.ui_manager import TeamManagemenUi
+from ...ui.ui_manager import TeamCreateUi
+from ...ui.ui_manager import VehicleCreateUi
+from .... import global_vars
 
 from ....libs import tools_qgis, tools_qt, tools_db
 from ...utils import tools_gw
 
 
-class AddNewLot(ParentManage):
+class AddNewLot():
 
-    def __init__(self, iface, settings, controller, plugin_dir):
+    def __init__(self, icon_path, action_name, text, toolbar, action_group):
         """ Class to control 'Add basic visit' of toolbar 'edit' """
 
-        ParentManage.__init__(self, iface, settings, controller, plugin_dir)
         self.ids = []
-        self.rb_red = QgsRubberBand(self.canvas)
+        self.canvas = global_vars.canvas
+        self.rb_red = tools_gw.create_rubberband(self.canvas)
         self.rb_red.setColor(Qt.darkRed)
         self.rb_red.setIconSize(20)
         self.rb_list = []
         self.lot_date_format = 'yyyy-MM-dd'
         self.max_id = 0
         self.signal_selectionChanged = False
-        self.sys_type = None
+        self.param_options = None
 
 
     def manage_lot(self, lot_id=None, is_new=True, visitclass_id=None):
@@ -68,7 +67,7 @@ class AddNewLot(ParentManage):
         self.cmb_position = 17  # Variable used to set the position of the QCheckBox in the relations table
 
         self.srid = lib_vars.data_epsg
-        # Get layers of every geom_type
+        # Get layers of every feature_type
         tools_gw.reset_feature_list()
         tools_gw.reset_layers()
         self.layers['arc'] = [tools_qgis.get_layer_by_tablename('v_edit_arc')]
@@ -79,7 +78,7 @@ class AddNewLot(ParentManage):
         if tools_gw.get_project_type() == 'ud':
             self.layers['gully'] = [self.tools_qgis.get_layer_by_tablename('v_edit_gully')]
 
-        self.dlg_lot = AddLot()
+        self.dlg_lot = AddLotUi()
         tools_gw.load_settings(self.dlg_lot)
         self.load_user_values(self.dlg_lot)
         self.dropdown = self.dlg_lot.findChild(QToolButton, 'action_selector')
@@ -101,10 +100,10 @@ class AddNewLot(ParentManage):
         tools_gw.add_icon(self.dlg_lot.btn_refresh_materialize_view, "116")
 
         # Set date format to date widgets (QUE ES ESTO)
-        tools_qt.check_date.set_regexp_date_validator(self.dlg_lot.startdate, self.dlg_lot.btn_accept, 1)
-        tools_qt.check_date.set_regexp_date_validator(self.dlg_lot.enddate, self.dlg_lot.btn_accept, 1)
-        tools_qt.check_date.set_regexp_date_validator(self.dlg_lot.real_startdate, self.dlg_lot.btn_accept, 1)
-        tools_qt.check_date.set_regexp_date_validator(self.dlg_lot.real_enddate, self.dlg_lot.btn_accept, 1)
+        tools_qt.check_date(self.dlg_lot.startdate, self.dlg_lot.btn_accept, 1)
+        tools_qt.check_date(self.dlg_lot.enddate, self.dlg_lot.btn_accept, 1)
+        tools_qt.check_date(self.dlg_lot.real_startdate, self.dlg_lot.btn_accept, 1)
+        tools_qt.check_date(self.dlg_lot.real_enddate, self.dlg_lot.btn_accept, 1)
         self.dlg_lot.enddate.textChanged.connect(self.check_dates_consistency)
 
         self.lot_id = self.dlg_lot.findChild(QLineEdit, "lot_id")
@@ -133,14 +132,13 @@ class AddNewLot(ParentManage):
             new_lot_id = self.get_next_id('om_visit_lot', 'id')
         tools_qt.set_widget_text(self.dlg_lot, self.lot_id, new_lot_id)
 
-        # QUE ES ESTO geom_type en este caso seria feature_type? que funcion se puede usar?
-        self.geom_type = tools_qt.get_combo_value(self.dlg_lot, self.visit_class, 2).lower()
+        self.feature_type = tools_qt.get_combo_value(self.dlg_lot, self.visit_class, 2).lower()
 
-        if self.geom_type != '':
-            viewname = "v_edit_" + self.geom_type
-            tools_gw.set_completer_feature_id(self.dlg_lot.feature_id, self.geom_type, viewname)
+        if self.feature_type != '':
+            viewname = "v_edit_" + self.feature_type
+            tools_gw.set_completer_feature_id(self.dlg_lot.feature_id, self.feature_type, viewname)
         else:
-            self.geom_type = 'arc'
+            self.feature_type = 'arc'
         self.clear_selection()
 
         self.event_feature_type_selected(self.dlg_lot)
@@ -233,7 +231,7 @@ class AddNewLot(ParentManage):
             result_visit = ''
 
         # Get columns to ignore for tab_relations when export csv
-        sql = "SELECT columnname FROM config_form_tableview WHERE location_type = 'lot' AND visible IS NOT TRUE AND objectname = 've_lot_x_"+str(self.geom_type)+"'"
+        sql = "SELECT columnname FROM config_form_tableview WHERE location_type = 'lot' AND visible IS NOT TRUE AND objectname = 've_lot_x_"+str(self.feature_type)+"'"
         rows = tools_db.get_rows(sql)
         result_relation = []
         if rows is not None:
@@ -332,7 +330,7 @@ class AddNewLot(ParentManage):
 
 
     def create_team(self):
-        self.dlg_create_team = TeamCreate()
+        self.dlg_create_team = TeamCreateUi()
         tools_gw.load_settings(self.dlg_create_team)
 
         self.dlg_create_team.rejected.connect(partial(tools_gw.close_dialog, self.dlg_create_team))
@@ -378,7 +376,7 @@ class AddNewLot(ParentManage):
 
 
     def create_vehicle(self):
-        self.dlg_create_vehicle = VehicleCreate()
+        self.dlg_create_vehicle = VehicleCreateUi()
         tools_gw.load_settings(self.dlg_create_vehicle)
 
         self.dlg_create_vehicle.rejected.connect(partial(tools_gw.close_dialog, self.dlg_create_vehicle))
@@ -426,7 +424,7 @@ class AddNewLot(ParentManage):
     def manage_team(self):
         """ Open dialog of teams """
 
-        self.dlg_basic_table = BasicTable()
+        self.dlg_basic_table = DialogTableUi()
         tools_gw.load_settings(self.dlg_basic_table)
         self.dlg_basic_table.setWindowTitle("Administrador d'equips")
         table_name = 'v_edit_cat_team'
@@ -797,13 +795,13 @@ class AddNewLot(ParentManage):
         # 1) set the model linked to selecte features
         # 2) check if there are features related to the current visit
         # 3) if so, select them => would appear in the table associated to the model
-        self.geom_type = self.feature_type.currentText().lower()
-        sys_type = tools_qt.fill_combo_values(self.dlg_lot, self.dlg_lot.cmb_visit_class, 4)
-        if sys_type in (None, ''): return
-        self.sys_type = json.loads(sys_type, object_pairs_hook=OrderedDict)
+        self.feature_type = self.feature_type.currentText().lower()
+        param_options = tools_qt.fill_combo_values(self.dlg_lot, self.dlg_lot.cmb_visit_class, 4)
+        if param_options in (None, ''): return
+        self.param_options = json.loads(param_options, object_pairs_hook=OrderedDict)
 
-        viewname = "v_edit_" + self.geom_type
-        tools_gw.set_completer_feature_id(dialog.feature_id, self.geom_type, viewname)
+        viewname = "v_edit_" + self.feature_type
+        tools_gw.set_completer_feature_id(dialog.feature_id, self.feature_type, viewname)
 
 
     def clear_selection(self, remove_groups=True):
@@ -929,23 +927,27 @@ class AddNewLot(ParentManage):
         self.set_active_layer()
         self.dropdown.setDefaultAction(action)
         tools_qgis.disconnect_signal_selection_changed()
-        self.geom_type = tools_qt.fill_combo_values(self.dlg_lot, self.dlg_lot.cmb_visit_class, 2)
+        self.feature_type = tools_qt.fill_combo_values(self.dlg_lot, self.dlg_lot.cmb_visit_class, 2)
         if self.signal_selectionChanged is False:
             self.iface.mainWindow().findChild(QAction, action_name).triggered.connect(
-                partial(self.selection_changed_by_expr, dialog, self.layer_lot, self.geom_type, self.sys_type))
+                partial(self.selection_changed_by_expr, dialog, self.layer_lot, self.feature_type, self.param_options))
         self.iface.mainWindow().findChild(QAction, action_name).trigger()
 
 
-    def selection_changed_by_expr(self, dialog, layer, geom_type, sys_type):
+    def selection_changed_by_expr(self, dialog, layer, feature_type, param_options):
         self.signal_selectionChanged = True
-        self.canvas.selectionChanged.connect(partial(self.manage_selection, dialog, layer, geom_type, sys_type))
+        self.canvas.selectionChanged.connect(partial(self.manage_selection, dialog, layer, feature_type, param_options))
 
 
-    def manage_selection(self, dialog, layer, geom_type, sys_type):
+    def manage_selection(self, dialog, layer, feature_type, param_options):
         """ Slot function for signal 'canvas.selectionChanged' """
-        field_id = geom_type + "_id"
-        if sys_type and 'sysType' in sys_type:
-            sys_type = sys_type['sysType']
+        field_id = feature_type + "_id"
+        if param_options and 'featureType' in param_options:
+            key = feature_type + "_type"
+            sys_type = param_options ['featureType']
+        elif param_options and 'sysType' in param_options:
+            key = "sysType"
+            sys_type = param_options['sysType']
         else:
             sys_type = None
 
@@ -961,7 +963,7 @@ class AddNewLot(ParentManage):
                 if str(state) != "1":
                     continue
 
-                if sys_type and (feature.attribute('sys_type') == sys_type and selected_id not in self.ids):
+                if sys_type and (feature.attribute(key) == sys_type and selected_id not in self.ids):
                     self.ids.append(str(selected_id))
                 elif sys_type is None and selected_id not in self.ids:
                     self.ids.append(str(selected_id))
@@ -1115,8 +1117,8 @@ class AddNewLot(ParentManage):
         """ Connect signal selectionChanged """
 
         try:
-            self.geom_type = tools_qt.fill_combo_values(self.dlg_lot, self.dlg_lot.cmb_visit_class, 2)
-            self.canvas.selectionChanged.connect(partial(self.manage_selection, dialog, self.layer_lot, self.geom_type, self.sys_type))
+            self.feature_type = tools_qt.fill_combo_values(self.dlg_lot, self.dlg_lot.cmb_visit_class, 2)
+            self.canvas.selectionChanged.connect(partial(self.manage_selection, dialog, self.layer_lot, self.feature_type, self.param_options))
         except:
             pass
 
@@ -1572,7 +1574,7 @@ class AddNewLot(ParentManage):
 
         # Create the dialog
         self.autocommit = True
-        self.dlg_lot_man = LotManagement()
+        self.dlg_lot_man = LotManagementUi()
         tools_gw.load_settings(self.dlg_lot_man)
         self.load_user_values(self.dlg_lot_man)
         self.dlg_lot_man.tbl_lots.setSelectionBehavior(QAbstractItemView.SelectRows)
@@ -1625,7 +1627,7 @@ class AddNewLot(ParentManage):
         self.dlg_lot_man.btn_delete.clicked.connect(partial(self.delete_lot, self.dlg_lot_man.tbl_lots))
         self.dlg_lot_man.btn_work_register.clicked.connect(self.open_work_register)
         self.dlg_lot_man.btn_manage_load.clicked.connect(self.open_load_manage)
-        self.dlg_lot_man.btn_lot_selector.clicked.connect(self.lot_selector)
+        self.dlg_lot_man.btn_LotSelectorUi.clicked.connect(self.LotSelectorUi)
 
         # Set filter events
         self.dlg_lot_man.txt_codi_ot.textChanged.connect(self.filter_lot)
@@ -1662,7 +1664,7 @@ class AddNewLot(ParentManage):
 
     def open_load_manage(self):
 
-        self.dlg_load_manager = LoadManagement()
+        self.dlg_load_manager = LoadManagementUi()
         tools_gw.load_settings(self.dlg_load_manager)
         self.dlg_load_manager.tbl_loads.setSelectionBehavior(QAbstractItemView.SelectRows)
 
@@ -1702,7 +1704,7 @@ class AddNewLot(ParentManage):
 
     def open_work_register(self):
 
-        self.dlg_work_register = WorkManagement()
+        self.dlg_work_register = WorkManagementUi()
         tools_gw.load_settings(self.dlg_work_register)
         self.dlg_work_register.tbl_work.setSelectionBehavior(QAbstractItemView.SelectRows)
 
@@ -1798,9 +1800,9 @@ class AddNewLot(ParentManage):
         self.dlg_load_manager.tbl_loads.model().select()
 
 
-    def lot_selector(self):
+    def LotSelectorUi(self):
 
-        self.dlg_lot_sel = Lot_selector()
+        self.dlg_lot_sel = LotSelectorUi()
         tools_gw.load_settings(self.dlg_lot_sel)
 
         self.dlg_lot_sel.btn_ok.clicked.connect(partial(tools_gw.close_dialog, self.dlg_lot_sel))
@@ -1822,7 +1824,7 @@ class AddNewLot(ParentManage):
         hide_left = [1, 2, 4, 6, 8, 10, 11, 12, 13, 14, 15, 16]
         hide_right = [1, 2, 4, 6, 8, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
 
-        self.populate_lot_selector(self.dlg_lot_sel, tableleft, tableright, field_id_left, field_id_right,
+        self.populate_LotSelectorUi(self.dlg_lot_sel, tableleft, tableright, field_id_left, field_id_right,
                                 hide_left, hide_right)
         self.dlg_lot_sel.btn_select.clicked.connect(partial(self.set_visible_lot_layers, True))
         self.dlg_lot_sel.btn_unselect.clicked.connect(partial(self.set_visible_lot_layers, True))
@@ -1831,7 +1833,7 @@ class AddNewLot(ParentManage):
         tools_gw.open_dialog(self.dlg_lot_sel)
 
 
-    def populate_lot_selector(self, dialog, tableleft, tableright, field_id_left, field_id_right, hide_left, hide_right):
+    def populate_LotSelectorUi(self, dialog, tableleft, tableright, field_id_left, field_id_right, hide_left, hide_right):
 
         # Get rows id on table lot manager
         model = self.dlg_lot_man.tbl_lots.model()
@@ -1878,17 +1880,17 @@ class AddNewLot(ParentManage):
                                                     query_left, query_right, field_id_right, add_sort=False))
         # QLineEdit
         dialog.txt_name.textChanged.connect(
-            partial(self.filter_lot_selector, dialog, dialog.txt_name, tbl_all_rows, tableleft, tableright,
+            partial(self.filter_LotSelectorUi, dialog, dialog.txt_name, tbl_all_rows, tableleft, tableright,
                     field_id_right, field_id_left, data))
         dialog.txt_status_filter.textChanged.connect(
-            partial(self.filter_lot_selector, dialog, dialog.txt_status_filter, tbl_all_rows, tableleft, tableright,
+            partial(self.filter_LotSelectorUi, dialog, dialog.txt_status_filter, tbl_all_rows, tableleft, tableright,
                     field_id_right, field_id_left, data))
         dialog.txt_wotype_filter.textChanged.connect(
-            partial(self.filter_lot_selector, dialog, dialog.txt_wotype_filter, tbl_all_rows, tableleft, tableright,
+            partial(self.filter_LotSelectorUi, dialog, dialog.txt_wotype_filter, tbl_all_rows, tableleft, tableright,
                     field_id_right, field_id_left, data))
 
 
-    def filter_lot_selector(self, dialog, text_line, qtable, tableleft, tableright, field_id_r, field_id_l, filter_data):
+    def filter_LotSelectorUi(self, dialog, text_line, qtable, tableleft, tableright, field_id_r, field_id_l, filter_data):
         """ Fill the QTableView by filtering through the QLineEdit"""
         filter_id = tools_qt.get_text(dialog, dialog.txt_name)
         filter_status = tools_qt.get_text(dialog, dialog.txt_status_filter)
@@ -2278,7 +2280,7 @@ class AddNewLot(ParentManage):
     def resources_management(self):
 
         # Create the dialog
-        self.dlg_resources_man = ResourcesManagement()
+        self.dlg_resources_man = ResourcesManagementUi()
         tools_gw.load_settings(self.dlg_resources_man)
 
         # Populate combos
@@ -2345,7 +2347,7 @@ class AddNewLot(ParentManage):
     def open_team_selector(self):
 
         # Create the dialog
-        self.dlg_team_man = TeamManagement()
+        self.dlg_team_man = TeamManagemenUi()
         tools_gw.load_settings(self.dlg_team_man)
 
         # Set signals
@@ -2541,7 +2543,7 @@ class AddNewLot(ParentManage):
     def manage_vehicle(self):
         """ Open dialog of teams """
 
-        self.dlg_basic_table = BasicTable()
+        self.dlg_basic_table = DialogTableUi()
         tools_gw.load_settings(self.dlg_basic_table)
         self.dlg_basic_table.setWindowTitle("Administrador de vehicles")
         table_name = 'v_ext_cat_vehicle'
@@ -2591,3 +2593,134 @@ class AddNewLot(ParentManage):
         # Manage date_from, date_to and save into settings variables
         date = tools_qt.get_calendar_date(self.dlg_lot_man, widget, 'dd/MM/yyyy')
         self.controller.plugin_settings_set_value(key, str(date))
+
+    def hide_colums(self, widget, comuns_to_hide):
+        for i in range(0, len(comuns_to_hide)):
+            widget.hideColumn(comuns_to_hide[i])
+
+
+    def unselector(self, qtable_left, qtable_right, query_delete, query_left, query_right, field_id_right, add_sort=True):
+
+        selected_list = qtable_right.selectionModel().selectedRows()
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message)
+            return
+        expl_id = []
+        for i in range(0, len(selected_list)):
+            row = selected_list[i].row()
+            id_ = str(qtable_right.model().record(row).value(field_id_right))
+            expl_id.append(id_)
+        for i in range(0, len(expl_id)):
+            self.controller.execute_sql(query_delete + str(expl_id[i]))
+
+        # Refresh
+        if add_sort is True:
+            oder_by = {0: "ASC", 1: "DESC"}
+            sort_order = qtable_left.horizontalHeader().sortIndicatorOrder()
+            idx = qtable_left.horizontalHeader().sortIndicatorSection()
+            col_to_sort = qtable_left.model().headerData(idx, Qt.Horizontal)
+            query_left += f" ORDER BY {col_to_sort} {oder_by[sort_order]}"
+        self.fill_table_by_query(qtable_left, query_left)
+        if add_sort is True:
+            sort_order = qtable_right.horizontalHeader().sortIndicatorOrder()
+            idx = qtable_right.horizontalHeader().sortIndicatorSection()
+            col_to_sort = qtable_right.model().headerData(idx, Qt.Horizontal)
+            query_right += f" ORDER BY {col_to_sort} {oder_by[sort_order]}"
+        self.fill_table_by_query(qtable_right, query_right)
+        self.refresh_map_canvas()
+
+
+    def multi_rows_selector(self, qtable_left, qtable_right, id_ori,
+                            tablename_des, id_des, query_left, query_right, field_id, add_sort=True):
+        """
+            :param qtable_left: QTableView origin
+            :param qtable_right: QTableView destini
+            :param id_ori: Refers to the id of the source table
+            :param tablename_des: table destini
+            :param id_des: Refers to the id of the target table, on which the query will be made
+            :param query_right:
+            :param query_left:
+            :param field_id:
+        """
+
+        selected_list = qtable_left.selectionModel().selectedRows()
+
+        if len(selected_list) == 0:
+            message = "Any record selected"
+            self.controller.show_warning(message)
+            return
+        expl_id = []
+        curuser_list = []
+        for i in range(0, len(selected_list)):
+            row = selected_list[i].row()
+            id_ = qtable_left.model().record(row).value(id_ori)
+            expl_id.append(id_)
+            curuser = qtable_left.model().record(row).value("cur_user")
+            curuser_list.append(curuser)
+        for i in range(0, len(expl_id)):
+            # Check if expl_id already exists in expl_selector
+            sql = (f"SELECT DISTINCT({id_des}, cur_user)"
+                   f" FROM {tablename_des}"
+                   f" WHERE {id_des} = '{expl_id[i]}' AND cur_user = current_user")
+            row = self.controller.get_row(sql)
+
+            if row:
+                # if exist - show warning
+                message = "Id already selected"
+                self.controller.show_info_box(message, "Info", parameter=str(expl_id[i]))
+            else:
+                sql = (f"INSERT INTO {tablename_des} ({field_id}, cur_user) "
+                       f" VALUES ({expl_id[i]}, current_user)")
+                self.controller.execute_sql(sql)
+
+        # Refresh
+        if add_sort is True:
+            oder_by = {0: "ASC", 1: "DESC"}
+            sort_order = qtable_left.horizontalHeader().sortIndicatorOrder()
+            idx = qtable_left.horizontalHeader().sortIndicatorSection()
+            col_to_sort = qtable_left.model().headerData(idx, Qt.Horizontal)
+            query_left += f" ORDER BY {col_to_sort} {oder_by[sort_order]}"
+        self.fill_table_by_query(qtable_right, query_right)
+
+        if add_sort is True:
+            sort_order = qtable_right.horizontalHeader().sortIndicatorOrder()
+            idx = qtable_right.horizontalHeader().sortIndicatorSection()
+            col_to_sort = qtable_right.model().headerData(idx, Qt.Horizontal)
+            query_right += f" ORDER BY {col_to_sort} {oder_by[sort_order]}"
+        self.fill_table_by_query(qtable_left, query_left)
+        self.refresh_map_canvas()
+
+
+    def query_like_widget_text(self, dialog, text_line, qtable, tableleft, tableright, field_id_r, field_id_l,
+                               name='name', aql=''):
+        """ Fill the QTableView by filtering through the QLineEdit"""
+
+        schema_name = self.schema_name.replace('"', '')
+        query = utils_giswater.getWidgetText(dialog, text_line, return_string_null=False).lower()
+        sql = (f"SELECT * FROM {schema_name}.{tableleft} WHERE {name} NOT IN "
+               f"(SELECT {tableleft}.{name} FROM {schema_name}.{tableleft}"
+               f" RIGHT JOIN {schema_name}.{tableright}"
+               f" ON {tableleft}.{field_id_l} = {tableright}.{field_id_r}"
+               f" WHERE cur_user = current_user) AND LOWER({name}::text) LIKE '%{query}%'"
+               f"  AND  {field_id_l} > -1")
+        sql += aql
+        self.fill_table_by_query(qtable, sql)
+
+
+    def create_action(self, action_name, action_group, icon_num=None, text=None):
+        """ Creates a new action with selected parameters """
+
+        icon = None
+        icon_folder = self.plugin_dir + '/icons/'
+        icon_path = icon_folder + icon_num + '.png'
+        if os.path.exists(icon_path):
+            icon = QIcon(icon_path)
+
+        if icon is None:
+            action = QAction(text, action_group)
+        else:
+            action = QAction(icon, text, action_group)
+        action.setObjectName(action_name)
+
+        return action

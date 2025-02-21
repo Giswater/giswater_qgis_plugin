@@ -345,104 +345,6 @@ class ParentAction(object):
         self.fill_table_by_query(qtable, query)
         self.refresh_map_canvas()
 
-    # QUE ES ESTO, no hay ninguna parecida?
-    def hide_colums(self, widget, comuns_to_hide):
-        for i in range(0, len(comuns_to_hide)):
-            widget.hideColumn(comuns_to_hide[i])
-
-    # QUE ES ESTO, no hay ninguna parecida?
-    def unselector(self, qtable_left, qtable_right, query_delete, query_left, query_right, field_id_right, add_sort=True):
-
-        selected_list = qtable_right.selectionModel().selectedRows()
-        if len(selected_list) == 0:
-            message = "Any record selected"
-            self.controller.show_warning(message)
-            return
-        expl_id = []
-        for i in range(0, len(selected_list)):
-            row = selected_list[i].row()
-            id_ = str(qtable_right.model().record(row).value(field_id_right))
-            expl_id.append(id_)
-        for i in range(0, len(expl_id)):
-            self.controller.execute_sql(query_delete + str(expl_id[i]))
-
-        # Refresh
-        if add_sort is True:
-            oder_by = {0: "ASC", 1: "DESC"}
-            sort_order = qtable_left.horizontalHeader().sortIndicatorOrder()
-            idx = qtable_left.horizontalHeader().sortIndicatorSection()
-            col_to_sort = qtable_left.model().headerData(idx, Qt.Horizontal)
-            query_left += f" ORDER BY {col_to_sort} {oder_by[sort_order]}"
-        self.fill_table_by_query(qtable_left, query_left)
-        if add_sort is True:
-            sort_order = qtable_right.horizontalHeader().sortIndicatorOrder()
-            idx = qtable_right.horizontalHeader().sortIndicatorSection()
-            col_to_sort = qtable_right.model().headerData(idx, Qt.Horizontal)
-            query_right += f" ORDER BY {col_to_sort} {oder_by[sort_order]}"
-        self.fill_table_by_query(qtable_right, query_right)
-        self.refresh_map_canvas()
-
-    # QUE ES ESTO, no hay ninguna parecida?
-    def multi_rows_selector(self, qtable_left, qtable_right, id_ori,
-                            tablename_des, id_des, query_left, query_right, field_id, add_sort=True):
-        """
-            :param qtable_left: QTableView origin
-            :param qtable_right: QTableView destini
-            :param id_ori: Refers to the id of the source table
-            :param tablename_des: table destini
-            :param id_des: Refers to the id of the target table, on which the query will be made
-            :param query_right:
-            :param query_left:
-            :param field_id:
-        """
-
-        selected_list = qtable_left.selectionModel().selectedRows()
-
-        if len(selected_list) == 0:
-            message = "Any record selected"
-            self.controller.show_warning(message)
-            return
-        expl_id = []
-        curuser_list = []
-        for i in range(0, len(selected_list)):
-            row = selected_list[i].row()
-            id_ = qtable_left.model().record(row).value(id_ori)
-            expl_id.append(id_)
-            curuser = qtable_left.model().record(row).value("cur_user")
-            curuser_list.append(curuser)
-        for i in range(0, len(expl_id)):
-            # Check if expl_id already exists in expl_selector
-            sql = (f"SELECT DISTINCT({id_des}, cur_user)"
-                   f" FROM {tablename_des}"
-                   f" WHERE {id_des} = '{expl_id[i]}' AND cur_user = current_user")
-            row = self.controller.get_row(sql)
-
-            if row:
-                # if exist - show warning
-                message = "Id already selected"
-                self.controller.show_info_box(message, "Info", parameter=str(expl_id[i]))
-            else:
-                sql = (f"INSERT INTO {tablename_des} ({field_id}, cur_user) "
-                       f" VALUES ({expl_id[i]}, current_user)")
-                self.controller.execute_sql(sql)
-
-        # Refresh
-        if add_sort is True:
-            oder_by = {0: "ASC", 1: "DESC"}
-            sort_order = qtable_left.horizontalHeader().sortIndicatorOrder()
-            idx = qtable_left.horizontalHeader().sortIndicatorSection()
-            col_to_sort = qtable_left.model().headerData(idx, Qt.Horizontal)
-            query_left += f" ORDER BY {col_to_sort} {oder_by[sort_order]}"
-        self.fill_table_by_query(qtable_right, query_right)
-
-        if add_sort is True:
-            sort_order = qtable_right.horizontalHeader().sortIndicatorOrder()
-            idx = qtable_right.horizontalHeader().sortIndicatorSection()
-            col_to_sort = qtable_right.model().headerData(idx, Qt.Horizontal)
-            query_right += f" ORDER BY {col_to_sort} {oder_by[sort_order]}"
-        self.fill_table_by_query(qtable_left, query_left)
-        self.refresh_map_canvas()
-
 
     def fill_table(self, widget, table_name, set_edit_strategy=QSqlTableModel.OnManualSubmit, expr_filter=None):
         """ Set a model with selected filter.
@@ -482,22 +384,6 @@ class ParentAction(object):
         # Check for errors
         if model.lastError().isValid():
             self.controller.show_warning(model.lastError().text())
-
-
-    # QUE ES ESTO, hay una con el mismo nombre en psector pero no tiene el mismo sql, alomejor juntar i crear condicion?
-    def query_like_widget_text(self, dialog, text_line, qtable, tableleft, tableright, field_id_r, field_id_l, name='name', aql=''):
-        """ Fill the QTableView by filtering through the QLineEdit"""
-
-        schema_name = self.schema_name.replace('"', '')
-        query = utils_giswater.getWidgetText(dialog, text_line, return_string_null=False).lower()
-        sql = (f"SELECT * FROM {schema_name}.{tableleft} WHERE {name} NOT IN "
-               f"(SELECT {tableleft}.{name} FROM {schema_name}.{tableleft}"
-               f" RIGHT JOIN {schema_name}.{tableright}"
-               f" ON {tableleft}.{field_id_l} = {tableright}.{field_id_r}"
-               f" WHERE cur_user = current_user) AND LOWER({name}::text) LIKE '%{query}%'"
-               f"  AND  {field_id_l} > -1")
-        sql += aql
-        self.fill_table_by_query(qtable, sql)
 
 
     def set_icon(self, widget, icon):
@@ -792,24 +678,6 @@ class ParentAction(object):
         rect = QgsRectangle(float(x1) - margin, float(y1) - margin, float(x2) + margin, float(y2) + margin)
         self.canvas.setExtent(rect)
         self.canvas.refresh()
-
-    # QUE ES ESTO, no hay alguna parecida
-    def create_action(self, action_name, action_group, icon_num=None, text=None):
-        """ Creates a new action with selected parameters """
-
-        icon = None
-        icon_folder = self.plugin_dir + '/icons/'
-        icon_path = icon_folder + icon_num + '.png'
-        if os.path.exists(icon_path):
-            icon = QIcon(icon_path)
-
-        if icon is None:
-            action = QAction(text, action_group)
-        else:
-            action = QAction(icon, text, action_group)
-        action.setObjectName(action_name)
-
-        return action
 
 
     def set_wait_cursor(self):
