@@ -39,6 +39,32 @@ SELECT SCHEMA_NAME.gw_fct_moveconnec ($${"client":{"device":4, "infoType":1, "la
 
 
 
+* PRIORIDAD:
+	ramal > parcela > tramo
+
+* PROCESO:
+1-miro si tiene ramales. 
+	si tiene - > palante
+	no tiene -> continuo
+	
+2-miro si tiene parcelas. 
+	si dentro de parcela
+		si connec está encima de tramo
+		si connec está fuera de tramo
+	no tiene parcelas
+		si connec está encima de tramo
+		si connec está fuera de tramo
+		
+	
+3-si no tiene ramales ni parcelas -> miro si hay connecs sobre tramo
+	si hay connec sobre tramo
+		muevo el connec hacia el lado con más espacio libre
+		conecto al tramo que tenía debajo
+	no hay connec sobre tramo
+		continua
+		
+	
+
  
 */
 
@@ -72,9 +98,6 @@ v_ramal_geom text;
 v_percent_ramal numeric;
 v_closest_parcel public.geometry;
 v_point_final public.geometry;
-
-
-
 
 
 v_sql_connec_parcel text;
@@ -172,15 +195,17 @@ BEGIN
 
 	
 
-	--raise exception 'connec_id, v_rec_point_final.arc_id: % %', v_connec, v_rec_point_final.arc_id;
+	raise notice 'connec_id, arc_id: % %', v_connec, v_rec_point_final.arc_id;
 -----------------
 
 	-- si HAY ramal, hacerlo
 
-	 
-	--execute 'select count(*) from ('||v_sql_ramal||')a' into v_count;
-	if v_sql_ramal is not null then
-	--if v_count > 0 then --existe una capa de ramal con geometria
+	--raise exception 'v_sql_ramal %', v_sql_ramal;
+
+
+	execute 'select count(*) from ('||v_sql_ramal||')a' into v_count;
+
+	if v_count > 0 then --existe una capa de ramal con geometria
 		
 		execute v_sql_ramal into v_ramal_table, v_ramal_geom;
 	
@@ -256,7 +281,7 @@ BEGIN
 			else -- dentro de la parcela + fuera del tramo
 					
 			
-				execute 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":'||v_srid||'}, 
+				execute 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25830}, 
 				"form":{}, "feature":{"id":"['||v_connec||']"}, "data":{"filterFields":{}, "pageInfo":{}, "feature_type":"CONNEC"}}$$);
 				';
 				return '{"sucess connec_id":"'||v_connec||'"}';
@@ -275,23 +300,28 @@ BEGIN
 							
 					--raise exception 'v_rec_point_final.point_final %', v_rec_point_final.point_final;
 					update connec set the_geom = v_point_final_reverse where connec_id = v_connec;
+				
+					raise notice 'v_rec_point_final %', v_rec_point_final.arc_id;
+					execute 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":"['||v_connec||']"},
+					"data":{"feature_type":"CONNEC", "forcedArcs":"['||v_rec_point_final.arc_id||']"}}$$)';
 	
 				else -- fuera de parcela + fuera dle tramo
 					
 					update connec set the_geom = v_rec_point_final.point_final where connec_id = v_connec;	
+				
+					raise notice 'v_rec_point_final %', v_rec_point_final.arc_id;
+					execute 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":"['||v_connec||']"},
+					"data":{"feature_type":"CONNEC", "forcedArcs":"[]"}}$$)';
 						
 				end if;
 			
-			
-				execute 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":"['||v_connec||']"},
-				"data":{"feature_type":"CONNEC", "forcedArcs":"['||v_rec_point_final.arc_id||']"}}$$)';
 			
 				return '{"sucess connec_id":"'||v_connec||'"}';
 			
 			else -- fuera de la parcela + fuera del tramo
 			
 				execute 'SELECT gw_fct_setlinktonetwork($${
-				"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":'||v_srid||'}, 
+				"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25830}, 
 				"form":{}, 
 				"feature":{"id":"['||v_connec||']"}, 
 				"data":{"filterFields":{}, "pageInfo":{}, "feature_type":"CONNEC"}}$$)
@@ -319,7 +349,7 @@ BEGIN
 		
 		end if; 
 	
-		v_sql = 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":'||v_srid||'}, "form":{}, 
+		v_sql = 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":25830}, "form":{}, 
 		"feature":{"id":"['||v_connec||']"}, "data":{"filterFields":{}, "pageInfo":{}, "feature_type":"CONNEC"}}$$);';
 		
 		execute v_sql;
