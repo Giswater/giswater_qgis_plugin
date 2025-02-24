@@ -428,8 +428,8 @@ AS WITH streetaxis AS (
     node.top_elev,
     node.custom_top_elev,
     CASE
-        WHEN node.custom_top_elev IS NOT NULL THEN node.custom_top_elev
-        ELSE node.top_elev
+      WHEN node.custom_top_elev IS NOT NULL THEN node.custom_top_elev
+      ELSE node.top_elev
     END AS sys_top_elev,
     node.depth,
     cat_node.node_type,
@@ -445,6 +445,9 @@ AS WITH streetaxis AS (
     node.expl_id,
     exploitation.macroexpl_id,
     node.sector_id,
+    sector.name AS sector_name,
+    sector.macrosector_id,
+    et1.idval::character varying(16) AS sector_type,
     node.presszone_id,
     presszone.name AS presszone_name,
     et2.idval::character varying(16) AS presszone_type,
@@ -513,14 +516,14 @@ AS WITH streetaxis AS (
     node.placement_type,
     node.expl_id2,
     vst.is_operative,
-        CASE
-            WHEN node.brand_id IS NULL THEN cat_node.brand_id
-            ELSE node.brand_id
-        END AS brand_id,
-        CASE
-            WHEN node.model_id IS NULL THEN cat_node.model_id
-            ELSE node.model_id
-        END AS model_id,
+    CASE
+      WHEN node.brand_id IS NULL THEN cat_node.brand_id
+      ELSE node.brand_id
+    END AS brand_id,
+    CASE
+      WHEN node.model_id IS NULL THEN cat_node.model_id
+      ELSE node.model_id
+    END AS model_id,
     node.serial_number,
     node.minsector_id,
     node.macrominsector_id,
@@ -542,11 +545,11 @@ AS WITH streetaxis AS (
     node.lastupdate_user,
     node.the_geom,
     CASE
-        WHEN vst.is_operative = true AND node.epa_type::text <> 'UNDEFINED'::character varying(16)::text THEN node.epa_type
-        ELSE NULL::character varying(16)
-	END AS inp_type,
-  node.pavcat_id,
-  node.is_scadamap
+      WHEN vst.is_operative = true AND node.epa_type::text <> 'UNDEFINED'::character varying(16)::text THEN node.epa_type
+      ELSE NULL::character varying(16)
+    END AS inp_type,
+    node.pavcat_id,
+    node.is_scadamap
    FROM node
      LEFT JOIN cat_node ON cat_node.id::text = node.nodecat_id::text
      JOIN cat_feature ON cat_feature.id::text = cat_node.node_type::text
@@ -1020,6 +1023,9 @@ CREATE OR REPLACE VIEW vu_connec AS
     connec.expl_id,
     exploitation.macroexpl_id,
     connec.sector_id,
+    sector.name AS sector_name,
+    sector.macrosector_id,
+    et1.idval::character varying(16) AS sector_type,
     connec.presszone_id,
     presszone.name AS presszone_name,
     et2.idval::character varying(16) AS presszone_type,
@@ -1098,14 +1104,14 @@ CREATE OR REPLACE VIEW vu_connec AS
     connec.expl_id2,
     vst.is_operative,
     connec.plot_code,
-        CASE
-            WHEN connec.brand_id IS NULL THEN cat_connec.brand_id
-            ELSE connec.brand_id
-        END AS brand_id,
-        CASE
-            WHEN connec.model_id IS NULL THEN cat_connec.model_id
-            ELSE connec.model_id
-        END AS model_id,
+    CASE
+      WHEN connec.brand_id IS NULL THEN cat_connec.brand_id
+      ELSE connec.brand_id
+    END AS brand_id,
+    CASE
+      WHEN connec.model_id IS NULL THEN cat_connec.model_id
+      ELSE connec.model_id
+    END AS model_id,
     connec.serial_number,
     connec.cat_valve,
     connec.minsector_id,
@@ -1132,10 +1138,10 @@ CREATE OR REPLACE VIEW vu_connec AS
     date_trunc('second'::text, connec.lastupdate) AS lastupdate,
     connec.lastupdate_user,
     connec.the_geom,
-        CASE
-            WHEN connec.sector_id > 0 AND vst.is_operative = true AND connec.epa_type = 'JUNCTION'::character varying(16)::text AND cpu.value = '4' THEN connec.epa_type::character varying
-            ELSE NULL::character varying(16)
-        END AS inp_type
+    CASE
+      WHEN connec.sector_id > 0 AND vst.is_operative = true AND connec.epa_type = 'JUNCTION'::character varying(16)::text AND cpu.value = '4' THEN connec.epa_type::character varying
+      ELSE NULL::character varying(16)
+    END AS inp_type
    FROM  (SELECT inp_netw_mode.value FROM inp_netw_mode) cpu, connec
      JOIN cat_connec ON connec.conneccat_id::text = cat_connec.id::text
      JOIN cat_feature ON cat_feature.id::text = cat_connec.connec_type::text
