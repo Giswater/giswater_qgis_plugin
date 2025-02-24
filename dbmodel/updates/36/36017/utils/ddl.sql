@@ -50,22 +50,3 @@ ALTER TABLE element ALTER COLUMN sector_id DROP NOT NULL;
 
 -- 17/02/2025
 DROP FUNCTION IF EXISTS gw_trg_edit_foreignkey() CASCADE;
-
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_streetaxis", "column":"road_type", "dataType":"varchar(100)"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_streetaxis", "column":"surface", "dataType":"varchar(100)"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_streetaxis", "column":"maxspeed", "dataType":"integer"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_streetaxis", "column":"lanes", "dataType":"integer"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_streetaxis", "column":"oneway", "dataType":"boolean"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_streetaxis", "column":"pedestrian", "dataType":"boolean"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_streetaxis", "column":"access_info", "dataType":"varchar(100)"}}$$);
-
-
-CREATE SEQUENCE IF NOT EXISTS om_streetaxis_id_seq
-  INCREMENT 1
-  MINVALUE 1
-  MAXVALUE 2147483647
-  START 1
-  CACHE 1;
-
-
-ALTER TABLE om_streetaxis ALTER COLUMN id SET DEFAULT nextval('om_streetaxis_id_seq');
