@@ -1,4 +1,5 @@
 3.6.017
 *************
 - Enable inserting a node at the vertex of an arc to correct its topology.
-- New columns streetname & streename2 for arc, node, connec, gully to materialice values and increase the performance for big projects
+- New columns streetname & streename2 for arc, node, connec, gully to materialice values and increase the performance for big projects.
+- New columns road_type, surface, maxspeed, lanes, oneway, pedestrian, access_info to enhance the capacities of om_streetaxis table.
