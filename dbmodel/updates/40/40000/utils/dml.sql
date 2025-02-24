@@ -1424,7 +1424,6 @@ INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES
   "lytOrientation": "vertical"
 }'::json);
 INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('tabname_typevalue', 'tab_other_prices', 'tab_other_prices', 'tabOtherPrices', NULL);
-INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('tabname_typevalue', 'tab_relations', 'tab_relations', 'tabRelations', NULL);
 INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('tabname_typevalue', 'tab_relations_arc', 'tab_relations_arc', 'tabRelationsArc', NULL);
 INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('tabname_typevalue', 'tab_relations_connec', 'tab_relations_connec', 'tabRelationsConnec', NULL);
 INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('tabname_typevalue', 'tab_relations_node', 'tab_relations_node', 'tabRelationsNode', NULL);
