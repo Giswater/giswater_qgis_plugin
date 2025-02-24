@@ -1143,7 +1143,8 @@ WITH vu_node AS (SELECT node.node_id,
     vu_node.access_type,
     brand_id,
     model_id,
-    serial_number
+    serial_number,
+    is_scadamap
    FROM vu_node;
 
 
@@ -1431,7 +1432,8 @@ AS WITH
 			brand_id,
 			model_id,
 			serial_number,
-            lock_level
+            lock_level,
+            is_scadamap
 			FROM node_selected
 		)
 	SELECT node_base.*
