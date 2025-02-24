@@ -55,7 +55,7 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_streetax
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_streetaxis", "column":"surface", "dataType":"varchar(100)"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_streetaxis", "column":"maxspeed", "dataType":"integer"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_streetaxis", "column":"lanes", "dataType":"integer"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_streetaxis", "column":"oneway", "dataType":"bolean"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_streetaxis", "column":"oneway", "dataType":"boolean"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_streetaxis", "column":"pedestrian", "dataType":"boolean"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"om_streetaxis", "column":"access_info", "dataType":"varchar(100)"}}$$);
 
