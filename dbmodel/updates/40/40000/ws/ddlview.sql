@@ -554,6 +554,7 @@ AS WITH streetaxis AS (
      LEFT JOIN cat_node ON cat_node.id::text = node.nodecat_id::text
      JOIN cat_feature ON cat_feature.id::text = cat_node.node_type::text
      LEFT JOIN dma ON node.dma_id = dma.dma_id
+     LEFT JOIN sector ON node.sector_id = sector.sector_id
      LEFT JOIN exploitation ON node.expl_id = exploitation.expl_id
      LEFT JOIN dqa ON node.dqa_id = dqa.dqa_id
      LEFT JOIN presszone ON presszone.presszone_id = node.presszone_id
@@ -562,6 +563,7 @@ AS WITH streetaxis AS (
      LEFT JOIN node_add e ON e.node_id::text = node.node_id::text
      LEFT JOIN value_state_type vst ON vst.id = node.state_type
      LEFT JOIN ext_municipality mu ON node.muni_id = mu.muni_id
+     LEFT JOIN typevalue et1 ON et1.id::text = sector.sector_type::text AND et1.typevalue::text = 'sector_type'::text
      LEFT JOIN typevalue et2 ON et2.id::text = presszone.presszone_type AND et2.typevalue::text = 'presszone_type'::text
      LEFT JOIN typevalue et3 ON et3.id::text = dma.dma_type::text AND et3.typevalue::text = 'dma_type'::text
      LEFT JOIN typevalue et4 ON et4.id::text = dqa.dqa_type::text AND et4.typevalue::text = 'dqa_type'::text;
@@ -1146,6 +1148,7 @@ CREATE OR REPLACE VIEW vu_connec AS
      JOIN cat_connec ON connec.conneccat_id::text = cat_connec.id::text
      JOIN cat_feature ON cat_feature.id::text = cat_connec.connec_type::text
      LEFT JOIN dma ON connec.dma_id = dma.dma_id
+     LEFT JOIN sector ON connec.sector_id = sector.sector_id
      LEFT JOIN exploitation ON connec.expl_id = exploitation.expl_id
      LEFT JOIN dqa ON connec.dqa_id = dqa.dqa_id
      LEFT JOIN presszone ON presszone.presszone_id = connec.presszone_id
@@ -1155,6 +1158,7 @@ CREATE OR REPLACE VIEW vu_connec AS
      LEFT JOIN connec_add e ON e.connec_id::text = connec.connec_id::text
      LEFT JOIN value_state_type vst ON vst.id = connec.state_type
      LEFT JOIN ext_municipality mu ON connec.muni_id = mu.muni_id
+     LEFT JOIN typevalue et1 ON et1.id::text = sector.sector_type AND et1.typevalue::text = 'sector_type'::text
      LEFT JOIN typevalue et2 ON et2.id::text = presszone.presszone_type AND et2.typevalue::text = 'presszone_type'::text
      LEFT JOIN typevalue et3 ON et3.id::text = dma.dma_type::text AND et3.typevalue::text = 'dma_type'::text
      LEFT JOIN typevalue et4 ON et4.id::text = dqa.dqa_type::text AND et4.typevalue::text = 'dqa_type'::text;
