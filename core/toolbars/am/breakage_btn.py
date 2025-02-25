@@ -80,22 +80,26 @@ class GwAmBreakageButton(GwAction):
     def _fill_action_menu(self):
         """Fill action menu"""
 
-        # disconnect and remove previuos signals and actions
-        actions = self.menu.actions()
-        for action in actions:
-            action.disconnect()
+        # Remove all previous actions from the menu
+        for action in self.menu.actions():
             self.menu.removeAction(action)
-            del action
-        ag = QActionGroup(self.iface.mainWindow())
+            action.deleteLater()  # Ensure the action is properly deleted
 
+        # Create a new QActionGroup to prevent persistent references
+        self.ag = QActionGroup(self.iface.mainWindow())
+
+        # Avoid adding duplicate actions by checking existing ones
         actions = [
             self.txt_assignation,
             self.txt_priority,
         ]
+
+        existing_actions = {a.text() for a in self.menu.actions()}  # Get current action texts
         for action in actions:
-            obj_action = QAction(f"{action}", ag)
-            self.menu.addAction(obj_action)
-            obj_action.triggered.connect(partial(self._get_selected_action, action))
+            if str(action) not in existing_actions:  # Check if it already exists
+                obj_action = QAction(f"{action}", self.ag)
+                self.menu.addAction(obj_action)
+                obj_action.triggered.connect(partial(self._get_selected_action, action))
 
     def _get_selected_action(self, name):
         """Gets selected action"""

@@ -74,8 +74,8 @@ class GwAssignation(GwTask):
             self._emit_report(tools_qt.tr("Saving results to DB") + " (5/5)...")
             self.setProgress(90)
             sql = (
-                "UPDATE asset.arc_input SET rleak = NULL; "
-                + "INSERT INTO asset.arc_input (arc_id, rleak) VALUES "
+                "UPDATE am.arc_input SET rleak = NULL; "
+                + "INSERT INTO am.arc_input (arc_id, rleak) VALUES "
             )
             for arc in arcs.values():
                 # Convert rleak to leaks/km.year
@@ -95,7 +95,7 @@ class GwAssignation(GwTask):
 
     def _assign_leaks(self):
         interval = tools_db.get_row(
-            "select max(date) - min(date) from asset.leaks", is_admin=True
+            "select max(date) - min(date) from am.leaks", is_admin=True
         )[0]
         if self.years:
             self.years = min(self.years, interval / 365)
@@ -113,7 +113,7 @@ class GwAssignation(GwTask):
             f"""
             WITH max_date AS (
                 SELECT max(date)
-                FROM asset.leaks)
+                FROM am.leaks)
             SELECT l.id AS leak_id,
                 l.diameter AS leak_diameter,
                 l.material AS leak_material,
@@ -125,8 +125,8 @@ class GwAssignation(GwTask):
                 ST_LENGTH(
                     ST_INTERSECTION(ST_BUFFER(l.the_geom, {self.buffer}), a.the_geom)
                 ) AS length
-            FROM asset.leaks AS l
-            JOIN asset.ext_arc_asset AS a ON
+            FROM am.leaks AS l
+            JOIN am.ext_arc_asset AS a ON
                 (l.date > a.builtdate OR a.builtdate IS NULL)
                 AND ST_DWITHIN(l.the_geom, a.the_geom, {self.buffer})     
             WHERE l.date > (
@@ -242,7 +242,7 @@ class GwAssignation(GwTask):
                 f"""
                 WITH start_pipe AS (
                         SELECT arc_id, matcat_id, dnom, builtdate, the_geom
-                        FROM asset.ext_arc_asset
+                        FROM am.ext_arc_asset
                         WHERE arc_id = '{arc["id"]}'),
                     ordered_list AS (
                         SELECT a.arc_id, 
@@ -251,7 +251,7 @@ class GwAssignation(GwTask):
                             a.dnom,
                             a.the_geom <-> s.the_geom AS dist,
                             ST_LENGTH(a.the_geom) AS length
-                        FROM asset.ext_arc_asset AS a, start_pipe AS s
+                        FROM am.ext_arc_asset AS a, start_pipe AS s
                         {where_clause}
                         ORDER BY start DESC, dist ASC),
                     cum_list AS (
@@ -301,23 +301,23 @@ class GwAssignation(GwTask):
             f"""
             with total_leaks as (
                 select count(*) as total_leaks
-                from asset.leaks
+                from am.leaks
                 where "date" > (
-                    (select max("date") from asset.leaks) - interval '{self.years} year'
+                    (select max("date") from am.leaks) - interval '{self.years} year'
                 )::date),
             total_pipes as (
                 select count(*) as total_pipes
-                from asset.ext_arc_asset),
+                from am.ext_arc_asset),
             orphan_pipes as (
                 select count(*) as orphan_pipes
-                from asset.v_asset_arc_input
+                from am.v_asset_arc_input
                 where rleak is null or rleak = 0),
             max_rleak as (
                 select max(rleak) as max_rleak
-                from asset.arc_input),
+                from am.arc_input),
             min_rleak as (
                 select min(rleak) as min_rleak
-                from asset.arc_input
+                from am.arc_input
                 where rleak is not null and rleak <> 0)
             select *
             from total_leaks

@@ -139,10 +139,10 @@ class GwCalculatePriority(GwTask):
     def _copy_input_to_output(self):
         tools_db.execute_sql(
             f"""
-            update asset.arc_output o
+            update am.arc_output o
             set (sector_id, macrosector_id, presszone_id, pavcat_id, function_type, the_geom, code, expl_id)
                 = (select sector_id, macrosector_id, presszone_id, pavcat_id, function_type, st_multi(the_geom), code, expl_id
-                    from asset.ext_arc_asset a
+                    from am.ext_arc_asset a
                     where a.arc_id = o.arc_id)
             where o.result_id = {self.result_id}
             """
@@ -222,8 +222,8 @@ class GwCalculatePriority(GwTask):
 
         sql = f"""
             select {columns}
-            from asset.ext_arc_asset a 
-            left join asset.arc_input ai using (arc_id)
+            from am.ext_arc_asset a 
+            left join am.arc_input ai using (arc_id)
             {filters}
         """
         return tools_db.get_rows(sql)
@@ -328,7 +328,7 @@ class GwCalculatePriority(GwTask):
         break_growth_rate = float(self.config_engine["bratemain0"])
 
         last_leak_year = tools_db.get_row(
-            "select max(date_part('year', date)) from asset.leaks", is_admin=True
+            "select max(date_part('year', date)) from am.leaks", is_admin=True
         )[0]
 
         if self.isCanceled():
@@ -490,14 +490,14 @@ class GwCalculatePriority(GwTask):
         self.setProgress(72)
 
         tools_db.execute_sql(
-            f"delete from asset.arc_engine_sh where result_id = {self.result_id};"
+            f"delete from am.arc_engine_sh where result_id = {self.result_id};"
         )
         index = 0
         loop = 0
         ended = False
         while not ended:
             save_arcs_sql = f"""
-                insert into asset.arc_engine_sh (
+                insert into am.arc_engine_sh (
                     arc_id,
                     result_id,
                     cost_repmain,
@@ -547,9 +547,9 @@ class GwCalculatePriority(GwTask):
 
         tools_db.execute_sql(
             f"""
-            delete from asset.arc_output
+            delete from am.arc_output
                 where result_id = {self.result_id};
-            insert into asset.arc_output (arc_id,
+            insert into am.arc_output (arc_id,
                     result_id,
                     dnom,
                     matcat_id,
@@ -583,9 +583,9 @@ class GwCalculatePriority(GwTask):
                     i.strategic,
                     rleak,
                     10 - sh.compliance
-                from asset.arc_engine_sh sh
-                left join asset.arc_input i using (arc_id)
-                left join asset.ext_arc_asset a using (arc_id)
+                from am.arc_engine_sh sh
+                left join am.arc_input i using (arc_id)
+                left join am.ext_arc_asset a using (arc_id)
                 where sh.result_id = {self.result_id}
                 order by total;
             """
@@ -617,11 +617,11 @@ class GwCalculatePriority(GwTask):
             """
             with lengths AS (
                 select a.dma_id, sum(st_length(a.the_geom)) as length 
-                from asset.ext_arc_asset a
+                from am.ext_arc_asset a
                 group by dma_id
             )
             select d.dma_id, (d.nrw / d.days / l.length * 1000) as nrw_m3kmd
-            from asset.dma_nrw as d
+            from am.dma_nrw as d
             join lengths as l using (dma_id)
             """
         )
@@ -911,18 +911,18 @@ class GwCalculatePriority(GwTask):
 
         tools_db.execute_sql(
             f"""
-            delete from asset.arc_engine_wm where result_id = {self.result_id};
-            delete from asset.arc_output where result_id = {self.result_id};
+            delete from am.arc_engine_wm where result_id = {self.result_id};
+            delete from am.arc_output where result_id = {self.result_id};
             """
         )
 
-        # Saving to asset.arc_engine_wm
+        # Saving to am.arc_engine_wm
         index = 0
         loop = 0
         ended = False
         while not ended:
             save_arcs_sql = f"""
-                insert into asset.arc_engine_wm (
+                insert into am.arc_engine_wm (
                     arc_id,
                     result_id,
                     rleak,
@@ -963,13 +963,13 @@ class GwCalculatePriority(GwTask):
             progress = (70 - 40) / len(second_iteration) * 1000 * loop + 40
             self.setProgress(progress)
 
-        # Saving to asset.arc_output
+        # Saving to am.arc_output
         index = 0
         loop = 0
         ended = False
         while not ended:
             save_arcs_sql = f"""
-                insert into asset.arc_output (
+                insert into am.arc_output (
                     arc_id,
                     result_id,
                     arccat_id,
@@ -1054,8 +1054,8 @@ class GwCalculatePriority(GwTask):
 
     def _save_config_engine(self):
         save_config_engine_sql = f"""
-            delete from asset.config_engine where result_id = {self.result_id};
-            insert into asset.config_engine
+            delete from am.config_engine where result_id = {self.result_id};
+            insert into am.config_engine
                 (result_id, parameter, value)
             values
         """
@@ -1072,7 +1072,7 @@ class GwCalculatePriority(GwTask):
         str_material_id = f"'{self.material}'" if self.material else "NULL"
         tools_db.execute_sql(
             f"""
-            insert into asset.cat_result (result_name, 
+            insert into am.cat_result (result_name, 
                 result_type, 
                 descript,
                 status,
@@ -1117,7 +1117,7 @@ class GwCalculatePriority(GwTask):
             """
         )
 
-        sql = f"select result_id from asset.cat_result where result_name = '{self.result_name}'"
+        sql = f"select result_id from am.cat_result where result_name = '{self.result_name}'"
         result_id = tools_db.get_row(sql, is_admin=True)[0]
         return result_id
 

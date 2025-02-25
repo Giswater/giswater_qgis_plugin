@@ -137,7 +137,7 @@
 			<translation>Giswater - OM</translation>
 		</message>
 		<message>
-			<source>toolbar_am_name</source>
+			<source>Giswater - AM</source>
 			<translation>Giswater - Asset Manager</translation>
 		</message>
 		<message>
