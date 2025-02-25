@@ -42,7 +42,7 @@ $BODY$
   COST 100;
 
 -- trigger
-drop trigger gw_trg_asset_cat_arc on PARENT_SCHEMA.cat_arc;
+drop trigger if exists gw_trg_asset_cat_arc on PARENT_SCHEMA.cat_arc;
 CREATE TRIGGER gw_trg_asset_cat_arc AFTER INSERT OR UPDATE OF dnom ON PARENT_SCHEMA.cat_arc
 FOR EACH ROW EXECUTE PROCEDURE PARENT_SCHEMA.gw_trg_asset_cat_arc();
 

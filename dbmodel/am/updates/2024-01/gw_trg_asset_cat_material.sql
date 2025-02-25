@@ -34,7 +34,7 @@ $BODY$
   COST 100;
 
 -- trigger
-drop trigger gw_trg_asset_cat_material on PARENT_SCHEMA.cat_material;
+drop trigger if exists gw_trg_asset_cat_material on PARENT_SCHEMA.cat_material;
 CREATE TRIGGER gw_trg_asset_cat_material AFTER INSERT ON PARENT_SCHEMA.cat_material
 FOR EACH ROW EXECUTE PROCEDURE PARENT_SCHEMA.gw_trg_asset_cat_material();
 
