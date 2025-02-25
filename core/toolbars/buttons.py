@@ -60,7 +60,9 @@ from .utilities.print_btn import GwPrintButton
 from .utilities.project_check_btn import GwProjectCheckButton
 from .utilities.utilities_manager.workspace_manager import GwWorkspaceManagerButton
 from .utilities.utils_manager_btn import GwUtilsManagerButton
-from.lot.lot import Lot
+from .lot.add_lot2 import GwAddLotButton
+from .lot.manager_lot import GwManageLotButton
+from .lot.resources_lot import GwLotResourceManagementButton
 
 # ToC
 from .toc.add_child_layer_btn import GwAddChildLayerButton
