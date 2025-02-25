@@ -12,6 +12,7 @@ from qgis.gui import QgsDateTimeEdit
 from .task import GwTask
 from ..utils import tools_gw
 from ...libs import lib_vars, tools_log, tools_qt, tools_qgis
+from ..utils.tools_gw import CustomQComboBox, CustomQgsDateTimeEdit
 
 
 class GwToolBoxTask(GwTask):
@@ -115,14 +116,14 @@ class GwToolBoxTask(GwTask):
                     if value == '':
                         value = 0
                     extras += f'"{param_name}":"{value}", '
-                elif type(widget) in ('', QComboBox):
+                elif type(widget) in ('', QComboBox, CustomQComboBox):
                     value = tools_qt.get_combo_value(self.dialog, widget, 0)
                     if value not in (None, ''):
                         extras += f'"{param_name}":"{value}", '
                 elif type(widget) in ('', QCheckBox):
                     value = tools_qt.is_checked(self.dialog, widget)
                     extras += f'"{param_name}":"{str(value).lower()}", '
-                elif type(widget) in ('', QgsDateTimeEdit):
+                elif type(widget) in ('', QgsDateTimeEdit, CustomQgsDateTimeEdit):
                     value = tools_qt.get_calendar_date(self.dialog, widget)
                     if value == "" or value is None:
                         extras += f'"{param_name}":null, '
