@@ -3235,3 +3235,12 @@ UPDATE config_form_fields SET layoutname='lyt_bot_1', layoutorder=3 WHERE (formn
 UPDATE config_form_fields SET layoutname='lyt_bot_1', layoutorder=4 WHERE (formname = 'v_edit_node' OR formname = 'v_edit_arc' OR formname = 'v_edit_connec') AND formtype='form_feature' AND columnname='dqa_id' AND tabname='tab_data';
 UPDATE config_form_fields SET layoutname='lyt_bot_1', layoutorder=5 WHERE (formname = 'v_edit_node' OR formname = 'v_edit_arc' OR formname = 'v_edit_connec') AND formtype='form_feature' AND columnname='state' AND tabname='tab_data';
 UPDATE config_form_fields SET layoutname='lyt_bot_1', layoutorder=6 WHERE (formname = 'v_edit_node' OR formname = 'v_edit_arc' OR formname = 'v_edit_connec') AND formtype='form_feature' AND columnname='state_type' AND tabname='tab_data';
+
+-- 25/02/2025
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'psector', 'tab_relations', 'tab_relations_arc', 'lyt_relations_1', 0, NULL, 'tabwidget', NULL, NULL, NULL, false, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{
+  "tabs": [
+    "tab_relations_arc",
+    "tab_relations_node",
+    "tab_relations_connec"
+  ]
+}'::json, NULL, NULL, false, 0);
