@@ -2725,8 +2725,10 @@ class GwNonVisual:
 
             if tab_name not in lidtabs:
                 tab_lidlayers.setTabVisible(i, False)
+                tab_lidlayers.setTabEnabled(i, False)
 
             else:
+                tab_lidlayers.setTabEnabled(i, True)
                 tab_lidlayers.setTabVisible(i, True)
 
                 if tab_name == 'DRAIN':
