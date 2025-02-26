@@ -2191,7 +2191,7 @@ def set_typeahead(field, dialog, widget, completer, feature_id=None):
         # Typeahead with queryText and queryTextFilter
         widget.setProperty('typeahead', True)
         model = QStringListModel()
-        widget.textChanged.connect(partial(fill_typeahead, completer, model, field, dialog, widget, feature_id))
+        widget.textEdited.connect(partial(fill_typeahead, completer, model, field, dialog, widget, feature_id))
         return widget
 
     # Check for the second behavior: 'comboIds' and 'comboNames' are required
