@@ -238,14 +238,15 @@ BEGIN
 			                EXECUTE (v_widget->'widgetcontrols')::json->>'vdefault_querytext' INTO v_field_value;
 			            END IF;
 			        END IF;
+					IF v_field_value IS NOT NULL AND v_field_value != '' THEN
+						v_widget := jsonb_set(v_widget, '{value}', to_jsonb(COALESCE(v_field_value, '')));
+						v_widget := v_widget - 'widgetcontrols';
+		        		v_fields_array[i] := v_widget;
+						v_field_value := '';
+					END IF;
 			    END IF;
-			v_widget := jsonb_set(v_widget, '{value}', to_jsonb(COALESCE(v_field_value, '')));
-			v_widget := v_widget - 'widgetcontrols';
-	        v_fields_array[i] := v_widget;
-			v_field_value := '';
 			END IF;
 	    END IF;
-
 	END LOOP;
 
     v_fieldsjson := to_jsonb(v_fields_array);
