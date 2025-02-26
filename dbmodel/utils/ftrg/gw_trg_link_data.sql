@@ -26,7 +26,7 @@ BEGIN
 		IF v_feature_type = 'LINK' THEN
 
 			IF v_projecttype = 'WS' THEN
-				UPDATE link l SET epa_type = c.epa_type, is_operative = v.is_operative, expl_id2 = c.expl_id2, conneccat_id = c.conneccat_id, fluid_type = c.fluid_type, muni_id = c.muni_id
+				UPDATE link l SET epa_type = c.epa_type, is_operative = v.is_operative, expl_id2 = c.expl_id2, conneccat_id = c.conneccat_id, fluid_type = c.fluid_type, muni_id = c.muni_id, n_hydrometer=c.n_hydrometer
 				FROM connec c
 				JOIN value_state_type v ON v.id = c.state_type WHERE l.feature_id = c.connec_id AND c.connec_id = NEW.feature_id AND l.state > 0 AND link_id = NEW.link_id;
 			ELSE
@@ -53,7 +53,7 @@ BEGIN
 		IF v_feature_type = 'CONNEC'  THEN
 
 			IF v_projecttype = 'WS' THEN
-				UPDATE link SET epa_type = NEW.epa_type, is_operative = v.is_operative, expl_id2 = NEW.expl_id2, conneccat_id = NEW.conneccat_id, fluid_type = NEW.fluid_type, muni_id = NEW.muni_id
+				UPDATE link SET epa_type = NEW.epa_type, is_operative = v.is_operative, expl_id2 = NEW.expl_id2, conneccat_id = NEW.conneccat_id, fluid_type = NEW.fluid_type, muni_id = NEW.muni_id, n_hydrometer=NEW.n_hydrometer
 				FROM value_state_type v WHERE id = NEW.state_type AND feature_id = NEW.connec_id;
 			ELSE
 				UPDATE link SET is_operative = v.is_operative, expl_id2 = NEW.expl_id2, conneccat_id = NEW.conneccat_id, fluid_type = NEW.fluid_type,muni_id = NEW.muni_id

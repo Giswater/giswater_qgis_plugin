@@ -1062,3 +1062,68 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"element", "
 -- 19/02/2025
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"arc", "column":"is_scadamap", "dataType":"boolean", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"node", "column":"is_scadamap", "dataType":"boolean", "isUtils":"False"}}$$);
+
+--21/02/2025
+-- man_valve
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_valve", "column":"automated", "dataType":"boolean", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_valve", "column":"connection_type", "dataType":"integer", "isUtils":"False"}}$$);
+UPDATE man_valve SET connection_type=0 WHERE connection_type IS NULL;
+ALTER TABLE man_valve ALTER COLUMN connection_type SET NOT NULL;
+
+-- man_tank
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_tank", "column":"automated", "dataType":"boolean", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_tank", "column":"length", "dataType":"float", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_tank", "column":"width", "dataType":"float", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_tank", "column":"shape", "dataType":"integer", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_tank", "column":"fence_type", "dataType":"integer", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_tank", "column":"fence_length", "dataType":"float", "isUtils":"False"}}$$);
+UPDATE man_tank SET shape=0 WHERE shape IS NULL;
+ALTER TABLE man_tank ALTER COLUMN shape SET NOT NULL;
+
+-- man_netelement
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_netelement", "column":"automated", "dataType":"boolean", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_netelement", "column":"fence_type", "dataType":"integer", "isUtils":"False"}}$$);
+
+-- man_hydrant
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_hydrant", "column":"hydrant_type"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_hydrant", "column":"hydrant_type", "dataType":"integer", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_hydrant", "column":"security_cover", "dataType":"boolean", "isUtils":"False"}}$$);
+
+-- connec
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"block_zone", "dataType":"text", "isUtils":"False"}}$$);
+
+-- link
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"link", "column":"n_hydrometer", "dataType":"integer", "isUtils":"False"}}$$);
+
+-- man_wtp
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_wtp", "column":"maxflow", "dataType":"float", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_wtp", "column":"opsflow", "dataType":"float", "isUtils":"False"}}$$);
+
+-- man_meter
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_meter", "column":"automated", "dataType":"boolean", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"man_meter", "column":"meter_code", "dataType":"text"}}$$);
+
+-- man_source
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_source", "column":"source_type", "dataType":"integer", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_source", "column":"source_code", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_source", "column":"aquifer_type", "dataType":"integer", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_source", "column":"aquifer_name", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_source", "column":"wtp_id", "dataType":"varchar(16)", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_source", "column":"registered_flow", "dataType":"float", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_source", "column":"auth_code", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_source", "column":"basin_id", "dataType":"integer", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_source", "column":"subbasin_id", "dataType":"integer", "isUtils":"False"}}$$);
+
+UPDATE man_source SET source_type=0 WHERE source_type IS NULL;
+ALTER TABLE man_source ALTER COLUMN source_type SET NOT NULL;
+
+UPDATE man_source SET aquifer_type=0 WHERE aquifer_type IS NULL;
+ALTER TABLE man_source ALTER COLUMN aquifer_type SET NOT NULL;
+
+UPDATE man_source SET basin_id=0 WHERE basin_id IS NULL;
+ALTER TABLE man_source ALTER COLUMN basin_id SET NOT NULL;
+
+UPDATE man_source SET subbasin_id=0 WHERE subbasin_id IS NULL;
+ALTER TABLE man_source ALTER COLUMN subbasin_id SET NOT NULL;
+
+ALTER TABLE man_source ADD CONSTRAINT man_wtp_id_fkey FOREIGN KEY (wtp_id) REFERENCES man_wtp(node_id) ON UPDATE CASCADE ON DELETE RESTRICT;

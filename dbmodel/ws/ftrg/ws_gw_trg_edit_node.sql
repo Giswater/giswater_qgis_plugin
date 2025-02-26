@@ -574,12 +574,12 @@ BEGIN
 
 
 		IF v_man_table='man_tank' THEN
-			INSERT INTO man_tank (node_id, vmax, vutil, area, chlorination, name, hmax)
-			VALUES (NEW.node_id, NEW.vmax, NEW.vutil, NEW.area,NEW.chlorination, NEW.name, NEW.hmax);
+			INSERT INTO man_tank (node_id, vmax, vutil, area, chlorination, name, hmax, automated, length, width, shape, fence_type, fence_length)
+			VALUES (NEW.node_id, NEW.vmax, NEW.vutil, NEW.area,NEW.chlorination, NEW.name, NEW.hmax, NEW.automated, NEW.length, NEW.width, NEW.shape, NEW.fence_type, NEW.fence_length);
 
 		ELSIF v_man_table='man_hydrant' THEN
-			INSERT INTO man_hydrant (node_id, fire_code, communication, valve, geom1, geom2, hydrant_type, customer_code)
-			VALUES (NEW.node_id, NEW.fire_code, NEW.communication, NEW.valve, NEW.geom1, NEW.geom2, NEW.hydrant_type, NEW.customer_code);
+			INSERT INTO man_hydrant (node_id, fire_code, communication, valve, geom1, geom2, customer_code, hydrant_type, security_cover)
+			VALUES (NEW.node_id, NEW.fire_code, NEW.communication, NEW.valve, NEW.geom1, NEW.geom2, NEW.customer_code, NEW.hydrant_type, NEW.security_cover);
 
 		ELSIF v_man_table='man_junction' THEN
 			INSERT INTO man_junction (node_id) VALUES(NEW.node_id);
@@ -603,20 +603,21 @@ BEGIN
 
 		ELSIF v_man_table='man_valve' THEN
 			INSERT INTO man_valve (node_id,closed, broken, buried,irrigation_indicator,pression_entry, pression_exit, depth_valveshaft,regulator_situation, regulator_location, regulator_observ,
-			lin_meters, exit_type,exit_code,drive_type, cat_valve2, ordinarystatus, shutter, brand2, model2, valve_type, to_arc, active)
+			lin_meters, exit_type,exit_code,drive_type, cat_valve2, ordinarystatus, shutter, brand2, model2, valve_type, to_arc, active, automated, connection_type)
 			VALUES (NEW.node_id, NEW.closed, NEW.broken, NEW.buried, NEW.irrigation_indicator, NEW.pression_entry, NEW.pression_exit, NEW.depth_valveshaft, NEW.regulator_situation,
 			NEW.regulator_location, NEW.regulator_observ, NEW.lin_meters, NEW.exit_type, NEW.exit_code, NEW.drive_type, NEW.cat_valve2, NEW.ordinarystatus,
-			NEW.shutter, NEW.brand2, NEW.model2, NEW.valve_type, NEW.to_arc, NEW.active);
+			NEW.shutter, NEW.brand2, NEW.model2, NEW.valve_type, NEW.to_arc, NEW.active, NEW.automated, NEW.connection_type);
 
 		ELSIF v_man_table='man_manhole' THEN
 			INSERT INTO man_manhole (node_id, name) VALUES(NEW.node_id, NEW.name);
 
 		ELSIF v_man_table='man_meter' THEN
-			INSERT INTO man_meter (node_id, real_press_max, real_press_min, real_press_avg, meter_code)
-			VALUES(NEW.node_id, NEW.real_press_max, NEW.real_press_min, NEW.real_press_avg, NEW.meter_code);
+			INSERT INTO man_meter (node_id, real_press_max, real_press_min, real_press_avg, meter_code, automated)
+			VALUES(NEW.node_id, NEW.real_press_max, NEW.real_press_min, NEW.real_press_avg, NEW.meter_code, NEW.automated);
 
 		ELSIF v_man_table='man_source' THEN
-				INSERT INTO man_source (node_id, name) VALUES(NEW.node_id, NEW.name);
+				INSERT INTO man_source (node_id, name, source_type, source_code, aquifer_type, aquifer_name, wtp_id, registered_flow, auth_code, basin_id, subbasin_id)
+				VALUES(NEW.node_id, NEW.name, NEW.source_type, NEW.source_code, NEW.aquifer_type, NEW.aquifer_name, NEW.wtp_id, NEW.registered_flow, NEW.auth_code, NEW.basin_id, NEW.subbasin_id);
 
 		ELSIF v_man_table='man_waterwell' THEN
 			INSERT INTO man_waterwell (node_id, name) VALUES(NEW.node_id, NEW.name);
@@ -638,15 +639,15 @@ BEGIN
 			INSERT INTO man_flexunion (node_id) VALUES(NEW.node_id);
 
 		ELSIF v_man_table='man_netelement' THEN
-			INSERT INTO man_netelement (node_id)
-			VALUES(NEW.node_id);
+			INSERT INTO man_netelement (node_id, automated, fence_type)
+			VALUES(NEW.node_id, NEW.automated, NEW.fence_type);
 
 		ELSIF v_man_table='man_netsamplepoint' THEN
 			INSERT INTO man_netsamplepoint (node_id, lab_code)
 			VALUES (NEW.node_id, NEW.lab_code);
 
 		ELSIF v_man_table='man_wtp' THEN
-			INSERT INTO man_wtp (node_id, name) VALUES(NEW.node_id, NEW.name);
+			INSERT INTO man_wtp (node_id, name, maxflow, opsflow) VALUES(NEW.node_id, NEW.name, NEW.maxflow, NEW.opsflow);
 
 		END IF;
 
@@ -969,7 +970,7 @@ BEGIN
 
 		ELSIF v_man_table ='man_tank' THEN
 			UPDATE man_tank SET vmax=NEW.vmax, vutil=NEW.vutil, area=NEW.area, chlorination=NEW.chlorination, name=NEW.name,
-			hmax=NEW.hmax
+			hmax=NEW.hmax, automated=NEW.automated, length=NEW.length, width=NEW.width, shape=NEW.shape, fence_type=NEW.fence_type, fence_length=NEW.fence_length
 			WHERE node_id=OLD.node_id;
 
 		ELSIF v_man_table ='man_pump' THEN
@@ -983,16 +984,17 @@ BEGIN
 
 		ELSIF v_man_table ='man_hydrant' THEN
 			UPDATE man_hydrant SET fire_code=NEW.fire_code, communication=NEW.communication, valve=NEW.valve,
-			geom1=NEW.geom1, geom2=NEW.geom2, hydrant_type=NEW.hydrant_type, customer_code=NEW.customer_code
+			geom1=NEW.geom1, geom2=NEW.geom2, customer_code=NEW.customer_code, hydrant_type=NEW.hydrant_type, security_cover=NEW.security_cover
 			WHERE node_id=OLD.node_id;
 
 		ELSIF v_man_table ='man_source' THEN
-			UPDATE man_source SET name=NEW.name
+			UPDATE man_source SET name=NEW.name, source_type=NEW.source_type, source_code=NEW.source_code, aquifer_type=NEW.aquifer_type, aquifer_name=NEW.aquifer_name,
+			wtp_id=NEW.wtp_id, registered_flow=NEW.registered_flow, auth_code=NEW.auth_code, basin_id=NEW.basin_id, subbasin_id=NEW.subbasin_id
 			WHERE node_id=OLD.node_id;
 
 		ELSIF v_man_table ='man_meter' THEN
 			UPDATE man_meter SET
-			real_press_max = NEW.real_press_max, real_press_min=NEW.real_press_min, real_press_avg=NEW.real_press_avg, meter_code=NEW.meter_code
+			real_press_max = NEW.real_press_max, real_press_min=NEW.real_press_min, real_press_avg=NEW.real_press_avg, meter_code=NEW.meter_code, automated=NEW.automated
 			WHERE node_id=OLD.node_id;
 
 		ELSIF v_man_table ='man_waterwell' THEN
@@ -1009,7 +1011,7 @@ BEGIN
 			SET closed=NEW.closed, broken=NEW.broken, buried=NEW.buried, irrigation_indicator=NEW.irrigation_indicator, pression_entry=NEW.pression_entry, pression_exit=NEW.pression_exit,
 			depth_valveshaft=NEW.depth_valveshaft, regulator_situation=NEW.regulator_situation, regulator_location=NEW.regulator_location, regulator_observ=NEW.regulator_observ,
 			lin_meters=NEW.lin_meters, exit_type=NEW.exit_type, exit_code=NEW.exit_code, drive_type=NEW.drive_type, cat_valve2=NEW.cat_valve2, ordinarystatus = NEW.ordinarystatus,
-			shutter=NEW.shutter, brand2=NEW.brand2, model2=NEW.model2, valve_type=NEW.valve_type, to_arc=NEW.to_arc, active=NEW.active
+			shutter=NEW.shutter, brand2=NEW.brand2, model2=NEW.model2, valve_type=NEW.valve_type, to_arc=NEW.to_arc, active=NEW.active, automated=NEW.automated, connection_type=NEW.connection_type
 			WHERE node_id=OLD.node_id;
 
 		ELSIF v_man_table ='man_register' THEN
@@ -1030,7 +1032,7 @@ BEGIN
 			WHERE node_id=OLD.node_id;
 
 		ELSIF v_man_table ='man_netelement' THEN
-			UPDATE man_netelement SET node_id=NEW.node_id
+			UPDATE man_netelement SET node_id=NEW.node_id, automated=NEW.automated, fence_type=NEW.fence_type
 			WHERE node_id=OLD.node_id;
 
 		ELSIF v_man_table ='man_netsamplepoint' THEN
@@ -1038,7 +1040,7 @@ BEGIN
 			WHERE node_id=OLD.node_id;
 
 		ELSIF v_man_table ='man_wtp' THEN
-			UPDATE man_wtp SET name=NEW.name
+			UPDATE man_wtp SET name=NEW.name, maxflow=NEW.maxflow, opsflow=NEW.opsflow
 			WHERE node_id=OLD.node_id;
 
 		ELSIF v_man_table ='man_filter' THEN

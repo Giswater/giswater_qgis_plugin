@@ -312,3 +312,8 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_ui_doc('doc_x_visit');
 
 CREATE TRIGGER gw_trg_edit_element INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_element
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_element('element');
+
+DROP TRIGGER IF EXISTS gw_trg_link_data ON connec;
+CREATE TRIGGER gw_trg_link_data
+AFTER UPDATE OF epa_type, state_type, expl_id2, conneccat_id, fluid_type, n_hydrometer
+ON connec FOR EACH ROW EXECUTE PROCEDURE gw_trg_link_data('connec');

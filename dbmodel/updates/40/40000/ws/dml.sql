@@ -3244,3 +3244,103 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
     "tab_relations_connec"
   ]
 }'::json, NULL, NULL, false, 0);
+
+-- 21/02/2025
+-- man_valve
+INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('man_valve_connectiontype', '0', 'UNKNOWN', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('man_valve_connectiontype', '1', 'FLANGE', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('man_valve_connectiontype', '2', 'THREADED', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('man_valve_connectiontype', '3', 'OTHER', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
+
+INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, parameter_id, active) VALUES('edit_typevalue', 'man_valve_connectiontype', 'man_valve', 'connection_type', NULL, true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field) DO NOTHING;
+
+UPDATE config_form_fields
+SET widgettype='combo', dv_querytext='SELECT id, idval FROM edit_typevalue WHERE typevalue = ''man_valve_connectiontype''', dv_isnullvalue=False
+WHERE formname ILIKE 've_node%_valve' AND formtype='form_feature' AND columnname='connection_type' AND tabname='tab_data';
+
+-- man_tank
+INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('man_tank_shape', '0', 'UNKNOWN', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('man_tank_shape', '1', 'CIRCULAR', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('man_tank_shape', '2', 'RECTANGULAR', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('man_tank_shape', '3', 'OTHER', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
+
+INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, parameter_id, active) VALUES('edit_typevalue', 'man_tank_shape', 'man_tank', 'shape', NULL, true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field) DO NOTHING;
+
+UPDATE config_form_fields
+SET widgettype='combo', dv_querytext='SELECT id, idval FROM edit_typevalue WHERE typevalue = ''man_tank_shape''', dv_isnullvalue=false
+WHERE formname ILIKE 've_node%_tank' AND formtype='form_feature' AND columnname='shape' AND tabname='tab_data';
+
+
+INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('man_tank_fencetype', '1', 'MESH', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('man_tank_fencetype', '2', 'BRICK', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('man_tank_fencetype', '3', 'OTHER', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
+
+INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, parameter_id, active) VALUES('edit_typevalue', 'man_tank_fencetype', 'man_tank', 'fence_type', NULL, true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field) DO NOTHING;
+
+UPDATE config_form_fields
+SET widgettype='combo', dv_querytext='SELECT id, idval FROM edit_typevalue WHERE typevalue = ''man_tank_fencetype''', dv_isnullvalue=true
+WHERE formname ILIKE 've_node%_tank' AND formtype='form_feature' AND columnname='fence_type' AND tabname='tab_data';
+
+-- man_netelement
+INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('man_netelement_fencetype', '1', 'MESH', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('man_netelement_fencetype', '2', 'BRICK', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('man_netelement_fencetype', '3', 'OTHER', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
+
+INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, parameter_id, active) VALUES('edit_typevalue', 'man_netelement_fencetype', 'man_netelement', 'fence_type', NULL, true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field) DO NOTHING;
+
+UPDATE config_form_fields
+SET widgettype='combo', dv_querytext='SELECT id, idval FROM edit_typevalue WHERE typevalue = ''man_netelement_fencetype''', dv_isnullvalue=true
+WHERE formname ILIKE 've_node%_netelement' AND formtype='form_feature' AND columnname='fence_type' AND tabname='tab_data';
+
+-- man_hydrant
+INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('man_hydrant_hydranttype', '0', 'UNKNOWN', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('man_hydrant_hydranttype', '1', 'SUCTION', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('man_hydrant_hydranttype', '2', 'HEAD', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('man_hydrant_hydranttype', '3', 'OTHER', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
+
+INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, parameter_id, active) VALUES('edit_typevalue', 'man_hydrant_hydranttype', 'man_hydrant', 'hydrant_type', NULL, true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field) DO NOTHING;
+
+UPDATE config_form_fields
+SET widgettype='combo', dv_querytext='SELECT id, idval FROM edit_typevalue WHERE typevalue = ''man_hydrant_hydranttype''', dv_isnullvalue=true
+WHERE formname ILIKE 've_node%_hydrant' AND formtype='form_feature' AND columnname='hydrant_type' AND tabname='tab_data';
+
+-- man_source
+INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('man_source_sourcetype', '0', 'UNKNOWN', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('man_source_sourcetype', '1', 'SPRING', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('man_source_sourcetype', '2', 'GROUNDWATER', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('man_source_sourcetype', '3', 'SURFACE WATER', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, parameter_id, active) VALUES('edit_typevalue', 'man_source_sourcetype', 'man_source', 'source_type', NULL, true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field) DO NOTHING;
+UPDATE config_form_fields
+SET widgettype='combo', dv_querytext='SELECT id, idval FROM edit_typevalue WHERE typevalue = ''man_source_sourcetype''', dv_isnullvalue=false
+WHERE formname ILIKE 've_node%_source' AND formtype='form_feature' AND columnname='source_type' AND tabname='tab_data';
+
+
+INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('man_source_aquifertype', '0', 'UNKNOWN', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('man_source_aquifertype', '1', 'CONFINED', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('man_source_aquifertype', '2', 'FREE', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('man_source_aquifertype', '3', 'OTHER', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, parameter_id, active) VALUES('edit_typevalue', 'man_source_aquifertype', 'man_source', 'aquifer_type', NULL, true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field) DO NOTHING;
+UPDATE config_form_fields
+SET widgettype='combo', dv_querytext='SELECT id, idval FROM edit_typevalue WHERE typevalue = ''man_source_aquifertype''', dv_isnullvalue=false
+WHERE formname ILIKE 've_node%_source' AND formtype='form_feature' AND columnname='aquifer_type' AND tabname='tab_data';
+
+
+INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('man_source_basinid', '0', 'UNKNOWN', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, parameter_id, active) VALUES('edit_typevalue', 'man_source_basinid', 'man_source', 'basin_id', NULL, true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field) DO NOTHING;
+UPDATE config_form_fields
+SET widgettype='combo', dv_querytext='SELECT id, idval FROM edit_typevalue WHERE typevalue = ''man_source_basinid''', dv_isnullvalue=false
+WHERE formname ILIKE 've_node%_source' AND formtype='form_feature' AND columnname='basin_id' AND tabname='tab_data';
+
+
+INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('man_source_subbasinid', '0', 'UNKNOWN', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, parameter_id, active) VALUES('edit_typevalue', 'man_source_subbasinid', 'man_source', 'subbasin_id', NULL, true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field) DO NOTHING;
+UPDATE config_form_fields
+SET widgettype='combo', dv_querytext='SELECT id, idval FROM edit_typevalue WHERE typevalue = ''man_source_subbasinid''', dv_isnullvalue=false
+WHERE formname ILIKE 've_node%_source' AND formtype='form_feature' AND columnname='subbasin_id' AND tabname='tab_data';
+
+UPDATE config_form_fields
+SET dv_querytext='SELECT node_id as id, node_type as idval FROM man_wtp WHERE id IS NOT NULL'
+WHERE formname ILIKE 've_node%_source' AND formtype='form_feature' AND columnname='wtp_id' AND tabname='tab_data';
+
+
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,widgetcontrols,hidden)	VALUES ('v_edit_link','form_feature','tab_none','n_hydrometer','lyt_data_1',35,'integer','text','N_hydrometer','N_hydrometer',false,false,true,false,'{"setMultiline":false}'::json,false);

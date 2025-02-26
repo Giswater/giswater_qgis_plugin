@@ -848,7 +848,8 @@ CREATE OR REPLACE VIEW vu_link AS
     CASE
             WHEN s.sector_id > 0 AND is_operative = true AND epa_type = 'JUNCTION'::character varying(16)::text AND cpu.value = '4' THEN epa_type::character varying
             ELSE NULL::character varying(16)
-        END AS inp_type
+        END AS inp_type,
+    l.n_hydrometer
      FROM ( SELECT inp_netw_mode.value FROM inp_netw_mode) cpu, link l
      LEFT JOIN sector s USING (sector_id)
      LEFT JOIN presszone p USING (presszone_id)
@@ -967,7 +968,8 @@ AS WITH
           THEN l.epa_type::character varying
           ELSE NULL::character varying(16)
         END AS inp_type,
-        l.verified
+        l.verified,
+        l.n_hydrometer
         FROM inp_network_mode, link_selector
         JOIN link l using (link_id)
         JOIN selector_expl se ON ((se.cur_user =current_user AND se.expl_id = l.expl_id) or (se.cur_user =current_user AND se.expl_id = l.expl_id2))
@@ -1143,7 +1145,8 @@ CREATE OR REPLACE VIEW vu_connec AS
     CASE
       WHEN connec.sector_id > 0 AND vst.is_operative = true AND connec.epa_type = 'JUNCTION'::character varying(16)::text AND cpu.value = '4' THEN connec.epa_type::character varying
       ELSE NULL::character varying(16)
-    END AS inp_type
+    END AS inp_type,
+    connec.block_zone
    FROM  (SELECT inp_netw_mode.value FROM inp_netw_mode) cpu, connec
      JOIN cat_connec ON connec.conneccat_id::text = cat_connec.id::text
      JOIN cat_feature ON cat_feature.id::text = cat_connec.connec_type::text
@@ -1428,7 +1431,8 @@ AS WITH
         connec.lastupdate_user,
         connec.the_geom,
         connec.n_inhabitants,
-        connec.lock_level
+        connec.lock_level,
+        connec.block_zone
         FROM inp_network_mode, connec_selector
         JOIN connec ON connec.connec_id = connec_selector.connec_id
         JOIN selector_expl se ON (se.cur_user =current_user AND se.expl_id = connec.expl_id) or (se.cur_user =current_user and se.expl_id = connec.expl_id2)
