@@ -131,9 +131,7 @@ class GwSchemaI18NUpdate:
         tools_qt.set_combo_value(self.dlg_qm.cmb_language, language, 0, add_new=False)
 
     def _populate_data_schema_name(self, widget):
-        """"""
-
-        # Get filter
+         # Get filter
         filter_ = tools_qt.get_text(self.dlg_qm, widget)
         if filter_ in (None, 'null') and self.project_type_selected:
             filter_ = self.project_type_selected
@@ -264,7 +262,10 @@ class GwSchemaI18NUpdate:
             i+=1
             if db_dialog['project_type'] == self.project_type or db_dialog['project_type'] == 'utils': # Avoid the unwnated project_types
                 j+=1
-                source = [db_dialog['formname'], db_dialog['formtype'], db_dialog['source']] #Take all the possible source from db_dialog
+                formname = db_dialog['formname']
+                if isinstance(formname, str):
+                    formname = "_".join(db_dialog['formname'].split("_")[:2])
+                source = [formname, db_dialog['formtype'], db_dialog['source']] #Take all the possible source from db_dialog
                 #Define the label taking into account the different possibilities by priority level
                 label = db_dialog[f'lb_{self.lower_lang}']
                 if label is None:
@@ -299,7 +300,9 @@ class GwSchemaI18NUpdate:
 
                     # Main query
                     sql_text = (f"UPDATE {self.schema}.{db_dialog['context']} SET label = '{label}', tooltip = '{tooltip}' "
-                        f"WHERE formname = '{source[0]}' and formtype = '{source[1]}' and columnname = '{source[2]}'")
+                                f"WHERE formname ILIKE '{source[0]}%' and formtype = '{source[1]}' and columnname = '{source[2]}'")
+                        #f"WHERE and formtype = '{source[1]}' and columnname = '{source[2]}'")
+                        #f"WHERE formname = '{source[0]}' and formtype = '{source[1]}' and columnname = '{source[2]}'"                        
                     
                     #Return config_form_fields to normal
                     sql_2 = f"UPDATE {self.schema}.config_param_system SET value = FALSE WHERE parameter = 'admin_config_control_trigger'"
