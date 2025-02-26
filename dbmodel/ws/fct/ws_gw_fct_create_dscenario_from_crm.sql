@@ -126,102 +126,96 @@ BEGIN
 		-- this factor is calculated assuming period value is on M3
 		v_factor = 1000*(SELECT value::json->>v_demandunits FROM config_param_system WHERE parameter = 'epa_units_factor')::float/v_periodseconds::float;		
 
-		-- total number of hydrometers
-		v_querytext = 'SELECT count(*) FROM ext_rtc_hydrometer_x_data 
-		JOIN ext_rtc_hydrometer erh on erh.id::varchar = hydrometer_id
-		JOIN rtc_hydrometer_x_connec hc USING (hydrometer_id) 
-		JOIN connec c ON c.connec_id = hc.connec_id
-		WHERE  cat_period_id  = '||v_period||'::text AND c.expl_id = '||v_expl||' AND is_waterbal IN ('||v_waterbal||');';
+		-- create base query
+		v_querytext = '
+		SELECT rhd.hydrometer_id, vuh.feature_id, sum(rhd."sum"), erh.is_waterbal, rhd.pattern_id, rhd.custom_sum,
+		CASE WHEN vuh.feature_id IN (SELECT node_id FROM node) THEN ''NODE'' ELSE ''CONNEC'' END AS feature_type
+		FROM ext_rtc_hydrometer_x_data rhd
+		LEFT JOIN v_ui_hydrometer vuh USING (hydrometer_id)
+		LEFT JOIN exploitation e ON vuh.expl_name = e.name
+		LEFT JOIN ext_rtc_hydrometer erh ON rhd.hydrometer_id=erh.id
+		WHERE e.expl_id='||v_expl||'
+		AND cat_period_id = '||v_period||':text
+		AND erh.is_waterbal IN ('||v_waterbal||')
+		GROUP BY rhd.hydrometer_id, erh.is_waterbal, rhd.pattern_id, vuh.feature_id, rhd.custom_sum';
 
-		EXECUTE v_querytext INTO v_total_hydro;
 
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	
+		-- count hydrometers and total vol grouped by feature_type
+		EXECUTE 'SELECT COUNT(hydrometer_id) FROM ('||v_querytext||')' INTO v_total_hydro;
+
+		EXECUTE 'SELECT sum("sum") FROM ('||v_querytext||')' INTO v_total_vol;
+
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 		VALUES (v_fid, v_result_id, 1, concat('There are ', v_total_hydro, ' hydrometers with data for this period and this exploitation.'));
-	
-		-- total volume of hydrometers
-		EXECUTE 'SELECT sum(sum) FROM ext_rtc_hydrometer_x_data 
-		JOIN ext_rtc_hydrometer erh on erh.id::varchar = hydrometer_id
-		JOIN rtc_hydrometer_x_connec hc USING (hydrometer_id) 
-		JOIN connec c ON c.connec_id = hc.connec_id	
-		WHERE  cat_period_id  = '||v_period||'::text AND c.expl_id = '||v_expl||' AND is_waterbal IN ('||v_waterbal||');'
-		INTO v_total_vol;
 
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	
 		VALUES (v_fid, v_result_id, 1, concat('The total volume (m3) for all the hydrometers is ', v_total_vol,'.'));
 
-		-- insert connecs
-		EXECUTE 'INSERT INTO inp_dscenario_demand (feature_type, dscenario_id, feature_id, demand, source)
-		SELECT ''CONNEC'' as feature_type, '||v_scenarioid||', c.connec_id as node_id, (case when custom_sum is null then '||v_factor||'*sum else '||v_factor||'*custom_sum end) as volume, hc.hydrometer_id
-		FROM ext_rtc_hydrometer_x_data d
-		JOIN ext_rtc_hydrometer h ON h.id::text = d.hydrometer_id::text
-		JOIN rtc_hydrometer_x_connec hc USING (hydrometer_id) 
-		JOIN connec c ON c.connec_id = hc.connec_id
-		WHERE cat_period_id  = '||v_period||'::text AND c.expl_id = '||v_expl||' AND is_waterbal IN ('||v_waterbal||') order by 2';
-		
-		-- real number of hydrometers
-		GET DIAGNOSTICS v_count = row_count;	
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	
-		VALUES (v_fid, v_result_id, 1, concat(v_count, ' rows (hydrometers) with demands on CONNEC (wjoin, greentap, fountain or tap) have been inserted on inp_dscenario_demand.'));
 
-		-- insert nodes (netwjoins)
+		-- insert connecs and nodes (netwjoins)
 		EXECUTE 'INSERT INTO inp_dscenario_demand (feature_type, dscenario_id, feature_id, demand, source)
-		SELECT ''NODE'' as feature_type, '||v_scenarioid||', n.node_id, (case when custom_sum is null then '||v_factor||'*sum else '||v_factor||'*custom_sum end) as volume, h.id as hydrometer_id
-		FROM ext_rtc_hydrometer_x_data d
-		JOIN ext_rtc_hydrometer h ON h.id::text = d.hydrometer_id::text
-		JOIN rtc_hydrometer_x_node USING (hydrometer_id) 
-		JOIN node n USING (node_id)
-		WHERE cat_period_id  = '||v_period||'::text AND n.expl_id = '||v_expl||' AND is_waterbal IN ('||v_waterbal||') order by 2';
+		WITH aux as ('||v_querytext||')
+		SELECT  feature_type, '||v_scenarioid||', feature_id,
+		(case when custom_sum is null then '||v_factor||'*sum else '||v_factor||'*custom_sum end) as volume,
+		hydrometer_id as source
+		FROM aux order by 2';
 
-		-- real number of hydrometers
-		GET DIAGNOSTICS v_count = row_count;	
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	
-		VALUES (v_fid, v_result_id, 1, concat(v_count, ' rows (hydrometers) with demands on NODE (netwjoin) have been inserted on inp_dscenario_demand.'));
+
+		EXECUTE  '
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+		WITH aux as ('||v_querytext||')
+		SELECT '||v_fid||', '||quote_literal(v_result_id)||', 1,
+		concat(count(hydrometer_id), '' rows (hydrometers) with demands on '', feature_type, '' have been inserted on inp_dscenario_demand.'')
+		FROM aux GROUP BY feature_type';
 
 		-- real volume inserted
 		SELECT sum(demand)/v_factor INTO v_count2 FROM inp_dscenario_demand WHERE dscenario_id = v_scenarioid;
 
 		--log
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	
-		VALUES (v_fid, v_result_id, 1, concat('The volume water inserted is ',v_count2,', wich it means that lossed water percentatge due leak of data have been ', 
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
+		VALUES (v_fid, v_result_id, 1, concat('The volume water inserted is ',v_count2,', wich it means that lossed water percentatge due leak of data have been ',
 		(100-100*v_count2::float/v_total_vol::float)::numeric(12,2),' %.'));
 
-		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)	
+		INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
 		VALUES (v_fid, v_result_id, 1, concat('The water loss could be motivated by current connecs with state = 0 which they was operative for that period with some hydrometer linked'));
-	
-		-- update patterns  (1 -> none)
-		IF v_pattern = 2 THEN -- sector default
 
-			UPDATE inp_dscenario_demand d SET pattern_id = s.pattern_id 
-			FROM sector s 
-			JOIN connec USING (sector_id) 
+
+		-- update patterns  (1 -> none) -> SEGONS D'ON VOLS AGAFAR EL PATTERN (del sector, dma, periodes de dma, .etc), AQUEST S'UPDATEJARÀ A LA TAULA DEL DSCENARIO
+		IF v_pattern = 2 THEN -- sector DEFAULT ->
+
+			UPDATE inp_dscenario_demand d SET pattern_id = s.pattern_id
+			FROM sector s
+			JOIN connec USING (sector_id)
 			JOIN rtc_hydrometer_x_connec h USING (connec_id)
 			WHERE d.source = h.hydrometer_id
 			AND dscenario_id = v_scenarioid;
-		
-		ELSIF v_pattern = 3 THEN -- dma default
 
-			UPDATE inp_dscenario_demand d SET pattern_id = s.pattern_id 
-			FROM dma s 
-			JOIN connec c ON c.dma_id = s.dma_id::integer  
-			JOIN rtc_hydrometer_x_connec h USING (connec_id) 
+		ELSIF v_pattern = 3 THEN -- dma default
+			-- LO MATEIX PERÒ PER AL PATTERN DE LA DMA
+			UPDATE inp_dscenario_demand d SET pattern_id = s.pattern_id
+			FROM dma s
+			JOIN connec c ON c.dma_id = s.dma_id::integer
+			JOIN rtc_hydrometer_x_connec h USING (connec_id)
 			WHERE d.source = h.hydrometer_id
 			AND dscenario_id = v_scenarioid;
 
 		ELSIF v_pattern = 4 THEN -- dma period
 
-			UPDATE inp_dscenario_demand d SET pattern_id = s.pattern_id 
-			FROM ext_rtc_dma_period s 
-			JOIN connec c ON c.dma_id = s.dma_id::integer  
-			JOIN rtc_hydrometer_x_connec h USING (connec_id) 
-			WHERE d.source = h.hydrometer_id AND cat_period_id = v_period
-			AND dscenario_id = v_scenarioid;
+			EXECUTE '
+			UPDATE inp_dscenario_demand d SET pattern_id = s.pattern_id
+			FROM ext_rtc_dma_period s
+			JOIN connec c ON c.dma_id = s.dma_id::integer
+			JOIN rtc_hydrometer_x_connec h USING (connec_id)
+			WHERE d.source = h.hydrometer_id AND h.hydrometer_id IN (SELECT hydrometer_id FROM ('||v_querytext||')
+			AND dscenario_id = '||v_scenarioid||'';
 
 		ELSIF v_pattern = 5 THEN -- hydrometer period
 
-			UPDATE inp_dscenario_demand d SET pattern_id = h.pattern_id 
+			EXECUTE '
+			UPDATE inp_dscenario_demand d SET pattern_id = h.pattern_id
 			FROM ext_rtc_hydrometer_x_data h
-			WHERE d.source = h.hydrometer_id AND cat_period_id = v_period
-			AND dscenario_id = v_scenarioid;
+			WHERE d.source = h.hydrometer_id AND h.hydrometer_id IN (SELECT hydrometer_id FROM ('||v_querytext||')
+			AND dscenario_id = '||v_scenarioid||'';
 
 		ELSIF v_pattern = 6 THEN -- hydrometer category
 
