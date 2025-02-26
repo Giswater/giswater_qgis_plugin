@@ -135,7 +135,7 @@ BEGIN
 		LEFT JOIN exploitation e ON vuh.expl_name = e.name
 		LEFT JOIN ext_rtc_hydrometer erh ON rhd.hydrometer_id=erh.id
 		WHERE e.expl_id='||v_expl||'
-		AND cat_period_id = '||v_period||':text
+		AND cat_period_id = '||v_period||'::text
 		AND erh.is_waterbal IN ('||v_waterbal||')
 		GROUP BY rhd.hydrometer_id, erh.is_waterbal, rhd.pattern_id, vuh.feature_id, rhd.custom_sum';
 
