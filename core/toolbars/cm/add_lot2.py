@@ -8,12 +8,13 @@ or (at your option) any later version.
 from .add_lot import AddNewLot
 from ..dialog import GwAction
 
-class GwManageLotButton(GwAction):
-    """ Button 75: Lot management """
+
+class GwAddLotButton(GwAction):
+    """ Button 84: Add new lot """
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
         super().__init__(icon_path, action_name, text, toolbar, action_group)
         self.new_lot = AddNewLot(icon_path, action_name, text, toolbar, action_group)
 
     def clicked_event(self):
-        self.new_lot.lot_manager()
+        self.new_lot.manage_lot()

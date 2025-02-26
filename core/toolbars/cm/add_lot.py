@@ -23,6 +23,7 @@ import urllib.parse as parse
 import webbrowser
 import json
 from collections import OrderedDict
+from ..maptool import GwMaptool
 
 #from ...ui.ui_manager import ManageVisit
 from ...ui.ui_manager import AddLotUi
@@ -36,9 +37,8 @@ from ...ui.ui_manager import TeamManagemenUi
 from ...ui.ui_manager import TeamCreateUi
 from ...ui.ui_manager import VehicleCreateUi
 from .... import global_vars
-#from ..dialog import GwAction
 
-from ....libs import lib_vars, tools_qgis, tools_qt, tools_db, tools_pgdao
+from ....libs import lib_vars, tools_qgis, tools_qt, tools_db, tools_pgdao, tools_log
 from ...utils import tools_gw
 
 
@@ -47,7 +47,6 @@ class AddNewLot():
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
         """ Class to control 'Add basic visit' of toolbar 'edit' """
 
-        #super().__init__(icon_path, action_name, text, toolbar, action_group)
         self.ids = []
         self.canvas = global_vars.canvas
         self.rb_red = tools_gw.create_rubberband(self.canvas)
@@ -61,6 +60,8 @@ class AddNewLot():
         self.plugin_name = tools_qgis.get_plugin_metadata('name', 'gw_lotmanage')
         self.plugin_dir = lib_vars.plugin_dir
         self.schemaname = lib_vars.schema_name
+        self.iface = global_vars.iface
+
 
     def manage_lot(self, lot_id=None, is_new=True, visitclass_id=None):
 
@@ -70,8 +71,8 @@ class AddNewLot():
         self.is_new_lot = is_new
         self.cmb_position = 17  # Variable used to set the position of the QCheckBox in the relations table
         self.layers = {}
-
         self.srid = lib_vars.data_epsg
+
         # Get layers of every feature_type
         tools_gw.reset_feature_list()
         tools_gw.reset_layers()
@@ -190,7 +191,7 @@ class AddNewLot():
         self.set_active_layer()
 
         tools_gw.add_icon(self.dlg_lot.btn_open_image, "136b")
-
+        print("hola1")
         self.dlg_lot.btn_open_image.clicked.connect(partial(self.open_load_image, self.tbl_load, 'v_ui_om_vehicle_x_parameters'))
 
         if lot_id is not None and visitclass_id not in (None, '', 'NULL'):
@@ -369,7 +370,7 @@ class AddNewLot():
                     tools_qgis.show_message(msg, 0)
                     return
 
-        sql = (f"INSERT INTO {self.schema_name}.cat_team (idval, descript, active) "
+        sql = (f"INSERT INTO {self.schemaname}.cat_team (idval, descript, active) "
                f"VALUES('{team_name}', '{team_descript}', '{team_active}');")
         tools_db.execute_sql(sql)
 
@@ -412,7 +413,7 @@ class AddNewLot():
                     tools_qgis.show_message(msg, 0)
                     return
 
-        sql = (f"INSERT INTO {self.schema_name}.ext_cat_vehicle (idval, descript, model, number_plate) "
+        sql = (f"INSERT INTO {self.schemaname}.ext_cat_vehicle (idval, descript, model, number_plate) "
                f"VALUES('{vehicle_name}', '{vehicle_descript}', '{vehicle_model}', '{vehicle_plate}');")
         tools_db.execute_sql(sql)
 
@@ -785,13 +786,15 @@ class AddNewLot():
 
 
     def get_next_id(self, table_name, pk):
-
-        sql = "SELECT max("+str(pk)+"::integer) FROM "+str(table_name)+";"
+        sql = f"SELECT MAX({pk}::integer) FROM {table_name};"
         row = tools_db.get_rows(sql)
-        if row is None or row[0] is None:
-            return 0
+
+        if row and isinstance(row, list) and len(row) > 0 and isinstance(row[0], tuple):
+            max_id = row[0][0] if row[0][0] is not None else 0
         else:
-            return row[0] + 1
+            max_id = 0
+
+        return max_id + 1
 
 
     def event_feature_type_selected(self, dialog):
@@ -802,12 +805,10 @@ class AddNewLot():
         # 1) set the model linked to selecte features
         # 2) check if there are features related to the current visit
         # 3) if so, select them => would appear in the table associated to the model
-        self.feature_type = self.feature_type.currentText().lower()
         param_options = tools_qt.get_combo_value(self.dlg_lot, self.dlg_lot.cmb_visit_class, 4)
         if param_options in (None, ''): return
         self.param_options = json.loads(param_options, object_pairs_hook=OrderedDict)
-
-        viewname = "v_edit_" + self.feature_type
+        viewname = "v_edit_" + self.feature_type.lower()
         tools_gw.set_completer_feature_id(dialog.feature_id, self.feature_type, viewname)
 
 
@@ -877,8 +878,8 @@ class AddNewLot():
     def populate_visits(self, widget, table_name, expr_filter=None):
         """ Set a model with selected filter. Attach that model to selected table """
 
-        if self.schema_name not in table_name:
-            table_name = str(self.schema_name) + "."+ str(table_name)
+        if self.schemaname not in table_name:
+            table_name = str(self.schemaname) + "."+ str(table_name)
 
         # Set model
         model = QSqlTableModel()
@@ -900,7 +901,7 @@ class AddNewLot():
     def update_id_list(self):
 
         feature_type = tools_qt.get_combo_value(self.dlg_lot, self.dlg_lot.feature_type, 1).lower()
-        sql = "SELECT alias FROM " + self.schema_name + ".config_form_tableview WHERE location_type = 'tbl_relations' AND columnname = '" + str(
+        sql = "SELECT alias FROM " + self.schemaname + ".config_form_tableview WHERE location_type = 'tbl_relations' AND columnname = '" + str(
             feature_type) + "_id'"
         row = tools_db.get_rows(sql)
 
@@ -1072,7 +1073,7 @@ class AddNewLot():
         index = index_list[0]
         model = qtable.model()
 
-        sql = "SELECT alias FROM " + self.schema_name + ".config_form_tableview WHERE location_type = 'tbl_relations' AND columnname = '" + str(
+        sql = "SELECT alias FROM " + self.schemaname + ".config_form_tableview WHERE location_type = 'tbl_relations' AND columnname = '" + str(
             feature_type) + "_id'"
         return_row = tools_db.get_rows(sql)
         if return_row:
@@ -1144,7 +1145,7 @@ class AddNewLot():
                     continue
                 else:
                     self.dlg_lot.tab_widget.setTabEnabled(index, True)
-        tools_qt.set_combo_value(self.feature_type, feature_type, 1)
+        tools_qt.set_combo_value(self.dlg_lot.findChild(QComboBox, "feature_type"), feature_type, 1, add_new=False)
         self.fill_tab_load()
 
 
@@ -1581,7 +1582,7 @@ class AddNewLot():
 
         # Create the dialog
         self.autocommit = True
-        self.dlg_lot_man = LotManagementUi()
+        self.dlg_lot_man = LotManagementUi(self)
         tools_gw.load_settings(self.dlg_lot_man)
         self.load_user_values(self.dlg_lot_man)
         self.dlg_lot_man.tbl_lots.setSelectionBehavior(QAbstractItemView.SelectRows)
@@ -1600,24 +1601,30 @@ class AddNewLot():
 
         # set timeStart and timeEnd as the min/max dave values get from model
         current_date = QDate.currentDate()
-        sql = ('SELECT MIN(startdate), MAX(startdate)'
-               ' FROM om_visit_lot')
+        sql = 'SELECT MIN(startdate), MAX(startdate) FROM om_visit_lot'
         row = tools_db.get_rows(sql, commit=self.autocommit)
-        if row:
-            if row[0]:
-                self.dlg_lot_man.date_event_from.setDate(row[0])
-            if row[1]:
-                self.dlg_lot_man.date_event_to.setDate(row[1])
+
+        # Ensure row contains valid data
+        if row and isinstance(row, list) and row[0] and any(row[0]):  # Check if at least one value is not None
+            print("entro?")
+            if row[0][0]:  # MIN(startdate)
+                self.dlg_lot_man.date_event_from.setDate(row[0][0])
+            if row[0][1]:  # MAX(startdate)
+                self.dlg_lot_man.date_event_to.setDate(row[0][1])
             else:
                 self.dlg_lot_man.date_event_to.setDate(current_date)
+        else:
+            # Handle case when there are no valid dates
+            print("No valid dates found.")
+            self.dlg_lot_man.date_event_from.setDate(current_date)
+            self.dlg_lot_man.date_event_to.setDate(current_date)
 
         # Hide button manage_load if project is WS
         if tools_gw.get_project_type() == 'ws':
             self.dlg_lot_man.btn_manage_load.hide()
 
         # Set a model with selected filter. Attach that model to selected table
-
-        tools_qt.fill_table(self.dlg_lot_man.tbl_lots, self.schema_name + "." + table_object)
+        tools_qt.fill_table(self.dlg_lot_man.tbl_lots, self.schemaname + "." + table_object)
 
         # manage open and close the dialog
         self.dlg_lot_man.rejected.connect(partial(self.save_user_values, self.dlg_lot_man))
@@ -1634,7 +1641,7 @@ class AddNewLot():
         self.dlg_lot_man.btn_delete.clicked.connect(partial(self.delete_lot, self.dlg_lot_man.tbl_lots))
         self.dlg_lot_man.btn_work_register.clicked.connect(self.open_work_register)
         self.dlg_lot_man.btn_manage_load.clicked.connect(self.open_load_manage)
-        self.dlg_lot_man.btn_LotSelectorUi.clicked.connect(self.LotSelectorUi)
+        self.dlg_lot_man.btn_lot_selector.clicked.connect(self.LotSelectorUi)
 
         # Set filter events
         self.dlg_lot_man.txt_codi_ot.textChanged.connect(self.filter_lot)
@@ -1659,8 +1666,8 @@ class AddNewLot():
         self.filter_lot()
 
         # Set last user dates for date_event_from and date_event_to
-        date_event_from = QDate.fromString(str(tools_qgis.get_plugin_settings_value('date_event_from')), 'dd/MM/yyyy')
-        date_event_to = QDate.fromString(str(tools_qgis.get_plugin_settings_value('date_event_to')), 'dd/MM/yyyy')
+        date_event_from = QDate.fromString(str(tools_qgis.get_plugin_settings_value("lot_manager", 'date_event_from')), 'dd/MM/yyyy')
+        date_event_to = QDate.fromString(str(tools_qgis.get_plugin_settings_value("lot_manager", 'date_event_to')), 'dd/MM/yyyy')
         if date_event_from:
             tools_qt.set_calendar(self.dlg_lot_man, self.dlg_lot_man.date_event_from, date_event_from)
         if date_event_to:
@@ -1690,10 +1697,13 @@ class AddNewLot():
         tools_qt.fill_combo_values(self.dlg_load_manager.cmb_filter_vehicle, combo_values, 1, combo_clear=False)
 
         tools_gw.add_icon(self.dlg_load_manager.btn_open_image, "136b")
+        print("hola2")
         self.dlg_load_manager.btn_open_image.clicked.connect(partial(self.open_load_image, self.tbl_load, 'v_ui_om_vehicle_x_parameters'))
 
         # @setEditStrategy: 0: OnFieldChange, 1: OnRowChange, 2: OnManualSubmit
+        print("hola3")
         tools_qt.fill_table(self.dlg_load_manager.tbl_loads, 'v_ui_om_vehicle_x_parameters', QSqlTableModel.OnManualSubmit)
+        print("hola4")
         tools_gw.set_tablemodel_config(self.dlg_load_manager, self.dlg_load_manager.tbl_loads, 'v_ui_om_vehicle_x_parameters')
         self.dlg_load_manager.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_load_manager))
         self.dlg_load_manager.rejected.connect(partial(tools_gw.save_settings, self.dlg_load_manager))
@@ -1717,7 +1727,7 @@ class AddNewLot():
 
         # Set a model with selected filter. Attach that model to selected table
         table_object = 'v_om_lot_x_user'
-        tools_qt.fill_table(self.dlg_work_register.tbl_work, f"{self.schema_name}.{table_object}")
+        tools_qt.fill_table(self.dlg_work_register.tbl_work, f"{self.schemaname}.{table_object}")
 
         # Set filter events
         self.dlg_work_register.txt_team_filter.textChanged.connect(self.filter_team)
@@ -1853,9 +1863,9 @@ class AddNewLot():
         tbl_all_rows = dialog.findChild(QTableView, "all_rows")
         tbl_all_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
 
-        query_left = "SELECT * FROM " + self.schema_name + "." +tableleft+" WHERE id NOT IN "
-        query_left += "(SELECT "+tableleft+".id FROM "+ self.schema_name + "." +tableleft+""
-        query_left += " RIGHT JOIN "+ self.schema_name + "." +tableright+" ON "+tableleft+"."+field_id_left+" = "+tableright+"."+field_id_right+""
+        query_left = "SELECT * FROM " + self.schemaname + "." +tableleft+" WHERE id NOT IN "
+        query_left += "(SELECT "+tableleft+".id FROM "+ self.schemaname + "." +tableleft+""
+        query_left += " RIGHT JOIN "+ self.schemaname + "." +tableright+" ON "+tableleft+"."+field_id_left+" = "+tableright+"."+field_id_right+""
         query_left += " WHERE cur_user = current_user)"
         query_left += " AND id::text = ANY(ARRAY" + str(data) + ")"
         query_left += " AND "+field_id_left+" > -1 ORDER BY id desc"
@@ -1868,8 +1878,8 @@ class AddNewLot():
         tbl_selected_rows = dialog.findChild(QTableView, "selected_rows")
         tbl_selected_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
 
-        query_right = "SELECT  * FROM " + self.schema_name + "." + tableleft + ""
-        query_right += " JOIN " + self.schema_name + "." + tableright + " ON " + tableleft + "."+field_id_left+" = "+tableright+"."+field_id_right+""
+        query_right = "SELECT  * FROM " + self.schemaname + "." + tableleft + ""
+        query_right += " JOIN " + self.schemaname + "." + tableright + " ON " + tableleft + "."+field_id_left+" = "+tableright+"."+field_id_right+""
         query_right += " WHERE cur_user = current_user AND lot_id::text = ANY(ARRAY" + str(data) + ") ORDER BY " + tableleft +".id desc"
 
         tools_db.fill_table_by_query(tbl_selected_rows, query_right)
@@ -1910,9 +1920,9 @@ class AddNewLot():
         if str(filter_wotype) == 'null':
             filter_wotype = ''
 
-        sql = ("SELECT * FROM " + self.schema_name + "." + tableleft + " WHERE id::text NOT IN "
-                "(SELECT " + tableleft + ".id::text FROM " + self.schema_name + "." + tableleft + ""
-                " RIGHT JOIN " + self.schema_name + "." + tableright + ""
+        sql = ("SELECT * FROM " + self.schemaname + "." + tableleft + " WHERE id::text NOT IN "
+                "(SELECT " + tableleft + ".id::text FROM " + self.schemaname + "." + tableleft + ""
+                " RIGHT JOIN " + self.schemaname + "." + tableright + ""
                 " ON " + tableleft + "." + field_id_l + " = " + tableright + "." + field_id_r + ""
                 " WHERE cur_user = current_user) AND LOWER(id::text) LIKE '%" + str(filter_id) + "%'"
                 " AND LOWER(status::text) LIKE '%" + str(filter_status) + "%'"
@@ -1959,7 +1969,7 @@ class AddNewLot():
 
         cur_user = tools_db.get_current_user()
         csv_path = tools_qt.get_text(dialog, dialog.txt_path)
-        self.controller.plugin_settings_set_value(dialog.objectName() + cur_user, csv_path)
+        tools_gw.set_config_parser("lots", dialog.objectName() + cur_user, csv_path)
 
 
     def load_user_values(self, dialog):
@@ -2190,6 +2200,7 @@ class AddNewLot():
     """ FUNCTIONS RELATED WITH TAB LOAD"""
     def fill_tab_load(self):
         """ Fill tab 'Load' """
+        print("hola5")
         table_load = "v_ui_om_vehicle_x_parameters"
         filter = "lot_id = '" + str(tools_qt.get_text(self.dlg_lot, self.dlg_lot.lot_id)) + "'"
 
@@ -2205,7 +2216,7 @@ class AddNewLot():
                " FROM config_form_tableview"
                " WHERE objectname = '" + table_name + "'"
                " ORDER BY columnindex")
-        rows = tools_db.get_rows(sql, log_info=False, commit=True)
+        rows = tools_db.get_rows(sql, log_info=False)
         if not rows:
             return widget
 
@@ -2241,7 +2252,7 @@ class AddNewLot():
         self.date_load_from = self.dlg_lot.findChild(QDateEdit, "date_load_from")
 
         # Set model of selected widget
-        self.set_model_to_table(widget, self.schema_name + "." + table_name, expr_filter)
+        self.set_model_to_table(widget, self.schemaname + "." + table_name, expr_filter)
 
     def open_load_image(self, qtable, pg_table):
 
@@ -2287,7 +2298,7 @@ class AddNewLot():
     def resources_management(self):
 
         # Create the dialog
-        self.dlg_resources_man = ResourcesManagementUi()
+        self.dlg_resources_man = ResourcesManagementUi(self)
         tools_gw.load_settings(self.dlg_resources_man)
 
         # Populate combos
@@ -2330,13 +2341,13 @@ class AddNewLot():
         team_name = tools_qt.get_text(self.dlg_resources_man, self.dlg_resources_man.cmb_team)
 
         # Populate tables
-        query = ("SELECT user_id AS " + '"' + "Usuari" + '"' + ", user_name AS " + '"' + "Nom" + '"' + " FROM " + self.schema_name + ".v_om_team_x_user WHERE team = '" + str(team_name) + "'")
+        query = ("SELECT user_id AS " + '"' + "Usuari" + '"' + ", user_name AS " + '"' + "Nom" + '"' + " FROM " + self.schemaname + ".v_om_team_x_user WHERE team = '" + str(team_name) + "'")
         tools_db.fill_table_by_query(self.dlg_resources_man.tbl_view_team_user, query)
 
-        query = ("SELECT vehicle  AS " + '"' + "Vehicle" + '"' + " FROM " + self.schema_name + ".v_om_team_x_vehicle WHERE team = '" + str(team_name) + "'")
+        query = ("SELECT vehicle  AS " + '"' + "Vehicle" + '"' + " FROM " + self.schemaname + ".v_om_team_x_vehicle WHERE team = '" + str(team_name) + "'")
         tools_db.fill_table_by_query(self.dlg_resources_man.tbl_view_team_vehicle, query)
 
-        query = ("SELECT visitclass  AS " + '"' + "Classe visita" + '"' + " FROM " + self.schema_name + ".v_om_team_x_visitclass WHERE team = '" + str(team_name) + "'")
+        query = ("SELECT visitclass  AS " + '"' + "Classe visita" + '"' + " FROM " + self.schemaname + ".v_om_team_x_visitclass WHERE team = '" + str(team_name) + "'")
         tools_db.fill_table_by_query(self.dlg_resources_man.tbl_view_team_visitclass, query)
 
 
@@ -2346,7 +2357,7 @@ class AddNewLot():
         vehicle_name = tools_qt.get_text(self.dlg_resources_man, self.dlg_resources_man.cmb_vehicle)
 
         # Populate tables
-        query = ("SELECT * FROM " + self.schema_name + ".v_ext_cat_vehicle WHERE idval = '" + str(vehicle_name) + "'")
+        query = ("SELECT * FROM " + self.schemaname + ".v_ext_cat_vehicle WHERE idval = '" + str(vehicle_name) + "'")
         tools_db.fill_table_by_query(self.dlg_resources_man.tbl_view_vehicle, query)
         self.hide_colums(self.dlg_resources_man.tbl_view_vehicle, [0])
 
@@ -2400,9 +2411,9 @@ class AddNewLot():
         tbl_all_rows = dialog.findChild(QTableView, table_all)
         tbl_all_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
 
-        query_left = "SELECT " + str(parameters_left) + " FROM " + self.schema_name + "." + tableleft + " WHERE id NOT IN "
-        query_left += "(SELECT " + tableleft + ".id FROM " + self.schema_name + "." + tableleft + ""
-        query_left += " RIGHT JOIN " + self.schema_name + "." + tableright + " ON " + tableleft + "." + field_id_left + "::text = " + tableright + "." + field_id_right + "::text"
+        query_left = "SELECT " + str(parameters_left) + " FROM " + self.schemaname + "." + tableleft + " WHERE id NOT IN "
+        query_left += "(SELECT " + tableleft + ".id FROM " + self.schemaname + "." + tableleft + ""
+        query_left += " RIGHT JOIN " + self.schemaname + "." + tableright + " ON " + tableleft + "." + field_id_left + "::text = " + tableright + "." + field_id_right + "::text"
         query_left += " WHERE team = '" + str(filter_team) + "')"
         if tableleft == 'config_visit_class':
             query_left += " AND visit_type = 1"
@@ -2415,8 +2426,8 @@ class AddNewLot():
         tbl_selected_rows = dialog.findChild(QTableView, table_selected)
         tbl_selected_rows.setSelectionBehavior(QAbstractItemView.SelectRows)
 
-        query_right = "SELECT " + str(parameters_right) + " FROM " + self.schema_name + "." + tableleft + ""
-        query_right += " JOIN " + self.schema_name + "." + tableright + " ON " + tableleft + "." + field_id_left + "::text = " + tableright + "." + field_id_right + "::text"
+        query_right = "SELECT " + str(parameters_right) + " FROM " + self.schemaname + "." + tableleft + ""
+        query_right += " JOIN " + self.schemaname + "." + tableright + " ON " + tableleft + "." + field_id_left + "::text = " + tableright + "." + field_id_right + "::text"
         query_right += " WHERE team = '" + str(filter_team) + "'"
 
         tools_db.fill_table_by_query(tbl_selected_rows, query_right)
@@ -2460,7 +2471,7 @@ class AddNewLot():
         for i in range(0, len(id_list)):
             # Check if id_list already exists in id_selector
             sql = ("SELECT DISTINCT(" + id_des + ")"
-                   " FROM " + self.schema_name + "." + tablename_des + ""
+                   " FROM " + self.schemaname + "." + tablename_des + ""
                    " WHERE " + id_des + " = '" + str(id_list[i]) + "' AND team = '" + filter_team + "'")
             row = tools_db.get_rows(sql)
 
@@ -2469,7 +2480,7 @@ class AddNewLot():
                 message = "Id already selected"
                 tools_qt.show_info_box(message, "Info", parameter=str(id_list[i]))
             else:
-                sql = ("INSERT INTO " + self.schema_name + "." + tablename_des + " (" + field_id + ", team) "
+                sql = ("INSERT INTO " + self.schemaname + "." + tablename_des + " (" + field_id + ", team) "
                        " VALUES ('" + str(id_list[i]) + "', '" + filter_team + "')")
                 tools_db.execute_sql(sql)
 
@@ -2599,7 +2610,7 @@ class AddNewLot():
 
         # Manage date_from, date_to and save into settings variables
         date = tools_qt.get_calendar_date(self.dlg_lot_man, widget, 'dd/MM/yyyy')
-        self.controller.plugin_settings_set_value(key, str(date))
+        tools_gw.set_config_parser("lots", key, str(date))
 
     def hide_colums(self, widget, comuns_to_hide):
         for i in range(0, len(comuns_to_hide)):
@@ -2636,6 +2647,31 @@ class AddNewLot():
             query_right += f" ORDER BY {col_to_sort} {oder_by[sort_order]}"
         self.fill_table_by_query(qtable_right, query_right)
         self.refresh_map_canvas()
+
+
+    def set_model_to_table(self, widget, table_name, expr_filter):
+        """ Set a model with selected filter.
+        Attach that model to selected table """
+
+        if self.schemaname not in table_name:
+            table_name = self.schemaname + "." + table_name
+
+        # Set model
+        model = QSqlTableModel()
+        model.setTable(table_name)
+        model.setEditStrategy(QSqlTableModel.OnManualSubmit)
+        model.setFilter(expr_filter)
+        model.select()
+
+        # Check for errors
+        if model.lastError().isValid():
+            tools_qgis.show_warning(model.lastError().text())
+
+        # Attach model to table view
+        if widget:
+            widget.setModel(model)
+        else:
+            tools_log.log_info("set_model_to_table: widget not found")
 
 
     def multi_rows_selector(self, qtable_left, qtable_right, id_ori,
@@ -2703,7 +2739,7 @@ class AddNewLot():
                                name='name', aql=''):
         """ Fill the QTableView by filtering through the QLineEdit"""
 
-        schema_name = self.schema_name.replace('"', '')
+        schema_name = self.schemaname.replace('"', '')
         query = utils_giswater.getWidgetText(dialog, text_line, return_string_null=False).lower()
         sql = (f"SELECT * FROM {schema_name}.{tableleft} WHERE {name} NOT IN "
                f"(SELECT {tableleft}.{name} FROM {schema_name}.{tableleft}"

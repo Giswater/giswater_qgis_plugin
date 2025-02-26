@@ -26,14 +26,21 @@
          <string>Equips</string>
         </attribute>
         <layout class="QGridLayout" name="gridLayout_2">
-         <item row="5" column="1">
-          <widget class="QTableView" name="tbl_view_team_vehicle"/>
+         <item row="5" column="2">
+          <widget class="QTableView" name="tbl_view_team_visitclass"/>
          </item>
          <item row="5" column="0">
           <widget class="QTableView" name="tbl_view_team_user"/>
          </item>
-         <item row="5" column="2">
-          <widget class="QTableView" name="tbl_view_team_visitclass"/>
+         <item row="0" column="0" colspan="3">
+          <widget class="QPushButton" name="btn_team_create">
+           <property name="text">
+            <string>Crear</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="1">
+          <widget class="QTableView" name="tbl_view_team_vehicle"/>
          </item>
          <item row="1" column="0" colspan="3">
           <widget class="QGroupBox" name="groupBox">
@@ -70,13 +77,6 @@
            <zorder>btn_team_selector</zorder>
            <zorder>btn_team_delete</zorder>
            <zorder>btn_team_update</zorder>
-          </widget>
-         </item>
-         <item row="0" column="0" colspan="3">
-          <widget class="QPushButton" name="btn_team_create">
-           <property name="text">
-            <string>Crear</string>
-           </property>
           </widget>
          </item>
         </layout>
@@ -129,8 +129,8 @@
     </layout>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_7">
-     <item>
+    <layout class="QGridLayout" name="lyt_buttons">
+     <item row="0" column="0">
       <spacer name="horizontalSpacer">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -143,7 +143,7 @@
        </property>
       </spacer>
      </item>
-     <item>
+     <item row="0" column="1">
       <widget class="QPushButton" name="btn_close">
        <property name="text">
         <string>Tancar</string>
