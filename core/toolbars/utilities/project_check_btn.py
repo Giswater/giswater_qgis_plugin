@@ -95,7 +95,7 @@ class GwProjectCheckButton(GwAction):
                 continue
 
             # Add widgets to the layout
-            old_widget_pos=tools_gw.add_widget_combined(dialog, field, label, widget, old_widget_pos)
+            old_widget_pos = tools_gw.add_widget_combined(dialog, field, label, widget, old_widget_pos)
 
 
     def _on_accept_clicked(self):

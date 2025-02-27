@@ -4781,6 +4781,7 @@ def manage_dlg_widgets(class_object, dialog, complet_result):
     """ Creates and populates all the widgets, preserving original layout logic while ensuring two-column alignment """
 
     layout_orientations = {}
+    old_widget_pos = 0
 
     # Retrieve layout orientations from the JSON response if provided
     for layout_name, layout_info in complet_result['body']['form']['layouts'].items():
@@ -4812,7 +4813,7 @@ def manage_dlg_widgets(class_object, dialog, complet_result):
         layout.setProperty('lytOrientation', orientation)
 
         # Add widget into layout
-        add_widget_combined(dialog, field, label, widget)
+        old_widget_pos = add_widget_combined(dialog, field, label, widget, old_widget_pos)
 
         # Apply consistent column stretch across all layouts
         layout.setColumnStretch(0, 1)  # Label column stretch (keep this compact)

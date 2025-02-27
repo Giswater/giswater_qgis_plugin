@@ -740,7 +740,7 @@ class GwInfo(QObject):
                     tools_gw.add_widget(self.dlg_cf, field, label, widget)
                 
                 # Populate dialog widgets using lytOrientation field
-                old_widget_pos=tools_gw.add_widget_combined(self.dlg_cf, field, label, widget, old_widget_pos)
+                old_widget_pos = tools_gw.add_widget_combined(self.dlg_cf, field, label, widget, old_widget_pos)
 
             elif field['layoutname'] != 'lyt_none':
                 message = "The field layoutname is not configured for"

@@ -228,7 +228,7 @@ class GwFeatureTypeChangeButton(GwMaptool):
                 layout.addWidget(widget, field['layoutorder'] - 1, 1)
             else:
                 # Use add_widget_combined for other fields
-                old_widget_pos=tools_gw.add_widget_combined(dialog, field, label, widget, old_widget_pos)
+                old_widget_pos = tools_gw.add_widget_combined(dialog, field, label, widget, old_widget_pos)
 
             # Apply consistent column stretch across all layouts
             layout.setColumnStretch(0, 1)  # Label column stretch (keep this compact)
