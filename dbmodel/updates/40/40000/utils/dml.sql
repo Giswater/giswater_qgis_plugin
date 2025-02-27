@@ -1949,5 +1949,7 @@ UPDATE config_form_fields	SET widgetcontrols='{"setMultiline": false, "valueRela
 
 UPDATE config_form_fields SET "label"='Customer code:', tooltip='Customer code' WHERE formname='connec' AND formtype='form_feature' AND columnname='hydrometer_id' AND tabname='tab_hydrometer';
 
--- 24/02/2025
-
+-- 27/02/2025
+UPDATE config_form_fields SET layoutorder=2, web_layoutorder=2 WHERE formname='generic' AND formtype='epa_selector' AND columnname='btn_accept' AND tabname='tab_none';
+UPDATE config_form_fields SET layoutorder=3, web_layoutorder=3 WHERE formname='generic' AND formtype='epa_selector' AND columnname='btn_cancel' AND tabname='tab_none';
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'epa_selector', 'tab_none', 'hspacer_epa_selector', 'lyt_buttons', 1, NULL, 'hspacer', NULL, NULL, NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 1);
