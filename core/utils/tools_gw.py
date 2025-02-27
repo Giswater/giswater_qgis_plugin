@@ -303,16 +303,25 @@ def open_help_link(context, uiname, tabname=None):
     """ Opens the help link for the given dialog, or a default link if not found. """
 
     # Base URL for the documentation
-    base_url = "https://giswater.gitbook.io"
+    domain = "https://docs.giswater.org"
+    language = "es_CR" # TODO: get dynamic language
+    plugin_version = "testing" # TODO: get dynamic version
+
+    if plugin_version == "":
+        plugin_version = "latest"
+
+    base_url = f"{domain}/{plugin_version}/{language}/docs/giswater/for-users"
+
+    uiname = uiname.replace("_", "-").replace(" ", "-").lower() + ".html" # sanitize uiname
 
     # Construct the path dynamically
-    if context and uiname:
-        file_path = f"{base_url}/dialogs/{context}/{uiname}"
+    if uiname:
+        file_path = f"{base_url}/dialogs/{uiname}"
         if tabname != 'tab_none':
-            file_path += f"/{tabname}"  # Append tabname as an anchor if provided
+            file_path += f"#{tabname}"  # Append tabname as an anchor if provided
     else:
         # Fallback to the general manual link if context and uiname are missing
-        file_path = f"{base_url}/giswater-manual"
+        file_path = f"{base_url}/index.html"
 
     tools_os.open_file(file_path)
 
