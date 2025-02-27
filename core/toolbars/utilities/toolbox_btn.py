@@ -140,7 +140,7 @@ class GwToolBoxButton(GwAction):
             if type(widget) is QCheckBox:
                 tools_gw.set_config_parser('btn_toolbox', f"{function_name}_{widget.objectName()}",
                                            f"{widget.isChecked()}")
-            elif type(widget) is QComboBox:
+            elif isinstance(widget, QComboBox):
                 value = tools_qt.get_combo_value(dialog, widget, 0)
                 tools_gw.set_config_parser('btn_toolbox', f"{function_name}_{widget.objectName()}", f"{value}")
             elif type(widget) in (QLineEdit, QSpinBox):
@@ -413,11 +413,11 @@ class GwToolBoxButton(GwAction):
         for widget in list_widgets:
             if type(widget) is QLineEdit:
                 value = tools_qt.get_text(self.dlg_reports, widget, return_string_null=False)
-            elif type(widget) is QComboBox:
+            elif isinstance(widget, QComboBox):
                 value = tools_qt.get_combo_value(self.dlg_reports, widget)
             elif type(widget) is QCheckBox:
                 value = widget.isChecked()
-            elif type(widget) is QgsDateTimeEdit:
+            elif isinstance(widget, QgsDateTimeEdit):
                 value = tools_qt.get_calendar_date(self.dlg_reports, widget)
             else:
                 continue
@@ -525,7 +525,7 @@ class GwToolBoxButton(GwAction):
                                                    "session")
                 if value not in (None, 'None'):
                     tools_qt.set_checked(dialog, widget, value)
-            elif type(widget) is QComboBox and widget.property('selectedId') in (None,'','NULL'):
+            elif isinstance(widget, QComboBox) and widget.property('selectedId') in (None,'','NULL'):
                 value = tools_gw.get_config_parser('btn_toolbox', f"{function_name}_{widget.objectName()}", "user",
                                                    "session")
                 if value in (None, '', 'NULL') and widget.property('selectedId') not in (None, '', 'NULL'):

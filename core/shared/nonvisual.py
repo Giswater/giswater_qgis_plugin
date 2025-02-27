@@ -2683,7 +2683,7 @@ class GwNonVisual:
                 tab_name = dialog.tab_lidlayers.widget(i).objectName().upper()
                 # List with all QLineEdit children
                 child_list = dialog.tab_lidlayers.widget(i).children()
-                visible_widgets = [widget for widget in child_list if type(widget) == QLineEdit or type(widget) == QComboBox]
+                visible_widgets = [widget for widget in child_list if type(widget) == QLineEdit or isinstance(widget, QComboBox)]
                 visible_widgets = self._order_list(visible_widgets)
 
                 for y, widget in enumerate(visible_widgets):
@@ -2880,7 +2880,7 @@ class GwNonVisual:
                 tab_name = dialog.tab_lidlayers.widget(i).objectName().upper()
                 # List with all QLineEdit children
                 child_list = dialog.tab_lidlayers.widget(i).children()
-                widgets_list = [widget for widget in child_list if type(widget) == QLineEdit or type(widget) == QComboBox]
+                widgets_list = [widget for widget in child_list if type(widget) == QLineEdit or isinstance(widget, QComboBox)]
                 widgets_list = self._order_list(widgets_list)
 
                 sql = f"INSERT INTO inp_lid_value (lidco_id, lidlayer,"

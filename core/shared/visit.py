@@ -1381,7 +1381,7 @@ class GwVisit(QObject):
                     value = getattr(self.dlg_event, field_name).text()
             if type(getattr(self.dlg_event, field_name)) is QTextEdit:
                 value = getattr(self.dlg_event, field_name).toPlainText()
-            if type(getattr(self.dlg_event, field_name)) is QComboBox:
+            if isinstance(getattr(self.dlg_event, field_name), QComboBox):
                 value = tools_qt.get_combo_value(self.dlg_event, getattr(self.dlg_event, field_name), index=0)
 
             if value:
@@ -1650,7 +1650,7 @@ class GwVisit(QObject):
                 value = getattr(self.dlg_event, field_name).text()
             elif type(getattr(self.dlg_event, field_name)) is QTextEdit:
                 value = getattr(self.dlg_event, field_name).toPlainText()
-            if type(getattr(self.dlg_event, field_name)) is QComboBox:
+            if isinstance(getattr(self.dlg_event, field_name), QComboBox):
                 value = tools_qt.get_combo_value(self.dlg_event, getattr(self.dlg_event, field_name), index=0)
             setattr(event, field_name, value)
 
@@ -1669,7 +1669,7 @@ class GwVisit(QObject):
                     value = getattr(self.dlg_event, field_name).text()
                 elif type(getattr(self.dlg_event, field_name)) is QTextEdit:
                     value = getattr(self.dlg_event, field_name).toPlainText()
-                elif type(getattr(self.dlg_event, field_name)) is QComboBox:
+                elif isinstance(getattr(self.dlg_event, field_name), QComboBox):
                     value = tools_qt.get_combo_value(self.dlg_event, getattr(self.dlg_event, field_name), index=0)
                 setattr(event, field_name, value)
 
@@ -1924,7 +1924,7 @@ class GwVisit(QObject):
                     widget.setText(value)
                 else:
                     widget.clear()
-            if type(widget) in [QComboBox]:
+            if isinstance(widget, QComboBox):
                 if not value:
                     widget.setCurrentIndex(0)
                     continue

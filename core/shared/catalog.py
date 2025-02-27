@@ -219,7 +219,7 @@ class GwCatalog:
         if type(widget) is QLineEdit:
             widget.setText(catalog_id)
             widget.setFocus()
-        elif type(widget) is QComboBox:
+        elif isinstance(widget, QComboBox):
             tools_qt.set_widget_text(previous_dialog, widget, catalog_id)
             widget.setFocus()
         else:

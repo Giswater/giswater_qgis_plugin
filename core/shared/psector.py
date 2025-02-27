@@ -450,7 +450,7 @@ class GwPsector:
                 # Set editable/readonly
                 if type(widget) in (QLineEdit, QTextEdit):
                     widget.setReadOnly(False)
-                elif type(widget) == tools_gw.CustomQComboBox:
+                elif isinstance(widget, QComboBox):
                     widget.setEnabled(True)
                 widget.setStyleSheet(None)
 
@@ -462,7 +462,7 @@ class GwPsector:
         for widget in widget_list:
             if type(widget) == QLineEdit:
                 widget.editingFinished.connect(partial(tools_gw.get_values, self.dlg_plan_psector, widget, self.my_json))
-            elif type(widget) in (QComboBox, tools_gw.CustomQComboBox):
+            elif isinstance(widget, QComboBox):
                 widget.currentIndexChanged.connect(partial(tools_gw.get_values, self.dlg_plan_psector, widget, self.my_json))
             elif type(widget) == QCheckBox:
                 if widget.objectName() == 'tab_general_chk_enable_all':
@@ -886,7 +886,7 @@ class GwPsector:
                 if type(widget) in (QLineEdit, QDoubleSpinBox, QTextEdit):
                     widget.setReadOnly(True)
                     widget.setStyleSheet("QWidget {background: rgb(242, 242, 242);color: rgb(100, 100, 100)}")
-                elif type(widget) in (QComboBox, QCheckBox, QTableView, QPushButton):
+                elif type(widget) in (QCheckBox, QTableView, QPushButton) or isinstance(widget, QComboBox):
                     widget.setEnabled(False)
 
 
@@ -982,7 +982,7 @@ class GwPsector:
                             elif widget_type is QDateEdit:
                                 date = self.dlg_plan_psector.findChild(QDateEdit, str(column_name))
                                 values += date.dateTime().toString('yyyy-MM-dd HH:mm:ss') + ", "
-                            elif widget_type in (QComboBox, tools_gw.CustomQComboBox):
+                            elif isinstance(widget_type, QComboBox):
                                 combo = tools_qt.get_widget(self.dlg_plan_psector, column_name)
                                 value = str(tools_qt.get_combo_value(self.dlg_plan_psector, combo))
                             else:

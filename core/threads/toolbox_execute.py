@@ -115,14 +115,14 @@ class GwToolBoxTask(GwTask):
                     if value == '':
                         value = 0
                     extras += f'"{param_name}":"{value}", '
-                elif type(widget) in ('', QComboBox, tools_gw.CustomQComboBox):
+                elif type(widget) == '' or isinstance(widget, QComboBox):
                     value = tools_qt.get_combo_value(self.dialog, widget, 0)
                     if value not in (None, ''):
                         extras += f'"{param_name}":"{value}", '
                 elif type(widget) in ('', QCheckBox):
                     value = tools_qt.is_checked(self.dialog, widget)
                     extras += f'"{param_name}":"{str(value).lower()}", '
-                elif type(widget) in ('', QgsDateTimeEdit, tools_gw.CustomQgsDateTimeEdit):
+                elif type(widget) == '' or isinstance(widget, QgsDateTimeEdit):
                     value = tools_qt.get_calendar_date(self.dialog, widget)
                     if value == "" or value is None:
                         extras += f'"{param_name}":null, '
