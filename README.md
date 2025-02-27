@@ -148,6 +148,10 @@ Giswater uses the following third-party libraries:
   PyPDF2 is a Python library for working with PDF files, offering functionalities such as splitting, merging, and text extraction.
   The PyPDF2 license is available in the [LICENSE](./packages/PyPDF2/LICENSE) or in their [repository](https://github.com/py-pdf/pypdf/blob/main/LICENSE).
 
+- **osmnx**: [OSMnx GitHub](https://github.com/gboeing/osmnx)
+  OSMnx is a Python package to easily download, model, analyze, and visualize street networks and other geospatial features from OpenStreetMap. You can download and model walking, driving, or biking networks with a single line of code then analyze and visualize them. You can just as easily work with urban amenities/points of interest, building footprints, transit stops, elevation data, street orientations, speed/travel time, and routing.
+  The OSMnx license can be viewed in the [LICENSE](./packages/osmnx/LICENSE.txt) or in their [repository](https://github.com/gboeing/osmnx/blob/main/LICENSE.txt)
+
 ## License
 
 This program is free software, licensed under the GNU General Public License (GPL) version 3 or later. Refer to the [LICENSE](./LICENSE) file for details.
