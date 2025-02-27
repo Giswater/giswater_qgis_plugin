@@ -60,6 +60,7 @@ from ..shared import info, mincut_tools
 from ..shared.selector import GwSelector
 from ..toolbars.edit import featuretype_change_btn
 from ..toolbars.epa import go2epa_selector_btn
+from ..shared import psector
 
 QgsGeometryType = Literal['line', 'point', 'polygon']
 
@@ -68,7 +69,7 @@ geom_types_dict: Dict = {
     "point": Qgis.GeometryType.Point,
     "polygon": Qgis.GeometryType.Polygon
 }
-    
+
 
 def _get_geom_type(geometry_type: QgsGeometryType = None):
 
@@ -914,14 +915,14 @@ def configure_layers_from_table_name(table_name):
             "v_edit_inp_dwf"
         ]
     }
-    
+
     match table_name:
         # Dynamically collect all 'dscenario' tables if 'table_name' is 'dscenario'
         case 'dscenario':
             tables = []
             for key, table_list in table_groups.items():
                 if "dscenario" in key:
-                    tables.extend(table_list)        
+                    tables.extend(table_list)
         # Dynamically collect all 'curve' tables if 'table_name' is 'curve'
         case 'curve':
             tables = []
@@ -945,7 +946,7 @@ def configure_layers_from_table_name(table_name):
             if table_name not in table_groups:
                 tools_log.log_info(f"Invalid table_name '{table_name}' provided. No configuration performed.")
                 return False
-            tables = table_groups[table_name]        
+            tables = table_groups[table_name]
 
     failed_layers = []
 
@@ -1074,7 +1075,7 @@ def config_layer_attributes(json_result, layer, layer_name, thread=None):
             else:
                 use_vr = False
 
-        if not use_vr:            
+        if not use_vr:
             # Manage new values in ValueMap
             match field['widgettype']:
                 case 'combo':
@@ -1102,7 +1103,7 @@ def config_layer_attributes(json_result, layer, layer_name, thread=None):
                     layer.setEditorWidgetSetup(field_index, editor_widget_setup)
                 case _:
                     editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': 'False'})
-                    layer.setEditorWidgetSetup(field_index, editor_widget_setup)            
+                    layer.setEditorWidgetSetup(field_index, editor_widget_setup)
 
         # multiline: key comes from widgecontrol but it's used here in order to set false when key is missing
         if field['widgettype'] == 'text':
@@ -1702,7 +1703,7 @@ def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None, module
                     case 'button':
                         kwargs = {"dialog": dialog, "field": field, "temp_layers_added": temp_layers_added}
                         widget = add_button(**kwargs)
-                        widget = set_widget_size(widget, field)                    
+                        widget = set_widget_size(widget, field)
 
                 if widget is None:
                     continue
@@ -1808,7 +1809,7 @@ def add_widget_combined(dialog, field, label, widget, old_widget_pos):
 
     if label and orientation == "horizontal":
         layout.setColumnStretch(col, 1)
-    
+
     return row
 
 def get_dialog_changed_values(dialog, chk, widget, field, list, value=None):
@@ -2931,7 +2932,7 @@ def manage_json_return(json_result, sql, rubber_band=None, i=None):
                             elif key in ('line', 'polygon'):
                                 v_layer.renderer().symbol().setWidth(size)
                             v_layer.renderer().symbol().setColor(color)
-                            v_layer.renderer().symbol().setOpacity(opacity)                    
+                            v_layer.renderer().symbol().setOpacity(opacity)
 
                     global_vars.iface.layerTreeView().refreshLayerSymbology(v_layer.id())
                     if margin:
