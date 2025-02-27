@@ -3198,13 +3198,6 @@ UPDATE config_form_fields SET "datatype"='integer', widgettype='combo', dv_query
 UPDATE config_form_fields SET "datatype"='integer', widgettype='combo', dv_querytext='SELECT id, idval FROM edit_typevalue WHERE typevalue = ''value_datasource''', dv_orderby_id=true, dv_isnullvalue=true, dv_querytext_filterc=NULL WHERE formname='v_edit_connec' AND formtype='form_feature' AND columnname='datasource' AND tabname='tab_data';
 UPDATE config_form_fields SET "datatype"='integer', widgettype='combo', dv_querytext='SELECT id, idval FROM edit_typevalue WHERE typevalue = ''value_datasource''', dv_orderby_id=true, dv_isnullvalue=true, dv_querytext_filterc=NULL WHERE formname ILIKE 've_connec_%*' AND formtype='form_feature' AND columnname='datasource' AND tabname='tab_data';
 
-UPDATE config_form_fields SET widgettype='typeahead', dv_querytext='SELECT id, id AS idval FROM cat_pavement WHERE id IS NOT NULL', dv_isnullvalue=True WHERE formname='v_edit_node' AND formtype='form_feature' AND columnname='pavcat_id' AND tabname='tab_data';
-UPDATE config_form_fields SET widgettype='typeahead', dv_querytext='SELECT id, id AS idval FROM cat_pavement WHERE id IS NOT NULL', dv_isnullvalue=True WHERE formname ILIKE 've_node_%' AND formtype='form_feature' AND columnname='pavcat_id' AND tabname='tab_data';
-
-INSERT INTO config_form_fields
-(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
-VALUES('v_edit_arc', 'form_feature', 'tab_data', 'cat_dr', 'lyt_data_1', 55, 'integer', 'text', 'cat_dr', 'cat_dr', NULL, false, NULL, false, NULL, NULL, NULL, true, true, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL);
-
 -- 17/02/2025
 INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, parameter_id, active) VALUES('edit_typevalue', 'value_lock_level', 'node', 'lock_level', NULL, true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field) DO NOTHING;
 INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, parameter_id, active) VALUES('edit_typevalue', 'value_lock_level', 'arc', 'lock_level', NULL, true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field) DO NOTHING;
@@ -3271,25 +3264,21 @@ SET widgettype='combo', dv_querytext='SELECT id, idval FROM edit_typevalue WHERE
 WHERE formname ILIKE 've_node%_tank' AND formtype='form_feature' AND columnname='shape' AND tabname='tab_data';
 
 
-INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('man_tank_fencetype', '1', 'MESH', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
-INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('man_tank_fencetype', '2', 'BRICK', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
-INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('man_tank_fencetype', '3', 'OTHER', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('value_fencetype', '1', 'MESH', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('value_fencetype', '2', 'BRICK', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('value_fencetype', '3', 'OTHER', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
 
-INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, parameter_id, active) VALUES('edit_typevalue', 'man_tank_fencetype', 'man_tank', 'fence_type', NULL, true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field) DO NOTHING;
+INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, parameter_id, active) VALUES('edit_typevalue', 'value_fencetype', 'man_tank', 'fence_type', NULL, true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field) DO NOTHING;
 
 UPDATE config_form_fields
-SET widgettype='combo', dv_querytext='SELECT id, idval FROM edit_typevalue WHERE typevalue = ''man_tank_fencetype''', dv_isnullvalue=true
+SET widgettype='combo', dv_querytext='SELECT id, idval FROM edit_typevalue WHERE typevalue = ''value_fencetype''', dv_isnullvalue=true
 WHERE formname ILIKE 've_node%_tank' AND formtype='form_feature' AND columnname='fence_type' AND tabname='tab_data';
 
 -- man_netelement
-INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('man_netelement_fencetype', '1', 'MESH', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
-INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('man_netelement_fencetype', '2', 'BRICK', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
-INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('man_netelement_fencetype', '3', 'OTHER', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
-
-INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, parameter_id, active) VALUES('edit_typevalue', 'man_netelement_fencetype', 'man_netelement', 'fence_type', NULL, true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field) DO NOTHING;
+INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, parameter_id, active) VALUES('edit_typevalue', 'value_fencetype', 'man_netelement', 'fence_type', NULL, true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field) DO NOTHING;
 
 UPDATE config_form_fields
-SET widgettype='combo', dv_querytext='SELECT id, idval FROM edit_typevalue WHERE typevalue = ''man_netelement_fencetype''', dv_isnullvalue=true
+SET widgettype='combo', dv_querytext='SELECT id, idval FROM edit_typevalue WHERE typevalue = ''value_fencetype''', dv_isnullvalue=true
 WHERE formname ILIKE 've_node%_netelement' AND formtype='form_feature' AND columnname='fence_type' AND tabname='tab_data';
 
 -- man_hydrant
@@ -3344,3 +3333,11 @@ WHERE formname ILIKE 've_node%_source' AND formtype='form_feature' AND columnnam
 
 
 INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,widgetcontrols,hidden)	VALUES ('v_edit_link','form_feature','tab_none','n_hydrometer','lyt_data_1',35,'integer','text','N_hydrometer','N_hydrometer',false,false,true,false,'{"setMultiline":false}'::json,false);
+
+-- node
+UPDATE config_form_fields SET widgettype='typeahead', dv_querytext='SELECT id, id AS idval FROM cat_pavement WHERE id IS NOT NULL', dv_isnullvalue=True WHERE formname='v_edit_node' AND formtype='form_feature' AND columnname='pavcat_id' AND tabname='tab_data';
+UPDATE config_form_fields SET widgettype='typeahead', dv_querytext='SELECT id, id AS idval FROM cat_pavement WHERE id IS NOT NULL', dv_isnullvalue=True WHERE formname ILIKE 've_node_%' AND formtype='form_feature' AND columnname='pavcat_id' AND tabname='tab_data';
+
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('v_edit_arc', 'form_feature', 'tab_data', 'cat_dr', 'lyt_data_1', 55, 'integer', 'text', 'cat_dr', 'cat_dr', NULL, false, NULL, false, NULL, NULL, NULL, true, true, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL);

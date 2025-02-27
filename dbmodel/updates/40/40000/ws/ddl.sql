@@ -1048,9 +1048,6 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP", "table":"doc_x_wor
 ALTER TABLE doc_x_workcat ADD CONSTRAINT doc_x_workcat_pkey PRIMARY KEY (doc_id, workcat_id);
 
 -- 10/02/2025
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node", "column":"pavcat_id", "dataType":"text", "isUtils":"False"}}$$);
-ALTER TABLE node ADD CONSTRAINT cat_pavement_id_fkey FOREIGN KEY (pavcat_id) REFERENCES cat_pavement(id) ON UPDATE CASCADE ON DELETE RESTRICT;
-
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_arc", "column":"dr", "dataType":"integer", "isUtils":"False"}}$$);
 
 -- 17/02/2025
@@ -1064,6 +1061,10 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"arc", "col
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"node", "column":"is_scadamap", "dataType":"boolean", "isUtils":"False"}}$$);
 
 --21/02/2025
+-- node
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node", "column":"pavcat_id", "dataType":"text", "isUtils":"False"}}$$);
+ALTER TABLE node ADD CONSTRAINT cat_pavement_id_fkey FOREIGN KEY (pavcat_id) REFERENCES cat_pavement(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
 -- man_valve
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_valve", "column":"automated", "dataType":"boolean", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_valve", "column":"connection_type", "dataType":"integer", "isUtils":"False"}}$$);
