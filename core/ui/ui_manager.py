@@ -751,6 +751,13 @@ class GwSchemaI18NUpdateUi(GwDialog, FORM_CLASS):
             self.action_dest.setText(text)
 
 
+UINAME = "admin_import_osm"
+FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+class GwAdminImportOsmUi(GwDialog, FORM_CLASS):
+    CONTEXT = CONTEXT
+    UINAME = UINAME
+
+
 UINAME = "admin_gisproject"
 FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
 class GwAdminGisProjectUi(GwMainWindow, FORM_CLASS):

@@ -30,12 +30,13 @@ from qgis.utils import reloadPlugin
 from .gis_file_create import GwGisFileCreate
 from ..threads.task import GwTask
 from ..ui.ui_manager import GwAdminUi, GwAdminDbProjectUi, GwAdminRenameProjUi, GwAdminProjectInfoUi, \
-    GwAdminGisProjectUi, GwAdminFieldsUi, GwCredentialsUi, GwReplaceInFileUi, GwAdminDbProjectAssetUi, GwSchemaI18NUpdateUi
+    GwAdminGisProjectUi, GwAdminFieldsUi, GwCredentialsUi, GwReplaceInFileUi, GwAdminDbProjectAssetUi
 
 from ..utils import tools_gw
 from ... import global_vars
 from .i18n_generator import GwI18NGenerator
 from .schema_i18n_update import GwSchemaI18NUpdate
+from .import_osm import GwImportOsm
 from ...libs import lib_vars, tools_qt, tools_qgis, tools_log, tools_db, tools_os
 from ..ui.docker import GwDocker
 from ..threads.project_schema_create import GwCreateSchemaTask
@@ -771,7 +772,7 @@ class GwAdminButton:
         self.dlg_readsql.btn_delete.clicked.connect(partial(self._delete_schema))
         self.dlg_readsql.btn_copy.clicked.connect(partial(self._copy_schema))
         self.dlg_readsql.btn_create_qgis_template.clicked.connect(partial(self._create_qgis_template))
-        self.dlg_readsql.btn_translation.clicked.connect(partial(self._manage_translations))
+        self.dlg_readsql.btn_translation.clicked.connect(partial(self._manage_translations))        
         self.dlg_readsql.btn_gis_create.clicked.connect(partial(self._open_form_create_gis_project))
         self.dlg_readsql.dlg_closed.connect(partial(self._save_selection))
         self.dlg_readsql.dlg_closed.connect(partial(self._save_custom_sql_path, self.dlg_readsql))
@@ -784,6 +785,7 @@ class GwAdminButton:
         self.dlg_readsql.btn_update_field.clicked.connect(partial(self._open_manage_field, 'update'))
         self.dlg_readsql.btn_delete_field.clicked.connect(partial(self._open_manage_field, 'delete'))
         self.dlg_readsql.btn_update_translation.clicked.connect(partial(self._update_translations))
+        self.dlg_readsql.btn_import_osm_streetaxis.clicked.connect(partial(self._import_osm))
 
         self.dlg_readsql.btn_create_asset.clicked.connect(partial(self._open_create_asset_project))
 
@@ -802,6 +804,13 @@ class GwAdminButton:
         qm_i18n_up.init_dialog()
         dict_info = tools_gw.get_project_info(self._get_schema_name())
         qm_i18n_up.pass_schema_info(dict_info, self._get_schema_name())
+
+
+    def _import_osm(self):
+        """ Initialize import osm streetaxis functionality """
+
+        dlg_import_osm = GwImportOsm()
+        dlg_import_osm.init_dialog(self._get_schema_name())
 
 
     def _info_show_database(self, connection_status=True, username=None, show_dialog=False):
@@ -2533,11 +2542,11 @@ class GwAdminButton:
 
                     if type(widget) in (QLineEdit, QSpinBox, QDoubleSpinBox):
                         value = tools_qt.get_text(self.dlg_manage_fields, widget, return_string_null=False)
-                    elif type(widget) is QComboBox:
+                    elif isinstance(widget, QComboBox):
                         value = tools_qt.get_combo_value(self.dlg_manage_fields, widget, 0)
                     elif type(widget) is QCheckBox:
                         value = tools_qt.is_checked(self.dlg_manage_fields, widget)
-                    elif type(widget) is QgsDateTimeEdit:
+                    elif isinstance(widget, QgsDateTimeEdit):
                         value = tools_qt.get_calendar_date(self.dlg_manage_fields, widget)
                     elif type(widget) is QPlainTextEdit:
                         value = widget.document().toPlainText()
@@ -2581,7 +2590,7 @@ class GwAdminButton:
                     value = None
                     if type(widget) in (QLineEdit, QSpinBox, QDoubleSpinBox):
                         value = tools_qt.get_text(self.dlg_manage_fields, widget, return_string_null=False)
-                    elif type(widget) is QComboBox:
+                    elif isinstance(widget, QComboBox):
                         value = tools_qt.get_combo_value(self.dlg_manage_fields, widget, 0)
                     elif type(widget) is QCheckBox:
                         value = tools_qt.is_checked(self.dlg_manage_fields, widget)
