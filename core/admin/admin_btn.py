@@ -30,7 +30,7 @@ from qgis.utils import reloadPlugin
 from .gis_file_create import GwGisFileCreate
 from ..threads.task import GwTask
 from ..ui.ui_manager import GwAdminUi, GwAdminDbProjectUi, GwAdminRenameProjUi, GwAdminProjectInfoUi, \
-    GwAdminGisProjectUi, GwAdminFieldsUi, GwCredentialsUi, GwReplaceInFileUi
+    GwAdminGisProjectUi, GwAdminFieldsUi, GwCredentialsUi, GwReplaceInFileUi, GwAdminCmProjectUi
 from ..utils import tools_gw
 from ... import global_vars
 from .i18n_generator import GwI18NGenerator
@@ -38,6 +38,7 @@ from ...libs import lib_vars, tools_qt, tools_qgis, tools_log, tools_db, tools_o
 from ..ui.docker import GwDocker
 from ..threads.project_schema_create import GwCreateSchemaTask
 from ..threads.project_schema_utils_create import GwCreateSchemaUtilsTask
+from ..threads.project_schema_cm_create import GwCreateSchemaCmTask
 from ..threads.project_schema_update import GwUpdateSchemaTask
 from ..threads.project_schema_copy import GwCopySchemaTask
 from ..threads.project_schema_rename import GwRenameSchemaTask
@@ -60,6 +61,7 @@ class GwAdminButton:
         self.dlg_readsql = None
         self.dlg_info = None
         self.dlg_readsql_create_project = None
+        self.dlg_readsql_create_cm_project = None
         self.project_type_selected = None
         self.schema_type = None
         self.form_enabled = True
@@ -104,6 +106,27 @@ class GwAdminButton:
         # Create the dialog and signals
         self._init_show_database()
         self._info_show_database(connection_status=connection_status, username=username, show_dialog=show_dialog)
+
+
+    def create_project_data_cm_schema(self):
+        """ Create cm schema """
+        self.cm_schema_name = tools_qt.get_text(self.dlg_readsql_create_cm_project, 'project_name')
+        self.cm_schema_description = tools_qt.get_text(self.dlg_readsql_create_cm_project, 'project_descript')
+
+        # Save in settings
+        tools_gw.set_config_parser('btn_admin', 'project_name_cm_schema', f'{self.cm_schema_name}', prefix=False)
+        tools_gw.set_config_parser('btn_admin', 'cm_project_descript', f'{self.cm_schema_description}',
+                                   prefix=False)
+
+        if not self._check_project_name(self.cm_schema_name, self.cm_schema_description):
+            return
+
+        answer = tools_qt.show_question("This process will take time (few minutes). Are you sure to continue?",
+                                        "Create cm schema")
+        if not answer:
+            return
+
+        self.start_create_cm_project_data_schema_task()
 
 
     def create_project_data_schema(self, project_name_schema=None, project_descript=None, project_type=None,
@@ -197,6 +220,25 @@ class GwAdminButton:
         QgsApplication.taskManager().addTask(self.task_create_schema)
         QgsApplication.taskManager().triggerTask(self.task_create_schema)
 
+
+    def start_create_cm_project_data_schema_task(self):
+        self.cm_error_count = 0
+        # We retrieve the desired name of the schema, since in case there had been a schema with the same name, we had
+        # changed the value of self.schema in the function _rename_project_data_schema or _execute_last_process
+
+        # Set background task 'GwCreateSchemaCmTask'
+        self.t0 = time()
+        self.timer = QTimer()
+        self.timer.timeout.connect(partial(self._calculate_elapsed_time, self.dlg_readsql_create_cm_project))
+
+        self.timer.start(1000)
+
+        description = "Create cm schema"
+        self.task_create_cm_schema = GwCreateSchemaCmTask(self, description, self.timer)
+        QgsApplication.taskManager().addTask(self.task_create_cm_schema)
+        QgsApplication.taskManager().triggerTask(self.task_create_cm_schema)
+
+
     def manage_process_result(self, project_name, project_type, is_test=False, is_utils=False, dlg=None):
         """"""
 
@@ -221,6 +263,23 @@ class GwAdminButton:
             tools_qgis.show_info("A rollback on schema will be done.")
             if dlg:
                 tools_gw.close_dialog(dlg)
+
+    def manage_cm_process_result(self):
+        """"""
+
+        status = (self.cm_error_count == 0)
+        self._manage_result_message(status, parameter="Create cm schema")
+        if status:
+            tools_db.dao.commit()
+            self._close_dialog_admin(self.dlg_readsql_create_cm_project)
+        else:
+            tools_db.dao.rollback()
+            # Reset count error variable to 0
+            self.cm_error_count = 0
+            tools_qt.show_exception_message(msg=lib_vars.session_vars['last_error_msg'])
+            tools_qgis.show_info("A rollback on schema will be done.")
+            if self.dlg_readsql_create_cm_projectdlg:
+                tools_gw.close_dialog(self.dlg_readsql_create_cm_project)
 
 
     def execute_last_process(self, new_project=False, schema_name=None, schema_type='', locale=False, srid=None):
@@ -398,12 +457,51 @@ class GwAdminButton:
         self._set_signals_create_project()
 
 
+    def init_dialog_create_cm_project(self):
+        """ Initialize dialog (only once) """
+
+        self.dlg_readsql_create_cm_project = GwAdminDbProjectCmUi(self)
+        tools_gw.load_settings(self.dlg_readsql_create_cm_project)
+        self.dlg_readsql_create_cm_project.btn_cancel_task.hide()
+
+        # Find Widgets in form
+        self.project_cm_name = self.dlg_readsql_create_cm_project.findChild(QLineEdit, 'project_name')
+        self.project_cm_descript = self.dlg_readsql_create_cm_project.findChild(QLineEdit, 'project_descript')
+
+        # Load user values
+        self.project_cm_name.setText(
+            tools_gw.get_config_parser('btn_admin', 'project_name_cm_schema', "user", "session",
+                                       False, force_reload=True))
+        self.project_cm_descript.setText(
+            tools_gw.get_config_parser('btn_admin', 'cm_project_descript', "user", "session",
+                                       False, force_reload=True))
+
+        # Set shortcut keys
+        self.dlg_readsql_create_cm_project.key_escape.connect(
+            partial(tools_gw.close_dialog, self.dlg_readsql_create_cm_project, False))
+
+        # Set signals
+        # self.dlg_readsql_create_cm_project.btn_cancel_task.clicked.connect(self.cancel_task)
+        self.dlg_readsql_create_cm_project.btn_accept.clicked.connect(partial(self.create_project_data_cm_schema))
+        self.dlg_readsql_create_cm_project.btn_close.clicked.connect(
+            partial(tools_gw.close_dialog, self.dlg_readsql_create_cm_project, False))
+
     # region 'Create Project'
 
     def load_base(self, dict_folders):
         """"""
         for folder in dict_folders.keys():
             status = self._execute_files(folder, set_progress_bar=True)
+            if not tools_os.set_boolean(status, False) and tools_os.set_boolean(self.dev_commit, False) is False:
+                return False
+
+        return True
+
+
+    def load_cm_folder(self, dict_folders):
+        """"""
+        for folder in dict_folders.keys():
+            status = self._execute_cm_files(folder, set_progress_bar=True)
             if not tools_os.set_boolean(status, False) and tools_os.set_boolean(self.dev_commit, False) is False:
                 return False
 
@@ -604,6 +702,12 @@ class GwAdminButton:
         self.folder_updates = os.path.join(self.sql_dir, 'updates')
         self.folder_example = os.path.join(self.sql_dir, 'example')
 
+        # Declare cm db folders
+        self.sql_cm_dir = os.path.join(self.sql_dir, 'am')
+        self.folder_base = os.path.join(self.sql_cm_dir, 'base')
+        self.folder_i18n = os.path.join(self.sql_cm_dir, 'i18n')
+        self.folder_cm_updates = os.path.join(self.sql_cm_dir, 'updates')
+
         # Variable to commit changes even if schema creation fails
         self.dev_commit = tools_gw.get_config_parser('system', 'force_commit', "user", "init", prefix=True)
 
@@ -684,6 +788,8 @@ class GwAdminButton:
         self.dlg_readsql.btn_create_field.clicked.connect(partial(self._open_manage_field, 'create'))
         self.dlg_readsql.btn_update_field.clicked.connect(partial(self._open_manage_field, 'update'))
         self.dlg_readsql.btn_delete_field.clicked.connect(partial(self._open_manage_field, 'delete'))
+
+        self.dlg_readsql.btn_create_cm.clicked.connect(partial(self._open_create_cm_project))
 
 
     def _manage_translations(self):
@@ -1582,6 +1688,19 @@ class GwAdminButton:
         tools_gw.open_dialog(self.dlg_readsql_create_project, dlg_name='admin_dbproject')
 
 
+    def _open_create_cm_project(self):
+        """Create Cm Project"""
+
+        if self.dlg_readsql_create_cm_project is None:
+            self.init_dialog_create_cm_project()
+
+        self._update_time_elapsed("", self.dlg_readsql_create_cm_project)
+
+        # Open dialog
+        self.dlg_readsql_create_cm_project.setWindowTitle(f"Create Cm Project")
+        tools_gw.open_dialog(self.dlg_readsql_create_cm_project, dlg_name='admin_cmdbproject')
+
+
     def _open_rename(self):
         """"""
 
@@ -1705,6 +1824,87 @@ class GwAdminButton:
             tools_log.log_info(f"_read_execute_file exception: {file}")
             tools_log.log_info(str(e))
             self.message_infolog = f"_read_execute_file exception: {file}\n {str(e)}"
+            if tools_os.set_boolean(self.dev_commit, False) is False:
+                tools_db.dao.rollback()
+            if hasattr(self, 'task_create_schema') and not isdeleted(self.task_create_schema):
+                self.task_create_schema.cancel()
+            status = False
+
+        finally:
+            if f:
+                f.close()
+            return status
+
+
+    def _execute_cm_files(self, filedir, set_progress_bar=False):
+        """"""
+
+        if not os.path.exists(filedir):
+            tools_log.log_info(f"Folder not found: {filedir}")
+            return True
+
+        tools_log.log_info(f"Processing folder: {filedir}")
+
+        filelist = sorted(os.listdir(filedir))
+        status = True
+        # Manage folders 'i18n'
+        if 'i18n' in filedir:
+            filelist = [f"{self.project_language}.sql"]
+        for file in filelist:
+            if ".sql" in file:
+                filepath = os.path.join(filedir, file)
+                self.current_sql_file += 1
+                status = self._read_execute_cm_file(filepath, set_progress_bar)
+                if not tools_os.set_boolean(status, False) and not tools_os.set_boolean(self.dev_commit, False):
+                    return False
+
+        return status
+
+    def _read_execute_cm_file(self, filepath, set_progress_bar=False):
+        """"""
+
+        status = False
+        f = None
+
+        PARENT_SCHEMA = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
+        SCHEMA_SRID = str(self.project_epsg)
+        SCHEMA_NAME = self.cm_schema_name
+
+        try:
+            # Manage progress bar
+            if set_progress_bar:
+                if hasattr(self, 'task_create_cm_schema') and not isdeleted(self.task_create_cm_schema):
+                    self.progress_value = int(float(self.current_sql_file / self.total_sql_files) * 100)
+                    self.progress_value = int(self.progress_value * self.progress_ratio)
+                    self.task_create_cm_schema.set_progress(self.progress_value)
+
+            if hasattr(self, 'task_create_cm_schema') and not isdeleted(
+                    self.task_create_cm_schema) and self.task_create_cm_schema.isCanceled():
+                return False
+
+            f = open(filepath, 'r', encoding="utf8")
+            if f:
+                f_to_read = str(
+                    f.read().replace("SCHEMA_NAME", SCHEMA_NAME).replace("SCHEMA_SRID", SCHEMA_SRID).replace(
+                        "PARENT_SCHEMA", PARENT_SCHEMA))
+                status = tools_db.execute_sql(str(f_to_read), filepath=filepath, commit=self.dev_commit, is_thread=True)
+                if tools_os.set_boolean(status, False) is False:
+                    self.cm_error_count = self.cm_error_count + 1
+                    if tools_os.set_boolean(self.dev_commit, False) is False:
+                        tools_db.dao.rollback()
+
+                    if hasattr(self, 'task_create_cm_schema') and not isdeleted(self.task_create_cm_schema):
+                        self.task_create_cm_schema.db_exception = (
+                        lib_vars.session_vars['last_error'], str(f_to_read), filepath)
+                        self.task_create_cm_schema.cancel()
+
+                    return False
+
+        except Exception as e:
+            self.error_count = self.error_count + 1
+            tools_log.log_info(f"_read_execute_file exception: {filepath}")
+            tools_log.log_info(str(e))
+            self.message_infolog = f"_read_execute_file exception: {filepath}\n {str(e)}"
             if tools_os.set_boolean(self.dev_commit, False) is False:
                 tools_db.dao.rollback()
             if hasattr(self, 'task_create_schema') and not isdeleted(self.task_create_schema):
