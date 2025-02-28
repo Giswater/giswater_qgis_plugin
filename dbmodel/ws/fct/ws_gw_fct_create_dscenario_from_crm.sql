@@ -39,16 +39,21 @@ v_source_name text;
 v_target_name text;
 v_action text;
 v_querytext text;
-v_result_id text = null;
+v_result_id text = 'empty';
 v_scenarioid integer;
 v_pattern integer;
 v_periodunits text;
 v_demandunits text;
 v_periodseconds integer;
 v_factor float;
-v_expl integer;
+v_expl TEXT;
 v_onlyiswaterbal boolean;
 v_waterbal TEXT;
+v_initdate TEXT;
+v_enddate TEXT;
+v_tmethod INTEGER;
+v_tmethod_query TEXT;
+v_query_catdscenario TEXT;
 
 BEGIN
 
@@ -56,8 +61,8 @@ BEGIN
 
 	-- select version
 	SELECT giswater, project_type INTO v_version, v_projecttype FROM sys_version ORDER BY id DESC LIMIT 1;
-	
-	-- getting input data 	
+
+	-- getting input data
 	v_name :=  ((p_data ->>'data')::json->>'parameters')::json->>'name';
 	v_descript :=  ((p_data ->>'data')::json->>'parameters')::json->>'descript';
 	v_period :=  ((p_data ->>'data')::json->>'parameters')::json->>'period';
@@ -65,6 +70,9 @@ BEGIN
 	v_demandunits :=  ((p_data ->>'data')::json->>'parameters')::json->>'demandUnits';
 	v_expl :=  ((p_data ->>'data')::json->>'parameters')::json->>'exploitation';
 	v_onlyiswaterbal :=  ((p_data ->>'data')::json->>'parameters')::json->>'onlyIsWaterBal';
+	v_tmethod :=  ((p_data ->>'data')::json->>'parameters')::json->>'patternOrDate';
+	v_initdate :=  ((p_data ->>'data')::json->>'parameters')::json->>'initDate';
+	v_enddate :=  ((p_data ->>'data')::json->>'parameters')::json->>'endDate';
 
 	IF v_onlyiswaterbal is true then 
 		v_waterbal = 'TRUE';
@@ -75,6 +83,7 @@ BEGIN
 	-- getting system values
 	v_crm_name := (SELECT code FROM ext_cat_period WHERE id  = v_period);
 	v_periodseconds := (SELECT period_seconds FROM ext_cat_period WHERE id  = v_period);
+
 	IF v_periodseconds IS NULL THEN
 		SELECT value::integer INTO v_periodseconds FROM config_param_system WHERE parameter = 'admin_crm_periodseconds_vdefault';
 	END IF;
@@ -100,9 +109,30 @@ BEGIN
 	-- inserting on catalog table
 	PERFORM setval('SCHEMA_NAME.cat_dscenario_dscenario_id_seq'::regclass,(SELECT max(dscenario_id) FROM cat_dscenario) ,true);
 
-	INSERT INTO cat_dscenario (name, descript, dscenario_type, expl_id, log) VALUES (v_name, v_descript, 'DEMAND', 
-	v_expl, concat('Insert by ',current_user,' on ', substring(now()::text,0,20),'. Input params:{·Target feature":"", "Source CRM Period":"',v_crm_name,'", "Source Pattern":"',v_pattern,'", "Demand Units":"',v_demandunits,'"}'))
-	ON CONFLICT (name) DO NOTHING RETURNING dscenario_id INTO v_scenarioid ;
+	INSERT INTO cat_dscenario (name, descript, dscenario_type, expl_id, log)
+	SELECT v_name, v_descript, 'DEMAND',
+	CASE WHEN v_expl='ALL' THEN NULL ELSE v_expl::integer END,
+	concat('Insert by ',current_user,' on ', substring(now()::text,0,20),'. Input params:{"Target feature":"", "Exploitation":"'||v_expl||'", "Source CRM Period":"',v_crm_name,'", "Source Pattern":"',v_pattern,'", "Demand Units":"',v_demandunits,'"}')
+	ON CONFLICT (name) DO NOTHING RETURNING dscenario_id INTO v_scenarioid;
+
+
+	IF v_tmethod = 1 THEN --use period_id
+
+		v_tmethod_query = 'rhd.cat_period_id = '||quote_literal(v_period)|| '';
+
+	ELSIF v_tmethod = 2 THEN -- use date INTERVAL
+
+		v_tmethod_query = 'value_date BETWEEN '||quote_literal(v_initdate)||'::date AND '||quote_literal(v_enddate)||'::date ';
+
+	END IF;
+
+
+	IF v_expl = 'ALL' THEN
+
+		EXECUTE 'SELECT string_agg(expl_id::text, '', '') from exploitation WHERE active IS TRUE AND expl_id>0 ' INTO v_expl;
+
+	END IF;
+
 
 	IF v_scenarioid IS NULL THEN
 		SELECT dscenario_id INTO v_scenarioid FROM cat_dscenario where name = v_name;
@@ -134,8 +164,8 @@ BEGIN
 		LEFT JOIN v_ui_hydrometer vuh USING (hydrometer_id)
 		LEFT JOIN exploitation e ON vuh.expl_name = e.name
 		LEFT JOIN ext_rtc_hydrometer erh ON rhd.hydrometer_id=erh.id
-		WHERE e.expl_id='||v_expl||'
-		AND cat_period_id = '||v_period||'::text
+		WHERE e.expl_id in ('||v_expl||')
+		AND '||v_tmethod_query||'
 		AND erh.is_waterbal IN ('||v_waterbal||')
 		GROUP BY rhd.hydrometer_id, erh.is_waterbal, rhd.pattern_id, vuh.feature_id, rhd.custom_sum';
 
