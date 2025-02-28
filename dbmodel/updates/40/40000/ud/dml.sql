@@ -2740,3 +2740,29 @@ INSERT INTO config_form_list (listname, query_text, device, listtype, listclass,
     }
   ]
 }'::json);
+
+-- 27/02/2025
+-- man_wwtp
+INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('man_wwtp_wwtptype', '0', 'UNDEFINED', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, parameter_id, active) VALUES('edit_typevalue', 'man_wwtp_wwtptype', 'man_wwtp', 'wwtp_type', NULL, true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field) DO NOTHING;
+UPDATE config_form_fields
+SET widgettype='combo', dv_querytext='SELECT id, idval FROM edit_typevalue WHERE typevalue = ''man_wwtp_wwtptype''', dv_isnullvalue=False
+WHERE formname ILIKE 've_node%_wwtp' AND formtype='form_feature' AND columnname='wwtp_type' AND tabname='tab_data';
+
+
+INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('man_wwtp_treatmenttype', '0', 'UNDEFINED', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO sys_foreignkey (typevalue_table, typevalue_name, target_table, target_field, parameter_id, active) VALUES('edit_typevalue', 'man_wwtp_treatmenttype', 'man_wwtp', 'treatment_type', NULL, true) ON CONFLICT (typevalue_table, typevalue_name, target_table, target_field) DO NOTHING;
+UPDATE config_form_fields
+SET widgettype='combo', dv_querytext='SELECT id, idval FROM edit_typevalue WHERE typevalue = ''man_wwtp_treatmenttype''', dv_isnullvalue=False
+WHERE formname ILIKE 've_node%_wwtp' AND formtype='form_feature' AND columnname='treatment_type' AND tabname='tab_data';
+
+-- node
+UPDATE config_form_fields SET widgettype='typeahead', dv_querytext='SELECT id, id AS idval FROM cat_pavement WHERE id IS NOT NULL', dv_isnullvalue=True WHERE formname='v_edit_node' AND formtype='form_feature' AND columnname='pavcat_id' AND tabname='tab_data';
+UPDATE config_form_fields SET widgettype='typeahead', dv_querytext='SELECT id, id AS idval FROM cat_pavement WHERE id IS NOT NULL', dv_isnullvalue=True WHERE formname ILIKE 've_node_%' AND formtype='form_feature' AND columnname='pavcat_id' AND tabname='tab_data';
+
+INSERT INTO config_form_fields
+(formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
+VALUES('v_edit_arc', 'form_feature', 'tab_data', 'cat_dr', 'lyt_data_1', 55, 'integer', 'text', 'cat_dr', 'cat_dr', NULL, false, NULL, false, NULL, NULL, NULL, true, true, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL);
+
+-- arc
+UPDATE config_form_fields SET widgettype='datetime' WHERE (formname ILIKE 've_arc%' OR formname='v_edit_arc') AND formtype='form_feature' AND columnname='registre_date' AND tabname='tab_data';

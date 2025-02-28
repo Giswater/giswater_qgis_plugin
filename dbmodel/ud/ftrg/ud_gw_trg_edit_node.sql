@@ -607,7 +607,7 @@ BEGIN
 			dma_id,soilcat_id, function_type, category_type,fluid_type,location_type,workcat_id, workcat_id_end, workcat_id_plan, buildercat_id, builtdate, enddate, ownercat_id,
 			muni_id, streetaxis_id, postcode, district_id, streetaxis2_id,postnumber, postnumber2, postcomplement, postcomplement2, descript,rotation,link,verified,
 			undelete,label_x,label_y,label_rotation,the_geom, expl_id, publish, inventory, uncertain, xyz_date, unconnected, num_value, lastupdate, lastupdate_user,
-			asset_id, drainzone_id, parent_id, arc_id, expl_id2, adate, adescript, placement_type, label_quadrant, access_type, brand_id, model_id, serial_number, streetname, streetname2, lock_level, is_scadamap)
+			asset_id, drainzone_id, parent_id, arc_id, expl_id2, adate, adescript, placement_type, label_quadrant, access_type, brand_id, model_id, serial_number, streetname, streetname2, lock_level, is_scadamap, pavcat_id)
 			VALUES (NEW.node_id,NEW.code, NEW.top_elev,NEW.custom_top_elev, NEW.ymax, NEW. custom_ymax, NEW. elev, NEW. custom_elev, NEW.node_type,NEW.nodecat_id,NEW.epa_type,NEW.sector_id,
 			NEW.state, NEW.state_type, NEW.annotation,NEW.observ, NEW.comment,NEW.dma_id,NEW.soilcat_id, NEW. function_type, NEW.category_type,NEW.fluid_type,NEW.location_type,
 			NEW.workcat_id, NEW.workcat_id_end, NEW.workcat_id_plan, NEW.buildercat_id,NEW.builtdate, NEW.enddate, NEW.ownercat_id,
@@ -615,13 +615,13 @@ BEGIN
 			NEW.descript, NEW.rotation,NEW.link, NEW.verified, NEW.undelete, NEW.label_x,NEW.label_y,NEW.label_rotation,NEW.the_geom,
 			NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.xyz_date, NEW.unconnected, NEW.num_value, NEW.lastupdate, NEW.lastupdate_user,
 			NEW.asset_id, NEW.drainzone_id, NEW.parent_id, NEW.arc_id, NEW.expl_id2, NEW.adate, NEW.adescript, NEW.placement_type, NEW.label_quadrant,
-			NEW.access_type, NEW.brand_id, NEW.model_id, NEW.serial_number, NEW.streetname, NEW.streetname2, NEW.lock_level, NEW.is_scadamap);
+			NEW.access_type, NEW.brand_id, NEW.model_id, NEW.serial_number, NEW.streetname, NEW.streetname2, NEW.lock_level, NEW.is_scadamap, NEW.pavcat_id);
 		ELSE
 			INSERT INTO node (node_id, code, top_elev, custom_top_elev, ymax, custom_ymax, elev, custom_elev, node_type,nodecat_id,epa_type,sector_id,"state", state_type, annotation,observ,"comment",
 			dma_id,soilcat_id, function_type, category_type,fluid_type,location_type,workcat_id, workcat_id_end, workcat_id_plan, buildercat_id, builtdate, enddate, ownercat_id,
 			muni_id, streetaxis_id, postcode, district_id, streetaxis2_id,postnumber, postnumber2, postcomplement, postcomplement2, descript,rotation,link,verified,
 			undelete,label_x,label_y,label_rotation,the_geom, expl_id, publish, inventory, uncertain, xyz_date, unconnected, num_value, lastupdate, lastupdate_user, matcat_id,
-			asset_id, drainzone_id, parent_id, arc_id, expl_id2, adate, adescript, placement_type, label_quadrant, access_type, brand_id, model_id, serial_number, streetname, streetname2, lock_level, is_scadamap)
+			asset_id, drainzone_id, parent_id, arc_id, expl_id2, adate, adescript, placement_type, label_quadrant, access_type, brand_id, model_id, serial_number, streetname, streetname2, lock_level, is_scadamap, pavcat_id)
 			VALUES (NEW.node_id,NEW.code, NEW.top_elev,NEW.custom_top_elev, NEW.ymax, NEW. custom_ymax, NEW. elev, NEW. custom_elev, NEW.node_type,NEW.nodecat_id,NEW.epa_type,NEW.sector_id,
 			NEW.state, NEW.state_type, NEW.annotation,NEW.observ, NEW.comment,NEW.dma_id,NEW.soilcat_id, NEW. function_type, NEW.category_type,NEW.fluid_type,NEW.location_type,
 			NEW.workcat_id, NEW.workcat_id_end, NEW.workcat_id_plan, NEW.buildercat_id,NEW.builtdate, NEW.enddate, NEW.ownercat_id,
@@ -629,7 +629,7 @@ BEGIN
 			NEW.descript, NEW.rotation,NEW.link, NEW.verified, NEW.undelete, NEW.label_x,NEW.label_y,NEW.label_rotation,NEW.the_geom,
 			NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.xyz_date, NEW.unconnected, NEW.num_value,  NEW.lastupdate, NEW.lastupdate_user,NEW.matcat_id,
 			NEW.asset_id, NEW.drainzone_id, NEW.parent_id, NEW.arc_id, NEW.expl_id2, NEW.adate, NEW.adescript, NEW.placement_type,
-			NEW.label_quadrant, NEW.access_type, NEW.brand_id, NEW.model_id, NEW.serial_number, NEW.streetname, NEW.streetname2, NEW.lock_level, NEW.is_scadamap);
+			NEW.label_quadrant, NEW.access_type, NEW.brand_id, NEW.model_id, NEW.serial_number, NEW.streetname, NEW.streetname2, NEW.lock_level, NEW.is_scadamap, NEW.pavcat_id);
 		END IF;
 
 		--check if feature is double geom
@@ -674,9 +674,9 @@ BEGIN
 
 		ELSIF v_man_table='man_manhole' THEN
 
-			INSERT INTO man_manhole (node_id,length, width, sander_depth, prot_surface, inlet, bottom_channel, accessibility, bottom_mat, height)
+			INSERT INTO man_manhole (node_id,length, width, sander_depth, prot_surface, inlet, bottom_channel, accessibility, bottom_mat, height, manhole_code)
 			VALUES (NEW.node_id,NEW.length, NEW.width, NEW.sander_depth,NEW.prot_surface, NEW.inlet, NEW.bottom_channel, NEW.accessibility,
-			NEW.bottom_mat, NEW.height);
+			NEW.bottom_mat, NEW.height, NEW.manhole_code);
 
 		ELSIF v_man_table='man_netinit' THEN
 
@@ -685,12 +685,13 @@ BEGIN
 
 		ELSIF v_man_table='man_wjump' THEN
 
-			INSERT INTO man_wjump (node_id, length, width,sander_depth,prot_surface, accessibility, name)
-			VALUES (NEW.node_id, NEW.length,NEW.width, NEW.sander_depth,NEW.prot_surface,NEW.accessibility, NEW.name);
+			INSERT INTO man_wjump (node_id, length, width,sander_depth,prot_surface, accessibility, name, wjump_code)
+			VALUES (NEW.node_id, NEW.length,NEW.width, NEW.sander_depth,NEW.prot_surface,NEW.accessibility, NEW.name, NEW.wjump_code);
 
 		ELSIF v_man_table='man_wwtp' THEN
 
-			INSERT INTO man_wwtp (node_id, name) VALUES (NEW.node_id, NEW.name);
+			INSERT INTO man_wwtp (node_id, name, wwtp_code, wwtp_type, treatment_type, maxflow, opsflow, wwtp_function, served_hydrometer, efficiency, sludge_disposition, sludge_treatment)
+			VALUES (NEW.node_id, NEW.name, NEW.wwtp_code, NEW.wwtp_type, NEW.treatment_type, NEW.maxflow, NEW.opsflow, NEW.wwtp_function, NEW.served_hydrometer, NEW.efficiency, NEW.sludge_disposition, NEW.sludge_treatment);
 
 		ELSIF v_man_table='man_netelement' THEN
 
@@ -904,7 +905,8 @@ BEGIN
 			xyz_date=NEW.xyz_date, unconnected=NEW.unconnected, expl_id=NEW.expl_id, num_value=NEW.num_value, lastupdate=now(), lastupdate_user=current_user,
 			asset_id=NEW.asset_id, drainzone_id=NEW.drainzone_id, parent_id=NEW.parent_id, arc_id = NEW.arc_id, expl_id2=NEW.expl_id2, adate=NEW.adate, adescript=NEW.adescript,
 			placement_type=NEW.placement_type, label_quadrant=NEW.label_quadrant,
-			access_type=NEW.access_type, brand_id=NEW.brand_id, model_id=NEW.model_id, serial_number=NEW.serial_number, streetname = NEW.streetname, streetname2 = NEW.streetname2, lock_level=NEW.lock_level, is_scadamap=NEW.is_scadamap
+			access_type=NEW.access_type, brand_id=NEW.brand_id, model_id=NEW.model_id, serial_number=NEW.serial_number, streetname = NEW.streetname, streetname2 = NEW.streetname2, lock_level=NEW.lock_level, is_scadamap=NEW.is_scadamap,
+			pavcat_id=NEW.pavcat_id
 			WHERE node_id = OLD.node_id;
 		ELSE
 			UPDATE node
@@ -918,7 +920,7 @@ BEGIN
 			xyz_date=NEW.xyz_date, unconnected=NEW.unconnected, expl_id=NEW.expl_id, num_value=NEW.num_value, lastupdate=now(), lastupdate_user=current_user, matcat_id = NEW.matcat_id,
 			asset_id=NEW.asset_id, drainzone_id=NEW.drainzone_id, parent_id=NEW.parent_id, arc_id = NEW.arc_id, expl_id2=NEW.expl_id2, adate=NEW.adate, adescript=NEW.adescript,
 			placement_type=NEW.placement_type, label_quadrant=NEW.label_quadrant, access_type=NEW.access_type, brand_id=NEW.brand_id, model_id=NEW.model_id, serial_number=NEW.serial_number,
-			streetname = NEW.streetname, streetname2 = NEW.streetname2, lock_level=NEW.lock_level, is_scadamap=NEW.is_scadamap
+			streetname = NEW.streetname, streetname2 = NEW.streetname2, lock_level=NEW.lock_level, is_scadamap=NEW.is_scadamap, pavcat_id=NEW.pavcat_id
 			WHERE node_id = OLD.node_id;
 		END IF;
 
@@ -960,7 +962,7 @@ BEGIN
 		ELSIF v_man_table='man_manhole' THEN
 			UPDATE man_manhole SET length=NEW.length, width=NEW.width, sander_depth=NEW.sander_depth, prot_surface=NEW.prot_surface,
 			inlet=NEW.inlet, bottom_channel=NEW.bottom_channel, accessibility=NEW.accessibility,
-			bottom_mat=NEW.bottom_mat, height=NEW.height
+			bottom_mat=NEW.bottom_mat, height=NEW.height, manhole_code=NEW.manhole_code
 			WHERE node_id=OLD.node_id;
 
 		ELSIF v_man_table='man_netinit' THEN
@@ -968,11 +970,13 @@ BEGIN
 			WHERE node_id=OLD.node_id;
 
 		ELSIF v_man_table='man_wjump' THEN
-			UPDATE man_wjump SET length=NEW.length, width=NEW.width, sander_depth=NEW.sander_depth, prot_surface=NEW.prot_surface, accessibility=NEW.accessibility, name=NEW.name
+			UPDATE man_wjump SET length=NEW.length, width=NEW.width, sander_depth=NEW.sander_depth, prot_surface=NEW.prot_surface, accessibility=NEW.accessibility, name=NEW.name,
+			wjump_code=NEW.wjump_code
 			WHERE node_id=OLD.node_id;
 
 		ELSIF v_man_table='man_wwtp' THEN
-			UPDATE man_wwtp SET name=NEW.name
+			UPDATE man_wwtp SET name=NEW.name, wwtp_code=NEW.wwtp_code, wwtp_type=NEW.wwtp_type, treatment_type=NEW.treatment_type, maxflow=NEW.maxflow, opsflow=NEW.opsflow, wwtp_function=NEW.wwtp_function,
+			served_hydrometer=NEW.served_hydrometer, efficiency=NEW.efficiency, sludge_disposition=NEW.sludge_disposition, sludge_treatment=NEW.sludge_treatment
 			WHERE node_id=OLD.node_id;
 
 		ELSIF v_man_table ='man_netelement' THEN

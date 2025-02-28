@@ -880,3 +880,52 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"gully", "co
 -- 19/02/2025
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"arc", "column":"is_scadamap", "dataType":"boolean", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"node", "column":"is_scadamap", "dataType":"boolean", "isUtils":"False"}}$$);
+
+
+-- 27/02/2025
+-- node
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node", "column":"pavcat_id", "dataType":"text", "isUtils":"False"}}$$);
+ALTER TABLE node ADD CONSTRAINT cat_pavement_id_fkey FOREIGN KEY (pavcat_id) REFERENCES cat_pavement(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+-- arc
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"arc", "column":"registre_date", "dataType":"date", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"arc", "column":"hydraulic_capacity", "dataType":"float", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"arc", "column":"corrosion", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"arc", "column":"deficiencies", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"arc", "column":"meandering", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"arc", "column":"conserv_state", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"arc", "column":"om_state", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"arc", "column":"last_visitdate", "dataType":"date", "isUtils":"False"}}$$);
+
+-- man_conduit
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"man_conduit", "column":"conduit_code", "dataType":"text", "isUtils":"False"}}$$);
+
+-- man_wjump
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"man_wjump", "column":"wjump_code", "dataType":"text", "isUtils":"False"}}$$);
+
+-- man_waccel
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"man_waccel", "column":"waccel_code", "dataType":"text", "isUtils":"False"}}$$);
+
+-- man_siphon
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"man_siphon", "column":"siphon_code", "dataType":"text", "isUtils":"False"}}$$);
+
+-- man_wwtp
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"man_wwtp", "column":"wwtp_code", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"man_wwtp", "column":"wwtp_type", "dataType":"int4", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"man_wwtp", "column":"treatment_type", "dataType":"int4", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"man_wwtp", "column":"maxflow", "dataType":"float", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"man_wwtp", "column":"opsflow", "dataType":"float", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"man_wwtp", "column":"wwtp_function", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"man_wwtp", "column":"served_hydrometer", "dataType":"int4", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"man_wwtp", "column":"efficiency", "dataType":"text", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"man_wwtp", "column":"sludge_disposition", "dataType":"boolean", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"man_wwtp", "column":"sludge_treatment", "dataType":"boolean", "isUtils":"False"}}$$);
+
+UPDATE man_wwtp SET wwtp_type=0 WHERE wwtp_type IS NULL;
+ALTER TABLE man_wwtp ALTER COLUMN wwtp_type SET NOT NULL;
+
+UPDATE man_wwtp SET treatment_type=0 WHERE treatment_type IS NULL;
+ALTER TABLE man_wwtp ALTER COLUMN treatment_type SET NOT NULL;
+
+-- man_manhole
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"man_manhole", "column":"manhole_code", "dataType":"text", "isUtils":"False"}}$$);

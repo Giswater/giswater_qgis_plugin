@@ -9694,7 +9694,7 @@ INSERT INTO man_waccel VALUES ('133', NULL, NULL, NULL, NULL, NULL);
 
 INSERT INTO man_wjump VALUES ('235', NULL, NULL, NULL, NULL, NULL, NULL);
 
-INSERT INTO man_wwtp VALUES ('236', NULL);
+INSERT INTO man_wwtp (node_id, name, wwtp_type, treatment_type) VALUES ('236', NULL, 0, 0);
 
 INSERT INTO man_pump VALUES('100019', 'PUMP-01');
 

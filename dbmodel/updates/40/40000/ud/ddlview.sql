@@ -686,7 +686,15 @@ SELECT arc.arc_id,
     arc.brand_id,
     arc.model_id,
     arc.serial_number,
-    arc.is_scadamap
+    arc.is_scadamap,
+    arc.registre_date,
+    arc.hydraulic_capacity,
+    arc.corrosion,
+    arc.deficiencies,
+    arc.meandering,
+    arc.conserv_state,
+    arc.om_state,
+    arc.last_visitdate
    FROM arc
      JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text
      JOIN cat_feature ON arc.arc_type::text = cat_feature.id::text
@@ -911,7 +919,15 @@ AS WITH
 			arc.serial_number,
             arc.initoverflowpath,
             arc.lock_level,
-            arc.is_scadamap
+            arc.is_scadamap,
+            arc.registre_date,
+            arc.hydraulic_capacity,
+            arc.corrosion,
+            arc.deficiencies,
+            arc.meandering,
+            arc.conserv_state,
+            arc.om_state,
+            arc.last_visitdate
 			FROM arc_selector
 			JOIN arc using (arc_id)
 			JOIN selector_expl se ON (se.cur_user =current_user AND se.expl_id = arc.expl_id) or (se.cur_user = current_user AND se.expl_id = arc.expl_id2)
@@ -1035,6 +1051,7 @@ WITH vu_node AS (SELECT node.node_id,
             node.brand_id,
             node.model_id,
             node.serial_number,
+            node.pavcat_id,
             node.is_scadamap
            FROM node
              LEFT JOIN cat_node ON node.nodecat_id::text = cat_node.id::text
@@ -1144,6 +1161,7 @@ WITH vu_node AS (SELECT node.node_id,
     brand_id,
     model_id,
     serial_number,
+    pavcat_id,
     is_scadamap
    FROM vu_node;
 
@@ -1309,6 +1327,7 @@ AS WITH
 			node.brand_id,
 			node.model_id,
 			node.serial_number,
+            node.pavcat_id,
             node.lock_level,
             node.is_scadamap
 			FROM node_selector
@@ -1432,6 +1451,7 @@ AS WITH
 			brand_id,
 			model_id,
 			serial_number,
+            pavcat_id,
             lock_level,
             is_scadamap
 			FROM node_selected
