@@ -460,7 +460,7 @@ class GwAdminButton:
     def init_dialog_create_cm_project(self):
         """ Initialize dialog (only once) """
 
-        self.dlg_readsql_create_cm_project = GwAdminDbProjectCmUi(self)
+        self.dlg_readsql_create_cm_project = GwAdminCmProjectUi(self)
         tools_gw.load_settings(self.dlg_readsql_create_cm_project)
         self.dlg_readsql_create_cm_project.btn_cancel_task.hide()
 
@@ -702,11 +702,11 @@ class GwAdminButton:
         self.folder_updates = os.path.join(self.sql_dir, 'updates')
         self.folder_example = os.path.join(self.sql_dir, 'example')
 
-        # Declare cm db folders
-        self.sql_cm_dir = os.path.join(self.sql_dir, 'am')
-        self.folder_base = os.path.join(self.sql_cm_dir, 'base')
-        self.folder_i18n = os.path.join(self.sql_cm_dir, 'i18n')
-        self.folder_cm_updates = os.path.join(self.sql_cm_dir, 'updates')
+        # Declare cm db folders (QUE ES ESTO?)
+        self.sql_cm_dir = os.path.join(self.sql_dir, 'cm')
+        self.folder_utils_cm = os.path.join(self.sql_cm_dir, 'utils')
+        self.folder_i18n_cm = os.path.join(self.sql_cm_dir, 'i18n')
+        self.folder_example_cm = os.path.join(self.sql_cm_dir, 'example')
 
         # Variable to commit changes even if schema creation fails
         self.dev_commit = tools_gw.get_config_parser('system', 'force_commit', "user", "init", prefix=True)
@@ -1835,7 +1835,7 @@ class GwAdminButton:
                 f.close()
             return status
 
-
+    #QUE ES ESTO, tenog que traer i18n?
     def _execute_cm_files(self, filedir, set_progress_bar=False):
         """"""
 
@@ -1845,20 +1845,29 @@ class GwAdminButton:
 
         tools_log.log_info(f"Processing folder: {filedir}")
 
-        filelist = sorted(os.listdir(filedir))
+        dirlist = sorted(os.listdir(filedir))
         status = True
         # Manage folders 'i18n'
         if 'i18n' in filedir:
-            filelist = [f"{self.project_language}.sql"]
-        for file in filelist:
-            if ".sql" in file:
-                filepath = os.path.join(filedir, file)
-                self.current_sql_file += 1
-                status = self._read_execute_cm_file(filepath, set_progress_bar)
-                if not tools_os.set_boolean(status, False) and not tools_os.set_boolean(self.dev_commit, False):
-                    return False
+            dirlist = [f"{self.project_language}.sql"]
+        for folder in dirlist:
+            folder_path = os.path.join(filedir, folder)  # Construct full path
 
-        return status
+            if not os.path.isdir(folder_path):  # Ensure it's a directory
+                continue
+            filelist = sorted(os.listdir(folder_path))
+            for file in filelist:
+                if file.endswith(".sql"):
+                    filepath = os.path.join(folder_path, file)  # Full path to the SQL file
+
+                    self.current_sql_file += 1
+                    status = self._read_execute_cm_file(filepath, set_progress_bar)
+
+                    # If execution fails and dev_commit is False, stop processing
+                    if not tools_os.set_boolean(status, False) and not tools_os.set_boolean(self.dev_commit, False):
+                        return False
+
+        return status  # Return final status
 
     def _read_execute_cm_file(self, filepath, set_progress_bar=False):
         """"""
@@ -1885,7 +1894,7 @@ class GwAdminButton:
             f = open(filepath, 'r', encoding="utf8")
             if f:
                 f_to_read = str(
-                    f.read().replace("SCHEMA_NAME", SCHEMA_NAME).replace("SCHEMA_SRID", SCHEMA_SRID).replace(
+                    f.read().replace("SCHEMA_NAME", SCHEMA_NAME).replace("SRID_VALUE", SCHEMA_SRID).replace(
                         "PARENT_SCHEMA", PARENT_SCHEMA))
                 status = tools_db.execute_sql(str(f_to_read), filepath=filepath, commit=self.dev_commit, is_thread=True)
                 if tools_os.set_boolean(status, False) is False:

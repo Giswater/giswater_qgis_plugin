@@ -5,10 +5,12 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
+import os
+
 from qgis.PyQt.QtCore import pyqtSignal
 
 from .task import GwTask
-from ...libs import tools_qt, tools_db, tools_log
+from ...libs import tools_qt, tools_db, tools_log, tools_os
 
 
 class GwCreateSchemaCmTask(GwTask):
@@ -24,18 +26,18 @@ class GwCreateSchemaCmTask(GwTask):
         self.timer = timer
 
         # Manage buttons & other dlg-related widgets
-        # Disable dlg_readsql_create_asset_project buttons
-        self.admin.dlg_readsql_create_asset_project.btn_cancel_task.show()
-        self.admin.dlg_readsql_create_asset_project.btn_accept.hide()
-        self.admin.dlg_readsql_create_asset_project.btn_close.setEnabled(False)
+        # Disable dlg_readsql_create_cm_project buttons
+        self.admin.dlg_readsql_create_cm_project.btn_cancel_task.show()
+        self.admin.dlg_readsql_create_cm_project.btn_accept.hide()
+        self.admin.dlg_readsql_create_cm_project.btn_close.setEnabled(False)
         try:
-            self.admin.dlg_readsql_create_asset_project.key_escape.disconnect()
+            self.admin.dlg_readsql_create_cm_project.key_escape.disconnect()
         except TypeError:
             pass
 
-        # Disable red 'X' from dlg_readsql_create_asset_project
-        self.admin.dlg_readsql_create_asset_project.setWindowFlag(Qt.WindowCloseButtonHint, False)
-        self.admin.dlg_readsql_create_asset_project.show()
+        # Disable red 'X' from dlg_readsql_create_cm_project
+        #self.admin.dlg_readsql_create_cm_project.setWindowFlag(Qt.WindowCloseButtonHint, False)
+        self.admin.dlg_readsql_create_cm_project.show()
         # Disable dlg_readsql buttons
         self.admin.dlg_readsql.btn_close.setEnabled(False)
 
@@ -57,13 +59,13 @@ class GwCreateSchemaCmTask(GwTask):
     def finished(self, result):
 
         super().finished(result)
-        # Enable dlg_readsql_create_asset_project buttons
-        self.admin.dlg_readsql_create_asset_project.btn_cancel_task.hide()
-        self.admin.dlg_readsql_create_asset_project.btn_accept.show()
-        self.admin.dlg_readsql_create_asset_project.btn_close.setEnabled(True)
-        # Enable red 'X' from dlg_readsql_create_asset_project
-        self.admin.dlg_readsql_create_asset_project.setWindowFlag(Qt.WindowCloseButtonHint, True)
-        self.admin.dlg_readsql_create_asset_project.show()
+        # Enable dlg_readsql_create_cm_project buttons
+        self.admin.dlg_readsql_create_cm_project.btn_cancel_task.hide()
+        self.admin.dlg_readsql_create_cm_project.btn_accept.show()
+        self.admin.dlg_readsql_create_cm_project.btn_close.setEnabled(True)
+        # Enable red 'X' from dlg_readsql_create_cm_project
+        #self.admin.dlg_readsql_create_cm_project.setWindowFlag(Qt.WindowCloseButtonHint, True)
+        self.admin.dlg_readsql_create_cm_project.show()
         # Disable dlg_readsql buttons
         self.admin.dlg_readsql.btn_close.setEnabled(True)
 
@@ -89,7 +91,7 @@ class GwCreateSchemaCmTask(GwTask):
         if self.timer:
             self.timer.stop()
 
-        self.admin.manage_asset_process_result()
+        self.admin.manage_cm_process_result()
         self.setProgress(100)
 
 
@@ -103,8 +105,8 @@ class GwCreateSchemaCmTask(GwTask):
 
         self.admin.progress_ratio = 0.8
         self.admin.total_sql_files = self.calculate_number_of_files()
-        for process in ['load_base', 'load_i18n', 'load_updates']:
-            status = self.admin.load_asset_folder(self.dict_folders_process[process])
+        for process in ['load_utils', 'load_example', 'load_i18n']:
+            status = self.admin.load_cm_folder(self.dict_folders_process[process])
             if (not tools_os.set_boolean(status, False) and tools_os.set_boolean(self.admin.dev_commit, False) is False) \
                     or self.isCanceled():
                 return False
@@ -116,7 +118,7 @@ class GwCreateSchemaCmTask(GwTask):
 
         total_sql_files = 0
         dict_process = {}
-        list_process = ['load_base', 'load_i18n', 'load_updates']
+        list_process = ['load_utils', 'load_example', 'load_i18n']
 
         for process_name in list_process:
             dict_folders, total = self.get_number_of_files_process(process_name)
@@ -147,16 +149,18 @@ class GwCreateSchemaCmTask(GwTask):
         """ Get list of folders related with this @process_name """
 
         dict_folders = {}
-        if process_name == 'load_base':
-            dict_folders[self.admin.folder_base] = 0
+        if process_name == 'load_utils':
+            dict_folders[self.admin.folder_utils_cm] = 0
 
-        elif process_name == 'load_i18n':
-            dict_folders[self.admin.folder_i18n] = 0
+        elif process_name == 'load_example':
+            dict_folders[self.admin.folder_example_cm] = 0
 
-        elif process_name == 'load_updates':
-            dict_folders[os.path.join(self.admin.folder_asset_updates, '2023-05')] = 0
-            dict_folders[os.path.join(self.admin.folder_asset_updates, '2024-01')] = 0
-            dict_folders[os.path.join(self.admin.folder_asset_updates, '2024-01','i18n')] = 0
+        #elif process_name == 'load_i18n':
+        #    dict_folders[self.admin.folder_i18n_cm] = 0
+
+            #dict_folders[os.path.join(self.admin.folder_cm_updates, '2023-05')] = 0
+            #dict_folders[os.path.join(self.admin.folder_cm_updates, '2024-01')] = 0
+            #dict_folders[os.path.join(self.admin.folder_cm_updates, '2024-01','i18n')] = 0
 
         return dict_folders
 
