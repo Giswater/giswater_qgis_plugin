@@ -30,7 +30,7 @@ from qgis.utils import reloadPlugin
 from .gis_file_create import GwGisFileCreate
 from ..threads.task import GwTask
 from ..ui.ui_manager import GwAdminUi, GwAdminDbProjectUi, GwAdminRenameProjUi, GwAdminProjectInfoUi, \
-    GwAdminGisProjectUi, GwAdminFieldsUi, GwCredentialsUi, GwReplaceInFileUi, GwAdminDbProjectAssetUi
+    GwAdminGisProjectUi, GwAdminFieldsUi, GwCredentialsUi, GwReplaceInFileUi, GwAdminDbProjectAssetUi, GwAdminDbProjectAuditUi
 
 from ..utils import tools_gw
 from ... import global_vars
@@ -41,6 +41,7 @@ from ...libs import lib_vars, tools_qt, tools_qgis, tools_log, tools_db, tools_o
 from ..ui.docker import GwDocker
 from ..threads.project_schema_create import GwCreateSchemaTask
 from ..threads.project_schema_asset_create import GwCreateSchemaAssetTask
+from ..threads.project_schema_audit_create import GwCreateSchemaAuditTask
 from ..threads.project_schema_utils_create import GwCreateSchemaUtilsTask
 from ..threads.project_schema_update import GwUpdateSchemaTask
 from ..threads.project_schema_copy import GwCopySchemaTask
@@ -63,7 +64,6 @@ class GwAdminButton:
         self.dlg_readsql = None
         self.dlg_info = None
         self.dlg_readsql_create_project = None
-        self.dlg_readsql_create_asset_project = None
         self.project_type_selected = None
         self.schema_type = None
         self.form_enabled = True
@@ -110,23 +110,26 @@ class GwAdminButton:
         self._info_show_database(connection_status=connection_status, username=username, show_dialog=show_dialog)
 
 
-    def create_project_data_asset_schema(self):
-        """ Create asset schema """
-        self.asset_schema_name = tools_qt.get_text(self.dlg_readsql_create_asset_project, 'project_name')
-        self.asset_schema_description = tools_qt.get_text(self.dlg_readsql_create_asset_project, 'project_descript')
+    def create_project_data_other_schema(self):
+        """ Create other schema """
+
+        project = self.other_project
+
+        setattr(self, f"{project}_schema_name", tools_qt.get_text(getattr(self, f"dlg_readsql_create_{project}_project"), 'project_name'))
+        setattr(self, f"{project}_schema_description", tools_qt.get_text(getattr(self, f"dlg_readsql_create_{project}_project"), 'project_descript'))
 
         # Save in settings
-        tools_gw.set_config_parser('btn_admin', 'project_name_asset_schema', f'{self.asset_schema_name}', prefix=False)
-        tools_gw.set_config_parser('btn_admin', 'asset_project_descript', f'{self.asset_schema_description}', prefix=False)
+        tools_gw.set_config_parser('btn_admin', f'project_name_{project}_schema', getattr(self, f"{project}_schema_name"), prefix=False)
+        tools_gw.set_config_parser('btn_admin', f'{project}_project_descript', getattr(self, f"{project}_schema_description"), prefix=False)
 
-        if not self._check_project_name(self.asset_schema_name, self.asset_schema_description):
+        if not self._check_project_name(getattr(self, f"{project}_schema_name"), getattr(self, f"{project}_schema_description")):
             return
 
-        answer = tools_qt.show_question("This process will take time (few minutes). Are you sure to continue?", "Create asset schema")
+        answer = tools_qt.show_question("This process will take time (few minutes). Are you sure to continue?", f"Create {project} schema")
         if not answer:
             return
 
-        self.start_create_asset_project_data_schema_task()
+        self.start_create_other_project_data_schema_task()
 
     def create_project_data_schema(self, project_name_schema=None, project_descript=None, project_type=None,
             project_srid=None, project_locale=None, is_test=False, exec_last_process=True, example_data=True):
@@ -219,22 +222,27 @@ class GwAdminButton:
         QgsApplication.taskManager().addTask(self.task_create_schema)
         QgsApplication.taskManager().triggerTask(self.task_create_schema)
 
-    def start_create_asset_project_data_schema_task(self):
-        self.asset_error_count = 0
+    def start_create_other_project_data_schema_task(self):
+        self.error_count = 0
         # We retrieve the desired name of the schema, since in case there had been a schema with the same name, we had
         # changed the value of self.schema in the function _rename_project_data_schema or _execute_last_process
 
-        # Set background task 'GwCreateSchemaAssetTask'
         self.t0 = time()
         self.timer = QTimer()
-        self.timer.timeout.connect(partial(self._calculate_elapsed_time, self.dlg_readsql_create_asset_project))
+        self.timer.timeout.connect(partial(self._calculate_elapsed_time, getattr(self, f"dlg_readsql_create_{self.other_project}_project")))
 
         self.timer.start(1000)
 
-        description = "Create asset schema"
-        self.task_create_asset_schema = GwCreateSchemaAssetTask(self, description, self.timer)
-        QgsApplication.taskManager().addTask(self.task_create_asset_schema)
-        QgsApplication.taskManager().triggerTask(self.task_create_asset_schema)
+        description = f"Create {self.other_project} schema"
+
+        match(self.other_project):
+            case "asset":
+               self.task_create_schema = GwCreateSchemaAssetTask(self, description, self.timer)
+            case "audit":
+               self.task_create_schema = GwCreateSchemaAuditTask(self, description, self.timer)
+
+        QgsApplication.taskManager().addTask(self.task_create_schema)
+        QgsApplication.taskManager().triggerTask(self.task_create_schema)
 
     def manage_process_result(self, project_name, project_type, is_test=False, is_utils=False, dlg=None):
         """"""
@@ -261,22 +269,22 @@ class GwAdminButton:
             if dlg:
                 tools_gw.close_dialog(dlg)
 
-    def manage_asset_process_result(self):
+    def manage_other_process_result(self):
         """"""
 
-        status = (self.asset_error_count == 0)
-        self._manage_result_message(status, parameter="Create asset schema")
+        status = (self.error_count == 0)
+        self._manage_result_message(status, parameter=f"Create {self.other_project} schema")
         if status:
             tools_db.dao.commit()
-            self._close_dialog_admin(self.dlg_readsql_create_asset_project)
+            self._close_dialog_admin(getattr(self, f"dlg_readsql_create_{self.other_project}_project"))
         else:
             tools_db.dao.rollback()
             # Reset count error variable to 0
-            self.asset_error_count = 0
+            self.error_count = 0
             tools_qt.show_exception_message(msg=lib_vars.session_vars['last_error_msg'])
             tools_qgis.show_info("A rollback on schema will be done.")
-            if self.dlg_readsql_create_asset_projectdlg:
-                tools_gw.close_dialog(self.dlg_readsql_create_asset_project)
+            if getattr(self, f"dlg_readsql_create_{self.other_project}_project"):
+                tools_gw.close_dialog(getattr(self, f"dlg_readsql_create_{self.other_project}_project"))
 
 
     def execute_last_process(self, new_project=False, schema_name=None, schema_type='', locale=False, srid=None):
@@ -456,31 +464,41 @@ class GwAdminButton:
         self._set_signals_create_project()
 
 
-    def init_dialog_create_asset_project(self):
+    def  init_dialog_create_other_project(self):
         """ Initialize dialog (only once) """
+        project = self.other_project
 
-        self.dlg_readsql_create_asset_project = GwAdminDbProjectAssetUi(self)
-        tools_gw.load_settings(self.dlg_readsql_create_asset_project)
-        self.dlg_readsql_create_asset_project.btn_cancel_task.hide()
+        match (project):
+            case "asset":
+                dialog = GwAdminDbProjectAssetUi(self)
+            case "audit":
+                dialog = GwAdminDbProjectAuditUi(self)
+
+        setattr(self, f"dlg_readsql_create_{project}_project", dialog)
+
+        tools_gw.load_settings(dialog)
+        dialog.btn_cancel_task.hide()
 
         # Find Widgets in form
-        self.project_asset_name = self.dlg_readsql_create_asset_project.findChild(QLineEdit, 'project_name')
-        self.project_asset_descript = self.dlg_readsql_create_asset_project.findChild(QLineEdit, 'project_descript')
+        setattr(self, f"project_{project}_name", dialog.findChild(QLineEdit, 'project_name'))
+        setattr(self, f"project_{project}_descript", dialog.findChild(QLineEdit, 'project_descript'))
 
         # Load user values
-        self.project_asset_name.setText(tools_gw.get_config_parser('btn_admin', 'project_name_asset_schema', "user", "session",
-                                                            False, force_reload=True))
-        self.project_asset_descript.setText(tools_gw.get_config_parser('btn_admin', 'asset_project_descript', "user", "session",
-                                                                False, force_reload=True))
+        name = tools_gw.get_config_parser('btn_admin', f'project_name_{project}_schema', "user", "session",False, force_reload=True)
+        getattr(self, f"project_{project}_name").setText(name)
+
+        descript = tools_gw.get_config_parser('btn_admin', f'{project}_project_descript', "user", "session",False, force_reload=True)
+        getattr(self, f"project_{project}_descript").setText(descript)
 
         # Set shortcut keys
-        self.dlg_readsql_create_asset_project.key_escape.connect(partial(tools_gw.close_dialog, self.dlg_readsql_create_asset_project, False))
+        dialog.key_escape.connect(partial(tools_gw.close_dialog, dialog, False))
 
         # Set signals
-        self.dlg_readsql_create_asset_project.btn_cancel_task.clicked.connect(partial(self.cancel_task, 'task_create_asset_schema'))
-        self.dlg_readsql_create_asset_project.btn_accept.clicked.connect(partial(self.create_project_data_asset_schema))
-        self.dlg_readsql_create_asset_project.btn_close.clicked.connect(
-                partial(tools_gw.close_dialog, self.dlg_readsql_create_asset_project, False))
+        dialog.btn_cancel_task.clicked.connect(partial(self.cancel_task, f'task_create_{project}_schema'))
+        dialog.btn_accept.clicked.connect(partial(self.create_project_data_other_schema))
+        dialog.btn_close.clicked.connect(partial(tools_gw.close_dialog, dialog, False))
+
+        return dialog
 
 
     # region 'Create Project'
@@ -494,10 +512,10 @@ class GwAdminButton:
 
         return True
 
-    def load_asset_folder(self, dict_folders):
+    def load_sql_folder(self, dict_folders):
         """"""
         for folder in dict_folders.keys():
-            status = self._execute_asset_files(folder, set_progress_bar=True)
+            status = self._execute_sql_files(folder, set_progress_bar=True)
             if not tools_os.set_boolean(status, False) and tools_os.set_boolean(self.dev_commit, False) is False:
                 return False
 
@@ -704,6 +722,10 @@ class GwAdminButton:
         self.folder_i18n = os.path.join(self.sql_asset_dir, 'i18n')
         self.folder_asset_updates = os.path.join(self.sql_asset_dir, 'updates')
 
+        # Declare audit db folders
+        self.sql_audit_dir = os.path.join(self.sql_dir, 'corporate','audit')
+        self.folder_audit = os.path.join(self.sql_audit_dir, 'audit')
+
         # Variable to commit changes even if schema creation fails
         self.dev_commit = tools_gw.get_config_parser('system', 'force_commit', "user", "init", prefix=True)
 
@@ -745,6 +767,9 @@ class GwAdminButton:
         # Set default project type
         tools_qt.set_widget_text(self.dlg_readsql, self.cmb_project_type, 'ws')
 
+        # Disable button if schema not is ws:
+        self.dlg_readsql.btn_create_asset.setEnabled(self.project_type_selected == "ws")
+
         # Update folderSoftware
         self._change_project_type(self.cmb_project_type)
 
@@ -772,7 +797,7 @@ class GwAdminButton:
         self.dlg_readsql.btn_delete.clicked.connect(partial(self._delete_schema))
         self.dlg_readsql.btn_copy.clicked.connect(partial(self._copy_schema))
         self.dlg_readsql.btn_create_qgis_template.clicked.connect(partial(self._create_qgis_template))
-        self.dlg_readsql.btn_translation.clicked.connect(partial(self._manage_translations))        
+        self.dlg_readsql.btn_translation.clicked.connect(partial(self._manage_translations))
         self.dlg_readsql.btn_gis_create.clicked.connect(partial(self._open_form_create_gis_project))
         self.dlg_readsql.dlg_closed.connect(partial(self._save_selection))
         self.dlg_readsql.dlg_closed.connect(partial(self._save_custom_sql_path, self.dlg_readsql))
@@ -787,7 +812,12 @@ class GwAdminButton:
         self.dlg_readsql.btn_update_translation.clicked.connect(partial(self._update_translations))
         self.dlg_readsql.btn_import_osm_streetaxis.clicked.connect(partial(self._import_osm))
 
-        self.dlg_readsql.btn_create_asset.clicked.connect(partial(self._open_create_asset_project))
+        self.dlg_readsql.btn_create_asset.clicked.connect(
+            partial(self._open_create_other_project, "Create Asset Project","admin_assetdbproject","asset"))
+
+        self.dlg_readsql.btn_create_audit.clicked.connect(
+            partial(self._open_create_other_project, "Create Audit Project","admin_auditdbproject","audit"))
+
 
     def _manage_translations(self):
         """ Initialize the translation functionalities """
@@ -919,7 +949,7 @@ class GwAdminButton:
             schema_name = tools_qt.get_text(self.dlg_readsql, 'project_schema_name')
             if any(x in str(tools_db.dao_db_credentials['db']) for x in ('.', ',')):
                 message = "Database name contains special characters that are not supported"
-                self.form_enabled = False            
+                self.form_enabled = False
             if schema_name == 'null':
                 tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_status_text, '')
                 tools_qt.set_widget_text(self.dlg_readsql, self.dlg_readsql.lbl_schema_name, '')
@@ -1123,7 +1153,7 @@ class GwAdminButton:
         elif [project_name] in pg_keywords:
             msg = "The project name can't be a PostgreSQL reserved keyword"
             tools_qt.show_info_box(msg, "Info")
-            return False           
+            return False
 
         if project_descript == 'null':
             msg = "The 'Description' field is required."
@@ -1699,17 +1729,15 @@ class GwAdminButton:
         self.dlg_readsql_create_project.setWindowTitle(f"Create Project - {self.connection_name}")
         tools_gw.open_dialog(self.dlg_readsql_create_project, dlg_name='admin_dbproject')
 
-    def _open_create_asset_project(self):
-        """Create Asset Project"""
+    def _open_create_other_project(self, title, dlg_name, other_project):
+        """Create Other Project"""
 
-        if self.dlg_readsql_create_asset_project is None:
-            self.init_dialog_create_asset_project()
-
-        self._update_time_elapsed("", self.dlg_readsql_create_asset_project)
+        self.other_project = other_project
+        self.init_dialog_create_other_project()
 
         # Open dialog
-        self.dlg_readsql_create_asset_project.setWindowTitle(f"Create Asset Project")
-        tools_gw.open_dialog(self.dlg_readsql_create_asset_project, dlg_name='admin_assetdbproject')
+        getattr(self, f"dlg_readsql_create_{other_project}_project").setWindowTitle(title)
+        tools_gw.open_dialog(getattr(self, f"dlg_readsql_create_{other_project}_project"), dlg_name=dlg_name)
 
 
     def _open_rename(self):
@@ -1847,7 +1875,7 @@ class GwAdminButton:
             return status
 
 
-    def _execute_asset_files(self, filedir, set_progress_bar=False):
+    def _execute_sql_files(self, filedir, set_progress_bar=False):
         """"""
 
         if not os.path.exists(filedir):
@@ -1865,14 +1893,14 @@ class GwAdminButton:
             if ".sql" in file:
                 filepath = os.path.join(filedir, file)
                 self.current_sql_file += 1
-                status = self._read_execute_asset_file(filepath, set_progress_bar)
+                status = self._read_execute_sql_file(filepath, set_progress_bar)
                 if not tools_os.set_boolean(status, False) and not tools_os.set_boolean(self.dev_commit, False):
                     return False
 
         return status
 
 
-    def _read_execute_asset_file(self, filepath, set_progress_bar=False):
+    def _read_execute_sql_file(self, filepath, set_progress_bar=False):
         """"""
 
         status = False
@@ -1880,17 +1908,19 @@ class GwAdminButton:
 
         PARENT_SCHEMA = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
         SCHEMA_SRID = str(self.project_epsg)
-        SCHEMA_NAME = self.asset_schema_name
+        SCHEMA_NAME = ""
+        if hasattr(self, f'{self.other_project}_schema_name'):
+            SCHEMA_NAME = getattr(self,f'{self.other_project}_schema_name')
 
         try:
             # Manage progress bar
             if set_progress_bar:
-                if hasattr(self, 'task_create_asset_schema') and not isdeleted(self.task_create_asset_schema):
+                if hasattr(self, 'task_create_schema') and not isdeleted(self.task_create_schema):
                     self.progress_value = int(float(self.current_sql_file / self.total_sql_files) * 100)
                     self.progress_value = int(self.progress_value * self.progress_ratio)
-                    self.task_create_asset_schema.set_progress(self.progress_value)
+                    self.task_create_schema.set_progress(self.progress_value)
 
-            if hasattr(self, 'task_create_asset_schema') and not isdeleted(self.task_create_asset_schema) and self.task_create_asset_schema.isCanceled():
+            if hasattr(self, 'task_create_schema') and not isdeleted(self.task_create_schema) and self.task_create_schema.isCanceled():
                 return False
 
             f = open(filepath, 'r', encoding="utf8")
@@ -1898,13 +1928,13 @@ class GwAdminButton:
                 f_to_read = str(f.read().replace("SCHEMA_NAME", SCHEMA_NAME).replace("SCHEMA_SRID", SCHEMA_SRID).replace("PARENT_SCHEMA", PARENT_SCHEMA))
                 status = tools_db.execute_sql(str(f_to_read), filepath=filepath, commit=self.dev_commit, is_thread=True)
                 if tools_os.set_boolean(status, False) is False:
-                    self.asset_error_count = self.asset_error_count + 1
+                    self.error_count = self.error_count + 1
                     if tools_os.set_boolean(self.dev_commit, False) is False:
                         tools_db.dao.rollback()
 
-                    if hasattr(self, 'task_create_asset_schema') and not isdeleted(self.task_create_asset_schema):
-                        self.task_create_asset_schema.db_exception = (lib_vars.session_vars['last_error'], str(f_to_read), filepath)
-                        self.task_create_asset_schema.cancel()
+                    if hasattr(self, 'task_create_schema') and not isdeleted(self.task_create_schema):
+                        self.task_create_schema.db_exception = (lib_vars.session_vars['last_error'], str(f_to_read), filepath)
+                        self.task_create_schema.cancel()
 
                     return False
 
@@ -2316,7 +2346,7 @@ class GwAdminButton:
                 self._manage_delete_field(form_name_fields, is_multi_addfield)
             case _:
                 tools_qgis.show_warning("No action detected")
-            
+
 
         # Set listeners
         self.dlg_manage_fields.btn_accept.clicked.connect(
@@ -2651,6 +2681,8 @@ class GwAdminButton:
         self.project_type_selected = tools_qt.get_text(self.dlg_readsql, widget)
         self.folder_software = os.path.join(self.sql_dir, self.project_type_selected)
 
+        # Disable button if schema not is ws:
+        self.dlg_readsql.btn_create_asset.setEnabled(self.project_type_selected == "ws")
 
     def _insert_inp_into_db(self, folder_path=None):
         """"""

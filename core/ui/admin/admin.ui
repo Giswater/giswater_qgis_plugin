@@ -533,6 +533,13 @@
                    </property>
                   </widget>
                  </item>
+                 <item row="1" column="0">
+                  <widget class="QPushButton" name="btn_create_audit">
+                   <property name="text">
+                    <string>Create DB audit schema</string>
+                   </property>
+                  </widget>
+                 </item>
                 </layout>
                </item>
               </layout>
@@ -646,8 +653,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>199</width>
-             <height>294</height>
+             <width>505</width>
+             <height>836</height>
             </rect>
            </property>
            <layout class="QGridLayout" name="gridLayout_20">
