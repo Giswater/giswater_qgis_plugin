@@ -484,7 +484,7 @@ WITH
 		),
 	dma_table as
 		(
-		select dma_id, name as dma_name, macrodma_id, stylesheet, id::varchar(16) as dma_type from dma
+		select dma_id, name as dma_name, macrodma_id, stylesheet, id::character varying::text as dma_type from dma
 		left JOIN typevalue t ON t.id::text = dma.dma_type AND t.typevalue::text = 'dma_type'::text
 		),
 	presszone_table as
