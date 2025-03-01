@@ -2404,7 +2404,7 @@ class GwInfo(QObject):
 
     def _open_audit_manager(self):
         self.audit = GwAudit()
-        self.audit.open_audit_manager(self.dlg_cf, self.feature_id)
+        self.audit.open_audit_manager(self.feature_id)
 
 
     def _show_actions(self, dialog, tab_name, enable_actions=True):

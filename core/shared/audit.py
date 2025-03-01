@@ -21,7 +21,7 @@ class GwAudit:
         pass
 
 
-    def open_audit_manager(self, previous_dialog, feature_id):
+    def open_audit_manager(self, feature_id):
         """ Open Audit Manager Dialog dynamic """
 
         user = tools_db.current_user
@@ -38,8 +38,7 @@ class GwAudit:
         tools_gw.open_dialog(self.dlg_audit_manager, 'audit_manager')
 
         # fill audit table
-        # falta filtrar la tabla por feature_id
-        self._fill_manager_table()
+        self._fill_manager_table(feature_id)
 
         self.dlg_audit_manager.tbl_audit.setSelectionBehavior(QAbstractItemView.SelectRows)
         tools_qt.set_tableview_config(self.dlg_audit_manager.tbl_audit, sectionResizeMode=0)
@@ -98,10 +97,10 @@ class GwAudit:
 
     # private region
 
-    def _fill_manager_table(self, filter_id=None):
+    def _fill_manager_table(self, feature_id=None):
         """ Fill dscenario manager table with data from v_edit_cat_dscenario """
 
-        complet_list = self._get_list(filter_id)
+        complet_list = self._get_list(feature_id)
 
         if complet_list is False:
             return False, False
@@ -123,14 +122,16 @@ class GwAudit:
 
         return complet_list
 
-    def _get_list(self, filter_id=None):
+    def _get_list(self, feature_id=None):
         """ Mount and execute the query for gw_fct_getlist """
 
         feature = f'"tableName":"audit_results"'
         filter_fields = f'"limit": -1'
-        if filter_id:
-            filter_fields += f', "result_id": {{"filterSign":"ILIKE", "value":"{filter_id}"}}'
-        body = tools_gw.create_body(feature=feature, filter_fields=filter_fields)
+        if feature_id:
+            filter_fields += f', "feature_id": {{"filterSign":"ILIKE", "value":"{feature_id}"}}'
+
+        page_info = f'"pageInfo":{{"orderBy":"tstamp", "orderType":"DESC"}}'
+        body = tools_gw.create_body(feature=feature, filter_fields=filter_fields, extras=page_info)
         json_result = tools_gw.execute_procedure('gw_fct_getlist', body)
         if json_result is None or json_result['status'] == 'Failed':
             return False
