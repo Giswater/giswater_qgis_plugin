@@ -817,15 +817,15 @@ BEGIN
 		union
 		select 'NODES', replace(replace(replace(array_agg(a.node_id)::text,',',' '),'}',''),'{','')  from (select unnest(concat('{',replace(value,' ',','),'}')::integer[]) as node_id
 		from config_param_user where parameter = 'inp_report_nodes' and cur_user=current_user)a
-		join temp_t_node n on n.node_id::integer = a.node_id
+		join temp_t_node n on n.node_id = a.node_id::text		
 		UNION
 		select 'NODES', replace(replace(replace(array_agg(a.node_id)::text,',',' '),'}',''),'{','')  from (select unnest(concat('{',replace(value,' ',','),'}')::integer[]) as node_id
 		from config_param_user where parameter = 'inp_report_nodes_2' and cur_user=current_user)a
-		join temp_t_node n on n.node_id::integer = a.node_id
+		join temp_t_node n on n.node_id = a.node_id::text
 		union
 		select 'LINKS', replace(replace(replace(array_agg(a.arc_id)::text,',',' '),'}',''),'{','')  from (select unnest(concat('{',replace(value,' ',','),'}')::integer[]) as arc_id
 		from config_param_user where parameter = 'inp_report_link' and cur_user=current_user)a
-		join temp_t_arc n on n.arc_id::integer = a.arc_id)a
+		join temp_t_arc n on n.arc_id = a.arc_id::text)a
 		where value is not null
 		ORDER BY 1;
 
