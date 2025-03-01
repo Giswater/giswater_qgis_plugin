@@ -82,7 +82,7 @@ class GwResultManagerButton(GwAction):
             self.dlg_priority_manager,
             self.dlg_priority_manager.tbl_results,
             "cat_result",
-            schema_name="asset",
+            schema_name="am",
         )
         rows = tools_db.get_rows(
             """

@@ -93,7 +93,7 @@ class GwCreateSchemaAssetTask(GwTask):
         if self.timer:
             self.timer.stop()
 
-        self.admin.manage_asset_process_result()
+        self.admin.manage_other_process_result()
         self.setProgress(100)
 
 
@@ -108,7 +108,7 @@ class GwCreateSchemaAssetTask(GwTask):
         self.admin.progress_ratio = 0.8
         self.admin.total_sql_files = self.calculate_number_of_files()
         for process in ['load_base', 'load_i18n', 'load_updates']:
-            status = self.admin.load_asset_folder(self.dict_folders_process[process])
+            status = self.admin.load_sql_folder(self.dict_folders_process[process])
             if (not tools_os.set_boolean(status, False) and tools_os.set_boolean(self.admin.dev_commit, False) is False) \
                     or self.isCanceled():
                 return False
