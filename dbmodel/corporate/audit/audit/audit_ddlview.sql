@@ -8,9 +8,9 @@ or (at your option) any later version.
 
 
 CREATE or replace VIEW audit.v_log AS
-SELECT user_name,  count (*) , action, date FROM 
+SELECT user_name,  count (*) , action, date FROM
 (SELECT user_name, substring(query,0,30)  as action, (substring(date_trunc('day',(tstamp))::text,0,12))::date AS date from audit.log
-where  schema = 'SCHEMA_NAME')a
+where  schema = 'PARENT_SCHEMA')a
 group by user_name, date, action
 ORDER BY date desc;
 

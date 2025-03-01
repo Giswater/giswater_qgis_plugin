@@ -8,27 +8,27 @@ or (at your option) any later version.
 
 --FUNCTION CODE: XXXX
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_audit_schema(p_action text)
+CREATE OR REPLACE FUNCTION PARENT_SCHEMA.gw_fct_audit_schema(p_action text)
   RETURNS integer AS
 $BODY$
 
 /*
-SELECT SCHEMA_NAME.gw_fct_audit_schema('enable')
-SELECT SCHEMA_NAME.gw_fct_audit_schema('disable')
+SELECT PARENT_SCHEMA.gw_fct_audit_schema('enable')
+SELECT PARENT_SCHEMA.gw_fct_audit_schema('disable')
 */
 
-DECLARE 
+DECLARE
       v_schemaname text;
       table_record record;
 
-BEGIN 
+BEGIN
 	-- search path
-	SET search_path = "SCHEMA_NAME", public;
-	v_schemaname = 'SCHEMA_NAME';
+	SET search_path = "PARENT_SCHEMA", public;
+	v_schemaname = 'PARENT_SCHEMA';
 
 
 	FOR table_record IN SELECT * FROM sys_table WHERE isaudit  IS TRUE
-	LOOP 
+	LOOP
 		IF table_record.id ilike 've_%' THEN
 			EXECUTE 'DROP TRIGGER IF EXISTS gw_trg_audit'||table_record.id||' ON '||table_record.id;
 			IF p_action='enable' THEN
@@ -43,7 +43,7 @@ BEGIN
 				||table_record.id||' FOR EACH ROW EXECUTE PROCEDURE '||v_schemaname||'.gw_trg_audit()';
 			END IF;
 	END IF;
-	END LOOP;		
+	END LOOP;
 
 return 0;
 END;

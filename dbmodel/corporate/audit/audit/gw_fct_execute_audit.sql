@@ -6,18 +6,18 @@ or (at your option) any later version.
 */
 
 
--- Function: SCHEMA_NAME.gw_fct_execute_foreign_audit(text, date)
+-- Function: PARENT_SCHEMA.gw_fct_execute_foreign_audit(text, date)
 
--- DROP FUNCTION SCHEMA_NAME.gw_fct_execute_foreign_audit(text, date);
+-- DROP FUNCTION PARENT_SCHEMA.gw_fct_execute_foreign_audit(text, date);
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_execute_foreign_audit(p_data json)
+CREATE OR REPLACE FUNCTION PARENT_SCHEMA.gw_fct_execute_foreign_audit(p_data json)
   RETURNS json AS
 $BODY$
 
 /*EXAMPLE
 
 
-    SELECT SCHEMA_NAME.gw_fct_execute_foreign_audit($${"client":
+    SELECT PARENT_SCHEMA.gw_fct_execute_foreign_audit($${"client":
     {"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},
     "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"sourceSchema":"ws", "auditDate":"10-09-2020"}}}$$)::text
 
@@ -51,7 +51,7 @@ v_audit_date date;
 BEGIN
 
 --  Set search path to local schema
-    SET search_path = "SCHEMA_NAME", public;
+    SET search_path = "PARENT_SCHEMA", public;
 
     -- select config values
     SELECT  wsoftware,epsg  INTO v_version, v_srid FROM version order by 1 desc limit 1;
@@ -64,14 +64,14 @@ BEGIN
     query not ilike '/*%' and date(tstamp) = v_audit_date) t ORDER BY id asc)
     LOOP
 
-    v_schemaname = 'SCHEMA_NAME';
+    v_schemaname = 'PARENT_SCHEMA';
 
     IF rec.table_name IN ('node','arc','connec','gully') THEN
         v_idname =  concat(rec.table_name,'_id');
     ELSE
         select concat(lower(type),'_id') into v_idname FROM sys_feature_class WHERE rec.table_name = concat('man_',lower(id));
     END IF;
-    rec.query = replace(rec.query,v_source_schema,'SCHEMA_NAME');
+    rec.query = replace(rec.query,v_source_schema,'PARENT_SCHEMA');
 
     raise notice 'rec.id,%',rec.id;
 
