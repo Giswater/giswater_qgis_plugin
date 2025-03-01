@@ -416,6 +416,7 @@
    <addaction name="actionDemand"/>
    <addaction name="separator"/>
    <addaction name="actionHelp"/>
+   <addaction name="actionAudit"/>
   </widget>
   <action name="actionCentered">
    <property name="text">
@@ -475,6 +476,14 @@
   <action name="actionWorkcat">
    <property name="text">
     <string>Workcat</string>
+   </property>
+   <property name="visible">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionAudit">
+   <property name="text">
+    <string>Audit</string>
    </property>
    <property name="visible">
     <bool>true</bool>

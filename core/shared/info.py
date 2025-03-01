@@ -45,6 +45,7 @@ from ..ui.ui_manager import GwInfoEpaUi
 from ... import global_vars
 from ...libs import lib_vars, tools_qgis, tools_qt, tools_log, tools_db, tools_os
 from ...libs.tools_qt import GwHyperLinkLineEdit
+from .audit import GwAudit
 
 global is_inserting
 is_inserting = False
@@ -207,7 +208,7 @@ class GwInfo(QObject):
             except Exception as e:
                 tools_log.log_info(str(e))
                 return False, None
-            
+
             match template:
                 case 'info_generic':
                     result, dialog = self._open_generic_form(self.complet_result)
@@ -268,7 +269,7 @@ class GwInfo(QObject):
                 case _:
                     tools_log.log_warning(f"template not managed: {template}")
                     return False, None
-                
+
         except Exception as e:
             tools_qgis.show_warning("Exception in info", parameter=e)
             tools_log.log_error(f"{traceback.format_exc()}")
@@ -603,7 +604,7 @@ class GwInfo(QObject):
             tools_gw.open_dialog(self.dlg_cf, dlg_name='info_feature')
             self.dlg_cf.setWindowTitle(title)
 
-        
+
 
         return self.complet_result, self.dlg_cf
 
@@ -650,7 +651,7 @@ class GwInfo(QObject):
         self.action_pump = self.dlg_cf.findChild(QAction, "actionPump")
         self.action_weir = self.dlg_cf.findChild(QAction, "actionWeir")
         self.action_demand = self.dlg_cf.findChild(QAction, "actionDemand")
-
+        self.action_audit = self.dlg_cf.findChild(QAction, "actionAudit")
 
     def _manage_icons(self):
         """ Adds icons to actions and buttons """
@@ -675,6 +676,7 @@ class GwInfo(QObject):
         tools_gw.add_icon(self.action_pump, "161")
         tools_gw.add_icon(self.action_weir, "162")
         tools_gw.add_icon(self.action_demand, "163")
+        tools_gw.add_icon(self.action_audit, "177")
 
 
     def _manage_dlg_widgets(self, complet_result, result, new_feature, reload_epa=False, tab='tab_data'):
@@ -687,7 +689,7 @@ class GwInfo(QObject):
         widget_dict = {'text': 'lineedit', 'typeahead': 'lineedit', 'textarea': 'textarea', 'combo': 'combobox',
                        'check': 'checkbox', 'datetime': 'dateedit', 'hyperlink': 'hyperlink', 'spinbox': 'spinbox',
                        'doublespinbox': 'spinbox'}
-        
+
         for layout_name, layout_info in complet_result['body']['form']['layouts'].items():
             orientation = layout_info.get('lytOrientation')
             if orientation:
@@ -738,7 +740,7 @@ class GwInfo(QObject):
                 # The data tab is somewhat special (it has 2 columns)
                 if 'lyt_data' in layout.objectName() or 'lyt_epa_data' in layout.objectName():
                     tools_gw.add_widget(self.dlg_cf, field, label, widget)
-                
+
                 # Populate dialog widgets using lytOrientation field
                 old_widget_pos = tools_gw.add_widget_combined(self.dlg_cf, field, label, widget, old_widget_pos)
 
@@ -846,6 +848,9 @@ class GwInfo(QObject):
         if not can_edit:
             self.action_edit.setChecked(False)
             self.action_edit.setEnabled(False)
+
+        # AUDIT Action
+        self.action_audit.triggered.connect(partial(self._open_audit_manager))
 
         return dlg_cf, fid
 
@@ -1819,6 +1824,7 @@ class GwInfo(QObject):
 
                 self.new_feature_id = None
                 self._enable_action(dialog, "actionCentered", True)
+                self._enable_action(dialog, "actionAudit", True)
                 self._enable_action(dialog, "actionSetToArc", True)
                 global is_inserting
                 is_inserting = False
@@ -1945,7 +1951,7 @@ class GwInfo(QObject):
 
         try:
             actions_list = dialog.findChildren(QAction)
-            static_actions = ('actionEdit', 'actionCentered', 'actionLink', 'actionHelp',
+            static_actions = ('actionEdit', 'actionCentered', 'actionLink', 'actionHelp', 'actionAudit'
                               'actionSection', 'actionOrifice', 'actionOutlet', 'actionPump', 'actionWeir', 'actionDemand')
 
             for action in actions_list:
@@ -2262,8 +2268,8 @@ class GwInfo(QObject):
                 tools_gw.enable_all(dialog, complet_result['body']['data'])
             else:
                 tools_gw.enable_widgets(dialog, complet_result['body']['data'], False)
-            self._reset_my_json_epa()                                    
-            dialog.show()        
+            self._reset_my_json_epa()
+            dialog.show()
 
 
     def _set_auto_update_combobox(self, field, dialog, widget, new_feature):
@@ -2395,6 +2401,10 @@ class GwInfo(QObject):
         self.catalog = GwCatalog()
         widget = f'tab_{tab_type}_{self.feature_type}cat_id'
         self.catalog.open_catalog(self.dlg_cf, widget, feature_type, child_type)
+
+    def _open_audit_manager(self):
+        self.audit = GwAudit()
+        self.audit.open_audit_manager(self.dlg_cf, self.feature_id)
 
 
     def _show_actions(self, dialog, tab_name, enable_actions=True):
@@ -2686,7 +2696,7 @@ class GwInfo(QObject):
         index_tab = self.tab_main.currentIndex()
         tab_name = self.tab_main.widget(index_tab).objectName()
         self._show_actions(dialog, tab_name)
-        
+
         match self.tab_main.widget(index_tab).objectName():
             # Tab 'Elements'
             case 'tab_elements' if not self.tab_element_loaded:
@@ -2769,8 +2779,8 @@ class GwInfo(QObject):
             complet_list, widget_list = self._fill_tbl(complet_result, self.dlg_cf, widgetname, linkedobject, filter_fields, id_name)
             if complet_list is False:
                 return False
-            tools_gw.set_filter_listeners(complet_result, self.dlg_cf, widget_list, columnname, widgetname, self.feature_id)            
-        return complet_list        
+            tools_gw.set_filter_listeners(complet_result, self.dlg_cf, widget_list, columnname, widgetname, self.feature_id)
+        return complet_list
 
 
     def _fill_tbl(self, complet_result, dialog, widgetname, linkedobject, filter_fields, id_name=None):
@@ -3107,8 +3117,8 @@ class GwInfo(QObject):
                 case 'set_to_arc_simple':
                     # functions called in -> getattr(self, options[option][0])(feat_id, child_type)
                     #       def _set_to_arc(self, dialog, feat_id, child_type, widget_name, simple=False)
-                    getattr(self, options[option][1])(dialog, feat_id, child_type, widget_name, simple=True)            
-                
+                    getattr(self, options[option][1])(dialog, feat_id, child_type, widget_name, simple=True)
+
         except Exception as e:
             tools_qgis.show_warning(f"Exception in info (def _get_id)", parameter=e)
         finally:
@@ -3377,7 +3387,7 @@ def open_epa_dlg(windowtitle, **kwargs):
     info.dlg = globals()[ui](info)
     tools_gw.load_settings(info.dlg)
     info.dlg.setWindowTitle(windowtitle)
-    
+
     if windowtitle == "DWF & INFLOWS":
         pages = ["page_base", "page_dscenario"]
         remove_toolbox_page(info.dlg.toolBox, pages)
@@ -3390,7 +3400,7 @@ def open_epa_dlg(windowtitle, **kwargs):
         pages = ["page_dwf", "page_inflows"]
         remove_toolbox_page(info.dlg.toolBox, pages)
         info.dlg.repaint()
-        
+
 
     # Fill widgets
     if widgets and widgets_tablename:
@@ -3484,7 +3494,7 @@ def open_epa_dlg(windowtitle, **kwargs):
         # Populate custom context menu
         tbl.setContextMenuPolicy(Qt.CustomContextMenu)
         tbl.customContextMenuRequested.connect(partial(_show_context_menu, tbl, tableview))
-            
+
 
     info.dlg.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, info.dlg, True))
     info.dlg.finished.connect(partial(tools_gw.save_settings, info.dlg))
@@ -3495,19 +3505,19 @@ def open_epa_dlg(windowtitle, **kwargs):
 def _show_context_menu(qtableview, tableview):
         """ Show custom context menu """
 
-        menu = QMenu(qtableview)        
-        if 'dscenario' in tableview['view'] and 'inflows' not in tableview['view']: 
+        menu = QMenu(qtableview)
+        if 'dscenario' in tableview['view'] and 'inflows' not in tableview['view']:
             action_delete = QAction("Delete dscenario", qtableview)
             action_delete.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_delete_dscenario"))
-            menu.addAction(action_delete)  
+            menu.addAction(action_delete)
 
             action_edit = QAction("Edit dscenario", qtableview)
             action_edit.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_edit_dscenario"))
-            menu.addAction(action_edit)    
+            menu.addAction(action_edit)
         elif 'dwf' in tableview['view']:
             action_delete = QAction("Delete dwf", qtableview)
             action_delete.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_delete_dwf"))
-            menu.addAction(action_delete)  
+            menu.addAction(action_delete)
 
             action_edit = QAction("Edit dwf", qtableview)
             action_edit.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_edit_dwf"))
@@ -3515,7 +3525,7 @@ def _show_context_menu(qtableview, tableview):
         elif 'inflows' in tableview['view']:
             action_delete = QAction("Delete inflows", qtableview)
             action_delete.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_delete_inflows"))
-            menu.addAction(action_delete)  
+            menu.addAction(action_delete)
 
             action_edit = QAction("Edit inflows", qtableview)
             action_edit.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_edit_inflows"))
@@ -3523,12 +3533,12 @@ def _show_context_menu(qtableview, tableview):
         else:
             action_delete = QAction("Delete base", qtableview)
             action_delete.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_delete_base"))
-            menu.addAction(action_delete)  
+            menu.addAction(action_delete)
 
             action_edit = QAction("Edit base", qtableview)
             action_edit.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_edit_base"))
             menu.addAction(action_edit)
-            
+
         menu.exec(QCursor.pos())
 
 
@@ -3536,7 +3546,7 @@ def remove_toolbox_page(toolbox, pages):
     for page in pages:
         toolbox.widget(tools_qt.get_page_index_by_page_name(toolbox, page)).deleteLater()
         toolbox.removeItem(tools_qt.get_page_index_by_page_name(toolbox, page))
-    
+
 
 
 
@@ -4045,7 +4055,7 @@ def open_selected_element(**kwargs):
     element_id = index.sibling(row, column_index).data()
 
     # Open selected element
-    manage_element(element_id,  **kwargs)    
+    manage_element(element_id,  **kwargs)
 
 
 def manage_element(element_id, **kwargs):
