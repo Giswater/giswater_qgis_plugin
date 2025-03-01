@@ -12,7 +12,7 @@ CREATE SCHEMA audit;
 
 CREATE TABLE audit.log (
 id serial8 PRIMARY KEY,
-schema text, 
+schema text,
 table_name text,
 id_name text,
 user_name text,
@@ -20,5 +20,6 @@ action text,
 olddata json,
 newdata json,
 query text,
-tstamp timestamp default now()
+tstamp timestamp default now(),
+feature_id text
 );
