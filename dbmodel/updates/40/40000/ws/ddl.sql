@@ -1128,3 +1128,26 @@ UPDATE man_source SET subbasin_id=0 WHERE subbasin_id IS NULL;
 ALTER TABLE man_source ALTER COLUMN subbasin_id SET NOT NULL;
 
 ALTER TABLE man_source ADD CONSTRAINT man_wtp_id_fkey FOREIGN KEY (wtp_id) REFERENCES man_wtp(node_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+-- 03/03/2025
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"rpt_cat_result", "column":"n_junction"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"rpt_cat_result", "column":"n_reservoir"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"rpt_cat_result", "column":"n_tank"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"rpt_cat_result", "column":"n_pipe"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"rpt_cat_result", "column":"n_pump"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"rpt_cat_result", "column":"n_valve"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"rpt_cat_result", "column":"head_form"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"rpt_cat_result", "column":"hydra_time"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"rpt_cat_result", "column":"hydra_acc"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"rpt_cat_result", "column":"st_ch_freq"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"rpt_cat_result", "column":"max_tr_ch"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"rpt_cat_result", "column":"dam_li_thr"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"rpt_cat_result", "column":"max_trials"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"rpt_cat_result", "column":"q_analysis"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"rpt_cat_result", "column":"spec_grav"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"rpt_cat_result", "column":"r_kin_visc"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"rpt_cat_result", "column":"r_che_diff"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"rpt_cat_result", "column":"dem_multi"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"rpt_cat_result", "column":"total_dura"}}$$);

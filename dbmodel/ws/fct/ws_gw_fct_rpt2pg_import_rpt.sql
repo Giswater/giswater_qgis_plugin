@@ -31,25 +31,6 @@ v_result_line json;
 v_version text;
 v_path text;
 v_result_id text;
-v_njunction integer;
-v_nreservoir integer;
-v_ntanks integer;
-v_npipes integer;
-v_npumps integer;
-v_nvalves integer;
-v_headloss text;
-v_htstep text;
-v_haccuracy numeric;
-v_statuscheck numeric;
-v_mcheck  numeric;
-v_dthreshold numeric;
-v_mtrials numeric;
-v_qanalysis text;
-v_sgravity numeric;
-v_rkinematic numeric;
-v_rchemical numeric;
-v_dmultiplier numeric;
-v_tduration text;
 v_qtimestep text;
 v_qtolerance text;
 v_type_2 text;
@@ -159,33 +140,11 @@ BEGIN
 	FROM temp_t_csv WHERE source='rpt_hydraulic_status' AND fid = 140 AND cur_user=current_user ORDER BY id;
 
 	-- rpt_cat_result
-	v_njunction = (SELECT csv4 FROM temp_t_csv WHERE concat(csv1,' ',csv3) ilike 'Number Junctions%' AND fid = 140 AND source='rpt_cat_result' AND cur_user=current_user);
-	v_nreservoir = (SELECT csv4 FROM temp_t_csv WHERE concat(csv1,' ',csv3) ilike 'Number Reservoirs%' AND fid = 140 AND source='rpt_cat_result' AND cur_user=current_user);
-	v_ntanks = (SELECT csv5 FROM temp_t_csv WHERE concat(csv1,' ',csv3) ilike 'Number Tanks%' AND fid = 140 AND source='rpt_cat_result' AND cur_user=current_user);
-	v_npipes = (SELECT csv5 FROM temp_t_csv WHERE concat(csv1,' ',csv3) ilike 'Number Pipes%' AND fid = 140 AND source='rpt_cat_result' AND cur_user=current_user);
-	v_npumps = (SELECT csv5 FROM temp_t_csv WHERE concat(csv1,' ',csv3) ilike 'Number Pumps%' AND fid = 140 AND source='rpt_cat_result' AND cur_user=current_user);
-	v_nvalves = (SELECT csv5 FROM temp_t_csv WHERE concat(csv1,' ',csv3) ilike 'Number Valves%' AND fid = 140 AND source='rpt_cat_result' AND cur_user=current_user);
-	v_headloss = (SELECT csv4 FROM temp_t_csv WHERE concat(csv1,' ',csv3) ilike 'Headloss%' AND fid = 140 AND source='rpt_cat_result' AND cur_user=current_user);
-	v_htstep= (SELECT concat(csv4,csv5) FROM temp_t_csv WHERE concat(csv1,' ',csv3) ilike 'Hydraulic Timestep%' AND fid = 140 AND source='rpt_cat_result' AND cur_user=current_user);
-	v_haccuracy = (SELECT csv4 FROM temp_t_csv WHERE concat(csv1,' ',csv3) ilike 'Hydraulic Accuracy%' AND fid = 140 AND source='rpt_cat_result' AND cur_user=current_user);
-	v_statuscheck = (SELECT csv5 FROM temp_t_csv WHERE concat(csv1,' ',csv3) ilike 'Status Check%' AND fid = 140 AND source='rpt_cat_result' AND cur_user=current_user);
-	v_mcheck = (SELECT csv5 FROM temp_t_csv WHERE concat(csv1,' ',csv3) ilike 'Maximum Check%' AND fid = 140 AND source='rpt_cat_result' AND cur_user=current_user);
-	v_dthreshold = (SELECT csv5 FROM temp_t_csv WHERE concat(csv1,' ',csv3) ilike 'Damping Threshold%' AND fid = 140 AND source='rpt_cat_result' AND cur_user=current_user);
-	v_mtrials = (SELECT csv4 FROM temp_t_csv WHERE concat(csv1,' ',csv3) ilike 'Maximum Trials ...................%' AND fid = 140 AND source='rpt_cat_result' AND cur_user=current_user);
-	v_qanalysis = (SELECT csv4 FROM temp_t_csv WHERE concat(csv1,' ',csv3) ilike 'Quality Analysis%' AND fid = 140 AND source='rpt_cat_result' AND cur_user=current_user);
-	v_sgravity = (SELECT csv4 FROM temp_t_csv WHERE concat(csv1,' ',csv3) ilike 'Specific Gravity%' AND fid = 140 AND source='rpt_cat_result' AND cur_user=current_user);
-	v_rkinematic = (SELECT csv5 FROM temp_t_csv WHERE concat(csv1,' ',csv3) ilike 'Relative Kinematic%' AND fid = 140 AND source='rpt_cat_result' AND cur_user=current_user);
-	v_rchemical = (SELECT csv5 FROM temp_t_csv WHERE concat(csv1,' ',csv3) ilike 'Relative Chemical%' AND fid = 140 AND source='rpt_cat_result' AND cur_user=current_user);
-	v_dmultiplier= (SELECT csv4 FROM temp_t_csv WHERE concat(csv1,' ',csv3) ilike 'Demand Multiplier%' AND fid = 140 AND source='rpt_cat_result' AND cur_user=current_user);
-	v_tduration = (SELECT csv4 FROM temp_t_csv WHERE concat(csv1,' ',csv3) ilike 'Total Duration%' AND fid = 140 AND source='rpt_cat_result' AND cur_user=current_user);
-
 	-- to do:
 	--v_qtimestep text;
 	--v_qtolerance text;
 
-	UPDATE rpt_cat_result set n_junction=v_njunction, n_reservoir=v_nreservoir, n_tank=v_ntanks, n_pipe=v_npipes, n_pump=v_npumps, n_valve=v_nvalves, head_form=v_headloss, hydra_time=v_htstep
-				, hydra_acc=v_haccuracy, st_ch_freq=v_statuscheck, max_tr_ch=v_mcheck, dam_li_thr=v_dthreshold, max_trials=v_mtrials, q_analysis=v_qanalysis, spec_grav=v_sgravity
-				, r_kin_visc=v_rkinematic, r_che_diff=v_rchemical, dem_multi=v_dmultiplier, total_dura=v_tduration, q_timestep=v_qtimestep, q_tolerance=v_qtolerance
+	UPDATE rpt_cat_result set q_timestep=v_qtimestep, q_tolerance=v_qtolerance
 				, expl_id = (SELECT array_agg(expl_id) FROM selector_expl WHERE cur_user = current_user AND expl_id > 0)
 				, sector_id = (SELECT array_agg(sector_id) FROM selector_sector WHERE cur_user = current_user AND sector_id > 0)
 				WHERE result_id = v_result_id;
