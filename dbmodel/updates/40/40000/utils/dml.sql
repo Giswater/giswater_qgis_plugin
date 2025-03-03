@@ -2103,3 +2103,5 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
   "functionName": "close_dlg",
   "module": "audit"
 }'::json, NULL, false, 0);
+
+DELETE FROM config_form_fields WHERE formname='v_edit_dimensions' AND formtype='form_feature' AND columnname='id' AND tabname='tab_none';
