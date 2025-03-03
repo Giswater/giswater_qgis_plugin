@@ -197,25 +197,7 @@ BEGIN
 			type_aux = rpt_rec.source;
 		END IF;
 
-		IF type_aux='rpt_cat_result' THEN
-			UPDATE rpt_cat_result set flow_units=SUBSTRING(rpt_rec.csv4,1,3) WHERE concat(rpt_rec.csv1,' ',rpt_rec.csv2) ilike 'Flow Units%' and result_id=v_result_id;
-			UPDATE rpt_cat_result set rain_runof=SUBSTRING(rpt_rec.csv3,1,3) WHERE rpt_rec.csv1 ilike 'Rainfall/Runoff%' and result_id=v_result_id;
-			UPDATE rpt_cat_result set snowmelt=SUBSTRING(rpt_rec.csv3,1,3) WHERE rpt_rec.csv1 ilike 'Snowmelt%' and result_id=v_result_id;
-			UPDATE rpt_cat_result set groundw=SUBSTRING(rpt_rec.csv3,1,3) WHERE rpt_rec.csv1 ilike 'Groundwater%' and result_id=v_result_id;
-			UPDATE rpt_cat_result set flow_rout=SUBSTRING(rpt_rec.csv4,1,3) WHERE concat(rpt_rec.csv1,' ',rpt_rec.csv2,' ',rpt_rec.csv3) ilike 'Flow Routing ...........%' and result_id=v_result_id;
-			UPDATE rpt_cat_result set pond_all=SUBSTRING(rpt_rec.csv4,1,3) WHERE concat(rpt_rec.csv1,' ',rpt_rec.csv2) ilike 'Ponding Allowed%' and result_id=v_result_id;
-			UPDATE rpt_cat_result set water_q=SUBSTRING(rpt_rec.csv4,1,3) WHERE concat(rpt_rec.csv1,' ',rpt_rec.csv2) ilike 'Water Quality%' and result_id=v_result_id;
-			UPDATE rpt_cat_result set infil_m=rpt_rec.csv4 WHERE concat(rpt_rec.csv1,' ',rpt_rec.csv2) ilike 'Infiltration Method%' and result_id=v_result_id;
-			UPDATE rpt_cat_result set flowrout_m=rpt_rec.csv5 WHERE concat(rpt_rec.csv1,' ',rpt_rec.csv2,' ',rpt_rec.csv3) ilike 'Flow Routing Method%' and result_id=v_result_id;
-			UPDATE rpt_cat_result set start_date=concat(rpt_rec.csv4,' ',rpt_rec.csv5) WHERE concat(rpt_rec.csv1,' ',rpt_rec.csv2) ilike 'Starting Date%' and result_id=v_result_id;
-			UPDATE rpt_cat_result set end_date=concat(rpt_rec.csv4,' ',rpt_rec.csv5) WHERE concat(rpt_rec.csv1,' ',rpt_rec.csv2) ilike 'Ending Date%' and result_id=v_result_id;
-			UPDATE rpt_cat_result set dry_days=rpt_rec.csv5::numeric WHERE concat(rpt_rec.csv1,' ',rpt_rec.csv2) ilike 'Antecedent Dry%' and result_id=v_result_id;
-			UPDATE rpt_cat_result set rep_tstep=rpt_rec.csv5 WHERE concat(rpt_rec.csv1,' ',rpt_rec.csv2) ilike 'Report Time%' and result_id=v_result_id;
-			UPDATE rpt_cat_result set wet_tstep=rpt_rec.csv5 WHERE concat(rpt_rec.csv1,' ',rpt_rec.csv2) ilike 'Wet Time%' and result_id=v_result_id;
-			UPDATE rpt_cat_result set dry_tstep=rpt_rec.csv5 WHERE concat(rpt_rec.csv1,' ',rpt_rec.csv2) ilike 'Dry Time%' and result_id=v_result_id;
-			UPDATE rpt_cat_result set rout_tstep=concat(rpt_rec.csv5,rpt_rec.csv6) WHERE concat(rpt_rec.csv1,' ',rpt_rec.csv2) ilike 'Routing Time%' and result_id=v_result_id;
-
-		ELSIF type_aux='rpt_timestep_subcatchment' THEN
+		IF type_aux='rpt_timestep_subcatchment' THEN
 
 			IF rpt_rec.csv1 ='<<<' THEN
 				v_id= rpt_rec.csv3;
