@@ -951,3 +951,6 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"rpt_cat_re
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"rpt_cat_result", "column":"var_time_step"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"rpt_cat_result", "column":"max_trials"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"rpt_cat_result", "column":"head_tolerance"}}$$);
+
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"man_outfall", "column":"discharge_medium", "dataType":"int4", "isUtils":"False"}}$$);

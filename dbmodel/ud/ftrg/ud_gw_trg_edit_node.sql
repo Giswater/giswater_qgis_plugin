@@ -649,7 +649,7 @@ BEGIN
 
 		ELSIF v_man_table='man_outfall' THEN
 
-			INSERT INTO man_outfall (node_id, name) VALUES (NEW.node_id,NEW.name);
+			INSERT INTO man_outfall (node_id, name, discharge_medium) VALUES (NEW.node_id,NEW.name, NEW.discharge_medium);
 
 		ELSIF v_man_table='man_valve' THEN
 
@@ -940,7 +940,7 @@ BEGIN
 			WHERE node_id=OLD.node_id;
 
 		ELSIF v_man_table='man_outfall' THEN
-			UPDATE man_outfall SET name=NEW.name
+			UPDATE man_outfall SET name=NEW.name, discharge_medium=NEW.discharge_medium
 			WHERE node_id=OLD.node_id;
 
 		ELSIF v_man_table='man_storage' THEN
