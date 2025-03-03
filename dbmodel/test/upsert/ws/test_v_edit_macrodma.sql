@@ -12,8 +12,8 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 SELECT plan(6);
 
-INSERT INTO v_edit_macrodma (macrodma_id, "name", descript, the_geom, undelete, expl_id)
-VALUES(-901, 'Undefined', NULL, NULL, NULL, 0);
+INSERT INTO v_edit_macrodma (macrodma_id, "name", descript, the_geom, expl_id)
+VALUES(-901, 'Undefined', NULL, NULL, 0);
 SELECT is((SELECT count(*)::integer FROM v_edit_macrodma WHERE macrodma_id = -901), 1, 'INSERT: v_edit_macrodma -901 was inserted');
 SELECT is((SELECT count(*)::integer FROM macrodma WHERE macrodma_id = -901), 1, 'INSERT: macrodma -901 was inserted');
 

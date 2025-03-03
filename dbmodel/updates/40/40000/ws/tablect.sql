@@ -63,10 +63,6 @@ CREATE RULE dma_undefined AS
     ON UPDATE TO dma
    WHERE ((new.dma_id = 0) OR (old.dma_id = 0)) DO INSTEAD NOTHING;
 
-CREATE RULE undelete_dma AS
-    ON DELETE TO dma
-   WHERE (old.undelete = true) DO INSTEAD NOTHING;
-
 
 ALTER TABLE arc ADD CONSTRAINT arc_dqa_id_fkey FOREIGN KEY (dqa_id) REFERENCES dqa(dqa_id) ON UPDATE CASCADE ON DELETE RESTRICT;
 ALTER TABLE connec ADD CONSTRAINT connec_dqa_id_fkey FOREIGN KEY (dqa_id) REFERENCES dqa(dqa_id) ON UPDATE CASCADE ON DELETE RESTRICT;
@@ -160,14 +156,6 @@ CREATE RULE supplyzone_del_undefined AS
 CREATE RULE supplyzone_undefined AS
     ON UPDATE TO supplyzone
    WHERE ((new.supplyzone_id = 0) OR (old.supplyzone_id = 0)) DO INSTEAD NOTHING;
-
-CREATE RULE undelete_supplyzone AS
-    ON DELETE TO supplyzone
-   WHERE (old.undelete = true) DO INSTEAD NOTHING;
-
-CREATE RULE undelete_presszone AS
-    ON DELETE TO presszone
-   WHERE (old.undelete = true) DO INSTEAD NOTHING;
 
 -- 06/02/2025
 ALTER TABLE arc ADD CONSTRAINT arc_node_1_fkey FOREIGN KEY (node_1) REFERENCES node(node_id) ON DELETE RESTRICT ON UPDATE CASCADE;

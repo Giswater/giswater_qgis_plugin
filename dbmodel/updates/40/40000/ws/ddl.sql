@@ -1151,3 +1151,13 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"rpt_cat_re
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"rpt_cat_result", "column":"r_che_diff"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"rpt_cat_result", "column":"dem_multi"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"rpt_cat_result", "column":"total_dura"}}$$);
+
+-- WS
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"dma", "column":"undelete"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"presszone", "column":"undelete"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"dqa", "column":"undelete"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"supplyzone", "column":"undelete"}}$$);
+DROP VIEW IF EXISTS v_edit_macrodma;
+DROP VIEW IF EXISTS v_ui_macrodma;
+DROP RULE IF EXISTS undelete_macrodma ON macrodma;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"macrodma", "column":"undelete"}}$$);

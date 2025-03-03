@@ -51,8 +51,8 @@ BEGIN
 			SELECT macrosector_id INTO v_mapzone_id FROM macrosector WHERE name = NEW.macrosector;
 		END IF;
 
-		INSERT INTO supplyzone (supplyzone_id, name, descript, macrosector_id, supplyzone_type, undelete, graphconfig, stylesheet, parent_id, pattern_id, avg_press, link, muni_id, expl_id)
-		VALUES (NEW.supplyzone_id, NEW.name, NEW.descript, v_mapzone_id, NEW.supplyzone_type, NEW.undelete,
+		INSERT INTO supplyzone (supplyzone_id, name, descript, macrosector_id, supplyzone_type, graphconfig, stylesheet, parent_id, pattern_id, avg_press, link, muni_id, expl_id)
+		VALUES (NEW.supplyzone_id, NEW.name, NEW.descript, v_mapzone_id, NEW.supplyzone_type,
 		NEW.graphconfig::json, NEW.stylesheet::json, NEW.parent_id, NEW.pattern_id, NEW.avg_press, NEW.link, NEW.muni_id, NEW.expl_id);
 
 		IF v_view_name = 'UI' THEN
@@ -75,7 +75,7 @@ BEGIN
 
 		UPDATE supplyzone
 		SET supplyzone_id=NEW.supplyzone_id, name=NEW.name, descript=NEW.descript, supplyzone_type = NEW.supplyzone_type, macrosector_id=v_mapzone_id,
-		undelete=NEW.undelete, graphconfig=NEW.graphconfig::json, stylesheet = NEW.stylesheet::json, parent_id = NEW.parent_id, pattern_id = NEW.pattern_id,
+		graphconfig=NEW.graphconfig::json, stylesheet = NEW.stylesheet::json, parent_id = NEW.parent_id, pattern_id = NEW.pattern_id,
 		lastupdate=now(), lastupdate_user = current_user, avg_press = NEW.avg_press, link = NEW.link, muni_id = NEW.muni_id, expl_id = NEW.expl_id
 		WHERE supplyzone_id=OLD.supplyzone_id;
 

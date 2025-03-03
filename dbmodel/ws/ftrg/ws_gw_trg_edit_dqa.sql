@@ -69,8 +69,8 @@ BEGIN
 			SELECT macrodqa_id INTO v_mapzone_id FROM macrodqa WHERE name = NEW.macrodqa;
 		END IF;
 
-		INSERT INTO dqa (dqa_id, name, expl_id, macrodqa_id, descript, undelete, pattern_id, dqa_type, link, graphconfig, stylesheet, muni_id, sector_id)
-		VALUES (NEW.dqa_id, NEW.name, NEW.expl_id, v_mapzone_id, NEW.descript, NEW.undelete, NEW.pattern_id, NEW.dqa_type,
+		INSERT INTO dqa (dqa_id, name, expl_id, macrodqa_id, descript, pattern_id, dqa_type, link, graphconfig, stylesheet, muni_id, sector_id)
+		VALUES (NEW.dqa_id, NEW.name, NEW.expl_id, v_mapzone_id, NEW.descript, NEW.pattern_id, NEW.dqa_type,
 		NEW.link, NEW.graphconfig::json, NEW.stylesheet::json, NEW.muni_id, NEW.sector_id);
 
 		IF v_view_name = 'UI' THEN
@@ -90,7 +90,7 @@ BEGIN
 		END IF;
 
 		UPDATE dqa
-		SET dqa_id=NEW.dqa_id, name=NEW.name, expl_id=NEW.expl_id, macrodqa_id=v_mapzone_id, descript=NEW.descript, undelete=NEW.undelete,
+		SET dqa_id=NEW.dqa_id, name=NEW.name, expl_id=NEW.expl_id, macrodqa_id=v_mapzone_id, descript=NEW.descript,
 		pattern_id=NEW.pattern_id, dqa_type=NEW.dqa_type, link=NEW.link, graphconfig=NEW.graphconfig::json,
 		stylesheet = NEW.stylesheet::json, lastupdate=now(), lastupdate_user = current_user, muni_id = NEW.muni_id, sector_id = NEW.sector_id
 		WHERE dqa_id=OLD.dqa_id;

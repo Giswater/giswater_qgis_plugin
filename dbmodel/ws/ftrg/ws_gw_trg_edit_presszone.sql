@@ -64,9 +64,9 @@ BEGIN
 			END IF;
 		END IF;
 
-		INSERT INTO presszone (presszone_id, name, expl_id, graphconfig, head, stylesheet, descript, avg_press, presszone_type, link, muni_id, sector_id, undelete)
+		INSERT INTO presszone (presszone_id, name, expl_id, graphconfig, head, stylesheet, descript, avg_press, presszone_type, link, muni_id, sector_id)
 		VALUES (NEW.presszone_id, NEW.name, NEW.expl_id, NEW.graphconfig::json, NEW.head, NEW.stylesheet::json, NEW.descript,
-		NEW.avg_press, NEW.presszone_type, NEW.link, NEW.muni_id, NEW.sector_id, NEW.undelete);
+		NEW.avg_press, NEW.presszone_type, NEW.link, NEW.muni_id, NEW.sector_id);
 
 		IF v_view_name = 'UI' THEN
 			UPDATE presszone SET active = NEW.active WHERE presszone_id = NEW.presszone_id;
@@ -81,7 +81,7 @@ BEGIN
 		UPDATE presszone
 		SET presszone_id=NEW.presszone_id, name=NEW.name, expl_id=NEW.expl_id, graphconfig=NEW.graphconfig::json,
 		head = NEW.head, stylesheet=NEW.stylesheet::json, descript=NEW.descript, lastupdate=now(), lastupdate_user = current_user,
-		avg_press = NEW.avg_press, presszone_type = NEW.presszone_type, link = NEW.link, muni_id = NEW.muni_id, sector_id = NEW.sector_id, undelete=NEW.undelete
+		avg_press = NEW.avg_press, presszone_type = NEW.presszone_type, link = NEW.link, muni_id = NEW.muni_id, sector_id = NEW.sector_id
 		WHERE presszone_id=OLD.presszone_id;
 
 		IF v_view_name = 'UI' THEN
