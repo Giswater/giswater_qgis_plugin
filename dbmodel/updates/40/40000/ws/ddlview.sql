@@ -756,7 +756,11 @@ AS WITH
         m.broken as broken_valve,
         node.pavcat_id,
         node.lock_level,
-        node.is_scadamap
+        node.is_scadamap,
+        (SELECT ST_X(node.the_geom)) AS xcoord,
+        (SELECT ST_Y(node.the_geom)) AS ycoord,
+        (SELECT ST_Y(ST_Transform(node.the_geom, 4326))) AS lat,
+        (SELECT ST_X(ST_Transform(node.the_geom, 4326))) AS long
         FROM node_selector
         JOIN node ON node.node_id = node_selector.node_id
         JOIN selector_expl se ON (se.cur_user =current_user AND se.expl_id = node.expl_id) or (se.cur_user = current_user AND se.expl_id = node.expl_id2)
@@ -1432,7 +1436,11 @@ AS WITH
         connec.the_geom,
         connec.n_inhabitants,
         connec.lock_level,
-        connec.block_zone
+        connec.block_zone,
+        (SELECT ST_X(connec.the_geom)) AS xcoord,
+        (SELECT ST_Y(connec.the_geom)) AS ycoord,
+        (SELECT ST_Y(ST_Transform(connec.the_geom, 4326))) AS lat,
+        (SELECT ST_X(ST_Transform(connec.the_geom, 4326))) AS long
         FROM inp_network_mode, connec_selector
         JOIN connec ON connec.connec_id = connec_selector.connec_id
         JOIN selector_expl se ON (se.cur_user =current_user AND se.expl_id = connec.expl_id) or (se.cur_user =current_user and se.expl_id = connec.expl_id2)

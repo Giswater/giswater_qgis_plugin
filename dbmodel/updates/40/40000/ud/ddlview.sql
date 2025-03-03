@@ -1329,7 +1329,11 @@ AS WITH
 			node.serial_number,
             node.pavcat_id,
             node.lock_level,
-            node.is_scadamap
+            node.is_scadamap,
+            (SELECT ST_X(node.the_geom)) AS xcoord,
+            (SELECT ST_Y(node.the_geom)) AS ycoord,
+            (SELECT ST_Y(ST_Transform(node.the_geom, 4326))) AS lat,
+            (SELECT ST_X(ST_Transform(node.the_geom, 4326))) AS long
 			FROM node_selector
 			JOIN node USING (node_id)
 			JOIN selector_expl se ON (se.cur_user = current_user AND se.expl_id = node.expl_id) OR (se.cur_user = current_user AND se.expl_id = node.expl_id2)
@@ -1453,7 +1457,11 @@ AS WITH
 			serial_number,
             pavcat_id,
             lock_level,
-            is_scadamap
+            is_scadamap,
+            xcoord,
+            ycoord,
+            lat,
+            long
 			FROM node_selected
 		)
 	SELECT node_base.*
@@ -1754,7 +1762,11 @@ AS WITH
 			connec.plot_code,
 			connec.placement_type,
 			connec.access_type,
-			connec.lock_level
+			connec.lock_level,
+            (SELECT ST_X(connec.the_geom)) AS xcoord,
+            (SELECT ST_Y(connec.the_geom)) AS ycoord,
+            (SELECT ST_Y(ST_Transform(connec.the_geom, 4326))) AS lat,
+            (SELECT ST_X(ST_Transform(connec.the_geom, 4326))) AS long
 			FROM connec_selector
 			JOIN connec USING (connec_id)
 			JOIN selector_expl se ON (se.cur_user = current_user AND se.expl_id = connec.expl_id) OR (se.cur_user = current_user AND se.expl_id = connec.expl_id2)
