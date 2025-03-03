@@ -192,7 +192,7 @@ class AddNewLot():
 
         tools_gw.add_icon(self.dlg_lot.btn_open_image, "136b")
         print("hola1")
-        self.dlg_lot.btn_open_image.clicked.connect(partial(self.open_load_image, self.tbl_load, 'v_ui_om_vehicle_x_parameters'))
+        self.dlg_lot.btn_open_image.clicked.connect(partial(self.open_load_image, self.tbl_load, 'cm.v_ui_om_vehicle_x_parameters'))
 
         if lot_id is not None and visitclass_id not in (None, '', 'NULL'):
             self.set_values(lot_id)
@@ -361,7 +361,7 @@ class AddNewLot():
             tools_qgis.show_message(msg, 0)
             return
 
-        sql = ("SELECT DISTINCT(idval) FROM cat_team")
+        sql = ("SELECT DISTINCT(idval) FROM cm.cat_team")
         rows = tools_db.get_rows(sql)
         if rows:
             for row in rows:
@@ -374,7 +374,7 @@ class AddNewLot():
                f"VALUES('{team_name}', '{team_descript}', '{team_active}');")
         tools_db.execute_sql(sql)
 
-        sql = ("SELECT id, idval FROM cat_team WHERE active is True ORDER BY idval")
+        sql = ("SELECT id, idval FROM cm.cat_team WHERE active is True ORDER BY idval")
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_resources_man.cmb_team, rows)
 
@@ -457,7 +457,7 @@ class AddNewLot():
         """ Fill ComboBox cmb_assigned_to """
 
         visit_class = tools_qt.get_combo_value(self.dlg_lot, self.dlg_lot.cmb_visit_class, 0)
-        sql = ("SELECT DISTINCT(cat_team.id), idval FROM cat_team "
+        sql = ("SELECT DISTINCT(cat_team.id), idval FROM cm.cat_team "
                 "JOIN om_team_x_visitclass ON cat_team.id = om_team_x_visitclass.team_id "
                 "WHERE om_team_x_visitclass.visitclass_id = " + str(visit_class) + "")
         rows = tools_db.get_rows(sql, commit=True)
@@ -472,7 +472,7 @@ class AddNewLot():
         """ Fill ComboBox cmb_assigned_to """
 
         sql = ("SELECT DISTINCT(cat_team.id), idval "
-               "FROM cat_team WHERE active is True ORDER BY idval")
+               "FROM cm.cat_team WHERE active is True ORDER BY idval")
         rows = tools_db.get_rows(sql, commit=True)
 
         if rows:
@@ -492,7 +492,7 @@ class AddNewLot():
             if visit_class not in (None, '') and self.assiged_to not in (None, ''):
                 sql = (
                     "SELECT DISTINCT(config_visit_class.id) FROM config_visit_class "
-                    "JOIN om_team_x_visitclass ON config_visit_class.id = om_team_x_visitclass.visitclass_id "
+                    "JOIN cm.om_team_x_visitclass ON config_visit_class.id = om_team_x_visitclass.visitclass_id "
                     "WHERE config_visit_class.active is True AND team_id = " + str(self.assiged_to) + " "
                     "AND config_visit_class.id = " + str(visit_class) + "")
                 result = tools_db.get_row(sql, commit=True)
@@ -510,7 +510,7 @@ class AddNewLot():
             sql = ("SELECT DISTINCT(config_visit_class.id), idval, feature_type, config_visit_class.tablename, param_options::text, "
                    "config_visit_class.feature_type FROM config_visit_class")
         if self.assiged_to:
-            sql += (" JOIN om_team_x_visitclass ON config_visit_class.id = om_team_x_visitclass.visitclass_id "
+            sql += (" JOIN cm.om_team_x_visitclass ON config_visit_class.id = om_team_x_visitclass.visitclass_id "
                     "WHERE config_visit_class.active is True AND team_id = " + str(self.assiged_to) + " ")
         if self.ot_result:
             sql += (" AND ismultifeature is False AND feature_type IS NOT null")
@@ -538,7 +538,7 @@ class AddNewLot():
         model = qtable.model()
         if model.submitAll():
             if manage_type == 'team_selector':
-                sql = ("SELECT id, idval FROM cat_team WHERE active is True ORDER BY idval")
+                sql = ("SELECT id, idval FROM cm.cat_team WHERE active is True ORDER BY idval")
                 rows = tools_db.get_rows(sql)
                 if rows:
                     tools_qt.fill_combo_values(self.dlg_resources_man.cmb_team, rows, 1)
@@ -556,10 +556,10 @@ class AddNewLot():
         # Fill ComboBox cmb_ot
         sql = ("SELECT ext_workorder.ct, ext_workorder.class_id,  ext_workorder.wotype_id, ext_workorder.wotype_name, "
                " ext_workorder.address, ext_workorder.serie, ext_workorder.visitclass_id, ext_workorder.observations "
-               " FROM ext_workorder ")
+               " FROM cm.ext_workorder ")
 
         if lot_id:
-            _sql = ("SELECT serie FROM om_visit_lot "
+            _sql = ("SELECT serie from cm.om_visit_lot "
                     " WHERE id = '"+str(lot_id)+"'")
             ct = tools_db.get_rows(_sql)
             sql += " WHERE ext_workorder.serie = '"+str(ct[0])+"'"
@@ -786,7 +786,7 @@ class AddNewLot():
 
 
     def get_next_id(self, table_name, pk):
-        sql = f"SELECT MAX({pk}::integer) FROM {table_name};"
+        sql = f"SELECT MAX({pk}::integer) FROM cm.{table_name};"
         row = tools_db.get_rows(sql)
 
         if row and isinstance(row, list) and len(row) > 0 and isinstance(row[0], tuple):
@@ -853,7 +853,7 @@ class AddNewLot():
 
     def set_values(self, lot_id):
 
-        sql = ("SELECT om_visit_lot.*, ext_workorder.ct FROM om_visit_lot LEFT JOIN ext_workorder using (serie) "
+        sql = ("SELECT om_visit_lot.*, ext_workorder.ct from cm.om_visit_lot LEFT JOIN ext_workorder using (serie) "
                "WHERE id ='" + str(lot_id) + "'")
         lot = tools_db.get_rows(sql, commit=True)
         if lot:
@@ -1380,7 +1380,7 @@ class AddNewLot():
             return
 
         # Save relations
-        sql = f"SELECT {feature_type}_id FROM om_visit_lot_x_{feature_type} WHERE lot_id = {lot_id}"
+        sql = f"SELECT {feature_type}_id from cm.om_visit_lot_x_{feature_type} WHERE lot_id = {lot_id}"
         rows = tools_db.get_rows(sql)
 
         if rows is not None:
@@ -1396,10 +1396,10 @@ class AddNewLot():
                     tools_db.execute_sql(sql)
             for id in ids:
                 if id not in id_list:
-                    sql = f"DELETE FROM om_visit_lot_x_{feature_type} WHERE lot_id = {lot_id} AND {feature_type}_id = '{id}'"
+                    sql = f"DELETE from cm.om_visit_lot_x_{feature_type} WHERE lot_id = {lot_id} AND {feature_type}_id = '{id}'"
                     tools_db.execute_sql(sql)
         else:
-            sql = f"DELETE FROM om_visit_lot_x_{feature_type} WHERE lot_id = {lot_id}"
+            sql = f"DELETE from cm.om_visit_lot_x_{feature_type} WHERE lot_id = {lot_id}"
             tools_db.execute_sql(sql)
 
 
@@ -1601,7 +1601,7 @@ class AddNewLot():
 
         # set timeStart and timeEnd as the min/max dave values get from model
         current_date = QDate.currentDate()
-        sql = 'SELECT MIN(startdate), MAX(startdate) FROM om_visit_lot'
+        sql = 'SELECT MIN(startdate), MAX(startdate) FROM cm.om_visit_lot'
         row = tools_db.get_rows(sql, commit=self.autocommit)
 
         # Ensure row contains valid data
@@ -1698,13 +1698,13 @@ class AddNewLot():
 
         tools_gw.add_icon(self.dlg_load_manager.btn_open_image, "136b")
         print("hola2")
-        self.dlg_load_manager.btn_open_image.clicked.connect(partial(self.open_load_image, self.tbl_load, 'v_ui_om_vehicle_x_parameters'))
+        self.dlg_load_manager.btn_open_image.clicked.connect(partial(self.open_load_image, self.tbl_load, 'cm.v_ui_om_vehicle_x_parameters'))
 
         # @setEditStrategy: 0: OnFieldChange, 1: OnRowChange, 2: OnManualSubmit
         print("hola3")
-        tools_qt.fill_table(self.dlg_load_manager.tbl_loads, 'v_ui_om_vehicle_x_parameters', QSqlTableModel.OnManualSubmit)
+        tools_qt.fill_table(self.dlg_load_manager.tbl_loads, 'cm.v_ui_om_vehicle_x_parameters', QSqlTableModel.OnManualSubmit)
         print("hola4")
-        tools_gw.set_tablemodel_config(self.dlg_load_manager, self.dlg_load_manager.tbl_loads, 'v_ui_om_vehicle_x_parameters')
+        tools_gw.set_tablemodel_config(self.dlg_load_manager, self.dlg_load_manager.tbl_loads, 'cm.v_ui_om_vehicle_x_parameters')
         self.dlg_load_manager.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_load_manager))
         self.dlg_load_manager.rejected.connect(partial(tools_gw.save_settings, self.dlg_load_manager))
         self.dlg_load_manager.cmb_filter_vehicle.currentIndexChanged.connect(partial(self.filter_loads))
@@ -1734,7 +1734,7 @@ class AddNewLot():
 
         # set timeStart and timeEnd as the min/max dave values get from model
         current_date = QDate.currentDate()
-        sql = "SELECT MIN(starttime), MAX(endtime) FROM om_visit_lot_x_user"
+        sql = "SELECT MIN(starttime), MAX(endtime) from cm.om_visit_lot_x_user"
         row = tools_db.get_rows(sql)
         if row:
             if row[0]:
@@ -2059,7 +2059,7 @@ class AddNewLot():
     def populate_combo_filters(self, combo, table_name, fields="id, idval"):
 
         sql = ("SELECT "+str(fields)+" "
-               "FROM "+str(table_name)+" "
+               "FROM cm."+str(table_name)+" "
                "ORDER BY idval")
         rows = tools_db.get_rows(sql, commit=True)
         if rows:
@@ -2104,7 +2104,7 @@ class AddNewLot():
             for x in range(0, len(selected_list)):
                 row = selected_list[x].row()
                 _id = qtable.model().record(row).value('id')
-                sql = ("DELETE FROM om_visit_lot "
+                sql = ("DELETE from cm.om_visit_lot "
                        " WHERE id ='" + str(_id) + "'")
                 tools_db.execute_sql(sql)
             self.filter_lot()
@@ -2201,7 +2201,7 @@ class AddNewLot():
     def fill_tab_load(self):
         """ Fill tab 'Load' """
         print("hola5")
-        table_load = "v_ui_om_vehicle_x_parameters"
+        table_load = "cm.v_ui_om_vehicle_x_parameters"
         filter = "lot_id = '" + str(tools_qt.get_text(self.dlg_lot, self.dlg_lot.lot_id)) + "'"
 
         self.fill_tbl_load_man(self.dlg_lot, self.tbl_load, table_load, filter)
@@ -2252,7 +2252,7 @@ class AddNewLot():
         self.date_load_from = self.dlg_lot.findChild(QDateEdit, "date_load_from")
 
         # Set model of selected widget
-        self.set_model_to_table(widget, self.schemaname + "." + table_name, expr_filter)
+        self.set_model_to_table(widget, table_name, expr_filter)
 
     def open_load_image(self, qtable, pg_table):
 
@@ -2302,12 +2302,12 @@ class AddNewLot():
         tools_gw.load_settings(self.dlg_resources_man)
 
         # Populate combos
-        sql = ("SELECT id, idval FROM cat_team WHERE active is True ORDER BY idval")
+        sql = ("SELECT id, idval FROM cm.cat_team WHERE active is True ORDER BY idval")
         rows = tools_db.get_rows(sql)
         if rows:
             tools_qt.fill_combo_values(self.dlg_resources_man.cmb_team, rows, 1)
 
-        sql = ("SELECT id, idval FROM ext_cat_vehicle ORDER BY idval")
+        sql = ("SELECT id, idval FROM cm.ext_cat_vehicle ORDER BY idval")
         rows = tools_db.get_rows(sql)
         if rows:
             tools_qt.fill_combo_values(self.dlg_resources_man.cmb_vehicle, rows, 1)
@@ -2341,13 +2341,13 @@ class AddNewLot():
         team_name = tools_qt.get_text(self.dlg_resources_man, self.dlg_resources_man.cmb_team)
 
         # Populate tables
-        query = ("SELECT user_id AS " + '"' + "Usuari" + '"' + ", user_name AS " + '"' + "Nom" + '"' + " FROM " + self.schemaname + ".v_om_team_x_user WHERE team = '" + str(team_name) + "'")
+        query = ("SELECT user_id AS " + '"' + "Usuari" + '"' + ", user_name AS " + '"' + "Nom" + '"' + " FROM cm.v_om_team_x_user WHERE team = '" + str(team_name) + "'")
         tools_db.fill_table_by_query(self.dlg_resources_man.tbl_view_team_user, query)
 
-        query = ("SELECT vehicle  AS " + '"' + "Vehicle" + '"' + " FROM " + self.schemaname + ".v_om_team_x_vehicle WHERE team = '" + str(team_name) + "'")
+        query = ("SELECT vehicle  AS " + '"' + "Vehicle" + '"' + " FROM cm.v_om_team_x_vehicle WHERE team = '" + str(team_name) + "'")
         tools_db.fill_table_by_query(self.dlg_resources_man.tbl_view_team_vehicle, query)
 
-        query = ("SELECT visitclass  AS " + '"' + "Classe visita" + '"' + " FROM " + self.schemaname + ".v_om_team_x_visitclass WHERE team = '" + str(team_name) + "'")
+        query = ("SELECT visitclass  AS " + '"' + "Classe visita" + '"' + " FROM cm.v_om_team_x_visitclass WHERE team = '" + str(team_name) + "'")
         tools_db.fill_table_by_query(self.dlg_resources_man.tbl_view_team_visitclass, query)
 
 
@@ -2357,7 +2357,7 @@ class AddNewLot():
         vehicle_name = tools_qt.get_text(self.dlg_resources_man, self.dlg_resources_man.cmb_vehicle)
 
         # Populate tables
-        query = ("SELECT * FROM " + self.schemaname + ".v_ext_cat_vehicle WHERE idval = '" + str(vehicle_name) + "'")
+        query = ("SELECT * FROM cm.v_ext_cat_vehicle WHERE idval = '" + str(vehicle_name) + "'")
         tools_db.fill_table_by_query(self.dlg_resources_man.tbl_view_vehicle, query)
         self.hide_colums(self.dlg_resources_man.tbl_view_vehicle, [0])
 
@@ -2365,7 +2365,7 @@ class AddNewLot():
     def open_team_selector(self):
 
         # Create the dialog
-        self.dlg_team_man = TeamManagemenUi()
+        self.dlg_team_man = TeamManagemenUi(self)
         tools_gw.load_settings(self.dlg_team_man)
 
         # Set signals
@@ -2525,12 +2525,12 @@ class AddNewLot():
                 msg = "This team have some relations on om_vehicle_x_parameters table. Abort delete transaction."
                 tools_qt.show_info_box(msg, "Info")
                 return
-            sql = ("DELETE FROM cat_team WHERE idval = '" + str(filter_team) + "'")
+            sql = ("DELETE FROM cm.cat_team WHERE idval = '" + str(filter_team) + "'")
             status = tools_db.execute_sql(sql)
             if status:
                 msg = "Successful removal."
                 tools_qt.show_info_box(msg, "Info")
-                sql = ("SELECT id, idval FROM cat_team WHERE active is True ORDER BY idval")
+                sql = ("SELECT id, idval FROM cm.cat_team WHERE active is True ORDER BY idval")
                 rows = tools_db.get_rows(sql, commit=True)
                 if rows:
                     tools_qt.fill_combo_values(self.dlg_resources_man.cmb_team, rows, 1)
@@ -2652,9 +2652,6 @@ class AddNewLot():
     def set_model_to_table(self, widget, table_name, expr_filter):
         """ Set a model with selected filter.
         Attach that model to selected table """
-
-        if self.schemaname not in table_name:
-            table_name = self.schemaname + "." + table_name
 
         # Set model
         model = QSqlTableModel()

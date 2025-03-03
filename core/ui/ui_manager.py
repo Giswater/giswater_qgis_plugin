@@ -589,6 +589,12 @@ class GwWorkcatManagerUi(GwDialog, FORM_CLASS):
     CONTEXT = CONTEXT
     UINAME = UINAME
 
+# endregion
+
+
+# region CM
+CONTEXT = "cm"
+
 UINAME = "add_lot"
 FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
 class AddLotUi(GwDialog, FORM_CLASS):
