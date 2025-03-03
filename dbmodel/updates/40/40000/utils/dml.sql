@@ -1953,3 +1953,153 @@ UPDATE config_form_fields SET "label"='Customer code:', tooltip='Customer code' 
 UPDATE config_form_fields SET layoutorder=2, web_layoutorder=2 WHERE formname='generic' AND formtype='epa_selector' AND columnname='btn_accept' AND tabname='tab_none';
 UPDATE config_form_fields SET layoutorder=3, web_layoutorder=3 WHERE formname='generic' AND formtype='epa_selector' AND columnname='btn_cancel' AND tabname='tab_none';
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'epa_selector', 'tab_none', 'hspacer_epa_selector', 'lyt_buttons', 1, NULL, 'hspacer', NULL, NULL, NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 1);
+
+-- 03/03/2025
+UPDATE config_form_tabs SET "label"='Data', tooltip='Data', sys_role='role_basic', tabfunction=NULL, tabactions='[
+  {
+    "actionName": "actionEdit",
+    "disabled": false
+  },
+  {
+    "actionName": "actionAudit",
+    "disabled": false
+  },
+  {
+    "actionName": "actionZoom",
+    "disabled": false
+  },
+  {
+    "actionName": "actionCentered",
+    "disabled": false
+  },
+  {
+    "actionName": "actionZoomOut",
+    "disabled": false
+  },
+  {
+    "actionName": "actionCatalog",
+    "disabled": false
+  },
+  {
+    "actionName": "actionWorkcat",
+    "disabled": false
+  },
+  {
+    "actionName": "actionCopyPaste",
+    "disabled": false
+  },
+  {
+    "actionName": "actionLink",
+    "disabled": false
+  },
+  {
+    "actionName": "actionMapZone",
+    "disabled": false
+  },
+  {
+    "actionName": "actionSetToArc",
+    "disabled": false
+  },
+  {
+    "actionName": "actionGetParentId",
+    "disabled": false
+  },
+  {
+    "actionName": "actionGetArcId",
+    "disabled": false
+  },
+  {
+    "actionName": "actionRotation",
+    "disabled": false
+  },
+  {
+    "actionName": "actionInterpolate",
+    "disabled": false
+  }
+]'::json, orderby=0, device='{4,5}' WHERE formname='v_edit_node' AND tabname='tab_data';
+
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('linkedaction_typevalue', 'action_audit', 'action_audit', 'actionAudit', NULL);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('formtype_typevalue', 'audit_manager', 'audit_manager', 'auditManager', NULL);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('layout_name_typevalue', 'lyt_audit_manager_1', 'lyt_audit_manager_1', 'layoutAuditManager1', '{
+  "lytOrientation": "horizontal"
+}'::json);
+
+INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('audit_results', 'SELECT id, "schema", table_name, id_name, user_name, "action", query, tstamp FROM audit.log WHERE id IS NOT NULL', 4, 'tab', 'list', '{"orderBy":"1", "orderType": "DESC"}'::json, '{
+  "enableGlobalFilter": false,
+  "enableStickyHeader": true,
+  "positionToolbarAlertBanner": "bottom",
+  "enableGrouping": false,
+  "enablePinning": true,
+  "enableColumnOrdering": true,
+  "enableColumnFilterModes": true,
+  "enableFullScreenToggle": false,
+  "enablePagination": true,
+  "enableExporting": true,
+  "muiTablePaginationProps": {
+    "rowsPerPageOptions": [
+      5,
+      10,
+      15,
+      20,
+      50,
+      100
+    ],
+    "showFirstButton": true,
+    "showLastButton": true
+  },
+  "enableRowSelection": true,
+  "multipleRowSelection": true,
+  "initialState": {
+    "showColumnFilters": false,
+    "pagination": {
+      "pageSize": 5,
+      "pageIndex": 0
+    },
+    "density": "compact",
+    "columnFilters": [
+      {
+        "id": "id",
+        "value": "",
+        "filterVariant": "text"
+      }
+    ],
+    "sorting": [
+      {
+        "id": "name",
+        "desc": false
+      }
+    ]
+  },
+  "modifyTopToolBar": true,
+  "renderTopToolbarCustomActions": [
+    {
+      "name": "btn_show_psector",
+      "widgetfunction": {
+        "functionName": "showPsector",
+        "params": {}
+      },
+      "color": "default",
+      "text": "Show psector",
+      "disableOnSelect": true,
+      "moreThanOneDisable": false
+    }
+  ],
+  "enableRowActions": false,
+  "renderRowActionMenuItems": [
+    {
+      "widgetfunction": {
+        "functionName": "open",
+        "params": {}
+      },
+      "icon": "OpenInBrowser",
+      "text": "Open"
+    }
+  ]
+}'::json);
+
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'audit_manager', 'tab_none', 'btn_close', 'lyt_buttons', 1, NULL, 'button', NULL, 'Close', NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{
+  "text": "Close"
+}'::json, '{
+  "functionName": "close_dlg",
+  "module": "audit"
+}'::json, NULL, false, 0);
