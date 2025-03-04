@@ -13,8 +13,8 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 SELECT plan(6);
 
 INSERT INTO v_edit_sector
-(sector_id, "name", descript, macrosector_id, sector_type, the_geom, undelete, parent_id, graphconfig, stylesheet)
-VALUES(-901, 'sector_01', 'sector_project_ud', 1, NULL, NULL, NULL, NULL, '{"use":[{"nodeParent":"", "toArc":[]}], "ignore":[], "forceClosed":[]}', NULL);
+(sector_id, "name", descript, macrosector_id, sector_type, the_geom, parent_id, graphconfig, stylesheet)
+VALUES(-901, 'sector_01', 'sector_project_ud', 1, NULL, NULL, NULL, '{"use":[{"nodeParent":"", "toArc":[]}], "ignore":[], "forceClosed":[]}', NULL);
 SELECT is((SELECT count(*)::integer FROM v_edit_sector WHERE sector_id = -901), 1, 'INSERT: v_edit_sector -901 was inserted');
 SELECT is((SELECT count(*)::integer FROM sector WHERE sector_id = -901), 1, 'INSERT: sector -901 was inserted');
 

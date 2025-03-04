@@ -5193,8 +5193,7 @@ CREATE OR REPLACE VIEW v_ui_macrosector
   SELECT m.macrosector_id,
     m.name,
     m.descript,
-    m.active,
-    m.undelete
+    m.active
     FROM macrosector m
     WHERE m.macrosector_id > 0
   ORDER BY m.macrosector_id;
@@ -5234,7 +5233,6 @@ AS SELECT s.sector_id,
     ms.name AS macrosector,
     s.descript,
     s.active,
-    s.undelete,
     s.graphconfig,
     s.stylesheet,
     s.parent_id,
@@ -5260,7 +5258,6 @@ AS SELECT s.sector_id,
     s.sector_type,
     s.macrosector_id,
     s.descript,
-    s.undelete,
     s.graphconfig,
     s.stylesheet,
     s.parent_id,
@@ -5370,8 +5367,7 @@ CREATE OR REPLACE VIEW v_edit_macrosector
 AS SELECT DISTINCT ON (macrosector_id) macrosector_id,
     m.name,
     m.descript,
-    m.the_geom,
-    m.undelete
+    m.the_geom
    FROM selector_sector ss, macrosector m LEFT JOIN sector s USING (macrosector_id)
    WHERE (ss.sector_id = s.sector_id AND cur_user = current_user OR s.macrosector_id IS NULL)
    AND m.active IS true;

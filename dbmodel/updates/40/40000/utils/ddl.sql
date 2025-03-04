@@ -262,3 +262,8 @@ ALTER TABLE cat_workspace ALTER COLUMN lastupdate_timestamp SET DEFAULT now();
 --20/02/2025
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"config_user_x_expl", "column":"active"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"config_user_x_expl", "column":"manager_id"}}$$);
+
+-- 04/03/2025
+DROP VIEW IF EXISTS v_edit_macrosector;
+DROP RULE IF EXISTS undelete_macrosector ON macrosector;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"macrosector", "column":"undelete"}}$$);

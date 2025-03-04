@@ -1161,3 +1161,9 @@ DROP VIEW IF EXISTS v_edit_macrodma;
 DROP VIEW IF EXISTS v_ui_macrodma;
 DROP RULE IF EXISTS undelete_macrodma ON macrodma;
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"macrodma", "column":"undelete"}}$$);
+
+
+DROP VIEW IF EXISTS v_edit_sector;
+DROP VIEW IF EXISTS v_ui_sector;
+DROP VIEW IF EXISTS vu_sector;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"sector", "column":"undelete"}}$$);

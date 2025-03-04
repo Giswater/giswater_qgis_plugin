@@ -38,7 +38,7 @@ BEGIN
 			END IF;
 		END IF;
 
-		INSERT INTO macrosector (macrosector_id, name, descript, undelete) VALUES (NEW.macrosector_id, NEW.name, NEW.descript, NEW.undelete);
+		INSERT INTO macrosector (macrosector_id, name, descript) VALUES (NEW.macrosector_id, NEW.name, NEW.descript);
 
 		IF v_view_name = 'UI' THEN
 			UPDATE macrosector SET active = NEW.active WHERE macrosector_id = NEW.macrosector_id;
@@ -50,7 +50,7 @@ BEGIN
 
 	ELSIF TG_OP = 'UPDATE' THEN
 		UPDATE macrosector
-		SET macrosector_id=NEW.macrosector_id, name=NEW.name, descript=NEW.descript, undelete=NEW.undelete
+		SET macrosector_id=NEW.macrosector_id, name=NEW.name, descript=NEW.descript
 		WHERE macrosector_id=NEW.macrosector_id;
 
 

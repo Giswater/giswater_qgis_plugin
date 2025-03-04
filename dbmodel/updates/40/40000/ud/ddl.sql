@@ -959,3 +959,9 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"man_outfal
 -- 04/03/2025
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"drainzone", "column":"undelete"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"dwfzone", "column":"undelete"}}$$);
+
+DROP VIEW IF EXISTS v_edit_sector;
+DROP VIEW IF EXISTS v_ui_sector;
+DROP VIEW IF EXISTS vu_sector;
+DROP RULE IF EXISTS undelete_sector ON sector;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"sector", "column":"undelete"}}$$);

@@ -32,8 +32,8 @@ BEGIN
 			SELECT macrosector_id INTO v_mapzone_id FROM macrosector WHERE name = NEW.macrosector;
 		END IF;
 
-		INSERT INTO sector (sector_id, name, descript, macrosector_id, undelete, parent_id, stylesheet, sector_type, graphconfig, link)
-		VALUES (NEW.sector_id, NEW.name, NEW.descript, v_mapzone_id, NEW.undelete, NEW.parent_id,
+		INSERT INTO sector (sector_id, name, descript, macrosector_id, parent_id, stylesheet, sector_type, graphconfig, link)
+		VALUES (NEW.sector_id, NEW.name, NEW.descript, v_mapzone_id, NEW.parent_id,
 		NEW.stylesheet, NEW.sector_type, NEW.graphconfig::json, NEW.link);
 
 		IF view_name = 'UI' THEN
@@ -56,7 +56,7 @@ BEGIN
 
 		UPDATE sector
 		SET sector_id=NEW.sector_id, name=NEW.name, descript=NEW.descript, macrosector_id=v_mapzone_id,
-		undelete=NEW.undelete, lastupdate=now(), lastupdate_user = current_user, stylesheet=NEW.stylesheet, sector_type=NEW.sector_type,
+		lastupdate=now(), lastupdate_user = current_user, stylesheet=NEW.stylesheet, sector_type=NEW.sector_type,
 		graphconfig=NEW.graphconfig::json, link=NEW.link
 		WHERE sector_id=OLD.sector_id;
 

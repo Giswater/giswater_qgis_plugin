@@ -116,9 +116,6 @@ CREATE RULE sector_undefined AS
     ON UPDATE TO sector
    WHERE ((new.sector_id = 0) OR (old.sector_id = 0)) DO INSTEAD NOTHING;
 
-CREATE RULE undelete_sector AS
-    ON DELETE TO sector
-   WHERE (old.undelete = true) DO INSTEAD NOTHING;
 
 
 CREATE RULE insert_plan_psector_x_arc AS
