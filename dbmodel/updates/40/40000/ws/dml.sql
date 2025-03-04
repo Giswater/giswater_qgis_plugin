@@ -1679,7 +1679,7 @@ set error_message = left(error_message, length(error_message)-1)
 where error_message ilike '%.';
 
 -- 18/12/2024
-INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('dscenario_results', 'SELECT dscenario_id as id, name, descript, dscenario_type, parent_id, expl_id, active::TEXT, log FROM v_edit_cat_dscenario', 5, 'tab', 'list', '{"orderBy":"1", "orderType": "DESC"}'::json, '{
+INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('dscenario_results', 'SELECT dscenario_id as id, name, descript, dscenario_type, parent_id, expl_id, active::TEXT, log FROM v_edit_cat_dscenario WHERE dscenario_id IS NOT NULL', 5, 'tab', 'list', '{"orderBy":"1", "orderType": "DESC"}'::json, '{
   "enableGlobalFilter": false,
   "enableStickyHeader": true,
   "positionToolbarAlertBanner": "bottom",
