@@ -954,3 +954,8 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"rpt_cat_re
 
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"man_outfall", "column":"discharge_medium", "dataType":"int4", "isUtils":"False"}}$$);
+
+
+-- 04/03/2025
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"drainzone", "column":"undelete"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"dwfzone", "column":"undelete"}}$$);

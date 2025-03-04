@@ -41,8 +41,8 @@ BEGIN
 			END IF;
 		END IF;
 
-		INSERT INTO drainzone (drainzone_id, "name", expl_id, descript, undelete, link, graphconfig, stylesheet, drainzone_type)
-		VALUES (NEW.drainzone_id, NEW.name, NEW.expl_id, NEW.descript, NEW.undelete,
+		INSERT INTO drainzone (drainzone_id, "name", expl_id, descript, link, graphconfig, stylesheet, drainzone_type)
+		VALUES (NEW.drainzone_id, NEW.name, NEW.expl_id, NEW.descript,
 		NEW.link, NEW.graphconfig::json, NEW.stylesheet::json, NEW.drainzone_type);
 
 		IF view_name = 'UI' THEN
@@ -58,7 +58,7 @@ BEGIN
 	ELSIF TG_OP = 'UPDATE' THEN
 
 		UPDATE drainzone
-		SET drainzone_id=NEW.drainzone_id, name=NEW.name, expl_id=NEW.expl_id, descript=NEW.descript, undelete=NEW.undelete,
+		SET drainzone_id=NEW.drainzone_id, name=NEW.name, expl_id=NEW.expl_id, descript=NEW.descript,
 		link=NEW.link, graphconfig=NEW.graphconfig::json, stylesheet=NEW.stylesheet::json, lastupdate=now(),
 		lastupdate_user = current_user, drainzone_type=NEW.drainzone_type
 		WHERE drainzone_id=OLD.drainzone_id;

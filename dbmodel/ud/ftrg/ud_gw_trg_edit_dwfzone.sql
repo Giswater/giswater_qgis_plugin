@@ -41,8 +41,8 @@ BEGIN
 			END IF;
 		END IF;
 
-		INSERT INTO dwfzone (dwfzone_id, "name", expl_id, descript, undelete, link, graphconfig, stylesheet, dwfzone_type)
-		VALUES (NEW.dwfzone_id, NEW.name, NEW.expl_id, NEW.descript, NEW.undelete,
+		INSERT INTO dwfzone (dwfzone_id, "name", expl_id, descript, link, graphconfig, stylesheet, dwfzone_type)
+		VALUES (NEW.dwfzone_id, NEW.name, NEW.expl_id, NEW.descript,
 		NEW.link, NEW.graphconfig::json, NEW.stylesheet::json, NEW.dwfzone_type);
 
 		IF view_name = 'UI' THEN
@@ -58,7 +58,7 @@ BEGIN
 	ELSIF TG_OP = 'UPDATE' THEN
 
 		UPDATE dwfzone
-		SET dwfzone_id=NEW.dwfzone_id, name=NEW.name, expl_id=NEW.expl_id, descript=NEW.descript, undelete=NEW.undelete,
+		SET dwfzone_id=NEW.dwfzone_id, name=NEW.name, expl_id=NEW.expl_id, descript=NEW.descript,
 		link=NEW.link, graphconfig=NEW.graphconfig::json, stylesheet=NEW.stylesheet::json, lastupdate=now(),
 		lastupdate_user = current_user, dwfzone_type=NEW.dwfzone_type
 		WHERE dwfzone_id=OLD.dwfzone_id;
