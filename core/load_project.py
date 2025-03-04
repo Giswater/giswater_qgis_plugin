@@ -454,7 +454,7 @@ class GwLoadProject(QObject):
 
         project_name = "cm"
         sql = (f"SELECT schema_name, schema_name FROM information_schema.schemata "
-               f"WHERE schema_name ILIKE '%{project_name}%'ORDER BY schema_name")
+               f"WHERE schema_name ILIKE '{project_name}'ORDER BY schema_name")
         rows = tools_db.get_rows(sql, commit=False)
         if rows is not None:
             self._enable_toolbar("cm")
