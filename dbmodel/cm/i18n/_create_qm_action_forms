@@ -1,0 +1,4 @@
+lrelease lot_manage_es.ts
+lrelease lot_manage_ca.ts
+lrelease lot_manage_en.ts
+pause
