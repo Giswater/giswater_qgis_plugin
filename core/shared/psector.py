@@ -1370,26 +1370,7 @@ class GwPsector:
         sql = (f"SELECT * FROM {schema_name}.{tableleft} WHERE LOWER ({field_id})"
                f" LIKE '%{query}%' AND {field_id} NOT IN (SELECT price_id FROM {schema_name}.{tableright}"
                f" WHERE psector_id = '{psector_id}')")
-        self.fill_table_by_query(qtable, sql)
-
-
-    def fill_table_by_query(self, qtable, query):
-        """
-        :param qtable: QTableView to show
-        :param query: query to set model
-        """
-
-        model = QSqlQueryModel()
-        model.setQuery(query, db=lib_vars.qgis_db_credentials)
-        qtable.setModel(model)
-        qtable.show()
-
-        # Check for errors
-        if model.lastError().isValid():
-            if 'Unable to find table' in model.lastError().text():
-                tools_db.reset_qsqldatabase_connection()
-            else:
-                tools_qgis.show_warning(model.lastError().text())
+        tools_db.fill_table_by_query(qtable, sql)
 
 
     def fill_table(self, dialog, widget, table_name, hidde=False, set_edit_triggers=QTableView.NoEditTriggers,

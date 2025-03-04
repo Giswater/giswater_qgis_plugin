@@ -540,6 +540,13 @@
                    </property>
                   </widget>
                  </item>
+                 <item row="2" column="0">
+                  <widget class="QPushButton" name="btn_create_cm">
+                   <property name="text">
+                    <string>Create DB cm schema</string>
+                   </property>
+                  </widget>
+                 </item>
                 </layout>
                </item>
               </layout>

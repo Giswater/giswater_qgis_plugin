@@ -23,7 +23,7 @@ def _get_ui_class(ui_file_name, subfolder='shared'):
     """ Get UI Python class from @ui_file_name """
 
     # Folder that contains UI files
-    if subfolder in ('basic', 'edit', 'epa', 'om', 'plan', 'utilities', 'toc', 'am'):
+    if subfolder in ('basic', 'edit', 'epa', 'om', 'plan', 'utilities', 'toc', 'am', 'cm'):
         ui_folder_path = os.path.dirname(__file__) + os.sep + 'toolbars' + os.sep + subfolder
     else:
         ui_folder_path = os.path.dirname(__file__) + os.sep + subfolder
@@ -591,6 +591,73 @@ class GwWorkcatManagerUi(GwDialog, FORM_CLASS):
 
 # endregion
 
+
+# region CM
+CONTEXT = "cm"
+
+UINAME = "add_lot"
+FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+class AddLotUi(GwDialog, FORM_CLASS):
+    CONTEXT = CONTEXT
+    UINAME = UINAME
+
+UINAME = "dialog_table"
+FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+class DialogTableUi(GwDialog, FORM_CLASS):
+    CONTEXT = CONTEXT
+    UINAME = UINAME
+
+UINAME = "load_management"
+FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+class LoadManagementUi(GwDialog, FORM_CLASS):
+    CONTEXT = CONTEXT
+    UINAME = UINAME
+
+UINAME = "lot_management"
+FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+class LotManagementUi(GwDialog, FORM_CLASS):
+    CONTEXT = CONTEXT
+    UINAME = UINAME
+
+UINAME = "lot_selector"
+FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+class LotSelectorUi(GwDialog, FORM_CLASS):
+    CONTEXT = CONTEXT
+    UINAME = UINAME
+
+UINAME = "resources_management"
+FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+class ResourcesManagementUi(GwDialog, FORM_CLASS):
+    CONTEXT = CONTEXT
+    UINAME = UINAME
+
+UINAME = "team_create"
+FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+class TeamCreateUi(GwDialog, FORM_CLASS):
+    CONTEXT = CONTEXT
+    UINAME = UINAME
+
+UINAME = "team_management"
+FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+class TeamManagemenUi(GwDialog, FORM_CLASS):
+    CONTEXT = CONTEXT
+    UINAME = UINAME
+
+UINAME = "vehicle_create"
+FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+class VehicleCreateUi(GwDialog, FORM_CLASS):
+    CONTEXT = CONTEXT
+    UINAME = UINAME
+
+UINAME = "work_management"
+FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+class WorkManagementUi(GwDialog, FORM_CLASS):
+    CONTEXT = CONTEXT
+    UINAME = UINAME
+
+
+# endregion
+
 # region TOC
 # endregion
 
@@ -660,6 +727,13 @@ FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
 class GwAdminDbProjectAuditUi(GwMainWindow, FORM_CLASS):
     CONTEXT = CONTEXT
     UINAME = UINAME
+
+UINAME = "admin_cmproject"
+FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+class GwAdminCmProjectUi(GwMainWindow, FORM_CLASS):
+    CONTEXT = CONTEXT
+    UINAME = UINAME
+
 
 UINAME = "admin_translation"
 FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')

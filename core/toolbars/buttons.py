@@ -70,3 +70,8 @@ from .am.breakage_btn import GwAmBreakageButton
 from .am.priority_btn import GwAmPriorityButton
 from .am.result_manager_btn import GwResultManagerButton
 from .am.result_selector_btn import GwResultSelectorButton
+
+# cm
+from .cm.add_lot2 import GwAddLotButton
+from .cm.manager_lot import GwManageLotButton
+from .cm.resources_lot import GwLotResourceManagementButton

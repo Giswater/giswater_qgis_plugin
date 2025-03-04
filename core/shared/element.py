@@ -103,8 +103,8 @@ class GwElement:
             layer = self.layers[feature_type][0]
             layer.selectByIds([feature.id()])
 
-        self._check_date(self.dlg_add_element.builtdate, self.dlg_add_element.btn_accept, 1)
-        self._check_date(self.dlg_add_element.enddate, self.dlg_add_element.btn_accept, 1)
+        tools_qt.check_date(self.dlg_add_element.builtdate, self.dlg_add_element.btn_accept, 1)
+        tools_qt.check_date(self.dlg_add_element.enddate, self.dlg_add_element.btn_accept, 1)
 
         # Get layer element and save if is visible or not for restore when finish process
         layer_element = tools_qgis.get_layer_by_tablename("v_edit_element")
