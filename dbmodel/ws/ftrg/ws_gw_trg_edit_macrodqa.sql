@@ -36,8 +36,8 @@ BEGIN
         
         -- FEATURE INSERT
 			
-				INSERT INTO macrodqa (macrodqa_id, name, descript, the_geom, undelete, expl_id)
-				VALUES (NEW.macrodqa_id, NEW.name, NEW.descript, NEW.the_geom, NEW.undelete, expl_id_int);
+				INSERT INTO macrodqa (macrodqa_id, name, descript, the_geom, expl_id)
+				VALUES (NEW.macrodqa_id, NEW.name, NEW.descript, NEW.the_geom, expl_id_int);
 				
 		RETURN NEW;
 		
@@ -46,7 +46,7 @@ BEGIN
 
 						
 			UPDATE macrodqa 
-			SET macrodqa_id=NEW.macrodqa_id, name=NEW.name, descript=NEW.descript, the_geom=NEW.the_geom, undelete=NEW.undelete,expl_id=NEW.expl_id
+			SET macrodqa_id=NEW.macrodqa_id, name=NEW.name, descript=NEW.descript, the_geom=NEW.the_geom,expl_id=NEW.expl_id
 			WHERE macrodqa_id=NEW.macrodqa_id;
 			
 	

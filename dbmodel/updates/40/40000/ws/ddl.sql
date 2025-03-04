@@ -1156,6 +1156,8 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"rpt_cat_re
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"dma", "column":"undelete"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"presszone", "column":"undelete"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"dqa", "column":"undelete"}}$$);
+DROP RULE IF EXISTS undelete_macrodqa ON macrodqa;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"macrodqa", "column":"undelete"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"supplyzone", "column":"undelete"}}$$);
 DROP VIEW IF EXISTS v_edit_macrodma;
 DROP VIEW IF EXISTS v_ui_macrodma;

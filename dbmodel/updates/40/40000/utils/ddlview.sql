@@ -214,6 +214,7 @@ DROP VIEW IF EXISTS v_om_mincut_hydrometer;
 
 DROP VIEW IF EXISTS v_edit_dma;
 DROP VIEW IF EXISTS v_ui_dma;
+DROP VIEW IF EXISTS v_edit_macrodma;
 DROP VIEW IF EXISTS vu_dma;
 DROP VIEW IF EXISTS v_edit_plan_netscenario_presszone;
 DROP VIEW IF EXISTS v_edit_dqa;

@@ -115,6 +115,15 @@ AND l.expl_id = se.expl_id AND se.cur_user = CURRENT_USER::text AND cf.value is 
 SELECT g.link_id FROM sp, se, cf, g JOIN l USING (link_id) WHERE g.psector_id = sp.psector_id AND sp.cur_user = "current_user"()::text AND g.state = 1
 AND l.expl_id = se.expl_id AND se.cur_user = CURRENT_USER::text AND cf.value is TRUE;
 
+CREATE OR REPLACE VIEW v_edit_macrodma AS 
+ SELECT macrodma.macrodma_id,
+    macrodma.name,
+    macrodma.descript,
+    macrodma.the_geom,
+    macrodma.expl_id,
+    macrodma.active
+   FROM selector_expl, macrodma
+  WHERE macrodma.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
 
 CREATE OR REPLACE VIEW vu_dma
 AS SELECT
@@ -125,7 +134,6 @@ AS SELECT
     dma.expl_id,
     e.name as expl_name,
     dma.descript,
-    dma.undelete,
     dma.link,
     dma.graphconfig::text,
     dma.active,

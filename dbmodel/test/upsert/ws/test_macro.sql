@@ -55,7 +55,7 @@ SELECT is((SELECT count(*)::integer FROM macrodma WHERE macrodma_id = -999), 0, 
 
 
 -- Subtest 4: Testing macrodqa operations
-INSERT INTO macrodqa (macrodqa_id, "name", expl_id, descript, undelete, the_geom, active) VALUES(-999, 'macrodqa_01', 0, NULL, NULL, NULL, true);
+INSERT INTO macrodqa (macrodqa_id, "name", expl_id, descript, the_geom, active) VALUES(-999, 'macrodqa_01', 0, NULL, NULL, true);
 SELECT is((SELECT count(*)::integer FROM macrodqa WHERE macrodqa_id = -999), 1, 'INSERT: macrodqa "1" was inserted');
 
 UPDATE macrodqa SET descript = 'updated test' WHERE macrodqa_id = -999;

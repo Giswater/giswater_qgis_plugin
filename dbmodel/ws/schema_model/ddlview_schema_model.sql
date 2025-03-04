@@ -2730,7 +2730,6 @@ CREATE VIEW v_edit_macrodqa AS
     macrodqa.name,
     macrodqa.expl_id,
     macrodqa.descript,
-    macrodqa.undelete,
     macrodqa.the_geom,
     macrodqa.active
    FROM selector_expl,

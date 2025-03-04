@@ -34,8 +34,8 @@ BEGIN
 			NEW.active = TRUE;
 		END IF;
 			
-		INSERT INTO dma (dma_id, name, descript, macrodma_id, the_geom, undelete, expl_id, link, active, stylesheet, dma_type, graphconfig)
-		VALUES (NEW.dma_id, NEW.name, NEW.descript, NEW.macrodma_id, NEW.the_geom, NEW.undelete, NEW.expl_id, NEW.link, NEW.active, NEW.stylesheet,
+		INSERT INTO dma (dma_id, name, descript, macrodma_id, the_geom, expl_id, link, active, stylesheet, dma_type, graphconfig)
+		VALUES (NEW.dma_id, NEW.name, NEW.descript, NEW.macrodma_id, NEW.the_geom, NEW.expl_id, NEW.link, NEW.active, NEW.stylesheet,
 		NEW.dma_type, NEW.graphconfig::json);
 
 		RETURN NEW;
@@ -43,7 +43,7 @@ BEGIN
 	ELSIF TG_OP = 'UPDATE' THEN
    	
 		UPDATE dma 
-		SET dma_id=NEW.dma_id, name=NEW.name, descript=NEW.descript, the_geom=NEW.the_geom, undelete=NEW.undelete, expl_id=NEW.expl_id, 
+		SET dma_id=NEW.dma_id, name=NEW.name, descript=NEW.descript, the_geom=NEW.the_geom, expl_id=NEW.expl_id, 
 		link=NEW.link, active=NEW.active, lastupdate=now(), lastupdate_user = current_user, macrodma_id = NEW.macrodma_id, stylesheet=NEW.stylesheet, 
 		dma_type=NEW.dma_type, graphconfig=NEW.graphconfig::json
 		WHERE dma_id=OLD.dma_id;

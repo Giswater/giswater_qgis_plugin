@@ -965,3 +965,9 @@ DROP VIEW IF EXISTS v_ui_sector;
 DROP VIEW IF EXISTS vu_sector;
 DROP RULE IF EXISTS undelete_sector ON sector;
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"sector", "column":"undelete"}}$$);
+
+DROP RULE IF EXISTS undelete_dma ON dma;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"dma", "column":"undelete"}}$$);
+
+DROP RULE IF EXISTS undelete_macrodma ON macrodma;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"macrodma", "column":"undelete"}}$$);
