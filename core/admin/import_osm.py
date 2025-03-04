@@ -203,6 +203,7 @@ class GwImportOsm:
 
         # Show summary
         tools_qgis.show_info(f"Data insertion completed: {success} successful, {errors} errors.")
+        tools_qt.show_details(f"Data insertion completed: {success} successful, {errors} errors.")
 
         # Close dialog and cursor
         cur.close()
@@ -232,7 +233,8 @@ class GwImportOsm:
                 # Check if imported_muni is selected
                 if imported_muni[0] in selected_munis:
                     # Ask if user wants to overwrite the municipaly imports       
-                    result = tools_qt.show_question(f"""This municipality is already imported on om_streetaxis. Id: {imported_muni[0]}. Do you want to overwrite it?""", "Info", force_action=True)
+                    result = tools_qt.show_question(f"""Municipality with id[{imported_muni[0]}] is already imported on om_streetaxis. \n\rDo you want to overwrite it? \n\r(This decision will not cancel the other selections, the process will keep running)
+                                                    """, "Info", force_action=True)
                     if not result:
                         selected_munis.remove(imported_muni[0])
                         self.dlg_import_osm.findChild(QCheckBox, f"chk_{imported_muni[0]}").setChecked(False)                        
