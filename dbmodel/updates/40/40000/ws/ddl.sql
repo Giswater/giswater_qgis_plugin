@@ -1167,3 +1167,6 @@ DROP VIEW IF EXISTS v_edit_sector;
 DROP VIEW IF EXISTS v_ui_sector;
 DROP VIEW IF EXISTS vu_sector;
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"sector", "column":"undelete"}}$$);
+
+-- 04/03/2025
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_valve", "column":"active"}}$$);

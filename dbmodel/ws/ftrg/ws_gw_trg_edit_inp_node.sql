@@ -129,8 +129,7 @@ BEGIN
             WHERE node_id=OLD.node_id;
 
 			update man_valve set closed = true where new.status = 'CLOSED' AND node_id = OLD.node_id;
-			update man_valve set closed = false, active=true where new.status = 'ACTIVE' and node_id = OLD.node_id;
-			update man_valve set closed = false, active = false where new.status = 'OPEN' and node_id = OLD.node_id;
+			update man_valve set closed = false where new.status IN ('ACTIVE', 'OPEN') and node_id = OLD.node_id;
 
         ELSIF v_node_table = 'inp_shortpipe' THEN
              UPDATE inp_shortpipe SET minorloss=NEW.minorloss, bulk_coeff = NEW.bulk_coeff, wall_coeff = NEW.wall_coeff WHERE node_id=OLD.node_id;

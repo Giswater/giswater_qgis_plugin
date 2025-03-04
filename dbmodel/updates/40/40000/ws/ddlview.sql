@@ -3051,12 +3051,12 @@ AS SELECT inp_valve.node_id,
     inp_valve.curve_id,
     inp_valve.minorloss,
     v.to_arc,
-        CASE
-            WHEN v.closed IS TRUE THEN 'CLOSED'::character varying(12)
-            WHEN v.closed IS FALSE AND v.active IS TRUE THEN 'ACTIVE'::character varying(12)
-            WHEN v.closed IS FALSE AND v.active IS FALSE THEN 'OPEN'::character varying(12)
-            ELSE NULL::character varying(12)
-        END AS status,
+    CASE
+      WHEN v.to_arc IS NOT NULL AND v.closed IS FALSE THEN 'ACTIVE'::character varying(12)
+      WHEN v.closed IS TRUE THEN 'CLOSED'::character varying(12)
+      WHEN v.closed IS FALSE THEN 'OPEN'::character varying(12)
+      ELSE NULL::character varying(12)
+    END AS status,
     inp_valve.add_settings,
     inp_valve.init_quality,
     concat(inp_valve.node_id, '_n2a') AS nodarc_id,
@@ -3086,12 +3086,12 @@ AS SELECT inp_shortpipe.node_id,
     vu_node.cat_dint,
     inp_shortpipe.custom_dint,
     v.to_arc,
-        CASE
-            WHEN v.active IS TRUE AND v.to_arc IS NOT NULL THEN 'CV'::character varying(12)
-            WHEN v.closed IS TRUE THEN 'CLOSED'::character varying(12)
-            WHEN v.closed IS FALSE THEN 'OPEN'::character varying(12)
-            ELSE NULL::character varying(12)
-        END AS status,
+    CASE
+      WHEN v.to_arc IS NOT NULL AND v.closed IS FALSE THEN 'CV'::character varying(12)
+      WHEN v.closed IS TRUE THEN 'CLOSED'::character varying(12)
+      WHEN v.closed IS FALSE THEN 'OPEN'::character varying(12)
+      ELSE NULL::character varying(12)
+    END AS status,
     inp_shortpipe.bulk_coeff,
     inp_shortpipe.wall_coeff,
     concat(inp_shortpipe.node_id, '_n2a') AS nodarc_id,
@@ -3523,10 +3523,10 @@ AS SELECT n.node_id,
     concat(n.node_id, '_n2a') AS nodarc_id,
     inp_shortpipe.minorloss,
     CASE
-	WHEN v.closed IS TRUE THEN 'CLOSED'::character varying(12)
-        WHEN v.closed IS FALSE AND v.active IS TRUE AND v.to_arc IS NOT NULL THEN 'CV'::character varying(12)
-        WHEN v.closed IS FALSE AND active IS FALSE THEN 'OPEN'::character varying(12)
-        ELSE NULL::character varying(12)
+      WHEN v.to_arc IS NOT NULL AND v.closed IS FALSE THEN 'CV'::character varying(12)
+      WHEN v.closed IS TRUE THEN 'CLOSED'::character varying(12)
+      WHEN v.closed IS FALSE THEN 'OPEN'::character varying(12)
+      ELSE NULL::character varying(12)
     END AS status,
     inp_shortpipe.bulk_coeff,
     inp_shortpipe.wall_coeff,
@@ -3668,13 +3668,13 @@ AS SELECT n.node_id,
     inp_valve.curve_id,
     inp_valve.minorloss,
     v.to_arc,
-	CASE
-	WHEN v.closed IS TRUE THEN 'CLOSED'::character varying(12)
-        WHEN v.closed IS FALSE AND v.active IS TRUE THEN 'ACTIVE'::character varying(12)
-        WHEN v.closed IS FALSE AND active IS FALSE THEN 'OPEN'::character varying(12)
-        ELSE NULL::character varying(12)
-        END AS status,
-	n.cat_dint,
+    CASE
+      WHEN v.to_arc IS NOT NULL AND v.closed IS FALSE THEN 'ACTIVE'::character varying(12)
+      WHEN v.closed IS TRUE THEN 'CLOSED'::character varying(12)
+      WHEN v.closed IS FALSE THEN 'OPEN'::character varying(12)
+      ELSE NULL::character varying(12)
+    END AS status,
+	  n.cat_dint,
     inp_valve.custom_dint,
     inp_valve.add_settings,
     inp_valve.init_quality,
