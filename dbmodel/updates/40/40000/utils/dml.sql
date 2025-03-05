@@ -2109,3 +2109,9 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 }'::json, NULL, false, 0);
 
 DELETE FROM config_form_fields WHERE formname='v_edit_dimensions' AND formtype='form_feature' AND columnname='id' AND tabname='tab_none';
+
+
+-- 05/03/2025
+UPDATE sys_param_user
+	SET layoutorder=24
+	WHERE id='utils_psector_strategy';
