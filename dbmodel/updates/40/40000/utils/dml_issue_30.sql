@@ -373,7 +373,7 @@ LEFT JOIN pg_roles m ON am.member = m.oid AND m.rolcanlogin = TRUE  LEFT JOIN pg
 WHERE (m.rolcanlogin IS TRUE OR s.rolcanlogin IS TRUE)
 ) 
 SELECT *, CONCAT(explots, ''-'', usern, ''-'', id) FROM (SELECT id, unnest(expl_id) explots, usern FROM cat_manager   JOIN exploit using(id)) a 
-WHERE CONCAT(explots, ''-'', usern, ''-'', id) NOT IN (SELECT CONCAT(expl_id, ''-'', username, ''-'', manager_id) FROM config_user_x_expl cuxe) AND explots != 0', info_msg='Configuration of cat_manager and config_user_x_expl is consistent.', function_name='[gw_fct_admin_check_data]' WHERE fid=472;
+WHERE CONCAT(explots, ''-'', usern, ''-'', id) NOT IN (SELECT CONCAT(expl_id, ''-'', username, ''-'', manager_id) FROM config_user_x_expl cuxe) AND explots != 0', info_msg='Configuration of cat_manager and config_user_x_expl is consistent.', function_name='[gw_fct_admin_check_data]', active = false WHERE fid=472;
 UPDATE sys_fprocess SET fprocess_name='Check consistency between cat_manager and config_user_x_sector', "source"='core', fprocess_type='Function process', project_type='utils', except_level=3, except_msg='inconsistent configurations on cat_manager and config_user_x_sector for user: '''',string_agg(DISTINCT usern,'''', '''')), ''||v_count||'' FROM ''||v_querytext||'';''"', query_text='WITH sectores AS (SELECT COALESCE(m.rolname, s.rolname) AS usern,  id  FROM (SELECT id, unnest(rolename) AS role FROM cat_manager WHERE sector_id IS NOT NULL) q 
 LEFT JOIN pg_roles r ON q.role = r.rolname
 LEFT JOIN pg_auth_members am ON r.oid = am.roleid

@@ -62,7 +62,7 @@ BEGIN
 
 	-- get system parameters in case input parameter is null
 /*
-	IF v_verified_exceptions IS NULL THEN SELECT value::json->>'verifiedExceptions' INTO v_verified_exceptions 
+	IF v_verified_exceptions IS NULL THEN SELECT value::json->>'verifiedExceptions' INTO v_verified_exceptions
 	   FROM config_param_system WHERE parameter = 'admin_checkproject'; END IF;
 	IF v_omcheck IS NULL THEN SELECT value::json->>'omCheck' INTO v_omcheck FROM config_param_system WHERE parameter = 'admin_checkproject'; END IF;
 	IF v_graphcheck IS NULL THEN SELECT value::json->>'graphCheck' INTO v_graphcheck FROM config_param_system WHERE parameter = 'admin_checkproject'; END IF;
@@ -81,8 +81,8 @@ BEGIN
 	-- create log tables
 	EXECUTE 'SELECT gw_fct_create_logtables($${"data":{"parameters":{"fid":604}}}$$::json)';
 
-	
-	CREATE TEMP TABLE t_temp_values AS 
+
+	CREATE TEMP TABLE t_temp_values AS
 	SELECT 'v_omcheck', 'om_check' AS check_data, v_omcheck AS val UNION
 	SELECT 'v_graphcheck', 'graph_check' AS check_data, v_graphcheck AS val UNION
 	SELECT 'v_epacheck', 'pg2epa_check' as check_data, v_epacheck AS val UNION
@@ -92,64 +92,66 @@ BEGIN
 
 	-- build query for generic cases
 	FOR v_rec_check IN SELECT check_data FROM t_temp_values WHERE val IS TRUE
-	LOOP 
-		
+	LOOP
+
 		v_querytext = '
 			SELECT * FROM sys_fprocess 
 			WHERE project_type IN (LOWER('||quote_literal(v_project_type)||'), ''utils'') 
 			AND query_text NOT ILIKE ''%v_graphClass%''
 			AND (addparam IS NULL 
 			AND query_text IS NOT NULL 
-			AND function_name ILIKE ''%'||v_rec_check.check_data||'%'') 
+			AND function_name ILIKE ''%'||v_rec_check.check_data||'%'')
+			AND active
 			ORDER BY fid ASC';
-	
-		FOR v_rec IN EXECUTE v_querytext 
+
+		FOR v_rec IN EXECUTE v_querytext
 		LOOP
-		
+
 			EXECUTE 'SELECT gw_fct_check_fprocess($${"client":{"device":4, "infoType":1, "lang":"ES"}, 
 		    "form":{},"feature":{},"data":{"parameters":{"functionFid": '||v_fid||', "checkFid":"'||v_rec.fid||'"}}}$$)';
-		   
+
 		END LOOP;
-	
+
 	END LOOP;
-	
+
 	-- build query for (mapzones)
 	IF v_graphcheck THEN
-		
+
 		v_querytext = '
 		SELECT * FROM sys_fprocess 
 		WHERE project_type IN (LOWER('||quote_literal(v_project_type)||'), ''utils'') 
 		AND (addparam IS NULL 
 		AND query_text ILIKE ''%v_graphClass%'')
+		AND active
 		ORDER BY fid ASC
 		';
-	
-		IF lower(v_project_type) = 'ws' THEN 
+
+		IF lower(v_project_type) = 'ws' THEN
 			v_mapzones = 'SELECT unnest(ARRAY[''sector'', ''dma'', ''dqa'', ''presszone'']) AS mec';
-		
-		ELSIF lower(v_project_type) = 'ud' THEN 
+
+		ELSIF lower(v_project_type) = 'ud' THEN
 			v_mapzones = 'SELECT unnest(ARRAY[''sector'', ''drainzone'']) AS mec';
-		
+
 		END IF;
 
-	
-		FOR v_rec IN EXECUTE v_querytext 
+
+		FOR v_rec IN EXECUTE v_querytext
 		LOOP
-			
+
 			FOR v_rec_mapzone IN EXECUTE v_mapzones
 			LOOP
-				
+
 				EXECUTE 'SELECT gw_fct_check_fprocess($${"client":{"device":4, "infoType":1, "lang":"ES"}, 
 		    	"form":{},"feature":{},"data":{"parameters":{"functionFid": '||v_fid||', "checkFid":"'||v_rec.fid||'", "graphClass":"'||v_rec_mapzone.mec||'"}}}$$)';
-				
+
 			END LOOP;
-		   
+
 		END LOOP;
 
 	END IF;
 
 	--EXECUTE 'SELECT gw_fct_user_check_data($${"data":{"parameters":{"fid":'||v_fid||', "isEmbebed":true}}}$$)';
-	
+
 	-- create json return to send client
 	EXECUTE 'SELECT gw_fct_create_logreturn($${"data":{"parameters":{"type":"info"}}}$$::json)' INTO v_result_info;
 	EXECUTE 'SELECT gw_fct_create_logreturn($${"data":{"parameters":{"type":"point"}}}$$::json)' INTO v_result_point;
@@ -175,7 +177,7 @@ BEGIN
 	--  Exception handling
 	--EXCEPTION WHEN OTHERS THEN
 	--GET STACKED DIAGNOSTICS v_error_context = pg_exception_context;
-	--RETURN json_build_object('status', 'Failed', 'NOSQLERR', SQLERRM, 'message', json_build_object('level', right(SQLSTATE, 1), 'text', SQLERRM), 'SQLSTATE', 
+	--RETURN json_build_object('status', 'Failed', 'NOSQLERR', SQLERRM, 'message', json_build_object('level', right(SQLSTATE, 1), 'text', SQLERRM), 'SQLSTATE',
 	--SQLSTATE, 'SQLCONTEXT', v_error_context)::json;
 
 END;
@@ -183,4 +185,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
- 

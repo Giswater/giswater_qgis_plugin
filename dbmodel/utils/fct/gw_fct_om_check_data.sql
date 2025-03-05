@@ -64,7 +64,8 @@ BEGIN
 		WHERE project_type IN (LOWER('||quote_literal(v_project_type)||'), ''utils'') 
 		AND addparam IS NULL 
 		AND query_text IS NOT NULL 
-		AND function_name ILIKE ''%om_check%'' 
+		AND function_name ILIKE ''%om_check%''
+		AND active
 		ORDER BY fid ASC
 	';
 

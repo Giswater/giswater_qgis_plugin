@@ -114,6 +114,7 @@ BEGIN
 		AND query_text IS NOT NULL
 		AND function_name ILIKE ''%graphanalytics%''
 		AND (parameters::text ILIKE ''%'||v_graphclass||'%'' OR parameters IS NULL)
+		AND active
 	';
 
 
