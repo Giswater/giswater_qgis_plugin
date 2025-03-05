@@ -256,7 +256,7 @@ BEGIN
  	v_fieldsjson := COALESCE(v_fieldsjson, '[]');
 
 	-- If there are tabs in dialog:
-	IF jsonb_path_exists(v_fieldsjson, '$.**.tabs') AND ((p_data ->>'form')::json->>'id') IS NOT NULL THEN
+	IF jsonb_path_exists(v_fieldsjson, '$.**.tabs_tab_main') AND ((p_data ->>'form')::json->>'id') IS NOT NULL THEN
 		-- REMOVE EMPTY TABS (WITH EMPTY TABLEWIDGETS)
 		-- Get tabnames to remove with empty table widgets
 	    FOREACH v_field IN ARRAY ARRAY(SELECT jsonb_array_elements(v_fieldsjson)) LOOP
@@ -289,7 +289,7 @@ BEGIN
 		-- Include tabs where tabName is not in v_tabnames (tab to remove)
 		v_tabsjson := (
 	        SELECT jsonb_agg(tab) FROM jsonb_array_elements(v_fieldsjson) AS field,
-	        jsonb_array_elements(field->'tabs') AS tab
+	        jsonb_array_elements(field->'tabs_tab_main') AS tab
 	    	WHERE tab->>'tabName' NOT IN (SELECT unnest(v_tabnames_to_remove))
 	    );
 
@@ -297,8 +297,8 @@ BEGIN
 		 v_fieldsjson := (
 	        SELECT jsonb_agg(
 	            CASE
-	                WHEN field->>'tabs' IS NOT NULL THEN
-						jsonb_set(field, '{tabs}', to_jsonb(v_tabsjson))
+	                WHEN field->>'tabs_tab_main' IS NOT NULL THEN
+						jsonb_set(field, '{tabs_tab_main}', to_jsonb(v_tabsjson))
 	            ELSE
 					field
 	            END
@@ -309,7 +309,7 @@ BEGIN
 		-- Remove empty table_views
 		v_fieldsjson := (
 			SELECT json_agg(field) FROM jsonb_array_elements(v_fieldsjson)
-			AS field WHERE field->>'tabs' IS NOT NULL OR field->>'tabname' NOT IN (SELECT unnest(v_tabnames_to_remove))
+			AS field WHERE field->>'tabs_tab_main' IS NOT NULL OR field->>'tabname' NOT IN (SELECT unnest(v_tabnames_to_remove))
 		);
 	END IF;
 
