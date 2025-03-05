@@ -375,7 +375,7 @@ INSERT INTO config_param_system ("parameter", value, descript, "label", dv_query
 
 
 -- 28/11/2024
-INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('epa_results', 'SELECT result_id as id, expl_id::text, sector_id::text, network_type, status, iscorporate::text, descript, cur_user, exec_date, rpt_stats::text, addparam, export_options, network_stats, inp_options FROM v_ui_rpt_cat_result', 5, 'tab', 'list', '{"orderBy":"1", "orderType": "DESC"}'::json, '{
+INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('epa_results', 'SELECT result_id as id, expl_id::text, sector_id::text, network_type, status, iscorporate::text, descript, cur_user, exec_date, rpt_stats::text, addparam, export_options, network_stats, inp_options FROM v_ui_rpt_cat_result', 5, 'tab', 'list', '{"orderBy":"1", "orderType": "ASC"}'::json, '{
   "enableGlobalFilter": false,
   "enableStickyHeader": true,
   "positionToolbarAlertBanner": "bottom",
@@ -417,7 +417,7 @@ INSERT INTO config_form_list (listname, query_text, device, listtype, listclass,
     "sorting": [
       {
         "id": "id",
-        "desc": true
+        "desc": false
       }
     ]
   },
@@ -618,11 +618,11 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 }'::json, NULL, false, 0);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'nvo_manager', 'tab_curves', 'tab_curves', 'lyt_curves_1', 0, NULL, 'tablewidget', NULL, NULL, NULL, false, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false}'::json, NULL, 'tbl_nvo_mng_curves', false, 0);
 
-INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('tbl_nvo_mng_curves', 'SELECT * FROM v_edit_inp_curve WHERE id IS NOT NULL', 5, 'tab', 'list', '{"orderBy":"1", "orderType": "DESC"}'::json, '{"enableGlobalFilter":false,"enableStickyHeader":true,"positionToolbarAlertBanner":"bottom","enableGrouping":false,"enablePinning":true,"enableColumnOrdering":true,"enableColumnFilterModes":true,"enableFullScreenToggle":false,"enablePagination":true,"enableExporting":true,"muiTablePaginationProps":{"rowsPerPageOptions":[5,10,15,20,50,100],"showFirstButton":true,"showLastButton":true},"enableRowSelection":true,"multipleRowSelection":true,"initialState":{"showColumnFilters":false,"pagination":{"pageSize":5,"pageIndex":0},"density":"compact","columnFilters":[],"sorting":[{"id":"id","desc":true}]},"modifyTopToolBar":true,"renderTopToolbarCustomActions":[{"widgetfunction":{"functionName":"openCurves","params":{"initialHeight":480,"initialWidth":650,"minHeight":480,"minWidth":560,"title":"Curve"}},"color":"success","text":"Open","disableOnSelect":true,"moreThanOneDisable":true}],"enableRowActions":false,"renderRowActionMenuItems":[{"widgetfunction":{"functionName":"openCurves","params":{}},"icon":"OpenInBrowser","text":"Open"}]}'::json);
-INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('tbl_nvo_mng_patterns', 'SELECT * FROM v_edit_inp_pattern WHERE pattern_id IS NOT NULL', 5, 'tab', 'list', '{"orderBy":"1", "orderType": "DESC"}'::json, '{"enableGlobalFilter":false,"enableStickyHeader":true,"positionToolbarAlertBanner":"bottom","enableGrouping":false,"enablePinning":true,"enableColumnOrdering":true,"enableColumnFilterModes":true,"enableFullScreenToggle":false,"enablePagination":true,"enableExporting":true,"muiTablePaginationProps":{"rowsPerPageOptions":[5,10,15,20,50,100],"showFirstButton":true,"showLastButton":true},"enableRowSelection":true,"multipleRowSelection":true,"initialState":{"showColumnFilters":false,"pagination":{"pageSize":5,"pageIndex":0},"density":"compact","columnFilters":[],"sorting":[{"id":"pattern_id","desc":true}]},"modifyTopToolBar":true,"renderTopToolbarCustomActions":[{"widgetfunction":{"functionName":"openPatterns","params":{"initialHeight":580,"initialWidth":720,"minHeight":579,"minWidth":719,"title":"Pattern"}},"color":"success","text":"Open","disableOnSelect":true,"moreThanOneDisable":true}],"enableRowActions":false,"renderRowActionMenuItems":[{"widgetfunction":{"functionName":"openPatterns","params":{}},"icon":"OpenInBrowser","text":"Open"}]}'::json);
-INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('tbl_nvo_mng_controls', 'SELECT * FROM v_edit_inp_controls WHERE id IS NOT NULL', 5, 'tab', 'list', '{"orderBy":"1", "orderType": "DESC"}'::json, '{"enableGlobalFilter":false,"enableStickyHeader":true,"positionToolbarAlertBanner":"bottom","enableGrouping":false,"enablePinning":true,"enableColumnOrdering":true,"enableColumnFilterModes":true,"enableFullScreenToggle":false,"enablePagination":true,"enableExporting":true,"muiTablePaginationProps":{"rowsPerPageOptions":[5,10,15,20,50,100],"showFirstButton":true,"showLastButton":true},"enableRowSelection":true,"multipleRowSelection":true,"initialState":{"showColumnFilters":false,"pagination":{"pageSize":5,"pageIndex":0},"density":"compact","columnFilters":[],"sorting":[{"id":"id","desc":true}]},"modifyTopToolBar":true,"renderTopToolbarCustomActions":[{"widgetfunction":{"functionName":"openControls","params":{"initialHeight":400,"initialWidth":300,"minHeight":390,"minWidth":290,"title":"Control"}},"color":"success","text":"Open","disableOnSelect":true,"moreThanOneDisable":true}],"enableRowActions":false,"renderRowActionMenuItems":[{"widgetfunction":{"functionName":"openControls","params":{}},"icon":"OpenInBrowser","text":"Open"}]}'::json);
-INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('tbl_nvo_mng_timeseries', 'SELECT * FROM v_edit_inp_timeseries WHERE id IS NOT NULL', 5, 'tab', 'list', '{"orderBy":"1", "orderType": "DESC"}'::json, '{"enableGlobalFilter":false,"enableStickyHeader":true,"positionToolbarAlertBanner":"bottom","enableGrouping":false,"enablePinning":true,"enableColumnOrdering":true,"enableColumnFilterModes":true,"enableFullScreenToggle":false,"enablePagination":true,"enableExporting":true,"muiTablePaginationProps":{"rowsPerPageOptions":[5,10,15,20,50,100],"showFirstButton":true,"showLastButton":true},"enableRowSelection":true,"multipleRowSelection":true,"initialState":{"showColumnFilters":false,"pagination":{"pageSize":5,"pageIndex":0},"density":"compact","columnFilters":[],"sorting":[{"id":"id","desc":true}]},"modifyTopToolBar":true,"renderTopToolbarCustomActions":[{"widgetfunction":{"functionName":"openTimeseries","params":{"initialHeight":480,"initialWidth":650,"minHeight":480,"minWidth":560,"title":"Timeseries"}},"color":"success","text":"Open","disableOnSelect":true,"moreThanOneDisable":true}],"enableRowActions":false,"renderRowActionMenuItems":[{"widgetfunction":{"functionName":"openTimeseries","params":{}},"icon":"OpenInBrowser","text":"Open"}]}'::json);
-INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('tbl_nvo_mng_lids', 'SELECT * FROM inp_lid WHERE lidco_id IS NOT NULL', 5, 'tab', 'list', '{"orderBy":"1", "orderType": "DESC"}'::json, '{"enableGlobalFilter":false,"enableStickyHeader":true,"positionToolbarAlertBanner":"bottom","enableGrouping":false,"enablePinning":true,"enableColumnOrdering":true,"enableColumnFilterModes":true,"enableFullScreenToggle":false,"enablePagination":true,"enableExporting":true,"muiTablePaginationProps":{"rowsPerPageOptions":[5,10,15,20,50,100],"showFirstButton":true,"showLastButton":true},"enableRowSelection":true,"multipleRowSelection":true,"initialState":{"showColumnFilters":false,"pagination":{"pageSize":5,"pageIndex":0},"density":"compact","columnFilters":[],"sorting":[{"id":"lidco_id","desc":true}]},"modifyTopToolBar":true,"renderTopToolbarCustomActions":[{"widgetfunction":{"functionName":"openLids","params":{"initialHeight":480,"initialWidth":650,"minHeight":480,"minWidth":560,"title":"LIDS"}},"color":"success","text":"Open","disableOnSelect":true,"moreThanOneDisable":true}],"enableRowActions":false,"renderRowActionMenuItems":[{"widgetfunction":{"functionName":"openLids","params":{}},"icon":"OpenInBrowser","text":"Open"}]}'::json);
+INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('tbl_nvo_mng_curves', 'SELECT * FROM v_edit_inp_curve WHERE id IS NOT NULL', 5, 'tab', 'list', '{"orderBy":"1", "orderType": "ASC"}'::json, '{"enableGlobalFilter":false,"enableStickyHeader":true,"positionToolbarAlertBanner":"bottom","enableGrouping":false,"enablePinning":true,"enableColumnOrdering":true,"enableColumnFilterModes":true,"enableFullScreenToggle":false,"enablePagination":true,"enableExporting":true,"muiTablePaginationProps":{"rowsPerPageOptions":[5,10,15,20,50,100],"showFirstButton":true,"showLastButton":true},"enableRowSelection":true,"multipleRowSelection":true,"initialState":{"showColumnFilters":false,"pagination":{"pageSize":5,"pageIndex":0},"density":"compact","columnFilters":[],"sorting":[{"id":"id","desc":true}]},"modifyTopToolBar":true,"renderTopToolbarCustomActions":[{"widgetfunction":{"functionName":"openCurves","params":{"initialHeight":480,"initialWidth":650,"minHeight":480,"minWidth":560,"title":"Curve"}},"color":"success","text":"Open","disableOnSelect":true,"moreThanOneDisable":true}],"enableRowActions":false,"renderRowActionMenuItems":[{"widgetfunction":{"functionName":"openCurves","params":{}},"icon":"OpenInBrowser","text":"Open"}]}'::json);
+INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('tbl_nvo_mng_patterns', 'SELECT * FROM v_edit_inp_pattern WHERE pattern_id IS NOT NULL', 5, 'tab', 'list', '{"orderBy":"1", "orderType": "ASC"}'::json, '{"enableGlobalFilter":false,"enableStickyHeader":true,"positionToolbarAlertBanner":"bottom","enableGrouping":false,"enablePinning":true,"enableColumnOrdering":true,"enableColumnFilterModes":true,"enableFullScreenToggle":false,"enablePagination":true,"enableExporting":true,"muiTablePaginationProps":{"rowsPerPageOptions":[5,10,15,20,50,100],"showFirstButton":true,"showLastButton":true},"enableRowSelection":true,"multipleRowSelection":true,"initialState":{"showColumnFilters":false,"pagination":{"pageSize":5,"pageIndex":0},"density":"compact","columnFilters":[],"sorting":[{"id":"pattern_id","desc":true}]},"modifyTopToolBar":true,"renderTopToolbarCustomActions":[{"widgetfunction":{"functionName":"openPatterns","params":{"initialHeight":580,"initialWidth":720,"minHeight":579,"minWidth":719,"title":"Pattern"}},"color":"success","text":"Open","disableOnSelect":true,"moreThanOneDisable":true}],"enableRowActions":false,"renderRowActionMenuItems":[{"widgetfunction":{"functionName":"openPatterns","params":{}},"icon":"OpenInBrowser","text":"Open"}]}'::json);
+INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('tbl_nvo_mng_controls', 'SELECT * FROM v_edit_inp_controls WHERE id IS NOT NULL', 5, 'tab', 'list', '{"orderBy":"1", "orderType": "ASC"}'::json, '{"enableGlobalFilter":false,"enableStickyHeader":true,"positionToolbarAlertBanner":"bottom","enableGrouping":false,"enablePinning":true,"enableColumnOrdering":true,"enableColumnFilterModes":true,"enableFullScreenToggle":false,"enablePagination":true,"enableExporting":true,"muiTablePaginationProps":{"rowsPerPageOptions":[5,10,15,20,50,100],"showFirstButton":true,"showLastButton":true},"enableRowSelection":true,"multipleRowSelection":true,"initialState":{"showColumnFilters":false,"pagination":{"pageSize":5,"pageIndex":0},"density":"compact","columnFilters":[],"sorting":[{"id":"id","desc":true}]},"modifyTopToolBar":true,"renderTopToolbarCustomActions":[{"widgetfunction":{"functionName":"openControls","params":{"initialHeight":400,"initialWidth":300,"minHeight":390,"minWidth":290,"title":"Control"}},"color":"success","text":"Open","disableOnSelect":true,"moreThanOneDisable":true}],"enableRowActions":false,"renderRowActionMenuItems":[{"widgetfunction":{"functionName":"openControls","params":{}},"icon":"OpenInBrowser","text":"Open"}]}'::json);
+INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('tbl_nvo_mng_timeseries', 'SELECT * FROM v_edit_inp_timeseries WHERE id IS NOT NULL', 5, 'tab', 'list', '{"orderBy":"1", "orderType": "ASC"}'::json, '{"enableGlobalFilter":false,"enableStickyHeader":true,"positionToolbarAlertBanner":"bottom","enableGrouping":false,"enablePinning":true,"enableColumnOrdering":true,"enableColumnFilterModes":true,"enableFullScreenToggle":false,"enablePagination":true,"enableExporting":true,"muiTablePaginationProps":{"rowsPerPageOptions":[5,10,15,20,50,100],"showFirstButton":true,"showLastButton":true},"enableRowSelection":true,"multipleRowSelection":true,"initialState":{"showColumnFilters":false,"pagination":{"pageSize":5,"pageIndex":0},"density":"compact","columnFilters":[],"sorting":[{"id":"id","desc":true}]},"modifyTopToolBar":true,"renderTopToolbarCustomActions":[{"widgetfunction":{"functionName":"openTimeseries","params":{"initialHeight":480,"initialWidth":650,"minHeight":480,"minWidth":560,"title":"Timeseries"}},"color":"success","text":"Open","disableOnSelect":true,"moreThanOneDisable":true}],"enableRowActions":false,"renderRowActionMenuItems":[{"widgetfunction":{"functionName":"openTimeseries","params":{}},"icon":"OpenInBrowser","text":"Open"}]}'::json);
+INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('tbl_nvo_mng_lids', 'SELECT * FROM inp_lid WHERE lidco_id IS NOT NULL', 5, 'tab', 'list', '{"orderBy":"1", "orderType": "ASC"}'::json, '{"enableGlobalFilter":false,"enableStickyHeader":true,"positionToolbarAlertBanner":"bottom","enableGrouping":false,"enablePinning":true,"enableColumnOrdering":true,"enableColumnFilterModes":true,"enableFullScreenToggle":false,"enablePagination":true,"enableExporting":true,"muiTablePaginationProps":{"rowsPerPageOptions":[5,10,15,20,50,100],"showFirstButton":true,"showLastButton":true},"enableRowSelection":true,"multipleRowSelection":true,"initialState":{"showColumnFilters":false,"pagination":{"pageSize":5,"pageIndex":0},"density":"compact","columnFilters":[],"sorting":[{"id":"lidco_id","desc":true}]},"modifyTopToolBar":true,"renderTopToolbarCustomActions":[{"widgetfunction":{"functionName":"openLids","params":{"initialHeight":480,"initialWidth":650,"minHeight":480,"minWidth":560,"title":"LIDS"}},"color":"success","text":"Open","disableOnSelect":true,"moreThanOneDisable":true}],"enableRowActions":false,"renderRowActionMenuItems":[{"widgetfunction":{"functionName":"openLids","params":{}},"icon":"OpenInBrowser","text":"Open"}]}'::json);
 
 INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('epa_toolbar', 'ud', 'tbl_nvo_mng_controls', 'id', 0, true, NULL, NULL, NULL, '{
   "accessorKey": "id",
@@ -1318,7 +1318,7 @@ INSERT INTO config_toolbox (id, alias, functionparams, inputparams, observ, acti
 ]'::json, NULL, true, '{4}');
 
 -- 18/12/2024
-INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('dscenario_results', 'SELECT dscenario_id as id, name, descript, dscenario_type, parent_id, expl_id, active::TEXT, log FROM v_edit_cat_dscenario WHERE dscenario_id IS NOT NULL', 5, 'tab', 'list', '{"orderBy":"1", "orderType": "DESC"}'::json, '{
+INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('dscenario_results', 'SELECT dscenario_id as id, name, descript, dscenario_type, parent_id, expl_id, active::TEXT, log FROM v_edit_cat_dscenario WHERE dscenario_id IS NOT NULL', 5, 'tab', 'list', '{"orderBy":"1", "orderType": "ASC"}'::json, '{
   "enableGlobalFilter": false,
   "enableStickyHeader": true,
   "positionToolbarAlertBanner": "bottom",
@@ -1491,7 +1491,7 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 
 INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('dscenario_controls', 'SELECT dscenario_id AS id, sector_id, "text", active FROM inp_dscenario_controls where dscenario_id is not NULL', 5, 'tab', 'list', '{
   "orderBy": "1",
-  "orderType": "DESC"
+  "orderType": "ASC"
 }'::json, '{
   "enableGlobalFilter": false,
   "enableStickyHeader": false,
@@ -1554,7 +1554,7 @@ INSERT INTO config_form_list (listname, query_text, device, listtype, listclass,
 }'::json);
 INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('dscenario_conduit', 'SELECT dscenario_id AS id, arc_id, arccat_id, matcat_id, custom_n, barrels, culvert, kentry, kexit, kavg, flap, q0, qmax, seepage, elev1, elev2 FROM inp_dscenario_conduit where dscenario_id is not NULL', 5, 'tab', 'list', '{
   "orderBy": "1",
-  "orderType": "DESC"
+  "orderType": "ASC"
 }'::json, '{
   "enableGlobalFilter": false,
   "enableStickyHeader": false,
@@ -1617,7 +1617,7 @@ INSERT INTO config_form_list (listname, query_text, device, listtype, listclass,
 }'::json);
 INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('dscenario_raingage', 'SELECT dscenario_id AS id, rg_id, form_type, intvl, scf, rgage_type, timser_id, fname,sta, units FROM inp_dscenario_raingage where dscenario_id is not NULL', 5, 'tab', 'list', '{
   "orderBy": "1",
-  "orderType": "DESC"
+  "orderType": "ASC"
 }'::json, '{
   "enableGlobalFilter": false,
   "enableStickyHeader": false,
@@ -1680,7 +1680,7 @@ INSERT INTO config_form_list (listname, query_text, device, listtype, listclass,
 }'::json);
 INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('dscenario_junction', 'SELECT dscenario_id AS id, node_id, y0, ysur, apond, outfallparam, elev, ymax FROM inp_dscenario_junction where dscenario_id is not NULL', 5, 'tab', 'list', '{
   "orderBy": "1",
-  "orderType": "DESC"
+  "orderType": "ASC"
 }'::json, '{
   "enableGlobalFilter": false,
   "enableStickyHeader": false,
@@ -1743,7 +1743,7 @@ INSERT INTO config_form_list (listname, query_text, device, listtype, listclass,
 }'::json);
 INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('dscenario_outfall', 'SELECT dscenario_id AS id, node_id, elev, ymax, outfall_type, stage, curve_id, timser_id, gate, route_to FROM inp_dscenario_outfall  where dscenario_id is not NULL', 5, 'tab', 'list', '{
   "orderBy": "1",
-  "orderType": "DESC"
+  "orderType": "ASC"
 }'::json, '{
   "enableGlobalFilter": false,
   "enableStickyHeader": false,
@@ -1806,7 +1806,7 @@ INSERT INTO config_form_list (listname, query_text, device, listtype, listclass,
 }'::json);
 INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('dscenario_storage', 'SELECT dscenario_id AS id, node_id, elev, ymax, storage_type, curve_id, a1, a2, a0, fevap, sh, hc, imd, y0, ysur FROM inp_dscenario_storage where dscenario_id is not NULL', 5, 'tab', 'list', '{
   "orderBy": "1",
-  "orderType": "DESC"
+  "orderType": "ASC"
 }'::json, '{
   "enableGlobalFilter": false,
   "enableStickyHeader": false,
@@ -1869,7 +1869,7 @@ INSERT INTO config_form_list (listname, query_text, device, listtype, listclass,
 }'::json);
 INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('dscenario_inflows', 'SELECT dscenario_id AS id, node_id, order_id, timser_id, sfactor, base, pattern_id FROM inp_dscenario_inflows where dscenario_id is not NULL', 5, 'tab', 'list', '{
   "orderBy": "1",
-  "orderType": "DESC"
+  "orderType": "ASC"
 }'::json, '{
   "enableGlobalFilter": false,
   "enableStickyHeader": false,
@@ -1932,7 +1932,7 @@ INSERT INTO config_form_list (listname, query_text, device, listtype, listclass,
 }'::json);
 INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('dscenario_treatment', 'SELECT dscenario_id AS id, node_id, poll_id, "function" FROM inp_dscenario_treatment where dscenario_id is not NULL', 5, 'tab', 'list', '{
   "orderBy": "1",
-  "orderType": "DESC"
+  "orderType": "ASC"
 }'::json, '{
   "enableGlobalFilter": false,
   "enableStickyHeader": false,
@@ -1995,7 +1995,7 @@ INSERT INTO config_form_list (listname, query_text, device, listtype, listclass,
 }'::json);
 INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('dscenario_orifice', 'SELECT dscenario_id AS id, nodarc_id, ori_type, offsetval, cd, orate, flap, shape, geom1, geom2, geom3, geom4 FROM inp_dscenario_flwreg_orifice where dscenario_id is not NULL', 5, 'tab', 'list', '{
   "orderBy": "1",
-  "orderType": "DESC"
+  "orderType": "ASC"
 }'::json, '{
   "enableGlobalFilter": false,
   "enableStickyHeader": false,
@@ -2058,7 +2058,7 @@ INSERT INTO config_form_list (listname, query_text, device, listtype, listclass,
 }'::json);
 INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('dscenario_lids', 'SELECT dscenario_id AS id, subc_id, lidco_id, numelem, area, width, initsat, fromimp, toperv, rptfile, descript FROM inp_dscenario_lids  where dscenario_id is not NULL', 5, 'tab', 'list', '{
   "orderBy": "1",
-  "orderType": "DESC"
+  "orderType": "ASC"
 }'::json, '{
   "enableGlobalFilter": false,
   "enableStickyHeader": false,
@@ -2121,7 +2121,7 @@ INSERT INTO config_form_list (listname, query_text, device, listtype, listclass,
 }'::json);
 INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('dscenario_outlet', 'SELECT dscenario_id AS id, nodarc_id, outlet_type, offsetval, curve_id, cd1, flap, cd2 FROM inp_dscenario_flwreg_outlet where dscenario_id is not NULL', 5, 'tab', 'list', '{
   "orderBy": "1",
-  "orderType": "DESC"
+  "orderType": "ASC"
 }'::json, '{
   "enableGlobalFilter": false,
   "enableStickyHeader": false,
@@ -2184,7 +2184,7 @@ INSERT INTO config_form_list (listname, query_text, device, listtype, listclass,
 }'::json);
 INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('dscenario_pump', 'SELECT dscenario_id AS id, nodarc_id, curve_id, status, shutoff, startup FROM inp_dscenario_flwreg_pump where dscenario_id is not NULL', 5, 'tab', 'list', '{
   "orderBy": "1",
-  "orderType": "DESC"
+  "orderType": "ASC"
 }'::json, '{
   "enableGlobalFilter": false,
   "enableStickyHeader": false,
@@ -2247,7 +2247,7 @@ INSERT INTO config_form_list (listname, query_text, device, listtype, listclass,
 }'::json);
 INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('dscenario_weir', 'SELECT dscenario_id AS id, nodarc_id, weir_type, offsetval, cd, ec, cd2, flap, geom1, geom2, geom3, geom4, surcharge, road_width, coef_curve, road_surf FROM inp_dscenario_flwreg_weir where dscenario_id is not NULL', 5, 'tab', 'list', '{
   "orderBy": "1",
-  "orderType": "DESC"
+  "orderType": "ASC"
 }'::json, '{
   "enableGlobalFilter": false,
   "enableStickyHeader": false,
@@ -2310,7 +2310,7 @@ INSERT INTO config_form_list (listname, query_text, device, listtype, listclass,
 }'::json);
 INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('dscenario_poll', 'SELECT dscenario_id AS id, node_id, poll_id, timser_id, form_type, mfactor, sfactor, base, pattern_id FROM inp_dscenario_inflows_poll  where dscenario_id is not NULL', 5, 'tab', 'list', '{
   "orderBy": "1",
-  "orderType": "DESC"
+  "orderType": "ASC"
 }'::json, '{
   "enableGlobalFilter": false,
   "enableStickyHeader": false,
@@ -2680,7 +2680,7 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 
 INSERT INTO config_param_system ("parameter", value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, placeholder, standardvalue, layoutname) VALUES('psector_tab_relations_gully', '{"layouts":["lyt_relations_gully_1"]}', NULL, NULL, NULL, NULL, false, NULL, 'utils', NULL, NULL, 'string', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
-INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('relations_gully_results', 'SELECT id, gully_id, arc_id, state, doable::TEXT FROM plan_psector_x_gully', 5, 'tab', 'list', '{"orderBy":"1", "orderType": "DESC"}'::json, '{
+INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('relations_gully_results', 'SELECT id, gully_id, arc_id, state, doable::TEXT FROM plan_psector_x_gully', 5, 'tab', 'list', '{"orderBy":"1", "orderType": "ASC"}'::json, '{
   "enableGlobalFilter": false,
   "enableStickyHeader": true,
   "positionToolbarAlertBanner": "bottom",
