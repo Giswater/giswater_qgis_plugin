@@ -2680,7 +2680,7 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 
 INSERT INTO config_param_system ("parameter", value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, placeholder, standardvalue, layoutname) VALUES('psector_tab_relations_gully', '{"layouts":["lyt_relations_gully_1"]}', NULL, NULL, NULL, NULL, false, NULL, 'utils', NULL, NULL, 'string', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
-INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('relations_gully_results', 'SELECT id, gully_id, arc_id, state, doable::TEXT FROM plan_psector_x_gully', 5, 'tab', 'list', '{"orderBy":"1", "orderType": "ASC"}'::json, '{
+INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('relations_gully_results', 'SELECT id, gully_id, arc_id, state, doable::TEXT FROM plan_psector_x_gully WHERE id IS NOT NULL', 5, 'tab', 'list', '{"orderBy":"1", "orderType": "ASC"}'::json, '{
   "enableGlobalFilter": false,
   "enableStickyHeader": true,
   "positionToolbarAlertBanner": "bottom",

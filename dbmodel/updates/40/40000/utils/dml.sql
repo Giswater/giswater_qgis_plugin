@@ -1568,7 +1568,7 @@ INSERT INTO config_param_system ("parameter", value, descript, "label", dv_query
 INSERT INTO config_param_system ("parameter", value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, placeholder, standardvalue, layoutname) VALUES('psector_tab_general', '{"layouts":["lyt_general_1","lyt_general_2","lyt_general_3","lyt_general_4","lyt_general_5","lyt_general_6","lyt_general_7","lyt_general_8"]}', NULL, NULL, NULL, NULL, false, NULL, 'utils', NULL, NULL, 'string', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO config_param_system ("parameter", value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, placeholder, standardvalue, layoutname) VALUES('psector_tab_budget', '{"layouts":["lyt_budget_1","lyt_budget_2","lyt_budget_3","lyt_budget_4","lyt_budget_5","lyt_budget_6","lyt_budget_7","lyt_budget_8","lyt_budget_9","lyt_budget_10","lyt_budget_11","lyt_budget_12","lyt_budget_13","lyt_budget_14"]}', NULL, NULL, NULL, NULL, false, NULL, 'utils', NULL, NULL, 'string', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
-INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('prices_results', 'SELECT id, unit, descript, price FROM v_price_compost', 5, 'tab', 'list', '{"orderBy":"1", "orderType": "ASC"}'::json, '{
+INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('prices_results', 'SELECT id, unit, descript, price FROM v_price_compost WHERE id IS NOT NULL', 5, 'tab', 'list', '{"orderBy":"1", "orderType": "ASC"}'::json, '{
   "enableGlobalFilter": false,
   "enableStickyHeader": true,
   "positionToolbarAlertBanner": "bottom",
@@ -1690,7 +1690,7 @@ INSERT INTO config_form_list (listname, query_text, device, listtype, listclass,
     }
   ]
 }'::json);
-INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('prices_psector_results', 'SELECT id, price_id, unit, price_descript, price, measurement, observ, total_budget FROM v_edit_plan_psector_x_other', 5, 'tab', 'list', '{"orderBy":"1", "orderType": "ASC"}'::json, '{
+INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('prices_psector_results', 'SELECT id, price_id, unit, price_descript, price, measurement, observ, total_budget FROM v_edit_plan_psector_x_other WHERE id IS NOT NULL', 5, 'tab', 'list', '{"orderBy":"1", "orderType": "ASC"}'::json, '{
   "enableGlobalFilter": false,
   "enableStickyHeader": true,
   "positionToolbarAlertBanner": "bottom",
@@ -1751,7 +1751,7 @@ INSERT INTO config_form_list (listname, query_text, device, listtype, listclass,
     }
   ]
 }'::json);
-INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('relations_arc_results', 'SELECT id, arc_id, state, doable::text, addparam::text FROM plan_psector_x_arc', 5, 'tab', 'list', '{"orderBy":"1", "orderType": "ASC"}'::json, '{
+INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('relations_arc_results', 'SELECT id, arc_id, state, doable::text, addparam::text FROM plan_psector_x_arc WHERE id IS NOT NULL', 5, 'tab', 'list', '{"orderBy":"1", "orderType": "ASC"}'::json, '{
   "enableGlobalFilter": false,
   "enableStickyHeader": true,
   "positionToolbarAlertBanner": "bottom",
@@ -1811,7 +1811,7 @@ INSERT INTO config_form_list (listname, query_text, device, listtype, listclass,
     }
   ]
 }'::json);
-INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('relations_connec_results', 'SELECT id, connec_id, arc_id, state, doable::text FROM plan_psector_x_connec', 5, 'tab', 'list', '{"orderBy":"1", "orderType": "ASC"}'::json, '{
+INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('relations_connec_results', 'SELECT id, connec_id, arc_id, state, doable::text FROM plan_psector_x_connec WHERE id IS NOT NULL', 5, 'tab', 'list', '{"orderBy":"1", "orderType": "ASC"}'::json, '{
   "enableGlobalFilter": false,
   "enableStickyHeader": true,
   "positionToolbarAlertBanner": "bottom",
@@ -1871,7 +1871,7 @@ INSERT INTO config_form_list (listname, query_text, device, listtype, listclass,
     }
   ]
 }'::json);
-INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('relations_node_results', 'SELECT id, node_id, state, doable::text, addparam::text FROM plan_psector_x_node', 5, 'tab', 'list', '{"orderBy":"1", "orderType": "ASC"}'::json, '{
+INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('relations_node_results', 'SELECT id, node_id, state, doable::text, addparam::text FROM plan_psector_x_node WHERE id IS NOT NULL', 5, 'tab', 'list', '{"orderBy":"1", "orderType": "ASC"}'::json, '{
   "enableGlobalFilter": false,
   "enableStickyHeader": true,
   "positionToolbarAlertBanner": "bottom",
