@@ -1793,9 +1793,10 @@ class GwInfo(QObject):
             return False
 
         if _json != '' and str(_json) != '{}':
-            if not generic and self._has_elev_and_y_json(_json):
-                tools_qt.set_action_checked("actionEdit", True, dialog)
-                return False
+            if global_vars.project_type == 'ud':
+                if not generic and self._has_elev_and_y_json(_json):
+                    tools_qt.set_action_checked("actionEdit", True, dialog)
+                    return False
 
             # If we create a new feature
             if self.new_feature_id is not None:
