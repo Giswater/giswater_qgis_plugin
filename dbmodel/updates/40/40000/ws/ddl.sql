@@ -1172,3 +1172,12 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"sector", "
 
 -- 04/03/2025
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_valve", "column":"active"}}$$);
+
+
+-- 05/03/2025
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"presszone", "column":"lock_level", "dataType":"int4", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dqa", "column":"lock_level", "dataType":"int4", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"macrodqa", "column":"lock_level", "dataType":"int4", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"supplyzone", "column":"lock_level", "dataType":"int4", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dma", "column":"lock_level", "dataType":"int4", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sector", "column":"lock_level", "dataType":"int4", "isUtils":"False"}}$$);

@@ -267,3 +267,10 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"config_use
 DROP VIEW IF EXISTS v_edit_macrosector;
 DROP RULE IF EXISTS undelete_macrosector ON macrosector;
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"macrosector", "column":"undelete"}}$$);
+
+
+-- 05/03/2025
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sector", "column":"lock_level", "dataType":"int4", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"macrosector", "column":"lock_level", "dataType":"int4", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dma", "column":"lock_level", "dataType":"int4", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"macrodma", "column":"lock_level", "dataType":"int4", "isUtils":"False"}}$$);

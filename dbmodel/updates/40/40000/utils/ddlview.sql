@@ -219,6 +219,7 @@ DROP VIEW IF EXISTS vu_dma;
 DROP VIEW IF EXISTS v_edit_plan_netscenario_presszone;
 DROP VIEW IF EXISTS v_edit_dqa;
 DROP VIEW IF EXISTS v_ui_dqa;
+DROP VIEW IF EXISTS v_edit_macrodqa;
 DROP VIEW IF EXISTS vu_dqa;
 
 DROP VIEW IF EXISTS v_state_arc;

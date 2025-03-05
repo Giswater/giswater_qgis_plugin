@@ -1479,7 +1479,8 @@ AS SELECT p.presszone_id,
     p.the_geom,
     p.muni_id,
     p.expl_id,
-    p.sector_id
+    p.sector_id,
+    p.lock_level
    FROM presszone p,
     selector_expl
   WHERE selector_expl.expl_id = ANY(p.expl_id) AND selector_expl.cur_user = "current_user"()::text OR p.expl_id IS NULL
@@ -1507,7 +1508,8 @@ AS SELECT d.dma_id,
     d.the_geom,
     d.muni_id,
     d.expl_id,
-    d.sector_id
+    d.sector_id,
+    d.lock_level
    FROM dma d,
     selector_expl
   WHERE selector_expl.expl_id = ANY(d.expl_id) AND selector_expl.cur_user = "current_user"()::text OR d.expl_id IS NULL
@@ -1533,7 +1535,8 @@ CREATE OR REPLACE VIEW v_edit_supplyzone
 	  s.the_geom,
     s.muni_id,
     s.expl_id,
-    et.idval
+    et.idval,
+    s.lock_level
    FROM selector_supplyzone,
     supplyzone s
     LEFT JOIN macrosector ms ON ms.macrosector_id = s.macrosector_id
@@ -1559,7 +1562,8 @@ AS SELECT d.dqa_id,
     d.the_geom,
     d.muni_id,
     d.expl_id,
-    d.sector_id
+    d.sector_id,
+    d.lock_level
    FROM dqa d,
     selector_expl
   WHERE selector_expl.expl_id = ANY(d.expl_id) AND selector_expl.cur_user = "current_user"()::text OR d.expl_id IS NULL
@@ -5187,6 +5191,18 @@ CREATE OR REPLACE VIEW v_ui_macrodma
 	WHERE macrodma_id > 0 AND m.expl_id = s.expl_id AND s.cur_user = "current_user"()::text
   ORDER BY m.macrodma_id;
 
+CREATE OR REPLACE VIEW v_ui_macrodqa
+ AS
+ SELECT m.macrodqa_id,
+  m.name,
+	m.descript,
+  m.active,
+	m.expl_id
+   FROM selector_expl s,
+    macrodqa m
+	WHERE macrodqa_id > 0 AND m.expl_id = s.expl_id AND s.cur_user = "current_user"()::text
+  ORDER BY m.macrodqa_id;
+
 
 CREATE OR REPLACE VIEW v_ui_macrosector
   AS
@@ -5271,7 +5287,8 @@ AS SELECT s.sector_id,
     s.the_geom,
     s.muni_id,
     s.expl_id,
-    et.idval
+    et.idval,
+    s.lock_level
    FROM sector s
    LEFT JOIN edit_typevalue et ON et.id::text = s.sector_type::text AND et.typevalue::text = 'sector_type'::text,
     selector_sector ss
@@ -5367,7 +5384,8 @@ CREATE OR REPLACE VIEW v_edit_macrosector
 AS SELECT DISTINCT ON (macrosector_id) macrosector_id,
     m.name,
     m.descript,
-    m.the_geom
+    m.the_geom,
+    m.lock_level
    FROM selector_sector ss, macrosector m LEFT JOIN sector s USING (macrosector_id)
    WHERE (ss.sector_id = s.sector_id AND cur_user = current_user OR s.macrosector_id IS NULL)
    AND m.active IS true;
@@ -5378,10 +5396,20 @@ AS SELECT DISTINCT ON (macrodma_id) macrodma_id,
     m.name,
     m.descript,
     m.the_geom,
-    m.expl_id
+    m.expl_id,
+    m.lock_level
    FROM selector_expl ss, macrodma m
     WHERE m.expl_id = ss.expl_id AND ss.cur_user = "current_user"()::text AND m.active IS true;
 
+CREATE OR REPLACE VIEW v_edit_macrodqa
+AS SELECT DISTINCT ON (macrodqa_id) macrodqa_id,
+    m.name,
+    m.descript,
+    m.the_geom,
+    m.expl_id,
+    m.lock_level
+   FROM selector_expl ss, macrodqa m
+    WHERE m.expl_id = ss.expl_id AND ss.cur_user = "current_user"()::text AND m.active IS true;
 
 CREATE OR REPLACE VIEW v_edit_macroexploitation
 AS SELECT DISTINCT ON (macroexpl_id) m.*

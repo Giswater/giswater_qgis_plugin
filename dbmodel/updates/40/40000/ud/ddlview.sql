@@ -121,7 +121,7 @@ CREATE OR REPLACE VIEW v_edit_macrodma AS
     macrodma.descript,
     macrodma.the_geom,
     macrodma.expl_id,
-    macrodma.active
+    macrodma.lock_level
    FROM selector_expl, macrodma
   WHERE macrodma.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
 
@@ -137,15 +137,27 @@ AS SELECT
     dma.link,
     dma.graphconfig::text,
     dma.active,
-    dma.stylesheet,
-    dma.the_geom
+    dma.stylesheet
     FROM dma
     LEFT JOIN exploitation e USING (expl_id)
     ORDER BY 1;
 
-CREATE OR REPLACE VIEW v_edit_dma AS
-select vu_dma.* from vu_dma, selector_expl
-WHERE ((vu_dma.expl_id = selector_expl.expl_id) AND selector_expl.cur_user = "current_user"()::text) OR vu_dma.expl_id is null
+CREATE OR REPLACE VIEW v_edit_dma
+AS SELECT d.dma_id,
+    d.name,
+    d.macrodma_id,
+    d.dma_type,
+    d.expl_id,
+    e.name as expl_name,
+    d.descript,
+    d.link,
+    d.graphconfig,
+    d.stylesheet,
+    d.the_geom,
+    d.lock_level
+FROM dma d, selector_expl
+LEFT JOIN exploitation e USING (expl_id)
+WHERE ((d.expl_id = selector_expl.expl_id) AND selector_expl.cur_user = "current_user"()::text) OR d.expl_id is null
 order by 1 asc;
 
 CREATE OR REPLACE VIEW v_edit_sector
@@ -162,7 +174,8 @@ AS SELECT s.sector_id,
     s.lastupdate,
     s.lastupdate_user,
     s.link,
-    s.the_geom
+    s.the_geom,
+    s.lock_level
    FROM selector_sector,
     sector s
   WHERE s.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
@@ -509,7 +522,8 @@ AS SELECT d.drainzone_id,
     d.lastupdate_user,
     d.link,
     d.the_geom,
-    d.expl_id
+    d.expl_id,
+    d.lock_level
    FROM selector_expl,
     drainzone d
     LEFT JOIN edit_typevalue et ON et.id::text = d.drainzone_type::text AND et.typevalue::text = 'drainzone_type'::text
@@ -528,7 +542,8 @@ AS SELECT d.dwfzone_id,
     d.lastupdate_user,
     d.link,
     d.the_geom,
-    d.expl_id
+    d.expl_id,
+    d.lock_level
    FROM selector_expl e,
     dwfzone d
     LEFT JOIN edit_typevalue et ON et.id::text = d.dwfzone_type::text AND et.typevalue::text = 'dwfzone_type'::text
@@ -6980,12 +6995,23 @@ AS SELECT m.macrosector_id,
     WHERE m.macrosector_id > 0
     ORDER BY m.macrosector_id;
 
+CREATE OR REPLACE VIEW v_ui_macrodma
+AS SELECT m.macrodma_id,
+    m.name,
+    m.expl_id,
+    m.descript,
+    m.active
+    FROM macrodma m
+    WHERE m.macrodma_id > 0
+    ORDER BY m.macrodma_id;
+
 DROP VIEW IF EXISTS v_edit_macrosector;
 CREATE OR REPLACE VIEW v_edit_macrosector AS
  SELECT DISTINCT ON (m.macrosector_id) m.macrosector_id,
     m.name,
     m.descript,
-    m.the_geom
+    m.the_geom,
+    m.lock_level
    FROM selector_sector, sector
      JOIN macrosector m ON m.macrosector_id = sector.macrosector_id
   WHERE sector.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;

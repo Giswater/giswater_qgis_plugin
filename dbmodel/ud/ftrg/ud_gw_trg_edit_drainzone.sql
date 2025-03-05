@@ -41,9 +41,9 @@ BEGIN
 			END IF;
 		END IF;
 
-		INSERT INTO drainzone (drainzone_id, "name", expl_id, descript, link, graphconfig, stylesheet, drainzone_type)
+		INSERT INTO drainzone (drainzone_id, "name", expl_id, descript, link, graphconfig, stylesheet, drainzone_type, lock_level)
 		VALUES (NEW.drainzone_id, NEW.name, NEW.expl_id, NEW.descript,
-		NEW.link, NEW.graphconfig::json, NEW.stylesheet::json, NEW.drainzone_type);
+		NEW.link, NEW.graphconfig::json, NEW.stylesheet::json, NEW.drainzone_type, NEW.lock_level);
 
 		IF view_name = 'UI' THEN
 			UPDATE drainzone SET active = NEW.active WHERE drainzone_id = NEW.drainzone_id;
@@ -60,7 +60,7 @@ BEGIN
 		UPDATE drainzone
 		SET drainzone_id=NEW.drainzone_id, name=NEW.name, expl_id=NEW.expl_id, descript=NEW.descript,
 		link=NEW.link, graphconfig=NEW.graphconfig::json, stylesheet=NEW.stylesheet::json, lastupdate=now(),
-		lastupdate_user = current_user, drainzone_type=NEW.drainzone_type
+		lastupdate_user = current_user, drainzone_type=NEW.drainzone_type, lock_level=NEW.lock_level
 		WHERE drainzone_id=OLD.drainzone_id;
 
 		IF view_name = 'UI' THEN

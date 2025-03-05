@@ -971,3 +971,9 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"dma", "col
 
 DROP RULE IF EXISTS undelete_macrodma ON macrodma;
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"macrodma", "column":"undelete"}}$$);
+
+
+-- 05/03/2025
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"drainzone", "column":"lock_level", "dataType":"int4", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dwfzone", "column":"lock_level", "dataType":"int4", "isUtils":"False"}}$$);

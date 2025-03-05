@@ -10,11 +10,13 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_dma()  RETURNS trigger AS
 $BODY$
 
 DECLARE 
-
+view_name TEXT;
 
 BEGIN
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
+
+	view_name = TG_ARGV[0];
 	
 	IF TG_OP = 'INSERT' THEN
 		
@@ -22,31 +24,51 @@ BEGIN
 		IF ((SELECT COUNT(*) FROM exploitation WHERE active IS TRUE) = 0) THEN
 			RETURN NULL;				
 		END IF;
-		IF NEW.the_geom IS NOT NULL THEN
-			IF NEW.expl_id IS NULL THEN
-				NEW.expl_id := (SELECT expl_id FROM exploitation WHERE active IS TRUE AND 
-				ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
+
+		IF view_name = 'EDIT'THEN
+			IF NEW.the_geom IS NOT NULL THEN
+				IF NEW.expl_id IS NULL THEN
+					NEW.expl_id := (SELECT expl_id FROM exploitation WHERE active IS TRUE AND ST_DWithin(NEW.the_geom, exploitation.the_geom,0.001) LIMIT 1);
+				END IF;
 			END IF;
 		END IF;
 
 		-- active
-		IF NEW.active IS NULL THEN
-			NEW.active = TRUE;
+		IF view_name = 'UI'THEN
+			IF NEW.active IS NULL THEN
+				NEW.active = TRUE;
+			END IF;
 		END IF;
 			
-		INSERT INTO dma (dma_id, name, descript, macrodma_id, the_geom, expl_id, link, active, stylesheet, dma_type, graphconfig)
-		VALUES (NEW.dma_id, NEW.name, NEW.descript, NEW.macrodma_id, NEW.the_geom, NEW.expl_id, NEW.link, NEW.active, NEW.stylesheet,
-		NEW.dma_type, NEW.graphconfig::json);
+		INSERT INTO dma (dma_id, name, descript, macrodma_id, expl_id, link, stylesheet, dma_type, graphconfig, lock_level)
+		VALUES (NEW.dma_id, NEW.name, NEW.descript, NEW.macrodma_id, NEW.expl_id, NEW.link, NEW.stylesheet,
+		NEW.dma_type, NEW.graphconfig::json, NEW.lock_level);
+
+		IF view_name = 'UI' THEN
+			UPDATE dma SET active = NEW.active WHERE dma_id = NEW.dma_id;
+
+		ELSIF view_name = 'EDIT' THEN
+			UPDATE dma SET the_geom = NEW.the_geom WHERE dma_id = NEW.dma_id;
+
+		END IF;
 
 		RETURN NEW;
 		
 	ELSIF TG_OP = 'UPDATE' THEN
    	
 		UPDATE dma 
-		SET dma_id=NEW.dma_id, name=NEW.name, descript=NEW.descript, the_geom=NEW.the_geom, expl_id=NEW.expl_id, 
-		link=NEW.link, active=NEW.active, lastupdate=now(), lastupdate_user = current_user, macrodma_id = NEW.macrodma_id, stylesheet=NEW.stylesheet, 
-		dma_type=NEW.dma_type, graphconfig=NEW.graphconfig::json
+		SET dma_id=NEW.dma_id, name=NEW.name, descript=NEW.descript, expl_id=NEW.expl_id, 
+		link=NEW.link, lastupdate=now(), lastupdate_user = current_user, macrodma_id = NEW.macrodma_id, stylesheet=NEW.stylesheet, 
+		dma_type=NEW.dma_type, graphconfig=NEW.graphconfig::json, lock_level=NEW.lock_level
 		WHERE dma_id=OLD.dma_id;
+
+		IF view_name = 'UI' THEN
+			UPDATE dma SET active = NEW.active WHERE dma_id = OLD.dma_id;
+
+		ELSIF view_name = 'EDIT' THEN
+			UPDATE dma SET the_geom = NEW.the_geom WHERE dma_id = OLD.dma_id;
+
+		END IF;
 		
 		RETURN NEW;
 		

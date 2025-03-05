@@ -13,8 +13,8 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 SELECT plan(6);
 
 
-INSERT INTO v_edit_macrodma (macrodma_id, "name", descript, the_geom, expl_id, active)
-VALUES(-901, 'Undefined', NULL, NULL, 0, true);
+INSERT INTO v_edit_macrodma (macrodma_id, "name", descript, the_geom, expl_id)
+VALUES(-901, 'Undefined', NULL, NULL, 0);
 
 
 

@@ -118,12 +118,27 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_dscenario('INLET');
 CREATE TRIGGER gw_trg_edit_inp_node_inlet INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_inlet
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_node('inp_inlet');
 
+CREATE TRIGGER gw_trg_edit_controls AFTER DELETE OR UPDATE
+ON presszone FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_controls('presszone_id');
+
+CREATE TRIGGER gw_trg_edit_controls AFTER DELETE OR UPDATE
+ON dqa FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_controls('dqa_id');
+
+CREATE TRIGGER gw_trg_edit_controls AFTER DELETE OR UPDATE
+ON macrodqa FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_controls('macrodqa_id');
+
+CREATE TRIGGER gw_trg_edit_controls AFTER DELETE OR UPDATE
+ON supplyzone FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_controls('supplyzone_id');
+
 
 CREATE TRIGGER gw_trg_edit_link INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_link
 FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_link();
 
 CREATE TRIGGER gw_trg_v_ui_supplyzone INSTEAD OF INSERT OR DELETE OR UPDATE
 ON v_edit_supplyzone FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_supplyzone('EDIT');
+
+CREATE TRIGGER gw_trg_v_ui_macrodqa INSTEAD OF INSERT OR DELETE OR UPDATE
+ON v_edit_macrodqa FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_macrodqa('EDIT');
 
 CREATE TRIGGER gw_trg_edit_sector INSTEAD OF INSERT OR DELETE OR UPDATE
 ON v_edit_sector FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_sector('EDIT');
@@ -230,6 +245,9 @@ ON v_ui_supplyzone FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_supplyzone('UI');
 
 CREATE TRIGGER gw_trg_v_ui_macrodma INSTEAD OF INSERT OR DELETE OR UPDATE
 ON v_ui_macrodma FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_macrodma('UI');
+
+CREATE TRIGGER gw_trg_v_ui_macrodqa INSTEAD OF INSERT OR DELETE OR UPDATE
+ON v_ui_macrodqa FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_macrodqa('UI');
 
 CREATE TRIGGER gw_trg_v_ui_macrosector INSTEAD OF INSERT OR DELETE OR UPDATE
 ON v_ui_macrosector FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_macrosector('UI');
