@@ -5,17 +5,16 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-import os
 import re
 import psycopg2
 import psycopg2.extras
-import subprocess
 from functools import partial
-import time
 
 from ..ui.ui_manager import GwSchemaI18NUpdateUi
 from ..utils import tools_gw
-from ...libs import lib_vars, tools_qt, tools_qgis, tools_db
+from ...libs import lib_vars, tools_qt, tools_qgis, tools_db,tools_log, tools_os
+from qgis.PyQt.QtWidgets import QLabel
+from PyQt5.QtWidgets import QApplication
 
 
 class GwSchemaI18NUpdate:
@@ -62,7 +61,6 @@ class GwSchemaI18NUpdate:
     def _set_signals(self):
         # Mysteriously without the partial the function check_connection is not called
         self.dlg_qm.btn_connection.clicked.connect(partial(self._check_connection))
-        self.dlg_qm.btn_connection_dest.clicked.connect(partial(self._check_connection_dest))
         self.dlg_qm.btn_connection.clicked.connect(partial(self._populate_cmb_language))
         self.dlg_qm.btn_translate.clicked.connect(self.schema_i18n_update)
         self.dlg_qm.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_qm))
@@ -97,25 +95,6 @@ class GwSchemaI18NUpdate:
             self.dlg_qm.btn_translate.setEnabled(False)
             tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', self.last_error)
             return
-
-    def _check_connection_dest(self):
-        """ Check connection to database """
-        # Connection with destiny db
-        self.dlg_qm.lbl_info.clear()
-        self._close_db_dest()
-        #Connect to the desttiny datbase
-        host_dest = tools_qt.get_text(self.dlg_qm, self.dlg_qm.txt_host_dest)
-        port_dest = tools_qt.get_text(self.dlg_qm, self.dlg_qm.txt_port_dest)
-        db_dest = tools_qt.get_text(self.dlg_qm, self.dlg_qm.txt_db_dest)
-        user_dest = tools_qt.get_text(self.dlg_qm, self.dlg_qm.txt_user_dest)
-        password_dest = tools_qt.get_text(self.dlg_qm, self.dlg_qm.txt_pass_dest)
-        status_dest = self._init_db_dest(host_dest, port_dest, db_dest, user_dest, password_dest)
-        #Send messages
-        if not status_dest:
-            tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', self.last_error)
-            return
-        
-        tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', f'Connected to {host_dest}')
         
     def _populate_cmb_language(self):
         """ Populate combo with languages values """
@@ -167,9 +146,11 @@ class GwSchemaI18NUpdate:
         self.project_type_selected = tools_qt.get_text(self.dlg_qm, widget)
 
     def schema_i18n_update(self):
+        """ Main program to run the the shcmea_i18n_update """
+
         #Connect in case of repeated actions
         self._check_connection()
-        self._check_connection_dest()
+        self.cursor_dest = tools_db.dao.get_cursor()
         #Initalize the language and the message (for errors,etc)
         self.language = tools_qt.get_combo_value(self.dlg_qm, self.dlg_qm.cmb_language, 0)
         self.lower_lang = self.language.lower()
@@ -190,13 +171,15 @@ class GwSchemaI18NUpdate:
             msg += f'. There have been errors translating: {', '.join(errors)}'
         
         #Close connections
-        self._close_db_dest()
         self._close_db()
+        self._close_db_dest()
 
+        self.dlg_qm.lbl_info.clear()
         tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', msg)
+        tools_qt.show_info_box(msg)
 
     def _copy_db_files(self):
-        """ Read the values of the database and generate the ts and qm files """
+        """ Read the values of the database and update the ones in the project """
 
         # On the database, the dialog_name column must match the name of the ui file (no extension).
         # Also, open_dialog function must be called, passed as parameter dlg_name = 'ui_file_name_without_extension'
@@ -237,10 +220,14 @@ class GwSchemaI18NUpdate:
         #Get db_feature values
 
     def _get_dbdialog_values(self):
-        """ Get db dialog values """
-
+        """ Get dbdialog values """
+        if self.lower_lang == 'en_us':
+            sql = (f"SELECT source, formname, formtype, project_type, context, lb_en_us, tt_en_us "
+               f"FROM i18n.dbdialog "
+               f"ORDER BY context, formname;")
         # Make the query
-        sql = (f"SELECT source, formname, formtype, project_type, context, lb_en_us, lb_{self.lower_lang}, auto_lb_{self.lower_lang}, tt_en_us, "
+        else:
+            sql = (f"SELECT source, formname, formtype, project_type, context, lb_en_us, lb_{self.lower_lang}, auto_lb_{self.lower_lang}, tt_en_us, "
                f"tt_{self.lower_lang}, auto_tt_{self.lower_lang} "
                f"FROM i18n.dbdialog "
                f"ORDER BY context, formname;")
@@ -248,7 +235,9 @@ class GwSchemaI18NUpdate:
 
         # Update the part the of the program in process
         self.dlg_qm.lbl_info.clear()
-        tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', f"Updating db_dialog...")
+        msg = f"Updating db_dialog..."
+        tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', msg)
+        QApplication.processEvents()
         
         # Return the corresponding information
         if not rows:
@@ -269,7 +258,8 @@ class GwSchemaI18NUpdate:
                 #Define the label taking into account the different possibilities by priority level
                 label = db_dialog[f'lb_{self.lower_lang}']
                 if label is None:
-                    label = db_dialog[f'auto_lb_{self.lower_lang}']
+                    if self.lower_lang != 'en_us':
+                        label = db_dialog[f'auto_lb_{self.lower_lang}']
                     if label is None:
                         label = db_dialog['lb_en_us']
                         if label is None:
@@ -279,8 +269,9 @@ class GwSchemaI18NUpdate:
                 #Define the tooltip taking into account the different possibilities by priority level
                 tooltip = db_dialog[f'tt_{self.lower_lang}']
                 if tooltip is None:
-                    tooltip = db_dialog[f'auto_tt_{self.lower_lang}']
-                    if tooltip is None:
+                    if self.lower_lang != 'en_us':
+                        tooltip = db_dialog[f'auto_tt_{self.lower_lang}']
+                    if tooltip is None :
                         tooltip = db_dialog['tt_en_us']
                         if tooltip is None:
                             tooltip = db_dialog['lb_en_us']
@@ -296,7 +287,7 @@ class GwSchemaI18NUpdate:
                     #Avoid sql problems with config_form_fields
                     sql_1 = f"UPDATE {self.schema}.config_param_system SET value = TRUE WHERE parameter = 'admin_config_control_trigger'"
                     self.cursor_dest.execute(sql_1)
-                    self.conn_dest.commit()
+                    self._commit_dest
 
                     # Main query
                     sql_text = (f"UPDATE {self.schema}.{db_dialog['context']} SET label = '{label}', tooltip = '{tooltip}' "
@@ -307,7 +298,7 @@ class GwSchemaI18NUpdate:
                     #Return config_form_fields to normal
                     sql_2 = f"UPDATE {self.schema}.config_param_system SET value = FALSE WHERE parameter = 'admin_config_control_trigger'"
                     self.cursor_dest.execute(sql_2)
-                    self.conn_dest.commit()
+                    self._commit_dest()
 
                 elif db_dialog['context'] == 'sys_param_user':
                     sql_text = (f"UPDATE {self.schema}.{db_dialog['context']} SET label = '{label}', descript = '{tooltip}' "
@@ -325,16 +316,21 @@ class GwSchemaI18NUpdate:
                 #Execute the corresponding query
                 try:
                     self.cursor_dest.execute(sql_text)
-                    self.conn_dest.commit()
+                    self._commit_dest()
                 except Exception as e:
                     print(e)
-                    self.conn_dest.rollback()
+                    tools_db.dao.rollback()
                     break
     
     def _get_dbmessages_values(self):
         """ Get db messages values """
         # Make the query
-        sql = (f"SELECT source, project_type, context, ms_en_us, ms_{self.lower_lang}, auto_ms_{self.lower_lang}, ht_en_us, ht_{self.lower_lang}, auto_ht_{self.lower_lang}"
+        if self.lower_lang == 'en_us':
+            sql = (f"SELECT source, project_type, context, ms_en_us, ht_en_us"
+               f" FROM i18n.dbmessage "
+               f" ORDER BY project_type;")
+        else:
+            sql = (f"SELECT source, project_type, context, ms_en_us, ms_{self.lower_lang}, auto_ms_{self.lower_lang}, ht_en_us, ht_{self.lower_lang}, auto_ht_{self.lower_lang}"
                f" FROM i18n.dbmessage "
                f" ORDER BY project_type;")
         rows = self._get_rows(sql, self.cursor_org)
@@ -342,6 +338,7 @@ class GwSchemaI18NUpdate:
         # Update the part the of the program in process
         self.dlg_qm.lbl_info.clear()
         tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', f"Updating db_messages...")
+        QApplication.processEvents()
 
         # Return the corresponding information
         if not rows:
@@ -359,7 +356,8 @@ class GwSchemaI18NUpdate:
                 #Define the error_ms taking into account the different possibilities by priority level
                 error_ms = db_message[f'ms_{self.lower_lang}']
                 if error_ms is None:
-                    error_ms = db_message[f'auto_ms_{self.lower_lang}']
+                    if self.lower_lang != 'en_us':
+                        error_ms = db_message[f'auto_ms_{self.lower_lang}']
                     if error_ms is None:
                         error_ms = db_message['ms_en_us']
                         if error_ms is None:
@@ -367,7 +365,8 @@ class GwSchemaI18NUpdate:
                 #Define the hint_ms taking into account the different possibilities by priority level
                 hint_ms = db_message[f'ht_{self.lower_lang}']
                 if hint_ms is None:
-                    hint_ms = db_message[f'auto_ht_{self.lower_lang}']
+                    if self.lower_lang != 'en_us':
+                        hint_ms = db_message[f'auto_ht_{self.lower_lang}']
                     if hint_ms is None:
                         hint_ms = db_message['ht_en_us']
                         if hint_ms is None:
@@ -383,21 +382,28 @@ class GwSchemaI18NUpdate:
                         f"SET error_message = '{error_ms}',  hint_message = '{hint_ms}'"
                         f"WHERE id = '{source}'")
                     self.cursor_dest.execute(sql)
-                    self.conn_dest.commit()
+                    self._commit_dest()
                 except Exception as e:
-                    self.conn_dest.rollback()
+                    tools_db.dao.rollback()
                     break
     
     def _get_dbfprocess_values(self):
         """ Get db messages values """
         # Make the query
-        sql = (f"SELECT source, project_type, context, ex_en_us, ex_{self.lower_lang}, auto_ex_{self.lower_lang}, in_en_us, in_{self.lower_lang}, auto_in_{self.lower_lang}"
+        if self.lower_lang == 'en_us':
+            sql = (f"SELECT source, project_type, context, ex_en_us, in_en_us"
                f" FROM i18n.dbfprocess "
-               f" ORDER BY context;")
+               f"ORDER BY context;")
+        else:
+            sql = (f"SELECT source, project_type, context, ex_en_us, ex_{self.lower_lang}, auto_ex_{self.lower_lang}, in_en_us, in_{self.lower_lang}, auto_in_{self.lower_lang}"
+               f" FROM i18n.dbfprocess "
+               f"ORDER BY context;")
         rows = self._get_rows(sql, self.cursor_org)
         # Update the part the of the program in process
         self.dlg_qm.lbl_info.clear()
         tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', f"Updating db_fprocess...")
+        QApplication.processEvents()
+
 
         # Return the corresponding information
         if not rows:
@@ -415,7 +421,8 @@ class GwSchemaI18NUpdate:
                 #Define the ex_msg taking into account the different possibilities by priority level
                 ex_msg = db_fprocess[f'ex_{self.lower_lang}']
                 if ex_msg is None:
-                    ex_msg = db_fprocess[f'auto_ex_{self.lower_lang}']
+                    if self.lower_lang != 'en_us':
+                        ex_msg = db_fprocess[f'auto_ex_{self.lower_lang}']
                     if ex_msg is None:
                         ex_msg = db_fprocess['ex_en_us']
                         if ex_msg is None:
@@ -423,7 +430,8 @@ class GwSchemaI18NUpdate:
                 #Define the in_msg taking into account the different possibilities by priority level
                 in_msg = db_fprocess[f'in_{self.lower_lang}']
                 if in_msg is None:
-                    in_msg = db_fprocess[f'auto_in_{self.lower_lang}']
+                    if self.lower_lang != 'en_us':
+                        in_msg = db_fprocess[f'auto_in_{self.lower_lang}']
                     if in_msg is None:
                         in_msg = db_fprocess['in_en_us']
                         if in_msg is None:
@@ -439,9 +447,9 @@ class GwSchemaI18NUpdate:
                         f"SET except_msg = '{ex_msg}', info_msg = '{in_msg}' "
                         f"WHERE fid = '{source}'")
                     self.cursor_dest.execute(sql)
-                    self.conn_dest.commit()
+                    self._commit_dest()
                 except Exception as e:
-                    self.conn_dest.rollback()
+                    tools_db.dao.rollback()
                     break
 
     def _save_user_values(self):
@@ -519,18 +527,6 @@ class GwSchemaI18NUpdate:
         except psycopg2.DatabaseError as e:
             self.last_error = e
             return False
-    
-    def _init_db_dest(self, host, port, db, user, password):
-        """Initializes database connection"""
-
-        try:
-            self.conn_dest = psycopg2.connect(database=db, user=user, port=port, password=password, host=host)
-            self.cursor_dest = self.conn_dest.cursor(cursor_factory=psycopg2.extras.DictCursor)
-        
-            return True
-        except psycopg2.DatabaseError as e:
-            self.last_error = e
-            return False
 
     def _close_db(self):
         """ Close database connection """
@@ -554,10 +550,7 @@ class GwSchemaI18NUpdate:
             status = True
             if self.cursor_dest:
                 self.cursor_dest.close()
-            if self.conn_dest:
-                self.conn_dest.close()
             del self.cursor_dest
-            del self.conn_dest
         except Exception as e:
             self.last_error = e
             status = False
@@ -571,7 +564,7 @@ class GwSchemaI18NUpdate:
 
     def _commit_dest(self):
         """ Commit current database transaction """
-        self.conn_dest.commit()
+        tools_db.dao.commit()
 
     def _rollback(self):
         """ Rollback current database transaction """

@@ -37,6 +37,7 @@ from ..utils import tools_gw
 from ... import global_vars
 from .i18n_generator import GwI18NGenerator
 from .schema_i18n_update import GwSchemaI18NUpdate
+from .i18n_manager import GwSchemaI18NManager
 from .import_osm import GwImportOsm
 from ...libs import lib_vars, tools_qt, tools_qgis, tools_log, tools_db, tools_os
 from ..ui.docker import GwDocker
@@ -921,6 +922,8 @@ class GwAdminButton:
 
         self.dlg_readsql.btn_create_cm.clicked.connect(partial(self._open_create_cm_project))
 
+        self.dlg_readsql.btn_i18n.clicked.connect(partial(self._i18n_manager))
+
 
     def _manage_translations(self):
         """ Initialize the translation functionalities """
@@ -937,6 +940,12 @@ class GwAdminButton:
         qm_i18n_up.init_dialog()
         dict_info = tools_gw.get_project_info(self._get_schema_name())
         qm_i18n_up.pass_schema_info(dict_info, self._get_schema_name())
+
+    def _i18n_manager(self):
+        """ Initialize the i18n functionalities """
+
+        qm_i18n_manager = GwSchemaI18NManager()
+        qm_i18n_manager.init_dialog()
 
 
     def _import_osm(self):

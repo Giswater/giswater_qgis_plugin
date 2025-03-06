@@ -81,9 +81,9 @@ class GwI18NGenerator:
         sql = "SELECT id, idval FROM i18n.cat_language"
         rows = self._get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_qm.cmb_language, rows)
-        language = tools_gw.get_config_parser('i18n_generator', 'qm_lang_language', "user", "session", False)
+        language = tools_gw.get_config_parser('i18n_generator', 'qm_lang_language', "user", "init", False)
 
-        tools_qt.set_combo_value(self.dlg_qm.cmb_language, language, 0, add_new=False)
+        tools_qt.set_combo_value(self.dlg_qm.cmb_language, language, 0)
 
 
     def _check_translate_options(self):
@@ -120,11 +120,11 @@ class GwI18NGenerator:
                 msg += "Database translation canceled\n"
 
         if refresh_i18n:
-            status_i18n_msg = self._create_i18n_files()
+            status_i18n_msg, table = self._create_i18n_files()
             if status_i18n_msg is True:
                 msg += "Database i18n translation successful\n"
             elif status_i18n_msg is False:
-                msg += "Database i18n translation failed\n"
+                msg += f"Database i18n translation failed in {table}\n"
             elif status_i18n_msg is None:
                 msg += "Database i18n translation canceled\n"
 
@@ -143,15 +143,15 @@ class GwI18NGenerator:
         key_message = f'ms_{self.lower_lang}'
 
         # Get python messages values
-        sql = f"SELECT source, ms_en_us, {key_message} FROM i18n.pymessage;"
+        sql = f"SELECT source, ms_en_us, {key_message}, auto_{key_message} FROM i18n.pymessage;" # ADD new columns
         py_messages = self._get_rows(sql)
 
         # Get python toolbars and buttons values
-        sql = f"SELECT source, lb_en_us, {key_label} FROM i18n.pytoolbar;"
+        sql = f"SELECT source, lb_en_us, {key_label}, auto_{key_label} FROM i18n.pytoolbar;"
         py_toolbars = self._get_rows(sql)
 
         # Get python dialog values
-        sql = (f"SELECT dialog_name, source, lb_en_us, {key_label}, tt_en_us, {key_tooltip} "
+        sql = (f"SELECT dialog_name, source, lb_en_us, {key_label}, auto_{key_label}, tt_en_us, {key_tooltip}, auto_{key_tooltip} "
                f" FROM i18n.pydialog "
                f" ORDER BY dialog_name;")
         py_dialogs = self._get_rows(sql)
@@ -180,24 +180,30 @@ class GwI18NGenerator:
         for py_tlb in py_toolbars:
             line = f"\t\t<message>\n"
             line += f"\t\t\t<source>{py_tlb['source']}</source>\n"
-            if py_tlb[key_label] is None:
-                py_tlb[key_label] = py_tlb['lb_en_us']
-                if py_tlb['lb_en_us'] is None:
-                    py_tlb[key_label] = py_tlb['source']
+            if py_tlb[key_label] is None: # Afegir aqui l'auto amb un if
+                py_tlb[key_label] = py_tlb[f'auto_{key_label}']
+                if py_tlb[f'auto_{key_label}'] is None:
+                    py_tlb[key_label] = py_tlb['lb_en_us']
+                    if py_tlb['lb_en_us'] is None:
+                        py_tlb[key_label] = py_tlb['source']
 
             line += f"\t\t\t<translation>{py_tlb[key_label]}</translation>\n"
             line += f"\t\t</message>\n"
             line = line.replace("&", "")
             ts_file.write(line)
+        line = '\t</context>\n\n'
         line += '\t<!-- PYTHON MESSAGES -->\n'
+        line += '\t<context>\n'
         ts_file.write(line)
 
         # Create children for message
         for py_msg in py_messages:
             line = f"\t\t<message>\n"
             line += f"\t\t\t<source>{py_msg['source']}</source>\n"
-            if py_msg[key_message] is None:
-                py_msg[key_message] = py_msg['source']
+            if py_msg[key_message] is None: # Afegir aqui l'auto amb un if
+                py_msg[key_message] = py_msg[f'auto_{key_message}']
+                if py_msg[f'auto_{key_message}'] is None:
+                    py_msg[key_message] = py_msg['source']
             line += f"\t\t\t<translation>{py_msg[key_message]}</translation>\n"
             line += f"\t\t</message>\n"
             line = line.replace("&", "")
@@ -228,8 +234,11 @@ class GwI18NGenerator:
             # Create child for labels
             line += f"\t\t<message>\n"
             line += f"\t\t\t<source>{py_dlg['source']}</source>\n"
-            if py_dlg[key_label] is None:
-                py_dlg[key_label] = py_dlg['lb_en_us']
+            if py_dlg[key_label] is None: # Afegir aqui l'auto amb un if
+                py_dlg[key_label] = py_dlg[f'auto_{key_label}']
+                if py_tlb[f'auto_{key_label}'] is None:
+                    py_dlg[key_label] = py_dlg['lb_en_us']
+                
 
             line += f"\t\t\t<translation>{py_dlg[key_label]}</translation>\n"
             line += f"\t\t</message>\n"
@@ -237,8 +246,10 @@ class GwI18NGenerator:
             # Create child for tooltip
             line += f"\t\t<message>\n"
             line += f"\t\t\t<source>tooltip_{py_dlg['source']}</source>\n"
-            if py_dlg[key_tooltip] is None:
-                py_dlg[key_tooltip] = py_dlg['tt_en_us']
+            if py_dlg[key_tooltip] is None:  # Afegir aqui l'auto amb un if
+                py_dlg[key_tooltip] = py_dlg[f'auto_{key_tooltip}']
+                if not title:  # Afegir aqui l'auto amb un if
+                    py_dlg[key_tooltip] = py_dlg['tt_en_us']
             line += f"\t\t\t<translation>{py_dlg[key_tooltip]}</translation>\n"
             line += f"\t\t</message>\n"
 
@@ -265,8 +276,11 @@ class GwI18NGenerator:
         for py in py_dialogs:
             if py['source'] == f'dlg_{name}':
                 title = py[key_label]
-                if not title:
-                    title = py['lb_en_us']
+                if not title:  # Afegir aqui l'auto amb un if
+                    title = py[f'auto_{key_label}']
+                    if not title:
+                        title = py['lb_en_us']
+                    return title
                 return title
         return title
 
@@ -296,10 +310,16 @@ class GwI18NGenerator:
         if not rows:
             return False
         self._write_dbdialog_values(rows, cfg_path + file_name)
+
         rows = self._get_dbmessages_values()
         if not rows:
             return False
         self._write_dbmessages_values(rows, cfg_path + file_name)
+
+        rows = self._get_dbfprocess_values()
+        if not rows:
+            return False
+        self._write_dbfprocess_values(rows, cfg_path + file_name)
 
         return True
 
@@ -329,27 +349,32 @@ class GwI18NGenerator:
         
         rows = self._get_config_form_fields_values('ws')
         if not rows:
-            return False
+            return False, "config_form_fields_ws"
         self._write_header(cfg_path + file_name_ws)
         self._write_config_form_fields_updates(rows, cfg_path + file_name_ws)
         
         rows = self._get_config_form_fields_values('ud')
         if not rows:
-            return False
+            return False, "config_form_fields_ud"
         self._write_header(cfg_path + file_name_ud)
         self._write_config_form_fields_updates(rows, cfg_path + file_name_ud)
 
         rows = self._get_dbdialog_values_i18n()
         if not rows:
-            return False
+            return False, "dbdialog"
         self._write_dbdialog_values_i18n(rows, cfg_path + file_name)
 
         rows = self._get_dbmessages_values_i18n()
         if not rows:
-            return False
+            return False, "dbmessage"
         self._write_dbmessages_values_i18n(rows, cfg_path + file_name)
 
-        return True
+        rows = self._get_dbfprocess_values_i18n()
+        if not rows:
+            return False, "dbfprocess"
+        self._write_dbfprocess_values_i18n(rows, cfg_path + file_name)
+
+        return True, ""
 
 
     def _check_missing_dbmessage_values(self):
@@ -385,8 +410,8 @@ class GwI18NGenerator:
     def _get_dbdialog_values(self):
         """ Get db dialog values """
 
-        sql = (f"SELECT source, project_type, context, formname, formtype, lb_en_us, lb_{self.lower_lang}, tt_en_us, "
-               f"tt_{self.lower_lang} "
+        sql = (f"SELECT source, project_type, context, formname, formtype, lb_en_us, lb_{self.lower_lang}, auto_lb_{self.lower_lang}, tt_en_us, "
+               f"tt_{self.lower_lang}, auto_tt_{self.lower_lang} "
                f"FROM i18n.dbdialog "
                f"ORDER BY context, formname;")
         rows = self._get_rows(sql)
@@ -398,19 +423,42 @@ class GwI18NGenerator:
     def _get_dbmessages_values(self):
         """ Get db messages values """
 
-        sql = (f"SELECT source, project_type, context, ms_en_us, ms_{self.lower_lang}, ht_en_us, ht_{self.lower_lang}"
+        sql = (f"SELECT source, project_type, context, ms_en_us, ms_{self.lower_lang}, auto_ms_{self.lower_lang}, ht_en_us, ht_{self.lower_lang}, auto_ht_{self.lower_lang}"
                f" FROM i18n.dbmessage "
                f" ORDER BY context;")
         rows = self._get_rows(sql)
         if not rows:
             return False
         return rows
+    
+    def _get_dbfprocess_values(self):
+        """ Get db messages values """
+        # Make the query
+        sql = (f"SELECT source, project_type, context, ex_en_us, ex_{self.lower_lang}, auto_ex_{self.lower_lang}, in_en_us, in_{self.lower_lang}, auto_in_{self.lower_lang}"
+               f" FROM i18n.dbfprocess "
+               f" ORDER BY context;")
+        rows = self._get_rows(sql, self.cursor)
+        # Return the corresponding information
+        if not rows:
+            return False
+        return rows
 
+    def _get_dbfprocess_values_i18n(self):
+        """ Get db messages values """
+        # Make the query
+        sql = (f"SELECT source, project_type, context, ex_en_us, ex_{self.lower_lang}, auto_ex_{self.lower_lang}, in_en_us, in_{self.lower_lang}, auto_in_{self.lower_lang}"
+               f" FROM i18n.dbfprocess "
+               f" ORDER BY context;")
+        rows = self._get_rows(sql, self.cursor)
+        # Return the corresponding information
+        if not rows:
+            return False
+        return rows
 
     def _get_config_form_fields_values(self, project_type):
         """ Get db dialog values """
 
-        sql = (f"SELECT formname, formname_{self.lower_lang}"
+        sql = (f"SELECT formname_en_us, formname_{self.lower_lang}, auto_formname_{self.lower_lang}"
                f" FROM i18n.dbfeature"
                f" WHERE project_type = \'{project_type}\';")
         rows = self._get_rows(sql)
@@ -422,11 +470,12 @@ class GwI18NGenerator:
     def _get_dbdialog_values_i18n(self):
         """ Get db dialog values """
 
-        sql = (f"SELECT d.source, d.project_type, d.context, d.formname, f.formname_{self.lower_lang},"
-               f" d.formtype, d.lb_en_us, d.lb_{self.lower_lang}, d.tt_en_us, d.tt_{self.lower_lang}"
-               f" FROM i18n.dbdialog d"
-               f" LEFT JOIN i18n.dbfeature f ON f.formname = d.formname"
-               f" ORDER BY d.context, d.formname;")
+        sql = (f"SELECT d.source, d.project_type, d.context, d.formname, f.formname_{self.lower_lang}, f.auto_formname_{self.lower_lang}, "
+                f"d.formtype, d.lb_en_us, d.lb_{self.lower_lang}, d.auto_lb_{self.lower_lang}, d.tt_en_us, d.tt_{self.lower_lang}, d.auto_tt_{self.lower_lang} "
+                f"FROM i18n.dbdialog d "
+                f"LEFT JOIN i18n.dbfeature f ON f.formname_en_us = d.formname "
+                f"ORDER BY d.context, d.formname;")
+
         rows = self._get_rows(sql)
         if not rows:
             return False
@@ -436,7 +485,7 @@ class GwI18NGenerator:
     def _get_dbmessages_values_i18n(self):
         """ Get db messages values """
 
-        sql = (f"SELECT source, project_type, context, ms_en_us, ms_{self.lower_lang}, ht_en_us, ht_{self.lower_lang}, log_level"
+        sql = (f"SELECT source, project_type, context, ms_en_us, ms_{self.lower_lang}, auto_ms_{self.lower_lang}, ht_en_us, ht_{self.lower_lang}, auto_ht_{self.lower_lang}, log_level"
                f" FROM i18n.dbmessage "
                f" ORDER BY context;")
         rows = self._get_rows(sql)
@@ -445,10 +494,10 @@ class GwI18NGenerator:
         return rows
     
     
-    def _write_config_form_fields_updates(self, rows, path):
+    def _write_config_form_fields_updates(self, rows, path): ## Parlar amb edgar
         """
             Generate a string and write into file
-            :param rows: List of values ([List][List])
+            :param rows: List of values ([List][List])z
             :param path: Full destination path (String)
             :return: (Boolean)
         """
@@ -456,11 +505,12 @@ class GwI18NGenerator:
         file = open(path, "a")
         for row in rows:
             # Get values
-            formname = row['formname'] if row['formname'] is not None else ""
-            formname_lang = row[f'formname_{self.lower_lang}'] if row[f'formname_{self.lower_lang}'] is not None else row['formname']            
+            formname = row['formname_en_us'] if row['formname_en_us'] is not None else ""
+            formname_lang = row[f'formname_{self.lower_lang}'] if row[f'formname_{self.lower_lang}'] is not None else row[f'auto_formname_{self.lower_lang}']
+            formname_lang = formname_lang if formname_lang is not None else row['formname_en_us']            
 
-            line = f'UPDATE config_form_fields SET formname = \'{formname_lang}\' ' \
-                   f'WHERE formname LIKE \'{formname}\';\n'
+            line = f'UPDATE config_form_fields SET formname_en_us = \'{formname_lang}\' ' \
+                   f'WHERE formname_en_us LIKE \'{formname}\';\n'
                    
             file.write(line)
         file.close()
@@ -485,14 +535,11 @@ class GwI18NGenerator:
             formname = form_name_lan if form_name_lan is not "" else form_name
             form_type = row['formtype'] if row['formtype'] is not None else ""
             source = row['source'] if row['source'] is not None else ""
-            lbl_value = row[f'lb_{self.lower_lang}'] if row[f'lb_{self.lower_lang}'] is not None else row['lb_en_us']
+            lbl_value = row[f'lb_{self.lower_lang}'] if row[f'lb_{self.lower_lang}'] is not None else row[f'auto_lb_{self.lower_lang}']
+            lbl_value = lbl_value if lbl_value is not None else row['lb_en_us'] # Afegir auto_ amb un if
             lbl_value = lbl_value if lbl_value is not None else ""
-            if row[f'tt_{self.lower_lang}'] is not None:
-                tt_value = row[f'tt_{self.lower_lang}']
-            elif row[f'tt_en_us'] is not None:
-                tt_value = row[f'tt_en_us']
-            else:
-                tt_value = row['lb_en_us']
+            tt_value = row[f'tt_{self.lower_lang}'] if row[f'tt_{self.lower_lang}'] is not None else row[f'auto_tt_{self.lower_lang}']
+            tt_value = tt_value if tt_value is not None else row['lb_en_us']
             tt_value = tt_value if tt_value is not None else ""
 
             # Check invalid characters
@@ -516,21 +563,18 @@ class GwI18NGenerator:
                 line += f'SET label = \'{lbl_value}\', tooltip = \'{tt_value}\' '
 
             # Clause WHERE for each context
-            match row['context']:
-                case 'config_form_fields':
-                    line += f'WHERE formname = \'{formname}\' AND formtype = \'{form_type}\' AND columnname = \'{source}\' '
-                case 'config_form_tabs':
-                    line += f'WHERE formname = \'{formname}\' AND formtype = \'{form_type}\' AND columnname = \'{source}\' '
-                case 'config_form_groupbox':
-                    line += f'WHERE formname = \'{formname}\' AND layout_if = \'{source}\' '
-                case 'config_typevalue':
-                    line += f'WHERE id = \'{source}\' '
-                case 'config_param_system':
-                    line += f'WHERE parameter = \'{source}\' '
-                case 'sys_param_user':
-                    line += f'WHERE id = \'{source}\' '
-                case _:
-                    tools_qgis.show_warning("No WHERE conditions found")
+            if row['context'] == 'config_form_fields':
+                line += f'WHERE formname = \'{formname}\' AND formtype = \'{form_type}\' AND columnname = \'{source}\' '
+            elif row['context'] == 'config_form_tabs':
+                line += f'WHERE formname = \'{formname}\' AND formtype = \'{form_type}\' AND columnname = \'{source}\' '
+            elif row['context'] == 'config_form_groupbox':
+                line += f'WHERE formname = \'{formname}\' AND layout_if = \'{source}\' '
+            elif row['context'] == 'config_typevalue':
+                line += f'WHERE id = \'{source}\' '
+            elif row['context'] == 'config_param_system':
+                line += f'WHERE parameter = \'{source}\' '
+            elif row['context'] == 'sys_param_user':
+                line += f'WHERE id = \'{source}\' '
 
             line += f';\n'
             file.write(line)
@@ -554,9 +598,9 @@ class GwI18NGenerator:
             source = row['source'] if row['source'] is not None else ""
             project_type = row['project_type'] if row['project_type'] is not None else ""
             log_level = row['log_level'] if row['log_level'] is not None else 2
-            ms_value = row[f'ms_{self.lower_lang}'] if row[f'ms_{self.lower_lang}'] is not None else row['ms_en_us']            
-            ht_value = row[f'ht_{self.lower_lang}'] if row[f'ht_{self.lower_lang}'] is not None else row['ht_en_us']
-            ht_value = ht_value if ht_value is not None else ""
+            ms_value = row.get(f'ms_{self.lower_lang}') or row.get(f'auto_ms_{self.lower_lang}') or row.get('ms_en_us')
+            ht_value = row.get(f'ht_{self.lower_lang}') or row.get(f'auto_ht_{self.lower_lang}') or row.get('ht_en_us') or ""
+
 
             # Check invalid characters
             if ms_value is not None:
@@ -571,6 +615,42 @@ class GwI18NGenerator:
 
             line = f'INSERT INTO {table} (id, error_message, hint_message, log_level, show_user, project_type, source) ' \
                    f'VALUES ({source}, \'{ms_value}\', \'{ht_value}\', {log_level}, true, \'{project_type}\', \'core\');\n'
+
+            file.write(line)
+        file.close()
+        del file
+
+    def _write_dbfprocess_values_i18n(self, rows, path):
+        """
+        Generate a string and write into file
+            :param rows: List of values ([List][List])
+            :param path: Full destination path (String)
+            :return: (Boolean)
+        """
+
+        file = open(path, "a")
+
+        for row in rows:
+            # Get values
+            table = row['context'] if row['context'] is not None else ""
+            source = row['source'] if row['source'] is not None else ""
+            project_type = row['project_type'] if row['project_type'] is not None else ""
+            ex_msg = row.get(f'ex_{self.lower_lang}') or row.get(f'auto_ex_{self.lower_lang}') or row.get('ex_en_us')
+            in_msg = row.get(f'in_{self.lower_lang}') or row.get(f'auto_in_{self.lower_lang}') or row.get('in_en_us') or ""
+
+            # Check invalid characters
+            if ex_msg is not None:
+                ex_msg = self._replace_invalid_quotation_marks(ex_msg)
+                if "\n" in ex_msg:
+                    ex_msg = self._replace_invalid_characters(ex_msg)
+            if in_msg is not None:
+                in_msg = self._replace_invalid_quotation_marks(in_msg)
+                if "\n" in in_msg:
+                    in_msg = self._replace_invalid_characters(in_msg)
+
+
+            line = f'INSERT INTO {table} (fid, except_msg, info_msg, show_user, project_type, source) ' \
+                   f'VALUES ({source}, \'{ex_msg}\', \'{in_msg}\', true, \'{project_type}\', \'core\');\n'
 
             file.write(line)
         file.close()
@@ -613,14 +693,11 @@ class GwI18NGenerator:
             form_name = row['formname'] if row['formname'] is not None else ""
             form_type = row['formtype'] if row['formtype'] is not None else ""
             source = row['source'] if row['source'] is not None else ""
-            lbl_value = row[f'lb_{self.lower_lang}'] if row[f'lb_{self.lower_lang}'] is not None else row['lb_en_us']
+            lbl_value = row[f'lb_{self.lower_lang}'] if row[f'lb_{self.lower_lang}'] is not None else row[f'auto_lb_{self.lower_lang}']
+            lbl_value = lbl_value if lbl_value is not None else row['lb_en_us'] # Afegir auto_ amb un if
             lbl_value = lbl_value if lbl_value is not None else ""
-            if row[f'tt_{self.lower_lang}'] is not None:
-                tt_value = row[f'tt_{self.lower_lang}']
-            elif row[f'tt_en_us'] is not None:
-                tt_value = row[f'tt_en_us']
-            else:
-                tt_value = row['lb_en_us']
+            tt_value = row[f'tt_{self.lower_lang}'] if row[f'tt_{self.lower_lang}'] is not None else row[f'auto_tt_{self.lower_lang}']
+            tt_value = tt_value if tt_value is not None else row['lb_en_us']
             tt_value = tt_value if tt_value is not None else ""
 
             # Check invalid characters
@@ -649,24 +726,21 @@ class GwI18NGenerator:
                          f'"tooltip":{{"column":"tooltip", "value":"{tt_value}"}}')
 
             # Clause WHERE for each context
-            match row['context']:
-                case 'config_form_fields':
-                    line += (f', "clause":"WHERE columnname = \'{source}\' '
+            if row['context'] == 'config_form_fields':
+                line += (f', "clause":"WHERE columnname = \'{source}\' '
                          f'AND formname = \'{form_name}\' AND formtype = \'{form_type}\'"')
-                case 'config_form_tabs':
-                    line += (f', "clause":"WHERE formname = \'{form_name}\' '
+            elif row['context'] == 'config_form_tabs':
+                line += (f', "clause":"WHERE formname = \'{form_name}\' '
                          f'AND columnname = \'{source}\' AND formtype = \'{form_type}\'"')
-                case 'config_form_groupbox':
-                    line += (f', "clause":"WHERE formname = \'{form_name}\' '
+            elif row['context'] == 'config_form_groupbox':
+                line += (f', "clause":"WHERE formname = \'{form_name}\' '
                          f'AND layout_id  = \'{source}\'"')
-                case 'config_typevalue':
-                    line += f', "clause":"WHERE typevalue = \'{form_name}\' AND id  = \'{source}\'"'
-                case 'config_param_system':
-                    line += f', "clause":"WHERE parameter = \'{source}\'"'
-                case 'sys_param_user':
-                    line += f', "clause":"WHERE id = \'{source}\'"'
-                case _:
-                    tools_qgis.show_warning("No WHERE conditions found")
+            elif row['context'] == 'config_typevalue':
+                line += f', "clause":"WHERE typevalue = \'{form_name}\' AND id  = \'{source}\'"'
+            elif row['context'] == 'config_param_system':
+                line += f', "clause":"WHERE parameter = \'{source}\'"'
+            elif row['context'] == 'sys_param_user':
+                line += f', "clause":"WHERE id = \'{source}\'"'
 
             line += f'}}}}$$);\n'
             file.write(line)
@@ -688,15 +762,16 @@ class GwI18NGenerator:
             # Get values
             table = row['context'] if row['context'] is not None else ""
             source = row['source'] if row['source'] is not None else ""
-            ms_value = row[f'ms_{self.lower_lang}'] if row[f'ms_{self.lower_lang}'] is not None else row['ms_en_us']
-            ht_value = row[f'ht_{self.lower_lang}'] if row[f'ht_{self.lower_lang}'] is not None else row['ht_en_us']
+            ms_value = row.get(f'ms_{self.lower_lang}') or row.get(f'auto_ms_{self.lower_lang}') or row.get('ms_en_us')
+            ht_value = row.get(f'ht_{self.lower_lang}') or row.get(f'auto_ht_{self.lower_lang}') or row.get('ht_en_us')
+
 
             # Check invalid characters
             if ms_value is not None and "\n" in ms_value:
                 ms_value = self._replace_invalid_characters(ms_value)
             if ht_value is not None and "\n" in ht_value:
                 ht_value = self._replace_invalid_characters(ht_value)
-
+    
             line = f'SELECT gw_fct_admin_schema_i18n($$'
             line += (f'{{"data":'
                      f'{{"table":"{table}", '
@@ -707,6 +782,45 @@ class GwI18NGenerator:
             # Clause WHERE for each context
             if row['context'] == 'sys_message':
                 line += f', "clause":"WHERE id = \'{source}\' "'
+
+            line += f'}}}}$$);\n'
+            file.write(line)
+        file.close()
+        del file
+
+    def _write_dbfprocess_values(self, rows, path):
+        """
+        Generate a string and write into file
+            :param rows: List of values ([List][List])
+            :param path: Full destination path (String)
+            :return: (Boolean)
+        """
+
+        file = open(path, "a")
+
+        for row in rows:
+            # Get values
+            table = row['context'] if row['context'] is not None else ""
+            source = row['source'] if row['source'] is not None else ""
+            ex_msg = row.get(f'ex_{self.lower_lang}') or row.get(f'auto_ex_{self.lower_lang}') or row.get('ex_en_us')
+            in_msg = row.get(f'in_{self.lower_lang}') or row.get(f'auto_in_{self.lower_lang}') or row.get('in_en_us')
+
+
+            # Check invalid characters
+            if ex_msg is not None and "\n" in ex_msg:
+                ms_value = self._replace_invalid_characters(ms_value)
+            if in_msg is not None and "\n" in in_msg:
+                ht_value = self._replace_invalid_characters(ht_value)
+
+            line = f'SELECT gw_fct_admin_schema_i18n($$'
+            line += (f'{{"data":'
+                     f'{{"table":"{table}", '
+                     f'"label":{{"column":"except_msg", "value":"{ex_msg}"}}, '
+                     f'"tooltip":{{"column":"info_msg", "value":"{in_msg}"}}')
+
+            # Clause WHERE for each context
+            if row['context'] == 'sys_fprocess':
+                line += f', "clause":"WHERE fid = \'{source}\' "'
 
             line += f'}}}}$$);\n'
             file.write(line)
@@ -724,13 +838,13 @@ class GwI18NGenerator:
         language = tools_qt.get_combo_value(self.dlg_qm, self.dlg_qm.cmb_language, 0)
         py_msg = tools_qt.is_checked(self.dlg_qm, self.dlg_qm.chk_py_msg)
         db_msg = tools_qt.is_checked(self.dlg_qm, self.dlg_qm.chk_db_msg)
-        tools_gw.set_config_parser('i18n_generator', 'qm_lang_host', f"{host}", "user", "session", prefix=False)
-        tools_gw.set_config_parser('i18n_generator', 'qm_lang_port', f"{port}", "user", "session", prefix=False)
-        tools_gw.set_config_parser('i18n_generator', 'qm_lang_db', f"{db}", "user", "session", prefix=False)
-        tools_gw.set_config_parser('i18n_generator', 'qm_lang_user', f"{user}", "user", "session", prefix=False)
-        tools_gw.set_config_parser('i18n_generator', 'qm_lang_language', f"{language}", "user", "session", prefix=False)
-        tools_gw.set_config_parser('i18n_generator', 'qm_lang_py_msg', f"{py_msg}", "user", "session", prefix=False)
-        tools_gw.set_config_parser('i18n_generator', 'qm_lang_db_msg', f"{db_msg}", "user", "session", prefix=False)
+        tools_gw.set_config_parser('i18n_generator', 'qm_lang_host', f"{host}", "user", "init", prefix=False)
+        tools_gw.set_config_parser('i18n_generator', 'qm_lang_port', f"{port}", "user", "init", prefix=False)
+        tools_gw.set_config_parser('i18n_generator', 'qm_lang_db', f"{db}", "user", "init", prefix=False)
+        tools_gw.set_config_parser('i18n_generator', 'qm_lang_user', f"{user}", "user", "init", prefix=False)
+        tools_gw.set_config_parser('i18n_generator', 'qm_lang_language', f"{language}", "user", "init", prefix=False)
+        tools_gw.set_config_parser('i18n_generator', 'qm_lang_py_msg', f"{py_msg}", "user", "init", prefix=False)
+        tools_gw.set_config_parser('i18n_generator', 'qm_lang_db_msg', f"{db_msg}", "user", "init", prefix=False)
 
 
     def _load_user_values(self):
@@ -739,12 +853,12 @@ class GwI18NGenerator:
             :return: Dictionary with values
         """
 
-        host = tools_gw.get_config_parser('i18n_generator', 'qm_lang_host', "user", "session", False)
-        port = tools_gw.get_config_parser('i18n_generator', 'qm_lang_port', "user", "session", False)
-        db = tools_gw.get_config_parser('i18n_generator', 'qm_lang_db', "user", "session", False)
-        user = tools_gw.get_config_parser('i18n_generator', 'qm_lang_user', "user", "session", False)
-        py_msg = tools_gw.get_config_parser('i18n_generator', 'qm_lang_py_msg', "user", "session", False)
-        db_msg = tools_gw.get_config_parser('i18n_generator', 'qm_lang_db_msg', "user", "session", False)
+        host = tools_gw.get_config_parser('i18n_generator', 'qm_lang_host', "user", "init", False)
+        port = tools_gw.get_config_parser('i18n_generator', 'qm_lang_port', "user", "init", False)
+        db = tools_gw.get_config_parser('i18n_generator', 'qm_lang_db', "user", "init", False)
+        user = tools_gw.get_config_parser('i18n_generator', 'qm_lang_user', "user", "init", False)
+        py_msg = tools_gw.get_config_parser('i18n_generator', 'qm_lang_py_msg', "user", "init", False)
+        db_msg = tools_gw.get_config_parser('i18n_generator', 'qm_lang_db_msg', "user", "init", False)
         tools_qt.set_widget_text(self.dlg_qm, 'txt_host', host)
         tools_qt.set_widget_text(self.dlg_qm, 'txt_port', port)
         tools_qt.set_widget_text(self.dlg_qm, 'txt_db', db)
