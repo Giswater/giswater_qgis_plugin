@@ -64,6 +64,9 @@ class AddNewLot():
 
 
     def manage_lot(self, lot_id=None, is_new=True, visitclass_id=None):
+        """Manage the creation or update of a lot by initializing and configuring the dialog UI,
+        setting up layers, actions, signals, and loading necessary data (including project-specific settings)
+        before finally opening the dialog for user interaction."""
 
         # turnoff autocommit of this and base class. Commit will be done at dialog button box level management
         self.autocommit = True
@@ -105,7 +108,6 @@ class AddNewLot():
         tools_gw.add_icon(self.dlg_lot.btn_feature_snapping, "137")
         tools_gw.add_icon(self.dlg_lot.btn_refresh_materialize_view, "116")
 
-        # Set date format to date widgets (QUE ES ESTO)
         tools_qt.check_date(self.dlg_lot.startdate, self.dlg_lot.btn_accept, 1)
         tools_qt.check_date(self.dlg_lot.enddate, self.dlg_lot.btn_accept, 1)
         tools_qt.check_date(self.dlg_lot.real_startdate, self.dlg_lot.btn_accept, 1)
@@ -191,7 +193,6 @@ class AddNewLot():
         self.set_active_layer()
 
         tools_gw.add_icon(self.dlg_lot.btn_open_image, "136b")
-        print("hola1")
         self.dlg_lot.btn_open_image.clicked.connect(partial(self.open_load_image, self.tbl_load, 'cm.v_ui_om_vehicle_x_parameters'))
 
         if lot_id is not None and visitclass_id not in (None, '', 'NULL'):
@@ -289,7 +290,6 @@ class AddNewLot():
         self.disbale_actions(value)
 
 
-    # QUE ES ESTO, no call?
     def set_checkbox_values(self):
         """ Set checkbox with the same values as the validate column """
 
@@ -305,6 +305,8 @@ class AddNewLot():
                 chk_list[0].setChecked(True)
 
     def open_photo(self, qtable):
+        """Opens the photo associated with a selected visit record by retrieving its URL
+         from the database and launching it in the default web browser."""
 
         selected_list = qtable.selectionModel().selectedRows()
 
@@ -336,7 +338,10 @@ class AddNewLot():
 
 
     def create_team(self):
-        self.dlg_create_team = TeamCreateUi()
+        """Opens the dialog for creating a new team and loads the required settings to
+        initialize the team creation interface."""
+
+        self.dlg_create_team = TeamCreateUi(self)
         tools_gw.load_settings(self.dlg_create_team)
 
         self.dlg_create_team.rejected.connect(partial(tools_gw.close_dialog, self.dlg_create_team))
@@ -351,6 +356,8 @@ class AddNewLot():
 
 
     def save_team(self):
+        """Saves the new team to the database after validating that the team name is provided and unique,
+        and updates team-related UI components accordingly."""
 
         team_name = tools_qt.get_text(self.dlg_create_team, self.dlg_create_team.txt_team)
         team_descript = tools_qt.get_text(self.dlg_create_team, self.dlg_create_team.txt_descript)
@@ -379,52 +386,6 @@ class AddNewLot():
         tools_qt.fill_combo_values(self.dlg_resources_man.cmb_team, rows)
 
         tools_gw.close_dialog(self.dlg_create_team)
-
-
-    def create_vehicle(self):
-        self.dlg_create_vehicle = VehicleCreateUi()
-        tools_gw.load_settings(self.dlg_create_vehicle)
-
-        self.dlg_create_vehicle.rejected.connect(partial(tools_gw.close_dialog, self.dlg_create_vehicle))
-        self.dlg_create_vehicle.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_create_vehicle))
-        self.dlg_create_vehicle.btn_accept.clicked.connect(partial(self.save_vehicle))
-
-        tools_gw.open_dialog(self.dlg_create_vehicle)
-
-
-    def save_vehicle(self):
-
-        vehicle_name = tools_qt.get_text(self.dlg_create_vehicle, self.dlg_create_vehicle.txt_vehicle)
-        vehicle_descript = tools_qt.get_text(self.dlg_create_vehicle, self.dlg_create_vehicle.txt_descript)
-        vehicle_model = tools_qt.get_text(self.dlg_create_vehicle, self.dlg_create_vehicle.txt_model)
-        vehicle_plate = tools_qt.get_text(self.dlg_create_vehicle, self.dlg_create_vehicle.txt_plate)
-
-        if vehicle_name is None:
-            msg = f"El parametre 'Nom vehicle' es obligatori."
-            tools_qgis.show_message(msg, 0)
-            return
-
-        sql = ("SELECT DISTINCT(idval) FROM ext_cat_vehicle")
-        rows = tools_db.get_rows(sql, commit=True)
-        if rows:
-            for row in rows:
-                if vehicle_name == row[0]:
-                    msg = f"Aquest 'Nom vehicle' ja existeix."
-                    tools_qgis.show_message(msg, 0)
-                    return
-
-        sql = (f"INSERT INTO {self.schemaname}.ext_cat_vehicle (idval, descript, model, number_plate) "
-               f"VALUES('{vehicle_name}', '{vehicle_descript}', '{vehicle_model}', '{vehicle_plate}');")
-        tools_db.execute_sql(sql)
-
-        sql = ("SELECT id, idval FROM ext_cat_vehicle ORDER BY idval")
-        rows = tools_db.get_rows(sql, commit=True)
-        tools_qt.fill_combo_values(self.dlg_resources_man.cmb_vehicle, rows)
-        tools_qt.fill_combo_valuesa(self.dlg_resources_man.cmb_vehicle, vehicle_name)
-        # Populate table_view vehicle
-        self.populate_vehicle_views()
-
-        tools_gw.close_dialog(self.dlg_create_vehicle)
 
 
     def manage_team(self):
@@ -480,9 +441,9 @@ class AddNewLot():
         else:
             self.dlg_lot.cmb_assigned_to.clear()
 
-    # QUE ES ESTO se podria gestion ar logica en db?
     def populate_cmb_visitclass(self, event_change_team=False):
         """ Fill ComboBox cmb_visit_class """
+
         # Fill ComboBox cmb_visit_class
         self.assiged_to = tools_qt.get_combo_value(self.dlg_lot, self.dlg_lot.cmb_assigned_to, 0)
 
@@ -527,6 +488,8 @@ class AddNewLot():
 
 
     def cancel_changes(self, qtable):
+        """Cancels any unsaved changes in the given table model by reverting modifications and
+        rolling back the database transaction."""
 
         model = qtable.model()
         model.revertAll()
@@ -534,6 +497,8 @@ class AddNewLot():
 
 
     def save_table(self, dialog, qtable, manage_type=None):
+        """Submits all changes from the provided table model to the database and updates related UI components based on
+        the specified management type (e.g., team selector or vehicle)."""
 
         model = qtable.model()
         if model.submitAll():
@@ -552,6 +517,8 @@ class AddNewLot():
 
 
     def manage_widget_lot(self, lot_id):
+        """Populates and configures the work order-related fields for a lot by querying the database and setting up the
+        corresponding UI elements, returning a flag indicating whether the work order was successfully loaded."""
 
         # Fill ComboBox cmb_ot
         sql = ("SELECT ext_workorder.ct, ext_workorder.class_id,  ext_workorder.wotype_id, ext_workorder.wotype_name, "
@@ -565,9 +532,7 @@ class AddNewLot():
             sql += " WHERE ext_workorder.serie = '"+str(ct[0])+"'"
         sql += " order by ct desc"
 
-        print(sql)
         rows = tools_db.get_rows(sql)
-        print(rows)
 
         self.list_to_show = ['']  # List to show
         self.list_to_work = [['', '', '', '', '', '', '']]  # List to work (find feature)
@@ -643,6 +608,9 @@ class AddNewLot():
 
 
     def set_ot_fields(self, index):
+        """Sets the work order-related fields in the UI based on the selected work order index.
+        Updates fields such as work order type, work order ID, address, and observations, and adjusts
+        the visit class combo box state based on the selected work order or project type."""
 
         item = self.list_to_work[index]
 
@@ -680,6 +648,9 @@ class AddNewLot():
 
 
     def delete_visit(self, qtable):
+        """Deletes the selected visit record(s) from the database after confirming with the user,
+        by constructing and executing a deletion query based on the visit and feature IDs, and then reloads the visits table."""
+
         selected_list = qtable.selectionModel().selectedRows()
         feature_type = tools_qt.get_combo_value(None, self.dlg_lot.cmb_visit_class, 2).lower()
 
@@ -713,6 +684,8 @@ class AddNewLot():
 
 
     def open_visit(self, qtable):
+        """Opens the visit management interface for the selected visit record.
+        Verifies that a record is selected, retrieves its visit ID, and launches the visit management process."""
 
         selected_list = qtable.selectionModel().selectedRows()
 
@@ -731,6 +704,8 @@ class AddNewLot():
 
 
     def read_standaritemmodel(self, qtable):
+        """Extracts data from the QStandardItemModel of the provided table view and returns it as a list of dictionaries,
+        with each dictionary representing a row using the header labels as keys and cell values as values."""
 
         headers = self.get_headers(qtable)
         rows = []
@@ -786,6 +761,9 @@ class AddNewLot():
 
 
     def get_next_id(self, table_name, pk):
+        """Retrieves the next available ID for a new record by querying the maximum value of the primary key column in
+        the specified table and returning that value incremented by one."""
+
         sql = f"SELECT MAX({pk}::integer) FROM cm.{table_name};"
         row = tools_db.get_rows(sql)
 
@@ -852,6 +830,8 @@ class AddNewLot():
 
 
     def set_values(self, lot_id):
+        """Sets the lot form fields by querying the database with the given lot ID.
+        Updates work order details, date fields, visit class, team assignment, status, description, and feature type in the UI."""
 
         sql = ("SELECT om_visit_lot.*, ext_workorder.ct from cm.om_visit_lot LEFT JOIN ext_workorder using (serie) "
                "WHERE id ='" + str(lot_id) + "'")
@@ -899,6 +879,8 @@ class AddNewLot():
 
 
     def update_id_list(self):
+        """Updates the internal list of selected feature IDs by retrieving the current IDs from the relations table for the current feature type,
+        then appending any new IDs to the internal list and invoking a check for consistency."""
 
         feature_type = tools_qt.get_combo_value(self.dlg_lot, self.dlg_lot.feature_type, 1).lower()
         sql = "SELECT alias FROM " + self.schemaname + ".config_form_tableview WHERE location_type = 'tbl_relations' AND columnname = '" + str(
@@ -917,6 +899,8 @@ class AddNewLot():
 
 
     def get_table_values(self, qtable, column_name):
+        """Retrieves a list of values from the specified column in the provided table view by iterating over each row of the table's model
+        and collecting the data from that column."""
 
         if qtable.model() is None:
             return []
@@ -931,6 +915,8 @@ class AddNewLot():
 
 
     def activate_selection(self, dialog, action, action_name):
+        """Activates the feature selection process by setting the active layer, assigning the default selection action,
+        disconnecting any previous selection signals, and then connecting and triggering the selection action using the specified parameters."""
 
         self.set_active_layer()
         self.dropdown.setDefaultAction(action)
@@ -943,12 +929,16 @@ class AddNewLot():
 
 
     def selection_changed_by_expr(self, dialog, layer, feature_type, param_options):
+        """Handles selection changes triggered by an expression by marking the selection signal as active and connecting
+        the canvas' selectionChanged signal to the manage_selection method with the appropriate dialog, layer, feature type, and options."""
+
         self.signal_selectionChanged = True
         self.canvas.selectionChanged.connect(partial(self.manage_selection, dialog, layer, feature_type, param_options))
 
 
     def manage_selection(self, dialog, layer, feature_type, param_options):
         """ Slot function for signal 'canvas.selectionChanged' """
+
         field_id = feature_type + "_id"
         if param_options and 'featureType' in param_options:
             key = feature_type + "_type"
@@ -1035,6 +1025,8 @@ class AddNewLot():
 
 
     def get_feature_by_id(self, layer, id_, field_id):
+        """Retrieves a feature from the specified layer that matches the given ID by constructing a filter expression using the provided field name.
+        Iterates over the filtered features and returns the matching feature if found; otherwise, returns False."""
 
         expr = "" + str(field_id) + "= '" + str(id_) + "'"
         features = layer.getFeatures(QgsFeatureRequest().setFilterExpression(expr))
@@ -1059,6 +1051,10 @@ class AddNewLot():
 
 
     def remove_selection(self, dialog, qtable):
+        """Removes the selected feature(s) from the relations table. Disconnects any selection signals,
+        retrieves the selected rows, identifies the corresponding feature IDs based on configuration settings,
+        updates the internal list by removing these IDs, clears and reloads the table view,
+        and refreshes related UI components (such as date filters and the visits table)."""
 
         tools_qgis.disconnect_signal_selection_changed()
         feature_type = tools_qt.get_combo_value(self.dlg_lot, self.dlg_lot.feature_type, 0).lower()
@@ -1100,6 +1096,8 @@ class AddNewLot():
 
 
     def set_active_layer(self):
+        """Sets the active map layer based on the current visit class selection from the UI.
+        Retrieves the corresponding layer by its table name, makes it active on the interface, and ensures that it is visible."""
 
         self.current_layer = self.iface.activeLayer()
         # Set active layer
@@ -1132,6 +1130,11 @@ class AddNewLot():
 
 
     def set_tab_dis_enabled(self):
+        """Enables or disables certain tabs in the UI based on the currently selected feature type.
+        For each tab in the dialog (specifically the Relations, Visits, and Loads tabs), if the feature type is empty or invalid,
+        the tab is disabled; otherwise, it is enabled. Additionally, the function updates the feature_type combo box and
+        refreshes the Loads tab configuration."""
+
         self.ids = []
         feature_type = tools_qt.get_combo_value(self.dlg_lot, self.dlg_lot.cmb_visit_class, 2)
         index = 0
@@ -1150,6 +1153,9 @@ class AddNewLot():
 
 
     def reload_table_visit(self):
+        """Reloads the visits table by applying filters based on the selected feature type, search text, lot ID, and date interval.
+        Constructs a SQL expression filter using these parameters, retrieves the corresponding data from the database,
+        populates a QStandardItemModel with the fetched data, and updates the table view along with its header labels."""
 
         feature_type = tools_qt.get_combo_value(self.dlg_lot, self.dlg_lot.cmb_visit_class, 2)
         object_id = tools_qt.get_text(self.dlg_lot, self.dlg_lot.txt_filter)
@@ -1257,6 +1263,8 @@ class AddNewLot():
 
 
     def populate_table_relations(self, lot_id):
+        """Populates the relations table with features associated with the specified lot ID by constructing an SQL query based on the current feature type,
+        fetching the corresponding rows from the database, and appending each row as items to the QStandardItemModel for display in the UI."""
 
         standard_model = self.tbl_relation.model()
 
@@ -1280,6 +1288,8 @@ class AddNewLot():
 
 
     def set_lot_headers(self):
+        """Sets the headers for the relations table in the UI based on the selected feature type by retrieving
+        the column names from the corresponding database view and applying them to a new QStandardItemModel."""
 
         standard_model = QStandardItemModel()
         self.tbl_relation.setModel(standard_model)
@@ -1302,6 +1312,9 @@ class AddNewLot():
 
 
     def save_lot(self):
+        """Saves the current lot details to the database by handling both insertion (for new lots) and update
+        (for existing lots), constructs the necessary SQL queries, updates related relations and visit records,
+        and refreshes the map canvas upon successful completion."""
 
         lot = {}
         index = self.dlg_lot.cmb_ot.currentIndex()
@@ -1368,6 +1381,9 @@ class AddNewLot():
 
 
     def save_relations(self, lot, lot_id, feature_type):
+        """Saves or updates the relationships between the lot and its associated features in the database.
+        Compares the current relations table values with existing database entries and performs INSERTs for new relations
+        or DELETEs for removed relations accordingly."""
 
         # Manage relations
         if not feature_type:
@@ -1404,6 +1420,9 @@ class AddNewLot():
 
 
     def save_visits(self):
+        """Updates the status of visit records in the database.
+        Iterates over the current visit table model, maps the UI status values to their corresponding database IDs,
+        constructs SQL UPDATE queries for each record, and executes the updates. Returns a flag indicating success."""
 
         # Manage visits
         table_name = tools_qt.get_combo_value(self.dlg_lot, self.dlg_lot.cmb_visit_class, 3)
@@ -1457,6 +1476,8 @@ class AddNewLot():
 
 
     def reset_rb_list(self, rb_list):
+        """Resets the main rubber band and clears all rubber band selections in the provided list,
+        effectively removing any current feature highlights from the canvas."""
 
         self.rb_red.reset()
         for rb in rb_list:
@@ -1464,6 +1485,10 @@ class AddNewLot():
 
 
     def hilight_features(self, rb_list, feature_type=None):
+        """Highlights features on the map canvas by executing a procedure to retrieve feature geometries based on
+        the current feature type and selected IDs. For each feature, converts its WKT representation to a QGIS geometry,
+        creates and configures a new rubber band with specified color and width,
+        displays it on the canvas, and appends it to the provided list of rubber bands."""
 
         self.reset_rb_list(rb_list)
 
@@ -1486,6 +1511,9 @@ class AddNewLot():
 
 
     def zoom_to_feature(self, qtable):
+        """Zooms the map canvas to the extent of the selected feature. Retrieves the feature from the table view,
+        selects it in the active layer using a constructed expression, triggers a zoom to actual size, and draws a polyline
+        highlight based on the feature's geometry if applicable."""
 
         feature_type = tools_qt.get_combo_value(self.dlg_lot, self.visit_class, 2).lower()
         selected_list = qtable.selectionModel().selectedRows()
@@ -1526,6 +1554,8 @@ class AddNewLot():
 
 
     def manage_rejected(self):
+        """Handles the cancellation or rejection of changes by disconnecting selection signals,
+        clearing any active feature selections, saving user settings, switching the tool to pan mode, and closing the current dialog."""
 
         tools_qgis.disconnect_signal_selection_changed()
         layer = self.iface.activeLayer()
@@ -1569,6 +1599,7 @@ class AddNewLot():
 
 
     def get_headers(self, qtable):
+        """Retrieves and returns a list of header labels from the model of the provided table view by iterating over each column."""
 
         headers = []
         if qtable.model() is not None:
@@ -1606,7 +1637,6 @@ class AddNewLot():
 
         # Ensure row contains valid data
         if row and isinstance(row, list) and row[0] and any(row[0]):  # Check if at least one value is not None
-            print("entro?")
             if row[0][0]:  # MIN(startdate)
                 self.dlg_lot_man.date_event_from.setDate(row[0][0])
             if row[0][1]:  # MAX(startdate)
@@ -1615,7 +1645,6 @@ class AddNewLot():
                 self.dlg_lot_man.date_event_to.setDate(current_date)
         else:
             # Handle case when there are no valid dates
-            print("No valid dates found.")
             self.dlg_lot_man.date_event_from.setDate(current_date)
             self.dlg_lot_man.date_event_to.setDate(current_date)
 
@@ -1677,6 +1706,8 @@ class AddNewLot():
 
 
     def open_load_manage(self):
+        """Opens the load management dialog by initializing its UI, loading necessary settings and data,
+        and allowing users to manage load-related information associated with the current lot."""
 
         self.dlg_load_manager = LoadManagementUi()
         tools_gw.load_settings(self.dlg_load_manager)
@@ -1697,13 +1728,10 @@ class AddNewLot():
         tools_qt.fill_combo_values(self.dlg_load_manager.cmb_filter_vehicle, combo_values, 1, combo_clear=False)
 
         tools_gw.add_icon(self.dlg_load_manager.btn_open_image, "136b")
-        print("hola2")
         self.dlg_load_manager.btn_open_image.clicked.connect(partial(self.open_load_image, self.tbl_load, 'cm.v_ui_om_vehicle_x_parameters'))
 
         # @setEditStrategy: 0: OnFieldChange, 1: OnRowChange, 2: OnManualSubmit
-        print("hola3")
         tools_qt.fill_table(self.dlg_load_manager.tbl_loads, 'cm.v_ui_om_vehicle_x_parameters', QSqlTableModel.OnManualSubmit)
-        print("hola4")
         tools_gw.set_tablemodel_config(self.dlg_load_manager, self.dlg_load_manager.tbl_loads, 'cm.v_ui_om_vehicle_x_parameters')
         self.dlg_load_manager.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_load_manager))
         self.dlg_load_manager.rejected.connect(partial(tools_gw.save_settings, self.dlg_load_manager))
@@ -1720,6 +1748,8 @@ class AddNewLot():
 
 
     def open_work_register(self):
+        """Opens the work register dialog, initializing its UI and loading the necessary data to allow users to view and
+        manage work register entries associated with the current lot or project."""
 
         self.dlg_work_register = WorkManagementUi()
         tools_gw.load_settings(self.dlg_work_register)
@@ -1767,6 +1797,8 @@ class AddNewLot():
 
 
     def accept_work_register(self, widget):
+        """Validates and finalizes the work register entries by processing user input, updating the corresponding
+        database records, and refreshing the UI to reflect the accepted work registration status."""
 
         model = widget.model()
         status = model is not None and model.submitAll()
@@ -1778,6 +1810,7 @@ class AddNewLot():
 
 
     def filter_team(self):
+        """Filters the team list based on specific criteria and updates the corresponding team selection UI component accordingly."""
 
         # Refresh model with selected filter
         filter = tools_qt.get_text(self.dlg_work_register, self.dlg_work_register.txt_team_filter)
@@ -1804,6 +1837,7 @@ class AddNewLot():
 
 
     def filter_loads(self):
+        """Applies filtering logic to the loads data, updating the loads display to only show records matching the specified criteria."""
 
         # Refresh model with selected filter
         filter = tools_qt.get_text(self.dlg_load_manager, self.dlg_load_manager.cmb_filter_vehicle)
@@ -1818,6 +1852,8 @@ class AddNewLot():
 
 
     def LotSelectorUi(self):
+        """Initializes and opens the Lot Selector UI, providing an interface for users to choose a lot from a list
+        with appropriate filtering and selection options."""
 
         self.dlg_lot_sel = LotSelectorUi()
         tools_gw.load_settings(self.dlg_lot_sel)
@@ -1851,6 +1887,8 @@ class AddNewLot():
 
 
     def populate_LotSelectorUi(self, dialog, tableleft, tableright, field_id_left, field_id_right, hide_left, hide_right):
+        """Populates the Lot Selector UI by retrieving available lot records from the database,
+        formatting the data, and updating the UI components to display the list of lots for user selection."""
 
         # Get rows id on table lot manager
         model = self.dlg_lot_man.tbl_lots.model()
@@ -1909,6 +1947,7 @@ class AddNewLot():
 
     def filter_LotSelectorUi(self, dialog, text_line, qtable, tableleft, tableright, field_id_r, field_id_l, filter_data):
         """ Fill the QTableView by filtering through the QLineEdit"""
+
         filter_id = tools_qt.get_text(dialog, dialog.txt_name)
         filter_status = tools_qt.get_text(dialog, dialog.txt_status_filter)
         filter_wotype = tools_qt.get_text(dialog, dialog.txt_wotype_filter)
@@ -1966,6 +2005,8 @@ class AddNewLot():
 
 
     def save_user_values(self, dialog):
+        """Saves the current user-specific settings or preferences from the dialog to persistent storage,
+        ensuring that the user's configuration is maintained for future sessions."""
 
         cur_user = tools_db.get_current_user()
         csv_path = tools_qt.get_text(dialog, dialog.txt_path)
@@ -1973,6 +2014,8 @@ class AddNewLot():
 
 
     def load_user_values(self, dialog):
+        """Loads previously saved user-specific settings or preferences into the dialog,
+        restoring configuration and personalization from prior sessions."""
 
         cur_user = tools_db.get_current_user()
         csv_path = tools_qgis.get_plugin_settings_value(self.plugin_name, dialog.objectName() + cur_user)
@@ -1980,6 +2023,8 @@ class AddNewLot():
 
 
     def select_path(self, dialog, widget_name):
+        """Opens a file or directory selection dialog, allowing the user to choose a path,
+        and updates the corresponding UI component with the selected path."""
 
         widget = tools_qt.get_widget(dialog, str(widget_name))
         csv_path = tools_qt.get_text(dialog, widget)
@@ -2041,13 +2086,14 @@ class AddNewLot():
             else:
                 self.write_to_csv(csv_path, all_rows)
         except Exception as e:
-            print(str(e))
             msg = "File path doesn't exist or you dont have permission or file is opened"
             tools_qgis.show_warning(msg)
             pass
 
 
     def write_to_csv(self, folder_path=None, all_rows=None):
+        """Writes the contents of a given model or dataset to a CSV file at the specified path,
+        handling formatting and export operations."""
 
         with open(folder_path, "w") as output:
             writer = csv.writer(output, lineterminator='\n')
@@ -2057,6 +2103,8 @@ class AddNewLot():
 
 
     def populate_combo_filters(self, combo, table_name, fields="id, idval"):
+        """Populates the combo box filters by retrieving the necessary data from the database or
+        data source and updating the UI component to enable filtering of table entries."""
 
         sql = ("SELECT "+str(fields)+" "
                "FROM cm."+str(table_name)+" "
@@ -2181,6 +2229,9 @@ class AddNewLot():
 
 
     def check_for_ids(self):
+        """Checks the internal list of selected feature IDs to ensure it is complete and consistent with
+        the current UI selections, triggering any necessary updates or validations."""
+
         row_count = self.dlg_lot.tbl_relation.model().rowCount()
         self.assiged_to = tools_qt.get_combo_value(self.dlg_lot, self.dlg_lot.cmb_assigned_to, 0)
         if row_count != 0:
@@ -2200,7 +2251,6 @@ class AddNewLot():
     """ FUNCTIONS RELATED WITH TAB LOAD"""
     def fill_tab_load(self):
         """ Fill tab 'Load' """
-        print("hola5")
         table_load = "cm.v_ui_om_vehicle_x_parameters"
         filter = "lot_id = '" + str(tools_qt.get_text(self.dlg_lot, self.dlg_lot.lot_id)) + "'"
 
@@ -2255,6 +2305,8 @@ class AddNewLot():
         self.set_model_to_table(widget, table_name, expr_filter)
 
     def open_load_image(self, qtable, pg_table):
+        """Opens the load image associated with the selected record by retrieving the relevant image data using the specified table parameter,
+        and then displaying the image in the appropriate viewer or external application."""
 
         selected_list = qtable.selectionModel().selectedRows(0)
 
@@ -2296,6 +2348,8 @@ class AddNewLot():
 
 
     def resources_management(self):
+        """Manages resources by coordinating the loading, display, and updates of resource-related information
+        (such as teams and vehicles) within the application's UI."""
 
         # Create the dialog
         self.dlg_resources_man = ResourcesManagementUi(self)
@@ -2336,6 +2390,8 @@ class AddNewLot():
 
 
     def populate_team_views(self):
+        """Populates the team views by retrieving current team data from the database and updating the corresponding
+        UI elements to display this information."""
 
         # Get team selected
         team_name = tools_qt.get_text(self.dlg_resources_man, self.dlg_resources_man.cmb_team)
@@ -2352,6 +2408,8 @@ class AddNewLot():
 
 
     def populate_vehicle_views(self):
+        """Populates the vehicle views by querying the database for the latest vehicle data and refreshing the associated
+        UI components to reflect current information."""
 
         # Get vehicle selected
         vehicle_name = tools_qt.get_text(self.dlg_resources_man, self.dlg_resources_man.cmb_vehicle)
@@ -2363,6 +2421,8 @@ class AddNewLot():
 
 
     def open_team_selector(self):
+        """Opens the team selector dialog, providing an interface for users to choose a team from the available
+        list and updating the selection state accordingly."""
 
         # Create the dialog
         self.dlg_team_man = TeamManagemenUi(self)
@@ -2396,6 +2456,8 @@ class AddNewLot():
     def populate_team_selectors(self, dialog, tableleft, tableright, field_id_left, field_id_right, alias,
                                 hide_left, hide_right, table_all, table_selected, button_select, button_unselect,
                                 parameters_left, parameters_right):
+        """Populates the team selectors by fetching available team data from the database and updating the corresponding
+        UI elements (e.g., combo boxes) to ensure users can select from the most current team options."""
 
         # Get team selected
         filter_team = tools_qt.get_text(self.dlg_resources_man, "cmb_team")
@@ -2541,7 +2603,7 @@ class AddNewLot():
         # Get vehicle selected
         filter_vehicle = tools_qt.get_text(self.dlg_resources_man, "cmb_vehicle")
         message = "You are trying delete vehicle '" + str(filter_vehicle) + "'. Do you want continue?"
-        answer =  tools_qt.show_question(message, "Delete vehicle")
+        answer = tools_qt.show_question(message, "Delete vehicle")
         if answer:
             sql = ("DELETE FROM ext_cat_vehicle WHERE idval = '" + str(filter_vehicle) + "'")
             tools_db.execute_sql(sql)
