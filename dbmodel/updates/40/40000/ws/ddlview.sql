@@ -5849,7 +5849,7 @@ p.pattern_id,
     inp_pattern_value.factor_15,
     inp_pattern_value.factor_16,
     inp_pattern_value.factor_17,
-    inp_pattern_value.factor_18,
+    inp_pattern_value.factor_18
    FROM selector_expl s,
     inp_pattern p
      JOIN inp_pattern_value USING (pattern_id)
