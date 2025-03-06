@@ -2115,3 +2115,6 @@ DELETE FROM config_form_fields WHERE formname='v_edit_dimensions' AND formtype='
 UPDATE sys_param_user
 	SET layoutorder=24
 	WHERE id='utils_psector_strategy';
+
+-- 06/03/2025
+DELETE FROM sys_function WHERE id = 3240;

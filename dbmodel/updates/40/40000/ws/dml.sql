@@ -3341,3 +3341,6 @@ UPDATE config_form_fields SET widgettype='typeahead', dv_querytext='SELECT id, i
 INSERT INTO config_form_fields
 (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder)
 VALUES('v_edit_arc', 'form_feature', 'tab_data', 'cat_dr', 'lyt_data_1', 55, 'integer', 'text', 'cat_dr', 'cat_dr', NULL, false, NULL, false, NULL, NULL, NULL, true, true, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL);
+
+-- 06/03/2025
+UPDATE config_form_fields SET layoutname='lyt_visit_mng_1', layoutorder=1, "datatype"=NULL, widgettype='tablewidget', "label"=NULL, tooltip=NULL, placeholder=NULL, ismandatory=false, isparent=false, iseditable=false, isautoupdate=false, isfilter=false, dv_querytext=NULL, dv_orderby_id=false, dv_isnullvalue=false, dv_parent_id=NULL, dv_querytext_filterc=NULL, stylesheet=NULL, widgetcontrols=NULL, widgetfunction=NULL, linkedobject='tbl_visit_manager', hidden=false, web_layoutorder=1 WHERE formname='generic' AND formtype='form_visit' AND columnname='tbl_visit_edit' AND tabname='tab_none';
