@@ -24,23 +24,7 @@ BEGIN
 
   v_featurefield:= TG_ARGV[0];
 
-  IF TG_OP = 'UPDATE' AND (OLD.lock_level = 1 AND NEW.lock_level = 1) THEN
-    EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-    "data":{"message":"3284", "function":"2718","parameters":{"lock_level":'||NEW.lock_level||'}}}$$);';
-    RETURN NULL;
-  ELSIF TG_OP = 'DELETE' AND (OLD.lock_level = 2) THEN
-    EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-    "data":{"message":"3284", "function":"2718","parameters":{"lock_level":'||OLD.lock_level||'}}}$$);';
-    RETURN NULL;
-  ELSIF TG_OP = 'UPDATE' AND (OLD.lock_level = 3 AND NEW.lock_level = 3) THEN
-    EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-    "data":{"message":"3284", "function":"2718","parameters":{"lock_level":'||NEW.lock_level||'}}}$$);';
-    RETURN NULL;
-  ELSIF TG_OP = 'DELETE' AND (OLD.lock_level = 3) THEN
-    EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-    "data":{"message":"3284", "function":"2718","parameters":{"lock_level":'||OLD.lock_level||'}}}$$);';
-    RETURN NULL;
-  END IF;
+
 
   IF v_featurefield = 'inp_subcatchment' THEN
     IF TG_OP = 'UPDATE' THEN
@@ -63,6 +47,24 @@ BEGIN
     END IF;
 
     RETURN NULL;
+  ELSE
+    IF TG_OP = 'UPDATE' AND (OLD.lock_level = 1 AND NEW.lock_level = 1) THEN
+      EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+      "data":{"message":"3284", "function":"2718","parameters":{"lock_level":'||NEW.lock_level||'}}}$$);';
+      RETURN NULL;
+    ELSIF TG_OP = 'DELETE' AND (OLD.lock_level = 2) THEN
+      EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+      "data":{"message":"3284", "function":"2718","parameters":{"lock_level":'||OLD.lock_level||'}}}$$);';
+      RETURN NULL;
+    ELSIF TG_OP = 'UPDATE' AND (OLD.lock_level = 3 AND NEW.lock_level = 3) THEN
+      EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+      "data":{"message":"3284", "function":"2718","parameters":{"lock_level":'||NEW.lock_level||'}}}$$);';
+      RETURN NULL;
+    ELSIF TG_OP = 'DELETE' AND (OLD.lock_level = 3) THEN
+      EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+      "data":{"message":"3284", "function":"2718","parameters":{"lock_level":'||OLD.lock_level||'}}}$$);';
+      RETURN NULL;
+    END IF;
   END IF;
 
 	RETURN NEW;
