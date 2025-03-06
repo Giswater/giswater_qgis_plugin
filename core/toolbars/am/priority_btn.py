@@ -370,21 +370,13 @@ class CalculatePriority:
 
         tools_gw.disable_tab_log(self.dlg_priority)
 
-        icons_folder = os.path.join(
-            lib_vars.plugin_dir, f"icons{os.sep}dialogs{os.sep}20x20"
-        )
-        icon_path = os.path.join(icons_folder, str(137) + ".png")
-        if os.path.exists(icon_path):
-            self.dlg_priority.btn_snapping.setIcon(QIcon(icon_path))
+        tools_gw.add_icon(self.dlg_priority.btn_snapping, "137")
 
-        icon_path = os.path.join(icons_folder, "111b.png")
-        if os.path.exists(icon_path):
-            self.dlg_priority.btn_add_catalog.setIcon(QIcon(icon_path))
-            self.dlg_priority.btn_add_material.setIcon(QIcon(icon_path))
-        icon_path = os.path.join(icons_folder, "112b.png")
-        if os.path.exists(icon_path):
-            self.dlg_priority.btn_remove_catalog.setIcon(QIcon(icon_path))
-            self.dlg_priority.btn_remove_material.setIcon(QIcon(icon_path))
+        tools_gw.add_icon(self.dlg_priority.btn_add_catalog, "111")
+        tools_gw.add_icon(self.dlg_priority.btn_add_material, "111")
+
+        tools_gw.add_icon(self.dlg_priority.btn_remove_catalog, "112")
+        tools_gw.add_icon(self.dlg_priority.btn_remove_material, "112")
 
         # Manage form
 
