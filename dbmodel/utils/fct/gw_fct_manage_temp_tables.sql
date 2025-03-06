@@ -227,7 +227,6 @@ BEGIN
                 CREATE TEMP TABLE IF NOT EXISTS temp_t_demand (LIKE temp_demand INCLUDING ALL);
 
 
-                CREATE TEMP TABLE IF NOT EXISTS temp_t_pgr_go2epa_arc (LIKE temp_arc INCLUDING ALL);
                 CREATE TEMP TABLE IF NOT EXISTS temp_t_pgr_go2epa_node (LIKE temp_node INCLUDING ALL);
 
                 CREATE TEMP TABLE IF NOT EXISTS t_rpt_inp_pattern_value (LIKE rpt_inp_pattern_value INCLUDING ALL);
@@ -243,6 +242,9 @@ BEGIN
                 CREATE TEMP TABLE IF NOT EXISTS t_rpt_inp_node (LIKE rpt_inp_node INCLUDING ALL);
                 CREATE TEMP TABLE IF NOT EXISTS t_rpt_inp_arc (LIKE rpt_inp_arc INCLUDING ALL);
             END IF;
+
+                            CREATE TEMP TABLE IF NOT EXISTS temp_t_pgr_go2epa_arc (LIKE temp_arc INCLUDING ALL);
+
 
             CREATE TEMP TABLE IF NOT EXISTS t_rpt_cat_result (LIKE rpt_cat_result INCLUDING ALL);
 
@@ -296,7 +298,7 @@ BEGIN
         END IF;
         -- return message:: 'Log tables created' or 'Anl tables created' ...
         RETURN '{"status":"Accepted", "message":"'||UPPER(LEFT(v_group,1))||LOWER(SUBSTRING(v_group,2))||' tables created"}';
-    
+
 	ELSIF v_action = 'DROP' THEN
         DROP TABLE IF EXISTS t_audit_check_data;
         DROP TABLE IF EXISTS t_audit_check_project;
