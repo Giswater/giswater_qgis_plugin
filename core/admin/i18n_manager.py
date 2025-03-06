@@ -141,14 +141,12 @@ class GwSchemaI18NManager:
         port = tools_qt.get_text(self.dlg_qm, self.dlg_qm.txt_port, return_string_null=False)
         db = tools_qt.get_text(self.dlg_qm, self.dlg_qm.txt_db, return_string_null=False)
         user = tools_qt.get_text(self.dlg_qm, self.dlg_qm.txt_user, return_string_null=False)
-        language = tools_qt.get_combo_value(self.dlg_qm, self.dlg_qm.cmb_language, 0)
         py_msg = False
         db_msg = False
         tools_gw.set_config_parser('i18n_generator', 'qm_lang_host', f"{host}", "user", "session", prefix=False)
         tools_gw.set_config_parser('i18n_generator', 'qm_lang_port', f"{port}", "user", "session", prefix=False)
         tools_gw.set_config_parser('i18n_generator', 'qm_lang_db', f"{db}", "user", "session", prefix=False)
         tools_gw.set_config_parser('i18n_generator', 'qm_lang_user', f"{user}", "user", "session", prefix=False)
-        tools_gw.set_config_parser('i18n_generator', 'qm_lang_language', f"{language}", "user", "session", prefix=False)
         tools_gw.set_config_parser('i18n_generator', 'qm_lang_py_msg', f"{py_msg}", "user", "session", prefix=False)
         tools_gw.set_config_parser('i18n_generator', 'qm_lang_db_msg', f"{db_msg}", "user", "session", prefix=False)
 
