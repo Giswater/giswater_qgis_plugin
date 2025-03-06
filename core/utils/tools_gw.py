@@ -4572,6 +4572,17 @@ def _check_user_params(section, parameter, file_name, prefix=False):
     # Get the value of the parameter (the one get_config_parser is looking for) in the inventory
     check_value = get_config_parser(f"{file_name}.{section}", parameter, "project", "user_params", False,
                                     get_comment=True, chk_user_params=False)
+    
+    if check_value is None:
+        # Get the value of the parameter (the one get_config_parser is looking for) in the inventory with prefix
+        parameter_prefixed = f"ws{parameter}"
+        check_value = get_config_parser(f"{file_name}.{section}", parameter_prefixed, "project", "user_params", False,
+                                        get_comment=True, chk_user_params=False)
+        if check_value is None:
+            parameter_prefixed = f"ud{parameter}"
+            check_value = get_config_parser(f"{file_name}.{section}", parameter_prefixed, "project", "user_params", False,
+                                        get_comment=True, chk_user_params=False)
+
     # If it doesn't exist in the inventory, add it with "None" as value
     if check_value is None:
         set_config_parser(f"{file_name}.{section}", parameter, None, "project", "user_params", prefix=False,
