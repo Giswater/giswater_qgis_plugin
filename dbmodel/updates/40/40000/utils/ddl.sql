@@ -274,3 +274,7 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sector", "c
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"macrosector", "column":"lock_level", "dataType":"int4", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dma", "column":"lock_level", "dataType":"int4", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"macrodma", "column":"lock_level", "dataType":"int4", "isUtils":"False"}}$$);
+
+-- 06/03/2025
+DROP VIEW v_ui_rpt_cat_result;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"rpt_cat_result", "column":"result_id", "dataType":"varchar(50)", "isUtils":"False"}}$$);
