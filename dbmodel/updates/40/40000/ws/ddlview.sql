@@ -5824,6 +5824,38 @@ AS SELECT DISTINCT
   WHERE p.expl_id = s.expl_id AND s.cur_user = "current_user"()::text OR p.expl_id IS NULL
   ORDER BY p.pattern_id;
 
+CREATE OR REPLACE VIEW v_edit_inp_pattern_value
+AS SELECT inp_pattern_value.id,
+p.pattern_id,
+    p.pattern_type,
+    p.observ,
+    p.tscode,
+    p.tsparameters::text AS tsparameters,
+    p.expl_id,
+    inp_pattern_value.factor_1,
+    inp_pattern_value.factor_2,
+    inp_pattern_value.factor_3,
+    inp_pattern_value.factor_4,
+    inp_pattern_value.factor_5,
+    inp_pattern_value.factor_6,
+    inp_pattern_value.factor_7,
+    inp_pattern_value.factor_8,
+    inp_pattern_value.factor_9,
+    inp_pattern_value.factor_10,
+    inp_pattern_value.factor_11,
+    inp_pattern_value.factor_12,
+    inp_pattern_value.factor_13,
+    inp_pattern_value.factor_14,
+    inp_pattern_value.factor_15,
+    inp_pattern_value.factor_16,
+    inp_pattern_value.factor_17,
+    inp_pattern_value.factor_18,
+   FROM selector_expl s,
+    inp_pattern p
+     JOIN inp_pattern_value USING (pattern_id)
+  WHERE p.expl_id = s.expl_id AND s.cur_user = "current_user"()::text OR p.expl_id IS NULL
+  ORDER BY inp_pattern_value.id;
+
 CREATE OR REPLACE VIEW v_anl_arc
 AS SELECT anl_arc.id,
     anl_arc.arc_id,

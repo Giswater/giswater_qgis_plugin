@@ -335,3 +335,9 @@ DROP TRIGGER IF EXISTS gw_trg_link_data ON connec;
 CREATE TRIGGER gw_trg_link_data
 AFTER UPDATE OF epa_type, state_type, expl_id2, conneccat_id, fluid_type, n_hydrometer
 ON connec FOR EACH ROW EXECUTE PROCEDURE gw_trg_link_data('connec');
+
+CREATE TRIGGER gw_trg_edit_inp_pattern INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_pattern
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_pattern('inp_pattern');
+
+CREATE TRIGGER gw_trg_edit_inp_pattern_value INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_pattern_value
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_pattern('inp_pattern_value');
