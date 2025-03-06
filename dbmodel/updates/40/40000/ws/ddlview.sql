@@ -5808,6 +5808,7 @@ AS SELECT DISTINCT c.id,
   WHERE c.expl_id = s.expl_id AND s.cur_user = "current_user"()::text OR c.expl_id IS NULL
   ORDER BY c.id;
 
+DROP VIEW IF EXISTS v_edit_inp_pattern;
 CREATE OR REPLACE VIEW v_edit_inp_pattern
 AS SELECT DISTINCT
     p.pattern_id,
