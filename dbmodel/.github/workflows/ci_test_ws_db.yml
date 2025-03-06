@@ -112,4 +112,6 @@ jobs:
           echo "Running STRUCTURE tests..."
           pg_prove -h localhost -p ${{ env.PORT }} -U postgres -d gw_db test/structure/ws/*.sql || EXIT_CODE=1
 
+          # TODO add new structure tests: ws/schema/, ws/data/, ws/security/ ws/plsql/, ws/perf/
+          # pg_prove -h localhost -p ${{ env.PORT }} -U postgres -d gw_db test/ws/plsql/*.sql || EXIT_CODE=1
           exit $EXIT_CODE
