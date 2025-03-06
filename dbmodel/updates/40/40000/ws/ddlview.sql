@@ -5809,7 +5809,9 @@ AS SELECT DISTINCT c.id,
   ORDER BY c.id;
 
 CREATE OR REPLACE VIEW v_edit_inp_pattern
-AS SELECT DISTINCT p.pattern_id,
+AS SELECT DISTINCT
+    p.pattern_id,
+    p.pattern_type,
     p.observ,
     p.tscode,
     p.tsparameters::text AS tsparameters,

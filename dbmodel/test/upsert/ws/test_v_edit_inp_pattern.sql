@@ -12,8 +12,8 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 SELECT plan(6);
 
-INSERT INTO v_edit_inp_pattern (pattern_id, observ, tscode, tsparameters, expl_id, log, active)
-VALUES('-901', NULL, NULL, NULL, 1, NULL, true);
+INSERT INTO v_edit_inp_pattern (pattern_id, pattern_type, observ, tscode, tsparameters, expl_id, log, active)
+VALUES('-901', 'MONTHLY', NULL, NULL, NULL, 1, NULL, true);
 
 SELECT is((SELECT count(*)::integer FROM v_edit_inp_pattern WHERE pattern_id = '-901'), 1, 'INSERT: v_edit_inp_pattern -901 was inserted');
 SELECT is((SELECT count(*)::integer FROM inp_pattern WHERE pattern_id = '-901'), 1, 'INSERT: inp_pattern -901 was inserted');
