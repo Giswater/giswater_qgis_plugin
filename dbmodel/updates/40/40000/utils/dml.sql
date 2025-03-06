@@ -2140,3 +2140,10 @@ UPDATE sys_param_user
 
 -- 06/03/2025
 DELETE FROM sys_function WHERE id = 3240;
+
+INSERT INTO inp_typevalue (typevalue, id, idval, descript, addparam) VALUES('inp_typevalue_pattern', 'MONTHLY', 'MONTHLY', NULL, NULL) ON CONFLICT DO NOTHING;
+INSERT INTO inp_typevalue (typevalue, id, idval, descript, addparam) VALUES('inp_typevalue_pattern', 'DAILY', 'DAILY', NULL, NULL) ON CONFLICT DO NOTHING;
+INSERT INTO inp_typevalue (typevalue, id, idval, descript, addparam) VALUES('inp_typevalue_pattern', 'HOURLY', 'HOURLY', NULL, NULL) ON CONFLICT DO NOTHING;
+INSERT INTO inp_typevalue (typevalue, id, idval, descript, addparam) VALUES('inp_typevalue_pattern', 'WEEKEND', 'WEEKEND', NULL, NULL) ON CONFLICT DO NOTHING;
+
+UPDATE config_form_fields SET dv_querytext='SELECT  id, idval FROM inp_typevalue WHERE id IS NOT NULL AND typevalue=''inp_typevalue_pattern''' WHERE formname='inp_pattern' AND formtype='form_feature' AND columnname='pattern_type' AND tabname='tab_none';

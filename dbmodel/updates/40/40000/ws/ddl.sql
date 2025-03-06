@@ -1183,3 +1183,54 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dma", "colu
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sector", "column":"lock_level", "dataType":"int4", "isUtils":"False"}}$$);
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"link", "column":"fluid_type", "dataType":"varchar(50)"}}$$);
+
+-- 06/03/2025
+ALTER TABLE inp_pattern RENAME TO _inp_pattern;
+
+-- Drop foreign keys that reference inp_pattern
+ALTER TABLE ext_hydrometer_category DROP CONSTRAINT ext_hydrometer_category_pattern_id_fkey;
+ALTER TABLE ext_rtc_dma_period DROP CONSTRAINT ext_rtc_dma_period_pattern_id_fkey;
+ALTER TABLE inp_inlet DROP CONSTRAINT inp_inlet_pattern_id_fkey;
+ALTER TABLE inp_pattern_value DROP CONSTRAINT inp_pattern_value_pattern_id_fkey;
+ALTER TABLE inp_connec DROP CONSTRAINT inp_connec_pattern_id_fkey;
+ALTER TABLE inp_dscenario_connec DROP CONSTRAINT inp_demand_pattern_id_fkey;
+ALTER TABLE inp_dscenario_inlet DROP CONSTRAINT inp_dscenario_inlet_pattern_id_fkey;
+ALTER TABLE inp_dscenario_junction DROP CONSTRAINT inp_dscenario_junction_pattern_id_fkey;
+ALTER TABLE inp_dscenario_pump DROP CONSTRAINT inp_dscenario_pump_pattern_id_fkey;
+ALTER TABLE inp_dscenario_pump DROP CONSTRAINT inp_dscenario_pump_energy_pattern_id_fkey;
+ALTER TABLE inp_dscenario_pump_additional DROP CONSTRAINT inp_dscenario_pump_additional_pattern_id_fkey;
+ALTER TABLE inp_dscenario_pump_additional DROP CONSTRAINT inp_dscenario_pump_additional_energy_pattern_id_fkey;
+ALTER TABLE inp_dscenario_reservoir DROP CONSTRAINT inp_dscenario_reservoir_pattern_id_fkey;
+ALTER TABLE inp_dscenario_virtualpump DROP CONSTRAINT inp_dscenario_virtualpump_pattern_id_fkey;
+ALTER TABLE inp_dscenario_virtualpump DROP CONSTRAINT inp_dscenario_virtualpump_energy_pattern_id_fkey;
+ALTER TABLE inp_junction DROP CONSTRAINT inp_junction_pattern_id_fkey;
+ALTER TABLE inp_pump DROP CONSTRAINT inp_pump_pattern_id_fkey;
+ALTER TABLE inp_pump DROP CONSTRAINT inp_pump_energy_pattern_id_fkey;
+ALTER TABLE inp_pump_additional DROP CONSTRAINT inp_pump_additional_pattern_id_fkey;
+ALTER TABLE inp_pump_additional DROP CONSTRAINT inp_pump_additional_energy_pattern_id_fkey;
+ALTER TABLE inp_reservoir DROP CONSTRAINT inp_reservoir_pattern_id_fkey;
+ALTER TABLE inp_virtualpump DROP CONSTRAINT inp_virtualpump_pattern_id_fkey;
+ALTER TABLE inp_virtualpump DROP CONSTRAINT inp_virtualpump_energy_pattern_id_fkey;
+ALTER TABLE dma DROP CONSTRAINT dma_pattern_id_fkey;
+ALTER TABLE dqa DROP CONSTRAINT dqa_pattern_id_fkey;
+ALTER TABLE sector DROP CONSTRAINT sector_pattern_id_fkey;
+ALTER TABLE inp_dscenario_demand DROP CONSTRAINT inp_dscenario_demand_pattern_id_fkey;
+ALTER TABLE supplyzone DROP CONSTRAINT supplyzone_pattern_id_fkey;
+ALTER TABLE _inp_source_ DROP CONSTRAINT inp_source_pattern_id_fkey;
+
+
+ALTER TABLE _inp_pattern DROP CONSTRAINT inp_pattern_pkey;
+ALTER TABLE _inp_pattern DROP CONSTRAINT inp_pattern_expl_id_fkey;
+
+CREATE TABLE inp_pattern (
+	pattern_id varchar(16) NOT NULL,
+	pattern_type varchar(30) NULL,
+	observ text NULL,
+	tscode text NULL,
+	tsparameters json NULL,
+	expl_id int4 NULL,
+	log text NULL,
+	active bool DEFAULT true NULL,
+	CONSTRAINT inp_pattern_pkey PRIMARY KEY (pattern_id),
+	CONSTRAINT inp_pattern_expl_id_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON DELETE CASCADE ON UPDATE CASCADE
+);

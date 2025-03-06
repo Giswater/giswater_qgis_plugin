@@ -3344,3 +3344,7 @@ VALUES('v_edit_arc', 'form_feature', 'tab_data', 'cat_dr', 'lyt_data_1', 55, 'in
 
 -- 06/03/2025
 UPDATE config_form_fields SET formname='generic' WHERE formname='visit_manager' AND formtype='form_visit' AND columnname='tbl_visit_edit' AND tabname='tab_none';
+
+INSERT INTO inp_pattern (pattern_id, observ, tscode, tsparameters, expl_id, log, active)
+SELECT pattern_id, observ, tscode, tsparameters, expl_id, log, true
+FROM _inp_pattern;
