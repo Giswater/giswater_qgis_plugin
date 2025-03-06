@@ -33,7 +33,7 @@ def get_min_greater_than(iterable, value):
             result = item
     return result
 
-
+# sh formula [directly from the paper Shamir and Howard Concept]
 def optimal_replacement_time(
     present_year,
     number_of_breaks,
@@ -42,7 +42,7 @@ def optimal_replacement_time(
     replacement_cost,
     discount_rate,
 ):
-    BREAKS_YEAR_0 = 0.05
+    BREAKS_YEAR_0 = 0.05   # represents how many breaks we have in the pipe right now.
     optimal_replacement_cycle = (1 / break_growth_rate) * log(
         log1p(discount_rate) * replacement_cost / BREAKS_YEAR_0 / repairing_cost
     )
@@ -698,9 +698,12 @@ class GwCalculatePriority(GwTask):
                 arc_material, pressure
             )
             one_year = timedelta(days=365)
-            duration = arc["total_expected_useful_life"] * one_year
-            remaining_years = arc["calculated_builtdate"] + duration - date.today()
-            arc["longevity"] = remaining_years / one_year
+            duration = arc["total_expected_useful_life"]
+            remaining_years = arc["calculated_builtdate"].year + duration - date.today().year
+            # Actual age of the arc
+            real_years = date.today().year - arc["calculated_builtdate"].year
+            # Calculate the longevity value [real life/ expected useful life]
+            arc["longevity"] = real_years / duration
 
             arc["nrw"] = nrw.get(arc["dma_id"], 0)
 
@@ -733,9 +736,8 @@ class GwCalculatePriority(GwTask):
         for arc in arcs:
             arc["val_rleak"] = self._fit_to_scale(arc["rleak"], min_rleak, max_rleak)
             arc["val_mleak"] = self._fit_to_scale(arc["mleak"], min_mleak, max_mleak)
-            arc["val_longevity"] = 10 - self._fit_to_scale(
-                arc["longevity"], min_longevity, max_longevity
-            )
+             # New Longevity formula
+            arc["val_longevity"] = ((arc["longevity"] - min_longevity) * 10) / (max_longevity - min_longevity)
             #   - flow (how to take in account ficticious flows?)
             arc["val_flow"] = self._fit_to_scale(arc["flow_avg"], min_flow, max_flow)
             arc["val_nrw"] = (
