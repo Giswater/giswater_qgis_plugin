@@ -1629,7 +1629,7 @@ INSERT INTO config_form_list (listname, query_text, device, listtype, listclass,
     }
   ]
 }'::json);
-INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('doc_results', 'SELECT id, psector_name, doc_name, doc_type, "path", observ, "date", user_name FROM v_ui_doc_x_psector', 5, 'tab', 'list', '{"orderBy":"1", "orderType": "ASC"}'::json, '{
+INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('doc_results', 'SELECT psector_name, doc_name, doc_type, "path", observ, "date", user_name FROM v_ui_doc_x_psector WHERE psector_name IS NOT NULL', 5, 'tab', 'list', '{"orderBy":"1", "orderType": "ASC"}'::json, '{
   "enableGlobalFilter": false,
   "enableStickyHeader": true,
   "positionToolbarAlertBanner": "bottom",
