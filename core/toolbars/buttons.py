@@ -6,12 +6,12 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 
-# Basic
+# Basic: 01, 02, 03
 from .basic.info_btn import GwInfoButton
-from .basic.search_btn import GwSearchButton
 from .basic.selector_btn import GwSelectorButton
+from .basic.search_btn import GwSearchButton
 
-# Om
+# Om: 11, 12, 13, 14, 15, 16, 17, 18
 from .om.mincut_btn import GwMincutButton
 from .om.mincut_manager_btn import GwMincutManagerButton
 from .om.flow_trace_btn import GwFlowTraceButton
@@ -21,13 +21,13 @@ from .om.visit_btn import GwVisitButton
 from .om.visit_manager_btn import GwVisitManagerButton
 from .om.date_selector_btn import GwDateSelectorButton
 
-# Edit
+# Edit: 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36
 from .edit.point_add_btn import GwPointAddButton
 from .edit.arc_add_btn import GwArcAddButton
-from .edit.feature_replace_btn import GwFeatureReplaceButton
 from .edit.arc_divide_btn import GwArcDivideButton
 from .edit.arc_fusion_btn import GwArcFusionButton
 from .edit.featuretype_change_btn import GwFeatureTypeChangeButton
+from .edit.feature_replace_btn import GwFeatureReplaceButton
 from .edit.connect_link_btn import GwConnectLinkButton
 from .edit.feature_end_btn import GwFeatureEndButton
 from .edit.feature_delete_btn import GwFeatureDeleteButton
@@ -39,39 +39,39 @@ from .edit.element_manager_btn import GwElementManagerButton
 from .edit.aux_circle_add_btn import GwAuxCircleAddButton
 from .edit.aux_point_add_btn import GwAuxPointAddButton
 
-# Epa
+# Epa: 41, 42, 43, 44, 45, 46
+from .epa.nonvisual_manager_btn import GwNonVisualManagerButton
 from .epa.go2epa_btn import GwGo2EpaButton
 from .epa.go2epa_manager_btn import GwGo2EpaManagerButton
 from .epa.go2epa_selector_btn import GwGo2EpaSelectorButton
 from .epa.dscenario_manager_btn import GwDscenarioManagerButton
-from .epa.nonvisual_manager_btn import GwNonVisualManagerButton
 from .epa.epa_tools_btn import GwEpaTools
 
-# Plan
+# Plan: 51, 52, 53
 from .plan.psector_btn import GwPsectorButton
 from .plan.psector_manager_btn import GwPsectorManagerButton
 from .plan.netscenario_manager_btn import GwNetscenarioManagerButton
 
-# Utilities
-from .utilities.toolbox_btn import GwToolBoxButton
-from .utilities.config_btn import GwConfigButton
-from .utilities.csv_btn import GwCSVButton
-from .utilities.print_btn import GwPrintButton
-from .utilities.project_check_btn import GwProjectCheckButton
-from .utilities.utilities_manager.workspace_manager import GwWorkspaceManagerButton
+# Utilities: 61, 62, 63, 64, 65, 66, 67
 from .utilities.utils_manager_btn import GwUtilsManagerButton
+from .utilities.config_btn import GwConfigButton
+from .utilities.toolbox_btn import GwToolBoxButton
+from .utilities.utilities_manager.workspace_manager import GwWorkspaceManagerButton
+from .utilities.print_btn import GwPrintButton
+from .utilities.csv_btn import GwCSVButton
+from .utilities.project_check_btn import GwProjectCheckButton
 
-# ToC
+# ToC: 71, 72
 from .toc.add_child_layer_btn import GwAddChildLayerButton
 from .toc.layerstyle_change_btn import GwLayerStyleChangeButton
 
-# am
+# am: 80, 81, 82, 83
 from .am.breakage_btn import GwAmBreakageButton
 from .am.priority_btn import GwAmPriorityButton
 from .am.result_manager_btn import GwResultManagerButton
 from .am.result_selector_btn import GwResultSelectorButton
 
-# cm
+# cm: 84, 85, 86
 from .cm.add_lot2 import GwAddLotButton
 from .cm.manager_lot import GwManageLotButton
 from .cm.resources_lot import GwLotResourceManagementButton
