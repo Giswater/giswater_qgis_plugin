@@ -62,7 +62,7 @@ v_type_column text;
 v_cat_column text;
 v_sql text;
 v_element_table text;
-v_verified_id text;
+v_verified_id integer;
 v_inventory boolean;
 v_connec_proximity_value text;
 v_connec_proximity_active text;
@@ -235,9 +235,9 @@ BEGIN
 
 	-- Control of state(1)
 	IF (v_state=0 OR v_state=2 OR v_state IS NULL) THEN
-
+		v_state = 0;
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-		"data":{"message":"1070", "function":"2126","debug_msg":"State is 0 or 2", "is_process":true}}$$);' INTO v_audit_result;
+		"data":{"message":"1070", "function":"2714","parameters":{"state_id": '||v_state||'}, "is_process":true}}$$);' INTO v_audit_result;
 
 		SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'status')::text INTO v_status;
 		SELECT ((((v_audit_result::json ->> 'body')::json ->> 'data')::json ->> 'info')::json ->> 'level')::integer INTO v_level;

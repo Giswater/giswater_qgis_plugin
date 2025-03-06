@@ -5809,6 +5809,7 @@ AS SELECT DISTINCT c.id,
   ORDER BY c.id;
 
 DROP VIEW IF EXISTS v_edit_inp_pattern;
+DROP VIEW IF EXISTS v_edit_inp_pattern_value;
 CREATE OR REPLACE VIEW v_edit_inp_pattern
 AS SELECT DISTINCT
     p.pattern_id,
@@ -5825,9 +5826,8 @@ AS SELECT DISTINCT
   ORDER BY p.pattern_id;
 
 CREATE OR REPLACE VIEW v_edit_inp_pattern_value
-AS SELECT inp_pattern_value.id,
-p.pattern_id,
-    p.pattern_type,
+AS SELECT DISTINCT inp_pattern_value.id,
+    p.pattern_id,
     p.observ,
     p.tscode,
     p.tsparameters::text AS tsparameters,
