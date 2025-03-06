@@ -115,7 +115,7 @@ AND l.expl_id = se.expl_id AND se.cur_user = CURRENT_USER::text AND cf.value is 
 SELECT g.link_id FROM sp, se, cf, g JOIN l USING (link_id) WHERE g.psector_id = sp.psector_id AND sp.cur_user = "current_user"()::text AND g.state = 1
 AND l.expl_id = se.expl_id AND se.cur_user = CURRENT_USER::text AND cf.value is TRUE;
 
-CREATE OR REPLACE VIEW v_edit_macrodma AS 
+CREATE OR REPLACE VIEW v_edit_macrodma AS
  SELECT macrodma.macrodma_id,
     macrodma.name,
     macrodma.descript,
@@ -784,6 +784,7 @@ AS WITH
 			arc.custom_y1,
 			arc.elev1,
 			arc.custom_elev1,
+            arc.negativeoffset,
 	        CASE
 	            WHEN arc.sys_elev1 IS NULL THEN arc.node_sys_elev_1
 	            ELSE arc.sys_elev1

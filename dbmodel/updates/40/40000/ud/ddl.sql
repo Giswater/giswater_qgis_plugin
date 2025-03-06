@@ -979,3 +979,6 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"drainzone",
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dwfzone", "column":"lock_level", "dataType":"int4", "isUtils":"False"}}$$);
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"link", "column":"fluid_type", "dataType":"varchar(50)"}}$$);
+
+-- 06/03/2025
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"negativeoffset", "dataType":"boolean", "isUtils":"False"}}$$);
