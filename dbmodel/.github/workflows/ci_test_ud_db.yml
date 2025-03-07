@@ -103,19 +103,19 @@ jobs:
         run: |
           EXIT_CODE=0
 
-          echo "Running PL/SQL tests..."
-          pg_prove -h localhost -p ${{ env.PORT }} -U postgres -d gw_db test/ud/plsql/*.sql || EXIT_CODE=1
-
-          echo "Running DATA tests..."
-          pg_prove -h localhost -p ${{ env.PORT }} -U postgres -d gw_db test/ud/data/*.sql || EXIT_CODE=1
-
           echo "Running SCHEMA tests..."
           pg_prove -h localhost -p ${{ env.PORT }} -U postgres -d gw_db test/ud/schema/*.sql || EXIT_CODE=1
 
           echo "Running SECURITY tests..."
           pg_prove -h localhost -p ${{ env.PORT }} -U postgres -d gw_db test/ud/security/*.sql || EXIT_CODE=1
 
+          echo "Running FUNCTION tests..."
+          pg_prove -h localhost -p ${{ env.PORT }} -U postgres -d gw_db test/ud/function/*.sql || EXIT_CODE=1
+
+          echo "Running DATA tests..."
+          pg_prove -h localhost -p ${{ env.PORT }} -U postgres -d gw_db test/ud/data/*.sql || EXIT_CODE=1
+
           echo "Running PERFORMANCE tests..."
-          pg_prove -h localhost -p ${{ env.PORT }} -U postgres -d gw_db test/ud/perf/*.sql || EXIT_CODE=1
+          pg_prove -h localhost -p ${{ env.PORT }} -U postgres -d gw_db test/ud/performance/*.sql || EXIT_CODE=1
 
           exit $EXIT_CODE
