@@ -821,7 +821,7 @@ class GwVisit(QObject):
             return
 
         db_record = None
-            
+
         match feature_type:
             case 'arc':
                 db_record = GwOmVisitXArc()
@@ -945,7 +945,7 @@ class GwVisit(QObject):
     def _manage_feature_type_selected(self):
 
         tab_index = 0
-        
+
         match self.feature_type:
             case 'arc':
                 tab_index = 0
@@ -1454,7 +1454,7 @@ class GwVisit(QObject):
         file_dialog = QFileDialog()
         file_dialog.setFileMode(QFileDialog.Directory)
         # Get file types from catalog and populate QFileDialog filter
-        sql = "SELECT filetype, fextension FROM config_file"
+        sql = "SELECT id AS fextension, idval AS filetype FROM config_typevalue WHERE typevalue = 'filetype_typevalue'"
         rows = tools_db.get_rows(sql)
         f_types = rows
         file_types = ""
@@ -1496,7 +1496,7 @@ class GwVisit(QObject):
         """ Save new files into DataBase """
 
         if self.files_added:
-            sql = "SELECT filetype, fextension FROM config_file"
+            sql = "SELECT id AS fextension, idval AS filetype FROM config_typevalue WHERE typevalue = 'filetype_typevalue'"
             f_types = tools_db.get_rows(sql)
             sql = ""
             for path in self.files_added:
@@ -1835,7 +1835,7 @@ class GwVisit(QObject):
 
         # Get selected tab to set geometry type
         tab_idx = dialog.tab_feature.currentIndex()
-        
+
         match dialog.tab_feature.widget(tab_idx).objectName():
             case 'tab_arc':
                 self.feature_type = "arc"
