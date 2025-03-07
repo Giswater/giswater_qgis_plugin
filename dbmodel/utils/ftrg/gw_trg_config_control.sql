@@ -60,6 +60,14 @@ BEGIN
 				END LOOP;
 			END IF;
 
+			-- Insert into cat_mat_roughness if feature_type is ARC and operation is INSERT. Before rule called: insert_inp_cat_mat_roughness
+			IF TG_OP = 'INSERT' THEN
+				IF NEW.feature_type IS NOT NULL AND 'ARC' = ANY(NEW.feature_type) THEN
+				    INSERT INTO cat_mat_roughness (matcat_id)
+				    VALUES (NEW.id);
+				END IF;
+			END IF;
+
 		ELSIF v_configtable IN ('man_type_category', 'man_type_fluid', 'man_type_function', 'man_type_location', 'cat_brand', 'cat_brand_model') THEN
 			v_querytext='SELECT * FROM '||v_configtable||';';
 
