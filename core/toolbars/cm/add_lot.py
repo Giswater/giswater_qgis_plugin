@@ -57,7 +57,7 @@ class AddNewLot():
         self.max_id = 0
         self.signal_selectionChanged = False
         self.param_options = None
-        self.plugin_name = tools_qgis.get_plugin_metadata('name', 'gw_lotmanage')
+        self.plugin_name = 'Giswater'
         self.plugin_dir = lib_vars.plugin_dir
         self.schemaname = lib_vars.schema_name
         self.iface = global_vars.iface
@@ -85,7 +85,7 @@ class AddNewLot():
 
         # Add 'gully' for 'UD' projects
         if tools_gw.get_project_type() == 'ud':
-            self.layers['gully'] = [self.tools_qgis.get_layer_by_tablename('v_edit_gully')]
+            self.layers['gully'] = [tools_qgis.get_layer_by_tablename('v_edit_gully')]
 
         self.dlg_lot = AddLotUi(self)
         tools_gw.load_settings(self.dlg_lot)
@@ -193,7 +193,6 @@ class AddNewLot():
         self.set_active_layer()
 
         tools_gw.add_icon(self.dlg_lot.btn_open_image, "136b")
-        self.dlg_lot.btn_open_image.clicked.connect(partial(self.open_load_image, self.tbl_load, 'cm.v_ui_om_vehicle_x_parameters'))
 
         if lot_id is not None and visitclass_id not in (None, '', 'NULL'):
             self.set_values(lot_id)
@@ -1149,7 +1148,6 @@ class AddNewLot():
                 else:
                     self.dlg_lot.tab_widget.setTabEnabled(index, True)
         tools_qt.set_combo_value(self.dlg_lot.findChild(QComboBox, "feature_type"), feature_type, 1, add_new=False)
-        self.fill_tab_load()
 
 
     def reload_table_visit(self):
@@ -1727,12 +1725,7 @@ class AddNewLot():
         self.dlg_load_manager.cmb_filter_vehicle.addItem('', '')
         tools_qt.fill_combo_values(self.dlg_load_manager.cmb_filter_vehicle, combo_values, 1, combo_clear=False)
 
-        tools_gw.add_icon(self.dlg_load_manager.btn_open_image, "136b")
-        self.dlg_load_manager.btn_open_image.clicked.connect(partial(self.open_load_image, self.tbl_load, 'cm.v_ui_om_vehicle_x_parameters'))
-
         # @setEditStrategy: 0: OnFieldChange, 1: OnRowChange, 2: OnManualSubmit
-        tools_qt.fill_table(self.dlg_load_manager.tbl_loads, 'cm.v_ui_om_vehicle_x_parameters', QSqlTableModel.OnManualSubmit)
-        tools_gw.set_tablemodel_config(self.dlg_load_manager, self.dlg_load_manager.tbl_loads, 'cm.v_ui_om_vehicle_x_parameters')
         self.dlg_load_manager.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_load_manager))
         self.dlg_load_manager.rejected.connect(partial(tools_gw.save_settings, self.dlg_load_manager))
         self.dlg_load_manager.cmb_filter_vehicle.currentIndexChanged.connect(partial(self.filter_loads))
@@ -2249,13 +2242,6 @@ class AddNewLot():
         tools_qt.set_combo_value(self.dlg_lot.cmb_assigned_to, str(self.assiged_to), 0)
 
     """ FUNCTIONS RELATED WITH TAB LOAD"""
-    def fill_tab_load(self):
-        """ Fill tab 'Load' """
-        table_load = "cm.v_ui_om_vehicle_x_parameters"
-        filter = "lot_id = '" + str(tools_qt.get_text(self.dlg_lot, self.dlg_lot.lot_id)) + "'"
-
-        self.fill_tbl_load_man(self.dlg_lot, self.tbl_load, table_load, filter)
-        self.set_columns_config(self.tbl_load, table_load)
 
     def set_columns_config(self, widget, table_name, sort_order=0, isQStandardItemModel=False):
         """ Configuration of tables. Set visibility and width of columns """
@@ -2378,7 +2364,7 @@ class AddNewLot():
         self.dlg_resources_man.btn_team_selector.clicked.connect(partial(self.open_team_selector))
         self.dlg_resources_man.btn_team_delete.clicked.connect(partial(self.delete_team))
 
-        self.dlg_resources_man.btn_vehicle_create.clicked.connect(partial(self.create_vehicle))
+        #self.dlg_resources_man.btn_vehicle_create.clicked.connect(partial(self.create_vehicle))
         self.dlg_resources_man.btn_vehicle_update.clicked.connect(partial(self.manage_vehicle))
         self.dlg_resources_man.btn_vehicle_delete.clicked.connect(partial(self.delete_vehicle))
 
