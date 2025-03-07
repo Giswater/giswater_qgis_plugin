@@ -302,10 +302,6 @@ def manage_visit_class(**kwargs):
             table_view.setModel(model)
         model.removeRows(0, model.rowCount())
 
-        if not field['value']:
-            widget.removeItem(widget.currentIndex())
-            return False
-
         table_view = tools_gw.add_tableview_header(table_view, field)
         table_view = tools_gw.fill_tableview_rows(table_view, field)
         tools_qt.set_tableview_config(table_view)
