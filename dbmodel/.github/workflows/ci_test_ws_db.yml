@@ -104,14 +104,18 @@ jobs:
           EXIT_CODE=0
 
           echo "Running PL/SQL tests..."
-          pg_prove -h localhost -p ${{ env.PORT }} -U postgres -d gw_db test/plsql/ws/*.sql || EXIT_CODE=1
+          pg_prove -h localhost -p ${{ env.PORT }} -U postgres -d gw_db test/ws/plsql/*.sql || EXIT_CODE=1
 
-          echo "Running UPSERT tests..."
-          pg_prove -h localhost -p ${{ env.PORT }} -U postgres -d gw_db test/upsert/ws/*.sql || EXIT_CODE=1
+          echo "Running DATA tests..."
+          pg_prove -h localhost -p ${{ env.PORT }} -U postgres -d gw_db test/ws/data/*.sql || EXIT_CODE=1
 
-          echo "Running STRUCTURE tests..."
-          pg_prove -h localhost -p ${{ env.PORT }} -U postgres -d gw_db test/structure/ws/*.sql || EXIT_CODE=1
+          echo "Running SCHEMA tests..."
+          pg_prove -h localhost -p ${{ env.PORT }} -U postgres -d gw_db test/ws/schema/*.sql || EXIT_CODE=1
 
-          # TODO add new structure tests: ws/schema/, ws/data/, ws/security/ ws/plsql/, ws/perf/
-          # pg_prove -h localhost -p ${{ env.PORT }} -U postgres -d gw_db test/ws/plsql/*.sql || EXIT_CODE=1
+          echo "Running SECURITY tests..."
+          pg_prove -h localhost -p ${{ env.PORT }} -U postgres -d gw_db test/ws/security/*.sql || EXIT_CODE=1
+
+          echo "Running PERFORMANCE tests..."
+          pg_prove -h localhost -p ${{ env.PORT }} -U postgres -d gw_db test/ws/perf/*.sql || EXIT_CODE=1
+
           exit $EXIT_CODE
