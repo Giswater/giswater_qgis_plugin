@@ -983,6 +983,3 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"link
 -- 06/03/2025
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"negativeoffset", "dataType":"boolean", "isUtils":"False"}}$$);
 
--- 07/03/2025
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"gully", "column":"buildercat_id"}}$$);
-
