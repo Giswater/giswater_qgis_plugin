@@ -2765,6 +2765,19 @@ class GwInfo(QObject):
             filter_fields = f'"{self.field_id}":{{"value":"{self.feature_id}","filterSign":"="}}'
             self._init_tab(self.complet_result, filter_fields)
             cmb_visit_class = self.dlg_cf.findChild(QComboBox, 'tab_visit_visit_class')
+            sql = (f"select distinct(class_id) from v_ui_om_visit_x_{self.feature_type} where {self.field_id} = '{self.feature_id}' ")
+            rows = tools_db.get_rows(sql)
+            if rows is None:
+                cmb_visit_class.clear()
+                return
+            rows_int = [set(map(int, row)) for row in rows]
+            index_to_remove = []
+            for i in range(cmb_visit_class.count() - 1, -1, -1):
+                visit_class_id = int(cmb_visit_class.itemData(i)[0])
+                if not any(visit_class_id in row for row in rows_int):
+                    index_to_remove.append(i)
+            for i in index_to_remove:
+                cmb_visit_class.removeItem(i)
             current_index = cmb_visit_class.currentIndex()
             cmb_visit_class.currentIndexChanged.emit(current_index)
             self.tab_visit_loaded = True
