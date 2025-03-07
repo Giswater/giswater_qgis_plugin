@@ -14,7 +14,7 @@ SELECT plan(1);
 
 
 SELECT ok(
-    'SELECT 1 = 1'
+    '1 = 1'
 );
 
 
