@@ -2129,3 +2129,7 @@ INSERT INTO inp_typevalue (typevalue, id, idval, descript, addparam) VALUES('inp
 INSERT INTO inp_typevalue (typevalue, id, idval, descript, addparam) VALUES('inp_typevalue_pattern', 'WEEKEND', 'WEEKEND', NULL, NULL) ON CONFLICT DO NOTHING;
 
 UPDATE config_form_fields SET dv_querytext='SELECT  id, idval FROM inp_typevalue WHERE id IS NOT NULL AND typevalue=''inp_typevalue_pattern''' WHERE formname='inp_pattern' AND formtype='form_feature' AND columnname='pattern_type' AND tabname='tab_none';
+
+-- 07/03/2025
+DELETE FROM sys_table WHERE id='config_file';
+UPDATE config_form_fields SET dv_querytext='SELECT DISTINCT idval AS id, idval FROM config_typevalue WHERE typevalue = ''filetype_typevalue''' WHERE formname='om_visit_event_photo' AND formtype='form_list_header' AND columnname='filetype' AND tabname='tab_none';

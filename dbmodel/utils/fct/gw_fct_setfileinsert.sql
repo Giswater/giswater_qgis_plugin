@@ -8,14 +8,14 @@ This version of Giswater is provided by Giswater Association
 
 DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_setfileinsert(json);
 CREATE OR REPLACE FUNCTION "SCHEMA_NAME"."gw_fct_setfileinsert"(p_data json)
-RETURNS pg_catalog.json AS 
+RETURNS pg_catalog.json AS
 $BODY$
 
 /*
 SELECT SCHEMA_NAME.gw_fct_setfileinsert($${"client":{"device":4, "infoType":1, "lang":"ES"},
-	"feature":{"featureType":"file", "tableName":"om_visit_file", "id":10004, "idName": "id"}, 
+	"feature":{"featureType":"file", "tableName":"om_visit_file", "id":10004, "idName": "id"},
 	"data":{"fields":{"visit_id":10004, "hash":"testhash", "url":"urltest", "fextension":"png","idval":"file1"},
-		"deviceTrace":{"xcoord":8597877, "ycoord":5346534, "compass":123}}}$$)	
+		"deviceTrace":{"xcoord":8597877, "ycoord":5346534, "compass":123}}}$$)
 */
 
 DECLARE
@@ -37,7 +37,7 @@ BEGIN
 
 	-- set search path to local schema
 	SET search_path = "SCHEMA_NAME", public;
-    
+
 	-- get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
 		INTO v_version;
@@ -46,16 +46,16 @@ BEGIN
 	--get input parameter
 	v_value = ((p_data->>'data')::json->>'fields')::json->>'url';
 	v_text = ((p_data->>'data')::json->>'fields')::json->>'idval';
-	
+
 	-- fix diferent ways to say null on client
 	p_data = REPLACE (p_data::text, '"NULL"', 'null');
 	p_data = REPLACE (p_data::text, '"null"', 'null');
 	p_data = REPLACE (p_data::text, '""', 'null');
     p_data = REPLACE (p_data::text, '''''', 'null');
-	
+
 	-- set output parameter
 	v_fextension = (((p_data)->>'data')::json->>'fields')::json->>'fextension';
-	v_filetype = (SELECT filetype FROM config_file WHERE fextension=v_fextension AND active IS TRUE);
+	v_filetype = (SELECT idval FROM config_typevalue WHERE id=v_fextension AND typevalue='filetype_typevalue');
 
 	v_data = (p_data->>'data')::json;
 	v_fields = ((p_data->>'data')::json->>'fields')::json;
@@ -91,7 +91,7 @@ BEGIN
 
 	--    Return
 	RETURN ('{"status":"Accepted", "message":'||v_message||', "version":'|| v_version ||
-		', "body": {"feature":{"id":"'||v_id||'"}}}')::json;    
+		', "body": {"feature":{"id":"'||v_id||'"}}}')::json;
 
 END;
 $BODY$

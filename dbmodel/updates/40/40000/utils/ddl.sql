@@ -278,3 +278,12 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"macrodma", 
 -- 06/03/2025
 DROP VIEW v_ui_rpt_cat_result;
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"rpt_cat_result", "column":"result_id", "dataType":"varchar(50)", "isUtils":"False"}}$$);
+
+-- 07/03/2025
+DROP TABLE config_file;
+
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('filetype_typevalue', 'doc', 'Document', 'doc', NULL);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('filetype_typevalue', 'pdf', 'Pdf', 'pdf', NULL);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('filetype_typevalue', 'jpg', 'Image', 'jpg', NULL);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('filetype_typevalue', 'png', 'Image', 'png', NULL);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('filetype_typevalue', 'mp4', 'Video', 'mp4', NULL);
