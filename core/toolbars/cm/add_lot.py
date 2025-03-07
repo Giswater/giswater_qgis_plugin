@@ -57,7 +57,7 @@ class AddNewLot():
         self.max_id = 0
         self.signal_selectionChanged = False
         self.param_options = None
-        self.plugin_name = tools_qgis.get_plugin_metadata('name', 'gw_lotmanage')
+        self.plugin_name = 'Giswater'
         self.plugin_dir = lib_vars.plugin_dir
         self.schemaname = lib_vars.schema_name
         self.iface = global_vars.iface
