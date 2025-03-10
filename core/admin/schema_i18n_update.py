@@ -78,20 +78,20 @@ class GwSchemaI18NUpdate:
         self.dlg_qm.lbl_info.clear()
         self._close_db()
         # Connection with origin db
-        host_org = tools_qt.get_text(self.dlg_qm, self.dlg_qm.txt_host)
-        port_org = tools_qt.get_text(self.dlg_qm, self.dlg_qm.txt_port)
-        db_org = tools_qt.get_text(self.dlg_qm, self.dlg_qm.txt_db)
-        user_org = tools_qt.get_text(self.dlg_qm, self.dlg_qm.txt_user)
-        password_org = tools_qt.get_text(self.dlg_qm, self.dlg_qm.txt_pass)
-        status_org = self._init_db_org(host_org, port_org, db_org, user_org, password_org)
+        host_i18n = tools_qt.get_text(self.dlg_qm, self.dlg_qm.txt_host)
+        port_i18n = tools_qt.get_text(self.dlg_qm, self.dlg_qm.txt_port)
+        db_i18n = tools_qt.get_text(self.dlg_qm, self.dlg_qm.txt_db)
+        user_i18n = tools_qt.get_text(self.dlg_qm, self.dlg_qm.txt_user)
+        password_i18n = tools_qt.get_text(self.dlg_qm, self.dlg_qm.txt_pass)
+        status_i18n = self._init_db_i18n(host_i18n, port_i18n, db_i18n, user_i18n, password_i18n)
 
         #Send messages
-        if host_org != '188.245.226.42' and port_org != '5432' and db_org != 'giswater':
+        if host_i18n != '188.245.226.42' and port_i18n != '5432' and db_i18n != 'giswater':
             self.dlg_qm.btn_translate.setEnabled(False)
             tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', self.last_error)
             return
         
-        if not status_org:
+        if not status_i18n:
             self.dlg_qm.btn_translate.setEnabled(False)
             tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', self.last_error)
             return
@@ -103,7 +103,7 @@ class GwSchemaI18NUpdate:
         host_org = tools_qt.get_text(self.dlg_qm, self.dlg_qm.txt_host)
         tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', f'Connected to {host_org}')
         sql = "SELECT id, idval FROM i18n.cat_language"
-        rows = self._get_rows(sql, self.cursor_org)
+        rows = self._get_rows(sql, self.cursor_i18n)
         tools_qt.fill_combo_values(self.dlg_qm.cmb_language, rows)
         language = tools_gw.get_config_parser('i18n_generator', 'qm_lang_language', "user", "session", False)
 
@@ -231,7 +231,7 @@ class GwSchemaI18NUpdate:
                f"tt_{self.lower_lang}, auto_tt_{self.lower_lang} "
                f"FROM i18n.dbdialog "
                f"ORDER BY context, formname;")
-        rows = self._get_rows(sql, self.cursor_org)
+        rows = self._get_rows(sql, self.cursor_i18n)
 
         # Update the part the of the program in process
         self.dlg_qm.lbl_info.clear()
@@ -333,7 +333,7 @@ class GwSchemaI18NUpdate:
             sql = (f"SELECT source, project_type, context, ms_en_us, ms_{self.lower_lang}, auto_ms_{self.lower_lang}, ht_en_us, ht_{self.lower_lang}, auto_ht_{self.lower_lang}"
                f" FROM i18n.dbmessage "
                f" ORDER BY project_type;")
-        rows = self._get_rows(sql, self.cursor_org)
+        rows = self._get_rows(sql, self.cursor_i18n)
 
         # Update the part the of the program in process
         self.dlg_qm.lbl_info.clear()
@@ -398,7 +398,7 @@ class GwSchemaI18NUpdate:
             sql = (f"SELECT source, project_type, context, ex_en_us, ex_{self.lower_lang}, auto_ex_{self.lower_lang}, in_en_us, in_{self.lower_lang}, auto_in_{self.lower_lang}"
                f" FROM i18n.dbfprocess "
                f"ORDER BY context;")
-        rows = self._get_rows(sql, self.cursor_org)
+        rows = self._get_rows(sql, self.cursor_i18n)
         # Update the part the of the program in process
         self.dlg_qm.lbl_info.clear()
         tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', f"Updating db_fprocess...")
@@ -516,12 +516,12 @@ class GwSchemaI18NUpdate:
         tools_qt.set_widget_text(self.dlg_qm, 'txt_db', db)
         tools_qt.set_widget_text(self.dlg_qm, 'txt_user', user)
 
-    def _init_db_org(self, host, port, db, user, password):
+    def _init_db_i18n(self, host, port, db, user, password):
         """Initializes database connection"""
 
         try:
-            self.conn_org = psycopg2.connect(database=db, user=user, port=port, password=password, host=host)
-            self.cursor_org = self.conn_org.cursor(cursor_factory=psycopg2.extras.DictCursor)
+            self.conn_i18n = psycopg2.connect(database=db, user=user, port=port, password=password, host=host)
+            self.cursor_i18n = self.conn_i18n.cursor(cursor_factory=psycopg2.extras.DictCursor)
         
             return True
         except psycopg2.DatabaseError as e:
@@ -533,12 +533,12 @@ class GwSchemaI18NUpdate:
 
         try:
             status = True
-            if self.cursor_org:
-                self.cursor_org.close()
-            if self.conn_org:
-                self.conn_org.close()
-            del self.cursor_org
-            del self.conn_org
+            if self.cursor_i18n:
+                self.cursor_i18n.close()
+            if self.conn_i18n:
+                self.conn_i18n.close()
+            del self.cursor_i18n
+            del self.conn_i18n
         except Exception as e:
             self.last_error = e
             status = False
@@ -560,7 +560,7 @@ class GwSchemaI18NUpdate:
 
     def _commit(self):
         """ Commit current database transaction """
-        self.conn_org.commit()
+        self.conn_i18n.commit()
 
     def _commit_dest(self):
         """ Commit current database transaction """
@@ -568,7 +568,7 @@ class GwSchemaI18NUpdate:
 
     def _rollback(self):
         """ Rollback current database transaction """
-        self.conn_org.rollback()
+        self.conn_i18n.rollback()
 
 
     def _get_rows(self, sql, cursor, commit=True):
