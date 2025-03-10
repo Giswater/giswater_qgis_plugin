@@ -287,3 +287,11 @@ INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES
 INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('filetype_typevalue', 'jpg', 'Image', 'jpg', NULL);
 INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('filetype_typevalue', 'png', 'Image', 'png', NULL);
 INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('filetype_typevalue', 'mp4', 'Video', 'mp4', NULL);
+
+
+-- 10/03/2025
+DROP VIEW IF EXISTS v_plan_psector_budget_arc;
+DROP VIEW IF EXISTS v_plan_psector_budget_node;
+DROP VIEW IF EXISTS v_plan_psector_budget;
+DROP VIEW IF EXISTS v_edit_plan_psector_x_other;
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"plan_psector", "column":"atlas_id", "dataType":"int4"}}$$);

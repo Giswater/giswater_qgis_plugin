@@ -217,6 +217,7 @@ DROP VIEW IF EXISTS v_ui_dma;
 DROP VIEW IF EXISTS v_edit_macrodma;
 DROP VIEW IF EXISTS vu_dma;
 DROP VIEW IF EXISTS v_edit_plan_netscenario_presszone;
+DROP VIEW IF EXISTS v_edit_plan_psector_x_other;
 DROP VIEW IF EXISTS v_edit_dqa;
 DROP VIEW IF EXISTS v_ui_dqa;
 DROP VIEW IF EXISTS v_edit_macrodqa;
@@ -419,7 +420,22 @@ AS SELECT ext_streetaxis.id,
     ext_streetaxis
   WHERE ext_streetaxis.muni_id = selector_municipality.muni_id AND selector_municipality.cur_user = "current_user"()::text;
 
-
+CREATE OR REPLACE VIEW v_edit_plan_psector_x_other
+AS SELECT plan_psector_x_other.id,
+    plan_psector_x_other.psector_id,
+    v_price_compost.id AS price_id,
+    v_price_compost.unit,
+    rpad(v_price_compost.descript::text, 125) AS price_descript,
+    v_price_compost.price,
+    plan_psector_x_other.measurement,
+    (plan_psector_x_other.measurement * v_price_compost.price)::numeric(14,2) AS total_budget,
+    plan_psector_x_other.observ,
+    plan_psector.atlas_id,
+    plan_psector_x_other.the_geom
+   FROM plan_psector_x_other
+     JOIN v_price_compost ON v_price_compost.id::text = plan_psector_x_other.price_id::text
+     JOIN plan_psector ON plan_psector.psector_id = plan_psector_x_other.psector_id
+  ORDER BY plan_psector_x_other.psector_id;
 
 CREATE OR REPLACE VIEW v_edit_plan_psector
 AS SELECT plan_psector.psector_id,
