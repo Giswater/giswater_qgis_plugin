@@ -996,7 +996,7 @@ class GwNonVisual:
                 tools_qgis.show_warning(msg, dialog=dialog)
 
         # Manage inverted plot and mirror plot for SHAPE type
-        if scipy_imported and len(x_list) == 1 and curve_type == 'SHAPE':
+        if scipy_imported and curve_type == 'SHAPE':
             if [] in (x_list, y_list):
                 if file_name:
                     fig_title = f"{file_name}"
