@@ -113,16 +113,16 @@ CREATE TRIGGER gw_trg_cat_material_fk_update AFTER UPDATE OF matcat_id ON cat_el
 FOR EACH ROW WHEN (((old.matcat_id)::TEXT IS DISTINCT FROM (new.matcat_id)::TEXT)) EXECUTE FUNCTION gw_trg_cat_material_fk('element');
 
 
-CREATE TRIGGER gw_trg_edit_controls AFTER DELETE OR UPDATE
+CREATE TRIGGER gw_trg_edit_controls BEFORE DELETE OR UPDATE
 ON sector FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_controls('sector_id');
 
-CREATE TRIGGER gw_trg_edit_controls AFTER DELETE OR UPDATE
+CREATE TRIGGER gw_trg_edit_controls BEFORE DELETE OR UPDATE
 ON macrosector FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_controls('macrosector_id');
 
-CREATE TRIGGER gw_trg_edit_controls AFTER DELETE OR UPDATE
+CREATE TRIGGER gw_trg_edit_controls BEFORE DELETE OR UPDATE
 ON dma FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_controls('dma_id');
 
-CREATE TRIGGER gw_trg_edit_controls AFTER DELETE OR UPDATE
+CREATE TRIGGER gw_trg_edit_controls BEFORE DELETE OR UPDATE
 ON macrodma FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_controls('macrodma_id');
 
 CREATE TRIGGER gw_trg_edit_psector_x_other INSTEAD OF INSERT OR UPDATE OR DELETE

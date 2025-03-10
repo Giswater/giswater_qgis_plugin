@@ -118,16 +118,16 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_dscenario('INLET');
 CREATE TRIGGER gw_trg_edit_inp_node_inlet INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_inlet
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_node('inp_inlet');
 
-CREATE TRIGGER gw_trg_edit_controls AFTER DELETE OR UPDATE
+CREATE TRIGGER gw_trg_edit_controls BEFORE DELETE OR UPDATE
 ON presszone FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_controls('presszone_id');
 
-CREATE TRIGGER gw_trg_edit_controls AFTER DELETE OR UPDATE
+CREATE TRIGGER gw_trg_edit_controls BEFORE DELETE OR UPDATE
 ON dqa FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_controls('dqa_id');
 
-CREATE TRIGGER gw_trg_edit_controls AFTER DELETE OR UPDATE
+CREATE TRIGGER gw_trg_edit_controls BEFORE DELETE OR UPDATE
 ON macrodqa FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_controls('macrodqa_id');
 
-CREATE TRIGGER gw_trg_edit_controls AFTER DELETE OR UPDATE
+CREATE TRIGGER gw_trg_edit_controls BEFORE DELETE OR UPDATE
 ON supplyzone FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_controls('supplyzone_id');
 
 
