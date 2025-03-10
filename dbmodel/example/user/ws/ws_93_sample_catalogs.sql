@@ -44,10 +44,6 @@ INSERT INTO cat_brand_model VALUES ('model4', 'brand2', NULL, NULL, true, NULL);
 INSERT INTO cat_brand_model VALUES ('model5', 'brand3', NULL, NULL, true, NULL);
 INSERT INTO cat_brand_model VALUES ('model6', 'brand3', NULL, NULL, true, NULL);
 
-INSERT INTO cat_builder VALUES ('builder1', NULL, NULL, true);
-INSERT INTO cat_builder VALUES ('builder2', NULL, NULL, true);
-INSERT INTO cat_builder VALUES ('builder3', NULL, NULL, true);
-
 UPDATE cat_feature SET active = false WHERE id = 'VCONNEC';
 
 INSERT INTO cat_connec VALUES ('PVC25-PN16-DOM', 'WJOIN', 'PVC', '16', '25', 25.00000, NULL, 'PVC connec', NULL, NULL, NULL, NULL, true, NULL);

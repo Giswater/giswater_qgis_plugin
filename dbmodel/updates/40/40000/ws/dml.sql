@@ -3348,3 +3348,6 @@ UPDATE config_form_fields SET formname='generic' WHERE formname='visit_manager' 
 INSERT INTO inp_pattern (pattern_id, observ, tscode, tsparameters, expl_id, log, active)
 SELECT pattern_id, observ, tscode, tsparameters, expl_id, log, true
 FROM _inp_pattern;
+
+-- 10/03/2025
+DELETE FROM config_form_fields WHERE columnname='buildercat_id';

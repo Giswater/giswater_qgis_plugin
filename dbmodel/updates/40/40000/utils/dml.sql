@@ -2133,3 +2133,13 @@ UPDATE config_form_fields SET dv_querytext='SELECT  id, idval FROM inp_typevalue
 -- 07/03/2025
 DELETE FROM sys_table WHERE id='config_file';
 UPDATE config_form_fields SET dv_querytext='SELECT DISTINCT idval AS id, idval FROM config_typevalue WHERE typevalue = ''filetype_typevalue''' WHERE formname='om_visit_event_photo' AND formtype='form_list_header' AND columnname='filetype' AND tabname='tab_none';
+
+-- 10/03/2025
+DELETE FROM sys_table WHERE id='cat_builder';
+UPDATE sys_table SET context = '{"level_1":"INVENTORY","level_2":"CATALOGS"}', alias = 'Brand model catalog', orderby=15 WHERE id ='cat_brand_model';
+UPDATE sys_table SET context = '{"level_1":"INVENTORY","level_2":"CATALOGS"}', alias = 'Brand catalog', orderby=16 WHERE id ='cat_brand';
+UPDATE sys_table SET context = '{"level_1":"INVENTORY","level_2":"CATALOGS"}', alias = 'Users catalog', orderby=17 WHERE id ='cat_users';
+UPDATE sys_table SET context = '{"level_1":"INVENTORY","level_2":"CATALOGS"}', alias = 'Period catalog', orderby=18 WHERE id ='ext_cat_period';
+UPDATE sys_table SET context = '{"level_1":"INVENTORY","level_2":"CATALOGS"}', alias = 'Hydrometer catalog', orderby=19 WHERE id ='ext_cat_hydrometer';
+
+DELETE FROM config_form_fields WHERE formname='cat_builder';

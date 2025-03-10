@@ -215,7 +215,7 @@ BEGIN
             ELSIF ((nodeRecord1.state = 2) OR (nodeRecord2.state = 2)) AND (NEW.state = 1) THEN
                 EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
                 "data":{"message":"3192", "function":"1344","parameters":null}}$$);';
-                
+
             ELSE
 
                 -- node_1
@@ -406,9 +406,9 @@ BEGIN
                 END IF;
 
                 -- Inserting new node
-                INSERT INTO v_edit_node (node_id, sector_id, state, state_type, dma_id, soilcat_id, workcat_id, buildercat_id, builtdate, nodecat_id, ownercat_id, muni_id,
+                INSERT INTO v_edit_node (node_id, sector_id, state, state_type, dma_id, soilcat_id, workcat_id, builtdate, nodecat_id, ownercat_id, muni_id,
                 postcode, district_id, expl_id, the_geom)
-                VALUES ((SELECT nextval('urn_id_seq')), NEW.sector_id, NEW.state, NEW.state_type, NEW.dma_id, NEW.soilcat_id, NEW.workcat_id, NEW.buildercat_id, NEW.builtdate, v_nodecat,
+                VALUES ((SELECT nextval('urn_id_seq')), NEW.sector_id, NEW.state, NEW.state_type, NEW.dma_id, NEW.soilcat_id, NEW.workcat_id, NEW.builtdate, v_nodecat,
                 NEW.ownercat_id, NEW.muni_id, NEW.postcode, NEW.district_id, NEW.expl_id, st_endpoint(NEW.the_geom))
                 RETURNING node_id INTO v_node2;
 

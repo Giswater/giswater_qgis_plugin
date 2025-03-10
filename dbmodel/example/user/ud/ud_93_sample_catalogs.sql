@@ -51,10 +51,6 @@ INSERT INTO cat_brand_model VALUES ('model4', 'brand2', NULL, NULL, true, NULL);
 INSERT INTO cat_brand_model VALUES ('model5', 'brand3', NULL, NULL, true, NULL);
 INSERT INTO cat_brand_model VALUES ('model6', 'brand3', NULL, NULL, true, NULL);
 
-INSERT INTO cat_builder VALUES ('builder1', NULL, NULL, true);
-INSERT INTO cat_builder VALUES ('builder2', NULL, NULL, true);
-INSERT INTO cat_builder VALUES ('builder3', NULL, NULL, true);
-
 INSERT INTO cat_connec VALUES ('PVC-CC025_D', 'CONNEC', NULL, 'CIRCULAR', 0.2500, 0.0000, 0.0000, 0.0000, NULL, 'PVC connec', NULL, NULL, NULL, NULL, true, NULL);
 INSERT INTO cat_connec VALUES ('CON-CC040_I', 'CONNEC', NULL, 'CIRCULAR', 0.4000, 0.0000, 0.0000, 0.0000, NULL, 'Concret connec', NULL, NULL, NULL, NULL, true, NULL);
 INSERT INTO cat_connec VALUES ('PVC-CC025_T', 'CONNEC', NULL, 'CIRCULAR', 0.2500, 0.0000, 0.0000, 0.0000, NULL, 'PVC connec', NULL, NULL, NULL, NULL, true, NULL);
