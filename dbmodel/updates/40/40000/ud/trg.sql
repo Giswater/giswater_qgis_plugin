@@ -325,10 +325,10 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_drainzone('UI');
 CREATE TRIGGER gw_trg_v_ui_dma INSTEAD OF INSERT OR DELETE OR UPDATE
 ON vu_dma FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_dma('UI');
 
-CREATE TRIGGER gw_trg_edit_controls AFTER DELETE OR UPDATE
+CREATE TRIGGER gw_trg_edit_controls BEFORE DELETE OR UPDATE
 ON drainzone FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_controls('drainzone_id');
 
-CREATE TRIGGER gw_trg_edit_controls AFTER DELETE OR UPDATE
+CREATE TRIGGER gw_trg_edit_controls BEFORE DELETE OR UPDATE
 ON dwfzone FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_controls('dwfzone_id');
 
 CREATE trigger gw_trg_v_ui_sector INSTEAD OF INSERT OR UPDATE OR DELETE ON v_ui_sector
