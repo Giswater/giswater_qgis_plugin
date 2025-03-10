@@ -41,7 +41,7 @@ CREATE TABLE address
 CREATE TABLE streetaxis
 (
   id character varying(16) NOT NULL,
-  code character varying(16),
+  code text,
   type character varying(18),
   name character varying(100),
   text text,
