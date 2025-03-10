@@ -8,7 +8,7 @@ or (at your option) any later version.
 from qgis.PyQt.QtCore import pyqtSignal
 
 from .task import GwTask
-from ...libs import tools_qt, tools_db, tools_log
+from ...libs import tools_qt, tools_db, tools_log, tools_os
 
 
 class GwCreateSchemaUtilsTask(GwTask):
@@ -38,7 +38,7 @@ class GwCreateSchemaUtilsTask(GwTask):
             if not status and self.admin.dev_commit is False:
                 return False
             status = self.admin._update_utils_schema(schema_version)
-            if not status and self.admin.dev_commit is False:
+            if not tools_os.set_boolean(status, False) and tools_os.set_boolean(self.dev_commit, False) is False:
                 return False
 
             # After create schema utils:
