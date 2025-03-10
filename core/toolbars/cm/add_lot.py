@@ -1352,24 +1352,24 @@ class AddNewLot():
         update = update[:-2]
 
         if self.is_new_lot is True:
-            sql = ("INSERT INTO om_visit_lot("+str(keys)+") "
+            sql = ("INSERT INTO cm.om_visit_lot("+str(keys)+") "
                    " VALUES ("+str(values)+") RETURNING id")
             row = tools_db.execute_returning(sql)
             if row in (None, False):
                 return
             lot_id = row[0]
-            sql = ("INSERT INTO selector_lot "
+            sql = ("INSERT INTO cm.selector_lot "
                    "(lot_id, cur_user) VALUES("+str(lot_id)+", current_user);")
             tools_db.execute_sql(sql)
             tools_qgis.refresh_map_canvas()
         else:
             lot_id = tools_qt.get_text(self.dlg_lot, 'lot_id', False, False)
-            sql = ("UPDATE om_visit_lot "
+            sql = ("UPDATE cm.om_visit_lot "
                    " SET "+str(update)+""
                    " WHERE id = '"+str(lot_id)+"'; \n")
             tools_db.execute_sql(sql)
         self.save_relations(lot, lot_id, lot['feature_type'])
-        sql = ("SELECT gw_fct_lot_psector_geom(" + str(lot_id) + ")")
+        sql = ("SELECT cm.gw_fct_lot_psector_geom(" + str(lot_id) + ")")
         tools_db.execute_sql(sql)
         status = self.save_visits()
 
@@ -1610,7 +1610,6 @@ class AddNewLot():
         """ Button 75: Lot manager """
 
         # Create the dialog
-        self.autocommit = True
         self.dlg_lot_man = LotManagementUi(self)
         tools_gw.load_settings(self.dlg_lot_man)
         self.load_user_values(self.dlg_lot_man)
@@ -1631,7 +1630,7 @@ class AddNewLot():
         # set timeStart and timeEnd as the min/max dave values get from model
         current_date = QDate.currentDate()
         sql = 'SELECT MIN(startdate), MAX(startdate) FROM cm.om_visit_lot'
-        row = tools_db.get_rows(sql, commit=self.autocommit)
+        row = tools_db.get_rows(sql)
 
         # Ensure row contains valid data
         if row and isinstance(row, list) and row[0] and any(row[0]):  # Check if at least one value is not None
@@ -1848,7 +1847,7 @@ class AddNewLot():
         """Initializes and opens the Lot Selector UI, providing an interface for users to choose a lot from a list
         with appropriate filtering and selection options."""
 
-        self.dlg_lot_sel = LotSelectorUi()
+        self.dlg_lot_sel = LotSelectorUi(self)
         tools_gw.load_settings(self.dlg_lot_sel)
 
         self.dlg_lot_sel.btn_ok.clicked.connect(partial(tools_gw.close_dialog, self.dlg_lot_sel))
@@ -1856,11 +1855,11 @@ class AddNewLot():
         self.dlg_lot_sel.rejected.connect(partial(tools_gw.save_settings, self.dlg_lot_sel))
         self.dlg_lot_sel.setWindowTitle("Selector de lots")
         tools_qt.set_widget_text(self.dlg_lot_sel, 'lbl_filter',
-                                     self.controller.tr('Filtrar per: Lot id', context_name='labels'))
+                                     tools_qt.tr('Filtrar per: Lot id', context_name='labels'))
         tools_qt.set_widget_text(self.dlg_lot_sel, 'lbl_unselected',
-                                     self.controller.tr('Lots disponibles:', context_name='labels'))
+                                     tools_qt.tr('Lots disponibles:', context_name='labels'))
         tools_qt.set_widget_text(self.dlg_lot_sel, 'lbl_selected',
-                                     self.controller.tr('Lots seleccionats', context_name='labels'))
+                                     tools_qt.tr('Lots seleccionats', context_name='labels'))
 
         tableleft = "v_ui_om_visit_lot"
         tableright = "selector_lot"
