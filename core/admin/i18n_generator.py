@@ -1,5 +1,5 @@
 """
-This file is part of Giswater 3
+This file is part of Giswater 4
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -665,7 +665,7 @@ class GwI18NGenerator:
 
         file = open(path, "w")
         header = (f'/*\n'
-                  f'This file is part of Giswater 3\n'
+                  f'This file is part of Giswater 4\n'
                   f'The program is free software: you can redistribute it and/or modify it under the terms of the GNU '
                   f'General Public License as published by the Free Software Foundation, either version 3 of the '
                   f'License, or (at your option) any later version.\n'

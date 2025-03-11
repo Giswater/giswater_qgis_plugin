@@ -1,5 +1,5 @@
 """
-This file is part of Giswater 3
+This file is part of Giswater 4
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -62,6 +62,7 @@ from ..toolbars.edit import featuretype_change_btn
 from ..toolbars.epa import go2epa_selector_btn
 from ..shared import psector
 from ..shared import audit
+from ..toolbars.utilities import snapshot_view
 
 QgsGeometryType = Literal['line', 'point', 'polygon']
 
@@ -4572,7 +4573,7 @@ def _check_user_params(section, parameter, file_name, prefix=False):
     # Get the value of the parameter (the one get_config_parser is looking for) in the inventory
     check_value = get_config_parser(f"{file_name}.{section}", parameter, "project", "user_params", False,
                                     get_comment=True, chk_user_params=False)
-    
+
     if check_value is None:
         # Get the value of the parameter (the one get_config_parser is looking for) in the inventory with prefix
         parameter_prefixed = f"ws{parameter}"

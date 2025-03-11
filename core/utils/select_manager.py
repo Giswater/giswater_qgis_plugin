@@ -1,5 +1,5 @@
 """
-This file is part of Giswater 3
+This file is part of Giswater 4
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -12,14 +12,14 @@ from qgis.gui import QgsMapTool
 
 from ..utils import tools_gw
 from ... import global_vars
-from ...libs import tools_qgis
+from ...libs import tools_qgis, tools_qt
 from ..utils.snap_manager import GwSnapManager
 from qgis.PyQt.QtCore import Qt
 from qgis.core import QgsWkbTypes
 
 class GwSelectManager(QgsMapTool):
 
-    def __init__(self, class_object, table_object=None, dialog=None, is_psector=None):
+    def __init__(self, class_object, table_object=None, dialog=None, is_psector=None, save_rectangle=False):
         """
         :param table_object: Class where we will look for @layers, @feature_type, @list_ids, etc
         :param table_object: (String)
@@ -33,6 +33,7 @@ class GwSelectManager(QgsMapTool):
         self.table_object = table_object
         self.dialog = dialog
         self.is_psector = is_psector
+        self.save_rectangle = save_rectangle
 
         # Call superclass constructor and set current action
         QgsMapTool.__init__(self, self.canvas)
@@ -62,6 +63,14 @@ class GwSelectManager(QgsMapTool):
 
         self.is_emitting_point = False
         rectangle = self._get_rectangle()
+        if self.save_rectangle:
+            xmin = rectangle.xMinimum()
+            xmax = rectangle.xMaximum()
+            ymin = rectangle.yMinimum()
+            ymax = rectangle.yMaximum()
+            tools_qt.set_widget_text(self.save_rectangle, "txt_coordinates", f"{xmin},{xmax},{ymin},{ymax} [EPSG:25831]")
+            self.rubber_band.hide()
+            return
         selected_rectangle = None
         key = QApplication.keyboardModifiers()
 

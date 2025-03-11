@@ -1,5 +1,5 @@
 """
-This file is part of Giswater 3
+This file is part of Giswater 4
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -52,7 +52,7 @@ from .plan.psector_btn import GwPsectorButton
 from .plan.psector_manager_btn import GwPsectorManagerButton
 from .plan.netscenario_manager_btn import GwNetscenarioManagerButton
 
-# Utilities: 61, 62, 63, 64, 65, 66, 67
+# Utilities: 61, 62, 63, 64, 65, 66, 67, 68
 from .utilities.utils_manager_btn import GwUtilsManagerButton
 from .utilities.config_btn import GwConfigButton
 from .utilities.toolbox_btn import GwToolBoxButton
@@ -60,6 +60,7 @@ from .utilities.utilities_manager.workspace_manager import GwWorkspaceManagerBut
 from .utilities.print_btn import GwPrintButton
 from .utilities.csv_btn import GwCSVButton
 from .utilities.project_check_btn import GwProjectCheckButton
+from .utilities.snapshot_view import GwSnapshotViewButton
 
 # ToC: 71, 72
 from .toc.add_child_layer_btn import GwAddChildLayerButton
