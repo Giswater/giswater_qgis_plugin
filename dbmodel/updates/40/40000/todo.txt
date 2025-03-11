@@ -1,5 +1,5 @@
 /*
-This file is part of Giswater 3
+This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
 */
@@ -33,7 +33,7 @@ IF no psector, no control topologic
 -- logics to be developed on python
 IF utils_psector_strategy =  true THEN
 	enable psector buttons (new psector and psector manager)
-ELSE  
+ELSE
 	disable psector buttons (new psector and psector manager). Missatge: has d'habilitar estrategia per treballar els psectors
 	no pots insertar o updatejar objectes a state=2 perque no tens cap psector actiu
 END IF;
