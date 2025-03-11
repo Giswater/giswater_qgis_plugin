@@ -201,10 +201,6 @@ class GwElement:
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_add_element.ownercat_id, rows, add_empty=True)
 
-        sql = "SELECT DISTINCT(id), id FROM cat_builder"
-        rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.dlg_add_element.buildercat_id, rows, add_empty=True)
-
         sql = "SELECT DISTINCT(id), id FROM cat_work"
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_add_element.workcat_id, rows, add_empty=True)
@@ -402,7 +398,6 @@ class GwElement:
         elementcat_id = tools_qt.get_combo_value(self.dlg_add_element, self.dlg_add_element.elementcat_id)
         ownercat_id = tools_qt.get_combo_value(self.dlg_add_element, self.dlg_add_element.ownercat_id)
         location_type = tools_qt.get_combo_value(self.dlg_add_element, self.dlg_add_element.location_type)
-        buildercat_id = tools_qt.get_combo_value(self.dlg_add_element, self.dlg_add_element.buildercat_id)
         builtdate = tools_qt.get_text(self.dlg_add_element, "builtdate", return_string_null=False)
         enddate = tools_qt.get_text(self.dlg_add_element, "enddate", return_string_null=False)
         workcat_id = tools_qt.get_combo_value(self.dlg_add_element, self.dlg_add_element.workcat_id)
@@ -446,14 +441,14 @@ class GwElement:
             if element_id == '':
                 sql = ("INSERT INTO v_edit_element (elementcat_id,  num_elements, state, state_type"
                        ", expl_id, rotation, comment, observ, link, undelete, builtdate, enddate, ownercat_id"
-                       ", location_type, buildercat_id, workcat_id, workcat_id_end, verified, the_geom, code)")
+                       ", location_type, workcat_id, workcat_id_end, verified, the_geom, code)")
                 sql_values = (f" VALUES ('{elementcat_id}', '{num_elements}', '{state}', '{state_type}', "
                               f"'{expl_id}', '{rotation}', $${comment}$$, $${observ}$$, "
                               f"$${link}$$, '{undelete}'")
             else:
                 sql = ("INSERT INTO v_edit_element (element_id, elementcat_id, num_elements, state, state_type"
                        ", expl_id, rotation, comment, observ, link, undelete, builtdate, enddate, ownercat_id"
-                       ", location_type, buildercat_id, workcat_id, workcat_id_end, verified, the_geom, code)")
+                       ", location_type, workcat_id, workcat_id_end, verified, the_geom, code)")
 
                 sql_values = (f" VALUES ('{element_id}', '{elementcat_id}', '{num_elements}',  '{state}', "
                               f"'{state_type}', '{expl_id}', '{rotation}', $${comment}$$, $${observ}$$, $${link}$$, "
@@ -472,10 +467,6 @@ class GwElement:
                 sql_values += ", null"
             if location_type:
                 sql_values += f", '{location_type}'"
-            else:
-                sql_values += ", null"
-            if buildercat_id:
-                sql_values += f", '{buildercat_id}'"
             else:
                 sql_values += ", null"
             if workcat_id:
@@ -535,10 +526,6 @@ class GwElement:
                 sql += f", location_type = '{location_type}'"
             else:
                 sql += ", location_type = null"
-            if buildercat_id:
-                sql += f", buildercat_id = '{buildercat_id}'"
-            else:
-                sql += ", buildercat_id = null"
             if workcat_id:
                 sql += f", workcat_id = '{workcat_id}'"
             else:
@@ -732,7 +719,7 @@ class GwElement:
         # If object_id not found: Clear data
         if not row:
             # Reset widgets
-            widgets = ["elementcat_id", "state", "expl_id", "ownercat_id", "location_type", "buildercat_id",
+            widgets = ["elementcat_id", "state", "expl_id", "ownercat_id", "location_type",
                        "workcat_id", "workcat_id_end", "comment", "observ", "path", "rotation", "verified",
                        "num_elements"]
             for widget_name in widgets:
@@ -766,7 +753,7 @@ class GwElement:
             tools_qt.set_widget_text(dialog, "element_type", f"{row_type[0]}")
 
         # Fill input widgets with data of the @row
-        cmb_widgets = ["elementcat_id", "state", "state_type", "expl_id", "ownercat_id", "location_type", "buildercat_id", "workcat_id",
+        cmb_widgets = ["elementcat_id", "state", "state_type", "expl_id", "ownercat_id", "location_type", "workcat_id",
                    "workcat_id_end", "verified"]
         widgets = ["comment", "observ", "link", "rotation", "num_elements"]
         for widget_name in cmb_widgets:
