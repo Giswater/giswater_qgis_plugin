@@ -295,3 +295,6 @@ DROP VIEW IF EXISTS v_plan_psector_budget_node;
 DROP VIEW IF EXISTS v_plan_psector_budget;
 DROP VIEW IF EXISTS v_edit_plan_psector_x_other;
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"plan_psector", "column":"atlas_id", "dataType":"int4"}}$$);
+
+-- 11/03/2025
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"ext_rtc_scada_x_data", "column":"value_date", "dataType":"date"}}$$);
