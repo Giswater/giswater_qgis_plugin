@@ -298,3 +298,9 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"plan
 
 -- 11/03/2025
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"ext_rtc_scada_x_data", "column":"value_date", "dataType":"date"}}$$);
+
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"cat_manager", "column":"sector_id"}}$$);
+
+ALTER TABLE config_user_x_sector RENAME TO _config_user_x_sector;
+

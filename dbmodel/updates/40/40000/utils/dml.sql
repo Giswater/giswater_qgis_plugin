@@ -2143,3 +2143,7 @@ UPDATE sys_table SET context = '{"level_1":"INVENTORY","level_2":"CATALOGS"}', a
 UPDATE sys_table SET context = '{"level_1":"INVENTORY","level_2":"CATALOGS"}', alias = 'Hydrometer catalog', orderby=19 WHERE id ='ext_cat_hydrometer';
 
 DELETE FROM config_form_fields WHERE formname='cat_builder';
+
+-- 11/03/2025
+DELETE FROM sys_table WHERE id='config_user_x_sector';
+DELETE FROM sys_function WHERE function_name='gw_trg_cat_manager';

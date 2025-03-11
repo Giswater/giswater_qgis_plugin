@@ -103,7 +103,6 @@ ALTER TABLE _dqa DROP CONSTRAINT dqa_pattern_id_fkey;
 ALTER SEQUENCE SCHEMA_NAME.dqa_dqa_id_seq RENAME TO dqa_dqa_id_seq1;
 
 ALTER TABLE arc DROP CONSTRAINT arc_sector_id_fkey;
-ALTER TABLE config_user_x_sector DROP CONSTRAINT config_user_x_sector_sector_id_fkey;
 ALTER TABLE connec DROP CONSTRAINT connec_sector_id_fkey;
 ALTER TABLE inp_controls DROP CONSTRAINT inp_controls_x_sector_id_fkey;
 ALTER TABLE inp_dscenario_controls DROP CONSTRAINT inp_dscenario_controls_sector_id_fkey;

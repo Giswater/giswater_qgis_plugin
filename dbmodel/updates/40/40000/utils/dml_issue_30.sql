@@ -374,14 +374,6 @@ WHERE (m.rolcanlogin IS TRUE OR s.rolcanlogin IS TRUE)
 ) 
 SELECT *, CONCAT(explots, ''-'', usern, ''-'', id) FROM (SELECT id, unnest(expl_id) explots, usern FROM cat_manager   JOIN exploit using(id)) a 
 WHERE CONCAT(explots, ''-'', usern, ''-'', id) NOT IN (SELECT CONCAT(expl_id, ''-'', username, ''-'', manager_id) FROM config_user_x_expl cuxe) AND explots != 0', info_msg='Configuration of cat_manager and config_user_x_expl is consistent.', function_name='[gw_fct_admin_check_data]', active = false WHERE fid=472;
-UPDATE sys_fprocess SET fprocess_name='Check consistency between cat_manager and config_user_x_sector', "source"='core', fprocess_type='Function process', project_type='utils', except_level=3, except_msg='inconsistent configurations on cat_manager and config_user_x_sector for user: '''',string_agg(DISTINCT usern,'''', '''')), ''||v_count||'' FROM ''||v_querytext||'';''"', query_text='WITH sectores AS (SELECT COALESCE(m.rolname, s.rolname) AS usern,  id  FROM (SELECT id, unnest(rolename) AS role FROM cat_manager WHERE sector_id IS NOT NULL) q 
-LEFT JOIN pg_roles r ON q.role = r.rolname
-LEFT JOIN pg_auth_members am ON r.oid = am.roleid
-LEFT JOIN pg_roles m ON am.member = m.oid AND m.rolcanlogin = TRUE
-LEFT JOIN pg_roles s ON q.role = s.rolname AND s.rolcanlogin = TRUE
-WHERE (m.rolcanlogin IS TRUE OR s.rolcanlogin IS TRUE))
-SELECT *, CONCAT(sectors, ''-'', usern, ''-'', id) FROM (SELECT id, unnest(sector_id) sectors, usern FROM cat_manager JOIN sectores using(id)) a 
-WHERE CONCAT(sectors, ''-'', usern, ''-'', id) NOT IN (SELECT CONCAT(sector_id, ''-'', username, ''-'', manager_id) FROM config_user_x_sector cuxe) AND sectors NOT IN (0, -1)', info_msg='Configuration of cat_manager and config_user_x_sector is consistent.', function_name='[gw_fct_admin_check_data]' WHERE fid=473;
 UPDATE sys_fprocess SET fprocess_name='Check features without defined sector_id', "source"='core', fprocess_type='Check om-data', project_type='ws', except_level=2, except_msg='connecs with sector_id 0 or -1.', query_text='SELECT connec_id, conneccat_id, the_geom, expl_id FROM connec WHERE state > 0 
 AND (sector_id=0 OR sector_id=-1)', info_msg='No connecs with 0 or -1 value on sector_id.', function_name='[gw_fct_om_check_data, gw_fct_admin_check_data]' WHERE fid=478;
 UPDATE sys_fprocess SET fprocess_name='Check duplicated arcs', "source"='core', fprocess_type='Check om-data', project_type='utils', except_level=3, except_msg='arcs with duplicated geometry.', query_text='SELECT arc_id, arccat_id, state1, arc_id_aux, node_1, node_2, expl_id, the_geom FROM        

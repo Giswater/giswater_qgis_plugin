@@ -10,7 +10,7 @@ SET client_min_messages TO WARNING;
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-SELECT plan(342);
+SELECT plan(341);
 
 SELECT has_table('anl_arc') AS "Table 'anl_arc' exists";
 SELECT has_table('anl_arc_x_node') AS "Table 'anl_arc_x_node' exists";
@@ -69,7 +69,6 @@ SELECT has_table('config_table') AS "Table 'config_table' exists";
 SELECT has_table('config_toolbox') AS "Table 'config_toolbox' exists";
 SELECT has_table('config_typevalue') AS "Table 'config_typevalue' exists";
 SELECT has_table('config_user_x_expl') AS "Table 'config_user_x_expl' exists";
-SELECT has_table('config_user_x_sector') AS "Table 'config_user_x_sector' exists";
 SELECT has_table('config_visit_class') AS "Table 'config_visit_class' exists";
 SELECT has_table('config_visit_class_x_parameter') AS "Table 'config_visit_class_x_parameter' exists";
 SELECT has_table('config_visit_parameter') AS "Table 'config_visit_parameter' exists";
