@@ -243,7 +243,7 @@ class GwSchemaI18NManager:
     # endregion
     # region Missing Database Dialogs
     def missing_dialogs(self):
-        tables = ["i18n_proves.dbmessage_prova"]
+        tables = ["i18n_proves.dbmessage_prova", "i18n_proves.dbconfig_param_system", "i18n_proves.dbconfig_form_fields", "i18n_proves.dbconfig_typevalue"]
         text_error = ''
         for table in tables:
             table_exists = self.detect_table_func(table)
@@ -252,11 +252,8 @@ class GwSchemaI18NManager:
             else:
                 tools_qt.show_info_box(f"The table ({table}) does not exists")
             self._vacuum_commit(table, self.conn_i18n, self.cursor_i18n)
-        
-        if text_error == '':
-            tools_qt.show_info_box('Succesful update of all tables')
-        else:
-            tools_qt.show_info_box(text_error)
+            
+        tools_qt.show_info_box(text_error)
 
         self._close_db_org()
         self._close_db_i18n()
@@ -278,20 +275,27 @@ class GwSchemaI18NManager:
             query = self._update_config_param_system(table_i18n, table_org)
         elif "config_typevalue" in table_i18n:
             query = self._update_config_typevalue(table_i18n, table_org)
+        elif "pytoolbar" in table_i18n:
+            print('pytoolbar')
+        elif "pymessage" in table_i18n:
+            print('pymessage')
+        elif "pydialog" in table_i18n:
+            print('pydialog')
+
         try:
             self.cursor_i18n.execute(query)
             self.conn_i18n.commit()
-            return ''
+            return f'Succesfully translated table: {table_i18n}\n'
         except Exception as e:
             self.conn_i18n.rollback()
-            return f"An error occured while translating {table_i18n}: {e}"
+            return f"An error occured while translating {table_i18n}: {e}\n"
 
     def _update_dbmessage(self, table_i18n, table_org):
         columns_i18n = "project_type, CAST(source AS INTEGER), CAST(log_level AS INTEGER), ms_en_us, COALESCE(ht_en_us, '')"
         columns_org = "project_type, id, log_level, error_message, COALESCE(hint_message, '')"
-        query = f"SELECT {columns_i18n} FROM {table_i18n} ORDER BY source;"
+        query = f"SELECT {columns_i18n} FROM {table_i18n};"
         rows_i18n = self._get_rows(query, self.cursor_i18n)
-        query = f"SELECT {columns_org} FROM ws40.{table_org} ORDER BY id;"
+        query = f"SELECT {columns_org} FROM ws40.{table_org};"
         rows_org = self._get_rows(query, self.cursor_org)
         if self.revise_lang:
             query = ""
@@ -300,14 +304,12 @@ class GwSchemaI18NManager:
         i = 0
         for i, row_org in enumerate(rows_org):  
             if row_org not in rows_i18n:
-                print(row_org)
                 query_row = f"""INSERT INTO {table_i18n} (context, source_code, project_type, log_level, source, ms_en_us, ht_en_us) VALUES """
                 query_row += f"""('{table_org}', 'giswater', '{row_org['project_type']}', '{row_org['log_level']}','{row_org['id']}', 
                             {f"'{row_org['error_message'].replace("'", "''")}'" if row_org['error_message'] else 'NULL'}, 
                             {f"'{row_org.get('hint_message').replace("'", "''") if row_org.get('hint_message') else 'NULL'}'"})"""
                 query_row += " ON CONFLICT (source_code, project_type, context, log_level, source) DO NOTHING"
                 query_row += ";\n"
-                print(query_row)
                 query += query_row
                 i += 1
         return query
@@ -315,16 +317,15 @@ class GwSchemaI18NManager:
     def _update_dbfeature(self, table_i18n, table_org):
         columns_i18n = "project_type, formname_en_us"
         columns_org = "child_layer"
-        query = f"SELECT {columns_i18n} FROM {table_i18n} ORDER BY source;"
+        query = f"SELECT {columns_i18n} FROM {table_i18n};"
         rows_i18n = self._get_rows(query, self.cursor_i18n)
-        query = f"SELECT {columns_org} FROM ws40.{table_org} ORDER BY id;"
+        query = f"SELECT {columns_org} FROM ws40.{table_org};"
         rows_org = self._get_rows(query, self.cursor_org)
         #_verify_lang(rows_i18n, rows_org, 'ms_en_us', 'error_message', 2, 2)
         query = ""
         i = 0
         for row_org in rows_org:  
             if row_org not in rows_i18n:
-                print(row_org)
                 query_row = f"""INSERT INTO {table_i18n} ({columns_i18n}) VALUES """
                 query_row += f"""('{table_org[0:1]}', '{row_org['child_layer']}'"""
                 query_row += " ON CONFLICT (formname_en_us) DO NOTHING"
@@ -336,16 +337,15 @@ class GwSchemaI18NManager:
     def _update_dbfprocess(self, table_i18n, table_org):
         columns_i18n = "project_type, CAST(source AS INTEGER), ex_en_us, COALESCE(in_en_us, '')"
         columns_org = "project_type, fid, except_msg, COALESCE(info_msg, '')"
-        query = f"SELECT {columns_i18n} FROM {table_i18n} ORDER BY source;"
+        query = f"SELECT {columns_i18n} FROM {table_i18n};"
         rows_i18n = self._get_rows(query, self.cursor_i18n)
-        query = f"SELECT {columns_org} FROM ws40.{table_org} ORDER BY id;"
+        query = f"SELECT {columns_org} FROM ws40.{table_org};"
         rows_org = self._get_rows(query, self.cursor_org)
         #_verify_lang(rows_i18n, rows_org, 'ms_en_us', 'error_message', 2, 2)
         query = ""
         i = 0
         for row_org in rows_org:  
             if row_org not in rows_i18n:
-                print(row_org)
                 query_row = f"""INSERT INTO {table_i18n} (context, project_type, source, ex_en_us, in_en_us) VALUES """
                 query_row += f"""('{table_org}', '{row_org['project_type']}', '{row_org['fid']}', 
                         {f"'{row_org['except_msg'].replace("'", "''")}'" if row_org['except_msg'] else 'NULL'}, 
@@ -357,93 +357,89 @@ class GwSchemaI18NManager:
         return query
 
     def _update_config_form_fields(self, table_i18n, table_org):
-        columns_i18n = "project_type, CAST(source AS INTEGER), formname, formtype, COALESCE(lb_en_us, ''), COALESCE(tt_en_us, '')"
-        columns_org = "formname, formtype, tabname, columnname, COALESCE(label, ''), COALESCE(tooltip, '')"
-        query = f"SELECT {columns_i18n} FROM {table_i18n} ORDER BY source;"
+        columns_i18n = "formname, formtype, source, COALESCE(lb_en_us, ''), COALESCE(tt_en_us, '')"
+        columns_org = "formname, formtype, columnname, COALESCE(label, ''), COALESCE(tooltip, '')"
+        query = f"SELECT {columns_i18n} FROM {table_i18n};"
         rows_i18n = self._get_rows(query, self.cursor_i18n)
-        query = f"SELECT {columns_org} FROM ws40.{table_org} ORDER BY id;"
+        query = f"SELECT {columns_org} FROM ws40.{table_org};"
         rows_org = self._get_rows(query, self.cursor_org)
         #_verify_lang(rows_i18n, rows_org, 'ms_en_us', 'error_message', 2, 2)
         query = ""
         i = 0
         for row_org in rows_org:  
             if row_org not in rows_i18n:
-                print(row_org)
-                query_row = f"""INSERT INTO {table_i18n} (context, source_code, project_type, source, formname, formtype, lb_en_us, tt_en_us,) VALUES """
-                query_row += f"""('{table_org}', 'giswater', '{table_org[0:1]}', '{row_org['id']}', '{row_org['']}'
+                query_row = f"""INSERT INTO {table_i18n} (context, source_code, project_type, source, formname, formtype, lb_en_us, tt_en_us) VALUES """
+                query_row += f"""('{table_org}', 'giswater', '{self.project_type}', '{row_org['columnname']}', '{row_org['formname']}', '{row_org['formtype']}',
                         {f"'{row_org.get('label', '').replace("'", "''")}'" if row_org.get('label', '') else 'NULL'}, 
                         {f"'{row_org.get('tooltip', '').replace("'", "''")}'" if row_org.get('tooltip', '') else 'NULL'})"""
-                query_row += " ON CONFLICT (context, source_code, project_type, source, formname, formtype) DO NOTHING"
+                query_row += " ON CONFLICT (context, source_code, project_type, source, formname, formtype) DO NOTHING" 
                 query_row += ";\n"
                 query += query_row
                 i += 1
         return query
 
     def _update_sys_param_user(self, table_i18n, table_org):
-        columns_i18n = "project_type, CAST(source AS INTEGER), formname, formtype, COALESCE(lb_en_us, ''), COALESCE(tt_en_us, '')"
-        columns_org = "formname, formtype, tabname, columnname, COALESCE(label, ''), COALESCE(tooltip, '')"
-        query = f"SELECT {columns_i18n} FROM {table_i18n} ORDER BY source;"
+        columns_i18n = "project_type, source, formname, COALESCE(lb_en_us, ''), COALESCE(tt_en_us, '')"
+        columns_org = "COALESCE(project_type, ''), id, formname, COALESCE(label, ''), COALESCE(descript, '')"
+        query = f"SELECT {columns_i18n} FROM {table_i18n};"
         rows_i18n = self._get_rows(query, self.cursor_i18n)
-        query = f"SELECT {columns_org} FROM ws40.{table_org} ORDER BY id;"
+        query = f"SELECT {columns_org} FROM ws40.{table_org};"
         rows_org = self._get_rows(query, self.cursor_org)
         #_verify_lang(rows_i18n, rows_org, 'ms_en_us', 'error_message', 2, 2)
         query = ""
         i = 0
         for row_org in rows_org:  
             if row_org not in rows_i18n:
-                print(row_org)
-                query_row = f"""INSERT INTO {table_i18n} (context, source_code, project_type, source, formname, formtype, lb_en_us, tt_en_us,) VALUES """
-                query_row += f"""('{table_org}', 'giswater', '{table_org[0:1]}', '{row_org['id']}', '{row_org['']}'
+                query_row = f"""INSERT INTO {table_i18n} (context, source_code, project_type, source, formname, lb_en_us, tt_en_us) VALUES """
+                query_row += f"""('{table_org}', 'giswater', '{row_org['project_type']}', '{row_org['id']}', '{row_org['formname']}'
                         {f"'{row_org.get('label', '').replace("'", "''")}'" if row_org.get('label', '') else 'NULL'}, 
-                        {f"'{row_org.get('tooltip', '').replace("'", "''")}'" if row_org.get('tooltip', '') else 'NULL'})"""
-                query_row += " ON CONFLICT (context, source_code, project_type, source, formname, formtype) DO NOTHING"
+                        {f"'{row_org.get('descript', '').replace("'", "''")}'" if row_org.get('descript', '') else 'NULL'})"""
+                query_row += " ON CONFLICT (context, source_code, project_type, source, formname) DO NOTHING"
                 query_row += ";\n"
                 query += query_row
                 i += 1
         return query
 
     def _update_config_param_system(self, table_i18n, table_org):
-        columns_i18n = "project_type, CAST(source AS INTEGER), formname, formtype, COALESCE(lb_en_us, ''), COALESCE(tt_en_us, '')"
-        columns_org = "formname, formtype, tabname, columnname, COALESCE(label, ''), COALESCE(tooltip, '')"
-        query = f"SELECT {columns_i18n} FROM {table_i18n} ORDER BY source;"
+        columns_i18n = "project_type, source, COALESCE(lb_en_us, ''), COALESCE(tt_en_us, '')"
+        columns_org = "project_type, parameter, COALESCE(label, ''), COALESCE(descript, '')"
+        query = f"SELECT {columns_i18n} FROM {table_i18n};"
         rows_i18n = self._get_rows(query, self.cursor_i18n)
-        query = f"SELECT {columns_org} FROM ws40.{table_org} ORDER BY id;"
+        query = f"SELECT {columns_org} FROM ws40.{table_org};"
         rows_org = self._get_rows(query, self.cursor_org)
         #_verify_lang(rows_i18n, rows_org, 'ms_en_us', 'error_message', 2, 2)
         query = ""
         i = 0
         for row_org in rows_org:  
             if row_org not in rows_i18n:
-                print(row_org)
-                query_row = f"""INSERT INTO {table_i18n} (context, source_code, project_type, source, formname, formtype, lb_en_us, tt_en_us,) VALUES """
-                query_row += f"""('{table_org}', 'giswater', '{table_org[0:1]}', '{row_org['id']}', '{row_org['']}'
+                query_row = f"""INSERT INTO {table_i18n} (context, source_code, project_type, source, lb_en_us, tt_en_us) VALUES """
+                query_row += f"""('{table_org}', 'giswater', '{row_org['project_type']}', '{row_org['parameter']}',
                         {f"'{row_org.get('label', '').replace("'", "''")}'" if row_org.get('label', '') else 'NULL'}, 
-                        {f"'{row_org.get('tooltip', '').replace("'", "''")}'" if row_org.get('tooltip', '') else 'NULL'})"""
-                query_row += " ON CONFLICT (context, source_code, project_type, source, formname, formtype) DO NOTHING"
+                        {f"'{row_org.get('descript', '').replace("'", "''")}'" if row_org.get('descript', '') else 'NULL'})"""
+                query_row += " ON CONFLICT (context, source_code, project_type, source) DO NOTHING"
                 query_row += ";\n"
                 query += query_row
                 i += 1
         return query
 
     def _update_config_typevalue(self, table_i18n, table_org):
-        columns_i18n = "project_type, CAST(source AS INTEGER), formname, formtype, COALESCE(lb_en_us, ''), COALESCE(tt_en_us, '')"
-        columns_org = "formname, formtype, tabname, columnname, COALESCE(label, ''), COALESCE(tooltip, '')"
-        query = f"SELECT {columns_i18n} FROM {table_i18n} ORDER BY source;"
+        columns_i18n = "formname, source, COALESCE(tt_en_us, '')"
+        columns_org = "typevalue, id, idval"
+        query = f"SELECT {columns_i18n} FROM {table_i18n};"
         rows_i18n = self._get_rows(query, self.cursor_i18n)
-        query = f"SELECT {columns_org} FROM ws40.{table_org} ORDER BY id;"
+        query = f"SELECT {columns_org} FROM ws40.{table_org};"
         rows_org = self._get_rows(query, self.cursor_org)
         #_verify_lang(rows_i18n, rows_org, 'ms_en_us', 'error_message', 2, 2)
         query = ""
         i = 0
         for row_org in rows_org:  
             if row_org not in rows_i18n:
-                print(row_org)
-                query_row = f"""INSERT INTO {table_i18n} (context, source_code, project_type, source, formname, formtype, lb_en_us, tt_en_us,) VALUES """
-                query_row += f"""('{table_org}', 'giswater', '{table_org[0:1]}', '{row_org['id']}', '{row_org['']}'
-                        {f"'{row_org.get('label', '').replace("'", "''")}'" if row_org.get('label', '') else 'NULL'}, 
-                        {f"'{row_org.get('tooltip', '').replace("'", "''")}'" if row_org.get('tooltip', '') else 'NULL'})"""
+                query_row = f"""INSERT INTO {table_i18n} (context, source_code, project_type, source, formname, formtype, tt_en_us) VALUES """
+                query_row += f"""('{table_org}', 'giswater', '{self.project_type}', '{row_org['id']}', '{row_org['typevalue']}', 'form_feature',
+                        {f"'{row_org.get('idval', '').replace("'", "''")}'" if row_org.get('idval', '') else 'NULL'})"""
                 query_row += " ON CONFLICT (context, source_code, project_type, source, formname, formtype) DO NOTHING"
                 query_row += ";\n"
+                print(query_row)
                 query += query_row
                 i += 1
         return query

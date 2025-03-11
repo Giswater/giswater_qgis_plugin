@@ -141,12 +141,12 @@
               <widget class="QComboBox" name="cmb_updatetype">
                <item>
                 <property name="text">
-                 <string>Update from existing schema</string>
+                 <string>Create new temporal schema</string>
                 </property>
                </item>
                <item>
                 <property name="text">
-                 <string>Create new temporal schema</string>
+                 <string>Update from existing schema</string>
                 </property>
                </item>
               </widget>
