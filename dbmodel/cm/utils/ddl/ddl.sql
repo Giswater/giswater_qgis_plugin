@@ -56,7 +56,7 @@ CREATE TABLE campaignclass_x_layer
   campaignclass_id integer NOT NULL,
   layer text NOT NULL,
   active boolean DEFAULT true,
-  CONSTRAINT cat_organitzation_pkey PRIMARY KEY (visitclass_id, layer)
+  CONSTRAINT campaignclass_x_layer_pkey PRIMARY KEY (campaignclass_id, layer)
 );
 
 
@@ -245,5 +245,5 @@ CREATE TABLE ext_workorder
   observations text,
   cost numeric,
   ct text,
-  CONSTRAINT ext_workorder_pkey PRIMARY KEY (workcat_id)
+  CONSTRAINT ext_workorder_pkey PRIMARY KEY (workorder_id)
 );

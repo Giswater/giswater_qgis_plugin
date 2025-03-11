@@ -15,9 +15,9 @@ INSERT INTO cat_team VALUES ('1', 'Test team', 'Test team', TRUE);
 INSERT INTO PARENT_SCHEMA.cat_users VALUES ('test', 'test')ON CONFLICT (id) DO NOTHING;
 INSERT INTO PARENT_SCHEMA.cat_users VALUES ('postgres', 'postgres')ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO PARENT_SCHEMA.config_visit_class VALUES (7, 'Connec Incident', NULL, true, false, true, 'CONNEC', 'role_om', 2, '{"offlineDefault":"true"}', 'visit_connec_incid', 've_visit_connec_incid', 'v_ui_visit_connec_incid');
-INSERT INTO PARENT_SCHEMA.config_visit_class VALUES (8, 'Generic Incident', NULL, true, false, true, NULL, 'role_om', 2, '{"offlineDefault":"true"}', 'visit_incident', 've_visit_incident', 'v_ui_visit_incident');
-INSERT INTO PARENT_SCHEMA.config_visit_class VALUES (9, 'Inspection Valves', NULL, true, false, true, 'NODE', 'role_om', 1, '{"offlineDefault":"true", "sysType":"VALVE"}', 'visit_valve_insp', 've_visit_valve_insp', 'v_ui_visit_valve_insp');
+INSERT INTO PARENT_SCHEMA.config_visit_class VALUES (10, 'Connec Incident', NULL, true, false, true, 'CONNEC', 'role_om', 2, '{"offlineDefault":"true"}', 'visit_connec_incid', 've_visit_connec_incid', 'v_ui_visit_connec_incid');
+INSERT INTO PARENT_SCHEMA.config_visit_class VALUES (11, 'Generic Incident', NULL, true, false, true, NULL, 'role_om', 2, '{"offlineDefault":"true"}', 'visit_incident', 've_visit_incident', 'v_ui_visit_incident');
+INSERT INTO PARENT_SCHEMA.config_visit_class VALUES (12, 'Inspection Valves', NULL, true, false, true, 'NODE', 'role_om', 1, '{"offlineDefault":"true", "sysType":"VALVE"}', 'visit_valve_insp', 've_visit_valve_insp', 'v_ui_visit_valve_insp');
 
 
 INSERT INTO PARENT_SCHEMA.config_visit_parameter VALUES ('observ_connec', NULL, 'INSPECTION', 'CONNEC', 'TEXT', NULL, 'Observ on connec', 'event_standard', NULL, TRUE, NULL, TRUE);
@@ -29,18 +29,18 @@ INSERT INTO PARENT_SCHEMA.config_visit_parameter VALUES ('defect_valve', NULL, '
 INSERT INTO PARENT_SCHEMA.config_visit_parameter VALUES ('manipulate_valve', NULL, 'INSPECTION', 'NODE', 'TEXT', NULL, 'Manipulate valve', 'event_standard', NULL, TRUE, NULL, TRUE);
 INSERT INTO PARENT_SCHEMA.config_visit_parameter VALUES ('observ_valve', NULL, 'INSPECTION', 'NODE', 'TEXT', NULL, 'Observ on valve', 'event_standard', NULL, TRUE, NULL, TRUE);
 
-INSERT INTO PARENT_SCHEMA.config_visit_class_x_parameter VALUES (7, 'incident_type');
-INSERT INTO PARENT_SCHEMA.config_visit_class_x_parameter VALUES (7, 'incident_comment');
-INSERT INTO PARENT_SCHEMA.config_visit_class_x_parameter VALUES (7, 'photo');
-INSERT INTO PARENT_SCHEMA.config_visit_class_x_parameter VALUES (8, 'incident_type');
-INSERT INTO PARENT_SCHEMA.config_visit_class_x_parameter VALUES (8, 'incident_comment');
-INSERT INTO PARENT_SCHEMA.config_visit_class_x_parameter VALUES (8, 'incident_location');
-INSERT INTO PARENT_SCHEMA.config_visit_class_x_parameter VALUES (8, 'photo');
-INSERT INTO PARENT_SCHEMA.config_visit_class_x_parameter VALUES (9, 'clean_valve');
-INSERT INTO PARENT_SCHEMA.config_visit_class_x_parameter VALUES (9, 'defect_valve');
-INSERT INTO PARENT_SCHEMA.config_visit_class_x_parameter VALUES (9, 'manipulate_valve');
-INSERT INTO PARENT_SCHEMA.config_visit_class_x_parameter VALUES (9, 'observ_valve');
-INSERT INTO PARENT_SCHEMA.config_visit_class_x_parameter VALUES (9, 'photo');
+INSERT INTO PARENT_SCHEMA.config_visit_class_x_parameter VALUES (10, 'incident_type');
+INSERT INTO PARENT_SCHEMA.config_visit_class_x_parameter VALUES (10, 'incident_comment');
+INSERT INTO PARENT_SCHEMA.config_visit_class_x_parameter VALUES (10, 'photo');
+INSERT INTO PARENT_SCHEMA.config_visit_class_x_parameter VALUES (11, 'incident_type');
+INSERT INTO PARENT_SCHEMA.config_visit_class_x_parameter VALUES (11, 'incident_comment');
+INSERT INTO PARENT_SCHEMA.config_visit_class_x_parameter VALUES (11, 'incident_location');
+INSERT INTO PARENT_SCHEMA.config_visit_class_x_parameter VALUES (11, 'photo');
+INSERT INTO PARENT_SCHEMA.config_visit_class_x_parameter VALUES (12, 'clean_valve');
+INSERT INTO PARENT_SCHEMA.config_visit_class_x_parameter VALUES (12, 'defect_valve');
+INSERT INTO PARENT_SCHEMA.config_visit_class_x_parameter VALUES (12, 'manipulate_valve');
+INSERT INTO PARENT_SCHEMA.config_visit_class_x_parameter VALUES (12, 'observ_valve');
+INSERT INTO PARENT_SCHEMA.config_visit_class_x_parameter VALUES (12, 'photo');
 
 INSERT INTO PARENT_SCHEMA.om_typevalue VALUES ('incident_location', 1, 'Sidewalk');
 INSERT INTO PARENT_SCHEMA.om_typevalue VALUES ('incident_location', 2, 'Road');
@@ -50,7 +50,7 @@ INSERT INTO PARENT_SCHEMA.om_typevalue VALUES ('incident_location', 4, 'Garden a
 INSERT INTO SCHEMA_NAME.om_team_x_user (user_id, team_id) VALUES ('test', 1) ON CONFLICT (user_id, team_id) DO NOTHING;
 INSERT INTO SCHEMA_NAME.om_team_x_user (user_id, team_id) VALUES ('postgres', 1) ON CONFLICT (user_id, team_id) DO NOTHING;
 
-INSERT INTO SCHEMA_NAME.om_team_x_visitclass (team_id, visitclass_id) VALUES (1, 9) ON CONFLICT (team_id, visitclass_id) DO NOTHING;
+INSERT INTO SCHEMA_NAME.om_team_x_visitclass (team_id, visitclass_id) VALUES (1, 12) ON CONFLICT (team_id, visitclass_id) DO NOTHING;
 
 
 

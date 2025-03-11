@@ -8,20 +8,6 @@ or (at your option) any later version.
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-CREATE OR REPLACE VIEW v_ui_om_vehicle_x_parameters AS 
-SELECT row_number() OVER (ORDER BY om_vehicle_x_parameters.tstamp DESC) AS rid,
-ext_cat_vehicle.idval AS vehicle,
-om_vehicle_x_parameters.lot_id,
-cat_team.idval AS team,
-om_vehicle_x_parameters.image,
-om_vehicle_x_parameters.load,
-om_vehicle_x_parameters.cur_user AS "user",
-om_vehicle_x_parameters.tstamp AS date
-FROM om_vehicle_x_parameters
-JOIN ext_cat_vehicle ON ext_cat_vehicle.id::text = om_vehicle_x_parameters.vehicle_id::text
-JOIN cat_team ON cat_team.id = om_vehicle_x_parameters.team_id;
-
-
 CREATE OR REPLACE VIEW v_om_team_x_user AS 
 SELECT om_team_x_user.id,
 om_team_x_user.user_id,
@@ -31,32 +17,12 @@ FROM om_team_x_user
 JOIN cat_team ON om_team_x_user.team_id = cat_team.id
 JOIN PARENT_SCHEMA.cat_users ON om_team_x_user.user_id::text = cat_users.id::text;
 
-
-CREATE OR REPLACE VIEW v_om_team_x_visitclass AS 
-SELECT om_team_x_visitclass.id,
-cat_team.idval AS team,
-config_visit_class.idval AS visitclass
-FROM om_team_x_visitclass
-JOIN cat_team ON om_team_x_visitclass.team_id = cat_team.id
-JOIN PARENT_SCHEMA.config_visit_class ON om_team_x_visitclass.visitclass_id = config_visit_class.id;
-
-
 CREATE OR REPLACE VIEW v_edit_cat_team AS 
 SELECT cat_team.id,
 cat_team.idval,
 cat_team.descript,
 cat_team.active
 FROM cat_team;
-
-
-CREATE VIEW v_ext_cat_vehicle AS
-SELECT
-id,
-idval,
-descript,
-model,
-number_plate
-FROM ext_cat_vehicle;
 
 
 CREATE OR REPLACE VIEW v_om_lot_x_user AS 
