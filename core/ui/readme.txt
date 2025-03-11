@@ -1,12 +1,12 @@
 /*
-This file is part of Giswater 3
+This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
 as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
 */
 
-On this folder you can find all ui files for forms. 
-Some forms are backend-built forms. It means the need to be configured on database 
+On this folder you can find all ui files for forms.
+Some forms are backend-built forms. It means the need to be configured on database
 table usign layoutname and layoutorder. Here after layoutname for that backend-built forms:
 
 
