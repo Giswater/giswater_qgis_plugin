@@ -19,7 +19,7 @@ SELECT has_table('cat_arc'::name, 'Table cat_arc should exist');
 SELECT columns_are(
     'cat_arc',
     ARRAY[
-        'id', 'arc_type', 'matcat_id', 'pnom', 'dnom', 'dint', 'dext', 'descript', 'link', 'brand_id', 'model_id', 'svg', 'z1', 'z2', 'width', 'area', 'estimated_depth', 'bulk', 'cost_unit', 'cost', 'm2bottom_cost', 'm3protec_cost', 'active', 'label', 'shape', 'acoeff', 'connect_cost', 'dr'
+        'id', 'arc_type', 'matcat_id', 'pnom', 'dnom', 'dint', 'dext', 'descript', 'link', 'brand_id', 'model_id', 'svg', 'z1', 'z2', 'width', 'area', 'estimated_depth', 'thickness', 'cost_unit', 'cost', 'm2bottom_cost', 'm3protec_cost', 'active', 'label', 'shape', 'acoeff', 'connect_cost', 'dr'
     ],
     'Table cat_arc should have the correct columns'
 );
@@ -45,7 +45,7 @@ SELECT col_type_is('cat_arc', 'z2', 'numeric(12,2)', 'Column z2 should be numeri
 SELECT col_type_is('cat_arc', 'width', 'numeric(12,2)', 'Column width should be numeric(12,2)');
 SELECT col_type_is('cat_arc', 'area', 'numeric(12,4)', 'Column area should be numeric(12,4)');
 SELECT col_type_is('cat_arc', 'estimated_depth', 'numeric(12,2)', 'Column estimated_depth should be numeric(12,2)');
-SELECT col_type_is('cat_arc', 'bulk', 'numeric(12,2)', 'Column bulk should be numeric(12,2)');
+SELECT col_type_is('cat_arc', 'thickness', 'numeric(12,2)', 'Column thickness should be numeric(12,2)');
 SELECT col_type_is('cat_arc', 'cost_unit', 'character varying(3)', 'Column cost_unit should be varchar(3)');
 SELECT col_type_is('cat_arc', 'cost', 'character varying(16)', 'Column cost should be varchar(16)');
 SELECT col_type_is('cat_arc', 'm2bottom_cost', 'character varying(16)', 'Column m2bottom_cost should be varchar(16)');

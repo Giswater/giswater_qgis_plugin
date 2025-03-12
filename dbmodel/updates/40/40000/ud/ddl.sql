@@ -983,3 +983,5 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"link
 -- 06/03/2025
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"negativeoffset", "dataType":"boolean", "isUtils":"False"}}$$);
 
+--12/03/2025
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"cat_arc", "column":"bulk", "newName":"thickness"}}$$);

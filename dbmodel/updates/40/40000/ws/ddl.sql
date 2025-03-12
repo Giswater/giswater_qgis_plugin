@@ -1233,3 +1233,6 @@ CREATE TABLE inp_pattern (
 	CONSTRAINT inp_pattern_pkey PRIMARY KEY (pattern_id),
 	CONSTRAINT inp_pattern_expl_id_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+-- 12/03/2025
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"cat_arc", "column":"bulk", "newName":"thickness"}}$$);

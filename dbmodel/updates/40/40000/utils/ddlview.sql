@@ -110,6 +110,7 @@ DROP VIEW IF EXISTS v_ui_om_visit_x_doc;
 DROP VIEW IF EXISTS v_ext_raster_dem;
 
 DROP VIEW IF EXISTS v_plan_arc;
+DROP VIEW IF EXISTS v_price_x_catarc;
 DROP VIEW IF EXISTS v_plan_aux_arc_pavement;
 
 DROP VIEW IF EXISTS vi_parent_dma;
