@@ -52,7 +52,7 @@ from .plan.psector_btn import GwPsectorButton
 from .plan.psector_manager_btn import GwPsectorManagerButton
 from .plan.netscenario_manager_btn import GwNetscenarioManagerButton
 
-# Utilities: 61, 62, 63, 64, 65, 66, 67, 68
+# Utilities: 61, 62, 63, 64, 65, 66, 67
 from .utilities.utils_manager_btn import GwUtilsManagerButton
 from .utilities.config_btn import GwConfigButton
 from .utilities.toolbox_btn import GwToolBoxButton
@@ -60,7 +60,6 @@ from .utilities.utilities_manager.workspace_manager import GwWorkspaceManagerBut
 from .utilities.print_btn import GwPrintButton
 from .utilities.csv_btn import GwCSVButton
 from .utilities.project_check_btn import GwProjectCheckButton
-from .utilities.snapshot_view import GwSnapshotViewButton
 
 # ToC: 71, 72
 from .toc.add_child_layer_btn import GwAddChildLayerButton
