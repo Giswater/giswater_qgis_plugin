@@ -70,10 +70,13 @@ SELECT col_type_is('anl_arc', 'addparam', 'text', 'Column addparam should be tex
 SELECT col_type_is('anl_arc', 'sector_id', 'integer', 'Column sector_id should be integer');
 
 -- Check foreign keys
-
+SELECT hasnt_fk('anl_arc', 'Table anl_arc should have no foreign keys');
 -- Check triggers
 
+-- Check rules
+
 -- Check sequences
+SELECT has_sequence('anl_arc_id_seq', 'Sequence anl_arc_id_seq should exist');
 
 SELECT * FROM finish();
 

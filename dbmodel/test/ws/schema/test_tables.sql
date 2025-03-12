@@ -10,27 +10,8 @@ SET client_min_messages TO WARNING;
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-SELECT plan(303);
+SELECT plan(284);
 
-SELECT has_table('arc_add') AS "Table 'arc_add' should exist";
-SELECT has_table('archived_rpt_arc') AS "Table 'archived_rpt_arc' should exist";
-SELECT has_table('archived_rpt_arc_stats') AS "Table 'archived_rpt_arc_stats' should exist";
-SELECT has_table('archived_rpt_energy_usage') AS "Table 'archived_rpt_energy_usage' should exist";
-SELECT has_table('archived_rpt_hydraulic_status') AS "Table 'archived_rpt_hydraulic_status' should exist";
-SELECT has_table('archived_rpt_inp_arc') AS "Table 'archived_rpt_inp_arc' should exist";
-SELECT has_table('archived_rpt_inp_node') AS "Table 'archived_rpt_inp_node' should exist";
-SELECT has_table('archived_rpt_inp_pattern_value') AS "Table 'archived_rpt_inp_pattern_value' should exist";
-SELECT has_table('archived_rpt_node') AS "Table 'archived_rpt_node' should exist";
-SELECT has_table('archived_rpt_node_stats') AS "Table 'archived_rpt_node_stats' should exist";
-SELECT has_table('audit_arc_traceability') AS "Table 'audit_arc_traceability' should exist";
-SELECT has_table('audit_check_data') AS "Table 'audit_check_data' should exist";
-SELECT has_table('audit_check_project') AS "Table 'audit_check_project' should exist";
-SELECT has_table('audit_fid_log') AS "Table 'audit_fid_log' should exist";
-SELECT has_table('audit_log_data') AS "Table 'audit_log_data' should exist";
-SELECT has_table('archived_psector_arc_traceability') AS "Table 'archived_psector_arc_traceability' should exist";
-SELECT has_table('archived_psector_connec_traceability') AS "Table 'archived_psector_connec_traceability' should exist";
-SELECT has_table('archived_psector_node_traceability') AS "Table 'archived_psector_node_traceability' should exist";
-SELECT has_table('cat_arc') AS "Table 'cat_arc' should exist";
 SELECT has_table('cat_arc_shape') AS "Table 'cat_arc_shape' should exist";
 SELECT has_table('cat_brand') AS "Table 'cat_brand' should exist";
 SELECT has_table('cat_brand_model') AS "Table 'cat_brand_model' should exist";

@@ -50,10 +50,14 @@ SELECT col_type_is('anl_connec', 'dma_id', 'text', 'Column dma_id should be text
 SELECT col_type_is('anl_connec', 'addparam', 'text', 'Column addparam should be text');
 
 -- Check foreign keys
+SELECT hasnt_fk('anl_connec', 'Table anl_connec should have no foreign keys');
 
 -- Check triggers
 
+-- Check rules
+
 -- Check sequences
+SELECT has_sequence('anl_connec_id_seq', 'Sequence anl_connec_id_seq should exist');
 
 SELECT * FROM finish();
 

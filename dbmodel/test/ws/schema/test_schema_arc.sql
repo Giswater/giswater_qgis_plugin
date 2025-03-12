@@ -137,6 +137,7 @@ SELECT col_type_is('arc', 'lock_level', 'integer', 'Column lock_level should be 
 SELECT col_type_is('arc', 'is_scadamap', 'boolean', 'Column is_scadamap should be boolean');
 
 -- Check foreign keys
+SELECT has_fk('arc', 'Table arc should have foreign keys');
 SELECT fk_ok('arc', ARRAY['arccat_id'], 'cat_arc', ARRAY['id'], 'Table should have foreign key from arccat_id to cat_arc.id');
 SELECT fk_ok('arc', ARRAY['district_id'], 'ext_district', ARRAY['district_id'], 'Table should have foreign key from district_id to ext_district.district_id');
 SELECT fk_ok('arc', ARRAY['dma_id'], 'dma', ARRAY['dma_id'], 'Table should have foreign key from dma_id to dma.dma_id');

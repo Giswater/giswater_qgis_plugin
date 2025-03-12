@@ -48,10 +48,14 @@ SELECT col_type_is('anl_arc_x_node', 'descript', 'text', 'Column descript should
 SELECT col_type_is('anl_arc_x_node', 'result_id', 'character varying(16)', 'Column result_id should be varchar(16)');
 
 -- Check foreign keys
+SELECT hasnt_fk('anl_arc_x_node', 'Table anl_arc_x_node should have no foreign keys');
 
 -- Check triggers
 
+-- Check rules
+
 -- Check sequences
+SELECT has_sequence('anl_arc_x_node_id_seq', 'Sequence anl_arc_x_node_id_seq should exist');
 
 SELECT * FROM finish();
 

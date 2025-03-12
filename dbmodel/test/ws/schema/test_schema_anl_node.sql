@@ -70,10 +70,14 @@ SELECT col_type_is('anl_node', 'demand', 'double precision', 'Column demand shou
 SELECT col_type_is('anl_node', 'addparam', 'text', 'Column addparam should be text');
 
 -- Check foreign keys
+SELECT hasnt_fk('anl_node', 'Table anl_node should have no foreign keys');
 
 -- Check triggers
 
+-- Check rules
+
 -- Check sequences
+SELECT has_sequence('anl_node_id_seq', 'Sequence anl_node_id_seq should exist');
 
 SELECT * FROM finish();
 

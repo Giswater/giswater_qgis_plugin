@@ -44,10 +44,14 @@ SELECT col_type_is('anl_polygon', 'result_id', 'character varying(16)', 'Column 
 SELECT col_type_is('anl_polygon', 'descript', 'text', 'Column descript should be text');
 
 -- Check foreign keys
+SELECT hasnt_fk('anl_polygon', 'Table anl_polygon should have no foreign keys');
 
 -- Check triggers
 
+-- Check rules
+
 -- Check sequences
+SELECT has_sequence('anl_polygon_id_seq', 'Sequence anl_polygon_id_seq should exist');
 
 SELECT * FROM finish();
 
