@@ -2757,6 +2757,14 @@ class GwInfo(QObject):
                     
                 current_index = cmb_visit_class.currentIndex()
                 cmb_visit_class.currentIndexChanged.emit(current_index)
+
+                # Manage btn_open_gallery
+                btn_open_gallery = self.dlg_cf.findChild(QPushButton, 'tab_visit_open_gallery')
+                tbl_visits = self.dlg_cf.findChild(QTableView, 'tab_visit_tbl_visits')
+
+                btn_open_gallery.setEnabled(False)
+                tbl_visits.selectionModel().selectionChanged.connect(partial(self._manage_gallery_status, tbl_visits, btn_open_gallery))
+        
                 self.tab_visit_loaded = True
             # Tab 'Event'
             case 'tab_event' if not self.tab_event_loaded:
@@ -4244,18 +4252,17 @@ def open_visit_files(**kwargs):
     func_params = kwargs['func_params']
     qtable = tools_qt.get_widget(kwargs['dialog'], f"{func_params.get('targetwidget')}")
 
-    # Get selected row
+    # Get selected rows
     selected_list = qtable.selectionModel().selectedRows()
-    message = "Any record selected"
-    if not selected_list:
+    if len(selected_list) == 0:
+        message = "Any record selected"
         tools_qgis.show_warning(message)
         return
-    selected_row = selected_list[0].row()
-    if not selected_row:
-        tools_qgis.show_warning(message)
-        return
-    visit_id = qtable.model().record(selected_row).value("visit_id")
 
+    index = selected_list[0]
+    row = index.row()
+    column_index = tools_qt.get_col_index_by_col_name(qtable, 'visit_id')
+    visit_id = index.sibling(row, column_index).data()
     sql = (f"SELECT value FROM om_visit_event_photo"
            f" WHERE visit_id = '{visit_id}'")
     rows = tools_db.get_rows(sql)
