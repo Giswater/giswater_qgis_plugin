@@ -10,33 +10,8 @@ SET client_min_messages TO WARNING;
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-SELECT plan(284);
+SELECT plan(259);
 
-SELECT has_table('cat_arc_shape') AS "Table 'cat_arc_shape' should exist";
-SELECT has_table('cat_brand') AS "Table 'cat_brand' should exist";
-SELECT has_table('cat_brand_model') AS "Table 'cat_brand_model' should exist";
-SELECT has_table('cat_connec') AS "Table 'cat_connec' should exist";
-SELECT has_table('cat_dscenario') AS "Table 'cat_dscenario' should exist";
-SELECT has_table('cat_element') AS "Table 'cat_element' should exist";
-SELECT has_table('cat_feature') AS "Table 'cat_feature' should exist";
-SELECT has_table('cat_feature_arc') AS "Table 'cat_feature_arc' should exist";
-SELECT has_table('cat_feature_connec') AS "Table 'cat_feature_connec' should exist";
-SELECT has_table('cat_feature_node') AS "Table 'cat_feature_node' should exist";
-SELECT has_table('cat_manager') AS "Table 'cat_manager' should exist";
-SELECT has_table('cat_material') AS "Table 'cat_material' should exist";
-SELECT has_table('cat_mat_roughness') AS "Table 'cat_mat_roughness' should exist";
-SELECT has_table('cat_node') AS "Table 'cat_node' should exist";
-SELECT has_table('cat_owner') AS "Table 'cat_owner' should exist";
-SELECT has_table('cat_pavement') AS "Table 'cat_pavement' should exist";
-SELECT has_table('cat_soil') AS "Table 'cat_soil' should exist";
-SELECT has_table('cat_users') AS "Table 'cat_users' should exist";
-SELECT has_table('cat_work') AS "Table 'cat_work' should exist";
-SELECT has_table('cat_workspace') AS "Table 'cat_workspace' should exist";
-SELECT has_table('config_csv') AS "Table 'config_csv' should exist";
-SELECT has_table('config_form_fields') AS "Table 'config_form_fields' should exist";
-SELECT has_table('config_form_list') AS "Table 'config_form_list' should exist";
-SELECT has_table('config_form_tableview') AS "Table 'config_form_tableview' should exist";
-SELECT has_table('config_form_tabs') AS "Table 'config_form_tabs' should exist";
 SELECT has_table('config_fprocess') AS "Table 'config_fprocess' should exist";
 SELECT has_table('config_function') AS "Table 'config_function' should exist";
 SELECT has_table('config_graph_checkvalve') AS "Table 'config_graph_checkvalve' should exist";

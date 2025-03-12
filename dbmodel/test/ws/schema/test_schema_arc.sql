@@ -177,6 +177,10 @@ SELECT has_trigger('arc', 'gw_trg_typevalue_fk_update', 'Table should have trigg
 SELECT has_rule('arc', 'insert_plan_psector_x_arc', 'Table should have rule insert_plan_psector_x_arc');
 SELECT has_rule('arc', 'undelete_arc', 'Table should have rule undelete_arc');
 
+-- Check sequences
+
+-- Check constraints
+
 SELECT * FROM finish();
 
 ROLLBACK;
