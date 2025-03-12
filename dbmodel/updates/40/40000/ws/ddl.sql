@@ -1236,3 +1236,5 @@ CREATE TABLE inp_pattern (
 
 -- 12/03/2025
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"cat_arc", "column":"bulk", "newName":"thickness"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_meter", "column":"closed", "dataType":"boolean", "isUtils":"False"}}$$);

@@ -612,8 +612,8 @@ BEGIN
 			INSERT INTO man_manhole (node_id, name) VALUES(NEW.node_id, NEW.name);
 
 		ELSIF v_man_table='man_meter' THEN
-			INSERT INTO man_meter (node_id, real_press_max, real_press_min, real_press_avg, meter_code, automated)
-			VALUES(NEW.node_id, NEW.real_press_max, NEW.real_press_min, NEW.real_press_avg, NEW.meter_code, NEW.automated);
+			INSERT INTO man_meter (node_id, real_press_max, real_press_min, real_press_avg, meter_code, automated, closed)
+			VALUES(NEW.node_id, NEW.real_press_max, NEW.real_press_min, NEW.real_press_avg, NEW.meter_code, NEW.automated, NEW.closed);
 
 		ELSIF v_man_table='man_source' THEN
 				INSERT INTO man_source (node_id, name, source_type, source_code, aquifer_type, aquifer_name, wtp_id, registered_flow, auth_code, basin_id, subbasin_id)
