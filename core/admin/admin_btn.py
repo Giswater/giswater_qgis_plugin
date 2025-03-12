@@ -1211,6 +1211,7 @@ class GwAdminButton:
                                                       force_reload=True)
         qgis_file_export = tools_os.set_boolean(qgis_file_export, False)
         self.dlg_create_gis_project.chk_export_passwd.setChecked(qgis_file_export)
+        self.dlg_create_gis_project.txt_gis_folder.setEnabled(False)
         if self.is_service:
             self.dlg_create_gis_project.lbl_export_user_pass.setVisible(False)
             self.dlg_create_gis_project.chk_export_passwd.setVisible(False)
