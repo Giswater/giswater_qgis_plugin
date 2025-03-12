@@ -651,7 +651,9 @@ INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES
 INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('layout_name_typevalue', 'lyt_time_1', 'lyt_time_1', 'layoutTime1', '{"lytOrientation": "vertical"}'::json);
 
 INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('tabname_typevalue', 'tab_result', 'tab_result', 'tabResult', NULL);
-INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('tabname_typevalue', 'tab_time', 'tab_time', 'tabTime', NULL);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('tabname_typevalue', 'tab_time', 'tab_time', 'tabTime', '{
+  "lytOrientation": "horizontal"
+}'::json);
 
 INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('widgettype_typevalue', 'tabwidget', 'tabwidget', 'tabwidget', NULL);
 
