@@ -1,5 +1,4 @@
 """
-This file is part of Giswater 3
 This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
@@ -587,6 +586,12 @@ class GwCompPagesUi(GwDialog, FORM_CLASS):
 UINAME = "workcat_manager"
 FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
 class GwWorkcatManagerUi(GwDialog, FORM_CLASS):
+    CONTEXT = CONTEXT
+    UINAME = UINAME
+
+UINAME = "snapshot_view"
+FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+class GwSnapshotViewUi(GwDialog, FORM_CLASS):
     CONTEXT = CONTEXT
     UINAME = UINAME
 

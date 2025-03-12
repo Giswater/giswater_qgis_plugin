@@ -62,6 +62,7 @@ from ..toolbars.edit import featuretype_change_btn
 from ..toolbars.epa import go2epa_selector_btn
 from ..shared import psector
 from ..shared import audit
+from ..toolbars.utilities import snapshot_view
 
 QgsGeometryType = Literal['line', 'point', 'polygon']
 
