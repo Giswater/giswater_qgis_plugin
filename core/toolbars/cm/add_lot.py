@@ -29,7 +29,6 @@ from ..maptool import GwMaptool
 from ...ui.ui_manager import AddLotUi
 from ...ui.ui_manager import LotSelectorUi
 from ...ui.ui_manager import DialogTableUi
-from ...ui.ui_manager import LoadManagementUi
 from ...ui.ui_manager import LotManagementUi
 from ...ui.ui_manager import WorkManagementUi
 from ...ui.ui_manager import ResourcesManagementUi
@@ -116,7 +115,6 @@ class AddNewLot():
 
         self.lot_id = self.dlg_lot.findChild(QLineEdit, "lot_id")
         self.user_name = self.dlg_lot.findChild(QLineEdit, "user_name")
-        self.visit_class = self.dlg_lot.findChild(QComboBox, "cmb_visit_class")
 
         # Tab 'Relations'
         self.feature_type = self.dlg_lot.findChild(QComboBox, "feature_type")
@@ -132,19 +130,15 @@ class AddNewLot():
         if tools_gw.get_project_type() == 'ws':
             tools_qt.enable_tab_by_tab_name(self.dlg_lot.tab_widget, 'LoadsTab', False)
 
-        self.tbl_load = self.dlg_lot.findChild(QTableView, "tbl_load")
-        tools_qt.set_tableview_config(self.tbl_load)
-
         new_lot_id = lot_id
         if lot_id is None:
             new_lot_id = self.get_next_id('om_visit_lot', 'id')
         tools_qt.set_widget_text(self.dlg_lot, self.lot_id, new_lot_id)
 
-        self.feature_type = tools_qt.get_combo_value(self.dlg_lot, self.visit_class, 2).lower()
 
         if self.feature_type != '':
-            viewname = "v_edit_" + self.feature_type
-            tools_gw.set_completer_feature_id(self.dlg_lot.feature_id, self.feature_type, viewname)
+            viewname = "v_edit_" + self.feature_type.currentText()
+            tools_gw.set_completer_feature_id(self.dlg_lot.feature_id, self.feature_type.currentText(), viewname)
         else:
             self.feature_type = 'arc'
         self.clear_selection()
@@ -165,13 +159,6 @@ class AddNewLot():
         self.dlg_lot.btn_feature_delete.clicked.connect(partial(self.remove_selection, self.dlg_lot, self.tbl_relation))
         self.dlg_lot.btn_feature_snapping.clicked.connect(partial(self.set_active_layer))
         self.dlg_lot.btn_feature_snapping.clicked.connect(partial(self.selection_init, self.dlg_lot))
-        self.dlg_lot.cmb_visit_class.currentIndexChanged.connect(self.set_tab_dis_enabled)
-        self.dlg_lot.cmb_visit_class.currentIndexChanged.connect(self.set_active_layer)
-        self.dlg_lot.cmb_visit_class.currentIndexChanged.connect(
-            partial(self.event_feature_type_selected, self.dlg_lot))
-        self.dlg_lot.cmb_visit_class.currentIndexChanged.connect(partial(self.reload_table_visit))
-        self.dlg_lot.cmb_visit_class.currentIndexChanged.connect(partial(self.set_lot_headers))
-        self.dlg_lot.cmb_assigned_to.currentIndexChanged.connect(partial(self.populate_cmb_visitclass, event_change_team=True))
         self.dlg_lot.cmb_status.currentIndexChanged.connect(partial(self.manage_cmb_status))
         self.dlg_lot.txt_filter.textChanged.connect(partial(self.reload_table_visit))
         self.dlg_lot.date_event_from.dateChanged.connect(partial(self.reload_table_visit))
@@ -196,11 +183,7 @@ class AddNewLot():
 
         if lot_id is not None and visitclass_id not in (None, '', 'NULL'):
             self.set_values(lot_id)
-            tools_qt.get_combo_value(self.dlg_lot, self.visit_class, 2).lower()
-
             self.update_id_list()
-            tools_qt.set_combo_value(self.dlg_lot.cmb_visit_class, visitclass_id, 1)
-            table_name = tools_qt.get_combo_value(self.dlg_lot, self.dlg_lot.cmb_visit_class, 3)
 
             tools_gw.set_dates_from_to(self.dlg_lot.date_event_from, self.dlg_lot.date_event_to, table_name,
                                    'startdate', 'enddate')
@@ -221,21 +204,6 @@ class AddNewLot():
         self.set_completers()
         self.hilight_features(self.rb_list)
 
-        # Get columns to ignore for tab_visit when export csv
-        table_name = tools_qt.get_combo_value(self.dlg_lot, self.dlg_lot.cmb_visit_class, 3)
-
-        if table_name is not None:
-            sql = "SELECT columnname FROM config_form_tableview WHERE location_type = 'tbl_visit' AND visible IS NOT TRUE AND objectname = '"+str(table_name)+"'"
-            rows = tools_db.get_rows(sql)
-            result_visit = []
-            if rows is not None:
-                for row in rows:
-                    result_visit.append(row[0])
-            else:
-                result_visit = ''
-        else:
-            result_visit = ''
-
         # Get columns to ignore for tab_relations when export csv
         sql = "SELECT columnname FROM config_form_tableview WHERE location_type = 'lot' AND visible IS NOT TRUE AND objectname = 've_lot_x_"+str(self.feature_type)+"'"
         rows = tools_db.get_rows(sql)
@@ -247,9 +215,6 @@ class AddNewLot():
             result = ''
 
         # Set listeners for export csv
-        self.dlg_lot.btn_export_visits.clicked.connect(
-            partial(self.export_model_to_csv, self.dlg_lot, self.dlg_lot.tbl_visit, 'txt_path', result_visit,
-                    self.lot_date_format))
         self.dlg_lot.btn_export_rel.clicked.connect(
             partial(self.export_model_to_csv, self.dlg_lot, self.dlg_lot.tbl_relation, 'txt_path_rel', result_relation,
                     self.lot_date_format))
@@ -413,21 +378,6 @@ class AddNewLot():
         tools_gw.open_dialog(self.dlg_basic_table)
 
 
-    def filter_cmb_team(self):
-        """ Fill ComboBox cmb_assigned_to """
-
-        visit_class = tools_qt.get_combo_value(self.dlg_lot, self.dlg_lot.cmb_visit_class, 0)
-        sql = ("SELECT DISTINCT(cat_team.id), idval FROM cm.cat_team "
-                "JOIN om_team_x_visitclass ON cat_team.id = om_team_x_visitclass.team_id "
-                "WHERE om_team_x_visitclass.visitclass_id = " + str(visit_class) + "")
-        rows = tools_db.get_rows(sql, commit=True)
-
-        if rows:
-            tools_qt.fill_combo_values(self.dlg_lot.cmb_assigned_to, rows)
-        else:
-            self.dlg_lot.cmb_assigned_to.clear()
-
-
     def populate_cmb_team(self):
         """ Fill ComboBox cmb_assigned_to """
 
@@ -439,51 +389,6 @@ class AddNewLot():
             tools_qt.fill_combo_values(self.dlg_lot.cmb_assigned_to, rows)
         else:
             self.dlg_lot.cmb_assigned_to.clear()
-
-    def populate_cmb_visitclass(self, event_change_team=False):
-        """ Fill ComboBox cmb_visit_class """
-
-        # Fill ComboBox cmb_visit_class
-        self.assiged_to = tools_qt.get_combo_value(self.dlg_lot, self.dlg_lot.cmb_assigned_to, 0)
-
-        # Check if team have current visit class
-        if event_change_team:
-            visit_class = tools_qt.get_combo_value(self.dlg_lot.cmb_visit_class, 0)
-            if visit_class not in (None, '') and self.assiged_to not in (None, ''):
-                sql = (
-                    "SELECT DISTINCT(config_visit_class.id) FROM config_visit_class "
-                    "JOIN cm.om_team_x_visitclass ON config_visit_class.id = om_team_x_visitclass.visitclass_id "
-                    "WHERE config_visit_class.active is True AND team_id = " + str(self.assiged_to) + " "
-                    "AND config_visit_class.id = " + str(visit_class) + "")
-                result = tools_db.get_row(sql, commit=True)
-                if result:
-                    return
-        self.visit_class.setEnabled(True)
-        if self.ot_result:
-            sql = (
-                "SELECT DISTINCT(config_visit_class.id), config_visit_class.idval, feature_type, "
-                "config_visit_class.tablename, param_options::text, config_visit_class.feature_type "
-                " FROM config_visit_class"
-                " INNER JOIN config_visit_class_x_workorder "
-                " ON config_visit_class_x_workorder.visitclass_id = config_visit_class.id ")
-        else:
-            sql = ("SELECT DISTINCT(config_visit_class.id), idval, feature_type, config_visit_class.tablename, param_options::text, "
-                   "config_visit_class.feature_type FROM config_visit_class")
-        if self.assiged_to:
-            sql += (" JOIN cm.om_team_x_visitclass ON config_visit_class.id = om_team_x_visitclass.visitclass_id "
-                    "WHERE config_visit_class.active is True AND team_id = " + str(self.assiged_to) + " ")
-        if self.ot_result:
-            sql += (" AND ismultifeature is False AND feature_type IS NOT null")
-
-        visitclass_ids = tools_db.get_rows(sql, commit=True)
-        if visitclass_ids:
-            visitclass_ids.append(['', '', '', '', ''])
-        else:
-            visitclass_ids = []
-            visitclass_ids.append(['', '', '', '', ''])
-
-        tools_qt.fill_combo_values(self.dlg_lot.cmb_visit_class, visitclass_ids, 1)
-        tools_qt.set_combo_value(self.dlg_lot.cmb_visit_class, visitclass_ids[0][1], 1)
 
 
     def cancel_changes(self, qtable):
@@ -618,14 +523,6 @@ class AddNewLot():
         tools_qt.set_widget_text(self.dlg_lot, self.dlg_lot.txt_ot_address, item[3])
         tools_qt.set_widget_text(self.dlg_lot, self.dlg_lot.txt_observ, item[6])
 
-        # Enable/Disable visit class combo according selected OT
-        if (tools_qt.get_text(self.dlg_lot, self.dlg_lot.cmb_ot) == 'null') or \
-                tools_gw.get_project_type() == 'ws':
-            self.dlg_lot.cmb_visit_class.setEnabled(True)
-        else:
-            self.dlg_lot.cmb_visit_class.setEnabled(False)
-            tools_qt.set_combo_value(self.dlg_lot.cmb_visit_class, str(item[5]), 0)
-
 
     def disbale_actions(self, value):
         """ Disable or enabled action according option selected into QComboBox cmb_status
@@ -670,9 +567,9 @@ class AddNewLot():
             index_feature = tools_qt.get_col_index_by_col_name(qtable, str(feature_type) + '_id')
             feature_id = row_index.sibling(row, index_feature).data()
             id_list += "'" + feature_id + "', "
-            msg_records += "visit_id: "+str(visit_id)+", "+str(feature_type)+"_id = '"+str(feature_id)+"';\n"
+            msg_records += "visit_id: "+str(visit_id)+";\n"
         id_list = id_list[:-2] + ")"
-        answer =  tools_qt.show_question(message, "Delete records", msg_records)
+        answer = tools_qt.show_question(message, "Delete records", msg_records)
         if answer:
             sql = ("DELETE FROM om_visit_x_"+str(feature_type)+" "
                    " WHERE visit_id = '"+str(visit_id)+"' "
@@ -738,8 +635,6 @@ class AddNewLot():
 
         # Fill ComboBox cmb_assigned_to
         self.populate_cmb_team()
-
-        self.populate_cmb_visitclass()
 
         # Fill ComboBox cmb_status
         rows = tools_db.get_values_from_catalog('om_typevalue', 'lot_cat_status')
@@ -1099,10 +994,6 @@ class AddNewLot():
         Retrieves the corresponding layer by its table name, makes it active on the interface, and ensures that it is visible."""
 
         self.current_layer = self.iface.activeLayer()
-        # Set active layer
-        visit_class = tools_qt.get_combo_value(self.dlg_lot, self.visit_class, 2)
-        if visit_class in (None, ''):
-            return
         layer_name = 'v_edit_' + visit_class.lower()
 
         self.layer_lot = tools_qgis.get_layer_by_tablename(layer_name)
@@ -1509,45 +1400,54 @@ class AddNewLot():
 
 
     def zoom_to_feature(self, qtable):
-        """Zooms the map canvas to the extent of the selected feature. Retrieves the feature from the table view,
-        selects it in the active layer using a constructed expression, triggers a zoom to actual size, and draws a polyline
-        highlight based on the feature's geometry if applicable."""
+        """Zooms the map canvas to the extent of the selected feature.
+        Retrieves the feature from the table view, selects it in the active layer using a constructed expression,
+        triggers a zoom to actual size, and draws a polyline highlight based on the feature's geometry if applicable."""
 
-        feature_type = tools_qt.get_combo_value(self.dlg_lot, self.visit_class, 2).lower()
         selected_list = qtable.selectionModel().selectedRows()
-        if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message)
+        if not selected_list:
+            tools_qgis.show_warning("No record selected")
             return
 
         index = selected_list[0]
         row = index.row()
-        column_index = tools_qt.get_col_index_by_col_name(qtable, feature_type + '_id')
+        # Assume the identifier column is named "id"
+        column_index = tools_qt.get_col_index_by_col_name(qtable, "id")
         feature_id = index.sibling(row, column_index).data()
-        expr_filter = "\""+str(feature_type)+"_id\" IN ('"+str(feature_id)+"')"
 
-        # Check expression
+        # Build the expression filter based on the "id" field
+        expr_filter = "\"id\" IN ('" + str(feature_id) + "')"
         (is_valid, expr) = tools_qt.check_expression_filter(expr_filter)
 
-        tools_qgis.select_features_by_ids(feature_type, expr)
+        # Select the feature in the active layer. If the function requires a layer name,
+        # you might want to pass in the current layer name or handle it inside the function.
+        tools_qgis.select_features_by_ids(None, expr)
+
+        # Zoom to the selected feature(s)
         self.iface.actionZoomActualSize().trigger()
 
         layer = self.iface.activeLayer()
         features = layer.selectedFeatures()
 
+        # Process the geometry of the first selected feature
         for f in features:
-            if feature_type == 'arc':
-                list_coord = f.geometry().asPolyline()
+            geom = f.geometry()
+            if geom.isMultipart():
+                list_coord = geom.asMultiPolyline()[0]
             else:
-                return
-            break
+                list_coord = geom.asPolyline()
+            break  # Process only the first feature
 
+        # Construct a WKT linestring from the coordinates
         coords = "LINESTRING( "
         for c in list_coord:
-            coords += c[0] + " " + c[1] + ","
+            # Ensure that the coordinate values are strings (if they aren't already)
+            coords += str(c[0]) + " " + str(c[1]) + ","
         coords = coords[:-1] + ")"
-        list_coord = re.search('\((.*)\)', str(coords))
-        points = self.get_points(list_coord)
+
+        # Extract the coordinate list from the WKT string and get points
+        list_coord_match = re.search(r'\((.*)\)', coords)
+        points = self.get_points(list_coord_match)
         self.draw_polyline(points)
 
 
@@ -1666,7 +1566,6 @@ class AddNewLot():
         self.dlg_lot_man.btn_open.clicked.connect(partial(self.open_lot, self.dlg_lot_man, self.dlg_lot_man.tbl_lots))
         self.dlg_lot_man.btn_delete.clicked.connect(partial(self.delete_lot, self.dlg_lot_man.tbl_lots))
         self.dlg_lot_man.btn_work_register.clicked.connect(self.open_work_register)
-        self.dlg_lot_man.btn_manage_load.clicked.connect(self.open_load_manage)
         self.dlg_lot_man.btn_lot_selector.clicked.connect(self.LotSelectorUi)
 
         # Set filter events
@@ -1700,43 +1599,6 @@ class AddNewLot():
             tools_qt.set_calendar(self.dlg_lot_man, self.dlg_lot_man.date_event_to, date_event_to)
 
         tools_gw.open_dialog(self.dlg_lot_man, dlg_name="visit_management")
-
-
-    def open_load_manage(self):
-        """Opens the load management dialog by initializing its UI, loading necessary settings and data,
-        and allowing users to manage load-related information associated with the current lot."""
-
-        self.dlg_load_manager = LoadManagementUi()
-        tools_gw.load_settings(self.dlg_load_manager)
-        self.dlg_load_manager.tbl_loads.setSelectionBehavior(QAbstractItemView.SelectRows)
-
-        # Tab 'Loads'
-        self.tbl_load = self.dlg_load_manager.findChild(QTableView, "tbl_loads")
-        tools_qt.set_tableview_config(self.tbl_load)
-
-        # Add combo into column vehicle_id
-        sql = ("SELECT id, idval"
-               " FROM ext_cat_vehicle"
-               " ORDER BY id")
-        combo_values = tools_db.get_rows(sql, commit=True)
-
-        # Populate cmb_vehicle on tab Loads
-        self.dlg_load_manager.cmb_filter_vehicle.addItem('', '')
-        tools_qt.fill_combo_values(self.dlg_load_manager.cmb_filter_vehicle, combo_values, 1, combo_clear=False)
-
-        # @setEditStrategy: 0: OnFieldChange, 1: OnRowChange, 2: OnManualSubmit
-        self.dlg_load_manager.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_load_manager))
-        self.dlg_load_manager.rejected.connect(partial(tools_gw.save_settings, self.dlg_load_manager))
-        self.dlg_load_manager.cmb_filter_vehicle.currentIndexChanged.connect(partial(self.filter_loads))
-        self.dlg_load_manager.btn_path.clicked.connect(partial(self.select_path, self.dlg_load_manager, 'txt_path'))
-
-        self.dlg_load_manager.btn_export_load.clicked.connect(partial(self.export_model_to_csv, self.dlg_load_manager, self.tbl_load, 'txt_path', '', 'yyyy-MM-dd hh:mm:ss'))
-
-        # Hide columns tbl_loads on load tab
-        self.hide_colums(self.dlg_load_manager.tbl_loads, [0])
-
-        # Open dialog
-        tools_gw.open_dialog(self.dlg_load_manager)
 
 
     def open_work_register(self):
@@ -1826,21 +1688,6 @@ class AddNewLot():
 
         self.dlg_work_register.tbl_work.model().setFilter(expr_filter)
         self.dlg_work_register.tbl_work.model().select()
-
-
-    def filter_loads(self):
-        """Applies filtering logic to the loads data, updating the loads display to only show records matching the specified criteria."""
-
-        # Refresh model with selected filter
-        filter = tools_qt.get_text(self.dlg_load_manager, self.dlg_load_manager.cmb_filter_vehicle)
-
-        if filter == 'null':
-            expr_filter = ''
-        else:
-            expr_filter = " vehicle = '"+str(filter)+"'"
-
-        self.dlg_load_manager.tbl_loads.model().setFilter(expr_filter)
-        self.dlg_load_manager.tbl_loads.model().select()
 
 
     def LotSelectorUi(self):
@@ -2224,18 +2071,12 @@ class AddNewLot():
         """Checks the internal list of selected feature IDs to ensure it is complete and consistent with
         the current UI selections, triggering any necessary updates or validations."""
 
-        row_count = self.dlg_lot.tbl_relation.model().rowCount()
         self.assiged_to = tools_qt.get_combo_value(self.dlg_lot, self.dlg_lot.cmb_assigned_to, 0)
-        if row_count != 0:
-            self.visit_class.setEnabled(False)
-            self.filter_cmb_team()
-        else:
-            self.populate_cmb_team()
-            layer = self.iface.activeLayer()
-            if layer:
-                layer.removeSelection()
-            self.iface.actionPan().trigger()
-            self.visit_class.setEnabled(True)
+        self.populate_cmb_team()
+        layer = self.iface.activeLayer()
+        if layer:
+            layer.removeSelection()
+        self.iface.actionPan().trigger()
 
         # Set team_id
         tools_qt.set_combo_value(self.dlg_lot.cmb_assigned_to, str(self.assiged_to), 0)
@@ -2278,16 +2119,6 @@ class AddNewLot():
 
         return widget
 
-
-    def fill_tbl_load_man(self, dialog, widget, table_name, expr_filter):
-        """ Fill the table control to show documents """
-
-        # Get widgets
-        self.date_load_to = self.dlg_lot.findChild(QDateEdit, "date_load_to")
-        self.date_load_from = self.dlg_lot.findChild(QDateEdit, "date_load_from")
-
-        # Set model of selected widget
-        self.set_model_to_table(widget, table_name, expr_filter)
 
     def open_load_image(self, qtable, pg_table):
         """Opens the load image associated with the selected record by retrieving the relevant image data using the specified table parameter,

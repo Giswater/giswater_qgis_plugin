@@ -607,12 +607,6 @@ class DialogTableUi(GwDialog, FORM_CLASS):
     CONTEXT = CONTEXT
     UINAME = UINAME
 
-UINAME = "load_management"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
-class LoadManagementUi(GwDialog, FORM_CLASS):
-    CONTEXT = CONTEXT
-    UINAME = UINAME
-
 UINAME = "lot_management"
 FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
 class LotManagementUi(GwDialog, FORM_CLASS):
