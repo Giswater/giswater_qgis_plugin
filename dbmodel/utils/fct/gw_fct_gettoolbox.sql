@@ -148,7 +148,7 @@ BEGIN
 			 SELECT config_toolbox.id, alias, function_name as functionname
 			 FROM sys_function
 			 JOIN config_toolbox USING (id)
-			 WHERE alias ILIKE ''%', v_filter ,'%'' AND sys_role =''role_master'' AND config_toolbox.active IS TRUE
+			 WHERE alias ILIKE ''%', v_filter ,'%'' AND sys_role =''role_plan'' AND config_toolbox.active IS TRUE
 			 AND sys_role IN  (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))
 			 AND (project_type=',quote_literal(v_projectype),' OR project_type=''utils'')
 			 AND ',v_device,' = ANY(device)) a');
@@ -212,7 +212,7 @@ BEGIN
 	v_querystring = concat('SELECT array_to_json(array_agg(row_to_json(a))) FROM (
 			 SELECT id, alias, addparam
 			 FROM config_report
-			 WHERE sys_role = ''role_master''
+			 WHERE sys_role = ''role_plan''
 			 AND sys_role IN  (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))
 			 AND alias ILIKE ''%', v_filter ,'%'' AND active IS TRUE AND ',v_device,' = ANY(device) ORDER BY id) a');
 

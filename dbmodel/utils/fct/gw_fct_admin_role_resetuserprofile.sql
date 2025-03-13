@@ -159,7 +159,7 @@ BEGIN
 					END IF;
 
 					-- plan selectors
-					IF 'role_master' IN (SELECT rolname FROM pg_roles WHERE pg_has_role( v_user, oid, 'member')) THEN
+					IF 'role_plan' IN (SELECT rolname FROM pg_roles WHERE pg_has_role( v_user, oid, 'member')) THEN
 
 						DELETE FROM selector_plan_result WHERE cur_user=v_user;
 						DELETE FROM selector_psector WHERE cur_user=v_user;

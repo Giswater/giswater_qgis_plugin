@@ -18,7 +18,7 @@ INSERT INTO cat_users VALUES ('user2','user2');
 INSERT INTO cat_users VALUES ('user3','user3');
 INSERT INTO cat_users VALUES ('user4','user4');
 
-INSERT INTO cat_manager (idval, expl_id, rolename, active) VALUES ('general manager', '{1,2}', '{role_master}', true);
+INSERT INTO cat_manager (idval, expl_id, rolename, active) VALUES ('general manager', '{1,2}', '{role_plan}', true);
 
 INSERT INTO config_graph_mincut VALUES (113766);
 INSERT INTO config_graph_mincut VALUES (113952);

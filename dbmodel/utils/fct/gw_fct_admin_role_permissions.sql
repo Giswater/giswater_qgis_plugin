@@ -70,16 +70,16 @@ BEGIN
 		GRANT role_edit TO role_epa;
 	END IF;
 
-	SELECT rolname into v_roleexists FROM pg_roles WHERE rolname = 'role_master';
+	SELECT rolname into v_roleexists FROM pg_roles WHERE rolname = 'role_plan';
 	IF v_roleexists is null THEN
-		CREATE ROLE "role_master" NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;
-		GRANT role_epa TO role_master;
+		CREATE ROLE "role_plan" NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;
+		GRANT role_epa TO role_plan;
 	END IF;
 
 	SELECT rolname into v_roleexists FROM pg_roles WHERE rolname = 'role_admin';
 	IF v_roleexists is null THEN
 		CREATE ROLE "role_admin" NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;
-		GRANT role_master TO role_admin;
+		GRANT role_plan TO role_admin;
 		-- Grant role admin to postgres user
 		GRANT role_admin TO postgres;
 	END IF;

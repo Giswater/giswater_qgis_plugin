@@ -128,7 +128,7 @@ BEGIN
 	SELECT 199, (array_agg(state_id)) FROM selector_state WHERE cur_user=current_user;
 
 	-- save & reset psector selector
-	IF p_usepsectors IS FALSE AND 'role_master' IN (SELECT rolname FROM pg_roles WHERE pg_has_role( current_user, oid, 'member')) THEN
+	IF p_usepsectors IS FALSE AND 'role_plan' IN (SELECT rolname FROM pg_roles WHERE pg_has_role( current_user, oid, 'member')) THEN
 		DELETE FROM temp_table WHERE fid=287 AND cur_user=current_user;
 		INSERT INTO temp_table (fid, text_column)  
 		SELECT 287, (array_agg(psector_id)) FROM selector_psector WHERE cur_user=current_user;
@@ -305,7 +305,7 @@ BEGIN
 	IF v_debug THEN	RAISE NOTICE '11-Insert into om_mincut_connec table ';	END IF;		
 	
 	-- insert connecs
-	IF p_usepsectors IS TRUE AND 'role_master' IN (SELECT rolname FROM pg_roles WHERE pg_has_role( current_user, oid, 'member')) THEN
+	IF p_usepsectors IS TRUE AND 'role_plan' IN (SELECT rolname FROM pg_roles WHERE pg_has_role( current_user, oid, 'member')) THEN
 		INSERT INTO om_mincut_connec (result_id, connec_id, the_geom, customer_code)
 		SELECT result_id_arg, connec_id, c.the_geom, c.customer_code FROM v_edit_connec c JOIN om_mincut_arc ON c.arc_id=om_mincut_arc.arc_id WHERE result_id=result_id_arg AND state > 0;
 	ELSE

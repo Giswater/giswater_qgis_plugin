@@ -2149,3 +2149,9 @@ DELETE FROM config_form_fields WHERE formname='cat_builder';
 -- 11/03/2025
 DELETE FROM sys_table WHERE id='config_user_x_sector';
 DELETE FROM sys_function WHERE function_name='gw_trg_cat_manager';
+
+--13/03/2025
+ALTER TABLE sys_role DROP CONSTRAINT sys_role_check;
+UPDATE sys_role SET id='role_plan', context='plan', descript=NULL WHERE id='role_master';
+ALTER TABLE sys_role ADD CONSTRAINT sys_role_check
+CHECK (((id)::text = ANY (ARRAY[('role_admin'::character varying)::text, ('role_basic'::character varying)::text, ('role_edit'::character varying)::text, ('role_epa'::character varying)::text, ('role_plan'::character varying)::text, ('role_om'::character varying)::text, ('role_crm'::character varying)::text, ('role_system'::character varying)::text])));
