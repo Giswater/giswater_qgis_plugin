@@ -31,7 +31,6 @@ CREATE TABLE cat_team
 );
 
 
-
 CREATE TABLE om_team_x_user
 (
   id serial NOT NULL,
@@ -41,25 +40,38 @@ CREATE TABLE om_team_x_user
 );
 
 
-CREATE TABLE om_campaignclass
+---- reviewclass & visitclass
+
+CREATE TABLE om_reviewclass
+(
+  id serial NOT NULL, 
+  idval text,
+  descript text,
+  active boolean DEFAULT true,
+  CONSTRAINT om_reviewclass_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE om_reviewclass_x_layer
+(
+  reviewclass_id integer NOT NULL,
+  layer text NOT NULL,
+  active boolean DEFAULT true,
+  CONSTRAINT om_reviewclass_x_layer_pkey PRIMARY KEY (reviewclass_id, layer)
+);
+
+
+CREATE TABLE om_visitclass
 (
   id serial NOT NULL,
   idval text,
   descript text,
+  feature_type text,
   active boolean DEFAULT true,
-  CONSTRAINT om_campaignclass_pkey PRIMARY KEY (id)
+  CONSTRAINT om_visitclass_pkey PRIMARY KEY (id)
 );
 
 
-CREATE TABLE campaignclass_x_layer
-(
-  campaignclass_id integer NOT NULL,
-  layer text NOT NULL,
-  active boolean DEFAULT true,
-  CONSTRAINT campaignclass_x_layer_pkey PRIMARY KEY (campaignclass_id, layer)
-);
-
-
+-- campaign
 CREATE TABLE om_campaign
 (
   id serial NOT NULL,
@@ -67,7 +79,7 @@ CREATE TABLE om_campaign
   enddate date,
   real_startdate date,
   real_enddate date,
-  visitclass_id integer,
+  campaign_type integer,  -- visit / review
   descript text,
   active boolean DEFAULT true,
   organitzation_id integer,
@@ -78,7 +90,31 @@ CREATE TABLE om_campaign
   exercise integer,
   serie character varying(10),
   address text,
-  CONSTRAINT om_visit_campaign_pkey PRIMARY KEY (id)
+  CONSTRAINT om_campaign_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE om_campaign_visit
+(
+  campaign_id integer NOT NULL,-- fk om_campaign
+  visitclass_id integer,
+  CONSTRAINT om_campaign_visit_pkey PRIMARY KEY (id)
+);
+
+
+CREATE TABLE om_campaign_review
+(
+  campaign_id integer NOT NULL, -- fk om_campaign
+  reviewclass_id integer,
+  CONSTRAINT om_campaign_review_pkey PRIMARY KEY (id)
+);
+
+
+CREATE TABLE om_campaign_x_layer
+(
+  campaign_id integer, -- fk om_campaign
+  layer_id text,
+  feature_type text,
+  CONSTRAINT om_campaign_x_layer_pkey PRIMARY KEY (campaign_id, layer_id)
 );
 
 
@@ -142,21 +178,19 @@ CREATE TABLE om_campaign_lot
   real_startdate date,
   real_enddate date,
   campaign_id integer,
+  workorder_id text,
   descript text,
   active boolean DEFAULT true,
   team_id integer,
   duration text,
-  feature_type text,
   status integer,
   the_geom geometry(MultiPolygon,SRID_VALUE),
   rotation numeric(8,4),
-  class_id character varying(5),
-  exercise integer,
-  serie character varying(10),
-  "number" integer,
+  descript text,
   address text,
   CONSTRAINT om_campaign_lot_pkey PRIMARY KEY (id)
 );
+
 
 CREATE TABLE selector_lot
 (
@@ -208,15 +242,8 @@ CREATE TABLE om_campaign_lot_x_node
   CONSTRAINT om_campaign_lot_x_node_pkey PRIMARY KEY (lot_id, node_id)
 );
 
-CREATE TABLE config_visit_class_x_workorder
-(
-  visitclass_id integer NOT NULL,
-  workorder_type character varying(50) NOT NULL,
-  active boolean DEFAULT true,
-  CONSTRAINT config_visit_class_x_workorder_pkey PRIMARY KEY (visitclass_id, workorder_type)
-);
 
-CREATE TABLE ext_workorder_type
+CREATE TABLE workorder_type
 (
   id character varying(50) NOT NULL,
   idval character varying(50),
@@ -224,14 +251,14 @@ CREATE TABLE ext_workorder_type
   CONSTRAINT ext_workorder_type_pkey PRIMARY KEY (id)
 );
 
-CREATE TABLE ext_workorder_class
+CREATE TABLE workorder_class
 (
   id character varying(50) NOT NULL,
   idval character varying(50),
   CONSTRAINT ext_workorder_class_pkey PRIMARY KEY (id)
 );
 
-CREATE TABLE ext_workorder
+CREATE TABLE workorder
 (
   workorder_id integer NOT NULL,
   workorder_name character varying(50),
@@ -241,9 +268,8 @@ CREATE TABLE ext_workorder
   serie character varying(10),
   startdate date,
   address character varying(50),
-  visitclass_id integer,
-  observations text,
+  observ text,
   cost numeric,
   ct text,
-  CONSTRAINT ext_workorder_pkey PRIMARY KEY (workorder_id)
+  CONSTRAINT workorder_pkey PRIMARY KEY (workorder_id)
 );
