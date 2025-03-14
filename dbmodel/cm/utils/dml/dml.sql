@@ -49,16 +49,16 @@ INSERT INTO PARENT_SCHEMA.sys_function VALUES (2842, 'gw_trg_edit_lot_x_user', '
 INSERT INTO PARENT_SCHEMA.sys_function VALUES (2834, 'gw_trg_edit_team_x_user', 'utils', 'trigger function', NULL, NULL, 'Makes editable v_om_team_x_user', 'role_om', NULL, NULL) ON CONFLICT (id) DO NOTHING;
 INSERT INTO PARENT_SCHEMA.sys_function VALUES (2836, 'gw_trg_edit_team_x_visitclass', 'utils', 'trigger function', NULL, NULL, 'Makes editable v_om_team_x_visitclass', 'role_om', NULL, NULL) ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO PARENT_SCHEMA.om_typevalue VALUES ('lot_cat_status', 1, 'PLANIFYING', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
-INSERT INTO PARENT_SCHEMA.om_typevalue VALUES ('lot_cat_status', 2, 'PLANIFIED', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
-INSERT INTO PARENT_SCHEMA.om_typevalue VALUES ('lot_cat_status', 3, 'ASSIGNED', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
-INSERT INTO PARENT_SCHEMA.om_typevalue VALUES ('lot_cat_status', 4, 'ON GOING', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
-INSERT INTO PARENT_SCHEMA.om_typevalue VALUES ('lot_cat_status', 5, 'EXECUTED', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
-INSERT INTO PARENT_SCHEMA.om_typevalue VALUES ('lot_cat_status', 6, 'REVISED', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
-INSERT INTO PARENT_SCHEMA.om_typevalue VALUES ('lot_cat_status', 7, 'CANCELED', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO PARENT_SCHEMA.om_typevalue VALUES ('campaign_cat_status', 1, 'PLANIFYING', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO PARENT_SCHEMA.om_typevalue VALUES ('campaign_cat_status', 2, 'PLANIFIED', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO PARENT_SCHEMA.om_typevalue VALUES ('campaign_cat_status', 3, 'ASSIGNED', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO PARENT_SCHEMA.om_typevalue VALUES ('campaign_cat_status', 4, 'ON GOING', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO PARENT_SCHEMA.om_typevalue VALUES ('campaign_cat_status', 5, 'EXECUTED', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO PARENT_SCHEMA.om_typevalue VALUES ('campaign_cat_status', 6, 'REVISED', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO PARENT_SCHEMA.om_typevalue VALUES ('campaign_cat_status', 7, 'CANCELED', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
 
-INSERT INTO PARENT_SCHEMA.om_typevalue VALUES ('lot_x_feature_status', 1, 'Not visited', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
-INSERT INTO PARENT_SCHEMA.om_typevalue VALUES ('lot_x_feature_status', 0, 'Visited', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO PARENT_SCHEMA.om_typevalue VALUES ('campaign_x_feature_status', 1, 'Not visited', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
+INSERT INTO PARENT_SCHEMA.om_typevalue VALUES ('campaign_x_feature_status', 0, 'Visited', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
 
 INSERT INTO PARENT_SCHEMA.om_typevalue VALUES ('visit_status', 5, 'Validated', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
 
