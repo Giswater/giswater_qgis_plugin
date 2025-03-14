@@ -171,7 +171,9 @@ class GwSchemaI18NUpdate:
         #Look for errors
         if errors:
             msg += f'There have been errors translating: {', '.join(errors)}'
-        
+            
+        self._change_lang()
+
         #Close connections
         self._close_db()
         self._close_db_dest()
@@ -450,6 +452,15 @@ class GwSchemaI18NUpdate:
                 except Exception as e:
                     tools_db.dao.rollback()
                     break
+    
+    
+    def _change_lang(self):
+        query = f"UPDATE {self.schema}.sys_version SET language = '{self.language}'"
+        try:
+            self.cursor_dest.execute(query)
+            self._commit_dest()
+        except Exception as e:
+            tools_db.dao.rollback()
 
     def _save_user_values(self):
         """ Save selected user values """
@@ -567,7 +578,6 @@ class GwSchemaI18NUpdate:
     def _rollback(self):
         """ Rollback current database transaction """
         self.conn_i18n.rollback()
-
 
     def _get_rows(self, sql, cursor, commit=True):
         """ Get multiple rows from selected query """

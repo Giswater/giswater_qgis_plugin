@@ -55,10 +55,13 @@ class GwSchemaI18NManager:
         self.dlg_qm.btn_connection.clicked.connect(partial(self._check_connection))
         self.dlg_qm.btn_update.clicked.connect(self.missing_dialogs)
         self.dlg_qm.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_qm))
+        self.dlg_qm.btn_close.clicked.connect(partial(self._close_db_i18n))
+        self.dlg_qm.btn_close.clicked.connect(partial(self._close_db_org))
         self.dlg_qm.rejected.connect(self._save_user_values)
         self.dlg_qm.rejected.connect(self._close_db_org)
         self.dlg_qm.rejected.connect(self._close_db_i18n)
         self.dlg_qm.cmb_updatetype.currentIndexChanged.connect(partial(self._set_values))
+        self.dlg_qm.cmb_schema_org.currentIndexChanged.connect(partial(self._set_values))
 
         #Populate schema names
         self.dlg_qm.cmb_projecttype.currentIndexChanged.connect(partial(self._populate_data_schema_name, self.dlg_qm.cmb_projecttype))
@@ -163,6 +166,12 @@ class GwSchemaI18NManager:
             tools_qt.show_info_box(f"Error connecting to i18n databse")
             QApplication.processEvents()
             return
+        elif 'password authentication failed' in str(self.last_error):
+            self.dlg_qm.btn_update.setEnabled(False)
+            self.dlg_qm.lbl_info.clear()
+            tools_qt.show_info_box(f"Incorrect user or password")
+            QApplication.processEvents()
+            return
         else:
             self.dlg_qm.btn_update.setEnabled(True)
             self.dlg_qm.lbl_info.clear()
@@ -170,6 +179,12 @@ class GwSchemaI18NManager:
             QApplication.processEvents()
         
         if not status_org:
+            self.dlg_qm.btn_update.setEnabled(False)
+            self.dlg_qm.lbl_info.clear()
+            tools_qt.show_info_box(f"Error connecting to origin database")
+            QApplication.processEvents()
+            return
+        elif 'password authentication failed' in str(self.last_error):
             self.dlg_qm.btn_update.setEnabled(False)
             self.dlg_qm.lbl_info.clear()
             tools_qt.show_info_box(f"Error connecting to origin database")
@@ -243,220 +258,254 @@ class GwSchemaI18NManager:
     # endregion
     # region Missing Database Dialogs
     def missing_dialogs(self):
-        tables = ["i18n_proves.dbmessage_prova", "i18n_proves.dbconfig_param_system", "i18n_proves.dbconfig_form_fields", "i18n_proves.dbconfig_typevalue"]
+        tables = ["i18n_proves.dbparam_user", "i18n_proves.dbconfig_param_system", "i18n_proves.dbconfig_form_fields", "i18n_proves.dbconfig_typevalue", "i18n_proves.dbfprocess", "i18n_proves.dbmessage"]
         text_error = ''
+        self.dlg_qm.lbl_info.clear()
         for table in tables:
             table_exists = self.detect_table_func(table)
+            correct_lang = self._verify_lang()
             if table_exists:
-                text_error += self._update_tables(table)
+                if correct_lang or not self.revise_lang:
+                    text_error += self._update_tables(table)
+                else:
+                    tools_qt.show_info_box('Incorrect languages, make sure to have the giswater project in english')
+                    break
             else:
                 tools_qt.show_info_box(f"The table ({table}) does not exists")
             self._vacuum_commit(table, self.conn_i18n, self.cursor_i18n)
-            
-        tools_qt.show_info_box(text_error)
 
-        self._close_db_org()
-        self._close_db_i18n()
+        self.dlg_qm.lbl_info.clear()
+        tools_qt.show_info_box(text_error)
 
     def _update_tables(self, table_i18n):
         table_org = self._find_table_org(table_i18n)
-
-        if "dbmessage" in table_i18n:
+        self._change_table_lyt(table_i18n)
+        query = ""
+        
+        if "sys_message" in table_org:
             query = self._update_dbmessage(table_i18n, table_org)
-        elif "dbfetaure" in table_i18n:
-            query = self._update_dbfeature(table_i18n, table_org)
-        elif "dbfprocess" in table_i18n:
+        elif "sys_fprocess" in table_org:
             query = self._update_dbfprocess(table_i18n, table_org)
-        elif "config_form_fields" in table_i18n:
+        elif "config_form_fields" in table_org:
             query = self._update_config_form_fields(table_i18n, table_org)
-        elif "sys_param_user" in table_i18n:
+        elif "sys_param_user" in table_org:
             query = self._update_sys_param_user(table_i18n, table_org)
-        elif "config_param_system" in table_i18n:
+        elif "config_param_system" in table_org:
             query = self._update_config_param_system(table_i18n, table_org)
-        elif "config_typevalue" in table_i18n:
+        elif "config_typevalue" in table_org:
             query = self._update_config_typevalue(table_i18n, table_org)
-        elif "pytoolbar" in table_i18n:
-            print('pytoolbar')
-        elif "pymessage" in table_i18n:
-            print('pymessage')
-        elif "pydialog" in table_i18n:
-            print('pydialog')
-
-        try:
-            self.cursor_i18n.execute(query)
-            self.conn_i18n.commit()
-            return f'Succesfully translated table: {table_i18n}\n'
-        except Exception as e:
-            self.conn_i18n.rollback()
-            return f"An error occured while translating {table_i18n}: {e}\n"
+        print(table_i18n,": ", query)
+        if query == '':
+            return f'No update needed in {table_i18n}\n'
+        else:
+            try:
+                self.cursor_i18n.execute(query)
+                self.conn_i18n.commit()
+                return f'Succesfully translated table: {table_i18n}\n'
+            except Exception as e:
+                self.conn_i18n.rollback()
+                print(f"An error occured while translating {table_i18n}: {e}\n")
+                return f"An error occured while translating {table_i18n}: {e}\n"
+            
 
     def _update_dbmessage(self, table_i18n, table_org):
-        columns_i18n = "project_type, CAST(source AS INTEGER), CAST(log_level AS INTEGER), ms_en_us, COALESCE(ht_en_us, '')"
-        columns_org = "project_type, id, log_level, error_message, COALESCE(hint_message, '')"
+        columns_i18n = "project_type, CAST(source AS INTEGER), CAST(log_level AS INTEGER), ms_en_us, ht_en_us"
+        columns_org = "project_type, id, log_level, error_message, hint_message"
         query = f"SELECT {columns_i18n} FROM {table_i18n};"
         rows_i18n = self._get_rows(query, self.cursor_i18n)
-        query = f"SELECT {columns_org} FROM ws40.{table_org};"
+        query = f"SELECT {columns_org} FROM {self.schema_org}.{table_org};"
         rows_org = self._get_rows(query, self.cursor_org)
-        if self.revise_lang:
-            query = ""
-            #_verify_lang(rows_i18n, rows_org, 'ms_en_us', 'error_message', 2, 2)
         query = ""
-        i = 0
-        for i, row_org in enumerate(rows_org):  
+        for row_i18n in rows_i18n:
+            if row_i18n['ht_en_us'] == None:
+                row_i18n['ht_en_us'] = ''
+        for i, row_org in enumerate(rows_org):
+            if row_org['hint_message'] == None:
+                row_org['hint_message'] = ''
             if row_org not in rows_i18n:
                 query_row = f"""INSERT INTO {table_i18n} (context, source_code, project_type, log_level, source, ms_en_us, ht_en_us) VALUES """
                 query_row += f"""('{table_org}', 'giswater', '{row_org['project_type']}', '{row_org['log_level']}','{row_org['id']}', 
-                            {f"'{row_org['error_message'].replace("'", "''")}'" if row_org['error_message'] else 'NULL'}, 
-                            {f"'{row_org.get('hint_message').replace("'", "''") if row_org.get('hint_message') else 'NULL'}'"})"""
-                query_row += " ON CONFLICT (source_code, project_type, context, log_level, source) DO NOTHING"
+                            {f"'{row_org['error_message'].replace("'", "''")}'" if row_org['error_message'] not in [None, ''] else 'NULL'}, 
+                            {f"'{row_org['hint_message'].replace("'", "''")}'" if row_org['hint_message'] not in [None, ''] else 'NULL'})"""
+                query_row += " ON CONFLICT (source_code, project_type, context, log_level, source) DO UPDATE"
+                query_row += f""" SET ms_en_us = {f"'{row_org['error_message'].replace("'", "''")}'" if row_org['error_message'] != '' or row_org['error_message'] == None else 'NULL'},
+                            ht_en_us = {f"'{row_org['hint_message'].replace("'", "''")}'" if row_org['hint_message'] != '' or row_org['hint_message'] == None else 'NULL'}"""
                 query_row += ";\n"
                 query += query_row
-                i += 1
-        return query
-
-    def _update_dbfeature(self, table_i18n, table_org):
-        columns_i18n = "project_type, formname_en_us"
-        columns_org = "child_layer"
-        query = f"SELECT {columns_i18n} FROM {table_i18n};"
-        rows_i18n = self._get_rows(query, self.cursor_i18n)
-        query = f"SELECT {columns_org} FROM ws40.{table_org};"
-        rows_org = self._get_rows(query, self.cursor_org)
-        #_verify_lang(rows_i18n, rows_org, 'ms_en_us', 'error_message', 2, 2)
-        query = ""
-        i = 0
-        for row_org in rows_org:  
-            if row_org not in rows_i18n:
-                query_row = f"""INSERT INTO {table_i18n} ({columns_i18n}) VALUES """
-                query_row += f"""('{table_org[0:1]}', '{row_org['child_layer']}'"""
-                query_row += " ON CONFLICT (formname_en_us) DO NOTHING"
-                query_row += ";\n"
-                query += query_row
-                i += 1
         return query
 
     def _update_dbfprocess(self, table_i18n, table_org):
-        columns_i18n = "project_type, CAST(source AS INTEGER), ex_en_us, COALESCE(in_en_us, '')"
-        columns_org = "project_type, fid, except_msg, COALESCE(info_msg, '')"
+        columns_i18n = "project_type, CAST(source AS INTEGER), ex_en_us, in_en_us"
+        columns_org = "project_type, fid, except_msg, info_msg"
         query = f"SELECT {columns_i18n} FROM {table_i18n};"
         rows_i18n = self._get_rows(query, self.cursor_i18n)
-        query = f"SELECT {columns_org} FROM ws40.{table_org};"
+        query = f"SELECT {columns_org} FROM {self.schema_org}.{table_org};"
         rows_org = self._get_rows(query, self.cursor_org)
-        #_verify_lang(rows_i18n, rows_org, 'ms_en_us', 'error_message', 2, 2)
         query = ""
-        i = 0
-        for row_org in rows_org:  
+        for row_i18n in rows_i18n:
+            if row_i18n['in_en_us'] == None:
+                row_i18n['in_en_us'] = ''
+        for i, row_org in enumerate(rows_org):
+            if row_org['info_msg'] == None:
+                row_org['info_msg'] = ''
             if row_org not in rows_i18n:
                 query_row = f"""INSERT INTO {table_i18n} (context, project_type, source, ex_en_us, in_en_us) VALUES """
                 query_row += f"""('{table_org}', '{row_org['project_type']}', '{row_org['fid']}', 
-                        {f"'{row_org['except_msg'].replace("'", "''")}'" if row_org['except_msg'] else 'NULL'}, 
-                        {f"'{row_org.get('info_msg', '').replace("'", "''")}'" if row_org.get('info_msg', '') else 'NULL'})"""
-                query_row += " ON CONFLICT (project_type, context, source) DO NOTHING"
+                            {f"'{row_org['except_msg'].replace("'", "''")}'" if row_org['except_msg'] not in [None, ''] else 'NULL'}, 
+                            {f"'{row_org['info_msg'].replace("'", "''")}'" if row_org['info_msg'] not in [None, ''] else 'NULL'})"""
+                query_row += " ON CONFLICT (project_type, context, source) DO UPDATE"
+                query_row += f""" SET ex_en_us = {f"'{row_org['except_msg'].replace("'", "''")}'" if row_org['except_msg'] not in [None, ''] else 'NULL'},
+                            in_en_us = {f"'{row_org['info_msg'].replace("'", "''")}'" if row_org['info_msg'] not in [None, ''] else 'NULL'}"""
                 query_row += ";\n"
                 query += query_row
-                i += 1
         return query
 
     def _update_config_form_fields(self, table_i18n, table_org):
-        columns_i18n = "formname, formtype, source, COALESCE(lb_en_us, ''), COALESCE(tt_en_us, '')"
-        columns_org = "formname, formtype, columnname, COALESCE(label, ''), COALESCE(tooltip, '')"
+        columns_i18n = "formname, formtype, source, lb_en_us, tt_en_us"
+        columns_org = "formname, formtype, columnname, label, tooltip"
         query = f"SELECT {columns_i18n} FROM {table_i18n};"
         rows_i18n = self._get_rows(query, self.cursor_i18n)
-        query = f"SELECT {columns_org} FROM ws40.{table_org};"
+        query = f"SELECT {columns_org} FROM {self.schema_org}.{table_org};"
         rows_org = self._get_rows(query, self.cursor_org)
-        #_verify_lang(rows_i18n, rows_org, 'ms_en_us', 'error_message', 2, 2)
         query = ""
-        i = 0
-        for row_org in rows_org:  
+        for row_i18n in rows_i18n:
+            if row_i18n['lb_en_us'] == None:
+                row_i18n['lb_en_us'] = ''
+            if row_i18n['tt_en_us'] == None:
+                row_i18n['tt_en_us'] = ''
+        for i, row_org in enumerate(rows_org):
+            if row_org['label'] == None:
+                row_org['label'] = ''
+            if row_org['tooltip'] == None:
+                row_org['tooltip'] = ''   
             if row_org not in rows_i18n:
                 query_row = f"""INSERT INTO {table_i18n} (context, source_code, project_type, source, formname, formtype, lb_en_us, tt_en_us) VALUES """
                 query_row += f"""('{table_org}', 'giswater', '{self.project_type}', '{row_org['columnname']}', '{row_org['formname']}', '{row_org['formtype']}',
-                        {f"'{row_org.get('label', '').replace("'", "''")}'" if row_org.get('label', '') else 'NULL'}, 
-                        {f"'{row_org.get('tooltip', '').replace("'", "''")}'" if row_org.get('tooltip', '') else 'NULL'})"""
-                query_row += " ON CONFLICT (context, source_code, project_type, source, formname, formtype) DO NOTHING" 
+                        {f"'{row_org['label'].replace("'", "''")}'" if row_org['label'] not in [None, ''] else 'NULL'}, 
+                        {f"'{row_org['tooltip'].replace("'", "''")}'" if row_org['tooltip'] not in [None, ''] else 'NULL'})"""
+                query_row += " ON CONFLICT (context, source_code, project_type, source, formname, formtype) DO UPDATE"
+                query_row += f""" SET lb_en_us = {f"'{row_org['label'].replace("'", "''")}'" if row_org['label'] not in [None, ''] else 'NULL'},
+                            tt_en_us = {f"'{row_org['tooltip'].replace("'", "''")}'" if row_org['tooltip'] not in [None, ''] else 'NULL'}""" 
                 query_row += ";\n"
                 query += query_row
-                i += 1
         return query
 
     def _update_sys_param_user(self, table_i18n, table_org):
-        columns_i18n = "project_type, source, formname, COALESCE(lb_en_us, ''), COALESCE(tt_en_us, '')"
-        columns_org = "COALESCE(project_type, ''), id, formname, COALESCE(label, ''), COALESCE(descript, '')"
+        columns_i18n = "project_type, source, formname, lb_en_us, tt_en_us"
+        columns_org = "project_type, id, formname, label, descript"
+
         query = f"SELECT {columns_i18n} FROM {table_i18n};"
         rows_i18n = self._get_rows(query, self.cursor_i18n)
-        query = f"SELECT {columns_org} FROM ws40.{table_org};"
+
+        query = f"SELECT {columns_org} FROM {self.schema_org}.{table_org};"
         rows_org = self._get_rows(query, self.cursor_org)
-        #_verify_lang(rows_i18n, rows_org, 'ms_en_us', 'error_message', 2, 2)
+
         query = ""
-        i = 0
-        for row_org in rows_org:  
+        for row_i18n in rows_i18n:
+            if row_i18n['lb_en_us'] is None:
+                row_i18n['lb_en_us'] = ''
+            if row_i18n['tt_en_us'] is None:
+                row_i18n['tt_en_us'] = ''
+
+        for i, row_org in enumerate(rows_org):
+            if row_org['label'] is None:
+                row_org['label'] = ''
+            if row_org['descript'] is None:
+                row_org['descript'] = ''
+
+            # Check if the row from org doesn't exist in i18n, and construct the query
             if row_org not in rows_i18n:
-                query_row = f"""INSERT INTO {table_i18n} (context, source_code, project_type, source, formname, lb_en_us, tt_en_us) VALUES """
-                query_row += f"""('{table_org}', 'giswater', '{row_org['project_type']}', '{row_org['id']}', '{row_org['formname']}'
-                        {f"'{row_org.get('label', '').replace("'", "''")}'" if row_org.get('label', '') else 'NULL'}, 
-                        {f"'{row_org.get('descript', '').replace("'", "''")}'" if row_org.get('descript', '') else 'NULL'})"""
-                query_row += " ON CONFLICT (context, source_code, project_type, source, formname) DO NOTHING"
-                query_row += ";\n"
+                # Safely handle NULL values and avoid SQL injection
+                label = f"'{row_org['label'].replace("'", "''")}'" if row_org['label'] not in [None, ''] else 'NULL'
+                descript = f"'{row_org['descript'].replace("'", "''")}'" if row_org['descript'] not in [None, ''] else 'NULL'
+                
+                query_row = f"""INSERT INTO {table_i18n} (context, source_code, source, formname, project_type, lb_en_us, tt_en_us) 
+                                VALUES ('{table_org}', 'giswater', '{row_org['id']}', '{row_org['formname']}', '{row_org['project_type']}',
+                                {label}, {descript})
+                                ON CONFLICT (context, source_code, project_type, source, formname) 
+                                DO UPDATE SET lb_en_us = {label}, tt_en_us = {descript};\n"""
+                
+                # Optionally, print the query for debugging if it contains the word "Variable"
+                if "Variable" in query_row:
+                    print(query_row)
+
                 query += query_row
-                i += 1
+
         return query
 
+
     def _update_config_param_system(self, table_i18n, table_org):
-        columns_i18n = "project_type, source, COALESCE(lb_en_us, ''), COALESCE(tt_en_us, '')"
-        columns_org = "project_type, parameter, COALESCE(label, ''), COALESCE(descript, '')"
+        columns_i18n = "project_type, source, lb_en_us, tt_en_us"
+        columns_org = "project_type, parameter, label, descript"
         query = f"SELECT {columns_i18n} FROM {table_i18n};"
         rows_i18n = self._get_rows(query, self.cursor_i18n)
-        query = f"SELECT {columns_org} FROM ws40.{table_org};"
+        query = f"SELECT {columns_org} FROM {self.schema_org}.{table_org};"
         rows_org = self._get_rows(query, self.cursor_org)
-        #_verify_lang(rows_i18n, rows_org, 'ms_en_us', 'error_message', 2, 2)
         query = ""
-        i = 0
-        for row_org in rows_org:  
+        for row_i18n in rows_i18n:
+            if row_i18n['lb_en_us'] == None:
+                row_i18n['lb_en_us'] = ''
+            if row_i18n['tt_en_us'] == None:
+                row_i18n['tt_en_us'] = ''
+        for i, row_org in enumerate(rows_org):
+            if row_org['label'] == None:
+                row_org['label'] = ''
+            if row_org['descript'] == None:
+                row_org['descript'] = ''  
             if row_org not in rows_i18n:
                 query_row = f"""INSERT INTO {table_i18n} (context, source_code, project_type, source, lb_en_us, tt_en_us) VALUES """
                 query_row += f"""('{table_org}', 'giswater', '{row_org['project_type']}', '{row_org['parameter']}',
-                        {f"'{row_org.get('label', '').replace("'", "''")}'" if row_org.get('label', '') else 'NULL'}, 
-                        {f"'{row_org.get('descript', '').replace("'", "''")}'" if row_org.get('descript', '') else 'NULL'})"""
-                query_row += " ON CONFLICT (context, source_code, project_type, source) DO NOTHING"
+                        {f"'{row_org['label'].replace("'", "''")}'" if row_org['label'] not in [None, ''] else 'NULL'}, 
+                        {f"'{row_org['descript'].replace("'", "''")}'" if row_org['descript'] not in [None, ''] else 'NULL'})"""
+                query_row += " ON CONFLICT (context, source_code, project_type, source) DO UPDATE"
+                query_row += f""" SET lb_en_us = {f"'{row_org['label'].replace("'", "''")}'" if row_org['label'] not in [None, ''] else 'NULL'},
+                            tt_en_us = {f"'{row_org['descript'].replace("'", "''")}'" if row_org['descript'] not in [None, ''] else 'NULL'}"""
                 query_row += ";\n"
                 query += query_row
-                i += 1
         return query
 
     def _update_config_typevalue(self, table_i18n, table_org):
-        columns_i18n = "formname, source, COALESCE(tt_en_us, '')"
+        columns_i18n = "formname, source, tt_en_us"
         columns_org = "typevalue, id, idval"
         query = f"SELECT {columns_i18n} FROM {table_i18n};"
         rows_i18n = self._get_rows(query, self.cursor_i18n)
-        query = f"SELECT {columns_org} FROM ws40.{table_org};"
+        query = f"SELECT {columns_org} FROM {self.schema_org}.{table_org};"
         rows_org = self._get_rows(query, self.cursor_org)
-        #_verify_lang(rows_i18n, rows_org, 'ms_en_us', 'error_message', 2, 2)
         query = ""
-        i = 0
+        for row_i18n in rows_i18n:
+            if row_i18n['tt_en_us'] == None:
+                row_i18n['tt_en_us'] = ''
+        for i, row_org in enumerate(rows_org):
+            if row_org['idval'] == None:
+                row_org['idval'] = ''
         for row_org in rows_org:  
             if row_org not in rows_i18n:
                 query_row = f"""INSERT INTO {table_i18n} (context, source_code, project_type, source, formname, formtype, tt_en_us) VALUES """
                 query_row += f"""('{table_org}', 'giswater', '{self.project_type}', '{row_org['id']}', '{row_org['typevalue']}', 'form_feature',
-                        {f"'{row_org.get('idval', '').replace("'", "''")}'" if row_org.get('idval', '') else 'NULL'})"""
-                query_row += " ON CONFLICT (context, source_code, project_type, source, formname, formtype) DO NOTHING"
+                        {f"'{row_org['idval'].replace("'", "''")}'" if row_org['idval'] not in [None, ''] else 'NULL'})"""
+                query_row += " ON CONFLICT (context, source_code, project_type, source, formname, formtype) DO UPDATE"
+                query_row += f""" SET tt_en_us = {f"'{row_org['idval'].replace("'", "''")}'" if row_org['idval'] not in [None, ''] else 'NULL'}"""
                 query_row += ";\n"
-                print(query_row)
                 query += query_row
-                i += 1
         return query
-
+    
+    def _verify_lang(self):
+        query = f"SELECT language from {self.schema_org}.sys_version"
+        self.cursor_org.execute(query)
+        language_org = self.cursor_org.fetchone()[0]
+        if language_org != 'en_US':
+            return False
+        return True
+    
     #endregion
     # region Global funcitons
     def detect_table_func(self, table):
         self.cursor_i18n.execute("SELECT schema_name FROM information_schema.schemata;")
-        database_name = self.cursor_i18n.fetchall()
-        print(f"Conectado a la base de datos: {database_name}")
-
-        print(f"SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = '{table.split('.')[0]}' AND table_name = '{table.split('.')[1]}';")
+        schemas = self.cursor_i18n.fetchall()
+        print(schemas)
         self.cursor_i18n.execute(f"SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = '{table.split('.')[0]}' AND table_name = '{table.split('.')[1]}';")
         result = self.cursor_i18n.fetchone()
-        print(result)
         existing_table = result[0] > 0  # Check if count is greater than 0
-        print(existing_table)
         return existing_table
     
     def _find_table_org(self, table_i18n):
@@ -489,4 +538,11 @@ class GwSchemaI18NManager:
         cursor.execute(f"VACUUM FULL {table};")
         cursor.execute(f"ANALYZE {table};")
         conn.set_isolation_level(old_isolation_level)
+
+    def _change_table_lyt(self, table):
+        # Update the part the of the program in process
+        self.dlg_qm.lbl_info.clear()
+        msg = f"Updating {table}..."
+        tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', msg)
+        QApplication.processEvents()
     #endregion
