@@ -12,13 +12,13 @@ $BODY$
 
 /*
 SELECT SCHEMA_NAME.gw_fct_getfeatureboundary($${"client":{"device":4, "infoType":1, "lang":"ES"},"form":{},"feature":{"arc":[2001,2002], "node":[], "connec":[3001, 3002]},"data":{"type":"feature"}}$$)
-SELECT SCHEMA_NAME.gw_fct_getfeatureboundary($${"client":{"device":4, "infoType":1, "lang":"ES"},"form":{},"feature":{"update_tables":["node", "arc", "connec", "link"]},"data":{"type":"time", "lastSeed":"2023-05-05"}}$$)
+SELECT SCHEMA_NAME.gw_fct_getfeatureboundary($${"client":{"device":4, "infoType":1, "lang":"ES"},"form":{},"feature":{"update_tables":["node", "arc", "connec", "link"]},"data":{"type":"time", "lastSeed":"2023-05-05", "extra":"expl_id = '1' AND sector_id = '10007' AND state = '1'"}}$$)
 
 -- The user need to have all the selector well configured on database because this function works with v_edit_ layers...
 
-*/  
+*/
 
-DECLARE    
+DECLARE
 v_type text;
 v_data json;
 v_querynode text = '';
@@ -40,20 +40,27 @@ BEGIN
 
 	v_type = ((p_data ->>'data')::json->>'type');
 
-	IF v_type = 'time' then
+	IF v_type = 'time' THEN
 
-		v_lastseed = ((p_data ->>'data')::json->>'lastSeed');
-		v_updatetables = ((p_data ->>'feature')::json->>'update_tables');
-		v_querytext='';
-		
-		FOR v_table IN SELECT json_array_elements_text(v_updatetables::json) loop
-			raise notice 'table: %', v_table;
-			v_querytext = concat(v_querytext, 
-			' SELECT the_geom FROM v_edit_', v_table, 
-			' WHERE lastupdate > ''', v_lastseed, '''::timestamp UNION'
-			);
-		END LOOP;
-		
+	    v_lastseed = ((p_data ->>'data')::json->>'lastSeed');
+	    v_updatetables = ((p_data ->>'feature')::json->>'update_tables');
+	    v_extra = ((p_data ->>'data')::json->>'extra');
+	    v_querytext = '';
+
+	    FOR v_table IN SELECT json_array_elements_text(v_updatetables::json) LOOP
+	        v_querytext = concat(
+	            v_querytext,
+	            ' SELECT the_geom FROM ', v_table,
+	            ' WHERE lastupdate > ''', v_lastseed, '''::timestamp',
+	            CASE
+	                WHEN v_extra IS NOT NULL AND v_extra <> ''
+	                THEN ' AND ' || v_extra
+	                ELSE ''
+	            END,
+	            ' UNION'
+	        );
+	    END LOOP;
+
 		v_querytext = left(v_querytext, length(v_querytext) - 6);
 		v_querytext = CONCAT('SELECT ST_AsGeoJSON(COALESCE(ST_Collect(ST_Buffer(the_geom, 2)), ST_GeomFromText(''POINT EMPTY'')))
 		FROM (', v_querytext, ') AS combined_geometries');
@@ -91,7 +98,7 @@ BEGIN
 
 	-- Exception handling
 	EXCEPTION WHEN OTHERS THEN RETURN NULL;
-	
+
 END;
 $BODY$
 LANGUAGE plpgsql VOLATILE
