@@ -10,13 +10,13 @@ CREATE SCHEMA "SCHEMA_NAME";
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
-CREATE TABLE cat_organitzation
+CREATE TABLE cat_organization
 (
   id serial NOT NULL,
   idval text,
   descript text,
   active boolean DEFAULT true,
-  CONSTRAINT cat_organitzation_pkey PRIMARY KEY (id)
+  CONSTRAINT cat_organization_pkey PRIMARY KEY (id)
 );
 
 
@@ -24,18 +24,18 @@ CREATE TABLE cat_team
 (
   id serial NOT NULL,
   idval text,
-  organitzation_id text,
+  organization_id integer, --fk cat_organization
   descript text,
   active boolean DEFAULT true,
-  CONSTRAINT cat_team_pkey PRIMARY KEY (id, organitzation_id)
+  CONSTRAINT cat_team_pkey PRIMARY KEY (id, organization_id)
 );
 
 
 CREATE TABLE om_team_x_user
 (
   id serial NOT NULL,
-  user_id character varying(50),
-  team_id integer,
+  user_id character varying(50), --fk user
+  team_id integer, -- fk cat_team
   CONSTRAINT om_team_x_user_pkey PRIMARY KEY (id)
 );
 
@@ -53,10 +53,11 @@ CREATE TABLE om_reviewclass
 
 CREATE TABLE om_reviewclass_x_layer
 (
-  reviewclass_id integer NOT NULL,
-  layer text NOT NULL,
+  reviewclass_id integer NOT NULL, -- fk om_reviewclass
+  layer_id text NOT NULL,
+  schema_name text,
   active boolean DEFAULT true,
-  CONSTRAINT om_reviewclass_x_layer_pkey PRIMARY KEY (reviewclass_id, layer)
+  CONSTRAINT om_reviewclass_x_layer_pkey PRIMARY KEY (schema_name, reviewclass_id, layer_id)
 );
 
 
@@ -82,7 +83,7 @@ CREATE TABLE om_campaign
   campaign_type integer,  -- visit / review
   descript text,
   active boolean DEFAULT true,
-  organitzation_id integer,
+  organization_id integer,
   duration text,
   status integer,
   the_geom geometry(MultiPolygon,SRID_VALUE),
@@ -96,32 +97,32 @@ CREATE TABLE om_campaign
 CREATE TABLE om_campaign_visit
 (
   campaign_id integer NOT NULL,-- fk om_campaign
-  visitclass_id integer,
-  CONSTRAINT om_campaign_visit_pkey PRIMARY KEY (id)
+  visitclass_id integer, -- fk om_visitclass
+  CONSTRAINT om_campaign_visit_pkey PRIMARY KEY (campaign_id, visitclass_id)
 );
 
 
 CREATE TABLE om_campaign_review
 (
   campaign_id integer NOT NULL, -- fk om_campaign
-  reviewclass_id integer,
-  CONSTRAINT om_campaign_review_pkey PRIMARY KEY (id)
+  reviewclass_id integer, -- fk om_reviewclass
+  CONSTRAINT om_campaign_review_pkey PRIMARY KEY (campaign_id, reviewclass_id)
 );
-
 
 CREATE TABLE om_campaign_x_layer
 (
   campaign_id integer, -- fk om_campaign
-  layer_id text,
+  layer_id text, -- fk layer?
+  schema_name text,
   feature_type text,
-  CONSTRAINT om_campaign_x_layer_pkey PRIMARY KEY (campaign_id, layer_id)
+  CONSTRAINT om_campaign_x_layer_pkey PRIMARY KEY (campaign_id, layer_id, schema_name)
 );
 
 
 CREATE TABLE selector_campaign
 (
   id serial NOT NULL,
-  campaing_id integer,
+  campaign_id integer, -- fk om_campaign
   cur_user text DEFAULT "current_user"(),
   CONSTRAINT selector_campaign_pkey PRIMARY KEY (id)
 );
@@ -129,18 +130,18 @@ CREATE TABLE selector_campaign
 
 CREATE TABLE om_campaign_x_arc
 (
-  campaing_id integer NOT NULL,
-  arc_id character varying(16) NOT NULL,
+  campaign_id integer NOT NULL, -- fk om_campaign
+  arc_id character varying(16) NOT NULL, -- fk arc
   code character varying(30),
   status integer,
   observ text,
-  CONSTRAINT om_campaign_x_arc_pkey PRIMARY KEY (campaing_id, arc_id)
+  CONSTRAINT om_campaign_x_arc_pkey PRIMARY KEY (campaign_id, arc_id)
 );
 
 CREATE TABLE om_campaign_x_connec
 (
-  campaign_id integer NOT NULL,
-  connec_id character varying(16) NOT NULL,
+  campaign_id integer NOT NULL, -- fk om_campaign
+  connec_id character varying(16) NOT NULL, -- fk connec
   code character varying(30),
   status integer,
   observ text,
@@ -150,8 +151,8 @@ CREATE TABLE om_campaign_x_connec
 
 CREATE TABLE om_campaign_x_link
 (
-  campaign_id integer NOT NULL,
-  link_id character varying(16) NOT NULL,
+  campaign_id integer NOT NULL, -- fk om_campaign
+  link_id integer NOT NULL, -- fk link
   code character varying(30),
   status integer,
   observ text,
@@ -161,8 +162,8 @@ CREATE TABLE om_campaign_x_link
 
 CREATE TABLE om_campaign_x_node
 (
-  campaign_id integer NOT NULL,
-  node_id character varying(16) NOT NULL,
+  campaign_id integer NOT NULL, -- fk om_campaign
+  node_id character varying(16) NOT NULL, -- fk node
   code character varying(30),
   status integer,
   observ text,
@@ -177,16 +178,15 @@ CREATE TABLE om_campaign_lot
   enddate date,
   real_startdate date,
   real_enddate date,
-  campaign_id integer,
-  workorder_id text,
+  campaign_id integer, -- fk om_campaign
+  workorder_id integer, -- fk workorder
   descript text,
   active boolean DEFAULT true,
-  team_id integer,
+  team_id integer, -- fk cat_team
   duration text,
   status integer,
   the_geom geometry(MultiPolygon,SRID_VALUE),
   rotation numeric(8,4),
-  descript text,
   address text,
   CONSTRAINT om_campaign_lot_pkey PRIMARY KEY (id)
 );
@@ -195,15 +195,15 @@ CREATE TABLE om_campaign_lot
 CREATE TABLE selector_lot
 (
   id serial NOT NULL,
-  lot_id integer,
+  lot_id integer, -- fk om_campaign_lot
   cur_user text DEFAULT "current_user"(),
   CONSTRAINT selector_lot_pkey PRIMARY KEY (id)
 );
 
 CREATE TABLE om_campaign_lot_x_arc
 (
-  lot_id integer NOT NULL,
-  arc_id character varying(16) NOT NULL,
+  lot_id integer NOT NULL, -- fk om_campaign_lot
+  arc_id character varying(16) NOT NULL, -- fk arc
   code character varying(30),
   status integer,
   observ text,
@@ -212,8 +212,8 @@ CREATE TABLE om_campaign_lot_x_arc
 
 CREATE TABLE om_campaign_lot_x_connec
 (
-  lot_id integer NOT NULL,
-  connec_id character varying(16) NOT NULL,
+  lot_id integer NOT NULL, -- fk om_campaign_lot
+  connec_id character varying(16) NOT NULL, -- fk connec
   code character varying(30),
   status integer,
   observ text,
@@ -223,8 +223,8 @@ CREATE TABLE om_campaign_lot_x_connec
 
 CREATE TABLE om_campaign_lot_x_link
 (
-  lot_id integer NOT NULL,
-  link_id character varying(16) NOT NULL,
+  lot_id integer NOT NULL, -- fk om_campaign_lot
+  link_id integer NOT NULL, -- fk link
   code character varying(30),
   status integer,
   observ text,
@@ -234,8 +234,8 @@ CREATE TABLE om_campaign_lot_x_link
 
 CREATE TABLE om_campaign_lot_x_node
 (
-  lot_id integer NOT NULL,
-  node_id character varying(16) NOT NULL,
+  lot_id integer NOT NULL, -- fk om_campaign_lot
+  node_id character varying(16) NOT NULL, -- fk node
   code character varying(30),
   status integer,
   observ text,
@@ -247,7 +247,6 @@ CREATE TABLE workorder_type
 (
   id character varying(50) NOT NULL,
   idval character varying(50),
-  class_id character varying(50),
   CONSTRAINT ext_workorder_type_pkey PRIMARY KEY (id)
 );
 
@@ -262,8 +261,8 @@ CREATE TABLE workorder
 (
   workorder_id integer NOT NULL,
   workorder_name character varying(50),
-  workorder_type character varying(50),
-  workorder_class character varying(200),
+  workorder_type character varying(50), --fk workorder_type
+  workorder_class character varying(200), --fk workorder_class
   exercise integer,
   serie character varying(10),
   startdate date,

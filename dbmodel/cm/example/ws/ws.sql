@@ -9,8 +9,8 @@ or (at your option) any later version.
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
-
-INSERT INTO cat_team VALUES ('1', 'Test team', 'Test team', TRUE);
+INSERT INTO cat_organization VALUES ('1', 'Test Organization', 'Test nova creació', True);
+INSERT INTO cat_team VALUES ('1', 'Test team', 1,'Test team', TRUE);
 
 INSERT INTO PARENT_SCHEMA.cat_users VALUES ('test', 'test')ON CONFLICT (id) DO NOTHING;
 INSERT INTO PARENT_SCHEMA.cat_users VALUES ('postgres', 'postgres')ON CONFLICT (id) DO NOTHING;
@@ -50,7 +50,7 @@ INSERT INTO PARENT_SCHEMA.om_typevalue VALUES ('incident_location', 4, 'Garden a
 INSERT INTO SCHEMA_NAME.om_team_x_user (user_id, team_id) VALUES ('test', 1) ON CONFLICT (user_id, team_id) DO NOTHING;
 INSERT INTO SCHEMA_NAME.om_team_x_user (user_id, team_id) VALUES ('postgres', 1) ON CONFLICT (user_id, team_id) DO NOTHING;
 
-INSERT INTO SCHEMA_NAME.om_team_x_visitclass (team_id, visitclass_id) VALUES (1, 12) ON CONFLICT (team_id, visitclass_id) DO NOTHING;
+--INSERT INTO SCHEMA_NAME.om_team_x_visitclass (team_id, visitclass_id) VALUES (1, 12) ON CONFLICT (team_id, visitclass_id) DO NOTHING;
 
 
 
@@ -59,16 +59,16 @@ INSERT INTO PARENT_SCHEMA.sys_table VALUES ('v_lot_x_connec_web', 'View to publi
 
 CREATE OR REPLACE VIEW v_lot_x_connec_web AS 
  SELECT row_number() OVER () AS rid,
-    om_visit_lot_x_connec.connec_id,
+    om_campaign_lot_x_connec.connec_id,
     connec.code,
-    om_visit_lot_x_connec.lot_id,
-    om_visit_lot_x_connec.status,
+    om_campaign_lot_x_connec.lot_id,
+    om_campaign_lot_x_connec.status,
     connec.the_geom,
     'connec'::text AS sys_type
- FROM SCHEMA_NAME.om_visit_lot_x_connec
-    JOIN connec USING (connec_id)
-    JOIN SCHEMA_NAME.om_visit_lot_x_user USING (lot_id)
-    WHERE om_visit_lot_x_user.endtime IS NULL;
+ FROM SCHEMA_NAME.om_campaign_lot_x_connec
+    JOIN connec USING (connec_id);
+    --JOIN SCHEMA_NAME.om_visit_lot_x_user USING (lot_id)
+    --WHERE om_visit_lot_x_user.endtime IS NULL;
 
 
  
@@ -78,16 +78,16 @@ INSERT INTO PARENT_SCHEMA.sys_table VALUES ('v_lot_x_node_web', 'View to publish
 
 CREATE OR REPLACE VIEW v_lot_x_node_web AS 
  SELECT row_number() OVER () AS rid,
-    om_visit_lot_x_node.node_id,
+    om_campaign_lot_x_node.node_id,
     node.code,
-    om_visit_lot_x_node.lot_id,
-    om_visit_lot_x_node.status,
+    om_campaign_lot_x_node.lot_id,
+    om_campaign_lot_x_node.status,
     node.the_geom,
     'node'::text AS sys_type
- FROM SCHEMA_NAME.om_visit_lot_x_node
-    JOIN node USING (node_id)
-    JOIN SCHEMA_NAME.om_visit_lot_x_user USING (lot_id)
-    WHERE om_visit_lot_x_user.endtime IS NULL;
+ FROM SCHEMA_NAME.om_campaign_lot_x_node
+    JOIN node USING (node_id);
+    --JOIN SCHEMA_NAME.om_visit_lot_x_user USING (lot_id)
+    --WHERE om_visit_lot_x_user.endtime IS NULL;
 
 
 --v_lot_x_arc_web
@@ -95,35 +95,33 @@ INSERT INTO PARENT_SCHEMA.sys_table VALUES ('v_lot_x_arc_web', 'View to publish 
 
 CREATE OR REPLACE VIEW v_lot_x_arc_web AS 
  SELECT row_number() OVER () AS rid,
-    om_visit_lot_x_arc.arc_id,
+    om_campaign_lot_x_arc.arc_id,
     arc.code,
-    om_visit_lot_x_arc.lot_id,
-    om_visit_lot_x_arc.status,
+    om_campaign_lot_x_arc.lot_id,
+    om_campaign_lot_x_arc.status,
     arc.the_geom,
     'arc'::text AS sys_type
- FROM SCHEMA_NAME.om_visit_lot_x_arc
-    JOIN arc USING (arc_id)
-    JOIN SCHEMA_NAME.om_visit_lot_x_user USING (lot_id)
-    WHERE om_visit_lot_x_user.endtime IS NULL;
+ FROM SCHEMA_NAME.om_campaign_lot_x_arc
+    JOIN arc USING (arc_id);
+    --JOIN SCHEMA_NAME.om_visit_lot_x_user USING (lot_id)
+    --WHERE om_visit_lot_x_user.endtime IS NULL;
 
 -- v_lot
 INSERT INTO PARENT_SCHEMA.sys_table VALUES ('v_lot', 'View with the information about lots', 'role_om', 0, NULL, NULL, NULL, NULL, NULL, NULL, 'lot_plugin');
 
  CREATE OR REPLACE VIEW v_lot AS 
- SELECT om_visit_lot.id,
-    om_visit_lot.startdate,
-    om_visit_lot.enddate,
-    om_visit_lot.visitclass_id,
-    om_visit_lot.descript,
-    om_visit_lot.team_id,
-    om_visit_lot.duration,
-    om_visit_lot.feature_type,
+ SELECT om_campaign_lot.id,
+    om_campaign_lot.startdate,
+    om_campaign_lot.enddate,
+    om_campaign_lot.descript,
+    om_campaign_lot.team_id,
+    om_campaign_lot.duration,
     PARENT_SCHEMA.om_typevalue.idval AS status,
-    om_visit_lot.the_geom
+    om_campaign_lot.the_geom
    FROM SCHEMA_NAME.selector_lot,
-    SCHEMA_NAME.om_visit_lot
-     JOIN PARENT_SCHEMA.om_typevalue ON om_visit_lot.status = PARENT_SCHEMA.om_typevalue.id::integer AND PARENT_SCHEMA.om_typevalue.typevalue = 'lot_cat_status'::text
-  WHERE om_visit_lot.id = selector_lot.lot_id AND selector_lot.cur_user = "current_user"()::text;
+    SCHEMA_NAME.om_campaign_lot
+     JOIN PARENT_SCHEMA.om_typevalue ON om_campaign_lot.status = PARENT_SCHEMA.om_typevalue.id::integer AND PARENT_SCHEMA.om_typevalue.typevalue = 'lot_cat_status'::text
+  WHERE om_campaign_lot.id = selector_lot.lot_id AND selector_lot.cur_user = "current_user"()::text;
 
 
 -- ve_visit_connec_incid
