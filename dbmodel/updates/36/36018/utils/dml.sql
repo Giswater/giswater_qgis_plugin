@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 UPDATE config_param_system SET 
-value = '{"table":"temp_municipality","selector":"selector_municipality","table_id":"muni_id","selector_id":"muni_id","label":"muni_id, ''-'', name","orderBy":"muni_id","manageAll":true,"query_filter":"","typeaheadFilter":" AND lower(concat(muni_id, ' - ', name))","selectionMode":"keepPreviousUsingShift", "orderbyCheck":false}'
+value = '{"table":"temp_municipality","selector":"selector_municipality","table_id":"muni_id","selector_id":"muni_id","label":"muni_id, ''-'', name","orderBy":"muni_id","manageAll":true,"query_filter":"","typeaheadFilter":" AND lower(concat(muni_id, '' - '', name))","selectionMode":"keepPreviousUsingShift", "orderbyCheck":false}'
 WHERE parameter = 'basic_selector_tab_municipality';
 
 
