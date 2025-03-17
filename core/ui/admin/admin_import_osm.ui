@@ -21,15 +21,41 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QGroupBox" name="grp_checkbox">
-     <property name="title">
-      <string>Municipalities</string>
+    <widget class="QTabWidget" name="mainTab">
+     <property name="currentIndex">
+      <number>0</number>
      </property>
-     <layout class="QGridLayout" name="gridLayout_2">
-      <item row="0" column="0">
-       <layout class="QVBoxLayout" name="verticalLayout_checkbox"/>
-      </item>
-     </layout>
+     <widget class="QWidget" name="tab_data">
+      <attribute name="title">
+       <string>Municipalities</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <layout class="QVBoxLayout" name="lyt_data_1"/>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab_log">
+      <attribute name="title">
+       <string>Logs</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout">
+       <item row="0" column="0">
+        <layout class="QGridLayout" name="lyt_log_1">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <item row="0" column="0">
+          <widget class="QTextEdit" name="tab_log_txt_infolog">
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
    <item>
@@ -61,7 +87,7 @@
       </spacer>
      </item>
      <item row="0" column="1">
-      <widget class="QPushButton" name="btn_execute">
+      <widget class="QPushButton" name="btn_accept">
        <property name="text">
         <string>Execute</string>
        </property>
@@ -79,7 +105,7 @@
   </layout>
  </widget>
  <tabstops>
-  <tabstop>btn_execute</tabstop>
+  <tabstop>btn_accept</tabstop>
   <tabstop>btn_close</tabstop>
  </tabstops>
  <resources/>
