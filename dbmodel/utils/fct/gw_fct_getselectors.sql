@@ -177,6 +177,7 @@ BEGIN
 	DROP TABLE IF EXISTS temp_macroexploitation;
 	DROP TABLE IF EXISTS temp_sector;
 	DROP TABLE IF EXISTS temp_macrosector;
+	DROP TABLE IF EXISTS temp_municipality;
 	DROP TABLE IF EXISTS temp_t_mincut;
 
 	IF v_expl_x_user is false then
@@ -184,7 +185,8 @@ BEGIN
 		CREATE TEMP TABLE temp_macroexploitation as select e.* from macroexploitation e WHERE active and macroexpl_id > 0 order by 1;
 		CREATE TEMP TABLE temp_sector as select e.* from sector e WHERE active and sector_id > 0 order by 1;
 		CREATE TEMP TABLE temp_macrosector as select e.* from macrosector e WHERE active and macrosector_id > 0 order by 1;
-
+		CREATE TEMP TABLE temp_municipality as select em.* from ext_municipality em WHERE active and muni_id > 0 order by 1;
+	
 		IF v_project_type = 'WS' THEN
 			CREATE TEMP TABLE temp_t_mincut as select e.* from om_mincut e WHERE id > 0 order by 1;
 		END IF;
@@ -211,6 +213,13 @@ BEGIN
 		JOIN temp_sector e USING (macrosector_id)
 		WHERE m.active and m.macrosector_id > 0;
 
+		CREATE TEMP TABLE temp_municipality as 
+		select distinct on (muni_id) muni_id, em.name, descript, em.active from ext_municipality em
+		JOIN (SELECT DISTINCT expl_id, muni_id FROM node)n USING (muni_id)
+		JOIN exploitation e ON e.expl_id=n.expl_id
+		JOIN config_user_x_expl c ON c.expl_id=n.expl_id 
+		WHERE em.active and username = current_user;
+	
 		IF v_project_type = 'WS' THEN
 			CREATE TEMP TABLE temp_t_mincut AS select distinct on (m.id) m.* from om_mincut m
 			JOIN config_user_x_expl USING (expl_id)
