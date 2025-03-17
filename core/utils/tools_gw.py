@@ -3067,7 +3067,7 @@ def get_layers_from_feature_type(feature_type):
 def get_role_permissions(qgis_project_role):
 
     role_admin = False
-    role_master = False
+    role_plan = False
     role_edit = False
     role_om = False
     role_epa = False
@@ -3077,8 +3077,8 @@ def get_role_permissions(qgis_project_role):
     if not role_system:
         role_admin = tools_db.check_role_user("role_admin")
         if not role_admin:
-            role_master = tools_db.check_role_user("role_master")
-            if not role_master:
+            role_plan = tools_db.check_role_user("role_plan")
+            if not role_plan:
                 role_epa = tools_db.check_role_user("role_epa")
                 if not role_epa:
                     role_edit = tools_db.check_role_user("role_edit")
@@ -3095,8 +3095,8 @@ def get_role_permissions(qgis_project_role):
         return 'role_edit'
     elif role_epa or qgis_project_role == 'role_epa':
         return 'role_epa'
-    elif role_master or qgis_project_role == 'role_master':
-        return 'role_master'
+    elif role_plan or qgis_project_role == 'role_plan':
+        return 'role_plan'
     elif role_admin or qgis_project_role == 'role_admin':
         return 'role_admin'
     elif role_system or qgis_project_role == 'role_system':

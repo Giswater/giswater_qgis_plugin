@@ -512,7 +512,7 @@ class GwLoadProject(QObject):
                 self._enable_toolbar("edit")
                 self._enable_toolbar("epa")
                 self._hide_button("72", False)
-            case 'role_master' | 'role_admin' | 'role_system':
+            case 'role_plan' | 'role_admin' | 'role_system':
                 self._enable_toolbar("om")
                 self._enable_toolbar("edit")
                 self._enable_toolbar("epa")

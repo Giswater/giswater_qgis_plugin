@@ -104,9 +104,9 @@ class GwCSVButton(GwAction):
                       "role_om": "'role_basic', 'role_om'",
                       "role_edit": "'role_basic', 'role_om', 'role_edit'",
                       "role_epa": "'role_basic', 'role_om', 'role_edit', 'role_epa'",
-                      "role_master": "'role_basic', 'role_om', 'role_edit', 'role_epa', 'role_master'",
-                      "role_admin": "'role_basic', 'role_om', 'role_edit', 'role_epa', 'role_master', 'role_admin'",
-                      "role_system": "''role_basic', 'role_om', 'role_edit', 'role_epa', 'role_master', 'role_admin, 'role_system'"}
+                      "role_plan": "'role_basic', 'role_om', 'role_edit', 'role_epa', 'role_plan'",
+                      "role_admin": "'role_basic', 'role_om', 'role_edit', 'role_epa', 'role_plan', 'role_admin'",
+                      "role_system": "''role_basic', 'role_om', 'role_edit', 'role_epa', 'role_plan', 'role_admin, 'role_system'"}
 
         sql = (f"SELECT DISTINCT({field_id}), {fields}"
                f" FROM {table_name}"
