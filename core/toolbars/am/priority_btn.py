@@ -945,7 +945,8 @@ class CalculatePriority:
         dlg.rejected.connect(partial(tools_gw.close_dialog, dlg))
         dlg.btn_save2file.clicked.connect(self._save2file)
         dlg.cmb_expl_selection.currentIndexChanged.connect(partial(self._load_presszone))
-        dlg.cmb_presszone.currentIndexChanged.connect(partial(self._load_diameter_material))
+        dlg.cmb_presszone.currentIndexChanged.connect(partial(self._load_diameter))
+        dlg.cmb_dnom.currentIndexChanged.connect(partial(self._load_material))
         dlg.btn_add_catalog.clicked.connect(
             partial(self._manage_qtw_row, dlg, dlg.tbl_catalog, "add")
         )
@@ -1030,7 +1031,7 @@ class CalculatePriority:
             features = self.list_ids["arc"] or None
 
         exploitation = tools_qt.get_combo_value(dlg, "cmb_expl_selection") or None
-        presszone = tools_qt.get_combo_value(dlg, "cmb_presszone") or None
+        presszone = tools_qt.get_combo_value(dlg, "cmb_presszone")
         diameter = tools_qt.get_combo_value(dlg, "cmb_dnom") or None
         diameter = f"{diameter:g}" if diameter else None
         material = tools_qt.get_combo_value(dlg, "cmb_material") or None
@@ -1178,23 +1179,32 @@ class CalculatePriority:
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(dlg.cmb_presszone, rows, 1)
 
-        self._load_diameter_material()
+        self._load_diameter()
 
-    def _load_diameter_material(self):
+    def _load_diameter(self):
         dlg = self.dlg_priority
         presszone = tools_qt.get_combo_value(dlg, "cmb_presszone")
+        exploitation = tools_qt.get_combo_value(dlg, "cmb_expl_selection")
         sql = f"""
             SELECT distinct(dnom::float) AS id, dnom as idval 
             FROM am.ext_arc_asset WHERE presszone_id = '{presszone}' 
+            AND expl_id = {exploitation}
             AND dnom is not null ORDER BY id;
             """
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(dlg.cmb_dnom, rows, 1)
 
+        self._load_material()
+
+    def _load_material(self):
+        dlg = self.dlg_priority
+        presszone = tools_qt.get_combo_value(dlg, "cmb_presszone")
+        exploitation = tools_qt.get_combo_value(dlg, "cmb_expl_selection")
+        dnom = tools_qt.get_combo_value(dlg, "cmb_dnom")
         sql = f"""
             SELECT distinct(matcat_id) AS id, matcat_id as idval 
             FROM am.ext_arc_asset WHERE presszone_id = '{presszone}' 
-            AND dnom is not null ORDER BY id;
+            AND expl_id = {exploitation} AND dnom::float ={dnom} ORDER BY id;
             """
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(dlg.cmb_material, rows, 1)
