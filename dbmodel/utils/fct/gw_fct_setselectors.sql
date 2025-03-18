@@ -329,7 +329,7 @@ BEGIN
 			-- macrosector
 			DELETE FROM selector_macrosector WHERE cur_user = current_user;
 			INSERT INTO selector_macrosector
-			SELECT DISTINCT macrosector_id, current_user FROM sector WHERE active is true and sector_id IN (SELECT DISTINCT (sector_id) FROM node 
+			SELECT DISTINCT macrosector_id, current_user FROM sector WHERE active is true and sector_id IN (SELECT DISTINCT (sector_id) FROM node
 			JOIN selector_expl using (expl_id) where cur_user = current_user);
 
 			-- sector
@@ -348,16 +348,18 @@ BEGIN
 			-- muni
 			DELETE FROM selector_municipality WHERE cur_user = current_user;
 			INSERT INTO selector_municipality
-			SELECT DISTINCT muni_id, current_user FROM node WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user);	
+			SELECT DISTINCT muni_id, current_user FROM node WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user);
 
 			-- scenarios
-			DELETE FROM selector_inp_dscenario WHERE dscenario_id NOT IN
-			(SELECT dscenario_id FROM cat_dscenario WHERE active is true and expl_id IS NULL OR expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user));
-				
+			IF (SELECT rolname FROM pg_roles WHERE pg_has_role(current_user, oid, 'member') AND rolname = 'role_epa') IS NOT NULL THEN
+				DELETE FROM selector_inp_dscenario WHERE dscenario_id NOT IN
+				(SELECT dscenario_id FROM cat_dscenario WHERE active is true and expl_id IS NULL OR expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user));
+			END IF;
+
 			-- psector
-			DELETE FROM selector_psector WHERE psector_id NOT IN 
+			DELETE FROM selector_psector WHERE psector_id NOT IN
 			(SELECT psector_id FROM cat_dscenario WHERE active is true and expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user));
-	
+
 
 		ELSIF v_tabname IN ('tab_sector', 'tab_macrosector') THEN
 
@@ -391,16 +393,18 @@ BEGIN
 
 			INSERT INTO selector_municipality
 			SELECT DISTINCT muni_id, current_user FROM node WHERE sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user = current_user AND sector_id > 0)
-			ON CONFLICT (muni_id, cur_user) DO NOTHING;	
+			ON CONFLICT (muni_id, cur_user) DO NOTHING;
 
 			-- scenarios
-			DELETE FROM selector_inp_dscenario WHERE dscenario_id NOT IN
-			(SELECT dscenario_id FROM cat_dscenario WHERE active is true and expl_id IS NULL OR expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user));
-				
+			IF (SELECT rolname FROM pg_roles WHERE pg_has_role(current_user, oid, 'member') AND rolname = 'role_epa') IS NOT NULL THEN
+				DELETE FROM selector_inp_dscenario WHERE dscenario_id NOT IN
+				(SELECT dscenario_id FROM cat_dscenario WHERE active is true and expl_id IS NULL OR expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user));
+			END IF;
+
 			-- psector
-			DELETE FROM selector_psector WHERE psector_id NOT IN 
+			DELETE FROM selector_psector WHERE psector_id NOT IN
 			(SELECT psector_id FROM cat_dscenario WHERE active is true and expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user));
-				
+
 
 		-- inserting muni_id from selected muni
 		ELSIF v_tabname IN ('tab_municipality') THEN
@@ -408,7 +412,7 @@ BEGIN
 			-- macroexpl
 			DELETE FROM selector_macroexpl WHERE cur_user = current_user;
 			INSERT INTO selector_macroexpl
-			SELECT DISTINCT macroexpl_id, current_user FROM exploitation WHERE expl_id IN (SELECT DISTINCT expl_id FROM node 
+			SELECT DISTINCT macroexpl_id, current_user FROM exploitation WHERE expl_id IN (SELECT DISTINCT expl_id FROM node
 			JOIN selector_sector using (sector_id) WHERE cur_user = current_user);
 
 			-- expl
@@ -420,7 +424,7 @@ BEGIN
 			-- macrosector
 			DELETE FROM selector_macrosector WHERE cur_user = current_user;
 			INSERT INTO selector_macrosector
-			SELECT DISTINCT macrosector_id, current_user FROM sector WHERE active is true and sector_id IN (SELECT DISTINCT sector_id FROM node 
+			SELECT DISTINCT macrosector_id, current_user FROM sector WHERE active is true and sector_id IN (SELECT DISTINCT sector_id FROM node
 			JOIN selector_expl using (expl_id) where state = 1 AND cur_user = current_user);
 
 			-- sector
@@ -435,15 +439,17 @@ BEGIN
 			UNION
 			SELECT DISTINCT sector_id,current_user FROM node WHERE expl_id2 IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user) AND sector_id > 0
 			ON CONFLICT (sector_id, cur_user) DO NOTHING;
-					
+
 			-- scenarios
-			DELETE FROM selector_inp_dscenario WHERE dscenario_id NOT IN
-			(SELECT dscenario_id FROM cat_dscenario WHERE active is true and expl_id IS NULL OR expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user));
-				
+			IF (SELECT rolname FROM pg_roles WHERE pg_has_role(current_user, oid, 'member') AND rolname = 'role_epa') IS NOT NULL THEN
+				DELETE FROM selector_inp_dscenario WHERE dscenario_id NOT IN
+				(SELECT dscenario_id FROM cat_dscenario WHERE active is true and expl_id IS NULL OR expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user));
+			END IF;
+
 			-- psector
-			DELETE FROM selector_psector WHERE psector_id NOT IN 
+			DELETE FROM selector_psector WHERE psector_id NOT IN
 			(SELECT psector_id FROM cat_dscenario WHERE active is true and expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user));
-		
+
 		END IF;
 	END IF;
 
@@ -487,7 +493,7 @@ BEGIN
 			DELETE FROM selector_macrosector WHERE cur_user = current_user;
 			INSERT INTO selector_macrosector
 
-			SELECT DISTINCT macrosector_id, current_user FROM sector 
+			SELECT DISTINCT macrosector_id, current_user FROM sector
 			WHERE active is true and sector_id IN (SELECT sector_id FROM selector_sector where cur_user = current_user)
 			ON CONFLICT (macrosector_id, cur_user) DO NOTHING;
 
