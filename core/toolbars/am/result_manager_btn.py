@@ -163,7 +163,7 @@ class GwResultManagerButton(GwAction):
 
         row = selected_list[0].row()
         status_i18n = dlg.tbl_results.model().record(row).value(10)
-        status = self._value_status[status_i18n]
+        status = self._value_status.get(status_i18n, "")
 
         if status == "FINISHED":
             dlg.btn_corporate.setEnabled(True)
@@ -196,11 +196,16 @@ class GwResultManagerButton(GwAction):
         expl_id = tools_qt.get_combo_value(dlg, dlg.cmb_expl, 0)
         status = tools_qt.get_combo_value(dlg, dlg.cmb_status, 0)
 
-        expr += f" result_name ILIKE '%{id_}%'"
-        expr += f" AND (result_type ILIKE '%{result_type}%')"
+        expr += f" result_id is NOT NULL"
+
+        if id_:
+            expr += f" AND result_name ILIKE '%{id_}%'"
+        if result_type:
+            expr += f" AND (result_type ILIKE '%{result_type}%')"
         if expl_id:
             expr += f" AND (expl_id = {expl_id})"
-        expr += f" AND (status::text ILIKE '%{status}%')"
+        if status:
+            expr += f" AND (status::text ILIKE '%{status}%')"
 
         # Refresh model with selected filter
         tbl_result.model().setFilter(expr)
@@ -269,6 +274,10 @@ class GwResultManagerButton(GwAction):
         row = selected_list[0].row()
         result_id = dlg.tbl_results.model().record(row).value("result_id")
         result_type_i18n = dlg.tbl_results.model().record(row).value(2)
+
+        if not result_type_i18n:
+            tools_gw.show_warning("Please select a result with not empty type", dialog=dlg)
+            return
         result_type = self._value_result_type[result_type_i18n]
 
         calculate_priority = CalculatePriority(
@@ -283,6 +292,11 @@ class GwResultManagerButton(GwAction):
         row = selected_list[0].row()
         result_id = dlg.tbl_results.model().record(row).value("result_id")
         result_type_i18n = dlg.tbl_results.model().record(row).value(2)
+
+        if not result_type_i18n:
+            tools_gw.show_warning("Please select a result with not empty type", dialog=dlg)
+            return
+
         result_type = self._value_result_type[result_type_i18n]
 
         calculate_priority = CalculatePriority(
@@ -421,7 +435,6 @@ class GwResultManagerButton(GwAction):
                     corporate_expl[result] = {expl}
                 else:
                     corporate_expl[result].add(expl)
-        print(f"{corporate_expl=}")
 
         # get result_ids that share exploitations with this
         conflict_results = []
