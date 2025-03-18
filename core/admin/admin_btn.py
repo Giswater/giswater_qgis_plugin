@@ -2738,9 +2738,9 @@ class GwAdminButton:
         config_trg_user_value = row[0] if row is not None else True
         # set admin_config_control_trigger to true to force config_form_fields trigger
         sql = (f"UPDATE {schema_name}.config_param_system "
-               f"SET value = 'TRUE'"
+               f"SET value = 'TRUE' "
                f"WHERE parameter = 'admin_config_control_trigger'")
-        tools_db.execute_sql(sql, commit=self.dev_commit)
+        tools_db.execute_sql(sql)
 
 
         # Execute manage add fields function
@@ -2811,13 +2811,13 @@ class GwAdminButton:
             body = body.replace('""', 'null')
 
             # Execute manage add fields function
-            json_result = tools_gw.execute_procedure('gw_fct_admin_manage_addfields', body, schema_name, commit=self.dev_commit)
+            json_result = tools_gw.execute_procedure('gw_fct_admin_manage_addfields', body, schema_name)
             if not json_result or json_result['status'] == 'Failed':
                 # set admin_config_control_trigger with prev user value
                 sql = (f"UPDATE {schema_name}.config_param_system "
-                    f"SET value = '{config_trg_user_value}'"
+                    f"SET value = '{config_trg_user_value}' "
                     f"WHERE parameter = 'admin_config_control_trigger'")
-                tools_db.execute_sql(sql, commit=self.dev_commit)
+                tools_db.execute_sql(sql)
                 return
             self._manage_json_message(json_result, parameter="Field configured in 'config_form_fields'")
 
@@ -2887,9 +2887,9 @@ class GwAdminButton:
 
         # set admin_config_control_trigger with prev user value
         sql = (f"UPDATE {schema_name}.config_param_system "
-               f"SET value = '{config_trg_user_value}'"
+               f"SET value = '{config_trg_user_value}' "
                f"WHERE parameter = 'admin_config_control_trigger'")
-        tools_db.execute_sql(sql, commit=self.dev_commit)
+        tools_db.execute_sql(sql)
 
     def _change_project_type(self, widget):
         """ Take current project type changed """
