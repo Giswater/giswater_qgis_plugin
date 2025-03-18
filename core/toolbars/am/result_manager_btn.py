@@ -49,6 +49,12 @@ class GwResultManagerButton(GwAction):
 
         self.dlg_priority_manager = GwPriorityManagerUi(self)
 
+        # Fill names
+        rows = tools_db.get_rows("SELECT result_name as id, result_name as idval FROM am.cat_result")
+        tools_qt.fill_combo_values(
+            self.dlg_priority_manager.cmb_name, rows, 1, add_empty=True
+        )
+
         # Fill filters
         rows = tools_db.get_rows("SELECT id, idval FROM am.value_result_type")
         tools_qt.fill_combo_values(
@@ -190,22 +196,21 @@ class GwResultManagerButton(GwAction):
 
         tbl_result = dlg.tbl_results
 
-        expr = ""
-        id_ = tools_qt.get_text(dlg, dlg.txt_filter, False, False)
+        name = tools_qt.get_combo_value(dlg, dlg.cmb_name, 0)
         result_type = tools_qt.get_combo_value(dlg, dlg.cmb_type, 0)
         expl_id = tools_qt.get_combo_value(dlg, dlg.cmb_expl, 0)
         status = tools_qt.get_combo_value(dlg, dlg.cmb_status, 0)
 
-        expr += f" result_id is NOT NULL"
+        expr = f"result_id is NOT NULL"
 
-        if id_:
-            expr += f" AND result_name ILIKE '%{id_}%'"
+        if name:
+            expr += f" AND result_name ILIKE '%{name}%'"
         if result_type:
-            expr += f" AND (result_type ILIKE '%{result_type}%')"
+            expr += f" AND result_type ILIKE '%{result_type}%'"
         if expl_id:
-            expr += f" AND (expl_id = {expl_id})"
+            expr += f" AND am.cat_result.expl_id = {expl_id}"
         if status:
-            expr += f" AND (status::text ILIKE '%{status}%')"
+            expr += f" AND status::text ILIKE '%{status}%'"
 
         # Refresh model with selected filter
         tbl_result.model().setFilter(expr)
@@ -490,7 +495,7 @@ class GwResultManagerButton(GwAction):
         dlg.btn_delete.clicked.connect(self._delete_result)
         dlg.btn_close.clicked.connect(dlg.reject)
 
-        dlg.txt_filter.textChanged.connect(partial(self._filter_table))
+        dlg.cmb_name.currentIndexChanged.connect(partial(self._filter_table))
         dlg.cmb_type.currentIndexChanged.connect(partial(self._filter_table))
         dlg.cmb_expl.currentIndexChanged.connect(partial(self._filter_table))
         dlg.cmb_status.currentIndexChanged.connect(partial(self._filter_table))
