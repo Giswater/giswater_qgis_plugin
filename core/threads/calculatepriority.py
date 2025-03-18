@@ -7,7 +7,6 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 
 import configparser
-from pprint import pprint
 import traceback
 from datetime import date, timedelta
 from math import log, log1p, exp

@@ -209,16 +209,17 @@ class ConfigMaterial:
 def configmaterial_from_sql(sql, unknown_material):
     rows = tools_db.get_rows(sql)
     data = {}
-    for row in rows:
-        data[row["material"]] = {
-            "material": row["material"],
-            "pleak": row["pleak"],
-            "age_max": row["age_max"],
-            "age_med": row["age_med"],
-            "age_min": row["age_min"],
-            "builtdate_vdef": row["builtdate_vdef"],
-            "compliance": row["compliance"],
-        }
+    if rows:
+        for row in rows:
+            data[row["material"]] = {
+                "material": row["material"],
+                "pleak": row["pleak"],
+                "age_max": row["age_max"],
+                "age_med": row["age_med"],
+                "age_min": row["age_min"],
+                "builtdate_vdef": row["builtdate_vdef"],
+                "compliance": row["compliance"],
+            }
     return ConfigMaterial(data, unknown_material)
 
 
@@ -396,7 +397,7 @@ class CalculatePriority:
         if self.mode == "new":
             sql = "select * from am.config_catalog_def"
         else:
-            sql = f"select * from am.config_catalog where result_id = {self.result['id']}"
+            sql = f"select * from am.config_catalog_def where id = {self.result['id']}"
         key = "arccat_id" if self.config.method == "WM" else "dnom"
 
         configcatalog = GwConfigCatalogButton(tools_db.get_rows(sql), key)
@@ -507,20 +508,21 @@ class CalculatePriority:
                 """
             )
 
-        for row in rows:
-            self.config_engine_fields.append(
-                {
-                    "widgetname": row["parameter"],
-                    "value": row[1],
-                    "tooltip": row[2],
-                    "layoutname": row[3],
-                    "layoutorder": row[4],
-                    "label": row[5],
-                    "datatype": row[6],
-                    "widgettype": row[7],
-                    "isMandatory": True,
-                }
-            )
+        if rows:
+            for row in rows:
+                self.config_engine_fields.append(
+                    {
+                        "widgetname": row["parameter"],
+                        "value": row[1],
+                        "tooltip": row[2],
+                        "layoutname": row[3],
+                        "layoutorder": row[4],
+                        "label": row[5],
+                        "datatype": row[6],
+                        "widgettype": row[7],
+                        "isMandatory": True,
+                    }
+                )
         tools_gw.build_dialog_options(
             dlg, [{"fields": self.config_engine_fields}], 0, []
         )
@@ -942,6 +944,8 @@ class CalculatePriority:
         dlg.buttonBox.rejected.connect(partial(tools_gw.close_dialog, dlg))
         dlg.rejected.connect(partial(tools_gw.close_dialog, dlg))
         dlg.btn_save2file.clicked.connect(self._save2file)
+        dlg.cmb_expl_selection.currentIndexChanged.connect(partial(self._load_presszone))
+        dlg.cmb_presszone.currentIndexChanged.connect(partial(self._load_diameter_material))
         dlg.btn_add_catalog.clicked.connect(
             partial(self._manage_qtw_row, dlg, dlg.tbl_catalog, "add")
         )
@@ -1121,49 +1125,25 @@ class CalculatePriority:
         # Text descript
         tools_qt.set_widget_text(dlg, dlg.txt_descript, self.result["descript"])
 
-        # Combo dnom
-        sql = "SELECT distinct(dnom::float) as id, dnom as idval FROM cat_arc WHERE dnom is not null ORDER BY id;"
-        rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(dlg.cmb_dnom, rows, 1, sort_by=0, add_empty=True)
-        if self.result["dnom"]:
-            tools_qt.set_combo_value(
-                dlg.cmb_dnom, f'{round(self.result["dnom"], 1)}', 0, add_new=False
-            )
-
-        # Combo material
-        sql = f"""
-            SELECT id, id as idval
-            FROM {lib_vars.schema_name}.cat_material
-            WHERE active = true
-            ORDER BY id;
-            """
-        rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(dlg.cmb_material, rows, 1, add_empty=True)
-        tools_qt.set_combo_value(
-            dlg.cmb_material, self.result["material_id"], 0, add_new=False
-        )
 
         # Combo exploitation
-        sql = f"SELECT expl_id as id, name as idval FROM {lib_vars.schema_name}.exploitation;"
+        sql = f"""
+            SELECT DISTINCT(expl.expl_id) as id, expl.name as idval 
+            FROM {lib_vars.schema_name}.exploitation expl 
+            INNER JOIN am.ext_arc_asset ext ON expl.expl_id = ext.expl_id;
+            """
+
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(dlg.cmb_expl_selection, rows, 1, add_empty=True)
+        tools_qt.fill_combo_values(dlg.cmb_expl_selection, rows, 1)
         tools_qt.set_combo_value(
             dlg.cmb_expl_selection,
-            f'{self.result["expl_id"]}',
+            dlg.cmb_expl_selection.itemText(0),
             0,
             add_new=False,
         )
 
-        # Combo presszone
-        sql = f"SELECT presszone_id as id, name as idval FROM {lib_vars.schema_name}.presszone"
-        rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(dlg.cmb_presszone, rows, 1, add_empty=True)
-        tools_qt.set_combo_value(
-            dlg.cmb_presszone,
-            self.result["presszone_id"],
-            0,
-            add_new=False,
-        )
+        # Load presszone combo
+        self._load_presszone()
 
         # Text budget
         tools_qt.set_widget_text(dlg, dlg.txt_budget, self.result["budget"])
@@ -1172,7 +1152,7 @@ class CalculatePriority:
         next_years = [
             [x + date.today().year, str(x + date.today().year)] for x in range(1, 101)
         ]
-        tools_qt.fill_combo_values(dlg.cmb_year, next_years, 1, add_empty=True)
+        tools_qt.fill_combo_values(dlg.cmb_year, next_years, 1)
         tools_qt.set_combo_value(
             dlg.cmb_year,
             self.result["target_year"],
@@ -1181,6 +1161,43 @@ class CalculatePriority:
         )
 
     # endregion
+
+    def _load_presszone(self):
+        dlg = self.dlg_priority
+        exploitation = tools_qt.get_combo_value(dlg, "cmb_expl_selection")
+        sql = f"""           
+            SELECT DISTINCT ON (ext.presszone_id) 
+                ext.presszone_id AS id, 
+                CONCAT(ext.presszone_id, ' - ', pres.name) AS idval
+            FROM {lib_vars.schema_name}.presszone pres 
+            INNER JOIN am.ext_arc_asset ext 
+                ON ext.expl_id = ANY(pres.expl_id)
+            WHERE ext.expl_id = {exploitation} 
+            ORDER BY ext.presszone_id;
+            """
+        rows = tools_db.get_rows(sql)
+        tools_qt.fill_combo_values(dlg.cmb_presszone, rows, 1)
+
+        self._load_diameter_material()
+
+    def _load_diameter_material(self):
+        dlg = self.dlg_priority
+        presszone = tools_qt.get_combo_value(dlg, "cmb_presszone")
+        sql = f"""
+            SELECT distinct(dnom::float) AS id, dnom as idval 
+            FROM am.ext_arc_asset WHERE presszone_id = '{presszone}' 
+            AND dnom is not null ORDER BY id;
+            """
+        rows = tools_db.get_rows(sql)
+        tools_qt.fill_combo_values(dlg.cmb_dnom, rows, 1)
+
+        sql = f"""
+            SELECT distinct(matcat_id) AS id, matcat_id as idval 
+            FROM am.ext_arc_asset WHERE presszone_id = '{presszone}' 
+            AND dnom is not null ORDER BY id;
+            """
+        rows = tools_db.get_rows(sql)
+        tools_qt.fill_combo_values(dlg.cmb_material, rows, 1)
 
     def _fill_table(
         self,
