@@ -216,11 +216,20 @@ class GwImportOsm:
                 self.logs_list.append('{"id":11,"message":"ERROR: Failing data: ' + row.to_dict() + '"}')
                 errors += 1
 
-        try:
+        try:                        
             cur.execute(f"""
-                    UPDATE {self.schema_name}.{TABLE_NAME} as osms
-                    SET expl_id = COALESCE((SELECT expl_id FROM {self.schema_name}.exploitation as exp WHERE ST_Contains(exp.the_geom, osms.the_geom) OR ST_Touches(exp.the_geom, osms.the_geom) IS TRUE), 0)                
-                """)
+                UPDATE {self.schema_name}.{TABLE_NAME} as osms
+                SET expl_id = COALESCE(
+                    (SELECT 
+                        CASE 
+                            WHEN COUNT(*) > 1 THEN NULL
+                            ELSE (SELECT exp.expl_id
+                                FROM {self.schema_name}.exploitation as exp
+                                WHERE ST_Contains(exp.the_geom, osms.the_geom) IS TRUE
+                                    OR ST_Touches(exp.the_geom, osms.the_geom) IS TRUE)
+                        END
+                    ), 0)
+            """)
 
             tools_db.dao.commit()
             success += 1
