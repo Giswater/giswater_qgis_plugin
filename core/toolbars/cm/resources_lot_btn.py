@@ -5,12 +5,12 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from .add_lot import AddNewLot
+from .lot import AddNewLot
 from ..dialog import GwAction
 
 
 class GwLotResourceManagementButton(GwAction):
-    """ Button 86: Resources Management """
+    """ Button 88: Resources Management """
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
         super().__init__(icon_path, action_name, text, toolbar, action_group)
