@@ -410,14 +410,14 @@ BEGIN
         -- update sys_foreignkey values
         IF EXISTS (SELECT 1 FROM _man_addfields_value_ mav LEFT JOIN sys_addfields sa ON sa.id = mav.parameter_id WHERE mav.value_param IS NOT NULL) THEN
             FOR rec_fgk IN
-                SELECT sf.id, cf.feature_type, sa.cat_feature_id, sa.param_name
+                SELECT sf.typevalue_table, sf.typevalue_name, sf.target_table, sf.target_field, cf.feature_type, sa.cat_feature_id, sa.param_name
                 FROM sys_foreignkey sf
                 INNER JOIN sys_addfields sa on sa.param_name = sf.typevalue_name
                 INNER JOIN cat_feature cf on cf.id = sa.cat_feature_id
                 WHERE sf.target_table = 'man_addfields_value'
             LOOP
                 v_feature_childtable_name := 'man_' || lower(rec_fgk.feature_type) || '_' || lower(rec_fgk.cat_feature_id);
-                EXECUTE 'UPDATE sys_foreignkey SET typevalue_table=''edit_typevalue'', typevalue_name='''|| rec_fgk.param_name ||''', target_table='''|| v_feature_childtable_name ||''', target_field='''|| rec_fgk.param_name ||''' WHERE id='|| rec_fgk.id ||';';
+                EXECUTE 'UPDATE sys_foreignkey SET typevalue_table=''edit_typevalue'', typevalue_name='''|| rec_fgk.param_name ||''', target_table='''|| v_feature_childtable_name ||''', target_field='''|| rec_fgk.param_name ||''' WHERE typevalue_table='''|| rec_fgk.typevalue_table ||''' AND typevalue_name='''|| rec_fgk.typevalue_name ||''' AND target_table='''|| rec_fgk.target_table ||''' AND target_field='''|| rec_fgk.target_field ||''' ;';
             END LOOP;
         END IF;
     END IF;
