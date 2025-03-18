@@ -225,13 +225,13 @@ class GwLoadProject(QObject):
 
         # Get version compatiblity from metadata.txt
         minorPgVersion = tools_qgis.get_plugin_metadata('minorPgVersion', '9.5', lib_vars.plugin_dir).replace('.', '')
-        majorPgVersion = tools_qgis.get_plugin_metadata('majorPgVersion', '11.99', lib_vars.plugin_dir).replace('.', '')        
+        majorPgVersion = tools_qgis.get_plugin_metadata('majorPgVersion', '11.99', lib_vars.plugin_dir).replace('.', '')
 
-        url_wiki = "https://github.com/Giswater/giswater_dbmodel/wiki/Version-compatibility"        
+        url_wiki = "https://github.com/Giswater/giswater_dbmodel/wiki/Version-compatibility"
         if postgresql_version is not None and minorPgVersion is not None and majorPgVersion is not None:
             if int(postgresql_version) < int(minorPgVersion) or int(postgresql_version) > int(majorPgVersion):
                 msg = "PostgreSQL version is not compatible with Giswater. Please check wiki"
-                tools_qgis.show_message_link(f"{msg}", url_wiki, message_level=1, btn_text="Open wiki")    
+                tools_qgis.show_message_link(f"{msg}", url_wiki, message_level=1, btn_text="Open wiki")
 
 
     def _get_project_variables(self):
@@ -445,21 +445,15 @@ class GwLoadProject(QObject):
         self._enable_toolbar("toc")
         self._hide_button("72")
 
-        project_name = "cm"
-        sql = (f"SELECT schema_name, schema_name FROM information_schema.schemata "
-               f"WHERE schema_name ILIKE '{project_name}'ORDER BY schema_name")
-        rows = tools_db.get_rows(sql, commit=False)
-        if rows is not None:
-            self._enable_toolbar("cm")
 
-
-        # Check is project name already exists
-        project_name = "am"
-        sql = (f"SELECT schema_name, schema_name FROM information_schema.schemata "
-               f"WHERE schema_name ILIKE '{project_name}'ORDER BY schema_name")
-        rows = tools_db.get_rows(sql, commit=False)
-        if rows is not None:
-            self._enable_toolbar("am")
+        # Enable toolbars if their schemas exist
+        schemas = ["am", "cm"]
+        for schema in schemas:
+            sql = (f"SELECT schema_name, schema_name FROM information_schema.schemata "
+                   f"WHERE schema_name = '{schema}'")
+            rows = tools_db.get_rows(sql, commit=False)
+            if rows is not None:
+                self._enable_toolbar(schema)
 
     def _create_toolbar(self, toolbar_id):
 
