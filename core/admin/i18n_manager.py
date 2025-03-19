@@ -9,6 +9,8 @@ import re
 import psycopg2
 import psycopg2.extras
 from functools import partial
+from datetime import datetime, date
+
 
 from ..ui.ui_manager import GwSchemaI18NManagerUi
 from ..utils import tools_gw
@@ -49,7 +51,7 @@ class GwSchemaI18NManager:
         tools_gw.open_dialog(self.dlg_qm, dlg_name='admin_i18n_manager')
         self._set_values()
 
-    # region Basic functions
+    # region Button functions
     def _set_signals(self):
         # Mysteriously without the partial the function check_connection is not called
         self.dlg_qm.btn_connection.clicked.connect(partial(self._check_connection))
@@ -62,10 +64,9 @@ class GwSchemaI18NManager:
         self.dlg_qm.rejected.connect(self._close_db_i18n)
         self.dlg_qm.cmb_updatetype.currentIndexChanged.connect(partial(self._set_values))
         self.dlg_qm.cmb_schema_org.currentIndexChanged.connect(partial(self._set_values))
-
+        
         #Populate schema names
         self.dlg_qm.cmb_projecttype.currentIndexChanged.connect(partial(self._populate_data_schema_name, self.dlg_qm.cmb_projecttype))
-        
 
     def _set_values(self):
         # Mysteriously without the partial the function check_connection is not called
@@ -256,8 +257,9 @@ class GwSchemaI18NManager:
         tools_gw.set_config_parser('i18n_generator', 'qm_lang_db_msg', f"{db_msg}", "user", "session", prefix=False)
 
     # endregion
-    # region Missing Database Dialogs
+    # region Missing DB Dialogs
     def missing_dialogs(self):
+        self.check_for_repeated = tools_qt.is_checked(self.dlg_qm, self.dlg_qm.chk_search_for_repeated)
         tables = ["i18n_proves.dbparam_user", "i18n_proves.dbconfig_param_system", "i18n_proves.dbconfig_form_fields", "i18n_proves.dbconfig_typevalue", "i18n_proves.dbfprocess", "i18n_proves.dbmessage"]
         text_error = ''
         self.dlg_qm.lbl_info.clear()
@@ -272,7 +274,11 @@ class GwSchemaI18NManager:
                     break
             else:
                 tools_qt.show_info_box(f"The table ({table}) does not exists")
+
+            if self.check_for_repeated:
+                text_error += self._update_project_type(table)
             self._vacuum_commit(table, self.conn_i18n, self.cursor_i18n)
+            
 
         self.dlg_qm.lbl_info.clear()
         tools_qt.show_info_box(text_error)
@@ -294,17 +300,15 @@ class GwSchemaI18NManager:
             query = self._update_config_param_system(table_i18n, table_org)
         elif "config_typevalue" in table_org:
             query = self._update_config_typevalue(table_i18n, table_org)
-        print(table_i18n,": ", query)
         if query == '':
-            return f'No update needed in {table_i18n}\n'
+            return f'{table_i18n}: 1- No update needed. '
         else:
             try:
                 self.cursor_i18n.execute(query)
                 self.conn_i18n.commit()
-                return f'Succesfully translated table: {table_i18n}\n'
+                return f'{table_i18n}: 1- Succesfully translated table. '
             except Exception as e:
                 self.conn_i18n.rollback()
-                print(f"An error occured while translating {table_i18n}: {e}\n")
                 return f"An error occured while translating {table_i18n}: {e}\n"
             
 
@@ -361,7 +365,7 @@ class GwSchemaI18NManager:
         return query
 
     def _update_config_form_fields(self, table_i18n, table_org):
-        columns_i18n = "formname, formtype, source, lb_en_us, tt_en_us"
+        columns_i18n = "formname, formtype, source, lb_en_us, tt_en_us, project_type"
         columns_org = "formname, formtype, columnname, label, tooltip"
         query = f"SELECT {columns_i18n} FROM {table_i18n};"
         rows_i18n = self._get_rows(query, self.cursor_i18n)
@@ -377,8 +381,10 @@ class GwSchemaI18NManager:
             if row_org['label'] == None:
                 row_org['label'] = ''
             if row_org['tooltip'] == None:
-                row_org['tooltip'] = ''   
-            if row_org not in rows_i18n:
+                row_org['tooltip'] = ''
+            row_org_com = row_org
+            row_org_com.append(self.project_type) 
+            if row_org_com not in rows_i18n:
                 query_row = f"""INSERT INTO {table_i18n} (context, source_code, project_type, source, formname, formtype, lb_en_us, tt_en_us) VALUES """
                 query_row += f"""('{table_org}', 'giswater', '{self.project_type}', '{row_org['columnname']}', '{row_org['formname']}', '{row_org['formtype']}',
                         {f"'{row_org['label'].replace("'", "''")}'" if row_org['label'] not in [None, ''] else 'NULL'}, 
@@ -424,11 +430,6 @@ class GwSchemaI18NManager:
                                 {label}, {descript})
                                 ON CONFLICT (context, source_code, project_type, source, formname) 
                                 DO UPDATE SET lb_en_us = {label}, tt_en_us = {descript};\n"""
-                
-                # Optionally, print the query for debugging if it contains the word "Variable"
-                if "Variable" in query_row:
-                    print(query_row)
-
                 query += query_row
 
         return query
@@ -498,11 +499,135 @@ class GwSchemaI18NManager:
         return True
     
     #endregion
+    # region Rewrite Project_type
+    def _update_project_type(self, table):
+        """Function to rewrite the repeated rows with different project_type to only one with project_type = 'utils'"""
+
+        # Step 1: Determine column names
+        try:
+            self._detect_column_names(table)
+        except Exception as e:
+            return f"Error deleting rows: {e}"
+
+        # Step 2: Get the duplicated rows
+        query = self._get_duplicates_rows(table)
+        try:
+            self.cursor_i18n.execute(query)
+            initial_rows = self.cursor_i18n.fetchall()
+        except Exception as e:
+            return f"Error deleting rows: {e}"
+
+        # Step 3: Create the rows with the correct project_type
+        final_rows = []
+        primary_rows = []
+        final_rows_no_utils = []
+        for row in initial_rows:
+            primary_row = [row[primary_key] for primary_key in self.primary_keys if primary_key != 'project_type']
+            if row['project_type'] in ['ws', 'ud', 'utils']:
+                if primary_row not in primary_rows:
+                    final_rows.append(row)
+                    primary_rows.append(primary_row)
+            elif row['project_type'] not in [None, 'None', '']:
+                final_rows_no_utils.append(row)
+
+
+        # Step 4: Delete the initial rows that are duplicates (those that will be replaced by final_rows)
+        delete_query = self._delete_duplicates_rows(table)
+        try:
+            self.cursor_i18n.execute(delete_query)
+            self.conn_i18n.commit()  # Commit the deletion
+        except Exception as e:
+            self.conn_i18n.rollback()  # Rollback in case of error
+            return f"Error deleting rows: {e}"
+
+        # Step 5: Insert the unique final rows back into the table
+        final_rows_tot = final_rows + final_rows_no_utils if final_rows_no_utils else final_rows
+        insert_query = self._add_duplicates_rows(table, final_rows_tot, final_rows)
+        if insert_query == "":
+            return "No rows to unify"
+        try:
+            self.cursor_i18n.execute(insert_query)
+        except Exception as e:
+            self.conn_i18n.rollback()  # Rollback in case of error
+            return f"Error inserting rows: {e}"
+
+        self.conn_i18n.commit()  # Commit the insertions
+        return f"2- Rows updated successfully.\n"
+    
+    def _get_duplicates_rows(self, table):
+        """Create query to determine the duplicated rows"""
+
+        query = f"""WITH duplicates AS (
+                SELECT """
+        query += ", ".join([primary_key for primary_key in self.primary_keys if primary_key != 'project_type'])
+        query += f""", COUNT(*) AS duplicate_count
+                FROM {table}
+                GROUP BY """
+        query += ", ".join([primary_key for primary_key in self.primary_keys if primary_key != 'project_type'])
+        query += f"""\nHAVING COUNT(*) > 1
+            )
+            SELECT t.*, d.duplicate_count
+            FROM {table} t
+            JOIN duplicates d
+            ON 
+        """
+        query += "AND ".join([f"""t.{primary_key} = d.{primary_key} """ for primary_key in self.primary_keys if primary_key != 'project_type'])
+        query += """ORDER BY source, duplicate_count DESC;"""
+        return query
+    
+    def _delete_duplicates_rows(self, table):
+        """Create query to delete the duplicated rows"""
+
+        delete_query = """
+            WITH duplicates AS (
+                SELECT """ 
+        delete_query += ", ".join([primary_key for primary_key in self.primary_keys if primary_key != 'project_type'])
+        delete_query += f""", COUNT(*) AS duplicate_count
+                FROM {table}
+                GROUP BY """
+        delete_query += ", ".join([primary_key for primary_key in self.primary_keys if primary_key != 'project_type'])
+        delete_query += f"""\nHAVING COUNT(*) > 1
+            )
+            DELETE FROM {table} WHERE ("""
+        delete_query += ", ".join([primary_key for primary_key in self.primary_keys if primary_key != 'project_type'])
+        delete_query +=""") IN (SELECT """
+        delete_query += ", ".join([primary_key for primary_key in self.primary_keys if primary_key != 'project_type'])
+        delete_query +="""  FROM duplicates);"""
+        return delete_query
+    
+    def _add_duplicates_rows(self, table, final_rows_tot, final_rows):
+        """Create query to add the correct rows to the table"""
+
+        insert_query = ""
+        for k, row in enumerate(final_rows_tot):
+            row_keys = list(row.keys())[:-1]
+            if k < len(final_rows):
+                row_keys.remove('project_type')
+            insert_query += f"INSERT INTO {table} ("
+            
+            # Handle columns (keys)
+            insert_query += ", ".join([row_key for row_key in row_keys])
+            insert_query += ", project_type) VALUES ("
+            
+            values = []
+            for row_key in row_keys:
+                value = row[row_key]
+                if isinstance(value, str):  
+                    value = f"'{value.replace('\'', '\'\'')}'"  # Escape single quotes in strings
+                elif isinstance(value, (datetime, date)):  # Handle timestamps properly
+                    value = f"'{value.strftime('%Y-%m-%d %H:%M:%S')}'"
+                elif value in [None, 'None', '']:
+                    value = "Null"
+                else:
+                    value = str(value)  # Convert other types directly
+                values.append(value)
+            # Add processed values to query
+            insert_query += ", ".join(values)
+            insert_query += ", 'utils');\n" if k < len(final_rows) else ");\n"
+        return insert_query
+    #endregion
     # region Global funcitons
     def detect_table_func(self, table):
-        self.cursor_i18n.execute("SELECT schema_name FROM information_schema.schemata;")
-        schemas = self.cursor_i18n.fetchall()
-        print(schemas)
         self.cursor_i18n.execute(f"SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = '{table.split('.')[0]}' AND table_name = '{table.split('.')[1]}';")
         result = self.cursor_i18n.fetchone()
         existing_table = result[0] > 0  # Check if count is greater than 0
@@ -545,4 +670,17 @@ class GwSchemaI18NManager:
         msg = f"Updating {table}..."
         tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', msg)
         QApplication.processEvents()
+
+    def _detect_column_names(self, table):
+        query = f"""
+            SELECT a.attname AS column_name
+            FROM pg_index i
+            JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey)
+            WHERE i.indrelid = '{table}'::regclass
+            AND i.indisprimary;
+            """
+            
+        self.cursor_i18n.execute(query)
+        results = self.cursor_i18n.fetchall()
+        self.primary_keys = [row['column_name'] for row in results]
     #endregion
