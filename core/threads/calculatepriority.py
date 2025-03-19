@@ -803,7 +803,7 @@ class GwCalculatePriority(GwTask):
         if not len(second_iteration):
             self._emit_report(
                 tools_qt.tr("Task canceled:"),
-                tools_qt.tr("No pipes found matching your budget. (Hint: increase the yearly budget)"),
+                tools_qt.tr("No pipes found matching your budget. (Hint: increase the yearly budget or/and the horizon year)"),
             )
             return False
 
