@@ -686,7 +686,7 @@ def set_completer_feature_id(widget, feature_type, viewname):
         completer.setModel(model)
 
 
-def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group="GW Layers", sub_group=None, style_id="-1", alias=None, sub_sub_group=None):
+def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group="GW Layers", sub_group=None, style_id="-1", alias=None, sub_sub_group=None, schema=None):
     """
     Put selected layer into TOC
         :param tablename: Postgres table name (String)
@@ -698,7 +698,7 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
     """
 
     tablename_og = tablename
-    schema_name = tools_db.dao_db_credentials['schema'].replace('"', '')
+    schema_name = tools_db.dao_db_credentials['schema'].replace('"', '') if schema is None else schema
     field_id = field_id.replace(" ", "")
     uri = tools_db.get_uri()
     uri.setDataSource(schema_name, f'{tablename}', the_geom, None, field_id)
@@ -734,7 +734,7 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
         if style_id in (None, "-1"):
             set_layer_styles(tablename_og, layer)
 
-        if tablename:
+        if tablename and schema != 'am':
             # Set layer config
             feature = '"tableName":"' + str(tablename_og) + '", "isLayer":true'
             extras = '"infoType":"' + str(lib_vars.project_vars['info_type']) + '"'

@@ -158,7 +158,10 @@ class GwAddChildLayerButton(GwAction):
             if layer is None:
                 if lib_vars.project_vars['current_style'] is not None:
                     style_id = lib_vars.project_vars['current_style']
-                tools_gw.add_layer_database(tablename, the_geom, field_id, group, sub_group, style_id=style_id, alias=alias, sub_sub_group=sub_sub_group)
+                schema = None
+                if group == "AM":
+                    schema = "am"
+                tools_gw.add_layer_database(tablename, the_geom, field_id, group, sub_group, style_id=style_id, alias=alias, sub_sub_group=sub_sub_group, schema=schema)
         elif state == 0:
             layer = tools_qgis.get_layer_by_tablename(tablename)
             if layer is not None:
