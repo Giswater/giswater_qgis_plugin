@@ -143,18 +143,31 @@ class GwI18NGenerator:
         key_message = f'ms_{self.lower_lang}'
 
         # Get python messages values
-        sql = f"SELECT source, ms_en_us, {key_message}, auto_{key_message} FROM i18n.pymessage;" # ADD new columns
-        py_messages = self._get_rows(sql)
+        
 
         # Get python toolbars and buttons values
-        sql = f"SELECT source, lb_en_us, {key_label}, auto_{key_label} FROM i18n.pytoolbar;"
-        py_toolbars = self._get_rows(sql)
+        if self.lower_lang == 'en_us':
+            sql = f"SELECT source, ms_en_us FROM i18n.pymessage;" # ADD new columns
+            py_messages = self._get_rows(sql)
+            sql = f"SELECT source, lb_en_us FROM i18n.pytoolbar;"
+            py_toolbars = self._get_rows(sql)
+            # Get python dialog values
+            sql = (f"SELECT dialog_name, source, lb_en_us, tt_en_us"
+                f" FROM i18n.pydialog"
+                f" ORDER BY dialog_name;")
+            py_dialogs = self._get_rows(sql)
+        else:
+            sql = f"SELECT source, ms_en_us, {key_message}, auto_{key_message} FROM i18n.pymessage;" # ADD new columns
+            py_messages = self._get_rows(sql)
+            sql = f"SELECT source, lb_en_us, {key_label}, auto_{key_label} FROM i18n.pytoolbar;"
+            py_toolbars = self._get_rows(sql)
+            # Get python dialog values
+            sql = (f"SELECT dialog_name, source, lb_en_us, {key_label}, auto_{key_label}, tt_en_us, {key_tooltip}, auto_{key_tooltip}"
+                f" FROM i18n.pydialog"
+                f" ORDER BY dialog_name;")
+            py_dialogs = self._get_rows(sql)
 
-        # Get python dialog values
-        sql = (f"SELECT dialog_name, source, lb_en_us, {key_label}, auto_{key_label}, tt_en_us, {key_tooltip}, auto_{key_tooltip} "
-               f" FROM i18n.pydialog "
-               f" ORDER BY dialog_name;")
-        py_dialogs = self._get_rows(sql)
+        
 
         ts_path = self.plugin_dir + os.sep + 'i18n' + os.sep + f'giswater_{self.language}.ts'
 
@@ -235,8 +248,9 @@ class GwI18NGenerator:
             line += f"\t\t<message>\n"
             line += f"\t\t\t<source>{py_dlg['source']}</source>\n"
             if py_dlg[key_label] is None: # Afegir aqui l'auto amb un if
-                py_dlg[key_label] = py_dlg[f'auto_{key_label}']
-                if py_tlb[f'auto_{key_label}'] is None:
+                if self.lower_lang != 'en_us':
+                    py_dlg[key_label] = py_dlg[f'auto_{key_label}']
+                if py_tlb[key_label] is None:
                     py_dlg[key_label] = py_dlg['lb_en_us']
                 
 
@@ -247,8 +261,9 @@ class GwI18NGenerator:
             line += f"\t\t<message>\n"
             line += f"\t\t\t<source>tooltip_{py_dlg['source']}</source>\n"
             if py_dlg[key_tooltip] is None:  # Afegir aqui l'auto amb un if
-                py_dlg[key_tooltip] = py_dlg[f'auto_{key_tooltip}']
-                if not title:  # Afegir aqui l'auto amb un if
+                if self.lower_lang != 'en_us':
+                    py_dlg[key_tooltip] = py_dlg[f'auto_{key_tooltip}']
+                if not py_dlg[key_tooltip]:  # Afegir aqui l'auto amb un if
                     py_dlg[key_tooltip] = py_dlg['tt_en_us']
             line += f"\t\t\t<translation>{py_dlg[key_tooltip]}</translation>\n"
             line += f"\t\t</message>\n"
@@ -277,7 +292,8 @@ class GwI18NGenerator:
             if py['source'] == f'dlg_{name}':
                 title = py[key_label]
                 if not title:  # Afegir aqui l'auto amb un if
-                    title = py[f'auto_{key_label}']
+                    if self.lower_lang != 'en_us':
+                        title = py[f'auto_{key_label}']
                     if not title:
                         title = py['lb_en_us']
                     return title
@@ -369,10 +385,10 @@ class GwI18NGenerator:
             return False, "dbmessage"
         self._write_dbmessages_values_i18n(rows, cfg_path + file_name)
 
-        rows = self._get_dbfprocess_values_i18n()
-        if not rows:
-            return False, "dbfprocess"
-        self._write_dbfprocess_values_i18n(rows, cfg_path + file_name)
+        #rows = self._get_dbfprocess_values_i18n()
+        #if not rows:
+            #return False, "dbfprocess"
+        #self._write_dbfprocess_values_i18n(rows, cfg_path + file_name)
 
         return True, ""
 
@@ -446,9 +462,15 @@ class GwI18NGenerator:
     def _get_dbfprocess_values_i18n(self):
         """ Get db messages values """
         # Make the query
-        sql = (f"SELECT source, project_type, context, ex_en_us, ex_{self.lower_lang}, auto_ex_{self.lower_lang}, in_en_us, in_{self.lower_lang}, auto_in_{self.lower_lang}"
-               f" FROM i18n.dbfprocess "
-               f" ORDER BY context;")
+        
+        if self.lower_lang == 'en_us':
+            sql = (f"SELECT source, project_type, context, ex_en_us, in_en_us"
+                f" FROM i18n.dbfprocess "
+                f" ORDER BY context;")
+        else:
+            sql = (f"SELECT source, project_type, context, ex_en_us, ex_{self.lower_lang}, auto_ex_{self.lower_lang}, in_en_us, in_{self.lower_lang}, auto_in_{self.lower_lang}"
+                f" FROM i18n.dbfprocess "
+                f" ORDER BY context;")
         rows = self._get_rows(sql, self.cursor)
         # Return the corresponding information
         if not rows:
@@ -457,10 +479,14 @@ class GwI18NGenerator:
 
     def _get_config_form_fields_values(self, project_type):
         """ Get db dialog values """
-
-        sql = (f"SELECT formname_en_us, formname_{self.lower_lang}, auto_formname_{self.lower_lang}"
-               f" FROM i18n.dbfeature"
-               f" WHERE project_type = \'{project_type}\';")
+        if self.lower_lang == 'en_us':
+            sql = (f"SELECT formname_en_us"
+                f" FROM i18n.dbfeature"
+                f" WHERE project_type = \'{project_type}\';")
+        else:
+            sql = (f"SELECT formname_en_us, formname_{self.lower_lang}, auto_formname_{self.lower_lang}"
+                f" FROM i18n.dbfeature"
+                f" WHERE project_type = \'{project_type}\';")
         rows = self._get_rows(sql)
         if not rows:
             return False
@@ -469,13 +495,19 @@ class GwI18NGenerator:
 
     def _get_dbdialog_values_i18n(self):
         """ Get db dialog values """
-
-        sql = (f"SELECT d.source, d.project_type, d.context, d.formname, f.formname_{self.lower_lang}, f.auto_formname_{self.lower_lang}, "
-                f"d.formtype, d.lb_en_us, d.lb_{self.lower_lang}, d.auto_lb_{self.lower_lang}, d.tt_en_us, d.tt_{self.lower_lang}, d.auto_tt_{self.lower_lang} "
-                f"FROM i18n.dbdialog d "
-                f"LEFT JOIN i18n.dbfeature f ON f.formname_en_us = d.formname "
-                f"ORDER BY d.context, d.formname;")
-
+        if self.lower_lang == 'en_us':
+            sql = (f"SELECT d.source, d.project_type, d.context, d.formname, "
+                    f"d.formtype, d.lb_en_us, d.tt_en_us "
+                    f"FROM i18n.dbdialog d "
+                    f"LEFT JOIN i18n.dbfeature f ON f.formname_en_us = d.formname "
+                    f"ORDER BY d.context, d.formname;")
+        else:
+            sql = (f"SELECT d.source, d.project_type, d.context, d.formname, f.formname_{self.lower_lang}, f.auto_formname_{self.lower_lang}, "
+                    f"d.formtype, d.lb_en_us, d.lb_{self.lower_lang}, d.auto_lb_{self.lower_lang}, d.tt_en_us, d.tt_{self.lower_lang}, d.auto_tt_{self.lower_lang} "
+                    f"FROM i18n.dbdialog d "
+                    f"LEFT JOIN i18n.dbfeature f ON f.formname_en_us = d.formname "
+                    f"ORDER BY d.context, d.formname;")
+        print(sql)
         rows = self._get_rows(sql)
         if not rows:
             return False
@@ -484,10 +516,14 @@ class GwI18NGenerator:
     
     def _get_dbmessages_values_i18n(self):
         """ Get db messages values """
-
-        sql = (f"SELECT source, project_type, context, ms_en_us, ms_{self.lower_lang}, auto_ms_{self.lower_lang}, ht_en_us, ht_{self.lower_lang}, auto_ht_{self.lower_lang}, log_level"
-               f" FROM i18n.dbmessage "
-               f" ORDER BY context;")
+        if self.lower_lang == 'en_us':
+            sql = (f"SELECT source, project_type, context, ms_en_us, ht_en_us, log_level"
+                f" FROM i18n.dbmessage "
+                f" ORDER BY context;")
+        else:
+            sql = (f"SELECT source, project_type, context, ms_en_us, ms_{self.lower_lang}, auto_ms_{self.lower_lang}, ht_en_us, ht_{self.lower_lang}, auto_ht_{self.lower_lang}, log_level"
+                f" FROM i18n.dbmessage "
+                f" ORDER BY context;")
         rows = self._get_rows(sql)
         if not rows:
             return False
@@ -509,8 +545,8 @@ class GwI18NGenerator:
             formname_lang = row[f'formname_{self.lower_lang}'] if row[f'formname_{self.lower_lang}'] is not None else row[f'auto_formname_{self.lower_lang}']
             formname_lang = formname_lang if formname_lang is not None else row['formname_en_us']            
 
-            line = f'UPDATE config_form_fields SET formname_en_us = \'{formname_lang}\' ' \
-                   f'WHERE formname_en_us LIKE \'{formname}\';\n'
+            line = f'UPDATE config_form_fields SET formname = \'{formname_lang}\' ' \
+                   f'WHERE formname LIKE \'{formname}\';\n'
                    
             file.write(line)
         file.close()
@@ -531,14 +567,16 @@ class GwI18NGenerator:
             # Get values
             table = row['context'] if row['context'] is not None else ""
             form_name = row['formname'] if row['formname'] is not None else ""
-            form_name_lan = row[f'formname_{self.lower_lang}'] if row[f'formname_{self.lower_lang}'] is not None else ""
+            form_name_lan = form_name
+            if self.lower_lang != 'en_us':
+                form_name_lan = row[f'formname_{self.lower_lang}'] if row[f'formname_{self.lower_lang}'] is not None else ""
             formname = form_name_lan if form_name_lan is not "" else form_name
             form_type = row['formtype'] if row['formtype'] is not None else ""
             source = row['source'] if row['source'] is not None else ""
-            lbl_value = row[f'lb_{self.lower_lang}'] if row[f'lb_{self.lower_lang}'] is not None else row[f'auto_lb_{self.lower_lang}']
+            lbl_value = row[f'lb_{self.lower_lang}'] if row[f'lb_{self.lower_lang}'] is not None or self.lower_lang == 'en_us' else row[f'auto_lb_{self.lower_lang}']
             lbl_value = lbl_value if lbl_value is not None else row['lb_en_us'] # Afegir auto_ amb un if
             lbl_value = lbl_value if lbl_value is not None else ""
-            tt_value = row[f'tt_{self.lower_lang}'] if row[f'tt_{self.lower_lang}'] is not None else row[f'auto_tt_{self.lower_lang}']
+            tt_value = row[f'tt_{self.lower_lang}'] if row[f'tt_{self.lower_lang}'] is not None or self.lower_lang == 'en_us' else row[f'auto_tt_{self.lower_lang}']
             tt_value = tt_value if tt_value is not None else row['lb_en_us']
             tt_value = tt_value if tt_value is not None else ""
 
@@ -799,6 +837,7 @@ class GwI18NGenerator:
         file = open(path, "a")
 
         for row in rows:
+            
             # Get values
             table = row['context'] if row['context'] is not None else ""
             source = row['source'] if row['source'] is not None else ""
@@ -808,9 +847,9 @@ class GwI18NGenerator:
 
             # Check invalid characters
             if ex_msg is not None and "\n" in ex_msg:
-                ms_value = self._replace_invalid_characters(ms_value)
+                ex_msg = self._replace_invalid_characters(ex_msg)
             if in_msg is not None and "\n" in in_msg:
-                ht_value = self._replace_invalid_characters(ht_value)
+                in_msg = self._replace_invalid_characters(in_msg)
 
             line = f'SELECT gw_fct_admin_schema_i18n($$'
             line += (f'{{"data":'
