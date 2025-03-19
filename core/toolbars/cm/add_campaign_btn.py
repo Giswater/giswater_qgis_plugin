@@ -31,22 +31,22 @@ class GwAddCampaignButton(GwAction):
 
     def _fill_action_menu(self):
         """ Fill action menu """
-
-        # disconnect and remove previuos signals and actions
         actions = self.menu.actions()
         for action in actions:
             action.disconnect()
             self.menu.removeAction(action)
             del action
-        ag = QActionGroup(self.iface.mainWindow())
 
+        ag = QActionGroup(self.iface.mainWindow())
 
         for action in self.actions:
             obj_action = QAction(f"{action}", ag)
             self.menu.addAction(obj_action)
-            obj_action.triggered.connect(partial(super().clicked_event))
-            obj_action.triggered.connect(partial(tools_gw.set_config_parser, section="btn_create_campaign",
-                                                 parameter="last_feature_type", value=action, comment=None))
+            obj_action.triggered.connect(partial(self.clicked_event, action))
 
-    def clicked_event(self):
-        self.new_campaign.create_campaign()
+    def clicked_event(self, selected_action):
+        """ Open the correct campaign dialog based on user selection """
+        if selected_action == "Review":
+            self.new_campaign.create_campaign(dialog_type="review")
+        elif selected_action == "Visit":
+            self.new_campaign.create_campaign(dialog_type="visit")

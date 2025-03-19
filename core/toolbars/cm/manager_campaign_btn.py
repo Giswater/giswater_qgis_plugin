@@ -5,16 +5,17 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from .lot import AddNewLot
+from .campaign import Campaign
 from ..dialog import GwAction
 
 
 class GwManageCampaignButton(GwAction):
-    """ Button 87: Campaign management """
+    """ Button 87: Campaign Management """
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
         super().__init__(icon_path, action_name, text, toolbar, action_group)
-        self.new_lot = AddNewLot(icon_path, action_name, text, toolbar, action_group)
+        self.campaign_manager = Campaign(icon_path, action_name, text, toolbar, action_group)
 
     def clicked_event(self):
-        self.new_lot.lot_manager()
+        """ Open the campaign manager """
+        self.campaign_manager.campaign_manager()

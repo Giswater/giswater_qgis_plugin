@@ -637,12 +637,6 @@ class TeamManagemenUi(GwDialog, FORM_CLASS):
     CONTEXT = CONTEXT
     UINAME = UINAME
 
-UINAME = "vehicle_create"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
-class VehicleCreateUi(GwDialog, FORM_CLASS):
-    CONTEXT = CONTEXT
-    UINAME = UINAME
-
 UINAME = "work_management"
 FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
 class WorkManagementUi(GwDialog, FORM_CLASS):
@@ -658,6 +652,12 @@ class AddCampaignReviewUi(GwDialog, FORM_CLASS):
 UINAME = "add_campaign_visit"
 FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
 class AddCampaignVisitUi(GwDialog, FORM_CLASS):
+    CONTEXT = CONTEXT
+    UINAME = UINAME
+
+UINAME = "campaign_management"
+FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+class CampaignManagementUi(GwDialog, FORM_CLASS):
     CONTEXT = CONTEXT
     UINAME = UINAME
 
