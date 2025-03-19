@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>779</width>
-    <height>669</height>
+    <height>694</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -24,7 +24,7 @@
    <item row="1" column="1" colspan="2">
     <widget class="QTabWidget" name="mainTab">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab_calc">
       <attribute name="title">
@@ -96,18 +96,8 @@
           <string>Calculation parameters</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_9">
-          <item row="1" column="0">
-           <widget class="QLabel" name="lbl_year">
-            <property name="text">
-             <string>Horizon year:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
+          <item row="0" column="2">
            <widget class="QLineEdit" name="txt_budget"/>
-          </item>
-          <item row="1" column="1">
-           <widget class="QComboBox" name="cmb_year"/>
           </item>
           <item row="0" column="0">
            <widget class="QLabel" name="lbl_budget">
@@ -116,7 +106,17 @@
             </property>
            </widget>
           </item>
-          <item row="2" column="0" colspan="2">
+          <item row="0" column="3">
+           <widget class="QLabel" name="lbl_year">
+            <property name="text">
+             <string>Horizon year:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="4">
+           <widget class="QLineEdit" name="txt_year"/>
+          </item>
+          <item row="2" column="0" colspan="5">
            <widget class="QTabWidget" name="tab_widget">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -396,12 +396,15 @@
        <item row="0" column="0">
         <layout class="QGridLayout" name="gridLayout_11">
          <item row="0" column="0" colspan="2">
-          <widget class="QTextEdit" name="txt_infolog">
+          <widget class="QTextEdit" name="tab_log_txt_infolog">
            <property name="font">
             <font>
              <family>Courier New</family>
              <pointsize>10</pointsize>
             </font>
+           </property>
+           <property name="readOnly">
+            <bool>true</bool>
            </property>
           </widget>
          </item>
@@ -450,10 +453,9 @@
   <tabstop>cmb_dnom</tabstop>
   <tabstop>cmb_material</tabstop>
   <tabstop>txt_budget</tabstop>
-  <tabstop>cmb_year</tabstop>
   <tabstop>mainTab</tabstop>
   <tabstop>tab_widget</tabstop>
-  <tabstop>txt_infolog</tabstop>
+  <tabstop>tab_log_txt_infolog</tabstop>
  </tabstops>
  <resources/>
  <connections/>

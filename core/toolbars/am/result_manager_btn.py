@@ -204,7 +204,7 @@ class GwResultManagerButton(GwAction):
         expr = f"result_id is NOT NULL"
 
         if name:
-            expr += f" AND result_name ILIKE '%{name}%'"
+            expr += f" AND result_name = '{name}'"
         if result_type:
             expr += f" AND result_type ILIKE '%{result_type}%'"
         if expl_id:

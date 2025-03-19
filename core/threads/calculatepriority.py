@@ -736,7 +736,8 @@ class GwCalculatePriority(GwTask):
             arc["val_rleak"] = self._fit_to_scale(arc["rleak"], min_rleak, max_rleak)
             arc["val_mleak"] = self._fit_to_scale(arc["mleak"], min_mleak, max_mleak)
              # New Longevity formula
-            arc["val_longevity"] = ((arc["longevity"] - min_longevity) * 10) / (max_longevity - min_longevity)
+            denominator = max_longevity - min_longevity
+            arc["val_longevity"] = ((arc["longevity"] - min_longevity) * 10) / denominator if denominator != 0 else 1
             #   - flow (how to take in account ficticious flows?)
             arc["val_flow"] = self._fit_to_scale(arc["flow_avg"], min_flow, max_flow)
             arc["val_nrw"] = (
@@ -802,7 +803,7 @@ class GwCalculatePriority(GwTask):
         if not len(second_iteration):
             self._emit_report(
                 tools_qt.tr("Task canceled:"),
-                tools_qt.tr("No pipes found matching your budget."),
+                tools_qt.tr("No pipes found matching your budget. (Hint: increase the yearly budget)"),
             )
             return False
 

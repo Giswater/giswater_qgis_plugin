@@ -451,14 +451,18 @@ class CalculatePriority:
 
     def _calculate_ended(self):
         dlg = self.dlg_priority
-        cancel = dlg.buttonBox.StandardButton.Cancel
-        dlg.buttonBox.removeButton(dlg.buttonBox.button(cancel))
-        close = dlg.buttonBox.StandardButton.Close
-        dlg.buttonBox.addButton(close)
+
         dlg.buttonBox.rejected.disconnect()
         dlg.buttonBox.rejected.connect(dlg.reject)
+        btn_ok = dlg.buttonBox.button(dlg.buttonBox.StandardButton.Ok)
+
+        # Check if thread is finished
         if hasattr(self.thread, "df"):
+            # Button OK behavior
+            tools_qt.set_widget_text(dlg, btn_ok, "Do another")
             dlg.btn_save2file.setEnabled(True)
+        else:
+            tools_qt.set_widget_text(dlg, btn_ok, "Try again")
         dlg.executing = False
         self.timer.stop()
 
@@ -549,7 +553,7 @@ class CalculatePriority:
             self.dlg_priority.txt_budget.setVisible(False)
         if self.config.show_target_year is not True and not self.result["target_year"]:
             self.dlg_priority.lbl_year.setVisible(False)
-            self.dlg_priority.cmb_year.setVisible(False)
+            self.dlg_priority.txt_year.setVisible(False)
         if (
             self.config.show_selection is not True
             and not self.result["features"]
@@ -604,7 +608,7 @@ class CalculatePriority:
 
     def _manage_calculate(self):
         dlg = self.dlg_priority
-
+        tools_qt.set_widget_text(dlg, 'tab_log_txt_infolog', '')
         inputs = self._validate_inputs()
         if not inputs:
             return
@@ -812,15 +816,11 @@ class CalculatePriority:
 
         # Log behavior
         t.report.connect(
-            partial(tools_gw.fill_tab_log, dlg, reset_text=False, close=False)
+            partial(tools_gw.fill_tab_log, dlg, reset_text=False, close=False, call_set_tabs_enabled=False)
         )
 
         # Progress bar behavior
         t.progressChanged.connect(lambda value: dlg.progressBar.setValue(int(value)))
-
-        # Button OK behavior
-        ok = dlg.buttonBox.StandardButton.Ok
-        dlg.buttonBox.button(ok).setEnabled(False)
 
         # Button Cancel behavior
         dlg.buttonBox.rejected.disconnect()
@@ -1046,12 +1046,16 @@ class CalculatePriority:
                 tools_qt.show_info_box(msg)
                 return
 
-        target_year = tools_qt.get_combo_value(dlg, "cmb_year") or None
-        if self.config.method == "WM" and not target_year:
-            msg = "Please select a target year."
+        target_year = dlg.txt_year.text() or None
+        if self.config.method == "WM" and not target_year or not target_year.isdigit():
+            msg = "Please enter a valid target year."
             tools_qt.show_info_box(msg)
             return
-
+        target_year = int(target_year)
+        if target_year <= date.today().year or target_year > date.today().year + 100:
+            msg = f"The target year must be between {date.today().year + 1} and {date.today().year + 100}."
+            tools_qt.show_info_box(msg)
+            return
         try:
             key = "dnom" if self.config.method == "SH" else "arccat_id"
             config_catalog = configcatalog_from_tablewidget(self.qtbl_catalog, key)
@@ -1135,7 +1139,7 @@ class CalculatePriority:
             """
 
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(dlg.cmb_expl_selection, rows, 1)
+        tools_qt.fill_combo_values(dlg.cmb_expl_selection, rows, 1, add_empty=True)
         tools_qt.set_combo_value(
             dlg.cmb_expl_selection,
             dlg.cmb_expl_selection.itemText(0),
@@ -1149,23 +1153,19 @@ class CalculatePriority:
         # Text budget
         tools_qt.set_widget_text(dlg, dlg.txt_budget, self.result["budget"])
 
-        # Combo horizon year
-        next_years = [
-            [x + date.today().year, str(x + date.today().year)] for x in range(1, 101)
-        ]
-        tools_qt.fill_combo_values(dlg.cmb_year, next_years, 1)
-        tools_qt.set_combo_value(
-            dlg.cmb_year,
-            self.result["target_year"],
-            0,
-            add_new=True,
-        )
+        # Text horizon year
+        tools_qt.set_widget_text(dlg, dlg.txt_year, self.result["budget"])
 
     # endregion
 
     def _load_presszone(self):
         dlg = self.dlg_priority
         exploitation = tools_qt.get_combo_value(dlg, "cmb_expl_selection")
+        if exploitation == "":
+            tools_qt.fill_combo_values(dlg.cmb_presszone, None, 1, combo_clear=True)
+            tools_qt.fill_combo_values(dlg.cmb_dnom, None, 1, combo_clear=True)
+            tools_qt.fill_combo_values(dlg.cmb_material, None, 1, combo_clear=True)
+            return
         sql = f"""           
             SELECT DISTINCT ON (ext.presszone_id) 
                 ext.presszone_id AS id, 
@@ -1177,7 +1177,7 @@ class CalculatePriority:
             ORDER BY ext.presszone_id;
             """
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(dlg.cmb_presszone, rows, 1)
+        tools_qt.fill_combo_values(dlg.cmb_presszone, rows, 1, add_empty=True)
 
         self._load_diameter()
 
@@ -1185,6 +1185,10 @@ class CalculatePriority:
         dlg = self.dlg_priority
         presszone = tools_qt.get_combo_value(dlg, "cmb_presszone")
         exploitation = tools_qt.get_combo_value(dlg, "cmb_expl_selection")
+        if presszone == "":
+            tools_qt.fill_combo_values(dlg.cmb_dnom, None, 1, combo_clear=True)
+            tools_qt.fill_combo_values(dlg.cmb_material, None, 1, combo_clear=True)
+            return
         sql = f"""
             SELECT distinct(dnom::float) AS id, dnom as idval 
             FROM am.ext_arc_asset WHERE presszone_id = '{presszone}' 
@@ -1192,7 +1196,7 @@ class CalculatePriority:
             AND dnom is not null ORDER BY id;
             """
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(dlg.cmb_dnom, rows, 1)
+        tools_qt.fill_combo_values(dlg.cmb_dnom, rows, 1, add_empty=True)
 
         self._load_material()
 
@@ -1201,13 +1205,18 @@ class CalculatePriority:
         presszone = tools_qt.get_combo_value(dlg, "cmb_presszone")
         exploitation = tools_qt.get_combo_value(dlg, "cmb_expl_selection")
         dnom = tools_qt.get_combo_value(dlg, "cmb_dnom")
+
+        if dnom == "":
+            tools_qt.fill_combo_values(dlg.cmb_material, None, 1, combo_clear=True)
+            return
+
         sql = f"""
             SELECT distinct(matcat_id) AS id, matcat_id as idval 
             FROM am.ext_arc_asset WHERE presszone_id = '{presszone}' 
             AND expl_id = {exploitation} AND dnom::float ={dnom} ORDER BY id;
             """
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(dlg.cmb_material, rows, 1)
+        tools_qt.fill_combo_values(dlg.cmb_material, rows, 1, add_empty=True)
 
     def _fill_table(
         self,
