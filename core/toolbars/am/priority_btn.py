@@ -459,7 +459,7 @@ class CalculatePriority:
         # Check if thread is finished
         if hasattr(self.thread, "df"):
             # Button OK behavior
-            tools_qt.set_widget_text(dlg, btn_ok, "Do another")
+            tools_qt.set_widget_text(dlg, btn_ok, "Next")
             dlg.btn_save2file.setEnabled(True)
         else:
             tools_qt.set_widget_text(dlg, btn_ok, "Try again")
@@ -854,11 +854,14 @@ class CalculatePriority:
                     self.list_ids["arc"].append(feature["arc_id"])
             layer.select(select_fid)
 
-        self.dlg_priority.btn_snapping.clicked.connect(
-            partial(
-                tools_gw.selection_init, self, self.dlg_priority, self.layer_to_work
-            )
-        )
+        self.dlg_priority.btn_snapping.clicked.connect(partial(self._snap_clicked, layer))
+
+    def _snap_clicked(self, layer):
+        if layer is None:
+            # show warning
+            tools_gw.show_warning("For select on canvas is mandatory to load v_asset_arc_input layer", dialog=self.dlg_priority)
+            return
+        tools_gw.selection_init(self, self.dlg_priority, self.layer_to_work)
 
     def old_manage_btn_snapping(self):
         """Fill btn_snapping QMenu"""
