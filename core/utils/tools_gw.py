@@ -1799,33 +1799,41 @@ def add_widget_combined(dialog, field, label, widget, old_widget_pos):
 
     label_pos = field['widgetcontrols']['labelPosition'] if (
                             'widgetcontrols' in field and field['widgetcontrols'] and 'labelPosition' in field['widgetcontrols']) else None
+    
+    if orientation == "horizontal":
+        col = old_widget_pos+1
+    else:
+        row = old_widget_pos+1
     if label:
-        if orientation == "horizontal":
-            layout.addWidget(label, row, col)
+        if orientation == "horizontal":                      
             if label_pos == 'top':
+                layout.addWidget(label, row, col)
                 row += 1
-            else:
+            else:       
+                layout.addWidget(label, row, col)           
                 col += 1
         else:
             if label_pos == 'top':
-                row= old_widget_pos+1
                 layout.addWidget(label, row, col)
                 row += 1
             else:
                 layout.addWidget(label, row, col)
-                col = 1
+                col += 1
             layout.setColumnStretch(col, 1)
 
-    if isinstance(widget, QSpacerItem):
+    if isinstance(widget, QSpacerItem):        
         layout.addItem(widget, row, col)
         layout.setColumnStretch(col, 1)
-    else:
-        layout.addWidget(widget, row, col)
+    else:        
+        layout.addWidget(widget, row, col)         
 
     if label and orientation == "horizontal":
         layout.setColumnStretch(col, 1)
 
-    return row
+    if orientation == "horizontal":        
+        return col
+    else:
+        return row
 
 def get_dialog_changed_values(dialog, chk, widget, field, list, value=None):
 
@@ -3698,8 +3706,7 @@ def add_tableview_header(widget, field):
 
 
 def fill_tableview_rows(widget, field):
-
-    if field is None or field['value'] is None: return widget
+    if field is None or field.get('value') is None: return widget
     model = widget.model()
 
     for item in field['value']:
@@ -4624,7 +4631,7 @@ def _get_parser_from_filename(filename):
 def fill_tbl(complet_result, dialog, widgetname, linkedobject, filter_fields):
     """ Put filter widgets into layout and set headers into QTableView """
 
-    complet_list = _get_list(complet_result, '', '', widgetname, 'form_feature', linkedobject)
+    complet_list = _get_list(complet_result, '', filter_fields, widgetname, 'form_feature', linkedobject)
     tab_name = 'tab_none'
     if complet_list is False:
         return False, False
@@ -4654,8 +4661,7 @@ def _get_list(complet_result, form_name='', filter_fields='', widgetname='', for
     form = f'"formName":"{form_name}", "tabName":"tab_none", "widgetname":"{widgetname}", "formtype":"{formtype}"'
     if linkedobject is None:
         return
-    feature = f'"tableName":"{linkedobject}"'
-    filter_fields = ''
+    feature = f'"tableName":"{linkedobject}"'    
     body = create_body(form, feature, filter_fields)
     json_result = execute_procedure('gw_fct_getlist', body)
     if json_result is None or json_result['status'] == 'Failed':
@@ -4972,14 +4978,16 @@ def _manage_typeahead(**kwargs):
     """ This function is called in def set_widgets(self, dialog, complet_result, field, new_feature)
             widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
         """
-
     dialog = kwargs['dialog']
     field = kwargs['field']
     complet_result = kwargs['complet_result']
-    feature_id = complet_result['body']['feature'].get('id')
+    if complet_result['body'].get('feature'):
+        feature_id = complet_result['body']['feature'].get('id')
+    else:
+        feature_id = None
     completer = QCompleter()
     widget = _manage_text(**kwargs)
-    widget = set_typeahead(field, dialog, widget, completer, feature_id=feature_id)
+    widget = set_typeahead(field, dialog, widget, completer, feature_id)
     return widget
 
 

@@ -12,9 +12,9 @@ from sip import isdeleted
 
 from qgis.PyQt.QtCore import QRegExp, Qt
 from qgis.PyQt.QtGui import QRegExpValidator, QCursor
-from qgis.PyQt.QtWidgets import QAbstractItemView, QPushButton, QTableView, QComboBox, QAction, QMenu
+from qgis.PyQt.QtWidgets import QAbstractItemView, QPushButton, QTableView, QComboBox, QGridLayout, QSpacerItem, QSizePolicy, QLineEdit
 
-from ..utils import tools_gw
+from ..utils import tools_gw, tools_backend_calls
 from ..ui.ui_manager import GwElementUi, GwElementManagerUi
 from ..utils.snap_manager import GwSnapManager
 from ... import global_vars
@@ -251,9 +251,6 @@ class GwElement:
         tools_gw.open_dialog(self.dlg_add_element, dlg_name='element', hide_config_widgets=True)
         return self.dlg_add_element
 
-    def open_element_dialog(self):
-        self.get_element()
-
     def get_element_dialog(self):
         return self.dlg_add_element
 
@@ -271,58 +268,108 @@ class GwElement:
 
 
     def manage_elements(self):
-        """ Button 34: Edit element """
+        """ Button 34: Edit element   
+            Fetches form configuration, dynamically populates widgets, and opens the dialog."""
 
-        # Create the dialog
-        self.dlg_man = GwElementManagerUi(self)
-        tools_gw.load_settings(self.dlg_man)
-        tools_qt.set_tableview_config(self.dlg_man.tbl_element, sectionResizeMode=0)
+        # Define the form type and create the body
+        form_type = "form_element"
+        body = tools_gw.create_body(form=f'"formName":"element_manager","formType":"{form_type}"')
 
-        # Adding auto-completion to a QLineEdit
-        table_object = "v_edit_element"
-        tools_gw.set_completer_object(self.dlg_man, table_object, field_id='element_id')
+        # Fetch dialog configuration from the database
+        json_result = tools_gw.execute_procedure('gw_fct_get_dialog', body)
 
-        # Populate custom context menu
-        self.dlg_man.tbl_element.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.dlg_man.tbl_element.customContextMenuRequested.connect(partial(self._show_context_menu, self.dlg_man.tbl_element))
+        # Check for a valid result
+        if not json_result or json_result.get("status") != "Accepted":
+            tools_qgis.show_message(f"Failed to fetch dialog configuration: ", 2, parameter=json_result)
+            return
+        self.complet_result = json_result
 
-        # Set a model with selected filter. Attach that model to selected table
-        message = tools_qt.fill_table(self.dlg_man.tbl_element, f"{self.schema_name}.{table_object}")
-        if message:
-            tools_qgis.show_warning(message)
-        tools_gw.set_tablemodel_config(self.dlg_man, self.dlg_man.tbl_element, table_object)
+        # Store the dialog as an instance variable to prevent garbage collection
+        self.dlg_mng = GwElementManagerUi(self)
+        tools_gw.load_settings(self.dlg_mng)
 
-        # Set signals
-        self.dlg_man.element_id.textChanged.connect(partial(
-            tools_qt.filter_by_id, self.dlg_man, self.dlg_man.tbl_element, self.dlg_man.element_id, table_object, "element_id"))
-        self.dlg_man.tbl_element.doubleClicked.connect(partial(
-            self._open_selected_object_element, self.dlg_man, self.dlg_man.tbl_element, table_object))
-        self.dlg_man.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_man))
-        self.dlg_man.rejected.connect(partial(tools_gw.close_dialog, self.dlg_man))
-        self.dlg_man.btn_delete.clicked.connect(partial(
-            tools_gw.delete_selected_rows, self.dlg_man.tbl_element, table_object))
-        self.dlg_man.btn_create.clicked.connect(partial(self.open_element_dialog))
+        # Populate the dialog with fields
+        self._populate_dynamic_widgets(self.dlg_mng, json_result)
+        self.load_connections(self.complet_result)     
 
-        # Open form
-        tools_gw.open_dialog(self.dlg_man, dlg_name='element_manager')
+        # Open the dialog
+        tools_gw.open_dialog(self.dlg_mng, dlg_name=form_type)
 
 
-    def _show_context_menu(self, qtableview, pos):
-        """ Show custom context menu """
-        menu = QMenu(qtableview)
+    def _populate_dynamic_widgets(self, dialog, complet_result):
+        """Creates and populates all widgets dynamically into the dialog layout."""
 
-        action_open = QAction("Open", qtableview)
-        action_open.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QTableView, qtableview.objectName(), pos))
-        menu.addAction(action_open)
+        # Retrieve the tablename from the JSON response if available
+        tablename = complet_result['body']['form'].get('tableName', 'default_table')
+        old_widget_pos = 0
+        layout_orientations = {}
+        layout_list = []
+        prev_layout = ""
 
-        action_delete = QAction("Delete", qtableview)
-        action_delete.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_delete"))
-        menu.addAction(action_delete)
+        for layout_name, layout_info in complet_result['body']['form']['layouts'].items():
+            orientation = layout_info.get('lytOrientation')
+            if orientation:
+                layout_orientations[layout_name] = orientation
+        
+        # Loop through fields and add them to the appropriate layouts
+        for field in complet_result['body']['data']['fields']:
+            # Skip hidden fields
+            if field.get('hidden'):
+                continue
+            
+            # Pass required parameters (dialog, result, field, tablename, class_info)            
+            label, widget = tools_gw.set_widgets(dialog, complet_result, field, tablename, self)
 
-        menu.exec(QCursor.pos())
+            if widget is None:
+                continue
+
+            layout = self.dlg_mng.findChild(QGridLayout, field['layoutname'])
+            if layout is not None:
+                orientation = layout_orientations.get(layout.objectName(), "vertical")
+                layout.setProperty('lytOrientation', orientation)
+                if layout.objectName() != prev_layout:
+                    prev_layout = layout.objectName()
+                # Take the QGridLayout with the intention of adding a QSpacerItem later
+                if layout not in layout_list and layout.objectName() in ('lyt_buttons', 'lyt_element_mng_1', 'lyt_element_mng_2'):
+                    layout_list.append(layout)
+
+                if field['layoutorder'] is None:
+                    message = "The field layoutorder is not configured for"
+                    msg = f"formname:form_element, columnname:{field['columnname']}"
+                    tools_qgis.show_message(message, 2, parameter=msg, dialog=self.dlg_mng)
+                    continue
+
+                # Populate dialog widgets using lytOrientation field
+                old_widget_pos = tools_gw.add_widget_combined(self.dlg_mng, field, label, widget, old_widget_pos)
+
+            elif field['layoutname'] != 'lyt_none':
+                message = "The field layoutname is not configured for"
+                msg = f"formname:form_element, columnname:{field['columnname']}"
+                tools_qgis.show_message(message, 2, parameter=msg, dialog=self.dlg_mng)
+
+            if isinstance(widget, QTableView):
+                # Populate custom context menu
+                widget.setContextMenuPolicy(Qt.CustomContextMenu)
+                widget.customContextMenuRequested.connect(partial(tools_gw._show_context_menu, widget, dialog))
 
 
-    # region private functions
+    def load_connections(self, complet_result):
+        list_tables = self.dlg_mng.findChildren(QTableView)
+        complet_list = []
+        for table in list_tables:
+            widgetname = table.objectName()
+            columnname = table.property('columnname')
+            if columnname is None:
+                msg = f"widget {widgetname} has not columnname and cant be configured"
+                tools_qgis.show_info(msg, 3)
+                continue
+            linkedobject = table.property('linkedobject')
+            complet_list, widget_list = tools_gw.fill_tbl(complet_result, self.dlg_mng, widgetname, linkedobject, '')
+            if complet_list is False:
+                return False
+            tools_gw.set_filter_listeners(complet_result, self.dlg_mng, widget_list, columnname, widgetname)
+
+    # region private functions    
 
     def _get_point_xy(self):
 
@@ -589,34 +636,7 @@ class GwElement:
                f" WHERE element_type = '{element_type}'"
                f" ORDER BY id")
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.dlg_add_element.elementcat_id, rows)
-
-
-    def _open_selected_object_element(self, dialog, widget, table_object):
-
-        # Check if there is a dlg_element already open
-        if hasattr(self, 'dlg_add_element') and self.dlg_add_element is not None and not isdeleted(self.dlg_add_element) and self.dlg_add_element.isVisible():
-            return
-
-        # Check if there are selected rows
-        selected_list = widget.selectionModel().selectedRows()
-        if len(selected_list) == 0:
-            message = "Any record selected"
-            tools_qgis.show_warning(message, dialog=dialog)
-            return
-
-        row = selected_list[0].row()
-
-        # Get object_id from selected row
-        field_object_id = "element_id"
-        selected_object_id = widget.model().record(row).value(field_object_id)
-
-        # Close this dialog and open selected object
-        keep_open_form = tools_gw.get_config_parser('dialogs_actions', 'element_manager_keep_open', "user", "init", prefix=True)
-        if tools_os.set_boolean(keep_open_form, False) is not True:
-            dialog.close()
-
-        self.get_element(new_element_id=False, selected_object_id=selected_object_id)
+        tools_qt.fill_combo_values(self.dlg_add_element.elementcat_id, rows)    
 
 
     def _check_date(self, widget, button=None, regex_type=1):
