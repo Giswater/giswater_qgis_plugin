@@ -602,15 +602,15 @@ class GwI18NGenerator:
 
             # Clause WHERE for each context
             if row['context'] == 'config_form_fields':
-                line += f'WHERE formname = \'{formname}\' AND formtype = \'{form_type}\' AND columnname = \'{source}\' '
+                line += f'WHERE formname = \'{formname}\' AND formtype = \'{form_type}\' AND columnname = \'{source}\''
             elif row['context'] == 'config_form_tabs':
-                line += f'WHERE formname = \'{formname}\' AND formtype = \'{form_type}\' AND columnname = \'{source}\' '
+                line += f'WHERE formname = \'{formname}\' AND formtype = \'{form_type}\' AND columnname = \'{source}\''
             elif row['context'] == 'config_form_groupbox':
-                line += f'WHERE formname = \'{formname}\' AND layout_if = \'{source}\' '
+                line += f'WHERE formname = \'{formname}\' AND layout_if = \'{source}\''
             elif row['context'] == 'config_typevalue':
-                line += f'WHERE id = \'{source}\' '
+                line += f'WHERE id = \'{source}\''
             elif row['context'] == 'config_param_system':
-                line += f'WHERE parameter = \'{source}\' '
+                line += f'WHERE parameter = \'{source}\''
             elif row['context'] == 'sys_param_user':
                 line += f'WHERE id = \'{source}\' '
 
@@ -650,9 +650,8 @@ class GwI18NGenerator:
                 if "\n" in ht_value:
                     ht_value = self._replace_invalid_characters(ht_value)
 
-
-            line = f'INSERT INTO {table} (id, error_message, hint_message, log_level, show_user, project_type, source) ' \
-                   f'VALUES ({source}, \'{ms_value}\', \'{ht_value}\', {log_level}, true, \'{project_type}\', \'core\');\n'
+            line = f'UPDATE {table} SET error_message = \'{ms_value}\', hint_message = \'{ht_value}\' '
+            line += f'WHERE id = {source} AND log_level = {log_level} AND project_type = \'{project_type}\';\n'
 
             file.write(line)
         file.close()
@@ -686,9 +685,8 @@ class GwI18NGenerator:
                 if "\n" in in_msg:
                     in_msg = self._replace_invalid_characters(in_msg)
 
-
-            line = f'INSERT INTO {table} (fid, except_msg, info_msg, show_user, project_type, source) ' \
-                   f'VALUES ({source}, \'{ex_msg}\', \'{in_msg}\', true, \'{project_type}\', \'core\');\n'
+            line = f'UPDATE {table} SET \"except_msg\" = \'{ex_msg}\', info_msg = \'{in_msg}\' '
+            line += f'WHERE fid = {source} AND project_type = \'{project_type}\';\n'
 
             file.write(line)
         file.close()
