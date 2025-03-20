@@ -2770,7 +2770,7 @@ class GwInfo(QObject):
             if rows is None:
                 cmb_visit_class.clear()
                 return
-            rows_int = [set(map(int, row)) for row in rows]
+            rows_int = [set(int(x) for x in row if x is not None) for row in rows]
             index_to_remove = []
             for i in range(cmb_visit_class.count() - 1, -1, -1):
                 visit_class_id = int(cmb_visit_class.itemData(i)[0])
@@ -2805,6 +2805,20 @@ class GwInfo(QObject):
         elif self.tab_main.widget(index_tab).objectName() == 'tab_plan' and not self.tab_plan_loaded:
             self._fill_tab_plan(self.complet_result)
             self.tab_plan_loaded = True
+
+
+    def _manage_gallery_status(self, tbl_visits, btn_open_gallery):
+
+        selected_indexes = tbl_visits.selectionModel().selectedRows()
+        
+        if selected_indexes:  
+            row = selected_indexes[0].row()
+            column_photo = tbl_visits.model().columnCount() - 1
+            index = tbl_visits.model().index(row, column_photo)
+            value = tbl_visits.model().data(index, Qt.DisplayRole)
+            btn_open_gallery.setEnabled(value in [True, "True", 1, "1"])
+        else:
+            btn_open_gallery.setEnabled(False)
 
 
     def _init_tab(self, complet_result, filter_fields='', id_name=None):
