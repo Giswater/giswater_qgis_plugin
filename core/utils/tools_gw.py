@@ -3215,7 +3215,7 @@ def zoom_to_feature_by_id(tablename: str, idname: str, _id, margin: float=15):
     if bbox:
         tools_qgis.zoom_to_rectangle(bbox.xMinimum() - margin, bbox.yMinimum() - margin, bbox.xMaximum() + margin, bbox.yMaximum() + margin)
 
-def selection_init(class_object, dialog, table_object, is_psector=False):
+def selection_init(class_object, dialog, table_object, is_psector=False, keep_drawing=False):
     """ Set canvas map tool to an instance of class 'GwSelectManager' """
 
     try:
@@ -3227,7 +3227,7 @@ def selection_init(class_object, dialog, table_object, is_psector=False):
     if class_object.feature_type in ('all', None):
         class_object.feature_type = 'arc'
 
-    select_manager = GwSelectManager(class_object, table_object, dialog, is_psector)
+    select_manager = GwSelectManager(class_object, table_object, dialog, is_psector, keep_drawing=keep_drawing)
     global_vars.canvas.setMapTool(select_manager)
     cursor = get_cursor_multiple_selection()
     global_vars.canvas.setCursor(cursor)

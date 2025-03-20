@@ -19,7 +19,7 @@ from qgis.core import QgsWkbTypes
 
 class GwSelectManager(QgsMapTool):
 
-    def __init__(self, class_object, table_object=None, dialog=None, is_psector=None, save_rectangle=False):
+    def __init__(self, class_object, table_object=None, dialog=None, is_psector=None, save_rectangle=False, keep_drawing=False):
         """
         :param table_object: Class where we will look for @layers, @feature_type, @list_ids, etc
         :param table_object: (String)
@@ -34,6 +34,7 @@ class GwSelectManager(QgsMapTool):
         self.dialog = dialog
         self.is_psector = is_psector
         self.save_rectangle = save_rectangle
+        self.keep_drawing = keep_drawing
 
         # Call superclass constructor and set current action
         QgsMapTool.__init__(self, self.canvas)
@@ -78,9 +79,6 @@ class GwSelectManager(QgsMapTool):
             self.rubber_band.hide()
             return
 
-        # Reconnect signal to enhance process
-        tools_qgis.disconnect_signal_selection_changed()
-        tools_gw.connect_signal_selection_changed(self.class_object, self.dialog, self.table_object, is_psector=self.is_psector)
         for i, layer in enumerate(self.class_object.layers[self.class_object.feature_type]):
             # Selection by rectangle
             if rectangle:
@@ -102,6 +100,13 @@ class GwSelectManager(QgsMapTool):
                     self.snapper_manager.get_snapped_feature(result, True)
 
         self.rubber_band.hide()
+        if self.keep_drawing:
+            global_vars.canvas.setMapTool(GwSelectManager(self.class_object, self.table_object, self.dialog, self.is_psector, keep_drawing=True))
+            return
+
+        # Reconnect signal to enhance process
+        tools_qgis.disconnect_signal_selection_changed()
+        tools_gw.connect_signal_selection_changed(self.class_object, self.dialog, self.table_object, is_psector=self.is_psector)
 
 
     def canvasMoveEvent(self, event):

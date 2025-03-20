@@ -434,6 +434,7 @@ class CalculatePriority:
 
         self.dlg_priority.executing = False
 
+        self.dlg_priority.btn_again.setVisible(False)
         # Open the dialog
         tools_gw.open_dialog(
             self.dlg_priority,
@@ -452,17 +453,15 @@ class CalculatePriority:
     def _calculate_ended(self):
         dlg = self.dlg_priority
 
-        dlg.buttonBox.rejected.disconnect()
-        dlg.buttonBox.rejected.connect(dlg.reject)
-        btn_ok = dlg.buttonBox.button(dlg.buttonBox.StandardButton.Ok)
+        dlg.btn_again.setVisible(True)
 
-        # Check if thread is finished
+        # Check if thread is finished wuih success
         if hasattr(self.thread, "df"):
             # Button OK behavior
-            tools_qt.set_widget_text(dlg, btn_ok, "Next")
-            dlg.btn_save2file.setEnabled(True)
+           tools_qt.set_widget_text(dlg, dlg.btn_again, "Next")
+           dlg.btn_save2file.setEnabled(True)
         else:
-            tools_qt.set_widget_text(dlg, btn_ok, "Try again")
+            tools_qt.set_widget_text(dlg, dlg.btn_again, "Try again")
         dlg.executing = False
         self.timer.stop()
 
@@ -816,15 +815,12 @@ class CalculatePriority:
 
         # Log behavior
         t.report.connect(
-            partial(tools_gw.fill_tab_log, dlg, reset_text=False, close=False, call_set_tabs_enabled=False)
+            partial(tools_gw.fill_tab_log, dlg, reset_text=False, close=False)
         )
 
         # Progress bar behavior
         t.progressChanged.connect(lambda value: dlg.progressBar.setValue(int(value)))
 
-        # Button Cancel behavior
-        dlg.buttonBox.rejected.disconnect()
-        dlg.buttonBox.rejected.connect(partial(self._cancel_thread, dlg))
 
         #dlg.executing = True
         QgsApplication.taskManager().addTask(t)
@@ -861,7 +857,7 @@ class CalculatePriority:
             # show warning
             tools_gw.show_warning("For select on canvas is mandatory to load v_asset_arc_input layer", dialog=self.dlg_priority)
             return
-        tools_gw.selection_init(self, self.dlg_priority, self.layer_to_work)
+        tools_gw.selection_init(self, self.dlg_priority, self.layer_to_work, keep_drawing=True)
 
     def old_manage_btn_snapping(self):
         """Fill btn_snapping QMenu"""
@@ -943,9 +939,9 @@ class CalculatePriority:
 
     def _set_signals(self):
         dlg = self.dlg_priority
-        dlg.buttonBox.accepted.connect(self._manage_calculate)
-        dlg.buttonBox.rejected.connect(partial(tools_gw.close_dialog, dlg))
-        dlg.rejected.connect(partial(tools_gw.close_dialog, dlg))
+        dlg.btn_accept.clicked.connect(self._manage_calculate)
+        dlg.btn_again.clicked.connect(self._go_first_tab)
+        dlg.btn_close.clicked.connect(self.close_dlg)
         dlg.btn_save2file.clicked.connect(self._save2file)
         dlg.cmb_expl_selection.currentIndexChanged.connect(partial(self._load_presszone))
         dlg.cmb_presszone.currentIndexChanged.connect(partial(self._load_diameter))
@@ -973,6 +969,23 @@ class CalculatePriority:
             widget.textChanged.connect(
                 partial(self._update_total_weight, "lyt_engine_2")
             )
+
+    def close_dlg(self):
+        """ Close dialog """
+        tools_qgis.disconnect_signal_selection_changed()
+        tools_gw.close_dialog(self.dlg_priority)
+
+    def _go_first_tab(self):
+        # Reset tab
+        dlg = self.dlg_priority
+        tools_gw.disable_tab_log(dlg)
+
+        # Enable first tab
+        dlg.mainTab.setTabEnabled(0, True)
+
+        # Reset buttons
+        dlg.btn_accept.setVisible(True)
+        dlg.btn_again.setVisible(False)
 
     def _manage_qtw_row(self, dialog, widget, action):
         if action == "add":
