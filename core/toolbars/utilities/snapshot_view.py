@@ -70,10 +70,7 @@ class GwSnapshotViewButton(GwAction):
         # Hide gully checkbox if project type is not UD
         if self.project_type != 'ud':
             self.dlg_snapshot_view.findChild(QCheckBox, "tab_none_chk_gully").hide()
-            self.dlg_snapshot_view.findChild(QLabel, "lbl_tab_none_chk_gully").hide()
-
-        # Add icons
-        tools_gw.add_icon(self.btn_coordinate_actions, "999")
+            self.dlg_snapshot_view.findChild(QLabel, "lbl_tab_none_chk_gully").setStyleSheet("color: transparent;")
 
         # Open form
         tools_gw.open_dialog(self.dlg_snapshot_view, 'snapshot_view')

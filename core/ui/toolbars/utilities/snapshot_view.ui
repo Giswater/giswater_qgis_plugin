@@ -6,17 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>383</width>
-    <height>178</height>
+    <width>343</width>
+    <height>284</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Audit</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_2">
-   <item row="1" column="0" colspan="2">
-    <layout class="QGridLayout" name="lyt_snapshot_view_2"/>
-   </item>
    <item row="2" column="0">
     <layout class="QGridLayout" name="lyt_snapshot_view_3">
      <property name="topMargin">
@@ -24,14 +21,17 @@
      </property>
     </layout>
    </item>
-   <item row="2" column="1">
-    <layout class="QGridLayout" name="lyt_snapshot_view_4"/>
+   <item row="1" column="0" colspan="2">
+    <layout class="QGridLayout" name="lyt_snapshot_view_2"/>
    </item>
    <item row="3" column="0" colspan="2">
     <layout class="QGridLayout" name="lyt_buttons"/>
    </item>
    <item row="0" column="0" colspan="2">
     <layout class="QGridLayout" name="lyt_snapshot_view_1"/>
+   </item>
+   <item row="2" column="1">
+    <layout class="QGridLayout" name="lyt_snapshot_view_4"/>
    </item>
   </layout>
  </widget>
