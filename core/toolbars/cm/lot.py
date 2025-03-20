@@ -34,7 +34,6 @@ from ...ui.ui_manager import WorkManagementUi
 from ...ui.ui_manager import ResourcesManagementUi
 from ...ui.ui_manager import TeamManagemenUi
 from ...ui.ui_manager import TeamCreateUi
-from ...ui.ui_manager import VehicleCreateUi
 from .... import global_vars
 
 from ....libs import lib_vars, tools_qgis, tools_qt, tools_db, tools_pgdao, tools_log
