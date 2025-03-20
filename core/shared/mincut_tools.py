@@ -382,6 +382,7 @@ def open_mincut(**kwargs):
     table = kwargs['qtable']
 
     dlg_mincut = GwMincutUi(class_obj)
+    tools_gw.load_missing_layers('v_om_mincut%', "OM", "Mincut")
     selected_list = table.selectionModel().selectedRows()
     if len(selected_list) == 0:
         message = "Any record selected"
