@@ -29,7 +29,7 @@ BEGIN
 
 	FOR table_record IN SELECT * FROM sys_table WHERE isaudit  IS TRUE
 	LOOP
-		IF table_record.id ilike 've_%' THEN
+		IF table_record.id ilike 've_%' OR table_record.id ilike 'v_e%' THEN
 			EXECUTE 'DROP TRIGGER IF EXISTS gw_trg_audit'||table_record.id||' ON '||table_record.id;
 			IF p_action='enable' THEN
 				EXECUTE 'CREATE TRIGGER gw_trg_audit'||table_record.id||' INSTEAD OF INSERT OR UPDATE OR DELETE ON '||v_schemaname||'.'
