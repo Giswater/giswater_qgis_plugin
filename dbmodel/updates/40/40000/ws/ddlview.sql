@@ -1563,6 +1563,12 @@ AS SELECT d.dqa_id,
   WHERE selector_expl.expl_id = ANY(d.expl_id) AND selector_expl.cur_user = "current_user"()::text OR d.expl_id IS NULL
   ORDER BY d.dqa_id;
 
+DROP VIEW IF EXISTS v_state_element;
+CREATE OR REPLACE VIEW v_state_element AS
+ SELECT element.element_id
+   FROM selector_state,
+    element
+  WHERE ((element.state = selector_state.state_id) AND (selector_state.cur_user = CURRENT_USER));
 
 CREATE OR REPLACE VIEW v_edit_element AS
 SELECT e.* FROM ( SELECT element.element_id,
@@ -6502,3 +6508,648 @@ AS SELECT DISTINCT ON (rpt_cat_result.result_id) rpt_cat_result.result_id,
   WHERE t1.typevalue::text = 'inp_result_status'::text AND t2.typevalue::text = 'inp_options_networkmode'::text
   AND ((s.expl_id = ANY (rpt_cat_result.expl_id)) AND s.cur_user = CURRENT_USER OR rpt_cat_result.expl_id = ARRAY[NULL]::INTEGER[]);
 
+
+--17/03/2025
+DROP VIEW IF EXISTS v_price_x_arc;
+CREATE VIEW v_price_x_arc AS
+ SELECT arc.arc_id,
+    cat_arc.id AS catalog_id,
+    v_price_compost.id AS price_id,
+    v_price_compost.unit,
+    v_price_compost.descript,
+    v_price_compost.price AS cost,
+    'element'::text AS identif
+   FROM ((arc
+     JOIN cat_arc ON (((cat_arc.id)::text = (arc.arccat_id)::text)))
+     JOIN v_price_compost ON (((cat_arc.cost)::text = (v_price_compost.id)::text)))
+UNION
+ SELECT arc.arc_id,
+    cat_arc.id AS catalog_id,
+    v_price_compost.id AS price_id,
+    v_price_compost.unit,
+    v_price_compost.descript,
+    v_price_compost.price AS cost,
+    'm2bottom'::text AS identif
+   FROM ((arc
+     JOIN cat_arc ON (((cat_arc.id)::text = (arc.arccat_id)::text)))
+     JOIN v_price_compost ON (((cat_arc.m2bottom_cost)::text = (v_price_compost.id)::text)))
+UNION
+ SELECT arc.arc_id,
+    cat_arc.id AS catalog_id,
+    v_price_compost.id AS price_id,
+    v_price_compost.unit,
+    v_price_compost.descript,
+    v_price_compost.price AS cost,
+    'm3protec'::text AS identif
+   FROM ((arc
+     JOIN cat_arc ON (((cat_arc.id)::text = (arc.arccat_id)::text)))
+     JOIN v_price_compost ON (((cat_arc.m3protec_cost)::text = (v_price_compost.id)::text)))
+UNION
+ SELECT arc.arc_id,
+    cat_soil.id AS catalog_id,
+    v_price_compost.id AS price_id,
+    v_price_compost.unit,
+    v_price_compost.descript,
+    v_price_compost.price AS cost,
+    'm3exc'::text AS identif
+   FROM ((arc
+     JOIN cat_soil ON (((cat_soil.id)::text = (arc.soilcat_id)::text)))
+     JOIN v_price_compost ON (((cat_soil.m3exc_cost)::text = (v_price_compost.id)::text)))
+UNION
+ SELECT arc.arc_id,
+    cat_soil.id AS catalog_id,
+    v_price_compost.id AS price_id,
+    v_price_compost.unit,
+    v_price_compost.descript,
+    v_price_compost.price AS cost,
+    'm3fill'::text AS identif
+   FROM ((arc
+     JOIN cat_soil ON (((cat_soil.id)::text = (arc.soilcat_id)::text)))
+     JOIN v_price_compost ON (((cat_soil.m3fill_cost)::text = (v_price_compost.id)::text)))
+UNION
+ SELECT arc.arc_id,
+    cat_soil.id AS catalog_id,
+    v_price_compost.id AS price_id,
+    v_price_compost.unit,
+    v_price_compost.descript,
+    v_price_compost.price AS cost,
+    'm3excess'::text AS identif
+   FROM ((arc
+     JOIN cat_soil ON (((cat_soil.id)::text = (arc.soilcat_id)::text)))
+     JOIN v_price_compost ON (((cat_soil.m3excess_cost)::text = (v_price_compost.id)::text)))
+UNION
+ SELECT arc.arc_id,
+    cat_soil.id AS catalog_id,
+    v_price_compost.id AS price_id,
+    v_price_compost.unit,
+    v_price_compost.descript,
+    v_price_compost.price AS cost,
+    'm2trenchl'::text AS identif
+   FROM ((arc
+     JOIN cat_soil ON (((cat_soil.id)::text = (arc.soilcat_id)::text)))
+     JOIN v_price_compost ON (((cat_soil.m2trenchl_cost)::text = (v_price_compost.id)::text)))
+UNION
+ SELECT arc.arc_id,
+    cat_pavement.id AS catalog_id,
+    v_price_compost.id AS price_id,
+    v_price_compost.unit,
+    v_price_compost.descript,
+    v_price_compost.price AS cost,
+    'pavement'::text AS identif
+   FROM (((arc
+     JOIN plan_arc_x_pavement ON (((plan_arc_x_pavement.arc_id)::text = (arc.arc_id)::text)))
+     JOIN cat_pavement ON (((cat_pavement.id)::text = (plan_arc_x_pavement.pavcat_id)::text)))
+     JOIN v_price_compost ON (((cat_pavement.m2_cost)::text = (v_price_compost.id)::text)))
+  ORDER BY 1, 2;
+
+CREATE OR REPLACE VIEW v_ui_event_x_arc
+AS SELECT om_visit_event.id AS event_id,
+    om_visit.id AS visit_id,
+    om_visit.ext_code AS code,
+    om_visit.visitcat_id,
+    om_visit.startdate AS visit_start,
+    om_visit.enddate AS visit_end,
+    om_visit.user_name,
+    om_visit.is_done,
+    om_visit.class_id as visit_class,
+    date_trunc('second'::text, om_visit_event.tstamp) AS tstamp,
+    om_visit_x_arc.arc_id,
+    om_visit_event.parameter_id,
+    config_visit_parameter.parameter_type,
+    config_visit_parameter.feature_type,
+    config_visit_parameter.form_type,
+    config_visit_parameter.descript,
+    om_visit_event.value,
+    om_visit_event.xcoord,
+    om_visit_event.ycoord,
+    om_visit_event.compass,
+    om_visit_event.event_code,
+        CASE
+            WHEN a.event_id IS NULL THEN false
+            ELSE true
+        END AS gallery,
+        CASE
+            WHEN b.visit_id IS NULL THEN false
+            ELSE true
+        END AS document
+   FROM om_visit
+     JOIN om_visit_event ON om_visit.id = om_visit_event.visit_id
+     JOIN om_visit_x_arc ON om_visit_x_arc.visit_id = om_visit.id
+     LEFT JOIN config_visit_parameter ON config_visit_parameter.id::text = om_visit_event.parameter_id::text
+     JOIN arc ON arc.arc_id::text = om_visit_x_arc.arc_id::text
+     LEFT JOIN ( SELECT DISTINCT om_visit_event_photo.event_id
+           FROM om_visit_event_photo) a ON a.event_id = om_visit_event.id
+     LEFT JOIN ( SELECT DISTINCT doc_x_visit.visit_id
+           FROM doc_x_visit) b ON b.visit_id = om_visit.id
+  ORDER BY om_visit_x_arc.arc_id;
+
+CREATE OR REPLACE VIEW v_ui_om_visit_x_arc AS 
+ SELECT om_visit_event.id AS event_id,
+    om_visit.id AS visit_id,
+    om_visit.ext_code AS code,
+    om_visit.visitcat_id,
+    om_visit.startdate AS visit_start,
+    om_visit.enddate AS visit_end,
+    om_visit.user_name,
+    om_visit.is_done,
+    date_trunc('second'::text, om_visit_event.tstamp) AS tstamp,
+    om_visit_x_arc.arc_id,
+    om_visit_event.parameter_id,
+    config_visit_parameter.parameter_type,
+    config_visit_parameter.feature_type,
+    config_visit_parameter.form_type,
+    config_visit_parameter.descript,
+    om_visit_event.value,
+    om_visit_event.xcoord,
+    om_visit_event.ycoord,
+    om_visit_event.compass,
+    om_visit_event.event_code,
+        CASE
+            WHEN a.event_id IS NULL THEN false
+            ELSE true
+        END AS gallery,
+        CASE
+            WHEN b.visit_id IS NULL THEN false
+            ELSE true
+        END AS document,
+    om_visit.class_id
+   FROM om_visit
+     JOIN om_visit_event ON om_visit.id = om_visit_event.visit_id
+     JOIN om_visit_x_arc ON om_visit_x_arc.visit_id = om_visit.id
+     LEFT JOIN config_visit_parameter ON config_visit_parameter.id::text = om_visit_event.parameter_id::text
+     JOIN arc ON arc.arc_id::text = om_visit_x_arc.arc_id::text
+     LEFT JOIN ( SELECT DISTINCT om_visit_event_photo.event_id
+           FROM om_visit_event_photo) a ON a.event_id = om_visit_event.id
+     LEFT JOIN ( SELECT DISTINCT doc_x_visit.visit_id
+           FROM doc_x_visit) b ON b.visit_id = om_visit.id
+  ORDER BY om_visit_x_arc.arc_id;
+
+CREATE OR REPLACE VIEW v_expl_connec
+AS SELECT connec.connec_id
+   FROM selector_expl,
+    connec
+  WHERE selector_expl.cur_user = "current_user"()::text AND connec.expl_id = selector_expl.expl_id;
+
+CREATE OR REPLACE VIEW v_inp_pjointpattern
+AS SELECT row_number() OVER (ORDER BY a.pattern_id, idrow) AS id,
+    idrow,
+        CASE
+            WHEN pjoint_type::text = 'VNODE'::text THEN concat('VN', pattern_id)::character varying
+            ELSE pattern_id
+        END AS pattern_id,
+    pjoint_type,
+    sum(factor_1)::numeric(10,8) AS factor_1,
+    sum(factor_2)::numeric(10,8) AS factor_2,
+    sum(factor_3)::numeric(10,8) AS factor_3,
+    sum(factor_4)::numeric(10,8) AS factor_4,
+    sum(factor_5)::numeric(10,8) AS factor_5,
+    sum(factor_6)::numeric(10,8) AS factor_6,
+    sum(factor_7)::numeric(10,8) AS factor_7,
+    sum(factor_8)::numeric(10,8) AS factor_8,
+    sum(factor_9)::numeric(10,8) AS factor_9,
+    sum(factor_10)::numeric(10,8) AS factor_10,
+    sum(factor_11)::numeric(10,8) AS factor_11,
+    sum(factor_12)::numeric(10,8) AS factor_12,
+    sum(factor_13)::numeric(10,8) AS factor_13,
+    sum(factor_14)::numeric(10,8) AS factor_14,
+    sum(factor_15)::numeric(10,8) AS factor_15,
+    sum(factor_16)::numeric(10,8) AS factor_16,
+    sum(factor_17)::numeric(10,8) AS factor_17,
+    sum(factor_18)::numeric(10,8) AS factor_18
+   FROM ( SELECT c.pjoint_type,
+                CASE
+                    WHEN b.id = (( SELECT min(sub.id) AS min
+                       FROM inp_pattern_value sub
+                      WHERE sub.pattern_id::text = b.pattern_id::text)) THEN 1
+                    WHEN b.id = (( SELECT min(sub.id) + 1
+                       FROM inp_pattern_value sub
+                      WHERE sub.pattern_id::text = b.pattern_id::text)) THEN 2
+                    WHEN b.id = (( SELECT min(sub.id) + 2
+                       FROM inp_pattern_value sub
+                      WHERE sub.pattern_id::text = b.pattern_id::text)) THEN 3
+                    WHEN b.id = (( SELECT min(sub.id) + 3
+                       FROM inp_pattern_value sub
+                      WHERE sub.pattern_id::text = b.pattern_id::text)) THEN 4
+                    WHEN b.id = (( SELECT min(sub.id) + 4
+                       FROM inp_pattern_value sub
+                      WHERE sub.pattern_id::text = b.pattern_id::text)) THEN 5
+                    WHEN b.id = (( SELECT min(sub.id) + 5
+                       FROM inp_pattern_value sub
+                      WHERE sub.pattern_id::text = b.pattern_id::text)) THEN 6
+                    WHEN b.id = (( SELECT min(sub.id) + 6
+                       FROM inp_pattern_value sub
+                      WHERE sub.pattern_id::text = b.pattern_id::text)) THEN 7
+                    WHEN b.id = (( SELECT min(sub.id) + 7
+                       FROM inp_pattern_value sub
+                      WHERE sub.pattern_id::text = b.pattern_id::text)) THEN 8
+                    WHEN b.id = (( SELECT min(sub.id) + 8
+                       FROM inp_pattern_value sub
+                      WHERE sub.pattern_id::text = b.pattern_id::text)) THEN 9
+                    WHEN b.id = (( SELECT min(sub.id) + 9
+                       FROM inp_pattern_value sub
+                      WHERE sub.pattern_id::text = b.pattern_id::text)) THEN 10
+                    WHEN b.id = (( SELECT min(sub.id) + 10
+                       FROM inp_pattern_value sub
+                      WHERE sub.pattern_id::text = b.pattern_id::text)) THEN 11
+                    WHEN b.id = (( SELECT min(sub.id) + 11
+                       FROM inp_pattern_value sub
+                      WHERE sub.pattern_id::text = b.pattern_id::text)) THEN 12
+                    WHEN b.id = (( SELECT min(sub.id) + 12
+                       FROM inp_pattern_value sub
+                      WHERE sub.pattern_id::text = b.pattern_id::text)) THEN 13
+                    WHEN b.id = (( SELECT min(sub.id) + 13
+                       FROM inp_pattern_value sub
+                      WHERE sub.pattern_id::text = b.pattern_id::text)) THEN 14
+                    WHEN b.id = (( SELECT min(sub.id) + 14
+                       FROM inp_pattern_value sub
+                      WHERE sub.pattern_id::text = b.pattern_id::text)) THEN 15
+                    WHEN b.id = (( SELECT min(sub.id) + 15
+                       FROM inp_pattern_value sub
+                      WHERE sub.pattern_id::text = b.pattern_id::text)) THEN 16
+                    WHEN b.id = (( SELECT min(sub.id) + 16
+                       FROM inp_pattern_value sub
+                      WHERE sub.pattern_id::text = b.pattern_id::text)) THEN 17
+                    WHEN b.id = (( SELECT min(sub.id) + 17
+                       FROM inp_pattern_value sub
+                      WHERE sub.pattern_id::text = b.pattern_id::text)) THEN 18
+                    WHEN b.id = (( SELECT min(sub.id) + 18
+                       FROM inp_pattern_value sub
+                      WHERE sub.pattern_id::text = b.pattern_id::text)) THEN 19
+                    WHEN b.id = (( SELECT min(sub.id) + 19
+                       FROM inp_pattern_value sub
+                      WHERE sub.pattern_id::text = b.pattern_id::text)) THEN 20
+                    WHEN b.id = (( SELECT min(sub.id) + 20
+                       FROM inp_pattern_value sub
+                      WHERE sub.pattern_id::text = b.pattern_id::text)) THEN 21
+                    WHEN b.id = (( SELECT min(sub.id) + 21
+                       FROM inp_pattern_value sub
+                      WHERE sub.pattern_id::text = b.pattern_id::text)) THEN 22
+                    WHEN b.id = (( SELECT min(sub.id) + 22
+                       FROM inp_pattern_value sub
+                      WHERE sub.pattern_id::text = b.pattern_id::text)) THEN 23
+                    WHEN b.id = (( SELECT min(sub.id) + 23
+                       FROM inp_pattern_value sub
+                      WHERE sub.pattern_id::text = b.pattern_id::text)) THEN 24
+                    WHEN b.id = (( SELECT min(sub.id) + 24
+                       FROM inp_pattern_value sub
+                      WHERE sub.pattern_id::text = b.pattern_id::text)) THEN 25
+                    WHEN b.id = (( SELECT min(sub.id) + 25
+                       FROM inp_pattern_value sub
+                      WHERE sub.pattern_id::text = b.pattern_id::text)) THEN 26
+                    WHEN b.id = (( SELECT min(sub.id) + 26
+                       FROM inp_pattern_value sub
+                      WHERE sub.pattern_id::text = b.pattern_id::text)) THEN 27
+                    WHEN b.id = (( SELECT min(sub.id) + 27
+                       FROM inp_pattern_value sub
+                      WHERE sub.pattern_id::text = b.pattern_id::text)) THEN 28
+                    WHEN b.id = (( SELECT min(sub.id) + 28
+                       FROM inp_pattern_value sub
+                      WHERE sub.pattern_id::text = b.pattern_id::text)) THEN 29
+                    WHEN b.id = (( SELECT min(sub.id) + 29
+                       FROM inp_pattern_value sub
+                      WHERE sub.pattern_id::text = b.pattern_id::text)) THEN 30
+                    ELSE NULL::integer
+                END AS idrow,
+            c.pjoint_id AS pattern_id,
+            sum(c.demand::double precision * b.factor_1::double precision) AS factor_1,
+            sum(c.demand::double precision * b.factor_2::double precision) AS factor_2,
+            sum(c.demand::double precision * b.factor_3::double precision) AS factor_3,
+            sum(c.demand::double precision * b.factor_4::double precision) AS factor_4,
+            sum(c.demand::double precision * b.factor_5::double precision) AS factor_5,
+            sum(c.demand::double precision * b.factor_6::double precision) AS factor_6,
+            sum(c.demand::double precision * b.factor_7::double precision) AS factor_7,
+            sum(c.demand::double precision * b.factor_8::double precision) AS factor_8,
+            sum(c.demand::double precision * b.factor_9::double precision) AS factor_9,
+            sum(c.demand::double precision * b.factor_10::double precision) AS factor_10,
+            sum(c.demand::double precision * b.factor_11::double precision) AS factor_11,
+            sum(c.demand::double precision * b.factor_12::double precision) AS factor_12,
+            sum(c.demand::double precision * b.factor_13::double precision) AS factor_13,
+            sum(c.demand::double precision * b.factor_14::double precision) AS factor_14,
+            sum(c.demand::double precision * b.factor_15::double precision) AS factor_15,
+            sum(c.demand::double precision * b.factor_16::double precision) AS factor_16,
+            sum(c.demand::double precision * b.factor_17::double precision) AS factor_17,
+            sum(c.demand::double precision * b.factor_18::double precision) AS factor_18
+           FROM ( SELECT inp_connec.connec_id,
+                    inp_connec.demand,
+                    inp_connec.pattern_id,
+                    connec.pjoint_id,
+                    connec.pjoint_type
+                   FROM inp_connec
+                     JOIN connec USING (connec_id)) c
+             JOIN inp_pattern_value b USING (pattern_id)
+          GROUP BY c.pjoint_type, c.pjoint_id, (
+                CASE
+                    WHEN b.id = (( SELECT min(sub.id) AS min
+                       FROM inp_pattern_value sub
+                      WHERE sub.pattern_id::text = b.pattern_id::text)) THEN 1
+                    WHEN b.id = (( SELECT min(sub.id) + 1
+                       FROM inp_pattern_value sub
+                      WHERE sub.pattern_id::text = b.pattern_id::text)) THEN 2
+                    WHEN b.id = (( SELECT min(sub.id) + 2
+                       FROM inp_pattern_value sub
+                      WHERE sub.pattern_id::text = b.pattern_id::text)) THEN 3
+                    WHEN b.id = (( SELECT min(sub.id) + 3
+                       FROM inp_pattern_value sub
+                      WHERE sub.pattern_id::text = b.pattern_id::text)) THEN 4
+                    WHEN b.id = (( SELECT min(sub.id) + 4
+                       FROM inp_pattern_value sub
+                      WHERE sub.pattern_id::text = b.pattern_id::text)) THEN 5
+                    WHEN b.id = (( SELECT min(sub.id) + 5
+                       FROM inp_pattern_value sub
+                      WHERE sub.pattern_id::text = b.pattern_id::text)) THEN 6
+                    WHEN b.id = (( SELECT min(sub.id) + 6
+                       FROM inp_pattern_value sub
+                      WHERE sub.pattern_id::text = b.pattern_id::text)) THEN 7
+                    WHEN b.id = (( SELECT min(sub.id) + 7
+                       FROM inp_pattern_value sub
+                      WHERE sub.pattern_id::text = b.pattern_id::text)) THEN 8
+                    WHEN b.id = (( SELECT min(sub.id) + 8
+                       FROM inp_pattern_value sub
+                      WHERE sub.pattern_id::text = b.pattern_id::text)) THEN 9
+                    WHEN b.id = (( SELECT min(sub.id) + 9
+                       FROM inp_pattern_value sub
+                      WHERE sub.pattern_id::text = b.pattern_id::text)) THEN 10
+                    WHEN b.id = (( SELECT min(sub.id) + 10
+                       FROM inp_pattern_value sub
+                      WHERE sub.pattern_id::text = b.pattern_id::text)) THEN 11
+                    WHEN b.id = (( SELECT min(sub.id) + 11
+                       FROM inp_pattern_value sub
+                      WHERE sub.pattern_id::text = b.pattern_id::text)) THEN 12
+                    WHEN b.id = (( SELECT min(sub.id) + 12
+                       FROM inp_pattern_value sub
+                      WHERE sub.pattern_id::text = b.pattern_id::text)) THEN 13
+                    WHEN b.id = (( SELECT min(sub.id) + 13
+                       FROM inp_pattern_value sub
+                      WHERE sub.pattern_id::text = b.pattern_id::text)) THEN 14
+                    WHEN b.id = (( SELECT min(sub.id) + 14
+                       FROM inp_pattern_value sub
+                      WHERE sub.pattern_id::text = b.pattern_id::text)) THEN 15
+                    WHEN b.id = (( SELECT min(sub.id) + 15
+                       FROM inp_pattern_value sub
+                      WHERE sub.pattern_id::text = b.pattern_id::text)) THEN 16
+                    WHEN b.id = (( SELECT min(sub.id) + 16
+                       FROM inp_pattern_value sub
+                      WHERE sub.pattern_id::text = b.pattern_id::text)) THEN 17
+                    WHEN b.id = (( SELECT min(sub.id) + 17
+                       FROM inp_pattern_value sub
+                      WHERE sub.pattern_id::text = b.pattern_id::text)) THEN 18
+                    WHEN b.id = (( SELECT min(sub.id) + 18
+                       FROM inp_pattern_value sub
+                      WHERE sub.pattern_id::text = b.pattern_id::text)) THEN 19
+                    WHEN b.id = (( SELECT min(sub.id) + 19
+                       FROM inp_pattern_value sub
+                      WHERE sub.pattern_id::text = b.pattern_id::text)) THEN 20
+                    WHEN b.id = (( SELECT min(sub.id) + 20
+                       FROM inp_pattern_value sub
+                      WHERE sub.pattern_id::text = b.pattern_id::text)) THEN 21
+                    WHEN b.id = (( SELECT min(sub.id) + 21
+                       FROM inp_pattern_value sub
+                      WHERE sub.pattern_id::text = b.pattern_id::text)) THEN 22
+                    WHEN b.id = (( SELECT min(sub.id) + 22
+                       FROM inp_pattern_value sub
+                      WHERE sub.pattern_id::text = b.pattern_id::text)) THEN 23
+                    WHEN b.id = (( SELECT min(sub.id) + 23
+                       FROM inp_pattern_value sub
+                      WHERE sub.pattern_id::text = b.pattern_id::text)) THEN 24
+                    WHEN b.id = (( SELECT min(sub.id) + 24
+                       FROM inp_pattern_value sub
+                      WHERE sub.pattern_id::text = b.pattern_id::text)) THEN 25
+                    WHEN b.id = (( SELECT min(sub.id) + 25
+                       FROM inp_pattern_value sub
+                      WHERE sub.pattern_id::text = b.pattern_id::text)) THEN 26
+                    WHEN b.id = (( SELECT min(sub.id) + 26
+                       FROM inp_pattern_value sub
+                      WHERE sub.pattern_id::text = b.pattern_id::text)) THEN 27
+                    WHEN b.id = (( SELECT min(sub.id) + 27
+                       FROM inp_pattern_value sub
+                      WHERE sub.pattern_id::text = b.pattern_id::text)) THEN 28
+                    WHEN b.id = (( SELECT min(sub.id) + 28
+                       FROM inp_pattern_value sub
+                      WHERE sub.pattern_id::text = b.pattern_id::text)) THEN 29
+                    WHEN b.id = (( SELECT min(sub.id) + 29
+                       FROM inp_pattern_value sub
+                      WHERE sub.pattern_id::text = b.pattern_id::text)) THEN 30
+                    ELSE NULL::integer
+                END)) a
+  GROUP BY idrow, pattern_id, pjoint_type;
+
+CREATE OR REPLACE VIEW v_plan_psector_link
+AS SELECT row_number() OVER () AS rid,
+    link.link_id,
+    plan_psector_x_connec.psector_id,
+    connec.connec_id,
+    connec.state AS original_state,
+    connec.state_type AS original_state_type,
+    plan_psector_x_connec.state AS plan_state,
+    plan_psector_x_connec.doable,
+    link.the_geom
+   FROM selector_psector,
+    connec
+     JOIN plan_psector_x_connec USING (connec_id)
+     JOIN link ON link.feature_id::text = connec.connec_id::text
+  WHERE plan_psector_x_connec.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text;
+
+
+CREATE OR REPLACE VIEW v_rtc_hydrometer_x_connec
+AS SELECT ext_rtc_hydrometer.id::text AS hydrometer_id,
+    ext_rtc_hydrometer.code AS hydrometer_customer_code,
+        CASE
+            WHEN connec.connec_id IS NULL THEN 'XXXX'::character varying
+            ELSE connec.connec_id
+        END AS connec_id,
+        CASE
+            WHEN ext_rtc_hydrometer.connec_id::text IS NULL THEN 'XXXX'::text
+            ELSE ext_rtc_hydrometer.connec_id::text
+        END AS connec_customer_code,
+    ext_rtc_hydrometer_state.name AS state,
+    ext_municipality.name AS muni_name,
+    connec.expl_id,
+    exploitation.name AS expl_name,
+    ext_rtc_hydrometer.plot_code,
+    ext_rtc_hydrometer.priority_id,
+    ext_rtc_hydrometer.catalog_id,
+    ext_rtc_hydrometer.category_id,
+    ext_rtc_hydrometer.hydro_number,
+    ext_rtc_hydrometer.hydro_man_date,
+    ext_rtc_hydrometer.crm_number,
+    ext_rtc_hydrometer.customer_name,
+    ext_rtc_hydrometer.address1,
+    ext_rtc_hydrometer.address2,
+    ext_rtc_hydrometer.address3,
+    ext_rtc_hydrometer.address2_1,
+    ext_rtc_hydrometer.address2_2,
+    ext_rtc_hydrometer.address2_3,
+    ext_rtc_hydrometer.m3_volume,
+    ext_rtc_hydrometer.start_date,
+    ext_rtc_hydrometer.end_date,
+    ext_rtc_hydrometer.update_date,
+        CASE
+            WHEN (( SELECT config_param_system.value
+               FROM config_param_system
+              WHERE config_param_system.parameter::text = 'edit_hydro_link_absolute_path'::text)) IS NULL THEN rtc_hydrometer.link
+            ELSE concat(( SELECT config_param_system.value
+               FROM config_param_system
+              WHERE config_param_system.parameter::text = 'edit_hydro_link_absolute_path'::text), rtc_hydrometer.link)
+        END AS hydrometer_link,
+    ext_rtc_hydrometer_state.is_operative,
+    ext_rtc_hydrometer.shutdown_date
+   FROM selector_hydrometer,
+    selector_expl,
+    rtc_hydrometer
+     LEFT JOIN ext_rtc_hydrometer ON ext_rtc_hydrometer.id::text = rtc_hydrometer.hydrometer_id::text
+     JOIN ext_rtc_hydrometer_state ON ext_rtc_hydrometer_state.id = ext_rtc_hydrometer.state_id
+     JOIN connec ON connec.customer_code::text = ext_rtc_hydrometer.connec_id::text
+     LEFT JOIN ext_municipality ON ext_municipality.muni_id = connec.muni_id
+     LEFT JOIN exploitation ON exploitation.expl_id = connec.expl_id
+  WHERE selector_hydrometer.state_id = ext_rtc_hydrometer.state_id AND selector_hydrometer.cur_user = "current_user"()::text AND selector_expl.expl_id = connec.expl_id AND selector_expl.cur_user = "current_user"()::text;
+
+
+CREATE OR REPLACE VIEW v_ui_hydroval_x_connec
+AS SELECT ext_rtc_hydrometer_x_data.id,
+    rtc_hydrometer_x_connec.connec_id,
+    connec.arc_id,
+    ext_rtc_hydrometer_x_data.hydrometer_id,
+    ext_rtc_hydrometer.catalog_id,
+    ext_cat_hydrometer.madeby,
+    ext_cat_hydrometer.class,
+    ext_rtc_hydrometer_x_data.cat_period_id,
+    ext_rtc_hydrometer_x_data.sum,
+    ext_rtc_hydrometer_x_data.custom_sum,
+    crmtype.idval AS value_type,
+    crmstatus.idval AS value_status,
+    crmstate.idval AS value_state
+   FROM ext_rtc_hydrometer_x_data
+     JOIN ext_rtc_hydrometer ON ext_rtc_hydrometer_x_data.hydrometer_id::text = ext_rtc_hydrometer.id::text
+     LEFT JOIN ext_cat_hydrometer ON ext_cat_hydrometer.id::text = ext_rtc_hydrometer.catalog_id::text
+     JOIN rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id::text = ext_rtc_hydrometer_x_data.hydrometer_id::text
+     JOIN connec ON rtc_hydrometer_x_connec.connec_id::text = connec.connec_id::text
+     LEFT JOIN crm_typevalue crmtype ON ext_rtc_hydrometer_x_data.value_type = crmtype.id::integer AND crmtype.typevalue::text = 'crm_value_type'::text
+     LEFT JOIN crm_typevalue crmstatus ON ext_rtc_hydrometer_x_data.value_status = crmstatus.id::integer AND crmstatus.typevalue::text = 'crm_value_status'::text
+     LEFT JOIN crm_typevalue crmstate ON ext_rtc_hydrometer_x_data.value_state = crmstate.id::integer AND crmstate.typevalue::text = 'crm_value_state'::text
+  ORDER BY ext_rtc_hydrometer_x_data.id;
+
+CREATE OR REPLACE VIEW v_ui_om_visit_x_connec
+AS SELECT om_visit_event.id AS event_id,
+    om_visit.id AS visit_id,
+    om_visit.ext_code AS code,
+    om_visit.visitcat_id,
+    om_visit.startdate AS visit_start,
+    om_visit.enddate AS visit_end,
+    om_visit.user_name,
+    om_visit.is_done,
+    date_trunc('second'::text, om_visit_event.tstamp) AS tstamp,
+    om_visit_x_connec.connec_id,
+    om_visit_event.parameter_id,
+    config_visit_parameter.parameter_type,
+    config_visit_parameter.feature_type,
+    config_visit_parameter.form_type,
+    config_visit_parameter.descript,
+    om_visit_event.value,
+    om_visit_event.xcoord,
+    om_visit_event.ycoord,
+    om_visit_event.compass,
+    om_visit_event.event_code,
+        CASE
+            WHEN a.event_id IS NULL THEN false
+            ELSE true
+        END AS gallery,
+        CASE
+            WHEN b.visit_id IS NULL THEN false
+            ELSE true
+        END AS document,
+    om_visit.class_id
+   FROM om_visit
+     JOIN om_visit_event ON om_visit.id = om_visit_event.visit_id
+     JOIN om_visit_x_connec ON om_visit_x_connec.visit_id = om_visit.id
+     JOIN config_visit_parameter ON config_visit_parameter.id::text = om_visit_event.parameter_id::text
+     LEFT JOIN connec ON connec.connec_id::text = om_visit_x_connec.connec_id::text
+     LEFT JOIN ( SELECT DISTINCT om_visit_event_photo.event_id
+           FROM om_visit_event_photo) a ON a.event_id = om_visit_event.id
+     LEFT JOIN ( SELECT DISTINCT doc_x_visit.visit_id
+           FROM doc_x_visit) b ON b.visit_id = om_visit.id
+  ORDER BY om_visit_x_connec.connec_id;
+
+CREATE OR REPLACE VIEW v_ui_event_x_connec
+AS SELECT om_visit_event.id AS event_id,
+    om_visit.id AS visit_id,
+    om_visit.ext_code AS code,
+    om_visit.visitcat_id,
+    om_visit.startdate AS visit_start,
+    om_visit.enddate AS visit_end,
+    om_visit.user_name,
+    om_visit.is_done,
+    om_visit.class_id AS visit_class,
+    date_trunc('second'::text, om_visit_event.tstamp) AS tstamp,
+    om_visit_x_connec.connec_id,
+    om_visit_event.parameter_id,
+    config_visit_parameter.parameter_type,
+    config_visit_parameter.feature_type,
+    config_visit_parameter.form_type,
+    config_visit_parameter.descript,
+    om_visit_event.value,
+    om_visit_event.xcoord,
+    om_visit_event.ycoord,
+    om_visit_event.compass,
+    om_visit_event.event_code,
+        CASE
+            WHEN a.event_id IS NULL THEN false
+            ELSE true
+        END AS gallery,
+        CASE
+            WHEN b.visit_id IS NULL THEN false
+            ELSE true
+        END AS document
+   FROM om_visit
+     JOIN om_visit_event ON om_visit.id = om_visit_event.visit_id
+     JOIN om_visit_x_connec ON om_visit_x_connec.visit_id = om_visit.id
+     JOIN config_visit_parameter ON config_visit_parameter.id::text = om_visit_event.parameter_id::text
+     LEFT JOIN connec ON connec.connec_id::text = om_visit_x_connec.connec_id::text
+     LEFT JOIN ( SELECT DISTINCT om_visit_event_photo.event_id
+           FROM om_visit_event_photo) a ON a.event_id = om_visit_event.id
+     LEFT JOIN ( SELECT DISTINCT doc_x_visit.visit_id
+           FROM doc_x_visit) b ON b.visit_id = om_visit.id
+  ORDER BY om_visit_x_connec.connec_id;
+
+CREATE OR REPLACE VIEW v_om_mincut_current_hydrometer
+AS SELECT om_mincut_hydrometer.id,
+    om_mincut_hydrometer.result_id,
+    om_mincut.work_order,
+    om_mincut_hydrometer.hydrometer_id,
+    ext_rtc_hydrometer.code AS hydrometer_customer_code,
+    rtc_hydrometer_x_connec.connec_id,
+    connec.code AS connec_code
+   FROM om_mincut_hydrometer
+     JOIN ext_rtc_hydrometer ON om_mincut_hydrometer.hydrometer_id::text = ext_rtc_hydrometer.id::text
+     JOIN rtc_hydrometer_x_connec ON om_mincut_hydrometer.hydrometer_id::text = rtc_hydrometer_x_connec.hydrometer_id::text
+     JOIN connec ON rtc_hydrometer_x_connec.connec_id::text = connec.connec_id::text
+     JOIN om_mincut ON om_mincut_hydrometer.result_id = om_mincut.id
+  WHERE om_mincut.mincut_state = 1;
+
+CREATE OR REPLACE VIEW vp_basic_arc
+AS SELECT arc.arc_id AS nid,
+    cat_arc.arc_type AS custom_type
+   FROM arc
+     JOIN cat_arc ON cat_arc.id::text = arc.arccat_id::text;
+
+CREATE OR REPLACE VIEW vp_basic_connec
+AS SELECT connec.connec_id AS nid,
+    cat_connec.connec_type AS custom_type
+   FROM connec
+     JOIN cat_connec ON cat_connec.id::text = connec.conneccat_id::text;
+
+
+CREATE OR REPLACE VIEW v_edit_plan_psector_x_connec
+AS SELECT plan_psector_x_connec.id,
+    plan_psector_x_connec.connec_id,
+    plan_psector_x_connec.arc_id,
+    plan_psector_x_connec.psector_id,
+    plan_psector_x_connec.state,
+    plan_psector_x_connec.doable,
+    plan_psector_x_connec.descript,
+    plan_psector_x_connec.link_id,
+    plan_psector_x_connec.active,
+    plan_psector_x_connec.insert_tstamp,
+    plan_psector_x_connec.insert_user,
+    link.exit_type
+   FROM plan_psector_x_connec
+     LEFT JOIN link USING (link_id);

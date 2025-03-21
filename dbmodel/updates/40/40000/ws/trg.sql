@@ -341,3 +341,103 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_pattern('inp_pattern');
 
 CREATE TRIGGER gw_trg_edit_inp_pattern_value INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_pattern_value
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_pattern('inp_pattern_value');
+
+
+-- 14/03/2025
+CREATE TRIGGER gw_trg_arc_link_update AFTER
+UPDATE OF the_geom ON arc FOR EACH ROW EXECUTE FUNCTION gw_trg_arc_link_update();
+CREATE TRIGGER gw_trg_arc_node_values AFTER
+INSERT OR UPDATE OF node_1, node_2, the_geom ON arc FOR EACH ROW EXECUTE FUNCTION gw_trg_arc_node_values();
+CREATE TRIGGER gw_trg_arc_noderotation_update AFTER
+INSERT OR DELETE OR UPDATE OF the_geom ON arc FOR EACH ROW EXECUTE FUNCTION gw_trg_arc_noderotation_update();
+CREATE TRIGGER gw_trg_topocontrol_arc BEFORE
+INSERT OR UPDATE OF the_geom, state ON arc FOR EACH ROW EXECUTE FUNCTION gw_trg_topocontrol_arc();
+CREATE TRIGGER gw_trg_edit_controls AFTER
+DELETE OR UPDATE ON arc FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_controls('arc_id');
+CREATE TRIGGER gw_trg_mantypevalue_fk_insert AFTER
+INSERT ON arc FOR EACH ROW EXECUTE FUNCTION gw_trg_mantypevalue_fk('arc');
+CREATE TRIGGER gw_trg_mantypevalue_fk_update AFTER
+UPDATE OF function_type, category_type, fluid_type, location_type ON arc FOR EACH ROW
+    WHEN ((((old.function_type)::TEXT IS DISTINCT
+FROM
+    (new.function_type)::TEXT)
+        OR ((old.category_type)::TEXT IS DISTINCT
+    FROM
+        (new.category_type)::TEXT)
+            OR ((old.fluid_type)::TEXT IS DISTINCT
+        FROM
+            (new.fluid_type)::TEXT)
+                OR ((old.location_type)::TEXT IS DISTINCT
+            FROM
+                (new.location_type)::TEXT))) EXECUTE FUNCTION gw_trg_mantypevalue_fk('arc');
+CREATE TRIGGER gw_trg_typevalue_fk_insert AFTER
+INSERT ON arc FOR EACH ROW EXECUTE FUNCTION gw_trg_typevalue_fk('arc');
+CREATE TRIGGER gw_trg_typevalue_fk_update AFTER
+UPDATE OF verified, datasource, lock_level ON arc FOR EACH ROW
+    WHEN (((old.verified IS DISTINCT
+FROM
+    new.verified)
+    OR (old.datasource IS DISTINCT
+FROM
+    new.datasource)
+    OR (old.lock_level IS DISTINCT
+FROM
+    new.lock_level))) EXECUTE FUNCTION gw_trg_typevalue_fk('arc');
+
+
+
+CREATE TRIGGER gw_trg_connec_proximity_insert BEFORE INSERT ON connec
+FOR EACH ROW EXECUTE FUNCTION gw_trg_connec_proximity();
+CREATE TRIGGER gw_trg_connec_proximity_update AFTER UPDATE OF the_geom ON connec
+FOR EACH ROW EXECUTE FUNCTION gw_trg_connec_proximity();
+CREATE TRIGGER gw_trg_connect_update AFTER UPDATE OF arc_id, pjoint_id, pjoint_type, the_geom ON connec
+FOR EACH ROW EXECUTE FUNCTION gw_trg_connect_update('connec');
+CREATE TRIGGER gw_trg_unique_field AFTER INSERT OR UPDATE OF customer_code, state ON connec
+FOR EACH ROW EXECUTE FUNCTION gw_trg_unique_field('connec');
+CREATE TRIGGER gw_trg_edit_controls AFTER DELETE OR UPDATE ON connec
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_controls('connec_id');
+CREATE TRIGGER gw_trg_mantypevalue_fk_insert AFTER INSERT ON connec
+FOR EACH ROW EXECUTE FUNCTION gw_trg_mantypevalue_fk('connec');
+CREATE TRIGGER gw_trg_mantypevalue_fk_update AFTER UPDATE OF function_type, category_type, fluid_type, location_type ON connec
+FOR EACH ROW
+    WHEN ((((old.function_type)::TEXT IS DISTINCT
+FROM
+    (new.function_type)::TEXT)
+        OR ((old.category_type)::TEXT IS DISTINCT
+    FROM
+        (new.category_type)::TEXT)
+            OR ((old.fluid_type)::TEXT IS DISTINCT
+        FROM
+            (new.fluid_type)::TEXT)
+                OR ((old.location_type)::TEXT IS DISTINCT
+            FROM
+                (new.location_type)::TEXT))) EXECUTE FUNCTION gw_trg_mantypevalue_fk('connec');
+CREATE TRIGGER gw_trg_typevalue_fk_insert AFTER INSERT ON connec
+FOR EACH ROW EXECUTE FUNCTION gw_trg_typevalue_fk('connec');
+CREATE TRIGGER gw_trg_typevalue_fk_update AFTER UPDATE OF verified, datasource, lock_level ON connec
+FOR EACH ROW
+    WHEN (((old.verified IS DISTINCT
+FROM
+    new.verified)
+    OR (old.datasource IS DISTINCT
+FROM
+    new.datasource)
+    OR (old.lock_level IS DISTINCT
+FROM
+    new.lock_level))) EXECUTE FUNCTION gw_trg_typevalue_fk('connec');
+
+
+CREATE TRIGGER gw_trg_edit_controls AFTER DELETE OR UPDATE ON element
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_controls('element_id');
+
+CREATE TRIGGER gw_trg_typevalue_fk_insert AFTER INSERT ON element
+FOR EACH ROW EXECUTE FUNCTION gw_trg_typevalue_fk('element');
+
+CREATE TRIGGER gw_trg_typevalue_fk_update AFTER UPDATE OF datasource, lock_level ON element
+FOR EACH ROW
+    WHEN (((old.datasource IS DISTINCT
+FROM
+    new.datasource)
+    OR (old.lock_level IS DISTINCT
+FROM
+    new.lock_level))) EXECUTE FUNCTION gw_trg_typevalue_fk('element');

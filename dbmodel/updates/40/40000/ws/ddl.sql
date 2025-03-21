@@ -768,214 +768,8 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"presszone",
 
 
 -- 06/02/2025
-ALTER TABLE node RENAME TO _node;
-
-ALTER TABLE arc DROP CONSTRAINT arc_node_1_fkey;
-ALTER TABLE arc DROP CONSTRAINT arc_node_2_fkey;
-ALTER TABLE arc DROP CONSTRAINT arc_parent_id_fkey;
-ALTER TABLE config_graph_mincut DROP CONSTRAINT config_graph_inlet_node_id_fkey;
-ALTER TABLE doc_x_node DROP CONSTRAINT doc_x_node_node_id_fkey;
-ALTER TABLE element_x_node DROP CONSTRAINT element_x_node_node_id_fkey;
-ALTER TABLE inp_dscenario_pump_additional DROP CONSTRAINT inp_dscenario_pump_additional_node_id_fkey;
-ALTER TABLE inp_inlet DROP CONSTRAINT inp_inlet_node_id_fkey;
-ALTER TABLE inp_junction DROP CONSTRAINT inp_junction_node_id_fkey;
-ALTER TABLE inp_label DROP CONSTRAINT inp_label_node_id_fkey;
-ALTER TABLE inp_pump_additional DROP CONSTRAINT inp_pump_additional_node_id_fkey;
-ALTER TABLE inp_pump DROP CONSTRAINT inp_pump_node_id_fkey;
-ALTER TABLE inp_reservoir DROP CONSTRAINT inp_reservoir_node_id_fkey;
-ALTER TABLE inp_shortpipe DROP CONSTRAINT inp_shortpipe_node_id_fkey;
-ALTER TABLE inp_tank DROP CONSTRAINT inp_tank_node_id_fkey;
-ALTER TABLE inp_valve DROP CONSTRAINT inp_valve_node_id_fkey;
-ALTER TABLE man_expansiontank DROP CONSTRAINT man_expansiontank_node_id_fkey;
-ALTER TABLE man_filter DROP CONSTRAINT man_filter_node_id_fkey;
-ALTER TABLE man_flexunion DROP CONSTRAINT man_flexunion_node_id_fkey;
-ALTER TABLE man_hydrant DROP CONSTRAINT man_hydrant_node_id_fkey;
-ALTER TABLE man_junction DROP CONSTRAINT man_junction_node_id_fkey;
-ALTER TABLE man_manhole DROP CONSTRAINT man_manhole_node_id_fkey;
-ALTER TABLE man_meter DROP CONSTRAINT man_meter_node_id_fkey;
-ALTER TABLE man_netelement DROP CONSTRAINT man_netelement_node_id_fkey;
-ALTER TABLE man_netsamplepoint DROP CONSTRAINT man_netsamplepoint_node_id_fkey;
-ALTER TABLE man_netwjoin DROP CONSTRAINT man_netwjoin_node_id_fkey;
-ALTER TABLE man_pump DROP CONSTRAINT man_pump_node_id_fkey;
-ALTER TABLE man_reduction DROP CONSTRAINT man_reduction_node_id_fkey;
-ALTER TABLE man_register DROP CONSTRAINT man_register_node_id_fkey;
-ALTER TABLE man_source DROP CONSTRAINT man_source_node_id_fkey;
-ALTER TABLE man_tank DROP CONSTRAINT man_tank_node_id_fkey;
-ALTER TABLE man_valve DROP CONSTRAINT man_valve_node_id_fkey;
-ALTER TABLE man_waterwell DROP CONSTRAINT man_waterwell_node_id_fkey;
-ALTER TABLE man_wtp DROP CONSTRAINT man_wtp_node_id_fkey;
-ALTER TABLE om_visit_x_node DROP CONSTRAINT om_visit_x_node_node_id_fkey;
-ALTER TABLE plan_psector_x_node DROP CONSTRAINT plan_psector_x_node_node_id_fkey;
-ALTER TABLE rtc_hydrometer_x_node DROP CONSTRAINT rtc_hydrometer_x_node_node_id_fkey;
-ALTER TABLE ext_rtc_scada_x_data DROP CONSTRAINT ext_rtc_scada_x_data_node_id_fkey;
-
-ALTER TABLE _node_border_sector DROP CONSTRAINT arc_border_expl_node_id_fkey;
-ALTER TABLE _inp_emitter_ DROP CONSTRAINT inp_emitter_node_id_fkey;
-ALTER TABLE _inp_mixing_ DROP CONSTRAINT inp_mixing_node_id_fkey;
-ALTER TABLE _inp_quality_ DROP CONSTRAINT inp_quality_node_id_fkey;
-ALTER TABLE _inp_source_ DROP CONSTRAINT inp_source_node_id_fkey;
-ALTER TABLE _inp_valve_ DROP CONSTRAINT _inp_valve_node_id_fkey_;
-ALTER TABLE om_visit_event DROP CONSTRAINT om_visit_event_position_id_fkey;
-
-ALTER TABLE _node DROP CONSTRAINT node_parent_id_fkey;
-ALTER TABLE _node DROP CONSTRAINT node_pkey;
-
-ALTER TABLE _node DROP CONSTRAINT node_arc_id_fkey;
-ALTER TABLE _node DROP CONSTRAINT node_buildercat_id_fkey;
-ALTER TABLE _node DROP CONSTRAINT node_district_id_fkey;
-ALTER TABLE _node DROP CONSTRAINT node_expl_fkey;
-ALTER TABLE _node DROP CONSTRAINT node_expl_id2_fkey;
-ALTER TABLE _node DROP CONSTRAINT node_feature_type_fkey;
-ALTER TABLE _node DROP CONSTRAINT node_muni_id_fkey;
-ALTER TABLE _node DROP CONSTRAINT node_nodecat_id_fkey;
-ALTER TABLE _node DROP CONSTRAINT node_ownercat_id_fkey;
-ALTER TABLE _node DROP CONSTRAINT node_soilcat_id_fkey;
-ALTER TABLE _node DROP CONSTRAINT node_state_fkey;
-ALTER TABLE _node DROP CONSTRAINT node_state_type_fkey;
-ALTER TABLE _node DROP CONSTRAINT node_streetaxis2_id_fkey;
-ALTER TABLE _node DROP CONSTRAINT node_streetaxis_id_fkey;
-ALTER TABLE _node DROP CONSTRAINT node_workcat_id_end_fkey;
-ALTER TABLE _node DROP CONSTRAINT node_workcat_id_fkey;
-
-DROP RULE IF EXISTS insert_plan_psector_x_node ON _node;
-DROP RULE IF EXISTS undelete_node ON _node;
-
-DROP INDEX IF EXISTS node_arc_id;
-DROP INDEX IF EXISTS node_dma;
-DROP INDEX IF EXISTS node_dqa;
-DROP INDEX IF EXISTS node_exploitation;
-DROP INDEX IF EXISTS node_exploitation2;
-DROP INDEX IF EXISTS node_index;
-DROP INDEX IF EXISTS node_muni;
-DROP INDEX IF EXISTS node_nodecat;
-DROP INDEX IF EXISTS node_presszone;
-DROP INDEX IF EXISTS node_sector;
-DROP INDEX IF EXISTS node_street1;
-DROP INDEX IF EXISTS node_street2;
-DROP INDEX IF EXISTS node_streetname;
-DROP INDEX IF EXISTS node_streetname2;
-
-
--- Rename 'elevation' to 'top_elev' and add new columns: 'custom_top_elev' and 'datasource'
-CREATE TABLE node (
-	node_id varchar(16) DEFAULT nextval('urn_id_seq'::regclass) NOT NULL,
-	code text NULL,
-	top_elev numeric(12, 4) NULL,
-	custom_top_elev numeric(12, 4) NULL,
-	datasource integer NULL, -- 0,1,2,3,4 (UNKNOWN, GMAO, CRM, DEM, TOPO)
-	"depth" numeric(12, 4) NULL,
-	nodecat_id varchar(30) NOT NULL,
-	epa_type varchar(16) NOT NULL,
-	sector_id int4 NOT NULL,
-	arc_id varchar(16) NULL,
-	parent_id varchar(16) NULL,
-	state int2 NOT NULL,
-	state_type int2 NOT NULL,
-	annotation text NULL,
-	observ text NULL,
-	"comment" text NULL,
-	dma_id int4 NULL,
-	presszone_id int4 NULL,
-	soilcat_id varchar(30) NULL,
-	function_type varchar(50) NULL,
-	category_type varchar(50) NULL,
-	fluid_type varchar(50) NULL,
-	location_type varchar(50) NULL,
-	workcat_id varchar(255) NULL,
-	workcat_id_end varchar(255) NULL,
-	buildercat_id varchar(30) NULL,
-	builtdate date NULL,
-	enddate date NULL,
-	ownercat_id varchar(30) NULL,
-	muni_id int4 NOT NULL,
-	postcode varchar(16) NULL,
-	streetaxis_id varchar(16) NULL,
-	postnumber int4 NULL,
-	postcomplement varchar(100) NULL,
-	streetaxis2_id varchar(16) NULL,
-	postnumber2 int4 NULL,
-	postcomplement2 varchar(100) NULL,
-	descript varchar(254) NULL,
-	link varchar(512) NULL,
-	verified int4 NULL,
-	rotation numeric(6, 3) NULL,
-	the_geom public.geometry(point, SRID_VALUE) NULL,
-	undelete bool NULL,
-	label_x varchar(30) NULL,
-	label_y varchar(30) NULL,
-	label_rotation numeric(6, 3) NULL,
-	publish bool NULL,
-	inventory bool NULL,
-	hemisphere float8 NULL,
-	expl_id int4 NOT NULL,
-	num_value numeric(12, 3) NULL,
-	feature_type varchar(16) DEFAULT 'NODE'::character varying NULL,
-	tstamp timestamp DEFAULT now() NULL,
-	lastupdate timestamp NULL,
-	lastupdate_user varchar(50) NULL,
-	insert_user varchar(50) DEFAULT CURRENT_USER NULL,
-	minsector_id int4 NULL,
-	dqa_id int4 NULL,
-	staticpressure numeric(12, 3) NULL,
-	district_id int4 NULL,
-	adate text NULL,
-	adescript text NULL,
-	accessibility int2 NULL,
-	workcat_id_plan varchar(255) NULL,
-	asset_id varchar(50) NULL,
-	om_state text NULL,
-	conserv_state text NULL,
-	access_type text NULL,
-	placement_type text NULL,
-	expl_id2 int4 NULL,
-	brand_id varchar(50) NULL,
-	model_id varchar(50) NULL,
-	serial_number varchar(100) NULL,
-	label_quadrant varchar(12) NULL,
-	macrominsector_id int4 DEFAULT 0 NULL,
-	streetname varchar(100) NULL,
-	streetname2 varchar(100) NULL,
-	supplyzone_id int4 NULL,
-	CONSTRAINT node_epa_type_check CHECK (((epa_type)::text = ANY (ARRAY['JUNCTION'::text, 'RESERVOIR'::text, 'TANK'::text, 'INLET'::text, 'UNDEFINED'::text, 'SHORTPIPE'::text, 'VALVE'::text, 'PUMP'::text]))),
-	CONSTRAINT node_pkey PRIMARY KEY (node_id),
-	CONSTRAINT node_arc_id_fkey FOREIGN KEY (arc_id) REFERENCES arc(arc_id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT node_buildercat_id_fkey FOREIGN KEY (buildercat_id) REFERENCES cat_builder(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT node_district_id_fkey FOREIGN KEY (district_id) REFERENCES ext_district(district_id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT node_dma_id_fkey FOREIGN KEY (dma_id) REFERENCES dma(dma_id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT node_dqa_id_fkey FOREIGN KEY (dqa_id) REFERENCES dqa(dqa_id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT node_expl_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT node_expl_id2_fkey FOREIGN KEY (expl_id2) REFERENCES exploitation(expl_id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT node_feature_type_fkey FOREIGN KEY (feature_type) REFERENCES sys_feature_type(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT node_muni_id_fkey FOREIGN KEY (muni_id) REFERENCES ext_municipality(muni_id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT node_nodecat_id_fkey FOREIGN KEY (nodecat_id) REFERENCES cat_node(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT node_ownercat_id_fkey FOREIGN KEY (ownercat_id) REFERENCES cat_owner(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT node_parent_id_fkey FOREIGN KEY (parent_id) REFERENCES node(node_id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT node_presszonecat_id_fkey FOREIGN KEY (presszone_id) REFERENCES presszone(presszone_id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT node_sector_id_fkey FOREIGN KEY (sector_id) REFERENCES sector(sector_id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT node_soilcat_id_fkey FOREIGN KEY (soilcat_id) REFERENCES cat_soil(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT node_state_fkey FOREIGN KEY (state) REFERENCES value_state(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT node_state_type_fkey FOREIGN KEY (state_type) REFERENCES value_state_type(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT node_streetaxis2_id_fkey FOREIGN KEY (muni_id,streetaxis2_id) REFERENCES ext_streetaxis(muni_id,id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT node_streetaxis_id_fkey FOREIGN KEY (muni_id,streetaxis_id) REFERENCES ext_streetaxis(muni_id,id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT node_supplyzone_id_fkey FOREIGN KEY (supplyzone_id) REFERENCES supplyzone(supplyzone_id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT node_workcat_id_end_fkey FOREIGN KEY (workcat_id_end) REFERENCES cat_work(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT node_workcat_id_fkey FOREIGN KEY (workcat_id) REFERENCES cat_work(id) ON DELETE RESTRICT ON UPDATE CASCADE
-);
-CREATE INDEX node_arc_id ON node USING btree (arc_id);
-CREATE INDEX node_dma ON node USING btree (dma_id);
-CREATE INDEX node_dqa ON node USING btree (dqa_id);
-CREATE INDEX node_exploitation ON node USING btree (expl_id);
-CREATE INDEX node_exploitation2 ON node USING btree (expl_id2);
-CREATE INDEX node_index ON node USING gist (the_geom);
-CREATE INDEX node_muni ON node USING btree (muni_id);
-CREATE INDEX node_nodecat ON node USING btree (nodecat_id);
-CREATE INDEX node_presszone ON node USING btree (presszone_id);
-CREATE INDEX node_sector ON node USING btree (sector_id);
-CREATE INDEX node_street1 ON node USING btree (streetaxis_id);
-CREATE INDEX node_street2 ON node USING btree (streetaxis2_id);
-CREATE INDEX node_streetname ON node USING btree (streetname);
-CREATE INDEX node_streetname2 ON node USING btree (streetname2);
-
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"node", "column":"elevation", "newName":"top_elev"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node", "column":"custom_top_elev", "dataType":"numeric(12, 4)"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"connec", "column":"elevation", "newName":"top_elev"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"element", "column":"elevation", "newName":"top_elev"}}$$);
 
@@ -991,6 +785,7 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"rpt_inp_
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"archived_rpt_inp_node", "column":"elevation", "newName":"top_elev"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"anl_node", "column":"elevation", "newName":"top_elev"}}$$);
 
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node", "column":"datasource", "dataType":"integer"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"datasource", "dataType":"integer"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"datasource", "dataType":"integer"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"element", "column":"datasource", "dataType":"integer"}}$$);
@@ -1238,3 +1033,747 @@ CREATE TABLE inp_pattern (
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"cat_arc", "column":"bulk", "newName":"thickness"}}$$);
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_meter", "column":"closed", "dataType":"boolean", "isUtils":"False"}}$$);
+
+
+
+-- 13/03/2025
+-- arc
+ALTER TABLE arc RENAME TO _arc;
+
+
+-- Drop foreign keys that reference arc
+ALTER TABLE config_graph_checkvalve DROP CONSTRAINT config_graph_checkvalve_to_arc_fkey;
+ALTER TABLE connec DROP CONSTRAINT connec_arc_id_fkey;
+ALTER TABLE doc_x_arc DROP CONSTRAINT doc_x_arc_arc_id_fkey;
+ALTER TABLE element_x_arc DROP CONSTRAINT element_x_arc_arc_id_fkey;
+ALTER TABLE inp_pipe DROP CONSTRAINT inp_pipe_arc_id_fkey;
+ALTER TABLE inp_virtualvalve DROP CONSTRAINT inp_virtualvalve_arc_id_fkey;
+ALTER TABLE man_pipe DROP CONSTRAINT man_pipe_arc_id_fkey;
+ALTER TABLE man_pump DROP CONSTRAINT man_pump_to_arc_fkey;
+ALTER TABLE man_valve DROP CONSTRAINT man_valve_to_arc_fky;
+ALTER TABLE man_varc DROP CONSTRAINT man_varc_arc_id_fkey;
+ALTER TABLE node DROP CONSTRAINT node_arc_id_fkey;
+ALTER TABLE om_visit_x_arc DROP CONSTRAINT om_visit_x_arc_arc_id_fkey;
+ALTER TABLE plan_arc_x_pavement DROP CONSTRAINT plan_arc_x_pavement_arc_id_fkey;
+ALTER TABLE plan_psector_x_arc DROP CONSTRAINT plan_psector_x_arc_arc_id_fkey;
+ALTER TABLE plan_psector_x_connec DROP CONSTRAINT plan_psector_x_connec_arc_id_fkey;
+
+
+ALTER TABLE _arc_border_expl_ DROP CONSTRAINT arc_border_expl_arc_id_fkey;
+ALTER TABLE _inp_valve_importinp_ DROP CONSTRAINT inp_valve_importinp_to_arc_fkey;
+ALTER TABLE _inp_virtualvalve_ DROP CONSTRAINT _inp_virtualvalve_arc_id_fkey_;
+
+-- Drop foreign keys from table arc
+
+ALTER TABLE _arc DROP CONSTRAINT arc_arccat_id_fkey;
+ALTER TABLE _arc DROP CONSTRAINT arc_buildercat_id_fkey;
+ALTER TABLE _arc DROP CONSTRAINT arc_district_id_fkey;
+ALTER TABLE _arc DROP CONSTRAINT arc_expl_fkey;
+ALTER TABLE _arc DROP CONSTRAINT arc_expl_id2_fkey;
+ALTER TABLE _arc DROP CONSTRAINT arc_feature_type_fkey;
+ALTER TABLE _arc DROP CONSTRAINT arc_muni_id_fkey;
+ALTER TABLE _arc DROP CONSTRAINT arc_ownercat_id_fkey;
+ALTER TABLE _arc DROP CONSTRAINT arc_pavcat_id_fkey;
+ALTER TABLE _arc DROP CONSTRAINT arc_soilcat_id_fkey;
+ALTER TABLE _arc DROP CONSTRAINT arc_state_fkey;
+ALTER TABLE _arc DROP CONSTRAINT arc_state_type_fkey;
+ALTER TABLE _arc DROP CONSTRAINT arc_streetaxis2_id_fkey;
+ALTER TABLE _arc DROP CONSTRAINT arc_streetaxis_id_fkey;
+ALTER TABLE _arc DROP CONSTRAINT arc_supplyzone_id_fkey;
+ALTER TABLE _arc DROP CONSTRAINT arc_workcat_id_end_fkey;
+ALTER TABLE _arc DROP CONSTRAINT arc_workcat_id_fkey;
+
+-- Drop restrictions from table arc
+ALTER TABLE _arc DROP CONSTRAINT arc_epa_type_check;
+ALTER TABLE _arc DROP CONSTRAINT arc_pkey;
+
+
+-- Drop rules from table arc
+
+DROP RULE IF EXISTS insert_plan_psector_x_arc ON _arc;
+DROP RULE IF EXISTS undelete_arc ON _arc;
+
+
+-- Drop indexes from table arc
+
+DROP INDEX IF EXISTS arc_arccat;
+DROP INDEX IF EXISTS arc_dma;
+DROP INDEX IF EXISTS arc_dqa;
+DROP INDEX IF EXISTS arc_exploitation;
+DROP INDEX IF EXISTS arc_exploitation2;
+DROP INDEX IF EXISTS arc_index;
+DROP INDEX IF EXISTS arc_muni;
+DROP INDEX IF EXISTS arc_node1;
+DROP INDEX IF EXISTS arc_node2;
+DROP INDEX IF EXISTS arc_pkey;
+DROP INDEX IF EXISTS arc_presszone;
+DROP INDEX IF EXISTS arc_sector;
+DROP INDEX IF EXISTS arc_street1;
+DROP INDEX IF EXISTS arc_street2;
+DROP INDEX IF EXISTS arc_streetname;
+DROP INDEX IF EXISTS arc_streetname2;
+
+
+-- New order to table arc
+CREATE TABLE arc (
+	arc_id varchar(16) DEFAULT nextval('urn_id_seq'::regclass) NOT NULL,
+	code text NULL,
+	node_1 varchar(16) NULL,
+	node_2 varchar(16) NULL,
+	arccat_id varchar(30) NOT NULL,
+	epa_type varchar(16) NOT NULL,
+	sector_id int4 NOT NULL,
+	state int2 NOT NULL,
+	state_type int2 NOT NULL,
+	annotation text NULL,
+	observ text NULL,
+	comment text NULL,
+	custom_length numeric(12, 2) NULL,
+	dma_id int4 NULL,
+	presszone_id int4 NULL,
+	soilcat_id varchar(30) NULL,
+	function_type varchar(50) NULL,
+	category_type varchar(50) NULL,
+	fluid_type varchar(50) NULL,
+	location_type varchar(50) NULL,
+	workcat_id varchar(255) NULL,
+	workcat_id_end varchar(255) NULL,
+	builtdate date NULL,
+	enddate date NULL,
+	ownercat_id varchar(30) NULL,
+	muni_id int4 NOT NULL,
+	postcode varchar(16) NULL,
+	streetaxis_id varchar(16) NULL,
+	postnumber int4 NULL,
+	postcomplement varchar(100) NULL,
+	streetaxis2_id varchar(16) NULL,
+	postnumber2 int4 NULL,
+	postcomplement2 varchar(100) NULL,
+	descript varchar(254) NULL,
+	link varchar(512) NULL,
+	verified int4 NULL,
+	the_geom public.geometry(linestring, 25831) NULL,
+	undelete bool NULL,
+	label_x varchar(30) NULL,
+	label_y varchar(30) NULL,
+	label_rotation numeric(6, 3) NULL,
+	publish bool NULL,
+	inventory bool NULL,
+	expl_id int4 NOT NULL,
+	num_value numeric(12, 3) NULL,
+	feature_type varchar(16) DEFAULT 'ARC'::character varying NULL,
+	tstamp timestamp DEFAULT now() NULL,
+	lastupdate timestamp NULL,
+	lastupdate_user varchar(50) NULL,
+	insert_user varchar(50) DEFAULT CURRENT_USER NULL,
+	minsector_id int4 NULL,
+	dqa_id int4 NULL,
+	district_id int4 NULL,
+	adate text NULL,
+	adescript text NULL,
+	workcat_id_plan varchar(255) NULL,
+	asset_id varchar(50) NULL,
+	pavcat_id varchar(30) NULL,
+	nodetype_1 varchar(30) NULL,
+	elevation1 numeric(12, 4) NULL,
+	depth1 numeric(12, 4) NULL,
+	staticpress1 numeric(12, 3) NULL,
+	nodetype_2 varchar(30) NULL,
+	elevation2 numeric(12, 4) NULL,
+	depth2 numeric(12, 4) NULL,
+	staticpress2 numeric(12, 3) NULL,
+	om_state text NULL,
+	conserv_state text NULL,
+	parent_id varchar(16) NULL,
+	expl_id2 int4 NULL,
+	brand_id varchar(50) NULL,
+	model_id varchar(50) NULL,
+	serial_number varchar(100) NULL,
+	label_quadrant varchar(12) NULL,
+	macrominsector_id int4 DEFAULT 0 NULL,
+	streetname varchar(100) NULL,
+	streetname2 varchar(100) NULL,
+	supplyzone_id int4 NULL,
+	datasource int4 NULL,
+	lock_level int4 NULL,
+	is_scadamap bool NULL,
+	CONSTRAINT arc_epa_type_check CHECK (((epa_type)::text = ANY (ARRAY['PIPE'::text, 'UNDEFINED'::text, 'VIRTUALPUMP'::text, 'VIRTUALVALVE'::text]))),
+	CONSTRAINT arc_pkey PRIMARY KEY (arc_id),
+	CONSTRAINT arc_arccat_id_fkey FOREIGN KEY (arccat_id) REFERENCES cat_arc(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT arc_district_id_fkey FOREIGN KEY (district_id) REFERENCES ext_district(district_id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT arc_expl_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT arc_expl_id2_fkey FOREIGN KEY (expl_id2) REFERENCES exploitation(expl_id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT arc_feature_type_fkey FOREIGN KEY (feature_type) REFERENCES sys_feature_type(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT arc_muni_id_fkey FOREIGN KEY (muni_id) REFERENCES ext_municipality(muni_id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT arc_ownercat_id_fkey FOREIGN KEY (ownercat_id) REFERENCES cat_owner(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT arc_pavcat_id_fkey FOREIGN KEY (pavcat_id) REFERENCES cat_pavement(id) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT arc_soilcat_id_fkey FOREIGN KEY (soilcat_id) REFERENCES cat_soil(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT arc_state_fkey FOREIGN KEY (state) REFERENCES value_state(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT arc_state_type_fkey FOREIGN KEY (state_type) REFERENCES value_state_type(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT arc_streetaxis2_id_fkey FOREIGN KEY (muni_id,streetaxis2_id) REFERENCES ext_streetaxis(muni_id,id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT arc_streetaxis_id_fkey FOREIGN KEY (muni_id,streetaxis_id) REFERENCES ext_streetaxis(muni_id,id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT arc_supplyzone_id_fkey FOREIGN KEY (supplyzone_id) REFERENCES supplyzone(supplyzone_id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT arc_workcat_id_end_fkey FOREIGN KEY (workcat_id_end) REFERENCES cat_work(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT arc_workcat_id_fkey FOREIGN KEY (workcat_id) REFERENCES cat_work(id) ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+
+CREATE INDEX arc_arccat ON arc USING btree (arccat_id);
+CREATE INDEX arc_dma ON arc USING btree (dma_id);
+CREATE INDEX arc_dqa ON arc USING btree (dqa_id);
+CREATE INDEX arc_exploitation ON arc USING btree (expl_id);
+CREATE INDEX arc_exploitation2 ON arc USING btree (expl_id2);
+CREATE INDEX arc_index ON arc USING gist (the_geom);
+CREATE INDEX arc_muni ON arc USING btree (muni_id);
+CREATE INDEX arc_node1 ON arc USING btree (node_1);
+CREATE INDEX arc_node2 ON arc USING btree (node_2);
+CREATE INDEX arc_presszone ON arc USING btree (presszone_id);
+CREATE INDEX arc_sector ON arc USING btree (sector_id);
+CREATE INDEX arc_street1 ON arc USING btree (streetaxis_id);
+CREATE INDEX arc_street2 ON arc USING btree (streetaxis2_id);
+CREATE INDEX arc_streetname ON arc USING btree (streetname);
+CREATE INDEX arc_streetname2 ON arc USING btree (streetname2);
+
+
+
+
+
+
+-- connec
+ALTER TABLE connec RENAME TO _connec;
+
+
+-- Drop foreign keys that reference connec
+ALTER TABLE doc_x_connec DROP CONSTRAINT doc_x_connec_connec_id_fkey;
+ALTER TABLE element_x_connec DROP CONSTRAINT element_x_connec_connec_id_fkey;
+ALTER TABLE inp_connec DROP CONSTRAINT inp_connec_connec_id_FKEY;
+ALTER TABLE man_fountain DROP CONSTRAINT man_fountain_connec_id_fkey;
+ALTER TABLE man_fountain DROP CONSTRAINT man_fountain_linked_connec_fkey;
+ALTER TABLE man_greentap DROP CONSTRAINT man_greentap_connec_id_fkey;
+ALTER TABLE man_greentap DROP CONSTRAINT man_greentap_linked_connec_fkey;
+ALTER TABLE man_tap DROP CONSTRAINT man_tap_connec_id_fkey;
+ALTER TABLE man_tap DROP CONSTRAINT man_tap_linked_connec_fkey;
+ALTER TABLE man_wjoin DROP CONSTRAINT man_wjoin_connec_id_fkey;
+ALTER TABLE om_visit_x_connec DROP CONSTRAINT om_visit_x_connec_connec_id_fkey;
+ALTER TABLE plan_psector_x_connec DROP CONSTRAINT plan_psector_x_connec_connec_id_fkey;
+ALTER TABLE rtc_hydrometer_x_connec DROP CONSTRAINT rtc_hydrometer_x_connec_connec_id_fkey;
+
+
+ALTER TABLE _pond_ DROP CONSTRAINT pond_connec_id_fkey;
+ALTER TABLE _pool_ DROP CONSTRAINT pool_connec_id_fkey;
+
+-- Drop foreign keys from table connec
+
+ALTER TABLE _connec DROP CONSTRAINT connec_cat_valve_fkey;
+ALTER TABLE _connec DROP CONSTRAINT connec_connecat_id_fkey;
+ALTER TABLE _connec DROP CONSTRAINT connec_buildercat_id_fkey;
+ALTER TABLE _connec DROP CONSTRAINT connec_crmzone_id_fkey;
+ALTER TABLE _connec DROP CONSTRAINT connec_district_id_fkey;
+ALTER TABLE _connec DROP CONSTRAINT connec_expl_fkey;
+ALTER TABLE _connec DROP CONSTRAINT connec_expl_id2_fkey;
+ALTER TABLE _connec DROP CONSTRAINT connec_feature_type_fkey;
+ALTER TABLE _connec DROP CONSTRAINT connec_muni_id_fkey;
+ALTER TABLE _connec DROP CONSTRAINT connec_ownercat_id_fkey;
+ALTER TABLE _connec DROP CONSTRAINT connec_pjoint_type_fkey;
+ALTER TABLE _connec DROP CONSTRAINT connec_soilcat_id_fkey;
+ALTER TABLE _connec DROP CONSTRAINT connec_state_fkey;
+ALTER TABLE _connec DROP CONSTRAINT connec_state_type_fkey;
+ALTER TABLE _connec DROP CONSTRAINT connec_streetaxis_id_fkey;
+ALTER TABLE _connec DROP CONSTRAINT connec_streetaxis2_id_fkey;
+ALTER TABLE _connec DROP CONSTRAINT connec_supplyzone_id_fkey;
+ALTER TABLE _connec DROP CONSTRAINT connec_workcat_id_end_fkey;
+ALTER TABLE _connec DROP CONSTRAINT connec_workcat_id_fkey;
+
+
+-- Drop restrictions from table arc
+ALTER TABLE _connec DROP CONSTRAINT connec_epa_type_check;
+ALTER TABLE _connec DROP CONSTRAINT connec_pkey;
+ALTER TABLE _connec DROP CONSTRAINT connec_pjoint_type_check;
+
+
+-- Drop rules from table connec
+
+DROP RULE IF EXISTS undelete_connec ON _connec;
+
+-- Drop indexes from table connec
+
+DROP INDEX IF EXISTS connec_connecat;
+DROP INDEX IF EXISTS connec_dma;
+DROP INDEX IF EXISTS connec_dqa;
+DROP INDEX IF EXISTS connec_exploitation;
+DROP INDEX IF EXISTS connec_exploitation2;
+DROP INDEX IF EXISTS connec_index;
+DROP INDEX IF EXISTS connec_muni;
+DROP INDEX IF EXISTS connec_pkey;
+DROP INDEX IF EXISTS connec_presszone;
+DROP INDEX IF EXISTS connec_sector;
+DROP INDEX IF EXISTS connec_street1;
+DROP INDEX IF EXISTS connec_street2;
+DROP INDEX IF EXISTS connec_streetname;
+DROP INDEX IF EXISTS connec_streetname2;
+
+
+-- New order to table connec
+CREATE TABLE connec (
+	connec_id varchar(16) DEFAULT nextval('urn_id_seq'::regclass) NOT NULL,
+	code text NULL,
+	top_elev numeric(12, 4) NULL,
+	"depth" numeric(12, 4) NULL,
+	conneccat_id varchar(30) NOT NULL,
+	sector_id int4 NOT NULL,
+	customer_code varchar(30) NULL,
+	state int2 NOT NULL,
+	state_type int2 NOT NULL,
+	arc_id varchar(16) NULL,
+	connec_length numeric(12, 3) NULL,
+	annotation text NULL,
+	observ text NULL,
+	"comment" text NULL,
+	dma_id int4 NULL,
+	presszone_id int4 NULL,
+	soilcat_id varchar(16) NULL,
+	function_type varchar(50) NULL,
+	category_type varchar(50) NULL,
+	fluid_type varchar(50) NULL,
+	location_type varchar(50) NULL,
+	workcat_id varchar(255) NULL,
+	workcat_id_end varchar(255) NULL,
+	builtdate date NULL,
+	enddate date NULL,
+	ownercat_id varchar(30) NULL,
+	muni_id int4 NOT NULL,
+	postcode varchar(16) NULL,
+	streetaxis_id varchar(16) NULL,
+	postnumber int4 NULL,
+	postcomplement varchar(100) NULL,
+	streetaxis2_id varchar(16) NULL,
+	postnumber2 int4 NULL,
+	postcomplement2 varchar(100) NULL,
+	descript text NULL,
+	link varchar(512) NULL,
+	verified int4 NULL,
+	rotation numeric(6, 3) NULL,
+	the_geom public.geometry(point, 25831) NULL,
+	undelete bool NULL,
+	label_x varchar(30) NULL,
+	label_y varchar(30) NULL,
+	label_rotation numeric(6, 3) NULL,
+	publish bool NULL,
+	inventory bool NULL,
+	expl_id int4 NOT NULL,
+	num_value numeric(12, 3) NULL,
+	feature_type varchar(16) DEFAULT 'CONNEC'::character varying NULL,
+	tstamp timestamp DEFAULT now() NULL,
+	pjoint_type varchar(16) NULL,
+	pjoint_id varchar(16) NULL,
+	lastupdate timestamp NULL,
+	lastupdate_user varchar(50) NULL,
+	insert_user varchar(50) DEFAULT CURRENT_USER NULL,
+	minsector_id int4 NULL,
+	dqa_id int4 NULL,
+	staticpressure numeric(12, 3) NULL,
+	district_id int4 NULL,
+	adate text NULL,
+	adescript text NULL,
+	accessibility int2 NULL,
+	workcat_id_plan varchar(255) NULL,
+	asset_id varchar(50) NULL,
+	epa_type text NOT NULL,
+	om_state text NULL,
+	conserv_state text NULL,
+	priority text NULL,
+	valve_location text NULL,
+	valve_type text NULL,
+	shutoff_valve text NULL,
+	access_type text NULL,
+	placement_type text NULL,
+	crmzone_id int4 NULL,
+	expl_id2 int4 NULL,
+	plot_code varchar NULL,
+	brand_id varchar(50) NULL,
+	model_id varchar(50) NULL,
+	serial_number varchar(100) NULL,
+	label_quadrant varchar(12) NULL,
+	cat_valve varchar(30) NULL,
+	macrominsector_id int4 DEFAULT 0 NULL,
+	n_hydrometer int4 NULL,
+	streetname varchar(100) NULL,
+	streetname2 varchar(100) NULL,
+	n_inhabitants int4 NULL,
+	supplyzone_id int4 NULL,
+	datasource int4 NULL,
+	lock_level int4 NULL,
+	block_zone text NULL,
+	CONSTRAINT connec_epa_type_check CHECK ((epa_type = ANY (ARRAY['JUNCTION'::text, 'UNDEFINED'::text]))),
+	CONSTRAINT connec_pjoint_type_check CHECK (((pjoint_type)::text = ANY (ARRAY['NODE'::text, 'ARC'::text, 'CONNEC'::text]))),
+	CONSTRAINT connec_pkey PRIMARY KEY (connec_id),
+	CONSTRAINT connec_cat_valve_fkey FOREIGN KEY (cat_valve) REFERENCES cat_node(id) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT connec_connecat_id_fkey FOREIGN KEY (conneccat_id) REFERENCES cat_connec(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT connec_crmzone_id_fkey FOREIGN KEY (crmzone_id) REFERENCES crm_zone(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT connec_district_id_fkey FOREIGN KEY (district_id) REFERENCES ext_district(district_id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT connec_expl_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT connec_expl_id2_fkey FOREIGN KEY (expl_id2) REFERENCES exploitation(expl_id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT connec_feature_type_fkey FOREIGN KEY (feature_type) REFERENCES sys_feature_type(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT connec_muni_id_fkey FOREIGN KEY (muni_id) REFERENCES ext_municipality(muni_id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT connec_ownercat_id_fkey FOREIGN KEY (ownercat_id) REFERENCES cat_owner(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT connec_pjoint_type_fkey FOREIGN KEY (pjoint_type) REFERENCES sys_feature_type(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT connec_soilcat_id_fkey FOREIGN KEY (soilcat_id) REFERENCES cat_soil(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT connec_state_fkey FOREIGN KEY (state) REFERENCES value_state(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT connec_state_type_fkey FOREIGN KEY (state_type) REFERENCES value_state_type(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT connec_streetaxis2_id_fkey FOREIGN KEY (muni_id,streetaxis2_id) REFERENCES ext_streetaxis(muni_id,id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT connec_streetaxis_id_fkey FOREIGN KEY (muni_id,streetaxis_id) REFERENCES ext_streetaxis(muni_id,id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT connec_supplyzone_id_fkey FOREIGN KEY (supplyzone_id) REFERENCES supplyzone(supplyzone_id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT connec_workcat_id_end_fkey FOREIGN KEY (workcat_id_end) REFERENCES cat_work(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT connec_workcat_id_fkey FOREIGN KEY (workcat_id) REFERENCES cat_work(id) ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+CREATE INDEX connec_connecat ON connec USING btree (conneccat_id);
+CREATE INDEX connec_dma ON connec USING btree (dma_id);
+CREATE INDEX connec_dqa ON connec USING btree (dqa_id);
+CREATE INDEX connec_exploitation ON connec USING btree (expl_id);
+CREATE INDEX connec_exploitation2 ON connec USING btree (expl_id2);
+CREATE INDEX connec_index ON connec USING gist (the_geom);
+CREATE INDEX connec_muni ON connec USING btree (muni_id);
+CREATE INDEX connec_presszone ON connec USING btree (presszone_id);
+CREATE INDEX connec_sector ON connec USING btree (sector_id);
+CREATE INDEX connec_street1 ON connec USING btree (streetaxis_id);
+CREATE INDEX connec_street2 ON connec USING btree (streetaxis2_id);
+CREATE INDEX connec_streetname ON connec USING btree (streetname);
+CREATE INDEX connec_streetname2 ON connec USING btree (streetname2);
+
+
+
+
+-- element
+ALTER TABLE element RENAME TO _element;
+
+
+-- Drop foreign keys that reference element
+ALTER TABLE element_x_node DROP CONSTRAINT element_x_node_element_id_fkey;
+ALTER TABLE element_x_arc DROP CONSTRAINT element_x_arc_element_id_fkey;
+ALTER TABLE element_x_connec DROP CONSTRAINT element_x_connec_element_id_fkey;
+
+-- Drop foreign keys from table element
+
+
+ALTER TABLE _element DROP CONSTRAINT element_brand_id;
+ALTER TABLE _element DROP CONSTRAINT element_category_type_feature_type_fkey;
+ALTER TABLE _element DROP CONSTRAINT element_elementcat_id_fkey;
+ALTER TABLE _element DROP CONSTRAINT element_buildercat_id_fkey;
+ALTER TABLE _element DROP CONSTRAINT element_feature_type_fkey;
+ALTER TABLE _element DROP CONSTRAINT element_fluid_type_feature_type_fkey;
+ALTER TABLE _element DROP CONSTRAINT element_function_type_feature_type_fkey;
+ALTER TABLE _element DROP CONSTRAINT element_location_type_feature_type_fkey;
+ALTER TABLE _element DROP CONSTRAINT element_model_id;
+ALTER TABLE _element DROP CONSTRAINT element_muni_id;
+ALTER TABLE _element DROP CONSTRAINT element_muni_id_fkey;
+ALTER TABLE _element DROP CONSTRAINT element_ownercat_id_fkey;
+ALTER TABLE _element DROP CONSTRAINT element_state_fkey;
+ALTER TABLE _element DROP CONSTRAINT element_state_type_fkey;
+ALTER TABLE _element DROP CONSTRAINT element_workcat_id_end_fkey;
+ALTER TABLE _element DROP CONSTRAINT element_workcat_id_fkey;
+
+
+-- Drop restrictions from table arc
+ALTER TABLE _element DROP CONSTRAINT element_pkey;
+
+
+-- Drop rules from table connec
+
+-- Drop indexes from table connec
+
+DROP INDEX IF EXISTS element_index;
+DROP INDEX IF EXISTS element_muni;
+DROP INDEX IF EXISTS element_pkey;
+DROP INDEX IF EXISTS element_sector;
+
+
+-- New order to table connec
+CREATE TABLE element (
+	element_id varchar(16) DEFAULT nextval('urn_id_seq'::regclass) NOT NULL,
+	code text NULL,
+	elementcat_id varchar(30) NOT NULL,
+	serial_number varchar(30) NULL,
+	num_elements int4 NULL,
+	state int2 NOT NULL,
+	state_type int2 NOT NULL,
+	observ varchar(254) NULL,
+	"comment" varchar(254) NULL,
+	function_type varchar(50) NULL,
+	category_type varchar(50) NULL,
+	fluid_type varchar(50) NULL,
+	location_type varchar(50) NULL,
+	workcat_id varchar(30) NULL,
+	workcat_id_end varchar(30) NULL,
+	builtdate date NULL,
+	enddate date NULL,
+	ownercat_id varchar(30) NULL,
+	rotation numeric(6, 3) NULL,
+	link varchar(512) NULL,
+	verified int4 NULL,
+	the_geom public.geometry(point, 25831) NULL,
+	label_x varchar(30) NULL,
+	label_y varchar(30) NULL,
+	label_rotation numeric(6, 3) NULL,
+	undelete bool NULL,
+	publish bool NULL,
+	inventory bool NULL,
+	expl_id int4 NULL,
+	feature_type varchar(16) DEFAULT 'ELEMENT'::character varying NULL,
+	tstamp timestamp DEFAULT now() NULL,
+	lastupdate timestamp NULL,
+	lastupdate_user varchar(50) NULL,
+	insert_user varchar(50) DEFAULT CURRENT_USER NULL,
+	pol_id varchar(16) NULL,
+	top_elev numeric(12, 4) NULL,
+	expl_id2 int4 NULL,
+	trace_featuregeom bool DEFAULT true NULL,
+	muni_id int4 NULL,
+	sector_id int4 DEFAULT 0 NULL,
+	brand_id varchar(50) NULL,
+	model_id varchar(50) NULL,
+	asset_id varchar(50) NULL,
+	datasource int4 NULL,
+	lock_level int4 NULL,
+	CONSTRAINT element_pkey PRIMARY KEY (element_id),
+	CONSTRAINT element_brand_id FOREIGN KEY (brand_id) REFERENCES cat_brand(id),
+	CONSTRAINT element_category_type_feature_type_fkey FOREIGN KEY (category_type,feature_type) REFERENCES man_type_category(category_type,feature_type) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT element_elementcat_id_fkey FOREIGN KEY (elementcat_id) REFERENCES cat_element(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT element_feature_type_fkey FOREIGN KEY (feature_type) REFERENCES sys_feature_class(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT element_fluid_type_feature_type_fkey FOREIGN KEY (fluid_type,feature_type) REFERENCES man_type_fluid(fluid_type,feature_type) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT element_function_type_feature_type_fkey FOREIGN KEY (function_type,feature_type) REFERENCES man_type_function(function_type,feature_type) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT element_location_type_feature_type_fkey FOREIGN KEY (location_type,feature_type) REFERENCES man_type_location(location_type,feature_type) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT element_model_id FOREIGN KEY (model_id) REFERENCES cat_brand_model(id),
+	CONSTRAINT element_muni_id FOREIGN KEY (muni_id) REFERENCES ext_municipality(muni_id),
+	CONSTRAINT element_muni_id_fkey FOREIGN KEY (muni_id) REFERENCES ext_municipality(muni_id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT element_ownercat_id_fkey FOREIGN KEY (ownercat_id) REFERENCES cat_owner(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT element_state_fkey FOREIGN KEY (state) REFERENCES value_state(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT element_state_type_fkey FOREIGN KEY (state_type) REFERENCES value_state_type(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT element_workcat_id_end_fkey FOREIGN KEY (workcat_id_end) REFERENCES cat_work(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT element_workcat_id_fkey FOREIGN KEY (workcat_id) REFERENCES cat_work(id) ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+CREATE INDEX element_index ON element USING gist (the_geom);
+CREATE INDEX element_muni ON element USING btree (muni_id);
+CREATE INDEX element_sector ON element USING btree (sector_id);
+
+
+-- node
+ALTER TABLE node RENAME TO _node;
+
+-- Drop foreign keys that reference node
+ALTER TABLE _arc DROP CONSTRAINT arc_node_1_fkey;
+ALTER TABLE _arc DROP CONSTRAINT arc_node_2_fkey;
+ALTER TABLE _arc DROP CONSTRAINT arc_parent_id_fkey;
+ALTER TABLE config_graph_mincut DROP CONSTRAINT config_graph_inlet_node_id_fkey;
+ALTER TABLE doc_x_node DROP CONSTRAINT doc_x_node_node_id_fkey;
+ALTER TABLE element_x_node DROP CONSTRAINT element_x_node_node_id_fkey;
+ALTER TABLE inp_dscenario_pump_additional DROP CONSTRAINT inp_dscenario_pump_additional_node_id_fkey;
+ALTER TABLE inp_inlet DROP CONSTRAINT inp_inlet_node_id_fkey;
+ALTER TABLE inp_junction DROP CONSTRAINT inp_junction_node_id_fkey;
+ALTER TABLE inp_label DROP CONSTRAINT inp_label_node_id_fkey;
+ALTER TABLE inp_pump_additional DROP CONSTRAINT inp_pump_additional_node_id_fkey;
+ALTER TABLE inp_pump DROP CONSTRAINT inp_pump_node_id_fkey;
+ALTER TABLE inp_reservoir DROP CONSTRAINT inp_reservoir_node_id_fkey;
+ALTER TABLE inp_shortpipe DROP CONSTRAINT inp_shortpipe_node_id_fkey;
+ALTER TABLE inp_tank DROP CONSTRAINT inp_tank_node_id_fkey;
+ALTER TABLE inp_valve DROP CONSTRAINT inp_valve_node_id_fkey;
+ALTER TABLE man_expansiontank DROP CONSTRAINT man_expansiontank_node_id_fkey;
+ALTER TABLE man_filter DROP CONSTRAINT man_filter_node_id_fkey;
+ALTER TABLE man_flexunion DROP CONSTRAINT man_flexunion_node_id_fkey;
+ALTER TABLE man_hydrant DROP CONSTRAINT man_hydrant_node_id_fkey;
+ALTER TABLE man_junction DROP CONSTRAINT man_junction_node_id_fkey;
+ALTER TABLE man_manhole DROP CONSTRAINT man_manhole_node_id_fkey;
+ALTER TABLE man_meter DROP CONSTRAINT man_meter_node_id_fkey;
+ALTER TABLE man_netelement DROP CONSTRAINT man_netelement_node_id_fkey;
+ALTER TABLE man_netsamplepoint DROP CONSTRAINT man_netsamplepoint_node_id_fkey;
+ALTER TABLE man_netwjoin DROP CONSTRAINT man_netwjoin_node_id_fkey;
+ALTER TABLE man_pump DROP CONSTRAINT man_pump_node_id_fkey;
+ALTER TABLE man_reduction DROP CONSTRAINT man_reduction_node_id_fkey;
+ALTER TABLE man_register DROP CONSTRAINT man_register_node_id_fkey;
+ALTER TABLE man_source DROP CONSTRAINT man_source_node_id_fkey;
+ALTER TABLE man_tank DROP CONSTRAINT man_tank_node_id_fkey;
+ALTER TABLE man_valve DROP CONSTRAINT man_valve_node_id_fkey;
+ALTER TABLE man_waterwell DROP CONSTRAINT man_waterwell_node_id_fkey;
+ALTER TABLE man_wtp DROP CONSTRAINT man_wtp_node_id_fkey;
+ALTER TABLE om_visit_x_node DROP CONSTRAINT om_visit_x_node_node_id_fkey;
+ALTER TABLE plan_psector_x_node DROP CONSTRAINT plan_psector_x_node_node_id_fkey;
+ALTER TABLE rtc_hydrometer_x_node DROP CONSTRAINT rtc_hydrometer_x_node_node_id_fkey;
+ALTER TABLE ext_rtc_scada_x_data DROP CONSTRAINT ext_rtc_scada_x_data_node_id_fkey;
+
+ALTER TABLE _node_border_sector DROP CONSTRAINT arc_border_expl_node_id_fkey;
+ALTER TABLE _inp_emitter_ DROP CONSTRAINT inp_emitter_node_id_fkey;
+ALTER TABLE _inp_mixing_ DROP CONSTRAINT inp_mixing_node_id_fkey;
+ALTER TABLE _inp_quality_ DROP CONSTRAINT inp_quality_node_id_fkey;
+ALTER TABLE _inp_source_ DROP CONSTRAINT inp_source_node_id_fkey;
+ALTER TABLE _inp_valve_ DROP CONSTRAINT _inp_valve_node_id_fkey_;
+ALTER TABLE om_visit_event DROP CONSTRAINT om_visit_event_position_id_fkey;
+
+-- Drop foreign keys from table node
+ALTER TABLE _node DROP CONSTRAINT node_parent_id_fkey;
+ALTER TABLE _node DROP CONSTRAINT node_pkey;
+
+ALTER TABLE _node DROP CONSTRAINT node_epa_type_check;
+
+ALTER TABLE _node DROP CONSTRAINT node_buildercat_id_fkey;
+ALTER TABLE _node DROP CONSTRAINT node_district_id_fkey;
+ALTER TABLE _node DROP CONSTRAINT node_expl_fkey;
+ALTER TABLE _node DROP CONSTRAINT node_expl_id2_fkey;
+ALTER TABLE _node DROP CONSTRAINT node_feature_type_fkey;
+ALTER TABLE _node DROP CONSTRAINT node_muni_id_fkey;
+ALTER TABLE _node DROP CONSTRAINT node_nodecat_id_fkey;
+ALTER TABLE _node DROP CONSTRAINT node_ownercat_id_fkey;
+ALTER TABLE _node DROP CONSTRAINT node_soilcat_id_fkey;
+ALTER TABLE _node DROP CONSTRAINT node_state_fkey;
+ALTER TABLE _node DROP CONSTRAINT node_state_type_fkey;
+ALTER TABLE _node DROP CONSTRAINT node_streetaxis2_id_fkey;
+ALTER TABLE _node DROP CONSTRAINT node_streetaxis_id_fkey;
+ALTER TABLE _node DROP CONSTRAINT node_workcat_id_end_fkey;
+ALTER TABLE _node DROP CONSTRAINT node_workcat_id_fkey;
+
+-- Drop restrictions from table node
+ALTER TABLE _node DROP CONSTRAINT cat_pavement_id_fkey;
+ALTER TABLE _node DROP CONSTRAINT node_supplyzone_id_fkey;
+
+-- Drop rules from table node
+DROP RULE IF EXISTS insert_plan_psector_x_node ON _node;
+DROP RULE IF EXISTS undelete_node ON _node;
+
+
+-- Drop indexes from table node
+DROP INDEX IF EXISTS node_arc_id;
+DROP INDEX IF EXISTS node_dma;
+DROP INDEX IF EXISTS node_dqa;
+DROP INDEX IF EXISTS node_exploitation;
+DROP INDEX IF EXISTS node_exploitation2;
+DROP INDEX IF EXISTS node_index;
+DROP INDEX IF EXISTS node_muni;
+DROP INDEX IF EXISTS node_nodecat;
+DROP INDEX IF EXISTS node_presszone;
+DROP INDEX IF EXISTS node_sector;
+DROP INDEX IF EXISTS node_street1;
+DROP INDEX IF EXISTS node_street2;
+DROP INDEX IF EXISTS node_streetname;
+DROP INDEX IF EXISTS node_streetname2;
+
+
+CREATE TABLE node (
+	node_id varchar(16) DEFAULT nextval('urn_id_seq'::regclass) NOT NULL,
+	code text NULL,
+	top_elev numeric(12, 4) NULL,
+	custom_top_elev numeric(12, 4) NULL,
+	datasource int4 NULL,
+	"depth" numeric(12, 4) NULL,
+	nodecat_id varchar(30) NOT NULL,
+	epa_type varchar(16) NOT NULL,
+	sector_id int4 NOT NULL,
+	arc_id varchar(16) NULL,
+	parent_id varchar(16) NULL,
+	state int2 NOT NULL,
+	state_type int2 NOT NULL,
+	annotation text NULL,
+	observ text NULL,
+	"comment" text NULL,
+	dma_id int4 NULL,
+	presszone_id int4 NULL,
+	soilcat_id varchar(30) NULL,
+	function_type varchar(50) NULL,
+	category_type varchar(50) NULL,
+	fluid_type varchar(50) NULL,
+	location_type varchar(50) NULL,
+	workcat_id varchar(255) NULL,
+	workcat_id_end varchar(255) NULL,
+	builtdate date NULL,
+	enddate date NULL,
+	ownercat_id varchar(30) NULL,
+	muni_id int4 NOT NULL,
+	postcode varchar(16) NULL,
+	streetaxis_id varchar(16) NULL,
+	postnumber int4 NULL,
+	postcomplement varchar(100) NULL,
+	streetaxis2_id varchar(16) NULL,
+	postnumber2 int4 NULL,
+	postcomplement2 varchar(100) NULL,
+	descript varchar(254) NULL,
+	link varchar(512) NULL,
+	verified int4 NULL,
+	rotation numeric(6, 3) NULL,
+	the_geom public.geometry(point, 25831) NULL,
+	undelete bool NULL,
+	label_x varchar(30) NULL,
+	label_y varchar(30) NULL,
+	label_rotation numeric(6, 3) NULL,
+	publish bool NULL,
+	inventory bool NULL,
+	hemisphere float8 NULL,
+	expl_id int4 NOT NULL,
+	num_value numeric(12, 3) NULL,
+	feature_type varchar(16) DEFAULT 'NODE'::character varying NULL,
+	tstamp timestamp DEFAULT now() NULL,
+	lastupdate timestamp NULL,
+	lastupdate_user varchar(50) NULL,
+	insert_user varchar(50) DEFAULT CURRENT_USER NULL,
+	minsector_id int4 NULL,
+	dqa_id int4 NULL,
+	staticpressure numeric(12, 3) NULL,
+	district_id int4 NULL,
+	adate text NULL,
+	adescript text NULL,
+	accessibility int2 NULL,
+	workcat_id_plan varchar(255) NULL,
+	asset_id varchar(50) NULL,
+	om_state text NULL,
+	conserv_state text NULL,
+	access_type text NULL,
+	placement_type text NULL,
+	expl_id2 int4 NULL,
+	brand_id varchar(50) NULL,
+	model_id varchar(50) NULL,
+	serial_number varchar(100) NULL,
+	label_quadrant varchar(12) NULL,
+	macrominsector_id int4 DEFAULT 0 NULL,
+	streetname varchar(100) NULL,
+	streetname2 varchar(100) NULL,
+	supplyzone_id int4 NULL,
+	lock_level int4 NULL,
+	is_scadamap bool NULL,
+	pavcat_id text NULL,
+	CONSTRAINT node_epa_type_check CHECK (((epa_type)::text = ANY (ARRAY['JUNCTION'::text, 'RESERVOIR'::text, 'TANK'::text, 'INLET'::text, 'UNDEFINED'::text, 'SHORTPIPE'::text, 'VALVE'::text, 'PUMP'::text]))),
+	CONSTRAINT node_pkey PRIMARY KEY (node_id),
+	CONSTRAINT node_arc_id_fkey FOREIGN KEY (arc_id) REFERENCES arc(arc_id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT node_district_id_fkey FOREIGN KEY (district_id) REFERENCES ext_district(district_id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT node_dma_id_fkey FOREIGN KEY (dma_id) REFERENCES dma(dma_id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT node_dqa_id_fkey FOREIGN KEY (dqa_id) REFERENCES dqa(dqa_id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT node_expl_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT node_expl_id2_fkey FOREIGN KEY (expl_id2) REFERENCES exploitation(expl_id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT node_feature_type_fkey FOREIGN KEY (feature_type) REFERENCES sys_feature_type(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT node_muni_id_fkey FOREIGN KEY (muni_id) REFERENCES ext_municipality(muni_id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT node_nodecat_id_fkey FOREIGN KEY (nodecat_id) REFERENCES cat_node(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT node_ownercat_id_fkey FOREIGN KEY (ownercat_id) REFERENCES cat_owner(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT node_parent_id_fkey FOREIGN KEY (parent_id) REFERENCES node(node_id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT node_presszonecat_id_fkey FOREIGN KEY (presszone_id) REFERENCES presszone(presszone_id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT node_sector_id_fkey FOREIGN KEY (sector_id) REFERENCES sector(sector_id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT node_soilcat_id_fkey FOREIGN KEY (soilcat_id) REFERENCES cat_soil(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT node_state_fkey FOREIGN KEY (state) REFERENCES value_state(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT node_state_type_fkey FOREIGN KEY (state_type) REFERENCES value_state_type(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT node_streetaxis2_id_fkey FOREIGN KEY (muni_id,streetaxis2_id) REFERENCES ext_streetaxis(muni_id,id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT node_streetaxis_id_fkey FOREIGN KEY (muni_id,streetaxis_id) REFERENCES ext_streetaxis(muni_id,id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT node_supplyzone_id_fkey FOREIGN KEY (supplyzone_id) REFERENCES supplyzone(supplyzone_id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT node_workcat_id_end_fkey FOREIGN KEY (workcat_id_end) REFERENCES cat_work(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT node_workcat_id_fkey FOREIGN KEY (workcat_id) REFERENCES cat_work(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT cat_pavement_id_fkey FOREIGN KEY (pavcat_id) REFERENCES cat_pavement(id) ON DELETE RESTRICT ON UPDATE CASCADE
+);
+CREATE INDEX node_arc_id ON node USING btree (arc_id);
+CREATE INDEX node_dma ON node USING btree (dma_id);
+CREATE INDEX node_dqa ON node USING btree (dqa_id);
+CREATE INDEX node_exploitation ON node USING btree (expl_id);
+CREATE INDEX node_exploitation2 ON node USING btree (expl_id2);
+CREATE INDEX node_index ON node USING gist (the_geom);
+CREATE INDEX node_muni ON node USING btree (muni_id);
+CREATE INDEX node_nodecat ON node USING btree (nodecat_id);
+CREATE INDEX node_presszone ON node USING btree (presszone_id);
+CREATE INDEX node_sector ON node USING btree (sector_id);
+CREATE INDEX node_street1 ON node USING btree (streetaxis_id);
+CREATE INDEX node_street2 ON node USING btree (streetaxis2_id);
+CREATE INDEX node_streetname ON node USING btree (streetname);
+CREATE INDEX node_streetname2 ON node USING btree (streetname2);
