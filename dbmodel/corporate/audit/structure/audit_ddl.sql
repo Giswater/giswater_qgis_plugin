@@ -6,10 +6,9 @@ This version of Giswater is provided by Giswater Association
 
 
 
-CREATE SCHEMA audit;
+CREATE SCHEMA SCHEMA_NAME;
 
-
-CREATE TABLE audit.log (
+CREATE TABLE SCHEMA_NAME.log (
 id serial8 PRIMARY KEY,
 schema text,
 table_name text,
