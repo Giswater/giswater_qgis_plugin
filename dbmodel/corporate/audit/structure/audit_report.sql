@@ -14,7 +14,7 @@ VALUES(902, 'DB Activity', 'SELECT date, user_name, count, action  FROM audit.v_
 '{"orderBy":"1", "orderType": "DESC", "filterSign":"> now() - INTERVAL", "vDefault":"60 days"}'::json,
 '[{"columnname":"date", "label":"Fecha:", "widgettype":"combo","datatype":"text","layoutorder":1,
 "dvquerytext":"Select id, idval FROM om_typevalue WHERE typevalue = ''custom_report_update_db'' ORDER BY addparam->>''orderby''", "filterSign":"> now() - INTERVAL"}]'::json,
-'role_master', NULL, true, '{4}') ON CONFLICT (id) DO NOTHING;
+'role_plan', NULL, true, '{4}') ON CONFLICT (id) DO NOTHING;
 
 
 CREATE OR REPLACE VIEW audit.v_log_ws AS
