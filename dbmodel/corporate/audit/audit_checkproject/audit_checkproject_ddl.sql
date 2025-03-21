@@ -1,10 +1,8 @@
 /*
-Copyright © 2023 by BGEO. All rights reserved.
-The program is free software: you can redistribute it and/or modify it under the terms of the GNU
-General Public License as published by the Free Software Foundation, either version 3 of the License,
-or (at your option) any later version.
+This file is part of Giswater
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+This version of Giswater is provided by Giswater Association
 */
-
 
 /*
 -- to run use initProject=false and isAudit=true
@@ -90,7 +88,7 @@ CREATE INDEX anl_node_node_id_index
   ON audit.anl_node
   USING btree
   (node_id COLLATE pg_catalog."default");
-  
+
 CREATE INDEX anl_arc_arc_id
   ON audit.anl_arc
   USING btree
