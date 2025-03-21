@@ -58,3 +58,6 @@ END;
 
 $function$
 ;
+
+-- Execute the function to do the first snapshot
+SELECT SCHEMA_NAME.gw_fct_set_snapshot();
