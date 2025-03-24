@@ -74,7 +74,7 @@ BEGIN
     -- v_disable_locklevel = {"update":false, "delete":true}
     -- RESULT: Lock level control is NOT applied (system override)
 
-    IF v_automatic_disable_locklevel->>'update' = 'false' AND v_disable_locklevel->>'update' = 'false' THEN
+    IF v_automatic_disable_locklevel->>'update' = 'false' AND (v_disable_locklevel->>'update' = 'false' OR v_disable_locklevel IS NULL) THEN
       IF TG_OP = 'UPDATE' AND (OLD.lock_level = 1 AND NEW.lock_level = 1) THEN
         EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
         "data":{"message":"3284", "function":"2718","parameters":{"lock_level":'||NEW.lock_level||'}}}$$);';
@@ -86,7 +86,7 @@ BEGIN
       END IF;
     END IF;
 
-    IF v_automatic_disable_locklevel->>'delete' = 'false' AND v_disable_locklevel->>'delete' = 'false' THEN
+    IF v_automatic_disable_locklevel->>'delete' = 'false' AND (v_disable_locklevel->>'delete' = 'false' OR v_disable_locklevel IS NULL) THEN
       IF TG_OP = 'DELETE' AND (OLD.lock_level = 2) THEN
         EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
         "data":{"message":"3284", "function":"2718","parameters":{"lock_level":'||OLD.lock_level||'}}}$$);';
