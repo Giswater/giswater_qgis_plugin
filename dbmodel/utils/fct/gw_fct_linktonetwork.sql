@@ -185,8 +185,6 @@ BEGIN
 	-- Main loop
 	IF v_feature_array IS NOT NULL THEN
 
-	    PERFORM setval('SCHEMA_NAME.link_link_id_seq', (SELECT max(link_id) FROM link),true);
-
 	    FOREACH v_connect_id IN ARRAY v_feature_array
 	    LOOP
 
@@ -464,7 +462,7 @@ BEGIN
 				IF v_link.link_id IS NULL THEN
 
 					-- creation of link
-					v_link.link_id = (SELECT nextval('link_link_id_seq'));
+					v_link.link_id = (SELECT nextval('urn_id_seq'));
 
 					IF v_projecttype = 'WS' THEN
 						INSERT INTO link (link_id, the_geom, feature_id, feature_type, exit_type, exit_id, state, expl_id, sector_id, dma_id,

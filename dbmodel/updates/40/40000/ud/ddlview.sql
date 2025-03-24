@@ -448,6 +448,7 @@ AS WITH
     link_selected as
     	(
 			SELECT DISTINCT ON (l.link_id) l.link_id,
+            l.code,
 			l.feature_type,
 			l.feature_id,
 			l.exit_type,
@@ -7567,15 +7568,15 @@ AS SELECT om_visit_event.id AS event_id,
 
 
 DROP VIEW IF EXISTS v_expl_connec;
-CREATE OR REPLACE VIEW v_expl_connec AS 
+CREATE OR REPLACE VIEW v_expl_connec AS
  SELECT connec.connec_id
  FROM selector_expl, connec
  WHERE selector_expl.cur_user = "current_user"()::text AND (connec.expl_id = selector_expl.expl_id);
 
 DROP VIEW IF EXISTS v_plan_psector_link;
-CREATE OR REPLACE VIEW v_plan_psector_link AS 
+CREATE OR REPLACE VIEW v_plan_psector_link AS
 SELECT row_number() OVER () AS rid,
-a.link_id, 
+a.link_id,
 a.psector_id,
 a.feature_id,
 a.original_state,
@@ -7595,7 +7596,7 @@ FROM selector_psector,connec
 JOIN plan_psector_x_connec USING (connec_id)
 JOIN link ON link.feature_id=connec.connec_id
 WHERE plan_psector_x_connec.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text
-UNION 
+UNION
 SELECT link.link_id,
 plan_psector_x_gully.psector_id,
 gully.gully_id AS feature_id,
@@ -7732,7 +7733,7 @@ CREATE OR REPLACE VIEW v_ui_hydrometer
 
 
 DROP VIEW IF EXISTS v_ui_hydroval_x_connec;
-CREATE OR REPLACE VIEW v_ui_hydroval_x_connec AS 
+CREATE OR REPLACE VIEW v_ui_hydroval_x_connec AS
 SELECT ext_rtc_hydrometer_x_data.id,
     rtc_hydrometer_x_connec.connec_id,
     connec.arc_id,
@@ -7743,8 +7744,8 @@ SELECT ext_rtc_hydrometer_x_data.id,
     ext_rtc_hydrometer_x_data.cat_period_id,
     ext_rtc_hydrometer_x_data.sum,
     ext_rtc_hydrometer_x_data.custom_sum,
-    crmtype.idval as value_type, 
-    crmstatus.idval as value_status, 
+    crmtype.idval as value_type,
+    crmstatus.idval as value_status,
     crmstate.idval as value_state
    FROM ext_rtc_hydrometer_x_data
     JOIN ext_rtc_hydrometer ON ext_rtc_hydrometer_x_data.hydrometer_id::text = ext_rtc_hydrometer.id::text
@@ -7759,7 +7760,7 @@ SELECT ext_rtc_hydrometer_x_data.id,
 
 DROP VIEW IF EXISTS v_ui_om_visitman_x_connec;
 DROP VIEW IF EXISTS v_ui_om_visit_x_connec;
-CREATE OR REPLACE VIEW v_ui_om_visit_x_connec AS 
+CREATE OR REPLACE VIEW v_ui_om_visit_x_connec AS
  SELECT om_visit_event.id AS event_id,
     om_visit.id AS visit_id,
     om_visit.ext_code AS code,
@@ -7801,7 +7802,7 @@ CREATE OR REPLACE VIEW v_ui_om_visit_x_connec AS
   ORDER BY om_visit_x_connec.connec_id;
 
 DROP VIEW IF EXISTS vp_basic_connec;
-CREATE OR REPLACE VIEW vp_basic_connec AS 
+CREATE OR REPLACE VIEW vp_basic_connec AS
 SELECT connec_id AS nid,
 connec_type AS custom_type
 FROM connec;

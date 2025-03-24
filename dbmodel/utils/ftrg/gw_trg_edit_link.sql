@@ -96,8 +96,8 @@ BEGIN
 	IF TG_OP = 'INSERT' THEN
 
 		-- link ID
-		IF (NEW.link_id IS NULL) THEN
-			NEW.link_id:= (SELECT nextval('link_link_id_seq'));
+		IF NEW.link_id != (SELECT last_value FROM urn_id_seq) OR NEW.link_id IS NULL THEN
+			NEW.link_id = (SELECT nextval('urn_id_seq'));
 		END IF;
 
 		-- State control of element
@@ -262,8 +262,8 @@ BEGIN
 
 			-- control of dma and fluidtype automatic values
 			IF v_dma_autoupdate is true or v_dma_autoupdate is null THEN v_dma = v_arc.dma_id; ELSE v_dma = NEW.dma_id; END IF;
-			IF v_fluidtype_autoupdate is true or v_fluidtype_autoupdate is null 
-				THEN v_fluidtype = v_arc.fluid_type; 
+			IF v_fluidtype_autoupdate is true or v_fluidtype_autoupdate is null
+				THEN v_fluidtype = v_arc.fluid_type;
 			ELSE
 				-- if no automatic values, take the value from the feature_id or the NEW.fluid_type
 				IF NEW.fluid_type is NULL then
@@ -309,8 +309,8 @@ BEGIN
 
 			-- control of dma and fluidtype automatic values
 			IF v_dma_autoupdate is true or v_dma_autoupdate is null THEN v_dma = v_node.dma_id; ELSE v_dma = NEW.dma_id; END IF;
-			IF v_fluidtype_autoupdate is true or v_fluidtype_autoupdate is null 
-				THEN v_fluidtype = v_node.fluid_type; 
+			IF v_fluidtype_autoupdate is true or v_fluidtype_autoupdate is null
+				THEN v_fluidtype = v_node.fluid_type;
 			ELSE
 				-- if no automatic values, take the value from the feature_id or the NEW.fluid_type
 				IF NEW.fluid_type is NULL then
@@ -359,8 +359,8 @@ BEGIN
 
             -- control of dma and fluidtype automatic values
 			IF v_dma_autoupdate is true or v_dma_autoupdate is null THEN v_dma = v_connec2.dma_id; ELSE v_dma = NEW.dma_id; END IF;
-			IF v_fluidtype_autoupdate is true or v_fluidtype_autoupdate is null THEN 
-				v_fluidtype = v_connec2.fluid_type; 
+			IF v_fluidtype_autoupdate is true or v_fluidtype_autoupdate is null THEN
+				v_fluidtype = v_connec2.fluid_type;
 			ELSE
 				-- if no automatic values, take the value from the feature_id or the NEW.fluid_type
 				IF NEW.fluid_type is NULL then
@@ -402,8 +402,8 @@ BEGIN
 
                 -- control of dma and fluidtype automatic values
                 IF v_dma_autoupdate is true or v_dma_autoupdate is null THEN v_dma = v_gully2.dma_id; ELSE v_dma = NEW.dma_id; END IF;
-                IF v_fluidtype_autoupdate is true or v_fluidtype_autoupdate is null THEN 
-					v_fluidtype = v_gully2.fluid_type; 
+                IF v_fluidtype_autoupdate is true or v_fluidtype_autoupdate is null THEN
+					v_fluidtype = v_gully2.fluid_type;
 				ELSE
 					-- if no automatic values, take the value from the feature_id or the NEW.fluid_type
 					IF NEW.fluid_type is NULL then
@@ -608,18 +608,18 @@ BEGIN
 		-- insert into link table
 		IF v_projectype = 'WS' THEN
 
-			INSERT INTO link (link_id, feature_type, feature_id, expl_id, exit_id, exit_type, userdefined_geom, state, the_geom, sector_id,
+			INSERT INTO link (link_id, code, feature_type, feature_id, expl_id, exit_id, exit_type, userdefined_geom, state, the_geom, sector_id,
 			 fluid_type, dma_id, dqa_id, presszone_id, minsector_id, conneccat_id, workcat_id, workcat_id_end, builtdate, enddate, exit_elev, exit_topelev,
 			 uncertain, muni_id, verified)
-			VALUES (NEW.link_id, NEW.feature_type, NEW.feature_id, v_expl, NEW.exit_id, NEW.exit_type, TRUE, NEW.state, NEW.the_geom, v_sector,
+			VALUES (NEW.link_id, NEW.code, NEW.feature_type, NEW.feature_id, v_expl, NEW.exit_id, NEW.exit_type, TRUE, NEW.state, NEW.the_geom, v_sector,
 			v_fluidtype, v_dma, v_dqa, v_presszone, v_minsector, NEW.conneccat_id, NEW.workcat_id, NEW.workcat_id_end, NEW.builtdate, NEW.enddate,
 			NEW.exit_elev, NEW.exit_topelev, NEW.uncertain, NEW.muni_id, NEW.verified);
 
 		ELSIF  v_projectype = 'UD' THEN
 
-			INSERT INTO link (link_id, feature_type, feature_id, expl_id, exit_id, exit_type, userdefined_geom, state, the_geom, sector_id, fluid_type, dma_id,
+			INSERT INTO link (link_id, code, feature_type, feature_id, expl_id, exit_id, exit_type, userdefined_geom, state, the_geom, sector_id, fluid_type, dma_id,
 				conneccat_id, workcat_id, workcat_id_end, builtdate, enddate, exit_elev, exit_topelev, uncertain, muni_id, verified)
-			VALUES (NEW.link_id, NEW.feature_type, NEW.feature_id, v_expl, NEW.exit_id, NEW.exit_type, TRUE, NEW.state, NEW.the_geom, v_sector, v_fluidtype, v_dma,
+			VALUES (NEW.link_id, NEW.code, NEW.feature_type, NEW.feature_id, v_expl, NEW.exit_id, NEW.exit_type, TRUE, NEW.state, NEW.the_geom, v_sector, v_fluidtype, v_dma,
 				NEW.conneccat_id, NEW.workcat_id, NEW.workcat_id_end, NEW.builtdate, NEW.enddate, NEW.exit_elev, NEW.exit_topelev, NEW.uncertain, NEW.muni_id, NEW.verified);
 		END IF;
 
@@ -751,7 +751,7 @@ BEGIN
 		END IF;
 
 		-- update link parameters
-		UPDATE link SET state = NEW.state, the_geom = NEW.the_geom, workcat_id = NEW.workcat_id, workcat_id_end = NEW.workcat_id_end, builtdate = NEW.builtdate,
+		UPDATE link SET code = NEW.code, state = NEW.state, the_geom = NEW.the_geom, workcat_id = NEW.workcat_id, workcat_id_end = NEW.workcat_id_end, builtdate = NEW.builtdate,
 		enddate = NEW.enddate, exit_elev = NEW.exit_elev, exit_topelev = NEW.exit_topelev, uncertain = NEW.uncertain, muni_id = NEW.muni_id, sector_id=v_sector,
 		verified = NEW.verified
 		WHERE link_id=NEW.link_id;

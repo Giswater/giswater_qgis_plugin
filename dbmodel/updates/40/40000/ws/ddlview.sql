@@ -923,6 +923,7 @@ AS WITH
     link_selected AS
       (
         SELECT l.link_id,
+        l.code,
         l.feature_type,
         l.feature_id,
         l.exit_type,
@@ -1798,7 +1799,7 @@ UNION
            FROM plan_arc_x_pavement) a USING (arc_id)
   WHERE a.arc_id IS NULL;
 
-CREATE OR REPLACE VIEW v_price_x_catarc AS 
+CREATE OR REPLACE VIEW v_price_x_catarc AS
   SELECT cat_arc.id,
     cat_arc.dint,
     cat_arc.z1,
@@ -6643,7 +6644,7 @@ AS SELECT om_visit_event.id AS event_id,
            FROM doc_x_visit) b ON b.visit_id = om_visit.id
   ORDER BY om_visit_x_arc.arc_id;
 
-CREATE OR REPLACE VIEW v_ui_om_visit_x_arc AS 
+CREATE OR REPLACE VIEW v_ui_om_visit_x_arc AS
  SELECT om_visit_event.id AS event_id,
     om_visit.id AS visit_id,
     om_visit.ext_code AS code,

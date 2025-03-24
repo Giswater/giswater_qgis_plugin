@@ -3397,3 +3397,11 @@ placement_type, expl_id2, brand_id, model_id, serial_number, label_quadrant, mac
 pavcat_id
 FROM _node;
 
+
+INSERT INTO link (link_id, code, feature_id, feature_type, exit_id, exit_type, userdefined_geom, state, expl_id, the_geom, tstamp, exit_topelev, exit_elev, sector_id,
+dma_id, fluid_type, presszone_id, dqa_id, minsector_id, expl_id2, epa_type, is_operative, insert_user, lastupdate, lastupdate_user, staticpressure, conneccat_id,
+workcat_id, workcat_id_end, builtdate, enddate, uncertain, muni_id, macrominsector_id, verified, supplyzone_id, n_hydrometer)
+SELECT nextval('SCHEMA_NAME.urn_id_seq'::regclass), link_id::text, feature_id, feature_type, exit_id, exit_type, userdefined_geom, state, expl_id, the_geom, tstamp, exit_topelev, exit_elev, sector_id,
+dma_id, fluid_type, presszone_id, dqa_id, minsector_id, expl_id2, epa_type, is_operative, insert_user, lastupdate, lastupdate_user, staticpressure, conneccat_id,
+workcat_id, workcat_id_end, builtdate, enddate, uncertain, muni_id, macrominsector_id, verified, supplyzone_id, n_hydrometer
+FROM _link;

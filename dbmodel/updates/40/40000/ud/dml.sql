@@ -2867,3 +2867,13 @@ ownercat_id, rotation, link, verified, the_geom, label_x, label_y, label_rotatio
 expl_id, feature_type, tstamp, lastupdate, lastupdate_user, insert_user, pol_id, top_elev, expl_id2, trace_featuregeom,
 muni_id, sector_id, brand_id, model_id, asset_id, datasource, omunit_id, lock_level
 FROM _element;
+
+INSERT INTO link (link_id, code, feature_id, feature_type, exit_id, exit_type, userdefined_geom, state, expl_id, the_geom,
+tstamp, exit_topelev, exit_elev, sector_id, dma_id, fluid_type, expl_id2, epa_type, is_operative, insert_user, lastupdate,
+lastupdate_user, conneccat_id, workcat_id, workcat_id_end, builtdate, enddate, drainzone_id, uncertain, muni_id, verified,
+macrominsector_id, dwfzone_id)
+SELECT nextval('SCHEMA_NAME.urn_id_seq'::regclass), link_id::text, feature_id, feature_type, exit_id, exit_type, userdefined_geom, state, expl_id, the_geom,
+tstamp, exit_topelev, exit_elev, sector_id, dma_id, fluid_type, expl_id2, epa_type, is_operative, insert_user, lastupdate,
+lastupdate_user, conneccat_id, workcat_id, workcat_id_end, builtdate, enddate, drainzone_id, uncertain, muni_id, verified,
+macrominsector_id, dwfzone_id
+FROM _link;

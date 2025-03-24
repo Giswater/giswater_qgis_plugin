@@ -441,3 +441,16 @@ FROM
     OR (old.lock_level IS DISTINCT
 FROM
     new.lock_level))) EXECUTE FUNCTION gw_trg_typevalue_fk('element');
+
+CREATE TRIGGER gw_trg_link_connecrotation_update AFTER
+INSERT
+    OR
+UPDATE
+    OF the_geom ON
+    link FOR EACH ROW EXECUTE FUNCTION gw_trg_link_connecrotation_update();
+CREATE TRIGGER gw_trg_link_data AFTER
+INSERT
+    OR
+UPDATE
+    OF the_geom ON
+    link FOR EACH ROW EXECUTE FUNCTION gw_trg_link_data('link');

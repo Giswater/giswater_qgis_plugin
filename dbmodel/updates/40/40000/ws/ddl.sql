@@ -1777,3 +1777,88 @@ CREATE INDEX node_street1 ON node USING btree (streetaxis_id);
 CREATE INDEX node_street2 ON node USING btree (streetaxis2_id);
 CREATE INDEX node_streetname ON node USING btree (streetname);
 CREATE INDEX node_streetname2 ON node USING btree (streetname2);
+
+ALTER TABLE link RENAME TO _link;
+
+-- Drop foreign keys from table link
+ALTER TABLE plan_psector_x_connec DROP CONSTRAINT plan_psector_x_connec_link_id_fkey;
+ALTER TABLE om_visit_x_link DROP CONSTRAINT om_visit_x_link_link_id_fkey;
+
+
+-- Drop constraints from table link
+ALTER TABLE _link DROP CONSTRAINT link_pkey;
+ALTER TABLE _link DROP CONSTRAINT link_connecat_id_fkey;
+ALTER TABLE _link DROP CONSTRAINT link_exit_type_fkey;
+ALTER TABLE _link DROP CONSTRAINT link_exploitation_id_fkey;
+ALTER TABLE _link DROP CONSTRAINT link_feature_type_fkey;
+ALTER TABLE _link DROP CONSTRAINT link_muni_id_fkey;
+ALTER TABLE _link DROP CONSTRAINT link_state_fkey;
+ALTER TABLE _link DROP CONSTRAINT link_supplyzone_id_fkey;
+ALTER TABLE _link DROP CONSTRAINT link_workcat_id_end_fkey;
+ALTER TABLE _link DROP CONSTRAINT link_workcat_id_fkey;
+
+-- Drop indexes from table link
+DROP INDEX IF EXISTS link_exit_id;
+DROP INDEX IF EXISTS link_expl_id2;
+DROP INDEX IF EXISTS link_exploitation2;
+DROP INDEX IF EXISTS link_feature_id;
+DROP INDEX IF EXISTS link_index;
+DROP INDEX IF EXISTS link_muni;
+
+CREATE TABLE link (
+	link_id int4 DEFAULT nextval('urn_id_seq'::regclass) NOT NULL,
+	code text NULL, -- added
+	feature_id varchar(16) NULL,
+	feature_type varchar(16) NULL,
+	exit_id varchar(16) NULL,
+	exit_type varchar(16) NULL,
+	userdefined_geom bool NULL,
+	state int2 NOT NULL,
+	expl_id int4 NOT NULL,
+	the_geom public.geometry(linestring, 25831) NULL,
+	tstamp timestamp DEFAULT now() NULL,
+	exit_topelev float8 NULL,
+	exit_elev numeric(12, 3) NULL,
+	sector_id int4 NULL,
+	dma_id int4 NULL,
+	fluid_type varchar(50) NULL,
+	presszone_id int4 NULL,
+	dqa_id int4 NULL,
+	minsector_id int4 NULL,
+	expl_id2 int4 NULL,
+	epa_type varchar(16) NULL,
+	is_operative bool NULL,
+	insert_user varchar(50) DEFAULT CURRENT_USER NULL,
+	lastupdate timestamp NULL,
+	lastupdate_user varchar(50) NULL,
+	staticpressure numeric(12, 3) NULL,
+	conneccat_id varchar(30) NULL,
+	workcat_id varchar(255) NULL,
+	workcat_id_end varchar(255) NULL,
+	builtdate date NULL,
+	enddate date NULL,
+	uncertain bool NULL,
+	muni_id int4 NULL,
+	macrominsector_id int4 DEFAULT 0 NULL,
+	verified int2 NULL,
+	supplyzone_id int4 NULL,
+	n_hydrometer int4 NULL,
+	CONSTRAINT link_pkey PRIMARY KEY (link_id),
+	CONSTRAINT link_conneccat_id_fkey FOREIGN KEY (conneccat_id) REFERENCES cat_connec(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT link_exit_type_fkey FOREIGN KEY (exit_type) REFERENCES sys_feature_type(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT link_exploitation_id_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT link_feature_type_fkey FOREIGN KEY (feature_type) REFERENCES sys_feature_type(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT link_muni_id_fkey FOREIGN KEY (muni_id) REFERENCES ext_municipality(muni_id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT link_presszonecat_id_fkey FOREIGN KEY (presszone_id) REFERENCES presszone(presszone_id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT link_sector_id FOREIGN KEY (sector_id) REFERENCES sector(sector_id),
+	CONSTRAINT link_state_fkey FOREIGN KEY (state) REFERENCES value_state(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT link_supplyzone_id_fkey FOREIGN KEY (supplyzone_id) REFERENCES supplyzone(supplyzone_id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT link_workcat_id_end_fkey FOREIGN KEY (workcat_id_end) REFERENCES cat_work(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT link_workcat_id_fkey FOREIGN KEY (workcat_id) REFERENCES cat_work(id) ON DELETE RESTRICT ON UPDATE CASCADE
+);
+CREATE INDEX link_exit_id ON link USING btree (exit_id);
+CREATE INDEX link_expl_id2 ON link USING btree (expl_id2);
+CREATE INDEX link_exploitation2 ON link USING btree (expl_id2);
+CREATE INDEX link_feature_id ON link USING btree (feature_id);
+CREATE INDEX link_index ON link USING gist (the_geom);
+CREATE INDEX link_muni ON link USING btree (muni_id);
