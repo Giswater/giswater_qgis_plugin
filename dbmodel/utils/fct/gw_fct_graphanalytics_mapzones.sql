@@ -138,6 +138,9 @@ v_dscenario_valve text;
 v_netscenario text;
 v_has_conflicts boolean = false;
 
+-- LOCK LEVEL LOGIC
+v_original_disable_locklevel json;
+
 BEGIN
 	-- Search path
 	SET search_path = "SCHEMA_NAME", public;
@@ -166,6 +169,13 @@ BEGIN
 	IF v_netscenario = '' THEN v_netscenario = NULL; END IF;
 	IF v_floodonlymapzone = '' THEN v_floodonlymapzone = NULL; END IF;
 	v_floodonlymapzone = REPLACE(REPLACE (v_floodonlymapzone,'[','') ,']','');
+
+	-- Get user variable for disabling lock level
+    SELECT value::json INTO v_original_disable_locklevel FROM config_param_user
+    WHERE parameter = 'edit_disable_locklevel' AND cur_user = current_user;
+    -- Set disable lock level to true for this operation
+    UPDATE config_param_user SET value = '{"update":true, "delete":true}'
+    WHERE parameter = 'edit_disable_locklevel' AND cur_user = current_user;
 
 	-- set fid:
 	IF v_class = 'PRESSZONE' THEN
@@ -1514,6 +1524,9 @@ BEGIN
 		DROP TABLE IF EXISTS temp_dma;
 		DROP TABLE IF EXISTS temp_dqa;
 	END IF;
+
+	-- Restore original disable lock level
+    UPDATE config_param_user SET value = v_original_disable_locklevel WHERE parameter = 'edit_disable_locklevel' AND cur_user = current_user;
 
 	--  Return
 	RETURN  gw_fct_json_create_return(('{"status":"'||v_status||'", "message":{"level":'||v_level||', "text":"'||v_message||'"}, "version":"'||v_version||'"'||

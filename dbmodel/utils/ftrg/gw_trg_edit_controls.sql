@@ -18,13 +18,22 @@ v_featureold varchar;
 v_projecttype text;
 v_count integer;
 
+v_disable_locklevel json;
+v_automatic_disable_locklevel json;
+
 BEGIN
 
   EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
   v_featurefield:= TG_ARGV[0];
 
+  -- Get user variable for disabling lock level
+  SELECT value::json INTO v_disable_locklevel FROM config_param_user
+  WHERE parameter = 'edit_disable_locklevel' AND cur_user = current_user;
 
+  -- Check if automatic disable is enabled in system config
+  SELECT value::json INTO v_automatic_disable_locklevel FROM config_param_system
+  WHERE parameter = 'edit_automatic_disable_locklevel';
 
   IF v_featurefield = 'inp_subcatchment' THEN
     IF TG_OP = 'UPDATE' THEN
@@ -48,22 +57,45 @@ BEGIN
 
     RETURN NULL;
   ELSE
-    IF TG_OP = 'UPDATE' AND (OLD.lock_level = 1 AND NEW.lock_level = 1) THEN
-      EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-      "data":{"message":"3284", "function":"2718","parameters":{"lock_level":'||NEW.lock_level||'}}}$$);';
-      RETURN NULL;
-    ELSIF TG_OP = 'DELETE' AND (OLD.lock_level = 2) THEN
-      EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-      "data":{"message":"3284", "function":"2718","parameters":{"lock_level":'||OLD.lock_level||'}}}$$);';
-      RETURN NULL;
-    ELSIF TG_OP = 'UPDATE' AND (OLD.lock_level = 3 AND NEW.lock_level = 3) THEN
-      EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-      "data":{"message":"3284", "function":"2718","parameters":{"lock_level":'||NEW.lock_level||'}}}$$);';
-      RETURN NULL;
-    ELSIF TG_OP = 'DELETE' AND (OLD.lock_level = 3) THEN
-      EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-      "data":{"message":"3284", "function":"2718","parameters":{"lock_level":'||OLD.lock_level||'}}}$$);';
-      RETURN NULL;
+    -- Lock level control behavior based on system and user variables:
+    --
+    -- CASE 1: Both system and user variables disabled
+    -- v_automatic_disable_locklevel = {"update":false,"delete":false}
+    -- v_disable_locklevel = {"update":false, "delete":false}
+    -- RESULT: Lock level control IS applied (most restrictive)
+    --
+    -- CASE 2: System variable disabled, user variable enabled
+    -- v_automatic_disable_locklevel = {"update":false,"delete":false}
+    -- v_disable_locklevel = {"update":true, "delete":true}
+    -- RESULT: Lock level control is NOT applied (user override)
+    --
+    -- CASE 3: System variable enabled (regardless of user variable)
+    -- v_automatic_disable_locklevel = {"update":true,"delete":true}
+    -- v_disable_locklevel = {"update":false, "delete":true}
+    -- RESULT: Lock level control is NOT applied (system override)
+
+    IF v_automatic_disable_locklevel->>'update' = 'false' AND v_disable_locklevel->>'update' = 'false' THEN
+      IF TG_OP = 'UPDATE' AND (OLD.lock_level = 1 AND NEW.lock_level = 1) THEN
+        EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+        "data":{"message":"3284", "function":"2718","parameters":{"lock_level":'||NEW.lock_level||'}}}$$);';
+        RETURN NULL;
+      ELSEIF TG_OP = 'UPDATE' AND (OLD.lock_level = 3 AND NEW.lock_level = 3) THEN
+        EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+        "data":{"message":"3284", "function":"2718","parameters":{"lock_level":'||NEW.lock_level||'}}}$$);';
+        RETURN NULL;
+      END IF;
+    END IF;
+
+    IF v_automatic_disable_locklevel->>'delete' = 'false' AND v_disable_locklevel->>'delete' = 'false' THEN
+      IF TG_OP = 'DELETE' AND (OLD.lock_level = 2) THEN
+        EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+        "data":{"message":"3284", "function":"2718","parameters":{"lock_level":'||OLD.lock_level||'}}}$$);';
+        RETURN NULL;
+      ELSEIF TG_OP = 'DELETE' AND (OLD.lock_level = 3) THEN
+        EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+        "data":{"message":"3284", "function":"2718","parameters":{"lock_level":'||OLD.lock_level||'}}}$$);';
+        RETURN NULL;
+      END IF;
     END IF;
   END IF;
 
