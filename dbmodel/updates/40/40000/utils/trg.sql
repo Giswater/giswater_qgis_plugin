@@ -130,3 +130,6 @@ ON v_edit_plan_psector_x_other FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_psecto
 
 -- 11/03/2025
 DROP TRIGGER gw_trg_cat_manager ON cat_manager;
+
+CREATE TRIGGER gw_trg_om_visit AFTER INSERT ON om_visit_x_link
+FOR EACH ROW EXECUTE FUNCTION gw_trg_om_visit('link');

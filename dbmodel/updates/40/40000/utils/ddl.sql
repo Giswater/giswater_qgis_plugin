@@ -304,3 +304,13 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"cat_manage
 
 ALTER TABLE config_user_x_sector RENAME TO _config_user_x_sector;
 
+CREATE TABLE om_visit_x_link (
+	id bigserial NOT NULL,
+	visit_id int8 NOT NULL,
+	link_id int4 NOT NULL,
+	is_last bool DEFAULT true NULL,
+	CONSTRAINT om_visit_x_link_pkey PRIMARY KEY (id),
+	CONSTRAINT om_visit_x_link_unique UNIQUE (link_id, visit_id),
+	CONSTRAINT om_visit_x_link_link_id_fkey FOREIGN KEY (link_id) REFERENCES link(link_id) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT om_visit_x_link_visit_id_fkey FOREIGN KEY (visit_id) REFERENCES om_visit(id) ON DELETE CASCADE ON UPDATE CASCADE
+);

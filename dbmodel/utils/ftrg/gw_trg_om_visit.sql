@@ -74,6 +74,8 @@ BEGIN
 				v_expl_id=(SELECT expl_id FROM connec WHERE connec_id=NEW.connec_id);
 			ELSIF v_featuretype='gully' THEN
 				v_expl_id=(SELECT expl_id FROM gully WHERE gully_id=NEW.gully_id);
+			ELSIF v_featuretype='link' THEN
+				v_expl_id=(SELECT expl_id FROM link WHERE link_id=NEW.link_id);
 			END IF;
 
 			-- Setting expl_id only the first time expl_id is null
