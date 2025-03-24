@@ -27,9 +27,12 @@ GRANT UPDATE (lock_level) ON drainzone TO role_admin;
 
 CREATE USER admin_user;
 GRANT role_admin to admin_user;
+INSERT INTO config_param_user ("parameter", value, cur_user) VALUES('edit_disable_locklevel', '{"update":"false", "delete":"false"}', 'admin_user');
 
 CREATE USER normal_user;
 GRANT role_edit to normal_user;
+INSERT INTO config_param_user ("parameter", value, cur_user) VALUES('edit_disable_locklevel', '{"update":"false", "delete":"false"}', 'normal_user');
+
 
 -- ===========================
 -- normal_user
