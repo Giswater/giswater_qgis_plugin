@@ -4,6 +4,9 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
+SET search_path = SCHEMA_NAME, public, pg_catalog;
+
+
 DROP TRIGGER IF EXISTS gw_trg_calculate_period ON ext_cat_period;
 
 CREATE TRIGGER gw_trg_calculate_period AFTER INSERT OR UPDATE OF start_date, end_date ON ext_cat_period FOR EACH ROW EXECUTE FUNCTION gw_trg_calculate_period();
