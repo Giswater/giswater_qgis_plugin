@@ -20,3 +20,8 @@ VALUES('edit_disable_locklevel', 'hidden', 'Temporarily disable lock level for s
 -- Create system parameter for automatic disable lock level configuration
 INSERT INTO config_param_system ("parameter", value, descript, "label", dv_querytext, dv_filterbyfield, isenabled, layoutorder, project_type, dv_isparent, isautoupdate, "datatype", widgettype, ismandatory, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, widgetcontrols, placeholder, standardvalue, layoutname)
 VALUES('edit_automatic_disable_locklevel', '{"update":false,"delete":false}', 'Enable/disable automatic lock level control for specific operations', 'Automatic disable lock level', NULL, NULL, true, 5, 'utils', NULL, NULL, 'json', 'json', true, true, NULL, NULL, NULL, NULL, NULL, NULL, 'lyt_system');
+
+UPDATE config_form_list SET query_text='SELECT concat(arc_id, '' - '', doc_id) as sys_id, * FROM v_ui_doc_x_arc WHERE arc_id IS NOT NULL' WHERE listname='tbl_doc_x_arc' AND device=4;
+UPDATE config_form_list SET query_text='SELECT concat(node_id, '' - '', doc_id) as sys_id, * FROM v_ui_doc_x_node WHERE node_id IS NOT NULL' WHERE listname='tbl_doc_x_node' AND device=4;
+UPDATE config_form_list SET query_text='SELECT concat(connec_id, '' - '', doc_id) as sys_id, * FROM v_ui_doc_x_connec WHERE connec_id IS NOT NULL' WHERE listname='tbl_doc_x_connec' AND device=4;
+UPDATE config_form_list SET query_text='SELECT concat(gully_id, '' - '', doc_id) as sys_id, * FROM v_ui_doc_x_gully WHERE gully_id IS NOT NULL' WHERE listname='tbl_doc_x_gully' AND device=4;
