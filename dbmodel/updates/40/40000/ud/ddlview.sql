@@ -2154,7 +2154,9 @@ AS WITH
 			date_trunc('second'::text, gully.lastupdate) AS lastupdate,
 			gully.lastupdate_user,
 			gully.the_geom,
-			gully.lock_level
+			gully.lock_level,
+			gully.length,
+			gully.width
 			FROM inp_network_mode, gully_selector
 			JOIN gully using (gully_id)
 			JOIN selector_expl se ON (se.cur_user = current_user AND se.expl_id = gully.expl_id) OR (se.cur_user = current_user AND se.expl_id = gully.expl_id2)

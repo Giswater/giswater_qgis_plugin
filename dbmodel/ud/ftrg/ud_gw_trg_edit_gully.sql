@@ -590,7 +590,7 @@ BEGIN
 				postcode, district_id, streetaxis_id, postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, descript, rotation,
 				link,verified, the_geom, undelete,label_x, label_y,label_rotation, expl_id, publish, inventory,uncertain, num_value,
 				lastupdate, lastupdate_user, asset_id, gullycat2_id, epa_type, units_placement, groove_height, groove_length, drainzone_id, expl_id2, adate, adescript,
-				siphon_type, odorflap, connec_y2, placement_type, label_quadrant, access_type, streetname, streetname2, lock_level)
+				siphon_type, odorflap, connec_y2, placement_type, label_quadrant, access_type, streetname, streetname2, lock_level, length, width)
 			VALUES (NEW.gully_id, NEW.code, NEW.top_elev, NEW."ymax",NEW.sandbox, NEW.matcat_id, NEW.gully_type, NEW.gullycat_id, NEW.units, NEW.groove,
 				NEW.connec_arccat_id, NEW.connec_length, NEW.connec_depth, NEW.siphon, NEW.arc_id, NEW.sector_id, NEW."state",
 				NEW.state_type, NEW.annotation, NEW."observ", NEW."comment", NEW.dma_id, NEW.soilcat_id, NEW.function_type, NEW.category_type,
@@ -600,7 +600,7 @@ BEGIN
 				NEW.label_x, NEW.label_y, NEW.label_rotation,  NEW.expl_id , NEW.publish, NEW.inventory,
 				NEW.uncertain, NEW.num_value,NEW.lastupdate, NEW.lastupdate_user, NEW.asset_id, NEW.gullycat2_id, NEW.epa_type, NEW.units_placement,
 				NEW.groove_height, NEW.groove_length, NEW.drainzone_id,NEW.expl_id2, NEW.adate, NEW.adescript, NEW.siphon_type, NEW.odorflap,
-				NEW.connec_y2, NEW.placement_type, NEW.label_quadrant, NEW.access_type, NEW.streetname, NEW.streetname2, NEW.lock_level);
+				NEW.connec_y2, NEW.placement_type, NEW.label_quadrant, NEW.access_type, NEW.streetname, NEW.streetname2, NEW.lock_level, NEW.length, NEW.width);
 		ELSE
 
 			INSERT INTO gully (gully_id, code, top_elev, "ymax",sandbox, matcat_id, gully_type, gullycat_id, units, groove, connec_arccat_id, connec_length,
@@ -609,7 +609,7 @@ BEGIN
 				postcode, district_id, streetaxis_id, postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, descript, rotation,
 				link,verified, the_geom, undelete,label_x, label_y,label_rotation, expl_id, publish, inventory,uncertain, num_value,
 				lastupdate, lastupdate_user, asset_id, connec_matcat_id, gullycat2_id, epa_type, units_placement, groove_height, groove_length, drainzone_id, expl_id2, adate, adescript,
-				siphon_type, odorflap, connec_y2, placement_type, label_quadrant, access_type, streetname, streetname2, lock_level)
+				siphon_type, odorflap, connec_y2, placement_type, label_quadrant, access_type, streetname, streetname2, lock_level, length, width)
 			VALUES (NEW.gully_id, NEW.code, NEW.top_elev, NEW."ymax",NEW.sandbox, NEW.matcat_id, NEW.gully_type, NEW.gullycat_id, NEW.units, NEW.groove,
 				NEW.connec_arccat_id, NEW.connec_length, NEW.connec_depth, NEW.siphon, NEW.arc_id, NEW.sector_id, NEW."state",
 				NEW.state_type, NEW.annotation, NEW."observ", NEW."comment", NEW.dma_id, NEW.soilcat_id, NEW.function_type, NEW.category_type,
@@ -619,7 +619,7 @@ BEGIN
 				NEW.label_x, NEW.label_y, NEW.label_rotation,  NEW.expl_id , NEW.publish, NEW.inventory,
 				NEW.uncertain, NEW.num_value,NEW.lastupdate, NEW.lastupdate_user, NEW.asset_id, NEW.connec_matcat_id, NEW.gullycat2_id,
 				NEW.epa_type, NEW.units_placement, NEW.groove_height, NEW.groove_length, NEW.drainzone_id,NEW.expl_id2, NEW.adate, NEW.adescript,
-				NEW.siphon_type, NEW.odorflap, NEW.connec_y2, NEW.placement_type, NEW.label_quadrant, NEW.access_type, NEW.streetname, NEW.streetname2, NEW.lock_level);
+				NEW.siphon_type, NEW.odorflap, NEW.connec_y2, NEW.placement_type, NEW.label_quadrant, NEW.access_type, NEW.streetname, NEW.streetname2, NEW.lock_level, NEW.length, NEW.width);
 
 		END IF;
 
@@ -922,7 +922,7 @@ BEGIN
 			postnumber=NEW.postnumber,  expl_id=NEW.expl_id, uncertain=NEW.uncertain, num_value=NEW.num_value, lastupdate=now(), lastupdate_user=current_user,
 			asset_id=NEW.asset_id, gullycat2_id = NEW.gullycat2_id, epa_type=NEW.epa_type, units_placement=NEW.units_placement, groove_height=NEW.groove_height,
 			groove_length=NEW.groove_length, drainzone_id=NEW.drainzone_id, expl_id2=NEW.expl_id2, adate=NEW.adate, adescript=NEW.adescript, siphon_type=NEW.siphon_type, odorflap=NEW.odorflap, connec_y2=NEW.connec_y2,
-			placement_type=NEW.placement_type, label_quadrant=NEW.label_quadrant, access_type=NEW.access_type, streetname = NEW.streetname, streetname2 = NEW.streetname2, lock_level=NEW.lock_level
+			placement_type=NEW.placement_type, label_quadrant=NEW.label_quadrant, access_type=NEW.access_type, streetname = NEW.streetname, streetname2 = NEW.streetname2, lock_level=NEW.lock_level, length=NEW.length, width=NEW.width
 			WHERE gully_id = OLD.gully_id;
 
 		ELSE
@@ -938,7 +938,7 @@ BEGIN
 			postnumber=NEW.postnumber,  expl_id=NEW.expl_id, uncertain=NEW.uncertain, num_value=NEW.num_value, lastupdate=now(), lastupdate_user=current_user,
 			asset_id=NEW.asset_id, gullycat2_id = NEW.gullycat2_id, epa_type=NEW.epa_type, units_placement=NEW.units_placement, groove_height=NEW.groove_height,
 			groove_length=NEW.groove_length, drainzone_id=NEW.drainzone_id, expl_id2=NEW.expl_id2, adate=NEW.adate, adescript=NEW.adescript, siphon_type=NEW.siphon_type, odorflap=NEW.odorflap, connec_y2=NEW.connec_y2,
-			placement_type=NEW.placement_type, label_quadrant=NEW.label_quadrant, access_type=NEW.access_type, streetname = NEW.streetname, streetname2 = NEW.streetname2, lock_level=NEW.lock_level
+			placement_type=NEW.placement_type, label_quadrant=NEW.label_quadrant, access_type=NEW.access_type, streetname = NEW.streetname, streetname2 = NEW.streetname2, lock_level=NEW.lock_level, length=NEW.length, width=NEW.width
 			WHERE gully_id = OLD.gully_id;
 
 		END IF;

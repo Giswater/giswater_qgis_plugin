@@ -1769,6 +1769,8 @@ CREATE TABLE gully (
 	datasource int4 NULL,
 	omunit_id int4 NULL,
 	lock_level int4 NULL,
+	length numeric(12, 3) NULL,
+	width numeric(12, 3) NULL,
 	CONSTRAINT gully_pjoint_type_check CHECK (((pjoint_type)::text = ANY (ARRAY['NODE'::text, 'ARC'::text, 'CONNEC'::text, 'GULLY'::text]))),
 	CONSTRAINT gully_pkey PRIMARY KEY (gully_id),
 	CONSTRAINT gully_district_id_fkey FOREIGN KEY (district_id) REFERENCES ext_district(district_id) ON DELETE RESTRICT ON UPDATE CASCADE,
