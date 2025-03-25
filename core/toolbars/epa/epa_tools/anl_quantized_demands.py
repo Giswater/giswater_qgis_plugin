@@ -66,7 +66,7 @@ class QuantizedDemands:
         self.dlg_epa.rejected.connect(partial(tools_gw.close_dialog, self.dlg_epa))
 
         tools_gw.disable_tab_log(dlg)
-        tools_gw.open_dialog(self.dlg_epa, dlg_name="dlg_quantized_demands")
+        tools_gw.open_dialog(self.dlg_epa, dlg_name="quantized_demands")
 
     def _execute_quantized_demands(self):
         if not self._validate_inputs():

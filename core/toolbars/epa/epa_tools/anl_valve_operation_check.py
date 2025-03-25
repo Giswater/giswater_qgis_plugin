@@ -35,7 +35,7 @@ class ValveOperationCheck:
         self._set_signals()
 
         tools_gw.disable_tab_log(dlg)
-        tools_gw.open_dialog(dlg, dlg_name="dlg_valve_operation_check")
+        tools_gw.open_dialog(dlg, dlg_name="valve_operation_check")
 
     def _execute_process(self):
         dlg = self.dlg_voc

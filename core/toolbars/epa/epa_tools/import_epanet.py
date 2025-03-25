@@ -147,7 +147,7 @@ class GwImportEpanet:
 
         self._manage_widgets_visibility()
 
-        tools_gw.open_dialog(self.dlg_config, dlg_name="dlg_inp_config_import")
+        tools_gw.open_dialog(self.dlg_config, dlg_name="inp_config_import")
 
     def _manage_widgets_visibility(self):
         # Hide widgets for WS

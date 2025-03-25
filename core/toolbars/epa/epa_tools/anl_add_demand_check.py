@@ -38,7 +38,7 @@ class AddDemandCheck:
         self._set_signals()
 
         tools_gw.disable_tab_log(dlg)
-        tools_gw.open_dialog(dlg, dlg_name="dlg_add_demand_check")
+        tools_gw.open_dialog(dlg, dlg_name="add_demand_check")
 
     def _check_for_partial_file(self):
         partial_file = Path(self.output_folder) / f"{self.file_name}-partial.json"

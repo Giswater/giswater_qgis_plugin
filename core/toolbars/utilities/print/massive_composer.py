@@ -47,7 +47,7 @@ class GwMassiveComposer:
 
         self.dlg_comp = dlg_comp
 
-        tools_gw.open_dialog(dlg_comp, dlg_name='dlg_comp_x_pages')
+        tools_gw.open_dialog(dlg_comp, dlg_name='comp_x_pages')
 
 
     def save_user_values(self, dialog):

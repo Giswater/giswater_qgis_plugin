@@ -297,7 +297,7 @@ class GwStyleManager:
         dialog_update.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, dialog_update))
         dialog_update.category_rename_copy.textChanged.connect(partial(self._check_style_group_exists, dialog_update))
 
-        tools_gw.open_dialog(dialog_update, dlg_name='dlg_update_style_group')
+        tools_gw.open_dialog(dialog_update, dlg_name='update_style_group')
 
     def _check_style_group_exists(self, dialog_update, idval=""):
         sql = f"SELECT idval FROM config_style WHERE idval = '{idval}'"

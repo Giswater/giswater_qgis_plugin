@@ -39,7 +39,7 @@ class StaticCalibration:
 
         tools_gw.disable_tab_log(dlg)
 
-        tools_gw.open_dialog(dlg, dlg_name="dlg_static_calibration")
+        tools_gw.open_dialog(dlg, dlg_name="static_calibration")
 
     def _ovewrite_existing_files(self, folder, file_name):
         prefix = f"{folder}/{file_name}"

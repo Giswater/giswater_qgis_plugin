@@ -46,7 +46,7 @@ class RecursiveEpa():
         self.dlg_epa.rejected.connect(partial(self.save_user_values, self.dlg_epa))
         self.dlg_epa.rejected.connect(partial(tools_gw.close_dialog, self.dlg_epa))
 
-        tools_gw.open_dialog(self.dlg_epa, dlg_name='dlg_recursive_epa')
+        tools_gw.open_dialog(self.dlg_epa, dlg_name='recursive_epa')
 
     def save_user_values(self, dialog):
         """ Save last user values """
