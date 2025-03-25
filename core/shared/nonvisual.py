@@ -99,7 +99,7 @@ class GwNonVisual:
         self._manage_tabs_changed()
 
         # Open dialog
-        tools_gw.open_dialog(self.manager_dlg, dlg_name=f'dlg_nonvisual_manager')
+        tools_gw.open_dialog(self.manager_dlg, dlg_name=f'nonvisual_manager')
 
 
     def _manage_tabs_manager(self):
@@ -449,7 +449,7 @@ class GwNonVisual:
         self.dlg_print.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_print))
 
         # Open dialog
-        tools_gw.open_dialog(self.dlg_print, dlg_name=f'dlg_nonvisual_print')
+        tools_gw.open_dialog(self.dlg_print, dlg_name=f'nonvisual_print')
 
 
     def _exec_print(self):
@@ -521,7 +521,7 @@ class GwNonVisual:
         self._connect_dialog_signals()
 
         # Open dialog
-        tools_gw.open_dialog(self.dialog, dlg_name=f'dlg_nonvisual_roughness')
+        tools_gw.open_dialog(self.dialog, dlg_name=f'nonvisual_roughness')
 
 
     def _populate_cmb_matcat_id(self, combobox):
@@ -750,7 +750,7 @@ class GwNonVisual:
         tools_qt.set_tableview_config(tbl_curve_value, sectionResizeMode=1, edit_triggers=QTableView.DoubleClicked)
 
         # Open dialog
-        tools_gw.open_dialog(self.dialog, dlg_name=f'dlg_nonvisual_curve')
+        tools_gw.open_dialog(self.dialog, dlg_name=f'nonvisual_curve')
 
     def _paste_curves_custom_menu(self, tbl):
         menu = QMenu(tbl)
@@ -1264,7 +1264,7 @@ class GwNonVisual:
         self._connect_dialog_signals()
 
         # Open dialog
-        tools_gw.open_dialog(self.dialog, dlg_name=f'dlg_nonvisual_pattern_{global_vars.project_type}')
+        tools_gw.open_dialog(self.dialog, dlg_name=f'nonvisual_pattern_{global_vars.project_type}')
 
 
     def _manage_ws_patterns_dlg(self, pattern_id, duplicate=False):
@@ -1907,7 +1907,7 @@ class GwNonVisual:
         self._connect_dialog_signals()
 
         # Open dialog
-        tools_gw.open_dialog(self.dialog, dlg_name=f'dlg_nonvisual_controls')
+        tools_gw.open_dialog(self.dialog, dlg_name=f'nonvisual_controls')
 
 
     def _populate_controls_widgets(self, control_id, dscenario_id):
@@ -2047,7 +2047,7 @@ class GwNonVisual:
         self._connect_dialog_signals()
 
         # Open dialog
-        tools_gw.open_dialog(self.dialog, dlg_name=f'dlg_nonvisual_rules')
+        tools_gw.open_dialog(self.dialog, dlg_name=f'nonvisual_rules')
 
 
     def _populate_rules_widgets(self, rule_id, dscenario_id):
@@ -2212,7 +2212,7 @@ class GwNonVisual:
         self._manage_times_type(tbl_timeseries_value, tools_qt.get_combo_value(self.dialog, cmb_times_type))
 
         # Open dialog
-        tools_gw.open_dialog(self.dialog, dlg_name=f'dlg_nonvisual_timeseries')
+        tools_gw.open_dialog(self.dialog, dlg_name=f'nonvisual_timeseries')
 
 
     def _paste_timeseries_custom_menu(self, tbl):
@@ -2597,7 +2597,7 @@ class GwNonVisual:
             self._load_lids_widgets(self.dialog)
 
         # Open dialog
-        tools_gw.open_dialog(self.dialog, dlg_name=f'dlg_nonvisual_lids')
+        tools_gw.open_dialog(self.dialog, dlg_name=f'nonvisual_lids')
 
 
     def _open_help(self):
