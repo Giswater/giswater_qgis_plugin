@@ -1844,6 +1844,7 @@ CREATE TABLE link (
 	verified int2 NULL,
 	supplyzone_id int4 NULL,
 	n_hydrometer int4 NULL,
+	custom_length numeric(12, 2) NULL,
 	CONSTRAINT link_pkey PRIMARY KEY (link_id),
 	CONSTRAINT link_conneccat_id_fkey FOREIGN KEY (conneccat_id) REFERENCES cat_connec(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT link_exit_type_fkey FOREIGN KEY (exit_type) REFERENCES sys_feature_type(id) ON DELETE RESTRICT ON UPDATE CASCADE,

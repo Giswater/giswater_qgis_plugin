@@ -1984,6 +1984,7 @@ CREATE TABLE link (
 	verified int2 NULL,
 	macrominsector_id int4 DEFAULT 0 NULL,
 	dwfzone_id int4 NULL,
+	custom_length numeric(12, 2) NULL,
 	CONSTRAINT link_pkey PRIMARY KEY (link_id),
 	CONSTRAINT link_conneccat_id_fkey FOREIGN KEY (conneccat_id) REFERENCES cat_connec(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT link_dwfzone_id_fkey FOREIGN KEY (dwfzone_id) REFERENCES dwfzone(dwfzone_id) ON DELETE RESTRICT ON UPDATE CASCADE,
