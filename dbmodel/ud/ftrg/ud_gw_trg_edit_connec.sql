@@ -557,7 +557,7 @@ BEGIN
 					USING NEW
 					INTO v_new_value_param;
 
-				v_childtable_name := 'man_connec' || lower(v_customfeature);
+				v_childtable_name := 'man_connec_' || lower(v_customfeature);
 				IF (SELECT EXISTS ( SELECT 1 FROM information_schema.tables WHERE table_schema = TG_TABLE_SCHEMA AND table_name = v_childtable_name)) IS TRUE THEN
 					IF v_new_value_param IS NOT NULL THEN
 						EXECUTE 'INSERT INTO '||v_childtable_name||' (connec_id, '||v_addfields.param_name||') VALUES ($1, $2::'||v_addfields.datatype_id||')'
@@ -793,7 +793,7 @@ BEGIN
 					USING OLD
 					INTO v_old_value_param;
 
-				v_childtable_name := 'man_connec' || lower(v_customfeature);
+				v_childtable_name := 'man_connec_' || lower(v_customfeature);
 				IF (SELECT EXISTS ( SELECT 1 FROM information_schema.tables WHERE table_schema = TG_TABLE_SCHEMA AND table_name = v_childtable_name)) IS TRUE THEN
 					IF (v_new_value_param IS NOT NULL AND v_old_value_param!=v_new_value_param) OR (v_new_value_param IS NOT NULL AND v_old_value_param IS NULL) THEN
 						EXECUTE 'INSERT INTO '||v_childtable_name||' (connec_id, '||v_addfields.param_name||') VALUES ($1, $2::'||v_addfields.datatype_id||')
@@ -834,7 +834,7 @@ BEGIN
 		v_connec_id = old.connec_id;
 
 
-		v_childtable_name := 'man_connec' || lower(v_customfeature);
+		v_childtable_name := 'man_connec_' || lower(v_customfeature);
 		IF (SELECT EXISTS ( SELECT 1 FROM information_schema.tables WHERE table_schema = TG_TABLE_SCHEMA AND table_name = v_childtable_name)) IS TRUE THEN
 			EXECUTE 'DELETE FROM '||v_childtable_name||' WHERE connec_id = '||quote_literal(v_connec_id)||'';
 		END IF;

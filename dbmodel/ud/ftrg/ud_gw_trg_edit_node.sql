@@ -718,7 +718,7 @@ BEGIN
 					USING NEW
 					INTO v_new_value_param;
 
-				v_childtable_name := 'man_node' || lower(v_customfeature);
+				v_childtable_name := 'man_node_' || lower(v_customfeature);
 				IF (SELECT EXISTS ( SELECT 1 FROM information_schema.tables WHERE table_schema = TG_TABLE_SCHEMA AND table_name = v_childtable_name)) IS TRUE THEN
 					IF v_new_value_param IS NOT NULL THEN
 						EXECUTE 'INSERT INTO '||v_childtable_name||' (node_id, '||v_addfields.param_name||') VALUES ($1, $2::'||v_addfields.datatype_id||')'
@@ -904,6 +904,7 @@ BEGIN
 			label_x=NEW.label_x, label_y=NEW.label_y, label_rotation=NEW.label_rotation, publish=NEW.publish, inventory=NEW.inventory, rotation=NEW.rotation, uncertain=NEW.uncertain,
 			xyz_date=NEW.xyz_date, unconnected=NEW.unconnected, expl_id=NEW.expl_id, num_value=NEW.num_value, lastupdate=now(), lastupdate_user=current_user,
 			asset_id=NEW.asset_id, drainzone_id=NEW.drainzone_id, parent_id=NEW.parent_id, arc_id = NEW.arc_id, expl_id2=NEW.expl_id2, adate=NEW.adate, adescript=NEW.adescript,
+			asset_id=NEW.asset_id, drainzone_id=NEW.drainzone_id, parent_id=NEW.parent_id, arc_id = NEW.arc_id, expl_id2=NEW.expl_id2, adate=NEW.adate, adescript=NEW.adescript,
 			placement_type=NEW.placement_type, label_quadrant=NEW.label_quadrant,
 			access_type=NEW.access_type, brand_id=NEW.brand_id, model_id=NEW.model_id, serial_number=NEW.serial_number, streetname = NEW.streetname, streetname2 = NEW.streetname2, lock_level=NEW.lock_level, is_scadamap=NEW.is_scadamap,
 			pavcat_id=NEW.pavcat_id
@@ -1002,7 +1003,7 @@ BEGIN
 					USING OLD
 					INTO v_old_value_param;
 
-				v_childtable_name := 'man_node' || lower(v_customfeature);
+				v_childtable_name := 'man_node_' || lower(v_customfeature);
 				IF (SELECT EXISTS ( SELECT 1 FROM information_schema.tables WHERE table_schema = TG_TABLE_SCHEMA AND table_name = v_childtable_name)) IS TRUE THEN
 					IF (v_new_value_param IS NOT NULL AND v_old_value_param!=v_new_value_param) OR (v_new_value_param IS NOT NULL AND v_old_value_param IS NULL) THEN
 						EXECUTE 'INSERT INTO '||v_childtable_name||' (node_id, '||v_addfields.param_name||') VALUES ($1, $2::'||v_addfields.datatype_id||')
@@ -1017,6 +1018,7 @@ BEGIN
 				END IF;
 			END LOOP;
 		END IF;
+
 
 		-- set label_quadrant, label_x and label_y according to cat_feature
 
@@ -1252,7 +1254,7 @@ BEGIN
 		v_customfeature = old.node_type;
 		v_node_id = old.node_id;
 
-		v_childtable_name := 'man_node' || lower(v_customfeature);
+		v_childtable_name := 'man_node_' || lower(v_customfeature);
 		IF (SELECT EXISTS ( SELECT 1 FROM information_schema.tables WHERE table_schema = TG_TABLE_SCHEMA AND table_name = v_childtable_name)) IS TRUE THEN
 	   		EXECUTE 'DELETE FROM '||v_childtable_name||' WHERE node_id = '||quote_literal(v_node_id)||'';
 		END IF;
