@@ -105,7 +105,7 @@ BEGIN
     END IF;
 
     -- element_x_arc, element_x_node, element_x_connec, element_x_gully
-    -- doc_x_arc, doc_x_node, doc_x_connec, doc_x_gully, doc_x_psector, doc_x_visit, doc_x_workcat
+    -- doc_x_arc, doc_x_node, doc_x_connec, doc_x_gully, doc_x_link, doc_x_psector, doc_x_visit, doc_x_workcat
 
     v_relations_table_prefix = v_table_name||'_x_';
 

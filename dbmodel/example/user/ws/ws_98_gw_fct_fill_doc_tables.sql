@@ -9,15 +9,14 @@ This version of Giswater is provided by Giswater Association
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_fill_doc_tables()
   RETURNS void AS
-$BODY$DECLARE
+$BODY$
 
- rec_doc    record;
- rec_node   record;
- rec_arc   record;
- rec_connec   record;
-
-
-
+DECLARE
+  rec_doc	record;
+  rec_node record;
+  rec_arc record;
+  rec_connec record;
+  rec_link record;
 BEGIN
 
     -- Search path
@@ -28,8 +27,9 @@ BEGIN
     DELETE FROM doc_x_arc;
     DELETE FROM doc_x_connec;
     DELETE FROM doc_x_node;
-    
-      
+    DELETE FROM doc_x_link;
+
+
 
         --doc
         FOR rec_doc IN SELECT * FROM doc
@@ -53,14 +53,20 @@ BEGIN
             INSERT INTO doc_x_node (doc_id, node_id) VALUES(rec_doc.id, rec_node.node_id);
             END LOOP;
 
+            --Insert link
+            FOR rec_link IN SELECT * FROM link
+            LOOP
+            INSERT INTO doc_x_link (doc_id, link_id) VALUES(rec_doc.id, rec_link.link_id);
+            END LOOP;
 
-            
+
+
         END LOOP;
 
 
     RETURN;
 
-        
+
 END;$BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;

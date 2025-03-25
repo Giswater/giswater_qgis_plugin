@@ -11,12 +11,12 @@ CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_fct_fill_doc_tables()
   RETURNS void AS
 $BODY$
 DECLARE
-rec_doc	record;
-rec_node record;
-rec_arc record;
-rec_connec record;
-rec_gully record;
-
+  rec_doc	record;
+  rec_node record;
+  rec_arc record;
+  rec_connec record;
+  rec_gully record;
+  rec_link record;
 BEGIN
 
 	-- Search path
@@ -27,6 +27,7 @@ BEGIN
 	DELETE FROM doc_x_connec;
 	DELETE FROM doc_x_node;
 	DELETE FROM doc_x_gully;
+	DELETE FROM doc_x_link;
 
         --doc
         FOR rec_doc IN SELECT * FROM doc
@@ -54,6 +55,12 @@ BEGIN
             FOR rec_gully IN SELECT * FROM gully
             LOOP
             INSERT INTO doc_x_gully (doc_id, gully_id) VALUES(rec_doc.id, rec_gully.gully_id) ON CONFLICT (doc_id, gully_id) DO NOTHING;
+            END LOOP;
+
+            --Insert link
+            FOR rec_link IN SELECT * FROM link
+            LOOP
+            INSERT INTO doc_x_link (doc_id, link_id) VALUES(rec_doc.id, rec_link.link_id) ON CONFLICT (doc_id, link_id) DO NOTHING;
             END LOOP;
         END LOOP;
 
