@@ -313,7 +313,26 @@ BEGIN
             v_label, v_ismandatory, v_isparent, v_iseditable, v_layoutname,
             v_placeholder, v_stylesheet, v_tooltip, v_widgetfunction, v_orderbyid, v_isnullvalue, v_jsonwidgetdim,
             v_parentid, v_querytextfilterc, v_querytext,  v_linkedobject, v_hidden)
-            ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+            ON CONFLICT (formname, formtype, columnname, tabname) DO UPDATE SET
+            datatype = EXCLUDED.datatype,
+            widgettype = EXCLUDED.widgettype,
+            label = EXCLUDED.label,
+            ismandatory = EXCLUDED.ismandatory,
+            isparent = EXCLUDED.isparent,
+            iseditable = EXCLUDED.iseditable,
+            layoutname = EXCLUDED.layoutname,
+            placeholder = EXCLUDED.placeholder,
+            stylesheet = EXCLUDED.stylesheet,
+            tooltip = EXCLUDED.tooltip,
+            widgetfunction = EXCLUDED.widgetfunction,
+            dv_orderby_id = EXCLUDED.dv_orderby_id,
+            dv_isnullvalue = EXCLUDED.dv_isnullvalue,
+            widgetcontrols = EXCLUDED.widgetcontrols,
+            dv_parent_id = EXCLUDED.dv_parent_id,
+            dv_querytext_filterc = EXCLUDED.dv_querytext_filterc,
+            dv_querytext = EXCLUDED.dv_querytext,
+            linkedobject = EXCLUDED.linkedobject,
+            hidden = EXCLUDED.hidden;
 
             -- log
             INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
@@ -588,7 +607,26 @@ BEGIN
                 v_label, v_ismandatory,v_isparent, v_iseditable, v_isautoupdate, v_layoutname,
                 v_placeholder, v_stylesheet, v_tooltip, v_widgetfunction, v_orderbyid, v_isnullvalue, v_jsonwidgetdim,
                 v_parentid, v_querytextfilterc, v_querytext,  v_linkedobject, v_hidden)
-                ON CONFLICT (formname, formtype, columnname, tabname) DO NOTHING;
+                ON CONFLICT (formname, formtype, columnname, tabname) DO UPDATE SET
+                datatype = EXCLUDED.datatype,
+                widgettype = EXCLUDED.widgettype,
+                label = EXCLUDED.label,
+                ismandatory = EXCLUDED.ismandatory,
+                isparent = EXCLUDED.isparent,
+                iseditable = EXCLUDED.iseditable,
+                layoutname = EXCLUDED.layoutname,
+                placeholder = EXCLUDED.placeholder,
+                stylesheet = EXCLUDED.stylesheet,
+                tooltip = EXCLUDED.tooltip,
+                widgetfunction = EXCLUDED.widgetfunction,
+                dv_orderby_id = EXCLUDED.dv_orderby_id,
+                dv_isnullvalue = EXCLUDED.dv_isnullvalue,
+                widgetcontrols = EXCLUDED.widgetcontrols,
+                dv_parent_id = EXCLUDED.dv_parent_id,
+                dv_querytext_filterc = EXCLUDED.dv_querytext_filterc,
+                dv_querytext = EXCLUDED.dv_querytext,
+                linkedobject = EXCLUDED.linkedobject,
+                hidden = EXCLUDED.hidden;
 
                 INSERT INTO audit_check_data (fid, result_id, criticity, error_message)
                 VALUES (218, null, 4, concat('Insert parameter into config_form_fields: ', v_param_name));
