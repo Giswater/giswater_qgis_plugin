@@ -41,7 +41,7 @@ class GwDocument(QObject):
         self.schema_name = lib_vars.schema_name
         self.files_path = []
         self.project_type = tools_gw.get_project_type()
-        self.doc_tables = ["doc_x_node", "doc_x_arc", "doc_x_connec", "doc_x_gully", "doc_x_workcat", "doc_x_psector", "doc_x_visit"]
+        self.doc_tables = ["doc_x_node", "doc_x_arc", "doc_x_connec", "doc_x_link", "doc_x_gully", "doc_x_workcat", "doc_x_psector", "doc_x_visit"]
         self.point_xy = {"x": None, "y": None}
         self.is_new = False
 
@@ -69,16 +69,17 @@ class GwDocument(QObject):
 
         # Setting lists
         self.ids = []
-        self.list_ids = {'arc': [], 'node': [], 'connec': [], 'gully': [], 'element': []}
-        self.layers = {'arc': [], 'node': [], 'connec': [], 'gully': [], 'element': []}
+        self.list_ids = {'arc': [], 'node': [], 'connec': [], 'link': [], 'gully': [], 'element': []}
+        self.layers = {'arc': [], 'node': [], 'connec': [], 'link': [], 'gully': [], 'element': []}
         self.layers['arc'] = tools_gw.get_layers_from_feature_type('arc')
         self.layers['node'] = tools_gw.get_layers_from_feature_type('node')
         self.layers['connec'] = tools_gw.get_layers_from_feature_type('connec')
+        self.layers['link'] = tools_gw.get_layers_from_feature_type('link')
         if self.project_type == 'ud':
             self.layers['gully'] = tools_gw.get_layers_from_feature_type('gully')
         self.layers['element'] = tools_gw.get_layers_from_feature_type('element')
 
-        params = ['arc', 'node', 'connec', 'gully']
+        params = ['arc', 'node', 'connec', 'gully', 'link']
         if list_tabs:
             for i in params:
                 if i not in list_tabs:
@@ -170,7 +171,7 @@ class GwDocument(QObject):
 
         # Set signals
         self.excluded_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_gully",
-                                "v_edit_element"]
+                                "v_edit_element", "v_edit_link"]
         layers_visibility = tools_gw.get_parent_layers_visibility()
         # Dialog
         self.dlg_add_doc.rejected.connect(lambda: tools_gw.reset_rubberband(self.rubber_band))
@@ -214,6 +215,8 @@ class GwDocument(QObject):
                                                                   self.dlg_add_doc.tbl_doc_x_connec, "v_edit_connec", "connec_id", self.rubber_band, 10))
         self.dlg_add_doc.tbl_doc_x_gully.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
                                                                  self.dlg_add_doc.tbl_doc_x_gully, "v_edit_gully", "gully_id", self.rubber_band, 10))
+        self.dlg_add_doc.tbl_doc_x_link.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
+                                                                 self.dlg_add_doc.tbl_doc_x_link, "v_edit_link", "link_id", self.rubber_band, 10))
 
         if feature:
             self.dlg_add_doc.tabWidget.currentChanged.connect(
@@ -426,7 +429,7 @@ class GwDocument(QObject):
         self.dlg_man.setProperty('class_obj', self)
         tools_gw.load_settings(self.dlg_man)
         tools_qt.set_tableview_config(self.dlg_man.tbl_document, sectionResizeMode=0)
-        tools_qt.set_tableview_config(self.dlg_man.tbl_document)        
+        tools_qt.set_tableview_config(self.dlg_man.tbl_document)
 
         # Adding auto-completion to a QLineEdit
         table_object = "doc"
@@ -649,6 +652,11 @@ class GwDocument(QObject):
         arc_ids = self.list_ids['arc']
         node_ids = self.list_ids['node']
         connec_ids = self.list_ids['connec']
+        link_ids = self.list_ids['link']
+        print(arc_ids)
+        print(node_ids)
+        print(connec_ids)
+        print(link_ids)
         workcat_ids = self._get_associated_workcat_ids()
         psector_ids = self._get_associated_psector_ids()
         visit_ids = self._get_associated_visit_ids()
@@ -671,6 +679,9 @@ class GwDocument(QObject):
         # Insert the new records for connec
         for feature_id in connec_ids:
             sql += f"\nINSERT INTO doc_x_connec (doc_id, connec_id) VALUES ('{doc_id}', '{feature_id}');"
+
+        for feature_id in link_ids:
+            sql += f"\nINSERT INTO doc_x_link (doc_id, link_id) VALUES ('{doc_id}', '{feature_id}');"
 
         # Insert the new records for workcat
         for feature_id in workcat_ids:
@@ -846,7 +857,7 @@ class GwDocument(QObject):
         # Reset list of selected records
         self.ids, self.list_ids = tools_gw.reset_feature_list()
 
-        list_feature_type = ['arc', 'node', 'connec', 'element']
+        list_feature_type = ['arc', 'node', 'connec', 'element', 'link']
         if global_vars.project_type == 'ud':
             list_feature_type.append('gully')
 

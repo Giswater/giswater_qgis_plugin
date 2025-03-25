@@ -447,6 +447,20 @@
               </item>
              </layout>
             </widget>
+            <widget class="QWidget" name="tab_link">
+             <attribute name="title">
+              <string>Link</string>
+             </attribute>
+             <layout class="QVBoxLayout" name="verticalLayout_8">
+              <item>
+               <widget class="QTableView" name="tbl_doc_x_link">
+                <property name="sortingEnabled">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
            </widget>
           </item>
          </layout>
