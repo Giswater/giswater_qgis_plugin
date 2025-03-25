@@ -133,3 +133,6 @@ DROP TRIGGER gw_trg_cat_manager ON cat_manager;
 
 CREATE TRIGGER gw_trg_om_visit AFTER INSERT ON om_visit_x_link
 FOR EACH ROW EXECUTE FUNCTION gw_trg_om_visit('link');
+
+CREATE TRIGGER gw_trg_ui_doc_x_link INSTEAD OF INSERT OR DELETE OR UPDATE ON v_ui_doc_x_link
+FOR EACH ROW EXECUTE FUNCTION gw_trg_ui_doc('link');

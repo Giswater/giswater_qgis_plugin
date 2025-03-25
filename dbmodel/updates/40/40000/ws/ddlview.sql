@@ -6357,7 +6357,7 @@ AS SELECT ext_rtc_hydrometer.id::text AS hydrometer_id,
 
 -- 10/02/2025
 CREATE OR REPLACE VIEW v_ui_doc_x_arc
-AS SELECT
+AS SELECT doc_x_arc.doc_id,
     doc_x_arc.arc_id,
     doc.name AS doc_name,
     doc.doc_type,
@@ -6369,7 +6369,7 @@ AS SELECT
      JOIN doc ON doc.id::text = doc_x_arc.doc_id::text;
 
 CREATE OR REPLACE VIEW v_ui_doc_x_connec
-AS SELECT
+AS SELECT doc_x_connec.doc_id,
     doc_x_connec.connec_id,
     doc.name AS doc_name,
     doc.doc_type,
@@ -6381,7 +6381,7 @@ AS SELECT
      JOIN doc ON doc.id::text = doc_x_connec.doc_id::text;
 
 CREATE OR REPLACE VIEW v_ui_doc_x_node
-AS SELECT
+AS SELECT doc_x_node.doc_id,
     doc_x_node.node_id,
     doc.name AS doc_name,
     doc.doc_type,
@@ -6394,7 +6394,7 @@ AS SELECT
 
 
 CREATE OR REPLACE VIEW v_ui_doc_x_psector
-AS SELECT
+AS SELECT doc_x_psector.doc_id,
     plan_psector.name AS psector_name,
     doc.name AS doc_name,
     doc.doc_type,
@@ -6407,7 +6407,7 @@ AS SELECT
      JOIN plan_psector ON plan_psector.psector_id::text = doc_x_psector.psector_id::text;
 
 CREATE OR REPLACE VIEW v_ui_doc_x_visit
-AS SELECT
+AS SELECT doc_x_visit.doc_id,
     doc_x_visit.visit_id,
     doc.name AS doc_name,
     doc.doc_type,
@@ -6419,7 +6419,7 @@ AS SELECT
      JOIN doc ON doc.id::text = doc_x_visit.doc_id::text;
 
 CREATE OR REPLACE VIEW v_ui_doc_x_workcat
-AS SELECT
+AS SELECT doc_x_workcat.doc_id,
     doc_x_workcat.workcat_id,
     doc.name,
     doc.doc_type,

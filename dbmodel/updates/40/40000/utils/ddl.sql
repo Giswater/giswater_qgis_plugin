@@ -314,3 +314,11 @@ CREATE TABLE om_visit_x_link (
 	CONSTRAINT om_visit_x_link_link_id_fkey FOREIGN KEY (link_id) REFERENCES link(link_id) ON DELETE CASCADE ON UPDATE CASCADE,
 	CONSTRAINT om_visit_x_link_visit_id_fkey FOREIGN KEY (visit_id) REFERENCES om_visit(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+CREATE TABLE doc_x_link (
+	doc_id varchar(30) NOT NULL,
+	link_id int4 NOT NULL,
+	CONSTRAINT doc_x_link_pkey PRIMARY KEY (doc_id, link_id),
+	CONSTRAINT doc_x_link_link_id_fkey FOREIGN KEY (link_id) REFERENCES link(link_id) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT doc_x_link_doc_id_fkey FOREIGN KEY (doc_id) REFERENCES doc(id) ON DELETE CASCADE ON UPDATE CASCADE
+);

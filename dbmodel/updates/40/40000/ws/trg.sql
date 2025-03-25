@@ -317,16 +317,16 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_review_node();
 
 -- 10/02/2025
 CREATE TRIGGER gw_trg_ui_doc_x_arc INSTEAD OF INSERT OR DELETE OR UPDATE ON v_ui_doc_x_arc
-FOR EACH ROW EXECUTE FUNCTION gw_trg_ui_doc('doc_x_arc');
+FOR EACH ROW EXECUTE FUNCTION gw_trg_ui_doc('arc');
 
 CREATE TRIGGER gw_trg_ui_doc_x_connec INSTEAD OF INSERT OR DELETE OR UPDATE ON v_ui_doc_x_connec
-FOR EACH ROW EXECUTE FUNCTION gw_trg_ui_doc('doc_x_connec');
+FOR EACH ROW EXECUTE FUNCTION gw_trg_ui_doc('connec');
 
 CREATE TRIGGER gw_trg_ui_doc_x_node INSTEAD OF INSERT OR DELETE OR UPDATE ON v_ui_doc_x_node
-FOR EACH ROW EXECUTE FUNCTION gw_trg_ui_doc('doc_x_node');
+FOR EACH ROW EXECUTE FUNCTION gw_trg_ui_doc('node');
 
 CREATE TRIGGER gw_trg_ui_doc_x_visit INSTEAD OF INSERT OR DELETE OR UPDATE ON v_ui_doc_x_visit
-FOR EACH ROW EXECUTE FUNCTION gw_trg_ui_doc('doc_x_visit');
+FOR EACH ROW EXECUTE FUNCTION gw_trg_ui_doc('visit');
 
 CREATE TRIGGER gw_trg_edit_element INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_element
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_element('element');

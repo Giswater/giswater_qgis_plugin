@@ -1783,6 +1783,7 @@ ALTER TABLE link RENAME TO _link;
 -- Drop foreign keys from table link
 ALTER TABLE plan_psector_x_connec DROP CONSTRAINT plan_psector_x_connec_link_id_fkey;
 ALTER TABLE om_visit_x_link DROP CONSTRAINT om_visit_x_link_link_id_fkey;
+ALTER TABLE doc_x_link DROP CONSTRAINT doc_x_link_link_id_fkey;
 
 
 -- Drop constraints from table link

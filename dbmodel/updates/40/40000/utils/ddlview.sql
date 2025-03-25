@@ -510,3 +510,17 @@ AS SELECT cat_workspace.id,
   cat_workspace.private IS FALSE
   OR cat_workspace.private IS TRUE
   AND (cat_workspace.insert_user = CURRENT_USER::text OR cat_workspace.lastupdate_user = CURRENT_USER::text);
+
+
+--25/03/2025
+CREATE OR REPLACE VIEW v_ui_doc_x_link
+AS SELECT doc_x_link.doc_id,
+    doc_x_link.link_id,
+    doc.name as doc_name,
+    doc.doc_type,
+    doc.path,
+    doc.observ,
+    doc.date,
+    doc.user_name
+  FROM doc_x_link
+     JOIN doc ON doc.id::text = doc_x_link.doc_id::text;

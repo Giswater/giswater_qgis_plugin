@@ -10,13 +10,19 @@ This version of Giswater is provided by Giswater Association
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_ui_doc() RETURNS trigger AS $BODY$
 DECLARE 
-    doc_table varchar;
-    v_sql varchar;
+    feature_type text;
+	feature_column text;
+    doc_table text;
+    v_sql text;
+    variable text;
+    v_old_value text;
     
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
-    doc_table:= TG_ARGV[0];
+    feature_type:= TG_ARGV[0];
+    doc_table:= 'doc_x_'||feature_type;
+	feature_column:= feature_type||'_id';
 
     IF TG_OP = 'INSERT' THEN
          --EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{}, "data":{"message":"1", "function":"1138","parameters":null}}$$);';
@@ -28,7 +34,12 @@ BEGIN
         RETURN NEW;
 
     ELSIF TG_OP = 'DELETE' THEN
-        v_sql:= 'DELETE FROM '||doc_table||' WHERE id = '||quote_literal(OLD.id)||';';
+		
+		EXECUTE format('SELECT ($1).%I', feature_column)
+      	INTO v_old_value
+      	USING OLD;
+
+        v_sql:= 'DELETE FROM '||doc_table||' WHERE doc_id = '||quote_literal(OLD.doc_id)||' AND '||feature_column||' = '||quote_literal(v_old_value)||';';
         EXECUTE v_sql;
          --EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{}, "data":{"message":"3", "function":"1138","parameters":null}}$$);';
         RETURN NULL;
@@ -40,4 +51,3 @@ $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
 
-  
