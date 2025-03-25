@@ -647,7 +647,10 @@ BEGIN
 			VALUES (NEW.node_id, NEW.lab_code);
 
 		ELSIF v_man_table='man_wtp' THEN
-			INSERT INTO man_wtp (node_id, name, maxflow, opsflow) VALUES(NEW.node_id, NEW.name, NEW.maxflow, NEW.opsflow);
+			INSERT INTO man_wtp (node_id, name, maxflow, opsflow, screening, desander, chemcond, oxidation, coagulation, floculation, presendiment, sediment,
+			filtration, disinfection, chemtreatment, storage, sludgeman)
+			VALUES (NEW.node_id, NEW.name, NEW.maxflow, NEW.opsflow, NEW.screening, NEW.desander, NEW.chemcond, NEW.oxidation, NEW.coagulation, NEW.floculation,
+			NEW.presendiment, NEW.sediment, NEW.filtration, NEW.disinfection, NEW.chemtreatment, NEW.storage, NEW.sludgeman);
 
 		END IF;
 
@@ -1040,7 +1043,9 @@ BEGIN
 			WHERE node_id=OLD.node_id;
 
 		ELSIF v_man_table ='man_wtp' THEN
-			UPDATE man_wtp SET name=NEW.name, maxflow=NEW.maxflow, opsflow=NEW.opsflow
+			UPDATE man_wtp SET name = NEW.name, maxflow = NEW.maxflow, opsflow = NEW.opsflow, screening = NEW.screening, desander = NEW.desander, chemcond = NEW.chemcond, 
+    		oxidation = NEW.oxidation, coagulation = NEW.coagulation, floculation = NEW.floculation, presendiment = NEW.presendiment, sediment = NEW.sediment, 
+    		filtration = NEW.filtration, disinfection = NEW.disinfection, chemtreatment = NEW.chemtreatment, storage = NEW.storage, sludgeman = NEW.sludgeman
 			WHERE node_id=OLD.node_id;
 
 		ELSIF v_man_table ='man_filter' THEN
