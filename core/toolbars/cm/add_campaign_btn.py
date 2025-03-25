@@ -47,6 +47,6 @@ class GwAddCampaignButton(GwAction):
     def clicked_event(self, selected_action):
         """ Open the correct campaign dialog based on user selection """
         if selected_action == "Review":
-            self.new_campaign.create_campaign_review()
+            self.new_campaign.create_campaign(dialog_type="review")
         elif selected_action == "Visit":
             self.new_campaign.create_campaign(dialog_type="visit")
