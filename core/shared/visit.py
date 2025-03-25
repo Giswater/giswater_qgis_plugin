@@ -319,7 +319,7 @@ class GwVisit(QObject):
             self.dlg_visit_manager.tbl_visit, self.dlg_visit_manager.txt_filter, table_object, expr_filter, filed_to_filter))
 
         # Open form
-        tools_gw.open_dialog(self.dlg_visit_manager, dlg_name="lot_visitmanager")
+        tools_gw.open_dialog(self.dlg_visit_manager, dlg_name="visit_manager")
 
 
     def get_visit_dialog(self):
