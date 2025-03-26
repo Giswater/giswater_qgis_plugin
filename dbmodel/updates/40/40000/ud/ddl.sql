@@ -1818,6 +1818,7 @@ ALTER TABLE element_x_gully DROP CONSTRAINT element_x_gully_element_id_fkey;
 ALTER TABLE element_x_connec DROP CONSTRAINT element_x_connec_element_id_fkey;
 ALTER TABLE element_x_node DROP CONSTRAINT element_x_node_element_id_fkey;
 ALTER TABLE element_x_arc DROP CONSTRAINT element_x_arc_element_id_fkey;
+ALTER TABLE element_x_link DROP CONSTRAINT element_x_link_element_id_fkey;
 
 
 -- Drop foreign keys from table element
@@ -1927,6 +1928,7 @@ ALTER TABLE plan_psector_x_gully DROP CONSTRAINT plan_psector_x_gully_link_id_fk
 ALTER TABLE plan_psector_x_connec DROP CONSTRAINT plan_psector_x_connec_link_id_fkey;
 ALTER TABLE om_visit_x_link DROP CONSTRAINT om_visit_x_link_link_id_fkey;
 ALTER TABLE doc_x_link DROP CONSTRAINT doc_x_link_link_id_fkey;
+ALTER TABLE element_x_link DROP CONSTRAINT element_x_link_link_id_fkey;
 
 
 -- Drop foreign keys from table link
