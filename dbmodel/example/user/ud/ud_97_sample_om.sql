@@ -708,14 +708,14 @@ AS SELECT ve_visit_link_insp.visit_id,
     z.idval AS "Sediments",
     u.idval AS "Defects",
     y.idval AS "Cleaned",
-    ve_visit_arc_insp.insp_observ AS "Observation",
-    ve_visit_arc_insp.photo AS "Photo"
-   FROM ve_visit_arc_insp
-     JOIN config_visit_class c ON c.id = ve_visit_arc_insp.class_id
-     JOIN om_typevalue t ON t.id::integer = ve_visit_arc_insp.status AND t.typevalue = 'visit_status'::text
-     LEFT JOIN om_typevalue y ON y.id::integer = ve_visit_arc_insp.clean_arc::integer AND y.typevalue = 'visit_cleaned'::text
-     LEFT JOIN om_typevalue u ON u.id::integer = ve_visit_arc_insp.defect_arc::integer AND u.typevalue = 'visit_defect'::text
-     LEFT JOIN om_typevalue z ON z.id::integer = ve_visit_arc_insp.sediments_arc::integer AND z.typevalue = 'visit_sediments'::text;
+    ve_visit_link_insp.insp_observ AS "Observation",
+    ve_visit_link_insp.photo AS "Photo"
+   FROM ve_visit_link_insp
+     JOIN config_visit_class c ON c.id = ve_visit_link_insp.class_id
+     JOIN om_typevalue t ON t.id::integer = ve_visit_link_insp.status AND t.typevalue = 'visit_status'::text
+     LEFT JOIN om_typevalue y ON y.id::integer = ve_visit_link_insp.clean_arc::integer AND y.typevalue = 'visit_cleaned'::text
+     LEFT JOIN om_typevalue u ON u.id::integer = ve_visit_link_insp.defect_arc::integer AND u.typevalue = 'visit_defect'::text
+     LEFT JOIN om_typevalue z ON z.id::integer = ve_visit_link_insp.sediments_arc::integer AND z.typevalue = 'visit_sediments'::text;
 
 CREATE OR REPLACE VIEW v_ui_visit_incid_link
 AS SELECT ve_visit_incid_link.visit_id,
