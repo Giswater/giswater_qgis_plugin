@@ -49,6 +49,9 @@ DECLARE
 
     v_response JSON;
 
+	-- LOCK LEVEL LOGIC
+	v_original_disable_locklevel json;
+
 BEGIN
 
 	-- Search path
@@ -62,6 +65,14 @@ BEGIN
 	v_commitchanges = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'commitChanges');
 	v_updatemapzgeom = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'updateMapZone');
 	v_geomparamupdate = (SELECT ((p_data::json->>'data')::json->>'parameters')::json->>'geomParamUpdate');
+
+
+	-- Get user variable for disabling lock level
+    SELECT value::json INTO v_original_disable_locklevel FROM config_param_user
+    WHERE parameter = 'edit_disable_locklevel' AND cur_user = current_user;
+    -- Set disable lock level to true for this operation
+    UPDATE config_param_user SET value = '{"update":true, "delete":true}'
+    WHERE parameter = 'edit_disable_locklevel' AND cur_user = current_user;
 
 
     -- Create temporary tables
@@ -108,23 +119,23 @@ BEGIN
 
     -- Arcs to be disconnected: one of the two arcs that reach the valve
 
-    WITH 
+    WITH
     arcs_selected AS (
         SELECT DISTINCT ON (n.pgr_node_id)  a.pgr_arc_id, n.pgr_node_id, a.pgr_node_1, a.pgr_node_2
-        FROM temp_pgr_node n 
+        FROM temp_pgr_node n
         JOIN temp_pgr_arc a ON n.pgr_node_id IN (a.pgr_node_1, a.pgr_node_2)
         WHERE n.modif = TRUE
     )
     UPDATE temp_pgr_arc a
-    SET 
-        modif1 = s.modif1, 
-        modif2 = s.modif2 
+    SET
+        modif1 = s.modif1,
+        modif2 = s.modif2
     FROM (
-        SELECT 
-            pgr_arc_id, 
-            bool_or(pgr_node_id = pgr_node_1) AS modif1, 
+        SELECT
+            pgr_arc_id,
+            bool_or(pgr_node_id = pgr_node_1) AS modif1,
             bool_or( pgr_node_id = pgr_node_2) AS modif2
-        FROM arcs_selected 
+        FROM arcs_selected
         GROUP BY pgr_arc_id
     ) s
     WHERE a.pgr_arc_id = s.pgr_arc_id;
@@ -138,7 +149,7 @@ BEGIN
     END IF;
 
     -- Generate the minsectors
-    v_query := 
+    v_query :=
     'SELECT pgr_arc_id AS id, pgr_node_1 AS source, pgr_node_2 AS target, 1 as cost 
     FROM temp_pgr_arc a
     WHERE a.arc_id IS NOT NULL
@@ -153,7 +164,7 @@ BEGIN
 
     UPDATE temp_pgr_arc a SET zone_id = c.component
     FROM temp_pgr_connectedcomponents c
-    WHERE a.pgr_node_1 = c.node 
+    WHERE a.pgr_node_1 = c.node
     AND a.arc_id IS NOT NULL
     AND a.pgr_node_1 IS NOT NULL AND a.pgr_node_2 IS NOT NULL;
 
@@ -163,7 +174,7 @@ BEGIN
     JOIN temp_pgr_node n1 ON a.pgr_node_1 = n1.pgr_node_id
     JOIN temp_pgr_node n2 ON a.pgr_node_2 = n2.pgr_node_id
     WHERE a.arc_id IS NULL
-    AND n1.zone_id <> 0 AND n2.zone_id <> 0 
+    AND n1.zone_id <> 0 AND n2.zone_id <> 0
     AND n1.zone_id <> n2.zone_id;
 
     -- Set zone_id to 0 for nodes at the border of minsectors
@@ -172,12 +183,12 @@ BEGIN
     WHERE n.node_id = s.node_id;
 
     -- Update feature temporary tables
-    UPDATE temp_pgr_connec c SET zone_id = a.zone_id 
-    FROM arc a 
+    UPDATE temp_pgr_connec c SET zone_id = a.zone_id
+    FROM arc a
     WHERE c.arc_id = a.arc_id AND a.zone_id<>0;
 
-    UPDATE temp_pgr_link l SET zone_id = c.zone_id 
-    FROM connec c 
+    UPDATE temp_pgr_link l SET zone_id = c.zone_id
+    FROM connec c
     WHERE c.connec_id = l.feature_id AND c.zone_id<>0;
 
     -- Insert into minsector temporary table
@@ -352,6 +363,10 @@ BEGIN
     v_result := NULL;
     v_result := COALESCE(v_result, '{}');
     v_result_line := CONCAT('{"geometryType":"LineString", "features":', v_result, '}');
+
+
+	-- Restore original disable lock level
+    UPDATE config_param_user SET value = v_original_disable_locklevel WHERE parameter = 'edit_disable_locklevel' AND cur_user = current_user;
 
 
     -- Delete temporary tables
