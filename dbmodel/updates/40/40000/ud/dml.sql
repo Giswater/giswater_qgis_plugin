@@ -2875,3 +2875,9 @@ tstamp, exit_topelev, exit_elev, sector_id, dma_id, fluid_type, expl_id2, epa_ty
 lastupdate_user, conneccat_id, workcat_id, workcat_id_end, builtdate, enddate, drainzone_id, uncertain, muni_id, verified,
 macrominsector_id, dwfzone_id
 FROM _link;
+
+-- 26/03/2025
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,dv_querytext,dv_isnullvalue,widgetcontrols,hidden)
+	VALUES ('v_edit_link','form_feature','tab_none','datasource','lyt_data_1',36,'integer','combo','Datasource','Datasource',false,false,true,false,'SELECT id, idval FROM edit_typevalue WHERE typevalue = ''value_datasource''', true,'{"setMultiline":false}'::json,false);
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,widgetcontrols,hidden)
+	VALUES ('v_edit_link','form_feature','tab_none','custom_length','lyt_data_1',37,'double','text','Custom length','Custom length',false,false,true,false,'{"setMultiline":false}'::json,false);

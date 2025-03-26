@@ -366,7 +366,8 @@ AS SELECT DISTINCT ON (link_id)
     date_trunc('second'::text, l.lastupdate) AS lastupdate,
     l.lastupdate_user,
     l.uncertain,
-    l.verified
+    l.verified,
+    l.datasource
    FROM link l
 	 LEFT JOIN exploitation e USING (expl_id)
      LEFT JOIN sector s USING (sector_id)
@@ -487,7 +488,8 @@ AS WITH
 			l.enddate,
 			date_trunc('second'::text, l.lastupdate) AS lastupdate,
 			l.lastupdate_user,
-			l.uncertain
+			l.uncertain,
+            l.datasource
 			from inp_network_mode, link_state
 			JOIN link l using (link_id)
 			JOIN selector_expl se ON (se.cur_user =current_user AND se.expl_id = l.expl_id) OR (se.cur_user =current_user AND se.expl_id = l.expl_id2)

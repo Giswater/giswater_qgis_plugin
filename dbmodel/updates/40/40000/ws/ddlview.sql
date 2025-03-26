@@ -850,7 +850,8 @@ CREATE OR REPLACE VIEW vu_link AS
             WHEN s.sector_id > 0 AND is_operative = true AND epa_type = 'JUNCTION'::character varying(16)::text AND cpu.value = '4' THEN epa_type::character varying
             ELSE NULL::character varying(16)
         END AS inp_type,
-    l.n_hydrometer
+    l.n_hydrometer,
+    l.datasource
      FROM ( SELECT inp_netw_mode.value FROM inp_netw_mode) cpu, link l
      LEFT JOIN sector s USING (sector_id)
      LEFT JOIN presszone p USING (presszone_id)
@@ -972,7 +973,8 @@ AS WITH
           ELSE NULL::character varying(16)
         END AS inp_type,
         l.verified,
-        l.n_hydrometer
+        l.n_hydrometer,
+        l.datasource
         FROM inp_network_mode, link_selector
         JOIN link l using (link_id)
         JOIN selector_expl se ON ((se.cur_user =current_user AND se.expl_id = l.expl_id) or (se.cur_user =current_user AND se.expl_id = l.expl_id2))

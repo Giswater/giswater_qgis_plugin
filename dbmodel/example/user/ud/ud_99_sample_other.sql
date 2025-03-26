@@ -974,3 +974,6 @@ UPDATE config_form_fields SET widgettype='datetime' WHERE (formname ILIKE 've_ar
 
 -- 10/03/2025
 UPDATE config_form_fields SET layoutname='lyt_data_1', widgettype='combo', dv_querytext='SELECT id, idval FROM edit_typevalue WHERE typevalue = ''discharge_medium_typevalue''', dv_isnullvalue=TRUE WHERE columnname='discharge_medium' AND formname ILIKE '%outfall%';
+
+-- 26/03/2025
+UPDATE config_form_fields SET layoutname='lyt_data_1', layoutorder=37, "datatype"='double', widgettype='text', "label"='Custom length', tooltip='Custom length', placeholder=NULL, ismandatory=false, isparent=false, iseditable=true, isautoupdate=false, isfilter=NULL, dv_querytext=NULL, dv_orderby_id=NULL, dv_isnullvalue=NULL, dv_parent_id=NULL, dv_querytext_filterc=NULL, stylesheet=NULL, widgetcontrols='{"setMultiline":false}'::json, widgetfunction=NULL, linkedobject=NULL, hidden=false, web_layoutorder=NULL WHERE formname='v_edit_link' AND formtype='form_feature' AND columnname='custom_length' AND tabname='tab_none';
