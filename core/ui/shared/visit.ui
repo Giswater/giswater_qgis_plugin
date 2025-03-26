@@ -478,6 +478,20 @@
               </item>
              </layout>
             </widget>
+            <widget class="QWidget" name="tab_link">
+             <attribute name="title">
+              <string>Link</string>
+             </attribute>
+             <layout class="QGridLayout" name="gridLayout_4">
+              <item row="0" column="0">
+               <widget class="QTableView" name="tbl_visit_x_link">
+                <property name="sortingEnabled">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
             <widget class="QWidget" name="tab_gully">
              <attribute name="title">
               <string>Gully</string>

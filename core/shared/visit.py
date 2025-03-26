@@ -22,6 +22,7 @@ from ..models.om_visit_event import GwOmVisitEvent
 from ..models.om_visit_x_arc import GwOmVisitXArc
 from ..models.om_visit_x_connec import GwOmVisitXConnec
 from ..models.om_visit_x_node import GwOmVisitXNode
+from ..models.om_visit_x_link import GwOmVisitXLink
 from ..models.om_visit_x_gully import GwOmVisitXGully
 from ..models.config_visit_parameter import GwConfigVisitParameter
 from ..ui.ui_manager import GwVisitUi, GwVisitEventUi, GwVisitEventRehabUi, GwVisitManagerUi
@@ -87,7 +88,7 @@ class GwVisit(QObject):
         tools_gw.load_settings(self.dlg_add_visit)
         # Get layer visibility to restore when dialog is closed
         layers_visibility = {}
-        for layer_name in ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_gully"]:
+        for layer_name in ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_link", "v_edit_element", "v_edit_gully"]:
             layer = tools_qgis.get_layer_by_tablename(layer_name)
             if layer:
                 layers_visibility[layer] = tools_qgis.is_layer_visible(layer)
@@ -107,6 +108,7 @@ class GwVisit(QObject):
         self.list_ids['arc'] = []
         self.list_ids['node'] = []
         self.list_ids['connec'] = []
+        self.list_ids['link'] = []
         self.list_ids['gully'] = []
         self.list_ids['element'] = []
 
@@ -117,6 +119,7 @@ class GwVisit(QObject):
         self.layers['arc'] = tools_gw.get_layers_from_feature_type('arc')
         self.layers['node'] = tools_gw.get_layers_from_feature_type('node')
         self.layers['connec'] = tools_gw.get_layers_from_feature_type('connec')
+        self.layers['link'] = tools_gw.get_layers_from_feature_type('link')
         self.layers['element'] = tools_gw.get_layers_from_feature_type('element')
         if tools_gw.get_project_type() == 'ud':
             self.layers['gully'] = tools_gw.get_layers_from_feature_type('gully')
@@ -220,10 +223,11 @@ class GwVisit(QObject):
         self._event_feature_type_selected(self.dlg_add_visit, "node")
         self._event_feature_type_selected(self.dlg_add_visit, "connec")
         self._event_feature_type_selected(self.dlg_add_visit, "arc")
+        self._event_feature_type_selected(self.dlg_add_visit, "link")
 
         # Force _visit_tab_feature_changed
         excluded_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_gully",
-                           "v_edit_element"]
+                           "v_edit_element", "v_edit_link"]
         self.excluded_layers = excluded_layers
         self._visit_tab_feature_changed(self.dlg_add_visit, 'visit', excluded_layers=excluded_layers)
 
@@ -389,6 +393,8 @@ class GwVisit(QObject):
                 feature_type = 'connec'
             case 'arc_id':
                 feature_type = 'arc'
+            case 'link_id':
+                feature_type = 'link'
             case 'gully_id':
                 feature_type = 'gully'
         # Fill ComboBox cmb_visit_class
@@ -517,6 +523,8 @@ class GwVisit(QObject):
                                                                     self.dlg_add_visit.tbl_visit_x_node, "v_edit_node", "node_id", self.rubber_band, 10))
         self.dlg_add_visit.tbl_visit_x_connec.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
                                                                       self.dlg_add_visit.tbl_visit_x_connec, "v_edit_connec", "connec_id", self.rubber_band, 10))
+        self.dlg_add_visit.tbl_visit_x_link.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
+                                                                    self.dlg_add_visit.tbl_visit_x_link, "v_edit_link", "link_id", self.rubber_band, 10))
         self.dlg_add_visit.tbl_visit_x_gully.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
                                                                      self.dlg_add_visit.tbl_visit_x_gully, "v_edit_gully", "gully_id", self.rubber_band, 10))
 
@@ -767,6 +775,7 @@ class GwVisit(QObject):
             self._update_relations_feature_type("arc")
             self._update_relations_feature_type("node")
             self._update_relations_feature_type("connec")
+            self._update_relations_feature_type("link")
             if tools_gw.get_project_type() == 'ud':
                 self._update_relations_feature_type("gully")
         else:
@@ -791,6 +800,8 @@ class GwVisit(QObject):
                 db_record = GwOmVisitXNode()
             case 'connec':
                 db_record = GwOmVisitXConnec()
+            case 'link':
+                db_record = GwOmVisitXLink()
             case 'gully':
                 db_record = GwOmVisitXGully()
 
@@ -829,6 +840,8 @@ class GwVisit(QObject):
                 db_record = GwOmVisitXNode()
             case 'connec':
                 db_record = GwOmVisitXConnec()
+            case 'link':
+                db_record = GwOmVisitXLink()
             case 'gully':
                 db_record = GwOmVisitXGully()
 
@@ -919,7 +932,7 @@ class GwVisit(QObject):
     def _manage_tabs_enabled(self, enable_tabs=False):
         """ Enable/Disable tabs depending feature_type """
 
-        excluded_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_gully",
+        excluded_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_link", "v_edit_element", "v_edit_gully",
                           "v_edit_element"]
         self.excluded_layers = excluded_layers
         if self.feature_type is None:
@@ -953,8 +966,10 @@ class GwVisit(QObject):
                 tab_index = 1
             case 'connec':
                 tab_index = 2
-            case 'gully':
+            case 'link':
                 tab_index = 3
+            case 'gully':
+                tab_index = 4
 
         # Enable only tab of this geometry type
         self.dlg_add_visit.tab_feature.setTabEnabled(tab_index, True)
@@ -998,6 +1013,7 @@ class GwVisit(QObject):
             tools_gw.set_tablemodel_config(dialog, "tbl_event_x_arc", "v_edit_arc")
             tools_gw.set_tablemodel_config(dialog, "tbl_event_x_node", "v_edit_node")
             tools_gw.set_tablemodel_config(dialog, "tbl_event_x_connec", "v_edit_connec")
+            tools_gw.set_tablemodel_config(dialog, "tbl_event_x_link", "v_edit_link")
             tools_gw.set_tablemodel_config(dialog, "tbl_event_x_gully", "v_edit_gully")
 
 
@@ -1211,7 +1227,7 @@ class GwVisit(QObject):
         sql = ("SELECT 'ALL' as id, 'ALL' as idval "
                "UNION SELECT id, id as idval "
                "FROM sys_feature_type "
-               "WHERE classlevel = 1 OR classlevel = 2 "
+               "WHERE classlevel = 1 OR classlevel = 2 OR classlevel = 4 "
                "ORDER BY id")
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_add_visit.feature_type, rows)
@@ -1316,7 +1332,7 @@ class GwVisit(QObject):
                f" WHERE id = '{parameter_id}'")
         row = tools_db.get_row(sql)
         form_type = str(row[0])
-        if form_type in ('event_ud_arc_standard', 'event_standard'):
+        if form_type in ('event_ud_arc_standard', 'event_ud_link_standard', 'event_standard'):
             self.dlg_event = GwVisitEventUi(self)
             tools_gw.load_settings(self.dlg_event)
             self._populate_position_id()
@@ -1842,6 +1858,8 @@ class GwVisit(QObject):
                 self.feature_type = "node"
             case 'tab_connec':
                 self.feature_type = "connec"
+            case 'tab_link':
+                self.feature_type = "link"
             case 'tab_gully':
                 self.feature_type = "gully"
 
