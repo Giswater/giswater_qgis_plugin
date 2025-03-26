@@ -187,6 +187,7 @@ AS SELECT s.sector_id,
     ms.name AS macrosector,
     s.descript,
     s.active,
+    s.lock_level,
     s.graphconfig,
     s.stylesheet,
     s.parent_id,
@@ -7002,6 +7003,7 @@ AS SELECT d.drainzone_id,
     et.idval AS drainzone_type,
     d.descript,
     d.active,
+    d.lock_level,
     d.graphconfig,
     d.stylesheet,
     d.tstamp,
@@ -7021,6 +7023,7 @@ AS SELECT d.dwfzone_id,
     et.idval AS dwfzone_type,
     d.descript,
     d.active,
+    d.lock_level,
     d.graphconfig,
     d.stylesheet,
     d.tstamp,
@@ -7038,7 +7041,8 @@ CREATE OR REPLACE VIEW v_ui_macrosector
 AS SELECT m.macrosector_id,
     m.name,
     m.descript,
-    m.active
+    m.active,
+    m.lock_level,
     FROM macrosector m
     WHERE m.macrosector_id > 0
     ORDER BY m.macrosector_id;
@@ -7048,7 +7052,8 @@ AS SELECT m.macrodma_id,
     m.name,
     m.expl_id,
     m.descript,
-    m.active
+    m.active,
+    m.lock_level
     FROM macrodma m
     WHERE m.macrodma_id > 0
     ORDER BY m.macrodma_id;

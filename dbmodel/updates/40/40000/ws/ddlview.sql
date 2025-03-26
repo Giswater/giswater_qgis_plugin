@@ -2096,6 +2096,7 @@ AS SELECT p.presszone_id,
     p.presszone_type,
     p.descript,
     p.active,
+    p.lock_level,
     p.graphconfig,
     p.stylesheet,
     p.head,
@@ -5168,6 +5169,7 @@ AS SELECT d.dma_id,
     md.name AS macrodma,
     d.descript,
     d.active,
+    d.lock_level,
     d.graphconfig,
     d.stylesheet,
     d.pattern_id,
@@ -5234,6 +5236,7 @@ CREATE OR REPLACE VIEW v_ui_supplyzone
     ms.name AS macrosector,
     s.descript,
     s.active,
+    s.lock_level,
     s.graphconfig,
     s.stylesheet,
     s.parent_id,
@@ -5258,6 +5261,7 @@ CREATE OR REPLACE VIEW v_ui_macrodma
   m.name,
 	m.descript,
   m.active,
+	m.lock_level,
 	m.expl_id
    FROM selector_expl s,
     macrodma m
@@ -5270,6 +5274,7 @@ CREATE OR REPLACE VIEW v_ui_macrodqa
   m.name,
 	m.descript,
   m.active,
+	m.lock_level,
 	m.expl_id
    FROM selector_expl s,
     macrodqa m
@@ -5282,7 +5287,8 @@ CREATE OR REPLACE VIEW v_ui_macrosector
   SELECT m.macrosector_id,
     m.name,
     m.descript,
-    m.active
+    m.active,
+    m.lock_level
     FROM macrosector m
     WHERE m.macrosector_id > 0
   ORDER BY m.macrosector_id;
@@ -5295,6 +5301,7 @@ AS SELECT d.dqa_id,
     md.name AS macrodqa,
     d.descript,
     d.active,
+    d.lock_level,
     d.graphconfig,
     d.stylesheet,
     d.pattern_id,
@@ -5322,6 +5329,7 @@ AS SELECT s.sector_id,
     ms.name AS macrosector,
     s.descript,
     s.active,
+    s.lock_level,
     s.graphconfig,
     s.stylesheet,
     s.parent_id,
