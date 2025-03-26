@@ -7,14 +7,19 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE: 1140
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_ui_element() RETURNS trigger AS $BODY$
-DECLARE 
-    element_table varchar;
-    v_sql varchar;
-    
+DECLARE
+    feature_type text;
+	feature_column text;
+    element_table text;
+    v_sql text;
+    variable text;
+    v_old_value text;
 BEGIN
 
     EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
-    element_table:= TG_ARGV[0];
+    feature_type:= TG_ARGV[0];
+    element_table:= 'element_x_'||feature_type;
+	feature_column:= feature_type||'_id';
 
     IF TG_OP = 'INSERT' THEN
 
@@ -24,27 +29,27 @@ BEGIN
         RETURN NEW;
 
     ELSIF TG_OP = 'UPDATE' THEN
- 
+
         --PERFORM gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
         -- "data":{"message":"2", "function":"1140","parameters":null, "variables":null}}$$);
         RETURN NEW;
 
     ELSIF TG_OP = 'DELETE' THEN
-        v_sql:= 'DELETE FROM '||element_table||' WHERE id = '||quote_literal(OLD.id)||';';
-        EXECUTE v_sql;
+		EXECUTE format('SELECT ($1).%I', feature_column)
+      	INTO v_old_value
+      	USING OLD;
 
-        --PERFORM gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-        -- "data":{"message":"3", "function":"1140","parameters":null, "variables":null}}$$);
+        v_sql:= 'DELETE FROM '||element_table||' WHERE element_id = '||quote_literal(OLD.element_id)||' AND	 '||feature_column||' = '||quote_literal(v_old_value)||';';
+        EXECUTE v_sql;
         RETURN NULL;
-    
+
     END IF;
-    
+
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
 
-  
 
 
-      
+

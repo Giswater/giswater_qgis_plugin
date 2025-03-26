@@ -29,16 +29,19 @@ CREATE TRIGGER gw_trg_edit_element_pol INSTEAD OF INSERT OR DELETE OR UPDATE ON 
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_element_pol();
 
 CREATE TRIGGER gw_trg_ui_element INSTEAD OF INSERT OR DELETE OR UPDATE ON v_ui_element_x_node
-FOR EACH ROW EXECUTE FUNCTION gw_trg_ui_element('element_x_node');
+FOR EACH ROW EXECUTE FUNCTION gw_trg_ui_element('node');
 
 CREATE TRIGGER gw_trg_ui_element INSTEAD OF INSERT OR DELETE OR UPDATE ON v_ui_element_x_connec
-FOR EACH ROW EXECUTE FUNCTION gw_trg_ui_element('element_x_connec');
+FOR EACH ROW EXECUTE FUNCTION gw_trg_ui_element('connec');
 
 CREATE TRIGGER gw_trg_ui_element INSTEAD OF INSERT OR DELETE OR UPDATE ON v_ui_element_x_arc
-FOR EACH ROW EXECUTE FUNCTION gw_trg_ui_element('element_x_arc');
+FOR EACH ROW EXECUTE FUNCTION gw_trg_ui_element('arc');
 
 CREATE TRIGGER gw_trg_ui_element INSTEAD OF INSERT OR DELETE OR UPDATE ON v_ui_element_x_gully
-FOR EACH ROW EXECUTE FUNCTION gw_trg_ui_element('element_x_gully');
+FOR EACH ROW EXECUTE FUNCTION gw_trg_ui_element('gully');
+
+CREATE TRIGGER gw_trg_ui_element INSTEAD OF INSERT OR DELETE OR UPDATE ON v_ui_element_x_link
+FOR EACH ROW EXECUTE FUNCTION gw_trg_ui_element('link');
 
 CREATE TRIGGER gw_trg_edit_inp_node_storage INSTEAD OF INSERT OR UPDATE OR DELETE
 ON v_edit_inp_storage FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_inp_node('inp_storage');

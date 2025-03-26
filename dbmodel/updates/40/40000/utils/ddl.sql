@@ -322,3 +322,11 @@ CREATE TABLE doc_x_link (
 	CONSTRAINT doc_x_link_link_id_fkey FOREIGN KEY (link_id) REFERENCES link(link_id) ON DELETE CASCADE ON UPDATE CASCADE,
 	CONSTRAINT doc_x_link_doc_id_fkey FOREIGN KEY (doc_id) REFERENCES doc(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+CREATE TABLE element_x_link (
+	element_id varchar(16) NOT NULL,
+	link_id int4 NOT NULL,
+	CONSTRAINT element_x_link_pkey PRIMARY KEY (element_id, link_id),
+	CONSTRAINT element_x_link_link_id_fkey FOREIGN KEY (link_id) REFERENCES link(link_id) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT element_x_link_element_id_fkey FOREIGN KEY (element_id) REFERENCES "element"(element_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
