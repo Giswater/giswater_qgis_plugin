@@ -7042,7 +7042,7 @@ AS SELECT m.macrosector_id,
     m.name,
     m.descript,
     m.active,
-    m.lock_level,
+    m.lock_level
     FROM macrosector m
     WHERE m.macrosector_id > 0
     ORDER BY m.macrosector_id;
