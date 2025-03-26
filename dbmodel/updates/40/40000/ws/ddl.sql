@@ -1882,3 +1882,6 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_wtp", "
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_wtp", "column":"chemtreatment", "dataType":"bool", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_wtp", "column":"storage", "dataType":"bool", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_wtp", "column":"sludgeman", "dataType":"bool", "isUtils":"False"}}$$);
+
+--26/03/2025
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_connec", "column":"estimated_depth", "dataType":"numeric(12,3)", "isUtils":"False"}}$$);

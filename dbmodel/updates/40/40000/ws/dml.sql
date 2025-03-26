@@ -3411,3 +3411,6 @@ INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,
 	VALUES ('v_edit_link','form_feature','tab_none','datasource','lyt_data_1',36,'integer','combo','Datasource','Datasource',false,false,true,false,'SELECT id, idval FROM edit_typevalue WHERE typevalue = ''value_datasource''', true,'{"setMultiline":false}'::json,false);
 INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,widgetcontrols,hidden)
 	VALUES ('v_edit_link','form_feature','tab_none','custom_length','lyt_data_1',37,'double','text','Custom length','Custom length',false,false,true,false,'{"setMultiline":false}'::json,false);
+
+INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,widgetcontrols,hidden)
+	VALUES ('cat_connec','form_feature','tab_none','estimated_depth','double','text','Estimated depth:','Estimated depth',false,false,true,false,'{"setMultiline":false}'::json,false);

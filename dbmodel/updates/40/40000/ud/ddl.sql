@@ -2007,3 +2007,6 @@ CREATE INDEX link_exploitation2 ON link USING btree (expl_id2);
 CREATE INDEX link_feature_id ON link USING btree (feature_id);
 CREATE INDEX link_index ON link USING gist (the_geom);
 CREATE INDEX link_muni ON link USING btree (muni_id);
+
+--26/03/2025
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_connec", "column":"estimated_depth", "dataType":"numeric(12,3)", "isUtils":"False"}}$$);
