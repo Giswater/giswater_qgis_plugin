@@ -54,6 +54,7 @@ v_man_table text;
 v_error_context text;
 v_count integer;
 v_related_id text;
+v_feature_childview_name text;
 v_feature_childtable_name text;
 v_schemaname text;
 
@@ -80,6 +81,7 @@ BEGIN
 
 	EXECUTE 'SELECT '||v_feature_type||'_type FROM v_edit_'||v_feature_type||' WHERE '||v_feature_type||'_id = '''||v_feature_id||''''
 	INTO v_featurecat;
+	v_feature_childview_name := 've_' || v_feature_type || '_' || lower(v_featurecat);
 
 	IF v_feature_type!='gully' THEN
 		EXECUTE 'SELECT man_table FROM cat_feature_'||v_feature_type||' c JOIN cat_feature cf ON c.id = cf.id JOIN sys_feature_class s ON cf.feature_class = s.id WHERE s.id = '''||v_featurecat||''';'
@@ -173,7 +175,7 @@ BEGIN
 
 		IF v_arc_id IS NULL THEN
 			--delete node
-			EXECUTE 'DELETE FROM v_edit_node WHERE node_id='''||v_feature_id||''';';
+			EXECUTE 'DELETE FROM '||v_feature_childview_name||' WHERE node_id='''||v_feature_id||''';';
 
 			INSERT INTO audit_check_data (fid, result_id, error_message)
 			VALUES (152, v_result_id, concat('Delete node: ', v_feature_id));
@@ -186,7 +188,7 @@ BEGIN
 				EXECUTE'UPDATE arc SET node_1=NULL, nodetype_1=NULL, node_sys_top_elev_1=NULL, node_sys_elev_1=NULL WHERE node_1='''||v_feature_id||''';';
 				EXECUTE'UPDATE arc SET node_2=NULL, nodetype_2=NULL, node_sys_top_elev_2=NULL, node_sys_elev_2=NULL WHERE node_2='''||v_feature_id||''';';
 			END IF;
-			EXECUTE 'DELETE FROM node WHERE node_id='''||v_feature_id||''';';
+			EXECUTE 'DELETE FROM '||v_feature_childview_name||' WHERE node_id='''||v_feature_id||''';';
 
 			INSERT INTO audit_check_data (fid, result_id, error_message)
 			VALUES (152, v_result_id, concat('Disconnected arcs: ',v_arc_id));
@@ -245,7 +247,7 @@ BEGIN
 		END IF;
 
 		--delete arc
-		EXECUTE 'DELETE FROM v_edit_arc WHERE arc_id='''||v_feature_id||''';';
+		EXECUTE 'DELETE FROM '||v_feature_childview_name||' WHERE arc_id='''||v_feature_id||''';';
 		INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (152, v_result_id, concat('Delete arc: ',v_feature_id ));
 
 	ELSIF  v_feature_type='connec' OR v_feature_type='gully' THEN
@@ -280,7 +282,7 @@ BEGIN
 		END IF;
 
 		--delete feature
-	  	EXECUTE 'DELETE FROM v_edit_'||(v_feature_type)||'  WHERE '||(v_feature_type)||'_id='''||v_feature_id||''';';
+		EXECUTE 'DELETE FROM '||v_feature_childview_name||' WHERE '||v_feature_type||'_id='''||v_feature_id||''';';
 
 	  	INSERT INTO audit_check_data (fid, result_id, error_message) VALUES (152, v_result_id, concat('Delete ',v_feature_type,': ',v_feature_id ));
 
