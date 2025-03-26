@@ -7,7 +7,7 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 
 from qgis.PyQt.QtCore import QDate
-from qgis.PyQt.QtWidgets import QLineEdit, QDateEdit, QCheckBox, QComboBox, QWidget
+from qgis.PyQt.QtWidgets import QLineEdit, QDateEdit, QCheckBox, QComboBox, QWidget, QLabel, QGridLayout, QSpacerItem, QSizePolicy, QTextEdit
 from .... import global_vars
 from ....libs import tools_qt, tools_db, tools_qgis
 from ...utils import tools_gw
@@ -35,12 +35,9 @@ class Campaign:
         tools_gw.load_settings(self.dialog)
         tools_gw.open_dialog(self.dialog, dlg_name="campaign_manager")
 
-
     def load_campaign_dialog(self, campaign_id=None, mode="review"):
-        """Loads and opens the dynamic campaign dialog for review or visit"""
         self.campaign_type = mode
 
-        # Compose JSON input
         feature = {
             "tableName": "om_campaign",
             "idName": "id",
@@ -56,50 +53,74 @@ class Campaign:
                 "infoType": 1,
                 "epsg": 25831
             },
-            "feature": feature
+            "feature": feature,
+            "form": {},
+            "data": {
+                "filterFields": {},
+                "pafeInfo": {}
+            }
         }
 
-        # Call the DB function
         response = tools_gw.execute_procedure("gw_fct_getcampaign", p_data, schema_name="cm")
         if not response or response.get("status") != "Accepted":
             tools_qgis.show_warning("Failed to load campaign form.")
             return
 
-        # Extract form structure and create dialog
-        data = response["body"]["data"]
-        form_fields = data["fields"]
-        print(form_fields)
-        is_new = not campaign_id
-
-        # Choose the right dialog class
-        if mode == "review":
-            self.dialog = AddCampaignReviewUi(self)
-        elif mode == "visit":
-            self.dialog = AddCampaignVisitUi(self)
-        else:
-            raise ValueError("Invalid campaign mode")
+        form_fields = response["body"]["data"].get("fields", [])
+        self.dialog = AddCampaignReviewUi(self) if mode == "review" else AddCampaignVisitUi(self)
 
         tools_gw.load_settings(self.dialog)
-        for field in form_fields:
-            print("hola")
-            widget = self.dialog.findChild(QWidget, field['widgetname'])
-            value = field.get("value") or field.get("selectedId")
-            if isinstance(widget, QLineEdit):
-                widget.setText(value or '')
-            elif isinstance(widget, QCheckBox):
-                widget.setChecked(value in ['true', True, '1', 1])
-            elif isinstance(widget, QComboBox):
-                index = widget.findData(value)
-                if index != -1:
-                    widget.setCurrentIndex(index)
 
-        if not is_new:
-            tools_qt.set_widget_text(self.dialog, self.dialog.campaign_id, campaign_id)
+        # Build widgets dynamically
+        for field in form_fields:
+            widget = self.create_widget_from_field(field)
+            if not widget:
+                continue
+
+            label = QLabel(field["label"]) if field.get("label") else None
+            tools_gw.add_widget(self.dialog, field, label, widget)
 
         self.dialog.btn_cancel.clicked.connect(self.dialog.reject)
         self.dialog.btn_accept.clicked.connect(self.save_campaign_review)
 
         tools_gw.open_dialog(self.dialog, dlg_name="add_campaign")
+
+    def create_widget_from_field(self, field):
+        """Create a Qt widget based on field metadata"""
+        wtype = field.get("widgettype", "text")
+
+        if wtype == "text":
+            return QLineEdit()
+        elif wtype == "textarea":
+            return QTextEdit()
+        elif wtype == "datetime":
+            widget = QDateEdit()
+            widget.setCalendarPopup(True)
+            widget.setDisplayFormat("MM/dd/yyyy")
+            value = field.get("value")
+            if value:
+                try:
+                    date = QDate.fromString(value, "yyyy-MM-dd")
+                    if date.isValid():
+                        widget.setDate(date)
+                    else:
+                        widget.setDate(QDate.currentDate())
+                except:
+                    widget.setDate(QDate.currentDate())
+            else:
+                widget.setDate(QDate.currentDate())
+            return widget
+        elif wtype == "check":
+            return QCheckBox()
+        elif wtype == "combo":
+            combo = QComboBox()
+            ids = field.get("comboIds", [])
+            names = field.get("comboNames", [])
+            for i, name in enumerate(names):
+                combo.addItem(name, ids[i] if i < len(ids) else name)
+            return combo
+        else:
+            return None
 
 
     def save_campaign_review(self):

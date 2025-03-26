@@ -131,7 +131,7 @@ class AddNewLot:
 
         new_lot_id = lot_id
         if lot_id is None:
-            new_lot_id = self.get_next_id('om_visit_lot', 'id')
+            new_lot_id = self.get_next_id('om_campaign_lot', 'id')
         tools_qt.set_widget_text(self.dlg_lot, self.lot_id, new_lot_id)
 
 
