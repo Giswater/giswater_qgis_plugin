@@ -36,6 +36,8 @@ INSERT INTO config_visit_class VALUES (1, 'Leak on arc', NULL, true, false, true
 INSERT INTO config_visit_class VALUES (2, 'Leak on connec', NULL, true, false, true, 'CONNEC', 'role_om', 1, NULL, 'visit_connec_leak', 've_visit_connec_leak', 'v_ui_visit_connec_leak', NULL, NULL);
 INSERT INTO config_visit_class VALUES (3, 'Inspection and clean node', NULL, true, false, true, 'NODE', 'role_om', 1, NULL, 'visit_node_insp', 've_visit_node_insp', 'v_ui_visit_node_insp', NULL, NULL);
 INSERT INTO config_visit_class VALUES (4, 'Incident node', NULL, true, false, true, 'NODE', 'role_om', 2, NULL, 'incident_node', 've_visit_incid_node', 'v_ui_visit_incid_node', NULL, NULL);
+INSERT INTO config_visit_class (id, idval, descript, active, ismultifeature, ismultievent, feature_type, sys_role, visit_type, param_options, formname, tablename, ui_tablename, parent_id, inherit_values) VALUES(5, 'Leak on link', NULL, true, false, true, 'LINK', 'role_om', 1, NULL, 'visit_link_leak', 've_visit_link_leak', 'v_ui_visit_link_leak', NULL, NULL);
+
 
 INSERT INTO config_visit_parameter VALUES ('leak_arc', NULL, 'INSPECTION', 'ARC', 'text', NULL, 'minor leak on arc', 'event_standard', 'defaultvalue', false, 'arc_insp_des', true);
 INSERT INTO config_visit_parameter VALUES ('leak_connec', NULL, 'INSPECTION', 'CONNEC', 'text', NULL, 'minor leak on connec', 'event_standard', 'defaultvalue', false, 'con_insp_des', true);
@@ -46,6 +48,8 @@ INSERT INTO config_visit_parameter VALUES ('incident_comment', NULL, 'INCIDENCE'
 INSERT INTO config_visit_parameter VALUES ('incident_type', NULL, 'INCIDENCE', 'ALL', 'text', NULL, 'incident type', 'event_standard', 'defaultvalue', false, 'incident_type', true);
 INSERT INTO config_visit_parameter VALUES ('insp_observ', NULL, 'INSPECTION', 'ALL', 'text', NULL, 'Inspection observations', 'event_standard', 'defaultvalue', false, 'insp_observ', true);
 INSERT INTO config_visit_parameter VALUES ('photo', NULL, 'INSPECTION', 'ALL', 'boolean', NULL, 'Photography', 'event_standard', 'defaultvalue', false, 'photo', true);
+INSERT INTO config_visit_parameter (id, code, parameter_type, feature_type, data_type, criticity, descript, form_type, vdefault, ismultifeature, short_descript, active) VALUES('leak_link', NULL, 'INSPECTION', 'LINK', 'text', NULL, 'minor leak on link', 'event_standard', 'defaultvalue', false, 'link_insp_des', true);
+
 
 INSERT INTO config_visit_class_x_parameter VALUES (1, 'leak_arc', true);
 INSERT INTO config_visit_class_x_parameter VALUES (1, 'insp_observ', true);
@@ -61,6 +65,9 @@ INSERT INTO config_visit_class_x_parameter VALUES (3, 'photo', true);
 INSERT INTO config_visit_class_x_parameter VALUES (4, 'incident_type', true);
 INSERT INTO config_visit_class_x_parameter VALUES (4, 'incident_comment', true);
 INSERT INTO config_visit_class_x_parameter VALUES (4, 'photo', true);
+INSERT INTO config_visit_class_x_parameter (class_id, parameter_id, active) VALUES(5, 'leak_link', true);
+INSERT INTO config_visit_class_x_parameter (class_id, parameter_id, active) VALUES(5, 'insp_observ', true);
+INSERT INTO config_visit_class_x_parameter (class_id, parameter_id, active) VALUES(5, 'photo', true);
 
 -- editable views with trigger
 DROP VIEW IF EXISTS ve_visit_arc_leak;
@@ -143,6 +150,47 @@ CREATE OR REPLACE VIEW ve_visit_connec_leak AS
 CREATE TRIGGER gw_trg_om_visit_multievent INSTEAD OF
 INSERT OR DELETE OR UPDATE ON ve_visit_connec_leak
 FOR EACH ROW EXECUTE FUNCTION gw_trg_om_visit_multievent('2');
+
+
+DROP VIEW IF EXISTS ve_visit_link_leak;
+CREATE OR REPLACE VIEW ve_visit_link_leak AS
+ SELECT om_visit_x_link.id,
+    om_visit_x_link.visit_id,
+    om_visit_x_link.link_id,
+    om_visit.visitcat_id,
+    om_visit.ext_code,
+    om_visit.startdate,
+    om_visit.enddate,
+    om_visit.user_name,
+    om_visit.webclient_id,
+    om_visit.expl_id,
+    link.the_geom,
+    om_visit.descript,
+    om_visit.is_done,
+    om_visit.class_id,
+    om_visit.status,
+    a.param_1 AS leak_link,
+    a.param_2 AS insp_observ,
+    a.param_3 AS photo
+   FROM om_visit
+     JOIN config_visit_class ON config_visit_class.id = om_visit.class_id
+     JOIN om_visit_x_link ON om_visit.id = om_visit_x_link.visit_id
+     JOIN link USING (link_id)
+     LEFT JOIN ( SELECT ct.visit_id,
+            ct.param_1,
+            ct.param_2,
+            ct.param_3
+           FROM crosstab('SELECT visit_id, om_visit_event.parameter_id, value
+      FROM SCHEMA_NAME.om_visit JOIN SCHEMA_NAME.om_visit_event ON om_visit.id= om_visit_event.visit_id
+      LEFT JOIN SCHEMA_NAME.config_visit_class on config_visit_class.id=om_visit.class_id
+      where config_visit_class.ismultievent = TRUE and om_visit.class_id = 5 ORDER  BY 1,2'::text,
+      ' VALUES (''leak_link''),(''insp_observ''),(''photo'')'::text)
+      ct(visit_id integer, param_1 text, param_2 text, param_3 boolean)) a ON a.visit_id = om_visit.id
+  WHERE config_visit_class.ismultievent = true AND config_visit_class.id = 5;
+
+CREATE TRIGGER gw_trg_om_visit_multievent INSTEAD OF
+INSERT OR DELETE OR UPDATE ON ve_visit_link_leak
+FOR EACH ROW EXECUTE FUNCTION gw_trg_om_visit_multievent('5');
 
 
 DROP VIEW IF EXISTS ve_visit_node_insp;
@@ -248,7 +296,6 @@ AS SELECT ve_visit_arc_leak.visit_id,
      LEFT JOIN om_typevalue z ON z.id::integer = ve_visit_arc_leak.leak_arc::integer AND z.typevalue = 'visit_leak'::text;
 
 
-
 CREATE OR REPLACE VIEW v_ui_visit_connec_leak
 AS SELECT ve_visit_connec_leak.visit_id,
     ve_visit_connec_leak.connec_id,
@@ -264,6 +311,23 @@ AS SELECT ve_visit_connec_leak.visit_id,
      JOIN config_visit_class c ON c.id = ve_visit_connec_leak.class_id
      JOIN om_typevalue t ON t.id::integer = ve_visit_connec_leak.status AND t.typevalue = 'visit_status'::text
      LEFT JOIN om_typevalue z ON z.id::integer = ve_visit_connec_leak.leak_connec::integer AND z.typevalue = 'visit_leak'::text;
+
+
+CREATE OR REPLACE VIEW v_ui_visit_link_leak
+AS SELECT ve_visit_link_leak.visit_id,
+    ve_visit_link_leak.link_id,
+    ve_visit_link_leak.startdate AS "Start date",
+    ve_visit_link_leak.enddate AS "End date",
+    ve_visit_link_leak.user_name AS "User",
+    c.idval AS "Visit class",
+    t.idval AS "Status",
+    z.idval AS "Leak",
+    ve_visit_link_leak.insp_observ AS "Observation",
+    ve_visit_link_leak.photo AS "Photo"
+   FROM ve_visit_link_leak
+     JOIN config_visit_class c ON c.id = ve_visit_link_leak.class_id
+     JOIN om_typevalue t ON t.id::integer = ve_visit_link_leak.status AND t.typevalue = 'visit_status'::text
+     LEFT JOIN om_typevalue z ON z.id::integer = ve_visit_link_leak.leak_link::integer AND z.typevalue = 'visit_leak'::text;
 
 
 CREATE OR REPLACE VIEW v_ui_visit_node_insp
@@ -303,6 +367,7 @@ AS SELECT ve_visit_incid_node.visit_id,
      JOIN om_typevalue t ON t.id::integer = ve_visit_incid_node.status AND t.typevalue = 'visit_status'::text
      JOIN om_typevalue y ON y.id::integer = ve_visit_incid_node.incident_type::integer AND y.typevalue = 'incident_type'::text;
 
+-- arc
 INSERT INTO config_form_fields VALUES ('visit_arc_leak', 'form_visit', 'tab_data', 'class_id', 'lyt_data_1', NULL, 'integer', 'combo', 'Visit class:', NULL, NULL, false, false, true, NULL, NULL, 'SELECT id, idval FROM config_visit_class WHERE feature_type=''ARC'' AND  active IS TRUE AND sys_role IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))', NULL, NULL, NULL, NULL, NULL, NULL, '{"functionName": "get_visit"}', NULL, false, 1);
 INSERT INTO config_form_fields VALUES ('visit_arc_leak', 'form_visit', 'tab_data', 'visit_id', 'lyt_data_1', NULL, 'double', 'text', 'Visit id:', NULL, NULL, false, false, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 2);
 INSERT INTO config_form_fields VALUES ('visit_arc_leak', 'form_visit', 'tab_data', 'arc_id', 'lyt_data_1', NULL, 'double', 'text', 'Arc id:', NULL, NULL, false, false, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 3);
@@ -320,6 +385,8 @@ INSERT INTO config_form_fields VALUES ('visit_arc_leak', 'form_visit', 'tab_file
 INSERT INTO config_form_fields VALUES ('visit_arc_leak', 'form_visit', 'tab_file', 'backbutton', 'lyt_files_2', NULL, NULL, 'button', '', NULL, NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false, "text":"Back"}', '{
   "functionName": "set_previous_form_back"
 }', NULL, false, 1);
+
+-- connec
 INSERT INTO config_form_fields VALUES ('visit_connec_leak', 'form_visit', 'tab_data', 'class_id', 'lyt_data_1', NULL, 'integer', 'combo', 'Visit class:', NULL, NULL, false, false, true, NULL, NULL, 'SELECT id, idval FROM config_visit_class WHERE feature_type=''CONNEC'' AND  active IS TRUE AND sys_role IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))', NULL, NULL, NULL, NULL, NULL, NULL, '{"functionName": "get_visit"}', NULL, false, 1);
 INSERT INTO config_form_fields VALUES ('visit_connec_leak', 'form_visit', 'tab_data', 'acceptbutton', 'lyt_data_2', NULL, NULL, 'button', '', NULL, NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false, "text":"Accept"}', '{
   "functionName": "set_visit"
@@ -331,6 +398,27 @@ INSERT INTO config_form_fields VALUES ('visit_connec_leak', 'form_visit', 'tab_f
 INSERT INTO config_form_fields VALUES ('visit_connec_leak', 'form_visit', 'tab_file', 'backbutton', 'lyt_files_2', NULL, NULL, 'button', '', NULL, NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false, "text":"Back"}', '{
   "functionName": "set_previous_form_back"
 }', NULL, false, 1);
+
+-- link
+INSERT INTO config_form_fields VALUES ('visit_link_leak', 'form_visit', 'tab_data', 'class_id', 'lyt_data_1', NULL, 'integer', 'combo', 'Visit class:', NULL, NULL, false, false, true, NULL, NULL, 'SELECT id, idval FROM config_visit_class WHERE feature_type=''LINK'' AND  active IS TRUE AND sys_role IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))', NULL, NULL, NULL, NULL, NULL, NULL, '{"functionName": "get_visit"}', NULL, false, 1);
+INSERT INTO config_form_fields VALUES ('visit_link_leak', 'form_visit', 'tab_data', 'visit_id', 'lyt_data_1', NULL, 'double', 'text', 'Visit id:', NULL, NULL, false, false, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 2);
+INSERT INTO config_form_fields VALUES ('visit_link_leak', 'form_visit', 'tab_data', 'link_id', 'lyt_data_1', NULL, 'double', 'text', 'Link id:', NULL, NULL, false, false, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 3);
+INSERT INTO config_form_fields VALUES ('visit_link_leak', 'form_visit', 'tab_data', 'startdate', 'lyt_data_1', NULL, 'date', 'datetime', 'Date:', NULL, NULL, false, false, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 4);
+INSERT INTO config_form_fields VALUES ('visit_link_leak', 'form_visit', 'tab_data', 'leak_link', 'lyt_data_1', NULL, 'string', 'text', 'Leak link:', NULL, NULL, false, false, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 5);
+INSERT INTO config_form_fields VALUES ('visit_link_leak', 'form_visit', 'tab_data', 'insp_observ', 'lyt_data_1', NULL, 'string', 'text', 'Observations:', NULL, NULL, false, false, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 6);
+INSERT INTO config_form_fields VALUES ('visit_link_leak', 'form_visit', 'tab_data', 'status', 'lyt_data_1', NULL, 'integer', 'combo', 'Status:', NULL, NULL, false, false, true, NULL, NULL, 'SELECT id, idval FROM om_typevalue WHERE typevalue = ''visit_status'' and id =''4''', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 7);
+INSERT INTO config_form_fields VALUES ('visit_link_leak', 'form_visit', 'tab_data', 'acceptbutton', 'lyt_data_2', NULL, NULL, 'button', '', NULL, NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false, "text":"Accept"}', '{
+  "functionName": "set_visit"
+}', NULL, false, 1);
+INSERT INTO config_form_fields VALUES ('visit_link_leak', 'form_visit', 'tab_file', 'addfile', 'lyt_files_1', NULL, NULL, 'fileselector', '', NULL, NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false, "text":"Add File"}', '{
+  "functionName": "add_file"
+}', NULL, false, 1);
+INSERT INTO config_form_fields VALUES ('visit_link_leak', 'form_visit', 'tab_file', 'tbl_files', 'lyt_files_1', NULL, NULL, 'tableview', '', NULL, NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"saveValue": false}', NULL, 'om_visit_event_photo', false, 2);
+INSERT INTO config_form_fields VALUES ('visit_link_leak', 'form_visit', 'tab_file', 'backbutton', 'lyt_files_2', NULL, NULL, 'button', '', NULL, NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{"setMultiline":false, "text":"Back"}', '{
+  "functionName": "set_previous_form_back"
+}', NULL, false, 1);
+
+
 INSERT INTO config_form_fields VALUES ('visit_node_insp', 'form_visit', 'tab_data', 'class_id', 'lyt_data_1', NULL, 'integer', 'combo', 'Visit class:', NULL, NULL, false, false, true, NULL, NULL, 'SELECT id, idval FROM config_visit_class WHERE feature_type=''NODE'' AND  active IS TRUE AND sys_role IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, ''member''))', NULL, NULL, NULL, NULL, NULL, NULL, '{"functionName": "get_visit"}', NULL, false, 1);
 INSERT INTO config_form_fields VALUES ('visit_node_insp', 'form_visit', 'tab_data', 'visit_id', 'lyt_data_1', NULL, 'double', 'text', 'Visit id:', NULL, NULL, false, false, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 2);
 INSERT INTO config_form_fields VALUES ('visit_node_insp', 'form_visit', 'tab_data', 'node_id', 'lyt_data_1', NULL, 'double', 'text', 'Node id:', NULL, NULL, false, false, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, 3);
@@ -373,19 +461,22 @@ INSERT INTO config_form_tabs VALUES ('visit_node_insp', 'tab_data', 'Data', 'Dat
 INSERT INTO config_form_tabs VALUES ('visit_arc_leak', 'tab_data', 'Data', 'Data', 'role_om', '{"name":"gwGetVisit", "parameters":{"form":{"tabData":{"active":true}, "tabFiles":{"active":false}}}}'::json, '[{"actionName":"actionAddFile", "actionFunction":"gwSetFileInsert", "actionTooltip":"Add file", "disabled":false}]'::json, 1, '{5}');
 INSERT INTO config_form_tabs VALUES ('visit_arc_leak', 'tab_file', 'Files', 'Files', 'role_om', '{"name":"gwGetVisit", "parameters":{"form":{"tabData":{"active":false},"tabFiles":{"active":true, "feature":{"tableName":"om_visit_event_photo"}}}}}', '[{"actionName":"actionAddFile", "actionFunction":"gwSetFileInsert", "actionTooltip":"Add file", "disabled":false},{"actionName":"actionDeleteFile", "actionFunction":"gwSetDelete", "actionTooltip":"Delete file", "disabled":false}]', 2, '{5}');
 INSERT INTO config_form_tabs VALUES ('visit_connec_leak', 'tab_data', 'Data', 'Data', 'role_om', '{"name":"gwGetVisit", "parameters":{"form":{"tabData":{"active":true}, "tabFiles":{"active":false}}}}', '[{"actionName":"actionAddFile", "actionFunction":"gwSetFileInsert", "actionTooltip":"Add file", "disabled":false}]', 1, '{5}');
+INSERT INTO config_form_tabs VALUES ('visit_link_leak', 'tab_data', 'Data', 'Data', 'role_om', '{"name":"gwGetVisit", "parameters":{"form":{"tabData":{"active":true}, "tabFiles":{"active":false}}}}', '[{"actionName":"actionAddFile", "actionFunction":"gwSetFileInsert", "actionTooltip":"Add file", "disabled":false}]', 1, '{5}');
+INSERT INTO config_form_tabs VALUES ('visit_link_leak', 'tab_file', 'Files', 'Files', 'role_om', '{"name":"gwGetVisit", "parameters":{"form":{"tabData":{"active":false},"tabFiles":{"active":true, "feature":{"tableName":"om_visit_event_photo"}}}}}', '[{"actionName":"actionAddFile", "actionFunction":"gwSetFileInsert", "actionTooltip":"Add file", "disabled":false},{"actionName":"actionDeleteFile", "actionFunction":"gwSetDelete", "actionTooltip":"Delete file", "disabled":false}]', 2, '{5}');
 INSERT INTO config_form_tabs VALUES ('visit_connec_leak', 'tab_file', 'Files', 'Files', 'role_om', '{"name":"gwGetVisit", "parameters":{"form":{"tabData":{"active":false},"tabFiles":{"active":true, "feature":{"tableName":"om_visit_event_photo"}}}}}', '[{"actionName":"actionAddFile", "actionFunction":"gwSetFileInsert", "actionTooltip":"Add file", "disabled":false},{"actionName":"actionDeleteFile", "actionFunction":"gwSetDelete", "actionTooltip":"Delete file", "disabled":false}]', 2, '{5}');
 INSERT INTO config_form_tabs VALUES ('incident_node', 'tab_data', 'Data', 'Data', 'role_om', '{"name":"gwGetVisit", "parameters":{"form":{"tabData":{"active":true}, "tabFiles":{"active":false}}}}', '[{"actionName":"actionAddFile", "actionFunction":"gwSetFileInsert", "actionTooltip":"Add file", "disabled":false}]', 1, '{5}');
 INSERT INTO config_form_tabs VALUES ('incident_node', 'tab_file', 'Files', 'Files', 'role_om', '{"name":"gwGetVisit", "parameters":{"form":{"tabData":{"active":false},"tabFiles":{"active":true, "feature":{"tableName":"om_visit_event_photo"}}}}}', '[{"actionName":"actionAddFile", "actionFunction":"gwSetFileInsert", "actionTooltip":"Add file", "disabled":false},{"actionName":"actionDeleteFile", "actionFunction":"gwSetDelete", "actionTooltip":"Delete file", "disabled":false}]', 2, '{5}');
 
 GRANT ALL ON TABLE ve_visit_arc_leak TO role_om;
 GRANT ALL ON TABLE ve_visit_connec_leak TO role_om;
+GRANT ALL ON TABLE ve_visit_link_leak TO role_om;
 
 GRANT ALL ON TABLE ve_visit_node_insp TO role_om;
 GRANT ALL ON TABLE ve_visit_incid_node TO role_om;
 
-
 GRANT ALL ON TABLE v_ui_visit_arc_leak TO role_om;
 GRANT ALL ON TABLE v_ui_visit_connec_leak TO role_om;
+GRANT ALL ON TABLE v_ui_visit_link_leak TO role_om;
 
 GRANT ALL ON TABLE v_ui_visit_node_insp TO role_om;
 GRANT ALL ON TABLE v_ui_visit_incid_node TO role_om;

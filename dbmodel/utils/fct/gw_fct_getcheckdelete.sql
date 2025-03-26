@@ -168,12 +168,11 @@ BEGIN
 
 	ELSIF v_feature_type='LINK' THEN
 
-		-- TODO: Check if this is needed
-		-- SELECT count(element_id) INTO v_num_feature FROM element_x_link WHERE link_id=v_feature_id ;
-		-- IF v_num_feature > 0 THEN
-		-- 	EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-		-- 	"data":{"message":"1058", "function":"2120","parameters":{"num_element":"'||v_num_feature||'", "feature_id":"'||v_feature_id||'"}, "is_process":true}}$$);';
-		-- END IF;
+		SELECT count(element_id) INTO v_num_feature FROM element_x_link WHERE link_id=v_feature_id ;
+		IF v_num_feature > 0 THEN
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+			"data":{"message":"1058", "function":"2120","parameters":{"num_element":"'||v_num_feature||'", "feature_id":"'||v_feature_id||'"}, "is_process":true}}$$);';
+		END IF;
 
 		SELECT count(link_id) INTO v_num_feature FROM doc_x_link WHERE link_id=v_feature_id;
 		IF v_num_feature > 0 THEN

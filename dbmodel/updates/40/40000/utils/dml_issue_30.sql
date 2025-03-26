@@ -398,7 +398,8 @@ UPDATE sys_fprocess SET fprocess_name='Check orphan visits', "source"='core', fp
 with mec as (
 select distinct visit_id from om_visit_x_arc UNION
 select distinct visit_id from om_visit_x_connec UNION
-select distinct visit_id from om_visit_x_node)
+select distinct visit_id from om_visit_x_node UNION
+select distinct visit_id from om_visit_x_link)
 select a.visit_id from mec a left join om_visit b on a.visit_id = id
 )', info_msg='All visits are related to the features or have geometry.', function_name='[gw_fct_om_check_data, gw_fct_admin_check_data]' WHERE fid=498;
 UPDATE sys_fprocess SET fprocess_name='Check orphan elements', "source"='core', fprocess_type='Function process', project_type='ws', except_level=2, except_msg='elements not related to any feature and without geometry.', query_text='select element_id, the_geom from element where the_geom is null and element_id not in (
@@ -546,7 +547,8 @@ with mec as (
 select distinct visit_id from om_visit_x_arc UNION
 select distinct visit_id from om_visit_x_connec UNION
 select distinct visit_id from om_visit_x_node UNION
-select distinct visit_id from om_visit_x_gully)
+select distinct visit_id from om_visit_x_gully UNION
+select distinct visit_id from om_visit_x_link)
 select a.visit_id from mec a left join om_visit b on a.visit_id = id
 )', 'All visits are related to the features or have geometry.', '[gw_fct_om_check_data]');
 INSERT INTO sys_fprocess (fid, fprocess_name, "source", fprocess_type, project_type, except_level, except_msg, query_text, info_msg, function_name) VALUES(557, 'Builddate before 1900', 'core', 'Check om-data', 'ud', 2, 'features with built date before 1900.', 'SELECT arc_id, ''ARC''::text FROM v_prefix_arc WHERE builtdate < ''1900/01/01''::date

@@ -25,6 +25,8 @@ INSERT INTO om_typevalue VALUES ('incident_type', '5', 'Others', NULL, NULL);
 INSERT INTO om_typevalue VALUES ('incident_type', '6', 'Minor leak', NULL, NULL);
 INSERT INTO om_typevalue VALUES ('incident_type', '7', 'Full of leaves', NULL, NULL);
 INSERT INTO om_typevalue VALUES ('visit_param_type', 'INCIDENCE', 'INCIDENCE', NULL, NULL);
+INSERT INTO om_typevalue (typevalue, id, idval, descript, addparam) VALUES('visit_form_type', 'event_ud_link_standard', 'event_ud_link_standard', NULL, NULL);
+
 
 INSERT INTO config_visit_class VALUES (1, 'Inspection and clean arc', NULL, true, false, true, 'ARC', 'role_om', 1, NULL, 'visit_arc_insp', 've_visit_arc_insp', 'v_ui_visit_arc_insp', NULL, NULL);
 INSERT INTO config_visit_class VALUES (2, 'Inspection and clean node', NULL, true, false, true, 'NODE', 'role_om', 1, NULL, 'visit_node_insp', 've_visit_node_insp', 'v_ui_visit_node_insp', NULL, NULL);
@@ -34,6 +36,9 @@ INSERT INTO config_visit_class VALUES (5, 'Incident arc', NULL, true, false, tru
 INSERT INTO config_visit_class VALUES (6, 'Incident node', NULL, true, false, true, 'NODE', 'role_om', 2, NULL, 'incident_node', 've_visit_incid_node', 'v_ui_visit_incid_node', NULL, NULL);
 INSERT INTO config_visit_class VALUES (7, 'Incident connec', NULL, true, false, true, 'CONNEC', 'role_om', 2, NULL, 'incident_connec', 've_visit_incid_connec', 'v_ui_visit_incid_connec', NULL, NULL);
 INSERT INTO config_visit_class VALUES (8, 'Incident gully', NULL, true, false, true, 'GULLY', 'role_om', 2, NULL, 'incident_gully', 've_visit_incid_gully', 'v_ui_visit_incid_gully', NULL, NULL);
+INSERT INTO config_visit_class (id, idval, descript, active, ismultifeature, ismultievent, feature_type, sys_role, visit_type, param_options, formname, tablename, ui_tablename, parent_id, inherit_values) VALUES(9, 'Inspection and clean link', NULL, true, false, true, 'LINK', 'role_om', 1, NULL, 'visit_link_insp', 've_visit_link_insp', 'v_ui_visit_link_insp', NULL, NULL);
+INSERT INTO config_visit_class (id, idval, descript, active, ismultifeature, ismultievent, feature_type, sys_role, visit_type, param_options, formname, tablename, ui_tablename, parent_id, inherit_values) VALUES(10, 'Incident link', NULL, true, false, true, 'GULLY', 'role_om', 2, NULL, 'incident_link', 've_visit_incid_link', 'v_ui_visit_incid_link', NULL, NULL);
+
 
 INSERT INTO config_visit_parameter VALUES ('sediments_arc', NULL, 'INSPECTION', 'ARC', 'text', NULL, 'Sediments in arc', 'event_ud_arc_standard', 'defaultvalue', false, 'arc_insp_sed', true);
 INSERT INTO config_visit_parameter VALUES ('clean_arc', NULL, 'INSPECTION', 'ARC', 'text', NULL, 'Clean of arc', 'event_ud_arc_standard', 'defaultvalue', false, 'arc_cln_exec', true);
@@ -52,6 +57,9 @@ INSERT INTO config_visit_parameter VALUES ('incident_comment', NULL, 'INCIDENCE'
 INSERT INTO config_visit_parameter VALUES ('incident_type', NULL, 'INCIDENCE', 'ALL', 'text', NULL, 'incident type', 'event_standard', 'defaultvalue', false, 'incident_type', true);
 INSERT INTO config_visit_parameter VALUES ('insp_observ', NULL, 'INSPECTION', 'ALL', 'text', NULL, 'Inspection observations', 'event_standard', 'defaultvalue', false, 'insp_observ', true);
 INSERT INTO config_visit_parameter VALUES ('photo', NULL, 'INSPECTION', 'ALL', 'boolean', NULL, 'Photography', 'event_standard', 'defaultvalue', false, 'photo', true);
+INSERT INTO config_visit_parameter (id, code, parameter_type, feature_type, data_type, criticity, descript, form_type, vdefault, ismultifeature, short_descript, active) VALUES('sediments_link', NULL, 'INSPECTION', 'LINK', 'text', NULL, 'Sediments in link', 'event_ud_link_standard', 'defaultvalue', false, 'link_insp_sed', true);
+INSERT INTO config_visit_parameter (id, code, parameter_type, feature_type, data_type, criticity, descript, form_type, vdefault, ismultifeature, short_descript, active) VALUES('clean_link', NULL, 'INSPECTION', 'LINK', 'text', NULL, 'Clean of link', 'event_ud_link_standard', 'defaultvalue', false, 'link_cln_exec', true);
+INSERT INTO config_visit_parameter (id, code, parameter_type, feature_type, data_type, criticity, descript, form_type, vdefault, ismultifeature, short_descript, active) VALUES('defect_link', NULL, 'INSPECTION', 'LINK', 'text', NULL, 'Defects of link', 'event_ud_link_standard', 'defaultvalue', false, 'link_defect', true);
 
 
 INSERT INTO config_visit_class_x_parameter VALUES (1, 'sediments_arc', true);
@@ -87,6 +95,12 @@ INSERT INTO config_visit_class_x_parameter VALUES (7, 'photo', true);
 INSERT INTO config_visit_class_x_parameter VALUES (8, 'incident_type', true);
 INSERT INTO config_visit_class_x_parameter VALUES (8, 'incident_comment', true);
 INSERT INTO config_visit_class_x_parameter VALUES (8, 'photo', true);
+INSERT INTO config_visit_class_x_parameter (class_id, parameter_id, active) VALUES(9, 'sediments_link', true);
+INSERT INTO config_visit_class_x_parameter (class_id, parameter_id, active) VALUES(9, 'clean_link', true);
+INSERT INTO config_visit_class_x_parameter (class_id, parameter_id, active) VALUES(9, 'defect_link', true);
+INSERT INTO config_visit_class_x_parameter (class_id, parameter_id, active) VALUES(10, 'incident_type', true);
+INSERT INTO config_visit_class_x_parameter (class_id, parameter_id, active) VALUES(10, 'incident_comment', true);
+INSERT INTO config_visit_class_x_parameter (class_id, parameter_id, active) VALUES(10, 'photo', true);
 
 -- editable views with trigger
 DROP VIEW IF EXISTS ve_visit_arc_insp;
@@ -442,6 +456,83 @@ CREATE TRIGGER gw_trg_om_visit_multievent INSTEAD OF
 INSERT OR DELETE OR UPDATE ON ve_visit_incid_gully
 FOR EACH ROW EXECUTE FUNCTION gw_trg_om_visit_multievent('8');
 
+CREATE OR REPLACE VIEW ve_visit_link_insp
+AS SELECT om_visit_x_link.id,
+    om_visit_x_link.visit_id,
+    om_visit_x_link.link_id,
+    om_visit.visitcat_id,
+    om_visit.ext_code,
+    om_visit.startdate,
+    om_visit.enddate,
+    om_visit.user_name,
+    om_visit.webclient_id,
+    om_visit.expl_id,
+    link.the_geom,
+    om_visit.descript,
+    om_visit.is_done,
+    om_visit.class_id,
+    om_visit.status,
+    a.param_1 AS sediments_link,
+    a.param_2 AS defect_link,
+    a.param_3 AS clean_link,
+    a.param_4 AS insp_observ,
+    a.param_5 AS photo
+   FROM om_visit
+     JOIN config_visit_class ON config_visit_class.id = om_visit.class_id
+     JOIN om_visit_x_link ON om_visit.id = om_visit_x_link.visit_id
+     JOIN link USING (link_id)
+     LEFT JOIN ( SELECT ct.visit_id,
+            ct.param_1,
+            ct.param_2,
+            ct.param_3,
+            ct.param_4,
+            ct.param_5
+           FROM crosstab('SELECT visit_id, om_visit_event.parameter_id, value
+      FROM om_visit JOIN om_visit_event ON om_visit.id= om_visit_event.visit_id
+      LEFT JOIN config_visit_class on config_visit_class.id=om_visit.class_id
+      where config_visit_class.ismultievent = TRUE and om_visit.class_id = 9 ORDER  BY 1,2'::text, ' VALUES (''sediments_link''),(''defect_link''),(''clean_link''),(''insp_observ''),(''photo'')'::text) ct(visit_id integer, param_1 text, param_2 text, param_3 text, param_4 text, param_5 boolean)) a ON a.visit_id = om_visit.id
+  WHERE config_visit_class.ismultievent = true AND config_visit_class.id = 9;
+
+CREATE TRIGGER gw_trg_om_visit_multievent INSTEAD OF
+INSERT OR DELETE OR UPDATE ON ve_visit_link_insp
+FOR EACH ROW EXECUTE FUNCTION gw_trg_om_visit_multievent('9'); -- 9: insp link
+
+CREATE OR REPLACE VIEW ve_visit_incid_link
+AS SELECT om_visit_x_link.id,
+    om_visit_x_link.visit_id,
+    om_visit_x_link.link_id,
+    om_visit.visitcat_id,
+    om_visit.ext_code,
+    om_visit.startdate,
+    om_visit.enddate,
+    om_visit.user_name,
+    om_visit.webclient_id,
+    om_visit.expl_id,
+    link.the_geom,
+    om_visit.descript,
+    om_visit.is_done,
+    om_visit.class_id,
+    om_visit.status,
+    a.param_1 AS incident_type,
+    a.param_2 AS incident_comment,
+    a.param_3 AS photo
+   FROM om_visit
+     JOIN config_visit_class ON config_visit_class.id = om_visit.class_id
+     JOIN om_visit_x_link ON om_visit.id = om_visit_x_link.visit_id
+     JOIN link USING (link_id)
+     LEFT JOIN ( SELECT ct.visit_id,
+            ct.param_1,
+            ct.param_2,
+            ct.param_3
+           FROM crosstab('SELECT visit_id, om_visit_event.parameter_id, value
+      FROM om_visit JOIN om_visit_event ON om_visit.id= om_visit_event.visit_id
+      LEFT JOIN config_visit_class on config_visit_class.id=om_visit.class_id
+      where config_visit_class.ismultievent = TRUE and om_visit.class_id = 10 ORDER  BY 1,2'::text, ' VALUES (''incident_type''), (''incident_comment''), (''photo'')'::text) ct(visit_id integer, param_1 text, param_2 text, param_3 boolean)) a ON a.visit_id = om_visit.id
+  WHERE config_visit_class.ismultievent = true AND config_visit_class.id = 10;
+
+CREATE TRIGGER gw_trg_om_visit_multievent INSTEAD OF
+INSERT OR DELETE OR UPDATE ON ve_visit_incid_link
+FOR EACH ROW EXECUTE FUNCTION gw_trg_om_visit_multievent('10'); -- 10: incid link
 
 
 -- UI views
@@ -606,6 +697,41 @@ AS SELECT ve_visit_incid_gully.visit_id,
      JOIN om_typevalue t ON t.id::integer = ve_visit_incid_gully.status AND t.typevalue = 'visit_status'::text
      JOIN om_typevalue y ON y.id::integer = ve_visit_incid_gully.incident_type::integer AND y.typevalue = 'incident_type'::text;
 
+CREATE OR REPLACE VIEW v_ui_visit_link_insp
+AS SELECT ve_visit_link_insp.visit_id,
+    ve_visit_link_insp.link_id,
+    ve_visit_link_insp.startdate AS "Start date",
+    ve_visit_link_insp.enddate AS "End date",
+    ve_visit_link_insp.user_name AS "User",
+    c.idval AS "Visit class",
+    t.idval AS "Status",
+    z.idval AS "Sediments",
+    u.idval AS "Defects",
+    y.idval AS "Cleaned",
+    ve_visit_arc_insp.insp_observ AS "Observation",
+    ve_visit_arc_insp.photo AS "Photo"
+   FROM ve_visit_arc_insp
+     JOIN config_visit_class c ON c.id = ve_visit_arc_insp.class_id
+     JOIN om_typevalue t ON t.id::integer = ve_visit_arc_insp.status AND t.typevalue = 'visit_status'::text
+     LEFT JOIN om_typevalue y ON y.id::integer = ve_visit_arc_insp.clean_arc::integer AND y.typevalue = 'visit_cleaned'::text
+     LEFT JOIN om_typevalue u ON u.id::integer = ve_visit_arc_insp.defect_arc::integer AND u.typevalue = 'visit_defect'::text
+     LEFT JOIN om_typevalue z ON z.id::integer = ve_visit_arc_insp.sediments_arc::integer AND z.typevalue = 'visit_sediments'::text;
+
+CREATE OR REPLACE VIEW v_ui_visit_incid_link
+AS SELECT ve_visit_incid_link.visit_id,
+    ve_visit_incid_link.link_id,
+    ve_visit_incid_link.startdate AS "Start date",
+    ve_visit_incid_link.enddate AS "End date",
+    ve_visit_incid_link.user_name AS "User",
+    c.idval AS "Visit class",
+    t.idval AS "Status",
+    y.idval AS "Incident type",
+    ve_visit_incid_link.incident_comment AS "Comment",
+    ve_visit_incid_link.photo AS "Photo"
+   FROM ve_visit_incid_link
+     JOIN config_visit_class c ON c.id = ve_visit_incid_link.class_id
+     JOIN om_typevalue t ON t.id::integer = ve_visit_incid_link.status AND t.typevalue = 'visit_status'::text
+     JOIN om_typevalue y ON y.id::integer = ve_visit_incid_link.incident_type::integer AND y.typevalue = 'incident_type'::text;
 
 
 /*
@@ -788,18 +914,22 @@ GRANT ALL ON TABLE ve_visit_arc_insp TO role_om;
 GRANT ALL ON TABLE ve_visit_connec_insp TO role_om;
 GRANT ALL ON TABLE ve_visit_node_insp TO role_om;
 GRANT ALL ON TABLE ve_visit_gully_insp TO role_om;
+GRANT ALL ON TABLE ve_visit_link_insp TO role_om;
 
 GRANT ALL ON TABLE ve_visit_incid_arc TO role_om;
 GRANT ALL ON TABLE ve_visit_incid_node TO role_om;
 GRANT ALL ON TABLE ve_visit_incid_connec TO role_om;
 GRANT ALL ON TABLE ve_visit_incid_gully TO role_om;
+GRANT ALL ON TABLE ve_visit_incid_link TO role_om;
 
 GRANT ALL ON TABLE v_ui_visit_arc_insp TO role_om;
 GRANT ALL ON TABLE v_ui_visit_connec_insp TO role_om;
 GRANT ALL ON TABLE v_ui_visit_node_insp TO role_om;
 GRANT ALL ON TABLE v_ui_visit_gully_insp TO role_om;
+GRANT ALL ON TABLE v_ui_visit_link_insp TO role_om;
 
 GRANT ALL ON TABLE v_ui_visit_incid_arc TO role_om;
 GRANT ALL ON TABLE v_ui_visit_incid_node TO role_om;
 GRANT ALL ON TABLE v_ui_visit_incid_connec TO role_om;
 GRANT ALL ON TABLE v_ui_visit_incid_gully TO role_om;
+GRANT ALL ON TABLE v_ui_visit_incid_link TO role_om;

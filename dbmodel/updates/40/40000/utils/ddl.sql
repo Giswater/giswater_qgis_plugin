@@ -315,6 +315,9 @@ CREATE TABLE om_visit_x_link (
 	CONSTRAINT om_visit_x_link_visit_id_fkey FOREIGN KEY (visit_id) REFERENCES om_visit(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
+ALTER TABLE config_visit_parameter DROP CONSTRAINT config_visit_parameter_feature_type_check;
+ALTER TABLE config_visit_parameter ADD CONSTRAINT config_visit_parameter_feature_type_check CHECK (feature_type::text = ANY (ARRAY['ARC'::text, 'NODE'::text, 'CONNEC'::text, 'GULLY'::text, 'LINK'::text, 'ALL'::text]));
+
 CREATE TABLE doc_x_link (
 	doc_id varchar(30) NOT NULL,
 	link_id int4 NOT NULL,

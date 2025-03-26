@@ -50,6 +50,7 @@ BEGIN
 	PERFORM setval('SCHEMA_NAME.om_visit_x_arc_id_seq', (SELECT max(id) FROM om_visit_x_arc) , true);
 	PERFORM setval('SCHEMA_NAME.om_visit_x_node_id_seq', (SELECT max(id) FROM om_visit_x_node) , true);
 	PERFORM setval('SCHEMA_NAME.om_visit_x_connec_id_seq', (SELECT max(id) FROM om_visit_x_connec) , true);
+	PERFORM setval('SCHEMA_NAME.om_visit_x_link_id_seq', (SELECT max(id) FROM om_visit_x_link) , true);
 	PERFORM setval('SCHEMA_NAME.om_visit_event_id_seq', (SELECT max(id) FROM om_visit_event) , true);
 	PERFORM setval('SCHEMA_NAME.om_visit_event_photo_id_seq', (SELECT max(id) FROM om_visit_event_photo) , true);
 
@@ -60,7 +61,8 @@ BEGIN
 	-- get if visit is multiplier
 	v_querytext =  'SELECT * FROM om_visit_x_node WHERE visit_id = '||(v_visitid)||' UNION 
 			SELECT * FROM om_visit_x_arc WHERE visit_id = '||(v_visitid)||' UNION 
-			SELECT * FROM om_visit_x_connec WHERE visit_id = '||(v_visitid);
+			SELECT * FROM om_visit_x_connec WHERE visit_id = '||(v_visitid)||' UNION 
+			SELECT id, visit_id, link_id::text as link_id, is_last FROM om_visit_x_link WHERE visit_id = '||(v_visitid); -- due to link_id is integer and others id are text
 
 	IF v_project_type = 'UD' THEN
 		v_querytext = concat(v_querytext, ' UNION SELECT * FROM om_visit_x_gully WHERE visit_id = '||(v_visitid));
@@ -155,6 +157,39 @@ BEGIN
 			-- new elements on visit_x_connec
 			INSERT INTO om_visit_x_connec (visit_id, connec_id, is_last)
 			VALUES (v_idlast, v_feature.connec_id, v_feature.is_last);
+
+			--looking for events relateds to visit
+			FOR v_event IN SELECT * FROM om_visit_event WHERE visit_id=v_visitid
+			LOOP
+				INSERT INTO om_visit_event (event_code, visit_id, position_id, position_value, parameter_id, value, value1, value2, geom1, geom2, geom3, tstamp, text, index_val, is_last)
+				VALUES (v_event.event_code, v_idlast, v_event.position_id, v_event.position_value, v_event.parameter_id, v_event.value, v_event.value1,
+				v_event.value2, v_event.geom1, v_event.geom2, v_event.geom3, v_event.tstamp, v_event.text, v_event.index_val, v_event.is_last) ON CONFLICT DO NOTHING RETURNING id INTO v_eventlast;
+
+				-- looking for photo relateds to event
+				FOR v_photo IN SELECT * FROM om_visit_event_photo WHERE event_id=v_event.id
+				LOOP
+					INSERT INTO om_visit_event_photo (visit_id, event_id, tstamp, value, text, compass)
+					VALUES (v_idlast, v_eventlast, v_photo.tstamp, v_photo.value, v_photo.text, v_photo.compass);
+				END LOOP;
+			END LOOP;
+		END LOOP;
+
+		-- looking for all link features relateds to visit
+		FOR v_feature IN SELECT * FROM om_visit_x_link WHERE visit_id=v_visitid
+		LOOP
+			-- inserting new visit on visit table
+			INSERT INTO om_visit (visitcat_id, ext_code, startdate, enddate, user_name, descript, is_done, status)
+			VALUES (v_visit.visitcat_id, v_visit.ext_code, v_visit.startdate, v_visit.enddate, v_visit.user_name, v_visit.descript, v_visit.is_done, v_visit.status) RETURNING id INTO v_idlast;
+
+			-- looking for documents
+			FOR v_doc IN SELECT * FROM doc_x_visit WHERE visit_id=v_visitid
+			LOOP
+				INSERT INTO doc_x_visit (visit_id, doc_id) VALUES (v_idlast, v_doc.doc_id);
+			END LOOP;
+
+			-- new elements on visit_x_link
+			INSERT INTO om_visit_x_link (visit_id, link_id, is_last)
+			VALUES (v_idlast, v_feature.link_id, v_feature.is_last);
 
 			--looking for events relateds to visit
 			FOR v_event IN SELECT * FROM om_visit_event WHERE visit_id=v_visitid

@@ -7292,3 +7292,17 @@ AS SELECT plan_psector_x_connec.id,
     link.exit_type
    FROM plan_psector_x_connec
      LEFT JOIN link USING (link_id);
+
+CREATE OR REPLACE VIEW v_ui_om_visitman_x_link
+AS SELECT DISTINCT ON (v_ui_om_visit_x_link.visit_id) v_ui_om_visit_x_link.visit_id,
+    v_ui_om_visit_x_link.code,
+    om_visit_cat.name AS visitcat_name,
+    v_ui_om_visit_x_link.link_id,
+    date_trunc('second'::text, v_ui_om_visit_x_link.visit_start) AS visit_start,
+    date_trunc('second'::text, v_ui_om_visit_x_link.visit_end) AS visit_end,
+    v_ui_om_visit_x_link.user_name,
+    v_ui_om_visit_x_link.is_done,
+    v_ui_om_visit_x_link.feature_type,
+    v_ui_om_visit_x_link.form_type
+   FROM v_ui_om_visit_x_link
+     LEFT JOIN om_visit_cat ON om_visit_cat.id = v_ui_om_visit_x_link.visitcat_id;

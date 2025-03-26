@@ -7,73 +7,77 @@ This version of Giswater is provided by Giswater Association
 --FUNCTION CODE:2888
 
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_fill_om_tables()
-  RETURNS void AS
+	RETURNS void AS
 $BODY$
 DECLARE
-
- rec_node   record;
- rec_arc   record;
- rec_connec   record;
- rec_parameter record;
- id_last   bigint;
- id_event_last bigint;
-
-
+	rec_node record;
+	rec_arc record;
+	rec_connec record;
+    rec_link record;
+	rec_parameter record;
+	id_last bigint;
+	id_event_last bigint;
 
 BEGIN
 
-    -- Search path
-    SET search_path = "SCHEMA_NAME", public;
+	-- Search path
+	SET search_path = "SCHEMA_NAME", public;
 
+	--Delete previous
+	DELETE FROM om_visit_event_photo CASCADE;
+	DELETE FROM om_visit_event CASCADE;
+	DELETE FROM om_visit CASCADE;
+	DELETE FROM om_visit_x_arc;
+	DELETE FROM om_visit_x_node;
+	DELETE FROM om_visit_x_connec;
+	DELETE FROM om_visit_x_link;
+	DELETE FROM om_visit_cat CASCADE;
 
-    --Delete previous
-    DELETE FROM om_visit_event_photo CASCADE;
-    DELETE FROM om_visit_event CASCADE;
-    DELETE FROM om_visit CASCADE;
-    DELETE FROM om_visit_x_arc;
-    DELETE FROM om_visit_x_node;
-    DELETE FROM om_visit_x_connec;
-    DELETE FROM om_visit_cat CASCADE;
+	--Insert Catalog of visit
+	INSERT INTO om_visit_cat (id, name, startdate, enddate, alias)
+	VALUES(1, 'Test', now(), (now()+'1hour'::INTERVAL * ROUND(RANDOM() * 5)), 'Test');
 
+	--ARCS
+	FOR rec_arc IN SELECT * FROM arc WHERE state=1
+	LOOP
+		--visit class 1. leak_arc
+		INSERT INTO ve_visit_arc_leak (arc_id, visitcat_id, startdate, enddate, user_name, expl_id, class_id, status, leak_arc, insp_observ, photo)
+		VALUES(rec_arc.arc_id, 1, now(), now(), 'postgres', rec_arc.expl_id, 1, 4, 2, 'No other problems', False);
+	END LOOP;
 
-  --Insert Catalog of visit
-    INSERT INTO om_visit_cat (id, name, startdate, enddate, alias) VALUES(1, 'Test', now(), (now()+'1hour'::INTERVAL * ROUND(RANDOM() * 5)), 'Test');
-         
-   --ARCS
-    FOR rec_arc IN SELECT * FROM arc WHERE state=1
-    LOOP
-        --visit class 1. leak_arc
-        INSERT INTO ve_visit_arc_leak (arc_id, visitcat_id, startdate, enddate, user_name, expl_id, class_id, status, leak_arc, insp_observ, photo) 
-        VALUES(rec_arc.arc_id, 1, now(), now(), 'postgres', rec_arc.expl_id, 1, 4, 2, 'No other problems', False);
-    END LOOP;
-   
-   --CONNECS
-    FOR rec_connec IN SELECT * from connec WHERE state=1
-    LOOP
-        --visit class 2. leak connec
-        INSERT INTO ve_visit_connec_leak (connec_id, visitcat_id, startdate, enddate, user_name, expl_id, class_id, status, leak_connec, insp_observ, photo) 
-        VALUES(rec_connec.connec_id, 1, now(), now(), 'postgres', rec_connec.expl_id, 2, 4, 2, 'No other problems', False);
-    END LOOP;       
+	--CONNECS
+	FOR rec_connec IN SELECT * from connec WHERE state=1
+	LOOP
+		--visit class 2. leak connec
+		INSERT INTO ve_visit_connec_leak (connec_id, visitcat_id, startdate, enddate, user_name, expl_id, class_id, status, leak_connec, insp_observ, photo)
+		VALUES(rec_connec.connec_id, 1, now(), now(), 'postgres', rec_connec.expl_id, 2, 4, 2, 'No other problems', False);
+	END LOOP;
 
-    --NODES
-    FOR rec_node IN SELECT * FROM node WHERE state=1
-    LOOP    
-        --visit class 3. inspection node
-        INSERT INTO ve_visit_node_insp (node_id, visitcat_id, startdate, enddate, user_name, expl_id, class_id, status, sediments_node, defect_node, clean_node, insp_observ, photo) 
-        VALUES(rec_node.node_id, 1, now(), now(), 'postgres', rec_node.expl_id, 3, 4, 1, 4, 1, 'No other problems', False);
-    END LOOP;
-    
-    --visit class 4 (incident nodes)
-    FOR rec_node IN SELECT * FROM node WHERE state=1 order by random() limit 20
-    LOOP
-        INSERT INTO ve_visit_incid_node (node_id, visitcat_id, startdate, enddate, user_name, expl_id, class_id, status, incident_type, incident_comment, photo) 
-        VALUES(rec_node.node_id, 1, now(), now(), 'postgres', rec_node.expl_id, 4, 4, 6, 'Minor loss of water', False);
-    END LOOP;    
-    
-   
-    RETURN;
+	--NODES
+	FOR rec_node IN SELECT * FROM node WHERE state=1
+	LOOP
+		--visit class 3. inspection node
+		INSERT INTO ve_visit_node_insp (node_id, visitcat_id, startdate, enddate, user_name, expl_id, class_id, status, sediments_node, defect_node, clean_node, insp_observ, photo)
+		VALUES(rec_node.node_id, 1, now(), now(), 'postgres', rec_node.expl_id, 3, 4, 1, 4, 1, 'No other problems', False);
+	END LOOP;
 
-        
+	FOR rec_node IN SELECT * FROM node WHERE state=1 order by random() limit 20
+	LOOP
+		--visit class 4 (incident nodes)
+		INSERT INTO ve_visit_incid_node (node_id, visitcat_id, startdate, enddate, user_name, expl_id, class_id, status, incident_type, incident_comment, photo)
+		VALUES(rec_node.node_id, 1, now(), now(), 'postgres', rec_node.expl_id, 4, 4, 6, 'Minor loss of water', False);
+	END LOOP;
+
+	--LINKS
+	FOR rec_link IN SELECT * FROM link WHERE state=1
+	LOOP
+		--visit class 5. leak_link
+		INSERT INTO ve_visit_link_leak (link_id, visitcat_id, startdate, enddate, user_name, expl_id, class_id, status, leak_link, insp_observ, photo)
+		VALUES(rec_link.link_id, 1, now(), now(), 'postgres', rec_link.expl_id, 5, 4, 2, 'No other problems', False);
+	END LOOP;
+
+	RETURN;
+
 END;$BODY$
-  LANGUAGE plpgsql VOLATILE
-  COST 100;
+	LANGUAGE plpgsql VOLATILE
+	COST 100;

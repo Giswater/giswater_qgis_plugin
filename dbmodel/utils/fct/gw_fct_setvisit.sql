@@ -117,6 +117,7 @@ BEGIN
 	PERFORM setval('"SCHEMA_NAME".om_visit_x_arc_id_seq', (SELECT max(id) FROM om_visit_x_arc), true);
 	PERFORM setval('"SCHEMA_NAME".om_visit_x_node_id_seq', (SELECT max(id) FROM om_visit_x_node), true);
 	PERFORM setval('"SCHEMA_NAME".om_visit_x_connec_id_seq', (SELECT max(id) FROM om_visit_x_connec), true);
+	PERFORM setval('"SCHEMA_NAME".om_visit_x_link_id_seq', (SELECT max(id) FROM om_visit_x_link), true);
 	PERFORM setval('"SCHEMA_NAME".doc_x_visit_id_seq', (SELECT max(id) FROM doc_x_visit), true);
 
 	IF v_project_type ='UD' THEN
@@ -309,6 +310,16 @@ BEGIN
 			INSERT INTO om_visit (startdate, enddate, expl_id, user_name, lot_id, class_id, status, visit_type, the_geom, unit_id)
 			SELECT startdate, enddate, expl_id, user_name, lot_id, v_visitclass_node, status, visit_type, the_geom, unit_id FROM om_visit WHERE id=v_id RETURNING id INTO id_last;
 			INSERT INTO om_visit_x_node (visit_id, node_id) VALUES(id_last, rec_node.node_id);
+	        INSERT INTO om_visit_event (visit_id, parameter_id, value, xcoord, ycoord) SELECT id_last, parameter_id, value, xcoord, ycoord FROM om_visit_event WHERE visit_id=v_id;
+		END LOOP;
+
+		-- select visitclass for link and loop for every link on om_visit_lot_x_link. Then insert visit and events with same values of the one triggered by this setvisit
+		SELECT id INTO v_visitclass_link FROM config_visit_class WHERE parent_id=v_parent_id AND lower(feature_type)='link';
+		FOR rec_link IN SELECT * FROM om_visit_lot_x_link WHERE unit_id=v_unit_id AND lot_id=v_lot AND link_id::integer <> v_feature_id::integer
+		LOOP
+			INSERT INTO om_visit (startdate, enddate, expl_id, user_name, lot_id, class_id, status, visit_type, the_geom, unit_id)
+			SELECT startdate, enddate, expl_id, user_name, lot_id, v_visitclass_link, status, visit_type, the_geom, unit_id FROM om_visit WHERE id=v_id RETURNING id INTO id_last;
+			INSERT INTO om_visit_x_link (visit_id, link_id) VALUES(id_last, rec_link.link_id);
 	        INSERT INTO om_visit_event (visit_id, parameter_id, value, xcoord, ycoord) SELECT id_last, parameter_id, value, xcoord, ycoord FROM om_visit_event WHERE visit_id=v_id;
 		END LOOP;
 
