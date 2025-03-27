@@ -82,6 +82,7 @@ class Campaign:
             if "columnname" in field:
                 widget.setProperty("columnname", field["columnname"])
 
+
             label = QLabel(field["label"]) if field.get("label") else None
             tools_gw.add_widget(self.dialog, field, label, widget)
 
@@ -94,40 +95,44 @@ class Campaign:
     def create_widget_from_field(self, field):
         """Create a Qt widget based on field metadata"""
         wtype = field.get("widgettype", "text")
+        iseditable = field.get("iseditable", True)
+        widget = None
 
         if wtype == "text":
-            return QLineEdit()
+            widget = QLineEdit()
+            if not iseditable:
+                widget.setEnabled(False)
+
         elif wtype == "textarea":
-            return QTextEdit()
+            widget = QTextEdit()
+            if not iseditable:
+                widget.setReadOnly(True)
+
         elif wtype == "datetime":
             widget = QDateEdit()
             widget.setCalendarPopup(True)
             widget.setDisplayFormat("MM/dd/yyyy")
             value = field.get("value")
-            if value:
-                try:
-                    date = QDate.fromString(value, "yyyy-MM-dd")
-                    if date.isValid():
-                        widget.setDate(date)
-                    else:
-                        widget.setDate(QDate.currentDate())
-                except:
-                    widget.setDate(QDate.currentDate())
-            else:
-                widget.setDate(QDate.currentDate())
-            return widget
+            date = QDate.fromString(value, "yyyy-MM-dd") if value else QDate.currentDate()
+            widget.setDate(date if date.isValid() else QDate.currentDate())
+            if not iseditable:
+                widget.setEnabled(False)
+
         elif wtype == "check":
-            return QCheckBox()
+            widget = QCheckBox()
+            if not iseditable:
+                widget.setEnabled(False)
+
         elif wtype == "combo":
-            combo = QComboBox()
+            widget = QComboBox()
             ids = field.get("comboIds", [])
             names = field.get("comboNames", [])
             for i, name in enumerate(names):
-                combo.addItem(name, ids[i] if i < len(ids) else name)
-            return combo
-        else:
-            return None
+                widget.addItem(name, ids[i] if i < len(ids) else name)
+            if not iseditable:
+                widget.setEnabled(False)
 
+        return widget
 
     def set_widget_value(self, widget, value):
         """Sets the widget value from JSON"""
