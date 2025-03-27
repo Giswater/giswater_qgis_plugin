@@ -54,6 +54,7 @@ class GwResultManagerButton(GwAction):
         tools_qt.fill_combo_values(
             self.dlg_priority_manager.cmb_name, rows, 1, add_empty=True
         )
+        tools_qt.set_autocompleter(self.dlg_priority_manager.cmb_name)
 
         # Fill filters
         rows = tools_db.get_rows("SELECT id, idval FROM am.value_result_type")

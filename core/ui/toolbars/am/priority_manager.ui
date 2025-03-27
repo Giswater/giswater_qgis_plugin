@@ -150,7 +150,11 @@
        <widget class="QComboBox" name="cmb_status"/>
       </item>
       <item row="1" column="0">
-       <widget class="QComboBox" name="cmb_name"/>
+       <widget class="QComboBox" name="cmb_name">
+        <property name="editable">
+         <bool>true</bool>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
