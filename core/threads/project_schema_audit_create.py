@@ -19,27 +19,14 @@ class GwCreateSchemaAuditTask(GwTask):
 
     task_finished = pyqtSignal(list)
 
-    def __init__(self, admin, description, timer=None):
+    def __init__(self, admin, description, timer=None, list_process=None):
 
         super().__init__(description)
         self.admin = admin
         self.dict_folders_process = {}
         self.db_exception = (None, None, None)  # error, sql, filepath
         self.timer = timer
-
-        # Manage buttons & other dlg-related widgets
-        # Disable dlg_readsql_create_audit_project buttons
-        self.admin.dlg_readsql_create_audit_project.btn_cancel_task.show()
-        self.admin.dlg_readsql_create_audit_project.btn_accept.hide()
-        self.admin.dlg_readsql_create_audit_project.btn_close.setEnabled(False)
-        try:
-            self.admin.dlg_readsql_create_audit_project.key_escape.disconnect()
-        except TypeError:
-            pass
-
-        # Disable red 'X' from dlg_readsql_create_audit_project
-        self.admin.dlg_readsql_create_audit_project.setWindowFlag(Qt.WindowCloseButtonHint, False)
-        self.admin.dlg_readsql_create_audit_project.show()
+        self.list_process = list_process
         # Disable dlg_readsql buttons
         self.admin.dlg_readsql.btn_close.setEnabled(False)
 
@@ -61,13 +48,6 @@ class GwCreateSchemaAuditTask(GwTask):
     def finished(self, result):
 
         super().finished(result)
-        # Enable dlg_readsql_create_audit_project buttons
-        self.admin.dlg_readsql_create_audit_project.btn_cancel_task.hide()
-        self.admin.dlg_readsql_create_audit_project.btn_accept.show()
-        self.admin.dlg_readsql_create_audit_project.btn_close.setEnabled(True)
-        # Enable red 'X' from dlg_readsql_create_audit_project
-        self.admin.dlg_readsql_create_audit_project.setWindowFlag(Qt.WindowCloseButtonHint, True)
-        self.admin.dlg_readsql_create_audit_project.show()
         # Disable dlg_readsql buttons
         self.admin.dlg_readsql.btn_close.setEnabled(True)
 
@@ -107,7 +87,7 @@ class GwCreateSchemaAuditTask(GwTask):
 
         self.admin.progress_ratio = 0.8
         self.admin.total_sql_files = self.calculate_number_of_files()
-        for process in ['load_audit']:
+        for process in self.list_process:
             status = self.admin.load_sql_folder(self.dict_folders_process[process])
             if (not tools_os.set_boolean(status, False) and tools_os.set_boolean(self.admin.dev_commit, False) is False) \
                     or self.isCanceled():
@@ -120,9 +100,8 @@ class GwCreateSchemaAuditTask(GwTask):
 
         total_sql_files = 0
         dict_process = {}
-        list_process = ['load_audit']
 
-        for process_name in list_process:
+        for process_name in self.list_process:
             dict_folders, total = self.get_number_of_files_process(process_name)
             total_sql_files += total
             dict_process[process_name] = total
@@ -151,8 +130,11 @@ class GwCreateSchemaAuditTask(GwTask):
         """ Get list of folders related with this @process_name """
 
         dict_folders = {}
-        if process_name == 'load_audit':
-            dict_folders[self.admin.folder_audit] = 0
+        if process_name == 'load_audit_structure':
+            dict_folders[self.admin.folder_audit_structure] = 0
+
+        elif process_name == 'load_audit_activation':
+            dict_folders[self.admin.folder_audit_activate] = 0
 
         return dict_folders
 
