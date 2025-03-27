@@ -9,30 +9,37 @@ CREATE OR REPLACE FUNCTION PARENT_SCHEMA.gw_trg_audit()
   RETURNS trigger AS
 $BODY$
 
-
 DECLARE
+
 v_old_data json;
 v_new_data json;
 v_feature_id text;
 v_feature_idname text;
+
 BEGIN
 
     --	Set search path to local schema
 	SET search_path = PARENT_SCHEMA, public;
 
-    -- Get primary key column name
-    SELECT a.attname::text
+    -- Get the first column of view (assuming is primary key of the table)
+    SELECT column_name
     INTO v_feature_idname
-    FROM pg_index i
-    JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey)
-    WHERE i.indrelid = TG_RELID AND i.indisprimary
+    FROM information_schema.columns
+    WHERE table_schema = TG_TABLE_SCHEMA
+      AND table_name = TG_TABLE_NAME
+    ORDER BY ordinal_position
     LIMIT 1;
 
     -- Extract the primary key value dynamically
-    IF TG_OP = 'INSERT' THEN
-        EXECUTE format('SELECT ($1).%I::text', v_feature_idname) INTO v_feature_id USING NEW;
-    ELSIF TG_OP = 'UPDATE' OR TG_OP = 'DELETE' THEN
-        EXECUTE format('SELECT ($1).%I::text', v_feature_idname) INTO v_feature_id USING OLD;
+    IF v_feature_idname IS NOT NULL THEN
+        -- Extract the primary key value dynamically
+        IF TG_OP = 'INSERT' THEN
+            EXECUTE format('SELECT ($1).%I::text', v_feature_idname) INTO v_feature_id USING NEW;
+        ELSIF TG_OP = 'UPDATE' OR TG_OP = 'DELETE' THEN
+            EXECUTE format('SELECT ($1).%I::text', v_feature_idname) INTO v_feature_id USING OLD;
+        END IF;
+    ELSE
+        v_feature_id := 'unknown';
     END IF;
 
     IF (SELECT value::boolean FROM config_param_system WHERE parameter='admin_skip_audit') IS FALSE THEN
