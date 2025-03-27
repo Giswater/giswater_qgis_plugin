@@ -55,7 +55,7 @@ class GwAmBreakageButton(GwAction):
         self.action_group = action_group
 
         # Menu labels
-        self.txt_assignation = tools_qt.tr("Leak Assignation")
+        self.txt_assignation = tools_qt.tr("Breakdown Assignation")
         self.txt_priority = tools_qt.tr("Priority Calculation (Global)")
 
         # Create a menu and add all the actions
@@ -284,7 +284,7 @@ class GwAmBreakageButton(GwAction):
             return
 
         self.thread = GwAssignation(
-            tools_qt.tr("Leak Assignation"),
+            tools_qt.tr("Breakdown Assignation"),
             buffer,
             years,
             max_distance,
