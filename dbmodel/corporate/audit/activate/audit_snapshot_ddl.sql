@@ -7,5 +7,7 @@ This version of Giswater is provided by Giswater Association
 
 CREATE TABLE SCHEMA_NAME.snapshot (
     date DATE PRIMARY KEY DEFAULT CURRENT_DATE,
-    descripcion TEXT NULL
+    description TEXT NULL,
+    tables TEXT[] NULL,
+    schema text
 );
