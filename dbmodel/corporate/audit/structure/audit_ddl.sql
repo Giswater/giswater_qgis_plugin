@@ -4,20 +4,18 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-
-
 CREATE SCHEMA SCHEMA_NAME;
 
 CREATE TABLE SCHEMA_NAME.log (
-id serial8 PRIMARY KEY,
-schema text,
-table_name text,
-id_name text,
-user_name text,
-action text,
-olddata json,
-newdata json,
-query text,
-tstamp timestamp default now(),
-feature_id text
+    id serial8 PRIMARY KEY,
+    tstamp timestamp default now(),
+    table_name text,
+    id_name text,
+    feature_id text,
+    action text,
+    query text,
+    olddata json,
+    newdata json,
+    user_name text,
+    schema text
 );
