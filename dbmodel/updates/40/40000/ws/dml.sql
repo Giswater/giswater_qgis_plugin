@@ -3419,3 +3419,45 @@ INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,
 
 INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,widgetcontrols,hidden)
 	VALUES ('cat_connec','form_feature','tab_none','estimated_depth','double','text','Estimated depth:','Estimated depth',false,false,true,false,'{"setMultiline":false}'::json,false);
+
+
+-- 27/03/2025
+UPDATE config_form_fields
+	SET tooltip='chemcond',widgettype='combo',dv_isnullvalue=false,dv_querytext='SELECT id, idval FROM edit_typevalue WHERE typevalue = ''value_boolean''',widgetcontrols='{"setMultiline":false}'::json
+	WHERE formname='ve_node_wtp' AND formtype='form_feature' AND columnname='chemcond' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET tooltip='chemtreatment',widgettype='combo',dv_isnullvalue=false,dv_querytext='SELECT id, idval FROM edit_typevalue WHERE typevalue = ''value_boolean''',widgetcontrols='{"setMultiline":false}'::json
+	WHERE formname='ve_node_wtp' AND formtype='form_feature' AND columnname='chemtreatment' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET tooltip='coagulation',widgettype='combo',dv_isnullvalue=false,dv_querytext='SELECT id, idval FROM edit_typevalue WHERE typevalue = ''value_boolean''',widgetcontrols='{"setMultiline":false}'::json
+	WHERE formname='ve_node_wtp' AND formtype='form_feature' AND columnname='coagulation' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET tooltip='desander',widgettype='combo',dv_isnullvalue=false,dv_querytext='SELECT id, idval FROM edit_typevalue WHERE typevalue = ''value_boolean''',widgetcontrols='{"setMultiline":false}'::json
+	WHERE formname='ve_node_wtp' AND formtype='form_feature' AND columnname='desander' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET tooltip='disinfection',widgettype='combo',dv_isnullvalue=false,dv_querytext='SELECT id, idval FROM edit_typevalue WHERE typevalue = ''value_boolean''',widgetcontrols='{"setMultiline":false}'::json
+	WHERE formname='ve_node_wtp' AND formtype='form_feature' AND columnname='disinfection' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET tooltip='filtration',widgettype='combo',dv_isnullvalue=false,dv_querytext='SELECT id, idval FROM edit_typevalue WHERE typevalue = ''value_boolean''',widgetcontrols='{"setMultiline":false}'::json
+	WHERE formname='ve_node_wtp' AND formtype='form_feature' AND columnname='filtration' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET tooltip='floculation',widgettype='combo',dv_isnullvalue=false,dv_querytext='SELECT id, idval FROM edit_typevalue WHERE typevalue = ''value_boolean''',widgetcontrols='{"setMultiline":false}'::json
+	WHERE formname='ve_node_wtp' AND formtype='form_feature' AND columnname='floculation' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET tooltip='oxidation',widgettype='combo',dv_isnullvalue=false,dv_querytext='SELECT id, idval FROM edit_typevalue WHERE typevalue = ''value_boolean''',widgetcontrols='{"setMultiline":false}'::json
+	WHERE formname='ve_node_wtp' AND formtype='form_feature' AND columnname='oxidation' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET tooltip='presendiment',widgettype='combo',dv_isnullvalue=false,dv_querytext='SELECT id, idval FROM edit_typevalue WHERE typevalue = ''value_boolean''',widgetcontrols='{"setMultiline":false}'::json
+	WHERE formname='ve_node_wtp' AND formtype='form_feature' AND columnname='presendiment' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET tooltip='screening',widgettype='combo',dv_isnullvalue=false,dv_querytext='SELECT id, idval FROM edit_typevalue WHERE typevalue = ''value_boolean''',widgetcontrols='{"setMultiline":false}'::json
+	WHERE formname='ve_node_wtp' AND formtype='form_feature' AND columnname='screening' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET tooltip='sediment',widgettype='combo',dv_isnullvalue=false,dv_querytext='SELECT id, idval FROM edit_typevalue WHERE typevalue = ''value_boolean''',widgetcontrols='{"setMultiline":false}'::json
+	WHERE formname='ve_node_wtp' AND formtype='form_feature' AND columnname='sediment' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET tooltip='sludgeman',widgettype='combo',dv_isnullvalue=false,dv_querytext='SELECT id, idval FROM edit_typevalue WHERE typevalue = ''value_boolean''',widgetcontrols='{"setMultiline":false}'::json
+	WHERE formname='ve_node_wtp' AND formtype='form_feature' AND columnname='sludgeman' AND tabname='tab_data';
+UPDATE config_form_fields
+	SET tooltip='storage',widgettype='combo',dv_isnullvalue=false,dv_querytext='SELECT id, idval FROM edit_typevalue WHERE typevalue = ''value_boolean''',widgetcontrols='{"setMultiline":false}'::json
+	WHERE formname='ve_node_wtp' AND formtype='form_feature' AND columnname='storage' AND tabname='tab_data';
