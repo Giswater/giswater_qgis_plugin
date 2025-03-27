@@ -194,9 +194,9 @@ def run(**kwargs):
     body = { "client" : { "cur_user": tools_db.current_user }, "form" : form }
 
     # Execute procedure
-    result = tools_gw.execute_procedure('gw_fct_getauditlayers', body, schema_name='audit')
+    result = tools_gw.execute_procedure('gw_fct_getsnapshot', body, schema_name='audit')
 
-    if result.get("body").get("data"):
+    if result.get("status") == "Accepted" and result.get("body").get("data"):
         tools_gw.add_layer_temp(dlg.dlg_snapshot_view, result['body']['data'], None, False, call_set_tabs_enabled=False, close=False)
         tools_gw.close_dialog(dlg.dlg_snapshot_view)
     else:
