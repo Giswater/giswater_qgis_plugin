@@ -12,22 +12,17 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 SELECT * FROM no_plan();
 
--- Check view exists
-SELECT has_view('v_anl_arc'::name, 'View v_anl_arc should exist');
+-- Check view v_anl_arc_point
+SELECT has_view('v_anl_arc_point'::name, 'View v_anl_arc_point should exist');
 
 -- Check view columns
-SELECT columns_are('v_anl_arc', ARRAY[
-    'id',
-    'arc_id',
-    'arc_type',
-    'state',
-    'arc_id_aux',
-    'fprocesscat_id',
-    'expl_name',
-    'the_geom',
-    'result_id',
-    'descript'
-], 'View v_anl_arc should have the correct columns');
+SELECT columns_are(
+    'v_anl_arc_point',
+    ARRAY[
+        'id', 'arc_id', 'arc_type', 'state', 'arc_id_aux', 'fprocesscat_id', 'expl_name', 'the_geom_p'
+    ],
+    'View v_anl_arc_point should have the correct columns'
+);
 
 SELECT * FROM finish();
 

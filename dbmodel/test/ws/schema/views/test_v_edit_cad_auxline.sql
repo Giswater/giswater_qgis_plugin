@@ -12,22 +12,20 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 SELECT * FROM no_plan();
 
--- Check view exists
-SELECT has_view('v_anl_arc'::name, 'View v_anl_arc should exist');
+-- Check view v_edit_cad_auxline
+SELECT has_view('v_edit_cad_auxline'::name, 'View v_edit_cad_auxline should exist');
 
 -- Check view columns
-SELECT columns_are('v_anl_arc', ARRAY[
-    'id',
-    'arc_id',
-    'arc_type',
-    'state',
-    'arc_id_aux',
-    'fprocesscat_id',
-    'expl_name',
-    'the_geom',
-    'result_id',
-    'descript'
-], 'View v_anl_arc should have the correct columns');
+SELECT columns_are(
+    'v_edit_cad_auxline',
+    ARRAY[
+        'id', 'geom_line'
+    ],
+    'View v_edit_cad_auxline should have the correct columns'
+);
+
+-- Check if trigger exists
+SELECT has_trigger('v_edit_cad_auxline', 'gw_trg_edit_cad_aux', 'Trigger gw_trg_edit_cad_aux should exist on v_edit_cad_auxline');
 
 SELECT * FROM finish();
 
