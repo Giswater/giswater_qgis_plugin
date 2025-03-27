@@ -133,7 +133,9 @@ class GwAdminButton:
         if not answer:
             return
 
-        self.start_create_other_project_data_schema_task()
+        self.create_process(project)
+
+
     def create_project_data_cm_schema(self):
         """ Create cm schema """
         self.cm_schema_name = tools_qt.get_text(self.dlg_readsql_create_cm_project, 'project_name')
@@ -246,24 +248,31 @@ class GwAdminButton:
         QgsApplication.taskManager().addTask(self.task_create_schema)
         QgsApplication.taskManager().triggerTask(self.task_create_schema)
 
-    def start_create_other_project_data_schema_task(self):
+    def create_process(self, process_name=""):
         self.error_count = 0
         # We retrieve the desired name of the schema, since in case there had been a schema with the same name, we had
         # changed the value of self.schema in the function _rename_project_data_schema or _execute_last_process
 
         self.t0 = time()
         self.timer = QTimer()
-        self.timer.timeout.connect(partial(self._calculate_elapsed_time, getattr(self, f"dlg_readsql_create_{self.other_project}_project")))
+        if hasattr (self, f"{process_name}"):
+            self.timer.timeout.connect(partial(self._calculate_elapsed_time, getattr(self, f"dlg_readsql_create_{process_name}_project")))
 
         self.timer.start(1000)
 
-        description = f"Create {self.other_project} schema"
+        description = f"Create {process_name} schema"
 
-        match(self.other_project):
+        match(process_name):
             case "asset":
                self.task_create_schema = GwCreateSchemaAssetTask(self, description, self.timer)
-            case "audit":
-               self.task_create_schema = GwCreateSchemaAuditTask(self, description, self.timer)
+            case "audit" | "audit_activation":
+                list_process = []
+                if process_name == "audit":
+                    list_process.append('load_audit_structure')
+                else:
+                    list_process.append('load_audit_activation')
+
+                self.task_create_schema = GwCreateSchemaAuditTask(self, description, self.timer, list_process=list_process)
 
         QgsApplication.taskManager().addTask(self.task_create_schema)
         QgsApplication.taskManager().triggerTask(self.task_create_schema)
@@ -315,18 +324,21 @@ class GwAdminButton:
         """"""
 
         status = (self.error_count == 0)
-        self._manage_result_message(status, parameter=f"Create {self.other_project} schema")
+        self._manage_result_message(status, parameter=f"Process finished with success")
         if status:
             tools_db.dao.commit()
-            self._close_dialog_admin(getattr(self, f"dlg_readsql_create_{self.other_project}_project"))
+            if hasattr (self, f"other_project"):
+                self._close_dialog_admin(getattr(self, f"dlg_readsql_create_{self.other_project}_project"))
         else:
             tools_db.dao.rollback()
             # Reset count error variable to 0
             self.error_count = 0
             tools_qt.show_exception_message(msg=lib_vars.session_vars['last_error_msg'])
             tools_qgis.show_info("A rollback on schema will be done.")
-            if getattr(self, f"dlg_readsql_create_{self.other_project}_project"):
+            if hasattr (self, f"other_project"):
                 tools_gw.close_dialog(getattr(self, f"dlg_readsql_create_{self.other_project}_project"))
+
+
     def manage_cm_process_result(self):
         """"""
 
@@ -820,7 +832,8 @@ class GwAdminButton:
 
         # Declare audit db folders
         self.sql_audit_dir = os.path.join(self.sql_dir, 'corporate','audit')
-        self.folder_audit = os.path.join(self.sql_audit_dir, 'audit')
+        self.folder_audit_structure = os.path.join(self.sql_audit_dir, 'structure')
+        self.folder_audit_activate = os.path.join(self.sql_audit_dir, 'activate')
 
         # Declare cm db folders (QUE ES ESTO?)
         self.sql_cm_dir = os.path.join(self.sql_dir, 'cm')
@@ -920,9 +933,27 @@ class GwAdminButton:
         self.dlg_readsql.btn_create_audit.clicked.connect(
             partial(self._open_create_other_project, "Create Audit Project","admin_auditdbproject","audit"))
 
+        self.dlg_readsql.btn_activate_audit.clicked.connect(partial(self._activate_audit))
+
         self.dlg_readsql.btn_create_cm.clicked.connect(partial(self._open_create_cm_project))
 
         self.dlg_readsql.btn_i18n.clicked.connect(partial(self._i18n_manager))
+
+
+    def _activate_audit(self):
+        """ Activate audit functionality """
+
+        sql = (f"SELECT schema_name, schema_name FROM information_schema.schemata "
+               f"WHERE schema_name = 'audit'")
+        rows = tools_db.get_rows(sql, commit=False)
+
+        if rows is not None:
+            answer = tools_qt.show_question("This process will active snapshot. Are you sure to continue?", f"Activate water netowrk snapshot")
+            if not answer:
+                return
+            self.create_process("audit_activation")
+        else:
+            tools_qgis.show_warning("Schema audit not found, please create it first")
 
 
     def _manage_translations(self):
