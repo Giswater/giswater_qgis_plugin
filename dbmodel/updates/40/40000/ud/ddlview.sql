@@ -441,12 +441,12 @@ AS WITH
         ),
     link_state AS
         (
-			SELECT l.link_id
-			FROM link l
-			JOIN selector_state s ON s.cur_user = current_user AND l.state = s.state_id
-			LEFT JOIN (SELECT link_id FROM link_psector WHERE p_state = 0) a USING (link_id) WHERE a.link_id IS NULL
-			UNION ALL
-			SELECT link_id FROM link_psector WHERE p_state = 1
+            SELECT DISTINCT l.link_id
+            FROM link l
+            JOIN selector_state s ON s.cur_user =current_user AND l.state =s.state_id
+		    LEFT JOIN link_psector lp0 ON lp0.link_id = l.link_id AND lp0.p_state = 0
+		    LEFT JOIN link_psector lp1 ON lp1.link_id = l.link_id AND lp1.p_state = 1
+		    WHERE lp0.link_id IS NULL
         ),
     link_selected as
     	(
@@ -772,12 +772,11 @@ AS WITH
         ),
     arc_selector AS
 		(
-			SELECT arc.arc_id
-			FROM arc
-			JOIN selector_state s ON s.cur_user = CURRENT_USER AND arc.state = s.state_id
-			LEFT JOIN (SELECT arc_id FROM arc_psector WHERE p_state = 0) a using (arc_id)  where a.arc_id IS NULL
-			UNION ALL
-			SELECT arc_id FROM arc_psector WHERE p_state = 1
+            SELECT arc.arc_id
+            FROM arc
+            JOIN selector_state s ON s.cur_user = CURRENT_USER AND arc.state = s.state_id
+            LEFT JOIN arc_psector aps ON aps.arc_id = arc.arc_id
+            WHERE (aps.arc_id IS NULL OR aps.p_state = 1)
          ),
     arc_selected AS
 		(
@@ -1228,12 +1227,11 @@ AS WITH
         ),
     node_selector AS
         (
-			SELECT node.node_id
-			FROM node
-			JOIN selector_state s ON s.cur_user = current_user AND node.state = s.state_id
-			LEFT JOIN (SELECT node_id FROM node_psector WHERE p_state = 0) a USING (node_id) WHERE a.node_id IS NULL
-			UNION ALL
-			SELECT node_id FROM node_psector WHERE p_state = 1
+            SELECT DISTINCT n.node_id
+            FROM node n
+            JOIN selector_state s ON s.cur_user = current_user AND n.state = s.state_id
+		    LEFT JOIN node_psector np ON np.node_id = n.node_id
+            WHERE np.node_id IS NULL OR np.p_state = 1
         ),
     node_selected AS
     	(
@@ -1649,13 +1647,11 @@ AS WITH
         ),
     connec_selector AS
         (
-			SELECT connec_id, arc_id::varchar(16), NULL::integer AS link_id
-			FROM connec
-			JOIN selector_state ss ON ss.cur_user = current_user AND connec.state = ss.state_id
-			LEFT JOIN (SELECT connec_id, arc_id::varchar(16) FROM connec_psector WHERE p_state = 0) a USING (connec_id, arc_id) WHERE a.connec_id IS NULL
-			UNION ALL
-			SELECT connec_id, connec_psector.arc_id::varchar(16), link_id FROM connec_psector
-			WHERE p_state = 1
+            SELECT DISTINCT c.connec_id, COALESCE(cp1.arc_id, c.arc_id)::varchar(16) AS arc_id, cp1.link_id
+            FROM connec c JOIN selector_state ss ON ss.cur_user = current_user AND c.state = ss.state_id
+            LEFT JOIN connec_psector cp0 ON cp0.connec_id = c.connec_id AND cp0.arc_id = c.arc_id AND cp0.p_state   = 0
+            LEFT JOIN connec_psector cp1 ON cp1.connec_id = c.connec_id AND cp1.p_state = 1
+            WHERE cp0.connec_id IS NULL
         ),
     connec_selected AS
     	(
@@ -1996,13 +1992,12 @@ AS WITH
         ),
     gully_selector AS
         (
-			SELECT gully_id, arc_id::varchar(16), null::integer as link_id
-			FROM gully
-			JOIN selector_state ss ON ss.cur_user = current_user AND gully.state = ss.state_id
-			LEFT JOIN (SELECT gully_id, arc_id FROM gully_psector WHERE p_state = 0) a USING (gully_id, arc_id) WHERE a.gully_id IS NULL
-			UNION ALL
-			SELECT gully_id, gully_psector.arc_id::varchar(16), link_id FROM gully_psector
-			WHERE p_state = 1
+            SELECT DISTINCT g.gully_id, COALESCE(gp1.arc_id, g.arc_id)::varchar(16) AS arc_id, gp1.link_id
+            FROM gully g
+            JOIN selector_state ss ON ss.cur_user = current_user AND g.state = ss.state_id
+            LEFT JOIN gully_psector gp0 ON gp0.gully_id = g.gully_id AND gp0.arc_id = g.arc_id AND gp0.p_state  = 0
+            LEFT JOIN gully_psector gp1 ON gp1.gully_id = g.gully_id AND gp1.p_state  = 1
+            WHERE gp0.gully_id IS NULL
         ),
     gully_selected AS
     	(
