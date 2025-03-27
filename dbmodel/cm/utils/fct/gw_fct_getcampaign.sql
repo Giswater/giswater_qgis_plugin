@@ -6,13 +6,13 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 3388
 
-CREATE OR REPLACE FUNCTION cm.gw_fct_getcampaign(p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getcampaign(p_data json)
   RETURNS json AS
 $BODY$
 
 DECLARE
 	v_version text;
-	v_schemaname text := 'cm';
+	v_schemaname text := 'SCHEMA_NAME';
 	v_id text;
 	v_idname text;
 	v_columntype text := 'integer';
@@ -40,16 +40,16 @@ DECLARE
 	v_formname text;
 BEGIN
 	-- Set search path
-	SET search_path = "cm", public;
+	SET search_path = "SCHEMA_NAME", public;
 
 	-- Get version
-	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM lots3_ws.config_param_system WHERE parameter=''admin_version'') row'
+	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM PARENT_SCHEMA.config_param_system WHERE parameter=''admin_version'') row'
 	INTO v_version;
 
 	-- Clean JSON null formats
 	p_data := REPLACE(p_data::text, '"NULL"', 'null');
 	p_data := REPLACE(p_data::text, '"null"', 'null');
-	p_data := REPLACE(p_data::text, '"cm"', 'null');
+	p_data := REPLACE(p_data::text, '"SCHEMA_NAME"', 'null');
 
 	-- Get client + feature inputs
 	v_client := (p_data ->> 'client')::json;
@@ -73,7 +73,7 @@ BEGIN
 	v_formtabs := '[';
 
 	-- Get dynamic fields
-	SELECT lots3_ws.gw_fct_getformfields(
+	SELECT PARENT_SCHEMA.gw_fct_getformfields(
 		v_formname,
 		'form_feature',
 		'data',
@@ -108,13 +108,13 @@ BEGIN
 
 	ELSE
 		-- If creating a new campaign
-		v_id := (SELECT COALESCE(MAX(id), 0) + 1 FROM cm.om_campaign);
+		SELECT nextval('SCHEMA_NAME.om_campaign_id_seq') INTO v_id;
 
 		FOR array_index IN array_lower(v_fields, 1)..array_upper(v_fields, 1) LOOP
-			aux_json := v_fields[array_index];
-			IF (aux_json ->> 'columnname') = 'id' THEN
-				v_fields[array_index] := gw_fct_json_object_set_key(aux_json, 'value', v_id);
-			END IF;
+		    aux_json := v_fields[array_index];
+		    IF (aux_json ->> 'columnname') = 'id' THEN
+		        v_fields[array_index] := gw_fct_json_object_set_key(aux_json, 'value', v_id::text);
+		    END IF;
 		END LOOP;
 
 		v_formheader := CONCAT('New Campaign - ', v_id);
@@ -122,6 +122,12 @@ BEGIN
 
 	-- Convert fields to JSON
 	v_fields_json := array_to_json(v_fields);
+	v_featureinfo := json_build_object(
+	    'featureType', 'campaign',
+	    'tableName', v_tablename,
+	    'idName', v_idname,
+	    'id', v_id
+	);
 	v_formtabs := v_formtabs || v_tabaux::text || ']';
 	v_forminfo := json_build_object('formName','Generic','template','info_generic');
 
