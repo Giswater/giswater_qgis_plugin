@@ -45,13 +45,11 @@ WITH
         ),
     node_selector AS
         (
-        SELECT node_id
-        FROM node
-        JOIN selector_state s ON s.cur_user =current_user AND node.state =s.state_id
-        LEFT JOIN (SELECT node_id FROM node_psector WHERE p_state = 0) a using (node_id) where a.node_id is null
-        union all
-        SELECT node_id FROM node_psector
-        WHERE p_state = 1
+        SELECT DISTINCT n.node_id
+        FROM node n
+		JOIN selector_state s ON s.cur_user = current_user AND n.state = s.state_id
+		LEFT JOIN node_psector np ON np.node_id = n.node_id
+		WHERE np.node_id IS NULL OR np.p_state = 1
         ),
     node_selected AS
         ( SELECT node.node_id,
@@ -232,16 +230,13 @@ AS WITH
         FROM plan_psector_x_arc pp
         JOIN selector_psector sp ON sp.cur_user = CURRENT_USER AND sp.psector_id = pp.psector_id
 		),
-    arc_selector AS
-		(
-        SELECT arc.arc_id
-        FROM arc
-        JOIN selector_state s ON s.cur_user = CURRENT_USER AND arc.state = s.state_id
-        left JOIN (SELECT arc_id FROM arc_psector WHERE p_state = 0) a using (arc_id)  where a.arc_id is null
-        union all
-        SELECT arc_id FROM arc_psector
-        WHERE p_state = 1
-        ),
+	arc_selector AS (
+		SELECT arc.arc_id
+		FROM arc
+		JOIN selector_state s ON s.cur_user = CURRENT_USER AND arc.state = s.state_id
+		LEFT JOIN arc_psector aps ON aps.arc_id = arc.arc_id
+		WHERE (aps.arc_id IS NULL OR aps.p_state = 1)
+	),
     arc_selected AS (
         SELECT arc.arc_id,
 		arc.code,
@@ -437,13 +432,11 @@ WITH
         ),
     connec_selector AS
         (
-        SELECT connec_id, arc_id::varchar(16), null::integer as link_id
-        FROM connec
-        JOIN selector_state ss ON ss.cur_user =current_user AND connec.state =ss.state_id
-        left join (SELECT connec_id, arc_id FROM connec_psector WHERE p_state = 0) a using (connec_id, arc_id) where a.connec_id is null
-       	union all
-        SELECT connec_id, connec_psector.arc_id::varchar(16), link_id FROM connec_psector
-        WHERE p_state = 1
+		SELECT DISTINCT c.connec_id, COALESCE(cp1.arc_id, c.arc_id)::varchar(16) AS arc_id, cp1.link_id
+		FROM connec c JOIN selector_state ss ON ss.cur_user = current_user AND c.state = ss.state_id
+		LEFT JOIN connec_psector cp0 ON cp0.connec_id = c.connec_id AND cp0.arc_id = c.arc_id AND cp0.p_state   = 0
+		LEFT JOIN connec_psector cp1 ON cp1.connec_id = c.connec_id AND cp1.p_state = 1
+		WHERE cp0.connec_id IS NULL
         ),
     connec_selected AS
     	(
@@ -662,6 +655,115 @@ WITH
 	SELECT c.*
 	FROM connec_selected c;
 
+create or replace view v_edit_link as
+WITH
+	typevalue AS
+        (
+        SELECT edit_typevalue.typevalue, edit_typevalue.id, edit_typevalue.idval
+        FROM edit_typevalue
+        WHERE edit_typevalue.typevalue::text = ANY (ARRAY['sector_type'::character varying::text, 'presszone_type'::character varying::text, 'dma_type'::character varying::text, 'dqa_type'::character varying::text])
+        ),
+	sector_table as
+		(
+		select sector_id, name as sector_name, macrosector_id, stylesheet, id::varchar(16) as sector_type
+		from sector left JOIN typevalue t ON t.id::text = sector.sector_type AND t.typevalue::text = 'sector_type'::text
+		),
+	dma_table as
+		(
+		select dma_id, name as dma_name, macrodma_id, stylesheet, id::varchar(16) as dma_type from dma
+		left JOIN typevalue t ON t.id::text = dma.dma_type AND t.typevalue::text = 'dma_type'::text
+		),
+	presszone_table as
+		(
+		select presszone_id, name as presszone_name, head as presszone_head, stylesheet, id::varchar(16) as presszone_type
+		from presszone left JOIN typevalue t ON t.id::text = presszone.presszone_type AND t.typevalue::text = 'presszone_type'::text
+		),
+	dqa_table as
+		(
+		select dqa_id, name as dqa_name, stylesheet, id::varchar(16) as dqa_type, macrodqa_id from dqa
+		left JOIN typevalue t ON t.id::text = dqa.dqa_type AND t.typevalue::text = 'dqa_type'::text
+		),
+    inp_network_mode AS
+    	(
+         select value FROM config_param_user WHERE parameter::text = 'inp_options_networkmode'::text AND config_param_user.cur_user::text = CURRENT_USER
+        ),
+    link_psector AS
+        (
+        SELECT DISTINCT ON (pp.connec_id, pp.state) 'CONNEC' AS feature_type, pp.connec_id AS feature_id, pp.state AS p_state, pp.psector_id, pp.link_id
+        FROM plan_psector_x_connec pp
+        JOIN selector_psector sp ON sp.cur_user = current_user AND sp.psector_id = pp.psector_id
+        ORDER BY pp.connec_id, pp.state, pp.link_id desc nulls last
+        ),
+    link_selector as
+        (
+        SELECT DISTINCT l.link_id
+        FROM link l
+        JOIN selector_state s ON s.cur_user =current_user AND l.state =s.state_id
+		LEFT JOIN link_psector lp0 ON lp0.link_id = l.link_id AND lp0.p_state = 0
+		LEFT JOIN link_psector lp1 ON lp1.link_id = l.link_id AND lp1.p_state = 1
+		WHERE lp0.link_id IS NULL
+        ),
+    link_selected as
+    	(
+		SELECT l.link_id,
+	    l.feature_type,
+	    l.feature_id,
+	    l.exit_type,
+	    l.exit_id,
+	    l.state,
+	    l.expl_id,
+	    l.sector_id,
+	    sector_name,
+	    sector_type,
+	    macrosector_id,
+	    l.presszone_id,
+	    presszone_name,
+	    presszone_type,
+	    presszone_head,
+	    l.dma_id,
+	    dma_name,
+	    dma_type,
+	    macrodma_id,
+	    l.dqa_id,
+	    dqa_name,
+	    dqa_type,
+	    macrodqa_id,
+	    l.exit_topelev,
+	    l.exit_elev,
+	    l.fluid_type,
+	    st_length(l.the_geom)::numeric(12,3) as gis_length,
+	    l.the_geom,
+	    l.muni_id,
+	    l.expl_id2,
+	    l.epa_type,
+	    l.is_operative,
+	    l.staticpressure,
+	    l.connecat_id,
+	    l.workcat_id,
+	    l.workcat_id_end,
+	    l.builtdate,
+	    l.enddate,
+	    l.lastupdate,
+	    l.lastupdate_user,
+	    l.uncertain,
+	    l.minsector_id,
+	    l.macrominsector_id,
+	   	CASE
+	       WHEN l.sector_id > 0 AND l.is_operative = true AND l.epa_type = 'JUNCTION'::character varying(16)::text AND inp_network_mode.value = '4'::text
+	       THEN l.epa_type::character varying
+	       ELSE NULL::character varying(16)
+	    END AS inp_type
+		FROM inp_network_mode, link_selector
+	    JOIN link l using (link_id)
+	    JOIN selector_expl se ON ((se.cur_user =current_user AND se.expl_id = l.expl_id) or (se.cur_user =current_user AND se.expl_id = l.expl_id2))
+        JOIN selector_sector sc ON (sc.cur_user = CURRENT_USER AND sc.sector_id = l.sector_id)
+		JOIN sector_table ON sector_table.sector_id = l.sector_id
+	    LEFT JOIN presszone_table ON presszone_table.presszone_id = l.presszone_id
+	    LEFT JOIN dma_table ON dma_table.dma_id = l.dma_id
+	    LEFT JOIN dqa_table ON dqa_table.dqa_id = l.dqa_id
+		)
+    SELECT l.*
+	FROM link_selected l;
 
 -- 24/03/2025
 DROP VIEW IF EXISTS v_ui_doc_x_arc;
