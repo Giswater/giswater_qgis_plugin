@@ -461,6 +461,7 @@ class CalculatePriority:
            tools_qt.set_widget_text(dlg, dlg.btn_again, "Next")
            dlg.btn_save2file.setEnabled(True)
         else:
+            dlg.progressBar.setValue(100)
             tools_qt.set_widget_text(dlg, dlg.btn_again, "Try again")
         dlg.executing = False
         self.timer.stop()
