@@ -2832,12 +2832,12 @@ FROM _connec;
 
 
 INSERT INTO gully (gully_id, code, top_elev, ymax, sandbox, matcat_id, gully_type, gullycat_id, units, groove, siphon,
-connec_arccat_id, connec_length, connec_depth, arc_id, "_pol_id_", sector_id, state, state_type, annotation, observ,
+_connec_arccat_id, connec_length, connec_depth, arc_id, "_pol_id_", sector_id, state, state_type, annotation, observ,
 "comment", dma_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end,
 builtdate, enddate, ownercat_id, muni_id, postcode, streetaxis_id, postnumber, postcomplement, streetaxis2_id,
 postnumber2, postcomplement2, descript, link, verified, rotation, the_geom, undelete, label_x, label_y, label_rotation,
 publish, inventory, uncertain, expl_id, num_value, feature_type, tstamp, pjoint_type, pjoint_id, lastupdate,
-lastupdate_user, insert_user, district_id, workcat_id_plan, asset_id, connec_matcat_id, connec_y2, gullycat2_id,
+lastupdate_user, insert_user, district_id, workcat_id_plan, asset_id, _connec_matcat_id, connec_y2, gullycat2_id,
 epa_type, groove_height, groove_length, units_placement, drainzone_id, expl_id2, adate, adescript, siphon_type,
 odorflap, placement_type, access_type, label_quadrant, minsector_id, macrominsector_id, streetname, streetname2,
 dwfzone_id, datasource, omunit_id, lock_level)
@@ -2884,3 +2884,23 @@ INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,
 
 INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,widgetcontrols,hidden)
 	VALUES ('cat_connec','form_feature','tab_none','estimated_depth','double','text','Estimated depth:','Estimated depth',false,false,true,false,'{"setMultiline":false}'::json,false);
+
+DO $func$
+DECLARE
+  gullyr record;
+  linkr record;
+BEGIN
+  FOR gullyr IN (SELECT * FROM gully)
+  LOOP
+	SELECT * into linkr FROM link WHERE feature_id = gullyr.gully_id;
+    IF FOUND THEN
+      IF (SELECT conneccat_id FROM link WHERE feature_id = gullyr.gully_id) IS NULL THEN
+        UPDATE link SET conneccat_id = gullyr._connec_arccat_id WHERE feature_id = gullyr.gully_id;
+      END IF;
+    ELSE
+      EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client": {"device": 4, "lang": "en_US", "infoType": 1, "epsg": 25831}, "form": {}, "feature": {"id": "[' || gullyr.gully_id || ']"},
+     "data": {"filterFields": {}, "pageInfo": {}, "feature_type": "GULLY"}}$$);';
+      UPDATE link SET conneccat_id = gullyr._connec_arccat_id WHERE feature_id = gullyr.gully_id;
+    END IF;
+  END LOOP;
+END $func$;

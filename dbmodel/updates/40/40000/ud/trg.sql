@@ -549,7 +549,7 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_gully_proximity();
 CREATE TRIGGER gw_trg_gully_proximity_update AFTER UPDATE OF the_geom ON gully
 FOR EACH ROW EXECUTE FUNCTION gw_trg_gully_proximity();
 
-CREATE TRIGGER gw_trg_link_data AFTER UPDATE OF epa_type, state_type, expl_id2, connec_arccat_id, fluid_type ON gully
+CREATE TRIGGER gw_trg_link_data AFTER UPDATE OF epa_type, state_type, expl_id2, _connec_arccat_id, fluid_type ON gully
 FOR EACH ROW EXECUTE FUNCTION gw_trg_link_data('gully');
 
 CREATE TRIGGER gw_trg_typevalue_fk_insert AFTER INSERT ON gully

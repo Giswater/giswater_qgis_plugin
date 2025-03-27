@@ -39,7 +39,7 @@ BEGIN
 
 	--getting original values
 	SELECT gully_id, top_elev, ymax, sandbox, gully.matcat_id, gully.gully_type, gullycat_id, units, groove, siphon,
-		connec_arccat_id, annotation, observ, expl_id, the_geom INTO rec_gully
+		_connec_arccat_id, annotation, observ, expl_id, the_geom INTO rec_gully
 	FROM gully JOIN cat_gully ON cat_gully.id=gully.gullycat_id
 	WHERE gully_id=NEW.gully_id;
 
@@ -143,7 +143,7 @@ BEGIN
 				new_ymax=NEW.ymax, old_sandbox=rec_gully.sandbox, new_sandbox=NEW.sandbox, old_matcat_id=rec_gully.matcat_id,
 				new_matcat_id=NEW.matcat_id, old_gully_type=rec_gully.gully_type, new_gully_type=NEW.gully_type, old_gullycat_id=rec_gully.gullycat_id,
 				new_gullycat_id=NEW.gullycat_id, old_units=rec_gully.units, new_units=NEW.units, old_groove=rec_gully.groove,
-				new_groove=NEW.groove, old_siphon=rec_gully.siphon, new_siphon=NEW.siphon,new_connec_arccat_id=NEW.connec_arccat_id, old_connec_arccat_id=rec_gully.connec_arccat_id,
+				new_groove=NEW.groove, old_siphon=rec_gully.siphon, new_siphon=NEW.siphon,new_connec_arccat_id=NEW.connec_arccat_id, old_connec_arccat_id=rec_gully._connec_arccat_id,
 				old_annotation=rec_gully.annotation,new_annotation=NEW.annotation, old_observ=rec_gully.observ, new_observ=NEW.observ, review_obs=NEW.review_obs, expl_id=NEW.expl_id,
 				the_geom=NEW.the_geom, review_status_id=v_review_status, field_date=NEW.field_date, field_user=current_user
        			WHERE gully_id=NEW.gully_id;
@@ -156,7 +156,7 @@ BEGIN
 				new_siphon, old_connec_arccat_id, new_connec_arccat_id, old_annotation, new_annotation, old_observ, new_observ, review_obs, expl_id, the_geom, review_status_id, field_date, field_user)
 				VALUES (NEW.gully_id, rec_gully.top_elev, NEW.top_elev, rec_gully.ymax, NEW.ymax, rec_gully.sandbox, NEW.sandbox,
 				rec_gully.matcat_id,NEW.matcat_id, rec_gully.gully_type, NEW.gully_type, rec_gully.gullycat_id, NEW.gullycat_id, rec_gully.units,
-				NEW.units, rec_gully.groove, NEW.groove, rec_gully.siphon, NEW.siphon, rec_gully.connec_arccat_id, NEW.connec_arccat_id,
+				NEW.units, rec_gully.groove, NEW.groove, rec_gully.siphon, NEW.siphon, rec_gully._connec_arccat_id, NEW.connec_arccat_id,
 				rec_gully.annotation, NEW.annotation, rec_gully.observ, NEW.observ, NEW.review_obs, NEW.expl_id, NEW.the_geom, v_review_status,NEW.field_date, current_user);
 
 			END IF;

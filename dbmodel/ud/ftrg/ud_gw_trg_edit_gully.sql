@@ -584,7 +584,7 @@ BEGIN
 		-- FEATURE INSERT
 		IF v_matfromcat THEN
 
-			INSERT INTO gully (gully_id, code, top_elev, "ymax",sandbox, matcat_id, gully_type, gullycat_id, units, groove, connec_arccat_id, connec_length,
+			INSERT INTO gully (gully_id, code, top_elev, "ymax",sandbox, matcat_id, gully_type, gullycat_id, units, groove, _connec_arccat_id, connec_length,
 				connec_depth, siphon, arc_id, sector_id, "state",state_type, annotation, "observ", "comment", dma_id, soilcat_id, function_type,
 				category_type, fluid_type, location_type, workcat_id, workcat_id_end, workcat_id_plan, builtdate, enddate, ownercat_id, muni_id,
 				postcode, district_id, streetaxis_id, postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, descript, rotation,
@@ -603,7 +603,7 @@ BEGIN
 				NEW.connec_y2, NEW.placement_type, NEW.label_quadrant, NEW.access_type, NEW.streetname, NEW.streetname2, NEW.lock_level, NEW.length, NEW.width);
 		ELSE
 
-			INSERT INTO gully (gully_id, code, top_elev, "ymax",sandbox, matcat_id, gully_type, gullycat_id, units, groove, connec_arccat_id, connec_length,
+			INSERT INTO gully (gully_id, code, top_elev, "ymax",sandbox, matcat_id, gully_type, gullycat_id, units, groove, _connec_arccat_id, connec_length,
 				connec_depth, siphon, arc_id, sector_id, "state",state_type, annotation, "observ", "comment", dma_id, soilcat_id, function_type,
 				category_type, fluid_type, location_type, workcat_id, workcat_id_end, workcat_id_plan, builtdate, enddate, ownercat_id, muni_id,
 				postcode, district_id, streetaxis_id, postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, descript, rotation,
@@ -912,7 +912,7 @@ BEGIN
 		IF v_matfromcat THEN
 			UPDATE gully
 			SET code=NEW.code, top_elev=NEW.top_elev, ymax=NEW."ymax", sandbox=NEW.sandbox, matcat_id=NEW.matcat_id, gully_type=NEW.gully_type, gullycat_id=NEW.gullycat_id, units=NEW.units,
-			groove=NEW.groove, connec_arccat_id=NEW.connec_arccat_id, connec_length=NEW.connec_length, connec_depth=NEW.connec_depth, siphon=NEW.siphon, sector_id=NEW.sector_id,
+			groove=NEW.groove, _connec_arccat_id=NEW.connec_arccat_id, connec_length=NEW.connec_length, connec_depth=NEW.connec_depth, siphon=NEW.siphon, sector_id=NEW.sector_id,
 			"state"=NEW."state",  state_type=NEW.state_type, annotation=NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id,
 			function_type=NEW.function_type, category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id,
 			workcat_id_end=NEW.workcat_id_end, workcat_id_plan=NEW.workcat_id_plan, builtdate=NEW.builtdate, enddate=NEW.enddate,
@@ -928,7 +928,7 @@ BEGIN
 		ELSE
 			UPDATE gully
 			SET code=NEW.code, top_elev=NEW.top_elev, ymax=NEW."ymax", sandbox=NEW.sandbox, matcat_id=NEW.matcat_id, gully_type=NEW.gully_type, gullycat_id=NEW.gullycat_id, units=NEW.units,
-			groove=NEW.groove, connec_arccat_id=NEW.connec_arccat_id, connec_length=NEW.connec_length, connec_depth=NEW.connec_depth, siphon=NEW.siphon, sector_id=NEW.sector_id,
+			groove=NEW.groove, _connec_arccat_id=NEW.connec_arccat_id, connec_length=NEW.connec_length, connec_depth=NEW.connec_depth, siphon=NEW.siphon, sector_id=NEW.sector_id,
 			"state"=NEW."state",  state_type=NEW.state_type, annotation=NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id,
 			function_type=NEW.function_type, category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id,
 			workcat_id_end=NEW.workcat_id_end, workcat_id_plan=NEW.workcat_id_plan, builtdate=NEW.builtdate, enddate=NEW.enddate,

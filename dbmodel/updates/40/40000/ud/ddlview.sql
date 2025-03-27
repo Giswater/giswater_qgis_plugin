@@ -490,7 +490,8 @@ AS WITH
 			date_trunc('second'::text, l.lastupdate) AS lastupdate,
 			l.lastupdate_user,
 			l.uncertain,
-            l.datasource
+            l.datasource,
+            l.verified
 			from inp_network_mode, link_state
 			JOIN link l using (link_id)
 			JOIN selector_expl se ON (se.cur_user =current_user AND se.expl_id = l.expl_id) OR (se.cur_user =current_user AND se.expl_id = l.expl_id2)
@@ -1839,7 +1840,6 @@ CREATE OR REPLACE VIEW vu_gully AS
     gully.groove_height,
     gully.groove_length,
     gully.siphon,
-    gully.connec_arccat_id,
     gully.connec_length,
     gully.top_elev - gully.ymax + gully.sandbox AS connec_y1,
     gully.connec_y2,
@@ -1904,10 +1904,6 @@ CREATE OR REPLACE VIEW vu_gully AS
     gully.pjoint_id,
     gully.pjoint_type,
     gully.asset_id,
-        CASE
-            WHEN gully.connec_matcat_id IS NULL THEN cc.matcat_id::text
-            ELSE gully.connec_matcat_id
-        END AS connec_matcat_id,
     gully.gullycat2_id,
     gully.units_placement,
     gully.expl_id2,
@@ -1937,7 +1933,7 @@ CREATE OR REPLACE VIEW vu_gully AS
      LEFT JOIN cat_feature ON gully.gully_type::text = cat_feature.id::text
      LEFT JOIN streetaxis c ON c.id::text = gully.streetaxis_id::text
      LEFT JOIN streetaxis d ON d.id::text = gully.streetaxis2_id::text
-     LEFT JOIN cat_connec cc ON cc.id::text = gully.connec_arccat_id::text
+     LEFT JOIN cat_connec cc ON cc.id::text = gully._connec_arccat_id::text
      LEFT JOIN value_state_type vst ON vst.id = gully.state_type
      LEFT JOIN ext_municipality mu ON gully.muni_id = mu.muni_id
      LEFT JOIN drainzone USING (drainzone_id);
@@ -2025,15 +2021,15 @@ AS WITH
 			gully.groove_height,
 			gully.groove_length,
 			gully.siphon,
-			gully.connec_arccat_id,
+			gully._connec_arccat_id as connec_arccat_id,
 			gully.connec_length,
 			CASE
 			   WHEN ((gully.top_elev - gully.ymax + gully.sandbox + gully.connec_y2) / 2::numeric) IS NOT NULL THEN ((gully.top_elev - gully.ymax + gully.sandbox + gully.connec_y2) / 2::numeric)::numeric(12,3)
 			   ELSE gully.connec_depth
 			END AS connec_depth,
 			CASE
-				WHEN gully.connec_matcat_id IS NULL THEN cc.matcat_id::text
-				ELSE gully.connec_matcat_id
+				WHEN gully._connec_matcat_id IS NULL THEN cc.matcat_id::text
+				ELSE gully._connec_matcat_id
 			END AS connec_matcat_id,
 			gully.top_elev - gully.ymax + gully.sandbox AS connec_y1,
 			gully.connec_y2,
@@ -2169,7 +2165,7 @@ AS WITH
 			JOIN cat_gully ON gully.gullycat_id::text = cat_gully.id::text
 			JOIN exploitation ON gully.expl_id = exploitation.expl_id
 			JOIN cat_feature ON gully.gully_type::text = cat_feature.id::text
-			JOIN cat_connec cc ON cc.id::text = gully.connec_arccat_id::text
+			JOIN cat_connec cc ON cc.id::text = gully._connec_arccat_id::text
 			JOIN value_state_type vst ON vst.id = gully.state_type
 			JOIN ext_municipality mu ON gully.muni_id = mu.muni_id
 			JOIN sector_table ON gully.sector_id = sector_table.sector_id
