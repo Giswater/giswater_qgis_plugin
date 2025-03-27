@@ -4,9 +4,9 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
+-- Active audit fields for trigger layers
+UPDATE PARENT_SCHEMA.sys_table SET isaudit = true WHERE
+id = ANY (SELECT child_layer FROM PARENT_SCHEMA.cat_feature);
+
 -- Execute the function to do the first snapshot
-SELECT SCHEMA_NAME.gw_fct_set_snapshot('First water network snapshot');
-
-
--- Activate audit
-SELECT PARENT_SCHEMA.gw_fct_audit_schema('enable');
+SELECT SCHEMA_NAME.gw_fct_setsnapshot($${"description": "First water network snapshot"}$$);
