@@ -34,19 +34,19 @@ SELECT col_type_is('man_wtp', 'node_id', 'varchar(16)', 'Column node_id should b
 SELECT col_type_is('man_wtp', 'name', 'varchar(50)', 'Column name should be varchar(50)');
 SELECT col_type_is('man_wtp', 'maxflow', 'double precision', 'Column maxflow should be double precision');
 SELECT col_type_is('man_wtp', 'opsflow', 'double precision', 'Column opsflow should be double precision');
-SELECT col_type_is('man_wtp', 'screening', 'boolean', 'Column screening should be boolean');
-SELECT col_type_is('man_wtp', 'desander', 'boolean', 'Column desander should be boolean');
-SELECT col_type_is('man_wtp', 'chemcond', 'boolean', 'Column chemcond should be boolean');
-SELECT col_type_is('man_wtp', 'oxidation', 'boolean', 'Column oxidation should be boolean');
-SELECT col_type_is('man_wtp', 'coagulation', 'boolean', 'Column coagulation should be boolean');
-SELECT col_type_is('man_wtp', 'floculation', 'boolean', 'Column floculation should be boolean');
-SELECT col_type_is('man_wtp', 'presendiment', 'boolean', 'Column presendiment should be boolean');
-SELECT col_type_is('man_wtp', 'sediment', 'boolean', 'Column sediment should be boolean');
-SELECT col_type_is('man_wtp', 'filtration', 'boolean', 'Column filtration should be boolean');
-SELECT col_type_is('man_wtp', 'disinfection', 'boolean', 'Column disinfection should be boolean');
-SELECT col_type_is('man_wtp', 'chemtreatment', 'boolean', 'Column chemtreatment should be boolean');
-SELECT col_type_is('man_wtp', 'storage', 'boolean', 'Column storage should be boolean');
-SELECT col_type_is('man_wtp', 'sludgeman', 'boolean', 'Column sludgeman should be boolean');
+SELECT col_type_is('man_wtp', 'screening', 'integer', 'Column screening should be integer');
+SELECT col_type_is('man_wtp', 'desander', 'integer', 'Column desander should be integer');
+SELECT col_type_is('man_wtp', 'chemcond', 'integer', 'Column chemcond should be integer');
+SELECT col_type_is('man_wtp', 'oxidation', 'integer', 'Column oxidation should be integer');
+SELECT col_type_is('man_wtp', 'coagulation', 'integer', 'Column coagulation should be integer');
+SELECT col_type_is('man_wtp', 'floculation', 'integer', 'Column floculation should be integer');
+SELECT col_type_is('man_wtp', 'presendiment', 'integer', 'Column presendiment should be integer');
+SELECT col_type_is('man_wtp', 'sediment', 'integer', 'Column sediment should be integer');
+SELECT col_type_is('man_wtp', 'filtration', 'integer', 'Column filtration should be integer');
+SELECT col_type_is('man_wtp', 'disinfection', 'integer', 'Column disinfection should be integer');
+SELECT col_type_is('man_wtp', 'chemtreatment', 'integer', 'Column chemtreatment should be integer');
+SELECT col_type_is('man_wtp', 'storage', 'integer', 'Column storage should be integer');
+SELECT col_type_is('man_wtp', 'sludgeman', 'integer', 'Column sludgeman should be integer');
 
 -- Check foreign keys
 SELECT has_fk('man_wtp', 'Table man_wtp should have foreign keys');
@@ -57,4 +57,4 @@ SELECT col_not_null('man_wtp', 'node_id', 'Column node_id should be NOT NULL');
 
 SELECT * FROM finish();
 
-ROLLBACK; 
+ROLLBACK;
