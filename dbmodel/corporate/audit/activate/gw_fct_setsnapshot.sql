@@ -4,9 +4,9 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
--- DROP FUNCTION SCHEMA_NAME.gw_fct_set_snapshot();
+-- DROP FUNCTION SCHEMA_NAME.gw_fct_setsnapshot();
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_set_snapshot(p_description TEXT DEFAULT NULL)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_setsnapshot(p_data json)
  RETURNS integer
  LANGUAGE plpgsql
 AS $function$
@@ -17,15 +17,22 @@ v_schemaname text;
 v_child text;
 v_pk_name text;
 v_table_name text;
-v_date DATE := CURRENT_DATE;
+-- entorno de pruevas (fecha harcdoded):
+-- v_date date := CURRENT_DATE;
+v_date date := '2025-02-20';
+
+v_tables text[];
+v_description text;
 
 BEGIN
 	-- search path
 	SET search_path = "SCHEMA_NAME", public;
 	v_schemaname = 'SCHEMA_NAME';
 
+	v_description = p_data ->>'description';
+
 	-- Insert the first snapshot
-	INSERT INTO snapshot (date, descripcion) VALUES (v_date, p_description);
+	INSERT INTO snapshot (date, description, schema) VALUES (v_date, v_description, 'PARENT_SCHEMA');
 
 	-- Get childs from cat_feature
 	FOR v_child IN (SELECT child_layer FROM PARENT_SCHEMA.cat_feature) LOOP
@@ -41,7 +48,8 @@ BEGIN
 
 			-- Get primary key column name
 			SELECT column_name INTO v_pk_name FROM information_schema.COLUMNS
-			WHERE table_schema = 'PARENT_SCHEMA' AND table_name = v_child LIMIT 1;
+			WHERE table_schema = 'PARENT_SCHEMA' AND table_name = v_child
+			ORDER BY ordinal_position LIMIT 1;
 
 			-- Add date column at the end of the table
             EXECUTE format('ALTER TABLE %I ADD COLUMN date DATE ', v_table_name);
@@ -57,7 +65,14 @@ BEGIN
 		-- Insert current data and current date from v_child into v_table_name
 		EXECUTE format('INSERT INTO %I SELECT *, %L FROM PARENT_SCHEMA.%I', v_table_name, v_date, v_child);
 
+		v_tables := v_tables || v_child;
+
     END LOOP;
+
+	UPDATE snapshot SET tables = v_tables WHERE date = v_date;
+
+	-- Activate audit
+	PERFORM PARENT_SCHEMA.gw_fct_update_audit_triggers();
 
 return 0;
 END;
