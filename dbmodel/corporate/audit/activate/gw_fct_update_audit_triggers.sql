@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 CREATE OR REPLACE FUNCTION PARENT_SCHEMA.gw_fct_update_audit_triggers()
-  RETURNS integer AS
+  RETURNS json AS
 $BODY$
 
 /*
@@ -38,7 +38,11 @@ BEGIN
 		END IF;
 	END LOOP;
 
-return 0;
+	-- Return JSON
+	RETURN jsonb_build_object(
+	        'status', 'Accepted'
+	    );
+
 END;
 
 $BODY$
