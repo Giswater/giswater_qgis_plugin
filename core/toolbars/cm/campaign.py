@@ -7,8 +7,10 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from functools import partial
 
+from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtCore import QDate
-from qgis.PyQt.QtWidgets import QLineEdit, QDateEdit, QCheckBox, QComboBox, QWidget, QLabel, QGridLayout, QSpacerItem, QSizePolicy, QTextEdit
+from qgis.PyQt.QtWidgets import QLineEdit, QDateEdit, QCheckBox, QComboBox, QWidget, QLabel, QGridLayout, QSpacerItem, \
+    QSizePolicy, QTextEdit, QMenu, QAction, QCompleter, QToolButton
 from .... import global_vars
 from ....libs import tools_qt, tools_db, tools_qgis
 from ...utils import tools_gw
@@ -24,9 +26,9 @@ class Campaign:
         self.campaign_date_format = 'yyyy-MM-dd'
         self.dialog = None
         self.campaign_type = None
-
-
-
+        self.canvas = global_vars.canvas
+        self.campaign_saved = False
+        self.is_new_campaign = True
 
     def create_campaign(self, campaign_id=None, is_new=True, dialog_type="review"):
         """ Entry point for campaign creation or editing """
@@ -46,7 +48,6 @@ class Campaign:
         # INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('cm_campaing_type', '1', 'Review', NULL, NULL);
         # INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('cm_campaing_type', '2', 'Visit', NULL, NULL);
 
-
         modes = {"review": 1, "visit": 2}
         self.campaign_type = modes.get(mode, 1)
 
@@ -60,6 +61,7 @@ class Campaign:
         if campaign_id:
             body["feature"]["id"] = campaign_id
         p_data = tools_gw.create_body(body=body)
+        self.is_new_campaign = campaign_id is None
 
         response = tools_gw.execute_procedure("gw_fct_getcampaign", p_data, schema_name="cm")
         if not response or response.get("status") != "Accepted":
@@ -88,6 +90,9 @@ class Campaign:
 
         self.dialog.btn_cancel.clicked.connect(self.dialog.reject)
         self.dialog.btn_accept.clicked.connect(self.save_campaign)
+        self.dialog.tab_widget.currentChanged.connect(self._on_tab_change)
+        self.setup_tab_relations()
+        self._update_feature_completer(self.dialog)
 
         tools_gw.open_dialog(self.dialog, dlg_name="add_campaign")
 
@@ -134,6 +139,7 @@ class Campaign:
 
         return widget
 
+
     def set_widget_value(self, widget, value):
         """Sets the widget value from JSON"""
         if isinstance(widget, QLineEdit):
@@ -152,25 +158,37 @@ class Campaign:
             if index >= 0:
                 widget.setCurrentIndex(index)
 
-    def save_campaign(self):
-        """Save campaign data from the dialog"""
+
+    def _on_tab_change(self, index):
+        # Get the tab object at the changed index
+        tab = self.dialog.tab_widget.widget(index)
+        if tab.objectName() == "tab_relations" and self.is_new_campaign and not self.campaign_saved:
+            self.save_campaign(from_tab_change=True)
+
+
+    def save_campaign(self, from_tab_change=False):
         try:
-            # Get form values from dialog
             fields_str = self.extract_campaign_fields(self.dialog)
-            print("CAMPAIGN_TYPE: ", self.campaign_type)
-            print("hola: ", fields_str)
-
-            # Prepare request body
-            feature = '"tableName":"om_campaign", "idName":"id"'
             extras = f'"fields":{{{fields_str}}}, "campaign_type":{self.campaign_type}'
-            body = tools_gw.create_body(feature=feature, extras=extras)
+            body = tools_gw.create_body(feature='"tableName":"om_campaign", "idName":"id"', extras=extras)
 
-            # Execute the save procedure
             result = tools_gw.execute_procedure("gw_fct_setcampaign", body, schema_name="cm")
 
             if result.get("status") == "Accepted":
                 tools_qgis.show_info("Campaign saved successfully.")
-                self.dialog.accept()
+                self.campaign_saved = True
+                self.is_new_campaign = False
+
+                # Update campaign ID in the dialog
+                campaign_id = result.get("body", {}).get("campaign_id")
+                if campaign_id:
+                    id_field = self.dialog.findChild(QLineEdit, "id")
+                    if id_field:
+                        id_field.setText(str(campaign_id))
+
+                if not from_tab_change:
+                    self.dialog.accept()
+
             else:
                 tools_qgis.show_warning(result.get("message", "Failed to save campaign."))
 
@@ -225,3 +243,156 @@ class Campaign:
             fields = fields[:-2]
 
         return fields
+
+
+    def setup_tab_relations(self):
+        #self.dialog.tab_relations.setCurrentIndex(0)
+        self.feature_type = "arc"
+        self.rubber_band = tools_gw.create_rubberband(self.canvas)
+
+        tools_gw.get_signal_change_tab(self.dialog)
+
+        highlight_mappings = {
+            "arc": ("v_edit_arc", "arc_id", 5),
+            "node": ("v_edit_node", "node_id", 10),
+            "connec": ("v_edit_connec", "connec_id", 10),
+            "gully": ("v_edit_gully", "gully_id", 10)
+        }
+
+        for name, (layer, id_column, size) in highlight_mappings.items():
+            tbl = getattr(self.dialog, f"tbl_campaign_x_{name}", None)
+            if tbl:
+                tbl.clicked.connect(
+                    partial(tools_qgis.highlight_feature_by_id, tbl, layer, id_column, self.rubber_band, size))
+
+        self.dialog.tab_feature.currentChanged.connect(
+            lambda: self._update_feature_completer(self.dialog)
+        )
+        self.dialog.btn_insert.clicked.connect(
+            lambda: self.insert_campaign_relation(self.dialog)
+        )
+
+        self.dialog.btn_delete.clicked.connect(
+            lambda: self.delete_campaign_relation(self.dialog)
+        )
+
+        self.dialog.btn_snapping.clicked.connect(
+            partial(tools_gw.selection_init, self, self.dialog, None, False)
+        )
+
+    def _update_feature_completer(self, dlg):
+        tab_name = dlg.tab_feature.currentWidget().objectName()
+        table_map = {
+            'tab': ('v_edit_arc', 'arc_id'),
+            'tab_2': ('v_edit_node', 'node_id'),
+            'tab_3': ('v_edit_connec', 'connec_id'),
+            'tab_4': ('v_edit_gully', 'gully_id')
+        }
+        table_name, id_column = table_map.get(tab_name, (None, None))
+        if not table_name:
+            return
+
+        sql = f"SELECT {id_column}::text FROM {table_name} ORDER BY {id_column} LIMIT 100"
+        result = tools_db.get_rows(sql)
+        values = [row[id_column] for row in result if row.get(id_column)]
+
+        completer = QCompleter(values)
+        completer.setCaseSensitivity(False)
+        dlg.feature_id.setCompleter(completer)
+
+
+    def _load_relation_table(self, view, table_name, id_column, campaign_id):
+        """Load existing relations into the view"""
+        query = f"""
+            SELECT a.{id_column} AS id, b.descript 
+            FROM {table_name} a
+            JOIN v_edit_{id_column.replace('_id', '')} b ON a.{id_column} = b.gid
+            WHERE a.campaign_id = {campaign_id}
+        """
+        tools_qt.populate_wtableview(view, query)
+
+
+    def insert_campaign_relation(self, dialog):
+        """Insert feature into the corresponding om_campaign_x_* table"""
+
+        # Get campaign ID from the dialog field
+        for w in dialog.findChildren(QLineEdit):
+            if w.property("columnname") == "id":
+                campaign_id = tools_qt.get_text(dialog, w)
+                break
+        print("campaign_id: ", campaign_id)
+        if not campaign_id or not campaign_id.isdigit():
+            tools_qgis.show_warning("Invalid campaign ID.")
+            return
+
+        # Get the feature ID from the line edit
+        feature_id = dialog.feature_id.text().strip()
+        if not feature_id or not feature_id.isdigit():
+            tools_qgis.show_warning("Feature ID must be a number.")
+            return
+
+        # Determine current tab and corresponding table/column
+        tab_name = dialog.tab_feature.currentWidget().objectName()
+        table_map = {
+            "tab": ("om_campaign_x_arc", "arc_id"),
+            "tab_2": ("om_campaign_x_node", "node_id"),
+            "tab_3": ("om_campaign_x_connec", "connec_id"),
+            "tab_4": ("om_campaign_x_gully", "gully_id"),
+        }
+
+        table_info = table_map.get(tab_name)
+        if not table_info:
+            tools_qgis.show_warning("Unknown feature tab.")
+            return
+
+        table_name, column_name = table_info
+
+        # Build and execute SQL
+        sql = f"""
+            INSERT INTO cm.{table_name} (campaign_id, {column_name})
+            VALUES ({campaign_id}, '{feature_id}')
+        """
+        ok = tools_db.execute_sql(sql)
+        if ok:
+            tools_qgis.show_info(f"{feature_id} inserted into {table_name}")
+            dialog.feature_id.clear()
+            self._refresh_relation_table(dialog)
+        else:
+            tools_qgis.show_warning("Insert failed.")
+
+
+    def delete_campaign_relation(self, dialog):
+        """Delete selected row from the active relation table"""
+        current_tab = dialog.tab_feature.currentWidget().objectName()
+        table = self._get_relation_table(dialog, current_tab)
+        selected = table.selectedItems()
+        if selected:
+            row = selected[0].row()
+            table.removeRow(row)
+
+
+    def _get_relation_table(self, dialog, tab_name):
+        return {
+            'tab': dialog.tbl_campaign_x_arc,
+            'tab_2': dialog.tbl_campaign_x_node,
+            'tab_3': dialog.tbl_campaign_x_connec,
+            'tab_4': dialog.tbl_campaign_x_gully,
+        }.get(tab_name)
+
+
+    def _get_relation_description(self, tab_name, id_):
+        """Fetch feature description from DB based on tab and ID"""
+        table_map = {
+            'tab': ('v_edit_arc', 'gid'),
+            'tab_2': ('v_edit_node', 'gid'),
+            'tab_3': ('v_edit_connec', 'gid'),
+            'tab_4': ('v_edit_gully', 'gid')
+        }
+        table_name, id_column = table_map.get(tab_name, (None, None))
+        if not table_name:
+            return None
+
+        sql = f"SELECT descript FROM {table_name} WHERE {id_column} = {id_}"
+        result = tools_db.get_row(sql)
+        return result.get("descript") if result else None
+
