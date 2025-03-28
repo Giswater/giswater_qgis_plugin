@@ -526,10 +526,10 @@
                  <property name="topMargin">
                   <number>0</number>
                  </property>
-                 <item row="0" column="0" colspan="2">
-                  <widget class="QPushButton" name="btn_create_asset">
+                 <item row="3" column="0">
+                  <widget class="QPushButton" name="btn_create_audit">
                    <property name="text">
-                    <string>Create DB asset schema</string>
+                    <string>Create DB audit schema</string>
                    </property>
                   </widget>
                  </item>
@@ -540,17 +540,24 @@
                    </property>
                   </widget>
                  </item>
-                 <item row="3" column="0">
-                  <widget class="QPushButton" name="btn_create_audit">
+                 <item row="3" column="2">
+                  <widget class="QPushButton" name="btn_reload_audit_triggers">
                    <property name="text">
-                    <string>Create DB audit schema</string>
+                    <string>Reload audit triggers</string>
                    </property>
                   </widget>
                  </item>
-                 <item row="1" column="0" colspan="2">
+                 <item row="1" column="0" colspan="3">
                   <widget class="QPushButton" name="btn_create_cm">
                    <property name="text">
                     <string>Create DB cm schema</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="0" colspan="3">
+                  <widget class="QPushButton" name="btn_create_asset">
+                   <property name="text">
+                    <string>Create DB asset schema</string>
                    </property>
                   </widget>
                  </item>

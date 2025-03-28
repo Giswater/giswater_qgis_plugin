@@ -5,18 +5,12 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-import json
-import operator
-import datetime
 from functools import partial
 
-from qgis.PyQt.QtCore import QDate, QDateTime
-from qgis.PyQt.QtWidgets import QComboBox, QCheckBox, QDateEdit, QDoubleSpinBox, QSizePolicy, QGridLayout, QLabel, \
-    QTextEdit, QLineEdit, QCompleter, QTabWidget, QWidget, QGroupBox, QMenu, QAction, QPushButton
-from qgis.gui import QgsDateTimeEdit, QgsMapTool
-from qgis.core import QgsRectangle, QgsGeometry, QgsPointXY
-from PyQt5.QtCore import pyqtSignal
-
+from qgis.PyQt.QtCore import QDateTime, QVariant
+from qgis.PyQt.QtWidgets import QCheckBox, QLabel, QLineEdit, QWidget, QMenu, QAction, QPushButton
+from qgis.core import QgsGeometry, QgsPointXY, QgsVectorLayer, QgsFeature, QgsProject, QgsField
+from qgis.PyQt.QtGui import QColor
 from ..dialog import GwAction
 from ...ui.ui_manager import GwSnapshotViewUi
 from ...utils import tools_gw
@@ -63,6 +57,7 @@ class GwSnapshotViewButton(GwAction):
 
         # Set default date to current date
         self.date.setDateTime(QDateTime.currentDateTime())
+        self.date.setMaximumDateTime(QDateTime.currentDateTime())
 
         # Handle coordinate actions
         self._handle_coordinates_actions()
@@ -197,11 +192,81 @@ def run(**kwargs):
     result = tools_gw.execute_procedure('gw_fct_getsnapshot', body, schema_name='audit')
 
     if result.get("status") == "Accepted" and result.get("body").get("data"):
-        tools_gw.add_layer_temp(dlg.dlg_snapshot_view, result['body']['data'], None, False, call_set_tabs_enabled=False, close=False)
+        layers = result['body']['data']
+        add_layers_temp(layers, f"Snapshot - {form["date"]}")
         tools_gw.close_dialog(dlg.dlg_snapshot_view)
     else:
         tools_qgis.show_warning("No results", dialog=dlg.dlg_snapshot_view)
 
 
+def add_layers_temp(layers, group):
+
+    i = 0
+    for layer in layers:
+
+        if not layer['features']:
+            continue
+        geometry_type = layer['geometryType']
+        aux_layer_name = layer['layerName']
+
+        tools_qgis.remove_layer_from_toc(aux_layer_name, group)
+
+        v_layer = QgsVectorLayer(f"{geometry_type}?crs=epsg:{lib_vars.data_epsg}", aux_layer_name, 'memory')
+        fill_layer_temp(v_layer, layer['features'], i, group)
+
+        # Increase iterator
+        i += 1
+
+        qml_path = layer.get('qmlPath')
+        category_field = layer.get('category_field')
+        if qml_path:
+            tools_qgis.load_qml(v_layer, qml_path)
+        elif category_field:
+            cat_field = layer['category_field']
+            size = layer.get('size', default=2)
+            color_values = {'NEW': QColor(0, 255, 0), 'DUPLICATED': QColor(255, 0, 0),
+                            'EXISTS': QColor(240, 150, 0)}
+            tools_qgis.set_layer_categoryze(v_layer, cat_field, size, color_values)
+        else:
+            if geometry_type == 'Point':
+                v_layer.renderer().symbol().setSize(3.5)
+                v_layer.renderer().symbol().setColor(QColor("blue"))
+            elif geometry_type == 'LineString':
+                v_layer.renderer().symbol().setWidth(1.5)
+                v_layer.renderer().symbol().setColor(QColor("blue"))
+            v_layer.renderer().symbol().setOpacity(0.7)
+        global_vars.iface.layerTreeView().refreshLayerSymbology(v_layer.id())
 
 
+def fill_layer_temp(virtual_layer, features, sort_val, group):
+
+    prov = virtual_layer.dataProvider()
+    # Enter editing mode
+    virtual_layer.startEditing()
+
+    for feature in features:
+
+        geometry = tools_qgis.get_geometry_from_json(feature)
+        if not geometry:
+            continue
+        attributes = []
+        fet = QgsFeature()
+        fet.setGeometry(geometry)
+        for key, value in feature['properties'].items():
+            if key == 'the_geom':
+                continue
+            prov.addAttributes([QgsField(str(key), QVariant.String)])
+            attributes.append(value)
+
+        fet.setAttributes(attributes)
+        prov.addFeatures([fet])
+
+    # Commit changes
+    virtual_layer.commitChanges()
+    QgsProject.instance().addMapLayer(virtual_layer, False)
+    root = QgsProject.instance().layerTreeRoot()
+    my_group = root.findGroup(group)
+    if my_group is None:
+        my_group = root.insertGroup(0, group)
+
+    my_group.insertLayer(sort_val, virtual_layer)

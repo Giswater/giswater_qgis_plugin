@@ -935,6 +935,8 @@ class GwAdminButton:
 
         self.dlg_readsql.btn_activate_audit.clicked.connect(partial(self._activate_audit))
 
+        self.dlg_readsql.btn_reload_audit_triggers.clicked.connect(partial(self._reload_audit_triggers))
+
         self.dlg_readsql.btn_create_cm.clicked.connect(partial(self._open_create_cm_project))
 
         self.dlg_readsql.btn_i18n.clicked.connect(partial(self._i18n_manager))
@@ -954,6 +956,16 @@ class GwAdminButton:
             self.create_process("audit_activation")
         else:
             tools_qgis.show_warning("Schema audit not found, please create it first")
+
+    def _reload_audit_triggers(self):
+        """ Update audit triggers to start or stop auditing a table """
+
+        schema_name = tools_qt.get_text(self.dlg_readsql, 'project_schema_name')
+        result = tools_gw.execute_procedure('gw_fct_update_audit_triggers', schema_name = schema_name)
+
+        if result:
+            tools_qgis.show_success("Triggers updated successfully")
+
 
 
     def _manage_translations(self):
