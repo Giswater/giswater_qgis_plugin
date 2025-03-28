@@ -28,7 +28,7 @@ SELECT columns_are(
         'feature_type', 'tstamp', 'pjoint_type', 'pjoint_id', 'lastupdate', 'lastupdate_user', 'insert_user',
         'minsector_id', 'dqa_id', 'staticpressure', 'district_id', 'adate', 'adescript', 'accessibility',
         'workcat_id_plan', 'asset_id', 'epa_type', 'om_state', 'conserv_state', 'priority', 'valve_location',
-        'valve_type', 'shutoff_valve', 'access_type', 'placement_type', 'crmzone_id', 'expl_id2', 'plot_code',
+        '_valve_type', '_shutoff_valve', 'access_type', 'placement_type', 'crmzone_id', 'expl_id2', 'plot_code',
         'brand_id', 'model_id', 'serial_number', 'label_quadrant', 'cat_valve', 'macrominsector_id', 'n_hydrometer',
         'streetname', 'streetname2', 'n_inhabitants', 'supplyzone_id', 'datasource', 'lock_level', 'block_zone'
     ],
@@ -44,12 +44,90 @@ SELECT col_type_is('connec', 'code', 'text', 'Column code should be text');
 SELECT col_type_is('connec', 'top_elev', 'numeric(12,4)', 'Column top_elev should be numeric(12,4)');
 SELECT col_type_is('connec', 'depth', 'numeric(12,4)', 'Column depth should be numeric(12,4)');
 SELECT col_type_is('connec', 'conneccat_id', 'varchar(30)', 'Column conneccat_id should be varchar(30)');
-SELECT col_type_is('connec', 'sector_id', 'integer', 'Column sector_id should be integer');
+SELECT col_type_is('connec', 'sector_id', 'int4', 'Column sector_id should be int4');
 SELECT col_type_is('connec', 'customer_code', 'varchar(30)', 'Column customer_code should be varchar(30)');
-SELECT col_type_is('connec', 'state', 'smallint', 'Column state should be smallint');
-SELECT col_type_is('connec', 'state_type', 'smallint', 'Column state_type should be smallint');
+SELECT col_type_is('connec', 'state', 'int2', 'Column state should be int2');
+SELECT col_type_is('connec', 'state_type', 'int2', 'Column state_type should be int2');
 SELECT col_type_is('connec', 'arc_id', 'varchar(16)', 'Column arc_id should be varchar(16)');
+SELECT col_type_is('connec', 'connec_length', 'numeric(12,3)', 'Column connec_length should be numeric(12,3)');
+SELECT col_type_is('connec', 'annotation', 'text', 'Column annotation should be text');
+SELECT col_type_is('connec', 'observ', 'text', 'Column observ should be text');
+SELECT col_type_is('connec', 'comment', 'text', 'Column comment should be text');
+SELECT col_type_is('connec', 'dma_id', 'int4', 'Column dma_id should be int4');
+SELECT col_type_is('connec', 'presszone_id', 'int4', 'Column presszone_id should be int4');
+SELECT col_type_is('connec', 'soilcat_id', 'varchar(16)', 'Column soilcat_id should be varchar(16)');
+SELECT col_type_is('connec', 'function_type', 'varchar(50)', 'Column function_type should be varchar(50)');
+SELECT col_type_is('connec', 'category_type', 'varchar(50)', 'Column category_type should be varchar(50)');
+SELECT col_type_is('connec', 'fluid_type', 'varchar(50)', 'Column fluid_type should be varchar(50)');
+SELECT col_type_is('connec', 'location_type', 'varchar(50)', 'Column location_type should be varchar(50)');
+SELECT col_type_is('connec', 'workcat_id', 'varchar(255)', 'Column workcat_id should be varchar(255)');
+SELECT col_type_is('connec', 'workcat_id_end', 'varchar(255)', 'Column workcat_id_end should be varchar(255)');
+SELECT col_type_is('connec', 'builtdate', 'date', 'Column builtdate should be date');
+SELECT col_type_is('connec', 'enddate', 'date', 'Column enddate should be date');
+SELECT col_type_is('connec', 'ownercat_id', 'varchar(30)', 'Column ownercat_id should be varchar(30)');
+SELECT col_type_is('connec', 'muni_id', 'int4', 'Column muni_id should be int4');
+SELECT col_type_is('connec', 'postcode', 'varchar(16)', 'Column postcode should be varchar(16)');
+SELECT col_type_is('connec', 'streetaxis_id', 'varchar(16)', 'Column streetaxis_id should be varchar(16)');
+SELECT col_type_is('connec', 'postnumber', 'int4', 'Column postnumber should be int4');
+SELECT col_type_is('connec', 'postcomplement', 'varchar(100)', 'Column postcomplement should be varchar(100)');
+SELECT col_type_is('connec', 'streetaxis2_id', 'varchar(16)', 'Column streetaxis2_id should be varchar(16)');
+SELECT col_type_is('connec', 'postnumber2', 'int4', 'Column postnumber2 should be int4');
+SELECT col_type_is('connec', 'postcomplement2', 'varchar(100)', 'Column postcomplement2 should be varchar(100)');
+SELECT col_type_is('connec', 'descript', 'text', 'Column descript should be text');
+SELECT col_type_is('connec', 'link', 'varchar(512)', 'Column link should be varchar(512)');
+SELECT col_type_is('connec', 'verified', 'int4', 'Column verified should be int4');
+SELECT col_type_is('connec', 'rotation', 'numeric(6,3)', 'Column rotation should be numeric(6,3)');
 SELECT col_type_is('connec', 'the_geom', 'geometry(Point,25831)', 'Column the_geom should be geometry(Point,25831)');
+SELECT col_type_is('connec', 'undelete', 'bool', 'Column undelete should be bool');
+SELECT col_type_is('connec', 'label_x', 'varchar(30)', 'Column label_x should be varchar(30)');
+SELECT col_type_is('connec', 'label_y', 'varchar(30)', 'Column label_y should be varchar(30)');
+SELECT col_type_is('connec', 'label_rotation', 'numeric(6,3)', 'Column label_rotation should be numeric(6,3)');
+SELECT col_type_is('connec', 'publish', 'bool', 'Column publish should be bool');
+SELECT col_type_is('connec', 'inventory', 'bool', 'Column inventory should be bool');
+SELECT col_type_is('connec', 'expl_id', 'int4', 'Column expl_id should be int4');
+SELECT col_type_is('connec', 'num_value', 'numeric(12,3)', 'Column num_value should be numeric(12,3)');
+SELECT col_type_is('connec', 'feature_type', 'varchar(16)', 'Column feature_type should be varchar(16)');
+SELECT col_type_is('connec', 'tstamp', 'timestamp', 'Column tstamp should be timestamp');
+SELECT col_type_is('connec', 'pjoint_type', 'varchar(16)', 'Column pjoint_type should be varchar(16)');
+SELECT col_type_is('connec', 'pjoint_id', 'varchar(16)', 'Column pjoint_id should be varchar(16)');
+SELECT col_type_is('connec', 'lastupdate', 'timestamp', 'Column lastupdate should be timestamp');
+SELECT col_type_is('connec', 'lastupdate_user', 'varchar(50)', 'Column lastupdate_user should be varchar(50)');
+SELECT col_type_is('connec', 'insert_user', 'varchar(50)', 'Column insert_user should be varchar(50)');
+SELECT col_type_is('connec', 'minsector_id', 'int4', 'Column minsector_id should be int4');
+SELECT col_type_is('connec', 'dqa_id', 'int4', 'Column dqa_id should be int4');
+SELECT col_type_is('connec', 'staticpressure', 'numeric(12,3)', 'Column staticpressure should be numeric(12,3)');
+SELECT col_type_is('connec', 'district_id', 'int4', 'Column district_id should be int4');
+SELECT col_type_is('connec', 'adate', 'text', 'Column adate should be text');
+SELECT col_type_is('connec', 'adescript', 'text', 'Column adescript should be text');
+SELECT col_type_is('connec', 'accessibility', 'int2', 'Column accessibility should be int2');
+SELECT col_type_is('connec', 'workcat_id_plan', 'varchar(255)', 'Column workcat_id_plan should be varchar(255)');
+SELECT col_type_is('connec', 'asset_id', 'varchar(50)', 'Column asset_id should be varchar(50)');
+SELECT col_type_is('connec', 'epa_type', 'text', 'Column epa_type should be text');
+SELECT col_type_is('connec', 'om_state', 'text', 'Column om_state should be text');
+SELECT col_type_is('connec', 'conserv_state', 'text', 'Column conserv_state should be text');
+SELECT col_type_is('connec', 'priority', 'text', 'Column priority should be text');
+SELECT col_type_is('connec', 'valve_location', 'text', 'Column valve_location should be text');
+SELECT col_type_is('connec', '_valve_type', 'text', 'Column _valve_type should be text');
+SELECT col_type_is('connec', '_shutoff_valve', 'text', 'Column _shutoff_valve should be text');
+SELECT col_type_is('connec', 'access_type', 'text', 'Column access_type should be text');
+SELECT col_type_is('connec', 'placement_type', 'text', 'Column placement_type should be text');
+SELECT col_type_is('connec', 'crmzone_id', 'int4', 'Column crmzone_id should be int4');
+SELECT col_type_is('connec', 'expl_id2', 'int4', 'Column expl_id2 should be int4');
+SELECT col_type_is('connec', 'plot_code', 'varchar', 'Column plot_code should be varchar');
+SELECT col_type_is('connec', 'brand_id', 'varchar(50)', 'Column brand_id should be varchar(50)');
+SELECT col_type_is('connec', 'model_id', 'varchar(50)', 'Column model_id should be varchar(50)');
+SELECT col_type_is('connec', 'serial_number', 'varchar(100)', 'Column serial_number should be varchar(100)');
+SELECT col_type_is('connec', 'label_quadrant', 'varchar(12)', 'Column label_quadrant should be varchar(12)');
+SELECT col_type_is('connec', 'cat_valve', 'varchar(30)', 'Column cat_valve should be varchar(30)');
+SELECT col_type_is('connec', 'macrominsector_id', 'int4', 'Column macrominsector_id should be int4');
+SELECT col_type_is('connec', 'n_hydrometer', 'int4', 'Column n_hydrometer should be int4');
+SELECT col_type_is('connec', 'streetname', 'varchar(100)', 'Column streetname should be varchar(100)');
+SELECT col_type_is('connec', 'streetname2', 'varchar(100)', 'Column streetname2 should be varchar(100)');
+SELECT col_type_is('connec', 'n_inhabitants', 'int4', 'Column n_inhabitants should be int4');
+SELECT col_type_is('connec', 'supplyzone_id', 'int4', 'Column supplyzone_id should be int4');
+SELECT col_type_is('connec', 'datasource', 'int4', 'Column datasource should be int4');
+SELECT col_type_is('connec', 'lock_level', 'int4', 'Column lock_level should be int4');
+SELECT col_type_is('connec', 'block_zone', 'text', 'Column block_zone should be text');
 
 -- Check foreign keys
 SELECT has_fk('connec', 'Table connec should have foreign keys');

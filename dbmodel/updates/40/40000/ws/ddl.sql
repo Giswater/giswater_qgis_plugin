@@ -1383,8 +1383,8 @@ CREATE TABLE connec (
 	conserv_state text NULL,
 	priority text NULL,
 	valve_location text NULL,
-	valve_type text NULL,
-	shutoff_valve text NULL,
+	_valve_type text NULL, -- added prefix '_'
+	_shutoff_valve text NULL, -- added prefix '_'
 	access_type text NULL,
 	placement_type text NULL,
 	crmzone_id int4 NULL,
