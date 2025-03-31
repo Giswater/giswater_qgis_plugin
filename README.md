@@ -42,12 +42,12 @@ As Giswater is as server-client software you need to install it into two separat
 Works as well on Windows, MaC or Linux O/S.<br>
 Install PostgreSQL (from 9.5 to 16).<br>
 Install Postgis, pgrouting and other extensions for PostgreSQL.<br>
-	`create extension postgis;`<br>
-	`create extension pgrouting;`<br>
-	`create extension tablefunc;`<br>
-	`create extension unaccent;`<br>
-	`create extension postgis_raster;`<br>
-	`create extension fuzzystrmatch;`<br>
+	`create extension postgis schema pg_catalog;`<br>
+	`create extension pgrouting schema pg_catalog;`<br>
+	`create extension tablefunc schema pg_catalog;`<br>
+	`create extension unaccent schema pg_catalog;`<br>
+	`create extension postgis_raster schema pg_catalog;`<br>
+	`create extension fuzzystrmatch schema pg_catalog;`<br>
 
 ### Frontend environment:
 Works as well on Windows, MaC or Linux O/S, but only on Windows to enjoy EPA models.<br>
