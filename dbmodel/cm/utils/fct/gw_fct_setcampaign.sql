@@ -23,6 +23,8 @@ DECLARE
     v_schemaname TEXT;
     v_id INTEGER;
     v_newid INTEGER;
+    v_exists INTEGER;
+
 BEGIN
     -- Set search path
     SET search_path = cm, public;
@@ -36,8 +38,8 @@ BEGIN
     v_client := (p_data ->> 'client')::json;
     v_fields := (p_data -> 'data' ->> 'fields')::json;
     v_campaign_type := (p_data -> 'data' ->> 'campaign_type')::int;
-	IF (p_data -> 'fields' ->> 'id') IS NOT NULL THEN
-	    v_id := (p_data -> 'fields' ->> 'id')::int;
+	IF (p_data -> 'data' -> 'fields' ->> 'id') IS NOT NULL THEN
+    v_id := (p_data -> 'data' -> 'fields' ->> 'id')::int;
 	END IF;
 
     -- Parse class ID
@@ -47,65 +49,65 @@ BEGIN
         v_visitclass_id := (v_fields ->> 'visitclass_id')::int;
     END IF;
 
-    -- INSERT or UPDATE
-    IF v_id IS NULL THEN
-        -- INSERT
-        v_querytext := 'INSERT INTO om_campaign (
-		    id, startdate, enddate, real_startdate, real_enddate, campaign_type,
-		    descript, active, organization_id, duration, status, rotation,
-		    exercise, serie, address
-		) VALUES (' ||
-		    v_id || ', ' ||
-		    quote_nullable(v_fields ->> 'startdate') || '::date, ' ||
-            quote_nullable(v_fields ->> 'enddate') || '::date, ' ||
-            quote_nullable(v_fields ->> 'real_startdate') || '::date, ' ||
-            quote_nullable(v_fields ->> 'real_enddate') || '::date, ' ||
-            v_campaign_type || ', ' ||
-            quote_nullable(v_fields ->> 'description') || ', ' ||
-            (v_fields ->> 'active')::bool || ', ' ||
-            quote_nullable(v_fields ->> 'organization_id') || ', ' ||
-            quote_nullable(v_fields ->> 'duration') || ', ' ||
-            quote_nullable(v_fields ->> 'status') || ', ' ||
-            quote_nullable(v_fields ->> 'rotation') || '::numeric, ' ||
-            quote_nullable(v_fields ->> 'exercise') || ', ' ||
-            quote_nullable(v_fields ->> 'serie') || ', ' ||
-            quote_nullable(v_fields ->> 'address') || ') RETURNING id';
+    -- Check if the campaign ID exists
+	SELECT id INTO v_exists FROM om_campaign WHERE id = v_id;
 
-        EXECUTE v_querytext INTO v_newid;
 
-        -- Insert into subtype table
-        IF v_campaign_type = 1 THEN
-            INSERT INTO om_campaign_review (campaign_id, reviewclass_id)
-            VALUES (v_newid, v_reviewclass_id);
-        ELSIF v_campaign_type = 2 THEN
-            INSERT INTO om_campaign_visit (campaign_id, visitclass_id)
-            VALUES (v_newid, v_visitclass_id);
-        END IF;
+    IF v_exists IS NULL THEN
+	    -- INSERT
+	    v_querytext := 'INSERT INTO om_campaign (
+	        id, startdate, enddate, real_startdate, real_enddate, campaign_type,
+	        descript, active, organization_id, duration, status, rotation,
+	        exercise, serie, address
+	    ) VALUES (' ||
+	        v_id || ', ' ||
+	        quote_nullable(v_fields ->> 'startdate') || '::date, ' ||
+	        quote_nullable(v_fields ->> 'enddate') || '::date, ' ||
+	        quote_nullable(v_fields ->> 'real_startdate') || '::date, ' ||
+	        quote_nullable(v_fields ->> 'real_enddate') || '::date, ' ||
+	        v_campaign_type || ', ' ||
+	        quote_nullable(v_fields ->> 'description') || ', ' ||
+	        (v_fields ->> 'active')::bool || ', ' ||
+	        quote_nullable(v_fields ->> 'organization_id') || ', ' ||
+	        quote_nullable(v_fields ->> 'duration') || ', ' ||
+	        quote_nullable(v_fields ->> 'status') || ', ' ||
+	        quote_nullable(v_fields ->> 'rotation') || '::numeric, ' ||
+	        quote_nullable(v_fields ->> 'exercise') || ', ' ||
+	        quote_nullable(v_fields ->> 'serie') || ', ' ||
+	        quote_nullable(v_fields ->> 'address') || ') RETURNING id';
+		RAISE NOTICE 'v_querytext de insert % ', v_querytext;
+	    EXECUTE v_querytext INTO v_newid;
 
-    ELSE
-        -- UPDATE
-        v_querytext := 'UPDATE om_campaign SET ' ||
-            'startdate = ' || quote_nullable(v_fields ->> 'startdate') || '::date, ' ||
-            'enddate = ' || quote_nullable(v_fields ->> 'enddate') || '::date, ' ||
-            'real_startdate = ' || quote_nullable(v_fields ->> 'real_startdate') || '::date, ' ||
-            'real_enddate = ' || quote_nullable(v_fields ->> 'real_enddate') || '::date, ' ||
-            'campaign_type = ' || v_campaign_type || ', ' ||
-            'descript = ' || quote_nullable(v_fields ->> 'description') || ', ' ||
-            'active = ' || (v_fields ->> 'active')::bool || ', ' ||
-            'organization_id = ' || quote_nullable(v_fields ->> 'organization_id') || ', ' ||
-            'duration = ' || quote_nullable(v_fields ->> 'duration') || ', ' ||
-            'status = ' || quote_nullable(v_fields ->> 'status') || ', ' ||
-            'rotation = ' || quote_nullable(v_fields ->> 'rotation') || '::numeric, ' ||
-            'exercise = ' || quote_nullable(v_fields ->> 'exercise') || ', ' ||
-            'serie = ' || quote_nullable(v_fields ->> 'serie') || ', ' ||
-            'address = ' || quote_nullable(v_fields ->> 'address') ||
-            ' WHERE id = ' || v_id || ' RETURNING id';
+	    -- Insert into subtype table
+	    IF v_campaign_type = 1 THEN
+	        INSERT INTO om_campaign_review (campaign_id, reviewclass_id)
+	        VALUES (v_newid, v_reviewclass_id);
+	    ELSIF v_campaign_type = 2 THEN
+	        INSERT INTO om_campaign_visit (campaign_id, visitclass_id)
+	        VALUES (v_newid, v_visitclass_id);
+	    END IF;
 
-        EXECUTE v_querytext INTO v_newid;
-
-        -- Update subtype tables if needed (optional: implement based on your needs)
-        -- Currently skipped for simplicity
-    END IF;
+	ELSE
+	    -- UPDATE
+	    v_querytext := 'UPDATE om_campaign SET ' ||
+	        'startdate = ' || quote_nullable(v_fields ->> 'startdate') || '::date, ' ||
+	        'enddate = ' || quote_nullable(v_fields ->> 'enddate') || '::date, ' ||
+	        'real_startdate = ' || quote_nullable(v_fields ->> 'real_startdate') || '::date, ' ||
+	        'real_enddate = ' || quote_nullable(v_fields ->> 'real_enddate') || '::date, ' ||
+	        'campaign_type = ' || v_campaign_type || ', ' ||
+	        'descript = ' || quote_nullable(v_fields ->> 'description') || ', ' ||
+	        'active = ' || (v_fields ->> 'active')::bool || ', ' ||
+	        'organization_id = ' || quote_nullable(v_fields ->> 'organization_id') || ', ' ||
+	        'duration = ' || quote_nullable(v_fields ->> 'duration') || ', ' ||
+	        'status = ' || quote_nullable(v_fields ->> 'status') || ', ' ||
+	        'rotation = ' || quote_nullable(v_fields ->> 'rotation') || '::numeric, ' ||
+	        'exercise = ' || quote_nullable(v_fields ->> 'exercise') || ', ' ||
+	        'serie = ' || quote_nullable(v_fields ->> 'serie') || ', ' ||
+	        'address = ' || quote_nullable(v_fields ->> 'address') ||
+	        ' WHERE id = ' || v_id || ' RETURNING id';
+		RAISE NOTICE 'v_querytext de update % ', v_querytext;
+	    EXECUTE v_querytext INTO v_newid;
+	END IF;
 
     -- Return success response
     RETURN json_build_object(
