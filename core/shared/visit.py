@@ -319,7 +319,7 @@ class GwVisit(QObject):
             self.dlg_visit_manager.tbl_visit, self.dlg_visit_manager.txt_filter, table_object, expr_filter, filed_to_filter))
 
         # Open form
-        tools_gw.open_dialog(self.dlg_visit_manager, dlg_name="lot_visitmanager")
+        tools_gw.open_dialog(self.dlg_visit_manager, dlg_name="visit_manager")
 
 
     def get_visit_dialog(self):
@@ -1144,8 +1144,7 @@ class GwVisit(QObject):
                        f" FROM om_visit"
                        f" WHERE id = '{visit_id}' ")
                 id_visitcat = tools_db.get_row(sql)
-                if id_visitcat is not None:
-
+                if id_visitcat and str(id_visitcat[0]) not in (None, 'None'):
                     sql = (f"SELECT id, name"
                            f" FROM om_visit_cat"
                            f" WHERE active is true AND id = '{id_visitcat[0]}' "
@@ -1884,7 +1883,8 @@ class GwVisit(QObject):
         row = tools_db.get_row(sql)
         if row:
             parameter_id = row["parameter_id"]
-            feature_type = row["feature_type"].lower()
+            if row["feature_type"]:
+                feature_type = row["feature_type"].lower()
 
         return parameter_id, feature_type
 
