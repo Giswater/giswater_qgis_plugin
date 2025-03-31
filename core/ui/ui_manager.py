@@ -643,13 +643,13 @@ class WorkManagementUi(GwDialog, FORM_CLASS):
     CONTEXT = CONTEXT
     UINAME = UINAME
 
-UINAME = "add_campaign_review_din"
+UINAME = "add_campaign_review"
 FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
 class AddCampaignReviewUi(GwDialog, FORM_CLASS):
     CONTEXT = CONTEXT
     UINAME = UINAME
 
-UINAME = "add_campaign_visit_din"
+UINAME = "add_campaign_visit"
 FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
 class AddCampaignVisitUi(GwDialog, FORM_CLASS):
     CONTEXT = CONTEXT

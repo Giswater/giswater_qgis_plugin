@@ -7,12 +7,13 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from functools import partial
 
+from qgis.PyQt.QtGui import QStandardItemModel, QStandardItem
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtCore import QDate
 from qgis.PyQt.QtWidgets import QLineEdit, QDateEdit, QCheckBox, QComboBox, QWidget, QLabel, QGridLayout, QSpacerItem, \
-    QSizePolicy, QTextEdit, QMenu, QAction, QCompleter, QToolButton
+    QSizePolicy, QTextEdit, QMenu, QAction, QCompleter, QToolButton, QTableView
 from .... import global_vars
-from ....libs import tools_qt, tools_db, tools_qgis
+from ....libs import tools_qt, tools_db, tools_qgis, lib_vars
 from ...utils import tools_gw
 from ...ui.ui_manager import AddCampaignReviewUi, AddCampaignVisitUi, CampaignManagementUi
 from qgis.gui import QgsDateTimeEdit
@@ -24,6 +25,8 @@ class Campaign:
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
         self.iface = global_vars.iface
         self.campaign_date_format = 'yyyy-MM-dd'
+        self.schema_name = lib_vars.schema_name
+        self.project_type = tools_gw.get_project_type()
         self.dialog = None
         self.campaign_type = None
         self.canvas = global_vars.canvas
@@ -62,6 +65,7 @@ class Campaign:
             body["feature"]["id"] = campaign_id
         p_data = tools_gw.create_body(body=body)
         self.is_new_campaign = campaign_id is None
+        self.campaign_saved = False
 
         response = tools_gw.execute_procedure("gw_fct_getcampaign", p_data, schema_name="cm")
         if not response or response.get("status") != "Accepted":
@@ -72,6 +76,12 @@ class Campaign:
         self.dialog = AddCampaignReviewUi(self) if mode == "review" else AddCampaignVisitUi(self)
 
         tools_gw.load_settings(self.dialog)
+
+        # Hide gully tab if project_type is 'ws'
+        if self.project_type == 'ws':
+            index = self.dialog.tab_feature.indexOf(self.dialog.tab_5)
+            if index != -1:
+                self.dialog.tab_feature.removeTab(index)
 
         # Build widgets dynamically
         for field in form_fields:
@@ -87,6 +97,10 @@ class Campaign:
 
             label = QLabel(field["label"]) if field.get("label") else None
             tools_gw.add_widget(self.dialog, field, label, widget)
+
+        tools_gw.add_icon(self.dialog.btn_insert, '111')
+        tools_gw.add_icon(self.dialog.btn_delete, '112')
+        tools_gw.add_icon(self.dialog.btn_snapping, '137')
 
         self.dialog.btn_cancel.clicked.connect(self.dialog.reject)
         self.dialog.btn_accept.clicked.connect(self.save_campaign)
@@ -175,7 +189,7 @@ class Campaign:
             result = tools_gw.execute_procedure("gw_fct_setcampaign", body, schema_name="cm")
 
             if result.get("status") == "Accepted":
-                tools_qgis.show_info("Campaign saved successfully.")
+                tools_qgis.show_info("Campaign saved successfully.", dialog=self.dialog)
                 self.campaign_saved = True
                 self.is_new_campaign = False
 
@@ -184,7 +198,7 @@ class Campaign:
                 if campaign_id:
                     id_field = self.dialog.findChild(QLineEdit, "id")
                     if id_field:
-                        id_field.setText(str(campaign_id))
+                        id_field.setTseext(str(campaign_id))
 
                 if not from_tab_change:
                     self.dialog.accept()
@@ -256,6 +270,7 @@ class Campaign:
             "arc": ("v_edit_arc", "arc_id", 5),
             "node": ("v_edit_node", "node_id", 10),
             "connec": ("v_edit_connec", "connec_id", 10),
+            "link": ("v_edit_link", "link_id", 10),
             "gully": ("v_edit_gully", "gully_id", 10)
         }
 
@@ -286,13 +301,14 @@ class Campaign:
             'tab': ('v_edit_arc', 'arc_id'),
             'tab_2': ('v_edit_node', 'node_id'),
             'tab_3': ('v_edit_connec', 'connec_id'),
-            'tab_4': ('v_edit_gully', 'gully_id')
+            'tab_4': ('v_edit_link', 'link_id'),
+            'tab_5': ('v_edit_gully', 'gully_id')
         }
         table_name, id_column = table_map.get(tab_name, (None, None))
         if not table_name:
             return
 
-        sql = f"SELECT {id_column}::text FROM {table_name} ORDER BY {id_column} LIMIT 100"
+        sql = f"SELECT {id_column}::text FROM {self.schema_name}.{table_name} ORDER BY {id_column} LIMIT 100"
         result = tools_db.get_rows(sql)
         values = [row[id_column] for row in result if row.get(id_column)]
 
@@ -303,13 +319,8 @@ class Campaign:
 
     def _load_relation_table(self, view, table_name, id_column, campaign_id):
         """Load existing relations into the view"""
-        query = f"""
-            SELECT a.{id_column} AS id, b.descript 
-            FROM {table_name} a
-            JOIN v_edit_{id_column.replace('_id', '')} b ON a.{id_column} = b.gid
-            WHERE a.campaign_id = {campaign_id}
-        """
-        tools_qt.populate_wtableview(view, query)
+        query = f"""SELECT * from {table_name} where campaign_id = {campaign_id}"""
+        self.populate_tableview(view, query)
 
 
     def insert_campaign_relation(self, dialog):
@@ -337,7 +348,8 @@ class Campaign:
             "tab": ("om_campaign_x_arc", "arc_id"),
             "tab_2": ("om_campaign_x_node", "node_id"),
             "tab_3": ("om_campaign_x_connec", "connec_id"),
-            "tab_4": ("om_campaign_x_gully", "gully_id"),
+            'tab_4': ('om_campaign_x_link', 'link_id'),
+            "tab_5": ("om_campaign_x_gully", "gully_id"),
         }
 
         table_info = table_map.get(tab_name)
@@ -376,23 +388,65 @@ class Campaign:
             'tab': dialog.tbl_campaign_x_arc,
             'tab_2': dialog.tbl_campaign_x_node,
             'tab_3': dialog.tbl_campaign_x_connec,
-            'tab_4': dialog.tbl_campaign_x_gully,
+            'tab_4': dialog.tbl_campaign_x_link,
+            'tab_5': dialog.tbl_campaign_x_gully,
         }.get(tab_name)
 
 
-    def _get_relation_description(self, tab_name, id_):
-        """Fetch feature description from DB based on tab and ID"""
+    def populate_tableview(self, view: QTableView, query: str, columns: list[str] = None):
+        """Populate a QTableView with the results of a SQL query."""
+        data = tools_db.get_rows(query)
+        if not data:
+            view.setModel(QStandardItemModel())  # Clear view
+            return
+
+        # Auto-detect column names if not provided
+        if not columns:
+            columns = list(data[0].keys())
+
+        model = QStandardItemModel(len(data), len(columns))
+        model.setHorizontalHeaderLabels(columns)
+
+        for row_idx, row in enumerate(data):
+            for col_idx, col_name in enumerate(columns):
+                value = str(row.get(col_name, ''))
+                model.setItem(row_idx, col_idx, QStandardItem(value))
+
+        view.setModel(model)
+        view.resizeColumnsToContents()
+
+    def _refresh_relation_table(self, dialog):
+        """Refresh the current relation table based on selected tab"""
+        tab_name = dialog.tab_feature.currentWidget().objectName()
+
         table_map = {
-            'tab': ('v_edit_arc', 'gid'),
-            'tab_2': ('v_edit_node', 'gid'),
-            'tab_3': ('v_edit_connec', 'gid'),
-            'tab_4': ('v_edit_gully', 'gid')
+            "tab": ("tbl_campaign_x_arc", "om_campaign_x_arc", "arc_id"),
+            "tab_2": ("tbl_campaign_x_node", "om_campaign_x_node", "node_id"),
+            "tab_3": ("tbl_campaign_x_connec", "om_campaign_x_connec", "connec_id"),
+            "tab_4": ("tbl_campaign_x_link", "om_campaign_x_link", "link_id"),
+            "tab_5": ("tbl_campaign_x_gully", "om_campaign_x_gully", "gully_id"),
         }
-        table_name, id_column = table_map.get(tab_name, (None, None))
-        if not table_name:
-            return None
 
-        sql = f"SELECT descript FROM {table_name} WHERE {id_column} = {id_}"
-        result = tools_db.get_row(sql)
-        return result.get("descript") if result else None
+        table_info = table_map.get(tab_name)
+        if not table_info:
+            return
 
+        table_widget_name, table_name, id_column = table_info
+        table_widget = getattr(dialog, table_widget_name, None)
+        if not table_widget:
+            return
+
+        # Get campaign_id from the dialog
+        campaign_id = None
+        for w in dialog.findChildren(QLineEdit):
+            if w.property("columnname") == "id":
+                campaign_id = tools_qt.get_text(dialog, w)
+                break
+        if not campaign_id:
+            return
+        print(table_widget)
+        print(table_name)
+        print(id_column)
+        print(campaign_id)
+
+        self._load_relation_table(table_widget, table_name, id_column, campaign_id)
