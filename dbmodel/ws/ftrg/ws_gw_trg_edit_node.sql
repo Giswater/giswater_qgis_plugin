@@ -1112,12 +1112,12 @@ BEGIN
 
 		EXECUTE '
 		SELECT addparam->''labelPosition''->''dist''->>0  
-		FROM cat_feature JOIN cat_node on cat_feature.id = cat_node.nodetype_id WHERE cat_node.id = '||quote_literal(new.nodecat_id)||'					
+		FROM cat_feature JOIN cat_node on cat_feature.id = cat_node.node_type WHERE cat_node.id = '||quote_literal(new.nodecat_id)||'					
 		' INTO v_dist_xlab;
 
 		EXECUTE '
 		SELECT addparam->''labelPosition''->''dist''->>1  
-		FROM cat_feature JOIN cat_node on cat_feature.id = cat_node.nodetype_id WHERE cat_node.id = '||quote_literal(new.nodecat_id)||'					
+		FROM cat_feature JOIN cat_node on cat_feature.id = cat_node.node_type WHERE cat_node.id = '||quote_literal(new.nodecat_id)||'					
 		' INTO v_dist_ylab;
 
 		if new.label_x != old.label_x and new.label_y != old.label_y then
