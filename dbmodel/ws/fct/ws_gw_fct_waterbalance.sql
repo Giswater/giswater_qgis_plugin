@@ -631,7 +631,7 @@ $function$
 
 -- Permissions
 
-ALTER FUNCTION ws_3.gw_fct_waterbalance(json) OWNER TO postgres;
-GRANT ALL ON FUNCTION ws_3.gw_fct_waterbalance(json) TO public;
-GRANT ALL ON FUNCTION ws_3.gw_fct_waterbalance(json) TO postgres;
-GRANT ALL ON FUNCTION ws_3.gw_fct_waterbalance(json) TO role_basic;
+ALTER FUNCTION SCHEMA_NAME.gw_fct_waterbalance(json) OWNER TO postgres;
+GRANT ALL ON FUNCTION SCHEMA_NAME.gw_fct_waterbalance(json) TO public;
+GRANT ALL ON FUNCTION SCHEMA_NAME.gw_fct_waterbalance(json) TO postgres;
+GRANT ALL ON FUNCTION SCHEMA_NAME.gw_fct_waterbalance(json) TO role_basic;
