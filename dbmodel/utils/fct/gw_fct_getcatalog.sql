@@ -158,7 +158,7 @@ BEGIN
 	IF v_formname='upsert_catalog_arc' OR v_formname='upsert_catalog_node' OR v_formname='upsert_catalog_connec' OR v_formname='upsert_catalog_gully' THEN
 
 		--  get querytext
-		v_querystring = concat('SELECT dv_querytext FROM config_form_fields WHERE formname = ',quote_nullable(v_formname), ' and columnname=''id''');
+		v_querystring = concat('SELECT dv_querytext FROM config_form_fields WHERE formname = ',quote_nullable(v_formname), ' and columnname=''matcat_id''');
 		v_debug_vars := json_build_object('v_formname', v_formname);
 		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getcatalog', 'flag', 50);
 		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
