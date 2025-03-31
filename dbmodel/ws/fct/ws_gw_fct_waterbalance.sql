@@ -628,10 +628,3 @@ BEGIN
 END;
 $function$
 ;
-
--- Permissions
-
-ALTER FUNCTION SCHEMA_NAME.gw_fct_waterbalance(json) OWNER TO postgres;
-GRANT ALL ON FUNCTION SCHEMA_NAME.gw_fct_waterbalance(json) TO public;
-GRANT ALL ON FUNCTION SCHEMA_NAME.gw_fct_waterbalance(json) TO postgres;
-GRANT ALL ON FUNCTION SCHEMA_NAME.gw_fct_waterbalance(json) TO role_basic;
