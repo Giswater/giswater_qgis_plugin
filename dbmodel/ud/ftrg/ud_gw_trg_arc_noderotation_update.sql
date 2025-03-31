@@ -17,7 +17,7 @@ DECLARE
     ang_aux float;
     count int2;
     azm_aux float;
-	v_srid numeric;
+	v_srid integer;
 	v_dist_xlab numeric;
 	v_dist_ylab numeric;
 	v_sql text;
@@ -26,6 +26,7 @@ DECLARE
 	v_rot2 numeric;
 	v_geom public.geometry;
 	v_cur_rotation numeric;
+	v_aux_rot numeric;
 
         
 BEGIN 
@@ -40,9 +41,9 @@ BEGIN
 	
 			FOR rec_node IN SELECT * FROM v_edit_node WHERE NEW.node_1 = node_id OR NEW.node_2 = node_id
 			LOOP
-				--SELECT choose_hemisphere INTO hemisphere_rotation_bool FROM v_edit_node JOIN cat_feature_node ON rec_node.node_type=id;
-				--SELECT hemisphere INTO hemisphere_rotation_aux FROM v_edit_node WHERE node_id=rec_node.node_id;
-			
+				SELECT choose_hemisphere INTO hemisphere_rotation_bool FROM v_edit_node JOIN cat_feature_node ON rec_node.node_type=id;
+				SELECT hemisphere INTO hemisphere_rotation_aux FROM v_edit_node WHERE node_id=rec_node.node_id;
+
 				-- init variables
 				ang_aux=0;
 				count=0;
@@ -65,29 +66,31 @@ BEGIN
 						ang_aux=ang_aux+azm_aux;
 						count=count+1;
 					END IF;
-				END LOOP	;
+				END LOOP;
 			
 				ang_aux=ang_aux/count;	
 				
-				/*IF hemisphere_rotation_bool IS true THEN
+				IF hemisphere_rotation_bool IS true THEN
 		
 					IF (hemisphere_rotation_aux >180)  THEN
 						UPDATE node set rotation=(ang_aux*(180/pi())+90) where node_id=rec_node.node_id;
 					ELSE		
 						UPDATE node set rotation=(ang_aux*(180/pi())-90) where node_id=rec_node.node_id;
 					END IF;
-				ELSE*/
+				ELSE
+
 					UPDATE node set rotation=(ang_aux*(180/pi())-90) where node_id=rec_node.node_id;
-					UPDATE node set label_rotation=(ang_aux*(180/pi())-90) where node_id=rec_node.node_id;		
-				--END IF;	
+					UPDATE node set label_rotation=(ang_aux*(180/pi())-90) where node_id=rec_node.node_id;
+
+				END IF;	
 
 				-- force positive values for rotation
 				IF (SELECT rotation FROM node where node_id = rec_node.node_id) < 0 then 
 					UPDATE node set rotation = rotation + 360 where node_id =  rec_node.node_id;
-					UPDATE node set label_rotation = rotation + 360 where node_id =  rec_node.node_id;
+					UPDATE node set label_rotation = rotation where node_id =  rec_node.node_id;
 				ELSIF (SELECT rotation FROM node where node_id = rec_node.node_id) > 360 then
 					UPDATE node set rotation = rotation -360 where node_id =  rec_node.node_id;
-					UPDATE node set label_rotation = rotation -360 where node_id =  rec_node.node_id;
+					UPDATE node set label_rotation = rotation where node_id =  rec_node.node_id;
 				END IF;
 				
 			END LOOP;
@@ -98,12 +101,13 @@ BEGIN
 
 			FOR rec_node IN SELECT * FROM v_edit_node WHERE NEW.node_1 = node_id OR NEW.node_2 = node_id
 			LOOP
-				--SELECT choose_hemisphere INTO hemisphere_rotation_bool FROM v_edit_node JOIN cat_feature_node ON rec_node.node_type=id;
-				--SELECT hemisphere INTO hemisphere_rotation_aux FROM v_edit_node WHERE node_id=rec_node.node_id;
-		
+				SELECT choose_hemisphere INTO hemisphere_rotation_bool FROM v_edit_node JOIN cat_feature_node ON rec_node.node_type=id;
+				SELECT hemisphere INTO hemisphere_rotation_aux FROM v_edit_node WHERE node_id=rec_node.node_id;
+
 				-- init variables
 				ang_aux=0;
 				count=0;
+				rec_node.rotation = COALESCE(rec_node.rotation,0);				
 			
 				FOR rec_arc IN SELECT arc_id, node_1, node_2, the_geom FROM arc WHERE arc.node_1 = rec_node.node_id or arc.node_2 = rec_node.node_id
 				LOOP
@@ -128,7 +132,7 @@ BEGIN
 			
 				ang_aux=ang_aux/count;	
 		
-				/*IF hemisphere_rotation_bool IS true THEN
+				IF hemisphere_rotation_bool IS true THEN
 		
 					IF (hemisphere_rotation_aux >180)  THEN
 						UPDATE node set rotation=(ang_aux*(180/pi())+90) where node_id=rec_node.node_id;
@@ -136,9 +140,9 @@ BEGIN
 						UPDATE node set rotation=(ang_aux*(180/pi())-90) where node_id=rec_node.node_id;
 					END IF;
 		
-				ELSE*/
+				ELSE
 					UPDATE node set rotation=(ang_aux*(180/pi())-90) where node_id=rec_node.node_id;		
-				--END IF;
+				END IF;
 			
 
 				-- force positive values for rotation
@@ -159,8 +163,10 @@ BEGIN
 				SELECT addparam->''labelPosition''->''dist''->>1  from cat_feature WHERE id = '||quote_literal(rec_node.node_type)||'					
 				' INTO v_dist_ylab;
 				
-				if v_dist_xlab is not null and v_dist_ylab is not null then --continue only with not-null values
-				
+				if v_dist_ylab is not null and v_dist_xlab is not null and 
+				(SELECT value::boolean FROM config_param_user WHERE parameter='edit_noderotation_update_dsbl' AND cur_user=current_user) IS FALSE 
+				then -- only start the process with not-null values
+	
 					-- prev calc: current label position
 					select st_setsrid(st_makepoint(label_x::numeric, label_y::numeric), v_srid) 
 					into v_label_point from node where node_id = rec_node.node_id;
@@ -185,7 +191,7 @@ BEGIN
 					execute v_sql into v_cur_rotation using v_label_point, rec_node.node_id;
 				   		
 					-- start process: calc intermediate rotations to project the label
-				   if (v_dist_xlab > 0 and v_dist_ylab > 0) -- top right
+				   	if (v_dist_xlab > 0 and v_dist_ylab > 0) -- top right
 					or (v_dist_xlab < 0 and v_dist_ylab < 0) -- bottom left
 					then 
 						v_rot1 = 90+rec_node.rotation; 
@@ -193,26 +199,34 @@ BEGIN
 					
 					elsif (v_dist_xlab > 0 and v_dist_ylab < 0) -- bottom right
 					or 	  (v_dist_xlab < 0 and v_dist_ylab > 0) -- top left
-					then 
-						v_rot1 = 0+rec_node.rotation;
-						v_rot2 = 90+rec_node.rotation; 
-					
+					then
+						v_rot1 = -90+rec_node.rotation;
+						v_rot2 = -180+rec_node.rotation;
+
+						v_dist_xlab = v_dist_xlab * (-1);
+						v_dist_ylab = v_dist_ylab * (-1);
+						
 					end if;
 				
 					
 				   	-- new label position
 					v_sql = '
 					with mec as (
-					select the_geom, ST_Project(ST_Transform(the_geom, 4326)::geography, '||v_dist_ylab||', radians('||v_rot1||')) as eee
+					select the_geom, ST_Project(ST_Transform(the_geom, 4326)::geography, '||v_dist_xlab||', radians('||v_rot1||')) as eee
 					FROM node WHERE node_id = '||QUOTE_LITERAL(rec_node.node_id)||'), lab_point as (
-					SELECT ST_Project(ST_Transform(eee::geometry, 4326)::geography, '||v_dist_xlab||', radians('||v_rot2||')) as fff
+					SELECT ST_Project(ST_Transform(eee::geometry, 4326)::geography, '||v_dist_ylab||', radians('||v_rot2||')) as fff
 					from mec)
 					select st_transform(fff::geometry, '||v_srid||') as label_p from lab_point';
 								
 					execute v_sql into v_label_point;
-										
-				
-					update node set label_rotation = rec_node.rotation where node_id = rec_node.node_id;
+
+					if rec_node.rotation > 360 then
+						v_aux_rot = rec_node.rotation - 360;
+					elsif rec_node.rotation < 0 then 
+						v_aux_rot = rec_node.rotation+360;
+					end if;		
+
+					update node set label_rotation = rotation  where node_id = rec_node.node_id;
 				
 					update node set label_x = st_x(v_label_point) where node_id = rec_node.node_id;
 					update node set label_y = st_y(v_label_point) where node_id = rec_node.node_id;
@@ -229,8 +243,8 @@ BEGIN
    	
 			FOR rec_node IN SELECT node_id,node_type, the_geom FROM v_edit_node WHERE OLD.node_1 = node_id OR OLD.node_2 = node_id
 			LOOP
-				--SELECT choose_hemisphere INTO hemisphere_rotation_bool FROM v_edit_node JOIN cat_feature_node ON rec_node.node_type=id;
-				--SELECT hemisphere INTO hemisphere_rotation_aux FROM v_edit_node WHERE node_id=rec_node.node_id;
+				SELECT choose_hemisphere INTO hemisphere_rotation_bool FROM v_edit_node JOIN cat_feature_node ON rec_node.node_type=id;
+				SELECT hemisphere INTO hemisphere_rotation_aux FROM v_edit_node WHERE node_id=rec_node.node_id;
 		
 				-- init variables
 				ang_aux=0;
@@ -262,7 +276,7 @@ BEGIN
 					ang_aux=ang_aux/count;	
 				END IF;
 				
-				/*IF hemisphere_rotation_bool IS true THEN
+				IF hemisphere_rotation_bool IS true THEN
 		
 					IF (hemisphere_rotation_aux >180)  THEN
 						UPDATE node set rotation=(ang_aux*(180/pi())+90) where node_id=rec_node.node_id;
@@ -270,9 +284,9 @@ BEGIN
 						UPDATE node set rotation=(ang_aux*(180/pi())-90) where node_id=rec_node.node_id;
 					END IF;
 		
-				ELSE*/
+				ELSE
 					UPDATE node set rotation=(ang_aux*(180/pi())-90) where node_id=rec_node.node_id;		
-				--END IF;
+				END IF;
 
 				-- force positive values for rotation
 				IF (SELECT rotation FROM node where node_id = rec_node.node_id) < 0 then 
@@ -301,6 +315,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-
-
-
