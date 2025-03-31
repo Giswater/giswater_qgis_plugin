@@ -60,12 +60,12 @@ Compatible with Windows, Mac, and Linux OS.
 - Install PostGIS, pgRouting, and other required PostgreSQL extensions:
 
   ```postgresql
-  CREATE EXTENSION postgis;
-  CREATE EXTENSION pgrouting;
-  CREATE EXTENSION tablefunc;
-  CREATE EXTENSION unaccent;
-  CREATE EXTENSION postgis_raster;
-  CREATE EXTENSION fuzzystrmatch;
+  CREATE EXTENSION postgis schema pg_catalog;
+  CREATE EXTENSION pgrouting schema pg_catalog;
+  CREATE EXTENSION tablefunc schema pg_catalog;
+  CREATE EXTENSION unaccent schema pg_catalog;
+  CREATE EXTENSION postgis_raster schema pg_catalog;
+  CREATE EXTENSION fuzzystrmatch schema pg_catalog;
   ```
 
 ### Frontend environment:
