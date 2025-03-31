@@ -26,7 +26,7 @@ EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||',public';
 	IF v_record.start_date IS NOT NULL AND v_record.end_date IS NOT NULL AND v_record.end_date >= v_record.start_date THEN
 	
 	
-		UPDATE ext_cat_period SET period_seconds = (EXTRACT(EPOCH FROM v_record.end_date::date + 1) - EXTRACT(EPOCH FROM v_record.start_date::date))::integer 
+		UPDATE ext_cat_period SET period_seconds = (EXTRACT(EPOCH FROM v_record.end_date::date) - EXTRACT(EPOCH FROM v_record.start_date::date))::integer 
 		WHERE ext_cat_period.id = NEW.id; 
 			
 	ELSE
