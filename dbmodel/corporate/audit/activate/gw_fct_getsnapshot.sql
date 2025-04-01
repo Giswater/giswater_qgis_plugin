@@ -23,15 +23,7 @@ v_last_snapshot_date date;
 v_tables text[];
 v_table text;
 v_log record;
-v_result json;
-v_query text;
-temp_table_name text;
-snapshot_table_name text;
-v_counter integer;
-v_columns text;
-v_values text;
-v_sql text;
-v_set_clause text;
+v_temp_table_name text;
 v_layer JSONB := '[]'::JSONB;
 v_features JSONB := '[]'::JSONB;
 v_geometry_type text;
@@ -56,75 +48,32 @@ BEGIN
 	FOREACH v_table IN ARRAY COALESCE(v_tables, '{}') LOOP
 
 		-- Set table names
-		snapshot_table_name = FORMAT('PARENT_SCHEMA_%I', v_table);
-		temp_table_name := FORMAT('temp_%I', snapshot_table_name);
+		v_temp_table_name := FORMAT('temp_PARENT_SCHEMA_%I', v_table);
 
 		-- Create temporal table with values of the last snapshot
-		EXECUTE FORMAT('CREATE TABLE %I AS SELECT * FROM %I WHERE date = %L',
-					temp_table_name, snapshot_table_name, v_last_snapshot_date);
+		EXECUTE FORMAT('CREATE TABLE %I AS SELECT * FROM PARENT_SCHEMA_%I WHERE date = %L',v_temp_table_name, v_table, v_last_snapshot_date);
 
-		EXECUTE FORMAT ('ALTER TABLE %I DROP COLUMN IF EXISTS date', temp_table_name);
+		-- Drop date column
+		EXECUTE FORMAT ('ALTER TABLE %I DROP COLUMN IF EXISTS date', v_temp_table_name);
 
 		-- Get logs from v_table between last snapshot date and selected date
 		FOR v_log IN
-			SELECT * FROM log WHERE tstamp::date BETWEEN v_last_snapshot_date AND v_date
-			AND table_name = v_table ORDER BY tstamp
+			SELECT DISTINCT ON (feature_id) * FROM log WHERE tstamp::date BETWEEN v_last_snapshot_date AND v_date
+			AND table_name = v_table ORDER BY feature_id, tstamp DESC
 		LOOP
-			-- Inspect if is an insert
-			EXECUTE FORMAT ('SELECT count(*) FROM %I WHERE %I = ''%s''',
-			temp_table_name, v_log.id_name, v_log.feature_id) INTO v_counter;
-
-			IF v_log.action = 'U' and v_counter = 0 THEN
-				UPDATE log SET action = 'I', olddata = NULL
-				WHERE id = v_log.id;
-				v_log.action = 'I';
-			END IF;
-
-			-- Check actions
-			IF v_log.action = 'I' THEN
-
-				-- Insert data
-				v_columns := string_agg(quote_ident(key), ', ') FROM json_each(v_log.newdata);
-				v_values := string_agg(quote_literal(value), ', ') FROM json_each(v_log.newdata);
-				v_sql := format('INSERT INTO %I (%s) VALUES (%s);', temp_table_name, v_columns, v_values);
-
-			ELSEIF v_log.action = 'U' THEN
-
-				-- Get different values between old and new json
-				SELECT string_agg(quote_ident(n.key) || ' = ' || quote_literal(n.value), ', ')
-				INTO v_set_clause
-				FROM json_each(v_log.newdata) n
-				LEFT JOIN json_each(v_log.olddata) o ON n.key = o.key
-				WHERE n.value::text != o.value::text OR o.value IS NULL;
-
-				v_sql := format('UPDATE %I SET %s', temp_table_name, v_set_clause);
-
-			ELSEIF v_log.action = 'D' THEN
-
-				-- Delete data
-				v_sql := FORMAT('DELETE FROM %I WHERE %I = ''%I''', temp_table_name, v_log.id_name, v_log.feature_id);
-
-			END IF;
-
-			-- Clean query and execute it
-			v_sql := regexp_replace(v_sql, '''(null|true|false|[0-9]+(\\.[0-9]+)?)''', '\1', 'g');
-			v_sql := REPLACE(v_sql, '"', '');
-
-			-- RAISE NOTICE '%', v_sql;
-			-- EXECUTE (v_sql);
-
+			-- Apply changes from logs into temporal layers
+			EXECUTE (v_log.query_sql);
 		END LOOP;
 
 		-- Build layers for each temp table updated
 		EXECUTE FORMAT('SELECT jsonb_agg(jsonb_build_object(''type'', ''Feature'',
 			           ''geometry'', ST_AsGeoJSON(the_geom)::jsonb,
 			        ''properties'', to_jsonb(row) - ''the_geom''
-			    )) FROM (SELECT the_geom FROM %I) row;', temp_table_name) INTO v_features;
+			    )) FROM (SELECT the_geom FROM %I) row;', v_temp_table_name) INTO v_features;
 
-
-		v_geometry_type := CASE
-		WHEN v_table ILIKE '%node%' OR v_table ILIKE '%connec%' THEN 'Point'
-		ELSE 'LineString' END;
+		-- Get geometry type
+		v_geometry_type := CASE WHEN v_table ILIKE '%node%' OR v_table ILIKE '%connec%'
+						   THEN 'Point' ELSE 'LineString' END;
 
 		v_layer := COALESCE(v_layer, '[]'::jsonb) || jsonb_build_array(
 			    jsonb_build_object(
@@ -135,7 +84,7 @@ BEGIN
 		);
 
 		-- Delete temporal table
-		EXECUTE FORMAT('DROP TABLE %I', temp_table_name);
+		EXECUTE FORMAT('DROP TABLE IF EXISTS %I', v_temp_table_name);
 
 	END LOOP;
 
