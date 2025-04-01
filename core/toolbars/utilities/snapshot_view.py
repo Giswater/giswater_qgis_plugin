@@ -8,7 +8,7 @@ or (at your option) any later version.
 from functools import partial
 
 from qgis.PyQt.QtCore import QDateTime, QVariant
-from qgis.PyQt.QtWidgets import QCheckBox, QLabel, QLineEdit, QWidget, QMenu, QAction, QPushButton
+from qgis.PyQt.QtWidgets import QCheckBox, QLabel, QLineEdit, QWidget, QMenu, QAction, QPushButton, QSpacerItem
 from qgis.core import QgsGeometry, QgsPointXY, QgsVectorLayer, QgsFeature, QgsProject, QgsField
 from qgis.PyQt.QtGui import QColor
 from ..dialog import GwAction
@@ -64,8 +64,13 @@ class GwSnapshotViewButton(GwAction):
 
         # Hide gully checkbox if project type is not UD
         if self.project_type != 'ud':
+            # self.dlg_snapshot_view.findChild(QCheckBox, "tab_none_chk_gully").hide()
+            # self.dlg_snapshot_view.findChild(QLabel, "lbl_tab_none_chk_gully").setStyleSheet("color: transparent;")
+
             self.dlg_snapshot_view.findChild(QCheckBox, "tab_none_chk_gully").hide()
-            self.dlg_snapshot_view.findChild(QLabel, "lbl_tab_none_chk_gully").setStyleSheet("color: transparent;")
+            self.dlg_snapshot_view.findChild(QLabel, "lbl_tab_none_chk_gully").hide()
+            self.dlg_snapshot_view.findChild(QLabel, "lbl_tab_none_spacer").hide()
+
 
         # Open form
         tools_gw.open_dialog(self.dlg_snapshot_view, 'snapshot_view')
@@ -200,73 +205,63 @@ def run(**kwargs):
 
 
 def add_layers_temp(layers, group):
+    """Creates temporary layers from a given list of layers and adds them to a specified group in QGIS."""
 
-    i = 0
-    for layer in layers:
+    for i, layer in enumerate(layers):
 
         if not layer['features']:
             continue
+
         geometry_type = layer['geometryType']
         aux_layer_name = layer['layerName']
 
+        # Remove existing layer with the same name
         tools_qgis.remove_layer_from_toc(aux_layer_name, group)
 
+        # Create a new memory layer
         v_layer = QgsVectorLayer(f"{geometry_type}?crs=epsg:{lib_vars.data_epsg}", aux_layer_name, 'memory')
-        fill_layer_temp(v_layer, layer['features'], i, group)
+        prov = v_layer.dataProvider()
 
-        # Increase iterator
-        i += 1
+        v_layer.startEditing()
 
-        qml_path = layer.get('qmlPath')
-        category_field = layer.get('category_field')
-        if qml_path:
-            tools_qgis.load_qml(v_layer, qml_path)
-        elif category_field:
-            cat_field = layer['category_field']
-            size = layer.get('size', default=2)
-            color_values = {'NEW': QColor(0, 255, 0), 'DUPLICATED': QColor(255, 0, 0),
-                            'EXISTS': QColor(240, 150, 0)}
-            tools_qgis.set_layer_categoryze(v_layer, cat_field, size, color_values)
-        else:
-            if geometry_type == 'Point':
-                v_layer.renderer().symbol().setSize(3.5)
-                v_layer.renderer().symbol().setColor(QColor("blue"))
-            elif geometry_type == 'LineString':
-                v_layer.renderer().symbol().setWidth(1.5)
-                v_layer.renderer().symbol().setColor(QColor("blue"))
-            v_layer.renderer().symbol().setOpacity(0.7)
-        global_vars.iface.layerTreeView().refreshLayerSymbology(v_layer.id())
-
-
-def fill_layer_temp(virtual_layer, features, sort_val, group):
-
-    prov = virtual_layer.dataProvider()
-    # Enter editing mode
-    virtual_layer.startEditing()
-
-    for feature in features:
-
-        geometry = tools_qgis.get_geometry_from_json(feature)
-        if not geometry:
-            continue
-        attributes = []
-        fet = QgsFeature()
-        fet.setGeometry(geometry)
-        for key, value in feature['properties'].items():
-            if key == 'the_geom':
+        for feature in layer['features']:
+            geometry = tools_qgis.get_geometry_from_json(feature)
+            if not geometry:
                 continue
-            prov.addAttributes([QgsField(str(key), QVariant.String)])
-            attributes.append(value)
 
-        fet.setAttributes(attributes)
-        prov.addFeatures([fet])
+            fet = QgsFeature()
+            fet.setGeometry(geometry)
 
-    # Commit changes
-    virtual_layer.commitChanges()
-    QgsProject.instance().addMapLayer(virtual_layer, False)
-    root = QgsProject.instance().layerTreeRoot()
-    my_group = root.findGroup(group)
-    if my_group is None:
-        my_group = root.insertGroup(0, group)
+            attributes = []
+            for key, value in feature['properties'].items():
+                if key != 'the_geom':
+                    prov.addAttributes([QgsField(str(key), QVariant.String)])
+                    attributes.append(value)
 
-    my_group.insertLayer(sort_val, virtual_layer)
+            fet.setAttributes(attributes)
+            prov.addFeatures([fet])
+
+        v_layer.commitChanges()
+
+        # Add the layer to the project
+        QgsProject.instance().addMapLayer(v_layer, False)
+        root = QgsProject.instance().layerTreeRoot()
+        my_group = root.findGroup(group) or root.insertGroup(0, group)
+        my_group.insertLayer(i, v_layer)
+
+        # Apply styles
+        apply_layer_style(v_layer, geometry_type)
+
+def apply_layer_style(layer, geometry_type):
+    """Applies styling to a layer based on its geometry type."""
+    symbol = layer.renderer().symbol()
+
+    if geometry_type == 'Point':
+        symbol.setSize(3.5)
+        symbol.setColor(QColor("blue"))
+    elif geometry_type == 'LineString':
+        symbol.setWidth(1.5)
+        symbol.setColor(QColor("blue"))
+
+    symbol.setOpacity(0.7)
+    global_vars.iface.layerTreeView().refreshLayerSymbology(layer.id())
