@@ -1235,8 +1235,29 @@ CREATE INDEX arc_streetname ON arc USING btree (streetname);
 CREATE INDEX arc_streetname2 ON arc USING btree (streetname2);
 
 
+DO $$
+DECLARE
+    rec record;
+    v_element_id varchar(16);
+	v_link_id integer;
+    v_midpoint geometry;
+BEGIN
+    -- Process each connec with cat_valve value
+    FOR rec IN SELECT connec_id, cat_valve, the_geom FROM connec WHERE cat_valve IS NOT NULL AND cat_valve != ''
+    LOOP
+        SELECT ST_LineInterpolatePoint(the_geom, 0.5), link_id INTO v_midpoint, v_link_id
+        FROM link
+        WHERE feature_id = rec.connec_id AND feature_type = 'CONNEC'
+        LIMIT 1;
 
+        INSERT INTO element (elementcat_id, state, expl_id, the_geom)
+        VALUES (rec.cat_valve, 1, (SELECT expl_id FROM connec WHERE connec_id = rec.connec_id), COALESCE(v_midpoint, rec.the_geom))
+        RETURNING element_id INTO v_element_id;
 
+        INSERT INTO element_x_link (link_id, element_id)
+        SELECT v_link_id, v_element_id;
+    END LOOP;
+END $$;
 
 
 -- connec
@@ -1382,7 +1403,6 @@ CREATE TABLE connec (
 	om_state text NULL,
 	conserv_state text NULL,
 	priority text NULL,
-	valve_location text NULL,
 	_valve_type text NULL, -- added prefix '_'
 	_shutoff_valve text NULL, -- added prefix '_'
 	access_type text NULL,
@@ -1394,7 +1414,6 @@ CREATE TABLE connec (
 	model_id varchar(50) NULL,
 	serial_number varchar(100) NULL,
 	label_quadrant varchar(12) NULL,
-	cat_valve varchar(30) NULL,
 	macrominsector_id int4 DEFAULT 0 NULL,
 	n_hydrometer int4 NULL,
 	streetname varchar(100) NULL,
@@ -1407,7 +1426,6 @@ CREATE TABLE connec (
 	CONSTRAINT connec_epa_type_check CHECK ((epa_type = ANY (ARRAY['JUNCTION'::text, 'UNDEFINED'::text]))),
 	CONSTRAINT connec_pjoint_type_check CHECK (((pjoint_type)::text = ANY (ARRAY['NODE'::text, 'ARC'::text, 'CONNEC'::text]))),
 	CONSTRAINT connec_pkey PRIMARY KEY (connec_id),
-	CONSTRAINT connec_cat_valve_fkey FOREIGN KEY (cat_valve) REFERENCES cat_node(id) ON DELETE CASCADE ON UPDATE CASCADE,
 	CONSTRAINT connec_connecat_id_fkey FOREIGN KEY (conneccat_id) REFERENCES cat_connec(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT connec_crmzone_id_fkey FOREIGN KEY (crmzone_id) REFERENCES crm_zone(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT connec_district_id_fkey FOREIGN KEY (district_id) REFERENCES ext_district(district_id) ON DELETE RESTRICT ON UPDATE CASCADE,

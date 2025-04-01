@@ -27,9 +27,9 @@ SELECT columns_are(
         'undelete', 'label_x', 'label_y', 'label_rotation', 'publish', 'inventory', 'expl_id', 'num_value',
         'feature_type', 'tstamp', 'pjoint_type', 'pjoint_id', 'lastupdate', 'lastupdate_user', 'insert_user',
         'minsector_id', 'dqa_id', 'staticpressure', 'district_id', 'adate', 'adescript', 'accessibility',
-        'workcat_id_plan', 'asset_id', 'epa_type', 'om_state', 'conserv_state', 'priority', 'valve_location',
+        'workcat_id_plan', 'asset_id', 'epa_type', 'om_state', 'conserv_state', 'priority',
         '_valve_type', '_shutoff_valve', 'access_type', 'placement_type', 'crmzone_id', 'expl_id2', 'plot_code',
-        'brand_id', 'model_id', 'serial_number', 'label_quadrant', 'cat_valve', 'macrominsector_id', 'n_hydrometer',
+        'brand_id', 'model_id', 'serial_number', 'label_quadrant', 'macrominsector_id', 'n_hydrometer',
         'streetname', 'streetname2', 'n_inhabitants', 'supplyzone_id', 'datasource', 'lock_level', 'block_zone'
     ],
     'Table connec should have the correct columns'
@@ -106,7 +106,6 @@ SELECT col_type_is('connec', 'epa_type', 'text', 'Column epa_type should be text
 SELECT col_type_is('connec', 'om_state', 'text', 'Column om_state should be text');
 SELECT col_type_is('connec', 'conserv_state', 'text', 'Column conserv_state should be text');
 SELECT col_type_is('connec', 'priority', 'text', 'Column priority should be text');
-SELECT col_type_is('connec', 'valve_location', 'text', 'Column valve_location should be text');
 SELECT col_type_is('connec', '_valve_type', 'text', 'Column _valve_type should be text');
 SELECT col_type_is('connec', '_shutoff_valve', 'text', 'Column _shutoff_valve should be text');
 SELECT col_type_is('connec', 'access_type', 'text', 'Column access_type should be text');
@@ -118,7 +117,6 @@ SELECT col_type_is('connec', 'brand_id', 'varchar(50)', 'Column brand_id should 
 SELECT col_type_is('connec', 'model_id', 'varchar(50)', 'Column model_id should be varchar(50)');
 SELECT col_type_is('connec', 'serial_number', 'varchar(100)', 'Column serial_number should be varchar(100)');
 SELECT col_type_is('connec', 'label_quadrant', 'varchar(12)', 'Column label_quadrant should be varchar(12)');
-SELECT col_type_is('connec', 'cat_valve', 'varchar(30)', 'Column cat_valve should be varchar(30)');
 SELECT col_type_is('connec', 'macrominsector_id', 'int4', 'Column macrominsector_id should be int4');
 SELECT col_type_is('connec', 'n_hydrometer', 'int4', 'Column n_hydrometer should be int4');
 SELECT col_type_is('connec', 'streetname', 'varchar(100)', 'Column streetname should be varchar(100)');

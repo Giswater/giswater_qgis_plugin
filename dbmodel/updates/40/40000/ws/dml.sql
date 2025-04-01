@@ -3362,15 +3362,15 @@ INSERT INTO connec (connec_id, code, top_elev, "depth", conneccat_id, sector_id,
 dma_id, presszone_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, builtdate, enddate, ownercat_id, muni_id,
 postcode, streetaxis_id, postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, descript, link, verified, rotation, the_geom, undelete, label_x,
 label_y, label_rotation, publish, inventory, expl_id, num_value, feature_type, tstamp, pjoint_type, pjoint_id, lastupdate, lastupdate_user, insert_user, minsector_id,
-dqa_id, staticpressure, district_id, adate, adescript, accessibility, workcat_id_plan, asset_id, epa_type, om_state, conserv_state, priority, valve_location,
-_valve_type, _shutoff_valve, access_type, placement_type, crmzone_id, expl_id2, plot_code, brand_id, model_id, serial_number, label_quadrant, cat_valve,
+dqa_id, staticpressure, district_id, adate, adescript, accessibility, workcat_id_plan, asset_id, epa_type, om_state, conserv_state, priority,
+_valve_type, _shutoff_valve, access_type, placement_type, crmzone_id, expl_id2, plot_code, brand_id, model_id, serial_number, label_quadrant,
 macrominsector_id, n_hydrometer, streetname, streetname2, n_inhabitants, supplyzone_id, datasource, lock_level, block_zone)
 SELECT connec_id, code, top_elev, "depth", conneccat_id, sector_id, customer_code, state, state_type, arc_id, connec_length, annotation, observ, "comment",
 dma_id, presszone_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, builtdate, enddate, ownercat_id, muni_id,
 postcode, streetaxis_id, postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, descript, link, verified, rotation, the_geom, undelete, label_x,
 label_y, label_rotation, publish, inventory, expl_id, num_value, feature_type, tstamp, pjoint_type, pjoint_id, lastupdate, lastupdate_user, insert_user, minsector_id,
-dqa_id, staticpressure, district_id, adate, adescript, accessibility, workcat_id_plan, asset_id, epa_type, om_state, conserv_state, priority, valve_location,
-valve_type, shutoff_valve, access_type, placement_type, crmzone_id, expl_id2, plot_code, brand_id, model_id, serial_number, label_quadrant, cat_valve,
+dqa_id, staticpressure, district_id, adate, adescript, accessibility, workcat_id_plan, asset_id, epa_type, om_state, conserv_state, priority,
+valve_type, shutoff_valve, access_type, placement_type, crmzone_id, expl_id2, plot_code, brand_id, model_id, serial_number, label_quadrant,
 macrominsector_id, n_hydrometer, streetname, streetname2, n_inhabitants, supplyzone_id, datasource, lock_level, block_zone
 FROM _connec;
 

@@ -541,15 +541,15 @@ BEGIN
 		muni_id, streetaxis2_id,  postcode, district_id, postcomplement, postcomplement2, descript, link, verified, rotation,  the_geom, undelete, label_x,label_y,label_rotation, expl_id,
 		publish, inventory,num_value, connec_length, arc_id, minsector_id, dqa_id, pjoint_id, pjoint_type,
 		adate, adescript, accessibility, lastupdate, lastupdate_user, asset_id, epa_type, om_state, conserv_state, priority,
-		valve_location, access_type, placement_type, crmzone_id, expl_id2, plot_code, brand_id, model_id, serial_number, cat_valve, label_quadrant, streetname, streetname2, n_inhabitants, lock_level, block_zone)
+		access_type, placement_type, crmzone_id, expl_id2, plot_code, brand_id, model_id, serial_number, label_quadrant, streetname, streetname2, n_inhabitants, lock_level, block_zone)
 		VALUES (NEW.connec_id, NEW.code, NEW.datasource, NEW.top_elev, NEW.depth, NEW.conneccat_id, NEW.sector_id, NEW.customer_code,  NEW.state, NEW.state_type, NEW.annotation,   NEW.observ, NEW.comment,
 		NEW.dma_id, NEW.presszone_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type,  NEW.location_type, NEW.workcat_id, NEW.workcat_id_end,  NEW.workcat_id_plan,
 		NEW.builtdate, NEW.enddate, NEW.ownercat_id, v_streetaxis, NEW.postnumber, NEW.postnumber2, NEW.muni_id, v_streetaxis2, NEW.postcode, NEW.district_id, NEW.postcomplement,
 		NEW.postcomplement2, NEW.descript, NEW.link, NEW.verified, NEW.rotation, NEW.the_geom,NEW.undelete,NEW.label_x, NEW.label_y,NEW.label_rotation,  NEW.expl_id, NEW.publish, NEW.inventory,
 		NEW.num_value, NEW.connec_length, NEW.arc_id, NEW.minsector_id, NEW.dqa_id, NEW.pjoint_id, NEW.pjoint_type,
 		NEW.adate, NEW.adescript, NEW.accessibility, NEW.lastupdate, NEW.lastupdate_user, NEW.asset_id, NEW.epa_type, NEW.om_state, NEW.conserv_state, NEW.priority,
-		NEW.valve_location, NEW.access_type, NEW.placement_type, NEW.crmzone_id, NEW.expl_id2, NEW.plot_code, NEW.brand_id, NEW.model_id, NEW.serial_number,
-		NEW.cat_valve, NEW.label_quadrant, NEW.streetname, NEW.streetname2, NEW.n_inhabitants, NEW.lock_level, NEW.block_zone);
+		NEW.access_type, NEW.placement_type, NEW.crmzone_id, NEW.expl_id2, NEW.plot_code, NEW.brand_id, NEW.model_id, NEW.serial_number,
+		NEW.label_quadrant, NEW.streetname, NEW.streetname2, NEW.n_inhabitants, NEW.lock_level, NEW.block_zone);
 
 		SELECT feature_class, cat_feature.id INTO v_feature_class, v_featurecat_id FROM cat_feature
 		JOIN cat_connec ON cat_feature.id=connec_type where cat_connec.id=NEW.conneccat_id;
@@ -880,9 +880,8 @@ BEGIN
 			inventory=NEW.inventory, expl_id=NEW.expl_id, num_value=NEW.num_value, connec_length=NEW.connec_length, link=NEW.link, lastupdate=now(), lastupdate_user=current_user,
 			dqa_id=NEW.dqa_id, minsector_id=NEW.minsector_id, pjoint_id=NEW.pjoint_id, pjoint_type = NEW.pjoint_type,
 			adate=NEW.adate, adescript=NEW.adescript, accessibility =  NEW.accessibility, asset_id=NEW.asset_id, epa_type = NEW.epa_type,
-			om_state = NEW.om_state, conserv_state = NEW.conserv_state, priority = NEW.priority,
-			valve_location = NEW.valve_location, access_type = NEW.access_type, placement_type = NEW.placement_type,
-			crmzone_id=NEW.crmzone_id, expl_id2=NEW.expl_id2, plot_code=NEW.plot_code, brand_id=NEW.brand_id, model_id=NEW.model_id, serial_number=NEW.serial_number, cat_valve=NEW.cat_valve,
+			om_state = NEW.om_state, conserv_state = NEW.conserv_state, priority = NEW.priority, access_type = NEW.access_type, placement_type = NEW.placement_type,
+			crmzone_id=NEW.crmzone_id, expl_id2=NEW.expl_id2, plot_code=NEW.plot_code, brand_id=NEW.brand_id, model_id=NEW.model_id, serial_number=NEW.serial_number,
 			label_quadrant=NEW.label_quadrant, streetname = NEW.streetname, streetname2 = NEW.streetname2, n_inhabitants = NEW.n_inhabitants, lock_level=NEW.lock_level, block_zone=NEW.block_zone
 			WHERE connec_id=OLD.connec_id;
 

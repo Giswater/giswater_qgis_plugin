@@ -1099,7 +1099,6 @@ CREATE OR REPLACE VIEW vu_connec AS
     connec.om_state,
     connec.conserv_state,
     connec.priority,
-    connec.valve_location,
     connec.access_type,
     connec.placement_type,
     connec.expl_id2,
@@ -1114,7 +1113,6 @@ CREATE OR REPLACE VIEW vu_connec AS
       ELSE connec.model_id
     END AS model_id,
     connec.serial_number,
-    connec.cat_valve,
     connec.minsector_id,
     connec.macrominsector_id,
     e.demand_base,
@@ -1381,7 +1379,6 @@ AS WITH
         dqa_table.stylesheet ->> 'featureColor'::text AS dqa_style,
         supplyzone_table.stylesheet ->> 'featureColor'::text AS supplyzone_style,
         connec.priority,
-        connec.valve_location,
         connec.access_type,
         connec.placement_type,
         connec.om_state,
@@ -1398,7 +1395,6 @@ AS WITH
           ELSE connec.model_id
         END AS model_id,
         connec.serial_number,
-        connec.cat_valve,
         CASE
           WHEN link_planned.minsector_id IS NULL THEN connec.minsector_id
           ELSE link_planned.minsector_id
