@@ -7,7 +7,7 @@ or (at your option) any later version.
 # -*- coding: latin-1 -*-
 import operator
 from functools import partial
-
+from qgis.PyQt.QtCore import QDateTime
 from qgis.PyQt.QtGui import QStandardItemModel
 from ..utils import tools_gw
 from ..ui.ui_manager import GwAuditManagerUi, GwAuditUi
@@ -46,6 +46,11 @@ class GwAudit:
         # connect signals
         self.dlg_audit_manager.tbl_audit.doubleClicked.connect(partial(self.open_audit))
 
+        # Set calendar options
+        self.date = self.dlg_audit_manager.findChild(QWidget, "tab_none_date_to")
+        self.date.setDateTime(QDateTime.currentDateTime())
+        self.date.setMaximumDateTime(QDateTime.currentDateTime())
+
 
     def open_audit(self):
         """ Open selected audit """
@@ -54,7 +59,7 @@ class GwAudit:
         selected_list = self.dlg_audit_manager.tbl_audit.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
-            tools_qgis.show_warning(message, dialog=self.dlg_psector_mng)
+            tools_qgis.show_warning(message, dialog=self.dlg_audit_manager)
             return
         row = selected_list[0].row()
 
@@ -78,8 +83,8 @@ class GwAudit:
             row = 0
             for old_data, new_data in zip(result[0].items(), result[1].items()):
                 # create widgets
-                label = QLabel(str(old_data[0]))
-                line_edit = QLineEdit(str(old_data[1]))
+                label = QLabel(str(new_data[0]))
+                line_edit = QLineEdit(str(new_data[1]))
 
                 # check if previous data is diferent from the current
                 if str(old_data[1]) != str(new_data[1]):
@@ -120,6 +125,8 @@ class GwAudit:
         tools_gw.set_tablemodel_config(self.dlg_audit_manager, self.dlg_audit_manager.tbl_audit, 'audit_results')
         tools_qt.set_tableview_config(self.dlg_audit_manager.tbl_audit, edit_triggers=QTableView.NoEditTriggers)
 
+        self.dlg_audit_manager.tbl_audit.setColumnHidden(0, True)
+
         return complet_list
 
     def _get_list(self, feature_id=None):
@@ -149,3 +156,10 @@ def close_dlg(**kwargs):
 
     dialog = kwargs["dialog"]
     tools_gw.close_dialog(dialog)
+
+def open(**kwargs):
+    """ Open audit """
+
+    dialog = kwargs["class"]
+
+    dialog.open_audit()
