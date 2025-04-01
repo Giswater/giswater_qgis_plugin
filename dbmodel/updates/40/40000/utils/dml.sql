@@ -2029,11 +2029,34 @@ UPDATE config_form_tabs SET "label"='Data', tooltip='Data', sys_role='role_basic
 
 INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('linkedaction_typevalue', 'action_audit', 'action_audit', 'actionAudit', NULL);
 INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('formtype_typevalue', 'audit_manager', 'audit_manager', 'auditManager', NULL);
+INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('layout_name_typevalue', 'lyt_audit_manager_2', 'lyt_audit_manager_2', 'layoutAuditManager2', '{
+  "lytOrientation": "vertical"
+}'::json);
 INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('layout_name_typevalue', 'lyt_audit_manager_1', 'lyt_audit_manager_1', 'layoutAuditManager1', '{
   "lytOrientation": "horizontal"
 }'::json);
 
-INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('audit_results', 'SELECT id, "schema", table_name, id_name, user_name, "action", query, tstamp FROM audit.log WHERE id IS NOT NULL', 4, 'tab', 'list', '{"orderBy":"1", "orderType": "ASC"}'::json, '{
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'audit_manager', 'tab_none', 'btn_open', 'lyt_audit_manager_1', 2, NULL, 'button', NULL, 'Open', NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{
+  "text": "Open"
+}'::json, '{
+  "functionName": "open",
+  "module": "audit"
+}'::json, NULL, false, 0);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'audit_manager', 'tab_none', 'date_to', 'lyt_audit_manager_2', 0, 'date', 'datetime', NULL, NULL, NULL, false, false, true, false, true, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'audit_manager', 'tab_none', 'btn_open_date', 'lyt_audit_manager_2', 1, NULL, 'button', NULL, 'Open', NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{
+  "text": "Open date"
+}'::json, '{
+  "functionName": "open_date",
+  "module": "audit"
+}'::json, NULL, false, 0);
+INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'audit_manager', 'tab_none', 'btn_close', 'lyt_buttons', 2, NULL, 'button', NULL, 'Close', NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{
+  "text": "Close"
+}'::json, '{
+  "functionName": "close_dlg",
+  "module": "audit"
+}'::json, NULL, false, 0);
+
+INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('audit_results', 'SELECT id, tstamp, "action", query, user_name FROM audit.log WHERE id IS NOT NULL', 4, 'tab', 'list', '{"orderBy":"1", "orderType": "ASC"}'::json, '{
   "enableGlobalFilter": false,
   "enableStickyHeader": true,
   "positionToolbarAlertBanner": "bottom",
@@ -2105,13 +2128,6 @@ INSERT INTO config_form_list (listname, query_text, device, listtype, listclass,
     }
   ]
 }'::json);
-
-INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'audit_manager', 'tab_none', 'btn_close', 'lyt_buttons', 2, NULL, 'button', NULL, 'Close', NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{
-  "text": "Close"
-}'::json, '{
-  "functionName": "close_dlg",
-  "module": "audit"
-}'::json, NULL, false, 0);
 
 DELETE FROM config_form_fields WHERE formname='v_edit_dimensions' AND formtype='form_feature' AND columnname='id' AND tabname='tab_none';
 
