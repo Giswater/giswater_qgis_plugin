@@ -14,6 +14,7 @@ CREATE TABLE SCHEMA_NAME.log (
     feature_id text,
     action text,
     query text,
+    query_sql text NULL,
     olddata json,
     newdata json,
     user_name text,
