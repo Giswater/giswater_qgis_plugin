@@ -32,6 +32,7 @@ v_geojson json;
 v_lastseed text;
 v_table text;
 v_updatetables text;
+v_extra text;
 
 BEGIN
 
