@@ -16,14 +16,38 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
     <item row="0" column="0">
-     <layout class="QGridLayout" name="lyt_audit_manager_1">
-      <item row="0" column="0">
-       <widget class="QTableView" name="tbl_audit"/>
-      </item>
-     </layout>
+     <widget class="QGroupBox" name="groupBox">
+      <property name="title">
+       <string>Logs</string>
+      </property>
+      <layout class="QGridLayout" name="gridLayout_2">
+       <item row="1" column="0">
+        <layout class="QGridLayout" name="lyt_audit_manager_1"/>
+       </item>
+       <item row="0" column="0">
+        <widget class="QTableView" name="tbl_audit"/>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <layout class="QGridLayout" name="lyt_buttons"/>
     </item>
     <item row="1" column="0">
-     <layout class="QGridLayout" name="lyt_buttons"/>
+     <widget class="QGroupBox" name="groupBox_2">
+      <property name="title">
+       <string>Date to</string>
+      </property>
+      <layout class="QGridLayout" name="gridLayout_4">
+       <item row="0" column="0">
+        <layout class="QGridLayout" name="lyt_audit_manager_2">
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+        </layout>
+       </item>
+      </layout>
+     </widget>
     </item>
    </layout>
   </widget>
