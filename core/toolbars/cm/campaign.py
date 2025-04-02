@@ -42,6 +42,29 @@ class Campaign:
         """ Opens the campaign management interface """
         self.dialog = CampaignManagementUi(self)
         tools_gw.load_settings(self.dialog)
+        self.load_campaigns_into_manager()
+
+        self.dialog.tbl_campaign.setEditTriggers(QTableView.NoEditTriggers)
+        self.dialog.tbl_campaign.setSelectionBehavior(QTableView.SelectRows)
+        self.dialog.tbl_campaign.setSelectionMode(QTableView.SingleSelection)
+
+        # Populate combo date type
+        rows = [['real_startdate', 'Data inici'], ['real_enddate', 'Data fi'], ['startdate', 'Data inici planificada'],
+                ['enddate', 'Data final planificada']]
+        tools_qt.fill_combo_values(self.dialog.campaign_cmb_date_filter_type, rows, 1, sort_combo=False)
+
+        # Fill combo values for campaign status (based on edit_typevalue table)
+        sql = "SELECT id, idval FROM edit_typevalue WHERE typevalue = 'cm_campaing_lot_status' ORDER BY id"
+        rows = tools_db.get_rows(sql)
+        tools_qt.fill_combo_values(self.dialog.campaign_cmb_state, rows, index_to_show=1, add_empty=True)
+
+
+        # Set filter events
+
+        self.dialog.campaign_cmb_date_filter_type.currentIndexChanged.connect(self.filter_campaigns)
+        self.dialog.campaign_cmb_date_filter_type.currentIndexChanged.connect(self.manage_date_filter)
+
+        self.manage_date_filter()
         tools_gw.open_dialog(self.dialog, dlg_name="campaign_manager")
 
 
@@ -50,6 +73,7 @@ class Campaign:
         # In the edit_typevalue or another cm.edit_typevalue
         # INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('cm_campaing_type', '1', 'Review', NULL, NULL);
         # INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('cm_campaing_type', '2', 'Visit', NULL, NULL);
+        # same with status and status in x_feature
 
         modes = {"review": 1, "visit": 2}
         self.campaign_type = modes.get(mode, 1)
@@ -295,6 +319,7 @@ class Campaign:
             partial(tools_gw.selection_init, self, self.dialog, None, False)
         )
 
+
     def _update_feature_completer(self, dlg):
         tab_name = dlg.tab_feature.currentWidget().objectName()
         table_map = {
@@ -415,6 +440,7 @@ class Campaign:
         view.setModel(model)
         view.resizeColumnsToContents()
 
+
     def _refresh_relation_table(self, dialog):
         """Refresh the current relation table based on selected tab"""
         tab_name = dialog.tab_feature.currentWidget().objectName()
@@ -450,3 +476,83 @@ class Campaign:
         print(campaign_id)
 
         self._load_relation_table(table_widget, table_name, id_column, campaign_id)
+
+
+    # Campaign manager
+    def load_campaigns_into_manager(self):
+        """Load campaign data into the campaign management table"""
+        if not hasattr(self.dialog, "tbl_campaign"):
+            return
+
+        query = "SELECT * FROM cm.om_campaign ORDER BY id DESC"
+        self.populate_tableview(self.dialog.tbl_campaign, query)
+
+
+    def manage_date_filter(self):
+        """Update date filters based on selected field (e.g., real_startdate)"""
+        field = tools_qt.get_combo_value(self.dialog, self.dialog.campaign_cmb_date_filter_type, 0)
+        print(field)
+        if not field:
+            return
+
+        sql = f"""
+            SELECT 
+                MIN({field})::date AS min_date, 
+                MAX({field})::date AS max_date 
+            FROM cm.om_campaign 
+            WHERE {field} IS NOT NULL
+        """
+        print(sql)
+        result = tools_db.get_row(sql)
+
+        if result:
+            min_date = result.get("min_date")
+            max_date = result.get("max_date")
+
+            if min_date:
+                self.dialog.date_event_from.setDate(min_date)
+            if max_date:
+                self.dialog.date_event_to.setDate(max_date)
+
+
+    def filter_campaigns(self):
+        """Filter om_campaign based on status and date"""
+        filters = []
+
+        status = tools_qt.get_combo_value(self.dialog, self.dialog.campaign_cmb_state, 1)
+
+        show_nulls = self.dialog.campaign_chk_show_nulls.isChecked()
+        date_from = self.dialog.date_event_from.date()
+        date_to = self.dialog.date_event_to.date()
+
+        if date_from > date_to:
+            tools_qgis.show_warning("Invalid date range.")
+            return
+
+        date_format_low = self.campaign_date_format + ' 00:00:00'
+        date_format_high = self.campaign_date_format + ' 23:59:59'
+
+        interval = f"'{date_from.toString(date_format_low)}' AND '{date_to.toString(date_format_high)}'"
+        date_filter = f"({date_type} BETWEEN {interval}"
+
+        if show_nulls:
+            date_filter += f" OR {date_type} IS NULL)"
+        else:
+            date_filter += ")"
+
+        filters.append(date_filter)
+
+        if text_filter:
+            filters.append(f"(descript ILIKE '%{text_filter}%' OR serie ILIKE '%{text_filter}%')")
+
+        if status not in ("", "-1", None):
+            filters.append(f"status::TEXT ILIKE '%{status}%'")
+
+        where_clause = " AND ".join(filters)
+        query = f"SELECT * FROM cm.om_campaign"
+        if where_clause:
+            query += f" WHERE {where_clause}"
+        query += " ORDER BY id DESC"
+
+        self.populate_tableview(self.dialog.tbl_campaign, query)
+

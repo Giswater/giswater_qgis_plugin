@@ -73,7 +73,6 @@ from .am.result_selector_btn import GwResultSelectorButton
 
 # cm
 from .cm.add_campaign_btn import GwAddCampaignButton
-from .cm.manager_campaign_btn import GwManageCampaignButton
+from .cm.manager_campaign_lot_btn import GwManageCampaignLotButton
 from .cm.add_lot_btn import GwAddLotButton
-from .cm.manager_lot_btn import GwManageLotButton
 from .cm.resources_lot_btn import GwLotResourceManagementButton
