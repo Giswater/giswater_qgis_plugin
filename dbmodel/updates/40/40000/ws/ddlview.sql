@@ -257,11 +257,13 @@ AS WITH
 		),
   arc_selector AS
 		(
-		SELECT arc.arc_id
-		FROM arc
-		JOIN selector_state s ON s.cur_user = CURRENT_USER AND arc.state = s.state_id
-		LEFT JOIN arc_psector aps ON aps.arc_id = arc.arc_id
-		WHERE (aps.arc_id IS NULL OR aps.p_state = 1)
+      SELECT arc.arc_id
+      FROM arc
+      JOIN selector_state s ON s.cur_user = CURRENT_USER AND arc.state = s.state_id
+      LEFT JOIN (SELECT arc_id FROM arc_psector WHERE p_state = 0) a USING (arc_id) WHERE a.arc_id IS NULL
+      UNION ALL
+      SELECT arc_id FROM arc_psector
+      WHERE p_state = 1
     ),
   arc_selected AS
     (
@@ -610,11 +612,13 @@ AS WITH
       ),
     node_selector AS
       (
-        SELECT DISTINCT n.node_id
-        FROM node n
-        JOIN selector_state s ON s.cur_user = current_user AND n.state = s.state_id
-        LEFT JOIN node_psector np ON np.node_id = n.node_id
-        WHERE np.node_id IS NULL OR np.p_state = 1
+        SELECT node_id
+        FROM node
+        JOIN selector_state s ON s.cur_user = current_user AND node.state = s.state_id
+        LEFT JOIN (SELECT node_id FROM node_psector WHERE p_state = 0) a USING (node_id) WHERE a.node_id IS NULL
+        UNION ALL
+        SELECT node_id FROM node_psector
+        WHERE p_state = 1
       ),
     node_selected AS
       (
@@ -910,12 +914,13 @@ AS WITH
       ),
     link_selector AS
       (
-        SELECT DISTINCT l.link_id
+        SELECT l.link_id
         FROM link l
-        JOIN selector_state s ON s.cur_user =current_user AND l.state =s.state_id
-        LEFT JOIN link_psector lp0 ON lp0.link_id = l.link_id AND lp0.p_state = 0
-        LEFT JOIN link_psector lp1 ON lp1.link_id = l.link_id AND lp1.p_state = 1
-        WHERE lp0.link_id IS NULL
+        JOIN selector_state s ON s.cur_user = current_user AND l.state = s.state_id
+        LEFT JOIN (SELECT link_id FROM link_psector WHERE p_state = 0) a USING (link_id) WHERE a.link_id IS NULL
+        UNION ALL
+        SELECT link_id FROM link_psector
+        WHERE p_state = 1
       ),
     link_selected AS
       (
@@ -1228,11 +1233,13 @@ AS WITH
       ),
     connec_selector AS
       (
-        SELECT DISTINCT c.connec_id, COALESCE(cp1.arc_id, c.arc_id)::varchar(16) AS arc_id, cp1.link_id
-        FROM connec c JOIN selector_state ss ON ss.cur_user = current_user AND c.state = ss.state_id
-        LEFT JOIN connec_psector cp0 ON cp0.connec_id = c.connec_id AND cp0.arc_id = c.arc_id AND cp0.p_state   = 0
-        LEFT JOIN connec_psector cp1 ON cp1.connec_id = c.connec_id AND cp1.p_state = 1
-        WHERE cp0.connec_id IS NULL
+        SELECT connec_id, arc_id::varchar(16), null::integer as link_id
+        FROM connec
+        JOIN selector_state ss ON ss.cur_user = current_user AND connec.state = ss.state_id
+        LEFT JOIN (SELECT connec_id, arc_id FROM connec_psector WHERE p_state = 0) a USING (connec_id, arc_id) WHERE a.connec_id IS NULL
+        UNION ALL
+        SELECT connec_id, connec_psector.arc_id::varchar(16), link_id FROM connec_psector
+        WHERE p_state = 1
       ),
     connec_selected AS
       (
