@@ -105,31 +105,68 @@ BEGIN
 
 				INSERT INTO archived_psector_connec_traceability
 				SELECT nextval('SCHEMA_NAME.archived_psector_connec_traceability_id_seq'), psector_id, pc.state, doable, pc.arc_id, l.link_id, l.the_geom, now(), current_user, 'Execute psector',
-				connec_id, code, top_elev, depth, c.conneccat_id,  c.sector_id, customer_code, c.state, c.state_type, c.arc_id, connec_length, annotation, observ, comment, c.dma_id,
+				connec_id, c.code, top_elev, depth, c.conneccat_id,  c.sector_id, customer_code, c.state, c.state_type, c.arc_id, connec_length, annotation, observ, comment, c.dma_id,
 				c.presszone_id, soilcat_id, function_type, category_type, c.fluid_type, location_type, c.workcat_id, c.workcat_id_end, c.builtdate, c.enddate, ownercat_id,
 				c.muni_id, postcode, streetaxis_id, postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, c.descript, link, c.verified, rotation, c.the_geom, undelete,
 				label_x, label_y, label_rotation, publish, inventory, c.expl_id, num_value, c.feature_type, c.tstamp, pjoint_type, pjoint_id, c.lastupdate, c.lastupdate_user, c.insert_user,
-				c.minsector_id, c.dqa_id, c.staticpressure, district_id,adate, adescript, accessibility,workcat_id_plan,asset_id, c.epa_type, om_state, conserv_state, priority, valve_location,
-				valve_type, shutoff_valve, access_type, placement_type, crmzone_id,c.expl_id2,plot_code,brand_id,model_id,serial_number,label_quadrant,c.macrominsector_id, streetname, streetname2
+				c.minsector_id, c.dqa_id, c.staticpressure, district_id,adate, adescript, accessibility,workcat_id_plan,asset_id, c.epa_type, om_state, conserv_state, priority,
+				access_type, placement_type, crmzone_id,c.expl_id2,plot_code,brand_id,model_id,serial_number,label_quadrant,c.macrominsector_id, streetname, streetname2
 				FROM plan_psector_x_connec pc JOIN connec c USING (connec_id)
 				JOIN link l USING (link_id)
 				WHERE psector_id=NEW.psector_id;
 
-				INSERT INTO archived_psector_link_traceability
-				SELECT nextval('SCHEMA_NAME.archived_psector_link_traceability_id_seq'), psector_id, pc.state, doable, now(), current_user, 'Execute psector', l.*
-				FROM plan_psector_x_connec pc JOIN link l USING (link_id)
-				WHERE psector_id=NEW.psector_id;
+				INSERT INTO archived_psector_link_traceability (id, psector_id, psector_state, doable, audit_tstamp, audit_user, "action",
+					link_id, code, feature_id, feature_type, exit_id, exit_type, userdefined_geom, state, expl_id, the_geom, exit_topelev, exit_elev, sector_id, dma_id, fluid_type,
+					presszone_id, dqa_id, minsector_id, expl_id2, epa_type, is_operative, insert_user, lastupdate, lastupdate_user, staticpressure, conneccat_id, workcat_id, workcat_id_end,
+					builtdate, enddate, uncertain, muni_id, macrominsector_id, verified, supplyzone_id, n_hydrometer, custom_length, datasource)
+				SELECT nextval('SCHEMA_NAME.archived_psector_link_traceability_id_seq'), pc.psector_id, pc.state, pc.doable, now(), current_user, 'Execute psector',
+					l.link_id, l.code, l.feature_id, l.feature_type, l.exit_id, l.exit_type, l.userdefined_geom, l.state, l.expl_id, l.the_geom, l.exit_topelev, l.exit_elev, l.sector_id, l.dma_id, l.fluid_type,
+					l.presszone_id, l.dqa_id, l.minsector_id, l.expl_id2, l.epa_type, l.is_operative, l.insert_user, l.lastupdate, l.lastupdate_user, l.staticpressure, l.conneccat_id, l.workcat_id, l.workcat_id_end,
+					l.builtdate, l.enddate, l.uncertain, l.muni_id, l.macrominsector_id, l.verified, l.supplyzone_id, l.n_hydrometer, l.custom_length, l.datasource
+				FROM plan_psector_x_connec pc
+				JOIN link l USING (link_id)
+				WHERE pc.psector_id = 2;
 
 				-- arc & node insert is different from ud because UD has legacy of _sys_length & _sys_elev and the impossibility to remove it from old production environments
-				INSERT INTO archived_psector_arc_traceability
-				SELECT nextval('SCHEMA_NAME.archived_psector_arc_traceability_id_seq'), psector_id, pa.state, doable, addparam, now(), current_user, 'Execute psector', arc.*
-				FROM plan_psector_x_arc pa JOIN arc USING (arc_id)
-				WHERE psector_id=NEW.psector_id;
+				INSERT INTO archived_psector_arc_traceability (
+					id, psector_id, psector_state, doable, addparam, audit_tstamp, audit_user, "action",
+					arc_id, code, node_1, node_2, arccat_id, epa_type, sector_id, state, state_type, annotation, observ, "comment", custom_length, dma_id, presszone_id, soilcat_id, function_type,
+					category_type, fluid_type, location_type, workcat_id, workcat_id_end, builtdate, enddate, ownercat_id, muni_id, postcode, streetaxis_id, postnumber, postcomplement, streetaxis2_id,
+					postnumber2, postcomplement2, descript, link, verified, the_geom, undelete, label_x, label_y, label_rotation, publish, inventory, expl_id, num_value, feature_type, tstamp, lastupdate,
+					lastupdate_user, insert_user, minsector_id, dqa_id, district_id, adate, adescript, workcat_id_plan, asset_id, pavcat_id, nodetype_1, elevation1, depth1, staticpress1, nodetype_2, elevation2,
+					depth2, staticpress2, om_state, conserv_state, parent_id, expl_id2, brand_id, model_id, serial_number, label_quadrant, macrominsector_id, streetname, streetname2, supplyzone_id, datasource,
+					lock_level, is_scadamap
+				)
+				SELECT
+					nextval('SCHEMA_NAME.archived_psector_arc_traceability_id_seq'), pa.psector_id, pa.state, pa.doable, pa.addparam, now(), current_user, 'Execute psector',
+					a.arc_id, a.code, a.node_1, a.node_2, a.arccat_id, a.epa_type, a.sector_id, a.state, a.state_type, a.annotation, a.observ, a.comment, a.custom_length, a.dma_id, a.presszone_id::varchar, a.soilcat_id, a.function_type,
+					a.category_type, a.fluid_type, a.location_type, a.workcat_id, a.workcat_id_end, a.builtdate, a.enddate, a.ownercat_id, a.muni_id, a.postcode, a.streetaxis_id, a.postnumber, a.postcomplement, a.streetaxis2_id,
+					a.postnumber2, a.postcomplement2, a.descript, a.link, a.verified, a.the_geom, a.undelete, a.label_x, a.label_y, a.label_rotation, a.publish, a.inventory, a.expl_id, a.num_value, a.feature_type, a.tstamp, a.lastupdate,
+					a.lastupdate_user, a.insert_user, a.minsector_id, a.dqa_id, a.district_id, a.adate, a.adescript, a.workcat_id_plan, a.asset_id, a.pavcat_id, a.nodetype_1, a.elevation1, a.depth1, a.staticpress1, a.nodetype_2, a.elevation2,
+					a.depth2, a.staticpress2, a.om_state, a.conserv_state, a.parent_id, a.expl_id2, a.brand_id, a.model_id, a.serial_number, a.label_quadrant, a.macrominsector_id, a.streetname, a.streetname2, a.supplyzone_id, a.datasource,
+					a.lock_level, a.is_scadamap
+				FROM plan_psector_x_arc pa
+				JOIN arc a USING (arc_id)
+				WHERE pa.psector_id = NEW.psector_id;
 
-				INSERT INTO archived_psector_node_traceability
-				SELECT nextval('SCHEMA_NAME.archived_psector_node_traceability_id_seq'), psector_id, pn.state, doable, addparam, now(), current_user, 'Execute psector', node.*
-				FROM plan_psector_x_node pn JOIN node USING (node_id)
-				WHERE psector_id=NEW.psector_id;
+				INSERT INTO archived_psector_node_traceability (
+					id, psector_id, psector_state, doable, addparam, audit_tstamp, audit_user, "action",
+					node_id, code, elevation, "depth", nodecat_id, epa_type, sector_id, arc_id, parent_id, state, state_type, annotation, observ, "comment", dma_id, presszone_id, soilcat_id, function_type,
+					category_type, fluid_type, location_type, workcat_id, workcat_id_end, builtdate, enddate, ownercat_id, muni_id, postcode, streetaxis_id, postnumber, postcomplement, streetaxis2_id,
+					postnumber2, postcomplement2, descript, link, verified, rotation, the_geom, undelete, label_x, label_y, label_rotation, publish, inventory, hemisphere, expl_id, num_value, feature_type, tstamp, lastupdate,
+					lastupdate_user, insert_user, minsector_id, dqa_id, staticpressure, district_id, adate, adescript, accessibility, workcat_id_plan, asset_id, om_state, conserv_state, access_type, placement_type, expl_id2,
+					brand_id, model_id, serial_number, label_quadrant, macrominsector_id, streetname, streetname2, top_elev, custom_top_elev, datasource, supplyzone_id, lock_level, is_scadamap
+				)
+				SELECT
+					nextval('SCHEMA_NAME.archived_psector_node_traceability_id_seq'), pn.psector_id, pn.state, pn.doable, pn.addparam, now(), current_user, 'Execute psector',
+					n.node_id, n.code, n.custom_top_elev, n.depth, n.nodecat_id, n.epa_type, n.sector_id, n.arc_id, n.parent_id, n.state, n.state_type, n.annotation, n.observ, n.comment, n.dma_id, n.presszone_id::varchar, n.soilcat_id, n.function_type,
+					n.category_type, n.fluid_type, n.location_type, n.workcat_id, n.workcat_id_end, n.builtdate, n.enddate, n.ownercat_id, n.muni_id, n.postcode, n.streetaxis_id, n.postnumber, n.postcomplement, n.streetaxis2_id,
+					n.postnumber2, n.postcomplement2, n.descript, n.link, n.verified, n.rotation, n.the_geom, n.undelete, n.label_x, n.label_y, n.label_rotation, n.publish, n.inventory, n.hemisphere, n.expl_id, n.num_value, n.feature_type, n.tstamp, n.lastupdate,
+					n.lastupdate_user, n.insert_user, n.minsector_id, n.dqa_id, n.staticpressure, n.district_id, n.adate, n.adescript, n.accessibility, n.workcat_id_plan, n.asset_id, n.om_state, n.conserv_state, n.access_type, n.placement_type, n.expl_id2,
+					n.brand_id, n.model_id, n.serial_number, n.label_quadrant, n.macrominsector_id, n.streetname, n.streetname2, n.top_elev, n.custom_top_elev, n.datasource, n.supplyzone_id, n.lock_level, n.is_scadamap
+				FROM plan_psector_x_node pn
+				JOIN node n USING (node_id)
+				WHERE pn.psector_id = NEW.psector_id;
 
 			ELSIF v_projectype = 'UD' THEN
 
@@ -165,9 +202,13 @@ BEGIN
 				WHERE psector_id=NEW.psector_id;
 
 				INSERT INTO archived_psector_link_traceability
-				SELECT nextval('SCHEMA_NAME.archived_psector_link_traceability_id_seq'), psector_id, pc.state, doable, now(), current_user, 'Execute psector', l.*
-				FROM plan_psector_x_connec pc JOIN link l USING (link_id)
-				WHERE psector_id=NEW.psector_id;
+				SELECT nextval('SCHEMA_NAME.archived_psector_link_traceability_id_seq'), pc.psector_id, pc.state, pc.doable, now(), current_user, 'Execute psector',
+				l.link_id, l.code, l.feature_id, l.feature_type, l.exit_id, l.exit_type, l.userdefined_geom, l.state, l.expl_id, l.the_geom, l.exit_topelev, l.exit_elev, l.sector_id, l.dma_id, l.fluid_type,
+				l.presszone_id, l.dqa_id, l.minsector_id, l.expl_id2, l.epa_type, l.is_operative, l.insert_user, l.lastupdate, l.lastupdate_user, l.staticpressure, l.conneccat_id, l.workcat_id, l.workcat_id_end,
+				l.builtdate, l.enddate, l.uncertain, l.muni_id, l.macrominsector_id, l.verified, l.supplyzone_id, l.n_hydrometer, l.custom_length, l.datasource
+				FROM plan_psector_x_connec pc
+				JOIN link l USING (link_id)
+				WHERE pc.psector_id=NEW.psector_id;
 
 				INSERT INTO archived_psector_gully_traceability
 				SELECT nextval('SCHEMA_NAME.archived_psector_gully_traceability_id_seq'), psector_id, pg.state, doable, pg.arc_id, l.link_id, l.the_geom, now(), current_user, 'Execute psector', gully.*
@@ -333,31 +374,68 @@ BEGIN
 
 				INSERT INTO archived_psector_connec_traceability
 				SELECT nextval('SCHEMA_NAME.archived_psector_connec_traceability_id_seq'), psector_id, pc.state, doable, pc.arc_id, l.link_id, l.the_geom, now(), current_user, v_action,
-				connec_id, code, elevation, depth, c.conneccat_id,  c.sector_id, customer_code, c.state, c.state_type, c.arc_id, connec_length, annotation, observ, comment, c.dma_id,
+				connec_id, c.code, elevation, depth, c.conneccat_id,  c.sector_id, customer_code, c.state, c.state_type, c.arc_id, connec_length, annotation, observ, comment, c.dma_id,
 				c.presszone_id, soilcat_id, function_type, category_type, c.fluid_type, location_type, c.workcat_id, c.workcat_id_end, c.builtdate, c.enddate, ownercat_id,
 				c.muni_id, postcode, streetaxis_id, postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, c.descript, link, verified, rotation, c.the_geom, undelete,
 				label_x, label_y, label_rotation, publish, inventory, c.expl_id, num_value, c.feature_type, c.tstamp, pjoint_type, pjoint_id, c.lastupdate, c.lastupdate_user, c.insert_user,
-				c.minsector_id, c.dqa_id, c.staticpressure, district_id,adate, adescript, accessibility,workcat_id_plan,asset_id, c.epa_type, om_state, conserv_state, priority, valve_location,
-				valve_type, shutoff_valve, access_type, placement_type, crmzone_id,c.expl_id2, plot_code,brand_id,model_id,serial_number,label_quadrant,c.macrominsector_id, streetname, streetname2
+				c.minsector_id, c.dqa_id, c.staticpressure, district_id,adate, adescript, accessibility,workcat_id_plan,asset_id, c.epa_type, om_state, conserv_state, priority,
+				access_type, placement_type, crmzone_id,c.expl_id2, plot_code,brand_id,model_id,serial_number,label_quadrant,c.macrominsector_id, streetname, streetname2
 				FROM plan_psector_x_connec pc JOIN connec c USING (connec_id)
 				JOIN link l USING (link_id)
 				WHERE psector_id=NEW.psector_id;
 
-				INSERT INTO archived_psector_link_traceability
-				SELECT nextval('SCHEMA_NAME.archived_psector_link_traceability_id_seq'), psector_id, pc.state, doable, now(), current_user, v_action, l.*
-				FROM plan_psector_x_connec pc JOIN link l USING (link_id)
-				WHERE psector_id=NEW.psector_id;
+				INSERT INTO archived_psector_link_traceability (id, psector_id, psector_state, doable, audit_tstamp, audit_user, "action",
+					link_id, code, feature_id, feature_type, exit_id, exit_type, userdefined_geom, state, expl_id, the_geom, exit_topelev, exit_elev, sector_id, dma_id, fluid_type,
+					presszone_id, dqa_id, minsector_id, expl_id2, epa_type, is_operative, insert_user, lastupdate, lastupdate_user, staticpressure, conneccat_id, workcat_id, workcat_id_end,
+					builtdate, enddate, uncertain, muni_id, macrominsector_id, verified, supplyzone_id, n_hydrometer, custom_length, datasource)
+				SELECT nextval('SCHEMA_NAME.archived_psector_link_traceability_id_seq'), pc.psector_id, pc.state, pc.doable, now(), current_user, 'Execute psector',
+					l.link_id, l.code, l.feature_id, l.feature_type, l.exit_id, l.exit_type, l.userdefined_geom, l.state, l.expl_id, l.the_geom, l.exit_topelev, l.exit_elev, l.sector_id, l.dma_id, l.fluid_type,
+					l.presszone_id, l.dqa_id, l.minsector_id, l.expl_id2, l.epa_type, l.is_operative, l.insert_user, l.lastupdate, l.lastupdate_user, l.staticpressure, l.conneccat_id, l.workcat_id, l.workcat_id_end,
+					l.builtdate, l.enddate, l.uncertain, l.muni_id, l.macrominsector_id, l.verified, l.supplyzone_id, l.n_hydrometer, l.custom_length, l.datasource
+				FROM plan_psector_x_connec pc
+				JOIN link l USING (link_id)
+				WHERE pc.psector_id = 2;
 
 				-- arc & node insert is different from ud because UD has legacy of _sys_length & _sys_elev and the impossibility to remove it from old production environments
-				INSERT INTO archived_psector_arc_traceability
-				SELECT nextval('SCHEMA_NAME.archived_psector_arc_traceability_id_seq'), psector_id, pa.state, doable, addparam, now(), current_user, v_action, arc.*
-				FROM plan_psector_x_arc pa JOIN arc USING (arc_id)
-				WHERE psector_id=NEW.psector_id;
+				INSERT INTO archived_psector_arc_traceability (
+					id, psector_id, psector_state, doable, addparam, audit_tstamp, audit_user, "action",
+					arc_id, code, node_1, node_2, arccat_id, epa_type, sector_id, state, state_type, annotation, observ, "comment", custom_length, dma_id, presszone_id, soilcat_id, function_type,
+					category_type, fluid_type, location_type, workcat_id, workcat_id_end, builtdate, enddate, ownercat_id, muni_id, postcode, streetaxis_id, postnumber, postcomplement, streetaxis2_id,
+					postnumber2, postcomplement2, descript, link, verified, the_geom, undelete, label_x, label_y, label_rotation, publish, inventory, expl_id, num_value, feature_type, tstamp, lastupdate,
+					lastupdate_user, insert_user, minsector_id, dqa_id, district_id, adate, adescript, workcat_id_plan, asset_id, pavcat_id, nodetype_1, elevation1, depth1, staticpress1, nodetype_2, elevation2,
+					depth2, staticpress2, om_state, conserv_state, parent_id, expl_id2, brand_id, model_id, serial_number, label_quadrant, macrominsector_id, streetname, streetname2, supplyzone_id, datasource,
+					lock_level, is_scadamap
+				)
+				SELECT
+					nextval('SCHEMA_NAME.archived_psector_arc_traceability_id_seq'), pa.psector_id, pa.state, pa.doable, pa.addparam, now(), current_user, 'Execute psector',
+					a.arc_id, a.code, a.node_1, a.node_2, a.arccat_id, a.epa_type, a.sector_id, a.state, a.state_type, a.annotation, a.observ, a.comment, a.custom_length, a.dma_id, a.presszone_id::varchar, a.soilcat_id, a.function_type,
+					a.category_type, a.fluid_type, a.location_type, a.workcat_id, a.workcat_id_end, a.builtdate, a.enddate, a.ownercat_id, a.muni_id, a.postcode, a.streetaxis_id, a.postnumber, a.postcomplement, a.streetaxis2_id,
+					a.postnumber2, a.postcomplement2, a.descript, a.link, a.verified, a.the_geom, a.undelete, a.label_x, a.label_y, a.label_rotation, a.publish, a.inventory, a.expl_id, a.num_value, a.feature_type, a.tstamp, a.lastupdate,
+					a.lastupdate_user, a.insert_user, a.minsector_id, a.dqa_id, a.district_id, a.adate, a.adescript, a.workcat_id_plan, a.asset_id, a.pavcat_id, a.nodetype_1, a.elevation1, a.depth1, a.staticpress1, a.nodetype_2, a.elevation2,
+					a.depth2, a.staticpress2, a.om_state, a.conserv_state, a.parent_id, a.expl_id2, a.brand_id, a.model_id, a.serial_number, a.label_quadrant, a.macrominsector_id, a.streetname, a.streetname2, a.supplyzone_id, a.datasource,
+					a.lock_level, a.is_scadamap
+				FROM plan_psector_x_arc pa
+				JOIN arc a USING (arc_id)
+				WHERE pa.psector_id = NEW.psector_id;
 
-				INSERT INTO archived_psector_node_traceability
-				SELECT nextval('SCHEMA_NAME.archived_psector_node_traceability_id_seq'), psector_id, pn.state, doable, addparam, now(), current_user, v_action, node.*
-				FROM plan_psector_x_node pn JOIN node USING (node_id)
-				WHERE psector_id=NEW.psector_id;
+				INSERT INTO archived_psector_node_traceability (
+					id, psector_id, psector_state, doable, addparam, audit_tstamp, audit_user, "action",
+					node_id, code, elevation, "depth", nodecat_id, epa_type, sector_id, arc_id, parent_id, state, state_type, annotation, observ, "comment", dma_id, presszone_id, soilcat_id, function_type,
+					category_type, fluid_type, location_type, workcat_id, workcat_id_end, builtdate, enddate, ownercat_id, muni_id, postcode, streetaxis_id, postnumber, postcomplement, streetaxis2_id,
+					postnumber2, postcomplement2, descript, link, verified, rotation, the_geom, undelete, label_x, label_y, label_rotation, publish, inventory, hemisphere, expl_id, num_value, feature_type, tstamp, lastupdate,
+					lastupdate_user, insert_user, minsector_id, dqa_id, staticpressure, district_id, adate, adescript, accessibility, workcat_id_plan, asset_id, om_state, conserv_state, access_type, placement_type, expl_id2,
+					brand_id, model_id, serial_number, label_quadrant, macrominsector_id, streetname, streetname2, top_elev, custom_top_elev, datasource, supplyzone_id, lock_level, is_scadamap
+				)
+				SELECT
+					nextval('SCHEMA_NAME.archived_psector_node_traceability_id_seq'), pn.psector_id, pn.state, pn.doable, pn.addparam, now(), current_user, 'Execute psector',
+					n.node_id, n.code, n.custom_top_elev, n.depth, n.nodecat_id, n.epa_type, n.sector_id, n.arc_id, n.parent_id, n.state, n.state_type, n.annotation, n.observ, n.comment, n.dma_id, n.presszone_id::varchar, n.soilcat_id, n.function_type,
+					n.category_type, n.fluid_type, n.location_type, n.workcat_id, n.workcat_id_end, n.builtdate, n.enddate, n.ownercat_id, n.muni_id, n.postcode, n.streetaxis_id, n.postnumber, n.postcomplement, n.streetaxis2_id,
+					n.postnumber2, n.postcomplement2, n.descript, n.link, n.verified, n.rotation, n.the_geom, n.undelete, n.label_x, n.label_y, n.label_rotation, n.publish, n.inventory, n.hemisphere, n.expl_id, n.num_value, n.feature_type, n.tstamp, n.lastupdate,
+					n.lastupdate_user, n.insert_user, n.minsector_id, n.dqa_id, n.staticpressure, n.district_id, n.adate, n.adescript, n.accessibility, n.workcat_id_plan, n.asset_id, n.om_state, n.conserv_state, n.access_type, n.placement_type, n.expl_id2,
+					n.brand_id, n.model_id, n.serial_number, n.label_quadrant, n.macrominsector_id, n.streetname, n.streetname2, n.top_elev, n.custom_top_elev, n.datasource, n.supplyzone_id, n.lock_level, n.is_scadamap
+				FROM plan_psector_x_node pn
+				JOIN node n USING (node_id)
+				WHERE pn.psector_id = NEW.psector_id;
 
 			ELSIF v_projectype = 'UD' THEN
 
@@ -393,9 +471,13 @@ BEGIN
 				WHERE psector_id=NEW.psector_id;
 
 				INSERT INTO archived_psector_link_traceability
-				SELECT nextval('SCHEMA_NAME.archived_psector_link_traceability_id_seq'), psector_id, pc.state, doable, now(), current_user, v_action, l.*
-				FROM plan_psector_x_connec pc JOIN link l USING (link_id)
-				WHERE psector_id=NEW.psector_id;
+				SELECT nextval('SCHEMA_NAME.archived_psector_link_traceability_id_seq'), pc.psector_id, pc.state, pc.doable, now(), current_user, 'Execute psector',
+				l.link_id, l.code, l.feature_id, l.feature_type, l.exit_id, l.exit_type, l.userdefined_geom, l.state, l.expl_id, l.the_geom, l.exit_topelev, l.exit_elev, l.sector_id, l.dma_id, l.fluid_type,
+				l.presszone_id, l.dqa_id, l.minsector_id, l.expl_id2, l.epa_type, l.is_operative, l.insert_user, l.lastupdate, l.lastupdate_user, l.staticpressure, l.conneccat_id, l.workcat_id, l.workcat_id_end,
+				l.builtdate, l.enddate, l.uncertain, l.muni_id, l.macrominsector_id, l.verified, l.supplyzone_id, l.n_hydrometer, l.custom_length, l.datasource
+				FROM plan_psector_x_connec pc
+				JOIN link l USING (link_id)
+				WHERE pc.psector_id=NEW.psector_id;
 
 				INSERT INTO archived_psector_gully_traceability
 				SELECT nextval('SCHEMA_NAME.archived_psector_gully_traceability_id_seq'), psector_id, pg.state, doable, pg.arc_id, l.link_id, l.the_geom, now(), current_user, v_action, gully.*

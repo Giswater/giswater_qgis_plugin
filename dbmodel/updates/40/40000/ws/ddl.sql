@@ -1903,3 +1903,29 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_wtp", "
 
 --26/03/2025
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"cat_connec", "column":"estimated_depth", "dataType":"numeric(12,3)", "isUtils":"False"}}$$);
+
+-- 02/04/2025
+-- fix archived_psector_*_traceability
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"archived_psector_connec_traceability", "column":"valve_location"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"archived_psector_connec_traceability", "column":"valve_type"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"archived_psector_connec_traceability", "column":"shutoff_valve"}}$$);
+
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"archived_psector_arc_traceability", "column":"_sys_length"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"archived_psector_arc_traceability", "column":"depth"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"archived_psector_arc_traceability", "column":"staticpressure"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"archived_psector_arc_traceability", "column":"verified", "dataType":"integer"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"archived_psector_arc_traceability", "column":"supplyzone_id", "dataType":"int4", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"archived_psector_arc_traceability", "column":"datasource", "dataType":"int4", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"archived_psector_arc_traceability", "column":"lock_level", "dataType":"int4", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"archived_psector_arc_traceability", "column":"is_scadamap", "dataType":"bool", "isUtils":"False"}}$$);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"archived_psector_node_traceability", "column":"verified", "dataType":"integer"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"archived_psector_node_traceability", "column":"top_elev", "dataType":"numeric(12, 4)", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"archived_psector_node_traceability", "column":"custom_top_elev", "dataType":"numeric(12, 4)", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"archived_psector_node_traceability", "column":"datasource", "dataType":"int4", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"archived_psector_node_traceability", "column":"supplyzone_id", "dataType":"int4", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"archived_psector_node_traceability", "column":"datasource", "dataType":"int4", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"archived_psector_node_traceability", "column":"lock_level", "dataType":"int4", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"archived_psector_node_traceability", "column":"is_scadamap", "dataType":"bool", "isUtils":"False"}}$$);
+
