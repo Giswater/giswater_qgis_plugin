@@ -39,7 +39,7 @@ def main(project_type: str) -> None:
     if os.path.isdir(i18n_dir):
         logger.info(f"Processing root directory: {i18n_dir}")
         for root, _, files in os.walk(i18n_dir):
-            for file in sorted(files):
+            for file in sorted(files, reverse=True):
                 if file.endswith(".sql") and exclude_prefix not in file:
                     file_path = os.path.join(root, file)
                     execute_sql_file(conn, file_path)
