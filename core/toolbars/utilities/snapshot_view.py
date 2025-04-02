@@ -1,0 +1,320 @@
+"""
+This file is part of Giswater
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU
+General Public License as published by the Free Software Foundation, either version 3 of the License,
+or (at your option) any later version.
+"""
+# -*- coding: utf-8 -*-
+from functools import partial
+
+from qgis.PyQt.QtCore import QDateTime, QVariant
+from qgis.PyQt.QtWidgets import QCheckBox, QLabel, QLineEdit, QWidget, QMenu, QAction, QPushButton, QSpacerItem
+from qgis.core import QgsGeometry, QgsPointXY, QgsVectorLayer, QgsFeature, QgsProject, QgsField, QgsSymbol, QgsRuleBasedRenderer
+from qgis.PyQt.QtGui import QColor
+from ..dialog import GwAction
+from ...ui.ui_manager import GwSnapshotViewUi
+from ...utils import tools_gw
+from ....libs import lib_vars, tools_qt, tools_db, tools_qgis
+
+from ...utils.select_manager import GwSelectManager
+from .... import global_vars
+
+class GwSnapshotViewButton(GwAction):
+    """ Button 68: Snapshot View """
+
+    def __init__(self, icon_path, action_name, text, toolbar, action_group):
+
+        super().__init__(icon_path, action_name, text, toolbar, action_group)
+
+
+    def clicked_event(self):
+
+        self._open_snapshot_view()
+
+
+    # region private functions
+
+    def _open_snapshot_view(self):
+        """ Get dialog """
+
+        # Create form and body
+        form = { "formName" : "generic", "formType" : "snapshot_view" }
+        body = { "client" : { "cur_user": tools_db.current_user }, "form" : form }
+
+        # Execute procedure
+        json_result = tools_gw.execute_procedure('gw_fct_get_dialog', body)
+
+        # Create dialog
+        self.dlg_snapshot_view = GwSnapshotViewUi(self)
+        tools_gw.load_settings(self.dlg_snapshot_view)
+        tools_gw.manage_dlg_widgets(self, self.dlg_snapshot_view, json_result)
+
+        # Get dynamic widgets
+        self.dlg_snapshot_view.findChild(QLineEdit, "tab_none_extension").setObjectName("txt_coordinates")
+        self.btn_coordinate_actions = self.dlg_snapshot_view.findChild(QPushButton, "tab_none_btn_grid")
+        self.date = self.dlg_snapshot_view.findChild(QWidget, "tab_none_date")
+        self.features = self.dlg_snapshot_view.findChildren(QCheckBox)
+
+        # Set default date to current date
+        self.date.setDateTime(QDateTime.currentDateTime())
+        self.date.setMaximumDateTime(QDateTime.currentDateTime())
+
+        # Handle coordinate actions
+        self._handle_coordinates_actions()
+
+        # Hide gully checkbox if project type is not UD
+        if self.project_type != 'ud':
+            # self.dlg_snapshot_view.findChild(QCheckBox, "tab_none_chk_gully").hide()
+            # self.dlg_snapshot_view.findChild(QLabel, "lbl_tab_none_chk_gully").setStyleSheet("color: transparent;")
+
+            self.dlg_snapshot_view.findChild(QCheckBox, "tab_none_chk_gully").hide()
+            self.dlg_snapshot_view.findChild(QLabel, "lbl_tab_none_chk_gully").hide()
+            self.dlg_snapshot_view.findChild(QLabel, "lbl_tab_none_spacer").hide()
+
+
+        # Open form
+        tools_gw.open_dialog(self.dlg_snapshot_view, 'snapshot_view')
+
+
+    def _handle_coordinates_actions(self):
+        """Populate the coordinates actions button with actions"""
+        try:
+            menu = QMenu(self.btn_coordinate_actions)
+            dict_menu = {}
+
+            # Exploitation
+            action_expl = menu.addMenu(f"Calculate from Exploitation")
+            dict_menu[f"Calculate from Exploitation"] = action_expl
+
+            action_expl_1 = QAction('1 - expl_01', self.btn_coordinate_actions)
+            action_expl_1.triggered.connect(partial(self._update_current_polygon, "exploitation", "expl_id", '1'))
+            dict_menu[f"Calculate from Exploitation - 1 - expl_01"] = action_expl_1
+            dict_menu[f"Calculate from Exploitation"].addAction(action_expl_1)
+
+            action_expl_2 = QAction('2 - expl_02', self.btn_coordinate_actions)
+            action_expl_2.triggered.connect(partial(self._update_current_polygon, "exploitation", "expl_id", '2'))
+            dict_menu[f"Calculate from Exploitation - 2 - expl_02"] = action_expl_2
+            dict_menu[f"Calculate from Exploitation"].addAction(action_expl_2)
+
+            # Municipality
+            action_muni = menu.addMenu(f"Calculate from Municipality")
+            dict_menu[f"Calculate from Municipality"] = action_muni
+
+            action_muni_1 = QAction('1 - Sant Boi del Llobregat', self.btn_coordinate_actions)
+            action_muni_1.triggered.connect(partial(self._update_current_polygon, "ext_municipality", "muni_id", '1'))
+            dict_menu[f"Calculate from Municipality - 1 - Sant Boi del Llobregat"] = action_muni_1
+            dict_menu[f"Calculate from Municipality"].addAction(action_muni_1)
+
+            action_muni_2 = QAction('2 - Sant Esteve de les Roures', self.btn_coordinate_actions)
+            action_muni_2.triggered.connect(partial(self._update_current_polygon, "ext_municipality", "muni_id", '2'))
+            dict_menu[f"Calculate from Municipality - 2 - Sant Esteve de les Roures"] = action_muni_2
+            dict_menu[f"Calculate from Municipality"].addAction(action_muni_2)
+
+            # Map Canvas Extent
+            action_current = QAction('Use Current Map Canvas Extent', self.btn_coordinate_actions)
+            action_current.triggered.connect(partial(self._update_current_polygon, "map_canvas"))
+            dict_menu[f"Use Current Map Canvas Extent"] = action_current
+            menu.addAction(action_current)
+
+            # Draw on map canvas
+            action_draw = QAction('Draw on Map Canvas', self.btn_coordinate_actions)
+            action_draw.triggered.connect(partial(self._update_current_polygon, "draw"))
+            dict_menu[f"Draw on Map Canvas"] = action_draw
+            menu.addAction(action_draw)
+
+            # Assign the menu to the button
+            self.btn_coordinate_actions.setMenu(menu)
+
+        except Exception as e:
+            tools_qgis.show_warning(f"Failed to load layers: {e}", dialog=self.style_mng_dlg)
+
+    def _update_current_polygon(self, origin, id_name=None, id=None):
+        """ Update polygon """
+        xmin, xmax, ymin, ymax = None, None, None, None
+        match origin:
+            case "map_canvas":
+                extent = self.iface.mapCanvas().extent()
+                xmin = extent.xMinimum()
+                xmax = extent.xMaximum()
+                ymin = extent.yMinimum()
+                ymax = extent.yMaximum()
+                tools_qt.set_widget_text(self.dlg_snapshot_view, "txt_coordinates", f"{xmin},{xmax},{ymin},{ymax} [EPSG:25831]")
+
+            case "exploitation" | "ext_municipality":
+                sql = f"SELECT ST_Xmin(the_geom), ST_Xmax(the_geom), ST_Ymin(the_geom), ST_Ymax(the_geom) FROM {lib_vars.schema_name}.{origin} where {id_name} = {id};"
+                xmin, xmax, ymin, ymax = tools_db.get_row(sql)
+                tools_qt.set_widget_text(self.dlg_snapshot_view, "txt_coordinates", f"{xmin},{xmax},{ymin},{ymax} [EPSG:25831]")
+
+            case "draw":
+                select_manager = GwSelectManager(self, None, self.dlg_snapshot_view, False, self.dlg_snapshot_view)
+                global_vars.canvas.setMapTool(select_manager)
+                cursor = tools_gw.get_cursor_multiple_selection()
+                global_vars.canvas.setCursor(cursor)
+
+
+def close_dlg(**kwargs):
+    """ Close form """
+
+    dialog = kwargs["dialog"]
+    tools_gw.close_dialog(dialog)
+
+
+def run(**kwargs):
+    """ Button run clicked """
+
+    dlg = kwargs["class"]
+
+    # Get coordinates
+    txt_coordinates = tools_qt.get_text(dlg.dlg_snapshot_view, "txt_coordinates")
+    polygon = None
+
+    if txt_coordinates != "null":
+        # Parse coordinates and create polygon
+        coordinates = list(map(float, txt_coordinates.split(" [EPSG")[0].split(",")))
+        polygon = QgsGeometry.fromPolygonXY([[
+            QgsPointXY(coordinates[0], coordinates[2]),
+            QgsPointXY(coordinates[1], coordinates[2]),
+            QgsPointXY(coordinates[1], coordinates[3]),
+            QgsPointXY(coordinates[0], coordinates[3]),
+            QgsPointXY(coordinates[0], coordinates[2])  # Close the polygon
+        ]])
+
+    # Check null values
+    if not polygon or dlg.date.dateTime().isNull() or not any([feature.isChecked() for feature in dlg.features]):
+        tools_qgis.show_warning("Required fields are missing", dialog=dlg.dlg_snapshot_view)
+        return
+
+    # Create json input data
+    form = {
+        "date" : dlg.date.dateTime().toString("yyyy-MM-dd"),
+        "polygon" : f'{polygon.asWkt()}',
+        "features" : [feature.objectName().split('_')[-1] for feature in dlg.features if feature.isChecked()]
+    }
+
+    body = { "client" : { "cur_user": tools_db.current_user }, "form" : form }
+
+    # Execute procedure
+    result = tools_gw.execute_procedure('gw_fct_getsnapshot', body, schema_name='audit')
+
+    if result.get("status") == "Accepted" and result.get("body").get("data"):
+        layers = result['body']['data']
+        add_layers_temp(layers, f"Snapshot - {form["date"]}")
+        tools_gw.close_dialog(dlg.dlg_snapshot_view)
+    else:
+        tools_qgis.show_warning("No results", dialog=dlg.dlg_snapshot_view)
+
+def add_layers_temp(layers, group):
+    """Creates temporary layers from a given list of layers and adds them to specified subgroups under a main group in QGIS."""
+
+    for i, layer in enumerate(layers):
+        if not layer['features']:
+            continue
+
+        geometry_type = layer['geometryType']
+        aux_layer_name = layer['layerName']
+        layer_group = layer.get('group', '')  # Get the subgroup name from the layer
+
+        # Remove existing layer with the same name from the group
+        tools_qgis.remove_layer_from_toc(aux_layer_name, group)
+
+        # Create a new memory layer
+        v_layer = QgsVectorLayer(f"{geometry_type}?crs=epsg:{lib_vars.data_epsg}", aux_layer_name, 'memory')
+        prov = v_layer.dataProvider()
+
+        v_layer.startEditing()
+
+        # Get unique attributes before adding features
+        unique_attributes = set()
+        for feature in layer['features']:
+            for key in feature['properties'].keys():
+                if key != 'the_geom':
+                    unique_attributes.add(key)
+        unique_attributes.add("color")  # Add color attribute
+
+        # Add unique attributes to the layer
+        prov.addAttributes([QgsField(str(key), QVariant.String) for key in unique_attributes])
+        v_layer.updateFields()
+
+        # Add features with their attributes and colors
+        for feature in layer['features']:
+            geometry = tools_qgis.get_geometry_from_json(feature)
+            if not geometry:
+                continue
+
+            fet = QgsFeature()
+            fet.setGeometry(geometry)
+
+            attributes = []
+            for key in unique_attributes:
+                value = feature['properties'].get(key, "")  # Get the value or an empty string if not exists
+                if key == "color":
+                    value = feature.get('color', 'blue')  # If no color, use blue by default
+                attributes.append(value)
+
+            fet.setAttributes(attributes)
+            prov.addFeatures([fet])
+
+        v_layer.commitChanges()
+
+        # Add the layer to the project under the main group
+        QgsProject.instance().addMapLayer(v_layer, False)
+        root = QgsProject.instance().layerTreeRoot()
+
+        # Ensure the main group exists
+        main_group = root.findGroup(group) or root.insertGroup(0, group)
+
+        # Check if the subgroup exists under the main group, if not, create it
+        subgroup = main_group.findGroup(layer_group) or main_group.insertGroup(0, layer_group)
+        subgroup.insertLayer(i, v_layer)
+
+        # Apply rule-based style
+        apply_layer_style(v_layer)
+
+
+def apply_layer_style(layer):
+    """Applies styling to a layer based on its geometry type and feature colors."""
+    symbol = layer.renderer().symbol()
+
+    # Flags to check for the presence of features with specific colors
+    has_red_features = False
+    has_yellow_features = False
+
+    # Iterate through features to check for red or yellow features
+    for feature in layer.getFeatures():
+        if feature['color'] == 'red':
+            has_red_features = True
+        if feature['color'] == 'yellow':
+            has_yellow_features = True
+
+    # Create rule-based renderer
+    root_rule = QgsRuleBasedRenderer.Rule(None)  # Root rule without filter
+
+    # If there are red features, create the "Red Features" subgroup
+    if has_red_features:
+        red_rule = QgsRuleBasedRenderer.Rule(symbol=QgsSymbol.defaultSymbol(layer.geometryType()))
+        red_rule.setLabel("Deleted")
+        red_rule.setFilterExpression("\"color\" = 'red'")
+        red_rule.symbol().setColor(QColor("red"))
+        root_rule.appendChild(red_rule)
+
+    # If there are yellow features, create the "Yellow Features" subgroup
+    if has_yellow_features:
+        yellow_rule = QgsRuleBasedRenderer.Rule(symbol=QgsSymbol.defaultSymbol(layer.geometryType()))
+        yellow_rule.setLabel("Updated")
+        yellow_rule.setFilterExpression("\"color\" = 'yellow'")
+        yellow_rule.symbol().setColor(QColor("yellow"))
+        root_rule.appendChild(yellow_rule)
+
+    # Always create the rule for "Blue Features" (or any other condition you want to apply)
+    blue_rule = QgsRuleBasedRenderer.Rule(symbol=QgsSymbol.defaultSymbol(layer.geometryType()))
+    blue_rule.setLabel("Existent")
+    blue_rule.setFilterExpression("\"color\" = 'blue'")
+    blue_rule.symbol().setColor(QColor("blue"))
+    root_rule.appendChild(blue_rule)
+
+    # Apply the rule-based renderer to the layer
+    renderer = QgsRuleBasedRenderer(root_rule)
+    layer.setRenderer(renderer)
+
+    # Refresh the symbology in QGIS
+    layer.triggerRepaint()

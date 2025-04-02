@@ -15,9 +15,6 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="1" column="0">
-     <layout class="QGridLayout" name="lyt_buttons"/>
-    </item>
     <item row="0" column="0">
      <widget class="QScrollArea" name="scroll_lyt_1">
       <property name="widgetResizable">
@@ -29,7 +26,7 @@
          <x>0</x>
          <y>0</y>
          <width>507</width>
-         <height>265</height>
+         <height>245</height>
         </rect>
        </property>
        <layout class="QGridLayout" name="gridLayout_2">
@@ -39,6 +36,26 @@
        </layout>
       </widget>
      </widget>
+    </item>
+    <item row="1" column="0">
+     <layout class="QGridLayout" name="lyt_buttons">
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <item row="0" column="0">
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
     </item>
    </layout>
   </widget>
