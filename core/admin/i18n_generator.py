@@ -322,20 +322,20 @@ class GwI18NGenerator:
 
         self._write_header(cfg_path + file_name)
 
-        rows = self._get_dbdialog_values()
+        rows = self._get_dbdialog_values_i18n()
         if not rows:
-            return False
-        self._write_dbdialog_values(rows, cfg_path + file_name)
+            return False, "dbdialog"
+        self._write_dbdialog_values_i18n(rows, cfg_path + file_name)
 
-        rows = self._get_dbmessages_values()
+        rows = self._get_dbmessages_values_i18n()
         if not rows:
-            return False
-        self._write_dbmessages_values(rows, cfg_path + file_name)
+            return False, "dbmessage"
+        self._write_dbmessages_values_i18n(rows, cfg_path + file_name)
 
-        rows = self._get_dbfprocess_values()
+        rows = self._get_dbfprocess_values_i18n()
         if not rows:
-            return False
-        self._write_dbfprocess_values(rows, cfg_path + file_name)
+            return False, "dbfprocess"
+        self._write_dbfprocess_values_i18n(rows, cfg_path + file_name)
 
         return True
 
@@ -421,43 +421,6 @@ class GwI18NGenerator:
                                   f"(source, project_type, context, ms_{self.project_language.lower()}, ht_{self.project_language.lower()}, source_code, log_level) "
                                   f"VALUES ('{source}', '{project_type}', 'sys_message', $${ms_msg}$$, $${ht_msg}$$, 'giswater', {log_level});")
                     self._get_rows(sql_insert)
-
-
-    def _get_dbdialog_values(self):
-        """ Get db dialog values """
-
-        sql = (f"SELECT source, project_type, context, formname, formtype, lb_en_us, lb_{self.lower_lang}, auto_lb_{self.lower_lang}, tt_en_us, "
-               f"tt_{self.lower_lang}, auto_tt_{self.lower_lang} "
-               f"FROM i18n.dbdialog "
-               f"ORDER BY context, formname;")
-        rows = self._get_rows(sql)
-        if not rows:
-            return False
-        return rows
-
-
-    def _get_dbmessages_values(self):
-        """ Get db messages values """
-
-        sql = (f"SELECT source, project_type, context, ms_en_us, ms_{self.lower_lang}, auto_ms_{self.lower_lang}, ht_en_us, ht_{self.lower_lang}, auto_ht_{self.lower_lang}"
-               f" FROM i18n.dbmessage "
-               f" ORDER BY context;")
-        rows = self._get_rows(sql)
-        if not rows:
-            return False
-        return rows
-    
-    def _get_dbfprocess_values(self):
-        """ Get db messages values """
-        # Make the query
-        sql = (f"SELECT source, project_type, context, ex_en_us, ex_{self.lower_lang}, auto_ex_{self.lower_lang}, in_en_us, in_{self.lower_lang}, auto_in_{self.lower_lang}"
-               f" FROM i18n.dbfprocess "
-               f" ORDER BY context;")
-        rows = self._get_rows(sql, self.cursor)
-        # Return the corresponding information
-        if not rows:
-            return False
-        return rows
 
     def _get_dbfprocess_values_i18n(self):
         """ Get db messages values """
@@ -649,9 +612,11 @@ class GwI18NGenerator:
                 ht_value = self._replace_invalid_quotation_marks(ht_value)
                 if "\n" in ht_value:
                     ht_value = self._replace_invalid_characters(ht_value)
-
-            line = f'UPDATE {table} SET error_message = \'{ms_value}\', hint_message = \'{ht_value}\' '
-            line += f'WHERE id = {source} AND log_level = {log_level} AND project_type = \'{project_type}\';\n'
+            
+            line = f'INSERT INTO {table} (id, error_message, hint_message, log_level, show_user, project_type, source) ' \
+                    f'VALUES ({source}, \'{ms_value}\', \'{ht_value}\', {log_level}, true, \'{project_type}\', \'core\') ' \
+                    f'ON CONFLICT (id) DO UPDATE SET ' \
+                    f'error_message = EXCLUDED.error_message, hint_message = EXCLUDED.hint_message, log_level = EXCLUDED.log_level, show_user = EXCLUDED.show_user, project_type = EXCLUDED.project_type, source = EXCLUDED.source;\n'
 
             file.write(line)
         file.close()
@@ -685,8 +650,10 @@ class GwI18NGenerator:
                 if "\n" in in_msg:
                     in_msg = self._replace_invalid_characters(in_msg)
 
-            line = f'UPDATE {table} SET \"except_msg\" = \'{ex_msg}\', info_msg = \'{in_msg}\' '
-            line += f'WHERE fid = {source} AND project_type = \'{project_type}\';\n'
+            line = f'INSERT INTO {table} (fid, except_msg, info_msg, project_type, source) ' \
+                    f'VALUES ({source}, \'{ex_msg}\', \'{in_msg}\', \'{project_type}\', \'core\') ' \
+                    f'ON CONFLICT (fid) DO UPDATE SET ' \
+                    f'except_msg = EXCLUDED.except_msg, info_msg = EXCLUDED.info_msg, project_type = EXCLUDED.project_type, source = EXCLUDED.source;\n'
 
             file.write(line)
         file.close()
@@ -711,159 +678,6 @@ class GwI18NGenerator:
         file.write(header)
         file.close()
         del file
-
-
-    def _write_dbdialog_values(self, rows, path):
-        """
-        Generate a string and write into file
-            :param rows: List of values ([List][List])
-            :param path: Full destination path (String)
-            :return: (Boolean)
-        """
-
-        file = open(path, "a")
-
-        for row in rows:
-            # Get values
-            table = row['context'] if row['context'] is not None else ""
-            form_name = row['formname'] if row['formname'] is not None else ""
-            form_type = row['formtype'] if row['formtype'] is not None else ""
-            source = row['source'] if row['source'] is not None else ""
-            lbl_value = row[f'lb_{self.lower_lang}'] if row[f'lb_{self.lower_lang}'] is not None else row[f'auto_lb_{self.lower_lang}']
-            lbl_value = lbl_value if lbl_value is not None else row['lb_en_us'] # Afegir auto_ amb un if
-            lbl_value = lbl_value if lbl_value is not None else ""
-            tt_value = row[f'tt_{self.lower_lang}'] if row[f'tt_{self.lower_lang}'] is not None else row[f'auto_tt_{self.lower_lang}']
-            tt_value = tt_value if tt_value is not None else row['lb_en_us']
-            tt_value = tt_value if tt_value is not None else ""
-
-            # Check invalid characters
-            if lbl_value is not None and "\n" in lbl_value:
-                lbl_value = self._replace_invalid_characters(lbl_value)
-            if tt_value is not None and "\n" in tt_value:
-                tt_value = self._replace_invalid_characters(tt_value)
-
-            line = f'SELECT gw_fct_admin_schema_i18n($$'
-            if row['context'] in ('config_param_system', 'sys_param_user'):
-                line += (f'{{"data":'
-                         f'{{"table":"{table}", '
-                         f'"formname":"{form_name}", '
-                         f'"label":{{"column":"label", "value":"{lbl_value}"}}, '
-                         f'"tooltip":{{"column":"descript", "value":"{tt_value}"}}')
-            elif row['context'] in 'config_typevalue':
-                line += (f'{{"data":'
-                         f'{{"table":"{table}", '
-                         f'"formname":"{form_name}", '
-                         f'"label":{{"column":"idval", "value":"{tt_value}"}} ')
-            elif row['context'] not in ('config_param_system', 'sys_param_user'):
-                line += (f'{{"data":'
-                         f'{{"table":"{table}", '
-                         f'"formname":"{form_name}", '
-                         f'"label":{{"column":"label", "value":"{lbl_value}"}}, '
-                         f'"tooltip":{{"column":"tooltip", "value":"{tt_value}"}}')
-
-            # Clause WHERE for each context
-            if row['context'] == 'config_form_fields':
-                line += (f', "clause":"WHERE columnname = \'{source}\' '
-                         f'AND formname = \'{form_name}\' AND formtype = \'{form_type}\'"')
-            elif row['context'] == 'config_form_tabs':
-                line += (f', "clause":"WHERE formname = \'{form_name}\' '
-                         f'AND columnname = \'{source}\' AND formtype = \'{form_type}\'"')
-            elif row['context'] == 'config_form_groupbox':
-                line += (f', "clause":"WHERE formname = \'{form_name}\' '
-                         f'AND layout_id  = \'{source}\'"')
-            elif row['context'] == 'config_typevalue':
-                line += f', "clause":"WHERE typevalue = \'{form_name}\' AND id  = \'{source}\'"'
-            elif row['context'] == 'config_param_system':
-                line += f', "clause":"WHERE parameter = \'{source}\'"'
-            elif row['context'] == 'sys_param_user':
-                line += f', "clause":"WHERE id = \'{source}\'"'
-
-            line += f'}}}}$$);\n'
-            file.write(line)
-        file.close()
-        del file
-
-
-    def _write_dbmessages_values(self, rows, path):
-        """
-        Generate a string and write into file
-            :param rows: List of values ([List][List])
-            :param path: Full destination path (String)
-            :return: (Boolean)
-        """
-
-        file = open(path, "a")
-
-        for row in rows:
-            # Get values
-            table = row['context'] if row['context'] is not None else ""
-            source = row['source'] if row['source'] is not None else ""
-            ms_value = row.get(f'ms_{self.lower_lang}') or row.get(f'auto_ms_{self.lower_lang}') or row.get('ms_en_us')
-            ht_value = row.get(f'ht_{self.lower_lang}') or row.get(f'auto_ht_{self.lower_lang}') or row.get('ht_en_us')
-
-
-            # Check invalid characters
-            if ms_value is not None and "\n" in ms_value:
-                ms_value = self._replace_invalid_characters(ms_value)
-            if ht_value is not None and "\n" in ht_value:
-                ht_value = self._replace_invalid_characters(ht_value)
-    
-            line = f'SELECT gw_fct_admin_schema_i18n($$'
-            line += (f'{{"data":'
-                     f'{{"table":"{table}", '
-                     f'"formname":null, '
-                     f'"label":{{"column":"error_message", "value":"{ms_value}"}}, '
-                     f'"tooltip":{{"column":"hint_message", "value":"{ht_value}"}}')
-
-            # Clause WHERE for each context
-            if row['context'] == 'sys_message':
-                line += f', "clause":"WHERE id = \'{source}\' "'
-
-            line += f'}}}}$$);\n'
-            file.write(line)
-        file.close()
-        del file
-
-    def _write_dbfprocess_values(self, rows, path):
-        """
-        Generate a string and write into file
-            :param rows: List of values ([List][List])
-            :param path: Full destination path (String)
-            :return: (Boolean)
-        """
-
-        file = open(path, "a")
-
-        for row in rows:
-            
-            # Get values
-            table = row['context'] if row['context'] is not None else ""
-            source = row['source'] if row['source'] is not None else ""
-            ex_msg = row.get(f'ex_{self.lower_lang}') or row.get(f'auto_ex_{self.lower_lang}') or row.get('ex_en_us')
-            in_msg = row.get(f'in_{self.lower_lang}') or row.get(f'auto_in_{self.lower_lang}') or row.get('in_en_us')
-
-
-            # Check invalid characters
-            if ex_msg is not None and "\n" in ex_msg:
-                ex_msg = self._replace_invalid_characters(ex_msg)
-            if in_msg is not None and "\n" in in_msg:
-                in_msg = self._replace_invalid_characters(in_msg)
-
-            line = f'SELECT gw_fct_admin_schema_i18n($$'
-            line += (f'{{"data":'
-                     f'{{"table":"{table}", '
-                     f'"label":{{"column":"except_msg", "value":"{ex_msg}"}}, '
-                     f'"tooltip":{{"column":"info_msg", "value":"{in_msg}"}}')
-
-            # Clause WHERE for each context
-            if row['context'] == 'sys_fprocess':
-                line += f', "clause":"WHERE fid = \'{source}\' "'
-
-            line += f'}}}}$$);\n'
-            file.write(line)
-        file.close()
-        del file
-
 
     def _save_user_values(self):
         """ Save selected user values """
