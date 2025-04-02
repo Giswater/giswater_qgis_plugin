@@ -74,9 +74,9 @@ BEGIN
 	IF om_aux='plan' THEN
 
 		INSERT INTO plan_psector (psector_id, name, psector_type, descript, priority, text1, text2, observ, rotation, scale,
-		 atlas_id, gexpenses, vat, other, the_geom, expl_id, active, ext_code, status, text3, text4, text5, text6, num_value, workcat_id, parent_id)
+		 atlas_id, gexpenses, vat, other, the_geom, expl_id, active, archived, ext_code, status, text3, text4, text5, text6, num_value, workcat_id, parent_id)
 		VALUES  (NEW.psector_id, NEW.name, NEW.psector_type, NEW.descript, NEW.priority, NEW.text1, NEW.text2, NEW.observ, NEW.rotation,
-		NEW.scale, NEW.atlas_id, NEW.gexpenses, NEW.vat, NEW.other, NEW.the_geom, NEW.expl_id, true,
+		NEW.scale, NEW.atlas_id, NEW.gexpenses, NEW.vat, NEW.other, NEW.the_geom, NEW.expl_id, true, false,
 		NEW.ext_code, NEW.status, NEW.text3, NEW.text4, NEW.text5, NEW.text6, NEW.num_value, new.workcat_id, new.parent_id);
 	END IF;
 
@@ -90,7 +90,7 @@ BEGIN
 		UPDATE plan_psector
 		SET psector_id=NEW.psector_id, name=NEW.name, psector_type=NEW.psector_type, descript=NEW.descript, priority=NEW.priority, text1=NEW.text1,
 		text2=NEW.text2, observ=NEW.observ, rotation=NEW.rotation, scale=NEW.scale, atlas_id=NEW.atlas_id,
-		gexpenses=NEW.gexpenses, vat=NEW.vat, other=NEW.other, expl_id=NEW.expl_id, active=NEW.active, ext_code=NEW.ext_code, status=NEW.status,
+		gexpenses=NEW.gexpenses, vat=NEW.vat, other=NEW.other, expl_id=NEW.expl_id, active=NEW.active, archived=NEW.archived, ext_code=NEW.ext_code, status=NEW.status,
 		text3=NEW.text3, text4=NEW.text4, text5=NEW.text5, text6=NEW.text6, num_value=NEW.num_value, workcat_id=new.workcat_id, parent_id=new.parent_id, lastupdate=now(), lastupdate_user=current_user
 		WHERE psector_id=OLD.psector_id;
 
@@ -113,6 +113,11 @@ BEGIN
 				valve_type, shutoff_valve, access_type, placement_type, crmzone_id,c.expl_id2,plot_code,brand_id,model_id,serial_number,label_quadrant,c.macrominsector_id, streetname, streetname2
 				FROM plan_psector_x_connec pc JOIN connec c USING (connec_id)
 				JOIN link l USING (link_id)
+				WHERE psector_id=NEW.psector_id;
+
+				INSERT INTO archived_psector_link_traceability
+				SELECT nextval('SCHEMA_NAME.archived_psector_link_traceability_id_seq'), psector_id, pc.state, doable, now(), current_user, 'Execute psector', l.*
+				FROM plan_psector_x_connec pc JOIN link l USING (link_id)
 				WHERE psector_id=NEW.psector_id;
 
 				-- arc & node insert is different from ud because UD has legacy of _sys_length & _sys_elev and the impossibility to remove it from old production environments
@@ -157,6 +162,11 @@ BEGIN
 				SELECT nextval('SCHEMA_NAME.archived_psector_connec_traceability_id_seq'), psector_id, pc.state, doable, pc.arc_id, l.link_id, l.the_geom, now(), current_user, 'Execute psector', connec.*
 				FROM plan_psector_x_connec pc JOIN connec USING (connec_id)
 				JOIN link l USING (link_id)
+				WHERE psector_id=NEW.psector_id;
+
+				INSERT INTO archived_psector_link_traceability
+				SELECT nextval('SCHEMA_NAME.archived_psector_link_traceability_id_seq'), psector_id, pc.state, doable, now(), current_user, 'Execute psector', l.*
+				FROM plan_psector_x_connec pc JOIN link l USING (link_id)
 				WHERE psector_id=NEW.psector_id;
 
 				INSERT INTO archived_psector_gully_traceability
@@ -300,7 +310,7 @@ BEGIN
 			END IF;
 
 			-- reset psector geometry and set inactive
-			UPDATE plan_psector SET the_geom=v_psector_geom, active=false WHERE psector_id=NEW.psector_id;
+			UPDATE plan_psector SET the_geom=v_psector_geom, active=false, archived=true WHERE psector_id=NEW.psector_id;
 
 			--reset topology control
 			UPDATE config_param_user SET value = 'false' WHERE parameter='edit_disable_statetopocontrol' AND cur_user=current_user;
@@ -331,6 +341,11 @@ BEGIN
 				valve_type, shutoff_valve, access_type, placement_type, crmzone_id,c.expl_id2, plot_code,brand_id,model_id,serial_number,label_quadrant,c.macrominsector_id, streetname, streetname2
 				FROM plan_psector_x_connec pc JOIN connec c USING (connec_id)
 				JOIN link l USING (link_id)
+				WHERE psector_id=NEW.psector_id;
+
+				INSERT INTO archived_psector_link_traceability
+				SELECT nextval('SCHEMA_NAME.archived_psector_link_traceability_id_seq'), psector_id, pc.state, doable, now(), current_user, v_action, l.*
+				FROM plan_psector_x_connec pc JOIN link l USING (link_id)
 				WHERE psector_id=NEW.psector_id;
 
 				-- arc & node insert is different from ud because UD has legacy of _sys_length & _sys_elev and the impossibility to remove it from old production environments
@@ -377,6 +392,11 @@ BEGIN
 				JOIN link l USING (link_id)
 				WHERE psector_id=NEW.psector_id;
 
+				INSERT INTO archived_psector_link_traceability
+				SELECT nextval('SCHEMA_NAME.archived_psector_link_traceability_id_seq'), psector_id, pc.state, doable, now(), current_user, v_action, l.*
+				FROM plan_psector_x_connec pc JOIN link l USING (link_id)
+				WHERE psector_id=NEW.psector_id;
+
 				INSERT INTO archived_psector_gully_traceability
 				SELECT nextval('SCHEMA_NAME.archived_psector_gully_traceability_id_seq'), psector_id, pg.state, doable, pg.arc_id, l.link_id, l.the_geom, now(), current_user, v_action, gully.*
 				FROM plan_psector_x_gully pg JOIN gully USING (gully_id)
@@ -397,7 +417,7 @@ BEGIN
 			END LOOP;
 
 			-- reset psector geometry and set inactive
-			UPDATE plan_psector SET the_geom=v_psector_geom, active=false WHERE psector_id=NEW.psector_id;
+			UPDATE plan_psector SET the_geom=v_psector_geom, active=false, archived=true WHERE psector_id=NEW.psector_id;
 
 			-- reset plan_psector_force_delete
 			UPDATE config_param_user SET value=v_plan_psector_force_delete WHERE parameter='plan_psector_force_delete' AND cur_user=current_user;

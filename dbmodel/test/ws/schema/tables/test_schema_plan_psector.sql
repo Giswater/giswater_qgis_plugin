@@ -19,10 +19,11 @@ SELECT has_table('plan_psector'::name, 'Table plan_psector should exist');
 SELECT columns_are(
     'plan_psector',
     ARRAY[
-        'psector_id', 'name', 'psector_type', 'descript', 'expl_id', 'priority', 'text1', 'text2', 
-        'observ', 'rotation', 'scale', 'atlas_id', 'gexpenses', 'vat', 'other', 'active', 
-        'the_geom', 'enable_all', 'status', 'ext_code', 'text3', 'text4', 'text5', 'text6', 
-        'num_value', 'workcat_id', 'parent_id', 'tstamp', 'insert_user', 'lastupdate', 'lastupdate_user'
+        'psector_id', 'name', 'psector_type', 'descript', 'expl_id', 'priority', 'text1', 'text2',
+        'observ', 'rotation', 'scale', 'atlas_id', 'gexpenses', 'vat', 'other', 'active',
+        'the_geom', 'enable_all', 'status', 'ext_code', 'text3', 'text4', 'text5', 'text6',
+        'num_value', 'workcat_id', 'parent_id', 'tstamp', 'insert_user', 'lastupdate', 'lastupdate_user',
+        'archived'
     ],
     'Table plan_psector should have the correct columns'
 );
@@ -62,6 +63,7 @@ SELECT col_type_is('plan_psector', 'tstamp', 'timestamp without time zone', 'Col
 SELECT col_type_is('plan_psector', 'insert_user', 'character varying(50)', 'Column insert_user should be character varying(50)');
 SELECT col_type_is('plan_psector', 'lastupdate', 'timestamp without time zone', 'Column lastupdate should be timestamp without time zone');
 SELECT col_type_is('plan_psector', 'lastupdate_user', 'character varying(50)', 'Column lastupdate_user should be character varying(50)');
+SELECT col_type_is('plan_psector', 'archived', 'boolean', 'Column archived should be boolean');
 
 -- Check default values
 SELECT col_has_default('plan_psector', 'psector_id', 'Column psector_id should have a default value');
@@ -105,4 +107,4 @@ SELECT has_trigger('plan_psector', 'gw_trg_typevalue_fk_update', 'Table should h
 
 SELECT * FROM finish();
 
-ROLLBACK; 
+ROLLBACK;

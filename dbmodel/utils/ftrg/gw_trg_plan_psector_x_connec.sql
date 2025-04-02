@@ -11,12 +11,12 @@ RETURNS trigger AS
 $BODY$
 
 
-DECLARE 
+DECLARE
 v_stateaux smallint;
 v_explaux smallint;
 v_psector_expl smallint;
 
-BEGIN 
+BEGIN
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
@@ -26,16 +26,16 @@ BEGIN
 	-- do not allow to insert features with expl diferent from psector expl
 	IF v_explaux<>v_psector_expl THEN
 		EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
-		"data":{"message":"3234", "function":"1130","parameters":null}}$$);';
+		"data":{"message":"3234", "function":"2936","parameters":null}}$$);';
 	END IF;
-		
+
 	IF NEW.state = 1 AND v_stateaux = 1 THEN
 		NEW.doable=false;
 		-- looking for arc_id state=2 closest
-	
+
 	ELSIF NEW.state = 0 AND v_stateaux=1 THEN
 		NEW.doable=false;
-		
+
 	ELSIF v_stateaux=2 THEN
 		IF NEW.state = 0 THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
@@ -44,7 +44,7 @@ BEGIN
 		NEW.state = 1;
 		NEW.doable=true;
 	END IF;
-	
+
 	-- profilactic control of doable
 	IF NEW.doable IS NULL THEN
 		NEW.doable =  TRUE;
@@ -52,7 +52,7 @@ BEGIN
 
 	RETURN NEW;
 
-END;  
+END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;

@@ -333,3 +333,58 @@ CREATE TABLE element_x_link (
 	CONSTRAINT element_x_link_link_id_fkey FOREIGN KEY (link_id) REFERENCES link(link_id) ON DELETE CASCADE ON UPDATE CASCADE,
 	CONSTRAINT element_x_link_element_id_fkey FOREIGN KEY (element_id) REFERENCES "element"(element_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+
+-- 02/04/2025
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"plan_psector", "column":"archived", "dataType":"boolean", "isUtils":"False"}}$$);
+
+CREATE TABLE archived_psector_link_traceability (
+    id serial4 NOT NULL,
+    psector_id int4 NOT NULL,
+    psector_state int2 NOT NULL,
+    doable bool NOT NULL,
+    audit_tstamp timestamp DEFAULT now() NULL,
+    audit_user text DEFAULT CURRENT_USER NULL,
+    "action" varchar(16) NOT NULL,
+
+    link_id int4 NOT NULL,
+    code text NULL,
+    feature_id varchar(16) NULL,
+    feature_type varchar(16) NULL,
+    exit_id varchar(16) NULL,
+    exit_type varchar(16) NULL,
+    userdefined_geom bool NULL,
+    state int2 NOT NULL,
+    expl_id int4 NOT NULL,
+    the_geom public.geometry(linestring, SRID_VALUE) NULL,
+    exit_topelev float8 NULL,
+    exit_elev numeric(12, 3) NULL,
+    sector_id int4 NULL,
+    dma_id int4 NULL,
+    fluid_type varchar(50) NULL,
+    presszone_id int4 NULL,
+    dqa_id int4 NULL,
+    minsector_id int4 NULL,
+    expl_id2 int4 NULL,
+    epa_type varchar(16) NULL,
+    is_operative bool NULL,
+    insert_user varchar(50) NULL,
+    lastupdate timestamp NULL,
+    lastupdate_user varchar(50) NULL,
+    staticpressure numeric(12, 3) NULL,
+    conneccat_id varchar(30) NULL,
+    workcat_id varchar(255) NULL,
+    workcat_id_end varchar(255) NULL,
+    builtdate date NULL,
+    enddate date NULL,
+    uncertain bool NULL,
+    muni_id int4 NULL,
+    macrominsector_id int4 NULL,
+    verified int2 NULL,
+    supplyzone_id int4 NULL,
+    n_hydrometer int4 NULL,
+    custom_length numeric(12, 2) NULL,
+    datasource int4 NULL,
+
+    CONSTRAINT archived_psector_link_traceability_pkey PRIMARY KEY (id)
+);
