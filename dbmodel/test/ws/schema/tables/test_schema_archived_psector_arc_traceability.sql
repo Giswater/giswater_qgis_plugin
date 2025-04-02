@@ -21,15 +21,15 @@ SELECT columns_are(
     ARRAY[
         'id', 'psector_id', 'psector_state', 'doable', 'addparam', 'audit_tstamp', 'audit_user', 'action', 'arc_id', 'code',
         'node_1', 'node_2', 'arccat_id', 'epa_type', 'sector_id', 'state', 'state_type', 'annotation', 'observ', 'comment',
-        '_sys_length', 'custom_length', 'dma_id', 'presszone_id', 'soilcat_id', 'function_type', 'category_type', 'fluid_type',
+        'custom_length', 'dma_id', 'presszone_id', 'soilcat_id', 'function_type', 'category_type', 'fluid_type',
         'location_type', 'workcat_id', 'workcat_id_end', 'builtdate', 'enddate', 'ownercat_id', 'muni_id', 'postcode',
         'streetaxis_id', 'postnumber', 'postcomplement', 'streetaxis2_id', 'postnumber2', 'postcomplement2', 'descript',
         'link', 'verified', 'the_geom', 'undelete', 'label_x', 'label_y', 'label_rotation', 'publish', 'inventory', 'expl_id',
         'num_value', 'feature_type', 'tstamp', 'lastupdate', 'lastupdate_user', 'insert_user', 'minsector_id', 'dqa_id',
-        'staticpressure', 'district_id', 'depth', 'adate', 'adescript', 'workcat_id_plan', 'asset_id', 'pavcat_id',
+        'district_id', 'adate', 'adescript', 'workcat_id_plan', 'asset_id', 'pavcat_id',
         'nodetype_1', 'elevation1', 'depth1', 'staticpress1', 'nodetype_2', 'elevation2', 'depth2', 'staticpress2',
         'om_state', 'conserv_state', 'parent_id', 'expl_id2', 'brand_id', 'model_id', 'serial_number', 'label_quadrant',
-        'macrominsector_id', 'streetname', 'streetname2'
+        'macrominsector_id', 'streetname', 'streetname2', 'supplyzone_id', 'datasource', 'lock_level', 'is_scadamap'
     ],
     'Table archived_psector_arc_traceability should have the correct columns'
 );
@@ -48,6 +48,10 @@ SELECT col_type_is('archived_psector_arc_traceability', 'audit_user', 'text', 'C
 SELECT col_type_is('archived_psector_arc_traceability', 'action', 'character varying(16)', 'Column action should be varchar(16)');
 SELECT col_type_is('archived_psector_arc_traceability', 'arc_id', 'character varying(16)', 'Column arc_id should be varchar(16)');
 SELECT col_type_is('archived_psector_arc_traceability', 'the_geom', 'geometry(LineString,25831)', 'Column the_geom should be geometry(LineString,25831)');
+SELECT col_type_is('archived_psector_arc_traceability', 'supplyzone_id', 'integer', 'Column supplyzone_id should be integer');
+SELECT col_type_is('archived_psector_arc_traceability', 'datasource', 'integer', 'Column datasource should be integer');
+SELECT col_type_is('archived_psector_arc_traceability', 'lock_level', 'integer', 'Column lock_level should be integer');
+SELECT col_type_is('archived_psector_arc_traceability', 'is_scadamap', 'boolean', 'Column is_scadamap should be boolean');
 
 -- Check foreign keys
 SELECT hasnt_fk('archived_psector_arc_traceability', 'Table archived_psector_arc_traceability should have no foreign keys');

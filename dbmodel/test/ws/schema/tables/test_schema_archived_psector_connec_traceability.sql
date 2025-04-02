@@ -27,9 +27,9 @@ SELECT columns_are(
         'descript', 'link', 'verified', 'rotation', 'the_geom', 'undelete', 'label_x', 'label_y', 'label_rotation', 'publish',
         'inventory', 'expl_id', 'num_value', 'feature_type', 'tstamp', 'pjoint_type', 'pjoint_id', 'lastupdate', 'lastupdate_user',
         'insert_user', 'minsector_id', 'dqa_id', 'staticpressure', 'district_id', 'adate', 'adescript', 'accessibility',
-        'workcat_id_plan', 'asset_id', 'epa_type', 'om_state', 'conserv_state', 'priority', 'valve_location', 'valve_type',
-        'shutoff_valve', 'access_type', 'placement_type', 'crmzone_id', 'expl_id2', 'plot_code', 'brand_id', 'model_id',
-        'serial_number', 'label_quadrant', 'macrominsector_id', 'streetname', 'streetname2'
+        'workcat_id_plan', 'asset_id', 'epa_type', 'om_state', 'conserv_state', 'priority', 'access_type', 'placement_type',
+        'crmzone_id', 'expl_id2', 'plot_code', 'brand_id', 'model_id', 'serial_number', 'label_quadrant', 'macrominsector_id',
+        'streetname', 'streetname2', 'supplyzone_id', 'datasource', 'lock_level', 'is_scadamap'
     ],
     'Table archived_psector_connec_traceability should have the correct columns'
 );
@@ -49,6 +49,11 @@ SELECT col_type_is('archived_psector_connec_traceability', 'audit_tstamp', 'time
 SELECT col_type_is('archived_psector_connec_traceability', 'audit_user', 'text', 'Column audit_user should be text');
 SELECT col_type_is('archived_psector_connec_traceability', 'action', 'character varying(16)', 'Column action should be varchar(16)');
 SELECT col_type_is('archived_psector_connec_traceability', 'the_geom', 'geometry(Point,25831)', 'Column the_geom should be geometry(Point,25831)');
+SELECT col_type_is('archived_psector_connec_traceability', 'verified', 'character varying(20)', 'Column verified should be varchar(20)');
+SELECT col_type_is('archived_psector_connec_traceability', 'supplyzone_id', 'integer', 'Column supplyzone_id should be integer');
+SELECT col_type_is('archived_psector_connec_traceability', 'datasource', 'integer', 'Column datasource should be integer');
+SELECT col_type_is('archived_psector_connec_traceability', 'lock_level', 'integer', 'Column lock_level should be integer');
+SELECT col_type_is('archived_psector_connec_traceability', 'is_scadamap', 'boolean', 'Column is_scadamap should be boolean');
 
 -- Check foreign keys
 SELECT hasnt_fk('archived_psector_connec_traceability', 'Table archived_psector_connec_traceability should have no foreign keys');

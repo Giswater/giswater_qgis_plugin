@@ -28,7 +28,8 @@ SELECT columns_are(
         'hemisphere', 'expl_id', 'num_value', 'feature_type', 'tstamp', 'lastupdate', 'lastupdate_user', 'insert_user',
         'minsector_id', 'dqa_id', 'staticpressure', 'district_id', 'adate', 'adescript', 'accessibility', 'workcat_id_plan',
         'asset_id', 'om_state', 'conserv_state', 'access_type', 'placement_type', 'expl_id2', 'brand_id', 'model_id',
-        'serial_number', 'label_quadrant', 'macrominsector_id', 'streetname', 'streetname2'
+        'serial_number', 'label_quadrant', 'macrominsector_id', 'streetname', 'streetname2', 'top_elev', 'custom_top_elev',
+        'datasource', 'supplyzone_id', 'lock_level', 'is_scadamap'
     ],
     'Table archived_psector_node_traceability should have the correct columns'
 );
@@ -47,6 +48,13 @@ SELECT col_type_is('archived_psector_node_traceability', 'audit_user', 'text', '
 SELECT col_type_is('archived_psector_node_traceability', 'action', 'character varying(16)', 'Column action should be varchar(16)');
 SELECT col_type_is('archived_psector_node_traceability', 'node_id', 'character varying(16)', 'Column node_id should be varchar(16)');
 SELECT col_type_is('archived_psector_node_traceability', 'the_geom', 'geometry(Point,25831)', 'Column the_geom should be geometry(Point,25831)');
+SELECT col_type_is('archived_psector_node_traceability', 'verified', 'integer', 'Column verified should be integer');
+SELECT col_type_is('archived_psector_node_traceability', 'top_elev', 'numeric(12, 4)', 'Column top_elev should be numeric(12, 4)');
+SELECT col_type_is('archived_psector_node_traceability', 'custom_top_elev', 'numeric(12, 4)', 'Column custom_top_elev should be numeric(12, 4)');
+SELECT col_type_is('archived_psector_node_traceability', 'datasource', 'integer', 'Column datasource should be integer');
+SELECT col_type_is('archived_psector_node_traceability', 'supplyzone_id', 'integer', 'Column supplyzone_id should be integer');
+SELECT col_type_is('archived_psector_node_traceability', 'lock_level', 'integer', 'Column lock_level should be integer');
+SELECT col_type_is('archived_psector_node_traceability', 'is_scadamap', 'boolean', 'Column is_scadamap should be boolean');
 
 -- Check foreign keys
 SELECT hasnt_fk('archived_psector_node_traceability', 'Table archived_psector_node_traceability should have no foreign keys');
