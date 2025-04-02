@@ -9,7 +9,7 @@ from functools import partial
 
 from qgis.PyQt.QtCore import QDateTime, QVariant
 from qgis.PyQt.QtWidgets import QCheckBox, QLabel, QLineEdit, QWidget, QMenu, QAction, QPushButton, QSpacerItem
-from qgis.core import QgsGeometry, QgsPointXY, QgsVectorLayer, QgsFeature, QgsProject, QgsField
+from qgis.core import QgsGeometry, QgsPointXY, QgsVectorLayer, QgsFeature, QgsProject, QgsField, QgsSymbol, QgsRuleBasedRenderer
 from qgis.PyQt.QtGui import QColor
 from ..dialog import GwAction
 from ...ui.ui_manager import GwSnapshotViewUi
@@ -203,19 +203,18 @@ def run(**kwargs):
     else:
         tools_qgis.show_warning("No results", dialog=dlg.dlg_snapshot_view)
 
-
 def add_layers_temp(layers, group):
-    """Creates temporary layers from a given list of layers and adds them to a specified group in QGIS."""
+    """Creates temporary layers from a given list of layers and adds them to specified subgroups under a main group in QGIS."""
 
     for i, layer in enumerate(layers):
-
         if not layer['features']:
             continue
 
         geometry_type = layer['geometryType']
         aux_layer_name = layer['layerName']
+        layer_group = layer.get('group', '')  # Get the subgroup name from the layer
 
-        # Remove existing layer with the same name
+        # Remove existing layer with the same name from the group
         tools_qgis.remove_layer_from_toc(aux_layer_name, group)
 
         # Create a new memory layer
@@ -224,6 +223,19 @@ def add_layers_temp(layers, group):
 
         v_layer.startEditing()
 
+        # Get unique attributes before adding features
+        unique_attributes = set()
+        for feature in layer['features']:
+            for key in feature['properties'].keys():
+                if key != 'the_geom':
+                    unique_attributes.add(key)
+        unique_attributes.add("color")  # Add color attribute
+
+        # Add unique attributes to the layer
+        prov.addAttributes([QgsField(str(key), QVariant.String) for key in unique_attributes])
+        v_layer.updateFields()
+
+        # Add features with their attributes and colors
         for feature in layer['features']:
             geometry = tools_qgis.get_geometry_from_json(feature)
             if not geometry:
@@ -233,35 +245,76 @@ def add_layers_temp(layers, group):
             fet.setGeometry(geometry)
 
             attributes = []
-            for key, value in feature['properties'].items():
-                if key != 'the_geom':
-                    prov.addAttributes([QgsField(str(key), QVariant.String)])
-                    attributes.append(value)
+            for key in unique_attributes:
+                value = feature['properties'].get(key, "")  # Get the value or an empty string if not exists
+                if key == "color":
+                    value = feature.get('color', 'blue')  # If no color, use blue by default
+                attributes.append(value)
 
             fet.setAttributes(attributes)
             prov.addFeatures([fet])
 
         v_layer.commitChanges()
 
-        # Add the layer to the project
+        # Add the layer to the project under the main group
         QgsProject.instance().addMapLayer(v_layer, False)
         root = QgsProject.instance().layerTreeRoot()
-        my_group = root.findGroup(group) or root.insertGroup(0, group)
-        my_group.insertLayer(i, v_layer)
 
-        # Apply styles
-        apply_layer_style(v_layer, geometry_type)
+        # Ensure the main group exists
+        main_group = root.findGroup(group) or root.insertGroup(0, group)
 
-def apply_layer_style(layer, geometry_type):
-    """Applies styling to a layer based on its geometry type."""
+        # Check if the subgroup exists under the main group, if not, create it
+        subgroup = main_group.findGroup(layer_group) or main_group.insertGroup(0, layer_group)
+        subgroup.insertLayer(i, v_layer)
+
+        # Apply rule-based style
+        apply_layer_style(v_layer)
+
+
+def apply_layer_style(layer):
+    """Applies styling to a layer based on its geometry type and feature colors."""
     symbol = layer.renderer().symbol()
 
-    if geometry_type == 'Point':
-        symbol.setSize(3.5)
-        symbol.setColor(QColor("blue"))
-    elif geometry_type == 'LineString':
-        symbol.setWidth(1.5)
-        symbol.setColor(QColor("blue"))
+    # Flags to check for the presence of features with specific colors
+    has_red_features = False
+    has_yellow_features = False
 
-    symbol.setOpacity(0.7)
-    global_vars.iface.layerTreeView().refreshLayerSymbology(layer.id())
+    # Iterate through features to check for red or yellow features
+    for feature in layer.getFeatures():
+        if feature['color'] == 'red':
+            has_red_features = True
+        if feature['color'] == 'yellow':
+            has_yellow_features = True
+
+    # Create rule-based renderer
+    root_rule = QgsRuleBasedRenderer.Rule(None)  # Root rule without filter
+
+    # If there are red features, create the "Red Features" subgroup
+    if has_red_features:
+        red_rule = QgsRuleBasedRenderer.Rule(symbol=QgsSymbol.defaultSymbol(layer.geometryType()))
+        red_rule.setLabel("Deleted")
+        red_rule.setFilterExpression("\"color\" = 'red'")
+        red_rule.symbol().setColor(QColor("red"))
+        root_rule.appendChild(red_rule)
+
+    # If there are yellow features, create the "Yellow Features" subgroup
+    if has_yellow_features:
+        yellow_rule = QgsRuleBasedRenderer.Rule(symbol=QgsSymbol.defaultSymbol(layer.geometryType()))
+        yellow_rule.setLabel("Updated")
+        yellow_rule.setFilterExpression("\"color\" = 'yellow'")
+        yellow_rule.symbol().setColor(QColor("yellow"))
+        root_rule.appendChild(yellow_rule)
+
+    # Always create the rule for "Blue Features" (or any other condition you want to apply)
+    blue_rule = QgsRuleBasedRenderer.Rule(symbol=QgsSymbol.defaultSymbol(layer.geometryType()))
+    blue_rule.setLabel("Existent")
+    blue_rule.setFilterExpression("\"color\" = 'blue'")
+    blue_rule.symbol().setColor(QColor("blue"))
+    root_rule.appendChild(blue_rule)
+
+    # Apply the rule-based renderer to the layer
+    renderer = QgsRuleBasedRenderer(root_rule)
+    layer.setRenderer(renderer)
+
+    # Refresh the symbology in QGIS
+    layer.triggerRepaint()
