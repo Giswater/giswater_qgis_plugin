@@ -20,7 +20,7 @@ SELECT columns_are(
     'archived_psector_connec_traceability',
     ARRAY[
         'id', 'psector_id', 'psector_state', 'doable', 'psector_arc_id', 'link_id', 'link_the_geom', 'audit_tstamp', 'audit_user',
-        'action', 'connec_id', 'code', 'elevation', 'depth', 'connecat_id', 'sector_id', 'customer_code', 'state', 'state_type',
+        'action', 'connec_id', 'code', 'top_elev', 'depth', 'conneccat_id', 'sector_id', 'customer_code', 'state', 'state_type',
         'arc_id', 'connec_length', 'annotation', 'observ', 'comment', 'dma_id', 'presszone_id', 'soilcat_id', 'function_type',
         'category_type', 'fluid_type', 'location_type', 'workcat_id', 'workcat_id_end', 'builtdate', 'enddate', 'ownercat_id',
         'muni_id', 'postcode', 'streetaxis_id', 'postnumber', 'postcomplement', 'streetaxis2_id', 'postnumber2', 'postcomplement2',
@@ -29,7 +29,7 @@ SELECT columns_are(
         'insert_user', 'minsector_id', 'dqa_id', 'staticpressure', 'district_id', 'adate', 'adescript', 'accessibility',
         'workcat_id_plan', 'asset_id', 'epa_type', 'om_state', 'conserv_state', 'priority', 'access_type', 'placement_type',
         'crmzone_id', 'expl_id2', 'plot_code', 'brand_id', 'model_id', 'serial_number', 'label_quadrant', 'macrominsector_id',
-        'streetname', 'streetname2', 'supplyzone_id', 'datasource', 'lock_level', 'is_scadamap'
+        'streetname', 'streetname2', 'n_inhabitants', 'supplyzone_id', 'datasource', 'lock_level', 'block_zone', 'n_hydrometer', 'is_scadamap'
     ],
     'Table archived_psector_connec_traceability should have the correct columns'
 );
@@ -49,10 +49,15 @@ SELECT col_type_is('archived_psector_connec_traceability', 'audit_tstamp', 'time
 SELECT col_type_is('archived_psector_connec_traceability', 'audit_user', 'text', 'Column audit_user should be text');
 SELECT col_type_is('archived_psector_connec_traceability', 'action', 'character varying(16)', 'Column action should be varchar(16)');
 SELECT col_type_is('archived_psector_connec_traceability', 'the_geom', 'geometry(Point,25831)', 'Column the_geom should be geometry(Point,25831)');
-SELECT col_type_is('archived_psector_connec_traceability', 'verified', 'character varying(20)', 'Column verified should be varchar(20)');
+SELECT col_type_is('archived_psector_connec_traceability', 'verified', 'integer', 'Column verified should be integer');
+SELECT col_type_is('archived_psector_connec_traceability', 'top_elev', 'numeric(12,4)', 'Column top_elev should be numeric(12,4)');
+SELECT col_type_is('archived_psector_connec_traceability', 'presszone_id', 'integer', 'Column presszone_id should be integer');
+SELECT col_type_is('archived_psector_connec_traceability', 'n_inhabitants', 'integer', 'Column n_inhabitants should be integer');
 SELECT col_type_is('archived_psector_connec_traceability', 'supplyzone_id', 'integer', 'Column supplyzone_id should be integer');
 SELECT col_type_is('archived_psector_connec_traceability', 'datasource', 'integer', 'Column datasource should be integer');
 SELECT col_type_is('archived_psector_connec_traceability', 'lock_level', 'integer', 'Column lock_level should be integer');
+SELECT col_type_is('archived_psector_connec_traceability', 'block_zone', 'text', 'Column block_zone should be text');
+SELECT col_type_is('archived_psector_connec_traceability', 'n_hydrometer', 'integer', 'Column n_hydrometer should be integer');
 SELECT col_type_is('archived_psector_connec_traceability', 'is_scadamap', 'boolean', 'Column is_scadamap should be boolean');
 
 -- Check foreign keys
