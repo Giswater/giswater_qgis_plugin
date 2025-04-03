@@ -11,9 +11,9 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- Data for Name: value_state; Type: TABLE DATA; Schema: ; Owner: -
 --
 
-INSERT INTO value_state (id, "name", observ) (0, 'OBSOLETE', NULL);
-INSERT INTO value_state (id, "name", observ) (1, 'OPERATIVE', NULL);
-INSERT INTO value_state (id, "name", observ) (2, 'PLANIFIED', NULL);
+INSERT INTO value_state (id, "name", observ) VALUES (0, 'OBSOLETE', NULL);
+INSERT INTO value_state (id, "name", observ) VALUES (1, 'OPERATIVE', NULL);
+INSERT INTO value_state (id, "name", observ) VALUES (2, 'PLANIFIED', NULL);
 
 
 --
