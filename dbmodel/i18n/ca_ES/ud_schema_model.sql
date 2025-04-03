@@ -11,21 +11,22 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 -- Data for Name: value_state; Type: TABLE DATA; Schema: ; Owner: -
 --
 
-INSERT INTO value_state VALUES (0, 'OBSOLET', NULL);
-INSERT INTO value_state VALUES (2, 'PLANIFICAT', NULL);
-INSERT INTO value_state VALUES (1, 'OPERATIU', NULL);
+INSERT INTO value_state (id, "name", observ) VALUES(0, 'OBSOLETE', NULL);
+INSERT INTO value_state (id, "name", observ) VALUES(2, 'PLANIFIED', NULL);
+INSERT INTO value_state (id, "name", observ) VALUES(1, 'OPERATIVE', NULL);
 
 
 --
 -- Data for Name: value_state_type; Type: TABLE DATA; Schema: ; Owner: -
 --
 
-INSERT INTO value_state_type VALUES (3, 2, 'PLANIFICAT', true, true);
-INSERT INTO value_state_type VALUES (4, 2, 'RECONSTRUIR', true, false);
-INSERT INTO value_state_type VALUES (5, 1, 'PROVISIONAL', false, true);
-INSERT INTO value_state_type VALUES (99, 2, 'FICTICIUS', true, false);
-INSERT INTO value_state_type VALUES (1, 0, 'OBSOLET', false, false);
-INSERT INTO value_state_type VALUES (2, 1, 'OPERATIU', true, true);
+INSERT INTO value_state_type (id, state, "name", is_operative, is_doable) VALUES (1, 0, 'OBSOLET', false, false);
+INSERT INTO value_state_type (id, state, "name", is_operative, is_doable) VALUES (2, 1, 'OPERATIU', true, true);
+INSERT INTO value_state_type (id, state, "name", is_operative, is_doable) VALUES (3, 2, 'PLANIFICAT', true, true);
+INSERT INTO value_state_type (id, state, "name", is_operative, is_doable) VALUES (4, 2, 'RECONSTRUIR', true, false);
+INSERT INTO value_state_type (id, state, "name", is_operative, is_doable) VALUES (5, 1, 'PROVISIONAL', false, true);
+INSERT INTO value_state_type (id, state, "name", is_operative, is_doable) VALUES (99, 2, 'FICTICIUS', true, false);
+INSERT INTO value_state_type (id, state, "name", is_operative, is_doable) VALUES (100, 2, 'OBSOLET-FICTICIUS', true, false);
 
 
 --

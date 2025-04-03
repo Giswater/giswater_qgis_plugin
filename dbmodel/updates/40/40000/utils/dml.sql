@@ -2360,3 +2360,19 @@ ALTER TABLE config_form_fields ENABLE TRIGGER gw_trg_config_control;
 
 -- 02/04/2025
 UPDATE config_form_fields SET dv_querytext = REPLACE(dv_querytext, 'sys_feature_cat', ' sys_feature_class') WHERE dv_querytext ILIKE '%sys_feature_cat%';
+
+-- 03/04/2025
+INSERT INTO value_state_type (id, state, "name", is_operative, is_doable) VALUES  (100, 2, 'OBSOLETE-FICTICIUS', true, false) ON CONFLICT DO NOTHING;
+
+UPDATE config_form_fields SET dv_querytext='WITH check_value AS (
+  SELECT value::integer AS psector_value 
+  FROM config_param_user 
+  WHERE parameter = ''plan_psector_current''
+)
+SELECT id, name as idval 
+FROM value_state 
+WHERE id IS NOT NULL 
+AND CASE 
+  WHEN (SELECT psector_value FROM check_value) IS NULL THEN id != 2 
+  ELSE true 
+END;' WHERE formname ILIKE 've_%' AND formtype='form_feature' AND columnname='state_type' AND tabname='tab_data';
