@@ -70,29 +70,49 @@ Once finished, create a PR and fill in the "Ready for review" template. Link the
 
 ## Contributors List
 
-- Nicole Aguiar, Freelance GIS consultant.
-- Jordi Blanch, Intern at BGEO OPEN GIS.
-- Guillem Esteve, Intern at BGEO OPEN GIS.
-- Elies Bertran, Intern at BGEO OPEN GIS.
-- Ivan Moreno, Intern at BGEO OPEN GIS.
-- Eter Gorgiladze, Intern at BGEO OPEN GIS.
-- Luigi Pirelli, Freelance GIS developer.
-- Vicente Medina, Barcelona Tech University.
-- Xavier Calatrava, Aigües de Blanes, SA.
-- Diego Guedes, SANEAGO.
-- Pablo Marques, SANEAGO.
-- Abel Garcia Juanes, Freelance GIS consultant.
-- Natasa Cica, GIS developer at BGEO OPEN GIS.
-- Sergi Muñoz, GIS analyst at BGEO OPEN GIS.
-- Sergi Maspons, GIS analyst at BGEO OPEN GIS.
-- David Erill, Freelance GIS developer.
-- Nestor Ibáñez, GIS developer at BGEO OPEN GIS.
-- Edgar Fuste, GIS developer at BGEO OPEN GIS.
-- Albert Bofill, GIS analyst at BGEO OPEN GIS.
-- Barbara Rzepka, GIS analyst at BGEO OPEN GIS.
-- Xavier Torret, GIS analyst at BGEO OPEN GIS.
-- Daniel Marín, Backend developer at BGEO OPEN GIS.
-- Ferran Martínez, Frontend developer at BGEO OPEN GIS.
+Adrian Valenciano, Freelance GIS consultant.<br>
+Nicole Aguiar, Freelance GIS consultant.<br>
+Abel Garcia Juanes, Freelance GIS consultant.<br>
+
+Luigi Pirelli, Freelance GIS developer.<br>
+David Erill, Freelance GIS developer.<br>
+
+Jordi Blanch, Full Stack developer on BGEO OPEN GIS.<br>
+Lia Bertran, Full Stack developer on BGEO OPEN GIS.<br>
+Sergi Maspons, Full Stack developer on BGEO OPEN GIS.<br>
+Edgar Fuste, Full Stack developer & DEV-OPS Area Coordinator on BGEO OPEN GIS.<br>
+
+Natasa Cica, GIS developer on BGEO OPEN GIS.<br>
+Nestor Ibáñez, GIS developer on BGEO OPEN GIS.<br>
+Oscar Pueyo, GIS developer on BGEO OPEN GIS.<br>
+
+Daniel Marín, Back-End developer on BGEO OPEN GIS.<br>
+Nico Pérez, Back-End developer on BGEO OPEN GIS.<br>
+Arnau Urgeles, Back-End developer on BGEO OPEN GIS.<br>
+
+Ferran Martínez, Front-End developer on BGEO OPEN GIS.<br>
+
+Arnau Torret, i18n & Release Manager  on BGEO OPEN GIS.<br>
+
+Sergi Muñoz, Engineering Projects Consultant & Engineering Area Coordinator on BGEO OPEN GIS.<br>
+Albert Bofill, GIS-Giswater Consultant & GIS Area Coordinator on BGEO OPEN GIS.<br>
+Namrata Karki, GIS-Giswater Consultant on BGEO OPEN GIS.<br>
+
+Maria Guzman, GIS-Giswater Analyst on BGEO OPEN GIS.<br>
+Barbara Rzepka, GIS analyst on BGEO OPEN GIS.<br>
+Xavier Torret, GIS analyst on BGEO OPEN GIS.<br>
+
+Guillem Esteve, Stagier on BGEO OPEN GIS.<br>
+Ivan Moreno, Stagier on BGEO OPEN GIS.<br>
+Eter Gorgiladze, Stagier on BGEO OPEN GIS.<br>
+Rafael Navarro, Stagier on BGEO OPEN GIS.<br>
+Lex Van Empel, Stagier on BGEO OPEN GIS.<br>
+
+Vicente Medina, Barcelona Tech University.<br>
+Xavier Calatrava, Aigües de Blanes, SA.<br>
+Diego Guedes, SANEAGO.<br>
+Pablo Marques, SANEAGO.<br>
+Claudia Dragoste, Aigües de Manresa, SA.<br>
 
 ## Commiters
 
