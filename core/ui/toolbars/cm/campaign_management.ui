@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Administrador de Lots</string>
+   <string>Administrador de Campañas</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_4">
    <item>
@@ -174,9 +174,9 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_2">
         <item>
-         <widget class="QPushButton" name="campaign_btn_open">
+         <widget class="QPushButton" name="campaign_btn_create">
           <property name="text">
-           <string>Obrir Campanya</string>
+           <string>Crear Campanya</string>
           </property>
          </widget>
         </item>
@@ -212,6 +212,9 @@
       </item>
       <item>
        <widget class="QTableView" name="tbl_campaign">
+        <property name="toolTipDuration">
+         <number>-1</number>
+        </property>
         <property name="sortingEnabled">
          <bool>true</bool>
         </property>
@@ -249,7 +252,7 @@
  <tabstops>
   <tabstop>date_event_from</tabstop>
   <tabstop>date_event_to</tabstop>
-  <tabstop>campaign_btn_open</tabstop>
+  <tabstop>campaign_btn_create</tabstop>
   <tabstop>campaign_btn_delete</tabstop>
   <tabstop>tbl_campaign</tabstop>
  </tabstops>

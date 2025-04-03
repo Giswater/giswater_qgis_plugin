@@ -46,7 +46,6 @@ class Campaign:
 
         self.dialog.tbl_campaign.setEditTriggers(QTableView.NoEditTriggers)
         self.dialog.tbl_campaign.setSelectionBehavior(QTableView.SelectRows)
-        self.dialog.tbl_campaign.setSelectionMode(QTableView.SingleSelection)
 
         # Populate combo date type
         rows = [['real_startdate', 'Data inici'], ['real_enddate', 'Data fi'], ['startdate', 'Data inici planificada'],
@@ -54,15 +53,22 @@ class Campaign:
         tools_qt.fill_combo_values(self.dialog.campaign_cmb_date_filter_type, rows, 1, sort_combo=False)
 
         # Fill combo values for campaign status (based on edit_typevalue table)
-        sql = "SELECT id, idval FROM edit_typevalue WHERE typevalue = 'cm_campaing_lot_status' ORDER BY id"
+        sql = "SELECT id, idval FROM lots3_ws.edit_typevalue WHERE typevalue = 'cm_campaing_lot_status' ORDER BY id"
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dialog.campaign_cmb_state, rows, index_to_show=1, add_empty=True)
 
 
         # Set filter events
-
+        self.dialog.campaign_cmb_state.currentIndexChanged.connect(self.filter_campaigns)
+        self.dialog.campaign_cmb_state.currentIndexChanged.connect(self.filter_campaigns)
+        self.dialog.date_event_from.dateChanged.connect(self.filter_campaigns)
+        self.dialog.date_event_to.dateChanged.connect(self.filter_campaigns)
         self.dialog.campaign_cmb_date_filter_type.currentIndexChanged.connect(self.filter_campaigns)
         self.dialog.campaign_cmb_date_filter_type.currentIndexChanged.connect(self.manage_date_filter)
+        self.dialog.tbl_campaign.doubleClicked.connect(self._on_campaign_double_click)
+        self.dialog.campaign_btn_create.clicked.connect(self.open_campaign)
+        self.dialog.campaign_btn_delete.clicked.connect(self.delete_selected_campaign)
+        self.dialog.campaign_btn_create.clicked.connect(lambda: self.create_campaign(is_new=True, dialog_type="review"))
 
         self.manage_date_filter()
         tools_gw.open_dialog(self.dialog, dlg_name="campaign_manager")
@@ -122,6 +128,9 @@ class Campaign:
             label = QLabel(field["label"]) if field.get("label") else None
             tools_gw.add_widget(self.dialog, field, label, widget)
 
+        if campaign_id:
+            self._load_campaign_relations(campaign_id)
+
         tools_gw.add_icon(self.dialog.btn_insert, '111')
         tools_gw.add_icon(self.dialog.btn_delete, '112')
         tools_gw.add_icon(self.dialog.btn_snapping, '137')
@@ -134,6 +143,26 @@ class Campaign:
 
         tools_gw.open_dialog(self.dialog, dlg_name="add_campaign")
 
+    def _load_campaign_relations(self, campaign_id):
+        relation_tabs = {
+            "tbl_campaign_x_arc": ("om_campaign_x_arc", "arc_id"),
+            "tbl_campaign_x_node": ("om_campaign_x_node", "node_id"),
+            "tbl_campaign_x_connec": ("om_campaign_x_connec", "connec_id"),
+            "tbl_campaign_x_link": ("om_campaign_x_link", "link_id")
+
+        }
+
+        # Only include gully and link if project type is 'ud'
+        if self.project_type == 'ud':
+            relation_tabs.update({
+                "tbl_campaign_x_gully": ("om_campaign_x_gully", "gully_id"),
+            })
+
+        for table_name, (db_table, col_id) in relation_tabs.items():
+            view = getattr(self.dialog, table_name, None)
+            if view:
+                sql = f"SELECT * FROM cm.{db_table} WHERE campaign_id = {campaign_id}"
+                self.populate_tableview(view, sql)
 
     def create_widget_from_field(self, field):
         """Create a Qt widget based on field metadata"""
@@ -519,15 +548,25 @@ class Campaign:
         """Filter om_campaign based on status and date"""
         filters = []
 
-        status = tools_qt.get_combo_value(self.dialog, self.dialog.campaign_cmb_state, 1)
+        # Estado
+        status_row = self.dialog.campaign_cmb_state.currentData()
+        if status_row and status_row[0]:
+            filters.append(f"status = {status_row[0]}")
 
-        show_nulls = self.dialog.campaign_chk_show_nulls.isChecked()
+        # Columna de fecha
+        date_type = tools_qt.get_combo_value(self.dialog, self.dialog.campaign_cmb_date_filter_type, 0)
+        if not date_type:
+            tools_qgis.show_warning("Select a valid date column to filter.", dialog=self.dialog)
+            return
+
+        # Rango de fechas
         date_from = self.dialog.date_event_from.date()
         date_to = self.dialog.date_event_to.date()
 
+        # Auto-correct date range
         if date_from > date_to:
-            tools_qgis.show_warning("Invalid date range.")
-            return
+            self.dialog.date_event_to.setDate(date_from)
+            date_to = date_from  # Update variable too
 
         date_format_low = self.campaign_date_format + ' 00:00:00'
         date_format_high = self.campaign_date_format + ' 23:59:59'
@@ -535,24 +574,86 @@ class Campaign:
         interval = f"'{date_from.toString(date_format_low)}' AND '{date_to.toString(date_format_high)}'"
         date_filter = f"({date_type} BETWEEN {interval}"
 
-        if show_nulls:
+        # Mostrar nulos
+        if self.dialog.campaign_chk_show_nulls.isChecked():
             date_filter += f" OR {date_type} IS NULL)"
         else:
             date_filter += ")"
 
         filters.append(date_filter)
 
-        if text_filter:
-            filters.append(f"(descript ILIKE '%{text_filter}%' OR serie ILIKE '%{text_filter}%')")
-
-        if status not in ("", "-1", None):
-            filters.append(f"status::TEXT ILIKE '%{status}%'")
-
+        # Build SQL
         where_clause = " AND ".join(filters)
-        query = f"SELECT * FROM cm.om_campaign"
+        query = "SELECT * FROM cm.om_campaign"
         if where_clause:
             query += f" WHERE {where_clause}"
         query += " ORDER BY id DESC"
 
         self.populate_tableview(self.dialog.tbl_campaign, query)
+
+    def delete_selected_campaign(self):
+        """Delete the selected campaign"""
+        selected = self.dialog.tbl_campaign.selectionModel().selectedRows()
+        if not selected:
+            tools_qgis.show_warning("Select a campaign to delete.", dialog=self.dialog)
+            return
+
+        index = selected[0]
+        campaign_id = index.data()
+        if not str(campaign_id).isdigit():
+            tools_qgis.show_warning("Invalid campaign ID.", dialog=self.dialog)
+            return
+
+        # Confirm deletion
+        if not tools_qt.show_question(f"Are you sure you want to delete {len(selected)} campaign(s)?"):
+            return
+
+        success = 0
+        for index in selected:
+            campaign_id = index.data()
+            if not str(campaign_id).isdigit():
+                continue
+            sql = f"DELETE FROM cm.om_campaign WHERE id = {campaign_id}"
+            if tools_db.execute_sql(sql):
+                success += 1
+
+        tools_qgis.show_info(f"{success} campaign(s) deleted.", dialog=self.dialog)
+        self.filter_campaigns()
+
+    def open_selected_campaign(self):
+        """Open the selected campaign from the manager"""
+        selected = self.dialog.tbl_campaign.selectionModel().selectedRows()
+        if not selected:
+            tools_qgis.show_warning("Select a campaign to open.")
+            return
+
+        index = selected[0]
+        campaign_id = index.data()
+        if not str(campaign_id).isdigit():
+            tools_qgis.show_warning("Invalid campaign ID.")
+            return
+
+        self.create_campaign(campaign_id=int(campaign_id), is_new=False, dialog_type="review")
+
+    def open_campaign(self, index):
+        """Open campaign from the clicked index safely (double click handler)."""
+        if not index.isValid():
+            return
+
+        model = index.model()
+        row = index.row()
+        id_index = model.index(row, 0)
+        campaign_id = model.data(id_index)
+
+        try:
+            campaign_id = int(campaign_id)
+            if campaign_id > 0:
+                self.load_campaign_dialog(campaign_id)
+        except (ValueError, TypeError):
+            tools_qgis.show_warning("Invalid campaign ID.")
+
+    def _on_campaign_double_click(self, index):
+        campaign_id = index.model().data(index.model().index(index.row(), 0))
+        self.load_campaign_dialog(int(campaign_id))
+
 
