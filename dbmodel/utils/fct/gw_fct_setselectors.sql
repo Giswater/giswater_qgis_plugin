@@ -77,7 +77,7 @@ v_sectorfrommacro boolean;
 v_explfrommacro boolean;
 v_expl_x_user boolean;
 v_project_type text;
-v_psector_current json;
+v_psector_current_value integer;
 
 BEGIN
 
@@ -199,12 +199,12 @@ BEGIN
 	IF v_checkall THEN
 		IF v_tabname = 'tab_psector' THEN -- to manage only those psectors related to selected exploitations
 
-			SELECT parameter, value FROM config_param_user WHERE parameter = 'plan_psector_current'
-			INTO v_psector_current;
+			SELECT value::integer FROM config_param_user WHERE parameter = 'plan_psector_current'
+			INTO v_psector_current_value;
 
 			-- Check if current psector is in the selected exploitations
-			IF v_psector_current.parameter IS NOT NULL AND v_psector_current.value IS NOT NULL THEN
-				IF (SELECT COUNT(*) FROM plan_psector WHERE psector_id = v_psector_current.value::integer
+			IF v_psector_current_value IS NOT NULL THEN
+				IF (SELECT COUNT(*) FROM plan_psector WHERE psector_id = v_psector_current_value
 					AND expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user)) = 0 THEN
 					-- Current psector is not in selected exploitations, set to NULL
 					UPDATE config_param_user SET value = NULL
