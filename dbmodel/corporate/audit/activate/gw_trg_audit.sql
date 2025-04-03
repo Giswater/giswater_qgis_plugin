@@ -76,12 +76,36 @@ BEGIN
                 v_geometry = regexp_replace(v_geometry, '[\[\]]', '', 'g');
             END IF;
 
-			v_new_data := (v_new_data::jsonb || jsonb_build_object('the_geom', v_geometry))::json;
+			v_new_data := jsonb_set(v_new_data::jsonb, '{the_geom}', to_jsonb(v_geometry))::json;
 
         END IF;
 
         IF row_to_json(OLD.*)::text != '{}' THEN
+
             v_old_data := row_to_json(OLD.*);
+            v_the_geom := (v_old_data::jsonb)->'the_geom';
+
+            IF v_geometry_type = 'Point' THEN
+				    v_geometry := 'POINT (' ||
+				            array_to_string(
+				                ARRAY[
+				                    (v_the_geom->'coordinates'->0)::text,
+				                    (v_the_geom->'coordinates'->1)::text
+				                ], ' '
+				            ) || ')';
+            ELSE
+                v_geometry := 'LINESTRING (' ||
+                        array_to_string(
+                            ARRAY[
+                                replace((v_the_geom->'coordinates'->0)::text,',',''),
+                                replace((v_the_geom->'coordinates'->1)::text,',','')
+                            ], ', '
+                        ) || ')';
+                v_geometry = regexp_replace(v_geometry, '[\[\]]', '', 'g');
+            END IF;
+
+			v_old_data := jsonb_set(v_old_data::jsonb, '{the_geom}', to_jsonb(v_geometry))::json;
+
         END IF;
 
         IF (TG_OP = 'INSERT') OR row_to_json(NEW.*)::text = row_to_json(OLD.*)::text THEN
