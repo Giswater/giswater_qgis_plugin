@@ -1735,6 +1735,9 @@ class GwAdminButton:
         self.postgresql_version = tools_db.get_pg_version()
         self.postgis_version = tools_db.get_postgis_version()
         self.pgrouting_version = tools_db.get_pgrouting_version()
+        tools_db.check_pg_extension('tablefunc')
+        tools_db.check_pg_extension('unaccent')
+        tools_db.check_pg_extension('fuzzystrmatch')
 
         if schema_name == 'null':
             tools_qt.enable_tab_by_tab_name(self.dlg_readsql.tab_main, "others", False)
