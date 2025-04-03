@@ -5,15 +5,15 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: latin-1 -*-
-import operator
+
 from functools import partial
 from qgis.PyQt.QtCore import QDateTime
 from qgis.PyQt.QtGui import QStandardItemModel
 from ..utils import tools_gw
 from ..ui.ui_manager import GwAuditManagerUi, GwAuditUi
-from ...libs import tools_qt, tools_log, tools_db, tools_qgis
+from ...libs import tools_qt, tools_db, tools_qgis
 from qgis.PyQt.QtWidgets import QTableView, QWidget, QAbstractItemView, QLabel, QLineEdit, QGridLayout, QScrollArea
-import json
+
 class GwAudit:
 
     def __init__(self):
@@ -21,14 +21,17 @@ class GwAudit:
         pass
 
 
-    def open_audit_manager(self, feature_id):
+    def open_audit_manager(self, feature_id, table_name):
         """ Open Audit Manager Dialog dynamic """
+
+        self.feature_id = feature_id
+        self.table_name = table_name
 
         user = tools_db.current_user
         form = { "formName" : "generic", "formType" : "audit_manager" }
         body = { "client" : { "cur_user": user }, "form" : form }
 
-        # db fct
+        # DB fct
         json_result = tools_gw.execute_procedure('gw_fct_get_dialog', body)
 
         # Create and open dialog
@@ -37,13 +40,13 @@ class GwAudit:
         tools_gw.manage_dlg_widgets(self, self.dlg_audit_manager, json_result)
         tools_gw.open_dialog(self.dlg_audit_manager, 'audit_manager')
 
-        # fill audit table
-        self._fill_manager_table(feature_id)
+        # Fill audit table
+        self._fill_manager_table()
 
         self.dlg_audit_manager.tbl_audit.setSelectionBehavior(QAbstractItemView.SelectRows)
         tools_qt.set_tableview_config(self.dlg_audit_manager.tbl_audit, sectionResizeMode=0)
 
-        # connect signals
+        # Connect signals
         self.dlg_audit_manager.tbl_audit.doubleClicked.connect(partial(self.open_audit))
 
         # Set calendar options
@@ -65,50 +68,59 @@ class GwAudit:
 
         model = self.dlg_audit_manager.tbl_audit.model()
         audit_id = model.item(row, 0)
+        self.fill_dialog({ "logId" : audit_id.text() })
 
-        # Create and open dialog
+
+    def fill_dialog(self, form):
+        """ Create and open dialog """
+
+        # Create body
+        body = { "client" : { "cur_user": tools_db.current_user }, "form" : form }
+
+        # Execute procedure
+        result = tools_gw.execute_procedure('gw_fct_getauditlogdata', body, schema_name='audit')
+        old_data = result['olddata']
+        new_data = result['newdata']
+
+        # Check results
+        if not old_data or not new_data:
+            tools_qgis.show_warning("No results", dialog=self.dlg_audit_manager)
+            return
+
+        # Create dialog
         self.dlg_audit = GwAuditUi(self)
         tools_gw.load_settings(self.dlg_audit)
         tools_gw.open_dialog(self.dlg_audit, 'audit')
 
-        # get json data
-        sql = f"SELECT olddata, newdata FROM audit.log WHERE id = {audit_id.text()};"
-        result = tools_db.dao.execute_returning(sql)
+        # Get layouts
+        layout = self.dlg_audit.centralwidget.findChild(QScrollArea).findChild(QWidget).findChild(QGridLayout)
 
-        if result:
-            # get layouts
-            layout = self.dlg_audit.centralwidget.findChild(QScrollArea).findChild(QWidget).findChild(QGridLayout)
+        # Add widgets in form for each value
+        for row, (key, new_value) in enumerate(new_data.items()):
+            old_value = old_data.get(key, "")
 
-            # add widgets in form for each value
-            row = 0
-            for old_data, new_data in zip(result[0].items(), result[1].items()):
-                # create widgets
-                label = QLabel(str(new_data[0]))
-                line_edit = QLineEdit(str(new_data[1]))
+            # Create widgets
+            label = QLabel(str(key))
+            line_edit = QLineEdit(str(new_value))
 
-                # check if previous data is diferent from the current
-                if str(old_data[1]) != str(new_data[1]):
-                    line_edit.setStyleSheet("color: orange;")
+            # Highlight field if the value has changed
+            if str(old_value) != str(new_value):
+                line_edit.setStyleSheet("color: orange;")
 
-                line_edit.setEnabled(False)
-                layout.addWidget(label, row, 0)
-                layout.addWidget(line_edit, row, 1)
-                row += 1
-        else:
-            tools_gw.close_dialog(self.dlg_audit)
-            tools_qgis.show_warning("No results", dialog=self.dlg_audit_manager)
-
-
+            line_edit.setEnabled(False)
+            layout.addWidget(label, row, 0)
+            layout.addWidget(line_edit, row, 1)
 
     # private region
 
-    def _fill_manager_table(self, feature_id=None):
-        """ Fill dscenario manager table with data from v_edit_cat_dscenario """
+    def _fill_manager_table(self):
+        """ Fill log manager table with data from audit.log """
 
-        complet_list = self._get_list(feature_id)
+        complet_list = self._get_list()
 
         if complet_list is False:
-            return False, False
+            return
+
         for field in complet_list['body']['data']['fields']:
             if field.get('hidden'):
                 continue
@@ -127,39 +139,50 @@ class GwAudit:
 
         self.dlg_audit_manager.tbl_audit.setColumnHidden(0, True)
 
-        return complet_list
 
-    def _get_list(self, feature_id=None):
+    def _get_list(self):
         """ Mount and execute the query for gw_fct_getlist """
 
         feature = f'"tableName":"audit_results"'
-        filter_fields = f'"limit": -1'
-        if feature_id:
-            filter_fields += f', "feature_id": {{"filterSign":"ILIKE", "value":"{feature_id}"}}'
-
+        filter_fields = f""""limit": -1, 
+                        "feature_id": {{"filterSign":"=", "value":"{self.feature_id}"}},
+                        "table_name": {{"filterSign":"=", "value":"{self.table_name}"}}
+                        """
         page_info = f'"pageInfo":{{"orderBy":"tstamp", "orderType":"DESC"}}'
+
+        # Create json body
         body = tools_gw.create_body(feature=feature, filter_fields=filter_fields, extras=page_info)
         json_result = tools_gw.execute_procedure('gw_fct_getlist', body)
         if json_result is None or json_result['status'] == 'Failed':
             return False
-        complet_list = json_result
-        if not complet_list:
-            return False
 
-        return complet_list
+        return json_result
 
     # end private region
 
-
 def close_dlg(**kwargs):
-    """ Close form """
+    """ Close dialog """
 
-    dialog = kwargs["dialog"]
-    tools_gw.close_dialog(dialog)
+    tools_gw.close_dialog(kwargs["dialog"])
+
 
 def open(**kwargs):
     """ Open audit """
 
-    dialog = kwargs["class"]
+    kwargs["class"].open_audit()
 
-    dialog.open_audit()
+
+def open_date(**kwargs):
+    """ Open audit in selected date """
+
+    this = kwargs["class"]
+
+    form = {
+        "date": this.date.dateTime().toString("yyyy-MM-dd"),
+        "featureId": this.feature_id,
+        "tableName": this.table_name
+    }
+
+    this.fill_dialog(form)
+
+
