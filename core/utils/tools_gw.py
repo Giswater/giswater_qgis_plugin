@@ -3956,7 +3956,7 @@ def delete_records(class_object, dialog, table_object, is_psector=False, lazy_wi
     answer = tools_qt.show_question(message, title, inf_text)
     if answer:
         for el in del_id:
-            class_object.ids.remove(el)
+            class_object.ids.remove(str(el))
     else:
         return
 
