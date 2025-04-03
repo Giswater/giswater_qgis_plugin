@@ -3300,7 +3300,7 @@ def selection_changed(class_object, dialog, table_object, is_psector=False, lazy
     table_widget.blockSignals(False)
 
     # Ensure selection of rows in the table based on the selected feature IDs from the map
-    if selection_model and selected_ids:
+    if model and selection_model and selected_ids:
         selection_model.clearSelection()
         selection_flags = QItemSelectionModel.Select | QItemSelectionModel.Rows | QItemSelectionModel.Current
 
