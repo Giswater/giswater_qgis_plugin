@@ -88,7 +88,7 @@ BEGIN
 	-- If editing an existing campaign
 	IF v_id IS NOT NULL THEN
 		EXECUTE FORMAT(
-			'SELECT row_to_json(a) FROM (SELECT * FROM %I WHERE %I = CAST($1 AS %s)) a',
+			'SELECT row_to_json(a) FROM (SELECT * FROM cm.%I WHERE %I = CAST($1 AS %s)) a',
 			v_tablename, v_idname, v_columntype
 		)
 		INTO v_values USING v_id;

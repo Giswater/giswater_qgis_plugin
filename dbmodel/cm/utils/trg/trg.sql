@@ -37,3 +37,11 @@ FOR EACH ROW EXECUTE PROCEDURE gw_trg_om_visit_lotmanage('node');
 DROP TRIGGER IF EXISTS gw_trg_om_visit_lotmanage ON PARENT_SCHEMA.om_visit_x_connec;
 CREATE TRIGGER gw_trg_om_visit_lotmanage AFTER INSERT ON PARENT_SCHEMA.om_visit_x_connec
 FOR EACH ROW EXECUTE PROCEDURE gw_trg_om_visit_lotmanage('connec');
+
+DROP TRIGGER IF EXISTS gw_fct_update_selectors_campaign ON cm.om_campaign;
+CREATE TRIGGER gw_fct_update_selectors_campaign AFTER INSERT OR UPDATE OR DELETE ON cm.om_campaign
+FOR EACH ROW EXECUTE FUNCTION cm.gw_fct_update_selectors('campaign');
+
+DROP TRIGGER IF EXISTS gw_fct_update_selectors_campaign_lot ON cm.om_campaign_lot;
+CREATE TRIGGER gw_fct_update_selectors_campaign_lot AFTER INSERT OR UPDATE OR DELETE ON cm.om_campaign_lot
+FOR EACH ROW EXECUTE FUNCTION cm.gw_fct_update_selectors('campaign_lot');
