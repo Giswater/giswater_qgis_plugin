@@ -2368,4 +2368,4 @@ WHERE id IS NOT NULL
 AND CASE 
   WHEN (SELECT psector_value FROM check_value) IS NULL THEN id != 2 
   ELSE true 
-END', dv_querytext_filterc = NULL WHERE formname ILIKE 've_%' AND formtype='form_feature' AND columnname='state_type' AND tabname='tab_data';
+END', dv_querytext_filterc = NULL WHERE formname ILIKE 've_%' AND formtype='form_feature' AND columnname='state' AND tabname='tab_data';
