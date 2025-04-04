@@ -8,14 +8,13 @@ or (at your option) any later version.
 from functools import partial
 
 from qgis.PyQt.QtCore import QDateTime, QVariant
-from qgis.PyQt.QtWidgets import QCheckBox, QLabel, QLineEdit, QWidget, QMenu, QAction, QPushButton, QSpacerItem
+from qgis.PyQt.QtWidgets import QCheckBox, QLabel, QLineEdit, QWidget, QMenu, QAction, QPushButton, QSizePolicy
 from qgis.core import QgsGeometry, QgsPointXY, QgsVectorLayer, QgsFeature, QgsProject, QgsField, QgsSymbol, QgsRuleBasedRenderer
 from qgis.PyQt.QtGui import QColor
 from ..dialog import GwAction
 from ...ui.ui_manager import GwSnapshotViewUi
 from ...utils import tools_gw
 from ....libs import lib_vars, tools_qt, tools_db, tools_qgis
-
 from ...utils.select_manager import GwSelectManager
 from .... import global_vars
 
@@ -64,13 +63,11 @@ class GwSnapshotViewButton(GwAction):
 
         # Hide gully checkbox if project type is not UD
         if self.project_type != 'ud':
-            # self.dlg_snapshot_view.findChild(QCheckBox, "tab_none_chk_gully").hide()
-            # self.dlg_snapshot_view.findChild(QLabel, "lbl_tab_none_chk_gully").setStyleSheet("color: transparent;")
-
             self.dlg_snapshot_view.findChild(QCheckBox, "tab_none_chk_gully").hide()
             self.dlg_snapshot_view.findChild(QLabel, "lbl_tab_none_chk_gully").hide()
-            self.dlg_snapshot_view.findChild(QLabel, "lbl_tab_none_spacer").hide()
 
+        # quiero cambiar el width del txt_coordinates
+        self.dlg_snapshot_view.findChild(QLineEdit, "txt_coordinates").setMinimumWidth(170)
 
         # Open form
         tools_gw.open_dialog(self.dlg_snapshot_view, 'snapshot_view')
@@ -268,12 +265,23 @@ def add_layers_temp(layers, group):
         subgroup.insertLayer(i, v_layer)
 
         # Apply rule-based style
-        apply_layer_style(v_layer)
+        apply_layer_style(v_layer, layer_group, aux_layer_name)
 
-
-def apply_layer_style(layer):
+def apply_layer_style(layer, layer_group, layer_origin):
     """Applies styling to a layer based on its geometry type and feature colors."""
     symbol = layer.renderer().symbol()
+
+    # Get reference symbol style from layer_group
+    layer_node = QgsProject.instance().mapLayersByName(layer_group)[0]
+    renderer = layer_node.renderer()
+    root_rule = renderer.rootRule()
+
+    reference_symbol = QgsSymbol.defaultSymbol(layer.geometryType())
+    for rule in root_rule.children():
+        if rule.label() == layer_origin:
+            reference_symbol = rule.symbol().clone()
+            break
+
 
     # Flags to check for the presence of features with specific colors
     has_red_features = False
@@ -291,30 +299,28 @@ def apply_layer_style(layer):
 
     # If there are red features, create the "Red Features" subgroup
     if has_red_features:
-        red_rule = QgsRuleBasedRenderer.Rule(symbol=QgsSymbol.defaultSymbol(layer.geometryType()))
+        red_rule = QgsRuleBasedRenderer.Rule(symbol=reference_symbol.clone())
         red_rule.setLabel("Deleted")
         red_rule.setFilterExpression("\"color\" = 'red'")
-        red_rule.symbol().setColor(QColor("red"))
+        red_rule.symbol().symbolLayer(0).setFillColor(QColor("red"))
         root_rule.appendChild(red_rule)
 
     # If there are yellow features, create the "Yellow Features" subgroup
     if has_yellow_features:
-        yellow_rule = QgsRuleBasedRenderer.Rule(symbol=QgsSymbol.defaultSymbol(layer.geometryType()))
+        yellow_rule = QgsRuleBasedRenderer.Rule(symbol=reference_symbol.clone())
         yellow_rule.setLabel("Updated")
         yellow_rule.setFilterExpression("\"color\" = 'yellow'")
-        yellow_rule.symbol().setColor(QColor("yellow"))
+        yellow_rule.symbol().symbolLayer(0).setFillColor(QColor("yellow"))
         root_rule.appendChild(yellow_rule)
 
-    # Always create the rule for "Blue Features" (or any other condition you want to apply)
-    blue_rule = QgsRuleBasedRenderer.Rule(symbol=QgsSymbol.defaultSymbol(layer.geometryType()))
+    # Always create the rule for "Blue Features"
+    blue_rule = QgsRuleBasedRenderer.Rule(symbol=reference_symbol.clone())
     blue_rule.setLabel("Existent")
     blue_rule.setFilterExpression("\"color\" = 'blue'")
-    blue_rule.symbol().setColor(QColor("blue"))
+    blue_rule.symbol().symbolLayer(0).setFillColor(QColor("blue"))
     root_rule.appendChild(blue_rule)
 
     # Apply the rule-based renderer to the layer
     renderer = QgsRuleBasedRenderer(root_rule)
     layer.setRenderer(renderer)
-
-    # Refresh the symbology in QGIS
     layer.triggerRepaint()
