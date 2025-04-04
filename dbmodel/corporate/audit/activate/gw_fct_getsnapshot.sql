@@ -30,6 +30,7 @@ v_feature jsonb;
 v_geometry_type text;
 v_idname text;
 v_columns text;
+v_feature_class text;
 
 BEGIN
 	-- search path
@@ -98,9 +99,14 @@ BEGIN
 			v_geometry_type := CASE WHEN v_idname ILIKE '%node%' OR v_idname ILIKE '%connec%'
 							   THEN 'Point' ELSE 'LineString' END;
 
+			-- Get feature class
+			SELECT feature_class INTO v_feature_class
+			FROM ws.cat_feature WHERE child_layer = v_table;
+
 			v_layer := COALESCE(v_layer, '[]'::jsonb) || jsonb_build_array(
 				    jsonb_build_object(
-			            'layerName', v_table,
+			            'layerName', initcap(lower(v_feature_class)),
+						'tableName', v_table,
 			            'features', v_features,
 			            'geometryType', v_geometry_type,
 						'group', initcap(regexp_replace(v_idname, '_id$', '', 'g'))
