@@ -14,8 +14,8 @@
    <string>Audit</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_2">
-   <item row="1" column="0" colspan="2">
-    <layout class="QGridLayout" name="lyt_snapshot_view_2"/>
+   <item row="5" column="0" colspan="2">
+    <layout class="QGridLayout" name="lyt_buttons"/>
    </item>
    <item row="4" column="0" colspan="2">
     <widget class="QGroupBox" name="groupBox">
@@ -26,7 +26,7 @@
       </sizepolicy>
      </property>
      <property name="title">
-      <string>Features</string>
+      <string>Features to recover</string>
      </property>
      <layout class="QGridLayout" name="gridLayout">
       <item row="0" column="0">
@@ -42,35 +42,17 @@
      </layout>
     </widget>
    </item>
-   <item row="6" column="0" colspan="2">
-    <layout class="QGridLayout" name="lyt_buttons"/>
-   </item>
    <item row="0" column="0" colspan="2">
-    <layout class="QGridLayout" name="lyt_snapshot_view_1"/>
-   </item>
-   <item row="5" column="0" colspan="2">
     <widget class="QGroupBox" name="groupBox_2">
      <property name="title">
-      <string>Layer style origin</string>
+      <string>Temporal and spatial selection</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_3">
       <item row="0" column="0">
-       <layout class="QGridLayout" name="lyt_snapshot_view_5">
-        <item row="0" column="0">
-         <widget class="QRadioButton" name="radioButton">
-          <property name="text">
-           <string>Parent</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1">
-         <widget class="QRadioButton" name="radioButton_2">
-          <property name="text">
-           <string>Child</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
+       <layout class="QGridLayout" name="lyt_snapshot_view_1"/>
+      </item>
+      <item row="1" column="0">
+       <layout class="QGridLayout" name="lyt_snapshot_view_2"/>
       </item>
      </layout>
     </widget>
