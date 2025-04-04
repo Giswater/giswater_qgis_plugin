@@ -199,19 +199,6 @@ BEGIN
 	IF v_checkall THEN
 		IF v_tabname = 'tab_psector' THEN -- to manage only those psectors related to selected exploitations
 
-			SELECT value::integer FROM config_param_user WHERE parameter = 'plan_psector_current'
-			INTO v_psector_current_value;
-
-			-- Check if current psector is in the selected exploitations
-			IF v_psector_current_value IS NOT NULL THEN
-				IF (SELECT COUNT(*) FROM plan_psector WHERE psector_id = v_psector_current_value
-					AND expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user)) = 0 THEN
-					-- Current psector is not in selected exploitations, set to NULL
-					UPDATE config_param_user SET value = NULL
-					WHERE parameter = 'plan_psector_current' AND cur_user = current_user;
-				END IF;
-			END IF;
-
 			EXECUTE 'INSERT INTO ' || v_tablename || ' ('|| v_columnname ||', cur_user) SELECT '||v_tableid||', current_user FROM '||v_table||
 			' WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user=current_user) AND active = true ON CONFLICT DO NOTHING';
 
@@ -375,6 +362,18 @@ BEGIN
 			DELETE FROM selector_psector WHERE psector_id NOT IN
 			(SELECT psector_id FROM cat_dscenario WHERE active is true and expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user));
 
+			SELECT value::integer FROM config_param_user WHERE parameter = 'plan_psector_current'
+			INTO v_psector_current_value;
+
+			-- Check if current psector is in the selected exploitations
+			IF v_psector_current_value IS NOT NULL THEN
+				IF (SELECT COUNT(*) FROM plan_psector WHERE psector_id = v_psector_current_value
+					AND expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user)) = 0 THEN
+					-- Current psector is not in selected exploitations, set to NULL
+					UPDATE config_param_user SET value = NULL
+					WHERE parameter = 'plan_psector_current' AND cur_user = current_user;
+				END IF;
+			END IF;
 
 		ELSIF v_tabname IN ('tab_sector', 'tab_macrosector') THEN
 
