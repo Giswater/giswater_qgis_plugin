@@ -138,6 +138,7 @@ class GwPsector:
         self.psector_id = self.dlg_plan_psector.findChild(QLineEdit, "psector_id")
         self.ext_code = self.dlg_plan_psector.findChild(QLineEdit, "ext_code")
         self.cmb_expl_id = self.dlg_plan_psector.findChild(QComboBox, "expl_id")
+        self.cmb_psector_type = self.dlg_plan_psector.findChild(QComboBox, "psector_type")
         self.cmb_status = self.dlg_plan_psector.findChild(QComboBox, "status")
         self.workcat_id = self.dlg_plan_psector.findChild(QComboBox, "workcat_id")
         self.parent_id = self.dlg_plan_psector.findChild(QLineEdit, "parent_id")
@@ -168,6 +169,11 @@ class GwPsector:
                " WHERE exploitation.expl_id != 0 and cur_user = current_user")
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.cmb_expl_id, rows)
+
+        # Populate combo psector_type
+        sql = ("SELECT id, idval FROM plan_typevalue WHERE typevalue = 'psector_type'")
+        rows = tools_db.get_rows(sql)
+        tools_qt.fill_combo_values(self.cmb_psector_type, rows)
 
         # Populate combo workcat_id
         sql = "SELECT id as id, id as idval FROM cat_work"
