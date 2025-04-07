@@ -31,6 +31,7 @@ v_geometry_type text;
 v_idname text;
 v_columns text;
 v_feature_class text;
+v_feature_type text;
 
 BEGIN
 	-- search path
@@ -56,8 +57,11 @@ BEGIN
 	    WHERE table_schema = 'PARENT_SCHEMA' AND table_name = v_table
 	    ORDER BY ordinal_position LIMIT 1;
 
-		IF regexp_replace(v_idname, '_id$', '', 'g') = ANY(v_selected_features) THEN
-			-- Set table names
+		-- Get feature type from column name
+		v_feature_type := REPLACE(v_idname, '_id', '');
+
+		IF v_feature_type = ANY(v_selected_features) THEN
+			-- Create dinamic table name
 			v_temp_table_name := FORMAT('temp_PARENT_SCHEMA_%I', v_table);
 
 			-- Create temporal table with values of the last snapshot
@@ -68,7 +72,7 @@ BEGIN
 				SELECT DISTINCT ON (feature_id) * FROM log WHERE tstamp::date BETWEEN v_last_snapshot_date AND v_date
 				AND table_name = v_table ORDER BY feature_id, tstamp DESC
 			LOOP
-				-- Apply changes from logs into temporal layers
+				-- Apply changes from logs into temporal tables
 				EXECUTE (v_record.query_sql);
 			END LOOP;
 
@@ -96,20 +100,19 @@ BEGIN
 			) INTO v_features;
 
 			-- Get geometry type
-			v_geometry_type := CASE WHEN v_idname ILIKE '%node%' OR v_idname ILIKE '%connec%'
-							   THEN 'Point' ELSE 'LineString' END;
+			v_geometry_type := CASE WHEN v_feature_type IN ('link','arc')
+							   THEN 'LineString' ELSE 'Point' END;
 
 			-- Get feature class
-			SELECT feature_class INTO v_feature_class
-			FROM ws.cat_feature WHERE child_layer = v_table;
+			SELECT id INTO v_feature_class
+			FROM PARENT_SCHEMA.cat_feature WHERE child_layer = v_table;
 
 			v_layer := COALESCE(v_layer, '[]'::jsonb) || jsonb_build_array(
 				    jsonb_build_object(
 			            'layerName', initcap(lower(v_feature_class)),
-						'tableName', v_table,
 			            'features', v_features,
 			            'geometryType', v_geometry_type,
-						'group', initcap(regexp_replace(v_idname, '_id$', '', 'g'))
+						'group', initcap(v_feature_type)
 				    )
 			);
 
