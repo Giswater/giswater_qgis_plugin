@@ -7306,3 +7306,343 @@ AS SELECT DISTINCT ON (v_ui_om_visit_x_link.visit_id) v_ui_om_visit_x_link.visit
     v_ui_om_visit_x_link.form_type
    FROM v_ui_om_visit_x_link
      LEFT JOIN om_visit_cat ON om_visit_cat.id = v_ui_om_visit_x_link.visitcat_id;
+
+-- 07/04/2025
+CREATE OR REPLACE VIEW vu_node
+AS WITH streetaxis AS (
+         SELECT v_ext_streetaxis.id,
+            v_ext_streetaxis.descript
+           FROM v_ext_streetaxis
+        ), typevalue AS (
+         SELECT edit_typevalue.typevalue,
+            edit_typevalue.id,
+            edit_typevalue.idval
+           FROM edit_typevalue
+          WHERE edit_typevalue.typevalue::text = ANY (ARRAY['sector_type'::character varying::text, 'presszone_type'::character varying::text, 'dma_type'::character varying::text, 'dqa_type'::character varying::text])
+        )
+ SELECT node.node_id,
+    node.code,
+    node.top_elev,
+    node.custom_top_elev,
+        CASE
+            WHEN node.custom_top_elev IS NOT NULL THEN node.custom_top_elev
+            ELSE node.top_elev
+        END AS sys_top_elev,
+    node.depth,
+    cat_node.node_type,
+    cat_feature.feature_class AS sys_type,
+    node.nodecat_id,
+    cat_node.matcat_id AS cat_matcat_id,
+    cat_node.pnom AS cat_pnom,
+    cat_node.dnom AS cat_dnom,
+    cat_node.dint AS cat_dint,
+    node.epa_type,
+    node.state,
+    node.state_type,
+    node.expl_id,
+    exploitation.macroexpl_id,
+    node.sector_id,
+    sector.name AS sector_name,
+    sector.macrosector_id,
+    et1.idval::character varying(16) AS sector_type,
+    node.presszone_id,
+    presszone.name AS presszone_name,
+    et2.idval::character varying(16) AS presszone_type,
+    presszone.head AS presszone_head,
+    node.dma_id,
+    dma.name AS dma_name,
+    et3.idval::character varying(16) AS dma_type,
+    dma.macrodma_id,
+    node.dqa_id,
+    dqa.name AS dqa_name,
+    et4.idval::character varying(16) AS dqa_type,
+    dqa.macrodqa_id,
+    node.arc_id,
+    node.parent_id,
+    node.annotation,
+    node.observ,
+    node.comment,
+    node.staticpressure,
+    node.soilcat_id,
+    node.function_type,
+    node.category_type,
+    node.fluid_type,
+    node.location_type,
+    node.workcat_id,
+    node.workcat_id_end,
+    node.workcat_id_plan,
+    node.builtdate,
+    node.enddate,
+    node.ownercat_id,
+    node.muni_id,
+    node.postcode,
+    node.district_id,
+    a.descript::character varying(100) AS streetname,
+    node.postnumber,
+    node.postcomplement,
+    b.descript::character varying(100) AS streetname2,
+    node.postnumber2,
+    node.postcomplement2,
+    mu.region_id,
+    mu.province_id,
+    node.descript,
+    cat_node.svg,
+    node.rotation,
+    concat(cat_feature.link_path, node.link) AS link,
+    node.verified,
+    node.undelete,
+    cat_node.label,
+    node.label_x,
+    node.label_y,
+    node.label_rotation,
+    node.label_quadrant,
+    node.publish,
+    node.inventory,
+    node.hemisphere,
+    node.num_value,
+    node.adate,
+    node.adescript,
+    node.accessibility,
+    dma.stylesheet ->> 'featureColor'::text AS dma_style,
+    presszone.stylesheet ->> 'featureColor'::text AS presszone_style,
+    node.asset_id,
+    node.om_state,
+    node.conserv_state,
+    node.access_type,
+    node.placement_type,
+    node.expl_id2,
+    vst.is_operative,
+        CASE
+            WHEN node.brand_id IS NULL THEN cat_node.brand_id
+            ELSE node.brand_id
+        END AS brand_id,
+        CASE
+            WHEN node.model_id IS NULL THEN cat_node.model_id
+            ELSE node.model_id
+        END AS model_id,
+    node.serial_number,
+    node.minsector_id,
+    node.macrominsector_id,
+    e.demand_max,
+    e.demand_min,
+    e.demand_avg,
+    e.press_max,
+    e.press_min,
+    e.press_avg,
+    e.head_max,
+    e.head_min,
+    e.head_avg,
+    e.quality_max,
+    e.quality_min,
+    e.quality_avg,
+    date_trunc('second'::text, node.tstamp) AS tstamp,
+    node.insert_user,
+    date_trunc('second'::text, node.lastupdate) AS lastupdate,
+    node.lastupdate_user,
+    node.the_geom,
+        CASE
+            WHEN vst.is_operative = true AND node.epa_type::text <> 'UNDEFINED'::character varying(16)::text THEN node.epa_type
+            ELSE NULL::character varying(16)
+        END AS inp_type,
+    node.pavcat_id,
+    node.is_scadamap,
+    ms.code as macrosector_code
+   FROM node
+     LEFT JOIN cat_node ON cat_node.id::text = node.nodecat_id::text
+     JOIN cat_feature ON cat_feature.id::text = cat_node.node_type::text
+     LEFT JOIN dma ON node.dma_id = dma.dma_id
+     LEFT JOIN sector ON node.sector_id = sector.sector_id
+     LEFT JOIN exploitation ON node.expl_id = exploitation.expl_id
+     LEFT JOIN dqa ON node.dqa_id = dqa.dqa_id
+     LEFT JOIN presszone ON presszone.presszone_id = node.presszone_id
+     LEFT JOIN streetaxis a ON a.id::text = node.streetaxis_id::text
+     LEFT JOIN streetaxis b ON b.id::text = node.streetaxis2_id::text
+     LEFT JOIN node_add e ON e.node_id::text = node.node_id::text
+     LEFT JOIN value_state_type vst ON vst.id = node.state_type
+     LEFT JOIN ext_municipality mu ON node.muni_id = mu.muni_id
+     LEFT JOIN typevalue et1 ON et1.id::text = sector.sector_type::text AND et1.typevalue::text = 'sector_type'::text
+     LEFT JOIN typevalue et2 ON et2.id::text = presszone.presszone_type AND et2.typevalue::text = 'presszone_type'::text
+     LEFT JOIN typevalue et3 ON et3.id::text = dma.dma_type::text AND et3.typevalue::text = 'dma_type'::text
+     LEFT JOIN typevalue et4 ON et4.id::text = dqa.dqa_type::text AND et4.typevalue::text = 'dqa_type'::text
+     LEFT JOIN macrosector ms ON ms.macrosector_id = sector.macrosector_id;;
+
+CREATE OR REPLACE VIEW vu_connec
+AS WITH streetaxis AS (
+         SELECT v_ext_streetaxis.id,
+            v_ext_streetaxis.descript
+           FROM v_ext_streetaxis
+        ), typevalue AS (
+         SELECT edit_typevalue.typevalue,
+            edit_typevalue.id,
+            edit_typevalue.idval
+           FROM edit_typevalue
+          WHERE edit_typevalue.typevalue::text = ANY (ARRAY['sector_type'::character varying::text, 'presszone_type'::character varying::text, 'dma_type'::character varying::text, 'dqa_type'::character varying::text])
+        ), inp_netw_mode AS (
+         WITH inp_netw_mode_aux AS (
+                 SELECT count(*) AS t
+                   FROM config_param_user
+                  WHERE config_param_user.parameter::text = 'inp_options_networkmode'::text AND config_param_user.cur_user::text = CURRENT_USER
+                )
+         SELECT
+                CASE
+                    WHEN inp_netw_mode_aux.t > 0 THEN ( SELECT config_param_user.value
+                       FROM config_param_user
+                      WHERE config_param_user.parameter::text = 'inp_options_networkmode'::text AND config_param_user.cur_user::text = CURRENT_USER)
+                    ELSE NULL::text
+                END AS value
+           FROM inp_netw_mode_aux
+        )
+ SELECT connec.connec_id,
+    connec.code,
+    connec.top_elev,
+    connec.depth,
+    cat_connec.connec_type,
+    cat_feature.feature_class AS sys_type,
+    connec.conneccat_id,
+    cat_connec.matcat_id AS cat_matcat_id,
+    cat_connec.pnom AS cat_pnom,
+    cat_connec.dnom AS cat_dnom,
+    cat_connec.dint AS cat_dint,
+    connec.epa_type,
+    connec.state,
+    connec.state_type,
+    connec.expl_id,
+    exploitation.macroexpl_id,
+    connec.sector_id,
+    sector.name AS sector_name,
+    sector.macrosector_id,
+    et1.idval::character varying(16) AS sector_type,
+    connec.presszone_id,
+    presszone.name AS presszone_name,
+    et2.idval::character varying(16) AS presszone_type,
+    presszone.head AS presszone_head,
+    connec.dma_id,
+    dma.name AS dma_name,
+    et3.idval::character varying(16) AS dma_type,
+    dma.macrodma_id,
+    connec.dqa_id,
+    dqa.name AS dqa_name,
+    et4.idval::character varying(16) AS dqa_type,
+    dqa.macrodqa_id,
+    connec.crmzone_id,
+    crm_zone.name AS crmzone_name,
+    connec.customer_code,
+    connec.connec_length,
+    connec.n_hydrometer,
+    connec.arc_id,
+    connec.annotation,
+    connec.observ,
+    connec.comment,
+    connec.staticpressure,
+    connec.soilcat_id,
+    connec.function_type,
+    connec.category_type,
+    connec.fluid_type,
+    connec.location_type,
+    connec.workcat_id,
+    connec.workcat_id_end,
+    connec.workcat_id_plan,
+    connec.builtdate,
+    connec.enddate,
+    connec.ownercat_id,
+    connec.muni_id,
+    connec.postcode,
+    connec.district_id,
+    c.descript::character varying(100) AS streetname,
+    connec.postnumber,
+    connec.postcomplement,
+    b.descript::character varying(100) AS streetname2,
+    connec.postnumber2,
+    connec.postcomplement2,
+    mu.region_id,
+    mu.province_id,
+    connec.descript,
+    cat_connec.svg,
+    connec.rotation,
+    concat(cat_feature.link_path, connec.link) AS link,
+    connec.verified,
+    connec.undelete,
+    cat_connec.label,
+    connec.label_x,
+    connec.label_y,
+    connec.label_rotation,
+    connec.label_quadrant,
+    connec.publish,
+    connec.inventory,
+    connec.num_value,
+    connec.pjoint_id,
+    connec.pjoint_type,
+    connec.adate,
+    connec.adescript,
+    connec.accessibility,
+    dma.stylesheet ->> 'featureColor'::text AS dma_style,
+    presszone.stylesheet ->> 'featureColor'::text AS presszone_style,
+    connec.asset_id,
+    connec.om_state,
+    connec.conserv_state,
+    connec.priority,
+    connec.access_type,
+    connec.placement_type,
+    connec.expl_id2,
+    vst.is_operative,
+    connec.plot_code,
+        CASE
+            WHEN connec.brand_id IS NULL THEN cat_connec.brand_id
+            ELSE connec.brand_id
+        END AS brand_id,
+        CASE
+            WHEN connec.model_id IS NULL THEN cat_connec.model_id
+            ELSE connec.model_id
+        END AS model_id,
+    connec.serial_number,
+    connec.minsector_id,
+    connec.macrominsector_id,
+    e.demand_base,
+    e.demand_max,
+    e.demand_min,
+    e.demand_avg,
+    e.press_max,
+    e.press_min,
+    e.press_avg,
+    e.quality_max,
+    e.quality_min,
+    e.quality_avg,
+    e.flow_max,
+    e.flow_min,
+    e.flow_avg,
+    e.vel_max,
+    e.vel_min,
+    e.vel_avg,
+    e.result_id,
+    date_trunc('second'::text, connec.tstamp) AS tstamp,
+    connec.insert_user,
+    date_trunc('second'::text, connec.lastupdate) AS lastupdate,
+    connec.lastupdate_user,
+    connec.the_geom,
+        CASE
+            WHEN connec.sector_id > 0 AND vst.is_operative = true AND connec.epa_type = 'JUNCTION'::character varying(16)::text AND cpu.value = '4'::text THEN connec.epa_type::character varying
+            ELSE NULL::character varying(16)
+        END AS inp_type,
+    connec.block_zone,
+    ms.code as macrosector_code
+   FROM ( SELECT inp_netw_mode.value
+           FROM inp_netw_mode) cpu,
+    connec
+     JOIN cat_connec ON connec.conneccat_id::text = cat_connec.id::text
+     JOIN cat_feature ON cat_feature.id::text = cat_connec.connec_type::text
+     LEFT JOIN dma ON connec.dma_id = dma.dma_id
+     LEFT JOIN sector ON connec.sector_id = sector.sector_id
+     LEFT JOIN exploitation ON connec.expl_id = exploitation.expl_id
+     LEFT JOIN dqa ON connec.dqa_id = dqa.dqa_id
+     LEFT JOIN presszone ON presszone.presszone_id = connec.presszone_id
+     LEFT JOIN crm_zone ON crm_zone.id::text = connec.crmzone_id::text
+     LEFT JOIN streetaxis c ON c.id::text = connec.streetaxis_id::text
+     LEFT JOIN streetaxis b ON b.id::text = connec.streetaxis2_id::text
+     LEFT JOIN connec_add e ON e.connec_id::text = connec.connec_id::text
+     LEFT JOIN value_state_type vst ON vst.id = connec.state_type
+     LEFT JOIN ext_municipality mu ON connec.muni_id = mu.muni_id
+     LEFT JOIN typevalue et1 ON et1.id::text = sector.sector_type::text AND et1.typevalue::text = 'sector_type'::text
+     LEFT JOIN typevalue et2 ON et2.id::text = presszone.presszone_type AND et2.typevalue::text = 'presszone_type'::text
+     LEFT JOIN typevalue et3 ON et3.id::text = dma.dma_type::text AND et3.typevalue::text = 'dma_type'::text
+     LEFT JOIN typevalue et4 ON et4.id::text = dqa.dqa_type::text AND et4.typevalue::text = 'dqa_type'::text
+     LEFT JOIN macrosector ms ON ms.macrosector_id = sector.macrosector_id;;

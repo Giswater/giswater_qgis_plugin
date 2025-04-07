@@ -1944,3 +1944,5 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"archived_ps
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"archived_psector_node_traceability", "column":"lock_level", "dataType":"int4", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"archived_psector_node_traceability", "column":"is_scadamap", "dataType":"bool", "isUtils":"False"}}$$);
 
+-- 07/04/2025
+ALTER TABLE macrosector ADD code varchar(50) NULL;
