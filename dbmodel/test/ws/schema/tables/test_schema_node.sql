@@ -19,7 +19,7 @@ SELECT has_table('node'::name, 'Table node should exist');
 SELECT columns_are(
     'node',
     ARRAY[
-        'node_id', 'code', 'top_elev', 'custom_top_elev', 'datasource', 'depth', 'nodecat_id', 'epa_type',
+        'node_id', 'code', 'sys_code', 'top_elev', 'custom_top_elev', 'datasource', 'depth', 'nodecat_id', 'epa_type',
         'sector_id', 'arc_id', 'parent_id', 'state', 'state_type', 'annotation', 'observ', 'comment',
         'dma_id', 'presszone_id', 'soilcat_id', 'function_type', 'category_type', 'fluid_type',
         'location_type', 'workcat_id', 'workcat_id_end', 'builtdate', 'enddate', 'ownercat_id',

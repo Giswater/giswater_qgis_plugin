@@ -783,6 +783,7 @@ AS WITH
 		(
 			SELECT arc.arc_id,
 			arc.code,
+            arc.sys_code,
 			arc.node_1,
 			arc.nodetype_1,
 			arc.y1,
@@ -1239,6 +1240,7 @@ AS WITH
     	(
     		SELECT node.node_id,
 			node.code,
+            node.sys_code,
 			node.top_elev,
 			node.custom_top_elev,
 			CASE
@@ -1376,6 +1378,7 @@ AS WITH
 			SELECT
 			node_id,
 			code,
+            sys_code,
 			top_elev,
 			custom_top_elev,
 			sys_top_elev,
@@ -1663,6 +1666,7 @@ AS WITH
     	(
 			SELECT connec.connec_id,
 			connec.code,
+            connec.sys_code,
 			connec.customer_code,
 			connec.top_elev,
 			connec.y1,
@@ -2010,6 +2014,7 @@ AS WITH
     	(
 			SELECT gully.gully_id,
 			gully.code,
+            gully.sys_code,
 			gully.top_elev,
 			gully.ymax,
 			gully.sandbox,

@@ -269,6 +269,7 @@ AS WITH
     (
       SELECT arc.arc_id,
       arc.code,
+      arc.sys_code,
       arc.datasource,
       arc.node_1,
       arc.nodetype_1,
@@ -624,6 +625,7 @@ AS WITH
       (
         SELECT node.node_id,
         node.code,
+        node.sys_code,
         node.top_elev,
         node.custom_top_elev,
         CASE
@@ -1245,6 +1247,7 @@ AS WITH
       (
         select connec.connec_id,
         connec.code,
+        connec.sys_code,
         connec.top_elev,
         connec.datasource,
         connec.depth,

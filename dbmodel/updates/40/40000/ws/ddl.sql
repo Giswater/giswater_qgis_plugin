@@ -1118,6 +1118,7 @@ DROP INDEX IF EXISTS arc_streetname2;
 CREATE TABLE arc (
 	arc_id varchar(16) DEFAULT nextval('urn_id_seq'::regclass) NOT NULL,
 	code text NULL,
+	sys_code text NULL,
 	node_1 varchar(16) NULL,
 	node_2 varchar(16) NULL,
 	arccat_id varchar(30) NOT NULL,
@@ -1338,6 +1339,7 @@ DROP INDEX IF EXISTS connec_streetname2;
 CREATE TABLE connec (
 	connec_id varchar(16) DEFAULT nextval('urn_id_seq'::regclass) NOT NULL,
 	code text NULL,
+	sys_code text NULL,
 	top_elev numeric(12, 4) NULL,
 	"depth" numeric(12, 4) NULL,
 	conneccat_id varchar(30) NOT NULL,
@@ -1679,6 +1681,7 @@ DROP INDEX IF EXISTS node_streetname2;
 CREATE TABLE node (
 	node_id varchar(16) DEFAULT nextval('urn_id_seq'::regclass) NOT NULL,
 	code text NULL,
+	sys_code text NULL,
 	top_elev numeric(12, 4) NULL,
 	custom_top_elev numeric(12, 4) NULL,
 	datasource int4 NULL,

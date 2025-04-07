@@ -19,7 +19,7 @@ SELECT has_table('arc'::name, 'Table arc should exist');
 SELECT columns_are(
     'arc',
     ARRAY[
-        'arc_id', 'code', 'node_1', 'node_2', 'arccat_id', 'epa_type', 'sector_id', 'state', 'state_type', 'annotation',
+        'arc_id', 'code', 'sys_code', 'node_1', 'node_2', 'arccat_id', 'epa_type', 'sector_id', 'state', 'state_type', 'annotation',
         'observ', 'comment', 'custom_length', 'dma_id', 'presszone_id', 'soilcat_id', 'function_type', 'category_type',
         'fluid_type', 'location_type', 'workcat_id', 'workcat_id_end', 'builtdate', 'enddate', 'ownercat_id', 'muni_id',
         'postcode', 'streetaxis_id', 'postnumber', 'postcomplement', 'streetaxis2_id', 'postnumber2', 'postcomplement2',
@@ -56,6 +56,7 @@ SELECT has_index('arc', 'arc_streetname2', 'Table should have index on streetnam
 -- Check column types
 SELECT col_type_is('arc', 'arc_id', 'varchar(16)', 'Column arc_id should be varchar(16)');
 SELECT col_type_is('arc', 'code', 'text', 'Column code should be text');
+SELECT col_type_is('arc', 'sys_code', 'text', 'Column sys_code should be text');
 SELECT col_type_is('arc', 'node_1', 'varchar(16)', 'Column node_1 should be varchar(16)');
 SELECT col_type_is('arc', 'node_2', 'varchar(16)', 'Column node_2 should be varchar(16)');
 SELECT col_type_is('arc', 'arccat_id', 'varchar(30)', 'Column arccat_id should be varchar(30)');

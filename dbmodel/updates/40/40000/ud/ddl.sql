@@ -1087,6 +1087,7 @@ DROP INDEX IF EXISTS node_streetname2;
 CREATE TABLE node (
 	node_id varchar(16) DEFAULT nextval('urn_id_seq'::regclass) NOT NULL,
 	code text NULL,
+	sys_code text NULL,
 	top_elev numeric(12, 3) NULL,
 	ymax numeric(12, 3) NULL,
 	elev numeric(12, 3) NULL,
@@ -1293,6 +1294,7 @@ DROP INDEX IF EXISTS gully_streetname2;
 CREATE TABLE arc (
 	arc_id varchar(16) DEFAULT nextval('urn_id_seq'::regclass) NOT NULL,
 	code text NULL,
+	sys_code text NULL,
 	node_1 varchar(16) NULL,
 	node_2 varchar(16) NULL,
 	y1 numeric(12, 3) NULL,
@@ -1502,6 +1504,7 @@ DROP INDEX IF EXISTS connec_streetname2;
 CREATE TABLE connec (
 	connec_id varchar(30) DEFAULT nextval('urn_id_seq'::regclass) NOT NULL,
 	code text NULL,
+	sys_code text NULL,
 	top_elev numeric(12, 4) NULL,
 	y1 numeric(12, 4) NULL,
 	y2 numeric(12, 4) NULL,
@@ -1682,6 +1685,7 @@ DROP INDEX IF EXISTS gully_street2;
 CREATE TABLE gully (
 	gully_id varchar(16) DEFAULT nextval('urn_id_seq'::regclass) NOT NULL,
 	code text NULL,
+	sys_code text NULL,
 	top_elev numeric(12, 4) NULL,
 	ymax numeric(12, 4) NULL,
 	sandbox numeric(12, 4) NULL,

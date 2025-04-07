@@ -2791,7 +2791,7 @@ lock_level, is_scadamap, pavcat_id
 FROM _node;
 
 
-INSERT INTO arc (arc_id, code, node_1, node_2, y1, y2, elev1, elev2, custom_y1, custom_y2, custom_elev1, custom_elev2, sys_elev1, sys_elev2, arc_type, arccat_id,
+INSERT INTO arc (arc_id, code, sys_code, node_1, node_2, y1, y2, elev1, elev2, custom_y1, custom_y2, custom_elev1, custom_elev2, sys_elev1, sys_elev2, arc_type, arccat_id,
 matcat_id, epa_type, sector_id, state, state_type, annotation, observ, "comment", sys_slope, inverted_slope, custom_length, dma_id, soilcat_id, function_type,
 category_type, fluid_type, location_type, workcat_id, workcat_id_end, builtdate, enddate, ownercat_id, muni_id, postcode, streetaxis_id, postnumber, postcomplement,
 streetaxis2_id, postnumber2, postcomplement2, descript, link, verified, the_geom, undelete, label_x, label_y, label_rotation, publish, inventory, uncertain, expl_id,
@@ -2799,7 +2799,7 @@ num_value, feature_type, tstamp, lastupdate, lastupdate_user, insert_user, distr
 node_sys_top_elev_1, node_sys_elev_1, nodetype_2, node_sys_top_elev_2, node_sys_elev_2, parent_id, expl_id2, adate, adescript, visitability, label_quadrant,
 minsector_id, macrominsector_id, brand_id, model_id, serial_number, streetname, streetname2, dwfzone_id, datasource, initoverflowpath, omunit_id, lock_level,
 is_scadamap, registre_date, hydraulic_capacity, corrosion, deficiencies, meandering, conserv_state, om_state, last_visitdate, negativeoffset)
-SELECT arc_id, code, node_1, node_2, y1, y2, elev1, elev2, custom_y1, custom_y2, custom_elev1, custom_elev2, sys_elev1, sys_elev2, arc_type, arccat_id,
+SELECT arc_id, code, code, node_1, node_2, y1, y2, elev1, elev2, custom_y1, custom_y2, custom_elev1, custom_elev2, sys_elev1, sys_elev2, arc_type, arccat_id,
 matcat_id, epa_type, sector_id, state, state_type, annotation, observ, "comment", sys_slope, inverted_slope, custom_length, dma_id, soilcat_id, function_type,
 category_type, fluid_type, location_type, workcat_id, workcat_id_end, builtdate, enddate, ownercat_id, muni_id, postcode, streetaxis_id, postnumber, postcomplement,
 streetaxis2_id, postnumber2, postcomplement2, descript, link, verified, the_geom, undelete, label_x, label_y, label_rotation, publish, inventory, uncertain, expl_id,

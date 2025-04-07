@@ -19,7 +19,7 @@ SELECT has_view('v_edit_arc'::name, 'View v_edit_arc should exist');
 SELECT columns_are(
     'v_edit_arc',
     ARRAY[
-        'arc_id', 'code', 'datasource', 'node_1', 'nodetype_1', 'elevation1', 'depth1', 'staticpress1',
+        'arc_id', 'code', 'sys_code', 'datasource', 'node_1', 'nodetype_1', 'elevation1', 'depth1', 'staticpress1',
         'node_2', 'nodetype_2', 'staticpress2', 'elevation2', 'depth2', 'depth', 'arccat_id',
         'arc_type', 'sys_type', 'cat_matcat_id', 'cat_pnom', 'cat_dnom', 'cat_dint', 'cat_dr', 'epa_type',
         'state', 'state_type', 'expl_id', 'macroexpl_id', 'sector_id', 'macrosector_id', 'sector_type',

@@ -19,7 +19,7 @@ SELECT has_table('connec'::name, 'Table connec should exist');
 SELECT columns_are(
     'connec',
     ARRAY[
-        'connec_id', 'code', 'top_elev', 'depth', 'conneccat_id', 'sector_id', 'customer_code', 'state', 'state_type',
+        'connec_id', 'code', 'sys_code', 'top_elev', 'depth', 'conneccat_id', 'sector_id', 'customer_code', 'state', 'state_type',
         'arc_id', 'connec_length', 'annotation', 'observ', 'comment', 'dma_id', 'presszone_id', 'soilcat_id',
         'function_type', 'category_type', 'fluid_type', 'location_type', 'workcat_id', 'workcat_id_end', 'builtdate',
         'enddate', 'ownercat_id', 'muni_id', 'postcode', 'streetaxis_id', 'postnumber', 'postcomplement',
@@ -41,6 +41,7 @@ SELECT col_is_pk('connec', ARRAY['connec_id'], 'Column connec_id should be prima
 -- Check column types
 SELECT col_type_is('connec', 'connec_id', 'varchar(16)', 'Column connec_id should be varchar(16)');
 SELECT col_type_is('connec', 'code', 'text', 'Column code should be text');
+SELECT col_type_is('connec', 'sys_code', 'text', 'Column sys_code should be text');
 SELECT col_type_is('connec', 'top_elev', 'numeric(12,4)', 'Column top_elev should be numeric(12,4)');
 SELECT col_type_is('connec', 'depth', 'numeric(12,4)', 'Column depth should be numeric(12,4)');
 SELECT col_type_is('connec', 'conneccat_id', 'varchar(30)', 'Column conneccat_id should be varchar(30)');
