@@ -1796,22 +1796,18 @@ def add_widget_combined(dialog, field, label, widget, old_widget_pos):
 
     orientation = layout.property('lytOrientation')
     widget_pos = int(field.get('layoutorder', 0))
-    row, col = (0, widget_pos) if orientation == "horizontal" else (widget_pos, 0)
+    row, col = (0, widget_pos + old_widget_pos ) if orientation == "horizontal" else (widget_pos + old_widget_pos, 0)
 
     label_pos = field['widgetcontrols']['labelPosition'] if (
                             'widgetcontrols' in field and field['widgetcontrols'] and 'labelPosition' in field['widgetcontrols']) else None
-    
-    if orientation == "horizontal":
-        col = old_widget_pos+1
-    else:
-        row = old_widget_pos+1
+
     if label:
-        if orientation == "horizontal":                      
+        if orientation == "horizontal":
             if label_pos == 'top':
                 layout.addWidget(label, row, col)
                 row += 1
-            else:       
-                layout.addWidget(label, row, col)           
+            else:
+                layout.addWidget(label, row, col)
                 col += 1
         else:
             if label_pos == 'top':
@@ -1822,19 +1818,15 @@ def add_widget_combined(dialog, field, label, widget, old_widget_pos):
                 col += 1
             layout.setColumnStretch(col, 1)
 
-    if isinstance(widget, QSpacerItem):        
+    if isinstance(widget, QSpacerItem):
         layout.addItem(widget, row, col)
         layout.setColumnStretch(col, 1)
-    else:        
-        layout.addWidget(widget, row, col)         
+    else:
+        layout.addWidget(widget, row, col)
 
     if label and orientation == "horizontal":
         layout.setColumnStretch(col, 1)
 
-    if orientation == "horizontal":        
-        return col
-    else:
-        return row
 
 def get_dialog_changed_values(dialog, chk, widget, field, list, value=None):
 
@@ -4662,7 +4654,7 @@ def _get_list(complet_result, form_name='', filter_fields='', widgetname='', for
     form = f'"formName":"{form_name}", "tabName":"tab_none", "widgetname":"{widgetname}", "formtype":"{formtype}"'
     if linkedobject is None:
         return
-    feature = f'"tableName":"{linkedobject}"'    
+    feature = f'"tableName":"{linkedobject}"'
     body = create_body(form, feature, filter_fields)
     json_result = execute_procedure('gw_fct_getlist', body)
     if json_result is None or json_result['status'] == 'Failed':
@@ -4823,6 +4815,8 @@ def manage_dlg_widgets(class_object, dialog, complet_result):
         if orientation:
             layout_orientations[layout_name] = orientation
 
+    current_layout = ""
+
     # Loop through fields to add them to the appropriate layout
     for field in complet_result['body']['data']['fields']:
         # Avoid error when field is None
@@ -4846,8 +4840,14 @@ def manage_dlg_widgets(class_object, dialog, complet_result):
         orientation = layout_orientations.get(layout.objectName(), "vertical")
         layout.setProperty('lytOrientation', orientation)
 
+        if current_layout != field['layoutname']:
+            current_layout = field['layoutname']
+            old_widget_pos = 0
+        else:
+            old_widget_pos = 1
+
         # Add widget into layout
-        old_widget_pos = add_widget_combined(dialog, field, label, widget, old_widget_pos)
+        add_widget_combined(dialog, field, label, widget, old_widget_pos)
 
         # Apply consistent column stretch across all layouts
         layout.setColumnStretch(0, 1)  # Label column stretch (keep this compact)
