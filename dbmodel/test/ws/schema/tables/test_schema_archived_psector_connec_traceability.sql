@@ -29,7 +29,7 @@ SELECT columns_are(
         'insert_user', 'minsector_id', 'dqa_id', 'staticpressure', 'district_id', 'adate', 'adescript', 'accessibility',
         'workcat_id_plan', 'asset_id', 'epa_type', 'om_state', 'conserv_state', 'priority', 'access_type', 'placement_type',
         'crmzone_id', 'expl_id2', 'plot_code', 'brand_id', 'model_id', 'serial_number', 'label_quadrant', 'macrominsector_id',
-        'streetname', 'streetname2', 'n_inhabitants', 'supplyzone_id', 'datasource', 'lock_level', 'block_zone', 'n_hydrometer', 'is_scadamap'
+        'streetname', 'streetname2', 'n_inhabitants', 'supplyzone_id', 'datasource', 'lock_level', 'block_zone', 'n_hydrometer'
     ],
     'Table archived_psector_connec_traceability should have the correct columns'
 );
@@ -58,7 +58,6 @@ SELECT col_type_is('archived_psector_connec_traceability', 'datasource', 'intege
 SELECT col_type_is('archived_psector_connec_traceability', 'lock_level', 'integer', 'Column lock_level should be integer');
 SELECT col_type_is('archived_psector_connec_traceability', 'block_zone', 'text', 'Column block_zone should be text');
 SELECT col_type_is('archived_psector_connec_traceability', 'n_hydrometer', 'integer', 'Column n_hydrometer should be integer');
-SELECT col_type_is('archived_psector_connec_traceability', 'is_scadamap', 'boolean', 'Column is_scadamap should be boolean');
 
 -- Check foreign keys
 SELECT hasnt_fk('archived_psector_connec_traceability', 'Table archived_psector_connec_traceability should have no foreign keys');
