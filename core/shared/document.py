@@ -7,6 +7,7 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 import os
 import webbrowser
+import json
 from functools import partial
 from osgeo import gdal
 from pyproj import CRS, Transformer
@@ -653,56 +654,20 @@ class GwDocument(QObject):
         node_ids = self.list_ids['node']
         connec_ids = self.list_ids['connec']
         link_ids = self.list_ids['link']
-        print(arc_ids)
-        print(node_ids)
-        print(connec_ids)
-        print(link_ids)
         workcat_ids = self._get_associated_workcat_ids()
         psector_ids = self._get_associated_psector_ids()
         visit_ids = self._get_associated_visit_ids()
         gully_ids = self.list_ids['gully']
-
-        # Clear the current records
-        for table in self.doc_tables:
-            if table == 'doc_x_gully' and self.project_type != 'ud':
-                continue
-            sql += f"\nDELETE FROM {table} WHERE doc_id = '{doc_id}';"
-
-        # Insert the new records for arcs
-        for feature_id in arc_ids:
-            sql += f"\nINSERT INTO doc_x_arc (doc_id, arc_id) VALUES ('{doc_id}', '{feature_id}');"
-
-        # Insert the new records for nodes
-        for feature_id in node_ids:
-            sql += f"\nINSERT INTO doc_x_node (doc_id, node_id) VALUES ('{doc_id}', '{feature_id}');"
-
-        # Insert the new records for connec
-        for feature_id in connec_ids:
-            sql += f"\nINSERT INTO doc_x_connec (doc_id, connec_id) VALUES ('{doc_id}', '{feature_id}');"
-
-        for feature_id in link_ids:
-            sql += f"\nINSERT INTO doc_x_link (doc_id, link_id) VALUES ('{doc_id}', '{feature_id}');"
-
-        # Insert the new records for workcat
-        for feature_id in workcat_ids:
-            sql += f"\nINSERT INTO doc_x_workcat (doc_id, workcat_id) VALUES ('{doc_id}', '{feature_id}');"
-
-        # Insert the new records for psector
-        for feature_id in psector_ids:
-            sql += f"\nINSERT INTO doc_x_psector (doc_id, psector_id) VALUES ('{doc_id}', '{feature_id}');"
-
-        # Insert the new records for visit
-        for feature_id in visit_ids:  # New lines
-            sql += f"\nINSERT INTO doc_x_visit (doc_id, visit_id) VALUES ('{doc_id}', '{feature_id}');"
-
-        # Insert the new records for gully
+        # Create body
         if self.project_type == 'ud':
-            for feature_id in gully_ids:
-                sql += f"\nINSERT INTO doc_x_gully (doc_id, gully_id) VALUES ('{doc_id}', '{feature_id}');"
+            extras = f'"parameters":{{"project_type":"{self.project_type}", "element_id": {doc_id}, "table_name":"doc", "data":{{"arc": {json.dumps(arc_ids)}, "node": {json.dumps(node_ids)}, "connec": {json.dumps(connec_ids)}, "link": {json.dumps(link_ids)}, "workcat": {json.dumps(workcat_ids)}, "psector": {json.dumps(psector_ids)}, "visit": {json.dumps(visit_ids)}, "gully": {json.dumps(gully_ids)}}}}}'
+        else:
+            extras = f'"parameters":{{"project_type":"{self.project_type}", "element_id": {doc_id}, "table_name":"doc", "data":{{"arc": {json.dumps(arc_ids)}, "node": {json.dumps(node_ids)}, "connec": {json.dumps(connec_ids)}, "link": {json.dumps(link_ids)}, "workcat": {json.dumps(workcat_ids)}, "psector": {json.dumps(psector_ids)}, "visit": {json.dumps(visit_ids)}}}}}'
+        body = tools_gw.create_body(extras=extras)
+        # Execute function
+        json_result = tools_gw.execute_procedure('gw_fct_manage_relations', body, self.schema_name, log_sql=True)
 
-        # Execute the SQL statements
-        status = tools_db.execute_sql(sql)
-        if status:
+        if json_result['status'] == 'Accepted':
             self.doc_id = doc_id
             self.doc_name = doc_name
             self.is_new = False

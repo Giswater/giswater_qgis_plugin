@@ -3408,7 +3408,7 @@ def insert_feature(class_object, dialog, table_object, is_psector=False, remove_
                 if selected_id not in selected_ids:
                     selected_ids.append(selected_id)
 
-    if feature_id not in selected_ids:
+    if int(feature_id) not in selected_ids:
         selected_ids.append(str(feature_id))
 
     # Append the new IDs to the existing list, ensuring no duplicates

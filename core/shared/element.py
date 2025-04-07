@@ -56,28 +56,16 @@ class GwElement:
 
         # Setting lists
         self.ids = []
-        self.list_ids = {}
-        self.list_ids['arc'] = []
-        self.list_ids['node'] = []
-        self.list_ids['connec'] = []
-        self.list_ids['gully'] = []
-        self.list_ids['element'] = []
-
-        # Setting layers
-        self.layers = {}
-        self.layers['arc'] = []
-        self.layers['node'] = []
-        self.layers['connec'] = []
-        self.layers['gully'] = []
-        self.layers['element'] = []
-
+        self.list_ids = {'arc': [], 'node': [], 'connec': [], 'link': [], 'gully': [], 'element': []}
+        self.layers = {'arc': [], 'node': [], 'connec': [], 'link': [], 'gully': [], 'element': []}
         self.layers['arc'] = tools_gw.get_layers_from_feature_type('arc')
         self.layers['node'] = tools_gw.get_layers_from_feature_type('node')
         self.layers['connec'] = tools_gw.get_layers_from_feature_type('connec')
+        self.layers['link'] = tools_gw.get_layers_from_feature_type('link')
         self.layers['element'] = tools_gw.get_layers_from_feature_type('element')
         self.point_xy = {"x": None, "y": None}
 
-        params = ['arc', 'node', 'connec', 'gully']
+        params = ['arc', 'node', 'connec', 'gully', 'link']
         if list_tabs:
             for i in params:
                 if i not in list_tabs:
@@ -122,7 +110,7 @@ class GwElement:
 
         # Set signals
         excluded_layers = ["v_edit_arc", "v_edit_node", "v_edit_connec", "v_edit_element", "v_edit_gully",
-                           "v_edit_element"]
+                           "v_edit_element", "v_edit_link"]
         self.excluded_layers = excluded_layers
         layers_visibility = tools_gw.get_parent_layers_visibility()
         self.dlg_add_element.rejected.connect(partial(tools_gw.restore_parent_layers_visibility, layers_visibility))
@@ -161,6 +149,8 @@ class GwElement:
                                                                           self.dlg_add_element.tbl_element_x_connec, "v_edit_connec", "connec_id", self.rubber_band, 10))
         self.dlg_add_element.tbl_element_x_gully.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
                                                                          self.dlg_add_element.tbl_element_x_gully, "v_edit_gully", "gully_id", self.rubber_band, 10))
+        self.dlg_add_element.tbl_element_x_link.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
+                                                                         self.dlg_add_element.tbl_element_x_link, "v_edit_link", "link_id", self.rubber_band, 10))
         self.dlg_add_element.btn_path_url.clicked.connect(partial(self._open_web_browser, self.dlg_add_element, "link"))
 
         # Fill combo boxes of the form and related events
@@ -616,6 +606,10 @@ class GwElement:
             for feature_id in self.list_ids['connec']:
                 sql += (f"\nINSERT INTO element_x_connec (element_id, connec_id)"
                         f" VALUES ('{element_id}', '{feature_id}');")
+        if self.list_ids['link']:
+            for feature_id in self.list_ids['link']:
+                sql += (f"\nINSERT INTO element_x_link (element_id, link_id)"
+                        f" VALUES ('{element_id}', '{feature_id}');")
         if self.list_ids['gully']:
             for feature_id in self.list_ids['gully']:
                 sql += (f"\nINSERT INTO element_x_gully (element_id, gully_id)"
@@ -724,7 +718,7 @@ class GwElement:
         # Reset list of selected records
         self.ids, self.list_ids = tools_gw.reset_feature_list()
 
-        list_feature_type = ['arc', 'node', 'connec', 'element']
+        list_feature_type = ['arc', 'node', 'connec', 'element', 'link']
         if global_vars.project_type == 'ud':
             list_feature_type.append('gully')
 

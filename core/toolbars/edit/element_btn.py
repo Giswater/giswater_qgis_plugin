@@ -14,7 +14,7 @@ class GwElementButton(GwAction):
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group, list_tabs=None, feature_type=None):
         super().__init__(icon_path, action_name, text, toolbar, action_group)
-        self.list_tabs = list_tabs if list_tabs else ["node", "arc", "connec", "gully"]
+        self.list_tabs = list_tabs if list_tabs else ["node", "arc", "connec", "gully", 'link']
         self.feature_type = feature_type
         self.element = GwElement()
 

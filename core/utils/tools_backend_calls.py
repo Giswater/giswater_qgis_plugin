@@ -116,11 +116,8 @@ def delete_object(**kwargs):
         at lines:   widget.clicked.connect(partial(getattr(module, function_name), **kwargs))
     """
     dialog = kwargs['dialog']
-    try:
-        index_tab = dialog.tab_main.currentIndex()
-        tab_name = dialog.tab_main.widget(index_tab).objectName()
-    except:
-        tab_name = 'main'
+    index_tab = dialog.tab_main.currentIndex()
+
     func_params = kwargs['func_params']
     complet_result = kwargs['complet_result']
 
@@ -132,8 +129,6 @@ def delete_object(**kwargs):
 
     qtable_name = func_params['targetwidget']
     qtable = tools_qt.get_widget(dialog, f"{qtable_name}")
-
-
 
     # Get selected rows
     selected_list = qtable.selectionModel().selectedRows()
@@ -151,11 +146,11 @@ def delete_object(**kwargs):
         row = index.row()
         column_index = tools_qt.get_col_index_by_col_name(qtable, func_params['columnfind'])
         object_id = index.sibling(row, column_index).data()
-        column_index = tools_qt.get_col_index_by_col_name(qtable, 'id')
         id_ = index.sibling(row, column_index).data()
 
         inf_text += str(object_id) + ", "
-        list_id += str(id_) + ", "
+        list_id += f"{str(id_)}, "
+        #ist_id += str(id_) + ", "
         list_object_id = list_object_id + str(object_id) + ", "
         row_index += str(row + 1) + ", "
 
@@ -164,8 +159,8 @@ def delete_object(**kwargs):
     message = "Are you sure you want to delete these records?"
     answer = tools_qt.show_question(message, "Delete records", list_object_id)
     if answer:
-        sql = ("DELETE FROM " + tablename + ""
-               " WHERE id::integer IN (" + list_id + ")")
+        sql = (f"DELETE FROM " + tablename + ""
+               f" WHERE {func_params['columnfind']}::text IN (" + list_id + ")")
         tools_db.execute_sql(sql, log_sql=False)
         _reload_table(**kwargs)
 
