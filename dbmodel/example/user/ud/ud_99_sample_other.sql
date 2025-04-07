@@ -977,3 +977,6 @@ UPDATE config_form_fields SET layoutname='lyt_data_1', widgettype='combo', dv_qu
 
 -- 26/03/2025
 UPDATE config_form_fields SET layoutname='lyt_data_1', layoutorder=37, "datatype"='double', widgettype='text', "label"='Custom length', tooltip='Custom length', placeholder=NULL, ismandatory=false, isparent=false, iseditable=true, isautoupdate=false, isfilter=NULL, dv_querytext=NULL, dv_orderby_id=NULL, dv_isnullvalue=NULL, dv_parent_id=NULL, dv_querytext_filterc=NULL, stylesheet=NULL, widgetcontrols='{"setMultiline":false}'::json, widgetfunction=NULL, linkedobject=NULL, hidden=false, web_layoutorder=NULL WHERE formname='v_edit_link' AND formtype='form_feature' AND columnname='custom_length' AND tabname='tab_none';
+
+-- 07/04/2025
+UPDATE config_form_fields SET layoutname='lyt_general_5', layoutorder=2, "datatype"='text', widgettype='text', "label"='Parent id:', tooltip='Parent id', placeholder=NULL, ismandatory=false, isparent=false, iseditable=false, isautoupdate=false, isfilter=false, dv_querytext=NULL, dv_orderby_id=NULL, dv_isnullvalue=NULL, dv_parent_id=NULL, dv_querytext_filterc=NULL, stylesheet=NULL, widgetcontrols='{"setMultiline":false}'::json, widgetfunction=NULL, linkedobject=NULL, hidden=false, web_layoutorder=1 WHERE formname='generic' AND formtype='psector' AND columnname='parent_id' AND tabname='tab_general';
