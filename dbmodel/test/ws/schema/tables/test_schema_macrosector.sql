@@ -19,7 +19,7 @@ SELECT has_table('macrosector'::name, 'Table macrosector should exist');
 SELECT columns_are(
     'macrosector',
     ARRAY[
-        'macrosector_id', 'name', 'descript', 'the_geom', 'active', 'lock_level'
+        'macrosector_id', 'name', 'descript', 'the_geom', 'active', 'lock_level', 'code'
     ],
     'Table macrosector should have the correct columns'
 );
