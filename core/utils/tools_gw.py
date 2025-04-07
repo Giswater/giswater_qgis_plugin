@@ -4872,6 +4872,12 @@ def set_widgets(dialog, complet_result, field, tablename, class_info):
      """
     widget = None
     label = None
+
+    # Skip widgets not supported
+    widgettypes_not_supported = ["tabwidget", "divider", "label"]
+    if 'widgettype' in field and field['widgettype'] in widgettypes_not_supported:
+        return label, widget
+
     if 'label' in field and field['label']:
         label = QLabel()
         label.setObjectName('lbl_' + field['widgetname'])
