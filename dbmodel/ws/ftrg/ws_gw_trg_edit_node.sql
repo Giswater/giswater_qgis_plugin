@@ -666,7 +666,7 @@ BEGIN
 				if NEW.closed_valve is null then NEW.closed_valve = false; end if;
 				if NEW.broken_valve is null then NEW.broken_valve = false; end if;
 
-				v_sql:= 'INSERT INTO man_valve (node_id, closed, broken) VALUES ('||quote_literal(NEW.node_id)||', '||(NEW.closed_valve)||', '||(NEW.broken_valve)||')';
+				v_sql:= 'INSERT INTO man_valve (node_id, closed, broken, connection_type) VALUES ('||quote_literal(NEW.node_id)||', '||(NEW.closed_valve)||', '||(NEW.broken_valve)||', 0)';
 
 			ELSE
 				v_sql:= 'INSERT INTO '||v_man_table||' (node_id) VALUES ('||(NEW.node_id)||')';
@@ -722,7 +722,7 @@ BEGIN
 			SELECT json_array_elements_text ((value::json->>'catfeatureId')::json) id , (value::json->>'vdefault') vdef FROM config_param_system WHERE parameter like 'epa_valve_vdefault_%'
 			)a WHERE id = v_customfeature;
 
-			INSERT INTO inp_valve (node_id, valv_type, coef_loss, pressure, minorloss)
+			INSERT INTO inp_valve (node_id, valv_type, custom_dint, setting, minorloss)
 			VALUES (NEW.node_id, v_epavdef ->>'valv_type', (v_epavdef ->>'coef_loss')::numeric, (v_epavdef ->>'pressure')::numeric,(v_epavdef ->>'minorloss')::numeric);
 
 		ELSIF (NEW.epa_type = 'SHORTPIPE') THEN
@@ -1043,8 +1043,8 @@ BEGIN
 			WHERE node_id=OLD.node_id;
 
 		ELSIF v_man_table ='man_wtp' THEN
-			UPDATE man_wtp SET name = NEW.name, maxflow = NEW.maxflow, opsflow = NEW.opsflow, screening = NEW.screening, desander = NEW.desander, chemcond = NEW.chemcond, 
-    		oxidation = NEW.oxidation, coagulation = NEW.coagulation, floculation = NEW.floculation, presendiment = NEW.presendiment, sediment = NEW.sediment, 
+			UPDATE man_wtp SET name = NEW.name, maxflow = NEW.maxflow, opsflow = NEW.opsflow, screening = NEW.screening, desander = NEW.desander, chemcond = NEW.chemcond,
+    		oxidation = NEW.oxidation, coagulation = NEW.coagulation, floculation = NEW.floculation, presendiment = NEW.presendiment, sediment = NEW.sediment,
     		filtration = NEW.filtration, disinfection = NEW.disinfection, chemtreatment = NEW.chemtreatment, storage = NEW.storage, sludgeman = NEW.sludgeman
 			WHERE node_id=OLD.node_id;
 
