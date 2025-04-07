@@ -982,7 +982,7 @@ class GwPsector:
                             elif widget_type is QDateEdit:
                                 date = self.dlg_plan_psector.findChild(QDateEdit, str(column_name))
                                 values += date.dateTime().toString('yyyy-MM-dd HH:mm:ss') + ", "
-                            elif isinstance(widget_type, QComboBox):
+                            elif isinstance(widget_type, QComboBox) or widget_type is tools_gw.CustomQComboBox:
                                 combo = tools_qt.get_widget(self.dlg_plan_psector, column_name)
                                 value = str(tools_qt.get_combo_value(self.dlg_plan_psector, combo))
                             else:
@@ -1004,8 +1004,8 @@ class GwPsector:
             sql += " RETURNING psector_id;"
             new_psector_id = tools_db.execute_returning(sql)
 
-            tools_qt.set_widget_text(self.dlg_plan_psector, "tab_general_psector_id", str(new_psector_id[0]))
             if new_psector_id:
+                tools_qt.set_widget_text(self.dlg_plan_psector, "tab_general_psector_id", str(new_psector_id[0]))
                 row = tools_gw.get_config_value('plan_psector_current')
                 if row:
                     sql = (f"UPDATE config_param_user "
@@ -1015,9 +1015,9 @@ class GwPsector:
                 else:
                     sql = (f"INSERT INTO config_param_user (parameter, value, cur_user) "
                            f" VALUES ('plan_psector_current', '{new_psector_id[0]}', current_user);")
-            tools_db.execute_sql(sql)
-            self.update = True
-        self.dlg_plan_psector.tabwidget.setTabEnabled(1, True)
+                tools_db.execute_sql(sql)
+                self.update = True
+                self.dlg_plan_psector.tabwidget.setTabEnabled(1, True)
 
         # Refresh selectors UI if it is open and and the form will close
         if close_dlg:
