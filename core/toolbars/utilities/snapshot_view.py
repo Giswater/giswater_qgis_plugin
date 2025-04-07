@@ -67,7 +67,7 @@ class GwSnapshotViewButton(GwAction):
             self.dlg_snapshot_view.findChild(QLabel, "lbl_tab_none_chk_gully").hide()
 
         # quiero cambiar el width del txt_coordinates
-        self.dlg_snapshot_view.findChild(QLineEdit, "txt_coordinates").setMinimumWidth(170)
+        self.dlg_snapshot_view.findChild(QLineEdit, "txt_coordinates").setMinimumWidth(190)
 
         # Open form
         tools_gw.open_dialog(self.dlg_snapshot_view, 'snapshot_view')
@@ -274,53 +274,47 @@ def apply_layer_style(layer, layer_group, layer_origin):
     # Get reference symbol style from layer_group
     layer_node = QgsProject.instance().mapLayersByName(layer_group)[0]
     renderer = layer_node.renderer()
-    root_rule = renderer.rootRule()
-
     reference_symbol = QgsSymbol.defaultSymbol(layer.geometryType())
-    for rule in root_rule.children():
-        if rule.label() == layer_origin:
-            reference_symbol = rule.symbol().clone()
-            break
+    if isinstance(renderer, QgsRuleBasedRenderer):
+        root_rule_group = renderer.rootRule()
+        for rule in root_rule_group.children():
+            if rule.label() == layer_origin:
+                reference_symbol = rule.symbol().clone()
+                break
 
-
-    # Flags to check for the presence of features with specific colors
-    has_red_features = False
-    has_yellow_features = False
-
-    # Iterate through features to check for red or yellow features
+    # Check which colors are present in the layer features
+    has_colors = {'red': False, 'yellow': False}
     for feature in layer.getFeatures():
-        if feature['color'] == 'red':
-            has_red_features = True
-        if feature['color'] == 'yellow':
-            has_yellow_features = True
+        color = feature['color']
+        if color in has_colors:
+            has_colors[color] = True
 
-    # Create rule-based renderer
-    root_rule = QgsRuleBasedRenderer.Rule(None)  # Root rule without filter
+    def create_colored_rule(color_name, label):
+        """Helper to create a rule with the correct color and style."""
+        rule = QgsRuleBasedRenderer.Rule(symbol=reference_symbol.clone())
+        rule.setLabel(label)
+        rule.setFilterExpression(f"\"color\" = '{color_name}'")
+        rule.symbol().setOpacity(0.5)
+        color = QColor(color_name)
+        if layer.geometryType() == 1:
+            rule.symbol().symbolLayer(0).setColor(color)
+        else:
+            rule.symbol().symbolLayer(0).setFillColor(color)
+        return rule
 
-    # If there are red features, create the "Red Features" subgroup
-    if has_red_features:
-        red_rule = QgsRuleBasedRenderer.Rule(symbol=reference_symbol.clone())
-        red_rule.setLabel("Deleted")
-        red_rule.setFilterExpression("\"color\" = 'red'")
-        red_rule.symbol().symbolLayer(0).setFillColor(QColor("red"))
-        root_rule.appendChild(red_rule)
+    # Create root rule
+    root_rule = QgsRuleBasedRenderer.Rule(None)
 
-    # If there are yellow features, create the "Yellow Features" subgroup
-    if has_yellow_features:
-        yellow_rule = QgsRuleBasedRenderer.Rule(symbol=reference_symbol.clone())
-        yellow_rule.setLabel("Updated")
-        yellow_rule.setFilterExpression("\"color\" = 'yellow'")
-        yellow_rule.symbol().symbolLayer(0).setFillColor(QColor("yellow"))
-        root_rule.appendChild(yellow_rule)
+    # Add rules based on available feature colors
+    if has_colors['red']:
+        root_rule.appendChild(create_colored_rule('red', 'Deleted'))
+    if has_colors['yellow']:
+        root_rule.appendChild(create_colored_rule('yellow', 'Updated'))
 
-    # Always create the rule for "Blue Features"
-    blue_rule = QgsRuleBasedRenderer.Rule(symbol=reference_symbol.clone())
-    blue_rule.setLabel("Existent")
-    blue_rule.setFilterExpression("\"color\" = 'blue'")
-    blue_rule.symbol().symbolLayer(0).setFillColor(QColor("blue"))
-    root_rule.appendChild(blue_rule)
+    # Blue features always present
+    root_rule.appendChild(create_colored_rule('blue', 'Existent'))
 
-    # Apply the rule-based renderer to the layer
+    # Apply the rule-based renderer
     renderer = QgsRuleBasedRenderer(root_rule)
     layer.setRenderer(renderer)
     layer.triggerRepaint()
