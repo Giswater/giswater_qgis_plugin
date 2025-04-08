@@ -4509,10 +4509,12 @@ AS SELECT row_number() OVER () AS rid,
     node.state_type AS original_state_type,
     plan_psector_x_node.state AS plan_state,
     plan_psector_x_node.doable,
+    plan_psector.priority AS psector_priority,
     node.the_geom
    FROM selector_psector,
     node
      JOIN plan_psector_x_node USING (node_id)
+     JOIN plan_psector USING (psector_id)
      JOIN cat_node ON cat_node.id::text = node.nodecat_id::text
      JOIN cat_feature ON cat_feature.id::text = cat_node.node_type::text
   WHERE plan_psector_x_node.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text;
@@ -4529,10 +4531,12 @@ AS SELECT row_number() OVER () AS rid,
     connec.state_type AS original_state_type,
     plan_psector_x_connec.state AS plan_state,
     plan_psector_x_connec.doable,
+    plan_psector.priority AS psector_priority,
     connec.the_geom
    FROM selector_psector,
     connec
      JOIN plan_psector_x_connec USING (connec_id)
+     JOIN plan_psector USING (psector_id)
      JOIN cat_connec ON cat_connec.id::text = connec.conneccat_id::text
      JOIN cat_feature ON cat_feature.id::text = cat_connec.connec_type::text
   WHERE plan_psector_x_connec.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text;
@@ -4550,10 +4554,12 @@ AS SELECT row_number() OVER () AS rid,
     plan_psector_x_arc.state AS plan_state,
     plan_psector_x_arc.doable,
     plan_psector_x_arc.addparam::text AS addparam,
+    plan_psector.priority AS psector_priority,
     arc.the_geom
    FROM selector_psector,
     arc
      JOIN plan_psector_x_arc USING (arc_id)
+     JOIN plan_psector USING (psector_id)
      JOIN cat_arc ON cat_arc.id::text = arc.arccat_id::text
      JOIN cat_feature ON cat_feature.id::text = cat_arc.arc_type::text
   WHERE plan_psector_x_arc.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text;
@@ -7084,10 +7090,12 @@ AS SELECT row_number() OVER () AS rid,
     connec.state_type AS original_state_type,
     plan_psector_x_connec.state AS plan_state,
     plan_psector_x_connec.doable,
+    plan_psector.priority AS psector_priority,
     link.the_geom
    FROM selector_psector,
     connec
      JOIN plan_psector_x_connec USING (connec_id)
+     JOIN plan_psector USING (psector_id)
      JOIN link ON link.feature_id::text = connec.connec_id::text
   WHERE plan_psector_x_connec.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text;
 

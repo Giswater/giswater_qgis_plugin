@@ -4971,10 +4971,12 @@ AS SELECT row_number() OVER () AS rid,
     node.state_type AS original_state_type,
     plan_psector_x_node.state AS plan_state,
     plan_psector_x_node.doable,
+    plan_psector.priority AS psector_priority,
     node.the_geom
    FROM selector_psector,
     node
      JOIN plan_psector_x_node USING (node_id)
+     JOIN plan_psector USING (psector_id)
      JOIN cat_node ON cat_node.id::text = node.nodecat_id::text
      JOIN cat_feature ON cat_feature.id::text = node.node_type::text
   WHERE plan_psector_x_node.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text;
@@ -4991,10 +4993,12 @@ AS SELECT row_number() OVER () AS rid,
     connec.state_type AS original_state_type,
     plan_psector_x_connec.state AS plan_state,
     plan_psector_x_connec.doable,
+    plan_psector.priority AS psector_priority,
     connec.the_geom
    FROM selector_psector,
     connec
      JOIN plan_psector_x_connec USING (connec_id)
+     JOIN plan_psector USING (psector_id)
      JOIN cat_connec ON cat_connec.id::text = connec.conneccat_id::text
      JOIN cat_feature ON cat_feature.id::text = connec.connec_type::text
   WHERE plan_psector_x_connec.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text;
@@ -5013,10 +5017,12 @@ AS SELECT row_number() OVER () AS rid,
     plan_psector_x_arc.state AS plan_state,
     plan_psector_x_arc.doable,
     plan_psector_x_arc.addparam::text AS addparam,
+    plan_psector.priority AS psector_priority,
     arc.the_geom
    FROM selector_psector,
     arc
      JOIN plan_psector_x_arc USING (arc_id)
+     JOIN plan_psector USING (psector_id)
      JOIN cat_arc ON cat_arc.id::text = arc.arccat_id::text
      JOIN cat_feature ON cat_feature.id::text = arc.arc_type::text
   WHERE plan_psector_x_arc.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text;
@@ -5616,9 +5622,11 @@ gully.state AS original_state,
 gully.state_type AS original_state_type,
 plan_psector_x_gully.state AS plan_state,
 plan_psector_x_gully.doable,
+plan_psector.priority AS psector_priority,
 gully.the_geom
 FROM selector_psector, gully
 JOIN plan_psector_x_gully USING (gully_id)
+JOIN plan_psector USING (psector_id)
 JOIN cat_gully ON cat_gully.id=gully.gullycat_id
 JOIN cat_feature ON cat_feature.id=gully.gully_type
 WHERE plan_psector_x_gully.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text;
@@ -7639,42 +7647,51 @@ CREATE OR REPLACE VIEW v_expl_connec AS
  FROM selector_expl, connec
  WHERE selector_expl.cur_user = "current_user"()::text AND (connec.expl_id = selector_expl.expl_id);
 
-DROP VIEW IF EXISTS v_plan_psector_link;
-CREATE OR REPLACE VIEW v_plan_psector_link AS
-SELECT row_number() OVER () AS rid,
-a.link_id,
-a.psector_id,
-a.feature_id,
-a.original_state,
-a.original_state_type,
-a.plan_state,
-a.doable,
-a.the_geom FROM
-(SELECT link.link_id,
-plan_psector_x_connec.psector_id,
-connec.connec_id AS feature_id,
-connec.state AS original_state,
-connec.state_type AS original_state_type,
-plan_psector_x_connec.state AS plan_state,
-plan_psector_x_connec.doable,
-link.the_geom
-FROM selector_psector,connec
-JOIN plan_psector_x_connec USING (connec_id)
-JOIN link ON link.feature_id=connec.connec_id
-WHERE plan_psector_x_connec.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text
-UNION
-SELECT link.link_id,
-plan_psector_x_gully.psector_id,
-gully.gully_id AS feature_id,
-gully.state AS original_state,
-gully.state_type AS original_state_type,
-plan_psector_x_gully.state AS plan_state,
-plan_psector_x_gully.doable,
-link.the_geom
-FROM selector_psector,gully
-JOIN plan_psector_x_gully USING (gully_id)
-JOIN link ON link.feature_id=gully.gully_id
-WHERE plan_psector_x_gully.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text)a;
+CREATE OR REPLACE VIEW v_plan_psector_link
+AS SELECT row_number() OVER () AS rid,
+    a.link_id,
+    a.psector_id,
+    a.feature_id,
+    a.original_state,
+    a.original_state_type,
+    a.plan_state,
+    a.doable,
+    a.plan_psector_priority,
+    a.the_geom
+    FROM
+    (
+        SELECT
+            link.link_id,
+            plan_psector_x_connec.psector_id,
+            connec.connec_id AS feature_id,
+            connec.state AS original_state,
+            connec.state_type AS original_state_type,
+            plan_psector_x_connec.state AS plan_state,
+            plan_psector_x_connec.doable,
+            plan_psector.priority AS psector_priority,
+            link.the_geom
+        FROM selector_psector,connec
+        JOIN plan_psector_x_connec USING (connec_id)
+        JOIN plan_psector USING (psector_id)
+        JOIN link ON link.feature_id=connec.connec_id
+        WHERE plan_psector_x_connec.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text
+        UNION
+        SELECT
+            link.link_id,
+            plan_psector_x_gully.psector_id,
+            gully.gully_id AS feature_id,
+            gully.state AS original_state,
+            gully.state_type AS original_state_type,
+            plan_psector_x_gully.state AS plan_state,
+            plan_psector_x_gully.doable,
+            plan_psector.priority AS psector_priority,
+            link.the_geom
+        FROM selector_psector,gully
+        JOIN plan_psector_x_gully USING (gully_id)
+        JOIN plan_psector USING (psector_id)
+        JOIN link ON link.feature_id=gully.gully_id
+        WHERE plan_psector_x_gully.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text
+    ) a;
 
 
 DROP VIEW IF EXISTS v_rtc_hydrometer;

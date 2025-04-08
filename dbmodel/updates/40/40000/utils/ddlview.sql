@@ -16,6 +16,7 @@ DROP VIEW IF EXISTS v_plan_current_psector;
 DROP VIEW IF EXISTS v_plan_psector_arc;
 DROP VIEW IF EXISTS v_plan_psector_connec;
 DROP VIEW IF EXISTS v_plan_psector_node;
+DROP VIEW IF EXISTS v_plan_psector_link;
 DROP VIEW IF EXISTS v_plan_psector;
 DROP VIEW IF EXISTS v_plan_result_arc;
 DROP VIEW IF EXISTS v_plan_netscenario_arc;
