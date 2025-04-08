@@ -24,7 +24,6 @@ ALTER TABLE link alter column muni_id set default 0;
 DROP RULE IF EXISTS dma_undefined ON dma;
 DROP RULE IF EXISTS dma_conflict ON dma;
 update dma set macrodma_id = 0 where macrodma_id is null;
-ALTER TABLE dma alter column macrodma_id set NOT NULL;
 ALTER TABLE dma alter column macrodma_id set default 0;
 CREATE RULE dma_conflict AS ON UPDATE TO dma WHERE ((new.dma_id = -1) OR (old.dma_id = -1)) DO INSTEAD NOTHING;
 CREATE RULE dma_undefined AS ON UPDATE TO dma WHERE ((new.dma_id = 0) OR (old.dma_id = 0)) DO INSTEAD NOTHING;;
