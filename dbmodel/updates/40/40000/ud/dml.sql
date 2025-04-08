@@ -2413,22 +2413,6 @@ where formname in ('v_edit_inp_flwreg_pump','v_edit_inp_flwreg_orifice','v_edit_
 --10/01/2025
 --edited 28/01/2025
 
--- Insert into sys_feature_epa_type
-INSERT INTO sys_feature_epa_type (id, feature_type, epa_table, descript, active) VALUES('PUMP', 'FLWREG', 'inp_flwreg_pump', NULL, true);
-INSERT INTO sys_feature_epa_type (id, feature_type, epa_table, descript, active) VALUES('WEIR', 'FLWREG', 'inp_flwreg_weir', NULL, true);
-INSERT INTO sys_feature_epa_type (id, feature_type, epa_table, descript, active) VALUES('ORIFICE', 'FLWREG', 'inp_flwreg_orifice', NULL, true);
-INSERT INTO sys_feature_epa_type (id, feature_type, epa_table, descript, active) VALUES('OUTLET', 'FLWREG', 'inp_flwreg_outlet', NULL, true);
-
--- Adding flowregulator objects on cat_feature [Modified from first version]
-
-INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, active) VALUES ('FRORIFICE', 'ORIFICE', 'FLWREG', 'v_edit_flwreg', true) ON CONFLICT (id) DO NOTHING;
-INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, active) VALUES ('FROUTLET', 'VFLWREG', 'FLWREG', 'v_edit_flwreg', true) ON CONFLICT (id) DO NOTHING;
-INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, active) VALUES ('FRWEIR', 'WEIR', 'FLWREG', 'v_edit_flwreg', true) ON CONFLICT (id) DO NOTHING;
-INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, active) VALUES ('FRPUMP', 'PUMP', 'FLWREG', 'v_edit_flwreg', true) ON CONFLICT (id) DO NOTHING;
-
--- Adding objects on config_info_layer and config_info_layer_x_type (this both tables controls the button info)
-INSERT INTO config_info_layer VALUES ('v_edit_flwreg', TRUE, 'flwreg', TRUE, 'info_generic', 'Flow regulator', 4);
-
 -- Insert on config_form_fields for parent view
 -- copying columns from some random child (all childs has same columns that parent)
 INSERT INTO config_form_fields
