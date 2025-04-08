@@ -7656,7 +7656,7 @@ AS SELECT row_number() OVER () AS rid,
     a.original_state_type,
     a.plan_state,
     a.doable,
-    a.plan_psector_priority,
+    a.psector_priority,
     a.the_geom
     FROM
     (
