@@ -134,7 +134,7 @@ class GwCreateSchemaTask(GwTask):
                 or self.isCanceled():
             return False
 
-        status = self.admin.update_dict_folders(True, project_type, dict_update_folders=self.dict_folders_process['update_35to39'])
+        status = self.admin.update_dict_folders(True, project_type, dict_update_folders=self.dict_folders_process['update_35to40'])
         if (not tools_os.set_boolean(status, False) and tools_os.set_boolean(self.admin.dev_commit, False) is False) \
                 or self.isCanceled():
             return False
@@ -183,7 +183,7 @@ class GwCreateSchemaTask(GwTask):
 
         total_sql_files = 0
         dict_process = {}
-        list_process = ['load_base', 'load_locale', 'update_35to39']
+        list_process = ['load_base', 'load_locale', 'update_35to40']
 
         for process_name in list_process:
             #tools_log.log_info(f"Task 'Create schema' execute function 'def get_number_of_files_process' with parameters: '{process_name}'")
@@ -239,7 +239,7 @@ class GwCreateSchemaTask(GwTask):
         elif process_name == 'load_locale':
             dict_folders[self.admin.folder_locale] = 0
 
-        elif process_name == 'update_35to39':
+        elif process_name == 'update_35to40':
             dict_folders[os.path.join(self.admin.folder_updates, '36')] = 0
             dict_folders[os.path.join(self.admin.folder_updates, '40')] = 0
 
