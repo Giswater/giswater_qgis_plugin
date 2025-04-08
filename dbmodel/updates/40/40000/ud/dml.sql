@@ -6,6 +6,8 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
+ALTER TABLE config_form_fields DISABLE TRIGGER gw_trg_config_control;
+
 -- 15/10/2024
 INSERT INTO cat_arc (id, arc_type, matcat_id, shape, geom1, geom2, geom3, geom4, geom5, geom6, geom7, geom8, geom_r, descript, link, brand_id, model_id, svg, z1, z2, width, area, estimated_depth, thickness, cost_unit, "cost", m2bottom_cost, m3protec_cost, active, "label", tsect_id, curve_id, acoeff, connect_cost, visitability_vdef)
 SELECT id, arc_type, matcat_id, shape, geom1, geom2, geom3, geom4, geom5, geom6, geom7, geom8, geom_r, descript, link, brand_id, model_id, svg, z1, z2, width, area, estimated_depth, bulk, cost_unit, "cost", m2bottom_cost, m3protec_cost, active, "label", tsect_id, curve_id, acoeff, connect_cost, visitability_vdef
@@ -44,10 +46,8 @@ DELETE FROM config_form_fields
 	WHERE formname='upsert_catalog_gully' AND formtype='form_catalog' AND columnname='shape' AND tabname='tab_none';
 
 
-ALTER TABLE config_form_fields DISABLE TRIGGER gw_trg_config_control;
 UPDATE config_form_fields set dv_querytext = replace(dv_querytext, 'cat_grate', 'cat_gully');
 UPDATE config_form_fields set dv_querytext_filterc = replace(dv_querytext_filterc, 'cat_grate', 'cat_gully');
-ALTER TABLE config_form_fields ENABLE TRIGGER gw_trg_config_control;
 
 -- 05/11/2024
 
@@ -2904,3 +2904,5 @@ BEGIN
     END IF;
   END LOOP;
 END $func$;
+
+ALTER TABLE config_form_fields ENABLE TRIGGER gw_trg_config_control;

@@ -6,6 +6,8 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
+ALTER TABLE config_form_fields DISABLE TRIGGER gw_trg_config_control;
+
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source")
 VALUES (3326, 'gw_fct_graphanalytics_arrangenetwork', 'utils', 'function', NULL, 'json', 'Function to arrenge the network in graphanalytics', 'role_basic', NULL, 'core')
 ON CONFLICT (id) DO NOTHING;
@@ -777,7 +779,6 @@ VALUES('cat_material', 'Catalog of materials.', 'role_edit', 2, '{"level_1":"INV
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, "source")
 VALUES (3358, 'gw_fct_admin_transfer_cat_material', 'utils', 'function', NULL, NULL, 'Function to transfer all values from old cat_mat_* tables to new one: cat_material', 'role_edit', 'core');
 
-ALTER TABLE config_form_fields DISABLE TRIGGER gw_trg_config_control;
 
 UPDATE config_form_fields SET dv_querytext='SELECT id, id AS idval FROM cat_material WHERE ''ARC'' = ANY(feature_type) AND id IS NOT NULL' WHERE formname='inp_cat_mat_roughness' AND formtype='form_feature' AND columnname='matcat_id' AND tabname='tab_none';
 UPDATE config_form_fields SET dv_querytext='SELECT id, id AS idval FROM cat_material WHERE ''ARC'' = ANY(feature_type) AND id IS NOT NULL' WHERE formname='cat_mat_roughness' AND formtype='form_feature' AND columnname='matcat_id' AND tabname='tab_none';
@@ -816,7 +817,6 @@ UPDATE config_form_fields SET widgetcontrols = replace(widgetcontrols::TEXT, 'ca
 UPDATE config_form_fields SET widgetcontrols = replace(widgetcontrols::TEXT, 'cat_mat_connec', 'cat_material')::json WHERE widgetcontrols::TEXT ILIKE '%cat_mat_connec%';
 UPDATE config_form_fields SET widgetcontrols = replace(widgetcontrols::TEXT, 'cat_mat_element', 'cat_material')::json WHERE widgetcontrols::TEXT ILIKE '%cat_mat_element%';
 
-ALTER TABLE config_form_fields ENABLE TRIGGER gw_trg_config_control;
 
 INSERT INTO sys_function (id, function_name, project_type, function_type, input_params, return_type, descript, sys_role, sample_query, "source")
 VALUES(3360, 'gw_fct_create_thyssen_subcatchments', 'ud', 'function', 'json', 'json', 'Calculate subcatchment parameters.', 'role_epa', NULL, 'core');
@@ -2216,7 +2216,6 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 
 -- 19/03/2025
 
-ALTER TABLE config_form_fields DISABLE TRIGGER gw_trg_config_control;
 
 INSERT INTO config_typevalue(typevalue, id, idval, camelstyle, addparam) VALUES ('layout_name_typevalue', 'lyt_element_mng_1', 'lyt_element_mng_1', 'layoutElementManager1', '{"lytOrientation":"horizontal"}'::json);
 INSERT INTO config_typevalue(typevalue, id, idval, camelstyle, addparam) VALUES ('layout_name_typevalue', 'lyt_element_mng_2', 'lyt_element_mng_2', 'layoutElementManager2', '{"lytOrientation":"horizontal"}'::json);
@@ -2254,7 +2253,6 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('campaign_review', 'form_feature', 'tab_data', 'serie', 'lyt_data_1', 13, 'string', 'text', 'Serie:', 'Serie', NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('campaign_review', 'form_feature', 'tab_data', 'address', 'lyt_data_1', 14, 'string', 'text', 'Address:', 'Address', NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('campaign_review', 'form_feature', 'tab_data', 'description', 'lyt_data_1', 15, 'string', 'textarea', 'Description:', 'Description', NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL);
-ALTER TABLE config_form_fields ENABLE TRIGGER gw_trg_config_control;
 
 
 -- link related
@@ -2333,7 +2331,6 @@ INSERT INTO config_form_tableview (location_type, project_type, objectname, colu
 INSERT INTO config_form_tableview (location_type, project_type, objectname, columnname, columnindex, visible, width, alias, "style", addparam) VALUES('link form', 'utils', 'tbl_doc_x_link', 'user_name', 8, true, NULL, NULL, NULL, NULL);
 
 --26/03/2025
-ALTER TABLE config_form_fields DISABLE TRIGGER gw_trg_config_control;
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('campaign_visit', 'form_feature', 'tab_data', 'id', 'lyt_data_1', 1, 'integer', 'text', 'Id:', 'Id', NULL, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('campaign_visit', 'form_feature', 'tab_data', 'startdate', 'lyt_data_1', 2, 'date', 'datetime', 'Planified start:', 'Planified start', NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('campaign_visit', 'form_feature', 'tab_data', 'enddate', 'lyt_data_1', 3, 'date', 'datetime', 'Planified end:', 'Planified end', NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL);
@@ -2349,7 +2346,6 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('campaign_visit', 'form_feature', 'tab_data', 'serie', 'lyt_data_1', 13, 'string', 'text', 'Serie:', 'Serie', NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('campaign_visit', 'form_feature', 'tab_data', 'address', 'lyt_data_1', 14, 'string', 'text', 'Address:', 'Address', NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('campaign_visit', 'form_feature', 'tab_data', 'description', 'lyt_data_1', 15, 'string', 'textarea', 'Description:', 'Description', NULL, false, false, true, false, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL);
-ALTER TABLE config_form_fields ENABLE TRIGGER gw_trg_config_control;
 
 -- 02/04/2025
 UPDATE config_form_fields SET dv_querytext = REPLACE(dv_querytext, 'sys_feature_cat', ' sys_feature_class') WHERE dv_querytext ILIKE '%sys_feature_cat%';
@@ -2455,3 +2451,5 @@ INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutn
   }
 }'::json, 'v_edit_link', false, NULL);
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('v_edit_link', 'form_feature', 'tab_elements', 'tbl_elements', 'lyt_element_3', 1, NULL, 'tableview', NULL, NULL, NULL, false, false, false, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{"saveValue": false}'::json, '{"functionName": "open_selected_element", "module": "info", "parameters":{"columnfind":"element_id"}}'::json, 'tbl_element_x_link', false, 1);
+
+ALTER TABLE config_form_fields ENABLE TRIGGER gw_trg_config_control;

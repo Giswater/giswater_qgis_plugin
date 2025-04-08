@@ -6,6 +6,8 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
+ALTER TABLE config_form_fields DISABLE TRIGGER gw_trg_config_control;
+
 -- drop gw_trg_presszone_check_datatype
 DELETE FROM sys_function WHERE id=3306;
 
@@ -3461,3 +3463,6 @@ UPDATE config_form_fields
 UPDATE config_form_fields
 	SET tooltip='storage',widgettype='combo',dv_isnullvalue=false,dv_querytext='SELECT id, idval FROM edit_typevalue WHERE typevalue = ''value_boolean''',widgetcontrols='{"setMultiline":false}'::json
 	WHERE formname='ve_node_wtp' AND formtype='form_feature' AND columnname='storage' AND tabname='tab_data';
+
+
+ALTER TABLE config_form_fields ENABLE TRIGGER gw_trg_config_control;
