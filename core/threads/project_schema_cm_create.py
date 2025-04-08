@@ -41,7 +41,6 @@ class GwCreateSchemaCmTask(GwTask):
         # Disable dlg_readsql buttons
         self.admin.dlg_readsql.btn_close.setEnabled(False)
 
-
     def run(self):
 
         super().run()
@@ -54,7 +53,6 @@ class GwCreateSchemaCmTask(GwTask):
         if not tools_os.set_boolean(status, False):
             return False
         return True
-
 
     def finished(self, result):
 
@@ -94,11 +92,9 @@ class GwCreateSchemaCmTask(GwTask):
         self.admin.manage_cm_process_result()
         self.setProgress(100)
 
-
     def set_progress(self, value):
 
         self.setProgress(value)
-
 
     def main_execution(self):
         """ Main common execution """
@@ -111,7 +107,6 @@ class GwCreateSchemaCmTask(GwTask):
                     or self.isCanceled():
                 return False
         return True
-
 
     def calculate_number_of_files(self):
         """ Calculate total number of SQL to execute """
@@ -128,7 +123,6 @@ class GwCreateSchemaCmTask(GwTask):
 
         return total_sql_files
 
-
     def get_number_of_files_process(self, process_name: str):
         """ Calculate number of files of all folders of selected @process_name """
 
@@ -143,7 +137,6 @@ class GwCreateSchemaCmTask(GwTask):
             dict_folders[folder] = file_count
 
         return dict_folders, number_of_files
-
 
     def get_folders_process(self, process_name):
         """ Get list of folders related with this @process_name """

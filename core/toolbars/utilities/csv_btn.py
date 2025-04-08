@@ -26,11 +26,9 @@ class GwCSVButton(GwAction):
 
         super().__init__(icon_path, action_name, text, toolbar, action_group)
 
-
     def clicked_event(self):
 
         self._open_csv()
-
 
     def save_settings_values(self):
         """ Save QGIS settings related with csv options """
@@ -45,8 +43,6 @@ class GwCSVButton(GwAction):
         tools_gw.set_config_parser('btn_csv2pg', 'rb_space', f"{self.dlg_csv.rb_space.isChecked()}")
         tools_gw.set_config_parser('btn_csv2pg', 'rb_dec_comma', f"{self.dlg_csv.rb_dec_comma.isChecked()}")
         tools_gw.set_config_parser('btn_csv2pg', 'rb_dec_period', f"{self.dlg_csv.rb_dec_period.isChecked()}")
-
-
 
     # region private functions
 
@@ -96,7 +92,6 @@ class GwCSVButton(GwAction):
         # Finally set label info
         self._update_info(self.dlg_csv)
 
-
     def _populate_combos(self, combo, field_id, fields, table_name):
 
         # Get role
@@ -132,7 +127,6 @@ class GwCSVButton(GwAction):
         else:
             tools_qt.fill_combo_values(combo, rows, True, True, 1)
             self._update_info(self.dlg_csv)
-
 
     def _write_csv(self, dialog, temp_tablename):
         """ Write csv in postgres and call gw_fct_utils_csv2pg function """
@@ -176,14 +170,12 @@ class GwCSVButton(GwAction):
                 msg = message.get('text')
                 tools_qt.show_info_box(msg)
 
-
     def _update_info(self, dialog):
         """ Update the tag according to item selected from cmb_import_type """
         try:
             dialog.lbl_info.setText(tools_qt.get_combo_value(self.dlg_csv, self.dlg_csv.cmb_import_type, 2))
         except Exception as e:
             tools_log.log_warning(str(e))
-
 
     def _get_function_name(self):
 
@@ -192,7 +184,6 @@ class GwCSVButton(GwAction):
             tools_log.log_info(str(self.func_name))
         except Exception as e:
             tools_log.log_warning(str(e))
-
 
     def _select_file_csv(self):
         """ Select CSV file """
@@ -213,7 +204,6 @@ class GwCSVButton(GwAction):
         self.save_settings_values()
         self._preview_csv(self.dlg_csv)
 
-
     def _preview_csv(self, dialog):
         """ Show current file in QTableView acorrding to selected delimiter and unicode """
 
@@ -233,7 +223,6 @@ class GwCSVButton(GwAction):
                 self._read_csv_file(model, file_input, delimiter, _unicode, _ignoreheader)
         except Exception as e:
             tools_qgis.show_warning(str(e), dialog=dialog)
-
 
     def _load_settings_values(self):
         """ Load QGIS settings related with csv options """
@@ -267,7 +256,6 @@ class GwCSVButton(GwAction):
         elif tools_gw.get_config_parser('btn_csv2pg', 'rb_dec_period', "user", "session") == 'True':
             self.dlg_csv.rb_dec_period.setChecked(True)
 
-
     def _validate_params(self, dialog):
         """ Validate if params are valids """
 
@@ -277,14 +265,12 @@ class GwCSVButton(GwAction):
             return False
         return True
 
-
     def _delete_table_csv(self, temp_tablename, fid_aux):
         """ Delete records from temp_csv for current user and selected cat """
 
         sql = (f"DELETE FROM {temp_tablename} "
                f"WHERE fid = '{fid_aux}' AND cur_user = current_user")
         tools_db.execute_sql(sql)
-
 
     def _get_delimiter(self, dialog):
 
@@ -296,7 +282,6 @@ class GwCSVButton(GwAction):
         elif dialog.rb_space.isChecked():
             delimiter = ' '
         return delimiter
-
 
     def _insert_into_db(self, dialog, csvfile, delimiter, _unicode):
 
@@ -348,7 +333,6 @@ class GwCSVButton(GwAction):
 
         return False
 
-
     def _get_path(self, dialog):
         """ Take the file path if exist. AND if not exit ask it """
 
@@ -364,7 +348,6 @@ class GwCSVButton(GwAction):
 
         return path
 
-
     def _read_csv_file(self, model, file_input, delimiter, _unicode, _ignoreheader):
 
         rows = csv.reader(file_input, delimiter=delimiter)
@@ -375,7 +358,6 @@ class GwCSVButton(GwAction):
             unicode_row = [x for x in row]
             items = [QStandardItem(field) for field in unicode_row]
             model.appendRow(items)
-
 
     def _get_rolenames(self):
         """ Get list of rolenames of current user """

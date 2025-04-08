@@ -18,13 +18,13 @@ from ...libs import lib_vars, tools_qt, tools_qgis, tools_db,tools_log, tools_os
 from qgis.PyQt.QtWidgets import QLabel
 from PyQt5.QtWidgets import QApplication
 
+
 class GwSchemaI18NManager:
 
     def __init__(self):
         self.plugin_dir = lib_vars.plugin_dir
         self.schema_name = lib_vars.schema_name
         self.project_type_selected = None
-
 
     def init_dialog(self):
         """ Constructor """
@@ -36,8 +36,6 @@ class GwSchemaI18NManager:
         self.dlg_qm.btn_update.setEnabled(False)
         self._set_signals() #Set all the signals to wait for response
 
-        
-    
         #Get the project_types (ws, ud)
         self.project_types = tools_gw.get_config_parser('system', 'project_types', "project", "giswater", False,
                                                         force_reload=True)
@@ -279,7 +277,6 @@ class GwSchemaI18NManager:
                 text_error += self._update_project_type(table)
             self._vacuum_commit(table, self.conn_i18n, self.cursor_i18n)
             
-
         self.dlg_qm.lbl_info.clear()
         tools_qt.show_info_box(text_error)
 
@@ -311,7 +308,6 @@ class GwSchemaI18NManager:
                 self.conn_i18n.rollback()
                 return f"An error occured while translating {table_i18n}: {e}\n"
             
-
     def _update_dbmessage(self, table_i18n, table_org):
         columns_i18n = "project_type, CAST(source AS INTEGER), CAST(log_level AS INTEGER), ms_en_us, ht_en_us"
         columns_org = "project_type, id, log_level, error_message, hint_message"
@@ -434,7 +430,6 @@ class GwSchemaI18NManager:
 
         return query
 
-
     def _update_config_param_system(self, table_i18n, table_org):
         columns_i18n = "project_type, source, lb_en_us, tt_en_us"
         columns_org = "project_type, parameter, label, descript"
@@ -530,7 +525,6 @@ class GwSchemaI18NManager:
             elif row['project_type'] not in [None, 'None', '']:
                 final_rows_no_utils.append(row)
 
-
         # Step 4: Delete the initial rows that are duplicates (those that will be replaced by final_rows)
         delete_query = self._delete_duplicates_rows(table)
         try:
@@ -625,6 +619,7 @@ class GwSchemaI18NManager:
             insert_query += ", ".join(values)
             insert_query += ", 'utils');\n" if k < len(final_rows) else ");\n"
         return insert_query
+
     #endregion
     # region Global funcitons
     def detect_table_func(self, table):

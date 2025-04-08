@@ -80,7 +80,6 @@ class GwMainWindow(QMainWindow):
         # Enable event filter
         self.installEventFilter(self)
 
-
     def closeEvent(self, event):
 
         try:
@@ -90,7 +89,6 @@ class GwMainWindow(QMainWindow):
             # This exception jumps, for example, when closing the mincut dialog when it is in docker
             # RuntimeError: wrapped C/C++ object of type Mincut has been deleted
             pass
-
 
     def eventFilter(self, object, event):
 
@@ -105,7 +103,6 @@ class GwMainWindow(QMainWindow):
 
         return False
 
-
     def keyPressEvent(self, event):
 
         try:
@@ -118,7 +115,6 @@ class GwMainWindow(QMainWindow):
         except RuntimeError:
             # Multiples signals are emited when we use key_scape in order to close dialog
             pass
-
 
     def messageBar(self):
         return self._messageBar

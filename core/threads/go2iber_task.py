@@ -44,7 +44,6 @@ class GwGo2IberTask(GwTask):
         self.drain_execute_model = importlib.import_module('.execute_model', package=f'{self.drain_folder}.core.threads')
         print("go2iber init 40")
 
-
     def initialize_variables(self):
 
         self.exception = None
@@ -55,7 +54,6 @@ class GwGo2IberTask(GwTask):
         self.complet_result = None
         self.replaced_velocities = False
 
-
     def set_variables_from_go2iber(self):
         """ Set variables from object Go2Iber """
 
@@ -63,7 +61,6 @@ class GwGo2IberTask(GwTask):
         self.result_name = self.go2iber.result_name
         self.folder_path = self.go2iber.folder_path
         self.drain_folder = self.go2iber.drain_folder
-
 
     def run(self):
 
@@ -106,7 +103,6 @@ class GwGo2IberTask(GwTask):
 
         return status
 
-
     def finished(self, result):
 
         super().finished(result)
@@ -142,7 +138,6 @@ class GwGo2IberTask(GwTask):
         # If Database exception, show dialog after task has finished
         if lib_vars.session_vars['last_error']:
             tools_qt.show_exception_message(msg=lib_vars.session_vars['last_error_msg'])
-
 
     def cancel(self):
 

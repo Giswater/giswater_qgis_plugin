@@ -14,12 +14,12 @@ from ..ui.ui_manager import GwAuditManagerUi, GwAuditUi
 from ...libs import tools_qt, tools_db, tools_qgis
 from qgis.PyQt.QtWidgets import QTableView, QWidget, QAbstractItemView, QLabel, QLineEdit, QGridLayout, QScrollArea
 
+
 class GwAudit:
 
     def __init__(self):
         """ Class to control toolbar 'om_ws' """
         pass
-
 
     def open_audit_manager(self, feature_id, table_name):
         """ Open Audit Manager Dialog dynamic """
@@ -54,7 +54,6 @@ class GwAudit:
         self.date.setDateTime(QDateTime.currentDateTime())
         self.date.setMaximumDateTime(QDateTime.currentDateTime())
 
-
     def open_audit(self):
         """ Open selected audit """
 
@@ -69,7 +68,6 @@ class GwAudit:
         model = self.dlg_audit_manager.tbl_audit.model()
         audit_id = model.item(row, 0)
         self.fill_dialog({ "logId" : audit_id.text() })
-
 
     def fill_dialog(self, form):
         """ Create and open dialog """
@@ -139,7 +137,6 @@ class GwAudit:
 
         self.dlg_audit_manager.tbl_audit.setColumnHidden(0, True)
 
-
     def _get_list(self):
         """ Mount and execute the query for gw_fct_getlist """
 
@@ -159,6 +156,7 @@ class GwAudit:
         return json_result
 
     # end private region
+
 
 def close_dlg(**kwargs):
     """ Close dialog """

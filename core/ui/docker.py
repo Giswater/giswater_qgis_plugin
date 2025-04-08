@@ -15,7 +15,6 @@ from ...libs import lib_vars
 class GwDocker(QDockWidget):
     dlg_closed = QtCore.pyqtSignal()
 
-
     def __init__(self, class_obj=None, subtag=None):
 
         super().__init__()
@@ -39,12 +38,10 @@ class GwDocker(QDockWidget):
         except Exception:
             pass
 
-
     def closeEvent(self, event):
 
         self.dlg_closed.emit()
         return super().closeEvent(event)
-
 
     def event(self, event):
 

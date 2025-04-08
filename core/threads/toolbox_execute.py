@@ -33,7 +33,6 @@ class GwToolBoxTask(GwTask):
         self.timer = timer
         self.aux_params = aux_params
 
-
     def run(self):
 
         super().run()
@@ -154,7 +153,6 @@ class GwToolBoxTask(GwTask):
 
         return True
 
-
     def finished(self, result):
 
         super().finished(result)
@@ -192,7 +190,6 @@ class GwToolBoxTask(GwTask):
         elif result is False:
             msg = f"Database returned null. Check postgres function 'gw_fct_getinfofromid'"
             tools_log.log_warning(msg)
-
 
     def cancel(self):
 

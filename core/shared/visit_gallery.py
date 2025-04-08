@@ -25,13 +25,11 @@ class GwVisitGallery:
 
         pass
 
-
     def manage_gallery(self):
 
         # Create the dialog and signals
         self.dlg_gallery = GwGalleryUi(self)
         tools_gw.load_settings(self.dlg_gallery)
-
 
     def fill_gallery(self, visit_id, event_id):
 
@@ -132,9 +130,7 @@ class GwVisitGallery:
         # Open dialog
         tools_gw.open_dialog(self.dlg_gallery, dlg_name='visit_gallery')
 
-
     # region private functions
-
 
     def _next_gallery(self):
 
@@ -172,7 +168,6 @@ class GwVisitGallery:
         if self.start_indx == (control - 1):
             self.btn_next.setEnabled(False)
 
-
     def _previous_gallery(self):
 
         self.start_indx = self.start_indx - 1
@@ -206,7 +201,6 @@ class GwVisitGallery:
         control = len(self.img_path_list1D) / 9
         if self.start_indx < (control - 1):
             self.btn_next.setEnabled(True)
-
 
     def _zoom_img(self, i, visit_id, event_id):
 
@@ -263,7 +257,6 @@ class GwVisitGallery:
         if handeler_index != i:
             self.start_indx = self.start_indx + 1
 
-
     def _slide_previous(self):
 
         indx = (self.start_indx * 9) + self.i - 1
@@ -297,7 +290,6 @@ class GwVisitGallery:
 
         if indx < (self.num_events - 1):
             self.btn_slideNext.setEnabled(True)
-
 
     def _slide_next(self):
 

@@ -33,7 +33,6 @@ class GwImportOsm:
         self.schema_name = lib_vars.schema_name    
         self.projetc_type = None    
 
-
     def init_dialog(self, schema_name):
         """ Constructor """
         
@@ -62,7 +61,6 @@ class GwImportOsm:
 
         tools_gw.open_dialog(self.dlg_import_osm, dlg_name='admin_import_osm')
 
-
     def load_municipalities(self):
         """ Get municipalities and add a checkbox widget for each of them """
         sql = (f"""
@@ -78,7 +76,6 @@ class GwImportOsm:
             widget.setLayoutDirection(Qt.LeftToRight)
             widget.setText(chk_muni[1])
             layout.addWidget(widget)
-
 
     def run(self):        
         """ Start import process """    
@@ -249,9 +246,6 @@ class GwImportOsm:
         logs = logs[:-2] + ']}}'
         tools_gw.fill_tab_log(self.dlg_import_osm, json.loads(logs), reset_text=True)        
 
-        
-
-
     def get_checked_municipalities(self):
         """ Get selected municipalities and checks if there are already imported """
 
@@ -291,8 +285,6 @@ class GwImportOsm:
                             tools_db.dao.rollback()
                             return None
                     
-
-
         # Return selected_municipalities as id list 
         #        Example: (0,1,2)
         checked_municipalities = "("        
@@ -307,7 +299,6 @@ class GwImportOsm:
     
         return checked_municipalities
 
-    
     def close_dialog(self):
         """ Close dialog """
         tools_gw.close_dialog(self.dlg_import_osm, delete_dlg=True)

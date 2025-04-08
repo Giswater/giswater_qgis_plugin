@@ -64,11 +64,9 @@ class GwWorkcat:
         # Open form
         tools_gw.open_dialog(self.dlg_man, dlg_name='workcat_manager')
 
-
     def _handle_delete(self):
         tools_gw.delete_selected_rows(self.dlg_man.tbl_workcat, "cat_work")
         self._refresh_manager_table()
-
 
     def _fill_workcat_table(self, filter_text=None):
         view = "cat_work"
@@ -92,7 +90,6 @@ class GwWorkcat:
         tools_qt.set_tableview_config(self.dlg_man.tbl_workcat, sectionResizeMode=0)
         return True
 
-
     def _open_selected_workcat(self, dialog, widget):
         selected_list = widget.selectionModel().selectedRows()
         if len(selected_list) == 0:
@@ -111,11 +108,9 @@ class GwWorkcat:
 
         self.open_workcat(selected_object_id)
 
-
     def open_workcat(self, workcat_id):
         item = {'sys_id': workcat_id, 'filter_text': '', 'display_name': 'Workcat Details'}
         self.workcat_open_table_items(item)
-
 
     def _refresh_manager_table(self):
         try:
@@ -140,7 +135,6 @@ class GwWorkcat:
 
         dialog.show()
 
-
     def _save_new_workcat(self, dialog):
         workid = dialog.cat_work_id.text()
         descript = dialog.descript.toPlainText()
@@ -160,7 +154,6 @@ class GwWorkcat:
         else:
             tools_qgis.show_warning("Error creating Workcat.")
 
-
     def _check_workcat_exists(self, dialog):
         workid = dialog.cat_work_id.text()
         sql = f"SELECT id FROM cat_work WHERE id = '{workid}'"
@@ -173,7 +166,6 @@ class GwWorkcat:
             dialog.cat_work_id.setStyleSheet("")
             dialog.btn_accept.setEnabled(True)
             dialog.cat_work_id.setToolTip("")
-
 
     def workcat_open_table_items(self, item):
         """ Create the view and open the dialog with his content """
@@ -323,7 +315,6 @@ class GwWorkcat:
         text = tools_qt.get_text(self.items_dialog, self.items_dialog.lbl_end, False, False)
         tools_qt.set_widget_text(self.items_dialog, self.items_dialog.lbl_end, f"{text} {field_id}")
 
-
     def _manage_document(self, qtable, item_id):
         """ Access GUI to manage documents e.g Execute action of button 34 """
 
@@ -331,7 +322,6 @@ class GwWorkcat:
         dlg_docman = manage_document.get_document(tablename='workcat', qtable=qtable, item_id=item_id)
         dlg_docman.btn_accept.clicked.connect(partial(tools_gw.set_completer_object, dlg_docman, 'doc'))
         tools_qt.remove_tab(dlg_docman.tabWidget, 'tab_rel')
-
 
     def _get_current_selectors(self):
         """ Take the current selector_expl and selector_state to restore them at the end of the operation """
@@ -342,7 +332,6 @@ class GwWorkcat:
         body = tools_gw.create_body(form=form, extras=extras)
         json_result = tools_gw.execute_procedure('gw_fct_getselectors', body)
         return json_result
-
 
     def _restore_selectors(self, current_selectors):
         """ Restore selector_expl and selector_state to how the user had it """
@@ -366,7 +355,6 @@ class GwWorkcat:
                 body = tools_gw.create_body(extras=extras)
                 tools_gw.execute_procedure('gw_fct_setselectors', body)
         tools_qgis.refresh_map_canvas()
-
 
     def _force_expl(self, workcat_id):
         """ Active exploitations are compared with workcat farms.
@@ -393,7 +381,6 @@ class GwWorkcat:
             msg = "Your exploitation selector has been updated"
             tools_qgis.show_info(msg)
 
-
     def _update_selector_workcat(self, workcat_id):
         """ Update table selector_workcat """
 
@@ -403,7 +390,6 @@ class GwWorkcat:
                 f" VALUES('{workcat_id}', current_user);\n")
         tools_db.execute_sql(sql)
 
-
     def _set_enable_qatable_by_state(self, qtable, _id, qbutton):
 
         sql = (f"SELECT state_id FROM selector_state "
@@ -412,7 +398,6 @@ class GwWorkcat:
         if row is None:
             qtable.setEnabled(False)
             qbutton.setEnabled(True)
-
 
     def _get_folder_dialog(self, dialog, widget):
         """ Get folder dialog """
@@ -433,7 +418,6 @@ class GwWorkcat:
         if folder_path:
             tools_qt.set_widget_text(dialog, widget, str(folder_path))
 
-
     def _force_state(self, qbutton, state, qtable):
         """ Force selected state and set qtable enabled = True """
 
@@ -452,7 +436,6 @@ class GwWorkcat:
         tools_qgis.refresh_map_canvas()
         qtable.model().select()
 
-
     def _write_to_csv(self, dialog, folder_path=None, all_rows=None):
 
         with open(folder_path, "w") as output:
@@ -461,7 +444,6 @@ class GwWorkcat:
         tools_gw.set_config_parser('btn_search', 'search_csv_path', f"{tools_qt.get_text(dialog, 'txt_path')}")
         message = "The csv file has been successfully exported"
         tools_qgis.show_info(message, dialog=dialog)
-
 
     def _workcat_filter_by_text(self, dialog, qtable, widget_txt, table_name, workcat_id, field_id):
         """ Filter list of workcats by workcat_id and field_id """
@@ -474,7 +456,6 @@ class GwWorkcat:
             expr = f"workcat_id ILIKE '%{workcat_id}%'"
         self._workcat_fill_table(qtable, table_name, expr=expr)
         tools_gw.set_tablemodel_config(dialog, qtable, table_name)
-
 
     def _workcat_fill_table(self, widget, table_name, set_edit_triggers=QTableView.NoEditTriggers, expr=None):
         """ Fill table @widget filtering query by @workcat_id
@@ -510,7 +491,6 @@ class GwWorkcat:
         else:
             widget.setModel(model)
 
-
     def _show_context_menu(self, qtableview, pos):
         """ Show custom context menu """
         menu = QMenu(qtableview)
@@ -525,7 +505,6 @@ class GwWorkcat:
 
         # Show menu
         menu.exec(QCursor.pos())
-
 
     def _open_feature_form(self, qtable):
         """ Zoom feature with the code set in 'network_code' of the layer set in 'network_feature_type' """
@@ -556,7 +535,6 @@ class GwWorkcat:
             tools_qgis.zoom_to_rectangle(max_x, max_y, min_x, min_y, 1)
         except Exception:
             pass
-
 
     def _fill_label_data(self, workcat_id, table_name, extension=None):
 
@@ -610,7 +588,6 @@ class GwWorkcat:
                 # Add data to workcat search form
                 widget.setText(f"Total arcs length: {length}")
 
-
     def _document_insert(self, dialog, tablename, field, field_value):
         """
         Insert a document related to the current visit
@@ -650,7 +627,6 @@ class GwWorkcat:
         dialog.doc_id.blockSignals(False)
         dialog.tbl_document.model().select()
 
-
     def _get_parameters(self, qtable, index):
 
         tools_gw.reset_rubberband(self.aux_rubber_band)
@@ -674,11 +650,9 @@ class GwWorkcat:
         except AttributeError:
             pass
 
-
     def _reset_rubber_band(self):
         tools_gw.reset_rubberband(self.rubber_band)
         tools_gw.reset_rubberband(self.aux_rubber_band)
-
 
     def export_to_csv(self, dialog, qtable_1=None, qtable_2=None, path=None):
 

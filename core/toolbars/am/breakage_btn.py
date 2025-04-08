@@ -38,7 +38,6 @@ from ...threads.assignation import GwAssignation
 from ...ui.ui_manager import GwAssignationUi
 
 
-
 class GwAmBreakageButton(GwAction):
     """Button 73: Breakage button
     Dropdown with two options: 'Incremental load' and 'Assigning'"""
@@ -69,8 +68,6 @@ class GwAmBreakageButton(GwAction):
 
         # Assignation variables
         self.dlg_assignation = None
-
-
 
     def clicked_event(self):
         button = self.action.associatedWidgets()[1]

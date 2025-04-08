@@ -22,10 +22,10 @@ from ...libs import tools_log, tools_qgis, tools_qt, lib_vars, tools_db
 from ... import global_vars
 
 
-
 class ProjectType(Enum):
     WS = "ws"
     UD = "ud"
+
 
 class GwInpConfig:
     """ Class to store the configuration of the import INP process, as well as serializing/deserializing it """
@@ -90,7 +90,6 @@ class GwInpConfig:
         if isinstance(obj, dict):
             return {str(k): self.convert_keys(v) for k, v in obj.items()}
         return obj
-
 
 
 def lerp_progress(subtask_progress: int, global_min: int, global_max: int) -> int:
@@ -186,10 +185,12 @@ def create_load_menu(self_cls):
 
     return menu
 
+
 def _load_last_config(self_cls):
     """Load the last saved configuration"""
 
     load_config(self_cls)
+
 
 def _load_config_from_file(self_cls):
     """Load configuration from a file"""
@@ -205,6 +206,7 @@ def _load_config_from_file(self_cls):
         config.read_from_file(config_path)
         load_config(self_cls, config)
 
+
 def save_config_to_file(self_cls):
     """Save configuration to a file"""
 
@@ -216,6 +218,7 @@ def save_config_to_file(self_cls):
         config_path: Path = Path(file_path_str)
         workcat, exploitation, sector, municipality, dscenario, catalogs = self_cls._get_config_values()
         save_config(self_cls, workcat=workcat, exploitation=exploitation, sector=sector, municipality=municipality, dscenario=dscenario, catalogs=catalogs, _config_path=config_path)
+
 
 def save_config(self_cls, workcat: Optional[str] = None, exploitation: Optional[int] = None, sector: Optional[int] = None,
                     municipality: Optional[int] = None, dscenario: Optional[str] = None, raingage: Optional[str] = None, catalogs: Optional[dict] = None, _config_path: Optional[Path] = None) -> None:
@@ -236,6 +239,7 @@ def save_config(self_cls, workcat: Optional[str] = None, exploitation: Optional[
         tools_log.log_info(f"Configuration saved to {config_path}")
     except Exception as e:
         tools_qgis.show_warning(f"Error saving the configuration: {e}", dialog=self_cls.dlg_config)
+
 
 def load_config(self_cls, config: Optional[GwInpConfig] = None) -> Optional[GwInpConfig]:
 
@@ -274,6 +278,7 @@ def load_config(self_cls, config: Optional[GwInpConfig] = None) -> Optional[GwIn
 
     return config
 
+
 def fill_txt_info(self_cls, dialog):
     """Fill the text information in the dialog"""
 
@@ -299,6 +304,7 @@ def fill_txt_info(self_cls, dialog):
     info_str += "If you have any questions, please contact the Giswater team via <a href='https://github.com/Giswater/giswater_qgis_plugin/issues'>GitHub Issues</a> or <a href='https://giswater.org/contact/'>our website</a>.<br>"
     info_str += "</p>"
     tools_qt.set_widget_text(dialog, 'txt_info', info_str)
+
 
 def _set_combo_values_from_epanet_catalogs(self_cls, catalogs):
     # Set features
@@ -343,6 +349,7 @@ def _set_combo_values_from_epanet_catalogs(self_cls, catalogs):
             combo: QComboBox = self_cls.tbl_elements["pipes"][dint_rough_tuple][0]
             if pipe_catalog:
                 combo.setCurrentText(pipe_catalog)
+
 
 def _set_combo_values_from_swmm_catalogs(self_cls, catalogs):
     # Set features

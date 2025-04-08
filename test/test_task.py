@@ -43,11 +43,9 @@ class GwTestTask:
         # return True
         self._task_completed(None, {'total': total, 'iterations': iterations, 'task': task.description()})
 
-
     def _task_stopped(self, task):
         """"""
         tools_log.log_info('Task "{name}" was cancelled'.format(name=task.description()))
-
 
     def _task_completed(self, exception, result):
         """ Called when run is finished.
@@ -68,7 +66,6 @@ class GwTestTask:
         else:
             tools_log.log_info("Exception: {}".format(exception))
             raise exception
-
 
     def _task_example(self):
         """ Add task example to taskManager """

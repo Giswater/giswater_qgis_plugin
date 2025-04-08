@@ -41,7 +41,6 @@ class Giswater(QObject):
         self.action = None
         self.action_info = None
 
-
     def initGui(self):
         """ Create the menu entries and toolbar icons inside the QGIS GUI """
 
@@ -49,7 +48,6 @@ class Giswater(QObject):
         if self._init_plugin():
             # Force project read (to work with PluginReloader)
             self._project_read(False, False)
-
 
     def unload(self, hide_gw_button=None):
         """
@@ -167,9 +165,7 @@ class Giswater(QObject):
 
         self.load_project = None
 
-
     # region private functions
-
 
     def _init_plugin(self):
         """ Plugin main initialization function """
@@ -254,14 +250,12 @@ class Giswater(QObject):
 
         return True
 
-
     def _create_signal_manager(self):
         """ Creates an instance of GwSignalManager and connects all the signals """
 
         global_vars.signal_manager = GwSignalManager()
         global_vars.signal_manager.show_message.connect(tools_qgis.show_message)
         global_vars.signal_manager.refresh_selectors.connect(tools_gw.refresh_selectors)
-
 
     def _manage_user_config_folder(self, user_folder_dir):
         """ Check if user config folder exists. If not create empty files init.config and session.config """
@@ -288,7 +282,6 @@ class Giswater(QObject):
         except Exception as e:
             tools_log.log_warning(f"manage_user_config_folder: {e}")
 
-
     def _set_signals(self):
         """ Define iface event signals on Project Read / New Project / Save Project """
 
@@ -297,7 +290,6 @@ class Giswater(QObject):
                                     'main', 'projectRead')
         except AttributeError:
             pass
-
 
     def _unset_signals(self, hide_gw_button):
         """ Disconnect iface event signals on Project Read / New Project / Save Project """
@@ -315,7 +307,6 @@ class Giswater(QObject):
             tools_gw.disconnect_signal('main', 'actionSaveProject_save_toolbars_position')
         except TypeError:
             pass
-
 
     def _set_info_button(self):
         """ Set Giswater information button (always visible)
@@ -340,7 +331,6 @@ class Giswater(QObject):
             admin_button = GwAdminButton()
             self.action.triggered.connect(partial(admin_button.init_sql, True))
 
-
     def _unset_info_button(self):
         """ Unset Giswater information button (when plugin is disabled or reloaded) """
 
@@ -356,7 +346,6 @@ class Giswater(QObject):
         self.action = None
         self.action_info = None
 
-
     def _unset_toc_buttons(self):
         """ Unset Add Child Layer and Toggle EPA World buttons (when plugin is disabled or reloaded) """
 
@@ -367,13 +356,11 @@ class Giswater(QObject):
             toolbar.removeAction(action)  # Remove from toolbar
             action.deleteLater()  # Schedule for deletion
 
-
     def _project_new(self):
         """ Function executed when a user creates a new QGIS project """
 
         # Unload plugin when create new QGIS project
         self.unload(False)
-
 
     def _project_read(self, show_warning=True, hide_gw_button=True):
         """ Function executed when a user opens a QGIS project (*.qgs) """
@@ -393,11 +380,9 @@ class Giswater(QObject):
         if is_gw_project is False:
             self._set_info_button()
 
-
     def save_project(self):
         project = QgsProject.instance()
         project.write()
-
 
     def _remove_dockers(self):
         """ Remove Giswater dockers """
@@ -431,7 +416,6 @@ class Giswater(QObject):
             # TODO improve this, now remove last action
             toolbar.removeAction(toolbar.actions()[len(toolbar.actions()) - 1])
             self.btn_add_layers = None
-
 
     def _close_open_dialogs(self):
         """ Close Giswater open dialogs """

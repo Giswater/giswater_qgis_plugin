@@ -41,7 +41,6 @@ class GwSnapManager(object):
         self.vertex_marker.setPenWidth(3)
         global_vars.snappers.append(self)
 
-
     def set_snapping_layers(self):
         """ Set main snapping layers """
 
@@ -50,13 +49,11 @@ class GwSnapManager(object):
         self.layer_gully = tools_qgis.get_layer_by_tablename('v_edit_gully')
         self.layer_node = tools_qgis.get_layer_by_tablename('v_edit_node')
 
-
     def get_snapping_options(self):
         """ Function that collects all the snapping options """
 
         global_snapping_config = QgsProject.instance().snappingConfig()
         return global_snapping_config
-
 
     def store_snapping_options(self):
         """ This function is deprecated """
@@ -68,7 +65,6 @@ class GwSnapManager(object):
         self.snapping_config = self.get_snapping_options()
         self.snapping_config.setEnabled(True)
         self.previous_snapping = self.snapping_config
-
 
     def set_snapping_status(self, enable=False):
         """ This function is deprecated """
@@ -90,7 +86,6 @@ class GwSnapManager(object):
         QgsProject.instance().blockSignals(False)
         QgsProject.instance().snappingConfigChanged.emit(self.snapping_config)
 
-
     def set_snap_mode(self, mode=3):
         """ This function is deprecated """
         """ Defines on which layer the snapping is performed
@@ -108,7 +103,6 @@ class GwSnapManager(object):
             QgsProject.instance().blockSignals(False)
             QgsProject.instance().snappingConfigChanged.emit(snapping_options)
 
-
     def config_snap_to_arc(self):
         """ This function is deprecated """
         """ Set snapping to 'arc' """
@@ -121,7 +115,6 @@ class GwSnapManager(object):
         layer_settings = QgsSnappingConfig.IndividualLayerSettings(True, segment_flag, 15, 1, 0, 0)
         self.snapping_config.setIndividualLayerSettings(self.layer_arc, layer_settings)
 
-
     def config_snap_to_node(self):
         """ This function is deprecated """
         """ Set snapping to 'node' """
@@ -132,7 +125,6 @@ class GwSnapManager(object):
         vertex_flag = tools_gw.get_vertex_flag(1)
         layer_settings = QgsSnappingConfig.IndividualLayerSettings(True, vertex_flag, 15, 1, 0, 0)
         self.snapping_config.setIndividualLayerSettings(self.layer_node, layer_settings)
-
 
     def config_snap_to_connec(self):
         """ This function is deprecated """
@@ -146,7 +138,6 @@ class GwSnapManager(object):
         layer_settings = QgsSnappingConfig.IndividualLayerSettings(True, vertex_flag, 15, 1, 0, 0)
         snapping_config.setIndividualLayerSettings(tools_qgis.get_layer_by_tablename('v_edit_connec'), layer_settings)
 
-
     def config_snap_to_gully(self):
         """ This function is deprecated """
         """ Set snapping to 'gully' """
@@ -158,7 +149,6 @@ class GwSnapManager(object):
         vertex_flag = tools_gw.get_vertex_flag(1)
         layer_settings = QgsSnappingConfig.IndividualLayerSettings(True, vertex_flag, 15, 1, 0, 0)
         snapping_config.setIndividualLayerSettings(tools_qgis.get_layer_by_tablename('v_edit_gully'), layer_settings)
-
 
     def config_snap_to_layer(self, layer, point_locator=QgsPointLocator.All, set_settings=False):
         """ This function is deprecated """
@@ -176,7 +166,6 @@ class GwSnapManager(object):
             self.snapping_config.setIndividualLayerSettings(layer, layer_settings)
             return layer_settings
 
-
     def restore_snap_options(self, snappings_options):
         """ This function is deprecated """
         """ Function that applies selected snapping configuration """
@@ -190,7 +179,6 @@ class GwSnapManager(object):
         QgsProject.instance().blockSignals(False)
         QgsProject.instance().snappingConfigChanged.emit(self.snapping_config)
 
-
     def recover_snapping_options(self):
         """ This function is deprecated """
         """ Function to restore the previous snapping configuration """
@@ -199,13 +187,11 @@ class GwSnapManager(object):
             return
         self.restore_snap_options(self.previous_snapping)
 
-
     def get_snapper(self):
         """ Return snapper """
 
         snapper = QgsMapCanvas.snappingUtils(self.canvas)
         return snapper
-
 
     def snap_to_current_layer(self, event_point, vertex_marker=None):
 
@@ -224,7 +210,6 @@ class GwSnapManager(object):
         self.is_valid = result.isValid()
         return result
 
-
     def snap_to_project_config_layers(self, event_point, vertex_marker=None):
 
         self.is_valid = False
@@ -242,7 +227,6 @@ class GwSnapManager(object):
         self.is_valid = result.isValid()
         return result
 
-
     def add_marker(self, result, vertex_marker=None, icon_type=None):
 
         if not result.isValid():
@@ -259,14 +243,12 @@ class GwSnapManager(object):
 
         return point
 
-
     def remove_marker(self, vertex_marker=None):
 
         if vertex_marker is None:
             vertex_marker = self.vertex_marker
 
         vertex_marker.hide()
-
 
     def get_event_point(self, event=None, point=None):
         """ Get point """
@@ -288,7 +270,6 @@ class GwSnapManager(object):
         finally:
             return event_point
 
-
     def get_snapped_layer(self, result):
 
         layer = None
@@ -296,7 +277,6 @@ class GwSnapManager(object):
             layer = result.layer()
 
         return layer
-
 
     def get_snapped_point(self, result):
 
@@ -306,7 +286,6 @@ class GwSnapManager(object):
 
         return point
 
-
     def get_snapped_feature_id(self, result):
 
         feature_id = None
@@ -314,7 +293,6 @@ class GwSnapManager(object):
             feature_id = result.featureId()
 
         return feature_id
-
 
     def get_snapped_feature(self, result, select_feature=False):
 
@@ -334,10 +312,8 @@ class GwSnapManager(object):
         finally:
             return snapped_feat
 
-
     def result_is_valid(self):
         return self.is_valid
-
 
     def add_point(self, vertex_marker):
         """ Create the appropriate map tool and connect to the corresponding signal """
@@ -356,7 +332,6 @@ class GwSnapManager(object):
         tools_gw.connect_signal(emit_point.canvasClicked, partial(self._get_xy, vertex_marker, emit_point),
                                 'snap_managers', f'{hash(self)}_ep_canvasClicked_get_xy')
 
-
     def set_vertex_marker(self, vertex_marker, icon_type=1, color_type=0, icon_size=15, pen_width=3):
 
         # Vertex marker
@@ -372,7 +347,6 @@ class GwSnapManager(object):
 
     # region private functions
 
-
     def _get_mouse_move(self, vertex_marker, point):
 
         # Hide marker and get coordinates
@@ -385,7 +359,6 @@ class GwSnapManager(object):
             self.add_marker(result, vertex_marker)
         else:
             vertex_marker.hide()
-
 
     def _get_xy(self, vertex_marker, emit_point, point):
         """ Get coordinates of selected point """
@@ -407,7 +380,6 @@ class GwSnapManager(object):
         global_vars.iface.mapCanvas().refreshAllLayers()
         vertex_marker.hide()
 
-
     def _select_snapped_feature(self, result, feature_id):
 
         if not result.isValid():
@@ -415,6 +387,5 @@ class GwSnapManager(object):
 
         layer = result.layer()
         layer.select([feature_id])
-
 
     # endregion

@@ -40,7 +40,6 @@ class GwCopySchemaTask(GwTask):
         self.admin.dlg_readsql_copy.setWindowFlag(Qt.WindowCloseButtonHint, False)
         self.admin.dlg_readsql_copy.show()
 
-
     def run(self):
 
         super().run()
@@ -67,7 +66,6 @@ class GwCopySchemaTask(GwTask):
         self.admin.error_count = 0
         self.status = status
         return status
-
 
     def finished(self, result):
 

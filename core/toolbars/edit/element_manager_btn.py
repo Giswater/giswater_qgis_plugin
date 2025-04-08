@@ -16,6 +16,5 @@ class GwElementManagerButton(GwAction):
         super().__init__(icon_path, action_name, text, toolbar, action_group)
         self.element = GwElement()
 
-
     def clicked_event(self):
         self.element.manage_elements()

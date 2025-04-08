@@ -18,6 +18,5 @@ class GwElementButton(GwAction):
         self.feature_type = feature_type
         self.element = GwElement()
 
-
     def clicked_event(self):
         self.element.get_element(list_tabs=self.list_tabs, feature_type=self.feature_type)

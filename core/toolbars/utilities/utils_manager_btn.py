@@ -44,7 +44,6 @@ class GwUtilsManagerButton(GwAction):
             self.action.setMenu(self.menu)
             toolbar.addAction(self.action)
 
-
     def clicked_event(self):
 
         if self.menu.property('last_selection') is not None:
@@ -54,10 +53,8 @@ class GwUtilsManagerButton(GwAction):
         menu_point = button.mapToGlobal(QPoint(0, button.height()))
         self.menu.popup(menu_point)
 
-
     def _save_last_selection(self, menu, button_function):
         menu.setProperty("last_selection", button_function)
-
 
     # region private functions
 

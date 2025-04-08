@@ -40,6 +40,7 @@ from ..dialog import GwAction
 from ...ui.ui_manager import GwPriorityUi, GwPriorityManagerUi
 from ...threads.calculatepriority import GwCalculatePriority
 
+
 class GwConfigCatalogButton:
     def __init__(self, data, key="arccat_id"):
         self._data = {}
@@ -822,7 +823,6 @@ class CalculatePriority:
         # Progress bar behavior
         t.progressChanged.connect(lambda value: dlg.progressBar.setValue(int(value)))
 
-
         #dlg.executing = True
         QgsApplication.taskManager().addTask(t)
 
@@ -1146,7 +1146,6 @@ class CalculatePriority:
 
         # Text descript
         tools_qt.set_widget_text(dlg, dlg.txt_descript, self.result["descript"])
-
 
         # Combo exploitation
         sql = f"""

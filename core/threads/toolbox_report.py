@@ -30,7 +30,6 @@ class GwReportTask(GwTask):
         self.queryAdd = queryAdd
         self.timer = timer
 
-
     def run(self):
 
         super().run()
@@ -53,7 +52,6 @@ class GwReportTask(GwTask):
             return False
 
         return True
-
 
     def finished(self, result):
 
@@ -87,7 +85,6 @@ class GwReportTask(GwTask):
         elif result is False:
             msg = f"Database returned null. Check postgres function 'gw_fct_getinfofromid'"
             tools_log.log_warning(msg)
-
 
     def cancel(self):
 

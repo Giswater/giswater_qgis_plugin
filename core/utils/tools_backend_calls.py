@@ -27,6 +27,7 @@ from ...libs import lib_vars, tools_qgis, tools_qt, tools_log, tools_os, tools_d
 
 from ..shared.mincut_tools import filter_by_days, filter_by_dates
 
+
 def add_object(**kwargs):
     """
     Open form of selected element of the @qtable??
@@ -409,6 +410,7 @@ def filter_table(**kwargs):
 
     return complet_list
 
+
 def filter_table_mincut(**kwargs):
     """
          Function called in module GwInfo: def _set_filter_listeners(self, complet_result, dialog, widget_list, columnname, widgetname)
@@ -447,6 +449,7 @@ def filter_table_mincut(**kwargs):
             tools_qt.set_tableview_config(qtable)
 
     return complet_list
+
 
 def open_rpt_result(**kwargs):
     """
@@ -910,6 +913,7 @@ def get_filter_qtableview_mincut(dialog, widget_list, func_params, filter_fields
 
     return filter_fields
 
+
 def open_selected_manager_item(**kwargs):
     """
     Open form of selected element of the @qtable??
@@ -1047,7 +1051,6 @@ def _reload_table(**kwargs):
         tab_name = 'main'
         list_tables = dialog.findChildren(QTableView)
 
-
     complet_result = kwargs['complet_result']
     feature_id = complet_result['body']['feature']['id']
     field_id = str(complet_result['body']['feature']['idName'])
@@ -1131,6 +1134,7 @@ def manage_duplicate_dscenario_copyfrom(dialog):
         tools_qt.set_combo_value(dialog.findChild(QComboBox, 'expl'), f"{row[4]}", 0)
 
 # region unused functions atm
+
 
 def get_all_layers(group, all_layers):
 

@@ -81,14 +81,12 @@ class GwMaptool(QgsMapTool):
         toolbar.addAction(self.action)
         self.setAction(self.action)
 
-
     def clicked_event(self):
 
         selected_maptool = self.iface.mapCanvas().mapTool()
         self.prev_maptool = selected_maptool
         if not self == selected_maptool:
             self.iface.mapCanvas().setMapTool(self)
-
 
     def deactivate(self):
 
@@ -101,7 +99,6 @@ class GwMaptool(QgsMapTool):
 
         # Remove highlight
         self.vertex_marker.hide()
-
 
     def canvasMoveEvent(self, event):
 
@@ -119,26 +116,22 @@ class GwMaptool(QgsMapTool):
         if result.isValid():
             self.snapper_manager.add_marker(result, self.vertex_marker)
 
-
     def keyPressEvent(self, event):
 
         if event.key() == Qt.Key_Escape:
             self.cancel_map_tool()
             return
 
-
     def canvasReleaseEvent(self, event):
 
         if event.button() == Qt.RightButton:
             self.cancel_map_tool()
-
 
     def recover_previus_maptool(self):
 
         if self.prev_maptool:
             self.iface.mapCanvas().setMapTool(self.prev_maptool)
             self.prev_maptool = None
-
 
     def set_action_pan(self):
         """ Set action 'Pan' """
@@ -147,7 +140,6 @@ class GwMaptool(QgsMapTool):
             self.iface.actionPan().trigger()
         except Exception:
             pass
-
 
     def reset_rubber_band(self, geom_type="polygon"):
 
@@ -159,12 +151,10 @@ class GwMaptool(QgsMapTool):
             geom_type = QgsWkbTypes.PointGeometry
         self.rubber_band.reset(geom_type)
 
-
     def reset(self):
 
         self.reset_rubber_band()
         self.snapped_feat = None
-
 
     def cancel_map_tool(self):
         """ Executed if user press right button or escape key """
@@ -178,14 +168,12 @@ class GwMaptool(QgsMapTool):
         # Set action pan
         self.set_action_pan()
 
-
     def refresh_map_canvas(self):
         """ Refresh all layers present in map canvas """
 
         self.canvas.refreshAllLayers()
         for layer_refresh in self.canvas.layers():
             layer_refresh.triggerRepaint()
-
 
     def manage_active_maptool(self):
         """ Check in init config file if user wants to keep map tool active or not """

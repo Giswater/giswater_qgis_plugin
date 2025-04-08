@@ -42,7 +42,6 @@ class GwSearch:
         self.rubber_band = tools_gw.create_rubberband(self.canvas)
         self.aux_rubber_band = tools_gw.create_rubberband(self.canvas)
 
-
     def open_search(self, dlg_search, dlg_mincut=None):
 
         # If dlg_search is not None we are going to open search independently.
@@ -128,7 +127,6 @@ class GwSearch:
             tools_qt.manage_translation('search', self.dlg_search)
             self._init_dialog()
 
-
     def export_to_csv(self, dialog, qtable_1=None, qtable_2=None, path=None):
 
         folder_path = tools_qt.get_text(dialog, path)
@@ -183,7 +181,6 @@ class GwSearch:
             msg = "File path doesn't exist or you dont have permission or file is opened"
             tools_qgis.show_warning(msg, dialog=dialog)
 
-
     def refresh_tab(self, tab_name=None):
         
         if tab_name:
@@ -211,9 +208,7 @@ class GwSearch:
                           f"widgetname='{field['widgetname']}' AND widgettype='{field['widgettype']}'"
                     tools_qgis.show_message(msg, 2)
 
-
     # region private functions
-
 
     def _init_dialog(self):
         """ Initialize dialog. Make it dockable in left dock widget area """
@@ -223,17 +218,14 @@ class GwSearch:
         self.dlg_search.dlg_closed.connect(self._close_search)
         docker_search = self.iface.mainWindow().findChild(QDockWidget, 'dlg_search')
 
-
     def _reset_rubber_band(self):
 
         tools_gw.reset_rubberband(self.rubber_band)
         tools_gw.reset_rubberband(self.aux_rubber_band)
 
-
     def _close_search(self):
 
         self.dlg_search = None
-
 
     def _set_typeahead_completer(self, widget, completer=None):
         """ Set completer and add listeners """
@@ -245,7 +237,6 @@ class GwSearch:
             widget.textChanged.connect(partial(self._make_list, completer, model, widget))
 
         return widget
-
 
     def _check_tab(self, completer):
 
@@ -379,7 +370,6 @@ class GwSearch:
         self.lbl_visible = False
         self.dlg_search.lbl_msg.setVisible(self.lbl_visible)
 
-
     def _make_list(self, completer, model, widget):
         """ Create a list of ids and populate widget (QLineEdit) """
 
@@ -475,7 +465,6 @@ class GwSearch:
                     display_list.append(data['display_name'])
                 tools_qt.set_completer_object(completer, model, line_edit_add, sorted(display_list))
 
-
     def _clear_line_edit_add(self, line_list):
         """ Clear second line edit if exist """
 
@@ -483,7 +472,6 @@ class GwSearch:
         line_edit_add.blockSignals(True)
         line_edit_add.setText('')
         line_edit_add.blockSignals(False)
-
 
     def _add_combobox(self, field):
 
@@ -495,7 +483,6 @@ class GwSearch:
         widget.currentIndexChanged.connect(partial(self._clear_lineedits))
 
         return widget
-
 
     def _clear_lineedits(self):
 

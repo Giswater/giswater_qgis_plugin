@@ -27,11 +27,9 @@ class GwGo2EpaManagerButton(GwAction):
 
         super().__init__(icon_path, action_name, text, toolbar, action_group)
 
-
     def clicked_event(self):
 
         self._manage_go2epa()
-
 
     # region private functions
 
@@ -76,7 +74,6 @@ class GwGo2EpaManagerButton(GwAction):
         # Open form
         tools_gw.open_dialog(self.dlg_manager, dlg_name='go2epa_manager')
 
-
     def _show_context_menu(self, qtableview):        
         """ Show custom context menu """                        
         menu = QMenu(qtableview)
@@ -105,7 +102,6 @@ class GwGo2EpaManagerButton(GwAction):
 
         menu.exec(QCursor.pos())
                        
-
     def _fill_manager_table(self, filter_id=None):
         """ Fill dscenario manager table with data from v_edit_cat_dscenario """
 
@@ -131,7 +127,6 @@ class GwGo2EpaManagerButton(GwAction):
 
         return complet_list
 
-
     def _get_list(self, table_name='v_ui_rpt_cat_result', filter_id=None):
         """ Mount and execute the query for gw_fct_getlist """
 
@@ -149,14 +144,12 @@ class GwGo2EpaManagerButton(GwAction):
 
         return complet_list
 
-
     def _update_data(self, result_id, columnname, value):
 
         sql = f"""UPDATE v_ui_rpt_cat_result SET "{columnname}" = $${value}$$ WHERE result_id = '{result_id}';"""
         result = tools_db.execute_sql(sql, log_sql = True)
         if result:
             self._fill_manager_table(tools_qt.get_text(self.dlg_manager, 'txt_result_id'))
-
 
     def _fill_txt_infolog(self, selected):
         """
@@ -239,7 +232,6 @@ class GwGo2EpaManagerButton(GwAction):
         # Set message text into widget
         tools_qt.set_widget_text(self.dlg_manager, 'tab_log_txt_infolog', msg)
 
-
     def _enable_buttons(self, selected):
         set_corporate_enabled, archive_enabled = True, True
         selected_rows = self.dlg_manager.tbl_rpt_cat_result.selectionModel().selectedRows()
@@ -273,13 +265,11 @@ class GwGo2EpaManagerButton(GwAction):
         self.dlg_manager.btn_set_corporate.setEnabled(set_corporate_enabled)
         self.dlg_manager.btn_archive.setEnabled(archive_enabled)
 
-
     def _fill_combo_result_id(self):
 
         sql = "SELECT result_id FROM v_ui_rpt_cat_result ORDER BY result_id"
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_manager.txt_result_id, rows, add_empty=True)
-
 
     def _filter_by_result_id(self):
 
@@ -296,7 +286,6 @@ class GwGo2EpaManagerButton(GwAction):
             message = tools_qt.fill_table(table, tablename)
             if message:
                 tools_qgis.show_warning(message)
-
 
     def _multi_rows_delete(self, widget, table_name, column_id):
         """ Delete selected elements of the table
@@ -330,7 +319,6 @@ class GwGo2EpaManagerButton(GwAction):
             sql += f" WHERE {column_id} IN ({list_id})"
             tools_db.execute_sql(sql)
             self._fill_manager_table(tools_qt.get_text(self.dlg_manager, 'txt_result_id'))
-
 
     def _toggle_rpt_archived(self, widget, column_id):
         """ Call gw_fct_set_rpt_archived with selected result_id
@@ -367,7 +355,6 @@ class GwGo2EpaManagerButton(GwAction):
         tools_qgis.show_info(message, dialog=self.dlg_manager)
         # Refresh table
         self._fill_manager_table()
-
 
     def _epa2data(self, widget, column_id):
         """ Delete selected elements of the table
@@ -415,7 +402,6 @@ class GwGo2EpaManagerButton(GwAction):
         # Refresh table
         self._fill_manager_table()
 
-
     def _manage_edit_row(self, dialog, widget):
 
         # Get selected rows
@@ -439,7 +425,6 @@ class GwGo2EpaManagerButton(GwAction):
         if edit_dialog.exec_() == QDialog.Accepted:
             new_value = edit_dialog.get_value()
             self._update_data(result_id, columnname, new_value)
-
 
     def _show_inp_data(self, dialog, widget):
         # Get selected rows

@@ -18,6 +18,7 @@ from ..... import global_vars
 from .....libs import tools_qt, tools_db
 from ....utils import tools_gw
 
+
 class StaticCalibration:
     def __init__(self):
         pass

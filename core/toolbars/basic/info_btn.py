@@ -38,7 +38,6 @@ class GwInfoButton(GwMaptool):
         self.previous_info_feature = None
         self.action_name = action_name
 
-
     # region QgsMapTools inherited
     """ QgsMapTools inherited event functions """
 
@@ -51,15 +50,12 @@ class GwInfoButton(GwMaptool):
             self.action.trigger()
             return
 
-
     def canvasMoveEvent(self, event):
         pass
-
 
     def canvasReleaseEvent(self, event):
 
         self._get_info(event)
-
 
     def activate(self):
 
@@ -78,7 +74,6 @@ class GwInfoButton(GwMaptool):
         self.canvas.setCursor(self.cursor)
         self.rubberband_list = []
         self.tab_type = 'data'
-
 
     def deactivate(self):
 
@@ -101,13 +96,11 @@ class GwInfoButton(GwMaptool):
         info_action = self.iface.mainWindow().findChildren(QAction, self.action_name)[-1]
         info_action.trigger()
 
-
     def _reset_rubber_bands(self):
         for rb in self.rubberband_list:
             tools_gw.reset_rubberband(rb)
         if hasattr(self, "rubber_band"):
             tools_qgis.reset_rubber_band(self.rubber_band)
-
 
     def _get_layers_from_coordinates(self, point, rb_list, tab_type=None):
 
@@ -200,7 +193,6 @@ class GwInfoButton(GwMaptool):
         main_menu.aboutToHide.connect(self._reset_rubber_bands)
         main_menu.exec_(click_point)
 
-
     def _identify_all(self, complet_list, rb_list):
 
         tools_gw.reset_rubberband(self.rubber_band)
@@ -223,7 +215,6 @@ class GwInfoButton(GwMaptool):
                 rb.setWidth(5)
                 rb.show()
                 rb_list.append(rb)
-
 
     def _toggle_valve_state(self, valve_id, table_name, value):
         """ Open or closes a valve. If parameter 'utils_graphanalytics_automatic_trigger' is true,
@@ -264,7 +255,6 @@ class GwInfoButton(GwMaptool):
             QgsApplication.taskManager().addTask(self.valve_thread)
             QgsApplication.taskManager().triggerTask(self.valve_thread)
 
-
     def _toggle_valve_state_netscenario(self, netscenario_id, valve_id, table_name, value):
         """ Open or closes a valve in a netscenario """
 
@@ -278,7 +268,6 @@ class GwInfoButton(GwMaptool):
         tools_gw.execute_procedure('gw_fct_upsertfields', body)
         tools_qgis.refresh_map_canvas()
 
-
     def _draw_by_action(self, feature, rb_list, reset_rb=True):
         """ Draw lines based on geometry """
 
@@ -290,7 +279,6 @@ class GwInfoButton(GwMaptool):
         if reset_rb:
             tools_gw.reset_rubberband(self.rubber_band)
         tools_gw.draw_wkt_geometry(str(feature['geometry']), self.rubber_band, QColor(255, 0, 0, 100), 3)
-
 
     def _get_info_from_selected_id(self, action, tab_type):
         """ Set active selected layer """
@@ -309,7 +297,6 @@ class GwInfoButton(GwMaptool):
             if isinstance(self.previous_info_feature, GwInfo) and lib_vars.session_vars['dialog_docker'] is not None:
                 tools_gw.reset_rubberband(self.previous_info_feature.rubber_band)
             self.previous_info_feature = info_feature
-
 
     def _get_info(self, event):
 

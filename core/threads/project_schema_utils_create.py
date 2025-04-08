@@ -22,8 +22,6 @@ class GwCreateSchemaUtilsTask(GwTask):
         self.admin = admin
         self.params = params
 
-
-
     def run(self):
         """"""
 
@@ -67,7 +65,6 @@ class GwCreateSchemaUtilsTask(GwTask):
             tools_log.log_info(f"{type(e).__name__} --> {e}")
             self.exception = e
             return False
-
 
     def finished(self, result):
 

@@ -67,7 +67,6 @@ class GwPsector:
 
         self.project_type = tools_gw.get_project_type()
 
-
     def get_psector(self, psector_id=None, list_coord=None):
         """ Buttons 51 and 52: New psector """
 
@@ -487,7 +486,6 @@ class GwPsector:
 
         return QStandardItemModel.flags(model, index)
 
-
     def fill_widget(self, dialog, widget, row):
 
         if type(widget) is str:
@@ -507,7 +505,6 @@ class GwPsector:
         else:
             widget.setText("")
 
-
     def update_total(self, dialog):
         """ Show description of product plan/om _psector as label """
 
@@ -519,7 +516,6 @@ class GwPsector:
             if 'widget_total' in widget.objectName():
                 total_result = float(total_result) + float(widget.text().replace(symbol, '').strip())
         tools_qt.set_widget_text(dialog, 'lbl_total_count', f'{"{:.2f}".format(total_result)} {symbol}')
-
 
     def open_dlg_reports(self):
 
@@ -557,7 +553,6 @@ class GwPsector:
         # Open dialog
         tools_gw.open_dialog(self.dlg_psector_rapport, dlg_name='psector_rapport')
 
-
     def populate_cmb_templates(self):
 
         index = 0
@@ -589,7 +584,6 @@ class GwPsector:
         row = tools_gw.get_config_value(f'composer_plan_vdefault')
         if row:
             tools_qt.set_combo_value(self.dlg_psector_rapport.cmb_templates, row[0])
-
 
     def generate_reports(self):
 
@@ -644,7 +638,6 @@ class GwPsector:
 
         tools_gw.close_dialog(self.dlg_psector_rapport)
 
-
     def generate_composer(self, path):
 
         # Get layout manager object
@@ -686,7 +679,6 @@ class GwPsector:
         else:
             tools_qgis.show_warning("Layout not found", parameter=layout_name, dialog=self.dlg_plan_psector)
 
-
     def generate_csv(self, path, viewname):
 
         # Get columns name in order of the table
@@ -719,7 +711,6 @@ class GwPsector:
             writer = csv.writer(output, lineterminator='\n')
             writer.writerows(all_rows)
 
-
     def populate_budget(self, dialog, psector_id):
 
         if psector_id is None or psector_id == 'null':
@@ -748,7 +739,6 @@ class GwPsector:
         self.calc_pecvat_pec(dialog)
         self.calc_pca_pecvat(dialog)
 
-
     def calc_pec_pem(self, dialog):
 
         if tools_qt.get_text(dialog, 'pec') not in ('null', None):
@@ -764,7 +754,6 @@ class GwPsector:
         res = f"{round(pec - pem, 2):.02f}"
         tools_qt.set_widget_text(dialog, 'pec_pem', res)
 
-
     def calc_pecvat_pec(self, dialog):
 
         if tools_qt.get_text(dialog, 'pec_vat') not in ('null', None):
@@ -778,7 +767,6 @@ class GwPsector:
             pec = 0
         res = f"{round(pec_vat - pec, 2):.02f}"
         tools_qt.set_widget_text(dialog, 'pecvat_pem', res)
-
 
     def calc_pca_pecvat(self, dialog):
 
@@ -794,7 +782,6 @@ class GwPsector:
         res = f"{round(pca - pec_vat, 2):.02f}"
         tools_qt.set_widget_text(dialog, 'pca_pecvat', res)
 
-
     def calculate_percents(self, tablename, field):
 
         field_value = f"{tools_qt.get_text(self.dlg_plan_psector, field)}"
@@ -802,7 +789,6 @@ class GwPsector:
         sql = f"UPDATE {tablename} SET {field} = '{field_value}' WHERE psector_id = '{psector_id}'"
         tools_db.execute_sql(sql)
         self.populate_budget(self.dlg_plan_psector, psector_id)
-
 
     def show_description(self):
         """ Show description of product plan/om _psector as label"""
@@ -814,7 +800,6 @@ class GwPsector:
             des = self.dlg_plan_psector.all_rows.model().record(row).value('descript')
         tools_qt.set_widget_text(self.dlg_plan_psector, self.lbl_descript, des)
 
-
     def set_tabs_enabled(self, enabled):
 
         self.dlg_plan_psector.tabwidget.setTabEnabled(1, enabled)
@@ -823,7 +808,6 @@ class GwPsector:
         self.dlg_plan_psector.tabwidget.setTabEnabled(4, enabled)
         self.dlg_plan_psector.tabwidget.setTabEnabled(5, enabled)
 
-
     def enable_buttons(self, enabled):
         self.dlg_plan_psector.btn_insert.setEnabled(enabled)
         self.dlg_plan_psector.btn_delete.setEnabled(enabled)
@@ -831,7 +815,6 @@ class GwPsector:
         widget_to_ignore = ('btn_accept', 'btn_cancel', 'btn_reports', 'btn_open_doc')
         restriction = ('role_basic', 'role_om', 'role_epa', 'role_om')
         self.set_restriction_by_role(self.dlg_plan_psector, widget_to_ignore, restriction)
-
 
     def check_tab_position(self):
 
@@ -866,7 +849,6 @@ class GwPsector:
         restriction = ('role_basic', 'role_om', 'role_epa', 'role_om')
         self.set_restriction_by_role(self.dlg_plan_psector, widget_to_ignore, restriction)
 
-
     def set_restriction_by_role(self, dialog, widget_to_ignore, restriction):
         """
         Set all widget enabled(False) or readOnly(True) except those on the tuple
@@ -889,7 +871,6 @@ class GwPsector:
                 elif type(widget) in (QCheckBox, QTableView, QPushButton) or isinstance(widget, QComboBox):
                     widget.setEnabled(False)
 
-
     def reload_states_selector(self):
 
         try:
@@ -905,8 +886,6 @@ class GwPsector:
             # Control if self.all_states is None (object of type 'NoneType' has no len())
             pass
 
-
-
     def reset_model_psector(self, feature_type):
         """ Reset model of the widget """
 
@@ -915,7 +894,6 @@ class GwPsector:
         widget = tools_qt.get_widget(self.dlg_plan_psector, widget_name)
         if widget:
             widget.setModel(None)
-
 
     def check_name(self, psector_name):
         """ Check if name of new psector exist or not """
@@ -926,7 +904,6 @@ class GwPsector:
         if row is None:
             return False
         return True
-
 
     def insert_or_update_new_psector(self, close_dlg=False):
 
@@ -1024,7 +1001,6 @@ class GwPsector:
             tools_gw.close_dialog(self.dlg_plan_psector)
             tools_gw.refresh_selectors()
 
-
     def set_plan(self):
 
         psector_id = tools_qt.get_text(self.dlg_plan_psector, "tab_general_psector_id")
@@ -1045,7 +1021,6 @@ class GwPsector:
 
         return json_result
 
-
     def show_psector_topoerror_log(self, json_result, psector_id):
 
         # Remove message
@@ -1061,7 +1036,6 @@ class GwPsector:
 
         # Draw log features on map
         tools_gw.manage_json_response(json_result)
-
 
     def repair_psector(self, psector_id):
 
@@ -1084,9 +1058,7 @@ class GwPsector:
         # Refresh canvas
         tools_qgis.refresh_map_canvas()
 
-
     def price_selector(self, dialog, tableleft, tableright):
-
 
         self.load_signals = True
 
@@ -1113,7 +1085,6 @@ class GwPsector:
         dialog.btn_remove.clicked.connect(
             partial(self.rows_unselector, dialog, tableright))
         dialog.btn_set_geom.clicked.connect(partial(self._manage_price_geom, dialog, tableright))
-
 
     def create_label(self, dialog, tbl_all_rows, id_ori, tableright, id_des):
 
@@ -1170,7 +1141,6 @@ class GwPsector:
 
         self._manage_widgets_price(dialog, tableright, psector_id, expl_id)
 
-
     def _manage_widgets_price(self, dialog, tableright, psector_id, print_all_rows=False, print_headers=True):
 
         layout = dialog.findChild(QGridLayout, 'lyt_price')
@@ -1185,7 +1155,6 @@ class GwPsector:
         self.update_total(dialog)
         self._manage_buttons_price(dialog)
 
-
     def _add_price_widgets(self, dialog, tableright, psector_id, expl_id=[], editable_widgets=['measurement','observ']
                            , print_all_rows=False, print_headers=False):
 
@@ -1195,7 +1164,6 @@ class GwPsector:
 
         if not complet_result or not complet_result.get('fields'):
             return
-
 
         if print_headers or self.header_exist is None:
             self.header_exist = True
@@ -1246,12 +1214,10 @@ class GwPsector:
                         layout.setColumnStretch(2, 1)
                         pos = pos + 1
 
-
     def _manage_updates_prices(self, widget, key, price_id):
 
         self.dict_to_update[f"widget_{key}_{price_id}"] = {"price_id":price_id, key:widget.text()}
         self._update_otherprice()
-
 
     def _update_otherprice(self):
 
@@ -1268,7 +1234,6 @@ class GwPsector:
                                f"WHERE psector_id = {tools_qt.get_text(self.dlg_plan_psector, self.psector_id)} AND price_id = '{_filter}';\n"
             tools_db.execute_sql(sql)
 
-
     def _manage_widgets(self, dialog, lbl, widget, count, pos):
 
         layout = dialog.findChild(QGridLayout, 'lyt_price')
@@ -1276,7 +1241,6 @@ class GwPsector:
         layout.addWidget(lbl, count, pos)
         layout.addWidget(widget, count, pos+1)
         layout.setColumnStretch(2, 1)
-
 
     def rows_unselector(self, dialog, tableright):
 
@@ -1298,7 +1262,6 @@ class GwPsector:
             tools_db.execute_sql(sql)
 
         self._manage_widgets_price(dialog, tableright, psector_id, print_all_rows=True, print_headers=True)
-
 
     def _manage_buttons_price(self, dialog):
         """ Get selected prices to enable/disable buttons """
@@ -1330,7 +1293,6 @@ class GwPsector:
         tools_gw.connect_signal(self.emit_point.canvasClicked, partial(self._set_price_geom, dialog, tableright), 'psector',
                                 'price_geom_ep_canvasClicked_set_price_geom')
 
-
     def _set_price_geom(self, dialog, tableright, point: QgsPointXY, button):
         """ Add clicked geom to the_geom column for selected prices """
 
@@ -1358,7 +1320,6 @@ class GwPsector:
             msg = "Geometry set correctly."
             tools_qgis.show_info(msg, dialog=dialog)
 
-
     def query_like_widget_text(self, dialog, text_line, qtable, tableleft, tableright, field_id):
         """ Populate the QTableView by filtering through the QLineEdit """
 
@@ -1371,7 +1332,6 @@ class GwPsector:
                f" LIKE '%{query}%' AND {field_id} NOT IN (SELECT price_id FROM {schema_name}.{tableright}"
                f" WHERE psector_id = '{psector_id}')")
         tools_db.fill_table_by_query(qtable, sql)
-
 
     def fill_table(self, dialog, widget, table_name, hidde=False, set_edit_triggers=QTableView.NoEditTriggers,
                    expr=None, feature_type=None, field_id=None, refresh_table=True):
@@ -1429,7 +1389,6 @@ class GwPsector:
                             set_edit_triggers=QTableView.DoubleClicked, expr=expr, feature_type="gully",
                             field_id="gully_id", refresh_table=False)
 
-
     def refresh_table(self, dialog, widget):
         """ Refresh qTableView """
 
@@ -1440,7 +1399,6 @@ class GwPsector:
             row = selected_list[i].row()
             if str(widget.model().record(row).value('tab_general_psector_id')) != tools_qt.get_text(dialog, 'tab_general_psector_id'):
                 widget.hideRow(i)
-
 
     def manage_update_state(self, model, row, record):
         """
@@ -1462,7 +1420,6 @@ class GwPsector:
         # Force a map refresh
         tools_qgis.force_refresh_map_canvas()
 
-
         # self.refresh_table(dialog, widget)
 
         # Get table name via current tab name (arc, node, connec or gully)
@@ -1483,7 +1440,6 @@ class GwPsector:
         #               "psector and needs to be removed from canvas"
         #         tools_qgis.show_warning(msg, dialog=self.dlg_plan_psector)
         #         model.revert()
-
 
     def document_insert(self):
         """ Insert a document related to the current visit """
@@ -1530,7 +1486,6 @@ class GwPsector:
         self.doc_id.clear()
         self.dlg_plan_psector.tbl_document.model().select()
 
-
     def manage_document(self, qtable):
         """ Access GUI to manage documents e.g Execute action of button 34 """
 
@@ -1540,11 +1495,9 @@ class GwPsector:
         dlg_docman.btn_accept.clicked.connect(partial(tools_gw.set_completer_object, dlg_docman, 'doc'))
         tools_qt.remove_tab(dlg_docman.tabwidget, 'tab_rel')
 
-
     def master_new_psector(self, psector_id=None):
         """ Button 51: New psector """
         self.get_psector(psector_id)
-
 
     def manage_psectors(self):
         """ Button 52: Psector management """
@@ -1599,7 +1552,6 @@ class GwPsector:
         tools_gw.open_dialog(self.dlg_psector_mng, dlg_name="psector_manager")
         self.dlg_psector_mng.btn_create.clicked.connect(partial(self.open_psector_dlg))
 
-
     def _show_context_menu_right_click(self, qtableview, pos):
         """ Show custom context menu """
         menu = QMenu(qtableview)
@@ -1633,7 +1585,6 @@ class GwPsector:
         menu.addAction(action_delete)
 
         menu.exec(QCursor.pos())
-
 
     def open_psector_dlg(self):
         self.get_psector()
@@ -1718,7 +1669,6 @@ class GwPsector:
         # Re-open the dialog
         tools_gw.open_dialog(dialog)
 
-
     def _filter_table(self, dialog, table, widget_txt, widget_chk, tablename):
 
         result_select = tools_qt.get_text(dialog, widget_txt)
@@ -1793,7 +1743,6 @@ class GwPsector:
                 visible_feature_ids.append(feature.id())
         self._update_psector_manager_table(visible_feature_ids)
 
-
     def _update_psector_manager_table(self, visible_ids):
         """Filters the table to show only features with IDs in `visible_ids`."""
 
@@ -1809,7 +1758,6 @@ class GwPsector:
 
         # Apply the filter to the model
         model.setFilter(filter_expression)
-
 
     def _enable_layers_for_filtering(self):
         """Ensures `v_edit_plan_psector` is loaded and visible in QGIS."""
@@ -1878,7 +1826,6 @@ class GwPsector:
         # Accept the close event to allow the dialog to close
         tools_gw.close_dialog(self.dlg_psector_mng)
 
-
     def charge_psector(self, qtbl_psm):
 
         selected_list = qtbl_psm.selectionModel().selectedRows()
@@ -1909,7 +1856,6 @@ class GwPsector:
         # Refresh canvas
         tools_qgis.refresh_map_canvas()
 
-
     def _show_psector(self):
 
         selected_rows = self.qtbl_psm.selectionModel().selectedRows()
@@ -1932,7 +1878,6 @@ class GwPsector:
 
         # The SQL procedure manage creating the temporal layers based on the returned features
         tools_qgis.show_success("Psector features loaded successfully on the map.", dialog=self.dlg_psector_mng)
-
 
     def multi_rows_delete(self, dialog, widget, table_name, column_id, label, action):
         """
@@ -2004,7 +1949,6 @@ class GwPsector:
 
         menu.exec(QCursor.pos())
 
-
     def update_price_vdefault(self):
 
         selected_list = self.dlg_merm.tbl_om_result_cat.selectionModel().selectedRows()
@@ -2027,19 +1971,16 @@ class GwPsector:
         # Refresh canvas
         self.iface.mapCanvas().refreshAllLayers()
 
-
     def delete_merm(self, dialog):
         """ Delete selected row from 'manage_prices' dialog from selected tab """
 
         self.multi_rows_delete(dialog, dialog.tbl_om_result_cat, 'plan_result_cat',
                                'result_id', 'lbl_vdefault_price', 'price')
 
-
     def filter_merm(self, dialog, tablename):
         """ Filter rows from 'manage_prices' dialog from selected tab """
 
         self._filter_table(dialog, dialog.tbl_om_result_cat, dialog.txt_name, dialog.chk_active, tablename)
-
 
     def psector_merge(self):
         """ Merges the selected psectors """
@@ -2066,7 +2007,6 @@ class GwPsector:
         tools_qt.set_widget_text(dlg_functions, 'psector_ids', f"{value}")
         tools_qt.set_widget_enabled(dlg_functions, 'psector_ids', False)
 
-
     def psector_duplicate(self):
         """" Button 51: Duplicate psector """
 
@@ -2082,7 +2022,6 @@ class GwPsector:
         self.duplicate_psector.is_duplicated.connect(partial(self.fill_table, self.dlg_psector_mng, self.qtbl_psm, 'v_ui_plan_psector'))
         self.duplicate_psector.is_duplicated.connect(partial(self.set_label_current_psector, self.dlg_psector_mng, scenario_type="psector", from_open_dialog=True))
         self.duplicate_psector.manage_duplicate_psector(psector_id)
-
 
     def set_label_current_psector(self, dialog, scenario_type=None, from_open_dialog=False, result=None):
         """
@@ -2126,7 +2065,6 @@ class GwPsector:
             result = tools_gw.execute_procedure("gw_fct_getselectors", body)
             tools_gw.manage_current_selections_docker(result)
 
-
     def zoom_to_selected_features(self, layer, feature_type=None, zoom=None):
         """ Zoom to selected features of the @layer with @feature_type """
 
@@ -2155,9 +2093,7 @@ class GwPsector:
 
             global_vars.iface.mapCanvas().zoomScale(float(scale))
 
-
     # region private functions
-
 
     def _fill_txt_infolog(self, selected):
         """
@@ -2183,7 +2119,6 @@ class GwPsector:
         # Set message text into widget
         tools_qt.set_widget_text(self.dlg_psector_mng, 'tab_log_txt_infolog', msg)
 
-
     def _refresh_tables_relations(self):
         # Refresh tableview tbl_psector_x_arc, tbl_psector_x_connec, tbl_psector_x_gully
         tools_gw.load_tableview_psector(self.dlg_plan_psector, 'arc')
@@ -2197,7 +2132,6 @@ class GwPsector:
         if self.project_type.upper() == 'UD':
             tools_gw.set_tablemodel_config(self.dlg_plan_psector, "tbl_psector_x_gully", self.tablename_psector_x_gully)
 
-
     def _check_layers_visible(self, layer_name, the_geom, field_id):
         """ Check layers visibility and add it if it is not in the toc """
 
@@ -2206,7 +2140,6 @@ class GwPsector:
             tools_gw.add_layer_database(layer_name, the_geom, field_id)
         if layer and QgsProject.instance().layerTreeRoot().findLayer(layer).isVisible() is False:
             tools_qgis.set_layer_visible(layer, True, True)
-
 
     def _check_for_layers(self):
         """ Return if ALL this layers in the list are checked or not """
@@ -2221,7 +2154,6 @@ class GwPsector:
             if layer is None or QgsProject.instance().layerTreeRoot().findLayer(layer).isVisible() is False:
                 all_checked = False
         return all_checked
-
 
     def _set_to_arc(self, idx):
 
@@ -2246,7 +2178,6 @@ class GwPsector:
                                 'set_to_arc_xyCoordinates_mouse_move_arc')
         tools_gw.connect_signal(self.emit_point.canvasClicked, partial(self._set_arc_id, idx),
                                 'psector', 'set_to_arc_ep_canvasClicked_set_arc_id')
-
 
     def _set_arc_id(self, idx, point, event):
 
@@ -2350,7 +2281,6 @@ class GwPsector:
         tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
         tools_gw.set_model_signals(self)
 
-
     def _replace_arc(self):
 
         if hasattr(self, 'emit_point') and self.emit_point is not None:
@@ -2372,7 +2302,6 @@ class GwPsector:
                                 'replace_arc_xyCoordinates_mouse_move_arc')
         tools_gw.connect_signal(self.emit_point.canvasClicked, self._open_arc_replace_form, 'psector',
                                 'replace_arc_ep_canvasClicked_open_arc_replace_form')
-
 
     def _open_arc_replace_form(self, point):
 
@@ -2454,7 +2383,6 @@ class GwPsector:
         # Open form
         tools_gw.open_dialog(self.dlg_replace_arc, dlg_name="replace_arc")
 
-
     def _set_plan_replace_feature(self):
 
         cmb_value = tools_qt.get_combo_value(self.dlg_replace_arc, self.dlg_replace_arc.cmb_newarccat)
@@ -2496,7 +2424,6 @@ class GwPsector:
                 return
             self.dlg_replace_arc.finished.connect(self.dlg_plan_psector.btn_select_arc.click)
 
-
     def _arc_fusion(self):
 
         if hasattr(self, 'emit_point') and self.emit_point is not None:
@@ -2518,7 +2445,6 @@ class GwPsector:
                                 'arc_fusion_xyCoordinates_mouse_move_node')
         tools_gw.connect_signal(self.emit_point.canvasClicked, self._perform_arc_fusion, 'psector',
                                 'arc_fusion_ep_canvasClicked_open_arc_fusion_form')
-
 
     def _perform_arc_fusion(self, point):
 
@@ -2571,7 +2497,6 @@ class GwPsector:
                 # Refresh tables
                 self._refresh_tables_relations()
 
-
     def _manage_tab_feature_buttons(self):
         tab_idx = self.dlg_plan_psector.tab_feature.currentIndex()
         tablename_map = {0: self.qtbl_arc, 1: self.qtbl_node, 2: self.qtbl_connec, 3: self.qtbl_gully}
@@ -2607,10 +2532,8 @@ class GwPsector:
         elif tab_idx == 3 and self.qtbl_gully.selectionModel().selectedRows():
             self._enable_set_to_arc()
 
-
     def _enable_set_to_arc(self):
         self.dlg_plan_psector.btn_set_to_arc.setEnabled(True)
-
 
     def _mouse_move_arc(self, point):
 
@@ -2627,7 +2550,6 @@ class GwPsector:
         if result.isValid():
             self.snapper_manager.add_marker(result, self.vertex_marker)
 
-
     def _mouse_move_node(self, point):
 
         if not self.layer_node:
@@ -2643,10 +2565,8 @@ class GwPsector:
         if result.isValid():
             self.snapper_manager.add_marker(result, self.vertex_marker)
 
-
     def _reset_snapping(self):
         tools_qgis.disconnect_snapping(True, self.emit_point, self.vertex_marker)
-
 
     def _manage_btn_toggle(self, dialog):
         """ Fill btn_toggle QMenu """
@@ -2664,7 +2584,6 @@ class GwPsector:
 
         dialog.btn_toggle.setMenu(toggle_menu)
 
-
     def _manage_btn_set_to_arc(self, dialog):
         """ Fill btn_set_to_arc QMenu """
 
@@ -2680,7 +2599,6 @@ class GwPsector:
             action.triggered.connect(partial(self._set_to_arc, idx))
 
         dialog.btn_set_to_arc.setMenu(set_to_arc_menu)
-
 
     def _toggle_feature_psector(self, dialog, idx):
         """ Delete features_id to table plan_@feature_type_x_psector"""
@@ -2716,7 +2634,6 @@ class GwPsector:
         tools_gw.load_tableview_psector(dialog, feature_type)
         tools_gw.set_model_signals(self)
 
-
     def _manage_features_geom(self, qtable, feature_type, field_id):
         tools_gw.reset_rubberband(self.rubber_band_op)
         ids = []
@@ -2739,7 +2656,6 @@ class GwPsector:
             return
 
         self.feature_geoms[feature_type] = json_result['body']['data']
-
 
     def _highlight_features_by_id(self, qtable, feature_type, field_id, rubber_band, width, selected, deselected):
 
@@ -2767,7 +2683,6 @@ class GwPsector:
             geom = geoms[_id]['st_astext']
             color = QColor(0, 90, 255, 125)
             tools_qgis.draw_polyline(geom, rubber_band, color, width)
-
 
     def _open_toolbox_function(self, function, signal=None, connect=None):
         """ Execute currently selected function from combobox """
@@ -2995,6 +2910,7 @@ class GwPsector:
 
     # endregion
 
+
 def close_dlg(**kwargs):
     """ Close dialog and disconnect snapping """
     dialog = kwargs["class"]
@@ -3030,6 +2946,7 @@ def close_dlg(**kwargs):
     except RuntimeError:
         pass
 
+
 def enable(**kwargs):
     """ Manage checkbox state and act accordingly with the layers """
     dialog = kwargs["class"]
@@ -3052,6 +2969,7 @@ def enable(**kwargs):
         if dialog.project_type == 'ud':
             dialog._check_layers_visible('v_plan_psector_gully', 'the_geom', 'gully_id')
 
+
 def accept(**kwargs):
     """ Accept button action """
     dialog = kwargs["class"]
@@ -3071,6 +2989,5 @@ def accept(**kwargs):
             msg = "Psector values updated successfully"
             tools_qgis.show_info(msg)
         dialog.my_json = {}
-
 
     dialog.insert_or_update_new_psector(True)

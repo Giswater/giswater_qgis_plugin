@@ -106,7 +106,6 @@ class GwFastprint:
             self.dlg_composer.btn_print.setEnabled(False)
             self.dlg_composer.btn_preview.setEnabled(False)
 
-
     def _get_composer(self, removed=None):
         """ Get all composers from current QGis project """
 
@@ -124,7 +123,6 @@ class GwFastprint:
             composers += '}"'
         return composers
 
-
     def _create_dialog(self, dialog, fields):
 
         for field in fields['fields']:
@@ -132,16 +130,13 @@ class GwFastprint:
             tools_gw.add_widget(dialog, field, label, widget)
             tools_gw.get_values(dialog, widget, self.my_json)
 
-
     def _set_rotation(self, widget):
         """ Set rotation to mapCanvas """
         self.canvas.setRotation(float(widget.text()))
 
-
     def _set_scale(self, widget):
         """ Set zoomScale to mapCanvas """
         self.canvas.zoomScale(float(widget.text()))
-
 
     def __print(self, dialog):
 
@@ -164,7 +159,6 @@ class GwFastprint:
         print_ = getattr(actual_printer, 'print')
         print_(self.printer, QgsLayoutExporter.PrintExportSettings())
 
-
     def _preview(self, dialog, show):
         """ Export values from widgets(only QLineEdit) into dialog, to selected composer
                 if composer.widget.id == dialog.widget.property('columnname')
@@ -181,7 +175,6 @@ class GwFastprint:
         if show:
             self._open_composer(dialog)
 
-
     def _destructor(self):
         self.canvas.setRotation(self.initial_rotation)
         tools_gw.disconnect_signal('print')
@@ -189,7 +182,6 @@ class GwFastprint:
         if self.rubber_band:
             self.canvas.scene().removeItem(self.rubber_band)
             self.rubber_band = None
-
 
     def _check_whidget_exist(self, dialog):
         """ Check if widget exist in composer """
@@ -205,7 +197,6 @@ class GwFastprint:
             elif type(item) == QgsLayoutItemLabel and item is not None:
                 widget.setStyleSheet(None)
 
-
     def _load_composer_values(self, dialog):
         """ Load values from composer into form dialog """
 
@@ -217,7 +208,6 @@ class GwFastprint:
                 item = selected_com.itemById(widget.property('columnname'))
                 if type(item) == QgsLayoutItemLabel:
                     widget.setText(str(item.text()))
-
 
     def _accept(self, dialog, my_json):
 
@@ -295,7 +285,6 @@ class GwFastprint:
 
         return True
 
-
     def _set_widgets_into_composer(self, dialog, field, my_json=None):
         """
         functions called in -> widget.currentIndexChanged.connect(partial(getattr(self, function_name), dialog, my_json))
@@ -331,7 +320,6 @@ class GwFastprint:
 
         return label, widget
 
-
     def _get_current_composer(self):
         """ Get composer selected in QComboBox """
 
@@ -344,7 +332,6 @@ class GwFastprint:
 
         return selected_com
 
-
     def _open_composer(self, dialog):
         """ Open selected composer and load values from composer into form dialog """
 
@@ -354,7 +341,6 @@ class GwFastprint:
 
         self._load_composer_values(dialog)
 
-
     def set_print(self, dialog, my_json):
         """ Function called in def _set_widgets_into_composer(...) -->
             widget.currentIndexChanged.connect(partial(getattr(self, function_name), dialog, my_json)) """
@@ -363,7 +349,6 @@ class GwFastprint:
             self._check_whidget_exist(self.dlg_composer)
             self._load_composer_values(dialog)
             self._accept(dialog, my_json)
-
 
     def _draw_rectangle(self, result, rubber_band):
         """ Draw lines based on geometry """

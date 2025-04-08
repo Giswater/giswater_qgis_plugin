@@ -51,7 +51,6 @@ class ParentAction(object):
         self.rubber_point = None
         self.rubber_polygon = None
 
-
     def init_rubber(self):
 
         try:
@@ -64,13 +63,11 @@ class ParentAction(object):
         except:
             pass
 
-
     def set_controller(self, controller):
         """ Set controller class """
 
         self.controller = controller
         self.schema_name = self.controller.schema_name
-
 
     def open_web_browser(self, dialog, widget=None):
         """ Display url using the default browser """
@@ -83,7 +80,6 @@ class ParentAction(object):
             url = 'http://www.giswater.org'
 
         webbrowser.open(url)
-
 
     def get_plugin_version(self):
         """ Get plugin version from metadata.txt file """
@@ -104,7 +100,6 @@ class ParentAction(object):
 
         return plugin_version
 
-
     def get_file_dialog(self, dialog, widget):
         """ Get file dialog """
 
@@ -124,7 +119,6 @@ class ParentAction(object):
         if folder_path:
             utils_giswater.setWidgetText(dialog, widget, str(folder_path))
 
-
     def get_folder_dialog(self, dialog, widget):
         """ Get folder dialog """
 
@@ -142,7 +136,6 @@ class ParentAction(object):
             parent=None, caption=self.controller.tr(message), directory=folder_path)
         if folder_path:
             utils_giswater.setWidgetText(dialog, widget, str(folder_path))
-
 
     def load_settings(self, dialog=None):
         """ Load QGIS settings related with dialog position and size """
@@ -170,7 +163,6 @@ class ParentAction(object):
         except:
             pass
 
-
     def save_settings(self, dialog=None):
         """ Save QGIS settings related with dialog position and size """
 
@@ -182,7 +174,6 @@ class ParentAction(object):
         self.controller.plugin_settings_set_value(dialog.objectName() + "_x", dialog.pos().x() + 8)
         self.controller.plugin_settings_set_value(dialog.objectName() + "_y", dialog.pos().y() + 31)
 
-
     def get_last_tab(self, dialog, selector_name):
         """ Get the name of the last tab used by the user from QSettings()
         :param dialog: QDialog
@@ -192,7 +183,6 @@ class ParentAction(object):
 
         tab_name = self.controller.plugin_settings_value(f"{dialog.objectName()}_{selector_name}")
         return tab_name
-
 
     def save_current_tab(self, dialog, tab_widget, selector_name):
         """ Save the name of current tab used by the user into QSettings()
@@ -207,7 +197,6 @@ class ParentAction(object):
             tab_name = tab.objectName()
             dlg_name = dialog.objectName()
             self.controller.plugin_settings_set_value(f"{dlg_name}_{selector_name}", tab_name)
-
 
     def open_dialog(self, dlg=None, dlg_name=None, info=True, maximize_button=True, stay_on_top=True, title=None):
         """ Open dialog """
@@ -249,7 +238,6 @@ class ParentAction(object):
         else:
             dlg.show()
 
-
     def close_dialog(self, dlg=None):
         """ Close dialog """
 
@@ -266,7 +254,6 @@ class ParentAction(object):
             pass
         except Exception as e:
             self.controller.log_info(type(e).__name__)
-
 
     def multi_row_selector(self, dialog, tableleft, tableright, field_id_left, field_id_right, name='name',
                            hide_left=[0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22,
@@ -330,7 +317,6 @@ class ParentAction(object):
         tbl_selected_rows.horizontalHeader().sectionClicked.connect(
             partial(self.order_by_column, tbl_selected_rows, query_right))
 
-
     def order_by_column(self, qtable, query, idx):
         """
         :param qtable: QTableView widget
@@ -344,7 +330,6 @@ class ParentAction(object):
         query += f" ORDER BY {col_to_sort} {oder_by[sort_order]}"
         self.fill_table_by_query(qtable, query)
         self.refresh_map_canvas()
-
 
     def fill_table(self, widget, table_name, set_edit_strategy=QSqlTableModel.OnManualSubmit, expr_filter=None):
         """ Set a model with selected filter.
@@ -369,7 +354,6 @@ class ParentAction(object):
         if expr_filter:
             widget.model().setFilter(expr_filter)
 
-
     def fill_table_by_query(self, qtable, query):
         """
         :param qtable: QTableView to show
@@ -385,7 +369,6 @@ class ParentAction(object):
         if model.lastError().isValid():
             self.controller.show_warning(model.lastError().text())
 
-
     def set_icon(self, widget, icon):
         """ Set @icon to selected @widget """
 
@@ -396,7 +379,6 @@ class ParentAction(object):
             widget.setIcon(QIcon(icon_path))
         else:
             self.controller.log_info("File not found", parameter=icon_path)
-
 
     def check_expression(self, expr_filter, log_info=False):
         """ Check if expression filter @expr_filter is valid """
@@ -411,7 +393,6 @@ class ParentAction(object):
 
         return True, expr
 
-
     def refresh_map_canvas(self, restore_cursor=False):
         """ Refresh all layers present in map canvas """
 
@@ -422,16 +403,13 @@ class ParentAction(object):
         if restore_cursor:
             self.set_cursor_restore()
 
-
     def set_cursor_wait(self):
         """ Change cursor to 'WaitCursor' """
         QApplication.setOverrideCursor(Qt.WaitCursor)
 
-
     def set_cursor_restore(self):
         """ Restore to previous cursors """
         QApplication.restoreOverrideCursor()
-
 
     def get_cursor_multiple_selection(self):
         """ Set cursor for multiple selection """
@@ -444,7 +422,6 @@ class ParentAction(object):
             cursor = QCursor(Qt.ArrowCursor)
 
         return cursor
-
 
     def set_table_columns(self, dialog, widget, table_name, sort_order=0, isQStandardItemModel=False, qt_order=Qt.AscendingOrder):
         """ Configuration of tables. Set visibility and width of columns """
@@ -485,7 +462,6 @@ class ParentAction(object):
 
         return widget
 
-
     def connect_signal_selection_changed(self, option):
         """ Connect signal selectionChanged """
 
@@ -497,7 +473,6 @@ class ParentAction(object):
         except Exception:
             pass
 
-
     def disconnect_signal_selection_changed(self):
         """ Disconnect signal selectionChanged """
 
@@ -508,7 +483,6 @@ class ParentAction(object):
         finally:
             self.iface.actionPan().trigger()
 
-
     def set_label_current_psector(self, dialog):
 
         sql = ("SELECT t1.name FROM plan_psector AS t1 "
@@ -518,7 +492,6 @@ class ParentAction(object):
         if not row:
             return
         utils_giswater.setWidgetText(dialog, 'lbl_vdefault_psector', row[0])
-
 
     def multi_rows_delete(self, widget, table_name, column_id):
         """ Delete selected elements of the table
@@ -552,7 +525,6 @@ class ParentAction(object):
             self.controller.execute_sql(sql)
             widget.model().select()
 
-
     def select_features_by_expr(self, layer, expr):
         """ Select features of @layer applying @expr """
 
@@ -570,7 +542,6 @@ class ParentAction(object):
             else:
                 layer.removeSelection()
 
-
     def hide_void_groupbox(self, dialog):
         """ Hide empty groupbox """
 
@@ -584,7 +555,6 @@ class ParentAction(object):
                 grbox.setVisible(False)
 
         return grb_list
-
 
     def zoom_to_selected_features(self, layer, geom_type=None, zoom=None):
         """ Zoom to selected features of the @layer with @geom_type """
@@ -614,7 +584,6 @@ class ParentAction(object):
 
             self.iface.mapCanvas().zoomScale(float(scale))
 
-
     def make_list_for_completer(self, sql):
         """ Prepare a list with the necessary items for the completer
         :param sql: Query to be executed, where will we get the list of items (string)
@@ -627,7 +596,6 @@ class ParentAction(object):
             for row in rows:
                 list_items.append(str(row[0]))
         return list_items
-
 
     def set_completer_lineedit(self, qlineedit, list_items):
         """ Set a completer into a QLineEdit
@@ -645,7 +613,6 @@ class ParentAction(object):
         model = QStringListModel()
         model.setStringList(list_items)
         completer.setModel(model)
-
 
     def get_max_rectangle_from_coords(self, list_coord):
         """ Returns the minimum rectangle(x1, y1, x2, y2) of a series of coordinates
@@ -672,21 +639,17 @@ class ParentAction(object):
 
         return max_x, max_y, min_x, min_y
 
-
     def zoom_to_rectangle(self, x1, y1, x2, y2, margin=5):
 
         rect = QgsRectangle(float(x1) - margin, float(y1) - margin, float(x2) + margin, float(y2) + margin)
         self.canvas.setExtent(rect)
         self.canvas.refresh()
 
-
     def set_wait_cursor(self):
         QApplication.instance().setOverrideCursor(Qt.WaitCursor)
 
-
     def set_arrow_cursor(self):
         QApplication.instance().setOverrideCursor(Qt.ArrowCursor)
-
 
     def delete_layer_from_toc(self, layer_name):
         """ Delete layer from toc if exist """
@@ -709,7 +672,6 @@ class ParentAction(object):
                     root.removeChildNode(group)
             self.delete_layer_from_toc(layer_name)
 
-
     def create_body(self, form='', feature='', filter_fields='', extras=None):
         """ Create and return parameters as body to functions"""
 
@@ -726,13 +688,11 @@ class ParentAction(object):
 
         return body
 
-
     def get_composers_list(self):
 
         layour_manager = QgsProject.instance().layoutManager().layouts()
         active_composers = [layout for layout in layour_manager]
         return active_composers
-
 
     def get_composer_index(self, name):
 
@@ -745,7 +705,6 @@ class ParentAction(object):
             index += 1
 
         return index
-
 
     def set_restriction(self, dialog, widget_to_ignore, restriction):
         """
@@ -769,7 +728,6 @@ class ParentAction(object):
                 elif type(widget) in (QComboBox, QCheckBox, QTableView, QPushButton):
                     widget.setEnabled(False)
 
-
     def set_dates_from_to(self, widget_from, widget_to, table_name, field_from, field_to):
 
         sql = (f"SELECT MIN(LEAST({field_from}, {field_to})),"
@@ -787,7 +745,6 @@ class ParentAction(object):
             else:
                 widget_to.setDate(current_date)
 
-
     def get_values_from_catalog(self, table_name, typevalue, order_by='id'):
 
         sql = (f"SELECT id, idval"
@@ -796,7 +753,6 @@ class ParentAction(object):
                f" ORDER BY {order_by}")
         rows = self.controller.get_rows(sql)
         return rows
-
 
     def integer_validator(self, value, widget, btn_accept):
         """ Check if the value is an integer or not.
@@ -811,7 +767,6 @@ class ParentAction(object):
             widget.setStyleSheet("border: 1px solid red")
             btn_accept.setEnabled(False)
 
-
     def double_validator(self, value, widget, btn_accept):
         """ Check if the value is double or not.
             This function is called in def set_datatype_validator(self, value, widget, btn)
@@ -824,7 +779,6 @@ class ParentAction(object):
         else:
             widget.setStyleSheet("border: 1px solid red")
             btn_accept.setEnabled(False)
-
 
     def load_qml(self, layer, qml_path):
         """ Apply QML style located in @qml_path in @layer """
@@ -845,14 +799,12 @@ class ParentAction(object):
 
         return True
 
-
     def open_file_path(self, filter_="All (*.*)"):
         """ Open QFileDialog """
         msg = self.controller.tr("Select DXF file")
         path, filter_ = QFileDialog.getOpenFileName(None, msg, "", filter_)
 
         return path, filter_
-
 
     def show_exceptions_msg(self, title, msg=""):
 
@@ -863,8 +815,6 @@ class ParentAction(object):
         self.dlg_info.setWindowTitle(title)
         utils_giswater.setWidgetText(self.dlg_info, self.dlg_info.txt_infolog, msg)
         self.open_dialog(self.dlg_info, dlg_name='dialog_text', title=title)
-
-
 
     def put_combobox(self, qtable, rows, field, widget_pos, combo_values):
         """ Set one column of a QtableView as QComboBox with values from database.
@@ -888,7 +838,6 @@ class ParentAction(object):
             qtable.setIndexWidget(idx, combo)
             combo.currentIndexChanged.connect(partial(self.update_status, combo, qtable, x, widget_pos))
 
-
     def update_status(self, combo, qtable, pos_x, widget_pos):
         """ Update values from QComboBox to QTableView
         :param combo: QComboBox from which we will take the value
@@ -904,7 +853,6 @@ class ParentAction(object):
         i = qtable.model().index(pos_x, widget_pos + 1)
         qtable.model().setData(i, elem[1])
 
-
     def get_feature_by_id(self, layer, id_, field_id):
 
         expr = "" + str(field_id) + "= '" + str(id_) + "'"
@@ -913,7 +861,6 @@ class ParentAction(object):
             if str(feature[field_id]) == str(id_):
                 return feature
         return False
-
 
     def document_insert(self, dialog, tablename, field, field_value):
         """ Insert a document related to the current visit
@@ -949,7 +896,6 @@ class ParentAction(object):
 
         dialog.tbl_document.model().select()
 
-
     def document_open(self, qtable):
         """ Open selected document """
 
@@ -976,7 +922,6 @@ class ParentAction(object):
                 subprocess.call([opener, path])
         else:
             webbrowser.open(path)
-
 
     def document_delete(self, qtable, tablename):
         """ Delete record from selected rows in tbl_document """
@@ -1008,7 +953,6 @@ class ParentAction(object):
                 self.controller.show_info(message)
                 qtable.model().select()
 
-
     def get_all_actions(self):
 
         actions_list = self.iface.mainWindow().findChildren(QAction)
@@ -1016,10 +960,8 @@ class ParentAction(object):
             self.controller.log_info(str(action.objectName()))
             action.triggered.connect(partial(self.show_action_name, action))
 
-
     def show_action_name(self, action):
         self.controller.log_info(str(action.objectName()))
-
 
     def get_points(self, list_coord=None):
         """ Return list of QgsPoints taken from geometry
@@ -1036,7 +978,6 @@ class ParentAction(object):
             points.append(point)
 
         return points
-
 
     def hilight_feature_by_id(self, qtable, layer_name, field_id, width, index):
         """ Based on the received index and field_id, the id of the received field_id is searched within the table
@@ -1059,7 +1000,6 @@ class ParentAction(object):
         except AttributeError:
             pass
 
-
     def draw_polyline(self, points, color=QColor(255, 0, 0, 100), width=5, duration_time=None):
         """ Draw 'line' over canvas following list of points
          :param duration_time: integer milliseconds ex: 3000 for 3 seconds
@@ -1081,7 +1021,6 @@ class ParentAction(object):
 
         return rb
 
-
     def resetRubberbands(self):
 
         if self.rubber_polygon is None:
@@ -1089,7 +1028,6 @@ class ParentAction(object):
 
         self.rubber_point.reset(0)
         self.rubber_polygon.reset(2)
-
 
     def restore_user_layer(self):
 
@@ -1099,7 +1037,6 @@ class ParentAction(object):
             layer = self.controller.get_layer_by_tablename('v_edit_node')
             if layer:
                 self.iface.setActiveLayer(layer)
-
 
     def set_style_mapzones(self):
 

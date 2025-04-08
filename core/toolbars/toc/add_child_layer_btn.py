@@ -26,11 +26,9 @@ class GwAddChildLayerButton(GwAction):
 
         super().__init__(icon_path, action_name, text, toolbar, action_group)
 
-
     def clicked_event(self):
 
         self._add_child_layer()
-
 
     # region private functions
 
@@ -132,14 +130,12 @@ class GwAddChildLayerButton(GwAction):
 
         main_menu.exec_(click_point)
 
-
     def _manage_load_all(self, menu, state=None):
 
         if state == 2:
             for child in menu.actions():
                 if not child.isChecked():
                     child.defaultWidget().setChecked(True)
-
 
     def _check_action_ischecked(self, tablename, the_geom=None, field_id=None, group=None,
                                 sub_group=None, sub_sub_group=None, alias=None, state=None):

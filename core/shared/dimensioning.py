@@ -33,7 +33,6 @@ class GwDimensioning:
         self.vertex_marker = self.snapper_manager.vertex_marker
         self.vertex_marker.setIconType(QgsVertexMarker.ICON_CIRCLE)
 
-
     def open_dimensioning_form(self, qgis_feature=None, layer=None, db_return=None, fid=None, rubber_band=None):
 
         self.dlg_dim = GwDimensioningUi(self)
@@ -151,9 +150,7 @@ class GwDimensioning:
         tools_gw.open_dialog(self.dlg_dim, dlg_name='dimensioning', title=title)
         return False, False
 
-
     # region private functions
-
 
     def _cancel_dimensioning(self, action_snapping, action_orientation):
 
@@ -165,7 +162,6 @@ class GwDimensioning:
         tools_qgis.restore_user_layer('v_edit_node', self.user_current_layer)
         tools_gw.disconnect_signal('dimensioning')
         tools_gw.close_dialog(self.dlg_dim)
-
 
     def _save_dimensioning(self, qgis_feature, layer, close_dlg=True):
 
@@ -191,7 +187,6 @@ class GwDimensioning:
                 continue
             fields += f'"{widget_name}":{widget_value},'
 
-
         list_widgets = self.dlg_dim.findChildren(QComboBox)
         for widget in list_widgets:
             widget_name = widget.property('columnname')
@@ -213,7 +208,6 @@ class GwDimensioning:
         if close_dlg:
             tools_gw.close_dialog(self.dlg_dim)
 
-
     def _deactivate_signals(self, action, emit_point=None):
 
         self.vertex_marker.hide()
@@ -233,7 +227,6 @@ class GwDimensioning:
 
         return False
 
-
     def _manage_edition(self, action, qgis_feature, layer):
 
         if action.isChecked():
@@ -248,7 +241,6 @@ class GwDimensioning:
                 tools_qt.set_action_checked(action, True)
                 return
             self._save_dimensioning(qgis_feature, layer, close_dlg=False)
-
 
     def _snapping(self, action):
 
@@ -271,7 +263,6 @@ class GwDimensioning:
         tools_gw.connect_signal(emit_point.canvasClicked, partial(self._click_button_snapping, action, emit_point),
                                 'dimensioning', 'snapping_ep_canvasClicked_click_button_snapping')
 
-
     def _mouse_move(self, point):
 
         # Hide marker and get coordinates
@@ -285,7 +276,6 @@ class GwDimensioning:
             # Check feature
             if layer == self.layer_node or layer == self.layer_connec:
                 self.snapper_manager.add_marker(result, self.vertex_marker)
-
 
     def _click_button_snapping(self, action, emit_point, point, btn):
 
@@ -356,7 +346,6 @@ class GwDimensioning:
             self._deactivate_signals(action, emit_point)
             action.setChecked(False)
 
-
     def _orientation(self, action):
 
         tools_gw.disconnect_signal('dimensioning', 'orientation_ep_canvasClicked_click_button_orientation')
@@ -376,7 +365,6 @@ class GwDimensioning:
         tools_gw.connect_signal(emit_point.canvasClicked, partial(self._click_button_orientation, action, emit_point),
                                 'dimensioning', 'orientation_ep_canvasClicked_click_button_orientation')
 
-
     def _canvas_move_event(self, point):
 
         # Get clicked point
@@ -385,7 +373,6 @@ class GwDimensioning:
         result = self.snapper_manager.snap_to_project_config_layers(event_point)
         if self.snapper_manager.result_is_valid():
             self.snapper_manager.add_marker(result, self.vertex_marker)
-
 
     def _click_button_orientation(self, action, emit_point, point, btn):
 
@@ -409,7 +396,6 @@ class GwDimensioning:
         self._deactivate_signals(action, emit_point)
         action.setChecked(False)
 
-
     def _create_map_tips(self):
         """ Create MapTips on the map """
 
@@ -432,7 +418,6 @@ class GwDimensioning:
         tools_gw.connect_signal(self.timer_map_tips_clear.timeout, self._clear_map_tip,
                                 'dimensioning', 'create_map_tips_timer_map_tips_clear_timeout_clear_map_tip')
 
-
     def _map_tip_changed(self, point):
         """ SLOT. Initialize the Timer to show MapTips on the map """
 
@@ -441,7 +426,6 @@ class GwDimensioning:
             self.map_tip_node.clear(self.canvas)
             self.map_tip_connec.clear(self.canvas)
             self.timer_map_tips.start(100)
-
 
     def _show_map_tip(self):
         """ Show MapTips on the map """
@@ -456,14 +440,12 @@ class GwDimensioning:
                 self.map_tip_connec.showMapTip(self.layer_connec, point_qgs, point_qt, self.canvas)
             self.timer_map_tips_clear.start(1000)
 
-
     def _clear_map_tip(self):
         """ Clear MapTips """
 
         self.timer_map_tips_clear.stop()
         self.map_tip_node.clear(self.canvas)
         self.map_tip_connec.clear(self.canvas)
-
 
     def _set_widgets(self, dialog, db_return, field):
 

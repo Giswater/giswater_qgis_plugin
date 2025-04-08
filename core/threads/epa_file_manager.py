@@ -37,7 +37,6 @@ class GwEpaFileManager(GwTask):
         self.initialize_variables()
         self.set_variables_from_go2epa()
 
-
     def initialize_variables(self):
 
         self.exception = None
@@ -47,7 +46,6 @@ class GwEpaFileManager(GwTask):
         self.function_failed = False
         self.complet_result = None
         self.replaced_velocities = False
-
 
     def set_variables_from_go2epa(self):
         """ Set variables from object Go2Epa """
@@ -60,7 +58,6 @@ class GwEpaFileManager(GwTask):
         self.go2epa_execute_epa = getattr(self.go2epa, 'exec_epa', None)
         self.go2epa_import_result = getattr(self.go2epa, 'import_result', None)
         self.export_subcatch = getattr(self.go2epa, 'export_subcatch', True)
-
 
     def run(self):
 
@@ -98,7 +95,6 @@ class GwEpaFileManager(GwTask):
             status = self._import_rpt()
 
         return status
-
 
     def finished(self, result):
 
@@ -185,13 +181,11 @@ class GwEpaFileManager(GwTask):
         if lib_vars.session_vars['last_error']:
             tools_qt.show_exception_message(msg=lib_vars.session_vars['last_error_msg'])
 
-
     def cancel(self):
 
         tools_qgis.show_info(f"Task canceled - {self.description()}")
         self._close_file()
         super().cancel()
-
 
     def _close_file(self, file=None):
 
@@ -204,7 +198,6 @@ class GwEpaFileManager(GwTask):
                 del file
         except Exception:
             pass
-
 
     # region private functions
 
@@ -252,7 +245,6 @@ class GwEpaFileManager(GwTask):
 
         return status
 
-
     def _export_inp(self):
 
         if self.isCanceled():
@@ -275,7 +267,6 @@ class GwEpaFileManager(GwTask):
         self.common_msg += "Export INP finished. "
 
         return True
-
 
     def _fill_inp_file(self, folder_path=None, all_rows=None):
 
@@ -340,7 +331,6 @@ class GwEpaFileManager(GwTask):
             if save_file is False:
                 os.remove(aditional_path)
 
-
     def _execute_epa(self):
 
         if self.isCanceled():
@@ -383,7 +373,6 @@ class GwEpaFileManager(GwTask):
 
         return True
 
-
     def _import_rpt(self):
         """ Import result file """
 
@@ -404,7 +393,6 @@ class GwEpaFileManager(GwTask):
             self.error_msg = str(e)
         finally:
             return status
-
 
     def _read_rpt_file(self, file_path:str = None):
 
@@ -535,7 +523,6 @@ class GwEpaFileManager(GwTask):
         del full_file
 
         return True
-
 
     def _exec_import_function(self):
         """ Call function gw_fct_rpt2pg_main """

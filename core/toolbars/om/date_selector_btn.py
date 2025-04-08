@@ -23,13 +23,10 @@ class GwDateSelectorButton(GwAction):
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
         super().__init__(icon_path, action_name, text, toolbar, action_group)
 
-
     def clicked_event(self):
         self._open_date_selector()
 
-
     # region private functions
-
 
     def _open_date_selector(self):
 
@@ -47,7 +44,6 @@ class GwDateSelectorButton(GwAction):
         tools_qt.set_calendar(self.dlg_selector_date, self.widget_date_from, self.from_date)
         tools_qt.set_calendar(self.dlg_selector_date, self.widget_date_to, self.to_date)
         tools_gw.open_dialog(self.dlg_selector_date, dlg_name="selector_date")
-
 
     def _update_dates_into_db(self):
         """ Insert or update dates into database """
@@ -73,7 +69,6 @@ class GwDateSelectorButton(GwAction):
         tools_gw.close_dialog(self.dlg_selector_date)
         tools_qgis.refresh_map_canvas()
 
-
     def _update_date_to(self):
         """ If 'date from' is upper than 'date to' set 'date to' 1 day more than 'date from' """
 
@@ -83,7 +78,6 @@ class GwDateSelectorButton(GwAction):
             to_date = self.widget_date_from.date().addDays(1).toString('yyyy-MM-dd')
             tools_qt.set_calendar(self.dlg_selector_date, self.widget_date_to, datetime.strptime(to_date, '%Y-%m-%d'))
 
-
     def _update_date_from(self):
         """ If 'date to' is lower than 'date from' set 'date from' 1 day less than 'date to' """
 
@@ -92,7 +86,6 @@ class GwDateSelectorButton(GwAction):
         if to_date <= from_date:
             from_date = self.widget_date_to.date().addDays(-1).toString('yyyy-MM-dd')
             tools_qt.set_calendar(self.dlg_selector_date, self.widget_date_from, datetime.strptime(from_date, '%Y-%m-%d'))
-
 
     def _get_default_dates(self):
         """ Load the dates from the DB for the current_user and set vars (self.from_date, self.to_date) """

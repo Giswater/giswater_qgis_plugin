@@ -71,7 +71,6 @@ class GwMincutTools:
         self.tbl_mincut_edit.setContextMenuPolicy(Qt.CustomContextMenu)
         self.tbl_mincut_edit.customContextMenuRequested.connect(partial(tools_gw._show_context_menu, self.tbl_mincut_edit, self.dlg_mincut_man))
 
-
     def load_connections(self, complet_result, filter_fields=''):
         list_tables = self.dlg_mincut_man.findChildren(QTableView)
         complet_list = []
@@ -279,6 +278,7 @@ def delete_mincut(**kwargs):
         if layer is not None:
             layer.triggerRepaint()
 
+
 def _reload_table(dialog, complet_result):
     """ Get inserted element_id and add it to current feature """
 
@@ -308,6 +308,7 @@ def _reload_table(dialog, complet_result):
         complet_list, widget_list = tools_backend_calls.fill_tbl(complet_result, dialog, widgetname, linkedobject, filter_fields)
         if complet_list is False:
             return False
+
 
 def cancel_mincut(**kwargs):
 

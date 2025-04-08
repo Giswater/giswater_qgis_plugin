@@ -19,7 +19,6 @@ class GwDocumentButton(GwAction):
         self.feature_type = feature_type
         self.document = GwDocument()
 
-
     def clicked_event(self):
         self.document.get_document(list_tabs=self.list_tabs, doc_tables=self.doc_tables, feature_type=self.feature_type)
 

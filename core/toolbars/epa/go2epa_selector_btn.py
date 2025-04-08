@@ -11,6 +11,7 @@ from ...utils import tools_gw
 from .... import global_vars
 from ....libs import tools_qt, tools_db, tools_qgis, tools_os
 
+
 class GwGo2EpaSelectorButton(GwAction):
     """ Button 44: Go2epa selector """
 
@@ -18,7 +19,6 @@ class GwGo2EpaSelectorButton(GwAction):
 
         super().__init__(icon_path, action_name, text, toolbar, action_group)
         self.project_type = global_vars.project_type
-
 
     def clicked_event(self):
         """ Button 44: Epa result selector """

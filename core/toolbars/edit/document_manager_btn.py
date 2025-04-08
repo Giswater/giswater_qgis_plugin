@@ -16,6 +16,5 @@ class GwDocumentManagerButton(GwAction):
         super().__init__(icon_path, action_name, text, toolbar, action_group)
         self.document = GwDocument()
 
-
     def clicked_event(self):
         self.document.manage_documents()

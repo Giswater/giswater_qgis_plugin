@@ -23,7 +23,6 @@ class GwI18NGenerator:
         self.plugin_dir = lib_vars.plugin_dir
         self.schema_name = lib_vars.schema_name
 
-
     def init_dialog(self):
         """ Constructor """
 
@@ -41,7 +40,6 @@ class GwI18NGenerator:
         self.dlg_qm.cmb_language.currentIndexChanged.connect(partial(self._set_editability_dbmessage))
         tools_gw.open_dialog(self.dlg_qm, dlg_name='admin_translation')
 
-
     def pass_schema_info(self, schema_info, schema_name):
         self.project_type = schema_info['project_type']
         self.project_epsg = schema_info['project_epsg']
@@ -50,7 +48,6 @@ class GwI18NGenerator:
         self.schema_name = schema_name
 
     # region private functions
-
 
     def _check_connection(self):
         """ Check connection to database """
@@ -71,7 +68,6 @@ class GwI18NGenerator:
             return
         self._populate_cmb_language()
 
-
     def _populate_cmb_language(self):
         """ Populate combo with languages values """
 
@@ -84,7 +80,6 @@ class GwI18NGenerator:
         language = tools_gw.get_config_parser('i18n_generator', 'qm_lang_language', "user", "init", False)
 
         tools_qt.set_combo_value(self.dlg_qm.cmb_language, language, 0)
-
 
     def _check_translate_options(self):
         """ Check the translation options selected by the user """
@@ -131,7 +126,6 @@ class GwI18NGenerator:
         if msg != '':
             tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', msg)
 
-
     def _create_py_files(self):
         """ Read the values of the database and generate the ts and qm files """
 
@@ -144,7 +138,6 @@ class GwI18NGenerator:
 
         # Get python messages values
         
-
         # Get python toolbars and buttons values
         if self.lower_lang == 'en_us':
             sql = f"SELECT source, ms_en_us FROM i18n.pymessage;" # ADD new columns
@@ -166,8 +159,6 @@ class GwI18NGenerator:
                 f" FROM i18n.pydialog"
                 f" ORDER BY dialog_name;")
             py_dialogs = self._get_rows(sql)
-
-        
 
         ts_path = self.plugin_dir + os.sep + 'i18n' + os.sep + f'giswater_{self.language}.ts'
 
@@ -253,7 +244,6 @@ class GwI18NGenerator:
                 if py_tlb[key_label] is None:
                     py_dlg[key_label] = py_dlg['lb_en_us']
                 
-
             line += f"\t\t\t<translation>{py_dlg[key_label]}</translation>\n"
             line += f"\t\t</message>\n"
 
@@ -283,7 +273,6 @@ class GwI18NGenerator:
         else:
             return False
 
-
     def _get_title(self, py_dialogs, name, key_label):
         """ Return title's according language """
 
@@ -299,7 +288,6 @@ class GwI18NGenerator:
                     return title
                 return title
         return title
-
 
     def _create_db_files(self):
         """ Read the values of the database and update the i18n files """
@@ -339,7 +327,6 @@ class GwI18NGenerator:
 
         return True
 
-    
     def _create_i18n_files(self):
         """ Read the values of the database and update the i18n files """
 
@@ -350,7 +337,6 @@ class GwI18NGenerator:
         file_name = f'dml.sql'
         file_name_ws = f'ws_dml.sql'
         file_name_ud = f'ud_dml.sql'
-
 
         # Check if file exist
         if os.path.exists(cfg_path + file_name):
@@ -391,7 +377,6 @@ class GwI18NGenerator:
         #self._write_dbfprocess_values_i18n(rows, cfg_path + file_name)
 
         return True, ""
-
 
     def _check_missing_dbmessage_values(self):
         """ Get db message values from schema_name """
@@ -455,7 +440,6 @@ class GwI18NGenerator:
             return False
         return rows
 
-
     def _get_dbdialog_values_i18n(self):
         """ Get db dialog values """
         if self.lower_lang == 'en_us':
@@ -476,7 +460,6 @@ class GwI18NGenerator:
             return False
         return rows
     
-    
     def _get_dbmessages_values_i18n(self):
         """ Get db messages values """
         if self.lower_lang == 'en_us':
@@ -491,7 +474,6 @@ class GwI18NGenerator:
         if not rows:
             return False
         return rows
-    
     
     def _write_config_form_fields_updates(self, rows, path): ## Parlar amb edgar
         """
@@ -515,7 +497,6 @@ class GwI18NGenerator:
         file.close()
         del file
 
-  
     def _write_dbdialog_values_i18n(self, rows, path):
         """
         Generate a string and write into file
@@ -582,7 +563,6 @@ class GwI18NGenerator:
         file.close()
         del file
 
-    
     def _write_dbmessages_values_i18n(self, rows, path):
         """
         Generate a string and write into file
@@ -601,7 +581,6 @@ class GwI18NGenerator:
             log_level = row['log_level'] if row['log_level'] is not None else 2
             ms_value = row.get(f'ms_{self.lower_lang}') or row.get(f'auto_ms_{self.lower_lang}') or row.get('ms_en_us')
             ht_value = row.get(f'ht_{self.lower_lang}') or row.get(f'auto_ht_{self.lower_lang}') or row.get('ht_en_us') or ""
-
 
             # Check invalid characters
             if ms_value is not None:
@@ -659,7 +638,6 @@ class GwI18NGenerator:
         file.close()
         del file
 
-    
     def _write_header(self, path):
         """
         Write the file header
@@ -697,7 +675,6 @@ class GwI18NGenerator:
         tools_gw.set_config_parser('i18n_generator', 'qm_lang_py_msg', f"{py_msg}", "user", "init", prefix=False)
         tools_gw.set_config_parser('i18n_generator', 'qm_lang_db_msg', f"{db_msg}", "user", "init", prefix=False)
 
-
     def _load_user_values(self):
         """
         Load last selected user values
@@ -717,7 +694,6 @@ class GwI18NGenerator:
         tools_qt.set_checked(self.dlg_qm, self.dlg_qm.chk_py_msg, py_msg)
         tools_qt.set_checked(self.dlg_qm, self.dlg_qm.chk_db_msg, db_msg)
 
-
     def _init_db(self, host, port, db, user, password):
         """ Initializes database connection """
 
@@ -732,7 +708,6 @@ class GwI18NGenerator:
             status = False
 
         return status
-
 
     def _close_db(self):
         """ Close database connection """
@@ -751,16 +726,13 @@ class GwI18NGenerator:
 
         return status
 
-
     def _commit(self):
         """ Commit current database transaction """
         self.conn.commit()
 
-
     def _rollback(self):
         """ Rollback current database transaction """
         self.conn.rollback()
-
 
     def _get_rows(self, sql, commit=True):
         """ Get multiple rows from selected query """
@@ -779,7 +751,6 @@ class GwI18NGenerator:
         finally:
             return rows
 
-
     def _replace_invalid_characters(self, param):
         """
         This function replaces the characters that break JSON messages
@@ -792,7 +763,6 @@ class GwI18NGenerator:
 
         return param
     
-    
     def _replace_invalid_quotation_marks(self, param):
         """
         This function replaces the characters that break JSON messages
@@ -802,7 +772,6 @@ class GwI18NGenerator:
         param = re.sub(r"(?<!')'(?!')", "''", param)
 
         return param
-
 
     def _set_editability_dbmessage(self):
 

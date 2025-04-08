@@ -67,7 +67,7 @@ class GwImportEpanet:
             import wntr
             from ....threads.import_inp import parse_epanet_task
 
-            global Catalogs, GwParseInpTask
+            global Catalogs, GwParseInpTask  # noqa: F824
             Catalogs = parse_epanet_task.Catalogs
             GwParseInpTask = parse_epanet_task.GwParseInpTask
 
@@ -97,7 +97,7 @@ class GwImportEpanet:
         )
         tools_gw.open_dialog(self.dlg_inp_parsing, dlg_name="parse_inp")
 
-        global GwParseInpTask
+        global GwParseInpTask  # noqa: F824
         self.parse_inp_task = GwParseInpTask(
             "Parse INP task", file_path, self.dlg_inp_parsing
         )
@@ -136,7 +136,7 @@ class GwImportEpanet:
         self.dlg_config.btn_accept.clicked.connect(self._importinp_accept)
 
         # Get catalogs from thread
-        global Catalogs
+        global Catalogs  # noqa: F824
         self.catalogs: Catalogs = self.parse_inp_task.catalogs
 
         fill_txt_info(self, self.dlg_config)
@@ -225,7 +225,6 @@ class GwImportEpanet:
                 result = tools_db.execute_sql(sql, commit=force_commit)
                 if not result:
                     return
-
 
             # Set variables
             workcat = "import_inp_test"

@@ -27,11 +27,9 @@ class GwWorkspaceManagerButton(GwAction):
 
         super().__init__(icon_path, action_name, text, toolbar, action_group)
 
-
     def clicked_event(self):
 
         self._open_workspace_manager()
-
 
     # region private functions
 
@@ -70,7 +68,6 @@ class GwWorkspaceManagerButton(GwAction):
         # Open dialog
         tools_gw.open_dialog(self.dlg_workspace_manager, 'workspace_manager')
 
-
     def _open_update_workspace_dlg(self):
 
         # Create workspace dialog
@@ -107,7 +104,6 @@ class GwWorkspaceManagerButton(GwAction):
         # Open the dialog
         tools_gw.open_dialog(self.dlg_create_workspace, 'workspace_create')
 
-
     def _open_create_workspace_dlg(self):
 
         # Create workspace dialog
@@ -127,7 +123,6 @@ class GwWorkspaceManagerButton(GwAction):
         # Open the dialog
         tools_gw.open_dialog(self.dlg_create_workspace, 'workspace_create')
 
-
     def _get_list(self, table_name='v_ui_workspace', filter_name=""):
         """ Mount and execute the query for gw_fct_getlist """
 
@@ -142,7 +137,6 @@ class GwWorkspaceManagerButton(GwAction):
             return False
 
         return complet_list
-
 
     def _fill_tbl(self, filter_name=""):
         """ Fill table with initial data into QTableView """
@@ -167,7 +161,6 @@ class GwWorkspaceManagerButton(GwAction):
             tools_qt.set_tableview_config(self.tbl_wrkspcm, selectionMode=QAbstractItemView.SingleSelection)
 
         return complet_list
-
 
     def _fill_info(self, selected, deselected):
         """
@@ -196,7 +189,6 @@ class GwWorkspaceManagerButton(GwAction):
             tools_gw.fill_tab_log(self.dlg_workspace_manager, result['body']['data'],
                                   force_tab=False, call_set_tabs_enabled=False, close=False)
 
-
     def _create_workspace(self):
         """ Create a workspace """
 
@@ -222,7 +214,6 @@ class GwWorkspaceManagerButton(GwAction):
             self._fill_tbl(self.filter_name.text())
             self._set_labels_current_workspace(dialog=self.dlg_workspace_manager)
 
-
     def _set_labels_current_workspace(self, dialog, result=None):
         """Set label for the current workspace."""
 
@@ -243,7 +234,6 @@ class GwWorkspaceManagerButton(GwAction):
             tools_qt.set_widget_text(dialog, 'lbl_vdefault_workspace', name_value)
         except KeyError:
             print("Error: 'name' field is missing in the result")
-
 
     def _set_current_workspace(self):
         """ Set the selected workspace as the current one """
@@ -292,7 +282,6 @@ class GwWorkspaceManagerButton(GwAction):
             # Build and Apply filters
             tools_gw.reload_layers_filters()
 
-
     def _check_goe2pa_options(self, tab_name=None):
         """ Refreshes the selectors' UI if it's open """
 
@@ -306,7 +295,6 @@ class GwWorkspaceManagerButton(GwAction):
                 go2epa._refresh_go2epa_options(go2epa.dlg_go2epa_options)
             except Exception:
                 pass
-
 
     def _toggle_privacy_workspace(self):
         """ Set the selected workspace as public/private """
@@ -333,7 +321,6 @@ class GwWorkspaceManagerButton(GwAction):
             if message:
                 tools_qgis.show_message(message['text'], message['level'], dialog=self.dlg_workspace_manager)
             self._fill_tbl(self.filter_name.text())
-
 
     def _update_workspace(self):
         """ Reset the values of the selected workspace """
@@ -379,7 +366,6 @@ class GwWorkspaceManagerButton(GwAction):
                 self._fill_tbl(self.filter_name.text())
                 self._set_labels_current_workspace(dialog=self.dlg_workspace_manager)
 
-
     def _delete_workspace(self):
         """ Delete the selected workspace """
 
@@ -416,7 +402,6 @@ class GwWorkspaceManagerButton(GwAction):
 
             self._fill_tbl(self.filter_name.text())
             self._set_labels_current_workspace(dialog=self.dlg_workspace_manager)
-
 
     def _check_exists(self, name=""):
         sql = f"SELECT name FROM cat_workspace WHERE name = '{name}'"

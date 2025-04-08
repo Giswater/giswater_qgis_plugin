@@ -30,7 +30,6 @@ class GwStyleManager:
         self.schema_name = lib_vars.schema_name
         self.style_mng_dlg = None
 
-
     def manage_styles(self):
         """Manages the user interface for style management."""
         self.style_mng_dlg = GwStyleManagerUi(self)
@@ -70,7 +69,6 @@ class GwStyleManager:
         # Open the style management dialog
         tools_gw.open_dialog(self.style_mng_dlg, 'style_manager')
 
-    
     def _show_context_menu(self, qtableview):
         """ Show custom context menu """
         menu = QMenu(qtableview)        
@@ -84,7 +82,6 @@ class GwStyleManager:
         menu.addAction(action_delete)
 
         menu.exec(QCursor.pos())
-
 
     def populate_stylegroup_combobox(self):
         """Populates the style group combobox with data from the database."""
@@ -124,7 +121,6 @@ class GwStyleManager:
 
         return [(row[0], row[1]) for row in processed_rows]
 
-
     def _load_sys_roles(self, dialog_create):
         """Load roles in combobox."""
         sql = "SELECT id FROM sys_role"
@@ -132,7 +128,6 @@ class GwStyleManager:
         dialog_create.sys_role.clear()
         for role in roles:
             dialog_create.sys_role.addItem(role[0])
-
 
     def _add_style_group(self, dialog):
         """Logic for adding a style group using the Qt Designer dialog."""
@@ -147,7 +142,6 @@ class GwStyleManager:
         dialog_create.idval.textChanged.connect(partial(self._check_style_exists, dialog_create))
 
         tools_gw.open_dialog(dialog_create, dlg_name='create_style_group')
-
 
     def _handle_add_feature(self, dialog_create):
         """Handles the logic when the add button is clicked."""
@@ -190,7 +184,6 @@ class GwStyleManager:
         except Exception as e:
             tools_qgis.show_warning(f"Failed to add feature: {e}", dialog=self.style_mng_dlg)
 
-
     def _filter_styles(self):
         """Applies a filter based on the text in the textbox and the selection in the combobox."""
         search_text = self.style_mng_dlg.txt_style_name.text().strip()
@@ -209,7 +202,6 @@ class GwStyleManager:
         model = self.style_mng_dlg.tbl_style.model()
         model.setFilter(filter_str)
         model.select()
-
 
     def _load_styles(self):
         """Loads styles into the table based on the selected style group."""
@@ -238,7 +230,6 @@ class GwStyleManager:
         header = self.style_mng_dlg.tbl_style.horizontalHeader()
         header.setSectionResizeMode(QHeaderView.Interactive)
         header.setStretchLastSection(True)
-
 
     def _check_style_exists(self, dialog_create):
         feature_id_text = dialog_create.feature_id.text().strip()
@@ -311,7 +302,6 @@ class GwStyleManager:
         tools_qt.set_stylesheet(dialog_update.category_rename_copy, style="")
         dialog_update.category_rename_copy.setToolTip("") 
 
-
     def _handle_update_feature(self, dialog_update, old_category_name):
         """Handles the logic when the add button is clicked."""
 
@@ -344,7 +334,6 @@ class GwStyleManager:
             msg = tools_qt.tr("Failed to update category:")
             tools_qgis.show_warning(f"{msg} {e}", dialog=self.style_mng_dlg)
 
-
     def _delete_style_group(self):
         """Logic for deleting a style group with cascade deletion."""
         selected_stylegroup_name = self.style_mng_dlg.cmb_stylegroup.currentText()
@@ -376,7 +365,6 @@ class GwStyleManager:
 
         except Exception as e:
             tools_qgis.show_warning(f"Failed to delete style group: {e}", dialog=self.style_mng_dlg)
-
 
     #Functions for btn style top right of the dialog
     def _delete_selected_styles(self):
@@ -430,7 +418,6 @@ class GwStyleManager:
         except Exception as e:
             tools_qgis.show_warning(f"Failed to delete styles: {e}", dialog=self.style_mng_dlg)
 
-
     def _load_layers_with_geom(self):
         """Load layers with geometry for the Add Style button."""
         try:
@@ -445,7 +432,6 @@ class GwStyleManager:
         except Exception as e:
             tools_qgis.show_warning(f"Failed to load layers: {e}", dialog=self.style_mng_dlg)
             return None
-
 
     def _populate_layers_menu(self, layers):
         """Populate the Add Style button with layers grouped by context."""
@@ -573,7 +559,6 @@ class GwStyleManager:
                 dialog=self.style_mng_dlg
             )
 
-
     def _update_selected_style(self):
         """Update the selected styles in the database with the current QGIS layer style."""
         selected_rows = self.style_mng_dlg.tbl_style.selectionModel().selectedRows()
@@ -632,7 +617,6 @@ class GwStyleManager:
 
         except Exception as e:
             tools_qgis.show_warning(f"Failed to update styles: {e}", dialog=self.style_mng_dlg)
-
 
     def _refresh_all_styles(self, dialog):
         """Refresh all styles in the database based on the current QGIS layer styles."""

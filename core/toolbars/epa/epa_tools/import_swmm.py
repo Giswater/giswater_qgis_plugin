@@ -67,7 +67,7 @@ class GwImportSwmm:
             import swmm_api
             from ....threads.import_inp import parse_swmm_task
 
-            global Catalogs, GwParseInpTask
+            global Catalogs, GwParseInpTask  # noqa: F824
             Catalogs = parse_swmm_task.Catalogs
             GwParseInpTask = parse_swmm_task.GwParseInpTask
 
@@ -113,7 +113,7 @@ class GwImportSwmm:
         )
         tools_gw.open_dialog(self.dlg_inp_parsing, dlg_name="parse_inp")
 
-        global GwParseInpTask
+        global GwParseInpTask  # noqa: F824
         self.parse_inp_task = GwParseInpTask(
             "Parse INP task", file_path, self.dlg_inp_parsing
         )
@@ -236,7 +236,6 @@ class GwImportSwmm:
                 result = tools_db.execute_sql(sql, commit=force_commit)
                 if not result:
                     return
-
 
             # Set variables
             workcat = "import_inp_test"
@@ -879,7 +878,6 @@ class GwImportSwmm:
                 )
 
         return workcat, exploitation, sector, municipality, raingage, catalogs
-
 
     def _toggle_enabled_new_catalog_field(
         self, field: QTableWidgetItem, text: str

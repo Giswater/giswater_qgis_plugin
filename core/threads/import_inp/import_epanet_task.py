@@ -586,7 +586,6 @@ class GwImportInpTask(GwTask):
                 params = (self.sector, text)
                 execute_sql(sql, params, commit=self.force_commit)
 
-
     def _save_junctions(self) -> None:
         node_sql = """ 
             INSERT INTO node (
@@ -728,7 +727,6 @@ class GwImportInpTask(GwTask):
         toolsdb_execute_values(
             demands_sql, demands_params, demands_template, fetch=False, commit=self.force_commit
         )
-
 
     def _save_reservoirs(self) -> None:
         feature_class = self.catalogs['features']['reservoirs'].lower()

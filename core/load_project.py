@@ -33,7 +33,6 @@ class GwLoadProject(QObject):
         self.buttons_to_hide = []
         self.buttons = {}
 
-
     def project_read(self, show_warning=True, main=None):
         """ Function executed when a user opens a QGIS project (*.qgs) """
 
@@ -93,7 +92,6 @@ class GwLoadProject(QObject):
         # Manage locale and corresponding 'i18n' file
         lib_vars.plugin_name = tools_qgis.get_plugin_metadata('name', 'giswater', lib_vars.plugin_dir)
         tools_qt.manage_translation(lib_vars.plugin_name)
-
 
         # Check if schema exists
         schema_exists = tools_db.check_schema(lib_vars.schema_name)
@@ -217,7 +215,6 @@ class GwLoadProject(QObject):
         sorted_toolbar_ids = ",".join(sorted_toolbar_ids)
         tools_gw.set_config_parser('toolbars_position', 'toolbars_order', str(sorted_toolbar_ids), "user", "init")
 
-
     def _check_version_compatibility(self):
 
         # Get PostgreSQL versions
@@ -233,7 +230,6 @@ class GwLoadProject(QObject):
                 msg = "PostgreSQL version is not compatible with Giswater. Please check wiki"
                 tools_qgis.show_message_link(f"{msg}", url_wiki, message_level=1, btn_text="Open wiki")
 
-
     def _get_project_variables(self):
         """ Manage QGIS project variables """
 
@@ -246,7 +242,6 @@ class GwLoadProject(QObject):
         lib_vars.project_vars['store_credentials'] = tools_qgis.get_project_variable('gwStoreCredentials')
         lib_vars.project_vars['current_style'] = tools_qgis.get_project_variable('gwCurrentStyle')
 
-
     def _get_user_variables(self):
         """ Get config related with user variables """
 
@@ -256,7 +251,6 @@ class GwLoadProject(QObject):
         lib_vars.user_level['showselectmessage'] = tools_gw.get_config_parser('user_level', 'showselectmessage', "user", "init", False)
         lib_vars.user_level['showadminadvanced'] = tools_gw.get_config_parser('user_level', 'showadminadvanced', "user", "init", False)
         lib_vars.date_format = tools_gw.get_config_parser('system', 'date_format', "user", "init", False)
-
 
     def _check_project(self, show_warning):
         """ Check if loaded project is valid for Giswater """
@@ -284,7 +278,6 @@ class GwLoadProject(QObject):
 
         return True
 
-
     def _check_project_type(self):
         """ Check if loaded project is valid for Giswater """
         # Check if table 'v_edit_node' is loaded
@@ -299,7 +292,6 @@ class GwLoadProject(QObject):
                 return False
 
         return True
-
 
     def _check_database_connection(self, show_warning, force_commit=False):
         """ Set new database connection. If force_commit=True then force commit before opening project """
@@ -321,7 +313,6 @@ class GwLoadProject(QObject):
                 return False
 
             return True
-
 
     def _check_layers_from_distinct_schema(self):
         """
@@ -356,7 +347,6 @@ class GwLoadProject(QObject):
 
         return True
 
-
     def _get_buttons_to_hide(self):
         """ Get all buttons to hide """
 
@@ -372,7 +362,6 @@ class GwLoadProject(QObject):
             tools_log.log_warning(f"{type(e).__name__}: {e}")
         finally:
             return buttons_to_hide
-
 
     def _manage_toolbars(self):
         """ Manage actions of the custom plugin toolbars """
@@ -462,7 +451,6 @@ class GwLoadProject(QObject):
                     case "audit":
                         self._hide_button(68, False)
 
-
     def _create_toolbar(self, toolbar_id):
 
         list_actions = tools_gw.get_config_parser('toolbars', str(toolbar_id), "project", "giswater")
@@ -487,7 +475,6 @@ class GwLoadProject(QObject):
         plugin_toolbar.list_actions = list_actions
         self.plugin_toolbars[toolbar_id] = plugin_toolbar
 
-
     def _manage_snapping_layers(self):
         """ Manage snapping of layers """
 
@@ -495,7 +482,6 @@ class GwLoadProject(QObject):
         tools_qgis.manage_snapping_layer('v_edit_connec', snapping_type=0)
         tools_qgis.manage_snapping_layer('v_edit_node', snapping_type=0)
         tools_qgis.manage_snapping_layer('v_edit_gully', snapping_type=0)
-
 
     def _check_user_roles(self):
         """ Check roles of this user to show or hide toolbars """
@@ -527,7 +513,6 @@ class GwLoadProject(QObject):
         if global_vars.feature_cat is None:
             self._enable_button("21", False)
             self._enable_button("22", False)
-
 
     def _config_layers(self):
         """ Call gw_fct_setcheckproject and create GwProjectLayersConfig thread """
@@ -570,7 +555,6 @@ class GwLoadProject(QObject):
 
         return True
 
-
     def _manage_layers(self):
         """ Get references to project main layers """
 
@@ -600,7 +584,6 @@ class GwLoadProject(QObject):
 
         return True
 
-
     def _manage_guided_map(self):
         """ Guide map works using ext_municipality """
 
@@ -618,7 +601,6 @@ class GwLoadProject(QObject):
         cursor = tools_gw.get_cursor_multiple_selection()
         if cursor:
             self.iface.mapCanvas().setCursor(cursor)
-
 
     def _selection_changed(self):
         """ Get selected muni_id and execute function setselectors """
@@ -657,7 +639,6 @@ class GwLoadProject(QObject):
                 pass
             tools_gw.set_style_mapzones()
 
-
     def _enable_toolbars(self, visible=True):
         """ Enable/disable all plugin toolbars from QGIS GUI """
 
@@ -670,13 +651,11 @@ class GwLoadProject(QObject):
         except Exception as e:
             tools_log.log_warning(str(e))
 
-
     def _enable_all_buttons(self, enable=True):
         """ Utility to enable/disable all buttons """
 
         for index in self.buttons.keys():
             self._enable_button(index, enable)
-
 
     def _enable_button(self, button_id, enable=True):
         """ Enable/disable selected button """
@@ -685,14 +664,12 @@ class GwLoadProject(QObject):
         if key in self.buttons:
             self.buttons[key].action.setEnabled(enable)
 
-
     def _hide_button(self, button_id, hide=True):
         """ Enable/disable selected action """
 
         key = str(button_id).zfill(2)
         if key in self.buttons:
             self.buttons[key].action.setVisible(not hide)
-
 
     def _enable_toolbar(self, toolbar_id, enable=True):
         """ Enable/Disable toolbar. Normally because user has no permission """
@@ -703,12 +680,10 @@ class GwLoadProject(QObject):
             for index_action in plugin_toolbar.list_actions:
                 self._enable_button(index_action, enable)
 
-
     def _force_tab_exploitation(self):
         """ Select tab 'tab_exploitation' in dialog 'dlg_selector_basic' """
 
         tools_gw.set_config_parser("dialogs_tab", f"dlg_selector_basic", f"tab_exploitation", "user", "session")
-
 
     def _manage_attribute_table(self):
         """ If configured, disable button "Update all" from attribute table """
@@ -717,7 +692,6 @@ class GwLoadProject(QObject):
         if tools_os.set_boolean(disable, False):
             tools_gw.connect_signal(QApplication.instance().focusChanged, self._manage_focus_changed,
                                     'load_project', 'manage_attribute_table_focusChanged')
-
 
     def _manage_focus_changed(self, old, new):
         """ Disable button "Update all" of QGIS attribute table dialog. Parameters are passed by the signal itself. """

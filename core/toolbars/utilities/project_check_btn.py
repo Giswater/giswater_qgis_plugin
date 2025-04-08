@@ -29,11 +29,9 @@ class GwProjectCheckButton(GwAction):
 
         super().__init__(icon_path, action_name, text, toolbar, action_group)
 
-
     def clicked_event(self):
 
         self._open_check_project()
-
 
     # region private functions
 
@@ -74,7 +72,6 @@ class GwProjectCheckButton(GwAction):
         # Open the dialog
         tools_gw.open_dialog(self.dialog, dlg_name=form_type)
 
-
     def _populate_dynamic_widgets(self, dialog, complet_result):
         """Creates and populates all widgets dynamically into the dialog layout."""
 
@@ -97,7 +94,6 @@ class GwProjectCheckButton(GwAction):
             # Add widgets to the layout
             old_widget_pos = tools_gw.add_widget_combined(dialog, field, label, widget, old_widget_pos)
 
-
     def _on_accept_clicked(self):
         """Handles the Accept button click event and starts the project check task."""
 
@@ -107,7 +103,6 @@ class GwProjectCheckButton(GwAction):
             tools_qt.enable_tab_by_tab_name(qtabwidget, "tab_log", True)  # Enable Log tab
 
         self._start_project_check()
-
 
     def _start_project_check(self):
         """Re-executes the project check process after Accept is pressed."""
@@ -135,7 +130,6 @@ class GwProjectCheckButton(GwAction):
 
         QgsApplication.taskManager().addTask(self.project_check_task)
         QgsApplication.taskManager().triggerTask(self.project_check_task)
-
 
     def _execute_checkdatabase(self):
         """Executes `gw_fct_setcheckdatabase` and updates the Log tab with results."""

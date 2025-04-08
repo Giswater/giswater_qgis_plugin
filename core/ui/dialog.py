@@ -79,7 +79,6 @@ class GwDialog(QDialog):
         # Enable event filter
         self.installEventFilter(self)
 
-
     def eventFilter(self, object, event):
         if hasattr(self, "subtag") and self.subtag is not None:
             tag = f'{self.objectName()}_{self.subtag}'

@@ -49,7 +49,6 @@ class GwMassiveComposer:
 
         tools_gw.open_dialog(dlg_comp, dlg_name='comp_x_pages')
 
-
     def save_user_values(self, dialog):
         """ Save last user values """
         folder_path = tools_qt.get_text(dialog, dialog.txt_path)
@@ -60,7 +59,6 @@ class GwMassiveComposer:
         tools_gw.set_config_parser('composer_pages', 'prefix', f"{prefix}")
         single = tools_qt.is_checked(dialog, dialog.chk_single)
         tools_gw.set_config_parser('composer_pages', 'single', f"{single}")
-
 
     def get_folder_dialog(self, dialog, widget):
         """ Get folder dialog """
@@ -79,7 +77,6 @@ class GwMassiveComposer:
             parent=None, caption=tools_qt.tr(message), directory=folder_path)
         if folder_path:
             tools_qt.set_widget_text(dialog, widget, str(folder_path))
-
 
     def populate_cmb_composers(self, combo):
         """
@@ -101,11 +98,9 @@ class GwMassiveComposer:
         last_composer = tools_gw.get_config_parser('composer_pages', 'last_composer', 'user', 'session')
         tools_qt.set_combo_value(combo, f'{last_composer}', 0, add_new=False)
 
-
     def generate_pdfs(self, dialog):
         folder_path = self.manage_folder_path(dialog)
         self.generate_composer_pages(dialog, folder_path)
-
 
     def manage_folder_path(self, dialog):
 
@@ -115,7 +110,6 @@ class GwMassiveComposer:
             folder_path = tools_qt.get_text(dialog, dialog.txt_path)
 
         return folder_path
-
 
     def generate_composer_pages(self, dialog, path):
 
@@ -188,7 +182,6 @@ class GwMassiveComposer:
         QgsApplication.taskManager().triggerTask(self.composer_task)
         self.composer_task.task_finished.connect(partial(self.restore_user_selectors, current_selectors))
 
-
     def restore_user_selectors(self, current_selectors):
         """ Restore user selectors """
         qgis_project_add_schema = tools_qgis.get_project_variable('gwAddSchema')
@@ -203,7 +196,6 @@ class GwMassiveComposer:
                           f'"addSchema":"{qgis_project_add_schema}"')
                 body = tools_gw.create_body(extras=extras)
                 tools_gw.execute_procedure('gw_fct_setselectors', body)
-
 
     def _enable_cancel_btn(self, enable):
         if enable:

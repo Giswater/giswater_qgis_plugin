@@ -43,11 +43,9 @@ class GwToolBoxButton(GwAction):
         self.add_columns = {}
         self.queryAdd = None
 
-
     def clicked_event(self):
 
         self._open_toolbox()
-
 
     def open_function_by_id(self, func_id, connect_signal=None, aux_params="null"):
 
@@ -119,7 +117,6 @@ class GwToolBoxButton(GwAction):
 
         global_vars.iface.mapCanvas().refresh()
 
-
     def set_selected_layer(self, dialog, combo):
 
         layer_name = tools_qt.get_combo_value(dialog, combo, 1)
@@ -129,7 +126,6 @@ class GwToolBoxButton(GwAction):
             return None
         global_vars.iface.setActiveLayer(layer)
         return layer
-
 
     def save_parametric_values(self, dialog, function_name):
         """ Save QGIS settings related with toolbox options """
@@ -147,7 +143,6 @@ class GwToolBoxButton(GwAction):
                 value = tools_qt.get_text(dialog, widget, False, False)
                 tools_gw.set_config_parser('btn_toolbox', f"{function_name}_{widget.objectName()}", f"{value}")
 
-
     def save_settings_values(self, dialog, function_name):
         """ Save QGIS settings related with toolbox options """
 
@@ -156,7 +151,6 @@ class GwToolBoxButton(GwAction):
         layer = tools_qt.get_combo_value(dialog, dialog.cmb_layers, 0)
         tools_gw.set_config_parser('btn_toolbox', f"{function_name}_cmb_layers", f"{layer}")
         tools_gw.set_config_parser('btn_toolbox', f"{function_name}_rbt_previous", f"{dialog.rbt_previous.isChecked()}")
-
 
     # region private functions
 
@@ -192,7 +186,6 @@ class GwToolBoxButton(GwAction):
         else:
             tools_gw.open_dialog(self.dlg_toolbox)
 
-
     def _filter_functions(self, text):
 
         extras = f'"filterText":"{text}"'
@@ -202,7 +195,6 @@ class GwToolBoxButton(GwAction):
             return False
 
         self._populate_trv(self.dlg_toolbox.trv, json_result['body']['data'], expand=True)
-
 
     def _open_function(self, index):
 
@@ -305,7 +297,6 @@ class GwToolBoxButton(GwAction):
             tools_gw.open_dialog(self.dlg_functions, dlg_name='toolbox')
             self.dlg_functions.setWindowTitle(f"{self.function_selected}")
 
-
     def _report_finished(self, status, json_result):
         if not status:
             return
@@ -405,7 +396,6 @@ class GwToolBoxButton(GwAction):
         # Update tbl in case filters have default value
         self._update_tbl_reports()
 
-
     def _update_tbl_reports(self):
 
         list_widgets = self.dlg_reports.findChildren(QWidget)
@@ -499,7 +489,6 @@ class GwToolBoxButton(GwAction):
             elif field['widgettype'] == 'list' and field.get('value') is None:
                 self.dlg_reports.tbl_reports.setRowCount(0)
 
-
     def _rbt_state(self, rbt, state):
 
         if rbt.objectName() == 'rbt_previous' and state is True:
@@ -508,7 +497,6 @@ class GwToolBoxButton(GwAction):
             self.rbt_checked['widget'] = 'wholeSelection'
 
         self.rbt_checked['value'] = state
-
 
     def _load_parametric_values(self, dialog, function):
         """ Load QGIS settings related with toolbox options """
@@ -536,7 +524,6 @@ class GwToolBoxButton(GwAction):
                                                    "session")
                 tools_qt.set_widget_text(dialog, widget, value)
 
-
     def _load_settings_values(self, dialog, function):
         """ Load QGIS settings related with toolbox options """
 
@@ -558,7 +545,6 @@ class GwToolBoxButton(GwAction):
             tools_qt.set_checked(dialog, 'rbt_previous', True)
         else:
             tools_qt.set_checked(dialog, 'rbt_layer', True)
-
 
     def _execute_function(self, description, dialog, combo, result, aux_params="null"):
 
@@ -590,7 +576,6 @@ class GwToolBoxButton(GwAction):
         QgsApplication.taskManager().addTask(self.toolbox_task)
         QgsApplication.taskManager().triggerTask(self.toolbox_task)
 
-
     def _calculate_elapsed_time(self, dialog):
 
         tf = time()  # Final time
@@ -605,7 +590,6 @@ class GwToolBoxButton(GwAction):
 
         lbl_time = dialog.findChild(QLabel, 'lbl_time')
         lbl_time.setText(text)
-
 
     def _manage_btn_run(self, index):
         """
@@ -625,7 +609,6 @@ class GwToolBoxButton(GwAction):
                 except RuntimeError:
                     pass
             self.dlg_functions.btn_run.setEnabled(True)
-
 
     def _populate_functions_dlg(self, dialog, result, module=tools_backend_calls):
 
@@ -671,7 +654,6 @@ class GwToolBoxButton(GwAction):
 
         return status
 
-
     def _populate_cmb_type(self, feature_types):
 
         feat_types = []
@@ -681,7 +663,6 @@ class GwToolBoxButton(GwAction):
         if feat_types and len(feat_types) <= 1:
             self.dlg_functions.cmb_feature_type.setVisible(False)
         tools_qt.fill_combo_values(self.dlg_functions.cmb_feature_type, feat_types)
-
 
     def _get_all_group_layers(self, feature_type):
 
@@ -704,7 +685,6 @@ class GwToolBoxButton(GwAction):
                     list_items.append(elem)
 
         return list_items
-
 
     def _populate_layer_combo(self, feature_types):
         feature_type = tools_qt.get_combo_value(self.dlg_functions, self.dlg_functions.cmb_feature_type, 0)
@@ -730,7 +710,6 @@ class GwToolBoxButton(GwAction):
             tools_qt.set_widget_enabled(self.dlg_functions, 'btn_run', False)
 
         tools_qt.fill_combo_values(self.dlg_functions.cmb_layers, layers, sort_combo=False, index_to_show=0)
-
 
     def _populate_trv(self, trv_widget, result, expand=False):
 
@@ -799,7 +778,6 @@ class GwToolBoxButton(GwAction):
         if expand:
             trv_widget.expandAll()
 
-
     def _sort_list(self, json_):
 
         try:
@@ -807,12 +785,10 @@ class GwToolBoxButton(GwAction):
         except KeyError:
             return 0
 
-
     def _cancel_task(self):
 
         if hasattr(self, 'toolbox_task'):
             self.toolbox_task.cancel()
-
 
     def _select_file_report(self):
         """ Select CSV file """
@@ -829,7 +805,6 @@ class GwToolBoxButton(GwAction):
         message = tools_qt.tr("Save report file")
         file_report, filter_ = QFileDialog.getSaveFileName(None, message, "", '*.csv')
         tools_qt.set_widget_text(self.dlg_reports, self.dlg_reports.txt_export_path, file_report)
-
 
     def _export_reports(self, dialog, table, path):
 
@@ -871,7 +846,6 @@ class GwToolBoxButton(GwAction):
         except Exception:
             msg = "File path doesn't exist or you dont have permission or file is opened"
             tools_qgis.show_warning(msg)
-
 
     def _write_to_csv(self, folder_path=None, all_rows=None):
 

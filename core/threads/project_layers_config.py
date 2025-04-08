@@ -33,7 +33,6 @@ class GwProjectLayersConfig(GwTask):
         self.vr_errors = None
         self.vr_missing = None
 
-
     def run(self):
 
         super().run()
@@ -45,7 +44,6 @@ class GwProjectLayersConfig(GwTask):
         self.setProgress(100)
 
         return True
-
 
     def finished(self, result):
 
@@ -77,9 +75,7 @@ class GwProjectLayersConfig(GwTask):
             tools_log.log_info(f"Task aborted: {self.description()}")
             tools_log.log_warning(f"Exception: {self.exception}")
 
-
     # region private functions
-
 
     def _get_layers_to_config(self):
         """ Get available layers to be configured """
@@ -97,7 +93,6 @@ class GwProjectLayersConfig(GwTask):
                 if table_name not in self.available_layers:
                     self.available_layers.append(table_name)
 
-
     def _set_form_suppress(self, layers_list):
         """ Set form suppress on "Hide form on add feature (global settings) """
 
@@ -108,7 +103,6 @@ class GwProjectLayersConfig(GwTask):
             config = layer.editFormConfig()
             config.setSuppress(QgsEditFormConfig.FeatureFormSuppress.SuppressOn)
             layer.setEditFormConfig(config)
-
 
     def _set_layer_config(self, layers):
         """ Set layer fields configured according to client configuration.

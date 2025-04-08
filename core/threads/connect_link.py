@@ -36,7 +36,6 @@ class GwConnectLink(GwTask):
             self.exception = e
             return False
 
-
     def finished(self, result):
         super().finished(result)
         tools_log.log_info(
@@ -44,7 +43,6 @@ class GwConnectLink(GwTask):
             f"'{self.element_type}', '{self.layer}'"
         )
         self.connect_link_class.manage_result(self.json_result, self.layer)
-
 
     def _link_selected_features(self, feature_type, layer, selected_arc=None):
         """ Link selected @feature_type to the pipe """

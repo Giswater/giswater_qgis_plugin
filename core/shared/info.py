@@ -47,7 +47,7 @@ from ...libs import lib_vars, tools_qgis, tools_qt, tools_log, tools_db, tools_o
 from ...libs.tools_qt import GwHyperLinkLineEdit
 from .audit import GwAudit
 
-global is_inserting
+global is_inserting  # noqa: F824
 is_inserting = False
 
 
@@ -76,14 +76,11 @@ class GwInfo(QObject):
         self.conf_supp = None
         self.prev_action = None
 
-
     def get_info_from_coordinates(self, point, tab_type):
         return self.open_form(point=point, tab_type=tab_type)
 
-
     def get_info_from_id(self, table_name, feature_id, tab_type=None, is_add_schema=None):
         return self.open_form(table_name=table_name, feature_id=feature_id, tab_type=tab_type, is_add_schema=is_add_schema)
-
 
     def open_form(self, point=None, table_name=None, feature_id=None, feature_cat=None, new_feature_id=None,
                   layer_new_feature=None, tab_type=None, new_feature=None, is_docker=True, is_add_schema=False):
@@ -141,7 +138,6 @@ class GwInfo(QObject):
                 extras = '"toolBar":"epa"'
             elif tab_type == 'data':
                 extras = '"toolBar":"basic"'
-
 
             function_name = None
             body = None
@@ -277,14 +273,12 @@ class GwInfo(QObject):
             tools_qgis.restore_cursor()  # Restore overridden cursor
             return False, None
 
-
     """ FUNCTIONS ASSOCIATED TO BUTTONS FROM POSTGRES"""
-
 
     def add_feature(self, feature_cat, action=None):
         """ Button 21, 22: Add 'node' or 'arc' """
 
-        global is_inserting
+        global is_inserting  # noqa: F824
         if is_inserting:
             msg = "You cannot insert more than one feature at the same time, finish editing the previous feature"
             tools_qgis.show_message(msg)
@@ -322,9 +316,7 @@ class GwInfo(QObject):
             message = "Layer not found"
             tools_qgis.show_warning(message, parameter=feature_cat.parent_layer)
 
-
     """ FUNCTIONS RELATED WITH TAB PLAN """
-
 
     def get_snapped_feature_id(self, dialog, action, layer_name, option, widget_name, child_type):
         """ Snap feature and set a value into dialog """
@@ -355,14 +347,11 @@ class GwInfo(QObject):
         tools_gw.connect_signal(emit_point.canvasClicked, partial(self._get_id, dialog, action, option, emit_point, child_type, widget_name),
                                 'info_snapping', 'get_snapped_feature_id_ep_canvasClicked_get_id')
 
-
     # region private functions
-
 
     def _get_feature_insert(self, point, feature_cat, new_feature_id, layer_new_feature, tab_type, new_feature):
         return self.open_form(point=point, feature_cat=feature_cat, new_feature_id=new_feature_id,
                               layer_new_feature=layer_new_feature, tab_type=tab_type, new_feature=new_feature)
-
 
     def _manage_new_feature(self, complet_result, dialog):
 
@@ -395,7 +384,6 @@ class GwInfo(QObject):
                 self.my_json[str(widget.property('columnname'))] = str(value)
 
         tools_log.log_info(str(self.my_json))
-
 
     def _open_generic_form(self, complet_result):
 
@@ -458,7 +446,6 @@ class GwInfo(QObject):
         tools_gw.open_dialog(self.dlg_generic, dlg_name='info_generic')
 
         return result, self.dlg_generic
-
 
     def _open_custom_form(self, feature_id, complet_result, tab_type=None, sub_tag=None, is_docker=True, new_feature=None):
         """
@@ -604,7 +591,6 @@ class GwInfo(QObject):
             tools_gw.open_dialog(self.dlg_cf, dlg_name='info_feature')
             self.dlg_cf.setWindowTitle(title)
 
-
         # Check if audit schema exists
         sql = "SELECT schema_name FROM information_schema.schemata WHERE schema_name = 'audit'"
         rows = tools_db.get_rows(sql, commit=False)
@@ -614,13 +600,11 @@ class GwInfo(QObject):
 
         return self.complet_result, self.dlg_cf
 
-
     def _get_widget_controls(self, new_feature):
         """ Sets class variables for most widgets """
 
         self.tab_main = self.dlg_cf.findChild(QTabWidget, "tab_main")
         self.tab_main.currentChanged.connect(partial(self._tab_activation, self.dlg_cf))
-
 
     def _get_features(self, complet_result):
 
@@ -632,7 +616,6 @@ class GwInfo(QObject):
         self.table_parent = str(complet_result['body']['feature']['tableParent'])
         schema_name = str(complet_result['body']['feature']['schemaName'])
         self.layer = tools_qgis.get_layer_by_tablename(self.table_parent, False, False, schema_name)
-
 
     def _get_actions(self):
         """ Sets class variables for actions """
@@ -683,7 +666,6 @@ class GwInfo(QObject):
         tools_gw.add_icon(self.action_weir, "162")
         tools_gw.add_icon(self.action_demand, "163")
         tools_gw.add_icon(self.action_audit, "177")
-
 
     def _manage_dlg_widgets(self, complet_result, result, new_feature, reload_epa=False, tab='tab_data'):
         """ Creates and populates all the widgets """
@@ -782,7 +764,6 @@ class GwInfo(QObject):
                             self._get_combo_child, self.dlg_cf, widget, self.feature_type,
                             self.tablename, self.field_id))
 
-
     def _manage_actions_signals(self, complet_result, list_points, new_feature, tab_type, result):
         """ Connects signals to the actions """
 
@@ -870,7 +851,6 @@ class GwInfo(QObject):
         kwargs = {"complet_result": self.complet_result, "class": self, "func_params": func_params}
         open_epa_dlg("Orifice", **kwargs)
 
-
     def _open_outlet_dlg(self):
         # kwargs
         func_params = {"ui": "GwInfoEpaUi", "uiName": "info_epa",
@@ -880,7 +860,6 @@ class GwInfo(QObject):
                        ]}
         kwargs = {"complet_result": self.complet_result, "class": self, "func_params": func_params}
         open_epa_dlg("Outlet" ,**kwargs)
-
 
     def _open_pump_dlg(self):
         # kwargs
@@ -892,7 +871,6 @@ class GwInfo(QObject):
         kwargs = {"complet_result": self.complet_result, "class": self, "func_params": func_params}
         open_epa_dlg("Pump", **kwargs)
 
-
     def _open_pump_additional_dlg(self):
         # kwargs
         func_params = {"ui": "GwInfoEpaUi", "uiName": "info_epa",
@@ -902,7 +880,6 @@ class GwInfo(QObject):
                        ]}
         kwargs = {"complet_result": self.complet_result, "class": self, "func_params": func_params}
         open_epa_dlg("Additional Pump", **kwargs)
-
 
     def _open_weir_dlg(self):
         # kwargs
@@ -914,7 +891,6 @@ class GwInfo(QObject):
         kwargs = {"complet_result": self.complet_result, "class": self, "func_params": func_params}
         open_epa_dlg("Weir", **kwargs)
 
-
     def _open_demand_dlg(self):
         # kwargs
         func_params = {"ui": "GwInfoEpaUi", "uiName": "info_epa",
@@ -923,7 +899,6 @@ class GwInfo(QObject):
                        ]}
         kwargs = {"complet_result": self.complet_result, "class": self, "func_params": func_params}
         open_epa_dlg("Demand", **kwargs)
-
 
     def _open_dwf_dlg(self):
         # kwargs
@@ -934,7 +909,6 @@ class GwInfo(QObject):
                        ]}
         kwargs = {"complet_result": self.complet_result, "class": self, "func_params": func_params}
         open_epa_dlg("DWF & INFLOWS", **kwargs)
-
 
     def action_open_link(self):
         """ Manage def open_file from action 'Open Link' """
@@ -948,7 +922,6 @@ class GwInfo(QObject):
                     tools_qgis.show_warning(message, parameter=path, dialog=self.dlg_cf)
         except Exception:
             pass
-
 
     def _get_feature_type(self, complet_result):
         """ Get feature type as feature_type (node, arc, connec, gully) """
@@ -966,7 +939,6 @@ class GwInfo(QObject):
         result = complet_result['body']['data']
         return result
 
-
     def _set_dlg_title(self, complet_result):
         """ Sets the dialog title """
 
@@ -982,7 +954,6 @@ class GwInfo(QObject):
             pass
         finally:
             return title
-
 
     def _open_help(self, feature_type):
         """ Open PDF file with selected @project_type and @feature_type """
@@ -1007,7 +978,6 @@ class GwInfo(QObject):
                 message = "No help file found"
                 tools_qgis.show_warning(message, parameter=pdf_path)
 
-
     def _block_action_edit(self, dialog, action_edit, result, layer, fid, my_json, new_feature):
 
         current_layer = self.iface.activeLayer()
@@ -1022,7 +992,6 @@ class GwInfo(QObject):
         if self.connected is False:
             self._connect_signals()
 
-
     def _connect_signals(self):
 
         if not self.connected:
@@ -1033,7 +1002,6 @@ class GwInfo(QObject):
                 tools_gw.connect_signal(action_toggle_editing.triggered, self.fct_block_action_edit,
                                         'info', 'connect_signals_action_toggle_editing_triggered_fct_block_action_edit')
             self.connected = True
-
 
     def _disconnect_signals(self):
 
@@ -1074,9 +1042,8 @@ class GwInfo(QObject):
             pass
 
         self.connected = False
-        global is_inserting
+        global is_inserting  # noqa: F824
         is_inserting = False
-
 
     def _activate_snapping(self, complet_result, ep, refresh_dialog=False):
 
@@ -1152,7 +1119,6 @@ class GwInfo(QObject):
         self.vertex_marker.hide()
         self.iface.actionPan().trigger()
 
-
     def _change_rb_type(self, dialog, widget, complet_result, ep):
         """ Function to manage radioButton interpolate/extrapolate"""
 
@@ -1161,7 +1127,6 @@ class GwInfo(QObject):
             tools_gw.set_config_parser("btn_info", "rb_action_interpolate", f"{widget.objectName()}")
             self._manage_interpolate_rejected()
             self._activate_snapping(complet_result, ep, refresh_dialog=dialog)
-
 
     def _snapping_node(self, dlg_interpolate, point, button):
         """ Get id of selected nodes (node1 and node2) """
@@ -1226,7 +1191,6 @@ class GwInfo(QObject):
 
             self.iface.actionPan().trigger()
 
-
     def _chek_for_existing_values(self, dlg_interpolate):
 
         text = False
@@ -1243,7 +1207,6 @@ class GwInfo(QObject):
         if not text:
             self._set_values(dlg_interpolate)
 
-
     def _set_values(self, dlg_interpolate):
 
         # Set values tu info form
@@ -1254,7 +1217,6 @@ class GwInfo(QObject):
                 tools_qt.set_widget_text(self.dlg_cf, widget, f'{v}')
                 widget.editingFinished.emit()
         tools_gw.close_dialog(dlg_interpolate)
-
 
     def _dlg_destroyed(self, layer=None, vertex=None):
 
@@ -1272,13 +1234,11 @@ class GwInfo(QObject):
         except Exception:
             pass
 
-
     def _remove_interpolate_rb(self):
 
         # Remove the circumferences made by the interpolate
         for rb in self.rb_interpolate:
             global_vars.iface.mapCanvas().scene().removeItem(rb)
-
 
     def _mouse_move(self, point):
 
@@ -1294,7 +1254,6 @@ class GwInfo(QObject):
         else:
             self.vertex_marker.hide()
 
-
     def _change_hemisphere(self, dialog, action):
 
         # Set map tool emit point and signals
@@ -1304,7 +1263,6 @@ class GwInfo(QObject):
         global_vars.canvas.setMapTool(emit_point)
         tools_gw.connect_signal(emit_point.canvasClicked, partial(self._action_rotation_canvas_clicked, dialog, action, emit_point),
                                 'info_snapping', 'change_hemisphere_ep_canvasClicked_action_rotation_canvas_clicked')
-
 
     def _action_rotation_canvas_clicked(self, dialog, action, emit_point, point, btn):
 
@@ -1354,7 +1312,6 @@ class GwInfo(QObject):
             action_widget.setChecked(False)
         tools_gw.disconnect_signal('info_snapping', 'change_hemisphere_ep_canvasClicked_action_rotation_canvas_clicked')
 
-
     def _manage_action_copy_paste(self, dialog, feature_type, tab_type=None):
         """ Copy some fields from snapped feature to current feature """
 
@@ -1382,7 +1339,6 @@ class GwInfo(QObject):
         if feature_type == 'node':
             self.snapper_manager.set_vertex_marker(self.vertex_marker, icon_type=4)
 
-
     def _manage_action_copy_paste_mouse_move(self, point):
         """ Slot function when mouse is moved in the canvas.
             Add marker if any feature is snapped
@@ -1399,7 +1355,6 @@ class GwInfo(QObject):
 
         # Add marker to snapped feature
         self.snapper_manager.add_marker(result, self.vertex_marker)
-
 
     def _manage_action_copy_paste_canvas_clicked(self, dialog, tab_type, emit_point, point, btn):
         """ Slot function when canvas is clicked """
@@ -1487,7 +1442,6 @@ class GwInfo(QObject):
 
         self._manage_disable_copy_paste(dialog, emit_point)
 
-
     def _manage_disable_copy_paste(self, dialog, emit_point):
         """ Disable actionCopyPaste and set action 'Identify' """
 
@@ -1502,7 +1456,6 @@ class GwInfo(QObject):
         except Exception:
             pass
 
-
     def _manage_docker_close(self):
 
         self._roll_back()
@@ -1512,14 +1465,12 @@ class GwInfo(QObject):
         self._reset_my_json()
         tools_gw.close_docker()
 
-
     def _remove_layer_selection(self):
 
         try:
             self.layer.removeSelection()
         except RuntimeError:
             pass
-
 
     def _manage_info_close(self, dialog):
 
@@ -1528,14 +1479,12 @@ class GwInfo(QObject):
         tools_gw.save_settings(dialog)
         tools_gw.close_dialog(dialog)
 
-
     def _get_feature(self, tab_type):
         """ Get current QgsFeature """
 
         expr_filter = f"{self.field_id} = '{self.feature_id}'"
         self.feature = tools_qgis.get_feature_by_expr(self.layer, expr_filter)
         return self.feature
-
 
     def _manage_action_centered(self, canvas, layer):
         """ Center map to current feature """
@@ -1544,7 +1493,6 @@ class GwInfo(QObject):
             self._get_feature(self.tab_type)
         layer.selectByIds([self.feature.id()])
         canvas.zoomToSelected(layer)
-
 
     def _get_last_value(self, dialog, generic=False):
 
@@ -1585,7 +1533,6 @@ class GwInfo(QObject):
                         widget.clearFocus()
             except RuntimeError:
                 pass
-
 
     def _manage_edition(self, dialog, action_edit, fid, new_feature=None, generic=False, from_apply=False):
 
@@ -1628,7 +1575,6 @@ class GwInfo(QObject):
                 tools_gw.enable_all(dialog, self.epa_complet_result['body']['data'])
             self._enable_actions(dialog, True)
 
-
     def _accept_from_btn(self, dialog, action_edit, new_feature, my_json, last_json, generic=False):
 
         if not action_edit.isChecked():
@@ -1638,7 +1584,6 @@ class GwInfo(QObject):
         status = self._manage_accept(dialog, action_edit, new_feature, my_json, True, generic)
         if status:
             self._reset_my_json()
-
 
     def _manage_accept(self, dialog, action_edit, new_feature, my_json, close_dlg, generic=False):
 
@@ -1651,7 +1596,6 @@ class GwInfo(QObject):
                 tools_gw.enable_widgets(dialog, self.epa_complet_result['body']['data'], False)
             self._enable_actions(dialog, False)
         return status
-
 
     def _stop_editing(self, dialog, action_edit, layer, fid, my_json, new_feature=None):
 
@@ -1673,7 +1617,6 @@ class GwInfo(QObject):
 
             return save
 
-
     def _start_editing(self, dialog, action_edit, result, layer):
 
         QgsProject.instance().blockSignals(True)
@@ -1686,7 +1629,6 @@ class GwInfo(QObject):
         layer.startEditing()
         QgsProject.instance().blockSignals(False)
 
-
     def _ask_for_save(self, action_edit, fid):
 
         msg = 'Are you sure to save this feature?'
@@ -1695,7 +1637,6 @@ class GwInfo(QObject):
             tools_qt.set_action_checked(action_edit, True)
             return False
         return True
-
 
     def _roll_back(self):
         """ Discard changes in current layer """
@@ -1718,7 +1659,6 @@ class GwInfo(QObject):
             pass
         except RuntimeError:
             pass
-
 
     def _open_section_form(self):
 
@@ -1747,7 +1687,6 @@ class GwInfo(QObject):
 
         dlg_sections.btn_close.clicked.connect(partial(tools_gw.close_dialog, dlg_sections))
         tools_gw.open_dialog(dlg_sections, dlg_name='info_crossect')
-
 
     def _accept(self, dialog, complet_result, _json, p_widget=None, clear_json=False, close_dlg=True, new_feature=None, generic=False):
         """
@@ -1833,7 +1772,7 @@ class GwInfo(QObject):
                 self._enable_action(dialog, "actionCentered", True)
                 self._enable_action(dialog, "actionAudit", True)
                 self._enable_action(dialog, "actionSetToArc", True)
-                global is_inserting
+                global is_inserting  # noqa: F824
                 is_inserting = False
                 my_json = json.dumps(_json)
                 if my_json == '' or str(my_json) == '{}':
@@ -1848,7 +1787,6 @@ class GwInfo(QObject):
                             return True
                         tools_gw.close_dialog(dialog)
                     return True
-
 
                 if self.new_feature.attribute(id_name) is not None:
                     feature = f'"id":"{self.new_feature.attribute(id_name)}", '
@@ -1947,11 +1885,9 @@ class GwInfo(QObject):
 
         return True
 
-
     def _manage_prev_action(self):
         if self.prev_action:
             self.prev_action.action.trigger()
-
 
     def _enable_actions(self, dialog, enabled):
         """ Enable actions according if layer is editable or not """
@@ -1967,7 +1903,7 @@ class GwInfo(QObject):
 
             # When we are inserting we want the activation of QAction to be governed by the database,
             # when we are editing, it will govern the editing state of the layer.
-            global is_inserting
+            global is_inserting  # noqa: F824
             if not is_inserting:
                 return
 
@@ -1988,7 +1924,6 @@ class GwInfo(QObject):
         except RuntimeError:
             pass
 
-
     def _enable_action(self, dialog, action, enabled):
 
         if type(action) is str:
@@ -1996,7 +1931,6 @@ class GwInfo(QObject):
         if not action:
             return
         action.setEnabled(enabled)
-
 
     def _check_datatype_validator(self, dialog, widget, btn):
         """
@@ -2012,7 +1946,6 @@ class GwInfo(QObject):
             """ If the function called by getattr don't exist raise this exception """
             pass
 
-
     def _check_double(self, value, widget, btn_accept):
         """ Check if the value is double or not.
             This function is called in def check_datatype_validator(self, value, widget, btn)
@@ -2026,7 +1959,6 @@ class GwInfo(QObject):
             widget.setStyleSheet("border: 1px solid red")
             btn_accept.setEnabled(False)
 
-
     def _check_integer(self, value, widget, btn_accept):
         """ Check if the value is an integer or not.
             This function is called in def check_datatype_validator(self, value, widget, btn)
@@ -2039,7 +1971,6 @@ class GwInfo(QObject):
         else:
             widget.setStyleSheet("border: 1px solid red")
             btn_accept.setEnabled(False)
-
 
     def _check_min_max_value(self, dialog, widget, btn_accept):
 
@@ -2056,14 +1987,12 @@ class GwInfo(QObject):
             widget.setStyleSheet("border: 1px solid red")
             btn_accept.setEnabled(False)
 
-
     def _check_tab_data(self, field):
         """ Check if current tab name is tab_data """
 
         if field.get('tabname') != 'tab_data':
             return False
         return True
-
 
     def _clean_my_json(self, widget):
         """ Delete keys if exist, when widget is autoupdate """
@@ -2073,7 +2002,6 @@ class GwInfo(QObject):
         except KeyError:
             pass
 
-
     def _reset_my_json(self, reset_epa=True):
         """ Clear the my_json dictionary """
 
@@ -2081,11 +2009,9 @@ class GwInfo(QObject):
         if reset_epa:
             self._reset_my_json_epa()
 
-
     def _reset_my_json_epa(self):
         """ Clear the my_json_epa dictionary """
         self.my_json_epa.clear()
-
 
     def _set_auto_update_lineedit(self, field, dialog, widget, new_feature=None):
 
@@ -2113,7 +2039,6 @@ class GwInfo(QObject):
         widget.textChanged.connect(partial(self._check_datatype_validator, dialog, widget, dialog.btn_accept))
 
         return widget
-
 
     def _accept_auto_update(self, dialog, complet_result, _json, p_widget=None, clear_json=False, close_dlg=True, new_feature=None, generic=False):
 
@@ -2151,7 +2076,6 @@ class GwInfo(QObject):
         # Call accept fct
         self._accept(dialog, complet_result, _json, p_widget, clear_json, close_dlg, new_feature, generic)
 
-
     def _set_auto_update_textarea(self, field, dialog, widget, new_feature):
 
         if widget.property('isfilter'): return widget
@@ -2177,14 +2101,12 @@ class GwInfo(QObject):
 
         return widget
 
-
     def _set_auto_update_hyperlink(self, field, dialog, widget, new_feature=None):
 
         if self._check_tab_data(dialog):
             widget.editingFinished.connect(partial(tools_gw.get_values, dialog, widget, self.my_json))
 
         return widget
-
 
     def _reload_fields(self, dialog, result, p_widget):
         """
@@ -2233,10 +2155,8 @@ class GwInfo(QObject):
                 level = field['message']['level'] if 'level' in field['message'] else 0
                 tools_qgis.show_message(field['message']['text'], level)
 
-
     def _enabled_accept(self, dialog):
         dialog.btn_accept.setEnabled(True)
-
 
     def _reload_epa_tab(self, dialog):
         epa_type = tools_qt.get_text(dialog, 'tab_data_epa_type')
@@ -2278,7 +2198,6 @@ class GwInfo(QObject):
             self._reset_my_json_epa()
             dialog.show()
 
-
     def _set_auto_update_combobox(self, field, dialog, widget, new_feature):
 
         if widget.property('isfilter'): return widget
@@ -2287,7 +2206,6 @@ class GwInfo(QObject):
         widget.currentIndexChanged.connect(partial(self._handle_combobox_change, widget, dialog, field))
 
         return widget
-
 
     def _set_auto_update_dateedit(self, field, dialog, widget, new_feature):
 
@@ -2309,7 +2227,6 @@ class GwInfo(QObject):
             # TODO: Make autoupdate widgets work
 
         return widget
-
 
     def _set_auto_update_spinbox(self, field, dialog, widget, new_feature):
 
@@ -2333,7 +2250,6 @@ class GwInfo(QObject):
 
         return widget
 
-
     def _set_auto_update_checkbox(self, field, dialog, widget, new_feature):
 
         if widget.property('isfilter'): return widget
@@ -2354,7 +2270,6 @@ class GwInfo(QObject):
             # TODO: Make autoupdate widgets work
         return widget
 
-
     def _handle_combobox_change(self, widget, dialog, field):
         _json = {}
         if self._check_tab_data(field):  # Tab data
@@ -2368,7 +2283,6 @@ class GwInfo(QObject):
         else:  # Other tabs
             tools_gw.get_values(dialog, widget, self.my_json_epa)
             # TODO: Make autoupdate widgets work for other tabs as well
-
 
     def run_settopology(self, widget, **kwargs):
         """ Sets node_1/2 from lineedit & converts widget into button if function run successfully """
@@ -2402,7 +2316,6 @@ class GwInfo(QObject):
             return
         tools_qgis.show_warning("Error setting node", dialog=dialog)
 
-
     def _open_catalog(self, tab_type, feature_type, child_type):
 
         self.catalog = GwCatalog()
@@ -2412,7 +2325,6 @@ class GwInfo(QObject):
     def _open_audit_manager(self):
         self.audit = GwAudit()
         self.audit.open_audit_manager(self.feature_id, self.tablename)
-
 
     def _show_actions(self, dialog, tab_name, enable_actions=True):
         """
@@ -2441,7 +2353,6 @@ class GwInfo(QObject):
 
         if enable_actions:
             self._enable_actions(dialog, self.action_edit.isChecked())
-
 
     def _check_elev_y(self):
         """ Show a warning if feature has both y and elev values """
@@ -2487,7 +2398,6 @@ class GwInfo(QObject):
                     tools_qgis.show_warning(msg, dialog=self.dlg_cf)
                     return False
         return True
-
 
     def _has_elev_and_y_json(self, _json):
         """ :returns True if feature has both y and elev values. False otherwise  """
@@ -2556,7 +2466,6 @@ class GwInfo(QObject):
                     return has_y and has_top_elev
 
         return False
-
 
     def _has_elev_y_json(self, _json, modified):
         """If we're creating new feature, check which keys are in json"""
@@ -2637,7 +2546,6 @@ class GwInfo(QObject):
 
         return False
 
-
     def _has_y(self, arc_n=1):
         """ :returns True if feature has y values. False otherwise """
 
@@ -2659,7 +2567,6 @@ class GwInfo(QObject):
 
         return True
 
-
     def _has_elev(self, arc_n=1):
         """ :returns True if feature has elev values. False otherwise """
 
@@ -2680,7 +2587,6 @@ class GwInfo(QObject):
                 return (row[0], row[1]) != (None, None)
 
         return True
-
 
     def _has_top_elev(self):
         """ :returns True if feature has top_elev values. False otherwise """
@@ -2789,7 +2695,6 @@ class GwInfo(QObject):
                 self._fill_tab_plan(self.complet_result)
                 self.tab_plan_loaded = True
 
-
     def _manage_gallery_status(self, tbl_visits, btn_open_gallery):
 
         selected_indexes = tbl_visits.selectionModel().selectedRows()
@@ -2802,7 +2707,6 @@ class GwInfo(QObject):
             btn_open_gallery.setEnabled(value in [True, "True", 1, "1"])
         else:
             btn_open_gallery.setEnabled(False)
-
 
     def _init_tab(self, complet_result, filter_fields='', id_name=None):
 
@@ -2824,7 +2728,6 @@ class GwInfo(QObject):
                 return False
             tools_gw.set_filter_listeners(complet_result, self.dlg_cf, widget_list, columnname, widgetname, self.feature_id)
         return complet_list
-
 
     def _fill_tbl(self, complet_result, dialog, widgetname, linkedobject, filter_fields, id_name=None):
         """ Put filter widgets into layout and set headers into QTableView """
@@ -2872,7 +2775,6 @@ class GwInfo(QObject):
         widget_list.extend(self.tab_main.widget(index_tab).findChildren(QLineEdit, QRegularExpression(f"{tab_name}_")))
         widget_list.extend(self.tab_main.widget(index_tab).findChildren(QgsDateTimeEdit, QRegularExpression(f"{tab_name}_")))
         return complet_list, widget_list
-
 
     def _set_filter_listeners(self, complet_result, dialog, widget_list, columnname, widgetname):
         """
@@ -2931,7 +2833,6 @@ class GwInfo(QObject):
             elif isinstance(last_widget, QComboBox):
                 last_widget.currentIndexChanged.emit(last_widget.currentIndex())
 
-
     def _get_list(self, complet_result, form_name='', tab_name='', filter_fields='', widgetname='', formtype='', linkedobject='', id_name=None):
 
         form = f'"formName":"{form_name}", "tabName":"{tab_name}", "widgetname":"{widgetname}", "formtype":"{formtype}"'
@@ -2947,9 +2848,7 @@ class GwInfo(QObject):
 
         return complet_list
 
-
     """ FUNCTIONS RELATED WITH TAB PLAN """
-
 
     def _fill_tab_plan(self, complet_result):
 
@@ -2998,7 +2897,6 @@ class GwInfo(QObject):
                 plan_vertical_spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
                 plan_layout.addItem(plan_vertical_spacer)
 
-
     def _add_label(self, field):
         """ Add widgets QLineEdit type """
 
@@ -3011,7 +2909,6 @@ class GwInfo(QObject):
             widget.setText(field['value'])
 
         return widget
-
 
     def _get_catalog(self, form_name, table_name, feature_type, feature_id, list_points, id_name):
 
@@ -3026,7 +2923,6 @@ class GwInfo(QObject):
         dlg_generic = GwInfoGenericUi(self)
         tools_gw.load_settings(dlg_generic)
 
-
         # Set signals
         dlg_generic.btn_close.clicked.connect(partial(tools_gw.close_dialog, dlg_generic))
         dlg_generic.dlg_closed.connect(partial(tools_gw.close_dialog, dlg_generic))
@@ -3037,7 +2933,6 @@ class GwInfo(QObject):
         # Open dialog
         dlg_generic.setWindowTitle(f"{(form_name.lower()).capitalize().replace('_', ' ')}")
         tools_gw.open_dialog(dlg_generic)
-
 
     def _set_catalog(self, dialog, form_name, table_name, feature_id, id_name):
         """ Insert table 'cat_work'. Add cat_work """
@@ -3092,10 +2987,8 @@ class GwInfo(QObject):
         self._enable_buttons()
         tools_gw.close_dialog(dialog)
 
-
     def _enable_buttons(self):
         self.dlg_cf.setEnabled(True)
-
 
     def _mouse_moved(self, layer, point):
         """ Mouse motion detection """
@@ -3116,7 +3009,6 @@ class GwInfo(QObject):
             viewname = tools_qgis.get_layer_source_table_name(layer)
             if viewname == layer_name:
                 self.snapper_manager.add_marker(result, self.vertex_marker)
-
 
     def _get_id(self, dialog, action, option, emit_point, child_type, widget_name, point, event):
         """ Get selected attribute from snapped feature """
@@ -3166,7 +3058,6 @@ class GwInfo(QObject):
             tools_qgis.show_warning(f"Exception in info (def _get_id)", parameter=e)
         finally:
             self._cancel_snapping_tool(dialog, action)
-
 
     def _set_to_arc(self, dialog, feat_id, child_type, widget_name, simple=False):
         """
@@ -3234,16 +3125,13 @@ class GwInfo(QObject):
         action.setChecked(False)
         self.signal_activate.emit()
 
-
     """ FUNCTIONS ASSOCIATED TO BUTTONS FROM POSTGRES"""
-
 
     def _action_is_checked(self):
         """ Recover snapping options when action add feature is un-checked """
 
         if not self.iface.actionAddFeature().isChecked():
             tools_gw.disconnect_signal('info', 'add_feature_actionAddFeature_toggled_action_is_checked')
-
 
     def _open_new_feature(self, feature_id):
         """
@@ -3268,7 +3156,7 @@ class GwInfo(QObject):
             tools_log.log_info("NO FEATURE TYPE DEFINED")
 
         tools_gw.init_docker()
-        global is_inserting
+        global is_inserting  # noqa: F824
         is_inserting = True
 
         self.info_feature = GwInfo('data')
@@ -3285,7 +3173,6 @@ class GwInfo(QObject):
             self.info_layer.deleteFeature(feature.id())
             self.iface.actionRollbackEdits().trigger()
             is_inserting = False
-
 
     def _get_combo_child(self, dialog, widget, feature_type, tablename, field_id):
         """
@@ -3422,7 +3309,6 @@ def open_epa_dlg(windowtitle, **kwargs):
     widgets_tablename = func_params.get('widgetsTablename')
     widgets_table_pk = func_params.get('widgetsTablePk')
 
-
     feature_id = complet_result['body']['feature']['id']
     id_name = complet_result['body']['feature']['idName']
 
@@ -3443,7 +3329,6 @@ def open_epa_dlg(windowtitle, **kwargs):
         pages = ["page_dwf", "page_inflows"]
         remove_toolbox_page(info.dlg.toolBox, pages)
         info.dlg.repaint()
-
 
     # Fill widgets
     if widgets and widgets_tablename:
@@ -3538,7 +3423,6 @@ def open_epa_dlg(windowtitle, **kwargs):
         tbl.setContextMenuPolicy(Qt.CustomContextMenu)
         tbl.customContextMenuRequested.connect(partial(_show_context_menu, tbl, tableview))
 
-
     info.dlg.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, info.dlg, True))
     info.dlg.finished.connect(partial(tools_gw.save_settings, info.dlg))
     # Open dlg
@@ -3589,8 +3473,6 @@ def remove_toolbox_page(toolbox, pages):
     for page in pages:
         toolbox.widget(tools_qt.get_page_index_by_page_name(toolbox, page)).deleteLater()
         toolbox.removeItem(tools_qt.get_page_index_by_page_name(toolbox, page))
-
-
 
 
 def edit_row_epa(tbl, view, tablename, pkey, dlg, dlg_title, **kwargs):

@@ -40,7 +40,6 @@ class GwArcAddButton(GwAction):
             self.action.setMenu(self.menu)
             toolbar.addAction(self.action)
 
-
     def clicked_event(self):
 
         # Refresh cat feature list
@@ -49,9 +48,7 @@ class GwArcAddButton(GwAction):
         if self.menu.property('last_selection') is not None:
             self.info_feature.add_feature(self.menu.property('last_selection'), action=self)
 
-
     # region private functions
-
 
     def _fill_arc_menu(self):
         """ Fill add arc menu """
@@ -122,7 +119,6 @@ class GwArcAddButton(GwAction):
                     self.menu.addAction(obj_action)
                     obj_action.triggered.connect(partial(self.info_feature.add_feature, feature_cat, self))
                     obj_action.triggered.connect(partial(self._save_last_selection, self.menu, feature_cat))
-
 
     def _save_last_selection(self, menu, feature_cat):
         menu.setProperty("last_selection", feature_cat)

@@ -18,7 +18,6 @@ class GwNonVisualManagerButton(GwAction):
 
         self.nonvisual = GwNonVisual()
 
-
     def clicked_event(self):
         self.nonvisual.manage_nonvisual()
 

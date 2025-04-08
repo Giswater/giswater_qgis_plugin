@@ -22,7 +22,6 @@ class GwDimensioningButton(GwMaptool):
         super().__init__(icon_path, action_name, text, toolbar, action_group)
         self.suppres_form = None
 
-
     # region QgsMapTools inherited
 
     def activate(self):
@@ -58,7 +57,6 @@ class GwDimensioningButton(GwMaptool):
                                     'dimensioning', 'activate_layer_featureAdded_open_new_dimensioning')
 
     # endregion
-
 
     # region private functions
 

@@ -31,6 +31,7 @@ except ImportError:
     tools_qgis.show_critical(title="Epatools Plugin", text=WNTR_IMPORT_ERROR)
     tools_qgis.show_critical(title="Epatools Plugin", text=error_traceback)
 
+
 class GwAddDemandCheck(GwTask):
     def __init__(
         self, description, input_file, config, output_folder, file_name, results={}

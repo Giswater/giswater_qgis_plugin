@@ -53,7 +53,6 @@ class GwFeatureReplaceButton(GwMaptool):
             self.action.setMenu(self.menu)
             toolbar.addAction(self.action)
 
-
     # region QgsMapTools inherited
     """ QgsMapTools inherited event functions """
 
@@ -90,7 +89,6 @@ class GwFeatureReplaceButton(GwMaptool):
             message = "Click on feature to replace it with a new one. You can select other layer to snapp diferent feature type."
             tools_qgis.show_info(message)
 
-
     def canvasMoveEvent(self, event):
 
         # Hide marker and get coordinates
@@ -104,7 +102,6 @@ class GwFeatureReplaceButton(GwMaptool):
             tablename = tools_qgis.get_layer_source_table_name(layer)
             if tablename and 'v_edit' in tablename:
                 self.snapper_manager.add_marker(result, self.vertex_marker)
-
 
     def canvasReleaseEvent(self, event):
 
@@ -144,7 +141,6 @@ class GwFeatureReplaceButton(GwMaptool):
 
     # endregion
 
-
     # region private functions
 
     def _fill_action_menu(self):
@@ -169,7 +165,6 @@ class GwFeatureReplaceButton(GwMaptool):
             obj_action.triggered.connect(partial(tools_gw.set_config_parser, section="btn_feature_replace",
                                                  parameter="last_feature_type", value=action, comment=None))
 
-
     def _set_active_layer(self, name):
         """ Sets the active layer according to the name parameter (ARC, NODE, CONNEC, GULLY) """
 
@@ -178,7 +173,6 @@ class GwFeatureReplaceButton(GwMaptool):
         if layer:
             self.iface.setActiveLayer(layer)
             self.current_layer = layer
-
 
     def _manage_dates(self, date_value):
         """ Manage dates """
@@ -192,7 +186,6 @@ class GwFeatureReplaceButton(GwMaptool):
             tools_log.log_warning(str(e))
         finally:
             return date_result
-
 
     def _init_replace_feature_form(self, feature):
 
@@ -287,7 +280,6 @@ class GwFeatureReplaceButton(GwMaptool):
         # Open dialog
         tools_gw.open_dialog(self.dlg_replace)
 
-
     def _open_catalog(self, feature_type):
 
         # Get feature_type
@@ -299,7 +291,6 @@ class GwFeatureReplaceButton(GwMaptool):
 
         self.catalog = GwCatalog()
         self.catalog.open_catalog(self.dlg_replace, 'featurecat_id', feature_type, child_type)
-
 
     def _update_date(self):
 
@@ -322,7 +313,6 @@ class GwFeatureReplaceButton(GwMaptool):
 
         self.dlg_replace.enddate.setDate(self.enddate_aux)
 
-
     def _new_workcat(self):
 
         self.dlg_new_workcat = GwInfoWorkcatUi(self)
@@ -338,7 +328,6 @@ class GwFeatureReplaceButton(GwMaptool):
 
         # Open dialog
         tools_gw.open_dialog(self.dlg_new_workcat, dlg_name='info_workcat')
-
 
     def _manage_new_workcat_accept(self, table_object):
         """ Insert table 'cat_work'. Add cat_work """
@@ -396,7 +385,6 @@ class GwFeatureReplaceButton(GwMaptool):
                 else:
                     msg = "This Workcat is already exist"
                     tools_qt.show_info_box(msg, "Warning")
-
 
     def _replace_feature(self, dialog):
 
@@ -465,7 +453,6 @@ class GwFeatureReplaceButton(GwMaptool):
 
             # Check in init config file if user wants to keep map tool active or not
             self.manage_active_maptool()
-
 
     def _edit_change_elem_type_get_value(self, index):
         """ Just select item to 'real' combo 'featurecat_id' (that is hidden) """

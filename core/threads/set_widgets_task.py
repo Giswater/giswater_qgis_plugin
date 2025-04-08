@@ -24,8 +24,6 @@ class GWSetWidgetsTask(GwTask):
         self.info = info
         self.params = params
 
-
-
     def run(self):
         """ Automatic mincut: Execute function 'gw_fct_mincut' """
         super().run()
@@ -55,8 +53,6 @@ class GWSetWidgetsTask(GwTask):
             vertical_spacer1 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
             layout.addItem(vertical_spacer1)
         return True
-
-
 
     def finished(self, result):
         super().finished(result)

@@ -17,7 +17,6 @@ from .. import global_vars
 from ..libs import lib_vars, tools_log
 
 
-
 class GwTest(QObject):
 
     def __init__(self, iface):
@@ -56,7 +55,6 @@ class GwTest(QObject):
 
         self.global_vars = global_vars
 
-
     def init_plugin(self, schema_name=None):
         """ Plugin main initialization function """
 
@@ -71,7 +69,6 @@ class GwTest(QObject):
         # Set test classes
         self.gw_admin = GwAdminButton()
         self.visit_manager = GwVisit()
-
 
     def get_plugin_metadata(self, parameter, default_value):
         """ Get @parameter from metadata.txt file """

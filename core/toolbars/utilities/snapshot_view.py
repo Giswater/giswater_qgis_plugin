@@ -18,6 +18,7 @@ from ....libs import lib_vars, tools_qt, tools_db, tools_qgis
 from ...utils.select_manager import GwSelectManager
 from .... import global_vars
 
+
 class GwSnapshotViewButton(GwAction):
     """ Button 68: Snapshot View """
 
@@ -25,11 +26,9 @@ class GwSnapshotViewButton(GwAction):
 
         super().__init__(icon_path, action_name, text, toolbar, action_group)
 
-
     def clicked_event(self):
 
         self._open_snapshot_view()
-
 
     # region private functions
 
@@ -71,7 +70,6 @@ class GwSnapshotViewButton(GwAction):
 
         # Open form
         tools_gw.open_dialog(self.dlg_snapshot_view, 'snapshot_view')
-
 
     def _handle_coordinates_actions(self):
         """Populate the coordinates actions button with actions"""
@@ -200,6 +198,7 @@ def run(**kwargs):
     else:
         tools_qgis.show_warning("No results", dialog=dlg.dlg_snapshot_view)
 
+
 def add_layers_temp(layers, group):
     """Creates temporary layers from a given list of layers and adds them to specified subgroups under a main group in QGIS."""
 
@@ -266,6 +265,7 @@ def add_layers_temp(layers, group):
 
         # Apply rule-based style
         apply_layer_style(v_layer, layer_group, aux_layer_name)
+
 
 def apply_layer_style(layer, layer_group, layer_origin):
     """Applies styling to a layer based on its geometry type and feature colors."""

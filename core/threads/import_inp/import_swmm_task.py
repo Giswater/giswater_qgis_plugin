@@ -664,6 +664,7 @@ class GwImportInpTask(GwTask):
             ts_data_f = tuple()
             if not ts_data:
                 return ts_data_f
+
             def format_time(time, value) -> tuple:
                 if isinstance(time, float):
                     total_minutes = int(time * 60)

@@ -48,7 +48,6 @@ class GwAuxPointAddButton(GwMaptool):
         self.rb_final_point.setIcon(QgsRubberBand.ICON_X)
         self.rb_final_point.setIconSize(10)
 
-
     def cancel(self):
 
         tools_gw.set_config_parser('btn_auxpoint', "rb_left", f"{self.dlg_create_point.rb_left.isChecked()}")
@@ -63,7 +62,6 @@ class GwAuxPointAddButton(GwMaptool):
         self.cancel_point = True
         self.cancel_map_tool()
 
-
     # region QgsMapTools inherited
     """ QgsMapTools inherited event functions """
 
@@ -73,7 +71,6 @@ class GwAuxPointAddButton(GwMaptool):
             self.cancel_map_tool()
             self.iface.setActiveLayer(self.current_layer)
             return
-
 
     def canvasMoveEvent(self, event):
 
@@ -91,11 +88,9 @@ class GwAuxPointAddButton(GwMaptool):
             # Get the point and add marker on it
             self.snapper_manager.add_marker(result, self.vertex_marker)
 
-
     def canvasReleaseEvent(self, event):
 
         self._add_aux_point(event)
-
 
     def activate(self):
 
@@ -123,7 +118,6 @@ class GwAuxPointAddButton(GwMaptool):
             message = "Click on 2 places on the map, creating a line, then set the location of a point"
             tools_qgis.show_info(message)
 
-
         # Get current layer
         self.current_layer = self.iface.activeLayer()
 
@@ -147,7 +141,6 @@ class GwAuxPointAddButton(GwMaptool):
         if self.vdefault_layer is None:
             self.vdefault_layer = self.iface.activeLayer()
 
-
     def deactivate(self):
 
         self.point_1 = None
@@ -161,7 +154,6 @@ class GwAuxPointAddButton(GwMaptool):
             self.iface.setActiveLayer(self.current_layer)
         except RuntimeError:
             pass
-
 
     # endregion
 
@@ -180,7 +172,6 @@ class GwAuxPointAddButton(GwMaptool):
                     if tablename == 'v_edit_cad_auxcircle':
                         geom = 'geom_polygon'
                     tools_gw.add_layer_database(tablename, alias=alias, group="INVENTORY", sub_group="AUXILIAR", the_geom=geom)
-
 
     def _init_create_point_form(self, point_1=None, point_2=None):
 
@@ -208,7 +199,6 @@ class GwAuxPointAddButton(GwMaptool):
 
         tools_gw.open_dialog(self.dlg_create_point, dlg_name='auxpoint')
         self.dlg_create_point.dist_x.setFocus()
-
 
     def _preview_point(self, dialog, point1, point2):
 
@@ -268,7 +258,6 @@ class GwAuxPointAddButton(GwMaptool):
         preview_point = QgsPointXY(new_point_x_perpendicular, new_point_y_perpendicular)
         self.rb_final_point.addPoint(preview_point)
 
-
     def _get_values(self, point_1, point_2):
 
         tools_gw.set_config_parser('btn_auxpoint', "rb_left", f"{self.dlg_create_point.rb_left.isChecked()}")
@@ -310,7 +299,6 @@ class GwAuxPointAddButton(GwMaptool):
             self.cancel_point = False
             return
         self._reset_rubberbands()
-
 
     def _add_aux_point(self, event):
         if event.button() == Qt.LeftButton:
@@ -358,7 +346,6 @@ class GwAuxPointAddButton(GwMaptool):
 
         if self.layer_points:
             self.layer_points.commitChanges()
-
 
     def _reset_rubberbands(self):
 

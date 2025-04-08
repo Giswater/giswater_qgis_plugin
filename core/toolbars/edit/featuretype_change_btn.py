@@ -22,6 +22,7 @@ from qgis.PyQt.QtWidgets import QAction, QAbstractItemView, QCheckBox, QComboBox
     QDateEdit, QGridLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QPushButton, QSizePolicy, \
     QSpinBox, QSpacerItem, QTableView, QTabWidget, QWidget, QTextEdit, QRadioButton, QToolBox, QHBoxLayout
 
+
 class GwFeatureTypeChangeButton(GwMaptool):
     """ Button 25: Change feature type
     User select from drop-down button feature type: ARC, NODE, CONNEC.
@@ -58,7 +59,6 @@ class GwFeatureTypeChangeButton(GwMaptool):
         if toolbar is not None:
             self.action.setMenu(self.menu)
             toolbar.addAction(self.action)
-
 
     # region QgsMapTools inherited
     """ QgsMapTools inherited event functions """
@@ -97,7 +97,6 @@ class GwFeatureTypeChangeButton(GwMaptool):
             message = "Click on feature to change its type"
             tools_qgis.show_info(message)
 
-
     def canvasMoveEvent(self, event):
 
         # Hide marker and get coordinates
@@ -112,14 +111,11 @@ class GwFeatureTypeChangeButton(GwMaptool):
             if tablename and 'v_edit' in tablename:
                 self.snapper_manager.add_marker(result, self.vertex_marker)
 
-
     def canvasReleaseEvent(self, event):
 
         self._featuretype_change(event)
 
-
     # endregion
-
 
     # region private functions
 
@@ -145,7 +141,6 @@ class GwFeatureTypeChangeButton(GwMaptool):
             obj_action.triggered.connect(partial(tools_gw.set_config_parser, section="btn_featuretype_change",
                                                  parameter="last_feature_type", value=action, comment=None))
 
-
     def _set_active_layer(self, name):
         """ Sets the active layer according to the name parameter (ARC, NODE, CONNEC, GULLY) """
 
@@ -170,7 +165,6 @@ class GwFeatureTypeChangeButton(GwMaptool):
 
             dialog.dlg_closed.connect(partial(tools_qgis.restore_user_layer, self.tablename))
 
-
     def _open_dialog(self):
         """ Open Feature Change Dialog dynamic """
 
@@ -181,7 +175,6 @@ class GwFeatureTypeChangeButton(GwMaptool):
         tools_gw.load_settings(self.dlg_change)
         self._manage_dlg_widgets(self.dlg_change, json_result)
         tools_gw.open_dialog(self.dlg_change, 'featuretype_change')
-
 
     def _manage_dlg_widgets(self, dialog, complet_result):
         """ Creates and populates all the widgets, preserving original layout logic while ensuring two-column alignment """
@@ -233,7 +226,6 @@ class GwFeatureTypeChangeButton(GwMaptool):
             # Apply consistent column stretch across all layouts
             layout.setColumnStretch(0, 1)  # Label column stretch (keep this compact)
             layout.setColumnStretch(1, 3)  # Widget column stretch for sufficient space
-
 
     def _featuretype_change(self, event):
 

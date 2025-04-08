@@ -16,7 +16,6 @@ class GwVisitButton(GwAction):
         super().__init__(icon_path, action_name, text, toolbar, action_group)
         self.visit_manager = GwVisit()
 
-
     def clicked_event(self):
         self.visit_manager.get_visit(tag='add')
 

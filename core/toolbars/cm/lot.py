@@ -22,16 +22,13 @@ class Lot(GwAction):
         super().__init__(icon_path, action_name, text, toolbar, action_group)
         self.new_lot = AddNewLot(icon_path, action_name, text, toolbar, action_group)
 
-
     def om_add_lot(self):
         """ Button 74: Add new lot """
         self.new_lot.manage_lot()
 
-
     def om_lot_management(self):
         """ Button 75: Lot management """
         self.new_lot.lot_manager()
-
 
     def om_resource_management(self):
         """ Button 76: Resources Management """

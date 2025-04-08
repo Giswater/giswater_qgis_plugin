@@ -102,7 +102,6 @@ class GwConnectLinkButton(GwMaptool):
                       "CTRL + SHIFT over selection to remove it"
             tools_qgis.show_info(message, duration=9)
 
-
     def canvasMoveEvent(self, event):
         """ With left click the digitizing is finished """
 
@@ -115,12 +114,10 @@ class GwConnectLinkButton(GwMaptool):
             self.select_rect.setBottomRight(event.pos())
             self._set_rubber_band()
 
-
     def canvasPressEvent(self, event):
 
         self.select_rect.setRect(0, 0, 0, 0)
         tools_gw.reset_rubberband(self.rubber_band, "polygon")
-
 
     def canvasReleaseEvent(self, event):
         """ With left click the digitizing is finished """
@@ -249,7 +246,6 @@ class GwConnectLinkButton(GwMaptool):
                     layer_connec).isVisible() is False:
                 self.cancel_map_tool()
 
-
     def manage_result(self, result, layer):
 
         if result and result['status'] != 'Failed':
@@ -278,7 +274,6 @@ class GwConnectLinkButton(GwMaptool):
         # Force reload dataProvider of layer
         tools_qgis.set_layer_index('v_edit_link')
         tools_qgis.set_layer_index('v_edit_vnode')
-
 
     def manage_gully_result(self):
 
@@ -312,7 +307,6 @@ class GwConnectLinkButton(GwMaptool):
 
     # endregion
 
-
     # region private functions
 
     def _set_rubber_band(self):
@@ -335,7 +329,6 @@ class GwConnectLinkButton(GwMaptool):
         self.rubber_band.addPoint(ll, True)
 
         self.selected_rectangle = QgsRectangle(ll, ur)
-
 
     def _select_multiple_features(self, select_geometry):
 
@@ -376,7 +369,5 @@ class GwConnectLinkButton(GwMaptool):
                     selected_ids = [feature.id() for feature in selected_features]
                     # Keep only the first ID and deselect the others
                     layer.selectByIds([selected_ids[0]])
-
-
 
     # endregion

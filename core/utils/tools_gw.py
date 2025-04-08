@@ -467,7 +467,6 @@ def reconnect_signal(section, signal_name):
 def create_body(form='', feature='', filter_fields='', extras=None, list_feature=None, body=None) -> str:
     """ Create and return parameters as body to functions"""
 
-
     info_types = {'full': 1}
     info_type = info_types.get(lib_vars.project_vars['info_type'])
     lang = QSettings().value('locale/globalLocale', QLocale().name())
@@ -772,6 +771,7 @@ def add_layer_database(tablename=None, the_geom="the_geom", field_id="id", group
                     vr_layer.setEditorWidgetSetup(field_index, editor_widget_setup)
 
     global_vars.iface.mapCanvas().refresh()
+
 
 def validate_qml(qml_content):
     if not qml_content:
@@ -1932,7 +1932,6 @@ def add_button(**kwargs):
         if 'parameters' in field['widgetfunction']:
             func_params = field['widgetfunction']['parameters']
 
-
     kwargs['widget'] = widget
     kwargs['message_level'] = 1
     kwargs['function_name'] = function_name
@@ -2197,7 +2196,6 @@ def add_calendar(dlg, fld, **kwargs):
 
     btn_calendar = widget.findChild(QToolButton)
     btn_calendar.clicked.connect(partial(tools_qt.set_calendar_empty, widget))
-
 
     return widget
 
@@ -2888,7 +2886,6 @@ def manage_json_return(json_result, sql, rubber_band=None, i=None):
                     # Get values for set layer style
                     opacity = 100
 
-
                     style_type = return_manager['style']
 
                     if 'style' in return_manager and 'values' in return_manager['style'][key]:
@@ -3184,6 +3181,7 @@ def manage_layer_manager(json_result, sql=None):
     except Exception as e:
         tools_qt.manage_exception(None, f"{type(e).__name__}: {e}", sql, lib_vars.schema_name)
 
+
 def zoom_to_feature_by_id(tablename: str, idname: str, _id, margin: float=15):
     """ Zoom to feature by id or list of ids """
 
@@ -3208,6 +3206,7 @@ def zoom_to_feature_by_id(tablename: str, idname: str, _id, margin: float=15):
 
     if bbox:
         tools_qgis.zoom_to_rectangle(bbox.xMinimum() - margin, bbox.yMinimum() - margin, bbox.xMaximum() + margin, bbox.yMaximum() + margin)
+
 
 def selection_init(class_object, dialog, table_object, is_psector=False):
     """ Set canvas map tool to an instance of class 'GwSelectManager' """
@@ -3313,7 +3312,6 @@ def selection_changed(class_object, dialog, table_object, is_psector=False, lazy
     table_widget.viewport().update()
     table_widget.repaint()
 
-
     enable_feature_type(dialog, widget_table=table_object, ids=class_object.list_ids[class_object.feature_type])
 
 
@@ -3361,6 +3359,7 @@ def set_model_signals(class_object):
         class_object.qtbl_gully.selectionModel().selectionChanged.connect(partial(
             class_object._manage_tab_feature_buttons
         ))
+
 
 def insert_feature(class_object, dialog, table_object, is_psector=False, remove_ids=True, lazy_widget=None,
                    lazy_init_function=None):
@@ -4743,7 +4742,6 @@ def set_filter_listeners(complet_result, dialog, widget_list, columnname, widget
         else:
             widgetfunction = [widget.property('widgetfunction')]
 
-
         for i in range(len(functions)):
             kwargs = {"complet_result": complet_result, "model": model, "dialog": dialog, "linkedobject": linkedobject,
                       "columnname": columnname, "widget": widget, "widgetname": widgetname, "widget_list": widget_list,
@@ -4804,6 +4802,7 @@ def set_filter_listeners(complet_result, dialog, widget_list, columnname, widget
         elif isinstance(last_widget, QComboBox):
             last_widget.currentIndexChanged.emit(last_widget.currentIndex())
 
+
 def manage_dlg_widgets(class_object, dialog, complet_result):
     """ Creates and populates all the widgets, preserving original layout logic while ensuring two-column alignment """
 
@@ -4853,6 +4852,7 @@ def manage_dlg_widgets(class_object, dialog, complet_result):
         # Apply consistent column stretch across all layouts
         layout.setColumnStretch(0, 1)  # Label column stretch (keep this compact)
         layout.setColumnStretch(1, 3)  # Widget column stretch for sufficient space
+
 
 def set_widgets(dialog, complet_result, field, tablename, class_info):
     """
@@ -5169,6 +5169,7 @@ def reload_layers_filters():
 
 # region Right Click TableView Menu
 
+
 def _force_button_click(dlg, obj, name, pos):
     if obj == QTableView:
         tab = dlg.findChild(obj, name)
@@ -5205,6 +5206,7 @@ def _show_context_menu(self, qtableview):
 
 """ Custom classes to disable wheel scroll event when the widget is not fucused """
 
+
 class CustomQComboBox(QComboBox):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -5215,6 +5217,7 @@ class CustomQComboBox(QComboBox):
             return QComboBox.wheelEvent(self, *args, **kwargs)
         else:
             return
+
 
 class CustomQgsDateTimeEdit(QgsDateTimeEdit):
     def __init__(self, *args, **kwargs):

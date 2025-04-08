@@ -26,7 +26,6 @@ class GwSelector:
         self.help_button = None
         self.scrolled_amount = 0
 
-
     def open_selector(self, selector_type="selector_basic", reload_dlg=None):
         """
         :param selector_type: This parameter must be a string between double quotes. Example: '"selector_basic"'
@@ -77,7 +76,6 @@ class GwSelector:
         # Set typeahead focus if configured
         self._set_focus(dlg_selector)
 
-
     def _selector_close(self, dialog):
 
         if lib_vars.session_vars['dialog_docker'] and lib_vars.session_vars['dialog_docker'].isFloating():
@@ -90,7 +88,6 @@ class GwSelector:
         else:
             tools_gw.close_dialog(dialog)
 
-
     def _set_focus(self, dialog):
         """ Sets the focus to the typeahead filter if it's configured in DB """
 
@@ -101,7 +98,6 @@ class GwSelector:
             widget = dialog.main_tab.widget(index).findChild(QLineEdit, f"txt_filter_{str(tab_name)}")
             if widget:
                 widget.setFocus()
-
 
     def get_selector(self, dialog, selector_type, filter=False, widget=None, text_filter=None, current_tab=None, aux_params=None):
         """
@@ -138,7 +134,6 @@ class GwSelector:
         extras += f', "addSchema":"{lib_vars.project_vars["add_schema"]}"'
         body = tools_gw.create_body(form=form, extras=extras)
         json_result = tools_gw.execute_procedure('gw_fct_getselectors', body)
-
 
         if not json_result or json_result['status'] == 'Failed':
             return False
@@ -280,7 +275,6 @@ class GwSelector:
         if tab:
             main_tab.setCurrentWidget(tab)
 
-
     def _get_layers(self):
             
         #self.arc_layers = [lyr for lyr in [tools_qgis.get_layer_by_tablename('v_edit_arc')] if lyr is not None]
@@ -338,7 +332,6 @@ class GwSelector:
                 # Apply the subset filter to the layer; if the list is empty, set it to None
                 layer.setSubsetString(" AND ".join(subset_filter) if subset_filter else None)
 
-
     def _build_filter(self) -> str:
 
         # Call get_selectors
@@ -378,7 +371,6 @@ class GwSelector:
 
         return muni_filter, sector_filter
 
-
     # region private functions
 
     def _show_help(self, dialog, selection_modes):
@@ -399,7 +391,6 @@ class GwSelector:
             msg += "Checking any item will uncheck all other items.\n"
         msg += f"This behaviour can be configured in the table 'config_param_system' (parameter = 'basic_selector_{tab_name}')."
         tools_qt.show_info_box(msg, "Selector help")
-
 
     def _set_selection_mode(self, dialog, widget, selection_mode):
         """
@@ -432,7 +423,6 @@ class GwSelector:
             self._remove_previuos(dialog, widget, widget_all, widget_list)
 
         self._set_selector(dialog, widget, is_alone, disable_parent)
-
 
     def _set_selector(self, dialog, widget, is_alone, disable_parent, check_all_override=None):
         """
@@ -523,7 +513,6 @@ class GwSelector:
         widget_filter = tools_qt.get_widget(dialog, f"txt_filter_{tab_name}")
         if widget_filter and tools_qt.get_text(dialog, widget_filter, False, False) not in (None, ''):
             widget_filter.textChanged.emit(widget_filter.text())
-
 
     def _remove_previuos(self, dialog, widget, widget_all, widget_list):
         """

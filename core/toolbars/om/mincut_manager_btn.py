@@ -20,6 +20,5 @@ class GwMincutManagerButton(GwAction):
         if global_vars.project_type == 'ws':
             self.mincut = GwMincut()
 
-
     def clicked_event(self):
         self.mincut.manage_mincuts(GwMincutManagerUi(self))

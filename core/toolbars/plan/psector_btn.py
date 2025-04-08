@@ -16,7 +16,6 @@ class GwPsectorButton(GwAction):
         super().__init__(icon_path, action_name, text, toolbar, action_group)
         self.psector = GwPsector()
 
-
     def clicked_event(self):
         self.psector.get_psector()
 

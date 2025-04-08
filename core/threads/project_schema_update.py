@@ -39,7 +39,6 @@ class GwUpdateSchemaTask(GwTask):
         self.admin.dlg_readsql_show_info.setWindowFlag(Qt.WindowCloseButtonHint, False)
         self.admin.dlg_readsql_show_info.show()
 
-
     def run(self):
 
         super().run()
@@ -53,7 +52,6 @@ class GwUpdateSchemaTask(GwTask):
             tools_log.log_info("Function main_execution returned False")
             return False
         return True
-
 
     def finished(self, result):
 
@@ -101,7 +99,6 @@ class GwUpdateSchemaTask(GwTask):
 
         self.setProgress(100)
 
-
     def main_execution(self):
         schema_name = self.admin._get_schema_name()
         sql = f"DELETE FROM {schema_name}.audit_check_data WHERE fid = 133 AND cur_user = current_user;"
@@ -110,7 +107,6 @@ class GwUpdateSchemaTask(GwTask):
         self.dict_folders_process['updates'] = self.get_updates_dict_folders()
         self.status = self.admin.load_updates(self.params['project_type'], update_changelog=True, schema_name=schema_name, dict_update_folders=self.dict_folders_process['updates'])
         return True
-
 
     def get_updates_dict_folders(self):
         """ Get list of all updates folders """

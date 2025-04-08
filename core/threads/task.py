@@ -25,7 +25,6 @@ class GwTask(QgsTask, QObject):
         self.duration = duration
         self.aux_conn = None
 
-
     def run(self) -> bool:
 
         lib_vars.session_vars['threads'].append(self)
@@ -34,7 +33,6 @@ class GwTask(QgsTask, QObject):
         iface.actionOpenProject().setEnabled(False)
         iface.actionNewProject().setEnabled(False)
         return True
-
 
     def finished(self, result):
 
@@ -52,7 +50,6 @@ class GwTask(QgsTask, QObject):
                 tools_log.log_info(f"Task '{self.description()}' not successful but without exception")
             else:
                 tools_log.log_info(f"Task '{self.description()}' Exception: {self.exception}")
-
 
     def cancel(self):
 

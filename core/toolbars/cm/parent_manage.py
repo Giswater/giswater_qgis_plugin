@@ -40,7 +40,6 @@ class ParentManage(ParentAction, object):
         self.remove_ids = True
         self.snapper_manager = None
 
-
     def reset_lists(self):
         """ Reset list of selected records """
 
@@ -52,7 +51,6 @@ class ParentManage(ParentAction, object):
         self.list_ids['gully'] = []
         self.list_ids['element'] = []
 
-
     def reset_layers(self):
         """ Reset list of layers """
 
@@ -63,7 +61,6 @@ class ParentManage(ParentAction, object):
         self.layers['gully'] = []
         self.layers['element'] = []
 
-
     def reset_model(self, dialog, table_object, geom_type):
         """ Reset model of the widget """
 
@@ -72,7 +69,6 @@ class ParentManage(ParentAction, object):
         widget = utils_giswater.getWidget(dialog, widget_name)
         if widget:
             widget.setModel(None)
-
 
     def remove_selection(self, remove_groups=True):
         """ Remove all previous selections """
@@ -112,7 +108,6 @@ class ParentManage(ParentAction, object):
 
         self.canvas.refresh()
 
-
     def reset_widgets(self, dialog, table_object):
         """ Clear contents of input widgets """
 
@@ -134,7 +129,6 @@ class ParentManage(ParentAction, object):
             utils_giswater.setWidgetText(dialog, "rotation", "")
             utils_giswater.setWidgetText(dialog, "verified", "")
             utils_giswater.setWidgetText(dialog, dialog.num_elements, "")
-
 
     def fill_widgets(self, dialog, table_object, row):
         """ Fill input widgets with data int he @row """
@@ -188,7 +182,6 @@ class ParentManage(ParentAction, object):
             if str(row['undelete']) == 'True':
                 dialog.undelete.setChecked(True)
 
-
     def get_records_geom_type(self, dialog, table_object, geom_type):
         """ Get records of @geom_type associated to selected @table_object """
 
@@ -212,7 +205,6 @@ class ParentManage(ParentAction, object):
 
             expr_filter = self.get_expr_filter(geom_type)
             self.set_table_model(dialog, widget_name, geom_type, expr_filter)
-
 
     def exist_object(self, dialog, table_object):
         """ Check if selected object (document or element) already exists """
@@ -276,7 +268,6 @@ class ParentManage(ParentAction, object):
         if self.project_type == 'ud':
             self.get_records_geom_type(dialog, table_object, "gully")
 
-
     def populate_combo(self, dialog, widget, table_name, field_name="id"):
         """ Executes query and fill combo box """
 
@@ -288,7 +279,6 @@ class ParentManage(ParentAction, object):
         if rows:
             utils_giswater.setCurrentIndex(dialog, widget, 0)
 
-
     def set_combo(self, dialog, widget, table_name, parameter, field_id='id', field_name='id'):
         """ Executes query and set combo box """
 
@@ -298,7 +288,6 @@ class ParentManage(ParentAction, object):
         row = self.controller.get_row(sql)
         if row:
             utils_giswater.setWidgetText(dialog, widget, row[0])
-
 
     def set_calendars(self, dialog, widget, table_name, value, parameter):
         """ Executes query and set QDateEdit """
@@ -313,7 +302,6 @@ class ParentManage(ParentAction, object):
         else:
             date = QDate.currentDate()
         utils_giswater.setCalendarDate(dialog, widget, date)
-
 
     def add_point(self):
         """ Create the appropriate map tool and connect to the corresponding signal """
@@ -344,7 +332,6 @@ class ParentManage(ParentAction, object):
         self.xyCoordinates_conected = True
         self.emit_point.canvasClicked.connect(partial(self.get_xy))
 
-
     def mouse_move(self, point):
 
         # Hide marker and get coordinates
@@ -358,7 +345,6 @@ class ParentManage(ParentAction, object):
             self.snapper_manager.add_marker(result, self.vertex_marker)
         else:
             self.vertex_marker.hide()
-
 
     def get_xy(self, point):
         """ Get coordinates of selected point """
@@ -378,13 +364,11 @@ class ParentManage(ParentAction, object):
         self.iface.mapCanvas().refreshAllLayers()
         self.vertex_marker.hide()
 
-
     def get_values_from_form(self, dialog):
 
         self.enddate = utils_giswater.getCalendarDate(dialog, "enddate")
         self.workcat_id_end = utils_giswater.getWidgetText(dialog, "workcat_id_end")
         self.description = utils_giswater.getWidgetText(dialog, "descript")
-
 
     def tab_feature_changed(self, dialog, table_object, excluded_layers=[]):
         """ Set geom_type and layer depending selected tab
@@ -413,7 +397,6 @@ class ParentManage(ParentAction, object):
         self.set_completer_feature_id(dialog.feature_id, self.geom_type, viewname)
 
         self.iface.actionPan().trigger()
-
 
     def set_completer_object(self, dialog, table_object):
         """ Set autocomplete of widget @table_object + "_id"
@@ -446,7 +429,6 @@ class ParentManage(ParentAction, object):
         model.setStringList(rows)
         self.completer.setModel(model)
 
-
     def set_completer_widget(self, tablename, widget, field_id):
         """ Set autocomplete of widget @table_object + "_id"
             getting id's from selected @table_object
@@ -472,7 +454,6 @@ class ParentManage(ParentAction, object):
         model.setStringList(row)
         self.completer.setModel(model)
 
-
     def set_completer_feature_id(self, widget, geom_type, viewname):
         """ Set autocomplete of widget 'feature_id'
             getting id's from selected @viewname
@@ -497,7 +478,6 @@ class ParentManage(ParentAction, object):
 
             model.setStringList(row)
             self.completer.setModel(model)
-
 
     def get_expr_filter(self, geom_type):
         """ Set an expression filter with the contents of the list.
@@ -525,7 +505,6 @@ class ParentManage(ParentAction, object):
 
         return expr_filter
 
-
     def reload_table(self, dialog, table_object, geom_type, expr_filter):
         """ Reload @widget with contents of @tablename applying selected @expr_filter """
 
@@ -545,7 +524,6 @@ class ParentManage(ParentAction, object):
 
         expr = self.set_table_model(dialog, widget, geom_type, expr_filter)
         return expr
-
 
     def set_table_model(self, dialog, table_object, geom_type, expr_filter):
         """ Sets a TableModel to @widget_name attached to
@@ -598,7 +576,6 @@ class ParentManage(ParentAction, object):
 
         return expr
 
-
     def apply_lazy_init(self, widget):
         """Apply the init function related to the model. It's necessary
         a lazy init because model is changed everytime is loaded."""
@@ -609,7 +586,6 @@ class ParentManage(ParentAction, object):
             return
         self.lazy_init_function(self.lazy_widget)
 
-
     def lazy_configuration(self, widget, init_function):
         """set the init_function where all necessary events are set.
         This is necessary to allow a lazy setup of the events because set_table_events
@@ -617,7 +593,6 @@ class ParentManage(ParentAction, object):
 
         self.lazy_widget = widget
         self.lazy_init_function = init_function
-
 
     def select_features_by_ids(self, geom_type, expr):
         """ Select features of layers of group @geom_type applying @expr """
@@ -636,7 +611,6 @@ class ParentManage(ParentAction, object):
                     layer.selectByIds(id_list)
                 else:
                     layer.removeSelection()
-
 
     def delete_records(self, dialog, table_object, query=False):
         """ Delete selected elements of the table """
@@ -733,7 +707,6 @@ class ParentManage(ParentAction, object):
         self.enable_feature_type(dialog, table_object)
         self.connect_signal_selection_changed(dialog, table_object)
 
-
     def manage_close(self, dialog, table_object, cur_active_layer=None, excluded_layers=[]):
         """ Close dialog and disconnect snapping """
 
@@ -758,7 +731,6 @@ class ParentManage(ParentAction, object):
         self.disconnect_snapping()
         self.disconnect_signal_selection_changed()
 
-
     def selection_init(self, dialog, table_object, query=False):
         """ Set canvas map tool to an instance of class 'MultipleSelection' """
 
@@ -772,7 +744,6 @@ class ParentManage(ParentAction, object):
         self.connect_signal_selection_changed(dialog, table_object, query)
         cursor = self.get_cursor_multiple_selection()
         self.canvas.setCursor(cursor)
-
 
     def selection_changed(self, dialog, table_object, geom_type, query=False):
         """ Slot function for signal 'canvas.selectionChanged' """
@@ -836,7 +807,6 @@ class ParentManage(ParentAction, object):
         self.enable_feature_type(dialog, table_object)
         self.connect_signal_selection_changed(dialog, table_object)
 
-
     def delete_feature_at_plan(self, dialog, geom_type, list_id):
         """ Delete features_id to table plan_@geom_type_x_psector"""
 
@@ -844,7 +814,6 @@ class ParentManage(ParentAction, object):
         sql = (f"DELETE FROM plan_psector_x_{geom_type} "
                f"WHERE {geom_type}_id IN ({list_id}) AND psector_id = '{value}'")
         self.controller.execute_sql(sql)
-
 
     def enable_feature_type(self, dialog, widget_name='tbl_relation'):
 
@@ -855,7 +824,6 @@ class ParentManage(ParentAction, object):
                 feature_type.setEnabled(False)
             else:
                 feature_type.setEnabled(True)
-
 
     def insert_feature(self, dialog, table_object, query=False, remove_ids=True):
         """ Select feature with entered id. Set a model with selected filter.
@@ -936,7 +904,6 @@ class ParentManage(ParentAction, object):
 
         self.controller.log_info(self.list_ids[self.geom_type])
 
-
     def insert_feature_to_plan(self, dialog, geom_type):
         """ Insert features_id to table plan_@geom_type_x_psector """
 
@@ -952,7 +919,6 @@ class ParentManage(ParentAction, object):
                 self.controller.execute_sql(sql)
             self.reload_qtable(dialog, geom_type)
 
-
     def reload_qtable(self, dialog, geom_type):
         """ Reload QtableView """
 
@@ -962,7 +928,6 @@ class ParentManage(ParentAction, object):
         self.fill_table_by_expr(qtable, f"plan_psector_x_{geom_type}", expr)
         self.set_table_columns(dialog, qtable, f"plan_psector_x_{geom_type}")
         self.refresh_map_canvas()
-
 
     def fill_table_by_expr(self, qtable, table_name, expr):
         """
@@ -996,7 +961,6 @@ class ParentManage(ParentAction, object):
         except:
             pass
 
-
     def fill_table_object(self, widget, table_name, expr_filter=None):
         """ Set a model with selected filter. Attach that model to selected table """
         if self.schema_name not in table_name:
@@ -1018,7 +982,6 @@ class ParentManage(ParentAction, object):
         # Attach model to table view
         widget.setModel(model)
 
-
     def filter_by_id(self, dialog, widget_table, widget_txt, table_object, field_object_id='id'):
 
         field_object_id = "id"
@@ -1032,7 +995,6 @@ class ParentManage(ParentAction, object):
             widget_table.model().select()
         else:
             self.fill_table_object(widget_table, self.schema_name + "." + table_object)
-
 
     def delete_selected_object(self, widget, table_object):
         """ Delete selected objects of the table (by object_id) """
@@ -1068,7 +1030,6 @@ class ParentManage(ParentAction, object):
                    f"WHERE {field_object_id} IN ({list_id})")
             self.controller.execute_sql(sql)
             widget.model().select()
-
 
     def open_selected_object(self, dialog, widget, table_object):
         """ Open object form with selected record of the table """
@@ -1106,14 +1067,12 @@ class ParentManage(ParentAction, object):
         elif "v_ui_om_visitman_x_" in table_object:
             self.manage_visit(visit_id=selected_object_id)
 
-
     def set_selectionbehavior(self, dialog):
 
         # Get objects of type: QTableView
         widget_list = dialog.findChildren(QTableView)
         for widget in widget_list:
             widget.setSelectionBehavior(QAbstractItemView.SelectRows)
-
 
     def hide_generic_layers(self, excluded_layers=[]):
         """ Hide generic layers """
@@ -1136,7 +1095,6 @@ class ParentManage(ParentAction, object):
             if layer and "v_edit_gully" not in excluded_layers:
                 self.controller.set_layer_visible(layer)
 
-
     def connect_signal_selection_changed(self, dialog, table_object, query=False):
         """ Connect signal selectionChanged """
 
@@ -1146,7 +1104,6 @@ class ParentManage(ParentAction, object):
         except Exception as e:
             self.controller.log_info(f"connect_signal_selection_changed: {e}")
 
-
     def disconnect_signal_selection_changed(self):
         """ Disconnect signal selectionChanged """
 
@@ -1155,7 +1112,6 @@ class ParentManage(ParentAction, object):
             self.iface.actionPan().trigger()
         except Exception:
             pass
-
 
     def fill_widget_with_fields(self, dialog, data_object, field_names):
         """Fill the Widget with value get from data_object limited to

@@ -17,6 +17,7 @@ from ..utils.snap_manager import GwSnapManager
 from qgis.PyQt.QtCore import Qt
 from qgis.core import QgsWkbTypes
 
+
 class GwSelectManager(QgsMapTool):
 
     def __init__(self, class_object, table_object=None, dialog=None, is_psector=None, save_rectangle=False):
@@ -47,7 +48,6 @@ class GwSelectManager(QgsMapTool):
         self._reset_selection()
         self.selected_features = []
 
-
     # region QgsMapTools inherited
     """ QgsMapTools inherited event functions """
     def canvasPressEvent(self, event):
@@ -57,7 +57,6 @@ class GwSelectManager(QgsMapTool):
             self.end_point = self.start_point
             self.is_emitting_point = True
             self._show_rectangle(self.start_point, self.end_point)
-
 
     def canvasReleaseEvent(self, event):
 
@@ -121,12 +120,10 @@ class GwSelectManager(QgsMapTool):
         self.end_point = self.toMapCoordinates(event.pos())
         self._show_rectangle(self.start_point, self.end_point)
 
-
     def deactivate(self):
 
         self.rubber_band.hide()
         QgsMapTool.deactivate(self)
-
 
     def activate(self):
         pass
@@ -141,7 +138,6 @@ class GwSelectManager(QgsMapTool):
         self.end_point = None
         self.is_emitting_point = False
         self._reset_rubber_band()
-
 
     def _show_rectangle(self, start_point, end_point):
 
@@ -160,7 +156,6 @@ class GwSelectManager(QgsMapTool):
         self.rubber_band.addPoint(point4, True)
         self.rubber_band.show()
 
-
     def _get_rectangle(self):
 
         if self.start_point is None or self.end_point is None:
@@ -169,7 +164,6 @@ class GwSelectManager(QgsMapTool):
             return None
 
         return QgsRectangle(self.start_point, self.end_point)
-
 
     def _reset_rubber_band(self):
 

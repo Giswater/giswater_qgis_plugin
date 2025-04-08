@@ -35,7 +35,6 @@ class GwFeatureDeleteButton(GwAction):
         if len(self.list_feature_type) == 1:
             self.list_feature_type = f"('{self.list_feature_type[0]}')"
 
-
     def clicked_event(self):
 
         # Create the dialog and signals
@@ -90,7 +89,6 @@ class GwFeatureDeleteButton(GwAction):
         # Open dialog
         tools_gw.open_dialog(self.dlg_feature_delete, dlg_name='feature_delete')
 
-
     def _delete_another_feature(self):
 
         # Reset delete feature form
@@ -106,7 +104,6 @@ class GwFeatureDeleteButton(GwAction):
         # Set delete feature tab as current index
         self.dlg_feature_delete.mainTab.setCurrentIndex(0)
         tools_gw.disable_tab_log(self.dlg_feature_delete)
-
 
     def _filter_typeahead(self, widget, completer, model):
 
@@ -133,13 +130,11 @@ class GwFeatureDeleteButton(GwAction):
         tools_qt.set_completer_object(completer, model, widget, rows_typeahead)
         self.dlg_feature_delete.feature_id.setStyleSheet(None)
 
-
     def connect_signal_selection_changed(self):
         """ Connect signal selectionChanged """
 
         tools_gw.connect_signal(self.canvas.selectionChanged, partial(self._manage_selection),
                                 'feature_delete', 'connect_signal_selection_changed_selectionChanged_manage_selection')
-
 
     # region private functions
 
@@ -169,7 +164,6 @@ class GwFeatureDeleteButton(GwAction):
         # Enable button delete feature
         if result_msg != '':
             self.dlg_feature_delete.btn_delete.setEnabled(True)
-
 
     def _delete_feature_relation(self):
 
@@ -206,14 +200,12 @@ class GwFeatureDeleteButton(GwAction):
         # Refresh canvas
         tools_qgis.refresh_map_canvas()
 
-
     def _selection_init(self):
         """ Set canvas map tool to an instance of class 'GwSelectManager' """
 
         tools_gw.disconnect_signal('feature_delete')
         self.iface.actionSelect().trigger()
         self.connect_signal_selection_changed()
-
 
     def _selection_end(self):
         """ Set canvas map tool to an instance of class 'GwSelectManager' """
@@ -226,7 +218,6 @@ class GwFeatureDeleteButton(GwAction):
 
         global_vars.canvas.refresh()
         global_vars.iface.actionPan().trigger()
-
 
     def _manage_selection(self):
         """ Slot function for signal 'canvas.selectionChanged' """
@@ -251,7 +242,6 @@ class GwFeatureDeleteButton(GwAction):
 
             if selected_id:
                 tools_qt.set_widget_text(self.dlg_feature_delete, self.dlg_feature_delete.feature_id, str(selected_id))
-
 
     def _set_active_layer(self):
 

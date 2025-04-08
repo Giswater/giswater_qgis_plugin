@@ -31,7 +31,6 @@ class GwProjectCheckTask(GwTask):
         self.dlg_audit_project = None
         self.timer = timer
 
-
     def run(self):
 
         super().run()
@@ -46,7 +45,6 @@ class GwProjectCheckTask(GwTask):
             return False
 
         return True
-
 
     def finished(self, result):
 
@@ -72,7 +70,6 @@ class GwProjectCheckTask(GwTask):
         self._show_check_project_result(self.result)
 
         self.setProgress(100)
-
 
     def fill_check_project_table(self, layers, init_project):
         """ Fill table 'audit_check_project' table with layers data """
@@ -112,9 +109,7 @@ class GwProjectCheckTask(GwTask):
 
         return True, result
 
-
     # region private functions
-
 
     def _execute_check_project_function(self, init_project, fields_to_insert):
         """ Execute function 'gw_fct_setcheckproject' with checkbox selections passed from project_check_btn.py """
@@ -172,7 +167,6 @@ class GwProjectCheckTask(GwTask):
 
         return result
 
-
     def _show_check_project_result(self, result):
         """ Show dialog with audit check project results """
 
@@ -183,7 +177,6 @@ class GwProjectCheckTask(GwTask):
 
         # Call `fill_tab_log()` directly, no need to store variables
         tools_gw.fill_tab_log(self.dlg_audit_project, result['body']['data'], reset_text=False)
-
 
     def _add_selected_layers(self, dialog, m_layers):
         """ Receive a list of layers, look for the checks associated with each layer and if they are checked,

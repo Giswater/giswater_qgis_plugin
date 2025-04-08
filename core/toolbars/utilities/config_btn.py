@@ -27,11 +27,9 @@ class GwConfigButton(GwAction):
 
         super().__init__(icon_path, action_name, text, toolbar, action_group)
 
-
     def clicked_event(self):
 
         self._open_config()
-
 
     # region private functions
 
@@ -139,7 +137,6 @@ class GwConfigButton(GwAction):
                 self._hide_void_tab_groupbox(grbox_list)
                 self.tab_admin_loaded = True
             
-
     def _hide_void_tab_groupbox(self, grbox_list):
         """ Recives a list, searches it all the QGroupBox, looks 1 to 1 if the grb have widgets, if it does not have
          (if it is empty), hides the QGroupBox
@@ -150,7 +147,6 @@ class GwConfigButton(GwAction):
             widget_list = grbox.findChildren(QWidget)
             if len(widget_list) == 0:
                 grbox.setVisible(False)
-
 
     def _hide_void_tab(self, row, tab_name, lyt_name):
 
@@ -177,7 +173,6 @@ class GwConfigButton(GwAction):
 
         return result
 
-
     def _get_event_combo_parent(self, row):
 
         for field in row[0]["fields"]:
@@ -185,7 +180,6 @@ class GwConfigButton(GwAction):
                 widget = self.dlg_config.findChild(QComboBox, field['widgetname'])
                 if widget:
                     widget.currentIndexChanged.connect(partial(tools_gw.fill_child, self.dlg_config, widget, 'config'))
-
 
     def _update_values(self):
 
@@ -203,7 +197,6 @@ class GwConfigButton(GwAction):
         tools_qgis.show_info(message)
         # Close dialog
         tools_gw.close_dialog(self.dlg_config)
-
 
     def _build_dialog_options(self, row, tab, list):
 
@@ -307,7 +300,6 @@ class GwConfigButton(GwAction):
                 msg = f"{type(e).__name__} {e}. widgetname='{field['widgetname']}' AND widgettype='{field['widgettype']}'"
                 tools_qgis.show_message(msg, 2, dialog=self.dlg_config)
 
-
     def populate_typeahead(self, completer, model, field, dialog, widget):
 
         if not widget:
@@ -328,18 +320,15 @@ class GwConfigButton(GwAction):
             list_items.append(field['idval'])
             tools_qt.set_completer_object(completer, model, widget, list_items)
 
-
     def _check_child_to_parent(self, widget_child, widget_parent):
 
         if widget_child.isChecked():
             widget_parent.setChecked(True)
 
-
     def _check_parent_to_child(self, widget_parent, widget_child):
 
         if not widget_parent.isChecked():
             widget_child.setChecked(False)
-
 
     def _fill_combo(self, widget, field):
 
@@ -363,7 +352,6 @@ class GwConfigButton(GwAction):
         value = field.get('value')
         if value not in (None, 'None'):
             tools_qt.set_combo_value(widget, value, 0)
-
 
     def _get_dialog_changed_values(self, widget, tab, chk):
 
@@ -400,7 +388,6 @@ class GwConfigButton(GwAction):
 
         self.list_update.append(elem)
 
-
     def _get_values_checked_param_user(self, chk, widget, value=None):
 
         elem = {}
@@ -428,7 +415,6 @@ class GwConfigButton(GwAction):
         elem['value'] = value
 
         self.list_update.append(elem)
-
 
     def _order_widgets(self, field, lbl, widget):
 

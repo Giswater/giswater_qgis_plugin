@@ -13,6 +13,7 @@ from ..toolbars.maptool import GwMaptool
 from ..utils import tools_gw
 from ...libs import tools_qgis
 
+
 class GwFlow(GwMaptool):
     """ Base class for flow buttons """
 

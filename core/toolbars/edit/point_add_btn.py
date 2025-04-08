@@ -40,7 +40,6 @@ class GwPointAddButton(GwAction):
             self.action.setMenu(self.menu)
             toolbar.addAction(self.action)
 
-
     def clicked_event(self):
 
         # Refresh cat feature list
@@ -49,9 +48,7 @@ class GwPointAddButton(GwAction):
         if self.menu.property('last_selection') is not None:
             self.info_feature.add_feature(self.menu.property('last_selection'), action=self)
 
-
     # region private functions
-
 
     def _fill_point_menu(self):
         """ Fill add point menu """
@@ -116,7 +113,6 @@ class GwPointAddButton(GwAction):
                             obj_action.triggered.connect(partial(self.info_feature.add_feature, feature_cat, self))
                             obj_action.triggered.connect(partial(self._save_last_selection, self.menu, feature_cat))
                     self.menu.addSeparator()
-
 
     def _save_last_selection(self, menu, feature_cat):
         menu.setProperty("last_selection", feature_cat)

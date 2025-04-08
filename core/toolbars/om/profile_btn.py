@@ -87,7 +87,6 @@ class GwProfileButton(GwAction):
         self.add_points = False
         self.add_points_list = []
 
-
     def clicked_event(self):
 
         self.action.setChecked(True)
@@ -151,7 +150,6 @@ class GwProfileButton(GwAction):
         else:
             tools_gw.open_dialog(self.dlg_draw_profile)
 
-
     # region private functions
 
     def _reset_profile_variables(self):
@@ -161,7 +159,6 @@ class GwProfileButton(GwAction):
         self.first_node = True
         self.add_points = False
         self.add_points_list = []
-
 
     def _activate_add_points(self, activate=True):
         self.add_points = activate
@@ -226,7 +223,6 @@ class GwProfileButton(GwAction):
             message = "There are missing values in these nodes:"
             tools_qt.show_info_box(message, inf_text=self.none_values)
 
-
     def _save_profile(self):
         """ Save profile """
 
@@ -261,7 +257,6 @@ class GwProfileButton(GwAction):
         message = f"{result['message']}"
         tools_qgis.show_info(message)
 
-
     def _open_profile(self):
         """ Open dialog profile_list.ui """
 
@@ -285,7 +280,6 @@ class GwProfileButton(GwAction):
             self.dlg_load.tbl_profiles.addItem(item_arc)
 
         tools_gw.open_dialog(self.dlg_load)
-
 
     def _load_profile(self, parameters):
         """ Open selected profile from dialog load_profiles.ui """
@@ -346,7 +340,6 @@ class GwProfileButton(GwAction):
                 # Center shortest path in canvas - ZOOM SELECTION
                 self.canvas.zoomToSelected(self.layer_arc)
 
-
     def _activate_snapping_node(self):
 
         if hasattr(self, "first_node"):
@@ -378,7 +371,6 @@ class GwProfileButton(GwAction):
         # The "e" is the QgsMapMouseEvent given by the function
         self.emit_point.canvasReleaseEvent = lambda e: self._action_pan()
 
-
     def _mouse_move(self, point):
 
         event_point = self.snapper_manager.get_event_point(point=point)
@@ -391,7 +383,6 @@ class GwProfileButton(GwAction):
                 self.snapper_manager.add_marker(result, self.vertex_marker)
         else:
             self.vertex_marker.hide()
-
 
     def _snapping_node(self, point):   # @UnusedVariable
 
@@ -487,12 +478,10 @@ class GwProfileButton(GwAction):
                     if self.add_points:
                         self.add_points = False
 
-
     def _action_pan(self):
         if self.first_node:
             # Set action pan
             self.iface.actionPan().trigger()
-
 
     def _draw_profile(self, arcs, nodes, terrains):
         """ Parent function - Draw profiles """
@@ -557,7 +546,6 @@ class GwProfileButton(GwAction):
         # Save profile with dpi = 300
         plt.savefig(img_path, dpi=300)
 
-
     def _set_profile_layout(self):
         """ Set properties of main window """
 
@@ -575,7 +563,6 @@ class GwProfileButton(GwAction):
         self.fig1.tight_layout()
         self.rect = self.fig1.patch
         self.rect.set_facecolor('white')
-
 
     def _set_profile_variables(self, arcs, nodes, terrains):
         """ Get and calculate parameters and values for drawing """
@@ -663,7 +650,6 @@ class GwProfileButton(GwAction):
             self.nodes[n].node_2 = arc['node_2']
             n += 1
 
-
     def _draw_start_node(self, node):
         """ Draw first node """
 
@@ -701,7 +687,6 @@ class GwProfileButton(GwAction):
             xsup = [s0x, s3x]
             ysup = [s0y, s3y]
 
-
         # draw first node bottom line
         plt.plot(xinf, yinf, zorder=100, linestyle=self._get_stylesheet(node.data_type)[0],
                  color=self._get_stylesheet(node.data_type)[1], linewidth=self._get_stylesheet(node.data_type)[2])
@@ -729,7 +714,6 @@ class GwProfileButton(GwAction):
         self._fill_guitar_text_legend()
         self._draw_guitar_auxiliar_lines(0)
 
-
     def _draw_guitar_vertical_lines(self, start_point):
         """ Draw fixed part of table """
 
@@ -752,7 +736,6 @@ class GwProfileButton(GwAction):
         x = [start_point - self.fix_x, start_point - self.fix_x]
         y = [self.min_top_elev - 1 * self.height_row, self.min_top_elev - Decimal(5.85) * self.height_row]
         plt.plot(x, y, linestyle=line_style, color=line_color, linewidth=line_width, zorder=100)
-
 
     def _draw_guitar_auxiliar_lines(self, start_point, first_vl=True):
         """ Draw marks for each node """
@@ -793,7 +776,6 @@ class GwProfileButton(GwAction):
         x = [start_point, start_point]
         y = [self.min_top_elev - Decimal(5.85) * self.height_row, self.min_top_elev - Decimal(5.7) * self.height_row]
         plt.plot(x, y, linestyle=auxline_style, color=auxline_color, linewidth=auxline_width, zorder=100)
-
 
     def _fill_guitar_text_legend(self):
 
@@ -850,7 +832,6 @@ class GwProfileButton(GwAction):
         date = tools_qt.get_calendar_date(self.dlg_draw_profile, self.dlg_draw_profile.date)
         plt.text(-self.fix_x * Decimal(1), self.min_top_elev - Decimal(6) * self.height_row - self.height_row / 2,
                  date, fontsize=title_size * 0.7, color=title_color, fontweight=title_weight, verticalalignment='center')
-
 
     def _draw_nodes(self, node, prev_node, index):
         """ Draw nodes between first and last node """
@@ -959,7 +940,6 @@ class GwProfileButton(GwAction):
         # Save last points for draw ground
         self.slast2 = [s3x, s3y]
         self.ilast2 = [i3x, i3y]
-
 
     def _fill_guitar_text_node(self, start_point, index):
 
@@ -1075,7 +1055,6 @@ class GwProfileButton(GwAction):
                          color=text_color, fontweight=text_weight,
                          rotation='vertical', horizontalalignment='center', verticalalignment='center')
 
-
         # Fill diameter and slope / length
         if index != self.n - 1:
 
@@ -1093,7 +1072,6 @@ class GwProfileButton(GwAction):
                      fontsize=7.5,
                      color=text_color, fontweight=text_weight,
                      horizontalalignment='center')  # PUT IN THE MIDDLE PARAMETRIZATION
-
 
     def _fill_guitar_text_terrain(self, start_point, index):
 
@@ -1141,7 +1119,6 @@ class GwProfileButton(GwAction):
                 fontsize=6,
                 color=text_color, fontweight=text_weight,
                 rotation='vertical', horizontalalignment='center', verticalalignment='center')
-
 
     def _draw_end_node(self, node, prev_node, index):
         """
@@ -1235,7 +1212,6 @@ class GwProfileButton(GwAction):
         # Reset lastnode_datatype
         self.lastnode_datatype = 'REAL'
 
-
     def _set_guitar_parameters(self):
         """
         Define parameters of table
@@ -1267,7 +1243,6 @@ class GwProfileButton(GwAction):
 
         # Height of graph + table
         self.height_y = Decimal(self.z * 2)
-
 
     def _draw_guitar_horitzontal_lines(self):
         """
@@ -1307,7 +1282,6 @@ class GwProfileButton(GwAction):
         x = [self.nodes[self.n - 1].start_point, self.nodes[0].start_point - self.fix_x]
         y = [self.min_top_elev - Decimal(5.85) * self.height_row, self.min_top_elev - Decimal(5.85) * self.height_row]
         plt.plot(x, y, color=line_color, linestyle=line_style, linewidth=line_width, zorder=100)
-
 
     def _draw_grid(self):
 
@@ -1393,7 +1367,6 @@ class GwProfileButton(GwAction):
             plt.annotate(str(i) + '\n' + ' ', xy=(i, int(math.ceil(self.max_top_elev) + 1)),
                          fontsize=6.5, color=text_color, fontweight=text_weight, horizontalalignment='center')
 
-
     def _draw_terrain(self, index):
 
         # getting variables
@@ -1411,7 +1384,6 @@ class GwProfileButton(GwAction):
         x = [self.first_top_x, self.node_top_x]
         y = [self.first_top_y, self.node_top_y]
         plt.plot(x, y, color=line_color, linewidth=line_width, linestyle=line_style)
-
 
     def _clear_profile(self):
         """ Manage button clear profile and leave form empty """
@@ -1433,7 +1405,6 @@ class GwProfileButton(GwAction):
         # Clear selection
         self._remove_selection()
         self._reset_profile_variables()
-
 
     def _delete_profile(self):
         """ Delete profile """
@@ -1457,7 +1428,6 @@ class GwProfileButton(GwAction):
         # Remove profile from list
         self.dlg_load.tbl_profiles.takeItem(self.dlg_load.tbl_profiles.row(self.dlg_load.tbl_profiles.currentItem()))
 
-
     def _remove_selection(self, actionpan=False):
         """ Remove selected features of all layers """
 
@@ -1467,7 +1437,6 @@ class GwProfileButton(GwAction):
         self.canvas.refresh()
         if actionpan:
             self.iface.actionPan().trigger()
-
 
     def _get_stylesheet(self, data_type='REAL'):
 

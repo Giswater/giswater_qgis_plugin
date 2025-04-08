@@ -31,6 +31,7 @@ from ..ui.ui_manager import GwDialogShowInfoUi, GwMincutComposerUi, GwMincutConn
 from ... import global_vars
 from ...libs import lib_vars, tools_qt, tools_qgis, tools_log, tools_db
 
+
 class GwMincut:
 
     def __init__(self):
@@ -72,13 +73,11 @@ class GwMincut:
         self.lbl1 = "Connec customer code:"
         self.lbl2 = "Hydrometer customer code:"
 
-
     def manage_mincuts(self, dialog):
         """ Button 12: Mincut management """
 
         self.action = "manage_mincuts"
         self.mincut_tools.set_dialog(dialog)
-
 
     def load_mincut(self, result_mincut_id):
         """ Load selected mincut """
@@ -308,7 +307,6 @@ class GwMincut:
 
         return row
 
-
     def connect_signal_selection_changed(self, option):
         """ Connect signal selectionChanged """
 
@@ -322,10 +320,8 @@ class GwMincut:
         except Exception:
             pass
 
-
     def set_dialog(self, dialog):
         self.dlg_mincut = dialog
-
 
     def init_mincut_form(self):
         """ Custom form initial configuration """
@@ -450,7 +446,6 @@ class GwMincut:
 
         self._load_widgets_values()
 
-
     def set_id_val(self):
 
         # Show future id of mincut
@@ -463,7 +458,6 @@ class GwMincut:
             result_mincut_id = str(int(row[0]) + 1)
 
         tools_qt.set_widget_text(self.dlg_mincut, self.dlg_mincut.result_mincut_id, str(result_mincut_id))
-
 
     def get_mincut(self):
         """ Button 11: Mincut """
@@ -494,7 +488,6 @@ class GwMincut:
         self.manage_docker()
         tools_qt.manage_translation('mincut', self.dlg_mincut)
 
-
     def manage_docker(self):
 
         tools_gw.init_docker('qgis_form_docker')
@@ -504,7 +497,6 @@ class GwMincut:
             tools_gw.open_dialog(self.dlg_mincut, dlg_name='mincut')
 
         self._set_signals()
-
 
     def set_visible_mincut_layers(self, zoom=False):
         """ Set visible mincut result layers """
@@ -552,7 +544,6 @@ class GwMincut:
         if cause is not None:
             tools_qt.set_widget_text(self.dlg_mincut, 'cause', cause)
 
-
     def _save_widgets_values(self):
 
         chk_use_planified = tools_qt.is_checked(self.dlg_mincut, 'chk_use_planified')
@@ -562,7 +553,6 @@ class GwMincut:
         tools_gw.set_config_parser('dlg_mincut', 'chk_use_planified', f"{chk_use_planified}")
         tools_gw.set_config_parser('dlg_mincut', 'type', f"{type}")
         tools_gw.set_config_parser('dlg_mincut', 'cause', f"{cause}")
-
 
     def _set_states(self):
         """ Serialize data of mincut states """
@@ -575,7 +565,6 @@ class GwMincut:
             for row in rows:
                 if 'idval' in row:
                     self.states[int(row['id'])] = row['idval']
-
 
     def _init_mincut_canvas(self):
 
@@ -594,7 +583,6 @@ class GwMincut:
         # Set active and current layer
         self.iface.setActiveLayer(self.layer_arc)
         self.current_layer = self.layer_arc
-
 
     def _set_signals(self):
 
@@ -626,7 +614,6 @@ class GwMincut:
         self.action_custom_mincut.toggled.connect(partial(self.manage_checked, self.action_custom_mincut))
         self.action_change_valve_status.toggled.connect(partial(self.manage_checked, self.action_change_valve_status))
 
-
     def manage_checked(self, action):
 
         if action.objectName() == "actionMincut" and action.isChecked():
@@ -639,7 +626,6 @@ class GwMincut:
             self.action_mincut.setChecked(False)
             self.action_custom_mincut.setChecked(False)
 
-
     def _refresh_tab_hydro(self):
 
         result_mincut_id = tools_qt.get_text(self.dlg_mincut, self.dlg_mincut.result_mincut_id)
@@ -649,7 +635,6 @@ class GwMincut:
         if message:
             tools_qgis.show_warning(message)
         tools_gw.set_tablemodel_config(self.dlg_mincut, self.dlg_mincut.tbl_hydro, 'v_om_mincut_hydrometer')
-
 
     def _check_dates_coherence(self, date_from, date_to, time_from, time_to):
         """
@@ -668,7 +653,6 @@ class GwMincut:
         if d_from > d_to:
             date_to.setDate(date_from.date())
             time_to.setTime(time_from.time())
-
 
     def _mincut_close(self):
 
@@ -716,7 +700,6 @@ class GwMincut:
             self._remove_selection()
             tools_qgis.refresh_map_canvas()
 
-
     def _real_start(self):
 
         # Run fct like 'Refresh mincut' but with action="startMincut"
@@ -741,7 +724,6 @@ class GwMincut:
 
         # Enable/Disable widget depending state
         self._enable_widgets('1')
-
 
     def _real_end(self):
 
@@ -807,7 +789,6 @@ class GwMincut:
         # Open the dialog
         tools_gw.open_dialog(self.dlg_fin, dlg_name='mincut_end')
 
-
     def _set_real_location(self):
 
         self.snapper_manager = GwSnapManager(self.iface)
@@ -822,7 +803,6 @@ class GwMincut:
                                 'mincut', 'real_end_xyCoordinates_mouse_move_node_arc')
         tools_gw.connect_signal(self.emit_point.canvasClicked, self._snapping_node_arc_real_location,
                                 'mincut', 'real_end_ep_canvasClicked_snapping_node_arc_real_location')
-
 
     def _accept_save_data(self):
         """ Slot function button 'Accept' """
@@ -1006,7 +986,6 @@ class GwMincut:
         self.iface.actionPan().trigger()
         self._remove_selection()
 
-
     def _force_mincut_overlap(self):
 
         use_planified = tools_qt.is_checked(self.dlg_mincut, 'chk_use_planified')
@@ -1018,7 +997,6 @@ class GwMincut:
         if not result or result['status'] == 'Failed':
             return
         self._mincut_ok(result)
-
 
     def _mincut_ok(self, result):
 
@@ -1064,7 +1042,6 @@ class GwMincut:
         self.action_change_valve_status.setEnabled(False)
         self.action_export_hydro_csv.setEnabled(True)
 
-
     def _update_result_selector(self, result_mincut_id, commit=True):
         """ Update table 'selector_mincut_result' """
 
@@ -1075,7 +1052,6 @@ class GwMincut:
         if not status:
             message = "Error updating table"
             tools_qgis.show_warning(message, parameter='selector_mincut_result')
-
 
     def _real_end_accept(self):
 
@@ -1104,7 +1080,6 @@ class GwMincut:
 
         self.dlg_fin.close()
 
-
     def _real_end_cancel(self):
 
         # Return to state 'In Progress'
@@ -1112,7 +1087,6 @@ class GwMincut:
         self._enable_widgets('1')
 
         self.dlg_fin.close()
-
 
     def _add_connec(self):
         """ B3-121: Connec selector """
@@ -1173,7 +1147,6 @@ class GwMincut:
 
         tools_gw.open_dialog(self.dlg_connec, dlg_name='mincut_connec')
 
-
     def _set_completer_customer_code(self, widget, set_signal=False):
         """ Set autocompleter for 'customer_code' """
 
@@ -1196,12 +1169,10 @@ class GwMincut:
             # noinspection PyUnresolvedReferences
             self.completer.activated.connect(self._auto_fill_hydro_id)
 
-
     def _snapping_init_connec(self):
         """ Snap connec """
         self.feature_type = 'connec'
         tools_gw.selection_init(self, self.dlg_connec, self.dlg_connec.tbl_mincut_connec, False)
-
 
     def _snapping_selection_hydro(self):
         """ Snap to connec layers to add its hydrometers """
@@ -1237,7 +1208,6 @@ class GwMincut:
 
         self._reload_table_hydro(expr_filter)
 
-
     def _snapping_selection_connec(self):
         """ Snap to connec layers """
 
@@ -1269,7 +1239,6 @@ class GwMincut:
                 return
 
         self._reload_table_connec(expr_filter)
-
 
     def _add_hydrometer(self):
         """ B4-122: Hydrometer selector """
@@ -1338,7 +1307,6 @@ class GwMincut:
 
         tools_gw.open_dialog(self.dlg_hydro)
 
-
     def _auto_fill_hydro_id(self):
 
         # Adding auto-completion to a QLineEdit - hydrometer_id
@@ -1364,7 +1332,6 @@ class GwMincut:
 
         model.setStringList(values)
         self.completer_hydro.setModel(model)
-
 
     def _insert_hydro(self):
         """ Select feature with entered id. Set a model with selected filter.
@@ -1410,7 +1377,6 @@ class GwMincut:
         # Reload table
         self._reload_table_hydro(expr_filter)
 
-
     def _select_features_group_layers(self, expr):
         """ Select features of the layers filtering by @expr """
 
@@ -1430,7 +1396,6 @@ class GwMincut:
                     # Check if 'connec_id' is already in 'connec_list'
                     if connec_id not in self.list_ids['connec']:
                         self.list_ids['connec'].append(connec_id)
-
 
     def _select_features_connec(self):
         """ Select features of 'connec' of selected mincut """
@@ -1463,7 +1428,6 @@ class GwMincut:
 
             # Reload table
             self._reload_table_connec(expr_filter)
-
 
     def _select_features_hydro(self):
 
@@ -1513,7 +1477,6 @@ class GwMincut:
             expr_filter = "\"hydrometer_id\" =''"
         # Reload contents of table 'hydro' with expr_filter
         self._reload_table_hydro(expr_filter)
-
 
     def _insert_connec(self):
         """ Select feature with entered id. Set a model with selected filter.
@@ -1581,7 +1544,6 @@ class GwMincut:
 
         self.connect_signal_selection_changed("mincut_connec")
 
-
     def _get_connec_id_from_customer_code(self, customer_code):
         """ Get 'connec_id' from @customer_code """
 
@@ -1595,7 +1557,6 @@ class GwMincut:
         else:
             return str(row[0])
 
-
     def _reload_table_connec(self, expr_filter=None):
         """ Reload contents of table 'connec' with selected @expr_filter """
 
@@ -1603,14 +1564,12 @@ class GwMincut:
         tools_gw.set_tablemodel_config(self.dlg_connec, 'tbl_mincut_connec', 'v_edit_connec')
         return expr
 
-
     def _reload_table_hydro(self, expr_filter=None):
         """ Reload contents of table 'hydro' """
 
         expr = tools_qt.set_table_model(self.dlg_hydro, "tbl_hydro", "v_rtc_hydrometer", expr_filter)
         tools_gw.set_tablemodel_config(self.dlg_hydro, "tbl_hydro", 'v_rtc_hydrometer')
         return expr
-
 
     def _delete_records_connec(self):
         """ Delete selected rows of the table """
@@ -1667,7 +1626,6 @@ class GwMincut:
 
         self.connect_signal_selection_changed("mincut_connec")
 
-
     def _delete_records_hydro(self):
         """ Delete selected rows of the table """
 
@@ -1713,7 +1671,6 @@ class GwMincut:
 
         self.connect_signal_selection_changed("mincut_hydro")
 
-
     def _accept_connec(self, dlg, element):
         """ Slot function widget 'btn_accept' of 'connec' dialog
             Insert into table 'om_mincut_connec' values of current mincut
@@ -1744,7 +1701,6 @@ class GwMincut:
         self.dlg_mincut.btn_start.setDisabled(False)
         tools_gw.close_dialog(self.dlg_connec)
 
-
     def _accept_hydro(self, dlg, element):
         """ Slot function widget 'btn_accept' of 'hydrometer' dialog
             Insert into table 'om_mincut_hydrometer' values of current mincut
@@ -1764,7 +1720,6 @@ class GwMincut:
         self.sql_hydro = sql
         self.dlg_mincut.btn_start.setDisabled(False)
         tools_gw.close_dialog(self.dlg_hydro)
-
 
     def _auto_mincut(self, is_checked):
         """ B1-126: Automatic mincut analysis """
@@ -1801,7 +1756,6 @@ class GwMincut:
                                 'auto_mincut_xyCoordinates_mouse_move_node_arc')
         tools_gw.connect_signal(self.emit_point.canvasClicked, self._auto_mincut_snapping,
                                 'mincut', 'auto_mincut_ep_canvasClicked_auto_mincut_snapping')
-
 
     def _export_hydro_csv(self):
         """ : Export Hydro Csv """
@@ -1858,7 +1812,6 @@ class GwMincut:
             msg = "File path doesn't exist or you dont have permission or file is opened"
             tools_qgis.show_warning(msg, dialog=self.dlg_mincut)
 
-
     def _mouse_move_node_arc(self, point):
 
         if not self.layer_arc:
@@ -1873,7 +1826,6 @@ class GwMincut:
         result = self.snapper_manager.snap_to_current_layer(event_point)
         if result.isValid():
             self.snapper_manager.add_marker(result, self.vertex_marker)
-
 
     def _auto_mincut_snapping(self, point, btn):
         """ Automatic mincut: Snapping to 'node' and 'arc' layers """
@@ -1943,7 +1895,6 @@ class GwMincut:
             self.mincut_task.task_finished.connect(
                 partial(self._mincut_task_finished, snapped_point, elem_type, element_id))
 
-
     def _cancel_task(self):
         """ Cancel GwAutoMincutTask """
 
@@ -1951,7 +1902,6 @@ class GwMincut:
         tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
         tools_gw.disconnect_signal('mincut')
         self.mincut_task.cancel()
-
 
     # noinspection PyUnusedLocal
     def _snapping_node_arc_real_location(self, point, btn):
@@ -1991,7 +1941,6 @@ class GwMincut:
         element_type = layer.name()
         if element_type in self.layernames_arc:
             self.snapper_manager.get_snapped_feature(result, True)
-
 
     def _mincut_task_finished(self, snapped_point, elem_type, element_id, signal):
 
@@ -2082,7 +2031,6 @@ class GwMincut:
         # Enabled button accept from mincut form
         self.dlg_mincut.btn_accept.setEnabled(True)
 
-
     def _refresh_mincut(self, triggered=None, action="mincutNetwork", zoom=True):
         """ B2-125: Refresh current mincut """
 
@@ -2124,7 +2072,6 @@ class GwMincut:
             QgsApplication.taskManager().addTask(self.mincut_task)
             QgsApplication.taskManager().triggerTask(self.mincut_task)
             self.mincut_task.task_finished.connect(partial(self._refresh_mincut_finished, zoom))
-
 
     def _refresh_mincut_finished(self, zoom, signal):
 
@@ -2175,7 +2122,6 @@ class GwMincut:
         self.set_visible_mincut_layers()
         self._remove_selection()
 
-
     def _custom_mincut(self, action, is_checked):
         """ B2-123: Custom mincut analysis. Working just with valve layer """
 
@@ -2210,7 +2156,6 @@ class GwMincut:
         tools_gw.connect_signal(self.emit_point.canvasClicked, partial(self._custom_mincut_snapping, action),
                                 'mincut', 'custom_mincut_ep_canvasClicked_custom_mincut_snapping')
 
-
     def _mouse_move_valve(self, point):
         """ Waiting for valves when mouse is moved"""
 
@@ -2219,7 +2164,6 @@ class GwMincut:
         result = self.snapper_manager.snap_to_current_layer(event_point)
         if result.isValid():
             self.snapper_manager.add_marker(result, self.vertex_marker)
-
 
     # noinspection PyUnusedLocal
     def _custom_mincut_snapping(self, action, point, btn):
@@ -2251,13 +2195,11 @@ class GwMincut:
             if action.objectName() == "actionCustomMincut":
                 action.setChecked(False)
 
-
     def _custom_mincut_execute(self, elem_id):
         """ Custom mincut. Execute function 'gw_fct_mincut_valve_unaccess' """
 
         # Change cursor to 'WaitCursor'
         tools_qgis.set_cursor_wait()
-
 
         use_planified = tools_qt.is_checked(self.dlg_mincut, 'chk_use_planified')
         result_mincut_id = tools_qt.get_text(self.dlg_mincut, "result_mincut_id")
@@ -2274,7 +2216,6 @@ class GwMincut:
         tools_qgis.disconnect_snapping(False, self.emit_point, self.vertex_marker)
         tools_gw.disconnect_signal('mincut')
 
-
     def _remove_selection(self):
         """ Remove selected features of all layers """
 
@@ -2288,7 +2229,6 @@ class GwMincut:
                 a.trigger()
                 break
 
-
     def _open_mincut_manage_dates(self, row):
         """ Management of null values in fields of type date """
 
@@ -2297,7 +2237,6 @@ class GwMincut:
         self._manage_date(row['forecast_end'], "cbx_date_end_predict", "cbx_hours_end_predict")
         self._manage_date(row['exec_start'], "cbx_date_start", "cbx_hours_start")
         self._manage_date(row['exec_end'], "cbx_date_end", "cbx_hours_end")
-
 
     def _manage_date(self, date_value, widget_date, widget_time):
         """ Manage date of current field """
@@ -2314,7 +2253,6 @@ class GwMincut:
         qt_time = QTime.fromString(time, 'h:mm:ss')
         tools_qt.set_calendar(self.dlg_mincut, widget_date, qt_date)
         tools_qt.set_time(self.dlg_mincut, widget_time, qt_time)
-
 
     def _mincut_composer(self):
         """ Open Composer """
@@ -2352,12 +2290,10 @@ class GwMincut:
         # Open dialog
         tools_gw.open_dialog(self.dlg_comp, dlg_name='mincut_composer')
 
-
     def _set_template(self):
 
         template = self.dlg_comp.cbx_template.currentText()
         self.template = template[:-4]
-
 
     def _open_composer(self):
 
@@ -2403,7 +2339,6 @@ class GwMincut:
         # Manage mincut layout
         self._manage_mincut_layout(comp_view)
 
-
     def _manage_mincut_layout(self, layout):
         """ Manage mincut layout """
 
@@ -2430,7 +2365,6 @@ class GwMincut:
         # Refresh items
         layout.refresh()
         layout.updateBounds()
-
 
     def _enable_widgets(self, state):
         """ Enable/Disable widget depending @state """
@@ -2558,7 +2492,6 @@ class GwMincut:
             self.action_add_connec.setDisabled(True)
             self.action_add_hydrometer.setDisabled(True)
 
-
     def _change_valve_status(self, action, is_checked):
         """ Change status of selected valve. Execute function gw_fct_setchangevalvestatus """
 
@@ -2589,7 +2522,6 @@ class GwMincut:
         tools_gw.connect_signal(self.emit_point.canvasClicked, partial(self._custom_mincut_snapping, action),
                                 'mincut', 'change_valve_status_ep_canvasClicked_custom_mincut_snapping')
 
-
     def _change_valve_status_execute(self, elem_id):
         """ Execute function 'gw_fct_setchangevalvestatus' """
 
@@ -2602,7 +2534,6 @@ class GwMincut:
             if result is not None and result['status'] == 'Accepted' and result['message']:
                 level = int(result['message']['level']) if 'level' in result['message'] else 1
                 tools_qgis.show_message(result['message']['text'], level)
-
 
     def _calculate_elapsed_time(self, dialog):
 

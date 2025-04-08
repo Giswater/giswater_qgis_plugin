@@ -23,7 +23,6 @@ class GwPsectorDuplicate(QObject):
 
         super().__init__()
 
-
     def manage_duplicate_psector(self, psector_id=None):
 
         # Create the dialog and signals
@@ -47,7 +46,6 @@ class GwPsectorDuplicate(QObject):
 
         # Open dialog
         tools_gw.open_dialog(self.dlg_duplicate_psector, dlg_name='psector_duplicate')
-
 
     # region private functions
 

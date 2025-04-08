@@ -24,7 +24,6 @@ class GwToggleValveTask(GwTask):
         self.result = None
         self.json_result = None
 
-
     def run(self):
 
         super().run()
@@ -48,7 +47,6 @@ class GwToggleValveTask(GwTask):
         tools_qgis.refresh_map_canvas()
 
         return True
-
 
     def finished(self, result):
 

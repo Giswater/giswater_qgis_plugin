@@ -20,6 +20,7 @@ from ...libs import tools_qt, tools_db, tools_log, lib_vars
 from ..utils import tools_gw
 from .task import GwTask
 
+
 class GwRecursiveEpa(GwTask):
     time_changed = pyqtSignal(str)
     task_finished = pyqtSignal()
@@ -40,7 +41,6 @@ class GwRecursiveEpa(GwTask):
         self.max_threads = 4
         self.initialize_variables()
 
-
     def initialize_variables(self):
 
         self.exception = None
@@ -54,7 +54,6 @@ class GwRecursiveEpa(GwTask):
         self.file_rpt = None
         self.files_exported = []
         global_vars.project_type = tools_gw.get_project_type()
-
 
     def run(self):
 
@@ -134,7 +133,6 @@ class GwRecursiveEpa(GwTask):
 
         return True
 
-
     def _get_queries_and_lists(self):
         # list1
         queries1 = []
@@ -173,7 +171,6 @@ class GwRecursiveEpa(GwTask):
                 list_str = [list_str]
             lists3.append(list_str)
         return lists1, lists2, lists3, queries1, queries2, queries3
-
 
     def run_go2epa(self, l1o=None, l2o=None, l3o=None):
         self.cur_idx += 1
@@ -236,15 +233,12 @@ class GwRecursiveEpa(GwTask):
         if global_vars.session_vars['last_error']:
             tools_qt.show_exception_message(msg=global_vars.session_vars['last_error_msg'])
 
-
     def cancel(self):
         self.stop_task()
         super().cancel()
 
-
     def stop_task(self):
         self.stop = True
-
 
     def _calculate_remaining_time(self, t0):
         tf = time()  # Final time
@@ -253,7 +247,6 @@ class GwRecursiveEpa(GwTask):
         print(td * (self.total_objects - self.cur_idx))
         time_remaining = td * (self.total_objects - self.cur_idx)  # Delta time * remaining pages
         self.time_changed.emit(f"Remaining: {timedelta(seconds=round(time_remaining))} ({self.cur_idx}/{self.total_objects})")
-
 
     def execute_go2epa(self, resultname, inpfilename, rptfilename):
 
@@ -332,7 +325,6 @@ class GwRecursiveEpa(GwTask):
 
         return True
 
-
     def _fill_inp_file(self, folder_path=None, all_rows=None):
 
         tools_log.log_info(f"Write inp file........: {folder_path}")
@@ -381,7 +373,6 @@ class GwRecursiveEpa(GwTask):
 
             if save_file is False:
                 os.remove(aditional_path)
-
 
     def _close_file(self, file=None):
 
@@ -442,7 +433,6 @@ class GwRecursiveEpa(GwTask):
 
         return True
 
-
     def _execute_epa(self, opener, file_inp, file_rpt):
         subprocess.call([opener, file_inp, file_rpt], shell=False)
 
@@ -472,7 +462,6 @@ class GwRecursiveEpa(GwTask):
             self.error_msg = str(e)
         finally:
             return status
-
 
     def _read_rpt_file(self, file_path=None):
 
@@ -599,7 +588,6 @@ class GwRecursiveEpa(GwTask):
         del full_file
 
         return True
-
 
     def _exec_import_function(self, result_name):
         """ Call function gw_fct_rpt2pg_main """

@@ -34,7 +34,6 @@ class GwTestQgis:
         self.service_name = "localhost_giswater"
         self.user = "gisadmin"
 
-
     def load_plugin(self, schema_name=None):
         """ Load main plugin class """
 
@@ -43,7 +42,6 @@ class GwTestQgis:
         self.test_giswater.init_plugin(schema_name)
 
         return True
-
 
     def init_config(self):
 
@@ -58,7 +56,6 @@ class GwTestQgis:
         if aux == 0:
             raise RuntimeError('No data providers available.')
 
-
     def connect_to_database(self, service_name):
         """ Connect to a database providing a service_name set in .pg_service.conf """
 
@@ -71,7 +68,6 @@ class GwTestQgis:
             return False
 
         return True
-
 
     def create_project(self, project_type='ws', project_name=None, project_title=None):
 
@@ -98,7 +94,6 @@ class GwTestQgis:
 
         return True
 
-
     def update_project(self, project_type='ws'):
 
         print("\nStart update_project")
@@ -119,7 +114,6 @@ class GwTestQgis:
         print("Finish update_project")
 
         return True
-
 
     def create_gis_project(self, project_type='ws'):
 
@@ -152,7 +146,6 @@ class GwTestQgis:
         print("Finish create_gis_project")
 
         return True
-
 
     def manage_visit(self, project_name='test_ud'):
 

@@ -102,7 +102,6 @@ class GwComposerPages(GwTask):
                 return False
         return True
 
-
     def finished(self, result):
         # Restore user selectors
         self.designer.close()
@@ -115,11 +114,9 @@ class GwComposerPages(GwTask):
         self.change_btn_accept.emit(False)
         self.task_finished.emit()
 
-
     def cancel(self):
         self.stop_task()
         super().cancel()
-
 
     def export_to_pdf(self, layout, path):
         """ Export to PDF file """
@@ -142,7 +139,6 @@ class GwComposerPages(GwTask):
                 tools_log.log_warning(str(e))
                 msg = "Cannot create file, check if selected giswater_advancedtools is the correct giswater_advancedtools"
                 tools_qgis.show_warning(msg, parameter=path)
-
 
     def _merge_files(self):
         from ...packages.PyPDF2 import PdfFileMerger
@@ -172,7 +168,6 @@ class GwComposerPages(GwTask):
             except Exception as e:
                 print(f"{e}")
 
-
     def _calculate_remaining_time(self, t0):
         tf = time()  # Final time
         td = tf - t0  # Delta time
@@ -181,10 +176,8 @@ class GwComposerPages(GwTask):
         time_remaining = td * (total_pages - cur_page)  # Delta time * remaining pages
         self.time_changed.emit(f"{timedelta(seconds=round(time_remaining))} ({cur_page}/{total_pages})")
 
-
     def _increase_map_refreshed(self, map):
         self.map_refreshed += 1
-
 
     def stop_task(self):
         self.stop = True

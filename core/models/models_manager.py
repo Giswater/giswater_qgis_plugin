@@ -46,13 +46,11 @@ class GwTable(object):
         self.__table_name = table_name
         self.__pk = pk
 
-
     def table_name(self):
         return self.__table_name
 
     def pk(self):
         return self.__pk
-
 
     def field_names(self):
         """ Return the list of field names composing the table.
@@ -62,7 +60,6 @@ class GwTable(object):
         # remove all _<classname>__<name> or __<names>__ vars, e.g. private vars
         fields = [x for x in fields if "__" not in x]
         return fields
-
 
     def fetch(self, commit=True):
         """ Retrieve a record with a specified primary key id."""
@@ -90,7 +87,6 @@ class GwTable(object):
             setattr(self, field, value)
 
         return True
-
 
     def upsert(self, commit=True):
         """ Save current event state in the DB as new record.
@@ -123,7 +119,6 @@ class GwTable(object):
 
         return True
 
-
     def nextval(self, commit=True):
         """ Get the next id for the __pk. that will be used for the next insert.
         BEWARE that this call increment the sequence at each call. """
@@ -135,7 +130,6 @@ class GwTable(object):
             return row[0]
         else:
             return None
-
 
     def currval(self, commit=True):
         """ Get the current id for the __pk. that is the id of the last insert. """
@@ -152,7 +146,6 @@ class GwTable(object):
             # serial not yet defined in the current session
             return None
 
-
     def max_pk(self, commit=True):
         """ Retrive max value of the primary key (if numeric). """
 
@@ -165,7 +158,6 @@ class GwTable(object):
         else:
             return row[0]
 
-
     def pks(self, commit=True):
         """ Fetch all pk values. """
 
@@ -173,7 +165,6 @@ class GwTable(object):
             self.table_name(), self.pk())
         rows = tools_db.get_rows(sql, commit=commit)
         return rows
-
 
     def delete(self, pks=[], all_records=False, where_clause='', commit=True):
         """ Delete all listed records with specified pks.
@@ -192,7 +183,6 @@ class GwTable(object):
                 sql += " WHERE {}".format(where_clause)
 
         return tools_db.execute_sql(sql, commit=commit)
-
 
     def execute_upsert(self, tablename, unique_field, unique_value, fields, values, commit=True):
         """ Execute UPSERT sentence """

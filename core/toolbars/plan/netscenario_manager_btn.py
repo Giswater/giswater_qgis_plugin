@@ -43,11 +43,8 @@ class GwNetscenarioManagerButton(GwAction):
         self.filter_disabled = []
         self.rubber_band = tools_gw.create_rubberband(global_vars.canvas)
 
-
-
     def clicked_event(self):
         self._open_netscenario_manager()
-
 
     def _open_netscenario_manager(self):
         """ Open netscenario manager """
@@ -99,7 +96,6 @@ class GwNetscenarioManagerButton(GwAction):
         # Open dialog
         tools_gw.open_dialog(self.dlg_netscenario_manager, 'netscenario_manager')
 
-    
     def _show_context_menu_right_click(self, qtableview, pos):
         """ Show custom context menu """
         menu = QMenu(qtableview)
@@ -133,7 +129,6 @@ class GwNetscenarioManagerButton(GwAction):
         menu.addAction(action_delete)
 
         menu.exec(QCursor.pos())
-
 
     def _filter_table(self, dialog, table, widget_txt, widget_chk, tablename):
 
@@ -196,7 +191,6 @@ class GwNetscenarioManagerButton(GwAction):
         # Re-open the dialog to reflect the changes
         tools_gw.open_dialog(dialog)
 
-
     def _set_label_current_netscenario(self, dialog, from_open_dialog=False, result=None):
         """Set label for the current netscenario."""
 
@@ -225,10 +219,8 @@ class GwNetscenarioManagerButton(GwAction):
 
     # region netscenario manager
 
-
     def save_user_values(self):
         pass
-
 
     def _get_list(self, table_name='v_ui_plan_netscenario', filter_name="", filter_id=None, chk_active=False):
         """ Mount and execute the query for gw_fct_getlist """
@@ -249,7 +241,6 @@ class GwNetscenarioManagerButton(GwAction):
             return False
 
         return complet_list
-
 
     def _fill_manager_table(self):
         """ Fill netscenario manager table with data from v_ui_plan_netscenario """
@@ -278,7 +269,6 @@ class GwNetscenarioManagerButton(GwAction):
 
         return complet_list
 
-
     def _manage_btn_create(self):
         """ Fill btn_create QMenu """
 
@@ -295,7 +285,6 @@ class GwNetscenarioManagerButton(GwAction):
 
         self.dlg_netscenario_manager.btn_create.setMenu(create_menu)
 
-
     def _open_toolbox_function(self, function, signal=None, connect=None):
         """ Execute currently selected function from combobox """
 
@@ -307,7 +296,6 @@ class GwNetscenarioManagerButton(GwAction):
                 connect = [connect]
         dlg_functions = toolbox_btn.open_function_by_id(function, connect_signal=connect)
         return dlg_functions
-
 
     def _duplicate_selected_netscenario(self):
         """ Duplicates the selected netscenario """
@@ -329,7 +317,6 @@ class GwNetscenarioManagerButton(GwAction):
         tools_qt.set_combo_value(dlg_functions.findChild(QComboBox, 'copyFrom'), f"{value}", 0)
         tools_qt.set_widget_enabled(dlg_functions, 'copyFrom', False)
 
-
     def _execute_current_netscenario(self):
         """ Executes the current netscenario """
 
@@ -343,7 +330,6 @@ class GwNetscenarioManagerButton(GwAction):
         # Set netscenario_id in combo copyFrom
         tools_qt.set_combo_value(dlg_functions.findChild(QComboBox, 'netscenario'), f"{self.current_netscenario_id[0]}", 0)
         tools_qt.set_widget_enabled(dlg_functions, 'netscenario', False)
-
 
     def _delete_selected_netscenario(self):
         """ Deletes the selected netscenario """
@@ -444,7 +430,6 @@ class GwNetscenarioManagerButton(GwAction):
         title = f"Netscenario {self.selected_netscenario_id} - {netscenario_name}"
         tools_gw.open_dialog(self.dlg_netscenario, 'netscenario', title=f"{title}")
 
-
     def _fill_netscenario_table(self, set_edit_triggers=QTableView.NoEditTriggers, expr=None):
         """ Fill netscenario table with data from its corresponding table """
 
@@ -500,7 +485,6 @@ class GwNetscenarioManagerButton(GwAction):
         # Sort the table by feature id
         model.sort(1, 0)
 
-
     def _manage_current_changed(self):
         """ Manages tab changes """
 
@@ -537,7 +521,6 @@ class GwNetscenarioManagerButton(GwAction):
         # Enable/disable filter & buttons
         self._enable_widgets(enable)
 
-
     def _enable_widgets(self, enable):
         """  """
 
@@ -569,7 +552,6 @@ class GwNetscenarioManagerButton(GwAction):
             tools_qt.set_widget_visible(self.dlg_netscenario, 'btn_toggle_closed', False)
             tools_qt.set_widget_text(self.dlg_netscenario, 'lbl_mapzone_id', f'{self.selected_netscenario_type.capitalize()} id:')
 
-
     def _manage_feature_type(self):
         """ Manages current tableview feature type (node, arc, nodarc, etc.) """
 
@@ -586,7 +568,6 @@ class GwNetscenarioManagerButton(GwAction):
         if feature_type != 'feature_id':
             self.feature_type = feature_type.split('_')[0]
 
-
     def _manage_highlight(self, qtableview, view, index):
         """ Creates rubberband to indicate which feature is selected """
 
@@ -601,7 +582,6 @@ class GwNetscenarioManagerButton(GwAction):
         table = f"v_edit_{view}"
         tools_qgis.highlight_feature_by_id(qtableview, table, feature_type, self.rubber_band, 5, index)
 
-
     def _manage_config(self):
         self.mapzone_manager = GwMapzoneManager()
         self.mapzone_manager.netscenario_id = self.selected_netscenario_id
@@ -610,7 +590,6 @@ class GwNetscenarioManagerButton(GwAction):
             self.mapzone_manager.config_dlg.finished.connect(partial(self._manage_current_changed))
         except:
             pass
-
 
     def _manage_create(self):
         self.mapzone_manager = GwMapzoneManager()
@@ -621,7 +600,6 @@ class GwNetscenarioManagerButton(GwAction):
         except:
             pass
 
-
     def _manage_update(self):
         self.mapzone_manager = GwMapzoneManager()
         self.mapzone_manager.netscenario_id = self.selected_netscenario_id
@@ -630,7 +608,6 @@ class GwNetscenarioManagerButton(GwAction):
             self.mapzone_manager.add_dlg.dlg_closed.connect(partial(self._manage_current_changed))
         except:
             pass
-
 
     def _manage_toggle_active(self, tableview, view, is_manager):
 
@@ -673,7 +650,6 @@ class GwNetscenarioManagerButton(GwAction):
         else:
             self._manage_current_changed()
 
-
     def _manage_toggle_closed(self):
         # Get selected row
         tableview = self.dlg_netscenario.main_tab.currentWidget()
@@ -698,7 +674,6 @@ class GwNetscenarioManagerButton(GwAction):
 
         # Refresh tableview
         self._manage_current_changed()
-
 
     def _manage_properties(self):
 
@@ -746,7 +721,6 @@ class GwNetscenarioManagerButton(GwAction):
         # Open dlg
         tools_gw.open_dialog(self.props_dlg, dlg_name='info_generic')
 
-
     def _accept_props_dlg(self, dialog, tablename, pkey, feature_id, my_json):
         if not my_json:
             return
@@ -765,7 +739,6 @@ class GwNetscenarioManagerButton(GwAction):
             self._fill_manager_table()
             return
         tools_qgis.show_warning('Error', parameter=json_result, dialog=dialog)
-
 
     def _manage_add_layers(self):
         """ Opens menu to add/remove layers to ToC """
@@ -833,7 +806,6 @@ class GwNetscenarioManagerButton(GwAction):
 
         main_menu.exec_(click_point)
 
-
     def _check_action_ischecked(self, tablename, the_geom, pk, style_id, alias, state):
         """ Control if user check or uncheck action menu, then add or remove layer from toc
         :param tablename: Postgres table name (String)
@@ -854,14 +826,12 @@ class GwNetscenarioManagerButton(GwAction):
                 if answer:
                     tools_qgis.remove_layer_from_toc(alias, "MASTERPLAN", "Netscenario")
 
-
     def _manage_load_all(self, menu, state=None):
 
         if state == 2:
             for child in menu.actions():
                 if not child.isChecked():
                     child.defaultWidget().setChecked(True)
-
 
     def _manage_insert(self, p_feature_id=None):
         """ Insert feature to netscenario via the button """
@@ -912,12 +882,10 @@ class GwNetscenarioManagerButton(GwAction):
             sql = f"INSERT INTO {view} VALUES ({self.selected_netscenario_id}, '{feature_id}');"
             result = tools_db.execute_sql(sql, show_exception=False)
 
-
         if p_feature_id is None:
             # Refresh tableview
             self._fill_netscenario_table()
         return result
-
 
     def _manage_delete(self):
         """ Delete features from netscenario via the button """
@@ -955,7 +923,6 @@ class GwNetscenarioManagerButton(GwAction):
             # Refresh tableview
             self._fill_netscenario_table()
 
-
     def _manage_select(self):
         """ Button snapping """
 
@@ -983,14 +950,12 @@ class GwNetscenarioManagerButton(GwAction):
         self._selection_init()
         # tools_gw.selection_init(self, self.dlg_netscenario, tableview)
 
-
     def _selection_init(self):
         """ Set canvas map tool to selection """
 
         tools_gw.disconnect_signal('netscenario_snapping')
         self.iface.actionSelect().trigger()
         self.connect_signal_selection_changed()
-
 
     def connect_signal_selection_changed(self):
         """ Connect signal selectionChanged """
@@ -1025,7 +990,6 @@ class GwNetscenarioManagerButton(GwAction):
                 self._selection_end()
                 # Just select the inserted features
                 tools_gw.get_expression_filter(self.feature_type, inserted, {f"{self.feature_type}": [layer]})
-
 
     def _selection_end(self):
         """ Stop selection mode """

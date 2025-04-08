@@ -44,7 +44,6 @@ class GwCreateSchemaTask(GwTask):
         # Disable dlg_readsql buttons
         self.admin.dlg_readsql.btn_close.setEnabled(False)
 
-
     def run(self):
 
         super().run()
@@ -62,7 +61,6 @@ class GwCreateSchemaTask(GwTask):
         tools_log.log_info(f"Task 'Create schema' execute function 'def custom_execution'")
         self.custom_execution()
         return True
-
 
     def finished(self, result):
 
@@ -103,12 +101,10 @@ class GwCreateSchemaTask(GwTask):
                                              is_test=self.is_test)
         self.setProgress(100)
 
-
     def set_progress(self, value):
 
         if not self.is_test:
             self.setProgress(value)
-
 
     def main_execution(self):
         """ Main common execution """
@@ -154,7 +150,6 @@ class GwCreateSchemaTask(GwTask):
 
         return True
 
-
     def custom_execution(self):
         """ Custom execution """
 
@@ -166,7 +161,6 @@ class GwCreateSchemaTask(GwTask):
         self.admin.total_sql_files = 100
         self.admin.progress_ratio = 1.0
 
-
         if self.admin.rdb_sample_inv.isChecked() and example_data:
             tools_gw.set_config_parser('btn_admin', 'create_schema_type', 'rdb_sample_full', prefix=False)
             self.admin.load_sample_data(project_type=project_type)
@@ -176,7 +170,6 @@ class GwCreateSchemaTask(GwTask):
             self.admin.load_sample_data(project_type=project_type)
         elif self.admin.rdb_empty.isChecked():
             tools_gw.set_config_parser('btn_admin', 'create_schema_type', 'rdb_empty', prefix=False)
-
 
     def calculate_number_of_files(self):
         """ Calculate total number of SQL to execute """
@@ -195,7 +188,6 @@ class GwCreateSchemaTask(GwTask):
 
         return total_sql_files
 
-
     def get_number_of_files_folder_update_minor(self, folder_update_minor):
 
         project_type = self.params['project_type']
@@ -205,7 +197,6 @@ class GwCreateSchemaTask(GwTask):
         total = len(files_project_type) + len(files_utils) + len(files_i18n)
 
         return total
-
 
     def get_number_of_files_process(self, process_name: str):
         """ Calculate number of files of all folders of selected @process_name """
@@ -222,7 +213,6 @@ class GwCreateSchemaTask(GwTask):
             dict_folders[folder] = file_count
 
         return dict_folders, number_of_files
-
 
     def get_folders_process(self, process_name):
         """ Get list of folders related with this @process_name """

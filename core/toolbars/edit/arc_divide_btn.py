@@ -45,7 +45,6 @@ class GwArcDivideButton(GwMaptool):
                                            prefix=True)
         self.keep_maptool_active = tools_os.set_boolean(value, False)
 
-
     # region QgsMapTools inherited
     """ QgsMapTool inherited event functions """
 
@@ -84,7 +83,6 @@ class GwArcDivideButton(GwMaptool):
             message = "Click on disconnected node, move the pointer to the desired location on pipe to break it"
             tools_qgis.show_info(message)
 
-
     def deactivate(self):
         """ Called when map tool is being deactivated """
 
@@ -99,22 +97,18 @@ class GwArcDivideButton(GwMaptool):
         except RuntimeError:
             pass
 
-
         self.refresh_map_canvas()
 
         self.reset()
-
 
     def canvasMoveEvent(self, event):
         """ Mouse movement event """
 
         self._move_event(event)
 
-
     def canvasReleaseEvent(self, event):
 
         self._release_event(event)
-
 
     # endregion
 
@@ -138,7 +132,6 @@ class GwArcDivideButton(GwMaptool):
             obj_action.triggered.connect(partial(super().clicked_event))
             obj_action.triggered.connect(partial(self._get_selected_action, action))
 
-
     def _get_selected_action(self, name):
         """ Gets selected action """
 
@@ -148,7 +141,6 @@ class GwArcDivideButton(GwMaptool):
             self.selected_action = 2
 
         tools_gw.set_config_parser("btn_arc_divide", "last_action", self.selected_action, "user", "session")
-
 
     def _move_event(self, event):
 
@@ -166,7 +158,6 @@ class GwArcDivideButton(GwMaptool):
         else:
             if self.selected_action == 1:
                 self._move_event_snap_to_arc(event_point, x, y)
-
 
     def _move_event_snap_to_node(self, event_point, x, y):
         """ Snap to node. First step: Any node selected """
@@ -187,7 +178,6 @@ class GwArcDivideButton(GwMaptool):
         # Set a new point to go on with
         if self.selected_action == 1:
             self.rubber_band.movePoint(point)
-
 
     def _move_event_snap_to_arc(self, event_point, x, y):
         """ Snap to arc. Second step: After a node is selected """
@@ -213,7 +203,6 @@ class GwArcDivideButton(GwMaptool):
             point = QgsMapToPixel.toMapCoordinates(self.canvas.getCoordinateTransform(), x, y)
 
         self.rubber_band.movePoint(point)
-
 
     def _move_node(self, node_id, point):
         """ Move selected node to the current point """
@@ -245,7 +234,6 @@ class GwArcDivideButton(GwMaptool):
         if self.keep_maptool_active:
             self.clicked_event()
 
-
     def _release_event(self, event):
 
         if event.button() == Qt.RightButton:
@@ -276,7 +264,6 @@ class GwArcDivideButton(GwMaptool):
             if self.selected_action == 1:
                 self._release_event_snap_to_arc(event_point)
 
-
     def _release_event_snap_to_node(self, event_point):
 
         result = self.snapper_manager.snap_to_current_layer(event_point)
@@ -294,7 +281,6 @@ class GwArcDivideButton(GwMaptool):
 
         # Add arc snapping
         self.iface.setActiveLayer(self.layer_arc)
-
 
     def _release_event_snap_to_arc(self, event_point):
 

@@ -46,8 +46,6 @@ class GwDocument(QObject):
         self.point_xy = {"x": None, "y": None}
         self.is_new = False
 
-
-
     def get_document(self, tablename=None, qtable=None, item_id=None, feature=None, feature_type=None, row=None, list_tabs=None, doc_tables=None):
         """ Button 31: Add document """
 
@@ -233,13 +231,11 @@ class GwDocument(QObject):
 
         return self.dlg_add_doc
 
-
     def _fill_table_doc_workcat(self):
         expr_filter = f"name = '{self.doc_name}'"
         table_name = "v_ui_doc_x_workcat"
 
         tools_qt.fill_table(self.dlg_add_doc.tbl_doc_x_workcat, table_name, expr_filter)
-
 
     def _insert_workcat(self, dialog):
         """Associate an existing workcat with the current document, ensuring no duplicates and clearing the input field"""
@@ -256,7 +252,6 @@ class GwDocument(QObject):
         if result:
             dialog.feature_id_workcat.clear()
             self._fill_table_doc_workcat()
-
 
     def _delete_workcat(self, dialog):
         """Delete the selected workcat from the document"""
@@ -288,13 +283,11 @@ class GwDocument(QObject):
 
         self._fill_table_doc_workcat()
 
-
     def _fill_table_doc_psector(self):
         expr_filter = f"doc_name = '{self.doc_name}'"
         table_name = "v_ui_doc_x_psector"
 
         tools_qt.fill_table(self.dlg_add_doc.tbl_doc_x_psector, table_name, expr_filter)
-
 
     def _insert_psector(self, dialog):
         """Associate an existing psector with the current document, ensuring no duplicates and clearing the input field"""
@@ -319,7 +312,6 @@ class GwDocument(QObject):
         if result:
             dialog.feature_id_psector.clear()
             self._fill_table_doc_psector()
-
 
     def _delete_psector(self, dialog):
         """Delete the selected psector from the document"""
@@ -384,7 +376,6 @@ class GwDocument(QObject):
             dialog.feature_id_visit.clear()
             self._fill_table_doc_visit()
 
-
     def _delete_visit(self, dialog):
         """Delete the selected visit from the document"""
         qtable = dialog.tbl_doc_x_visit
@@ -414,13 +405,11 @@ class GwDocument(QObject):
 
         self._fill_table_doc_visit()
 
-
     def _get_existing_doc_names(self):
         """ list of existing names """
         sql = "SELECT name FROM doc ORDER BY name;"
         rows = tools_db.get_rows(sql)
         return [row['name'] for row in rows if 'name' in row]
-
 
     def manage_documents(self):
         """ Button 32: Edit document """
@@ -470,11 +459,9 @@ class GwDocument(QObject):
 
         menu.exec(QCursor.pos())
 
-
     def _handle_delete(self):
         tools_gw.delete_selected_rows(self.dlg_man.tbl_document, "doc")
         self._refresh_manager_table()
-
 
     def _fill_table(self, filter_text=None):
         # Set a model with selected filter. Attach that model to selected table
@@ -505,7 +492,6 @@ class GwDocument(QObject):
     def open_document_dialog(self):
         self.get_document()
 
-
     def _refresh_manager_table(self):
         """ Refresh the manager table """
         try:
@@ -514,7 +500,6 @@ class GwDocument(QObject):
                 self._fill_table()
         except Exception as e:
             print(f"Error refreshing manager table: {e}")
-
 
     def _fill_combo_doc_type(self, widget):
         """ Executes query and fill combo box """
@@ -528,7 +513,6 @@ class GwDocument(QObject):
         if doctype_vdefault:
             tools_qt.set_combo_value(widget, doctype_vdefault[0], 0)
             self._activate_relations()
-
 
     def _activate_relations(self):
         """ Force user to set doc_id and doc_type """
@@ -546,7 +530,6 @@ class GwDocument(QObject):
         for n in range(2, 5):
             self.dlg_add_doc.tabWidget.setTabEnabled(n, activate)
 
-
     def _fill_table_doc(self, dialog, feature_type, feature_id):
         widget = "tbl_doc_x_" + feature_type
         widget = dialog.findChild(QTableView, widget)
@@ -558,7 +541,6 @@ class GwDocument(QObject):
         message = tools_qt.fill_table(widget, table_name, expr_filter)
         if message:
             tools_qgis.show_warning(message)
-
 
     def _manage_document_accept(self, table_object, tablename=None, qtable=None, item_id=None, close_dlg=True):
         """ Insert or update table 'document'. Add document to selected feature """
@@ -622,7 +604,6 @@ class GwDocument(QObject):
         self._refresh_manager_table()
         tools_gw.execute_class_function(GwDocManagerUi, '_refresh_manager_table')
 
-
     def _insert_doc_sql(self, doc_type, observ, date, path, the_geom, name):
         fields = "doc_type, path, observ, date, name"
         values = f"'{doc_type}', '{path}', '{observ}', '{date}', '{name}'"
@@ -638,7 +619,6 @@ class GwDocument(QObject):
         doc_id = str(new_doc_id[0])
         return sql, doc_id
 
-
     def _update_doc_sql(self, doc_type, observ, date, doc_id, path, the_geom, name):
         sql = (f"UPDATE doc "
                f"SET doc_type = '{doc_type}', observ = '{observ}', path = '{path}', date = '{date}', name = '{name}'")
@@ -646,7 +626,6 @@ class GwDocument(QObject):
             sql += f", the_geom = {the_geom}"
         sql += f" WHERE id = '{doc_id}';"
         return sql
-
 
     def _update_doc_tables(self, sql, doc_id, table_object, tablename, item_id, qtable, doc_name, close_dlg=True):
 
@@ -688,7 +667,6 @@ class GwDocument(QObject):
             if message:
                 tools_qgis.show_warning(message)
 
-
     def _get_associated_workcat_ids(self, doc_id=None):
         """Get workcat_ids linked to documento"""
         if doc_id is None:
@@ -698,7 +676,6 @@ class GwDocument(QObject):
         if not rows:
             return []
         return [row['workcat_id'] for row in rows if 'workcat_id' in row]
-
 
     def _get_associated_psector_ids(self, doc_id=None):
         """Get psector_ids linked to documento"""
@@ -710,7 +687,6 @@ class GwDocument(QObject):
             return []
         return [row['psector_id'] for row in rows if 'psector_id' in row]
 
-
     def _get_associated_visit_ids(self, doc_id=None):
         """Get visit_ids linked to the document"""
         if doc_id is None:
@@ -720,7 +696,6 @@ class GwDocument(QObject):
         if not rows:
             return []
         return [row['visit_id'] for row in rows if 'visit_id' in row]
-
 
     def _check_doc_exists(self, name=""):
         sql = f"SELECT name FROM doc WHERE name = '{name}'"
@@ -733,7 +708,6 @@ class GwDocument(QObject):
         self.dlg_add_doc.btn_accept.setEnabled(True)
         tools_qt.set_stylesheet(self.dlg_add_doc.doc_name, style="")
         self.dlg_add_doc.doc_name.setToolTip("")
-
 
     def _open_selected_object_document(self, dialog, widget, table_object):
 
@@ -763,7 +737,6 @@ class GwDocument(QObject):
         # Assuming 'row' is the QStandardItemModel row data
         self.get_document(row=widget.model().item(row, 0), item_id=selected_object_id)
 
-
     def _open_web_browser(self, dialog, widget=None):
         """ Display url using the default browser """
 
@@ -776,12 +749,10 @@ class GwDocument(QObject):
 
         webbrowser.open(url)
 
-
     def _get_point_xy(self):
         """ Capture point XY from the canvas """
         self.snapper_manager.add_point(self.vertex_marker)
         self.point_xy = self.snapper_manager.point_xy
-
 
     def _get_file_dialog(self, dialog, widget):
         """ Get file dialog """
@@ -816,7 +787,6 @@ class GwDocument(QObject):
 
         return files_path
 
-
     def _fill_dialog_document(self, dialog, table_object, single_tool_mode=None, doc_id=None):
 
         # Reset list of selected records
@@ -850,14 +820,12 @@ class GwDocument(QObject):
         for feature_type in list_feature_type:
             tools_gw.get_rows_by_feature_type(self, dialog, table_object, feature_type, feature_id=doc_id, feature_idname="doc_id")
 
-
     def convert_to_degrees(self, value):
         """ Convert GPS coordinates stored in EXIF to degrees """
         d = float(value[0])
         m = float(value[1])
         s = float(value[2])
         return d + (m / 60.0) + (s / 3600.0)
-
 
     def get_geolocation_gdal(self, file_path):
         """ Extract geolocation metadata from an image file using GDAL """

@@ -15,6 +15,7 @@ from wntr.epanet.util import to_si, FlowUnits, HydParam
 from .task import GwTask
 from ...libs import tools_db, lib_vars
 
+
 class GwValveOperationCheck(GwTask):
     def __init__(
         self,

@@ -34,7 +34,6 @@ class GwAuxCircleAddButton(GwMaptool):
         self.rb_circle.setLineStyle(Qt.DashLine)
         self.rb_circle.setColor(QColor(255, 0, 0, 150))
 
-
     def cancel(self):
 
         self._reset_rubberbands()
@@ -57,7 +56,6 @@ class GwAuxCircleAddButton(GwMaptool):
             self.iface.setActiveLayer(self.current_layer)
             return
 
-
     def canvasMoveEvent(self, event):
 
         # Hide marker and get coordinates
@@ -73,11 +71,9 @@ class GwAuxCircleAddButton(GwMaptool):
         # Add marker
         self.snapper_manager.add_marker(result, self.vertex_marker)
 
-
     def canvasReleaseEvent(self, event):
 
         self._add_aux_circle(event)
-
 
     def activate(self):
 
@@ -128,7 +124,6 @@ class GwAuxCircleAddButton(GwMaptool):
         if self.vdefault_layer is None:
             self.vdefault_layer = self.iface.activeLayer()
 
-
     def deactivate(self):
 
         # Call parent method
@@ -156,7 +151,6 @@ class GwAuxCircleAddButton(GwMaptool):
                         geom = 'geom_multicurve'
                     tools_gw.add_layer_database(tablename, alias=alias, group="INVENTORY", sub_group="AUXILIAR", the_geom=geom)
 
-
     def _init_create_circle_form(self, point):
 
         # Create the dialog and signals
@@ -172,10 +166,8 @@ class GwAuxCircleAddButton(GwMaptool):
         self.dlg_create_circle.btn_cancel.clicked.connect(self.cancel)
         self.dlg_create_circle.rejected.connect(self.cancel)
 
-
         tools_gw.open_dialog(self.dlg_create_circle, dlg_name='auxcircle')
         self.dlg_create_circle.radius.setFocus()
-
 
     def _preview_circle(self, point, text):
         self.rb_circle.reset(QgsWkbTypes.LineGeometry)
@@ -185,8 +177,6 @@ class GwAuxCircleAddButton(GwMaptool):
             radius = 0.0
         geom = QgsGeometry.fromPointXY(point).buffer(radius, 100)
         self.rb_circle.addGeometry(geom)
-
-
 
     def _get_radius(self, point):
 
@@ -253,7 +243,6 @@ class GwAuxCircleAddButton(GwMaptool):
             self.cancel_circle = False
             return
 
-
     def _add_aux_circle(self, event):
 
         if event.button() == Qt.LeftButton:
@@ -283,7 +272,6 @@ class GwAuxCircleAddButton(GwMaptool):
 
         if self.layer_circle:
             self.layer_circle.commitChanges()
-
 
     def _reset_rubberbands(self):
 

@@ -24,7 +24,6 @@ class GwSchemaI18NUpdate:
         self.schema_name = lib_vars.schema_name
         self.project_type_selected = None
 
-
     def init_dialog(self):
         """ Constructor """
     
@@ -48,7 +47,6 @@ class GwSchemaI18NUpdate:
 
         tools_gw.open_dialog(self.dlg_qm, dlg_name='admin_update_translation')
 
-
     def pass_schema_info(self, schema_info, schema_name):
         self.project_type = schema_info['project_type']
         self.project_epsg = schema_info['project_epsg']
@@ -69,7 +67,6 @@ class GwSchemaI18NUpdate:
 
         #Populate schema names
         self.dlg_qm.cmb_projecttype.currentIndexChanged.connect(partial(self._populate_data_schema_name, self.dlg_qm.cmb_projecttype))
-
 
     def _check_connection(self, set_languages):
         """ Check connection to database """
@@ -218,7 +215,6 @@ class GwSchemaI18NUpdate:
             return False, messages
         else:
             return True, None
-
 
         #Get db_feature values
 
@@ -453,7 +449,6 @@ class GwSchemaI18NUpdate:
                     tools_db.dao.rollback()
                     break
     
-    
     def _change_lang(self):
         query = f"UPDATE {self.schema}.sys_version SET language = '{self.language}'"
         try:
@@ -566,7 +561,6 @@ class GwSchemaI18NUpdate:
 
         return status
 
-
     def _commit(self):
         """ Commit current database transaction """
         self.conn_i18n.commit()
@@ -596,7 +590,6 @@ class GwSchemaI18NUpdate:
         finally:
             return rows
 
-
     def _replace_invalid_characters(self, param):
         """
         This function replaces the characters that break JSON messages
@@ -608,7 +601,6 @@ class GwSchemaI18NUpdate:
         param = param.replace("\n", " ")
 
         return param
-    
     
     def _replace_invalid_quotation_marks(self, param):
         """

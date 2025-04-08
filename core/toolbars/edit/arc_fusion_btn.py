@@ -23,7 +23,6 @@ class GwArcFusionButton(GwMaptool):
 
         super().__init__(icon_path, action_name, text, toolbar, action_group)
 
-
     # region QgsMapTools inherited
     """ QgsMapTools inherited event functions """
 
@@ -48,14 +47,11 @@ class GwArcFusionButton(GwMaptool):
             message = "Click on node, that joins two pipes, in order to remove it and merge pipes"
             tools_qgis.show_info(message)
 
-
     def canvasReleaseEvent(self, event):
 
         self._get_arc_fusion(event)
 
-
     # endregion
-
 
     # region private functions
 
@@ -104,7 +100,6 @@ class GwArcFusionButton(GwMaptool):
         # Check in init config file if user wants to keep map tool active or not
         self.manage_active_maptool()
 
-
     def _get_arc_fusion(self, event):
 
         if event.button() == Qt.RightButton:
@@ -132,7 +127,6 @@ class GwArcFusionButton(GwMaptool):
                 return
 
             self.open_arc_fusion_dlg()
-
 
     def open_arc_fusion_dlg(self):
         self.dlg_fusion = GwArcFusionUi(self)
@@ -188,7 +182,6 @@ class GwArcFusionButton(GwMaptool):
 
         tools_gw.open_dialog(self.dlg_fusion, dlg_name='arc_fusion')
 
-
     def _manage_nodeaction(self, index):
 
         if index == 1:
@@ -199,7 +192,6 @@ class GwArcFusionButton(GwMaptool):
             self.dlg_fusion.enddate.setEnabled(False)
             self.dlg_fusion.workcat_id_end.setEnabled(False)
             self.dlg_fusion.cmb_statetype.setEnabled(False)
-
 
     def _save_dlg_values(self):
 

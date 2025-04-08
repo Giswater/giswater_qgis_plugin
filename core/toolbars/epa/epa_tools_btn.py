@@ -129,7 +129,6 @@ class GwEpaTools(GwAction):
                 go2iber = Go2Iber()
                 go2iber.clicked_event()
     
-
     def _check_drain_project(self) -> bool:
         gpkg_path = tools_qgis.get_project_variable('project_gpkg_path')
         if not gpkg_path or not os.path.exists(f"{QgsProject.instance().absolutePath()}{os.sep}{gpkg_path}"):

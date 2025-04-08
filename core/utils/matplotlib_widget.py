@@ -30,7 +30,6 @@ except ImportError:
             tools_qt.show_info_box("Matplotlib installed successfully. Please restart QGIS.")
 
 
-
 class MplCanvas(FigureCanvasQTAgg):
 
     def __init__(self, parent=None, width=5, height=4, dpi=100):

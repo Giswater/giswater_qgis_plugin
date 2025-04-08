@@ -19,6 +19,7 @@ from ..... import global_vars
 from .....libs import tools_qt
 from ....utils import tools_gw
 
+
 class RecursiveEpa():
 
     def __init__(self):
@@ -56,7 +57,6 @@ class RecursiveEpa():
         tools_gw.set_config_parser('recursive_epa', 'folder_path', f"{folder_path}")
         prefix = tools_qt.get_text(dialog, dialog.txt_prefix, False, False)
         tools_gw.set_config_parser('recursive_epa', 'prefix', f"{prefix}")
-
 
     def execute_epa(self, dlg_epa):
         # Get config path
@@ -134,7 +134,6 @@ class RecursiveEpa():
         if folder_path:
             tools_qt.set_widget_text(self.dlg_epa, widget, str(folder_path))
 
-
     def _enable_cancel_btn(self, enable):
         if enable:
             self.dlg_epa.btn_accept.clicked.disconnect()
@@ -146,7 +145,6 @@ class RecursiveEpa():
             self.dlg_epa.btn_accept.clicked.disconnect()
             self.dlg_epa.btn_accept.setText(f"Accept")
             self.dlg_epa.btn_accept.clicked.connect(partial(self.execute_epa, self.dlg_epa))
-
 
     def _set_remaining_time(self, time):
         lbl_time = self.dlg_epa.findChild(QLabel, 'lbl_time')

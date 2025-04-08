@@ -25,7 +25,6 @@ class GwAutoMincutTask(GwTask):
         self.exception = None
         self.timer = timer
 
-
     def run(self):
         """ Automatic mincut: Execute function 'gw_fct_mincut' """
 
@@ -64,7 +63,6 @@ class GwAutoMincutTask(GwTask):
         except KeyError as e:
             self.exception = e
             return False
-
 
     def finished(self, result):
 

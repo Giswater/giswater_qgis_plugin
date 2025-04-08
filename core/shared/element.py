@@ -33,7 +33,6 @@ class GwElement:
         self.vertex_marker = self.snapper_manager.vertex_marker
         self.dlg_add_element = None
 
-
     def get_element(self, new_element_id=True, feature=None, feature_type=None, selected_object_id=None, list_tabs=None):
         """ Button 33: Add element """
 
@@ -256,7 +255,6 @@ class GwElement:
         if rows:
             tools_qt.set_combo_value(self.dlg_add_element.location_type, rows[0][0], 0)
 
-
     def manage_elements(self):
         """ Button 34: Edit element   
             Fetches form configuration, dynamically populates widgets, and opens the dialog."""
@@ -284,7 +282,6 @@ class GwElement:
 
         # Open the dialog
         tools_gw.open_dialog(self.dlg_mng, dlg_name=form_type)
-
 
     def _populate_dynamic_widgets(self, dialog, complet_result):
         """Creates and populates all widgets dynamically into the dialog layout."""
@@ -342,7 +339,6 @@ class GwElement:
                 widget.setContextMenuPolicy(Qt.CustomContextMenu)
                 widget.customContextMenuRequested.connect(partial(tools_gw._show_context_menu, widget, dialog))
 
-
     def load_connections(self, complet_result):
         list_tables = self.dlg_mng.findChildren(QTableView)
         complet_list = []
@@ -365,7 +361,6 @@ class GwElement:
 
         self.snapper_manager.add_point(self.vertex_marker)
         self.point_xy = self.snapper_manager.point_xy
-
 
     def _set_default_values(self):
         """ Set default values """
@@ -391,13 +386,11 @@ class GwElement:
         if enddate_vdef:
             self.dlg_add_element.enddate.setText(enddate_vdef[0].replace('/', '-'))
 
-
     def _manage_combo(self, combo, parameter):
 
         row = tools_gw.get_config_value(parameter)
         if row:
             tools_qt.set_combo_value(combo, row[0], 0)
-
 
     def _filter_state_type(self):
 
@@ -406,7 +399,6 @@ class GwElement:
                f"WHERE state = {state}")
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_add_element.state_type, rows)
-
 
     def _fill_tbl_new_element(self, dialog, feature_type, feature_id):
 
@@ -424,7 +416,6 @@ class GwElement:
         # Adding auto-completion to a QLineEdit
         self.table_object = "element"
         tools_gw.set_completer_object(dialog, self.table_object, field_id='element_id')
-
 
     def _manage_element_accept(self, table_object):
         """ Insert or update table 'element'. Add element to selected feature """
@@ -621,7 +612,6 @@ class GwElement:
             # Refresh canvas
             tools_qgis.refresh_map_canvas()
 
-
     def _filter_elementcat_id(self):
         """ Filter QComboBox @elementcat_id according QComboBox @element_type """
 
@@ -631,7 +621,6 @@ class GwElement:
                f" ORDER BY id")
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_add_element.elementcat_id, rows)    
-
 
     def _check_date(self, widget, button=None, regex_type=1):
         """ Set QRegExpression in order to validate QLineEdit(widget) field type date.
@@ -691,7 +680,6 @@ class GwElement:
         widget.setValidator(QRegExpValidator(reg_exp))
         widget.textChanged.connect(partial(self._check_regex, widget, reg_exp, button, placeholder))
 
-
     def _check_regex(self, widget, reg_exp, button, placeholder, text):
 
         is_valid = False
@@ -711,7 +699,6 @@ class GwElement:
                 button.setEnabled(False)
             else:
                 button.setEnabled(True)
-
 
     def _fill_dialog_element(self, dialog, table_object, single_tool_mode=None):
 
@@ -805,7 +792,6 @@ class GwElement:
             return
         tools_qgis.zoom_to_rectangle(x1, y1, x2, y2)
 
-
     def _set_combo_from_param_user(self, dialog, widget, table_name, parameter, field_id='id', field_name='id'):
         """ Executes query and set combo box """
 
@@ -815,7 +801,6 @@ class GwElement:
         row = tools_db.get_row(sql)
         if row:
             tools_qt.set_widget_text(dialog, widget, row[0])
-
 
     def _open_web_browser(self, dialog, widget=None):
         """ Display url using the default browser """

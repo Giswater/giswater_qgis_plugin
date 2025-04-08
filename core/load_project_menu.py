@@ -29,7 +29,6 @@ class GwMenuLoad(QObject):
         super().__init__()
         self.iface = global_vars.iface
 
-
     def read_menu(self, project_loaded):
         """  """
 
@@ -127,20 +126,16 @@ class GwMenuLoad(QObject):
 
         self.iface.mainWindow().menuBar().insertMenu(last_action, self.main_menu)
 
-
     def _clicked_event(self, action_function):
 
         action_function.clicked_event()
-
 
     def _translate(self, message):
         """ Calls on tools_qt to translate parameter message """
 
         return tools_qt.tr(message)
 
-
     # region private functions
-
 
     def _open_config_path(self):
         """ Opens the OS-specific Config directory """
@@ -150,7 +145,6 @@ class GwMenuLoad(QObject):
         if status is False and message is not None:
             tools_qgis.show_warning(message, parameter=path)
 
-
     def _open_plugin_path(self):
         """ Opens the OS-specific Plugin directory """
 
@@ -158,7 +152,6 @@ class GwMenuLoad(QObject):
         status, message = tools_os.open_file(path)
         if status is False and message is not None:
             tools_qgis.show_warning(message, parameter=path)
-
 
     def _open_manage_file(self):
         """ Manage files dialog:: """
@@ -190,11 +183,9 @@ class GwMenuLoad(QObject):
         # Open dialog
         tools_gw.open_dialog(self.dlg_manage_menu, title="Advanced Menu")
 
-
     def _reset_position_dialog(self):
         """ Reset position dialog x/y """
         tools_gw.reset_position_dialog(True)
-
 
     def _fill_tbl_config_files(self):
         """ Fills a UI table with the local list of values variable. """
@@ -246,7 +237,6 @@ class GwMenuLoad(QObject):
             # Sort
             top_level_item.sortChildren(0, Qt.AscendingOrder)
 
-
     def _set_config_value(self, item, column):
 
         if column == 2:
@@ -258,13 +248,11 @@ class GwMenuLoad(QObject):
                 value = "None"
             tools_gw.set_config_parser(section, parameter, value, file_name=file_name, prefix=False, chk_user_params=False)
 
-
     def _double_click_event(self, item, column):
 
         tmp = item.flags()
         if column == 2 and item.text(2):
             item.setFlags(tmp | Qt.ItemIsEditable)
-
 
     def _set_log_sql(self):
 
@@ -278,12 +266,10 @@ class GwMenuLoad(QObject):
 
         tools_qgis.show_info(message)
 
-
     def _open_current_selections(self):
 
         if lib_vars.session_vars['current_selections']:
             global_vars.iface.addDockWidget(Qt.LeftDockWidgetArea, lib_vars.session_vars['current_selections'])
-
 
     def _reset_plugin(self):
         """ Called in reset plugin action """
@@ -293,7 +279,6 @@ class GwMenuLoad(QObject):
         tools_qgis.restore_cursor()  # Restore cursor in case it's stuck with an overridden one
         self.iface.actionPan().trigger()  # Force actionPan action
         self._reload_layers()  # Execute GwProjectLayersConfig thread
-
 
     def _reload_layers(self):
         """ Reloads all the layers """
@@ -323,13 +308,11 @@ class GwMenuLoad(QObject):
         QgsApplication.taskManager().addTask(self.task_get_layers)
         QgsApplication.taskManager().triggerTask(self.task_get_layers)
 
-
     def _reset_snapping_managers(self):
         """ Deactivates all snapping managers """
 
         for i in range(0, len(global_vars.snappers)):
             global_vars.snappers[i].vertex_marker.hide()
-
 
     def _reset_all_rubberbands(self):
         """ Resets all active rubber bands """

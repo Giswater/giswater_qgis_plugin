@@ -40,7 +40,6 @@ class GwRenameSchemaTask(GwTask):
             self.admin.dlg_readsql_rename.setWindowFlag(Qt.WindowCloseButtonHint, False)
             self.admin.dlg_readsql_rename.show()
 
-
     def run(self):
         super().run()        
         
@@ -72,7 +71,6 @@ class GwRenameSchemaTask(GwTask):
         self.admin.error_count = 0
         self.status = status
         return status
-
 
     def finished(self, result):
         super().finished(result)

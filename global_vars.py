@@ -24,6 +24,7 @@ class GwFeatureTypes(Enum):
     def from_index(cls, index):
         return list(cls)[index]
 
+
 # end region
 
 # region system variables (values are initialized on load project without changes during session)

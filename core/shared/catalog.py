@@ -21,7 +21,6 @@ class GwCatalog:
         """ Class to control toolbar 'om_ws' """
         pass
 
-
     def open_catalog(self, previous_dialog, widget_name, feature_type, child_type):
         """ Main function of catalog """
 
@@ -89,7 +88,6 @@ class GwCatalog:
         # Open form
         tools_gw.open_dialog(self.dlg_catalog, dlg_name='info_catalog')
 
-
     # region private functions
 
     def _get_catalog(self, matcat_id, pnom, dnom, id, feature_type, child_type):
@@ -127,7 +125,6 @@ class GwCatalog:
                 if field['columnname'] == 'id':
                     self._fill_combo(id, field)
 
-
     def _populate_pn_dn(self, matcat_id, pnom, dnom, feature_type, child_type):
         """ Execute gw_fct_getcatalog and fill combos """
 
@@ -147,7 +144,6 @@ class GwCatalog:
                 self._fill_combo(pnom, field)
             elif field['columnname'] in ('dnom', 'geom1'):
                 self._fill_combo(dnom, field)
-
 
     def _populate_catalog_id(self, feature_type):
         """ Execute gw_api_get_catalog_id and fill combo id """
@@ -169,7 +165,6 @@ class GwCatalog:
             row = tools_db.get_row(sql)
             self._fill_combo(widget_id, row[0]['catalog_id'][0])
 
-
     def _add_combobox(self, field):
         """ Add QComboBox to dialog """
 
@@ -180,7 +175,6 @@ class GwCatalog:
         tools_qt.set_combo_value(widget, field.get('selectedId'), 0)
 
         return widget
-
 
     def _fill_combo(self, widget, field):
         """
@@ -207,7 +201,6 @@ class GwCatalog:
                 records_sorted.insert(0, ['', ''])
             for record in records_sorted:
                 widget.addItem(str(record[1]), record)
-
 
     def _fill_geomcat_id(self, previous_dialog, widget_name):
         """ Fill the widget of the previous dialogue """

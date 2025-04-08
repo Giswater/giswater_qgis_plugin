@@ -20,7 +20,6 @@ class GwGisFileCreate:
         self.layer_source = None
         self.srid = None
 
-
     def gis_project_database(self, folder_path=None, filename=None, project_type='ws', schema='ws_sample',
                              export_passwd=False, roletype='admin', layer_source=None):
 
@@ -97,9 +96,7 @@ class GwGisFileCreate:
             message = "File cannot be created. Check if it is already opened"
             tools_qgis.show_warning(message, parameter=qgs_path)
 
-
     # region private functions
-
 
     def _get_database_parameters(self, schema):
         """ Get database parameters from layer source """
@@ -111,7 +108,6 @@ class GwGisFileCreate:
         else:
             layer_source['srid'] = tools_db.get_srid('v_edit_node', schema)
             return True, layer_source
-
 
     def _replace_spatial_parameters(self, srid, content):
 
@@ -127,7 +123,6 @@ class GwGisFileCreate:
             aux = aux.replace("__AUTHID__", row[2])
 
         return aux
-
 
     def _replace_extent_parameters(self, schema_name, content):
 
@@ -162,7 +157,6 @@ class GwGisFileCreate:
 
         return aux
 
-
     def _replace_connection_parameters(self, content, export_passwd):
 
         if self.layer_source['service']:
@@ -181,7 +175,6 @@ class GwGisFileCreate:
         content = content.replace("__DATASOURCE__", datasource)
 
         return content
-
 
     def _set_project_vars(self, content, export_passwd):
 

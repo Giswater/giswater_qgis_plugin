@@ -38,24 +38,20 @@ class GwGo2EpaButton(GwAction):
         self.project_type = global_vars.project_type
         self.epa_options_list = []
 
-
     def clicked_event(self):
 
         self._open_go2epa()
-
 
     def check_result_id(self):
         """ Check if selected @result_id already exists """
 
         self.dlg_go2epa.txt_result_name.setStyleSheet(None)
 
-
     # region private functions
 
     def _open_go2epa(self):
 
         self._go2epa()
-
 
     def _go2epa(self):
         """ Button 42: Open form to set INP, RPT and project """
@@ -99,7 +95,6 @@ class GwGo2EpaButton(GwAction):
         else:
             tools_gw.open_dialog(self.dlg_go2epa, dlg_name='go2epa')
 
-
     def _set_signals(self):
 
         self.dlg_go2epa.btn_cancel.clicked.connect(self._cancel_task)
@@ -111,7 +106,6 @@ class GwGo2EpaButton(GwAction):
         self.dlg_go2epa.rejected.connect(partial(tools_gw.close_dialog, self.dlg_go2epa))
         self.dlg_go2epa.btn_options.clicked.connect(self._go2epa_options)
         self.dlg_go2epa.mainTab.currentChanged.connect(partial(self._manage_btn_accept))
-
 
     def _manage_btn_accept(self, index):
         """
@@ -132,7 +126,6 @@ class GwGo2EpaButton(GwAction):
                     pass
             self.dlg_go2epa.btn_accept.setEnabled(True)
 
-
     def _check_inp_chk(self, file_inp):
 
         if file_inp is None:
@@ -141,7 +134,6 @@ class GwGo2EpaButton(GwAction):
             return False
 
         return True
-
 
     def _check_rpt(self):
 
@@ -165,7 +157,6 @@ class GwGo2EpaButton(GwAction):
                     return False
 
         return True
-
 
     def _check_fields(self):
 
@@ -233,7 +224,6 @@ class GwGo2EpaButton(GwAction):
 
         return True
 
-
     def _load_user_values(self):
         """ Load QGIS settings related with file_manager """
 
@@ -254,7 +244,6 @@ class GwGo2EpaButton(GwAction):
         value = tools_gw.get_config_parser('btn_go2epa', 'go2epa_chk_RPT', "user", "session")
         tools_qt.set_checked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result, value)
 
-
     def _save_user_values(self):
         """ Save QGIS settings related with file_manager """
 
@@ -272,8 +261,6 @@ class GwGo2EpaButton(GwAction):
         tools_gw.set_config_parser('btn_go2epa', 'go2epa_chk_EPA', f"{chk_exec}")
         chk_import_result = f"{tools_qt.is_checked(self.dlg_go2epa, self.dlg_go2epa.chk_import_result)}"
         tools_gw.set_config_parser('btn_go2epa', 'go2epa_chk_RPT', f"{chk_import_result}")
-
-
 
     def _sector_selection(self):
         """ Load the tables in the selection form """
@@ -307,7 +294,6 @@ class GwGo2EpaButton(GwAction):
             # Open form
             tools_gw.open_dialog(dlg_selector)
 
-
     def _manage_form_settings(self, action):
 
         if action == 'save':
@@ -328,7 +314,6 @@ class GwGo2EpaButton(GwAction):
             if self.chk_exec is not 'null': tools_qt.set_widget_text(self.dlg_go2epa, self.dlg_go2epa.chk_exec, self.chk_exec)
             if self.txt_file_rpt is not 'null': tools_qt.set_widget_text(self.dlg_go2epa, self.dlg_go2epa.txt_file_rpt, self.txt_file_rpt)
             if self.chk_import_result is not 'null': tools_qt.set_widget_text(self.dlg_go2epa, self.dlg_go2epa.chk_import_result, self.chk_import_result)
-
 
     def _go2epa_select_file_inp(self):
         """ Select INP file """
@@ -351,7 +336,6 @@ class GwGo2EpaButton(GwAction):
             self.file_inp, filter_ = QFileDialog.getOpenFileName(None, message, "", '*.inp')
         tools_qt.set_widget_text(self.dlg_go2epa, self.dlg_go2epa.txt_file_inp, self.file_inp)
 
-
     def _go2epa_select_file_rpt(self):
         """ Select RPT file """
 
@@ -371,7 +355,6 @@ class GwGo2EpaButton(GwAction):
         else:
             self.file_rpt, filter_ = QFileDialog.getOpenFileName(None, message, "", '*.rpt')
         tools_qt.set_widget_text(self.dlg_go2epa, self.dlg_go2epa.txt_file_rpt, self.file_rpt)
-
 
     def _go2epa_accept(self):
         """ Save INP, RPT and result name"""
@@ -429,12 +412,10 @@ class GwGo2EpaButton(GwAction):
         QgsApplication.taskManager().addTask(self.go2epa_task)
         QgsApplication.taskManager().triggerTask(self.go2epa_task)
 
-
     def _cancel_task(self):
 
         if hasattr(self, 'go2epa_task'):
             self.go2epa_task.cancel()
-
 
     def step_completed(self, json_result, end="\n"):
 
@@ -442,7 +423,6 @@ class GwGo2EpaButton(GwAction):
         if message:
             data = {"info": {"values": [{"message": message.get('text')}]}}
             tools_gw.fill_tab_log(self.dlg_go2epa, data, reset_text=False, close=False, end=end, call_set_tabs_enabled=False)
-
 
     def _set_completer_result(self, widget, viewname, field_name):
         """ Set autocomplete of widget 'feature_id'
@@ -465,7 +445,6 @@ class GwGo2EpaButton(GwAction):
 
             model.setStringList(rows)
             self.completer.setModel(model)
-
 
     def _refresh_go2epa_options(self, dialog):
         """ Refresh widgets into layouts on go2epa_options form """
@@ -545,7 +524,6 @@ class GwGo2EpaButton(GwAction):
             self.dlg_go2epa_options.tabWidget.setCurrentWidget(tab)
         tools_gw.open_dialog(self.dlg_go2epa_options, dlg_name='go2epa_options')
 
-
     def _update_values(self, _json):
 
         my_json = json.dumps(_json)
@@ -566,7 +544,6 @@ class GwGo2EpaButton(GwAction):
         # Close dialog
         tools_gw.close_dialog(self.dlg_go2epa_options)
 
-
     def _get_event_combo_parent(self, complet_result):
 
         for field in complet_result['body']['form']['formTabs'][0]["fields"]:
@@ -574,7 +551,6 @@ class GwGo2EpaButton(GwAction):
                 widget = self.dlg_go2epa_options.findChild(QComboBox, field['widgetname'])
                 if widget:
                     widget.currentIndexChanged.connect(partial(self._fill_child, self.dlg_go2epa_options, widget))
-
 
     def _fill_child(self, dialog, widget):
 
@@ -588,7 +564,6 @@ class GwGo2EpaButton(GwAction):
         for combo_child in json_result['fields']:
             if combo_child is not None:
                 tools_gw.manage_combo_child(dialog, widget, combo_child)
-
 
     def _calculate_elapsed_time(self, dialog):
 

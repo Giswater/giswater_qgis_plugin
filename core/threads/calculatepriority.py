@@ -32,6 +32,7 @@ def get_min_greater_than(iterable, value):
             result = item
     return result
 
+
 # sh formula [directly from the paper Shamir and Howard Concept]
 def optimal_replacement_time(
     present_year,
