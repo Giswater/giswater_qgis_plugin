@@ -29,9 +29,9 @@ CREATE RULE dma_conflict AS ON UPDATE TO dma WHERE ((new.dma_id = -1) OR (old.dm
 CREATE RULE dma_undefined AS ON UPDATE TO dma WHERE ((new.dma_id = 0) OR (old.dma_id = 0)) DO INSTEAD NOTHING;;
 
 update sector set macrosector_id = 0 where macrosector_id is null;
-ALTER TABLE sector alter column macrosector_id set NOT NULL;
+--ALTER TABLE sector alter column macrosector_id set NOT NULL;
 ALTER TABLE sector alter column macrosector_id set default 0;
 
 update exploitation set macroexpl_id = 0 where macroexpl_id is null;
-ALTER TABLE exploitation alter column macroexpl_id set NOT NULL;
+--ALTER TABLE exploitation alter column macroexpl_id set NOT NULL;
 ALTER TABLE exploitation alter column macroexpl_id set default 0;
