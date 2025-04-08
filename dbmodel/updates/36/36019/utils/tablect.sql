@@ -6,6 +6,10 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
+update arc set muni_id = 0 where muni_id is null;
+update node set muni_id = 0 where muni_id is null;
+update connec set muni_id = 0 where muni_id is null;
+update link set muni_id = 0 where muni_id is null;
 
 ALTER TABLE arc alter column muni_id set NOT NULL;
 ALTER TABLE node alter column muni_id set NOT NULL;

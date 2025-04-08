@@ -6,6 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-update gully set muni_id = 0 where muni_id is null;
-ALTER TABLE gully alter column muni_id set NOT NULL;
-ALTER TABLE gully alter column muni_id set default 0;
+
+update dqa set macrodqa_id = 0 where macrodqa_id is null;
+ALTER TABLE dqa alter column macrodqa_id set NOT NULL;
+ALTER TABLE dqa alter column macrodqa_id set default 0;
