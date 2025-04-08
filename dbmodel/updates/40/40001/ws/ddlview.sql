@@ -6251,12 +6251,6 @@ AS SELECT review_node.node_id,
     selector_expl
   WHERE selector_expl.cur_user = "current_user"()::text AND review_node.expl_id = selector_expl.expl_id;
 
-CREATE OR REPLACE VIEW vp_basic_node AS
-SELECT node_id AS nid,
-node_type AS custom_type
-FROM node
-JOIN cat_node ON id=nodecat_id;
-
 CREATE OR REPLACE VIEW v_rtc_hydrometer
 AS SELECT ext_rtc_hydrometer.id::text AS hydrometer_id,
     ext_rtc_hydrometer.code AS hydrometer_customer_code,
@@ -7274,18 +7268,6 @@ AS SELECT om_mincut_hydrometer.id,
      JOIN connec ON rtc_hydrometer_x_connec.connec_id::text = connec.connec_id::text
      JOIN om_mincut ON om_mincut_hydrometer.result_id = om_mincut.id
   WHERE om_mincut.mincut_state = 1;
-
-CREATE OR REPLACE VIEW vp_basic_arc
-AS SELECT arc.arc_id AS nid,
-    cat_arc.arc_type AS custom_type
-   FROM arc
-     JOIN cat_arc ON cat_arc.id::text = arc.arccat_id::text;
-
-CREATE OR REPLACE VIEW vp_basic_connec
-AS SELECT connec.connec_id AS nid,
-    cat_connec.connec_type AS custom_type
-   FROM connec
-     JOIN cat_connec ON cat_connec.id::text = connec.conneccat_id::text;
 
 
 CREATE OR REPLACE VIEW v_edit_plan_psector_x_connec

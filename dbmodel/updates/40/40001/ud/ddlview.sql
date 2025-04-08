@@ -7426,12 +7426,6 @@ AS SELECT DISTINCT ON (rpt_cat_result.result_id) rpt_cat_result.result_id,
 
 
 -- 18/03/2025
-CREATE OR REPLACE VIEW vp_basic_node
-AS SELECT node_id AS nid,
-    node_type AS custom_type
-   FROM node;
-
-
 CREATE OR REPLACE VIEW v_om_visit
 AS SELECT DISTINCT ON (visit_id) visit_id,
     code,
@@ -7592,12 +7586,6 @@ AS SELECT om_visit_event.id AS event_id,
      LEFT JOIN ( SELECT DISTINCT doc_x_visit.visit_id
            FROM doc_x_visit) b ON b.visit_id = om_visit.id
   ORDER BY om_visit_x_arc.arc_id;
-
-CREATE OR REPLACE VIEW vp_basic_arc
-AS SELECT arc_id AS nid,
-    arc_type AS custom_type
-   FROM arc;
-
 
 CREATE OR REPLACE VIEW v_ui_event_x_arc
 AS SELECT om_visit_event.id AS event_id,
@@ -7884,12 +7872,6 @@ CREATE OR REPLACE VIEW v_ui_om_visit_x_connec AS
            FROM doc_x_visit) b ON b.visit_id = om_visit.id
   ORDER BY om_visit_x_connec.connec_id;
 
-DROP VIEW IF EXISTS vp_basic_connec;
-CREATE OR REPLACE VIEW vp_basic_connec AS
-SELECT connec_id AS nid,
-connec_type AS custom_type
-FROM connec;
-
 CREATE OR REPLACE VIEW v_ui_om_visit_x_link AS
  SELECT om_visit_event.id AS event_id,
     om_visit.id AS visit_id,
@@ -8013,11 +7995,6 @@ AS SELECT gully.gully_id,
     gully.the_geom
    FROM gully
      JOIN selector_state ON gully.state = selector_state.state_id;
-
-CREATE OR REPLACE VIEW vp_basic_gully
-AS SELECT gully_id AS nid,
-    gully_type AS custom_type
-   FROM gully;
 
 CREATE OR REPLACE VIEW v_ui_event_x_gully
 AS SELECT om_visit_event.id AS event_id,

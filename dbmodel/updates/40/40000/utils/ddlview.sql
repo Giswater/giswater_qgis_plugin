@@ -275,7 +275,6 @@ DROP VIEW IF EXISTS vu_drainzone;
 DROP VIEW IF EXISTS v_edit_inp_timeseries;
 DROP VIEW IF EXISTS v_edit_inp_timeseries_value;
 
-
 -- 30/10/2024
 
 CREATE OR REPLACE VIEW vcv_times AS

@@ -1,5 +1,5 @@
 4.0.001
 *************
 - Recreate all giswater views
--
+- Remove vp_basic_* views & Remove from sys_table
 -
