@@ -605,6 +605,12 @@ class GwInfo(QObject):
             self.dlg_cf.setWindowTitle(title)
 
 
+        # Check if audit schema exists
+        sql = "SELECT schema_name FROM information_schema.schemata WHERE schema_name = 'audit'"
+        rows = tools_db.get_rows(sql, commit=False)
+        self.action_audit.setVisible(rows is not None)
+        if rows:
+            self._enable_action(dlg_cf, self.action_audit, True)
 
         return self.complet_result, self.dlg_cf
 
@@ -1952,11 +1958,11 @@ class GwInfo(QObject):
 
         try:
             actions_list = dialog.findChildren(QAction)
-            static_actions = ('actionEdit', 'actionCentered', 'actionLink', 'actionHelp', 'actionAudit'
+            static_actions = ('actionEdit', 'actionCentered', 'actionLink', 'actionHelp'
                               'actionSection', 'actionOrifice', 'actionOutlet', 'actionPump', 'actionWeir', 'actionDemand')
 
             for action in actions_list:
-                if action.objectName() not in static_actions:
+                if action.objectName() not in static_actions and action.objectName() != 'actionAudit':
                     self._enable_action(dialog, action, enabled)
 
             # When we are inserting we want the activation of QAction to be governed by the database,
@@ -1976,7 +1982,7 @@ class GwInfo(QObject):
                     if self.visible_tabs[tab]['tabactions'] is not None:
                         for act in self.visible_tabs[tab]['tabactions']:
                             action = dialog.findChild(QAction, act['actionName'])
-                            if action is not None and action.objectName() not in static_actions:
+                            if action is not None and action.objectName() not in static_actions and action.objectName() != 'actionAudit':
                                 action.setEnabled(not act['disabled'])
 
         except RuntimeError:
@@ -2416,7 +2422,7 @@ class GwInfo(QObject):
 
         actions_list = dialog.findChildren(QAction)
         for action in actions_list:
-            if not action.objectName():
+            if not action.objectName() or action.objectName() == 'actionAudit':
                 continue
             action.setVisible(False)
 
@@ -2428,7 +2434,7 @@ class GwInfo(QObject):
                 if self.visible_tabs[tab]['tabactions'] is not None:
                     for act in self.visible_tabs[tab]['tabactions']:
                         action = dialog.findChild(QAction, act['actionName'])
-                        if action is not None:
+                        if action is not None and act['actionName'] != "actionAudit":
                             if 'actionTooltip' in act:
                                 action.setToolTip(act['actionTooltip'])
                             action.setVisible(True)
