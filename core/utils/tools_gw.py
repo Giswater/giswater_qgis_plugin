@@ -1916,22 +1916,22 @@ def add_button(**kwargs):
         add_icon(widget, f'{icon}')
 
     func_params = ""
-    if field.get('widgetfunction'):
-        if 'module' in field['widgetfunction']:
-            module = globals()[field['widgetfunction']['module']]
-        function_name = field['widgetfunction'].get('functionName')
-        if function_name is not None:
-            exist = tools_os.check_python_function(module, function_name)
-            if not exist:
-                msg = f"widget {real_name} has associated function {function_name}, but {function_name} not exist"
-                tools_qgis.show_message(msg, 2)
-                return widget
-            if 'parameters' in field['widgetfunction']:
-                func_params = field['widgetfunction']['parameters']
-    else:
-        message = "Parameter widgetfunction.functionName is null for button"
-        tools_qgis.show_message(message, 2, parameter=widget.objectName())
+
+    if not field.get('widgetfunction'):
         return widget
+
+    if 'module' in field['widgetfunction']:
+        module = globals()[field['widgetfunction']['module']]
+    function_name = field['widgetfunction'].get('functionName')
+    if function_name is not None:
+        exist = tools_os.check_python_function(module, function_name)
+        if not exist:
+            msg = f"widget {real_name} has associated function {function_name}, but {function_name} not exist"
+            tools_qgis.show_message(msg, 2)
+            return widget
+        if 'parameters' in field['widgetfunction']:
+            func_params = field['widgetfunction']['parameters']
+
 
     kwargs['widget'] = widget
     kwargs['message_level'] = 1
