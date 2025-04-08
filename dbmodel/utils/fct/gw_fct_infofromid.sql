@@ -12,7 +12,7 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_infofromid(p_data json)
 $BODY$
 
 /*EXAMPLE
-UPSERT FEATURE 
+UPSERT FEATURE
 arc no nodes extremals
 SELECT SCHEMA_NAME.gw_fct_infofromid($${
 		"client":{"device":4, "infoType":1, "lang":"ES", "cur_user":"test_user"},
@@ -34,7 +34,7 @@ SELECT SCHEMA_NAME.gw_fct_infofromid($${
 
 SELECT SCHEMA_NAME.gw_fct_infofromid($${
 		"client":{"device":4, "infoType":1, "lang":"ES", "cur_user":"test_user"},
-		"form":{"editable":"True"}, 
+		"form":{"editable":"True"},
 		"feature":{"tableName":"v_edit_arc","id":"2001"},
 		"data":{}}$$)
 
@@ -74,7 +74,7 @@ v_inputgeometry public.geometry;
 v_editable boolean = true;
 v_device integer;
 v_infotype integer = 1;
-v_forminfo json;   
+v_forminfo json;
 form_tabs json[];
 form_tablabel varchar[];
 form_tabs_json json;
@@ -404,10 +404,10 @@ BEGIN
     	EXECUTE v_querystring INTO v_forminfo;
     END IF;
 
-	
+
 	-- Set layouts orientation
 	v_form_orientation = '"layouts": {';
-    
+
 	SELECT array_agg(distinct layoutname) INTO v_layouts FROM config_form_fields  WHERE formtype = 'form_feature';
 	layout_orientation_exist = false;
 
@@ -656,7 +656,7 @@ BEGIN
 		EXECUTE v_querystring INTO tableparent_id_arg;
 
 		-- get childtype
-		EXECUTE 'SELECT custom_type FROM vp_basic_'||v_featuretype||' WHERE nid = '||quote_literal(v_id) INTO v_childtype;
+		EXECUTE 'SELECT '||v_featuretype||'_type FROM v_edit_'||v_featuretype||' WHERE '||v_featuretype||'_id = '||quote_nullable(v_id) INTO v_childtype;
 
 		-- Identify tableinfotype_id
 		v_querystring = concat(' SELECT tableinfotype_id FROM cat_feature
@@ -788,7 +788,7 @@ BEGIN
                 ORDER BY ST_Distance(v_edit_node.the_geom, ST_startpoint(v_inputgeometry)) LIMIT 1;
                 -- Get order_id
                 SELECT COALESCE(MAX(order_id), 0) + 1 INTO v_order_id FROM v_edit_flwreg WHERE node_id = v_noderecord1.node_id ::text; -- afegir flwreg_type
-                -- Get flowreg_type  
+                -- Get flowreg_type
                 v_querystring = concat('SELECT feature_class FROM cat_feature WHERE child_layer = ' , quote_nullable(v_tablename) ,' LIMIT 1');
                 v_debug_vars := json_build_object('v_tablename', v_tablename);
                 v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getfeatureupsert', 'flag', 70);
@@ -866,8 +866,8 @@ BEGIN
 		'featureType',v_featuretype, 'childType', v_childtype, 'tableParent',v_table_parent, 'schemaName', v_schemaname,
 		'geometry', v_geometry, 'zoomCanvasMargin',concat('{"mts":"',v_canvasmargin,'"}')::json);
 
-	
-	
+
+
 	IF (v_fields->>'status')='Failed' THEN
 		v_message = (v_fields->>'message');
 		v_status = 'Failed';
@@ -894,10 +894,10 @@ BEGIN
 		v_tabdata_lytname_result := gw_fct_json_object_set_key(v_tabdata_lytname_result,concat('index_', v_record.index), v_record.text);
 	END LOOP;
 	v_forminfo := gw_fct_json_object_set_key(v_forminfo,'tabDataLytNames', v_tabdata_lytname_result);
-	
+
 
 	v_forminfo:= concat(left(v_forminfo::text, length(v_forminfo::text) - 1), ',', v_form_orientation, '}');
-	
+
 
 	EXECUTE 'SET ROLE "'||v_prev_cur_user||'"';
 
