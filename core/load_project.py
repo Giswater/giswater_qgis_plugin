@@ -445,20 +445,23 @@ class GwLoadProject(QObject):
         self._enable_toolbar("toc")
         self._hide_button("72")
 
+        self._hide_button(68)
 
         # Enable toolbars if their schemas exist
-        schemas = ["am", "cm"]
+        schemas = ["am", "cm", "audit"]
         for schema in schemas:
             sql = f"SELECT schema_name FROM information_schema.schemata WHERE schema_name = '{schema}'"
             rows = tools_db.get_rows(sql, commit=False)
             if rows is not None:
-                self._enable_toolbar(schema)
+                match schema:
+                    case "cm":
+                        self._enable_toolbar(schema)
+                    case "am":
+                        if global_vars.project_type == 'ws':
+                            self._enable_toolbar(schema)
+                    case "audit":
+                        self._hide_button(68, False)
 
-        # Hide snapshot button if schema audit is missing
-        sql = f"SELECT schema_name FROM information_schema.schemata WHERE schema_name = 'audit'"
-        rows = tools_db.get_rows(sql, commit=False)
-        if rows is None:
-            self._hide_button(68)
 
     def _create_toolbar(self, toolbar_id):
 
