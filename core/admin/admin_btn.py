@@ -329,6 +329,11 @@ class GwAdminButton:
             tools_db.dao.commit()
             if hasattr (self, f"other_project"):
                 self._close_dialog_admin(getattr(self, f"dlg_readsql_create_{self.other_project}_project"))
+                if self.other_project == "audit":
+                    self.dlg_readsql.btn_activate_audit.setEnabled(True)
+                    self.dlg_readsql.btn_reload_audit_triggers.setEnabled(True)
+                    self.dlg_readsql.btn_create_audit.setEnabled(False)
+
         else:
             tools_db.dao.rollback()
             # Reset count error variable to 0
@@ -881,9 +886,6 @@ class GwAdminButton:
 
         # Set default project type
         tools_qt.set_widget_text(self.dlg_readsql, self.cmb_project_type, 'ws')
-
-        # Disable button if schema not is ws:
-        self.dlg_readsql.btn_create_asset.setEnabled(self.project_type_selected == "ws")
 
         # Update folderSoftware
         self._change_project_type(self.cmb_project_type)
@@ -1678,9 +1680,11 @@ class GwAdminButton:
                     result_list.append(elem)
         if not result_list:
             self.dlg_readsql.project_schema_name.clear()
+            self._set_buttons_enabled()
             return
 
         tools_qt.fill_combo_values(self.dlg_readsql.project_schema_name, result_list)
+        self._set_buttons_enabled()
 
 
     def _manage_srid(self):
@@ -2943,9 +2947,6 @@ class GwAdminButton:
         self.project_type_selected = tools_qt.get_text(self.dlg_readsql, widget)
         self.folder_software = os.path.join(self.sql_dir, self.project_type_selected)
 
-        # Disable button if schema not is ws:
-        self.dlg_readsql.btn_create_asset.setEnabled(self.project_type_selected == "ws")
-
     def _insert_inp_into_db(self, folder_path=None):
         """"""
 
@@ -3205,9 +3206,36 @@ class GwAdminButton:
             tools_gw.manage_docker_options('admin_position')
             tools_gw.docker_dialog(self.dlg_readsql)
             self.dlg_readsql.dlg_closed.connect(partial(tools_gw.close_docker, 'admin_position'))
+            self._set_buttons_enabled()
         except Exception as e:
             tools_log.log_info(str(e))
             tools_gw.open_dialog(self.dlg_readsql, dlg_name='admin_ui')
+
+    def _set_buttons_enabled(self):
+        """ Disable/enable buttons """
+
+        # Check schema name
+        schema_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
+
+        # Buttons delete, rename and copy schema
+        self.dlg_readsql.btn_delete.setEnabled(schema_name != "null")
+        self.dlg_readsql.btn_schema_rename.setEnabled(schema_name != "null")
+        self.dlg_readsql.btn_copy.setEnabled(schema_name != "null")
+
+        # Check project type
+        project_type = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
+
+        # Button create asset schema
+        self.dlg_readsql.btn_create_asset.setEnabled(project_type == "ws" and schema_name != "null")
+
+        # Check if audit schema exists
+        sql = "SELECT schema_name FROM information_schema.schemata WHERE schema_name = 'audit'"
+        rows = tools_db.get_rows(sql)
+
+        # Buttons to manage audit
+        self.dlg_readsql.btn_create_audit.setEnabled(schema_name != "null" and rows is None)
+        self.dlg_readsql.btn_activate_audit.setEnabled(schema_name != "null" and rows is not None)
+        self.dlg_readsql.btn_reload_audit_triggers.setEnabled(schema_name != "null" and rows is not None)
 
 
     def _manage_utils(self):
