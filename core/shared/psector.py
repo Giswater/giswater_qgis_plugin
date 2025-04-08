@@ -490,7 +490,7 @@ class GwPsector:
 
     def fill_widget(self, dialog, widget, row):
 
-        if type(widget) is str or type(widget) is str:
+        if type(widget) is str:
             widget = dialog.findChild(QWidget, widget)
         if not widget:
             return
