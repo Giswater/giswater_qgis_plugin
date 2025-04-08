@@ -3322,7 +3322,7 @@ def set_model_signals(class_object):
     class_object.rubber_band_point.reset()
     class_object.dlg_plan_psector.btn_set_to_arc.setEnabled(False)
 
-    filter_ = "psector_id = '" + str(class_object.psector_id.text()) + "'"
+    filter_ = "psector_id = '" + str(class_object.psector_id) + "'"
     class_object.fill_table(class_object.dlg_plan_psector, class_object.qtbl_connec, class_object.tablename_psector_x_connec,
                     set_edit_triggers=QTableView.DoubleClicked, expr=filter_, feature_type="connec", field_id="connec_id")
 
@@ -3761,7 +3761,7 @@ def load_tablename(dialog, table_object, feature_type, expr_filter):
 def load_tableview_psector(dialog, feature_type):
     """ Reload QtableView """
 
-    value = tools_qt.get_text(dialog, dialog.psector_id)
+    value = tools_qt.get_text(dialog, "tab_general_psector_id")
     expr = f"psector_id = '{value}'"
     qtable = tools_qt.get_widget(dialog, f'tbl_psector_x_{feature_type}')
     tablename = qtable.property('tablename')
@@ -4535,7 +4535,7 @@ def _insert_feature_psector(dialog, feature_type, ids=None):
 
     widget = tools_qt.get_widget(dialog, f"tbl_psector_x_{feature_type}")
     tablename = widget.property('tablename')
-    value = tools_qt.get_text(dialog, dialog.psector_id)
+    value = tools_qt.get_text(dialog, "tab_general_psector_id")
     for i in range(len(ids)):
         sql = f"INSERT INTO {tablename} ({feature_type}_id, psector_id) "
         sql += f"VALUES('{ids[i]}', '{value}') ON CONFLICT DO NOTHING;"
@@ -4548,7 +4548,7 @@ def _delete_feature_psector(dialog, feature_type, list_id, state=None):
 
     widget = tools_qt.get_widget(dialog, f"tbl_psector_x_{feature_type}")
     tablename = widget.property('tablename')
-    value = tools_qt.get_text(dialog, dialog.psector_id)
+    value = tools_qt.get_text(dialog, "tab_general_psector_id")
 
     sql = (f"DELETE FROM {tablename} "
            f"WHERE {feature_type}_id IN ({list_id}) AND psector_id = '{value}'")
