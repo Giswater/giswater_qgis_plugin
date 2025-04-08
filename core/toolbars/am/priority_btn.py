@@ -858,7 +858,7 @@ class CalculatePriority:
             # show warning
             tools_gw.show_warning("For select on canvas is mandatory to load v_asset_arc_input layer", dialog=self.dlg_priority)
             return
-        tools_gw.selection_init(self, self.dlg_priority, self.layer_to_work, keep_drawing=True)
+        tools_gw.selection_init(self, self.dlg_priority, self.layer_to_work)
 
     def old_manage_btn_snapping(self):
         """Fill btn_snapping QMenu"""

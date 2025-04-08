@@ -12,14 +12,14 @@ from qgis.gui import QgsMapTool
 
 from ..utils import tools_gw
 from ... import global_vars
-from ...libs import tools_qgis, tools_qt
+from ...libs import tools_qgis, tools_qt, tools_os
 from ..utils.snap_manager import GwSnapManager
 from qgis.PyQt.QtCore import Qt
 from qgis.core import QgsWkbTypes
 
 class GwSelectManager(QgsMapTool):
 
-    def __init__(self, class_object, table_object=None, dialog=None, is_psector=None, save_rectangle=False, keep_drawing=False):
+    def __init__(self, class_object, table_object=None, dialog=None, is_psector=None, save_rectangle=False):
         """
         :param table_object: Class where we will look for @layers, @feature_type, @list_ids, etc
         :param table_object: (String)
@@ -34,7 +34,6 @@ class GwSelectManager(QgsMapTool):
         self.dialog = dialog
         self.is_psector = is_psector
         self.save_rectangle = save_rectangle
-        self.keep_drawing = keep_drawing
 
         # Call superclass constructor and set current action
         QgsMapTool.__init__(self, self.canvas)
@@ -79,6 +78,10 @@ class GwSelectManager(QgsMapTool):
             self.rubber_band.hide()
             return
 
+        # Reconnect signal to enhance process
+        tools_qgis.disconnect_signal_selection_changed()
+        tools_gw.connect_signal_selection_changed(self.class_object, self.dialog, self.table_object, is_psector=self.is_psector)
+
         for i, layer in enumerate(self.class_object.layers[self.class_object.feature_type]):
             # Selection by rectangle
             if rectangle:
@@ -100,14 +103,15 @@ class GwSelectManager(QgsMapTool):
                     self.snapper_manager.get_snapped_feature(result, True)
 
         self.rubber_band.hide()
-        if self.keep_drawing:
-            global_vars.canvas.setMapTool(GwSelectManager(self.class_object, self.table_object, self.dialog, self.is_psector, keep_drawing=True))
-            return
 
-        # Reconnect signal to enhance process
-        tools_qgis.disconnect_signal_selection_changed()
-        tools_gw.connect_signal_selection_changed(self.class_object, self.dialog, self.table_object, is_psector=self.is_psector)
+        # Check system variable to keep drawing
+        keep_drawing = tools_gw.get_config_parser('dialogs_actions', 'keep_drawing', "user", "init", prefix=False)
+        keep_drawing = tools_os.set_boolean(keep_drawing, False)
 
+        if keep_drawing:
+            global_vars.canvas.setMapTool(GwSelectManager(self.class_object, self.table_object, self.dialog, self.is_psector))
+            cursor = tools_gw.get_cursor_multiple_selection()
+            global_vars.canvas.setCursor(cursor)
 
     def canvasMoveEvent(self, event):
 
