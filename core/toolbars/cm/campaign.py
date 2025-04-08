@@ -373,7 +373,7 @@ class Campaign:
 
     def _load_relation_table(self, view, table_name, id_column, campaign_id):
         """Load existing relations into the view"""
-        query = f"""SELECT * from {table_name} where campaign_id = {campaign_id}"""
+        query = f"""SELECT * from cm.{table_name} where campaign_id = {campaign_id}"""
         self.populate_tableview(view, query)
 
 
