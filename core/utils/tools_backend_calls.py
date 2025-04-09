@@ -150,7 +150,7 @@ def delete_object(**kwargs):
         id_ = index.sibling(row, column_index).data()
 
         inf_text += str(object_id) + ", "
-        list_id += f"{str(id_)}, "
+        list_id += f"'{str(id_)}', "
         # ist_id += str(id_) + ", "
         list_object_id = list_object_id + str(object_id) + ", "
         row_index += str(row + 1) + ", "
@@ -160,8 +160,7 @@ def delete_object(**kwargs):
     message = "Are you sure you want to delete these records?"
     answer = tools_qt.show_question(message, "Delete records", list_object_id)
     if answer:
-        sql = (f"DELETE FROM " + tablename + ""
-               f" WHERE {func_params['columnfind']}::text IN (" + list_id + ")")
+        sql = f"DELETE FROM {tablename} WHERE {func_params['columnfind']}::text IN ({list_id})"
         tools_db.execute_sql(sql, log_sql=False)
         _reload_table(**kwargs)
 
