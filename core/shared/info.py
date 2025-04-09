@@ -683,6 +683,7 @@ class GwInfo(QObject):
             if orientation:
                 layout_orientations[layout_name] = orientation
 
+        current_layout = ""
         for field in complet_result['body']['data']['fields']:
             if field.get('hidden'):
                 continue
@@ -729,8 +730,14 @@ class GwInfo(QObject):
                 if 'lyt_data' in layout.objectName() or 'lyt_epa_data' in layout.objectName():
                     tools_gw.add_widget(self.dlg_cf, field, label, widget)
 
+                if current_layout != field['layoutname']:
+                    current_layout = field['layoutname']
+                    old_widget_pos = field['layoutorder']
+                else:
+                    old_widget_pos = field['layoutorder'] + 1
+
                 # Populate dialog widgets using lytOrientation field
-                old_widget_pos = tools_gw.add_widget_combined(self.dlg_cf, field, label, widget, old_widget_pos)
+                tools_gw.add_widget_combined(self.dlg_cf, field, label, widget, old_widget_pos)
 
             elif field['layoutname'] != 'lyt_none':
                 message = "The field layoutname is not configured for"
