@@ -919,7 +919,7 @@ class AddNewLot():
         field_id = feature_type + "_id"
         if param_options and 'featureType' in param_options:
             key = feature_type + "_type"
-            sys_type = param_options ['featureType']
+            sys_type = param_options['featureType']
         elif param_options and 'sysType' in param_options:
             key = "sysType"
             sys_type = param_options['sysType']

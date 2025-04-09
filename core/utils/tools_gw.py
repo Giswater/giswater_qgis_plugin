@@ -1797,7 +1797,7 @@ def add_widget_combined(dialog, field, label, widget, old_widget_pos):
     orientation = layout.property('lytOrientation')
     old_widget_pos = int(old_widget_pos) if old_widget_pos is not None else 0
     widget_pos = int(field.get('layoutorder', 0))
-    row, col = (0, widget_pos + old_widget_pos ) if orientation == "horizontal" else (widget_pos + old_widget_pos, 0)
+    row, col = (0, widget_pos + old_widget_pos) if orientation == "horizontal" else (widget_pos + old_widget_pos, 0)
 
     label_pos = field['widgetcontrols']['labelPosition'] if (
                             'widgetcontrols' in field and field['widgetcontrols'] and 'labelPosition' in field['widgetcontrols']) else None

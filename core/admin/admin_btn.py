@@ -252,7 +252,7 @@ class GwAdminButton:
 
         self.t0 = time()
         self.timer = QTimer()
-        if hasattr (self, f"{process_name}"):
+        if hasattr(self, f"{process_name}"):
             self.timer.timeout.connect(partial(self._calculate_elapsed_time, getattr(self, f"dlg_readsql_create_{process_name}_project")))
 
         self.timer.start(1000)
@@ -323,7 +323,7 @@ class GwAdminButton:
         self._manage_result_message(status, parameter=f"Process finished with success")
         if status:
             tools_db.dao.commit()
-            if hasattr (self, f"other_project"):
+            if hasattr(self, f"other_project"):
                 self._close_dialog_admin(getattr(self, f"dlg_readsql_create_{self.other_project}_project"))
                 if self.other_project == "audit":
                     self.dlg_readsql.btn_activate_audit.setEnabled(True)
@@ -336,7 +336,7 @@ class GwAdminButton:
             self.error_count = 0
             tools_qt.show_exception_message(msg=lib_vars.session_vars['last_error_msg'])
             tools_qgis.show_info("A rollback on schema will be done.")
-            if hasattr (self, f"other_project"):
+            if hasattr(self, f"other_project"):
                 tools_gw.close_dialog(getattr(self, f"dlg_readsql_create_{self.other_project}_project"))
 
     def manage_cm_process_result(self):

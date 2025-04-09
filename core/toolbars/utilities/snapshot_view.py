@@ -36,8 +36,8 @@ class GwSnapshotViewButton(GwAction):
         """ Get dialog """
 
         # Create form and body
-        form = { "formName" : "generic", "formType" : "snapshot_view" }
-        body = { "client" : { "cur_user": tools_db.current_user }, "form" : form }
+        form = {"formName": "generic", "formType": "snapshot_view"}
+        body = {"client": {"cur_user": tools_db.current_user}, "form": form}
 
         # Execute procedure
         json_result = tools_gw.execute_procedure('gw_fct_get_dialog', body)
@@ -181,12 +181,12 @@ def run(**kwargs):
 
     # Create json input data
     form = {
-        "date" : dlg.date.dateTime().toString("yyyy-MM-dd"),
-        "polygon" : f'{polygon.asWkt()}',
-        "features" : [feature.objectName().split('_')[-1] for feature in dlg.features if feature.isChecked()]
+        "date": dlg.date.dateTime().toString("yyyy-MM-dd"),
+        "polygon": f'{polygon.asWkt()}',
+        "features": [feature.objectName().split('_')[-1] for feature in dlg.features if feature.isChecked()]
     }
 
-    body = { "client" : { "cur_user": tools_db.current_user }, "form" : form }
+    body = {"client": {"cur_user": tools_db.current_user}, "form": form}
 
     # Execute procedure
     result = tools_gw.execute_procedure('gw_fct_getsnapshot', body, schema_name='audit')

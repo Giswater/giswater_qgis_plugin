@@ -859,7 +859,7 @@ class GwInfo(QObject):
                         {"tbl": "tbl_dscenario", "view": "inp_dscenario_flwreg_outlet", "add_view": "v_edit_inp_dscenario_flwreg_outlet", "pk": ["dscenario_id", "nodarc_id"], "add_dlg_title": "Outlet - Dscenario"}
                        ]}
         kwargs = {"complet_result": self.complet_result, "class": self, "func_params": func_params}
-        open_epa_dlg("Outlet" ,**kwargs)
+        open_epa_dlg("Outlet",**kwargs)
 
     def _open_pump_dlg(self):
         # kwargs

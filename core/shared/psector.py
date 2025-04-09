@@ -422,7 +422,7 @@ class GwPsector:
 
         # Open dialog
         user = tools_db.current_user
-        form = { "formName" : "generic", "formType" : "psector" }
+        form = {"formName": "generic", "formType": "psector"}
 
         if psector_id is not None:
             form["id"] = 1
@@ -430,7 +430,7 @@ class GwPsector:
             form["tableName"] = "plan_psector"
 
         # db fct to get dialog
-        body = { "client" : { "cur_user": user }, "form" : form }
+        body = {"client": {"cur_user": user}, "form": form}
         json_result = tools_gw.execute_procedure('gw_fct_get_dialog', body)
 
         # manage widgets
@@ -1207,7 +1207,7 @@ class GwPsector:
                             text = field.get(key) if field.get(key) is not None else ''
                             widget.setText(f"{text}")
                             widget.editingFinished.connect(partial(self._manage_updates_prices, widget, key, field['price_id']))
-                            widget.editingFinished.connect(partial(self._manage_widgets_price, dialog, tableright, psector_id, print_all_rows=True ))
+                            widget.editingFinished.connect(partial(self._manage_widgets_price, dialog, tableright, psector_id, print_all_rows=True))
 
                         layout = dialog.findChild(QGridLayout, 'lyt_price')
                         layout.addWidget(widget, self.count, pos)

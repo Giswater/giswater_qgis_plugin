@@ -28,8 +28,8 @@ class GwAudit:
         self.table_name = table_name
 
         user = tools_db.current_user
-        form = { "formName" : "generic", "formType" : "audit_manager" }
-        body = { "client" : { "cur_user": user }, "form" : form }
+        form = {"formName": "generic", "formType": "audit_manager"}
+        body = {"client": {"cur_user": user}, "form": form}
 
         # DB fct
         json_result = tools_gw.execute_procedure('gw_fct_get_dialog', body)
@@ -67,13 +67,13 @@ class GwAudit:
 
         model = self.dlg_audit_manager.tbl_audit.model()
         audit_id = model.item(row, 0)
-        self.fill_dialog({ "logId" : audit_id.text() })
+        self.fill_dialog({"logId": audit_id.text()})
 
     def fill_dialog(self, form):
         """ Create and open dialog """
 
         # Create body
-        body = { "client" : { "cur_user": tools_db.current_user }, "form" : form }
+        body = {"client": {"cur_user": tools_db.current_user}, "form": form}
 
         # Execute procedure
         result = tools_gw.execute_procedure('gw_fct_getauditlogdata', body, schema_name='audit')

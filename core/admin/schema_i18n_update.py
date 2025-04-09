@@ -271,7 +271,7 @@ class GwSchemaI18NUpdate:
                 if tooltip is None:
                     if self.lower_lang != 'en_us':
                         tooltip = dbdialog[f'auto_tt_{self.lower_lang}']
-                    if tooltip is None :
+                    if tooltip is None:
                         tooltip = dbdialog['tt_en_us']
                         if tooltip is None:
                             tooltip = dbdialog['lb_en_us']

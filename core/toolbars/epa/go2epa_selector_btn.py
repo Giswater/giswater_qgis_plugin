@@ -29,8 +29,8 @@ class GwGo2EpaSelectorButton(GwAction):
         """ Open Epa Selector Dialog dynamic """
 
         user = tools_db.current_user
-        form = { "formName" : "generic", "formType" : "epa_selector" }
-        body = { "client" : { "cur_user": user }, "form" : form }
+        form = {"formName": "generic", "formType": "epa_selector"}
+        body = {"client": {"cur_user": user}, "form": form}
 
         json_result = tools_gw.execute_procedure('gw_fct_get_epa_selector', body)
 
@@ -48,9 +48,9 @@ def set_combo_values(**kwargs):
 
     form = _get_form_with_combos(dialog)
     user = tools_db.current_user
-    feature = { "childs" : combo_childs }
+    feature = {"childs": combo_childs}
 
-    body = { "client" : { "cur_user": user }, "form" : form, "feature" : feature }
+    body = {"client": {"cur_user": user}, "form": form, "feature": feature}
 
     # db fct
     combo_list = tools_gw.execute_procedure('gw_fct_get_epa_selector', body)["body"]
@@ -71,7 +71,7 @@ def accept(**kwargs):
     form = _get_form_with_combos(dialog)
 
     user = tools_db.current_user
-    body = { "client" : { "cur_user": user }, "form" : form }
+    body = {"client": {"cur_user": user}, "form": form}
 
     # db fct
     tools_gw.execute_procedure('gw_fct_set_epa_selector', body)
