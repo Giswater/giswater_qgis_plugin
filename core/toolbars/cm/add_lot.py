@@ -1172,7 +1172,7 @@ class AddNewLot():
             item = []
             for value in row:
                 if value is not None:
-                    if type(value) != str:
+                    if type(value) is not str:
                         item.append(QStandardItem(str(value)))
                     else:
                         item.append(QStandardItem(value))
@@ -1955,7 +1955,7 @@ class AddNewLot():
                     value = qtable.model().data(qtable.model().index(r, c))
                     if str(value) == 'NULL':
                         value = ''
-                    elif type(value) == QDate or type(value) == QDateTime:
+                    elif type(value) is QDate or type(value) is QDateTime:
                         value = value.toString(date_format)
                     row.append(value)
             all_rows.append(row)

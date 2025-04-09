@@ -153,7 +153,7 @@ class GwMapzoneManager:
             self.mapzone_mng_dlg.btn_config.setEnabled(False)
         else:
             self.mapzone_mng_dlg.btn_config.setEnabled(True)
-        
+
     def _fill_mapzone_table(self, set_edit_triggers=QTableView.NoEditTriggers, expr=None):
         """ Fill mapzone table with data from its corresponding table """
         # Manage exception if dialog is closed
@@ -1144,7 +1144,7 @@ class GwMapzoneManager:
             tableview = dialog.main_tab.currentWidget()
         tablename = tableview.objectName().replace('tbl_', '')
         field_id = tableview.model().headerData(0, Qt.Horizontal)
-        
+
         # Execute getinfofromid
         feature = f'"tableName":"{tablename}"'
         body = tools_gw.create_body(feature=feature)
@@ -1245,7 +1245,7 @@ class GwMapzoneManager:
                 item = layout.itemAtPosition(row, column)
                 if item is not None:
                     widget = item.widget()
-                    if widget is not None and type(widget) != QLabel:
+                    if widget is not None and type(widget) is not QLabel:
                         widgets.append(widget)
         # Get all widget's values
         for widget in widgets:
@@ -1283,7 +1283,7 @@ class GwMapzoneManager:
                     if not expl_id[len(expl_id) - 1] == '}':
                         expl_id = expl_id + '}'
                     my_json['expl_id'] = expl_id
-        
+
         # Change format when muni_id is an array
         if 'muni_id' in my_json:
             muni_id = my_json['muni_id']

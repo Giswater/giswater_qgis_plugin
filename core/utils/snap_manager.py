@@ -77,7 +77,7 @@ class GwSnapManager(object):
         layers = tools_qgis.get_project_layers()
         # Loop through all the layers in the project
         for layer in layers:
-            if type(layer) != QgsVectorLayer:
+            if type(layer) is not QgsVectorLayer:
                 continue
             layer_settings = self.snapping_config.individualLayerSettings(layer)
             layer_settings.setEnabled(enable)

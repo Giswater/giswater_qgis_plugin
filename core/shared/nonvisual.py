@@ -121,7 +121,7 @@ class GwNonVisual:
             self._fill_manager_table(qtableview, key, expr='active is true')
 
             qtableview.doubleClicked.connect(partial(self._get_nonvisual_object, qtableview, function_name))
-            
+
     def _show_context_menu(self, qtableview, pos):
         """ Show custom context menu """
         menu = QMenu(qtableview)
@@ -2575,7 +2575,7 @@ class GwNonVisual:
 
                     # List with all QLineEdit children
                     child_list = self.dialog.tab_lidlayers.widget(i).children()
-                    visible_widgets = [widget for widget in child_list if type(widget) == QLineEdit]
+                    visible_widgets = [widget for widget in child_list if type(widget) is QLineEdit]
                     visible_widgets = self._order_list(visible_widgets)
 
                     for x, value in enumerate(row):
@@ -2620,11 +2620,11 @@ class GwNonVisual:
                 tab_name = dialog.tab_lidlayers.widget(i).objectName().upper()
                 # List with all QLineEdit children
                 child_list = dialog.tab_lidlayers.widget(i).children()
-                visible_widgets = [widget for widget in child_list if type(widget) == QLineEdit or isinstance(widget, QComboBox)]
+                visible_widgets = [widget for widget in child_list if type(widget) is QLineEdit or isinstance(widget, QComboBox)]
                 visible_widgets = self._order_list(visible_widgets)
 
                 for y, widget in enumerate(visible_widgets):
-                    if type(widget) == QLineEdit:
+                    if type(widget) is QLineEdit:
                         value = tools_qt.get_text(dialog, widget)
                     else:
                         value = tools_qt.get_combo_value(dialog, widget)
@@ -2700,7 +2700,7 @@ class GwNonVisual:
             # List of children
             list = dialog.tab_lidlayers.widget(i).children()
             for y in list:
-                if type(y) != QGridLayout:
+                if type(y) is not QGridLayout:
                     y.show()
                     for j in widgets_hide[lid_id]:
                         if j == y.objectName():
@@ -2810,7 +2810,7 @@ class GwNonVisual:
                 tab_name = dialog.tab_lidlayers.widget(i).objectName().upper()
                 # List with all QLineEdit children
                 child_list = dialog.tab_lidlayers.widget(i).children()
-                widgets_list = [widget for widget in child_list if type(widget) == QLineEdit or isinstance(widget, QComboBox)]
+                widgets_list = [widget for widget in child_list if type(widget) is QLineEdit or isinstance(widget, QComboBox)]
                 widgets_list = self._order_list(widgets_list)
 
                 sql = f"INSERT INTO inp_lid_value (lidco_id, lidlayer,"

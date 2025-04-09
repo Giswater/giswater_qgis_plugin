@@ -113,7 +113,7 @@ class GwFastprint:
         active_composers = tools_qgis.get_composers_list()
 
         for composer in active_composers:
-            if type(composer) == QgsPrintLayout:  # TODO: use isinstance(composer, QgsPrintLayout)
+            if type(composer) is QgsPrintLayout:  # TODO: use isinstance(composer, QgsPrintLayout)
                 if composer != removed and composer.name():
                     cur = composer.name()
                     composers += cur + ', '
@@ -169,7 +169,7 @@ class GwFastprint:
 
         for widget in widget_list:
             item = selected_com.itemById(widget.property('columnname'))
-            if type(item) == QgsLayoutItemLabel:
+            if type(item) is QgsLayoutItemLabel:
                 item.setText(str(widget.text()))
                 item.refresh()
         if show:
@@ -190,11 +190,11 @@ class GwFastprint:
         widget_list = dialog.grb_option_values.findChildren(QLineEdit)
         for widget in widget_list:
             item = selected_com.itemById(widget.property('columnname'))
-            if type(item) != QgsLayoutItemLabel or item is None:
+            if type(item) is not QgsLayoutItemLabel or item is None:
                 widget.clear()
                 widget.setStyleSheet("border: 1px solid red")
                 widget.setPlaceholderText(f"Widget '{widget.property('columnname')}' not found in the composer")
-            elif type(item) == QgsLayoutItemLabel and item is not None:
+            elif type(item) is QgsLayoutItemLabel and item is not None:
                 widget.setStyleSheet(None)
 
     def _load_composer_values(self, dialog):
@@ -206,7 +206,7 @@ class GwFastprint:
         if selected_com is not None:
             for widget in widget_list:
                 item = selected_com.itemById(widget.property('columnname'))
-                if type(item) == QgsLayoutItemLabel:
+                if type(item) is QgsLayoutItemLabel:
                     widget.setText(str(item.text()))
 
     def _accept(self, dialog, my_json):

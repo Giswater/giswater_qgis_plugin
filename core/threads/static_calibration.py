@@ -429,7 +429,7 @@ class Calibrations:
 
             checker = self.checkers[target_parameter](target_id, target_val)
             modders = self.modders[calibration_mode](features, brackets)
-            if type(modders) != list:
+            if type(modders) is not list:
                 modders = [modders]
             calibrator = Calibrator(wn, checker, modders, self.accuracy, self.trials)
             wn = calibrator.calibrate()

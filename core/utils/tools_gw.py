@@ -1276,7 +1276,7 @@ def enable_widgets(dialog, result, enable):
                     if type(widget) in (QDoubleSpinBox, QLineEdit, QSpinBox, QTextEdit, GwHyperLinkLineEdit):
                         widget.setReadOnly(not enable)
                         widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(110, 110, 110)}")
-                        if type(widget) == GwHyperLinkLineEdit:
+                        if type(widget) is GwHyperLinkLineEdit:
                             widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242); color:blue; text-decoration: underline; border: none;}")
                     elif isinstance(widget, (QComboBox, QgsDateTimeEdit, QCheckBox)):
                         widget.setEnabled(enable)
@@ -1307,7 +1307,7 @@ def enable_all(dialog, result):
                         if not field['iseditable']:
                             widget.setFocusPolicy(Qt.NoFocus)
                             widget.setStyleSheet("QWidget { background: rgb(242, 242, 242); color: rgb(110, 110, 110)}")
-                            if type(widget) == GwHyperLinkLineEdit:
+                            if type(widget) is GwHyperLinkLineEdit:
                                 widget.setStyleSheet("QLineEdit { background: rgb(242, 242, 242); color:blue; text-decoration: underline; border: none;}")
                         else:
                             widget.setFocusPolicy(Qt.StrongFocus)
@@ -1731,7 +1731,7 @@ def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None, module
                     if iseditable in (False, "False"):
                         widget.setReadOnly(True)
                         widget.setStyleSheet("QWidget {background: rgb(242, 242, 242);color: rgb(100, 100, 100)}")
-                    if type(widget) == QLineEdit:
+                    if type(widget) is QLineEdit:
                         if 'placeholder' in field:
                             widget.setPlaceholderText(field['placeholder'])
                 elif isinstance(widget, (QComboBox, QCheckBox)):
@@ -3801,7 +3801,7 @@ def set_completer_widget(tablename, widget, field_id, add_id=False,
 
     if not widget:
         return
-    if type(tablename) == list and type(field_id) == list:
+    if type(tablename) is list and type(field_id) is list:
         return set_multi_completer_widget(tablename, widget, field_id, add_id=add_id)
     if add_id:
         field_id += '_id'

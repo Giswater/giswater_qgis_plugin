@@ -460,15 +460,15 @@ class GwPsector:
 
         # fill my_json when field change
         for widget in widget_list:
-            if type(widget) == QLineEdit:
+            if type(widget) is QLineEdit:
                 widget.editingFinished.connect(partial(tools_gw.get_values, self.dlg_plan_psector, widget, self.my_json))
             elif isinstance(widget, QComboBox):
                 widget.currentIndexChanged.connect(partial(tools_gw.get_values, self.dlg_plan_psector, widget, self.my_json))
-            elif type(widget) == QCheckBox:
+            elif type(widget) is QCheckBox:
                 if widget.objectName() == 'tab_general_chk_enable_all':
                     continue
                 widget.stateChanged.connect(partial(tools_gw.get_values, self.dlg_plan_psector, widget, self.my_json))
-            elif type(widget) == QTextEdit:
+            elif type(widget) is QTextEdit:
                 widget.textChanged.connect(partial(tools_gw.get_values, self.dlg_plan_psector, widget, self.my_json))
 
         # Set checked enable all layers
@@ -2695,7 +2695,7 @@ class GwPsector:
             connect = [partial(self.fill_table, self.dlg_psector_mng, self.qtbl_psm, 'v_ui_plan_psector'),
                        partial(tools_gw.refresh_selectors)]
         else:
-            if type(connect) != list:
+            if type(connect) is not list:
                 connect = [connect]
         dlg_functions = toolbox_btn.open_function_by_id(function, connect_signal=connect)
         return dlg_functions

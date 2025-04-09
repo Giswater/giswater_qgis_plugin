@@ -490,9 +490,9 @@ def set_layer_index(**kwargs):
     layers_name_list = kwargs['tableName']
     if not layers_name_list:
         return
-    if type(layers_name_list) == str:
+    if type(layers_name_list) is str:
         tools_qgis.set_layer_index(layers_name_list)
-    if type(layers_name_list) == list:
+    if type(layers_name_list) is list:
         for layer_name in layers_name_list:
             tools_qgis.set_layer_index(layer_name)
 
@@ -661,10 +661,10 @@ def refresh_canvas(**kwargs):
         layers_name_list = kwargs['tableName']
         if not layers_name_list:
             return
-        if type(layers_name_list) == str:
+        if type(layers_name_list) is str:
             layer = tools_qgis.get_layer_by_tablename(layers_name_list)
             layer.triggerRepaint()
-        elif type(layers_name_list) == list:
+        elif type(layers_name_list) is list:
             for layer_name in layers_name_list:
                 tools_qgis.set_layer_index(layer_name)
     except Exception:

@@ -1410,7 +1410,7 @@ class GwVisit(QObject):
                 self.files_all.append(str(row[0]))
             for _file in row:
                 if _file is not None:
-                    if type(_file) != str:
+                    if type(_file) is not str:
                         item.append(QStandardItem(str(_file)))
                     else:
                         item.append(QStandardItem(_file))
@@ -1879,9 +1879,9 @@ class GwVisit(QObject):
                 continue
 
             widget = getattr(dialog, field_name)
-            if type(widget) == QDateEdit:
+            if type(widget) is QDateEdit:
                 widget.setDate(value if value else QDate.currentDate())
-            elif type(widget) == QDateTimeEdit:
+            elif type(widget) is QDateTimeEdit:
                 widget.setDateTime(value if value else QDateTime.currentDateTime())
 
             if type(widget) in [QLineEdit, QTextEdit]:

@@ -1123,9 +1123,9 @@ class ParentManage(ParentAction, object):
                 continue
 
             widget = getattr(dialog, field_name)
-            if type(widget) == QDateEdit:
+            if type(widget) is QDateEdit:
                 widget.setDate(value if value else QDate.currentDate())
-            elif type(widget) == QDateTimeEdit:
+            elif type(widget) is QDateTimeEdit:
                 widget.setDateTime(value if value else QDateTime.currentDateTime())
 
             if type(widget) in [QLineEdit, QTextEdit]:

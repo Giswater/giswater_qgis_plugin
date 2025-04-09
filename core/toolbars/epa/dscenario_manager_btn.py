@@ -1373,7 +1373,7 @@ class GwDscenarioManagerButton(GwAction):
                 item = layout.itemAtPosition(row, column)
                 if item is not None:
                     widget = item.widget()
-                    if widget is not None and type(widget) != QLabel:
+                    if widget is not None and type(widget) is not QLabel:
                         widgets.append(widget)
         # Get all widget's values
         for widget in widgets:

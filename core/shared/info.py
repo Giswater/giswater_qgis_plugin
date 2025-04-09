@@ -123,7 +123,7 @@ class GwInfo(QObject):
 
             # Check for query layer and/or bad layer
             if not tools_qgis.check_query_layer(self.iface.activeLayer()) or self.iface.activeLayer() is None or \
-                    type(self.iface.activeLayer()) != QgsVectorLayer:
+                    type(self.iface.activeLayer()) is not QgsVectorLayer:
                 active_layer = ""
             else:
                 active_layer = tools_qgis.get_layer_source_table_name(self.iface.activeLayer())
@@ -698,7 +698,7 @@ class GwInfo(QObject):
             # Create connections
             if field['widgettype'] not in ('tableview', 'vspacer', 'list', 'hspacer', 'button'):
                 if field['widgettype'] == 'hyperlink':
-                    if type(widget) == GwHyperLinkLineEdit:
+                    if type(widget) is GwHyperLinkLineEdit:
                         widget = getattr(self, f"_set_auto_update_{widget_dict[field['widgettype']]}")(field, self.dlg_cf, widget, new_feature)
                 else:
                     widget = getattr(self, f"_set_auto_update_{widget_dict[field['widgettype']]}")(field, self.dlg_cf, widget, new_feature)
@@ -3579,7 +3579,7 @@ def add_row_epa(tbl, view, tablename, pkey, dlg, dlg_title, force_action, **kwar
             item = layout.itemAtPosition(row, column)
             if item is not None:
                 widget = item.widget()
-                if widget is not None and type(widget) != QLabel:
+                if widget is not None and type(widget) is not QLabel:
                     widgets.append(widget)
     # Get all widget's values
     for widget in widgets:
@@ -3846,7 +3846,7 @@ def save_tbl_changes(table_name, info, dialog, pk):
         if not fields:
             continue
         feature = f'"id":"{k}"'
-        if pk and type(pk) != list and ',' not in pk:
+        if pk and type(pk) is not list and ',' not in pk:
             feature += f', "idName":"{pk}"'
         feature += f', "tableName":"{table_name}"'
         extras = f'"fields":{fields}, "force_action":"UPDATE"'
@@ -3876,7 +3876,7 @@ def save_widgets_changes(table_name, info, dialog, pk):
         return
     id_ = tools_qt.get_text(dialog, pk)
     feature = f'"id":"{id_}"'
-    if pk and type(pk) != list:
+    if pk and type(pk) is not list:
         feature += f', "idName":"{pk}"'
     feature += f', "tableName":"{table_name}"'
     extras = f'"fields":{fields}, "force_action":"UPDATE"'
@@ -4478,7 +4478,7 @@ def _populate_tbl_docs_x_event(dlg_event_full, visit_id, event_id):
         item = []
         for value in row:
             if value is not None:
-                if type(value) != str:
+                if type(value) is not str:
                     item.append(QStandardItem(str(value)))
                 else:
                     item.append(QStandardItem(value))

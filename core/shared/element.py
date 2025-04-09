@@ -694,7 +694,7 @@ class GwElement:
             widget.setStyleSheet("border: 1px solid red")
             is_valid = False
 
-        if button is not None and type(button) == QPushButton:
+        if button is not None and type(button) is QPushButton:
             if is_valid is False:
                 button.setEnabled(False)
             else:

@@ -102,26 +102,26 @@ class GwToolBoxTask(GwTask):
             for field in self.result.get('fields'):
                 widget = self.dialog.findChild(QWidget, field['widgetname'])
                 param_name = widget.objectName()
-                if type(widget) in ('', QLineEdit):
+                if type(widget) in (QLineEdit,):
                     widget.setStyleSheet(None)
                     value = tools_qt.get_text(self.dialog, widget, False, False)
                     extras += f'"{param_name}":"{value}", '.replace('""', 'null')
                     if value == '' and widget.property('ismandatory'):
                         widget_is_void = True
                         widget.setStyleSheet("border: 1px solid red")
-                elif type(widget) in ('', QSpinBox, QDoubleSpinBox):
+                elif type(widget) in (QSpinBox, QDoubleSpinBox):
                     value = tools_qt.get_text(self.dialog, widget, False, False)
                     if value == '':
                         value = 0
                     extras += f'"{param_name}":"{value}", '
-                elif type(widget) == '' or isinstance(widget, QComboBox):
+                elif isinstance(widget, QComboBox):
                     value = tools_qt.get_combo_value(self.dialog, widget, 0)
                     if value not in (None, ''):
                         extras += f'"{param_name}":"{value}", '
-                elif type(widget) in ('', QCheckBox):
+                elif type(widget) in (QCheckBox,):
                     value = tools_qt.is_checked(self.dialog, widget)
                     extras += f'"{param_name}":"{str(value).lower()}", '
-                elif type(widget) == '' or isinstance(widget, QgsDateTimeEdit):
+                elif isinstance(widget, QgsDateTimeEdit):
                     value = tools_qt.get_calendar_date(self.dialog, widget)
                     if value == "" or value is None:
                         extras += f'"{param_name}":null, '

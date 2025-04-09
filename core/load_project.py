@@ -458,7 +458,7 @@ class GwLoadProject(QObject):
             return
 
         list_actions = list_actions.replace(' ', '').split(',')
-        if type(list_actions) != list:
+        if type(list_actions) is not list:
             list_actions = [list_actions]
 
         toolbar_name = tools_qt.tr(f'toolbar_{toolbar_id}_name')

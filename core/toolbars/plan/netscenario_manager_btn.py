@@ -293,7 +293,7 @@ class GwNetscenarioManagerButton(GwAction):
         if connect is None:
             connect = [partial(self._fill_manager_table), partial(tools_gw.refresh_selectors)]
         else:
-            if type(connect) != list:
+            if type(connect) is not list:
                 connect = [connect]
         dlg_functions = toolbox_btn.open_function_by_id(function, connect_signal=connect)
         return dlg_functions
