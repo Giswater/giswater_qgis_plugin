@@ -18,9 +18,9 @@ SELECT is((SELECT count(*)::integer FROM v_edit_link WHERE code = '-901'), 1, 'I
 SELECT is((SELECT count(*)::integer FROM link WHERE code = '-901'), 1, 'INSERT: link -901 was inserted');
 
 
-UPDATE v_edit_link SET verified = true WHERE code = '-901';
-SELECT is((SELECT verified::boolean FROM v_edit_link WHERE code = '-901'), true, 'UPDATE: v_edit_link -901 was updated');
-SELECT is((SELECT verified::boolean FROM link WHERE code = '-901'), true, 'UPDATE: link -901 was updated');
+UPDATE v_edit_link SET verified = 1 WHERE code = '-901';
+SELECT is((SELECT verified::integer FROM v_edit_link WHERE code = '-901'), 1, 'UPDATE: v_edit_link -901 was updated');
+SELECT is((SELECT verified::integer FROM link WHERE code = '-901'), 1, 'UPDATE: link -901 was updated');
 
 
 DELETE FROM v_edit_link WHERE code = '-901';
