@@ -12,6 +12,6 @@ UPDATE config_info_layer SET is_parent=false, tableparent_id=NULL WHERE layer_id
 UPDATE config_info_layer SET is_parent=false, tableparent_id=NULL WHERE layer_id='v_edit_connec';
 UPDATE config_info_layer SET is_parent=false, tableparent_id=NULL WHERE layer_id='v_edit_arc';
 
-INSERT INTO sys_feature_class (id, "type", epa_default, man_table) VALUES('LINK_CONNEC', 'LINK', 'UNDEFINED', 'man_link_connec');
+INSERT INTO sys_feature_class (id, "type", epa_default, man_table) VALUES('SERVCONNECTION', 'LINK', 'UNDEFINED', 'man_servconnection');
 
 DELETE FROM cat_feature WHERE id = 'LINK';

@@ -6,10 +6,10 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-CREATE TABLE man_link_connec (
+CREATE TABLE man_servconnection (
 	link_id int4 NOT NULL,
-	CONSTRAINT man_lconnec_pkey PRIMARY KEY (link_id),
-	CONSTRAINT man_lconnec_link_id_fkey FOREIGN KEY (link_id) REFERENCES link(link_id) ON DELETE CASCADE ON UPDATE CASCADE
+	CONSTRAINT man_servconnection_pkey PRIMARY KEY (link_id),
+	CONSTRAINT man_servconnection_link_id_fkey FOREIGN KEY (link_id) REFERENCES link(link_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 ALTER TABLE sys_feature_class DROP CONSTRAINT sys_feature_cat_check;
