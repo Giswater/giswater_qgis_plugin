@@ -421,10 +421,10 @@ def filter_by_dates(dialog, widget):
     date_to = dialog.findChild(QgsDateTimeEdit, "tab_none_date_to")
 
     options = {
-         0: {"widget_text_from":"Date from: forecast_start", "widget_text_to":"Date to: forecast_end", "column_from":"forecast_start", "column_to":"forecast_end"},
-         1: {"widget_text_from":"Date from: exec_start", "widget_text_to":"Date to: exec_end", "column_from":"exec_start", "column_to":None},
-         2: {"widget_text_from":"Date from: exec_start", "widget_text_to":"Date to: exec_end", "column_from":"exec_start", "column_to":None},
-         3: {"widget_text_from":"Date from: received_date", "widget_text_to":"Date to: received_date", "column_from":"received_date", "column_to":None}
+         0: {"widget_text_from": "Date from: forecast_start", "widget_text_to": "Date to: forecast_end", "column_from": "forecast_start", "column_to": "forecast_end"},
+         1: {"widget_text_from": "Date from: exec_start", "widget_text_to": "Date to: exec_end", "column_from": "exec_start", "column_to": None},
+         2: {"widget_text_from": "Date from: exec_start", "widget_text_to": "Date to: exec_end", "column_from": "exec_start", "column_to": None},
+         3: {"widget_text_from": "Date from: received_date", "widget_text_to": "Date to: received_date", "column_from": "received_date", "column_to": None}
     }
 
     state_id = tools_qt.get_combo_value(dialog, state_combo, 0)

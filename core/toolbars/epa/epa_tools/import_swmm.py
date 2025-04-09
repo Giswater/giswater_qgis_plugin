@@ -289,7 +289,7 @@ class GwImportSwmm:
             save_config(self, workcat=workcat, exploitation=exploitation, sector=sector, municipality=municipality, raingage=raingage, catalogs=catalogs)
 
             # Show tab log
-            self.dlg_config.mainTab.setCurrentIndex(self.dlg_config.mainTab.count()-1)
+            self.dlg_config.mainTab.setCurrentIndex(self.dlg_config.mainTab.count() - 1)
 
             # Set background task 'Import INP'
             description = "Import INP (TESTING MODE)"
@@ -403,7 +403,7 @@ class GwImportSwmm:
         save_config(self, workcat=workcat, exploitation=exploitation, sector=sector, municipality=municipality, raingage=raingage, catalogs=catalogs)
 
         # Show tab log
-        self.dlg_config.mainTab.setCurrentIndex(self.dlg_config.mainTab.count()-1)
+        self.dlg_config.mainTab.setCurrentIndex(self.dlg_config.mainTab.count() - 1)
 
         # Set background task 'Import INP'
         description = "Import INP"
@@ -489,7 +489,7 @@ class GwImportSwmm:
                     value = str(prop) if prop is not None else ''
                     item = QTableWidgetItem(value)
                     item.setFlags(Qt.ItemIsEnabled)
-                    tbl_arcs.setItem(row, idx+1, item)
+                    tbl_arcs.setItem(row, idx + 1, item)
 
                 combo_cat = QComboBox()
                 tbl_arcs.setCellWidget(row, 6, combo_cat)
@@ -535,10 +535,10 @@ class GwImportSwmm:
             ("DIVIDERS", self.catalogs.inp_dividers, ("MANHOLE",), "NODE"),
             ("STORAGE", self.catalogs.inp_storage, ("STORAGE",), "NODE"),
             ("CONDUITS", self.catalogs.inp_conduits, ("CONDUIT",), "ARC"),
-            ("PUMPS", self.catalogs.inp_pumps, ("VARC","FRPUMP"), ("ARC", "FLWREG")),
-            ("ORIFICES", self.catalogs.inp_orifice, ("VARC","FRORIFICE"), ("ARC", "FLWREG")),
-            ("WEIRS", self.catalogs.inp_weir, ("VARC","FRWEIR"), ("ARC", "FLWREG")),
-            ("OUTLETS", self.catalogs.inp_outlet, ("VARC","FROUTLET"), ("ARC", "FLWREG")),
+            ("PUMPS", self.catalogs.inp_pumps, ("VARC", "FRPUMP"), ("ARC", "FLWREG")),
+            ("ORIFICES", self.catalogs.inp_orifice, ("VARC", "FRORIFICE"), ("ARC", "FLWREG")),
+            ("WEIRS", self.catalogs.inp_weir, ("VARC", "FRWEIR"), ("ARC", "FLWREG")),
+            ("OUTLETS", self.catalogs.inp_outlet, ("VARC", "FROUTLET"), ("ARC", "FLWREG")),
         ]
 
         self.tbl_elements["features"] = {}
@@ -712,10 +712,10 @@ class GwImportSwmm:
             "dividers": ("NODE", ("MANHOLE",)),
             "storage": ("NODE", ("STORAGE",)),
             "conduits": ("ARC", ("CONDUIT",)),
-            "pumps": (("ARC", "FLWREG"), ("VARC","FRPUMP")),
-            "orifices": (("ARC", "FLWREG"), ("VARC","FRORIFICE")),
-            "weirs": (("ARC", "FLWREG"), ("VARC","FRWEIR")),
-            "outlets": (("ARC", "FLWREG"), ("VARC","FROUTLET")),
+            "pumps": (("ARC", "FLWREG"), ("VARC", "FRPUMP")),
+            "orifices": (("ARC", "FLWREG"), ("VARC", "FRORIFICE")),
+            "weirs": (("ARC", "FLWREG"), ("VARC", "FRWEIR")),
+            "outlets": (("ARC", "FLWREG"), ("VARC", "FROUTLET")),
         }
         for element_type, (combo,) in self.tbl_elements["features"].items():
             system_catalog = [
@@ -826,7 +826,7 @@ class GwImportSwmm:
             # Fill the "NEW CATALOG" column
             new_cat_name = QTableWidgetItem("")
             new_cat_name.setFlags(Qt.NoItemFlags)
-            tbl.setItem(row, combo_idx+1, new_cat_name)
+            tbl.setItem(row, combo_idx + 1, new_cat_name)
 
             # Connect signal to the new combo
             tools_gw.connect_signal(combo_cat.currentTextChanged,
@@ -923,7 +923,7 @@ class GwImportSwmm:
         lbl_time: QLabel = dialog.findChild(QLabel, "lbl_time")
         lbl_time.setText(text)
 
-    def _message_logged(self, message: str, end: str="\n"):
+    def _message_logged(self, message: str, end: str = "\n"):
 
         data = {"info": {"values": [{"message": message}]}}
         tools_gw.fill_tab_log(self.dlg_config, data, reset_text=True, close=False, end=end, call_set_tabs_enabled=False)

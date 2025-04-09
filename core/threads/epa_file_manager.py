@@ -394,7 +394,7 @@ class GwEpaFileManager(GwTask):
         finally:
             return status
 
-    def _read_rpt_file(self, file_path:str = None):
+    def _read_rpt_file(self, file_path: str = None):
 
         replace = tools_gw.get_config_parser('btn_go2epa', 'force_import_velocity_higher_50ms', "user", "init", prefix=False)
         replace = tools_os.set_boolean(replace, default=False)
@@ -459,7 +459,7 @@ class GwEpaFileManager(GwTask):
 
                     elif bool(re.search('(\d\..*\.\d)', str(dirty_list[x]))):
                         if not any(item in dirty_list for item in ['Version', 'VERSION', 'Input', 'INPUT']):
-                            error_near = f"Error near line {line_number+1} -> {dirty_list}"
+                            error_near = f"Error near line {line_number + 1} -> {dirty_list}"
                             tools_log.log_info(error_near)
                             message = (f"The rpt file is not valid to import. "
                                        f"Because columns on rpt file are overlaped, it seems you need to improve your simulation. "
@@ -470,7 +470,7 @@ class GwEpaFileManager(GwTask):
                             del full_file
                             return False
                     elif bool(re.search('>50', str(dirty_list[x]))):
-                        error_near = f"Error near line {line_number+1} -> {dirty_list}"
+                        error_near = f"Error near line {line_number + 1} -> {dirty_list}"
                         tools_log.log_info(error_near)
                         message = (f"The rpt file is not valid to import. "
                                    f"Because velocity has not numeric value (>50), it seems you need to improve your simulation. "

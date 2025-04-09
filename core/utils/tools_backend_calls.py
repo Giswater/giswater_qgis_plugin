@@ -820,7 +820,7 @@ def fill_tbl(complet_result, dialog, widgetname, linkedobject, filter_fields):
     return complet_list, widget_list
 
 
-def get_filter_qtableview(dialog, widget_list, complet_result, filter_fields = ''):
+def get_filter_qtableview(dialog, widget_list, complet_result, filter_fields=''):
 
     for widget in widget_list:
         if widget.property('isfilter'):
@@ -857,7 +857,7 @@ def get_filter_qtableview(dialog, widget_list, complet_result, filter_fields = '
     return filter_fields
 
 
-def get_filter_qtableview_mincut(dialog, widget_list, func_params, filter_fields = ''):
+def get_filter_qtableview_mincut(dialog, widget_list, func_params, filter_fields=''):
 
     for widget in widget_list:
         if widget.property('isfilter'):
@@ -937,7 +937,7 @@ def open_selected_manager_item(**kwargs):
     if qtable.property('linkedobject') == 'v_ui_element':
         # Open selected element
         element_id = index.sibling(row, column_index).data()
-        manage_element(element_id,  **kwargs)    
+        manage_element(element_id, **kwargs)    
 
 
 def manage_element(element_id, **kwargs):
@@ -1034,7 +1034,7 @@ def _manage_document_new(doc, **kwargs):
     dialog = kwargs['dialog']
     func_params = kwargs['func_params']
 
-    tools_qt.set_widget_text(dialog,  f"{func_params['sourcewidget']}", doc.doc_name)
+    tools_qt.set_widget_text(dialog, f"{func_params['sourcewidget']}", doc.doc_name)
     add_object(**kwargs)
 
 

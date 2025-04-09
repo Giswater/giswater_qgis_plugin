@@ -14,7 +14,7 @@ from datetime import datetime, date
 
 from ..ui.ui_manager import GwSchemaI18NManagerUi
 from ..utils import tools_gw
-from ...libs import lib_vars, tools_qt, tools_qgis, tools_db,tools_log, tools_os
+from ...libs import lib_vars, tools_qt, tools_qgis, tools_db, tools_log, tools_os
 from qgis.PyQt.QtWidgets import QLabel
 from PyQt5.QtWidgets import QApplication
 
@@ -584,9 +584,9 @@ class GwSchemaI18NManager:
             )
             DELETE FROM {table} WHERE ("""
         delete_query += ", ".join([primary_key for primary_key in self.primary_keys if primary_key != 'project_type'])
-        delete_query +=""") IN (SELECT """
+        delete_query += """) IN (SELECT """
         delete_query += ", ".join([primary_key for primary_key in self.primary_keys if primary_key != 'project_type'])
-        delete_query +="""  FROM duplicates);"""
+        delete_query += """  FROM duplicates);"""
         return delete_query
     
     def _add_duplicates_rows(self, table, final_rows_tot, final_rows):

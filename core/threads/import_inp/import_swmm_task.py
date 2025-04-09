@@ -33,7 +33,7 @@ except ImportError:
     JUNCTIONS, OUTFALLS, DIVIDERS, STORAGE = None, None, None, None
     CONDUITS, PUMPS, ORIFICES, WEIRS, OUTLETS = None, None, None, None, None
     XSECTIONS, COORDINATES, VERTICES, SYMBOLS, POLYGONS = None, None, None, None, None
-    PATTERNS, CURVES, TIMESERIES, CONTROLS, LID_CONTROLS, LID_USAGE  = None, None, None, None, None, None
+    PATTERNS, CURVES, TIMESERIES, CONTROLS, LID_CONTROLS, LID_USAGE = None, None, None, None, None, None
     LOSSES, INFLOWS, DWF, SUBCATCHMENTS, RAINGAGES, SUBAREAS = None, None, None, None, None, None
     INFILTRATION, ADJUSTMENTS = None, None
 
@@ -604,7 +604,7 @@ class GwImportInpTask(GwTask):
             values_str = "%s"
             values = (pattern_name,)
             for idx, f in enumerate(pattern.factors):
-                fields_str += f",factor_{idx+1}"
+                fields_str += f",factor_{idx + 1}"
                 values_str += ",%s"
                 values += (f,)
 

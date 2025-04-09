@@ -153,7 +153,7 @@ class GwCreateSchemaAssetTask(GwTask):
         elif process_name == 'load_updates':
             dict_folders[os.path.join(self.admin.folder_asset_updates, '2023-05')] = 0
             dict_folders[os.path.join(self.admin.folder_asset_updates, '2024-01')] = 0
-            dict_folders[os.path.join(self.admin.folder_asset_updates, '2024-01','i18n')] = 0
+            dict_folders[os.path.join(self.admin.folder_asset_updates, '2024-01', 'i18n')] = 0
 
         return dict_folders
 

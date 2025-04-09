@@ -143,7 +143,7 @@ class GwFeatureEndButton(GwAction):
         # Adding auto-completion to a QLineEdit for default feature
         if self.feature_type is None:
             self.feature_type = "arc"
-        viewname=f"v_edit_{self.feature_type}"
+        viewname = f"v_edit_{self.feature_type}"
         tools_gw.set_completer_widget(viewname, self.dlg_work_end.feature_id, str(self.feature_type + "_id"))
 
         # Set default tab 'arc'

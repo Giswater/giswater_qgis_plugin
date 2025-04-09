@@ -525,7 +525,7 @@ class GwRecursiveEpa(GwTask):
 
                     elif bool(re.search('(\d\..*\.\d)', str(dirty_list[x]))):
                         if 'Version' not in dirty_list and 'VERSION' not in dirty_list:
-                            error_near = f"Error near line {line_number+1} -> {dirty_list}"
+                            error_near = f"Error near line {line_number + 1} -> {dirty_list}"
                             tools_log.log_info(error_near)
                             message = (f"The rpt file is not valid to import. "
                                        f"Because columns on rpt file are overlaped, it seems you need to improve your simulation. "
@@ -536,7 +536,7 @@ class GwRecursiveEpa(GwTask):
                             del full_file
                             return False
                     elif bool(re.search('>50', str(dirty_list[x]))):
-                        error_near = f"Error near line {line_number+1} -> {dirty_list}"
+                        error_near = f"Error near line {line_number + 1} -> {dirty_list}"
                         tools_log.log_info(error_near)
                         message = (f"The rpt file is not valid to import. "
                                    f"Because velocity has not numeric value (>50), it seems you need to improve your simulation. "

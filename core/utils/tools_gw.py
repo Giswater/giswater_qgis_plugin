@@ -472,7 +472,7 @@ def create_body(form='', feature='', filter_fields='', extras=None, list_feature
     lang = QSettings().value('locale/globalLocale', QLocale().name())
 
     if body:
-        body.setdefault('client', {"device":4, "lang":lang})
+        body.setdefault('client', {"device": 4, "lang": lang})
         body["client"].setdefault('device', 4)
         body["client"].setdefault('lang', lang)
         if info_type is not None:
@@ -1380,7 +1380,7 @@ def set_tabs_enabled(dialog, hide_btn_accept=True, change_btn_cancel=True):
     qtabwidget = dialog.findChild(QTabWidget, 'mainTab')
     for x in range(0, qtabwidget.count() - 1):
         qtabwidget.widget(x).setEnabled(False)
-    qtabwidget.setTabEnabled(qtabwidget.count()-1, True)
+    qtabwidget.setTabEnabled(qtabwidget.count() - 1, True)
 
     btn_accept = dialog.findChild(QPushButton, 'btn_accept')
     if btn_accept and hide_btn_accept:
@@ -2574,7 +2574,7 @@ def exec_pg_function(function_name, parameters=None, commit=True, schema_name=No
     """
 
     # Define dictionary with results
-    dict_result= {}
+    dict_result = {}
     status = False
     function_failed = False
     json_result = None
@@ -2690,7 +2690,7 @@ def execute_procedure(function_name, parameters=None, schema_name=None, commit=T
                 parameters_dict['data'] = {}
                 parameters_dict['data'][cancel_action] = True
             else:
-                return {"status":"Accepted", "message":{"level":1, "text":"Action canceled"}}
+                return {"status": "Accepted", "message": {"level": 1, "text": "Action canceled"}}
         else:
             accept_action = json_result['body']['data']['question'].get('accept_action')
             if accept_action:
@@ -2881,7 +2881,7 @@ def manage_json_return(json_result, sql, rubber_band=None, i=None):
                     fill_layer_temp(v_layer, json_result['body']['data'], key, counter, sort_val=i)
 
                     # Increase iterator
-                    i = i+1
+                    i = i + 1
 
                     # Get values for set layer style
                     opacity = 100
@@ -3182,7 +3182,7 @@ def manage_layer_manager(json_result, sql=None):
         tools_qt.manage_exception(None, f"{type(e).__name__}: {e}", sql, lib_vars.schema_name)
 
 
-def zoom_to_feature_by_id(tablename: str, idname: str, _id, margin: float=15):
+def zoom_to_feature_by_id(tablename: str, idname: str, _id, margin: float = 15):
     """ Zoom to feature by id or list of ids """
 
     layer = tools_qgis.get_layer_by_tablename(tablename)

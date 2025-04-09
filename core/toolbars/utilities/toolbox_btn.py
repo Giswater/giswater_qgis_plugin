@@ -450,8 +450,8 @@ class GwToolBoxButton(GwAction):
                     skipped = 0
                     while self.add_columns.get(i) is not None and self.add_columns.get(i)[0] not in skipped_dict:
                         if self.add_columns.get(i)[1] not in ('', 'null', None):
-                            dict_keys[i-skipped] = self.add_columns.get(i)[1]
-                            self.dlg_reports.tbl_reports.setHorizontalHeaderItem(i-skipped, QTableWidgetItem(f"{self.add_columns.get(i)[0]}"))
+                            dict_keys[i - skipped] = self.add_columns.get(i)[1]
+                            self.dlg_reports.tbl_reports.setHorizontalHeaderItem(i - skipped, QTableWidgetItem(f"{self.add_columns.get(i)[0]}"))
                         else:
                             skipped += 1
                             if self.add_columns.get(i)[0] not in skipped_dict:
@@ -513,7 +513,7 @@ class GwToolBoxButton(GwAction):
                                                    "session")
                 if value not in (None, 'None'):
                     tools_qt.set_checked(dialog, widget, value)
-            elif isinstance(widget, QComboBox) and widget.property('selectedId') in (None,'','NULL'):
+            elif isinstance(widget, QComboBox) and widget.property('selectedId') in (None, '', 'NULL'):
                 value = tools_gw.get_config_parser('btn_toolbox', f"{function_name}_{widget.objectName()}", "user",
                                                    "session")
                 if value in (None, '', 'NULL') and widget.property('selectedId') not in (None, '', 'NULL'):

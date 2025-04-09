@@ -1155,7 +1155,7 @@ class GwPsector:
         self.update_total(dialog)
         self._manage_buttons_price(dialog)
 
-    def _add_price_widgets(self, dialog, tableright, psector_id, expl_id=[], editable_widgets=['measurement','observ']
+    def _add_price_widgets(self, dialog, tableright, psector_id, expl_id=[], editable_widgets=['measurement', 'observ']
                            , print_all_rows=False, print_headers=False):
 
         extras = (f'"tableName":"{tableright}", "psectorId":{psector_id}')
@@ -1216,7 +1216,7 @@ class GwPsector:
 
     def _manage_updates_prices(self, widget, key, price_id):
 
-        self.dict_to_update[f"widget_{key}_{price_id}"] = {"price_id":price_id, key:widget.text()}
+        self.dict_to_update[f"widget_{key}_{price_id}"] = {"price_id": price_id, key: widget.text()}
         self._update_otherprice()
 
     def _update_otherprice(self):
@@ -1239,7 +1239,7 @@ class GwPsector:
         layout = dialog.findChild(QGridLayout, 'lyt_price')
 
         layout.addWidget(lbl, count, pos)
-        layout.addWidget(widget, count, pos+1)
+        layout.addWidget(widget, count, pos + 1)
         layout.setColumnStretch(2, 1)
 
     def rows_unselector(self, dialog, tableright):
@@ -1450,7 +1450,7 @@ class GwPsector:
             message = "You need to insert a document name"
             tools_qgis.show_warning(message, dialog=self.dlg_plan_psector)
             return
-        if not psector_id or psector_id =="null":
+        if not psector_id or psector_id == "null":
             message = "You need to insert psector_id"
             tools_qgis.show_warning(message, dialog=self.dlg_plan_psector)
             return
@@ -2607,8 +2607,8 @@ class GwPsector:
         feature_type = dialog.tab_feature.tabText(tab_idx).lower()
         qtbl_feature = dialog.findChild(QTableView, f"tbl_psector_x_{feature_type}")
         selected_psector = tools_qt.get_text(self.dlg_plan_psector, self.psector_id)
-        list_tables = {'arc':self.tablename_psector_x_arc, 'node':self.tablename_psector_x_node,
-                       'connec':self.tablename_psector_x_connec, 'gully':self.tablename_psector_x_gully}
+        list_tables = {'arc': self.tablename_psector_x_arc, 'node': self.tablename_psector_x_node,
+                       'connec': self.tablename_psector_x_connec, 'gully': self.tablename_psector_x_gully}
 
         sql = ""
         selected_list = qtbl_feature.selectionModel().selectedRows()

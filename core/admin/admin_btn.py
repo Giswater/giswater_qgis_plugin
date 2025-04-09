@@ -547,10 +547,10 @@ class GwAdminButton:
         setattr(self, f"project_{project}_descript", dialog.findChild(QLineEdit, 'project_descript'))
 
         # Load user values
-        name = tools_gw.get_config_parser('btn_admin', f'project_name_{project}_schema', "user", "session",False, force_reload=True)
+        name = tools_gw.get_config_parser('btn_admin', f'project_name_{project}_schema', "user", "session", False, force_reload=True)
         getattr(self, f"project_{project}_name").setText(name)
 
-        descript = tools_gw.get_config_parser('btn_admin', f'{project}_project_descript', "user", "session",False, force_reload=True)
+        descript = tools_gw.get_config_parser('btn_admin', f'{project}_project_descript', "user", "session", False, force_reload=True)
         getattr(self, f"project_{project}_descript").setText(descript)
 
         # Set shortcut keys
@@ -814,7 +814,7 @@ class GwAdminButton:
         self.folder_asset_updates = os.path.join(self.sql_asset_dir, 'updates')
 
         # Declare audit db folders
-        self.sql_audit_dir = os.path.join(self.sql_dir, 'corporate','audit')
+        self.sql_audit_dir = os.path.join(self.sql_dir, 'corporate', 'audit')
         self.folder_audit_structure = os.path.join(self.sql_audit_dir, 'structure')
         self.folder_audit_activate = os.path.join(self.sql_audit_dir, 'activate')
 
@@ -907,10 +907,10 @@ class GwAdminButton:
         self.dlg_readsql.btn_import_osm_streetaxis.clicked.connect(partial(self._import_osm))
 
         self.dlg_readsql.btn_create_asset.clicked.connect(
-            partial(self._open_create_other_project, "Create Asset Project","admin_assetdbproject","asset"))
+            partial(self._open_create_other_project, "Create Asset Project", "admin_assetdbproject", "asset"))
 
         self.dlg_readsql.btn_create_audit.clicked.connect(
-            partial(self._open_create_other_project, "Create Audit Project","admin_auditdbproject","audit"))
+            partial(self._open_create_other_project, "Create Audit Project", "admin_auditdbproject", "audit"))
 
         self.dlg_readsql.btn_activate_audit.clicked.connect(partial(self._activate_audit))
 
@@ -939,7 +939,7 @@ class GwAdminButton:
         """ Update audit triggers to start or stop auditing a table """
 
         schema_name = tools_qt.get_text(self.dlg_readsql, 'project_schema_name')
-        result = tools_gw.execute_procedure('gw_fct_update_audit_triggers', schema_name = schema_name)
+        result = tools_gw.execute_procedure('gw_fct_update_audit_triggers', schema_name=schema_name)
 
         if result:
             tools_qgis.show_success("Triggers updated successfully")
@@ -1010,7 +1010,7 @@ class GwAdminButton:
             self.form_enabled = False
             message = 'There is an error in the configuration of the pgservice file, ' \
                       'please check it or consult your administrator'
-            ignore_widgets =  ['cmb_connection', 'btn_gis_create', 'cmb_project_type', 'project_schema_name']
+            ignore_widgets = ['cmb_connection', 'btn_gis_create', 'cmb_project_type', 'project_schema_name']
             tools_qt.enable_dialog(self.dlg_readsql, False, ignore_widgets)
             self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
             tools_qt.set_widget_text(self.dlg_readsql, 'lbl_status_text', message)
@@ -1099,7 +1099,7 @@ class GwAdminButton:
             tools_qt.enable_dialog(self.dlg_readsql, True)
 
         if self.form_enabled is False:
-            ignore_widgets =  ['cmb_connection', 'btn_gis_create', 'cmb_project_type', 'project_schema_name']
+            ignore_widgets = ['cmb_connection', 'btn_gis_create', 'cmb_project_type', 'project_schema_name']
             tools_qt.enable_dialog(self.dlg_readsql, False, ignore_widgets)
             self.dlg_readsql.lbl_status.setPixmap(self.status_ko)
             tools_qt.set_widget_text(self.dlg_readsql, 'lbl_status_text', message)
@@ -2112,7 +2112,7 @@ class GwAdminButton:
         SCHEMA_SRID = str(self.project_epsg)
         SCHEMA_NAME = ""
         if hasattr(self, f'{self.other_project}_schema_name'):
-            SCHEMA_NAME = getattr(self,f'{self.other_project}_schema_name')
+            SCHEMA_NAME = getattr(self, f'{self.other_project}_schema_name')
 
         try:
             # Manage progress bar
@@ -2961,7 +2961,7 @@ class GwAdminButton:
                 for x in range(0, len(sp_n)):
                     csv_col = str(x + 1)
                     if sp_n[x] != "''":
-                        if sp_n[x].strip().replace("\n", "").startswith(';') and x == len(sp_n)-1:
+                        if sp_n[x].strip().replace("\n", "").startswith(';') and x == len(sp_n) - 1:
                             csv_col = "39"
                         sql += "csv" + csv_col + ", "
                         value = "$$" + sp_n[x].strip().replace("\n", "") + "$$, "
@@ -3225,8 +3225,8 @@ class GwAdminButton:
         params = {'is_test': False, 'project_type': 'utils', 'exec_last_process': False,
                   'project_name_schema': 'utils', 'project_locale': self.ws_project_result[1],
                   'project_srid': self.ws_project_result[2], 'example_data': False, 'schema_version': None,
-                  'schema_utils':'utils', 'schema_ws':self.ws_project_name, 'schema_ud':self.ud_project_name,
-                  'main_project_version':self.ws_project_result[0]}
+                  'schema_utils': 'utils', 'schema_ws': self.ws_project_name, 'schema_ud': self.ud_project_name,
+                  'main_project_version': self.ws_project_result[0]}
         self.task_create_schema = GwCreateSchemaUtilsTask(self, description, params)
         QgsApplication.taskManager().addTask(self.task_create_schema)
         QgsApplication.taskManager().triggerTask(self.task_create_schema)

@@ -18,7 +18,7 @@ try:
 except ImportError:
     scipy_imported = False
 
-from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QTableWidget, QTableWidgetItem, QSizePolicy, QLineEdit, QGridLayout, QComboBox, QWidget, QShortcut,QApplication, QMenu, QAction, QPushButton
+from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QTableWidget, QTableWidgetItem, QSizePolicy, QLineEdit, QGridLayout, QComboBox, QWidget, QShortcut, QApplication, QMenu, QAction, QPushButton
 from qgis.PyQt.QtGui import QKeySequence, QCursor
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtCore import Qt
@@ -901,7 +901,7 @@ class GwNonVisual:
             # If not first row, check if previous row has a smaller value than current row
             if row - 1 >= 0:
                 cur_cell = table.item(row, column)
-                prev_cell = table.item(row-1, column)
+                prev_cell = table.item(row - 1, column)
                 if None not in (cur_cell, prev_cell):
                     if cur_cell.data(0) not in (None, '') and prev_cell.data(0) not in (None, ''):
                         try:
@@ -951,7 +951,7 @@ class GwNonVisual:
             for i, n in enumerate(x_values):
                 if i == 0 or n is None:
                     continue
-                if (n > x_values[i-1]) or (curve_type == 'SHAPE' and global_vars.project_type == 'ud'):
+                if (n > x_values[i - 1]) or (curve_type == 'SHAPE' and global_vars.project_type == 'ud'):
                     continue
                 valid = False
                 self.valid = NOT_VALID_ASCENDING
@@ -995,7 +995,7 @@ class GwNonVisual:
             for j, value in enumerate(item):
                 if value != 'null':
                     last_idx = j
-            clean_list.append(item[:last_idx+1])
+            clean_list.append(item[:last_idx + 1])
 
         # Convert list items to float
         float_list = []
@@ -1023,8 +1023,8 @@ class GwNonVisual:
             x = x_list[0]
             y = y_list[0]
             if x != 0:
-                x_array = np.array([0, x, 2*x])
-                y_array = np.array([1.33*y, y, 0])
+                x_array = np.array([0, x, 2 * x])
+                y_array = np.array([1.33 * y, y, 0])
 
                 # Define x_array as 100 equally spaced values between the min and max of original x_array
                 xnew = np.linspace(x_array.min(), x_array.max(), 100)
@@ -1078,8 +1078,8 @@ class GwNonVisual:
             if file_name:
                 fig_title = f"{file_name}"
                 if area and geom1 and geom2:
-                    fig_title = f"{fig_title} (S: {round(area*100, 2)} dm2 - {round(geom1, 2)} x {round(geom2, 2)})"
-                plot_widget.axes.text(min(y_list_inverted)*1.1, max(x_list)*1.07, f"{fig_title}", fontsize=8)
+                    fig_title = f"{fig_title} (S: {round(area * 100, 2)} dm2 - {round(geom1, 2)} x {round(geom2, 2)})"
+                plot_widget.axes.text(min(y_list_inverted) * 1.1, max(x_list) * 1.07, f"{fig_title}", fontsize=8)
         else:
             plot_widget.axes.plot(x_list, y_list, color='indianred')
 
@@ -1505,7 +1505,7 @@ class GwNonVisual:
             for j, value in enumerate(item):
                 if value != 'null':
                     last_idx = j
-            clean_list.append(item[:last_idx+1])
+            clean_list.append(item[:last_idx + 1])
 
         # Convert list items to float
         float_list = []
@@ -1610,7 +1610,7 @@ class GwNonVisual:
         table = self.dialog.findChild(QTableWidget, f"tbl_{row['pattern_type'].lower()}")
         for n, row in enumerate(rows):
             for i in range(0, table.columnCount()):
-                value = f"{row[f'factor_{i+1}']}"
+                value = f"{row[f'factor_{i + 1}']}"
                 if value == 'None':
                     value = ''
                 table.setItem(n, i, QTableWidgetItem(value))
@@ -1810,7 +1810,7 @@ class GwNonVisual:
             for j, value in enumerate(item):
                 if value != 'null':
                     last_idx = j
-            clean_list.append(item[:last_idx+1])
+            clean_list.append(item[:last_idx + 1])
 
         # Convert list items to float
         float_list = []
@@ -2687,9 +2687,9 @@ class GwNonVisual:
                         'PP': {'lbl_swale_side_slope', 'txt_5_swale_side_slope', 'lbl_drain_delay', 'txt_4_drain_delay'},
                         'RB': {'lbl_seepage_rate', 'txt_3_seepage_rate', 'lbl_clogging_factor_storage', 'txt_4_clogging_factor_storage'},
                         'RD': {'lbl_vegetation_volume', 'txt_2_vegetation_volume', 'lbl_swale_side_slope', 'txt_5_swale_side_slope',
-                               'lbl_flow_exponent','lbl_offset', 'lbl_drain_delay', 'lbl_open_level',
+                               'lbl_flow_exponent', 'lbl_offset', 'lbl_drain_delay', 'lbl_open_level',
                                'lbl_closed_level', 'lbl_control_curve', 'lbl_flow_description', 'txt_2_flow_exponent',
-                               'txt_3_offset', 'txt_4_drain_delay', 'txt_5_open_level', 'txt_6_closed_level', 'txt_7_cmb_control_curve',},
+                               'txt_3_offset', 'txt_4_drain_delay', 'txt_5_open_level', 'txt_6_closed_level', 'txt_7_cmb_control_curve', },
                         'VS': {''}}
 
         # Hide widgets in list
@@ -2722,7 +2722,7 @@ class GwNonVisual:
         """ Manage accept button (insert & update) """
 
         # Variables
-        cmb_lidtype=dialog.cmb_lidtype
+        cmb_lidtype = dialog.cmb_lidtype
         txt_lidco_id = dialog.txt_name
 
         # Get widget values
@@ -2874,18 +2874,18 @@ class GwNonVisual:
         """ Note: row & column parameters are passed by the signal """
 
         # Add a new row if the edited row is the last one
-        if row >= (table.rowCount()-1):
-            headers = ['Multiplier' for n in range(0, table.rowCount()+1)]
+        if row >= (table.rowCount() - 1):
+            headers = ['Multiplier' for n in range(0, table.rowCount() + 1)]
             table.insertRow(table.rowCount())
             table.setVerticalHeaderLabels(headers)
         # Remove "last" row (empty one) if the real last row is empty
-        elif row == (table.rowCount()-2):
+        elif row == (table.rowCount() - 2):
             for n in range(0, table.columnCount()):
                 item = table.item(row, n)
                 if item is not None:
                     if item.data(0) not in (None, ''):
                         return
-            table.setRowCount(table.rowCount()-1)
+            table.setRowCount(table.rowCount() - 1)
 
     def _read_tbl_values(self, table, clear_nulls=False):
 

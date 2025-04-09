@@ -37,7 +37,7 @@ class GwCSVButton(GwAction):
                                    f"{tools_qt.get_combo_value(self.dlg_csv, 'cmb_import_type', 0)}")
         tools_gw.set_config_parser('btn_csv2pg', 'txt_import', tools_qt.get_text(self.dlg_csv, 'txt_import'))
         tools_gw.set_config_parser('btn_csv2pg', 'txt_file_csv', tools_qt.get_text(self.dlg_csv, 'txt_file_csv'))
-        tools_gw.set_config_parser('btn_csv2pg', 'cmb_unicode_list',tools_qt.get_text(self.dlg_csv, 'cmb_unicode_list'))
+        tools_gw.set_config_parser('btn_csv2pg', 'cmb_unicode_list', tools_qt.get_text(self.dlg_csv, 'cmb_unicode_list'))
         tools_gw.set_config_parser('btn_csv2pg', 'chk_ignore_header', f"{self.dlg_csv.chk_ignore_header.isChecked()}")
         tools_gw.set_config_parser('btn_csv2pg', 'rb_semicolon', f"{self.dlg_csv.rb_semicolon.isChecked()}")
         tools_gw.set_config_parser('btn_csv2pg', 'rb_space', f"{self.dlg_csv.rb_space.isChecked()}")

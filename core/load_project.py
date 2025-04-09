@@ -272,7 +272,7 @@ class GwLoadProject(QObject):
         if missing_layers:
             if show_warning:
                 title = "Giswater plugin cannot be loaded"
-                msg = f"QGIS project seems to be a Giswater project, but layer(s) {[k for k,v in missing_layers.items()]} are missing"
+                msg = f"QGIS project seems to be a Giswater project, but layer(s) {[k for k, v in missing_layers.items()]} are missing"
                 tools_qgis.show_warning(msg, 20, title=title)
             return False
 

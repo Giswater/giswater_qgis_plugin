@@ -1279,9 +1279,9 @@ class GwMapzoneManager:
                     expl_id = expl_id.replace('[', '{')
                     expl_id = expl_id.replace(']', '}')
                     if not expl_id[0] == '{':
-                        expl_id = '{'+expl_id
-                    if not expl_id[len(expl_id)-1]=='}':
-                        expl_id = expl_id+'}'
+                        expl_id = '{' + expl_id
+                    if not expl_id[len(expl_id) - 1] == '}':
+                        expl_id = expl_id + '}'
                     my_json['expl_id'] = expl_id
         
         # Change format when muni_id is an array
@@ -1291,9 +1291,9 @@ class GwMapzoneManager:
                 muni_id = muni_id.replace('[', '{')
                 muni_id = muni_id.replace(']', '}')
                 if not muni_id[0] == '{':
-                    muni_id = '{'+muni_id
-                if not muni_id[len(muni_id)-1]=='}':
-                    muni_id = muni_id+'}'
+                    muni_id = '{' + muni_id
+                if not muni_id[len(muni_id) - 1] == '}':
+                    muni_id = muni_id + '}'
                 my_json['muni_id'] = muni_id
 
         # Change format when sector_id is an array
@@ -1304,9 +1304,9 @@ class GwMapzoneManager:
                     sector_id = sector_id.replace('[', '{')
                     sector_id = sector_id.replace(']', '}')
                     if not sector_id[0] == '{':
-                        sector_id = '{'+sector_id
-                    if not sector_id[len(sector_id)-1]=='}':
-                        sector_id = sector_id+'}'
+                        sector_id = '{' + sector_id
+                    if not sector_id[len(sector_id) - 1] == '}':
+                        sector_id = sector_id + '}'
                     my_json['sector_id'] = sector_id
 
         list_mandatory = []

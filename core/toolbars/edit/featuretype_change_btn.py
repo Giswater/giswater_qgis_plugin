@@ -169,7 +169,7 @@ class GwFeatureTypeChangeButton(GwMaptool):
         """ Open Feature Change Dialog dynamic """
 
         feature = f'"tableName":"{self.tablename}", "id":"{self.feature_id}"'
-        body = tools_gw.create_body(feature = feature)
+        body = tools_gw.create_body(feature=feature)
         json_result = tools_gw.execute_procedure('gw_fct_getchangefeaturetype', body)
         self.dlg_change = GwFeatureTypeChangeUi(self)
         tools_gw.load_settings(self.dlg_change)

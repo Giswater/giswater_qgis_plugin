@@ -421,7 +421,7 @@ class Calibrations:
             if self.task:
                 self.task.status.emit(
                     {
-                        "message": f'Executing calibration "{name}" ({index+1}/{total_steps})...',
+                        "message": f'Executing calibration "{name}" ({index + 1}/{total_steps})...',
                         "step": index + 1,
                         "steps": total_steps,
                     }

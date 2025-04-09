@@ -147,7 +147,7 @@ class GwGo2EpaManagerButton(GwAction):
     def _update_data(self, result_id, columnname, value):
 
         sql = f"""UPDATE v_ui_rpt_cat_result SET "{columnname}" = $${value}$$ WHERE result_id = '{result_id}';"""
-        result = tools_db.execute_sql(sql, log_sql = True)
+        result = tools_db.execute_sql(sql, log_sql=True)
         if result:
             self._fill_manager_table(tools_qt.get_text(self.dlg_manager, 'txt_result_id'))
 
@@ -386,7 +386,7 @@ class GwGo2EpaManagerButton(GwAction):
             col = tools_qt.get_col_index_by_col_name(widget, "iscorporate")
             set_corporate = widget.model().index(row, col).data()
         set_corporate = not tools_os.set_boolean(set_corporate, False)
-        parameter = {"data":{"resultId": result_id, "isCorporate": str(set_corporate).lower()}}
+        parameter = {"data": {"resultId": result_id, "isCorporate": str(set_corporate).lower()}}
         result = tools_gw.execute_procedure('gw_fct_epa2data', parameter)
 
         if not result or result.get('status') != 'Accepted':

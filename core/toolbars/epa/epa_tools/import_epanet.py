@@ -175,7 +175,7 @@ class GwImportEpanet:
             "gpv": self.catalog_source["gpv"] == "db_nodes",
         }
 
-        self.dlg_config.mainTab.setCurrentIndex(self.dlg_config.mainTab.count()-1)
+        self.dlg_config.mainTab.setCurrentIndex(self.dlg_config.mainTab.count() - 1)
         if TESTING_MODE:
             # Show warning message
             message = "You are about to import the INP file in TESTING MODE. This will delete all the data in the database related to the network you are importing. Are you sure you want to proceed?"
@@ -487,12 +487,12 @@ class GwImportEpanet:
                 "NODE",
             ),
             ("TANKS", self.catalogs.inp_tanks, ("TANK",), "NODE"),
-            ("PRV", self.catalogs.inp_valves_prv, ("VARC","PR_REDUC_VALVE"), ("ARC","NODE")),
-            ("PSV", self.catalogs.inp_valves_psv, ("VARC","PR_SUSTA_VALVE"), ("ARC","NODE")),
-            ("PBV", self.catalogs.inp_valves_pbv, ("VARC","PR_BREAK_VALVE"), ("ARC","NODE")),
-            ("FCV", self.catalogs.inp_valves_fcv, ("VARC","FL_CONTR_VALVE"), ("ARC","NODE")),
-            ("TCV", self.catalogs.inp_valves_tcv, ("VARC","THROTTLE_VALVE"), ("ARC","NODE")),
-            ("GPV", self.catalogs.inp_valves_gpv, ("VARC","GEN_PURP_VALVE"), ("ARC","NODE")),
+            ("PRV", self.catalogs.inp_valves_prv, ("VARC", "PR_REDUC_VALVE"), ("ARC", "NODE")),
+            ("PSV", self.catalogs.inp_valves_psv, ("VARC", "PR_SUSTA_VALVE"), ("ARC", "NODE")),
+            ("PBV", self.catalogs.inp_valves_pbv, ("VARC", "PR_BREAK_VALVE"), ("ARC", "NODE")),
+            ("FCV", self.catalogs.inp_valves_fcv, ("VARC", "FL_CONTR_VALVE"), ("ARC", "NODE")),
+            ("TCV", self.catalogs.inp_valves_tcv, ("VARC", "THROTTLE_VALVE"), ("ARC", "NODE")),
+            ("GPV", self.catalogs.inp_valves_gpv, ("VARC", "GEN_PURP_VALVE"), ("ARC", "NODE")),
         ]
 
         self.tbl_elements["features"] = {}
@@ -680,12 +680,12 @@ class GwImportEpanet:
             "reservoirs": ("NODE", ("SOURCE", "WATERWELL", "WTP")),
             "tanks": ("NODE", ("TANK",)),
             "valves": (("ARC", "NODE"), ("VARC",)),
-            "prv": (("ARC","NODE"), ("VARC","PR_REDUC_VALVE")),
-            "psv": (("ARC","NODE"), ("VARC","PR_SUSTA_VALVE")),
-            "pbv": (("ARC","NODE"), ("VARC","PR_BREAK_VALVE")),
-            "fcv": (("ARC","NODE"), ("VARC","FL_CONTR_VALVE")),
-            "tcv": (("ARC","NODE"), ("VARC","THROTTLE_VALVE")),
-            "gpv": (("ARC","NODE"), ("VARC","GEN_PURP_VALVE")),
+            "prv": (("ARC", "NODE"), ("VARC", "PR_REDUC_VALVE")),
+            "psv": (("ARC", "NODE"), ("VARC", "PR_SUSTA_VALVE")),
+            "pbv": (("ARC", "NODE"), ("VARC", "PR_BREAK_VALVE")),
+            "fcv": (("ARC", "NODE"), ("VARC", "FL_CONTR_VALVE")),
+            "tcv": (("ARC", "NODE"), ("VARC", "THROTTLE_VALVE")),
+            "gpv": (("ARC", "NODE"), ("VARC", "GEN_PURP_VALVE")),
         }
         for element_type, (combo,) in self.tbl_elements["features"].items():
             system_catalog = [
@@ -797,7 +797,7 @@ class GwImportEpanet:
             # Fill the "NEW CATALOG" column
             new_cat_name = QTableWidgetItem("")
             new_cat_name.setFlags(Qt.NoItemFlags)
-            tbl.setItem(row, combo_idx+1, new_cat_name)
+            tbl.setItem(row, combo_idx + 1, new_cat_name)
 
             # Connect signal to the new combo
             tools_gw.connect_signal(combo_cat.currentTextChanged,
@@ -910,7 +910,7 @@ class GwImportEpanet:
         lbl_time: QLabel = dialog.findChild(QLabel, "lbl_time")
         lbl_time.setText(text)
 
-    def _message_logged(self, message: str, end: str="\n"):
+    def _message_logged(self, message: str, end: str = "\n"):
 
         data = {"info": {"values": [{"message": message}]}}
         tools_gw.fill_tab_log(self.dlg_config, data, reset_text=True, close=False, end=end, call_set_tabs_enabled=False)

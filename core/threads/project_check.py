@@ -134,7 +134,7 @@ class GwProjectCheckTask(GwTask):
         if lib_vars.user_folder_dir:
             log_folder = f"{lib_vars.user_folder_dir}{os.sep}core{os.sep}log"
             size = tools_os.get_folder_size(log_folder)
-            log_folder_volume = f"{round(size / (1024*1024), 2)} MB"
+            log_folder_volume = f"{round(size / (1024 * 1024), 2)} MB"
 
         extras = f'"version":"{plugin_version}"'
         extras += f', "fid":101'

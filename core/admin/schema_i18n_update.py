@@ -12,7 +12,7 @@ from functools import partial
 
 from ..ui.ui_manager import GwSchemaI18NUpdateUi
 from ..utils import tools_gw
-from ...libs import lib_vars, tools_qt, tools_qgis, tools_db,tools_log, tools_os
+from ...libs import lib_vars, tools_qt, tools_qgis, tools_db, tools_log, tools_os
 from qgis.PyQt.QtWidgets import QLabel
 from PyQt5.QtWidgets import QApplication
 
@@ -245,12 +245,12 @@ class GwSchemaI18NUpdate:
         return rows
     
     def _write_dbdialog_values(self, dbdialogs):
-        i=0
-        j=0
+        i = 0
+        j = 0
         for dbdialog in dbdialogs: #(For row in rows)
-            i+=1
+            i += 1
             if dbdialog['project_type'] == self.project_type or dbdialog['project_type'] == 'utils': # Avoid the unwnated project_types
-                j+=1
+                j += 1
                 formname = dbdialog['formname']
                 if isinstance(formname, str):
                     formname = "_".join(dbdialog['formname'].split("_")[:2])
@@ -413,7 +413,7 @@ class GwSchemaI18NUpdate:
         j = 0
         for dbfprocess in dbfprocesses: #(For row in rows)
             i += 1
-            if dbfprocess['project_type'] == self.project_type or dbfprocess['project_type'] == 'utils':# Avoid the unwnated project_types
+            if dbfprocess['project_type'] == self.project_type or dbfprocess['project_type'] == 'utils': # Avoid the unwnated project_types
                 j += 1
                 source = dbfprocess['source']# Take all the possible source from dbfprocesses
                 #Define the ex_msg taking into account the different possibilities by priority level
