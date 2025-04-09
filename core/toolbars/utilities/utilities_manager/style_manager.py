@@ -366,7 +366,7 @@ class GwStyleManager:
         except Exception as e:
             tools_qgis.show_warning(f"Failed to delete style group: {e}", dialog=self.style_mng_dlg)
 
-    #Functions for btn style top right of the dialog
+    # Functions for btn style top right of the dialog
     def _delete_selected_styles(self):
         """Logic for deleting the selected styles from the table."""
         selected_rows = self.style_mng_dlg.tbl_style.selectionModel().selectedRows()

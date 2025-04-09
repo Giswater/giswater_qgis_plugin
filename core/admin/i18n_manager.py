@@ -29,14 +29,14 @@ class GwSchemaI18NManager:
     def init_dialog(self):
         """ Constructor """
     
-        self.dlg_qm = GwSchemaI18NManagerUi(self) #Initialize the UI
+        self.dlg_qm = GwSchemaI18NManagerUi(self)  # Initialize the UI
         tools_gw.load_settings(self.dlg_qm)
-        self._load_user_values() #keep values
+        self._load_user_values()  # keep values
         self.dev_commit = tools_gw.get_config_parser('system', 'force_commit', "user", "init", prefix=True)
         self.dlg_qm.btn_update.setEnabled(False)
-        self._set_signals() #Set all the signals to wait for response
+        self._set_signals()  # Set all the signals to wait for response
 
-        #Get the project_types (ws, ud)
+        # Get the project_types (ws, ud)
         self.project_types = tools_gw.get_config_parser('system', 'project_types', "project", "giswater", False,
                                                         force_reload=True)
         self.project_types = self.project_types.split(',')
@@ -63,7 +63,7 @@ class GwSchemaI18NManager:
         self.dlg_qm.cmb_updatetype.currentIndexChanged.connect(partial(self._set_values))
         self.dlg_qm.cmb_schema_org.currentIndexChanged.connect(partial(self._set_values))
         
-        #Populate schema names
+        # Populate schema names
         self.dlg_qm.cmb_projecttype.currentIndexChanged.connect(partial(self._populate_data_schema_name, self.dlg_qm.cmb_projecttype))
 
     def _set_values(self):
@@ -152,7 +152,7 @@ class GwSchemaI18NManager:
         status_i18n = self._init_db_i18n(host_i18n, port_i18n, db_i18n, user_i18n, password_i18n)
         status_org = self._init_db_org()
 
-        #Send messages
+        # Send messages
         if not status_i18n:
             self.dlg_qm.btn_update.setEnabled(False)
             self.dlg_qm.lbl_info.clear()
@@ -493,7 +493,7 @@ class GwSchemaI18NManager:
             return False
         return True
     
-    #endregion
+    # endregion
     # region Rewrite Project_type
     def _update_project_type(self, table):
         """Function to rewrite the repeated rows with different project_type to only one with project_type = 'utils'"""
@@ -620,7 +620,7 @@ class GwSchemaI18NManager:
             insert_query += ", 'utils');\n" if k < len(final_rows) else ");\n"
         return insert_query
 
-    #endregion
+    # endregion
     # region Global funcitons
     def detect_table_func(self, table):
         self.cursor_i18n.execute(f"SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = '{table.split('.')[0]}' AND table_name = '{table.split('.')[1]}';")
@@ -678,4 +678,4 @@ class GwSchemaI18NManager:
         self.cursor_i18n.execute(query)
         results = self.cursor_i18n.fetchall()
         self.primary_keys = [row['column_name'] for row in results]
-    #endregion
+    # endregion

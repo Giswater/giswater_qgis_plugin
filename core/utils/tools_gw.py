@@ -306,15 +306,15 @@ def open_help_link(context, uiname, tabname=None):
 
     # Base URL for the documentation
     domain = "https://docs.giswater.org"
-    language = "es_CR" # TODO: get dynamic language
-    plugin_version = "testing" # TODO: get dynamic version
+    language = "es_CR"  # TODO: get dynamic language
+    plugin_version = "testing"  # TODO: get dynamic version
 
     if plugin_version == "":
         plugin_version = "latest"
 
     base_url = f"{domain}/{plugin_version}/{language}/docs/giswater/for-users"
 
-    uiname = uiname.replace("_", "-").replace(" ", "-").lower() + ".html" # sanitize uiname
+    uiname = uiname.replace("_", "-").replace(" ", "-").lower() + ".html"  # sanitize uiname
 
     # Construct the path dynamically
     if uiname:
@@ -1695,7 +1695,7 @@ def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None, module
                         widget.setDisplayFormat('yyyy/MM/dd')
                         if lib_vars.date_format in ("dd/MM/yyyy", "dd-MM-yyyy", "yyyy/MM/dd", "yyyy-MM-dd"):
                             widget.setDisplayFormat(lib_vars.date_format)
-                        widget.clear() # Set the date to NULL initially
+                        widget.clear()  # Set the date to NULL initially
                         if field.get('value') not in ('', None, 'null'):
                             date = QDate.fromString(field['value'].replace('/', '-'), 'yyyy-MM-dd')
                             widget.setDate(date)
@@ -2534,7 +2534,7 @@ def get_expression_filter(feature_type, list_ids=None, layers=None):
         return None
 
     # Select features of layers applying @expr
-    #tools_qgis.select_features_by_ids(feature_type, expr, layers=layers)
+    # tools_qgis.select_features_by_ids(feature_type, expr, layers=layers)
 
     return expr_filter
 
@@ -5022,7 +5022,7 @@ def _manage_check(**kwargs):
     field = kwargs['field']
     class_info = kwargs['class']
     widget = add_checkbox(**kwargs)
-    #widget.stateChanged.connect(partial(get_values, dialog, widget, class_info.my_json))
+    # widget.stateChanged.connect(partial(get_values, dialog, widget, class_info.my_json))
     return widget
 
 

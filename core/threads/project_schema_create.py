@@ -179,7 +179,7 @@ class GwCreateSchemaTask(GwTask):
         list_process = ['load_base', 'load_locale', 'update_35to40']
 
         for process_name in list_process:
-            #tools_log.log_info(f"Task 'Create schema' execute function 'def get_number_of_files_process' with parameters: '{process_name}'")
+            # tools_log.log_info(f"Task 'Create schema' execute function 'def get_number_of_files_process' with parameters: '{process_name}'")
             dict_folders, total = self.get_number_of_files_process(process_name)
             total_sql_files += total
             tools_log.log_info(f"Number of SQL files '{process_name}': {total}")
@@ -201,7 +201,7 @@ class GwCreateSchemaTask(GwTask):
     def get_number_of_files_process(self, process_name: str):
         """ Calculate number of files of all folders of selected @process_name """
 
-        #tools_log.log_info(f"Task 'Create schema' execute function 'def get_folders_process' with parameters: '{process_name}'")
+        # tools_log.log_info(f"Task 'Create schema' execute function 'def get_folders_process' with parameters: '{process_name}'")
         dict_folders = self.get_folders_process(process_name)
         if dict_folders is None:
             return dict_folders, 0

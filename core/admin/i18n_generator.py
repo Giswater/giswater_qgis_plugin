@@ -140,7 +140,7 @@ class GwI18NGenerator:
         
         # Get python toolbars and buttons values
         if self.lower_lang == 'en_us':
-            sql = f"SELECT source, ms_en_us FROM i18n.pymessage;" # ADD new columns
+            sql = f"SELECT source, ms_en_us FROM i18n.pymessage;"  # ADD new columns
             py_messages = self._get_rows(sql)
             sql = f"SELECT source, lb_en_us FROM i18n.pytoolbar;"
             py_toolbars = self._get_rows(sql)
@@ -150,7 +150,7 @@ class GwI18NGenerator:
                 f" ORDER BY dialog_name;")
             py_dialogs = self._get_rows(sql)
         else:
-            sql = f"SELECT source, ms_en_us, {key_message}, auto_{key_message} FROM i18n.pymessage;" # ADD new columns
+            sql = f"SELECT source, ms_en_us, {key_message}, auto_{key_message} FROM i18n.pymessage;"  # ADD new columns
             py_messages = self._get_rows(sql)
             sql = f"SELECT source, lb_en_us, {key_label}, auto_{key_label} FROM i18n.pytoolbar;"
             py_toolbars = self._get_rows(sql)
@@ -184,7 +184,7 @@ class GwI18NGenerator:
         for py_tlb in py_toolbars:
             line = f"\t\t<message>\n"
             line += f"\t\t\t<source>{py_tlb['source']}</source>\n"
-            if py_tlb[key_label] is None: # Afegir aqui l'auto amb un if
+            if py_tlb[key_label] is None:  # Afegir aqui l'auto amb un if
                 py_tlb[key_label] = py_tlb[f'auto_{key_label}']
                 if py_tlb[f'auto_{key_label}'] is None:
                     py_tlb[key_label] = py_tlb['lb_en_us']
@@ -204,7 +204,7 @@ class GwI18NGenerator:
         for py_msg in py_messages:
             line = f"\t\t<message>\n"
             line += f"\t\t\t<source>{py_msg['source']}</source>\n"
-            if py_msg[key_message] is None: # Afegir aqui l'auto amb un if
+            if py_msg[key_message] is None:  # Afegir aqui l'auto amb un if
                 py_msg[key_message] = py_msg[f'auto_{key_message}']
                 if py_msg[f'auto_{key_message}'] is None:
                     py_msg[key_message] = py_msg['source']
@@ -238,7 +238,7 @@ class GwI18NGenerator:
             # Create child for labels
             line += f"\t\t<message>\n"
             line += f"\t\t\t<source>{py_dlg['source']}</source>\n"
-            if py_dlg[key_label] is None: # Afegir aqui l'auto amb un if
+            if py_dlg[key_label] is None:  # Afegir aqui l'auto amb un if
                 if self.lower_lang != 'en_us':
                     py_dlg[key_label] = py_dlg[f'auto_{key_label}']
                 if py_tlb[key_label] is None:
@@ -371,10 +371,10 @@ class GwI18NGenerator:
             return False, "dbmessage"
         self._write_dbmessages_values_i18n(rows, cfg_path + file_name)
 
-        #rows = self._get_dbfprocess_values_i18n()
-        #if not rows:
-            #return False, "dbfprocess"
-        #self._write_dbfprocess_values_i18n(rows, cfg_path + file_name)
+        # rows = self._get_dbfprocess_values_i18n()
+        # if not rows:
+            # return False, "dbfprocess"
+        # self._write_dbfprocess_values_i18n(rows, cfg_path + file_name)
 
         return True, ""
 
@@ -475,7 +475,7 @@ class GwI18NGenerator:
             return False
         return rows
     
-    def _write_config_form_fields_updates(self, rows, path): ## Parlar amb edgar
+    def _write_config_form_fields_updates(self, rows, path):  # Parlar amb edgar
         """
             Generate a string and write into file
             :param rows: List of values ([List][List])z
@@ -518,7 +518,7 @@ class GwI18NGenerator:
             form_type = row['formtype'] if row['formtype'] is not None else ""
             source = row['source'] if row['source'] is not None else ""
             lbl_value = row[f'lb_{self.lower_lang}'] if row[f'lb_{self.lower_lang}'] is not None or self.lower_lang == 'en_us' else row[f'auto_lb_{self.lower_lang}']
-            lbl_value = lbl_value if lbl_value is not None else row['lb_en_us'] # Afegir auto_ amb un if
+            lbl_value = lbl_value if lbl_value is not None else row['lb_en_us']  # Afegir auto_ amb un if
             lbl_value = lbl_value if lbl_value is not None else ""
             tt_value = row[f'tt_{self.lower_lang}'] if row[f'tt_{self.lower_lang}'] is not None or self.lower_lang == 'en_us' else row[f'auto_tt_{self.lower_lang}']
             tt_value = tt_value if tt_value is not None else row['lb_en_us']

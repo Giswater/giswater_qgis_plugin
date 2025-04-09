@@ -1723,7 +1723,7 @@ class GwPsector:
             try:
                 self.canvas.mapCanvasRefreshed.disconnect(self._apply_canvas_filter)
             except TypeError:
-                pass # Ignore if already disconnected
+                pass  # Ignore if already disconnected
 
             # Clear filter to show all features in the table
             self.dlg_psector_mng.tbl_psm.model().setFilter("")

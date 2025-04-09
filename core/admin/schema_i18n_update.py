@@ -27,15 +27,15 @@ class GwSchemaI18NUpdate:
     def init_dialog(self):
         """ Constructor """
     
-        self.dlg_qm = GwSchemaI18NUpdateUi(self) #Initialize the UI
+        self.dlg_qm = GwSchemaI18NUpdateUi(self)  # Initialize the UI
         tools_gw.load_settings(self.dlg_qm)
-        self._load_user_values() #keep values
+        self._load_user_values()  # keep values
         self.dev_commit = tools_gw.get_config_parser('system', 'force_commit', "user", "init", prefix=True)
-        self._set_signals() #Set all the signals to wait for response
+        self._set_signals()  # Set all the signals to wait for response
 
         self.dlg_qm.btn_translate.setEnabled(False)
     
-        #Get the project_types (ws, ud)
+        # Get the project_types (ws, ud)
         self.project_types = tools_gw.get_config_parser('system', 'project_types', "project", "giswater", False,
                                                         force_reload=True)
         self.project_types = self.project_types.split(',')
@@ -65,7 +65,7 @@ class GwSchemaI18NUpdate:
         self.dlg_qm.rejected.connect(self._close_db)
         self.dlg_qm.rejected.connect(self._close_db_dest)
 
-        #Populate schema names
+        # Populate schema names
         self.dlg_qm.cmb_projecttype.currentIndexChanged.connect(partial(self._populate_data_schema_name, self.dlg_qm.cmb_projecttype))
 
     def _check_connection(self, set_languages):
@@ -80,7 +80,7 @@ class GwSchemaI18NUpdate:
         user_i18n = tools_qt.get_text(self.dlg_qm, self.dlg_qm.txt_user)
         password_i18n = tools_qt.get_text(self.dlg_qm, self.dlg_qm.txt_pass)
         status_i18n, e = self._init_db_i18n(host_i18n, port_i18n, db_i18n, user_i18n, password_i18n)
-        #Send messages
+        # Send messages
         if 'password authentication failed' in str(self.last_error):
             self.dlg_qm.btn_translate.setEnabled(False)
             tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', 'Incorrect user or password')
@@ -147,10 +147,10 @@ class GwSchemaI18NUpdate:
     def schema_i18n_update(self):
         """ Main program to run the the shcmea_i18n_update """
 
-        #Connect in case of repeated actions
+        # Connect in case of repeated actions
         self._check_connection(False)
         self.cursor_dest = tools_db.dao.get_cursor()
-        #Initalize the language and the message (for errors,etc)
+        # Initalize the language and the message (for errors,etc)
         self.language = tools_qt.get_combo_value(self.dlg_qm, self.dlg_qm.cmb_language, 0)
         self.lower_lang = self.language.lower()
         msg = ''
@@ -165,13 +165,13 @@ class GwSchemaI18NUpdate:
         elif status_cfg_msg is None:
             msg += "Database translation canceled.\n"
 
-        #Look for errors
+        # Look for errors
         if errors:
             msg += f'There have been errors translating: {', '.join(errors)}'
             
         self._change_lang()
 
-        #Close connections
+        # Close connections
         self._close_db()
         self._close_db_dest()
 
@@ -216,7 +216,7 @@ class GwSchemaI18NUpdate:
         else:
             return True, None
 
-        #Get db_feature values
+        # Get db_feature values
 
     def _get_dbdialog_values(self):
         """ Get dbdialog values """
@@ -247,15 +247,15 @@ class GwSchemaI18NUpdate:
     def _write_dbdialog_values(self, dbdialogs):
         i = 0
         j = 0
-        for dbdialog in dbdialogs: #(For row in rows)
+        for dbdialog in dbdialogs:  # (For row in rows)
             i += 1
-            if dbdialog['project_type'] == self.project_type or dbdialog['project_type'] == 'utils': # Avoid the unwnated project_types
+            if dbdialog['project_type'] == self.project_type or dbdialog['project_type'] == 'utils':  # Avoid the unwnated project_types
                 j += 1
                 formname = dbdialog['formname']
                 if isinstance(formname, str):
                     formname = "_".join(dbdialog['formname'].split("_")[:2])
-                source = [formname, dbdialog['formtype'], dbdialog['source']] #Take all the possible source from dbdialog
-                #Define the label taking into account the different possibilities by priority level
+                source = [formname, dbdialog['formtype'], dbdialog['source']]  # Take all the possible source from dbdialog
+                # Define the label taking into account the different possibilities by priority level
                 label = dbdialog[f'lb_{self.lower_lang}']
                 if label is None:
                     if self.lower_lang != 'en_us':
@@ -266,7 +266,7 @@ class GwSchemaI18NUpdate:
                             label = source[2]
                             if label is None:
                                 label = ""
-                #Define the tooltip taking into account the different possibilities by priority level
+                # Define the tooltip taking into account the different possibilities by priority level
                 tooltip = dbdialog[f'tt_{self.lower_lang}']
                 if tooltip is None:
                     if self.lower_lang != 'en_us':
@@ -277,14 +277,14 @@ class GwSchemaI18NUpdate:
                             tooltip = dbdialog['lb_en_us']
                             if tooltip is None:
                                 tooltip = ""
-                #Replace unwanted characters
+                # Replace unwanted characters
                 tooltip = tooltip.replace("'", "''") 
                 label = label.replace("'", "''")
                 
-                #Define the query depending on the table
+                # Define the query depending on the table
                 sql_text = None
                 if dbdialog['context'] == 'config_form_fields':
-                    #Avoid sql problems with config_form_fields
+                    # Avoid sql problems with config_form_fields
                     sql_1 = f"UPDATE {self.schema}.config_param_system SET value = TRUE WHERE parameter = 'admin_config_control_trigger'"
                     self.cursor_dest.execute(sql_1)
                     self._commit_dest
@@ -292,10 +292,10 @@ class GwSchemaI18NUpdate:
                     # Main query
                     sql_text = (f"UPDATE {self.schema}.{dbdialog['context']} SET label = '{label}', tooltip = '{tooltip}' "
                                 f"WHERE formname ILIKE '{source[0]}%' and formtype = '{source[1]}' and columnname = '{source[2]}'")
-                        #f"WHERE and formtype = '{source[1]}' and columnname = '{source[2]}'")
-                        #f"WHERE formname = '{source[0]}' and formtype = '{source[1]}' and columnname = '{source[2]}'"                        
+                        # f"WHERE and formtype = '{source[1]}' and columnname = '{source[2]}'")
+                        # f"WHERE formname = '{source[0]}' and formtype = '{source[1]}' and columnname = '{source[2]}'"                        
                     
-                    #Return config_form_fields to normal
+                    # Return config_form_fields to normal
                     sql_2 = f"UPDATE {self.schema}.config_param_system SET value = FALSE WHERE parameter = 'admin_config_control_trigger'"
                     self.cursor_dest.execute(sql_2)
                     self._commit_dest()
@@ -312,7 +312,7 @@ class GwSchemaI18NUpdate:
                     sql_text = (f"UPDATE {self.schema}.{dbdialog['context']} SET idval = '{tooltip}' "
                         f"WHERE id = '{source[2]}' and typevalue = '{source[0]}'")
 
-                #Execute the corresponding query
+                # Execute the corresponding query
                 try:
                     self.cursor_dest.execute(sql_text)
                     self._commit_dest()
@@ -347,12 +347,12 @@ class GwSchemaI18NUpdate:
     def _write_dbmessages_values(self, dbmessages):
         i = 0
         j = 0
-        for dbmessage in dbmessages: #(For row in rows)
+        for dbmessage in dbmessages:  # (For row in rows)
             i += 1
-            if dbmessage['project_type'] == self.project_type or dbmessage['project_type'] == 'utils': # Avoid the unwnated project_types
+            if dbmessage['project_type'] == self.project_type or dbmessage['project_type'] == 'utils':  # Avoid the unwnated project_types
                 j += 1
-                source = dbmessage['source'] # Take all the possible source from dbmessages
-                #Define the error_ms taking into account the different possibilities by priority level
+                source = dbmessage['source']  # Take all the possible source from dbmessages
+                # Define the error_ms taking into account the different possibilities by priority level
                 error_ms = dbmessage[f'ms_{self.lower_lang}']
                 if error_ms is None:
                     if self.lower_lang != 'en_us':
@@ -361,7 +361,7 @@ class GwSchemaI18NUpdate:
                         error_ms = dbmessage['ms_en_us']
                         if error_ms is None:
                             error_ms = ""
-                #Define the hint_ms taking into account the different possibilities by priority level
+                # Define the hint_ms taking into account the different possibilities by priority level
                 hint_ms = dbmessage[f'ht_{self.lower_lang}']
                 if hint_ms is None:
                     if self.lower_lang != 'en_us':
@@ -370,11 +370,11 @@ class GwSchemaI18NUpdate:
                         hint_ms = dbmessage['ht_en_us']
                         if hint_ms is None:
                             hint_ms = ""
-                #Replace unwanted characters
+                # Replace unwanted characters
                 error_ms = error_ms.replace("'", "''") 
                 hint_ms = hint_ms.replace("'", "''")
 
-                #Define and execute the corresponding query
+                # Define and execute the corresponding query
                 try:
                     sql = (f"UPDATE {self.schema}.sys_message "
                         f"SET error_message = '{error_ms}',  hint_message = '{hint_ms}'"
@@ -411,12 +411,12 @@ class GwSchemaI18NUpdate:
     def _write_dbfprocess_values(self, dbfprocesses):
         i = 0
         j = 0
-        for dbfprocess in dbfprocesses: #(For row in rows)
+        for dbfprocess in dbfprocesses:  # (For row in rows)
             i += 1
-            if dbfprocess['project_type'] == self.project_type or dbfprocess['project_type'] == 'utils': # Avoid the unwnated project_types
+            if dbfprocess['project_type'] == self.project_type or dbfprocess['project_type'] == 'utils':  # Avoid the unwnated project_types
                 j += 1
-                source = dbfprocess['source']# Take all the possible source from dbfprocesses
-                #Define the ex_msg taking into account the different possibilities by priority level
+                source = dbfprocess['source']  # Take all the possible source from dbfprocesses
+                # Define the ex_msg taking into account the different possibilities by priority level
                 ex_msg = dbfprocess[f'ex_{self.lower_lang}']
                 if ex_msg is None:
                     if self.lower_lang != 'en_us':
@@ -425,7 +425,7 @@ class GwSchemaI18NUpdate:
                         ex_msg = dbfprocess['ex_en_us']
                         if ex_msg is None:
                             ex_msg = ""
-                #Define the in_msg taking into account the different possibilities by priority level
+                # Define the in_msg taking into account the different possibilities by priority level
                 in_msg = dbfprocess[f'in_{self.lower_lang}']
                 if in_msg is None:
                     if self.lower_lang != 'en_us':
@@ -434,11 +434,11 @@ class GwSchemaI18NUpdate:
                         in_msg = dbfprocess['in_en_us']
                         if in_msg is None:
                             in_msg = ""
-                #Replace unwanted characters
+                # Replace unwanted characters
                 ex_msg = ex_msg.replace("'", "''") 
                 in_msg = in_msg.replace("'", "''")
 
-                #Define and execute the corresponding query
+                # Define and execute the corresponding query
                 try:
                     sql = (f"UPDATE {self.schema}.sys_fprocess "
                         f"SET except_msg = '{ex_msg}', info_msg = '{in_msg}' "

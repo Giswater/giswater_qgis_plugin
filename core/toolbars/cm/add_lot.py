@@ -25,7 +25,7 @@ import json
 from collections import OrderedDict
 from ..maptool import GwMaptool
 
-#from ...ui.ui_manager import ManageVisit
+# from ...ui.ui_manager import ManageVisit
 from ...ui.ui_manager import AddLotUi
 from ...ui.ui_manager import LotSelectorUi
 from ...ui.ui_manager import DialogTableUi
@@ -1183,7 +1183,7 @@ class AddNewLot():
         combo_values = tools_db.get_values_from_catalog('om_typevalue', 'visit_status')
         if combo_values is None:
             return
-        #self.put_combobox(self.dlg_lot.tbl_visit, rows, 'status', 17, combo_values)
+        # self.put_combobox(self.dlg_lot.tbl_visit, rows, 'status', 17, combo_values)
 
     def put_combobox(self, qtable, rows, field, widget_pos, combo_values):
         """ Set one column of a QtableView as QComboBox with values from database. """

@@ -151,7 +151,7 @@ def delete_object(**kwargs):
 
         inf_text += str(object_id) + ", "
         list_id += f"{str(id_)}, "
-        #ist_id += str(id_) + ", "
+        # ist_id += str(id_) + ", "
         list_object_id = list_object_id + str(object_id) + ", "
         row_index += str(row + 1) + ", "
 

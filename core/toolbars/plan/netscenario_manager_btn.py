@@ -61,7 +61,7 @@ class GwNetscenarioManagerButton(GwAction):
 
         # Apply filter validator
         self.filter_name = self.dlg_netscenario_manager.findChild(QLineEdit, 'txt_name')
-        reg_exp = QRegExp('([^"\'\\\\$]|\\$(?!\\$))*') # Don't allow " or ' or \ or $$ because it breaks the query
+        reg_exp = QRegExp('([^"\'\\\\$]|\\$(?!\\$))*')  # Don't allow " or ' or \ or $$ because it breaks the query
         self.filter_name.setValidator(QRegExpValidator(reg_exp))
 
         # Fill table

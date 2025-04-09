@@ -53,7 +53,7 @@ class GwDscenarioManagerButton(GwAction):
                             }
         self.filter_disabled = ["inp_dscenario_lids", "inp_dscenario_inflows", "inp_dscenario_treatment",
                                 "inp_dscenario_flwreg_pump", "inp_dscenario_flwreg_weir", "inp_dscenario_flwreg_orifice",
-                                "inp_dscenario_flwreg_outlet", "inp_dscenario_inflows_poll", #"inp_dscenario_pump_additional"
+                                "inp_dscenario_flwreg_outlet", "inp_dscenario_inflows_poll",  # "inp_dscenario_pump_additional"
                                 ]
         self.dict_ids = {'v_edit_cat_hydrology': 'name', 'v_edit_cat_dwf': 'idval', 'v_edit_cat_dscenario': 'name'}
         self.rubber_band = tools_gw.create_rubberband(global_vars.canvas)

@@ -277,11 +277,11 @@ class GwSelector:
 
     def _get_layers(self):
             
-        #self.arc_layers = [lyr for lyr in [tools_qgis.get_layer_by_tablename('v_edit_arc')] if lyr is not None]
-        #self.node_layers = [lyr for lyr in [tools_qgis.get_layer_by_tablename('v_edit_node')] if lyr is not None]
-        #self.connec_layers = [lyr for lyr in [tools_qgis.get_layer_by_tablename('v_edit_connec')] if lyr is not None]
-        #self.gully_layers = [lyr for lyr in [tools_qgis.get_layer_by_tablename('v_edit_gully')] if lyr is not None]
-        #self.link_layers = [lyr for lyr in [tools_qgis.get_layer_by_tablename('v_edit_link')] if lyr is not None]
+        # self.arc_layers = [lyr for lyr in [tools_qgis.get_layer_by_tablename('v_edit_arc')] if lyr is not None]
+        # self.node_layers = [lyr for lyr in [tools_qgis.get_layer_by_tablename('v_edit_node')] if lyr is not None]
+        # self.connec_layers = [lyr for lyr in [tools_qgis.get_layer_by_tablename('v_edit_connec')] if lyr is not None]
+        # self.gully_layers = [lyr for lyr in [tools_qgis.get_layer_by_tablename('v_edit_gully')] if lyr is not None]
+        # self.link_layers = [lyr for lyr in [tools_qgis.get_layer_by_tablename('v_edit_link')] if lyr is not None]
 
         filter_layers = {}
         filter_layers['muni'] = []
@@ -297,7 +297,7 @@ class GwSelector:
                 filter_layers['sector'].append(tools_qgis.get_layer_source_table_name(layer))
 
         return filter_layers
-        #return self.arc_layers, self.node_layers, self.connec_layers, self.gully_layers, self.link_layers
+        # return self.arc_layers, self.node_layers, self.connec_layers, self.gully_layers, self.link_layers
                 
     def _apply_filter(self, muni_filter: str, sector_filter: str) -> None:
         """

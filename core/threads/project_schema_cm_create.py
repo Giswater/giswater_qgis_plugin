@@ -36,7 +36,7 @@ class GwCreateSchemaCmTask(GwTask):
             pass
 
         # Disable red 'X' from dlg_readsql_create_cm_project
-        #self.admin.dlg_readsql_create_cm_project.setWindowFlag(Qt.WindowCloseButtonHint, False)
+        # self.admin.dlg_readsql_create_cm_project.setWindowFlag(Qt.WindowCloseButtonHint, False)
         self.admin.dlg_readsql_create_cm_project.show()
         # Disable dlg_readsql buttons
         self.admin.dlg_readsql.btn_close.setEnabled(False)
@@ -62,7 +62,7 @@ class GwCreateSchemaCmTask(GwTask):
         self.admin.dlg_readsql_create_cm_project.btn_accept.show()
         self.admin.dlg_readsql_create_cm_project.btn_close.setEnabled(True)
         # Enable red 'X' from dlg_readsql_create_cm_project
-        #self.admin.dlg_readsql_create_cm_project.setWindowFlag(Qt.WindowCloseButtonHint, True)
+        # self.admin.dlg_readsql_create_cm_project.setWindowFlag(Qt.WindowCloseButtonHint, True)
         self.admin.dlg_readsql_create_cm_project.show()
         # Disable dlg_readsql buttons
         self.admin.dlg_readsql.btn_close.setEnabled(True)
@@ -148,12 +148,12 @@ class GwCreateSchemaCmTask(GwTask):
         elif process_name == 'load_example':
             dict_folders[self.admin.folder_example_cm] = 0
 
-        #elif process_name == 'load_i18n':
+        # elif process_name == 'load_i18n':
         #    dict_folders[self.admin.folder_i18n_cm] = 0
 
-            #dict_folders[os.path.join(self.admin.folder_cm_updates, '2023-05')] = 0
-            #dict_folders[os.path.join(self.admin.folder_cm_updates, '2024-01')] = 0
-            #dict_folders[os.path.join(self.admin.folder_cm_updates, '2024-01','i18n')] = 0
+            # dict_folders[os.path.join(self.admin.folder_cm_updates, '2023-05')] = 0
+            # dict_folders[os.path.join(self.admin.folder_cm_updates, '2024-01')] = 0
+            # dict_folders[os.path.join(self.admin.folder_cm_updates, '2024-01','i18n')] = 0
 
         return dict_folders
 

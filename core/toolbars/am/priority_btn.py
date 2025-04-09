@@ -823,7 +823,7 @@ class CalculatePriority:
         # Progress bar behavior
         t.progressChanged.connect(lambda value: dlg.progressBar.setValue(int(value)))
 
-        #dlg.executing = True
+        # dlg.executing = True
         QgsApplication.taskManager().addTask(t)
 
     # region Selection
