@@ -432,7 +432,7 @@ BEGIN
 			FROM (
 				SELECT DISTINCT column_name, ordinal_position
 				FROM information_schema.columns
-				WHERE table_name = ''' || v_tablename || '''
+				WHERE table_name = ''' || substring(v_query_result FROM 'FROM\s+([a-zA-Z0-9_\.]+)') || '''
 				ORDER BY ordinal_position
 			) a' INTO v_table_headers;
 	END IF;
