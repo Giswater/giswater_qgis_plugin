@@ -52,8 +52,8 @@ class GwPsector:
         self.feature_geoms = {}
         self.tablename_psector_x_arc = "plan_psector_x_arc"
         self.tablename_psector_x_node = "plan_psector_x_node"
-        self.tablename_psector_x_connec = "v_edit_plan_psector_x_connec"
-        self.tablename_psector_x_gully = "v_edit_plan_psector_x_gully"
+        self.tablename_psector_x_connec = "plan_psector_x_connec"
+        self.tablename_psector_x_gully = "plan_psector_x_gully"
 
         self.qtbl_node = None
         self.qtbl_arc = None
