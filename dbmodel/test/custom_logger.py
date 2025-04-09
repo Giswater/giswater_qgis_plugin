@@ -13,10 +13,12 @@ from typing import cast
 SUCCESS_LEVEL_NUM = 25
 logging.addLevelName(SUCCESS_LEVEL_NUM, "SUCCESS")
 
+
 class CustomLogger(logging.Logger):
     def success(self, message, *args, **kws):
         if self.isEnabledFor(SUCCESS_LEVEL_NUM):
             self._log(SUCCESS_LEVEL_NUM, message, args, **kws)
+
 
 # Define color codes
 class CustomFormatter(logging.Formatter):
@@ -42,6 +44,7 @@ class CustomFormatter(logging.Formatter):
         log_fmt = self.FORMATS.get(record.levelno)
         formatter = logging.Formatter(log_fmt)
         return formatter.format(record)
+
 
 logging.setLoggerClass(CustomLogger)
 

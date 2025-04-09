@@ -1,6 +1,7 @@
 import os
 import sys
 
+
 def replace_vars_in_file(file_path: str, replacements: dict) -> None:
     with open(file_path, 'r') as file:
         content = file.read()
@@ -8,6 +9,7 @@ def replace_vars_in_file(file_path: str, replacements: dict) -> None:
         content = content.replace(old, new)
     with open(file_path, 'w') as file:
         file.write(content)
+
 
 def main(project_type: str):
     sql_dir = './'
@@ -20,6 +22,7 @@ def main(project_type: str):
         for file in files:
             if file.endswith('.sql'):
                 replace_vars_in_file(os.path.join(root, file), replacements)
+
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:

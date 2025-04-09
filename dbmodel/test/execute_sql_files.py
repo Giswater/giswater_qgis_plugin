@@ -89,10 +89,9 @@ def main(project_type: str) -> None:
     else:
         logger.warning(f"Directory {example_dir} does not exist")
 
-
-
     # Close the database connection
     conn.close()
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Execute SQL files of a certain project type.')
