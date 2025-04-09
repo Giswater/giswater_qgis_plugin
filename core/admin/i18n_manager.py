@@ -28,7 +28,7 @@ class GwSchemaI18NManager:
 
     def init_dialog(self):
         """ Constructor """
-    
+
         self.dlg_qm = GwSchemaI18NManagerUi(self)  # Initialize the UI
         tools_gw.load_settings(self.dlg_qm)
         self._load_user_values()  # keep values
@@ -62,7 +62,7 @@ class GwSchemaI18NManager:
         self.dlg_qm.rejected.connect(self._close_db_i18n)
         self.dlg_qm.cmb_updatetype.currentIndexChanged.connect(partial(self._set_values))
         self.dlg_qm.cmb_schema_org.currentIndexChanged.connect(partial(self._set_values))
-        
+
         # Populate schema names
         self.dlg_qm.cmb_projecttype.currentIndexChanged.connect(partial(self._populate_data_schema_name, self.dlg_qm.cmb_projecttype))
 
@@ -78,14 +78,14 @@ class GwSchemaI18NManager:
             self.revise_lang = False
             self.schema_org = tools_qt.get_text(self.dlg_qm, self.dlg_qm.txt_schema_org)
             self._change_update_type(self.dlg_qm.lyt_existing_schema, self.dlg_qm.lyt_new_schema)
-    
+
     def _change_update_type(self, previous_layout, new_layout):
         # Disable all widgets in the previous layout
         for i in range(previous_layout.count()):
             widget = previous_layout.itemAt(i).widget()
             if widget is not None:
                 widget.setEnabled(False)
-        
+
         # Enable all widgets in the new layout
         for i in range(new_layout.count()):
             widget = new_layout.itemAt(i).widget()
@@ -136,7 +136,7 @@ class GwSchemaI18NManager:
         tools_qt.set_widget_text(self.dlg_qm, 'txt_host', host)
         tools_qt.set_widget_text(self.dlg_qm, 'txt_port', port)
         tools_qt.set_widget_text(self.dlg_qm, 'txt_db', db)
-        tools_qt.set_widget_text(self.dlg_qm, 'txt_user', user) 
+        tools_qt.set_widget_text(self.dlg_qm, 'txt_user', user)
 
     def _check_connection(self):
         """ Check connection to database """
@@ -176,7 +176,7 @@ class GwSchemaI18NManager:
             self.dlg_qm.lbl_info.clear()
             tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', f"Successful connection to {db_i18n} database")
             QApplication.processEvents()
-        
+
         if not status_org:
             self.dlg_qm.btn_update.setEnabled(False)
             self.dlg_qm.lbl_info.clear()
@@ -189,19 +189,19 @@ class GwSchemaI18NManager:
             tools_qt.show_info_box(f"Error connecting to origin database")
             QApplication.processEvents()
             return
-        
+
     def _init_db_i18n(self, host, port, db, user, password):
         """Initializes database connection"""
 
         try:
             self.conn_i18n = psycopg2.connect(database=db, user=user, port=port, password=password, host=host)
             self.cursor_i18n = self.conn_i18n.cursor(cursor_factory=psycopg2.extras.DictCursor)
-        
+
             return True
         except psycopg2.DatabaseError as e:
             self.last_error = e
             return False
-    
+
     def _init_db_org(self):
         """Initializes database connection"""
 
@@ -237,7 +237,7 @@ class GwSchemaI18NManager:
             del self.conn_i18n
         except Exception as e:
             self.last_error = e
-    
+
     def _save_user_values(self):
         """ Save selected user values """
 
@@ -276,7 +276,7 @@ class GwSchemaI18NManager:
             if self.check_for_repeated:
                 text_error += self._update_project_type(table)
             self._vacuum_commit(table, self.conn_i18n, self.cursor_i18n)
-            
+
         self.dlg_qm.lbl_info.clear()
         tools_qt.show_info_box(text_error)
 
@@ -284,7 +284,7 @@ class GwSchemaI18NManager:
         table_org = self._find_table_org(table_i18n)
         self._change_table_lyt(table_i18n)
         query = ""
-        
+
         if "sys_message" in table_org:
             query = self._update_dbmessage(table_i18n, table_org)
         elif "sys_fprocess" in table_org:
@@ -307,7 +307,7 @@ class GwSchemaI18NManager:
             except Exception as e:
                 self.conn_i18n.rollback()
                 return f"An error occured while translating {table_i18n}: {e}\n"
-            
+
     def _update_dbmessage(self, table_i18n, table_org):
         columns_i18n = "project_type, CAST(source AS INTEGER), CAST(log_level AS INTEGER), ms_en_us, ht_en_us"
         columns_org = "project_type, id, log_level, error_message, hint_message"
@@ -317,10 +317,10 @@ class GwSchemaI18NManager:
         rows_org = self._get_rows(query, self.cursor_org)
         query = ""
         for row_i18n in rows_i18n:
-            if row_i18n['ht_en_us'] == None:
+            if row_i18n['ht_en_us'] is None:
                 row_i18n['ht_en_us'] = ''
         for i, row_org in enumerate(rows_org):
-            if row_org['hint_message'] == None:
+            if row_org['hint_message'] is None:
                 row_org['hint_message'] = ''
             if row_org not in rows_i18n:
                 query_row = f"""INSERT INTO {table_i18n} (context, source_code, project_type, log_level, source, ms_en_us, ht_en_us) VALUES """
@@ -328,8 +328,8 @@ class GwSchemaI18NManager:
                             {f"'{row_org['error_message'].replace("'", "''")}'" if row_org['error_message'] not in [None, ''] else 'NULL'}, 
                             {f"'{row_org['hint_message'].replace("'", "''")}'" if row_org['hint_message'] not in [None, ''] else 'NULL'})"""
                 query_row += " ON CONFLICT (source_code, project_type, context, log_level, source) DO UPDATE"
-                query_row += f""" SET ms_en_us = {f"'{row_org['error_message'].replace("'", "''")}'" if row_org['error_message'] != '' or row_org['error_message'] == None else 'NULL'},
-                            ht_en_us = {f"'{row_org['hint_message'].replace("'", "''")}'" if row_org['hint_message'] != '' or row_org['hint_message'] == None else 'NULL'}"""
+                query_row += f""" SET ms_en_us = {f"'{row_org['error_message'].replace("'", "''")}'" if row_org['error_message'] != '' or row_org['error_message'] is None else 'NULL'},
+                            ht_en_us = {f"'{row_org['hint_message'].replace("'", "''")}'" if row_org['hint_message'] != '' or row_org['hint_message'] is None else 'NULL'}"""
                 query_row += ";\n"
                 query += query_row
         return query
@@ -343,10 +343,10 @@ class GwSchemaI18NManager:
         rows_org = self._get_rows(query, self.cursor_org)
         query = ""
         for row_i18n in rows_i18n:
-            if row_i18n['in_en_us'] == None:
+            if row_i18n['in_en_us'] is None:
                 row_i18n['in_en_us'] = ''
         for i, row_org in enumerate(rows_org):
-            if row_org['info_msg'] == None:
+            if row_org['info_msg'] is None:
                 row_org['info_msg'] = ''
             if row_org not in rows_i18n:
                 query_row = f"""INSERT INTO {table_i18n} (context, project_type, source, ex_en_us, in_en_us) VALUES """
@@ -369,14 +369,14 @@ class GwSchemaI18NManager:
         rows_org = self._get_rows(query, self.cursor_org)
         query = ""
         for row_i18n in rows_i18n:
-            if row_i18n['lb_en_us'] == None:
+            if row_i18n['lb_en_us'] is None:
                 row_i18n['lb_en_us'] = ''
-            if row_i18n['tt_en_us'] == None:
+            if row_i18n['tt_en_us'] is None:
                 row_i18n['tt_en_us'] = ''
         for i, row_org in enumerate(rows_org):
-            if row_org['label'] == None:
+            if row_org['label'] is None:
                 row_org['label'] = ''
-            if row_org['tooltip'] == None:
+            if row_org['tooltip'] is None:
                 row_org['tooltip'] = ''
             row_org_com = row_org
             row_org_com.append(self.project_type) 
@@ -439,14 +439,14 @@ class GwSchemaI18NManager:
         rows_org = self._get_rows(query, self.cursor_org)
         query = ""
         for row_i18n in rows_i18n:
-            if row_i18n['lb_en_us'] == None:
+            if row_i18n['lb_en_us'] is None:
                 row_i18n['lb_en_us'] = ''
-            if row_i18n['tt_en_us'] == None:
+            if row_i18n['tt_en_us'] is None:
                 row_i18n['tt_en_us'] = ''
         for i, row_org in enumerate(rows_org):
-            if row_org['label'] == None:
+            if row_org['label'] is None:
                 row_org['label'] = ''
-            if row_org['descript'] == None:
+            if row_org['descript'] is None:
                 row_org['descript'] = ''  
             if row_org not in rows_i18n:
                 query_row = f"""INSERT INTO {table_i18n} (context, source_code, project_type, source, lb_en_us, tt_en_us) VALUES """
@@ -469,10 +469,10 @@ class GwSchemaI18NManager:
         rows_org = self._get_rows(query, self.cursor_org)
         query = ""
         for row_i18n in rows_i18n:
-            if row_i18n['tt_en_us'] == None:
+            if row_i18n['tt_en_us'] is None:
                 row_i18n['tt_en_us'] = ''
         for i, row_org in enumerate(rows_org):
-            if row_org['idval'] == None:
+            if row_org['idval'] is None:
                 row_org['idval'] = ''
         for row_org in rows_org:  
             if row_org not in rows_i18n:
