@@ -292,7 +292,8 @@ def manage_visit_class(**kwargs):
 
     # values
     for field in complet_list['body']['data']['fields']:
-        if 'hidden' in field and field['hidden']: continue
+        if 'hidden' in field and field['hidden']:
+            continue
         model = table_view.model()
         if model is None:
             model = QStandardItemModel()
@@ -799,10 +800,12 @@ def fill_tbl(complet_result, dialog, widgetname, linkedobject, filter_fields):
     if complet_list is False:
         return False, False
     for field in complet_list['body']['data']['fields']:
-        if 'hidden' in field and field['hidden']: continue
+        if 'hidden' in field and field['hidden']:
+            continue
 
         widget = dialog.findChild(QTableView, field['widgetname'])
-        if widget is None: continue
+        if widget is None:
+            continue
         widget = tools_gw.add_tableview_header(widget, field)
         widget = tools_gw.fill_tableview_rows(widget, field)
         widget = tools_gw.set_tablemodel_config(dialog, widget, field['widgetname'], 1)
@@ -870,7 +873,8 @@ def get_filter_qtableview_mincut(dialog, widget_list, func_params, filter_fields
                     functions = [widgetfunction]
 
                 for f in functions:
-                    if 'isFilter' in f and f['isFilter']: continue
+                    if 'isFilter' in f and f['isFilter']:
+                        continue
                     columnname = widget.property('columnname')
                     parameters = f['parameters']
                     filter_sign = "ILIKE"
@@ -937,7 +941,7 @@ def open_selected_manager_item(**kwargs):
     if qtable.property('linkedobject') == 'v_ui_element':
         # Open selected element
         element_id = index.sibling(row, column_index).data()
-        manage_element(element_id, **kwargs)    
+        manage_element(element_id, **kwargs)
 
 
 def manage_element(element_id, **kwargs):
@@ -956,7 +960,7 @@ def manage_element(element_id, **kwargs):
 def delete_manager_item(**kwargs):
     """ Function called in class tools_gw.add_button(...) -->
             widget.clicked.connect(partial(getattr(self, function_name), **kwargs)) """
-    
+
     dialog = kwargs['dialog']
     params = kwargs['func_params']
     table_widget = params['targetwidget']
@@ -1013,7 +1017,7 @@ def _get_list(complet_result, form_name='', tab_name='', filter_fields='', widge
 
     form = f'"formName":"{form_name}", "tabName":"{tab_name}", "widgetname":"{widgetname}", "formtype":"{formtype}"'
     if complet_result['body'].get('feature') and complet_result['body']['feature'].get('idName'):
-        id_name = complet_result['body']['feature']['idName'] if id_name is None else id_name        
+        id_name = complet_result['body']['feature']['idName'] if id_name is None else id_name
     feature = f'"tableName":"{linkedobject}", "idName":"{id_name}", "id":"{feature_id}"'
     body = tools_gw.create_body(form, feature, filter_fields)
     json_result = tools_gw.execute_procedure('gw_fct_getlist', body, log_sql=True)

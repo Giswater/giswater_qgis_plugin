@@ -781,7 +781,8 @@ class AddNewLot():
         # 2) check if there are features related to the current visit
         # 3) if so, select them => would appear in the table associated to the model
         param_options = tools_qt.get_combo_value(self.dlg_lot, self.dlg_lot.cmb_visit_class, 4)
-        if param_options in (None, ''): return
+        if param_options in (None, ''):
+            return
         self.param_options = json.loads(param_options, object_pairs_hook=OrderedDict)
         viewname = "v_edit_" + self.feature_type.lower()
         tools_gw.set_completer_feature_id(dialog.feature_id, self.feature_type, viewname)

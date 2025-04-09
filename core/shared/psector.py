@@ -279,7 +279,8 @@ class GwPsector:
                 psector_rec = polygon.boundingBox()
                 tools_gw.reset_rubberband(self.rubber_band_rectangle)
                 rb_duration = tools_gw.get_config_parser("system", "show_psector_ruberband_duration", "user", "init", prefix=False)
-                if rb_duration == "0": rb_duration = None
+                if rb_duration == "0":
+                    rb_duration = None
                 tools_qgis.draw_polygon(points, self.rubber_band_rectangle, duration_time=rb_duration)
 
                 # Manage Zoom to rectangle
@@ -2254,7 +2255,8 @@ class GwPsector:
                 except AttributeError:
                     pass
 
-        if self.arc_id is None: return
+        if self.arc_id is None:
+            return
 
         the_geom = f"ST_GeomFromText('POINT({point.x()} {point.y()})', {lib_vars.data_epsg})"
 
@@ -2351,7 +2353,8 @@ class GwPsector:
                 except AttributeError:
                     pass
 
-        if self.arc_id is None: return
+        if self.arc_id is None:
+            return
 
         # Populate combo arccat
         sql = "SELECT cat_arc.id AS id, cat_arc.id as idval FROM cat_arc WHERE id IS NOT NULL AND active IS TRUE "

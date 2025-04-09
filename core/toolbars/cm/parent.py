@@ -985,7 +985,8 @@ class ParentAction(object):
 
         self.resetRubberbands()
         layer = self.controller.get_layer_by_tablename(layer_name)
-        if not layer: return
+        if not layer:
+            return
 
         row = index.row()
         column_index = utils_giswater.get_col_index_by_col_name(qtable, field_id)

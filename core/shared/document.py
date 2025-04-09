@@ -472,7 +472,8 @@ class GwDocument(QObject):
         if complet_list is False:
             return False
         for field in complet_list['body']['data']['fields']:
-            if field.get('hidden'): continue
+            if field.get('hidden'):
+                continue
             model = self.dlg_man.tbl_document.model()
             if model is None:
                 model = QStandardItemModel()

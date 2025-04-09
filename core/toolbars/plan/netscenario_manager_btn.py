@@ -84,7 +84,7 @@ class GwNetscenarioManagerButton(GwAction):
         self.tbl_netscenario.doubleClicked.connect(self._open_netscenario)
         self.dlg_netscenario_manager.btn_update_netscenario.clicked.connect(
             partial(self._update_current_netscenario, self.dlg_netscenario_manager, self.tbl_netscenario))
-        
+
         self.dlg_netscenario_manager.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_netscenario_manager))
         self.dlg_netscenario_manager.finished.connect(partial(tools_gw.save_settings, self.dlg_netscenario_manager))
         self.dlg_netscenario_manager.finished.connect(partial(self.save_user_values))
@@ -114,7 +114,7 @@ class GwNetscenarioManagerButton(GwAction):
 
         action_execute = QAction("Execute", qtableview)
         action_execute.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_execute"))
-        menu.addAction(action_execute)        
+        menu.addAction(action_execute)
 
         action_duplicate = QAction("Duplicate", qtableview)
         action_duplicate.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_duplicate"))
@@ -253,7 +253,8 @@ class GwNetscenarioManagerButton(GwAction):
         if complet_list is False:
             return False, False
         for field in complet_list['body']['data']['fields']:
-            if field.get('hidden'): continue
+            if field.get('hidden'):
+                continue
             model = self.tbl_netscenario.model()
             if model is None:
                 model = QStandardItemModel()

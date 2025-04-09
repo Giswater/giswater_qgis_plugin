@@ -2078,9 +2078,11 @@ class GwInfo(QObject):
 
     def _set_auto_update_textarea(self, field, dialog, widget, new_feature):
 
-        if widget.property('isfilter'): return widget
+        if widget.property('isfilter'):
+            return widget
         if widget.property('widgetcontrols') is not None and 'saveValue' in widget.property('widgetcontrols'):
-            if widget.property('widgetcontrols')['saveValue'] is False: return widget
+            if widget.property('widgetcontrols')['saveValue'] is False:
+                return widget
 
         if self._check_tab_data(field):  # Tab data
             # "and field['widgettype'] != 'typeahead'" It is necessary so that the textchanged signal of the typeahead
@@ -2200,18 +2202,22 @@ class GwInfo(QObject):
 
     def _set_auto_update_combobox(self, field, dialog, widget, new_feature):
 
-        if widget.property('isfilter'): return widget
+        if widget.property('isfilter'):
+            return widget
         if widget.property('widgetcontrols') is not None and 'saveValue' in widget.property('widgetcontrols'):
-            if widget.property('widgetcontrols')['saveValue'] is False: return widget
+            if widget.property('widgetcontrols')['saveValue'] is False:
+                return widget
         widget.currentIndexChanged.connect(partial(self._handle_combobox_change, widget, dialog, field))
 
         return widget
 
     def _set_auto_update_dateedit(self, field, dialog, widget, new_feature):
 
-        if widget.property('isfilter'): return widget
+        if widget.property('isfilter'):
+            return widget
         if widget.property('widgetcontrols') is not None and 'saveValue' in widget.property('widgetcontrols'):
-            if widget.property('widgetcontrols')['saveValue'] is False: return widget
+            if widget.property('widgetcontrols')['saveValue'] is False:
+                return widget
 
         if self._check_tab_data(field):  # Tab data
             if field['isautoupdate'] and self.new_feature_id is None:
@@ -2230,10 +2236,11 @@ class GwInfo(QObject):
 
     def _set_auto_update_spinbox(self, field, dialog, widget, new_feature):
 
-        if widget.property('isfilter'): return widget
-        if widget.property('isfilter'): return widget
+        if widget.property('isfilter'):
+            return widget
         if widget.property('widgetcontrols') is not None and 'saveValue' in widget.property('widgetcontrols'):
-            if widget.property('widgetcontrols')['saveValue'] is False: return widget
+            if widget.property('widgetcontrols')['saveValue'] is False:
+                return widget
 
         if self._check_tab_data(field):  # Tab data
             if field['isautoupdate'] and self.new_feature_id is None:
@@ -2252,9 +2259,11 @@ class GwInfo(QObject):
 
     def _set_auto_update_checkbox(self, field, dialog, widget, new_feature):
 
-        if widget.property('isfilter'): return widget
+        if widget.property('isfilter'):
+            return widget
         if widget.property('widgetcontrols') is not None and 'saveValue' in widget.property('widgetcontrols'):
-            if widget.property('widgetcontrols')['saveValue'] is False: return widget
+            if widget.property('widgetcontrols')['saveValue'] is False:
+                return widget
 
         if self._check_tab_data(field):  # Tab data
             if field['isautoupdate'] and self.new_feature_id is None:
@@ -2666,7 +2675,7 @@ class GwInfo(QObject):
                         index_to_remove.append(i)
                 for i in index_to_remove:
                     cmb_visit_class.removeItem(i)
-                    
+
                 current_index = cmb_visit_class.currentIndex()
                 cmb_visit_class.currentIndexChanged.emit(current_index)
 
@@ -2676,7 +2685,7 @@ class GwInfo(QObject):
 
                 btn_open_gallery.setEnabled(False)
                 tbl_visits.selectionModel().selectionChanged.connect(partial(self._manage_gallery_status, tbl_visits, btn_open_gallery))
-        
+
                 self.tab_visit_loaded = True
             # Tab 'Event'
             case 'tab_event' if not self.tab_event_loaded:
@@ -2698,8 +2707,8 @@ class GwInfo(QObject):
     def _manage_gallery_status(self, tbl_visits, btn_open_gallery):
 
         selected_indexes = tbl_visits.selectionModel().selectedRows()
-        
-        if selected_indexes:  
+
+        if selected_indexes:
             row = selected_indexes[0].row()
             column_photo = tbl_visits.model().columnCount() - 1
             index = tbl_visits.model().index(row, column_photo)
@@ -2739,10 +2748,12 @@ class GwInfo(QObject):
         if complet_list is False:
             return False, False
         for field in complet_list['body']['data']['fields']:
-            if 'hidden' in field and field['hidden']: continue
+            if 'hidden' in field and field['hidden']:
+                continue
 
             widget = self.dlg_cf.findChild(QTableView, field['widgetname'])
-            if widget is None: continue
+            if widget is None:
+                continue
             short_name = field['widgetname'].replace(f"tab_{tab_name}_", "", 1)
             widget = tools_gw.add_tableview_header(widget, field)
             widget = tools_gw.fill_tableview_rows(widget, field)
@@ -2794,13 +2805,15 @@ class GwInfo(QObject):
         # QTableView and we gain in performance
         last_widget = None
         for widget in widget_list:
-            if widget.property('isfilter') is not True: continue
+            if widget.property('isfilter') is not True:
+                continue
             widgetfunction = False
             func_params = None
             if widget.property('widgetfunction') is not None and 'functionName' in widget.property('widgetfunction'):
                 widgetfunction = widget.property('widgetfunction')['functionName']
                 func_params = widget.property('widgetfunction').get('parameters')
-            if widgetfunction is False: continue
+            if widgetfunction is False:
+                continue
 
             field_id = None
             if func_params is not None:
@@ -3254,7 +3267,8 @@ def fill_tbl(complet_list, tbl, info, view, dlg):
 
     # values
     for field in complet_list['body']['data']['fields']:
-        if 'hidden' in field and field['hidden']: continue
+        if 'hidden' in field and field['hidden']:
+            continue
         model = tbl.model()
         if model is None:
             model = QStandardItemModel()

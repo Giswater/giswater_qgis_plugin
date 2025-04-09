@@ -278,7 +278,7 @@ class GwElement:
 
         # Populate the dialog with fields
         self._populate_dynamic_widgets(self.dlg_mng, json_result)
-        self.load_connections(self.complet_result)     
+        self.load_connections(self.complet_result)
 
         # Open the dialog
         tools_gw.open_dialog(self.dlg_mng, dlg_name=form_type)
@@ -297,14 +297,14 @@ class GwElement:
             orientation = layout_info.get('lytOrientation')
             if orientation:
                 layout_orientations[layout_name] = orientation
-        
+
         # Loop through fields and add them to the appropriate layouts
         for field in complet_result['body']['data']['fields']:
             # Skip hidden fields
             if field.get('hidden'):
                 continue
-            
-            # Pass required parameters (dialog, result, field, tablename, class_info)            
+
+            # Pass required parameters (dialog, result, field, tablename, class_info)
             label, widget = tools_gw.set_widgets(dialog, complet_result, field, tablename, self)
 
             if widget is None:
@@ -355,7 +355,7 @@ class GwElement:
                 return False
             tools_gw.set_filter_listeners(complet_result, self.dlg_mng, widget_list, columnname, widgetname)
 
-    # region private functions    
+    # region private functions
 
     def _get_point_xy(self):
 
@@ -620,7 +620,7 @@ class GwElement:
                f" WHERE element_type = '{element_type}'"
                f" ORDER BY id")
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.dlg_add_element.elementcat_id, rows)    
+        tools_qt.fill_combo_values(self.dlg_add_element.elementcat_id, rows)
 
     def _check_date(self, widget, button=None, regex_type=1):
         """ Set QRegExpression in order to validate QLineEdit(widget) field type date.
@@ -731,9 +731,11 @@ class GwElement:
                                            field_id='expl_id', field_name='name')
 
             builtdate = tools_gw.get_config_value('edit_builtdate_vdefault')
-            if builtdate: self.dlg_add_element.builtdate.setText(builtdate[0].replace('/', '-'))
+            if builtdate:
+                self.dlg_add_element.builtdate.setText(builtdate[0].replace('/', '-'))
             enddate = tools_gw.get_config_value('edit_enddate_vdefault')
-            if enddate: self.dlg_add_element.enddate.setText(enddate[0].replace('/', '-'))
+            if enddate:
+                self.dlg_add_element.enddate.setText(enddate[0].replace('/', '-'))
             self._set_combo_from_param_user(dialog, 'workcat_id', 'cat_work', 'edit_workcat_vdefault',
                                            field_id='id', field_name='id')
             if single_tool_mode is not None:

@@ -307,13 +307,20 @@ class GwGo2EpaButton(GwAction):
             self.chk_import_result = self.dlg_go2epa.chk_import_result.isChecked()
         elif action == 'restore':
             # Set widgets form values
-            if self.txt_result_name is not 'null': tools_qt.set_widget_text(self.dlg_go2epa, self.dlg_go2epa.txt_result_name, self.txt_result_name)
-            if self.chk_export is not 'null': tools_qt.set_widget_text(self.dlg_go2epa, self.dlg_go2epa.chk_export, self.chk_export)
-            if self.chk_export_subcatch is not 'null': tools_qt.set_widget_text(self.dlg_go2epa, self.dlg_go2epa.chk_export_subcatch, self.chk_export_subcatch)
-            if self.txt_file_inp is not 'null': tools_qt.set_widget_text(self.dlg_go2epa, self.dlg_go2epa.txt_file_inp, self.txt_file_inp)
-            if self.chk_exec is not 'null': tools_qt.set_widget_text(self.dlg_go2epa, self.dlg_go2epa.chk_exec, self.chk_exec)
-            if self.txt_file_rpt is not 'null': tools_qt.set_widget_text(self.dlg_go2epa, self.dlg_go2epa.txt_file_rpt, self.txt_file_rpt)
-            if self.chk_import_result is not 'null': tools_qt.set_widget_text(self.dlg_go2epa, self.dlg_go2epa.chk_import_result, self.chk_import_result)
+            if self.txt_result_name is not 'null':
+                tools_qt.set_widget_text(self.dlg_go2epa, self.dlg_go2epa.txt_result_name, self.txt_result_name)
+            if self.chk_export is not 'null':
+                tools_qt.set_widget_text(self.dlg_go2epa, self.dlg_go2epa.chk_export, self.chk_export)
+            if self.chk_export_subcatch is not 'null':
+                tools_qt.set_widget_text(self.dlg_go2epa, self.dlg_go2epa.chk_export_subcatch, self.chk_export_subcatch)
+            if self.txt_file_inp is not 'null':
+                tools_qt.set_widget_text(self.dlg_go2epa, self.dlg_go2epa.txt_file_inp, self.txt_file_inp)
+            if self.chk_exec is not 'null':
+                tools_qt.set_widget_text(self.dlg_go2epa, self.dlg_go2epa.chk_exec, self.chk_exec)
+            if self.txt_file_rpt is not 'null':
+                tools_qt.set_widget_text(self.dlg_go2epa, self.dlg_go2epa.txt_file_rpt, self.txt_file_rpt)
+            if self.chk_import_result is not 'null':
+                tools_qt.set_widget_text(self.dlg_go2epa, self.dlg_go2epa.chk_import_result, self.chk_import_result)
 
     def _go2epa_select_file_inp(self):
         """ Select INP file """

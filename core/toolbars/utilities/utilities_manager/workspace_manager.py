@@ -146,7 +146,8 @@ class GwWorkspaceManagerButton(GwAction):
         if complet_list is False:
             return False, False
         for field in complet_list['body']['data']['fields']:
-            if field.get('hidden'): continue
+            if field.get('hidden'):
+                continue
             model = self.tbl_wrkspcm.model()
             if model is None:
                 model = QStandardItemModel()

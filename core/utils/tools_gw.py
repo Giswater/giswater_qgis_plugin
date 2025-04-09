@@ -1266,7 +1266,8 @@ def enable_widgets(dialog, result, enable):
     try:
         widget_list = dialog.findChildren(QWidget)
         for widget in widget_list:
-            if widget.property('isfilter'): continue
+            if widget.property('isfilter'):
+                continue
             for field in result['fields']:
                 if widget.property('columnname') == field['columnname']:
                     # If it's not the main tab we want the widgets to be enabled
@@ -2408,7 +2409,8 @@ def add_combo(field, dialog=None, complet_result=None, ignore_function=False, cl
                 return widget
             functions = [widgetfunction]
         for f in functions:
-            if 'isFilter' in f and f['isFilter']: continue
+            if 'isFilter' in f and f['isFilter']:
+                continue
             columnname = field['columnname']
             parameters = f.get('parameters')
 
@@ -3699,7 +3701,8 @@ def add_tableview_header(widget, field):
 
 
 def fill_tableview_rows(widget, field):
-    if field is None or field.get('value') is None: return widget
+    if field is None or field.get('value') is None:
+        return widget
     model = widget.model()
 
     for item in field['value']:
@@ -4629,10 +4632,12 @@ def fill_tbl(complet_result, dialog, widgetname, linkedobject, filter_fields):
     if complet_list is False:
         return False, False
     for field in complet_list['body']['data']['fields']:
-        if 'hidden' in field and field['hidden']: continue
+        if 'hidden' in field and field['hidden']:
+            continue
         short_name = f'{tab_name}_{field["widgetname"]}'
         widget = dialog.findChild(QTableView, short_name)
-        if widget is None: continue
+        if widget is None:
+            continue
         widget = add_tableview_header(widget, field)
         widget = fill_tableview_rows(widget, field)
         widget = set_tablemodel_config(dialog, widget, short_name, 1)
@@ -4713,7 +4718,8 @@ def set_filter_listeners(complet_result, dialog, widget_list, columnname, widget
     # QTableView and we gain in performance
     last_widget = None
     for widget in widget_list:
-        if widget.property('isfilter') is not True: continue
+        if widget.property('isfilter') is not True:
+            continue
         module = tools_backend_calls
         functions = None
         if widget.property('widgetfunction') is not None and isinstance(widget.property('widgetfunction'), list):
@@ -4728,7 +4734,8 @@ def set_filter_listeners(complet_result, dialog, widget_list, columnname, widget
         if widget.property('widgetfunction') is not None and 'functionName' in widget.property('widgetfunction'):
             widgetfunction = widget.property('widgetfunction')['functionName']
             functions = [widget.property('widgetfunction')]
-        if widgetfunction is False: continue
+        if widgetfunction is False:
+            continue
 
         linkedobject = ""
         if widget.property('linkedobject') is not None:

@@ -174,7 +174,7 @@ class GwDscenarioManagerButton(GwAction):
 
         # Open dialog
         self.dlg_hydrology_manager.setWindowTitle(f'Hydrology scenario manager')
-        tools_gw.open_dialog(self.dlg_hydrology_manager, 'dscenario_manager')        
+        tools_gw.open_dialog(self.dlg_hydrology_manager, 'dscenario_manager')
 
     def _open_dwf_manager(self):
         """"""
@@ -235,7 +235,7 @@ class GwDscenarioManagerButton(GwAction):
 
         # Open dialog
         self.dlg_dwf_manager.setWindowTitle(f'DWF scenario manager')
-        tools_gw.open_dialog(self.dlg_dwf_manager, 'dscenario_manager')    
+        tools_gw.open_dialog(self.dlg_dwf_manager, 'dscenario_manager')
 
     def _open_dscenario_manager(self):
         """ Open dscenario manager """
@@ -313,7 +313,7 @@ class GwDscenarioManagerButton(GwAction):
 
         action_toggle = QAction("Toggle active", qtableview)
         action_toggle.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_toggle_active"))
-        menu.addAction(action_toggle)        
+        menu.addAction(action_toggle)
 
         action_duplicate = QAction("Duplicate", qtableview)
         action_duplicate.triggered.connect(partial(tools_gw._force_button_click, qtableview.window(), QPushButton, "btn_duplicate"))
@@ -469,7 +469,8 @@ class GwDscenarioManagerButton(GwAction):
         if complet_list is False:
             return False, False
         for field in complet_list['body']['data']['fields']:
-            if field.get('hidden'): continue
+            if field.get('hidden'):
+                continue
             model = self.tbl_dscenario.model()
             if model is None:
                 model = QStandardItemModel()
@@ -964,14 +965,14 @@ class GwDscenarioManagerButton(GwAction):
 
     def _manage_properties(self, dialog, view, feature_id=None):
         tablename = view
-        pkey = self.views_dict[view]      
+        pkey = self.views_dict[view]
 
         # Check if there are selected rows
         selected_list = self.tbl_dscenario.selectionModel().selectedRows()
         if len(selected_list) == 0:
             message = "Any record selected"
             tools_qgis.show_warning(message, dialog=dialog)
-            return  
+            return
 
         if feature_id is None:
             feature_id = self.selected_dscenario_id
