@@ -27,7 +27,8 @@ BEGIN
 
 			IF v_projecttype = 'WS' THEN
 				UPDATE link l
-				SET linkcat_id = NEW.linkcat_id
+				SET linkcat_id = NEW.linkcat_id, top_elev1 = COALESCE(NEW.top_elev1, (SELECT top_elev FROM connec WHERE connec_id=NEW.feature_id LIMIT 1)),
+				depth1 = COALESCE(NEW.depth1, (SELECT depth FROM connec WHERE connec_id=NEW.feature_id LIMIT 1))
 				WHERE l.feature_id = NEW.feature_id AND l.state > 0 AND l.link_id = NEW.link_id;
 
 				UPDATE link l SET epa_type = c.epa_type, is_operative = v.is_operative, expl_id2 = c.expl_id2, fluid_type = c.fluid_type, muni_id = c.muni_id, n_hydrometer=c.n_hydrometer

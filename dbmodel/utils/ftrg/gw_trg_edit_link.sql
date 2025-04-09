@@ -786,9 +786,10 @@ BEGIN
 
 		-- update link parameters
 		UPDATE link SET code = NEW.code, state = NEW.state, the_geom = NEW.the_geom, workcat_id = NEW.workcat_id, workcat_id_end = NEW.workcat_id_end, builtdate = NEW.builtdate,
-		enddate = NEW.enddate, exit_elev = NEW.exit_elev, top_elev2 = NEW.top_elev2, uncertain = NEW.uncertain, muni_id = NEW.muni_id, sector_id=v_sector,
-		verified = NEW.verified, custom_length = NEW.custom_length, datasource = NEW.datasource
+		enddate = NEW.enddate, uncertain = NEW.uncertain, muni_id = NEW.muni_id, sector_id=v_sector, verified = NEW.verified, custom_length = NEW.custom_length,
+		datasource = NEW.datasource, top_elev1 = NEW.top_elev1, depth1=NEW.depth1, top_elev2 = NEW.top_elev2, depth2 = NEW.depth2
 		WHERE link_id=NEW.link_id;
+		
 
 		-- Update state_type if edit_connect_update_statetype is TRUE
 		IF (SELECT ((value::json->>'connec')::json->>'status')::boolean FROM config_param_system WHERE parameter = 'edit_connect_update_statetype') IS TRUE THEN
