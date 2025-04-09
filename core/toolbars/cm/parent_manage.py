@@ -597,7 +597,7 @@ class ParentManage(ParentAction, object):
     def select_features_by_ids(self, geom_type, expr):
         """ Select features of layers of group @geom_type applying @expr """
 
-        if not geom_type in self.layers:
+        if geom_type not in self.layers:
             return
 
         # Build a list of feature id's and select them
