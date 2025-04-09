@@ -604,13 +604,14 @@ BEGIN
 		IF v_expl is null then v_expl = NEW.expl_id; END IF;
 		IF NEW.state IS NULL THEN NEW.state =  1; END IF;
 
-		IF v_linkcat_id IS NULL THEN
-				IF v_projecttype = 'WS' THEN
-					
-				ELSE
-					
-				END IF;
-			END IF;
+		-- TODO: finish this logic
+		-- IF v_linkcat_id IS NULL THEN
+		-- 		IF v_projecttype = 'WS' THEN
+
+		-- 		ELSE
+
+		-- 		END IF;
+		-- 	END IF;
 
 
 		-- insert into link table

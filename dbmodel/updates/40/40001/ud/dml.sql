@@ -44,7 +44,7 @@ INSERT INTO cat_link (id, link_type, matcat_id, descript, link, brand_id, model_
 SELECT id, 'LINK_CONNEC' AS link_type, matcat_id, descript, link, brand_id, model_id, svg, estimated_depth, active, label
 FROM cat_connec ON CONFLICT DO NOTHING;
 
-INSERT INTO cat_link (id, link_type, shape) VALUES ('UPDATE_LINK_40','LINK_CONNEC','CIRCULAR');
+INSERT INTO cat_link (id, link_type) VALUES ('UPDATE_LINK_40','LINK_CONNEC');
 
 INSERT INTO link (link_id, code, feature_id, feature_type, exit_id, exit_type, userdefined_geom, state, expl_id, the_geom,
 tstamp, exit_topelev, exit_elev, sector_id, dma_id, fluid_type, expl_id2, epa_type, is_operative, insert_user, lastupdate,
