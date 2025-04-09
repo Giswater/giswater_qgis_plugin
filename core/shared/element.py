@@ -776,7 +776,7 @@ class GwElement:
             tools_gw.get_rows_by_feature_type(self, dialog, table_object, feature_type)
             try:
                 layer = self.layers[feature_type][0]
-            except:
+            except Exception as e:
                 continue
             extent = layer.boundingBoxOfSelected()
             if extent.xMinimum() == 0 and extent.xMaximum() == 0:

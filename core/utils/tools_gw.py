@@ -1626,7 +1626,7 @@ def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None, module
 
     try:
         fields = row[pos]
-    except:
+    except Exception as e:
         fields = row
     field_id = ''
     if 'fields' in fields:
@@ -4257,7 +4257,7 @@ def user_params_to_userconfig():
                             # Get the comment (inventory) and set it (user config file)
                             comment = value2.split('#')[1]
                             set_config_parser(section_name, parameter, value.strip(), "user", file_name, comment, _pre, False)
-    except:
+    except Exception as e:
         pass
 
 
@@ -4309,7 +4309,7 @@ def remove_deprecated_config_vars():
         with open(path, 'w') as configfile:
             init_parser.write(configfile)
             configfile.close()
-    except:
+    except Exception as e:
         pass
 
     # Remove deprecated sections for session
@@ -4331,7 +4331,7 @@ def remove_deprecated_config_vars():
         with open(path, 'w') as configfile:
             session_parser.write(configfile)
             configfile.close()
-    except:
+    except Exception as e:
         pass
 
     # Remove deprecated vars for init
@@ -4358,7 +4358,7 @@ def remove_deprecated_config_vars():
         with open(path, 'w') as configfile:
             init_parser.write(configfile)
             configfile.close()
-    except:
+    except Exception as e:
         pass
 
     # Remove deprecated vars for session
@@ -4385,7 +4385,7 @@ def remove_deprecated_config_vars():
         with open(path, 'w') as configfile:
             session_parser.write(configfile)
             configfile.close()
-    except:
+    except Exception as e:
         pass
 
 

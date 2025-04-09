@@ -820,7 +820,7 @@ class AddNewLot():
                     layer.removeSelection()
                 for layer in self.layers['element']:
                     layer.removeSelection()
-        except:
+        except Exception as e:
             pass
 
         self.canvas.refresh()
@@ -1087,7 +1087,7 @@ class AddNewLot():
         try:
             self.feature_type = tools_qt.get_combo_value(self.dlg_lot, self.dlg_lot.cmb_visit_class, 2)
             self.canvas.selectionChanged.connect(partial(self.manage_selection, dialog, self.layer_lot, self.feature_type, self.param_options))
-        except:
+        except Exception as e:
             pass
 
     def set_tab_dis_enabled(self):

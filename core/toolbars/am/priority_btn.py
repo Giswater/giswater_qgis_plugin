@@ -1013,7 +1013,7 @@ class CalculatePriority:
                 total += float(widget.text())
             self.total_weight[lyt] = total
             label.setText(str(round(self.total_weight[lyt], 2)))
-        except:
+        except Exception as e:
             self.total_weight[lyt] = None
             label.setText("Error")
 
@@ -1101,7 +1101,7 @@ class CalculatePriority:
                 config_engine[widget_name] = float(
                     tools_qt.get_widget(dlg, widget_name).text()
                 )
-            except:
+            except Exception as e:
                 msg = "Invalid value for field"
                 info = "Please enter a valid number."
                 tools_qt.show_info_box(

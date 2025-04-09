@@ -2862,7 +2862,7 @@ class GwNonVisual:
 
         try:
             self.manager_dlg.main_tab.currentWidget().model().select()
-        except:
+        except Exception as e:
             pass
 
     def _connect_dialog_signals(self):

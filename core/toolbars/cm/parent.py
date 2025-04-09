@@ -60,7 +60,7 @@ class ParentAction(object):
             self.rubber_polygon = QgsRubberBand(self.canvas, 2)
             self.rubber_polygon.setColor(Qt.darkRed)
             self.rubber_polygon.setIconSize(20)
-        except:
+        except Exception as e:
             pass
 
     def set_controller(self, controller):
@@ -160,7 +160,7 @@ class ParentAction(object):
                 if int(y) > screen_y:
                     y = int(screen_y)
                 dialog.setGeometry(int(x), int(y), int(width), int(height))
-        except:
+        except Exception as e:
             pass
 
     def save_settings(self, dialog=None):

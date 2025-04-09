@@ -495,7 +495,7 @@ class GwInfo(QObject):
             try:
                 list_points = (f'"x1": {complet_result["body"]["feature"]["geometry"]["x"]}, '
                                f'"y1": {complet_result["body"]["feature"]["geometry"]["y"]}')
-            except:
+            except Exception as e:
                 pass
 
         for tab in complet_result['body']['form']['visibleTabs']:

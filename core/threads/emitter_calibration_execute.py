@@ -129,7 +129,7 @@ class EmitterCalibrationExecute(QgsTask, QObject):
                 demand = self.results.node["demand"].loc[:, junction]
                 junction_demand = demand.sum().sum()
                 network_demand += junction_demand
-            except:
+            except Exception as e:
                 continue
         for dma_id in effc_by_dma:
             dma_demand = 0
@@ -140,7 +140,7 @@ class EmitterCalibrationExecute(QgsTask, QObject):
                     demand = self.results.node["demand"].loc[:, junction]
                     junction_demand = demand.sum().sum()
                     dma_demand += junction_demand
-                except:
+                except Exception as e:
                     continue
             # Multiply demands for work with wntr units
             demand_by_dma[dma_id] = dma_demand * 1000
@@ -481,7 +481,7 @@ class EmitterCalibrationExecute(QgsTask, QObject):
                 demand = self.results.node["demand"].loc[:, junction]
                 junction_demand = demand.sum().sum()
                 demands += junction_demand
-            except:
+            except Exception as e:
                 continue
         # Multiply demands for work with wntr units
         return demands * 1000

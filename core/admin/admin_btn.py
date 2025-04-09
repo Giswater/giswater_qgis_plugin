@@ -491,7 +491,7 @@ class GwAdminButton:
             chk_widget = self.dlg_readsql_create_project.findChild(QWidget, create_schema_type)
             try:
                 chk_widget.setChecked(True)
-            except:
+            except Exception as e:
                 pass
 
         # TODO: do and call listener for buton + table -> temp_csv

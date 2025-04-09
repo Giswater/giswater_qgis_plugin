@@ -103,7 +103,7 @@ class ParentManage(ParentAction, object):
                     layer.removeSelection()
                 for layer in self.layers['element']:
                     layer.removeSelection()
-        except:
+        except Exception as e:
             pass
 
         self.canvas.refresh()
@@ -958,7 +958,7 @@ class ParentManage(ParentAction, object):
             self.canvas.xyCoordinates.disconnect()
             if self.emit_point:
                 self.emit_point.canvasClicked.disconnect()
-        except:
+        except Exception as e:
             pass
 
     def fill_table_object(self, widget, table_name, expr_filter=None):
