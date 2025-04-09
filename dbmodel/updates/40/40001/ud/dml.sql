@@ -19,3 +19,5 @@ INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, active) 
 INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, active) VALUES ('FRPUMP', 'PUMP', 'FLWREG', 'v_edit_flwreg', true) ON CONFLICT (id) DO NOTHING;
 -- Adding objects on config_info_layer and config_info_layer_x_type (this both tables controls the button info)
 INSERT INTO config_info_layer VALUES ('v_edit_flwreg', TRUE, 'flwreg', TRUE, 'info_generic', 'Flow regulator', 4);
+
+UPDATE config_info_layer SET is_parent=false, tableparent_id=NULL WHERE layer_id='v_edit_gully';
