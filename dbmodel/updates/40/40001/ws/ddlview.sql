@@ -976,6 +976,8 @@ AS WITH
         l.is_operative,
         l.staticpressure,
         l.linkcat_id,
+        cat_link.link_type,
+        cat_feature.feature_class AS sys_type,
         l.workcat_id,
         l.workcat_id_end,
         l.builtdate,
@@ -998,6 +1000,8 @@ AS WITH
         JOIN selector_expl se ON ((se.cur_user =current_user AND se.expl_id = l.expl_id) or (se.cur_user =current_user AND se.expl_id = l.expl_id2))
         JOIN selector_sector sc ON (sc.cur_user = CURRENT_USER AND sc.sector_id = l.sector_id)
         JOIN sector_table ON sector_table.sector_id = l.sector_id
+        JOIN cat_link ON cat_link.id::text = l.linkcat_id::text
+        JOIN cat_feature ON cat_feature.id::text = cat_link.link_type::text
         LEFT JOIN presszone_table ON presszone_table.presszone_id = l.presszone_id
         LEFT JOIN dma_table ON dma_table.dma_id = l.dma_id
         LEFT JOIN dqa_table ON dqa_table.dqa_id = l.dqa_id

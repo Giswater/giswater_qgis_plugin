@@ -21,3 +21,52 @@ INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, active) 
 INSERT INTO config_info_layer VALUES ('v_edit_flwreg', TRUE, 'flwreg', TRUE, 'info_generic', 'Flow regulator', 4);
 
 UPDATE config_info_layer SET is_parent=false, tableparent_id=NULL WHERE layer_id='v_edit_gully';
+
+INSERT INTO sys_feature_class (id, "type", epa_default, man_table) VALUES('LINK_GULLY', 'LINK', 'UNDEFINED', 'man_link_gully');
+
+INSERT INTO cat_feature (id, feature_class, feature_type, shortcut_key, parent_layer, child_layer, descript, link_path, code_autofill, active, addparam)
+VALUES('LINK_CONNEC', 'LINK_CONNEC', 'LINK', NULL, 'v_edit_link', 've_link_connec', 'Connec link', NULL, true, true, NULL);
+INSERT INTO cat_feature (id, feature_class, feature_type, shortcut_key, parent_layer, child_layer, descript, link_path, code_autofill, active, addparam)
+VALUES('LINK_GULLY', 'LINK_GULLY', 'LINK', NULL, 'v_edit_link', 've_link_gully', 'Gully link', NULL, true, true, NULL);
+
+INSERT INTO cat_feature_link (id) VALUES ('LINK_CONNEC');
+INSERT INTO cat_feature_link (id) VALUES ('LINK_GULLY');
+
+INSERT INTO sys_param_user (id, formname, descript, sys_role, idval, "label", dv_querytext, dv_parent_id, isenabled, layoutorder, project_type, isparent, dv_querytext_filterc, feature_field_id, feature_dv_parent_value, isautoupdate, "datatype", widgettype, ismandatory, widgetcontrols, vdefault, layoutname, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, placeholder, "source")
+VALUES('edit_gully_linkcat_vdefault', 'config', 'Value default catalog for link connected to gully', 'role_edit', NULL, 'Default catalog for linkcat:', 'SELECT cat_link.id, cat_link.id AS idval FROM cat_link JOIN cat_feature ON cat_feature.id = cat_link.link_type WHERE cat_feature.feature_type = ''LINK_GULLY''', NULL, true, 20, 'ud', false, NULL, 'linkcat_id', NULL, false, 'text', 'combo', true, NULL, 'CC020', 'lyt_gully', true, NULL, false, NULL, NULL, NULL);
+
+UPDATE sys_param_user
+SET vdefault='CC020',"label"='Default catalog for linkcat:',dv_querytext='SELECT cat_link.id, cat_link.id AS idval FROM cat_link JOIN cat_feature ON cat_feature.id = cat_link.link_type WHERE cat_feature.feature_type = ''LINK_CONNEC''',descript='Value default catalog for link connected to connec',feature_field_id='linkcat_id',ismandatory=true,dv_isnullvalue=false,project_type='utils',id='edit_connec_linkcat_vdefault'
+WHERE id='edit_connecarccat_vdefault'; -- TODO: update id
+
+
+INSERT INTO cat_link (id, link_type, matcat_id, descript, link, brand_id, model_id, svg, estimated_depth, active, label)
+SELECT id, 'LINK_CONNEC' AS link_type, matcat_id, descript, link, brand_id, model_id, svg, estimated_depth, active, label
+FROM cat_connec ON CONFLICT DO NOTHING;
+
+INSERT INTO cat_link (id, link_type, shape) VALUES ('UPDATE_LINK_40','LINK_CONNEC','CIRCULAR');
+
+INSERT INTO link (link_id, code, feature_id, feature_type, exit_id, exit_type, userdefined_geom, state, expl_id, the_geom,
+tstamp, exit_topelev, exit_elev, sector_id, dma_id, fluid_type, expl_id2, epa_type, is_operative, insert_user, lastupdate,
+lastupdate_user, linkcat_id, workcat_id, workcat_id_end, builtdate, enddate, drainzone_id, uncertain, muni_id, verified,
+macrominsector_id, dwfzone_id)
+SELECT nextval('SCHEMA_NAME.urn_id_seq'::regclass), link_id::text, feature_id, feature_type, exit_id, exit_type, userdefined_geom, state, expl_id, the_geom,
+tstamp, exit_topelev, exit_elev, sector_id, dma_id, fluid_type, expl_id2, epa_type, is_operative, insert_user, lastupdate,
+lastupdate_user,
+CASE
+  WHEN conneccat_id IS NULL THEN
+    CASE
+      WHEN feature_type = 'GULLY' THEN
+        (SELECT _connec_arccat_id FROM gully WHERE gully_id = feature_id LIMIT 1)
+      WHEN feature_type = 'CONNEC' THEN
+        (SELECT conneccat_id FROM connec WHERE connec_id = feature_id LIMIT 1)
+      ELSE
+        'UPDATE_LINK_40'
+    END
+  ELSE conneccat_id
+END AS conneccat_id, workcat_id, workcat_id_end, builtdate, enddate, drainzone_id, uncertain, muni_id, verified,
+macrominsector_id, dwfzone_id
+FROM _link;
+
+
+

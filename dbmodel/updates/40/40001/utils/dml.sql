@@ -11,3 +11,7 @@ DELETE FROM sys_table WHERE id IN ('vp_basic_arc', 'vp_basic_node', 'vp_basic_co
 UPDATE config_info_layer SET is_parent=false, tableparent_id=NULL WHERE layer_id='v_edit_node';
 UPDATE config_info_layer SET is_parent=false, tableparent_id=NULL WHERE layer_id='v_edit_connec';
 UPDATE config_info_layer SET is_parent=false, tableparent_id=NULL WHERE layer_id='v_edit_arc';
+
+INSERT INTO sys_feature_class (id, "type", epa_default, man_table) VALUES('LINK_CONNEC', 'LINK', 'UNDEFINED', 'man_link_connec');
+
+DELETE FROM cat_feature WHERE id = 'LINK';

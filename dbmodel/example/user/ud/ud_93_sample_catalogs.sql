@@ -6,14 +6,14 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-INSERT INTO cat_material (id, descript, feature_type, featurecat_id, n, link, active) VALUES('N/I', 'No information', '{NODE,ARC,CONNEC,ELEMENT,GULLY}', NULL, NULL, NULL, true);
-INSERT INTO cat_material (id, descript, feature_type, featurecat_id, n, link, active) VALUES('Unknown', 'Unknown', '{NODE,ARC,CONNEC,ELEMENT,GULLY}', NULL, 0.0130, NULL, true);
-INSERT INTO cat_material (id, descript, feature_type, featurecat_id, n, link, active) VALUES('Concret', 'Concret', '{NODE,ARC,CONNEC,ELEMENT,GULLY}', NULL, 0.0140, NULL, true);
-INSERT INTO cat_material (id, descript, feature_type, featurecat_id, n, link, active) VALUES('Brick', 'Brick', '{NODE,ARC,CONNEC,GULLY}', NULL, 0.0140, NULL, true);
-INSERT INTO cat_material (id, descript, feature_type, featurecat_id, n, link, active) VALUES('PEAD', 'PEAD', '{NODE,ARC,CONNEC,GULLY}', NULL, 0.0110, NULL, true);
+INSERT INTO cat_material (id, descript, feature_type, featurecat_id, n, link, active) VALUES('N/I', 'No information', '{NODE,ARC,CONNEC,ELEMENT,GULLY,LINK}', NULL, NULL, NULL, true);
+INSERT INTO cat_material (id, descript, feature_type, featurecat_id, n, link, active) VALUES('Unknown', 'Unknown', '{NODE,ARC,CONNEC,ELEMENT,GULLY,LINK}', NULL, 0.0130, NULL, true);
+INSERT INTO cat_material (id, descript, feature_type, featurecat_id, n, link, active) VALUES('Concret', 'Concret', '{NODE,ARC,CONNEC,ELEMENT,GULLY,LINK}', NULL, 0.0140, NULL, true);
+INSERT INTO cat_material (id, descript, feature_type, featurecat_id, n, link, active) VALUES('Brick', 'Brick', '{NODE,ARC,CONNEC,GULLY,LINK}', NULL, 0.0140, NULL, true);
+INSERT INTO cat_material (id, descript, feature_type, featurecat_id, n, link, active) VALUES('PEAD', 'PEAD', '{NODE,ARC,CONNEC,GULLY,LINK}', NULL, 0.0110, NULL, true);
 INSERT INTO cat_material (id, descript, feature_type, featurecat_id, n, link, active) VALUES('PEC', 'PEC', '{ARC,CONNEC}', NULL, 0.0120, NULL, true);
-INSERT INTO cat_material (id, descript, feature_type, featurecat_id, n, link, active) VALUES('PVC', 'PVC', '{NODE,ARC,CONNEC,GULLY}', NULL, 0.0110, NULL, true);
-INSERT INTO cat_material (id, descript, feature_type, featurecat_id, n, link, active) VALUES('Virtual', 'Virtual', '{NODE,ARC,CONNEC}', NULL, 0.0120, NULL, true);
+INSERT INTO cat_material (id, descript, feature_type, featurecat_id, n, link, active) VALUES('PVC', 'PVC', '{NODE,ARC,CONNEC,GULLY,LINK}', NULL, 0.0110, NULL, true);
+INSERT INTO cat_material (id, descript, feature_type, featurecat_id, n, link, active) VALUES('Virtual', 'Virtual', '{NODE,ARC,CONNEC,LINK}', NULL, 0.0120, NULL, true);
 INSERT INTO cat_material (id, descript, feature_type, featurecat_id, n, link, active) VALUES('FD', 'FD', '{NODE,ELEMENT,GULLY}', NULL, NULL, NULL, true);
 INSERT INTO cat_material (id, descript, feature_type, featurecat_id, n, link, active) VALUES('Iron', 'Iron', '{NODE,ELEMENT,GULLY}', NULL, NULL, NULL, true);
 
@@ -201,13 +201,6 @@ INSERT INTO cat_flwreg (id, flwreg_type, active) VALUES ('FROUTLET-01', 'FROUTLE
 INSERT INTO cat_flwreg (id, flwreg_type, active) VALUES ('FRWEIR-01', 'FRWEIR', TRUE) ON CONFLICT (id) DO NOTHING;
 INSERT INTO cat_flwreg (id, flwreg_type, active) VALUES ('FRPUMP-01', 'FRPUMP', TRUE) ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO cat_arc (id, arc_type, matcat_id, shape, geom1, geom2, geom3, geom4, geom_r, descript, link, brand_id, model_id, svg,
-estimated_depth, active, label)
-SELECT id,
-  CASE
-    WHEN connec_type='VCONNEC' THEN 'VARC'
-    ELSE 'CONDUIT'
-  END 
-  AS connec_type, matcat_id, shape, geom1, geom2, geom3, geom4, geom_r, descript, link, brand_id, model_id, svg,
-estimated_depth, active, label
+INSERT INTO cat_link (id, link_type, matcat_id, descript, link, brand_id, model_id, svg, estimated_depth, active, label)
+SELECT id, 'LINK_CONNEC' AS link_type, matcat_id, descript, link, brand_id, model_id, svg, estimated_depth, active, label
 FROM cat_connec ON CONFLICT DO NOTHING;

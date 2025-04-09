@@ -19,12 +19,11 @@ SELECT has_table('link'::name, 'Table link should exist');
 SELECT columns_are(
     'link',
     ARRAY[
-        'link_id', 'code', 'feature_id', 'feature_type', 'exit_id', 'exit_type', 'userdefined_geom', 'state', 'expl_id',
-        'the_geom', 'tstamp', 'top_elev2', 'exit_elev', 'sector_id', 'dma_id', 'fluid_type', 'presszone_id',
-        'dqa_id', 'minsector_id', 'expl_id2', 'epa_type', 'is_operative', 'insert_user', 'lastupdate',
-        'lastupdate_user', 'staticpressure', 'linkcat_id', 'workcat_id', 'workcat_id_end', 'builtdate',
-        'enddate', 'uncertain', 'muni_id', 'macrominsector_id', 'verified', 'supplyzone_id', 'n_hydrometer',
-        'custom_length', 'datasource'
+        'link_id', 'code', 'feature_id', 'feature_type', 'linkcat_id', 'top_elev1', 'depth1', 'exit_id', 'exit_type',
+        'top_elev2', 'depth2', 'userdefined_geom', 'state', 'expl_id', 'the_geom', 'tstamp', 'sector_id', 'dma_id',
+        'fluid_type', 'presszone_id', 'dqa_id', 'minsector_id', 'expl_id2', 'epa_type', 'is_operative', 'insert_user',
+        'lastupdate', 'lastupdate_user', 'staticpressure', 'workcat_id', 'workcat_id_end', 'builtdate', 'enddate',
+        'uncertain', 'muni_id', 'macrominsector_id', 'verified', 'supplyzone_id', 'n_hydrometer', 'custom_length', 'datasource'
     ],
     'Table link should have the correct columns'
 );
@@ -37,14 +36,20 @@ SELECT col_type_is('link', 'link_id', 'integer', 'Column link_id should be integ
 SELECT col_type_is('link', 'code', 'text', 'Column code should be text');
 SELECT col_type_is('link', 'feature_id', 'varchar(16)', 'Column feature_id should be varchar(16)');
 SELECT col_type_is('link', 'feature_type', 'varchar(16)', 'Column feature_type should be varchar(16)');
+SELECT col_type_is('link', 'linkcat_id', 'varchar(30)', 'Column linkcat_id should be varchar(30)');
+SELECT col_type_is('link', 'top_elev1', 'double precision', 'Column top_elev1 should be double precision');
+SELECT col_type_is('link', 'depth1', 'numeric(12,4)', 'Column depth1 should be numeric(12,4)');
 SELECT col_type_is('link', 'exit_id', 'varchar(16)', 'Column exit_id should be varchar(16)');
 SELECT col_type_is('link', 'exit_type', 'varchar(16)', 'Column exit_type should be varchar(16)');
+SELECT col_type_is('link', 'top_elev2', 'double precision', 'Column top_elev2 should be double precision');
+SELECT col_type_is('link', 'depth2', 'numeric(12,4)', 'Column depth2 should be numeric(12,4)');
 SELECT col_type_is('link', 'userdefined_geom', 'boolean', 'Column userdefined_geom should be boolean');
 SELECT col_type_is('link', 'state', 'smallint', 'Column state should be smallint');
 SELECT col_type_is('link', 'expl_id', 'integer', 'Column expl_id should be integer');
 SELECT col_type_is('link', 'the_geom', 'geometry(LineString,25831)', 'Column the_geom should be geometry(LineString,25831)');
 
 -- Check not null constraints
+SELECT col_not_null('link', 'linkcat_id', 'Column linkcat_id should be NOT NULL');
 SELECT col_not_null('link', 'state', 'Column state should be NOT NULL');
 SELECT col_not_null('link', 'expl_id', 'Column expl_id should be NOT NULL');
 
@@ -66,7 +71,7 @@ SELECT has_trigger('link', 'gw_trg_link_connecrotation_update', 'Trigger gw_trg_
 SELECT has_trigger('link', 'gw_trg_link_data', 'Trigger gw_trg_link_data should exist');
 
 -- Check foreign keys
-SELECT fk_ok('link', 'linkcat_id', 'cat_arc', 'id', 'FK linkcat_id should reference cat_arc(id)');
+SELECT fk_ok('link', 'linkcat_id', 'cat_link', 'id', 'FK linkcat_id should reference cat_link(id)');
 SELECT fk_ok('link', 'exit_type', 'sys_feature_type', 'id', 'FK exit_type should reference sys_feature_type(id)');
 SELECT fk_ok('link', 'expl_id', 'exploitation', 'expl_id', 'FK expl_id should reference exploitation(expl_id)');
 SELECT fk_ok('link', 'feature_type', 'sys_feature_type', 'id', 'FK feature_type should reference sys_feature_type(id)');

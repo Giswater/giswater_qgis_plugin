@@ -118,38 +118,23 @@ BEGIN
 		ELSIF v_table='gully' THEN
 
 			UPDATE cat_feature_gully SET double_geom=NEW.double_geom::json WHERE id=NEW.id;
-		
+
 		ELSIF v_table='flwreg' THEN
 
 			UPDATE cat_feature_flwreg SET epa_default=NEW.epa_default WHERE id=NEW.id;
 
 
 		END IF;
-	
+
 		-- manage mandatory values of config_param_user where feature is deprecated
-		DELETE FROM sys_param_user WHERE id IN (SELECT sys_param_user.id FROM sys_param_user, cat_feature 
+		DELETE FROM sys_param_user WHERE id IN (SELECT sys_param_user.id FROM sys_param_user, cat_feature
 		WHERE active=false AND concat(lower(cat_feature.id),'_vdefault') = sys_param_user.id);
 
 		RETURN NEW;
 
 	ELSIF TG_OP = 'DELETE' THEN
 
-		IF v_table='arc' THEN
-
-			DELETE FROM cat_feature_arc WHERE id = OLD.id;
-
-		ELSIF v_table='connec' THEN
-
-			DELETE FROM cat_feature_connec WHERE id = OLD.id;
-
-		ELSIF v_table='node' THEN
-
-			DELETE FROM cat_feature_node WHERE id = OLD.id;
-		
-		ELSIF v_table='flwreg' THEN
-
-			DELETE FROM cat_feature_arc WHERE id = OLD.id;
-		END IF;
+		EXECUTE 'DELETE FROM cat_feature_'||lower(v_table)||' WHERE id = '||quote_literal(OLD.id)||';';
 
 		DELETE FROM cat_feature WHERE id = OLD.id;
 

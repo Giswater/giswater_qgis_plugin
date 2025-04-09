@@ -325,6 +325,9 @@ BEGIN
 			ELSIF lower(NEW.feature_type)='connec' THEN
 				EXECUTE 'INSERT INTO cat_feature_connec (id)
 				VALUES ('||quote_literal(NEW.id)||',);';
+			ELSIF lower(NEW.feature_type)='link' THEN
+				EXECUTE 'INSERT INTO cat_feature_link (id)
+				VALUES ('||quote_literal(NEW.id)||');';
 			ELSIF lower(NEW.feature_type)='gully' THEN
 				EXECUTE 'INSERT INTO cat_feature_gully (id)
 				VALUES ('||quote_literal(NEW.id)||',);';
@@ -352,31 +355,29 @@ BEGIN
 
 		DELETE FROM config_form_tabs WHERE formname = concat('ve_', lower(old.feature_type), '_', lower(old.id));
 
-		IF v_table = 'DELETE' AND OLD.feature_class <> 'LINK' THEN
+		IF v_table = 'DELETE' THEN
 			RETURN OLD;
 		ELSE
-		    IF OLD.feature_class <> 'LINK' THEN
-				-- delete child views
-				IF OLD.child_layer IS NOT NULL THEN
-					EXECUTE 'DROP VIEW IF EXISTS '||OLD.child_layer||';';
-				END IF;
+			-- delete child views
+			IF OLD.child_layer IS NOT NULL THEN
+				EXECUTE 'DROP VIEW IF EXISTS '||OLD.child_layer||';';
+			END IF;
 
-				--delete configuration from config_form_fields
-				DELETE FROM config_form_fields where formname=OLD.child_layer AND formtype = 'form_feature';
+			--delete configuration from config_form_fields
+			DELETE FROM config_form_fields where formname=OLD.child_layer AND formtype = 'form_feature';
 
-				--delete definition from config_info_layer_x_type
-				DELETE FROM config_info_layer_x_type where tableinfo_id=OLD.child_layer OR tableinfotype_id=OLD.child_layer;
+			--delete definition from config_info_layer_x_type
+			DELETE FROM config_info_layer_x_type where tableinfo_id=OLD.child_layer OR tableinfotype_id=OLD.child_layer;
 
-				--delete definition from sys_table
-				DELETE FROM sys_table where id=OLD.child_layer;
+			--delete definition from sys_table
+			DELETE FROM sys_table where id=OLD.child_layer;
 
-				-- delete sys_param_user parameters
-				DELETE FROM sys_param_user WHERE id = concat('feat_',lower(OLD.id),'_vdefault');
+			-- delete sys_param_user parameters
+			DELETE FROM sys_param_user WHERE id = concat('feat_',lower(OLD.id),'_vdefault');
 
-				IF  v_projecttype = 'WS' and OLD.feature_class = 'NETWJOIN' THEN
-					DELETE FROM config_form_tabs where formname=OLD.child_layer and tabname in ('tab_hydrometer', 'tab_hydrometer_val');
-				END IF;
-		    END IF;
+			IF  v_projecttype = 'WS' and OLD.feature_class = 'NETWJOIN' THEN
+				DELETE FROM config_form_tabs where formname=OLD.child_layer and tabname in ('tab_hydrometer', 'tab_hydrometer_val');
+			END IF;
 		    RETURN NULL;
 		END IF;
 	END IF;

@@ -6,15 +6,15 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-INSERT INTO cat_material (id, descript, feature_type, featurecat_id, link, active) VALUES('N/I', 'No information', '{NODE,ARC,CONNEC,ELEMENT}', NULL, NULL, true);
-INSERT INTO cat_material (id, descript, feature_type, featurecat_id, link, active) VALUES('Unknown', 'Unknown', '{NODE,ARC,CONNEC,ELEMENT}', NULL, NULL, true);
-INSERT INTO cat_material (id, descript, feature_type, featurecat_id, link, active) VALUES('FD', 'Iron', '{NODE,ARC,CONNEC,ELEMENT}', NULL, 'c:\\users\users\catalog.pdf', true);
-INSERT INTO cat_material (id, descript, feature_type, featurecat_id, link, active) VALUES('PVC', 'PVC', '{NODE,ARC,CONNEC,ELEMENT}', NULL, 'c:\\users\users\catalog.pdf', true);
-INSERT INTO cat_material (id, descript, feature_type, featurecat_id, link, active) VALUES('FC', 'Fiberconcret', '{NODE,ARC,CONNEC}', NULL, 'c:\\users\users\catalog.pdf', true);
+INSERT INTO cat_material (id, descript, feature_type, featurecat_id, link, active) VALUES('N/I', 'No information', '{NODE,ARC,CONNEC,LINK,ELEMENT}', NULL, NULL, true);
+INSERT INTO cat_material (id, descript, feature_type, featurecat_id, link, active) VALUES('Unknown', 'Unknown', '{NODE,ARC,CONNEC,LINK,ELEMENT}', NULL, NULL, true);
+INSERT INTO cat_material (id, descript, feature_type, featurecat_id, link, active) VALUES('FD', 'Iron', '{NODE,ARC,CONNEC,LINK,ELEMENT}', NULL, 'c:\\users\users\catalog.pdf', true);
+INSERT INTO cat_material (id, descript, feature_type, featurecat_id, link, active) VALUES('PVC', 'PVC', '{NODE,ARC,CONNEC,LINK,ELEMENT}', NULL, 'c:\\users\users\catalog.pdf', true);
+INSERT INTO cat_material (id, descript, feature_type, featurecat_id, link, active) VALUES('FC', 'Fiberconcret', '{NODE,ARC,CONNEC,LINK}', NULL, 'c:\\users\users\catalog.pdf', true);
 INSERT INTO cat_material (id, descript, feature_type, featurecat_id, link, active) VALUES('CONCRET', 'Concret', '{ELEMENT}', NULL, 'c:\\users\users\catalog.pdf', true);
 INSERT INTO cat_material (id, descript, feature_type, featurecat_id, link, active) VALUES('BRICK+IRON', 'Brick and iron', '{ELEMENT}', NULL, 'c:\\users\users\catalog.pdf', true);
-INSERT INTO cat_material (id, descript, feature_type, featurecat_id, link, active) VALUES('PE-HD', 'PE high density', '{ARC,CONNEC}', NULL, 'c:\\users\users\catalog.pdf', true);
-INSERT INTO cat_material (id, descript, feature_type, featurecat_id, link, active) VALUES('PE-LD', 'PE low density', '{ARC,CONNEC}', NULL, 'c:\\users\users\catalog.pdf', true);
+INSERT INTO cat_material (id, descript, feature_type, featurecat_id, link, active) VALUES('PE-HD', 'PE high density', '{ARC,CONNEC,LINK}', NULL, 'c:\\users\users\catalog.pdf', true);
+INSERT INTO cat_material (id, descript, feature_type, featurecat_id, link, active) VALUES('PE-LD', 'PE low density', '{ARC,CONNEC,LINK}', NULL, 'c:\\users\users\catalog.pdf', true);
 INSERT INTO cat_material (id, descript, feature_type, featurecat_id, link, active) VALUES('FC-FC-FC', 'Fiberconcret', '{NODE}', NULL, 'c:\\users\users\catalog.pdf', true);
 INSERT INTO cat_material (id, descript, feature_type, featurecat_id, link, active) VALUES('FD-FD-PVC', 'Iron-Iron-PVC', '{NODE}', NULL, 'c:\\users\users\catalog.pdf', true);
 
@@ -178,12 +178,6 @@ INSERT INTO man_type_location VALUES (3, 'St. Location', 'CONNEC', NULL, NULL, t
 INSERT INTO man_type_location VALUES (4, 'St. Location', 'ELEMENT', NULL, NULL, true);
 
 
-INSERT INTO cat_arc (id, arc_type, matcat_id, pnom, dnom, dint, dext, descript, link, brand_id, model_id, svg, estimated_depth,
-active, label)
-SELECT id,
-  CASE
-    WHEN connec_type='VCONNEC' THEN 'VARC'
-    ELSE 'PIPE'
-  END 
-  AS connec_type, matcat_id, pnom, dnom, dint, dext, descript, link, brand_id, model_id, svg, estimated_depth, active, "label"
-FROM cat_connec;
+INSERT INTO cat_link (id, link_type, matcat_id, descript, link, brand_id, model_id, svg, estimated_depth, active, label)
+SELECT id, 'LINK_CONNEC' AS link_type, matcat_id, descript, link, brand_id, model_id, svg, estimated_depth, active, label
+FROM cat_connec ON CONFLICT DO NOTHING;
