@@ -12,15 +12,15 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 SELECT plan(6);
 
-INSERT INTO v_edit_link (link_id, code, feature_type, feature_id, exit_type, exit_id, state, expl_id, sector_id, sector_type, macrosector_id, presszone_id, presszone_type, presszone_head, dma_id, dma_type, macrodma_id, dqa_id, dqa_type, macrodqa_id, top_elev2, exit_elev, fluid_type, gis_length, the_geom, muni_id, expl_id2, epa_type, is_operative, staticpressure, linkcat_id, workcat_id, workcat_id_end, builtdate, enddate, lastupdate, lastupdate_user, uncertain, minsector_id, macrominsector_id, verified)
+INSERT INTO v_edit_link (link_id, code, feature_type, feature_id, exit_type, exit_id, state, expl_id, sector_id, sector_type, macrosector_id, presszone_id, presszone_type, presszone_head, dma_id, dma_type, macrodma_id, dqa_id, dqa_type, macrodqa_id, top_elev2, elevation1, fluid_type, gis_length, the_geom, muni_id, expl_id2, epa_type, is_operative, staticpressure, linkcat_id, workcat_id, workcat_id_end, builtdate, enddate, lastupdate, lastupdate_user, uncertain, minsector_id, macrominsector_id, verified)
 VALUES(-901, '-901', 'CONNEC', '3008', 'ARC', '2067', 1, 1, 3, 'DISTRIBUTION', 1, '3', NULL, 71.75, 2, NULL, NULL, 1, NULL, NULL, NULL, NULL, 'St. Fluid', 16.646, 'SRID=25831;LINESTRING (419084.18264611065 4576806.076099069, 419093.3076407612 4576819.998540623)'::public.geometry, 1, NULL, 'JUNCTION', true, 22.741, 'PVC25-PN16-DOM', NULL, NULL, '2002-04-21', NULL, NULL, NULL, false, 113854, NULL, 0);
 SELECT is((SELECT count(*)::integer FROM v_edit_link WHERE code = '-901'), 1, 'INSERT: v_edit_link -901 was inserted');
 SELECT is((SELECT count(*)::integer FROM link WHERE code = '-901'), 1, 'INSERT: link -901 was inserted');
 
 
-UPDATE v_edit_link SET exit_elev = -901 WHERE code = '-901';
-SELECT is((SELECT exit_elev::integer FROM v_edit_link WHERE code = '-901'), -901, 'UPDATE: v_edit_link -901 was updated');
-SELECT is((SELECT exit_elev::integer FROM link WHERE code = '-901'), -901, 'UPDATE: link -901 was updated');
+UPDATE v_edit_link SET verified = true WHERE code = '-901';
+SELECT is((SELECT verified::boolean FROM v_edit_link WHERE code = '-901'), true, 'UPDATE: v_edit_link -901 was updated');
+SELECT is((SELECT verified::boolean FROM link WHERE code = '-901'), true, 'UPDATE: link -901 was updated');
 
 
 DELETE FROM v_edit_link WHERE code = '-901';
