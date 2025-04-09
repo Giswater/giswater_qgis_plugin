@@ -15,3 +15,5 @@ UPDATE config_info_layer SET is_parent=false, tableparent_id=NULL WHERE layer_id
 INSERT INTO sys_feature_class (id, "type", epa_default, man_table) VALUES('SERVCONNECTION', 'LINK', 'UNDEFINED', 'man_servconnection');
 
 DELETE FROM cat_feature WHERE id = 'LINK';
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source") VALUES(3286, 'arc_id column cannot be modified when state = 0 on plan_psector %psector_id%.', '', 2, true, 'utils', 'core');

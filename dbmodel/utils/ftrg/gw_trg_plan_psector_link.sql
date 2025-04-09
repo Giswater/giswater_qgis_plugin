@@ -11,7 +11,7 @@ CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_trg_plan_psector_link()
 $BODY$
 
 
-DECLARE 
+DECLARE
 
 v_table_name text;
 v_point_aux public.geometry;
@@ -26,15 +26,15 @@ v_arc record;
 v_feature text;
 v_id integer;
 v_link record;
-	
-BEGIN 
+
+BEGIN
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
-	
+
 	v_table_name:= TG_ARGV[0];
 	v_schemaname='SCHEMA_NAME';
 	v_projecttype = (SELECT project_type FROM sys_version ORDER BY id DESC LIMIT 1);
-	
+
 	IF NEW.arc_id='' THEN NEW.arc_id=NULL; END IF;
 
 	-- setting variables
@@ -55,11 +55,11 @@ BEGIN
 
 	-- executing options
 	IF TG_OP = 'INSERT' THEN
-	
+
 		IF NEW.state = 0 THEN
-			
+
 		ELSIF NEW.state = 1 THEN
-	
+
 			IF NEW.arc_id IS NOT NULL AND NEW.link_id IS NULL THEN
 
 				EXECUTE 'SELECT gw_fct_linktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
@@ -67,7 +67,14 @@ BEGIN
 			END IF;
 		END IF;
 
-	ELSIF TG_OP = 'UPDATE' THEN 
+	ELSIF TG_OP = 'UPDATE' THEN
+
+		-- Block arc_id update when state = 0
+		IF OLD.state = 0 AND NEW.state = 0 AND NEW.arc_id IS DISTINCT FROM OLD.arc_id THEN
+			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
+			"data":{"message":"3286", "function":"2938","parameters":{"psector_id":"'||NEW.psector_id||'"}}}$$);';
+		END IF;
+
 
 		IF NEW.state = 1 AND COALESCE(NEW.arc_id,'') != COALESCE(OLD.arc_id,'') AND COALESCE(NEW.link_id,0) = COALESCE(OLD.link_id,0) THEN
 
@@ -75,7 +82,7 @@ BEGIN
 
 				IF (SELECT exit_type FROM link WHERE link_id = NEW.link_id) = 'ARC' THEN
 					EXECUTE 'UPDATE plan_psector_x_'||v_table_name||' SET link_id = NULL WHERE id = '||v_id;
-					DELETE FROM link WHERE link_id = NEW.link_id;			
+					DELETE FROM link WHERE link_id = NEW.link_id;
 				END IF;
 			ELSE
 				EXECUTE 'SELECT gw_fct_linktonetwork($${"client":{"device":4, "infoType":1, "lang":"ES"},
@@ -86,41 +93,41 @@ BEGIN
 
 	-- reconnect connects
 	IF v_table_name = 'connec' THEN
-	
+
 		-- looking for related connecs
 		FOR v_connect IN SELECT feature_id FROM v_edit_link WHERE feature_type = 'CONNEC' AND exit_type = 'CONNEC' and exit_id = NEW.connec_id
 		LOOP
 			UPDATE plan_psector_x_connec SET arc_id = NEW.arc_id WHERE connec_id = v_connect AND psector_id = NEW.psector_id AND state = 1;
 		END LOOP;
-		
+
 		-- looking for related gullies
 		IF v_projecttype = 'UD' THEN
 			FOR v_connect IN SELECT feature_id FROM v_edit_link WHERE feature_type = 'GULLY' AND exit_type = 'CONNEC' and exit_id = NEW.connec_id
 			LOOP
-			
+
 				UPDATE plan_psector_x_gully SET arc_id = NEW.arc_id WHERE gully_id = v_connect AND psector_id = NEW.psector_id AND state = 1;
 			END LOOP;
 		END IF;
 
-		
+
 	ELSIF v_table_name = 'gully' THEN
-	
+
 		-- looking for related connecs
 		FOR v_connect IN SELECT feature_id FROM v_edit_link WHERE feature_type = 'CONNEC' AND exit_type = 'GULLY' and exit_id = NEW.gully_id
 		LOOP
 			UPDATE plan_psector_x_connec SET arc_id = NEW.arc_id WHERE connec_id = v_connect AND psector_id = NEW.psector_id AND state = 1;
 		END LOOP;
-		
+
 		-- looking for related gullies
 		FOR v_connect IN SELECT feature_id FROM v_edit_link WHERE feature_type = 'GULLY' AND exit_type = 'GULLY' and exit_id = NEW.gully_id
 		LOOP
 			UPDATE plan_psector_x_gully SET arc_id = NEW.arc_id WHERE gully_id = v_connect AND psector_id = NEW.psector_id AND state = 1;
 		END LOOP;
-	END IF;		
+	END IF;
 
 	RETURN NEW;
 
-END;  
+END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
