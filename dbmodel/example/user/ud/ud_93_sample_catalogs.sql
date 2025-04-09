@@ -200,3 +200,14 @@ INSERT INTO cat_flwreg (id, flwreg_type, active) VALUES ('FRORIFICE-01', 'FRORIF
 INSERT INTO cat_flwreg (id, flwreg_type, active) VALUES ('FROUTLET-01', 'FROUTLET', TRUE) ON CONFLICT (id) DO NOTHING;
 INSERT INTO cat_flwreg (id, flwreg_type, active) VALUES ('FRWEIR-01', 'FRWEIR', TRUE) ON CONFLICT (id) DO NOTHING;
 INSERT INTO cat_flwreg (id, flwreg_type, active) VALUES ('FRPUMP-01', 'FRPUMP', TRUE) ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO cat_arc (id, arc_type, matcat_id, shape, geom1, geom2, geom3, geom4, geom_r, descript, link, brand_id, model_id, svg,
+estimated_depth, active, label)
+SELECT id,
+  CASE
+    WHEN connec_type='VCONNEC' THEN 'VARC'
+    ELSE 'CONDUIT'
+  END 
+  AS connec_type, matcat_id, shape, geom1, geom2, geom3, geom4, geom_r, descript, link, brand_id, model_id, svg,
+estimated_depth, active, label
+FROM cat_connec ON CONFLICT DO NOTHING;

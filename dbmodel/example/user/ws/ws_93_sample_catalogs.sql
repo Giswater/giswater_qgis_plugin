@@ -176,3 +176,14 @@ INSERT INTO man_type_location VALUES (1, 'St. Location', 'NODE', NULL, NULL, tru
 INSERT INTO man_type_location VALUES (2, 'St. Location', 'ARC', NULL, NULL, true);
 INSERT INTO man_type_location VALUES (3, 'St. Location', 'CONNEC', NULL, NULL, true);
 INSERT INTO man_type_location VALUES (4, 'St. Location', 'ELEMENT', NULL, NULL, true);
+
+
+INSERT INTO cat_arc (id, arc_type, matcat_id, pnom, dnom, dint, dext, descript, link, brand_id, model_id, svg, estimated_depth,
+active, label)
+SELECT id,
+  CASE
+    WHEN connec_type='VCONNEC' THEN 'VARC'
+    ELSE 'PIPE'
+  END 
+  AS connec_type, matcat_id, pnom, dnom, dint, dext, descript, link, brand_id, model_id, svg, estimated_depth, active, "label"
+FROM cat_connec;

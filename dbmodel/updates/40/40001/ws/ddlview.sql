@@ -826,8 +826,16 @@ CREATE OR REPLACE VIEW vu_link AS
     q.name AS dqa_name,
     et4.idval::character varying(16) AS dqa_type,
     q.macrodqa_id,
-    l.exit_topelev,
-    l.exit_elev,
+    COALESCE(l.top_elev1, (SELECT top_elev FROM connec WHERE connec_id=l.feature_id)) AS top_elev1,
+    COALESCE(l.depth1, (SELECT depth FROM connec WHERE connec_id=l.feature_id)) AS depth1,
+    (SELECT COALESCE(l.top_elev1, (SELECT top_elev FROM connec WHERE connec_id=l.feature_id))-
+    COALESCE(l.depth1, (SELECT depth FROM connec WHERE connec_id=l.feature_id))) AS elevation1,
+    l.top_elev2,
+    l.depth2,
+    CASE
+      WHEN l.top_elev2 IS NULL OR l.depth2 IS NULL THEN NULL
+      ELSE (l.top_elev2 - l.depth2)
+    END AS elevation2,
     l.fluid_type,
     st_length2d(l.the_geom)::numeric(12,3) AS gis_length,
     l.custom_length,
@@ -837,7 +845,7 @@ CREATE OR REPLACE VIEW vu_link AS
     l.epa_type,
     l.is_operative,
     l.staticpressure,
-    l.conneccat_id,
+    l.linkcat_id,
     l.workcat_id,
     l.workcat_id_end,
     l.builtdate,
@@ -948,8 +956,16 @@ AS WITH
         dqa_table.macrodqa_id,
         l.supplyzone_id,
         supplyzone_table.supplyzone_type,
-        l.exit_topelev,
-        l.exit_elev,
+        COALESCE(l.top_elev1, (SELECT top_elev FROM connec WHERE connec_id=l.feature_id)) AS top_elev1,
+        COALESCE(l.depth1, (SELECT depth FROM connec WHERE connec_id=l.feature_id)) AS depth1,
+        (SELECT COALESCE(l.top_elev1, (SELECT top_elev FROM connec WHERE connec_id=l.feature_id))-
+        COALESCE(l.depth1, (SELECT depth FROM connec WHERE connec_id=l.feature_id))) AS elevation1,
+        l.top_elev2,
+        l.depth2,
+        CASE
+          WHEN l.top_elev2 IS NULL OR l.depth2 IS NULL THEN NULL
+          ELSE (l.top_elev2 - l.depth2)
+        END AS elevation2,
         l.fluid_type,
         st_length(l.the_geom)::numeric(12,3) AS gis_length,
         l.custom_length,
@@ -959,7 +975,7 @@ AS WITH
         l.epa_type,
         l.is_operative,
         l.staticpressure,
-        l.conneccat_id,
+        l.linkcat_id,
         l.workcat_id,
         l.workcat_id_end,
         l.builtdate,

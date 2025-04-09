@@ -2794,7 +2794,7 @@ FROM _arc;
 
 
 INSERT INTO connec (connec_id, code, top_elev, y1, y2, connec_type, conneccat_id, sector_id, customer_code,
-private_conneccat_id, demand, state, state_type, connec_depth, connec_length, arc_id, annotation, observ, "comment",
+demand, state, state_type, connec_depth, connec_length, arc_id, annotation, observ, "comment",
 dma_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, builtdate,
 enddate, ownercat_id, muni_id, postcode, streetaxis_id, postnumber, postcomplement, streetaxis2_id, postnumber2,
 postcomplement2, descript, link, verified, rotation, the_geom, undelete, label_x, label_y, label_rotation, accessibility,
@@ -2803,7 +2803,7 @@ lastupdate_user, insert_user, matcat_id, district_id, workcat_id_plan, asset_id,
 plot_code, placement_type, access_type, label_quadrant, n_hydrometer, minsector_id, macrominsector_id, streetname,
 streetname2, dwfzone_id, datasource, omunit_id, lock_level)
 SELECT connec_id, code, top_elev, y1, y2, connec_type, conneccat_id, sector_id, customer_code,
-private_conneccat_id, demand, state, state_type, connec_depth, connec_length, arc_id, annotation, observ, "comment",
+demand, state, state_type, connec_depth, connec_length, arc_id, annotation, observ, "comment",
 dma_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, builtdate,
 enddate, ownercat_id, muni_id, postcode, streetaxis_id, postnumber, postcomplement, streetaxis2_id, postnumber2,
 postcomplement2, descript, link, verified, rotation, the_geom, undelete, label_x, label_y, label_rotation, accessibility,
@@ -2815,7 +2815,7 @@ FROM _connec;
 
 
 INSERT INTO gully (gully_id, code, top_elev, ymax, sandbox, matcat_id, gully_type, gullycat_id, units, groove, siphon,
-_connec_arccat_id, connec_length, connec_depth, arc_id, "_pol_id_", sector_id, state, state_type, annotation, observ,
+_connec_arccat_id, arc_id, "_pol_id_", sector_id, state, state_type, annotation, observ,
 "comment", dma_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end,
 builtdate, enddate, ownercat_id, muni_id, postcode, streetaxis_id, postnumber, postcomplement, streetaxis2_id,
 postnumber2, postcomplement2, descript, link, verified, rotation, the_geom, undelete, label_x, label_y, label_rotation,
@@ -2825,7 +2825,7 @@ epa_type, groove_height, groove_length, units_placement, drainzone_id, expl_id2,
 odorflap, placement_type, access_type, label_quadrant, minsector_id, macrominsector_id, streetname, streetname2,
 dwfzone_id, datasource, omunit_id, lock_level)
 SELECT gully_id, code, top_elev, ymax, sandbox, matcat_id, gully_type, gullycat_id, units, groove, siphon,
-connec_arccat_id, connec_length, connec_depth, arc_id, "_pol_id_", sector_id, state, state_type, annotation, observ,
+connec_arccat_id, arc_id, "_pol_id_", sector_id, state, state_type, annotation, observ,
 "comment", dma_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end,
 builtdate, enddate, ownercat_id, muni_id, postcode, streetaxis_id, postnumber, postcomplement, streetaxis2_id,
 postnumber2, postcomplement2, descript, link, verified, rotation, the_geom, undelete, label_x, label_y, label_rotation,
@@ -2849,15 +2849,51 @@ expl_id, feature_type, tstamp, lastupdate, lastupdate_user, insert_user, pol_id,
 muni_id, sector_id, brand_id, model_id, asset_id, datasource, omunit_id, lock_level
 FROM _element;
 
+INSERT INTO sys_param_user (id, formname, descript, sys_role, idval, "label", dv_querytext, dv_parent_id, isenabled, layoutorder, project_type, isparent, dv_querytext_filterc, feature_field_id, feature_dv_parent_value, isautoupdate, "datatype", widgettype, ismandatory, widgetcontrols, vdefault, layoutname, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, placeholder, "source")
+VALUES('edit_gully_linkcat_vdefault', 'config', 'Value default catalog for link connected to gully', 'role_edit', NULL, 'Default catalog for linkcat:', 'SELECT cat_arc.id, cat_arc.id AS idval FROM cat_arc JOIN cat_feature ON cat_feature.id = cat_arc.arc_type WHERE cat_feature.feature_type = ''ARC''', NULL, true, 20, 'ud', false, NULL, 'linkcat_id', NULL, false, 'text', 'combo', true, NULL, 'CC020', 'lyt_gully', true, NULL, false, NULL, NULL, NULL);
+
+UPDATE sys_param_user
+SET vdefault='CC020',"label"='Default catalog for linkcat:',dv_querytext='SELECT cat_arc.id, cat_arc.id AS idval FROM cat_arc JOIN cat_feature ON cat_feature.id = cat_arc.arc_type WHERE cat_feature.feature_type = ''ARC''',descript='Value default catalog for link connected to connec',feature_field_id='linkcat_id',ismandatory=true,dv_isnullvalue=false,project_type='utils',id='edit_connec_linkcat_vdefault'
+WHERE id='edit_connecarccat_vdefault';
+
+
+
+
+INSERT INTO cat_arc (id, arc_type, matcat_id, shape, geom1, geom2, geom3, geom4, geom_r, descript, link, brand_id, model_id, svg,
+estimated_depth, active, label)
+SELECT id,
+  CASE
+    WHEN connec_type='VCONNEC' THEN 'VARC'
+    ELSE 'CONDUIT'
+  END 
+  AS connec_type, matcat_id, shape, geom1, geom2, geom3, geom4, geom_r, descript, link, brand_id, model_id, svg,
+estimated_depth, active, label
+FROM cat_connec ON CONFLICT DO NOTHING;
+
+INSERT INTO cat_arc (id,arc_type,shape) VALUES ('UPDATE_LINK_40','CONDUIT','CIRCULAR');
+
 INSERT INTO link (link_id, code, feature_id, feature_type, exit_id, exit_type, userdefined_geom, state, expl_id, the_geom,
 tstamp, exit_topelev, exit_elev, sector_id, dma_id, fluid_type, expl_id2, epa_type, is_operative, insert_user, lastupdate,
-lastupdate_user, conneccat_id, workcat_id, workcat_id_end, builtdate, enddate, drainzone_id, uncertain, muni_id, verified,
+lastupdate_user, linkcat_id, workcat_id, workcat_id_end, builtdate, enddate, drainzone_id, uncertain, muni_id, verified,
 macrominsector_id, dwfzone_id)
 SELECT nextval('SCHEMA_NAME.urn_id_seq'::regclass), link_id::text, feature_id, feature_type, exit_id, exit_type, userdefined_geom, state, expl_id, the_geom,
 tstamp, exit_topelev, exit_elev, sector_id, dma_id, fluid_type, expl_id2, epa_type, is_operative, insert_user, lastupdate,
-lastupdate_user, conneccat_id, workcat_id, workcat_id_end, builtdate, enddate, drainzone_id, uncertain, muni_id, verified,
+lastupdate_user,
+CASE
+  WHEN conneccat_id IS NULL THEN
+    CASE
+      WHEN feature_type = 'GULLY' THEN
+        (SELECT _connec_arccat_id FROM gully WHERE gully_id = feature_id LIMIT 1)
+      WHEN feature_type = 'CONNEC' THEN
+        (SELECT conneccat_id FROM connec WHERE connec_id = feature_id LIMIT 1)
+      ELSE
+        'UPDATE_LINK_40'
+    END
+  ELSE conneccat_id
+END AS conneccat_id, workcat_id, workcat_id_end, builtdate, enddate, drainzone_id, uncertain, muni_id, verified,
 macrominsector_id, dwfzone_id
 FROM _link;
+
 
 -- 26/03/2025
 INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,layoutorder,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,dv_querytext,dv_isnullvalue,widgetcontrols,hidden)
@@ -2868,22 +2904,34 @@ INSERT INTO config_form_fields (formname,formtype,tabname,columnname,layoutname,
 INSERT INTO config_form_fields (formname,formtype,tabname,columnname,"datatype",widgettype,"label",tooltip,ismandatory,isparent,iseditable,isautoupdate,widgetcontrols,hidden)
 	VALUES ('cat_connec','form_feature','tab_none','estimated_depth','double','text','Estimated depth:','Estimated depth',false,false,true,false,'{"setMultiline":false}'::json,false);
 
+
+
+-- 28/03/2025
+UPDATE sys_fprocess
+SET query_text='select link_id as arc_id, linkcat_id as arccat_id, a.expl_id, l.the_geom FROM t_link l, temp_t_arc a WHERE st_dwithin(st_endpoint(l.the_geom), a.the_geom, 0.001) AND a.epa_type NOT IN (''CONDUIT'', ''PIPE'', ''VIRTUALVALVE'', ''VIRTUALPUMP'')'
+WHERE fid=404;
+
+
 DO $func$
 DECLARE
   gullyr record;
-  linkr record;
+  connecr record;
 BEGIN
-  FOR gullyr IN (SELECT * FROM gully)
+  FOR gullyr IN (SELECT gully_id, _connec_arccat_id FROM gully)
   LOOP
-	SELECT * into linkr FROM link WHERE feature_id = gullyr.gully_id;
-    IF FOUND THEN
-      IF (SELECT conneccat_id FROM link WHERE feature_id = gullyr.gully_id) IS NULL THEN
-        UPDATE link SET conneccat_id = gullyr._connec_arccat_id WHERE feature_id = gullyr.gully_id;
-      END IF;
-    ELSE
+    IF NOT EXISTS(SELECT 1 FROM link WHERE feature_id = gullyr.gully_id) THEN
       EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client": {"device": 4, "lang": "en_US", "infoType": 1, "epsg": 25831}, "form": {}, "feature": {"id": "[' || gullyr.gully_id || ']"},
-     "data": {"filterFields": {}, "pageInfo": {}, "feature_type": "GULLY"}}$$);';
-      UPDATE link SET conneccat_id = gullyr._connec_arccat_id WHERE feature_id = gullyr.gully_id;
+     "data": {"filterFields": {}, "pageInfo": {}, "feature_type": "GULLY", "linkcatId":"UPDATE_LINK_40"}}$$);';
+      UPDATE link SET uncertain=true WHERE feature_id = gullyr.gully_id;
+    END IF;
+  END LOOP;
+
+  FOR connecr IN (SELECT connec_id, conneccat_id  FROM connec)
+  LOOP
+    IF NOT EXISTS(SELECT 1 FROM link WHERE feature_id = connecr.connec_id) THEN
+      EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client": {"device": 4, "lang": "en_US", "infoType": 1, "epsg": 25831}, "form": {}, "feature": {"id": "[' || connecr.connec_id || ']"},
+     "data": {"filterFields": {}, "pageInfo": {}, "feature_type": "CONNEC", "linkcatId":"UPDATE_LINK_40"}}$$);';
+      UPDATE link SET uncertain=true WHERE feature_id = connecr.connec_id;
     END IF;
   END LOOP;
 END $func$;

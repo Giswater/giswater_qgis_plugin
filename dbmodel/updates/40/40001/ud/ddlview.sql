@@ -359,7 +359,7 @@ AS SELECT DISTINCT ON (link_id)
     l.expl_id2,
     l.epa_type,
     l.is_operative,
-    l.conneccat_id,
+    l.linkcat_id,
     l.workcat_id,
     l.workcat_id_end,
     l.builtdate,
@@ -478,7 +478,7 @@ AS WITH
 			l.expl_id2,
 			l.epa_type,
 			l.is_operative,
-			l.conneccat_id,
+			l.linkcat_id,
 			l.workcat_id,
 			l.workcat_id_end,
 			sector_table.stylesheet ->> 'featureColor'::text AS sector_style,
@@ -1504,7 +1504,6 @@ SELECT connec.connec_id,
     connec.conneccat_id,
     connec.connec_type,
     cat_feature.feature_class AS sys_type,
-    connec.private_conneccat_id,
         CASE
             WHEN connec.matcat_id IS NULL THEN cat_connec.matcat_id
             ELSE connec.matcat_id
@@ -1674,7 +1673,6 @@ AS WITH
 			connec.conneccat_id,
 			connec.connec_type,
 			cat_feature.feature_class as sys_type,
-			connec.private_conneccat_id,
 			connec.matcat_id,
 			connec.state,
 			connec.state_type,

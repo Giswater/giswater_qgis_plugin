@@ -20,9 +20,9 @@ SELECT columns_are(
     'link',
     ARRAY[
         'link_id', 'code', 'feature_id', 'feature_type', 'exit_id', 'exit_type', 'userdefined_geom', 'state', 'expl_id',
-        'the_geom', 'tstamp', 'exit_topelev', 'exit_elev', 'sector_id', 'dma_id', 'fluid_type', 'presszone_id',
+        'the_geom', 'tstamp', 'top_elev2', 'exit_elev', 'sector_id', 'dma_id', 'fluid_type', 'presszone_id',
         'dqa_id', 'minsector_id', 'expl_id2', 'epa_type', 'is_operative', 'insert_user', 'lastupdate',
-        'lastupdate_user', 'staticpressure', 'conneccat_id', 'workcat_id', 'workcat_id_end', 'builtdate',
+        'lastupdate_user', 'staticpressure', 'linkcat_id', 'workcat_id', 'workcat_id_end', 'builtdate',
         'enddate', 'uncertain', 'muni_id', 'macrominsector_id', 'verified', 'supplyzone_id', 'n_hydrometer',
         'custom_length', 'datasource'
     ],
@@ -66,7 +66,7 @@ SELECT has_trigger('link', 'gw_trg_link_connecrotation_update', 'Trigger gw_trg_
 SELECT has_trigger('link', 'gw_trg_link_data', 'Trigger gw_trg_link_data should exist');
 
 -- Check foreign keys
-SELECT fk_ok('link', 'conneccat_id', 'cat_connec', 'id', 'FK conneccat_id should reference cat_connec(id)');
+SELECT fk_ok('link', 'linkcat_id', 'cat_arc', 'id', 'FK linkcat_id should reference cat_arc(id)');
 SELECT fk_ok('link', 'exit_type', 'sys_feature_type', 'id', 'FK exit_type should reference sys_feature_type(id)');
 SELECT fk_ok('link', 'expl_id', 'exploitation', 'expl_id', 'FK expl_id should reference exploitation(expl_id)');
 SELECT fk_ok('link', 'feature_type', 'sys_feature_type', 'id', 'FK feature_type should reference sys_feature_type(id)');

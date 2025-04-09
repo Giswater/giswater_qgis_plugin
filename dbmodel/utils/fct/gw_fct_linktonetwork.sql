@@ -109,6 +109,7 @@ v_check_arcdnom float;
 v_check_maxdistance float;
 v_checkeddiam text;
 v_querytext text;
+v_linkcat_id text;
 
 BEGIN
 
@@ -135,6 +136,7 @@ BEGIN
 	v_forceendpoint = (p_data->>'data')::json->>'forceEndPoint';
 	v_isarcdivide = (p_data->>'data')::json->>'isArcDivide';
 	v_link_id = (p_data->>'data')::json->>'linkId';
+	v_linkcat_id = (p_data->>'data')::json->>'linkcatId';
 
 	--profilactic values
 	IF v_forceendpoint IS NULL THEN v_forceendpoint = FALSE; END IF;
@@ -187,6 +189,32 @@ BEGIN
 
 	    FOREACH v_connect_id IN ARRAY v_feature_array
 	    LOOP
+
+			IF v_linkcat_id IS NULL THEN
+				IF v_projecttype = 'WS' THEN
+					IF v_feature_type ='CONNEC' THEN
+						IF (SELECT value FROM config_param_user WHERE parameter = 'edit_connec_linkcat_vdefault' AND "cur_user"="current_user"() LIMIT 1) IS NOT NULL THEN
+							v_linkcat_id = (SELECT value FROM config_param_user WHERE parameter = 'edit_connec_linkcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+						ELSE
+							v_linkcat_id = (SELECT conneccat_id FROM connec WHERE connec_id = v_connect_id);
+						END IF;
+					END IF;
+				ELSE
+					IF v_feature_type ='CONNEC' THEN
+						IF (SELECT value FROM config_param_user WHERE parameter = 'edit_connec_linkcat_vdefault' AND "cur_user"="current_user"() LIMIT 1) IS NOT NULL THEN
+							v_linkcat_id = (SELECT value FROM config_param_user WHERE parameter = 'edit_connec_linkcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+						ELSE
+							v_linkcat_id = (SELECT conneccat_id FROM connec WHERE connec_id = v_connect_id);
+						END IF;
+					ELSEIF v_feature_type ='GULLY' THEN
+						IF (SELECT value FROM config_param_user WHERE parameter = 'edit_gully_linkcat_vdefault' AND "cur_user"="current_user"() LIMIT 1) IS NOT NULL THEN
+							v_linkcat_id = (SELECT value FROM config_param_user WHERE parameter = 'edit_gully_linkcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+						ELSE
+							v_linkcat_id = (SELECT _connec_arccat_id FROM gully WHERE gully_id = v_connect_id);
+						END IF;
+					END IF;
+				END IF;
+			END IF;
 
 		v_i = v_i+1;
 
@@ -466,18 +494,23 @@ BEGIN
 
 					IF v_projecttype = 'WS' THEN
 						INSERT INTO link (link_id, the_geom, feature_id, feature_type, exit_type, exit_id, state, expl_id, sector_id, dma_id,
-						presszone_id, dqa_id, minsector_id, fluid_type, muni_id)
+						presszone_id, dqa_id, minsector_id, fluid_type, muni_id, linkcat_id)
 						VALUES (v_link.link_id, v_link.the_geom, v_connect_id, v_feature_type, v_link.exit_type, v_link.exit_id,
-						 v_connect.state, v_arc.expl_id, v_arc.sector_id, v_dma_value, v_arc.presszone_id, v_arc.dqa_id, v_arc.minsector_id, v_fluidtype_value, v_connect.muni_id);
-
+						v_connect.state, v_arc.expl_id, v_arc.sector_id, v_dma_value, v_arc.presszone_id, v_arc.dqa_id, v_arc.minsector_id, v_fluidtype_value, v_connect.muni_id,
+						v_linkcat_id);
 					ELSIF v_projecttype = 'UD' THEN
-						INSERT INTO link (link_id, the_geom, feature_id, feature_type, exit_type, exit_id, state, expl_id, sector_id, dma_id, fluid_type, muni_id)
+						INSERT INTO link (link_id, the_geom, feature_id, feature_type, exit_type, exit_id, state, expl_id, sector_id, dma_id, fluid_type, muni_id, linkcat_id)
 						VALUES (v_link.link_id, v_link.the_geom, v_connect_id, v_feature_type, v_link.exit_type, v_link.exit_id,
-						v_connect.state, v_arc.expl_id, v_arc.sector_id, v_dma_value, v_fluidtype_value, v_connect.muni_id);
+						v_connect.state, v_arc.expl_id, v_arc.sector_id, v_dma_value, v_fluidtype_value, v_connect.muni_id, v_linkcat_id);
 					END IF;
 				ELSE
-					UPDATE link SET the_geom=v_link.the_geom, exit_type=v_link.exit_type, exit_id=v_link.exit_id, dma_id = v_dma_value, fluid_type = v_fluidtype_value
-					WHERE link_id = v_link.link_id;
+					IF v_linkcat_id IS NULL THEN
+						UPDATE link SET the_geom=v_link.the_geom, exit_type=v_link.exit_type, exit_id=v_link.exit_id, dma_id = v_dma_value, fluid_type = v_fluidtype_value
+						WHERE link_id = v_link.link_id;
+					ELSE
+						UPDATE link SET the_geom=v_link.the_geom, exit_type=v_link.exit_type, exit_id=v_link.exit_id, dma_id = v_dma_value, fluid_type = v_fluidtype_value, linkcat_id = v_linkcat_id
+						WHERE link_id = v_link.link_id;
+					END IF;
 
 					IF v_projecttype = 'WS' THEN
 						UPDATE link SET	presszone_id=v_arc.presszone_id, dqa_id=v_arc.dqa_id, minsector_id=v_arc.minsector_id

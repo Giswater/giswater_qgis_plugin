@@ -560,7 +560,7 @@ BEGIN
 			WHERE st_dwithin (new.the_geom, c.the_geom, rec_param_link.v_buffer)
 			AND c.connec_id not in (select feature_id from v_edit_link);
 
-			execute 'SELECT ws_link2net.gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1,"lang":"ES"},"feature":
+			execute 'SELECT gw_fct_setlinktonetwork($${"client":{"device":4, "infoType":1,"lang":"ES"},"feature":
 			{"id":"['||v_connecs||']"}, "data":{"feature_type":"CONNEC", "forcedArcs":["'||new.arc_id||'"]}}$$)';
 
 		END IF;

@@ -123,9 +123,9 @@ BEGIN
 			INSERT INTO inp_connec SELECT connec_id FROM connec WHERE epa_type = 'JUNCTION' ON CONFLICT (connec_id) DO NOTHING;
 
 			RAISE NOTICE 'links';
-			INSERT INTO link (feature_type, feature_id, expl_id, exit_id, exit_type, userdefined_geom, state, the_geom, exit_topelev,
+			INSERT INTO link (feature_type, feature_id, expl_id, exit_id, exit_type, userdefined_geom, state, the_geom, top_elev2,
 			exit_elev, sector_id, dma_id, fluid_type, presszone_id, dqa_id, minsector_id,expl_id2, epa_type, is_operative, insert_user, lastupdate, lastupdate_user, connecat_id, workcat_id, workcat_id_end, builtdate, enddate)
-			SELECT feature_type, feature_id, expl_id, exit_id, exit_type, userdefined_geom, state,  st_translate(the_geom,x*p_dx,y*p_dy), exit_topelev,
+			SELECT feature_type, feature_id, expl_id, exit_id, exit_type, userdefined_geom, state,  st_translate(the_geom,x*p_dx,y*p_dy), top_elev2,
 			exit_elev, sector_id, dma_id, fluid_type, presszone_id, dqa_id, minsector_id,expl_id2, epa_type, is_operative, insert_user, lastupdate, lastupdate_user, connecat_id, workcat_id, workcat_id_end, builtdate, enddate
 			FROM link;
 

@@ -1512,7 +1512,6 @@ CREATE TABLE connec (
 	conneccat_id varchar(30) NOT NULL,
 	sector_id int4 NOT NULL,
 	customer_code varchar(30) NULL,
-	private_conneccat_id varchar(30) NULL,
 	demand numeric(12, 8) NULL,
 	state int2 NOT NULL,
 	state_type int2 NULL,
@@ -1962,6 +1961,7 @@ CREATE TABLE link (
 	code text NULL, -- added
 	feature_id varchar(16) NULL,
 	feature_type varchar(16) NULL,
+	linkcat_id varchar(30) NOT NULL,
 	exit_id varchar(16) NULL,
 	exit_type varchar(16) NULL,
 	userdefined_geom bool NULL,
@@ -1980,7 +1980,6 @@ CREATE TABLE link (
 	insert_user varchar(50) DEFAULT CURRENT_USER NULL,
 	lastupdate timestamp NULL,
 	lastupdate_user varchar(50) NULL,
-	conneccat_id varchar(30) NULL,
 	workcat_id varchar(255) NULL,
 	workcat_id_end varchar(255) NULL,
 	builtdate date NULL,
@@ -1993,8 +1992,9 @@ CREATE TABLE link (
 	dwfzone_id int4 NULL,
 	custom_length numeric(12, 2) NULL,
 	datasource int4 NULL,
+	private_linkcat_id varchar(30) NULL,
 	CONSTRAINT link_pkey PRIMARY KEY (link_id),
-	CONSTRAINT link_conneccat_id_fkey FOREIGN KEY (conneccat_id) REFERENCES cat_connec(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT link_linkcat_id_fkey FOREIGN KEY (linkcat_id) REFERENCES cat_link(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT link_dwfzone_id_fkey FOREIGN KEY (dwfzone_id) REFERENCES dwfzone(dwfzone_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT link_exit_type_fkey FOREIGN KEY (exit_type) REFERENCES sys_feature_type(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT link_exploitation_id_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON DELETE RESTRICT ON UPDATE CASCADE,
@@ -2003,7 +2003,8 @@ CREATE TABLE link (
 	CONSTRAINT link_sector_id_fkey FOREIGN KEY (sector_id) REFERENCES sector(sector_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT link_state_fkey FOREIGN KEY (state) REFERENCES value_state(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT link_workcat_id_end_fkey FOREIGN KEY (workcat_id_end) REFERENCES cat_work(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT link_workcat_id_fkey FOREIGN KEY (workcat_id) REFERENCES cat_work(id) ON DELETE RESTRICT ON UPDATE CASCADE
+	CONSTRAINT link_workcat_id_fkey FOREIGN KEY (workcat_id) REFERENCES cat_work(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT link_private_linkcat_id_fkey FOREIGN KEY (private_linkcat_id) REFERENCES cat_arc(id) ON UPDATE CASCADE ON DELETE RESTRICT
 );
 CREATE INDEX link_exit_id ON link USING btree (exit_id);
 CREATE INDEX link_expl_id2 ON link USING btree (expl_id2);

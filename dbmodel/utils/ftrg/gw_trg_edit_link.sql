@@ -604,23 +604,56 @@ BEGIN
 		IF v_expl is null then v_expl = NEW.expl_id; END IF;
 		IF NEW.state IS NULL THEN NEW.state =  1; END IF;
 
+		IF v_linkcat_id IS NULL THEN
+				IF v_projecttype = 'WS' THEN
+					
+				ELSE
+					
+				END IF;
+			END IF;
+
 
 		-- insert into link table
 		IF v_projectype = 'WS' THEN
+			IF NEW.linkcat_id IS NULL THEN
+				IF NEW.feature_type ='CONNEC' THEN
+					IF (SELECT value FROM config_param_user WHERE parameter = 'edit_connec_linkcat_vdefault' AND "cur_user"="current_user"() LIMIT 1) IS NOT NULL THEN
+						NEW.linkcat_id = (SELECT value FROM config_param_user WHERE parameter = 'edit_connec_linkcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+					ELSE
+						NEW.linkcat_id = (SELECT conneccat_id FROM connec WHERE connec_id = NEW.feature_id);
+					END IF;
+				END IF;
+			END IF;
 
 			INSERT INTO link (link_id, code, feature_type, feature_id, expl_id, exit_id, exit_type, userdefined_geom, state, the_geom, sector_id,
-			 fluid_type, dma_id, dqa_id, presszone_id, minsector_id, conneccat_id, workcat_id, workcat_id_end, builtdate, enddate, exit_elev, exit_topelev,
-			 uncertain, muni_id, verified, custom_length, datasource)
+			 fluid_type, dma_id, dqa_id, presszone_id, minsector_id, linkcat_id, workcat_id, workcat_id_end, builtdate, enddate,
+			 uncertain, muni_id, verified, custom_length, datasource, top_elev1, depth1, top_elev2, depth2)
 			VALUES (NEW.link_id, NEW.code, NEW.feature_type, NEW.feature_id, v_expl, NEW.exit_id, NEW.exit_type, TRUE, NEW.state, NEW.the_geom, v_sector,
-			v_fluidtype, v_dma, v_dqa, v_presszone, v_minsector, NEW.conneccat_id, NEW.workcat_id, NEW.workcat_id_end, NEW.builtdate, NEW.enddate,
-			NEW.exit_elev, NEW.exit_topelev, NEW.uncertain, NEW.muni_id, NEW.verified, NEW.custom_length, NEW.datasource);
+			v_fluidtype, v_dma, v_dqa, v_presszone, v_minsector, NEW.linkcat_id, NEW.workcat_id, NEW.workcat_id_end, NEW.builtdate, NEW.enddate,
+			NEW.uncertain, NEW.muni_id, NEW.verified, NEW.custom_length, NEW.datasource, COALESCE(NEW.top_elev1, (SELECT top_elev FROM connec WHERE connec_id=NEW.feature_id LIMIT 1)),
+			COALESCE(NEW.depth1, (SELECT depth FROM connec WHERE connec_id=NEW.feature_id LIMIT 1)), NEW.top_elev2, NEW.depth2);
 
 		ELSIF  v_projectype = 'UD' THEN
+			IF NEW.linkcat_id IS NULL THEN
+				IF NEW.feature_type ='CONNEC' THEN
+					IF (SELECT value FROM config_param_user WHERE parameter = 'edit_connec_linkcat_vdefault' AND "cur_user"="current_user"() LIMIT 1) IS NOT NULL THEN
+						NEW.linkcat_id = (SELECT value FROM config_param_user WHERE parameter = 'edit_connec_linkcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+					ELSE
+						NEW.linkcat_id = (SELECT conneccat_id FROM connec WHERE connec_id = NEW.feature_id);
+					END IF;
+				ELSEIF NEW.feature_type ='GULLY' THEN
+					IF (SELECT value FROM config_param_user WHERE parameter = 'edit_gully_linkcat_vdefault' AND "cur_user"="current_user"() LIMIT 1) IS NOT NULL THEN
+						NEW.linkcat_id = (SELECT value FROM config_param_user WHERE parameter = 'edit_gully_linkcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+					ELSE
+						NEW.linkcat_id = (SELECT _connec_arccat_id FROM gully WHERE gully_id = NEW.feature_id);
+					END IF;
+				END IF;
+			END IF;
 
 			INSERT INTO link (link_id, code, feature_type, feature_id, expl_id, exit_id, exit_type, userdefined_geom, state, the_geom, sector_id, fluid_type, dma_id,
-				conneccat_id, workcat_id, workcat_id_end, builtdate, enddate, exit_elev, exit_topelev, uncertain, muni_id, verified, custom_length, datasource)
+				linkcat_id, workcat_id, workcat_id_end, builtdate, enddate, exit_elev, top_elev2, uncertain, muni_id, verified, custom_length, datasource)
 			VALUES (NEW.link_id, NEW.code, NEW.feature_type, NEW.feature_id, v_expl, NEW.exit_id, NEW.exit_type, TRUE, NEW.state, NEW.the_geom, v_sector, v_fluidtype, v_dma,
-				NEW.conneccat_id, NEW.workcat_id, NEW.workcat_id_end, NEW.builtdate, NEW.enddate, NEW.exit_elev, NEW.exit_topelev, NEW.uncertain, NEW.muni_id, NEW.verified, NEW.custom_length, NEW.datasource);
+				NEW.linkcat_id, NEW.workcat_id, NEW.workcat_id_end, NEW.builtdate, NEW.enddate, NEW.uncertain, NEW.muni_id, NEW.verified, NEW.custom_length, NEW.datasource);
 		END IF;
 
 		-- update feature
@@ -715,7 +748,7 @@ BEGIN
 			IF NEW.feature_type = 'CONNEC' THEN
 				UPDATE connec SET arc_id = v_arc_id, pjoint_type = NEW.exit_type, pjoint_id = NEW.exit_id,
 				dma_id = v_dma, fluid_type=v_fluidtype WHERE connec_id = NEW.feature_id;
-				UPDATE link SET conneccat_id = c.conneccat_id FROM connec c WHERE connec_id = NEW.feature_id AND link.state > 0;
+				UPDATE link SET linkcat_id = c.conneccat_id FROM connec c WHERE connec_id = NEW.feature_id AND link.state > 0;
 
 			ELSIF NEW.feature_type = 'GULLY' THEN
 				UPDATE gully SET arc_id = v_arc_id, pjoint_type = NEW.exit_type, pjoint_id = NEW.exit_id,
@@ -732,7 +765,7 @@ BEGIN
 			-- update values on plan_psector tables
 			IF NEW.feature_type='CONNEC' THEN
 				UPDATE plan_psector_x_connec SET arc_id = v_arc_id WHERE plan_psector_x_connec.link_id=NEW.link_id;
-				UPDATE link SET conneccat_id = c.conneccat_id FROM connec c WHERE connec_id = NEW.feature_id AND link.state > 0;
+				UPDATE link SET linkcat_id = c.conneccat_id FROM connec c WHERE connec_id = NEW.feature_id AND link.state > 0;
 
 			ELSIF NEW.feature_type='GULLY' THEN
 				UPDATE plan_psector_x_gully SET arc_id = v_arc_id WHERE plan_psector_x_gully.link_id=NEW.link_id;
@@ -752,7 +785,7 @@ BEGIN
 
 		-- update link parameters
 		UPDATE link SET code = NEW.code, state = NEW.state, the_geom = NEW.the_geom, workcat_id = NEW.workcat_id, workcat_id_end = NEW.workcat_id_end, builtdate = NEW.builtdate,
-		enddate = NEW.enddate, exit_elev = NEW.exit_elev, exit_topelev = NEW.exit_topelev, uncertain = NEW.uncertain, muni_id = NEW.muni_id, sector_id=v_sector,
+		enddate = NEW.enddate, exit_elev = NEW.exit_elev, top_elev2 = NEW.top_elev2, uncertain = NEW.uncertain, muni_id = NEW.muni_id, sector_id=v_sector,
 		verified = NEW.verified, custom_length = NEW.custom_length, datasource = NEW.datasource
 		WHERE link_id=NEW.link_id;
 
