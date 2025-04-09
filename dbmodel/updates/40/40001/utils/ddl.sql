@@ -6,6 +6,10 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
+DROP TABLE IF EXISTS flwreg CASCADE;
+DROP TABLE IF EXISTS cat_flwreg CASCADE;
+
+
 CREATE TABLE man_servconnection (
 	link_id int4 NOT NULL,
 	CONSTRAINT man_servconnection_pkey PRIMARY KEY (link_id),
@@ -61,3 +65,54 @@ CREATE INDEX cat_link_m3protec_cost_pkey ON cat_link USING btree (m3protec_cost)
 ALTER TABLE link DROP CONSTRAINT link_linkcat_id_fkey;
 ALTER TABLE link ADD CONSTRAINT link_linkcat_id_fkey FOREIGN KEY (linkcat_id) REFERENCES cat_link(id) ON DELETE RESTRICT ON UPDATE CASCADE;
 
+
+
+CREATE TABLE man_genelement (
+    element_id varchar(16) NOT NULL,
+    CONSTRAINT man_genelement_pkey PRIMARY KEY (element_id)
+);
+
+CREATE TABLE man_flwreg (
+    element_id varchar(16) NOT NULL,
+    flwreg_class varchar(16) NOT NULL,
+    nodarc_id varchar NULL,
+    order_id numeric NULL,
+    to_arc varchar NULL,
+    flwreg_length numeric NULL,
+    CONSTRAINT man_flwreg_pkey PRIMARY KEY (element_id)
+);
+
+CREATE TABLE cat_feature_element (
+    id varchar(30) NOT NULL,
+    epa_default varchar(30) NOT NULL,
+    geometry_type varchar(30) NOT NULL DEFAULT 'POINT',
+    CONSTRAINT cat_feature_element_pkey PRIMARY KEY (id),
+    CONSTRAINT cat_feature_element_fkey_element_id FOREIGN KEY (id) REFERENCES cat_feature(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT cat_feature_element_check_geometry_type CHECK (geometry_type::text = ANY (ARRAY['POLYGON'::text, 'LINESTRING'::text, 'POINT'::text])),
+    CONSTRAINT cat_feature_element_inp_check CHECK (epa_default::text = ANY (ARRAY['ORIFICE'::text, 'WEIR'::text, 'OUTLET'::text, 'PUMP'::text, 'UNDEFINED'::text]))
+);
+
+CREATE TABLE inp_flwreg_pump (
+    element_id varchar(16) NOT NULL,
+    pump_type varchar(18) NOT NULL,
+    curve_id varchar(16) NOT NULL,
+    status varchar(3) NULL,
+    startup numeric(12, 4) NULL,
+    shutoff numeric(12, 4) NULL,
+    CONSTRAINT inp_flwreg_pump_pkey PRIMARY KEY (element_id),
+    CONSTRAINT inp_flwreg_pump_check_status CHECK (status::text = ANY (ARRAY['ON'::text, 'OFF'::text])),
+    CONSTRAINT inp_flwreg_pump_fkey_curve_id FOREIGN KEY (curve_id) REFERENCES inp_curve(id) ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+CREATE TABLE inp_dscenario_flwreg_pump (
+    dscenario_id int4 NOT NULL,
+    element_id varchar(16) NOT NULL,
+    pump_type varchar(18) NOT NULL,
+    curve_id varchar(16) NOT NULL,
+    status varchar(3) NULL,
+    startup numeric(12, 4) NULL,
+    shutoff numeric(12, 4) NULL,
+    CONSTRAINT inp_dscenario_flwreg_pump_pkey PRIMARY KEY (element_id, dscenario_id),
+    CONSTRAINT inp_dscenario_flwreg_pump_check_status CHECK (status::text = ANY (ARRAY['ON'::text, 'OFF'::text])),
+    CONSTRAINT inp_dscenario_flwreg_pump_fkey_curve_id FOREIGN KEY (curve_id) REFERENCES inp_curve(id) ON DELETE RESTRICT ON UPDATE CASCADE
+);

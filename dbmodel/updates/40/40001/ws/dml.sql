@@ -38,3 +38,5 @@ END	AS conneccat_id, workcat_id, workcat_id_end, builtdate, enddate, uncertain, 
 (SELECT c.top_elev FROM connec c WHERE c.connec_id=feature_id LIMIT 1) AS top_elev1,
 (SELECT c.depth FROM connec c WHERE c.connec_id = feature_id LIMIT 1) AS depth1
 FROM _link;
+
+INSERT INTO sys_feature_epa_type (id, feature_type, epa_table, descript, active) VALUES('VALVE', 'ELEMENT', 'inp_flwreg_valve', NULL, true);
