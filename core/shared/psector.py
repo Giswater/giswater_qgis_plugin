@@ -426,7 +426,7 @@ class GwPsector:
         form = {"formName": "generic", "formType": "psector"}
 
         if psector_id is not None:
-            form["id"] = 1
+            form["id"] = psector_id
             form["idname"] = "psector_id"
             form["tableName"] = "plan_psector"
 
