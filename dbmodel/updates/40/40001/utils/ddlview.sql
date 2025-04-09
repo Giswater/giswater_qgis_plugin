@@ -10,6 +10,12 @@ DROP VIEW IF EXISTS vp_basic_arc;
 DROP VIEW IF EXISTS vp_basic_node;
 DROP VIEW IF EXISTS vp_basic_connec;
 DROP VIEW IF EXISTS vp_basic_gully;
+DROP VIEW IF EXISTS v_edit_exploitation;
+DROP VIEW IF EXISTS v_edit_macrodqa;
+DROP VIEW IF EXISTS v_edit_macrodma;
+DROP VIEW IF EXISTS v_edit_macrosector;
+DROP VIEW IF EXISTS v_edit_sector;
+DROP VIEW IF EXISTS v_ui_sector;
 
 CREATE OR REPLACE VIEW v_edit_cat_feature_link
 AS SELECT cat_feature.id,

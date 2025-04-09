@@ -1479,6 +1479,7 @@ AS WITH
 CREATE OR REPLACE VIEW v_edit_presszone
 AS SELECT p.presszone_id,
     p.name,
+    p.code,
     p.presszone_type,
     p.descript,
     p.graphconfig,
@@ -1504,6 +1505,7 @@ AS SELECT p.presszone_id,
 CREATE OR REPLACE VIEW v_edit_dma
 AS SELECT d.dma_id,
     d.name,
+    d.code,
     d.dma_type,
     d.macrodma_id,
     d.descript,
@@ -1561,6 +1563,7 @@ CREATE OR REPLACE VIEW v_edit_supplyzone
 CREATE OR REPLACE VIEW v_edit_dqa
 AS SELECT d.dqa_id,
     d.name,
+    d.code,
     d.dqa_type,
     d.macrodqa_id,
     d.descript,
@@ -2108,6 +2111,7 @@ AS SELECT e.pol_id,
 CREATE OR REPLACE VIEW v_ui_presszone
 AS SELECT p.presszone_id,
     p.name,
+    p.code,
     p.presszone_type,
     p.descript,
     p.active,
@@ -5186,6 +5190,7 @@ AS WITH expl_data AS (
 CREATE OR REPLACE VIEW v_ui_dma
 AS SELECT d.dma_id,
     d.name,
+    d.code,
     d.dma_type,
     md.name AS macrodma,
     d.descript,
@@ -5280,6 +5285,7 @@ CREATE OR REPLACE VIEW v_ui_macrodma
  AS
  SELECT m.macrodma_id,
   m.name,
+  m.code,
 	m.descript,
   m.active,
 	m.lock_level,
@@ -5293,6 +5299,7 @@ CREATE OR REPLACE VIEW v_ui_macrodqa
  AS
  SELECT m.macrodqa_id,
   m.name,
+  m.code,
 	m.descript,
   m.active,
 	m.lock_level,
@@ -5307,6 +5314,7 @@ CREATE OR REPLACE VIEW v_ui_macrosector
   AS
   SELECT m.macrosector_id,
     m.name,
+    m.code,
     m.descript,
     m.active,
     m.lock_level
@@ -5318,6 +5326,7 @@ CREATE OR REPLACE VIEW v_ui_macrosector
 CREATE OR REPLACE VIEW v_ui_dqa
 AS SELECT d.dqa_id,
     d.name,
+    d.code,
     d.dqa_type,
     md.name AS macrodqa,
     d.descript,
@@ -5346,6 +5355,7 @@ AS SELECT d.dqa_id,
 CREATE OR REPLACE VIEW v_ui_sector
 AS SELECT s.sector_id,
     s.name,
+    s.code,
     s.sector_type,
     ms.name AS macrosector,
     s.descript,
@@ -5373,6 +5383,7 @@ AS SELECT s.sector_id,
 CREATE OR REPLACE VIEW v_edit_sector
 AS SELECT s.sector_id,
     s.name,
+    s.code,
     s.sector_type,
     s.macrosector_id,
     s.descript,
@@ -5485,6 +5496,7 @@ DROP VIEW IF EXISTS v_edit_macrosector;
 CREATE OR REPLACE VIEW v_edit_macrosector
 AS SELECT DISTINCT ON (macrosector_id) macrosector_id,
     m.name,
+    m.code,
     m.descript,
     m.the_geom,
     m.lock_level
@@ -5496,6 +5508,7 @@ AS SELECT DISTINCT ON (macrosector_id) macrosector_id,
 CREATE OR REPLACE VIEW v_edit_macrodma
 AS SELECT DISTINCT ON (macrodma_id) macrodma_id,
     m.name,
+    m.code,
     m.descript,
     m.the_geom,
     m.expl_id,
@@ -5506,6 +5519,7 @@ AS SELECT DISTINCT ON (macrodma_id) macrodma_id,
 CREATE OR REPLACE VIEW v_edit_macrodqa
 AS SELECT DISTINCT ON (macrodqa_id) macrodqa_id,
     m.name,
+    m.code,
     m.descript,
     m.the_geom,
     m.expl_id,
@@ -7659,3 +7673,17 @@ AS WITH streetaxis AS (
      LEFT JOIN typevalue et3 ON et3.id::text = dma.dma_type::text AND et3.typevalue::text = 'dma_type'::text
      LEFT JOIN typevalue et4 ON et4.id::text = dqa.dqa_type::text AND et4.typevalue::text = 'dqa_type'::text
      LEFT JOIN macrosector ms ON ms.macrosector_id = sector.macrosector_id;;
+
+-- 09/04/2025
+CREATE OR REPLACE VIEW v_edit_exploitation
+AS SELECT exploitation.expl_id,
+    exploitation.name,
+    exploitation.macroexpl_id,
+    exploitation.descript,
+    exploitation.undelete,
+    exploitation.the_geom,
+    exploitation.tstamp,
+    exploitation.active
+   FROM selector_expl,
+    exploitation
+  WHERE exploitation.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;

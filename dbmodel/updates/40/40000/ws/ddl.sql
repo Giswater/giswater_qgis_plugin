@@ -134,6 +134,7 @@ DROP RULE IF EXISTS undelete_sector ON _sector;
 -- add new columns [sector_id, muni_id, expl_id] to dma, presszone, dqa, sector
 CREATE TABLE dma (
 	dma_id serial4 NOT NULL,
+	code text NULL,
 	"name" varchar(30) NULL,
 	dma_type varchar(16) NULL,
     muni_id int4[] NULL,
@@ -163,6 +164,7 @@ CREATE TABLE dma (
 
 CREATE TABLE presszone (
 	presszone_id int4 NOT NULL,
+	code text NULL,
 	"name" text NOT NULL,
 	presszone_type text NULL,
     muni_id int4[] NULL,
@@ -185,6 +187,7 @@ CREATE TABLE presszone (
 
 CREATE TABLE dqa (
 	dqa_id serial4 NOT NULL,
+	code text NULL,
 	"name" varchar(30) NULL,
 	dqa_type varchar(16) NULL,
     muni_id int4[] NULL,
@@ -211,6 +214,7 @@ CREATE TABLE dqa (
 
 CREATE TABLE sector (
 	sector_id serial4 NOT NULL,
+	code text NULL,
 	"name" varchar(50) NOT NULL,
 	sector_type varchar(16) NULL,
     muni_id int4[] NULL,
@@ -1948,3 +1952,210 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"archived_ps
 
 -- 07/04/2025
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"macrosector", "column":"code", "dataType":"varchar(50)", "isUtils":"False"}}$$);
+
+
+
+-- 09/04/2025
+
+-- macrosector
+ALTER TABLE macrosector RENAME TO _macrosector;
+
+-- Drop foreign keys that reference macrosector
+ALTER TABLE sector DROP CONSTRAINT sector_macrosector_id_fkey;
+ALTER TABLE supplyzone DROP CONSTRAINT supplyzone_macrosector_id_fkey;
+
+-- Drop restrictions from table macrosector
+ALTER TABLE _macrosector DROP CONSTRAINT macrosector_pkey;
+
+-- Drop rules from table macrosector
+DROP RULE IF EXISTS macrosector_del_undefined ON _macrosector;
+DROP RULE IF EXISTS macrosector_undefined ON _macrosector;
+
+
+-- Drop indexes from table macrosector
+DROP INDEX IF EXISTS macrosector_index;
+DROP INDEX IF EXISTS macrosector_pkey;
+
+
+CREATE TABLE macrosector (
+	macrosector_id serial4 NOT NULL,
+	code text NULL,
+	"name" varchar(50) NOT NULL,
+	descript text NULL,
+	the_geom public.geometry(multipolygon, 25831) NULL,
+	active bool DEFAULT true NULL,
+	lock_level int4 NULL,
+	CONSTRAINT macrosector_pkey PRIMARY KEY (macrosector_id)
+);
+
+CREATE INDEX macrosector_index ON macrosector USING gist (the_geom);
+
+
+-- macrodma
+ALTER TABLE macrodma RENAME TO _macrodma;
+
+-- Drop foreign keys that reference macrodma
+ALTER TABLE dma DROP CONSTRAINT dma_macrodma_id_fkey;
+
+-- Drop foreign keys from table macrodma
+ALTER TABLE _macrodma DROP CONSTRAINT macrodma_expl_id_fkey;
+
+-- Drop restrictions from table macrodma
+ALTER TABLE _macrodma DROP CONSTRAINT macrodma_pkey;
+
+-- Drop rules from table macrodma
+DROP RULE IF EXISTS macrodma_del_undefined ON _macrodma;
+DROP RULE IF EXISTS macrodma_undefined ON _macrodma;
+
+
+-- Drop indexes from table macrodma
+DROP INDEX IF EXISTS macrodma_index;
+DROP INDEX IF EXISTS macrodma_pkey;
+
+
+CREATE TABLE macrodma (
+	macrodma_id serial4 NOT NULL,
+	code text NULL,
+	"name" varchar(50) NOT NULL,
+	expl_id int4 NOT NULL,
+	descript text NULL,
+	the_geom public.geometry(multipolygon, 25831) NULL,
+	active bool DEFAULT true NULL,
+	lock_level int4 NULL,
+	CONSTRAINT macrodma_pkey PRIMARY KEY (macrodma_id),
+	CONSTRAINT macrodma_expl_id_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON DELETE RESTRICT ON UPDATE CASCADE
+);
+CREATE INDEX macrodma_index ON macrodma USING gist (the_geom);
+
+-- macrodqa
+ALTER TABLE macrodqa RENAME TO _macrodqa;
+
+-- Drop foreign keys that reference macrodqa
+ALTER TABLE dqa DROP CONSTRAINT dqa_macrodqa_id_fkey;
+
+-- Drop foreign keys from table macrodqa
+ALTER TABLE _macrodqa DROP CONSTRAINT macrodqa_expl_id_fkey;
+
+-- Drop restrictions from table macrodqa
+ALTER TABLE _macrodqa DROP CONSTRAINT macrodqa_pkey;
+
+-- Drop rules from table macrodqa
+DROP RULE IF EXISTS macrodqa_del_undefined ON _macrodqa;
+DROP RULE IF EXISTS macrodqa_undefined ON _macrodqa;
+
+
+-- Drop indexes from table macrodqa
+DROP INDEX IF EXISTS macrodqa_pkey;
+
+
+CREATE TABLE macrodqa (
+	macrodqa_id serial4 NOT NULL,
+	code text NULL,
+	"name" varchar(50) NOT NULL,
+	expl_id int4 NOT NULL,
+	descript text NULL,
+	the_geom public.geometry(multipolygon, 25831) NULL,
+	active bool DEFAULT true NULL,
+	lock_level int4 NULL,
+	CONSTRAINT macrodqa_pkey PRIMARY KEY (macrodqa_id),
+	CONSTRAINT macrodqa_expl_id_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+-- macroexploitation
+ALTER TABLE macroexploitation RENAME TO _macroexploitation;
+
+-- Drop foreign keys that reference macroexploitation
+ALTER TABLE exploitation DROP CONSTRAINT macroexpl_id_fkey;
+
+-- Drop restrictions from table macroexploitation
+ALTER TABLE _macroexploitation DROP CONSTRAINT macroexploitation_pkey;
+
+-- Drop rules from table macroexploitation
+DROP RULE IF EXISTS macroexploitation_del_undefined ON _macroexploitation;
+DROP RULE IF EXISTS macroexploitation_undefined ON _macroexploitation;
+
+-- Drop indexes from table macroexploitation
+DROP INDEX IF EXISTS macroexploitation_pkey;
+
+
+CREATE TABLE macroexploitation (
+	macroexpl_id int4 NOT NULL,
+	code text NULL,
+	"name" varchar(50) NOT NULL,
+	descript varchar(100) NULL,
+	active bool DEFAULT true NULL,
+	the_geom public.geometry(multipolygon, 25831) NULL,
+	lock_level int4 NULL,
+	CONSTRAINT macroexploitation_pkey PRIMARY KEY (macroexpl_id)
+);
+
+
+-- exploitation
+ALTER TABLE exploitation RENAME TO _exploitation;
+
+-- Drop foreign keys that reference exploitation
+ALTER TABLE ext_streetaxis DROP CONSTRAINT ext_streetaxis_exploitation_id_fkey;
+ALTER TABLE node DROP CONSTRAINT node_expl_fkey;
+ALTER TABLE node DROP CONSTRAINT node_expl_id2_fkey;
+ALTER TABLE config_user_x_expl DROP CONSTRAINT config_user_x_expl_expl_id_fkey;
+ALTER TABLE macrodqa DROP CONSTRAINT macrodqa_expl_id_fkey;
+ALTER TABLE om_streetaxis DROP CONSTRAINT om_streetaxis_exploitation_id_fkey;
+ALTER TABLE connec DROP CONSTRAINT connec_expl_fkey;
+ALTER TABLE connec DROP CONSTRAINT connec_expl_id2_fkey;
+ALTER TABLE om_waterbalance DROP CONSTRAINT om_waterbalance_expl_id_fkey;
+ALTER TABLE samplepoint DROP CONSTRAINT samplepoint_exploitation_id_fkey;
+ALTER TABLE ext_address DROP CONSTRAINT ext_address_exploitation_id_fkey;
+ALTER TABLE dimensions DROP CONSTRAINT dimensions_exploitation_id_fkey;
+ALTER TABLE om_mincut DROP CONSTRAINT om_mincut_expl_id_fkey;
+ALTER TABLE selector_expl DROP CONSTRAINT selector_expl_id_fkey;
+ALTER TABLE macrodma DROP CONSTRAINT macrodma_expl_id_fkey;
+ALTER TABLE plan_psector DROP CONSTRAINT plan_psector_expl_id_fkey;
+ALTER TABLE plan_netscenario DROP CONSTRAINT plan_netscenario_expl_id_fkey;
+ALTER TABLE om_visit DROP CONSTRAINT om_visit_expl_id_fkey;
+ALTER TABLE arc DROP CONSTRAINT arc_expl_fkey;
+ALTER TABLE arc DROP CONSTRAINT arc_expl_id2_fkey;
+ALTER TABLE link DROP CONSTRAINT link_exploitation_id_fkey;
+ALTER TABLE inp_pattern DROP CONSTRAINT inp_pattern_expl_id_fkey;
+ALTER TABLE minsector DROP CONSTRAINT minsector_expl_id_fkey;
+ALTER TABLE cat_dscenario DROP CONSTRAINT cat_dscenario_expl_id_fkey;
+ALTER TABLE ext_plot DROP CONSTRAINT ext_plot_exploitation_id_fkey;
+ALTER TABLE inp_curve DROP CONSTRAINT inp_curve_expl_id_fkey;
+ALTER TABLE _arc_border_expl_ DROP CONSTRAINT arc_border_expl_expl_id_fkey;
+ALTER TABLE _pond_ DROP CONSTRAINT pond_exploitation_id_fkey;
+ALTER TABLE _pool_ DROP CONSTRAINT pool_exploitation_id_fkey;
+
+
+-- Drop foreign keys from table exploitation
+--ALTER TABLE _exploitation DROP CONSTRAINT exploitation_id_fkey;
+
+-- Drop restrictions from table exploitation
+ALTER TABLE _exploitation DROP CONSTRAINT exploitation_pkey;
+
+-- Drop rules from table exploitation
+DROP RULE IF EXISTS exploitation_del_undefined ON _exploitation;
+DROP RULE IF EXISTS exploitation_undefined ON _exploitation;
+DROP RULE IF EXISTS undelete_exploitation ON _exploitation;
+
+
+-- Drop indexes from table exploitation
+DROP INDEX IF EXISTS exploitation_index;
+--DROP INDEX IF EXISTS exploitation_pkey;
+
+
+CREATE TABLE exploitation (
+	expl_id int4 NOT NULL,
+	code text NULL,
+	"name" varchar(50) NOT NULL,
+	macroexpl_id int4 NOT NULL,
+	descript text NULL,
+	the_geom public.geometry(multipolygon, 25831) NULL,
+	tstamp timestamp DEFAULT now() NULL,
+	active bool DEFAULT true NULL,
+	insert_user varchar(50) DEFAULT CURRENT_USER NULL,
+	lastupdate timestamp NULL,
+	lastupdate_user varchar(50) NULL,
+	lock_level int4 NULL,
+	CONSTRAINT exploitation_pkey PRIMARY KEY (expl_id),
+	CONSTRAINT macroexpl_id_fkey FOREIGN KEY (macroexpl_id) REFERENCES macroexploitation(macroexpl_id) ON DELETE RESTRICT ON UPDATE CASCADE
+);
+CREATE INDEX exploitation_index ON exploitation USING gist (the_geom);

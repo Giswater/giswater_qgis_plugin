@@ -457,3 +457,22 @@ INSERT
 UPDATE
     OF the_geom ON
     link FOR EACH ROW EXECUTE FUNCTION gw_trg_link_data('link');
+
+-- 09/04/2025
+CREATE TRIGGER gw_trg_edit_controls BEFORE DELETE OR UPDATE ON macrosector
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_controls('macrosector_id');
+
+CREATE TRIGGER gw_trg_edit_controls BEFORE DELETE OR UPDATE ON macrodma
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_controls('macrodma_id');
+
+CREATE TRIGGER gw_trg_edit_controls BEFORE DELETE OR UPDATE ON macrodqa
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_controls('macrodqa_id');
+
+CREATE TRIGGER gw_trg_edit_exploitation INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_exploitation
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_exploitation();
+
+CREATE TRIGGER gw_trg_edit_controls BEFORE DELETE OR UPDATE ON exploitation
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_controls('expl_id');
+
+CREATE TRIGGER gw_trg_edit_controls BEFORE DELETE OR UPDATE ON macroexploitation
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_controls('macroexpl_id');

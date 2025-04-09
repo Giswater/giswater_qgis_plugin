@@ -3473,3 +3473,24 @@ BEGIN
     END IF;
   END LOOP;
 END $func$;
+
+
+INSERT INTO macrosector (macrosector_id, code, name, descript, the_geom, active, lock_level)
+SELECT macrosector_id, macrosector_id::text, name, descript, the_geom, active, lock_level
+FROM _macrosector;
+
+INSERT INTO macrodma (macrodma_id, code, name, expl_id, descript, the_geom, active, lock_level)
+SELECT macrodma_id, macrodma_id::text, name, expl_id, descript, the_geom, active, lock_level
+FROM _macrodma;
+
+INSERT INTO macrodqa (macrodqa_id, code, name, expl_id, descript, the_geom, active, lock_level)
+SELECT macrodqa_id, macrodqa_id::text, name, expl_id, descript, the_geom, active, lock_level
+FROM _macrodqa;
+
+INSERT INTO macroexploitation (macroexpl_id, code, name, descript, active, the_geom)
+SELECT macroexpl_id, macroexpl_id::text, name, descript, active, the_geom
+FROM _macroexploitation;
+
+INSERT INTO exploitation (expl_id, code, name, macroexpl_id, descript, the_geom, tstamp, active, insert_user, lastupdate, lastupdate_user)
+SELECT expl_id, expl_id::text, name, macroexpl_id, descript, the_geom, tstamp, active, insert_user, lastupdate, lastupdate_user
+FROM _exploitation;
