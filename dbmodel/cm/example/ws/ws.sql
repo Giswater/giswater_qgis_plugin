@@ -10,10 +10,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 INSERT INTO cat_organization VALUES ('1', 'Test Organization', 'Test nova creació', True);
-INSERT INTO cat_team VALUES ('1', 'Test team', 1,'Test team', TRUE);
-
-INSERT INTO PARENT_SCHEMA.cat_users VALUES ('test', 'test')ON CONFLICT (id) DO NOTHING;
-INSERT INTO PARENT_SCHEMA.cat_users VALUES ('postgres', 'postgres')ON CONFLICT (id) DO NOTHING;
+INSERT INTO cat_team VALUES ('1', '123456', 'Team test',1, null, null, TRUE);
 
 INSERT INTO PARENT_SCHEMA.config_visit_class VALUES (10, 'Connec Incident', NULL, true, false, true, 'CONNEC', 'role_om', 2, '{"offlineDefault":"true"}', 'visit_connec_incid', 've_visit_connec_incid', 'v_ui_visit_connec_incid');
 INSERT INTO PARENT_SCHEMA.config_visit_class VALUES (11, 'Generic Incident', NULL, true, false, true, NULL, 'role_om', 2, '{"offlineDefault":"true"}', 'visit_incident', 've_visit_incident', 'v_ui_visit_incident');
@@ -47,8 +44,8 @@ INSERT INTO PARENT_SCHEMA.om_typevalue VALUES ('incident_location', 2, 'Road');
 INSERT INTO PARENT_SCHEMA.om_typevalue VALUES ('incident_location', 3, 'Facade');
 INSERT INTO PARENT_SCHEMA.om_typevalue VALUES ('incident_location', 4, 'Garden area');
 
-INSERT INTO SCHEMA_NAME.om_team_x_user (user_id, team_id) VALUES ('test', 1) ON CONFLICT (user_id, team_id) DO NOTHING;
-INSERT INTO SCHEMA_NAME.om_team_x_user (user_id, team_id) VALUES ('postgres', 1) ON CONFLICT (user_id, team_id) DO NOTHING;
+--INSERT INTO SCHEMA_NAME.om_team_x_user (user_id, team_id) VALUES ('test', 1) ON CONFLICT (user_id, team_id) DO NOTHING;
+--INSERT INTO SCHEMA_NAME.om_team_x_user (user_id, team_id) VALUES ('postgres', 1) ON CONFLICT (user_id, team_id) DO NOTHING;
 
 --INSERT INTO SCHEMA_NAME.om_team_x_visitclass (team_id, visitclass_id) VALUES (1, 12) ON CONFLICT (team_id, visitclass_id) DO NOTHING;
 
@@ -373,3 +370,30 @@ CREATE OR REPLACE VIEW v_ui_visit_incident AS
     ve_visit_incident.user_name
    FROM ve_visit_incident
    JOIN PARENT_SCHEMA.config_visit_class ON PARENT_SCHEMA.config_visit_class.id=class_id;
+
+INSERT INTO cat_organization (organization_id, code, "name", descript, active) VALUES(1, '123123', 'OWNER', 'PROPIETARIS', true);
+INSERT INTO cat_organization (organization_id, code, "name", descript, active) VALUES(2, '123123', 'O1', 'O1', true);
+INSERT INTO cat_organization (organization_id, code, "name", descript, active) VALUES(3, '123123', 'O2', 'O2', true);
+
+INSERT INTO cat_team (team_id, code, "name", organization_id, descript, role_id, active) VALUES(1, '1234512345', 'ADMIN', 1, 'equip administratiu', 'role_admin', true);
+INSERT INTO cat_team (team_id, code, "name", organization_id, descript, role_id, active) VALUES(2, '1234512345', 'o1_manager', 2, 'equip administratiu', 'role_manager', true);
+INSERT INTO cat_team (team_id, code, "name", organization_id, descript, role_id, active) VALUES(3, '1234512345', 'o2_manager', 3, 'equip administratiu', 'role_manager', true);
+INSERT INTO cat_team (team_id, code, "name", organization_id, descript, role_id, active) VALUES(4, '1234512345', 'o1_field1', 2, 'equip camp', 'role_field', true);
+INSERT INTO cat_team (team_id, code, "name", organization_id, descript, role_id, active) VALUES(5, '1234512345', 'o1_field2', 2, 'equip camp', 'role_field', true);
+INSERT INTO cat_team (team_id, code, "name", organization_id, descript, role_id, active) VALUES(6, '1234512345', 'o2_field1', 3, 'equip camp', 'role_field', true);
+INSERT INTO cat_team (team_id, code, "name", organization_id, descript, role_id, active) VALUES(7, '1234512345', 'o2_field2', 3, 'equip camp', 'role_field', true);
+
+INSERT INTO cat_user (user_id, loginname, code, "name", descript, team_id, active) VALUES(1, 'antonio@gmail.com', '48178923Z', 'antonio', 'administrador1', 1, true);
+INSERT INTO cat_user (user_id, loginname, code, "name", descript, team_id, active) VALUES(2, 'test@gmail.com', '48178923Z', 'juan', 'administrador2', 1, true);
+INSERT INTO cat_user (user_id, loginname, code, "name", descript, team_id, active) VALUES(4, 'test@gmail.com', '48178923Z', 'test', 'manager o1', 2, true);
+INSERT INTO cat_user (user_id, loginname, code, "name", descript, team_id, active) VALUES(5, 'test@gmail.com', '48178923Z', 'test', 'manager o1', 2, true);
+INSERT INTO cat_user (user_id, loginname, code, "name", descript, team_id, active) VALUES(6, 'test@gmail.com', '48178923Z', 'test', 'o1 field 1', 4, true);
+INSERT INTO cat_user (user_id, loginname, code, "name", descript, team_id, active) VALUES(7, 'test@gmail.com', '48178923Z', 'test', 'o1 field 1', 4, true);
+INSERT INTO cat_user (user_id, loginname, code, "name", descript, team_id, active) VALUES(8, 'test@gmail.com', '48178923Z', 'test', 'o1 field 2', 5, true);
+INSERT INTO cat_user (user_id, loginname, code, "name", descript, team_id, active) VALUES(9, 'test@gmail.com', '48178923Z', 'test', 'o1 field 2', 5, true);
+INSERT INTO cat_user (user_id, loginname, code, "name", descript, team_id, active) VALUES(10, 'test@gmail.com', '48178923Z', 'test', 'manager 02', 3, true);
+INSERT INTO cat_user (user_id, loginname, code, "name", descript, team_id, active) VALUES(11, 'test@gmail.com', '48178923Z', 'test', 'manager 02', 3, true);
+INSERT INTO cat_user (user_id, loginname, code, "name", descript, team_id, active) VALUES(12, 'test@gmail.com', '48178923Z', 'test', 'o2 field 1', 6, true);
+INSERT INTO cat_user (user_id, loginname, code, "name", descript, team_id, active) VALUES(13, 'test@gmail.com', '48178923Z', 'test', 'o2 field 1', 6, true);
+INSERT INTO cat_user (user_id, loginname, code, "name", descript, team_id, active) VALUES(14, 'test@gmail.com', '48178923Z', 'test', 'o2 field 2', 7, true);
+INSERT INTO cat_user (user_id, loginname, code, "name", descript, team_id, active) VALUES(15, 'test@gmail.com', '48178923Z', 'test', 'o2 field 2', 7, true);

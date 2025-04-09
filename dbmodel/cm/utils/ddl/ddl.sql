@@ -21,7 +21,7 @@ CREATE TABLE cm.cat_organization (
 	name text NULL,
 	descript text NULL,
 	active bool NULL DEFAULT true,
-	CONSTRAINT cat_organization_pkey PRIMARY KEY (id)
+	CONSTRAINT cat_organization_pkey PRIMARY KEY (organization_id)
 );
 
 CREATE TABLE cm.cat_team (
@@ -32,15 +32,15 @@ CREATE TABLE cm.cat_team (
 	descript text NULL,
 	role_id TEXT NULL,
 	active bool NULL DEFAULT true,
-	CONSTRAINT cat_team_pkey PRIMARY KEY (id, organization_id),
-	CONSTRAINT cat_team_unique UNIQUE (id),
-	CONSTRAINT cat_team_organization_id_fkey FOREIGN KEY (organization_id) REFERENCES cm.cat_organization(id) ON DELETE RESTRICT ON UPDATE CASCADE
+	CONSTRAINT cat_team_pkey PRIMARY KEY (team_id, organization_id),
+	CONSTRAINT cat_team_unique UNIQUE (team_id),
+	CONSTRAINT cat_team_organization_id_fkey FOREIGN KEY (organization_id) REFERENCES cm.cat_organization(organization_id) ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
 CREATE TABLE om_team_x_user
 (
   id serial NOT NULL,
-  user_id character varying(50), --fk user
+  user_id integer, --fk user
   team_id integer, -- fk cat_team
   CONSTRAINT om_team_x_user_pkey PRIMARY KEY (id)
 );
@@ -286,8 +286,8 @@ CREATE TABLE cat_user (
     name varchar(200),
     descript text,
     team_id int4,
-    active boolean DEFAULT TRUE
-    CONSTRAINT cat_user_team_id_fkey FOREIGN KEY (team_id) REFERENCES cat_team(id)
+    active boolean DEFAULT TRUE,
+    CONSTRAINT cat_user_team_id_fkey FOREIGN KEY (team_id) REFERENCES cat_team(team_id)
 );
 
 CREATE TABLE cm.selector_campaign_lot (

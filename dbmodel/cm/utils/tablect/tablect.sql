@@ -10,21 +10,18 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 ALTER TABLE cat_team DROP CONSTRAINT IF EXISTS cat_team_organization_id_fkey;
 ALTER TABLE cat_team ADD CONSTRAINT cat_team_organization_id_fkey FOREIGN KEY (organization_id)
-REFERENCES cat_organization(id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
-
-ALTER TABLE cat_team DROP CONSTRAINT IF EXISTS cat_team_unique;
-ALTER TABLE cat_team ADD CONSTRAINT cat_team_unique UNIQUE (id);
+REFERENCES cat_organization(organization_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 
 ALTER TABLE om_team_x_user DROP CONSTRAINT IF EXISTS om_team_x_user_unique;
 ALTER TABLE om_team_x_user ADD CONSTRAINT om_team_x_user_unique UNIQUE (user_id, team_id);
 
 ALTER TABLE om_team_x_user DROP CONSTRAINT IF EXISTS om_team_x_user_user_id_fkey;
 ALTER TABLE om_team_x_user ADD CONSTRAINT om_team_x_user_user_id_fkey FOREIGN KEY (user_id)
-REFERENCES PARENT_SCHEMA.cat_users (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+REFERENCES cat_user (user_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
 
 ALTER TABLE om_team_x_user DROP CONSTRAINT IF EXISTS om_team_x_user_team_id_fkey;
 ALTER TABLE om_team_x_user ADD CONSTRAINT om_team_x_user_team_id_fkey FOREIGN KEY (team_id)
-REFERENCES cat_team (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+REFERENCES cat_team (team_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
 
 ALTER TABLE om_reviewclass_x_layer DROP CONSTRAINT IF EXISTS om_reviewclass_x_layer_reviewclass_id_fkey;
 ALTER TABLE om_reviewclass_x_layer ADD CONSTRAINT om_reviewclass_x_layer_reviewclass_id_fkey FOREIGN KEY (reviewclass_id)
@@ -32,7 +29,7 @@ REFERENCES om_reviewclass (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
 
 ALTER TABLE om_campaign DROP CONSTRAINT IF EXISTS om_campaign_organization_id_fkey;
 ALTER TABLE om_campaign ADD CONSTRAINT om_campaign_organization_id_fkey FOREIGN KEY (organization_id)
-REFERENCES cat_organization(id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+REFERENCES cat_organization(organization_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 
 ALTER TABLE om_campaign_visit DROP CONSTRAINT IF EXISTS om_campaign_visit_campaign_id_fkey;
 ALTER TABLE om_campaign_visit ADD CONSTRAINT om_campaign_visit_campaign_id_fkey FOREIGN KEY (campaign_id)
@@ -100,7 +97,7 @@ REFERENCES workorder (workorder_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RES
 
 ALTER TABLE om_campaign_lot DROP CONSTRAINT IF EXISTS om_campaign_lot_team_id_fkey;
 ALTER TABLE om_campaign_lot ADD CONSTRAINT om_campaign_lot_team_id_fkey FOREIGN KEY (team_id)
-REFERENCES cat_team (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+REFERENCES cat_team (team_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 
 ALTER TABLE selector_lot DROP CONSTRAINT IF EXISTS selector_lot_lot_id_fkey;
 ALTER TABLE selector_lot ADD CONSTRAINT selector_lot_lot_id_fkey FOREIGN KEY (lot_id)

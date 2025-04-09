@@ -11,15 +11,15 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 CREATE OR REPLACE VIEW v_om_team_x_user AS 
 SELECT om_team_x_user.id,
 om_team_x_user.user_id,
-cat_team.idval AS team,
-cat_users.name AS user_name
+cat_team.name AS team,
+cat_user.name AS user_name
 FROM om_team_x_user
-JOIN cat_team ON om_team_x_user.team_id = cat_team.id
-JOIN PARENT_SCHEMA.cat_users ON om_team_x_user.user_id::text = cat_users.id::text;
+JOIN cat_team USING (team_id)
+JOIN cat_user USING (user_id);
 
 CREATE OR REPLACE VIEW v_edit_cat_team AS 
-SELECT cat_team.id,
-cat_team.idval,
+SELECT cat_team.team_id,
+cat_team.name,
 cat_team.descript,
 cat_team.active
 FROM cat_team;
@@ -28,7 +28,7 @@ FROM cat_team;
 CREATE OR REPLACE VIEW v_om_campaign_x_user AS
 SELECT om_visit_lot_x_user.id,
 om_visit_lot_x_user.user_id,
-cat_team.idval AS team,
+cat_team.name AS team,
 om_visit_lot_x_user.lot_id,
 workorder.workorder_name,
 om_visit_lot.serie,
@@ -38,7 +38,7 @@ om_visit_lot_x_user.starttime,
 om_visit_lot_x_user.endtime,
 om_visit_lot_x_user.the_geom
 FROM om_visit_lot_x_user
-JOIN cat_team ON om_visit_lot_x_user.team_id = cat_team.id
+JOIN cat_team ON om_visit_lot_x_user.team_id = cat_team.team_id
 LEFT JOIN om_visit_lot ON om_visit_lot.id = om_visit_lot_x_user.lot_id
 LEFT JOIN workorder ON workorder.serie::text = om_visit_lot.serie::text;
 */
@@ -51,14 +51,14 @@ om_campaign_lot.enddate,
 om_campaign_lot.real_startdate,
 om_campaign_lot.real_enddate,
 om_campaign_lot.descript,
-cat_team.idval AS team,
+cat_team.name AS team,
 om_campaign_lot.duration,
 om_typevalue.idval AS status,
 workorder.workorder_name,
 om_campaign_lot.address
 FROM om_campaign_lot
 LEFT JOIN workorder ON workorder.workorder_id = om_campaign_lot.workorder_id
-LEFT JOIN cat_team ON cat_team.id = om_campaign_lot.team_id
+LEFT JOIN cat_team ON cat_team.team_id = om_campaign_lot.team_id
 LEFT JOIN PARENT_SCHEMA.om_typevalue ON om_typevalue.id::integer = om_campaign_lot.status AND om_typevalue.typevalue = 'lot_cat_status'::text;
 
 

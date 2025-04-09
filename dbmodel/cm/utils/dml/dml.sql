@@ -63,11 +63,11 @@ INSERT INTO PARENT_SCHEMA.om_typevalue VALUES ('campaign_x_feature_status', 0, '
 INSERT INTO PARENT_SCHEMA.om_typevalue VALUES ('visit_status', 5, 'Validated', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;
 
 INSERT INTO PARENT_SCHEMA.config_typevalue VALUES ('tabname_typevalue', 'tab_team', 'tab_team', 'tabTeam');
-INSERT INTO PARENT_SCHEMA.config_typevalue VALUES ('widgetfunction_typevalue', 'get_visit_manager', 'get_visit_manager', 'gwGetVisitManager') 
+INSERT INTO PARENT_SCHEMA.config_typevalue VALUES ('widgetfunction_typevalue', 'get_visit_manager', 'get_visit_manager', 'gwGetVisitManager')
 ON CONFLICT (typevalue, id) DO UPDATE SET camelstyle=EXCLUDED.camelstyle;
-INSERT INTO PARENT_SCHEMA.config_typevalue VALUES ('widgetfunction_typevalue', 'set_visit_manager', 'set_visit_manager', 'gwSetVisitManager') 
+INSERT INTO PARENT_SCHEMA.config_typevalue VALUES ('widgetfunction_typevalue', 'set_visit_manager', 'set_visit_manager', 'gwSetVisitManager')
 ON CONFLICT (typevalue, id) DO UPDATE SET camelstyle=EXCLUDED.camelstyle;
-INSERT INTO PARENT_SCHEMA.config_typevalue VALUES ('widgetfunction_typevalue', 'get_lot', 'get_lot', 'gwGetLot') 
+INSERT INTO PARENT_SCHEMA.config_typevalue VALUES ('widgetfunction_typevalue', 'get_lot', 'get_lot', 'gwGetLot')
 ON CONFLICT (typevalue, id) DO UPDATE SET camelstyle=EXCLUDED.camelstyle;
 INSERT INTO PARENT_SCHEMA.config_typevalue VALUES ('widgetfunction_typevalue', 'set_lot', 'set_lot', 'gwSetLot')
 ON CONFLICT (typevalue, id) DO UPDATE SET camelstyle=EXCLUDED.camelstyle;
@@ -87,15 +87,15 @@ INSERT INTO PARENT_SCHEMA.config_form_tabs VALUES ('v_edit_connec', 'tab_visit',
 /*config_form_list*/
 INSERT INTO PARENT_SCHEMA.config_form_list VALUES ('om_campaign_lot', 'SELECT a.id AS sys_id, ''om_campaign_lot'' as sys_listname, ''id'' as sys_idname, a.id AS lot_id, c.idval AS visitclass_id, t.idval AS status FROM om_campaign_lot a
 JOIN config_visit_class c ON c.id=a.visitclass_id
-LEFT JOIN PARENT_SCHEMA.om_typevalue t ON t.id::integer=a.status WHERE typevalue=''lot_cat_status''', 
+LEFT JOIN PARENT_SCHEMA.om_typevalue t ON t.id::integer=a.status WHERE typevalue=''lot_cat_status''',
 3, 'tab', 'list', '{"orderBy":"1", "orderType": "DESC"}')
-ON CONFLICT (listname, device) DO NOTHING; 
+ON CONFLICT (listname, device) DO NOTHING;
 
 INSERT INTO PARENT_SCHEMA.config_form_list VALUES ('om_visit', 'SELECT o.id as sys_id, ''om_visit'' as sys_listname,''id'' as sys_idname, o.id, date_trunc(''second'',startdate) AS startdate, c.idval AS visitclass_id FROM om_visit o
 LEFT JOIN config_visit_class c ON c.id=o.class_id
-WHERE  user_name=current_user', 
+WHERE  user_name=current_user',
 3, 'tab', 'list', '{"orderBy":"1", "orderType": "DESC"}')
-ON CONFLICT (listname, device) DO NOTHING; 
+ON CONFLICT (listname, device) DO NOTHING;
 
 /*config_form_fields*/
 ALTER TABLE PARENT_SCHEMA.config_form_fields DISABLE TRIGGER gw_trg_config_control;
@@ -150,7 +150,7 @@ ALTER TABLE PARENT_SCHEMA.config_form_fields ENABLE TRIGGER gw_trg_config_contro
 UPDATE PARENT_SCHEMA.config_form_list SET query_text='SELECT visit_id AS sys_id, visit_start AS "Date", config_visit_class.idval AS "Visit class", om_visit.user_name AS "Visit user"
 FROM v_ui_om_visitman_x_node
 JOIN om_visit ON om_visit.id=v_ui_om_visitman_x_node.visit_id
-JOIN config_visit_class ON config_visit_class.id=om_visit.class_id' 
+JOIN config_visit_class ON config_visit_class.id=om_visit.class_id'
 WHERE query_text='SELECT visit_id AS sys_id, visitcat_name, visit_start, visit_end, user_name FROM v_ui_om_visitman_x_node'
 AND listname='node_x_visit_manager';
 
