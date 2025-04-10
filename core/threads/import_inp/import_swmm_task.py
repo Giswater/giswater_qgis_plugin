@@ -5,6 +5,7 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 import traceback
+import sys
 from datetime import date
 from itertools import count
 from typing import Any
@@ -12,6 +13,8 @@ from datetime import datetime
 from typing import Optional
 
 try:
+    if sys.version_info < (3, 10):
+        raise ImportError
     from swmm_api import SwmmInput
     from swmm_api.input_file.section_labels import (
         TITLE, OPTIONS, REPORT, FILES,

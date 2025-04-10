@@ -5,6 +5,7 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 import os
+import sys
 
 from datetime import timedelta
 from enum import Enum
@@ -31,11 +32,16 @@ from .....libs import tools_db, tools_qgis, tools_qt, tools_log, lib_vars
 from ....models.plugin_toolbar import GwPluginToolbar
 from ....ui.dialog import GwDialog
 from ....ui.ui_manager import GwInpConfigImportUi, GwInpParsingUi
-from ....threads.import_inp.import_swmm_task import GwImportInpTask
+if sys.version_info >= (3, 10):
+    from ....threads.import_inp.import_swmm_task import GwImportInpTask
+    from ....utils.import_inp import GwInpConfig, create_load_menu, load_config, save_config, save_config_to_file, fill_txt_info
+    from ....threads.import_inp import parse_swmm_task
+else:
+    GwImportInpTask = None
+    GwInpConfig, create_load_menu, load_config, save_config, save_config_to_file, fill_txt_info = None, None, None, None, None, None
+    parse_swmm_task = None
 from ....utils import tools_gw
-from ....utils.import_inp import GwInpConfig, create_load_menu, load_config, save_config, save_config_to_file, fill_txt_info
 from ...dialog import GwAction
-from ....threads.import_inp import parse_swmm_task
 
 CREATE_NEW = "Create new"
 SPATIAL_INTERSECT = "Get from spatial intersect"
@@ -58,10 +64,11 @@ class GwImportSwmm:
 
     def clicked_event(self) -> None:
         """Start the Import INP workflow"""
-
-        # TODO: remove this message once it's not in developement
-        msg = "Import INP is still in developement. It may not work as intended yet. Please report any unexpected behaviour to the Giswater team."
-        tools_qgis.show_warning(msg, duration=30)
+        if sys.version_info < (3, 10):
+            msg = "Import INP is only available on Python 3.10 or higher. " \
+                  "Please update your QGIS's Python version."
+            tools_qgis.show_warning(msg)
+            return
 
         try:
             import swmm_api
