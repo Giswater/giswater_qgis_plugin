@@ -3191,7 +3191,7 @@ def zoom_to_feature_by_id(tablename: str, idname: str, _id, margin: float = 15):
         return
 
     if isinstance(_id, list):
-        expr_filter = f"{idname} IN ({', '.join([f'\'{i}\'' for i in _id])})"
+        expr_filter = f"""{idname} IN ({', '.join([f"'{i}'" for i in _id])})"""
     else:
         expr_filter = f"{idname} = '{_id}'"
 
@@ -4555,7 +4555,7 @@ def _delete_feature_psector(dialog, feature_type, list_id, state=None):
            f"WHERE {feature_type}_id IN ({list_id}) AND psector_id = '{value}'")
     # Add state if needed
     if state is not None:
-        sql += f' AND "state" = \'{state}\''
+        sql += f""" AND "state" = '{state}'"""
     tools_db.execute_sql(sql)
 
 
