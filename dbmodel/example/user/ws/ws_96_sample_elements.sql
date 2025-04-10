@@ -1009,7 +1009,7 @@ INSERT INTO connec VALUES ('3076', '3076', '3076', 60.4549, NULL, 'PVC25-PN16-DO
 INSERT INTO connec VALUES ('3177', '3177', '3177', 45.1068, NULL, 'PVC32-PN16-IND', 3, 'cc3177', 1, 2, '2088', NULL, NULL, NULL, NULL, 2, '0', 'soil1', 'St. Function', 'St. Category', 'St. Fluid', 'St. Location', 'work2', NULL, '2017-12-06', NULL, 'owner1', 1, '08830', '1-9100C', 48, NULL, NULL, NULL, NULL, NULL, 'https://www.giswater.org', '0', -56.623, '0101000020E7640000CB2CEC86EA92194129DEE0541E755141', NULL, '3', NULL, -56.623, true, true, 1, NULL, 'CONNEC', '2021-03-28 17:06:35.170994', 'ARC', '2088', '2024-02-21 12:08:24.052788', 'postgres', 'postgres', NULL, 1, NULL, 1, NULL, NULL, NULL, NULL, NULL, 'JUNCTION', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
 
-INSERT INTO element (element_id, code, elementcat_id, state, state_type, muni_id, expl_id, feature_type)
+INSERT INTO element (element_id, code, elementcat_id, state, state_type, muni_id, expl_id)
 SELECT generate_series(473, 594), concat('E', generate_series(473, 594)), 'COVER40X40', 1, 2, 1, 1 UNION
 SELECT generate_series(595, 708), concat('E', generate_series(595, 708)), 'COVER40X40', 1, 2, 1, 2 UNION
 SELECT generate_series(709, 830), concat('E', generate_series(709, 830)), 'REGISTER40X40', 1, 2, 1, 1 UNION

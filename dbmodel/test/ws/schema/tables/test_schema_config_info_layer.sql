@@ -19,7 +19,7 @@ SELECT has_table('config_info_layer'::name, 'Table config_info_layer should exis
 SELECT columns_are(
     'config_info_layer',
     ARRAY[
-        'layer_id', 'is_parent', 'tableparent_id', 'is_editable', 'formtemplate', 'headertext', 'orderby', 'tableparentepa_id', 'addparam'
+        'layer_id', 'is_parent', 'is_editable', 'formtemplate', 'headertext', 'orderby', 'tableparentepa_id', 'addparam'
     ],
     'Table config_info_layer should have the correct columns'
 );
@@ -30,7 +30,6 @@ SELECT col_is_pk('config_info_layer', ARRAY['layer_id'], 'Column layer_id should
 -- Check column types
 SELECT col_type_is('config_info_layer', 'layer_id', 'text', 'Column layer_id should be text');
 SELECT col_type_is('config_info_layer', 'is_parent', 'boolean', 'Column is_parent should be boolean');
-SELECT col_type_is('config_info_layer', 'tableparent_id', 'text', 'Column tableparent_id should be text');
 SELECT col_type_is('config_info_layer', 'is_editable', 'boolean', 'Column is_editable should be boolean');
 SELECT col_type_is('config_info_layer', 'formtemplate', 'text', 'Column formtemplate should be text');
 SELECT col_type_is('config_info_layer', 'headertext', 'text', 'Column headertext should be text');
