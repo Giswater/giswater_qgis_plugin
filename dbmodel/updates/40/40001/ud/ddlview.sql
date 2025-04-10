@@ -1991,41 +1991,6 @@ AS SELECT v_rtc_period_hydrometer.dma_id::integer AS dma_id,
   GROUP BY v_rtc_period_hydrometer.dma_id, v_rtc_period_hydrometer.period_id, a.pattern_id;
 
 
-CREATE OR REPLACE VIEW v_ui_element
-AS SELECT element.element_id AS id,
-    element.code,
-    element.elementcat_id,
-    element.brand_id,
-    element.model_id,
-    element.serial_number,
-    element.num_elements,
-    element.state,
-    element.state_type,
-    element.observ,
-    element.comment,
-    element.function_type,
-    element.category_type,
-    element.fluid_type,
-    element.location_type,
-    element.workcat_id,
-    element.workcat_id_end,
-    element.builtdate,
-    element.enddate,
-    element.ownercat_id,
-    element.rotation,
-    element.link,
-    element.verified,
-    element.the_geom,
-    element.label_x,
-    element.label_y,
-    element.label_rotation,
-    element.undelete,
-    element.publish,
-    element.inventory,
-    element.expl_id,
-    element.feature_type,
-    element.tstamp
-   FROM element;
 
 
 CREATE OR REPLACE VIEW v_edit_inp_conduit
@@ -4451,7 +4416,7 @@ AS SELECT polygon.pol_id,
     gully.fluid_type,
     polygon.trace_featuregeom
     FROM polygon
-    JOIN gully ON polygon.feature_id::text = gully.gully_id::text;
+    JOIN gully ON polygon.feature_id::text = gully.gully_id::text
     JOIN selector_expl se ON (se.cur_user = CURRENT_USER AND se.expl_id = gully.expl_id) or (se.cur_user = CURRENT_USER and se.expl_id = gully.expl_id2)
     JOIN selector_sector ss ON (ss.cur_user = CURRENT_USER AND ss.sector_id = gully.sector_id)
     JOIN selector_municipality sm ON (sm.cur_user = CURRENT_USER AND sm.muni_id = gully.muni_id);
