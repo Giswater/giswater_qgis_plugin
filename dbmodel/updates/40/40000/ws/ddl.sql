@@ -1472,7 +1472,7 @@ CREATE TABLE element (
 	rotation numeric(6, 3) NULL,
 	link varchar(512) NULL,
 	verified int4 NULL,
-	the_geom public.geometry(point, SRID_VALUE) NULL,
+	the_geom public.geometry(geometry, SRID_VALUE) NULL,
 	label_x varchar(30) NULL,
 	label_y varchar(30) NULL,
 	label_rotation numeric(6, 3) NULL,
@@ -1508,7 +1508,8 @@ CREATE TABLE element (
 	CONSTRAINT element_state_fkey FOREIGN KEY (state) REFERENCES value_state(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT element_state_type_fkey FOREIGN KEY (state_type) REFERENCES value_state_type(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT element_workcat_id_end_fkey FOREIGN KEY (workcat_id_end) REFERENCES cat_work(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT element_workcat_id_fkey FOREIGN KEY (workcat_id) REFERENCES cat_work(id) ON DELETE RESTRICT ON UPDATE CASCADE
+	CONSTRAINT element_workcat_id_fkey FOREIGN KEY (workcat_id) REFERENCES cat_work(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT element_expl_id_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
 CREATE INDEX element_index ON element USING gist (the_geom);

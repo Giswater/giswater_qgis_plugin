@@ -123,5 +123,3 @@ CREATE TABLE inp_dscenario_flwreg_pump (
     CONSTRAINT inp_dscenario_flwreg_pump_check_status CHECK (status::text = ANY (ARRAY['ON'::text, 'OFF'::text])),
     CONSTRAINT inp_dscenario_flwreg_pump_fkey_curve_id FOREIGN KEY (curve_id) REFERENCES inp_curve(id) ON DELETE RESTRICT ON UPDATE CASCADE
 );
-
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"element", "column":"geometry_type", "dataType":"text"}}$$);

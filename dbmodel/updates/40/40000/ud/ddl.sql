@@ -1879,7 +1879,7 @@ CREATE TABLE element (
 	rotation numeric(6, 3) NULL,
 	link varchar(512) NULL,
 	verified int4 NULL,
-	the_geom public.geometry(point, SRID_VALUE) NULL,
+	the_geom public.geometry(geometry, SRID_VALUE) NULL,
 	label_x varchar(30) NULL,
 	label_y varchar(30) NULL,
 	label_rotation numeric(6, 3) NULL,
@@ -1911,14 +1911,14 @@ CREATE TABLE element (
 	CONSTRAINT element_fluid_type_feature_type_fkey FOREIGN KEY (fluid_type,feature_type) REFERENCES man_type_fluid(fluid_type,feature_type) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT element_function_type_feature_type_fkey FOREIGN KEY (function_type,feature_type) REFERENCES man_type_function(function_type,feature_type) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT element_location_type_feature_type_fkey FOREIGN KEY (location_type,feature_type) REFERENCES man_type_location(location_type,feature_type) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT element_muni_id FOREIGN KEY (muni_id) REFERENCES ext_municipality(muni_id),
 	CONSTRAINT element_muni_id_fkey FOREIGN KEY (muni_id) REFERENCES ext_municipality(muni_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT element_ownercat_id_fkey FOREIGN KEY (ownercat_id) REFERENCES cat_owner(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT element_sector_id FOREIGN KEY (sector_id) REFERENCES sector(sector_id),
 	CONSTRAINT element_state_fkey FOREIGN KEY (state) REFERENCES value_state(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT element_state_type_fkey FOREIGN KEY (state_type) REFERENCES value_state_type(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT element_workcat_id_end_fkey FOREIGN KEY (workcat_id_end) REFERENCES cat_work(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT element_workcat_id_fkey FOREIGN KEY (workcat_id) REFERENCES cat_work(id) ON DELETE RESTRICT ON UPDATE CASCADE
+	CONSTRAINT element_workcat_id_fkey FOREIGN KEY (workcat_id) REFERENCES cat_work(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT element_expl_id_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON DELETE RESTRICT ON UPDATE CASCADE
 );
 CREATE INDEX element_index ON element USING gist (the_geom);
 CREATE INDEX element_muni ON element USING btree (muni_id);
