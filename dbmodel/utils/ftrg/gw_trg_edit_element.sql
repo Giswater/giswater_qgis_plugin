@@ -45,7 +45,22 @@ v_tablefeature text;
 v_element_type text;
 v_trace_featuregeom boolean;
 
+--
+v_origin_table TEXT;
+v_parent_table TEXT;
+v_json_new_data JSON;
+v_sql TEXT;
+v_rec_sentence record;
+v_tg_table_name TEXT;
+v_result text;
+v_input_json JSON;
+v_result_rec record;
+v_json_old_data JSON;
+
 BEGIN
+		v_tg_table_name = TG_TABLE_NAME;
+		
+		
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
@@ -230,15 +245,32 @@ BEGIN
 			END IF;
 		END IF;
 
-		-- FEATURE INSERT
-		INSERT INTO element (element_id, code, datasource, elementcat_id, model_id, brand_id, serial_number, "state", state_type, observ, "comment", function_type, category_type, location_type,
-		workcat_id, workcat_id_end, builtdate, enddate, ownercat_id, rotation, link, verified, the_geom, label_x, label_y, label_rotation, publish,
-		inventory, undelete, expl_id, num_elements, pol_id, expl_id2, sector_id, muni_id, lock_level)
-		VALUES (NEW.element_id, NEW.code, NEW.datasource,NEW.elementcat_id, NEW.model_id, NEW.brand_id, NEW.serial_number, NEW."state", NEW.state_type, NEW.observ, NEW."comment",
-		NEW.function_type, NEW.category_type, NEW.location_type, NEW.workcat_id, NEW.workcat_id_end, NEW.builtdate, NEW.enddate,
-		NEW.ownercat_id, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom, NEW.label_x, NEW.label_y, NEW.label_rotation, NEW.publish,
-		NEW.inventory, NEW.undelete, NEW.expl_id, NEW.num_elements, v_pol_id, NEW.expl_id2, NEW.sector_id, NEW.muni_id, NEW.lock_level);
-
+		-- FEATURE INSERT (DYNAMIC TRIGGER)
+		SELECT row_to_json(NEW) INTO v_json_new_data;
+		SELECT row_to_json(OLD) INTO v_json_old_data;
+	
+		v_input_json := jsonb_build_object(
+        'client', jsonb_build_object(
+            'device', 4,
+            'infoType', 1,
+            'lang', 'ES'
+        	),
+        'feature', '{}'::jsonb,
+        'data', jsonb_build_object(
+            'parameters', jsonb_build_object(
+                'jsonNewData', v_json_new_data,
+                'jsonOldData', v_json_old_data,
+                'action', 'INSERT',
+                'originTable', v_tg_table_name,
+                'pkeyColumn', 'element_id',
+                'pkeyValue', NEW.element_id
+            	)	
+        	)
+    	);
+	
+		PERFORM gw_fct_admin_dynamic_trigger(v_input_json);
+	
+	
 		-- update element_x_feature table
 		IF v_tablefeature IS NOT NULL AND v_feature IS NOT NULL THEN
 			EXECUTE 'INSERT INTO element_x_'||v_tablefeature||' ('||v_tablefeature||'_id, element_id) VALUES ('||v_feature||','||NEW.element_id||') ON CONFLICT 
@@ -271,14 +303,31 @@ BEGIN
 			NEW.muni_id := (SELECT m.muni_id FROM ext_municipality m WHERE ST_intersects(NEW.the_geom, m.the_geom) AND active IS TRUE limit 1);
 		END IF;
 
-		UPDATE element
-		SET element_id=NEW.element_id, code=NEW.code, datasource=NEW.datasource, elementcat_id=NEW.elementcat_id, model_id=NEW.model_id, brand_id=NEW.brand_id, serial_number=NEW.serial_number, "state"=NEW."state", state_type=NEW.state_type, observ=NEW.observ, "comment"=NEW."comment",
-		function_type=NEW.function_type, category_type=NEW.category_type,  location_type=NEW.location_type, workcat_id=NEW.workcat_id, workcat_id_end=NEW.workcat_id_end,
-		builtdate=NEW.builtdate, enddate=NEW.enddate, ownercat_id=NEW.ownercat_id, rotation=NEW.rotation, link=NEW.link, verified=NEW.verified,
-		the_geom=NEW.the_geom, label_x=NEW.label_x, label_y=NEW.label_y, label_rotation=NEW.label_rotation, publish=NEW.publish, inventory=NEW.inventory, undelete=NEW.undelete,expl_id=NEW.expl_id, num_elements=NEW.num_elements,
-		lastupdate=now(), lastupdate_user=current_user, trace_featuregeom=NEW.trace_featuregeom, sector_id=NEW.sector_id, muni_id=NEW.muni_id, lock_level=NEW.lock_level
-		WHERE element_id=OLD.element_id;
-
+		-- UPDATE element (DYNAMIC TRIGGER)
+		SELECT row_to_json(NEW) INTO v_json_new_data;
+		SELECT row_to_json(OLD) INTO v_json_old_data;
+	
+		v_input_json := jsonb_build_object(
+        'client', jsonb_build_object(
+            'device', 4,
+            'infoType', 1,
+            'lang', 'ES'
+        	),
+        'feature', '{}'::jsonb,
+        'data', jsonb_build_object(
+            'parameters', jsonb_build_object(
+                'jsonNewData', v_json_new_data,
+                'jsonOldData', v_json_old_data,
+                'action', 'UPDATE',
+                'originTable', v_tg_table_name,
+                'pkeyColumn', 'element_id',
+                'pkeyValue', NEW.element_id
+            	)	
+        	)
+    	);
+	
+		PERFORM gw_fct_admin_dynamic_trigger(v_input_json);
+		
 		-- UPDATE geom
 		IF st_equals( NEW.the_geom, OLD.the_geom) IS FALSE THEN
 			--update elevation from raster
