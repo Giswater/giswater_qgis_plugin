@@ -1863,16 +1863,16 @@ INSERT INTO link (link_id, code, feature_id, feature_type, exit_id, exit_type, u
 INSERT INTO link (link_id, code, feature_id, feature_type, exit_id, exit_type, userdefined_geom, state, expl_id, the_geom, tstamp, exit_topelev, sector_id, dma_id, fluid_type, exit_elev, expl_id2, epa_type, is_operative, insert_user, lastupdate, lastupdate_user, linkcat_id, workcat_id, workcat_id_end, builtdate, enddate, drainzone_id, uncertain) VALUES (637, NULL, '49997', 'GULLY', '18901', 'ARC', false, 1, 2, '0102000020E7640000020000009ACE0D44608C194172AC41D269765141BBEFF789648C194162B74B1168765141', '2020-09-30 16:21:54.036021', NULL, 2, 3, NULL, NULL, NULL, 'GULLY', true, 'postgres', '2024-02-21 12:09:27.095883', 'postgres', 'PVC-CC025_D', NULL, NULL, NULL, NULL, NULL, false);
 
 INSERT INTO element (element_id, code, elementcat_id, state, state_type, expl_id, muni_id, feature_type)
-SELECT generate_series(671, 798), concat('E', generate_series(671, 798)), 'COVER70', 1, 2, 1, 1, 'GENELEMENT' UNION
-SELECT generate_series(799, 866), concat('E', generate_series(799, 866)), 'COVER70', 1, 2, 2, 1, 'GENELEMENT' UNION
-SELECT generate_series(867, 994), concat('E', generate_series(867, 994)), 'STEP200', 1, 2, 1, 1, 'GENELEMENT' UNION
-SELECT generate_series(995, 1062), concat('E', generate_series(995, 1062)), 'STEP200', 1, 2, 2, 1, 'GENELEMENT' UNION
-SELECT generate_series(1063, 1340), concat('E', generate_series(1063, 1340)), 'COVER70', 1, 2, 1, 1, 'GENELEMENT' UNION
-SELECT generate_series(1341, 1534), concat('E', generate_series(1341, 1534)), 'COVER70', 1, 2, 2, 1, 'GENELEMENT' UNION
-SELECT generate_series(1535, 1665), concat('E', generate_series(1535, 1665)), 'HYDROGEN SULFIDE SENSOR', 1, 2, 1, 1, 'GENELEMENT' UNION
-SELECT generate_series(1666, 1739), concat('E', generate_series(1666, 1739)), 'HYDROGEN SULFIDE SENSOR', 1, 2, 2, 1, 'GENELEMENT' UNION
-SELECT generate_series(1740, 1870), concat('E', generate_series(1740, 1870)), 'HYDROGEN SULFIDE SENSOR', 1, 2, 1, 1, 'GENELEMENT' UNION
-SELECT generate_series(1871, 1973), concat('E', generate_series(1871, 1973)), 'HYDROGEN SULFIDE SENSOR', 1, 2, 2, 1, 'GENELEMENT';
+SELECT generate_series(671, 798), concat('E', generate_series(671, 798)), 'COVER70', 1, 2, 1, 1 UNION
+SELECT generate_series(799, 866), concat('E', generate_series(799, 866)), 'COVER70', 1, 2, 2, 1 UNION
+SELECT generate_series(867, 994), concat('E', generate_series(867, 994)), 'STEP200', 1, 2, 1, 1 UNION
+SELECT generate_series(995, 1062), concat('E', generate_series(995, 1062)), 'STEP200', 1, 2, 2, 1 UNION
+SELECT generate_series(1063, 1340), concat('E', generate_series(1063, 1340)), 'COVER70', 1, 2, 1, 1 UNION
+SELECT generate_series(1341, 1534), concat('E', generate_series(1341, 1534)), 'COVER70', 1, 2, 2, 1 UNION
+SELECT generate_series(1535, 1665), concat('E', generate_series(1535, 1665)), 'HYDROGEN SULFIDE SENSOR', 1, 2, 1, 1 UNION
+SELECT generate_series(1666, 1739), concat('E', generate_series(1666, 1739)), 'HYDROGEN SULFIDE SENSOR', 1, 2, 2, 1 UNION
+SELECT generate_series(1740, 1870), concat('E', generate_series(1740, 1870)), 'HYDROGEN SULFIDE SENSOR', 1, 2, 1, 1 UNION
+SELECT generate_series(1871, 1973), concat('E', generate_series(1871, 1973)), 'HYDROGEN SULFIDE SENSOR', 1, 2, 2, 1;
 
 UPDATE element SET tstamp = now(), num_elements = 1, location_type = 'St. Location', workcat_id = 'work1', builtdate = '1900-01-01', ownercat_id = 'owner1', verified = 0, 
 insert_user = CURRENT_USER, trace_featuregeom = true, geometry_type = 'POINT';

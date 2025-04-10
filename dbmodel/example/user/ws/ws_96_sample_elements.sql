@@ -1010,16 +1010,16 @@ INSERT INTO connec VALUES ('3177', '3177', '3177', 45.1068, NULL, 'PVC32-PN16-IN
 
 
 INSERT INTO element (element_id, code, elementcat_id, state, state_type, muni_id, expl_id, feature_type)
-SELECT generate_series(473, 594), concat('E', generate_series(473, 594)), 'COVER40X40', 1, 2, 1, 1, 'GENELEMENT' UNION
-SELECT generate_series(595, 708), concat('E', generate_series(595, 708)), 'COVER40X40', 1, 2, 1, 2, 'GENELEMENT' UNION
-SELECT generate_series(709, 830), concat('E', generate_series(709, 830)), 'REGISTER40X40', 1, 2, 1, 1, 'GENELEMENT' UNION
-SELECT generate_series(831, 944), concat('E', generate_series(831, 944)), 'REGISTER40X40', 1, 2, 1, 2, 'GENELEMENT' UNION
-SELECT generate_series(1703, 1896), concat('E', generate_series(1703, 1896)), 'REGISTER40X40', 1, 2, 1, 2, 'GENELEMENT' UNION
-SELECT generate_series(946, 1226), concat('E', generate_series(946, 1226)), 'COVER40X40', 1, 2, 1, 1, 'GENELEMENT' UNION
-SELECT generate_series(1227, 1420), concat('E', generate_series(1227, 1420)), 'COVER40X40', 1, 2, 1, 2, 'GENELEMENT' UNION
-SELECT generate_series(1422, 1702), concat('E', generate_series(1422, 1702)), 'REGISTER40X40', 1, 2, 1, 2, 'GENELEMENT' UNION
-SELECT generate_series(1897, 2032), concat('E', generate_series(1897, 2032)), 'PROTECT-BAND', 1, 2, 1, 1, 'GENELEMENT' UNION
-SELECT generate_series(2033, 2162), concat('E', generate_series(2033, 2162)), 'PROTECT-BAND', 1, 2, 1, 2, 'GENELEMENT';
+SELECT generate_series(473, 594), concat('E', generate_series(473, 594)), 'COVER40X40', 1, 2, 1, 1 UNION
+SELECT generate_series(595, 708), concat('E', generate_series(595, 708)), 'COVER40X40', 1, 2, 1, 2 UNION
+SELECT generate_series(709, 830), concat('E', generate_series(709, 830)), 'REGISTER40X40', 1, 2, 1, 1 UNION
+SELECT generate_series(831, 944), concat('E', generate_series(831, 944)), 'REGISTER40X40', 1, 2, 1, 2 UNION
+SELECT generate_series(1703, 1896), concat('E', generate_series(1703, 1896)), 'REGISTER40X40', 1, 2, 1, 2 UNION
+SELECT generate_series(946, 1226), concat('E', generate_series(946, 1226)), 'COVER40X40', 1, 2, 1, 1 UNION
+SELECT generate_series(1227, 1420), concat('E', generate_series(1227, 1420)), 'COVER40X40', 1, 2, 1, 2 UNION
+SELECT generate_series(1422, 1702), concat('E', generate_series(1422, 1702)), 'REGISTER40X40', 1, 2, 1, 2 UNION
+SELECT generate_series(1897, 2032), concat('E', generate_series(1897, 2032)), 'PROTECT-BAND', 1, 2, 1, 1 UNION
+SELECT generate_series(2033, 2162), concat('E', generate_series(2033, 2162)), 'PROTECT-BAND', 1, 2, 1, 2;
 
 UPDATE element SET tstamp = now(), num_elements = 1, location_type = 'St. Location', workcat_id = 'work1', builtdate = '1900-01-01', ownercat_id = 'owner1', verified = 0,
 insert_user = CURRENT_USER, trace_featuregeom = true, muni_id = 1;
