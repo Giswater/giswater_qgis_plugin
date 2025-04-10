@@ -408,6 +408,7 @@ CREATE OR REPLACE VIEW v_edit_flwreg AS
     man_flwreg.nodarc_id,
     man_flwreg.order_id,
     man_flwreg.to_arc,
+    man_flwreg.flwreg_type,
     man_flwreg.flwreg_length,
     element.brand_id,
     element.model_id,

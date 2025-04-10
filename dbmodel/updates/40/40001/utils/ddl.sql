@@ -78,6 +78,7 @@ CREATE TABLE man_genelement (
 CREATE TABLE man_flwreg (
     element_id varchar(16) NOT NULL,
     flwreg_class varchar(16) NOT NULL,
+	flwreg_type text NULL,
     nodarc_id varchar NULL,
     order_id numeric NULL,
     to_arc varchar NULL,
