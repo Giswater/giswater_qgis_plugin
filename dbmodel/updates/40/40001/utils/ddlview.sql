@@ -71,6 +71,12 @@ DROP VIEW IF EXISTS vi_transects;
 DROP VIEW IF EXISTS vi_treatment;
 DROP VIEW IF EXISTS vi_washoff;
 
+DROP VIEW IF EXISTS vu_dma;
+DROP VIEW IF EXISTS vu_link;
+DROP VIEW IF EXISTS vu_arc;
+DROP VIEW IF EXISTS vu_node;
+
+
 
 CREATE OR REPLACE VIEW v_edit_cat_feature_link
 AS SELECT cat_feature.id,
