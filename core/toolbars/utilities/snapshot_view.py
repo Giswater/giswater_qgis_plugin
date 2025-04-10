@@ -191,7 +191,7 @@ def run(**kwargs):
 
     if result.get("status") == "Accepted" and result.get("body").get("data"):
         layers = result['body']['data']
-        add_layers_temp(layers, f"Snapshot - {form["date"]}")
+        add_layers_temp(layers, f"Snapshot - {form['date']}")
         tools_gw.close_dialog(dlg.dlg_snapshot_view)
     else:
         tools_qgis.show_warning("No results", dialog=dlg.dlg_snapshot_view)

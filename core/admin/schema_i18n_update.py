@@ -26,7 +26,7 @@ class GwSchemaI18NUpdate:
 
     def init_dialog(self):
         """ Constructor """
-    
+
         self.dlg_qm = GwSchemaI18NUpdateUi(self)  # Initialize the UI
         tools_gw.load_settings(self.dlg_qm)
         self._load_user_values()  # keep values
@@ -34,7 +34,7 @@ class GwSchemaI18NUpdate:
         self._set_signals()  # Set all the signals to wait for response
 
         self.dlg_qm.btn_translate.setEnabled(False)
-    
+
         # Get the project_types (ws, ud)
         self.project_types = tools_gw.get_config_parser('system', 'project_types', "project", "giswater", False,
                                                         force_reload=True)
@@ -91,10 +91,10 @@ class GwSchemaI18NUpdate:
             tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', self.last_error)
             QApplication.processEvents()
             return
-        
+
         if set_languages:
             self._populate_cmb_language()
-        
+
     def _populate_cmb_language(self):
         """ Populate combo with languages values """
         self.dlg_qm.cmb_language.clear()
@@ -155,7 +155,7 @@ class GwSchemaI18NUpdate:
         self.lower_lang = self.language.lower()
         msg = ''
 
-        # Run the updater of db_files and look at the result 
+        # Run the updater of db_files and look at the result
         status_cfg_msg, errors = self._copy_db_files()
         if status_cfg_msg is True:
             msg += f"Database translation successful to {self.lower_lang}.\n"
@@ -167,8 +167,8 @@ class GwSchemaI18NUpdate:
 
         # Look for errors
         if errors:
-            msg += f'There have been errors translating: {', '.join(errors)}'
-            
+            msg += f"There have been errors translating: {', '.join(errors)}"
+
         self._change_lang()
 
         # Close connections
@@ -211,7 +211,7 @@ class GwSchemaI18NUpdate:
 
         # Mostrar mensaje de error si hay errores
         if messages:  # Corregido: Verifica si hay elementos en la lista
-            tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', f'Error translating: {', '.join(messages)}')
+            tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', f"Error translating: {', '.join(messages)}")
             return False, messages
         else:
             return True, None
@@ -238,12 +238,12 @@ class GwSchemaI18NUpdate:
                f"FROM i18n.dbdialog "
                f"ORDER BY context, formname;")
         rows = self._get_rows(sql, self.cursor_i18n)
-        
+
         # Return the corresponding information
         if not rows:
             return False
         return rows
-    
+
     def _write_dbdialog_values(self, dbdialogs):
         i = 0
         j = 0
@@ -278,9 +278,9 @@ class GwSchemaI18NUpdate:
                             if tooltip is None:
                                 tooltip = ""
                 # Replace unwanted characters
-                tooltip = tooltip.replace("'", "''") 
+                tooltip = tooltip.replace("'", "''")
                 label = label.replace("'", "''")
-                
+
                 # Define the query depending on the table
                 sql_text = None
                 if dbdialog['context'] == 'config_form_fields':
@@ -293,8 +293,8 @@ class GwSchemaI18NUpdate:
                     sql_text = (f"UPDATE {self.schema}.{dbdialog['context']} SET label = '{label}', tooltip = '{tooltip}' "
                                 f"WHERE formname ILIKE '{source[0]}%' and formtype = '{source[1]}' and columnname = '{source[2]}'")
                         # f"WHERE and formtype = '{source[1]}' and columnname = '{source[2]}'")
-                        # f"WHERE formname = '{source[0]}' and formtype = '{source[1]}' and columnname = '{source[2]}'"                        
-                    
+                        # f"WHERE formname = '{source[0]}' and formtype = '{source[1]}' and columnname = '{source[2]}'"
+
                     # Return config_form_fields to normal
                     sql_2 = f"UPDATE {self.schema}.config_param_system SET value = FALSE WHERE parameter = 'admin_config_control_trigger'"
                     self.cursor_dest.execute(sql_2)
@@ -320,7 +320,7 @@ class GwSchemaI18NUpdate:
                     print(e)
                     tools_db.dao.rollback()
                     break
-    
+
     def _get_dbmessages_values(self):
         """ Get db messages values """
         # Update the part the of the program in process
@@ -371,7 +371,7 @@ class GwSchemaI18NUpdate:
                         if hint_ms is None:
                             hint_ms = ""
                 # Replace unwanted characters
-                error_ms = error_ms.replace("'", "''") 
+                error_ms = error_ms.replace("'", "''")
                 hint_ms = hint_ms.replace("'", "''")
 
                 # Define and execute the corresponding query
@@ -384,7 +384,7 @@ class GwSchemaI18NUpdate:
                 except Exception as e:
                     tools_db.dao.rollback()
                     break
-    
+
     def _get_dbfprocess_values(self):
         """ Get db messages values """
         # Update the part the of the program in process
@@ -435,7 +435,7 @@ class GwSchemaI18NUpdate:
                         if in_msg is None:
                             in_msg = ""
                 # Replace unwanted characters
-                ex_msg = ex_msg.replace("'", "''") 
+                ex_msg = ex_msg.replace("'", "''")
                 in_msg = in_msg.replace("'", "''")
 
                 # Define and execute the corresponding query
@@ -448,7 +448,7 @@ class GwSchemaI18NUpdate:
                 except Exception as e:
                     tools_db.dao.rollback()
                     break
-    
+
     def _change_lang(self):
         query = f"UPDATE {self.schema}.sys_version SET language = '{self.language}'"
         try:
@@ -601,7 +601,7 @@ class GwSchemaI18NUpdate:
         param = param.replace("\n", " ")
 
         return param
-    
+
     def _replace_invalid_quotation_marks(self, param):
         """
         This function replaces the characters that break JSON messages

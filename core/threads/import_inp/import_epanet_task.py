@@ -573,7 +573,7 @@ class GwImportInpTask(GwTask):
                 params = (self.sector, text)
                 execute_sql(sql, params, commit=self.force_commit)
             elif type(control) is Rule:
-                text = f"RULE {control.name}\nIF {condition}\nTHEN {'\nAND '.join(then_actions)}"
+                text = f"RULE {control.name}" + "\n" + f"IF {condition}" + "\n" + f"THEN {' AND '.join(then_actions)}"
                 if else_actions:
                     text += f"\nELSE {else_actions}"
                 text += f"\nPRIORITY {priority}"

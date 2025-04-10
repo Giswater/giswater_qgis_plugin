@@ -490,8 +490,8 @@ class GwI18NGenerator:
             formname_lang = row[f'formname_{self.lower_lang}'] if row[f'formname_{self.lower_lang}'] is not None else row[f'auto_formname_{self.lower_lang}']
             formname_lang = formname_lang if formname_lang is not None else row['formname_en_us']
 
-            line = f'UPDATE config_form_fields SET formname = \'{formname_lang}\' ' \
-                   f'WHERE formname LIKE \'{formname}\';\n'
+            line = f"""UPDATE config_form_fields SET formname = '{formname_lang}' """ \
+                   f"""WHERE formname LIKE '{formname}';\n"""
 
             file.write(line)
         file.close()
@@ -536,29 +536,29 @@ class GwI18NGenerator:
 
             line = f'UPDATE {table} '
             if row['context'] in 'config_param_system':
-                line += f'SET label = \'{lbl_value}\', descript = \'{tt_value}\' '
+                line += f"""SET label = '{lbl_value}', descript = '{tt_value}' """
             elif row['context'] in 'sys_param_user':
-                line += f'SET label = \'{lbl_value}\', descript = \'{tt_value}\' '
+                line += f"""SET label = '{lbl_value}', descript = '{tt_value}' """
             elif row['context'] in 'config_typevalue':
-                line += f'SET idval = \'{tt_value}\' '
+                line += f"""SET idval = '{tt_value}' """
             elif row['context'] not in ('config_param_system', 'sys_param_user'):
-                line += f'SET label = \'{lbl_value}\', tooltip = \'{tt_value}\' '
+                line += f"""SET label = '{lbl_value}', tooltip = '{tt_value}' """
 
             # Clause WHERE for each context
             if row['context'] == 'config_form_fields':
-                line += f'WHERE formname = \'{formname}\' AND formtype = \'{form_type}\' AND columnname = \'{source}\''
+                line += f"""WHERE formname = '{formname}' AND formtype = '{form_type}' AND columnname = '{source}'"""
             elif row['context'] == 'config_form_tabs':
-                line += f'WHERE formname = \'{formname}\' AND formtype = \'{form_type}\' AND columnname = \'{source}\''
+                line += f"""WHERE formname = '{formname}' AND formtype = '{form_type}' AND columnname = '{source}'"""
             elif row['context'] == 'config_form_groupbox':
-                line += f'WHERE formname = \'{formname}\' AND layout_if = \'{source}\''
+                line += f"""WHERE formname = '{formname}' AND layout_if = '{source}'"""
             elif row['context'] == 'config_typevalue':
-                line += f'WHERE id = \'{source}\''
+                line += f"""WHERE id = '{source}'"""
             elif row['context'] == 'config_param_system':
-                line += f'WHERE parameter = \'{source}\''
+                line += f"""WHERE parameter = '{source}'"""
             elif row['context'] == 'sys_param_user':
-                line += f'WHERE id = \'{source}\' '
+                line += f"""WHERE id = '{source}'"""
 
-            line += f';\n'
+            line += ';\n'
             file.write(line)
         file.close()
         del file
@@ -593,7 +593,7 @@ class GwI18NGenerator:
                     ht_value = self._replace_invalid_characters(ht_value)
 
             line = f'INSERT INTO {table} (id, error_message, hint_message, log_level, show_user, project_type, source) ' \
-                    f'VALUES ({source}, \'{ms_value}\', \'{ht_value}\', {log_level}, true, \'{project_type}\', \'core\') ' \
+                    f"""VALUES ({source}, '{ms_value}', '{ht_value}', {log_level}, true, '{project_type}', 'core') """ \
                     f'ON CONFLICT (id) DO UPDATE SET ' \
                     f'error_message = EXCLUDED.error_message, hint_message = EXCLUDED.hint_message, log_level = EXCLUDED.log_level, show_user = EXCLUDED.show_user, project_type = EXCLUDED.project_type, source = EXCLUDED.source;\n'
 
@@ -630,7 +630,7 @@ class GwI18NGenerator:
                     in_msg = self._replace_invalid_characters(in_msg)
 
             line = f'INSERT INTO {table} (fid, except_msg, info_msg, project_type, source) ' \
-                    f'VALUES ({source}, \'{ex_msg}\', \'{in_msg}\', \'{project_type}\', \'core\') ' \
+                    f"""VALUES ({source}, '{ex_msg}', '{in_msg}', '{project_type}', 'core') """ \
                     f'ON CONFLICT (fid) DO UPDATE SET ' \
                     f'except_msg = EXCLUDED.except_msg, info_msg = EXCLUDED.info_msg, project_type = EXCLUDED.project_type, source = EXCLUDED.source;\n'
 

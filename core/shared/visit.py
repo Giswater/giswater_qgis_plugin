@@ -544,7 +544,7 @@ class GwVisit(QObject):
         # Load feature if in @table_name. Select list of related features
         # Set 'expr_filter' with features that are in the list
         if self.locked_feature_id:
-            expr_filter = f'"{self.feature_type}_id" IN (\'{self.locked_feature_id}\')'
+            expr_filter = f""""{self.feature_type}_id" IN ('{self.locked_feature_id}')"""
             (is_valid, expr) = tools_qt.check_expression_filter(expr_filter)
             if not is_valid:
                 return

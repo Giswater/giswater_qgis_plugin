@@ -405,7 +405,8 @@ class GwImportInpTask(GwTask):
             WHERE parameter = 'admin_schema_info';
         """
 
-        params = (f'''"{title.replace('\n', '\\n')}"''',)
+        title = title.replace('\n', '\\n')
+        params = (f'''"{title}"''',)
 
         execute_sql(sql, params)
 

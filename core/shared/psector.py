@@ -698,7 +698,7 @@ class GwPsector:
             column_name = rows[i]
             columns.append(str(column_name[0]))
 
-        psector_id = f"{tools_qt.get_text(self.dlg_plan_psector, "tab_general_psector_id")}"
+        psector_id = f"{tools_qt.get_text(self.dlg_plan_psector, 'tab_general_psector_id')}"
         sql = f"SELECT * FROM {viewname} WHERE psector_id = '{psector_id}'"
         rows = tools_db.get_rows(sql)
         all_rows = []
