@@ -73,7 +73,7 @@ SELECT col_type_is('element', 'model_id', 'varchar(50)', 'Column model_id should
 SELECT col_type_is('element', 'asset_id', 'varchar(50)', 'Column asset_id should be varchar(50)');
 SELECT col_type_is('element', 'datasource', 'integer', 'Column datasource should be integer');
 SELECT col_type_is('element', 'lock_level', 'integer', 'Column lock_level should be integer');
-SELECT col_type_is('element', 'geometry_type', 'varchar(50)', 'Column geometry_type should be varchar(50)');
+SELECT col_type_is('element', 'geometry_type', 'text', 'Column geometry_type should be text');
 
 -- Check foreign keys
 SELECT has_fk('element', 'Table element should have foreign keys');
