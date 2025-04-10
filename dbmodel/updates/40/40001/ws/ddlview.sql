@@ -6,6 +6,20 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
+DROP VIEW IF EXISTS v_rpt_comp_node;
+DROP VIEW IF EXISTS v_rpt_comp_node_hourly;
+DROP VIEW IF EXISTS v_rpt_comp_arc_hourly;
+
+DROP VIEW IF EXISTS v_edit_inp_pattern;
+DROP VIEW IF EXISTS v_edit_inp_pattern_value;
+
+DROP VIEW IF EXISTS v_edit_review_node;
+
+DROP VIEW IF EXISTS v_price_x_arc;
+
+
+-- ====
+
 CREATE OR REPLACE VIEW v_edit_arc
 AS WITH
   typevalue AS
@@ -4297,7 +4311,6 @@ JOIN selector_expl s ON s.expl_id = n.expl_id
 WHERE s.cur_user = CURRENT_USER;
 
 
-DROP VIEW IF EXISTS v_sector_node;
 
 --05/12/2024
 DROP  VIEW IF EXISTS v_rpt_comp_arc;
@@ -4402,7 +4415,6 @@ WITH main AS
 	FROM main JOIN compare ON main.arc_id = compare.arc_id;
 
 
-DROP VIEW IF EXISTS v_rpt_comp_node;
 
 CREATE OR REPLACE VIEW v_rpt_comp_node
 AS
@@ -4502,7 +4514,6 @@ SELECT r.node_id,
 
 --10/12/2024
 --v_rpt_comp_node_hourly--
-DROP VIEW IF EXISTS v_rpt_comp_node_hourly;
 CREATE OR REPLACE VIEW v_rpt_comp_node_hourly  AS
  WITH main AS (
   SELECT rpt_node.id,
@@ -4573,7 +4584,6 @@ SELECT main.node_id,
 
 
  --v_rpt_comp_arc_hourly--
-DROP VIEW IF EXISTS v_rpt_comp_arc_hourly;
 CREATE OR REPLACE VIEW v_rpt_comp_arc_hourly
 AS
 WITH main AS (
@@ -4673,8 +4683,6 @@ AS SELECT DISTINCT c.id,
   WHERE c.expl_id = s.expl_id AND s.cur_user = CURRENT_USER OR c.expl_id IS NULL
   ORDER BY c.id;
 
-DROP VIEW IF EXISTS v_edit_inp_pattern;
-DROP VIEW IF EXISTS v_edit_inp_pattern_value;
 CREATE OR REPLACE VIEW v_edit_inp_pattern
 AS SELECT DISTINCT
     p.pattern_id,
@@ -4843,7 +4851,6 @@ AS SELECT inp.feature_id,
     inp_dscenario_demand inp
   WHERE c.parameter::text = 'epatools_calibrator_dscenario_id'::text AND c.value = inp.dscenario_id::text AND c.cur_user::text = CURRENT_USER;
 
-DROP VIEW IF EXISTS v_edit_review_node;
 CREATE OR REPLACE VIEW v_edit_review_node
 AS SELECT review_node.node_id,
     review_node.top_elev,
@@ -5180,7 +5187,6 @@ AS SELECT DISTINCT ON (rpt_cat_result.result_id) rpt_cat_result.result_id,
 
 
 --17/03/2025
-DROP VIEW IF EXISTS v_price_x_arc;
 CREATE VIEW v_price_x_arc AS
  SELECT arc.arc_id,
     cat_arc.id AS catalog_id,

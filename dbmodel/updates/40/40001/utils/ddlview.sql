@@ -28,6 +28,7 @@ DROP VIEW IF EXISTS v_state_link_connec;
 DROP VIEW IF EXISTS v_edit_flwreg CASCADE;
 DROP VIEW IF EXISTS v_edit_inp_flwreg_pump CASCADE;
 DROP VIEW IF EXISTS v_edit_inp_dscenario_flwreg_pump CASCADE;
+
 DROP VIEW IF EXISTS vi_controls;
 DROP VIEW IF EXISTS vi_coordinates;
 DROP VIEW IF EXISTS vi_curves;
@@ -76,6 +77,7 @@ DROP VIEW IF EXISTS vu_link;
 DROP VIEW IF EXISTS vu_arc;
 DROP VIEW IF EXISTS vu_node;
 
+DROP VIEW IF EXISTS v_sector_node;
 
 
 CREATE OR REPLACE VIEW v_edit_cat_feature_link

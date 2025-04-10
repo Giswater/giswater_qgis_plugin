@@ -16,6 +16,35 @@ DROP VIEW IF EXISTS v_edit_inp_flwreg_orifice;
 DROP VIEW IF EXISTS v_edit_inp_flwreg_outlet;
 DROP VIEW IF EXISTS v_edit_inp_flwreg_weir;
 
+
+DROP VIEW IF EXISTS v_edit_drainzone;
+DROP VIEW IF EXISTS v_rpt_comp_nodedepth_sum;
+DROP VIEW IF EXISTS v_rpt_comp_nodeinflow_sum;
+DROP VIEW IF EXISTS v_rpt_comp_nodeflooding_sum;
+
+DROP VIEW IF EXISTS v_rpt_comp_nodesurcharge_sum;
+DROP VIEW IF EXISTS v_rpt_comp_arcflow_sum;
+DROP VIEW IF EXISTS v_rpt_comp_condsurcharge_sum;
+
+DROP VIEW IF EXISTS v_rpt_comp_pumping_sum;
+DROP VIEW IF EXISTS v_rpt_comp_flowclass_sum;
+DROP VIEW IF EXISTS v_edit_macrosector;
+
+DROP VIEW IF EXISTS v_edit_review_node;
+DROP VIEW IF EXISTS v_expl_connec;
+DROP VIEW IF EXISTS v_rtc_hydrometer;
+
+DROP VIEW IF EXISTS v_ui_hydroval;
+DROP VIEW IF EXISTS v_ui_hydrometer;
+DROP VIEW IF EXISTS v_ui_hydroval_x_connec;
+
+DROP VIEW IF EXISTS v_ui_om_visitman_x_connec;
+DROP VIEW IF EXISTS v_ui_om_visit_x_connec;
+
+DROP VIEW IF EXISTS v_ui_event_x_connec;
+
+-- ====
+
 CREATE OR REPLACE VIEW v_edit_macrodma AS
  SELECT macrodma.macrodma_id,
     macrodma.name,
@@ -265,7 +294,6 @@ as select * from v_edit_link where feature_type = 'CONNEC';
 CREATE OR REPLACE VIEW v_edit_link_gully
 as select * from v_edit_link where feature_type = 'GULLY';
 
-DROP VIEW IF EXISTS v_edit_drainzone;
 
 CREATE OR REPLACE VIEW v_edit_drainzone
 AS SELECT d.drainzone_id,
@@ -4542,7 +4570,6 @@ AS SELECT inp_orifice.arc_id,
    FROM inp_orifice
      LEFT JOIN rpt_arcflow_sum USING (arc_id);
 
-DROP VIEW IF EXISTS v_sector_node;
 
 -- 04/12/2024
 CREATE OR REPLACE VIEW v_edit_cat_dwf
@@ -4585,7 +4612,6 @@ AS SELECT inp_storage.node_id,
 --12/12/2024
 
 --v_rpt_comp_nodedepth_sum
-DROP VIEW IF EXISTS v_rpt_comp_nodedepth_sum;
 CREATE OR REPLACE VIEW v_rpt_comp_nodedepth_sum
 AS  WITH main AS (
 	SELECT rpt_nodedepth_sum.id,
@@ -4673,7 +4699,6 @@ SELECT main.node_id,
 	FROM main RIGHT JOIN compare ON main.node_id = compare.node_id;
 
 --v_rpt_comp_nodeinflow_sum
-DROP VIEW IF EXISTS v_rpt_comp_nodeinflow_sum;
 CREATE OR REPLACE VIEW v_rpt_comp_nodeinflow_sum
 AS
 WITH main AS (
@@ -4780,7 +4805,6 @@ WITH main AS (
 	FROM main RIGHT JOIN compare ON main.node_id = compare.node_id;
 
 -- v_rpt_comp_nodeflooding_sum
-DROP VIEW IF EXISTS v_rpt_comp_nodeflooding_sum;
 CREATE OR REPLACE VIEW v_rpt_comp_nodeflooding_sum
 AS
 WITH main AS (
@@ -4876,7 +4900,6 @@ WITH main AS (
 	FROM main RIGHT JOIN compare ON main.node_id = compare.node_id;
 
 --v_rpt_comp_nodesurcharge_sum
-DROP VIEW IF EXISTS v_rpt_comp_nodesurcharge_sum;
 CREATE OR REPLACE VIEW v_rpt_comp_nodesurcharge_sum
 AS
 WITH main AS (
@@ -4955,7 +4978,6 @@ WITH main AS (
 	FROM main RIGHT JOIN compare ON main.node_id = compare.node_id;
 
 -- v_rpt_comp_arcflow_sum
-DROP VIEW IF EXISTS v_rpt_comp_arcflow_sum;
 CREATE OR REPLACE VIEW v_rpt_comp_arcflow_sum
 AS
 WITH main AS (
@@ -5113,7 +5135,6 @@ compare AS (
 
 
 ----v_rpt_comp_condsurcharge_sum
-DROP VIEW IF EXISTS v_rpt_comp_condsurcharge_sum;
 CREATE OR REPLACE VIEW v_rpt_comp_condsurcharge_sum
 AS
 WITH main AS (
@@ -5206,7 +5227,6 @@ compare AS (
 
 
 ---- v_rpt_comp_pumping_sum
-DROP VIEW IF EXISTS v_rpt_comp_pumping_sum;
 CREATE OR REPLACE VIEW v_rpt_comp_pumping_sum
 AS WITH main AS (
 	SELECT rpt_pumping_sum.id,
@@ -5329,7 +5349,6 @@ AS WITH main AS (
     FROM main RIGHT JOIN compare ON main.arc_id = compare.arc_id; ;
 
 ---- v_rpt_comp_flowclass_sum
-DROP VIEW IF EXISTS v_rpt_comp_flowclass_sum;
 CREATE OR REPLACE VIEW v_rpt_comp_flowclass_sum
 AS WITH main AS (
 	SELECT rpt_flowclass_sum.id,
@@ -5643,7 +5662,6 @@ AS SELECT m.macrodma_id,
     WHERE m.macrodma_id > 0
     ORDER BY m.macrodma_id;
 
-DROP VIEW IF EXISTS v_edit_macrosector;
 CREATE OR REPLACE VIEW v_edit_macrosector AS
  SELECT DISTINCT ON (m.macrosector_id) m.macrosector_id,
     m.name,
@@ -5828,7 +5846,6 @@ AS SELECT inp_pump.arc_id,
      LEFT JOIN v_rpt_pumping_sum USING (arc_id);
 
 
-DROP VIEW IF EXISTS v_edit_review_node;
 
 CREATE OR REPLACE VIEW v_edit_review_node
 AS SELECT review_node.node_id,
@@ -6169,7 +6186,6 @@ AS SELECT om_visit_event.id AS event_id,
   ORDER BY om_visit_x_arc.arc_id;
 
 
-DROP VIEW IF EXISTS v_expl_connec;
 CREATE OR REPLACE VIEW v_expl_connec AS
  SELECT connec.connec_id
  FROM selector_expl, connec
@@ -6222,7 +6238,6 @@ AS SELECT row_number() OVER () AS rid,
     ) a;
 
 
-DROP VIEW IF EXISTS v_rtc_hydrometer;
 CREATE OR REPLACE VIEW v_rtc_hydrometer
  AS
  SELECT ext_rtc_hydrometer.id::text AS hydrometer_id,
@@ -6278,7 +6293,6 @@ CREATE OR REPLACE VIEW v_rtc_hydrometer
      LEFT JOIN exploitation ON exploitation.expl_id = connec.expl_id
   WHERE selector_hydrometer.state_id = ext_rtc_hydrometer.state_id AND selector_hydrometer.cur_user = "current_user"()::text AND selector_expl.expl_id = connec.expl_id AND selector_expl.cur_user = "current_user"()::text;
 
-DROP VIEW IF EXISTS v_ui_hydrometer;
 CREATE OR REPLACE VIEW v_rtc_hydrometer_x_connec
 AS SELECT ext_rtc_hydrometer.id::text AS hydrometer_id,
     ext_rtc_hydrometer.code AS hydrometer_customer_code,
@@ -6343,7 +6357,6 @@ CREATE OR REPLACE VIEW v_ui_hydrometer
    FROM v_rtc_hydrometer_x_connec;
 
 
-DROP VIEW IF EXISTS v_ui_hydroval_x_connec;
 CREATE OR REPLACE VIEW v_ui_hydroval_x_connec AS
 SELECT ext_rtc_hydrometer_x_data.id,
     rtc_hydrometer_x_connec.connec_id,
@@ -6369,8 +6382,6 @@ SELECT ext_rtc_hydrometer_x_data.id,
   ORDER BY ext_rtc_hydrometer_x_data.id;
 
 
-DROP VIEW IF EXISTS v_ui_om_visitman_x_connec;
-DROP VIEW IF EXISTS v_ui_om_visit_x_connec;
 CREATE OR REPLACE VIEW v_ui_om_visit_x_connec AS
  SELECT om_visit_event.id AS event_id,
     om_visit.id AS visit_id,
@@ -6453,7 +6464,6 @@ CREATE OR REPLACE VIEW v_ui_om_visit_x_link AS
            FROM doc_x_visit) b ON b.visit_id = om_visit.id
   ORDER BY om_visit_x_link.link_id;
 
-DROP VIEW IF EXISTS v_ui_hydroval;
 CREATE OR REPLACE VIEW v_ui_hydroval
  AS
  SELECT ext_rtc_hydrometer_x_data.id,
@@ -6480,7 +6490,6 @@ CREATE OR REPLACE VIEW v_ui_hydroval
      LEFT JOIN crm_typevalue crmstate ON ext_rtc_hydrometer_x_data.value_state = crmstate.id::integer AND crmstate.typevalue::text = 'crm_value_state'::text
   ORDER BY 1;
 
-DROP VIEW IF EXISTS v_ui_event_x_connec;
 CREATE OR REPLACE VIEW v_ui_event_x_connec
 AS SELECT om_visit_event.id AS event_id,
     om_visit.id AS visit_id,
