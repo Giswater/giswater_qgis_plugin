@@ -14,6 +14,8 @@ UPDATE config_info_layer SET is_parent=false, tableparent_id=NULL WHERE layer_id
 
 INSERT INTO sys_feature_class (id, "type", epa_default, man_table) VALUES('SERVCONNECTION', 'LINK', 'UNDEFINED', 'man_servconnection');
 
+
+DELETE FROM sys_feature_class WHERE id = 'ELEMENT' AND type = 'ELEMENT';
 INSERT INTO sys_feature_class (id, "type", epa_default, man_table) VALUES('FLWREG', 'ELEMENT', 'UNDEFINED', 'man_flwreg');
 INSERT INTO sys_feature_class (id, "type", epa_default, man_table) VALUES('GENELEMENT', 'ELEMENT', 'UNDEFINED', 'man_genelement');
 
