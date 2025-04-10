@@ -22,7 +22,7 @@
         <property name="currentIndex">
          <number>0</number>
         </property>
-        <widget class="QWidget" name="CampaignTab">
+        <widget class="QWidget" name="tab_data">
          <attribute name="title">
           <string>Campaign</string>
          </attribute>
@@ -32,7 +32,7 @@
           </item>
          </layout>
         </widget>
-        <widget class="QWidget" name="RelationsTab">
+        <widget class="QWidget" name="tab_relations">
          <attribute name="title">
           <string>Relació d'elements</string>
          </attribute>
