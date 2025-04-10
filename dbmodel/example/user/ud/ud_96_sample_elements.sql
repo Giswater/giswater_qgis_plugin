@@ -1862,19 +1862,19 @@ INSERT INTO link (link_id, code, feature_id, feature_type, exit_id, exit_type, u
 INSERT INTO link (link_id, code, feature_id, feature_type, exit_id, exit_type, userdefined_geom, state, expl_id, the_geom, tstamp, exit_topelev, sector_id, dma_id, fluid_type, exit_elev, expl_id2, epa_type, is_operative, insert_user, lastupdate, lastupdate_user, linkcat_id, workcat_id, workcat_id_end, builtdate, enddate, drainzone_id, uncertain) VALUES (638, NULL, '49998', 'GULLY', '18901', 'ARC', false, 1, 2, '0102000020E76400000200000007BA6F5E688C1941C12B477E66765141BBEFF789648C194162B74B1168765141', '2020-09-30 16:21:54.036021', NULL, 2, 3, NULL, NULL, NULL, 'GULLY', true, 'postgres', '2024-02-21 12:09:27.095883', 'postgres', 'PVC-CC025_D', NULL, NULL, NULL, NULL, NULL, false);
 INSERT INTO link (link_id, code, feature_id, feature_type, exit_id, exit_type, userdefined_geom, state, expl_id, the_geom, tstamp, exit_topelev, sector_id, dma_id, fluid_type, exit_elev, expl_id2, epa_type, is_operative, insert_user, lastupdate, lastupdate_user, linkcat_id, workcat_id, workcat_id_end, builtdate, enddate, drainzone_id, uncertain) VALUES (637, NULL, '49997', 'GULLY', '18901', 'ARC', false, 1, 2, '0102000020E7640000020000009ACE0D44608C194172AC41D269765141BBEFF789648C194162B74B1168765141', '2020-09-30 16:21:54.036021', NULL, 2, 3, NULL, NULL, NULL, 'GULLY', true, 'postgres', '2024-02-21 12:09:27.095883', 'postgres', 'PVC-CC025_D', NULL, NULL, NULL, NULL, NULL, false);
 
-INSERT INTO element (element_id, code, elementcat_id, state, state_type, expl_id, muni_id)
-SELECT generate_series(671, 798), concat('E', generate_series(671, 798)), 'COVER70', 1, 2, 1, 1 UNION
-SELECT generate_series(799, 866), concat('E', generate_series(799, 866)), 'COVER70', 1, 2, 2, 1 UNION
-SELECT generate_series(867, 994), concat('E', generate_series(867, 994)), 'STEP200', 1, 2, 1, 1 UNION
-SELECT generate_series(995, 1062), concat('E', generate_series(995, 1062)), 'STEP200', 1, 2, 2, 1 UNION
-SELECT generate_series(1063, 1340), concat('E', generate_series(1063, 1340)), 'COVER70', 1, 2, 1, 1 UNION
-SELECT generate_series(1341, 1534), concat('E', generate_series(1341, 1534)), 'COVER70', 1, 2, 2, 1 UNION
-SELECT generate_series(1535, 1665), concat('E', generate_series(1535, 1665)), 'HYDROGEN SULFIDE SENSOR', 1, 2, 1, 1 UNION
-SELECT generate_series(1666, 1739), concat('E', generate_series(1666, 1739)), 'HYDROGEN SULFIDE SENSOR', 1, 2, 2, 1 UNION
-SELECT generate_series(1740, 1870), concat('E', generate_series(1740, 1870)), 'HYDROGEN SULFIDE SENSOR', 1, 2, 1, 1 UNION
-SELECT generate_series(1871, 1973), concat('E', generate_series(1871, 1973)), 'HYDROGEN SULFIDE SENSOR', 1, 2, 2, 1;
+INSERT INTO element (element_id, code, elementcat_id, state, state_type, expl_id, muni_id, feature_type)
+SELECT generate_series(671, 798), concat('E', generate_series(671, 798)), 'COVER70', 1, 2, 1, 1, 'GENELEMENT' UNION
+SELECT generate_series(799, 866), concat('E', generate_series(799, 866)), 'COVER70', 1, 2, 2, 1, 'GENELEMENT' UNION
+SELECT generate_series(867, 994), concat('E', generate_series(867, 994)), 'STEP200', 1, 2, 1, 1, 'GENELEMENT' UNION
+SELECT generate_series(995, 1062), concat('E', generate_series(995, 1062)), 'STEP200', 1, 2, 2, 1, 'GENELEMENT' UNION
+SELECT generate_series(1063, 1340), concat('E', generate_series(1063, 1340)), 'COVER70', 1, 2, 1, 1, 'GENELEMENT' UNION
+SELECT generate_series(1341, 1534), concat('E', generate_series(1341, 1534)), 'COVER70', 1, 2, 2, 1, 'GENELEMENT' UNION
+SELECT generate_series(1535, 1665), concat('E', generate_series(1535, 1665)), 'HYDROGEN SULFIDE SENSOR', 1, 2, 1, 1, 'GENELEMENT' UNION
+SELECT generate_series(1666, 1739), concat('E', generate_series(1666, 1739)), 'HYDROGEN SULFIDE SENSOR', 1, 2, 2, 1, 'GENELEMENT' UNION
+SELECT generate_series(1740, 1870), concat('E', generate_series(1740, 1870)), 'HYDROGEN SULFIDE SENSOR', 1, 2, 1, 1, 'GENELEMENT' UNION
+SELECT generate_series(1871, 1973), concat('E', generate_series(1871, 1973)), 'HYDROGEN SULFIDE SENSOR', 1, 2, 2, 1, 'GENELEMENT';
 
-UPDATE element SET tstamp = now(), num_elements = 1, location_type = 'St. Location', workcat_id = 'work1', builtdate = '1900-01-01', ownercat_id = 'owner1', verified = 0, feature_type = 'ELEMENT', 
+UPDATE element SET tstamp = now(), num_elements = 1, location_type = 'St. Location', workcat_id = 'work1', builtdate = '1900-01-01', ownercat_id = 'owner1', verified = 0, 
 insert_user = CURRENT_USER, trace_featuregeom = true, geometry_type = 'POINT';
 
 
@@ -7987,13 +7987,6 @@ INSERT INTO rtc_hydrometer_x_connec VALUES ('3197', '114368');
 
 INSERT INTO man_chamber VALUES ('18868', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO man_chamber VALUES ('237', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-
-INSERT INTO flwreg VALUES ('100019', '67', 1, '200', 'FRPUMP1', 'FRPUMP-01', 3.0, 'PUMP', 1, 2, NULL, NULL, '0102000020E764000002000000643BDF4F1B9219411F85EB414E755141D8BEDF0E54921941589BA0F34B755141');
-INSERT INTO flwreg VALUES ('100021', '18775', 1, '18777', 'FROUTLET1', 'FROUTLET-01', 2.0, 'OUTLET', 1, 2, NULL, NULL, '0102000020E7640000020000001D7684E5289619417050E1C45B75514139B4C8F690961941C3F5284C5B755141');
-INSERT INTO flwreg VALUES ('100017', '237', 1, '100014', 'FRORIFICE1', 'FRORIFICE-01', 0.5, 'ORIFICE', 1, 2, NULL, NULL, '0102000020E76400000200000040CF5EE0369C1941973AF72833755141FEFA1E82559C1941358838FD31755141');
-INSERT INTO flwreg VALUES ('100023', '18828', 1, '18968', 'FRWEIR1', 'FRWEIR-01', 0.5, 'WEIR', 1, 2, NULL, NULL, '0102000020E76400000200000050E3E717708E1941A43CF973507651418FBE3B24718E194188C38B2E50765141');
-INSERT INTO flwreg VALUES ('100018', '238', 1, '244', 'FRWEIR1', 'FRWEIR-01', 1.0, 'WEIR', 1, 2, NULL, NULL, '0102000020E764000002000000F28216DC8F9C194148D4A19F34755141AA678A1B939C194118D5143334755141');
-
 
 INSERT INTO man_conduit VALUES ('100014');
 INSERT INTO man_conduit VALUES ('18777', NULL);
