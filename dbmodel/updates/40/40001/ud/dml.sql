@@ -16,9 +16,7 @@ INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_la
 INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) VALUES ('FROUTLET', 'FLWREG', 'ELEMENT', 'v_edit_element', 've_elem_froutlet', true) ON CONFLICT (id) DO NOTHING;
 INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) VALUES ('FRWEIR', 'FLWREG', 'ELEMENT', 'v_edit_element', 've_elem_frweir', true) ON CONFLICT (id) DO NOTHING;
 -- Adding objects on config_info_layer and config_info_layer_x_type (this both tables controls the button info)
-INSERT INTO config_info_layer VALUES ('v_edit_flwreg', TRUE, 'element', TRUE, 'info_generic', 'Flow regulator', 4);
 
-UPDATE config_info_layer SET is_parent=false, tableparent_id=NULL WHERE layer_id='v_edit_gully';
 
 INSERT INTO sys_feature_class (id, "type", epa_default, man_table) VALUES('INLETPIPE', 'LINK', 'UNDEFINED', 'man_inletpipe');
 

@@ -43,3 +43,6 @@ ALTER TABLE config_info_layer DROP COLUMN tableparent_id;
 UPDATE config_info_layer SET is_parent=true WHERE layer_id='v_edit_node';
 UPDATE config_info_layer SET is_parent=true WHERE layer_id='v_edit_connec';
 UPDATE config_info_layer SET is_parent=true WHERE layer_id='v_edit_arc';
+
+INSERT INTO config_info_layer (layer_id, is_parent, is_editable, formtemplate, headertext, orderby) 
+VALUES('v_edit_flwreg', true, true, 'info_generic', 'Flow regulator', 4);
