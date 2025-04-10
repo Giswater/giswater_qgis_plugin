@@ -1872,7 +1872,7 @@ SELECT generate_series(1341, 1534), concat('E', generate_series(1341, 1534)), 'C
 SELECT generate_series(1535, 1665), concat('E', generate_series(1535, 1665)), 'HYDROGEN SULFIDE SENSOR', 1, 2, 1, 1 UNION
 SELECT generate_series(1666, 1739), concat('E', generate_series(1666, 1739)), 'HYDROGEN SULFIDE SENSOR', 1, 2, 2, 1 UNION
 SELECT generate_series(1740, 1870), concat('E', generate_series(1740, 1870)), 'HYDROGEN SULFIDE SENSOR', 1, 2, 1, 1 UNION
-SELECT generate_series(1871, 1973), concat('E', generate_series(1871, 1973)), 'HYDROGEN SULFIDE SENSOR', 1, 2, 2, 1
+SELECT generate_series(1871, 1973), concat('E', generate_series(1871, 1973)), 'HYDROGEN SULFIDE SENSOR', 1, 2, 2, 1;
 
 UPDATE element SET tstamp = now(), num_elements = 1, location_type = 'St. Location', workcat_id = 'work1', builtdate = '1900-01-01', ownercat_id = 'owner1', verified = 0, feature_type = 'ELEMENT', 
 insert_user = CURRENT_USER, trace_featuregeom = true, geometry_type = 'POINT';
