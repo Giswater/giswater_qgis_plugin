@@ -12,7 +12,7 @@ CREATE OR REPLACE VIEW v_om_team_x_user AS
 SELECT om_team_x_user.id,
 om_team_x_user.user_id,
 cat_team.name AS team,
-cat_user.name AS user_name
+cat_user.user_id AS user_name
 FROM om_team_x_user
 JOIN cat_team USING (team_id)
 JOIN cat_user USING (user_id);

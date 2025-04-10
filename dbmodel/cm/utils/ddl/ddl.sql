@@ -37,12 +37,14 @@ CREATE TABLE cm.cat_team (
 	CONSTRAINT cat_team_organization_id_fkey FOREIGN KEY (organization_id) REFERENCES cm.cat_organization(organization_id) ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
-CREATE TABLE om_team_x_user
-(
-  id serial NOT NULL,
-  user_id integer, --fk user
-  team_id integer, -- fk cat_team
-  CONSTRAINT om_team_x_user_pkey PRIMARY KEY (id)
+CREATE TABLE om_team_x_user (
+	id serial4 NOT NULL,
+	user_id text NULL,
+	team_id int4 NULL,
+	CONSTRAINT om_team_x_user_pkey PRIMARY KEY (id),
+	CONSTRAINT om_team_x_user_unique UNIQUE (user_id, team_id),
+	CONSTRAINT om_team_x_user_team_id_fkey FOREIGN KEY (team_id) REFERENCES cm.cat_team(team_id) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT om_team_x_user_user_id_fkey FOREIGN KEY (user_id) REFERENCES cm.cat_user(user_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 
@@ -62,6 +64,7 @@ CREATE TABLE om_reviewclass_x_layer
   reviewclass_id integer NOT NULL, -- fk om_reviewclass
   layer_id text NOT NULL,
   schema_name text,
+  feature_type text,
   active boolean DEFAULT true,
   CONSTRAINT om_reviewclass_x_layer_pkey PRIMARY KEY (schema_name, reviewclass_id, layer_id)
 );
@@ -73,6 +76,7 @@ CREATE TABLE om_visitclass
   idval text,
   descript text,
   feature_type text,
+  layer_id text NOT NULL,
   active boolean DEFAULT true,
   CONSTRAINT om_visitclass_pkey PRIMARY KEY (id)
 );
@@ -114,16 +118,6 @@ CREATE TABLE om_campaign_review
   reviewclass_id integer, -- fk om_reviewclass
   CONSTRAINT om_campaign_review_pkey PRIMARY KEY (campaign_id, reviewclass_id)
 );
-
-CREATE TABLE om_campaign_x_layer
-(
-  campaign_id integer, -- fk om_campaign
-  layer_id text, -- fk layer?
-  schema_name text,
-  feature_type text,
-  CONSTRAINT om_campaign_x_layer_pkey PRIMARY KEY (campaign_id, layer_id, schema_name)
-);
-
 
 CREATE TABLE selector_campaign
 (
@@ -280,7 +274,7 @@ CREATE TABLE workorder
 );
 
 CREATE TABLE cat_user (
-    user_id serial4 PRIMARY KEY,
+    user_id text PRIMARY KEY,
     loginname varchar(100) NOT NULL,
     code varchar(50),
     name varchar(200),
