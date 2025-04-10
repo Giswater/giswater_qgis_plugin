@@ -126,7 +126,7 @@ Arnau Torret, i18n & Release Manager  on BGEO OPEN GIS.<br>
 
 Sergi Muñoz, Engineering Projects Consultant & Engineering Area Coordinator on BGEO OPEN GIS.<br>
 Albert Bofill, GIS-Giswater Consultant & GIS Area Coordinator on BGEO OPEN GIS.<br>
-Namrata Karki, GIS-Giswater Consultant on BGEO OPEN GIS.<br>
+Namrata Karki, Project Engineer - Hydroinformatics on BGEO OPEN GIS.<br>
 
 Maria Guzman, GIS-Giswater Analyst on BGEO OPEN GIS.<br>
 Barbara Rzepka, GIS analyst on BGEO OPEN GIS.<br>
