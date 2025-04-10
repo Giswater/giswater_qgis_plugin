@@ -128,7 +128,7 @@ SELECT element.element_id,
     element.enddate,
     element.ownercat_id,
     element.rotation,
-    concat(element_type.link_path, element.link) AS link,
+    element.link,
     element.verified,
     element.the_geom,
     element.label_x,
@@ -146,10 +146,63 @@ SELECT element.element_id,
     element.trace_featuregeom,
     element.muni_id,
     element.sector_id,
-    element.lock_level
+    element.lock_level,
+    element.geometry_type
    FROM selector_expl, element
      JOIN cat_element ON element.elementcat_id::text = cat_element.id::text
-     JOIN element_type ON element_type.id::text = cat_element.element_type::text
+  WHERE element.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text) e
+  LEFT JOIN selector_sector s USING (sector_id)
+  LEFT JOIN selector_municipality m USING (muni_id)
+  WHERE (s.cur_user = current_user OR s.sector_id IS NULL)
+  AND (m.cur_user = current_user OR e.muni_id IS NULL);
+
+CREATE OR REPLACE VIEW v_edit_genelement AS
+SELECT e.* FROM (
+SELECT element.element_id,
+    element.code,
+    element.elementcat_id,
+    cat_element.element_type,
+    element.brand_id,
+    element.model_id,
+    element.serial_number,
+    element.state,
+    element.state_type,
+    element.num_elements,
+    element.observ,
+    element.comment,
+    element.function_type,
+    element.category_type,
+    element.location_type,
+    element.fluid_type,
+    element.workcat_id,
+    element.workcat_id_end,
+    element.builtdate,
+    element.enddate,
+    element.ownercat_id,
+    element.rotation,
+    element.link,
+    element.verified,
+    element.the_geom,
+    element.label_x,
+    element.label_y,
+    element.label_rotation,
+    element.publish,
+    element.inventory,
+    element.undelete,
+    element.expl_id,
+    element.pol_id,
+    element.lastupdate,
+    element.lastupdate_user,
+    element.top_elev,
+    element.expl_id2,
+    element.trace_featuregeom,
+    element.muni_id,
+    element.sector_id,
+    element.lock_level,
+    element.geometry_type
+   FROM selector_expl, element
+     JOIN cat_element ON element.elementcat_id::text = cat_element.id::text
+     JOIN man_genelement USING (element_id)
   WHERE element.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text) e
   LEFT JOIN selector_sector s USING (sector_id)
   LEFT JOIN selector_municipality m USING (muni_id)
