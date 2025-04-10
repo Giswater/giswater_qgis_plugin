@@ -39,8 +39,6 @@ UPDATE cat_arc SET geom2 = null WHERE id = 'EG150';
 
 
 -- refactoring flowregulators for node pump station on expl_1
-DELETE FROM inp_flwreg_weir where flwreg_id = (SELECT flwreg_id FROM flwreg WHERE node_id = '238');
-DELETE FROM inp_flwreg_pump where flwreg_id = (SELECT flwreg_id FROM flwreg WHERE node_id = '238');
 UPDATE v_edit_arc SET epa_type = 'PUMP' WHERE arc_id = '303';
 UPDATE inp_pump set curve_id = 'PUMP-01', status='OFF', startup=2, shutoff=0.4 WHERE arc_id = '303';
 UPDATE v_edit_arc SET epa_type = 'WEIR' WHERE arc_id = '342';
@@ -48,7 +46,7 @@ UPDATE inp_weir SET weir_type ='TRANSVERSE', offsetval = 17, cd=1.5, geom1=1, ge
 
 
 -- refactoring flowregulators form node weir of expl_1
-DELETE FROM inp_flwreg_weir where flwreg_id = (SELECT flwreg_id FROM flwreg WHERE to_arc = '242');;
+
 SELECT gw_fct_setarcfusion('{"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":[20587]},
 "data":{"workcatId":"work1","enddate":"2020-02-05", "arccat_id":"RC200", "action_mode": 2, "arc_type":"CONDUIT"}}'::json);
 SELECT gw_fct_setarcfusion('{"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{"id":[20590]},
