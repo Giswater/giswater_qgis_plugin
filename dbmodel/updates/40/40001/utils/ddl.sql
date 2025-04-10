@@ -20,6 +20,7 @@ CREATE TABLE man_servconnection (
 
 ALTER TABLE sys_feature_class DROP CONSTRAINT sys_feature_cat_check;
 DELETE FROM sys_feature_class WHERE id = 'LINK';
+DELETE FROM sys_feature_class WHERE type = 'FLWREG';
 
 CREATE TABLE cat_feature_link (
 	id varchar(30) NOT NULL,

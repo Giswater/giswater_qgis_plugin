@@ -14,9 +14,9 @@ INSERT INTO sys_feature_epa_type (id, feature_type, epa_table, descript, active)
 -- Adding flowregulator objects on cat_feature [Modified from first version]
 INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) VALUES ('FRORIFICE', 'FLWREG', 'ELEMENT', 'v_edit_element', 've_elem_frorifice', true) ON CONFLICT (id) DO NOTHING;
 INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) VALUES ('FROUTLET', 'FLWREG', 'ELEMENT', 'v_edit_element', 've_elem_froutlet', true) ON CONFLICT (id) DO NOTHING;
-INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) VALUES ('FRWEIR', 'FLWREG', 'FLWREG', 'v_edit_element', 've_elem_frweir', true) ON CONFLICT (id) DO NOTHING;
+INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) VALUES ('FRWEIR', 'FLWREG', 'ELEMENT', 'v_edit_element', 've_elem_frweir', true) ON CONFLICT (id) DO NOTHING;
 -- Adding objects on config_info_layer and config_info_layer_x_type (this both tables controls the button info)
-INSERT INTO config_info_layer VALUES ('v_edit_flwreg', TRUE, 'flwreg', TRUE, 'info_generic', 'Flow regulator', 4);
+INSERT INTO config_info_layer VALUES ('v_edit_flwreg', TRUE, 'element', TRUE, 'info_generic', 'Flow regulator', 4);
 
 UPDATE config_info_layer SET is_parent=false, tableparent_id=NULL WHERE layer_id='v_edit_gully';
 

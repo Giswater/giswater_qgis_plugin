@@ -150,8 +150,8 @@ BEGIN
 		ELSIF lower(v_feature.type)='gully' THEN
 			EXECUTE 'INSERT INTO cat_feature_gully (id)
 			VALUES ('||quote_literal(NEW.id)||');';
-		ELSIF lower(v_feature.type)='flwreg' THEN
-			EXECUTE 'INSERT INTO cat_feature_flwreg (id, epa_default)
+		ELSIF lower(v_feature.type)='element' THEN
+			EXECUTE 'INSERT INTO cat_feature_element (id, epa_default)
 			VALUES ('||quote_literal(NEW.id)||', '||quote_literal(v_feature.epa_default)||');';
 		END IF;
 
@@ -331,8 +331,8 @@ BEGIN
 			ELSIF lower(NEW.feature_type)='gully' THEN
 				EXECUTE 'INSERT INTO cat_feature_gully (id)
 				VALUES ('||quote_literal(NEW.id)||',);';
-			ELSIF lower(NEW.feature_type)='flwreg' THEN
-				EXECUTE 'INSERT INTO cat_feature_flwreg (id, epa_default)
+			ELSIF lower(NEW.feature_type)='element' THEN
+				EXECUTE 'INSERT INTO cat_feature_element (id, epa_default)
 				VALUES ('||quote_literal(NEW.id)||','||quote_literal(v_feature.epa_default)||')';
 			END IF;
 
