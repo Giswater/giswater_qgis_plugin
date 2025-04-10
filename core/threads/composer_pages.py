@@ -39,7 +39,8 @@ class GwComposerPages(GwTask):
         self.stop = False
         self.sleep_time = sleep_time
 
-        self.designer.mapPreviewRefreshed.connect(self._increase_map_refreshed)
+        if Qgis.QGIS_VERSION_INT >= 32000:
+            self.designer.mapPreviewRefreshed.connect(self._increase_map_refreshed)
 
     def sort_list(self, json_):
 
@@ -75,6 +76,8 @@ class GwComposerPages(GwTask):
                 # Wait for the maps to be updated
                 while self.map_refreshed < len(maps):
                     sleep(0.1)
+                    if Qgis.QGIS_VERSION_INT <= 32000:
+                        self.map_refreshed = self.map_refreshed + 1
                     if self.stop:
                         return False
 

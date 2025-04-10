@@ -100,18 +100,16 @@ class GwSearch:
                         label.setToolTip(field['label'].capitalize())
 
                     widget = None
-                    match field['widgettype']:
-                        case 'typeahead':
-                            completer = QCompleter()
-                            widget = tools_gw.add_lineedit(field)
-                            widget = self._set_typeahead_completer(widget, completer)
-                            self.lineedit_list.append(widget)
-                        case 'combo':
-                            widget = self._add_combobox(field)
-                        case 'check':
-                            kwargs = {"dialog": self.dlg_search, "field": field}
-                            widget = tools_gw.add_checkbox(**kwargs)
-                        
+                    if field['widgettype'] == 'typeahead':
+                        completer = QCompleter()
+                        widget = tools_gw.add_lineedit(field)
+                        widget = self._set_typeahead_completer(widget, completer)
+                        self.lineedit_list.append(widget)
+                    elif field['widgettype'] == 'combo':
+                        widget = self._add_combobox(field)
+                    elif field['widgettype'] == 'check':
+                        kwargs = {"dialog": self.dlg_search, "field": field}
+                        widget = tools_gw.add_checkbox(**kwargs)
                     gridlayout.addWidget(label, x, 0)
                     gridlayout.addWidget(widget, x, 1)
                     x += 1
@@ -279,93 +277,92 @@ class GwSearch:
         if tab_selected == 'add_network':
             is_add_schema = True
 
-        match tab_selected:
-            # Tab 'network or add_network'
-            case 'network' | 'add_network':
-                self.customForm = GwInfo(tab_type='data')
-                complet_result, dialog = self.customForm.get_info_from_id(
-                    item['sys_table_id'], tab_type='data', feature_id=item['sys_id'], is_add_schema=is_add_schema)
+        # Tab 'network or add_network'
+        if tab_selected == 'network' or tab_selected == 'add_network':
+            self.customForm = GwInfo(tab_type='data')
+            complet_result, dialog = self.customForm.get_info_from_id(
+                item['sys_table_id'], tab_type='data', feature_id=item['sys_id'], is_add_schema=is_add_schema)
 
-                if not complet_result:
-                    return
+            if not complet_result:
+                return
 
-                # self.customForm.get_info_from_id (...) in turn ends up calling self.open_custom_form (...) which will draw
-                # the line on the feature but not zoom. Here, with draw we redraw simply to zoom and so that there are not
-                # two ruberbands (the one from self.open_custom_form (...) and this one) we delete these
+            # self.customForm.get_info_from_id (...) in turn ends up calling self.open_custom_form (...) which will draw
+            # the line on the feature but not zoom. Here, with draw we redraw simply to zoom and so that there are not
+            # two ruberbands (the one from self.open_custom_form (...) and this one) we delete these
 
-                try:
-                    margin = float(complet_result['body']['feature']['zoomCanvasMargin']['mts'])
-                except ValueError:
-                    margin = 50
+            try:
+                margin = float(complet_result['body']['feature']['zoomCanvasMargin']['mts'])
+            except ValueError:
+                margin = 50
 
-                tools_gw.draw_by_json(complet_result, self.rubber_band, margin)
-                self._reset_rubber_band()
+            tools_gw.draw_by_json(complet_result, self.rubber_band, margin)
+            self._reset_rubber_band()
 
-            # Tab 'address' (streets)
-            case 'address' if 'id' in item and 'sys_id' not in item:
-                polygon = item['st_astext']
-                if polygon:
-                    polygon = polygon[9:len(polygon) - 2]
-                    polygon = polygon.split(',')
-                    x1, y1 = polygon[0].split(' ')
-                    x2, y2 = polygon[2].split(' ')
-                    tools_qgis.zoom_to_rectangle(x1, y1, x2, y2)
-                else:
-                    message = f"Zoom unavailable. Doesn't exist the geometry for the street"
-                    tools_qgis.show_info(message, parameter=item['display_name'])
+        # Tab 'address' (streets)
+        elif tab_selected == 'address' and 'id' in item and 'sys_id' not in item:
+            polygon = item['st_astext']
+            if polygon:
+                polygon = polygon[9:len(polygon) - 2]
+                polygon = polygon.split(',')
+                x1, y1 = polygon[0].split(' ')
+                x2, y2 = polygon[2].split(' ')
+                tools_qgis.zoom_to_rectangle(x1, y1, x2, y2)
+            else:
+                message = f"Zoom unavailable. Doesn't exist the geometry for the street"
+                tools_qgis.show_info(message, parameter=item['display_name'])
 
-            # Tab 'address'
-            case 'address' if 'sys_x' in item and 'sys_y' in item:
+        # Tab 'address'
+        elif tab_selected == 'address' and 'sys_x' in item and 'sys_y' in item:
+            x1 = item['sys_x']
+            y1 = item['sys_y']
+            point = QgsPointXY(float(x1), float(y1))
+            tools_qgis.draw_point(point, self.rubber_band, duration_time=5000)
+            tools_qgis.zoom_to_rectangle(x1, y1, x1, y1, margin=100)
+            self.canvas.refresh()
+
+        # Tab 'hydro'
+        elif tab_selected == 'hydro':
+            # Get basic_search_hydrometer_show_connec param
+            row = tools_gw.get_config_value("basic_search_hydrometer_show_connec", table='config_param_system')
+            basic_search_hydrometer = tools_os.set_boolean(row['value'])
+            if not basic_search_hydrometer:
                 x1 = item['sys_x']
                 y1 = item['sys_y']
                 point = QgsPointXY(float(x1), float(y1))
-                tools_qgis.draw_point(point, self.rubber_band, duration_time=5000)
-                tools_qgis.zoom_to_rectangle(x1, y1, x1, y1, margin=100)
-                self.canvas.refresh()
-
-            # Tab 'hydro'
-            case 'hydro':
-                # Get basic_search_hydrometer_show_connec param
-                row = tools_gw.get_config_value("basic_search_hydrometer_show_connec", table='config_param_system')
-                basic_search_hydrometer = tools_os.set_boolean(row['value'])
-                if not basic_search_hydrometer:
-                    x1 = item['sys_x']
-                    y1 = item['sys_y']
-                    point = QgsPointXY(float(x1), float(y1))
-                    tools_qgis.draw_point(point, self.rubber_band)
-                    tools_qgis.zoom_to_rectangle(x1, y1, x1, y1, margin=100)
-                self._open_hydrometer_dialog(table_name=item['sys_table_id'], feature_id=item['sys_id'],
-                                            sys_feature_type_id=item['sys_feature_type_id'],
-                                            basic_search_hydrometer=basic_search_hydrometer,
-                                            feature_type=item['sys_feature'])
-
-            # Tab 'workcat'
-            case 'workcat':
-                workcat_instance = GwWorkcat(global_vars.iface, global_vars.canvas)
-                workcat_instance.workcat_open_table_items(item)
-                return
-
-            # Tab 'psector'
-            case 'psector':
-                list_coord = re.search('\(\((.*)\)\)', str(item['sys_geometry']))
-                self.manage_new_psector.get_psector(item['sys_id'], list_coord)
-
-            # Tab 'visit'
-            case 'visit':
-                list_coord = re.search('\((.*)\)', str(item['sys_geometry']))
-                if not list_coord:
-                    msg = "Empty coordinate list"
-                    tools_qgis.show_info(msg)
-                    self.manage_visit.get_visit(visit_id=item['sys_id'])
-                    return
-                max_x, max_y, min_x, min_y = tools_qgis.get_max_rectangle_from_coords(list_coord)
-                self._reset_rubber_band()
-                point = QgsPointXY(float(max_x), float(max_y))
                 tools_qgis.draw_point(point, self.rubber_band)
-                tools_qgis.zoom_to_rectangle(max_x, max_y, min_x, min_y, margin=100)
+                tools_qgis.zoom_to_rectangle(x1, y1, x1, y1, margin=100)
+            self._open_hydrometer_dialog(table_name=item['sys_table_id'], feature_id=item['sys_id'],
+                                         sys_feature_type_id=item['sys_feature_type_id'],
+                                         basic_search_hydrometer=basic_search_hydrometer,
+                                         feature_type=item['sys_feature'])
+
+        # Tab 'workcat'
+        elif tab_selected == 'workcat':
+            workcat_instance = GwWorkcat(global_vars.iface, global_vars.canvas)
+            workcat_instance.workcat_open_table_items(item)
+            return
+
+        # Tab 'psector'
+        elif tab_selected == 'psector':
+            list_coord = re.search('\(\((.*)\)\)', str(item['sys_geometry']))
+            self.manage_new_psector.get_psector(item['sys_id'], list_coord)
+
+        # Tab 'visit'
+        elif tab_selected == 'visit':
+            list_coord = re.search('\((.*)\)', str(item['sys_geometry']))
+            if not list_coord:
+                msg = "Empty coordinate list"
+                tools_qgis.show_info(msg)
                 self.manage_visit.get_visit(visit_id=item['sys_id'])
-                self.manage_visit.dlg_add_visit.rejected.connect(self.rubber_band.reset)
                 return
+            max_x, max_y, min_x, min_y = tools_qgis.get_max_rectangle_from_coords(list_coord)
+            self._reset_rubber_band()
+            point = QgsPointXY(float(max_x), float(max_y))
+            tools_qgis.draw_point(point, self.rubber_band)
+            tools_qgis.zoom_to_rectangle(max_x, max_y, min_x, min_y, margin=100)
+            self.manage_visit.get_visit(visit_id=item['sys_id'])
+            self.manage_visit.dlg_add_visit.rejected.connect(self.rubber_band.reset)
+            return
 
         self.lbl_visible = False
         self.dlg_search.lbl_msg.setVisible(self.lbl_visible)

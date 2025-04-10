@@ -137,7 +137,7 @@ class GwI18NGenerator:
         key_message = f'ms_{self.lower_lang}'
 
         # Get python messages values
-        
+
         # Get python toolbars and buttons values
         if self.lower_lang == 'en_us':
             sql = f"SELECT source, ms_en_us FROM i18n.pymessage;"  # ADD new columns
@@ -243,7 +243,7 @@ class GwI18NGenerator:
                     py_dlg[key_label] = py_dlg[f'auto_{key_label}']
                 if py_tlb[key_label] is None:
                     py_dlg[key_label] = py_dlg['lb_en_us']
-                
+
             line += f"\t\t\t<translation>{py_dlg[key_label]}</translation>\n"
             line += f"\t\t</message>\n"
 
@@ -348,13 +348,13 @@ class GwI18NGenerator:
             os.makedirs(cfg_path, exist_ok=True)
 
         self._write_header(cfg_path + file_name)
-        
+
         rows = self._get_config_form_fields_values('ws')
         if not rows:
             return False, "config_form_fields_ws"
         self._write_header(cfg_path + file_name_ws)
         self._write_config_form_fields_updates(rows, cfg_path + file_name_ws)
-        
+
         rows = self._get_config_form_fields_values('ud')
         if not rows:
             return False, "config_form_fields_ud"
@@ -410,7 +410,7 @@ class GwI18NGenerator:
     def _get_dbfprocess_values_i18n(self):
         """ Get db messages values """
         # Make the query
-        
+
         if self.lower_lang == 'en_us':
             sql = (f"SELECT source, project_type, context, ex_en_us, in_en_us"
                 f" FROM i18n.dbfprocess "
@@ -459,7 +459,7 @@ class GwI18NGenerator:
         if not rows:
             return False
         return rows
-    
+
     def _get_dbmessages_values_i18n(self):
         """ Get db messages values """
         if self.lower_lang == 'en_us':
@@ -474,7 +474,7 @@ class GwI18NGenerator:
         if not rows:
             return False
         return rows
-    
+
     def _write_config_form_fields_updates(self, rows, path):  # Parlar amb edgar
         """
             Generate a string and write into file
@@ -488,11 +488,11 @@ class GwI18NGenerator:
             # Get values
             formname = row['formname_en_us'] if row['formname_en_us'] is not None else ""
             formname_lang = row[f'formname_{self.lower_lang}'] if row[f'formname_{self.lower_lang}'] is not None else row[f'auto_formname_{self.lower_lang}']
-            formname_lang = formname_lang if formname_lang is not None else row['formname_en_us']            
+            formname_lang = formname_lang if formname_lang is not None else row['formname_en_us']
 
             line = f'UPDATE config_form_fields SET formname = \'{formname_lang}\' ' \
                    f'WHERE formname LIKE \'{formname}\';\n'
-                   
+
             file.write(line)
         file.close()
         del file
@@ -591,7 +591,7 @@ class GwI18NGenerator:
                 ht_value = self._replace_invalid_quotation_marks(ht_value)
                 if "\n" in ht_value:
                     ht_value = self._replace_invalid_characters(ht_value)
-            
+
             line = f'INSERT INTO {table} (id, error_message, hint_message, log_level, show_user, project_type, source) ' \
                     f'VALUES ({source}, \'{ms_value}\', \'{ht_value}\', {log_level}, true, \'{project_type}\', \'core\') ' \
                     f'ON CONFLICT (id) DO UPDATE SET ' \
@@ -762,7 +762,7 @@ class GwI18NGenerator:
         param = param.replace("\n", " ")
 
         return param
-    
+
     def _replace_invalid_quotation_marks(self, param):
         """
         This function replaces the characters that break JSON messages
