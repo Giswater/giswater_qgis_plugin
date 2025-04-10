@@ -149,9 +149,10 @@ SELECT element.element_id,
     element.muni_id,
     element.sector_id,
     element.lock_level,
-    element.geometry_type
+    cat_feature_element.geometry_type
    FROM selector_expl, element
-     JOIN cat_element ON element.elementcat_id::text = cat_element.id::text
+    JOIN cat_element ON element.elementcat_id::text = cat_element.id::text
+    LEFT JOIN cat_feature_element ON cat_element.element_type::text = cat_feature_element.id::text
   WHERE element.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text) e
   LEFT JOIN selector_sector s USING (sector_id)
   LEFT JOIN selector_municipality m USING (muni_id)
@@ -201,9 +202,10 @@ SELECT element.element_id,
     element.muni_id,
     element.sector_id,
     element.lock_level,
-    element.geometry_type
+    cat_feature_element.geometry_type
    FROM selector_expl, element
      JOIN cat_element ON element.elementcat_id::text = cat_element.id::text
+    LEFT JOIN cat_feature_element ON cat_element.element_type::text = cat_feature_element.id::text
      JOIN man_genelement USING (element_id)
   WHERE element.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text) e
   LEFT JOIN selector_sector s USING (sector_id)
