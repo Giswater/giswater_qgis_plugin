@@ -383,17 +383,35 @@ INSERT INTO cat_team (team_id, code, "name", organization_id, descript, role_id,
 INSERT INTO cat_team (team_id, code, "name", organization_id, descript, role_id, active) VALUES(6, '1234512345', 'o2_field1', 3, 'equip camp', 'role_field', true);
 INSERT INTO cat_team (team_id, code, "name", organization_id, descript, role_id, active) VALUES(7, '1234512345', 'o2_field2', 3, 'equip camp', 'role_field', true);
 
-INSERT INTO cat_user (user_id, loginname, code, "name", descript, team_id, active) VALUES(1, 'antonio@gmail.com', '48178923Z', 'antonio', 'administrador1', 1, true);
-INSERT INTO cat_user (user_id, loginname, code, "name", descript, team_id, active) VALUES(2, 'test@gmail.com', '48178923Z', 'juan', 'administrador2', 1, true);
-INSERT INTO cat_user (user_id, loginname, code, "name", descript, team_id, active) VALUES(4, 'test@gmail.com', '48178923Z', 'test', 'manager o1', 2, true);
-INSERT INTO cat_user (user_id, loginname, code, "name", descript, team_id, active) VALUES(5, 'test@gmail.com', '48178923Z', 'test', 'manager o1', 2, true);
-INSERT INTO cat_user (user_id, loginname, code, "name", descript, team_id, active) VALUES(6, 'test@gmail.com', '48178923Z', 'test', 'o1 field 1', 4, true);
-INSERT INTO cat_user (user_id, loginname, code, "name", descript, team_id, active) VALUES(7, 'test@gmail.com', '48178923Z', 'test', 'o1 field 1', 4, true);
-INSERT INTO cat_user (user_id, loginname, code, "name", descript, team_id, active) VALUES(8, 'test@gmail.com', '48178923Z', 'test', 'o1 field 2', 5, true);
-INSERT INTO cat_user (user_id, loginname, code, "name", descript, team_id, active) VALUES(9, 'test@gmail.com', '48178923Z', 'test', 'o1 field 2', 5, true);
-INSERT INTO cat_user (user_id, loginname, code, "name", descript, team_id, active) VALUES(10, 'test@gmail.com', '48178923Z', 'test', 'manager 02', 3, true);
-INSERT INTO cat_user (user_id, loginname, code, "name", descript, team_id, active) VALUES(11, 'test@gmail.com', '48178923Z', 'test', 'manager 02', 3, true);
-INSERT INTO cat_user (user_id, loginname, code, "name", descript, team_id, active) VALUES(12, 'test@gmail.com', '48178923Z', 'test', 'o2 field 1', 6, true);
-INSERT INTO cat_user (user_id, loginname, code, "name", descript, team_id, active) VALUES(13, 'test@gmail.com', '48178923Z', 'test', 'o2 field 1', 6, true);
-INSERT INTO cat_user (user_id, loginname, code, "name", descript, team_id, active) VALUES(14, 'test@gmail.com', '48178923Z', 'test', 'o2 field 2', 7, true);
-INSERT INTO cat_user (user_id, loginname, code, "name", descript, team_id, active) VALUES(15, 'test@gmail.com', '48178923Z', 'test', 'o2 field 2', 7, true);
+-- Team administrator
+INSERT INTO cat_user (user_id, loginname, code, "name", descript, team_id, active) VALUES('ferran', 'ferran@gmail.com', '48178923Z', 'ferran martinez lopez', 'administrador1', 1, true);
+INSERT INTO cat_user (user_id, loginname, code, "name", descript, team_id, active) VALUES('daniel', 'daniel@gmail.com', '38145678P', 'daniel marin bocanegra', 'administrador2', 1, true);
+
+-- Team: Manager o1
+INSERT INTO cat_user (user_id, loginname, code, "name", descript, team_id, active) VALUES('juan', 'juan@gmail.com', '79234561A', 'juan peris gallego', 'manager o1', 2, true);
+INSERT INTO cat_user (user_id, loginname, code, "name", descript, team_id, active) VALUES('marta', 'marta.o1@gmail.com', '10923456H', 'marta sierra roca', 'manager o1', 2, true);
+
+-- Team: Manager o2
+INSERT INTO cat_user (user_id, loginname, code, "name", descript, team_id, active) VALUES('ana', 'ana.o2@gmail.com', '52013478Y', 'ana torres delgado', 'manager o2', 3, true);
+INSERT INTO cat_user (user_id, loginname, code, "name", descript, team_id, active) VALUES('carlos', 'carlos.manager@gmail.com', '64823109F', 'carlos fuentes mora', 'manager o2', 3, true);
+
+-- Team: o1 field 1
+INSERT INTO cat_user (user_id, loginname, code, "name", descript, team_id, active) VALUES('laura', 'laura.field1@gmail.com', '78124567Q', 'laura blanco martí', 'o1 field 1', 4, true);
+INSERT INTO cat_user (user_id, loginname, code, "name", descript, team_id, active) VALUES('david', 'david.o1f1@gmail.com', '34567012K', 'david ferrer romeu', 'o1 field 1', 4, true);
+
+-- Team: o1 field 2
+INSERT INTO cat_user (user_id, loginname, code, "name", descript, team_id, active) VALUES('nuria', 'nuria.o1f2@gmail.com', '46283910L', 'nuria gallart costa', 'o1 field 2', 5, true);
+INSERT INTO cat_user (user_id, loginname, code, "name", descript, team_id, active) VALUES('oscar', 'oscar.field2@gmail.com', '57201894W', 'oscar martin serra', 'o1 field 2', 5, true);
+
+-- Team: o2 field 1
+INSERT INTO cat_user (user_id, loginname, code, "name", descript, team_id, active) VALUES('ines', 'ines.o2f1@gmail.com', '68391740T', 'ines ramos vega', 'o2 field 1', 6, true);
+INSERT INTO cat_user (user_id, loginname, code, "name", descript, team_id, active) VALUES('pablo', 'pablo.o2f1@gmail.com', '78291034X', 'pablo nuñez bravo', 'o2 field 1', 6, true);
+
+-- Team: o2 field 2
+INSERT INTO cat_user (user_id, loginname, code, "name", descript, team_id, active) VALUES('carla', 'carla.o2f2@gmail.com', '84023910S', 'carla gil torras', 'o2 field 2', 7, true);
+INSERT INTO cat_user (user_id, loginname, code, "name", descript, team_id, active) VALUES('raul', 'raul.o2f2@gmail.com', '92034185M', 'raul bueno soler', 'o2 field 2', 7, true);
+
+INSERT INTO om_reviewclass (id, idval, descript, active) VALUES(1, 'DEPOSITOS', 'TEST INSERT', true);
+INSERT INTO om_reviewclass (id, idval, descript, active) VALUES(2, 'VALVULAS HIDRAULICAS', 'TEST INSERT', true);
+INSERT INTO om_reviewclass (id, idval, descript, active) VALUES(3, 'CAPAS PADRE', 'TEST INSERT', true);
+
