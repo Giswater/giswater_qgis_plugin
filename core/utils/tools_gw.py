@@ -591,33 +591,32 @@ def draw_wkt_geometry(wkt_string, rubber_band, color, width):
     coordinates = match.group(2)
 
     # Draw the geometry based on its type
-    match geometry_type:
-        case 'POINT':
-            x, y = [float(c) for c in coordinates.split()]
-            point = QgsPointXY(x, y)
-            tools_qgis.draw_point(point, rubber_band, color, width, reset_rb=False)
-        case 'LINESTRING':
-            points = [QgsPointXY(float(x), float(y)) for x, y in (c.split() for c in coordinates.split(','))]
-            tools_qgis.draw_polyline(points, rubber_band, color, width, reset_rb=False)
-        case 'POLYGON':
-            # TODO: accept polygons with inner rings
-            rings = QgsGeometry.fromWkt(wkt_string).asPolygon()
-            rings = [QgsPointXY(x, y) for x, y in rings[0]]
-            tools_qgis.draw_polygon(rings, rubber_band, color, width)
-        case 'GEOMETRYCOLLECTION':
-            # Extract the individual geometries from the collection
-            # NOTE: will only work if all geometries have the same geometry type
-            geometries = re.findall(r'(\w+)\((.*?)\)', coordinates)
-            for geometry_type, geometry_coords in geometries:
-                geometry_wkt = f'{geometry_type.upper()}({geometry_coords})'
-                draw_wkt_geometry(geometry_wkt, rubber_band, color, width)
-        case 'MULTIPOLYGON':
-            geometries = re.findall(r'\(\((.*?)\)\)', coordinates)
-            for geometry_coords in geometries:
-                geometry_wkt = f'POLYGON(({geometry_coords}))'
-                draw_wkt_geometry(geometry_wkt, rubber_band, color, width)
-        case _:
-            tools_qgis.show_warning('Unsuported geometry type', parameter=geometry_type)
+    if geometry_type == 'POINT':
+        x, y = [float(c) for c in coordinates.split()]
+        point = QgsPointXY(x, y)
+        tools_qgis.draw_point(point, rubber_band, color, width, reset_rb=False)
+    elif geometry_type == 'LINESTRING':
+        points = [QgsPointXY(float(x), float(y)) for x, y in (c.split() for c in coordinates.split(','))]
+        tools_qgis.draw_polyline(points, rubber_band, color, width, reset_rb=False)
+    elif geometry_type == 'POLYGON':
+        # TODO: accept polygons with inner rings
+        rings = QgsGeometry.fromWkt(wkt_string).asPolygon()
+        rings = [QgsPointXY(x, y) for x, y in rings[0]]
+        tools_qgis.draw_polygon(rings, rubber_band, color, width)
+    elif geometry_type == 'GEOMETRYCOLLECTION':
+        # Extract the individual geometries from the collection
+        # NOTE: will only work if all geometries have the same geometry type
+        geometries = re.findall(r'(\w+)\((.*?)\)', coordinates)
+        for geometry_type, geometry_coords in geometries:
+            geometry_wkt = f'{geometry_type.upper()}({geometry_coords})'
+            draw_wkt_geometry(geometry_wkt, rubber_band, color, width)
+    elif geometry_type == 'MULTIPOLYGON':
+        geometries = re.findall(r'\(\((.*?)\)\)', coordinates)
+        for geometry_coords in geometries:
+            geometry_wkt = f'POLYGON(({geometry_coords}))'
+            draw_wkt_geometry(geometry_wkt, rubber_band, color, width)
+    else:
+        tools_qgis.show_warning('Unsuported geometry type', parameter=geometry_type)
 
 
 def enable_feature_type(dialog, widget_name='tbl_relation', ids=None, widget_table=None):
@@ -932,37 +931,40 @@ def configure_layers_from_table_name(table_name):
         ]
     }
 
-    match table_name:
-        # Dynamically collect all 'dscenario' tables if 'table_name' is 'dscenario'
-        case 'dscenario':
-            tables = []
-            for key, table_list in table_groups.items():
-                if "dscenario" in key:
-                    tables.extend(table_list)
-        # Dynamically collect all 'curve' tables if 'table_name' is 'curve'
-        case 'curve':
-            tables = []
-            for key, table_list in table_groups.items():
-                if "curve" in key:
-                    tables.extend(table_list)
-        # Dynamically collect all 'pattern' tables if 'table_name' is 'pattern'
-        case 'pattern':
-            tables = []
-            for key, table_list in table_groups.items():
-                if "pattern" in key:
-                    tables.extend(table_list)
-        # Dynamically collect all 'timeseries' tables if 'table_name' is 'timeseries'
-        case 'timeseries':
-            tables = []
-            for key, table_list in table_groups.items():
-                if "timeseries" in key:
-                    tables.extend(table_list)
-        case _:
-            # Validate if the table_name exists in the table_groups
-            if table_name not in table_groups:
-                tools_log.log_info(f"Invalid table_name '{table_name}' provided. No configuration performed.")
-                return False
-            tables = table_groups[table_name]
+    # Dynamically collect all 'dscenario' tables if 'table_name' is 'dscenario'
+    if table_name == "dscenario":
+        tables = []
+        for key, table_list in table_groups.items():
+            if "dscenario" in key:
+                tables.extend(table_list)
+
+    # Dynamically collect all 'curve' tables if 'table_name' is 'curve'
+    elif table_name == "curve":
+        tables = []
+        for key, table_list in table_groups.items():
+            if "curve" in key:
+                tables.extend(table_list)
+
+    # Dynamically collect all 'pattern' tables if 'table_name' is 'pattern'
+    elif table_name == "pattern":
+        tables = []
+        for key, table_list in table_groups.items():
+            if "pattern" in key:
+                tables.extend(table_list)
+
+    # Dynamically collect all 'timeseries' tables if 'table_name' is 'timeseries'
+    elif table_name == "timeseries":
+        tables = []
+        for key, table_list in table_groups.items():
+            if "timeseries" in key:
+                tables.extend(table_list)
+
+    else:
+        # Validate if the table_name exists in the table_groups
+        if table_name not in table_groups:
+            tools_log.log_info(f"Invalid table_name '{table_name}' provided. No configuration performed.")
+            return False
+        tables = table_groups[table_name]
 
     failed_layers = []
 
@@ -1093,33 +1095,32 @@ def config_layer_attributes(json_result, layer, layer_name, thread=None):
 
         if not use_vr:
             # Manage new values in ValueMap
-            match field['widgettype']:
-                case 'combo':
-                    if 'comboIds' in field:
-                        # Set values
-                        for i in range(0, len(field['comboIds'])):
-                            valuemap_values[field['comboNames'][i]] = field['comboIds'][i]
-                    # Set values into valueMap
-                    editor_widget_setup = QgsEditorWidgetSetup('ValueMap', {'map': valuemap_values})
-                    layer.setEditorWidgetSetup(field_index, editor_widget_setup)
-                case 'check':
-                    config = {'CheckedState': 'true', 'UncheckedState': 'false'}
-                    editor_widget_setup = QgsEditorWidgetSetup('CheckBox', config)
-                    layer.setEditorWidgetSetup(field_index, editor_widget_setup)
-                case 'datetime':
-                    config = {'allow_null': True,
-                            'calendar_popup': True,
-                            'display_format': 'yyyy-MM-dd',
-                            'field_format': 'yyyy-MM-dd',
-                            'field_iso_format': False}
-                    editor_widget_setup = QgsEditorWidgetSetup('DateTime', config)
-                    layer.setEditorWidgetSetup(field_index, editor_widget_setup)
-                case 'textarea':
-                    editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': 'True'})
-                    layer.setEditorWidgetSetup(field_index, editor_widget_setup)
-                case _:
-                    editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': 'False'})
-                    layer.setEditorWidgetSetup(field_index, editor_widget_setup)
+            if field['widgettype'] == 'combo':
+                if 'comboIds' in field:
+                    # Set values
+                    for i in range(0, len(field['comboIds'])):
+                        valuemap_values[field['comboNames'][i]] = field['comboIds'][i]
+                # Set values into valueMap
+                editor_widget_setup = QgsEditorWidgetSetup('ValueMap', {'map': valuemap_values})
+                layer.setEditorWidgetSetup(field_index, editor_widget_setup)
+            elif field['widgettype'] == 'check':
+                config = {'CheckedState': 'true', 'UncheckedState': 'false'}
+                editor_widget_setup = QgsEditorWidgetSetup('CheckBox', config)
+                layer.setEditorWidgetSetup(field_index, editor_widget_setup)
+            elif field['widgettype'] == 'datetime':
+                config = {'allow_null': True,
+                          'calendar_popup': True,
+                          'display_format': 'yyyy-MM-dd',
+                          'field_format': 'yyyy-MM-dd',
+                          'field_iso_format': False}
+                editor_widget_setup = QgsEditorWidgetSetup('DateTime', config)
+                layer.setEditorWidgetSetup(field_index, editor_widget_setup)
+            elif field['widgettype'] == 'textarea':
+                editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': 'True'})
+                layer.setEditorWidgetSetup(field_index, editor_widget_setup)
+            else:
+                editor_widget_setup = QgsEditorWidgetSetup('TextEdit', {'IsMultiline': 'False'})
+                layer.setEditorWidgetSetup(field_index, editor_widget_setup)
 
         # multiline: key comes from widgecontrol but it's used here in order to set false when key is missing
         if field['widgettype'] == 'text':
@@ -1537,35 +1538,33 @@ def build_dialog_info(dialog, result, my_json=None, tab_name=None, enable_action
             label.setToolTip(field['label'].capitalize())
 
         widget = None
-
-        match field['widgettype']:
-            case 'text' | 'textline' | 'typeahead':
-                completer = QCompleter()
-                widget = add_lineedit(field)
-                widget = set_widget_size(widget, field)
-                widget = set_data_type(field, widget)
-                if field['widgettype'] == 'typeahead':
-                    widget = set_typeahead(field, dialog, widget, completer)
-                widget.editingFinished.connect(partial(get_values, dialog, widget, my_json))
-            case 'datetime':
-                widget = add_calendar(dialog, field)
-                widget.valueChanged.connect(partial(get_values, dialog, widget, my_json))
-            case 'hyperlink':
-                widget = add_hyperlink(field)
-            case 'textarea':
-                widget = add_textarea(field)
-                widget.textChanged.connect(partial(get_values, dialog, widget, my_json))
-            case 'combo' | 'combobox':
-                widget = add_combo(field)
-                widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-                widget.currentIndexChanged.connect(partial(get_values, dialog, widget, my_json))
-            case 'check' | 'checkbox':
-                kwargs = {"dialog": dialog, "field": field}
-                widget = add_checkbox(**kwargs)
-                widget.stateChanged.connect(partial(get_values, dialog, widget, my_json))
-            case 'button':
-                kwargs = {"dialog": dialog, "field": field}
-                widget = add_button(**kwargs)
+        if field['widgettype'] in ('text', 'textline') or field['widgettype'] == 'typeahead':
+            completer = QCompleter()
+            widget = add_lineedit(field)
+            widget = set_widget_size(widget, field)
+            widget = set_data_type(field, widget)
+            if field['widgettype'] == 'typeahead':
+                widget = set_typeahead(field, dialog, widget, completer)
+            widget.editingFinished.connect(partial(get_values, dialog, widget, my_json))
+        elif field['widgettype'] == 'datetime':
+            widget = add_calendar(dialog, field)
+            widget.valueChanged.connect(partial(get_values, dialog, widget, my_json))
+        elif field['widgettype'] == 'hyperlink':
+            widget = add_hyperlink(field)
+        elif field['widgettype'] == 'textarea':
+            widget = add_textarea(field)
+            widget.textChanged.connect(partial(get_values, dialog, widget, my_json))
+        elif field['widgettype'] in ('combo', 'combobox'):
+            widget = add_combo(field)
+            widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+            widget.currentIndexChanged.connect(partial(get_values, dialog, widget, my_json))
+        elif field['widgettype'] in ('check', 'checkbox'):
+            kwargs = {"dialog": dialog, "field": field}
+            widget = add_checkbox(**kwargs)
+            widget.stateChanged.connect(partial(get_values, dialog, widget, my_json))
+        elif field['widgettype'] == 'button':
+            kwargs = {"dialog": dialog, "field": field}
+            widget = add_button(**kwargs)
 
         if 'ismandatory' in field and widget is not None:
             widget.setProperty('ismandatory', field['ismandatory'])
@@ -1652,75 +1651,73 @@ def build_dialog_options(dialog, row, pos, _json, temp_layers_added=None, module
                     lbl.setToolTip(field['tooltip'])
 
                 widget = None
-
-                match field['widgettype']:
-                    case 'text' | 'linetext':
-                        widget = QLineEdit()
-                        if 'isMandatory' in field:
-                            widget.setProperty('ismandatory', field['isMandatory'])
-                        else:
-                            widget.setProperty('ismandatory', False)
-                        if 'value' in field:
-                            widget.setText(field['value'])
-                            widget.setProperty('value', field['value'])
-                        widgetcontrols = field.get('widgetcontrols')
-                        if widgetcontrols and widgetcontrols.get('regexpControl') is not None:
-                            pass
-                        widget.editingFinished.connect(partial(get_dialog_changed_values, dialog, None, widget, field, _json))
-                        widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-                        datatype = field.get('datatype')
-                        if datatype == 'int':
-                            widget.setValidator(QIntValidator())
-                        elif datatype == 'float':
-                            widget.setValidator(QDoubleValidator())
-                    case 'combo':
-                        widget = add_combo(field)
-                        widget.currentIndexChanged.connect(partial(get_dialog_changed_values, dialog, None, widget, field, _json))
-                        signal = field.get('signal')
-                        if signal:
-                            widget.currentIndexChanged.connect(partial(getattr(module, signal), dialog))
-                            getattr(module, signal)(dialog)
-                        widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-                    case 'check':
-                        widget = QCheckBox()
-                        if field['value'] is not None and field['value'].lower() == "true":
-                            widget.setChecked(True)
-                        else:
-                            widget.setChecked(False)
-                        widget.stateChanged.connect(partial(get_dialog_changed_values, dialog, None, widget, field, _json))
-                        widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-                    case 'datetime':
-                        widget = CustomQgsDateTimeEdit()
-                        widget.setAllowNull(True)
-                        widget.setCalendarPopup(True)
-                        widget.setDisplayFormat('yyyy/MM/dd')
-                        if lib_vars.date_format in ("dd/MM/yyyy", "dd-MM-yyyy", "yyyy/MM/dd", "yyyy-MM-dd"):
-                            widget.setDisplayFormat(lib_vars.date_format)
-                        widget.clear()  # Set the date to NULL initially
-                        if field.get('value') not in ('', None, 'null'):
-                            date = QDate.fromString(field['value'].replace('/', '-'), 'yyyy-MM-dd')
-                            widget.setDate(date)
-                        widget.valueChanged.connect(partial(get_dialog_changed_values, dialog, None, widget, field, _json))
-                        widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-                    case 'spinbox':
-                        widget = QDoubleSpinBox()
-                        widgetcontrols = field.get('widgetcontrols')
-                        if widgetcontrols:
-                            spinboxDecimals = widgetcontrols.get('spinboxDecimals')
-                            if spinboxDecimals is not None:
-                                widget.setDecimals(spinboxDecimals)
-                            maximumNumber = widgetcontrols.get('maximumNumber')
-                            if maximumNumber is not None:
-                                widget.setMaximum(maximumNumber)
-                        if field.get('value') not in (None, ""):
-                            value = float(str(field['value']))
-                            widget.setValue(value)
-                        widget.valueChanged.connect(partial(get_dialog_changed_values, dialog, None, widget, field, _json))
-                        widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-                    case 'button':
-                        kwargs = {"dialog": dialog, "field": field, "temp_layers_added": temp_layers_added}
-                        widget = add_button(**kwargs)
-                        widget = set_widget_size(widget, field)
+                if field['widgettype'] == 'text' or field['widgettype'] == 'linetext':
+                    widget = QLineEdit()
+                    if 'isMandatory' in field:
+                        widget.setProperty('ismandatory', field['isMandatory'])
+                    else:
+                        widget.setProperty('ismandatory', False)
+                    if 'value' in field:
+                        widget.setText(field['value'])
+                        widget.setProperty('value', field['value'])
+                    widgetcontrols = field.get('widgetcontrols')
+                    if widgetcontrols and widgetcontrols.get('regexpControl') is not None:
+                        pass
+                    widget.editingFinished.connect(partial(get_dialog_changed_values, dialog, None, widget, field, _json))
+                    widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+                    datatype = field.get('datatype')
+                    if datatype == 'int':
+                        widget.setValidator(QIntValidator())
+                    elif datatype == 'float':
+                        widget.setValidator(QDoubleValidator())
+                elif field['widgettype'] == 'combo':
+                    widget = add_combo(field)
+                    widget.currentIndexChanged.connect(partial(get_dialog_changed_values, dialog, None, widget, field, _json))
+                    signal = field.get('signal')
+                    if signal:
+                        widget.currentIndexChanged.connect(partial(getattr(module, signal), dialog))
+                        getattr(module, signal)(dialog)
+                    widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+                elif field['widgettype'] == 'check':
+                    widget = QCheckBox()
+                    if field['value'] is not None and field['value'].lower() == "true":
+                        widget.setChecked(True)
+                    else:
+                        widget.setChecked(False)
+                    widget.stateChanged.connect(partial(get_dialog_changed_values, dialog, None, widget, field, _json))
+                    widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+                elif field['widgettype'] == 'datetime':
+                    widget = CustomQgsDateTimeEdit()
+                    widget.setAllowNull(True)
+                    widget.setCalendarPopup(True)
+                    widget.setDisplayFormat('yyyy/MM/dd')
+                    if lib_vars.date_format in ("dd/MM/yyyy", "dd-MM-yyyy", "yyyy/MM/dd", "yyyy-MM-dd"):
+                        widget.setDisplayFormat(lib_vars.date_format)
+                    widget.clear()  # Set the date to NULL initially
+                    if field.get('value') not in ('', None, 'null'):
+                        date = QDate.fromString(field['value'].replace('/', '-'), 'yyyy-MM-dd')
+                        widget.setDate(date)
+                    widget.valueChanged.connect(partial(get_dialog_changed_values, dialog, None, widget, field, _json))
+                    widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+                elif field['widgettype'] == 'spinbox':
+                    widget = QDoubleSpinBox()
+                    widgetcontrols = field.get('widgetcontrols')
+                    if widgetcontrols:
+                        spinboxDecimals = widgetcontrols.get('spinboxDecimals')
+                        if spinboxDecimals is not None:
+                            widget.setDecimals(spinboxDecimals)
+                        maximumNumber = widgetcontrols.get('maximumNumber')
+                        if maximumNumber is not None:
+                            widget.setMaximum(maximumNumber)
+                    if field.get('value') not in (None, ""):
+                        value = float(str(field['value']))
+                        widget.setValue(value)
+                    widget.valueChanged.connect(partial(get_dialog_changed_values, dialog, None, widget, field, _json))
+                    widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+                elif field['widgettype'] == 'button':
+                    kwargs = {"dialog": dialog, "field": field, "temp_layers_added": temp_layers_added}
+                    widget = add_button(**kwargs)
+                    widget = set_widget_size(widget, field)
 
                 if widget is None:
                     continue
@@ -2893,62 +2890,63 @@ def manage_json_return(json_result, sql, rubber_band=None, i=None):
                     if 'style' in return_manager and 'values' in return_manager['style'][key]:
                         if 'transparency' in return_manager['style'][key]['values']:
                             opacity = return_manager['style'][key]['values']['transparency']
+                    if style_type[key]['style'] == 'categorized':
+                        if 'transparency' in return_manager['style'][key]:
+                            opacity = return_manager['style'][key]['transparency']
+                        color_values = {}
+                        for item in return_manager['style'][key].get('values', []):
+                            color = QColor(item['color'][0], item['color'][1], item['color'][2], int(opacity * 255))
+                            color_values[item['id']] = color
+                        cat_field = str(style_type[key]['field'])
+                        size = style_type[key]['width'] if style_type[key].get('width') else 2
+                        tools_qgis.set_layer_categoryze(v_layer, cat_field, size, color_values, opacity=int(opacity * 255))
 
-                    match style_type[key]['style']:
-                        case 'categorized':
-                            if 'transparency' in return_manager['style'][key]:
-                                opacity = return_manager['style'][key]['transparency']
-                            color_values = {}
-                            for item in return_manager['style'][key].get('values', []):
-                                color = QColor(item['color'][0], item['color'][1], item['color'][2], int(opacity * 255))
-                                color_values[item['id']] = color
-                            cat_field = str(style_type[key]['field'])
-                            size = style_type[key]['width'] if style_type[key].get('width') else 2
-                            tools_qgis.set_layer_categoryze(v_layer, cat_field, size, color_values, opacity=int(opacity * 255))
-                        case 'random':
-                            size = style_type['width'] if style_type.get('width') else 2
-                            if geometry_type == 'Point':
-                                v_layer.renderer().symbol().setSize(size)
-                            elif geometry_type in ('Polygon', 'Multipolygon'):
-                                pass
-                            else:
-                                v_layer.renderer().symbol().setWidth(size)
-                            v_layer.renderer().symbol().setOpacity(opacity)
-                        case 'qml':
-                            style_id = style_type[key]['id']
-                            extras = f'"style_id":"{style_id}", "layername":"{key}"'
-                            body = create_body(extras=extras)
-                            style = execute_procedure('gw_fct_getstyle', body)
-                            if style is None or style.get('status') == 'Failed':
-                                return
-                            if 'styles' in style['body']:
-                                for style_name, qml in style['body']['styles'].items():
-                                    if qml is None:
-                                        continue
+                    elif style_type[key]['style'] == 'random':
+                        size = style_type['width'] if style_type.get('width') else 2
+                        if geometry_type == 'Point':
+                            v_layer.renderer().symbol().setSize(size)
+                        elif geometry_type in ('Polygon', 'Multipolygon'):
+                            pass
+                        else:
+                            v_layer.renderer().symbol().setWidth(size)
+                        v_layer.renderer().symbol().setOpacity(opacity)
 
-                                    valid_qml, error_message = validate_qml(qml)
-                                    if not valid_qml:
-                                        msg = "The QML file is invalid."
-                                        tools_qgis.show_warning(msg, parameter=error_message)
-                                    else:
-                                        style_manager = v_layer.styleManager()
+                    elif style_type[key]['style'] == 'qml':
+                        style_id = style_type[key]['id']
+                        extras = f'"style_id":"{style_id}", "layername":"{key}"'
+                        body = create_body(extras=extras)
+                        style = execute_procedure('gw_fct_getstyle', body)
+                        if style is None or style.get('status') == 'Failed':
+                            return
+                        if 'styles' in style['body']:
+                            for style_name, qml in style['body']['styles'].items():
+                                if qml is None:
+                                    continue
 
-                                        default_style_name = tools_qt.tr('default', context_name='QgsMapLayerStyleManager')
-                                        # add style with new name
-                                        style_manager.renameStyle(default_style_name, style_name)
-                                        # set new style as current
-                                        style_manager.setCurrentStyle(style_name)
-                                        tools_qgis.create_qml(v_layer, qml)
-                        case 'unique':
-                            color = style_type[key]['values']['color']
-                            size = style_type['width'] if style_type.get('width') else 2
-                            color = QColor(color[0], color[1], color[2])
-                            if key == 'point':
-                                v_layer.renderer().symbol().setSize(size)
-                            elif key in ('line', 'polygon'):
-                                v_layer.renderer().symbol().setWidth(size)
-                            v_layer.renderer().symbol().setColor(color)
-                            v_layer.renderer().symbol().setOpacity(opacity)
+                                valid_qml, error_message = validate_qml(qml)
+                                if not valid_qml:
+                                    msg = "The QML file is invalid."
+                                    tools_qgis.show_warning(msg, parameter=error_message)
+                                else:
+                                    style_manager = v_layer.styleManager()
+
+                                    default_style_name = tools_qt.tr('default', context_name='QgsMapLayerStyleManager')
+                                    # add style with new name
+                                    style_manager.renameStyle(default_style_name, style_name)
+                                    # set new style as current
+                                    style_manager.setCurrentStyle(style_name)
+                                    tools_qgis.create_qml(v_layer, qml)
+
+                    elif style_type[key]['style'] == 'unique':
+                        color = style_type[key]['values']['color']
+                        size = style_type['width'] if style_type.get('width') else 2
+                        color = QColor(color[0], color[1], color[2])
+                        if key == 'point':
+                            v_layer.renderer().symbol().setSize(size)
+                        elif key in ('line', 'polygon'):
+                            v_layer.renderer().symbol().setWidth(size)
+                        v_layer.renderer().symbol().setColor(color)
+                        v_layer.renderer().symbol().setOpacity(opacity)
 
                     global_vars.iface.layerTreeView().refreshLayerSymbology(v_layer.id())
                     if margin:
@@ -3193,7 +3191,7 @@ def zoom_to_feature_by_id(tablename: str, idname: str, _id, margin: float = 15):
         return
 
     if isinstance(_id, list):
-        expr_filter = f"{idname} IN ({', '.join([f'\'{i}\'' for i in _id])})"
+        expr_filter = f"""{idname} IN ({', '.join([f"'{i}'" for i in _id])})"""
     else:
         expr_filter = f"{idname} = '{_id}'"
 
@@ -4557,7 +4555,7 @@ def _delete_feature_psector(dialog, feature_type, list_id, state=None):
            f"WHERE {feature_type}_id IN ({list_id}) AND psector_id = '{value}'")
     # Add state if needed
     if state is not None:
-        sql += f' AND "state" = \'{state}\''
+        sql += f""" AND "state" = '{state}'"""
     tools_db.execute_sql(sql)
 
 

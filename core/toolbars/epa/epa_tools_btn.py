@@ -95,40 +95,47 @@ class GwEpaTools(GwAction):
     def _get_selected_action(self, name):
         """ Gets selected action """
 
-        match name:
-            case 'ADDITIONAL DEMAND CHECK':
-                add_demand_check = AddDemandCheck()
-                add_demand_check.clicked_event()
-            case 'EPA MULTI CALLS':
-                recursive_epa = RecursiveEpa()
-                recursive_epa.clicked_event()
-            case 'EMITTER CALIBRATION':
-                emitter_calibration = EmitterCalibration()
-                emitter_calibration.clicked_event()
-            case 'QUANTIZED DEMANDS':
-                quantized_demands = QuantizedDemands()
-                quantized_demands.clicked_event()
-            case 'STATIC CALIBRATION':
-                static_calibration = StaticCalibration()
-                static_calibration.clicked_event()
-            case 'VALVE OPERATION CHECK':
-                valve_operation_check = ValveOperationCheck()
-                valve_operation_check.clicked_event()
-            case 'IMPORT INP FILE':
-                if global_vars.project_type == 'ws':
-                    import_inp = GwImportEpanet()
-                    import_inp.clicked_event()
-                    return
-                if global_vars.project_type == 'ud':
-                    import_inp = GwImportSwmm()
-                    import_inp.clicked_event()
-                    return
-            case 'ADD DRAIN GPKG PROJECT':
-                print("add drain layer")
-            case 'GO2IBER':
-                go2iber = Go2Iber()
-                go2iber.clicked_event()
-    
+        if name == 'ADDITIONAL DEMAND CHECK':
+            add_demand_check = AddDemandCheck()
+            add_demand_check.clicked_event()
+
+        elif name == 'EPA MULTI CALLS':
+            recursive_epa = RecursiveEpa()
+            recursive_epa.clicked_event()
+
+        elif name == 'EMITTER CALIBRATION':
+            emitter_calibration = EmitterCalibration()
+            emitter_calibration.clicked_event()
+
+        elif name == 'QUANTIZED DEMANDS':
+            quantized_demands = QuantizedDemands()
+            quantized_demands.clicked_event()
+
+        elif name == 'STATIC CALIBRATION':
+            static_calibration = StaticCalibration()
+            static_calibration.clicked_event()
+
+        elif name == 'VALVE OPERATION CHECK':
+            valve_operation_check = ValveOperationCheck()
+            valve_operation_check.clicked_event()
+
+        elif name == 'IMPORT INP FILE':
+            if global_vars.project_type == 'ws':
+                import_inp = GwImportEpanet()
+                import_inp.clicked_event()
+                return
+            if global_vars.project_type == 'ud':
+                import_inp = GwImportSwmm()
+                import_inp.clicked_event()
+                return
+
+        elif name == 'ADD DRAIN GPKG PROJECT':
+            print("add drain layer")
+
+        elif name == 'GO2IBER':
+            go2iber = Go2Iber()
+            go2iber.clicked_event()
+
     def _check_drain_project(self) -> bool:
         gpkg_path = tools_qgis.get_project_variable('project_gpkg_path')
         if not gpkg_path or not os.path.exists(f"{QgsProject.instance().absolutePath()}{os.sep}{gpkg_path}"):

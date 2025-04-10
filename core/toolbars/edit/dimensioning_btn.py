@@ -38,7 +38,10 @@ class GwDimensioningButton(GwMaptool):
             QSettings().setValue("/Qgis/digitizing/disable_enter_attribute_values_dialog", True)
             config = self.layer.editFormConfig()
             self.conf_supp = config.suppress()
-            config.setSuppress(QgsEditFormConfig.FeatureFormSuppress.SuppressOn)
+            if Qgis.QGIS_VERSION_INT >= 33200:
+                config.setSuppress(QgsEditFormConfig.FeatureFormSuppress.SuppressOn)
+            else:
+                config.setSuppress(1)
             self.layer.setEditFormConfig(config)
 
             self.iface.setActiveLayer(self.layer)

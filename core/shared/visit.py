@@ -379,17 +379,17 @@ class GwVisit(QObject):
         current_visit_class = tools_qt.get_combo_value(self.dlg_add_visit, self.dlg_add_visit.visitclass_id, 0)
         feature_key = tools_qgis.get_primary_key()
         feature_type = 'node'
-        match feature_key:
-            case 'node_id':
-                feature_type = 'node'
-            case 'connec_id':
-                feature_type = 'connec'
-            case 'arc_id':
-                feature_type = 'arc'
-            case 'link_id':
-                feature_type = 'link'
-            case 'gully_id':
-                feature_type = 'gully'
+        if feature_key == 'node_id':
+            feature_type = 'node'
+        elif feature_key == 'connec_id':
+            feature_type = 'connec'
+        elif feature_key == 'arc_id':
+            feature_type = 'arc'
+        elif feature_key == 'gully_id':
+            feature_type = 'gully'
+        elif feature_key == 'link_id':
+            feature_type = 'link'
+
         # Fill ComboBox cmb_visit_class
         sql = ("SELECT DISTINCT(class_id), om_visit_class.idval"
                " FROM " + self.schema_name + ".v_ui_om_visit_x_" + feature_type + ""
@@ -544,7 +544,7 @@ class GwVisit(QObject):
         # Load feature if in @table_name. Select list of related features
         # Set 'expr_filter' with features that are in the list
         if self.locked_feature_id:
-            expr_filter = f'"{self.feature_type}_id" IN (\'{self.locked_feature_id}\')'
+            expr_filter = f""""{self.feature_type}_id" IN ('{self.locked_feature_id}')"""
             (is_valid, expr) = tools_qt.check_expression_filter(expr_filter)
             if not is_valid:
                 return
@@ -770,18 +770,16 @@ class GwVisit(QObject):
             return
 
         db_record = None
-
-        match feature_type:
-            case 'arc':
-                db_record = GwOmVisitXArc()
-            case 'node':
-                db_record = GwOmVisitXNode()
-            case 'connec':
-                db_record = GwOmVisitXConnec()
-            case 'link':
-                db_record = GwOmVisitXLink()
-            case 'gully':
-                db_record = GwOmVisitXGully()
+        if feature_type == 'arc':
+            db_record = GwOmVisitXArc()
+        elif feature_type == 'node':
+            db_record = GwOmVisitXNode()
+        elif feature_type == 'connec':
+            db_record = GwOmVisitXConnec()
+        elif feature_type == 'gully':
+            db_record = GwOmVisitXGully()
+        elif feature_type == 'link':
+            db_record = GwOmVisitXLink()
 
         # remove all actual saved records related with visit_id
         where_clause = f"visit_id = '{self.visit_id.text()}'"
@@ -809,18 +807,16 @@ class GwVisit(QObject):
             return
 
         db_record = None
-
-        match feature_type:
-            case 'arc':
-                db_record = GwOmVisitXArc()
-            case 'node':
-                db_record = GwOmVisitXNode()
-            case 'connec':
-                db_record = GwOmVisitXConnec()
-            case 'link':
-                db_record = GwOmVisitXLink()
-            case 'gully':
-                db_record = GwOmVisitXGully()
+        if feature_type == 'arc':
+            db_record = GwOmVisitXArc()
+        elif feature_type == 'node':
+            db_record = GwOmVisitXNode()
+        elif feature_type == 'connec':
+            db_record = GwOmVisitXConnec()
+        elif feature_type == 'gully':
+            db_record = GwOmVisitXGully()
+        elif feature_type == 'link':
+            db_record = GwOmVisitXLink()
 
         if db_record:
             for row in range(widget.model().rowCount()):
@@ -929,18 +925,16 @@ class GwVisit(QObject):
     def _manage_feature_type_selected(self):
 
         tab_index = 0
-
-        match self.feature_type:
-            case 'arc':
-                tab_index = 0
-            case 'node':
-                tab_index = 1
-            case 'connec':
-                tab_index = 2
-            case 'link':
-                tab_index = 3
-            case 'gully':
-                tab_index = 4
+        if self.feature_type == 'arc':
+            tab_index = 0
+        elif self.feature_type == 'node':
+            tab_index = 1
+        elif self.feature_type == 'connec':
+            tab_index = 2
+        elif self.feature_type == 'link':
+            tab_index = 3
+        elif self.feature_type == 'gully':
+            tab_index = 4
 
         # Enable only tab of this geometry type
         self.dlg_add_visit.tab_feature.setTabEnabled(tab_index, True)
@@ -1800,19 +1794,16 @@ class GwVisit(QObject):
 
         # Get selected tab to set geometry type
         tab_idx = dialog.tab_feature.currentIndex()
-
-        match dialog.tab_feature.widget(tab_idx).objectName():
-            case 'tab_arc':
-                self.feature_type = "arc"
-            case 'tab_node':
-                self.feature_type = "node"
-            case 'tab_connec':
-                self.feature_type = "connec"
-            case 'tab_link':
-                self.feature_type = "link"
-            case 'tab_gully':
-                self.feature_type = "gully"
-
+        if dialog.tab_feature.widget(tab_idx).objectName() == 'tab_arc':
+            self.feature_type = "arc"
+        elif dialog.tab_feature.widget(tab_idx).objectName() == 'tab_node':
+            self.feature_type = "node"
+        elif dialog.tab_feature.widget(tab_idx).objectName() == 'tab_connec':
+            self.feature_type = "connec"
+        elif dialog.tab_feature.widget(tab_idx).objectName() == 'tab_link':
+            self.feature_type = "link"
+        elif dialog.tab_feature.widget(tab_idx).objectName() == 'tab_gully':
+            self.feature_type = "gully"
         if self.feature_type == '':
             return
 

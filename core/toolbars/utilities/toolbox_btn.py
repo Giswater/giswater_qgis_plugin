@@ -321,67 +321,66 @@ class GwToolBoxButton(GwAction):
                 else:
                     label.setToolTip(field['label'].capitalize())
 
-            match field['widgettype']:
-                case 'text' | 'typeahead':
-                    completer = QCompleter()
-                    widget = tools_gw.add_lineedit(field)
-                    widget = tools_gw.set_widget_size(widget, field)
-                    widget = tools_gw.set_data_type(field, widget)
-                    if field.get('filterDefault') is not None:
-                        tools_qt.set_widget_text(self.dlg_reports, widget, field.get('filterDefault'))
-                    widget.textChanged.connect(partial(self._update_tbl_reports))
-                    if field['widgettype'] == 'typeahead':
-                        widget = tools_gw.set_typeahead(field, self.dlg_reports, widget, completer)
-                case 'combo':
-                    widget = tools_gw.add_combo(field)
-                    widget = tools_gw.set_widget_size(widget, field)
-                    widget.setProperty('filterSign', field.get('filterSign'))
-                    widget.setProperty('showOnTableModel', field.get('showOnTableModel'))
-                    if field.get('filterDefault') is not None:
-                        tools_qt.set_widget_text(self.dlg_reports, widget, field.get('filterDefault'))
-                    widget.currentIndexChanged.connect(partial(self._update_tbl_reports))
-                case 'check':
-                    kwargs = {"dialog": self.dlg_reports, "field": field}
-                    widget = tools_gw.add_checkbox(**kwargs)
-                    if field.get('filterDefault') is not None:
-                        tools_qt.set_widget_text(self.dlg_reports, widget, field.get('filterDefault'))
-                    widget.stateChanged.connect(partial(self._update_tbl_reports))
-                case 'datetime':
-                    widget = tools_gw.add_calendar(self.dlg_reports, field)
-                    if field.get('filterDefault') is not None:
-                        tools_qt.set_widget_text(self.dlg_reports, widget, field.get('filterDefault'))
-                    widget.valueChanged.connect(partial(self._update_tbl_reports))
-                case 'list':
-                    if field['value'] is None:
-                        msg = "No results found. Please check values set on selector of state and exploitation"
-                        tools_qgis.show_warning(msg)
-                        return
-                    numrows = len(field['value'])
-                    numcols = len(field['value'][0])
+            if field['widgettype'] == 'text' or field['widgettype'] == 'typeahead':
+                completer = QCompleter()
+                widget = tools_gw.add_lineedit(field)
+                widget = tools_gw.set_widget_size(widget, field)
+                widget = tools_gw.set_data_type(field, widget)
+                if field.get('filterDefault') is not None:
+                    tools_qt.set_widget_text(self.dlg_reports, widget, field.get('filterDefault'))
+                widget.textChanged.connect(partial(self._update_tbl_reports))
+                if field['widgettype'] == 'typeahead':
+                    widget = tools_gw.set_typeahead(field, self.dlg_reports, widget, completer)
+            elif field['widgettype'] == 'combo':
+                widget = tools_gw.add_combo(field)
+                widget = tools_gw.set_widget_size(widget, field)
+                widget.setProperty('filterSign', field.get('filterSign'))
+                widget.setProperty('showOnTableModel', field.get('showOnTableModel'))
+                if field.get('filterDefault') is not None:
+                    tools_qt.set_widget_text(self.dlg_reports, widget, field.get('filterDefault'))
+                widget.currentIndexChanged.connect(partial(self._update_tbl_reports))
+            elif field['widgettype'] == 'check':
+                kwargs = {"dialog": self.dlg_reports, "field": field}
+                widget = tools_gw.add_checkbox(**kwargs)
+                if field.get('filterDefault') is not None:
+                    tools_qt.set_widget_text(self.dlg_reports, widget, field.get('filterDefault'))
+                widget.stateChanged.connect(partial(self._update_tbl_reports))
+            elif field['widgettype'] == 'datetime':
+                widget = tools_gw.add_calendar(self.dlg_reports, field)
+                if field.get('filterDefault') is not None:
+                    tools_qt.set_widget_text(self.dlg_reports, widget, field.get('filterDefault'))
+                widget.valueChanged.connect(partial(self._update_tbl_reports))
+            elif field['widgettype'] == 'list':
+                if field['value'] is None:
+                    msg = "No results found. Please check values set on selector of state and exploitation"
+                    tools_qgis.show_warning(msg)
+                    return
+                numrows = len(field['value'])
+                numcols = len(field['value'][0])
 
-                    self.dlg_reports.tbl_reports.setColumnCount(numcols)
-                    self.dlg_reports.tbl_reports.setRowCount(numrows)
+                self.dlg_reports.tbl_reports.setColumnCount(numcols)
+                self.dlg_reports.tbl_reports.setRowCount(numrows)
 
-                    i = 0
-                    dict_keys = {}
-                    for key in field['value'][0].keys():
-                        dict_keys[i] = f"{key}"
-                        self.dlg_reports.tbl_reports.setHorizontalHeaderItem(i, QTableWidgetItem(f"{key}"))
-                        i = i + 1
+                i = 0
+                dict_keys = {}
+                for key in field['value'][0].keys():
+                    dict_keys[i] = f"{key}"
+                    self.dlg_reports.tbl_reports.setHorizontalHeaderItem(i, QTableWidgetItem(f"{key}"))
+                    i = i + 1
 
-                    for row in range(numrows):
-                        for column in range(numcols):
-                            column_name = dict_keys[column]
-                            value = field['value'][row][column_name]
-                            if value in (None, 'None'):
-                                value = ''
-                            # Create a QTableWidgetItem and then set the data so the sorting works properly
-                            # with Strings, Integers and any other type
-                            qtable_item = QTableWidgetItem()
-                            qtable_item.setData(Qt.DisplayRole, value)
-                            self.dlg_reports.tbl_reports.setItem(row, column, qtable_item)
+                for row in range(numrows):
+                    for column in range(numcols):
+                        column_name = dict_keys[column]
+                        value = field['value'][row][column_name]
+                        if value in (None, 'None'):
+                            value = ''
+                        # Create a QTableWidgetItem and then set the data so the sorting works properly
+                        # with Strings, Integers and any other type
+                        qtable_item = QTableWidgetItem()
+                        qtable_item.setData(Qt.DisplayRole, value)
+                        self.dlg_reports.tbl_reports.setItem(row, column, qtable_item)
 
-                    continue               
+                continue
 
             order = order + 1
 

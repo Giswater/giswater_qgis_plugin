@@ -5,6 +5,7 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 import traceback
+import sys
 from datetime import date
 from itertools import count
 from typing import Any
@@ -12,6 +13,8 @@ from datetime import datetime
 from typing import Optional
 
 try:
+    if sys.version_info < (3, 10):
+        raise ImportError
     from swmm_api import SwmmInput
     from swmm_api.input_file.section_labels import (
         TITLE, OPTIONS, REPORT, FILES,
@@ -405,7 +408,8 @@ class GwImportInpTask(GwTask):
             WHERE parameter = 'admin_schema_info';
         """
 
-        params = (f'''"{title.replace('\n', '\\n')}"''',)
+        title = title.replace('\n', '\\n')
+        params = (f'''"{title}"''',)
 
         execute_sql(sql, params)
 
@@ -782,21 +786,20 @@ class GwImportInpTask(GwTask):
             template = "(%s, %s, %s, %s, %s, %s, %s, %s, %s)"
             params = []
             for k, v in lid.layer_dict.items():
-                match k:
-                    case 'SURFACE':
-                        lid_values = (lid_name, k, v.StorHt, v.VegFrac, v.Rough, v.Slope, v.Xslope, None, None)
-                    case 'SOIL':
-                        lid_values = (lid_name, k, v.Thick, v.Por, v.FC, v.WP, v.Ksat, v.Kcoeff, v.Suct)
-                    case 'PAVEMENT':
-                        lid_values = (lid_name, k, v.Thick, v.Vratio, v.FracImp, v.Perm, v.Vclog, v.regeneration_interval, v.regeneration_fraction)
-                    case 'STORAGE':
-                        lid_values = (lid_name, k, v.Height, v.Vratio, v.Seepage, v.Vclog, v.Covrd, None, None)
-                    case 'DRAIN':
-                        lid_values = (lid_name, k, v.Coeff, v.Expon, v.Offset, v.Delay, v.open_level, v.close_level, v.Qcurve)
-                    case 'DRAINMAT':
-                        lid_values = (lid_name, k, v.Thick, v.Vratio, v.Rough, None, None, None, None)
-                    case _:
-                        continue
+                if k == 'SURFACE':
+                    lid_values = (lid_name, k, v.StorHt, v.VegFrac, v.Rough, v.Slope, v.Xslope, None, None)
+                elif k == 'SOIL':
+                    lid_values = (lid_name, k, v.Thick, v.Por, v.FC, v.WP, v.Ksat, v.Kcoeff, v.Suct)
+                elif k == 'PAVEMENT':
+                    lid_values = (lid_name, k, v.Thick, v.Vratio, v.FracImp, v.Perm, v.Vclog, v.regeneration_interval, v.regeneration_fraction)
+                elif k == 'STORAGE':
+                    lid_values = (lid_name, k, v.Height, v.Vratio, v.Seepage, v.Vclog, v.Covrd, None, None)
+                elif k == 'DRAIN':
+                    lid_values = (lid_name, k, v.Coeff, v.Expon, v.Offset, v.Delay, v.open_level, v.close_level, v.Qcurve)
+                elif k == 'DRAINMAT':
+                    lid_values = (lid_name, k, v.Thick, v.Vratio, v.Rough, None, None, None, None)
+                else:
+                    continue
                 params.append(lid_values)
             toolsdb_execute_values(sql, params, template, commit=self.force_commit)
             self.results["lids"] += 1

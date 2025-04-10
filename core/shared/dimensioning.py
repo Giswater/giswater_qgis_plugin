@@ -320,15 +320,12 @@ class GwDimensioning:
             # Get depth of the feature
             fieldname = None
             self.project_type = tools_gw.get_project_type()
-            match self.project_type:
-                case 'ws':
-                    fieldname = "depth"
-                case 'ud' if feat_type == 'node':
-                    fieldname = "ymax"
-                case 'ud' if feat_type == 'connec':
-                    fieldname = "connec_depth"
-                case _:
-                    tools_qgis.show_warning("No project type found")            
+            if self.project_type == 'ws':
+                fieldname = "depth"
+            elif self.project_type == 'ud' and feat_type == 'node':
+                fieldname = "ymax"
+            elif self.project_type == 'ud' and feat_type == 'connec':
+                fieldname = "connec_depth"
 
             if fieldname is None:
                 return
@@ -463,46 +460,43 @@ class GwDimensioning:
                 label.setToolTip(tooltip)
             else:
                 label.setToolTip(field['label'].capitalize())
-
-        match field['widgettype']:
-            case 'text' | 'typeahead':
-                completer = QCompleter()
-                widget = tools_gw.add_lineedit(field)
-                widget = tools_gw.set_widget_size(widget, field)
-                widget = tools_gw.set_data_type(field, widget)
-                if field['widgettype'] == 'typeahead':
-                    widget = tools_gw.set_typeahead(field, dialog, widget, completer)
-            case 'combo':
-                widget = tools_gw.add_combo(field)
-                widget = tools_gw.set_widget_size(widget, field)
-            case 'check':
-                kwargs = {"dialog": dialog, "field": field}
-                widget = tools_gw.add_checkbox(**kwargs)
-            case 'datetime':
-                widget = tools_gw.add_calendar(dialog, field)
-            case 'button':
-                kwargs = {"dialog": dialog, "field": field}
-                widget = tools_gw.add_button(**kwargs)
-                widget = tools_gw.set_widget_size(widget, field)
-            case 'hyperlink':
-                widget = tools_gw.add_hyperlink(field)
-                widget = tools_gw.set_widget_size(widget, field)
-            case 'hspacer':
-                widget = tools_qt.add_horizontal_spacer()
-            case 'vspacer':
-                widget = tools_qt.add_verticalspacer()
-            case 'textarea':
-                widget = tools_gw.add_textarea(field)
-            case 'spinbox':
-                kwargs = {"dialog": dialog, "field": field}
-                widget = tools_gw.add_spinbox(**kwargs)
-            case 'tableview':
-                widget = tools_gw.add_tableview(db_return, field, dialog)
-                widget = tools_gw.add_tableview_header(widget, field)
-                widget = tools_gw.fill_tableview_rows(widget, field)
-                widget = tools_gw.set_tablemodel_config(dialog, widget, field['widgetname'], sort_order=1)
-                tools_qt.set_tableview_config(widget)
-        
+        if field['widgettype'] == 'text' or field['widgettype'] == 'typeahead':
+            completer = QCompleter()
+            widget = tools_gw.add_lineedit(field)
+            widget = tools_gw.set_widget_size(widget, field)
+            widget = tools_gw.set_data_type(field, widget)
+            if field['widgettype'] == 'typeahead':
+                widget = tools_gw.set_typeahead(field, dialog, widget, completer)
+        elif field['widgettype'] == 'combo':
+            widget = tools_gw.add_combo(field)
+            widget = tools_gw.set_widget_size(widget, field)
+        elif field['widgettype'] == 'check':
+            kwargs = {"dialog": dialog,  "field": field}
+            widget = tools_gw.add_checkbox(**kwargs)
+        elif field['widgettype'] == 'datetime':
+            widget = tools_gw.add_calendar(dialog, field)
+        elif field['widgettype'] == 'button':
+            kwargs = {"dialog": dialog,  "field": field}
+            widget = tools_gw.add_button(**kwargs)
+            widget = tools_gw.set_widget_size(widget, field)
+        elif field['widgettype'] == 'hyperlink':
+            widget = tools_gw.add_hyperlink(field)
+            widget = tools_gw.set_widget_size(widget, field)
+        elif field['widgettype'] == 'hspacer':
+            widget = tools_qt.add_horizontal_spacer()
+        elif field['widgettype'] == 'vspacer':
+            widget = tools_qt.add_verticalspacer()
+        elif field['widgettype'] == 'textarea':
+            widget = tools_gw.add_textarea(field)
+        elif field['widgettype'] in 'spinbox':
+            kwargs = {"dialog": dialog,  "field": field}
+            widget = tools_gw.add_spinbox(**kwargs)
+        elif field['widgettype'] == 'tableview':
+            widget = tools_gw.add_tableview(db_return, field, dialog)
+            widget = tools_gw.add_tableview_header(widget, field)
+            widget = tools_gw.fill_tableview_rows(widget, field)
+            widget = tools_gw.set_tablemodel_config(dialog, widget, field['widgetname'], sort_order=1)
+            tools_qt.set_tableview_config(widget)
         widget.setObjectName(widget.property('columnname'))
 
         return label, widget

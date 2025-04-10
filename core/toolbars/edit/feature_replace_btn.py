@@ -122,15 +122,14 @@ class GwFeatureReplaceButton(GwMaptool):
         layer = self.snapper_manager.get_snapped_layer(result)
         tablename = tools_qgis.get_layer_source_table_name(layer)
         if tablename and 'v_edit' in tablename:
-            match tablename:
-                case 'v_edit_node':
-                    self.feature_type = 'node'
-                case 'v_edit_connec':
-                    self.feature_type = 'connec'
-                case 'v_edit_gully':
-                    self.feature_type = 'gully'
-                case 'v_edit_arc':
-                    self.feature_type = 'arc'        
+            if tablename == 'v_edit_node':
+                self.feature_type = 'node'
+            elif tablename == 'v_edit_connec':
+                self.feature_type = 'connec'
+            elif tablename == 'v_edit_gully':
+                self.feature_type = 'gully'
+            elif tablename == 'v_edit_arc':
+                self.feature_type = 'arc'
 
             self.geom_view = tablename
             self.cat_table = f'cat_{self.feature_type}'

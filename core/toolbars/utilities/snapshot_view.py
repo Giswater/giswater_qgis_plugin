@@ -126,26 +126,24 @@ class GwSnapshotViewButton(GwAction):
     def _update_current_polygon(self, origin, id_name=None, id=None):
         """ Update polygon """
         xmin, xmax, ymin, ymax = None, None, None, None
-        match origin:
-            case "map_canvas":
-                extent = self.iface.mapCanvas().extent()
-                xmin = extent.xMinimum()
-                xmax = extent.xMaximum()
-                ymin = extent.yMinimum()
-                ymax = extent.yMaximum()
-                tools_qt.set_widget_text(self.dlg_snapshot_view, "txt_coordinates", f"{xmin},{xmax},{ymin},{ymax} [EPSG:25831]")
+        if origin == "map_canvas":
+            extent = self.iface.mapCanvas().extent()
+            xmin = extent.xMinimum()
+            xmax = extent.xMaximum()
+            ymin = extent.yMinimum()
+            ymax = extent.yMaximum()
+            tools_qt.set_widget_text(self.dlg_snapshot_view, "txt_coordinates", f"{xmin},{xmax},{ymin},{ymax} [EPSG:25831]")
 
-            case "exploitation" | "ext_municipality":
-                sql = f"SELECT ST_Xmin(the_geom), ST_Xmax(the_geom), ST_Ymin(the_geom), ST_Ymax(the_geom) FROM {lib_vars.schema_name}.{origin} where {id_name} = {id};"
-                xmin, xmax, ymin, ymax = tools_db.get_row(sql)
-                tools_qt.set_widget_text(self.dlg_snapshot_view, "txt_coordinates", f"{xmin},{xmax},{ymin},{ymax} [EPSG:25831]")
+        elif origin in ("exploitation", "ext_municipality"):
+            sql = f"SELECT ST_Xmin(the_geom), ST_Xmax(the_geom), ST_Ymin(the_geom), ST_Ymax(the_geom) FROM {lib_vars.schema_name}.{origin} where {id_name} = {id};"
+            xmin, xmax, ymin, ymax = tools_db.get_row(sql)
+            tools_qt.set_widget_text(self.dlg_snapshot_view, "txt_coordinates", f"{xmin},{xmax},{ymin},{ymax} [EPSG:25831]")
 
-            case "draw":
-                select_manager = GwSelectManager(self, None, self.dlg_snapshot_view, False, self.dlg_snapshot_view)
-                global_vars.canvas.setMapTool(select_manager)
-                cursor = tools_gw.get_cursor_multiple_selection()
-                global_vars.canvas.setCursor(cursor)
-
+        elif origin == "draw":
+            select_manager = GwSelectManager(self, None, self.dlg_snapshot_view, False, self.dlg_snapshot_view)
+            global_vars.canvas.setMapTool(select_manager)
+            cursor = tools_gw.get_cursor_multiple_selection()
+            global_vars.canvas.setCursor(cursor)
 
 def close_dlg(**kwargs):
     """ Close form """
@@ -193,7 +191,7 @@ def run(**kwargs):
 
     if result.get("status") == "Accepted" and result.get("body").get("data"):
         layers = result['body']['data']
-        add_layers_temp(layers, f"Snapshot - {form["date"]}")
+        add_layers_temp(layers, f"Snapshot - {form['date']}")
         tools_gw.close_dialog(dlg.dlg_snapshot_view)
     else:
         tools_qgis.show_warning("No results", dialog=dlg.dlg_snapshot_view)

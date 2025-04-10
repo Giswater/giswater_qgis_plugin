@@ -323,14 +323,16 @@ class GwSchemaI18NManager:
             if row_org['hint_message'] is None:
                 row_org['hint_message'] = ''
             if row_org not in rows_i18n:
+                error_msg = row_org['error_message']
+                hint_msg = row_org['hint_message']
+
+                ms_en_us = f"""'{error_msg.replace("'", "''")}'""" if error_msg not in [None, ''] else 'NULL'
+                ht_en_us = f"""'{hint_msg.replace("'", "''")}'""" if hint_msg not in [None, ''] else 'NULL'
+
                 query_row = f"""INSERT INTO {table_i18n} (context, source_code, project_type, log_level, source, ms_en_us, ht_en_us) VALUES """
-                query_row += f"""('{table_org}', 'giswater', '{row_org['project_type']}', '{row_org['log_level']}','{row_org['id']}', 
-                            {f"'{row_org['error_message'].replace("'", "''")}'" if row_org['error_message'] not in [None, ''] else 'NULL'}, 
-                            {f"'{row_org['hint_message'].replace("'", "''")}'" if row_org['hint_message'] not in [None, ''] else 'NULL'})"""
+                query_row += f"""('{table_org}', 'giswater', '{row_org['project_type']}', '{row_org['log_level']}', '{row_org['id']}', {ms_en_us}, {ht_en_us})"""
                 query_row += " ON CONFLICT (source_code, project_type, context, log_level, source) DO UPDATE"
-                query_row += f""" SET ms_en_us = {f"'{row_org['error_message'].replace("'", "''")}'" if row_org['error_message'] != '' or row_org['error_message'] is None else 'NULL'},
-                            ht_en_us = {f"'{row_org['hint_message'].replace("'", "''")}'" if row_org['hint_message'] != '' or row_org['hint_message'] is None else 'NULL'}"""
-                query_row += ";\n"
+                query_row += f" SET ms_en_us = {ms_en_us}, ht_en_us = {ht_en_us};\n"
                 query += query_row
         return query
 
@@ -349,14 +351,16 @@ class GwSchemaI18NManager:
             if row_org['info_msg'] is None:
                 row_org['info_msg'] = ''
             if row_org not in rows_i18n:
+                except_msg = row_org['except_msg']
+                info_msg = row_org['info_msg']
+
+                ex_en_us = f"""'{except_msg.replace("'", "''")}'""" if except_msg not in [None, ''] else 'NULL'
+                in_en_us = f"""'{info_msg.replace("'", "''")}'""" if info_msg not in [None, ''] else 'NULL'
+
                 query_row = f"""INSERT INTO {table_i18n} (context, project_type, source, ex_en_us, in_en_us) VALUES """
-                query_row += f"""('{table_org}', '{row_org['project_type']}', '{row_org['fid']}', 
-                            {f"'{row_org['except_msg'].replace("'", "''")}'" if row_org['except_msg'] not in [None, ''] else 'NULL'}, 
-                            {f"'{row_org['info_msg'].replace("'", "''")}'" if row_org['info_msg'] not in [None, ''] else 'NULL'})"""
+                query_row += f"""('{table_org}', '{row_org['project_type']}', '{row_org['fid']}', {ex_en_us}, {in_en_us})"""
                 query_row += " ON CONFLICT (project_type, context, source) DO UPDATE"
-                query_row += f""" SET ex_en_us = {f"'{row_org['except_msg'].replace("'", "''")}'" if row_org['except_msg'] not in [None, ''] else 'NULL'},
-                            in_en_us = {f"'{row_org['info_msg'].replace("'", "''")}'" if row_org['info_msg'] not in [None, ''] else 'NULL'}"""
-                query_row += ";\n"
+                query_row += f" SET ex_en_us = {ex_en_us}, in_en_us = {in_en_us};\n"
                 query += query_row
         return query
 
@@ -379,16 +383,18 @@ class GwSchemaI18NManager:
             if row_org['tooltip'] is None:
                 row_org['tooltip'] = ''
             row_org_com = row_org
-            row_org_com.append(self.project_type) 
+            row_org_com.append(self.project_type)
             if row_org_com not in rows_i18n:
+                label = row_org['label']
+                tooltip = row_org['tooltip']
+
+                lb_en_us = f"""'{label.replace("'", "''")}'""" if label not in [None, ''] else 'NULL'
+                tt_en_us = f"""'{tooltip.replace("'", "''")}'""" if tooltip not in [None, ''] else 'NULL'
+
                 query_row = f"""INSERT INTO {table_i18n} (context, source_code, project_type, source, formname, formtype, lb_en_us, tt_en_us) VALUES """
-                query_row += f"""('{table_org}', 'giswater', '{self.project_type}', '{row_org['columnname']}', '{row_org['formname']}', '{row_org['formtype']}',
-                        {f"'{row_org['label'].replace("'", "''")}'" if row_org['label'] not in [None, ''] else 'NULL'}, 
-                        {f"'{row_org['tooltip'].replace("'", "''")}'" if row_org['tooltip'] not in [None, ''] else 'NULL'})"""
+                query_row += f"""('{table_org}', 'giswater', '{self.project_type}', '{row_org['columnname']}', '{row_org['formname']}', '{row_org['formtype']}', {lb_en_us}, {tt_en_us})"""
                 query_row += " ON CONFLICT (context, source_code, project_type, source, formname, formtype) DO UPDATE"
-                query_row += f""" SET lb_en_us = {f"'{row_org['label'].replace("'", "''")}'" if row_org['label'] not in [None, ''] else 'NULL'},
-                            tt_en_us = {f"'{row_org['tooltip'].replace("'", "''")}'" if row_org['tooltip'] not in [None, ''] else 'NULL'}""" 
-                query_row += ";\n"
+                query_row += f" SET lb_en_us = {lb_en_us}, tt_en_us = {tt_en_us};\n"
                 query += query_row
         return query
 
@@ -418,12 +424,11 @@ class GwSchemaI18NManager:
             # Check if the row from org doesn't exist in i18n, and construct the query
             if row_org not in rows_i18n:
                 # Safely handle NULL values and avoid SQL injection
-                label = f"'{row_org['label'].replace("'", "''")}'" if row_org['label'] not in [None, ''] else 'NULL'
-                descript = f"'{row_org['descript'].replace("'", "''")}'" if row_org['descript'] not in [None, ''] else 'NULL'
-                
+                label = f"""'{row_org['label'].replace("'", "''")}'""" if row_org['label'] not in [None, ''] else 'NULL'
+                descript = f"""'{row_org['descript'].replace("'", "''")}'""" if row_org['descript'] not in [None, ''] else 'NULL'
+
                 query_row = f"""INSERT INTO {table_i18n} (context, source_code, source, formname, project_type, lb_en_us, tt_en_us) 
-                                VALUES ('{table_org}', 'giswater', '{row_org['id']}', '{row_org['formname']}', '{row_org['project_type']}',
-                                {label}, {descript})
+                                VALUES ('{table_org}', 'giswater', '{row_org['id']}', '{row_org['formname']}', '{row_org['project_type']}', {label}, {descript})
                                 ON CONFLICT (context, source_code, project_type, source, formname) 
                                 DO UPDATE SET lb_en_us = {label}, tt_en_us = {descript};\n"""
                 query += query_row
@@ -447,16 +452,15 @@ class GwSchemaI18NManager:
             if row_org['label'] is None:
                 row_org['label'] = ''
             if row_org['descript'] is None:
-                row_org['descript'] = ''  
+                row_org['descript'] = ''
             if row_org not in rows_i18n:
-                query_row = f"""INSERT INTO {table_i18n} (context, source_code, project_type, source, lb_en_us, tt_en_us) VALUES """
-                query_row += f"""('{table_org}', 'giswater', '{row_org['project_type']}', '{row_org['parameter']}',
-                        {f"'{row_org['label'].replace("'", "''")}'" if row_org['label'] not in [None, ''] else 'NULL'}, 
-                        {f"'{row_org['descript'].replace("'", "''")}'" if row_org['descript'] not in [None, ''] else 'NULL'})"""
+                label = f"""'{row_org['label'].replace("'", "''")}'""" if row_org['label'] not in [None, ''] else 'NULL'
+                descript = f"""'{row_org['descript'].replace("'", "''")}'""" if row_org['descript'] not in [None, ''] else 'NULL'
+
+                query_row = f"""INSERT INTO {table_i18n} (context, source_code, project_type, source, lb_en_us, tt_en_us) 
+                                VALUES ('{table_org}', 'giswater', '{row_org['project_type']}', '{row_org['parameter']}', {label}, {descript})"""
                 query_row += " ON CONFLICT (context, source_code, project_type, source) DO UPDATE"
-                query_row += f""" SET lb_en_us = {f"'{row_org['label'].replace("'", "''")}'" if row_org['label'] not in [None, ''] else 'NULL'},
-                            tt_en_us = {f"'{row_org['descript'].replace("'", "''")}'" if row_org['descript'] not in [None, ''] else 'NULL'}"""
-                query_row += ";\n"
+                query_row += f" SET lb_en_us = {label}, tt_en_us = {descript};\n"
                 query += query_row
         return query
 
@@ -474,17 +478,17 @@ class GwSchemaI18NManager:
         for i, row_org in enumerate(rows_org):
             if row_org['idval'] is None:
                 row_org['idval'] = ''
-        for row_org in rows_org:  
+        for row_org in rows_org:
             if row_org not in rows_i18n:
-                query_row = f"""INSERT INTO {table_i18n} (context, source_code, project_type, source, formname, formtype, tt_en_us) VALUES """
-                query_row += f"""('{table_org}', 'giswater', '{self.project_type}', '{row_org['id']}', '{row_org['typevalue']}', 'form_feature',
-                        {f"'{row_org['idval'].replace("'", "''")}'" if row_org['idval'] not in [None, ''] else 'NULL'})"""
+                idval = f"""'{row_org['idval'].replace("'", "''")}'""" if row_org['idval'] not in [None, ''] else 'NULL'
+
+                query_row = f"""INSERT INTO {table_i18n} (context, source_code, project_type, source, formname, formtype, tt_en_us) 
+                                VALUES ('{table_org}', 'giswater', '{self.project_type}', '{row_org['id']}', '{row_org['typevalue']}', 'form_feature', {idval})"""
                 query_row += " ON CONFLICT (context, source_code, project_type, source, formname, formtype) DO UPDATE"
-                query_row += f""" SET tt_en_us = {f"'{row_org['idval'].replace("'", "''")}'" if row_org['idval'] not in [None, ''] else 'NULL'}"""
-                query_row += ";\n"
+                query_row += f" SET tt_en_us = {idval};\n"
                 query += query_row
         return query
-    
+
     def _verify_lang(self):
         query = f"SELECT language from {self.schema_org}.sys_version"
         self.cursor_org.execute(query)
@@ -492,7 +496,7 @@ class GwSchemaI18NManager:
         if language_org != 'en_US':
             return False
         return True
-    
+
     # endregion
     # region Rewrite Project_type
     def _update_project_type(self, table):
@@ -547,7 +551,7 @@ class GwSchemaI18NManager:
 
         self.conn_i18n.commit()  # Commit the insertions
         return f"2- Rows updated successfully.\n"
-    
+
     def _get_duplicates_rows(self, table):
         """Create query to determine the duplicated rows"""
 
@@ -568,13 +572,13 @@ class GwSchemaI18NManager:
         query += "AND ".join([f"""t.{primary_key} = d.{primary_key} """ for primary_key in self.primary_keys if primary_key != 'project_type'])
         query += """ORDER BY source, duplicate_count DESC;"""
         return query
-    
+
     def _delete_duplicates_rows(self, table):
         """Create query to delete the duplicated rows"""
 
         delete_query = """
             WITH duplicates AS (
-                SELECT """ 
+                SELECT """
         delete_query += ", ".join([primary_key for primary_key in self.primary_keys if primary_key != 'project_type'])
         delete_query += f""", COUNT(*) AS duplicate_count
                 FROM {table}
@@ -588,7 +592,7 @@ class GwSchemaI18NManager:
         delete_query += ", ".join([primary_key for primary_key in self.primary_keys if primary_key != 'project_type'])
         delete_query += """  FROM duplicates);"""
         return delete_query
-    
+
     def _add_duplicates_rows(self, table, final_rows_tot, final_rows):
         """Create query to add the correct rows to the table"""
 
@@ -598,16 +602,16 @@ class GwSchemaI18NManager:
             if k < len(final_rows):
                 row_keys.remove('project_type')
             insert_query += f"INSERT INTO {table} ("
-            
+
             # Handle columns (keys)
             insert_query += ", ".join([row_key for row_key in row_keys])
             insert_query += ", project_type) VALUES ("
-            
+
             values = []
             for row_key in row_keys:
                 value = row[row_key]
-                if isinstance(value, str):  
-                    value = f"'{value.replace('\'', '\'\'')}'"  # Escape single quotes in strings
+                if isinstance(value, str):
+                    value = f"""'{value.replace("'", "''")}'"""  # Escape single quotes in strings
                 elif isinstance(value, (datetime, date)):  # Handle timestamps properly
                     value = f"'{value.strftime('%Y-%m-%d %H:%M:%S')}'"
                 elif value in [None, 'None', '']:
@@ -627,7 +631,7 @@ class GwSchemaI18NManager:
         result = self.cursor_i18n.fetchone()
         existing_table = result[0] > 0  # Check if count is greater than 0
         return existing_table
-    
+
     def _find_table_org(self, table_i18n):
         query = f'SELECT * FROM {table_i18n}'
         rows = self._get_rows(query, self.cursor_i18n)
@@ -635,7 +639,7 @@ class GwSchemaI18NManager:
         if not table_org:
             return False
         return table_org
-    
+
     def _get_rows(self, sql, cursor, commit=True):
         """ Get multiple rows from selected query """
         last_error = None
@@ -651,7 +655,7 @@ class GwSchemaI18NManager:
                 cursor._rollback()
         finally:
             return rows
-        
+
     def _vacuum_commit(self, table, conn, cursor):
         old_isolation_level = conn.isolation_level
         conn.set_isolation_level(0)
@@ -674,7 +678,7 @@ class GwSchemaI18NManager:
             WHERE i.indrelid = '{table}'::regclass
             AND i.indisprimary;
             """
-            
+
         self.cursor_i18n.execute(query)
         results = self.cursor_i18n.fetchall()
         self.primary_keys = [row['column_name'] for row in results]
