@@ -73,6 +73,7 @@ ALTER TABLE link ADD CONSTRAINT link_linkcat_id_fkey FOREIGN KEY (linkcat_id) RE
 CREATE TABLE man_genelement (
     element_id varchar(16) NOT NULL,
     CONSTRAINT man_genelement_pkey PRIMARY KEY (element_id)
+	CONSTRAINT man_genelement_fkey_element_id FOREIGN KEY (element_id) REFERENCES element(element_id)
 );
 
 CREATE TABLE man_flwreg (
@@ -84,6 +85,7 @@ CREATE TABLE man_flwreg (
     to_arc varchar NULL,
     flwreg_length numeric NULL,
     CONSTRAINT man_flwreg_pkey PRIMARY KEY (element_id)
+	CONSTRAINT man_flwreg_fkey_element_id FOREIGN KEY (element_id) REFERENCES element(element_id)
 );
 
 CREATE TABLE cat_feature_element (
@@ -104,6 +106,7 @@ CREATE TABLE inp_flwreg_pump (
     startup numeric(12, 4) NULL,
     shutoff numeric(12, 4) NULL,
     CONSTRAINT inp_flwreg_pump_pkey PRIMARY KEY (element_id),
+	CONSTRAINT inp_flwreg_pump_fkey_element_id FOREIGN KEY (element_id) REFERENCES element(element_id)
     CONSTRAINT inp_flwreg_pump_check_status CHECK (status::text = ANY (ARRAY['ON'::text, 'OFF'::text])),
     CONSTRAINT inp_flwreg_pump_fkey_curve_id FOREIGN KEY (curve_id) REFERENCES inp_curve(id) ON DELETE RESTRICT ON UPDATE CASCADE
 );
