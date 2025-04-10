@@ -442,14 +442,12 @@ class GwLoadProject(QObject):
             sql = f"SELECT schema_name FROM information_schema.schemata WHERE schema_name = '{schema}'"
             rows = tools_db.get_rows(sql, commit=False)
             if rows is not None:
-                match schema:
-                    case "cm":
-                        self._enable_toolbar(schema)
-                    case "am":
-                        if global_vars.project_type == 'ws':
-                            self._enable_toolbar(schema)
-                    case "audit":
-                        self._hide_button(68, False)
+                if schema == "cm":
+                    self._enable_toolbar(schema)
+                elif schema == "am" and global_vars.project_type == 'ws':
+                    self._enable_toolbar(schema)
+                elif schema == "audit":
+                    self._hide_button(68, False)
 
     def _create_toolbar(self, toolbar_id):
 

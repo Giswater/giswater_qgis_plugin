@@ -259,18 +259,16 @@ class GwAdminButton:
 
         description = f"Create {process_name} schema"
 
-        match(process_name):
-            case "asset":
-               self.task_create_schema = GwCreateSchemaAssetTask(self, description, self.timer)
-            case "audit" | "audit_activation":
-                list_process = []
-                if process_name == "audit":
-                    list_process.append('load_audit_structure')
-                else:
-                    list_process.append('load_audit_activation')
+        if process_name == "asset":
+            self.task_create_schema = GwCreateSchemaAssetTask(self, description, self.timer)
+        elif process_name in ("audit", "audit_activation"):
+            list_process = []
+            if process_name == "audit":
+                list_process.append('load_audit_structure')
+            else:
+                list_process.append('load_audit_activation')
 
-                self.task_create_schema = GwCreateSchemaAuditTask(self, description, self.timer, list_process=list_process)
-
+            self.task_create_schema = GwCreateSchemaAuditTask(self, description, self.timer, list_process=list_process)
         QgsApplication.taskManager().addTask(self.task_create_schema)
         QgsApplication.taskManager().triggerTask(self.task_create_schema)
 
@@ -531,12 +529,10 @@ class GwAdminButton:
         """ Initialize dialog (only once) """
         project = self.other_project
 
-        match (project):
-            case "asset":
-                dialog = GwAdminDbProjectAssetUi(self)
-            case "audit":
-                dialog = GwAdminDbProjectAuditUi(self)
-
+        if project == "asset":
+            dialog = GwAdminDbProjectAssetUi(self)
+        elif project == "audit":
+            dialog = GwAdminDbProjectAuditUi(self)
         setattr(self, f"dlg_readsql_create_{project}_project", dialog)
 
         tools_gw.load_settings(dialog)
