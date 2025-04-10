@@ -8,6 +8,8 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 DROP TABLE IF EXISTS flwreg CASCADE;
 DROP TABLE IF EXISTS cat_flwreg CASCADE;
+DROP TABLE IF EXISTS inp_flwreg_pump CASCADE;
+DROP TABLE IF EXISTS inp_dscenario_flwreg_pump CASCADE;
 
 
 CREATE TABLE man_servconnection (

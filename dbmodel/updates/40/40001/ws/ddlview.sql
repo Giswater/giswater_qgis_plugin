@@ -960,58 +960,6 @@ CREATE OR REPLACE VIEW v_state_element AS
     element
   WHERE ((element.state = selector_state.state_id) AND (selector_state.cur_user = CURRENT_USER));
 
-CREATE OR REPLACE VIEW v_edit_element AS
-SELECT e.* FROM ( SELECT element.element_id,
-    element.code,
-    element.datasource,
-    element.elementcat_id,
-    cat_element.element_type,
-    element.brand_id,
-    element.model_id,
-    element.serial_number,
-    element.state,
-    element.state_type,
-    element.num_elements,
-    element.observ,
-    element.comment,
-    element.function_type,
-    element.category_type,
-    element.location_type,
-    element.fluid_type,
-    element.workcat_id,
-    element.workcat_id_end,
-    element.builtdate,
-    element.enddate,
-    element.ownercat_id,
-    element.rotation,
-    concat(element_type.link_path, element.link) AS link,
-    element.verified,
-    element.the_geom,
-    element.label_x,
-    element.label_y,
-    element.label_rotation,
-    element.publish,
-    element.inventory,
-    element.undelete,
-    element.expl_id,
-    element.pol_id,
-    element.lastupdate,
-    element.lastupdate_user,
-    element.top_elev,
-    element.expl_id2,
-    element.trace_featuregeom,
-    element.muni_id,
-    element.sector_id,
-    element.lock_level
-   FROM selector_expl, element
-     JOIN v_state_element ON element.element_id::text = v_state_element.element_id::text
-     JOIN cat_element ON element.elementcat_id::text = cat_element.id::text
-     JOIN element_type ON element_type.id::text = cat_element.element_type::text
-  WHERE element.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text) e
-  LEFT JOIN selector_sector s USING (sector_id)
-  LEFT JOIN selector_municipality m USING (muni_id)
-  WHERE (s.cur_user = current_user OR s.sector_id IS NULL)
-  AND (m.cur_user = current_user OR e.muni_id IS NULL);
 
 CREATE OR REPLACE VIEW v_edit_minsector
 AS SELECT m.minsector_id,
@@ -2477,7 +2425,7 @@ CREATE OR REPLACE VIEW ve_epa_pipe AS
     a.builtdate,
     r.roughness AS cat_roughness,
     inp_pipe.custom_roughness,
-	  a.dint,
+	  cat_arc.dint,
     inp_pipe.custom_dint,
     inp_pipe.reactionparam,
     inp_pipe.reactionvalue,
@@ -2501,10 +2449,10 @@ CREATE OR REPLACE VIEW ve_epa_pipe AS
     v_rpt_arc_stats.tot_headloss_max,
     v_rpt_arc_stats.tot_headloss_min
    FROM arc a
-      LEFT JOIN cat_arc ON cat_arc.id = arc.arccat_id
+      LEFT JOIN cat_arc ON cat_arc.id = a.arccat_id
      JOIN inp_pipe USING (arc_id)
      LEFT JOIN v_rpt_arc_stats ON split_part(v_rpt_arc_stats.arc_id::text, 'P'::text, 1) = inp_pipe.arc_id::text
-  LEFT JOIN cat_mat_roughness r ON a.cat_matcat_id::text = r.matcat_id::text
+  LEFT JOIN cat_mat_roughness r ON cat_arc.matcat_id::text = r.matcat_id::text
   WHERE ((now()::date -
         CASE
             WHEN a.builtdate IS NULL THEN '1900-01-01'::date

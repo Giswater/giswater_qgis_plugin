@@ -6,11 +6,6 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-ALTER TABLE sys_feature_class ADD CONSTRAINT sys_feature_cat_check CHECK 
-(((id)::text = ANY (ARRAY['ELEMENT'::text, 'EXPANSIONTANK'::text, 'FILTER'::text, 'FLEXUNION'::text, 'FOUNTAIN'::text, 'GREENTAP'::text, 'HYDRANT'::text, 'JUNCTION'::text, 'MANHOLE'::text, 
-'METER'::text, 'NETELEMENT'::text, 'NETSAMPLEPOINT'::text, 'NETWJOIN'::text, 'PIPE'::text, 'PUMP'::text, 'REDUCTION'::text, 'REGISTER'::text, 'SOURCE'::text, 'TANK'::text, 'TAP'::text, 
-'VALVE'::text, 'VARC'::text, 'WATERWELL'::text, 'WJOIN'::text, 'WTP'::text, 'SERVCONNECTION'::text, 'GENELEMENT'::text, 'FLWREG'::text])));
-
 CREATE TABLE inp_flwreg_valve (
 	element_id varchar(16) NOT NULL,
 	valve_type varchar(18) NULL,
