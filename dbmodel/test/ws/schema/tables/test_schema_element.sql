@@ -19,7 +19,7 @@ SELECT has_table('element'::name, 'Table element should exist');
 SELECT columns_are(
     'element',
     ARRAY[
-        'element_id', 'code', 'elementcat_id', 'serial_number', 'num_elements', 'state', 'state_type', 'observ', 'comment', 'function_type', 'category_type', 'fluid_type', 'location_type', 'workcat_id', 'workcat_id_end', 'builtdate', 'enddate', 'ownercat_id', 'rotation', 'link', 'verified', 'the_geom', 'label_x', 'label_y', 'label_rotation', 'undelete', 'publish', 'inventory', 'expl_id', 'feature_type', 'tstamp', 'lastupdate', 'lastupdate_user', 'insert_user', 'pol_id', 'top_elev', 'expl_id2', 'trace_featuregeom', 'muni_id', 'sector_id', 'brand_id', 'model_id', 'asset_id', 'datasource', 'lock_level'
+        'element_id', 'code', 'elementcat_id', 'serial_number', 'num_elements', 'state', 'state_type', 'observ', 'comment', 'function_type', 'category_type', 'fluid_type', 'location_type', 'workcat_id', 'workcat_id_end', 'builtdate', 'enddate', 'ownercat_id', 'rotation', 'link', 'verified', 'the_geom', 'label_x', 'label_y', 'label_rotation', 'undelete', 'publish', 'inventory', 'expl_id', 'feature_type', 'tstamp', 'lastupdate', 'lastupdate_user', 'insert_user', 'pol_id', 'top_elev', 'expl_id2', 'trace_featuregeom', 'muni_id', 'sector_id', 'brand_id', 'model_id', 'asset_id', 'datasource', 'lock_level', 'geometry_type'
     ],
     'Table element should have the correct columns'
 );
@@ -73,6 +73,7 @@ SELECT col_type_is('element', 'model_id', 'varchar(50)', 'Column model_id should
 SELECT col_type_is('element', 'asset_id', 'varchar(50)', 'Column asset_id should be varchar(50)');
 SELECT col_type_is('element', 'datasource', 'integer', 'Column datasource should be integer');
 SELECT col_type_is('element', 'lock_level', 'integer', 'Column lock_level should be integer');
+SELECT col_type_is('element', 'geometry_type', 'varchar(50)', 'Column geometry_type should be varchar(50)');
 
 -- Check foreign keys
 SELECT has_fk('element', 'Table element should have foreign keys');

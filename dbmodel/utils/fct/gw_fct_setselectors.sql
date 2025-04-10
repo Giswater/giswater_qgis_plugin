@@ -338,6 +338,7 @@ BEGIN
 			DELETE FROM selector_sector WHERE cur_user = current_user AND sector_id > 0;
 			INSERT INTO selector_sector
 			SELECT DISTINCT sector_id, current_user FROM node WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user)
+
 			ON CONFLICT (sector_id, cur_user) DO NOTHING;
 
 			-- sector for those objects wich has expl_id2 and expl_id2 is not selected but yes one
@@ -383,6 +384,7 @@ BEGIN
 				end if;
 				INSERT INTO selector_macrosector
 				SELECT DISTINCT macrosector_id, current_user FROM sector WHERE sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user = current_user)
+				AND macrosector_id IS NOT NULL
 				ON CONFLICT (macrosector_id, cur_user) DO NOTHING;
 
 			ELSIF v_tabname = 'tab_macrosector' THEN
