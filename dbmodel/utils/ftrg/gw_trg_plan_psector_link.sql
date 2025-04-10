@@ -70,7 +70,7 @@ BEGIN
 	ELSIF TG_OP = 'UPDATE' THEN
 
 		-- Block arc_id update when state = 0
-		IF OLD.state = 0 AND NEW.state = 0 AND NEW.arc_id IS DISTINCT FROM OLD.arc_id THEN
+		IF (OLD.state = 0 AND NEW.state = 0) AND NEW.arc_id IS DISTINCT FROM OLD.arc_id THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 			"data":{"message":"3286", "function":"2938","parameters":{"psector_id":"'||NEW.psector_id||'"}}}$$);';
 		END IF;

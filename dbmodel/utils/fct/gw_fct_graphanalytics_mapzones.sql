@@ -1020,8 +1020,8 @@ BEGIN
 			END IF;
 		END IF;
 
-		--update of fields 'lastupdate' and 'lastupdate_user'
-		v_querytext = 'UPDATE temp_'||quote_ident(v_table)||' set lastupdate=now(), lastupdate_user=current_user 
+		--update of fields 'updated_at' and 'updated_by'
+		v_querytext = 'UPDATE temp_'||quote_ident(v_table)||' set updated_at=now(), updated_by=current_user 
 		where '||quote_ident(v_field)||' IN (SELECT distinct '||quote_ident(v_field)||' FROM temp_t_arc JOIN temp_t_anlgraph USING (arc_id))';
 		EXECUTE v_querytext;
 
@@ -1386,9 +1386,9 @@ BEGIN
 
 		-- mapzone
 		IF v_floodonlymapzone IS NULL THEN
-			v_querytext = 'UPDATE '||v_table||' SET the_geom = t.the_geom, lastupdate = now(), lastupdate_user = current_user FROM temp_'||v_table||' t WHERE t.'||v_field||' = '||v_table||'.'||v_field;
+			v_querytext = 'UPDATE '||v_table||' SET the_geom = t.the_geom, updated_at = now(), updated_by = current_user FROM temp_'||v_table||' t WHERE t.'||v_field||' = '||v_table||'.'||v_field;
 		ELSE
-			v_querytext = 'UPDATE '||v_table||' m SET the_geom = t.the_geom, lastupdate = now(), lastupdate_user = current_user FROM temp_'||v_table||' t WHERE t.'||v_field||' = m.'||v_field||' AND m.'||quote_ident(v_field)||'::integer IN ('||v_floodonlymapzone||')';
+			v_querytext = 'UPDATE '||v_table||' m SET the_geom = t.the_geom, updated_at = now(), updated_by = current_user FROM temp_'||v_table||' t WHERE t.'||v_field||' = m.'||v_field||' AND m.'||quote_ident(v_field)||'::integer IN ('||v_floodonlymapzone||')';
 		END IF;
 
 		EXECUTE v_querytext;

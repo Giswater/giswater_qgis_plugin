@@ -19,9 +19,9 @@ SELECT has_table('dma'::name, 'Table dma should exist');
 SELECT columns_are(
     'dma',
     ARRAY[
-        'dma_id', 'name', 'dma_type', 'muni_id', 'expl_id', 'sector_id', 'macrodma_id', 'descript', 'the_geom', 'minc',
-        'maxc', 'effc', 'pattern_id', 'link', 'graphconfig', 'stylesheet', 'active', 'avg_press', 'tstamp', 'insert_user',
-        'lastupdate', 'lastupdate_user', 'lock_level'
+        'dma_id', 'code', 'name', 'descript', 'dma_type', 'muni_id', 'expl_id', 'sector_id', 'macrodma_id',
+        'minc', 'maxc', 'effc', 'pattern_id', 'link', 'graphconfig', 'stylesheet', 'avg_press', 'lock_level',
+        'active', 'the_geom', 'created_at', 'created_by', 'updated_at', 'updated_by'
     ],
     'Table dma should have the correct columns'
 );
@@ -31,14 +31,14 @@ SELECT col_is_pk('dma', ARRAY['dma_id'], 'Column dma_id should be primary key');
 
 -- Check column types
 SELECT col_type_is('dma', 'dma_id', 'integer', 'Column dma_id should be integer');
+SELECT col_type_is('dma', 'code', 'text', 'Column code should be text');
 SELECT col_type_is('dma', 'name', 'varchar(30)', 'Column name should be varchar(30)');
+SELECT col_type_is('dma', 'descript', 'text', 'Column descript should be text');
 SELECT col_type_is('dma', 'dma_type', 'varchar(16)', 'Column dma_type should be varchar(16)');
 SELECT col_type_is('dma', 'muni_id', 'integer[]', 'Column muni_id should be integer[]');
 SELECT col_type_is('dma', 'expl_id', 'integer[]', 'Column expl_id should be integer[]');
 SELECT col_type_is('dma', 'sector_id', 'integer[]', 'Column sector_id should be integer[]');
 SELECT col_type_is('dma', 'macrodma_id', 'integer', 'Column macrodma_id should be integer');
-SELECT col_type_is('dma', 'descript', 'text', 'Column descript should be text');
-SELECT col_type_is('dma', 'the_geom', 'geometry(MultiPolygon,25831)', 'Column the_geom should be geometry(MultiPolygon,25831)');
 SELECT col_type_is('dma', 'minc', 'double precision', 'Column minc should be double precision');
 SELECT col_type_is('dma', 'maxc', 'double precision', 'Column maxc should be double precision');
 SELECT col_type_is('dma', 'effc', 'double precision', 'Column effc should be double precision');
@@ -46,13 +46,14 @@ SELECT col_type_is('dma', 'pattern_id', 'varchar(16)', 'Column pattern_id should
 SELECT col_type_is('dma', 'link', 'text', 'Column link should be text');
 SELECT col_type_is('dma', 'graphconfig', 'json', 'Column graphconfig should be json');
 SELECT col_type_is('dma', 'stylesheet', 'json', 'Column stylesheet should be json');
-SELECT col_type_is('dma', 'active', 'boolean', 'Column active should be boolean');
 SELECT col_type_is('dma', 'avg_press', 'numeric', 'Column avg_press should be numeric');
-SELECT col_type_is('dma', 'tstamp', 'timestamp', 'Column tstamp should be timestamp');
-SELECT col_type_is('dma', 'insert_user', 'varchar(50)', 'Column insert_user should be varchar(50)');
-SELECT col_type_is('dma', 'lastupdate', 'timestamp', 'Column lastupdate should be timestamp');
-SELECT col_type_is('dma', 'lastupdate_user', 'varchar(50)', 'Column lastupdate_user should be varchar(50)');
 SELECT col_type_is('dma', 'lock_level', 'integer', 'Column lock_level should be integer');
+SELECT col_type_is('dma', 'active', 'boolean', 'Column active should be boolean');
+SELECT col_type_is('dma', 'the_geom', 'geometry(MultiPolygon,SRID_VALUE)', 'Column the_geom should be geometry(MultiPolygon,SRID_VALUE)');
+SELECT col_type_is('dma', 'created_at', 'timestamp with time zone', 'Column created_at should be timestamp with time zone');
+SELECT col_type_is('dma', 'created_by', 'varchar(50)', 'Column created_by should be varchar(50)');
+SELECT col_type_is('dma', 'updated_at', 'timestamp with time zone', 'Column updated_at should be timestamp with time zone');
+SELECT col_type_is('dma', 'updated_by', 'varchar(50)', 'Column updated_by should be varchar(50)');
 
 -- Check foreign keys
 SELECT has_fk('dma', 'Table dma should have foreign keys');
@@ -74,8 +75,8 @@ SELECT has_sequence('dma_dma_id_seq', 'Sequence dma_dma_id_seq should exist'); -
 
 -- Check constraints
 SELECT col_default_is('dma', 'active', 'true', 'Column active should default to true');
-SELECT col_default_is('dma', 'tstamp', 'now()', 'Column tstamp should default to now()');
-SELECT col_default_is('dma', 'insert_user', 'CURRENT_USER', 'Column insert_user should default to CURRENT_USER');
+SELECT col_default_is('dma', 'created_at', 'now()', 'Column created_at should default to now()');
+SELECT col_default_is('dma', 'created_by', 'CURRENT_USER', 'Column created_by should default to CURRENT_USER');
 
 SELECT * FROM finish();
 

@@ -136,14 +136,12 @@ CREATE TABLE dma (
 	dma_id serial4 NOT NULL,
 	code text NULL,
 	"name" varchar(30) NULL,
+	descript text NULL,
 	dma_type varchar(16) NULL,
     muni_id int4[] NULL,
 	expl_id int4[]  NULL,
     sector_id int4[] NULL,
 	macrodma_id int4 NULL,
-	descript text NULL,
-	undelete bool NULL,
-	the_geom public.geometry(multipolygon, SRID_VALUE) NULL,
 	minc float8 NULL,
 	maxc float8 NULL,
 	effc float8 NULL,
@@ -151,12 +149,14 @@ CREATE TABLE dma (
 	link text NULL,
 	graphconfig json DEFAULT '{"use":[{"nodeParent":"", "toArc":[]}], "ignore":[], "forceClosed":[]}'::json NULL,
 	stylesheet json NULL,
-	active bool DEFAULT true NULL,
 	avg_press numeric NULL,
-	tstamp timestamp DEFAULT now() NULL,
-	insert_user varchar(15) DEFAULT CURRENT_USER NULL,
-	lastupdate timestamp NULL,
-	lastupdate_user varchar(15) NULL,
+	lock_level int4 NULL,
+	active bool DEFAULT true NULL,
+	the_geom public.geometry(multipolygon, SRID_VALUE) NULL,
+	created_at timestamp with time zone DEFAULT now() NULL,
+	created_by varchar(50) DEFAULT CURRENT_USER NULL,
+	updated_at timestamp with time zone NULL,
+	updated_by varchar(50) NULL,
 	CONSTRAINT dma_pkey PRIMARY KEY (dma_id),
 	CONSTRAINT dma_macrodma_id_fkey FOREIGN KEY (macrodma_id) REFERENCES macrodma(macrodma_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT dma_pattern_id_fkey FOREIGN KEY (pattern_id) REFERENCES inp_pattern(pattern_id) ON DELETE RESTRICT ON UPDATE CASCADE
@@ -166,22 +166,23 @@ CREATE TABLE presszone (
 	presszone_id int4 NOT NULL,
 	code text NULL,
 	"name" text NOT NULL,
+	descript text NULL,
 	presszone_type text NULL,
     muni_id int4[] NULL,
 	expl_id int4[] NOT NULL,
     sector_id int4[] NULL,
 	link varchar(512) NULL,
-	the_geom public.geometry(multipolygon, SRID_VALUE) NULL,
 	graphconfig json DEFAULT '{"use":[{"nodeParent":"", "toArc":[]}], "ignore":[], "forceClosed":[]}'::json NULL,
 	stylesheet json NULL,
 	head numeric(12, 2) NULL,
-	active bool DEFAULT true NULL,
-	descript text NULL,
-	tstamp timestamp DEFAULT now() NULL,
-	insert_user varchar(15) DEFAULT CURRENT_USER NULL,
-	lastupdate timestamp NULL,
-	lastupdate_user varchar(15) NULL,
 	avg_press float8 NULL,
+	lock_level int4 NULL,
+	active bool DEFAULT true NULL,
+	the_geom public.geometry(multipolygon, SRID_VALUE) NULL,
+	created_at timestamp with time zone DEFAULT now() NULL,
+	created_by varchar(50) DEFAULT CURRENT_USER NULL,
+	updated_at timestamp with time zone NULL,
+	updated_by varchar(50) NULL,
 	CONSTRAINT cat_presszone_pkey PRIMARY KEY (presszone_id)
 );
 
@@ -189,24 +190,24 @@ CREATE TABLE dqa (
 	dqa_id serial4 NOT NULL,
 	code text NULL,
 	"name" varchar(30) NULL,
+	descript text NULL,
 	dqa_type varchar(16) NULL,
     muni_id int4[] NULL,
 	expl_id int4[] NULL,
     sector_id int4[] NULL,
 	macrodqa_id int4 NULL,
-	descript text NULL,
-	undelete bool NULL,
-	the_geom public.geometry(multipolygon, SRID_VALUE) NULL,
 	pattern_id varchar(16) NULL,
 	link text NULL,
 	graphconfig json DEFAULT '{"use":[{"nodeParent":"", "toArc":[]}], "ignore":[], "forceClosed":[]}'::json NULL,
 	stylesheet json NULL,
-	active bool DEFAULT true NULL,
-	tstamp timestamp DEFAULT now() NULL,
-	insert_user varchar(15) DEFAULT CURRENT_USER NULL,
-	lastupdate timestamp NULL,
-	lastupdate_user varchar(15) NULL,
 	avg_press float8 NULL,
+	lock_level int4 NULL,
+	active bool DEFAULT true NULL,
+	the_geom public.geometry(multipolygon, SRID_VALUE) NULL,
+	created_at timestamp with time zone DEFAULT now() NULL,
+	created_by varchar(50) DEFAULT CURRENT_USER NULL,
+	updated_at timestamp with time zone NULL,
+	updated_by varchar(50) NULL,
 	CONSTRAINT dqa_pkey PRIMARY KEY (dqa_id),
 	CONSTRAINT dqa_macrodqa_id_fkey FOREIGN KEY (macrodqa_id) REFERENCES macrodqa(macrodqa_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT dqa_pattern_id_fkey FOREIGN KEY (pattern_id) REFERENCES inp_pattern(pattern_id) ON DELETE CASCADE ON UPDATE CASCADE
@@ -216,24 +217,24 @@ CREATE TABLE sector (
 	sector_id serial4 NOT NULL,
 	code text NULL,
 	"name" varchar(50) NOT NULL,
+	descript text NULL,
 	sector_type varchar(16) NULL,
     muni_id int4[] NULL,
     expl_id int4[] NULL,
 	macrosector_id int4 NULL,
-	descript text NULL,
-	undelete bool NULL,
-	the_geom public.geometry(multipolygon, SRID_VALUE) NULL,
 	graphconfig json DEFAULT '{"use":[{"nodeParent":"", "toArc":[]}], "ignore":[], "forceClosed":[]}'::json NULL,
 	stylesheet json NULL,
-	active bool DEFAULT true NULL,
 	parent_id int4 NULL,
 	pattern_id varchar(20) NULL,
-	tstamp timestamp DEFAULT now() NULL,
-	insert_user varchar(15) DEFAULT CURRENT_USER NULL,
-	lastupdate timestamp NULL,
-	lastupdate_user varchar(15) NULL,
 	avg_press float8 NULL,
 	link text NULL,
+	lock_level int4 NULL,
+	active bool DEFAULT true NULL,
+	the_geom public.geometry(multipolygon, SRID_VALUE) NULL,
+	created_at timestamp with time zone DEFAULT now() NULL,
+	created_by varchar(50) DEFAULT CURRENT_USER NULL,
+	updated_at timestamp with time zone NULL,
+	updated_by varchar(50) NULL,
 	CONSTRAINT sector_pkey PRIMARY KEY (sector_id),
 	CONSTRAINT sector_macrosector_id_fkey FOREIGN KEY (macrosector_id) REFERENCES macrosector(macrosector_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT sector_parent_id_fkey FOREIGN KEY (parent_id) REFERENCES sector(sector_id) ON DELETE RESTRICT ON UPDATE CASCADE,
@@ -369,22 +370,12 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"anl_
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"config_param_user", "column":"cur_user", "dataType":"varchar(50)"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"dimensions", "column":"insert_user", "dataType":"varchar(50)"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"dimensions", "column":"lastupdate_user", "dataType":"varchar(50)"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"dma", "column":"insert_user", "dataType":"varchar(50)"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"dma", "column":"lastupdate_user", "dataType":"varchar(50)"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"dqa", "column":"insert_user", "dataType":"varchar(50)"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"dqa", "column":"lastupdate_user", "dataType":"varchar(50)"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"exploitation", "column":"insert_user", "dataType":"varchar(50)"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"exploitation", "column":"lastupdate_user", "dataType":"varchar(50)"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"link", "column":"insert_user", "dataType":"varchar(50)"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"link", "column":"lastupdate_user", "dataType":"varchar(50)"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"plan_netscenario_dma", "column":"lastupdate_user", "dataType":"varchar(50)"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"plan_netscenario_presszone", "column":"lastupdate_user", "dataType":"varchar(50)"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"plan_psector", "column":"insert_user", "dataType":"varchar(50)"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"plan_psector", "column":"lastupdate_user", "dataType":"varchar(50)"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"presszone", "column":"insert_user", "dataType":"varchar(50)"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"presszone", "column":"lastupdate_user", "dataType":"varchar(50)"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"sector", "column":"insert_user", "dataType":"varchar(50)"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"sector", "column":"lastupdate_user", "dataType":"varchar(50)"}}$$);
 
 -- 20/01/2025
 ALTER TABLE rpt_arc_stats RENAME TO _rpt_arc_stats;
@@ -692,60 +683,30 @@ ALTER TABLE inp_dscenario_valve ADD CONSTRAINT inp_dscenario_valve_dscenario_id_
 ALTER TABLE inp_dscenario_valve ADD CONSTRAINT inp_dscenario_valve_node_id_fkey FOREIGN KEY (node_id) REFERENCES inp_valve(node_id) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- 27/01/2025
-
-CREATE SEQUENCE IF NOT EXISTS supplyzone_supplyzone_id_seq
-    INCREMENT 1
-    START 1
-    MINVALUE 1
-    MAXVALUE 9223372036854775807
-    CACHE 1;
-
-CREATE TABLE IF NOT EXISTS supplyzone
-(
-    supplyzone_id integer NOT NULL DEFAULT nextval('supplyzone_supplyzone_id_seq'::regclass),
-    name character varying(50) COLLATE pg_catalog."default" NOT NULL,
-    supplyzone_type character varying(16) COLLATE pg_catalog."default",
+CREATE TABLE IF NOT EXISTS supplyzone (
+    supplyzone_id serial4,
+	code text NULL,
+	"name" varchar(30) NULL,
+    descript text NULL,
+	supplyzone_type varchar(16) NULL,
     muni_id integer[],
     expl_id integer[],
-    macrosector_id integer,
-    descript text COLLATE pg_catalog."default",
-    undelete boolean,
-    the_geom geometry(MultiPolygon,SRID_VALUE),
-    graphconfig json DEFAULT '{"use":[{"nodeParent":"", "toArc":[]}], "ignore":[], "forceClosed":[]}'::json,
-    stylesheet json,
-    active boolean DEFAULT true,
+	graphconfig json DEFAULT '{"use":[{"nodeParent":"", "toArc":[]}], "ignore":[], "forceClosed":[]}'::json NULL,
+	stylesheet json NULL,
     parent_id integer,
-    pattern_id character varying(20) COLLATE pg_catalog."default",
-    tstamp timestamp without time zone DEFAULT now(),
-    insert_user character varying(50) COLLATE pg_catalog."default" DEFAULT CURRENT_USER,
-    lastupdate timestamp without time zone,
-    lastupdate_user character varying(50) COLLATE pg_catalog."default",
+    pattern_id varchar(20),
     avg_press double precision,
-    link text COLLATE pg_catalog."default",
+    link text,
+	lock_level int4 NULL,
+	active bool DEFAULT true NULL,
+    the_geom public.geometry(MultiPolygon, SRID_VALUE),
+	created_at timestamp with time zone DEFAULT now() NULL,
+	created_by varchar(50) DEFAULT CURRENT_USER NULL,
+	updated_at timestamp with time zone NULL,
+	updated_by varchar(50) NULL,
     CONSTRAINT supplyzone_pkey PRIMARY KEY (supplyzone_id),
-    CONSTRAINT supplyzone_macrosector_id_fkey FOREIGN KEY (macrosector_id)
-        REFERENCES macrosector (macrosector_id) MATCH SIMPLE
-        ON UPDATE CASCADE
-        ON DELETE RESTRICT,
-    CONSTRAINT supplyzone_parent_id_fkey FOREIGN KEY (parent_id)
-        REFERENCES supplyzone (supplyzone_id) MATCH SIMPLE
-        ON UPDATE CASCADE
-        ON DELETE RESTRICT,
-    CONSTRAINT supplyzone_pattern_id_fkey FOREIGN KEY (pattern_id)
-        REFERENCES inp_pattern (pattern_id) MATCH SIMPLE
-        ON UPDATE CASCADE
-        ON DELETE RESTRICT
-);
-
-CREATE TABLE IF NOT EXISTS selector_supplyzone
-(
-    supplyzone_id integer NOT NULL,
-    cur_user text COLLATE pg_catalog."default" NOT NULL DEFAULT "current_user"(),
-    CONSTRAINT selector_supplyzone_pkey PRIMARY KEY (supplyzone_id, cur_user),
-    CONSTRAINT inp_selector_supplyzone_id_fkey FOREIGN KEY (supplyzone_id)
-        REFERENCES supplyzone (supplyzone_id) MATCH SIMPLE
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
+    CONSTRAINT supplyzone_parent_id_fkey FOREIGN KEY (parent_id) REFERENCES supplyzone (supplyzone_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT,
+    CONSTRAINT supplyzone_pattern_id_fkey FOREIGN KEY (pattern_id) REFERENCES inp_pattern (pattern_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT
 );
 
 
@@ -767,9 +728,6 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"conn
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"samplepoint", "column":"verified", "dataType":"integer"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"element", "column":"verified", "dataType":"integer"}}$$);
 
--- 31/01/2025
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"presszone", "column":"undelete", "dataType":"boolean"}}$$);
-
 
 -- 06/02/2025
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"node", "column":"elevation", "newName":"top_elev"}}$$);
@@ -788,11 +746,6 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"review_a
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"rpt_inp_node", "column":"elevation", "newName":"top_elev"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"archived_rpt_inp_node", "column":"elevation", "newName":"top_elev"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"anl_node", "column":"elevation", "newName":"top_elev"}}$$);
-
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node", "column":"datasource", "dataType":"integer"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"datasource", "dataType":"integer"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"datasource", "dataType":"integer"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"element", "column":"datasource", "dataType":"integer"}}$$);
 
 -- 10/02/2025
 
@@ -951,34 +904,17 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"rpt_cat_re
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"rpt_cat_result", "column":"total_dura"}}$$);
 
 -- WS
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"dma", "column":"undelete"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"presszone", "column":"undelete"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"dqa", "column":"undelete"}}$$);
 DROP RULE IF EXISTS undelete_macrodqa ON macrodqa;
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"macrodqa", "column":"undelete"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"supplyzone", "column":"undelete"}}$$);
 DROP VIEW IF EXISTS v_edit_macrodma;
 DROP VIEW IF EXISTS v_ui_macrodma;
 DROP RULE IF EXISTS undelete_macrodma ON macrodma;
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"macrodma", "column":"undelete"}}$$);
-
 
 DROP VIEW IF EXISTS v_edit_sector;
 DROP VIEW IF EXISTS v_ui_sector;
 DROP VIEW IF EXISTS vu_sector;
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"sector", "column":"undelete"}}$$);
 
 -- 04/03/2025
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"man_valve", "column":"active"}}$$);
-
-
--- 05/03/2025
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"presszone", "column":"lock_level", "dataType":"int4", "isUtils":"False"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dqa", "column":"lock_level", "dataType":"int4", "isUtils":"False"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"macrodqa", "column":"lock_level", "dataType":"int4", "isUtils":"False"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"supplyzone", "column":"lock_level", "dataType":"int4", "isUtils":"False"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dma", "column":"lock_level", "dataType":"int4", "isUtils":"False"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"sector", "column":"lock_level", "dataType":"int4", "isUtils":"False"}}$$);
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"link", "column":"fluid_type", "dataType":"varchar(50)"}}$$);
 
@@ -1157,7 +1093,7 @@ CREATE TABLE arc (
 	descript varchar(254) NULL,
 	link varchar(512) NULL,
 	verified int4 NULL,
-	the_geom public.geometry(linestring, 25831) NULL,
+	the_geom public.geometry(linestring, SRID_VALUE) NULL,
 	undelete bool NULL,
 	label_x varchar(30) NULL,
 	label_y varchar(30) NULL,
@@ -1380,7 +1316,7 @@ CREATE TABLE connec (
 	link varchar(512) NULL,
 	verified int4 NULL,
 	rotation numeric(6, 3) NULL,
-	the_geom public.geometry(point, 25831) NULL,
+	the_geom public.geometry(point, SRID_VALUE) NULL,
 	undelete bool NULL,
 	label_x varchar(30) NULL,
 	label_y varchar(30) NULL,
@@ -1536,7 +1472,7 @@ CREATE TABLE element (
 	rotation numeric(6, 3) NULL,
 	link varchar(512) NULL,
 	verified int4 NULL,
-	the_geom public.geometry(point, 25831) NULL,
+	the_geom public.geometry(point, SRID_VALUE) NULL,
 	label_x varchar(30) NULL,
 	label_y varchar(30) NULL,
 	label_rotation numeric(6, 3) NULL,
@@ -1724,7 +1660,7 @@ CREATE TABLE node (
 	link varchar(512) NULL,
 	verified int4 NULL,
 	rotation numeric(6, 3) NULL,
-	the_geom public.geometry(point, 25831) NULL,
+	the_geom public.geometry(point, SRID_VALUE) NULL,
 	undelete bool NULL,
 	label_x varchar(30) NULL,
 	label_y varchar(30) NULL,
@@ -1763,7 +1699,7 @@ CREATE TABLE node (
 	supplyzone_id int4 NULL,
 	lock_level int4 NULL,
 	is_scadamap bool NULL,
-	pavcat_id text NULL,
+	pavcat_id text NULL
 	CONSTRAINT node_epa_type_check CHECK (((epa_type)::text = ANY (ARRAY['JUNCTION'::text, 'RESERVOIR'::text, 'TANK'::text, 'INLET'::text, 'UNDEFINED'::text, 'SHORTPIPE'::text, 'VALVE'::text, 'PUMP'::text]))),
 	CONSTRAINT node_pkey PRIMARY KEY (node_id),
 	CONSTRAINT node_arc_id_fkey FOREIGN KEY (arc_id) REFERENCES arc(arc_id) ON DELETE RESTRICT ON UPDATE CASCADE,
@@ -1847,7 +1783,7 @@ CREATE TABLE link (
 	userdefined_geom bool NULL,
 	state int2 NOT NULL,
 	expl_id int4 NOT NULL,
-	the_geom public.geometry(linestring, 25831) NULL,
+	the_geom public.geometry(linestring, SRID_VALUE) NULL,
 	tstamp timestamp DEFAULT now() NULL,
 	sector_id int4 NULL,
 	dma_id int4 NULL,
@@ -1950,19 +1886,12 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"archived_ps
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"archived_psector_node_traceability", "column":"lock_level", "dataType":"int4", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"archived_psector_node_traceability", "column":"is_scadamap", "dataType":"bool", "isUtils":"False"}}$$);
 
--- 07/04/2025
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"macrosector", "column":"code", "dataType":"varchar(50)", "isUtils":"False"}}$$);
-
-
-
 -- 09/04/2025
-
 -- macrosector
 ALTER TABLE macrosector RENAME TO _macrosector;
 
 -- Drop foreign keys that reference macrosector
 ALTER TABLE sector DROP CONSTRAINT sector_macrosector_id_fkey;
-ALTER TABLE supplyzone DROP CONSTRAINT supplyzone_macrosector_id_fkey;
 
 -- Drop restrictions from table macrosector
 ALTER TABLE _macrosector DROP CONSTRAINT macrosector_pkey;
@@ -1982,9 +1911,13 @@ CREATE TABLE macrosector (
 	code text NULL,
 	"name" varchar(50) NOT NULL,
 	descript text NULL,
-	the_geom public.geometry(multipolygon, 25831) NULL,
-	active bool DEFAULT true NULL,
 	lock_level int4 NULL,
+	active bool DEFAULT true NULL,
+	the_geom public.geometry(multipolygon, SRID_VALUE) NULL,
+	created_at timestamp with time zone DEFAULT now() NULL,
+	created_by varchar(50) DEFAULT CURRENT_USER NULL,
+	updated_at timestamp with time zone NULL,
+	updated_by varchar(50) NULL,
 	CONSTRAINT macrosector_pkey PRIMARY KEY (macrosector_id)
 );
 
@@ -2017,11 +1950,15 @@ CREATE TABLE macrodma (
 	macrodma_id serial4 NOT NULL,
 	code text NULL,
 	"name" varchar(50) NOT NULL,
-	expl_id int4 NOT NULL,
 	descript text NULL,
-	the_geom public.geometry(multipolygon, 25831) NULL,
-	active bool DEFAULT true NULL,
+	expl_id int4 NOT NULL,
 	lock_level int4 NULL,
+	active bool DEFAULT true NULL,
+	the_geom public.geometry(multipolygon, SRID_VALUE) NULL,
+	created_at timestamp with time zone DEFAULT now() NULL,
+	created_by varchar(50) DEFAULT CURRENT_USER NULL,
+	updated_at timestamp with time zone NULL,
+	updated_by varchar(50) NULL,
 	CONSTRAINT macrodma_pkey PRIMARY KEY (macrodma_id),
 	CONSTRAINT macrodma_expl_id_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON DELETE RESTRICT ON UPDATE CASCADE
 );
@@ -2052,11 +1989,15 @@ CREATE TABLE macrodqa (
 	macrodqa_id serial4 NOT NULL,
 	code text NULL,
 	"name" varchar(50) NOT NULL,
-	expl_id int4 NOT NULL,
 	descript text NULL,
-	the_geom public.geometry(multipolygon, 25831) NULL,
-	active bool DEFAULT true NULL,
+	expl_id int4 NOT NULL,
 	lock_level int4 NULL,
+	active bool DEFAULT true NULL,
+	the_geom public.geometry(multipolygon, SRID_VALUE) NULL,
+	created_at timestamp with time zone DEFAULT now() NULL,
+	created_by varchar(50) DEFAULT CURRENT_USER NULL,
+	updated_at timestamp with time zone NULL,
+	updated_by varchar(50) NULL,
 	CONSTRAINT macrodqa_pkey PRIMARY KEY (macrodqa_id),
 	CONSTRAINT macrodqa_expl_id_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON DELETE RESTRICT ON UPDATE CASCADE
 );
@@ -2083,9 +2024,13 @@ CREATE TABLE macroexploitation (
 	code text NULL,
 	"name" varchar(50) NOT NULL,
 	descript varchar(100) NULL,
-	active bool DEFAULT true NULL,
-	the_geom public.geometry(multipolygon, 25831) NULL,
 	lock_level int4 NULL,
+	active bool DEFAULT true NULL,
+	the_geom public.geometry(multipolygon, SRID_VALUE) NULL,
+	created_at timestamp with time zone DEFAULT now() NULL,
+	created_by varchar(50) DEFAULT CURRENT_USER NULL,
+	updated_at timestamp with time zone NULL,
+	updated_by varchar(50) NULL,
 	CONSTRAINT macroexploitation_pkey PRIMARY KEY (macroexpl_id)
 );
 
@@ -2146,16 +2091,59 @@ CREATE TABLE exploitation (
 	expl_id int4 NOT NULL,
 	code text NULL,
 	"name" varchar(50) NOT NULL,
-	macroexpl_id int4 NOT NULL,
 	descript text NULL,
-	the_geom public.geometry(multipolygon, 25831) NULL,
-	tstamp timestamp DEFAULT now() NULL,
-	active bool DEFAULT true NULL,
-	insert_user varchar(50) DEFAULT CURRENT_USER NULL,
-	lastupdate timestamp NULL,
-	lastupdate_user varchar(50) NULL,
+	macroexpl_id int4 NOT NULL,
 	lock_level int4 NULL,
+	active bool DEFAULT true NULL,
+	the_geom public.geometry(multipolygon, SRID_VALUE) NULL,
+	created_at timestamp with time zone DEFAULT now() NULL,
+	created_by varchar(50) DEFAULT CURRENT_USER NULL,
+	updated_at timestamp with time zone NULL,
+	updated_by varchar(50) NULL,
 	CONSTRAINT exploitation_pkey PRIMARY KEY (expl_id),
 	CONSTRAINT macroexpl_id_fkey FOREIGN KEY (macroexpl_id) REFERENCES macroexploitation(macroexpl_id) ON DELETE RESTRICT ON UPDATE CASCADE
 );
 CREATE INDEX exploitation_index ON exploitation USING gist (the_geom);
+
+
+
+-- 10/04/2025
+CREATE TABLE IF NOT EXISTS macroomzone (
+    macroomzone_id serial4,
+    code text NULL,
+    "name" varchar(50) NOT NULL,
+    descript text NULL,
+	expl_id int4 NOT NULL,
+    lock_level int4 NULL,
+	active bool DEFAULT true NULL,
+    the_geom public.geometry(MultiPolygon, SRID_VALUE),
+    created_at timestamp with time zone DEFAULT now() NULL,
+    created_by varchar(50) DEFAULT CURRENT_USER NULL,
+    updated_at timestamp with time zone NULL,
+    updated_by varchar(50) NULL,
+    CONSTRAINT macroomzone_pkey PRIMARY KEY (macroomzone_id),
+    CONSTRAINT macroomzone_expl_id_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+
+CREATE TABLE IF NOT EXISTS omzone (
+    omzone_id serial4,
+	code text NULL,
+	"name" varchar(30) NULL,
+    descript text NULL,
+	omzone_type varchar(16) NULL,
+    muni_id integer[],
+    expl_id integer[],
+    macroomzone_id integer,
+    link text,
+	lock_level int4 NULL,
+	active bool DEFAULT true NULL,
+    the_geom public.geometry(MultiPolygon, SRID_VALUE),
+	created_at timestamp with time zone DEFAULT now() NULL,
+	created_by varchar(50) DEFAULT CURRENT_USER NULL,
+	updated_at timestamp with time zone NULL,
+	updated_by varchar(50) NULL,
+    CONSTRAINT omzone_pkey PRIMARY KEY (omzone_id),
+    CONSTRAINT omzone_macroomzone_id_fkey FOREIGN KEY (macroomzone_id) REFERENCES macroomzone (macroomzone_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT
+);
+

@@ -216,6 +216,7 @@ DROP VIEW IF EXISTS v_om_mincut_hydrometer;
 
 DROP VIEW IF EXISTS v_edit_dma;
 DROP VIEW IF EXISTS v_ui_dma;
+DROP VIEW IF EXISTS v_ui_macrodma;
 DROP VIEW IF EXISTS v_edit_macrodma;
 DROP VIEW IF EXISTS vu_dma;
 DROP VIEW IF EXISTS v_edit_plan_netscenario_presszone;
@@ -223,7 +224,14 @@ DROP VIEW IF EXISTS v_edit_plan_psector_x_other;
 DROP VIEW IF EXISTS v_edit_dqa;
 DROP VIEW IF EXISTS v_ui_dqa;
 DROP VIEW IF EXISTS v_edit_macrodqa;
+DROP VIEW IF EXISTS v_ui_macrodqa;
 DROP VIEW IF EXISTS vu_dqa;
+
+DROP VIEW IF EXISTS v_edit_macrosector;
+DROP VIEW IF EXISTS v_ui_macrosector;
+
+DROP VIEW IF EXISTS v_edit_macroexploitation;
+DROP VIEW IF EXISTS v_edit_exploitation;
 
 DROP VIEW IF EXISTS v_state_arc;
 DROP VIEW IF EXISTS v_state_node;

@@ -92,7 +92,7 @@ BEGIN
 		UPDATE dqa
 		SET dqa_id=NEW.dqa_id, name=NEW.name, expl_id=NEW.expl_id, macrodqa_id=v_mapzone_id, descript=NEW.descript,
 		pattern_id=NEW.pattern_id, dqa_type=NEW.dqa_type, link=NEW.link, graphconfig=NEW.graphconfig::json,
-		stylesheet = NEW.stylesheet::json, lastupdate=now(), lastupdate_user = current_user, muni_id = NEW.muni_id, sector_id = NEW.sector_id, lock_level=NEW.lock_level
+		stylesheet = NEW.stylesheet::json, updated_at=now(), updated_by = current_user, muni_id = NEW.muni_id, sector_id = NEW.sector_id, lock_level=NEW.lock_level
 		WHERE dqa_id=OLD.dqa_id;
 
 		IF v_view_name = 'UI' THEN

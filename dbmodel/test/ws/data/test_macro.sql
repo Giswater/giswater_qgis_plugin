@@ -13,7 +13,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 SELECT plan(12);
 
 -- Subtest 1: Testing macroexplotation operations
-INSERT INTO macroexploitation (macroexpl_id, "name", descript, undelete, active) VALUES(-999, 'Test', 'Test macroexploitation', NULL, true);
+INSERT INTO macroexploitation (macroexpl_id, code, "name", descript, lock_level, active) VALUES(-999, '-999', 'Test', 'Test macroexploitation', NULL, true);
 SELECT is((SELECT count(*)::integer FROM macroexploitation WHERE macroexpl_id = -999), 1, 'INSERT: macroexploitation "2" was inserted');
 
 UPDATE macroexploitation SET descript = 'updated test' WHERE macroexpl_id = -999;
@@ -24,8 +24,8 @@ SELECT is((SELECT count(*)::integer FROM macroexploitation WHERE macroexpl_id = 
 
 
 -- Subtest 2: Testing macrosector operations
-INSERT INTO macrosector (macrosector_id, "name", descript, the_geom, active)
-VALUES(-999, 'macrosector_03', 'macrosector_project_ud', 'SRID=25831;MULTIPOLYGON (((418661.46939954103 4578015.45745487, 418647.37730746274 4578106.685208859, 
+INSERT INTO macrosector (macrosector_id, code, "name", descript, the_geom, active)
+VALUES(-999, '-999', 'macrosector_03', 'macrosector_project_ud', 'SRID=25831;MULTIPOLYGON (((418661.46939954103 4578015.45745487, 418647.37730746274 4578106.685208859, 
 418536.61840831034 4578081.220551241, 418457.5049089153 4578046.113935886, 418401.13654059684 4578007.051645559, 418347.73492850515 4577966.505977117, 
 418307.6837194355 4577934.366117985, 418280.9829133909 4577912.609905655, 418294.82777578407 4577893.820449547, 418303.72804446577 4577879.481127782, 
 418316.08952874615 4577811.740193926, 418323.50641931436 4577792.456278448, 418334.38452548115 4577771.688984857, 418348.7238472465 4577744.49371944, 
@@ -44,7 +44,7 @@ SELECT is((SELECT count(*)::integer FROM macrosector WHERE macrosector_id = -999
 
 
 -- Subtest 3: Testing macrodma operations
-INSERT INTO macrodma (macrodma_id, "name", expl_id, descript, the_geom, active) VALUES(-999, 'macrodma_03', 0, NULL, NULL, true);
+INSERT INTO macrodma (macrodma_id, code, "name", expl_id, descript, the_geom, active) VALUES(-999, '-999', 'macrodma_03', 0, NULL, NULL, true);
 SELECT is((SELECT count(*)::integer FROM macrodma WHERE macrodma_id = -999), 1, 'INSERT: macrodma "3" was inserted');
 
 UPDATE macrodma SET descript = 'updated test' WHERE macrodma_id = -999;
@@ -55,7 +55,7 @@ SELECT is((SELECT count(*)::integer FROM macrodma WHERE macrodma_id = -999), 0, 
 
 
 -- Subtest 4: Testing macrodqa operations
-INSERT INTO macrodqa (macrodqa_id, "name", expl_id, descript, the_geom, active) VALUES(-999, 'macrodqa_01', 0, NULL, NULL, true);
+INSERT INTO macrodqa (macrodqa_id, code, "name", expl_id, descript, the_geom, active) VALUES(-999, '-999', 'macrodqa_01', 0, NULL, NULL, true);
 SELECT is((SELECT count(*)::integer FROM macrodqa WHERE macrodqa_id = -999), 1, 'INSERT: macrodqa "1" was inserted');
 
 UPDATE macrodqa SET descript = 'updated test' WHERE macrodqa_id = -999;

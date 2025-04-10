@@ -19,7 +19,8 @@ SELECT has_table('macrosector'::name, 'Table macrosector should exist');
 SELECT columns_are(
     'macrosector',
     ARRAY[
-        'macrosector_id', 'name', 'descript', 'the_geom', 'active', 'lock_level', 'code'
+        'macrosector_id', 'code', 'name', 'descript', 'lock_level', 'active', 'the_geom',
+        'created_at', 'created_by', 'updated_at', 'updated_by'
     ],
     'Table macrosector should have the correct columns'
 );
@@ -29,11 +30,16 @@ SELECT col_is_pk('macrosector', ARRAY['macrosector_id'], 'Column macrosector_id 
 
 -- Check column types
 SELECT col_type_is('macrosector', 'macrosector_id', 'integer', 'Column macrosector_id should be integer');
+SELECT col_type_is('macrosector', 'code', 'text', 'Column code should be text');
 SELECT col_type_is('macrosector', 'name', 'varchar(50)', 'Column name should be varchar(50)');
 SELECT col_type_is('macrosector', 'descript', 'text', 'Column descript should be text');
-SELECT col_type_is('macrosector', 'the_geom', 'geometry(MultiPolygon,25831)', 'Column the_geom should be geometry(MultiPolygon,25831)');
-SELECT col_type_is('macrosector', 'active', 'boolean', 'Column active should be boolean');
 SELECT col_type_is('macrosector', 'lock_level', 'integer', 'Column lock_level should be integer');
+SELECT col_type_is('macrosector', 'active', 'boolean', 'Column active should be boolean');
+SELECT col_type_is('macrosector', 'the_geom', 'geometry(MultiPolygon,SRID_VALUE)', 'Column the_geom should be geometry(MultiPolygon,SRID_VALUE)');
+SELECT col_type_is('macrosector', 'created_at', 'timestamp with time zone', 'Column created_at should be timestamp with time zone');
+SELECT col_type_is('macrosector', 'created_by', 'varchar(50)', 'Column created_by should be varchar(50)');
+SELECT col_type_is('macrosector', 'updated_at', 'timestamp with time zone', 'Column updated_at should be timestamp with time zone');
+SELECT col_type_is('macrosector', 'updated_by', 'varchar(50)', 'Column updated_by should be varchar(50)');
 
 -- Check not null constraints
 SELECT col_not_null('macrosector', 'macrosector_id', 'Column macrosector_id should be NOT NULL');
@@ -41,6 +47,8 @@ SELECT col_not_null('macrosector', 'name', 'Column name should be NOT NULL');
 
 -- Check default values
 SELECT col_default_is('macrosector', 'active', 'true', 'Column active should default to true');
+SELECT col_default_is('macrosector', 'created_at', 'now()', 'Column created_at should default to now()');
+SELECT col_default_is('macrosector', 'created_by', 'CURRENT_USER', 'Column created_by should default to CURRENT_USER');
 
 -- Check indexes
 SELECT has_index('macrosector', 'macrosector_index', 'Should have index on the_geom');

@@ -128,9 +128,6 @@ CREATE TRIGGER gw_trg_edit_controls BEFORE DELETE OR UPDATE
 ON dqa FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_controls('dqa_id');
 
 CREATE TRIGGER gw_trg_edit_controls BEFORE DELETE OR UPDATE
-ON macrodqa FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_controls('macrodqa_id');
-
-CREATE TRIGGER gw_trg_edit_controls BEFORE DELETE OR UPDATE
 ON supplyzone FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_controls('supplyzone_id');
 
 
@@ -460,3 +457,10 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_controls('expl_id');
 
 CREATE TRIGGER gw_trg_edit_controls BEFORE DELETE OR UPDATE ON macroexploitation
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_controls('macroexpl_id');
+
+CREATE TRIGGER gw_trg_typevalue_fk_insert AFTER INSERT
+ON omzone FOR EACH ROW EXECUTE FUNCTION gw_trg_typevalue_fk('omzone');
+
+CREATE TRIGGER gw_trg_typevalue_fk_update AFTER UPDATE OF omzone_type
+ON omzone FOR EACH ROW WHEN (((old.omzone_type)::TEXT IS DISTINCT
+FROM (new.omzone_type)::TEXT)) EXECUTE FUNCTION gw_trg_typevalue_fk('omzone');

@@ -112,7 +112,7 @@ BEGIN
 		UPDATE dma
 		SET dma_id=NEW.dma_id, name=NEW.name, descript=NEW.descript, macrodma_id=v_mapzone_id, expl_id=NEW.expl_id,
 		pattern_id=NEW.pattern_id, link=NEW.link, effc=NEW.effc, graphconfig=NEW.graphconfig::json, dma_type=NEW.dma_type,
-		stylesheet = NEW.stylesheet::json, avg_press=NEW.avg_press, lastupdate=now(), lastupdate_user = current_user,
+		stylesheet = NEW.stylesheet::json, avg_press=NEW.avg_press, updated_at=now(), updated_by = current_user,
 		minc = NEW.minc, maxc = NEW.maxc, muni_id = NEW.muni_id, sector_id = NEW.sector_id, lock_level=NEW.lock_level
 		WHERE dma_id=OLD.dma_id;
 

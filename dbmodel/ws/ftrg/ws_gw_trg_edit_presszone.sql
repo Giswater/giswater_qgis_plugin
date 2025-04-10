@@ -80,7 +80,7 @@ BEGIN
 
 		UPDATE presszone
 		SET presszone_id=NEW.presszone_id, name=NEW.name, expl_id=NEW.expl_id, graphconfig=NEW.graphconfig::json,
-		head = NEW.head, stylesheet=NEW.stylesheet::json, descript=NEW.descript, lastupdate=now(), lastupdate_user = current_user,
+		head = NEW.head, stylesheet=NEW.stylesheet::json, descript=NEW.descript, updated_at=now(), updated_by = current_user,
 		avg_press = NEW.avg_press, presszone_type = NEW.presszone_type, link = NEW.link, muni_id = NEW.muni_id, sector_id = NEW.sector_id, lock_level=NEW.lock_level
 		WHERE presszone_id=OLD.presszone_id;
 

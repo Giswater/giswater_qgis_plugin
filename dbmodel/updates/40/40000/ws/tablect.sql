@@ -294,7 +294,6 @@ ALTER TABLE element_x_link ADD CONSTRAINT element_x_link_link_id_fkey FOREIGN KE
 -- 09/04/2025
 -- macrosector
 ALTER TABLE sector ADD CONSTRAINT sector_macrosector_id_fkey FOREIGN KEY (macrosector_id) REFERENCES macrosector(macrosector_id) ON UPDATE CASCADE ON DELETE RESTRICT;
-ALTER TABLE supplyzone ADD CONSTRAINT supplyzone_macrosector_id_fkey FOREIGN KEY (macrosector_id) REFERENCES macrosector(macrosector_id) ON UPDATE CASCADE ON DELETE RESTRICT;
 
 CREATE RULE macrosector_del_undefined AS
     ON DELETE TO macrosector
@@ -347,7 +346,7 @@ CREATE RULE macroexploitation_del_undefined AS
 CREATE RULE macroexploitation_undefined AS
     ON UPDATE TO macroexploitation
    WHERE ((new.macroexpl_id = 0) OR (old.macroexpl_id = 0)) DO INSTEAD NOTHING;
-   
+
 ALTER TABLE node ADD CONSTRAINT node_expl_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON UPDATE CASCADE ON DELETE RESTRICT;
 ALTER TABLE node ADD CONSTRAINT node_expl_id2_fkey FOREIGN KEY (expl_id2) REFERENCES exploitation(expl_id) ON UPDATE CASCADE ON DELETE RESTRICT;
 ALTER TABLE config_user_x_expl ADD CONSTRAINT config_user_x_expl_expl_id_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON UPDATE CASCADE ON DELETE CASCADE;
@@ -376,3 +375,19 @@ ALTER TABLE inp_curve ADD CONSTRAINT inp_curve_expl_id_fkey FOREIGN KEY (expl_id
 ALTER TABLE _pond_ ADD CONSTRAINT pond_exploitation_id_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON UPDATE CASCADE ON DELETE RESTRICT;
 ALTER TABLE _pool_ ADD CONSTRAINT pool_exploitation_id_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON UPDATE CASCADE ON DELETE RESTRICT;
 ALTER TABLE _arc_border_expl_ ADD CONSTRAINT arc_border_expl_expl_id_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+CREATE RULE omzone_conflict AS
+    ON UPDATE TO omzone
+   WHERE ((new.omzone_id = '-1'::integer) OR (old.omzone_id = '-1'::integer)) DO INSTEAD NOTHING;
+
+CREATE RULE omzone_del_conflict AS
+    ON DELETE TO omzone
+   WHERE (old.omzone_id = '-1'::integer) DO INSTEAD NOTHING;
+
+CREATE RULE omzone_del_undefined AS
+    ON DELETE TO omzone
+   WHERE (old.omzone_id = 0) DO INSTEAD NOTHING;
+
+CREATE RULE omzone_undefined AS
+    ON UPDATE TO omzone
+   WHERE ((new.omzone_id = 0) OR (old.omzone_id = 0)) DO INSTEAD NOTHING;
