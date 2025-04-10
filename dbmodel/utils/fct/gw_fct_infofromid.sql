@@ -648,22 +648,15 @@ BEGIN
 
 		parent_child_relation:=true;
 
-		-- check parent_view
-		v_querystring = concat('SELECT tableparent_id from config_info_layer WHERE layer_id=',quote_nullable(v_tablename));
-		v_debug_vars := json_build_object('v_tablename', v_tablename);
-		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_infofromid', 'flag', 250);
-		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
-		EXECUTE v_querystring INTO tableparent_id_arg;
-
 		-- get childtype
 		EXECUTE 'SELECT '||v_featuretype||'_type FROM v_edit_'||v_featuretype||' WHERE '||v_featuretype||'_id = '||quote_nullable(v_id) INTO v_childtype;
 
 		-- Identify tableinfotype_id
 		v_querystring = concat(' SELECT tableinfotype_id FROM cat_feature
 			JOIN config_info_layer_x_type ON child_layer=tableinfo_id
-			WHERE cat_feature.id= (SELECT custom_type FROM ',quote_ident(tableparent_id_arg),' WHERE nid::text=',quote_nullable(v_id),')
+			WHERE cat_feature.id= (SELECT ',v_featuretype,'_type FROM ',quote_ident(v_tablename),' WHERE ',v_featuretype,'_id::text=',quote_nullable(v_id),')
 			AND infotype_id=',quote_nullable(v_infotype));
-		v_debug_vars := json_build_object('tableparent_id_arg', tableparent_id_arg, 'v_id', v_id, 'v_infotype', v_infotype);
+		v_debug_vars := json_build_object('v_tablename', v_tablename, 'v_id', v_id, 'v_infotype', v_infotype);
 		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_infofromid', 'flag', 260);
 
 		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;

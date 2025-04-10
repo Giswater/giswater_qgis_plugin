@@ -36,3 +36,10 @@ INSERT INTO sys_function (id, function_name, project_type, function_type, input_
 VALUES(3388, 'gw_fct_admin_dynamic_trigger', 'utils', 'function', 'json', 'json', 'Function to insert or update columns dynamically through triggers', 'role_admin', NULL, 'core');
 
 UPDATE config_report SET query_text='SELECT e.name as "Exploitation", vec.connec_id, vec.code, vec.customer_code FROM v_edit_connec vec JOIN exploitation e USING (expl_id) ' WHERE id=101;
+
+-- 10/04/25
+ALTER TABLE config_info_layer DROP COLUMN tableparent_id;
+
+UPDATE config_info_layer SET is_parent=true WHERE layer_id='v_edit_node';
+UPDATE config_info_layer SET is_parent=true WHERE layer_id='v_edit_connec';
+UPDATE config_info_layer SET is_parent=true WHERE layer_id='v_edit_arc';
