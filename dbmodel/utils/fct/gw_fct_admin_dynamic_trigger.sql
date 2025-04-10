@@ -42,6 +42,8 @@ v_parent_layer TEXT;
 v_feature_type TEXT;
 
 BEGIN
+
+	SET search_path = "SCHEMA_NAME", public;
 	
 	v_origin_table :=  ((p_data ->> 'data')::json->>'parameters')::json->> 'originTable';
 	v_column_pkey := ((p_data ->> 'data')::json->>'parameters')::json->> 'pkeyColumn';
