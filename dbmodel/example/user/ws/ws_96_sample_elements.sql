@@ -1021,8 +1021,8 @@ SELECT generate_series(1422, 1702), concat('E', generate_series(1422, 1702)), 'R
 SELECT generate_series(1897, 2032), concat('E', generate_series(1897, 2032)), 'PROTECT-BAND', 1, 2, 1, 1 UNION
 SELECT generate_series(2033, 2162), concat('E', generate_series(2033, 2162)), 'PROTECT-BAND', 1, 2, 1, 2;
 
-UPDATE element SET tstamp = now(), num_elements = 1, location_type = 'St. Location', workcat_id = 'work1', builtdate = '1900-01-01', ownercat_id = 'owner1', verified = 0, feature_type = 'ELEMENT', 
-insert_user = CURRENT_USER, trace_featuregeom = true, muni_id = 1, geometry_type = 'POINT';
+UPDATE element SET tstamp = now(), num_elements = 1, location_type = 'St. Location', workcat_id = 'work1', builtdate = '1900-01-01', ownercat_id = 'owner1', verified = 0, feature_type = 'GENELEMENT',
+insert_user = CURRENT_USER, trace_featuregeom = true, muni_id = 1;
 
 
 INSERT INTO element_x_arc VALUES ('1897', '2098');

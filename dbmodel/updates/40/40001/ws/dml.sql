@@ -81,3 +81,5 @@ FROM _sector;
 
 -- supplyzone is new
 -- omzone is new
+
+INSERT INTO cat_feature_element (id, epa_default, geometry_type) VALUES('REGISTER', 'UNDEFINED', 'POINT');

@@ -1054,59 +1054,6 @@ CREATE OR REPLACE VIEW v_state_element AS
     element
   WHERE ((element.state = selector_state.state_id) AND (selector_state.cur_user = CURRENT_USER));
 
-CREATE OR REPLACE VIEW v_edit_element AS
-SELECT e.* FROM ( SELECT element.element_id,
-    element.code,
-    element.datasource,
-    element.elementcat_id,
-    cat_element.element_type,
-    element.brand_id,
-    element.model_id,
-    element.serial_number,
-    element.state,
-    element.state_type,
-    element.num_elements,
-    element.observ,
-    element.comment,
-    element.function_type,
-    element.category_type,
-    element.location_type,
-    element.fluid_type,
-    element.workcat_id,
-    element.workcat_id_end,
-    element.builtdate,
-    element.enddate,
-    element.ownercat_id,
-    element.rotation,
-    concat(element_type.link_path, element.link) AS link,
-    element.verified,
-    element.the_geom,
-    element.label_x,
-    element.label_y,
-    element.label_rotation,
-    element.publish,
-    element.inventory,
-    element.undelete,
-    element.expl_id,
-    element.pol_id,
-    element.lastupdate,
-    element.lastupdate_user,
-    element.top_elev,
-    element.expl_id2,
-    element.trace_featuregeom,
-    element.muni_id,
-    element.sector_id,
-    element.lock_level
-   FROM selector_expl, element
-     JOIN v_state_element ON element.element_id::text = v_state_element.element_id::text
-     JOIN cat_element ON element.elementcat_id::text = cat_element.id::text
-     JOIN element_type ON element_type.id::text = cat_element.element_type::text
-  WHERE element.expl_id = selector_expl.expl_id AND selector_expl.cur_user = CURRENT_USER) e
-  LEFT JOIN selector_sector s USING (sector_id)
-  LEFT JOIN selector_municipality m USING (muni_id)
-  WHERE (s.cur_user = current_user OR s.sector_id IS NULL)
-  AND (m.cur_user = current_user OR e.muni_id IS NULL);
-
 CREATE OR REPLACE VIEW v_edit_minsector
 AS SELECT m.minsector_id,
     m.code,
@@ -1561,39 +1508,6 @@ AS SELECT DISTINCT ON (r.id) r.id,
    JOIN ext_cat_raster c ON c.id = r.rastercat_id
    WHERE st_dwithin(r.envelope, a.the_geom, 0::double precision);
 
-CREATE OR REPLACE VIEW ve_pol_element
-AS SELECT e.pol_id,
-    e.element_id,
-    polygon.the_geom,
-    polygon.trace_featuregeom
-    FROM v_edit_element e
-    JOIN polygon USING (pol_id);
-
-CREATE OR REPLACE VIEW v_ui_presszone
-AS SELECT p.presszone_id,
-    p.name,
-    p.code,
-    p.presszone_type,
-    p.descript,
-    p.active,
-    p.lock_level,
-    p.graphconfig,
-    p.stylesheet,
-    p.head,
-    p.tstamp,
-    p.insert_user,
-    p.lastupdate,
-    p.lastupdate_user,
-    p.avg_press,
-    p.link,
-    p.muni_id,
-    p.expl_id,
-    p.sector_id
-   FROM selector_expl s,
-    presszone p
-  WHERE p.presszone_id <> ALL (ARRAY[0, -1]::integer[])
-  ORDER BY p.presszone_id;
-
 CREATE OR REPLACE VIEW vu_element_x_arc
 AS SELECT
     element_x_arc.arc_id,
@@ -1706,104 +1620,6 @@ AS SELECT
      LEFT JOIN value_state_type ON element.state_type = value_state_type.id
      LEFT JOIN man_type_location ON man_type_location.location_type::text = element.location_type::text AND man_type_location.feature_type::text = 'ELEMENT'::text
      LEFT JOIN cat_element ON cat_element.id::text = element.elementcat_id::text;
-
-CREATE OR REPLACE VIEW v_ui_element_x_link
-AS SELECT
-    element_x_link.link_id,
-    element_x_link.element_id,
-    v_edit_element.elementcat_id,
-    cat_element.descript,
-    v_edit_element.num_elements,
-    value_state.name AS state,
-    value_state_type.name AS state_type,
-    v_edit_element.observ,
-    v_edit_element.comment,
-    v_edit_element.location_type,
-    v_edit_element.builtdate,
-    v_edit_element.enddate,
-    v_edit_element.link,
-    v_edit_element.publish,
-    v_edit_element.inventory
-   FROM element_x_link
-     JOIN v_edit_element ON v_edit_element.element_id::text = element_x_link.element_id::text
-     JOIN value_state ON v_edit_element.state = value_state.id
-     LEFT JOIN value_state_type ON v_edit_element.state_type = value_state_type.id
-     LEFT JOIN man_type_location ON man_type_location.location_type::text = v_edit_element.location_type::text AND man_type_location.feature_type::text = 'ELEMENT'::text
-     LEFT JOIN cat_element ON cat_element.id::text = v_edit_element.elementcat_id::text;
-
-CREATE OR REPLACE VIEW v_ui_element_x_node
-AS SELECT
-    element_x_node.node_id,
-    element_x_node.element_id,
-    v_edit_element.elementcat_id,
-    cat_element.descript,
-    v_edit_element.num_elements,
-    value_state.name AS state,
-    value_state_type.name AS state_type,
-    v_edit_element.observ,
-    v_edit_element.comment,
-    v_edit_element.location_type,
-    v_edit_element.builtdate,
-    v_edit_element.enddate,
-    v_edit_element.link,
-    v_edit_element.publish,
-    v_edit_element.inventory
-   FROM element_x_node
-     JOIN v_edit_element ON v_edit_element.element_id::text = element_x_node.element_id::text
-     JOIN value_state ON v_edit_element.state = value_state.id
-     LEFT JOIN value_state_type ON v_edit_element.state_type = value_state_type.id
-     LEFT JOIN man_type_location ON man_type_location.location_type::text = v_edit_element.location_type::text AND man_type_location.feature_type::text = 'ELEMENT'::text
-     LEFT JOIN cat_element ON cat_element.id::text = v_edit_element.elementcat_id::text;
-
-
-CREATE OR REPLACE VIEW v_ui_element_x_connec
-AS SELECT
-    element_x_connec.connec_id,
-    element_x_connec.element_id,
-    v_edit_element.elementcat_id,
-    cat_element.descript,
-    v_edit_element.num_elements,
-    value_state.name AS state,
-    value_state_type.name AS state_type,
-    v_edit_element.observ,
-    v_edit_element.comment,
-    v_edit_element.location_type,
-    v_edit_element.builtdate,
-    v_edit_element.enddate,
-    v_edit_element.link,
-    v_edit_element.publish,
-    v_edit_element.inventory
-   FROM element_x_connec
-     JOIN v_edit_element ON v_edit_element.element_id::text = element_x_connec.element_id::text
-     JOIN value_state ON v_edit_element.state = value_state.id
-     LEFT JOIN value_state_type ON v_edit_element.state_type = value_state_type.id
-     LEFT JOIN man_type_location ON man_type_location.location_type::text = v_edit_element.location_type::text AND man_type_location.feature_type::text = 'ELEMENT'::text
-     LEFT JOIN cat_element ON cat_element.id::text = v_edit_element.elementcat_id::text;
-
-
-CREATE OR REPLACE VIEW v_ui_element_x_arc
-AS SELECT
-    element_x_arc.arc_id,
-    element_x_arc.element_id,
-    v_edit_element.elementcat_id,
-    cat_element.descript,
-    v_edit_element.num_elements,
-    value_state.name AS state,
-    value_state_type.name AS state_type,
-    v_edit_element.observ,
-    v_edit_element.comment,
-    v_edit_element.location_type,
-    v_edit_element.builtdate,
-    v_edit_element.enddate,
-    v_edit_element.link,
-    v_edit_element.publish,
-    v_edit_element.inventory
-   FROM element_x_arc
-     JOIN v_edit_element ON v_edit_element.element_id::text = element_x_arc.element_id::text
-     JOIN value_state ON v_edit_element.state = value_state.id
-     LEFT JOIN value_state_type ON v_edit_element.state_type = value_state_type.id
-     LEFT JOIN man_type_location ON man_type_location.location_type::text = v_edit_element.location_type::text AND man_type_location.feature_type::text = 'ELEMENT'::text
-     LEFT JOIN cat_element ON cat_element.id::text = v_edit_element.elementcat_id::text;
 
 CREATE OR REPLACE VIEW v_ui_arc_x_relations
 AS WITH links_node AS (
@@ -3985,72 +3801,6 @@ AS SELECT plan_psector.psector_id,
           GROUP BY v_plan_psector_x_other.psector_id) c ON c.psector_id = plan_psector.psector_id
   WHERE plan_psector.psector_id = selector_psector.psector_id AND selector_psector.cur_user = CURRENT_USER;
 
-CREATE OR REPLACE VIEW v_plan_psector_node
-AS SELECT row_number() OVER () AS rid,
-    node.node_id,
-    plan_psector_x_node.psector_id,
-    node.code,
-    node.nodecat_id,
-    cat_node.node_type,
-    cat_feature.feature_class,
-    node.state AS original_state,
-    node.state_type AS original_state_type,
-    plan_psector_x_node.state AS plan_state,
-    plan_psector_x_node.doable,
-    plan_psector.priority AS psector_priority,
-    node.the_geom
-   FROM selector_psector,
-    node
-     JOIN plan_psector_x_node USING (node_id)
-     JOIN plan_psector USING (psector_id)
-     JOIN cat_node ON cat_node.id::text = node.nodecat_id::text
-     JOIN cat_feature ON cat_feature.id::text = cat_node.node_type::text
-  WHERE plan_psector_x_node.psector_id = selector_psector.psector_id AND selector_psector.cur_user = CURRENT_USER;
-
-CREATE OR REPLACE VIEW v_plan_psector_connec
-AS SELECT row_number() OVER () AS rid,
-    connec.connec_id,
-    plan_psector_x_connec.psector_id,
-    connec.code,
-    connec.conneccat_id,
-    cat_connec.connec_type,
-    cat_feature.feature_class,
-    connec.state AS original_state,
-    connec.state_type AS original_state_type,
-    plan_psector_x_connec.state AS plan_state,
-    plan_psector_x_connec.doable,
-    plan_psector.priority AS psector_priority,
-    connec.the_geom
-   FROM selector_psector,
-    connec
-     JOIN plan_psector_x_connec USING (connec_id)
-     JOIN plan_psector USING (psector_id)
-     JOIN cat_connec ON cat_connec.id::text = connec.conneccat_id::text
-     JOIN cat_feature ON cat_feature.id::text = cat_connec.connec_type::text
-  WHERE plan_psector_x_connec.psector_id = selector_psector.psector_id AND selector_psector.cur_user = CURRENT_USER;
-
-CREATE OR REPLACE VIEW v_plan_psector_arc
-AS SELECT row_number() OVER () AS rid,
-    arc.arc_id,
-    plan_psector_x_arc.psector_id,
-    arc.code,
-    arc.arccat_id,
-    cat_arc.arc_type,
-    cat_feature.feature_class,
-    arc.state AS original_state,
-    arc.state_type AS original_state_type,
-    plan_psector_x_arc.state AS plan_state,
-    plan_psector_x_arc.doable,
-    plan_psector_x_arc.addparam::text AS addparam,
-    plan_psector.priority AS psector_priority,
-    arc.the_geom
-   FROM selector_psector,
-    arc
-     JOIN plan_psector_x_arc USING (arc_id)
-     JOIN plan_psector USING (psector_id)
-     JOIN cat_arc ON cat_arc.id::text = arc.arccat_id::text
-     JOIN cat_feature ON cat_feature.id::text = cat_arc.arc_type::text
-  WHERE plan_psector_x_arc.psector_id = selector_psector.psector_id AND selector_psector.cur_user = CURRENT_USER;
 
 CREATE OR REPLACE VIEW v_plan_current_psector
 AS SELECT plan_psector.psector_id,
