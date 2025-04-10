@@ -3171,102 +3171,6 @@ AS SELECT inp_subcatchment.hydrology_id,
   WHERE inp_subcatchment.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND inp_subcatchment.muni_id = selector_municipality.muni_id AND selector_municipality.cur_user = "current_user"()::text AND inp_subcatchment.hydrology_id = config_param_user.value::integer AND config_param_user.cur_user::text = "current_user"()::text AND config_param_user.parameter::text = 'inp_options_hydrology_scenario'::text;
 
 
-CREATE OR REPLACE VIEW vi_coverages
-AS SELECT v_edit_inp_subcatchment.subc_id,
-    inp_coverage.landus_id,
-    inp_coverage.percent
-   FROM inp_coverage
-     JOIN v_edit_inp_subcatchment ON inp_coverage.subc_id::text = v_edit_inp_subcatchment.subc_id::text
-     LEFT JOIN ( SELECT DISTINCT ON (a.subc_id) a.subc_id,
-            v_edit_node.node_id
-           FROM ( SELECT unnest(inp_subcatchment.outlet_id::text[]) AS node_array,
-            inp_subcatchment.subc_id,
-            inp_subcatchment.outlet_id,
-            inp_subcatchment.rg_id,
-            inp_subcatchment.area,
-            inp_subcatchment.imperv,
-            inp_subcatchment.width,
-            inp_subcatchment.slope,
-            inp_subcatchment.clength,
-            inp_subcatchment.snow_id,
-            inp_subcatchment.nimp,
-            inp_subcatchment.nperv,
-            inp_subcatchment.simp,
-            inp_subcatchment.sperv,
-            inp_subcatchment.zero,
-            inp_subcatchment.routeto,
-            inp_subcatchment.rted,
-            inp_subcatchment.maxrate,
-            inp_subcatchment.minrate,
-            inp_subcatchment.decay,
-            inp_subcatchment.drytime,
-            inp_subcatchment.maxinfil,
-            inp_subcatchment.suction,
-            inp_subcatchment.conduct,
-            inp_subcatchment.initdef,
-            inp_subcatchment.curveno,
-            inp_subcatchment.conduct_2,
-            inp_subcatchment.drytime_2,
-            inp_subcatchment.sector_id,
-            inp_subcatchment.hydrology_id,
-            inp_subcatchment.the_geom,
-            inp_subcatchment.descript
-            FROM inp_subcatchment
-            WHERE "left"(inp_subcatchment.outlet_id::text, 1) = '{'::text) a
-    JOIN v_edit_node ON v_edit_node.node_id::text = a.node_array) b ON v_edit_inp_subcatchment.subc_id::text = b.subc_id::text;
-
-CREATE OR REPLACE VIEW vi_groundwater
-AS SELECT inp_groundwater.subc_id,
-    inp_groundwater.aquif_id,
-    inp_groundwater.node_id,
-    inp_groundwater.surfel,
-    inp_groundwater.a1,
-    inp_groundwater.b1,
-    inp_groundwater.a2,
-    inp_groundwater.b2,
-    inp_groundwater.a3,
-    inp_groundwater.tw,
-    inp_groundwater.h
-   FROM v_edit_inp_subcatchment
-     JOIN inp_groundwater ON inp_groundwater.subc_id::text = v_edit_inp_subcatchment.subc_id::text
-     LEFT JOIN ( SELECT DISTINCT ON (a.subc_id) a.subc_id,
-            v_edit_node.node_id
-           FROM ( SELECT unnest(inp_subcatchment.outlet_id::text[]) AS node_array,
-            inp_subcatchment.subc_id,
-            inp_subcatchment.outlet_id,
-            inp_subcatchment.rg_id,
-            inp_subcatchment.area,
-            inp_subcatchment.imperv,
-            inp_subcatchment.width,
-            inp_subcatchment.slope,
-            inp_subcatchment.clength,
-            inp_subcatchment.snow_id,
-            inp_subcatchment.nimp,
-            inp_subcatchment.nperv,
-            inp_subcatchment.simp,
-            inp_subcatchment.sperv,
-            inp_subcatchment.zero,
-            inp_subcatchment.routeto,
-            inp_subcatchment.rted,
-            inp_subcatchment.maxrate,
-            inp_subcatchment.minrate,
-            inp_subcatchment.decay,
-            inp_subcatchment.drytime,
-            inp_subcatchment.maxinfil,
-            inp_subcatchment.suction,
-            inp_subcatchment.conduct,
-            inp_subcatchment.initdef,
-            inp_subcatchment.curveno,
-            inp_subcatchment.conduct_2,
-            inp_subcatchment.drytime_2,
-            inp_subcatchment.sector_id,
-            inp_subcatchment.hydrology_id,
-            inp_subcatchment.the_geom,
-            inp_subcatchment.descript
-           FROM inp_subcatchment
-          WHERE "left"(inp_subcatchment.outlet_id::text, 1) = '{'::text) a
-         JOIN v_edit_node ON v_edit_node.node_id::text = a.node_array) b ON v_edit_inp_subcatchment.subc_id::text = b.subc_id::text;
-
 CREATE OR REPLACE VIEW ve_pol_chamber
 AS SELECT polygon.pol_id,
     polygon.feature_id AS node_id,
@@ -5577,22 +5481,6 @@ AS SELECT polygon.pol_id,
     FROM polygon
     JOIN v_edit_gully ON polygon.feature_id::text = v_edit_gully.gully_id::text;
 
-CREATE OR REPLACE VIEW vi_gully2node
-AS SELECT a.gully_id,
-    n.node_id,
-    st_makeline(a.the_geom, n.the_geom) AS the_geom
-   FROM ( SELECT g.gully_id,
-                CASE
-                    WHEN g.pjoint_type::text = 'NODE'::text THEN g.pjoint_id
-                    ELSE a_1.node_2
-                END AS node_id,
-            a_1.expl_id,
-            g.the_geom
-           FROM v_edit_inp_gully g
-             LEFT JOIN arc a_1 USING (arc_id)) a
-     JOIN node n USING (node_id);
-
-
 CREATE OR REPLACE VIEW v_edit_raingage AS
  SELECT raingage.rg_id,
     raingage.form_type,
@@ -6693,92 +6581,6 @@ AS SELECT anl_connec.id,
      JOIN exploitation ON anl_connec.expl_id = exploitation.expl_id
   WHERE anl_connec.fid = selector_audit.fid AND selector_audit.cur_user = "current_user"()::text AND anl_connec.cur_user::name = "current_user"();
 
-CREATE OR REPLACE VIEW vi_options
-AS SELECT a.parameter,
-    a.value
-   FROM ( SELECT a_1.idval AS parameter,
-            b.value,
-                CASE
-                    WHEN a_1.layoutname ~~ '%general_1%'::text THEN '1'::text
-                    WHEN a_1.layoutname ~~ '%hydraulics_1%'::text THEN '2'::text
-                    WHEN a_1.layoutname ~~ '%hydraulics_2%'::text THEN '3'::text
-                    WHEN a_1.layoutname ~~ '%date_1%'::text THEN '3'::text
-                    WHEN a_1.layoutname ~~ '%date_2%'::text THEN '4'::text
-                    WHEN a_1.layoutname ~~ '%general_2%'::text THEN '5'::text
-                    ELSE NULL::text
-                END AS layoutname,
-            a_1.layoutorder
-           FROM sys_param_user a_1
-             JOIN config_param_user b ON a_1.id = b.parameter::text
-          WHERE (a_1.layoutname = ANY (ARRAY['lyt_general_1'::text, 'lyt_general_2'::text, 'lyt_hydraulics_1'::text, 'lyt_hydraulics_2'::text, 'lyt_date_1'::text, 'lyt_date_2'::text])) AND b.cur_user::name = "current_user"() AND b.value IS NOT NULL AND a_1.idval IS NOT NULL
-        UNION
-         SELECT 'INFILTRATION'::text AS parameter,
-            cat_hydrology.infiltration AS value,
-            '1'::text AS text,
-            2
-           FROM config_param_user,
-            cat_hydrology
-          WHERE config_param_user.parameter::text = 'inp_options_hydrology_scenario'::text AND config_param_user.cur_user::text = "current_user"()::text) a
-  ORDER BY a.layoutname, a.layoutorder;
-
-CREATE OR REPLACE VIEW vi_report
-AS SELECT a.idval AS parameter,
-    b.value
-   FROM sys_param_user a
-     JOIN config_param_user b ON a.id = b.parameter::text
-  WHERE (a.layoutname = ANY (ARRAY['lyt_reports_1'::text, 'lyt_reports_2'::text])) AND b.cur_user::name = "current_user"() AND b.value IS NOT NULL
-  ORDER BY a.idval;
-
-
-CREATE OR REPLACE VIEW vi_timeseries
-AS SELECT b.timser_id,
-    b.other1,
-    b.other2,
-    b.other3
-   FROM ( SELECT t.id,
-            t.timser_id,
-            t.other1,
-            t.other2,
-            t.other3
-           FROM selector_expl s,
-            ( SELECT a.id,
-                    a.timser_id,
-                    a.other1,
-                    a.other2,
-                    a.other3,
-                    a.expl_id
-                   FROM ( SELECT inp_timeseries_value.id,
-                            inp_timeseries_value.timser_id,
-                            inp_timeseries_value.date AS other1,
-                            inp_timeseries_value.hour AS other2,
-                            inp_timeseries_value.value AS other3,
-                            inp_timeseries.expl_id
-                           FROM inp_timeseries_value
-                             JOIN inp_timeseries ON inp_timeseries_value.timser_id::text = inp_timeseries.id::text
-                          WHERE inp_timeseries.times_type::text = 'ABSOLUTE'::text AND inp_timeseries.active
-                        UNION
-                         SELECT inp_timeseries_value.id,
-                            inp_timeseries_value.timser_id,
-                            concat('FILE', ' ', inp_timeseries.fname) AS other1,
-                            NULL::character varying AS other2,
-                            NULL::numeric AS other3,
-                            inp_timeseries.expl_id
-                           FROM inp_timeseries_value
-                             JOIN inp_timeseries ON inp_timeseries_value.timser_id::text = inp_timeseries.id::text
-                          WHERE inp_timeseries.times_type::text = 'FILE'::text AND inp_timeseries.active
-                        UNION
-                         SELECT inp_timeseries_value.id,
-                            inp_timeseries_value.timser_id,
-                            NULL::text AS other1,
-                            inp_timeseries_value."time" AS other2,
-                            inp_timeseries_value.value::numeric AS other3,
-                            inp_timeseries.expl_id
-                           FROM inp_timeseries_value
-                             JOIN inp_timeseries ON inp_timeseries_value.timser_id::text = inp_timeseries.id::text
-                          WHERE inp_timeseries.times_type::text = 'RELATIVE'::text AND inp_timeseries.active) a
-                  ORDER BY a.id) t
-          WHERE t.expl_id = s.expl_id AND s.cur_user = "current_user"()::text OR t.expl_id IS NULL) b
-  ORDER BY b.id;
 
 CREATE OR REPLACE VIEW v_edit_inp_coverage
 AS SELECT c.subc_id,
@@ -6790,36 +6592,6 @@ AS SELECT c.subc_id,
     inp_coverage c
      JOIN inp_subcatchment s USING (subc_id)
   WHERE s.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text AND c.hydrology_id = config_param_user.value::integer AND config_param_user.cur_user::text = "current_user"()::text AND config_param_user.parameter::text = 'inp_options_hydrology_scenario'::text;
-
-CREATE OR REPLACE VIEW vi_dwf
-AS SELECT rpt_inp_node.node_id,
-    'FLOW'::text AS type_dwf,
-    inp_dwf.value,
-    inp_dwf.pat1,
-    inp_dwf.pat2,
-    inp_dwf.pat3,
-    inp_dwf.pat4
-   FROM selector_inp_result,
-    rpt_inp_node
-     JOIN inp_dwf ON inp_dwf.node_id::text = rpt_inp_node.node_id::text
-  WHERE rpt_inp_node.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text AND inp_dwf.dwfscenario_id = (( SELECT config_param_user.value::integer AS value
-           FROM config_param_user
-          WHERE config_param_user.parameter::text = 'inp_options_dwfscenario'::text AND config_param_user.cur_user::text = CURRENT_USER))
-UNION
- SELECT rpt_inp_node.node_id,
-    inp_dwf_pol_x_node.poll_id AS type_dwf,
-    inp_dwf_pol_x_node.value,
-    inp_dwf_pol_x_node.pat1,
-    inp_dwf_pol_x_node.pat2,
-    inp_dwf_pol_x_node.pat3,
-    inp_dwf_pol_x_node.pat4
-   FROM selector_inp_result,
-    rpt_inp_node
-     JOIN inp_dwf_pol_x_node ON inp_dwf_pol_x_node.node_id::text = rpt_inp_node.node_id::text
-  WHERE rpt_inp_node.result_id::text = selector_inp_result.result_id::text AND selector_inp_result.cur_user = "current_user"()::text AND inp_dwf_pol_x_node.dwfscenario_id = (( SELECT config_param_user.value::integer AS value
-           FROM config_param_user
-          WHERE config_param_user.parameter::text = 'inp_options_dwfscenario'::text AND config_param_user.cur_user::text = CURRENT_USER));
-
 
 CREATE OR REPLACE VIEW v_edit_inp_dscenario_lids
 AS SELECT sd.dscenario_id,
@@ -6838,146 +6610,6 @@ AS SELECT sd.dscenario_id,
     inp_dscenario_lids l
      JOIN v_edit_inp_subcatchment s USING (subc_id)
   WHERE l.dscenario_id = sd.dscenario_id AND sd.cur_user = CURRENT_USER;
-
-CREATE OR REPLACE VIEW vi_gwf
-AS SELECT inp_groundwater.subc_id,
-    ('LATERAL'::text || ' '::text) || inp_groundwater.fl_eq_lat::text AS fl_eq_lat,
-    ('DEEP'::text || ' '::text) || inp_groundwater.fl_eq_lat::text AS fl_eq_deep
-   FROM v_edit_inp_subcatchment
-     JOIN inp_groundwater ON inp_groundwater.subc_id::text = v_edit_inp_subcatchment.subc_id::text;
-
-CREATE OR REPLACE VIEW vi_infiltration
-AS SELECT v_edit_inp_subcatchment.subc_id,
-    v_edit_inp_subcatchment.curveno AS other1,
-    v_edit_inp_subcatchment.conduct_2 AS other2,
-    v_edit_inp_subcatchment.drytime_2 AS other3,
-    NULL::numeric AS other4,
-    NULL::double precision AS other5
-   FROM v_edit_inp_subcatchment
-     JOIN cat_hydrology ON cat_hydrology.hydrology_id = v_edit_inp_subcatchment.hydrology_id
-     JOIN ( SELECT a.subc_id,
-            a.outlet_id
-           FROM ( SELECT unnest(inp_subcatchment.outlet_id::character varying[]) AS outlet_id,
-                    inp_subcatchment.subc_id
-                   FROM inp_subcatchment
-                     JOIN temp_node ON inp_subcatchment.outlet_id::text = temp_node.node_id::text
-                  WHERE "left"(inp_subcatchment.outlet_id::text, 1) = '{'::text
-                UNION
-                 SELECT inp_subcatchment.outlet_id,
-                    inp_subcatchment.subc_id
-                   FROM inp_subcatchment
-                  WHERE "left"(inp_subcatchment.outlet_id::text, 1) <> '{'::text) a) b USING (outlet_id)
-  WHERE cat_hydrology.infiltration::text = 'CURVE_NUMBER'::text
-UNION
- SELECT v_edit_inp_subcatchment.subc_id,
-    v_edit_inp_subcatchment.suction AS other1,
-    v_edit_inp_subcatchment.conduct AS other2,
-    v_edit_inp_subcatchment.initdef AS other3,
-    NULL::integer AS other4,
-    NULL::double precision AS other5
-   FROM v_edit_inp_subcatchment
-     JOIN cat_hydrology ON cat_hydrology.hydrology_id = v_edit_inp_subcatchment.hydrology_id
-     JOIN ( SELECT a.subc_id,
-            a.outlet_id
-           FROM ( SELECT unnest(inp_subcatchment.outlet_id::character varying[]) AS outlet_id,
-                    inp_subcatchment.subc_id
-                   FROM inp_subcatchment
-                     JOIN temp_node ON inp_subcatchment.outlet_id::text = temp_node.node_id::text
-                  WHERE "left"(inp_subcatchment.outlet_id::text, 1) = '{'::text
-                UNION
-                 SELECT inp_subcatchment.outlet_id,
-                    inp_subcatchment.subc_id
-                   FROM inp_subcatchment
-                  WHERE "left"(inp_subcatchment.outlet_id::text, 1) <> '{'::text) a) b USING (outlet_id)
-  WHERE cat_hydrology.infiltration::text = 'GREEN_AMPT'::text
-UNION
- SELECT v_edit_inp_subcatchment.subc_id,
-    v_edit_inp_subcatchment.curveno AS other1,
-    v_edit_inp_subcatchment.conduct_2 AS other2,
-    v_edit_inp_subcatchment.drytime_2 AS other3,
-    NULL::integer AS other4,
-    NULL::double precision AS other5
-   FROM v_edit_inp_subcatchment
-     JOIN cat_hydrology ON cat_hydrology.hydrology_id = v_edit_inp_subcatchment.hydrology_id
-     JOIN ( SELECT a.subc_id,
-            a.outlet_id
-           FROM ( SELECT unnest(inp_subcatchment.outlet_id::character varying[]) AS outlet_id,
-                    inp_subcatchment.subc_id
-                   FROM inp_subcatchment
-                     JOIN temp_node ON inp_subcatchment.outlet_id::text = temp_node.node_id::text
-                  WHERE "left"(inp_subcatchment.outlet_id::text, 1) = '{'::text
-                UNION
-                 SELECT inp_subcatchment.outlet_id,
-                    inp_subcatchment.subc_id
-                   FROM inp_subcatchment
-                  WHERE "left"(inp_subcatchment.outlet_id::text, 1) <> '{'::text) a) b USING (outlet_id)
-  WHERE cat_hydrology.infiltration::text = ANY (ARRAY['MODIFIED_HORTON'::text, 'HORTON'::text]);
-
-CREATE OR REPLACE VIEW vi_lid_usage
-AS SELECT temp_lid_usage.subc_id,
-    temp_lid_usage.lidco_id,
-    temp_lid_usage.numelem::integer AS numelem,
-    temp_lid_usage.area,
-    temp_lid_usage.width,
-    temp_lid_usage.initsat,
-    temp_lid_usage.fromimp,
-    temp_lid_usage.toperv::integer AS toperv,
-    temp_lid_usage.rptfile
-   FROM v_edit_inp_subcatchment
-     JOIN temp_lid_usage ON temp_lid_usage.subc_id::text = v_edit_inp_subcatchment.subc_id::text;
-
-CREATE OR REPLACE VIEW vi_subareas
-AS SELECT DISTINCT v_edit_inp_subcatchment.subc_id,
-    v_edit_inp_subcatchment.nimp,
-    v_edit_inp_subcatchment.nperv,
-    v_edit_inp_subcatchment.simp,
-    v_edit_inp_subcatchment.sperv,
-    v_edit_inp_subcatchment.zero,
-    v_edit_inp_subcatchment.routeto,
-    v_edit_inp_subcatchment.rted
-   FROM v_edit_inp_subcatchment
-     JOIN ( SELECT a.subc_id,
-            a.outlet_id
-           FROM ( SELECT unnest(inp_subcatchment.outlet_id::character varying[]) AS outlet_id,
-                    inp_subcatchment.subc_id
-                   FROM inp_subcatchment
-                     JOIN temp_node ON inp_subcatchment.outlet_id::text = temp_node.node_id::text
-                  WHERE "left"(inp_subcatchment.outlet_id::text, 1) = '{'::text
-                UNION
-                 SELECT inp_subcatchment.outlet_id,
-                    inp_subcatchment.subc_id
-                   FROM inp_subcatchment
-                  WHERE "left"(inp_subcatchment.outlet_id::text, 1) <> '{'::text) a) b USING (outlet_id);
-
-CREATE OR REPLACE VIEW vi_subcatchcentroid
-AS SELECT v_edit_inp_subcatchment.subc_id,
-    v_edit_inp_subcatchment.hydrology_id,
-    st_centroid(v_edit_inp_subcatchment.the_geom) AS the_geom
-   FROM v_edit_inp_subcatchment;
-
-CREATE OR REPLACE VIEW vi_subcatchments
-AS SELECT DISTINCT v_edit_inp_subcatchment.subc_id,
-    v_edit_inp_subcatchment.rg_id,
-    b.outlet_id,
-    v_edit_inp_subcatchment.area,
-    v_edit_inp_subcatchment.imperv,
-    v_edit_inp_subcatchment.width,
-    v_edit_inp_subcatchment.slope,
-    v_edit_inp_subcatchment.clength,
-    v_edit_inp_subcatchment.snow_id
-   FROM v_edit_inp_subcatchment
-     JOIN ( SELECT a.subc_id,
-            a.outlet_id
-           FROM ( SELECT unnest(inp_subcatchment.outlet_id::character varying[]) AS outlet_id,
-                    inp_subcatchment.subc_id
-                   FROM inp_subcatchment
-                     JOIN temp_node ON inp_subcatchment.outlet_id::text = temp_node.node_id::text
-                  WHERE "left"(inp_subcatchment.outlet_id::text, 1) = '{'::text
-                UNION
-                 SELECT inp_subcatchment.outlet_id,
-                    inp_subcatchment.subc_id
-                   FROM inp_subcatchment
-                  WHERE "left"(inp_subcatchment.outlet_id::text, 1) <> '{'::text) a) b USING (outlet_id);
 
 CREATE OR REPLACE VIEW v_edit_inp_subc2outlet
 AS SELECT a.subc_id,
@@ -7002,13 +6634,6 @@ AS SELECT a.subc_id,
            FROM v_edit_inp_subcatchment s1
              JOIN v_edit_inp_subcatchment s2 ON s1.outlet_id::text = s2.subc_id::text) a;
 
-
-CREATE OR REPLACE VIEW vi_loadings
-AS SELECT inp_loadings.subc_id,
-    inp_loadings.poll_id,
-    inp_loadings.ibuildup
-   FROM v_edit_inp_subcatchment
-     JOIN inp_loadings ON inp_loadings.subc_id::text = v_edit_inp_subcatchment.subc_id::text;
 
 CREATE OR REPLACE VIEW v_ui_drainzone
 AS SELECT d.drainzone_id,

@@ -6,6 +6,18 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
+DROP TRIGGER IF EXISTS gw_trg_vi_conduits ON vi_conduits;
+DROP TRIGGER IF EXISTS gw_trg_vi_dividers ON vi_dividers;
+DROP TRIGGER IF EXISTS gw_trg_vi_losses ON vi_losses;
+DROP TRIGGER IF EXISTS gw_trg_vi_orifices ON vi_orifices;
+DROP TRIGGER IF EXISTS gw_trg_vi_outfalls ON vi_outfalls;
+DROP TRIGGER IF EXISTS gw_trg_vi_outlets ON vi_outlets;
+DROP TRIGGER IF EXISTS gw_trg_vi_storage ON vi_storage;
+DROP TRIGGER IF EXISTS gw_trg_vi_weirs ON vi_weirs;
+DROP TRIGGER IF EXISTS gw_trg_vi_xsections ON vi_xsections;
+DROP TRIGGER IF EXISTS gw_trg_vi_quality ON vi_quality;
+
+
 CREATE TRIGGER gw_trg_edit_cat_feature INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_cat_feature_link
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_cat_feature('link');
 

@@ -28,6 +28,49 @@ DROP VIEW IF EXISTS v_state_link_connec;
 DROP VIEW IF EXISTS v_edit_flwreg CASCADE;
 DROP VIEW IF EXISTS v_edit_inp_flwreg_pump CASCADE;
 DROP VIEW IF EXISTS v_edit_inp_dscenario_flwreg_pump CASCADE;
+DROP VIEW IF EXISTS vi_controls;
+DROP VIEW IF EXISTS vi_coordinates;
+DROP VIEW IF EXISTS vi_curves;
+DROP VIEW IF EXISTS vi_demands;
+DROP VIEW IF EXISTS vi_emitters;
+DROP VIEW IF EXISTS vi_junctions;
+DROP VIEW IF EXISTS vi_labels;
+DROP VIEW IF EXISTS vi_mixing;
+DROP VIEW IF EXISTS vi_patterns;
+DROP VIEW IF EXISTS vi_pipes;
+DROP VIEW IF EXISTS vi_pumps;
+DROP VIEW IF EXISTS vi_reservoirs;
+DROP VIEW IF EXISTS vi_rules;
+DROP VIEW IF EXISTS vi_sources;
+DROP VIEW IF EXISTS vi_status;
+DROP VIEW IF EXISTS vi_tags;
+DROP VIEW IF EXISTS vi_tanks;
+DROP VIEW IF EXISTS vi_title;
+DROP VIEW IF EXISTS vi_valves;
+DROP VIEW IF EXISTS vi_vertices;
+
+DROP VIEW IF EXISTS vi_adjustments;
+DROP VIEW IF EXISTS vi_aquifers;
+DROP VIEW IF EXISTS vi_buildup;
+DROP VIEW IF EXISTS vi_evaporation;
+DROP VIEW IF EXISTS vi_files;
+DROP VIEW IF EXISTS vi_gully;
+DROP VIEW IF EXISTS vi_hydrographs;
+DROP VIEW IF EXISTS vi_inflows;
+DROP VIEW IF EXISTS vi_landuses;
+DROP VIEW IF EXISTS vi_lid_controls;
+DROP VIEW IF EXISTS vi_map;
+DROP VIEW IF EXISTS vi_pollutants;
+DROP VIEW IF EXISTS vi_polygons;
+DROP VIEW IF EXISTS vi_raingages;
+DROP VIEW IF EXISTS vi_rdii;
+DROP VIEW IF EXISTS vi_snowpacks;
+DROP VIEW IF EXISTS vi_symbols;
+DROP VIEW IF EXISTS vi_temperature;
+DROP VIEW IF EXISTS vi_transects;
+DROP VIEW IF EXISTS vi_treatment;
+DROP VIEW IF EXISTS vi_washoff;
+
 
 CREATE OR REPLACE VIEW v_edit_cat_feature_link
 AS SELECT cat_feature.id,

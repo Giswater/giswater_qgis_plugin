@@ -190,22 +190,6 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_typevalue_fk('inp_dscenario_demand');
 CREATE TRIGGER gw_trg_edit_anl_hydrant INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_anl_hydrant
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_anl_hydrant();
 
-CREATE TRIGGER gw_trg_vi_options INSTEAD OF INSERT OR DELETE OR UPDATE ON vi_options
-FOR EACH ROW EXECUTE FUNCTION gw_trg_vi('vi_options');
-
-CREATE TRIGGER gw_trg_vi_report INSTEAD OF INSERT OR DELETE OR UPDATE ON vi_report
-FOR EACH ROW EXECUTE FUNCTION gw_trg_vi('vi_report');
-
-CREATE TRIGGER gw_trg_vi_times INSTEAD OF INSERT OR DELETE OR UPDATE ON vi_times
-FOR EACH ROW EXECUTE FUNCTION gw_trg_vi('vi_times');
-
-CREATE TRIGGER gw_trg_vi_reactions INSTEAD OF INSERT OR DELETE OR UPDATE ON vi_reactions
-FOR EACH ROW EXECUTE FUNCTION gw_trg_vi('vi_reactions');
-
-CREATE TRIGGER gw_trg_vi_energy INSTEAD OF INSERT OR DELETE OR UPDATE ON vi_energy
-FOR EACH ROW EXECUTE FUNCTION gw_trg_vi('vi_energy');
-
-
 CREATE TRIGGER gw_trg_edit_ve_epa_junction INSTEAD OF INSERT OR DELETE OR UPDATE ON
 ve_epa_junction FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_ve_epa('junction');
 

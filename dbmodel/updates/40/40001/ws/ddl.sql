@@ -41,3 +41,5 @@ CREATE TABLE inp_dscenario_flwreg_valve (
 	CONSTRAINT inp_dscenario_flwreg_valve_fkey_curve_id FOREIGN KEY (curve_id) REFERENCES inp_curve(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT inp_dscenario_flwreg_valve_fkey_element_id FOREIGN KEY (element_id) REFERENCES element(element_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+DROP FUNCTION IF EXISTS gw_trg_vi();
