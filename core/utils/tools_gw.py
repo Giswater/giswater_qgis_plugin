@@ -2815,7 +2815,8 @@ def get_role_permissions(qgis_project_role):
 
 def get_config_value(parameter='', columns='value', table='config_param_user', sql_added=None, log_info=True):
 
-    tools_db.check_db_connection()
+    if not tools_db.check_db_connection():
+        return None
     if not tools_db.check_table(table):
         tools_log.log_warning(f"Table not found: {table}")
         return None
