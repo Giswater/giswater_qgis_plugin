@@ -11,7 +11,7 @@ This version of Giswater is provided by Giswater Association
 CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getreport(p_data json)
   RETURNS json AS
 $BODY$
-	
+
 /*DESCRIPTION:
 
 This function has two logics with SQL:
@@ -21,7 +21,7 @@ This function has two logics with SQL:
 2) SQL WITH GROUP BY EXPRESSION. For use with this strategy:
 	- 'queryAdd' to concatenate after filter fields on initial query
 	- 'showOnTableModel' To show filterfields on tablemodel (as that fields are missed)
-	
+
 EXAMPLE:
 
 SELECT SCHEMA_NAME.gw_fct_getreport($${
@@ -67,7 +67,7 @@ BEGIN
 
 	-- Set search path to local schema
 	SET search_path = "SCHEMA_NAME", public;
-  
+
 	--  get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
 		INTO v_version;
@@ -81,7 +81,7 @@ BEGIN
 
 	--filter widgets
 	IF (SELECT filterparam FROM config_report WHERE id = v_list_id) IS NOT NULL THEN
-	
+
 		FOR i IN 0..(SELECT jsonb_array_length(filterparam::jsonb)-1 FROM config_report WHERE id = v_list_id) LOOP
 
 			SELECT filterparam::jsonb->>i into v_filterparam FROM config_report WHERE id = v_list_id;
@@ -93,8 +93,8 @@ BEGIN
 				INTO v_comboidval;
 
 				v_filterdvquery=(v_filterparam::jsonb || json_build_object(
-				'comboIds', v_comboid, 
-				'comboNames', v_comboidval, 
+				'comboIds', v_comboid,
+				'comboNames', v_comboidval,
 				'widgetname',json_extract_path_text(v_filterparam,'columnname'),
 				'filterSign', json_extract_path_text(v_filterparam,'filterSign'),
 				'showOnTableModel', json_extract_path_text(v_filterparam,'showOnTableModel'))::jsonb);
@@ -109,9 +109,9 @@ BEGIN
 
 	v_querytext = v_record.query_text;
 	IF v_filterinput IS NOT NULL THEN  -- when filter has not values form client
-		
+
 		FOREACH rec_filter IN ARRAY v_filterinput LOOP
-	
+
 			v_filtername = concat('"',json_extract_path_text(rec_filter::json,'filterName'),'"');
 			v_filtersign = json_extract_path_text(rec_filter::json,'filterSign');
 			v_filtervalue = json_extract_path_text(rec_filter::json,'filterValue');
@@ -119,17 +119,17 @@ BEGIN
 			IF v_filtersign  IS NULL THEN
 				v_filtersign='=';
 			END IF;
-            
+
 			IF v_filtervalue = 'None' THEN
 				v_filtervalue = '';
 			END IF;
-			
+
 			IF v_filtername != '' AND v_filtervalue != '' THEN
-			
+
 				IF v_queryadd IS NOT NULL THEN
 
 					v_querytext = concat(v_querytext,' AND ',v_filtername, v_filtersign, quote_literal(v_filtervalue));
-				ELSE 
+				ELSE
 					v_querytext = concat('SELECT * FROM (',v_querytext,') a WHERE ',v_filtername, v_filtersign, quote_literal(v_filtervalue));
 				END IF;
 			END IF;
@@ -138,9 +138,9 @@ BEGIN
 		IF v_queryadd IS NOT NULL THEN
 			v_querytext = concat(v_querytext,' ',v_queryadd, ' ');
 		END IF;
-		
+
 	ELSIF (SELECT filterparam FROM config_report WHERE id = v_list_id) IS NOT NULL THEN  -- when filter has values form client
-		
+
 		-- Look for default values in each widget
 		FOR i IN 0..(SELECT jsonb_array_length(filterparam::jsonb)-1 FROM config_report WHERE id = v_list_id) LOOP
 
@@ -149,12 +149,12 @@ BEGIN
 			v_filtername = concat('"',json_extract_path_text(v_filterparam::json,'columnname'),'"');
 			v_filtersign = json_extract_path_text(v_filterparam::json,'filterSign');
 			v_filterdefault  = (COALESCE(json_extract_path_text(v_filterparam::json,'filterDefault'), ''));
-			
+
 			IF v_filtername != '""' AND v_filterdefault != '' THEN
-			
+
 				IF v_queryadd IS NOT NULL THEN
 					v_querytext = concat(v_querytext,' AND ',v_filtername, v_filtersign, quote_literal(v_filterdefault));
-				ELSE 
+				ELSE
 					v_querytext = concat('SELECT * FROM (',v_querytext,') a WHERE ',v_filtername, v_filtersign, quote_literal(v_filtervalue));
 				END IF;
 			END IF;
@@ -167,15 +167,17 @@ BEGIN
 
 	END IF;
 
+
+	RAISE NOTICE 'v_querytext: %', v_querytext;
 	-- order by
 	v_default = (SELECT addparam->>'orderBy' FROM config_report WHERE id = v_list_id);
-	
+
 	IF v_default IS NOT NULL THEN
 		v_querytext = concat (v_querytext ,' ORDER BY ', v_default);
 		v_default = (SELECT addparam->>'orderType' FROM config_report WHERE id = v_list_id);
 		v_querytext = concat (v_querytext ,' ', v_default);
 	END IF;
-	
+
 	IF v_queryadd IS NOT NULL THEN
 		EXECUTE 'SELECT json_agg(t) FROM (SELECT * FROM ('||v_querytext||') a) t'
 		INTO v_fields ;

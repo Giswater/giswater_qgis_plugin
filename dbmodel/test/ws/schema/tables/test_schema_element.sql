@@ -80,9 +80,6 @@ SELECT fk_ok('element', 'brand_id', 'cat_brand', 'id', 'FK element_brand_id shou
 SELECT fk_ok('element', ARRAY['category_type','feature_type'], 'man_type_category', ARRAY['category_type','feature_type'], 'FK element_category_type_feature_type_fkey should exist');
 SELECT fk_ok('element', 'elementcat_id', 'cat_element', 'id', 'FK element_elementcat_id_fkey should exist');
 SELECT fk_ok('element', 'feature_type', 'sys_feature_class', 'id', 'FK element_feature_type_fkey should exist');
-SELECT fk_ok('element', ARRAY['fluid_type','feature_type'], 'man_type_fluid', ARRAY['fluid_type','feature_type'], 'FK element_fluid_type_feature_type_fkey should exist');
-SELECT fk_ok('element', ARRAY['function_type','feature_type'], 'man_type_function', ARRAY['function_type','feature_type'], 'FK element_function_type_feature_type_fkey should exist');
-SELECT fk_ok('element', ARRAY['location_type','feature_type'], 'man_type_location', ARRAY['location_type','feature_type'], 'FK element_location_type_feature_type_fkey should exist');
 SELECT fk_ok('element', 'model_id', 'cat_brand_model', 'id', 'FK element_model_id should exist');
 SELECT fk_ok('element', 'muni_id', 'ext_municipality', 'muni_id', 'FK element_muni_id should exist');
 SELECT fk_ok('element', 'ownercat_id', 'cat_owner', 'id', 'FK element_ownercat_id_fkey should exist');
@@ -108,7 +105,7 @@ SELECT col_not_null('element', 'state', 'Column state should be NOT NULL');
 SELECT col_not_null('element', 'state_type', 'Column state_type should be NOT NULL');
 
 SELECT col_default_is('element', 'element_id', 'nextval(''urn_id_seq''::regclass)', 'Column element_id should have default value');
-SELECT col_default_is('element', 'feature_type', 'ELEMENT', 'Column feature_type should have default value');
+SELECT col_default_is('element', 'feature_type', 'GENELEMENT', 'Column feature_type should have default value');
 SELECT col_default_is('element', 'tstamp', 'now()', 'Column tstamp should have default value');
 SELECT col_default_is('element', 'insert_user', 'CURRENT_USER', 'Column insert_user should have default value');
 SELECT col_default_is('element', 'trace_featuregeom', 'true', 'Column trace_featuregeom should have default value');

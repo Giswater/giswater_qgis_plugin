@@ -332,7 +332,7 @@ BEGIN
 			DELETE FROM selector_macrosector WHERE cur_user = current_user;
 			INSERT INTO selector_macrosector
 			SELECT DISTINCT macrosector_id, current_user FROM sector WHERE active is true and sector_id IN (SELECT DISTINCT (sector_id) FROM node
-			JOIN selector_expl using (expl_id) where cur_user = current_user);
+			JOIN selector_expl using (expl_id) where cur_user = current_user) AND macrosector_id IS NOT NULL;
 
 			-- sector
 			DELETE FROM selector_sector WHERE cur_user = current_user AND sector_id > 0;

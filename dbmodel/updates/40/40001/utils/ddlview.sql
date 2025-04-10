@@ -456,7 +456,7 @@ CREATE OR REPLACE VIEW v_edit_flwreg AS
     AND s.cur_user = "current_user"()::text AND m.cur_user = "current_user"()::text AND e.cur_user = "current_user"()::text;
 
 CREATE OR REPLACE VIEW v_edit_inp_flwreg_pump
-AS SELECT 
+AS SELECT
     f.element_id,
     f.nodarc_id,
     f.order_id,
@@ -551,3 +551,143 @@ AS SELECT row_number() OVER () AS rid,
      JOIN cat_arc ON cat_arc.id::text = arc.arccat_id::text
      JOIN cat_feature ON cat_feature.id::text = cat_arc.arc_type::text
   WHERE plan_psector_x_arc.psector_id = selector_psector.psector_id AND selector_psector.cur_user = "current_user"()::text;
+
+CREATE OR REPLACE VIEW v_ui_plan_psector
+AS SELECT plan_psector.psector_id,
+    plan_psector.ext_code,
+    plan_psector.name,
+    plan_psector.descript,
+    p.idval AS priority,
+    s.idval AS status,
+    plan_psector.text1,
+    plan_psector.text2,
+    plan_psector.observ,
+    plan_psector.vat,
+    plan_psector.other,
+    plan_psector.expl_id,
+    t.idval AS psector_type,
+    plan_psector.active,
+    plan_psector.archived,
+    plan_psector.workcat_id,
+    plan_psector.parent_id
+   FROM selector_expl,
+    plan_psector
+     JOIN exploitation USING (expl_id)
+     LEFT JOIN plan_typevalue p ON p.id::text = plan_psector.priority::text AND p.typevalue = 'value_priority'::text
+     LEFT JOIN plan_typevalue s ON s.id::text = plan_psector.status::text AND s.typevalue = 'psector_status'::text
+     LEFT JOIN plan_typevalue t ON t.id::integer = plan_psector.psector_type AND t.typevalue = 'psector_type'::text
+  WHERE plan_psector.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
+
+CREATE OR REPLACE VIEW v_om_mincut
+AS SELECT om_mincut.id,
+    om_mincut.work_order,
+    a.idval AS state,
+    b.idval AS class,
+    om_mincut.mincut_type,
+    om_mincut.received_date,
+    om_mincut.expl_id,
+    exploitation.name AS expl_name,
+    macroexploitation.name AS macroexpl_name,
+    om_mincut.macroexpl_id,
+    om_mincut.muni_id,
+    ext_municipality.name AS muni_name,
+    om_mincut.postcode,
+    om_mincut.streetaxis_id,
+    ext_streetaxis.name AS street_name,
+    om_mincut.postnumber,
+    c.idval AS anl_cause,
+    om_mincut.anl_tstamp,
+    om_mincut.anl_user,
+    om_mincut.anl_descript,
+    om_mincut.anl_feature_id,
+    om_mincut.anl_feature_type,
+    om_mincut.anl_the_geom,
+    om_mincut.forecast_start,
+    om_mincut.forecast_end,
+    om_mincut.assigned_to,
+    om_mincut.exec_start,
+    om_mincut.exec_end,
+    om_mincut.exec_user,
+    om_mincut.exec_descript,
+    om_mincut.exec_the_geom,
+    om_mincut.exec_from_plot,
+    om_mincut.exec_depth,
+    om_mincut.exec_appropiate,
+    om_mincut.chlorine,
+    om_mincut.turbidity,
+    om_mincut.notified,
+    om_mincut.output
+   FROM selector_mincut_result,
+    om_mincut
+     LEFT JOIN om_typevalue a ON a.id::integer = om_mincut.mincut_state AND a.typevalue = 'mincut_state'::text
+     LEFT JOIN om_typevalue b ON b.id::integer = om_mincut.mincut_class AND b.typevalue = 'mincut_class'::text
+     LEFT JOIN om_typevalue c ON c.id::integer = om_mincut.anl_cause::integer AND c.typevalue = 'mincut_cause'::text
+     LEFT JOIN exploitation ON om_mincut.expl_id = exploitation.expl_id
+     LEFT JOIN ext_streetaxis ON om_mincut.streetaxis_id::text = ext_streetaxis.id::text
+     LEFT JOIN macroexploitation ON om_mincut.macroexpl_id = macroexploitation.macroexpl_id
+     LEFT JOIN ext_municipality ON om_mincut.muni_id = ext_municipality.muni_id
+  WHERE selector_mincut_result.result_id = om_mincut.id AND selector_mincut_result.cur_user = "current_user"()::text AND om_mincut.id > 0;
+
+CREATE OR REPLACE VIEW v_om_mincut_initpoint
+AS SELECT om_mincut.id,
+    om_mincut.work_order,
+    a.idval AS state,
+    b.idval AS class,
+    om_mincut.mincut_type,
+    om_mincut.received_date,
+    om_mincut.expl_id,
+    exploitation.name AS expl_name,
+    macroexploitation.name AS macroexpl_name,
+    om_mincut.macroexpl_id,
+    om_mincut.muni_id,
+    ext_municipality.name AS muni_name,
+    om_mincut.postcode,
+    om_mincut.streetaxis_id,
+    ext_streetaxis.name AS street_name,
+    om_mincut.postnumber,
+    c.idval AS anl_cause,
+    om_mincut.anl_tstamp,
+    om_mincut.anl_user,
+    om_mincut.anl_descript,
+    om_mincut.anl_feature_id,
+    om_mincut.anl_feature_type,
+    om_mincut.anl_the_geom,
+    om_mincut.forecast_start,
+    om_mincut.forecast_end,
+    om_mincut.assigned_to,
+    om_mincut.exec_start,
+    om_mincut.exec_end,
+    om_mincut.exec_user,
+    om_mincut.exec_descript,
+    om_mincut.exec_from_plot,
+    om_mincut.exec_depth,
+    om_mincut.exec_appropiate,
+    om_mincut.notified,
+    om_mincut.output
+   FROM selector_mincut_result,
+    om_mincut
+     LEFT JOIN om_typevalue a ON a.id::integer = om_mincut.mincut_state AND a.typevalue = 'mincut_state'::text
+     LEFT JOIN om_typevalue b ON b.id::integer = om_mincut.mincut_class AND b.typevalue = 'mincut_class'::text
+     LEFT JOIN om_typevalue c ON c.id::integer = om_mincut.anl_cause::integer AND c.typevalue = 'mincut_cause'::text
+     LEFT JOIN exploitation ON om_mincut.expl_id = exploitation.expl_id
+     LEFT JOIN ext_streetaxis ON om_mincut.streetaxis_id::text = ext_streetaxis.id::text
+     LEFT JOIN macroexploitation ON om_mincut.macroexpl_id = macroexploitation.macroexpl_id
+     LEFT JOIN ext_municipality ON om_mincut.muni_id = ext_municipality.muni_id
+  WHERE selector_mincut_result.result_id = om_mincut.id AND selector_mincut_result.cur_user = "current_user"()::text AND om_mincut.id > 0;
+
+CREATE OR REPLACE VIEW v_ui_om_visit
+AS SELECT om_visit.id,
+    om_visit_cat.name AS visit_catalog,
+    om_visit.ext_code,
+    om_visit.startdate,
+    om_visit.enddate,
+    om_visit.user_name,
+    om_visit.webclient_id,
+    exploitation.name AS exploitation,
+    om_visit.the_geom,
+    om_visit.descript,
+    om_visit.is_done,
+    om_visit.visit_type
+   FROM om_visit
+     LEFT JOIN om_visit_cat ON om_visit.visitcat_id = om_visit_cat.id
+     LEFT JOIN exploitation ON exploitation.expl_id = om_visit.expl_id;

@@ -52,8 +52,8 @@ SELECT fk_ok(
 );
 SELECT fk_ok(
     'cat_element', 'element_type',
-    'element_type', 'id',
-    'Column element_type should reference element_type(id)'
+    'cat_feature_element', 'id',
+    'Column element_type should reference cat_feature_element(id)'
 );
 SELECT fk_ok(
     'cat_element', 'model',
