@@ -132,7 +132,6 @@ SELECT element.element_id,
     element.rotation,
     element.link,
     element.verified,
-    element.the_geom,
     element.label_x,
     element.label_y,
     element.label_rotation,
@@ -185,7 +184,6 @@ SELECT element.element_id,
     element.rotation,
     element.link,
     element.verified,
-    element.the_geom,
     element.label_x,
     element.label_y,
     element.label_rotation,
@@ -202,7 +200,8 @@ SELECT element.element_id,
     element.muni_id,
     element.sector_id,
     element.lock_level,
-    cat_feature_element.geometry_type
+    cat_feature_element.geometry_type,
+    man_genelement.the_geom
    FROM selector_expl, element
      JOIN cat_element ON element.elementcat_id::text = cat_element.id::text
     LEFT JOIN cat_feature_element ON cat_element.element_type::text = cat_feature_element.id::text
@@ -434,7 +433,6 @@ CREATE OR REPLACE VIEW v_edit_flwreg AS
     element.rotation,
     cat_element.link,
     element.verified,
-    element.the_geom,
     element.label_x,
     element.label_y,
     element.label_rotation,
@@ -448,9 +446,10 @@ CREATE OR REPLACE VIEW v_edit_flwreg AS
     element.top_elev,
     element.expl_id2,
     element.trace_featuregeom,
-      element.muni_id,
-      element.sector_id,
-    element.lock_level
+    element.muni_id,
+    element.sector_id,
+    element.lock_level,
+    man_flwreg.the_geom
    FROM element
       JOIN cat_element ON element.elementcat_id::text = cat_element.id::text
       JOIN man_flwreg ON element.element_id::text = man_flwreg.element_id::text

@@ -1875,7 +1875,7 @@ SELECT generate_series(1740, 1870), concat('E', generate_series(1740, 1870)), 'H
 SELECT generate_series(1871, 1973), concat('E', generate_series(1871, 1973)), 'HYDROGEN SULFIDE SENSOR', 1, 2, 2, 1;
 
 UPDATE element SET tstamp = now(), num_elements = 1, location_type = 'St. Location', workcat_id = 'work1', builtdate = '1900-01-01', ownercat_id = 'owner1', verified = 0, 
-insert_user = CURRENT_USER, trace_featuregeom = true, geometry_type = 'POINT';
+insert_user = CURRENT_USER, trace_featuregeom = true;
 
 
 INSERT INTO element_x_arc VALUES ('1547', '20608');
