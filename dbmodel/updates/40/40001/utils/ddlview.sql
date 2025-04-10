@@ -83,6 +83,19 @@ AS SELECT cat_feature.id,
    FROM cat_feature
      JOIN cat_feature_link USING (id);
 
+     CREATE OR REPLACE VIEW v_edit_cat_feature_element
+AS SELECT
+	cat_feature.id,
+    cat_feature.feature_class AS system_id,
+    cat_feature_element.epa_default,
+    cat_feature.code_autofill,
+    cat_feature.link_path,
+    cat_feature.descript,
+    cat_feature.active
+   FROM cat_feature
+     JOIN cat_feature_element USING (id);
+
+
 -- ====================
 
 CREATE OR REPLACE VIEW v_edit_element AS

@@ -6,114 +6,15 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
+DROP VIEW IF EXISTS v_edit_cat_feature_flwreg;
 
-CREATE OR REPLACE VIEW v_state_arc AS
-WITH
-p AS (SELECT arc_id, psector_id, state FROM plan_psector_x_arc WHERE active),
-cf AS (SELECT value::boolean FROM config_param_user WHERE parameter = 'utils_psector_strategy' AND cur_user = current_user),
-s AS (SELECT * FROM selector_psector WHERE cur_user = current_user),
-a as (SELECT arc_id, state FROM arc)
-SELECT arc.arc_id FROM selector_state,arc WHERE arc.state = selector_state.state_id AND selector_state.cur_user = "current_user"()::text
-	EXCEPT ALL
-SELECT p.arc_id FROM s, p WHERE p.psector_id = s.psector_id AND p.state = 0
-	UNION ALL
-SELECT DISTINCT p.arc_id FROM s, p WHERE p.psector_id = s.psector_id AND p.state = 1;
+DROP VIEW IF EXISTS v_edit_inp_dscenario_flwreg_orifice;
+DROP VIEW IF EXISTS v_edit_inp_dscenario_flwreg_outlet;
+DROP VIEW IF EXISTS v_edit_inp_dscenario_flwreg_weir;
 
-
-CREATE OR REPLACE VIEW v_state_node AS
-WITH
-p AS (SELECT node_id, psector_id, state FROM plan_psector_x_node WHERE active),
-cf AS (SELECT value::boolean FROM config_param_user WHERE parameter = 'utils_psector_strategy' AND cur_user = current_user),
-s AS (SELECT * FROM selector_psector WHERE cur_user = current_user),
-n AS (SELECT node_id, state FROM node)
-SELECT n.node_id FROM selector_state,n WHERE n.state = selector_state.state_id AND selector_state.cur_user = "current_user"()::text
-	EXCEPT ALL
-SELECT p.node_id FROM s, p, cf WHERE p.psector_id = s.psector_id AND p.state = 0 AND cf.value is TRUE
-	UNION ALL
-SELECT DISTINCT p.node_id FROM s, p, cf WHERE p.psector_id = s.psector_id AND p.state = 1 AND cf.value is TRUE;
-
-CREATE OR REPLACE VIEW v_state_connec AS
-WITH
-p AS (SELECT connec_id, psector_id, state, arc_id FROM plan_psector_x_connec WHERE active),
-cf AS (SELECT value::boolean FROM config_param_user WHERE parameter = 'utils_psector_strategy' AND cur_user = current_user),
-s AS (SELECT * FROM selector_psector WHERE cur_user = current_user),
-c as (SELECT connec_id, state, arc_id FROM connec)
-SELECT c.connec_id::varchar(30), c.arc_id FROM selector_state,c WHERE c.state = selector_state.state_id AND selector_state.cur_user = "current_user"()::text
-	EXCEPT ALL
-SELECT p.connec_id::varchar(30), p.arc_id FROM s, p, cf WHERE p.psector_id = s.psector_id AND s.cur_user = "current_user"()::text
-AND p.state = 0 AND cf.value is TRUE
-	UNION ALL
-SELECT DISTINCT ON (p.connec_id) p.connec_id::varchar(30), p.arc_id FROM s, p, cf WHERE p.psector_id = s.psector_id AND s.cur_user = "current_user"()::text
-AND p.state = 1 AND cf.value is TRUE;
-
-CREATE OR REPLACE VIEW v_state_gully AS
-WITH
-p AS (SELECT gully_id, psector_id, state, arc_id FROM plan_psector_x_gully WHERE active),
-cf AS (SELECT value::boolean FROM config_param_user WHERE parameter = 'utils_psector_strategy' AND cur_user = current_user),
-s AS (SELECT * FROM selector_psector WHERE cur_user = current_user),
-c as (SELECT gully_id, state, arc_id FROM gully)
-SELECT c.gully_id, c.arc_id FROM selector_state,c WHERE c.state = selector_state.state_id AND selector_state.cur_user = "current_user"()::text
-	EXCEPT ALL
-SELECT p.gully_id, p.arc_id FROM s, p, cf WHERE p.psector_id = s.psector_id AND s.cur_user = "current_user"()::text
-AND p.state = 0 AND cf.value is TRUE
-	UNION ALL
-SELECT DISTINCT ON (p.gully_id) p.gully_id, p.arc_id FROM s, p, cf WHERE p.psector_id = s.psector_id AND s.cur_user = "current_user"()::text
-AND p.state = 1 AND cf.value is TRUE;
-
-CREATE OR REPLACE VIEW v_state_link_connec AS
-WITH
-p AS (SELECT connec_id, psector_id, state, link_id FROM plan_psector_x_connec WHERE active),
-cf AS (SELECT value::boolean FROM config_param_user WHERE parameter = 'utils_psector_strategy' AND cur_user = current_user),
-sp AS (SELECT * FROM selector_psector WHERE cur_user = current_user),
-se AS (SELECT * FROM selector_expl WHERE cur_user = current_user),
-l AS (SELECT link_id, state, expl_id, expl_id2 FROM link)
-SELECT l.link_id  FROM selector_state, se, l WHERE l.state = selector_state.state_id AND (l.expl_id = se.expl_id OR l.expl_id2 = se.expl_id)
-AND selector_state.cur_user = "current_user"()::text AND se.cur_user = "current_user"()::text
-	EXCEPT ALL
-SELECT p.link_id FROM sp, se, cf, p JOIN l USING (link_id) WHERE p.psector_id = sp.psector_id AND sp.cur_user = "current_user"()::text AND p.state = 0
-AND l.expl_id = se.expl_id AND se.cur_user = CURRENT_USER::text AND cf.value is TRUE
-	UNION ALL
-SELECT p.link_id FROM sp, se, cf, p JOIN l USING (link_id) WHERE p.psector_id = sp.psector_id AND sp.cur_user = "current_user"()::text AND p.state = 1
-AND l.expl_id = se.expl_id AND se.cur_user = CURRENT_USER::text AND cf.value is TRUE;
-
-CREATE OR REPLACE VIEW v_state_link_gully AS
-WITH
-p AS (SELECT gully_id, psector_id, state, link_id FROM plan_psector_x_gully WHERE active),
-sp AS (SELECT * FROM selector_psector WHERE cur_user = current_user),
-cf AS (SELECT value::boolean FROM config_param_user WHERE parameter = 'utils_psector_strategy' AND cur_user = current_user),
-se AS (SELECT * FROM selector_expl WHERE cur_user = current_user),
-l AS (SELECT link_id, state, expl_id, expl_id2 FROM link)
-SELECT l.link_id  FROM selector_state, se, l WHERE l.state = selector_state.state_id AND (l.expl_id = se.expl_id OR l.expl_id2 = se.expl_id)
-AND selector_state.cur_user = "current_user"()::text AND se.cur_user = "current_user"()::text
-	EXCEPT ALL
-SELECT p.link_id FROM sp, se, cf, p JOIN l USING (link_id) WHERE p.psector_id = sp.psector_id AND sp.cur_user = "current_user"()::text AND p.state = 0
-AND l.expl_id = se.expl_id AND se.cur_user = CURRENT_USER::text AND cf.value is TRUE
-	UNION ALL
-SELECT p.link_id FROM sp, se, cf, p JOIN l USING (link_id) WHERE p.psector_id = sp.psector_id AND sp.cur_user = "current_user"()::text AND p.state = 1
-AND l.expl_id = se.expl_id AND se.cur_user = CURRENT_USER::text AND cf.value is TRUE;
-
-CREATE OR REPLACE VIEW v_state_link AS
-WITH
-c AS (SELECT connec_id, psector_id, state, link_id FROM plan_psector_x_connec WHERE active),
-cf AS (SELECT value::boolean FROM config_param_user WHERE parameter = 'utils_psector_strategy' AND cur_user = current_user),
-g AS (SELECT gully_id, psector_id, state, link_id FROM plan_psector_x_gully WHERE active),
-sp AS (SELECT * FROM selector_psector WHERE cur_user = current_user),
-se AS (SELECT * FROM selector_expl WHERE cur_user = current_user),
-l AS (SELECT link_id, state, expl_id, expl_id2 FROM link)
-SELECT l.link_id  FROM selector_state, se, l WHERE l.state = selector_state.state_id AND (l.expl_id = se.expl_id OR l.expl_id2 = se.expl_id)
-AND selector_state.cur_user = "current_user"()::text AND se.cur_user = "current_user"()::text
-	EXCEPT ALL
-SELECT c.link_id FROM sp, se, cf, c JOIN l USING (link_id) WHERE c.psector_id = sp.psector_id AND sp.cur_user = "current_user"()::text AND c.state = 0
-AND l.expl_id = se.expl_id AND se.cur_user = CURRENT_USER::text AND cf.value is TRUE
-	EXCEPT ALL
-SELECT g.link_id FROM sp, se, cf, g JOIN l USING (link_id) WHERE g.psector_id = sp.psector_id AND sp.cur_user = "current_user"()::text AND g.state = 0
-AND l.expl_id = se.expl_id AND se.cur_user = CURRENT_USER::text AND cf.value is TRUE
-	UNION ALL
-SELECT c.link_id FROM sp, se, cf, c JOIN l USING (link_id) WHERE c.psector_id = sp.psector_id AND sp.cur_user = "current_user"()::text AND c.state = 1
-AND l.expl_id = se.expl_id AND se.cur_user = CURRENT_USER::text AND cf.value is TRUE
-	UNION ALL
-SELECT g.link_id FROM sp, se, cf, g JOIN l USING (link_id) WHERE g.psector_id = sp.psector_id AND sp.cur_user = "current_user"()::text AND g.state = 1
-AND l.expl_id = se.expl_id AND se.cur_user = CURRENT_USER::text AND cf.value is TRUE;
+DROP VIEW IF EXISTS v_edit_inp_flwreg_orifice;
+DROP VIEW IF EXISTS v_edit_inp_flwreg_outlet;
+DROP VIEW IF EXISTS v_edit_inp_flwreg_weir;
 
 CREATE OR REPLACE VIEW v_edit_macrodma AS
  SELECT macrodma.macrodma_id,
@@ -204,60 +105,8 @@ AS SELECT s.sector_id,
 
 
 
--- recreate v_edit_element, v_edit_samplepoint, v_ext_streetaxis, v_ext_municipality views
+-- recreate v_edit_samplepoint, v_ext_streetaxis, v_ext_municipality views
 -----------------------------------
-CREATE OR REPLACE VIEW v_edit_element AS
-SELECT e.* FROM (
-SELECT element.element_id,
-    element.code,
-    element.elementcat_id,
-    cat_element.element_type,
-    element.brand_id,
-    element.model_id,
-    element.serial_number,
-    element.state,
-    element.state_type,
-    element.num_elements,
-    element.observ,
-    element.comment,
-    element.function_type,
-    element.category_type,
-    element.location_type,
-    element.fluid_type,
-    element.workcat_id,
-    element.workcat_id_end,
-    element.builtdate,
-    element.enddate,
-    element.ownercat_id,
-    element.rotation,
-    concat(element_type.link_path, element.link) AS link,
-    element.verified,
-    element.the_geom,
-    element.label_x,
-    element.label_y,
-    element.label_rotation,
-    element.publish,
-    element.inventory,
-    element.undelete,
-    element.expl_id,
-    element.pol_id,
-    element.lastupdate,
-    element.lastupdate_user,
-    element.top_elev,
-    element.expl_id2,
-    element.trace_featuregeom,
-	element.muni_id,
-	element.sector_id,
-    element.lock_level
-   FROM selector_expl, element
-     JOIN v_state_element ON element.element_id::text = v_state_element.element_id::text
-     JOIN cat_element ON element.elementcat_id::text = cat_element.id::text
-     JOIN element_type ON element_type.id::text = cat_element.element_type::text
-  WHERE element.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text) e
-  LEFT JOIN selector_sector s USING (sector_id)
-  LEFT JOIN selector_municipality m USING (muni_id)
-  WHERE (s.cur_user = current_user OR s.sector_id IS NULL)
-  AND (m.cur_user = current_user OR e.muni_id IS NULL);
 
 CREATE OR REPLACE VIEW v_edit_samplepoint AS
 SELECT sm.* FROM (
@@ -293,7 +142,7 @@ SELECT
     samplepoint.link,
     samplepoint.the_geom
     FROM selector_expl, samplepoint
-    JOIN v_state_samplepoint ON samplepoint.sample_id::text = v_state_samplepoint.sample_id::text
+    --JOIN v_state_samplepoint ON samplepoint.sample_id::text = v_state_samplepoint.sample_id::text
     LEFT JOIN dma ON dma.dma_id = samplepoint.dma_id
 	WHERE samplepoint.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text) sm
 	join selector_sector s using (sector_id)
@@ -3666,8 +3515,9 @@ AS SELECT s.dscenario_id,
 
 
 CREATE OR REPLACE VIEW v_edit_inp_flwreg_outlet
-AS SELECT f.nodarc_id,
-    f.node_id,
+AS SELECT 
+    f.element_id,
+    f.nodarc_id,
     f.order_id,
     f.to_arc,
     f.flwreg_length,
@@ -3678,16 +3528,13 @@ AS SELECT f.nodarc_id,
     ou.cd2,
     ou.flap,
     f.the_geom
-    FROM flwreg f
-    JOIN inp_flwreg_outlet ou USING (flwreg_id)
-    JOIN v_edit_node n USING (node_id)
-    JOIN value_state_type vs ON vs.id = n.state_type
-    LEFT JOIN arc a ON a.arc_id::text = f.to_arc::text
-    WHERE vs.is_operative IS TRUE;
+    FROM v_edit_flwreg f
+    JOIN inp_flwreg_outlet ou USING (element_id);
 
 CREATE OR REPLACE VIEW v_edit_inp_flwreg_weir
-AS SELECT f.nodarc_id,
-    f.node_id,
+AS SELECT 
+    f.element_id,
+    f.nodarc_id,
     f.order_id,
     f.to_arc,
     f.flwreg_length,
@@ -3706,16 +3553,14 @@ AS SELECT f.nodarc_id,
     w.road_surf,
     w.coef_curve,
     f.the_geom
-    FROM flwreg f
-    JOIN inp_flwreg_weir w USING (flwreg_id)
-    JOIN v_edit_node n USING (node_id)
-    JOIN value_state_type vs ON vs.id = n.state_type
-    LEFT JOIN arc a ON a.arc_id::text = f.to_arc::text
-    WHERE vs.is_operative IS TRUE;
+    FROM v_edit_flwreg f
+    JOIN inp_flwreg_weir w USING (element_id);
+
 
 CREATE OR REPLACE VIEW v_edit_inp_flwreg_pump
-AS SELECT f.nodarc_id,
-    f.node_id,
+AS SELECT 
+    f.element_id,
+    f.nodarc_id,
     f.order_id,
     f.to_arc,
     f.flwreg_length,
@@ -3724,16 +3569,13 @@ AS SELECT f.nodarc_id,
     p.startup,
     p.shutoff,
     f.the_geom
-    FROM flwreg f
-    JOIN inp_flwreg_pump p USING (flwreg_id)
-    JOIN v_edit_node n USING (node_id)
-    JOIN value_state_type vs ON vs.id = n.state_type
-    LEFT JOIN arc a ON a.arc_id::text = f.to_arc::text
-    WHERE vs.is_operative IS TRUE;
+    FROM v_edit_flwreg f
+    JOIN inp_flwreg_pump p USING (element_id);
 
 CREATE OR REPLACE VIEW v_edit_inp_flwreg_orifice
-AS SELECT f.nodarc_id,
-    f.node_id,
+AS SELECT 
+    f.element_id,
+    f.nodarc_id,
     f.order_id,
     f.to_arc,
     f.flwreg_length,
@@ -3748,18 +3590,15 @@ AS SELECT f.nodarc_id,
     ori.geom3,
     ori.geom4,
     f.the_geom
-    FROM flwreg f
-    JOIN inp_flwreg_orifice ori USING (flwreg_id)
-    JOIN v_edit_node n USING (node_id)
-    JOIN value_state_type vs ON vs.id = n.state_type
-    LEFT JOIN arc a ON a.arc_id::text = f.to_arc::text
-    WHERE vs.is_operative IS TRUE;
+    FROM v_edit_flwreg f
+    JOIN inp_flwreg_orifice ori USING (element_id);
 
 
 CREATE OR REPLACE VIEW v_edit_inp_dscenario_flwreg_outlet
-AS SELECT s.dscenario_id,
-    f.nodarc_id,
-    n.node_id,
+AS SELECT 
+    s.dscenario_id,
+    f.element_id,
+    n.nodarc_id,
     f.outlet_type,
     f.offsetval,
     f.curve_id,
@@ -3768,13 +3607,14 @@ AS SELECT s.dscenario_id,
     f.flap,
     n.the_geom
     FROM selector_inp_dscenario s, inp_dscenario_flwreg_outlet f
-    JOIN v_edit_inp_flwreg_outlet n USING (nodarc_id)
+    JOIN v_edit_inp_flwreg_outlet n USING (element_id)
 	WHERE s.dscenario_id = f.dscenario_id AND s.cur_user = CURRENT_USER::text;
 
 CREATE OR REPLACE VIEW v_edit_inp_dscenario_flwreg_weir
-AS SELECT s.dscenario_id,
-    f.nodarc_id,
-    n.node_id,
+AS SELECT 
+    s.dscenario_id,
+    f.element_id,
+    n.nodarc_id,
     f.weir_type,
     f.offsetval,
     f.cd,
@@ -3791,27 +3631,29 @@ AS SELECT s.dscenario_id,
     f.coef_curve,
     n.the_geom
     FROM selector_inp_dscenario s, inp_dscenario_flwreg_weir f
-    JOIN v_edit_inp_flwreg_weir n USING (nodarc_id)
+    JOIN v_edit_inp_flwreg_weir n USING (element_id)
 	WHERE s.dscenario_id = f.dscenario_id AND s.cur_user = CURRENT_USER::text;
 
 CREATE OR REPLACE VIEW v_edit_inp_dscenario_flwreg_pump
-AS SELECT s.dscenario_id,
-    f.nodarc_id,
-    n.node_id,
+AS SELECT 
+    s.dscenario_id,
+    f.element_id,
     f.curve_id,
+    -- n.nodarc_id,
     f.status,
     f.startup,
     f.shutoff,
     n.the_geom
     FROM selector_inp_dscenario s, inp_dscenario_flwreg_pump f
-    JOIN v_edit_inp_flwreg_pump n USING (nodarc_id)
+    JOIN v_edit_inp_flwreg_pump n USING (element_id)
     WHERE s.dscenario_id = f.dscenario_id AND s.cur_user = CURRENT_USER::text;
 
 CREATE OR REPLACE VIEW v_edit_inp_dscenario_flwreg_orifice
-AS SELECT s.dscenario_id,
-    f.nodarc_id,
-    n.node_id,
-    f.ori_type,
+AS SELECT 
+    s.dscenario_id,
+    f.element_id,
+    n.nodarc_id,
+    f.orifice_type,
     f.offsetval,
     f.cd,
     f.orate,
@@ -3823,7 +3665,7 @@ AS SELECT s.dscenario_id,
     f.geom4,
     n.the_geom
     FROM selector_inp_dscenario s, inp_dscenario_flwreg_orifice f
-    JOIN v_edit_inp_flwreg_orifice n USING (nodarc_id)
+    JOIN v_edit_inp_flwreg_orifice n USING (element_id)
     WHERE s.dscenario_id = f.dscenario_id AND s.cur_user = CURRENT_USER::text;
 
 
@@ -6740,106 +6582,72 @@ AS SELECT DISTINCT p.id,
 
 
  -- Drop the view if it already exists
-CREATE OR REPLACE VIEW v_edit_inp_flwreg AS
-SELECT
-    f.nodarc_id,
-    f.node_id,
-    f.order_id,
-   	f.to_arc,
-    f.flwreg_length,
-    f.flwregcat_id,
-    -- Orifice Columns
-    o.orifice_type,
-    o.offsetval as orifice_offsetval,
-    o.cd as orifice_cd,
-    o.orate as orifice_orate,
-    o.flap as orifice_flap,
-    o.shape as orifice_shape,
-    o.geom1 as orifice_geom1,
-    o.geom2 as orifice_geom2,
-    o.geom3 as orifice_geom3,
-    o.geom4 as orifice_geom4,
-    -- Outlet Columns
-    ou.outlet_type,
-    ou.offsetval as outlet_offsetval,
-    ou.curve_id as outlet_curve_id,
-    ou.cd1 as outlet_cd1,
-    ou.cd2 as outlet_cd2,
-    ou.flap as outlet_flap,
-    --Pump Columns
-    p.pump_type,
-    p.curve_id as pump_curve_id,
-    p.status as pump_status,
-    p.startup as pump_startup,
-    p.shutoff as pump_shutoff,
-    --Weir Columns
-    w.weir_type,
-    w.offsetval as weir_offsetval,
-    w.cd as weir_cd,
-    w.ec as weir_ec,
-    w.cd2 as weir_cd2,
-    w.flap as weir_flap,
-    w.geom1 as weir_geom1,
-    w.geom2 as weir_geom2,
-    w.geom3 as weir_geom3,
-    w.geom4 as weir_geom4,
-    w.surcharge as weir_surcharge,
-    w.road_width as weir_road_width,
-    w.road_surf as weir_road_surf,
-    w.coef_curve as weir_coef_curve,
-    -- Geometry
-    f.the_geom
-FROM
-    flwreg f
-left join inp_flwreg_orifice o using (flwreg_id)
-left join inp_flwreg_outlet ou using (flwreg_id)
-left join inp_flwreg_pump p using (flwreg_id)
-left join inp_flwreg_weir w using (flwreg_id);
+-- CREATE OR REPLACE VIEW v_edit_inp_flwreg AS
+-- SELECT
+--     f.nodarc_id,
+--     f.node_id,
+--     f.order_id,
+--    	f.to_arc,
+--     f.flwreg_length,
+--     f.flwregcat_id,
+--     -- Orifice Columns
+--     o.orifice_type,
+--     o.offsetval as orifice_offsetval,
+--     o.cd as orifice_cd,
+--     o.orate as orifice_orate,
+--     o.flap as orifice_flap,
+--     o.shape as orifice_shape,
+--     o.geom1 as orifice_geom1,
+--     o.geom2 as orifice_geom2,
+--     o.geom3 as orifice_geom3,
+--     o.geom4 as orifice_geom4,
+--     -- Outlet Columns
+--     ou.outlet_type,
+--     ou.offsetval as outlet_offsetval,
+--     ou.curve_id as outlet_curve_id,
+--     ou.cd1 as outlet_cd1,
+--     ou.cd2 as outlet_cd2,
+--     ou.flap as outlet_flap,
+--     --Pump Columns
+--     p.pump_type,
+--     p.curve_id as pump_curve_id,
+--     p.status as pump_status,
+--     p.startup as pump_startup,
+--     p.shutoff as pump_shutoff,
+--     --Weir Columns
+--     w.weir_type,
+--     w.offsetval as weir_offsetval,
+--     w.cd as weir_cd,
+--     w.ec as weir_ec,
+--     w.cd2 as weir_cd2,
+--     w.flap as weir_flap,
+--     w.geom1 as weir_geom1,
+--     w.geom2 as weir_geom2,
+--     w.geom3 as weir_geom3,
+--     w.geom4 as weir_geom4,
+--     w.surcharge as weir_surcharge,
+--     w.road_width as weir_road_width,
+--     w.road_surf as weir_road_surf,
+--     w.coef_curve as weir_coef_curve,
+--     -- Geometry
+--     f.the_geom
+-- FROM
+--     flwreg f
+-- left join inp_flwreg_orifice o using (flwreg_id)
+-- left join inp_flwreg_outlet ou using (flwreg_id)
+-- left join inp_flwreg_pump p using (flwreg_id)
+-- left join inp_flwreg_weir w using (flwreg_id);
 
 --10/01/2025
 --28/01/2025 [Modified]
 --create view for cat_feature_flwreg
-DROP VIEW IF EXISTS v_edit_cat_feature_flwreg;
-CREATE OR REPLACE VIEW v_edit_cat_feature_flwreg
-AS SELECT
-	cat_feature.id,
-    cat_feature.feature_class AS system_id,
-    cat_feature_flwreg.epa_default,
-    cat_feature.code_autofill,
-    cat_feature.link_path,
-    cat_feature.descript,
-    cat_feature.active
-   FROM cat_feature
-     JOIN cat_feature_flwreg USING (id);
 
--- Create parent view for flow regulators.
-CREATE OR REPLACE VIEW v_edit_flwreg
-AS SELECT
-	f.flwreg_id,
-	f.node_id,
-	f.order_id,
-	f.to_arc,
-	f.nodarc_id,
-    f.flwregcat_id,
-	cf.flwreg_type,
-	round(f.flwreg_length::numeric, 2) as flwreg_length,
-	f.epa_type,
-	f.state,
-	f.state_type,
-    n.muni_id,
-    n.expl_id,
-	f.annotation,
-	f.observ,
-    f.the_geom
-    FROM flwreg f
-	LEFT JOIN cat_flwreg cf ON cf.id = f.flwregcat_id
-	LEFT JOIN v_edit_node n USING (node_id);
 
 CREATE OR REPLACE VIEW v_rpt_node
 AS SELECT rpt_node.id,
     node.node_id,
     selector_rpt_main.result_id,
-    node.node_type,
+    node.node_type::varchar,
     node.nodecat_id,
     rpt_node.resultdate,
     rpt_node.resulttime,
@@ -7662,118 +7470,3 @@ AS SELECT om_visit_event.id AS event_id,
      LEFT JOIN ( SELECT DISTINCT doc_x_visit.visit_id
            FROM doc_x_visit) b ON b.visit_id = om_visit.id
   ORDER BY om_visit_x_gully.gully_id;
-
-
-CREATE OR REPLACE VIEW v_state_element
-AS SELECT element.element_id
-   FROM selector_state,
-    element
-  WHERE element.state = selector_state.state_id AND selector_state.cur_user = CURRENT_USER;
-
-
-CREATE OR REPLACE VIEW v_edit_element
-AS SELECT e.element_id,
-    e.code,
-    e.elementcat_id,
-    e.element_type,
-    e.brand_id,
-    e.model_id,
-    e.serial_number,
-    e.state,
-    e.state_type,
-    e.num_elements,
-    e.observ,
-    e.comment,
-    e.function_type,
-    e.category_type,
-    e.location_type,
-    e.fluid_type,
-    e.workcat_id,
-    e.workcat_id_end,
-    e.builtdate,
-    e.enddate,
-    e.ownercat_id,
-    e.rotation,
-    e.link,
-    e.verified,
-    e.the_geom,
-    e.label_x,
-    e.label_y,
-    e.label_rotation,
-    e.publish,
-    e.inventory,
-    e.undelete,
-    e.expl_id,
-    e.pol_id,
-    e.lastupdate,
-    e.lastupdate_user,
-    e.top_elev,
-    e.expl_id2,
-    e.trace_featuregeom,
-    e.muni_id,
-    e.sector_id,
-    e.lock_level
-   FROM ( SELECT element.element_id,
-            element.code,
-            element.elementcat_id,
-            cat_element.element_type,
-            element.brand_id,
-            element.model_id,
-            element.serial_number,
-            element.state,
-            element.state_type,
-            element.num_elements,
-            element.observ,
-            element.comment,
-            element.function_type,
-            element.category_type,
-            element.location_type,
-            element.fluid_type,
-            element.workcat_id,
-            element.workcat_id_end,
-            element.builtdate,
-            element.enddate,
-            element.ownercat_id,
-            element.rotation,
-            concat(element_type.link_path, element.link) AS link,
-            element.verified,
-            element.the_geom,
-            element.label_x,
-            element.label_y,
-            element.label_rotation,
-            element.publish,
-            element.inventory,
-            element.undelete,
-            element.expl_id,
-            element.pol_id,
-            element.lastupdate,
-            element.lastupdate_user,
-            element.top_elev,
-            element.expl_id2,
-            element.trace_featuregeom,
-            element.muni_id,
-            element.sector_id,
-            element.lock_level
-           FROM selector_expl,
-            element
-             JOIN v_state_element ON element.element_id::text = v_state_element.element_id::text
-             JOIN cat_element ON element.elementcat_id::text = cat_element.id::text
-             JOIN element_type ON element_type.id::text = cat_element.element_type::text
-          WHERE element.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text) e
-     LEFT JOIN selector_sector s USING (sector_id)
-     LEFT JOIN selector_municipality m USING (muni_id)
-  WHERE (s.cur_user = CURRENT_USER OR s.sector_id IS NULL) AND (m.cur_user = CURRENT_USER OR e.muni_id IS NULL);
-
-CREATE OR REPLACE VIEW v_ui_om_visitman_x_link
-AS SELECT DISTINCT ON (v_ui_om_visit_x_link.visit_id) v_ui_om_visit_x_link.visit_id,
-    v_ui_om_visit_x_link.code,
-    om_visit_cat.name AS visitcat_name,
-    v_ui_om_visit_x_link.link_id,
-    date_trunc('second'::text, v_ui_om_visit_x_link.visit_start) AS visit_start,
-    date_trunc('second'::text, v_ui_om_visit_x_link.visit_end) AS visit_end,
-    v_ui_om_visit_x_link.user_name,
-    v_ui_om_visit_x_link.is_done,
-    v_ui_om_visit_x_link.feature_type,
-    v_ui_om_visit_x_link.form_type
-   FROM v_ui_om_visit_x_link
-     LEFT JOIN om_visit_cat ON om_visit_cat.id = v_ui_om_visit_x_link.visitcat_id;
