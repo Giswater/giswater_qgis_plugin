@@ -597,3 +597,69 @@ AS SELECT om_visit.id,
    FROM om_visit
      LEFT JOIN om_visit_cat ON om_visit.visitcat_id = om_visit_cat.id
      LEFT JOIN exploitation ON exploitation.expl_id = om_visit.expl_id;
+
+CREATE OR REPLACE VIEW v_ext_streetaxis
+AS SELECT ext_streetaxis.id,
+    ext_streetaxis.code,
+    ext_streetaxis.type,
+    ext_streetaxis.name,
+    ext_streetaxis.text,
+    ext_streetaxis.the_geom,
+    ext_streetaxis.expl_id,
+    ext_streetaxis.muni_id,
+        CASE
+            WHEN ext_streetaxis.type IS NULL THEN ext_streetaxis.name::text
+            WHEN ext_streetaxis.text IS NULL THEN ((ext_streetaxis.name::text || ', '::text) || ext_streetaxis.type::text) || '.'::text
+            WHEN ext_streetaxis.type IS NULL AND ext_streetaxis.text IS NULL THEN ext_streetaxis.name::text
+            ELSE (((ext_streetaxis.name::text || ', '::text) || ext_streetaxis.type::text) || '. '::text) || ext_streetaxis.text
+        END AS descript,
+    ext_streetaxis.source
+   FROM selector_municipality s, ext_streetaxis
+   WHERE ext_streetaxis.muni_id = s.muni_id AND s.cur_user = "current_user"()::text;
+
+CREATE OR REPLACE VIEW v_ext_municipality
+AS SELECT DISTINCT s.muni_id,
+    m.name,
+    m.active,
+    m.the_geom
+    FROM ext_municipality m, selector_municipality s
+    WHERE m.muni_id = s.muni_id AND s.cur_user = "current_user"()::text;
+
+CREATE OR REPLACE VIEW ve_pol_connec
+AS SELECT polygon.pol_id,
+    polygon.feature_id,
+    polygon.featurecat_id,
+    polygon.state,
+    polygon.sys_type,
+    polygon.the_geom,
+    polygon.trace_featuregeom
+    FROM polygon
+    JOIN connec ON polygon.feature_id::text = connec.connec_id::text
+    JOIN selector_expl se ON (se.cur_user = CURRENT_USER AND se.expl_id = connec.expl_id) or (se.cur_user = CURRENT_USER and se.expl_id = connec.expl_id2)
+    JOIN selector_sector ss ON (ss.cur_user = CURRENT_USER AND ss.sector_id = connec.sector_id)
+    JOIN selector_municipality sm ON (sm.cur_user = CURRENT_USER AND sm.muni_id = connec.muni_id);
+
+CREATE OR REPLACE VIEW ve_pol_node
+AS SELECT polygon.pol_id,
+    polygon.feature_id,
+    polygon.featurecat_id,
+    polygon.state,
+    polygon.sys_type,
+    polygon.the_geom,
+    polygon.trace_featuregeom
+    FROM polygon
+    JOIN node ON polygon.feature_id::text = node.node_id::text
+    JOIN selector_expl se ON (se.cur_user =CURRENT_USER AND se.expl_id = node.expl_id) or (se.cur_user = CURRENT_USER and se.expl_id = node.expl_id2)
+    JOIN selector_sector ss ON (ss.cur_user = CURRENT_USER AND ss.sector_id = node.sector_id)
+    JOIN selector_municipality sm ON (sm.cur_user = CURRENT_USER AND sm.muni_id = node.muni_id);
+
+CREATE OR REPLACE VIEW ve_pol_element
+AS SELECT element.pol_id,
+    element.element_id,
+    polygon.the_geom,
+    polygon.trace_featuregeom
+    FROM polygon
+    JOIN element ON polygon.feature_id::text = element.element_id::text
+    JOIN selector_expl se ON (se.cur_user =CURRENT_USER AND se.expl_id = element.expl_id) or (se.cur_user = CURRENT_USER and se.expl_id = element.expl_id2)
+    JOIN selector_sector ss ON (ss.cur_user = CURRENT_USER AND ss.sector_id = element.sector_id)
+    JOIN selector_municipality sm ON (sm.cur_user = CURRENT_USER AND sm.muni_id = element.muni_id);

@@ -1482,18 +1482,6 @@ SELECT row_number() OVER (ORDER BY v_edit_node.node_id) AS rid,
    FROM v_edit_node
   WHERE v_edit_node.parent_id IS NOT NULL;
 
-
-CREATE OR REPLACE VIEW ve_pol_connec
-AS SELECT polygon.pol_id,
-    polygon.feature_id,
-    polygon.featurecat_id,
-    polygon.state,
-    polygon.sys_type,
-    polygon.the_geom,
-    polygon.trace_featuregeom
-    FROM v_edit_connec c
-    JOIN polygon ON polygon.feature_id::text = c.connec_id::text;
-
 CREATE OR REPLACE VIEW v_rtc_period_hydrometer
 AS SELECT ext_rtc_hydrometer.id AS hydrometer_id,
     v_edit_connec.connec_id,
@@ -1625,17 +1613,6 @@ AS SELECT element.element_id AS id,
     element.tstamp
    FROM element;
 
-
-CREATE OR REPLACE VIEW ve_pol_node as
-SELECT polygon.pol_id,
-    polygon.feature_id,
-    polygon.featurecat_id,
-    polygon.state,
-    polygon.sys_type,
-    polygon.the_geom,
-    polygon.trace_featuregeom
-   FROM polygon
-   JOIN v_edit_node ON polygon.feature_id::text = v_edit_node.node_id::text;
 
 CREATE OR REPLACE VIEW v_plan_node
 AS SELECT a.node_id,

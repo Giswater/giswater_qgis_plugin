@@ -135,36 +135,6 @@ SELECT
     and (m.cur_user = current_user or sm.muni_id is null);
 
 
-CREATE OR REPLACE VIEW v_ext_streetaxis
-AS SELECT ext_streetaxis.id,
-    ext_streetaxis.code,
-    ext_streetaxis.type,
-    ext_streetaxis.name,
-    ext_streetaxis.text,
-    ext_streetaxis.the_geom,
-    ext_streetaxis.expl_id,
-    ext_streetaxis.muni_id,
-        CASE
-            WHEN ext_streetaxis.type IS NULL THEN ext_streetaxis.name::text
-            WHEN ext_streetaxis.text IS NULL THEN ((ext_streetaxis.name::text || ', '::text) || ext_streetaxis.type::text) || '.'::text
-            WHEN ext_streetaxis.type IS NULL AND ext_streetaxis.text IS NULL THEN ext_streetaxis.name::text
-            ELSE (((ext_streetaxis.name::text || ', '::text) || ext_streetaxis.type::text) || '. '::text) || ext_streetaxis.text
-        END AS descript,
-    ext_streetaxis.source
-   FROM selector_municipality s, ext_streetaxis
-   WHERE ext_streetaxis.muni_id = s.muni_id AND s.cur_user = "current_user"()::text;
-
-CREATE OR REPLACE VIEW v_ext_municipality
-AS SELECT DISTINCT s.muni_id,
-    m.name,
-    m.active,
-    m.the_geom
-    FROM ext_municipality m, selector_municipality s
-	WHERE m.muni_id = s.muni_id AND s.cur_user = "current_user"()::text;
-
-
-
-
 CREATE OR REPLACE VIEW v_edit_link
 AS WITH
 	typevalue AS
@@ -1642,14 +1612,6 @@ AS SELECT DISTINCT ON (r.id) r.id,
     WHERE st_dwithin(r.envelope, a.the_geom, 0::double precision);
 
 
-CREATE OR REPLACE VIEW ve_pol_element
-AS SELECT e.pol_id,
-    e.element_id,
-    polygon.the_geom,
-    polygon.trace_featuregeom
-    FROM v_edit_element e
-    JOIN polygon USING (pol_id);
-
 CREATE OR REPLACE VIEW v_ui_element_x_link
 AS SELECT
     element_x_link.link_id,
@@ -1852,18 +1814,6 @@ UNION
    FROM arc a
      JOIN links_node n ON a.node_1::text = n.node_id::text
      JOIN v_edit_gully g ON g.gully_id::text = n.feature_id::text;
-
-
-CREATE OR REPLACE VIEW ve_pol_connec
-AS SELECT polygon.pol_id,
-    polygon.feature_id,
-    polygon.featurecat_id,
-    polygon.state,
-    polygon.sys_type,
-    polygon.the_geom,
-    polygon.trace_featuregeom
-    FROM polygon
-    JOIN v_edit_connec ON polygon.feature_id::text = v_edit_connec.connec_id::text;
 
 
 CREATE OR REPLACE VIEW v_rtc_period_hydrometer
@@ -2113,17 +2063,6 @@ AS SELECT f.dscenario_id,
     FROM selector_inp_dscenario s, inp_dscenario_conduit f
     JOIN v_edit_inp_conduit USING (arc_id)
 	WHERE s.dscenario_id = f.dscenario_id AND s.cur_user = CURRENT_USER;
-
-CREATE OR REPLACE VIEW ve_pol_node
-AS SELECT polygon.pol_id,
-    polygon.feature_id,
-    polygon.featurecat_id,
-    polygon.state,
-    polygon.sys_type,
-    polygon.the_geom,
-    polygon.trace_featuregeom
-    FROM polygon
-    JOIN v_edit_node ON polygon.feature_id::text = v_edit_node.node_id::text;
 
 CREATE OR REPLACE VIEW ve_pol_storage
 AS SELECT polygon.pol_id,
@@ -4481,10 +4420,13 @@ AS SELECT polygon.pol_id,
     polygon.state,
     polygon.sys_type,
     polygon.the_geom,
-    v_edit_gully.fluid_type,
+    gully.fluid_type,
     polygon.trace_featuregeom
     FROM polygon
-    JOIN v_edit_gully ON polygon.feature_id::text = v_edit_gully.gully_id::text;
+    JOIN gully ON polygon.feature_id::text = gully.gully_id::text;
+    JOIN selector_expl se ON (se.cur_user = CURRENT_USER AND se.expl_id = gully.expl_id) or (se.cur_user = CURRENT_USER and se.expl_id = gully.expl_id2)
+    JOIN selector_sector ss ON (ss.cur_user = CURRENT_USER AND ss.sector_id = gully.sector_id)
+    JOIN selector_municipality sm ON (sm.cur_user = CURRENT_USER AND sm.muni_id = gully.muni_id);
 
 CREATE OR REPLACE VIEW v_edit_raingage AS
  SELECT raingage.rg_id,
