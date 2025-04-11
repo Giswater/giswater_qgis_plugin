@@ -19,7 +19,7 @@ SELECT has_table('element'::name, 'Table element should exist');
 SELECT columns_are(
     'element',
     ARRAY[
-        'element_id', 'code', 'elementcat_id', 'serial_number', 'num_elements', 'state', 'state_type', 'observ', 'comment', 'function_type', 'category_type', 'fluid_type', 'location_type', 'workcat_id', 'workcat_id_end', 'builtdate', 'enddate', 'ownercat_id', 'rotation', 'link', 'verified', 'the_geom', 'label_x', 'label_y', 'label_rotation', 'undelete', 'publish', 'inventory', 'expl_id', 'feature_type', 'tstamp', 'lastupdate', 'lastupdate_user', 'insert_user', 'pol_id', 'top_elev', 'expl_id2', 'trace_featuregeom', 'muni_id', 'sector_id', 'brand_id', 'model_id', 'asset_id', 'datasource', 'lock_level', 'geometry_type'
+        'element_id', 'code', 'elementcat_id', 'serial_number', 'num_elements', 'state', 'state_type', 'observ', 'comment', 'function_type', 'category_type', 'fluid_type', 'location_type', 'workcat_id', 'workcat_id_end', 'builtdate', 'enddate', 'ownercat_id', 'rotation', 'link', 'verified', 'the_geom', 'label_x', 'label_y', 'label_rotation', 'undelete', 'publish', 'inventory', 'expl_id', 'feature_type', 'tstamp', 'lastupdate', 'lastupdate_user', 'insert_user', 'pol_id', 'top_elev', 'expl_id2', 'trace_featuregeom', 'muni_id', 'sector_id', 'brand_id', 'model_id', 'asset_id', 'datasource', 'lock_level'
     ],
     'Table element should have the correct columns'
 );
@@ -49,7 +49,7 @@ SELECT col_type_is('element', 'ownercat_id', 'varchar(30)', 'Column ownercat_id 
 SELECT col_type_is('element', 'rotation', 'numeric(6,3)', 'Column rotation should be numeric(6,3)');
 SELECT col_type_is('element', 'link', 'varchar(512)', 'Column link should be varchar(512)');
 SELECT col_type_is('element', 'verified', 'integer', 'Column verified should be integer');
-SELECT col_type_is('element', 'the_geom', 'geometry(Point,25831)', 'Column the_geom should be geometry(Point,25831)');
+SELECT col_type_is('element', 'the_geom', 'geometry(geometry, SRID_VALUE)', 'Column the_geom should be geometry(geometry, SRID_VALUE)');
 SELECT col_type_is('element', 'label_x', 'varchar(30)', 'Column label_x should be varchar(30)');
 SELECT col_type_is('element', 'label_y', 'varchar(30)', 'Column label_y should be varchar(30)');
 SELECT col_type_is('element', 'label_rotation', 'numeric(6,3)', 'Column label_rotation should be numeric(6,3)');
@@ -73,14 +73,13 @@ SELECT col_type_is('element', 'model_id', 'varchar(50)', 'Column model_id should
 SELECT col_type_is('element', 'asset_id', 'varchar(50)', 'Column asset_id should be varchar(50)');
 SELECT col_type_is('element', 'datasource', 'integer', 'Column datasource should be integer');
 SELECT col_type_is('element', 'lock_level', 'integer', 'Column lock_level should be integer');
-SELECT col_type_is('element', 'geometry_type', 'text', 'Column geometry_type should be text');
 
 -- Check foreign keys
 SELECT has_fk('element', 'Table element should have foreign keys');
 SELECT fk_ok('element', 'brand_id', 'cat_brand', 'id', 'FK element_brand_id should exist');
 SELECT fk_ok('element', ARRAY['category_type','feature_type'], 'man_type_category', ARRAY['category_type','feature_type'], 'FK element_category_type_feature_type_fkey should exist');
 SELECT fk_ok('element', 'elementcat_id', 'cat_element', 'id', 'FK element_elementcat_id_fkey should exist');
-SELECT fk_ok('element', 'feature_type', 'sys_feature_class', 'id', 'FK element_feature_type_fkey should exist');
+SELECT fk_ok('element', 'feature_type', 'sys_feature_type', 'id', 'FK element_feature_type_fkey should exist');
 SELECT fk_ok('element', 'model_id', 'cat_brand_model', 'id', 'FK element_model_id should exist');
 SELECT fk_ok('element', 'muni_id', 'ext_municipality', 'muni_id', 'FK element_muni_id should exist');
 SELECT fk_ok('element', 'ownercat_id', 'cat_owner', 'id', 'FK element_ownercat_id_fkey should exist');
@@ -106,7 +105,7 @@ SELECT col_not_null('element', 'state', 'Column state should be NOT NULL');
 SELECT col_not_null('element', 'state_type', 'Column state_type should be NOT NULL');
 
 SELECT col_default_is('element', 'element_id', 'nextval(''urn_id_seq''::regclass)', 'Column element_id should have default value');
-SELECT col_default_is('element', 'feature_type', 'GENELEMENT', 'Column feature_type should have default value');
+SELECT col_default_is('element', 'feature_type', 'ELEMENT', 'Column feature_type should have default value');
 SELECT col_default_is('element', 'tstamp', 'now()', 'Column tstamp should have default value');
 SELECT col_default_is('element', 'insert_user', 'CURRENT_USER', 'Column insert_user should have default value');
 SELECT col_default_is('element', 'trace_featuregeom', 'true', 'Column trace_featuregeom should have default value');

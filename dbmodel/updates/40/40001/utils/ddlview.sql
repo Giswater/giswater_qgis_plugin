@@ -702,3 +702,183 @@ AS SELECT element.element_id AS id,
     element.feature_type,
     element.tstamp
    FROM element;
+
+CREATE OR REPLACE VIEW v_state_arc
+AS WITH p AS (
+         SELECT plan_psector_x_arc.arc_id,
+            plan_psector_x_arc.psector_id,
+            plan_psector_x_arc.state
+           FROM plan_psector_x_arc
+          WHERE plan_psector_x_arc.active
+        ), cf AS (
+         SELECT config_param_user.value::boolean AS value
+           FROM config_param_user
+          WHERE config_param_user.parameter::text = 'utils_psector_strategy'::text AND config_param_user.cur_user::text = CURRENT_USER
+        ), s AS (
+         SELECT selector_psector.psector_id,
+            selector_psector.cur_user
+           FROM selector_psector
+          WHERE selector_psector.cur_user = CURRENT_USER
+        ), a AS (
+         SELECT arc.arc_id,
+            arc.state
+           FROM arc
+        )
+(
+         SELECT arc.arc_id
+           FROM selector_state,
+            arc
+          WHERE arc.state = selector_state.state_id AND selector_state.cur_user = "current_user"()::text
+        EXCEPT ALL
+         SELECT p.arc_id
+           FROM s,
+            p
+          WHERE p.psector_id = s.psector_id AND p.state = 0
+) UNION ALL
+ SELECT DISTINCT p.arc_id
+   FROM s,
+    p
+  WHERE p.psector_id = s.psector_id AND p.state = 1;
+
+CREATE OR REPLACE VIEW v_state_node
+AS WITH p AS (
+         SELECT plan_psector_x_node.node_id,
+            plan_psector_x_node.psector_id,
+            plan_psector_x_node.state
+           FROM plan_psector_x_node
+          WHERE plan_psector_x_node.active
+        ), cf AS (
+         SELECT config_param_user.value::boolean AS value
+           FROM config_param_user
+          WHERE config_param_user.parameter::text = 'utils_psector_strategy'::text AND config_param_user.cur_user::text = CURRENT_USER
+        ), s AS (
+         SELECT selector_psector.psector_id,
+            selector_psector.cur_user
+           FROM selector_psector
+          WHERE selector_psector.cur_user = CURRENT_USER
+        ), n AS (
+         SELECT node.node_id,
+            node.state
+           FROM node
+        )
+(
+         SELECT n.node_id
+           FROM selector_state,
+            n
+          WHERE n.state = selector_state.state_id AND selector_state.cur_user = "current_user"()::text
+        EXCEPT ALL
+         SELECT p.node_id
+           FROM s,
+            p,
+            cf
+          WHERE p.psector_id = s.psector_id AND p.state = 0 AND cf.value IS TRUE
+) UNION ALL
+ SELECT DISTINCT p.node_id
+   FROM s,
+    p,
+    cf
+  WHERE p.psector_id = s.psector_id AND p.state = 1 AND cf.value IS TRUE;
+
+
+CREATE OR REPLACE VIEW v_state_link
+AS WITH p AS (
+         SELECT plan_psector_x_connec.connec_id,
+            plan_psector_x_connec.psector_id,
+            plan_psector_x_connec.state,
+            plan_psector_x_connec.link_id
+           FROM plan_psector_x_connec
+          WHERE plan_psector_x_connec.active
+        ), cf AS (
+         SELECT config_param_user.value::boolean AS value
+           FROM config_param_user
+          WHERE config_param_user.parameter::text = 'utils_psector_strategy'::text AND config_param_user.cur_user::text = CURRENT_USER
+        ), sp AS (
+         SELECT selector_psector.psector_id,
+            selector_psector.cur_user
+           FROM selector_psector
+          WHERE selector_psector.cur_user = CURRENT_USER
+        ), se AS (
+         SELECT selector_expl.expl_id,
+            selector_expl.cur_user
+           FROM selector_expl
+          WHERE selector_expl.cur_user = CURRENT_USER
+        ), l AS (
+         SELECT link.link_id,
+            link.state,
+            link.expl_id,
+            link.expl_id2
+           FROM link
+        )
+(
+         SELECT l.link_id
+           FROM selector_state,
+            se,
+            l
+          WHERE l.state = selector_state.state_id AND (l.expl_id = se.expl_id OR l.expl_id2 = se.expl_id) AND selector_state.cur_user = "current_user"()::text AND se.cur_user = "current_user"()::text
+        EXCEPT ALL
+         SELECT p.link_id
+           FROM cf,
+            sp,
+            se,
+            p
+             JOIN l USING (link_id)
+          WHERE p.psector_id = sp.psector_id AND sp.cur_user = "current_user"()::text AND p.state = 0 AND l.expl_id = se.expl_id AND se.cur_user = CURRENT_USER::text AND cf.value IS TRUE
+) UNION ALL
+ SELECT p.link_id
+   FROM cf,
+    sp,
+    se,
+    p
+     JOIN l USING (link_id)
+  WHERE p.psector_id = sp.psector_id AND sp.cur_user = "current_user"()::text AND p.state = 1 AND l.expl_id = se.expl_id AND se.cur_user = CURRENT_USER::text AND cf.value IS TRUE;
+
+CREATE OR REPLACE VIEW v_state_element
+AS SELECT element.element_id
+   FROM selector_state,
+    element
+  WHERE element.state = selector_state.state_id AND selector_state.cur_user = CURRENT_USER;
+
+
+CREATE OR REPLACE VIEW v_state_connec
+AS WITH p AS (
+         SELECT plan_psector_x_connec.connec_id,
+            plan_psector_x_connec.psector_id,
+            plan_psector_x_connec.state,
+            plan_psector_x_connec.arc_id
+           FROM plan_psector_x_connec
+          WHERE plan_psector_x_connec.active
+        ), cf AS (
+         SELECT config_param_user.value::boolean AS value
+           FROM config_param_user
+          WHERE config_param_user.parameter::text = 'utils_psector_strategy'::text AND config_param_user.cur_user::text = CURRENT_USER
+        ), s AS (
+         SELECT selector_psector.psector_id,
+            selector_psector.cur_user
+           FROM selector_psector
+          WHERE selector_psector.cur_user = CURRENT_USER
+        ), c AS (
+         SELECT connec.connec_id,
+            connec.state,
+            connec.arc_id
+           FROM connec
+        )
+(
+         SELECT c.connec_id,
+            c.arc_id
+           FROM selector_state,
+            c
+          WHERE c.state = selector_state.state_id AND selector_state.cur_user = "current_user"()::text
+        EXCEPT ALL
+         SELECT p.connec_id,
+            p.arc_id
+           FROM cf,
+            s,
+            p
+          WHERE p.psector_id = s.psector_id AND s.cur_user = "current_user"()::text AND p.state = 0 AND cf.value IS TRUE
+) UNION ALL
+ SELECT DISTINCT ON (p.connec_id) p.connec_id,
+    p.arc_id
+   FROM cf,
+    s,
+    p
+  WHERE p.psector_id = s.psector_id AND s.cur_user = "current_user"()::text AND p.state = 1 AND cf.value IS TRUE;

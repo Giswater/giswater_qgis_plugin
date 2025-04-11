@@ -113,10 +113,10 @@ SELECT connec_id as id, a.state, state_type FROM v_prefix_connec a
 JOIN value_state_type b ON id=state_type WHERE a.state <> b.state UNION 
 SELECT element_id as id, a.state, state_type FROM v_prefix_element a 
 JOIN value_state_type b ON id=state_type WHERE a.state <> b.state', info_msg='No features without concordance against state and state_type.', function_name='[gw_fct_om_check_data, gw_fct_admin_check_data]' WHERE fid=253;
-UPDATE sys_fprocess SET fprocess_name='Features with code null', "source"='core', fprocess_type='Check om-data', project_type='ws', except_level=3, except_msg='features with code with NULL values. Please, check your data before continue with code with NULL values. Please, check your data before continue', query_text='SELECT arc_id, arccat_id, the_geom FROM v_prefix_arc WHERE code IS NULL UNION 
-SELECT node_id, nodecat_id, the_geom FROM v_prefix_node WHERE code IS NULL UNION 
-SELECT connec_id, conneccat_id, the_geom FROM v_prefix_connec WHERE code IS NULL UNION 
-SELECT element_id, elementcat_id, the_geom FROM v_prefix_element WHERE code IS NULL', info_msg='No features (arc, node, connec, element) with NULL values on code found.', function_name='[gw_fct_om_check_data, gw_fct_admin_check_data]' WHERE fid=254;
+UPDATE sys_fprocess SET fprocess_name='Features with code null', "source"='core', fprocess_type='Check om-data', project_type='ws', except_level=3, except_msg='features with code with NULL values. Please, check your data before continue with code with NULL values. Please, check your data before continue', query_text='SELECT arc_id, arccat_id FROM v_prefix_arc WHERE code IS NULL UNION 
+SELECT node_id, nodecat_id FROM v_prefix_node WHERE code IS NULL UNION 
+SELECT connec_id, conneccat_id FROM v_prefix_connec WHERE code IS NULL UNION 
+SELECT element_id, elementcat_id FROM v_prefix_element WHERE code IS NULL', info_msg='No features (arc, node, connec, element) with NULL values on code found.', function_name='[gw_fct_om_check_data, gw_fct_admin_check_data]' WHERE fid=254;
 UPDATE sys_fprocess SET fprocess_name='Connec or gully without or with wrong arc_id', "source"='core', fprocess_type='Check om-data', project_type='ws', except_level=2, except_msg='connecs without or with incorrect arc_id. gullies without or with incorrect arc_id.', query_text='SELECT c.connec_id, c.conneccat_id, c.the_geom, c.expl_id, l.feature_type, link_id FROM arc a, link l 
 JOIN connec c ON l.feature_id = c.connec_id WHERE st_dwithin(a.the_geom, st_endpoint(l.the_geom), 0.01) AND exit_type = ''ARC'' 
 AND (a.arc_id <> c.arc_id or c.arc_id is null)   AND l.feature_type = ''CONNEC'' AND a.state=1 and c.state = 1 and l.state=1 EXCEPT 
