@@ -455,10 +455,10 @@ BEGIN
 
 	-- getting source table in order to enhance performance
 	IF v_tablename LIKE 'v_edit_cad%' THEN v_sourcetable = v_tablename;
-	ELSIF v_tablename LIKE '%link_connec%' OR v_tablename LIKE '%link_gully%' THEN v_sourcetable = 'link';
     ELSIF v_tablename LIKE 'v_edit_flwreg_%' THEN v_sourcetable = replace(v_tablename, 'v_edit_', 'inp_');
 	ELSIF v_tablename LIKE 'v_edit_%' AND v_tablename != 'v_edit_flwreg' THEN v_sourcetable = replace (v_tablename, 'v_edit_', '');
 	ELSIF v_tablename LIKE 've_node_%' THEN v_sourcetable = 'node';
+	ELSIF v_tablename LIKE 've_link_%' THEN v_sourcetable = 'link';
 	ELSIF v_tablename LIKE 've_arc_%' THEN v_sourcetable = 'arc';
 	ELSIF v_tablename LIKE 've_connec_%' THEN v_sourcetable = 'connec';
 	ELSIF v_tablename LIKE 've_gully_%' THEN v_sourcetable = 'gully';
