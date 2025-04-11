@@ -45,37 +45,43 @@ DROP VIEW IF EXISTS v_ui_event_x_connec;
 
 -- ====
 
-CREATE OR REPLACE VIEW v_edit_macrodma AS
- SELECT macrodma.macrodma_id,
-    macrodma.name,
-    macrodma.descript,
-    macrodma.the_geom,
-    macrodma.expl_id,
-    macrodma.lock_level
-   FROM selector_expl, macrodma
-  WHERE macrodma.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
+CREATE OR REPLACE VIEW v_edit_macroomzone AS
+ SELECT macroomzone.macroomzone_id,
+    macroomzone.code,
+    macroomzone.name,
+    macroomzone.descript,
+    macroomzone.the_geom,
+    macroomzone.expl_id,
+    macroomzone.lock_level,
+    macroomzone.created_at,
+    macroomzone.created_by,
+    macroomzone.updated_at,
+    macroomzone.updated_by
+   FROM selector_expl, macroomzone
+  WHERE macroomzone.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
 
 
-CREATE OR REPLACE VIEW v_edit_dma
-AS SELECT d.dma_id,
-    d.name,
-    d.macrodma_id,
-    d.dma_type,
-    d.expl_id,
+CREATE OR REPLACE VIEW v_edit_omzone
+AS SELECT o.omzone_id,
+    o.name,
+    o.macroomzone_id,
+    o.omzone_type,
+    o.expl_id,
     e.name as expl_name,
-    d.descript,
-    d.link,
-    d.graphconfig,
-    d.stylesheet,
-    d.the_geom,
-    d.lock_level
-FROM dma d, selector_expl
+    o.descript,
+    o.link,
+    o.graphconfig,
+    o.stylesheet,
+    o.the_geom,
+    o.lock_level
+FROM omzone o, selector_expl
 LEFT JOIN exploitation e USING (expl_id)
-WHERE ((d.expl_id = selector_expl.expl_id) AND selector_expl.cur_user = "current_user"()::text) OR d.expl_id is null
+WHERE ((o.expl_id = selector_expl.expl_id) AND selector_expl.cur_user = "current_user"()::text) OR o.expl_id is null
 order by 1 asc;
 
 CREATE OR REPLACE VIEW v_edit_sector
 AS SELECT s.sector_id,
+    s.code,
     s.name,
     s.sector_type,
     s.macrosector_id,
@@ -83,33 +89,34 @@ AS SELECT s.sector_id,
     s.graphconfig::text,
     s.stylesheet,
     s.parent_id,
-    s.tstamp,
-    s.insert_user,
-    s.lastupdate,
-    s.lastupdate_user,
     s.link,
+    s.lock_level,
     s.the_geom,
-    s.lock_level
+    s.created_at,
+    s.created_by,
+    s.updated_at,
+    s.updated_by
    FROM selector_sector,
     sector s
   WHERE s.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;
 
 CREATE OR REPLACE VIEW v_ui_sector
 AS SELECT s.sector_id,
+    s.code,
     s.name,
     s.sector_type,
     ms.name AS macrosector,
     s.descript,
-    s.active,
     s.lock_level,
     s.graphconfig,
     s.stylesheet,
+    s.link,
+    s.active,
     s.parent_id,
-    s.tstamp,
-    s.insert_user,
-    s.lastupdate,
-    s.lastupdate_user,
-    s.link
+    s.created_at,
+    s.created_by,
+    s.updated_at,
+    s.updated_by
     FROM selector_sector ss,
     sector s
      LEFT JOIN macrosector ms ON ms.macrosector_id = s.macrosector_id
@@ -132,8 +139,8 @@ SELECT
     samplepoint.expl_id,
     samplepoint.muni_id,
     samplepoint.sector_id,
-    samplepoint.dma_id,
-    dma.macrodma_id,
+    samplepoint.omzone_id,
+    omzone.macroomzone_id,
     samplepoint.state,
     samplepoint.builtdate,
     samplepoint.enddate,
@@ -156,7 +163,7 @@ SELECT
     samplepoint.the_geom
     FROM selector_expl, samplepoint
     --JOIN v_state_samplepoint ON samplepoint.sample_id::text = v_state_samplepoint.sample_id::text
-    LEFT JOIN dma ON dma.dma_id = samplepoint.dma_id
+    LEFT JOIN omzone ON omzone.omzone_id = samplepoint.omzone_id
 	WHERE samplepoint.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text) sm
 	join selector_sector s using (sector_id)
     LEFT JOIN selector_municipality m using (muni_id)
@@ -170,7 +177,7 @@ AS WITH
        (
 			SELECT edit_typevalue.typevalue, edit_typevalue.id, edit_typevalue.idval
 			FROM edit_typevalue
-			WHERE edit_typevalue.typevalue::text = ANY (ARRAY['sector_type'::character varying::text, 'drainzone_type'::character varying::text, 'dma_type'::character varying::text, 'dwfzone_type'::character varying::text])
+			WHERE edit_typevalue.typevalue::text = ANY (ARRAY['sector_type'::character varying::text, 'drainzone_type'::character varying::text, 'omzone_type'::character varying::text, 'dwfzone_type'::character varying::text])
         ),
     sector_table AS
 		(
@@ -178,11 +185,11 @@ AS WITH
 			FROM sector
 			LEFT JOIN typevalue t ON t.id::text = sector.sector_type AND t.typevalue::text = 'sector_type'::text
 		),
-	dma_table AS
+	omzone_table AS
 		(
-			SELECT dma_id, macrodma_id, stylesheet, id::varchar(16) AS dma_type
-			FROM dma
-			LEFT JOIN typevalue t ON t.id::text = dma.dma_type AND t.typevalue::text = 'dma_type'::text
+			SELECT omzone_id, macroomzone_id, stylesheet, id::varchar(16) AS omzone_type
+			FROM omzone
+			LEFT JOIN typevalue t ON t.id::text = omzone.omzone_type AND t.typevalue::text = 'omzone_type'::text
 		),
 	drainzone_table AS
 		(
@@ -242,8 +249,8 @@ AS WITH
 			l.muni_id,
 			l.drainzone_id,
 			drainzone_table.drainzone_type,
-			l.dma_id,
-			dma_table.macrodma_id,
+			l.omzone_id,
+			omzone_table.macroomzone_id,
 			l.dwfzone_id,
 			dwfzone_table.dwfzone_type,
 			l.exit_topelev,
@@ -261,7 +268,7 @@ AS WITH
 			l.workcat_id,
 			l.workcat_id_end,
 			sector_table.stylesheet ->> 'featureColor'::text AS sector_style,
-			dma_table.stylesheet ->> 'featureColor'::text AS dma_style,
+			omzone_table.stylesheet ->> 'featureColor'::text AS omzone_style,
 			drainzone_table.stylesheet ->> 'featureColor'::text AS drainzone_style,
 			dwfzone_table.stylesheet ->> 'featureColor'::text AS dwfzone_style,
 			l.builtdate,
@@ -279,8 +286,8 @@ AS WITH
 			JOIN sector_table ON l.sector_id = sector_table.sector_id
             JOIN cat_link ON cat_link.id::text = l.linkcat_id::text
             JOIN cat_feature ON cat_feature.id::text = cat_link.link_type::text
-			LEFT JOIN dma_table ON l.dma_id = dma_table.dma_id
-			LEFT join drainzone_table ON l.dma_id = drainzone_table.drainzone_id
+			LEFT JOIN omzone_table ON l.omzone_id = omzone_table.omzone_id
+			LEFT join drainzone_table ON l.omzone_id = drainzone_table.drainzone_id
 			LEFT JOIN dwfzone_table ON l.dwfzone_id = dwfzone_table.dwfzone_id
 		)
      SELECT link_selected.*
@@ -297,19 +304,20 @@ as select * from v_edit_link where feature_type = 'GULLY';
 
 CREATE OR REPLACE VIEW v_edit_drainzone
 AS SELECT d.drainzone_id,
+    d.code,
     d.name,
     et.idval as drainzone_type,
     d.descript,
     d.graphconfig::text AS graphconfig,
     d.stylesheet::text AS stylesheet,
-    d.tstamp,
-    d.insert_user,
-    d.lastupdate,
-    d.lastupdate_user,
     d.link,
-    d.the_geom,
     d.expl_id,
-    d.lock_level
+    d.lock_level,
+    d.the_geom,
+    d.created_at,
+    d.created_by,
+    d.updated_at,
+    d.updated_by
    FROM selector_expl,
     drainzone d
     LEFT JOIN edit_typevalue et ON et.id::text = d.drainzone_type::text AND et.typevalue::text = 'drainzone_type'::text
@@ -317,19 +325,20 @@ AS SELECT d.drainzone_id,
 
 CREATE OR REPLACE VIEW v_edit_dwfzone
 AS SELECT d.dwfzone_id,
+    d.code,
     d.name,
     et.idval as dwfzone_type,
     d.descript,
     d.graphconfig::text AS graphconfig,
     d.stylesheet::text AS stylesheet,
-    d.tstamp,
-    d.insert_user,
-    d.lastupdate,
-    d.lastupdate_user,
     d.link,
-    d.the_geom,
     d.expl_id,
-    d.lock_level
+    d.lock_level,
+    d.the_geom,
+    d.created_at,
+    d.created_by,
+    d.updated_at,
+    d.updated_by
    FROM selector_expl e,
     dwfzone d
     LEFT JOIN edit_typevalue et ON et.id::text = d.dwfzone_type::text AND et.typevalue::text = 'dwfzone_type'::text
@@ -347,7 +356,7 @@ AS WITH
        (
 			SELECT edit_typevalue.typevalue, edit_typevalue.id, edit_typevalue.idval
 			FROM edit_typevalue
-			WHERE edit_typevalue.typevalue::text = ANY (ARRAY['sector_type'::character varying::text, 'drainzone_type'::character varying::text, 'dma_type'::character varying::text, 'dwfzone_type'::character varying::text])
+			WHERE edit_typevalue.typevalue::text = ANY (ARRAY['sector_type'::character varying::text, 'drainzone_type'::character varying::text, 'omzone_type'::character varying::text, 'dwfzone_type'::character varying::text])
         ),
     sector_table AS
 		(
@@ -355,11 +364,11 @@ AS WITH
 			FROM sector
 			LEFT JOIN typevalue t ON t.id::text = sector.sector_type AND t.typevalue::text = 'sector_type'::text
 		),
-	dma_table AS
+	omzone_table AS
 		(
-			SELECT dma_id, macrodma_id, stylesheet, id::varchar(16) AS dma_type
-			FROM dma
-			LEFT JOIN typevalue t ON t.id::text = dma.dma_type AND t.typevalue::text = 'dma_type'::text
+			SELECT omzone_id, macroomzone_id, stylesheet, id::varchar(16) AS omzone_type
+			FROM omzone
+			LEFT JOIN typevalue t ON t.id::text = omzone.omzone_type AND t.typevalue::text = 'omzone_type'::text
 		),
 	drainzone_table AS
 		(
@@ -485,9 +494,9 @@ AS WITH
 			arc.inverted_slope,
 			arc.observ,
 			arc.comment,
-			arc.dma_id,
-			dma_table.macrodma_id,
-			dma_table.dma_type,
+			arc.omzone_id,
+			omzone_table.macroomzone_id,
+			omzone_table.omzone_type,
 			arc.dwfzone_id,
 			dwfzone_table.dwfzone_type,
 			arc.soilcat_id,
@@ -499,7 +508,7 @@ AS WITH
 			arc.workcat_id_end,
 			arc.workcat_id_plan,
 			sector_table.stylesheet ->> 'featureColor'::text AS sector_style,
-			dma_table.stylesheet ->> 'featureColor'::text AS dma_style,
+			omzone_table.stylesheet ->> 'featureColor'::text AS omzone_style,
 			drainzone_table.stylesheet ->> 'featureColor'::text AS drainzone_style,
 			dwfzone_table.stylesheet ->> 'featureColor'::text AS dwfzone_style,
 			arc.builtdate,
@@ -572,8 +581,8 @@ AS WITH
 			JOIN ext_municipality mu ON arc.muni_id = mu.muni_id
 			JOIN value_state_type vst ON vst.id = arc.state_type
 			JOIN sector_table on sector_table.sector_id = arc.sector_id
-			LEFT JOIN dma_table on dma_table.dma_id = arc.dma_id
-			LEFT JOIN drainzone_table ON arc.dma_id = drainzone_table.drainzone_id
+			LEFT JOIN omzone_table on omzone_table.omzone_id = arc.omzone_id
+			LEFT JOIN drainzone_table ON arc.omzone_id = drainzone_table.drainzone_id
 			LEFT JOIN dwfzone_table ON arc.dwfzone_id = dwfzone_table.dwfzone_id
             LEFT JOIN arc_add a ON a.arc_id::text = arc.arc_id::text
 		)
@@ -587,7 +596,7 @@ AS WITH
        (
 			SELECT edit_typevalue.typevalue, edit_typevalue.id, edit_typevalue.idval
 			FROM edit_typevalue
-			WHERE edit_typevalue.typevalue::text = ANY (ARRAY['sector_type'::character varying::text, 'drainzone_type'::character varying::text, 'dma_type'::character varying::text, 'dwfzone_type'::character varying::text])
+			WHERE edit_typevalue.typevalue::text = ANY (ARRAY['sector_type'::character varying::text, 'drainzone_type'::character varying::text, 'omzone_type'::character varying::text, 'dwfzone_type'::character varying::text])
         ),
     sector_table AS
 		(
@@ -595,11 +604,11 @@ AS WITH
 			FROM sector
 			LEFT JOIN typevalue t ON t.id::text = sector.sector_type AND t.typevalue::text = 'sector_type'::text
 		),
-	dma_table AS
+	omzone_table AS
 		(
-			SELECT dma_id, macrodma_id, stylesheet, id::varchar(16) AS dma_type
-			FROM dma
-			LEFT JOIN typevalue t ON t.id::text = dma.dma_type AND t.typevalue::text = 'dma_type'::text
+			SELECT omzone_id, macroomzone_id, stylesheet, id::varchar(16) AS omzone_type
+			FROM omzone
+			LEFT JOIN typevalue t ON t.id::text = omzone.omzone_type AND t.typevalue::text = 'omzone_type'::text
 		),
 	drainzone_table AS
 		(
@@ -672,8 +681,8 @@ AS WITH
 			node.annotation,
 			node.observ,
 			node.comment,
-			node.dma_id,
-			dma_table.macrodma_id,
+			node.omzone_id,
+			omzone_table.macroomzone_id,
 			node.dwfzone_id,
 			dwfzone_table.dwfzone_type,
 			node.soilcat_id,
@@ -682,7 +691,7 @@ AS WITH
 			node.fluid_type,
 			node.location_type,
 			sector_table.stylesheet ->> 'featureColor'::text AS sector_style,
-			dma_table.stylesheet ->> 'featureColor'::text AS dma_style,
+			omzone_table.stylesheet ->> 'featureColor'::text AS omzone_style,
 			drainzone_table.stylesheet ->> 'featureColor'::text AS drainzone_style,
 			dwfzone_table.stylesheet ->> 'featureColor'::text AS dwfzone_style,
 			node.workcat_id,
@@ -760,8 +769,8 @@ AS WITH
 			JOIN ext_municipality mu ON node.muni_id = mu.muni_id
 			JOIN value_state_type vst ON vst.id = node.state_type
 			JOIN sector_table ON sector_table.sector_id = node.sector_id
-			LEFT JOIN dma_table ON dma_table.dma_id = node.dma_id
-			LEFT JOIN drainzone_table ON node.dma_id = drainzone_table.drainzone_id
+			LEFT JOIN omzone_table ON omzone_table.omzone_id = node.omzone_id
+			LEFT JOIN drainzone_table ON node.omzone_id = drainzone_table.drainzone_id
 			LEFT JOIN dwfzone_table ON node.dwfzone_id = dwfzone_table.dwfzone_id
             LEFT JOIN node_add e ON e.node_id::text = node.node_id::text
     	),
@@ -804,8 +813,8 @@ AS WITH
 			annotation,
 			observ,
 			comment,
-			dma_id,
-			macrodma_id,
+			omzone_id,
+			macroomzone_id,
 			dwfzone_id,
 			dwfzone_type,
 			soilcat_id,
@@ -814,7 +823,7 @@ AS WITH
 			fluid_type,
 			location_type,
 			sector_style,
-			dma_style,
+			omzone_style,
 			drainzone_style,
 			dwfzone_style,
 			workcat_id,
@@ -891,7 +900,7 @@ AS WITH
        (
 			SELECT edit_typevalue.typevalue, edit_typevalue.id, edit_typevalue.idval
 			FROM edit_typevalue
-			WHERE edit_typevalue.typevalue::text = ANY (ARRAY['sector_type'::character varying::text, 'drainzone_type'::character varying::text, 'dma_type'::character varying::text, 'dwfzone_type'::character varying::text])
+			WHERE edit_typevalue.typevalue::text = ANY (ARRAY['sector_type'::character varying::text, 'drainzone_type'::character varying::text, 'omzone_type'::character varying::text, 'dwfzone_type'::character varying::text])
         ),
     sector_table AS
 		(
@@ -899,11 +908,11 @@ AS WITH
 			FROM sector
 			LEFT JOIN typevalue t ON t.id::text = sector.sector_type AND t.typevalue::text = 'sector_type'::text
 		),
-	dma_table AS
+	omzone_table AS
 		(
-			SELECT dma_id, macrodma_id, stylesheet, id::varchar(16) AS dma_type
-			FROM dma
-			LEFT JOIN typevalue t ON t.id::text = dma.dma_type AND t.typevalue::text = 'dma_type'::text
+			SELECT omzone_id, macroomzone_id, stylesheet, id::varchar(16) AS omzone_type
+			FROM omzone
+			LEFT JOIN typevalue t ON t.id::text = omzone.omzone_type AND t.typevalue::text = 'omzone_type'::text
 		),
 	drainzone_table AS
 		(
@@ -919,14 +928,14 @@ AS WITH
 		),
 	link_planned AS
     	(
-			SELECT link_id, feature_id, feature_type, exit_id, exit_type, l.expl_id, macroexpl_id, l.sector_id, sector_type, macrosector_id, l.dma_id, macrodma_id, dma_type,
+			SELECT link_id, feature_id, feature_type, exit_id, exit_type, l.expl_id, macroexpl_id, l.sector_id, sector_type, macrosector_id, l.omzone_id, macroomzone_id, omzone_type,
 			l.drainzone_id, drainzone_type, l.dwfzone_id, dwfzone_type,
 		    fluid_type
 			FROM link l
 			JOIN exploitation USING (expl_id)
 			JOIN sector_table ON l.sector_id = sector_table.sector_id
-			LEFT JOIN dma_table ON l.dma_id = dma_table.dma_id
-			LEFT JOIN drainzone_table ON l.dma_id = drainzone_table.drainzone_id
+			LEFT JOIN omzone_table ON l.omzone_id = omzone_table.omzone_id
+			LEFT JOIN drainzone_table ON l.omzone_id = drainzone_table.drainzone_id
 			LEFT JOIN dwfzone_table ON l.dwfzone_id = dwfzone_table.dwfzone_id
 			WHERE l.state = 2
     	),
@@ -989,17 +998,17 @@ AS WITH
 			connec.observ,
 			connec.comment,
 			CASE
-				WHEN link_planned.dma_id IS NULL THEN connec.dma_id
-				ELSE link_planned.dma_id
-			END AS dma_id,
+				WHEN link_planned.omzone_id IS NULL THEN connec.omzone_id
+				ELSE link_planned.omzone_id
+			END AS omzone_id,
 			CASE
-				WHEN link_planned.macrodma_id IS NULL THEN dma_table.macrodma_id
-				ELSE link_planned.macrodma_id
-			END AS macrodma_id,
+				WHEN link_planned.macroomzone_id IS NULL THEN omzone_table.macroomzone_id
+				ELSE link_planned.macroomzone_id
+			END AS macroomzone_id,
 			CASE
-				WHEN link_planned.dma_type IS NULL THEN dma_table.dma_type
-				ELSE link_planned.dma_type
-			END AS dma_type,
+				WHEN link_planned.omzone_type IS NULL THEN omzone_table.omzone_type
+				ELSE link_planned.omzone_type
+			END AS omzone_type,
 			CASE
 				WHEN link_planned.dwfzone_type IS NULL THEN dwfzone_table.dwfzone_type
 				ELSE link_planned.dwfzone_type
@@ -1010,7 +1019,7 @@ AS WITH
 			connec.fluid_type,
 			connec.location_type,
 			sector_table.stylesheet ->> 'featureColor'::text AS sector_style,
-			dma_table.stylesheet ->> 'featureColor'::text AS dma_style,
+			omzone_table.stylesheet ->> 'featureColor'::text AS omzone_style,
 			drainzone_table.stylesheet ->> 'featureColor'::text AS drainzone_style,
 			dwfzone_table.stylesheet ->> 'featureColor'::text AS dwfzone_style,
 			connec.workcat_id,
@@ -1085,8 +1094,8 @@ AS WITH
 			JOIN ext_municipality mu ON connec.muni_id = mu.muni_id
 			JOIN value_state_type vst ON vst.id = connec.state_type
 			JOIN sector_table ON sector_table.sector_id = connec.sector_id
-			LEFT JOIN dma_table ON dma_table.dma_id = connec.dma_id
-			LEFT JOIN drainzone_table ON connec.dma_id = drainzone_table.drainzone_id
+			LEFT JOIN omzone_table ON omzone_table.omzone_id = connec.omzone_id
+			LEFT JOIN drainzone_table ON connec.omzone_id = drainzone_table.drainzone_id
 			LEFT JOIN dwfzone_table ON connec.dwfzone_id = dwfzone_table.dwfzone_id
 			LEFT JOIN link_planned USING (link_id)
 	   )
@@ -1101,7 +1110,7 @@ AS WITH
        (
 			SELECT edit_typevalue.typevalue, edit_typevalue.id, edit_typevalue.idval
 			FROM edit_typevalue
-			WHERE edit_typevalue.typevalue::text = ANY (ARRAY['sector_type'::character varying::text, 'drainzone_type'::character varying::text, 'dma_type'::character varying::text, 'dwfzone_type'::character varying::text])
+			WHERE edit_typevalue.typevalue::text = ANY (ARRAY['sector_type'::character varying::text, 'drainzone_type'::character varying::text, 'omzone_type'::character varying::text, 'dwfzone_type'::character varying::text])
         ),
     sector_table AS
 		(
@@ -1109,11 +1118,11 @@ AS WITH
 			FROM sector
 			LEFT JOIN typevalue t ON t.id::text = sector.sector_type AND t.typevalue::text = 'sector_type'::text
 		),
-	dma_table AS
+	omzone_table AS
 		(
-			SELECT dma_id, macrodma_id, stylesheet, id::varchar(16) AS dma_type
-			FROM dma
-			LEFT JOIN typevalue t ON t.id::text = dma.dma_type AND t.typevalue::text = 'dma_type'::text
+			SELECT omzone_id, macroomzone_id, stylesheet, id::varchar(16) AS omzone_type
+			FROM omzone
+			LEFT JOIN typevalue t ON t.id::text = omzone.omzone_type AND t.typevalue::text = 'omzone_type'::text
 		),
 	drainzone_table AS
 		(
@@ -1133,14 +1142,14 @@ AS WITH
         ),
     link_planned AS
     	(
-			SELECT link_id, feature_id, feature_type, exit_id, exit_type, l.expl_id, macroexpl_id, l.sector_id, sector_type, macrosector_id, l.dma_id, dma_type, macrodma_id,
+			SELECT link_id, feature_id, feature_type, exit_id, exit_type, l.expl_id, macroexpl_id, l.sector_id, sector_type, macrosector_id, l.omzone_id, omzone_type, macroomzone_id,
 			l.drainzone_id, drainzone_type, l.dwfzone_id, dwfzone_type,
 			fluid_type
 			FROM link l
 			JOIN exploitation USING (expl_id)
 			JOIN sector_table ON l.sector_id = sector_table.sector_id
-			LEFT JOIN dma_table ON l.dma_id = dma_table.dma_id
-			LEFT JOIN drainzone_table ON l.dma_id = drainzone_table.drainzone_id
+			LEFT JOIN omzone_table ON l.omzone_id = omzone_table.omzone_id
+			LEFT JOIN drainzone_table ON l.omzone_id = drainzone_table.drainzone_id
 			LEFT JOIN dwfzone_table ON l.dwfzone_id = dwfzone_table.dwfzone_id
 			WHERE l.state = 2
     	),
@@ -1224,17 +1233,17 @@ AS WITH
 				ELSE link_planned.drainzone_type
 			END AS drainzone_type,
 			CASE
-				WHEN link_planned.dma_id IS NULL THEN dma_table.dma_id
-				ELSE link_planned.dma_id
-			END AS dma_id,
+				WHEN link_planned.omzone_id IS NULL THEN omzone_table.omzone_id
+				ELSE link_planned.omzone_id
+			END AS omzone_id,
 			CASE
-				WHEN link_planned.dma_type IS NULL THEN dma_table.dma_type
-				ELSE link_planned.dma_type
-			END AS dma_type,
+				WHEN link_planned.omzone_type IS NULL THEN omzone_table.omzone_type
+				ELSE link_planned.omzone_type
+			END AS omzone_type,
 			CASE
-				WHEN link_planned.macrodma_id IS NULL THEN dma_table.macrodma_id
-				ELSE link_planned.macrodma_id
-			END AS macrodma_id,
+				WHEN link_planned.macroomzone_id IS NULL THEN omzone_table.macroomzone_id
+				ELSE link_planned.macroomzone_id
+			END AS macroomzone_id,
 			CASE
 				WHEN link_planned.dwfzone_id IS NULL THEN dwfzone_table.dwfzone_id
 				ELSE link_planned.dwfzone_id
@@ -1255,7 +1264,7 @@ AS WITH
 			gully.workcat_id_end,
 			gully.workcat_id_plan,
 			sector_table.stylesheet ->> 'featureColor'::text AS sector_style,
-			dma_table.stylesheet ->> 'featureColor'::text AS dma_style,
+			omzone_table.stylesheet ->> 'featureColor'::text AS omzone_style,
 			drainzone_table.stylesheet ->> 'featureColor'::text AS drainzone_style,
 			dwfzone_table.stylesheet ->> 'featureColor'::text AS dwfzone_style,
 			gully.builtdate,
@@ -1327,8 +1336,8 @@ AS WITH
 			JOIN value_state_type vst ON vst.id = gully.state_type
 			JOIN ext_municipality mu ON gully.muni_id = mu.muni_id
 			JOIN sector_table ON gully.sector_id = sector_table.sector_id
-			LEFT JOIN dma_table ON gully.dma_id = dma_table.dma_id
-			LEFT JOIN drainzone_table ON gully.dma_id = drainzone_table.drainzone_id
+			LEFT JOIN omzone_table ON gully.omzone_id = omzone_table.omzone_id
+			LEFT JOIN drainzone_table ON gully.omzone_id = drainzone_table.drainzone_id
 			LEFT JOIN dwfzone_table ON gully.dwfzone_id = dwfzone_table.dwfzone_id
 			LEFT JOIN link_planned ON gully.gully_id = feature_id
 		)
@@ -1871,7 +1880,7 @@ AS SELECT ext_rtc_hydrometer.id AS hydrometer_id,
      JOIN rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id::bigint = ext_rtc_hydrometer.id::bigint
      JOIN v_edit_connec ON v_edit_connec.connec_id::text = rtc_hydrometer_x_connec.connec_id::text
      JOIN temp_arc ON v_edit_connec.arc_id::text = temp_arc.arc_id::text
-     JOIN ext_rtc_dma_period c ON c.cat_period_id::text = ext_cat_period.id::text AND c.dma_id::integer = v_edit_connec.dma_id
+     JOIN ext_rtc_dma_period c ON c.cat_period_id::text = ext_cat_period.id::text AND c.dma_id::integer = v_edit_connec.omzone_id
   WHERE ext_cat_period.id::text = (( SELECT config_param_user.value
            FROM config_param_user
           WHERE config_param_user.cur_user::name = "current_user"() AND config_param_user.parameter::text = 'inp_options_rtc_period_id'::text))
@@ -1902,7 +1911,7 @@ UNION
      JOIN rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id::bigint = ext_rtc_hydrometer.id::bigint
      LEFT JOIN v_edit_connec ON v_edit_connec.connec_id::text = rtc_hydrometer_x_connec.connec_id::text
      JOIN temp_node ON concat('VN', v_edit_connec.pjoint_id) = temp_node.node_id::text
-     JOIN ext_rtc_dma_period c ON c.cat_period_id::text = ext_cat_period.id::text AND v_edit_connec.dma_id::text = c.dma_id::text
+     JOIN ext_rtc_dma_period c ON c.cat_period_id::text = ext_cat_period.id::text AND v_edit_connec.omzone_id::text = c.dma_id::text
   WHERE v_edit_connec.pjoint_type::text = 'VNODE'::text AND ext_cat_period.id::text = (( SELECT config_param_user.value
            FROM config_param_user
           WHERE config_param_user.cur_user::name = "current_user"() AND config_param_user.parameter::text = 'inp_options_rtc_period_id'::text))
@@ -1933,7 +1942,7 @@ UNION
      JOIN rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id::bigint = ext_rtc_hydrometer.id::bigint
      LEFT JOIN v_edit_connec ON v_edit_connec.connec_id::text = rtc_hydrometer_x_connec.connec_id::text
      JOIN temp_node ON v_edit_connec.pjoint_id::text = temp_node.node_id::text
-     JOIN ext_rtc_dma_period c ON c.cat_period_id::text = ext_cat_period.id::text AND v_edit_connec.dma_id::text = c.dma_id::text
+     JOIN ext_rtc_dma_period c ON c.cat_period_id::text = ext_cat_period.id::text AND v_edit_connec.omzone_id::text = c.dma_id::text
   WHERE v_edit_connec.pjoint_type::text = 'NODE'::text AND ext_cat_period.id::text = (( SELECT config_param_user.value
            FROM config_param_user
           WHERE config_param_user.cur_user::name = "current_user"() AND config_param_user.parameter::text = 'inp_options_rtc_period_id'::text));
@@ -2610,7 +2619,7 @@ AS SELECT s.dscenario_id,
 
 
 CREATE OR REPLACE VIEW v_edit_inp_flwreg_outlet
-AS SELECT 
+AS SELECT
     f.element_id,
     f.nodarc_id,
     f.order_id,
@@ -2627,7 +2636,7 @@ AS SELECT
     JOIN inp_flwreg_outlet ou USING (element_id);
 
 CREATE OR REPLACE VIEW v_edit_inp_flwreg_weir
-AS SELECT 
+AS SELECT
     f.element_id,
     f.nodarc_id,
     f.order_id,
@@ -2653,7 +2662,7 @@ AS SELECT
 
 
 CREATE OR REPLACE VIEW v_edit_inp_flwreg_pump
-AS SELECT 
+AS SELECT
     f.element_id,
     f.nodarc_id,
     f.order_id,
@@ -2668,7 +2677,7 @@ AS SELECT
     JOIN inp_flwreg_pump p USING (element_id);
 
 CREATE OR REPLACE VIEW v_edit_inp_flwreg_orifice
-AS SELECT 
+AS SELECT
     f.element_id,
     f.nodarc_id,
     f.order_id,
@@ -2690,7 +2699,7 @@ AS SELECT
 
 
 CREATE OR REPLACE VIEW v_edit_inp_dscenario_flwreg_outlet
-AS SELECT 
+AS SELECT
     s.dscenario_id,
     f.element_id,
     n.nodarc_id,
@@ -2706,7 +2715,7 @@ AS SELECT
 	WHERE s.dscenario_id = f.dscenario_id AND s.cur_user = CURRENT_USER::text;
 
 CREATE OR REPLACE VIEW v_edit_inp_dscenario_flwreg_weir
-AS SELECT 
+AS SELECT
     s.dscenario_id,
     f.element_id,
     n.nodarc_id,
@@ -2730,7 +2739,7 @@ AS SELECT
 	WHERE s.dscenario_id = f.dscenario_id AND s.cur_user = CURRENT_USER::text;
 
 CREATE OR REPLACE VIEW v_edit_inp_dscenario_flwreg_pump
-AS SELECT 
+AS SELECT
     s.dscenario_id,
     f.element_id,
     f.curve_id,
@@ -2744,7 +2753,7 @@ AS SELECT
     WHERE s.dscenario_id = f.dscenario_id AND s.cur_user = CURRENT_USER::text;
 
 CREATE OR REPLACE VIEW v_edit_inp_dscenario_flwreg_orifice
-AS SELECT 
+AS SELECT
     s.dscenario_id,
     f.element_id,
     n.nodarc_id,
@@ -5568,6 +5577,7 @@ AS SELECT a.subc_id,
 
 CREATE OR REPLACE VIEW v_ui_drainzone
 AS SELECT d.drainzone_id,
+    d.code,
     d.name,
     et.idval AS drainzone_type,
     d.descript,
@@ -5575,12 +5585,12 @@ AS SELECT d.drainzone_id,
     d.lock_level,
     d.graphconfig,
     d.stylesheet,
-    d.tstamp,
-    d.insert_user,
-    d.lastupdate,
-    d.lastupdate_user,
     d.link,
-    d.expl_id
+    d.expl_id,
+    d.created_at,
+    d.created_by,
+    d.updated_at,
+    d.updated_by
    FROM drainzone d
    LEFT JOIN edit_typevalue et ON et.id::text = d.drainzone_type::text AND et.typevalue::text = 'drainzone_type'::text
   WHERE d.drainzone_id > 0
@@ -5588,19 +5598,20 @@ AS SELECT d.drainzone_id,
 
 CREATE OR REPLACE VIEW v_ui_dwfzone
 AS SELECT d.dwfzone_id,
+    d.code,
     d.name,
     et.idval AS dwfzone_type,
     d.descript,
-    d.active,
-    d.lock_level,
     d.graphconfig,
     d.stylesheet,
-    d.tstamp,
-    d.insert_user,
-    d.lastupdate,
-    d.lastupdate_user,
     d.link,
-    d.expl_id
+    d.expl_id,
+    d.lock_level,
+    d.active,
+    d.created_at,
+    d.created_by,
+    d.updated_at,
+    d.updated_by
    FROM dwfzone d
    LEFT JOIN edit_typevalue et ON et.id::text = d.dwfzone_type::text AND et.typevalue::text = 'dwfzone_type'::text
   WHERE d.dwfzone_id > 0
@@ -5608,31 +5619,45 @@ AS SELECT d.dwfzone_id,
 
 CREATE OR REPLACE VIEW v_ui_macrosector
 AS SELECT m.macrosector_id,
+    m.code,
     m.name,
     m.descript,
     m.active,
-    m.lock_level
+    m.lock_level,
+    m.created_at,
+    m.created_by,
+    m.updated_at,
+    m.updated_by
     FROM macrosector m
     WHERE m.macrosector_id > 0
     ORDER BY m.macrosector_id;
 
-CREATE OR REPLACE VIEW v_ui_macrodma
-AS SELECT m.macrodma_id,
+CREATE OR REPLACE VIEW v_ui_macroomzone
+AS SELECT m.macroomzone_id,
+    m.code,
     m.name,
     m.expl_id,
     m.descript,
     m.active,
-    m.lock_level
-    FROM macrodma m
-    WHERE m.macrodma_id > 0
-    ORDER BY m.macrodma_id;
+    m.lock_level,
+    m.created_at,
+    m.created_by,
+    m.updated_at,
+    m.updated_by
+    FROM macroomzone m
+    WHERE m.macroomzone_id > 0
+    ORDER BY m.macroomzone_id;
 
 CREATE OR REPLACE VIEW v_edit_macrosector AS
  SELECT DISTINCT ON (m.macrosector_id) m.macrosector_id,
     m.name,
     m.descript,
     m.the_geom,
-    m.lock_level
+    m.lock_level,
+    m.created_at,
+    m.created_by,
+    m.updated_at,
+    m.updated_by
    FROM selector_sector, sector
      JOIN macrosector m ON m.macrosector_id = sector.macrosector_id
   WHERE sector.sector_id = selector_sector.sector_id AND selector_sector.cur_user = "current_user"()::text;

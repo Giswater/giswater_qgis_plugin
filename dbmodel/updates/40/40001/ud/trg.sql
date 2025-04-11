@@ -133,8 +133,8 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_man_gully_pol();
 CREATE TRIGGER gw_trg_edit_link INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_link
 FOR EACH ROW EXECUTE PROCEDURE gw_trg_edit_link();
 
-CREATE TRIGGER gw_trg_edit_dma INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_dma
-FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_dma('dma');
+CREATE TRIGGER gw_trg_edit_omzone INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_omzone
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_omzone('omzone');
 
 CREATE trigger gw_trg_edit_drainzone INSTEAD OF INSERT OR UPDATE OR DELETE ON v_edit_drainzone
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_drainzone('EDIT');
@@ -301,8 +301,6 @@ FOR EACH ROW WHEN ((((old.outlet_type)::TEXT IS DISTINCT FROM (new.outlet_type):
 CREATE trigger gw_trg_v_ui_drainzone INSTEAD OF INSERT OR UPDATE OR DELETE ON v_ui_drainzone
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_drainzone('UI');
 
-CREATE TRIGGER gw_trg_edit_controls BEFORE DELETE OR UPDATE
-ON drainzone FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_controls('drainzone_id');
 
 CREATE TRIGGER gw_trg_edit_controls BEFORE DELETE OR UPDATE
 ON dwfzone FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_controls('dwfzone_id');
@@ -318,11 +316,10 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_dwfzone('UI');
 
 -- delete duplicated triggers
 DROP TRIGGER IF EXISTS gw_trg_edit_macrosector ON v_edit_macrosector;
-DROP TRIGGER IF EXISTS gw_trg_edit_macrodma ON v_edit_macrodma;
 
-CREATE TRIGGER gw_trg_v_edit_macrodma INSTEAD OF INSERT OR DELETE OR UPDATE
-ON v_edit_macrodma
-FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_macrodma('EDIT');
+CREATE TRIGGER gw_trg_v_edit_macroomzone INSTEAD OF INSERT OR DELETE OR UPDATE
+ON v_edit_macroomzone
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_macroomzone('EDIT');
 
 CREATE TRIGGER gw_trg_v_edit_macrosector INSTEAD OF INSERT OR DELETE OR UPDATE
 ON v_edit_macrosector

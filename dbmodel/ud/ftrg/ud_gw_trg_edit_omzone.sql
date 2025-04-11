@@ -6,7 +6,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: 1112
 
-CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_dma()  RETURNS trigger AS
+CREATE OR REPLACE FUNCTION "SCHEMA_NAME".gw_trg_edit_omzone()  RETURNS trigger AS
 $BODY$
 
 DECLARE
@@ -40,15 +40,15 @@ BEGIN
 			END IF;
 		END IF;
 
-		INSERT INTO dma (dma_id, name, descript, macrodma_id, expl_id, link, stylesheet, dma_type, graphconfig, lock_level)
-		VALUES (NEW.dma_id, NEW.name, NEW.descript, NEW.macrodma_id, NEW.expl_id, NEW.link, NEW.stylesheet,
-		NEW.dma_type, NEW.graphconfig::json, NEW.lock_level);
+		INSERT INTO omzone (omzone_id, name, descript, macrodma_id, expl_id, link, stylesheet, omzone_type, graphconfig, lock_level)
+		VALUES (NEW.omzone_id, NEW.name, NEW.descript, NEW.macrodma_id, NEW.expl_id, NEW.link, NEW.stylesheet,
+		NEW.omzone_type, NEW.graphconfig::json, NEW.lock_level);
 
 		IF view_name = 'UI' THEN
-			UPDATE dma SET active = NEW.active WHERE dma_id = NEW.dma_id;
+			UPDATE omzone SET active = NEW.active WHERE omzone_id = NEW.omzone_id;
 
 		ELSIF view_name = 'EDIT' THEN
-			UPDATE dma SET the_geom = NEW.the_geom WHERE dma_id = NEW.dma_id;
+			UPDATE omzone SET the_geom = NEW.the_geom WHERE omzone_id = NEW.omzone_id;
 
 		END IF;
 
@@ -56,17 +56,17 @@ BEGIN
 
 	ELSIF TG_OP = 'UPDATE' THEN
 
-		UPDATE dma
-		SET dma_id=NEW.dma_id, name=NEW.name, descript=NEW.descript, expl_id=NEW.expl_id,
+		UPDATE omzone
+		SET omzone_id=NEW.omzone_id, name=NEW.name, descript=NEW.descript, expl_id=NEW.expl_id,
 		link=NEW.link, lastupdate=now(), lastupdate_user = current_user, macrodma_id = NEW.macrodma_id, stylesheet=NEW.stylesheet,
-		dma_type=NEW.dma_type, graphconfig=NEW.graphconfig::json, lock_level=NEW.lock_level
-		WHERE dma_id=OLD.dma_id;
+		omzone_type=NEW.omzone_type, graphconfig=NEW.graphconfig::json, lock_level=NEW.lock_level
+		WHERE omzone_id=OLD.omzone_id;
 
 		IF view_name = 'UI' THEN
-			UPDATE dma SET active = NEW.active WHERE dma_id = OLD.dma_id;
+			UPDATE omzone SET active = NEW.active WHERE omzone_id = OLD.omzone_id;
 
 		ELSIF view_name = 'EDIT' THEN
-			UPDATE dma SET the_geom = NEW.the_geom WHERE dma_id = OLD.dma_id;
+			UPDATE omzone SET the_geom = NEW.the_geom WHERE omzone_id = OLD.omzone_id;
 
 		END IF;
 
@@ -74,7 +74,7 @@ BEGIN
 
 	ELSIF TG_OP = 'DELETE' THEN
 
-		DELETE FROM dma WHERE dma_id = OLD.dma_id;
+		DELETE FROM omzone WHERE omzone_id = OLD.omzone_id;
 		RETURN NULL;
 	END IF;
 END;

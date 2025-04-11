@@ -380,7 +380,7 @@ CREATE TABLE temp_node (
 	state int2 NULL,
 	state_type int2 NULL,
 	annotation varchar(254) NULL,
-	dma_id int4 NULL,
+	omzone_id int4 NULL,
 	y0 numeric(12, 4) NULL,
 	ysur numeric(12, 4) NULL,
 	apond numeric(12, 4) NULL,
@@ -400,7 +400,7 @@ CREATE INDEX temp_node_node_id ON temp_node USING btree (node_id);
 CREATE INDEX temp_node_node_type ON temp_node USING btree (node_type);
 CREATE INDEX temp_node_nodeparent ON temp_node USING btree (parent);
 CREATE INDEX temp_node_result_id ON temp_node USING btree (result_id);
-CREATE INDEX temp_node_dma_id ON temp_node USING btree (dma_id);
+CREATE INDEX temp_node_omzone_id ON temp_node USING btree (omzone_id);
 
 ALTER TABLE temp_arc RENAME TO _temp_arc;
 ALTER TABLE _temp_arc RENAME CONSTRAINT temp_arc_pkey TO _temp_arc_pkey;
@@ -429,7 +429,7 @@ CREATE TABLE temp_arc (
 	state int2 NULL,
 	state_type int2 NULL,
 	annotation varchar(254) NULL,
-	dma_id int4 NULL,
+	omzone_id int4 NULL,
 	length numeric(12, 3) NULL,
 	n numeric(12, 3) NULL,
 	the_geom public.geometry(linestring, SRID_VALUE) NULL,
@@ -456,7 +456,7 @@ CREATE INDEX temp_arc_epa_type ON temp_arc USING btree (epa_type);
 CREATE INDEX temp_arc_index ON temp_arc USING gist (the_geom);
 CREATE INDEX temp_arc_node_1_type ON temp_arc USING btree (node_1);
 CREATE INDEX temp_arc_node_2_type ON temp_arc USING btree (node_2);
-CREATE INDEX temp_arc_dma_id ON temp_arc USING btree (dma_id);
+CREATE INDEX temp_arc_omzone_id ON temp_arc USING btree (omzone_id);
 CREATE INDEX temp_arc_result_id ON temp_arc USING btree (result_id);
 
 -- 29/01/2025
@@ -641,15 +641,6 @@ CREATE TABLE man_orifice (
 	CONSTRAINT man_frorifice_flwreg_id_fk FOREIGN KEY (flwreg_id) REFERENCES flwreg(flwreg_id) ON DELETE CASCADE
 );
 
--- 30/01/2025
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"arc", "column":"verified", "dataType":"integer"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"node", "column":"verified", "dataType":"integer"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"connec", "column":"verified", "dataType":"integer"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"gully", "column":"verified", "dataType":"integer"}}$$);
-
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"samplepoint", "column":"verified", "dataType":"integer"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"element", "column":"verified", "dataType":"integer"}}$$);
-
 ALTER TABLE man_manhole RENAME TO _man_manhole;
 ALTER TABLE _man_manhole DROP CONSTRAINT IF EXISTS man_manhole_pkey;
 ALTER TABLE _man_manhole DROP CONSTRAINT IF EXISTS man_manhole_node_id_fkey;
@@ -727,30 +718,23 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"man_chamber
 
 
 -- 30/01/2025
-
-CREATE SEQUENCE IF NOT EXISTS dwfzone_dwfzone_id_seq
-    INCREMENT 1
-    START 1
-    MINVALUE 1
-    MAXVALUE 9223372036854775807
-    CACHE 1;
-
 CREATE TABLE dwfzone (
 	dwfzone_id serial4 NOT NULL,
+	code text NULL,
 	"name" varchar(30) NULL,
+	dwfzone_type varchar(16) NULL,
 	expl_id int4 NULL,
 	descript text NULL,
-	undelete bool NULL,
-	the_geom public.geometry(multipolygon, SRID_VALUE) NULL,
 	link text NULL,
 	graphconfig json DEFAULT '{"use":[{"nodeParent":""}], "ignore":[], "forceClosed":[]}'::json NULL,
 	stylesheet json NULL,
+	lock_level bool NULL,
 	active bool DEFAULT true NULL,
-	tstamp timestamp DEFAULT now() NULL,
-	insert_user varchar(50) DEFAULT CURRENT_USER NULL,
-	lastupdate timestamp NULL,
-	lastupdate_user varchar(50) NULL,
-	dwfzone_type varchar(16) NULL,
+	the_geom public.geometry(multipolygon, SRID_VALUE) NULL,
+	created_at timestamp DEFAULT now() NULL,
+	created_by varchar(50) DEFAULT CURRENT_USER NULL,
+	updated_at timestamp NULL,
+	updated_by varchar(50) NULL,
 	CONSTRAINT dwfzone_pkey PRIMARY KEY (dwfzone_id)
 );
 
@@ -758,35 +742,7 @@ CREATE TABLE dwfzone (
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"sector", "column":"sector_type", "dataType":"varchar(50)"}}$$);
 
--- 04/02/2025
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"dwfzone_id", "dataType":"int4"}}$$);
-ALTER TABLE arc ADD CONSTRAINT arc_dwfzone_id_fkey FOREIGN KEY (dwfzone_id) REFERENCES dwfzone(dwfzone_id) ON DELETE RESTRICT ON UPDATE CASCADE;
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node", "column":"dwfzone_id", "dataType":"int4"}}$$);
-ALTER TABLE node ADD CONSTRAINT node_dwfzone_id_fkey FOREIGN KEY (dwfzone_id) REFERENCES dwfzone(dwfzone_id) ON DELETE RESTRICT ON UPDATE CASCADE;
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"dwfzone_id", "dataType":"int4"}}$$);
-ALTER TABLE connec ADD CONSTRAINT connec_dwfzone_id_fkey FOREIGN KEY (dwfzone_id) REFERENCES dwfzone(dwfzone_id) ON DELETE RESTRICT ON UPDATE CASCADE;
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"gully", "column":"dwfzone_id", "dataType":"int4"}}$$);
-ALTER TABLE gully ADD CONSTRAINT gully_dwfzone_id_fkey FOREIGN KEY (dwfzone_id) REFERENCES dwfzone(dwfzone_id) ON DELETE RESTRICT ON UPDATE CASCADE;
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"link", "column":"dwfzone_id", "dataType":"int4"}}$$);
-ALTER TABLE link ADD CONSTRAINT link_dwfzone_id_fkey FOREIGN KEY (dwfzone_id) REFERENCES dwfzone(dwfzone_id) ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- 06/02/2025
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node", "column":"datasource", "dataType":"integer"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"datasource", "dataType":"integer"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"datasource", "dataType":"integer"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"element", "column":"datasource", "dataType":"integer"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"gully", "column":"datasource", "dataType":"integer"}}$$);
-
 -- 10/02/2025
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"initoverflowpath", "dataType":"boolean"}}$$);
-
--- TODO: add logic to calculate this field
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"omunit_id", "dataType":"int4"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node", "column":"omunit_id", "dataType":"int4"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"omunit_id", "dataType":"int4"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"element", "column":"omunit_id", "dataType":"int4"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"gully", "column":"omunit_id", "dataType":"int4"}}$$);
-
 CREATE TABLE arc_add (
 	arc_id varchar(16) NOT NULL,
 	result_id text NULL,
@@ -870,33 +826,7 @@ ALTER TABLE doc_x_workcat DROP CONSTRAINT unique_doc_id_workcat_id;
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP", "table":"doc_x_workcat", "column":"id"}}$$);
 ALTER TABLE doc_x_workcat ADD CONSTRAINT doc_x_workcat_pkey PRIMARY KEY (doc_id, workcat_id);
 
--- 17/02/2025
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node", "column":"lock_level", "dataType":"int4", "isUtils":"False"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"arc", "column":"lock_level", "dataType":"int4", "isUtils":"False"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"connec", "column":"lock_level", "dataType":"int4", "isUtils":"False"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"element", "column":"lock_level", "dataType":"int4", "isUtils":"False"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"gully", "column":"lock_level", "dataType":"int4", "isUtils":"False"}}$$);
-
--- 19/02/2025
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"arc", "column":"is_scadamap", "dataType":"boolean", "isUtils":"False"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"node", "column":"is_scadamap", "dataType":"boolean", "isUtils":"False"}}$$);
-
-
 -- 27/02/2025
--- node
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"node", "column":"pavcat_id", "dataType":"text", "isUtils":"False"}}$$);
-ALTER TABLE node ADD CONSTRAINT cat_pavement_id_fkey FOREIGN KEY (pavcat_id) REFERENCES cat_pavement(id) ON UPDATE CASCADE ON DELETE RESTRICT;
-
--- arc
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"arc", "column":"registre_date", "dataType":"date", "isUtils":"False"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"arc", "column":"hydraulic_capacity", "dataType":"float", "isUtils":"False"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"arc", "column":"corrosion", "dataType":"text", "isUtils":"False"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"arc", "column":"deficiencies", "dataType":"text", "isUtils":"False"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"arc", "column":"meandering", "dataType":"text", "isUtils":"False"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"arc", "column":"conserv_state", "dataType":"text", "isUtils":"False"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"arc", "column":"om_state", "dataType":"text", "isUtils":"False"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"arc", "column":"last_visitdate", "dataType":"date", "isUtils":"False"}}$$);
-
 -- man_conduit
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"man_conduit", "column":"conduit_code", "dataType":"text", "isUtils":"False"}}$$);
 
@@ -957,27 +887,15 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD", "table":"man_outfal
 
 
 -- 04/03/2025
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"drainzone", "column":"undelete"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"dwfzone", "column":"undelete"}}$$);
-
 DROP VIEW IF EXISTS v_edit_sector;
 DROP VIEW IF EXISTS v_ui_sector;
 DROP VIEW IF EXISTS vu_sector;
 DROP RULE IF EXISTS undelete_sector ON sector;
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"sector", "column":"undelete"}}$$);
-
 DROP RULE IF EXISTS undelete_dma ON dma;
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"dma", "column":"undelete"}}$$);
-
 DROP RULE IF EXISTS undelete_macrodma ON macrodma;
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"macrodma", "column":"undelete"}}$$);
 
 
 -- 05/03/2025
-
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"drainzone", "column":"lock_level", "dataType":"int4", "isUtils":"False"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"dwfzone", "column":"lock_level", "dataType":"int4", "isUtils":"False"}}$$);
-
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"link", "column":"fluid_type", "dataType":"varchar(50)"}}$$);
 
 -- 06/03/2025
@@ -1032,12 +950,10 @@ ALTER TABLE inp_treatment DROP CONSTRAINT inp_treatment_node_x_pol_node_id_fkey;
 
 -- Drop foreign keys from table node
 
-ALTER TABLE _node DROP CONSTRAINT cat_pavement_id_fkey;
 ALTER TABLE _node DROP CONSTRAINT node_district_id_fkey;
 ALTER TABLE _node DROP CONSTRAINT node_buildercat_id_fkey;
-ALTER TABLE _node DROP CONSTRAINT node_dma_id_fkey;
 ALTER TABLE _node DROP CONSTRAINT node_drainzone_id_fkey;
-ALTER TABLE _node DROP CONSTRAINT node_dwfzone_id_fkey;
+ALTER TABLE _node DROP CONSTRAINT node_dma_id_fkey;
 ALTER TABLE _node DROP CONSTRAINT node_expl_fkey;
 ALTER TABLE _node DROP CONSTRAINT node_expl_id2_fkey;
 ALTER TABLE _node DROP CONSTRAINT node_feature_type_fkey;
@@ -1103,7 +1019,7 @@ CREATE TABLE node (
 	annotation text NULL,
 	observ text NULL,
 	"comment" text NULL,
-	dma_id int4 NULL,
+	omzone_id int4 NULL,
 	soilcat_id varchar(16) NULL,
 	function_type varchar(50) NULL,
 	category_type varchar(50) NULL,
@@ -1126,7 +1042,7 @@ CREATE TABLE node (
 	rotation numeric(6, 3) NULL,
 	link varchar(512) NULL,
 	verified int4 NULL,
-	the_geom public.geometry(point, 25831) NULL,
+	the_geom public.geometry(point, SRID_VALUE) NULL,
 	undelete bool NULL,
 	label_x varchar(30) NULL,
 	label_y varchar(30) NULL,
@@ -1174,7 +1090,6 @@ CREATE TABLE node (
 	CONSTRAINT node_pkey PRIMARY KEY (node_id),
 	CONSTRAINT cat_pavement_id_fkey FOREIGN KEY (pavcat_id) REFERENCES cat_pavement(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT node_district_id_fkey FOREIGN KEY (district_id) REFERENCES ext_district(district_id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT node_dma_id_fkey FOREIGN KEY (dma_id) REFERENCES dma(dma_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT node_drainzone_id_fkey FOREIGN KEY (drainzone_id) REFERENCES drainzone(drainzone_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT node_dwfzone_id_fkey FOREIGN KEY (dwfzone_id) REFERENCES dwfzone(dwfzone_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT node_expl_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON DELETE RESTRICT ON UPDATE CASCADE,
@@ -1193,7 +1108,7 @@ CREATE TABLE node (
 	CONSTRAINT node_workcat_id_fkey FOREIGN KEY (workcat_id) REFERENCES cat_work(id) ON DELETE RESTRICT ON UPDATE CASCADE
 );
 CREATE INDEX node_arc_id ON node USING btree (arc_id);
-CREATE INDEX node_dma ON node USING btree (dma_id);
+CREATE INDEX node_omzone ON node USING btree (omzone_id);
 CREATE INDEX node_exploitation ON node USING btree (expl_id);
 CREATE INDEX node_exploitation2 ON node USING btree (expl_id2);
 CREATE INDEX node_index ON node USING gist (the_geom);
@@ -1243,7 +1158,6 @@ ALTER TABLE _arc DROP CONSTRAINT arc_buildercat_id_fkey;
 ALTER TABLE _arc DROP CONSTRAINT arc_district_id_fkey;
 ALTER TABLE _arc DROP CONSTRAINT arc_dma_id_fkey;
 ALTER TABLE _arc DROP CONSTRAINT arc_drainzone_id_fkey;
-ALTER TABLE _arc DROP CONSTRAINT arc_dwfzone_id_fkey;
 ALTER TABLE _arc DROP CONSTRAINT arc_expl_fkey;
 ALTER TABLE _arc DROP CONSTRAINT arc_expl_id2_fkey;
 ALTER TABLE _arc DROP CONSTRAINT arc_feature_type_fkey;
@@ -1320,7 +1234,7 @@ CREATE TABLE arc (
 	sys_slope numeric(12, 4) NULL,
 	inverted_slope bool DEFAULT false NULL,
 	custom_length numeric(12, 2) NULL,
-	dma_id int4 NULL,
+	omzone_id int4 NULL,
 	soilcat_id varchar(16) NULL,
 	function_type varchar(50) NULL,
 	category_type varchar(50) NULL,
@@ -1342,7 +1256,7 @@ CREATE TABLE arc (
 	descript text NULL,
 	link varchar(512) NULL,
 	verified int4 NULL,
-	the_geom public.geometry(linestring, 25831) NULL,
+	the_geom public.geometry(linestring, SRID_VALUE) NULL,
 	undelete bool NULL,
 	label_x varchar(30) NULL,
 	label_y varchar(30) NULL,
@@ -1400,7 +1314,6 @@ CREATE TABLE arc (
 	CONSTRAINT arc_pkey PRIMARY KEY (arc_id),
 	CONSTRAINT arc_arc_type_fkey FOREIGN KEY (arc_type) REFERENCES cat_feature_arc(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT arc_district_id_fkey FOREIGN KEY (district_id) REFERENCES ext_district(district_id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT arc_dma_id_fkey FOREIGN KEY (dma_id) REFERENCES dma(dma_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT arc_drainzone_id_fkey FOREIGN KEY (drainzone_id) REFERENCES drainzone(drainzone_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT arc_dwfzone_id_fkey FOREIGN KEY (dwfzone_id) REFERENCES dwfzone(dwfzone_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT arc_expl_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON DELETE RESTRICT ON UPDATE CASCADE,
@@ -1419,7 +1332,7 @@ CREATE TABLE arc (
 	CONSTRAINT arc_workcat_id_fkey FOREIGN KEY (workcat_id) REFERENCES cat_work(id) ON DELETE RESTRICT ON UPDATE CASCADE
 );
 CREATE INDEX arc_arccat ON arc USING btree (arccat_id);
-CREATE INDEX arc_dma ON arc USING btree (dma_id);
+CREATE INDEX arc_omzone ON arc USING btree (omzone_id);
 CREATE INDEX arc_exploitation ON arc USING btree (expl_id);
 CREATE INDEX arc_exploitation2 ON arc USING btree (expl_id2);
 CREATE INDEX arc_index ON arc USING gist (the_geom);
@@ -1458,7 +1371,6 @@ ALTER TABLE _connec DROP CONSTRAINT connec_buildercat_id_fkey;
 ALTER TABLE _connec DROP CONSTRAINT connec_district_id_fkey;
 ALTER TABLE _connec DROP CONSTRAINT connec_dma_id_fkey;
 ALTER TABLE _connec DROP CONSTRAINT connec_drainzone_id_fkey;
-ALTER TABLE _connec DROP CONSTRAINT connec_dwfzone_id_fkey;
 ALTER TABLE _connec DROP CONSTRAINT connec_expl_fkey;
 ALTER TABLE _connec DROP CONSTRAINT connec_expl_id2_fkey;
 ALTER TABLE _connec DROP CONSTRAINT connec_feature_type_fkey;
@@ -1521,7 +1433,7 @@ CREATE TABLE connec (
 	annotation text NULL,
 	observ text NULL,
 	"comment" text NULL,
-	dma_id int4 NULL,
+	omzone_id int4 NULL,
 	soilcat_id varchar(16) NULL,
 	function_type varchar(50) NULL,
 	category_type varchar(50) NULL,
@@ -1544,7 +1456,7 @@ CREATE TABLE connec (
 	link varchar(512) NULL,
 	verified int4 NULL,
 	rotation numeric(6, 3) NULL,
-	the_geom public.geometry(point, 25831) NULL,
+	the_geom public.geometry(point, SRID_VALUE) NULL,
 	undelete bool NULL,
 	label_x varchar(30) NULL,
 	label_y varchar(30) NULL,
@@ -1588,7 +1500,6 @@ CREATE TABLE connec (
 	CONSTRAINT connec_pkey PRIMARY KEY (connec_id),
 	CONSTRAINT connec_connectype_id_fkey FOREIGN KEY (connec_type) REFERENCES cat_feature_connec(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT connec_district_id_fkey FOREIGN KEY (district_id) REFERENCES ext_district(district_id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT connec_dma_id_fkey FOREIGN KEY (dma_id) REFERENCES dma(dma_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT connec_drainzone_id_fkey FOREIGN KEY (drainzone_id) REFERENCES drainzone(drainzone_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT connec_dwfzone_id_fkey FOREIGN KEY (dwfzone_id) REFERENCES dwfzone(dwfzone_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT connec_expl_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON DELETE RESTRICT ON UPDATE CASCADE,
@@ -1607,7 +1518,7 @@ CREATE TABLE connec (
 	CONSTRAINT connec_workcat_id_fkey FOREIGN KEY (workcat_id) REFERENCES cat_work(id) ON DELETE RESTRICT ON UPDATE CASCADE
 );
 CREATE INDEX connec_connecat ON connec USING btree (conneccat_id);
-CREATE INDEX connec_dma ON connec USING btree (dma_id);
+CREATE INDEX connec_omzone ON connec USING btree (omzone_id);
 CREATE INDEX connec_exploitation ON connec USING btree (expl_id);
 CREATE INDEX connec_exploitation2 ON connec USING btree (expl_id2);
 CREATE INDEX connec_index ON connec USING gist (the_geom);
@@ -1639,7 +1550,6 @@ ALTER TABLE _gully DROP CONSTRAINT gully_district_id_fkey;
 ALTER TABLE _gully DROP CONSTRAINT gully_buildercat_id_fkey;
 ALTER TABLE _gully DROP CONSTRAINT gully_dma_id_fkey;
 ALTER TABLE _gully DROP CONSTRAINT gully_drainzone_id_fkey;
-ALTER TABLE _gully DROP CONSTRAINT gully_dwfzone_id_fkey;
 ALTER TABLE _gully DROP CONSTRAINT gully_expl_id2_fkey;
 ALTER TABLE _gully DROP CONSTRAINT gully_feature_type_fkey;
 ALTER TABLE _gully DROP CONSTRAINT gully_gullytype_id_fkey;
@@ -1705,7 +1615,7 @@ CREATE TABLE gully (
 	annotation text NULL,
 	observ text NULL,
 	"comment" text NULL,
-	dma_id int4 NULL,
+	omzone_id int4 NULL,
 	soilcat_id varchar(16) NULL,
 	function_type varchar(50) NULL,
 	category_type varchar(50) NULL,
@@ -1728,7 +1638,7 @@ CREATE TABLE gully (
 	link varchar(512) NULL,
 	verified int4 NULL,
 	rotation numeric(6, 3) NULL,
-	the_geom public.geometry(point, 25831) NULL,
+	the_geom public.geometry(point, SRID_VALUE) NULL,
 	undelete bool NULL,
 	label_x varchar(30) NULL,
 	label_y varchar(30) NULL,
@@ -1777,7 +1687,6 @@ CREATE TABLE gully (
 	CONSTRAINT gully_pjoint_type_check CHECK (((pjoint_type)::text = ANY (ARRAY['NODE'::text, 'ARC'::text, 'CONNEC'::text, 'GULLY'::text]))),
 	CONSTRAINT gully_pkey PRIMARY KEY (gully_id),
 	CONSTRAINT gully_district_id_fkey FOREIGN KEY (district_id) REFERENCES ext_district(district_id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT gully_dma_id_fkey FOREIGN KEY (dma_id) REFERENCES dma(dma_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT gully_drainzone_id_fkey FOREIGN KEY (drainzone_id) REFERENCES drainzone(drainzone_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT gully_dwfzone_id_fkey FOREIGN KEY (dwfzone_id) REFERENCES dwfzone(dwfzone_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT gully_expl_id2_fkey FOREIGN KEY (expl_id2) REFERENCES exploitation(expl_id) ON DELETE RESTRICT ON UPDATE CASCADE,
@@ -1796,7 +1705,7 @@ CREATE TABLE gully (
 	CONSTRAINT gully_workcat_id_end_fkey FOREIGN KEY (workcat_id_end) REFERENCES cat_work(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT gully_workcat_id_fkey FOREIGN KEY (workcat_id) REFERENCES cat_work(id) ON DELETE RESTRICT ON UPDATE CASCADE
 );
-CREATE INDEX gully_dma ON gully USING btree (dma_id);
+CREATE INDEX gully_omzone ON gully USING btree (omzone_id);
 CREATE INDEX gully_exploitation ON gully USING btree (expl_id);
 CREATE INDEX gully_exploitation2 ON gully USING btree (expl_id2);
 CREATE INDEX gully_gratecat ON gully USING btree (gullycat_id);
@@ -1934,7 +1843,6 @@ ALTER TABLE element_x_link DROP CONSTRAINT element_x_link_link_id_fkey;
 
 
 -- Drop foreign keys from table link
-ALTER TABLE _link DROP CONSTRAINT link_dwfzone_id_fkey;
 ALTER TABLE _link DROP CONSTRAINT link_exit_type_fkey;
 ALTER TABLE _link DROP CONSTRAINT link_exploitation_id_fkey;
 ALTER TABLE _link DROP CONSTRAINT link_feature_type_fkey;
@@ -1966,11 +1874,11 @@ CREATE TABLE link (
 	userdefined_geom bool NULL,
 	state int2 NOT NULL,
 	expl_id int4 NOT NULL,
-	the_geom public.geometry(linestring, 25831) NULL,
+	the_geom public.geometry(linestring, SRID_VALUE) NULL,
 	tstamp timestamp DEFAULT now() NULL,
 	exit_topelev float8 NULL,
 	sector_id int4 NULL,
-	dma_id int4 NULL,
+	omzone_id int4 NULL,
 	fluid_type varchar(50) NULL,
 	exit_elev numeric(12, 3) NULL,
 	expl_id2 int4 NULL,
@@ -2058,3 +1966,241 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"archived_ps
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"archived_psector_gully_traceability", "column":"length", "dataType":"numeric(12,3)", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"archived_psector_gully_traceability", "column":"width", "dataType":"numeric(12,3)", "isUtils":"False"}}$$);
 
+
+-- MAPZONES
+ALTER TABLE macroexploitation RENAME TO _macroexploitation;
+ALTER TABLE exploitation DROP CONSTRAINT IF EXISTS macroexpl_id_fkey;
+ALTER TABLE _macroexploitation DROP CONSTRAINT macroexploitation_pkey;
+
+DROP INDEX IF EXISTS macroexploitation_index;
+
+CREATE TABLE macroexploitation (
+	macroexpl_id int4 NOT NULL,
+	code text NULL,
+	"name" varchar(50) NOT NULL,
+	descript varchar(100) NULL,
+	lock_level int4 NULL,
+	active bool DEFAULT true NULL,
+	created_at timestamp with time zone DEFAULT now() NULL,
+	created_by varchar(50) DEFAULT CURRENT_USER NULL,
+	updated_at timestamp with time zone NULL,
+	updated_by varchar(50) NULL,
+	CONSTRAINT macroexploitation_pkey PRIMARY KEY (macroexpl_id)
+);
+
+ALTER TABLE exploitation RENAME TO _exploitation;
+
+-- Drop foreign key constraints that reference exploitation_pkey
+ALTER TABLE cat_dscenario DROP CONSTRAINT IF EXISTS cat_dscenario_expl_id_fkey;
+ALTER TABLE cat_dwf DROP CONSTRAINT IF EXISTS cat_dwf_scenario_expl_id_fkey;
+ALTER TABLE cat_hydrology DROP CONSTRAINT IF EXISTS cat_hydrology_expl_id_fkey;
+ALTER TABLE dimensions DROP CONSTRAINT IF EXISTS dimensions_exploitation_id_fkey;
+ALTER TABLE dma DROP CONSTRAINT IF EXISTS dma_expl_id_fkey;
+ALTER TABLE macrodma DROP CONSTRAINT IF EXISTS macrodma_expl_id_fkey;
+ALTER TABLE inp_curve DROP CONSTRAINT IF EXISTS inp_curve_expl_id_fkey;
+ALTER TABLE inp_pattern DROP CONSTRAINT IF EXISTS inp_pattern_expl_id_fkey;
+ALTER TABLE inp_timeseries DROP CONSTRAINT IF EXISTS inp_timeseries_expl_id_fkey;
+ALTER TABLE om_visit DROP CONSTRAINT IF EXISTS om_visit_expl_id_fkey;
+ALTER TABLE plan_psector DROP CONSTRAINT IF EXISTS plan_psector_expl_id_fkey;
+ALTER TABLE raingage DROP CONSTRAINT IF EXISTS raingage_expl_id_fkey;
+ALTER TABLE samplepoint DROP CONSTRAINT IF EXISTS samplepoint_exploitation_id_fkey;
+ALTER TABLE selector_expl DROP CONSTRAINT IF EXISTS selector_expl_id_fkey;
+ALTER TABLE config_user_x_expl DROP CONSTRAINT IF EXISTS config_user_x_expl_expl_id_fkey;
+ALTER TABLE node DROP CONSTRAINT IF EXISTS node_expl_fkey;
+ALTER TABLE node DROP CONSTRAINT IF EXISTS node_expl_id2_fkey;
+ALTER TABLE arc DROP CONSTRAINT IF EXISTS arc_expl_fkey;
+ALTER TABLE arc DROP CONSTRAINT IF EXISTS arc_expl_id2_fkey;
+ALTER TABLE connec DROP CONSTRAINT IF EXISTS connec_expl_fkey;
+ALTER TABLE connec DROP CONSTRAINT IF EXISTS connec_expl_id2_fkey;
+ALTER TABLE gully DROP CONSTRAINT IF EXISTS gully_expl_id2_fkey;
+ALTER TABLE link DROP CONSTRAINT IF EXISTS link_exploitation_id_fkey;
+ALTER TABLE ext_streetaxis DROP CONSTRAINT IF EXISTS ext_streetaxis_exploitation_id_fkey;
+ALTER TABLE ext_address DROP CONSTRAINT IF EXISTS ext_address_exploitation_id_fkey;
+ALTER TABLE ext_plot DROP CONSTRAINT IF EXISTS ext_plot_exploitation_id_fkey;
+ALTER TABLE _arc_border_expl_ DROP CONSTRAINT IF EXISTS arc_border_expl_expl_id_fkey;
+
+ALTER TABLE _exploitation DROP CONSTRAINT exploitation_pkey;
+
+DROP INDEX IF EXISTS exploitation_index;
+
+CREATE TABLE exploitation (
+	expl_id int4 NOT NULL,
+	code text NULL,
+	"name" varchar(50) NOT NULL,
+	descript text NULL,
+	macroexpl_id int4 DEFAULT 0 NOT NULL,
+	lock_level int4 NULL,
+	active bool DEFAULT true NULL,
+	the_geom public.geometry(multipolygon, SRID_VALUE) NULL,
+	created_at timestamp with time zone DEFAULT now() NULL,
+	created_by varchar(50) DEFAULT CURRENT_USER NULL,
+	updated_at timestamp with time zone NULL,
+	updated_by varchar(50) NULL,
+	CONSTRAINT exploitation_pkey PRIMARY KEY (expl_id),
+	CONSTRAINT macroexpl_id_fkey FOREIGN KEY (macroexpl_id) REFERENCES macroexploitation(macroexpl_id) ON DELETE RESTRICT ON UPDATE CASCADE
+);
+CREATE INDEX exploitation_index ON exploitation USING gist (the_geom);
+
+ALTER TABLE macrodma RENAME TO _macrodma;
+ALTER TABLE dma DROP CONSTRAINT IF EXISTS dma_macrodma_id_fkey;
+
+ALTER TABLE _macrodma DROP CONSTRAINT macrodma_pkey;
+
+CREATE TABLE macroomzone (
+	macroomzone_id serial4 NOT NULL,
+	code text NULL,
+	"name" varchar(50) NOT NULL,
+	expl_id int4 NOT NULL,
+	descript text NULL,
+	lock_level int4 NULL,
+	active bool DEFAULT true NULL,
+	the_geom public.geometry(multipolygon, SRID_VALUE) NULL,
+	created_at timestamp with time zone DEFAULT now() NULL,
+	created_by varchar(50) DEFAULT CURRENT_USER NULL,
+	updated_at timestamp with time zone NULL,
+	updated_by varchar(50) NULL,
+	CONSTRAINT macroomzone_pkey PRIMARY KEY (macroomzone_id),
+	CONSTRAINT macroomzone_expl_id_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON DELETE RESTRICT ON UPDATE CASCADE
+);
+CREATE INDEX macroomzone_index ON macroomzone USING gist (the_geom);
+
+ALTER TABLE macrosector RENAME TO _macrosector;
+ALTER TABLE sector DROP CONSTRAINT IF EXISTS sector_macrosector_id_fkey;
+ALTER TABLE _macrosector DROP CONSTRAINT macrosector_pkey;
+
+DROP INDEX IF EXISTS macrosector_index;
+
+CREATE TABLE macrosector (
+	macrosector_id serial4 NOT NULL,
+	code text NULL,
+	"name" varchar(50) NOT NULL,
+	descript text NULL,
+	lock_level int4 NULL,
+	active bool DEFAULT true NULL,
+	the_geom public.geometry(multipolygon, SRID_VALUE) NULL,
+	created_at timestamp with time zone DEFAULT now() NULL,
+	created_by varchar(50) DEFAULT CURRENT_USER NULL,
+	updated_at timestamp with time zone NULL,
+	updated_by varchar(50) NULL,
+	CONSTRAINT macrosector_pkey PRIMARY KEY (macrosector_id)
+);
+CREATE INDEX macrosector_index ON macrosector USING gist (the_geom);
+
+
+
+ALTER TABLE dma RENAME TO _dma;
+
+ALTER TABLE samplepoint DROP CONSTRAINT IF EXISTS samplepoint_verified_fkey;
+
+ALTER TABLE _dma DROP CONSTRAINT dma_pkey;
+
+DROP INDEX IF EXISTS dma_index;
+
+-- ! dma renamed to omzone
+CREATE TABLE omzone (
+	omzone_id serial4 NOT NULL,
+	code text NULL,
+	"name" varchar(30) NULL,
+	descript text NULL,
+	omzone_type varchar(16) NULL,
+	expl_id int4 NULL,
+	macroomzone_id int4 DEFAULT 0 NULL,
+	minc float8 NULL,
+	maxc float8 NULL,
+	effc float8 NULL,
+	link text NULL,
+	graphconfig json DEFAULT '{"use":[{"nodeParent":"", "toArc":[]}], "ignore":[], "forceClosed":[]}'::json NULL,
+	stylesheet json NULL,
+	lock_level int4 NULL,
+	active bool DEFAULT true NULL,
+	the_geom public.geometry(multipolygon, SRID_VALUE) NULL,
+	created_at timestamp with time zone DEFAULT now() NULL,
+	created_by varchar(50) DEFAULT CURRENT_USER NULL,
+	updated_at timestamp with time zone NULL,
+	updated_by varchar(50) NULL,
+	CONSTRAINT omzone_pkey PRIMARY KEY (omzone_id),
+	CONSTRAINT omzone_expl_id_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT omzone_macroomzone_id_fkey FOREIGN KEY (macroomzone_id) REFERENCES macroomzone(macroomzone_id) ON DELETE RESTRICT ON UPDATE CASCADE
+);
+CREATE INDEX omzone_index ON omzone USING gist (the_geom);
+
+
+ALTER TABLE drainzone RENAME TO _drainzone;
+
+ALTER TABLE node DROP CONSTRAINT IF EXISTS node_drainzone_id_fkey;
+ALTER TABLE arc DROP CONSTRAINT IF EXISTS arc_drainzone_id_fkey;
+ALTER TABLE connec DROP CONSTRAINT IF EXISTS connec_drainzone_id_fkey;
+ALTER TABLE gully DROP CONSTRAINT IF EXISTS gully_drainzone_id_fkey;
+ALTER TABLE _drainzone DROP CONSTRAINT drainzone_pkey;
+
+DROP INDEX IF EXISTS drainzone_index;
+
+CREATE TABLE drainzone (
+	drainzone_id serial4 NOT NULL,
+	code text NULL,
+	"name" varchar(30) NULL,
+	drainzone_type varchar(16) NULL,
+	descript text NULL,
+	expl_id int4 NULL,
+	link text NULL,
+	graphconfig json DEFAULT '{"use":[{"nodeParent":""}], "ignore":[], "forceClosed":[]}'::json NULL,
+	stylesheet json NULL,
+	lock_level int4 NULL,
+	active bool DEFAULT true NULL,
+	the_geom public.geometry(multipolygon, SRID_VALUE) NULL,
+	created_at timestamp with time zone DEFAULT now() NULL,
+	created_by varchar(50) DEFAULT CURRENT_USER NULL,
+	updated_at timestamp with time zone NULL,
+	updated_by varchar(50) NULL,
+	CONSTRAINT drainzone_pkey PRIMARY KEY (drainzone_id)
+);
+CREATE INDEX drainzone_index ON drainzone USING gist (the_geom);
+
+ALTER TABLE sector RENAME TO _sector;
+
+-- Drop foreign key constraints that reference sector_pkey
+ALTER TABLE inp_controls DROP CONSTRAINT IF EXISTS inp_controls_x_sector_id_fkey;
+ALTER TABLE inp_dscenario_controls DROP CONSTRAINT IF EXISTS inp_dscenario_controls_sector_id_fkey;
+ALTER TABLE selector_sector DROP CONSTRAINT IF EXISTS inp_selector_sector_id_fkey;
+ALTER TABLE node_border_sector DROP CONSTRAINT IF EXISTS node_border_expl_sector_id_fkey;
+ALTER TABLE _sector DROP CONSTRAINT IF EXISTS sector_parent_id_fkey;
+ALTER TABLE inp_subcatchment DROP CONSTRAINT IF EXISTS subcatchment_sector_id_fkey;
+ALTER TABLE samplepoint DROP CONSTRAINT IF EXISTS samplepoint_sector_id;
+ALTER TABLE dimensions DROP CONSTRAINT IF EXISTS dimensions_sector_id;
+ALTER TABLE node DROP CONSTRAINT IF EXISTS node_sector_id_fkey;
+ALTER TABLE arc DROP CONSTRAINT IF EXISTS arc_sector_id_fkey;
+ALTER TABLE connec DROP CONSTRAINT IF EXISTS connec_sector_id_fkey;
+ALTER TABLE gully DROP CONSTRAINT IF EXISTS gully_sector_id_fkey;
+ALTER TABLE "element" DROP CONSTRAINT IF EXISTS element_sector_id;
+ALTER TABLE link DROP CONSTRAINT IF EXISTS link_sector_id_fkey;
+ALTER TABLE _config_user_x_sector DROP CONSTRAINT IF EXISTS config_user_x_sector_sector_id_fkey;
+
+ALTER TABLE _sector DROP CONSTRAINT sector_pkey;
+
+DROP INDEX IF EXISTS sector_index;
+
+CREATE TABLE sector (
+	sector_id serial4 NOT NULL,
+	code text NULL,
+	"name" varchar(50) NOT NULL,
+	descript text NULL,
+	sector_type varchar(50) NULL,
+	macrosector_id int4 DEFAULT 0 NULL,
+	parent_id int4 NULL,
+	graphconfig json DEFAULT '{"use":[{"nodeParent":"", "toArc":[]}], "ignore":[], "forceClosed":[]}'::json NULL,
+	stylesheet json NULL,
+	link text NULL,
+	lock_level int4 NULL,
+	active bool DEFAULT true NULL,
+	the_geom public.geometry(multipolygon, SRID_VALUE) NULL,
+	created_at timestamp with time zone DEFAULT now() NULL,
+	created_by varchar(50) DEFAULT CURRENT_USER NULL,
+	updated_at timestamp with time zone NULL,
+	updated_by varchar(50) NULL,
+	CONSTRAINT sector_pkey PRIMARY KEY (sector_id),
+	CONSTRAINT sector_macrosector_id_fkey FOREIGN KEY (macrosector_id) REFERENCES macrosector(macrosector_id) ON DELETE RESTRICT ON UPDATE CASCADE,
+	CONSTRAINT sector_parent_id_fkey FOREIGN KEY (parent_id) REFERENCES sector(sector_id) ON DELETE RESTRICT ON UPDATE CASCADE
+);
+CREATE INDEX sector_index ON sector USING gist (the_geom);
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"samplepoint", "column":"dma_id", "newName":"omzone_id"}}$$);
