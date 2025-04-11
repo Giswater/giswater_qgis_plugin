@@ -51,6 +51,7 @@ class AddNewLot:
         self.rb_red.setColor(Qt.darkRed)
         self.rb_red.setIconSize(20)
         self.rb_list = []
+        self.schema_name = lib_vars.schema_name
         self.lot_date_format = 'yyyy-MM-dd'
         self.max_id = 0
         self.signal_selectionChanged = False
@@ -331,7 +332,7 @@ class AddNewLot:
             tools_qgis.show_message(msg, 0)
             return
 
-        sql = ("SELECT DISTINCT(idval) FROM cm.cat_team")
+        sql = ("SELECT DISTINCT(name) FROM cm.cat_team")
         rows = tools_db.get_rows(sql)
         if rows:
             for row in rows:
@@ -340,11 +341,11 @@ class AddNewLot:
                     tools_qgis.show_message(msg, 0)
                     return
 
-        sql = (f"INSERT INTO {self.schemaname}.cat_team (idval, descript, active) "
+        sql = (f"INSERT INTO {self.schemaname}.cat_team (name, descript, active) "
                f"VALUES('{team_name}', '{team_descript}', '{team_active}');")
         tools_db.execute_sql(sql)
 
-        sql = ("SELECT id, idval FROM cm.cat_team WHERE active is True ORDER BY idval")
+        sql = ("SELECT team_id, name FROM cm.cat_team WHERE active is True ORDER BY idval")
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_resources_man.cmb_team, rows)
 
@@ -380,8 +381,8 @@ class AddNewLot:
     def populate_cmb_team(self):
         """ Fill ComboBox cmb_assigned_to """
 
-        sql = ("SELECT DISTINCT(cat_team.id), idval "
-               "FROM cm.cat_team WHERE active is True ORDER BY idval")
+        sql = ("SELECT DISTINCT(cat_team.team_id), name "
+               "FROM cm.cat_team WHERE active is True ORDER BY name")
         rows = tools_db.get_rows(sql, commit=True)
 
         if rows:
@@ -406,7 +407,7 @@ class AddNewLot:
         model = qtable.model()
         if model.submitAll():
             if manage_type == 'team_selector':
-                sql = ("SELECT id, idval FROM cm.cat_team WHERE active is True ORDER BY idval")
+                sql = ("SELECT team_id, name FROM cm.cat_team WHERE active is True ORDER BY name")
                 rows = tools_db.get_rows(sql)
                 if rows:
                     tools_qt.fill_combo_values(self.dlg_resources_man.cmb_team, rows, 1)
@@ -424,15 +425,15 @@ class AddNewLot:
         corresponding UI elements, returning a flag indicating whether the work order was successfully loaded."""
 
         # Fill ComboBox cmb_ot
-        sql = ("SELECT ext_workorder.ct, ext_workorder.class_id,  ext_workorder.wotype_id, ext_workorder.wotype_name, "
-               " ext_workorder.address, ext_workorder.serie, ext_workorder.visitclass_id, ext_workorder.observations "
-               " FROM cm.ext_workorder ")
+        sql = ("SELECT ct, workorder_class, workorder_id, workorder_name, "
+               " address, serie, observ "
+               " FROM cm.workorder ")
 
         if lot_id:
             _sql = ("SELECT serie from cm.om_visit_lot "
                     " WHERE id = '"+str(lot_id)+"'")
             ct = tools_db.get_rows(_sql)
-            sql += " WHERE ext_workorder.serie = '"+str(ct[0])+"'"
+            sql += " WHERE workorder.serie = '"+str(ct[0])+"'"
         sql += " order by ct desc"
 
         rows = tools_db.get_rows(sql)
@@ -645,7 +646,7 @@ class AddNewLot:
         # Relations tab
         # fill feature_type
         sql = ("SELECT id, id"
-               " FROM sys_feature_type"
+               f" FROM {self.schema_name}.sys_feature_type"
                " WHERE classlevel = 1 or classlevel = 2"
                " ORDER BY id")
         feature_type = tools_db.get_rows(sql, commit=self.autocommit)
@@ -726,7 +727,7 @@ class AddNewLot:
         """Sets the lot form fields by querying the database with the given lot ID.
         Updates work order details, date fields, visit class, team assignment, status, description, and feature type in the UI."""
 
-        sql = ("SELECT om_visit_lot.*, ext_workorder.ct from cm.om_visit_lot LEFT JOIN ext_workorder using (serie) "
+        sql = ("SELECT om_visit_lot.*, workorder.ct from cm.om_visit_lot LEFT JOIN workorder using (serie) "
                "WHERE id ='" + str(lot_id) + "'")
         lot = tools_db.get_rows(sql, commit=True)
         if lot:
@@ -1513,7 +1514,7 @@ class AddNewLot:
         tools_gw.load_settings(self.dlg_lot_man)
         self.load_user_values(self.dlg_lot_man)
         self.dlg_lot_man.tbl_lots.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self.populate_combo_filters(self.dlg_lot_man.cmb_actuacio, 'ext_workorder_type')
+        self.populate_combo_filters(self.dlg_lot_man.cmb_actuacio, 'workorder_type')
         rows = tools_db.get_values_from_catalog('om_typevalue', 'lot_cat_status')
         if rows:
             rows.insert(0, ['', ''])
@@ -2171,18 +2172,10 @@ class AddNewLot:
         tools_gw.load_settings(self.dlg_resources_man)
 
         # Populate combos
-        sql = ("SELECT id, idval FROM cm.cat_team WHERE active is True ORDER BY idval")
+        sql = ("SELECT team_id, name FROM cm.cat_team WHERE active is True ORDER BY idval")
         rows = tools_db.get_rows(sql)
         if rows:
             tools_qt.fill_combo_values(self.dlg_resources_man.cmb_team, rows, 1)
-
-        sql = ("SELECT id, idval FROM cm.ext_cat_vehicle ORDER BY idval")
-        rows = tools_db.get_rows(sql)
-        if rows:
-            tools_qt.fill_combo_values(self.dlg_resources_man.cmb_vehicle, rows, 1)
-
-        self.populate_team_views()
-        self.populate_vehicle_views()
 
         # Set signals
         self.dlg_resources_man.cmb_team.currentIndexChanged.connect(self.populate_team_views)
@@ -2396,18 +2389,18 @@ class AddNewLot:
         message = "You are trying delete team '" + str(filter_team) + "'. Do you want continue?"
         answer =  tools_qt.show_question(message, "Delete team")
         if answer:
-            sql = ("SELECT * FROM om_vehicle_x_parameters JOIN cat_team ON cat_team.id = om_vehicle_x_parameters.team_id WHERE cat_team.idval = '" + str(filter_team) + "'")
+            sql = ("SELECT * FROM om_vehicle_x_parameters JOIN cat_team ON cat_team.team_id = om_vehicle_x_parameters.team_id WHERE cat_team.name = '" + str(filter_team) + "'")
             rows = tools_db.get_rows(sql, log_sql=True)
             if rows:
                 msg = "This team have some relations on om_vehicle_x_parameters table. Abort delete transaction."
                 tools_qt.show_info_box(msg, "Info")
                 return
-            sql = ("DELETE FROM cm.cat_team WHERE idval = '" + str(filter_team) + "'")
+            sql = ("DELETE FROM cm.cat_team WHERE name = '" + str(filter_team) + "'")
             status = tools_db.execute_sql(sql)
             if status:
                 msg = "Successful removal."
                 tools_qt.show_info_box(msg, "Info")
-                sql = ("SELECT id, idval FROM cm.cat_team WHERE active is True ORDER BY idval")
+                sql = ("SELECT team_id, name FROM cm.cat_team WHERE active is True ORDER BY idval")
                 rows = tools_db.get_rows(sql, commit=True)
                 if rows:
                     tools_qt.fill_combo_values(self.dlg_resources_man.cmb_team, rows, 1)
@@ -2473,7 +2466,7 @@ class AddNewLot:
 
     def refresh_materialize_view(self):
 
-        sql = ("REFRESH MATERIALIZED VIEW ext_workorder WITH DATA;")
+        sql = ("REFRESH MATERIALIZED VIEW workorder WITH DATA;")
         tools_db.execute_sql(sql)
         msg = "Data updated successfully."
         tools_qgis.show_info(msg)
