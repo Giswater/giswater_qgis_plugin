@@ -415,3 +415,6 @@ INSERT INTO om_reviewclass (id, idval, descript, active) VALUES(1, 'DEPOSITOS', 
 INSERT INTO om_reviewclass (id, idval, descript, active) VALUES(2, 'VALVULAS HIDRAULICAS', 'TEST INSERT', true);
 INSERT INTO om_reviewclass (id, idval, descript, active) VALUES(3, 'CAPAS PADRE', 'TEST INSERT', true);
 
+INSERT INTO om_reviewclass_x_layer (reviewclass_id, layer_id, schema_name, feature_type, active) VALUES(3, 've_node_pr_susta_valve', 'parent', 'NODE', true);
+INSERT INTO om_reviewclass_x_layer (reviewclass_id, layer_id, schema_name, feature_type, active) VALUES(3, 've_node_pr_break_valve', 'parent', 'NODE', true);
+INSERT INTO om_reviewclass_x_layer (reviewclass_id, layer_id, schema_name, feature_type, active) VALUES(3, 've_node_pr_reduc_valve', 'parent', 'NODE', true);
