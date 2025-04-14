@@ -291,7 +291,7 @@ AS WITH
       ),
     node_selected AS
       (
-		SELECT node_id,
+		SELECT node.node_id,
         node.code,
         node.sys_code,
         node.top_elev,

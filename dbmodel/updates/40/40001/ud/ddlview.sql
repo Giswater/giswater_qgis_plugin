@@ -1004,7 +1004,7 @@ AS WITH
         ),
     connec_selector AS
         (
-            SELECT DISTINCT ON (connec_id), connec_id, arc_id::varchar(16), NULL::integer AS link_id
+            SELECT DISTINCT ON (connec_id) connec_id, arc_id::varchar(16), NULL::integer AS link_id
             FROM connec
 			JOIN selector_expl se ON (se.cur_user = current_user AND se.expl_id = connec.expl_id) OR (se.cur_user = current_user AND se.expl_id = connec.expl_id2)
             JOIN selector_state ss ON ss.cur_user = current_user AND connec.state = ss.state_id
