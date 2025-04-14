@@ -164,8 +164,8 @@ delete from element where element_id in ('787', '791', '794', '983', '987', '990
 
 delete from om_visit where id in (386, 389, 390, 575);
 
-update macroexploitation set name ='macroexpl-01', undelete = true where macroexpl_id = 1;
-insert into macroexploitation values (2, 'Other', 'Macroexploitation used for test', true, true);
+update macroexploitation set name ='macroexpl-01', lock_level = 1 where macroexpl_id = 1;
+insert into macroexploitation (macroexpl_id, code, name, descript, lock_level, active) values (2, '2', 'Other', 'Macroexploitation used for test', 1, true);
 
 -- update descript for cat_feature
 update cat_feature set descript = concat(left(id,1), substring(lower(id), 2,99));

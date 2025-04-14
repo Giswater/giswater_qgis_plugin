@@ -208,34 +208,34 @@ BEGIN
 		END IF;
 
 
-		-- Dma ID
-		IF (NEW.dma_id IS NULL) THEN
+		-- Omzone ID
+		IF (NEW.omzone_id IS NULL) THEN
 
 			-- control error without any mapzones defined on the table of mapzone
-			IF ((SELECT COUNT(*) FROM dma WHERE active IS TRUE ) = 0) THEN
+			IF ((SELECT COUNT(*) FROM omzone WHERE active IS TRUE ) = 0) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 		       	"data":{"message":"1012", "function":"1204","parameters":null}}$$);';
 			END IF;
 
 			-- getting value default
-			IF (NEW.dma_id IS NULL) THEN
-				NEW.dma_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_dma_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+			IF (NEW.omzone_id IS NULL) THEN
+				NEW.omzone_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_omzone_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			END IF;
 
 			-- getting value from geometry of mapzone
-			IF (NEW.dma_id IS NULL) THEN
-				SELECT count(*) INTO v_count FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) AND active IS TRUE ;
+			IF (NEW.omzone_id IS NULL) THEN
+				SELECT count(*) INTO v_count FROM omzone WHERE ST_DWithin(NEW.the_geom, omzone.the_geom,0.001) AND active IS TRUE ;
 				IF v_count = 1 THEN
-					NEW.dma_id = (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) AND active IS TRUE LIMIT 1);
+					NEW.omzone_id = (SELECT omzone_id FROM omzone WHERE ST_DWithin(NEW.the_geom, omzone.the_geom,0.001) AND active IS TRUE LIMIT 1);
 				ELSE
-					NEW.dma_id =(SELECT dma_id FROM v_edit_arc WHERE ST_DWithin(NEW.the_geom, v_edit_arc.the_geom, v_proximity_buffer)
+					NEW.omzone_id =(SELECT omzone_id FROM v_edit_arc WHERE ST_DWithin(NEW.the_geom, v_edit_arc.the_geom, v_proximity_buffer)
 					order by ST_Distance (NEW.the_geom, v_edit_arc.the_geom) LIMIT 1);
 				END IF;
 			END IF;
 
 			-- control error when no value
-			IF (NEW.dma_id IS NULL) THEN
-				NEW.dma_id = 0;
+			IF (NEW.omzone_id IS NULL) THEN
+				NEW.omzone_id = 0;
 			END IF;
 		END IF;
 
@@ -484,13 +484,13 @@ BEGIN
 		-- FEATURE INSERT
 		IF v_matfromcat THEN
 			INSERT INTO connec (connec_id, code, sys_code, customer_code, top_elev, y1, y2,conneccat_id, connec_type, sector_id, demand, "state",  state_type, connec_depth, connec_length, arc_id, annotation,
-			"observ","comment",  dma_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, workcat_id_plan,
+			"observ","comment",  omzone_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, workcat_id_plan,
 			builtdate, enddate, ownercat_id, muni_id, postcode, district_id,
 			streetaxis2_id, streetaxis_id, postnumber, postnumber2, postcomplement, postcomplement2, descript, rotation, link, verified, the_geom,  undelete,  label_x, label_y,
 			label_rotation, accessibility,diagonal, expl_id, publish, inventory, uncertain, num_value,
 			lastupdate, lastupdate_user, asset_id, drainzone_id, expl_id2, adate, adescript, plot_code, placement_type, label_quadrant, access_type, streetname, streetname2, lock_level)
 			VALUES (NEW.connec_id, NEW.code, NEW.sys_code, NEW.customer_code, NEW.top_elev, NEW.y1, NEW.y2, NEW.conneccat_id, NEW.connec_type, NEW.sector_id, NEW.demand,NEW."state", NEW.state_type, NEW.connec_depth,
-			NEW.connec_length, NEW.arc_id, NEW.annotation, NEW."observ", NEW."comment", NEW.dma_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type, NEW.location_type,
+			NEW.connec_length, NEW.arc_id, NEW.annotation, NEW."observ", NEW."comment", NEW.omzone_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type, NEW.location_type,
 			NEW.workcat_id, NEW.workcat_id_end, NEW.workcat_id_plan, NEW.builtdate, NEW.enddate, NEW.ownercat_id, NEW.muni_id, NEW.postcode, NEW.district_id,
 			v_streetaxis2, v_streetaxis, NEW.postnumber, NEW.postnumber2, NEW.postcomplement, NEW.postcomplement2,
 			NEW.descript, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom, NEW.undelete, NEW.label_x, NEW.label_y, NEW.label_rotation,
@@ -499,13 +499,13 @@ BEGIN
 			NEW.label_quadrant, NEW.access_type, NEW.streetname, NEW.streetname2, NEW.lock_level);
 		ELSE
 			INSERT INTO connec (connec_id, code, sys_code, customer_code, top_elev, y1, y2,conneccat_id, connec_type, sector_id, demand, "state",  state_type, connec_depth, connec_length, arc_id, annotation,
-			"observ","comment",  dma_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, workcat_id_plan,
+			"observ","comment",  omzone_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, workcat_id_plan,
 			builtdate, enddate, ownercat_id, muni_id,postcode,district_id,
 			streetaxis2_id, streetaxis_id, postnumber, postnumber2, postcomplement, postcomplement2, descript, rotation, link, verified, the_geom,  undelete, label_x, label_y,
 			label_rotation, accessibility,diagonal, expl_id, publish, inventory, uncertain, num_value, matcat_id,
 			lastupdate, lastupdate_user, asset_id, drainzone_id, expl_id2, adate, adescript, plot_code, placement_type, label_quadrant, access_type, streetname, streetname2, lock_level)
 			VALUES (NEW.connec_id, NEW.code, NEW.sys_code, NEW.customer_code, NEW.top_elev, NEW.y1, NEW.y2, NEW.conneccat_id, NEW.connec_type, NEW.sector_id, NEW.demand,NEW."state", NEW.state_type, NEW.connec_depth,
-			NEW.connec_length, NEW.arc_id, NEW.annotation, NEW."observ", NEW."comment", NEW.dma_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type, NEW.location_type,
+			NEW.connec_length, NEW.arc_id, NEW.annotation, NEW."observ", NEW."comment", NEW.omzone_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type, NEW.location_type,
 			NEW.workcat_id, NEW.workcat_id_end, NEW.workcat_id_plan, NEW.builtdate, NEW.enddate, NEW.ownercat_id, NEW.muni_id, NEW.postcode, NEW.district_id,
 			v_streetaxis2, v_streetaxis, NEW.postnumber, NEW.postnumber2, NEW.postcomplement, NEW.postcomplement2,
 			NEW.descript, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom, NEW.undelete, NEW.label_x, NEW.label_y, NEW.label_rotation,
@@ -545,7 +545,7 @@ BEGIN
 
 			-- recover values in order to do not disturb this workflow
 			SELECT * INTO v_arc FROM arc WHERE arc_id = NEW.arc_id;
-			NEW.pjoint_id = v_arc.arc_id; NEW.pjoint_type = 'ARC'; NEW.sector_id = v_arc.sector_id; NEW.dma_id = v_arc.dma_id;
+			NEW.pjoint_id = v_arc.arc_id; NEW.pjoint_type = 'ARC'; NEW.sector_id = v_arc.sector_id; NEW.omzone_id = v_arc.omzone_id;
 		END IF;
 
 		-- childtable insert
@@ -631,7 +631,7 @@ BEGIN
 					END IF;
 
 					-- setting values
-					NEW.sector_id = 0; NEW.dma_id = 0; NEW.pjoint_id = null; NEW.pjoint_type = null;
+					NEW.sector_id = 0; NEW.omzone_id = 0; NEW.pjoint_id = null; NEW.pjoint_type = null;
 				END IF;
 			ELSE
 				-- when arc_id comes from connec table
@@ -647,14 +647,14 @@ BEGIN
 
 					-- recover values in order to do not disturb this workflow
 					SELECT * INTO v_arc FROM arc WHERE arc_id = NEW.arc_id;
-					NEW.pjoint_id = v_arc.arc_id; NEW.pjoint_type = 'ARC'; NEW.sector_id = v_arc.sector_id; NEW.dma_id = v_arc.dma_id;
+					NEW.pjoint_id = v_arc.arc_id; NEW.pjoint_type = 'ARC'; NEW.sector_id = v_arc.sector_id; NEW.omzone_id = v_arc.omzone_id;
 				ELSE
 
 					IF (SELECT count(*)FROM link WHERE feature_id = NEW.connec_id AND state = 1) > 0 THEN
 						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 						"data":{"message":"3204", "function":"1204","parameters":null}}$$);';
 					ELSE
-						NEW.sector_id = 0; NEW.dma_id = 0; NEW.pjoint_id = null; NEW.pjoint_type = null;
+						NEW.sector_id = 0; NEW.omzone_id = 0; NEW.pjoint_id = null; NEW.pjoint_type = null;
 					END IF;
 
 				END IF;
@@ -759,7 +759,7 @@ BEGIN
 			UPDATE connec
 			SET code=NEW.code, sys_code=NEW.sys_code, top_elev=NEW.top_elev, y1=NEW.y1, y2=NEW.y2, conneccat_id=NEW.conneccat_id, connec_type=NEW.connec_type, sector_id=NEW.sector_id, demand=NEW.demand,
 			connec_depth=NEW.connec_depth, connec_length=NEW.connec_length, annotation=NEW.annotation, "observ"=NEW."observ",
-			"comment"=NEW."comment", dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, function_type=NEW.function_type, category_type=NEW.category_type, fluid_type=NEW.fluid_type,
+			"comment"=NEW."comment", omzone_id=NEW.omzone_id, soilcat_id=NEW.soilcat_id, function_type=NEW.function_type, category_type=NEW.category_type, fluid_type=NEW.fluid_type,
 			location_type=NEW.location_type, workcat_id=NEW.workcat_id, workcat_id_end=NEW.workcat_id_end, workcat_id_plan=NEW.workcat_id_plan, builtdate=NEW.builtdate, enddate=NEW.enddate,
 			ownercat_id=NEW.ownercat_id, muni_id=NEW.muni_id, postcode=NEW.postcode, district_id =NEW.district_id, streetaxis2_id=v_streetaxis2, streetaxis_id=v_streetaxis, postnumber=NEW.postnumber, postnumber2=NEW.postnumber2, postcomplement=NEW.postcomplement, postcomplement2=NEW.postcomplement2, descript=NEW.descript,
 			rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, undelete=NEW.undelete,
@@ -771,7 +771,7 @@ BEGIN
 			UPDATE connec
 			SET code=NEW.code, sys_code=NEW.sys_code, top_elev=NEW.top_elev, y1=NEW.y1, y2=NEW.y2, conneccat_id=NEW.conneccat_id, connec_type=NEW.connec_type, sector_id=NEW.sector_id, demand=NEW.demand,
 			connec_depth=NEW.connec_depth, connec_length=NEW.connec_length, annotation=NEW.annotation, "observ"=NEW."observ",
-			"comment"=NEW."comment", dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id, function_type=NEW.function_type, category_type=NEW.category_type, fluid_type=NEW.fluid_type,
+			"comment"=NEW."comment", omzone_id=NEW.omzone_id, soilcat_id=NEW.soilcat_id, function_type=NEW.function_type, category_type=NEW.category_type, fluid_type=NEW.fluid_type,
 			location_type=NEW.location_type, workcat_id=NEW.workcat_id, workcat_id_end=NEW.workcat_id_end, workcat_id_plan=NEW.workcat_id_plan, builtdate=NEW.builtdate, enddate=NEW.enddate,
 			ownercat_id=NEW.ownercat_id, muni_id=NEW.muni_id, postcode=NEW.postcode, district_id=NEW.district_id, streetaxis2_id=v_streetaxis2, streetaxis_id=v_streetaxis, postnumber=NEW.postnumber, postnumber2=NEW.postnumber2, postcomplement=NEW.postcomplement, postcomplement2=NEW.postcomplement2, descript=NEW.descript,
 			rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, undelete=NEW.undelete,

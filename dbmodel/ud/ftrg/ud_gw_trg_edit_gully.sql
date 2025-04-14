@@ -237,34 +237,34 @@ BEGIN
 		END IF;
 
 
-		-- Dma ID
-		IF (NEW.dma_id IS NULL) THEN
+		-- Omzone ID
+		IF (NEW.omzone_id IS NULL) THEN
 
 			-- control error without any mapzones defined on the table of mapzone
-			IF ((SELECT COUNT(*) FROM dma WHERE active IS TRUE) = 0) THEN
+			IF ((SELECT COUNT(*) FROM omzone WHERE active IS TRUE) = 0) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 		       	"data":{"message":"1012", "function":"1206","parameters":null}}$$);';
 			END IF;
 
 			-- getting value default
-			IF (NEW.dma_id IS NULL) THEN
-				NEW.dma_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_dma_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+			IF (NEW.omzone_id IS NULL) THEN
+				NEW.omzone_id := (SELECT "value" FROM config_param_user WHERE "parameter"='edit_omzone_vdefault' AND "cur_user"="current_user"() LIMIT 1);
 			END IF;
 
 			-- getting value from geometry of mapzone
-			IF (NEW.dma_id IS NULL) THEN
-				SELECT count(*) INTO v_count FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) AND active IS TRUE ;
+			IF (NEW.omzone_id IS NULL) THEN
+				SELECT count(*) INTO v_count FROM omzone WHERE ST_DWithin(NEW.the_geom, omzone.the_geom,0.001) AND active IS TRUE ;
 				IF v_count = 1 THEN
-					NEW.dma_id = (SELECT dma_id FROM dma WHERE ST_DWithin(NEW.the_geom, dma.the_geom,0.001) AND active IS TRUE LIMIT 1);
+					NEW.omzone_id = (SELECT omzone_id FROM omzone WHERE ST_DWithin(NEW.the_geom, omzone.the_geom,0.001) AND active IS TRUE LIMIT 1);
 				ELSE
-					NEW.dma_id =(SELECT dma_id FROM v_edit_arc WHERE ST_DWithin(NEW.the_geom, v_edit_arc.the_geom, v_proximity_buffer)
+					NEW.omzone_id =(SELECT omzone_id FROM v_edit_arc WHERE ST_DWithin(NEW.the_geom, v_edit_arc.the_geom, v_proximity_buffer)
 					order by ST_Distance (NEW.the_geom, v_edit_arc.the_geom) LIMIT 1);
 				END IF;
 			END IF;
 
 			-- control error when no value
-			IF (NEW.dma_id IS NULL) THEN
-				NEW.dma_id = 0;
+			IF (NEW.omzone_id IS NULL) THEN
+				NEW.omzone_id = 0;
 			END IF;
 		END IF;
 
@@ -585,7 +585,7 @@ BEGIN
 		IF v_matfromcat THEN
 
 			INSERT INTO gully (gully_id, code, sys_code, top_elev, "ymax",sandbox, matcat_id, gully_type, gullycat_id, units, groove, _connec_arccat_id, connec_length,
-				connec_depth, siphon, arc_id, sector_id, "state",state_type, annotation, "observ", "comment", dma_id, soilcat_id, function_type,
+				connec_depth, siphon, arc_id, sector_id, "state",state_type, annotation, "observ", "comment", omzone_id, soilcat_id, function_type,
 				category_type, fluid_type, location_type, workcat_id, workcat_id_end, workcat_id_plan, builtdate, enddate, ownercat_id, muni_id,
 				postcode, district_id, streetaxis_id, postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, descript, rotation,
 				link,verified, the_geom, undelete,label_x, label_y,label_rotation, expl_id, publish, inventory,uncertain, num_value,
@@ -593,7 +593,7 @@ BEGIN
 				siphon_type, odorflap, connec_y2, placement_type, label_quadrant, access_type, streetname, streetname2, lock_level, length, width)
 			VALUES (NEW.gully_id, NEW.code, NEW.sys_code, NEW.top_elev, NEW."ymax",NEW.sandbox, NEW.matcat_id, NEW.gully_type, NEW.gullycat_id, NEW.units, NEW.groove,
 				NEW.connec_arccat_id, NEW.connec_length, NEW.connec_depth, NEW.siphon, NEW.arc_id, NEW.sector_id, NEW."state",
-				NEW.state_type, NEW.annotation, NEW."observ", NEW."comment", NEW.dma_id, NEW.soilcat_id, NEW.function_type, NEW.category_type,
+				NEW.state_type, NEW.annotation, NEW."observ", NEW."comment", NEW.omzone_id, NEW.soilcat_id, NEW.function_type, NEW.category_type,
 				NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.workcat_id_end, NEW.workcat_id_plan, NEW.builtdate, NEW.enddate,
 				NEW.ownercat_id, NEW.muni_id, NEW.postcode, NEW.district_id, v_streetaxis, NEW.postnumber, NEW.postcomplement, v_streetaxis2,
 				NEW.postnumber2, NEW.postcomplement2, NEW.descript, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom, NEW.undelete,
@@ -604,7 +604,7 @@ BEGIN
 		ELSE
 
 			INSERT INTO gully (gully_id, code, sys_code, top_elev, "ymax",sandbox, matcat_id, gully_type, gullycat_id, units, groove, _connec_arccat_id, connec_length,
-				connec_depth, siphon, arc_id, sector_id, "state",state_type, annotation, "observ", "comment", dma_id, soilcat_id, function_type,
+				connec_depth, siphon, arc_id, sector_id, "state",state_type, annotation, "observ", "comment", omzone_id, soilcat_id, function_type,
 				category_type, fluid_type, location_type, workcat_id, workcat_id_end, workcat_id_plan, builtdate, enddate, ownercat_id, muni_id,
 				postcode, district_id, streetaxis_id, postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, descript, rotation,
 				link,verified, the_geom, undelete,label_x, label_y,label_rotation, expl_id, publish, inventory,uncertain, num_value,
@@ -612,7 +612,7 @@ BEGIN
 				siphon_type, odorflap, connec_y2, placement_type, label_quadrant, access_type, streetname, streetname2, lock_level, length, width)
 			VALUES (NEW.gully_id, NEW.code, NEW.sys_code, NEW.top_elev, NEW."ymax",NEW.sandbox, NEW.matcat_id, NEW.gully_type, NEW.gullycat_id, NEW.units, NEW.groove,
 				NEW.connec_arccat_id, NEW.connec_length, NEW.connec_depth, NEW.siphon, NEW.arc_id, NEW.sector_id, NEW."state",
-				NEW.state_type, NEW.annotation, NEW."observ", NEW."comment", NEW.dma_id, NEW.soilcat_id, NEW.function_type, NEW.category_type,
+				NEW.state_type, NEW.annotation, NEW."observ", NEW."comment", NEW.omzone_id, NEW.soilcat_id, NEW.function_type, NEW.category_type,
 				NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.workcat_id_end, NEW.workcat_id_plan, NEW.builtdate, NEW.enddate,
 				NEW.ownercat_id, NEW.muni_id, NEW.postcode, NEW.district_id, v_streetaxis, NEW.postnumber, NEW.postcomplement, v_streetaxis2,
 				NEW.postnumber2, NEW.postcomplement2, NEW.descript, NEW.rotation, NEW.link, NEW.verified, NEW.the_geom, NEW.undelete,
@@ -642,7 +642,7 @@ BEGIN
 
 			-- recover values in order to do not disturb this workflow
 			SELECT * INTO v_arc FROM arc WHERE arc_id = NEW.arc_id;
-			NEW.pjoint_id = v_arc.arc_id; NEW.pjoint_type = 'ARC'; NEW.sector_id = v_arc.sector_id; NEW.dma_id = v_arc.dma_id;
+			NEW.pjoint_id = v_arc.arc_id; NEW.pjoint_type = 'ARC'; NEW.sector_id = v_arc.sector_id; NEW.omzone_id = v_arc.omzone_id;
 		END IF;
 
 		-- childtable insert
@@ -735,7 +735,7 @@ BEGIN
 					END IF;
 
 					-- setting values
-					NEW.sector_id = 0; NEW.dma_id = 0; NEW.pjoint_id = null; NEW.pjoint_type = null;
+					NEW.sector_id = 0; NEW.omzone_id = 0; NEW.pjoint_id = null; NEW.pjoint_type = null;
 				END IF;
 			ELSE
 				-- when arc_id comes from gully table
@@ -751,14 +751,14 @@ BEGIN
 
 					-- recover values in order to do not disturb this workflow
 					SELECT * INTO v_arc FROM arc WHERE arc_id = NEW.arc_id;
-					NEW.pjoint_id = v_arc.arc_id; NEW.pjoint_type = 'ARC'; NEW.sector_id = v_arc.sector_id; NEW.dma_id = v_arc.dma_id;
+					NEW.pjoint_id = v_arc.arc_id; NEW.pjoint_type = 'ARC'; NEW.sector_id = v_arc.sector_id; NEW.omzone_id = v_arc.omzone_id;
 
 				ELSE
 					IF (SELECT count(*)FROM link WHERE feature_id = NEW.gully_id AND state = 1) > 0 THEN
 						EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
 						"data":{"message":"3206", "function":"1206","parameters":null}}$$);';
 					ELSE
-						NEW.sector_id = 0; NEW.dma_id = 0; NEW.pjoint_id = null; NEW.pjoint_type = null;
+						NEW.sector_id = 0; NEW.omzone_id = 0; NEW.pjoint_id = null; NEW.pjoint_type = null;
 					END IF;
 				END IF;
 			END IF;
@@ -919,7 +919,7 @@ BEGIN
 			UPDATE gully
 			SET code=NEW.code, sys_code=NEW.sys_code, top_elev=NEW.top_elev, ymax=NEW."ymax", sandbox=NEW.sandbox, matcat_id=NEW.matcat_id, gully_type=NEW.gully_type, gullycat_id=NEW.gullycat_id, units=NEW.units,
 			groove=NEW.groove, _connec_arccat_id=NEW.connec_arccat_id, connec_length=NEW.connec_length, connec_depth=NEW.connec_depth, siphon=NEW.siphon, sector_id=NEW.sector_id,
-			"state"=NEW."state",  state_type=NEW.state_type, annotation=NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id,
+			"state"=NEW."state",  state_type=NEW.state_type, annotation=NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", omzone_id=NEW.omzone_id, soilcat_id=NEW.soilcat_id,
 			function_type=NEW.function_type, category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id,
 			workcat_id_end=NEW.workcat_id_end, workcat_id_plan=NEW.workcat_id_plan, builtdate=NEW.builtdate, enddate=NEW.enddate,
 			ownercat_id=NEW.ownercat_id, postcode=NEW.postcode, district_id=NEW.district_id, streetaxis2_id=v_streetaxis2, postnumber2=NEW.postnumber2, postcomplement=NEW.postcomplement,
@@ -935,7 +935,7 @@ BEGIN
 			UPDATE gully
 			SET code=NEW.code, sys_code=NEW.sys_code, top_elev=NEW.top_elev, ymax=NEW."ymax", sandbox=NEW.sandbox, matcat_id=NEW.matcat_id, gully_type=NEW.gully_type, gullycat_id=NEW.gullycat_id, units=NEW.units,
 			groove=NEW.groove, _connec_arccat_id=NEW.connec_arccat_id, connec_length=NEW.connec_length, connec_depth=NEW.connec_depth, siphon=NEW.siphon, sector_id=NEW.sector_id,
-			"state"=NEW."state",  state_type=NEW.state_type, annotation=NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", dma_id=NEW.dma_id, soilcat_id=NEW.soilcat_id,
+			"state"=NEW."state",  state_type=NEW.state_type, annotation=NEW.annotation, "observ"=NEW."observ", "comment"=NEW."comment", omzone_id=NEW.omzone_id, soilcat_id=NEW.soilcat_id,
 			function_type=NEW.function_type, category_type=NEW.category_type, fluid_type=NEW.fluid_type, location_type=NEW.location_type, workcat_id=NEW.workcat_id,
 			workcat_id_end=NEW.workcat_id_end, workcat_id_plan=NEW.workcat_id_plan, builtdate=NEW.builtdate, enddate=NEW.enddate,
 			ownercat_id=NEW.ownercat_id, postcode=NEW.postcode, district_id=NEW.district_id, streetaxis2_id=v_streetaxis2, postnumber2=NEW.postnumber2, postcomplement=NEW.postcomplement,
