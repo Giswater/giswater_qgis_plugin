@@ -82,7 +82,7 @@ AS WITH
     ),
   arc_selected AS
     (
-      SELECT arc.arc_id,
+      SELECT DISTINCT ON (arc.arc_id) arc.arc_id,
       arc.code,
       arc.sys_code,
       arc.datasource,
@@ -290,7 +290,7 @@ AS WITH
       ),
     node_selected AS
       (
-        SELECT node.node_id,
+        SELECT DISTINCT ON (node.node_id) node.node_id,
         node.code,
         node.sys_code,
         node.top_elev,
@@ -517,7 +517,7 @@ AS WITH
       ),
     link_selected AS
       (
-        SELECT l.link_id,
+        SELECT DISTINCT ON (l.link_id) l.link_id,
         l.code,
         l.feature_type,
         l.feature_id,
@@ -682,7 +682,7 @@ AS WITH
       ),
     connec_selected AS
       (
-        select connec.connec_id,
+        SELECT DISTINCT ON (connec_id) connec.connec_id,
         connec.code,
         connec.sys_code,
         connec.top_elev,

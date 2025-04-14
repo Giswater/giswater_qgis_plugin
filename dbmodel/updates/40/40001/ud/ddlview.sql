@@ -454,7 +454,7 @@ AS WITH
          ),
     arc_selected AS
 		(
-			SELECT arc.arc_id,
+			SELECT DISTINCT ON (arc.arc_id) arc.arc_id,
 			arc.code,
             arc.sys_code,
 			arc.node_1,
@@ -694,7 +694,7 @@ AS WITH
         ),
     node_selected AS
     	(
-    		SELECT node.node_id,
+    		SELECT DISTINCT ON (node.node_id) node.node_id,
 			node.code,
             node.sys_code,
 			node.top_elev,
@@ -1013,7 +1013,7 @@ AS WITH
         ),
     connec_selected AS
     	(
-			SELECT connec.connec_id,
+			SELECT DISTINCT ON (connec.connec_id) connec.connec_id,
 			connec.code,
             connec.sys_code,
 			connec.customer_code,
@@ -1227,7 +1227,7 @@ AS WITH
         ),
     gully_selected AS
     	(
-			SELECT gully.gully_id,
+			SELECT DISTINCT ON (gully.gully_id) gully.gully_id,
 			gully.code,
             gully.sys_code,
 			gully.top_elev,
