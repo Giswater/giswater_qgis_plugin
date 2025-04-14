@@ -1172,7 +1172,7 @@ class GwMincut:
     def _snapping_init_connec(self):
         """ Snap connec """
         self.feature_type = 'connec'
-        tools_gw.selection_init(self, self.dlg_connec, self.dlg_connec.tbl_mincut_connec, False)
+        tools_gw.selection_init(self, self.dlg_connec, self.dlg_connec.tbl_mincut_connec, tools_gw.GwSelectionMode.NORMAL)
 
     def _snapping_selection_hydro(self):
         """ Snap to connec layers to add its hydrometers """

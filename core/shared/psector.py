@@ -328,7 +328,7 @@ class GwPsector:
         self.dlg_plan_psector.btn_delete.clicked.connect(
             partial(tools_gw.set_model_signals, self))
         self.dlg_plan_psector.btn_snapping.clicked.connect(
-            partial(tools_gw.selection_init, self, self.dlg_plan_psector, table_object, True))
+            partial(tools_gw.selection_init, self, self.dlg_plan_psector, table_object, tools_gw.GwSelectionMode.PSECTOR))
         self.dlg_plan_psector.btn_select_arc.clicked.connect(
             partial(self._replace_arc))
         self.dlg_plan_psector.btn_arc_fusion.clicked.connect(

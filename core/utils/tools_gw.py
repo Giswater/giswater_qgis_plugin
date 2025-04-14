@@ -53,6 +53,7 @@ from ...libs.tools_qt import GwHyperLinkLabel, GwHyperLinkLineEdit
 from ...libs.tools_db import check_function
 from ...libs.tools_log import log_info
 from ...libs.tools_qgis import show_warning, get_layer_by_tablename
+from .selection_mode import GwSelectionMode
 
 # These imports are for the add_{widget} functions (modules need to be imported in order to find it by its name)
 # noinspection PyUnresolvedReferences
@@ -3209,7 +3210,7 @@ def zoom_to_feature_by_id(tablename: str, idname: str, _id, margin: float = 15):
         tools_qgis.zoom_to_rectangle(bbox.xMinimum() - margin, bbox.yMinimum() - margin, bbox.xMaximum() + margin, bbox.yMaximum() + margin)
 
 
-def selection_init(class_object, dialog, table_object, is_psector=False):
+def selection_init(class_object, dialog, table_object, selection_mode: GwSelectionMode = GwSelectionMode.NORMAL):
     """ Set canvas map tool to an instance of class 'GwSelectManager' """
 
     try:
@@ -3221,16 +3222,17 @@ def selection_init(class_object, dialog, table_object, is_psector=False):
     if class_object.feature_type in ('all', None):
         class_object.feature_type = 'arc'
 
-    select_manager = GwSelectManager(class_object, table_object, dialog, is_psector)
+    select_manager = GwSelectManager(class_object, table_object, dialog, selection_mode)
     global_vars.canvas.setMapTool(select_manager)
     cursor = get_cursor_multiple_selection()
     global_vars.canvas.setCursor(cursor)
 
 
-def selection_changed(class_object, dialog, table_object, is_psector=False, lazy_widget=None, lazy_init_function=None):
+def selection_changed(class_object, dialog, table_object, selection_mode: GwSelectionMode = GwSelectionMode.NORMAL, lazy_widget=None, lazy_init_function=None):
     """Handles selections from the map while keeping stored table values and allowing new selections from snapping."""
 
-    tools_qgis.disconnect_signal_selection_changed()
+    if selection_mode != GwSelectionMode.EXPRESSION:
+        tools_qgis.disconnect_signal_selection_changed()
     field_id = f"{class_object.feature_type}_id"
     expected_table_name = f"tbl_{table_object}_x_{class_object.feature_type}"
 
@@ -3281,7 +3283,7 @@ def selection_changed(class_object, dialog, table_object, is_psector=False, lazy
     table_widget.blockSignals(True)
     expr_filter = f'"{field_id}" IN (' + ", ".join(f"'{i}'" for i in class_object.list_ids[class_object.feature_type]) + ")"
 
-    if is_psector:
+    if selection_mode == GwSelectionMode.PSECTOR:
         _insert_feature_psector(dialog, class_object.feature_type, ids=class_object.list_ids[class_object.feature_type])
         remove_selection()
         load_tableview_psector(dialog, class_object.feature_type)
@@ -3475,12 +3477,12 @@ def remove_selection(remove_groups=True, layers=None):
     return layers
 
 
-def connect_signal_selection_changed(class_object, dialog, table_object, is_psector=False):
+def connect_signal_selection_changed(class_object, dialog, table_object, selection_mode: GwSelectionMode = GwSelectionMode.NORMAL):
     """ Connect signal selectionChanged """
 
     try:
         global_vars.canvas.selectionChanged.connect(
-            partial(selection_changed, class_object, dialog, table_object, is_psector))
+            partial(selection_changed, class_object, dialog, table_object, selection_mode))
     except Exception as e:
         tools_log.log_info(f"connect_signal_selection_changed: {e}")
 

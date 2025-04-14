@@ -555,7 +555,7 @@ class GwVisit(QObject):
             tools_qgis.disconnect_signal_selection_changed()
             tools_gw.disconnect_signal('visit')
             tools_gw.connect_signal(global_vars.canvas.selectionChanged,
-                                    partial(tools_gw.selection_changed, self, self.dlg_add_visit, widget_table, False),
+                                    partial(tools_gw.selection_changed, self, self.dlg_add_visit, widget_table, tools_gw.GwSelectionMode.NORMAL),
                                     'visit', 'set_locked_relation_canvas_selectionChanged')
             tools_qgis.select_features_by_ids(self.feature_type, expr, self.layers)
             tools_qgis.disconnect_signal_selection_changed()
@@ -1061,7 +1061,7 @@ class GwVisit(QObject):
         tools_qgis.disconnect_signal_selection_changed()
         tools_gw.disconnect_signal('visit')
         tools_gw.connect_signal(global_vars.canvas.selectionChanged,
-                                partial(tools_gw.selection_changed, self, self.dlg_add_visit, widget_table, False),
+                                partial(tools_gw.selection_changed, self, self.dlg_add_visit, widget_table, tools_gw.GwSelectionMode.NORMAL),
                                 'visit', 'get_features_visit_feature_type_canvas_selectionChanged')
         tools_qgis.select_features_by_ids(feature_type, expr, self.layers)
         tools_qgis.disconnect_signal_selection_changed()
@@ -1831,7 +1831,7 @@ class GwVisit(QObject):
 
         # Adding auto-completion to a QLineEdit
         tools_gw.set_completer_widget(viewname, dialog.feature_id, str(self.feature_type) + "_id")
-        tools_gw.selection_changed(self, dialog, widget_table, False, self.lazy_widget, self.lazy_init_function)
+        tools_gw.selection_changed(self, dialog, widget_table, tools_gw.GwSelectionMode.NORMAL, self.lazy_widget, self.lazy_init_function)
 
         try:
             self.iface.actionPan().trigger()
@@ -1841,7 +1841,7 @@ class GwVisit(QObject):
     def _feature_snapping_clicked(self, dialog, table_object):
 
         self.previous_map_tool = global_vars.canvas.mapTool()
-        tools_gw.selection_init(self, dialog, table_object, False)
+        tools_gw.selection_init(self, dialog, table_object, tools_gw.GwSelectionMode.NORMAL)
 
     def _get_data_from_event(self, visit_id):
         """ Get parameter_id and feature_type from event of @visit_id """
