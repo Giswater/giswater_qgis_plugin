@@ -28,7 +28,8 @@ SELECT columns_are(
         'minsector_id', 'dqa_id', 'district_id', 'adate', 'adescript', 'workcat_id_plan', 'asset_id', 'pavcat_id',
         'nodetype_1', 'elevation1', 'depth1', 'staticpress1', 'nodetype_2', 'elevation2', 'depth2', 'staticpress2',
         'om_state', 'conserv_state', 'parent_id', 'expl_id2', 'brand_id', 'model_id', 'serial_number', 'label_quadrant',
-        'macrominsector_id', 'streetname', 'streetname2', 'supplyzone_id', 'datasource', 'lock_level', 'is_scadamap'
+        'macrominsector_id', 'streetname', 'streetname2', 'supplyzone_id', 'datasource', 'lock_level', 'is_scadamap',
+        'omzone_id'
     ],
     'Table arc should have the correct columns'
 );
@@ -136,6 +137,8 @@ SELECT col_type_is('arc', 'supplyzone_id', 'integer', 'Column supplyzone_id shou
 SELECT col_type_is('arc', 'datasource', 'integer', 'Column datasource should be integer');
 SELECT col_type_is('arc', 'lock_level', 'integer', 'Column lock_level should be integer');
 SELECT col_type_is('arc', 'is_scadamap', 'boolean', 'Column is_scadamap should be boolean');
+SELECT col_type_is('arc', 'omzone_id', 'integer', 'Column omzone_id should be integer');
+
 
 -- Check foreign keys
 SELECT has_fk('arc', 'Table arc should have foreign keys');
@@ -162,6 +165,8 @@ SELECT fk_ok('arc', ARRAY['muni_id', 'streetaxis_id'], 'ext_streetaxis', ARRAY['
 SELECT fk_ok('arc', ARRAY['supplyzone_id'], 'supplyzone', ARRAY['supplyzone_id'], 'Table should have foreign key from supplyzone_id to supplyzone.supplyzone_id');
 SELECT fk_ok('arc', ARRAY['workcat_id_end'], 'cat_work', ARRAY['id'], 'Table should have foreign key from workcat_id_end to cat_work.id');
 SELECT fk_ok('arc', ARRAY['workcat_id'], 'cat_work', ARRAY['id'], 'Table should have foreign key from workcat_id to cat_work.id');
+SELECT fk_ok('arc', ARRAY['omzone_id'], 'omzone', ARRAY['omzone_id'], 'Table should have foreign key from omzone_id to omzone.omzone_id');
+
 
 -- Check triggers
 SELECT has_trigger('arc', 'gw_trg_arc_link_update', 'Table should have trigger gw_trg_arc_link_update');

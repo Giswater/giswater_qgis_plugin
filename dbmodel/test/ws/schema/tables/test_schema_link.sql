@@ -23,7 +23,8 @@ SELECT columns_are(
         'top_elev2', 'depth2', 'userdefined_geom', 'state', 'expl_id', 'the_geom', 'tstamp', 'sector_id', 'dma_id',
         'fluid_type', 'presszone_id', 'dqa_id', 'minsector_id', 'expl_id2', 'epa_type', 'is_operative', 'insert_user',
         'lastupdate', 'lastupdate_user', 'staticpressure', 'workcat_id', 'workcat_id_end', 'builtdate', 'enddate',
-        'uncertain', 'muni_id', 'macrominsector_id', 'verified', 'supplyzone_id', 'n_hydrometer', 'custom_length', 'datasource'
+        'uncertain', 'muni_id', 'macrominsector_id', 'verified', 'supplyzone_id', 'n_hydrometer', 'custom_length', 'datasource',
+        'omzone_id'
     ],
     'Table link should have the correct columns'
 );
@@ -47,6 +48,7 @@ SELECT col_type_is('link', 'userdefined_geom', 'boolean', 'Column userdefined_ge
 SELECT col_type_is('link', 'state', 'smallint', 'Column state should be smallint');
 SELECT col_type_is('link', 'expl_id', 'integer', 'Column expl_id should be integer');
 SELECT col_type_is('link', 'the_geom', 'geometry(LineString,25831)', 'Column the_geom should be geometry(LineString,25831)');
+SELECT col_type_is('link', 'omzone_id', 'integer', 'Column omzone_id should be integer');
 
 -- Check not null constraints
 SELECT col_not_null('link', 'linkcat_id', 'Column linkcat_id should be NOT NULL');

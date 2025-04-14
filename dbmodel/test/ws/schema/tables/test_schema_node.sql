@@ -31,7 +31,7 @@ SELECT columns_are(
         'adescript', 'accessibility', 'workcat_id_plan', 'asset_id', 'om_state', 'conserv_state',
         'access_type', 'placement_type', 'expl_id2', 'brand_id', 'model_id', 'serial_number',
         'label_quadrant', 'macrominsector_id', 'streetname', 'streetname2', 'supplyzone_id',
-        'lock_level', 'is_scadamap', 'pavcat_id'
+        'lock_level', 'is_scadamap', 'pavcat_id', 'omzone_id'
     ],
     'Table node should have the correct columns'
 );
@@ -67,7 +67,7 @@ SELECT fk_ok('node', 'sector_id', 'sector', 'sector_id', 'FK sector_id should re
 SELECT fk_ok('node', 'soilcat_id', 'cat_soil', 'id', 'FK soilcat_id should reference cat_soil.id');
 SELECT fk_ok('node', 'state', 'value_state', 'id', 'FK state should reference value_state.id');
 SELECT fk_ok('node', 'state_type', 'value_state_type', 'id', 'FK state_type should reference value_state_type.id');
-
+SELECT fk_ok('node', 'omzone_id', 'omzone', 'omzone_id', 'FK omzone_id should reference omzone.omzone_id');
 -- Check triggers
 SELECT has_trigger('node', 'gw_trg_mantypevalue_fk_insert', 'Table should have gw_trg_mantypevalue_fk_insert trigger');
 SELECT has_trigger('node', 'gw_trg_mantypevalue_fk_update', 'Table should have gw_trg_mantypevalue_fk_update trigger');

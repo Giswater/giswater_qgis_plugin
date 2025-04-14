@@ -30,7 +30,8 @@ SELECT columns_are(
         'workcat_id_plan', 'asset_id', 'epa_type', 'om_state', 'conserv_state', 'priority',
         '_valve_type', '_shutoff_valve', 'access_type', 'placement_type', 'crmzone_id', 'expl_id2', 'plot_code',
         'brand_id', 'model_id', 'serial_number', 'label_quadrant', 'macrominsector_id', 'n_hydrometer',
-        'streetname', 'streetname2', 'n_inhabitants', 'supplyzone_id', 'datasource', 'lock_level', 'block_zone'
+        'streetname', 'streetname2', 'n_inhabitants', 'supplyzone_id', 'datasource', 'lock_level', 'block_zone',
+        'omzone_id'
     ],
     'Table connec should have the correct columns'
 );
@@ -127,7 +128,7 @@ SELECT col_type_is('connec', 'supplyzone_id', 'int4', 'Column supplyzone_id shou
 SELECT col_type_is('connec', 'datasource', 'int4', 'Column datasource should be int4');
 SELECT col_type_is('connec', 'lock_level', 'int4', 'Column lock_level should be int4');
 SELECT col_type_is('connec', 'block_zone', 'text', 'Column block_zone should be text');
-
+SELECT col_type_is('connec', 'omzone_id', 'integer', 'Column omzone_id should be integer');
 -- Check foreign keys
 SELECT has_fk('connec', 'Table connec should have foreign keys');
 SELECT fk_ok('connec', 'arc_id', 'arc', 'arc_id', 'FK connec_arc_id_fkey should exist');

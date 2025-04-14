@@ -34,7 +34,7 @@ SELECT columns_are(
         'asset_id', 'pavcat_id', 'om_state', 'conserv_state', 'parent_id', 'expl_id2', 'is_operative',
         'brand_id', 'model_id', 'serial_number', 'minsector_id', 'macrominsector_id', 'flow_max', 'flow_min',
         'flow_avg', 'vel_max', 'vel_min', 'vel_avg', 'tstamp', 'insert_user', 'lastupdate', 'lastupdate_user',
-        'the_geom', 'lock_level', 'inp_type', 'is_scadamap'
+        'the_geom', 'lock_level', 'inp_type', 'is_scadamap', 'omzone_id', 'omzone_type'
     ],
     'View v_edit_arc should have the correct columns'
 );
