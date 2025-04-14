@@ -33,7 +33,7 @@ SELECT columns_are(
 SELECT col_is_pk('om_waterbalance', ARRAY['dma_id', 'startdate', 'enddate'], 'Columns dma_id, startdate and enddate should be primary key');
 
 -- Check column types
-SELECT col_type_is('om_waterbalance', 'expl_id', 'integer', 'Column expl_id should be integer');
+SELECT col_type_is('om_waterbalance', 'expl_id', 'integer[]', 'Column expl_id should be integer[]');
 SELECT col_type_is('om_waterbalance', 'dma_id', 'integer', 'Column dma_id should be integer');
 SELECT col_type_is('om_waterbalance', 'cat_period_id', 'varchar(16)', 'Column cat_period_id should be varchar(16)');
 SELECT col_type_is('om_waterbalance', 'total_sys_input', 'double precision', 'Column total_sys_input should be double precision');
@@ -76,7 +76,6 @@ SELECT col_type_is('om_waterbalance', 'avg_press', 'numeric(12,3)', 'Column avg_
 -- Check foreign keys
 SELECT has_fk('om_waterbalance', 'Table om_waterbalance should have foreign keys');
 SELECT fk_ok('om_waterbalance', 'dma_id', 'dma', 'dma_id', 'FK dma_id should reference dma.dma_id');
-SELECT fk_ok('om_waterbalance', 'expl_id', 'exploitation', 'expl_id', 'FK expl_id should reference exploitation.expl_id');
 
 -- Check constraints
 SELECT col_not_null('om_waterbalance', 'dma_id', 'Column dma_id should be NOT NULL');
