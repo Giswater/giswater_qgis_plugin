@@ -551,7 +551,8 @@ CREATE TABLE inp_flwreg_outlet (
     cd2 numeric(12,4),
     flap character varying(3),
 	CONSTRAINT inp_flwreg_outlet_pkey PRIMARY KEY (flwreg_id),
-    CONSTRAINT inp_flwreg_outlet_check_outlet_type CHECK (((outlet_type)::text = ANY ((ARRAY['FUNCTIONAL/DEPTH'::character varying, 'FUNCTIONAL/HEAD'::character varying, 'TABULAR/DEPTH'::character varying, 'TABULAR/HEAD'::character varying])::text[])))
+    CONSTRAINT inp_flwreg_outlet_check_outlet_type CHECK (((outlet_type)::text = ANY ((ARRAY['FUNCTIONAL/DEPTH'::character varying, 'FUNCTIONAL/HEAD'::character varying, 'TABULAR/DEPTH'::character varying, 'TABULAR/HEAD'::character varying])::text[]))),
+	CONSTRAINT inp_flwreg_outlet_flwreg_id_fkey FOREIGN KEY (flwreg_id) REFERENCES flwreg(flwreg_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE inp_flwreg_orifice (

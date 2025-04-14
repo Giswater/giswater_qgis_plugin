@@ -61,7 +61,7 @@ DROP VIEW IF EXISTS vi_inflows;
 DROP VIEW IF EXISTS vi_landuses;
 DROP VIEW IF EXISTS vi_lid_controls;
 DROP VIEW IF EXISTS vi_map;
-DROP VIEW IF EXISTS vi_pollutants;
+-- DROP VIEW IF EXISTS vi_pollutants; -- TODO: refactor gw_fct_rpt2pg_import_rpt
 DROP VIEW IF EXISTS vi_polygons;
 DROP VIEW IF EXISTS vi_raingages;
 DROP VIEW IF EXISTS vi_rdii;
@@ -148,7 +148,8 @@ SELECT element.element_id,
     element.muni_id,
     element.sector_id,
     element.lock_level,
-    cat_feature_element.geometry_type
+    cat_feature_element.geometry_type,
+    element.the_geom
    FROM selector_expl, element
     JOIN cat_element ON element.elementcat_id::text = cat_element.id::text
     LEFT JOIN cat_feature_element ON cat_element.element_type::text = cat_feature_element.id::text
@@ -201,7 +202,7 @@ SELECT element.element_id,
     element.sector_id,
     element.lock_level,
     cat_feature_element.geometry_type,
-    man_genelement.the_geom
+    element.the_geom
    FROM selector_expl, element
      JOIN cat_element ON element.elementcat_id::text = cat_element.id::text
     LEFT JOIN cat_feature_element ON cat_element.element_type::text = cat_feature_element.id::text
@@ -449,7 +450,7 @@ CREATE OR REPLACE VIEW v_edit_flwreg AS
     element.muni_id,
     element.sector_id,
     element.lock_level,
-    man_flwreg.the_geom
+    element.the_geom
    FROM element
       JOIN cat_element ON element.elementcat_id::text = cat_element.id::text
       JOIN man_flwreg ON element.element_id::text = man_flwreg.element_id::text
@@ -667,7 +668,7 @@ AS SELECT element.pol_id,
     JOIN selector_sector ss ON (ss.cur_user = CURRENT_USER AND ss.sector_id = element.sector_id)
     JOIN selector_municipality sm ON (sm.cur_user = CURRENT_USER AND sm.muni_id = element.muni_id);
 
-    CREATE OR REPLACE VIEW v_ui_element
+CREATE OR REPLACE VIEW v_ui_element
 AS SELECT element.element_id AS id,
     element.code,
     element.elementcat_id,

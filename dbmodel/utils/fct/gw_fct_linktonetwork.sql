@@ -478,7 +478,9 @@ BEGIN
 				END IF;
 
 				-- control of dma and fluidtype automatic values
-				IF v_dma_autoupdate is true or v_dma_autoupdate is null THEN v_dma_value = v_arc.dma_id; ELSE v_dma_value = v_connect.dma_id; END IF;
+				IF v_projecttype = 'WS' THEN
+					IF v_dma_autoupdate is true or v_dma_autoupdate is null THEN v_dma_value = v_arc.dma_id; ELSE v_dma_value = v_connect.dma_id; END IF;
+				END IF;
 				IF v_fluidtype_autoupdate is true or v_fluidtype_autoupdate is null THEN
 					v_fluidtype_value = v_arc.fluid_type;
 					IF v_fluidtype_value not in (SELECT fluid_type FROM man_type_fluid WHERE feature_type='CONNEC') AND v_fluidtype_value IS NOT NULL THEN
@@ -493,27 +495,27 @@ BEGIN
 					v_link.link_id = (SELECT nextval('urn_id_seq'));
 
 					IF v_projecttype = 'WS' THEN
-						INSERT INTO link (link_id, the_geom, feature_id, feature_type, exit_type, exit_id, state, expl_id, sector_id, dma_id,
+						INSERT INTO link (link_id, the_geom, feature_id, feature_type, exit_type, exit_id, state, expl_id, sector_id, dma_id, omzone_id,
 						presszone_id, dqa_id, minsector_id, fluid_type, muni_id, linkcat_id)
 						VALUES (v_link.link_id, v_link.the_geom, v_connect_id, v_feature_type, v_link.exit_type, v_link.exit_id,
-						v_connect.state, v_arc.expl_id, v_arc.sector_id, v_dma_value, v_arc.presszone_id, v_arc.dqa_id, v_arc.minsector_id, v_fluidtype_value, v_connect.muni_id,
+						v_connect.state, v_arc.expl_id, v_arc.sector_id, v_dma_value, v_arc.omzone_id, v_arc.presszone_id, v_arc.dqa_id, v_arc.minsector_id, v_fluidtype_value, v_connect.muni_id,
 						v_linkcat_id);
 					ELSIF v_projecttype = 'UD' THEN
-						INSERT INTO link (link_id, the_geom, feature_id, feature_type, exit_type, exit_id, state, expl_id, sector_id, dma_id, fluid_type, muni_id, linkcat_id)
+						INSERT INTO link (link_id, the_geom, feature_id, feature_type, exit_type, exit_id, state, expl_id, sector_id, omzone_id, fluid_type, muni_id, linkcat_id)
 						VALUES (v_link.link_id, v_link.the_geom, v_connect_id, v_feature_type, v_link.exit_type, v_link.exit_id,
-						v_connect.state, v_arc.expl_id, v_arc.sector_id, v_dma_value, v_fluidtype_value, v_connect.muni_id, v_linkcat_id);
+						v_connect.state, v_arc.expl_id, v_arc.sector_id, v_arc.omzone_id, v_fluidtype_value, v_connect.muni_id, v_linkcat_id);
 					END IF;
 				ELSE
 					IF v_linkcat_id IS NULL THEN
-						UPDATE link SET the_geom=v_link.the_geom, exit_type=v_link.exit_type, exit_id=v_link.exit_id, dma_id = v_dma_value, fluid_type = v_fluidtype_value
+						UPDATE link SET the_geom=v_link.the_geom, exit_type=v_link.exit_type, exit_id=v_link.exit_id, omzone_id = v_arc.omzone_id, fluid_type = v_fluidtype_value
 						WHERE link_id = v_link.link_id;
 					ELSE
-						UPDATE link SET the_geom=v_link.the_geom, exit_type=v_link.exit_type, exit_id=v_link.exit_id, dma_id = v_dma_value, fluid_type = v_fluidtype_value, linkcat_id = v_linkcat_id
+						UPDATE link SET the_geom=v_link.the_geom, exit_type=v_link.exit_type, exit_id=v_link.exit_id, omzone_id = v_arc.omzone_id, fluid_type = v_fluidtype_value, linkcat_id = v_linkcat_id
 						WHERE link_id = v_link.link_id;
 					END IF;
 
 					IF v_projecttype = 'WS' THEN
-						UPDATE link SET	presszone_id=v_arc.presszone_id, dqa_id=v_arc.dqa_id, minsector_id=v_arc.minsector_id
+						UPDATE link SET	presszone_id=v_arc.presszone_id, dqa_id=v_arc.dqa_id, dma_id = v_dma_value, minsector_id=v_arc.minsector_id
 						WHERE link_id = v_link.link_id;
 					END IF;
 				END IF;
@@ -565,20 +567,20 @@ BEGIN
 
 						IF v_feature_type ='CONNEC' THEN
 
-							UPDATE connec SET arc_id=v_connect.arc_id, expl_id=v_arc.expl_id, dma_id=v_dma_value, sector_id=v_arc.sector_id,
+							UPDATE connec SET arc_id=v_connect.arc_id, expl_id=v_arc.expl_id, omzone_id=v_arc.omzone_id, sector_id=v_arc.sector_id,
 							pjoint_type=v_pjointtype, pjoint_id=v_pjointid, fluid_type = v_fluidtype_value
 							WHERE connec_id = v_connect_id;
 
 							-- update specific fields for ws projects
 							IF v_projecttype = 'WS' THEN
-								UPDATE connec SET dqa_id=v_arc.dqa_id, minsector_id=v_arc.minsector_id,presszone_id=v_arc.presszone_id,
+								UPDATE connec SET dqa_id=v_arc.dqa_id, minsector_id=v_arc.minsector_id, dma_id = v_dma_value, presszone_id=v_arc.presszone_id,
 								staticpressure = ((SELECT head from presszone WHERE presszone_id = v_arc.presszone_id)- v_connect.top_elev)
 								WHERE connec_id = v_connect_id;
 							END IF;
 
 						ELSIF v_feature_type ='GULLY' THEN
 
-							UPDATE gully SET arc_id=v_connect.arc_id, expl_id=v_arc.expl_id, dma_id=v_dma_value, sector_id=v_arc.sector_id,
+							UPDATE gully SET arc_id=v_connect.arc_id, expl_id=v_arc.expl_id, omzone_id=v_arc.omzone_id, sector_id=v_arc.sector_id,
 							pjoint_type=v_pjointtype, pjoint_id=v_pjointid, fluid_type = v_fluidtype_value
 							WHERE gully_id = v_connect_id;
 						END IF;

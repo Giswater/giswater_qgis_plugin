@@ -35,21 +35,21 @@ SELECT SCHEMA_NAME.gw_fct_getinfofromcoordinates($${
 SELECT SCHEMA_NAME.gw_fct_getinfofromcoordinates($${
 		"client":{"device":4, "infoType":1, "lang":"ES", "epsg":SRID_VALUE},
 		"form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "toolBar":"basic", "activeLayer":"", "featureDialog":["PIPE"],
-		"visibleLayer":["v_om_mincut_valve", "v_om_mincut_arc", "v_edit_dma", "v_edit_node", "v_edit_node", "v_edit_arc", "v_edit_connec", "v_edit_link", "ve_pol_fountain", "ve_pol_register", "ve_pol_tank", "v_edit_inp_connec", 
+		"visibleLayer":["v_om_mincut_valve", "v_om_mincut_arc", "v_edit_dma", "v_edit_node", "v_edit_node", "v_edit_arc", "v_edit_connec", "v_edit_link", "ve_pol_fountain", "ve_pol_register", "ve_pol_tank", "v_edit_inp_connec",
 		"v_edit_inp_inlet", "v_edit_inp_junction", "v_edit_inp_pipe", "v_edit_inp_pump", "v_edit_inp_reservoir", "v_edit_inp_shortpipe", "v_edit_inp_tank", "v_edit_inp_valve", "v_edit_inp_virtualvalve"],
 		"mainSchema":"NULL", "addSchema":"NULL", "infoType":"full", "projecRole":"role_admin", "epsg":SRID_VALUE, "coordinates":{"xcoord":418930.4280605118,"ycoord":4576587.621989262, "zoomRatio":1341.590797402754}}}$$);
 
  SELECT gw_fct_getinfofromcoordinates($${
 		"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "toolBar":"basic", "editable":"false", "activeLayer":"",
-		"visibleLayer":["v_edit_arc", "v_edit_dma", "v_edit_connec", "v_edit_element", "v_edit_node", "v_edit_link", "v_edit_sector", "v_edit_exploitation"], "addSchema":"None", "infoType":"None", "projecRole":"None", 
+		"visibleLayer":["v_edit_arc", "v_edit_dma", "v_edit_connec", "v_edit_element", "v_edit_node", "v_edit_link", "v_edit_sector", "v_edit_exploitation"], "addSchema":"None", "infoType":"None", "projecRole":"None",
 		"featureDialog":["VALVE"],
 		"coordinates":{"xcoord":418911.7807826943,"ycoord":4576796.706092382, "zoomRatio":5804.613871393841}}}$$);
-   
+
 
  SELECT gw_fct_getinfofromcoordinates($${
 		"client":{"device":4, "infoType":1, "lang":"ES"},
-		"form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "toolBar":"basic", "activeLayer":"", 
-		"visibleLayer":["v_edit_arc", "v_edit_dma", "v_edit_connec", "v_edit_element", "v_edit_node", "v_edit_link", "v_edit_sector", "v_edit_exploitation"], 
+		"form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "toolBar":"basic", "activeLayer":"",
+		"visibleLayer":["v_edit_arc", "v_edit_dma", "v_edit_connec", "v_edit_element", "v_edit_node", "v_edit_link", "v_edit_sector", "v_edit_exploitation"],
 		"addSchema":"None", "infoType":"None", "projecRole":"None", "coordinates":{"xcoord":418894.6048028714,"ycoord":4576612.785781575, "zoomRatio":2105.7904524867854}}}$$);
 */
 
@@ -60,8 +60,8 @@ v_ycoord double precision;
 v_epsg integer;
 v_activelayer text;
 v_visiblelayer text;
-v_zoomratio double precision; 
-v_device integer;  
+v_zoomratio double precision;
+v_device integer;
 v_point public.geometry;
 v_sensibility float;
 v_sensibility_f float;
@@ -80,8 +80,8 @@ v_the_geom text;
 v_config_layer text;
 v_toolbar text;
 v_errcontext text;
-v_addschema text; 
-v_projectrole text; 
+v_addschema text;
+v_projectrole text;
 v_flag boolean = false;
 v_infotype text;
 v_data json;
@@ -117,10 +117,10 @@ BEGIN
 
 	IF v_client_epsg IS NULL THEN v_client_epsg = v_epsg; END IF;
 
-	
+
 	-- profilactic control of schema name
 	IF lower(v_addschema) = 'none' OR v_addschema = '' OR lower(v_addschema) ='null'
-		THEN v_addschema = null; 
+		THEN v_addschema = null;
 	ELSE
 		IF (select schemaname from pg_tables WHERE schemaname = v_addschema LIMIT 1) IS NULL THEN
 			EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
@@ -128,7 +128,7 @@ BEGIN
 			-- todo: send message to response
 		END IF;
 	END IF;
-		
+
 	v_activelayer := (p_data ->> 'data')::json->> 'activeLayer';
 	v_featuredialog := coalesce((p_data ->> 'data')::json->> 'featureDialog','[]');
 	v_visiblelayer := (p_data ->> 'data')::json->> 'visibleLayers';
@@ -144,10 +144,10 @@ BEGIN
 		INTO v_sensibility_f;
 		-- 10 pixels of base sensibility
 		v_sensibility = (v_zoomratio * 10 * v_sensibility_f);
-		
+
 	ELSIF  v_device = 3 THEN
 		EXECUTE 'SELECT (value::json->>''web'')::float FROM config_param_system WHERE parameter=''basic_info_sensibility_factor'''
-		INTO v_sensibility_f;     
+		INTO v_sensibility_f;
 		-- 10 pixels of base sensibility
 		v_sensibility = (v_zoomratio * 10 * v_sensibility_f);
 
@@ -165,7 +165,7 @@ BEGIN
 
 	-- Make point
 	SELECT ST_Transform(ST_SetSRID(ST_MakePoint(v_xcoord,v_ycoord),v_client_epsg),v_epsg) INTO v_point;
-		
+
 	-- Get feature
 	v_sql = concat('SELECT layer_id, 0 as orderby, a.addparam->>''geomType'' as geomtype FROM  ',quote_ident(v_config_layer),' a WHERE layer_id = ',quote_literal(v_activelayer),'::text 
 		AND (a.addparam->>''forceWhenActive'')::boolean IS TRUE
@@ -178,11 +178,11 @@ BEGIN
 	v_debug := json_build_object('querystring', v_sql, 'vars', v_debug_vars, 'funcname', 'gw_fct_getinfofromcoordinates', 'flag', 10);
 	SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 
-	FOR v_layer IN EXECUTE v_sql     
+	FOR v_layer IN EXECUTE v_sql
 	LOOP
 		PERFORM gw_fct_debug(concat('{"data":{"msg":"Layer", "variables":"',v_layer,'"}}')::json);
 
-		-- Indentify geometry type   
+		-- Indentify geometry type
 		v_count=v_count+1;
 
 		--    Get id column
@@ -192,7 +192,7 @@ BEGIN
 		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 
 		EXECUTE v_querystring INTO v_idname;
-            
+
 		--    For views it suposse pk is the first column
 		IF v_idname IS NULL THEN
 			v_querystring = concat('SELECT a.attname FROM pg_attribute a   JOIN pg_class t on a.attrelid = t.oid  JOIN pg_namespace s on t.relnamespace = s.oid WHERE a.attnum > 0   AND NOT a.attisdropped
@@ -221,15 +221,16 @@ BEGIN
 		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getinfofromcoordinates', 'flag', 40);
 		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 
+		RAISE NOTICE 'v_querystring %', v_querystring;
 		EXECUTE v_querystring INTO v_the_geom;
 
 		EXECUTE 'SELECT column_name FROM information_schema.columns 
 		WHERE table_name='||quote_literal(v_schemaname)||' and column_name=''state'' and table_schema='||quote_literal(v_layer)||''
 		INTO v_field_state;
-	        
+
 		IF v_layer.geomtype = 'polygon' THEN
 
-			--  Get element from active layer, using the area of the elements to order possible multiselection (minor as first)        
+			--  Get element from active layer, using the area of the elements to order possible multiselection (minor as first)
 			v_querystring = concat('SELECT ',quote_ident(v_idname),' FROM ',quote_ident(v_layer.layer_id),' WHERE st_dwithin (''',v_point,''', ',quote_ident(v_layer.layer_id),'.',quote_ident(v_the_geom),', ',v_sensibility,') 
 			ORDER BY  ST_area(',v_layer.layer_id,'.',v_the_geom,') asc LIMIT 1');
 			v_debug_vars := json_build_object('v_idname', v_idname, 'layer_id', v_layer.layer_id, 'v_point', v_point, 'v_the_geom', v_the_geom, 'v_sensibility', v_sensibility);
@@ -256,13 +257,13 @@ BEGIN
 			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 
 			EXECUTE v_querystring INTO v_id;
-		END IF;      
+		END IF;
 
-		IF v_id IS NOT NULL THEN 
+		IF v_id IS NOT NULL THEN
 			v_flag = true;
 			exit;
-		ELSE 
-		-- RAISE NOTICE 'Searching for layer....loop number: % layer: % ,idname: %, id: %', v_count, v_layer, v_idname, v_id;    
+		ELSE
+		-- RAISE NOTICE 'Searching for layer....loop number: % layer: % ,idname: %, id: %', v_count, v_layer, v_idname, v_id;
 		END IF;
 	END LOOP;
 
@@ -274,13 +275,13 @@ BEGIN
 	SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 
 	EXECUTE v_querystring INTO v_iseditable;
-	
-	-- looking for additional schema 
+
+	-- looking for additional schema
 	IF v_addschema IS NOT NULL AND v_addschema != v_schemaname AND v_flag IS FALSE THEN
 
 		v_data = gw_fct_json_object_set_key((p_data->>'data')::json, 'editable', 'false'::text);
 		p_data = gw_fct_json_object_set_key(p_data, 'data', v_data::text);
-		
+
 		v_querystring = concat('SET search_path = ',v_addschema,', public');
 		v_debug_vars := json_build_object('v_addschema', v_addschema);
 		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getinfofromcoordinates', 'flag', 80);
@@ -291,17 +292,17 @@ BEGIN
 		SET search_path = 'SCHEMA_NAME', public;
 		RETURN v_return;
 	END IF;
-	
+
 	-- Control NULL's
 	IF v_id IS NULL THEN
-		RETURN ('{"status":"Accepted", "message":{"level":0, "text":"No feature found"}, "results":0, "version":'|| v_version 
+		RETURN ('{"status":"Accepted", "message":{"level":0, "text":"No feature found"}, "results":0, "version":'|| v_version
 		||', "formTabs":[] , "tableName":"", "featureType": "","idName": "", "geometry":"", "linkPath":"", "editData":[] }')::json;
 	END IF;
 
 	IF v_toolbar IS NULL THEN
 		v_toolbar = 'basic';
 	END IF;
-    
+
 	PERFORM gw_fct_debug(concat('{"data":{"msg":"Toolbar", "variables":"',v_toolbar,'"}}')::json);
 
 	v_return = concat('{"client":',(p_data->>'client'),',"form":{"editable":"',v_iseditable, '", "featureDialog": ',v_featuredialog,
@@ -311,10 +312,10 @@ BEGIN
 
 	--   Call and return gw_fct_getinfofromid
 	RETURN gw_fct_json_create_return(gw_fct_getinfofromid(v_return::json), 2580, null, null, null);
-	
+
 	-- Exception handling
 	EXCEPTION WHEN OTHERS THEN
-	GET STACKED DIAGNOSTICS v_errcontext = pg_exception_context;  
+	GET STACKED DIAGNOSTICS v_errcontext = pg_exception_context;
 	 RETURN json_build_object('status', 'Failed','NOSQLERR', SQLERRM, 'version', v_version, 'SQLSTATE', SQLSTATE, 'MSGERR', (v_msgerr::json ->> 'MSGERR'))::json;
 
 END;

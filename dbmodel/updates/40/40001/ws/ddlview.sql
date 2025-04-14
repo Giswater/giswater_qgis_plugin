@@ -60,7 +60,7 @@ AS WITH
     ),
   omzone_table AS
     (
-      SELECT omzone_id, stylesheet, id::varchar(16) AS omzone_type
+      SELECT omzone_id, id::varchar(16) AS omzone_type
       FROM omzone
       LEFT JOIN typevalue t ON t.id::text = omzone.omzone_type AND t.typevalue::text = 'omzone_type'::text
     ),
@@ -172,7 +172,6 @@ AS WITH
       presszone_table.stylesheet ->> 'featureColor'::text AS presszone_style,
       dqa_table.stylesheet ->> 'featureColor'::text AS dqa_style,
       supplyzone_table.stylesheet ->> 'featureColor'::text AS supplyzone_style,
-      omzone_table.stylesheet ->> 'featureColor'::text AS omzone_style,
       arc.asset_id,
       arc.pavcat_id,
       arc.om_state,
@@ -269,7 +268,7 @@ AS WITH
       ),
     omzone_table AS
       (
-        SELECT omzone_id, stylesheet, id::varchar(16) AS omzone_type
+        SELECT omzone_id, id::varchar(16) AS omzone_type
         FROM omzone
         LEFT JOIN typevalue t ON t.id::text = omzone.omzone_type AND t.typevalue::text = 'omzone_type'::text
       ),
@@ -381,7 +380,6 @@ AS WITH
         presszone_table.stylesheet ->> 'featureColor'::text AS presszone_style,
         dqa_table.stylesheet ->> 'featureColor'::text AS dqa_style,
         supplyzone_table.stylesheet ->> 'featureColor'::text AS supplyzone_style,
-        omzone_table.stylesheet ->> 'featureColor'::text AS omzone_style,
         node.asset_id,
         node.om_state,
         node.conserv_state,
@@ -492,7 +490,7 @@ AS WITH
       ),
     omzone_table AS
       (
-        SELECT omzone_id, stylesheet, id::varchar(16) AS omzone_type
+        SELECT omzone_id, id::varchar(16) AS omzone_type
         FROM omzone
         LEFT JOIN typevalue t ON t.id::text = omzone.omzone_type AND t.typevalue::text = 'omzone_type'::text
       ),
@@ -641,7 +639,7 @@ AS WITH
       ),
     omzone_table AS
       (
-        SELECT omzone_id, stylesheet, id::varchar(16) AS omzone_type
+        SELECT omzone_id, id::varchar(16) AS omzone_type
         FROM omzone
         LEFT JOIN typevalue t ON t.id::text = omzone.omzone_type AND t.typevalue::text = 'omzone_type'::text
       ),
@@ -838,7 +836,6 @@ AS WITH
         presszone_table.stylesheet ->> 'featureColor'::text AS presszone_style,
         dqa_table.stylesheet ->> 'featureColor'::text AS dqa_style,
         supplyzone_table.stylesheet ->> 'featureColor'::text AS supplyzone_style,
-        omzone_table.stylesheet ->> 'featureColor'::text AS omzone_style,
         connec.priority,
         connec.access_type,
         connec.placement_type,

@@ -72,7 +72,6 @@ ALTER TABLE link ADD CONSTRAINT link_linkcat_id_fkey FOREIGN KEY (linkcat_id) RE
 
 CREATE TABLE man_genelement (
     element_id varchar(16) NOT NULL,
-	the_geom public.geometry(point, SRID_VALUE) NULL,
     CONSTRAINT man_genelement_pkey PRIMARY KEY (element_id),
 	CONSTRAINT man_genelement_fkey_element_id FOREIGN KEY (element_id) REFERENCES element(element_id)
 );
@@ -85,7 +84,6 @@ CREATE TABLE man_flwreg (
     order_id numeric NULL,
     to_arc varchar NULL,
     flwreg_length numeric NULL,
-	the_geom public.geometry(linestring, SRID_VALUE) NOT NULL,
     CONSTRAINT man_flwreg_pkey PRIMARY KEY (element_id),
 	CONSTRAINT man_flwreg_fkey_element_id FOREIGN KEY (element_id) REFERENCES element(element_id)
 );
@@ -126,4 +124,4 @@ CREATE TABLE inp_dscenario_flwreg_pump (
     CONSTRAINT inp_dscenario_flwreg_pump_fkey_curve_id FOREIGN KEY (curve_id) REFERENCES inp_curve(id) ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
-INSERT INTO man_genelement (element_id, the_geom) SELECT element_id, the_geom FROM element where ST_GeometryType(the_geom) = 'ST_Point' OR the_geom IS NULL;
+INSERT INTO man_genelement (element_id) SELECT element_id FROM element where ST_GeometryType(the_geom) = 'ST_Point' OR the_geom IS NULL;

@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
-DROP FUNCTION IF EXISTS gw_trg_vi();
+-- DROP FUNCTION IF EXISTS gw_trg_vi(); -- TODO: refactor gw_fct_rpt2pg_import_rpt
 
 DROP TABLE IF EXISTS inp_flwreg_outlet CASCADE;
 DROP TABLE IF EXISTS inp_flwreg_orifice CASCADE;

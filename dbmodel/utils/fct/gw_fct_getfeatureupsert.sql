@@ -70,6 +70,11 @@ v_macrosector_id integer;
 v_expl_id integer;
 v_dma_id integer;
 v_macrodma_id integer;
+v_omzone_id integer;
+v_macroomzone_id integer;
+v_supplyzone_id integer;
+v_dwfzone_id integer;
+v_drainzone_id integer;
 v_macrominsector_id integer;
 v_muni_id integer;
 v_district_id integer;
@@ -167,7 +172,7 @@ v_schemaname text;
 v_idname_aux text;
 
 v_nodarc_id varchar;
-v_toarc varchar; 
+v_toarc varchar;
 v_order_id integer;
 v_flwreg_type text;
 v_flwreg_length numeric(14,2);
@@ -375,16 +380,16 @@ BEGIN
 						IF v_noderecord1.macrominsector_id = v_noderecord2.macrominsector_id THEN
 							v_macrominsector_id = v_noderecord1.macrominsector_id;
 						END IF;
-	
+
 						-- getting supplyzone by heritage from nodes: TODO
 
-					
+
 					ELSE
-					
+
 						-- getting dwfzone by heritage from nodes: TODO
-					
+
 						-- getting drainzone by heritage from nodes: TODO
-					
+
 
 					END IF;
 
@@ -400,14 +405,27 @@ BEGIN
 					END IF;
 
 					-- getting dma_id by heritage from nodes
-					IF v_noderecord1.dma_id = v_noderecord2.dma_id THEN
-						v_dma_id = v_noderecord1.dma_id;
-					ELSIF v_noderecord1.dma_id = 0 THEN
-						v_dma_id = v_noderecord2.dma_id;
-					ELSIF v_noderecord2.dma_id = 0 THEN
-						v_dma_id = v_noderecord1.dma_id;
-					ELSIF v_noderecord1.dma_id::text != v_noderecord2.dma_id::text THEN
-						v_dma_id = 0;
+					IF v_project_type = 'WS' THEN
+						IF v_noderecord1.dma_id = v_noderecord2.dma_id THEN
+							v_dma_id = v_noderecord1.dma_id;
+						ELSIF v_noderecord1.dma_id = 0 THEN
+							v_dma_id = v_noderecord2.dma_id;
+						ELSIF v_noderecord2.dma_id = 0 THEN
+							v_dma_id = v_noderecord1.dma_id;
+						ELSIF v_noderecord1.dma_id::text != v_noderecord2.dma_id::text THEN
+							v_dma_id = 0;
+						END IF;
+					END IF;
+
+					-- getting omzone_id by heritage from nodes
+					IF v_noderecord1.omzone_id = v_noderecord2.omzone_id THEN
+						v_omzone_id = v_noderecord1.omzone_id;
+					ELSIF v_noderecord1.omzone_id = 0 THEN
+						v_omzone_id = v_noderecord2.omzone_id;
+					ELSIF v_noderecord2.omzone_id = 0 THEN
+						v_omzone_id = v_noderecord1.omzone_id;
+					ELSIF v_noderecord1.omzone_id::text != v_noderecord2.omzone_id::text THEN
+						v_omzone_id = 0;
 					END IF;
 
 					-- getting expl_id by heritage from nodes
@@ -424,7 +442,7 @@ BEGIN
 					-- getting muni_id by heritage from nodes
 					IF v_noderecord1.muni_id = v_noderecord2.muni_id THEN
 						v_muni_id = v_noderecord1.muni_id;
-					ELSE 
+					ELSE
 						v_muni_id = 0;
 					END IF;
 
@@ -458,20 +476,20 @@ BEGIN
 					v_message = (SELECT concat('ERROR-1045:',error_message, p_id,'. ',hint_message) FROM sys_message WHERE id=1045);
 					v_status = false;
 				END IF;
-				
-			--- get Flowreg Defaults 
+
+			--- get Flowreg Defaults
             ELSIF upper(v_catfeature.feature_type) = 'FLWREG' THEN
                 -- Get toarc
                 SELECT arc_id , the_geom into v_toarc, v_toarc_geom FROM v_edit_arc WHERE ST_DWithin(ST_endpoint(p_reduced_geometry), v_edit_arc.the_geom, 0.001) LIMIT 1;
                 -- Get flwreg_length
-                SELECT abs(ST_LineLocatePoint(v_toarc_geom, ST_startpoint(p_reduced_geometry)) - ST_LineLocatePoint(v_toarc_geom, ST_endpoint(p_reduced_geometry))) * ST_Length(v_toarc_geom) 
+                SELECT abs(ST_LineLocatePoint(v_toarc_geom, ST_startpoint(p_reduced_geometry)) - ST_LineLocatePoint(v_toarc_geom, ST_endpoint(p_reduced_geometry))) * ST_Length(v_toarc_geom)
                 INTO v_flwreg_length;
 
                 -- WARNING: this code is also in gw_fct_infofromid. If it needs to be changed here, it will most likely have to be changed there too.
                 -- Get node id from initial clicked point
                 SELECT * INTO v_noderecord1 FROM v_edit_node WHERE ST_DWithin(ST_startpoint(p_reduced_geometry), v_edit_node.the_geom, v_arc_searchnodes)
                 ORDER BY ST_Distance(v_edit_node.the_geom, ST_startpoint(p_reduced_geometry)) LIMIT 1;
-                -- Get flowreg_type  
+                -- Get flowreg_type
                 v_querystring = concat('SELECT feature_class FROM cat_feature WHERE child_layer = ' , quote_nullable(p_table_id) ,' LIMIT 1');
                 v_debug_vars := json_build_object('p_table_id', p_table_id);
                 v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getfeatureupsert', 'flag', 70);
@@ -515,12 +533,22 @@ BEGIN
 		END IF;
 
 		-- Dma ID
-		IF v_dma_id IS NULL THEN
+		IF v_project_type = 'WS' AND v_dma_id IS NULL THEN
 			SELECT count(*) into count_aux FROM dma WHERE ST_DWithin(p_reduced_geometry, dma.the_geom,0.001) AND active IS TRUE ;
 			IF count_aux = 1 THEN
 				v_dma_id = (SELECT dma_id FROM dma WHERE ST_DWithin(p_reduced_geometry, dma.the_geom,0.001) AND active IS TRUE LIMIT 1);
 			ELSE
 				v_dma_id =(SELECT dma_id FROM v_edit_arc WHERE ST_DWithin(p_reduced_geometry, v_edit_arc.the_geom, v_proximity_buffer)
+				order by ST_Distance (p_reduced_geometry, v_edit_arc.the_geom) LIMIT 1);
+			END IF;
+		END IF;
+
+		IF v_omzone_id IS NULL THEN
+			SELECT count(*) into count_aux FROM omzone WHERE ST_DWithin(p_reduced_geometry, omzone.the_geom,0.001) AND active IS TRUE ;
+			IF count_aux = 1 THEN
+				v_omzone_id = (SELECT omzone_id FROM omzone WHERE ST_DWithin(p_reduced_geometry, omzone.the_geom,0.001) AND active IS TRUE LIMIT 1);
+			ELSE
+				v_omzone_id =(SELECT omzone_id FROM v_edit_arc WHERE ST_DWithin(p_reduced_geometry, v_edit_arc.the_geom, v_proximity_buffer)
 				order by ST_Distance (p_reduced_geometry, v_edit_arc.the_geom) LIMIT 1);
 			END IF;
 		END IF;
@@ -535,16 +563,48 @@ BEGIN
 				order by ST_Distance (p_reduced_geometry, v_edit_arc.the_geom) LIMIT 1);
 			END IF;
 		END IF;
-	
+
 		-- supplyzone: TODO
-				
+		IF v_project_type = 'WS' AND v_supplyzone_id IS NULL THEN
+			SELECT count(*) into count_aux FROM supplyzone WHERE ST_DWithin(p_reduced_geometry, supplyzone.the_geom,0.001) AND active IS TRUE ;
+			IF count_aux = 1 THEN
+				v_supplyzone_id = (SELECT supplyzone_id FROM supplyzone WHERE ST_DWithin(p_reduced_geometry, supplyzone.the_geom,0.001) AND active IS TRUE LIMIT 1);
+			ELSE
+				v_supplyzone_id =(SELECT supplyzone_id FROM v_edit_arc WHERE ST_DWithin(p_reduced_geometry, v_edit_arc.the_geom, v_proximity_buffer)
+				order by ST_Distance (p_reduced_geometry, v_edit_arc.the_geom) LIMIT 1);
+			END IF;
+		END IF;
+
 		-- dwfzone: TODO
-					
+		IF v_project_type = 'UD' AND v_dwfzone_id IS NULL THEN
+			SELECT count(*) into count_aux FROM dwfzone WHERE ST_DWithin(p_reduced_geometry, dwfzone.the_geom,0.001) AND active IS TRUE ;
+			IF count_aux = 1 THEN
+				v_dwfzone_id = (SELECT dwfzone_id FROM dwfzone WHERE ST_DWithin(p_reduced_geometry, dwfzone.the_geom,0.001) AND active IS TRUE LIMIT 1);
+			ELSE
+				v_dwfzone_id =(SELECT dwfzone_id FROM v_edit_arc WHERE ST_DWithin(p_reduced_geometry, v_edit_arc.the_geom, v_proximity_buffer)
+				order by ST_Distance (p_reduced_geometry, v_edit_arc.the_geom) LIMIT 1);
+			END IF;
+		END IF;
+
 		-- drainzone: TODO
-	
+		IF v_project_type = 'UD' AND v_drainzone_id IS NULL THEN
+			SELECT count(*) into count_aux FROM drainzone WHERE ST_DWithin(p_reduced_geometry, drainzone.the_geom,0.001) AND active IS TRUE ;
+			IF count_aux = 1 THEN
+				v_drainzone_id = (SELECT drainzone_id FROM drainzone WHERE ST_DWithin(p_reduced_geometry, drainzone.the_geom,0.001) AND active IS TRUE LIMIT 1);
+			ELSE
+				v_drainzone_id =(SELECT drainzone_id FROM v_edit_arc WHERE ST_DWithin(p_reduced_geometry, v_edit_arc.the_geom, v_proximity_buffer)
+				order by ST_Distance (p_reduced_geometry, v_edit_arc.the_geom) LIMIT 1);
+			END IF;
+		END IF;
+
 
 		-- Macrodma
-		v_macrodma_id := (SELECT macrodma_id FROM dma WHERE dma_id=v_dma_id);
+		IF v_project_type = 'WS' THEN
+			v_macrodma_id := (SELECT macrodma_id FROM dma WHERE dma_id=v_dma_id);
+		END IF;
+
+		-- macroomzone
+		v_macroomzone_id := (SELECT macroomzone_id FROM omzone WHERE omzone_id=v_omzone_id);
 
 		-- Macrosector
 		v_macrosector_id := (SELECT macrosector_id FROM sector WHERE sector_id=v_sector_id);
@@ -784,6 +844,8 @@ BEGIN
 					field_value = v_dma_id;
 				WHEN 'dqa_id' THEN
 					field_value = v_dqa_id;
+				WHEN 'supplyzone_id' THEN
+					field_value = v_supplyzone_id;
 				WHEN 'macrominsector_id' THEN
 					field_value = v_macrominsector_id;
 
@@ -792,6 +854,10 @@ BEGIN
 					field_value = v_macrosector_id;
 				WHEN 'macrodma_id' THEN
 					field_value = v_macrodma_id;
+				WHEN 'omzone_id' THEN
+					field_value = v_omzone_id;
+				WHEN 'macroomzone_id' THEN
+					field_value = v_macroomzone_id;
 				WHEN 'expl_id' THEN
 					field_value = v_expl_id;
 				WHEN 'muni_id' THEN
@@ -964,7 +1030,7 @@ BEGIN
                      WHEN 'to_arc' THEN
                         IF v_catfeature.feature_type = 'FLWREG' THEN
                             field_value = v_toarc;
-                        END IF;             
+                        END IF;
                     WHEN 'order_id' THEN
                         IF v_catfeature.feature_type = 'FLWREG' THEN
                             field_value = v_order_id;
@@ -973,9 +1039,9 @@ BEGIN
                         IF v_catfeature.feature_type = 'FLWREG' THEN
                             field_value = v_nodarc_id;
                         END IF;
-                    when 'flwreg_type' then 
+                    when 'flwreg_type' then
                         field_value = v_flwreg_type;
-                    when 'flwreg_length' then 
+                    when 'flwreg_length' then
                         field_value = v_flwreg_length;
                     ELSE
                     END CASE;
@@ -1004,7 +1070,7 @@ BEGIN
 						END IF;
 					END IF;
 				END IF;
-				
+
 				--check if selected id is on combo list
 				IF field_value::text not in  (select a from json_array_elements_text(json_extract_path(v_fields_array[array_index],'comboIds'))a) AND field_value IS NOT NULL then
 					--find dvquerytext for combo
@@ -1072,7 +1138,7 @@ BEGIN
                 END IF;
 
 			ELSIF (aux_json->>'widgettype') !='button' THEN
-				
+
 				-- Set default value if exist when inserting and feild_value is null
 				IF p_tg_op ='INSERT' AND (field_value IS NULL OR field_value = '') THEN
 					IF (aux_json->>'widgetcontrols') IS NOT NULL THEN
