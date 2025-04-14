@@ -268,10 +268,11 @@ AS WITH
 				ORDER BY pp.gully_id, pp.state, pp.link_id DESC NULLS LAST
 			)
         ),
-    link_state AS
+    link_selector AS
         (
-            SELECT l.link_id
+			SELECT DISTINCT ON (l.link_id) l.link_id
             FROM link l
+			JOIN selector_expl se ON (se.cur_user =current_user AND se.expl_id = l.expl_id) OR (se.cur_user =current_user AND se.expl_id = l.expl_id2)
             JOIN selector_state s ON s.cur_user = current_user AND l.state = s.state_id
             LEFT JOIN (SELECT link_id FROM link_psector WHERE p_state = 0) a USING (link_id) WHERE a.link_id IS NULL
             UNION ALL
@@ -333,9 +334,9 @@ AS WITH
 			l.uncertain,
             l.datasource,
             l.verified
-			FROM inp_network_mode, link_state
+			FROM inp_network_mode, link_selector
 			JOIN link l using (link_id)
-			JOIN selector_expl se ON (se.cur_user =current_user AND se.expl_id = l.expl_id) OR (se.cur_user =current_user AND se.expl_id = l.expl_id2)
+			JOIN selector_sector ss ON (ss.cur_user =current_user AND ss.sector_id = l.sector_id)
 			JOIN exploitation ON l.expl_id = exploitation.expl_id
 			JOIN ext_municipality mu ON l.muni_id = mu.muni_id
 			JOIN sector_table ON l.sector_id = sector_table.sector_id
@@ -445,8 +446,9 @@ AS WITH
         ),
     arc_selector AS
 		(
-            SELECT arc.arc_id
+			SELECT DISTINCT ON (arc.arc_id) arc.arc_id
             FROM arc
+			JOIN selector_expl se ON (se.cur_user =current_user AND se.expl_id = arc.expl_id) or (se.cur_user = current_user AND se.expl_id = arc.expl_id2)
             JOIN selector_state s ON s.cur_user = CURRENT_USER AND arc.state = s.state_id
             LEFT JOIN (SELECT arc_id FROM arc_psector WHERE p_state = 0) a USING (arc_id) WHERE a.arc_id IS NULL
             UNION ALL
@@ -454,7 +456,7 @@ AS WITH
          ),
     arc_selected AS
 		(
-			SELECT DISTINCT ON (arc.arc_id) arc.arc_id,
+		    SELECT arc.arc_id,
 			arc.code,
             arc.sys_code,
 			arc.node_1,
@@ -628,7 +630,6 @@ AS WITH
             arc.last_visitdate
 			FROM arc_selector
 			JOIN arc using (arc_id)
-			JOIN selector_expl se ON (se.cur_user =current_user AND se.expl_id = arc.expl_id) or (se.cur_user = current_user AND se.expl_id = arc.expl_id2)
 			JOIN selector_sector sc ON (sc.cur_user = CURRENT_USER AND sc.sector_id = arc.sector_id)
 			JOIN cat_arc ON arc.arccat_id::text = cat_arc.id::text
 			JOIN cat_feature ON arc.arc_type::text = cat_feature.id::text
@@ -685,8 +686,9 @@ AS WITH
         ),
     node_selector AS
         (
-            SELECT node.node_id
+			SELECT DISTINCT ON (node.node_id) node.node_id
             FROM node
+			JOIN selector_expl se ON (se.cur_user = current_user AND se.expl_id = node.expl_id) OR (se.cur_user = current_user AND se.expl_id = node.expl_id2)
             JOIN selector_state s ON s.cur_user = current_user AND node.state = s.state_id
             LEFT JOIN (SELECT node_id FROM node_psector WHERE p_state = 0) a USING (node_id) WHERE a.node_id IS NULL
             UNION ALL
@@ -694,7 +696,7 @@ AS WITH
         ),
     node_selected AS
     	(
-    		SELECT DISTINCT ON (node.node_id) node.node_id,
+    		SELECT node.node_id,
 			node.code,
             node.sys_code,
 			node.top_elev,
@@ -816,7 +818,6 @@ AS WITH
             node.hemisphere
 			FROM node_selector
 			JOIN node USING (node_id)
-			JOIN selector_expl se ON (se.cur_user = current_user AND se.expl_id = node.expl_id) OR (se.cur_user = current_user AND se.expl_id = node.expl_id2)
 			JOIN selector_sector sc ON (sc.cur_user = CURRENT_USER AND sc.sector_id = node.sector_id)
 			JOIN cat_node ON node.nodecat_id::text = cat_node.id::text
 			JOIN cat_feature ON cat_feature.id::text = node.node_type::text
@@ -1003,8 +1004,9 @@ AS WITH
         ),
     connec_selector AS
         (
-            SELECT connec_id, arc_id::varchar(16), NULL::integer AS link_id
+            SELECT DISTINCT ON (connec_id), connec_id, arc_id::varchar(16), NULL::integer AS link_id
             FROM connec
+			JOIN selector_expl se ON (se.cur_user = current_user AND se.expl_id = connec.expl_id) OR (se.cur_user = current_user AND se.expl_id = connec.expl_id2)
             JOIN selector_state ss ON ss.cur_user = current_user AND connec.state = ss.state_id
             LEFT JOIN (SELECT connec_id, arc_id::varchar(16) FROM connec_psector WHERE p_state = 0) a USING (connec_id, arc_id) WHERE a.connec_id IS NULL
             UNION ALL
@@ -1013,7 +1015,7 @@ AS WITH
         ),
     connec_selected AS
     	(
-			SELECT DISTINCT ON (connec.connec_id) connec.connec_id,
+			SELECT connec.connec_id,
 			connec.code,
             connec.sys_code,
 			connec.customer_code,
@@ -1141,7 +1143,6 @@ AS WITH
             (SELECT ST_X(ST_Transform(connec.the_geom, 4326))) AS long
 			FROM connec_selector
 			JOIN connec USING (connec_id)
-			JOIN selector_expl se ON (se.cur_user = current_user AND se.expl_id = connec.expl_id) OR (se.cur_user = current_user AND se.expl_id = connec.expl_id2)
 			JOIN selector_sector sc ON (sc.cur_user = CURRENT_USER AND sc.sector_id = connec.sector_id)
 			JOIN cat_connec ON cat_connec.id::text = connec.conneccat_id::text
 			JOIN cat_feature ON cat_feature.id::text = connec.connec_type::text::text
@@ -1217,8 +1218,9 @@ AS WITH
         ),
     gully_selector AS
         (
-            SELECT gully_id, arc_id::varchar(16), null::integer as link_id
+            SELECT DISTINCT ON (gully_id) gully_id, arc_id::varchar(16), null::integer as link_id
             FROM gully
+			JOIN selector_expl se ON (se.cur_user = current_user AND se.expl_id = gully.expl_id) OR (se.cur_user = current_user AND se.expl_id = gully.expl_id2)
             JOIN selector_state ss ON ss.cur_user =current_user AND gully.state =ss.state_id
             LEFT JOIN (SELECT gully_id, arc_id FROM gully_psector WHERE p_state = 0) a USING (gully_id, arc_id) WHERE a.gully_id IS NULL
             UNION ALL
@@ -1227,7 +1229,7 @@ AS WITH
         ),
     gully_selected AS
     	(
-			SELECT DISTINCT ON (gully.gully_id) gully.gully_id,
+			SELECT gully.gully_id,
 			gully.code,
             gully.sys_code,
 			gully.top_elev,
@@ -1382,7 +1384,6 @@ AS WITH
 			gully.width
 			FROM inp_network_mode, gully_selector
 			JOIN gully using (gully_id)
-			JOIN selector_expl se ON (se.cur_user = current_user AND se.expl_id = gully.expl_id) OR (se.cur_user = current_user AND se.expl_id = gully.expl_id2)
 			JOIN selector_sector sc ON (sc.cur_user = CURRENT_USER AND sc.sector_id = gully.sector_id)
 			JOIN cat_gully ON gully.gullycat_id::text = cat_gully.id::text
 			JOIN exploitation ON gully.expl_id = exploitation.expl_id

@@ -72,8 +72,9 @@ AS WITH
 		),
   arc_selector AS
 		(
-      SELECT arc.arc_id
+	  SELECT DISTINCT ON (arc.arc_id) arc.arc_id
       FROM arc
+      JOIN selector_expl se ON ((se.cur_user = CURRENT_USER AND se.expl_id = arc.expl_id) OR (se.cur_user = CURRENT_USER and se.expl_id = arc.expl_id2))
       JOIN selector_state s ON s.cur_user = CURRENT_USER AND arc.state = s.state_id
       LEFT JOIN (SELECT arc_id FROM arc_psector WHERE p_state = 0) a USING (arc_id) WHERE a.arc_id IS NULL
       UNION ALL
@@ -82,7 +83,7 @@ AS WITH
     ),
   arc_selected AS
     (
-      SELECT DISTINCT ON (arc.arc_id) arc.arc_id,
+	  SELECT arc.arc_id,
       arc.code,
       arc.sys_code,
       arc.datasource,
@@ -209,7 +210,6 @@ AS WITH
       arc.is_scadamap
       FROM arc_selector
       JOIN arc ON arc.arc_id::text = arc_selector.arc_id::text
-      JOIN selector_expl se ON ((se.cur_user = CURRENT_USER AND se.expl_id = arc.expl_id) OR (se.cur_user = CURRENT_USER and se.expl_id = arc.expl_id2))
       JOIN selector_sector sc ON (sc.cur_user = CURRENT_USER AND sc.sector_id = arc.sector_id)
       JOIN cat_arc ON cat_arc.id::text = arc.arccat_id::text
       JOIN cat_feature ON cat_feature.id::text = cat_arc.arc_type::text
@@ -280,8 +280,9 @@ AS WITH
       ),
     node_selector AS
       (
-        SELECT node_id
+		SELECT DISTINCT ON (node.node_id) node.node_id
         FROM node
+        JOIN selector_expl se ON (se.cur_user =current_user AND se.expl_id = node.expl_id) or (se.cur_user = current_user AND se.expl_id = node.expl_id2)
         JOIN selector_state s ON s.cur_user = current_user AND node.state = s.state_id
         LEFT JOIN (SELECT node_id FROM node_psector WHERE p_state = 0) a USING (node_id) WHERE a.node_id IS NULL
         UNION ALL
@@ -290,7 +291,7 @@ AS WITH
       ),
     node_selected AS
       (
-        SELECT DISTINCT ON (node.node_id) node.node_id,
+		SELECT node_id,
         node.code,
         node.sys_code,
         node.top_elev,
@@ -430,7 +431,6 @@ AS WITH
         (SELECT ST_X(ST_Transform(node.the_geom, 4326))) AS long
         FROM node_selector
         JOIN node ON node.node_id = node_selector.node_id
-        JOIN selector_expl se ON (se.cur_user =current_user AND se.expl_id = node.expl_id) or (se.cur_user = current_user AND se.expl_id = node.expl_id2)
         JOIN selector_sector sc ON (sc.cur_user = CURRENT_USER AND sc.sector_id = node.sector_id)
         JOIN cat_node ON cat_node.id::text = node.nodecat_id::text
         JOIN cat_feature ON cat_feature.id::text = cat_node.node_type::text
@@ -507,8 +507,9 @@ AS WITH
       ),
     link_selector AS
       (
-        SELECT l.link_id
+        SELECT DISTINCT ON (l.link_id) l.link_id
         FROM link l
+        JOIN selector_expl se ON ((se.cur_user =current_user AND se.expl_id = l.expl_id) or (se.cur_user =current_user AND se.expl_id = l.expl_id2))
         JOIN selector_state s ON s.cur_user = current_user AND l.state = s.state_id
         LEFT JOIN (SELECT link_id FROM link_psector WHERE p_state = 0) a USING (link_id) WHERE a.link_id IS NULL
         UNION ALL
@@ -517,7 +518,7 @@ AS WITH
       ),
     link_selected AS
       (
-        SELECT DISTINCT ON (l.link_id) l.link_id,
+        SELECT l.link_id,
         l.code,
         l.feature_type,
         l.feature_id,
@@ -585,7 +586,6 @@ AS WITH
         FROM inp_network_mode, link_selector
         JOIN link l using (link_id)
         LEFT JOIN connec c ON c.connec_id = l.feature_id
-        JOIN selector_expl se ON ((se.cur_user =current_user AND se.expl_id = l.expl_id) or (se.cur_user =current_user AND se.expl_id = l.expl_id2))
         JOIN selector_sector sc ON (sc.cur_user = CURRENT_USER AND sc.sector_id = l.sector_id)
         JOIN sector_table ON sector_table.sector_id = l.sector_id
         JOIN cat_link ON cat_link.id::text = l.linkcat_id::text
@@ -672,8 +672,9 @@ AS WITH
       ),
     connec_selector AS
       (
-        SELECT connec_id, arc_id::varchar(16), null::integer as link_id
+        SELECT DISTINCT ON (connec_id) connec_id, arc_id::varchar(16), null::integer as link_id
         FROM connec
+        JOIN selector_expl se ON (se.cur_user =current_user AND se.expl_id = connec.expl_id) or (se.cur_user =current_user and se.expl_id = connec.expl_id2)
         JOIN selector_state ss ON ss.cur_user = current_user AND connec.state = ss.state_id
         LEFT JOIN (SELECT connec_id, arc_id FROM connec_psector WHERE p_state = 0) a USING (connec_id, arc_id) WHERE a.connec_id IS NULL
         UNION ALL
@@ -682,7 +683,7 @@ AS WITH
       ),
     connec_selected AS
       (
-        SELECT DISTINCT ON (connec_id) connec.connec_id,
+        SELECT connec.connec_id,
         connec.code,
         connec.sys_code,
         connec.top_elev,
@@ -886,7 +887,6 @@ AS WITH
         (SELECT ST_X(ST_Transform(connec.the_geom, 4326))) AS long
         FROM inp_network_mode, connec_selector
         JOIN connec ON connec.connec_id = connec_selector.connec_id
-        JOIN selector_expl se ON (se.cur_user =current_user AND se.expl_id = connec.expl_id) or (se.cur_user =current_user and se.expl_id = connec.expl_id2)
         JOIN selector_sector sc ON (sc.cur_user = CURRENT_USER AND sc.sector_id = connec.sector_id)
         JOIN cat_connec ON cat_connec.id::text = connec.conneccat_id::text
         JOIN cat_feature ON cat_feature.id::text = cat_connec.connec_type::text
