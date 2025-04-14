@@ -31,6 +31,7 @@ from ..utils import tools_gw
 from ...libs import lib_vars, tools_db, tools_qgis, tools_qt, tools_log, tools_os
 from ..utils.snap_manager import GwSnapManager
 from ...global_vars import GwFeatureTypes
+from ..utils.selection_mode import GwSelectionMode
 
 
 class GwPsector:
@@ -328,7 +329,7 @@ class GwPsector:
         self.dlg_plan_psector.btn_delete.clicked.connect(
             partial(tools_gw.set_model_signals, self))
         self.dlg_plan_psector.btn_snapping.clicked.connect(
-            partial(tools_gw.selection_init, self, self.dlg_plan_psector, table_object, tools_gw.GwSelectionMode.PSECTOR))
+            partial(tools_gw.selection_init, self, self.dlg_plan_psector, table_object, GwSelectionMode.PSECTOR))
         self.dlg_plan_psector.btn_select_arc.clicked.connect(
             partial(self._replace_arc))
         self.dlg_plan_psector.btn_arc_fusion.clicked.connect(

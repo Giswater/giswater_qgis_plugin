@@ -27,6 +27,7 @@ from .search import GwSearch
 from ..threads.auto_mincut_execute import GwAutoMincutTask
 from ..utils import tools_gw
 from ..utils.snap_manager import GwSnapManager
+from ..utils.selection_mode import GwSelectionMode
 from ..ui.ui_manager import GwDialogShowInfoUi, GwMincutComposerUi, GwMincutConnecUi, GwMincutEndUi, GwMincutHydrometerUi
 from ... import global_vars
 from ...libs import lib_vars, tools_qt, tools_qgis, tools_log, tools_db
@@ -1172,7 +1173,7 @@ class GwMincut:
     def _snapping_init_connec(self):
         """ Snap connec """
         self.feature_type = 'connec'
-        tools_gw.selection_init(self, self.dlg_connec, self.dlg_connec.tbl_mincut_connec, tools_gw.GwSelectionMode.NORMAL)
+        tools_gw.selection_init(self, self.dlg_connec, self.dlg_connec.tbl_mincut_connec, GwSelectionMode.NORMAL)
 
     def _snapping_selection_hydro(self):
         """ Snap to connec layers to add its hydrometers """

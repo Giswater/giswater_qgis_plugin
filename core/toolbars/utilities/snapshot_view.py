@@ -14,6 +14,7 @@ from qgis.PyQt.QtGui import QColor
 from ..dialog import GwAction
 from ...ui.ui_manager import GwSnapshotViewUi
 from ...utils import tools_gw
+from ...utils.selection_mode import GwSelectionMode
 from ....libs import lib_vars, tools_qt, tools_db, tools_qgis
 from ...utils.select_manager import GwSelectManager
 from .... import global_vars
@@ -140,7 +141,7 @@ class GwSnapshotViewButton(GwAction):
             tools_qt.set_widget_text(self.dlg_snapshot_view, "txt_coordinates", f"{xmin},{xmax},{ymin},{ymax} [EPSG:25831]")
 
         elif origin == "draw":
-            select_manager = GwSelectManager(self, None, self.dlg_snapshot_view, tools_gw.GwSelectionMode.NORMAL, self.dlg_snapshot_view)
+            select_manager = GwSelectManager(self, None, self.dlg_snapshot_view, GwSelectionMode.NORMAL, self.dlg_snapshot_view)
             global_vars.canvas.setMapTool(select_manager)
             cursor = tools_gw.get_cursor_multiple_selection()
             global_vars.canvas.setCursor(cursor)

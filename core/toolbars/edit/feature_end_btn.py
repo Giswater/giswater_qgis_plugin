@@ -16,6 +16,7 @@ from qgis.core import QgsExpression, QgsFeatureRequest
 from ..dialog import GwAction
 from ...ui.ui_manager import GwFeatureEndUi, GwInfoWorkcatUi, GwFeatureEndConnecUi
 from ...utils import tools_gw
+from ...utils.selection_mode import GwSelectionMode
 from ....libs import lib_vars, tools_qgis, tools_qt, tools_log, tools_db
 
 
@@ -116,7 +117,7 @@ class GwFeatureEndButton(GwAction):
         self.dlg_work_end.btn_delete.clicked.connect(
             partial(tools_gw.delete_records, self, self.dlg_work_end, self.table_object, False, None, None))
         self.dlg_work_end.btn_snapping.clicked.connect(
-            partial(tools_gw.selection_init, self, self.dlg_work_end, self.table_object, tools_gw.GwSelectionMode.NORMAL))
+            partial(tools_gw.selection_init, self, self.dlg_work_end, self.table_object, GwSelectionMode.NORMAL))
 
         self.dlg_work_end.workcat_id_end.activated.connect(partial(self._fill_workids))
         self.dlg_work_end.tab_feature.currentChanged.connect(

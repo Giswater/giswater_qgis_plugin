@@ -15,6 +15,7 @@ from qgis.PyQt.QtGui import QRegExpValidator, QCursor
 from qgis.PyQt.QtWidgets import QAbstractItemView, QPushButton, QTableView, QComboBox, QGridLayout, QSpacerItem, QSizePolicy, QLineEdit
 
 from ..utils import tools_gw, tools_backend_calls
+from ..utils.selection_mode import GwSelectionMode
 from ..ui.ui_manager import GwElementUi, GwElementManagerUi
 from ..utils.snap_manager import GwSnapManager
 from ... import global_vars
@@ -135,7 +136,7 @@ class GwElement:
         self.dlg_add_element.btn_delete.clicked.connect(
             partial(tools_gw.delete_records, self, self.dlg_add_element, table_object, False, None, None))
         self.dlg_add_element.btn_snapping.clicked.connect(
-            partial(tools_gw.selection_init, self, self.dlg_add_element, table_object, tools_gw.GwSelectionMode.NORMAL))
+            partial(tools_gw.selection_init, self, self.dlg_add_element, table_object, GwSelectionMode.NORMAL))
 
         self.dlg_add_element.btn_add_geom.clicked.connect(self._get_point_xy)
         self.dlg_add_element.state.currentIndexChanged.connect(partial(self._filter_state_type))
