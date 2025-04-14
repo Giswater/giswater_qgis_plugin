@@ -24,9 +24,7 @@ INSERT INTO config_param_user ("parameter", value, cur_user) SELECT 'epa_dscenar
 
 UPDATE sys_function SET descript='Function to create dscenarios from CRM.
 This function store values on CONNEC features.
-When the network geometry generator works with [NODE] demands are moved 30% to node_30 and node_300.
-
->End Date proposal for 1% of hydrometers which consum is out of the period: 2015-07-31 00:00:00'
+When the network geometry generator works with [NODE] demands are moved 50% to node_1 50% and node_2.'
 WHERE id=3110;
 
 UPDATE config_toolbox SET inputparams = '
