@@ -9,7 +9,7 @@ from functools import partial
 
 from qgis.PyQt.QtGui import QStandardItemModel, QStandardItem
 from qgis.PyQt.QtSql import QSqlTableModel
-from qgis.PyQt.QtCore import QDate
+from qgis.PyQt.QtCore import QDate, QTimer
 from qgis.PyQt.QtWidgets import QLineEdit, QDateEdit, QCheckBox, QComboBox, QWidget, QLabel, QGridLayout, QSpacerItem, \
     QSizePolicy, QTextEdit, QMenu, QAction, QCompleter, QToolButton, QTableView
 from .... import global_vars
@@ -29,6 +29,7 @@ class Campaign:
         self.project_type = tools_gw.get_project_type()
         self.dialog = None
         self.campaign_type = None
+        self.campaign_id = None
         self.canvas = global_vars.canvas
         self.campaign_saved = False
         self.is_new_campaign = True
@@ -65,10 +66,10 @@ class Campaign:
         self.dialog.date_event_to.dateChanged.connect(self.filter_campaigns)
         self.dialog.campaign_cmb_date_filter_type.currentIndexChanged.connect(self.filter_campaigns)
         self.dialog.campaign_cmb_date_filter_type.currentIndexChanged.connect(self.manage_date_filter)
-        self.dialog.tbl_campaign.doubleClicked.connect(self._on_campaign_double_click)
-        self.dialog.campaign_btn_create.clicked.connect(self.open_campaign)
+        #self.dialog.tbl_campaign.doubleClicked.connect(self.open_selected_campaign)
+        self.dialog.tbl_campaign.doubleClicked.connect(self.open_campaign)
         self.dialog.campaign_btn_delete.clicked.connect(self.delete_selected_campaign)
-        self.dialog.campaign_btn_create.clicked.connect(lambda: self.create_campaign(is_new=True, dialog_type="review"))
+        self.dialog.campaign_btn_create.clicked.connect(self.open_selected_campaign)
 
         self.manage_date_filter()
         tools_gw.open_dialog(self.dialog, dlg_name="campaign_manager")
@@ -80,6 +81,23 @@ class Campaign:
         # INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('cm_campaing_type', '1', 'Review', NULL, NULL);
         # INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('cm_campaing_type', '2', 'Visit', NULL, NULL);
         # same with status and status in x_feature
+
+        # Setting lists
+        self.ids = []
+        self.list_ids = {'arc': [], 'node': [], 'connec': [], 'gully': [], 'link': []}
+        self.layers = {'arc': [], 'node': [], 'connec': [], 'gully': [], 'link': []}
+        self.layers['arc'] = tools_gw.get_layers_from_feature_type('arc')
+        self.layers['node'] = tools_gw.get_layers_from_feature_type('node')
+        self.layers['connec'] = tools_gw.get_layers_from_feature_type('connec')
+        if self.project_type == 'ud':
+            self.layers['gully'] = tools_gw.get_layers_from_feature_type('gully')
+        self.layers['link'] = tools_gw.get_layers_from_feature_type('link')
+
+
+        self.excluded_layers = [
+            "v_edit_arc", "v_edit_node", "v_edit_connec",
+            "v_edit_gully", "v_edit_link"
+        ]
 
         modes = {"review": 1, "visit": 2}
         self.campaign_type = modes.get(mode, 1)
@@ -109,7 +127,7 @@ class Campaign:
 
         # Hide gully tab if project_type is 'ws'
         if self.project_type == 'ws':
-            index = self.dialog.tab_feature.indexOf(self.dialog.tab_5)
+            index = self.dialog.tab_feature.indexOf(self.dialog.tab_gully)
             if index != -1:
                 self.dialog.tab_feature.removeTab(index)
 
@@ -314,7 +332,7 @@ class Campaign:
 
     def setup_tab_relations(self):
         #self.dialog.tab_relations.setCurrentIndex(0)
-        self.feature_type = "arc"
+        self.feature_type = tools_gw.get_signal_change_tab(self.dialog)
         self.rubber_band = tools_gw.create_rubberband(self.canvas)
 
         tools_gw.get_signal_change_tab(self.dialog)
@@ -336,6 +354,9 @@ class Campaign:
         self.dialog.tab_feature.currentChanged.connect(
             lambda: self._update_feature_completer(self.dialog)
         )
+
+        self.dialog.tab_feature.currentChanged.connect(self._on_tab_feature_changed)
+
         self.dialog.btn_insert.clicked.connect(
             lambda: self.insert_campaign_relation(self.dialog)
         )
@@ -345,18 +366,22 @@ class Campaign:
         )
 
         self.dialog.btn_snapping.clicked.connect(
-            partial(tools_gw.selection_init, self, self.dialog, None, False)
+            partial(tools_gw.selection_init, self, self.dialog, "campaign", 'campaign')
         )
+
+
+    def _on_tab_feature_changed(self):
+        self.feature_type = tools_gw.get_signal_change_tab(self.dialog, self.excluded_layers)
 
 
     def _update_feature_completer(self, dlg):
         tab_name = dlg.tab_feature.currentWidget().objectName()
         table_map = {
-            'tab': ('v_edit_arc', 'arc_id'),
-            'tab_2': ('v_edit_node', 'node_id'),
-            'tab_3': ('v_edit_connec', 'connec_id'),
-            'tab_4': ('v_edit_link', 'link_id'),
-            'tab_5': ('v_edit_gully', 'gully_id')
+            'tab_arc': ('v_edit_arc', 'arc_id'),
+            'tab_node': ('v_edit_node', 'node_id'),
+            'tab_connec': ('v_edit_connec', 'connec_id'),
+            'tab_link': ('v_edit_link', 'link_id'),
+            'tab_gully': ('v_edit_gully', 'gully_id')
         }
         table_name, id_column = table_map.get(tab_name, (None, None))
         if not table_name:
@@ -381,11 +406,13 @@ class Campaign:
         """Insert feature into the corresponding om_campaign_x_* table"""
 
         # Get campaign ID from the dialog field
+
         for w in dialog.findChildren(QLineEdit):
             if w.property("columnname") == "id":
                 campaign_id = tools_qt.get_text(dialog, w)
                 break
-        print("campaign_id: ", campaign_id)
+        self.campaign_id = campaign_id
+        print("CAMPAIGN ID: ", self.campaign_id)
         if not campaign_id or not campaign_id.isdigit():
             tools_qgis.show_warning("Invalid campaign ID.")
             return
@@ -399,11 +426,11 @@ class Campaign:
         # Determine current tab and corresponding table/column
         tab_name = dialog.tab_feature.currentWidget().objectName()
         table_map = {
-            "tab": ("om_campaign_x_arc", "arc_id"),
-            "tab_2": ("om_campaign_x_node", "node_id"),
-            "tab_3": ("om_campaign_x_connec", "connec_id"),
-            'tab_4': ('om_campaign_x_link', 'link_id'),
-            "tab_5": ("om_campaign_x_gully", "gully_id"),
+            "tab_arc": ("om_campaign_x_arc", "arc_id"),
+            "tab_node": ("om_campaign_x_node", "node_id"),
+            "tab_connec": ("om_campaign_x_connec", "connec_id"),
+            'tab_link': ('om_campaign_x_link', 'link_id'),
+            "tab_gully": ("om_campaign_x_gully", "gully_id"),
         }
 
         table_info = table_map.get(tab_name)
@@ -439,11 +466,11 @@ class Campaign:
 
     def _get_relation_table(self, dialog, tab_name):
         return {
-            'tab': dialog.tbl_campaign_x_arc,
-            'tab_2': dialog.tbl_campaign_x_node,
-            'tab_3': dialog.tbl_campaign_x_connec,
-            'tab_4': dialog.tbl_campaign_x_link,
-            'tab_5': dialog.tbl_campaign_x_gully,
+            'tab_arc': dialog.tbl_campaign_x_arc,
+            'tab_node': dialog.tbl_campaign_x_node,
+            'tab_connec': dialog.tbl_campaign_x_connec,
+            'tab_link': dialog.tbl_campaign_x_link,
+            'tab_gully': dialog.tbl_campaign_x_gully,
         }.get(tab_name)
 
 
@@ -475,11 +502,11 @@ class Campaign:
         tab_name = dialog.tab_feature.currentWidget().objectName()
 
         table_map = {
-            "tab": ("tbl_campaign_x_arc", "om_campaign_x_arc", "arc_id"),
-            "tab_2": ("tbl_campaign_x_node", "om_campaign_x_node", "node_id"),
-            "tab_3": ("tbl_campaign_x_connec", "om_campaign_x_connec", "connec_id"),
-            "tab_4": ("tbl_campaign_x_link", "om_campaign_x_link", "link_id"),
-            "tab_5": ("tbl_campaign_x_gully", "om_campaign_x_gully", "gully_id"),
+            "tab_arc": ("tbl_campaign_x_arc", "om_campaign_x_arc", "arc_id"),
+            "tab_node": ("tbl_campaign_x_node", "om_campaign_x_node", "node_id"),
+            "tab_connec": ("tbl_campaign_x_connec", "om_campaign_x_connec", "connec_id"),
+            "tab_link": ("tbl_campaign_x_link", "om_campaign_x_link", "link_id"),
+            "tab_gully": ("tbl_campaign_x_gully", "om_campaign_x_gully", "gully_id"),
         }
 
         table_info = table_map.get(tab_name)
@@ -648,7 +675,8 @@ class Campaign:
         try:
             campaign_id = int(campaign_id)
             if campaign_id > 0:
-                self.load_campaign_dialog(campaign_id)
+                # Delay dialog creation to avoid access violation during double-click stack
+                QTimer.singleShot(0, lambda: self.load_campaign_dialog(campaign_id))
         except (ValueError, TypeError):
             tools_qgis.show_warning("Invalid campaign ID.")
 

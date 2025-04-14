@@ -4528,6 +4528,45 @@ def reset_position_dialog(show_message=False, plugin='core', file_name='session'
 
 
 # region private functions
+def _insert_feature_campaign(dialog, feature_type, campaign_id, ids=None):
+    """ Insert features_id to table plan_@feature_type_x_campaign """
+
+    widget = tools_qt.get_widget(dialog, f"tbl_campaign_x_{feature_type}")
+    tablename = widget.property('tablename') or f"cm.om_campaign_x_{feature_type}"
+
+    if not campaign_id:
+        tools_qgis.show_warning("Campaign ID is missing.")
+        return
+
+    for feature_id in ids or []:
+        sql = f"""
+            INSERT INTO {tablename} (campaign_id, {feature_type}_id)
+            VALUES ('{campaign_id}', '{feature_id}')
+            ON CONFLICT DO NOTHING;
+        """
+        print("swl: ", sql)
+        tools_db.execute_sql(sql)
+
+    load_tableview_campaign(dialog, feature_type, campaign_id)
+
+
+def load_tableview_campaign(dialog, feature_type, campaign_id):
+    """ Reload QTableView for campaign_x_<feature_type> """
+
+    if not campaign_id:
+        tools_qgis.show_warning("Campaign ID not found.")
+        return
+
+    expr = f"campaign_id = '{campaign_id}'"
+    qtable = tools_qt.get_widget(dialog, f'tbl_campaign_x_{feature_type}')
+    tablename = qtable.property('tablename') or f"cm.om_campaign_x_{feature_type}"
+    message = tools_qt.fill_table(qtable, f"{tablename}", expr, QSqlTableModel.OnFieldChange, schema_name='cm')
+    if message:
+        tools_qgis.show_warning(message)
+
+    set_tablemodel_config(dialog, qtable, tablename)
+    tools_qgis.refresh_map_canvas()
+
 
 def _insert_feature_psector(dialog, feature_type, ids=None):
     """ Insert features_id to table plan_@feature_type_x_psector """
