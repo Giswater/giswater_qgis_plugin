@@ -10,7 +10,7 @@ SET client_min_messages TO WARNING;
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-SELECT plan(12);
+SELECT plan(6);
 
 -- Extract and test the "status" field from the function's JSON response
 
