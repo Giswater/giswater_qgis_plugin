@@ -19,10 +19,10 @@ SELECT has_table('temp_node'::name, 'Table temp_node should exist');
 SELECT columns_are(
     'temp_node',
     ARRAY[
-        'id', 'result_id', 'node_id', 'top_elev', 'elev', 'node_type', 'nodecat_id', 'epa_type', 
-        'sector_id', 'state', 'state_type', 'annotation', 'demand', 'the_geom', 'expl_id', 
-        'pattern_id', 'addparam', 'nodeparent', 'arcposition', 'dma_id', 'presszone_id', 
-        'dqa_id', 'minsector_id', 'age'
+        'id', 'result_id', 'node_id', 'top_elev', 'elev', 'node_type', 'nodecat_id', 'epa_type',
+        'sector_id', 'state', 'state_type', 'annotation', 'demand', 'the_geom', 'expl_id',
+        'pattern_id', 'addparam', 'nodeparent', 'arcposition', 'dma_id', 'presszone_id',
+        'dqa_id', 'minsector_id', 'age', 'omzone_id'
     ],
     'Table temp_node should have the correct columns'
 );
@@ -55,6 +55,7 @@ SELECT col_type_is('temp_node', 'presszone_id', 'text', 'Column presszone_id sho
 SELECT col_type_is('temp_node', 'dqa_id', 'integer', 'Column dqa_id should be integer');
 SELECT col_type_is('temp_node', 'minsector_id', 'integer', 'Column minsector_id should be integer');
 SELECT col_type_is('temp_node', 'age', 'integer', 'Column age should be integer');
+SELECT col_type_is('temp_node', 'omzone_id', 'integer', 'Column omzone_id should be integer');
 
 -- Check default values
 SELECT col_has_default('temp_node', 'id', 'Column id should have a default value');
@@ -68,4 +69,4 @@ SELECT has_index('temp_node', 'temp_node_nodeparent', 'Index temp_node_nodeparen
 
 SELECT * FROM finish();
 
-ROLLBACK; 
+ROLLBACK;

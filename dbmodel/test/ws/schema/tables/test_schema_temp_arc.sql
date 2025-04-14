@@ -19,10 +19,10 @@ SELECT has_table('temp_arc'::name, 'Table temp_arc should exist');
 SELECT columns_are(
     'temp_arc',
     ARRAY[
-        'id', 'result_id', 'arc_id', 'node_1', 'node_2', 'arc_type', 'arccat_id', 'epa_type', 
-        'sector_id', 'state', 'state_type', 'annotation', 'diameter', 'roughness', 'length', 
-        'status', 'the_geom', 'expl_id', 'flw_code', 'minorloss', 'addparam', 'arcparent', 
-        'flag', 'dma_id', 'presszone_id', 'dqa_id', 'minsector_id', 'age'
+        'id', 'result_id', 'arc_id', 'node_1', 'node_2', 'arc_type', 'arccat_id', 'epa_type',
+        'sector_id', 'state', 'state_type', 'annotation', 'diameter', 'roughness', 'length',
+        'status', 'the_geom', 'expl_id', 'flw_code', 'minorloss', 'addparam', 'arcparent',
+        'flag', 'dma_id', 'presszone_id', 'dqa_id', 'minsector_id', 'age', 'omzone_id'
     ],
     'Table temp_arc should have the correct columns'
 );
@@ -59,6 +59,7 @@ SELECT col_type_is('temp_arc', 'presszone_id', 'text', 'Column presszone_id shou
 SELECT col_type_is('temp_arc', 'dqa_id', 'integer', 'Column dqa_id should be integer');
 SELECT col_type_is('temp_arc', 'minsector_id', 'integer', 'Column minsector_id should be integer');
 SELECT col_type_is('temp_arc', 'age', 'integer', 'Column age should be integer');
+SELECT col_type_is('temp_arc', 'omzone_id', 'integer', 'Column omzone_id should be integer');
 
 -- Check default values
 SELECT col_has_default('temp_arc', 'id', 'Column id should have a default value');
@@ -73,4 +74,4 @@ SELECT has_index('temp_arc', 'temp_arc_node_2_type', 'Index temp_arc_node_2_type
 
 SELECT * FROM finish();
 
-ROLLBACK; 
+ROLLBACK;

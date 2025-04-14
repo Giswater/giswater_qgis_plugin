@@ -125,3 +125,6 @@ CREATE TABLE inp_dscenario_flwreg_pump (
 );
 
 INSERT INTO man_genelement (element_id) SELECT element_id FROM element where ST_GeometryType(the_geom) = 'ST_Point' OR the_geom IS NULL;
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"temp_node", "column":"omzone_id", "dataType":"integer", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"temp_arc", "column":"omzone_id", "dataType":"integer", "isUtils":"False"}}$$);
