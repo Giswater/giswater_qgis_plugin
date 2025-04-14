@@ -171,6 +171,10 @@ SELECT col_default_is('connec', 'tstamp', 'now()', 'Column tstamp should default
 SELECT col_default_is('connec', 'insert_user', 'CURRENT_USER', 'Column insert_user should default to CURRENT_USER');
 SELECT col_default_is('connec', 'macrominsector_id', '0', 'Column macrominsector_id should default to 0');
 
+-- Check indexes
+SELECT has_index('connec', 'connec_sys_code_idx', 'Table should have index on sys_code');
+SELECT has_index('connec', 'connec_asset_id_idx', 'Table should have index on asset_id');
+
 SELECT col_has_check('connec', 'epa_type', 'Column epa_type should have check constraint');
 
 SELECT * FROM finish();

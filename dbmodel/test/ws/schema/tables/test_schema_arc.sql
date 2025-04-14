@@ -53,6 +53,8 @@ SELECT has_index('arc', 'arc_street1', 'Table should have index on streetaxis_id
 SELECT has_index('arc', 'arc_street2', 'Table should have index on streetaxis2_id');
 SELECT has_index('arc', 'arc_streetname', 'Table should have index on streetname');
 SELECT has_index('arc', 'arc_streetname2', 'Table should have index on streetname2');
+SELECT has_index('arc', 'arc_sys_code_idx', 'Table should have index on sys_code');
+SELECT has_index('arc', 'arc_asset_id_idx', 'Table should have index on asset_id');
 
 -- Check column types
 SELECT col_type_is('arc', 'arc_id', 'varchar(16)', 'Column arc_id should be varchar(16)');

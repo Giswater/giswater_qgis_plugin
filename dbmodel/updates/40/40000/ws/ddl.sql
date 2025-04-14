@@ -1175,6 +1175,8 @@ CREATE INDEX arc_street1 ON arc USING btree (streetaxis_id);
 CREATE INDEX arc_street2 ON arc USING btree (streetaxis2_id);
 CREATE INDEX arc_streetname ON arc USING btree (streetname);
 CREATE INDEX arc_streetname2 ON arc USING btree (streetname2);
+CREATE INDEX arc_sys_code_idx ON arc USING btree (sys_code);
+CREATE INDEX arc_asset_id_idx ON arc USING btree (asset_id);
 
 
 DO $$
@@ -1402,7 +1404,8 @@ CREATE INDEX connec_street1 ON connec USING btree (streetaxis_id);
 CREATE INDEX connec_street2 ON connec USING btree (streetaxis2_id);
 CREATE INDEX connec_streetname ON connec USING btree (streetname);
 CREATE INDEX connec_streetname2 ON connec USING btree (streetname2);
-
+CREATE INDEX connec_sys_code_idx ON connec USING btree (sys_code);
+CREATE INDEX connec_asset_id_idx ON connec USING btree (asset_id);
 
 
 
@@ -1739,6 +1742,8 @@ CREATE INDEX node_street1 ON node USING btree (streetaxis_id);
 CREATE INDEX node_street2 ON node USING btree (streetaxis2_id);
 CREATE INDEX node_streetname ON node USING btree (streetname);
 CREATE INDEX node_streetname2 ON node USING btree (streetname2);
+CREATE INDEX node_sys_code_idx ON node USING btree (sys_code);
+CREATE INDEX node_asset_id_idx ON node USING btree (asset_id);
 
 ALTER TABLE link RENAME TO _link;
 
