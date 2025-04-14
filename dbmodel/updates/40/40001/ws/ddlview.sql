@@ -650,7 +650,7 @@ AS WITH
     link_planned as
       (
         SELECT link_id, feature_id, feature_type, exit_id, exit_type, l.expl_id, macroexpl_id, l.sector_id, sector_type, macrosector_id,
-        l.dma_id, dma_type, macrodma_id, l.presszone_id, presszone_type, presszone_head, l.dqa_id, dqa_type, dqa_table.macrodqa_id,
+        l.dma_id, dma_type, l.omzone_id, omzone_type, macrodma_id, l.presszone_id, presszone_type, presszone_head, l.dqa_id, dqa_type, dqa_table.macrodqa_id,
         l.supplyzone_id, supplyzone_type, fluid_type,
         minsector_id, staticpressure, null::integer AS macrominsector_id
         FROM link l
