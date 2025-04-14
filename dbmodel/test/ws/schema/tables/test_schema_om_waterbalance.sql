@@ -30,7 +30,7 @@ SELECT columns_are(
 );
 
 -- Check primary key
-SELECT col_is_pk('om_waterbalance', ARRAY['dma_id', 'cat_period_id'], 'Columns dma_id and cat_period_id should be primary key');
+SELECT col_is_pk('om_waterbalance', ARRAY['dma_id', 'startdate', 'enddate'], 'Columns dma_id, startdate and enddate should be primary key');
 
 -- Check column types
 SELECT col_type_is('om_waterbalance', 'expl_id', 'integer', 'Column expl_id should be integer');
