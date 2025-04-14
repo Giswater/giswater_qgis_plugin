@@ -919,23 +919,6 @@ class GwAdminDbProjectUi(GwMainWindow, FORM_CLASS):
     UINAME = UINAME
 
 
-UINAME = "admin_assetdbproject"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
-
-
-class GwAdminDbProjectAssetUi(GwMainWindow, FORM_CLASS):
-    CONTEXT = CONTEXT
-    UINAME = UINAME
-
-
-UINAME = "admin_auditdbproject"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
-
-
-class GwAdminDbProjectAuditUi(GwMainWindow, FORM_CLASS):
-    CONTEXT = CONTEXT
-    UINAME = UINAME
-
 
 UINAME = "admin_cmproject"
 FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')

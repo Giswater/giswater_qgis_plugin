@@ -27,22 +27,6 @@ class GwCreateSchemaAssetTask(GwTask):
         self.db_exception = (None, None, None)  # error, sql, filepath
         self.timer = timer
 
-        # Manage buttons & other dlg-related widgets
-        # Disable dlg_readsql_create_asset_project buttons
-        self.admin.dlg_readsql_create_asset_project.btn_cancel_task.show()
-        self.admin.dlg_readsql_create_asset_project.btn_accept.hide()
-        self.admin.dlg_readsql_create_asset_project.btn_close.setEnabled(False)
-        try:
-            self.admin.dlg_readsql_create_asset_project.key_escape.disconnect()
-        except TypeError:
-            pass
-
-        # Disable red 'X' from dlg_readsql_create_asset_project
-        self.admin.dlg_readsql_create_asset_project.setWindowFlag(Qt.WindowCloseButtonHint, False)
-        self.admin.dlg_readsql_create_asset_project.show()
-        # Disable dlg_readsql buttons
-        self.admin.dlg_readsql.btn_close.setEnabled(False)
-
     def run(self):
 
         super().run()
@@ -60,14 +44,8 @@ class GwCreateSchemaAssetTask(GwTask):
 
         super().finished(result)
         # Enable dlg_readsql_create_asset_project buttons
-        self.admin.dlg_readsql_create_asset_project.btn_cancel_task.hide()
-        self.admin.dlg_readsql_create_asset_project.btn_accept.show()
-        self.admin.dlg_readsql_create_asset_project.btn_close.setEnabled(True)
         # Enable red 'X' from dlg_readsql_create_asset_project
-        self.admin.dlg_readsql_create_asset_project.setWindowFlag(Qt.WindowCloseButtonHint, True)
-        self.admin.dlg_readsql_create_asset_project.show()
         # Disable dlg_readsql buttons
-        self.admin.dlg_readsql.btn_close.setEnabled(True)
 
         if self.isCanceled():
             if self.timer:
