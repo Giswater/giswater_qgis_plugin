@@ -45,6 +45,23 @@ DROP VIEW IF EXISTS v_ui_event_x_connec;
 
 -- ====
 
+CREATE OR REPLACE VIEW v_edit_exploitation
+AS SELECT exploitation.expl_id,
+    exploitation.code,
+    exploitation.name,
+    exploitation.macroexpl_id,
+    exploitation.descript,
+    exploitation.lock_level,
+    exploitation.active,
+    exploitation.the_geom,
+    exploitation.created_at,
+    exploitation.created_by,
+    exploitation.updated_at,
+    exploitation.updated_by
+   FROM selector_expl,
+    exploitation
+  WHERE exploitation.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text;
+
 CREATE OR REPLACE VIEW v_edit_macroomzone AS
  SELECT macroomzone.macroomzone_id,
     macroomzone.code,
@@ -63,6 +80,7 @@ CREATE OR REPLACE VIEW v_edit_macroomzone AS
 
 CREATE OR REPLACE VIEW v_edit_omzone
 AS SELECT o.omzone_id,
+    o.code,
     o.name,
     o.macroomzone_id,
     o.omzone_type,
@@ -197,79 +215,6 @@ AS SELECT DISTINCT s.muni_id,
     m.the_geom
     FROM ext_municipality m, selector_municipality s
 	WHERE m.muni_id = s.muni_id AND s.cur_user = "current_user"()::text;
-
-
-CREATE OR REPLACE VIEW vu_link
-AS WITH
-link_selected AS (
- SELECT DISTINCT ON (link_id)
-	l.link_id,
-    l.feature_type,
-    l.feature_id,
-    l.exit_type,
-    l.exit_id,
-    l.state,
-    l.expl_id,
-	e.macroexpl_id,
-    l.sector_id,
-    s.sector_type,
-	s.macrosector_id,
-	l.muni_id,
-	l.drainzone_id,
-    drainzone.drainzone_type,
-    l.dma_id,
-	d.macrodma_id,
-    l.top_elev1,
-    l.y1,
-    CASE
-        WHEN l.top_elev1 IS NOT NULL AND l.y1 IS NOT NULL THEN (l.top_elev1 - l.y1)
-        ELSE NULL
-    END AS elevation1,
-    l.top_elev2,
-    l.y2,
-    CASE
-        WHEN l.top_elev2 IS NULL OR l.y2 IS NULL THEN NULL
-        ELSE (l.top_elev2 - l.y2)
-    END AS elevation2,
-    l.fluid_type,
-    st_length2d(l.the_geom)::numeric(12,3) AS gis_length,
-    l.custom_length,
-    l.the_geom,
-	s.name as sector_name,
-	d.name as dma_name,
-    l.expl_id2,
-    l.epa_type,
-    l.is_operative,
-    l.linkcat_id,
-    l.workcat_id,
-    l.workcat_id_end,
-    l.builtdate,
-    l.enddate,
-    date_trunc('second'::text, l.lastupdate) AS lastupdate,
-    l.lastupdate_user,
-    l.uncertain,
-    l.verified,
-    l.datasource
-   FROM link l
-     LEFT JOIN exploitation e USING (expl_id)
-     LEFT JOIN sector s USING (sector_id)
-     LEFT JOIN dma d USING (dma_id)
-	 LEFT JOIN ext_municipality m USING (muni_id)
-     LEFT JOIN drainzone USING (drainzone_id)
-    )
-    SELECT link_selected.*
-    FROM link_selected;
-
-CREATE OR REPLACE VIEW vu_link_connec AS
-	SELECT l.*
-	FROM link l
-	WHERE l.feature_type::text = 'CONNEC'::text;
-
-CREATE OR REPLACE VIEW vu_link_gully AS
-	SELECT l.*
-	FROM link l
-    WHERE l.feature_type::text = 'GULLY'::text;
-
 
 CREATE OR REPLACE VIEW v_edit_link
 AS WITH
@@ -1961,154 +1906,6 @@ UNION
    FROM arc a
      JOIN links_node n ON a.node_1::text = n.node_id::text
      JOIN v_edit_gully g ON g.gully_id::text = n.feature_id::text;
-
-
-CREATE OR REPLACE VIEW v_rtc_period_hydrometer
-AS SELECT ext_rtc_hydrometer.id AS hydrometer_id,
-    v_edit_connec.connec_id,
-    NULL::character varying(16) AS pjoint_id,
-    temp_arc.node_1,
-    temp_arc.node_2,
-    ext_cat_period.id AS period_id,
-    ext_cat_period.period_seconds,
-    c.dma_id,
-    c.effc::numeric(5,4) AS effc,
-    c.minc,
-    c.maxc,
-        CASE
-            WHEN ext_rtc_hydrometer_x_data.custom_sum IS NOT NULL THEN ext_rtc_hydrometer_x_data.custom_sum
-            ELSE ext_rtc_hydrometer_x_data.sum
-        END AS m3_total_period,
-        CASE
-            WHEN ext_rtc_hydrometer_x_data.custom_sum IS NOT NULL THEN ext_rtc_hydrometer_x_data.custom_sum * 1000::double precision / ext_cat_period.period_seconds::double precision
-            ELSE ext_rtc_hydrometer_x_data.sum * 1000::double precision / ext_cat_period.period_seconds::double precision
-        END AS lps_avg,
-    ext_rtc_hydrometer_x_data.pattern_id
-   FROM ext_rtc_hydrometer
-     JOIN ext_rtc_hydrometer_x_data ON ext_rtc_hydrometer_x_data.hydrometer_id::bigint = ext_rtc_hydrometer.id::bigint
-     JOIN ext_cat_period ON ext_rtc_hydrometer_x_data.cat_period_id::text = ext_cat_period.id::text
-     JOIN rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id::bigint = ext_rtc_hydrometer.id::bigint
-     JOIN v_edit_connec ON v_edit_connec.connec_id::text = rtc_hydrometer_x_connec.connec_id::text
-     JOIN temp_arc ON v_edit_connec.arc_id::text = temp_arc.arc_id::text
-     JOIN ext_rtc_dma_period c ON c.cat_period_id::text = ext_cat_period.id::text AND c.dma_id::integer = v_edit_connec.omzone_id
-  WHERE ext_cat_period.id::text = (( SELECT config_param_user.value
-           FROM config_param_user
-          WHERE config_param_user.cur_user::name = "current_user"() AND config_param_user.parameter::text = 'inp_options_rtc_period_id'::text))
-UNION
- SELECT ext_rtc_hydrometer.id AS hydrometer_id,
-    v_edit_connec.connec_id,
-    temp_node.node_id AS pjoint_id,
-    NULL::character varying AS node_1,
-    NULL::character varying AS node_2,
-    ext_cat_period.id AS period_id,
-    ext_cat_period.period_seconds,
-    c.dma_id,
-    c.effc::numeric(5,4) AS effc,
-    c.minc,
-    c.maxc,
-        CASE
-            WHEN ext_rtc_hydrometer_x_data.custom_sum IS NOT NULL THEN ext_rtc_hydrometer_x_data.custom_sum
-            ELSE ext_rtc_hydrometer_x_data.sum
-        END AS m3_total_period,
-        CASE
-            WHEN ext_rtc_hydrometer_x_data.custom_sum IS NOT NULL THEN ext_rtc_hydrometer_x_data.custom_sum * 1000::double precision / ext_cat_period.period_seconds::double precision
-            ELSE ext_rtc_hydrometer_x_data.sum * 1000::double precision / ext_cat_period.period_seconds::double precision
-        END AS lps_avg,
-    ext_rtc_hydrometer_x_data.pattern_id
-   FROM ext_rtc_hydrometer
-     JOIN ext_rtc_hydrometer_x_data ON ext_rtc_hydrometer_x_data.hydrometer_id::bigint = ext_rtc_hydrometer.id::bigint
-     JOIN ext_cat_period ON ext_rtc_hydrometer_x_data.cat_period_id::text = ext_cat_period.id::text
-     JOIN rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id::bigint = ext_rtc_hydrometer.id::bigint
-     LEFT JOIN v_edit_connec ON v_edit_connec.connec_id::text = rtc_hydrometer_x_connec.connec_id::text
-     JOIN temp_node ON concat('VN', v_edit_connec.pjoint_id) = temp_node.node_id::text
-     JOIN ext_rtc_dma_period c ON c.cat_period_id::text = ext_cat_period.id::text AND v_edit_connec.omzone_id::text = c.dma_id::text
-  WHERE v_edit_connec.pjoint_type::text = 'VNODE'::text AND ext_cat_period.id::text = (( SELECT config_param_user.value
-           FROM config_param_user
-          WHERE config_param_user.cur_user::name = "current_user"() AND config_param_user.parameter::text = 'inp_options_rtc_period_id'::text))
-UNION
- SELECT ext_rtc_hydrometer.id AS hydrometer_id,
-    v_edit_connec.connec_id,
-    temp_node.node_id AS pjoint_id,
-    NULL::character varying AS node_1,
-    NULL::character varying AS node_2,
-    ext_cat_period.id AS period_id,
-    ext_cat_period.period_seconds,
-    c.dma_id,
-    c.effc::numeric(5,4) AS effc,
-    c.minc,
-    c.maxc,
-        CASE
-            WHEN ext_rtc_hydrometer_x_data.custom_sum IS NOT NULL THEN ext_rtc_hydrometer_x_data.custom_sum
-            ELSE ext_rtc_hydrometer_x_data.sum
-        END AS m3_total_period,
-        CASE
-            WHEN ext_rtc_hydrometer_x_data.custom_sum IS NOT NULL THEN ext_rtc_hydrometer_x_data.custom_sum * 1000::double precision / ext_cat_period.period_seconds::double precision
-            ELSE ext_rtc_hydrometer_x_data.sum * 1000::double precision / ext_cat_period.period_seconds::double precision
-        END AS lps_avg,
-    ext_rtc_hydrometer_x_data.pattern_id
-   FROM ext_rtc_hydrometer
-     JOIN ext_rtc_hydrometer_x_data ON ext_rtc_hydrometer_x_data.hydrometer_id::bigint = ext_rtc_hydrometer.id::bigint
-     JOIN ext_cat_period ON ext_rtc_hydrometer_x_data.cat_period_id::text = ext_cat_period.id::text
-     JOIN rtc_hydrometer_x_connec ON rtc_hydrometer_x_connec.hydrometer_id::bigint = ext_rtc_hydrometer.id::bigint
-     LEFT JOIN v_edit_connec ON v_edit_connec.connec_id::text = rtc_hydrometer_x_connec.connec_id::text
-     JOIN temp_node ON v_edit_connec.pjoint_id::text = temp_node.node_id::text
-     JOIN ext_rtc_dma_period c ON c.cat_period_id::text = ext_cat_period.id::text AND v_edit_connec.omzone_id::text = c.dma_id::text
-  WHERE v_edit_connec.pjoint_type::text = 'NODE'::text AND ext_cat_period.id::text = (( SELECT config_param_user.value
-           FROM config_param_user
-          WHERE config_param_user.cur_user::name = "current_user"() AND config_param_user.parameter::text = 'inp_options_rtc_period_id'::text));
-
-CREATE OR REPLACE VIEW v_rtc_period_node
-AS SELECT a.node_id,
-    a.dma_id,
-    a.period_id,
-    sum(a.lps_avg) AS lps_avg,
-    a.effc,
-    sum(a.lps_avg_real) AS lps_avg_real,
-    a.minc,
-    sum(a.lps_min) AS lps_min,
-    a.maxc,
-    sum(a.lps_max) AS lps_max,
-    sum(a.m3_total_period) AS m3_total_period
-   FROM ( SELECT v_rtc_period_hydrometer.node_1 AS node_id,
-            v_rtc_period_hydrometer.dma_id,
-            v_rtc_period_hydrometer.period_id,
-            sum(v_rtc_period_hydrometer.lps_avg * 0.5::double precision) AS lps_avg,
-            v_rtc_period_hydrometer.effc,
-            sum(v_rtc_period_hydrometer.lps_avg * 0.5::double precision / v_rtc_period_hydrometer.effc::double precision) AS lps_avg_real,
-            v_rtc_period_hydrometer.minc,
-            sum(v_rtc_period_hydrometer.lps_avg * 0.5::double precision / v_rtc_period_hydrometer.effc::double precision * v_rtc_period_hydrometer.minc) AS lps_min,
-            v_rtc_period_hydrometer.maxc,
-            sum(v_rtc_period_hydrometer.lps_avg * 0.5::double precision / v_rtc_period_hydrometer.effc::double precision * v_rtc_period_hydrometer.maxc) AS lps_max,
-            sum(v_rtc_period_hydrometer.m3_total_period * 0.5::double precision) AS m3_total_period
-           FROM v_rtc_period_hydrometer
-          WHERE v_rtc_period_hydrometer.pjoint_id IS NULL
-          GROUP BY v_rtc_period_hydrometer.node_1, v_rtc_period_hydrometer.period_id, v_rtc_period_hydrometer.dma_id, v_rtc_period_hydrometer.effc, v_rtc_period_hydrometer.minc, v_rtc_period_hydrometer.maxc
-        UNION
-         SELECT v_rtc_period_hydrometer.node_2 AS node_id,
-            v_rtc_period_hydrometer.dma_id,
-            v_rtc_period_hydrometer.period_id,
-            sum(v_rtc_period_hydrometer.lps_avg * 0.5::double precision) AS lps_avg,
-            v_rtc_period_hydrometer.effc,
-            sum(v_rtc_period_hydrometer.lps_avg * 0.5::double precision / v_rtc_period_hydrometer.effc::double precision) AS lps_avg_real,
-            v_rtc_period_hydrometer.minc,
-            sum(v_rtc_period_hydrometer.lps_avg * 0.5::double precision / v_rtc_period_hydrometer.effc::double precision * v_rtc_period_hydrometer.minc) AS lps_min,
-            v_rtc_period_hydrometer.maxc,
-            sum(v_rtc_period_hydrometer.lps_avg * 0.5::double precision / v_rtc_period_hydrometer.effc::double precision * v_rtc_period_hydrometer.maxc) AS lps_max,
-            sum(v_rtc_period_hydrometer.m3_total_period * 0.5::double precision) AS m3_total_period
-           FROM v_rtc_period_hydrometer
-          WHERE v_rtc_period_hydrometer.pjoint_id IS NULL
-          GROUP BY v_rtc_period_hydrometer.node_2, v_rtc_period_hydrometer.period_id, v_rtc_period_hydrometer.dma_id, v_rtc_period_hydrometer.effc, v_rtc_period_hydrometer.minc, v_rtc_period_hydrometer.maxc) a
-  GROUP BY a.node_id, a.period_id, a.dma_id, a.effc, a.minc, a.maxc;
-
-CREATE OR REPLACE VIEW v_rtc_period_dma
-AS SELECT v_rtc_period_hydrometer.dma_id::integer AS dma_id,
-    v_rtc_period_hydrometer.period_id,
-    sum(v_rtc_period_hydrometer.m3_total_period) AS m3_total_period,
-    a.pattern_id
-   FROM v_rtc_period_hydrometer
-     JOIN ext_rtc_dma_period a ON a.dma_id::text = v_rtc_period_hydrometer.dma_id::text AND v_rtc_period_hydrometer.period_id::text = a.cat_period_id::text
-  GROUP BY v_rtc_period_hydrometer.dma_id, v_rtc_period_hydrometer.period_id, a.pattern_id;
-
 
 
 
@@ -5760,6 +5557,7 @@ AS SELECT m.macroomzone_id,
 
 CREATE OR REPLACE VIEW v_edit_macrosector AS
  SELECT DISTINCT ON (m.macrosector_id) m.macrosector_id,
+    m.code,
     m.name,
     m.descript,
     m.the_geom,

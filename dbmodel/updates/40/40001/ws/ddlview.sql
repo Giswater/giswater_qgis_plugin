@@ -26,7 +26,7 @@ AS WITH
     (
       SELECT edit_typevalue.typevalue, edit_typevalue.id, edit_typevalue.idval
       FROM edit_typevalue
-      WHERE edit_typevalue.typevalue::text = ANY (ARRAY['sector_type'::text, 'presszone_type'::text, 'dma_type'::text, 'dqa_type'::text, 'supplyzone_type'::text])
+      WHERE edit_typevalue.typevalue::text = ANY (ARRAY['sector_type'::text, 'presszone_type'::text, 'dma_type'::text, 'dqa_type'::text, 'supplyzone_type'::text, 'omzone_type'::text])
     ),
 	sector_table AS
 		(
@@ -57,6 +57,12 @@ AS WITH
       SELECT supplyzone_id, stylesheet, id::varchar(16) AS supplyzone_type
       FROM supplyzone
       LEFT JOIN typevalue t ON t.id::text = supplyzone.supplyzone_type AND t.typevalue::text = 'supplyzone_type'::text
+    ),
+  omzone_table AS
+    (
+      SELECT omzone_id, stylesheet, id::varchar(16) AS omzone_type
+      FROM omzone
+      LEFT JOIN typevalue t ON t.id::text = omzone.omzone_type AND t.typevalue::text = 'omzone_type'::text
     ),
 	arc_psector AS
 		(
@@ -118,6 +124,8 @@ AS WITH
       dqa_table.macrodqa_id,
       arc.supplyzone_id,
       supplyzone_table.supplyzone_type,
+      arc.omzone_id,
+      omzone_table.omzone_type,
       arc.annotation,
       arc.observ,
       arc.comment,
@@ -164,6 +172,7 @@ AS WITH
       presszone_table.stylesheet ->> 'featureColor'::text AS presszone_style,
       dqa_table.stylesheet ->> 'featureColor'::text AS dqa_style,
       supplyzone_table.stylesheet ->> 'featureColor'::text AS supplyzone_style,
+      omzone_table.stylesheet ->> 'featureColor'::text AS omzone_style,
       arc.asset_id,
       arc.pavcat_id,
       arc.om_state,
@@ -212,6 +221,7 @@ AS WITH
       LEFT JOIN dma_table ON dma_table.dma_id = arc.dma_id
       LEFT JOIN dqa_table ON dqa_table.dqa_id = arc.dqa_id
       LEFT JOIN supplyzone_table ON supplyzone_table.supplyzone_id = arc.supplyzone_id
+      LEFT JOIN omzone_table ON omzone_table.omzone_id = arc.omzone_id
       LEFT JOIN arc_add e ON e.arc_id::text = arc.arc_id::text
       LEFT JOIN value_state_type vst ON vst.id = arc.state_type
     )
@@ -225,7 +235,7 @@ AS WITH
       (
         SELECT edit_typevalue.typevalue, edit_typevalue.id, edit_typevalue.idval
         FROM edit_typevalue
-        WHERE edit_typevalue.typevalue::text = ANY (ARRAY['sector_type'::text, 'presszone_type'::text, 'dma_type'::text, 'dqa_type'::text, 'supplyzone_type'::text])
+        WHERE edit_typevalue.typevalue::text = ANY (ARRAY['sector_type'::text, 'presszone_type'::text, 'dma_type'::text, 'dqa_type'::text, 'supplyzone_type'::text, 'omzone_type'::text])
       ),
     sector_table AS
       (
@@ -256,6 +266,12 @@ AS WITH
         SELECT supplyzone_id, stylesheet, id::varchar(16) AS supplyzone_type
         FROM supplyzone
         LEFT JOIN typevalue t ON t.id::text = supplyzone.supplyzone_type AND t.typevalue::text = 'supplyzone_type'::text
+      ),
+    omzone_table AS
+      (
+        SELECT omzone_id, stylesheet, id::varchar(16) AS omzone_type
+        FROM omzone
+        LEFT JOIN typevalue t ON t.id::text = omzone.omzone_type AND t.typevalue::text = 'omzone_type'::text
       ),
     node_psector AS
       (
@@ -312,6 +328,8 @@ AS WITH
         dqa_table.macrodqa_id,
         node.supplyzone_id,
         supplyzone_table.supplyzone_type,
+        node.omzone_id,
+        omzone_table.omzone_type,
         node.arc_id,
         node.parent_id,
         node.annotation,
@@ -363,6 +381,7 @@ AS WITH
         presszone_table.stylesheet ->> 'featureColor'::text AS presszone_style,
         dqa_table.stylesheet ->> 'featureColor'::text AS dqa_style,
         supplyzone_table.stylesheet ->> 'featureColor'::text AS supplyzone_style,
+        omzone_table.stylesheet ->> 'featureColor'::text AS omzone_style,
         node.asset_id,
         node.om_state,
         node.conserv_state,
@@ -425,106 +444,12 @@ AS WITH
         LEFT JOIN dma_table ON dma_table.dma_id = node.dma_id
         LEFT JOIN dqa_table ON dqa_table.dqa_id = node.dqa_id
         LEFT JOIN supplyzone_table ON supplyzone_table.supplyzone_id = node.supplyzone_id
+        LEFT JOIN omzone_table ON omzone_table.omzone_id = node.omzone_id
         LEFT JOIN node_add e ON e.node_id::text = node.node_id::text
         LEFT JOIN man_valve m ON m.node_id = node.node_id
       )
     SELECT n.*
     FROM node_selected n;
-
-
-
-CREATE OR REPLACE VIEW vu_link AS
- WITH typevalue AS (
-         SELECT edit_typevalue.typevalue,
-            edit_typevalue.id,
-            edit_typevalue.idval
-           FROM edit_typevalue
-          WHERE edit_typevalue.typevalue::text = ANY (ARRAY['sector_type'::character varying, 'presszone_type'::character varying, 'dma_type'::character varying, 'dqa_type'::character varying]::text[])
-        ),inp_netw_mode AS (
-         WITH inp_netw_mode_aux AS (
-                 SELECT count(*) AS t
-                   FROM config_param_user
-                  WHERE config_param_user.parameter::text = 'inp_options_networkmode'::text AND config_param_user.cur_user::text = CURRENT_USER
-                )
-         SELECT
-                CASE
-                    WHEN inp_netw_mode_aux.t > 0 THEN ( SELECT config_param_user.value
-                       FROM config_param_user
-                      WHERE config_param_user.parameter::text = 'inp_options_networkmode'::text AND config_param_user.cur_user::text = CURRENT_USER)
-                    ELSE NULL::text
-                END AS value
-           FROM inp_netw_mode_aux
-        )
- SELECT l.link_id,
-    l.feature_type,
-    l.feature_id,
-    l.exit_type,
-    l.exit_id,
-    l.state,
-    l.expl_id,
-    l.sector_id,
-    s.name AS sector_name,
-    et1.idval::character varying(16) AS sector_type,
-    s.macrosector_id,
-    p.presszone_id,
-    p.name AS presszone_name,
-    et2.idval::character varying(16) AS presszone_type,
-    p.head AS presszone_head,
-    l.dma_id,
-    d.name AS dma_name,
-    et3.idval::character varying(16) AS dma_type,
-    d.macrodma_id,
-    l.dqa_id,
-    q.name AS dqa_name,
-    et4.idval::character varying(16) AS dqa_type,
-    q.macrodqa_id,
-    l.top_elev1,
-    l.depth1,
-    CASE
-      WHEN l.top_elev1 IS NULL OR l.depth1 IS NULL THEN NULL
-      ELSE (l.top_elev1 - l.depth1)
-    END AS elevation1,
-    l.top_elev2,
-    l.depth2,
-    CASE
-      WHEN l.top_elev2 IS NULL OR l.depth2 IS NULL THEN NULL
-      ELSE (l.top_elev2 - l.depth2)
-    END AS elevation2,
-    l.fluid_type,
-    st_length2d(l.the_geom)::numeric(12,3) AS gis_length,
-    l.custom_length,
-    l.the_geom,
-    l.muni_id,
-    l.expl_id2,
-    l.epa_type,
-    l.is_operative,
-    l.staticpressure,
-    l.linkcat_id,
-    l.workcat_id,
-    l.workcat_id_end,
-    l.builtdate,
-    l.enddate,
-    date_trunc('second'::text, l.lastupdate) AS lastupdate,
-    l.lastupdate_user,
-    l.uncertain,
-    l.verified,
-    l.minsector_id,
-    l.macrominsector_id,
-    CASE
-            WHEN s.sector_id > 0 AND is_operative = true AND epa_type = 'JUNCTION'::character varying(16)::text AND cpu.value = '4' THEN epa_type::character varying
-            ELSE NULL::character varying(16)
-        END AS inp_type,
-    l.n_hydrometer,
-    l.datasource
-     FROM ( SELECT inp_netw_mode.value FROM inp_netw_mode) cpu, link l
-     LEFT JOIN sector s USING (sector_id)
-     LEFT JOIN presszone p USING (presszone_id)
-     LEFT JOIN dma d USING (dma_id)
-     LEFT JOIN dqa q USING (dqa_id)
-     LEFT JOIN typevalue et1 ON et1.id::text = s.sector_type::text AND et1.typevalue::text = 'sector_type'::text
-     LEFT JOIN typevalue et2 ON et2.id::text = p.presszone_type AND et2.typevalue::text = 'presszone_type'::text
-     LEFT JOIN typevalue et3 ON et3.id::text = d.dma_type::text AND et3.typevalue::text = 'dma_type'::text
-     LEFT JOIN typevalue et4 ON et4.id::text = q.dqa_type::text AND et4.typevalue::text = 'dqa_type'::text;
 
 
 CREATE OR REPLACE VIEW v_edit_link
@@ -533,7 +458,7 @@ AS WITH
       (
         SELECT edit_typevalue.typevalue, edit_typevalue.id, edit_typevalue.idval
         FROM edit_typevalue
-        WHERE edit_typevalue.typevalue::text = ANY (ARRAY['sector_type'::text, 'presszone_type'::text, 'dma_type'::text, 'dqa_type'::text, 'supplyzone_type'::text])
+        WHERE edit_typevalue.typevalue::text = ANY (ARRAY['sector_type'::text, 'presszone_type'::text, 'dma_type'::text, 'dqa_type'::text, 'supplyzone_type'::text, 'omzone_type'::text])
       ),
     sector_table AS
       (
@@ -564,6 +489,12 @@ AS WITH
         SELECT supplyzone_id, stylesheet, id::varchar(16) AS supplyzone_type
         FROM supplyzone
         LEFT JOIN typevalue t ON t.id::text = supplyzone.supplyzone_type AND t.typevalue::text = 'supplyzone_type'::text
+      ),
+    omzone_table AS
+      (
+        SELECT omzone_id, stylesheet, id::varchar(16) AS omzone_type
+        FROM omzone
+        LEFT JOIN typevalue t ON t.id::text = omzone.omzone_type AND t.typevalue::text = 'omzone_type'::text
       ),
     inp_network_mode AS
       (
@@ -610,6 +541,8 @@ AS WITH
         dqa_table.macrodqa_id,
         l.supplyzone_id,
         supplyzone_table.supplyzone_type,
+        l.omzone_id,
+        omzone_table.omzone_type,
         l.top_elev1,
         l.depth1,
         CASE
@@ -663,6 +596,7 @@ AS WITH
         LEFT JOIN dma_table ON dma_table.dma_id = l.dma_id
         LEFT JOIN dqa_table ON dqa_table.dqa_id = l.dqa_id
         LEFT JOIN supplyzone_table ON supplyzone_table.supplyzone_id = l.supplyzone_id
+        LEFT JOIN omzone_table ON omzone_table.omzone_id = l.omzone_id
       )
     SELECT l.*
     FROM link_selected l;
@@ -673,7 +607,7 @@ AS WITH
       (
         SELECT edit_typevalue.typevalue, edit_typevalue.id, edit_typevalue.idval
         FROM edit_typevalue
-        WHERE edit_typevalue.typevalue::text = ANY (ARRAY['sector_type'::text, 'presszone_type'::text, 'dma_type'::text, 'dqa_type'::text, 'supplyzone_type'::text])
+        WHERE edit_typevalue.typevalue::text = ANY (ARRAY['sector_type'::text, 'presszone_type'::text, 'dma_type'::text, 'dqa_type'::text, 'supplyzone_type'::text, 'omzone_type'::text])
       ),
     sector_table AS
       (
@@ -704,6 +638,12 @@ AS WITH
         SELECT supplyzone_id, stylesheet, id::varchar(16) AS supplyzone_type
         FROM supplyzone
         LEFT JOIN typevalue t ON t.id::text = supplyzone.supplyzone_type AND t.typevalue::text = 'supplyzone_type'::text
+      ),
+    omzone_table AS
+      (
+        SELECT omzone_id, stylesheet, id::varchar(16) AS omzone_type
+        FROM omzone
+        LEFT JOIN typevalue t ON t.id::text = omzone.omzone_type AND t.typevalue::text = 'omzone_type'::text
       ),
     inp_network_mode AS
       (
@@ -817,6 +757,18 @@ AS WITH
           WHEN link_planned.supplyzone_id IS NULL THEN supplyzone_table.supplyzone_id
           ELSE link_planned.supplyzone_id
         END AS supplyzone_id,
+        CASE
+          WHEN link_planned.supplyzone_type IS NULL THEN supplyzone_table.supplyzone_type
+          ELSE link_planned.supplyzone_type
+        END AS supplyzone_type,
+        CASE
+          WHEN link_planned.omzone_id IS NULL THEN omzone_table.omzone_id
+          ELSE link_planned.omzone_id
+        END AS omzone_id,
+        CASE
+          WHEN link_planned.omzone_type IS NULL THEN omzone_table.omzone_type
+          ELSE link_planned.omzone_type
+        END AS omzone_type,
         connec.crmzone_id,
         crm_zone.name AS crmzone_name,
         connec.customer_code,
@@ -886,6 +838,7 @@ AS WITH
         presszone_table.stylesheet ->> 'featureColor'::text AS presszone_style,
         dqa_table.stylesheet ->> 'featureColor'::text AS dqa_style,
         supplyzone_table.stylesheet ->> 'featureColor'::text AS supplyzone_style,
+        omzone_table.stylesheet ->> 'featureColor'::text AS omzone_style,
         connec.priority,
         connec.access_type,
         connec.placement_type,
@@ -946,6 +899,7 @@ AS WITH
         LEFT JOIN dma_table ON dma_table.dma_id = connec.dma_id
         LEFT JOIN dqa_table ON dqa_table.dqa_id = connec.dqa_id
         LEFT JOIN supplyzone_table ON supplyzone_table.supplyzone_id = connec.supplyzone_id
+        LEFT JOIN omzone_table ON omzone_table.omzone_id = connec.omzone_id
         LEFT JOIN crm_zone ON crm_zone.id::text = connec.crmzone_id::text
         LEFT JOIN link_planned using (link_id)
         LEFT JOIN connec_add e ON e.connec_id::text = connec.connec_id::text

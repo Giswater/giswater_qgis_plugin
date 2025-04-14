@@ -22,7 +22,7 @@ INSERT INTO drainzone (drainzone_id, name, lock_level) VALUES (-996, 'Drainzone9
 INSERT INTO drainzone (drainzone_id, name, lock_level) VALUES (-995, 'Drainzone995', 3);
 
 REVOKE UPDATE ON TABLE drainzone FROM role_edit;
-GRANT UPDATE (drainzone_id, name, expl_id, descript, the_geom, link, graphconfig, stylesheet, active, tstamp, insert_user, lastupdate, lastupdate_user, drainzone_type) ON drainzone TO role_edit;
+GRANT UPDATE (drainzone_id, name, expl_id, descript, the_geom, link, graphconfig, stylesheet, active, created_at, created_by, updated_at, updated_by, drainzone_type) ON drainzone TO role_edit;
 GRANT UPDATE (lock_level) ON drainzone TO role_admin;
 
 CREATE USER admin_user;

@@ -569,3 +569,6 @@ INSERT
 UPDATE
     OF the_geom ON
     link FOR EACH ROW EXECUTE FUNCTION gw_trg_link_data('link');
+
+CREATE TRIGGER gw_trg_edit_exploitation INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_exploitation
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_exploitation();

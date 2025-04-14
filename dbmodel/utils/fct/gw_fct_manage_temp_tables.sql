@@ -101,7 +101,7 @@ BEGIN
     END IF;
 
     -- validate subGroup for mapzones
-    IF v_subGroup IS NOT NULL AND v_group = 'MAPZONES' AND v_subGroup NOT IN ('ALL', 'DMA', 'DQA', 'PRESSZONE', 'SECTOR', 'DRAINZONE') THEN
+    IF v_subGroup IS NOT NULL AND v_group = 'MAPZONES' AND v_subGroup NOT IN ('ALL', 'DMA', 'DQA', 'PRESSZONE', 'SECTOR', 'DRAINZONE', 'SUPPLYZONE', 'DWFZONE', 'OMZONE') THEN
         RETURN ('{"status":"Failed","message":{"level":1, "text":"subGroup is invalid"}}')::json;
     END IF;
 
@@ -109,13 +109,13 @@ BEGIN
     IF v_group = 'EPAMAIN' THEN
         v_group_array = ARRAY['LOG', 'ANL', 'MAPZONES', 'EPA', 'OMCHECK', 'ADMIN'];
         IF v_project_type = 'WS' THEN
-            v_subGroup_array = ARRAY['DMA', 'DQA', 'PRESSZONE', 'SECTOR'];
+            v_subGroup_array = ARRAY['DMA', 'DQA', 'PRESSZONE', 'SECTOR', 'SUPPLYZONE', 'OMZONE'];
         ELSIF v_project_type = 'UD' THEN
-            v_subGroup_array = ARRAY['DMA', 'DRAINZONE'];
+            v_subGroup_array = ARRAY['DRAINZONE', 'DWFZONE', 'OMZONE'];
         END IF;
     ELSIF v_group = 'GRAPHANALYTICSCHECK' THEN
         v_group_array = ARRAY['LOG', 'ANL', 'MAPZONES', 'OMCHECK'];
-        v_subGroup_array = ARRAY['DMA', 'DQA', 'PRESSZONE', 'SECTOR'];
+        v_subGroup_array = ARRAY['DMA', 'DQA', 'PRESSZONE', 'SECTOR', 'SUPPLYZONE', 'DWFZONE', 'OMZONE'];
     ELSIF v_group = 'USERCHECK' THEN
         v_group_array = ARRAY['LOG', 'ANL'];
     ELSIF v_group = 'CHECKPROJECT' THEN
@@ -150,27 +150,39 @@ BEGIN
         END IF;
 
         IF 'MAPZONES' = ANY(v_group_array) THEN
-            IF 'DMA' = ANY(v_subGroup_array) OR 'ALL' = ANY(v_subGroup_array) THEN
-                CREATE TEMP TABLE t_dma AS SELECT * FROM v_edit_dma;
-               --raise exception 'aaaa';
-            END IF;
 
             IF 'SECTOR' = ANY(v_subGroup_array) OR 'ALL' = ANY(v_subGroup_array) THEN
                 CREATE TEMP TABLE t_sector AS SELECT * FROM v_edit_sector;
             END IF;
 
+            IF 'OMZONE' = ANY(v_subGroup_array) OR 'ALL' = ANY(v_subGroup_array) THEN
+                CREATE TEMP TABLE t_omzone AS SELECT * FROM v_edit_omzone;
+            END IF;
+
             IF v_project_type = 'WS' THEN
             	IF 'PRESSZONE' = ANY(v_subGroup_array) OR 'ALL' = ANY(v_subGroup_array) THEN
-                CREATE TEMP TABLE t_presszone AS SELECT * FROM v_edit_presszone;
+                    CREATE TEMP TABLE t_presszone AS SELECT * FROM v_edit_presszone;
             	END IF;
 
 	            IF 'DQA' = ANY(v_subGroup_array) OR 'ALL' = ANY(v_subGroup_array)THEN
 	                CREATE TEMP TABLE t_dqa AS SELECT * FROM v_edit_dqa;
 	            END IF;
 
+                IF 'DMA' = ANY(v_subGroup_array) OR 'ALL' = ANY(v_subGroup_array) THEN
+                    CREATE TEMP TABLE t_dma AS SELECT * FROM v_edit_dma;
+                END IF;
+
+                IF 'SUPPLYZONE' = ANY(v_subGroup_array) OR 'ALL' = ANY(v_subGroup_array) THEN
+                    CREATE TEMP TABLE t_supplyzone AS SELECT * FROM v_edit_supplyzone;
+                END IF;
+
             ELSIF v_project_type = 'UD' THEN
                 IF 'DRAINZONE' = ANY(v_subGroup_array) OR 'ALL' = ANY(v_subGroup_array) THEN
                     CREATE TEMP TABLE t_drainzone AS SELECT * FROM v_edit_drainzone;
+                END IF;
+
+                IF 'DWFZONE' = ANY(v_subGroup_array) OR 'ALL' = ANY(v_subGroup_array) THEN
+                    CREATE TEMP TABLE t_dwfzone AS SELECT * FROM v_edit_dwfzone;
                 END IF;
             END IF;
         END IF;
@@ -200,6 +212,8 @@ BEGIN
                     expl_id integer,
                     sector_id integer,
                     dma_id integer,
+                    supplyzone_id integer,
+                    omzone_id integer,
                     exit_topelev double precision,
                     exit_elev double precision,
                     the_geom geometry(LineString,SRID_VALUE),
@@ -243,8 +257,7 @@ BEGIN
                 CREATE TEMP TABLE IF NOT EXISTS t_rpt_inp_arc (LIKE rpt_inp_arc INCLUDING ALL);
             END IF;
 
-                            CREATE TEMP TABLE IF NOT EXISTS temp_t_pgr_go2epa_arc (LIKE temp_arc INCLUDING ALL);
-
+            CREATE TEMP TABLE IF NOT EXISTS temp_t_pgr_go2epa_arc (LIKE temp_arc INCLUDING ALL);
 
             CREATE TEMP TABLE IF NOT EXISTS t_rpt_cat_result (LIKE rpt_cat_result INCLUDING ALL);
 
@@ -257,6 +270,7 @@ BEGIN
             CREATE TEMP TABLE IF NOT EXISTS temp_t_go2epa (LIKE temp_go2epa INCLUDING ALL);
 
             EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_inp_pump AS SELECT * FROM v_edit_inp_pump'||v_filter;
+
             IF v_project_type = 'WS' THEN
 			    EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_inp_pipe AS SELECT * FROM v_edit_inp_pipe'||v_filter;
 			    EXECUTE 'CREATE TEMP TABLE IF NOT EXISTS t_inp_valve AS SELECT * FROM v_edit_inp_valve'||v_filter;
@@ -313,6 +327,9 @@ BEGIN
         DROP TABLE IF EXISTS t_dqa;
         DROP TABLE IF EXISTS t_presszone;
         DROP TABLE IF EXISTS t_sector;
+        DROP TABLE IF EXISTS t_supplyzone;
+        DROP TABLE IF EXISTS t_dwfzone;
+        DROP TABLE IF EXISTS t_omzone;
         DROP TABLE IF EXISTS t_drainzone;
 
         DROP TABLE IF EXISTS temp_vnode;

@@ -391,3 +391,8 @@ CREATE RULE omzone_del_undefined AS
 CREATE RULE omzone_undefined AS
     ON UPDATE TO omzone
    WHERE ((new.omzone_id = 0) OR (old.omzone_id = 0)) DO INSTEAD NOTHING;
+
+ALTER TABLE arc ADD CONSTRAINT arc_omzone_id_fkey FOREIGN KEY (omzone_id) REFERENCES omzone(omzone_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE connec ADD CONSTRAINT connec_omzone_id_fkey FOREIGN KEY (omzone_id) REFERENCES omzone(omzone_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE node ADD CONSTRAINT node_omzone_id_fkey FOREIGN KEY (omzone_id) REFERENCES omzone(omzone_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+ALTER TABLE link ADD CONSTRAINT link_omzone_id_fkey FOREIGN KEY (omzone_id) REFERENCES omzone(omzone_id) ON UPDATE CASCADE ON DELETE RESTRICT;

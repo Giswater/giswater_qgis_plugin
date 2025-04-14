@@ -3441,5 +3441,6 @@ UPDATE config_form_fields
 	SET tooltip='storage',widgettype='combo',dv_isnullvalue=false,dv_querytext='SELECT id, idval FROM edit_typevalue WHERE typevalue = ''value_boolean''',widgetcontrols='{"setMultiline":false}'::json
 	WHERE formname='ve_node_wtp' AND formtype='form_feature' AND columnname='storage' AND tabname='tab_data';
 
+INSERT INTO edit_typevalue VALUES('omzone_type', 'UNDEFINED', 'UNDEFINED', NULL, NULL);
 
 ALTER TABLE config_form_fields ENABLE TRIGGER gw_trg_config_control;

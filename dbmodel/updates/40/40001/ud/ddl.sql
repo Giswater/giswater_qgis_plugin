@@ -131,3 +131,5 @@ CREATE TABLE inp_dscenario_flwreg_weir (
     CONSTRAINT inp_dscenario_flwreg_weir_fkey_element_id_fkey FOREIGN KEY (element_id) REFERENCES element(element_id) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT inp_dscenario_flwreg_weir_check_weir_type CHECK (((weir_type)::text = ANY (ARRAY['ROADWAY'::text, 'SIDEFLOW'::text, 'TRANSVERSE'::text, 'V-NOTCH'::text, 'TRAPEZOIDAL_WEIR'::text])))
 );
+
+DROP TABLE IF EXISTS ext_rtc_dma_period CASCADE;

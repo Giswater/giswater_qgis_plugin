@@ -40,8 +40,8 @@ BEGIN
 			END IF;
 		END IF;
 
-		INSERT INTO omzone (omzone_id, name, descript, macrodma_id, expl_id, link, stylesheet, omzone_type, graphconfig, lock_level)
-		VALUES (NEW.omzone_id, NEW.name, NEW.descript, NEW.macrodma_id, NEW.expl_id, NEW.link, NEW.stylesheet,
+		INSERT INTO omzone (omzone_id, name, descript, macroomzone_id, expl_id, link, stylesheet, omzone_type, graphconfig, lock_level)
+		VALUES (NEW.omzone_id, NEW.name, NEW.descript, NEW.macroomzone_id, NEW.expl_id, NEW.link, NEW.stylesheet,
 		NEW.omzone_type, NEW.graphconfig::json, NEW.lock_level);
 
 		IF view_name = 'UI' THEN
@@ -58,7 +58,7 @@ BEGIN
 
 		UPDATE omzone
 		SET omzone_id=NEW.omzone_id, name=NEW.name, descript=NEW.descript, expl_id=NEW.expl_id,
-		link=NEW.link, lastupdate=now(), lastupdate_user = current_user, macrodma_id = NEW.macrodma_id, stylesheet=NEW.stylesheet,
+		link=NEW.link, updated_at=now(), updated_by = current_user, macroomzone_id = NEW.macroomzone_id, stylesheet=NEW.stylesheet,
 		omzone_type=NEW.omzone_type, graphconfig=NEW.graphconfig::json, lock_level=NEW.lock_level
 		WHERE omzone_id=OLD.omzone_id;
 

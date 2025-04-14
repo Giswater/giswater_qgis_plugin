@@ -59,8 +59,8 @@ BEGIN
 
 		UPDATE dwfzone
 		SET dwfzone_id=NEW.dwfzone_id, name=NEW.name, expl_id=NEW.expl_id, descript=NEW.descript,
-		link=NEW.link, graphconfig=NEW.graphconfig::json, stylesheet=NEW.stylesheet::json, lastupdate=now(),
-		lastupdate_user = current_user, dwfzone_type=NEW.dwfzone_type, lock_level=NEW.lock_level
+		link=NEW.link, graphconfig=NEW.graphconfig::json, stylesheet=NEW.stylesheet::json, updated_at=now(),
+		updated_by = current_user, dwfzone_type=NEW.dwfzone_type, lock_level=NEW.lock_level
 		WHERE dwfzone_id=OLD.dwfzone_id;
 
 		IF view_name = 'UI' THEN

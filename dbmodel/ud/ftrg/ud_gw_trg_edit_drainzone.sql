@@ -59,8 +59,8 @@ BEGIN
 
 		UPDATE drainzone
 		SET drainzone_id=NEW.drainzone_id, name=NEW.name, expl_id=NEW.expl_id, descript=NEW.descript,
-		link=NEW.link, graphconfig=NEW.graphconfig::json, stylesheet=NEW.stylesheet::json, lastupdate=now(),
-		lastupdate_user = current_user, drainzone_type=NEW.drainzone_type, lock_level=NEW.lock_level
+		link=NEW.link, graphconfig=NEW.graphconfig::json, stylesheet=NEW.stylesheet::json, updated_at=now(),
+		updated_by = current_user, drainzone_type=NEW.drainzone_type, lock_level=NEW.lock_level
 		WHERE drainzone_id=OLD.drainzone_id;
 
 		IF view_name = 'UI' THEN

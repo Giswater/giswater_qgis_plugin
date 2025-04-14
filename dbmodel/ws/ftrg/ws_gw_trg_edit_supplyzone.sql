@@ -76,7 +76,7 @@ BEGIN
 		UPDATE supplyzone
 		SET supplyzone_id=NEW.supplyzone_id, name=NEW.name, descript=NEW.descript, supplyzone_type = NEW.supplyzone_type, macrosector_id=v_mapzone_id,
 		graphconfig=NEW.graphconfig::json, stylesheet = NEW.stylesheet::json, parent_id = NEW.parent_id, pattern_id = NEW.pattern_id,
-		lastupdate=now(), lastupdate_user = current_user, avg_press = NEW.avg_press, link = NEW.link, muni_id = NEW.muni_id, expl_id = NEW.expl_id, lock_level=NEW.lock_level
+		updated_at=now(), updated_by = current_user, avg_press = NEW.avg_press, link = NEW.link, muni_id = NEW.muni_id, expl_id = NEW.expl_id, lock_level=NEW.lock_level
 		WHERE supplyzone_id=OLD.supplyzone_id;
 
 		IF v_view_name = 'UI' THEN

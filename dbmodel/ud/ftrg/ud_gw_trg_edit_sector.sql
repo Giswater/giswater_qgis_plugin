@@ -56,7 +56,7 @@ BEGIN
 
 		UPDATE sector
 		SET sector_id=NEW.sector_id, name=NEW.name, descript=NEW.descript, macrosector_id=v_mapzone_id,
-		lastupdate=now(), lastupdate_user = current_user, stylesheet=NEW.stylesheet, sector_type=NEW.sector_type,
+		updated_at=now(), updated_by = current_user, stylesheet=NEW.stylesheet, sector_type=NEW.sector_type,
 		graphconfig=NEW.graphconfig::json, link=NEW.link, lock_level=NEW.lock_level
 		WHERE sector_id=OLD.sector_id;
 

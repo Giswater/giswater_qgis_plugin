@@ -10,7 +10,7 @@ SET client_min_messages TO WARNING;
 
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-SELECT plan(334);
+SELECT plan(329);
 
 SELECT has_table('anl_arc') AS "Table 'anl_arc' exists";
 SELECT has_table('anl_arc_x_node') AS "Table 'anl_arc_x_node' exists";
@@ -110,11 +110,6 @@ SELECT has_table('ext_province') AS "Table 'ext_province' exists";
 SELECT has_table('ext_raster_dem') AS "Table 'ext_raster_dem' exists";
 SELECT has_table('ext_region') AS "Table 'ext_region' exists";
 SELECT has_table('ext_region_x_province') AS "Table 'ext_region_x_province' exists";
-SELECT has_table('ext_rtc_dma_period') AS "Table 'ext_rtc_dma_period' exists";
-SELECT has_table('ext_rtc_hydrometer') AS "Table 'ext_rtc_hydrometer' exists";
-SELECT has_table('ext_rtc_hydrometer_state') AS "Table 'ext_rtc_hydrometer_state' exists";
-SELECT has_table('ext_rtc_hydrometer_x_data') AS "Table 'ext_rtc_hydrometer_x_data' exists";
-SELECT has_table('ext_rtc_scada_x_data') AS "Table 'ext_rtc_scada_x_data' exists";
 SELECT has_table('ext_streetaxis') AS "Table 'ext_streetaxis' exists";
 SELECT has_table('ext_timeseries') AS "Table 'ext_timeseries' exists";
 SELECT has_table('ext_type_street') AS "Table 'ext_type_street' exists";

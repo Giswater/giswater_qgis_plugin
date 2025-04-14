@@ -13,7 +13,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 SELECT plan(9);
 
 -- Subtest 1: Testing macroexplotation operations
-INSERT INTO macroexploitation (macroexpl_id, "name", descript, undelete, active) VALUES(-999, 'Test', 'Test macroexploitation', NULL, true);
+INSERT INTO macroexploitation (macroexpl_id, "name", descript, lock_level, active) VALUES(-999, 'Test', 'Test macroexploitation', NULL, true);
 SELECT is((SELECT count(*)::integer FROM macroexploitation WHERE macroexpl_id = -999), 1, 'INSERT: macroexploitation "2" was inserted');
 
 UPDATE macroexploitation SET descript = 'updated test' WHERE macroexpl_id = -999;
@@ -43,15 +43,15 @@ DELETE FROM macrosector WHERE macrosector_id = -999;
 SELECT is((SELECT count(*)::integer FROM macrosector WHERE macrosector_id = -999), 0, 'DELETE: macrosector 3 was deleted');
 
 
--- Subtest 3: Testing macrodma operations
-INSERT INTO macrodma (macrodma_id, "name", expl_id, descript, the_geom, active) VALUES(-999, 'macrodma_03', 0, NULL, NULL, true);
-SELECT is((SELECT count(*)::integer FROM macrodma WHERE macrodma_id = -999), 1, 'INSERT: macrodma "3" was inserted');
+-- Subtest 3: Testing macroomzone operations
+INSERT INTO macroomzone (macroomzone_id, "name", expl_id, descript, the_geom, active) VALUES(-999, 'macroomzone_03', 0, NULL, NULL, true);
+SELECT is((SELECT count(*)::integer FROM macroomzone WHERE macroomzone_id = -999), 1, 'INSERT: macroomzone "3" was inserted');
 
-UPDATE macrodma SET descript = 'updated test' WHERE macrodma_id = -999;
-SELECT is((SELECT descript FROM macrodma WHERE macrodma_id = -999), 'updated test', 'UPDATE: descript was updated to "updated test"');
+UPDATE macroomzone SET descript = 'updated test' WHERE macroomzone_id = -999;
+SELECT is((SELECT descript FROM macroomzone WHERE macroomzone_id = -999), 'updated test', 'UPDATE: descript was updated to "updated test"');
 
-DELETE FROM macrodma WHERE macrodma_id = -999;
-SELECT is((SELECT count(*)::integer FROM macrodma WHERE macrodma_id = -999), 0, 'DELETE: macrodma 3 was deleted');
+DELETE FROM macroomzone WHERE macroomzone_id = -999;
+SELECT is((SELECT count(*)::integer FROM macroomzone WHERE macroomzone_id = -999), 0, 'DELETE: macroomzone 3 was deleted');
 
 
 SELECT * FROM finish();
