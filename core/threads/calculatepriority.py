@@ -814,19 +814,31 @@ class GwCalculatePriority(GwTask):
         replacement_year = date.today().year + 1
         cum_cost_constr = 0
         cum_length = 0
+
         for arc in second_iteration:
+            #Assign arc to current year before checking for overflow
             cum_cost_constr += arc["cost_constr"]
-            if cum_cost_constr > self.result_budget:
-                cum_cost_constr = arc["cost_constr"]
-                cum_length = 0
-                replacement_year += 1
-            cum_length += arc["length"]
+            cum_length += arc["length"]   
+
             arc["replacement_year"] = replacement_year
             arc["cum_cost_constr"] = cum_cost_constr
             arc["cum_length"] = cum_length
 
-        # Save results to a DataFrame
-        self.df = pd.DataFrame(second_iteration).reset_index()
+            # If the budget is exceeded, increment the year for the *next* arc
+            if cum_cost_constr > self.result_budget:
+                replacement_year += 1
+                cum_cost_constr = 0
+                cum_length = 0
+
+        for arc in arcs:
+            # Check if the arc is in second_iteration, and update it
+            matching_arc = next((arc_2 for arc_2 in second_iteration if arc_2['arc_id'] == arc['arc_id']), None)
+            if matching_arc:
+                # Update the arc in arcs with the modified data from second_iteration
+                arc.update(matching_arc)
+
+        # Save all arcs (both to be replaced and not replaced) to a DataFrame
+        self.df = pd.DataFrame(arcs).reset_index(drop=True)
         self.df = self.df[
             [
                 "arc_id",
