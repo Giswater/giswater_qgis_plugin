@@ -660,6 +660,7 @@ AS WITH
         LEFT JOIN dma_table ON dma_table.dma_id = l.dma_id
         LEFT JOIN dqa_table ON dqa_table.dqa_id = l.dqa_id
         LEFT JOIN supplyzone_table ON supplyzone_table.supplyzone_id = l.supplyzone_id
+        LEFT JOIN omzone_table ON omzone_table.omzone_id = l.omzone_id
         WHERE l.state = 2
       ),
     connec_psector AS
