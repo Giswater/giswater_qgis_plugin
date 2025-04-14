@@ -6844,6 +6844,7 @@ AS SELECT om_mincut.id,
 
 DROP VIEW IF EXISTS v_om_waterbalance;
 DROP VIEW IF EXISTS v_om_waterbalance_report;
+ALTER TABLE om_waterbalance DROP CONSTRAINT om_waterbalance_expl_id_fkey;
 ALTER TABLE om_waterbalance ALTER COLUMN expl_id TYPE integer[] USING ARRAY[expl_id];
 
  CREATE OR REPLACE VIEW v_om_waterbalance AS
