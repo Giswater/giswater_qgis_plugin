@@ -171,6 +171,106 @@ SELECT
     and (m.cur_user = current_user or sm.muni_id is null);
 
 
+CREATE OR REPLACE VIEW v_ext_streetaxis
+AS SELECT ext_streetaxis.id,
+    ext_streetaxis.code,
+    ext_streetaxis.type,
+    ext_streetaxis.name,
+    ext_streetaxis.text,
+    ext_streetaxis.the_geom,
+    ext_streetaxis.expl_id,
+    ext_streetaxis.muni_id,
+        CASE
+            WHEN ext_streetaxis.type IS NULL THEN ext_streetaxis.name::text
+            WHEN ext_streetaxis.text IS NULL THEN ((ext_streetaxis.name::text || ', '::text) || ext_streetaxis.type::text) || '.'::text
+            WHEN ext_streetaxis.type IS NULL AND ext_streetaxis.text IS NULL THEN ext_streetaxis.name::text
+            ELSE (((ext_streetaxis.name::text || ', '::text) || ext_streetaxis.type::text) || '. '::text) || ext_streetaxis.text
+        END AS descript,
+    ext_streetaxis.source
+   FROM selector_municipality s, ext_streetaxis
+   WHERE ext_streetaxis.muni_id = s.muni_id AND s.cur_user = "current_user"()::text;
+
+CREATE OR REPLACE VIEW v_ext_municipality
+AS SELECT DISTINCT s.muni_id,
+    m.name,
+    m.active,
+    m.the_geom
+    FROM ext_municipality m, selector_municipality s
+	WHERE m.muni_id = s.muni_id AND s.cur_user = "current_user"()::text;
+
+
+CREATE OR REPLACE VIEW vu_link
+AS WITH
+link_selected AS (
+ SELECT DISTINCT ON (link_id)
+	l.link_id,
+    l.feature_type,
+    l.feature_id,
+    l.exit_type,
+    l.exit_id,
+    l.state,
+    l.expl_id,
+	e.macroexpl_id,
+    l.sector_id,
+    s.sector_type,
+	s.macrosector_id,
+	l.muni_id,
+	l.drainzone_id,
+    drainzone.drainzone_type,
+    l.dma_id,
+	d.macrodma_id,
+    l.top_elev1,
+    l.y1,
+    CASE
+        WHEN l.top_elev1 IS NOT NULL AND l.y1 IS NOT NULL THEN (l.top_elev1 - l.y1)
+        ELSE NULL
+    END AS elevation1,
+    l.top_elev2,
+    l.y2,
+    CASE
+        WHEN l.top_elev2 IS NULL OR l.y2 IS NULL THEN NULL
+        ELSE (l.top_elev2 - l.y2)
+    END AS elevation2,
+    l.fluid_type,
+    st_length2d(l.the_geom)::numeric(12,3) AS gis_length,
+    l.custom_length,
+    l.the_geom,
+	s.name as sector_name,
+	d.name as dma_name,
+    l.expl_id2,
+    l.epa_type,
+    l.is_operative,
+    l.linkcat_id,
+    l.workcat_id,
+    l.workcat_id_end,
+    l.builtdate,
+    l.enddate,
+    date_trunc('second'::text, l.lastupdate) AS lastupdate,
+    l.lastupdate_user,
+    l.uncertain,
+    l.verified,
+    l.datasource
+   FROM link l
+     LEFT JOIN exploitation e USING (expl_id)
+     LEFT JOIN sector s USING (sector_id)
+     LEFT JOIN dma d USING (dma_id)
+	 LEFT JOIN ext_municipality m USING (muni_id)
+     LEFT JOIN drainzone USING (drainzone_id)
+    )
+    SELECT link_selected.*
+    FROM link_selected;
+
+CREATE OR REPLACE VIEW vu_link_connec AS
+	SELECT l.*
+	FROM link l
+	WHERE l.feature_type::text = 'CONNEC'::text;
+
+CREATE OR REPLACE VIEW vu_link_gully AS
+	SELECT l.*
+	FROM link l
+    WHERE l.feature_type::text = 'GULLY'::text;
+
+
 CREATE OR REPLACE VIEW v_edit_link
 AS WITH
 	typevalue AS
@@ -253,8 +353,18 @@ AS WITH
 			omzone_table.macroomzone_id,
 			l.dwfzone_id,
 			dwfzone_table.dwfzone_type,
-			l.exit_topelev,
-			l.exit_elev,
+            l.top_elev1,
+            l.y1,
+            CASE
+                WHEN l.top_elev1 IS NULL OR l.y1 IS NULL THEN NULL
+                ELSE (l.top_elev1 - l.y1)
+            END AS elevation1,
+            l.top_elev2,
+            l.y2,
+            CASE
+                WHEN l.top_elev2 IS NULL OR l.y2 IS NULL THEN NULL
+                ELSE (l.top_elev2 - l.y2)
+            END AS elevation2,
 			l.fluid_type,
 			st_length2d(l.the_geom)::numeric(12,3) AS gis_length,
             l.custom_length,
@@ -278,7 +388,7 @@ AS WITH
 			l.uncertain,
             l.datasource,
             l.verified
-			from inp_network_mode, link_state
+			FROM inp_network_mode, link_state
 			JOIN link l using (link_id)
 			JOIN selector_expl se ON (se.cur_user =current_user AND se.expl_id = l.expl_id) OR (se.cur_user =current_user AND se.expl_id = l.expl_id2)
 			JOIN exploitation ON l.expl_id = exploitation.expl_id

@@ -604,25 +604,13 @@ BEGIN
 		IF v_expl is null then v_expl = NEW.expl_id; END IF;
 		IF NEW.state IS NULL THEN NEW.state =  1; END IF;
 
-		-- TODO: finish this logic
-		-- IF v_linkcat_id IS NULL THEN
-		-- 		IF v_projecttype = 'WS' THEN
-
-		-- 		ELSE
-
-		-- 		END IF;
-		-- 	END IF;
-
-
 		-- insert into link table
 		IF v_projectype = 'WS' THEN
 			IF NEW.linkcat_id IS NULL THEN
-				IF NEW.feature_type ='CONNEC' THEN
-					IF (SELECT value FROM config_param_user WHERE parameter = 'edit_connec_linkcat_vdefault' AND "cur_user"="current_user"() LIMIT 1) IS NOT NULL THEN
-						NEW.linkcat_id = (SELECT value FROM config_param_user WHERE parameter = 'edit_connec_linkcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
-					ELSE
-						NEW.linkcat_id = (SELECT conneccat_id FROM connec WHERE connec_id = NEW.feature_id);
-					END IF;
+				IF (SELECT value FROM config_param_user WHERE parameter = 'edit_connec_linkcat_vdefault' AND "cur_user"="current_user"() LIMIT 1) IS NOT NULL THEN
+					NEW.linkcat_id = (SELECT value FROM config_param_user WHERE parameter = 'edit_connec_linkcat_vdefault' AND "cur_user"="current_user"() LIMIT 1);
+				ELSE
+					NEW.linkcat_id = (SELECT conneccat_id FROM connec WHERE connec_id = NEW.feature_id);
 				END IF;
 			END IF;
 
@@ -651,10 +639,19 @@ BEGIN
 				END IF;
 			END IF;
 
+			IF NEW.top_elev1 IS NULL THEN
+				IF NEW.feature_type ='CONNEC' THEN
+					NEW.top_elev1 = (SELECT top_elev FROM connec WHERE connec_id=NEW.feature_id LIMIT 1);
+				ELSEIF NEW.feature_type ='GULLY' THEN
+					NEW.top_elev1 = (SELECT top_elev FROM gully WHERE gully_id=NEW.feature_id LIMIT 1);
+				END IF;
+			END IF;
+
 			INSERT INTO link (link_id, code, feature_type, feature_id, expl_id, exit_id, exit_type, userdefined_geom, state, the_geom, sector_id, fluid_type, dma_id,
-				linkcat_id, workcat_id, workcat_id_end, builtdate, enddate, exit_elev, top_elev2, uncertain, muni_id, verified, custom_length, datasource)
+				linkcat_id, workcat_id, workcat_id_end, builtdate, enddate, exit_elev, top_elev2, uncertain, muni_id, verified, custom_length, datasource, top_elev1, y1, top_elev2, y2)
 			VALUES (NEW.link_id, NEW.code, NEW.feature_type, NEW.feature_id, v_expl, NEW.exit_id, NEW.exit_type, TRUE, NEW.state, NEW.the_geom, v_sector, v_fluidtype, v_dma,
-				NEW.linkcat_id, NEW.workcat_id, NEW.workcat_id_end, NEW.builtdate, NEW.enddate, NEW.uncertain, NEW.muni_id, NEW.verified, NEW.custom_length, NEW.datasource);
+				NEW.linkcat_id, NEW.workcat_id, NEW.workcat_id_end, NEW.builtdate, NEW.enddate, NEW.uncertain, NEW.muni_id, NEW.verified, NEW.custom_length, NEW.datasource,
+				NEW.top_elev1, NEW.y1, NEW.top_elev2, NEW.y2);
 		END IF;
 
 		-- update feature
@@ -774,7 +771,8 @@ BEGIN
 
 			-- update specific colums for ws-link
 			IF v_projectype = 'WS' THEN
-				UPDATE link SET presszone_id = v_presszone, dqa_id = NEW.dqa_id, minsector_id = NEW.minsector_id  WHERE link_id = NEW.link_id;
+				UPDATE link SET presszone_id = v_presszone, dqa_id = NEW.dqa_id, minsector_id = NEW.minsector_id
+				WHERE link_id = NEW.link_id;
 			END IF;
 
 			-- update link
@@ -785,9 +783,18 @@ BEGIN
 		END IF;
 
 		-- update link parameters
+		IF v_projectype = 'WS' THEN
+			UPDATE link
+			SET top_elev1 = NEW.top_elev1, depth1=NEW.depth1, top_elev2 = NEW.top_elev2, depth2 = NEW.depth2
+			WHERE link_id=NEW.link_id;
+		ELSE
+			UPDATE link
+			SET top_elev1 = NEW.top_elev1, y1 = NEW.y1, top_elev2 = NEW.top_elev2, y2 = NEW.y2
+			WHERE link_id=NEW.link_id;
+		END IF;
 		UPDATE link SET code = NEW.code, state = NEW.state, the_geom = NEW.the_geom, workcat_id = NEW.workcat_id, workcat_id_end = NEW.workcat_id_end, builtdate = NEW.builtdate,
 		enddate = NEW.enddate, uncertain = NEW.uncertain, muni_id = NEW.muni_id, sector_id=v_sector, verified = NEW.verified, custom_length = NEW.custom_length,
-		datasource = NEW.datasource, top_elev1 = NEW.top_elev1, depth1=NEW.depth1, top_elev2 = NEW.top_elev2, depth2 = NEW.depth2
+		datasource = NEW.datasource
 		WHERE link_id=NEW.link_id;
 		
 

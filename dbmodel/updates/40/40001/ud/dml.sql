@@ -43,12 +43,11 @@ FROM cat_connec ON CONFLICT DO NOTHING;
 INSERT INTO cat_link (id, link_type) VALUES ('UPDATE_LINK_40','SERVCONNECTION');
 
 INSERT INTO link (link_id, code, feature_id, feature_type, exit_id, exit_type, userdefined_geom, state, expl_id, the_geom,
-tstamp, exit_topelev, exit_elev, sector_id, omzone_id, fluid_type, expl_id2, epa_type, is_operative, insert_user, lastupdate,
+tstamp, sector_id, dma_id, fluid_type, expl_id2, epa_type, is_operative, insert_user, lastupdate,
 lastupdate_user, linkcat_id, workcat_id, workcat_id_end, builtdate, enddate, drainzone_id, uncertain, muni_id, verified,
-macrominsector_id)
+macrominsector_id, dwfzone_id, top_elev1, top_elev2, y2)
 SELECT nextval('SCHEMA_NAME.urn_id_seq'::regclass), link_id::text, feature_id, feature_type, exit_id, exit_type, userdefined_geom, state, expl_id, the_geom,
-tstamp, exit_topelev, exit_elev, sector_id, dma_id, fluid_type, expl_id2, epa_type, is_operative, insert_user, lastupdate,
-lastupdate_user,
+tstamp, sector_id, dma_id, fluid_type, expl_id2, epa_type, is_operative, insert_user, lastupdate, lastupdate_user,
 CASE
   WHEN conneccat_id IS NULL THEN
     CASE
@@ -61,10 +60,45 @@ CASE
     END
   ELSE conneccat_id
 END AS conneccat_id, workcat_id, workcat_id_end, builtdate, enddate, drainzone_id, uncertain, muni_id, verified,
-macrominsector_id
+macrominsector_id, dwfzone_id,
+CASE
+  WHEN feature_type = 'GULLY' THEN
+    (SELECT g.top_elev FROM gully g WHERE g.gully_id=feature_id LIMIT 1)
+  WHEN feature_type = 'CONNEC' THEN
+    (SELECT c.top_elev FROM connec c WHERE c.connec_id = feature_id LIMIT 1)
+  ELSE NULL
+END AS top_elev1, exit_topelev,
+CASE
+  WHEN exit_topelev IS NOT NULL AND exit_elev IS NOT NULL THEN
+    exit_topelev - exit_elev
+  ELSE NULL
+END AS y2
 FROM _link;
 
 
+DO $func$
+DECLARE
+  gullyr record;
+  connecr record;
+BEGIN
+  FOR gullyr IN (SELECT gully_id, _connec_arccat_id FROM gully WHERE _connec_arccat_id IS NOT NULL)
+  LOOP
+    IF NOT EXISTS(SELECT 1 FROM link WHERE feature_id = gullyr.gully_id) THEN
+      EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client": {"device": 4, "lang": "en_US", "infoType": 1, "epsg": 25831}, "form": {}, "feature": {"id": "[' || gullyr.gully_id || ']"},
+     "data": {"filterFields": {}, "pageInfo": {}, "feature_type": "GULLY", "linkcatId":"UPDATE_LINK_40"}}$$);';
+      UPDATE link SET uncertain=true WHERE feature_id = gullyr.gully_id;
+    END IF;
+  END LOOP;
+
+  FOR connecr IN (SELECT connec_id, conneccat_id  FROM connec)
+  LOOP
+    IF NOT EXISTS(SELECT 1 FROM link WHERE feature_id = connecr.connec_id) THEN
+      EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client": {"device": 4, "lang": "en_US", "infoType": 1, "epsg": 25831}, "form": {}, "feature": {"id": "[' || connecr.connec_id || ']"},
+     "data": {"filterFields": {}, "pageInfo": {}, "feature_type": "CONNEC", "linkcatId":"UPDATE_LINK_40"}}$$);';
+      UPDATE link SET uncertain=true WHERE feature_id = connecr.connec_id;
+    END IF;
+  END LOOP;
+END $func$;
 
 INSERT INTO macroexploitation (macroexpl_id, code, "name", descript, lock_level, active, updated_at)
 SELECT macroexpl_id, macroexpl_id::text, "name", descript, NULL, active, now()
@@ -95,12 +129,3 @@ FROM _drainzone;
 INSERT INTO sector (sector_id, code, "name", descript, macrosector_id, parent_id, lock_level, active, the_geom, created_at, created_by, updated_at, updated_by)
 SELECT sector_id, sector_id::text, "name", descript, macrosector_id, parent_id, NULL, active, the_geom, tstamp, insert_user, lastupdate, lastupdate_user
 FROM _sector;
-
-
-
-
-
-
-
-
-

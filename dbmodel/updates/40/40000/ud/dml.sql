@@ -2860,29 +2860,4 @@ UPDATE sys_fprocess
 SET query_text='select link_id as arc_id, linkcat_id as arccat_id, a.expl_id, l.the_geom FROM t_link l, temp_t_arc a WHERE st_dwithin(st_endpoint(l.the_geom), a.the_geom, 0.001) AND a.epa_type NOT IN (''CONDUIT'', ''PIPE'', ''VIRTUALVALVE'', ''VIRTUALPUMP'')'
 WHERE fid=404;
 
-
-DO $func$
-DECLARE
-  gullyr record;
-  connecr record;
-BEGIN
-  FOR gullyr IN (SELECT gully_id, _connec_arccat_id FROM gully)
-  LOOP
-    IF NOT EXISTS(SELECT 1 FROM link WHERE feature_id = gullyr.gully_id) THEN
-      EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client": {"device": 4, "lang": "en_US", "infoType": 1, "epsg": 25831}, "form": {}, "feature": {"id": "[' || gullyr.gully_id || ']"},
-     "data": {"filterFields": {}, "pageInfo": {}, "feature_type": "GULLY", "linkcatId":"UPDATE_LINK_40"}}$$);';
-      UPDATE link SET uncertain=true WHERE feature_id = gullyr.gully_id;
-    END IF;
-  END LOOP;
-
-  FOR connecr IN (SELECT connec_id, conneccat_id  FROM connec)
-  LOOP
-    IF NOT EXISTS(SELECT 1 FROM link WHERE feature_id = connecr.connec_id) THEN
-      EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client": {"device": 4, "lang": "en_US", "infoType": 1, "epsg": 25831}, "form": {}, "feature": {"id": "[' || connecr.connec_id || ']"},
-     "data": {"filterFields": {}, "pageInfo": {}, "feature_type": "CONNEC", "linkcatId":"UPDATE_LINK_40"}}$$);';
-      UPDATE link SET uncertain=true WHERE feature_id = connecr.connec_id;
-    END IF;
-  END LOOP;
-END $func$;
-
 ALTER TABLE config_form_fields ENABLE TRIGGER gw_trg_config_control;

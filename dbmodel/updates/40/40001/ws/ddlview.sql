@@ -432,6 +432,101 @@ AS WITH
     FROM node_selected n;
 
 
+
+CREATE OR REPLACE VIEW vu_link AS
+ WITH typevalue AS (
+         SELECT edit_typevalue.typevalue,
+            edit_typevalue.id,
+            edit_typevalue.idval
+           FROM edit_typevalue
+          WHERE edit_typevalue.typevalue::text = ANY (ARRAY['sector_type'::character varying, 'presszone_type'::character varying, 'dma_type'::character varying, 'dqa_type'::character varying]::text[])
+        ),inp_netw_mode AS (
+         WITH inp_netw_mode_aux AS (
+                 SELECT count(*) AS t
+                   FROM config_param_user
+                  WHERE config_param_user.parameter::text = 'inp_options_networkmode'::text AND config_param_user.cur_user::text = CURRENT_USER
+                )
+         SELECT
+                CASE
+                    WHEN inp_netw_mode_aux.t > 0 THEN ( SELECT config_param_user.value
+                       FROM config_param_user
+                      WHERE config_param_user.parameter::text = 'inp_options_networkmode'::text AND config_param_user.cur_user::text = CURRENT_USER)
+                    ELSE NULL::text
+                END AS value
+           FROM inp_netw_mode_aux
+        )
+ SELECT l.link_id,
+    l.feature_type,
+    l.feature_id,
+    l.exit_type,
+    l.exit_id,
+    l.state,
+    l.expl_id,
+    l.sector_id,
+    s.name AS sector_name,
+    et1.idval::character varying(16) AS sector_type,
+    s.macrosector_id,
+    p.presszone_id,
+    p.name AS presszone_name,
+    et2.idval::character varying(16) AS presszone_type,
+    p.head AS presszone_head,
+    l.dma_id,
+    d.name AS dma_name,
+    et3.idval::character varying(16) AS dma_type,
+    d.macrodma_id,
+    l.dqa_id,
+    q.name AS dqa_name,
+    et4.idval::character varying(16) AS dqa_type,
+    q.macrodqa_id,
+    l.top_elev1,
+    l.depth1,
+    CASE
+      WHEN l.top_elev1 IS NULL OR l.depth1 IS NULL THEN NULL
+      ELSE (l.top_elev1 - l.depth1)
+    END AS elevation1,
+    l.top_elev2,
+    l.depth2,
+    CASE
+      WHEN l.top_elev2 IS NULL OR l.depth2 IS NULL THEN NULL
+      ELSE (l.top_elev2 - l.depth2)
+    END AS elevation2,
+    l.fluid_type,
+    st_length2d(l.the_geom)::numeric(12,3) AS gis_length,
+    l.custom_length,
+    l.the_geom,
+    l.muni_id,
+    l.expl_id2,
+    l.epa_type,
+    l.is_operative,
+    l.staticpressure,
+    l.linkcat_id,
+    l.workcat_id,
+    l.workcat_id_end,
+    l.builtdate,
+    l.enddate,
+    date_trunc('second'::text, l.lastupdate) AS lastupdate,
+    l.lastupdate_user,
+    l.uncertain,
+    l.verified,
+    l.minsector_id,
+    l.macrominsector_id,
+    CASE
+            WHEN s.sector_id > 0 AND is_operative = true AND epa_type = 'JUNCTION'::character varying(16)::text AND cpu.value = '4' THEN epa_type::character varying
+            ELSE NULL::character varying(16)
+        END AS inp_type,
+    l.n_hydrometer,
+    l.datasource
+     FROM ( SELECT inp_netw_mode.value FROM inp_netw_mode) cpu, link l
+     LEFT JOIN sector s USING (sector_id)
+     LEFT JOIN presszone p USING (presszone_id)
+     LEFT JOIN dma d USING (dma_id)
+     LEFT JOIN dqa q USING (dqa_id)
+     LEFT JOIN typevalue et1 ON et1.id::text = s.sector_type::text AND et1.typevalue::text = 'sector_type'::text
+     LEFT JOIN typevalue et2 ON et2.id::text = p.presszone_type AND et2.typevalue::text = 'presszone_type'::text
+     LEFT JOIN typevalue et3 ON et3.id::text = d.dma_type::text AND et3.typevalue::text = 'dma_type'::text
+     LEFT JOIN typevalue et4 ON et4.id::text = q.dqa_type::text AND et4.typevalue::text = 'dqa_type'::text;
+
+
 CREATE OR REPLACE VIEW v_edit_link
 AS WITH
     typevalue AS
@@ -515,10 +610,12 @@ AS WITH
         dqa_table.macrodqa_id,
         l.supplyzone_id,
         supplyzone_table.supplyzone_type,
-        COALESCE(l.top_elev1, (SELECT top_elev FROM connec WHERE connec_id=l.feature_id)) AS top_elev1,
-        COALESCE(l.depth1, (SELECT depth FROM connec WHERE connec_id=l.feature_id)) AS depth1,
-        (SELECT COALESCE(l.top_elev1, (SELECT top_elev FROM connec WHERE connec_id=l.feature_id))-
-        COALESCE(l.depth1, (SELECT depth FROM connec WHERE connec_id=l.feature_id))) AS elevation1,
+        l.top_elev1,
+        l.depth1,
+        CASE
+          WHEN l.top_elev1 IS NULL OR l.depth1 IS NULL THEN NULL
+          ELSE (l.top_elev1 - l.depth1)
+        END AS elevation1,
         l.top_elev2,
         l.depth2,
         CASE
@@ -556,6 +653,7 @@ AS WITH
         l.datasource
         FROM inp_network_mode, link_selector
         JOIN link l using (link_id)
+        LEFT JOIN connec c ON c.connec_id = l.feature_id
         JOIN selector_expl se ON ((se.cur_user =current_user AND se.expl_id = l.expl_id) or (se.cur_user =current_user AND se.expl_id = l.expl_id2))
         JOIN selector_sector sc ON (sc.cur_user = CURRENT_USER AND sc.sector_id = l.sector_id)
         JOIN sector_table ON sector_table.sector_id = l.sector_id

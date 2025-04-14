@@ -22,7 +22,7 @@ INSERT INTO cat_link (id, link_type) VALUES ('UPDATE_LINK_40','SERVCONNECTION');
 
 INSERT INTO link (link_id, code, feature_id, feature_type, exit_id, exit_type, userdefined_geom, state, expl_id, the_geom, tstamp, sector_id,
 dma_id, fluid_type, presszone_id, dqa_id, minsector_id, expl_id2, epa_type, is_operative, insert_user, lastupdate, lastupdate_user, staticpressure, linkcat_id,
-workcat_id, workcat_id_end, builtdate, enddate, uncertain, muni_id, macrominsector_id, verified, supplyzone_id, n_hydrometer, top_elev1, depth1)
+workcat_id, workcat_id_end, builtdate, enddate, uncertain, muni_id, macrominsector_id, verified, supplyzone_id, n_hydrometer, top_elev1, depth1, top_elev2, depth2)
 SELECT nextval('SCHEMA_NAME.urn_id_seq'::regclass), link_id::text, feature_id, feature_type, exit_id, exit_type, userdefined_geom, state, expl_id, the_geom, tstamp, sector_id,
 dma_id, fluid_type, presszone_id, dqa_id, minsector_id, expl_id2, epa_type, is_operative, insert_user, lastupdate, lastupdate_user, staticpressure,
 CASE
@@ -36,8 +36,29 @@ CASE
   ELSE conneccat_id
 END	AS conneccat_id, workcat_id, workcat_id_end, builtdate, enddate, uncertain, muni_id, macrominsector_id, verified, supplyzone_id, n_hydrometer,
 (SELECT c.top_elev FROM connec c WHERE c.connec_id=feature_id LIMIT 1) AS top_elev1,
-(SELECT c.depth FROM connec c WHERE c.connec_id = feature_id LIMIT 1) AS depth1
+(SELECT c.depth FROM connec c WHERE c.connec_id = feature_id LIMIT 1) AS depth1,
+exit_topelev,
+CASE
+  WHEN exit_topelev IS NOT NULL AND exit_elev IS NOT NULL THEN
+    exit_topelev - exit_elev
+  ELSE NULL
+END AS depth2
 FROM _link;
+
+
+DO $func$
+DECLARE
+  connecr record;
+BEGIN
+  FOR connecr IN (SELECT connec_id, conneccat_id  FROM connec)
+  LOOP
+    IF NOT EXISTS(SELECT 1 FROM link WHERE feature_id = connecr.connec_id) THEN
+      EXECUTE 'SELECT gw_fct_setlinktonetwork($${"client": {"device": 4, "lang": "en_US", "infoType": 1, "epsg": 25831}, "form": {}, "feature": {"id": "[' || connecr.connec_id || ']"},
+     "data": {"filterFields": {}, "pageInfo": {}, "feature_type": "CONNEC", "linkcatId":"UPDATE_LINK_40"}}$$);';
+      UPDATE link SET uncertain=true WHERE feature_id = connecr.connec_id;
+    END IF;
+  END LOOP;
+END $func$;
 
 INSERT INTO sys_feature_epa_type (id, feature_type, epa_table, descript, active) VALUES('VALVE', 'ELEMENT', 'inp_flwreg_valve', NULL, true);
 
@@ -83,3 +104,4 @@ FROM _sector;
 -- omzone is new
 
 INSERT INTO cat_feature_element (id, epa_default, geometry_type) VALUES('REGISTER', 'UNDEFINED', 'POINT');
+

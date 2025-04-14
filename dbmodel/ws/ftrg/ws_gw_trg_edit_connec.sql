@@ -800,9 +800,20 @@ BEGIN
 			UPDATE connec SET state=NEW.state WHERE connec_id = NEW.connec_id;
 
 		END IF;
-		-- IF (NEW.conneccat_id != OLD.conneccat_id) AND NEW.state > 0 THEN
-		-- 	UPDATE link SET linkcat_id=NEW.conneccat_id WHERE feature_id = NEW.connec_id AND state>0;
-		-- END IF;
+		
+
+		-- update inherit link fields
+		IF NEW.top_elev IS NOT NULL THEN
+			UPDATE link
+			SET top_elev1 = NEW.top_elev
+			WHERE link_id in (SELECT link_id FROM link WHERE feature_id = NEW.connec_id AND state = 1);
+		END IF;
+
+		IF NEW.depth IS NOT NULL THEN
+			UPDATE link
+			SET depth1 = NEW.depth
+			WHERE link_id in (SELECT link_id FROM link WHERE feature_id = NEW.connec_id AND state = 1);
+		END IF;
 
 		-- State_type
 		IF NEW.state=0 AND OLD.state=1 THEN

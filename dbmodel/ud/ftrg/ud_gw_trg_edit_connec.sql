@@ -661,6 +661,12 @@ BEGIN
 			END IF;
 		END IF;
 
+		IF NEW.top_elev IS NOT NULL THEN
+			UPDATE link
+			SET top_elev1 = NEW.top_elev
+			WHERE link_id in (SELECT link_id FROM link WHERE feature_id = NEW.connec_id AND state = 1);
+		END IF;
+
 		-- State_type
 		IF NEW.state=0 AND OLD.state=1 THEN
 			IF (SELECT state FROM value_state_type WHERE id=NEW.state_type) != NEW.state THEN
@@ -716,10 +722,6 @@ BEGIN
 
 			UPDATE connec SET state=NEW.state WHERE connec_id = OLD.connec_id;
 		END IF;
-
-		-- IF (NEW.conneccat_id != OLD.conneccat_id) AND NEW.state > 0 THEN
-		-- 	UPDATE link SET linkcat_id=NEW.conneccat_id WHERE feature_id = NEW.connec_id AND state>0;
-		-- END IF;
 
 		--check relation state - state_type
 		IF (NEW.state_type != OLD.state_type) THEN

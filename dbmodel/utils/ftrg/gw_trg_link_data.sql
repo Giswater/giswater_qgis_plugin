@@ -35,8 +35,16 @@ BEGIN
 				FROM connec c
 				JOIN value_state_type v ON v.id = c.state_type WHERE l.feature_id = c.connec_id AND c.connec_id = NEW.feature_id AND l.state > 0 AND link_id = NEW.link_id;
 			ELSE
+				IF NEW.top_elev1 IS NULL THEN
+					IF NEW.feature_type ='CONNEC' THEN
+						NEW.top_elev1 = (SELECT top_elev FROM connec WHERE connec_id=NEW.feature_id LIMIT 1);
+					ELSEIF NEW.feature_type ='GULLY' THEN
+						NEW.top_elev1 = (SELECT top_elev FROM gully WHERE gully_id=NEW.feature_id LIMIT 1);
+					END IF;
+				END IF;
+				
 				UPDATE link l
-				SET linkcat_id = NEW.linkcat_id
+				SET linkcat_id = NEW.linkcat_id, top_elev1 = NEW.top_elev1
 				WHERE l.feature_id = NEW.feature_id AND l.state > 0 AND l.link_id = NEW.link_id;
 
 				UPDATE link l SET epa_type = c.epa_type, is_operative = v.is_operative, expl_id2 = c.expl_id2, fluid_type = c.fluid_type, muni_id = c.muni_id
