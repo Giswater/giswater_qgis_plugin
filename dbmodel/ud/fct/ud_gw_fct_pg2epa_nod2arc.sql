@@ -74,20 +74,27 @@ BEGIN
 	-- setting record_new_arc
 	SELECT * INTO rec_new_arc FROM temp_t_arc LIMIT 1;
 
+	-- TODO: review this code, with new elements logic of flow regulators
 	FOR rec_flowreg IN
-	SELECT node_id, to_arc, flwreg_length, flw_type, order_id, epa_type FROM
-	(SELECT temp_t_node.node_id, to_arc, flwreg_length, 'OR'::text as flw_type, order_id, 'ORIFICE' as epa_type FROM inp_flwreg_orifice, flwreg JOIN temp_t_node ON temp_t_node.node_id = flwreg.node_id
-	JOIN selector_sector ON selector_sector.sector_id=temp_t_node.sector_id
-		UNION
-	SELECT temp_t_node.node_id, to_arc, flwreg_length, 'OT'::text as flw_type, order_id, 'OUTLET' as epa_type FROM inp_flwreg_outlet, flwreg JOIN temp_t_node ON temp_t_node.node_id = flwreg.node_id
-	JOIN selector_sector ON selector_sector.sector_id=temp_t_node.sector_id
-		UNION
-	SELECT temp_t_node.node_id, to_arc, flwreg_length, 'PU'::text as flw_type, order_id, 'PUMP' as epa_type FROM inp_flwreg_pump, flwreg JOIN temp_t_node ON temp_t_node.node_id = flwreg.node_id
-	JOIN selector_sector ON selector_sector.sector_id=temp_t_node.sector_id
-		UNION
-	SELECT temp_t_node.node_id, to_arc, flwreg_length, 'WE'::text as flw_type, order_id, 'WEIR' as epa_type FROM inp_flwreg_weir, flwreg JOIN temp_t_node ON temp_t_node.node_id = flwreg.node_id
-	JOIN selector_sector ON selector_sector.sector_id=temp_t_node.sector_id)a
-	ORDER BY node_id, to_arc
+		SELECT element_id, to_arc, flwreg_length, flw_type, order_id, epa_type FROM
+		(
+			SELECT temp_t_element.element_id, to_arc, flwreg_length, 'OR'::text as flw_type, order_id, 'ORIFICE' as epa_type FROM inp_flwreg_orifice, man_flwreg
+			JOIN temp_t_element ON temp_t_element.element_id = man_flwreg.element_id
+			JOIN selector_sector ON selector_sector.sector_id=temp_t_element.sector_id
+			UNION
+			SELECT temp_t_element.element_id, to_arc, flwreg_length, 'OT'::text as flw_type, order_id, 'OUTLET' as epa_type FROM inp_flwreg_outlet, man_flwreg
+			JOIN temp_t_element ON temp_t_element.element_id = man_flwreg.element_id
+			JOIN selector_sector ON selector_sector.sector_id=temp_t_element.sector_id
+			UNION
+			SELECT temp_t_element.element_id, to_arc, flwreg_length, 'PU'::text as flw_type, order_id, 'PUMP' as epa_type FROM inp_flwreg_pump, man_flwreg
+			JOIN temp_t_element ON temp_t_element.element_id = man_flwreg.element_id
+			JOIN selector_sector ON selector_sector.sector_id=temp_t_element.sector_id
+			UNION
+			SELECT temp_t_element.element_id, to_arc, flwreg_length, 'WE'::text as flw_type, order_id, 'WEIR' as epa_type FROM inp_flwreg_weir, man_flwreg
+			JOIN temp_t_element ON temp_t_element.element_id = man_flwreg.element_id
+			JOIN selector_sector ON selector_sector.sector_id=temp_t_element.sector_id
+		) a
+		ORDER BY element_id, to_arc
 
 	LOOP
 		-- Getting data from node
