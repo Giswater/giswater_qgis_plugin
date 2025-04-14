@@ -85,6 +85,7 @@ v_queryhydro TEXT;
 v_proposed_enddate TEXT;
 v_step integer;
 v_descript TEXT;
+v_propose_initdate text;
 
 
 BEGIN
@@ -116,7 +117,7 @@ BEGIN
 	IF v_step = 1 THEN 
 		
 		-- query calc proposed enddate
-		v_queryhydro = 
+v_queryhydro = 
 		'WITH 
 			hydrometer AS (
 				SELECT h.hydrometer_id, c.dma_id
@@ -158,11 +159,11 @@ BEGIN
 			),
 			hydro_data_selected_expl AS (
 				SELECT d.*, h.dma_id
-				FROM hydro_data_selected d
+				FROM exploitation e, hydro_data_selected d
 				JOIN hydrometer h USING(hydrometer_id)
 				JOIN DMA m on h.dma_id = m.dma_id 
-				JOIN exploitation e ON UNNEST(m.expl_id) = e.expl_id
-				WHERE e.expl_id >0 AND e.active = TRUE 
+				WHERE e.expl_id = any (m.expl_id) AND
+				e.expl_id >0 AND e.active = TRUE 
 				AND m.dma_id > 0 AND m.active = TRUE
      		),
 			hydro_estimated_statistic AS (
@@ -173,22 +174,25 @@ BEGIN
 				count(*) OVER () AS hydro_total
 				FROM hydro_data_selected_expl as d
 			) 
-		SELECT max(last_end_date)
+		SELECT (last_end_date)
     	FROM hydro_estimated_statistic
     	WHERE (100*hydro_no_llegits/hydro_total::float) < '||v_percent_hydro||'';
-
+   
 		execute v_queryhydro INTO v_proposed_enddate;
 		
     	v_proposed_enddate = coalesce(v_proposed_enddate, '1800-01-01');
 
 		v_proposed_enddate = quote_literal(v_proposed_enddate)::date - INTERVAL '1 day';
 		v_proposed_enddate = v_proposed_enddate::date;	
+	
+		v_propose_initdate = ((now() - interval '12 years')::date)::text;
 
 		EXECUTE '
  		UPDATE temp_sys_function
  		SET descript = REPLACE(descript, split_part(descript, ''>'', 2), ''End Date proposal for '||v_percent_hydro||'% of hydrometers which consum is out of the period: '||v_proposed_enddate::TIMESTAMP||''')
     	WHERE id in (3142)';
 
+   		UPDATE temp_config_toolbox c SET inputparams = (replace (inputparams::text, '1111-12-12', ''))::json WHERE id = 3142; --enddate
  		UPDATE temp_config_toolbox c SET inputparams = (replace (inputparams::text, '9999-12-12', v_proposed_enddate))::json WHERE id = 3142; --enddate
  		
    		RETURN '{"status":"Accepted"}';
@@ -203,7 +207,7 @@ BEGIN
 
 			IF v_setmawithperiodmeters THEN 
 
-				EXECUTE 'UPDATE dma SET active = false, the_geom = null WHERE expl_id @> ARRAY['||v_expl||']';
+				EXECUTE 'UPDATE dma SET active = false, the_geom = null WHERE expl_id && ARRAY['||v_expl||']';
 				
 				EXECUTE '
 				UPDATE dma SET active = TRUE FROM 
@@ -237,8 +241,8 @@ BEGIN
 		
 		END IF;
 	
-		execute 'delete from om_waterbalance where expl_id @> ARRAY['||v_expl||'] and startdate='||quote_literal(v_startdate)||'::date 
-		and enddate = '||quote_literal(v_enddate)||'::date';
+		EXECUTE 'delete from om_waterbalance where expl_id && array['||v_expl||'] and startdate='||quote_literal(v_startdate)||'::date 
+		and enddate = '||quote_literal(v_enddate)||'::date';	
 	
 		EXECUTE '
 		INSERT INTO om_waterbalance (expl_id, dma_id, cat_period_id, startdate, enddate, descript)
@@ -247,9 +251,9 @@ BEGIN
 		'||quote_literal(v_startdate)||'::date, '||quote_literal(v_enddate)||'::date, 
 		'||quote_literal(v_descript)||' 
 		FROM dma 
-		WHERE expl_id @> ARRAY['||v_expl||']
+		WHERE expl_id && ARRAY['||v_expl||']
 		AND dma_id > 0 AND active = TRUE';
-		
+			
 		IF v_method = 'CPW' THEN -- static period or remote lecture period (1 day)
 
 			-- total inlet
@@ -265,7 +269,7 @@ BEGIN
 			)a
 			WHERE n.dma_id = a.dma_id 
 			AND n.cat_period_id ='||quote_literal(v_period)||'::text
-			AND n.expl_id @> ARRAY['||v_expl||']';
+			AND n.expl_id && ARRAY['||v_expl||']';
 
 			-- total_inyected
 			EXECUTE '
@@ -279,14 +283,14 @@ BEGIN
 			)a
 			WHERE n.dma_id = a.dma_id 
 			AND n.cat_period_id ='||quote_literal(v_period)||'::text
-			AND n.expl_id @> ARRAY['||v_expl||']';
+			AND n.expl_id && ARRAY['||v_expl||']';
 
 			-- total outlet
 			EXECUTE '
 			UPDATE om_waterbalance n 
 			SET total_out = total_in - total_sys_input
 			WHERE n.cat_period_id = '||quote_literal(v_period)||'::text
-			AND n.expl_id @> ARRAY['||v_expl||']';
+			AND n.expl_id && ARRAY['||v_expl||']';
 
 			-- auth_bill_met_hydro
 			EXECUTE '
@@ -313,20 +317,20 @@ BEGIN
 			) a
 			WHERE n.dma_id = a.dma_id 
 			AND n.cat_period_id ='||quote_literal(v_period)||'::text
-			AND n.expl_id @> ARRAY['||v_expl||']';
+			AND n.expl_id && ARRAY['||v_expl||']';
 
 			EXECUTE '
 			UPDATE om_waterbalance n
 			SET auth_bill_met_hydro = 0 
 			WHERE n.auth_bill_met_hydro is null 
 			AND n.cat_period_id ='||quote_literal(v_period)||'::text
-			AND n.expl_id @> ARRAY['||v_expl||']';
+			AND n.expl_id && ARRAY['||v_expl||']';
 		
 			EXECUTE '
 			SELECT count(*) 
 			FROM om_waterbalance n
 			WHERE n.cat_period_id = '||quote_literal(v_period) ||'::text 
-			AND nexpl_id @> ARRAY['||v_expl||']' INTO v_count;
+			AND n.expl_id && ARRAY['||v_expl||']' INTO v_count;
 
 			EXECUTE '
 			WITH 
@@ -347,7 +351,7 @@ BEGIN
 			WHERE (e.is_waterbal = TRUE OR e.is_waterbal IS NULL) 
 			AND n.cat_period_id = '||quote_literal(v_period) ||'::text 
 			AND d.cat_period_id = '||quote_literal(v_period) ||'::text 
-			AND n.expl_id @> ARRAY['||v_expl||']' INTO v_hydrometer;
+			AND n.expl_id && ARRAY['||v_expl||']' INTO v_hydrometer;
 				
 		ELSIF v_method = 'CDI' THEN -- custom date interval
 		
@@ -387,7 +391,7 @@ BEGIN
 			UPDATE om_waterbalance n SET total_out = total_in - total_sys_input
 			WHERE n.startdate = '||quote_literal(v_startdate)||'::date 
 			AND n.enddate = '||quote_literal(v_enddate)||'::date
-			AND n.expl_id @> ARRAY['||v_expl||']';
+			AND n.expl_id && ARRAY['||v_expl||']';
 
 			-- auth_bill_met_hydro
 			EXECUTE '
@@ -448,14 +452,14 @@ BEGIN
 			WHERE auth_bill_met_hydro is null 
 			AND n.startdate::date = '||quote_literal(v_startdate)||'::date 
 			AND n.enddate::date = '||quote_literal(v_enddate)||'::date 
-			AND n.expl_id @> ARRAY['||v_expl||']';
+			AND n.expl_id && ARRAY['||v_expl||']';
 
 			EXECUTE '
 			SELECT count(*) 
 			FROM om_waterbalance 
 			WHERE startdate::date = '||quote_literal(v_startdate)||'::date 
 			AND enddate::date = '||quote_literal(v_enddate)||'::date 
-			AND expl_id @> ARRAY['||v_expl||']' INTO v_count;
+			AND expl_id && ARRAY['||v_expl||']' INTO v_count;
 
 			EXECUTE '
 			WITH 
@@ -503,7 +507,7 @@ BEGIN
 			WHERE (e.is_waterbal = TRUE OR e.is_waterbal IS NULL) 
 			AND n.startdate::date = '||quote_literal(v_startdate)||'::date 
 			AND n.enddate::date = '||quote_literal(v_enddate)||'::date 
-			AND n.expl_id @> ARRAY['||v_expl||']' INTO v_hydrometer;
+			AND n.expl_id && ARRAY['||v_expl||']' INTO v_hydrometer;
 			
 		END IF;
 
@@ -516,7 +520,7 @@ BEGIN
 		where c.state=1
 		GROUP BY c.dma_id)a
 		WHERE n.dma_id = a.dma_id AND n.startdate::date = '||quote_literal(v_startdate)||'::date 
-		AND n.enddate::date = '||quote_literal(v_enddate)||'::date AND expl_id @> ARRAY['||v_expl||']';
+		AND n.enddate::date = '||quote_literal(v_enddate)||'::date AND expl_id && ARRAY['||v_expl||']';
 
 		-- n_hydro
 		EXECUTE '
@@ -526,7 +530,7 @@ BEGIN
 		JOIN connec c USING (connec_id) 
 		GROUP BY dma_id)a
 		WHERE n.dma_id = a.dma_id AND n.startdate::date = '||quote_literal(v_startdate)||'::date 
-		AND n.enddate::date = '||quote_literal(v_enddate )||'::date AND expl_id @> ARRAY['||v_expl||']';
+		AND n.enddate::date = '||quote_literal(v_enddate )||'::date AND expl_id && ARRAY['||v_expl||']';
 
 		-- arc_length
 		EXECUTE '
@@ -535,21 +539,21 @@ BEGIN
 		FROM arc c
 		GROUP BY dma_id)a
 		WHERE n.dma_id = a.dma_id AND n.startdate::date = '||quote_literal(v_startdate)||'::date 
-		and n.enddate::date = '||quote_literal(v_enddate)||'::date AND expl_id @> ARRAY['||v_expl||']';
+		and n.enddate::date = '||quote_literal(v_enddate)||'::date AND expl_id && ARRAY['||v_expl||']';
 
 		-- meters_in
 		EXECUTE '
 		UPDATE om_waterbalance w SET meters_in = meters FROM 
 		(SELECT string_agg (node_id, '', '') as meters, dma_id FROM om_waterbalance_dma_graph WHERE flow_sign = 1 group by dma_id) a
 		WHERE a.dma_id = w.dma_id AND w.startdate::date = '||quote_literal(v_startdate)||'::date 
-		and w.enddate::date = '||quote_literal(v_enddate)||'::date AND expl_id @> ARRAY['||v_expl||']';
+		and w.enddate::date = '||quote_literal(v_enddate)||'::date AND expl_id && ARRAY['||v_expl||']';
 
 		-- meters_out
 		EXECUTE '
 		UPDATE om_waterbalance w SET meters_out = meters FROM 
 		(SELECT string_agg (node_id, '', '') as meters, dma_id FROM om_waterbalance_dma_graph WHERE flow_sign = -1 group by dma_id) a
 		WHERE a.dma_id = w.dma_id AND w.startdate::date = '||quote_literal(v_startdate)||'::date 
-		and w.enddate::date = '||quote_literal(v_enddate)||'::date expl_id @> ARRAY['||v_expl||']';
+		and w.enddate::date = '||quote_literal(v_enddate)||'::date AND expl_id && ARRAY['||v_expl||']';
 		
 		-- auth_bill
 		EXECUTE '
@@ -565,7 +569,7 @@ BEGIN
 		total_out = COALESCE(total_out::double precision, 0::double precision),
 		total = COALESCE(total_sys_input, 0::double precision) 
 		WHERE startdate::date = '||quote_literal(v_startdate)||'::date and enddate::date = '||quote_literal(v_enddate)||'::date 
-		AND expl_id @> ARRAY['||v_expl||']';
+		AND expl_id && ARRAY['||v_expl||']';
 		
 		-- auth
 		EXECUTE '
@@ -573,23 +577,23 @@ BEGIN
 		nrw = (total::double precision - auth_bill::double precision)::numeric,
 		nrw_eff = CASE WHEN total::double precision > 0::double precision THEN ((100::numeric * auth_bill)::double precision / total::double precision)::numeric
 		ELSE 0::numeric end, loss = (total::double precision - auth_bill::double precision - auth_unbill::double precision)
-		WHERE startdate::date = '||quote_literal(v_startdate)||'::date and enddate::date = '||quote_literal(v_enddate)||'::date AND expl_id @> ARRAY['||v_expl||']';
+		WHERE startdate::date = '||quote_literal(v_startdate)||'::date and enddate::date = '||quote_literal(v_enddate)||'::date AND expl_id && ARRAY['||v_expl||']';
 					
 		-- get log data
 		EXECUTE '
 		SELECT sum(total_sys_input) as tsi, sum(auth_bill_met_hydro) as bmc, (sum(total_sys_input) - sum(auth_bill_met_hydro))::numeric (12,2) as nrw
 		FROM om_waterbalance  
-		WHERE startdate::date = '||quote_literal(v_startdate)||'::date and enddate::date = '||quote_literal(v_enddate)||'::date AND expl_id @> ARRAY['||v_expl||']'
+		WHERE startdate::date = '||quote_literal(v_startdate)||'::date and enddate::date = '||quote_literal(v_enddate)||'::date AND expl_id && ARRAY['||v_expl||']'
 		INTO rec_nrw;
 
 		--restrict water balance if threshold days after lastupdate DMA are surpassed
 		select value into v_days_limiter from config_param_system where parameter = 'om_waterbalance_threshold_days';
 		
-		EXECUTE 'select lastupdate::text from dma where expl_id @> ARRAY['||v_expl||'] and lastupdate is not null order by tstamp asc limit 1'  into v_current_date;
+		EXECUTE 'select updated_at::text from dma where expl_id && ARRAY['||v_expl||'] and updated_at is not null order by created_at asc limit 1'  into v_current_date;
 
 		if v_current_date is null then
 		
-			EXECUTE 'select tstamp::text from dma where expl_id @> ARRAY['||v_expl||'] and tstamp is not null order by tstamp asc limit 1' into v_current_date;
+			EXECUTE 'select created_at::text from dma where expl_id && ARRAY['||v_expl||'] and created_at is not null order by created_at asc limit 1' into v_current_date;
 				
 		end if;
 
@@ -599,7 +603,7 @@ BEGIN
 		IF v_days_past is null then
 
 			INSERT INTO audit_check_data (error_message, fid, cur_user, criticity) 
-			VALUES ('ERROR: There are NULL values on lastupdate or tstamp on table dma. Please, update DMAs to fill these columns', v_fid, current_user, 3);
+			VALUES ('ERROR: There are NULL values on updated_at or created_at on table dma. Please, update DMAs to fill these columns', v_fid, current_user, 3);
 		
 		ELSIF v_days_past >= v_days_limiter then
 		

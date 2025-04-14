@@ -6839,3 +6839,106 @@ AS SELECT om_mincut.id,
      LEFT JOIN macroexploitation ON om_mincut.macroexpl_id = macroexploitation.macroexpl_id
      LEFT JOIN ext_municipality ON om_mincut.muni_id = ext_municipality.muni_id
   WHERE selector_mincut_result.result_id = om_mincut.id AND selector_mincut_result.cur_user = "current_user"()::text AND om_mincut.id > 0;
+  
+  
+
+DROP VIEW IF EXISTS v_om_waterbalance;
+DROP VIEW IF EXISTS v_om_waterbalance_report;
+ALTER TABLE om_waterbalance ALTER COLUMN expl_id TYPE integer[] USING ARRAY[expl_id];
+
+ CREATE OR REPLACE VIEW v_om_waterbalance AS
+SELECT e.name AS exploitation,
+    d.name AS dma,
+    p.code AS period,
+    om_waterbalance.auth_bill,
+    om_waterbalance.auth_unbill,
+    om_waterbalance.loss_app,
+    om_waterbalance.loss_real,
+    om_waterbalance.total_in,
+    om_waterbalance.total_out,
+    om_waterbalance.total,
+    om_waterbalance.startdate,
+    om_waterbalance.enddate,
+    om_waterbalance.ili,
+    om_waterbalance.auth,
+    om_waterbalance.loss,
+        CASE
+            WHEN om_waterbalance.total > 0::double precision THEN (100::numeric::double precision * (om_waterbalance.auth_bill + om_waterbalance.auth_unbill) / om_waterbalance.total)::numeric(20,2)
+            ELSE 0::numeric(20,2)
+        END AS loss_eff,
+    om_waterbalance.auth_bill AS rw,
+    (om_waterbalance.total - om_waterbalance.auth_bill)::numeric(20,2) AS nrw,
+        CASE
+            WHEN om_waterbalance.total > 0::double precision THEN (100::numeric::double precision * om_waterbalance.auth_bill / om_waterbalance.total)::numeric(20,2)
+            ELSE 0::numeric(20,2)
+        END AS nrw_eff,
+    d.the_geom
+   FROM exploitation e, om_waterbalance
+     JOIN dma d USING (dma_id)
+     LEFT JOIN ext_cat_period p ON p.id::text = om_waterbalance.cat_period_id::text
+	 where e.expl_id = any(d.expl_id);
+	  
+	 
+	 
+CREATE OR REPLACE VIEW v_om_waterbalance_report
+AS WITH expl_data AS (
+         SELECT sum(w_1.auth) / sum(w_1.total) AS expl_rw_eff,
+            1::double precision - sum(w_1.auth) / sum(w_1.total) AS expl_nrw_eff,
+            NULL::text AS expl_nightvol,
+                CASE
+                    WHEN sum(w_1.arc_length) = 0::double precision THEN NULL::double precision
+                    ELSE sum(w_1.nrw) / sum(w_1.arc_length) / (date_part('epoch'::text, age(p_1.end_date, p_1.start_date)) / 3600::numeric::double precision)
+                END AS expl_m4day,
+                CASE
+                    WHEN sum(w_1.arc_length) = 0::double precision AND sum(w_1.n_connec) = 0 AND sum(w_1.link_length) = 0::double precision THEN NULL::double precision
+                    ELSE sum(w_1.loss) * (365::numeric::double precision / date_part('day'::text, p_1.end_date - p_1.start_date)) / (6.57::double precision * sum(w_1.arc_length) + 9.13::double precision * sum(w_1.link_length) + (0.256 * sum(w_1.n_connec)::numeric * avg(d_1.avg_press))::double precision)
+                END AS expl_ili,
+            w_1.expl_id,
+            w_1.cat_period_id,
+            p_1.start_date
+           FROM om_waterbalance w_1
+             JOIN ext_cat_period p_1 ON w_1.cat_period_id::text = p_1.id::text
+             JOIN dma d_1 ON d_1.dma_id = w_1.dma_id
+          GROUP BY w_1.expl_id, w_1.cat_period_id, p_1.end_date, p_1.start_date
+        )
+ SELECT DISTINCT ex.name AS exploitation,
+    ex.expl_id,
+    d.name AS dma,
+    w.dma_id,
+    w.cat_period_id,
+    p.code AS period,
+    p.start_date,
+    p.end_date,
+    w.meters_in,
+    w.meters_out,
+    w.n_connec,
+    w.n_hydro,
+    w.arc_length,
+    w.link_length,
+    w.total_in,
+    w.total_out,
+    w.total,
+    w.auth,
+    w.nrw,
+        CASE
+            WHEN w.total <> 0::double precision THEN w.auth / w.total
+            ELSE NULL::double precision
+        END AS dma_rw_eff,
+        CASE
+            WHEN w.total <> 0::double precision THEN 1::double precision - w.auth / w.total
+            ELSE NULL::double precision
+        END AS dma_nrw_eff,
+    w.ili AS dma_ili,
+    NULL::text AS dma_nightvol,
+    w.nrw / w.arc_length / (date_part('epoch'::text, age(p.end_date, p.start_date)) / 3600::numeric::double precision) AS dma_m4day,
+    ed.expl_rw_eff,
+    ed.expl_nrw_eff,
+    ed.expl_nightvol,
+    ed.expl_ili,
+    ed.expl_m4day
+   FROM exploitation ex, om_waterbalance w
+     JOIN dma d USING (dma_id)
+     LEFT JOIN ext_cat_period p ON w.cat_period_id::text = p.id::text
+     JOIN expl_data ed ON ed.expl_id = w.expl_id AND w.cat_period_id::text = p.id::text
+  WHERE ed.start_date = p.start_date
+  AND ex.expl_id = any(d.expl_id);
