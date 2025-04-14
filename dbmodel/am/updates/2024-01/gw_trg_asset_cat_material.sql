@@ -8,7 +8,7 @@ This version of Giswater is provided by Giswater Association
 -- material
 ------------
 
-SET search_path = SCHEMA_NAME, public;
+SET search_path = am, public;
 
 CREATE OR REPLACE FUNCTION PARENT_SCHEMA.gw_trg_asset_cat_material()  RETURNS trigger AS
 $BODY$

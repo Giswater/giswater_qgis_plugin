@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-SET search_path = SCHEMA_NAME, public;
+SET search_path = am, public;
 
 GRANT ALL ON TABLE arc_engine_sh TO role_basic;
 GRANT ALL ON TABLE arc_engine_wm TO role_basic;

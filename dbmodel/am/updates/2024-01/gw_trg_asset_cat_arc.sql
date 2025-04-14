@@ -9,7 +9,7 @@ This version of Giswater is provided by Giswater Association
 -- cat_arc
 ------------
 
-SET search_path = SCHEMA_NAME, public;
+SET search_path = am, public;
 
 CREATE OR REPLACE FUNCTION PARENT_SCHEMA.gw_trg_asset_cat_arc()  RETURNS trigger AS
 $BODY$

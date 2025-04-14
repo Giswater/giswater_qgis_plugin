@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-SET search_path = SCHEMA_NAME, public;
+SET search_path = am, public;
 
 ALTER TABLE config_catalog_def ADD COLUMN id SERIAL PRIMARY KEY;
 ALTER TABLE value_result_type ADD PRIMARY KEY (id);

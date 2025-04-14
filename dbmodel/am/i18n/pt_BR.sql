@@ -4,7 +4,7 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-SET search_path = SCHEMA_NAME, public;
+SET search_path = am, public;
 
 INSERT INTO value_result_type VALUES ('GLOBAL', 'GLOBAL');
 INSERT INTO value_result_type VALUES ('SELECTION', 'SELEÇÃO');

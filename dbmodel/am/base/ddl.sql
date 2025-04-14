@@ -3,9 +3,9 @@ This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This version of Giswater is provided by Giswater Association
 */
-CREATE SCHEMA SCHEMA_NAME;
+CREATE SCHEMA am;
 
-SET search_path = SCHEMA_NAME, public;
+SET search_path = am, public;
 
 --
 -- TABLES:
@@ -274,9 +274,9 @@ CREATE VIEW ext_arc_asset AS
     n1.press_avg AS press1,
     n2.press_avg AS press2,
     a.flow_avg
-   FROM PARENT_SCHEMA.vu_arc AS a
-   JOIN PARENT_SCHEMA.vu_node AS n1 ON (a.node_1 = n1.node_id)
-   JOIN PARENT_SCHEMA.vu_node AS n2 ON (a.node_2 = n2.node_id)
+   FROM PARENT_SCHEMA.v_edit_arc AS a
+   JOIN PARENT_SCHEMA.v_edit_node AS n1 ON (a.node_1 = n1.node_id)
+   JOIN PARENT_SCHEMA.v_edit_node AS n2 ON (a.node_2 = n2.node_id)
    WHERE a.state = 1;
 
 CREATE VIEW v_asset_arc_input AS
