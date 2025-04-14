@@ -30,8 +30,7 @@ from qgis.utils import reloadPlugin
 from .gis_file_create import GwGisFileCreate
 from ..threads.task import GwTask
 from ..ui.ui_manager import GwAdminUi, GwAdminDbProjectUi, GwAdminRenameProjUi, GwAdminProjectInfoUi, \
-    GwAdminGisProjectUi, GwAdminFieldsUi, GwCredentialsUi, GwReplaceInFileUi, GwAdminDbProjectAssetUi, \
-    GwAdminDbProjectAuditUi, GwAdminCmProjectUi
+    GwAdminGisProjectUi, GwAdminFieldsUi, GwCredentialsUi, GwReplaceInFileUi, GwAdminCmProjectUi
 
 from ..utils import tools_gw
 from ... import global_vars
@@ -113,20 +112,10 @@ class GwAdminButton:
         self._init_show_database()
         self._info_show_database(connection_status=connection_status, username=username, show_dialog=show_dialog)
 
-    def create_project_data_other_schema(self):
+    def create_project_data_other_schema(self, project):
         """ Create other schema """
 
-        project = self.other_project
-
-        setattr(self, f"{project}_schema_name", tools_qt.get_text(getattr(self, f"dlg_readsql_create_{project}_project"), 'project_name'))
-        setattr(self, f"{project}_schema_description", tools_qt.get_text(getattr(self, f"dlg_readsql_create_{project}_project"), 'project_descript'))
-
-        # Save in settings
-        tools_gw.set_config_parser('btn_admin', f'project_name_{project}_schema', getattr(self, f"{project}_schema_name"), prefix=False)
-        tools_gw.set_config_parser('btn_admin', f'{project}_project_descript', getattr(self, f"{project}_schema_description"), prefix=False)
-
-        if not self._check_project_name(getattr(self, f"{project}_schema_name"), getattr(self, f"{project}_schema_description")):
-            return
+        self.other_project = project
 
         answer = tools_qt.show_question("This process will take time (few minutes). Are you sure to continue?", f"Create {project} schema")
         if not answer:
@@ -259,7 +248,7 @@ class GwAdminButton:
 
         description = f"Create {process_name} schema"
 
-        if process_name == "asset":
+        if process_name == "am":
             self.task_create_schema = GwCreateSchemaAssetTask(self, description, self.timer)
         elif process_name in ("audit", "audit_activation"):
             list_process = []
@@ -321,12 +310,7 @@ class GwAdminButton:
         self._manage_result_message(status, parameter=f"Process finished with success")
         if status:
             tools_db.dao.commit()
-            if hasattr(self, f"other_project"):
-                self._close_dialog_admin(getattr(self, f"dlg_readsql_create_{self.other_project}_project"))
-                if self.other_project == "audit":
-                    self.dlg_readsql.btn_activate_audit.setEnabled(True)
-                    self.dlg_readsql.btn_reload_audit_triggers.setEnabled(True)
-                    self.dlg_readsql.btn_create_audit.setEnabled(False)
+            self._set_buttons_enabled()
 
         else:
             tools_db.dao.rollback()
@@ -334,8 +318,7 @@ class GwAdminButton:
             self.error_count = 0
             tools_qt.show_exception_message(msg=lib_vars.session_vars['last_error_msg'])
             tools_qgis.show_info("A rollback on schema will be done.")
-            if hasattr(self, f"other_project"):
-                tools_gw.close_dialog(getattr(self, f"dlg_readsql_create_{self.other_project}_project"))
+
 
     def manage_cm_process_result(self):
         """"""
@@ -524,40 +507,6 @@ class GwAdminButton:
 
         # Set signals
         self._set_signals_create_project()
-
-    def  init_dialog_create_other_project(self):
-        """ Initialize dialog (only once) """
-        project = self.other_project
-
-        if project == "asset":
-            dialog = GwAdminDbProjectAssetUi(self)
-        elif project == "audit":
-            dialog = GwAdminDbProjectAuditUi(self)
-        setattr(self, f"dlg_readsql_create_{project}_project", dialog)
-
-        tools_gw.load_settings(dialog)
-        dialog.btn_cancel_task.hide()
-
-        # Find Widgets in form
-        setattr(self, f"project_{project}_name", dialog.findChild(QLineEdit, 'project_name'))
-        setattr(self, f"project_{project}_descript", dialog.findChild(QLineEdit, 'project_descript'))
-
-        # Load user values
-        name = tools_gw.get_config_parser('btn_admin', f'project_name_{project}_schema', "user", "session", False, force_reload=True)
-        getattr(self, f"project_{project}_name").setText(name)
-
-        descript = tools_gw.get_config_parser('btn_admin', f'{project}_project_descript', "user", "session", False, force_reload=True)
-        getattr(self, f"project_{project}_descript").setText(descript)
-
-        # Set shortcut keys
-        dialog.key_escape.connect(partial(tools_gw.close_dialog, dialog, False))
-
-        # Set signals
-        dialog.btn_cancel_task.clicked.connect(partial(self.cancel_task, f'task_create_{project}_schema'))
-        dialog.btn_accept.clicked.connect(partial(self.create_project_data_other_schema))
-        dialog.btn_close.clicked.connect(partial(tools_gw.close_dialog, dialog, False))
-
-        return dialog
 
     def init_dialog_create_cm_project(self):
         """ Initialize dialog (only once) """
@@ -902,17 +851,19 @@ class GwAdminButton:
         self.dlg_readsql.btn_update_translation.clicked.connect(partial(self._update_translations))
         self.dlg_readsql.btn_import_osm_streetaxis.clicked.connect(partial(self._import_osm))
 
-        self.dlg_readsql.btn_create_asset.clicked.connect(
-            partial(self._open_create_other_project, "Create Asset Project", "admin_assetdbproject", "asset"))
+        # Asset manage buttons
+        self.dlg_readsql.btn_create_asset.clicked.connect(partial(self.create_project_data_other_schema, 'am'))
+        self.dlg_readsql.btn_delete_asset.clicked.connect(partial(self._delete_other_schema, 'am'))
 
-        self.dlg_readsql.btn_create_audit.clicked.connect(
-            partial(self._open_create_other_project, "Create Audit Project", "admin_auditdbproject", "audit"))
-
-        self.dlg_readsql.btn_activate_audit.clicked.connect(partial(self._activate_audit))
-
-        self.dlg_readsql.btn_reload_audit_triggers.clicked.connect(partial(self._reload_audit_triggers))
-
+        # Campaign manage buttons
         self.dlg_readsql.btn_create_cm.clicked.connect(partial(self._open_create_cm_project))
+        self.dlg_readsql.btn_delete_cm.clicked.connect(partial(self._delete_other_schema, 'cm'))
+
+        # Audit buttons
+        self.dlg_readsql.btn_create_audit.clicked.connect(partial(self.create_project_data_other_schema, 'audit'))
+        self.dlg_readsql.btn_activate_audit.clicked.connect(partial(self._activate_audit))
+        self.dlg_readsql.btn_reload_audit_triggers.clicked.connect(partial(self._reload_audit_triggers))
+        self.dlg_readsql.btn_delete_audit.clicked.connect(partial(self._delete_other_schema, 'audit'))
 
         self.dlg_readsql.btn_i18n.clicked.connect(partial(self._i18n_manager))
 
@@ -1830,16 +1781,6 @@ class GwAdminButton:
         self.dlg_readsql_create_project.setWindowTitle(f"Create Project - {self.connection_name}")
         tools_gw.open_dialog(self.dlg_readsql_create_project, dlg_name='admin_dbproject')
 
-    def _open_create_other_project(self, title, dlg_name, other_project):
-        """Create Other Project"""
-
-        self.other_project = other_project
-        self.init_dialog_create_other_project()
-
-        # Open dialog
-        getattr(self, f"dlg_readsql_create_{other_project}_project").setWindowTitle(title)
-        tools_gw.open_dialog(getattr(self, f"dlg_readsql_create_{other_project}_project"), dlg_name=dlg_name)
-
     def _open_create_cm_project(self):
         """Create Cm Project"""
 
@@ -2252,6 +2193,20 @@ class GwAdminButton:
                 self._populate_data_schema_name(self.dlg_readsql.cmb_project_type)
                 self._manage_utils()
                 self._set_info_project()
+
+    def _delete_other_schema(self, schema):
+        """ Delete other schema """
+
+        msg = f"Are you sure you want delete schema '{schema}' ?"
+        result = tools_qt.show_question(msg, "Info", force_action=True)
+        if result:
+            sql = f'DROP SCHEMA IF EXISTS {schema} CASCADE;'
+            status = tools_db.execute_sql(sql)
+            if status:
+                msg = "Process finished successfully"
+                tools_qt.show_info_box(msg, "Info", parameter="Delete schema")
+                self._set_buttons_enabled()
+
 
     def _build_replace_dlg(self, replace_json):
 
@@ -3123,17 +3078,19 @@ class GwAdminButton:
         # Check project type
         project_type = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
 
-        # Button create asset schema
-        self.dlg_readsql.btn_create_asset.setEnabled(project_type == "ws" and schema_name != "null")
-
-        # Check if audit schema exists
-        sql = "SELECT schema_name FROM information_schema.schemata WHERE schema_name = 'audit'"
+        # Buttons to manage am
+        sql = "SELECT schema_name FROM information_schema.schemata WHERE schema_name = 'am'"
         rows = tools_db.get_rows(sql)
+        self.dlg_readsql.btn_create_asset.setEnabled(project_type == "ws" and schema_name != "null" and rows is None)
+        self.dlg_readsql.btn_delete_asset.setEnabled(rows is not None)
 
         # Buttons to manage audit
+        sql = "SELECT schema_name FROM information_schema.schemata WHERE schema_name = 'audit'"
+        rows = tools_db.get_rows(sql)
         self.dlg_readsql.btn_create_audit.setEnabled(schema_name != "null" and rows is None)
         self.dlg_readsql.btn_activate_audit.setEnabled(schema_name != "null" and rows is not None)
         self.dlg_readsql.btn_reload_audit_triggers.setEnabled(schema_name != "null" and rows is not None)
+        self.dlg_readsql.btn_delete_audit.setEnabled(rows is not None)
 
     def _manage_utils(self):
 

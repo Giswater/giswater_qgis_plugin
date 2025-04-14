@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>557</width>
+    <width>650</width>
     <height>911</height>
    </rect>
   </property>
@@ -59,7 +59,7 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>505</width>
+             <width>598</width>
              <height>799</height>
             </rect>
            </property>
@@ -390,7 +390,7 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>505</width>
+             <width>598</width>
              <height>836</height>
             </rect>
            </property>
@@ -526,17 +526,17 @@
                  <property name="topMargin">
                   <number>0</number>
                  </property>
-                 <item row="3" column="0">
-                  <widget class="QPushButton" name="btn_create_audit">
-                   <property name="text">
-                    <string>Create DB audit schema</string>
-                   </property>
-                  </widget>
-                 </item>
                  <item row="3" column="1">
                   <widget class="QPushButton" name="btn_activate_audit">
                    <property name="text">
                     <string>Activate audit environment</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="3" column="0">
+                  <widget class="QPushButton" name="btn_create_audit">
+                   <property name="text">
+                    <string>Create DB audit schema</string>
                    </property>
                   </widget>
                  </item>
@@ -547,10 +547,43 @@
                    </property>
                   </widget>
                  </item>
+                 <item row="3" column="3">
+                  <widget class="QPushButton" name="btn_delete_audit">
+                   <property name="text">
+                    <string/>
+                   </property>
+                   <property name="icon">
+                    <iconset>
+                     <normaloff>../../../icons/dialogs/114.png</normaloff>../../../icons/dialogs/114.png</iconset>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="3">
+                  <widget class="QPushButton" name="btn_delete_cm">
+                   <property name="text">
+                    <string/>
+                   </property>
+                   <property name="icon">
+                    <iconset>
+                     <normaloff>../../../icons/dialogs/112.png</normaloff>../../../icons/dialogs/112.png</iconset>
+                   </property>
+                  </widget>
+                 </item>
                  <item row="1" column="0" colspan="3">
                   <widget class="QPushButton" name="btn_create_cm">
                    <property name="text">
                     <string>Create DB cm schema</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="3">
+                  <widget class="QPushButton" name="btn_delete_asset">
+                   <property name="text">
+                    <string/>
+                   </property>
+                   <property name="icon">
+                    <iconset>
+                     <normaloff>../../../icons/dialogs/112.png</normaloff>../../../icons/dialogs/112.png</iconset>
                    </property>
                   </widget>
                  </item>
@@ -674,7 +707,7 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>505</width>
+             <width>598</width>
              <height>836</height>
             </rect>
            </property>
