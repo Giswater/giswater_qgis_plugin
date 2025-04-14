@@ -415,6 +415,13 @@ INSERT INTO om_reviewclass (id, idval, descript, active) VALUES(1, 'DEPOSITOS', 
 INSERT INTO om_reviewclass (id, idval, descript, active) VALUES(2, 'VALVULAS HIDRAULICAS', 'TEST INSERT', true);
 INSERT INTO om_reviewclass (id, idval, descript, active) VALUES(3, 'CAPAS PADRE', 'TEST INSERT', true);
 
-INSERT INTO om_reviewclass_x_layer (reviewclass_id, layer_id, schema_name, feature_type, active) VALUES(3, 've_node_pr_susta_valve', 'parent', 'NODE', true);
-INSERT INTO om_reviewclass_x_layer (reviewclass_id, layer_id, schema_name, feature_type, active) VALUES(3, 've_node_pr_break_valve', 'parent', 'NODE', true);
-INSERT INTO om_reviewclass_x_layer (reviewclass_id, layer_id, schema_name, feature_type, active) VALUES(3, 've_node_pr_reduc_valve', 'parent', 'NODE', true);
+INSERT INTO om_reviewclass_x_layer (reviewclass_id, layer_id, schema_name, feature_type, active) VALUES(1, 've_node_tank', 'parent', 'NODE', true);
+
+INSERT INTO om_reviewclass_x_layer (reviewclass_id, layer_id, schema_name, feature_type, active) VALUES(2, 've_node_pr_susta_valve', 'parent', 'NODE', true);
+INSERT INTO om_reviewclass_x_layer (reviewclass_id, layer_id, schema_name, feature_type, active) VALUES(2, 've_node_pr_break_valve', 'parent', 'NODE', true);
+INSERT INTO om_reviewclass_x_layer (reviewclass_id, layer_id, schema_name, feature_type, active) VALUES(2, 've_node_pr_reduc_valve', 'parent', 'NODE', true);
+
+INSERT INTO om_reviewclass_x_layer (reviewclass_id, layer_id, schema_name, feature_type, active) VALUES(3, 'v_edit_node', 'parent', 'NODE', true);
+INSERT INTO om_reviewclass_x_layer (reviewclass_id, layer_id, schema_name, feature_type, active) VALUES(3, 'v_edit_arc', 'parent', 'ARC', true);
+INSERT INTO om_reviewclass_x_layer (reviewclass_id, layer_id, schema_name, feature_type, active) VALUES(3, 'v_edit_connec', 'parent', 'CONNEC', true);
+INSERT INTO om_reviewclass_x_layer (reviewclass_id, layer_id, schema_name, feature_type, active) VALUES(3, 'v_edit_link', 'parent', 'LINK', true);
