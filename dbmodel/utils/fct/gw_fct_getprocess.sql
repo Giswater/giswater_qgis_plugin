@@ -15,7 +15,7 @@ AS $function$
 
 
 
-SELECT SCHEMA_NAME.gw_fct_getprocess($${"client":{"device":4, "lang":"CA", "infoType":1, "epsg":SRID_VALUE}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "functionId":2522}}$$);
+SELECT SCHEMA_NAME.gw_fct_getprocess($${"client":{"device":4, "lang":"CA", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "functionId":2522}}$$);
 
 
 */
@@ -83,8 +83,8 @@ BEGIN
 	v_state  = (SELECT expl_id FROM selector_expl WHERE cur_user = current_user limit 1);
 	v_inp_result = (SELECT result_id FROM selector_inp_result WHERE cur_user = current_user limit 1);
 	v_rpt_result = (SELECT result_id FROM selector_rpt_main WHERE cur_user = current_user limit 1);
-	v_inp_hydrology = (SELECT value FROM config_param_user WHERE parameter = 'inp_options_hydrology_current' AND cur_user = current_user limit 1);
-	v_inp_dwf = (SELECT value FROM config_param_user WHERE parameter = 'inp_options_dwfscenario_current' AND cur_user = current_user limit 1);
+	v_inp_hydrology = (SELECT value FROM config_param_user WHERE parameter = 'inp_options_hydrology_scenario' AND cur_user = current_user limit 1);
+	v_inp_dwf = (SELECT value FROM config_param_user WHERE parameter = 'inp_options_dwfscenario' AND cur_user = current_user limit 1);
 	v_inp_dscenario = (SELECT dscenario_id FROM selector_inp_dscenario WHERE cur_user = current_user limit 1);
 	v_sector = (SELECT sector_id FROM selector_sector WHERE cur_user = current_user AND sector_id > 0 limit 1 );
 
@@ -94,22 +94,24 @@ BEGIN
 	CREATE TEMP TABLE IF NOT EXISTS temp_sys_function AS SELECT*FROM sys_function;
 	CREATE TEMP TABLE IF NOT EXISTS temp_config_toolbox AS SELECT*FROM config_toolbox;
 
-	IF v_projectype = 'ws' THEN
+	IF v_projectype = 'ws' then
+	
 		v_mincut = (SELECT result_id FROM selector_mincut_result WHERE cur_user = current_user limit 1 );
 
-		-- get enddate proposal for demand dscenarios
-		PERFORM gw_fct_create_dscenario_from_crm($${"client":{"device":4, "lang":"ca_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"step":1, "exploitation":"1"}}}$$);
-
-		PERFORM gw_fct_waterbalance($${"client":{"device":4, "infoType":1, "lang":"ES"},"form":{}, "data":{"parameters":{"step":"1"}}}$$)::text;
+		if v_function_id in (3142, 3110) then
+			-- get enddate proposal for demand dscenarios
+			PERFORM gw_fct_create_dscenario_from_crm($${"client":{"device":4, "lang":"ca_ES", "infoType":1, "epsg":25831}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "parameters":{"step":1, "exploitation":"1"}}}$$);
+			PERFORM gw_fct_waterbalance($${"client":{"device":4, "infoType":1, "lang":"ES"},"form":{}, "data":{"parameters":{"step":"1"}}}$$)::text;
+		end if;
 
 	END IF;
 
 	IF v_projectype = 'ws' THEN
-		v_nodetype = (SELECT node_type FROM cat_node JOIN config_param_user ON cat_node.id = config_param_user.value
+		v_nodetype = (SELECT nodetype_id FROM cat_node JOIN config_param_user ON cat_node.id = config_param_user.value
 		WHERE cur_user = current_user AND parameter = 'edit_nodecat_vdefault');
-		IF v_nodetype IS NULL OR (SELECT id FROM cat_node WHERE node_type = v_nodetype limit 1) IS NULL THEN
+		IF v_nodetype IS NULL OR (SELECT id FROM cat_node WHERE nodetype_id = v_nodetype limit 1) IS NULL THEN
 			v_nodetype = (SELECT ctn.id FROM cat_feature_node ctn JOIN cat_feature USING  (id)
-			join cat_node cn ON cn.node_type=ctn.id  WHERE cat_feature.active IS TRUE and cn.active IS TRUE limit 1);
+			join cat_node cn ON cn.nodetype_id=ctn.id  WHERE cat_feature.active IS TRUE and cn.active IS TRUE limit 1);
 		END IF;
 	ELSE
 		v_nodetype = (SELECT value FROM config_param_user WHERE cur_user = current_user AND parameter = 'edit_nodetype_vdefault');
@@ -121,7 +123,11 @@ BEGIN
 	v_nodecat = (SELECT value FROM config_param_user WHERE cur_user = current_user AND parameter = 'edit_nodecat_vdefault');
 
 	IF v_nodecat IS NULL THEN
-		v_nodecat = (SELECT id FROM cat_node WHERE active IS true AND node_type = v_nodetype limit 1);
+		IF v_projectype = 'ws' THEN
+			v_nodecat = (SELECT id FROM cat_node WHERE active IS true AND nodetype_id = v_nodetype limit 1);
+		ELSIF  v_projectype = 'ud' THEN
+			v_nodecat = (SELECT id FROM cat_node WHERE active IS true AND node_type = v_nodetype limit 1);
+		END IF;
 
 		IF v_nodecat IS NULL and v_projectype = 'ud' THEN
 			v_nodecat = (SELECT id FROM cat_node WHERE active IS true limit 1);
@@ -132,8 +138,8 @@ BEGIN
 	-- get process parameters
 	v_querystring = concat('SELECT row_to_json(a) FROM (
 			 SELECT id, alias, descript, functionparams, inputparams AS fields, observ AS isnotparammsg, sys_role, function_name as functionname
-			 FROM sys_function 
-			 JOIN config_toolbox USING (id)
+			 FROM temp_sys_function
+			 JOIN temp_config_toolbox USING (id)
 			 WHERE id = '||v_function_id||') a');
 	v_debug_vars := json_build_object('v_filter', v_filter, 'v_projectype', v_projectype);
 	v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_gettoolbox', 'flag', 10);
@@ -142,8 +148,8 @@ BEGIN
 
 	-- refactor dvquerytext
 	FOR rec IN SELECT json_array_elements(inputparams::json) as inputparams, functionparams
-	FROM sys_function JOIN config_toolbox USING (id)
-	WHERE id = v_function_id  AND config_toolbox.active IS TRUE AND (project_type=v_projectype OR project_type='utils')
+	FROM temp_sys_function JOIN temp_config_toolbox USING (id)
+	WHERE id = v_function_id  AND temp_config_toolbox.active IS TRUE AND (project_type=v_projectype OR project_type='utils')
 	loop
 		v_querytext = rec.inputparams::json->>'dvQueryText';
 
