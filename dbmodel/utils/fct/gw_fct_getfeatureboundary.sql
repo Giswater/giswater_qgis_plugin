@@ -52,7 +52,7 @@ BEGIN
 	        v_querytext = concat(
 	            v_querytext,
 	            ' SELECT the_geom FROM ', v_table,
-	            ' WHERE lastupdate > ''', v_lastseed, '''::timestamp',
+	            ' WHERE updated_at > ''', v_lastseed, '''::timestamp',
 	            CASE
 	                WHEN v_extra IS NOT NULL AND v_extra <> ''
 	                THEN ' AND ' || v_extra

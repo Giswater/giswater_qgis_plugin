@@ -329,11 +329,11 @@ AS WITH
 			dwfzone_table.stylesheet ->> 'featureColor'::text AS dwfzone_style,
 			l.builtdate,
 			l.enddate,
-			date_trunc('second'::text, l.lastupdate) AS lastupdate,
-			l.lastupdate_user,
 			l.uncertain,
             l.datasource,
-            l.verified
+            l.verified,
+			date_trunc('second'::text, l.updated_at) AS updated_at,
+			l.updated_by
 			FROM inp_network_mode, link_selector
 			JOIN link l using (link_id)
 			JOIN selector_sector ss ON (ss.cur_user =current_user AND ss.sector_id = l.sector_id)
@@ -605,11 +605,6 @@ AS WITH
 			arc.adate,
 			arc.adescript,
 			arc.visitability,
-			date_trunc('second'::text, arc.tstamp) AS tstamp,
-			arc.insert_user,
-			date_trunc('second'::text, arc.lastupdate) AS lastupdate,
-			arc.lastupdate_user,
-			arc.the_geom,
 	        CASE
 	            WHEN arc.sector_id > 0 AND vst.is_operative = true AND arc.epa_type::text <> 'UNDEFINED'::character varying(16)::text THEN arc.epa_type
 	            ELSE NULL::character varying(16)
@@ -627,7 +622,12 @@ AS WITH
             arc.meandering,
             arc.conserv_state,
             arc.om_state,
-            arc.last_visitdate
+            arc.last_visitdate,
+            date_trunc('second'::text, arc.created_at) AS created_at,
+			arc.created_by,
+			date_trunc('second'::text, arc.updated_at) AS updated_at,
+			arc.updated_by,
+			arc.the_geom
 			FROM arc_selector
 			JOIN arc using (arc_id)
 			JOIN selector_sector sc ON (sc.cur_user = CURRENT_USER AND sc.sector_id = arc.sector_id)
@@ -772,7 +772,6 @@ AS WITH
 			node.rotation,
 			concat(cat_feature.link_path, node.link) AS link,
 			node.verified,
-			node.the_geom,
 			node.undelete,
 			cat_node.label,
 			node.label_x,
@@ -785,10 +784,6 @@ AS WITH
 			node.xyz_date,
 			node.unconnected,
 			node.num_value,
-			date_trunc('second'::text, node.tstamp) AS tstamp,
-			node.insert_user,
-			date_trunc('second'::text, node.lastupdate) AS lastupdate,
-			node.lastupdate_user,
 			node.workcat_id_plan,
 			node.asset_id,
 			node.parent_id,
@@ -815,7 +810,12 @@ AS WITH
             (SELECT ST_Y(node.the_geom)) AS ycoord,
             (SELECT ST_Y(ST_Transform(node.the_geom, 4326))) AS lat,
             (SELECT ST_X(ST_Transform(node.the_geom, 4326))) AS long,
-            node.hemisphere
+            node.hemisphere,
+            date_trunc('second'::text, node.created_at) AS created_at,
+			node.created_by,
+			date_trunc('second'::text, node.updated_at) AS updated_at,
+			node.updated_by,
+			node.the_geom
 			FROM node_selector
 			JOIN node USING (node_id)
 			JOIN selector_sector sc ON (sc.cur_user = CURRENT_USER AND sc.sector_id = node.sector_id)
@@ -903,7 +903,6 @@ AS WITH
 			rotation,
 			link,
 			verified,
-			the_geom,
 			undelete,
 			label,
 			label_x,
@@ -916,10 +915,6 @@ AS WITH
 			xyz_date,
 			unconnected,
 			num_value,
-			tstamp,
-			insert_user,
-			lastupdate,
-			lastupdate_user,
 			workcat_id_plan,
 			asset_id,
 			parent_id,
@@ -943,7 +938,12 @@ AS WITH
             ycoord,
             lat,
             long,
-            hemisphere
+            hemisphere,
+            created_at,
+			created_by,
+			updated_at,
+			updated_by,
+			the_geom
 			FROM node_selected
 		)
 	SELECT node_base.*
@@ -1120,11 +1120,6 @@ AS WITH
 				WHEN link_planned.exit_type IS NULL THEN connec.pjoint_type
 				ELSE link_planned.exit_type
 			END AS pjoint_type,
-			connec.tstamp,
-			connec.insert_user,
-			connec.lastupdate,
-			connec.lastupdate_user,
-			connec.the_geom,
 			connec.workcat_id_plan,
 			connec.asset_id,
 			connec.expl_id2,
@@ -1140,7 +1135,12 @@ AS WITH
             (SELECT ST_X(connec.the_geom)) AS xcoord,
             (SELECT ST_Y(connec.the_geom)) AS ycoord,
             (SELECT ST_Y(ST_Transform(connec.the_geom, 4326))) AS lat,
-            (SELECT ST_X(ST_Transform(connec.the_geom, 4326))) AS long
+            (SELECT ST_X(ST_Transform(connec.the_geom, 4326))) AS long,
+            date_trunc('second'::text, connec.created_at) AS created_at,
+			connec.created_by,
+			date_trunc('second'::text, connec.updated_at) AS updated_at,
+			connec.updated_by,
+			connec.the_geom
 			FROM connec_selector
 			JOIN connec USING (connec_id)
 			JOIN selector_sector sc ON (sc.cur_user = CURRENT_USER AND sc.sector_id = connec.sector_id)
@@ -1374,14 +1374,14 @@ AS WITH
 			gully.odorflap,
 			gully.placement_type,
 			gully.access_type,
-			date_trunc('second'::text, gully.tstamp) AS tstamp,
-			gully.insert_user,
-			date_trunc('second'::text, gully.lastupdate) AS lastupdate,
-			gully.lastupdate_user,
-			gully.the_geom,
 			gully.lock_level,
 			gully.length,
-			gully.width
+			gully.width,
+            date_trunc('second'::text, gully.created_at) AS created_at,
+			gully.created_by,
+			date_trunc('second'::text, gully.updated_at) AS updated_at,
+			gully.updated_by,
+			gully.the_geom
 			FROM inp_network_mode, gully_selector
 			JOIN gully using (gully_id)
 			JOIN selector_sector sc ON (sc.cur_user = CURRENT_USER AND sc.sector_id = gully.sector_id)

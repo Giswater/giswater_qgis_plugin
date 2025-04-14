@@ -325,7 +325,7 @@ BEGIN
 			END IF;
 
 			-- hidden lastupdate and lastupdate_user columns
-			update config_form_fields SET hidden = true WHERE columnname IN ('lastupdate', 'lastupdate_user', 'publish', 'uncertain');
+			update config_form_fields SET hidden = true WHERE columnname IN ('updated_at', 'updated_by', 'lastupdate', 'lastupdate_user', 'publish', 'uncertain');
 
 			-- disable edit_noderotation_update_dsbl
 			UPDATE sys_param_user SET ismandatory = true, vdefault ='TRUE' WHERE id = 'edit_noderotation_update_dsbl';

@@ -43,8 +43,8 @@ FROM cat_connec ON CONFLICT DO NOTHING;
 INSERT INTO cat_link (id, link_type) VALUES ('UPDATE_LINK_40','SERVCONNECTION');
 
 INSERT INTO link (link_id, code, feature_id, feature_type, exit_id, exit_type, userdefined_geom, state, expl_id, the_geom,
-tstamp, sector_id, omzone_id, fluid_type, expl_id2, epa_type, is_operative, insert_user, lastupdate,
-lastupdate_user, linkcat_id, workcat_id, workcat_id_end, builtdate, enddate, drainzone_id, uncertain, muni_id, verified,
+created_at, sector_id, omzone_id, fluid_type, expl_id2, epa_type, is_operative, created_by, updated_at,
+updated_by, linkcat_id, workcat_id, workcat_id_end, builtdate, enddate, drainzone_id, uncertain, muni_id, verified,
 macrominsector_id, top_elev1, top_elev2, y2)
 SELECT nextval('SCHEMA_NAME.urn_id_seq'::regclass), link_id::text, feature_id, feature_type, exit_id, exit_type, userdefined_geom, state, expl_id, the_geom,
 tstamp, sector_id, dma_id, fluid_type, expl_id2, epa_type, is_operative, insert_user, lastupdate, lastupdate_user,
