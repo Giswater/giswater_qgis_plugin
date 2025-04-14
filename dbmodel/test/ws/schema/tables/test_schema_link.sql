@@ -20,11 +20,11 @@ SELECT columns_are(
     'link',
     ARRAY[
         'link_id', 'code', 'feature_id', 'feature_type', 'linkcat_id', 'top_elev1', 'depth1', 'exit_id', 'exit_type',
-        'top_elev2', 'depth2', 'userdefined_geom', 'state', 'expl_id', 'the_geom', 'tstamp', 'sector_id', 'dma_id',
-        'fluid_type', 'presszone_id', 'dqa_id', 'minsector_id', 'expl_id2', 'epa_type', 'is_operative', 'insert_user',
-        'lastupdate', 'lastupdate_user', 'staticpressure', 'workcat_id', 'workcat_id_end', 'builtdate', 'enddate',
+        'top_elev2', 'depth2', 'userdefined_geom', 'state', 'expl_id', 'sector_id', 'dma_id',
+        'fluid_type', 'presszone_id', 'dqa_id', 'minsector_id', 'expl_id2', 'epa_type', 'is_operative',
+        'staticpressure', 'workcat_id', 'workcat_id_end', 'builtdate', 'enddate',
         'uncertain', 'muni_id', 'macrominsector_id', 'verified', 'supplyzone_id', 'n_hydrometer', 'custom_length', 'datasource',
-        'omzone_id'
+        'omzone_id', 'the_geom', 'created_at', 'created_by', 'updated_at', 'updated_by'
     ],
     'Table link should have the correct columns'
 );
@@ -47,8 +47,12 @@ SELECT col_type_is('link', 'depth2', 'numeric(12,4)', 'Column depth2 should be n
 SELECT col_type_is('link', 'userdefined_geom', 'boolean', 'Column userdefined_geom should be boolean');
 SELECT col_type_is('link', 'state', 'smallint', 'Column state should be smallint');
 SELECT col_type_is('link', 'expl_id', 'integer', 'Column expl_id should be integer');
-SELECT col_type_is('link', 'the_geom', 'geometry(LineString,25831)', 'Column the_geom should be geometry(LineString,25831)');
 SELECT col_type_is('link', 'omzone_id', 'integer', 'Column omzone_id should be integer');
+SELECT col_type_is('link', 'the_geom', 'geometry(LineString,SRID_VALUE)', 'Column the_geom should be geometry(LineString,SRID_VALUE)');
+SELECT col_type_is('link', 'created_at', 'timestamp with time zone', 'Column created_at should be timestamp with time zone');
+SELECT col_type_is('link', 'created_by', 'varchar(50)', 'Column created_by should be varchar(50)');
+SELECT col_type_is('link', 'updated_at', 'timestamp with time zone', 'Column updated_at should be timestamp with time zone');
+SELECT col_type_is('link', 'updated_by', 'varchar(50)', 'Column updated_by should be varchar(50)');
 
 -- Check not null constraints
 SELECT col_not_null('link', 'linkcat_id', 'Column linkcat_id should be NOT NULL');
@@ -56,8 +60,8 @@ SELECT col_not_null('link', 'state', 'Column state should be NOT NULL');
 SELECT col_not_null('link', 'expl_id', 'Column expl_id should be NOT NULL');
 
 -- Check default values
-SELECT col_default_is('link', 'tstamp', 'now()', 'Column tstamp should default to now()');
-SELECT col_default_is('link', 'insert_user', 'CURRENT_USER', 'Column insert_user should default to CURRENT_USER');
+SELECT col_default_is('link', 'created_at', 'now()', 'Column created_at should default to now()');
+SELECT col_default_is('link', 'created_by', 'CURRENT_USER', 'Column created_by should default to CURRENT_USER');
 SELECT col_default_is('link', 'macrominsector_id', '0', 'Column macrominsector_id should default to 0');
 
 -- Check indexes

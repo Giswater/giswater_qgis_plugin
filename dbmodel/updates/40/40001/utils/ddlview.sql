@@ -140,8 +140,6 @@ SELECT element.element_id,
     element.undelete,
     element.expl_id,
     element.pol_id,
-    element.lastupdate,
-    element.lastupdate_user,
     element.top_elev,
     element.expl_id2,
     element.trace_featuregeom,
@@ -149,7 +147,11 @@ SELECT element.element_id,
     element.sector_id,
     element.lock_level,
     cat_feature_element.geometry_type,
-    element.the_geom
+    element.the_geom,
+    element.created_at,
+    element.created_by,
+    element.updated_at,
+    element.updated_by
    FROM selector_expl, element
     JOIN cat_element ON element.elementcat_id::text = cat_element.id::text
     LEFT JOIN cat_feature_element ON cat_element.element_type::text = cat_feature_element.id::text
@@ -193,8 +195,6 @@ SELECT element.element_id,
     element.undelete,
     element.expl_id,
     element.pol_id,
-    element.lastupdate,
-    element.lastupdate_user,
     element.top_elev,
     element.expl_id2,
     element.trace_featuregeom,
@@ -202,7 +202,11 @@ SELECT element.element_id,
     element.sector_id,
     element.lock_level,
     cat_feature_element.geometry_type,
-    element.the_geom
+    element.the_geom,
+    element.created_at,
+    element.created_by,
+    element.updated_at,
+    element.updated_by
    FROM selector_expl, element
      JOIN cat_element ON element.elementcat_id::text = cat_element.id::text
     LEFT JOIN cat_feature_element ON cat_element.element_type::text = cat_feature_element.id::text
@@ -367,43 +371,6 @@ AS SELECT
      LEFT JOIN man_type_location ON man_type_location.location_type::text = v_edit_element.location_type::text AND man_type_location.feature_type::text = 'ELEMENT'::text
      LEFT JOIN cat_element ON cat_element.id::text = v_edit_element.elementcat_id::text;
 
-CREATE OR REPLACE VIEW v_ui_element
-AS SELECT element.element_id AS id,
-    element.code,
-    element.elementcat_id,
-    element.brand_id,
-    element.model_id,
-    element.serial_number,
-    element.num_elements,
-    element.state,
-    element.state_type,
-    element.observ,
-    element.comment,
-    element.function_type,
-    element.category_type,
-    element.fluid_type,
-    element.location_type,
-    element.workcat_id,
-    element.workcat_id_end,
-    element.builtdate,
-    element.enddate,
-    element.ownercat_id,
-    element.rotation,
-    element.link,
-    element.verified,
-    element.the_geom,
-    element.label_x,
-    element.label_y,
-    element.label_rotation,
-    element.undelete,
-    element.publish,
-    element.inventory,
-    element.expl_id,
-    element.feature_type,
-    element.tstamp
-   FROM element;
-
-
 CREATE OR REPLACE VIEW v_edit_flwreg AS
   SELECT element.element_id,
     element.code,
@@ -442,15 +409,17 @@ CREATE OR REPLACE VIEW v_edit_flwreg AS
     element.undelete,
     element.expl_id,
     element.pol_id,
-    element.lastupdate,
-    element.lastupdate_user,
     element.top_elev,
     element.expl_id2,
     element.trace_featuregeom,
     element.muni_id,
     element.sector_id,
     element.lock_level,
-    element.the_geom
+    element.the_geom,
+    element.created_at,
+    element.created_by,
+    element.updated_at,
+    element.updated_by
    FROM element
       JOIN cat_element ON element.elementcat_id::text = cat_element.id::text
       JOIN man_flwreg ON element.element_id::text = man_flwreg.element_id::text
@@ -692,7 +661,6 @@ AS SELECT element.element_id AS id,
     element.rotation,
     element.link,
     element.verified,
-    element.the_geom,
     element.label_x,
     element.label_y,
     element.label_rotation,
@@ -700,8 +668,12 @@ AS SELECT element.element_id AS id,
     element.publish,
     element.inventory,
     element.expl_id,
+    element.the_geom,
     element.feature_type,
-    element.tstamp
+    element.created_at,
+    element.created_by,
+    element.updated_at,
+    element.updated_by
    FROM element;
 
 CREATE OR REPLACE VIEW v_state_arc

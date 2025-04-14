@@ -42,7 +42,7 @@ BEGIN
 						NEW.top_elev1 = (SELECT top_elev FROM gully WHERE gully_id=NEW.feature_id LIMIT 1);
 					END IF;
 				END IF;
-				
+
 				UPDATE link l
 				SET linkcat_id = NEW.linkcat_id, top_elev1 = NEW.top_elev1
 				WHERE l.feature_id = NEW.feature_id AND l.state > 0 AND l.link_id = NEW.link_id;
@@ -83,7 +83,7 @@ BEGIN
 
 		ELSIF v_feature_type = 'LINK' THEN
 			-- only apply for traceability when the_geom changes
-			UPDATE link SET lastupdate = now(), lastupdate_user = current_user WHERE link_id = NEW.link_id;
+			UPDATE link SET updated_at = now(), updated_by = current_user WHERE link_id = NEW.link_id;
 		END IF;
 	END IF;
 

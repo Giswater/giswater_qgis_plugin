@@ -23,13 +23,13 @@ SELECT columns_are(
         'observ', 'comment', 'custom_length', 'dma_id', 'presszone_id', 'soilcat_id', 'function_type', 'category_type',
         'fluid_type', 'location_type', 'workcat_id', 'workcat_id_end', 'builtdate', 'enddate', 'ownercat_id', 'muni_id',
         'postcode', 'streetaxis_id', 'postnumber', 'postcomplement', 'streetaxis2_id', 'postnumber2', 'postcomplement2',
-        'descript', 'link', 'verified', 'the_geom', 'undelete', 'label_x', 'label_y', 'label_rotation', 'publish',
-        'inventory', 'expl_id', 'num_value', 'feature_type', 'tstamp', 'lastupdate', 'lastupdate_user', 'insert_user',
+        'descript', 'link', 'verified', 'undelete', 'label_x', 'label_y', 'label_rotation', 'publish',
+        'inventory', 'expl_id', 'num_value', 'feature_type',
         'minsector_id', 'dqa_id', 'district_id', 'adate', 'adescript', 'workcat_id_plan', 'asset_id', 'pavcat_id',
         'nodetype_1', 'elevation1', 'depth1', 'staticpress1', 'nodetype_2', 'elevation2', 'depth2', 'staticpress2',
         'om_state', 'conserv_state', 'parent_id', 'expl_id2', 'brand_id', 'model_id', 'serial_number', 'label_quadrant',
         'macrominsector_id', 'streetname', 'streetname2', 'supplyzone_id', 'datasource', 'lock_level', 'is_scadamap',
-        'omzone_id'
+        'omzone_id', 'the_geom', 'created_at', 'created_by', 'updated_at', 'updated_by'
     ],
     'Table arc should have the correct columns'
 );
@@ -94,7 +94,6 @@ SELECT col_type_is('arc', 'postcomplement2', 'varchar(100)', 'Column postcomplem
 SELECT col_type_is('arc', 'descript', 'varchar(254)', 'Column descript should be varchar(254)');
 SELECT col_type_is('arc', 'link', 'varchar(512)', 'Column link should be varchar(512)');
 SELECT col_type_is('arc', 'verified', 'integer', 'Column verified should be integer');
-SELECT col_type_is('arc', 'the_geom', 'geometry(LineString,25831)', 'Column the_geom should be geometry(LineString,25831)');
 SELECT col_type_is('arc', 'undelete', 'boolean', 'Column undelete should be boolean');
 SELECT col_type_is('arc', 'label_x', 'varchar(30)', 'Column label_x should be varchar(30)');
 SELECT col_type_is('arc', 'label_y', 'varchar(30)', 'Column label_y should be varchar(30)');
@@ -104,10 +103,6 @@ SELECT col_type_is('arc', 'inventory', 'boolean', 'Column inventory should be bo
 SELECT col_type_is('arc', 'expl_id', 'integer', 'Column expl_id should be integer');
 SELECT col_type_is('arc', 'num_value', 'numeric(12,3)', 'Column num_value should be numeric(12,3)');
 SELECT col_type_is('arc', 'feature_type', 'varchar(16)', 'Column feature_type should be varchar(16)');
-SELECT col_type_is('arc', 'tstamp', 'timestamp', 'Column tstamp should be timestamp');
-SELECT col_type_is('arc', 'lastupdate', 'timestamp', 'Column lastupdate should be timestamp');
-SELECT col_type_is('arc', 'lastupdate_user', 'varchar(50)', 'Column lastupdate_user should be varchar(50)');
-SELECT col_type_is('arc', 'insert_user', 'varchar(50)', 'Column insert_user should be varchar(50)');
 SELECT col_type_is('arc', 'minsector_id', 'integer', 'Column minsector_id should be integer');
 SELECT col_type_is('arc', 'dqa_id', 'integer', 'Column dqa_id should be integer');
 SELECT col_type_is('arc', 'district_id', 'integer', 'Column district_id should be integer');
@@ -140,7 +135,11 @@ SELECT col_type_is('arc', 'datasource', 'integer', 'Column datasource should be 
 SELECT col_type_is('arc', 'lock_level', 'integer', 'Column lock_level should be integer');
 SELECT col_type_is('arc', 'is_scadamap', 'boolean', 'Column is_scadamap should be boolean');
 SELECT col_type_is('arc', 'omzone_id', 'integer', 'Column omzone_id should be integer');
-
+SELECT col_type_is('arc', 'the_geom', 'geometry(LineString,SRID_VALUE)', 'Column the_geom should be geometry(LineString,SRID_VALUE)');
+SELECT col_type_is('arc', 'created_at', 'timestamp with time zone', 'Column created_at should be timestamp with time zone');
+SELECT col_type_is('arc', 'created_by', 'varchar(50)', 'Column created_by should be varchar(50)');
+SELECT col_type_is('arc', 'updated_at', 'timestamp with time zone', 'Column updated_at should be timestamp with time zone');
+SELECT col_type_is('arc', 'updated_by', 'varchar(50)', 'Column updated_by should be varchar(50)');
 
 -- Check foreign keys
 SELECT has_fk('arc', 'Table arc should have foreign keys');

@@ -760,13 +760,13 @@ BEGIN
 
 		IF v_islastupdate IS TRUE THEN
 
-			v_querytext = 'UPDATE temp_t_arc SET lastupdate = now(), lastupdate_user=current_user FROM temp_t_anlgraph t WHERE temp_t_arc.arc_id = t.arc_id AND water = 1';
+			v_querytext = 'UPDATE temp_t_arc SET updated_at = now(), updated_by=current_user FROM temp_t_anlgraph t WHERE temp_t_arc.arc_id = t.arc_id AND water = 1';
 			EXECUTE v_querytext;
 
-			v_querytext = 'UPDATE temp_t_node SET lastupdate = now(), lastupdate_user=current_user FROM temp_t_arc a WHERE a.arc_id=temp_t_node.arc_id';
+			v_querytext = 'UPDATE temp_t_node SET updated_at = now(), updated_by=current_user FROM temp_t_arc a WHERE a.arc_id=temp_t_node.arc_id';
 			EXECUTE v_querytext;
 
-			EXECUTE 'UPDATE temp_t_node SET lastupdate = now(), lastupdate_user=current_user  FROM (
+			EXECUTE 'UPDATE temp_t_node SET updated_at = now(), updated_by=current_user  FROM (
 			SELECT distinct on(node) node, trace FROM(
 
 			select node, count(*) c, trace FROM(
@@ -780,14 +780,14 @@ BEGIN
 			)c order by node, c desc)a
 			WHERE node = node_id';
 
-			v_querytext = 'UPDATE temp_t_connec SET lastupdate = now(), lastupdate_user=current_user FROM temp_t_arc a WHERE a.arc_id=temp_t_connec.arc_id';
+			v_querytext = 'UPDATE temp_t_connec SET updated_at = now(), updated_by=current_user FROM temp_t_arc a WHERE a.arc_id=temp_t_connec.arc_id';
 			EXECUTE v_querytext;
 
 			-- update link table
-			EXECUTE 'UPDATE temp_t_link SET lastupdate = now(), lastupdate_user=current_user;';
+			EXECUTE 'UPDATE temp_t_link SET updated_at = now(), updated_by=current_user;';
 
 			IF v_project_type='UD' THEN
-				v_querytext = 'UPDATE temp_t_gully SET lastupdate = now(), lastupdate_user=current_user FROM temp_t_arc a WHERE a.arc_id=temp_t_gully.arc_id';
+				v_querytext = 'UPDATE temp_t_gully SET updated_at = now(), updated_by=current_user FROM temp_t_arc a WHERE a.arc_id=temp_t_gully.arc_id';
 				EXECUTE v_querytext;
 			END IF;
 		END IF;
@@ -1394,7 +1394,7 @@ BEGIN
 		EXECUTE v_querytext;
 
 		-- arcs
-		v_querytext = 'UPDATE arc SET '||quote_ident(v_field)||' = a.'||quote_ident(v_field)||', lastupdate_user = a.lastupdate_user, lastupdate = a.lastupdate 
+		v_querytext = 'UPDATE arc SET '||quote_ident(v_field)||' = a.'||quote_ident(v_field)||', updated_by = a.updated_by, updated_at = a.updated_at 
 		FROM temp_t_arc a WHERE a.arc_id=arc.arc_id';
 		EXECUTE v_querytext;
 		IF v_class = 'PRESSZONE' THEN
@@ -1404,7 +1404,7 @@ BEGIN
 		END IF;
 
 		-- node
-		v_querytext = 'UPDATE node SET '||quote_ident(v_field)||' = n.'||quote_ident(v_field)||', lastupdate_user = n.lastupdate_user, lastupdate = n.lastupdate 
+		v_querytext = 'UPDATE node SET '||quote_ident(v_field)||' = n.'||quote_ident(v_field)||', updated_by = n.updated_by, updated_at = n.updated_at 
 		FROM temp_t_node n WHERE n.node_id=node.node_id';
 		EXECUTE v_querytext;
 		IF v_class = 'PRESSZONE' THEN
@@ -1412,7 +1412,7 @@ BEGIN
 		END IF;
 
 		-- connec state = 1
-		v_querytext = 'UPDATE connec SET '||quote_ident(v_field)||' = c.'||quote_ident(v_field)||', lastupdate_user = c.lastupdate_user, lastupdate = c.lastupdate 
+		v_querytext = 'UPDATE connec SET '||quote_ident(v_field)||' = c.'||quote_ident(v_field)||', updated_by = c.updated_by, updated_at = c.updated_at 
 		FROM temp_t_connec c WHERE c.connec_id=connec.connec_id';
 		EXECUTE v_querytext;
 		IF v_class = 'PRESSZONE' THEN
@@ -1424,14 +1424,14 @@ BEGIN
 			UPDATE link SET staticpressure = l.staticpressure FROM temp_t_link l WHERE l.link_id=link.link_id;
 		END IF;
 
-		v_querytext = 'UPDATE link SET '||quote_ident(v_field)||' = l.'||quote_ident(v_field)||', lastupdate_user = l.lastupdate_user, lastupdate = l.lastupdate 
+		v_querytext = 'UPDATE link SET '||quote_ident(v_field)||' = l.'||quote_ident(v_field)||', updated_by = l.updated_by, updated_at = l.updated_at 
 		FROM temp_t_link l WHERE link.link_id = l.link_id';
 		EXECUTE v_querytext;
 
 		IF v_project_type = 'UD' THEN
 
 			-- gully
-			v_querytext = 'UPDATE gully SET '||quote_ident(v_field)||' = g.'||quote_ident(v_field)||', lastupdate_user = g.lastupdate_user, lastupdate = g.lastupdate 
+			v_querytext = 'UPDATE gully SET '||quote_ident(v_field)||' = g.'||quote_ident(v_field)||', updated_by = g.updated_by, updated_at = g.updated_at 
 			FROM temp_t_gully g WHERE g.gully_id=gully.gully_id';
 			EXECUTE v_querytext;
 		END IF;
@@ -1443,7 +1443,7 @@ BEGIN
 
 	ELSIF v_netscenario IS NOT NULL THEN
 
-		v_querytext = 'UPDATE plan_netscenario_'||v_table||' SET the_geom = t.the_geom, lastupdate = now(), lastupdate_user=current_user FROM temp_'||v_table||
+		v_querytext = 'UPDATE plan_netscenario_'||v_table||' SET the_geom = t.the_geom, updated_at = now(), updated_by=current_user FROM temp_'||v_table||
 		' t WHERE t.'||v_field||' = plan_netscenario_'||v_table||'.'||v_field||' 
 		AND plan_netscenario_'||v_table||'.netscenario_id = '||v_netscenario||'';
 		EXECUTE v_querytext;

@@ -197,10 +197,10 @@ AS WITH
       e.vel_max,
       e.vel_min,
       e.vel_avg,
-      date_trunc('second'::text, arc.tstamp) AS tstamp,
-      arc.insert_user,
-      date_trunc('second'::text, arc.lastupdate) AS lastupdate,
-      arc.lastupdate_user,
+      date_trunc('second'::text, arc.created_at) AS created_at,
+      arc.created_by,
+      date_trunc('second'::text, arc.updated_at) AS updated_at,
+      arc.updated_by,
       arc.the_geom,
       arc.lock_level,
       CASE
@@ -411,10 +411,10 @@ AS WITH
         e.quality_max,
         e.quality_min,
         e.quality_avg,
-        date_trunc('second'::text, node.tstamp) AS tstamp,
-        node.insert_user,
-        date_trunc('second'::text, node.lastupdate) AS lastupdate,
-        node.lastupdate_user,
+        date_trunc('second'::text, node.created_at) AS created_at,
+        node.created_by,
+        date_trunc('second'::text, node.updated_at) AS updated_at,
+        node.updated_by,
         node.the_geom,
         CASE
           WHEN node.sector_id > 0 AND vst.is_operative = true AND node.epa_type::text <> 'UNDEFINED'::character varying(16)::text THEN node.epa_type
@@ -557,7 +557,6 @@ AS WITH
         l.fluid_type,
         st_length(l.the_geom)::numeric(12,3) AS gis_length,
         l.custom_length,
-        l.the_geom,
         l.muni_id,
         l.expl_id2,
         l.epa_type,
@@ -570,8 +569,6 @@ AS WITH
         l.workcat_id_end,
         l.builtdate,
         l.enddate,
-        l.lastupdate,
-        l.lastupdate_user,
         l.uncertain,
         l.minsector_id,
         l.macrominsector_id,
@@ -582,7 +579,12 @@ AS WITH
         END AS inp_type,
         l.verified,
         l.n_hydrometer,
-        l.datasource
+        l.datasource,
+        l.the_geom,
+        l.created_at,
+        l.created_by,
+        l.updated_at,
+        l.updated_by
         FROM inp_network_mode, link_selector
         JOIN link l using (link_id)
         LEFT JOIN connec c ON c.connec_id = l.feature_id
@@ -873,10 +875,10 @@ AS WITH
         e.quality_max,
         e.quality_min,
         e.quality_avg,
-        date_trunc('second'::text, connec.tstamp) AS tstamp,
-        connec.insert_user,
-        date_trunc('second'::text, connec.lastupdate) AS lastupdate,
-        connec.lastupdate_user,
+        date_trunc('second'::text, connec.created_at) AS created_at,
+        connec.created_by,
+        date_trunc('second'::text, connec.updated_at) AS updated_at,
+        connec.updated_by,
         connec.the_geom,
         connec.n_inhabitants,
         connec.lock_level,
@@ -1380,7 +1382,10 @@ AS SELECT
     element.serial_number,
     element.brand_id,
     element.model_id,
-    element.lastupdate
+    element.created_at,
+    element.created_by,
+    element.updated_at,
+    element.updated_by
    FROM element_x_arc
      JOIN element ON element.element_id::text = element_x_arc.element_id::text
      JOIN value_state ON element.state = value_state.id
@@ -1409,7 +1414,10 @@ AS SELECT
     element.serial_number,
     element.brand_id,
     element.model_id,
-    element.lastupdate
+    element.created_at,
+    element.created_by,
+    element.updated_at,
+    element.updated_by
    FROM element_x_connec
      JOIN element ON element.element_id::text = element_x_connec.element_id::text
      JOIN value_state ON element.state = value_state.id
@@ -1437,7 +1445,10 @@ AS SELECT
     element.serial_number,
     element.brand_id,
     element.model_id,
-    element.lastupdate
+    element.created_at,
+    element.created_by,
+    element.updated_at,
+    element.updated_by
    FROM element_x_node
      JOIN element ON element.element_id::text = element_x_node.element_id::text
      JOIN value_state ON element.state = value_state.id
@@ -1465,7 +1476,10 @@ AS SELECT
     element.serial_number,
     element.brand_id,
     element.model_id,
-    element.lastupdate
+    element.created_at,
+    element.created_by,
+    element.updated_at,
+    element.updated_by
    FROM element_x_link
      JOIN element ON element.element_id::text = element_x_link.element_id::text
      JOIN value_state ON element.state = value_state.id
@@ -1639,44 +1653,6 @@ UNION
   WHERE v_edit_connec.pjoint_type::text = 'NODE'::text AND ext_cat_period.id::text = (( SELECT config_param_user.value
            FROM config_param_user
           WHERE config_param_user.cur_user::name = "current_user"() AND config_param_user.parameter::text = 'inp_options_rtc_period_id'::text));
-
-
-CREATE OR REPLACE VIEW v_ui_element
-AS SELECT element.element_id AS id,
-    element.code,
-    element.elementcat_id,
-    element.brand_id,
-    element.model_id,
-    element.serial_number,
-    element.num_elements,
-    element.state,
-    element.state_type,
-    element.observ,
-    element.comment,
-    element.function_type,
-    element.category_type,
-    element.fluid_type,
-    element.location_type,
-    element.workcat_id,
-    element.workcat_id_end,
-    element.builtdate,
-    element.enddate,
-    element.ownercat_id,
-    element.rotation,
-    element.link,
-    element.verified,
-    element.the_geom,
-    element.label_x,
-    element.label_y,
-    element.label_rotation,
-    element.undelete,
-    element.publish,
-    element.inventory,
-    element.expl_id,
-    element.feature_type,
-    element.tstamp
-   FROM element;
-
 
 CREATE OR REPLACE VIEW v_plan_node
 AS SELECT a.node_id,
@@ -6094,10 +6070,10 @@ AS WITH streetaxis AS (
     e.quality_max,
     e.quality_min,
     e.quality_avg,
-    date_trunc('second'::text, node.tstamp) AS tstamp,
-    node.insert_user,
-    date_trunc('second'::text, node.lastupdate) AS lastupdate,
-    node.lastupdate_user,
+    date_trunc('second'::text, node.created_at) AS created_at,
+    node.created_by,
+    date_trunc('second'::text, node.updated_at) AS updated_at,
+    node.updated_by,
     node.the_geom,
         CASE
             WHEN vst.is_operative = true AND node.epa_type::text <> 'UNDEFINED'::character varying(16)::text THEN node.epa_type
@@ -6273,10 +6249,10 @@ AS WITH streetaxis AS (
     e.vel_min,
     e.vel_avg,
     e.result_id,
-    date_trunc('second'::text, connec.tstamp) AS tstamp,
-    connec.insert_user,
-    date_trunc('second'::text, connec.lastupdate) AS lastupdate,
-    connec.lastupdate_user,
+    date_trunc('second'::text, connec.created_at) AS created_at,
+    connec.created_by,
+    date_trunc('second'::text, connec.updated_at) AS updated_at,
+    connec.updated_by,
     connec.the_geom,
         CASE
             WHEN connec.sector_id > 0 AND vst.is_operative = true AND connec.epa_type = 'JUNCTION'::character varying(16)::text AND cpu.value = '4'::text THEN connec.epa_type::character varying

@@ -24,14 +24,14 @@ SELECT columns_are(
         'dma_id', 'presszone_id', 'soilcat_id', 'function_type', 'category_type', 'fluid_type',
         'location_type', 'workcat_id', 'workcat_id_end', 'builtdate', 'enddate', 'ownercat_id',
         'muni_id', 'postcode', 'streetaxis_id', 'postnumber', 'postcomplement', 'streetaxis2_id',
-        'postnumber2', 'postcomplement2', 'descript', 'link', 'verified', 'rotation', 'the_geom',
+        'postnumber2', 'postcomplement2', 'descript', 'link', 'verified', 'rotation',
         'undelete', 'label_x', 'label_y', 'label_rotation', 'publish', 'inventory', 'hemisphere',
-        'expl_id', 'num_value', 'feature_type', 'tstamp', 'lastupdate', 'lastupdate_user',
-        'insert_user', 'minsector_id', 'dqa_id', 'staticpressure', 'district_id', 'adate',
+        'expl_id', 'num_value', 'feature_type', 'minsector_id', 'dqa_id', 'staticpressure', 'district_id', 'adate',
         'adescript', 'accessibility', 'workcat_id_plan', 'asset_id', 'om_state', 'conserv_state',
         'access_type', 'placement_type', 'expl_id2', 'brand_id', 'model_id', 'serial_number',
         'label_quadrant', 'macrominsector_id', 'streetname', 'streetname2', 'supplyzone_id',
-        'lock_level', 'is_scadamap', 'pavcat_id', 'omzone_id'
+        'lock_level', 'is_scadamap', 'pavcat_id', 'omzone_id',
+        'the_geom', 'created_at', 'created_by', 'updated_at', 'updated_by'
     ],
     'Table node should have the correct columns'
 );
@@ -46,10 +46,6 @@ SELECT col_type_is('node', 'feature_type', 'varchar(16)', 'Column feature_type s
 SELECT col_default_is('node', 'feature_type', 'NODE', 'Column feature_type should default to NODE');
 SELECT col_type_is('node', 'macrominsector_id', 'integer', 'Column macrominsector_id should be integer');
 SELECT col_default_is('node', 'macrominsector_id', '0', 'Column macrominsector_id should default to 0');
-SELECT col_type_is('node', 'tstamp', 'timestamp without time zone', 'Column tstamp should be timestamp');
-SELECT col_has_default('node', 'tstamp', 'Column tstamp should have a default value');
-SELECT col_type_is('node', 'insert_user', 'varchar(50)', 'Column insert_user should be varchar(50)');
-SELECT col_default_is('node', 'insert_user', 'CURRENT_USER', 'Column insert_user should default to CURRENT_USER');
 
 -- Check foreign keys
 SELECT has_fk('node', 'Table node should have foreign keys');

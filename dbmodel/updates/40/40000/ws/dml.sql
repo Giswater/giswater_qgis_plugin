@@ -3333,13 +3333,13 @@ DELETE FROM config_form_fields WHERE columnname='buildercat_id';
 INSERT INTO arc (arc_id, code, sys_code, node_1, node_2, arccat_id, epa_type, sector_id, state, state_type, annotation, observ, "comment", custom_length, dma_id, presszone_id,
 soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, builtdate, enddate, ownercat_id, muni_id, postcode, streetaxis_id,
 postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, descript, link, verified, the_geom, undelete, label_x, label_y, label_rotation, publish,
-inventory, expl_id, num_value, feature_type, tstamp, lastupdate, lastupdate_user, insert_user, minsector_id, dqa_id, district_id, adate, adescript, workcat_id_plan,
+inventory, expl_id, num_value, feature_type, created_at, created_by, updated_at, updated_by, minsector_id, dqa_id, district_id, adate, adescript, workcat_id_plan,
 asset_id, pavcat_id, nodetype_1, elevation1, depth1, staticpress1, nodetype_2, elevation2, depth2, staticpress2, om_state, conserv_state, parent_id, expl_id2, brand_id,
 model_id, serial_number, label_quadrant, macrominsector_id, streetname, streetname2, supplyzone_id, lock_level, is_scadamap)
 SELECT arc_id, code, code, node_1, node_2, arccat_id, epa_type, sector_id, state, state_type, annotation, observ, "comment", custom_length, dma_id, presszone_id,
 soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, builtdate, enddate, ownercat_id, muni_id, postcode, streetaxis_id,
 postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, descript, link, verified, the_geom, undelete, label_x, label_y, label_rotation, publish,
-inventory, expl_id, num_value, feature_type, tstamp, lastupdate, lastupdate_user, insert_user, minsector_id, dqa_id, district_id, adate, adescript, workcat_id_plan,
+inventory, expl_id, num_value, feature_type, tstamp, insert_user, lastupdate, lastupdate_user, minsector_id, dqa_id, district_id, adate, adescript, workcat_id_plan,
 asset_id, pavcat_id, nodetype_1, elevation1, depth1, staticpress1, nodetype_2, elevation2, depth2, staticpress2, om_state, conserv_state, parent_id, expl_id2, brand_id,
 model_id, serial_number, label_quadrant, macrominsector_id, streetname, streetname2, supplyzone_id, lock_level, is_scadamap
 FROM _arc;
@@ -3348,7 +3348,7 @@ FROM _arc;
 INSERT INTO connec (connec_id, code, top_elev, "depth", conneccat_id, sector_id, customer_code, state, state_type, arc_id, connec_length, annotation, observ, "comment",
 dma_id, presszone_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, builtdate, enddate, ownercat_id, muni_id,
 postcode, streetaxis_id, postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, descript, link, verified, rotation, the_geom, undelete, label_x,
-label_y, label_rotation, publish, inventory, expl_id, num_value, feature_type, tstamp, pjoint_type, pjoint_id, lastupdate, lastupdate_user, insert_user, minsector_id,
+label_y, label_rotation, publish, inventory, expl_id, num_value, feature_type, created_at, pjoint_type, pjoint_id, updated_at, updated_by, created_by, minsector_id,
 dqa_id, staticpressure, district_id, adate, adescript, accessibility, workcat_id_plan, asset_id, epa_type, om_state, conserv_state, priority,
 _valve_type, _shutoff_valve, access_type, placement_type, crmzone_id, expl_id2, plot_code, brand_id, model_id, serial_number, label_quadrant,
 macrominsector_id, n_hydrometer, streetname, streetname2, n_inhabitants, supplyzone_id, lock_level, block_zone)
@@ -3364,7 +3364,7 @@ FROM _connec;
 
 INSERT INTO element (element_id, code, elementcat_id, serial_number, num_elements, state, state_type, observ, "comment", function_type, category_type, fluid_type,
 location_type, workcat_id, workcat_id_end, builtdate, enddate, ownercat_id, rotation, link, verified, the_geom, label_x, label_y, label_rotation, undelete, publish,
-inventory, expl_id, feature_type, tstamp, lastupdate, lastupdate_user, insert_user, pol_id, top_elev, expl_id2, trace_featuregeom, muni_id, sector_id, brand_id,
+inventory, expl_id, feature_type, created_at, updated_at, created_by, updated_by, pol_id, top_elev, expl_id2, trace_featuregeom, muni_id, sector_id, brand_id,
 model_id, asset_id, lock_level)
 SELECT element_id, code, elementcat_id, serial_number, num_elements, state, state_type, observ, "comment", function_type, category_type, fluid_type,
 location_type, workcat_id, workcat_id_end, builtdate, enddate, ownercat_id, rotation, link, verified, the_geom, label_x, label_y, label_rotation, undelete, publish,
@@ -3376,8 +3376,8 @@ FROM _element;
 INSERT INTO node (node_id, code, top_elev, custom_top_elev, "depth", nodecat_id, epa_type, sector_id, arc_id, parent_id, state, state_type, annotation,
 observ, "comment", dma_id, presszone_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, builtdate, enddate,
 ownercat_id, muni_id, postcode, streetaxis_id, postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, descript, link, verified, rotation,
-the_geom, undelete, label_x, label_y, label_rotation, publish, inventory, hemisphere, expl_id, num_value, feature_type, tstamp, lastupdate, lastupdate_user,
-insert_user, minsector_id, dqa_id, staticpressure, district_id, adate, adescript, accessibility, workcat_id_plan, asset_id, om_state, conserv_state, access_type,
+the_geom, undelete, label_x, label_y, label_rotation, publish, inventory, hemisphere, expl_id, num_value, feature_type, created_at, updated_at, updated_by,
+created_by, minsector_id, dqa_id, staticpressure, district_id, adate, adescript, accessibility, workcat_id_plan, asset_id, om_state, conserv_state, access_type,
 placement_type, expl_id2, brand_id, model_id, serial_number, label_quadrant, macrominsector_id, streetname, streetname2, supplyzone_id, lock_level, is_scadamap,
 pavcat_id)
 SELECT node_id, code, top_elev, custom_top_elev, "depth", nodecat_id, epa_type, sector_id, arc_id, parent_id, state, state_type, annotation,

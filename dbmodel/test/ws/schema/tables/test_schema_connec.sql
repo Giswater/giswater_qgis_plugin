@@ -23,15 +23,15 @@ SELECT columns_are(
         'arc_id', 'connec_length', 'annotation', 'observ', 'comment', 'dma_id', 'presszone_id', 'soilcat_id',
         'function_type', 'category_type', 'fluid_type', 'location_type', 'workcat_id', 'workcat_id_end', 'builtdate',
         'enddate', 'ownercat_id', 'muni_id', 'postcode', 'streetaxis_id', 'postnumber', 'postcomplement',
-        'streetaxis2_id', 'postnumber2', 'postcomplement2', 'descript', 'link', 'verified', 'rotation', 'the_geom',
+        'streetaxis2_id', 'postnumber2', 'postcomplement2', 'descript', 'link', 'verified', 'rotation',
         'undelete', 'label_x', 'label_y', 'label_rotation', 'publish', 'inventory', 'expl_id', 'num_value',
-        'feature_type', 'tstamp', 'pjoint_type', 'pjoint_id', 'lastupdate', 'lastupdate_user', 'insert_user',
+        'feature_type', 'pjoint_type', 'pjoint_id',
         'minsector_id', 'dqa_id', 'staticpressure', 'district_id', 'adate', 'adescript', 'accessibility',
         'workcat_id_plan', 'asset_id', 'epa_type', 'om_state', 'conserv_state', 'priority',
         '_valve_type', '_shutoff_valve', 'access_type', 'placement_type', 'crmzone_id', 'expl_id2', 'plot_code',
         'brand_id', 'model_id', 'serial_number', 'label_quadrant', 'macrominsector_id', 'n_hydrometer',
         'streetname', 'streetname2', 'n_inhabitants', 'supplyzone_id', 'datasource', 'lock_level', 'block_zone',
-        'omzone_id'
+        'omzone_id', 'the_geom', 'created_at', 'created_by', 'updated_at', 'updated_by'
     ],
     'Table connec should have the correct columns'
 );
@@ -79,7 +79,6 @@ SELECT col_type_is('connec', 'descript', 'text', 'Column descript should be text
 SELECT col_type_is('connec', 'link', 'varchar(512)', 'Column link should be varchar(512)');
 SELECT col_type_is('connec', 'verified', 'int4', 'Column verified should be int4');
 SELECT col_type_is('connec', 'rotation', 'numeric(6,3)', 'Column rotation should be numeric(6,3)');
-SELECT col_type_is('connec', 'the_geom', 'geometry(Point,25831)', 'Column the_geom should be geometry(Point,25831)');
 SELECT col_type_is('connec', 'undelete', 'bool', 'Column undelete should be bool');
 SELECT col_type_is('connec', 'label_x', 'varchar(30)', 'Column label_x should be varchar(30)');
 SELECT col_type_is('connec', 'label_y', 'varchar(30)', 'Column label_y should be varchar(30)');
@@ -89,12 +88,8 @@ SELECT col_type_is('connec', 'inventory', 'bool', 'Column inventory should be bo
 SELECT col_type_is('connec', 'expl_id', 'int4', 'Column expl_id should be int4');
 SELECT col_type_is('connec', 'num_value', 'numeric(12,3)', 'Column num_value should be numeric(12,3)');
 SELECT col_type_is('connec', 'feature_type', 'varchar(16)', 'Column feature_type should be varchar(16)');
-SELECT col_type_is('connec', 'tstamp', 'timestamp', 'Column tstamp should be timestamp');
 SELECT col_type_is('connec', 'pjoint_type', 'varchar(16)', 'Column pjoint_type should be varchar(16)');
 SELECT col_type_is('connec', 'pjoint_id', 'varchar(16)', 'Column pjoint_id should be varchar(16)');
-SELECT col_type_is('connec', 'lastupdate', 'timestamp', 'Column lastupdate should be timestamp');
-SELECT col_type_is('connec', 'lastupdate_user', 'varchar(50)', 'Column lastupdate_user should be varchar(50)');
-SELECT col_type_is('connec', 'insert_user', 'varchar(50)', 'Column insert_user should be varchar(50)');
 SELECT col_type_is('connec', 'minsector_id', 'int4', 'Column minsector_id should be int4');
 SELECT col_type_is('connec', 'dqa_id', 'int4', 'Column dqa_id should be int4');
 SELECT col_type_is('connec', 'staticpressure', 'numeric(12,3)', 'Column staticpressure should be numeric(12,3)');
@@ -129,6 +124,12 @@ SELECT col_type_is('connec', 'datasource', 'int4', 'Column datasource should be 
 SELECT col_type_is('connec', 'lock_level', 'int4', 'Column lock_level should be int4');
 SELECT col_type_is('connec', 'block_zone', 'text', 'Column block_zone should be text');
 SELECT col_type_is('connec', 'omzone_id', 'integer', 'Column omzone_id should be integer');
+SELECT col_type_is('connec', 'the_geom', 'geometry(Point,SRID_VALUE)', 'Column the_geom should be geometry(Point,SRID_VALUE)');
+SELECT col_type_is('connec', 'created_at', 'timestamp with time zone', 'Column created_at should be timestamp with time zone');
+SELECT col_type_is('connec', 'created_by', 'varchar(50)', 'Column created_by should be varchar(50)');
+SELECT col_type_is('connec', 'updated_at', 'timestamp with time zone', 'Column updated_at should be timestamp with time zone');
+SELECT col_type_is('connec', 'updated_by', 'varchar(50)', 'Column updated_by should be varchar(50)');
+
 -- Check foreign keys
 SELECT has_fk('connec', 'Table connec should have foreign keys');
 SELECT fk_ok('connec', 'arc_id', 'arc', 'arc_id', 'FK connec_arc_id_fkey should exist');
@@ -167,8 +168,8 @@ SELECT col_not_null('connec', 'epa_type', 'Column epa_type should be NOT NULL');
 
 SELECT col_default_is('connec', 'connec_id', 'nextval(''urn_id_seq''::regclass)', 'Column connec_id should default to nextval');
 SELECT col_default_is('connec', 'feature_type', 'CONNEC', 'Column feature_type should default to CONNEC');
-SELECT col_default_is('connec', 'tstamp', 'now()', 'Column tstamp should default to now()');
-SELECT col_default_is('connec', 'insert_user', 'CURRENT_USER', 'Column insert_user should default to CURRENT_USER');
+SELECT col_default_is('connec', 'created_at', 'now()', 'Column created_at should default to now()');
+SELECT col_default_is('connec', 'created_by', 'CURRENT_USER', 'Column created_by should default to CURRENT_USER');
 SELECT col_default_is('connec', 'macrominsector_id', '0', 'Column macrominsector_id should default to 0');
 
 -- Check indexes
