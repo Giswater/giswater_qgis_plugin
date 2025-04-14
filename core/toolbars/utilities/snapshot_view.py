@@ -141,7 +141,7 @@ class GwSnapshotViewButton(GwAction):
             tools_qt.set_widget_text(self.dlg_snapshot_view, "txt_coordinates", f"{xmin},{xmax},{ymin},{ymax} [EPSG:25831]")
 
         elif origin == "draw":
-            select_manager = GwSelectManager(self, None, self.dlg_snapshot_view, GwSelectionMode.NORMAL, self.dlg_snapshot_view)
+            select_manager = GwSelectManager(self, None, self.dlg_snapshot_view, GwSelectionMode.DEFAULT, self.dlg_snapshot_view)
             global_vars.canvas.setMapTool(select_manager)
             cursor = tools_gw.get_cursor_multiple_selection()
             global_vars.canvas.setCursor(cursor)

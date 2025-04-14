@@ -11,6 +11,6 @@ from enum import Enum
 class GwSelectionMode(Enum):
     """Selection mode"""
 
-    NORMAL = 0
+    DEFAULT = 0
     EXPRESSION = 1
     PSECTOR = 2

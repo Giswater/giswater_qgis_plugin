@@ -3210,7 +3210,7 @@ def zoom_to_feature_by_id(tablename: str, idname: str, _id, margin: float = 15):
         tools_qgis.zoom_to_rectangle(bbox.xMinimum() - margin, bbox.yMinimum() - margin, bbox.xMaximum() + margin, bbox.yMaximum() + margin)
 
 
-def selection_init(class_object, dialog, table_object, selection_mode: GwSelectionMode = GwSelectionMode.NORMAL):
+def selection_init(class_object, dialog, table_object, selection_mode: GwSelectionMode = GwSelectionMode.DEFAULT):
     """ Set canvas map tool to an instance of class 'GwSelectManager' """
 
     try:
@@ -3228,7 +3228,7 @@ def selection_init(class_object, dialog, table_object, selection_mode: GwSelecti
     global_vars.canvas.setCursor(cursor)
 
 
-def selection_changed(class_object, dialog, table_object, selection_mode: GwSelectionMode = GwSelectionMode.NORMAL, lazy_widget=None, lazy_init_function=None):
+def selection_changed(class_object, dialog, table_object, selection_mode: GwSelectionMode = GwSelectionMode.DEFAULT, lazy_widget=None, lazy_init_function=None):
     """Handles selections from the map while keeping stored table values and allowing new selections from snapping."""
 
     if selection_mode != GwSelectionMode.EXPRESSION:
@@ -3477,7 +3477,7 @@ def remove_selection(remove_groups=True, layers=None):
     return layers
 
 
-def connect_signal_selection_changed(class_object, dialog, table_object, selection_mode: GwSelectionMode = GwSelectionMode.NORMAL):
+def connect_signal_selection_changed(class_object, dialog, table_object, selection_mode: GwSelectionMode = GwSelectionMode.DEFAULT):
     """ Connect signal selectionChanged """
 
     try:

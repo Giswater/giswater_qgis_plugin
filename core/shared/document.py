@@ -205,7 +205,7 @@ class GwDocument(QObject):
         self.dlg_add_doc.btn_delete.clicked.connect(
             partial(tools_gw.delete_records, self, self.dlg_add_doc, table_object, False, None, None))
         self.dlg_add_doc.btn_snapping.clicked.connect(
-            partial(tools_gw.selection_init, self, self.dlg_add_doc, table_object, GwSelectionMode.NORMAL))
+            partial(tools_gw.selection_init, self, self.dlg_add_doc, table_object, GwSelectionMode.DEFAULT))
 
         self.dlg_add_doc.tbl_doc_x_arc.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
                                                                self.dlg_add_doc.tbl_doc_x_arc, "v_edit_arc", "arc_id", self.rubber_band, 5))

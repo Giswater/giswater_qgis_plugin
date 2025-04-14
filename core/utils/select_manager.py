@@ -20,7 +20,7 @@ from .selection_mode import GwSelectionMode
 
 class GwSelectManager(QgsMapTool):
 
-    def __init__(self, class_object, table_object=None, dialog=None, selection_mode: GwSelectionMode = GwSelectionMode.NORMAL, save_rectangle=False):
+    def __init__(self, class_object, table_object=None, dialog=None, selection_mode: GwSelectionMode = GwSelectionMode.DEFAULT, save_rectangle=False):
         """
         :param table_object: Class where we will look for @layers, @feature_type, @list_ids, etc
         :param table_object: (String)

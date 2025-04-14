@@ -136,7 +136,7 @@ class GwElement:
         self.dlg_add_element.btn_delete.clicked.connect(
             partial(tools_gw.delete_records, self, self.dlg_add_element, table_object, False, None, None))
         self.dlg_add_element.btn_snapping.clicked.connect(
-            partial(tools_gw.selection_init, self, self.dlg_add_element, table_object, GwSelectionMode.NORMAL))
+            partial(tools_gw.selection_init, self, self.dlg_add_element, table_object, GwSelectionMode.DEFAULT))
 
         self.dlg_add_element.btn_add_geom.clicked.connect(self._get_point_xy)
         self.dlg_add_element.state.currentIndexChanged.connect(partial(self._filter_state_type))
