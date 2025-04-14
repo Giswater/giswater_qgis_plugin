@@ -13,3 +13,8 @@ update dqa set macrodqa_id = 0 where macrodqa_id is null;
 ALTER TABLE dqa alter column macrodqa_id set default 0;
 CREATE RULE dqa_undefined AS ON UPDATE TO dqa WHERE((new.dqa_id = 0) OR (old.dqa_id = 0)) DO INSTEAD NOTHING;
 CREATE RULE dqa_conflict AS ON UPDATE TO dqa WHERE((new.dqa_id = -1) OR (old.dqa_id = -1)) DO INSTEAD NOTHING;
+
+
+ALTER TABLE om_waterbalance DROP CONSTRAINT om_waterbalance_pkey;
+ALTER TABLE om_waterbalance ADD CONSTRAINT om_waterbalance_pkey PRIMARY KEY (dma_id, startdate, enddate);
+
