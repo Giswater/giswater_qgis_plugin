@@ -4,9 +4,9 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
--- DROP FUNCTION SCHEMA_NAME.gw_fct_getauditlogdata(json);
+-- DROP FUNCTION audit.gw_fct_getauditlogdata(json);
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getauditlogdata(p_data json)
+CREATE OR REPLACE FUNCTION audit.gw_fct_getauditlogdata(p_data json)
  RETURNS json
  LANGUAGE plpgsql
 AS $function$
@@ -30,8 +30,8 @@ v_geometry text;
 
 BEGIN
 	-- search path
-	SET search_path = "SCHEMA_NAME", public;
-	v_schemaname = 'SCHEMA_NAME';
+	SET search_path = "audit", public;
+	v_schemaname = 'audit';
 
 	-- Get api version
     SELECT value INTO v_version FROM ws.config_param_system WHERE parameter = 'admin_version';

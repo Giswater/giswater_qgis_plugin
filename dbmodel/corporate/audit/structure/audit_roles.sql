@@ -7,5 +7,5 @@ This version of Giswater is provided by Giswater Association
 
 
 
-GRANT ALL ON SCHEMA SCHEMA_NAME TO role_basic; --probably the restriction might be stronger
-GRANT ALL ON SEQUENCE SCHEMA_NAME.log_id_seq TO role_basic;
+GRANT ALL ON SCHEMA audit TO role_basic; --probably the restriction might be stronger
+GRANT ALL ON SEQUENCE audit.log_id_seq TO role_basic;

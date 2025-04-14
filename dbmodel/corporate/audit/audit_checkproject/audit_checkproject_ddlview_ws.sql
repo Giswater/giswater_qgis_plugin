@@ -16,7 +16,7 @@ AS SELECT a.tstamp::date AS date,
     a.criticity,
     a.fcount AS value
    FROM audit_fid_log a
-     LEFT JOIN SCHEMA_NAME.sys_fprocess USING (fid)
+     LEFT JOIN audit.sys_fprocess USING (fid)
   WHERE sys_fprocess.isaudit IS TRUE
   ORDER BY (a.tstamp::date), a.source ->> 'schema'::text, sys_fprocess.fprocess_type;
 
@@ -59,7 +59,7 @@ AS SELECT ct.date,
     (ct.length::numeric / 1000::numeric)::numeric(12,1) AS km,
     (100000::numeric * (COALESCE(ct.omdata, 0) + COALESCE(ct.omtopology, 0) + COALESCE(ct.grafdata, 0) + COALESCE(ct.epaconfig, 0) + COALESCE(ct.epadata, 0) + COALESCE(ct.epatopology, 0) + COALESCE(ct.planconfig, 0))::numeric / ct.length::numeric)::integer AS index
    FROM crosstab('
-SELECT date, type, value FROM audit.v_fidlog where schema = ''SCHEMA_NAME'' and criticity in (0,2)
+SELECT date, type, value FROM audit.v_fidlog where schema = ''audit'' and criticity in (0,2)
 '::text, 'VALUES (''Check om-data''), (''Check om-topology''), (''Check graf-data''),(''Check epa-config''), (''Check epa-data''),(''Check epa-topology''), (''Check plan-config''),(''length'')'::text) ct(date date, omdata integer, omtopology integer, grafdata integer, epaconfig integer, epadata integer, epatopology integer, planconfig integer, length integer)
 UNION
  SELECT ct.date,
@@ -75,7 +75,7 @@ UNION
     (ct.length::numeric / 1000::numeric)::numeric(12,1) AS km,
     (100000::numeric * (COALESCE(ct.omdata, 0) + COALESCE(ct.omtopology, 0) + COALESCE(ct.grafdata, 0) + COALESCE(ct.epaconfig, 0) + COALESCE(ct.epadata, 0) + COALESCE(ct.epatopology, 0) + COALESCE(ct.planconfig, 0))::numeric / ct.length::numeric)::integer AS index
    FROM crosstab('
-SELECT date, type, value FROM audit.v_fidlog where schema = ''SCHEMA_NAME'' and criticity in (0,3)
+SELECT date, type, value FROM audit.v_fidlog where schema = ''audit'' and criticity in (0,3)
 '::text, 'VALUES (''Check om-data''), (''Check om-topology''), (''Check graf-data''),(''Check epa-config''), (''Check epa-data''),(''Check epa-topology''), (''Check plan-config''),(''length'')'::text) ct(date date, omdata integer, omtopology integer, grafdata integer, epaconfig integer, epadata integer, epatopology integer, planconfig integer, length integer)
   ORDER BY 1, 2, 3, 4;
 
@@ -90,7 +90,7 @@ AS SELECT v_fidlog_aux.date,
     v_fidlog_aux.criticity,
     v_fidlog_aux.value
    FROM v_fidlog_aux
-  WHERE v_fidlog_aux.schema = 'SCHEMA_NAME';
+  WHERE v_fidlog_aux.schema = 'audit';
 
 GRANT ALL ON TABLE v_fidlog_ws_aux TO role_admin;
 GRANT INSERT, SELECT ON TABLE v_fidlog_ws_aux TO role_basic;

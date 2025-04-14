@@ -4,9 +4,9 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
--- DROP FUNCTION SCHEMA_NAME.gw_fct_setsnapshot();
+-- DROP FUNCTION audit.gw_fct_setsnapshot();
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_setsnapshot(p_data json)
+CREATE OR REPLACE FUNCTION audit.gw_fct_setsnapshot(p_data json)
  RETURNS integer
  LANGUAGE plpgsql
 AS $function$
@@ -26,8 +26,8 @@ v_description text;
 
 BEGIN
 	-- search path
-	SET search_path = "SCHEMA_NAME", public;
-	v_schemaname = 'SCHEMA_NAME';
+	SET search_path = "audit", public;
+	v_schemaname = 'audit';
 
 	v_description = p_data ->>'description';
 

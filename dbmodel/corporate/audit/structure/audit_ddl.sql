@@ -4,9 +4,9 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
-CREATE SCHEMA SCHEMA_NAME;
+CREATE SCHEMA audit;
 
-CREATE TABLE SCHEMA_NAME.log (
+CREATE TABLE audit.log (
     id serial8 PRIMARY KEY,
     tstamp timestamp default now(),
     table_name text,

@@ -5,7 +5,7 @@ This version of Giswater is provided by Giswater Association
 */
 
 
-CREATE TABLE SCHEMA_NAME.snapshot (
+CREATE TABLE audit.snapshot (
     date DATE PRIMARY KEY DEFAULT CURRENT_DATE,
     description TEXT NULL,
     tables TEXT[] NULL,

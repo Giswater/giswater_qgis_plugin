@@ -16,7 +16,7 @@ AS SELECT a.tstamp::date AS date,
     a.criticity,
     a.fcount AS value
    FROM audit_fid_log a
-     LEFT JOIN SCHEMA_NAME.sys_fprocess USING (fid)
+     LEFT JOIN audit.sys_fprocess USING (fid)
   WHERE sys_fprocess.isaudit IS TRUE
   ORDER BY (a.tstamp::date), a.source ->> 'schema'::text, sys_fprocess.fprocess_type;
 

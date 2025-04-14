@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 /*
 -- to run use initProject=false and isAudit=true
 
-SELECT SCHEMA_NAME.gw_fct_setcheckproject ($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"initProject":false, "isAudit":true}}$$);
+SELECT audit.gw_fct_setcheckproject ($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{}, "data":{"initProject":false, "isAudit":true}}$$);
 */
 
 CREATE SCHEMA audit;

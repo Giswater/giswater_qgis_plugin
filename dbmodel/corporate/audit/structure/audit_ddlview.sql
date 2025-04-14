@@ -6,11 +6,11 @@ This version of Giswater is provided by Giswater Association
 
 
 
-CREATE or replace VIEW SCHEMA_NAME.v_log AS
+CREATE or replace VIEW audit.v_log AS
 SELECT user_name,  count (*) , action, date FROM
-(SELECT user_name, substring(query,0,30)  as action, (substring(date_trunc('day',(tstamp))::text,0,12))::date AS date from SCHEMA_NAME.log
+(SELECT user_name, substring(query,0,30)  as action, (substring(date_trunc('day',(tstamp))::text,0,12))::date AS date from audit.log
 where  schema = 'PARENT_SCHEMA')a
 group by user_name, date, action
 ORDER BY date desc;
 
-GRANT ALL ON TABLE SCHEMA_NAME.v_log TO role_master;
+GRANT ALL ON TABLE audit.v_log TO role_master;

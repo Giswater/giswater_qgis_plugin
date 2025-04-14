@@ -4,9 +4,9 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
--- DROP FUNCTION SCHEMA_NAME.gw_fct_getsnapshot(json);
+-- DROP FUNCTION audit.gw_fct_getsnapshot(json);
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getsnapshot(p_data json)
+CREATE OR REPLACE FUNCTION audit.gw_fct_getsnapshot(p_data json)
  RETURNS json
  LANGUAGE plpgsql
 AS $function$
@@ -35,8 +35,8 @@ v_feature_type text;
 
 BEGIN
 	-- search path
-	SET search_path = "SCHEMA_NAME", public;
-	v_schemaname = 'SCHEMA_NAME';
+	SET search_path = "audit", public;
+	v_schemaname = 'audit';
 
 	-- Get api version
     SELECT value INTO v_version FROM PARENT_SCHEMA.config_param_system WHERE parameter = 'admin_version';
@@ -81,7 +81,7 @@ BEGIN
 	        'PARENT_SCHEMA.' || v_table || '.' || column_name || ' IS NOT DISTINCT FROM row.' || column_name, ' AND ')
 		    INTO v_columns
 		    FROM information_schema.columns
-		    WHERE table_name = v_table;
+		    WHERE table_name = v_table AND table_schema = 'PARENT_SCHEMA';
 
 		    -- Build features
 			EXECUTE format(
