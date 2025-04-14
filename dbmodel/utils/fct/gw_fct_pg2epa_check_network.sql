@@ -73,8 +73,14 @@ BEGIN
 	DROP TABLE IF EXISTS temp_t_pgr_go2epa_arc; CREATE TEMP TABLE temp_t_pgr_go2epa_arc AS SELECT * FROM temp_t_arc;
 	DROP TABLE IF EXISTS temp_t_pgr_go2epa_node; CREATE TEMP TABLE temp_t_pgr_go2epa_node AS SELECT * FROM temp_t_node;
 
-	UPDATE temp_t_pgr_go2epa_node n SET sector_id = 0, dma_id=0;
-	UPDATE temp_t_pgr_go2epa_arc SET sector_id = 0, dma_id=0;
+	IF v_project_type = 'WS' THEN
+		UPDATE temp_t_pgr_go2epa_node n SET dma_id = 0;
+		UPDATE temp_t_pgr_go2epa_arc SET dma_id = 0;
+	END IF;
+
+	UPDATE temp_t_pgr_go2epa_node n SET sector_id = 0, omzone_id=0;
+	UPDATE temp_t_pgr_go2epa_arc SET sector_id = 0, omzone_id=0;
+
 
 	-- update graph for disconnected (139)
     UPDATE temp_t_pgr_go2epa_node n SET sector_id = c.component

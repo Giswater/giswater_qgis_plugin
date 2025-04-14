@@ -266,6 +266,7 @@ BEGIN
             CREATE TEMP TABLE IF NOT EXISTS temp_t_node (LIKE temp_node INCLUDING ALL);
             CREATE TEMP TABLE IF NOT EXISTS temp_t_arc (LIKE temp_arc INCLUDING ALL);
 			CREATE TEMP TABLE IF NOT EXISTS temp_t_link (LIKE link INCLUDING ALL);
+            CREATE TEMP TABLE IF NOT EXISTS temp_t_element (LIKE element INCLUDING ALL);
             CREATE TEMP TABLE IF NOT EXISTS temp_t_anlgraph (LIKE temp_anlgraph INCLUDING ALL);
             CREATE TEMP TABLE IF NOT EXISTS temp_t_go2epa (LIKE temp_go2epa INCLUDING ALL);
 
@@ -340,6 +341,7 @@ BEGIN
         DROP TABLE IF EXISTS temp_t_node;
         DROP TABLE IF EXISTS temp_t_arc;
         DROP TABLE IF EXISTS temp_t_link;
+        DROP TABLE IF EXISTS temp_t_element;
         DROP TABLE IF EXISTS temp_t_gully;
         DROP TABLE IF EXISTS temp_t_demand;
         DROP TABLE IF EXISTS temp_t_anlgraph;
