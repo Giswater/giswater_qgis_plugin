@@ -201,6 +201,6 @@ INSERT INTO cat_element (id, element_type, active) VALUES ('FROUTLET-01', 'FROUT
 INSERT INTO cat_element (id, element_type, active) VALUES ('FRWEIR-01', 'FRWEIR', TRUE) ON CONFLICT (id) DO NOTHING;
 INSERT INTO cat_element (id, element_type, active) VALUES ('FRPUMP-01', 'FRPUMP', TRUE) ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO cat_link (id, link_type, matcat_id, descript, link, brand_id, model_id, svg, estimated_depth, active, label)
-SELECT id, 'SERVCONNECTION' AS link_type, matcat_id, descript, link, brand_id, model_id, svg, estimated_depth, active, label
+INSERT INTO cat_link (id, matcat_id, descript, link, brand_id, model_id, svg, estimated_depth, active, label)
+SELECT id, matcat_id, descript, link, brand_id, model_id, svg, estimated_depth, active, label
 FROM cat_connec ON CONFLICT DO NOTHING;

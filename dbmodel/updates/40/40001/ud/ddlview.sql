@@ -319,7 +319,7 @@ AS WITH
 			l.epa_type,
 			l.is_operative,
 			l.linkcat_id,
-            cat_link.link_type,
+            l.link_type,
             cat_feature.feature_class AS sys_type,
 			l.workcat_id,
 			l.workcat_id_end,
@@ -341,7 +341,7 @@ AS WITH
 			JOIN ext_municipality mu ON l.muni_id = mu.muni_id
 			JOIN sector_table ON l.sector_id = sector_table.sector_id
             JOIN cat_link ON cat_link.id::text = l.linkcat_id::text
-            JOIN cat_feature ON cat_feature.id::text = cat_link.link_type::text
+            JOIN cat_feature ON cat_feature.id::text = l.link_type::text
 			LEFT JOIN omzone_table ON l.omzone_id = omzone_table.omzone_id
 			LEFT join drainzone_table ON l.omzone_id = drainzone_table.drainzone_id
 			LEFT JOIN dwfzone_table ON l.dwfzone_id = dwfzone_table.dwfzone_id
