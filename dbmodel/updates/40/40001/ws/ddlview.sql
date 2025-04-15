@@ -4681,6 +4681,49 @@ SELECT main.arc_id,
   FROM main
   JOIN compare ON main.arc_id = compare.arc_id;
 
+CREATE OR REPLACE VIEW v_ui_mincut
+AS SELECT om_mincut.id,
+    om_mincut.work_order,
+    a.idval AS state,
+    b.idval AS class,
+    om_mincut.mincut_type,
+    om_mincut.received_date,
+    exploitation.name AS exploitation,
+    ext_municipality.name AS municipality,
+    om_mincut.postcode,
+    ext_streetaxis.name AS streetaxis,
+    om_mincut.postnumber,
+    c.idval AS anl_cause,
+    om_mincut.anl_tstamp,
+    om_mincut.anl_user,
+    om_mincut.anl_descript,
+    om_mincut.anl_feature_id,
+    om_mincut.anl_feature_type,
+    om_mincut.forecast_start,
+    om_mincut.forecast_end,
+    cat_users.name AS assigned_to,
+    om_mincut.exec_start,
+    om_mincut.exec_end,
+    om_mincut.exec_user,
+    om_mincut.exec_descript,
+    om_mincut.exec_from_plot,
+    om_mincut.exec_depth,
+    om_mincut.exec_appropiate,
+    om_mincut.chlorine,
+    om_mincut.turbidity,
+    om_mincut.notified,
+    om_mincut.output
+   FROM om_mincut
+     LEFT JOIN om_typevalue a ON a.id::integer = om_mincut.mincut_state AND a.typevalue = 'mincut_state'::text
+     LEFT JOIN om_typevalue b ON b.id::integer = om_mincut.mincut_class AND b.typevalue = 'mincut_class'::text
+     LEFT JOIN om_typevalue c ON c.id::integer = om_mincut.anl_cause::integer AND c.typevalue = 'mincut_cause'::text
+     LEFT JOIN exploitation ON exploitation.expl_id = om_mincut.expl_id
+     LEFT JOIN macroexploitation ON macroexploitation.macroexpl_id = om_mincut.macroexpl_id
+     LEFT JOIN ext_municipality ON ext_municipality.muni_id = om_mincut.muni_id
+     LEFT JOIN ext_streetaxis ON ext_streetaxis.id::text = om_mincut.streetaxis_id::text
+     LEFT JOIN cat_users ON cat_users.id::text = om_mincut.assigned_to::text
+  WHERE om_mincut.id > 0;
+
 CREATE OR REPLACE VIEW v_om_mincut_hydrometer
 AS SELECT om_mincut_hydrometer.id,
     om_mincut_hydrometer.result_id,
@@ -6839,8 +6882,8 @@ AS SELECT om_mincut.id,
      LEFT JOIN macroexploitation ON om_mincut.macroexpl_id = macroexploitation.macroexpl_id
      LEFT JOIN ext_municipality ON om_mincut.muni_id = ext_municipality.muni_id
   WHERE selector_mincut_result.result_id = om_mincut.id AND selector_mincut_result.cur_user = "current_user"()::text AND om_mincut.id > 0;
-  
-  
+
+
 
 DROP VIEW IF EXISTS v_om_waterbalance;
 DROP VIEW IF EXISTS v_om_waterbalance_report;
@@ -6878,9 +6921,9 @@ SELECT e.name AS exploitation,
      JOIN dma d USING (dma_id)
      LEFT JOIN ext_cat_period p ON p.id::text = om_waterbalance.cat_period_id::text
 	 where e.expl_id = any(d.expl_id);
-	  
-	 
-	 
+
+
+
 CREATE OR REPLACE VIEW v_om_waterbalance_report
 AS WITH expl_data AS (
          SELECT sum(w_1.auth) / sum(w_1.total) AS expl_rw_eff,
