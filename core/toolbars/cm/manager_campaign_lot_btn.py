@@ -10,7 +10,7 @@ from .lot import AddNewLot
 from ..dialog import GwAction
 from qgis.PyQt.QtWidgets import QAction, QMenu, QActionGroup
 from functools import partial
-from ...utils import tools_gw
+from ....libs import tools_qt
 
 class GwManageCampaignLotButton(GwAction):
     """ Button 87: Campaign Management """
@@ -20,7 +20,7 @@ class GwManageCampaignLotButton(GwAction):
         self.campaign_manager = Campaign(icon_path, action_name, text, toolbar, action_group)
         self.new_lot = AddNewLot(icon_path, action_name, text, toolbar, action_group)
 
-        self.actions = ['Manage Campaign', 'Manage Lot']
+        self.actions = [tools_qt.tr('Manage Campaign'), tools_qt.tr('Manage Lot')]
 
         # Create a menu and add all the actions
         self.menu = QMenu()
@@ -50,8 +50,8 @@ class GwManageCampaignLotButton(GwAction):
 
     def clicked_event(self, selected_action):
         """ Open the correct campaign dialog based on user selection """
-        if selected_action == "Manage Campaign":
+        if selected_action == tools_qt.tr('Manage Campaign'):
             self.campaign_manager.campaign_manager()
-        elif selected_action == "Manage Lot":
+        elif selected_action == tools_qt.tr('Manage Lot'):
             self.new_lot.lot_manager()
 

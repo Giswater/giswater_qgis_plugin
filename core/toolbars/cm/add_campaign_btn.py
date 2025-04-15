@@ -9,7 +9,7 @@ from .campaign import Campaign
 from ..dialog import GwAction
 from qgis.PyQt.QtWidgets import QAction, QMenu, QActionGroup
 from functools import partial
-from ...utils import tools_gw
+from ....libs import tools_qt
 
 class GwAddCampaignButton(GwAction):
     """ Button 84: Add new campaign """
@@ -18,7 +18,7 @@ class GwAddCampaignButton(GwAction):
         super().__init__(icon_path, action_name, text, toolbar, action_group)
         self.new_campaign = Campaign(icon_path, action_name, text, toolbar, action_group)
 
-        self.actions = ['Review', 'Visit']
+        self.actions = [tools_qt.tr('Review'), tools_qt.tr('Visit')]
 
         # Create a menu and add all the actions
         self.menu = QMenu()
@@ -46,7 +46,7 @@ class GwAddCampaignButton(GwAction):
 
     def clicked_event(self, selected_action):
         """ Open the correct campaign dialog based on user selection """
-        if selected_action == "Review":
+        if selected_action == tools_qt.tr("Review"):
             self.new_campaign.create_campaign(dialog_type="review")
-        elif selected_action == "Visit":
+        elif selected_action == tools_qt.tr("Visit"):
             self.new_campaign.create_campaign(dialog_type="visit")
