@@ -47,10 +47,6 @@ ALTER TABLE om_campaign_review DROP CONSTRAINT IF EXISTS om_campaign_review_revi
 ALTER TABLE om_campaign_review ADD CONSTRAINT om_campaign_review_reviewclass_id_fkey FOREIGN KEY (reviewclass_id)
 REFERENCES om_reviewclass (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
 
-ALTER TABLE om_campaign_x_layer DROP CONSTRAINT IF EXISTS om_campaign_x_layer_campaign_id_fkey;
-ALTER TABLE om_campaign_x_layer ADD CONSTRAINT om_campaign_x_layer_campaign_id_fkey FOREIGN KEY (campaign_id)
-REFERENCES om_campaign (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
-
 ALTER TABLE selector_campaign DROP CONSTRAINT IF EXISTS selector_campaign_campaign_id_fkey;
 ALTER TABLE selector_campaign ADD CONSTRAINT selector_campaign_campaign_id_fkey FOREIGN KEY (campaign_id)
 REFERENCES om_campaign (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;

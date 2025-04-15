@@ -37,6 +37,17 @@ CREATE TABLE cm.cat_team (
 	CONSTRAINT cat_team_organization_id_fkey FOREIGN KEY (organization_id) REFERENCES cm.cat_organization(organization_id) ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
+CREATE TABLE cat_user (
+    user_id text PRIMARY KEY,
+    loginname varchar(100) NOT NULL,
+    code varchar(50),
+    name varchar(200),
+    descript text,
+    team_id int4,
+    active boolean DEFAULT TRUE,
+    CONSTRAINT cat_user_team_id_fkey FOREIGN KEY (team_id) REFERENCES cat_team(team_id)
+);
+
 CREATE TABLE om_team_x_user (
 	id serial4 NOT NULL,
 	user_id text NULL,
@@ -271,17 +282,6 @@ CREATE TABLE workorder
   cost numeric,
   ct text,
   CONSTRAINT workorder_pkey PRIMARY KEY (workorder_id)
-);
-
-CREATE TABLE cat_user (
-    user_id text PRIMARY KEY,
-    loginname varchar(100) NOT NULL,
-    code varchar(50),
-    name varchar(200),
-    descript text,
-    team_id int4,
-    active boolean DEFAULT TRUE,
-    CONSTRAINT cat_user_team_id_fkey FOREIGN KEY (team_id) REFERENCES cat_team(team_id)
 );
 
 CREATE TABLE cm.selector_campaign_lot (
