@@ -110,6 +110,7 @@ class GwDocument(QObject):
         tools_gw.add_icon(self.dlg_add_doc.btn_delete_psector, "112")
         tools_gw.add_icon(self.dlg_add_doc.btn_delete_visit, "112")
         tools_gw.add_icon(self.dlg_add_doc.btn_snapping, "137")
+        tools_gw.add_icon(self.dlg_add_doc.btn_expr_select, "178")
 
         # Fill combo boxes
         self._fill_combo_doc_type(self.dlg_add_doc.doc_type)
@@ -206,6 +207,9 @@ class GwDocument(QObject):
             partial(tools_gw.delete_records, self, self.dlg_add_doc, table_object, False, None, None))
         self.dlg_add_doc.btn_snapping.clicked.connect(
             partial(tools_gw.selection_init, self, self.dlg_add_doc, table_object, GwSelectionMode.DEFAULT))
+        self.dlg_add_doc.btn_expr_select.clicked.connect(
+            partial(tools_gw.select_with_expression_dialog, self, self.dlg_add_doc, table_object)
+        )
 
         self.dlg_add_doc.tbl_doc_x_arc.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
                                                                self.dlg_add_doc.tbl_doc_x_arc, "v_edit_arc", "arc_id", self.rubber_band, 5))

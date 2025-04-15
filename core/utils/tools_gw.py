@@ -36,7 +36,7 @@ from qgis.core import Qgis, QgsProject, QgsPointXY, QgsVectorLayer, QgsField, Qg
     QgsSnappingConfig, QgsCoordinateTransform, QgsCoordinateReferenceSystem, QgsApplication, QgsVectorFileWriter, \
     QgsCoordinateTransformContext, QgsFieldConstraints, QgsEditorWidgetSetup, QgsRasterLayer, QgsDataSourceUri, \
     QgsProviderRegistry, QgsMapLayerStyle, QgsGeometry, QgsWkbTypes
-from qgis.gui import QgsDateTimeEdit, QgsRubberBand
+from qgis.gui import QgsDateTimeEdit, QgsRubberBand, QgsExpressionSelectionDialog
 
 from ..models.cat_feature import GwCatFeature
 from ..ui.dialog import GwDialog
@@ -57,13 +57,13 @@ from .selection_mode import GwSelectionMode
 
 # These imports are for the add_{widget} functions (modules need to be imported in order to find it by its name)
 # noinspection PyUnresolvedReferences
-from ..shared import info, mincut_tools
-from ..shared.selector import GwSelector
-from ..toolbars.edit import featuretype_change_btn
-from ..toolbars.epa import go2epa_selector_btn
-from ..shared import psector
-from ..shared import audit
-from ..toolbars.utilities import snapshot_view
+from ..shared import info, mincut_tools  # noqa: F401
+from ..shared.selector import GwSelector  # noqa: F401
+from ..toolbars.edit import featuretype_change_btn  # noqa: F401
+from ..toolbars.epa import go2epa_selector_btn  # noqa: F401
+from ..shared import psector  # noqa: F401
+from ..shared import audit  # noqa: F401
+from ..toolbars.utilities import snapshot_view  # noqa: F401
 
 QgsGeometryType = Literal['line', 'point', 'polygon']
 
@@ -3228,6 +3228,19 @@ def selection_init(class_object, dialog, table_object, selection_mode: GwSelecti
     global_vars.canvas.setCursor(cursor)
 
 
+def select_with_expression_dialog(class_object, dialog, table_object):
+    """Select features by expression"""
+
+    # Get the current feature type
+    class_object.feature_type = get_signal_change_tab(dialog)
+    # Connect the signal selection changed
+    connect_signal_selection_changed(class_object, dialog, table_object, GwSelectionMode.EXPRESSION)
+    # Show the expression dialog
+    show_expression_dialog(class_object, dialog, table_object)
+    # Disconnect the signal selection changed
+    # tools_qgis.disconnect_signal_selection_changed()
+
+
 def selection_changed(class_object, dialog, table_object, selection_mode: GwSelectionMode = GwSelectionMode.DEFAULT, lazy_widget=None, lazy_init_function=None):
     """Handles selections from the map while keeping stored table values and allowing new selections from snapping."""
 
@@ -3362,6 +3375,18 @@ def set_model_signals(class_object):
         class_object.qtbl_gully.selectionModel().selectionChanged.connect(partial(
             class_object._manage_tab_feature_buttons
         ))
+
+
+def show_expression_dialog(class_object, dialog, table_object):
+    """ Show expression builder dialog """
+
+    # Open a dialog with a QgsExpressionBuilderWidget in it
+    tablename = f"v_edit_{class_object.feature_type}"
+    layer = tools_qgis.get_layer_by_tablename(tablename)
+    start_text = f"{class_object.feature_type}_id"
+    print(layer)
+    dlg = QgsExpressionSelectionDialog(layer, start_text, dialog)
+    dlg.exec_()
 
 
 def insert_feature(class_object, dialog, table_object, is_psector=False, remove_ids=True, lazy_widget=None,

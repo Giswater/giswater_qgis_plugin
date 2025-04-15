@@ -384,6 +384,13 @@
               </property>
              </widget>
             </item>
+            <item>
+             <widget class="QPushButton" name="btn_expr_select">
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
            </layout>
           </item>
           <item>
@@ -487,7 +494,6 @@
               <property name="text">
                <string/>
               </property>
-
              </widget>
             </item>
            </layout>
