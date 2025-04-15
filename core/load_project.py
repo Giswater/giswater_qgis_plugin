@@ -432,22 +432,20 @@ class GwLoadProject(QObject):
         self._enable_toolbar("basic")
         self._enable_toolbar("utilities")
         self._enable_toolbar("toc")
+        self._enable_toolbar("am")
+        self._enable_toolbar("cm")
         self._hide_button("72")
 
-        self._hide_button(68)
+        # Check if audit exists
+        sql = f"SELECT schema_name FROM information_schema.schemata WHERE schema_name = 'audit'"
+        rows = tools_db.get_rows(sql, commit=False)
 
-        # Enable toolbars if their schemas exist
-        schemas = ["am", "cm", "audit"]
-        for schema in schemas:
-            sql = f"SELECT schema_name FROM information_schema.schemata WHERE schema_name = '{schema}'"
-            rows = tools_db.get_rows(sql, commit=False)
-            if rows is not None:
-                if schema == "cm":
-                    self._enable_toolbar(schema)
-                elif schema == "am" and global_vars.project_type == 'ws':
-                    self._enable_toolbar(schema)
-                elif schema == "audit":
-                    self._hide_button(68, False)
+        # Check if schema is actived
+        schema_actived = tools_gw.get_config_parser('toolbars_add', f'audit_active', 'user', 'init', False)
+        schema_actived = tools_os.set_boolean(schema_actived, False)
+
+        if rows is None or schema_actived is False:
+            self._hide_button(68)
 
     def _create_toolbar(self, toolbar_id):
 
@@ -462,16 +460,30 @@ class GwLoadProject(QObject):
         toolbar_name = tools_qt.tr(f'toolbar_{toolbar_id}_name')
         plugin_toolbar = GwPluginToolbar(toolbar_id, toolbar_name, True)
 
-        # If the toolbar is ToC, add it to the Layers docker toolbar, if not, create a new toolbar
-        if toolbar_id == "toc":
-            plugin_toolbar.toolbar = self.iface.mainWindow().findChild(QDockWidget, 'Layers').findChildren(QToolBar)[0]
-        else:
-            plugin_toolbar.toolbar = self.iface.addToolBar(toolbar_name)
+        match toolbar_id:
+            case "toc":
+                 # If the toolbar is ToC, add it to the Layers docker toolbar
+                plugin_toolbar.toolbar = self.iface.mainWindow().findChild(QDockWidget, 'Layers').findChildren(QToolBar)[0]
+            case "cm" | "am":
+                # If the toolbar is cm or am, check if the schema exists and if it is actived
+                sql = f"SELECT schema_name FROM information_schema.schemata WHERE schema_name = '{toolbar_id}'"
+                rows = tools_db.get_rows(sql, commit=False)
+                schema_actived = tools_gw.get_config_parser('toolbars_add', f'{toolbar_id}_active', 'user', 'init', False)
+                schema_actived = tools_os.set_boolean(schema_actived, False)
 
-        plugin_toolbar.toolbar.setObjectName(toolbar_name)
-        plugin_toolbar.toolbar.setProperty('gw_name', toolbar_id)
-        plugin_toolbar.list_actions = list_actions
-        self.plugin_toolbars[toolbar_id] = plugin_toolbar
+                if rows is not None and schema_actived is True:
+                    if toolbar_id == "cm" :
+                        plugin_toolbar.toolbar = self.iface.addToolBar(toolbar_name)
+                    elif global_vars.project_type == 'ws':
+                        plugin_toolbar.toolbar = self.iface.addToolBar(toolbar_name)
+            case _:
+                plugin_toolbar.toolbar = self.iface.addToolBar(toolbar_name)
+
+        if hasattr(plugin_toolbar, 'toolbar') and plugin_toolbar.toolbar is not None:
+            plugin_toolbar.toolbar.setObjectName(toolbar_name)
+            plugin_toolbar.toolbar.setProperty('gw_name', toolbar_id)
+            plugin_toolbar.list_actions = list_actions
+            self.plugin_toolbars[toolbar_id] = plugin_toolbar
 
     def _manage_snapping_layers(self):
         """ Manage snapping of layers """
