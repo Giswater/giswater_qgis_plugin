@@ -3964,11 +3964,7 @@ def delete_records(class_object, dialog, table_object, selection_mode: GwSelecti
     if selection_mode == GwSelectionMode.PSECTOR:
         full_list = widget.model()
         for x in range(0, full_list.rowCount()):
-            class_object.ids.append(widget.model().record(x).value(f"{feature_type}_id"))
-    if selection_mode == GwSelectionMode.CAMPAIGN:
-        full_list = widget.model()
-        for x in range(0, full_list.rowCount()):
-            class_object.ids.append(widget.model().record(x).value(f"{feature_type}_id"))
+            class_object.ids.append(widget.model().record(x).value(f"{feature_type}_id")
     else:
         class_object.ids = class_object.list_ids[feature_type]
 
@@ -4592,7 +4588,6 @@ def _insert_feature_campaign(dialog, feature_type, campaign_id, ids=None):
             VALUES ('{campaign_id}', '{feature_id}')
             ON CONFLICT DO NOTHING;
         """
-        print("swl: ", sql)
         tools_db.execute_sql(sql)
 
 
@@ -4619,7 +4614,6 @@ def _delete_feature_campaign(dialog, feature_type, list_id, campaign_id, state=N
 
     sql = (f"DELETE FROM {tablename} "
            f"WHERE {feature_type}_id IN ({list_id}) AND campaign_id = '{campaign_id}'")
-    print(sql)
     # Add state if needed
     if state is not None:
         sql += f""" AND "state" = '{state}'"""
