@@ -43,3 +43,8 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_controls('macroomzone_id');
 
 CREATE TRIGGER gw_trg_edit_controls BEFORE DELETE OR UPDATE ON macrosector
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_controls('macrosector_id');
+
+drop trigger if exists gw_trg_edit_element on inp_flwreg_weir;
+drop trigger if exists gw_trg_edit_element on inp_flwreg_orifice;
+drop trigger if exists gw_trg_edit_element on inp_flwreg_outlet;
+drop trigger if exists gw_trg_edit_element on inp_flwreg_pump;

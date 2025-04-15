@@ -257,7 +257,6 @@ ALTER TABLE gully ALTER COLUMN macrominsector_id SET DEFAULT 0;
 -- 02/12/2024
 DROP VIEW IF EXISTS ve_epa_orifice;
 DROP VIEW IF EXISTS v_edit_inp_orifice;
-DROP VIEW IF EXISTS v_edit_inp_dscenario_flwreg_orifice;
 DROP VIEW IF EXISTS v_edit_inp_flwreg_orifice;
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP", "table":"inp_orifice", "column":"close_time"}}$$);
@@ -334,25 +333,6 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE", "table":"inp
 
 ALTER TABLE config_form_fields ENABLE TRIGGER gw_trg_config_control;
 
---10/01/2025
---28/01/2025 [Modified]
--- Add flwreg as system type
-ALTER TABLE sys_feature_type DROP CONSTRAINT sys_feature_type_check;
-INSERT INTO sys_feature_type VALUES ('FLWREG', 5);
-ALTER TABLE sys_feature_type ADD CONSTRAINT sys_feature_type_check CHECK (((id)::text =ANY (ARRAY['ARC'::text, 'CONNEC'::text, 'ELEMENT'::text,
-'GULLY'::text, 'LINK'::text, 'NODE'::text, 'VNODE'::text, 'FLWREG'::text])));
-
--- Add flwregulators childs as feature_class
-ALTER TABLE sys_feature_class DROP CONSTRAINT sys_feature_cat_check;
-
-INSERT INTO sys_feature_class (id, "type", epa_default, man_table) VALUES('ORIFICE', 'FLWREG', 'ORIFICE', 'man_orifice') ON CONFLICT (id) DO NOTHING;
-INSERT INTO sys_feature_class (id, "type", epa_default, man_table) VALUES('VFLWREG', 'FLWREG', 'OUTLET', 'man_outlet') ON CONFLICT (id) DO NOTHING;
-INSERT INTO sys_feature_class (id, "type", epa_default, man_table) VALUES('WEIR', 'FLWREG', 'WEIR', 'man_weir') ON CONFLICT (id) DO NOTHING;
-INSERT INTO sys_feature_class (id, "type", epa_default, man_table) VALUES('PUMP', 'FLWREG', 'PUMP', 'man_pump') ON CONFLICT (id) DO NOTHING;
-
-ALTER TABLE sys_feature_class ADD CONSTRAINT sys_feature_cat_check CHECK (((id)::text = ANY (ARRAY['CHAMBER'::text, 'CONDUIT'::text, 'CONNEC'::text, 'GULLY'::text,
-'JUNCTION'::text, 'MANHOLE'::text, 'NETELEMENT'::text, 'NETGULLY'::text, 'NETINIT'::text, 'OUTFALL'::text, 'SIPHON'::text, 'STORAGE'::text, 'VALVE'::text,
-'VARC'::text, 'WACCEL'::text, 'WJUMP'::text, 'WWTP'::text, 'ELEMENT'::text, 'LINK'::text, 'ORIFICE'::text, 'VFLWREG'::text, 'WEIR'::text, 'PUMP'::text])));
 
 -- 21/01/2025
 ALTER TABLE temp_node RENAME TO _temp_node;
@@ -467,69 +447,6 @@ CREATE INDEX temp_arc_node_2_type ON temp_arc USING btree (node_2);
 CREATE INDEX temp_arc_omzone_id ON temp_arc USING btree (omzone_id);
 CREATE INDEX temp_arc_result_id ON temp_arc USING btree (result_id);
 
--- 29/01/2025
--- Add table for cat_feature_flwreg
-CREATE TABLE cat_feature_flwreg (
-	id varchar(30) NOT NULL,
-	epa_default varchar(30) NOT NULL,
-	CONSTRAINT cat_feature_flwreg_pkey PRIMARY KEY (id),
-	CONSTRAINT cat_feature_flwreg_fkey FOREIGN KEY (id) REFERENCES cat_feature(id) ON DELETE CASCADE ON UPDATE CASCADE,
-	CONSTRAINT cat_feature_flwreg_inp_check CHECK (((epa_default)::text = ANY (ARRAY['WEIR'::text, 'ORIFICE'::text, 'PUMP'::text, 'OUTLET'::text, 'UNDEFINED'::text])))
-);
-
-CREATE TABLE cat_flwreg (
-	id varchar(30) NOT NULL,
-	flwreg_type text NULL,
-	matcat_id varchar(16) NULL,
-	descript varchar(255) NULL,
-	link varchar(512) NULL,
-	brand_id varchar(30) NULL,
-	model_id varchar(30) NULL,
-	cost_unit varchar(3) DEFAULT 'u'::character varying NULL,
-	"cost" varchar(16) NULL,
-	active bool DEFAULT true NULL,
-	CONSTRAINT cat_flwreg_pkey PRIMARY KEY (id),
-	CONSTRAINT cat_flwreg_brand_fkey FOREIGN KEY (brand_id) REFERENCES cat_brand(id) ON DELETE CASCADE ON UPDATE CASCADE,
-	CONSTRAINT cat_flwreg_cost_fkey FOREIGN KEY ("cost") REFERENCES plan_price(id) ON DELETE CASCADE ON UPDATE CASCADE,
-	CONSTRAINT cat_flwreg_model_fkey FOREIGN KEY (model_id) REFERENCES cat_brand_model(id) ON DELETE CASCADE ON UPDATE CASCADE,
-	CONSTRAINT cat_flwreg_flwreg_type_fkey FOREIGN KEY (flwreg_type) REFERENCES cat_feature_flwreg(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT cat_flwreg_matcat_id_fkey FOREIGN KEY (matcat_id) REFERENCES cat_material(id) ON DELETE RESTRICT ON UPDATE CASCADE
-);
-
---create parent table for flow regulators
-CREATE TABLE flwreg (
-	flwreg_id varchar(16) DEFAULT nextval('urn_id_seq'::regclass) NOT NULL,
-	node_id varchar(16) NOT NULL,
-	order_id int2 NOT NULL,
-	to_arc varchar(16) NOT NULL,
-	nodarc_id character varying(20),
-	flwregcat_id varchar(18) NOT NULL,
-	flwreg_length float8 NOT NULL,
-	epa_type varchar(16) NOT NULL,  --(ORIFICE / WEIR / OUTLET / PUMP)
-	state int2 NOT NULL,
-	state_type int2 NOT NULL,
-	annotation text NULL,
-	observ text NULL,
-	the_geom public.geometry(linestring, SRID_VALUE) NOT NULL,
-	CONSTRAINT flwreg_epa_type_check CHECK (((epa_type)::text = ANY (ARRAY['WEIR'::text, 'ORIFICE'::text, 'PUMP'::text, 'OUTLET'::text, 'UNDEFINED'::text]))),
-	CONSTRAINT flwreg_pkey PRIMARY KEY (flwreg_id),
-	CONSTRAINT flwregcat_id_fkey FOREIGN KEY (flwregcat_id) REFERENCES cat_flwreg(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT flwreg_node_id_fkey FOREIGN KEY (node_id) REFERENCES node(node_id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT flwreg_to_arc_fkey FOREIGN KEY (to_arc) REFERENCES arc(arc_id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT flwreg_state_fkey FOREIGN KEY (state) REFERENCES value_state(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT flwreg_state_type_fkey FOREIGN KEY (state_type) REFERENCES value_state_type(id) ON DELETE RESTRICT ON UPDATE CASCADE
-
-);
-
-CREATE INDEX flwreg_node_id ON flwreg USING btree (node_id);
-CREATE INDEX flwreg_flwregcat_id ON flwreg USING btree (flwregcat_id);
-
-
-CREATE TABLE _inp_flwreg_pump AS SELECT * FROM inp_flwreg_pump;
-CREATE TABLE _inp_flwreg_outlet AS SELECT * FROM inp_flwreg_outlet;
-CREATE TABLE _inp_flwreg_orifice AS SELECT * FROM inp_flwreg_orifice;
-CREATE TABLE _inp_flwreg_weir AS SELECT * FROM inp_flwreg_weir;
-
 DROP VIEW IF EXISTS v_edit_inp_dscenario_flwreg_pump;
 DROP VIEW IF EXISTS v_edit_inp_dscenario_flwreg_outlet;
 DROP VIEW IF EXISTS v_edit_inp_dscenario_flwreg_orifice;
@@ -540,108 +457,6 @@ DROP VIEW IF EXISTS v_edit_inp_flwreg_outlet;
 DROP VIEW IF EXISTS v_edit_inp_flwreg_orifice;
 DROP VIEW IF EXISTS v_edit_inp_flwreg_weir;
 
-ALTER TABLE inp_dscenario_flwreg_pump DROP CONSTRAINT inp_dscenario_flwreg_pump_nodarc_id_fkey;
-ALTER TABLE inp_dscenario_flwreg_outlet DROP CONSTRAINT inp_dscenario_flwreg_outlet_nodarc_id_fkey;
-ALTER TABLE inp_dscenario_flwreg_orifice DROP CONSTRAINT inp_dscenario_flwreg_orifice_nodarc_id_fkey;
-ALTER TABLE inp_dscenario_flwreg_weir DROP CONSTRAINT inp_dscenario_flwreg_weir_nodarc_id_fkey;
-
-DROP TABLE IF EXISTS inp_flwreg_pump;
-DROP TABLE IF EXISTS inp_flwreg_outlet;
-DROP TABLE IF EXISTS inp_flwreg_orifice;
-DROP TABLE IF EXISTS inp_flwreg_weir;
-
-CREATE TABLE inp_flwreg_outlet (
-	flwreg_id varchar(16) NOT NULL,
-    outlet_type character varying(16) NOT NULL,
-    offsetval numeric(12,4),
-    curve_id character varying(16),
-    cd1 numeric(12,4),
-    cd2 numeric(12,4),
-    flap character varying(3),
-	CONSTRAINT inp_flwreg_outlet_pkey PRIMARY KEY (flwreg_id),
-    CONSTRAINT inp_flwreg_outlet_check_outlet_type CHECK (((outlet_type)::text = ANY ((ARRAY['FUNCTIONAL/DEPTH'::character varying, 'FUNCTIONAL/HEAD'::character varying, 'TABULAR/DEPTH'::character varying, 'TABULAR/HEAD'::character varying])::text[]))),
-	CONSTRAINT inp_flwreg_outlet_flwreg_id_fkey FOREIGN KEY (flwreg_id) REFERENCES flwreg(flwreg_id) ON DELETE CASCADE ON UPDATE CASCADE
-);
-
-CREATE TABLE inp_flwreg_orifice (
-	flwreg_id varchar(16) NOT NULL,
-	orifice_type varchar(18) NOT NULL,
-	offsetval numeric(12, 4) NULL,
-	cd numeric(12, 4) NOT NULL,
-	orate numeric(12, 4) NULL,
-	flap varchar(3) NOT NULL,
-	shape varchar(18) NOT NULL,
-	geom1 numeric(12, 4) NOT NULL,
-	geom2 numeric(12, 4) DEFAULT 0.00 NOT NULL,
-	geom3 numeric(12, 4) DEFAULT 0.00 NULL,
-	geom4 numeric(12, 4) DEFAULT 0.00 NULL,
-	CONSTRAINT inp_flwreg_orifice_check_ory_type CHECK (((orifice_type)::text = ANY (ARRAY[('SIDE'::character varying)::text, ('BOTTOM'::character varying)::text]))),
-	CONSTRAINT inp_flwreg_orifice_check_shape CHECK (((shape)::text = ANY (ARRAY[('CIRCULAR'::character varying)::text, ('RECT_CLOSED'::character varying)::text]))),
-	CONSTRAINT inp_flwreg_orifice_pkey PRIMARY KEY (flwreg_id),
-	CONSTRAINT inp_flwreg_orifice_flwreg_id_fkey FOREIGN KEY (flwreg_id) REFERENCES flwreg(flwreg_id) ON DELETE CASCADE ON UPDATE CASCADE
-);
-
-CREATE TABLE inp_flwreg_pump (
-	flwreg_id varchar(16) NOT NULL,
-	pump_type varchar(18) NOT NULL,
-	curve_id varchar(16) NOT NULL,
-	status varchar(3) NULL,
-	startup numeric(12, 4) NULL,
-	shutoff numeric(12, 4) NULL,
-	CONSTRAINT inp_flwreg_pump_pkey PRIMARY KEY (flwreg_id),
-	CONSTRAINT inp_flwreg_pump_check_status CHECK (((status)::text = ANY (ARRAY[('ON'::character varying)::text, ('OFF'::character varying)::text]))),
-	CONSTRAINT inp_flwreg_pump_curve_id_fkey FOREIGN KEY (curve_id) REFERENCES inp_curve(id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT inp_flwreg_pump_flwreg_id_fkey FOREIGN KEY (flwreg_id) REFERENCES flwreg(flwreg_id) ON DELETE CASCADE ON UPDATE CASCADE
-);
-
-CREATE TABLE inp_flwreg_weir (
-	flwreg_id varchar(16) NOT NULL,
-	weir_type varchar(18) NOT NULL,
-	offsetval numeric(12, 4) NULL,
-	cd numeric(12, 4) NULL,
-	ec numeric(12, 4) NULL,
-	cd2 numeric(12, 4) NULL,
-	flap varchar(3) NULL,
-	geom1 numeric(12, 4) NULL,
-	geom2 numeric(12, 4) DEFAULT 0.00 NULL,
-	geom3 numeric(12, 4) DEFAULT 0.00 NULL,
-	geom4 numeric(12, 4) DEFAULT 0.00 NULL,
-	surcharge varchar(3) NULL,
-	road_width float8 NULL,
-	road_surf varchar(16) NULL,
-	coef_curve float8 NULL,
-	CONSTRAINT inp_flwreg_weir_check_type CHECK (((weir_type)::text = ANY (ARRAY['ROADWAY'::text, 'SIDEFLOW'::text, 'TRANSVERSE'::text, 'V-NOTCH'::text, 'TRAPEZOIDAL_WEIR'::text]))),
-	CONSTRAINT inp_flwreg_weir_pkey PRIMARY KEY (flwreg_id),
-	CONSTRAINT inp_flwreg_weir_flwreg_id_fkey FOREIGN KEY (flwreg_id) REFERENCES flwreg(flwreg_id) ON DELETE CASCADE ON UPDATE CASCADE
-);
-
-DROP TABLE IF EXISTS _inp_flwreg_pump;
-DROP TABLE IF EXISTS _inp_flwreg_outlet;
-DROP TABLE IF EXISTS _inp_flwreg_orifice;
-DROP TABLE IF EXISTS _inp_flwreg_weir;
-
-
--- Create man table for flow regulators
-CREATE TABLE man_pump (
-	flwreg_id varchar(16) NOT NULL,
-	pump_class varchar(16) NOT NULL,
-	CONSTRAINT man_frpump_pkey PRIMARY KEY (flwreg_id),
-	CONSTRAINT man_frpump_flwreg_id_fk FOREIGN KEY (flwreg_id) REFERENCES flwreg(flwreg_id) ON DELETE CASCADE
-);
-
-CREATE TABLE man_weir(
-	flwreg_id varchar(16) NOT NULL,
-	weir_class varchar(16) NOT NULL,
-	CONSTRAINT man_frweir_pkey PRIMARY KEY (flwreg_id),
-	CONSTRAINT man_frweir_flwreg_id_fk FOREIGN KEY (flwreg_id) REFERENCES flwreg(flwreg_id) ON DELETE CASCADE
-);
-
-CREATE TABLE man_orifice (
-	flwreg_id varchar(16) NOT NULL,
-	orifice_class varchar(16) NOT NULL,
-	CONSTRAINT man_frorifice_pkey PRIMARY KEY (flwreg_id),
-	CONSTRAINT man_frorifice_flwreg_id_fk FOREIGN KEY (flwreg_id) REFERENCES flwreg(flwreg_id) ON DELETE CASCADE
-);
 
 ALTER TABLE man_manhole RENAME TO _man_manhole;
 ALTER TABLE _man_manhole DROP CONSTRAINT IF EXISTS man_manhole_pkey;
@@ -945,7 +760,6 @@ ALTER TABLE inp_dwf DROP CONSTRAINT inp_dwf_node_id_fkey;
 ALTER TABLE man_outfall DROP CONSTRAINT man_outfall_node_id_fkey;
 ALTER TABLE inp_junction DROP CONSTRAINT inp_junction_node_id_fkey;
 ALTER TABLE inp_dscenario_inflows DROP CONSTRAINT inp_dscenario_inflows_node_id_fkey;
-ALTER TABLE flwreg DROP CONSTRAINT flwreg_node_id_fkey;
 ALTER TABLE plan_psector_x_node DROP CONSTRAINT plan_psector_x_node_node_id_fkey;
 ALTER TABLE inp_treatment DROP CONSTRAINT inp_treatment_node_x_pol_node_id_fkey;
 
@@ -971,6 +785,18 @@ ALTER TABLE _node DROP CONSTRAINT node_streetaxis2_id_fkey;
 ALTER TABLE _node DROP CONSTRAINT node_streetaxis_id_fkey;
 ALTER TABLE _node DROP CONSTRAINT node_workcat_id_end_fkey;
 ALTER TABLE _node DROP CONSTRAINT node_workcat_id_fkey;
+
+ALTER TABLE inp_flwreg_orifice DROP CONSTRAINT inp_flwreg_orifice_node_id_fkey;
+ALTER TABLE inp_flwreg_outlet DROP CONSTRAINT inp_flwreg_outlet_node_id_fkey;
+ALTER TABLE inp_flwreg_pump DROP CONSTRAINT inp_flwreg_pump_node_id_fkey;
+ALTER TABLE inp_flwreg_weir DROP CONSTRAINT inp_flwreg_weir_node_id_fkey;
+
+ALTER TABLE inp_flwreg_orifice DROP CONSTRAINT inp_flwreg_orifice_to_arc_fkey;
+ALTER TABLE inp_flwreg_outlet DROP CONSTRAINT inp_flwreg_outlet_to_arc_fkey;
+ALTER TABLE inp_flwreg_pump DROP CONSTRAINT inp_flwreg_pump_to_arc_fkey;
+ALTER TABLE inp_flwreg_weir DROP CONSTRAINT inp_flwreg_weir_to_arc_fkey;
+
+
 
 -- Drop restrictions from table node
 ALTER TABLE _node DROP CONSTRAINT node_epa_type_check;
@@ -1133,7 +959,6 @@ ALTER TABLE arc RENAME TO _arc;
 ALTER TABLE connec DROP CONSTRAINT connec_arc_id_fkey;
 ALTER TABLE doc_x_arc DROP CONSTRAINT doc_x_arc_arc_id_fkey;
 ALTER TABLE element_x_arc DROP CONSTRAINT element_x_arc_arc_id_fkey;
-ALTER TABLE flwreg DROP CONSTRAINT flwreg_to_arc_fkey;
 ALTER TABLE gully DROP CONSTRAINT gully_arc_id_fkey;
 ALTER TABLE inp_conduit DROP CONSTRAINT inp_conduit_arc_id_fkey;
 ALTER TABLE inp_divider DROP CONSTRAINT inp_divider_arc_id_fkey;

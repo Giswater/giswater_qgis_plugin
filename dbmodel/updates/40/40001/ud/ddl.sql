@@ -7,8 +7,6 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
--- DROP FUNCTION IF EXISTS gw_trg_vi(); -- TODO: refactor gw_fct_rpt2pg_import_rpt
-
 ALTER TABLE inp_flwreg_outlet RENAME TO inp_flwreg_outlet2;
 ALTER TABLE inp_flwreg_orifice RENAME TO inp_flwreg_orifice2;
 ALTER TABLE inp_flwreg_weir RENAME TO inp_flwreg_weir2;
@@ -161,3 +159,5 @@ CREATE TABLE inp_dscenario_flwreg_weir (
 );
 
 DROP TABLE IF EXISTS ext_rtc_dma_period CASCADE;
+
+alter table inp_flwreg_pump alter column pump_type drop not null;

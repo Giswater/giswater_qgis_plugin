@@ -8402,12 +8402,6 @@ INSERT INTO man_wjump VALUES ('235', NULL, NULL, NULL, NULL, NULL, NULL);
 
 INSERT INTO man_wwtp (node_id, name, wwtp_type, treatment_type) VALUES ('236', NULL, 0, 0);
 
-INSERT INTO man_pump VALUES('100019', 'PUMP-01');
-
-INSERT INTO man_orifice VALUES('100017', 'ORIFICE-01');
-
-INSERT INTO man_weir VALUES('100023', 'TRANSVERSE');
-INSERT INTO man_weir VALUES('100018', 'TRANSVERSE');
 
 DO $func$
 DECLARE

@@ -323,3 +323,49 @@ BEGIN
     END IF;
   END LOOP;
 END $func$;
+
+
+--- WEIR: insert man table
+insert into ve_elem_frweir (elementcat_id, state, state_type, num_elements, expl_id, sector_id, muni_id, the_geom, flwreg_class, nodarc_id, order_id, to_arc, flwreg_length )
+select 'FRWEIR-01', state, state_type, 1, expl_id, sector_id, muni_id, the_geom, 'WEIR', node_id, order_id, to_arc, flwreg_length 
+from inp_flwreg_weir2
+join node using (node_id);
+
+--- WEIR: insert epa table
+insert into inp_flwreg_weir
+select element_id, weir_type, offsetval, cd, ec, cd2, flap, geom1, geom2, geom3, geom4, surcharge, road_width, road_surf, coef_curve
+from inp_flwreg_weir2 w join ve_elem_frweir r on node_id=r.nodarc_id and w.to_arc = r.to_arc and w.order_id = r.order_id;
+
+--- PUMP: insert man table
+insert into ve_elem_frpump (elementcat_id, state, state_type, num_elements, expl_id, sector_id, muni_id, the_geom, flwreg_class, nodarc_id, order_id, to_arc, flwreg_length )
+select 'FRPUMP-01', state, state_type, 1, expl_id, sector_id, muni_id, the_geom, 'PUMP', node_id, order_id, to_arc, flwreg_length 
+from inp_flwreg_pump2
+join node using (node_id);
+
+--- PUMP: insert epa table
+insert into inp_flwreg_pump (element_id, curve_id, status, startup, shutoff)
+select element_id, curve_id, status, startup, shutoff
+from inp_flwreg_pump2 w join ve_elem_frpump r on node_id=r.nodarc_id and w.to_arc = r.to_arc and w.order_id = r.order_id;
+
+--- ORIFICE: insert man table
+insert into ve_elem_frorifice (elementcat_id, state, state_type, num_elements, expl_id, sector_id, muni_id, the_geom, flwreg_class, nodarc_id, order_id, to_arc, flwreg_length )
+select 'FRORIFICE-01', state, state_type, 1, expl_id, sector_id, muni_id, the_geom, 'ORIFICE', node_id, order_id, to_arc, flwreg_length 
+from inp_flwreg_orifice2
+join node using (node_id);
+
+--- ORIFICE: insert epa table
+insert into inp_flwreg_orifice
+select element_id, ori_type, offsetval, cd, orate, flap, shape, geom1, geom2, geom3, geom4
+from inp_flwreg_orifice2 w join ve_elem_frorifice r on node_id=r.nodarc_id and w.to_arc = r.to_arc and w.order_id = r.order_id;
+
+--- OUTLET: insert man table
+insert into ve_elem_froutlet (elementcat_id, state, state_type, num_elements, expl_id, sector_id, muni_id, the_geom, flwreg_class, nodarc_id, order_id, to_arc, flwreg_length )
+select 'FROUTLET-01', state, state_type, 1, expl_id, sector_id, muni_id, the_geom, 'OUTLET', node_id, order_id, to_arc, flwreg_length 
+from inp_flwreg_outlet2
+join node using (node_id);
+
+--- OUTLET: insert epa table
+insert into inp_flwreg_outlet
+select element_id, outlet_type, offsetval, curve_id, cd1, cd2, flap
+from inp_flwreg_outlet2 w join ve_elem_frorifice r on node_id=r.nodarc_id and w.to_arc = r.to_arc and w.order_id = r.order_id;
+
