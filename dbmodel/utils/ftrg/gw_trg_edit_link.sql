@@ -788,7 +788,7 @@ BEGIN
 			-- force reconnection on connecs
 			IF NEW.feature_type = 'CONNEC' THEN
 				IF v_projectype = 'WS' THEN
-					UPDATE dma_id = v_dma WHERE connec_id = NEW.feature_id;
+					UPDATE connec SET dma_id = v_dma WHERE connec_id = NEW.feature_id;
 				END IF;
 
 				UPDATE connec SET arc_id = v_arc_id, pjoint_type = NEW.exit_type, pjoint_id = NEW.exit_id,
