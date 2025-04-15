@@ -3964,7 +3964,7 @@ def delete_records(class_object, dialog, table_object, selection_mode: GwSelecti
     if selection_mode == GwSelectionMode.PSECTOR:
         full_list = widget.model()
         for x in range(0, full_list.rowCount()):
-            class_object.ids.append(widget.model().record(x).value(f"{feature_type}_id")
+            class_object.ids.append(widget.model().record(x).value(f"{feature_type}_id"))
     else:
         class_object.ids = class_object.list_ids[feature_type]
 
