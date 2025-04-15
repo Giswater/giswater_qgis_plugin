@@ -15,7 +15,7 @@ from qgis.PyQt.QtGui import QIcon
 
 from ..dialog import GwAction
 from .... import global_vars
-from ....libs import lib_vars, tools_qgis
+from ....libs import lib_vars, tools_qgis, tools_qt
 from .epa_tools.anl_add_demand_check import AddDemandCheck
 from .epa_tools.anl_recursive_go2epa import RecursiveEpa
 from .epa_tools.anl_quantized_demands import QuantizedDemands
@@ -60,23 +60,23 @@ class GwEpaTools(GwAction):
             del action
         ag = QActionGroup(self.iface.mainWindow())
 
-        anl_menu = self.menu.addMenu("ANALYTICS")
-        cal_menu = self.menu.addMenu("CALIBRATION")
+        anl_menu = self.menu.addMenu(tools_qt.tr("ANALYTICS"))
+        cal_menu = self.menu.addMenu(tools_qt.tr("CALIBRATION"))
 
         new_actions = [
-            (anl_menu, ('ws'), 'ADDITIONAL DEMAND CHECK', None),
-            (anl_menu, ('ud', 'ws'), 'EPA MULTI CALLS', None),
-            (anl_menu, ('ws'), 'QUANTIZED DEMANDS', None),
-            (anl_menu, ('ws'), 'VALVE OPERATION CHECK', None),
-            (cal_menu, ('ws'), 'EMITTER CALIBRATION', None),
-            (cal_menu, ('ws'), 'STATIC CALIBRATION', None),
-            (self.menu, ('ud', 'ws'), 'IMPORT INP FILE', QIcon(f"{lib_vars.plugin_dir}{os.sep}icons{os.sep}toolbars{os.sep}epa{os.sep}22.png"))
+            (anl_menu, ('ws'), tools_qt.tr('ADDITIONAL DEMAND CHECK'), None),
+            (anl_menu, ('ud', 'ws'), tools_qt.tr('EPA MULTI CALLS'), None),
+            (anl_menu, ('ws'), tools_qt.tr('QUANTIZED DEMANDS'), None),
+            (anl_menu, ('ws'), tools_qt.tr('VALVE OPERATION CHECK'), None),
+            (cal_menu, ('ws'), tools_qt.tr('EMITTER CALIBRATION'), None),
+            (cal_menu, ('ws'), tools_qt.tr('STATIC CALIBRATION'), None),
+            (self.menu, ('ud', 'ws'), tools_qt.tr('IMPORT INP FILE'), QIcon(f"{lib_vars.plugin_dir}{os.sep}icons{os.sep}toolbars{os.sep}epa{os.sep}22.png"))
         ]
         # Add Go2Iber action if drain plugin is available
         if tools_qgis.is_plugin_active('drain'):
             drain_menu = self.menu.addMenu(QIcon(f"{lib_vars.plugin_dir}{os.sep}icons{os.sep}toolbars{os.sep}epa{os.sep}47.png"), "DRAIN")
-            new_actions.append((drain_menu, ('ud'), 'ADD DRAIN GPKG PROJECT', None))
-            new_actions.append((drain_menu, ('ud'), 'GO2IBER', None))
+            new_actions.append((drain_menu, ('ud'), tools_qt.tr('ADD DRAIN GPKG PROJECT'), None))
+            new_actions.append((drain_menu, ('ud'), tools_qt.tr('GO2IBER'), None))
 
         for menu, types, action, icon in new_actions:
             if global_vars.project_type in types:
@@ -95,31 +95,31 @@ class GwEpaTools(GwAction):
     def _get_selected_action(self, name):
         """ Gets selected action """
 
-        if name == 'ADDITIONAL DEMAND CHECK':
+        if name == tools_qt.tr('ADDITIONAL DEMAND CHECK'):
             add_demand_check = AddDemandCheck()
             add_demand_check.clicked_event()
 
-        elif name == 'EPA MULTI CALLS':
+        elif name == tools_qt.tr('EPA MULTI CALLS'):
             recursive_epa = RecursiveEpa()
             recursive_epa.clicked_event()
 
-        elif name == 'EMITTER CALIBRATION':
+        elif name == tools_qt.tr('EMITTER CALIBRATION'):
             emitter_calibration = EmitterCalibration()
             emitter_calibration.clicked_event()
 
-        elif name == 'QUANTIZED DEMANDS':
+        elif name == tools_qt.tr('QUANTIZED DEMANDS'):
             quantized_demands = QuantizedDemands()
             quantized_demands.clicked_event()
 
-        elif name == 'STATIC CALIBRATION':
+        elif name == tools_qt.tr('STATIC CALIBRATION'):
             static_calibration = StaticCalibration()
             static_calibration.clicked_event()
 
-        elif name == 'VALVE OPERATION CHECK':
+        elif name == tools_qt.tr('VALVE OPERATION CHECK'):
             valve_operation_check = ValveOperationCheck()
             valve_operation_check.clicked_event()
 
-        elif name == 'IMPORT INP FILE':
+        elif name == tools_qt.tr('IMPORT INP FILE'):
             if global_vars.project_type == 'ws':
                 import_inp = GwImportEpanet()
                 import_inp.clicked_event()
@@ -129,10 +129,10 @@ class GwEpaTools(GwAction):
                 import_inp.clicked_event()
                 return
 
-        elif name == 'ADD DRAIN GPKG PROJECT':
+        elif name == tools_qt.tr('ADD DRAIN GPKG PROJECT'):
             print("add drain layer")
 
-        elif name == 'GO2IBER':
+        elif name == tools_qt.tr('GO2IBER'):
             go2iber = Go2Iber()
             go2iber.clicked_event()
 
