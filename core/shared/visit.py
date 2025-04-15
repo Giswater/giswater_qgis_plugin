@@ -138,6 +138,7 @@ class GwVisit(QObject):
         tools_gw.add_icon(self.dlg_add_visit.btn_feature_insert, "111")
         tools_gw.add_icon(self.dlg_add_visit.btn_feature_delete, "112")
         tools_gw.add_icon(self.dlg_add_visit.btn_feature_snapping, "137")
+        tools_gw.add_icon(self.dlg_add_visit.btn_expr_select, "178")
         tools_gw.add_icon(self.dlg_add_visit.btn_doc_insert, "111")
         tools_gw.add_icon(self.dlg_add_visit.btn_doc_delete, "112")
         tools_gw.add_icon(self.dlg_add_visit.btn_doc_new, "134")
@@ -1817,6 +1818,7 @@ class GwVisit(QObject):
             self.dlg_add_visit.btn_feature_insert.clicked.disconnect()
             self.dlg_add_visit.btn_feature_delete.clicked.disconnect()
             self.dlg_add_visit.btn_feature_snapping.clicked.disconnect()
+            self.dlg_add_visit.btn_expr_select.clicked.disconnect()
         except Exception as e:
             tools_log.log_info(f"visit_tab_feature_changed exception: {e}")
         finally:
@@ -1829,6 +1831,9 @@ class GwVisit(QObject):
 
             self.dlg_add_visit.btn_feature_snapping.clicked.connect(
                 partial(self._feature_snapping_clicked, self.dlg_add_visit, 'visit'))
+            self.dlg_add_visit.btn_expr_select.clicked.connect(
+                partial(tools_gw.select_with_expression_dialog, self, self.dlg_add_visit, 'visit')
+            )
 
         # Adding auto-completion to a QLineEdit
         tools_gw.set_completer_widget(viewname, dialog.feature_id, str(self.feature_type) + "_id")
