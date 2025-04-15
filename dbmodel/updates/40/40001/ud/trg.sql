@@ -255,10 +255,6 @@ CREATE TRIGGER gw_trg_edit_ve_epa_pump INSTEAD OF INSERT OR DELETE OR UPDATE ON 
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_ve_epa('pump');
 
 
--- CREATE TRIGGER for cat_feature_flwreg
-CREATE TRIGGER gw_trg_edit_cat_feature INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_cat_feature_element
-FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_cat_feature('element');
-
 --CREATE TRIGGER for parent view by passing parameter 'parent'
 CREATE TRIGGER gw_trg_edit_element INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_flwreg
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_element('flwreg');

@@ -30,6 +30,9 @@ INSERT INTO config_typevalue (typevalue, id, camelstyle, idval, addparam) VALUES
 
 
 INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) VALUES ('FRPUMP', 'FLWREG', 'ELEMENT', 'v_edit_element', 've_elem_frpump', true) ON CONFLICT (id) DO NOTHING;
+
+UPDATE cat_feature SET id ='NETREGISTER' WHERE id = 'REGISTER';
+
 INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer)
 SELECT upper(REPLACE(id, ' ', '_')), 'GENELEMENT', 'ELEMENT', 'v_edit_element', concat('ve_elem_', lower(REPLACE(id, ' ', '_'))) FROM element_type ON CONFLICT (id) DO NOTHING;
 
@@ -60,6 +63,7 @@ insert into config_typevalue values ('sys_table_context', '{"level_1":"INVENTORY
 insert into sys_table values ('v_edit_genelement', 'Parent view for general elements', 'role_basic', null, 
 '{"level_1":"INVENTORY","level_2":"NETWORK", "level_3":"GENELEMENT"}', 1, 'Genelement', null, null, null, 'core'); 
 
+delete from sys_table WHERE id = 'v_edit_flwreg';
 insert into sys_table values ('v_edit_flwreg', 'Parent view for flowregulator elements', 'role_basic', null, 
 '{"level_1":"INVENTORY","level_2":"NETWORK", "level_3":"FLWREG"}', 1, 'Flowregulator', null, null, null, 'core'); 
 

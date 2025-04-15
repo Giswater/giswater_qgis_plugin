@@ -148,7 +148,6 @@ SELECT element.element_id,
     element.muni_id,
     element.sector_id,
     element.lock_level,
-    element.the_geom,
     element.created_at,
     element.created_by,
     element.updated_at,
@@ -203,11 +202,10 @@ SELECT element.element_id,
     element.muni_id,
     element.sector_id,
     element.lock_level,
-    element.the_geom,
     element.created_at,
     element.created_by,
     element.updated_at,
-    element.updated_by
+    element.updated_by,
     man_genelement.the_geom
    FROM selector_expl, element
      JOIN cat_element ON element.elementcat_id::text = cat_element.id::text
@@ -218,6 +216,67 @@ SELECT element.element_id,
   LEFT JOIN selector_municipality m USING (muni_id)
   WHERE (s.cur_user = current_user OR s.sector_id IS NULL)
   AND (m.cur_user = current_user OR e.muni_id IS NULL);
+  
+  
+  
+CREATE OR REPLACE VIEW v_edit_flwreg AS
+  SELECT element.element_id,
+    element.code,
+    element.elementcat_id,
+    cat_element.element_type,
+    element.brand_id,
+    element.model_id,
+    element.serial_number,
+    element.state,
+    element.state_type,
+    element.num_elements,
+    element.observ,
+    element.comment,
+    element.function_type,
+    element.category_type,
+    element.location_type,
+    element.fluid_type,
+    element.workcat_id,
+    element.workcat_id_end,
+    element.builtdate,
+    element.enddate,
+    element.ownercat_id,
+    element.rotation,
+    cat_element.link,
+    element.verified,
+    element.label_x,
+    element.label_y,
+    element.label_rotation,
+    element.publish,
+    element.inventory,
+    element.undelete,
+    element.expl_id,
+    element.pol_id,
+    element.top_elev,
+    element.expl_id2,
+    element.trace_featuregeom,
+    element.muni_id,
+    element.sector_id,
+    element.lock_level,
+    element.created_at,
+    element.created_by,
+    element.updated_at,
+    element.updated_by,
+	man_flwreg.flwreg_class,
+	man_flwreg.flwreg_type,
+	man_flwreg.nodarc_id,
+	man_flwreg.order_id,
+	man_flwreg.to_arc,
+	man_flwreg.flwreg_length,
+	man_flwreg.the_geom
+   FROM element
+      JOIN cat_element ON element.elementcat_id::text = cat_element.id::text
+      JOIN man_flwreg ON element.element_id::text = man_flwreg.element_id::text
+      LEFT JOIN selector_sector s USING (sector_id)
+      LEFT JOIN selector_municipality m USING (muni_id)
+      LEFT JOIN selector_expl e using (expl_id)
+    WHERE element.expl_id = e.expl_id
+    AND s.cur_user = "current_user"()::text AND m.cur_user = "current_user"()::text AND e.cur_user = "current_user"()::text;
 
 CREATE OR REPLACE VIEW v_ext_raster_dem
 AS SELECT DISTINCT ON (r.id) r.id,
@@ -373,63 +432,6 @@ AS SELECT
      LEFT JOIN man_type_location ON man_type_location.location_type::text = v_edit_element.location_type::text AND man_type_location.feature_type::text = 'ELEMENT'::text
      LEFT JOIN cat_element ON cat_element.id::text = v_edit_element.elementcat_id::text;
 
-CREATE OR REPLACE VIEW v_edit_flwreg AS
-  SELECT element.element_id,
-    element.code,
-    element.elementcat_id,
-    cat_element.element_type,
-    man_flwreg.nodarc_id,
-    man_flwreg.order_id,
-    man_flwreg.to_arc,
-    man_flwreg.flwreg_type,
-    man_flwreg.flwreg_length,
-    element.brand_id,
-    element.model_id,
-    element.serial_number,
-    element.state,
-    element.state_type,
-    element.num_elements,
-    element.observ,
-    element.comment,
-    element.function_type,
-    element.category_type,
-    element.location_type,
-    element.fluid_type,
-    element.workcat_id,
-    element.workcat_id_end,
-    element.builtdate,
-    element.enddate,
-    element.ownercat_id,
-    element.rotation,
-    cat_element.link,
-    element.verified,
-    element.label_x,
-    element.label_y,
-    element.label_rotation,
-    element.publish,
-    element.inventory,
-    element.undelete,
-    element.expl_id,
-    element.pol_id,
-    element.top_elev,
-    element.expl_id2,
-    element.trace_featuregeom,
-    element.muni_id,
-    element.sector_id,
-    element.lock_level,
-    element.the_geom,
-    element.created_at,
-    element.created_by,
-    element.updated_at,
-    element.updated_by
-   FROM element
-      JOIN cat_element ON element.elementcat_id::text = cat_element.id::text
-      JOIN man_flwreg ON element.element_id::text = man_flwreg.element_id::text
-      LEFT JOIN selector_sector s USING (sector_id)
-      LEFT JOIN selector_municipality m USING (muni_id)
-      LEFT JOIN selector_expl e using (expl_id)
-    WHERE element.expl_id = e.expl_id
-    AND s.cur_user = "current_user"()::text AND m.cur_user = "current_user"()::text AND e.cur_user = "current_user"()::text;
 
 CREATE OR REPLACE VIEW v_edit_inp_flwreg_pump
 AS SELECT
