@@ -21,8 +21,13 @@ DROP TRIGGER IF EXISTS gw_trg_vi_quality ON vi_quality;
 CREATE TRIGGER gw_trg_edit_cat_feature INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_cat_feature_link
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_cat_feature('link');
 
+CREATE TRIGGER gw_trg_edit_cat_feature INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_cat_feature_element 
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_cat_feature('element');
+
 CREATE TRIGGER gw_trg_cat_material_fk_insert AFTER INSERT ON cat_link
 FOR EACH ROW EXECUTE FUNCTION gw_trg_cat_material_fk('link');
 
 CREATE TRIGGER gw_trg_cat_material_fk_update AFTER UPDATE OF matcat_id ON cat_link
 FOR EACH ROW WHEN (((old.matcat_id)::TEXT IS DISTINCT FROM (new.matcat_id)::TEXT)) EXECUTE FUNCTION gw_trg_cat_material_fk('link');
+
+

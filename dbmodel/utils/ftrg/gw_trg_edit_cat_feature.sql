@@ -80,9 +80,9 @@ BEGIN
 
 			UPDATE cat_feature_gully SET double_geom=NEW.double_geom::json, epa_default=NEW.epa_default WHERE id=NEW.id;
 
-		ELSIF v_table='flwreg' THEN
+		ELSIF v_table='element' THEN
 
-			UPDATE cat_feature_flwreg SET epa_default=NEW.epa_default WHERE id=NEW.id;
+			UPDATE cat_feature_element SET epa_default=NEW.epa_default WHERE id=NEW.id;
 		END IF;
 
 		RETURN NEW;
@@ -105,7 +105,6 @@ BEGIN
 			END IF;
 
 		ELSIF v_table='node' THEN
-
 			IF v_project_type='ws' THEN
 				UPDATE cat_feature_node SET epa_default=NEW.epa_default, isarcdivide=NEW.isarcdivide, isprofilesurface=NEW.isprofilesurface, choose_hemisphere=NEW.choose_hemisphere,
 				double_geom=NEW.double_geom::json, num_arcs=NEW.num_arcs, graph_delimiter=NEW.graph_delimiter  WHERE id=NEW.id;
@@ -116,13 +115,10 @@ BEGIN
 			END IF;
 
 		ELSIF v_table='gully' THEN
-
 			UPDATE cat_feature_gully SET double_geom=NEW.double_geom::json WHERE id=NEW.id;
 
-		ELSIF v_table='flwreg' THEN
-
-			UPDATE cat_feature_flwreg SET epa_default=NEW.epa_default WHERE id=NEW.id;
-
+		ELSIF v_table='element' THEN
+			UPDATE cat_feature_element SET epa_default=NEW.epa_default WHERE id=NEW.id;
 
 		END IF;
 

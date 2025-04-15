@@ -61,8 +61,13 @@ BEGIN
         INSERT INTO sys_table(id, descript, sys_role)
         VALUES (v_view_name, concat('Custom editable view for ',v_cat_feature), 'role_edit') ON CONFLICT (id) DO NOTHING;
         IF v_version >'3.5.020' or v_version is null THEN
-            UPDATE sys_table st SET context = concat('{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"',feature_type,'"}'), criticity=0, alias = initcap(cf.id)
-            FROM cat_feature cf WHERE cf.child_layer = v_view_name AND cf.child_layer=st.id;
+        	IF v_feature_type = 'ELEMENT' THEN
+            	UPDATE sys_table st SET context = concat('{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"',feature_class,'"}'), criticity=0, alias = initcap(cf.id)
+            	FROM cat_feature cf WHERE cf.child_layer = v_view_name AND cf.child_layer=st.id;
+           ELSE 
+           		UPDATE sys_table st SET context = concat('{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"',feature_type,'"}'), criticity=0, alias = initcap(cf.id)
+            	FROM cat_feature cf WHERE cf.child_layer = v_view_name AND cf.child_layer=st.id;
+           END IF;
         END IF;
 
 	    PERFORM gw_fct_admin_role_permissions();

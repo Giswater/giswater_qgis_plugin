@@ -91,10 +91,8 @@ CREATE TABLE man_flwreg (
 CREATE TABLE cat_feature_element (
     id varchar(30) NOT NULL,
     epa_default varchar(30) NOT NULL,
-    geometry_type varchar(30) NOT NULL DEFAULT 'POINT',
     CONSTRAINT cat_feature_element_pkey PRIMARY KEY (id),
     CONSTRAINT cat_feature_element_fkey_element_id FOREIGN KEY (id) REFERENCES cat_feature(id) ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT cat_feature_element_check_geometry_type CHECK (geometry_type::text = ANY (ARRAY['POLYGON'::text, 'LINESTRING'::text, 'POINT'::text])),
     CONSTRAINT cat_feature_element_inp_check CHECK (epa_default::text = ANY (ARRAY['ORIFICE'::text, 'WEIR'::text, 'OUTLET'::text, 'PUMP'::text, 'UNDEFINED'::text]))
 );
 

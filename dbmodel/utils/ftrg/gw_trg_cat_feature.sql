@@ -93,13 +93,12 @@ BEGIN
 			DELETE FROM sys_param_user WHERE id = concat('feat_',lower(OLD.id),'_vdefault');
 		END IF;
 
-		IF NEW.feature_class <> 'LINK' THEN
-			INSERT INTO sys_param_user(id, formname, descript, sys_role, label, isenabled, layoutname, layoutorder,
-			dv_querytext, feature_field_id, project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, iseditable)
-			VALUES (concat('feat_',v_id,'_vdefault'),'config',concat ('Value default catalog for ',v_id,' cat_feature'), 'role_edit', concat ('Default catalog for ', v_id), true, v_layout ,v_layoutorder,
-			v_querytext, v_feature_field_id, lower(v_projecttype),false,false,'text', 'combo', true, true)
-			ON CONFLICT (id) DO NOTHING;
-		END IF;
+		INSERT INTO sys_param_user(id, formname, descript, sys_role, label, isenabled, layoutname, layoutorder,
+		dv_querytext, feature_field_id, project_type, isparent, isautoupdate, datatype, widgettype, ismandatory, iseditable)
+		VALUES (concat('feat_',v_id,'_vdefault'),'config',concat ('Value default catalog for ',v_id,' cat_feature'), 'role_edit', concat ('Default catalog for ', v_id), true, v_layout ,v_layoutorder,
+		v_querytext, v_feature_field_id, lower(v_projecttype),false,false,'text', 'combo', true, true)
+		ON CONFLICT (id) DO NOTHING;
+
 	END IF;
 
 	IF TG_OP = 'INSERT' THEN
@@ -141,26 +140,28 @@ BEGIN
 		IF lower(v_feature.type)='arc' THEN
 			EXECUTE 'INSERT INTO cat_feature_arc (id, epa_default)
 			VALUES ('||quote_literal(NEW.id)||', '||quote_literal(v_feature.epa_default)||');';
+		
 		ELSIF lower(v_feature.type)='node' THEN
 			EXECUTE 'INSERT INTO cat_feature_node (id, epa_default, choose_hemisphere, isarcdivide, num_arcs)
 			VALUES ('||quote_literal(NEW.id)||', '||quote_literal(v_feature.epa_default)||', TRUE, TRUE, 2)';
+		
 		ELSIF lower(v_feature.type)='connec' THEN
 			EXECUTE 'INSERT INTO cat_feature_connec (id)
 			VALUES ('||quote_literal(NEW.id)||');';
+		
 		ELSIF lower(v_feature.type)='gully' THEN
 			EXECUTE 'INSERT INTO cat_feature_gully (id)
 			VALUES ('||quote_literal(NEW.id)||');';
+		
 		ELSIF lower(v_feature.type)='element' THEN
 			EXECUTE 'INSERT INTO cat_feature_element (id, epa_default)
 			VALUES ('||quote_literal(NEW.id)||', '||quote_literal(v_feature.epa_default)||');';
 		END IF;
 
 		--create child view
-		IF NEW.feature_class <> 'LINK'  THEN
-			v_query='{"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"catFeature":"'||NEW.id||'"},
-			"data":{"filterFields":{}, "pageInfo":{}, "action":"SINGLE-CREATE" }}';
-			PERFORM gw_fct_admin_manage_child_views(v_query::json);
-		END IF;
+		v_query='{"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{"catFeature":"'||NEW.id||'"},
+		"data":{"filterFields":{}, "pageInfo":{}, "action":"SINGLE-CREATE" }}';
+		PERFORM gw_fct_admin_manage_child_views(v_query::json);
 
 		--insert definition into config_info_layer_x_type if its not present already
 		IF NEW.child_layer NOT IN (SELECT tableinfo_id from config_info_layer_x_type)
@@ -191,7 +192,7 @@ BEGIN
 
 				IF v_viewname IS NOT NULL THEN
 
-					IF  (SELECT EXISTS (SELECT FROM information_schema.tables WHERE  table_schema = 'SCHEMA_NAME'
+					IF  (SELECT EXISTS (SELECT FROM information_schema.tables WHERE  table_schema = 'ud400011'
 					AND table_name = v_viewname)) = true THEN
 
 						--get the old view definition
@@ -242,7 +243,7 @@ BEGIN
 			END IF;
 
 			IF v_viewname IS NOT NULL THEN
-				IF  (SELECT EXISTS (SELECT FROM information_schema.tables WHERE  table_schema = 'SCHEMA_NAME'
+				IF  (SELECT EXISTS (SELECT FROM information_schema.tables WHERE  table_schema = 'ud400011'
 				AND table_name = v_old_child_layer)) = true THEN
 
 					--get the old view definition

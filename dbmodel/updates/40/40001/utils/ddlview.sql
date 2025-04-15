@@ -90,22 +90,24 @@ AS SELECT cat_feature.id,
     cat_feature.active
    FROM cat_feature
      JOIN cat_feature_link USING (id);
+    
 
-     CREATE OR REPLACE VIEW v_edit_cat_feature_element
+  CREATE OR REPLACE VIEW v_edit_cat_feature_element
 AS SELECT
 	cat_feature.id,
     cat_feature.feature_class AS system_id,
     cat_feature_element.epa_default,
     cat_feature.code_autofill,
+    cat_feature.shortcut_key ,
     cat_feature.link_path,
     cat_feature.descript,
     cat_feature.active
    FROM cat_feature
      JOIN cat_feature_element USING (id);
-
-
+    
+    
 -- ====================
-
+ 
 CREATE OR REPLACE VIEW v_edit_element AS
 SELECT e.* FROM (
 SELECT element.element_id,
@@ -146,7 +148,6 @@ SELECT element.element_id,
     element.muni_id,
     element.sector_id,
     element.lock_level,
-    cat_feature_element.geometry_type,
     element.the_geom,
     element.created_at,
     element.created_by,
@@ -161,6 +162,7 @@ SELECT element.element_id,
   WHERE (s.cur_user = current_user OR s.sector_id IS NULL)
   AND (m.cur_user = current_user OR e.muni_id IS NULL);
 
+ 
 CREATE OR REPLACE VIEW v_edit_genelement AS
 SELECT e.* FROM (
 SELECT element.element_id,
@@ -201,12 +203,12 @@ SELECT element.element_id,
     element.muni_id,
     element.sector_id,
     element.lock_level,
-    cat_feature_element.geometry_type,
     element.the_geom,
     element.created_at,
     element.created_by,
     element.updated_at,
     element.updated_by
+    man_genelement.the_geom
    FROM selector_expl, element
      JOIN cat_element ON element.elementcat_id::text = cat_element.id::text
     LEFT JOIN cat_feature_element ON cat_element.element_type::text = cat_feature_element.id::text
