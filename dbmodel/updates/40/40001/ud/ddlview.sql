@@ -5484,7 +5484,7 @@ AS SELECT a.subc_id,
 
 
 CREATE OR REPLACE VIEW v_ui_drainzone
-AS SELECT d.drainzone_id,
+AS SELECT DISTINCT ON (d.drainzone_id) d.drainzone_id,
     d.code,
     d.name,
     et.idval AS drainzone_type,
@@ -5505,7 +5505,7 @@ AS SELECT d.drainzone_id,
   ORDER BY d.drainzone_id;
 
 CREATE OR REPLACE VIEW v_ui_dwfzone
-AS SELECT d.dwfzone_id,
+AS SELECT DISTINCT ON (d.dwfzone_id) d.dwfzone_id,
     d.code,
     d.name,
     et.idval AS dwfzone_type,
@@ -5525,8 +5525,30 @@ AS SELECT d.dwfzone_id,
   WHERE d.dwfzone_id > 0
   ORDER BY d.dwfzone_id;
 
+CREATE OR REPLACE VIEW v_ui_omzone
+AS SELECT DISTINCT ON (o.omzone_id) o.omzone_id,
+    o.code,
+    o.name,
+    o.descript,
+    et.idval AS omzone_type,
+    o.macroomzone_id,
+    o.graphconfig,
+    o.stylesheet,
+    o.link,
+    o.expl_id,
+    o.lock_level,
+    o.active,
+    o.created_at,
+    o.created_by,
+    o.updated_at,
+    o.updated_by
+   FROM omzone o
+   LEFT JOIN edit_typevalue et ON et.id::text = o.omzone_type::text AND et.typevalue::text = 'omzone_type'::text
+  WHERE o.omzone_id > 0
+  ORDER BY o.omzone_id;
+
 CREATE OR REPLACE VIEW v_ui_macrosector
-AS SELECT m.macrosector_id,
+AS SELECT DISTINCT ON (m.macrosector_id) m.macrosector_id,
     m.code,
     m.name,
     m.descript,
@@ -5541,7 +5563,7 @@ AS SELECT m.macrosector_id,
     ORDER BY m.macrosector_id;
 
 CREATE OR REPLACE VIEW v_ui_macroomzone
-AS SELECT m.macroomzone_id,
+AS SELECT DISTINCT ON (m.macroomzone_id) m.macroomzone_id,
     m.code,
     m.name,
     m.expl_id,

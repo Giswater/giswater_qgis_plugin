@@ -6330,7 +6330,7 @@ AS WITH streetaxis AS (
 -- =========================
 -- with the_geom and without active
 CREATE OR REPLACE VIEW v_edit_presszone
-AS SELECT p.presszone_id,
+AS SELECT  p.presszone_id,
     p.code,
     p.name,
     p.presszone_type,
@@ -6576,7 +6576,7 @@ AS SELECT DISTINCT ON (macroexpl_id) macroexpl_id,
 
 -- with active and without the_geom
 CREATE OR REPLACE VIEW v_ui_presszone
-AS SELECT p.presszone_id,
+AS SELECT DISTINCT ON (p.presszone_id) p.presszone_id,
     p.code,
     p.name,
     p.descript,
@@ -6600,7 +6600,7 @@ AS SELECT p.presszone_id,
   ORDER BY p.presszone_id;
 
 CREATE OR REPLACE VIEW v_ui_dma
-AS SELECT d.dma_id,
+AS SELECT DISTINCT ON (d.dma_id) d.dma_id,
     d.code,
     d.name,
     d.descript,
@@ -6629,7 +6629,7 @@ AS SELECT d.dma_id,
   ORDER BY d.dma_id;
 
 CREATE OR REPLACE VIEW v_ui_dqa
-AS SELECT d.dqa_id,
+AS SELECT DISTINCT ON (d.dqa_id) d.dqa_id,
     d.code,
     d.name,
     d.descript,
@@ -6655,7 +6655,7 @@ AS SELECT d.dqa_id,
   ORDER BY d.dqa_id;
 
 CREATE OR REPLACE VIEW v_ui_sector
-AS SELECT s.sector_id,
+AS SELECT DISTINCT ON (s.sector_id) s.sector_id,
     s.code,
     s.name,
     s.descript,
@@ -6681,7 +6681,7 @@ AS SELECT s.sector_id,
   ORDER BY s.sector_id;
 
 CREATE OR REPLACE VIEW v_ui_supplyzone
-AS SELECT s.supplyzone_id,
+AS SELECT DISTINCT ON (s.supplyzone_id) s.supplyzone_id,
     s.code,
     s.name,
     s.descript,
@@ -6705,7 +6705,7 @@ AS SELECT s.supplyzone_id,
   ORDER BY s.supplyzone_id;
 
 CREATE OR REPLACE VIEW v_ui_omzone
-AS SELECT o.omzone_id,
+AS SELECT DISTINCT ON (o.omzone_id) o.omzone_id,
     o.name,
     o.descript,
     o.omzone_type,
@@ -6725,7 +6725,7 @@ AS SELECT o.omzone_id,
   ORDER BY o.omzone_id;
 
 CREATE OR REPLACE VIEW v_ui_macrodma
-AS SELECT m.macrodma_id,
+AS SELECT DISTINCT ON (m.macrodma_id) m.macrodma_id,
     m.code,
     m.name,
     m.descript,
@@ -6741,7 +6741,7 @@ AS SELECT m.macrodma_id,
   ORDER BY m.macrodma_id;
 
 CREATE OR REPLACE VIEW v_ui_macrodqa
-AS SELECT m.macrodqa_id,
+AS SELECT DISTINCT ON (m.macrodqa_id) m.macrodqa_id,
     m.code,
     m.name,
     m.descript,
@@ -6756,7 +6756,7 @@ AS SELECT m.macrodqa_id,
   ORDER BY m.macrodqa_id;
 
 CREATE OR REPLACE VIEW v_ui_macrosector
-AS SELECT m.macrosector_id,
+AS SELECT DISTINCT ON (m.macrosector_id) m.macrosector_id,
     m.code,
     m.name,
     m.descript,
@@ -6771,7 +6771,7 @@ AS SELECT m.macrosector_id,
   ORDER BY m.macrosector_id;
 
 CREATE OR REPLACE VIEW v_ui_macroomzone
-AS SELECT m.macroomzone_id,
+AS SELECT DISTINCT ON (m.macroomzone_id) m.macroomzone_id,
     m.code,
     m.name,
     m.descript,
