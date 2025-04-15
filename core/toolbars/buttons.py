@@ -72,7 +72,9 @@ from .am.priority_btn import GwAmPriorityButton
 from .am.result_manager_btn import GwResultManagerButton
 from .am.result_selector_btn import GwResultSelectorButton
 
-# cm: 84, 85, 86
-from .cm.add_lot2 import GwAddLotButton
-from .cm.manager_lot import GwManageLotButton
-from .cm.resources_lot import GwLotResourceManagementButton
+# cm 84, 85, 86, 87
+from .cm.add_campaign_btn import GwAddCampaignButton
+from .cm.manager_campaign_lot_btn import GwManageCampaignLotButton
+from .cm.add_lot_btn import GwAddLotButton
+from .cm.resources_lot_btn import GwLotResourceManagementButton
+

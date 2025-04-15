@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>add_lot</class>
- <widget class="QDialog" name="add_lot">
+ <class>add_campaign</class>
+ <widget class="QDialog" name="add_campaign">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>470</width>
-    <height>792</height>
+    <width>512</width>
+    <height>706</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Lot</string>
+   <string>Campaign</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_3">
    <item>
@@ -22,101 +22,67 @@
         <property name="currentIndex">
          <number>0</number>
         </property>
-        <widget class="QWidget" name="LotTab">
+        <widget class="QWidget" name="CampaignTab">
          <attribute name="title">
-          <string>Lot</string>
+          <string>Campaign</string>
          </attribute>
-         <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0">
+         <layout class="QVBoxLayout" name="verticalLayout" stretch="0">
           <item>
-           <widget class="QGroupBox" name="grb_ot">
+           <widget class="QGroupBox" name="grb_campaign">
             <property name="title">
-             <string>Ordre de treball:</string>
+             <string>Campaign:</string>
             </property>
-            <layout class="QGridLayout" name="gridLayout">
-             <item row="0" column="0">
-              <layout class="QGridLayout" name="gridLayout_3">
-               <item row="0" column="2">
-                <widget class="QPushButton" name="btn_refresh_materialize_view">
+            <layout class="QGridLayout" name="gridLayout_2">
+             <item row="7" column="0" colspan="2">
+              <layout class="QGridLayout" name="gridLayout_5">
+               <item row="8" column="1">
+                <widget class="QLineEdit" name="campaign_duration"/>
+               </item>
+               <item row="11" column="0">
+                <widget class="QLabel" name="label">
+                 <property name="maximumSize">
+                  <size>
+                   <width>16777215</width>
+                   <height>16777215</height>
+                  </size>
+                 </property>
                  <property name="text">
-                  <string/>
+                  <string>Exercise:</string>
+                 </property>
+                 <property name="margin">
+                  <number>3</number>
                  </property>
                 </widget>
                </item>
-               <item row="1" column="1" colspan="2">
-                <widget class="QLineEdit" name="txt_ot_type"/>
+               <item row="14" column="1">
+                <widget class="QTextEdit" name="campaign_descript"/>
                </item>
-               <item row="1" column="0">
-                <widget class="QLabel" name="label_6">
+               <item row="4" column="0">
+                <widget class="QLabel" name="label_4">
                  <property name="text">
-                  <string>Tipus d'OT:</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="2" column="0">
-                <widget class="QLabel" name="label_8">
-                 <property name="text">
-                  <string>Tipus d'actuacio:</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="1">
-                <widget class="QComboBox" name="cmb_ot">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="editable">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item row="3" column="1" colspan="2">
-                <widget class="QLineEdit" name="txt_ot_address"/>
-               </item>
-               <item row="0" column="0">
-                <widget class="QLabel" name="label_5">
-                 <property name="text">
-                  <string>OT:</string>
+                  <string>Fi real:</string>
                  </property>
                 </widget>
                </item>
                <item row="3" column="0">
+                <widget class="QLabel" name="label_3">
+                 <property name="text">
+                  <string>Inici real:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="9" column="0">
                 <widget class="QLabel" name="label_7">
                  <property name="text">
-                  <string>Adreça:</string>
+                  <string>Status:</string>
                  </property>
                 </widget>
                </item>
-               <item row="2" column="1" colspan="2">
-                <widget class="QLineEdit" name="txt_wotype_id"/>
+               <item row="2" column="1">
+                <widget class="QLineEdit" name="campaign_enddate"/>
                </item>
-               <item row="4" column="0">
-                <widget class="QLabel" name="label_9">
-                 <property name="text">
-                  <string>Observacions:</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="4" column="1" colspan="2">
-                <widget class="QTextEdit" name="txt_observ"/>
-               </item>
-              </layout>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item>
-           <widget class="QGroupBox" name="grb_lot">
-            <property name="title">
-             <string>Lot:</string>
-            </property>
-            <layout class="QGridLayout" name="gridLayout_2">
-             <item row="8" column="0">
-              <layout class="QGridLayout" name="gridLayout_5">
-               <item row="5" column="0">
-                <widget class="QLabel" name="label_node_type_5">
+               <item row="0" column="0">
+                <widget class="QLabel" name="label_node_type">
                  <property name="font">
                   <font>
                    <pointsize>8</pointsize>
@@ -131,7 +97,7 @@
                   <enum>QFrame::Plain</enum>
                  </property>
                  <property name="text">
-                  <string>Usuari:</string>
+                  <string>Id:</string>
                  </property>
                  <property name="textFormat">
                   <enum>Qt::AutoText</enum>
@@ -147,48 +113,25 @@
                  </property>
                 </widget>
                </item>
-               <item row="6" column="1">
-                <widget class="QComboBox" name="cmb_assigned_to">
-                 <property name="editable">
-                  <bool>true</bool>
-                 </property>
-                 <property name="sizeAdjustPolicy">
-                  <enum>QComboBox::AdjustToContents</enum>
-                 </property>
-                </widget>
-               </item>
-               <item row="5" column="1">
-                <widget class="QLineEdit" name="user_name">
-                 <property name="enabled">
-                  <bool>false</bool>
-                 </property>
-                 <property name="frame">
-                  <bool>true</bool>
-                 </property>
-                 <property name="readOnly">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item row="4" column="0">
-                <widget class="QLabel" name="label_4">
+               <item row="13" column="0">
+                <widget class="QLabel" name="label_8">
                  <property name="text">
-                  <string>Fi real:</string>
+                  <string>Address:</string>
                  </property>
                 </widget>
                </item>
-               <item row="4" column="1">
-                <widget class="QLineEdit" name="real_enddate">
-                 <property name="enabled">
-                  <bool>false</bool>
-                 </property>
-                 <property name="readOnly">
-                  <bool>true</bool>
+               <item row="13" column="1">
+                <widget class="QLineEdit" name="campaign_address"/>
+               </item>
+               <item row="7" column="0">
+                <widget class="QLabel" name="label_5">
+                 <property name="text">
+                  <string>Organization:</string>
                  </property>
                 </widget>
                </item>
-               <item row="2" column="1">
-                <widget class="QLineEdit" name="enddate"/>
+               <item row="7" column="1">
+                <widget class="QLineEdit" name="campaign_organization_id"/>
                </item>
                <item row="1" column="0">
                 <widget class="QLabel" name="label_node_type_3">
@@ -234,18 +177,8 @@
                  </property>
                 </widget>
                </item>
-               <item row="7" column="0">
-                <widget class="QLabel" name="label_2">
-                 <property name="text">
-                  <string>Estat:</string>
-                 </property>
-                 <property name="margin">
-                  <number>3</number>
-                 </property>
-                </widget>
-               </item>
                <item row="0" column="1">
-                <widget class="QLineEdit" name="lot_id">
+                <widget class="QLineEdit" name="campaign_id">
                  <property name="enabled">
                   <bool>true</bool>
                  </property>
@@ -258,6 +191,36 @@
                  </property>
                  <property name="readOnly">
                   <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item row="14" column="0">
+                <widget class="QLabel" name="label_flexunion_code_5">
+                 <property name="font">
+                  <font>
+                   <pointsize>8</pointsize>
+                  </font>
+                 </property>
+                 <property name="frameShape">
+                  <enum>QFrame::NoFrame</enum>
+                 </property>
+                 <property name="frameShadow">
+                  <enum>QFrame::Plain</enum>
+                 </property>
+                 <property name="text">
+                  <string>Descripció:</string>
+                 </property>
+                 <property name="textFormat">
+                  <enum>Qt::AutoText</enum>
+                 </property>
+                 <property name="scaledContents">
+                  <bool>false</bool>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                 </property>
+                 <property name="margin">
+                  <number>3</number>
                  </property>
                 </widget>
                </item>
@@ -305,8 +268,45 @@
                  </property>
                 </widget>
                </item>
-               <item row="0" column="0">
-                <widget class="QLabel" name="label_node_type">
+               <item row="5" column="0">
+                <widget class="QLabel" name="reviewclass_id">
+                 <property name="text">
+                  <string>Reviewclass:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="4" column="1">
+                <widget class="QLineEdit" name="campaign_real_enddate">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="readOnly">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="1">
+                <widget class="QLineEdit" name="campaign_startdate"/>
+               </item>
+               <item row="8" column="0">
+                <widget class="QLabel" name="label_6">
+                 <property name="text">
+                  <string>Duration:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="5" column="1">
+                <widget class="QComboBox" name="campaign_reviewclass_id"/>
+               </item>
+               <item row="6" column="1">
+                <widget class="QCheckBox" name="campaign_active">
+                 <property name="text">
+                  <string/>
+                 </property>
+                </widget>
+               </item>
+               <item row="10" column="0">
+                <widget class="QLabel" name="label_node_type_5">
                  <property name="font">
                   <font>
                    <pointsize>8</pointsize>
@@ -321,7 +321,7 @@
                   <enum>QFrame::Plain</enum>
                  </property>
                  <property name="text">
-                  <string>Id:</string>
+                  <string>Rotation:</string>
                  </property>
                  <property name="textFormat">
                   <enum>Qt::AutoText</enum>
@@ -337,44 +337,27 @@
                  </property>
                 </widget>
                </item>
-               <item row="6" column="0">
-                <widget class="QLabel" name="label">
-                 <property name="maximumSize">
-                  <size>
-                   <width>16777215</width>
-                   <height>16777215</height>
-                  </size>
-                 </property>
+               <item row="9" column="1">
+                <widget class="QLineEdit" name="campaign_status"/>
+               </item>
+               <item row="12" column="0">
+                <widget class="QLabel" name="label_2">
                  <property name="text">
-                  <string>Equip:</string>
+                  <string>Serie:</string>
                  </property>
                  <property name="margin">
                   <number>3</number>
                  </property>
                 </widget>
                </item>
-               <item row="1" column="1">
-                <widget class="QLineEdit" name="startdate"/>
+               <item row="10" column="1">
+                <widget class="QLineEdit" name="campaign_rotation"/>
                </item>
-               <item row="3" column="0">
-                <widget class="QLabel" name="label_3">
-                 <property name="text">
-                  <string>Inici real:</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="7" column="1">
-                <widget class="QComboBox" name="cmb_status">
-                 <property name="editable">
-                  <bool>true</bool>
-                 </property>
-                 <property name="sizeAdjustPolicy">
-                  <enum>QComboBox::AdjustToContents</enum>
-                 </property>
-                </widget>
+               <item row="11" column="1">
+                <widget class="QLineEdit" name="campaign_exercise"/>
                </item>
                <item row="3" column="1">
-                <widget class="QLineEdit" name="real_startdate">
+                <widget class="QLineEdit" name="campaign_real_startdate">
                  <property name="enabled">
                   <bool>false</bool>
                  </property>
@@ -383,38 +366,15 @@
                  </property>
                 </widget>
                </item>
-               <item row="8" column="0">
-                <widget class="QLabel" name="label_flexunion_code_5">
-                 <property name="font">
-                  <font>
-                   <pointsize>8</pointsize>
-                  </font>
-                 </property>
-                 <property name="frameShape">
-                  <enum>QFrame::NoFrame</enum>
-                 </property>
-                 <property name="frameShadow">
-                  <enum>QFrame::Plain</enum>
-                 </property>
+               <item row="6" column="0">
+                <widget class="QLabel" name="active">
                  <property name="text">
-                  <string>Descripció:</string>
-                 </property>
-                 <property name="textFormat">
-                  <enum>Qt::AutoText</enum>
-                 </property>
-                 <property name="scaledContents">
-                  <bool>false</bool>
-                 </property>
-                 <property name="alignment">
-                  <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-                 </property>
-                 <property name="margin">
-                  <number>3</number>
+                  <string>Active:</string>
                  </property>
                 </widget>
                </item>
-               <item row="8" column="1">
-                <widget class="QTextEdit" name="descript"/>
+               <item row="12" column="1">
+                <widget class="QLineEdit" name="campaign_serie"/>
                </item>
               </layout>
              </item>
@@ -461,7 +421,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QComboBox" name="feature_type">
+             <widget class="QComboBox" name="campaign_feature_type">
               <property name="editable">
                <bool>true</bool>
               </property>
@@ -475,21 +435,21 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_20">
             <item>
-             <widget class="QLineEdit" name="txt_path_rel">
+             <widget class="QLineEdit" name="campaign_txt_path_rel">
               <property name="readOnly">
                <bool>true</bool>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QPushButton" name="btn_path_rel">
+             <widget class="QPushButton" name="campaign_btn_path_rel">
               <property name="text">
                <string>...</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QPushButton" name="btn_export_rel">
+             <widget class="QPushButton" name="campaign_btn_export_rel">
               <property name="text">
                <string>Exportar a csv</string>
               </property>
@@ -507,7 +467,7 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_9">
             <item>
-             <widget class="QLineEdit" name="feature_id"/>
+             <widget class="QLineEdit" name="campaign_feature_id"/>
             </item>
             <item>
              <widget class="QToolButton" name="action_selector">
@@ -523,7 +483,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QPushButton" name="btn_feature_insert">
+             <widget class="QPushButton" name="campaign_btn_feature_insert">
               <property name="text">
                <string/>
               </property>
@@ -566,164 +526,6 @@
           </item>
          </layout>
         </widget>
-        <widget class="QWidget" name="VisitsTab">
-         <attribute name="title">
-          <string>Visites</string>
-         </attribute>
-         <layout class="QVBoxLayout" name="verticalLayout_5">
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_12">
-            <item>
-             <widget class="QLabel" name="lbl_filter">
-              <property name="text">
-               <string>Filtre per element id:</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLineEdit" name="txt_filter"/>
-            </item>
-            <item>
-             <spacer name="horizontalSpacer_10">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_13">
-            <item>
-             <layout class="QVBoxLayout" name="verticalLayout_8">
-              <item>
-               <widget class="QLabel" name="label_data_event_from">
-                <property name="text">
-                 <string>Des de:</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QDateEdit" name="date_event_from">
-                <property name="calendarPopup">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-            <item>
-             <layout class="QVBoxLayout" name="verticalLayout_7">
-              <item>
-               <widget class="QLabel" name="label_data_event_to">
-                <property name="text">
-                 <string>Fins:</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QDateEdit" name="date_event_to">
-                <property name="calendarPopup">
-                 <bool>true</bool>
-                </property>
-                <property name="date">
-                 <date>
-                  <year>3000</year>
-                  <month>1</month>
-                  <day>1</day>
-                 </date>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_14">
-            <item>
-             <widget class="QPushButton" name="btn_open_visit">
-              <property name="text">
-               <string>Obrir visita</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="btn_delete_visit">
-              <property name="text">
-               <string>Eliminar visita</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <spacer name="horizontalSpacer_17">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item>
-             <widget class="QPushButton" name="btn_open_photo">
-              <property name="text">
-               <string>Obrir foto</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="btn_validate_all">
-              <property name="text">
-               <string>Validar totes</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_21">
-            <item>
-             <widget class="QLineEdit" name="txt_path">
-              <property name="readOnly">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="btn_path">
-              <property name="text">
-               <string>...</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="btn_export_visits">
-              <property name="text">
-               <string>Exportar a csv</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <widget class="QTableView" name="tbl_visit">
-            <property name="sortingEnabled">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
        </widget>
       </item>
      </layout>
@@ -731,19 +533,6 @@
    </item>
    <item>
     <layout class="QGridLayout" name="lyt_buttons">
-     <item row="0" column="0">
-      <spacer name="horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
      <item row="0" column="1">
       <widget class="QPushButton" name="btn_accept">
        <property name="text">
@@ -758,6 +547,19 @@
        </property>
       </widget>
      </item>
+     <item row="0" column="0">
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
     </layout>
    </item>
   </layout>
@@ -769,9 +571,9 @@
  </widget>
  <tabstops>
   <tabstop>tab_widget</tabstop>
-  <tabstop>feature_type</tabstop>
-  <tabstop>feature_id</tabstop>
-  <tabstop>btn_feature_insert</tabstop>
+  <tabstop>campaign_feature_type</tabstop>
+  <tabstop>campaign_feature_id</tabstop>
+  <tabstop>campaign_btn_feature_insert</tabstop>
   <tabstop>btn_feature_delete</tabstop>
   <tabstop>btn_feature_snapping</tabstop>
   <tabstop>tbl_relation</tabstop>

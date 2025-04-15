@@ -5,16 +5,16 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from .add_lot import AddNewLot
+from .lot import AddNewLot
 from ..dialog import GwAction
 
 
-class GwManageLotButton(GwAction):
-    """ Button 85: Lot management """
+class GwLotResourceManagementButton(GwAction):
+    """ Button 88: Resources Management """
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
         super().__init__(icon_path, action_name, text, toolbar, action_group)
         self.new_lot = AddNewLot(icon_path, action_name, text, toolbar, action_group)
 
     def clicked_event(self):
-        self.new_lot.lot_manager()
+        self.new_lot.resources_management()
