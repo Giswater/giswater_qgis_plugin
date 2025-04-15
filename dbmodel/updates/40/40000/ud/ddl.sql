@@ -1875,6 +1875,7 @@ CREATE TABLE link (
 	code text NULL, -- added
 	feature_id varchar(16) NULL,
 	feature_type varchar(16) NULL,
+	link_type varchar(30) NOT NULL,
 	linkcat_id varchar(30) NOT NULL,
 	top_elev1 float8 NULL,
 	y1 numeric(12, 4) NULL,

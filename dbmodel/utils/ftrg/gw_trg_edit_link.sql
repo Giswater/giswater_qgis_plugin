@@ -108,6 +108,15 @@ BEGIN
 				NEW.state := 1;
 			END IF;
 		END IF;
+
+
+		-- Inserts to man tables
+		IF (NEW.link_type = 'SERVCONNECTION') THEN
+			INSERT INTO man_servconnection VALUES (NEW.link_id);
+		ELSEIF(NEW.link_type='INLETPIPE') THEN
+			INSERT INTO man_inletpipe VALUES (NEW.link_id);
+		END IF;
+
 	END IF;
 
 	NEW.exit_type = NULL;
@@ -666,12 +675,18 @@ BEGIN
 					NEW.top_elev1 = (SELECT top_elev FROM gully WHERE gully_id=NEW.feature_id LIMIT 1);
 				END IF;
 			END IF;
+			
+			IF NEW.feature_type ='GULLY' THEN
+				NEW.link_type = 'INLETPIPE';
+			ELSEIF NEW.feature_type ='CONNEC' THEN
+				NEW.link_type = 'SERVCONNECTION';
+			END IF;
 
 			INSERT INTO link (link_id, code, feature_type, feature_id, expl_id, exit_id, exit_type, userdefined_geom, state, the_geom, sector_id, fluid_type, omzone_id,
-			linkcat_id, workcat_id, workcat_id_end, builtdate, enddate, exit_elev, top_elev2, uncertain, muni_id, verified, custom_length, datasource, top_elev1, y1, top_elev2, y2)
+			linkcat_id, workcat_id, workcat_id_end, builtdate, enddate, uncertain, muni_id, verified, custom_length, datasource, top_elev1, y1, top_elev2, y2, link_type)
 			VALUES (NEW.link_id, NEW.code, NEW.feature_type, NEW.feature_id, v_expl, NEW.exit_id, NEW.exit_type, TRUE, NEW.state, NEW.the_geom, v_sector, v_fluidtype, v_omzone,
 			NEW.linkcat_id, NEW.workcat_id, NEW.workcat_id_end, NEW.builtdate, NEW.enddate, NEW.uncertain, NEW.muni_id, NEW.verified, NEW.custom_length, NEW.datasource,
-			NEW.top_elev1, NEW.y1, NEW.top_elev2, NEW.y2);
+			NEW.top_elev1, NEW.y1, NEW.top_elev2, NEW.y2, NEW.link_type);
 
 			IF v_projectype = 'WS' THEN
 				UPDATE link SET dma_id = v_dma WHERE link_id = NEW.link_id;
@@ -788,7 +803,7 @@ BEGIN
 			-- force reconnection on connecs
 			IF NEW.feature_type = 'CONNEC' THEN
 				IF v_projectype = 'WS' THEN
-					UPDATE dma_id = v_dma WHERE connec_id = NEW.feature_id;
+					UPDATE connec SET dma_id = v_dma WHERE connec_id = NEW.feature_id;
 				END IF;
 
 				UPDATE connec SET arc_id = v_arc_id, pjoint_type = NEW.exit_type, pjoint_id = NEW.exit_id,

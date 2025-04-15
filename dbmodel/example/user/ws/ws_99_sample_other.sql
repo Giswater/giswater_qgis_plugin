@@ -1100,3 +1100,6 @@ UPDATE config_form_fields
 
 -- 07/04/2025
 UPDATE config_form_fields SET layoutname='lyt_general_5', layoutorder=2, "datatype"='text', widgettype='text', "label"='Parent id:', tooltip='Parent id', placeholder=NULL, ismandatory=false, isparent=false, iseditable=false, isautoupdate=false, isfilter=false, dv_querytext=NULL, dv_orderby_id=NULL, dv_isnullvalue=NULL, dv_parent_id=NULL, dv_querytext_filterc=NULL, stylesheet=NULL, widgetcontrols='{"setMultiline":false}'::json, widgetfunction=NULL, linkedobject=NULL, hidden=false, web_layoutorder=1 WHERE formname='generic' AND formtype='psector' AND columnname='parent_id' AND tabname='tab_general';
+
+-- 15/04/2025
+INSERT INTO man_servconnection (link_id) SELECT link_id FROM link l;
