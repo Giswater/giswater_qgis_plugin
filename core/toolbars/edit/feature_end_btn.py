@@ -94,6 +94,7 @@ class GwFeatureEndButton(GwAction):
         tools_gw.add_icon(self.dlg_work_end.btn_insert, "111")
         tools_gw.add_icon(self.dlg_work_end.btn_delete, "112")
         tools_gw.add_icon(self.dlg_work_end.btn_snapping, "137")
+        tools_gw.add_icon(self.dlg_work_end.btn_expr_select, "178")
         tools_gw.add_icon(self.dlg_work_end.btn_new_workcat, "150")
 
         # Adding auto-completion to a QLineEdit
@@ -118,6 +119,8 @@ class GwFeatureEndButton(GwAction):
             partial(tools_gw.delete_records, self, self.dlg_work_end, self.table_object, GwSelectionMode.DEFAULT, None, None))
         self.dlg_work_end.btn_snapping.clicked.connect(
             partial(tools_gw.selection_init, self, self.dlg_work_end, self.table_object, GwSelectionMode.DEFAULT))
+        self.dlg_work_end.btn_expr_select.clicked.connect(
+            partial(tools_gw.select_with_expression_dialog, self, self.dlg_work_end, self.table_object))
 
         self.dlg_work_end.workcat_id_end.activated.connect(partial(self._fill_workids))
         self.dlg_work_end.tab_feature.currentChanged.connect(
