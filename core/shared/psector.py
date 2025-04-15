@@ -323,9 +323,9 @@ class GwPsector:
             button.clicked.connect(partial(self._reset_snapping))
 
         self.dlg_plan_psector.btn_insert.clicked.connect(
-            partial(tools_gw.insert_feature, self, self.dlg_plan_psector, table_object, True, True, None, None))
+            partial(tools_gw.insert_feature, self, self.dlg_plan_psector, table_object, GwSelectionMode.PSECTOR, True, None, None))
         self.dlg_plan_psector.btn_delete.clicked.connect(
-            partial(tools_gw.delete_records, self, self.dlg_plan_psector, table_object, True, None, None, "state"))
+            partial(tools_gw.delete_records, self, self.dlg_plan_psector, table_object, GwSelectionMode.PSECTOR, None, None, "state"))
         self.dlg_plan_psector.btn_delete.clicked.connect(
             partial(tools_gw.set_model_signals, self))
         self.dlg_plan_psector.btn_snapping.clicked.connect(

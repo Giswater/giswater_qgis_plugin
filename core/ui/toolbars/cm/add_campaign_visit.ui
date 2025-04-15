@@ -80,9 +80,9 @@
           <item>
            <widget class="QTabWidget" name="tab_feature">
             <property name="currentIndex">
-             <number>0</number>
+             <number>4</number>
             </property>
-            <widget class="QWidget" name="tab">
+            <widget class="QWidget" name="tab_arc">
              <attribute name="title">
               <string>Arc</string>
              </attribute>
@@ -96,7 +96,7 @@
               </item>
              </layout>
             </widget>
-            <widget class="QWidget" name="tab_2">
+            <widget class="QWidget" name="tab_node">
              <attribute name="title">
               <string>Node</string>
              </attribute>
@@ -110,7 +110,7 @@
               </item>
              </layout>
             </widget>
-            <widget class="QWidget" name="tab_3">
+            <widget class="QWidget" name="tab_connec">
              <attribute name="title">
               <string>Connec</string>
              </attribute>
@@ -124,7 +124,7 @@
               </item>
              </layout>
             </widget>
-            <widget class="QWidget" name="tab_4">
+            <widget class="QWidget" name="tab_link">
              <attribute name="title">
               <string>Link</string>
              </attribute>
@@ -138,7 +138,7 @@
               </item>
              </layout>
             </widget>
-            <widget class="QWidget" name="tab_5">
+            <widget class="QWidget" name="tab_gully">
              <attribute name="title">
               <string>Gully</string>
              </attribute>

@@ -3301,6 +3301,9 @@ def selection_changed(class_object, dialog, table_object, selection_mode: GwSele
         remove_selection()
         load_tableview_psector(dialog, class_object.feature_type)
         set_model_signals(class_object)
+    if selection_mode == GwSelectionMode.CAMPAIGN:
+        _insert_feature_campaign(dialog, class_object.feature_type, class_object.campaign_id, ids=class_object.list_ids[class_object.feature_type])
+        load_tableview_campaign(dialog, class_object.feature_type, class_object.campaign_id)
     else:
         load_tablename(dialog, table_object, class_object.feature_type, expr_filter)
         tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
@@ -3389,7 +3392,7 @@ def show_expression_dialog(class_object, dialog, table_object):
     dlg.exec_()
 
 
-def insert_feature(class_object, dialog, table_object, is_psector=False, remove_ids=True, lazy_widget=None,
+def insert_feature(class_object, dialog, table_object, selection_mode: GwSelectionMode = GwSelectionMode.DEFAULT, remove_ids=True, lazy_widget=None,
                    lazy_init_function=None):
     """ Select feature with entered id. Set a model with selected filter.
         Attach that model to selected table
@@ -3465,10 +3468,15 @@ def insert_feature(class_object, dialog, table_object, is_psector=False, remove_
             layer.selectByIds(id_list)
 
     # Reload contents of table 'tbl_xxx_xxx_@feature_type'
-    if is_psector:
+    if selection_mode == GwSelectionMode.PSECTOR:
         _insert_feature_psector(dialog, feature_type, ids=selected_ids)
         layers = remove_selection(True, class_object.layers)
         class_object.layers = layers
+    if selection_mode == GwSelectionMode.CAMPAIGN:
+        _insert_feature_campaign(dialog, feature_type, class_object.campaign_id, ids=selected_ids)
+        layers = remove_selection(True, class_object.layers)
+        class_object.layers = layers
+        load_tableview_campaign(dialog, feature_type, class_object.campaign_id)
     else:
         load_tablename(dialog, table_object, feature_type, expr_filter)
         tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
@@ -3921,7 +3929,8 @@ def manage_close(dialog, table_object, cur_active_layer=None, single_tool_mode=N
     return layers
 
 
-def delete_records(class_object, dialog, table_object, is_psector=False, lazy_widget=None, lazy_init_function=None, extra_field=None):
+def delete_records(class_object, dialog, table_object, selection_mode: GwSelectionMode = GwSelectionMode.DEFAULT,
+                   lazy_widget=None, lazy_init_function=None, extra_field=None):
     """ Delete selected elements of the table """
 
     tools_qgis.disconnect_signal_selection_changed()
@@ -3952,7 +3961,11 @@ def delete_records(class_object, dialog, table_object, is_psector=False, lazy_wi
         tools_qt.tools_qgis.show_warning(message, dialog=dialog)
         return
 
-    if is_psector:
+    if selection_mode == GwSelectionMode.PSECTOR:
+        full_list = widget.model()
+        for x in range(0, full_list.rowCount()):
+            class_object.ids.append(widget.model().record(x).value(f"{feature_type}_id"))
+    if selection_mode == GwSelectionMode.CAMPAIGN:
         full_list = widget.model()
         for x in range(0, full_list.rowCount()):
             class_object.ids.append(widget.model().record(x).value(f"{feature_type}_id"))
@@ -3997,12 +4010,18 @@ def delete_records(class_object, dialog, table_object, is_psector=False, lazy_wi
             return
 
     # Update model of the widget with selected expr_filter
-    if is_psector:
+    if selection_mode == GwSelectionMode.PSECTOR:
         state = None
         if extra_field is not None and len(selected_list) == 1:
             state = widget.model().record(selected_list[0].row()).value(extra_field)
         _delete_feature_psector(dialog, feature_type, list_id, state)
         load_tableview_psector(dialog, feature_type)
+    if selection_mode == GwSelectionMode.CAMPAIGN:
+        state = None
+        if extra_field is not None and len(selected_list) == 1:
+            state = widget.model().record(selected_list[0].row()).value(extra_field)
+        _delete_feature_campaign(dialog, feature_type, list_id, class_object.campaign_id, state)
+        load_tableview_campaign(dialog, class_object.feature_type, class_object.campaign_id)
     else:
         load_tablename(dialog, table_object, feature_type, expr_filter)
         tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
@@ -4011,7 +4030,7 @@ def delete_records(class_object, dialog, table_object, is_psector=False, lazy_wi
     # Build a list of feature id's and select them
     tools_qgis.select_features_by_ids(feature_type, expr, layers=class_object.layers)
 
-    if is_psector:
+    if selection_mode == GwSelectionMode.PSECTOR:
         class_object.layers = remove_selection(layers=class_object.layers)
 
     # Update list
@@ -4576,8 +4595,6 @@ def _insert_feature_campaign(dialog, feature_type, campaign_id, ids=None):
         print("swl: ", sql)
         tools_db.execute_sql(sql)
 
-    load_tableview_campaign(dialog, feature_type, campaign_id)
-
 
 def load_tableview_campaign(dialog, feature_type, campaign_id):
     """ Reload QTableView for campaign_x_<feature_type> """
@@ -4592,9 +4609,22 @@ def load_tableview_campaign(dialog, feature_type, campaign_id):
     message = tools_qt.fill_table(qtable, f"{tablename}", expr, QSqlTableModel.OnFieldChange, schema_name='cm')
     if message:
         tools_qgis.show_warning(message)
-
     set_tablemodel_config(dialog, qtable, tablename)
-    tools_qgis.refresh_map_canvas()
+
+
+def _delete_feature_campaign(dialog, feature_type, list_id, campaign_id, state=None):
+    """ Delete features_id to table plan_@feature_type_x_psector"""
+    widget = tools_qt.get_widget(dialog, f"tbl_campaign_x_{feature_type}")
+    tablename = widget.property('tablename') or f"cm.om_campaign_x_{feature_type}"
+
+    sql = (f"DELETE FROM {tablename} "
+           f"WHERE {feature_type}_id IN ({list_id}) AND campaign_id = '{campaign_id}'")
+    print(sql)
+    # Add state if needed
+    if state is not None:
+        sql += f""" AND "state" = '{state}'"""
+    tools_db.execute_sql(sql)
+
 
 
 def _insert_feature_psector(dialog, feature_type, ids=None):

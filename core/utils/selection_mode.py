@@ -14,3 +14,4 @@ class GwSelectionMode(Enum):
     DEFAULT = 0
     EXPRESSION = 1
     PSECTOR = 2
+    CAMPAIGN = 3

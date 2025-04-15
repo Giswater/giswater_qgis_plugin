@@ -202,9 +202,9 @@ class GwDocument(QObject):
         self.dlg_add_doc.tab_feature.currentChanged.connect(
             partial(tools_gw.get_signal_change_tab, self.dlg_add_doc, self.excluded_layers))
         self.dlg_add_doc.btn_insert.clicked.connect(
-            partial(tools_gw.insert_feature, self, self.dlg_add_doc, table_object, False, False, None, None))
+            partial(tools_gw.insert_feature, self, self.dlg_add_doc, table_object, GwSelectionMode.DEFAULT, False, None, None))
         self.dlg_add_doc.btn_delete.clicked.connect(
-            partial(tools_gw.delete_records, self, self.dlg_add_doc, table_object, False, None, None))
+            partial(tools_gw.delete_records, self, self.dlg_add_doc, table_object, GwSelectionMode.DEFAULT, None, None))
         self.dlg_add_doc.btn_snapping.clicked.connect(
             partial(tools_gw.selection_init, self, self.dlg_add_doc, table_object, GwSelectionMode.DEFAULT))
         self.dlg_add_doc.btn_expr_select.clicked.connect(

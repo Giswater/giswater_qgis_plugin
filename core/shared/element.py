@@ -132,9 +132,9 @@ class GwElement:
         self.dlg_add_element.element_id.textChanged.connect(
             partial(self._fill_dialog_element, self.dlg_add_element, table_object, None))
         self.dlg_add_element.btn_insert.clicked.connect(
-            partial(tools_gw.insert_feature, self, self.dlg_add_element, table_object, False, False, None, None))
+            partial(tools_gw.insert_feature, self, self.dlg_add_element, table_object, GwSelectionMode.DEFAULT, False, None, None))
         self.dlg_add_element.btn_delete.clicked.connect(
-            partial(tools_gw.delete_records, self, self.dlg_add_element, table_object, False, None, None))
+            partial(tools_gw.delete_records, self, self.dlg_add_element, table_object, GwSelectionMode.DEFAULT, None, None))
         self.dlg_add_element.btn_snapping.clicked.connect(
             partial(tools_gw.selection_init, self, self.dlg_add_element, table_object, GwSelectionMode.DEFAULT))
 

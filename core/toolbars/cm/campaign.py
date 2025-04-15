@@ -15,6 +15,7 @@ from qgis.PyQt.QtWidgets import QLineEdit, QDateEdit, QCheckBox, QComboBox, QWid
 from .... import global_vars
 from ....libs import tools_qt, tools_db, tools_qgis, lib_vars
 from ...utils import tools_gw
+from ...utils.selection_mode import GwSelectionMode
 from ...ui.ui_manager import AddCampaignReviewUi, AddCampaignVisitUi, CampaignManagementUi
 from qgis.gui import QgsDateTimeEdit
 
@@ -83,6 +84,7 @@ class Campaign:
         # same with status and status in x_feature
 
         # Setting lists
+        self.rubber_band = tools_gw.create_rubberband(self.canvas)
         self.ids = []
         self.list_ids = {'arc': [], 'node': [], 'connec': [], 'gully': [], 'link': []}
         self.layers = {'arc': [], 'node': [], 'connec': [], 'gully': [], 'link': []}
@@ -153,11 +155,25 @@ class Campaign:
         tools_gw.add_icon(self.dialog.btn_delete, '112')
         tools_gw.add_icon(self.dialog.btn_snapping, '137')
 
+        self.dialog.rejected.connect(lambda: tools_gw.reset_rubberband(self.rubber_band))
+        self.dialog.rejected.connect(lambda: tools_gw.remove_selection(True, layers=self.layers))
+
         self.dialog.btn_cancel.clicked.connect(self.dialog.reject)
         self.dialog.btn_accept.clicked.connect(self.save_campaign)
         self.dialog.tab_widget.currentChanged.connect(self._on_tab_change)
         self.setup_tab_relations()
         self._update_feature_completer(self.dialog)
+
+        self.dialog.tbl_campaign_x_arc.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
+                                                               self.dialog.tbl_campaign_x_arc, "v_edit_arc", "arc_id", self.rubber_band, 5))
+        self.dialog.tbl_campaign_x_node.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
+                                                                self.dialog.tbl_campaign_x_node, "v_edit_node", "node_id", self.rubber_band, 10))
+        self.dialog.tbl_campaign_x_connec.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
+                                                                  self.dialog.tbl_campaign_x_connec, "v_edit_connec", "connec_id", self.rubber_band, 10))
+        self.dialog.tbl_campaign_x_gully.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
+                                                                 self.dialog.tbl_campaign_x_gully, "v_edit_gully", "gully_id", self.rubber_band, 10))
+        self.dialog.tbl_campaign_x_link.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
+                                                                 self.dialog.tbl_campaign_x_link, "v_edit_link", "link_id", self.rubber_band, 10))
 
         tools_gw.open_dialog(self.dialog, dlg_name="add_campaign")
 
@@ -263,13 +279,16 @@ class Campaign:
                 tools_qgis.show_info("Campaign saved successfully.", dialog=self.dialog)
                 self.campaign_saved = True
                 self.is_new_campaign = False
+                tools_gw.remove_selection(True, layers=self.layers)
+                tools_gw.reset_rubberband(self.rubber_band)
 
                 # Update campaign ID in the dialog
                 campaign_id = result.get("body", {}).get("campaign_id")
+                self.campaign_id = campaign_id
                 if campaign_id:
                     id_field = self.dialog.findChild(QLineEdit, "id")
                     if id_field:
-                        id_field.setTseext(str(campaign_id))
+                        id_field.setText(str(campaign_id))
 
                 if not from_tab_change:
                     self.dialog.accept()
@@ -334,7 +353,7 @@ class Campaign:
         #self.dialog.tab_relations.setCurrentIndex(0)
         self.feature_type = tools_gw.get_signal_change_tab(self.dialog)
         self.rubber_band = tools_gw.create_rubberband(self.canvas)
-
+        table_object = "campaign"
         tools_gw.get_signal_change_tab(self.dialog)
 
         highlight_mappings = {
@@ -358,15 +377,13 @@ class Campaign:
         self.dialog.tab_feature.currentChanged.connect(self._on_tab_feature_changed)
 
         self.dialog.btn_insert.clicked.connect(
-            lambda: self.insert_campaign_relation(self.dialog)
-        )
+            partial(tools_gw.insert_feature, self, self.dialog, table_object, GwSelectionMode.CAMPAIGN, True, None, None))
 
         self.dialog.btn_delete.clicked.connect(
-            lambda: self.delete_campaign_relation(self.dialog)
-        )
+            partial(tools_gw.delete_records, self, self.dialog, table_object, GwSelectionMode.CAMPAIGN, None, None, None))
 
         self.dialog.btn_snapping.clicked.connect(
-            partial(tools_gw.selection_init, self, self.dialog, "campaign", 'campaign')
+            partial(tools_gw.selection_init, self, self.dialog, table_object, GwSelectionMode.CAMPAIGN)
         )
 
 
@@ -411,8 +428,7 @@ class Campaign:
             if w.property("columnname") == "id":
                 campaign_id = tools_qt.get_text(dialog, w)
                 break
-        self.campaign_id = campaign_id
-        print("CAMPAIGN ID: ", self.campaign_id)
+
         if not campaign_id or not campaign_id.isdigit():
             tools_qgis.show_warning("Invalid campaign ID.")
             return

@@ -113,9 +113,9 @@ class GwFeatureEndButton(GwAction):
         self.dlg_work_end.btn_new_workcat.clicked.connect(partial(self._new_workcat))
 
         self.dlg_work_end.btn_insert.clicked.connect(
-            partial(tools_gw.insert_feature, self, self.dlg_work_end, self.table_object, False, False, None, None))
+            partial(tools_gw.insert_feature, self, self.dlg_work_end, self.table_object, GwSelectionMode.DEFAULT, False, None, None))
         self.dlg_work_end.btn_delete.clicked.connect(
-            partial(tools_gw.delete_records, self, self.dlg_work_end, self.table_object, False, None, None))
+            partial(tools_gw.delete_records, self, self.dlg_work_end, self.table_object, GwSelectionMode.DEFAULT, None, None))
         self.dlg_work_end.btn_snapping.clicked.connect(
             partial(tools_gw.selection_init, self, self.dlg_work_end, self.table_object, GwSelectionMode.DEFAULT))
 

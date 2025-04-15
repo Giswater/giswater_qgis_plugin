@@ -956,9 +956,9 @@ class GwVisit(QObject):
             tools_log.log_info(f"manage_feature_type_selected exception: {e}")
         finally:
             self.dlg_add_visit.btn_feature_insert.clicked.connect(partial(tools_gw.insert_feature, self,
-                 self.dlg_add_visit, widget_table, False, False, None, None))
+                 self.dlg_add_visit, widget_table, GwSelectionMode.DEFAULT, False, None, None))
             self.dlg_add_visit.btn_feature_delete.clicked.connect(partial(tools_gw.delete_records, self,
-                 self.dlg_add_visit, widget_table, False, self.lazy_widget, self.lazy_init_function))
+                 self.dlg_add_visit, widget_table, GwSelectionMode.DEFAULT, self.lazy_widget, self.lazy_init_function))
             self.dlg_add_visit.btn_feature_snapping.clicked.connect(
                 partial(self._feature_snapping_clicked, self.dlg_add_visit, 'visit'))
 
@@ -1822,7 +1822,7 @@ class GwVisit(QObject):
         finally:
 
             self.dlg_add_visit.btn_feature_insert.clicked.connect(
-                partial(tools_gw.insert_feature, self, self.dlg_add_visit, widget_table, False, False))
+                partial(tools_gw.insert_feature, self, self.dlg_add_visit, widget_table, GwSelectionMode.DEFAULT, False))
 
             self.dlg_add_visit.btn_feature_delete.clicked.connect(partial(tools_gw.delete_records, self,
                  self.dlg_add_visit, widget_table, False, self.lazy_widget, self.lazy_init_function))
