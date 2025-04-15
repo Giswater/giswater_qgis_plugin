@@ -9,13 +9,15 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- DROP FUNCTION IF EXISTS gw_trg_vi(); -- TODO: refactor gw_fct_rpt2pg_import_rpt
 
-DROP TABLE IF EXISTS inp_flwreg_outlet CASCADE;
-DROP TABLE IF EXISTS inp_flwreg_orifice CASCADE;
-DROP TABLE IF EXISTS inp_flwreg_weir CASCADE;
+ALTER TABLE inp_flwreg_outlet RENAME TO inp_flwreg_outlet2;
+ALTER TABLE inp_flwreg_orifice RENAME TO inp_flwreg_orifice2;
+ALTER TABLE inp_flwreg_weir RENAME TO inp_flwreg_weir2;
+ALTER TABLE inp_flwreg_pump RENAME TO inp_flwreg_pump2;
 
-DROP TABLE IF EXISTS inp_dscenario_flwreg_outlet CASCADE;
-DROP TABLE IF EXISTS inp_dscenario_flwreg_orifice CASCADE;
-DROP TABLE IF EXISTS inp_dscenario_flwreg_weir CASCADE;
+ALTER TABLE inp_dscenario_flwreg_pump RENAME TO inp_dscenario_flwreg_pump2;
+ALTER TABLE inp_dscenario_flwreg_outlet RENAME TO inp_dscenario_flwreg_outlet2;
+ALTER TABLE inp_dscenario_flwreg_orifice RENAME TO inp_dscenario_flwreg_orifice2;
+ALTER TABLE inp_dscenario_flwreg_weir RENAME TO inp_dscenario_flwreg_weir2;
 
 
 CREATE TABLE man_inletpipe (
@@ -32,8 +34,8 @@ CREATE TABLE inp_flwreg_outlet (
     cd1 numeric(12,4),
     cd2 numeric(12,4),
     flap character varying(3),
-    CONSTRAINT inp_flwreg_outlet_pkey PRIMARY KEY (element_id),
-    CONSTRAINT inp_flwreg_outlet_check_outlet_type CHECK (((outlet_type)::text = ANY ((ARRAY['FUNCTIONAL/DEPTH'::character varying, 'FUNCTIONAL/HEAD'::character varying, 'TABULAR/DEPTH'::character varying, 'TABULAR/HEAD'::character varying])::text[])))
+    CONSTRAINT inp_flwreg_outlet_pk PRIMARY KEY (element_id),
+    CONSTRAINT inp_flwreg_outlet_chk_outlet_type CHECK (((outlet_type)::text = ANY ((ARRAY['FUNCTIONAL/DEPTH'::character varying, 'FUNCTIONAL/HEAD'::character varying, 'TABULAR/DEPTH'::character varying, 'TABULAR/HEAD'::character varying])::text[])))
 );
 
 CREATE TABLE inp_flwreg_orifice(
@@ -48,10 +50,10 @@ CREATE TABLE inp_flwreg_orifice(
     geom2 numeric(12, 4) DEFAULT 0.00 NOT NULL,
     geom3 numeric(12, 4) DEFAULT 0.00 NULL,
     geom4 numeric(12, 4) DEFAULT 0.00 NULL,
-    CONSTRAINT inp_flwreg_orifice_pkey PRIMARY KEY (element_id),
-    CONSTRAINT inp_flwreg_orifice_fkey_element_id FOREIGN KEY (element_id) REFERENCES element(element_id) ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT inp_flwreg_orifice_check_orifice_type CHECK (((orifice_type)::text = ANY (ARRAY[('SIDE'::character varying)::text, ('BOTTOM'::character varying)::text]))),
-    CONSTRAINT inp_flwreg_orifice_check_shape CHECK (((shape)::text = ANY (ARRAY[('CIRCULAR'::character varying)::text, ('RECT_CLOSED'::character varying)::text])))
+    CONSTRAINT inp_flwreg_orifice_pk PRIMARY KEY (element_id),
+    CONSTRAINT inp_flwreg_orifice_fk_element_id FOREIGN KEY (element_id) REFERENCES element(element_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT inp_flwreg_orifice_chk_orifice_type CHECK (((orifice_type)::text = ANY (ARRAY[('SIDE'::character varying)::text, ('BOTTOM'::character varying)::text]))),
+    CONSTRAINT inp_flwreg_orifice_chk_shape CHECK (((shape)::text = ANY (ARRAY[('CIRCULAR'::character varying)::text, ('RECT_CLOSED'::character varying)::text])))
 );
 
 CREATE TABLE inp_flwreg_weir(
@@ -70,9 +72,35 @@ CREATE TABLE inp_flwreg_weir(
     road_width float8 NULL,
     road_surf varchar(16) NULL,
     coef_curve float8 NULL,
-    CONSTRAINT inp_flwreg_weir_pkey PRIMARY KEY (element_id),
-    CONSTRAINT inp_flwreg_weir_fkey_element_id_fkey FOREIGN KEY (element_id) REFERENCES element(element_id) ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT inp_flwreg_weir_check_weir_type CHECK (((weir_type)::text = ANY (ARRAY['ROADWAY'::text, 'SIDEFLOW'::text, 'TRANSVERSE'::text, 'V-NOTCH'::text, 'TRAPEZOIDAL_WEIR'::text])))
+    CONSTRAINT inp_flwreg_weir_pk PRIMARY KEY (element_id),
+    CONSTRAINT inp_flwreg_weir_fk_element_id_fkey FOREIGN KEY (element_id) REFERENCES element(element_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT inp_flwreg_weir_chk_weir_type CHECK (((weir_type)::text = ANY (ARRAY['ROADWAY'::text, 'SIDEFLOW'::text, 'TRANSVERSE'::text, 'V-NOTCH'::text, 'TRAPEZOIDAL_WEIR'::text])))
+);
+
+CREATE TABLE inp_flwreg_pump (
+    element_id varchar(16) NOT NULL,
+    pump_type varchar(18) NOT NULL,
+    curve_id varchar(16) NOT NULL,
+    status varchar(3) NULL,
+    startup numeric(12, 4) NULL,
+    shutoff numeric(12, 4) NULL,
+    CONSTRAINT inp_flwreg_pump_pk PRIMARY KEY (element_id),
+	CONSTRAINT inp_flwreg_pump_fk_element_id FOREIGN KEY (element_id) REFERENCES element(element_id),
+    CONSTRAINT inp_flwreg_pump_chk_status CHECK (status::text = ANY (ARRAY['ON'::text, 'OFF'::text])),
+    CONSTRAINT inp_flwreg_pump_fk_curve_id FOREIGN KEY (curve_id) REFERENCES inp_curve(id) ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+CREATE TABLE inp_dscenario_flwreg_pump (
+    dscenario_id int4 NOT NULL,
+    element_id varchar(16) NOT NULL,
+    pump_type varchar(18) NOT NULL,
+    curve_id varchar(16) NOT NULL,
+    status varchar(3) NULL,
+    startup numeric(12, 4) NULL,
+    shutoff numeric(12, 4) NULL,
+    CONSTRAINT inp_dscenario_flwreg_pump_pk PRIMARY KEY (element_id, dscenario_id),
+    CONSTRAINT inp_dscenario_flwreg_pump_chk_status CHECK (status::text = ANY (ARRAY['ON'::text, 'OFF'::text])),
+    CONSTRAINT inp_dscenario_flwreg_pump_fk_curve_id FOREIGN KEY (curve_id) REFERENCES inp_curve(id) ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
 CREATE TABLE inp_dscenario_flwreg_outlet (
@@ -84,9 +112,9 @@ CREATE TABLE inp_dscenario_flwreg_outlet (
     cd1 numeric(12,4),
     cd2 numeric(12,4),
     flap character varying(3),
-    CONSTRAINT inp_dscenario_flwreg_outlet_pkey PRIMARY KEY (element_id, dscenario_id),
-    CONSTRAINT inp_dscenario_flwreg_outlet_fkey_dscenario_id FOREIGN KEY (dscenario_id) REFERENCES cat_dscenario(dscenario_id) ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT inp_dscenario_flwreg_outlet_check_outlet_type CHECK (((outlet_type)::text = ANY ((ARRAY['FUNCTIONAL/DEPTH'::character varying, 'FUNCTIONAL/HEAD'::character varying, 'TABULAR/DEPTH'::character varying, 'TABULAR/HEAD'::character varying])::text[])))
+    CONSTRAINT inp_dscenario_flwreg_outlet_pk PRIMARY KEY (element_id, dscenario_id),
+    CONSTRAINT inp_dscenario_flwreg_outlet_fk_dscenario_id FOREIGN KEY (dscenario_id) REFERENCES cat_dscenario(dscenario_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT inp_dscenario_flwreg_outlet_chk_outlet_type CHECK (((outlet_type)::text = ANY ((ARRAY['FUNCTIONAL/DEPTH'::character varying, 'FUNCTIONAL/HEAD'::character varying, 'TABULAR/DEPTH'::character varying, 'TABULAR/HEAD'::character varying])::text[])))
 );
 
 CREATE TABLE inp_dscenario_flwreg_orifice (
@@ -102,11 +130,11 @@ CREATE TABLE inp_dscenario_flwreg_orifice (
     geom2 numeric(12, 4) DEFAULT 0.00 NOT NULL,
     geom3 numeric(12, 4) DEFAULT 0.00 NULL,
     geom4 numeric(12, 4) DEFAULT 0.00 NULL,
-    CONSTRAINT inp_dscenario_flwreg_orifice_pkey PRIMARY KEY (element_id, dscenario_id),
-    CONSTRAINT inp_dscenario_flwreg_orifice_fkey_dscenario_id FOREIGN KEY (dscenario_id) REFERENCES cat_dscenario(dscenario_id) ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT inp_dscenario_flwreg_orifice_fkey_element_id FOREIGN KEY (element_id) REFERENCES element(element_id) ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT inp_dscenario_flwreg_orifice_check_orifice_type CHECK (((orifice_type)::text = ANY (ARRAY[('SIDE'::character varying)::text, ('BOTTOM'::character varying)::text]))),
-    CONSTRAINT inp_dscenario_flwreg_orifice_check_shape CHECK (((shape)::text = ANY (ARRAY[('CIRCULAR'::character varying)::text, ('RECT_CLOSED'::character varying)::text])))
+    CONSTRAINT inp_dscenario_flwreg_orifice_py PRIMARY KEY (element_id, dscenario_id),
+    CONSTRAINT inp_dscenario_flwreg_orifice_fy_dscenario_id FOREIGN KEY (dscenario_id) REFERENCES cat_dscenario(dscenario_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT inp_dscenario_flwreg_orifice_fy_element_id FOREIGN KEY (element_id) REFERENCES element(element_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT inp_dscenario_flwreg_orifice_chk_orifice_type CHECK (((orifice_type)::text = ANY (ARRAY[('SIDE'::character varying)::text, ('BOTTOM'::character varying)::text]))),
+    CONSTRAINT inp_dscenario_flwreg_orifice_chk_shape CHECK (((shape)::text = ANY (ARRAY[('CIRCULAR'::character varying)::text, ('RECT_CLOSED'::character varying)::text])))
 );
 
 CREATE TABLE inp_dscenario_flwreg_weir (
@@ -126,10 +154,10 @@ CREATE TABLE inp_dscenario_flwreg_weir (
     road_width float8 NULL,
     road_surf varchar(16) NULL,
     coef_curve float8 NULL,
-    CONSTRAINT inp_dscenario_flwreg_weir_pkey PRIMARY KEY (element_id, dscenario_id),
-    CONSTRAINT inp_dscenario_flwreg_weir_fkey_dscenario_id FOREIGN KEY (dscenario_id) REFERENCES cat_dscenario(dscenario_id) ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT inp_dscenario_flwreg_weir_fkey_element_id_fkey FOREIGN KEY (element_id) REFERENCES element(element_id) ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT inp_dscenario_flwreg_weir_check_weir_type CHECK (((weir_type)::text = ANY (ARRAY['ROADWAY'::text, 'SIDEFLOW'::text, 'TRANSVERSE'::text, 'V-NOTCH'::text, 'TRAPEZOIDAL_WEIR'::text])))
+    CONSTRAINT inp_dscenario_flwreg_weir_pk PRIMARY KEY (element_id, dscenario_id),
+    CONSTRAINT inp_dscenario_flwreg_weir_fk_dscenario_id FOREIGN KEY (dscenario_id) REFERENCES cat_dscenario(dscenario_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT inp_dscenario_flwreg_weir_fk_element_id_fkey FOREIGN KEY (element_id) REFERENCES element(element_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT inp_dscenario_flwreg_weir_chk_weir_type CHECK (((weir_type)::text = ANY (ARRAY['ROADWAY'::text, 'SIDEFLOW'::text, 'TRANSVERSE'::text, 'V-NOTCH'::text, 'TRAPEZOIDAL_WEIR'::text])))
 );
 
 DROP TABLE IF EXISTS ext_rtc_dma_period CASCADE;

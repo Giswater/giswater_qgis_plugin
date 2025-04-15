@@ -2604,6 +2604,34 @@ AS SELECT
     f.the_geom
     FROM v_edit_flwreg f
     JOIN inp_flwreg_orifice ori USING (element_id);
+	
+CREATE OR REPLACE VIEW v_edit_inp_flwreg_pump
+AS SELECT
+    f.element_id,
+    f.nodarc_id,
+    f.order_id,
+    f.to_arc,
+    f.flwreg_length,
+    p.curve_id,
+    p.status,
+    p.startup,
+    p.shutoff,
+    f.the_geom
+    FROM v_edit_flwreg f
+    JOIN inp_flwreg_pump p ON f.element_id::text = p.element_id::text;
+
+
+CREATE OR REPLACE VIEW v_edit_inp_dscenario_flwreg_pump
+AS SELECT s.dscenario_id,
+    f.element_id,
+    f.curve_id,
+    f.status,
+    f.startup,
+    f.shutoff,
+    n.the_geom
+    FROM selector_inp_dscenario s, inp_dscenario_flwreg_pump f
+    JOIN v_edit_inp_flwreg_pump n USING (element_id)
+    WHERE s.dscenario_id = f.dscenario_id AND s.cur_user = CURRENT_USER::text;
 
 
 CREATE OR REPLACE VIEW v_edit_inp_dscenario_flwreg_outlet

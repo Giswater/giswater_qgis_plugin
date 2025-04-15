@@ -37,4 +37,31 @@ CREATE TABLE inp_dscenario_flwreg_valve (
 	CONSTRAINT inp_dscenario_flwreg_valve_fkey_element_id FOREIGN KEY (element_id) REFERENCES element(element_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
+CREATE TABLE inp_flwreg_pump (
+    element_id varchar(16) NOT NULL,
+    pump_type varchar(18) NOT NULL,
+    curve_id varchar(16) NOT NULL,
+    status varchar(3) NULL,
+    startup numeric(12, 4) NULL,
+    shutoff numeric(12, 4) NULL,
+    CONSTRAINT inp_flwreg_pump_pk PRIMARY KEY (element_id),
+	CONSTRAINT inp_flwreg_pump_fk_element_id FOREIGN KEY (element_id) REFERENCES element(element_id),
+    CONSTRAINT inp_flwreg_pump_chk_status CHECK (status::text = ANY (ARRAY['ON'::text, 'OFF'::text])),
+    CONSTRAINT inp_flwreg_pump_fk_curve_id FOREIGN KEY (curve_id) REFERENCES inp_curve(id) ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+CREATE TABLE inp_dscenario_flwreg_pump (
+    dscenario_id int4 NOT NULL,
+    element_id varchar(16) NOT NULL,
+    pump_type varchar(18) NOT NULL,
+    curve_id varchar(16) NOT NULL,
+    status varchar(3) NULL,
+    startup numeric(12, 4) NULL,
+    shutoff numeric(12, 4) NULL,
+    CONSTRAINT inp_dscenario_flwreg_pump_pk PRIMARY KEY (element_id, dscenario_id),
+    CONSTRAINT inp_dscenario_flwreg_pump_chk_status CHECK (status::text = ANY (ARRAY['ON'::text, 'OFF'::text])),
+    CONSTRAINT inp_dscenario_flwreg_pump_fk_curve_id FOREIGN KEY (curve_id) REFERENCES inp_curve(id) ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+
 DROP FUNCTION IF EXISTS gw_trg_vi();

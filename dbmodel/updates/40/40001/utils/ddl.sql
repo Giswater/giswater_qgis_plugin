@@ -8,9 +8,6 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 DROP TABLE IF EXISTS flwreg CASCADE;
 DROP TABLE IF EXISTS cat_flwreg CASCADE;
-DROP TABLE IF EXISTS inp_flwreg_pump CASCADE;
-DROP TABLE IF EXISTS inp_dscenario_flwreg_pump CASCADE;
-
 
 CREATE TABLE man_servconnection (
 	link_id int4 NOT NULL,
@@ -72,7 +69,6 @@ ALTER TABLE link ADD CONSTRAINT link_linkcat_id_fkey FOREIGN KEY (linkcat_id) RE
 
 CREATE TABLE man_genelement (
     element_id varchar(16) NOT NULL,
-	the_geom geometry(POINT, SRID_VALUE),
     CONSTRAINT man_genelement_pkey PRIMARY KEY (element_id),
 	CONSTRAINT man_genelement_fkey_element_id FOREIGN KEY (element_id) REFERENCES element(element_id)
 );
@@ -85,7 +81,6 @@ CREATE TABLE man_flwreg (
     order_id numeric NULL,
     to_arc varchar NULL,
     flwreg_length numeric NULL,
-	the_geom geometry(LINESTRING, SRID_VALUE),
     CONSTRAINT man_flwreg_pkey PRIMARY KEY (element_id),
 	CONSTRAINT man_flwreg_fkey_element_id FOREIGN KEY (element_id) REFERENCES element(element_id)
 );
@@ -98,33 +93,7 @@ CREATE TABLE cat_feature_element (
     CONSTRAINT cat_feature_element_inp_check CHECK (epa_default::text = ANY (ARRAY['ORIFICE'::text, 'WEIR'::text, 'OUTLET'::text, 'PUMP'::text, 'UNDEFINED'::text]))
 );
 
-CREATE TABLE inp_flwreg_pump (
-    element_id varchar(16) NOT NULL,
-    pump_type varchar(18) NOT NULL,
-    curve_id varchar(16) NOT NULL,
-    status varchar(3) NULL,
-    startup numeric(12, 4) NULL,
-    shutoff numeric(12, 4) NULL,
-    CONSTRAINT inp_flwreg_pump_pkey PRIMARY KEY (element_id),
-	CONSTRAINT inp_flwreg_pump_fkey_element_id FOREIGN KEY (element_id) REFERENCES element(element_id),
-    CONSTRAINT inp_flwreg_pump_check_status CHECK (status::text = ANY (ARRAY['ON'::text, 'OFF'::text])),
-    CONSTRAINT inp_flwreg_pump_fkey_curve_id FOREIGN KEY (curve_id) REFERENCES inp_curve(id) ON DELETE RESTRICT ON UPDATE CASCADE
-);
-
-CREATE TABLE inp_dscenario_flwreg_pump (
-    dscenario_id int4 NOT NULL,
-    element_id varchar(16) NOT NULL,
-    pump_type varchar(18) NOT NULL,
-    curve_id varchar(16) NOT NULL,
-    status varchar(3) NULL,
-    startup numeric(12, 4) NULL,
-    shutoff numeric(12, 4) NULL,
-    CONSTRAINT inp_dscenario_flwreg_pump_pkey PRIMARY KEY (element_id, dscenario_id),
-    CONSTRAINT inp_dscenario_flwreg_pump_check_status CHECK (status::text = ANY (ARRAY['ON'::text, 'OFF'::text])),
-    CONSTRAINT inp_dscenario_flwreg_pump_fkey_curve_id FOREIGN KEY (curve_id) REFERENCES inp_curve(id) ON DELETE RESTRICT ON UPDATE CASCADE
-);
-
-INSERT INTO man_genelement (element_id) SELECT element_id FROM element where ST_GeometryType(the_geom) = 'ST_Point' OR the_geom IS NULL;
+INSERT INTO man_genelement (element_id) SELECT element_id FROM element;
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"temp_node", "column":"omzone_id", "dataType":"integer", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"temp_arc", "column":"omzone_id", "dataType":"integer", "isUtils":"False"}}$$);

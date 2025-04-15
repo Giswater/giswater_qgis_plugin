@@ -346,7 +346,7 @@ ALTER TABLE sys_feature_type ADD CONSTRAINT sys_feature_type_check CHECK (((id):
 ALTER TABLE sys_feature_class DROP CONSTRAINT sys_feature_cat_check;
 
 INSERT INTO sys_feature_class (id, "type", epa_default, man_table) VALUES('ORIFICE', 'FLWREG', 'ORIFICE', 'man_orifice') ON CONFLICT (id) DO NOTHING;
-INSERT INTO sys_feature_class (id, "type", epa_default, man_table) VALUES('VFLWREG', 'FLWREG', 'OUTLET', 'man_vflwreg') ON CONFLICT (id) DO NOTHING;
+INSERT INTO sys_feature_class (id, "type", epa_default, man_table) VALUES('VFLWREG', 'FLWREG', 'OUTLET', 'man_outlet') ON CONFLICT (id) DO NOTHING;
 INSERT INTO sys_feature_class (id, "type", epa_default, man_table) VALUES('WEIR', 'FLWREG', 'WEIR', 'man_weir') ON CONFLICT (id) DO NOTHING;
 INSERT INTO sys_feature_class (id, "type", epa_default, man_table) VALUES('PUMP', 'FLWREG', 'PUMP', 'man_pump') ON CONFLICT (id) DO NOTHING;
 
@@ -634,13 +634,6 @@ CREATE TABLE man_weir(
 	weir_class varchar(16) NOT NULL,
 	CONSTRAINT man_frweir_pkey PRIMARY KEY (flwreg_id),
 	CONSTRAINT man_frweir_flwreg_id_fk FOREIGN KEY (flwreg_id) REFERENCES flwreg(flwreg_id) ON DELETE CASCADE
-);
-
-CREATE TABLE man_vflwreg (
-	flwreg_id varchar(16) NOT NULL,
-	outlet_class varchar(16) NOT NULL,
-	CONSTRAINT outlet_type_pkey PRIMARY KEY (flwreg_id),
-	CONSTRAINT outlet_type_flwreg_id_fk FOREIGN KEY (flwreg_id) REFERENCES flwreg(flwreg_id) ON DELETE CASCADE
 );
 
 CREATE TABLE man_orifice (

@@ -8404,8 +8404,6 @@ INSERT INTO man_wwtp (node_id, name, wwtp_type, treatment_type) VALUES ('236', N
 
 INSERT INTO man_pump VALUES('100019', 'PUMP-01');
 
-INSERT INTO man_vflwreg VALUES('100021', 'OUTLET-01');
-
 INSERT INTO man_orifice VALUES('100017', 'ORIFICE-01');
 
 INSERT INTO man_weir VALUES('100023', 'TRANSVERSE');
