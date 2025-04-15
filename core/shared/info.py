@@ -598,8 +598,14 @@ class GwInfo(QObject):
         # Check if audit schema exists
         sql = "SELECT schema_name FROM information_schema.schemata WHERE schema_name = 'audit'"
         rows = tools_db.get_rows(sql, commit=False)
-        self.action_audit.setVisible(rows is not None)
-        if rows:
+
+        # Check if audit is active
+        schema_actived = tools_gw.get_config_parser('toolbars_add', 'audit_active', 'user', 'init', False)
+        schema_actived = tools_os.set_boolean(schema_actived, False)
+
+        self.action_audit.setVisible(rows is not None and schema_actived)
+
+        if rows and schema_actived:
             self._enable_action(dlg_cf, self.action_audit, True)
 
         return self.complet_result, self.dlg_cf
