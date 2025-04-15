@@ -3238,7 +3238,7 @@ def select_with_expression_dialog(class_object, dialog, table_object):
     # Show the expression dialog
     show_expression_dialog(class_object, dialog, table_object)
     # Disconnect the signal selection changed
-    # tools_qgis.disconnect_signal_selection_changed()
+    tools_qgis.disconnect_signal_selection_changed()
 
 
 def selection_changed(class_object, dialog, table_object, selection_mode: GwSelectionMode = GwSelectionMode.DEFAULT, lazy_widget=None, lazy_init_function=None):
