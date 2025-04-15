@@ -418,3 +418,7 @@ WHERE formname = 'v_edit_link_gully';
 UPDATE config_info_layer
 SET is_parent = true
 WHERE layer_id = 'v_edit_link';
+
+-- 15/04/2025
+
+DELETE FROM config_param_system WHERE "parameter"='admin_customform_param';
