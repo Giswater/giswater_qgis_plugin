@@ -195,9 +195,8 @@ class GwI18NGenerator:
             line += f"\t\t</message>\n"
             line = line.replace("&", "")
             ts_file.write(line)
-        line = '\t</context>\n\n'
-        line += '\t<!-- PYTHON MESSAGES -->\n'
-        line += '\t<context>\n'
+
+        line = '\t\t<!-- PYTHON MESSAGES -->\n'
         ts_file.write(line)
 
         # Create children for message
@@ -213,6 +212,7 @@ class GwI18NGenerator:
             line = line.replace("&", "")
             ts_file.write(line)
         line = '\t</context>\n\n'
+
         line += '\t<!-- UI TRANSLATION -->\n'
         ts_file.write(line)
 
