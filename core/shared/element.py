@@ -83,6 +83,7 @@ class GwElement:
         tools_gw.add_icon(self.dlg_add_element.btn_insert, "111")
         tools_gw.add_icon(self.dlg_add_element.btn_delete, "112")
         tools_gw.add_icon(self.dlg_add_element.btn_snapping, "137")
+        tools_gw.add_icon(self.dlg_add_element.btn_expr_select, "178")
         tools_gw.add_icon(self.dlg_add_element.btn_path_url, "173")
 
         # Remove all previous selections
@@ -137,6 +138,9 @@ class GwElement:
             partial(tools_gw.delete_records, self, self.dlg_add_element, table_object, GwSelectionMode.DEFAULT, None, None))
         self.dlg_add_element.btn_snapping.clicked.connect(
             partial(tools_gw.selection_init, self, self.dlg_add_element, table_object, GwSelectionMode.DEFAULT))
+        self.dlg_add_element.btn_expr_select.clicked.connect(
+            partial(tools_gw.select_with_expression_dialog, self, self.dlg_add_element, table_object)
+        )
 
         self.dlg_add_element.btn_add_geom.clicked.connect(self._get_point_xy)
         self.dlg_add_element.state.currentIndexChanged.connect(partial(self._filter_state_type))
