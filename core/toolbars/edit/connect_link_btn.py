@@ -21,9 +21,9 @@ from .... import global_vars
 
 
 class SelectAction(Enum):
-    CLOSEST_ARCS = "CLOSEST ARCS"
-    FORCED_ARCS = "FORCED ARCS"
-    FORCED_ARCS2 = "FORCED ARCS (SELECTING ONLY ARCS)"
+    CLOSEST_ARCS = tools_qt.tr('Closest arcs')
+    FORCED_ARCS = tools_qt.tr('Forced arcs')
+    FORCED_ARCS2 = tools_qt.tr('Forced arcs (selecting only arcs)')
 
 
 class GwConnectLinkButton(GwMaptool):
