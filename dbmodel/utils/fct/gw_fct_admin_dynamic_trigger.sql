@@ -144,20 +144,11 @@ BEGIN
 
 	DROP TABLE IF EXISTS temp_new_vals;
 
-
 	v_result := json_build_object('insert', v_json_insert, 'update', v_json_update);
 
-
-
 RETURN v_result;
-
 
 END;
 $function$
 ;
 
--- Permissions
-
-ALTER FUNCTION SCHEMA_NAME.gw_fct_admin_dynamic_trigger(json) OWNER TO postgres;
-GRANT ALL ON FUNCTION SCHEMA_NAME.gw_fct_admin_dynamic_trigger(json) TO public;
-GRANT ALL ON FUNCTION SCHEMA_NAME.gw_fct_admin_dynamic_trigger(json) TO postgres;
