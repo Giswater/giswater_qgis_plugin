@@ -90,7 +90,7 @@
             <item>
              <widget class="QComboBox" name="cmb_import_type">
               <property name="sizePolicy">
-               <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
@@ -110,20 +110,33 @@
              </widget>
             </item>
             <item>
-             <spacer name="horizontalSpacer">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
+             <widget class="QLabel" name="lbl_file">
+              <property name="text">
+               <string>File:</string>
               </property>
-              <property name="sizeType">
-               <enum>QSizePolicy::Expanding</enum>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="txt_file_csv"/>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btn_file_csv">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
               </property>
-              <property name="sizeHint" stdset="0">
+              <property name="maximumSize">
                <size>
-                <width>40</width>
-                <height>20</height>
+                <width>32</width>
+                <height>16777215</height>
                </size>
               </property>
-             </spacer>
+              <property name="text">
+               <string>...</string>
+              </property>
+             </widget>
             </item>
             <item>
              <widget class="QLabel" name="lbl_import_label">
@@ -156,33 +169,6 @@
              <string>Info:</string>
             </property>
            </widget>
-          </item>
-          <item>
-           <layout class="QVBoxLayout" name="verticalLayout">
-            <item>
-             <widget class="QLabel" name="lbl_file">
-              <property name="text">
-               <string>File:</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QTextEdit" name="txt_file_csv">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>16777215</width>
-                <height>100</height>
-               </size>
-              </property>
-             </widget>
-            </item>
-           </layout>
           </item>
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_3">
@@ -220,6 +206,19 @@
                </size>
               </property>
              </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_2">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
             </item>
             <item>
              <widget class="QLabel" name="lbl_ignore_header">
@@ -376,26 +375,6 @@
               </layout>
              </widget>
             </item>
-            <item>
-             <spacer name="horizontalSpacer_2">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item>
-             <widget class="QPushButton" name="btn_file_csv">
-              <property name="text">
-               <string>...</string>
-              </property>
-             </widget>
-            </item>
            </layout>
           </item>
           <item>
@@ -427,8 +406,9 @@
  <tabstops>
   <tabstop>mainTab</tabstop>
   <tabstop>cmb_import_type</tabstop>
-  <tabstop>txt_import</tabstop>
   <tabstop>txt_file_csv</tabstop>
+  <tabstop>btn_file_csv</tabstop>
+  <tabstop>txt_import</tabstop>
   <tabstop>cmb_unicode_list</tabstop>
   <tabstop>chk_ignore_header</tabstop>
   <tabstop>rb_comma</tabstop>
@@ -436,11 +416,10 @@
   <tabstop>rb_space</tabstop>
   <tabstop>rb_dec_comma</tabstop>
   <tabstop>rb_dec_period</tabstop>
-  <tabstop>btn_file_csv</tabstop>
   <tabstop>tbl_csv</tabstop>
-  <tabstop>tab_log_txt_infolog</tabstop>
   <tabstop>btn_accept</tabstop>
   <tabstop>btn_cancel</tabstop>
+  <tabstop>tab_log_txt_infolog</tabstop>
  </tabstops>
  <resources/>
  <connections/>
