@@ -259,34 +259,17 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_ve_epa('pump');
 CREATE TRIGGER gw_trg_edit_element INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_flwreg
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_element('flwreg');
 
-CREATE TRIGGER gw_trg_edit_element BEFORE INSERT OR UPDATE ON inp_flwreg_orifice FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_element('orifice');
-
-CREATE TRIGGER gw_trg_edit_element BEFORE INSERT OR UPDATE ON inp_flwreg_weir
-FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_element('weir');
-
 CREATE TRIGGER gw_trg_typevalue_fk_insert AFTER INSERT ON inp_flwreg_weir
 FOR EACH ROW EXECUTE FUNCTION gw_trg_typevalue_fk('inp_flwreg_weir');
 
 CREATE TRIGGER gw_trg_typevalue_fk_update AFTER UPDATE of weir_type, flap on inp_flwreg_weir
 FOR EACH ROW WHEN (((old.weir_type)::TEXT IS DISTINCT FROM (new.weir_type)::text OR ((old.flap)::TEXT IS DISTINCT FROM (new.flap)::text))) EXECUTE FUNCTION gw_trg_typevalue_fk('inp_flwreg_weir');
 
-
-CREATE TRIGGER gw_trg_edit_element BEFORE INSERT OR UPDATE ON inp_flwreg_pump
-FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_element('pump');
-
 CREATE TRIGGER gw_trg_typevalue_fk_insert AFTER INSERT ON inp_flwreg_pump
 FOR EACH ROW EXECUTE FUNCTION gw_trg_typevalue_fk('inp_flwreg_pump');
 
 CREATE TRIGGER gw_trg_typevalue_fk_update AFTER UPDATE of status ON inp_flwreg_pump
 FOR EACH ROW WHEN (((old.status)::TEXT IS DISTINCT FROM (new.status)::text)) EXECUTE FUNCTION gw_trg_typevalue_fk('inp_flwreg_pump');
-
-
---CREATE TRIGGER gw_trg_flw_regulator BEFORE INSERT OR UPDATE ON inp_flwreg_orifice
---FOR EACH ROW EXECUTE FUNCTION gw_trg_flw_regulator('orifice');
-
-
-CREATE TRIGGER gw_trg_edit_element BEFORE INSERT OR UPDATE ON inp_flwreg_outlet
-FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_element('outlet');
 
 CREATE TRIGGER gw_trg_typevalue_fk_insert AFTER INSERT ON inp_flwreg_outlet
 FOR EACH ROW EXECUTE FUNCTION gw_trg_typevalue_fk('inp_flwreg_outlet');
