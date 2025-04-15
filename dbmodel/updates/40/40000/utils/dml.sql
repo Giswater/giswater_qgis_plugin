@@ -661,7 +661,7 @@ INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES
 
 INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('formtype_typevalue', 'epa_selector', 'epa_selector', 'epaSelector', NULL);
 
-INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('epa_selector', 'tab_result', 'Result', 'Result', 'role_baisc', NULL, NULL, 0, '{5}');
+INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('epa_selector', 'tab_result', 'Result', 'Result', 'role_basic', NULL, NULL, 0, '{5}');
 
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter, dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols, widgetfunction, linkedobject, hidden, web_layoutorder) VALUES('generic', 'epa_selector', 'tab_none', 'btn_cancel', 'lyt_buttons', 2, NULL, 'button', NULL, 'Cancel', NULL, false, false, true, false, false, NULL, NULL, NULL, NULL, NULL, NULL, '{
 "text": "Cancel"
@@ -1438,15 +1438,15 @@ INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES
 INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('layout_name_typevalue', 'lyt_other_prices_all_1', 'lyt_other_prices_all_1', 'layoutOtherPricesAll1', NULL);
 INSERT INTO config_typevalue (typevalue, id, idval, camelstyle, addparam) VALUES('layout_name_typevalue', 'lyt_other_prices_mine_1', 'lyt_other_prices_mine_1', 'layoutOtherPricesMine1', NULL);
 
-INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('psector', 'tab_relations_node', 'Node', 'Node', 'role_baisc', NULL, NULL, 0, '{5}');
-INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('psector', 'tab_relations_connec', 'Connec', 'Connec', 'role_baisc', NULL, NULL, 0, '{5}');
-INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('psector', 'tab_add_info', 'Additional info', 'Additional info', 'role_baisc', NULL, NULL, 0, '{5}');
-INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('psector', 'tab_budget', 'Budget', 'Budget', 'role_baisc', NULL, NULL, 0, '{5}');
-INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('psector', 'tab_document', 'Document', 'Document', 'role_baisc', NULL, NULL, 0, '{5}');
-INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('psector', 'tab_general', 'General', 'General', 'role_baisc', NULL, NULL, 0, '{5}');
-INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('psector', 'tab_other_prices', 'Other prices', 'Other prices', 'role_baisc', NULL, NULL, 0, '{5}');
-INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('psector', 'tab_relations', 'Relations', 'Relations', 'role_baisc', NULL, NULL, 0, '{5}');
-INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('psector', 'tab_relations_arc', 'Arc', 'Arc', 'role_baisc', NULL, NULL, 0, '{5}');
+INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('psector', 'tab_relations_node', 'Node', 'Node', 'role_basic', NULL, NULL, 0, '{5}');
+INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('psector', 'tab_relations_connec', 'Connec', 'Connec', 'role_basic', NULL, NULL, 0, '{5}');
+INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('psector', 'tab_add_info', 'Additional info', 'Additional info', 'role_basic', NULL, NULL, 0, '{5}');
+INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('psector', 'tab_budget', 'Budget', 'Budget', 'role_basic', NULL, NULL, 0, '{5}');
+INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('psector', 'tab_document', 'Document', 'Document', 'role_basic', NULL, NULL, 0, '{5}');
+INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('psector', 'tab_general', 'General', 'General', 'role_basic', NULL, NULL, 0, '{5}');
+INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('psector', 'tab_other_prices', 'Other prices', 'Other prices', 'role_basic', NULL, NULL, 0, '{5}');
+INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('psector', 'tab_relations', 'Relations', 'Relations', 'role_basic', NULL, NULL, 0, '{5}');
+INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('psector', 'tab_relations_arc', 'Arc', 'Arc', 'role_basic', NULL, NULL, 0, '{5}');
 INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('psector', 'tab_other_prices_mine', 'My prices', 'My prices', 'role_basic', NULL, NULL, 0, '{5}');
 INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('psector', 'tab_other_prices_all', 'All prices', 'All prices', 'role_basic', NULL, NULL, 0, '{5}');
 
