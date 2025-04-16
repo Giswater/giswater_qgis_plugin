@@ -677,7 +677,7 @@ class GwI18NGenerator:
                     
                 elif 'su_feature' in table:
                     line += (f"UPDATE {row['context']} SET id = '{texts[0]}', descript = '{texts[1]}' "
-                                f"WHERE id = '{texts[0]}' AND feature_class = '{row['feature_class']}' AND feature_type = '{row['feature_type']}';\n")
+                                f"WHERE id = '{row['lb_en_us']}' AND feature_class = '{row['feature_class']}' AND feature_type = '{row['feature_type']}';\n")
 
                 file.write(line)
 

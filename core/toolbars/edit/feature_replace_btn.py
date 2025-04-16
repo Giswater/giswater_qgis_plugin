@@ -36,7 +36,7 @@ class GwFeatureReplaceButton(GwMaptool):
         self.feature_id = None
         self.actions = actions
         if not self.actions:
-            self.actions = ['ARC', 'NODE', 'CONNEC']
+            self.actions = [tools_qt.tr('ARC'), tools_qt.tr('NODE'), tools_qt.tr('CONNEC')]
         self.list_tables = list_tables
         if not self.list_tables:
             self.list_tables = ['v_edit_arc', 'v_edit_node', 'v_edit_connec', 'v_edit_gully']
@@ -154,7 +154,7 @@ class GwFeatureReplaceButton(GwMaptool):
         ag = QActionGroup(self.iface.mainWindow())
 
         if global_vars.project_type in ('UD', 'ud'):
-            self.actions.append('GULLY')
+            self.actions.append(tools_qt.tr('GULLY'))
 
         for action in self.actions:
             obj_action = QAction(f"{action}", ag)

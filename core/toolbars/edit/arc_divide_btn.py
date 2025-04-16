@@ -125,7 +125,7 @@ class GwArcDivideButton(GwMaptool):
             del action
         ag = QActionGroup(self.iface.mainWindow())
 
-        actions = ['DRAG-DROP', 'SELECT']
+        actions = [tools_qt.tr('DRAG-DROP'), tools_qt.tr('SELECT')]
         for action in actions:
             obj_action = QAction(f"{action}", ag)
             self.menu.addAction(obj_action)
