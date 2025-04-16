@@ -8,6 +8,7 @@ or (at your option) any later version.
 import re
 import psycopg2
 import psycopg2.extras
+from psycopg2.extras import execute_values
 from functools import partial
 from datetime import datetime, date
 
@@ -258,10 +259,21 @@ class GwSchemaI18NManager:
     # region Missing DB Dialogs
     def missing_dialogs(self):
         self.check_for_repeated = tools_qt.is_checked(self.dlg_qm, self.dlg_qm.chk_search_for_repeated)
-        tables = ["i18n_proves.dbparam_user", "i18n_proves.dbconfig_param_system", "i18n_proves.dbconfig_form_fields", "i18n_proves.dbconfig_typevalue", "i18n_proves.dbfprocess", "i18n_proves.dbmessage"]
+        self.check_for_su_tables = tools_qt.is_checked(self.dlg_qm, self.dlg_qm.check_for_su_tables)
+        tables = [ "dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue", 
+                    "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report", 
+                    "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_fields_feat", 
+                    "dbconfig_form_tableview", "dbtable", "dbjson"
+                 ]
+        if self.check_for_su_tables:
+            tables.append("su_basic_tables")
+            tables.append("su_feature")
+
+        schema_i18n = "i18n"
         text_error = ''
         self.dlg_qm.lbl_info.clear()
         for table in tables:
+            table = f"{schema_i18n}.{table}"
             table_exists = self.detect_table_func(table)
             correct_lang = self._verify_lang()
             if table_exists:
@@ -280,23 +292,20 @@ class GwSchemaI18NManager:
         self.dlg_qm.lbl_info.clear()
         tools_qt.show_info_box(text_error)
 
-    def _update_tables(self, table_i18n):
-        table_org = self._find_table_org(table_i18n)
-        self._change_table_lyt(table_i18n)
-        query = ""
 
-        if "sys_message" in table_org:
-            query = self._update_dbmessage(table_i18n, table_org)
-        elif "sys_fprocess" in table_org:
-            query = self._update_dbfprocess(table_i18n, table_org)
-        elif "config_form_fields" in table_org:
-            query = self._update_config_form_fields(table_i18n, table_org)
-        elif "sys_param_user" in table_org:
-            query = self._update_sys_param_user(table_i18n, table_org)
-        elif "config_param_system" in table_org:
-            query = self._update_config_param_system(table_i18n, table_org)
-        elif "config_typevalue" in table_org:
-            query = self._update_config_typevalue(table_i18n, table_org)
+    def _update_tables(self, table_i18n):
+        self._change_table_lyt(table_i18n)
+        tables_org = self._find_table_org(table_i18n)
+        
+        query = ""
+        for table_org in tables_org:
+            if "dbjson" in table_i18n:
+                query += self._json_update(table_i18n, table_org)
+            elif "dbconfig_form_fields_feat" in table_i18n:
+                query += self._dbconfig_form_fields_feat_update(table_i18n)
+            else:
+                query += self._update_any_table(table_i18n, table_org)
+
         if query == '':
             return f'{table_i18n}: 1- No update needed. '
         else:
@@ -307,187 +316,7 @@ class GwSchemaI18NManager:
             except Exception as e:
                 self.conn_i18n.rollback()
                 return f"An error occured while translating {table_i18n}: {e}\n"
-
-    def _update_dbmessage(self, table_i18n, table_org):
-        columns_i18n = "project_type, CAST(source AS INTEGER), CAST(log_level AS INTEGER), ms_en_us, ht_en_us"
-        columns_org = "project_type, id, log_level, error_message, hint_message"
-        query = f"SELECT {columns_i18n} FROM {table_i18n};"
-        rows_i18n = self._get_rows(query, self.cursor_i18n)
-        query = f"SELECT {columns_org} FROM {self.schema_org}.{table_org};"
-        rows_org = self._get_rows(query, self.cursor_org)
-        query = ""
-        for row_i18n in rows_i18n:
-            if row_i18n['ht_en_us'] is None:
-                row_i18n['ht_en_us'] = ''
-        for i, row_org in enumerate(rows_org):
-            if row_org['hint_message'] is None:
-                row_org['hint_message'] = ''
-            if row_org not in rows_i18n:
-                error_msg = row_org['error_message']
-                hint_msg = row_org['hint_message']
-
-                ms_en_us = f"""'{error_msg.replace("'", "''")}'""" if error_msg not in [None, ''] else 'NULL'
-                ht_en_us = f"""'{hint_msg.replace("'", "''")}'""" if hint_msg not in [None, ''] else 'NULL'
-
-                query_row = f"""INSERT INTO {table_i18n} (context, source_code, project_type, log_level, source, ms_en_us, ht_en_us) VALUES """
-                query_row += f"""('{table_org}', 'giswater', '{row_org['project_type']}', '{row_org['log_level']}', '{row_org['id']}', {ms_en_us}, {ht_en_us})"""
-                query_row += " ON CONFLICT (source_code, project_type, context, log_level, source) DO UPDATE"
-                query_row += f" SET ms_en_us = {ms_en_us}, ht_en_us = {ht_en_us};\n"
-                query += query_row
-        return query
-
-    def _update_dbfprocess(self, table_i18n, table_org):
-        columns_i18n = "project_type, CAST(source AS INTEGER), ex_en_us, in_en_us"
-        columns_org = "project_type, fid, except_msg, info_msg"
-        query = f"SELECT {columns_i18n} FROM {table_i18n};"
-        rows_i18n = self._get_rows(query, self.cursor_i18n)
-        query = f"SELECT {columns_org} FROM {self.schema_org}.{table_org};"
-        rows_org = self._get_rows(query, self.cursor_org)
-        query = ""
-        for row_i18n in rows_i18n:
-            if row_i18n['in_en_us'] is None:
-                row_i18n['in_en_us'] = ''
-        for i, row_org in enumerate(rows_org):
-            if row_org['info_msg'] is None:
-                row_org['info_msg'] = ''
-            if row_org not in rows_i18n:
-                except_msg = row_org['except_msg']
-                info_msg = row_org['info_msg']
-
-                ex_en_us = f"""'{except_msg.replace("'", "''")}'""" if except_msg not in [None, ''] else 'NULL'
-                in_en_us = f"""'{info_msg.replace("'", "''")}'""" if info_msg not in [None, ''] else 'NULL'
-
-                query_row = f"""INSERT INTO {table_i18n} (context, project_type, source, ex_en_us, in_en_us) VALUES """
-                query_row += f"""('{table_org}', '{row_org['project_type']}', '{row_org['fid']}', {ex_en_us}, {in_en_us})"""
-                query_row += " ON CONFLICT (project_type, context, source) DO UPDATE"
-                query_row += f" SET ex_en_us = {ex_en_us}, in_en_us = {in_en_us};\n"
-                query += query_row
-        return query
-
-    def _update_config_form_fields(self, table_i18n, table_org):
-        columns_i18n = "formname, formtype, source, lb_en_us, tt_en_us, project_type"
-        columns_org = "formname, formtype, columnname, label, tooltip"
-        query = f"SELECT {columns_i18n} FROM {table_i18n};"
-        rows_i18n = self._get_rows(query, self.cursor_i18n)
-        query = f"SELECT {columns_org} FROM {self.schema_org}.{table_org};"
-        rows_org = self._get_rows(query, self.cursor_org)
-        query = ""
-        for row_i18n in rows_i18n:
-            if row_i18n['lb_en_us'] is None:
-                row_i18n['lb_en_us'] = ''
-            if row_i18n['tt_en_us'] is None:
-                row_i18n['tt_en_us'] = ''
-        for i, row_org in enumerate(rows_org):
-            if row_org['label'] is None:
-                row_org['label'] = ''
-            if row_org['tooltip'] is None:
-                row_org['tooltip'] = ''
-            row_org_com = row_org
-            row_org_com.append(self.project_type)
-            if row_org_com not in rows_i18n:
-                label = row_org['label']
-                tooltip = row_org['tooltip']
-
-                lb_en_us = f"""'{label.replace("'", "''")}'""" if label not in [None, ''] else 'NULL'
-                tt_en_us = f"""'{tooltip.replace("'", "''")}'""" if tooltip not in [None, ''] else 'NULL'
-
-                query_row = f"""INSERT INTO {table_i18n} (context, source_code, project_type, source, formname, formtype, lb_en_us, tt_en_us) VALUES """
-                query_row += f"""('{table_org}', 'giswater', '{self.project_type}', '{row_org['columnname']}', '{row_org['formname']}', '{row_org['formtype']}', {lb_en_us}, {tt_en_us})"""
-                query_row += " ON CONFLICT (context, source_code, project_type, source, formname, formtype) DO UPDATE"
-                query_row += f" SET lb_en_us = {lb_en_us}, tt_en_us = {tt_en_us};\n"
-                query += query_row
-        return query
-
-    def _update_sys_param_user(self, table_i18n, table_org):
-        columns_i18n = "project_type, source, formname, lb_en_us, tt_en_us"
-        columns_org = "project_type, id, formname, label, descript"
-
-        query = f"SELECT {columns_i18n} FROM {table_i18n};"
-        rows_i18n = self._get_rows(query, self.cursor_i18n)
-
-        query = f"SELECT {columns_org} FROM {self.schema_org}.{table_org};"
-        rows_org = self._get_rows(query, self.cursor_org)
-
-        query = ""
-        for row_i18n in rows_i18n:
-            if row_i18n['lb_en_us'] is None:
-                row_i18n['lb_en_us'] = ''
-            if row_i18n['tt_en_us'] is None:
-                row_i18n['tt_en_us'] = ''
-
-        for i, row_org in enumerate(rows_org):
-            if row_org['label'] is None:
-                row_org['label'] = ''
-            if row_org['descript'] is None:
-                row_org['descript'] = ''
-
-            # Check if the row from org doesn't exist in i18n, and construct the query
-            if row_org not in rows_i18n:
-                # Safely handle NULL values and avoid SQL injection
-                label = f"""'{row_org['label'].replace("'", "''")}'""" if row_org['label'] not in [None, ''] else 'NULL'
-                descript = f"""'{row_org['descript'].replace("'", "''")}'""" if row_org['descript'] not in [None, ''] else 'NULL'
-
-                query_row = f"""INSERT INTO {table_i18n} (context, source_code, source, formname, project_type, lb_en_us, tt_en_us) 
-                                VALUES ('{table_org}', 'giswater', '{row_org['id']}', '{row_org['formname']}', '{row_org['project_type']}', {label}, {descript})
-                                ON CONFLICT (context, source_code, project_type, source, formname) 
-                                DO UPDATE SET lb_en_us = {label}, tt_en_us = {descript};\n"""
-                query += query_row
-
-        return query
-
-    def _update_config_param_system(self, table_i18n, table_org):
-        columns_i18n = "project_type, source, lb_en_us, tt_en_us"
-        columns_org = "project_type, parameter, label, descript"
-        query = f"SELECT {columns_i18n} FROM {table_i18n};"
-        rows_i18n = self._get_rows(query, self.cursor_i18n)
-        query = f"SELECT {columns_org} FROM {self.schema_org}.{table_org};"
-        rows_org = self._get_rows(query, self.cursor_org)
-        query = ""
-        for row_i18n in rows_i18n:
-            if row_i18n['lb_en_us'] is None:
-                row_i18n['lb_en_us'] = ''
-            if row_i18n['tt_en_us'] is None:
-                row_i18n['tt_en_us'] = ''
-        for i, row_org in enumerate(rows_org):
-            if row_org['label'] is None:
-                row_org['label'] = ''
-            if row_org['descript'] is None:
-                row_org['descript'] = ''
-            if row_org not in rows_i18n:
-                label = f"""'{row_org['label'].replace("'", "''")}'""" if row_org['label'] not in [None, ''] else 'NULL'
-                descript = f"""'{row_org['descript'].replace("'", "''")}'""" if row_org['descript'] not in [None, ''] else 'NULL'
-
-                query_row = f"""INSERT INTO {table_i18n} (context, source_code, project_type, source, lb_en_us, tt_en_us) 
-                                VALUES ('{table_org}', 'giswater', '{row_org['project_type']}', '{row_org['parameter']}', {label}, {descript})"""
-                query_row += " ON CONFLICT (context, source_code, project_type, source) DO UPDATE"
-                query_row += f" SET lb_en_us = {label}, tt_en_us = {descript};\n"
-                query += query_row
-        return query
-
-    def _update_config_typevalue(self, table_i18n, table_org):
-        columns_i18n = "formname, source, tt_en_us"
-        columns_org = "typevalue, id, idval"
-        query = f"SELECT {columns_i18n} FROM {table_i18n};"
-        rows_i18n = self._get_rows(query, self.cursor_i18n)
-        query = f"SELECT {columns_org} FROM {self.schema_org}.{table_org};"
-        rows_org = self._get_rows(query, self.cursor_org)
-        query = ""
-        for row_i18n in rows_i18n:
-            if row_i18n['tt_en_us'] is None:
-                row_i18n['tt_en_us'] = ''
-        for i, row_org in enumerate(rows_org):
-            if row_org['idval'] is None:
-                row_org['idval'] = ''
-        for row_org in rows_org:
-            if row_org not in rows_i18n:
-                idval = f"""'{row_org['idval'].replace("'", "''")}'""" if row_org['idval'] not in [None, ''] else 'NULL'
-
-                query_row = f"""INSERT INTO {table_i18n} (context, source_code, project_type, source, formname, formtype, tt_en_us) 
-                                VALUES ('{table_org}', 'giswater', '{self.project_type}', '{row_org['id']}', '{row_org['typevalue']}', 'form_feature', {idval})"""
-                query_row += " ON CONFLICT (context, source_code, project_type, source, formname, formtype) DO UPDATE"
-                query_row += f" SET tt_en_us = {idval};\n"
-                query += query_row
-        return query
+    
 
     def _verify_lang(self):
         query = f"SELECT language from {self.schema_org}.sys_version"
@@ -496,8 +325,354 @@ class GwSchemaI18NManager:
         if language_org != 'en_US':
             return False
         return True
+    
 
-    # endregion
+    def _update_any_table(self, table_i18n, table_org):
+        columns_i18n, columns_org, names = self._get_rows_to_compare(table_i18n, table_org)
+
+        columns = ", ".join(columns_i18n)
+        query = f"SELECT {columns} FROM {table_i18n};"
+        print(query)
+        rows_i18n = self._get_rows(query, self.cursor_i18n)
+
+        columns = ", ".join(columns_org)
+        query = f"SELECT {columns} FROM {self.schema_org}.{table_org};"
+        print(query)
+        rows_org = self._get_rows(query, self.cursor_org)
+
+        query = ""
+        if rows_i18n:
+            for row_i18n in rows_i18n:
+                for column_i18n in columns_i18n:
+                    if "CAST(" in column_i18n:
+                        column_i18n = column_i18n[5:].split(" ")[0]
+                    if row_i18n[column_i18n] is None:
+                        row_i18n[column_i18n] = ''
+
+        for row_org in rows_org:
+            for column_org in columns_org:
+                if row_org[column_org] is None:
+                    row_org[column_org] = ''
+
+            row_org_com = row_org
+            no_project_type = ["dbconfig_form_fields", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report", "dbconfig_toolbox", 
+                               "edit_typevalue", "plan_typevalue", "om_typevalue", "dbtable", "su_feature", "su_basic_tables"]
+            if table_i18n in no_project_type:
+               row_org_com.append(self.project_type) 
+
+            # Check if the row from org doesn't exist in i18n, and construct the query
+            if rows_i18n is None or row_org_com not in rows_i18n:
+                # Safely handle NULL values and avoid SQL injection
+                texts = []
+                for name in names:
+                    value = f"'{row_org[name].replace("'", "''")}'" if row_org[name] not in [None, ''] else 'NULL'
+                    texts.append(value)
+
+                if 'dbconfig_form_fields' in table_i18n:
+                    query_row = f"""INSERT INTO {table_i18n} (context, source_code, project_type, source, formname, formtype, lb_en_us, tt_en_us) 
+                                    VALUES ('{table_org}', 'giswater', '{self.project_type}', '{row_org['columnname']}', '{row_org['formname']}', '{row_org['formtype']}',
+                                    {texts[0]}, {texts[1]}) 
+                                    ON CONFLICT (context, source_code, project_type, source, formname, formtype) 
+                                    DO UPDATE SET lb_en_us = {texts[0]}, tt_en_us = {texts[1]};\n"""
+                    
+                elif 'dbparam_user' in table_i18n:
+                    query_row = f"""INSERT INTO {table_i18n} (context, source_code, source, formname, project_type, lb_en_us, tt_en_us) 
+                                    VALUES ('{table_org}', 'giswater', '{row_org['id']}', '{row_org['formname']}', '{row_org['project_type']}',
+                                    {texts[0]}, {texts[1]}) 
+                                    ON CONFLICT (context, source_code, project_type, source, formname) 
+                                    DO UPDATE SET lb_en_us = {texts[0]}, tt_en_us = {texts[1]};\n"""
+                    
+                elif 'dbconfig_param_system' in table_i18n:
+                    query_row = f"""INSERT INTO {table_i18n} (context, source_code, project_type, source, lb_en_us, tt_en_us) 
+                                    VALUES ('{table_org}', 'giswater', '{row_org['project_type']}', '{row_org['parameter']}',
+                                    {texts[0]}, {texts[1]}) 
+                                    ON CONFLICT (context, source_code, project_type, source) 
+                                    DO UPDATE SET lb_en_us = {texts[0]}, tt_en_us = {texts[1]};\n"""
+                    
+                elif 'dbconfig_typevalue' in table_i18n:
+                    query_row = f"""INSERT INTO {table_i18n} (context, source_code, project_type, source, formname, formtype, tt_en_us) 
+                                    VALUES ('{table_org}', 'giswater', '{self.project_type}', '{row_org['id']}', '{row_org['typevalue']}', 
+                                    'form_feature', {texts[0]}) 
+                                    ON CONFLICT (context, source_code, project_type, source, formname, formtype) 
+                                    DO UPDATE SET tt_en_us = {texts[0]};\n"""
+                
+                elif 'dbmessage' in table_i18n:
+                    query_row = f"""INSERT INTO {table_i18n} (context, source_code, project_type, log_level, source, ms_en_us, ht_en_us) 
+                                    VALUES ('{table_org}', 'giswater', '{row_org['project_type']}', '{row_org['log_level']}','{row_org['id']}', 
+                                    {texts[0]}, {texts[1]}) 
+                                    ON CONFLICT (source_code, project_type, context, log_level, source)  
+                                    DO UPDATE SET ms_en_us = {texts[0]}, ht_en_us = {texts[1]};\n"""
+                    
+                elif 'dbfprocess' in table_i18n:
+                    query_row = f"""INSERT INTO {table_i18n} (source_code, context, project_type, source, ex_en_us, in_en_us, na_en_us) 
+                                    VALUES ('giswater', '{table_org}', '{row_org['project_type']}', '{row_org['fid']}', 
+                                    {texts[0]}, {texts[1]}, {texts[2]}) 
+                                    ON CONFLICT (source_code, project_type, context, source) 
+                                    DO UPDATE SET ex_en_us = {texts[0]}, in_en_us = {texts[1]}, na_en_us = {texts[2]};\n"""
+
+                elif 'dbconfig_csv' in table_i18n:
+                    query_row = f"""INSERT INTO {table_i18n} (source_code, context, project_type, source, al_en_us, ds_en_us) 
+                                    VALUES ('giswater', '{table_org}', '{self.project_type}', '{row_org['fid']}', 
+                                    {texts[0]}, {texts[1]}) 
+                                    ON CONFLICT (source_code, project_type, context, source) 
+                                    DO UPDATE SET al_en_us = {texts[0]}, ds_en_us = {texts[1]};\n"""
+                    
+                elif 'dbconfig_form_tabs' in table_i18n:
+                    query_row = f"""INSERT INTO {table_i18n} (source_code, context, project_type, formname, source, lb_en_us, tt_en_us) 
+                                    VALUES ('giswater', '{table_org}', '{self.project_type}', '{row_org['formname']}', '{row_org['tabname']}', 
+                                    {texts[0]}, {texts[1]}) 
+                                    ON CONFLICT (source_code, project_type, context, formname, source) 
+                                    DO UPDATE SET lb_en_us = {texts[0]}, tt_en_us = {texts[1]};\n"""
+                   
+                elif 'dbconfig_report' in table_i18n:
+                    query_row = f"""INSERT INTO {table_i18n} (source_code, context, project_type, source, al_en_us, ds_en_us) 
+                                    VALUES ('giswater', '{table_org}', '{self.project_type}', '{row_org['id']}', 
+                                    {texts[0]}, {texts[1]}) 
+                                    ON CONFLICT (source_code, project_type, context, source) 
+                                    DO UPDATE SET al_en_us = {texts[0]}, ds_en_us = {texts[1]};\n"""
+                    
+                elif 'dbconfig_toolbox' in table_i18n:
+                    query_row = f"""INSERT INTO {table_i18n} (source_code, context, project_type, source, al_en_us, ob_en_us) 
+                                    VALUES ('giswater', '{table_org}', '{self.project_type}', '{row_org['id']}', 
+                                    {texts[0]}, {texts[1]}) 
+                                    ON CONFLICT (source_code, project_type, context, source) 
+                                    DO UPDATE SET al_en_us = {texts[0]}, ob_en_us = {texts[1]};\n"""
+                    
+                elif 'dbfunction' in table_i18n:
+                    query_row = f"""INSERT INTO {table_i18n} (source_code, context, project_type, source, ds_en_us) 
+                                    VALUES ('giswater', '{table_org}', '{row_org['project_type']}', '{row_org['id']}', 
+                                    {texts[0]}) 
+                                    ON CONFLICT (source_code, project_type, context, source) 
+                                    DO UPDATE SET ds_en_us = {texts[0]};\n"""
+
+                elif 'dbtypevalue' in table_i18n:
+                    query_row = f"""INSERT INTO {table_i18n} (source_code, context, project_type, typevalue, source, vl_en_us, ds_en_us) 
+                                    VALUES ('giswater', '{table_org}', '{self.project_type}', '{row_org['typevalue']}', '{row_org['id']}', 
+                                    {texts[0]}, {texts[1]}) 
+                                    ON CONFLICT (source_code, project_type, context, typevalue, source) 
+                                    DO UPDATE SET vl_en_us = {texts[0]}, ds_en_us = {texts[1]};\n"""
+                    
+                elif 'dbconfig_form_tableview' in table_i18n:
+                    query_row = f"""INSERT INTO {table_i18n} (source_code, context, project_type, location_type, columnname, source, al_en_us) 
+                                    VALUES ('giswater', '{table_org}', '{row_org['project_type']}', '{row_org['location_type']}', '{row_org['columnname']}', '{row_org['objectname']}', 
+                                    {texts[0]}) 
+                                    ON CONFLICT (source_code, context, project_type, location_type, columnname, source) 
+                                    DO UPDATE SET al_en_us = {texts[0]};\n"""
+
+                elif 'dbtable' in table_i18n:
+                    query_row = f"""INSERT INTO {table_i18n} (source_code, context, project_type, source, ds_en_us, al_en_us) 
+                                    VALUES ('giswater', '{table_org}', '{self.project_type}', '{row_org['id']}', {texts[0]}, {texts[1]}) 
+                                    ON CONFLICT (source_code, context, project_type, source) 
+                                    DO UPDATE SET al_en_us = {texts[0]}, ds_en_us = {texts[1]};\n"""    
+                
+                elif 'su_basic_tables' in table_i18n:
+                    source = row_org["id"]
+                    if table_org == "value_state_type":
+                        texts.append('null')
+                    query_row = f"""INSERT INTO {table_i18n} (source_code, context, project_type, source, na_en_us, ob_en_us) 
+                                    VALUES ('giswater', '{table_org}', '{self.project_type}', '{source}', {texts[0]}, {texts[1]}) 
+                                    ON CONFLICT (source_code, context, project_type, source) 
+                                    DO UPDATE SET na_en_us = {texts[0]}, ob_en_us = {texts[1]};\n"""
+                    
+                elif 'su_feature' in table_i18n:
+                    query_row = f"""INSERT INTO {table_i18n} (source_code, context, project_type, feature_class, feature_type, lb_en_us, ds_en_us) 
+                                    VALUES ('giswater', '{table_org}', '{self.project_type}', '{row_org["feature_class"]}', '{row_org["feature_type"]}', {texts[0]}, {texts[1]}) 
+                                    ON CONFLICT (source_code, context, project_type, feature_class, feature_type, lb_en_us) 
+                                    DO UPDATE SET lb_en_us = {texts[0]}, ds_en_us = {texts[1]};\n"""  
+                    
+
+                query += query_row
+        return query              
+
+    def _get_rows_to_compare(self, table_i18n, table_org):
+        if 'dbconfig_form_fields' in table_i18n:
+            columns_i18n = ["formname", "formtype", "source", "lb_en_us", "tt_en_us", "project_type"]
+            columns_org = ["formname", "formtype", "columnname", "label", "tooltip"]
+            names = ["label", "tooltip"]
+
+        elif 'dbparam_user' in table_i18n:
+            columns_i18n = ["project_type", "source", "formname", "lb_en_us", "tt_en_us"]
+            columns_org = ["project_type", "id", "formname", "label", "descript"]
+            names = ["label", "descript"]
+
+        elif 'dbconfig_param_system' in table_i18n:
+            columns_i18n = ["project_type", "source", "lb_en_us", "tt_en_us"]
+            columns_org = ["project_type", "parameter", "label", "descript"]
+            names = ["label", "descript"]
+
+        elif 'dbconfig_typevalue' in table_i18n:
+            columns_i18n = ["formname", "source", "tt_en_us"]
+            columns_org = ["typevalue", "id", "idval"]
+            names = ["idval"]
+
+        elif 'dbmessage' in table_i18n:
+            columns_i18n = ["project_type", "CAST(source AS INTEGER) AS source", "CAST(log_level AS INTEGER) AS log_level", "ms_en_us", "ht_en_us"]
+            columns_org = ["project_type", "id", "log_level", "error_message", "hint_message"]
+            names = ["error_message", "hint_message"]
+
+        elif 'dbfprocess' in table_i18n:
+            columns_i18n = ["project_type", "CAST(source AS INTEGER) AS source", "ex_en_us", "in_en_us", "na_en_us"]
+            columns_org = ["project_type", "fid", "except_msg", "info_msg", "fprocess_name"]
+            names = ["except_msg", "info_msg", "fprocess_name"]
+
+        elif 'dbconfig_csv' in table_i18n:
+            columns_i18n = ["project_type", "source", "al_en_us", "ds_en_us"]
+            columns_org = ["fid", "alias", "descript"]
+            names = ["alias", "descript"]
+
+        elif 'dbconfig_form_tabs' in table_i18n:
+            columns_i18n = ["project_type", "formname", "source", "lb_en_us", "tt_en_us"]
+            columns_org = ["formname", "tabname", "label", "tooltip"]
+            names = ["label", "tooltip"]
+
+        elif 'dbconfig_report' in table_i18n:
+            columns_i18n = ["project_type", "source", "al_en_us", "ds_en_us"]
+            columns_org = ["id", "alias", "descript"]
+            names = ["alias", "descript"]
+
+        elif 'dbconfig_toolbox' in table_i18n:
+            columns_i18n = ["project_type", "source", "al_en_us", "ob_en_us"]
+            columns_org = ["id", "alias", "observ"]
+            names = ["alias", "observ"]
+
+        elif 'dbfunction' in table_i18n:
+            columns_i18n = ["project_type", "source", "ds_en_us"]
+            columns_org = ["project_type", "id", "descript"]
+            names = ["descript"]
+
+        elif 'dbtypevalue' in table_i18n:
+            columns_i18n = ["project_type", "typevalue", "source", "vl_en_us"]
+            columns_org = ["typevalue", "id", "idval", "descript"]
+            names = ["idval", "descript"]
+
+        elif 'dbconfig_form_tableview' in table_i18n:
+            columns_i18n = ["project_type", "location_type", "source", "al_en_us"]
+            columns_org = ["project_type", "location_type", "objectname", "columnname", "alias"]
+            names = ["columnname"]
+
+        elif 'dbtable' in table_i18n:
+            columns_i18n = ["project_type", "source", "ds_en_us", "al_en_us"]
+            columns_org = ["id", "descript", "alias"]
+            names = ["descript", "alias"]
+
+        elif 'su_basic_tables' in table_i18n:
+            columns_i18n = ["project_type", "source", "na_en_us", "ob_en_us"]
+            columns_org = ["id", "name"]
+            names = ["name"]
+            if table_org == "value_state":
+                columns_org.append("observ")
+                names.append("observ")
+            elif table_org == "doc_type":
+                columns_org = ["id", "comment"]
+                names = ["id", "comment"]
+
+        elif 'su_feature' in table_i18n:
+            columns_i18n = ["project_type", "feature_class", "feature_type", "lb_en_us", "ds_en_us"]
+            columns_org = ["feature_class", "feature_type", "id", "descript"]
+            names = ["id", "descript"]
+
+        return columns_i18n, columns_org, names
+    
+    def _json_update(self, table_i18n, table_org):
+        column = ""
+        if table_org == 'config_report':
+            column = "filterparam"
+        elif table_org == 'config_toolbox':
+            column = 'inputparams'
+        query = f"SELECT * FROM {self.schema_org}.{table_org}"
+        rows = self._get_rows(query, self.cursor_org)
+        query = ""
+        for row in rows:
+            safe_row_column = str(row[column]).replace("'", "''")
+            datas = self.extract_and_update_strings(row[column])
+
+            for i, data in enumerate(datas):
+                for key, text in data.items():
+                    # Handle string or list of strings
+                    if isinstance(text, list):
+                        text = ", ".join(text)  # or use another delimiter
+                    elif not isinstance(text, str):
+                        continue  # Skip if it's not a string or list
+
+                    safe_text = text.replace("'", "''")
+
+                    query_row = f"""
+                    INSERT INTO {table_i18n} (source_code, project_type, context, hint, text, source, lb_en_us)
+                    VALUES ('giswater', '{self.project_type}', '{table_org}', '{key}_{i}', '{safe_row_column}', '{row['id']}', '{safe_text}')
+                    ON CONFLICT (source_code, project_type, context, hint, text, source)
+                    DO UPDATE SET lb_en_us = '{safe_text}';
+                    """ 
+            # Execute or collect query_row
+                query += query_row
+        return query
+    
+    def _dbconfig_form_fields_feat_update(self, table_i18n):
+        schema = table_i18n.split('.')[0]
+        table_org = f"{schema}.dbconfig_form_fields"
+        query = f"""
+            INSERT INTO {table_i18n}
+            select distinct on (feature_type, project_type, source) *
+            FROM (
+                SELECT 'ARC' AS feature_type, * 
+                FROM {table_org} 
+                WHERE formtype = 'form_feature' AND (formname LIKE 've_arc%' OR formname = 'v_edit_arc')
+                
+                UNION
+                
+                SELECT 'NODE', * 
+                FROM {table_org} 
+                WHERE formtype = 'form_feature' AND (formname LIKE 've_node%' OR formname = 'v_edit_node')
+                
+                UNION
+                
+                SELECT 'CONNEC', * 
+                FROM {table_org} 
+                WHERE formtype = 'form_feature' AND (formname LIKE 've_connec%' OR formname = 'v_edit_connec')
+                
+                UNION
+                
+                SELECT 'GULLY', * 
+                FROM {table_org} 
+                WHERE formtype = 'form_feature' AND (formname LIKE 've_gully%' OR formname = 'v_edit_gully')
+                
+                UNION
+                
+                SELECT 'ELEMENT', * 
+                FROM {table_org} 
+                WHERE formtype = 'form_feature' AND (formname LIKE 've_element%' OR formname = 'v_edit_element')
+                
+                UNION
+                
+                SELECT 'LINK', * 
+                FROM {table_org} 
+                WHERE formtype = 'form_feature' AND (formname LIKE 've_link%' OR formname = 'v_edit_link')
+                
+                UNION
+                
+                SELECT 'FLWREG', * 
+                FROM {table_org} 
+                WHERE formtype = 'form_feature' AND (formname LIKE 've_flwreg%' OR formname = 'v_edit_flwreg')
+            ) AS unioned
+            ON CONFLICT (feature_type, source_code, project_type, context, formname, formtype, source)
+            DO NOTHING;
+
+            delete from {table_org}  where formtype = 'form_feature' and (formname like 've_arc%' or formname in ('v_edit_arc'));
+
+            delete from {table_org} where formtype = 'form_feature' and (formname like 've_node%' or formname in ('v_edit_node'));
+
+            delete from {table_org} where formtype = 'form_feature' and (formname like 've_connec%' or formname in ('v_edit_connec'));
+
+            delete from {table_org} where formtype = 'form_feature' and (formname like 've_gully%' or formname in ('v_edit_gully'));
+
+            delete from {table_org} where formtype = 'form_feature' and (formname like 've_element%' or formname in ('v_edit_element'));
+
+            delete from {table_org} where formtype = 'form_feature'and (formname like 've_link%' or formname in ('v_edit_link'));
+
+            delete from {table_org} where formtype = 'form_feature'  and (formname like 've_flwreg%' or formname in ('v_edit_flwreg'));
+        """
+        return query
+            
+    #endregion
     # region Rewrite Project_type
     def _update_project_type(self, table):
         """Function to rewrite the repeated rows with different project_type to only one with project_type = 'utils'"""
@@ -633,26 +808,53 @@ class GwSchemaI18NManager:
         return existing_table
 
     def _find_table_org(self, table_i18n):
+        # Create the query using table_i18n
         query = f'SELECT * FROM {table_i18n}'
         rows = self._get_rows(query, self.cursor_i18n)
-        table_org = rows[0]['context']
-        if not table_org:
-            return False
+
+        # If no rows returned from the query, proceed to process table_i18n
+        if not rows:
+            table_name = table_i18n.split(".")[1]
+            # Process the table name based on its prefix
+            if "dbtypevalue" in table_i18n:
+                table_org = ["edit_typevalue","plan_typevalue","om_typevalue"]
+            elif "dbjson" in table_i18n:
+                table_org = ["config_report", "config_toolbox"]
+            elif table_name.startswith("dbconfig"):
+                table_org = [table_name[2:]] # Get everything after the first two characters
+            elif table_name.startswith("su_"):
+                if table_name == "su_feature":
+                    table_org = ["cat_feature"]
+                else:
+                    table_org = ["value_state", "value_state_type", "doc_type"]
+            else:
+                table_org = [f"sys_{table_name[2:]}"]  # Prepend "sys_" and get everything after the first two characters
+            print(table_org)
+            return table_org
+        
+        # If rows exist, retrieve 'context' from the first row
+        table_org = []
+        seen_contexts = set()
+        for row in rows:
+            context = row.get('context')
+            if context not in seen_contexts:
+                table_org.append(context)
+                seen_contexts.add(context) # Use .get() to avoid KeyError if 'context' doesn't exist
+        print(table_org)
+        if table_org is None:
+            return None  # Or some fallback behavior
+        
         return table_org
 
-    def _get_rows(self, sql, cursor, commit=True):
+    
+    def _get_rows(self, sql, cursor):
         """ Get multiple rows from selected query """
-        last_error = None
         rows = None
         try:
             cursor.execute(sql)
             rows = cursor.fetchall()
-            if commit:
-                cursor._commit()
         except Exception as e:
-            last_error = e
-            if commit:
-                cursor._rollback()
+            print(f"Error: {e}")
         finally:
             return rows
 
@@ -682,4 +884,31 @@ class GwSchemaI18NManager:
         self.cursor_i18n.execute(query)
         results = self.cursor_i18n.fetchall()
         self.primary_keys = [row['column_name'] for row in results]
+
+    def extract_and_update_strings(self, data):
+        """Recursively extract and translate 'label', 'comboNames', 'tooltip', and 'placeholder' keys in JSON."""
+        new_data = {}
+        if isinstance(data, dict):
+            for key, value in data.items():
+                # Keys that should be translated if the value is a string
+                translatable_keys = {'label', 'tooltip', 'placeholder'}
+
+                if key in translatable_keys and isinstance(value, str):
+                    new_data[key] = value
+
+                # Translate 'comboNames' (list of strings)
+                elif key == 'comboNames' and isinstance(value, list):
+                    translated_list = []
+                    for item in value:
+                        translated_list.append(item)
+                    new_data[key] = translated_list
+
+                # Recurse into nested structures
+                else:
+                    data[key] = self.extract_and_update_strings(value)
+
+        elif isinstance(data, list):
+            return [self.extract_and_update_strings(item) for item in data]
+
+        return new_data
     # endregion
