@@ -1034,7 +1034,7 @@ class GwPsector:
         self.dlg_infolog.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_infolog, True))
 
         text, _ = tools_gw.fill_tab_log(self.dlg_infolog, json_result['body']['data'], close=False)
-        tools_gw.open_dialog(self.dlg_infolog)
+        tools_gw.open_dialog(self.dlg_infolog, dlg_name='psector_repair')
 
         # Draw log features on map
         tools_gw.manage_json_response(json_result)

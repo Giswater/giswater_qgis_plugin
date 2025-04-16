@@ -63,7 +63,7 @@ class Go2Iber:
 
         # Open dialog
         tools_qgis.show_warning("This tool is still in developement, it might not work as intended.", dialog=self.dlg_go2iber)  # TODO: remove this
-        tools_gw.open_dialog(self.dlg_go2iber)
+        tools_gw.open_dialog(self.dlg_go2iber, dlg_name='go2iber')
 
     def _btn_swmm_options_clicked(self):
         # tools_gw.execute_class_function(GwGo2EpaUI, '_go2epa_options')

@@ -181,7 +181,7 @@ class GwMenuLoad(QObject):
             return
 
         # Open dialog
-        tools_gw.open_dialog(self.dlg_manage_menu, title="Advanced Menu")
+        tools_gw.open_dialog(self.dlg_manage_menu, dlg_name='load_menu', title="Advanced Menu")
 
     def _reset_position_dialog(self):
         """ Reset position dialog x/y """
