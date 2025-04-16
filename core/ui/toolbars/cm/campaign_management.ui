@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>835</width>
-    <height>669</height>
+    <width>839</width>
+    <height>678</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -174,9 +174,9 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_2">
         <item>
-         <widget class="QPushButton" name="campaign_btn_create">
+         <widget class="QPushButton" name="campaign_btn_open">
           <property name="text">
-           <string>Crear Campanya</string>
+           <string>Obrir Campanya</string>
           </property>
          </widget>
         </item>
@@ -252,7 +252,7 @@
  <tabstops>
   <tabstop>date_event_from</tabstop>
   <tabstop>date_event_to</tabstop>
-  <tabstop>campaign_btn_create</tabstop>
+  <tabstop>campaign_btn_open</tabstop>
   <tabstop>campaign_btn_delete</tabstop>
   <tabstop>tbl_campaign</tabstop>
  </tabstops>

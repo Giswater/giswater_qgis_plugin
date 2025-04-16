@@ -72,7 +72,7 @@ class Campaign:
         #self.dialog.tbl_campaign.doubleClicked.connect(self.open_selected_campaign)
         self.dialog.tbl_campaign.doubleClicked.connect(self.open_campaign)
         self.dialog.campaign_btn_delete.clicked.connect(self.delete_selected_campaign)
-        self.dialog.campaign_btn_create.clicked.connect(self.open_selected_campaign)
+        self.dialog.campaign_btn_open.clicked.connect(self.open_campaign)
 
         self.manage_date_filter()
         tools_gw.open_dialog(self.dialog, dlg_name="campaign_manager")
@@ -663,20 +663,6 @@ class Campaign:
         tools_qgis.show_info(f"{success} campaign(s) deleted.", dialog=self.dialog)
         self.filter_campaigns()
 
-    def open_selected_campaign(self):
-        """Open the selected campaign from the manager"""
-        selected = self.dialog.tbl_campaign.selectionModel().selectedRows()
-        if not selected:
-            tools_qgis.show_warning("Select a campaign to open.")
-            return
-
-        index = selected[0]
-        campaign_id = index.data()
-        if not str(campaign_id).isdigit():
-            tools_qgis.show_warning("Invalid campaign ID.")
-            return
-
-        self.create_campaign(campaign_id=int(campaign_id), is_new=False, dialog_type="review")
 
     def open_campaign(self, index):
         """Open campaign from the clicked index safely (double click handler)."""
