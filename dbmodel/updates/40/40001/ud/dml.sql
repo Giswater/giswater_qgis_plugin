@@ -29,7 +29,7 @@ INSERT INTO cat_feature_link (id) VALUES ('SERVCONNECTION');
 INSERT INTO cat_feature_link (id) VALUES ('INLETPIPE');
 
 INSERT INTO sys_param_user (id, formname, descript, sys_role, idval, "label", dv_querytext, dv_parent_id, isenabled, layoutorder, project_type, isparent, dv_querytext_filterc, feature_field_id, feature_dv_parent_value, isautoupdate, "datatype", widgettype, ismandatory, widgetcontrols, vdefault, layoutname, iseditable, dv_orderby_id, dv_isnullvalue, stylesheet, placeholder, "source")
-VALUES('edit_gully_linkcat_vdefault', 'config', 'Value default catalog for link connected to gully', 'role_edit', NULL, 'Default catalog for linkcat:', 'SELECT cat_link.id, cat_link.id AS idval FROM cat_link JOIN cat_feature ON cat_feature.id = cat_link.link_type WHERE cat_feature.feature_type = ''INLETPIPE''', NULL, true, 20, 'ud', false, NULL, 'linkcat_id', NULL, false, 'text', 'combo', true, NULL, 'CC020', 'lyt_gully', true, NULL, false, NULL, NULL, NULL);
+VALUES('edit_gully_linkcat_vdefault', 'config', 'Value default catalog for link connected to gully', 'role_edit', NULL, 'Default catalog for linkcat:', 'SELECT DISTINCT ON (cl.id) cl.id, cl.id AS idval FROM link l JOIN cat_link cl ON l.linkcat_id = cl.id WHERE l.link_type = ''INLETPIPE''', NULL, true, 20, 'ud', false, NULL, 'linkcat_id', NULL, false, 'text', 'combo', true, NULL, 'CC020', 'lyt_gully', true, true, false, NULL, NULL, NULL);
 
 UPDATE sys_param_user
 SET vdefault='CC020',"label"='Default catalog for linkcat:',dv_querytext='SELECT cat_link.id, cat_link.id AS idval FROM cat_link JOIN cat_feature ON cat_feature.id = cat_link.link_type WHERE cat_feature.feature_type = ''INLETPIPE''',descript='Value default catalog for link connected to inletpipe',feature_field_id='linkcat_id',ismandatory=true,dv_isnullvalue=false,project_type='utils',id='edit_inletpipe_linkcat_vdefault'
@@ -327,7 +327,7 @@ END $func$;
 
 --- WEIR: insert man table
 insert into ve_elem_frweir (elementcat_id, state, state_type, num_elements, expl_id, sector_id, muni_id, the_geom, flwreg_class, nodarc_id, order_id, to_arc, flwreg_length )
-select 'FRWEIR-01', state, state_type, 1, expl_id, sector_id, muni_id, the_geom, 'WEIR', node_id, order_id, to_arc, flwreg_length 
+select 'FRWEIR-01', state, state_type, 1, expl_id, sector_id, muni_id, the_geom, 'WEIR', node_id, order_id, to_arc, flwreg_length
 from inp_flwreg_weir2
 join node using (node_id);
 
@@ -338,7 +338,7 @@ from inp_flwreg_weir2 w join ve_elem_frweir r on node_id=r.nodarc_id and w.to_ar
 
 --- PUMP: insert man table
 insert into ve_elem_frpump (elementcat_id, state, state_type, num_elements, expl_id, sector_id, muni_id, the_geom, flwreg_class, nodarc_id, order_id, to_arc, flwreg_length )
-select 'FRPUMP-01', state, state_type, 1, expl_id, sector_id, muni_id, the_geom, 'PUMP', node_id, order_id, to_arc, flwreg_length 
+select 'FRPUMP-01', state, state_type, 1, expl_id, sector_id, muni_id, the_geom, 'PUMP', node_id, order_id, to_arc, flwreg_length
 from inp_flwreg_pump2
 join node using (node_id);
 
@@ -349,7 +349,7 @@ from inp_flwreg_pump2 w join ve_elem_frpump r on node_id=r.nodarc_id and w.to_ar
 
 --- ORIFICE: insert man table
 insert into ve_elem_frorifice (elementcat_id, state, state_type, num_elements, expl_id, sector_id, muni_id, the_geom, flwreg_class, nodarc_id, order_id, to_arc, flwreg_length )
-select 'FRORIFICE-01', state, state_type, 1, expl_id, sector_id, muni_id, the_geom, 'ORIFICE', node_id, order_id, to_arc, flwreg_length 
+select 'FRORIFICE-01', state, state_type, 1, expl_id, sector_id, muni_id, the_geom, 'ORIFICE', node_id, order_id, to_arc, flwreg_length
 from inp_flwreg_orifice2
 join node using (node_id);
 
@@ -360,7 +360,7 @@ from inp_flwreg_orifice2 w join ve_elem_frorifice r on node_id=r.nodarc_id and w
 
 --- OUTLET: insert man table
 insert into ve_elem_froutlet (elementcat_id, state, state_type, num_elements, expl_id, sector_id, muni_id, the_geom, flwreg_class, nodarc_id, order_id, to_arc, flwreg_length )
-select 'FROUTLET-01', state, state_type, 1, expl_id, sector_id, muni_id, the_geom, 'OUTLET', node_id, order_id, to_arc, flwreg_length 
+select 'FROUTLET-01', state, state_type, 1, expl_id, sector_id, muni_id, the_geom, 'OUTLET', node_id, order_id, to_arc, flwreg_length
 from inp_flwreg_outlet2
 join node using (node_id);
 
