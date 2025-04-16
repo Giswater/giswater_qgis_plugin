@@ -11,10 +11,13 @@ import psycopg2
 import psycopg2.extras
 import subprocess
 from functools import partial
+import json
+import ast
 
 from ..ui.ui_manager import GwAdminTranslationUi
 from ..utils import tools_gw
 from ...libs import lib_vars, tools_qt, tools_qgis, tools_db
+from PyQt5.QtWidgets import QApplication
 
 
 class GwI18NGenerator:
@@ -23,11 +26,13 @@ class GwI18NGenerator:
         self.plugin_dir = lib_vars.plugin_dir
         self.schema_name = lib_vars.schema_name
 
+
     def init_dialog(self):
         """ Constructor """
 
         self.dlg_qm = GwAdminTranslationUi(self)
         tools_gw.load_settings(self.dlg_qm)
+
         self._load_user_values()
 
         self.dlg_qm.btn_translate.setEnabled(False)
@@ -40,6 +45,7 @@ class GwI18NGenerator:
         self.dlg_qm.cmb_language.currentIndexChanged.connect(partial(self._set_editability_dbmessage))
         tools_gw.open_dialog(self.dlg_qm, dlg_name='admin_translation')
 
+
     def pass_schema_info(self, schema_info, schema_name):
         self.project_type = schema_info['project_type']
         self.project_epsg = schema_info['project_epsg']
@@ -48,6 +54,7 @@ class GwI18NGenerator:
         self.schema_name = schema_name
 
     # region private functions
+
 
     def _check_connection(self):
         """ Check connection to database """
@@ -68,6 +75,7 @@ class GwI18NGenerator:
             return
         self._populate_cmb_language()
 
+
     def _populate_cmb_language(self):
         """ Populate combo with languages values """
 
@@ -81,6 +89,7 @@ class GwI18NGenerator:
 
         tools_qt.set_combo_value(self.dlg_qm.cmb_language, language, 0)
 
+
     def _check_translate_options(self):
         """ Check the translation options selected by the user """
         py_msg = tools_qt.is_checked(self.dlg_qm, self.dlg_qm.chk_py_msg)
@@ -92,6 +101,7 @@ class GwI18NGenerator:
         msg = ''
         self.language = tools_qt.get_combo_value(self.dlg_qm, self.dlg_qm.cmb_language, 0)
         self.lower_lang = self.language.lower()
+        self.schema_i18n = "i18n"
         # TODO ('Next release 3.6.011')
         # if missing_translations:
         #     self._check_missing_dbmessage_values()
@@ -125,6 +135,7 @@ class GwI18NGenerator:
 
         if msg != '':
             tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', msg)
+
 
     def _create_py_files(self):
         """ Read the values of the database and generate the ts and qm files """
@@ -273,6 +284,7 @@ class GwI18NGenerator:
         else:
             return False
 
+
     def _get_title(self, py_dialogs, name, key_label):
         """ Return title's according language """
 
@@ -289,6 +301,7 @@ class GwI18NGenerator:
                 return title
         return title
 
+    
     def _create_db_files(self):
         """ Read the values of the database and update the i18n files """
 
@@ -304,39 +317,37 @@ class GwI18NGenerator:
             msg = "Are you sure you want to overwrite this file?"
             answer = tools_qt.show_question(msg, "Overwrite", parameter=f"\n\n{cfg_path}{file_name}")
             if not answer:
-                return None
+                return None, ""
         else:
             os.makedirs(cfg_path, exist_ok=True)
 
+        # Get All table values
         self._write_header(cfg_path + file_name)
+        dbtables = [ "dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue", 
+                    "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report", 
+                    "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_tableview",
+                    "dbtable", "dbconfig_form_fields_feat", "su_basic_tables", "su_feature", "dbjson"
+                 ]
 
-        rows = self._get_dbdialog_values_i18n()
-        if not rows:
-            return False, "dbdialog"
-        self._write_dbdialog_values_i18n(rows, cfg_path + file_name)
+        for dbtable in dbtables:
+            dbtable_rows, dbtable_columns = self._get_table_values(dbtable)
+            if not dbtable_rows:
+                return False, dbtable
+            else:
+                if dbtable == 'dbjson':
+                    self._write_dbjson_values_i18n(dbtable_rows, cfg_path + file_name)
+                else:
+                    self._write_table_values_i18n(dbtable_rows, dbtable_columns, dbtable, cfg_path + file_name)            
 
-        rows = self._get_dbmessages_values_i18n()
-        if not rows:
-            return False, "dbmessage"
-        self._write_dbmessages_values_i18n(rows, cfg_path + file_name)
+        return True, ""
 
-        rows = self._get_dbfprocess_values_i18n()
-        if not rows:
-            return False, "dbfprocess"
-        self._write_dbfprocess_values_i18n(rows, cfg_path + file_name)
-
-        return True
-
+    
     def _create_i18n_files(self):
         """ Read the values of the database and update the i18n files """
 
-        major_version = tools_qgis.get_major_version(plugin_dir=self.plugin_dir).replace(".", "")
-        ver_build = tools_qgis.get_build_version(plugin_dir=self.plugin_dir)
-
         cfg_path = f"{self.plugin_dir}{os.sep}dbmodel{os.sep}i18n{os.sep}{self.language}{os.sep}"
         file_name = f'dml.sql'
-        file_name_ws = f'ws_dml.sql'
-        file_name_ud = f'ud_dml.sql'
+
 
         # Check if file exist
         if os.path.exists(cfg_path + file_name):
@@ -347,36 +358,33 @@ class GwI18NGenerator:
         else:
             os.makedirs(cfg_path, exist_ok=True)
 
+        # for project_type in ["ws", "ud"]:
+        #     rows = self._get_dbfeature_values(project_type)
+        #     if not rows:
+        #         return False, f"config_form_fields_{project_type}"
+        #     self._write_header(cfg_path + f"{project_type}_{file_name}")
+        #     self._write_dbfeature_updates(rows, cfg_path + f"{project_type}_{file_name}")
+
+        # Get All table values
         self._write_header(cfg_path + file_name)
+        dbtables = [ "dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue", 
+                    "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report", 
+                    "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_tableview", 
+                    "dbtable", "dbconfig_form_fields_feat", "su_basic_tables", "su_feature", "dbjson"
+                 ]
 
-        rows = self._get_config_form_fields_values('ws')
-        if not rows:
-            return False, "config_form_fields_ws"
-        self._write_header(cfg_path + file_name_ws)
-        self._write_config_form_fields_updates(rows, cfg_path + file_name_ws)
-
-        rows = self._get_config_form_fields_values('ud')
-        if not rows:
-            return False, "config_form_fields_ud"
-        self._write_header(cfg_path + file_name_ud)
-        self._write_config_form_fields_updates(rows, cfg_path + file_name_ud)
-
-        rows = self._get_dbdialog_values_i18n()
-        if not rows:
-            return False, "dbdialog"
-        self._write_dbdialog_values_i18n(rows, cfg_path + file_name)
-
-        rows = self._get_dbmessages_values_i18n()
-        if not rows:
-            return False, "dbmessage"
-        self._write_dbmessages_values_i18n(rows, cfg_path + file_name)
-
-        # rows = self._get_dbfprocess_values_i18n()
-        # if not rows:
-            # return False, "dbfprocess"
-        # self._write_dbfprocess_values_i18n(rows, cfg_path + file_name)
+        for dbtable in dbtables:
+            dbtable_rows, dbtable_columns = self._get_table_values(dbtable)
+            if not dbtable_rows:
+                return False, dbtable
+            else:
+                if dbtable == 'dbjson':
+                    self._write_dbjson_values_i18n(dbtable_rows, cfg_path + file_name)
+                else:
+                    self._write_table_values_i18n(dbtable_rows, dbtable_columns, dbtable, cfg_path + file_name) 
 
         return True, ""
+
 
     def _check_missing_dbmessage_values(self):
         """ Get db message values from schema_name """
@@ -407,25 +415,131 @@ class GwI18NGenerator:
                                   f"VALUES ('{source}', '{project_type}', 'sys_message', $${ms_msg}$$, $${ht_msg}$$, 'giswater', {log_level});")
                     self._get_rows(sql_insert)
 
-    def _get_dbfprocess_values_i18n(self):
-        """ Get db messages values """
-        # Make the query
+        
+    def _write_header(self, path):
+        """
+        Write the file header
+            :param path: Full destination path (String)
+        """
 
+        file = open(path, "w")
+        header = (f'/*\n'
+                  f'This file is part of Giswater\n'
+                  f'The program is free software: you can redistribute it and/or modify it under the terms of the GNU '
+                  f'General Public License as published by the Free Software Foundation, either version 3 of the '
+                  f'License, or (at your option) any later version.\n'
+                  f'This version of Giswater is provided by Giswater Association,\n'
+                  f'*/\n\n\n'
+                  f'SET search_path = SCHEMA_NAME, public, pg_catalog;\n'
+                  f"UPDATE config_param_system SET value = FALSE WHERE parameter = 'admin_config_control_trigger';\n\n")
+        file.write(header)
+        file.close()
+        del file
+
+
+    def _get_table_values(self, table):
+        """ Get table values """
+
+        # Update the part the of the program in process
+        self.dlg_qm.lbl_info.clear()
+        msg = f"Updating {table}..."
+        tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', msg)
+        QApplication.processEvents()
+        colums = []
+        lang_colums = []
+
+        if table == 'dbconfig_form_fields':
+            colums = ["source", "formname", "formtype", "project_type", "context", "source_code", "lb_en_us", "tt_en_us"]
+            lang_colums = [f"lb_{self.lower_lang}", f"tt_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}", f"auto_tt_{self.lower_lang}", f"va_auto_tt_{self.lower_lang}"]
+        
+        elif table == 'dbparam_user':
+            colums = ["source", "formname", "project_type", "context", "source_code", "lb_en_us", "tt_en_us"]
+            lang_colums = [f"lb_{self.lower_lang}", f"tt_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}", f"auto_tt_{self.lower_lang}", f"va_auto_tt_{self.lower_lang}"]
+        
+        elif table == 'dbconfig_param_system':
+            colums = ["source", "project_type", "context", "source_code", "lb_en_us", "tt_en_us"]
+            lang_colums = [f"lb_{self.lower_lang}", f"tt_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}", f"auto_tt_{self.lower_lang}", f"va_auto_tt_{self.lower_lang}"]
+        
+        elif table == 'dbconfig_typevalue':
+            colums = ["source", "formname", "formtype", "project_type", "context", "source_code", "tt_en_us"]
+            lang_colums = [f"tt_{self.lower_lang}", f"auto_tt_{self.lower_lang}", f"va_auto_tt_{self.lower_lang}"]
+
+        elif table == 'dbmessage':
+            colums = ["source", "project_type", "context", "log_level", "ms_en_us", "ht_en_us"]
+            lang_colums = [f"ms_{self.lower_lang}", f"auto_ms_{self.lower_lang}", f"va_auto_ms_{self.lower_lang}," f"ht_{self.lower_lang}", f"auto_ht_{self.lower_lang}", f"va_auto_ht_{self.lower_lang}"]
+        
+        elif table == 'dbfprocess':
+            colums = ["source", "project_type", "context", "ex_en_us", "in_en_us", "na_en_us"]
+            lang_colums = [f"ex_{self.lower_lang}", f"auto_ex_{self.lower_lang}", f"va_auto_ex_{self.lower_lang}," f"in_{self.lower_lang}", f"auto_in_{self.lower_lang}", f"va_auto_in_{self.lower_lang}", f"na_{self.lower_lang}", f"auto_na_{self.lower_lang}", f"va_auto_na_{self.lower_lang}"]
+        
+        elif table == 'dbconfig_csv':
+            colums = ["source", "project_type", "context", "al_en_us", "ds_en_us"]
+            lang_colums = [f"al_{self.lower_lang}", f"auto_al_{self.lower_lang}", f"va_auto_al_{self.lower_lang}", f"ds_{self.lower_lang}", f"auto_ds_{self.lower_lang}", f"va_auto_ds_{self.lower_lang}"]
+
+        elif table == 'dbconfig_form_tabs':
+            colums = ["formname", "source", "project_type", "context", "lb_en_us", "tt_en_us"]
+            lang_colums = [f"lb_{self.lower_lang}", f"tt_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}", f"auto_tt_{self.lower_lang}", f"va_auto_tt_{self.lower_lang}"]
+        
+        elif table == 'dbconfig_report':
+            colums = ["source", "project_type", "context", "al_en_us", "ds_en_us"]
+            lang_colums = [f"al_{self.lower_lang}", f"auto_al_{self.lower_lang}", f"va_auto_al_{self.lower_lang}", f"ds_{self.lower_lang}", f"auto_ds_{self.lower_lang}", f"va_auto_ds_{self.lower_lang}"]
+        
+        elif table == 'dbconfig_toolbox':
+            colums = ["source", "project_type", "context", "al_en_us", "ob_en_us"]
+            lang_colums = [f"al_{self.lower_lang}", f"auto_al_{self.lower_lang}", f"va_auto_al_{self.lower_lang}", f"ob_{self.lower_lang}", f"auto_ob_{self.lower_lang}", f"va_auto_ob_{self.lower_lang}"]
+       
+        elif table == 'dbfunction':
+            colums = ["source", "project_type", "context", "ds_en_us"]
+            lang_colums = [f"ds_{self.lower_lang}", f"auto_ds_{self.lower_lang}", f"va_auto_ds_{self.lower_lang}"]
+       
+        elif table == 'dbtypevalue':
+            colums = ["source", "project_type", "context", "typevalue", "vl_en_us", "ds_en_us"]
+            lang_colums = [f"vl_{self.lower_lang}", f"auto_vl_{self.lower_lang}", f"va_auto_vl_{self.lower_lang}", f"ds_{self.lower_lang}", f"auto_ds_{self.lower_lang}", f"va_auto_ds_{self.lower_lang}"]
+
+        elif table == 'dbconfig_form_tableview':
+            colums = ["source", "columnname", "project_type", "context", "location_type", "al_en_us"]
+            lang_colums = [f"al_{self.lower_lang}", f"auto_al_{self.lower_lang}", f"va_auto_al_{self.lower_lang}", ]
+
+        elif table == 'dbjson':
+            colums = ["source", "project_type", "context", "hint", "text", "lb_en_us"]
+            lang_colums = [f"lb_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}"]
+        
+        elif table == 'dbconfig_form_fields_feat':
+            colums = ["feature_type","source", "formname", "formtype", "project_type", "context", "source_code", "lb_en_us", "tt_en_us"]
+            lang_colums = [f"lb_{self.lower_lang}", f"tt_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}", f"auto_tt_{self.lower_lang}", f"va_auto_tt_{self.lower_lang}"]
+
+        elif table == 'dbtable':
+            colums = ["source", "project_type", "context", "al_en_us", "ds_en_us"]
+            lang_colums = [f"al_{self.lower_lang}", f"auto_al_{self.lower_lang}", f"va_auto_al_{self.lower_lang}", f"ds_{self.lower_lang}", f"auto_ds_{self.lower_lang}", f"va_auto_ds_{self.lower_lang}"]
+        
+        elif table == 'su_basic_tables':
+            colums = ["source", "project_type", "context", "na_en_us", "ob_en_us"]
+            lang_colums = [f"na_{self.lower_lang}", f"auto_na_{self.lower_lang}", f"va_auto_na_{self.lower_lang}", f"ob_{self.lower_lang}", f"auto_ob_{self.lower_lang}", f"va_auto_ob_{self.lower_lang}"]
+
+        elif table == 'su_feature':
+            colums = ["project_type", "context", "feature_class", "feature_type", "lb_en_us", "ds_en_us"]
+            lang_colums = [f"lb_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}", f"ds_{self.lower_lang}", f"auto_ds_{self.lower_lang}", f"va_auto_ds_{self.lower_lang}"]
+        
+
+        # Make the query
+        sql=""
         if self.lower_lang == 'en_us':
-            sql = (f"SELECT source, project_type, context, ex_en_us, in_en_us"
-                f" FROM i18n.dbfprocess "
-                f" ORDER BY context;")
+            sql = (f"SELECT {", ".join(colums)} "
+               f"FROM {self.schema_i18n}.{table} "
+               f"ORDER BY context")
         else:
-            sql = (f"SELECT source, project_type, context, ex_en_us, ex_{self.lower_lang}, auto_ex_{self.lower_lang}, in_en_us, in_{self.lower_lang}, auto_in_{self.lower_lang}"
-                f" FROM i18n.dbfprocess "
-                f" ORDER BY context;")
-        rows = self._get_rows(sql, self.cursor)
+            sql = (f"SELECT {", ".join(colums)}, {", ".join(lang_colums)} "
+               f"FROM {self.schema_i18n}.{table} "
+               f"ORDER BY context")
+        rows = self._get_rows(sql, self.cursor_i18n)
+        print(sql)
+
         # Return the corresponding information
         if not rows:
             return False
-        return rows
+        return rows, colums
 
-    def _get_config_form_fields_values(self, project_type):
+    def _get_dbfeature_values(self, project_type):
         """ Get db dialog values """
         if self.lower_lang == 'en_us':
             sql = (f"SELECT formname_en_us"
@@ -439,43 +553,138 @@ class GwI18NGenerator:
         if not rows:
             return False
         return rows
+    
 
-    def _get_dbdialog_values_i18n(self):
-        """ Get db dialog values """
-        if self.lower_lang == 'en_us':
-            sql = (f"SELECT d.source, d.project_type, d.context, d.formname, "
-                    f"d.formtype, d.lb_en_us, d.tt_en_us "
-                    f"FROM i18n.dbdialog d "
-                    f"LEFT JOIN i18n.dbfeature f ON f.formname_en_us = d.formname "
-                    f"ORDER BY d.context, d.formname;")
-        else:
-            sql = (f"SELECT d.source, d.project_type, d.context, d.formname, f.formname_{self.lower_lang}, f.auto_formname_{self.lower_lang}, "
-                    f"d.formtype, d.lb_en_us, d.lb_{self.lower_lang}, d.auto_lb_{self.lower_lang}, d.tt_en_us, d.tt_{self.lower_lang}, d.auto_tt_{self.lower_lang} "
-                    f"FROM i18n.dbdialog d "
-                    f"LEFT JOIN i18n.dbfeature f ON f.formname_en_us = d.formname "
-                    f"ORDER BY d.context, d.formname;")
-        print(sql)
-        rows = self._get_rows(sql)
-        if not rows:
-            return False
-        return rows
+    def _write_table_values_i18n(self, rows, columns, table, path):
+        """
+        Generate a string and write into file
+            :param rows: List of values ([List][List])
+            :param path: Full destination path (String)
+            :return: (Boolean)
+        """
 
-    def _get_dbmessages_values_i18n(self):
-        """ Get db messages values """
-        if self.lower_lang == 'en_us':
-            sql = (f"SELECT source, project_type, context, ms_en_us, ht_en_us, log_level"
-                f" FROM i18n.dbmessage "
-                f" ORDER BY context;")
-        else:
-            sql = (f"SELECT source, project_type, context, ms_en_us, ms_{self.lower_lang}, auto_ms_{self.lower_lang}, ht_en_us, ht_{self.lower_lang}, auto_ht_{self.lower_lang}, log_level"
-                f" FROM i18n.dbmessage "
-                f" ORDER BY context;")
-        rows = self._get_rows(sql)
-        if not rows:
-            return False
-        return rows
+        file = open(path, "a")
+        j=0
+        for i, row in enumerate(rows): #(For row in rows)
+            if row['project_type'] == self.project_type or row['project_type'] == 'utils': # Avoid the unwnated project_types
+                forenames = []
+                for column in columns:
+                    if column[-5:] == "en_us":
+                        forenames.append(column.split("_")[0])
 
-    def _write_config_form_fields_updates(self, rows, path):  # Parlar amb edgar
+                texts = []
+                for forename in forenames:
+                    text = row[f'{forename}_{self.lower_lang}']
+                    if text is None:
+                        if self.lower_lang != 'en_us':
+                            text = row[f'auto_{forename}_{self.lower_lang}']
+                        if text is None :
+                            text = row[f'{forename}_en_us']
+                            if text is None:
+                                if forename == 'tt' and table in ["dbconfig_form_fields", "dbconfig_param_system", "dbparam_user"]:
+                                    text = row[f'lb_en_us']
+                                if text is None:
+                                    text = ""
+                    text = text.replace("'", "''")
+                    texts.append(text)
+                
+                # Check invalid characters
+                for i, text in enumerate(texts):
+                    if texts[i] is not None:
+                        texts[i] = self._replace_invalid_quotation_marks(texts[i])
+                        if "\n" in texts[i]:
+                            texts[i] = self._replace_invalid_characters(texts[i])
+
+                #Define the query depending on the table
+                line = ''
+                   
+                if 'dbconfig_form_fields' in table:
+                    if 'feat' in table:
+                        feature_types = ['ARC', 'CONNEC', 'NODE', 'GULLY', 'LINK', 'ELEMENT']
+                        for feature_type in feature_types:
+                            if row['feature_type'] == feature_type:
+                                formname = row['feature_type'].lower()
+                                line += (f'UPDATE {row['context']} SET label = \'{texts[0]}\', tooltip = \'{texts[1]}\' '
+                                        f'WHERE formname LIKE \'%_{formname}%\' AND formtype = \'{row['formtype']}\' AND columnname = \'{row['source']}\';\n')
+                                break
+                    else:
+                        line += (f"UPDATE {row['context']} SET label = '{texts[0]}', tooltip = '{texts[1]}' "
+                                f"WHERE formname = '{row['formname']}' AND formtype = '{row['formtype']}' AND columnname = '{row['source']}';\n")
+
+                elif 'dbparam_user' in table:
+                    line += (f"UPDATE {row['context']} SET label = '{texts[0]}', descript = '{texts[1]}' "
+                                f"WHERE id = '{row['source']}';\n")
+
+                elif 'dbconfig_param_system' in table:
+                    line += (f"UPDATE {row['context']} SET label = '{texts[0]}', descript = '{texts[1]}' "
+                                f"WHERE parameter = '{row['source']}';\n")
+
+                elif 'dbconfig_typevalue' in table:
+                    line += (f"UPDATE {row['context']} SET idval = '{texts[0]}' "
+                                f"WHERE id = '{row['source']}' AND typevalue = '{row['formname']}';\n")
+
+                elif 'dbmessage' in table:
+                    line += (f"UPDATE {row['context']} SET error_message = '{texts[0]}', hint_message = '{texts[1]}' "
+                                f"WHERE id = '{row['source']}';\n")
+
+                elif 'dbfprocess' in table:
+                    line += (f"UPDATE {row['context']} SET except_msg = '{texts[0]}', info_msg = '{texts[1]}', fprocess_name = '{texts[2]}' "
+                                f"WHERE fid = '{row['source']}';\n")
+
+                elif 'dbconfig_csv' in table:
+                    line += (f"UPDATE {row['context']} SET alias = '{texts[0]}', descript = '{texts[1]}' "
+                                f"WHERE fid = '{row['source']}';\n")
+
+                elif 'dbconfig_form_tabs' in table:
+                    line += (f"UPDATE {row['context']} SET label = '{texts[0]}', tooltip = '{texts[1]}' "
+                                f"WHERE formname = '{row['formname']}' AND tabname = '{row['source']}';\n")
+
+                elif 'dbconfig_report' in table:
+                    line += (f"UPDATE {row['context']} SET alias = '{texts[0]}', descript = '{texts[1]}' "
+                                f"WHERE id = '{row['source']}';\n")
+
+                elif 'dbconfig_toolbox' in table:
+                    line += (f"UPDATE {row['context']} SET alias = '{texts[0]}', observ = '{texts[1]}' "
+                                f"WHERE id = '{row['source']}';\n")
+
+                elif 'dbfunction' in table:
+                    line += (f"UPDATE {row['context']} SET descript = '{texts[0]}' "
+                                f"WHERE id = '{row['source']}';\n")
+
+                elif 'dbtypevalue' in table:
+                    line += (f"UPDATE {row['context']} SET idval = '{texts[0]}', descript = '{texts[1]}' "
+                                f"WHERE id = '{row['source']}' AND typevalue = '{row['typevalue']}';\n")
+
+                elif 'dbconfig_form_tableview' in table:
+                    line += (f"UPDATE {row['context']} SET alias = '{texts[0]}' "
+                                f"WHERE objectname = '{row['source']}' AND columnname = '{row['columnname']}';\n")
+
+                elif 'dbtable' in table:
+                    line += (f"UPDATE {row['context']} SET alias = '{texts[0]}', descript = '{texts[1]}' "
+                                f"WHERE id = '{row['source']}';\n")
+                    
+                elif 'value_state' == row['context']:
+                    line += (f"UPDATE {row['context']} SET name = '{texts[0]}', observ = '{texts[1]}' "
+                                f"WHERE id = '{row['source']}';\n")
+                
+                elif 'value_state_type' == row['context']:
+                    line += (f"UPDATE {row['context']} SET name = '{texts[0]}' "
+                                f"WHERE id = '{row['source']}';\n")
+                    
+                elif 'doc_type' == row['context']:
+                    line += (f"UPDATE {row['context']} SET id = '{texts[0]}', comment = '{texts[1]}' "
+                                f"WHERE id = '{row['source']}';\n")
+                    
+                elif 'su_feature' in table:
+                    line += (f"UPDATE {row['context']} SET id = '{texts[0]}', descript = '{texts[1]}' "
+                                f"WHERE id = '{texts[0]}' AND feature_class = '{row['feature_class']}' AND feature_type = '{row['feature_type']}';\n")
+
+                file.write(line)
+
+        file.close()
+        del file
+
+    def _write_dbfeature_updates(self, rows, path): ## Parlar amb edgar
         """
             Generate a string and write into file
             :param rows: List of values ([List][List])z
@@ -497,7 +706,51 @@ class GwI18NGenerator:
         file.close()
         del file
 
-    def _write_dbdialog_values_i18n(self, rows, path):
+
+    def _write_dbjson_values_i18n(self, rows, path):
+        updates = {}
+
+        for row in rows:
+            key = (row["source"], row["context"], row["text"])
+            if key not in updates:
+                updates[key] = []
+            updates[key].append(row)
+
+        with open(path, "a") as file:
+            for (source, context, original_text), related_rows in updates.items():
+                column = ""
+                if context == "config_report":
+                    column = "filterparam"
+                elif context == "config_toolbox":
+                    column = "inputparams"
+                else:
+                    continue
+
+                # Safely parse the string as dict
+                try:
+                    json_data = ast.literal_eval(original_text)
+                except (ValueError, SyntaxError):
+                    continue  # Skip invalid JSON-like data
+
+                for row in related_rows:
+                    key_hint = row["hint"].split('_')[0]
+                    default_text = row.get("lb_en_us", "")
+                    translated = row.get(f"lb_{self.lower_lang}") or \
+                                row.get(f"auto_lb_{self.lower_lang}") or \
+                                default_text
+
+                    if key_hint in json_data and json_data[key_hint] == default_text:
+                        json_data[key_hint] = translated
+
+                new_text = json.dumps(json_data)
+                new_text = str(new_text).replace("'", "''")  # Convert to proper JSON format
+                update_line = f"UPDATE {context} SET {column} = '{new_text}' WHERE id = {source};\n"
+                file.write(update_line)
+            line = "UPDATE config_param_system SET value = TRUE WHERE parameter = 'admin_config_control_trigger';"
+            file.write(line)
+
+
+    def _write_table_values(self, rows, columns, table, path):
         """
         Generate a string and write into file
             :param rows: List of values ([List][List])
@@ -506,156 +759,175 @@ class GwI18NGenerator:
         """
 
         file = open(path, "a")
+        j=0
+        for i, row in enumerate(rows): #(For row in rows)
+            if row['project_type'] == self.project_type or row['project_type'] == 'utils': # Avoid the unwnated project_types
+                forenames = []
+                for column in columns:
+                    if column[-5:] == "en_us":
+                        forenames.append(column.split("_")[0])
 
+                texts = []
+                for forename in forenames:
+                    text = row[f'{forename}_{self.lower_lang}']
+                    if text is None:
+                        if self.lower_lang != 'en_us':
+                            text = row[f'auto_{forename}_{self.lower_lang}']
+                        if text is None :
+                            text = row[f'{forename}_en_us']
+                            if text is None:
+                                if forename == 'tt' and table in ["dbconfig_form_fields", "dbconfig_param_system", "dbparam_user", "dbconfig_form_fields_feat"]:
+                                    text = row[f'lb_en_us']
+                                if text is None:
+                                    text = ""
+                    text = text.replace("'", "''")
+                    texts.append(text)
+                
+                # Check invalid characters
+                for i, text in enumerate(texts):
+                    if text is not None and "\n" in text:
+                        texts[i] = self._replace_invalid_characters(text)
+
+                #Define the query depending on the table
+                line = (f'SELECT gw_fct_admin_schema_i18n($$ {{"data":'
+                        f'{{"data":'
+                        f'{{"table":"{row['context']}", ')
+
+                if table == 'dbconfig_form_fields':
+                   line += (f'"formname":"{row['formname']}", '
+                            f'"label":{{"column":"label", "value":"{texts[0]}"}}, '
+                            f'"tooltip":{{"column":"tooltip", "value":"{texts[1]}"}}')
+                   line += (f', "clause":"WHERE columnname = \'{row['source']}\' '
+                            f'AND formname = \'{row['formname']}\' AND formtype = \'{row['formtype']}\'"')
+                
+                elif table == 'dbconfig_form_fields_feat':
+                    feature_types = ['ARC', 'CONNEC', 'NODE', 'GULLY', 'LINK']
+                    for feature_type in feature_types:
+                        if row['feature_type'] == feature_type:
+                            line += (f'"formname":"{row['formname']}", '
+                                    f'"label":{{"column":"label", "value":"{texts[0]}"}}, '
+                                    f'"tooltip":{{"column":"tooltip", "value":"{texts[1]}"}}')
+                            line += (f', "clause":"WHERE columnname = \'{row['source']}\' '
+                                    f'AND formname LIKE \'%_{row['feature_type'].lower()}%\' AND formtype = \'{row['formtype']}\'"')
+                            
+
+                            
+                elif table == 'dbparam_user':
+                    line += (f'"formname":"{row['formname']}", '
+                            f'"label":{{"column":"label", "value":"{texts[0]}"}}, '
+                            f'"tooltip":{{"column":"descript", "value":"{texts[1]}"}}')
+                    line += f', "clause":"WHERE id = \'{row['source']}\'"'
+
+                elif table == 'dbconfig_param_system':
+                    line += (f'"formname":null, '
+                            f'"label":{{"column":"label", "value":"{texts[0]}"}}, '
+                            f'"tooltip":{{"column":"descript", "value":"{texts[1]}"}}')
+                    line += f', "clause":"WHERE parameter = \'{row['source']}\'"'
+
+                elif table == 'dbconfig_typevalue':
+                    line += (f'"formname":"{row['formname']}", '
+                            f'"label":{{"column":"idval", "value":"{texts[0]}"}}, ')
+                    line += f', "clause":"WHERE typevalue = \'{row['formname']}\' AND id  = \'{row['source']}\'"'
+                    
+                elif table == 'dbmessage':
+                    line += (f'"formname":null, '
+                            f'"label":{{"column":"error_message", "value":"{texts[0]}"}}, '
+                            f'"tooltip":{{"column":"hint_message", "value":"{texts[1]}"}}')
+                    line += f', "clause":"WHERE id = \'{row['source']}\' "'
+
+                elif table == 'dbfprocess':
+                    line += (f'"label":{{"column":"except_msg", "value":"{texts[0]}"}}, '
+                            f'"tooltip":{{"column":"info_msg", "value":"{texts[1]}"}}')
+                    line += f', "clause":"WHERE fid = \'{row['source']}\' "'
+
+                elif table == 'dbconfig_csv':
+                    line += (f'"formname":null, '
+                            f'"label":{{"column":"alias", "value":"{texts[0]}"}}, '
+                            f'"tooltip":{{"column":"descript", "value":"{texts[1]}"}}')
+                    line += f', "clause":"WHERE fid = \'{row['source']}\' "'
+
+                elif table == 'dbconfig_form_tabs':
+                    line += (f'"formname":"{row['formname']}", '
+                            f'"label":{{"column":"label", "value":"{texts[0]}"}}, '
+                            f'"tooltip":{{"column":"tooltip", "value":"{texts[1]}"}}')
+                    line += f', "clause":"WHERE formname = \'{row['formname']}\' AND tabname = \'{row['source']}\'"'
+
+                elif table == 'dbconfig_report':
+                    line += (f'"formname":null, '
+                            f'"label":{{"column":"alias", "value":"{texts[0]}"}}')
+                    line += f', "clause":"WHERE id = \'{row['source']}\' "'
+
+                elif table == 'dbconfig_toolbox':
+                    line += (f'"formname":null, '
+                            f'"label":{{"column":"alias", "value":"{texts[0]}"}}')
+                    line += f', "clause":"WHERE id = \'{row['source']}\' "'
+
+                elif table == 'dbfunction':
+                    line += (f'"formname":null, '
+                            f'"label":{{"column":"descript", "value":"{texts[0]}"}}')
+                    line += f', "clause":"WHERE id = \'{row['source']}\' "'
+
+                elif table == 'dbtypevalue':
+                    line += (f'"formname":null, '
+                            f'"label":{{"column":"idval", "value":"{texts[0]}"}}')
+                    line += f', "clause":"WHERE id = \'{row['source']}\' AND typevalue = \'{row['typevalue']}\' "'
+
+                elif table == 'dbconfig_form_tableview':
+                    line += (f'"formname":null, '
+                            f'"label":{{"column":"alias", "value":"{texts[0]}"}}')
+                    line += f', "clause":"WHERE objectname = \'{row["source"]}\' AND columnname = \'{row['columnname']}\' "'
+                    
+                line += f'}}}}$$);\n'
+                file.write(line)
+        file.close()
+        del file
+
+    
+    def _write_dbjson_values(self, rows, path):
+        updates = {}
+
+        # Group rows by (source, context, text)
         for row in rows:
-            # Get values
-            table = row['context'] if row['context'] is not None else ""
-            form_name = row['formname'] if row['formname'] is not None else ""
-            form_name_lan = form_name
-            if self.lower_lang != 'en_us':
-                form_name_lan = row[f'formname_{self.lower_lang}'] if row[f'formname_{self.lower_lang}'] is not None else ""
-            formname = form_name_lan if form_name_lan is not "" else form_name
-            form_type = row['formtype'] if row['formtype'] is not None else ""
-            source = row['source'] if row['source'] is not None else ""
-            lbl_value = row[f'lb_{self.lower_lang}'] if row[f'lb_{self.lower_lang}'] is not None or self.lower_lang == 'en_us' else row[f'auto_lb_{self.lower_lang}']
-            lbl_value = lbl_value if lbl_value is not None else row['lb_en_us']  # Afegir auto_ amb un if
-            lbl_value = lbl_value if lbl_value is not None else ""
-            tt_value = row[f'tt_{self.lower_lang}'] if row[f'tt_{self.lower_lang}'] is not None or self.lower_lang == 'en_us' else row[f'auto_tt_{self.lower_lang}']
-            tt_value = tt_value if tt_value is not None else row['lb_en_us']
-            tt_value = tt_value if tt_value is not None else ""
+            key = (row["source"], row["context"], row["text"])
+            if key not in updates:
+                updates[key] = []
+            updates[key].append(row)
 
-            # Check invalid characters
-            if lbl_value is not None:
-                lbl_value = self._replace_invalid_quotation_marks(lbl_value)
-                if "\n" in lbl_value:
-                    lbl_value = self._replace_invalid_characters(lbl_value)
-            if tt_value is not None:
-                tt_value = self._replace_invalid_quotation_marks(tt_value)
-                if "\n" in tt_value:
-                    tt_value = self._replace_invalid_characters(tt_value)
+        with open(path, "a") as file:
+            for (source, context, original_text), related_rows in updates.items():
+                column = ""
+                if context == "config_report":
+                    column = "filterparam"
+                elif context == "config_toolbox":
+                    column = "inputparams"
+                else:
+                    continue  # Skip unknown contexts
 
-            line = f'UPDATE {table} '
-            if row['context'] in 'config_param_system':
-                line += f"""SET label = '{lbl_value}', descript = '{tt_value}' """
-            elif row['context'] in 'sys_param_user':
-                line += f"""SET label = '{lbl_value}', descript = '{tt_value}' """
-            elif row['context'] in 'config_typevalue':
-                line += f"""SET idval = '{tt_value}' """
-            elif row['context'] not in ('config_param_system', 'sys_param_user'):
-                line += f"""SET label = '{lbl_value}', tooltip = '{tt_value}' """
+                updated_text = original_text
+                for row in related_rows:
+                    key_hint = row["hint"].split('_')[0]
+                    default_text = row.get("lb_en_us", "")
+                    base_key = "lb"
 
-            # Clause WHERE for each context
-            if row['context'] == 'config_form_fields':
-                line += f"""WHERE formname = '{formname}' AND formtype = '{form_type}' AND columnname = '{source}'"""
-            elif row['context'] == 'config_form_tabs':
-                line += f"""WHERE formname = '{formname}' AND formtype = '{form_type}' AND columnname = '{source}'"""
-            elif row['context'] == 'config_form_groupbox':
-                line += f"""WHERE formname = '{formname}' AND layout_if = '{source}'"""
-            elif row['context'] == 'config_typevalue':
-                line += f"""WHERE id = '{source}'"""
-            elif row['context'] == 'config_param_system':
-                line += f"""WHERE parameter = '{source}'"""
-            elif row['context'] == 'sys_param_user':
-                line += f"""WHERE id = '{source}'"""
+                    translated = row.get(f"{base_key}_{self.lower_lang}")
+                    if not translated and self.lower_lang != "en_us":
+                        translated = row.get(f"auto_{base_key}_{self.lower_lang}")
+                    if not translated:
+                        translated = row.get(f"{base_key}_en_us") or ""
 
-            line += ';\n'
-            file.write(line)
-        file.close()
-        del file
+                    updated_text = updated_text.replace(
+                        f"'{key_hint}':'{default_text}'",
+                        f"'{key_hint}':'{translated}'"
+                    )
 
-    def _write_dbmessages_values_i18n(self, rows, path):
-        """
-        Generate a string and write into file
-            :param rows: List of values ([List][List])
-            :param path: Full destination path (String)
-            :return: (Boolean)
-        """
+                sql = (
+                    f"SELECT gw_fct_admin_schema_i18n($$ {{\"data\":{{\"data\":"
+                    f"{{\"table\":\"{context}\", \"formname\":null, "
+                    f"\"label\":{{\"column\":\"{column}\", \"value\":\"{updated_text}\"}}, "
+                    f"\"clause\":\"WHERE id = '{source}'\"}}}}}}$$);\n"
+                )
+                file.write(sql)
 
-        file = open(path, "a")
-
-        for row in rows:
-            # Get values
-            table = row['context'] if row['context'] is not None else ""
-            source = row['source'] if row['source'] is not None else ""
-            project_type = row['project_type'] if row['project_type'] is not None else ""
-            log_level = row['log_level'] if row['log_level'] is not None else 2
-            ms_value = row.get(f'ms_{self.lower_lang}') or row.get(f'auto_ms_{self.lower_lang}') or row.get('ms_en_us')
-            ht_value = row.get(f'ht_{self.lower_lang}') or row.get(f'auto_ht_{self.lower_lang}') or row.get('ht_en_us') or ""
-
-            # Check invalid characters
-            if ms_value is not None:
-                ms_value = self._replace_invalid_quotation_marks(ms_value)
-                if "\n" in ms_value:
-                    ms_value = self._replace_invalid_characters(ms_value)
-            if ht_value is not None:
-                ht_value = self._replace_invalid_quotation_marks(ht_value)
-                if "\n" in ht_value:
-                    ht_value = self._replace_invalid_characters(ht_value)
-
-            line = f'INSERT INTO {table} (id, error_message, hint_message, log_level, show_user, project_type, source) ' \
-                    f"""VALUES ({source}, '{ms_value}', '{ht_value}', {log_level}, true, '{project_type}', 'core') """ \
-                    f'ON CONFLICT (id) DO UPDATE SET ' \
-                    f'error_message = EXCLUDED.error_message, hint_message = EXCLUDED.hint_message, log_level = EXCLUDED.log_level, show_user = EXCLUDED.show_user, project_type = EXCLUDED.project_type, source = EXCLUDED.source;\n'
-
-            file.write(line)
-        file.close()
-        del file
-
-    def _write_dbfprocess_values_i18n(self, rows, path):
-        """
-        Generate a string and write into file
-            :param rows: List of values ([List][List])
-            :param path: Full destination path (String)
-            :return: (Boolean)
-        """
-
-        file = open(path, "a")
-
-        for row in rows:
-            # Get values
-            table = row['context'] if row['context'] is not None else ""
-            source = row['source'] if row['source'] is not None else ""
-            project_type = row['project_type'] if row['project_type'] is not None else ""
-            ex_msg = row.get(f'ex_{self.lower_lang}') or row.get(f'auto_ex_{self.lower_lang}') or row.get('ex_en_us')
-            in_msg = row.get(f'in_{self.lower_lang}') or row.get(f'auto_in_{self.lower_lang}') or row.get('in_en_us') or ""
-
-            # Check invalid characters
-            if ex_msg is not None:
-                ex_msg = self._replace_invalid_quotation_marks(ex_msg)
-                if "\n" in ex_msg:
-                    ex_msg = self._replace_invalid_characters(ex_msg)
-            if in_msg is not None:
-                in_msg = self._replace_invalid_quotation_marks(in_msg)
-                if "\n" in in_msg:
-                    in_msg = self._replace_invalid_characters(in_msg)
-
-            line = f'INSERT INTO {table} (fid, except_msg, info_msg, project_type, source) ' \
-                    f"""VALUES ({source}, '{ex_msg}', '{in_msg}', '{project_type}', 'core') """ \
-                    f'ON CONFLICT (fid) DO UPDATE SET ' \
-                    f'except_msg = EXCLUDED.except_msg, info_msg = EXCLUDED.info_msg, project_type = EXCLUDED.project_type, source = EXCLUDED.source;\n'
-
-            file.write(line)
-        file.close()
-        del file
-
-    def _write_header(self, path):
-        """
-        Write the file header
-            :param path: Full destination path (String)
-        """
-
-        file = open(path, "w")
-        header = (f'/*\n'
-                  f'This file is part of Giswater\n'
-                  f'The program is free software: you can redistribute it and/or modify it under the terms of the GNU '
-                  f'General Public License as published by the Free Software Foundation, either version 3 of the '
-                  f'License, or (at your option) any later version.\n'
-                  f'This version of Giswater is provided by Giswater Association,\n'
-                  f'*/\n\n\n'
-                  f'SET search_path = SCHEMA_NAME, public, pg_catalog;\n\n')
-        file.write(header)
-        file.close()
-        del file
 
     def _save_user_values(self):
         """ Save selected user values """
@@ -674,6 +946,7 @@ class GwI18NGenerator:
         tools_gw.set_config_parser('i18n_generator', 'qm_lang_language', f"{language}", "user", "init", prefix=False)
         tools_gw.set_config_parser('i18n_generator', 'qm_lang_py_msg', f"{py_msg}", "user", "init", prefix=False)
         tools_gw.set_config_parser('i18n_generator', 'qm_lang_db_msg', f"{db_msg}", "user", "init", prefix=False)
+
 
     def _load_user_values(self):
         """
@@ -694,14 +967,13 @@ class GwI18NGenerator:
         tools_qt.set_checked(self.dlg_qm, self.dlg_qm.chk_py_msg, py_msg)
         tools_qt.set_checked(self.dlg_qm, self.dlg_qm.chk_db_msg, db_msg)
 
+
     def _init_db(self, host, port, db, user, password):
         """ Initializes database connection """
 
-        self.conn = None
-        self.cursor = None
         try:
-            self.conn = psycopg2.connect(database=db, user=user, port=port, password=password, host=host)
-            self.cursor = self.conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+            self.conn_i18n = psycopg2.connect(database=db, user=user, port=port, password=password, host=host)
+            self.cursor_i18n = self.conn_i18n.cursor(cursor_factory=psycopg2.extras.DictCursor)
             status = True
         except psycopg2.DatabaseError as e:
             self.last_error = e
@@ -709,30 +981,34 @@ class GwI18NGenerator:
 
         return status
 
+
     def _close_db(self):
         """ Close database connection """
 
         try:
             status = True
-            if self.cursor:
-                self.cursor.close()
-            if self.conn:
-                self.conn.close()
-            del self.cursor
-            del self.conn
+            if self.cursor_i18n:
+                self.cursor_i18n.close()
+            if self.conn_i18n:
+                self.conn_i18n.close()
+            del self.cursor_i18n
+            del self.conn_i18n
         except Exception as e:
             self.last_error = e
             status = False
 
         return status
 
+
     def _commit(self):
         """ Commit current database transaction """
-        self.conn.commit()
+        self.conn_i18n.commit()
+
 
     def _rollback(self):
         """ Rollback current database transaction """
-        self.conn.rollback()
+        self.conn_i18n.rollback()
+
 
     def _get_rows(self, sql, commit=True):
         """ Get multiple rows from selected query """
@@ -740,8 +1016,8 @@ class GwI18NGenerator:
         self.last_error = None
         rows = None
         try:
-            self.cursor.execute(sql)
-            rows = self.cursor.fetchall()
+            self.cursor_i18n.execute(sql)
+            rows = self.cursor_i18n.fetchall()
             if commit:
                 self._commit()
         except Exception as e:
@@ -750,6 +1026,7 @@ class GwI18NGenerator:
                 self._rollback()
         finally:
             return rows
+
 
     def _replace_invalid_characters(self, param):
         """
@@ -762,7 +1039,8 @@ class GwI18NGenerator:
         param = param.replace("\n", " ")
 
         return param
-
+    
+    
     def _replace_invalid_quotation_marks(self, param):
         """
         This function replaces the characters that break JSON messages
@@ -772,6 +1050,7 @@ class GwI18NGenerator:
         param = re.sub(r"(?<!')'(?!')", "''", param)
 
         return param
+
 
     def _set_editability_dbmessage(self):
 
