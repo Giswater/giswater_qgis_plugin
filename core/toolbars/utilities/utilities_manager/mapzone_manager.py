@@ -513,7 +513,7 @@ class GwMapzoneManager:
         self.layer_node.removeSelection()
 
         tools_qgis.disconnect_snapping(True, self.emit_point, self.vertex_marker)
-        tools_qgis.disconnect_signal_selection_changed()
+        tools_gw.disconnect_signal_selection_changed()
 
     def _on_dialog_closed(self):
         """Ensure snapping is deactivated and Pan tool is set when dialog closes."""
@@ -580,6 +580,10 @@ class GwMapzoneManager:
         tools_gw.add_icon(self.config_dlg.btn_snapping_toArc, "137")
         tools_gw.add_icon(self.config_dlg.btn_snapping_forceClosed, "137")
         tools_gw.add_icon(self.config_dlg.btn_snapping_ignore, "137")
+        tools_gw.add_icon(self.config_dlg.btn_expr_nodeParent, "178")
+        tools_gw.add_icon(self.config_dlg.btn_expr_toArc, "178")
+        tools_gw.add_icon(self.config_dlg.btn_expr_forceClosed, "178")
+        tools_gw.add_icon(self.config_dlg.btn_expr_ignore, "178")
 
         # Set variables
         self._reset_config_vars()
@@ -595,12 +599,16 @@ class GwMapzoneManager:
             partial(self.get_snapped_feature_id, self.config_dlg, self.config_dlg.btn_snapping_nodeParent,
                     'v_edit_node', 'nodeParent', None,
                     self.child_type))
+        self.config_dlg.btn_expr_nodeParent.clicked.connect(
+            partial(self._select_with_expression_dialog, self.config_dlg, 'nodeParent'))
         self.config_dlg.txt_nodeParent.textEdited.connect(partial(self._txt_node_parent_finished))
         # toArc
         self.config_dlg.btn_snapping_toArc.clicked.connect(
             partial(self.get_snapped_feature_id, self.config_dlg, self.config_dlg.btn_snapping_toArc, 'v_edit_arc',
                     'toArc', None,
                     self.child_type))
+        self.config_dlg.btn_expr_toArc.clicked.connect(
+            partial(self._select_with_expression_dialog, self.config_dlg, 'toArc'))
         self.config_dlg.btn_add_nodeParent.clicked.connect(
             partial(self._add_node_parent, self.config_dlg)
         )
@@ -612,6 +620,8 @@ class GwMapzoneManager:
             partial(self.get_snapped_feature_id, self.config_dlg, self.config_dlg.btn_snapping_forceClosed,
                     'v_edit_node', 'forceClosed', None,
                     self.child_type))
+        self.config_dlg.btn_expr_forceClosed.clicked.connect(
+            partial(self._select_with_expression_dialog, self.config_dlg, 'forceClosed'))
         self.config_dlg.btn_add_forceClosed.clicked.connect(
             partial(self._add_force_closed, self.config_dlg)
         )
@@ -622,6 +632,8 @@ class GwMapzoneManager:
         self.config_dlg.btn_snapping_ignore.clicked.connect(
             partial(self.get_snapped_feature_id, self.config_dlg, self.config_dlg.btn_snapping_ignore,
                     'v_edit_node', 'ignore', None, self.child_type))
+        self.config_dlg.btn_expr_ignore.clicked.connect(
+            partial(self._select_with_expression_dialog, self.config_dlg, 'ignore'))
         self.config_dlg.btn_add_ignore.clicked.connect(
             partial(self._add_ignore, self.config_dlg)
         )
@@ -638,6 +650,7 @@ class GwMapzoneManager:
         # Enable/disable certain widgets
         tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_snapping_nodeParent, True)
         tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_snapping_toArc, False)
+        tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_expr_toArc, False)
         tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_add_nodeParent, False)
         tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_remove_nodeParent, False)
 
@@ -651,6 +664,7 @@ class GwMapzoneManager:
         if global_vars.project_type == 'ud':
             tools_qt.set_widget_visible(self.config_dlg, self.config_dlg.lbl_toArc, False)
             tools_qt.set_widget_visible(self.config_dlg, self.config_dlg.btn_snapping_toArc, False)
+            tools_qt.set_widget_visible(self.config_dlg, self.config_dlg.btn_expr_toArc, False)
             tools_qt.set_widget_visible(self.config_dlg, self.config_dlg.txt_toArc, False)
 
         # Open dialog
@@ -676,6 +690,7 @@ class GwMapzoneManager:
             self.node_parent = None
             tools_qt.set_widget_text(self.config_dlg, 'txt_nodeParent', '')
             tools_qt.set_widget_enabled(self.config_dlg, 'btn_snapping_toArc', False)
+            tools_qt.set_widget_enabled(self.config_dlg, 'btn_expr_toArc', False)
             tools_qt.set_widget_enabled(self.config_dlg, 'btn_add_nodeParent', False)
             tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_remove_nodeParent, False)
         if mode in (0, 1, 2):
@@ -802,6 +817,7 @@ class GwMapzoneManager:
         if set_text:
             tools_qt.set_widget_text(self.config_dlg, 'txt_nodeParent', f"{feat_id}")
         tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_snapping_toArc, bool(feat_id))
+        tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_expr_toArc, bool(feat_id))
         tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_remove_nodeParent, bool(feat_id))
         if global_vars.project_type == 'ud':
             tools_qt.set_widget_enabled(self.config_dlg, self.config_dlg.btn_add_nodeParent, bool(feat_id))
@@ -1114,7 +1130,72 @@ class GwMapzoneManager:
         self.iface.actionPan().trigger()
         # self.signal_activate.emit()
 
-    # endregion
+    def _select_with_expression_dialog(self, dialog, option):
+        """Select features by expression for mapzone config"""
+
+        # Get current layer and feature type
+        layer_name = 'v_edit_node'  # Default to node layer
+        if option == 'toArc':
+            layer_name = 'v_edit_arc'
+        self.feature_type = layer_name.split('_')[-1]
+        layer = tools_qgis.get_layer_by_tablename(layer_name)
+        if not layer:
+            return
+
+        # Set active layer
+        self.iface.setActiveLayer(layer)
+        tools_qgis.set_layer_visible(layer)
+
+        # Show expression dialog
+        tools_gw.select_with_expression_dialog_custom(
+            self,
+            dialog,
+            None,  # No table object needed for expression selection
+            layer_name,
+            self._selection_init,
+            partial(self._selection_end, option)
+        )
+
+    def _selection_init(self):
+        """Initialize selection mode"""
+        self.iface.actionSelect().trigger()
+
+    def _selection_end(self, option):
+        """Process selected features and update the corresponding line edit"""
+        layer = self.iface.activeLayer()
+        if not layer:
+            return
+
+        selected_features = layer.selectedFeatures()
+        if not selected_features:
+            return
+
+        # Get the appropriate field name based on the option
+        field_name = 'node_id'
+        if option == 'toArc':
+            field_name = 'arc_id'
+
+        # Extract IDs from selected features
+        selected_ids = [str(feature.attribute(field_name)) for feature in selected_features]
+
+        # Update the appropriate line edit based on the option
+        if option == 'nodeParent':
+            self._set_node_parent(selected_ids[0] if selected_ids else None)
+        elif option == 'toArc':
+            for arc_id in selected_ids:
+                self._set_to_arc(arc_id)
+        elif option == 'forceClosed':
+            for node_id in selected_ids:
+                self._set_force_closed(node_id)
+        elif option == 'ignore':
+            for node_id in selected_ids:
+                self._set_ignore(node_id)
+
+        # Clean up
+        tools_gw.disconnect_signal('mapzone_manager_snapping')
+        tools_gw.remove_selection()
+        tools_gw.reset_rubberband(self.rubber_band)
+        self.iface.actionPan().trigger()
 
     def _manage_toggle_active(self):
         # Get selected row

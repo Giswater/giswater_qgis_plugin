@@ -135,64 +135,24 @@ p, li { white-space: pre-wrap; }
        </property>
       </widget>
      </item>
-     <item row="0" column="2" colspan="2">
-      <widget class="QLineEdit" name="txt_nodeParent">
-       <property name="readOnly">
-        <bool>false</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="2" colspan="2">
-      <widget class="QLineEdit" name="txt_toArc">
-       <property name="readOnly">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="3">
-      <widget class="QPushButton" name="btn_remove_nodeParent">
-       <property name="text">
-        <string>REMOVE</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="2">
-      <widget class="QPushButton" name="btn_add_nodeParent">
+     <item row="6" column="3">
+      <widget class="QPushButton" name="btn_add_forceClosed">
        <property name="text">
         <string>ADD</string>
        </property>
       </widget>
      </item>
-     <item row="0" column="1">
-      <widget class="QPushButton" name="btn_snapping_nodeParent">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
+     <item row="6" column="4">
+      <widget class="QPushButton" name="btn_remove_forceClosed">
        <property name="text">
-        <string/>
+        <string>REMOVE</string>
        </property>
       </widget>
      </item>
-     <item row="1" column="1">
-      <widget class="QPushButton" name="btn_snapping_toArc">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
+     <item row="4" column="4">
+      <widget class="QPushButton" name="btn_remove_ignore">
        <property name="text">
-        <string/>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="0">
-      <widget class="QLabel" name="lbl_ignore">
-       <property name="text">
-        <string>ignore</string>
+        <string>REMOVE</string>
        </property>
       </widget>
      </item>
@@ -223,41 +183,133 @@ p, li { white-space: pre-wrap; }
        </property>
       </widget>
      </item>
-     <item row="3" column="2" colspan="2">
+     <item row="3" column="3" colspan="2">
       <widget class="QLineEdit" name="txt_ignore"/>
      </item>
-     <item row="5" column="2" colspan="2">
-      <widget class="QLineEdit" name="txt_forceClosed">
-       <property name="readOnly">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="2">
+     <item row="4" column="3">
       <widget class="QPushButton" name="btn_add_ignore">
        <property name="text">
         <string>ADD</string>
        </property>
       </widget>
      </item>
-     <item row="6" column="2">
-      <widget class="QPushButton" name="btn_add_forceClosed">
+     <item row="5" column="3" colspan="2">
+      <widget class="QLineEdit" name="txt_forceClosed">
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="4">
+      <widget class="QPushButton" name="btn_remove_nodeParent">
+       <property name="text">
+        <string>REMOVE</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QPushButton" name="btn_snapping_nodeParent">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="lbl_ignore">
+       <property name="text">
+        <string>ignore</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QPushButton" name="btn_snapping_toArc">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="3">
+      <widget class="QPushButton" name="btn_add_nodeParent">
        <property name="text">
         <string>ADD</string>
        </property>
       </widget>
      </item>
-     <item row="4" column="3">
-      <widget class="QPushButton" name="btn_remove_ignore">
-       <property name="text">
-        <string>REMOVE</string>
+     <item row="0" column="3" colspan="2">
+      <widget class="QLineEdit" name="txt_nodeParent">
+       <property name="readOnly">
+        <bool>false</bool>
        </property>
       </widget>
      </item>
-     <item row="6" column="3">
-      <widget class="QPushButton" name="btn_remove_forceClosed">
+     <item row="1" column="3" colspan="2">
+      <widget class="QLineEdit" name="txt_toArc">
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="2">
+      <widget class="QPushButton" name="btn_expr_nodeParent">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="text">
-        <string>REMOVE</string>
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="2">
+      <widget class="QPushButton" name="btn_expr_toArc">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="2">
+      <widget class="QPushButton" name="btn_expr_ignore">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="2">
+      <widget class="QPushButton" name="btn_expr_forceClosed">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string/>
        </property>
       </widget>
      </item>

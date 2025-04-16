@@ -16,6 +16,7 @@ Changelog=Version 4.0.001
     - Refactor featuretype change button.
     - Add buttons on mapzones manager to visualize network inundation.
     - Button 'Connect to network': add option to force an arc where they will be connected.
+    - Added button to select by expression in dialogs with button to select on map canvas.
     - Giswater no longer requires the 'v_edit_connec' layer to be in the QGIS project.
     - Add 'set to arc' action to orifice, outlet, pump & weir.
     - Make dialog's messageBar appear on top of widgets, no longer moving all widgets downwards.
