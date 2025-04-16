@@ -103,7 +103,7 @@ FROM _sector;
 -- supplyzone is new
 -- omzone is new
 
-INSERT INTO cat_feature_element (id, epa_default, geometry_type) VALUES('REGISTER', 'UNDEFINED', 'POINT');
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"element", "column":"geometry_type", "dataType":"text"}}$$);
 
 -- 15/04/2025
 INSERT INTO config_form_fields

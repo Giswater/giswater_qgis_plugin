@@ -27,6 +27,7 @@ CREATE TABLE cat_feature_link (
 
 CREATE TABLE cat_link (
 	id varchar(30) NOT NULL,
+	link_type varchar(30) NOT NULL,
 	matcat_id varchar(30) NULL,
 	pnom varchar(16) NULL,
 	dnom varchar(16) NULL,
@@ -50,6 +51,7 @@ CREATE TABLE cat_link (
 	active bool DEFAULT true NULL,
 	"label" varchar(255) NULL,
 	CONSTRAINT cat_link_pkey PRIMARY KEY (id),
+	CONSTRAINT cat_link_linktype_fkey FOREIGN KEY (link_type) REFERENCES cat_feature_link(id) ON DELETE CASCADE ON UPDATE CASCADE,
 	CONSTRAINT cat_link_brand_fkey FOREIGN KEY (brand_id) REFERENCES cat_brand(id) ON DELETE CASCADE ON UPDATE CASCADE,
 	CONSTRAINT cat_link_cost_fkey FOREIGN KEY ("cost") REFERENCES plan_price(id) ON DELETE CASCADE ON UPDATE CASCADE,
 	CONSTRAINT cat_link_m2bottom_cost_fkey FOREIGN KEY (m2bottom_cost) REFERENCES plan_price(id) ON DELETE CASCADE ON UPDATE CASCADE,

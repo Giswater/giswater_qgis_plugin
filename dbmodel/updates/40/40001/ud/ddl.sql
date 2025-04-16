@@ -161,3 +161,6 @@ CREATE TABLE inp_dscenario_flwreg_weir (
 DROP TABLE IF EXISTS ext_rtc_dma_period CASCADE;
 
 alter table inp_flwreg_pump alter column pump_type drop not null;
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP", "table":"cat_link", "column":"link_type"}}$$);
+ALTER TABLE cat_link DROP CONSTRAINT IF EXISTS cat_link_linktype_fkey;
