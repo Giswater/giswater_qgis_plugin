@@ -6,8 +6,15 @@ or (at your option) any later version.
 */
 
 
-SET search_path = SCHEMA_NAME, public, pg_catalog;
+SET search_path = SCHEMA_NAME, public, pg_catalog
 
-DROP TRIGGER IF EXISTS gw_trg_om_visit_lotmanage ON om_visit_x_gully;
-CREATE TRIGGER gw_trg_om_visit_lotmanage AFTER INSERT ON om_visit_x_gully
-FOR EACH ROW EXECUTE PROCEDURE gw_trg_om_visit_lotmanage('gully');
+
+
+/*
+------ FEATURE X CAMPAIGN
+CREATE OR REPLACE VIEW ve_PARENT_SCHEMA_campaign_x_gully
+
+------ FEATURE X LOT
+CREATE OR REPLACE VIEW ve_PARENT_SCHEMA_lot_x_gully
+
+*/
