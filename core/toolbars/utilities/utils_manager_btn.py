@@ -19,7 +19,7 @@ from .utilities_manager.mapzone_manager import GwMapzoneManager
 from ...shared.info import GwInfo
 from ...shared.psector import GwPsector
 from ...shared.workcat import GwWorkcat
-
+from ....libs import tools_qt
 
 class GwUtilsManagerButton(GwAction):
     """ Button 61: Utils manager """
@@ -74,7 +74,7 @@ class GwUtilsManagerButton(GwAction):
         for button in buttons:
             button_name = button[0]
             button_function = button[1]
-            obj_action = QAction(str(button_name), action_group)
+            obj_action = QAction(str(tools_qt.tr(button_name)), action_group)
             obj_action.setObjectName(button_name)
             obj_action.setProperty('action_group', action_group)
             # if f"{feature_cat.shortcut_key}" not in global_vars.shortcut_keys:
