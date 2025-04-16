@@ -24,6 +24,8 @@ class Campaign:
     """Handles campaign creation, management, and database operations"""
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
+        self.visitclass_combo = None
+        self.reviewclass_combo = None
         self.iface = global_vars.iface
         self.campaign_date_format = 'yyyy-MM-dd'
         self.schema_name = lib_vars.schema_name
@@ -176,9 +178,14 @@ class Campaign:
         self.setup_tab_relations()
         self._update_feature_completer(self.dialog)
 
+        # Code logic to deal with the review/visit combo change to load tabs in relations
         self.reviewclass_combo = self.get_widget_by_columnname(self.dialog, "reviewclass_id")
+        self.visitclass_combo = self.get_widget_by_columnname(self.dialog, "visitclass_id")
         if isinstance(self.reviewclass_combo, QComboBox):
-            self.reviewclass_combo.currentIndexChanged.connect(self._on_reviewclass_changed)
+            self.reviewclass_combo.currentIndexChanged.connect(self._on_class_changed)
+
+        if isinstance(self.visitclass_combo, QComboBox):
+            self.visitclass_combo.currentIndexChanged.connect(self._on_class_changed)
 
         self.dialog.tbl_campaign_x_arc.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
                                                                self.dialog.tbl_campaign_x_arc, "v_edit_arc", "arc_id", self.rubber_band, 5))
@@ -446,18 +453,29 @@ class Campaign:
         dlg.feature_id.setCompleter(completer)
 
 
-    def _on_reviewclass_changed(self):
-        """Called when the user changes reviewclass combo."""
+    def _on_class_changed(self):
+        """Called when the user changes the reviewclass or visitclass combo."""
 
-        reviewclass_data = self.reviewclass_combo.currentData()
-        if not reviewclass_data:
+        sender = self.dialog.sender()  # Automatically gets the QComboBox that triggered the event
+        if not isinstance(sender, QComboBox):
             return
 
-        reviewclass_id = reviewclass_data[0]
-        if not str(reviewclass_id).isdigit():
+        combo_data = sender.currentData()
+        if not combo_data:
             return
 
-        feature_types = self.get_allowed_feature_types_for_reviewclass(int(reviewclass_id))
+        selected_id = combo_data[0] if isinstance(combo_data, (list, tuple)) else combo_data
+        if not str(selected_id).isdigit():
+            return
+
+        # Determine which table to query
+        if sender == self.reviewclass_combo:
+            feature_types = self.get_allowed_feature_types_for_reviewclass(selected_id)
+        elif sender == self.visitclass_combo:
+            feature_types = self.get_allowed_feature_types_from_visitclass("om_visitclass", selected_id)
+        else:
+            return
+
         print("Features_type:", feature_types)
         self._manage_tabs_enabled(feature_types)
 
@@ -471,6 +489,17 @@ class Campaign:
         """
         rows = tools_db.get_rows(sql)
         return [r["feature_type"] for r in rows if r.get("feature_type")]
+
+
+    def get_allowed_feature_types_from_visitclass(self, table_name: str, visitclass_id: int):
+        """Function to get feature types directly from om_visitclass table."""
+        sql = f"""
+            SELECT DISTINCT feature_type
+            FROM cm.{table_name}
+            WHERE id = {visitclass_id}
+        """
+        rows = tools_db.get_rows(sql)
+        return [r["feature_type"].lower() for r in rows if r.get("feature_type")]
 
 
     def _manage_tabs_enabled(self, feature_types):
