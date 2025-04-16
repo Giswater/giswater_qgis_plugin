@@ -173,12 +173,12 @@ update cat_feature set descript = concat(left(id,1), substring(lower(id), 2,99))
 UPDATE config_param_system SET isenabled = false where parameter = ' basic_selector_tab_municipality';
 
 
-insert into element
-(element_id, code, elementcat_id, state, state_type, rotation, verified, publish, inventory, expl_id, feature_type, top_elev, muni_id, sector_id, the_geom)
-values
-('100020', 'E100020', 'FRWEIR-01',1,2,79.731, 1,true,true,2,'ELEMENT',30.190,2,2,'POINT (418716.0233455198 4577601.812087212)'),
-('100021', 'E100021', 'FRWEIR-01',1,2,122.505,1,true,true,1,'ELEMENT',19.230,1,1,'POINT (419597.7191116698 4576460.6400896525)'),
-('100022', 'E100022', 'FRPUMP-01',1,2,79.731, 1,true,true,2,'ELEMENT',30.190,2,2,'POINT (418716.0233455198 4577601.812087212)');
+insert into element 
+(element_id, code, elementcat_id, state, state_type, num_elements, rotation, verified, publish, inventory, expl_id, feature_type, top_elev, muni_id, sector_id, the_geom)
+values 
+('100020', 'E100020', 'FRWEIR-01',1,2,1,79.731, 1,true,true,2,'ELEMENT',30.190,2,2,'POINT (418716.0233455198 4577601.812087212)'),
+('100021', 'E100021', 'FRWEIR-01',1,2,1,122.505,1,true,true,1,'ELEMENT',19.230,1,1,'POINT (419597.7191116698 4576460.6400896525)'),
+('100022', 'E100022', 'FRPUMP-01',1,2,1,79.731, 1,true,true,2,'ELEMENT',30.190,2,2,'POINT (418716.0233455198 4577601.812087212)');
 
 insert into inp_flwreg_weir
 (element_id, weir_type, offsetval, cd, flap, geom1,geom2, geom3, geom4) VALUES
@@ -194,3 +194,6 @@ insert into man_flwreg
 insert into inp_flwreg_pump
 (element_id, curve_id, status, startup, shutoff) VALUES
 ('100022', 'PUMP-02', 'ON', 2, 0.4);
+
+insert into element_x_node
+select element_id, nodarc_id from man_flwreg;
