@@ -631,7 +631,9 @@ BEGIN
 				v_childtable_name := 'man_connec_' || lower(v_customfeature);
 				IF (SELECT EXISTS ( SELECT 1 FROM information_schema.tables WHERE table_schema = TG_TABLE_SCHEMA AND table_name = v_childtable_name)) IS TRUE THEN
 					IF v_new_value_param IS NOT NULL THEN
-						EXECUTE 'INSERT INTO '||v_childtable_name||' (connec_id, '||v_addfields.param_name||') VALUES ($1, $2::'||v_addfields.datatype_id||')'
+						EXECUTE 'INSERT INTO '||v_childtable_name||' (connec_id, '||v_addfields.param_name||') VALUES ($1, $2::'||v_addfields.datatype_id||')
+							ON CONFLICT (connec_id)
+							DO UPDATE SET '||v_addfields.param_name||'=$2::'||v_addfields.datatype_id||' WHERE '||v_childtable_name||'.connec_id=$1'
 							USING NEW.connec_id, v_new_value_param;
 					END IF;
 				END IF;
