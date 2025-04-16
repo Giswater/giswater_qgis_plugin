@@ -77,6 +77,18 @@ class Campaign:
 
 
     def load_campaign_dialog(self, campaign_id=None, mode="review"):
+        """
+        Load and initialize the campaign dialog.
+
+        - Creates and sets up the form dynamically based on response from `gw_fct_getcampaign`.
+        - Initializes rubberbands and layer lists.
+        - Loads campaign relations if editing an existing campaign.
+        - Sets icons, connections, tab visibility (e.g. hides gully tab for 'ws' projects), and widget behaviors.
+        - Applies reviewclass logic and sets up snapping/highlight connections for relation tabs.
+
+        :param campaign_id: ID of the campaign to load. If None, creates a new campaign.
+        :param mode: Type of campaign dialog to load. Options: 'review', 'visit'.
+        """
 
         # In the edit_typevalue or another cm.edit_typevalue
         # INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('cm_campaing_type', '1', 'Review', NULL, NULL);
@@ -164,6 +176,10 @@ class Campaign:
         self.setup_tab_relations()
         self._update_feature_completer(self.dialog)
 
+        self.reviewclass_combo = self.get_widget_by_columnname(self.dialog, "reviewclass_id")
+        if isinstance(self.reviewclass_combo, QComboBox):
+            self.reviewclass_combo.currentIndexChanged.connect(self._on_reviewclass_changed)
+
         self.dialog.tbl_campaign_x_arc.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
                                                                self.dialog.tbl_campaign_x_arc, "v_edit_arc", "arc_id", self.rubber_band, 5))
         self.dialog.tbl_campaign_x_node.clicked.connect(partial(tools_qgis.highlight_feature_by_id,
@@ -177,7 +193,13 @@ class Campaign:
 
         tools_gw.open_dialog(self.dialog, dlg_name="add_campaign")
 
+
     def _load_campaign_relations(self, campaign_id):
+        """
+        Load related elements into campaign relation tabs for the given ID.
+        Includes 'gully' only if project type is UD.
+        """
+
         relation_tabs = {
             "tbl_campaign_x_arc": ("om_campaign_x_arc", "arc_id"),
             "tbl_campaign_x_node": ("om_campaign_x_node", "node_id"),
@@ -200,6 +222,7 @@ class Campaign:
 
     def create_widget_from_field(self, field):
         """Create a Qt widget based on field metadata"""
+
         wtype = field.get("widgettype", "text")
         iseditable = field.get("iseditable", True)
         widget = None
@@ -243,6 +266,7 @@ class Campaign:
 
     def set_widget_value(self, widget, value):
         """Sets the widget value from JSON"""
+
         if isinstance(widget, QLineEdit):
             widget.setText(str(value))
         elif isinstance(widget, QTextEdit):
@@ -268,6 +292,8 @@ class Campaign:
 
 
     def save_campaign(self, from_tab_change=False):
+        """Save campaign data to the database. Updates ID and resets map on success."""
+
         try:
             fields_str = self.extract_campaign_fields(self.dialog)
             extras = f'"fields":{{{fields_str}}}, "campaign_type":{self.campaign_type}'
@@ -391,6 +417,13 @@ class Campaign:
         self.feature_type = tools_gw.get_signal_change_tab(self.dialog, self.excluded_layers)
 
 
+    def get_widget_by_columnname(self, dialog, columnname):
+        for widget in dialog.findChildren(QWidget):
+            if widget.property("columnname") == columnname:
+                return widget
+        return None
+
+
     def _update_feature_completer(self, dlg):
         tab_name = dlg.tab_feature.currentWidget().objectName()
         table_map = {
@@ -413,85 +446,57 @@ class Campaign:
         dlg.feature_id.setCompleter(completer)
 
 
-    def _load_relation_table(self, view, table_name, id_column, campaign_id):
-        """Load existing relations into the view"""
-        query = f"""SELECT * from cm.{table_name} where campaign_id = {campaign_id}"""
-        self.populate_tableview(view, query)
+    def _on_reviewclass_changed(self):
+        """Called when the user changes reviewclass combo."""
 
-
-    def insert_campaign_relation(self, dialog):
-        """Insert feature into the corresponding om_campaign_x_* table"""
-
-        # Get campaign ID from the dialog field
-
-        for w in dialog.findChildren(QLineEdit):
-            if w.property("columnname") == "id":
-                campaign_id = tools_qt.get_text(dialog, w)
-                break
-
-        if not campaign_id or not campaign_id.isdigit():
-            tools_qgis.show_warning("Invalid campaign ID.")
+        reviewclass_data = self.reviewclass_combo.currentData()
+        if not reviewclass_data:
             return
 
-        # Get the feature ID from the line edit
-        feature_id = dialog.feature_id.text().strip()
-        if not feature_id or not feature_id.isdigit():
-            tools_qgis.show_warning("Feature ID must be a number.")
+        reviewclass_id = reviewclass_data[0]
+        if not str(reviewclass_id).isdigit():
             return
 
-        # Determine current tab and corresponding table/column
-        tab_name = dialog.tab_feature.currentWidget().objectName()
-        table_map = {
-            "tab_arc": ("om_campaign_x_arc", "arc_id"),
-            "tab_node": ("om_campaign_x_node", "node_id"),
-            "tab_connec": ("om_campaign_x_connec", "connec_id"),
-            'tab_link': ('om_campaign_x_link', 'link_id'),
-            "tab_gully": ("om_campaign_x_gully", "gully_id"),
-        }
+        feature_types = self.get_allowed_feature_types_for_reviewclass(int(reviewclass_id))
+        print("Features_type:", feature_types)
+        self._manage_tabs_enabled(feature_types)
 
-        table_info = table_map.get(tab_name)
-        if not table_info:
-            tools_qgis.show_warning("Unknown feature tab.")
-            return
 
-        table_name, column_name = table_info
-
-        # Build and execute SQL
+    def get_allowed_feature_types_for_reviewclass(self, reviewclass_id: int):
+        """Query om_reviewclass_x_layer to get allowed feature types for a given reviewclass"""
         sql = f"""
-            INSERT INTO cm.{table_name} (campaign_id, {column_name})
-            VALUES ({campaign_id}, '{feature_id}')
+            SELECT DISTINCT feature_type
+            FROM cm.om_reviewclass_x_layer
+            WHERE reviewclass_id = {reviewclass_id}
         """
-        ok = tools_db.execute_sql(sql)
-        if ok:
-            tools_qgis.show_info(f"{feature_id} inserted into {table_name}")
-            dialog.feature_id.clear()
-            self._refresh_relation_table(dialog)
-        else:
-            tools_qgis.show_warning("Insert failed.")
+        rows = tools_db.get_rows(sql)
+        return [r["feature_type"] for r in rows if r.get("feature_type")]
 
 
-    def delete_campaign_relation(self, dialog):
-        """Delete selected row from the active relation table"""
-        current_tab = dialog.tab_feature.currentWidget().objectName()
-        table = self._get_relation_table(dialog, current_tab)
-        selected = table.selectedItems()
-        if selected:
-            row = selected[0].row()
-            table.removeRow(row)
+    def _manage_tabs_enabled(self, feature_types):
+        """ Enable or disable relation tabs depending on allowed feature types (e.g., ['node', 'arc']). """
 
+        # Normalize all feature types to lowercase for comparison
+        normalized = [ft.lower() for ft in feature_types]
 
-    def _get_relation_table(self, dialog, tab_name):
-        return {
-            'tab_arc': dialog.tbl_campaign_x_arc,
-            'tab_node': dialog.tbl_campaign_x_node,
-            'tab_connec': dialog.tbl_campaign_x_connec,
-            'tab_link': dialog.tbl_campaign_x_link,
-            'tab_gully': dialog.tbl_campaign_x_gully,
-        }.get(tab_name)
+        tab_widget = self.dialog.tab_feature
+
+        print("Enabled tabs should be:", normalized)
+
+        for i in range(tab_widget.count()):
+            widget = tab_widget.widget(i)
+            if not widget:
+                continue
+
+            object_name = widget.objectName()
+            tab_type = object_name.replace("tab_", "")
+            enabled = tab_type in normalized
+            tab_widget.setTabEnabled(i, enabled)
 
 
     def populate_tableview(self, view: QTableView, query: str, columns: list[str] = None):
         """Populate a QTableView with the results of a SQL query."""
+
         data = tools_db.get_rows(query)
         if not data:
             view.setModel(QStandardItemModel())  # Clear view
@@ -513,46 +518,10 @@ class Campaign:
         view.resizeColumnsToContents()
 
 
-    def _refresh_relation_table(self, dialog):
-        """Refresh the current relation table based on selected tab"""
-        tab_name = dialog.tab_feature.currentWidget().objectName()
-
-        table_map = {
-            "tab_arc": ("tbl_campaign_x_arc", "om_campaign_x_arc", "arc_id"),
-            "tab_node": ("tbl_campaign_x_node", "om_campaign_x_node", "node_id"),
-            "tab_connec": ("tbl_campaign_x_connec", "om_campaign_x_connec", "connec_id"),
-            "tab_link": ("tbl_campaign_x_link", "om_campaign_x_link", "link_id"),
-            "tab_gully": ("tbl_campaign_x_gully", "om_campaign_x_gully", "gully_id"),
-        }
-
-        table_info = table_map.get(tab_name)
-        if not table_info:
-            return
-
-        table_widget_name, table_name, id_column = table_info
-        table_widget = getattr(dialog, table_widget_name, None)
-        if not table_widget:
-            return
-
-        # Get campaign_id from the dialog
-        campaign_id = None
-        for w in dialog.findChildren(QLineEdit):
-            if w.property("columnname") == "id":
-                campaign_id = tools_qt.get_text(dialog, w)
-                break
-        if not campaign_id:
-            return
-        print(table_widget)
-        print(table_name)
-        print(id_column)
-        print(campaign_id)
-
-        self._load_relation_table(table_widget, table_name, id_column, campaign_id)
-
-
     # Campaign manager
     def load_campaigns_into_manager(self):
         """Load campaign data into the campaign management table"""
+
         if not hasattr(self.dialog, "tbl_campaign"):
             return
 
@@ -562,6 +531,7 @@ class Campaign:
 
     def manage_date_filter(self):
         """Update date filters based on selected field (e.g., real_startdate)"""
+
         field = tools_qt.get_combo_value(self.dialog, self.dialog.campaign_cmb_date_filter_type, 0)
         print(field)
         if not field:
@@ -589,6 +559,7 @@ class Campaign:
 
     def filter_campaigns(self):
         """Filter om_campaign based on status and date"""
+
         filters = []
 
         # Estado
