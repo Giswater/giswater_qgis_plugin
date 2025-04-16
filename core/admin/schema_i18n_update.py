@@ -9,10 +9,13 @@ import re
 import psycopg2
 import psycopg2.extras
 from functools import partial
+import datetime
+import ast
+import json
 
 from ..ui.ui_manager import GwSchemaI18NUpdateUi
 from ..utils import tools_gw
-from ...libs import lib_vars, tools_qt, tools_qgis, tools_db, tools_log, tools_os
+from ...libs import lib_vars, tools_qt, tools_qgis, tools_db,tools_log, tools_os
 from qgis.PyQt.QtWidgets import QLabel
 from PyQt5.QtWidgets import QApplication
 
@@ -24,14 +27,15 @@ class GwSchemaI18NUpdate:
         self.schema_name = lib_vars.schema_name
         self.project_type_selected = None
 
+
     def init_dialog(self):
         """ Constructor """
 
         self.dlg_qm = GwSchemaI18NUpdateUi(self)  # Initialize the UI
         tools_gw.load_settings(self.dlg_qm)
-        self._load_user_values()  # keep values
+        self._load_user_values() #keep values
         self.dev_commit = tools_gw.get_config_parser('system', 'force_commit', "user", "init", prefix=True)
-        self._set_signals()  # Set all the signals to wait for response
+        self._set_signals() #Set all the signals to wait for response
 
         self.dlg_qm.btn_translate.setEnabled(False)
 
@@ -46,6 +50,7 @@ class GwSchemaI18NUpdate:
             self.dlg_qm.cmb_projecttype.addItem(str(aux))
 
         tools_gw.open_dialog(self.dlg_qm, dlg_name='admin_update_translation')
+
 
     def pass_schema_info(self, schema_info, schema_name):
         self.project_type = schema_info['project_type']
@@ -65,8 +70,9 @@ class GwSchemaI18NUpdate:
         self.dlg_qm.rejected.connect(self._close_db)
         self.dlg_qm.rejected.connect(self._close_db_dest)
 
-        # Populate schema names
+        #Populate schema names
         self.dlg_qm.cmb_projecttype.currentIndexChanged.connect(partial(self._populate_data_schema_name, self.dlg_qm.cmb_projecttype))
+
 
     def _check_connection(self, set_languages):
         """ Check connection to database """
@@ -80,7 +86,7 @@ class GwSchemaI18NUpdate:
         user_i18n = tools_qt.get_text(self.dlg_qm, self.dlg_qm.txt_user)
         password_i18n = tools_qt.get_text(self.dlg_qm, self.dlg_qm.txt_pass)
         status_i18n, e = self._init_db_i18n(host_i18n, port_i18n, db_i18n, user_i18n, password_i18n)
-        # Send messages
+        #Send messages
         if 'password authentication failed' in str(self.last_error):
             self.dlg_qm.btn_translate.setEnabled(False)
             tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', 'Incorrect user or password')
@@ -141,16 +147,20 @@ class GwSchemaI18NUpdate:
 
     def _change_project_type(self, widget):
         """ Take current project type changed """
-
         self.project_type_selected = tools_qt.get_text(self.dlg_qm, widget)
+
+    #endregion
+
+    # region Main program
 
     def schema_i18n_update(self):
         """ Main program to run the the shcmea_i18n_update """
 
-        # Connect in case of repeated actions
+        #Connect in case of repeated actions
         self._check_connection(False)
         self.cursor_dest = tools_db.dao.get_cursor()
-        # Initalize the language and the message (for errors,etc)
+        self.conn_dest = tools_db.dao
+        #Initalize the language and the message (for errors,etc)
         self.language = tools_qt.get_combo_value(self.dlg_qm, self.dlg_qm.cmb_language, 0)
         self.lower_lang = self.language.lower()
         msg = ''
@@ -165,13 +175,13 @@ class GwSchemaI18NUpdate:
         elif status_cfg_msg is None:
             msg += "Database translation canceled.\n"
 
-        # Look for errors
+        #Look for errors
         if errors:
             msg += f"There have been errors translating: {', '.join(errors)}"
 
         self._change_lang()
 
-        # Close connections
+        #Close connections
         self._close_db()
         self._close_db_dest()
 
@@ -188,27 +198,31 @@ class GwSchemaI18NUpdate:
         self.schema = tools_qt.get_text(self.dlg_qm, self.dlg_qm.cmb_schema, 0)
         messages = []
 
-        # Get dbmessage values
-        dbmessages = self._get_dbmessages_values()
-        if not dbmessages:
-            messages.append('dbmessage')  # Corregido: usar append en lugar de expand
-        else:
-            self._write_dbmessages_values(dbmessages)
+        sql_1 = f"UPDATE {self.schema}.config_param_system SET value = FALSE WHERE parameter = 'admin_config_control_trigger'"
+        self.cursor_dest.execute(sql_1)
+        self._commit_dest
 
-        # Get dbdialog values
-        dbdialogs = self._get_dbdialog_values()
-        if not dbdialogs:
-            messages.append('dbdialogs')  # Corregido
-        else:
-            self._write_dbdialog_values(dbdialogs)
+        # Get dbconfig_param_system values
+        dbtables = [ "dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue", 
+                    "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report", 
+                    "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_tableview", "dbjson", "dbtable", "dbconfig_form_fields_feat"
+                 ]
+        schema_i18n = "i18n"
+        for dbtable in dbtables:
+            dbtable = f"{schema_i18n}.{dbtable}"
+            dbtable_rows, dbtable_columns = self._get_table_values(dbtable)
+            if not dbtable_rows:
+                messages.append(dbtable)  # Corregido
+            else:
+                if "dbjson" in dbtable:
+                    self._write_dbjson_values(dbtable_rows)
+                else:
+                    self._write_table_values(dbtable_rows, dbtable_columns, dbtable)
 
-        # Get dbfprocess values
-        dbfprocesses = self._get_dbfprocess_values()
-        if not dbfprocesses:
-            messages.append('dbfprocesses')  # Corregido
-        else:
-            self._write_dbfprocess_values(dbfprocesses)
-
+        sql_2 = f"UPDATE {self.schema}.config_param_system SET value = TRUE WHERE parameter = 'admin_config_control_trigger'"
+        self.cursor_dest.execute(sql_2)
+        self._commit_dest()
+        
         # Mostrar mensaje de error si hay errores
         if messages:  # Corregido: Verifica si hay elementos en la lista
             tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', f"Error translating: {', '.join(messages)}")
@@ -216,239 +230,256 @@ class GwSchemaI18NUpdate:
         else:
             return True, None
 
-        # Get db_feature values
+        #Get db_feature values
 
-    def _get_dbdialog_values(self):
-        """ Get dbdialog values """
+    #endregion
+
+    # region Alter any table
+    def _get_table_values(self, table):
+        """ Get table values """
 
         # Update the part the of the program in process
         self.dlg_qm.lbl_info.clear()
-        msg = f"Updating dbdialog..."
+        msg = f"Updating {table}..."
         tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', msg)
         QApplication.processEvents()
+        columns = []
+        lang_columns = []
+
+        if 'dbconfig_form_fields' in table:
+            columns = ["source", "formname", "formtype", "project_type", "context", "source_code", "lb_en_us", "tt_en_us"]
+            lang_columns = [f"lb_{self.lower_lang}", f"tt_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}", f"auto_tt_{self.lower_lang}", f"va_auto_tt_{self.lower_lang}"]
+            if 'feat' in table:
+                columns.append('feature_type')
+
+        elif 'dbparam_user' in table:
+            columns = ["source", "formname", "project_type", "context", "source_code", "lb_en_us", "tt_en_us"]
+            lang_columns = [f"lb_{self.lower_lang}", f"tt_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}", f"auto_tt_{self.lower_lang}", f"va_auto_tt_{self.lower_lang}"]
+        
+        elif 'dbconfig_param_system' in table:
+            columns = ["source", "project_type", "context", "source_code", "lb_en_us", "tt_en_us"]
+            lang_columns = [f"lb_{self.lower_lang}", f"tt_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}", f"auto_tt_{self.lower_lang}", f"va_auto_tt_{self.lower_lang}"]
+        
+        elif 'dbconfig_typevalue' in table:
+            columns = ["source", "formname", "formtype", "project_type", "context", "source_code", "tt_en_us"]
+            lang_columns = [f"tt_{self.lower_lang}", f"auto_tt_{self.lower_lang}", f"va_auto_tt_{self.lower_lang}"]
+
+        elif 'dbmessage' in table:
+            columns = ["source", "project_type", "context", "log_level", "ms_en_us", "ht_en_us"]
+            lang_columns = [f"ms_{self.lower_lang}", f"auto_ms_{self.lower_lang}", f"va_auto_ms_{self.lower_lang}," f"ht_{self.lower_lang}", f"auto_ht_{self.lower_lang}", f"va_auto_ht_{self.lower_lang}"]
+        
+        elif 'dbfprocess' in table:
+            columns = ["source", "project_type", "context", "ex_en_us", "in_en_us", "na_en_us"]
+            lang_columns = [f"ex_{self.lower_lang}", f"auto_ex_{self.lower_lang}", f"va_auto_ex_{self.lower_lang}," f"in_{self.lower_lang}", f"auto_in_{self.lower_lang}", f"va_auto_in_{self.lower_lang}", f"na_{self.lower_lang}", f"auto_na_{self.lower_lang}", f"va_auto_na_{self.lower_lang}"]
+        
+        elif 'dbconfig_csv' in table:
+            columns = ["source", "project_type", "context", "al_en_us", "ds_en_us"]
+            lang_columns = [f"al_{self.lower_lang}", f"auto_al_{self.lower_lang}", f"va_auto_al_{self.lower_lang}", f"ds_{self.lower_lang}", f"auto_ds_{self.lower_lang}", f"va_auto_ds_{self.lower_lang}"]
+
+        elif 'dbconfig_form_tabs' in table:
+            columns = ["formname", "source", "project_type", "context", "lb_en_us", "tt_en_us"]
+            lang_columns = [f"lb_{self.lower_lang}", f"tt_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}", f"auto_tt_{self.lower_lang}", f"va_auto_tt_{self.lower_lang}"]
+        
+        elif 'dbconfig_report' in table:
+            columns = ["source", "project_type", "context", "al_en_us", "ds_en_us"]
+            lang_columns = [f"al_{self.lower_lang}", f"auto_al_{self.lower_lang}", f"va_auto_al_{self.lower_lang}", f"ds_{self.lower_lang}", f"auto_ds_{self.lower_lang}", f"va_auto_ds_{self.lower_lang}"]
+        
+        elif 'dbconfig_toolbox' in table:
+            columns = ["source", "project_type", "context", "al_en_us", "ob_en_us"]
+            lang_columns = [f"al_{self.lower_lang}", f"auto_al_{self.lower_lang}", f"va_auto_al_{self.lower_lang}", f"ob_{self.lower_lang}", f"auto_ob_{self.lower_lang}", f"va_auto_ob_{self.lower_lang}"]
+       
+        elif 'dbfunction' in table:
+            columns = ["source", "project_type", "context", "ds_en_us"]
+            lang_columns = [f"ds_{self.lower_lang}", f"auto_ds_{self.lower_lang}", f"va_auto_ds_{self.lower_lang}"]
+       
+        elif 'dbtypevalue' in table:
+            columns = ["source", "project_type", "context", "typevalue", "vl_en_us", "ds_en_us"]
+            lang_columns = [f"vl_{self.lower_lang}", f"auto_vl_{self.lower_lang}", f"va_auto_vl_{self.lower_lang}", f"ds_{self.lower_lang}", f"auto_ds_{self.lower_lang}", f"va_auto_ds_{self.lower_lang}"]
+
+        elif 'dbconfig_form_tableview' in table:
+            columns = ["source", "columnname", "project_type", "context", "location_type", "al_en_us"]
+            lang_columns = [f"al_{self.lower_lang}", f"auto_al_{self.lower_lang}", f"va_auto_al_{self.lower_lang}", ]
+
+        elif 'dbjson' in table:
+            columns = ["source", "project_type", "context", "hint", "text", "lb_en_us"]
+            lang_columns = [f"lb_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}"]
+        
+        elif 'dbtable' in table:
+            columns = ["source", "project_type", "context", "al_en_us", "ds_en_us"]
+            lang_columns = [f"al_{self.lower_lang}", f"auto_al_{self.lower_lang}", f"va_auto_al_{self.lower_lang}", f"ds_{self.lower_lang}", f"auto_ds_{self.lower_lang}", f"va_auto_ds_{self.lower_lang}"]
 
         # Make the query
+        sql=""
         if self.lower_lang == 'en_us':
-            sql = (f"SELECT source, formname, formtype, project_type, context, lb_en_us, tt_en_us "
-               f"FROM i18n.dbdialog "
-               f"ORDER BY context, formname;")
+            sql = (f"SELECT {", ".join(columns)} "
+               f"FROM {table} "
+               f"ORDER BY context")
         else:
-            sql = (f"SELECT source, formname, formtype, project_type, context, lb_en_us, lb_{self.lower_lang}, auto_lb_{self.lower_lang}, tt_en_us, "
-               f"tt_{self.lower_lang}, auto_tt_{self.lower_lang} "
-               f"FROM i18n.dbdialog "
-               f"ORDER BY context, formname;")
+            sql = (f"SELECT {", ".join(columns)}, {", ".join(lang_columns)} "
+               f"FROM {table} "
+               f"ORDER BY context")
         rows = self._get_rows(sql, self.cursor_i18n)
-
+        print(sql)
+        
         # Return the corresponding information
         if not rows:
             return False
-        return rows
+        return rows, columns
+    
+    def _write_table_values(self, rows, columns, table):
+        print(table)
+        j=0
+        for i, row in enumerate(rows): #(For row in rows)
+            if row['project_type'] == self.project_type or row['project_type'] == 'utils': # Avoid the unwnated project_types
+                forenames = []
+                for column in columns:
+                    if column[-5:] == "en_us":
+                        forenames.append(column.split("_")[0])
 
-    def _write_dbdialog_values(self, dbdialogs):
-        i = 0
-        j = 0
-        for dbdialog in dbdialogs:  # (For row in rows)
-            i += 1
-            if dbdialog['project_type'] == self.project_type or dbdialog['project_type'] == 'utils':  # Avoid the unwnated project_types
-                j += 1
-                formname = dbdialog['formname']
-                if isinstance(formname, str):
-                    formname = "_".join(dbdialog['formname'].split("_")[:2])
-                source = [formname, dbdialog['formtype'], dbdialog['source']]  # Take all the possible source from dbdialog
-                # Define the label taking into account the different possibilities by priority level
-                label = dbdialog[f'lb_{self.lower_lang}']
-                if label is None:
-                    if self.lower_lang != 'en_us':
-                        label = dbdialog[f'auto_lb_{self.lower_lang}']
-                    if label is None:
-                        label = dbdialog['lb_en_us']
-                        if label is None:
-                            label = source[2]
-                            if label is None:
-                                label = ""
-                # Define the tooltip taking into account the different possibilities by priority level
-                tooltip = dbdialog[f'tt_{self.lower_lang}']
-                if tooltip is None:
-                    if self.lower_lang != 'en_us':
-                        tooltip = dbdialog[f'auto_tt_{self.lower_lang}']
-                    if tooltip is None:
-                        tooltip = dbdialog['tt_en_us']
-                        if tooltip is None:
-                            tooltip = dbdialog['lb_en_us']
-                            if tooltip is None:
-                                tooltip = ""
-                # Replace unwanted characters
-                tooltip = tooltip.replace("'", "''")
-                label = label.replace("'", "''")
+                texts = []
+                for forename in forenames:
+                    text = row[f'{forename}_{self.lower_lang}']
+                    if text is None:
+                        if self.lower_lang != 'en_us':
+                            text = row[f'auto_{forename}_{self.lower_lang}']
+                        if text is None :
+                            text = row[f'{forename}_en_us']
+                            if text is None:
+                                if forename == 'tt' and table in ["dbconfig_form_fields", "dbconfig_param_system", "dbparam_user", "dbconfig_form_fields_feat"]:
+                                    text = row[f'lb_en_us']
+                                if text is None:
+                                    text = ""
+                    text = text.replace("'", "''")
+                    texts.append(text)
+                
+                sql_text = ""
+                #Define the query depending on the table
+                if 'dbconfig_form_fields' in table:
+                    if 'feat' in table:
+                        feature_types = ['ARC', 'CONNEC', 'NODE', 'GULLY', 'LINK', 'ELEMENT']
+                        for feature_type in feature_types:
+                            if row['feature_type'] == feature_type:
+                                formname = row['feature_type'].lower()
+                                sql_text = (f'UPDATE {self.schema}.{row['context']} SET label = \'{texts[0]}\', tooltip = \'{texts[1]}\' '
+                                        f'WHERE formname LIKE \'%_{formname}%\' AND formtype = \'{row['formtype']}\' AND columnname = \'{row['source']}\' ')
+                                break
+                    else:
+                        sql_text = (f"UPDATE {self.schema}.{row['context']} SET label = '{texts[0]}', tooltip = '{texts[1]}' "
+                                f"WHERE formname = '{row['formname']}' AND formtype = '{row['formtype']}' AND columnname = '{row['source']}';\n")
 
-                # Define the query depending on the table
-                sql_text = None
-                if dbdialog['context'] == 'config_form_fields':
-                    # Avoid sql problems with config_form_fields
-                    sql_1 = f"UPDATE {self.schema}.config_param_system SET value = TRUE WHERE parameter = 'admin_config_control_trigger'"
-                    self.cursor_dest.execute(sql_1)
-                    self._commit_dest
+                elif 'dbparam_user' in table:
+                    sql_text = (f"UPDATE {self.schema}.{row['context']} SET label = '{texts[0]}', descript = '{texts[1]}' "
+                                f"WHERE id = '{row['source']}';\n")
 
-                    # Main query
-                    sql_text = (f"UPDATE {self.schema}.{dbdialog['context']} SET label = '{label}', tooltip = '{tooltip}' "
-                                f"WHERE formname ILIKE '{source[0]}%' and formtype = '{source[1]}' and columnname = '{source[2]}'")
-                        # f"WHERE and formtype = '{source[1]}' and columnname = '{source[2]}'")
-                        # f"WHERE formname = '{source[0]}' and formtype = '{source[1]}' and columnname = '{source[2]}'"
+                elif 'dbconfig_param_system' in table:
+                    sql_text = (f"UPDATE {self.schema}.{row['context']} SET label = '{texts[0]}', descript = '{texts[1]}' "
+                                f"WHERE parameter = '{row['source']}';\n")
 
-                    # Return config_form_fields to normal
-                    sql_2 = f"UPDATE {self.schema}.config_param_system SET value = FALSE WHERE parameter = 'admin_config_control_trigger'"
-                    self.cursor_dest.execute(sql_2)
-                    self._commit_dest()
+                elif 'dbconfig_typevalue' in table:
+                    sql_text = (f"UPDATE {self.schema}.{row['context']} SET idval = '{texts[0]}' "
+                                f"WHERE id = '{row['source']}' AND typevalue = '{row['formname']}';\n")
 
-                elif dbdialog['context'] == 'sys_param_user':
-                    sql_text = (f"UPDATE {self.schema}.{dbdialog['context']} SET label = '{label}', descript = '{tooltip}' "
-                        f"WHERE id = '{source[2]}'")
+                elif 'dbmessage' in table:
+                    sql_text = (f"UPDATE {self.schema}.{row['context']} SET error_message = '{texts[0]}', hint_message = '{texts[1]}' "
+                                f"WHERE id = '{row['source']}';\n")
 
-                elif dbdialog['context'] == 'config_param_system':
-                    sql_text = (f"UPDATE {self.schema}.{dbdialog['context']} SET label = '{label}', descript = '{tooltip}' "
-                        f"WHERE parameter = '{source[2]}'")
+                elif 'dbfprocess' in table:
+                    sql_text = (f"UPDATE {self.schema}.{row['context']} SET except_msg = '{texts[0]}', info_msg = '{texts[1]}', fprocess_name = '{texts[2]}' "
+                                f"WHERE fid = '{row['source']}';\n")
 
-                elif dbdialog['context'] == 'config_typevalue':
-                    sql_text = (f"UPDATE {self.schema}.{dbdialog['context']} SET idval = '{tooltip}' "
-                        f"WHERE id = '{source[2]}' and typevalue = '{source[0]}'")
+                elif 'dbconfig_csv' in table:
+                    sql_text = (f"UPDATE {self.schema}.{row['context']} SET alias = '{texts[0]}', descript = '{texts[1]}' "
+                                f"WHERE fid = '{row['source']}';\n")
 
-                # Execute the corresponding query
+                elif 'dbconfig_form_tabs' in table:
+                    sql_text = (f"UPDATE {self.schema}.{row['context']} SET label = '{texts[0]}', tooltip = '{texts[1]}' "
+                                f"WHERE formname = '{row['formname']}' AND tabname = '{row['source']}';\n")
+
+                elif 'dbconfig_report' in table:
+                    sql_text = (f"UPDATE {self.schema}.{row['context']} SET alias = '{texts[0]}', descript = '{texts[1]}' "
+                                f"WHERE id = '{row['source']}';\n")
+
+                elif 'dbconfig_toolbox' in table:
+                    sql_text = (f"UPDATE {self.schema}.{row['context']} SET alias = '{texts[0]}', observ = '{texts[1]}' "
+                                f"WHERE id = '{row['source']}';\n")
+
+                elif 'dbfunction' in table:
+                    sql_text = (f"UPDATE {self.schema}.{row['context']} SET descript = '{texts[0]}' "
+                                f"WHERE id = '{row['source']}';\n")
+
+                elif 'dbtypevalue' in table:
+                    sql_text = (f"UPDATE {self.schema}.{row['context']} SET idval = '{texts[0]}', descript = '{texts[1]}' "
+                                f"WHERE id = '{row['source']}' AND typevalue = '{row['typevalue']}';\n")
+
+                elif 'dbconfig_form_tableview' in table:
+                    sql_text = (f"UPDATE {self.schema}.{row['context']} SET alias = '{texts[0]}' "
+                                f"WHERE objectname = '{row['source']}' AND columnname = '{row['columnname']}';\n")
+
+                elif 'dbtable' in table:
+                    sql_text = (f"UPDATE {self.schema}.{row['context']} SET alias = '{texts[0]}', descript = '{texts[1]}' "
+                                f"WHERE id = '{row['source']}';\n")
+
+                    
+                #Execute the corresponding query
                 try:
                     self.cursor_dest.execute(sql_text)
                     self._commit_dest()
                 except Exception as e:
                     print(e)
                     tools_db.dao.rollback()
-                    break
+        
+    
+    def _write_dbjson_values(self, rows):
+        updates = {}
 
-    def _get_dbmessages_values(self):
-        """ Get db messages values """
-        # Update the part the of the program in process
-        self.dlg_qm.lbl_info.clear()
-        tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', f"Updating dbmessages...")
-        QApplication.processEvents()
+        for row in rows:
+            key = (row["source"], row["context"], row["text"])
+            if key not in updates:
+                updates[key] = []
+            updates[key].append(row)
 
-        # Make the query
-        if self.lower_lang == 'en_us':
-            sql = (f"SELECT source, project_type, context, ms_en_us, ht_en_us"
-               f" FROM i18n.dbmessage "
-               f" ORDER BY project_type;")
-        else:
-            sql = (f"SELECT source, project_type, context, ms_en_us, ms_{self.lower_lang}, auto_ms_{self.lower_lang}, ht_en_us, ht_{self.lower_lang}, auto_ht_{self.lower_lang}"
-               f" FROM i18n.dbmessage "
-               f" ORDER BY project_type;")
-        rows = self._get_rows(sql, self.cursor_i18n)
+        query = ""
+        for (source, context, original_text), related_rows in updates.items():
+            column = ""
+            if context == "config_report":
+                column = "filterparam"
+            elif context == "config_toolbox":
+                column = "inputparams"
+            else:
+                continue
 
-        # Return the corresponding information
-        if not rows:
-            return False
-        return rows
+            # Safely parse the string as dict
+            try:
+                json_data = ast.literal_eval(original_text)
+            except (ValueError, SyntaxError):
+                continue  # Skip invalid JSON-like data
 
-    def _write_dbmessages_values(self, dbmessages):
-        i = 0
-        j = 0
-        for dbmessage in dbmessages:  # (For row in rows)
-            i += 1
-            if dbmessage['project_type'] == self.project_type or dbmessage['project_type'] == 'utils':  # Avoid the unwnated project_types
-                j += 1
-                source = dbmessage['source']  # Take all the possible source from dbmessages
-                # Define the error_ms taking into account the different possibilities by priority level
-                error_ms = dbmessage[f'ms_{self.lower_lang}']
-                if error_ms is None:
-                    if self.lower_lang != 'en_us':
-                        error_ms = dbmessage[f'auto_ms_{self.lower_lang}']
-                    if error_ms is None:
-                        error_ms = dbmessage['ms_en_us']
-                        if error_ms is None:
-                            error_ms = ""
-                # Define the hint_ms taking into account the different possibilities by priority level
-                hint_ms = dbmessage[f'ht_{self.lower_lang}']
-                if hint_ms is None:
-                    if self.lower_lang != 'en_us':
-                        hint_ms = dbmessage[f'auto_ht_{self.lower_lang}']
-                    if hint_ms is None:
-                        hint_ms = dbmessage['ht_en_us']
-                        if hint_ms is None:
-                            hint_ms = ""
-                # Replace unwanted characters
-                error_ms = error_ms.replace("'", "''")
-                hint_ms = hint_ms.replace("'", "''")
+            for row in related_rows:
+                key_hint = row["hint"].split('_')[0]
+                default_text = row.get("lb_en_us", "")
+                translated = row.get(f"lb_{self.lower_lang}") or \
+                            row.get(f"auto_lb_{self.lower_lang}") or \
+                            default_text
 
-                # Define and execute the corresponding query
-                try:
-                    sql = (f"UPDATE {self.schema}.sys_message "
-                        f"SET error_message = '{error_ms}',  hint_message = '{hint_ms}'"
-                        f"WHERE id = '{source}'")
-                    self.cursor_dest.execute(sql)
-                    self._commit_dest()
-                except Exception as e:
-                    tools_db.dao.rollback()
-                    break
+                if key_hint in json_data and json_data[key_hint] == default_text:
+                    json_data[key_hint] = translated
 
-    def _get_dbfprocess_values(self):
-        """ Get db messages values """
-        # Update the part the of the program in process
-        self.dlg_qm.lbl_info.clear()
-        tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', f"Updating dbfprocess...")
-        QApplication.processEvents()
+           
+            new_text = json.dumps(json_data)
+            new_text = str(new_text).replace("'", "''")  # Convert to proper JSON format
+            query += f"UPDATE {self.schema}.{context} SET {column} = \'{new_text}\' WHERE id = {source};\n"
 
-        # Make the query
-        if self.lower_lang == 'en_us':
-            sql = (f"SELECT source, project_type, context, ex_en_us, in_en_us"
-               f" FROM i18n.dbfprocess "
-               f"ORDER BY context;")
-        else:
-            sql = (f"SELECT source, project_type, context, ex_en_us, ex_{self.lower_lang}, auto_ex_{self.lower_lang}, in_en_us, in_{self.lower_lang}, auto_in_{self.lower_lang}"
-               f" FROM i18n.dbfprocess "
-               f"ORDER BY context;")
-        rows = self._get_rows(sql, self.cursor_i18n)
-
-        # Return the corresponding information
-        if not rows:
-            return False
-        return rows
-
-    def _write_dbfprocess_values(self, dbfprocesses):
-        i = 0
-        j = 0
-        for dbfprocess in dbfprocesses:  # (For row in rows)
-            i += 1
-            if dbfprocess['project_type'] == self.project_type or dbfprocess['project_type'] == 'utils':  # Avoid the unwnated project_types
-                j += 1
-                source = dbfprocess['source']  # Take all the possible source from dbfprocesses
-                # Define the ex_msg taking into account the different possibilities by priority level
-                ex_msg = dbfprocess[f'ex_{self.lower_lang}']
-                if ex_msg is None:
-                    if self.lower_lang != 'en_us':
-                        ex_msg = dbfprocess[f'auto_ex_{self.lower_lang}']
-                    if ex_msg is None:
-                        ex_msg = dbfprocess['ex_en_us']
-                        if ex_msg is None:
-                            ex_msg = ""
-                # Define the in_msg taking into account the different possibilities by priority level
-                in_msg = dbfprocess[f'in_{self.lower_lang}']
-                if in_msg is None:
-                    if self.lower_lang != 'en_us':
-                        in_msg = dbfprocess[f'auto_in_{self.lower_lang}']
-                    if in_msg is None:
-                        in_msg = dbfprocess['in_en_us']
-                        if in_msg is None:
-                            in_msg = ""
-                # Replace unwanted characters
-                ex_msg = ex_msg.replace("'", "''")
-                in_msg = in_msg.replace("'", "''")
-
-                # Define and execute the corresponding query
-                try:
-                    sql = (f"UPDATE {self.schema}.sys_fprocess "
-                        f"SET except_msg = '{ex_msg}', info_msg = '{in_msg}' "
-                        f"WHERE fid = '{source}'")
-                    self.cursor_dest.execute(sql)
-                    self._commit_dest()
-                except Exception as e:
-                    tools_db.dao.rollback()
-                    break
-
+        try:
+            self.cursor_dest.execute(query)
+            self.conn_dest.commit()
+        except Exception as e:
+            self.conn_dest.rollback()
+            print(e)
+           
+    
+    #endregion
+    
+    # region Extra fucntions
     def _change_lang(self):
         query = f"UPDATE {self.schema}.sys_version SET language = '{self.language}'"
         try:
@@ -561,6 +592,7 @@ class GwSchemaI18NUpdate:
 
         return status
 
+
     def _commit(self):
         """ Commit current database transaction """
         self.conn_i18n.commit()
@@ -590,6 +622,7 @@ class GwSchemaI18NUpdate:
         finally:
             return rows
 
+
     def _replace_invalid_characters(self, param):
         """
         This function replaces the characters that break JSON messages
@@ -601,7 +634,8 @@ class GwSchemaI18NUpdate:
         param = param.replace("\n", " ")
 
         return param
-
+    
+    
     def _replace_invalid_quotation_marks(self, param):
         """
         This function replaces the characters that break JSON messages
@@ -611,5 +645,60 @@ class GwSchemaI18NUpdate:
         param = re.sub(r"(?<!')'(?!')", "''", param)
 
         return param
+    
+    def _delete_table(self, table, cur, conn):
+        query = f"DROP TABLE IF EXISTS {table}"
+        try:
+            cur.execute(query)
+            conn.commit()
+        except Exception as e:
+            print(e)
+            conn.rollback()
+
+            
+    def _copy_table_from_another_db(self, full_table_org, full_table_dest, cur_org, cur_dest, conn_dest):
+        # Fetch existing rows from cat_feature
+        schema_org = full_table_org.split('.')[0]
+        table_org = full_table_org.split('.')[1]
+        schema_dest = full_table_dest.split('.')[0]
+        table_dest = full_table_dest.split('.')[1]
+
+        query = f"SELECT * FROM {schema_org}.{table_org}"
+        cur_org.execute(query)
+        rows = cur_org.fetchall()
+
+        # Fetch column names and types
+        query = f"""SELECT column_name, data_type FROM information_schema.columns 
+                    WHERE table_schema = '{schema_org}' AND table_name = '{table_org}';"""
+        cur_org.execute(query)
+        column_types = cur_org.fetchall()
+
+        # Remove 'lastupdate' before joining
+        filtered_columns = [f"{col[0]} {col[1]}" for col in column_types if col[0].lower() != 'lastupdate']
+
+        # Generate CREATE TABLE statement
+        columns_def = ", ".join(filtered_columns)  
+
+        create_table_query = f"DROP TABLE IF EXISTS {schema_dest}.{table_dest};\n"
+        create_table_query += f"CREATE TABLE IF NOT EXISTS {schema_dest}.{table_dest} ({columns_def}, CONSTRAINT {table_org}_pkey PRIMARY KEY (id));\n"
+
+        # Generate INSERT statements
+        column_names = ", ".join([col[0] for col in column_types if col[0].lower() != 'lastupdate'])
+        insert_queries = ""
+        for row in rows:
+            # Create a proper insert query for each row
+            values = ", ".join([
+                "NULL" if value is None
+                else f"'{value.replace("'", "''")}'" if isinstance(value, str)  # String values need to be quoted
+                else str(value).replace("'", "''")  # For other types like integers and floats
+                for value in row if not isinstance(value, datetime.datetime)
+            ])
+            insert_queries += f"INSERT INTO {schema_dest}.{table_dest} ({column_names}) VALUES ({values});\n"
+
+        # Final SQL query
+        final_query = create_table_query + insert_queries
+
+        cur_dest.execute(final_query)
+        conn_dest.commit()
 
     # endregion
