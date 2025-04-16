@@ -388,6 +388,7 @@ class GwNetscenarioManagerButton(GwAction):
         tools_gw.add_icon(self.dlg_netscenario.btn_insert, "111")
         # tools_gw.add_icon(self.dlg_netscenario.btn_delete, "112")
         tools_gw.add_icon(self.dlg_netscenario.btn_snapping, "137")
+        tools_gw.add_icon(self.dlg_netscenario.btn_expr_select, "178")
 
         default_tab_idx = 0
         # Select all netscenario views
@@ -419,6 +420,7 @@ class GwNetscenarioManagerButton(GwAction):
         self.dlg_netscenario.btn_insert.clicked.connect(partial(self._manage_insert, None))
         self.dlg_netscenario.btn_delete.clicked.connect(partial(self._manage_delete))
         self.dlg_netscenario.btn_snapping.clicked.connect(partial(self._manage_select))
+        self.dlg_netscenario.btn_expr_select.clicked.connect(partial(self._select_with_expression_dialog))
         self.dlg_netscenario.main_tab.currentChanged.connect(partial(self._manage_current_changed))
         self.dlg_netscenario.finished.connect(self._selection_end)
         self.dlg_netscenario.finished.connect(partial(tools_gw.close_dialog, self.dlg_netscenario, True))
@@ -529,15 +531,15 @@ class GwNetscenarioManagerButton(GwAction):
         index_tab = self.dlg_netscenario.main_tab.currentIndex()
         tab_name = self.dlg_netscenario.main_tab.widget(index_tab).objectName()
 
-        widget_names = ['cmb_feature_id', 'btn_insert', 'btn_delete', 'btn_snapping', 'btn_config', 'btn_create', 'btn_update', 'btn_toggle_active']
+        widget_names = ['cmb_feature_id', 'btn_insert', 'btn_delete', 'btn_snapping', 'btn_expr_select', 'btn_config', 'btn_create', 'btn_update', 'btn_toggle_active']
 
         for name in widget_names:
             tools_qt.set_widget_enabled(self.dlg_netscenario, name, enable)
 
         disabled_widgets = {
-            'plan_netscenario_arc': ['cmb_feature_id', 'btn_insert', 'btn_delete', 'btn_snapping', 'btn_config', 'btn_create', 'btn_update', 'btn_toggle_active'],
-            'plan_netscenario_node': ['cmb_feature_id', 'btn_insert', 'btn_delete', 'btn_snapping', 'btn_config', 'btn_create', 'btn_update', 'btn_toggle_active'],
-            'plan_netscenario_connec': ['cmb_feature_id', 'btn_insert', 'btn_delete', 'btn_snapping', 'btn_config', 'btn_create', 'btn_update', 'btn_toggle_active'],
+            'plan_netscenario_arc': ['cmb_feature_id', 'btn_insert', 'btn_delete', 'btn_snapping', 'btn_expr_select', 'btn_config', 'btn_create', 'btn_update', 'btn_toggle_active'],
+            'plan_netscenario_node': ['cmb_feature_id', 'btn_insert', 'btn_delete', 'btn_snapping', 'btn_expr_select', 'btn_config', 'btn_create', 'btn_update', 'btn_toggle_active'],
+            'plan_netscenario_connec': ['cmb_feature_id', 'btn_insert', 'btn_delete', 'btn_snapping', 'btn_expr_select', 'btn_config', 'btn_create', 'btn_update', 'btn_toggle_active'],
             'plan_netscenario_valve': ['btn_config', 'btn_create', 'btn_update', 'btn_toggle_active']
         }
         if tab_name in disabled_widgets:
@@ -999,6 +1001,36 @@ class GwNetscenarioManagerButton(GwAction):
         tools_gw.remove_selection()
         tools_gw.reset_rubberband(self.rubber_band)
         self.iface.actionPan().trigger()
+
+
+    def _select_with_expression_dialog(self):
+        """Select features by expression for netscenario"""
+
+        # Get current layer and feature type
+        self._manage_feature_type()
+        view_name = self.dlg_netscenario.main_tab.currentWidget().objectName()
+        layer_name = 'v_edit_' + self.feature_type
+        if self.feature_type == 'nodarc':
+            layer_name = view_name.replace("netscenario_", "")
+
+        # Get the layer
+        layer = tools_qgis.get_layer_by_tablename(layer_name)
+        if not layer:
+            return
+
+        # Set active layer
+        self.iface.setActiveLayer(layer)
+        tools_qgis.set_layer_visible(layer)
+
+        # Show expression dialog
+        tools_gw.select_with_expression_dialog_custom(
+            self,
+            self.dlg_netscenario,
+            self.dlg_netscenario.main_tab.currentWidget(),
+            layer_name,
+            self._selection_init,
+            self._selection_end
+        )
 
     # endregion
 

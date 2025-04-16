@@ -29,6 +29,59 @@
    </item>
    <item row="0" column="0">
     <layout class="QGridLayout" name="gridLayout_2">
+     <item row="0" column="6">
+      <widget class="QPushButton" name="btn_toggle_active">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Toggle active</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="2">
+      <widget class="QPushButton" name="btn_insert">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="7">
+      <widget class="QPushButton" name="btn_toggle_closed">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Toggle closed</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="10">
+      <widget class="QPushButton" name="btn_update">
+       <property name="text">
+        <string>Update</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="11">
+      <widget class="QPushButton" name="btn_delete">
+       <property name="text">
+        <string>Delete</string>
+       </property>
+      </widget>
+     </item>
      <item row="0" column="1">
       <widget class="QComboBox" name="cmb_feature_id">
        <property name="sizePolicy">
@@ -48,56 +101,10 @@
        </property>
       </widget>
      </item>
-     <item row="0" column="2">
-      <widget class="QPushButton" name="btn_insert">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
+     <item row="0" column="8">
+      <widget class="QPushButton" name="btn_config">
        <property name="text">
-        <string/>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="10">
-      <widget class="QPushButton" name="btn_delete">
-       <property name="text">
-        <string>Delete</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="6">
-      <widget class="QPushButton" name="btn_toggle_closed">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>Toggle closed</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="5">
-      <widget class="QPushButton" name="btn_toggle_active">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>Toggle active</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="9">
-      <widget class="QPushButton" name="btn_update">
-       <property name="text">
-        <string>Update</string>
+        <string>Config</string>
        </property>
       </widget>
      </item>
@@ -114,7 +121,20 @@
        </property>
       </widget>
      </item>
-     <item row="0" column="4">
+     <item row="0" column="0">
+      <widget class="QLabel" name="lbl_mapzone_id">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Mapzone id:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="5">
       <spacer name="horizontalSpacer">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -127,30 +147,17 @@
        </property>
       </spacer>
      </item>
-     <item row="0" column="8">
+     <item row="0" column="9">
       <widget class="QPushButton" name="btn_create">
        <property name="text">
         <string>Create</string>
        </property>
       </widget>
      </item>
-     <item row="0" column="7">
-      <widget class="QPushButton" name="btn_config">
+     <item row="0" column="4">
+      <widget class="QPushButton" name="btn_expr_select">
        <property name="text">
-        <string>Config</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="0">
-      <widget class="QLabel" name="lbl_mapzone_id">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>Mapzone id:</string>
+        <string/>
        </property>
       </widget>
      </item>
