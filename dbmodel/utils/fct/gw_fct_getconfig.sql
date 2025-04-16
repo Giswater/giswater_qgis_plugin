@@ -23,7 +23,7 @@ SELECT "SCHEMA_NAME".gw_fct_getconfig($${
 "feature":{},"data":{}}$$)
 */
 
-                                                                                              
+
 
 DECLARE
 
@@ -74,16 +74,16 @@ BEGIN
 	-- Set search path to local schema
 	SET search_path = "SCHEMA_NAME", public;
 
-	--  get api version	
+	--  get api version
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
         INTO v_version;
 
 	-- get input parameters
 	v_formname := (p_data ->> 'form')::json->> 'formName';
-        
+
 	--  Get project type
 	SELECT project_type INTO v_project_type FROM sys_version ORDER BY id DESC LIMIT 1;
-    
+
 	-- Get layers and table names
 	v_layers_name = ((p_data ->> 'data')::json->> 'list_layers_name')::text;
 	v_layers_table = ((p_data ->> 'data')::json->> 'list_tables_name')::text;
@@ -91,7 +91,7 @@ BEGIN
 	-- Delete and insert layers and table names into temp_table
 	DELETE FROM temp_table where fid=163 and cur_user=current_user;
 	INSERT INTO temp_table(fid, text_column, cur_user) VALUES (163, '{"list_layers_name":"'||v_layers_name||'", "list_tables_name":"'||v_layers_table||'"}', current_user);
-    
+
 	-- Create tabs array
 	v_formtabs := '[';
 
@@ -134,20 +134,20 @@ BEGIN
 					AND active IS TRUE
 					AND sys_param_user.id LIKE ''feat_%'')b			
 					ORDER by orderby) a');
-					
+
 		v_debug_vars := json_build_object('v_formname', v_formname, 'v_project_type', v_project_type);
 		v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getconfig', 'flag', 10);
 		SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 		EXECUTE v_querystring INTO fields_array;
 
-		fields_array := COALESCE(fields_array, '{}');  
+		fields_array := COALESCE(fields_array, '{}');
 
 		FOREACH aux_json IN ARRAY fields_array
 		LOOP
-			
+
 			-- Refactor widget
 			IF (aux_json->>'widgettype')='image' THEN
-					EXECUTE (aux_json->>'dv_querytext') INTO v_image; 
+					EXECUTE (aux_json->>'dv_querytext') INTO v_image;
 				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'imageVal', COALESCE(v_image, '[]'));
 			END IF;
 
@@ -155,12 +155,12 @@ BEGIN
 			IF p_tgop ='UPDATE' THEN
 				IF (aux_json->>'isnotupdate')::boolean IS TRUE THEN
 					fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'isEditable','False');
-				END IF;		
+				END IF;
 			END IF;
-			
+
 			-- for image widgets
 			IF (aux_json->>'widgettype')='image' THEN
-					EXECUTE (aux_json->>'dv_querytext') INTO v_image; 
+					EXECUTE (aux_json->>'dv_querytext') INTO v_image;
 				fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'imageVal', COALESCE(v_image, '[]'));
 			END IF;
 
@@ -170,28 +170,28 @@ BEGIN
 				-- Define the order by column
 				IF (aux_json->>'dv_orderby_id')::boolean IS TRUE THEN
 					v_orderby='id';
-				ELSE 
+				ELSE
 					v_orderby='idval';
 				END IF;
 
 				v_dv_querytext=(aux_json->>'dv_querytext');
 
 				IF (aux_json->>'widgettype') = 'combo' THEN
-		
+
 					-- Get combo id's
 					v_querystring = concat('SELECT (array_agg(id)) FROM (',v_dv_querytext,' ORDER BY ',v_orderby,')a');
 					v_debug_vars := json_build_object('v_dv_querytext', v_dv_querytext, 'v_orderby', v_orderby);
 					v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getconfig', 'flag', 20);
 					SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 					EXECUTE v_querystring INTO v_array;
-					
+
 					-- Enable null values
 					IF (aux_json->>'dv_isnullvalue')::boolean IS TRUE THEN
 						v_array = array_prepend('',v_array);
 					END IF;
 					combo_json = array_to_json(v_array);
 					v_combo_id = combo_json;
-					fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'comboIds', COALESCE(combo_json, '[]'));		
+					fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'comboIds', COALESCE(combo_json, '[]'));
 
 					-- Get combo values
 					v_querystring = concat('SELECT (array_agg(idval)) FROM (',v_dv_querytext,' ORDER BY ',v_orderby,')a');
@@ -207,28 +207,28 @@ BEGIN
 					combo_json = array_to_json(v_array);
 					fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'comboNames', COALESCE(combo_json, '[]'));
 
-			
+
 					-- Get selected value
-					fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'selectedId', aux_json->>'value'); 
+					fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json->>'orderby')::INT], 'selectedId', aux_json->>'value');
 				END IF;
 
-				-- looking for childs 
+				-- looking for childs
 				IF (aux_json->>'isparent')::boolean IS TRUE THEN
-				
+
 					FOREACH aux_json_child IN ARRAY fields_array
-					LOOP	
+					LOOP
 						IF (aux_json_child->>'dv_parent_id') = (aux_json->>'widgetname') THEN
 
 							IF (aux_json_child->>'widgettype') = 'combo' THEN
-		
-								SELECT (json_array_elements(array_to_json(fields_array[(aux_json->> 'orderby')::INT:(aux_json->> 'orderby')::INT])))->>'selectedId' INTO v_selected_id;	
+
+								SELECT (json_array_elements(array_to_json(fields_array[(aux_json->> 'orderby')::INT:(aux_json->> 'orderby')::INT])))->>'selectedId' INTO v_selected_id;
 
 								-- Define the order by column
 								IF (aux_json_child->>'dv_orderby_id')::boolean IS TRUE THEN
 									v_orderby_child='id';
-								ELSE 
+								ELSE
 									v_orderby_child='idval';
-								END IF;	
+								END IF;
 
 								-- set false the editability
 								v_editability = replace (((aux_json_child->>'widgetcontrols')::json->>'enableWhenParent'), '[', '{');
@@ -237,34 +237,34 @@ BEGIN
 								IF v_selected_id::text != ANY (v_editability::text[]) THEN
 									fields_array[(aux_json_child->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json_child->>'orderby')::INT], 'iseditable', false);
 								END IF;
-									
+
 								-- Enable null values
 								v_dv_querytext_child=(aux_json_child->>'dv_querytext');
-							
+
 								-- Get combo id's
-								IF (aux_json_child->>'dv_querytext_filterc') IS NOT NULL AND v_selected_id IS NOT NULL THEN		
+								IF (aux_json_child->>'dv_querytext_filterc') IS NOT NULL AND v_selected_id IS NOT NULL THEN
 									query_text= concat('SELECT (array_agg(id)) FROM (', v_dv_querytext_child , (aux_json_child->>'dv_querytext_filterc'),' ',quote_literal(v_selected_id),' ORDER BY ',v_orderby_child,') a');
-									v_debug_vars := json_build_object('v_dv_querytext_child', v_dv_querytext_child, 'aux_json_child->>''dv_querytext_filterc''', 
+									v_debug_vars := json_build_object('v_dv_querytext_child', v_dv_querytext_child, 'aux_json_child->>''dv_querytext_filterc''',
 									(aux_json_child->>'dv_querytext_filterc'), 'v_selected_id', v_selected_id, 'v_orderby_child', v_orderby_child);
 									v_debug := json_build_object('querystring', query_text, 'vars', v_debug_vars, 'funcname', 'gw_fct_getconfig', 'flag', 40);
 									SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
-									EXECUTE query_text INTO v_array_child;								
-								ELSE 	
+									EXECUTE query_text INTO v_array_child;
+								ELSE
 									v_querystring = concat('SELECT (array_agg(id)) FROM (',(aux_json_child->>'dv_querytext'),' ORDER BY ',v_orderby_child,')a');
 									v_debug_vars := json_build_object('aux_json_child->>''dv_querytext''', (aux_json_child->>'dv_querytext'), 'v_selected_id', v_selected_id);
 									v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getconfig', 'flag', 50);
 									SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 									EXECUTE v_querystring INTO v_array_child;
 								END IF;
-								
+
 								-- Enable null values
-								IF (aux_json_child->>'dv_isnullvalue')::boolean IS TRUE THEN 
+								IF (aux_json_child->>'dv_isnullvalue')::boolean IS TRUE THEN
 									v_array_child = array_prepend('',v_array_child);
 								END IF;
 								combo_json_child = array_to_json(v_array_child);
 
 								fields_array[(aux_json_child->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json_child->>'orderby')::INT], 'comboIds', COALESCE(combo_json_child, '[]'));
-								
+
 								-- Get combo values
 								IF (aux_json_child->>'dv_querytext_filterc') IS NOT NULL AND v_selected_id IS NOT NULL THEN
 									query_text = concat('SELECT (array_agg(idval)) FROM (', v_dv_querytext_child ,(aux_json_child->>'dv_querytext_filterc'),' ',
@@ -274,52 +274,54 @@ BEGIN
 									v_debug := json_build_object('querystring', query_text, 'vars', v_debug_vars, 'funcname', 'gw_fct_getconfig', 'flag', 60);
 									SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 									EXECUTE query_text INTO v_array_child;
-								ELSE 	
+								ELSE
 									v_querystring = concat('SELECT (array_agg(idval)) FROM (',(aux_json_child->>'dv_querytext'),' ORDER BY ',v_orderby_child,')a');
 									v_debug_vars := json_build_object('aux_json_child->>''dv_querytext''', (aux_json_child->>'dv_querytext'), 'v_orderby_child', v_orderby_child);
 									v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_getconfig', 'flag', 70);
 									SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 									EXECUTE v_querystring INTO v_array_child;
 								END IF;
-								
+
 								-- Enable null values
-								IF (aux_json_child->>'dv_isnullvalue')::boolean IS TRUE THEN 
+								IF (aux_json_child->>'dv_isnullvalue')::boolean IS TRUE THEN
 									v_array_child = array_prepend('',v_array_child);
 								END IF;
-								
+
 								combo_json_child = array_to_json(v_array_child);
 								combo_json_child := COALESCE(combo_json_child, '[]');
 
-								fields_array[(aux_json_child->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json_child->>'orderby')::INT], 'comboNames', combo_json_child);	
+								fields_array[(aux_json_child->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json_child->>'orderby')::INT], 'comboNames', combo_json_child);
 
 								-- Get selected value
-								fields_array[(aux_json_child->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json_child->>'orderby')::INT], 'selectedId', (aux_json_child->>'value')::text); 					
-			
+								fields_array[(aux_json_child->>'orderby')::INT] := gw_fct_json_object_set_key(fields_array[(aux_json_child->>'orderby')::INT], 'selectedId', (aux_json_child->>'value')::text);
+
 								--removing the not used fields
 								fields_array[(aux_json_child->>'orderby')::INT] := gw_fct_json_object_delete_keys(fields_array[(aux_json_child->>'orderby')::INT],
 								'dv_querytext', 'dv_orderby_id', 'dv_isnullvalue', 'dv_parent_id', 'dv_querytext_filterc', 'typeahead');
-							
+
 							END IF;
 							raise notice 'parent % v_selected_id % aux_json_child %', (aux_json->>'widgetname'), v_selected_id, aux_json_child;
 						END IF;
 
 						raise notice ' CHILDDDDDDDDDDDDDDDD % ', fields_array[(aux_json_child->>'orderby')::INT];
 					END LOOP;
-				END IF;			    
-			END IF;	
-				
+				END IF;
+			END IF;
+
+						raise notice ' aux_json 1%', aux_json;
+
 			--removing the not used fields
 			fields_array[(aux_json->>'orderby')::INT] := gw_fct_json_object_delete_keys(fields_array[(aux_json->>'orderby')::INT],
 			'dv_querytext', 'dv_orderby_id', 'dv_isnullvalue', 'dv_parent_id', 'dv_querytext_filterc', 'sys_role', 'project_type');
 
 			raise notice ' aux_json %', aux_json;
-		
+
 		END LOOP;
-		 
+
 		--  Convert to json
 		fields := array_to_json(fields_array);
-		fields := COALESCE(fields, '[]');    
-		  
+		fields := COALESCE(fields, '[]');
+
 		-- Add tab name to json
 		tabUser := ('{"fields":' || fields || '}')::json;
 		tabUser := gw_fct_json_object_set_key(tabUser, 'tabName', 'tabUser'::TEXT);
@@ -340,9 +342,9 @@ BEGIN
     SELECT * INTO rec_tab FROM config_form_tabs WHERE formname='config' AND tabname='tab_admin' ;
 
     -- only form config form (epaoptions not need admin tab)
-    IF v_formname='config' THEN 
-    
-		IF rec_tab.tabname IS NOT NULL AND 'role_admin' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN 
+    IF v_formname='config' THEN
+
+		IF rec_tab.tabname IS NOT NULL AND 'role_admin' IN (SELECT rolname FROM pg_roles WHERE  pg_has_role( current_user, oid, 'member')) THEN
 
 			-- Get fields for admin enabled
 			v_querystring = concat('SELECT (array_agg(row_to_json(a))) FROM (SELECT label, parameter AS widgetname, parameter as widgetname, concat(''admin_'',parameter), value, 
@@ -356,7 +358,7 @@ BEGIN
 			SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
 			EXECUTE v_querystring INTO fields_array;
 
-		ELSE 
+		ELSE
 			-- Get fields for admin disabled (only to show)
 			v_querystring = concat('SELECT (array_agg(row_to_json(a))) FROM (SELECT label, parameter AS widgetname, parameter as widgetname, concat(''admin_'',parameter), value, 
 							widgettype, datatype, layoutname, layoutorder, row_number() over (order by layoutname, layoutorder) as orderby, descript as tooltip, FALSE AS iseditable,
@@ -370,8 +372,8 @@ BEGIN
 
 		-- Convert to json
 		fields := array_to_json(fields_array);
-		fields := COALESCE(fields, '[]');    
-	
+		fields := COALESCE(fields, '[]');
+
         -- Add tab name to json
         v_tabadmin := ('{"fields":' || fields || '}')::json;
         v_tabadmin := gw_fct_json_object_set_key(v_tabadmin, 'tabName', 'tabAdmin'::TEXT);
@@ -379,7 +381,7 @@ BEGIN
         v_tabadmin := gw_fct_json_object_set_key(v_tabadmin, 'tooltip', rec_tab.tooltip);
 
         v_formtabs := v_formtabs ||','|| v_tabadmin::text;
-        
+
     END IF;
 
 	--  Finish the construction of v_formtabs
@@ -388,18 +390,18 @@ BEGIN
 
 	-- Check null
     v_version := COALESCE(v_version, '[]');
-    v_formtabs := COALESCE(v_formtabs, '[]'); 
+    v_formtabs := COALESCE(v_formtabs, '[]');
 
 	-- Return
     RETURN ('{"status":"Accepted", "version":'||v_version||
              ',"body":{"message":{"level":1, "text":"Process done successfully"}'||
-			',"form":{"formName":"", "formLabel":"", "formText":""'|| 
+			',"form":{"formName":"", "formLabel":"", "formText":""'||
 				',"formTabs":'||v_formtabs||
 				',"formActions":[]}'||
 			',"feature":{}'||
 			',"data":{}}'||
 	    '}')::json;
-    
+
 	-- Exception handling
 	EXCEPTION WHEN OTHERS THEN
 	GET STACKED DIAGNOSTICS v_errcontext = pg_exception_context;

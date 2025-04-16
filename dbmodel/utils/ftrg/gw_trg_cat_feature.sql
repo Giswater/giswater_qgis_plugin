@@ -99,6 +99,12 @@ BEGIN
 		v_querytext, v_feature_field_id, lower(v_projecttype),false,false,'text', 'combo', true, true)
 		ON CONFLICT (id) DO NOTHING;
 
+		IF upper(v_projecttype) = 'UD' AND NEW.feature_type = 'LINK' THEN
+			v_querytext = concat('SELECT DISTINCT ON (cl.id) cl.id, cl.id AS idval FROM link l JOIN cat_link cl ON l.linkcat_id = cl.id WHERE l.link_type = ', quote_literal(NEW.id));
+
+			UPDATE sys_param_user SET dv_querytext = v_querytext, dv_orderby = true WHERE id = concat('feat_',v_id,'_vdefault');
+		END IF;
+
 	END IF;
 
 	IF TG_OP = 'INSERT' THEN
@@ -140,19 +146,19 @@ BEGIN
 		IF lower(v_feature.type)='arc' THEN
 			EXECUTE 'INSERT INTO cat_feature_arc (id, epa_default)
 			VALUES ('||quote_literal(NEW.id)||', '||quote_literal(v_feature.epa_default)||');';
-		
+
 		ELSIF lower(v_feature.type)='node' THEN
 			EXECUTE 'INSERT INTO cat_feature_node (id, epa_default, choose_hemisphere, isarcdivide, num_arcs)
 			VALUES ('||quote_literal(NEW.id)||', '||quote_literal(v_feature.epa_default)||', TRUE, TRUE, 2)';
-		
+
 		ELSIF lower(v_feature.type)='connec' THEN
 			EXECUTE 'INSERT INTO cat_feature_connec (id)
 			VALUES ('||quote_literal(NEW.id)||');';
-		
+
 		ELSIF lower(v_feature.type)='gully' THEN
 			EXECUTE 'INSERT INTO cat_feature_gully (id)
 			VALUES ('||quote_literal(NEW.id)||');';
-		
+
 		ELSIF lower(v_feature.type)='element' THEN
 			EXECUTE 'INSERT INTO cat_feature_element (id, epa_default)
 			VALUES ('||quote_literal(NEW.id)||', '||quote_literal(v_feature.epa_default)||');';
