@@ -1388,7 +1388,7 @@ AS WITH
 			JOIN cat_gully ON gully.gullycat_id::text = cat_gully.id::text
 			JOIN exploitation ON gully.expl_id = exploitation.expl_id
 			JOIN cat_feature ON gully.gully_type::text = cat_feature.id::text
-			JOIN cat_connec cc ON cc.id::text = gully._connec_arccat_id::text
+			LEFT JOIN cat_connec cc ON cc.id::text = gully._connec_arccat_id::text
 			JOIN value_state_type vst ON vst.id = gully.state_type
 			JOIN ext_municipality mu ON gully.muni_id = mu.muni_id
 			JOIN sector_table ON gully.sector_id = sector_table.sector_id
