@@ -198,7 +198,7 @@ BEGIN
 
 				IF v_viewname IS NOT NULL THEN
 
-					IF  (SELECT EXISTS (SELECT FROM information_schema.tables WHERE  table_schema = 'ud400011'
+					IF  (SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_schema = v_schemaname
 					AND table_name = v_viewname)) = true THEN
 
 						--get the old view definition
@@ -249,7 +249,7 @@ BEGIN
 			END IF;
 
 			IF v_viewname IS NOT NULL THEN
-				IF  (SELECT EXISTS (SELECT FROM information_schema.tables WHERE  table_schema = 'ud400011'
+				IF  (SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_schema = v_schemaname
 				AND table_name = v_old_child_layer)) = true THEN
 
 					--get the old view definition
