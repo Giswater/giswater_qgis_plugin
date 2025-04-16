@@ -332,7 +332,6 @@ def open_help_link(context, uiname, tabname=None):
 def open_dialog(dlg, dlg_name=None, stay_on_top=False, title=None, hide_config_widgets=False, plugin_dir=lib_vars.plugin_dir, plugin_name=lib_vars.plugin_name):
 
     """ Open dialog """
-
     # Check database connection before opening dialog
     if (dlg_name != 'admin_credentials' and dlg_name != 'admin_ui') and not tools_db.check_db_connection():
         return
@@ -3532,11 +3531,13 @@ def connect_signal_selection_changed(class_object, dialog, table_object, selecti
         tools_log.log_info(f"connect_signal_selection_changed: {e}")
 
 
-def docker_dialog(dialog):
+def docker_dialog(dialog, dlg_name=None):
 
     positions = {8: Qt.BottomDockWidgetArea, 4: Qt.TopDockWidgetArea,
                  2: Qt.RightDockWidgetArea, 1: Qt.LeftDockWidgetArea}
     try:
+        if dlg_name:
+            tools_qt.manage_translation(dlg_name, dialog)
         lib_vars.session_vars['dialog_docker'].setWindowTitle(dialog.windowTitle())
         lib_vars.session_vars['dialog_docker'].setWidget(dialog)
         lib_vars.session_vars['dialog_docker'].setWindowFlags(Qt.WindowContextHelpButtonHint)

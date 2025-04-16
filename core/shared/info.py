@@ -573,7 +573,7 @@ class GwInfo(QObject):
                 last_info.setParent(None)
                 del last_info
 
-            tools_gw.docker_dialog(dlg_cf)
+            tools_gw.docker_dialog(dlg_cf, dlg_name='info_feature')
             lib_vars.session_vars['dialog_docker'].widget().dlg_closed.connect(self._manage_docker_close)
             lib_vars.session_vars['dialog_docker'].setWindowTitle(title)
             btn_cancel.clicked.connect(self._manage_docker_close)
@@ -2946,7 +2946,7 @@ class GwInfo(QObject):
                                     enable_actions=True, is_inserting=False)
         # Open dialog
         dlg_generic.setWindowTitle(f"{(form_name.lower()).capitalize().replace('_', ' ')}")
-        tools_gw.open_dialog(dlg_generic)
+        tools_gw.open_dialog(dlg_generic, dlg_name='info_generic')
 
     def _set_catalog(self, dialog, form_name, table_name, feature_id, id_name):
         """ Insert table 'cat_work'. Add cat_work """

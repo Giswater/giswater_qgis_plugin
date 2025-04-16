@@ -50,9 +50,9 @@ class GwSelector:
         # Get the name of the last tab used by the user
         current_tab = tools_gw.get_config_parser('dialogs_tab', "dlg_selector_basic", "user", "session")
         self.get_selector(dlg_selector, selector_type, current_tab=current_tab)
-
+        tools_qt.manage_translation('selector', dlg_selector)
         if lib_vars.session_vars['dialog_docker']:
-            tools_gw.docker_dialog(dlg_selector)
+            tools_gw.docker_dialog(dlg_selector, dlg_name='selector')
             dlg_selector.btn_close.clicked.connect(partial(tools_gw.close_docker, option_name='position'))
 
             # Set shortcut keys

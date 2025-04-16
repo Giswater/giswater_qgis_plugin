@@ -277,7 +277,7 @@ class GwFeatureReplaceButton(GwMaptool):
         self.dlg_replace.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_replace))
 
         # Open dialog
-        tools_gw.open_dialog(self.dlg_replace)
+        tools_gw.open_dialog(self.dlg_replace, dlg_name='feature_replace')
 
     def _open_catalog(self, feature_type):
 

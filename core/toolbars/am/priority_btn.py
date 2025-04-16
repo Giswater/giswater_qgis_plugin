@@ -437,10 +437,8 @@ class CalculatePriority:
 
         self.dlg_priority.btn_again.setVisible(False)
         # Open the dialog
-        tools_gw.open_dialog(
-            self.dlg_priority,
-            dlg_name="priority"
-        )
+        tools_gw.open_dialog(self.dlg_priority,dlg_name="priority")
+        
 
     def _add_total(self, lyt):
         lbl = QLabel()

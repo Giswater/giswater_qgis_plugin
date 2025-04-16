@@ -146,9 +146,9 @@ class GwProfileButton(GwAction):
         # Show form in docker
         tools_gw.init_docker('qgis_form_docker')
         if lib_vars.session_vars['dialog_docker']:
-            tools_gw.docker_dialog(self.dlg_draw_profile)
+            tools_gw.docker_dialog(self.dlg_draw_profile, dlg_name='profile')
         else:
-            tools_gw.open_dialog(self.dlg_draw_profile)
+            tools_gw.open_dialog(self.dlg_draw_profile, dlg_name='profile')
 
     # region private functions
 
@@ -279,7 +279,7 @@ class GwProfileButton(GwAction):
             item_arc = QListWidgetItem(str(profile['profile_id']))
             self.dlg_load.tbl_profiles.addItem(item_arc)
 
-        tools_gw.open_dialog(self.dlg_load)
+        tools_gw.open_dialog(self.dlg_load, dlg_name='profile_list')
 
     def _load_profile(self, parameters):
         """ Open selected profile from dialog load_profiles.ui """

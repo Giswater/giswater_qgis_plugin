@@ -174,7 +174,6 @@ class GwToolBoxButton(GwAction):
             self._populate_trv(self.dlg_toolbox.trv, json_result['body']['data'])
             self.dlg_toolbox.txt_filter.textChanged.connect(partial(self._filter_functions))
             self.dlg_toolbox.trv.doubleClicked.connect(partial(self._open_function))
-            tools_qt.manage_translation('toolbox_docker', self.dlg_toolbox)
 
         # Set shortcut keys
         self.dlg_toolbox.key_escape.connect(partial(tools_gw.close_docker))
@@ -182,9 +181,9 @@ class GwToolBoxButton(GwAction):
         # Show form in docker
         tools_gw.init_docker('qgis_form_docker')
         if lib_vars.session_vars['dialog_docker']:
-            tools_gw.docker_dialog(self.dlg_toolbox)
+            tools_gw.docker_dialog(self.dlg_toolbox, dlg_name='toolbox')
         else:
-            tools_gw.open_dialog(self.dlg_toolbox)
+            tools_gw.open_dialog(self.dlg_toolbox, dlg_name='toolbox')
 
     def _filter_functions(self, text):
 

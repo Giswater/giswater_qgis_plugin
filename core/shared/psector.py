@@ -1669,7 +1669,7 @@ class GwPsector:
             tools_qgis.show_warning("Failed to set psector", dialog=dialog)
 
         # Re-open the dialog
-        tools_gw.open_dialog(dialog)
+        tools_gw.open_dialog(dialog, dlg_name='plan_psector')
 
     def _filter_table(self, dialog, table, widget_txt, widget_chk, tablename):
 

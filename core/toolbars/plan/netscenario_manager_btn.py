@@ -189,7 +189,7 @@ class GwNetscenarioManagerButton(GwAction):
             tools_qgis.show_warning("Failed to set netscenario", dialog=dialog)
 
         # Re-open the dialog to reflect the changes
-        tools_gw.open_dialog(dialog)
+        tools_gw.open_dialog(dialog, dlg_name='netscenario_manager')
 
     def _set_label_current_netscenario(self, dialog, from_open_dialog=False, result=None):
         """Set label for the current netscenario."""

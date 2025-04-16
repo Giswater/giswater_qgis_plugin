@@ -410,7 +410,7 @@ class GwDscenarioManagerButton(GwAction):
             tools_qgis.show_warning(f"Failed to set {scenario_type} scenario", dialog=dialog)
 
         # Re-open the dialog
-        tools_gw.open_dialog(dialog)
+        tools_gw.open_dialog(dialog, dlg_name='dscenario_manager')
 
     def _set_label_current_dscenario_type(self, dialog, scenario_type=None, from_open_dialog=False, result=None):
         """

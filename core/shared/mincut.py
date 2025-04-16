@@ -487,15 +487,15 @@ class GwMincut:
 
         # Show form in docker?
         self.manage_docker()
-        tools_qt.manage_translation('mincut', self.dlg_mincut)
+
 
     def manage_docker(self):
-
+        
         tools_gw.init_docker('qgis_form_docker')
         if lib_vars.session_vars['dialog_docker']:
-            tools_gw.docker_dialog(self.dlg_mincut)
+            tools_gw.docker_dialog(self.dlg_mincut, 'mincut')
         else:
-            tools_gw.open_dialog(self.dlg_mincut, dlg_name='mincut')
+            tools_gw.open_dialog(self.dlg_mincut, 'mincut')
 
         self._set_signals()
 
@@ -981,7 +981,7 @@ class GwMincut:
                 self.dlg_info.btn_accept.clicked.connect(partial(tools_gw.close_dialog, self.dlg_info))
                 self.dlg_info.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_info))
                 tools_gw.fill_tab_log(self.dlg_info, result['body']['data'], False, close=False)
-                tools_gw.open_dialog(self.dlg_info)
+                tools_gw.open_dialog(self.dlg_info, dlg_name='dialog_text')
 
         self._save_widgets_values()
         self.iface.actionPan().trigger()
@@ -1306,7 +1306,7 @@ class GwMincut:
             # Read selection and reload table
             self._select_features_hydro()
 
-        tools_gw.open_dialog(self.dlg_hydro)
+        tools_gw.open_dialog(self.dlg_hydro, 'mincut_hydrometer')
 
     def _auto_fill_hydro_id(self):
 

@@ -119,10 +119,8 @@ class GwResultManagerButton(GwAction):
             self._value_result_type[idval] = id
 
         # Open the dialog
-        tools_gw.open_dialog(
-            self.dlg_priority_manager,
-            dlg_name="priority_manager"
-        )
+        tools_gw.open_dialog(self.dlg_priority_manager,dlg_name="priority_manager")
+
 
     def _manage_txt_report(self):
 
@@ -394,10 +392,8 @@ class GwResultManagerButton(GwAction):
         )
         self.dlg_status.btn_cancel.clicked.connect(self.dlg_status.reject)
 
-        tools_gw.open_dialog(
-            self.dlg_status,
-            dlg_name="status_selector"
-        )
+        tools_gw.open_dialog(self.dlg_status,dlg_name="status_selector")
+        
 
     def _set_corporate(self):
         table = self.dlg_priority_manager.tbl_results

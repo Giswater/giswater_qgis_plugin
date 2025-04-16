@@ -286,7 +286,7 @@ class GwElement:
         self.load_connections(self.complet_result)
 
         # Open the dialog
-        tools_gw.open_dialog(self.dlg_mng, dlg_name=form_type)
+        tools_gw.open_dialog(self.dlg_mng, dlg_name='element')
 
     def _populate_dynamic_widgets(self, dialog, complet_result):
         """Creates and populates all widgets dynamically into the dialog layout."""

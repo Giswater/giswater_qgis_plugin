@@ -488,7 +488,7 @@ class GwFeatureEndButton(GwAction):
         """ Close dialog """
 
         tools_gw.close_dialog(dlg)
-        tools_gw.open_dialog(self.dlg_work_end)
+        tools_gw.open_dialog(self.dlg_work_end, dlg_name='feature_end')
 
     def _manage_close(self, dialog, force_downgrade=False, show_warning=False):
         """ Close dialog and disconnect snapping """

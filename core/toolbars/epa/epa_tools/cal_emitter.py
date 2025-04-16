@@ -74,7 +74,7 @@ class EmitterCalibration:
         self._load_values()
 
         # Open dialog
-        tools_gw.open_dialog(self.dlg_vol_cal)
+        tools_gw.open_dialog(self.dlg_vol_cal, dlg_name='emitter_calibration')
 
     def _execute_process(self):
 
