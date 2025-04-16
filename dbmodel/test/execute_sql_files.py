@@ -20,6 +20,7 @@ def main(project_type: str) -> None:
     root_directories = ["utils/ddl", f"{project_type}/schema_model", "utils/fct", "utils/ftrg", f"{project_type}/fct", f"{project_type}/ftrg"]
     exclude_prefix = "ud_" if project_type == "ws" else "ws_"
     exculude_files = "trg_schema_model.sql"
+    exclude_i18n_files = []
 
     # Execute SQL files in the root directories
     for root_dir in root_directories:
@@ -35,14 +36,13 @@ def main(project_type: str) -> None:
 
     i18n_dir = f"i18n/en_US"
 
-    # Check if the i18n directory exists and process it
+    # Check if the i18n directory exists and process schema_model file
     if os.path.isdir(i18n_dir):
         logger.info(f"Processing root directory: {i18n_dir}")
         for root, _, files in os.walk(i18n_dir):
-            for file in sorted(files, reverse=True):
-                if file.endswith(".sql") and exclude_prefix not in file:
-                    file_path = os.path.join(root, file)
-                    execute_sql_file(conn, file_path)
+            file_to_execute = f"{project_type}_schema_model.sql"
+            file_path = os.path.join(root, file_to_execute)
+            execute_sql_file(conn, file_path)
     else:
         logger.warning(f"Directory {i18n_dir} does not exist")
 
@@ -63,6 +63,16 @@ def main(project_type: str) -> None:
                         if file.endswith(".sql"):
                             file_path = os.path.join(root, file)
                             execute_sql_file(conn, file_path)
+
+    # Check if the i18n directory exists and process the en_US dml
+    if os.path.isdir(i18n_dir):
+        logger.info(f"Processing root directory: {i18n_dir}")
+        for root, _, files in os.walk(i18n_dir):
+            file_to_execute = f"{project_type}_schema_model.sql"
+            file_path = os.path.join(root, file_to_execute)
+            execute_sql_file(conn, file_path)
+    else:
+        logger.warning(f"Directory {i18n_dir} does not exist")
 
     logger.info(f"PERFORM lastprocess:")
     # Execute last process command
