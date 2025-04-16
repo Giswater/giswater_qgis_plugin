@@ -124,17 +124,22 @@ class GwCreateSchemaTask(GwTask):
         if (not tools_os.set_boolean(status, False) and tools_os.set_boolean(self.admin.dev_commit, False) is False) \
                 or self.isCanceled():
             return False
-
-        status = self.admin.load_locale()
+        
+        status = self.admin.load_base_locale()
         if (not tools_os.set_boolean(status, False) and tools_os.set_boolean(self.admin.dev_commit, False) is False) \
                 or self.isCanceled():
             return False
+        
 
         status = self.admin.update_dict_folders(True, project_type, dict_update_folders=self.dict_folders_process['update_35to40'])
         if (not tools_os.set_boolean(status, False) and tools_os.set_boolean(self.admin.dev_commit, False) is False) \
                 or self.isCanceled():
             return False
 
+        status = self.admin.load_locale()
+        if (not tools_os.set_boolean(status, False) and tools_os.set_boolean(self.admin.dev_commit, False) is False) \
+                or self.isCanceled():
+            return False
         # status = self.admin.load_childviews()
         # if (not tools_os.set_boolean(status, False) and tools_os.set_boolean(self.admin.dev_commit, False) is False) \
         #         or self.isCanceled():
