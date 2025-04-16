@@ -68,7 +68,7 @@ def main(project_type: str) -> None:
     if os.path.isdir(i18n_dir):
         logger.info(f"Processing root directory: {i18n_dir}")
         for root, _, files in os.walk(i18n_dir):
-            file_to_execute = f"{project_type}_schema_model.sql"
+            file_to_execute = f"dml.sql"
             file_path = os.path.join(root, file_to_execute)
             execute_sql_file(conn, file_path)
     else:
