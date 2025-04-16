@@ -566,18 +566,31 @@ class GwAdminButton:
 
         return True
 
+    def load_base_locale(self):
+            
+        folder_locale = os.path.join(self.sql_dir, 'i18n', 'en_US')
+        if self._process_folder(folder_locale) is False:
+            return False
+        else:
+            status = self._execute_files(folder_locale, True, set_progress_bar=True, do_schema_model_i18n=True)
+            if tools_os.set_boolean(status, False) is False and tools_os.set_boolean(self.dev_commit, False) is False:
+                return False
+
+        return True
+    
     def load_locale(self):
 
         if self._process_folder(self.folder_locale) is False:
             folder_locale = os.path.join(self.sql_dir, 'i18n', 'en_US')
+            print(folder_locale)
             if self._process_folder(folder_locale) is False:
                 return False
             else:
-                status = self._execute_files(folder_locale, True, set_progress_bar=True)
+                status = self._execute_files(folder_locale, True, set_progress_bar=True, do_schema_model_i18n=False)
                 if tools_os.set_boolean(status, False) is False and tools_os.set_boolean(self.dev_commit, False) is False:
                     return False
         else:
-            status = self._execute_files(self.folder_locale, True, set_progress_bar=True)
+            status = self._execute_files(self.folder_locale, True, set_progress_bar=True, do_schema_model_i18n=False)
             if tools_os.set_boolean(status, False) is False and tools_os.set_boolean(self.dev_commit, False) is False:
                 return False
 
@@ -1820,7 +1833,7 @@ class GwAdminButton:
         self.dlg_readsql_rename.schema_rename_copy.setText(schema)
         tools_gw.open_dialog(self.dlg_readsql_rename, dlg_name='admin_renameproj')
 
-    def _execute_files(self, filedir, i18n=False, no_ct=False, utils_schema_name=None, set_progress_bar=False):
+    def _execute_files(self, filedir, i18n=False, no_ct=False, utils_schema_name=None, set_progress_bar=False, do_schema_model_i18n=True):
         """"""
 
         if not os.path.exists(filedir):
@@ -1851,8 +1864,15 @@ class GwAdminButton:
             manage_i18n = True
 
         if manage_i18n:
-            files_to_execute = [f"{self.project_type_selected}_schema_model.sql", f"{self.project_type_selected}_dml.sql", f"dml.sql"]
+            files_to_execute = []
+            if do_schema_model_i18n:
+                files_to_execute = [f"{self.project_type_selected}_schema_model.sql"]
+            else:
+                files_to_execute = [f"dml.sql", f"{self.project_type_selected}_dml.sql"]
+                files_to_execute = [f"dml.sql"]
+
             for file in files_to_execute:
+                print(file)
                 status = True
                 if file in filelist:
                     tools_log.log_info(os.path.join(filedir, file))
