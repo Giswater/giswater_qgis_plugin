@@ -780,15 +780,6 @@ class DialogTableUi(GwDialog, FORM_CLASS):
     UINAME = UINAME
 
 
-UINAME = "load_management"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
-
-
-class LoadManagementUi(GwDialog, FORM_CLASS):
-    CONTEXT = CONTEXT
-    UINAME = UINAME
-
-
 UINAME = "lot_management"
 FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
 
@@ -830,15 +821,6 @@ FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
 
 
 class TeamManagemenUi(GwDialog, FORM_CLASS):
-    CONTEXT = CONTEXT
-    UINAME = UINAME
-
-
-UINAME = "vehicle_create"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
-
-
-class VehicleCreateUi(GwDialog, FORM_CLASS):
     CONTEXT = CONTEXT
     UINAME = UINAME
 
