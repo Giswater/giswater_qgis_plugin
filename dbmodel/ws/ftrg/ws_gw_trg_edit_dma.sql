@@ -67,6 +67,8 @@ BEGIN
 				END IF;
 			END IF;
 
+			-- set macrodma_id = 0 if null
+			IF NEW.macrodma_id IS NULL THEN NEW.macrodma_id = 0; END IF;
 			v_mapzone_id = NEW.macrodma_id;
 		ELSIF v_view_name = 'UI' THEN
 			IF NEW.active IS NULL THEN

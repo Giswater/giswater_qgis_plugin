@@ -54,6 +54,8 @@ BEGIN
 				END IF;
 			END IF;
 
+			-- set macrosector_id = 0 if null
+			IF NEW.macrosector_id IS NULL THEN NEW.macrosector_id = 0; END IF;
 			v_mapzone_id = NEW.macrosector_id;
 		ELSIF v_view_name = 'UI' THEN
 			IF NEW.active IS NULL THEN

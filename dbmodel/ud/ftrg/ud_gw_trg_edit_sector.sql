@@ -23,6 +23,8 @@ BEGIN
 	IF TG_OP = 'INSERT' THEN
 
 		IF view_name = 'EDIT' THEN
+			-- set macrosector_id = 0 if null
+			IF NEW.macrosector_id IS NULL THEN NEW.macrosector_id = 0; END IF;
 			v_mapzone_id = NEW.macrosector_id;
 		ELSIF view_name = 'UI' THEN
 			IF NEW.active IS NULL THEN
