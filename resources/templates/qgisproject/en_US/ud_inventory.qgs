@@ -6,15 +6,15 @@
   <projectFlags set=""/>
   <projectCrs>
     <spatialrefsys nativeFormat="Wkt">
-      
+
       <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
       <srsid>__SRSID__</srsid>
       <srid>__SRID__</srid>
       <authid>__AUTHID__</authid>
-      
-      
+
+
       <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-      
+
     </spatialrefsys>
   </projectCrs>
   <elevation-shading-renderer hillshading-is-active="0" combined-method="0" edl-strength="1000" edl-distance="0.5" is-active="0" hillshading-is-multidirectional="0" light-altitude="45" light-azimuth="315" edl-is-active="1" edl-distance-unit="0" hillshading-z-factor="1"/>
@@ -127,7 +127,7 @@
             <Option/>
           </customproperties>
         </layer-tree-layer>
-        <layer-tree-layer patch_size="-1,-1" name="Flow Regulators" id="v_edit_flwreg_94b3eebc_b5d5_40ea_be5e_e0d6c9ec2845" expanded="0" legend_split_behavior="0" source=" __DATASOURCE__  key='flwreg_id' srid=__SRID__ type=LineString checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_flwreg&quot; (the_geom)" checked="Qt::Checked" legend_exp="" providerKey="postgres">
+        <layer-tree-layer patch_size="-1,-1" name="Flow Regulators" id="v_edit_flwreg_94b3eebc_b5d5_40ea_be5e_e0d6c9ec2845" expanded="0" legend_split_behavior="0" source=" __DATASOURCE__  key='element_id' srid=__SRID__ type=LineString checkPrimaryKeyUnicity='1' table=&quot;SCHEMA_NAME&quot;.&quot;v_edit_flwreg&quot; (the_geom)" checked="Qt::Checked" legend_exp="" providerKey="postgres">
           <customproperties>
             <Option/>
           </customproperties>
@@ -269,15 +269,15 @@
     <rotation>0</rotation>
     <destinationsrs>
       <spatialrefsys nativeFormat="Wkt">
-        
+
         <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
         <srsid>__SRSID__</srsid>
         <srid>__SRID__</srid>
         <authid>__AUTHID__</authid>
-        
-        
+
+
         <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-        
+
       </spatialrefsys>
     </destinationsrs>
     <rendermaptile>0</rendermaptile>
@@ -465,7 +465,7 @@
         <description></description>
         <projectionacronym></projectionacronym>
         <ellipsoidacronym></ellipsoidacronym>
-        
+
       </spatialrefsys>
     </srs>
     <resourceMetadata>
@@ -489,7 +489,7 @@
           <description></description>
           <projectionacronym></projectionacronym>
           <ellipsoidacronym></ellipsoidacronym>
-          
+
         </spatialrefsys>
       </crs>
       <extent/>
@@ -526,7 +526,7 @@
           <description></description>
           <projectionacronym></projectionacronym>
           <ellipsoidacronym></ellipsoidacronym>
-          
+
         </spatialrefsys>
       </srs>
       <resourceMetadata>
@@ -550,7 +550,7 @@
             <description></description>
             <projectionacronym></projectionacronym>
             <ellipsoidacronym></ellipsoidacronym>
-            
+
           </spatialrefsys>
         </crs>
         <extent/>
@@ -1378,7 +1378,7 @@
           <description></description>
           <projectionacronym></projectionacronym>
           <ellipsoidacronym></ellipsoidacronym>
-          
+
         </spatialrefsys>
       </srs>
       <resourceMetadata>
@@ -1402,7 +1402,7 @@
             <description></description>
             <projectionacronym></projectionacronym>
             <ellipsoidacronym></ellipsoidacronym>
-            
+
           </spatialrefsys>
         </crs>
         <extent/>
@@ -1902,7 +1902,7 @@
           <description></description>
           <projectionacronym></projectionacronym>
           <ellipsoidacronym></ellipsoidacronym>
-          
+
         </spatialrefsys>
       </srs>
       <resourceMetadata>
@@ -1926,7 +1926,7 @@
             <description></description>
             <projectionacronym></projectionacronym>
             <ellipsoidacronym></ellipsoidacronym>
-            
+
           </spatialrefsys>
         </crs>
         <extent/>
@@ -2380,7 +2380,7 @@
           <description></description>
           <projectionacronym></projectionacronym>
           <ellipsoidacronym></ellipsoidacronym>
-          
+
         </spatialrefsys>
       </srs>
       <resourceMetadata>
@@ -2413,7 +2413,7 @@
             <description></description>
             <projectionacronym></projectionacronym>
             <ellipsoidacronym></ellipsoidacronym>
-            
+
           </spatialrefsys>
         </crs>
         <extent>
@@ -2783,7 +2783,7 @@ def my_form_open(dialog, layer, feature):
           <description></description>
           <projectionacronym></projectionacronym>
           <ellipsoidacronym></ellipsoidacronym>
-          
+
         </spatialrefsys>
       </srs>
       <resourceMetadata>
@@ -2807,7 +2807,7 @@ def my_form_open(dialog, layer, feature):
             <description></description>
             <projectionacronym></projectionacronym>
             <ellipsoidacronym></ellipsoidacronym>
-            
+
           </spatialrefsys>
         </crs>
         <extent/>
@@ -3340,15 +3340,15 @@ def my_form_open(dialog, layer, feature):
       <layername>Arc</layername>
       <srs>
         <spatialrefsys nativeFormat="Wkt">
-          
+
           <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
           <srsid>__SRSID__</srsid>
           <srid>__SRID__</srid>
           <authid>__AUTHID__</authid>
-          
-          
+
+
           <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-          
+
         </spatialrefsys>
       </srs>
       <resourceMetadata>
@@ -3373,15 +3373,15 @@ def my_form_open(dialog, layer, feature):
         <encoding></encoding>
         <crs>
           <spatialrefsys nativeFormat="Wkt">
-            
+
             <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
             <srsid>__SRSID__</srsid>
             <srid>__SRID__</srid>
             <authid>__AUTHID__</authid>
-            
-            
+
+
             <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-            
+
           </spatialrefsys>
         </crs>
         <extent>
@@ -6938,7 +6938,7 @@ def my_form_open(dialog, layer, feature):
           <description></description>
           <projectionacronym></projectionacronym>
           <ellipsoidacronym></ellipsoidacronym>
-          
+
         </spatialrefsys>
       </srs>
       <resourceMetadata>
@@ -6962,7 +6962,7 @@ def my_form_open(dialog, layer, feature):
             <description></description>
             <projectionacronym></projectionacronym>
             <ellipsoidacronym></ellipsoidacronym>
-            
+
           </spatialrefsys>
         </crs>
         <extent/>
@@ -7284,7 +7284,7 @@ def my_form_open(dialog, layer, feature):
           <description></description>
           <projectionacronym></projectionacronym>
           <ellipsoidacronym></ellipsoidacronym>
-          
+
         </spatialrefsys>
       </srs>
       <resourceMetadata>
@@ -7308,7 +7308,7 @@ def my_form_open(dialog, layer, feature):
             <description></description>
             <projectionacronym></projectionacronym>
             <ellipsoidacronym></ellipsoidacronym>
-            
+
           </spatialrefsys>
         </crs>
         <extent/>
@@ -7630,7 +7630,7 @@ def my_form_open(dialog, layer, feature):
           <description></description>
           <projectionacronym></projectionacronym>
           <ellipsoidacronym></ellipsoidacronym>
-          
+
         </spatialrefsys>
       </srs>
       <resourceMetadata>
@@ -7654,7 +7654,7 @@ def my_form_open(dialog, layer, feature):
             <description></description>
             <projectionacronym></projectionacronym>
             <ellipsoidacronym></ellipsoidacronym>
-            
+
           </spatialrefsys>
         </crs>
         <extent/>
@@ -8003,7 +8003,7 @@ def my_form_open(dialog, layer, feature):
           <description></description>
           <projectionacronym></projectionacronym>
           <ellipsoidacronym></ellipsoidacronym>
-          
+
         </spatialrefsys>
       </srs>
       <resourceMetadata>
@@ -8027,7 +8027,7 @@ def my_form_open(dialog, layer, feature):
             <description></description>
             <projectionacronym></projectionacronym>
             <ellipsoidacronym></ellipsoidacronym>
-            
+
           </spatialrefsys>
         </crs>
         <extent/>
@@ -8433,15 +8433,15 @@ def my_form_open(dialog, layer, feature):
       <layername>Connec</layername>
       <srs>
         <spatialrefsys nativeFormat="Wkt">
-          
+
           <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
           <srsid>__SRSID__</srsid>
           <srid>__SRID__</srid>
           <authid>__AUTHID__</authid>
-          
-          
+
+
           <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-          
+
         </spatialrefsys>
       </srs>
       <resourceMetadata>
@@ -8466,15 +8466,15 @@ def my_form_open(dialog, layer, feature):
         <encoding></encoding>
         <crs>
           <spatialrefsys nativeFormat="Wkt">
-            
+
             <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
             <srsid>__SRSID__</srsid>
             <srid>__SRID__</srid>
             <authid>__AUTHID__</authid>
-            
-            
+
+
             <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-            
+
           </spatialrefsys>
         </crs>
         <extent>
@@ -10501,15 +10501,15 @@ def my_form_open(dialog, layer, feature):
       <layername>Dimensioning</layername>
       <srs>
         <spatialrefsys nativeFormat="Wkt">
-          
+
           <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
           <srsid>__SRSID__</srsid>
           <srid>__SRID__</srid>
           <authid>__AUTHID__</authid>
-          
-          
+
+
           <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-          
+
         </spatialrefsys>
       </srs>
       <resourceMetadata>
@@ -10534,15 +10534,15 @@ def my_form_open(dialog, layer, feature):
         <encoding></encoding>
         <crs>
           <spatialrefsys nativeFormat="Wkt">
-            
+
             <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
             <srsid>__SRSID__</srsid>
             <srid>__SRID__</srid>
             <authid>__AUTHID__</authid>
-            
-            
+
+
             <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-            
+
           </spatialrefsys>
         </crs>
         <extent>
@@ -12868,15 +12868,15 @@ def my_form_open(dialog, layer, feature):
       <layername>Drainzone</layername>
       <srs>
         <spatialrefsys nativeFormat="Wkt">
-          
+
           <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
           <srsid>__SRSID__</srsid>
           <srid>__SRID__</srid>
           <authid>__AUTHID__</authid>
-          
-          
+
+
           <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-          
+
         </spatialrefsys>
       </srs>
       <resourceMetadata>
@@ -12892,15 +12892,15 @@ def my_form_open(dialog, layer, feature):
         <encoding></encoding>
         <crs>
           <spatialrefsys nativeFormat="Wkt">
-            
+
             <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
             <srsid>__SRSID__</srsid>
             <srid>__SRID__</srid>
             <authid>__AUTHID__</authid>
-            
-            
+
+
             <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-            
+
           </spatialrefsys>
         </crs>
         <extent/>
@@ -13425,15 +13425,15 @@ def my_form_open(dialog, layer, feature):
       <layername>Dwfzone</layername>
       <srs>
         <spatialrefsys nativeFormat="Wkt">
-          
+
           <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
           <srsid>__SRSID__</srsid>
           <srid>__SRID__</srid>
           <authid>__AUTHID__</authid>
-          
-          
+
+
           <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-          
+
         </spatialrefsys>
       </srs>
       <resourceMetadata>
@@ -13458,15 +13458,15 @@ def my_form_open(dialog, layer, feature):
         <encoding></encoding>
         <crs>
           <spatialrefsys nativeFormat="Wkt">
-            
+
             <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
             <srsid>__SRSID__</srsid>
             <srid>__SRID__</srid>
             <authid>__AUTHID__</authid>
-            
-            
+
+
             <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-            
+
           </spatialrefsys>
         </crs>
         <extent>
@@ -14055,15 +14055,15 @@ def my_form_open(dialog, layer, feature):
       <layername>Element</layername>
       <srs>
         <spatialrefsys nativeFormat="Wkt">
-          
+
           <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
           <srsid>__SRSID__</srsid>
           <srid>__SRID__</srid>
           <authid>__AUTHID__</authid>
-          
-          
+
+
           <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-          
+
         </spatialrefsys>
       </srs>
       <resourceMetadata>
@@ -14088,15 +14088,15 @@ def my_form_open(dialog, layer, feature):
         <encoding></encoding>
         <crs>
           <spatialrefsys nativeFormat="Wkt">
-            
+
             <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
             <srsid>__SRSID__</srsid>
             <srid>__SRID__</srid>
             <authid>__AUTHID__</authid>
-            
-            
+
+
             <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-            
+
           </spatialrefsys>
         </crs>
         <extent>
@@ -15132,15 +15132,15 @@ def my_form_open(dialog, layer, feature):
       <layername>Exploitation</layername>
       <srs>
         <spatialrefsys nativeFormat="Wkt">
-          
+
           <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
           <srsid>__SRSID__</srsid>
           <srid>__SRID__</srid>
           <authid>__AUTHID__</authid>
-          
-          
+
+
           <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-          
+
         </spatialrefsys>
       </srs>
       <resourceMetadata>
@@ -15156,15 +15156,15 @@ def my_form_open(dialog, layer, feature):
         <encoding></encoding>
         <crs>
           <spatialrefsys nativeFormat="Wkt">
-            
+
             <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
             <srsid>__SRSID__</srsid>
             <srid>__SRID__</srid>
             <authid>__AUTHID__</authid>
-            
-            
+
+
             <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-            
+
           </spatialrefsys>
         </crs>
         <extent/>
@@ -15539,22 +15539,22 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer geometry="Line" autoRefreshMode="Disabled" simplifyLocal="1" maxScale="0" simplifyDrawingHints="1" autoRefreshTime="0" type="vector" legendPlaceholderImage="" styleCategories="AllStyleCategories" refreshOnNotifyEnabled="0" wkbType="LineString" labelsEnabled="0" simplifyAlgorithm="0" minScale="100000000" readOnly="0" refreshOnNotifyMessage="" hasScaleBasedVisibilityFlag="0" symbologyReferenceScale="-1" simplifyMaxScale="1" simplifyDrawingTol="1">
       <id>v_edit_flwreg_94b3eebc_b5d5_40ea_be5e_e0d6c9ec2845</id>
-      <datasource> __DATASOURCE__   key='flwreg_id' srid=__SRID__ type=LineString checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_flwreg" (the_geom)</datasource>
+      <datasource> __DATASOURCE__   key='element_id' srid=__SRID__ type=LineString checkPrimaryKeyUnicity='1' table="SCHEMA_NAME"."v_edit_flwreg" (the_geom)</datasource>
       <keywordList>
         <value></value>
       </keywordList>
       <layername>Flow Regulators</layername>
       <srs>
         <spatialrefsys nativeFormat="Wkt">
-          
+
           <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
           <srsid>__SRSID__</srsid>
           <srid>__SRID__</srid>
           <authid>__AUTHID__</authid>
-          
-          
+
+
           <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-          
+
         </spatialrefsys>
       </srs>
       <resourceMetadata>
@@ -15570,15 +15570,15 @@ def my_form_open(dialog, layer, feature):
         <encoding></encoding>
         <crs>
           <spatialrefsys nativeFormat="Wkt">
-            
+
             <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
             <srsid>__SRSID__</srsid>
             <srid>__SRID__</srid>
             <authid>__AUTHID__</authid>
-            
-            
+
+
             <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-            
+
           </spatialrefsys>
         </crs>
         <extent/>
@@ -16822,7 +16822,7 @@ def my_form_open(dialog, layer, feature):
       <legend type="default-vector" showLabelLegend="0"/>
       <referencedLayers/>
       <fieldConfiguration>
-        <field name="flwreg_id" configurationFlags="NoFlag">
+        <field name="element_id" configurationFlags="NoFlag">
           <editWidget type="">
             <config>
               <Option/>
@@ -16937,7 +16937,7 @@ def my_form_open(dialog, layer, feature):
         </field>
       </fieldConfiguration>
       <aliases>
-        <alias name="" field="flwreg_id" index="0"/>
+        <alias name="" field="element_id" index="0"/>
         <alias name="" field="node_id" index="1"/>
         <alias name="order_id" field="order_id" index="2"/>
         <alias name="to_arc" field="to_arc" index="3"/>
@@ -16954,7 +16954,7 @@ def my_form_open(dialog, layer, feature):
         <alias name="" field="observ" index="14"/>
       </aliases>
       <splitPolicies>
-        <policy policy="Duplicate" field="flwreg_id"/>
+        <policy policy="Duplicate" field="element_id"/>
         <policy policy="Duplicate" field="node_id"/>
         <policy policy="Duplicate" field="order_id"/>
         <policy policy="Duplicate" field="to_arc"/>
@@ -16971,7 +16971,7 @@ def my_form_open(dialog, layer, feature):
         <policy policy="Duplicate" field="observ"/>
       </splitPolicies>
       <defaults>
-        <default expression="" applyOnUpdate="0" field="flwreg_id"/>
+        <default expression="" applyOnUpdate="0" field="element_id"/>
         <default expression="" applyOnUpdate="0" field="node_id"/>
         <default expression="" applyOnUpdate="0" field="order_id"/>
         <default expression="" applyOnUpdate="0" field="to_arc"/>
@@ -16988,7 +16988,7 @@ def my_form_open(dialog, layer, feature):
         <default expression="" applyOnUpdate="0" field="observ"/>
       </defaults>
       <constraints>
-        <constraint exp_strength="0" unique_strength="1" constraints="3" field="flwreg_id" notnull_strength="1"/>
+        <constraint exp_strength="0" unique_strength="1" constraints="3" field="element_id" notnull_strength="1"/>
         <constraint exp_strength="0" unique_strength="0" constraints="0" field="node_id" notnull_strength="0"/>
         <constraint exp_strength="0" unique_strength="0" constraints="1" field="order_id" notnull_strength="1"/>
         <constraint exp_strength="0" unique_strength="0" constraints="1" field="to_arc" notnull_strength="1"/>
@@ -17005,7 +17005,7 @@ def my_form_open(dialog, layer, feature):
         <constraint exp_strength="0" unique_strength="0" constraints="0" field="observ" notnull_strength="0"/>
       </constraints>
       <constraintExpressions>
-        <constraint desc="" field="flwreg_id" exp=""/>
+        <constraint desc="" field="element_id" exp=""/>
         <constraint desc="" field="node_id" exp=""/>
         <constraint desc="" field="order_id" exp=""/>
         <constraint desc="" field="to_arc" exp=""/>
@@ -17070,15 +17070,15 @@ def my_form_open(dialog, layer, feature):
       <layername>Gully</layername>
       <srs>
         <spatialrefsys nativeFormat="Wkt">
-          
+
           <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
           <srsid>__SRSID__</srsid>
           <srid>__SRID__</srid>
           <authid>__AUTHID__</authid>
-          
-          
+
+
           <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-          
+
         </spatialrefsys>
       </srs>
       <resourceMetadata>
@@ -17103,15 +17103,15 @@ def my_form_open(dialog, layer, feature):
         <encoding></encoding>
         <crs>
           <spatialrefsys nativeFormat="Wkt">
-            
+
             <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
             <srsid>__SRSID__</srsid>
             <srid>__SRID__</srid>
             <authid>__AUTHID__</authid>
-            
-            
+
+
             <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-            
+
           </spatialrefsys>
         </crs>
         <extent>
@@ -19410,15 +19410,15 @@ def my_form_open(dialog, layer, feature):
       <layername>Link</layername>
       <srs>
         <spatialrefsys nativeFormat="Wkt">
-          
+
           <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
           <srsid>__SRSID__</srsid>
           <srid>__SRID__</srid>
           <authid>__AUTHID__</authid>
-          
-          
+
+
           <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-          
+
         </spatialrefsys>
       </srs>
       <resourceMetadata>
@@ -19443,15 +19443,15 @@ def my_form_open(dialog, layer, feature):
         <encoding></encoding>
         <crs>
           <spatialrefsys nativeFormat="Wkt">
-            
+
             <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
             <srsid>__SRSID__</srsid>
             <srid>__SRID__</srid>
             <authid>__AUTHID__</authid>
-            
-            
+
+
             <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-            
+
           </spatialrefsys>
         </crs>
         <extent>
@@ -20828,15 +20828,15 @@ def my_form_open(dialog, layer, feature):
       <layername>Macrosector</layername>
       <srs>
         <spatialrefsys nativeFormat="Wkt">
-          
+
           <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
           <srsid>__SRSID__</srsid>
           <srid>__SRID__</srid>
           <authid>__AUTHID__</authid>
-          
-          
+
+
           <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-          
+
         </spatialrefsys>
       </srs>
       <resourceMetadata>
@@ -20861,15 +20861,15 @@ def my_form_open(dialog, layer, feature):
         <encoding></encoding>
         <crs>
           <spatialrefsys nativeFormat="Wkt">
-            
+
             <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
             <srsid>__SRSID__</srsid>
             <srid>__SRID__</srid>
             <authid>__AUTHID__</authid>
-            
-            
+
+
             <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-            
+
           </spatialrefsys>
         </crs>
         <extent>
@@ -21342,15 +21342,15 @@ def my_form_open(dialog, layer, feature):
       <layername>Node</layername>
       <srs>
         <spatialrefsys nativeFormat="Wkt">
-          
+
           <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
           <srsid>__SRSID__</srsid>
           <srid>__SRID__</srid>
           <authid>__AUTHID__</authid>
-          
-          
+
+
           <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-          
+
         </spatialrefsys>
       </srs>
       <resourceMetadata>
@@ -21375,15 +21375,15 @@ def my_form_open(dialog, layer, feature):
         <encoding></encoding>
         <crs>
           <spatialrefsys nativeFormat="Wkt">
-            
+
             <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
             <srsid>__SRSID__</srsid>
             <srid>__SRID__</srid>
             <authid>__AUTHID__</authid>
-            
-            
+
+
             <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-            
+
           </spatialrefsys>
         </crs>
         <extent>
@@ -24178,15 +24178,15 @@ def my_form_open(dialog, layer, feature):
       <layername>Sector</layername>
       <srs>
         <spatialrefsys nativeFormat="Wkt">
-          
+
           <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
           <srsid>__SRSID__</srsid>
           <srid>__SRID__</srid>
           <authid>__AUTHID__</authid>
-          
-          
+
+
           <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-          
+
         </spatialrefsys>
       </srs>
       <resourceMetadata>
@@ -24202,15 +24202,15 @@ def my_form_open(dialog, layer, feature):
         <encoding></encoding>
         <crs>
           <spatialrefsys nativeFormat="Wkt">
-            
+
             <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
             <srsid>__SRSID__</srsid>
             <srid>__SRID__</srid>
             <authid>__AUTHID__</authid>
-            
-            
+
+
             <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-            
+
           </spatialrefsys>
         </crs>
         <extent/>
@@ -24746,15 +24746,15 @@ def my_form_open(dialog, layer, feature):
       <layername>Address</layername>
       <srs>
         <spatialrefsys nativeFormat="Wkt">
-          
+
           <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
           <srsid>__SRSID__</srsid>
           <srid>__SRID__</srid>
           <authid>__AUTHID__</authid>
-          
-          
+
+
           <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-          
+
         </spatialrefsys>
       </srs>
       <resourceMetadata>
@@ -24779,15 +24779,15 @@ def my_form_open(dialog, layer, feature):
         <encoding></encoding>
         <crs>
           <spatialrefsys nativeFormat="Wkt">
-            
+
             <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
             <srsid>__SRSID__</srsid>
             <srid>__SRID__</srid>
             <authid>__AUTHID__</authid>
-            
-            
+
+
             <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-            
+
           </spatialrefsys>
         </crs>
         <extent>
@@ -25456,15 +25456,15 @@ def my_form_open(dialog, layer, feature):
       <layername>Municipality</layername>
       <srs>
         <spatialrefsys nativeFormat="Wkt">
-          
+
           <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
           <srsid>__SRSID__</srsid>
           <srid>__SRID__</srid>
           <authid>__AUTHID__</authid>
-          
-          
+
+
           <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-          
+
         </spatialrefsys>
       </srs>
       <resourceMetadata>
@@ -25489,15 +25489,15 @@ def my_form_open(dialog, layer, feature):
         <encoding></encoding>
         <crs>
           <spatialrefsys nativeFormat="Wkt">
-            
+
             <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
             <srsid>__SRSID__</srsid>
             <srid>__SRID__</srid>
             <authid>__AUTHID__</authid>
-            
-            
+
+
             <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-            
+
           </spatialrefsys>
         </crs>
         <extent>
@@ -25919,15 +25919,15 @@ def my_form_open(dialog, layer, feature):
       <layername>Plot</layername>
       <srs>
         <spatialrefsys nativeFormat="Wkt">
-          
+
           <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
           <srsid>__SRSID__</srsid>
           <srid>__SRID__</srid>
           <authid>__AUTHID__</authid>
-          
-          
+
+
           <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-          
+
         </spatialrefsys>
       </srs>
       <resourceMetadata>
@@ -25952,15 +25952,15 @@ def my_form_open(dialog, layer, feature):
         <encoding></encoding>
         <crs>
           <spatialrefsys nativeFormat="Wkt">
-            
+
             <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
             <srsid>__SRSID__</srsid>
             <srid>__SRID__</srid>
             <authid>__AUTHID__</authid>
-            
-            
+
+
             <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-            
+
           </spatialrefsys>
         </crs>
         <extent>
@@ -26540,15 +26540,15 @@ def my_form_open(dialog, layer, feature):
       <layername>Streetaxis</layername>
       <srs>
         <spatialrefsys nativeFormat="Wkt">
-          
+
           <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
           <srsid>__SRSID__</srsid>
           <srid>__SRID__</srid>
           <authid>__AUTHID__</authid>
-          
-          
+
+
           <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-          
+
         </spatialrefsys>
       </srs>
       <resourceMetadata>
@@ -26573,15 +26573,15 @@ def my_form_open(dialog, layer, feature):
         <encoding></encoding>
         <crs>
           <spatialrefsys nativeFormat="Wkt">
-            
+
             <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
             <srsid>__SRSID__</srsid>
             <srid>__SRID__</srid>
             <authid>__AUTHID__</authid>
-            
-            
+
+
             <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-            
+
           </spatialrefsys>
         </crs>
         <extent>
@@ -27264,15 +27264,15 @@ def my_form_open(dialog, layer, feature):
       <layername>Connec polygon</layername>
       <srs>
         <spatialrefsys nativeFormat="Wkt">
-          
+
           <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
           <srsid>__SRSID__</srsid>
           <srid>__SRID__</srid>
           <authid>__AUTHID__</authid>
-          
-          
+
+
           <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-          
+
         </spatialrefsys>
       </srs>
       <resourceMetadata>
@@ -27297,15 +27297,15 @@ def my_form_open(dialog, layer, feature):
         <encoding></encoding>
         <crs>
           <spatialrefsys nativeFormat="Wkt">
-            
+
             <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
             <srsid>__SRSID__</srsid>
             <srid>__SRID__</srid>
             <authid>__AUTHID__</authid>
-            
-            
+
+
             <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-            
+
           </spatialrefsys>
         </crs>
         <extent>
@@ -27747,15 +27747,15 @@ def my_form_open(dialog, layer, feature):
       <layername>Gully polygon</layername>
       <srs>
         <spatialrefsys nativeFormat="Wkt">
-          
+
           <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
           <srsid>__SRSID__</srsid>
           <srid>__SRID__</srid>
           <authid>__AUTHID__</authid>
-          
-          
+
+
           <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-          
+
         </spatialrefsys>
       </srs>
       <resourceMetadata>
@@ -27780,15 +27780,15 @@ def my_form_open(dialog, layer, feature):
         <encoding></encoding>
         <crs>
           <spatialrefsys nativeFormat="Wkt">
-            
+
             <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
             <srsid>__SRSID__</srsid>
             <srid>__SRID__</srid>
             <authid>__AUTHID__</authid>
-            
-            
+
+
             <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-            
+
           </spatialrefsys>
         </crs>
         <extent>
@@ -28239,15 +28239,15 @@ def my_form_open(dialog, layer, feature):
       <layername>Node polygon</layername>
       <srs>
         <spatialrefsys nativeFormat="Wkt">
-          
+
           <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
           <srsid>__SRSID__</srsid>
           <srid>__SRID__</srid>
           <authid>__AUTHID__</authid>
-          
-          
+
+
           <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-          
+
         </spatialrefsys>
       </srs>
       <resourceMetadata>
@@ -28272,15 +28272,15 @@ def my_form_open(dialog, layer, feature):
         <encoding></encoding>
         <crs>
           <spatialrefsys nativeFormat="Wkt">
-            
+
             <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
             <srsid>__SRSID__</srsid>
             <srid>__SRID__</srid>
             <authid>__AUTHID__</authid>
-            
-            
+
+
             <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-            
+
           </spatialrefsys>
         </crs>
         <extent>
@@ -45163,15 +45163,15 @@ def my_form_open(dialog, layer, feature):
     <Scales/>
     <DefaultViewExtent xmax="419776.57615249586524442" ymin="4576500.64353850204497576" xmin="418917.59640500514069572" ymax="4576967.86637273151427507">
       <spatialrefsys nativeFormat="Wkt">
-        
+
         <proj4>+proj=utm +zone=31 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs</proj4>
         <srsid>__SRSID__</srsid>
         <srid>__SRID__</srid>
         <authid>__AUTHID__</authid>
-        
-        
+
+
         <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
-        
+
       </spatialrefsys>
     </DefaultViewExtent>
   </ProjectViewSettings>
@@ -45214,7 +45214,7 @@ def my_form_open(dialog, layer, feature):
     </GeographicCoordinateFormat>
     <CoordinateCustomCrs>
       <spatialrefsys nativeFormat="Wkt">
-        
+
         <proj4>+proj=longlat +datum=WGS84 +no_defs</proj4>
         <srsid>3452</srsid>
         <srid>4326</srid>
