@@ -75,7 +75,7 @@ class Campaign:
         self.dialog.campaign_btn_open.clicked.connect(self.open_campaign)
 
         self.manage_date_filter()
-        tools_gw.open_dialog(self.dialog, dlg_name="campaign_manager")
+        tools_gw.open_dialog(self.dialog, dlg_name="campaign_management")
 
 
     def load_campaign_dialog(self, campaign_id=None, mode="review"):

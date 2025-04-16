@@ -1609,7 +1609,7 @@ class AddNewLot:
         if date_event_to:
             tools_qt.set_calendar(self.dlg_lot_man, self.dlg_lot_man.date_event_to, date_event_to)
 
-        tools_gw.open_dialog(self.dlg_lot_man, dlg_name="visit_management")
+        tools_gw.open_dialog(self.dlg_lot_man, dlg_name="lot_management")
 
 
     def open_work_register(self):

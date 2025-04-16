@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>775</width>
+    <width>835</width>
     <height>669</height>
    </rect>
   </property>
@@ -23,14 +23,14 @@
       <item>
        <layout class="QGridLayout" name="gridLayout_2">
         <item row="0" column="0">
-         <widget class="QLabel" name="lbl_filter">
+         <widget class="QLabel" name="lbl_serie">
           <property name="text">
            <string>Serie:</string>
           </property>
          </widget>
         </item>
         <item row="0" column="3">
-         <widget class="QLabel" name="label_3">
+         <widget class="QLabel" name="lbl_state">
           <property name="text">
            <string>Estat:</string>
           </property>
@@ -66,7 +66,7 @@
          </widget>
         </item>
         <item row="0" column="2">
-         <widget class="QLabel" name="label_2">
+         <widget class="QLabel" name="lbl_address">
           <property name="text">
            <string>Adreça:</string>
           </property>
@@ -80,7 +80,7 @@
          </widget>
         </item>
         <item row="0" column="1">
-         <widget class="QLabel" name="label">
+         <widget class="QLabel" name="lbl_performance_type">
           <property name="text">
            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Tipus d'actuació:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
@@ -94,7 +94,7 @@
          </widget>
         </item>
         <item row="3" column="0">
-         <widget class="QLabel" name="label_4">
+         <widget class="QLabel" name="lbl_column_filter">
           <property name="text">
            <string>Columna filtre dates:</string>
           </property>
@@ -137,7 +137,7 @@
         <item>
          <layout class="QGridLayout" name="gridLayout">
           <item row="0" column="0">
-           <widget class="QLabel" name="label_data_event_from">
+           <widget class="QLabel" name="lbl_data_event_from">
             <property name="font">
              <font>
               <pointsize>8</pointsize>
@@ -185,7 +185,7 @@
         <item>
          <layout class="QVBoxLayout" name="verticalLayout_2">
           <item>
-           <widget class="QLabel" name="label_data_event_to">
+           <widget class="QLabel" name="lbl_data_event_to">
             <property name="font">
              <font>
               <pointsize>8</pointsize>

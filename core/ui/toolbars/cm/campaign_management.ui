@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>lot_management</class>
- <widget class="QDialog" name="lot_management">
+ <class>campaign_management</class>
+ <widget class="QDialog" name="campaign_management">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>839</width>
-    <height>678</height>
+    <width>835</width>
+    <height>669</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -23,7 +23,7 @@
       <item>
        <layout class="QGridLayout" name="gridLayout_2">
         <item row="3" column="0">
-         <widget class="QLabel" name="label_4">
+         <widget class="QLabel" name="lbl_column_filter_dates">
           <property name="text">
            <string>Columna filtre dates:</string>
           </property>
@@ -59,7 +59,7 @@
          <widget class="QComboBox" name="campaign_cmb_date_filter_type"/>
         </item>
         <item row="1" column="0">
-         <widget class="QLabel" name="label_3">
+         <widget class="QLabel" name="lbl_state">
           <property name="text">
            <string>Estat:</string>
           </property>
@@ -79,7 +79,7 @@
         <item>
          <layout class="QGridLayout" name="gridLayout">
           <item row="0" column="0">
-           <widget class="QLabel" name="label_data_event_from">
+           <widget class="QLabel" name="lbl_data_event_from">
             <property name="font">
              <font>
               <pointsize>8</pointsize>
@@ -127,7 +127,7 @@
         <item>
          <layout class="QVBoxLayout" name="verticalLayout_2">
           <item>
-           <widget class="QLabel" name="label_data_event_to">
+           <widget class="QLabel" name="lbl_data_event_to">
             <property name="font">
              <font>
               <pointsize>8</pointsize>
