@@ -641,6 +641,7 @@ class GwDscenarioManagerButton(GwAction):
         tools_gw.add_icon(self.dlg_dscenario.btn_delete, "112")
         tools_gw.add_icon(self.dlg_dscenario.btn_toc, "164")
         tools_gw.add_icon(self.dlg_dscenario.btn_snapping, "137")
+        tools_gw.add_icon(self.dlg_dscenario.btn_expr_select, "178")
 
         default_tab_idx = 0
         # Select all dscenario views
@@ -669,6 +670,7 @@ class GwDscenarioManagerButton(GwAction):
         self.dlg_dscenario.btn_insert.clicked.connect(partial(self._manage_insert))
         self.dlg_dscenario.btn_delete.clicked.connect(partial(self._manage_delete))
         self.dlg_dscenario.btn_snapping.toggled.connect(partial(self._manage_btn_snapping))
+        self.dlg_dscenario.btn_expr_select.clicked.connect(partial(self._select_with_expression_dialog))
         self.dlg_dscenario.main_tab.currentChanged.connect(partial(self._manage_current_changed))
         self.dlg_dscenario.btn_accept.clicked.connect(self.dlg_dscenario.accept)
         self.dlg_dscenario.btn_close.clicked.connect(self.dlg_dscenario.reject)
@@ -872,10 +874,12 @@ class GwDscenarioManagerButton(GwAction):
         tools_qt.set_widget_enabled(self.dlg_dscenario, 'btn_insert', enable)
         tools_qt.set_widget_enabled(self.dlg_dscenario, 'btn_delete', enable)
         tools_qt.set_widget_enabled(self.dlg_dscenario, 'btn_snapping', enable)
+        tools_qt.set_widget_enabled(self.dlg_dscenario, 'btn_expr_select', enable)
 
         if tableview.objectName() in ("inp_dscenario_controls", "inp_dscenario_rules"):
             tools_qt.set_widget_enabled(self.dlg_dscenario, 'txt_feature_id', False)
             tools_qt.set_widget_enabled(self.dlg_dscenario, 'btn_snapping', False)
+            tools_qt.set_widget_enabled(self.dlg_dscenario, 'btn_expr_select', False)
 
     def _manage_feature_type(self):
         """ Manages current tableview feature type (node, arc, nodarc, etc.) """
@@ -1342,6 +1346,37 @@ class GwDscenarioManagerButton(GwAction):
         tools_gw.remove_selection()
         tools_gw.reset_rubberband(self.rubber_band)
         self.iface.actionPan().trigger()
+
+    def _select_with_expression_dialog(self):
+        """Select features by expression for dscenario"""
+
+        # Get current layer and feature type
+        self._manage_feature_type()
+        view_name = self.dlg_dscenario.main_tab.currentWidget().objectName()
+        layer_name = 'v_edit_' + self.feature_type
+
+        if view_name != 'inp_dscenario_demand':
+            if self.feature_type == 'nodarc':
+                layer_name = view_name.replace("dscenario_", "")
+
+        # Get the layer
+        layer = tools_qgis.get_layer_by_tablename(layer_name)
+        if not layer:
+            return
+
+        # Set active layer
+        self.iface.setActiveLayer(layer)
+        tools_qgis.set_layer_visible(layer)
+
+        # Show expression dialog
+        tools_gw.select_with_expression_dialog_custom(
+            self,
+            self.dlg_dscenario,
+            self.dlg_dscenario.main_tab.currentWidget(),
+            layer_name,
+            self._selection_init,
+            self._selection_end
+        )
 
     def _build_generic_info(self, dlg_title, result, tablename, field_id, force_action=None):
         # Build dlg

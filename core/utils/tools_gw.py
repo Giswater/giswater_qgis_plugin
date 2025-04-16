@@ -30,13 +30,13 @@ from qgis.PyQt.QtGui import QCursor, QPixmap, QColor, QFontMetrics, QStandardIte
 from qgis.PyQt.QtSql import QSqlTableModel
 from qgis.PyQt.QtWidgets import QSpacerItem, QSizePolicy, QLineEdit, QLabel, QComboBox, QGridLayout, QTabWidget, \
     QCompleter, QPushButton, QTableView, QFrame, QCheckBox, QDoubleSpinBox, QSpinBox, QDateEdit, QTextEdit, \
-    QToolButton, QWidget, QApplication, QDockWidget, QMenu, QAction, QAbstractItemView
+    QToolButton, QWidget, QApplication, QDockWidget, QMenu, QAction, QAbstractItemView, QVBoxLayout, QDialog, QDialogButtonBox
 from qgis.core import Qgis, QgsProject, QgsPointXY, QgsVectorLayer, QgsField, QgsFeature, QgsSymbol, \
     QgsFeatureRequest, QgsSimpleFillSymbolLayer, QgsRendererCategory, QgsCategorizedSymbolRenderer, QgsPointLocator, \
     QgsSnappingConfig, QgsCoordinateTransform, QgsCoordinateReferenceSystem, QgsApplication, QgsVectorFileWriter, \
     QgsCoordinateTransformContext, QgsFieldConstraints, QgsEditorWidgetSetup, QgsRasterLayer, QgsDataSourceUri, \
     QgsProviderRegistry, QgsMapLayerStyle, QgsGeometry, QgsWkbTypes
-from qgis.gui import QgsDateTimeEdit, QgsRubberBand, QgsExpressionSelectionDialog
+from qgis.gui import QgsDateTimeEdit, QgsRubberBand, QgsExpressionSelectionDialog, QgsExpressionBuilderDialog
 
 from ..models.cat_feature import GwCatFeature
 from ..ui.dialog import GwDialog
@@ -3236,9 +3236,21 @@ def select_with_expression_dialog(class_object, dialog, table_object):
     # Connect the signal selection changed
     connect_signal_selection_changed(class_object, dialog, table_object, GwSelectionMode.EXPRESSION)
     # Show the expression dialog
-    show_expression_dialog(class_object, dialog, table_object)
+    show_expression_dialog(class_object.feature_type, dialog, table_object)
     # Disconnect the signal selection changed
     tools_qgis.disconnect_signal_selection_changed()
+
+
+def select_with_expression_dialog_custom(class_object, dialog, table_object, layer_name, activation_function, deactivation_function):
+    """Select features by expression with custom activation and deactivation functions"""
+
+    # Execute activation function
+    activation_function()
+
+    # Show dialog
+    if show_expression_dialog(class_object.feature_type, dialog, table_object) in (QDialog.Accepted, QDialog.Rejected):
+        # Execute deactivation function
+        deactivation_function()
 
 
 def selection_changed(class_object, dialog, table_object, selection_mode: GwSelectionMode = GwSelectionMode.DEFAULT, lazy_widget=None, lazy_init_function=None):
@@ -3380,16 +3392,16 @@ def set_model_signals(class_object):
         ))
 
 
-def show_expression_dialog(class_object, dialog, table_object):
+def show_expression_dialog(feature_type, dialog, table_object):
     """ Show expression builder dialog """
 
     # Open a dialog with a QgsExpressionBuilderWidget in it
-    tablename = f"v_edit_{class_object.feature_type}"
+    tablename = f"v_edit_{feature_type}"
     layer = tools_qgis.get_layer_by_tablename(tablename)
-    start_text = f"{class_object.feature_type}_id"
+    start_text = f"{feature_type}_id"
     print(layer)
     dlg = QgsExpressionSelectionDialog(layer, start_text, dialog)
-    dlg.exec_()
+    return dlg.exec_()
 
 
 def insert_feature(class_object, dialog, table_object, selection_mode: GwSelectionMode = GwSelectionMode.DEFAULT, remove_ids=True, lazy_widget=None,
