@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>278</width>
-    <height>174</height>
+    <height>208</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,21 +20,21 @@
       <widget class="QComboBox" name="cmb_active"/>
      </item>
      <item row="1" column="0">
-      <widget class="QLabel" name="label_2">
+      <widget class="QLabel" name="lbl_descript">
        <property name="text">
         <string>Descripció:</string>
        </property>
       </widget>
      </item>
      <item row="2" column="0">
-      <widget class="QLabel" name="label_3">
+      <widget class="QLabel" name="lbl_active">
        <property name="text">
         <string>Actiu:</string>
        </property>
       </widget>
      </item>
      <item row="0" column="0">
-      <widget class="QLabel" name="label">
+      <widget class="QLabel" name="lbl_name">
        <property name="text">
         <string>Nom equip:</string>
        </property>

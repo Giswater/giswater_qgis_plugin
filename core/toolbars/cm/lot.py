@@ -327,7 +327,7 @@ class AddNewLot:
         values = [[0, "False"], [1, "True"]]
         tools_qt.fill_combo_values(self.dlg_create_team.cmb_active, values, 1)
 
-        tools_gw.open_dialog(self.dlg_create_team)
+        tools_gw.open_dialog(self.dlg_create_team, "team_create")
 
 
     def save_team(self):
@@ -386,7 +386,7 @@ class AddNewLot:
 
         self.dlg_basic_table.btn_add_row.setVisible(False)
 
-        tools_gw.open_dialog(self.dlg_basic_table)
+        tools_gw.open_dialog(self.dlg_basic_table, 'dialog_table')
 
 
     def populate_cmb_team(self):
@@ -1658,7 +1658,7 @@ class AddNewLot:
 
         # Open form
         self.dlg_work_register.setWindowFlags(Qt.WindowStaysOnTopHint)
-        self.dlg_work_register.show()
+        tools_gw.open_dialog(self.dlg_work_register, dlg_name="work_management")
 
 
     def accept_work_register(self, widget):
@@ -1733,7 +1733,7 @@ class AddNewLot:
         self.dlg_lot_sel.btn_unselect.clicked.connect(partial(self.set_visible_lot_layers, True))
 
         # Open dialog
-        tools_gw.open_dialog(self.dlg_lot_sel)
+        tools_gw.open_dialog(self.dlg_lot_sel, "lot_selector")
 
 
     def populate_LotSelectorUi(self, dialog, tableleft, tableright, field_id_left, field_id_right, hide_left, hide_right):
@@ -2205,7 +2205,7 @@ class AddNewLot:
         self.dlg_resources_man.rejected.connect(partial(tools_gw.save_settings, self.dlg_resources_man))
 
         # Open form
-        tools_gw.open_dialog(self.dlg_resources_man)
+        tools_gw.open_dialog(self.dlg_resources_man, "resources_management")
 
 
     def populate_team_views(self):
@@ -2269,7 +2269,7 @@ class AddNewLot:
                                      "btn_visitclass_unselect", 'idval AS "Classe visita", descript AS "Descripcio"',
                                      'idval AS "Classe visita", descript AS "Descripcio"')
         # Open forms
-        tools_gw.open_dialog(self.dlg_team_man)
+        tools_gw.open_dialog(self.dlg_team_man, "team_management")
 
 
     def populate_team_selectors(self, dialog, tableleft, tableright, field_id_left, field_id_right, alias,

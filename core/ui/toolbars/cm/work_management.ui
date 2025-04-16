@@ -52,7 +52,7 @@
      <item>
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
-        <widget class="QLabel" name="lbl_user_filter">
+        <widget class="QLabel" name="lbl_team">
          <property name="text">
           <string>Equip:</string>
          </property>
@@ -73,7 +73,7 @@
      <item>
       <layout class="QVBoxLayout" name="verticalLayout_9">
        <item>
-        <widget class="QLabel" name="label_data_event_from">
+        <widget class="QLabel" name="lbl_from">
          <property name="text">
           <string>Des de:</string>
          </property>
@@ -91,7 +91,7 @@
      <item>
       <layout class="QVBoxLayout" name="verticalLayout_10">
        <item>
-        <widget class="QLabel" name="label_data_event_to">
+        <widget class="QLabel" name="lbl_to">
          <property name="text">
           <string>Fins:</string>
          </property>

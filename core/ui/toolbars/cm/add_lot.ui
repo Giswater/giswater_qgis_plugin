@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>470</width>
+    <width>474</width>
     <height>792</height>
    </rect>
   </property>
@@ -46,14 +46,14 @@
                 <widget class="QLineEdit" name="txt_ot_type"/>
                </item>
                <item row="1" column="0">
-                <widget class="QLabel" name="label_6">
+                <widget class="QLabel" name="lbl_ot_type">
                  <property name="text">
                   <string>Tipus d'OT:</string>
                  </property>
                 </widget>
                </item>
                <item row="2" column="0">
-                <widget class="QLabel" name="label_8">
+                <widget class="QLabel" name="lbl_performance_type">
                  <property name="text">
                   <string>Tipus d'actuacio:</string>
                  </property>
@@ -76,14 +76,14 @@
                 <widget class="QLineEdit" name="txt_ot_address"/>
                </item>
                <item row="0" column="0">
-                <widget class="QLabel" name="label_5">
+                <widget class="QLabel" name="lbl_ot">
                  <property name="text">
                   <string>OT:</string>
                  </property>
                 </widget>
                </item>
                <item row="3" column="0">
-                <widget class="QLabel" name="label_7">
+                <widget class="QLabel" name="lbl_address">
                  <property name="text">
                   <string>Adreça:</string>
                  </property>
@@ -93,7 +93,7 @@
                 <widget class="QLineEdit" name="txt_wotype_id"/>
                </item>
                <item row="4" column="0">
-                <widget class="QLabel" name="label_9">
+                <widget class="QLabel" name="lbl_observations">
                  <property name="text">
                   <string>Observacions:</string>
                  </property>
@@ -116,7 +116,7 @@
              <item row="8" column="0">
               <layout class="QGridLayout" name="gridLayout_5">
                <item row="5" column="0">
-                <widget class="QLabel" name="label_node_type_5">
+                <widget class="QLabel" name="lbl_user">
                  <property name="font">
                   <font>
                    <pointsize>8</pointsize>
@@ -171,7 +171,7 @@
                 </widget>
                </item>
                <item row="4" column="0">
-                <widget class="QLabel" name="label_4">
+                <widget class="QLabel" name="lbl_real_end">
                  <property name="text">
                   <string>Fi real:</string>
                  </property>
@@ -191,7 +191,7 @@
                 <widget class="QLineEdit" name="enddate"/>
                </item>
                <item row="1" column="0">
-                <widget class="QLabel" name="label_node_type_3">
+                <widget class="QLabel" name="lbl_plan_start">
                  <property name="minimumSize">
                   <size>
                    <width>80</width>
@@ -235,7 +235,7 @@
                 </widget>
                </item>
                <item row="7" column="0">
-                <widget class="QLabel" name="label_2">
+                <widget class="QLabel" name="lbl_state">
                  <property name="text">
                   <string>Estat:</string>
                  </property>
@@ -262,7 +262,7 @@
                 </widget>
                </item>
                <item row="2" column="0">
-                <widget class="QLabel" name="label_node_type_2">
+                <widget class="QLabel" name="lbl_plan_end">
                  <property name="minimumSize">
                   <size>
                    <width>80</width>
@@ -306,7 +306,7 @@
                 </widget>
                </item>
                <item row="0" column="0">
-                <widget class="QLabel" name="label_node_type">
+                <widget class="QLabel" name="lbl_id">
                  <property name="font">
                   <font>
                    <pointsize>8</pointsize>
@@ -338,7 +338,7 @@
                 </widget>
                </item>
                <item row="6" column="0">
-                <widget class="QLabel" name="label">
+                <widget class="QLabel" name="lbl_team">
                  <property name="maximumSize">
                   <size>
                    <width>16777215</width>
@@ -357,7 +357,7 @@
                 <widget class="QLineEdit" name="startdate"/>
                </item>
                <item row="3" column="0">
-                <widget class="QLabel" name="label_3">
+                <widget class="QLabel" name="lbl_real_start">
                  <property name="text">
                   <string>Inici real:</string>
                  </property>
@@ -384,7 +384,7 @@
                 </widget>
                </item>
                <item row="8" column="0">
-                <widget class="QLabel" name="label_flexunion_code_5">
+                <widget class="QLabel" name="lbl_description">
                  <property name="font">
                   <font>
                    <pointsize>8</pointsize>
