@@ -146,8 +146,7 @@ class GwDimensioning:
         tools_qt.hide_void_groupbox(self.dlg_dim)
         self.iface.actionPan().trigger()
 
-        title = f"DIMENSIONING - {self.fid}"
-        tools_gw.open_dialog(self.dlg_dim, dlg_name='dimensioning', title=title)
+        tools_gw.open_dialog(self.dlg_dim, dlg_name='dimensioning')
         return False, False
 
     # region private functions

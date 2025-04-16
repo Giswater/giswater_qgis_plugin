@@ -65,7 +65,7 @@ class GwMincutTools:
         self.load_connections(self.complet_result)
 
         self.tbl_mincut_edit = self.dlg_mincut_man.findChild(QTableView, "tab_none_tbl_mincut_edit")
-        tools_gw.open_dialog(self.dlg_mincut_man, dlg_name='mincut_manager_dinamic')
+        tools_gw.open_dialog(self.dlg_mincut_man, dlg_name='mincut_manager')
 
         # Populate custom context menu
         self.tbl_mincut_edit.setContextMenuPolicy(Qt.CustomContextMenu)

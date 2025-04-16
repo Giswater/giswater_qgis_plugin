@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>314</width>
-    <height>206</height>
+    <height>237</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -67,7 +67,7 @@
        <item row="3" column="0">
         <layout class="QHBoxLayout" name="horizontalLayout">
          <item>
-          <widget class="QLabel" name="label_workcat_id_end">
+          <widget class="QLabel" name="lbl_workcat_id_end">
            <property name="font">
             <font>
              <pointsize>8</pointsize>
@@ -133,7 +133,7 @@
           <number>6</number>
          </property>
          <item>
-          <widget class="QLabel" name="label_statetype">
+          <widget class="QLabel" name="lbl_statetype">
            <property name="text">
             <string>State type:</string>
            </property>
@@ -170,7 +170,7 @@
        <item row="1" column="0">
         <layout class="QHBoxLayout" name="horizontalLayout_4">
          <item>
-          <widget class="QLabel" name="label_nodeaction">
+          <widget class="QLabel" name="lbl_nodeaction">
            <property name="text">
             <string>Node action:</string>
            </property>
@@ -207,7 +207,7 @@
        <item row="2" column="0">
         <layout class="QHBoxLayout" name="horizontalLayout_2">
          <item>
-          <widget class="QLabel" name="label_enddate">
+          <widget class="QLabel" name="lbl_enddate">
            <property name="font">
             <font>
              <pointsize>8</pointsize>

@@ -61,7 +61,7 @@
        <item row="0" column="0">
         <layout class="QHBoxLayout" name="horizontalLayout">
          <item>
-          <widget class="QGroupBox" name="groupBox">
+          <widget class="QGroupBox" name="grb_end_parameters">
            <property name="title">
             <string>End parameters</string>
            </property>
@@ -195,7 +195,7 @@
        <item row="1" column="0">
         <layout class="QHBoxLayout" name="horizontalLayout_2">
          <item>
-          <widget class="QGroupBox" name="groupBox_2">
+          <widget class="QGroupBox" name="grb_feature_parameters">
            <property name="title">
             <string>Feature parameters</string>
            </property>

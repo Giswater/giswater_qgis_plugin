@@ -13,7 +13,7 @@ from qgis.PyQt.QtWidgets import QAction, QMenu
 from .print.fastprint import GwFastprint
 from .print.massive_composer import GwMassiveComposer
 from ..dialog import GwAction
-
+from ....libs import tools_qt
 
 class GwPrintButton(GwAction):
     """ Button 65: Print """
@@ -63,7 +63,7 @@ class GwPrintButton(GwAction):
         for button in buttons:
             button_name = button[0]
             button_function = button[1]
-            obj_action = QAction(str(button_name), action_group)
+            obj_action = QAction(str(tools_qt.tr(button_name)), action_group)
             obj_action.setObjectName(button_name)
             obj_action.setProperty('action_group', action_group)
             self.menu.addAction(obj_action)
