@@ -75,7 +75,7 @@ CREATE TABLE cat_pschema
   pschema_id integer,
   name text,
   observ text,
-  CONSTRAINT project_pkey PRIMARY KEY (pschema_id)
+  CONSTRAINT cat_pschema_pkey PRIMARY KEY (pschema_id)
 );
 
 
@@ -139,19 +139,18 @@ CREATE TABLE om_reviewclass
 (
   id serial NOT NULL, 
   idval text,
+  pschema_id text,
   descript text,
   active boolean DEFAULT true,
   CONSTRAINT om_reviewclass_pkey PRIMARY KEY (id)
 );
 
-CREATE TABLE om_reviewclass_x_layer
+CREATE TABLE om_reviewclass_x_object
 (
   reviewclass_id integer NOT NULL, -- fk om_reviewclass
-  layer_id text NOT NULL,
-  schemaname text,
-  feature_type text,
+  object_id text NOT NULL,
   active boolean DEFAULT true,
-  CONSTRAINT om_reviewclass_x_layer_pkey PRIMARY KEY (schemaname, reviewclass_id, layer_id)
+  CONSTRAINT om_reviewclass_x_object_pkey PRIMARY KEY (reviewclass_id, object_id)
 );
 
 
@@ -159,9 +158,9 @@ CREATE TABLE om_visitclass
 (
   id serial NOT NULL,
   idval text,
+  pschema_id text,
   descript text,
   feature_type text,
-  layer_id text NOT NULL,
   active boolean DEFAULT true,
   CONSTRAINT om_visitclass_pkey PRIMARY KEY (id)
 );
@@ -171,7 +170,6 @@ CREATE TABLE om_visitclass
 CREATE TABLE om_campaign
 (
   id serial NOT NULL,
-  pschema_id integer,
   startdate date DEFAULT now(),
   enddate date,
   real_startdate date,
@@ -194,7 +192,7 @@ CREATE TABLE om_campaign_visit
 (
   campaign_id integer NOT NULL,-- fk om_campaign
   visitclass_id integer, -- fk om_visitclass
-  CONSTRAINT om_campaign_visit_pkey PRIMARY KEY (campaign_id, visitclass_id)
+  CONSTRAINT om_campaign_visit_pkey PRIMARY KEY (campaign_id)
 );
 
 
@@ -202,7 +200,7 @@ CREATE TABLE om_campaign_review
 (
   campaign_id integer NOT NULL, -- fk om_campaign
   reviewclass_id integer, -- fk om_reviewclass
-  CONSTRAINT om_campaign_review_pkey PRIMARY KEY (campaign_id, reviewclass_id)
+  CONSTRAINT om_campaign_review_pkey PRIMARY KEY (campaign_id)
 );
 
 
@@ -212,7 +210,8 @@ CREATE TABLE om_campaign_x_arc
   arc_id character varying(16) NOT NULL, -- fk arc
   code character varying(30),
   status integer,
-  observ text,
+  admin_observ text,
+  org_observ text,
   CONSTRAINT om_campaign_x_arc_pkey PRIMARY KEY (campaign_id, arc_id)
 );
 
@@ -222,7 +221,8 @@ CREATE TABLE om_campaign_x_connec
   connec_id character varying(16) NOT NULL, -- fk connec
   code character varying(30),
   status integer,
-  observ text,
+  admin_observ text,
+  org_observ text,
   CONSTRAINT om_campaign_x_connec_pkey PRIMARY KEY (campaign_id, connec_id)
 );
 
@@ -233,7 +233,8 @@ CREATE TABLE om_campaign_x_link
   link_id integer NOT NULL, -- fk link
   code character varying(30),
   status integer,
-  observ text,
+  admin_observ text,
+  org_observ text,
   CONSTRAINT om_lot_x_link_pkey PRIMARY KEY (campaign_id, link_id)
 );
 
@@ -244,7 +245,8 @@ CREATE TABLE om_campaign_x_node
   node_id character varying(16) NOT NULL, -- fk node
   code character varying(30),
   status integer,
-  observ text,
+  admin_observ text,
+  org_observ text,
   CONSTRAINT om_campaign_x_node_pkey PRIMARY KEY (campaign_id, node_id)
 );
 
@@ -254,7 +256,8 @@ CREATE TABLE om_campaign_x_gully
   gully_id character varying(16) NOT NULL, -- fk gully
   code character varying(30),
   status integer,
-  observ text,
+  admin_observ text,
+  org_observ text,
   CONSTRAINT oom_campaign_x_gully_pkey PRIMARY KEY (campaign_id, gully_id)
 );
 
@@ -286,7 +289,13 @@ CREATE TABLE om_campaign_lot_x_arc
   arc_id character varying(16) NOT NULL, -- fk arc
   code character varying(30),
   status integer,
-  observ text,
+  org_observ text,
+  team_observ text,
+  update_at timestamp,
+  update_by text,
+  update_count integer,
+  update_log json, 	
+  update_quality integer,
   CONSTRAINT om_campaign_lot_x_arc_pkey PRIMARY KEY (lot_id, arc_id)
 );
 
@@ -296,7 +305,13 @@ CREATE TABLE om_campaign_lot_x_connec
   connec_id character varying(16) NOT NULL, -- fk connec
   code character varying(30),
   status integer,
-  observ text,
+  org_observ text,
+  team_observ text,
+  update_at timestamp,
+  update_by text,
+  update_count integer,
+  update_log json, 	
+  update_quality integer,
   CONSTRAINT om_campaign_lot_x_connec_pkey PRIMARY KEY (lot_id, connec_id)
 );
 
@@ -307,7 +322,13 @@ CREATE TABLE om_campaign_lot_x_link
   link_id integer NOT NULL, -- fk link
   code character varying(30),
   status integer,
-  observ text,
+  org_observ text,
+  team_observ text,
+  update_at timestamp,
+  update_by text,
+  update_count integer,
+  update_log json, 	
+  update_quality integer,
   CONSTRAINT om_campaign_lot_x_link_pkey PRIMARY KEY (lot_id, link_id)
 );
 
@@ -318,7 +339,13 @@ CREATE TABLE om_campaign_lot_x_node
   node_id character varying(16) NOT NULL, -- fk node
   code character varying(30),
   status integer,
-  observ text,
+  org_observ text,
+  team_observ text,
+  update_at timestamp,
+  update_by text,
+  update_count integer,
+  update_log json, 	
+  update_quality integer,
   CONSTRAINT om_campaign_lot_x_node_pkey PRIMARY KEY (lot_id, node_id)
 );
 
@@ -328,7 +355,13 @@ CREATE TABLE om_campaign_lot_x_gully
   connec_id character varying(16) NOT NULL, -- fk connec
   code character varying(30),
   status integer,
-  observ text,
+  org_observ text,
+  team_observ text,
+  update_at timestamp,
+  update_by text,
+  update_count integer,
+  update_log json, 
+  update_quality integer,
   CONSTRAINT om_campaign_lot_x_gully_pkey PRIMARY KEY (lot_id, connec_id)
 );
 
@@ -361,6 +394,22 @@ CREATE TABLE workorder
   cost numeric,
   ct text,
   CONSTRAINT workorder_pkey PRIMARY KEY (workorder_id)
+);
+
+
+CREATE TABLE campaign_x_organitzaton
+(
+  campaign_id integer, -- fk om_campaign
+  organitzation_id integer, --fk om_organitzation
+  CONSTRAINT campaign_x_organitzaton_pkey PRIMARY KEY (campaign_id, organitzation_id)
+);
+
+
+CREATE TABLE lot_x_team
+(
+  lot_id integer, -- fk lot
+  team_id integer, -- fk team
+  CONSTRAINT lot_x_team_pkey PRIMARY KEY (lot_id, team_id)
 );
 
 

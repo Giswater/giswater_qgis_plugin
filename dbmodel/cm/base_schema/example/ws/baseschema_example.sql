@@ -48,18 +48,3 @@ INSERT INTO cat_user (user_id, loginname, code, "name", descript, team_id, activ
 -- Team: o2 field 2
 INSERT INTO cat_user (user_id, loginname, code, "name", descript, team_id, active) VALUES('carla', 'carla.o2f2@gmail.com', '84023910S', 'carla gil torras', 'o2 field 2', 7, true);
 INSERT INTO cat_user (user_id, loginname, code, "name", descript, team_id, active) VALUES('raul', 'raul.o2f2@gmail.com', '92034185M', 'raul bueno soler', 'o2 field 2', 7, true);
-
-INSERT INTO om_reviewclass (id, idval, descript, active) VALUES(1, 'DEPOSITOS', 'TEST INSERT', true);
-INSERT INTO om_reviewclass (id, idval, descript, active) VALUES(2, 'VALVULAS HIDRAULICAS', 'TEST INSERT', true);
-INSERT INTO om_reviewclass (id, idval, descript, active) VALUES(3, 'CAPAS PADRE', 'TEST INSERT', true);
-
-INSERT INTO om_reviewclass_x_layer (reviewclass_id, layer_id, schemaname, feature_type, active) VALUES(1, 've_node_tank', 'parent', 'NODE', true);
-
-INSERT INTO om_reviewclass_x_layer (reviewclass_id, layer_id, schemaname, feature_type, active) VALUES(2, 've_node_pr_susta_valve', 'parent', 'NODE', true);
-INSERT INTO om_reviewclass_x_layer (reviewclass_id, layer_id, schemaname, feature_type, active) VALUES(2, 've_node_pr_break_valve', 'parent', 'NODE', true);
-INSERT INTO om_reviewclass_x_layer (reviewclass_id, layer_id, schemaname, feature_type, active) VALUES(2, 've_node_pr_reduc_valve', 'parent', 'NODE', true);
-
-INSERT INTO om_reviewclass_x_layer (reviewclass_id, layer_id, schemaname, feature_type, active) VALUES(3, 'v_edit_node', 'parent', 'NODE', true);
-INSERT INTO om_reviewclass_x_layer (reviewclass_id, layer_id, schemaname, feature_type, active) VALUES(3, 'v_edit_arc', 'parent', 'ARC', true);
-INSERT INTO om_reviewclass_x_layer (reviewclass_id, layer_id, schemaname, feature_type, active) VALUES(3, 'v_edit_connec', 'parent', 'CONNEC', true);
-INSERT INTO om_reviewclass_x_layer (reviewclass_id, layer_id, schemaname, feature_type, active) VALUES(3, 'v_edit_link', 'parent', 'LINK', true);
