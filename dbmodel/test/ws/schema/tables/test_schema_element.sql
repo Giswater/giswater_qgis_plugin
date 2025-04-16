@@ -23,7 +23,7 @@ SELECT columns_are(
         'observ', 'comment', 'function_type', 'category_type', 'fluid_type', 'location_type', 'workcat_id',
         'workcat_id_end', 'builtdate', 'enddate', 'ownercat_id', 'rotation', 'link', 'verified',
         'label_x', 'label_y', 'label_rotation', 'undelete', 'publish', 'inventory', 'expl_id', 'feature_type',
-        'pol_id', 'top_elev', 'expl_id2', 'trace_featuregeom',
+        'pol_id', 'top_elev', 'expl_id2', 'trace_featuregeom', 'geometry_type',
         'muni_id', 'sector_id', 'brand_id', 'model_id', 'asset_id', 'datasource', 'lock_level',
         'the_geom', 'created_at', 'created_by', 'updated_at', 'updated_by'
     ],
@@ -75,6 +75,7 @@ SELECT col_type_is('element', 'asset_id', 'varchar(50)', 'Column asset_id should
 SELECT col_type_is('element', 'datasource', 'integer', 'Column datasource should be integer');
 SELECT col_type_is('element', 'lock_level', 'integer', 'Column lock_level should be integer');
 SELECT col_type_is('element', 'the_geom', 'geometry(geometry, SRID_VALUE)', 'Column the_geom should be geometry(geometry, SRID_VALUE)');
+SELECT col_type_is('element', 'geometry_type', 'text', 'Column geometry_type should be text');
 SELECT col_type_is('element', 'created_at', 'timestamp with time zone', 'Column created_at should be timestamp with time zone');
 SELECT col_type_is('element', 'updated_at', 'timestamp with time zone', 'Column updated_at should be timestamp with time zone');
 SELECT col_type_is('element', 'updated_by', 'varchar(50)', 'Column updated_by should be varchar(50)');
