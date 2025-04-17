@@ -284,9 +284,10 @@ def add_btn_help(dlg):
     if tools_qt.get_widget(dlg, 'btn_help') is not None:
         return
 
-    btn_help = QPushButton("Help")
+    btn_help_translation = tools_qt.tr("btn_help", "common")
+    btn_help = QPushButton(btn_help_translation)
     btn_help.setObjectName("btn_help")
-    btn_help.setToolTip("Help")
+    btn_help.setToolTip(btn_help_translation)
     dlg.lyt_buttons.addWidget(btn_help, 0, dlg.lyt_buttons.columnCount())
 
     # Get formtype, formname & tabname
