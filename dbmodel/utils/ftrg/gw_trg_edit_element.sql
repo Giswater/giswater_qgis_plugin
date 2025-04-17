@@ -57,16 +57,28 @@ v_input_json JSON;
 v_result_rec record;
 v_json_old_data JSON;
 
+--
+v_man_table TEXT;
+v_customfeature TEXT;
+v_childtable_name TEXT;
+v_element_id TEXT;
+
 BEGIN
-		v_tg_table_name = TG_TABLE_NAME;
-		
-		
+
+	v_man_table:= TG_ARGV[0];
+	v_tg_table_name = TG_TABLE_NAME;
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
 
 	-- get values
 	SELECT ((value::json)->>'activated')::boolean INTO v_insert_double_geom FROM config_param_system WHERE parameter='edit_element_doublegeom';
 	SELECT ((value::json)->>'value')::float INTO v_unitsfactor FROM config_param_system WHERE parameter='edit_element_doublegeom';
+
+	--modify values for custom view inserts
+	IF v_man_table IN (SELECT id FROM cat_feature WHERE feature_type = 'ELEMENT') THEN
+		v_customfeature:=v_man_table;
+		v_man_table:=(SELECT man_table FROM cat_feature_element c JOIN cat_feature cf ON cf.id = c.id JOIN sys_feature_class s ON cf.feature_class = s.id  WHERE c.id=v_man_table);
+	END IF;
 
 	IF v_unitsfactor IS NULL THEN
 		v_unitsfactor = 1;
@@ -245,32 +257,50 @@ BEGIN
 			END IF;
 		END IF;
 
-		-- FEATURE INSERT (DYNAMIC TRIGGER)
-		SELECT row_to_json(NEW) INTO v_json_new_data;
-		SELECT row_to_json(OLD) INTO v_json_old_data;
-	
-		v_input_json := jsonb_build_object(
-        'client', jsonb_build_object(
-            'device', 4,
-            'infoType', 1,
-            'lang', 'ES'
-        	),
-        'feature', '{}'::jsonb,
-        'data', jsonb_build_object(
-            'parameters', jsonb_build_object(
-                'jsonNewData', v_json_new_data,
-                'jsonOldData', v_json_old_data,
-                'action', 'INSERT',
-                'originTable', v_tg_table_name,
-                'pkeyColumn', 'element_id',
-                'pkeyValue', NEW.element_id
-            	)	
-        	)
-    	);
-	
-		PERFORM gw_fct_admin_dynamic_trigger(v_input_json);
-	
-	
+
+		INSERT INTO "element" (element_id, code, elementcat_id, serial_number, num_elements, state, state_type, observ, "comment", function_type, category_type,
+		fluid_type, location_type, workcat_id, workcat_id_end, builtdate, enddate, ownercat_id, rotation, link, verified, label_x, label_y, label_rotation, undelete,
+		publish, inventory, expl_id, feature_type, pol_id, top_elev, expl_id2, trace_featuregeom, muni_id, sector_id, brand_id, model_id, asset_id, datasource, omunit_id,
+		lock_level, the_geom, created_at, created_by, updated_at, updated_by)
+		VALUES(NEW.element_id, NEW.code, NEW.elementcat_id, NEW.serial_number, NEW.num_elements, NEW.state, NEW.state_type, NEW.observ, NEW."comment", NEW.function_type, NEW.category_type,
+		NEW.fluid_type, NEW.location_type, NEW.workcat_id, NEW.workcat_id_end, NEW.builtdate, NEW.enddate, NEW.ownercat_id, NEW.rotation, NEW.link, NEW.verified, NEW.label_x, NEW.label_y, NEW.label_rotation, NEW.undelete,
+		NEW.publish, NEW.inventory, NEW.expl_id, NEW.feature_type, NEW.pol_id, NEW.top_elev, NEW.expl_id2, NEW.trace_featuregeom, NEW.muni_id, NEW.sector_id, NEW.brand_id, NEW.model_id, NEW.asset_id, NEW.datasource, NEW.omunit_id,
+		NEW.lock_level, NEW.the_geom, NEW.created_at, NEW.created_by, NEW.updated_at, NEW.updated_by);
+
+		IF v_man_table='man_flwreg' THEN
+			INSERT INTO man_flwreg (element_id, flwreg_class, flwreg_type, nodarc_id, order_id, to_arc, flwreg_length)
+			VALUES(NEW.element_id, NEW.flwreg_class, NEW.flwreg_type, NEW.nodarc_id, NEW.order_id, NEW.to_arc, NEW.flwreg_length);
+		END IF;
+
+
+
+
+		-- -- FEATURE INSERT (DYNAMIC TRIGGER)
+		-- SELECT row_to_json(NEW) INTO v_json_new_data;
+		-- SELECT row_to_json(OLD) INTO v_json_old_data;
+
+		-- v_input_json := jsonb_build_object(
+        -- 'client', jsonb_build_object(
+        --     'device', 4,
+        --     'infoType', 1,
+        --     'lang', 'ES'
+        -- 	),
+        -- 'feature', '{}'::jsonb,
+        -- 'data', jsonb_build_object(
+        --     'parameters', jsonb_build_object(
+        --         'jsonNewData', v_json_new_data,
+        --         'jsonOldData', v_json_old_data,
+        --         'action', 'INSERT',
+        --         'originTable', v_tg_table_name,
+        --         'pkeyColumn', 'element_id',
+        --         'pkeyValue', NEW.element_id
+        --     	)
+        -- 	)
+    	-- );
+
+		-- PERFORM gw_fct_admin_dynamic_trigger(v_input_json);
+
+
 		-- update element_x_feature table
 		IF v_tablefeature IS NOT NULL AND v_feature IS NOT NULL THEN
 			EXECUTE 'INSERT INTO element_x_'||v_tablefeature||' ('||v_tablefeature||'_id, element_id) VALUES ('||v_feature||','||NEW.element_id||') ON CONFLICT 
@@ -280,7 +310,7 @@ BEGIN
 		--elevation from raster
 		IF (SELECT json_extract_path_text(value::json,'activated')::boolean FROM config_param_system WHERE parameter='admin_raster_dem') IS TRUE
 		AND (NEW.top_elev IS NULL) AND
-		(SELECT upper(value)  FROM config_param_user WHERE parameter = 'edit_insert_elevation_from_dem' and cur_user = current_user) = 'TRUE' 
+		(SELECT upper(value)  FROM config_param_user WHERE parameter = 'edit_insert_elevation_from_dem' and cur_user = current_user) = 'TRUE'
 		AND ST_geometrytype(NEW.the_geom) = 'ST_Point'
 		THEN
 			NEW.top_elev = (SELECT ST_Value(rast,1,NEW.the_geom,true) FROM ext_raster_dem WHERE id =
@@ -305,37 +335,52 @@ BEGIN
 			NEW.muni_id := (SELECT m.muni_id FROM ext_municipality m WHERE ST_intersects(NEW.the_geom, m.the_geom) AND active IS TRUE limit 1);
 		END IF;
 
-		-- UPDATE element (DYNAMIC TRIGGER)
-		SELECT row_to_json(NEW) INTO v_json_new_data;
-		SELECT row_to_json(OLD) INTO v_json_old_data;
-	
-		v_input_json := jsonb_build_object(
-        'client', jsonb_build_object(
-            'device', 4,
-            'infoType', 1,
-            'lang', 'ES'
-        	),
-        'feature', '{}'::jsonb,
-        'data', jsonb_build_object(
-            'parameters', jsonb_build_object(
-                'jsonNewData', v_json_new_data,
-                'jsonOldData', v_json_old_data,
-                'action', 'UPDATE',
-                'originTable', v_tg_table_name,
-                'pkeyColumn', 'element_id',
-                'pkeyValue', NEW.element_id
-            	)	
-        	)
-    	);
-	
-		PERFORM gw_fct_admin_dynamic_trigger(v_input_json);
-		
+		UPDATE "element" SET code=NEW.code, elementcat_id=NEW.elementcat_id, serial_number=NEW.serial_number, num_elements=NEW.num_elements, state=NEW.state,
+		state_type=NEW.state_type, observ=NEW.observ, "comment"=NEW."comment",  function_type=NEW.function_type, category_type=NEW.category_type, fluid_type=NEW.fluid_type,
+		location_type=NEW.location_type, workcat_id=NEW.workcat_id, workcat_id_end=NEW.workcat_id_end, builtdate=NEW.builtdate, enddate=NEW.enddate, ownercat_id=NEW.ownercat_id,
+		rotation=NEW.rotation, link=NEW.link, verified=NEW.verified, label_x=NEW.label_x, label_y=NEW.label_y, label_rotation=NEW.label_rotation, undelete=NEW.undelete, publish=NEW.publish,
+		inventory=NEW.inventory, expl_id=NEW.expl_id, feature_type='ELEMENT', pol_id=NEW.pol_id, top_elev=NEW.top_elev, expl_id2=NEW.expl_id2, trace_featuregeom=NEW.trace_featuregeom,
+		muni_id=NEW.muni_id, sector_id=NEW.sector_id, brand_id=NEW.brand_id, model_id=NEW.model_id, asset_id=NEW.asset_id, datasource=NEW.datasource, omunit_id=NEW.omunit_id,
+		lock_level=NEW.lock_level, the_geom=NEW.the_geom, created_at=NEW.created_at, created_by=NEW.created_by, updated_at=NEW.updated_at, updated_by=NEW.updated_by
+		WHERE element_id=OLD.element_id;
+
+
+		IF v_man_table='man_flwreg' THEN
+			UPDATE man_flwreg SET flwreg_class=NEW.flwreg_class, flwreg_type=NEW.flwreg_type, nodarc_id=NEW.nodarc_id, order_id=NEW.order_id, to_arc=NEW.to_arc, flwreg_length=NEW.flwreg_length
+			WHERE element_id=OLD.element_id;
+		END IF;
+
+		-- -- UPDATE element (DYNAMIC TRIGGER)
+		-- SELECT row_to_json(NEW) INTO v_json_new_data;
+		-- SELECT row_to_json(OLD) INTO v_json_old_data;
+
+		-- v_input_json := jsonb_build_object(
+        -- 'client', jsonb_build_object(
+        --     'device', 4,
+        --     'infoType', 1,
+        --     'lang', 'ES'
+        -- 	),
+        -- 'feature', '{}'::jsonb,
+        -- 'data', jsonb_build_object(
+        --     'parameters', jsonb_build_object(
+        --         'jsonNewData', v_json_new_data,
+        --         'jsonOldData', v_json_old_data,
+        --         'action', 'UPDATE',
+        --         'originTable', v_tg_table_name,
+        --         'pkeyColumn', 'element_id',
+        --         'pkeyValue', NEW.element_id
+        --     	)
+        -- 	)
+    	-- );
+
+		-- PERFORM gw_fct_admin_dynamic_trigger(v_input_json);
+
 		-- UPDATE geom
 		IF st_equals( NEW.the_geom, OLD.the_geom) IS FALSE THEN
 			--update elevation from raster
 			IF (SELECT json_extract_path_text(value::json,'activated')::boolean FROM config_param_system WHERE parameter='admin_raster_dem') IS TRUE
 			AND (NEW.top_elev = OLD.top_elev) AND
-			(SELECT upper(value)  FROM config_param_user WHERE parameter = 'edit_update_elevation_from_dem' and cur_user = current_user) = 'TRUE' 
+			(SELECT upper(value)  FROM config_param_user WHERE parameter = 'edit_update_elevation_from_dem' and cur_user = current_user) = 'TRUE'
 			AND ST_geometrytype(NEW.the_geom) = 'ST_Point'
 			THEN
 				NEW.top_elev = (SELECT ST_Value(rast,1,NEW.the_geom,true) FROM ext_raster_dem WHERE id =
@@ -461,6 +506,14 @@ BEGIN
 		END IF;
 
 		DELETE FROM element WHERE element_id=OLD.element_id;
+
+		v_customfeature = old.element_type;
+		v_element_id = old.element_id;
+
+		v_childtable_name := 'man_element_' || lower(v_customfeature);
+		IF (SELECT EXISTS ( SELECT 1 FROM information_schema.tables WHERE table_schema = TG_TABLE_SCHEMA AND table_name = v_childtable_name)) IS TRUE THEN
+			EXECUTE 'DELETE FROM '||v_childtable_name||' WHERE element_id = '||quote_literal(v_element_id)||'';
+		END IF;
 
         RETURN NULL;
 
