@@ -221,10 +221,10 @@ class GwPsector:
 
             self._manage_selection_changed_signals(GwFeatureTypes.GULLY)
 
-        if psector_id is not None:
+        self.set_tabs_enabled(psector_id is not None)
+        self.enable_buttons(psector_id is not None)
 
-            self.set_tabs_enabled(True)
-            self.enable_buttons(True)
+        if psector_id is not None:
 
             sql = (f"SELECT psector_id, name, psector_type, expl_id, priority, descript, text1, text2, "
                    f"text3, text4, text5, text6, num_value, observ, atlas_id, scale, rotation, active, ext_code, status, workcat_id, parent_id"
@@ -342,9 +342,6 @@ class GwPsector:
         self.dlg_plan_psector.tab_feature.currentChanged.connect(
             partial(self._manage_tab_feature_buttons))
         viewname = 'v_edit_plan_psector_x_other'
-        self.dlg_plan_psector.txt_name.textChanged.connect(
-            partial(self.query_like_widget_text, self.dlg_plan_psector, self.dlg_plan_psector.txt_name,
-                    self.dlg_plan_psector.all_rows, 'v_price_compost', viewname, "id"))
 
         # Create corner buttons
         self.corner_widget = QWidget()
@@ -475,6 +472,17 @@ class GwPsector:
         # Set checked enable all layers
         if self.all_layers_checked:
             tools_qt.set_checked(self.dlg_plan_psector, "tab_general_chk_enable_all", True)
+
+        self.dlg_plan_psector.findChild(QLineEdit, "tab_general_name").textChanged.connect(partial(self.psector_name_changed))
+
+
+    def psector_name_changed(self):
+        """ Enable buttons and tabs when name is changed """
+
+        psector_name = tools_qt.get_text(self.dlg_plan_psector, "tab_general_name")
+        self.enable_buttons(psector_name != 'null')
+        self.set_tabs_enabled(psector_name != 'null')
+
 
     def flags(self, index, model, editable_columns=None):
 
@@ -925,9 +933,6 @@ class GwPsector:
             message = "The name is current in use"
             tools_qgis.show_warning(message, dialog=self.dlg_plan_psector)
             return
-        else:
-            self.set_tabs_enabled(True)
-            self.enable_buttons(True)
 
         viewname = f"'v_edit_plan_psector'"
         sql = (f"SELECT column_name FROM information_schema.columns "
@@ -984,6 +989,7 @@ class GwPsector:
             new_psector_id = tools_db.execute_returning(sql)
 
             if new_psector_id:
+                self.dlg_plan_psector.findChild(QLineEdit, "tab_general_name").setEnabled(False)
                 tools_qt.set_widget_text(self.dlg_plan_psector, "tab_general_psector_id", str(new_psector_id[0]))
                 row = tools_gw.get_config_value('plan_psector_current')
                 if row:
