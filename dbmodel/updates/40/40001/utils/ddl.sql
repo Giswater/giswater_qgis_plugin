@@ -81,6 +81,7 @@ CREATE TABLE man_flwreg (
     order_id numeric NULL,
     to_arc varchar NULL,
     flwreg_length numeric NULL,
+	nodarc_id varchar NULL,
     CONSTRAINT man_flwreg_pkey PRIMARY KEY (element_id),
 	CONSTRAINT man_flwreg_fkey_element_id FOREIGN KEY (element_id) REFERENCES element(element_id) on update cascade on delete cascade
 );
@@ -125,3 +126,5 @@ FROM doc_type;
 ALTER TABLE doc DROP CONSTRAINT IF EXISTS doc_doc_type_fkey;
 
 DROP TABLE IF EXISTS doc_type;
+
+ALTER TABLE element ADD COLUMN epa_type varchar(16) NULL;

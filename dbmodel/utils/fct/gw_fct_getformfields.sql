@@ -161,7 +161,7 @@ BEGIN
 
 	ELSIF p_formname ILIKE 've%' or p_formname ILIKE 'v_edit%' THEN
 
-		if replace(p_idname,'_id','') in ('arc', 'node', 'connec', 'gully') then
+		if replace(p_idname,'_id','') in ('arc', 'node', 'connec', 'gully', 'element') then
 			v_querystring = concat('SELECT array_agg(row_to_json(a)) FROM (
 
 			WITH typevalue AS (SELECT * FROM config_typevalue)

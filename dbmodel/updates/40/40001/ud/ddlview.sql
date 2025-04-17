@@ -102,6 +102,7 @@ SELECT element.element_id,
     element.created_by,
     element.updated_at,
     element.updated_by,
+    element.epa_type,
 	element.the_geom
    FROM selector_expl, element
     JOIN cat_element ON element.elementcat_id::text = cat_element.id::text
@@ -6509,3 +6510,120 @@ AS SELECT om_visit_event.id AS event_id,
      LEFT JOIN ( SELECT DISTINCT doc_x_visit.visit_id
            FROM doc_x_visit) b ON b.visit_id = om_visit.id
   ORDER BY om_visit_x_gully.gully_id;
+
+-- ve_epa_flwreg_weir
+
+CREATE OR REPLACE VIEW ve_epa_flwreg_weir
+AS SELECT inp_flwreg_weir.element_id,
+    inp_flwreg_weir.weir_type,
+    inp_flwreg_weir.offsetval,
+    inp_flwreg_weir.cd,
+    inp_flwreg_weir.ec,
+    inp_flwreg_weir.cd2,
+    inp_flwreg_weir.flap,
+    inp_flwreg_weir.geom1,
+    inp_flwreg_weir.geom2,
+    inp_flwreg_weir.geom3,
+    inp_flwreg_weir.geom4,
+    inp_flwreg_weir.surcharge,
+    inp_flwreg_weir.road_width,
+    inp_flwreg_weir.road_surf,
+    inp_flwreg_weir.coef_curve,
+    rpt_arcflow_sum.max_flow,
+    rpt_arcflow_sum.time_days,
+    rpt_arcflow_sum.time_hour,
+    rpt_arcflow_sum.max_veloc,
+    rpt_arcflow_sum.mfull_flow,
+    rpt_arcflow_sum.mfull_depth AS mfull_dept,
+    rpt_arcflow_sum.max_shear,
+    rpt_arcflow_sum.max_hr,
+    rpt_arcflow_sum.max_slope,
+    rpt_arcflow_sum.day_max,
+    rpt_arcflow_sum.time_max,
+    rpt_arcflow_sum.min_shear,
+    rpt_arcflow_sum.day_min,
+    rpt_arcflow_sum.time_min
+   FROM inp_flwreg_weir
+     LEFT JOIN man_flwreg USING (element_id)
+     LEFT JOIN rpt_arcflow_sum ON rpt_arcflow_sum.arc_id = man_flwreg.nodarc_id;
+
+
+-- ve_epa_flwreg_orifice
+CREATE OR REPLACE VIEW ve_epa_flwreg_orifice
+AS SELECT inp_flwreg_orifice.element_id,
+    inp_flwreg_orifice.orifice_type,
+    inp_flwreg_orifice.offsetval,
+    inp_flwreg_orifice.cd,
+    inp_flwreg_orifice.orate,
+    inp_flwreg_orifice.flap,
+    inp_flwreg_orifice.shape,
+    inp_flwreg_orifice.geom1,
+    inp_flwreg_orifice.geom2,
+    inp_flwreg_orifice.geom3,
+    inp_flwreg_orifice.geom4,
+    rpt_arcflow_sum.max_flow,
+    rpt_arcflow_sum.time_days,
+    rpt_arcflow_sum.time_hour,
+    rpt_arcflow_sum.max_veloc,
+    rpt_arcflow_sum.mfull_flow,
+    rpt_arcflow_sum.mfull_depth,
+    rpt_arcflow_sum.max_shear,
+    rpt_arcflow_sum.max_hr,
+    rpt_arcflow_sum.max_slope,
+    rpt_arcflow_sum.day_max,
+    rpt_arcflow_sum.time_max,
+    rpt_arcflow_sum.min_shear,
+    rpt_arcflow_sum.day_min,
+    rpt_arcflow_sum.time_min
+   FROM inp_flwreg_orifice
+     LEFT JOIN man_flwreg USING (element_id)
+     LEFT JOIN rpt_arcflow_sum ON rpt_arcflow_sum.arc_id = man_flwreg.nodarc_id;
+
+
+-- ve_epa_flwreg_outlet
+CREATE OR REPLACE VIEW ve_epa_flwreg_outlet
+AS SELECT inp_flwreg_outlet.element_id,
+    inp_flwreg_outlet.outlet_type,
+    inp_flwreg_outlet.offsetval,
+    inp_flwreg_outlet.curve_id,
+    inp_flwreg_outlet.cd1,
+    inp_flwreg_outlet.cd2,
+    inp_flwreg_outlet.flap,
+    rpt_arcflow_sum.max_flow,
+    rpt_arcflow_sum.time_days,
+    rpt_arcflow_sum.time_hour,
+    rpt_arcflow_sum.max_veloc,
+    rpt_arcflow_sum.mfull_flow,
+    rpt_arcflow_sum.mfull_depth AS mfull_dept,
+    rpt_arcflow_sum.max_shear,
+    rpt_arcflow_sum.max_hr,
+    rpt_arcflow_sum.max_slope,
+    rpt_arcflow_sum.day_max,
+    rpt_arcflow_sum.time_max,
+    rpt_arcflow_sum.min_shear,
+    rpt_arcflow_sum.day_min,
+    rpt_arcflow_sum.time_min
+   FROM inp_flwreg_outlet
+     LEFT JOIN man_flwreg USING (element_id)
+     LEFT JOIN rpt_arcflow_sum ON rpt_arcflow_sum.arc_id = man_flwreg.nodarc_id;
+
+
+-- ve_epa_flwreg_pump
+CREATE OR REPLACE VIEW ve_epa_flwreg_pump
+AS SELECT inp_flwreg_pump.element_id,
+    inp_flwreg_pump.curve_id,
+    inp_flwreg_pump.status,
+    inp_flwreg_pump.startup,
+    inp_flwreg_pump.shutoff,
+    v_rpt_pumping_sum.percent,
+    v_rpt_pumping_sum.num_startup,
+    v_rpt_pumping_sum.min_flow,
+    v_rpt_pumping_sum.avg_flow,
+    v_rpt_pumping_sum.max_flow,
+    v_rpt_pumping_sum.vol_ltr,
+    v_rpt_pumping_sum.powus_kwh,
+    v_rpt_pumping_sum.timoff_min,
+    v_rpt_pumping_sum.timoff_max
+   FROM inp_flwreg_pump
+     LEFT JOIN man_flwreg USING (element_id)
+     LEFT JOIN v_rpt_pumping_sum ON v_rpt_pumping_sum.arc_id = man_flwreg.nodarc_id;

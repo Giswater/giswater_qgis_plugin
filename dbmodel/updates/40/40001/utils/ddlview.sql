@@ -90,7 +90,7 @@ AS SELECT cat_feature.id,
     cat_feature.active
    FROM cat_feature
      JOIN cat_feature_link USING (id);
-    
+
 
   CREATE OR REPLACE VIEW v_edit_cat_feature_element
 AS SELECT
@@ -104,10 +104,10 @@ AS SELECT
     cat_feature.active
    FROM cat_feature
      JOIN cat_feature_element USING (id);
-    
-    
+
+
 -- ====================
-  
+
 CREATE OR REPLACE VIEW v_edit_flwreg AS
   SELECT element.element_id,
     element.code,
@@ -151,6 +151,7 @@ CREATE OR REPLACE VIEW v_edit_flwreg AS
     element.created_by,
     element.updated_at,
     element.updated_by,
+    element.epa_type,
 	man_flwreg.flwreg_class,
 	man_flwreg.flwreg_type,
 	man_flwreg.node_id,
