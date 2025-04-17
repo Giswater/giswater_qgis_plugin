@@ -19,7 +19,7 @@ SELECT has_table('element'::name, 'Table element should exist');
 SELECT columns_are(
     'element',
     ARRAY[
-        'element_id', 'code', 'elementcat_id', 'serial_number', 'num_elements', 'state', 'state_type',
+        'element_id', 'code', 'sys_code', 'elementcat_id', 'serial_number', 'num_elements', 'state', 'state_type',
         'observ', 'comment', 'function_type', 'category_type', 'fluid_type', 'location_type', 'workcat_id',
         'workcat_id_end', 'builtdate', 'enddate', 'ownercat_id', 'rotation', 'link', 'verified',
         'label_x', 'label_y', 'label_rotation', 'undelete', 'publish', 'inventory', 'expl_id', 'feature_type',
@@ -36,6 +36,7 @@ SELECT col_is_pk('element', ARRAY['element_id'], 'Column element_id should be pr
 -- Check column types
 SELECT col_type_is('element', 'element_id', 'varchar(16)', 'Column element_id should be varchar(16)');
 SELECT col_type_is('element', 'code', 'text', 'Column code should be text');
+SELECT col_type_is('element', 'sys_code', 'text', 'Column sys_code should be text');
 SELECT col_type_is('element', 'elementcat_id', 'varchar(30)', 'Column elementcat_id should be varchar(30)');
 SELECT col_type_is('element', 'serial_number', 'varchar(30)', 'Column serial_number should be varchar(30)');
 SELECT col_type_is('element', 'num_elements', 'integer', 'Column num_elements should be integer');
