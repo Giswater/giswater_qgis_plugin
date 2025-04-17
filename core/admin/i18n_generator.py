@@ -381,7 +381,7 @@ class GwI18NGenerator:
                 if dbtable == 'dbjson':
                     self._write_dbjson_values_i18n(dbtable_rows, cfg_path + file_name)
                 else:
-                    self._write_table_values_i18n(dbtable_rows, dbtable_columns, dbtable, cfg_path + file_name) 
+                    self._write_table_values_i18n(dbtable_rows, dbtable_columns, dbtable, cfg_path + file_name)
 
         return True, ""
 
@@ -415,7 +415,7 @@ class GwI18NGenerator:
                                   f"VALUES ('{source}', '{project_type}', 'sys_message', $${ms_msg}$$, $${ht_msg}$$, 'giswater', {log_level});")
                     self._get_rows(sql_insert)
 
-        
+
     def _write_header(self, path):
         """
         Write the file header
@@ -451,15 +451,15 @@ class GwI18NGenerator:
         if table == 'dbconfig_form_fields':
             colums = ["source", "formname", "formtype", "project_type", "context", "source_code", "lb_en_us", "tt_en_us"]
             lang_colums = [f"lb_{self.lower_lang}", f"tt_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}", f"auto_tt_{self.lower_lang}", f"va_auto_tt_{self.lower_lang}"]
-        
+
         elif table == 'dbparam_user':
             colums = ["source", "formname", "project_type", "context", "source_code", "lb_en_us", "tt_en_us"]
             lang_colums = [f"lb_{self.lower_lang}", f"tt_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}", f"auto_tt_{self.lower_lang}", f"va_auto_tt_{self.lower_lang}"]
-        
+
         elif table == 'dbconfig_param_system':
             colums = ["source", "project_type", "context", "source_code", "lb_en_us", "tt_en_us"]
             lang_colums = [f"lb_{self.lower_lang}", f"tt_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}", f"auto_tt_{self.lower_lang}", f"va_auto_tt_{self.lower_lang}"]
-        
+
         elif table == 'dbconfig_typevalue':
             colums = ["source", "formname", "formtype", "project_type", "context", "source_code", "tt_en_us"]
             lang_colums = [f"tt_{self.lower_lang}", f"auto_tt_{self.lower_lang}", f"va_auto_tt_{self.lower_lang}"]
@@ -467,11 +467,11 @@ class GwI18NGenerator:
         elif table == 'dbmessage':
             colums = ["source", "project_type", "context", "log_level", "ms_en_us", "ht_en_us"]
             lang_colums = [f"ms_{self.lower_lang}", f"auto_ms_{self.lower_lang}", f"va_auto_ms_{self.lower_lang}," f"ht_{self.lower_lang}", f"auto_ht_{self.lower_lang}", f"va_auto_ht_{self.lower_lang}"]
-        
+
         elif table == 'dbfprocess':
             colums = ["source", "project_type", "context", "ex_en_us", "in_en_us", "na_en_us"]
             lang_colums = [f"ex_{self.lower_lang}", f"auto_ex_{self.lower_lang}", f"va_auto_ex_{self.lower_lang}," f"in_{self.lower_lang}", f"auto_in_{self.lower_lang}", f"va_auto_in_{self.lower_lang}", f"na_{self.lower_lang}", f"auto_na_{self.lower_lang}", f"va_auto_na_{self.lower_lang}"]
-        
+
         elif table == 'dbconfig_csv':
             colums = ["source", "project_type", "context", "al_en_us", "ds_en_us"]
             lang_colums = [f"al_{self.lower_lang}", f"auto_al_{self.lower_lang}", f"va_auto_al_{self.lower_lang}", f"ds_{self.lower_lang}", f"auto_ds_{self.lower_lang}", f"va_auto_ds_{self.lower_lang}"]
@@ -479,19 +479,19 @@ class GwI18NGenerator:
         elif table == 'dbconfig_form_tabs':
             colums = ["formname", "source", "project_type", "context", "lb_en_us", "tt_en_us"]
             lang_colums = [f"lb_{self.lower_lang}", f"tt_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}", f"auto_tt_{self.lower_lang}", f"va_auto_tt_{self.lower_lang}"]
-        
+
         elif table == 'dbconfig_report':
             colums = ["source", "project_type", "context", "al_en_us", "ds_en_us"]
             lang_colums = [f"al_{self.lower_lang}", f"auto_al_{self.lower_lang}", f"va_auto_al_{self.lower_lang}", f"ds_{self.lower_lang}", f"auto_ds_{self.lower_lang}", f"va_auto_ds_{self.lower_lang}"]
-        
+
         elif table == 'dbconfig_toolbox':
             colums = ["source", "project_type", "context", "al_en_us", "ob_en_us"]
             lang_colums = [f"al_{self.lower_lang}", f"auto_al_{self.lower_lang}", f"va_auto_al_{self.lower_lang}", f"ob_{self.lower_lang}", f"auto_ob_{self.lower_lang}", f"va_auto_ob_{self.lower_lang}"]
-       
+
         elif table == 'dbfunction':
             colums = ["source", "project_type", "context", "ds_en_us"]
             lang_colums = [f"ds_{self.lower_lang}", f"auto_ds_{self.lower_lang}", f"va_auto_ds_{self.lower_lang}"]
-       
+
         elif table == 'dbtypevalue':
             colums = ["source", "project_type", "context", "typevalue", "vl_en_us", "ds_en_us"]
             lang_colums = [f"vl_{self.lower_lang}", f"auto_vl_{self.lower_lang}", f"va_auto_vl_{self.lower_lang}", f"ds_{self.lower_lang}", f"auto_ds_{self.lower_lang}", f"va_auto_ds_{self.lower_lang}"]
@@ -503,7 +503,7 @@ class GwI18NGenerator:
         elif table == 'dbjson':
             colums = ["source", "project_type", "context", "hint", "text", "lb_en_us"]
             lang_colums = [f"lb_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}"]
-        
+
         elif table == 'dbconfig_form_fields_feat':
             colums = ["feature_type","source", "formname", "formtype", "project_type", "context", "source_code", "lb_en_us", "tt_en_us"]
             lang_colums = [f"lb_{self.lower_lang}", f"tt_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}", f"auto_tt_{self.lower_lang}", f"va_auto_tt_{self.lower_lang}"]
@@ -511,7 +511,7 @@ class GwI18NGenerator:
         elif table == 'dbtable':
             colums = ["source", "project_type", "context", "al_en_us", "ds_en_us"]
             lang_colums = [f"al_{self.lower_lang}", f"auto_al_{self.lower_lang}", f"va_auto_al_{self.lower_lang}", f"ds_{self.lower_lang}", f"auto_ds_{self.lower_lang}", f"va_auto_ds_{self.lower_lang}"]
-        
+
         elif table == 'su_basic_tables':
             colums = ["source", "project_type", "context", "na_en_us", "ob_en_us"]
             lang_colums = [f"na_{self.lower_lang}", f"auto_na_{self.lower_lang}", f"va_auto_na_{self.lower_lang}", f"ob_{self.lower_lang}", f"auto_ob_{self.lower_lang}", f"va_auto_ob_{self.lower_lang}"]
@@ -519,7 +519,7 @@ class GwI18NGenerator:
         elif table == 'su_feature':
             colums = ["project_type", "context", "feature_class", "feature_type", "lb_en_us", "ds_en_us"]
             lang_colums = [f"lb_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}", f"ds_{self.lower_lang}", f"auto_ds_{self.lower_lang}", f"va_auto_ds_{self.lower_lang}"]
-        
+
 
         # Make the query
         sql=""
@@ -553,7 +553,7 @@ class GwI18NGenerator:
         if not rows:
             return False
         return rows
-    
+
 
     def _write_table_values_i18n(self, rows, columns, table, path):
         """
@@ -587,7 +587,7 @@ class GwI18NGenerator:
                                     text = ""
                     text = text.replace("'", "''")
                     texts.append(text)
-                
+
                 # Check invalid characters
                 for i, text in enumerate(texts):
                     if texts[i] is not None:
@@ -597,7 +597,7 @@ class GwI18NGenerator:
 
                 #Define the query depending on the table
                 line = ''
-                   
+
                 if 'dbconfig_form_fields' in table:
                     if 'feat' in table:
                         feature_types = ['ARC', 'CONNEC', 'NODE', 'GULLY', 'LINK', 'ELEMENT']
@@ -662,19 +662,19 @@ class GwI18NGenerator:
                 elif 'dbtable' in table:
                     line += (f"UPDATE {row['context']} SET alias = '{texts[0]}', descript = '{texts[1]}' "
                                 f"WHERE id = '{row['source']}';\n")
-                    
+
                 elif 'value_state' == row['context']:
                     line += (f"UPDATE {row['context']} SET name = '{texts[0]}', observ = '{texts[1]}' "
                                 f"WHERE id = '{row['source']}';\n")
-                
+
                 elif 'value_state_type' == row['context']:
                     line += (f"UPDATE {row['context']} SET name = '{texts[0]}' "
                                 f"WHERE id = '{row['source']}';\n")
-                    
+
                 elif 'doc_type' == row['context']:
                     line += (f"UPDATE {row['context']} SET id = '{texts[0]}', comment = '{texts[1]}' "
                                 f"WHERE id = '{row['source']}';\n")
-                    
+
                 elif 'su_feature' in table:
                     line += (f"UPDATE {row['context']} SET id = '{texts[0]}', descript = '{texts[1]}' "
                                 f"WHERE id = '{row['lb_en_us']}' AND feature_class = '{row['feature_class']}' AND feature_type = '{row['feature_type']}';\n")
@@ -782,7 +782,7 @@ class GwI18NGenerator:
                                     text = ""
                     text = text.replace("'", "''")
                     texts.append(text)
-                
+
                 # Check invalid characters
                 for i, text in enumerate(texts):
                     if text is not None and "\n" in text:
@@ -799,7 +799,7 @@ class GwI18NGenerator:
                             f'"tooltip":{{"column":"tooltip", "value":"{texts[1]}"}}')
                    line += (f', "clause":"WHERE columnname = \'{row['source']}\' '
                             f'AND formname = \'{row['formname']}\' AND formtype = \'{row['formtype']}\'"')
-                
+
                 elif table == 'dbconfig_form_fields_feat':
                     feature_types = ['ARC', 'CONNEC', 'NODE', 'GULLY', 'LINK']
                     for feature_type in feature_types:
@@ -809,9 +809,9 @@ class GwI18NGenerator:
                                     f'"tooltip":{{"column":"tooltip", "value":"{texts[1]}"}}')
                             line += (f', "clause":"WHERE columnname = \'{row['source']}\' '
                                     f'AND formname LIKE \'%_{row['feature_type'].lower()}%\' AND formtype = \'{row['formtype']}\'"')
-                            
 
-                            
+
+
                 elif table == 'dbparam_user':
                     line += (f'"formname":"{row['formname']}", '
                             f'"label":{{"column":"label", "value":"{texts[0]}"}}, '
@@ -828,7 +828,7 @@ class GwI18NGenerator:
                     line += (f'"formname":"{row['formname']}", '
                             f'"label":{{"column":"idval", "value":"{texts[0]}"}}, ')
                     line += f', "clause":"WHERE typevalue = \'{row['formname']}\' AND id  = \'{row['source']}\'"'
-                    
+
                 elif table == 'dbmessage':
                     line += (f'"formname":null, '
                             f'"label":{{"column":"error_message", "value":"{texts[0]}"}}, '
@@ -876,13 +876,13 @@ class GwI18NGenerator:
                     line += (f'"formname":null, '
                             f'"label":{{"column":"alias", "value":"{texts[0]}"}}')
                     line += f', "clause":"WHERE objectname = \'{row["source"]}\' AND columnname = \'{row['columnname']}\' "'
-                    
+
                 line += f'}}}}$$);\n'
                 file.write(line)
         file.close()
         del file
 
-    
+
     def _write_dbjson_values(self, rows, path):
         updates = {}
 
@@ -936,16 +936,15 @@ class GwI18NGenerator:
         port = tools_qt.get_text(self.dlg_qm, self.dlg_qm.txt_port, return_string_null=False)
         db = tools_qt.get_text(self.dlg_qm, self.dlg_qm.txt_db, return_string_null=False)
         user = tools_qt.get_text(self.dlg_qm, self.dlg_qm.txt_user, return_string_null=False)
-        language = tools_qt.get_combo_value(self.dlg_qm, self.dlg_qm.cmb_language, 0)
         py_msg = tools_qt.is_checked(self.dlg_qm, self.dlg_qm.chk_py_msg)
         db_msg = tools_qt.is_checked(self.dlg_qm, self.dlg_qm.chk_db_msg)
-        tools_gw.set_config_parser('i18n_generator', 'qm_lang_host', f"{host}", "user", "init", prefix=False)
-        tools_gw.set_config_parser('i18n_generator', 'qm_lang_port', f"{port}", "user", "init", prefix=False)
-        tools_gw.set_config_parser('i18n_generator', 'qm_lang_db', f"{db}", "user", "init", prefix=False)
-        tools_gw.set_config_parser('i18n_generator', 'qm_lang_user', f"{user}", "user", "init", prefix=False)
-        tools_gw.set_config_parser('i18n_generator', 'qm_lang_language', f"{language}", "user", "init", prefix=False)
-        tools_gw.set_config_parser('i18n_generator', 'qm_lang_py_msg', f"{py_msg}", "user", "init", prefix=False)
-        tools_gw.set_config_parser('i18n_generator', 'qm_lang_db_msg', f"{db_msg}", "user", "init", prefix=False)
+
+        tools_gw.set_config_parser('i18n_generator', 'txt_host', f"{host}", "user", "session", prefix=False)
+        tools_gw.set_config_parser('i18n_generator', 'txt_port', f"{port}", "user", "session", prefix=False)
+        tools_gw.set_config_parser('i18n_generator', 'txt_db', f"{db}", "user", "session", prefix=False)
+        tools_gw.set_config_parser('i18n_generator', 'txt_user', f"{user}", "user", "session", prefix=False)
+        tools_gw.set_config_parser('i18n_generator', 'chk_py_msg', f"{py_msg}", "user", "session", prefix=False)
+        tools_gw.set_config_parser('i18n_generator', 'chk_db_msg', f"{db_msg}", "user", "session", prefix=False)
 
 
     def _load_user_values(self):
@@ -954,12 +953,13 @@ class GwI18NGenerator:
             :return: Dictionary with values
         """
 
-        host = tools_gw.get_config_parser('i18n_generator', 'qm_lang_host', "user", "init", False)
-        port = tools_gw.get_config_parser('i18n_generator', 'qm_lang_port', "user", "init", False)
-        db = tools_gw.get_config_parser('i18n_generator', 'qm_lang_db', "user", "init", False)
-        user = tools_gw.get_config_parser('i18n_generator', 'qm_lang_user', "user", "init", False)
-        py_msg = tools_gw.get_config_parser('i18n_generator', 'qm_lang_py_msg', "user", "init", False)
-        db_msg = tools_gw.get_config_parser('i18n_generator', 'qm_lang_db_msg', "user", "init", False)
+        host = tools_gw.get_config_parser('i18n_generator', 'txt_host', "user", "session", False)
+        port = tools_gw.get_config_parser('i18n_generator', 'txt_port', "user", "session", False)
+        db = tools_gw.get_config_parser('i18n_generator', 'txt_db', "user", "session", False)
+        user = tools_gw.get_config_parser('i18n_generator', 'txt_user', "user", "session", False)
+        py_msg = tools_gw.get_config_parser('i18n_generator', 'chk_py_msg', "user", "session", False)
+        db_msg = tools_gw.get_config_parser('i18n_generator', 'chk_db_msg', "user", "session", False)
+
         tools_qt.set_widget_text(self.dlg_qm, 'txt_host', host)
         tools_qt.set_widget_text(self.dlg_qm, 'txt_port', port)
         tools_qt.set_widget_text(self.dlg_qm, 'txt_db', db)
@@ -1039,8 +1039,8 @@ class GwI18NGenerator:
         param = param.replace("\n", " ")
 
         return param
-    
-    
+
+
     def _replace_invalid_quotation_marks(self, param):
         """
         This function replaces the characters that break JSON messages
