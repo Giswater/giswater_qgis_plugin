@@ -1124,7 +1124,7 @@ CREATE TABLE arc (
 	omunit_id int4 NULL,
 	lock_level int4 NULL,
 	is_scadamap bool NULL,
-	registre_date date NULL,
+	registration_date date NULL,
 	hydraulic_capacity float8 NULL,
 	meandering text NULL,
 	conserv_state text NULL,
@@ -1770,7 +1770,7 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"CHANGETYPE","table":"arch
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"archived_psector_arc_traceability", "column":"dwfzone_id", "dataType":"int4", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"archived_psector_arc_traceability", "column":"initoverflowpath", "dataType":"bool", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"archived_psector_arc_traceability", "column":"omunit_id", "dataType":"int4", "isUtils":"False"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"archived_psector_arc_traceability", "column":"registre_date", "dataType":"date", "isUtils":"False"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"archived_psector_arc_traceability", "column":"registration_date", "dataType":"date", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"archived_psector_arc_traceability", "column":"hydraulic_capacity", "dataType":"float8", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"archived_psector_arc_traceability", "column":"meandering", "dataType":"text", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"archived_psector_arc_traceability", "column":"conserv_state", "dataType":"text", "isUtils":"False"}}$$);

@@ -2746,7 +2746,7 @@ INSERT INTO config_form_fields
 VALUES('v_edit_arc', 'form_feature', 'tab_data', 'cat_dr', 'lyt_data_1', 55, 'integer', 'text', 'cat_dr', 'cat_dr', NULL, false, NULL, false, NULL, NULL, NULL, true, true, NULL, NULL, NULL, NULL, NULL, NULL, false, NULL);
 
 -- arc
-UPDATE config_form_fields SET widgettype='datetime' WHERE (formname ILIKE 've_arc%' OR formname='v_edit_arc') AND formtype='form_feature' AND columnname='registre_date' AND tabname='tab_data';
+UPDATE config_form_fields SET columnname='registration_date', widgettype='datetime' WHERE (formname ILIKE 've_arc%' OR formname='v_edit_arc') AND formtype='form_feature' AND columnname='registre_date' AND tabname='tab_data';
 
 -- 10/03/2025
 INSERT INTO edit_typevalue (typevalue, id, idval, descript, addparam) VALUES('discharge_medium_typevalue', '0', 'Undefined', NULL, NULL) ON CONFLICT (typevalue, id) DO NOTHING;

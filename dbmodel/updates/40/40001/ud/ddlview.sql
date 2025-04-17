@@ -615,7 +615,7 @@ AS WITH
             arc.initoverflowpath,
             arc.lock_level,
             arc.is_scadamap,
-            arc.registre_date,
+            arc.registration_date,
             arc.hydraulic_capacity,
             arc.meandering,
             arc.conserv_state,

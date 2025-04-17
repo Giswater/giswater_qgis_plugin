@@ -969,7 +969,7 @@ UPDATE config_form_fields SET widgettype='combo', dv_querytext='SELECT id, idval
 UPDATE config_form_fields SET widgettype='combo', dv_querytext='SELECT id, idval FROM edit_typevalue WHERE typevalue = ''man_wwtp_treatmenttype''', dv_isnullvalue=True WHERE formname ILIKE 've_node%_wwtp' AND formtype='form_feature' AND columnname='treatment_type' AND tabname='tab_data';
 
 -- arc
-UPDATE config_form_fields SET widgettype='datetime' WHERE (formname ILIKE 've_arc%' OR formname='v_edit_arc') AND formtype='form_feature' AND columnname='registre_date' AND tabname='tab_data';
+UPDATE config_form_fields SET widgettype='datetime' WHERE (formname ILIKE 've_arc%' OR formname='v_edit_arc') AND formtype='form_feature' AND columnname='registration_date' AND tabname='tab_data';
 
 -- 10/03/2025
 UPDATE config_form_fields SET layoutname='lyt_data_1', widgettype='combo', dv_querytext='SELECT id, idval FROM edit_typevalue WHERE typevalue = ''discharge_medium_typevalue''', dv_isnullvalue=TRUE WHERE columnname='discharge_medium' AND formname ILIKE '%outfall%';
