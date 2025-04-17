@@ -77,7 +77,7 @@ CREATE TABLE man_flwreg (
     element_id varchar(16) NOT NULL,
     flwreg_class varchar(16) NOT NULL,
 	flwreg_type text NULL,
-    nodarc_id varchar NULL,
+    node_id varchar NULL,
     order_id numeric NULL,
     to_arc varchar NULL,
     flwreg_length numeric NULL,

@@ -7,15 +7,15 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
-ALTER TABLE inp_flwreg_outlet RENAME TO inp_flwreg_outlet2;
-ALTER TABLE inp_flwreg_orifice RENAME TO inp_flwreg_orifice2;
-ALTER TABLE inp_flwreg_weir RENAME TO inp_flwreg_weir2;
-ALTER TABLE inp_flwreg_pump RENAME TO inp_flwreg_pump2;
+ALTER TABLE inp_flwreg_outlet RENAME TO _inp_flwreg_outlet;
+ALTER TABLE inp_flwreg_orifice RENAME TO _inp_flwreg_orifice;
+ALTER TABLE inp_flwreg_weir RENAME TO _inp_flwreg_weir;
+ALTER TABLE inp_flwreg_pump RENAME TO _inp_flwreg_pump;
 
-ALTER TABLE inp_dscenario_flwreg_pump RENAME TO inp_dscenario_flwreg_pump2;
-ALTER TABLE inp_dscenario_flwreg_outlet RENAME TO inp_dscenario_flwreg_outlet2;
-ALTER TABLE inp_dscenario_flwreg_orifice RENAME TO inp_dscenario_flwreg_orifice2;
-ALTER TABLE inp_dscenario_flwreg_weir RENAME TO inp_dscenario_flwreg_weir2;
+ALTER TABLE inp_dscenario_flwreg_pump RENAME TO _inp_dscenario_flwreg_pump;
+ALTER TABLE inp_dscenario_flwreg_outlet RENAME TO _inp_dscenario_flwreg_outlet;
+ALTER TABLE inp_dscenario_flwreg_orifice RENAME TO _inp_dscenario_flwreg_orifice;
+ALTER TABLE inp_dscenario_flwreg_weir RENAME TO _inp_dscenario_flwreg_weir;
 
 
 CREATE TABLE man_inletpipe (

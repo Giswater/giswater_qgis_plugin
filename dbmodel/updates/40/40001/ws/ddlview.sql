@@ -6986,12 +6986,12 @@ AS WITH expl_data AS (
      JOIN expl_data ed ON ed.expl_id = w.expl_id AND w.cat_period_id::text = p.id::text
   WHERE ed.start_date = p.start_date
   AND ex.expl_id = any(d.expl_id);
-  
+
 
 CREATE OR REPLACE VIEW v_edit_inp_flwreg_pump
 AS SELECT
     f.element_id,
-    f.nodarc_id,
+    f.node_id,
     f.order_id,
     f.to_arc,
     f.flwreg_length,

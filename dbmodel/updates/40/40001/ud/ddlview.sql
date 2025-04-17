@@ -2436,7 +2436,7 @@ AS SELECT s.dscenario_id,
 CREATE OR REPLACE VIEW v_edit_inp_flwreg_outlet
 AS SELECT
     f.element_id,
-    f.nodarc_id,
+    f.node_id,
     f.order_id,
     f.to_arc,
     f.flwreg_length,
@@ -2453,7 +2453,7 @@ AS SELECT
 CREATE OR REPLACE VIEW v_edit_inp_flwreg_weir
 AS SELECT
     f.element_id,
-    f.nodarc_id,
+    f.node_id,
     f.order_id,
     f.to_arc,
     f.flwreg_length,
@@ -2479,7 +2479,7 @@ AS SELECT
 CREATE OR REPLACE VIEW v_edit_inp_flwreg_pump
 AS SELECT
     f.element_id,
-    f.nodarc_id,
+    f.node_id,
     f.order_id,
     f.to_arc,
     f.flwreg_length,
@@ -2494,7 +2494,7 @@ AS SELECT
 CREATE OR REPLACE VIEW v_edit_inp_flwreg_orifice
 AS SELECT
     f.element_id,
-    f.nodarc_id,
+    f.node_id,
     f.order_id,
     f.to_arc,
     f.flwreg_length,
@@ -2515,7 +2515,7 @@ AS SELECT
 CREATE OR REPLACE VIEW v_edit_inp_flwreg_pump
 AS SELECT
     f.element_id,
-    f.nodarc_id,
+    f.node_id,
     f.order_id,
     f.to_arc,
     f.flwreg_length,
@@ -2545,7 +2545,7 @@ CREATE OR REPLACE VIEW v_edit_inp_dscenario_flwreg_outlet
 AS SELECT
     s.dscenario_id,
     f.element_id,
-    n.nodarc_id,
+    n.node_id,
     f.outlet_type,
     f.offsetval,
     f.curve_id,
@@ -2561,7 +2561,7 @@ CREATE OR REPLACE VIEW v_edit_inp_dscenario_flwreg_weir
 AS SELECT
     s.dscenario_id,
     f.element_id,
-    n.nodarc_id,
+    n.node_id,
     f.weir_type,
     f.offsetval,
     f.cd,
@@ -2586,7 +2586,7 @@ AS SELECT
     s.dscenario_id,
     f.element_id,
     f.curve_id,
-    -- n.nodarc_id,
+    -- n.node_id,
     f.status,
     f.startup,
     f.shutoff,
@@ -2599,7 +2599,7 @@ CREATE OR REPLACE VIEW v_edit_inp_dscenario_flwreg_orifice
 AS SELECT
     s.dscenario_id,
     f.element_id,
-    n.nodarc_id,
+    n.node_id,
     f.orifice_type,
     f.offsetval,
     f.cd,

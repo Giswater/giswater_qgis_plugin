@@ -268,8 +268,8 @@ BEGIN
 		NEW.lock_level, NEW.the_geom, NEW.created_at, NEW.created_by, NEW.updated_at, NEW.updated_by);
 
 		IF v_man_table='man_flwreg' THEN
-			INSERT INTO man_flwreg (element_id, flwreg_class, flwreg_type, nodarc_id, order_id, to_arc, flwreg_length)
-			VALUES(NEW.element_id, NEW.flwreg_class, NEW.flwreg_type, NEW.nodarc_id, NEW.order_id, NEW.to_arc, NEW.flwreg_length);
+			INSERT INTO man_flwreg (element_id, flwreg_class, flwreg_type, node_id, order_id, to_arc, flwreg_length)
+			VALUES(NEW.element_id, NEW.flwreg_class, NEW.flwreg_type, NEW.node_id, NEW.order_id, NEW.to_arc, NEW.flwreg_length);
 		END IF;
 
 
@@ -346,7 +346,7 @@ BEGIN
 
 
 		IF v_man_table='man_flwreg' THEN
-			UPDATE man_flwreg SET flwreg_class=NEW.flwreg_class, flwreg_type=NEW.flwreg_type, nodarc_id=NEW.nodarc_id, order_id=NEW.order_id, to_arc=NEW.to_arc, flwreg_length=NEW.flwreg_length
+			UPDATE man_flwreg SET flwreg_class=NEW.flwreg_class, flwreg_type=NEW.flwreg_type, node_id=NEW.node_id, order_id=NEW.order_id, to_arc=NEW.to_arc, flwreg_length=NEW.flwreg_length
 			WHERE element_id=OLD.element_id;
 		END IF;
 

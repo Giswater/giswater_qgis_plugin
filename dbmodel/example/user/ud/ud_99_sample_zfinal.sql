@@ -173,27 +173,20 @@ update cat_feature set descript = concat(left(id,1), substring(lower(id), 2,99))
 UPDATE config_param_system SET isenabled = false where parameter = ' basic_selector_tab_municipality';
 
 
-insert into element 
-(element_id, code, elementcat_id, state, state_type, num_elements, rotation, verified, publish, inventory, expl_id, feature_type, top_elev, muni_id, sector_id, the_geom)
-values 
+INSERT INTO element  (element_id, code, elementcat_id, state, state_type, num_elements, rotation, verified, publish, inventory, expl_id, feature_type, top_elev, muni_id, sector_id, the_geom) VALUES
 ('100020', 'E100020', 'FRWEIR-01',1,2,1,79.731, 1,true,true,2,'ELEMENT',30.190,2,2,'POINT (418716.0233455198 4577601.812087212)'),
 ('100021', 'E100021', 'FRWEIR-01',1,2,1,122.505,1,true,true,1,'ELEMENT',19.230,1,1,'POINT (419597.7191116698 4576460.6400896525)'),
 ('100022', 'E100022', 'FRPUMP-01',1,2,1,79.731, 1,true,true,2,'ELEMENT',30.190,2,2,'POINT (418716.0233455198 4577601.812087212)');
 
-insert into inp_flwreg_weir
-(element_id, weir_type, offsetval, cd, flap, geom1,geom2, geom3, geom4) VALUES
+INSERT INTO inp_flwreg_weir (element_id, weir_type, offsetval, cd, flap, geom1,geom2, geom3, geom4) VALUES
 ('100020', 'TRANSVERSE',17.15,1.5000,'NO',1.0000,1.0000,0.0000,0.0000),
 ('100021', 'TRANSVERSE',16.35,1.5000,'NO',2.0000,1.0000,0.0000,0.0000);
 
-insert into man_flwreg
-(element_id, flwreg_class, nodarc_id, order_id, to_arc, flwreg_length) VALUES
+INSERT INTO man_flwreg (element_id, flwreg_class, node_id, order_id, to_arc, flwreg_length) VALUES
 ('100020','WEIR','18828',1,'18969',0.5),
 ('100021','WEIR','237',1,'100014',0.5),
 ('100022','PUMP','18838',1,'18966',1);
 
-insert into inp_flwreg_pump
-(element_id, curve_id, status, startup, shutoff) VALUES
-('100022', 'PUMP-02', 'ON', 2, 0.4);
+INSERT INTO inp_flwreg_pump (element_id, curve_id, status, startup, shutoff) VALUES ('100022', 'PUMP-02', 'ON', 2, 0.4);
 
-insert into element_x_node
-select element_id, nodarc_id from man_flwreg;
+INSERT INTO element_x_node SELECT element_id, node_id from man_flwreg;

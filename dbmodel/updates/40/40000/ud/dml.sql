@@ -2539,16 +2539,16 @@ SELECT id, node_id, old_top_elev, new_top_elev, old_ymax, new_ymax, old_node_typ
 old_annotation, new_annotation, old_observ, new_observ, review_obs, expl_id, the_geom, review_status_id, field_date, field_user, is_validated
 FROM _review_audit_node;
 
-UPDATE config_form_fields SET dv_querytext='SELECT nodarc_id as id, nodarc_id as idval FROM v_edit_flwreg WHERE flwreg_type = ''FRORIFICE'' AND nodarc_id IS NOT NULL'
+UPDATE config_form_fields SET dv_querytext='SELECT node_id as id, node_id as idval FROM v_edit_flwreg WHERE flwreg_type = ''FRORIFICE'' AND node_id IS NOT NULL'
 WHERE formname='v_edit_inp_dscenario_flwreg_orifice' AND columnname='nodarc_id';
 
-UPDATE config_form_fields SET dv_querytext='SELECT nodarc_id as id, nodarc_id as idval FROM v_edit_flwreg WHERE flwreg_type = ''FROUTLET'' AND nodarc_id IS NOT NULL'
+UPDATE config_form_fields SET dv_querytext='SELECT node_id as id, node_id as idval FROM v_edit_flwreg WHERE flwreg_type = ''FROUTLET'' AND node_id IS NOT NULL'
 WHERE formname='v_edit_inp_dscenario_flwreg_outlet' AND columnname='nodarc_id';
 
-UPDATE config_form_fields SET dv_querytext='SELECT nodarc_id as id, nodarc_id as idval FROM v_edit_flwreg WHERE flwreg_type = ''FRPUMP'' AND nodarc_id IS NOT NULL'
+UPDATE config_form_fields SET dv_querytext='SELECT node_id as id, node_id as idval FROM v_edit_flwreg WHERE flwreg_type = ''FRPUMP'' AND node_id IS NOT NULL'
 WHERE formname='v_edit_inp_dscenario_flwreg_pump' AND columnname='nodarc_id';
 
-UPDATE config_form_fields SET dv_querytext='SELECT nodarc_id as id, nodarc_id as idval FROM v_edit_flwreg WHERE flwreg_type = ''FRWEIR'' AND nodarc_id IS NOT NULL'
+UPDATE config_form_fields SET dv_querytext='SELECT node_id as id, node_id as idval FROM v_edit_flwreg WHERE flwreg_type = ''FRWEIR'' AND node_id IS NOT NULL'
 WHERE formname='v_edit_inp_dscenario_flwreg_weir' AND columnname='nodarc_id';
 -- 30/01/2025
 
