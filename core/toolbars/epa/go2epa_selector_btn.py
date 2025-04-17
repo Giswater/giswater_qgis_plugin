@@ -37,7 +37,7 @@ class GwGo2EpaSelectorButton(GwAction):
         self.dlg_go2epa_result = GwGo2EpaSelectorUi(self, 'go2epa')
         tools_gw.load_settings(self.dlg_go2epa_result)
         tools_gw.manage_dlg_widgets(self, self.dlg_go2epa_result, json_result)
-        tools_gw.open_dialog(self.dlg_go2epa_result, 'go2epa_selector')
+        tools_gw.open_dialog(self.dlg_go2epa_result, 'go2epa_result')
 
 
 def set_combo_values(**kwargs):

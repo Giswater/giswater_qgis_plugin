@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1104</width>
-    <height>795</height>
+    <width>1100</width>
+    <height>786</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,30 +20,10 @@
       <string/>
      </property>
      <layout class="QGridLayout" name="verticalLayout_3">
-      <item row="6" column="1">
-       <widget class="QCheckBox" name="chk_active">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
+      <item row="6" column="12">
+       <widget class="QPushButton" name="btn_update">
         <property name="text">
-         <string>Show inactive</string>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="8">
-       <widget class="QPushButton" name="btn_toc">
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
-      <item row="10" column="0" colspan="15">
-       <widget class="QTableView" name="tbl_dscenario">
-        <property name="selectionMode">
-         <enum>QAbstractItemView::SingleSelection</enum>
+         <string>Update</string>
         </property>
        </widget>
       </item>
@@ -60,28 +40,17 @@
         </property>
        </widget>
       </item>
-      <item row="6" column="10">
-       <widget class="QToolButton" name="btn_create">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
+      <item row="6" column="11">
+       <widget class="QPushButton" name="btn_duplicate">
         <property name="text">
-         <string>     Create     </string>
+         <string>Duplicate</string>
         </property>
-        <property name="popupMode">
-         <enum>QToolButton::InstantPopup</enum>
-        </property>
-        <property name="toolButtonStyle">
-         <enum>Qt::ToolButtonTextOnly</enum>
-        </property>
-        <property name="autoRaise">
-         <bool>false</bool>
-        </property>
-        <property name="arrowType">
-         <enum>Qt::DownArrow</enum>
+       </widget>
+      </item>
+      <item row="6" column="8">
+       <widget class="QPushButton" name="btn_toc">
+        <property name="text">
+         <string/>
         </property>
        </widget>
       </item>
@@ -92,10 +61,20 @@
         </property>
        </widget>
       </item>
-      <item row="6" column="13">
-       <widget class="QPushButton" name="btn_toolbox">
+      <item row="4" column="0" colspan="2">
+       <widget class="QLabel" name="lbl_dscenario_name">
         <property name="text">
-         <string>Actions</string>
+         <string>Filter by: Dscenario name</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="6">
+       <widget class="QLabel" name="lbl_vdefault_dscenario">
+        <property name="text">
+         <string/>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
         </property>
        </widget>
       </item>
@@ -112,27 +91,6 @@
         </property>
        </spacer>
       </item>
-      <item row="4" column="0" colspan="2">
-       <widget class="QLabel" name="lbl_dscenario_name">
-        <property name="text">
-         <string>Filter by: Dscenario name</string>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="9">
-       <widget class="QPushButton" name="btn_toggle_active">
-        <property name="text">
-         <string>Toggle active</string>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="12">
-       <widget class="QPushButton" name="btn_update">
-        <property name="text">
-         <string>Update</string>
-        </property>
-       </widget>
-      </item>
       <item row="6" column="14">
        <widget class="QPushButton" name="btn_delete">
         <property name="sizePolicy">
@@ -146,20 +104,44 @@
         </property>
        </widget>
       </item>
-      <item row="6" column="11">
-       <widget class="QPushButton" name="btn_duplicate">
+      <item row="6" column="13">
+       <widget class="QPushButton" name="btn_toolbox">
         <property name="text">
-         <string>Duplicate</string>
+         <string>Actions</string>
         </property>
        </widget>
       </item>
-      <item row="6" column="6">
-       <widget class="QLabel" name="lbl_vdefault_dscenario">
-        <property name="text">
-         <string/>
+      <item row="10" column="0" colspan="15">
+       <widget class="QTableView" name="tbl_dscenario">
+        <property name="selectionMode">
+         <enum>QAbstractItemView::SingleSelection</enum>
         </property>
-        <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </widget>
+      </item>
+      <item row="6" column="9">
+       <widget class="QPushButton" name="btn_toggle_active">
+        <property name="text">
+         <string>Toggle active</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="10">
+       <widget class="QPushButton" name="btn_create">
+        <property name="text">
+         <string>     Create     </string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="1">
+       <widget class="QCheckBox" name="chk_active">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Show inactive</string>
         </property>
        </widget>
       </item>
@@ -201,7 +183,6 @@
   <tabstop>btn_update_dscenario</tabstop>
   <tabstop>btn_toc</tabstop>
   <tabstop>btn_toggle_active</tabstop>
-  <tabstop>btn_create</tabstop>
   <tabstop>btn_duplicate</tabstop>
   <tabstop>btn_update</tabstop>
   <tabstop>btn_toolbox</tabstop>

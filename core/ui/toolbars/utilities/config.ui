@@ -103,8 +103,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>866</width>
-             <height>647</height>
+             <width>858</width>
+             <height>630</height>
             </rect>
            </property>
            <layout class="QGridLayout" name="gridLayout_2">
@@ -168,7 +168,7 @@
                 </widget>
                </item>
                <item row="0" column="0">
-                <widget class="QGroupBox" name="grb_edit">
+                <widget class="QGroupBox" name="grb_epa">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                    <horstretch>0</horstretch>
@@ -328,8 +328,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>457</width>
-             <height>472</height>
+             <width>858</width>
+             <height>630</height>
             </rect>
            </property>
            <layout class="QGridLayout" name="gridLayout_3">
@@ -477,8 +477,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>457</width>
-             <height>472</height>
+             <width>858</width>
+             <height>630</height>
             </rect>
            </property>
            <layout class="QGridLayout" name="gridLayout_36">
@@ -553,17 +553,17 @@
                <enum>QFrame::Raised</enum>
               </property>
               <layout class="QGridLayout" name="gridLayout_33">
-               <item row="1" column="0">
-                <widget class="QGroupBox" name="grb_function_type">
+               <item row="0" column="0">
+                <widget class="QGroupBox" name="grb_category_type">
                  <property name="title">
-                  <string>Function type</string>
+                  <string>Category type</string>
                  </property>
-                 <layout class="QGridLayout" name="gridLayout_26">
+                 <layout class="QGridLayout" name="gridLayout_27">
                   <item row="0" column="0">
-                   <layout class="QGridLayout" name="lyt_function_type"/>
+                   <layout class="QGridLayout" name="lyt_category_type"/>
                   </item>
                   <item row="1" column="0">
-                   <spacer name="verticalSpacer_13">
+                   <spacer name="verticalSpacer_11">
                     <property name="orientation">
                      <enum>Qt::Vertical</enum>
                     </property>
@@ -578,17 +578,17 @@
                  </layout>
                 </widget>
                </item>
-               <item row="0" column="0">
-                <widget class="QGroupBox" name="grb_category_type">
+               <item row="1" column="0">
+                <widget class="QGroupBox" name="grb_function_type">
                  <property name="title">
-                  <string>Category type</string>
+                  <string>Function type</string>
                  </property>
-                 <layout class="QGridLayout" name="gridLayout_27">
+                 <layout class="QGridLayout" name="gridLayout_26">
                   <item row="0" column="0">
-                   <layout class="QGridLayout" name="lyt_category_type"/>
+                   <layout class="QGridLayout" name="lyt_function_type"/>
                   </item>
                   <item row="1" column="0">
-                   <spacer name="verticalSpacer_11">
+                   <spacer name="verticalSpacer_13">
                     <property name="orientation">
                      <enum>Qt::Vertical</enum>
                     </property>
@@ -646,8 +646,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>457</width>
-             <height>472</height>
+             <width>858</width>
+             <height>630</height>
             </rect>
            </property>
            <layout class="QGridLayout" name="gridLayout_7">
@@ -703,8 +703,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>457</width>
-             <height>472</height>
+             <width>858</width>
+             <height>630</height>
             </rect>
            </property>
            <layout class="QGridLayout" name="gridLayout_8">

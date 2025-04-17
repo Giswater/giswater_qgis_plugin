@@ -719,7 +719,7 @@ class GwToolBoxButton(GwAction):
         path_icon_blue = icon_folder + os.sep + '118.png'
 
         # Section Processes
-        section_processes = QStandardItem('{}'.format('Processes'))
+        section_processes = QStandardItem('{}'.format(tools_qt.tr('trv_processes', 'toolbox', default="Processes")))
         for group, functions in result['processes']['fields'].items():
             parent1 = QStandardItem(f'{group} [{len(functions)}]')
             self.no_clickable_items.append(f'{group} [{len(functions)}]')
@@ -740,7 +740,7 @@ class GwToolBoxButton(GwAction):
             section_processes.appendRow(parent1)
 
         # Section Reports
-        reports_processes = QStandardItem('{}'.format('Reports'))
+        reports_processes = QStandardItem('{}'.format(tools_qt.tr('trv_reports', 'toolbox', default="Reports")))
         for group, functions in result['reports']['fields'].items():
             parent1 = QStandardItem(f'{group} [{len(functions)}]')
             self.no_clickable_items.append(f'{group} [{len(functions)}]')

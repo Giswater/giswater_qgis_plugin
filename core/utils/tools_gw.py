@@ -284,7 +284,7 @@ def add_btn_help(dlg):
     if tools_qt.get_widget(dlg, 'btn_help') is not None:
         return
 
-    btn_help_translation = tools_qt.tr("btn_help", "common")
+    btn_help_translation = tools_qt.tr("btn_help", "common", default="Help")
     btn_help = QPushButton(btn_help_translation)
     btn_help.setObjectName("btn_help")
     btn_help.setToolTip(btn_help_translation)

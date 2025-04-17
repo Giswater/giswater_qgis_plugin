@@ -50,7 +50,7 @@
              <item>
               <widget class="QGroupBox" name="grb_general">
                <property name="title">
-                <string>GENERAL</string>
+                <string>General</string>
                </property>
                <layout class="QGridLayout" name="gridLayout_3" rowstretch="0" columnstretch="0,0">
                 <item row="0" column="0">
@@ -65,7 +65,7 @@
              <item>
               <widget class="QGroupBox" name="grb_hydraulics">
                <property name="title">
-                <string>HYDRAULICS</string>
+                <string>Hydraulics</string>
                </property>
                <layout class="QGridLayout" name="gridLayout_6">
                 <item row="0" column="1">
@@ -80,7 +80,7 @@
              <item>
               <widget class="QGroupBox" name="grb_time_steps">
                <property name="title">
-                <string>DATE &amp; TIME STEPS</string>
+                <string>Date &amp; time steps</string>
                </property>
                <layout class="QGridLayout" name="gridLayout_19">
                 <item row="0" column="1">
@@ -95,7 +95,7 @@
              <item>
               <widget class="QGroupBox" name="grb_other">
                <property name="title">
-                <string>OTHER</string>
+                <string>Other</string>
                </property>
                <layout class="QGridLayout" name="gridLayout_12">
                 <item row="0" column="1">
@@ -130,17 +130,17 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>112</width>
-            <height>164</height>
+            <width>396</width>
+            <height>327</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout_8">
            <item row="0" column="0">
             <layout class="QVBoxLayout" name="verticalLayout">
              <item>
-              <widget class="QGroupBox" name="groupBox">
+              <widget class="QGroupBox" name="grb_reactions">
                <property name="title">
-                <string>REACTIONS</string>
+                <string>Reactions</string>
                </property>
                <layout class="QGridLayout" name="gridLayout_9">
                 <item row="0" column="0">
@@ -153,9 +153,9 @@
               </widget>
              </item>
              <item>
-              <widget class="QGroupBox" name="groupBox_2">
+              <widget class="QGroupBox" name="grb_energy">
                <property name="title">
-                <string>ENERGY</string>
+                <string>Energy</string>
                </property>
                <layout class="QGridLayout" name="gridLayout_15">
                 <item row="0" column="0">
@@ -170,7 +170,7 @@
              <item>
               <widget class="QGroupBox" name="grb_reports">
                <property name="title">
-                <string>REPORTS</string>
+                <string>Reports</string>
                </property>
                <layout class="QGridLayout" name="gridLayout_10">
                 <item row="0" column="1">
