@@ -154,8 +154,8 @@ BEGIN
 
         -- Insert into inp table
         IF v_epatablename = 'inp_flwreg_pump' THEN
-            INSERT INTO inp_flwreg_pump (flwreg_id, pump_type, curve_id, status, startup, shutoff)
-            SELECT v_flwreg_id, 'TEST', curve_id, status, startup, shutoff FROM inp_pump WHERE arc_id = v_data.arc_id;
+            INSERT INTO inp_flwreg_pump (flwreg_id, curve_id, status, startup, shutoff)
+            SELECT v_flwreg_id, curve_id, status, startup, shutoff FROM inp_pump WHERE arc_id = v_data.arc_id;
 
         ELSIF v_epatablename = 'inp_flwreg_orifice' THEN
             INSERT INTO inp_flwreg_orifice (

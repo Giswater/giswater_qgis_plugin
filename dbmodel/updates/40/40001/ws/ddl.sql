@@ -39,7 +39,6 @@ CREATE TABLE inp_dscenario_flwreg_valve (
 
 CREATE TABLE inp_flwreg_pump (
     element_id varchar(16) NOT NULL,
-    pump_type varchar(18) NOT NULL,
     curve_id varchar(16) NOT NULL,
     status varchar(3) NULL,
     startup numeric(12, 4) NULL,
