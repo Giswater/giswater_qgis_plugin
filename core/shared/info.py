@@ -563,7 +563,12 @@ class GwInfo(QObject):
 
         btn_cancel = self.dlg_cf.findChild(QPushButton, 'btn_cancel')
         btn_accept = self.dlg_cf.findChild(QPushButton, 'btn_accept')
-        title = f"{complet_result['body']['form']['headerText']}"
+        try:
+            title = f"{complet_result['body']['form']['headerText']}"
+        except KeyError:
+            title = f"{complet_result['body']['feature']['childType']}"
+        except Exception:
+            title = "Info"
 
         # Connect dialog signals
         if lib_vars.session_vars['dialog_docker'] and is_docker and lib_vars.session_vars['info_docker']:
@@ -955,7 +960,7 @@ class GwInfo(QObject):
                 self.feature_type = result[0]
         result = complet_result['body']['data']
         return result
-    
+
 
     def _open_help(self, feature_type):
         """ Open PDF file with selected @project_type and @feature_type """
