@@ -66,7 +66,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="additional_info">
+     <widget class="QWidget" name="tab_additional_info">
       <attribute name="title">
        <string>Additional info</string>
       </attribute>
@@ -136,7 +136,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tab_rel">
+     <widget class="QWidget" name="tab_relations">
       <attribute name="title">
        <string>Relations</string>
       </attribute>
@@ -550,7 +550,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tab">
+     <widget class="QWidget" name="tab_budget">
       <attribute name="title">
        <string>Budget</string>
       </attribute>

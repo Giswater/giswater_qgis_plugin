@@ -453,7 +453,7 @@ class GwPsector:
                 widget.setStyleSheet(None)
 
         # get widgets from additional_info tab
-        add_info_widgets = self.dlg_plan_psector.additional_info.findChildren(QWidget)
+        add_info_widgets = self.dlg_plan_psector.tab_additional_info.findChildren(QWidget)
         widget_list.extend(add_info_widgets)
 
         # fill my_json when field change
