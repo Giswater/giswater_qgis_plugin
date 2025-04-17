@@ -1458,6 +1458,7 @@ DROP INDEX IF EXISTS element_sector;
 CREATE TABLE element (
 	element_id varchar(16) DEFAULT nextval('urn_id_seq'::regclass) NOT NULL,
 	code text NULL,
+	sys_code text NULL,
 	elementcat_id varchar(30) NOT NULL,
 	serial_number varchar(30) NULL,
 	num_elements int4 NULL,
@@ -1518,7 +1519,9 @@ CREATE TABLE element (
 
 CREATE INDEX element_index ON element USING gist (the_geom);
 CREATE INDEX element_muni ON element USING btree (muni_id);
+CREATE INDEX element_sys_code_idx ON element USING btree (sys_code);
 CREATE INDEX element_sector ON element USING btree (sector_id);
+CREATE INDEX element_asset_id_idx ON element USING btree (asset_id);
 
 
 -- node

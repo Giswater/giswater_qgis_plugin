@@ -112,10 +112,14 @@ CREATE OR REPLACE VIEW v_edit_element AS
 SELECT e.* FROM (
 SELECT element.element_id,
     element.code,
+    element.sys_code,
     element.elementcat_id,
     cat_element.element_type,
     element.brand_id,
     element.model_id,
+    element.asset_id,
+    element.datasource,
+    element.omunit_id,
     element.serial_number,
     element.state,
     element.state_type,
@@ -574,6 +578,8 @@ AS SELECT element.pol_id,
 CREATE OR REPLACE VIEW v_ui_element
 AS SELECT element.element_id AS id,
     element.code,
+    cat_feature.feature_class,
+    cat_element.element_type,
     element.elementcat_id,
     element.brand_id,
     element.model_id,
@@ -608,7 +614,10 @@ AS SELECT element.element_id AS id,
     element.created_by,
     element.updated_at,
     element.updated_by
-   FROM element;
+   FROM element
+     LEFT JOIN cat_element ON cat_element.id::text = element.elementcat_id::text
+     JOIN cat_feature_element cfe ON cfe.id::text = cat_element.element_type::text
+     JOIN cat_feature ON cat_feature.id::text = cfe.id::text;
 
 CREATE OR REPLACE VIEW v_state_arc
 AS WITH p AS (
