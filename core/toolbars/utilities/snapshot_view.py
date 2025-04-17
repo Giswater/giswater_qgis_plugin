@@ -75,48 +75,47 @@ class GwSnapshotViewButton(GwAction):
     def _handle_coordinates_actions(self):
         """Populate the coordinates actions button with actions"""
         try:
+
+            # Create menu
             menu = QMenu(self.btn_coordinate_actions)
-            dict_menu = {}
 
-            # Exploitation
-            action_expl = menu.addMenu(f"Calculate from Exploitation")
-            dict_menu[f"Calculate from Exploitation"] = action_expl
+            # Get translations
+            calc_expl = tools_qt.tr("Calculate from exploitation", "snapshot_view")
+            calc_muni = tools_qt.tr("Calculate from municipality", "snapshot_view")
+            cur_canvas = tools_qt.tr("Use current map canvas extent", "snapshot_view")
+            draw_canvas = tools_qt.tr("Draw on map canvas", "snapshot_view")
 
-            action_expl_1 = QAction('1 - expl_01', self.btn_coordinate_actions)
-            action_expl_1.triggered.connect(partial(self._update_current_polygon, "exploitation", "expl_id", '1'))
-            dict_menu[f"Calculate from Exploitation - 1 - expl_01"] = action_expl_1
-            dict_menu[f"Calculate from Exploitation"].addAction(action_expl_1)
+            # Create actions for the menu
+            dict_menu = {
+                calc_expl: menu.addMenu(calc_expl),
+                calc_muni: menu.addMenu(calc_muni),
+                cur_canvas: QAction(cur_canvas, self.btn_coordinate_actions),
+                draw_canvas: QAction(draw_canvas, self.btn_coordinate_actions)
+            }
 
-            action_expl_2 = QAction('2 - expl_02', self.btn_coordinate_actions)
-            action_expl_2.triggered.connect(partial(self._update_current_polygon, "exploitation", "expl_id", '2'))
-            dict_menu[f"Calculate from Exploitation - 2 - expl_02"] = action_expl_2
-            dict_menu[f"Calculate from Exploitation"].addAction(action_expl_2)
+            # Fill actions from exploitation
+            result = tools_db.get_rows(f"SELECT expl_id, name FROM {lib_vars.schema_name}.exploitation WHERE the_geom IS NOT NULL;")
+            if result:
+                for row in result:
+                    action = QAction(f"{row[0]} - {row[1]}", self.btn_coordinate_actions)
+                    dict_menu[calc_expl].addAction(action)
+                    action.triggered.connect(partial(self._update_current_polygon, "exploitation", "expl_id", row[0]))
 
-            # Municipality
-            action_muni = menu.addMenu(f"Calculate from Municipality")
-            dict_menu[f"Calculate from Municipality"] = action_muni
-
-            action_muni_1 = QAction('1 - Sant Boi del Llobregat', self.btn_coordinate_actions)
-            action_muni_1.triggered.connect(partial(self._update_current_polygon, "ext_municipality", "muni_id", '1'))
-            dict_menu[f"Calculate from Municipality - 1 - Sant Boi del Llobregat"] = action_muni_1
-            dict_menu[f"Calculate from Municipality"].addAction(action_muni_1)
-
-            action_muni_2 = QAction('2 - Sant Esteve de les Roures', self.btn_coordinate_actions)
-            action_muni_2.triggered.connect(partial(self._update_current_polygon, "ext_municipality", "muni_id", '2'))
-            dict_menu[f"Calculate from Municipality - 2 - Sant Esteve de les Roures"] = action_muni_2
-            dict_menu[f"Calculate from Municipality"].addAction(action_muni_2)
+            # Fill actions from municipality
+            result = tools_db.get_rows(f"SELECT muni_id, name FROM {lib_vars.schema_name}.ext_municipality WHERE the_geom IS NOT NULL;")
+            if result:
+                for row in result:
+                    action = QAction(f"{row[0]} - {row[1]}", self.btn_coordinate_actions)
+                    dict_menu[calc_muni].addAction(action)
+                    action.triggered.connect(partial(self._update_current_polygon, "ext_municipality", "muni_id", row[0]))
 
             # Map Canvas Extent
-            action_current = QAction('Use Current Map Canvas Extent', self.btn_coordinate_actions)
-            action_current.triggered.connect(partial(self._update_current_polygon, "map_canvas"))
-            dict_menu[f"Use Current Map Canvas Extent"] = action_current
-            menu.addAction(action_current)
+            dict_menu[cur_canvas].triggered.connect(partial(self._update_current_polygon, "map_canvas"))
+            menu.addAction(dict_menu[cur_canvas])
 
             # Draw on map canvas
-            action_draw = QAction('Draw on Map Canvas', self.btn_coordinate_actions)
-            action_draw.triggered.connect(partial(self._update_current_polygon, "draw"))
-            dict_menu[f"Draw on Map Canvas"] = action_draw
-            menu.addAction(action_draw)
+            dict_menu[draw_canvas].triggered.connect(partial(self._update_current_polygon, "draw"))
+            menu.addAction(dict_menu[draw_canvas])
 
             # Assign the menu to the button
             self.btn_coordinate_actions.setMenu(menu)
