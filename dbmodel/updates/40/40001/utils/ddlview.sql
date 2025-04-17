@@ -286,97 +286,110 @@ CREATE OR REPLACE VIEW v_ui_element_x_link
 AS SELECT
     element_x_link.link_id,
     element_x_link.element_id,
-    v_edit_element.elementcat_id,
+    cat_feature.feature_class,
+    cat_element.element_type,
+    element.elementcat_id,
     cat_element.descript,
-    v_edit_element.num_elements,
+    element.num_elements,
     value_state.name AS state,
     value_state_type.name AS state_type,
-    v_edit_element.observ,
-    v_edit_element.comment,
-    v_edit_element.location_type,
-    v_edit_element.builtdate,
-    v_edit_element.enddate,
-    v_edit_element.link,
-    v_edit_element.publish,
-    v_edit_element.inventory
+    element.observ,
+    element.comment,
+    element.location_type,
+    element.builtdate,
+    element.enddate,
+    element.link,
+    element.publish,
+    element.inventory
    FROM element_x_link
-     JOIN v_edit_element ON v_edit_element.element_id::text = element_x_link.element_id::text
-     JOIN value_state ON v_edit_element.state = value_state.id
-     LEFT JOIN value_state_type ON v_edit_element.state_type = value_state_type.id
-     LEFT JOIN man_type_location ON man_type_location.location_type::text = v_edit_element.location_type::text AND man_type_location.feature_type::text = 'ELEMENT'::text
-     LEFT JOIN cat_element ON cat_element.id::text = v_edit_element.elementcat_id::text;
+     JOIN element ON element.element_id::text = element_x_link.element_id::text
+     JOIN value_state ON element.state = value_state.id
+     LEFT JOIN value_state_type ON element.state_type = value_state_type.id
+     LEFT JOIN man_type_location ON man_type_location.location_type::text = element.location_type::text AND man_type_location.feature_type::text = 'ELEMENT'::text
+     LEFT JOIN cat_element ON cat_element.id::text = element.elementcat_id::text
+     JOIN cat_feature_element cfe ON cfe.id::text = cat_element.element_type::text
+     JOIN cat_feature ON cat_feature.id::text = cfe.id::text;
 
 CREATE OR REPLACE VIEW v_ui_element_x_node
-AS SELECT
-    element_x_node.node_id,
+AS SELECT element_x_node.node_id,
     element_x_node.element_id,
-    v_edit_element.elementcat_id,
+    cat_feature.feature_class,
+    cat_element.element_type,
+    element.elementcat_id,
     cat_element.descript,
-    v_edit_element.num_elements,
+    element.num_elements,
     value_state.name AS state,
     value_state_type.name AS state_type,
-    v_edit_element.observ,
-    v_edit_element.comment,
-    v_edit_element.location_type,
-    v_edit_element.builtdate,
-    v_edit_element.enddate,
-    v_edit_element.link,
-    v_edit_element.publish,
-    v_edit_element.inventory
+    element.observ,
+    element.comment,
+    element.location_type,
+    element.builtdate,
+    element.enddate,
+    element.link,
+    element.publish,
+    element.inventory
    FROM element_x_node
-     JOIN v_edit_element ON v_edit_element.element_id::text = element_x_node.element_id::text
-     JOIN value_state ON v_edit_element.state = value_state.id
-     LEFT JOIN value_state_type ON v_edit_element.state_type = value_state_type.id
-     LEFT JOIN man_type_location ON man_type_location.location_type::text = v_edit_element.location_type::text AND man_type_location.feature_type::text = 'ELEMENT'::text
-     LEFT JOIN cat_element ON cat_element.id::text = v_edit_element.elementcat_id::text;
+     JOIN element ON element.element_id::text = element_x_node.element_id::text
+     JOIN value_state ON element.state = value_state.id
+     LEFT JOIN value_state_type ON element.state_type = value_state_type.id
+     LEFT JOIN man_type_location ON man_type_location.location_type::text = element.location_type::text AND man_type_location.feature_type::text = 'ELEMENT'::text
+     LEFT JOIN cat_element ON cat_element.id::text = element.elementcat_id::text
+     JOIN cat_feature_element cfe ON cfe.id::text = cat_element.element_type::text
+     JOIN cat_feature ON cat_feature.id::text = cfe.id::text;
 
 CREATE OR REPLACE VIEW v_ui_element_x_connec
-AS SELECT
-    element_x_connec.connec_id,
+AS SELECT element_x_connec.connec_id,
     element_x_connec.element_id,
-    v_edit_element.elementcat_id,
+    cat_feature.feature_class,
+    cat_element.element_type,
+    element.elementcat_id,
     cat_element.descript,
-    v_edit_element.num_elements,
+    element.num_elements,
     value_state.name AS state,
     value_state_type.name AS state_type,
-    v_edit_element.observ,
-    v_edit_element.comment,
-    v_edit_element.location_type,
-    v_edit_element.builtdate,
-    v_edit_element.enddate,
-    v_edit_element.link,
-    v_edit_element.publish,
-    v_edit_element.inventory
+    element.observ,
+    element.comment,
+    element.location_type,
+    element.builtdate,
+    element.enddate,
+    element.link,
+    element.publish,
+    element.inventory
    FROM element_x_connec
-     JOIN v_edit_element ON v_edit_element.element_id::text = element_x_connec.element_id::text
-     JOIN value_state ON v_edit_element.state = value_state.id
-     LEFT JOIN value_state_type ON v_edit_element.state_type = value_state_type.id
-     LEFT JOIN man_type_location ON man_type_location.location_type::text = v_edit_element.location_type::text AND man_type_location.feature_type::text = 'ELEMENT'::text
-     LEFT JOIN cat_element ON cat_element.id::text = v_edit_element.elementcat_id::text;
+     JOIN element ON element.element_id::text = element_x_connec.element_id::text
+     JOIN value_state ON element.state = value_state.id
+     LEFT JOIN value_state_type ON element.state_type = value_state_type.id
+     LEFT JOIN man_type_location ON man_type_location.location_type::text = element.location_type::text AND man_type_location.feature_type::text = 'ELEMENT'::text
+     LEFT JOIN cat_element ON cat_element.id::text = element.elementcat_id::TEXT
+     JOIN cat_feature_element cfe ON cfe.id::text = cat_element.element_type::text
+     JOIN cat_feature ON cat_feature.id::text = cfe.id::text;
 
 CREATE OR REPLACE VIEW v_ui_element_x_arc
-AS SELECT
-    element_x_arc.arc_id,
+AS SELECT element_x_arc.arc_id,
     element_x_arc.element_id,
-    v_edit_element.elementcat_id,
+    cat_feature.feature_class,
+    cat_element.element_type,
+    element.elementcat_id,
     cat_element.descript,
-    v_edit_element.num_elements,
+    element.num_elements,
     value_state.name AS state,
     value_state_type.name AS state_type,
-    v_edit_element.observ,
-    v_edit_element.comment,
-    v_edit_element.location_type,
-    v_edit_element.builtdate,
-    v_edit_element.enddate,
-    v_edit_element.link,
-    v_edit_element.publish,
-    v_edit_element.inventory
+    element.observ,
+    element.comment,
+    element.location_type,
+    element.builtdate,
+    element.enddate,
+    element.link,
+    element.publish,
+    element.inventory
    FROM element_x_arc
-     JOIN v_edit_element ON v_edit_element.element_id::text = element_x_arc.element_id::text
-     JOIN value_state ON v_edit_element.state = value_state.id
-     LEFT JOIN value_state_type ON v_edit_element.state_type = value_state_type.id
-     LEFT JOIN man_type_location ON man_type_location.location_type::text = v_edit_element.location_type::text AND man_type_location.feature_type::text = 'ELEMENT'::text
-     LEFT JOIN cat_element ON cat_element.id::text = v_edit_element.elementcat_id::text;
+     JOIN element ON element.element_id::text = element_x_arc.element_id::text
+     JOIN value_state ON element.state = value_state.id
+     LEFT JOIN value_state_type ON element.state_type = value_state_type.id
+     LEFT JOIN man_type_location ON man_type_location.location_type::text = element.location_type::text AND man_type_location.feature_type::text = 'ELEMENT'::text
+     LEFT JOIN cat_element ON cat_element.id::text = element.elementcat_id::text
+     JOIN cat_feature_element cfe ON cfe.id::text = cat_element.element_type::text
+     JOIN cat_feature ON cat_feature.id::text = cfe.id::text;
 
 -- PSECTORS
 CREATE OR REPLACE VIEW v_plan_psector_node
