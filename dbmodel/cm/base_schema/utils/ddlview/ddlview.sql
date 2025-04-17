@@ -8,7 +8,7 @@ or (at your option) any later version.
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-CREATE OR REPLACE VIEW v_team_x_user AS 
+CREATE OR REPLACE VIEW vi_team_x_user AS 
 SELECT om_team_x_user.id,
 om_team_x_user.user_id,
 cat_user.user_id AS user_name,
