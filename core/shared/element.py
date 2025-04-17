@@ -303,6 +303,9 @@ class GwElement:
             if orientation:
                 layout_orientations[layout_name] = orientation
 
+        current_layout = ""
+        previous_label = False
+
         # Loop through fields and add them to the appropriate layouts
         for field in complet_result['body']['data']['fields']:
             # Skip hidden fields
@@ -331,8 +334,18 @@ class GwElement:
                     tools_qgis.show_message(message, 2, parameter=msg, dialog=self.dlg_mng)
                     continue
 
+                if current_layout != field['layoutname']:
+                    current_layout = field['layoutname']
+                    old_widget_pos = field['layoutorder']
+                elif previous_label:
+                    # If the previous widget was a label, adjust the position of the new widget
+                    old_widget_pos = field['layoutorder']
+
                 # Populate dialog widgets using lytOrientation field
-                old_widget_pos = tools_gw.add_widget_combined(self.dlg_mng, field, label, widget, old_widget_pos)
+                tools_gw.add_widget_combined(self.dlg_mng, field, label, widget, old_widget_pos)
+
+                # Check if label is not None
+                previous_label = label is not None
 
             elif field['layoutname'] != 'lyt_none':
                 message = "The field layoutname is not configured for"
