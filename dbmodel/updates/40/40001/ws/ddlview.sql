@@ -227,7 +227,6 @@ AS WITH
   SELECT arc_selected.*
   FROM arc_selected;
 
-
 CREATE OR REPLACE VIEW v_edit_node
 AS WITH
     typevalue AS
@@ -448,6 +447,63 @@ AS WITH
       )
     SELECT n.*
     FROM node_selected n;
+
+CREATE OR REPLACE VIEW v_edit_element AS
+SELECT e.* FROM (
+SELECT element.element_id,
+    element.code,
+    element.sys_code,
+    element.elementcat_id,
+    cat_element.element_type,
+    element.brand_id,
+    element.model_id,
+    element.asset_id,
+    element.datasource,
+    element.serial_number,
+    element.state,
+    element.state_type,
+    element.num_elements,
+    element.observ,
+    element.comment,
+    element.function_type,
+    element.category_type,
+    element.location_type,
+    element.fluid_type,
+    element.workcat_id,
+    element.workcat_id_end,
+    element.builtdate,
+    element.enddate,
+    element.ownercat_id,
+    element.rotation,
+    element.link,
+    element.verified,
+    element.label_x,
+    element.label_y,
+    element.label_rotation,
+    element.publish,
+    element.inventory,
+    element.undelete,
+    element.expl_id,
+    element.pol_id,
+    element.top_elev,
+    element.expl_id2,
+    element.trace_featuregeom,
+    element.muni_id,
+    element.sector_id,
+    element.lock_level,
+    element.created_at,
+    element.created_by,
+    element.updated_at,
+    element.updated_by,
+    element.the_geom
+   FROM selector_expl, element
+    JOIN cat_element ON element.elementcat_id::text = cat_element.id::text
+    LEFT JOIN cat_feature_element ON cat_element.element_type::text = cat_feature_element.id::text
+  WHERE element.expl_id = selector_expl.expl_id AND selector_expl.cur_user = "current_user"()::text) e
+  LEFT JOIN selector_sector s USING (sector_id)
+  LEFT JOIN selector_municipality m USING (muni_id)
+  WHERE (s.cur_user = current_user OR s.sector_id IS NULL)
+  AND (m.cur_user = current_user OR e.muni_id IS NULL);
 
 
 CREATE OR REPLACE VIEW v_edit_link
