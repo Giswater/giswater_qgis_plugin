@@ -97,3 +97,31 @@ INSERT INTO man_genelement (element_id) SELECT element_id FROM element;
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"temp_node", "column":"omzone_id", "dataType":"integer", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"temp_arc", "column":"omzone_id", "dataType":"integer", "isUtils":"False"}}$$);
+
+UPDATE config_form_fields
+SET layoutname='lyt_document_1', layoutorder=3, "datatype"='string', widgettype='combo', "label"='Doc type:', tooltip='Doc type:', placeholder=NULL, ismandatory=false, isparent=false, iseditable=true, isautoupdate=false, isfilter=true, dv_querytext='SELECT id as id, idval as idval FROM edit_typevalue WHERE typevalue = ''doc_type''', dv_orderby_id=NULL, dv_isnullvalue=true, dv_parent_id=NULL, dv_querytext_filterc=NULL, stylesheet=NULL, widgetcontrols='{"labelPosition": "top"}'::json, widgetfunction='{"functionName": "filter_table", "parameters":{}}'::json, linkedobject='tbl_doc_x_node', hidden=false, web_layoutorder=3
+WHERE formname='node' AND formtype='form_feature' AND columnname='doc_type' AND tabname='tab_documents';
+UPDATE config_form_fields
+SET layoutname='lyt_document_1', layoutorder=3, "datatype"='string', widgettype='combo', "label"='Doc type:', tooltip='Doc type:', placeholder=NULL, ismandatory=false, isparent=false, iseditable=true, isautoupdate=false, isfilter=true, dv_querytext='SELECT id as id, idval as idval FROM edit_typevalue WHERE typevalue = ''doc_type''', dv_orderby_id=NULL, dv_isnullvalue=true, dv_parent_id=NULL, dv_querytext_filterc=NULL, stylesheet=NULL, widgetcontrols='{"labelPosition": "top"}'::json, widgetfunction='{"functionName": "filter_table", "parameters":{}}'::json, linkedobject='tbl_doc_x_connec', hidden=false, web_layoutorder=3
+WHERE formname='connec' AND formtype='form_feature' AND columnname='doc_type' AND tabname='tab_documents';
+UPDATE config_form_fields
+SET layoutname='lyt_document_1', layoutorder=3, "datatype"='string', widgettype='combo', "label"='Doc type:', tooltip=NULL, placeholder=NULL, ismandatory=false, isparent=false, iseditable=true, isautoupdate=false, isfilter=true, dv_querytext='SELECT id as id, idval as idval FROM edit_typevalue WHERE typevalue = ''doc_type''', dv_orderby_id=NULL, dv_isnullvalue=true, dv_parent_id=NULL, dv_querytext_filterc=NULL, stylesheet=NULL, widgetcontrols='{"labelPosition": "top"}'::json, widgetfunction='{"functionName": "filter_table", "parameters":{}}'::json, linkedobject='tbl_doc_x_link', hidden=false, web_layoutorder=3
+WHERE formname='v_edit_link' AND formtype='form_feature' AND columnname='doc_type' AND tabname='tab_documents';
+UPDATE config_form_fields
+SET layoutname='lyt_document_1', layoutorder=3, "datatype"='string', widgettype='combo', "label"='Doc type:', tooltip=NULL, placeholder=NULL, ismandatory=false, isparent=false, iseditable=true, isautoupdate=false, isfilter=true, dv_querytext='SELECT id as id, idval as idval FROM edit_typevalue WHERE typevalue = ''doc_type''', dv_orderby_id=NULL, dv_isnullvalue=true, dv_parent_id=NULL, dv_querytext_filterc=NULL, stylesheet=NULL, widgetcontrols='{"labelPosition": "top"}'::json, widgetfunction='{"functionName": "filter_table", "parameters":{}}'::json, linkedobject='tbl_doc_x_link', hidden=false, web_layoutorder=3
+WHERE formname='ve_link_servconnection' AND formtype='form_feature' AND columnname='doc_type' AND tabname='tab_documents';
+UPDATE config_form_fields
+SET layoutname='lyt_document_1', layoutorder=3, "datatype"='string', widgettype='combo', "label"='Doc type:', tooltip='Doc type:', placeholder=NULL, ismandatory=false, isparent=false, iseditable=true, isautoupdate=false, isfilter=true, dv_querytext='SELECT id as id, idval as idval FROM edit_typevalue WHERE typevalue = ''doc_type''', dv_orderby_id=NULL, dv_isnullvalue=true, dv_parent_id=NULL, dv_querytext_filterc=NULL, stylesheet=NULL, widgetcontrols='{"labelPosition": "top"}'::json, widgetfunction='{"functionName": "filter_table", "parameters":{}}'::json, linkedobject='tbl_doc_x_arc', hidden=false, web_layoutorder=3
+WHERE formname='arc' AND formtype='form_feature' AND columnname='doc_type' AND tabname='tab_documents';
+UPDATE config_form_fields
+SET layoutname='lyt_document_1', layoutorder=3, "datatype"='string', widgettype='combo', "label"='Doc type:', tooltip='Doc type:', placeholder=NULL, ismandatory=false, isparent=false, iseditable=true, isautoupdate=false, isfilter=true, dv_querytext='SELECT id as id, idval as idval FROM edit_typevalue WHERE typevalue = ''doc_type''', dv_orderby_id=NULL, dv_isnullvalue=true, dv_parent_id=NULL, dv_querytext_filterc=NULL, stylesheet=NULL, widgetcontrols='{"labelPosition": "top"}'::json, widgetfunction='{"functionName": "filter_table", "parameters":{}}'::json, linkedobject='tbl_doc_x_gully', hidden=false, web_layoutorder=3
+WHERE formname='gully' AND formtype='form_feature' AND columnname='doc_type' AND tabname='tab_documents';
+
+
+INSERT INTO edit_typevalue (typevalue, id, idval, descript)
+SELECT 'doc_type', id, id, comment
+FROM doc_type;
+
+ALTER TABLE doc DROP CONSTRAINT IF EXISTS doc_doc_type_fkey;
+
+DROP TABLE IF EXISTS doc_type;

@@ -39,8 +39,6 @@ SELECT col_type_is('doc', 'tstamp', 'timestamp', 'Column tstamp should be timest
 SELECT col_type_is('doc', 'the_geom', 'geometry(Point,25831)', 'Column the_geom should be geometry(Point,25831)');
 
 -- Check foreign keys
-SELECT has_fk('doc', 'Table doc should have foreign keys');
-SELECT fk_ok('doc', 'doc_type', 'doc_type', 'id', 'FK doc_doc_type_fkey should exist');
 
 -- Check triggers
 SELECT has_trigger('doc', 'gw_trg_doc', 'Table should have gw_trg_doc trigger');

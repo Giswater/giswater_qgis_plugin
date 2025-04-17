@@ -5122,6 +5122,11 @@ UPDATE edit_typevalue SET idval = 'BUSTER', descript = '' WHERE id = 'BUSTER' AN
 UPDATE edit_typevalue SET idval = 'CHECKVALVE', descript = '' WHERE id = 'CHECKVALVE' AND typevalue = 'graphdelimiter_type';
 UPDATE edit_typevalue SET idval = 'date', descript = '' WHERE id = 'date' AND typevalue = 'man_addfields_cat_datatype';
 UPDATE edit_typevalue SET idval = 'integer', descript = '' WHERE id = 'integer' AND typevalue = 'man_addfields_cat_datatype';
+UPDATE edit_typevalue SET id = 'AS_BUILT', descript = '' WHERE id = 'AS_BUILT' AND typevalue = 'doc_type';
+UPDATE edit_typevalue SET id = 'INCIDENT', descript = '' WHERE id = 'INCIDENT' AND typevalue = 'doc_type';
+UPDATE edit_typevalue SET id = 'OTHER', descript = '' WHERE id = 'OTHER' AND typevalue = 'doc_type';
+UPDATE edit_typevalue SET id = 'WORK RAPPORT', descript = '' WHERE id = 'WORK RAPPORT' AND typevalue = 'doc_type';
+UPDATE edit_typevalue SET id = 'PICTURE', descript = '' WHERE id = 'PICTURE' AND typevalue = 'doc_type';
 UPDATE om_typevalue SET idval = 'No', descript = '' WHERE id = '2' AND typevalue = 'visit_cleaned';
 UPDATE om_typevalue SET idval = 'Started', descript = '' WHERE id = '1' AND typevalue = 'visit_status';
 UPDATE om_typevalue SET idval = 'Broken cover', descript = '' WHERE id = '1' AND typevalue = 'incident_type';
@@ -7423,11 +7428,6 @@ UPDATE config_form_fields SET label = 'Workcat ID end', tooltip = 'workcat_id_en
 UPDATE config_form_fields SET label = 'Workcat ID plan', tooltip = 'workcat_id_plan - Item planning record' WHERE formname LIKE '%_node%' AND formtype = 'form_feature' AND columnname = 'workcat_id_plan';
 UPDATE config_form_fields SET label = 'Date', tooltip = 'xyz_date - Collection date of the surveyor''s level' WHERE formname LIKE '%_node%' AND formtype = 'form_feature' AND columnname = 'xyz_date';
 UPDATE config_form_fields SET label = 'ymax', tooltip = 'ymax - Depth from ground to invert elevation (ft or m)' WHERE formname LIKE '%_node%' AND formtype = 'form_feature' AND columnname = 'ymax';
-UPDATE doc_type SET id = 'AS_BUILT', comment = '' WHERE id = 'AS_BUILT';
-UPDATE doc_type SET id = 'INCIDENT', comment = '' WHERE id = 'INCIDENT';
-UPDATE doc_type SET id = 'OTHER', comment = '' WHERE id = 'OTHER';
-UPDATE doc_type SET id = 'WORK RAPPORT', comment = '' WHERE id = 'WORK RAPPORT';
-UPDATE doc_type SET id = 'PICTURE', comment = '' WHERE id = 'PICTURE';
 UPDATE value_state SET name = 'OPERATIVE', observ = '' WHERE id = '1';
 UPDATE value_state SET name = 'OBSOLETE', observ = '' WHERE id = '0';
 UPDATE value_state SET name = 'PLANIFIED', observ = '' WHERE id = '2';

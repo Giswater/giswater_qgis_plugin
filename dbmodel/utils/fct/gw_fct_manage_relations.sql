@@ -146,7 +146,7 @@ BEGIN
     END IF;
 
     IF v_data->>'visit' IS NOT NULL AND v_data->>'visit' != '[]' THEN
-        v_querytext = format('DELETE FROM %I WHERE %I = $1 AND %I NOT IN (SELECT jsonb_array_elements_text($2::jsonb))',
+        v_querytext = format('DELETE FROM %I WHERE %I::text = $1 AND %I::text NOT IN (SELECT jsonb_array_elements_text($2::jsonb))',
             v_relations_table_prefix||'visit', v_table_name||'_id', 'visit_id');
 
         EXECUTE v_querytext USING v_element_id, v_data->>'visit';
@@ -196,7 +196,7 @@ BEGIN
     END IF;
 
     IF v_data->>'visit' IS NOT NULL AND v_data->>'visit' != '[]' THEN
-        v_querytext = format('INSERT INTO %I (%I, visit_id) SELECT $1, jsonb_array_elements_text($2::jsonb) ON CONFLICT DO NOTHING',
+        v_querytext = format('INSERT INTO %I (%I, visit_id) SELECT $1, jsonb_array_elements_text($2::jsonb)::int ON CONFLICT DO NOTHING',
             v_relations_table_prefix||'visit', v_table_name||'_id');
 
         EXECUTE v_querytext USING v_element_id, v_data->>'visit';

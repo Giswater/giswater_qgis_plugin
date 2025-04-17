@@ -70,6 +70,11 @@ INSERT INTO edit_typevalue VALUES ('graphdelimiter_type', 'NONE', 'NONE', NULL, 
 INSERT INTO edit_typevalue VALUES ('graphdelimiter_type', 'PRESSZONE', 'PRESSZONE', NULL, NULL);
 INSERT INTO edit_typevalue VALUES ('graphdelimiter_type', 'SECTOR', 'SECTOR', NULL, NULL);
 INSERT INTO edit_typevalue VALUES ('value_review_status', '4', 'Only review observations', NULL, NULL);
+INSERT INTO edit_typevalue VALUES ('doc_type', 'AS_BUILT', 'AS_BUILT', NULL, NULL);
+INSERT INTO edit_typevalue VALUES ('doc_type', 'INCIDENT', 'INCIDENT', NULL, NULL);
+INSERT INTO edit_typevalue VALUES ('doc_type', 'WORK RAPPORT', 'WORK RAPPORT', NULL, NULL);
+INSERT INTO edit_typevalue VALUES ('doc_type', 'OTHER', 'OTHER', NULL, NULL);
+INSERT INTO edit_typevalue VALUES ('doc_type', 'PICTURE', 'PICTURE', NULL, NULL);
 
 
 --
@@ -114,17 +119,6 @@ INSERT INTO om_typevalue VALUES ('visit_param_type', 'OTHER', 'OTHER', NULL, '{"
 INSERT INTO om_typevalue VALUES ('visit_param_type', 'REHABIT', 'REHABIT', NULL, '{"go2plan":true}');
 INSERT INTO om_typevalue VALUES ('waterbalance_method', 'CPW', 'CRM PERIOD WINDOW', NULL, NULL);
 INSERT INTO om_typevalue VALUES ('waterbalance_method', 'DCW', 'DMA CENTROID WINDOW', NULL, NULL);
-
-
---
--- Data for Name: doc_type; Type: TABLE DATA; Schema: ; Owner: -
---
-
-INSERT INTO doc_type VALUES ('AS_BUILT', NULL);
-INSERT INTO doc_type VALUES ('INCIDENT', NULL);
-INSERT INTO doc_type VALUES ('WORK RAPPORT', NULL);
-INSERT INTO doc_type VALUES ('OTHER', NULL);
-INSERT INTO doc_type VALUES ('PICTURE', NULL);
 
 
 --
