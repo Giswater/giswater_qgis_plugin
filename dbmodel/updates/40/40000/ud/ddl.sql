@@ -1126,8 +1126,6 @@ CREATE TABLE arc (
 	is_scadamap bool NULL,
 	registre_date date NULL,
 	hydraulic_capacity float8 NULL,
-	corrosion text NULL,
-	deficiencies text NULL,
 	meandering text NULL,
 	conserv_state text NULL,
 	om_state text NULL,
@@ -1774,8 +1772,6 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"archived_ps
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"archived_psector_arc_traceability", "column":"omunit_id", "dataType":"int4", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"archived_psector_arc_traceability", "column":"registre_date", "dataType":"date", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"archived_psector_arc_traceability", "column":"hydraulic_capacity", "dataType":"float8", "isUtils":"False"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"archived_psector_arc_traceability", "column":"corrosion", "dataType":"text", "isUtils":"False"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"archived_psector_arc_traceability", "column":"deficiencies", "dataType":"text", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"archived_psector_arc_traceability", "column":"meandering", "dataType":"text", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"archived_psector_arc_traceability", "column":"conserv_state", "dataType":"text", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"archived_psector_arc_traceability", "column":"om_state", "dataType":"text", "isUtils":"False"}}$$);

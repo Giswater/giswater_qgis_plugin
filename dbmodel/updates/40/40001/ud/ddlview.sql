@@ -617,8 +617,6 @@ AS WITH
             arc.is_scadamap,
             arc.registre_date,
             arc.hydraulic_capacity,
-            arc.corrosion,
-            arc.deficiencies,
             arc.meandering,
             arc.conserv_state,
             arc.om_state,
@@ -2513,7 +2511,7 @@ AS SELECT
     f.the_geom
     FROM v_edit_flwreg f
     JOIN inp_flwreg_orifice ori USING (element_id);
-	
+
 CREATE OR REPLACE VIEW v_edit_inp_flwreg_pump
 AS SELECT
     f.element_id,
