@@ -124,17 +124,17 @@ BEGIN
 		ELSIF v_targettable = 'inp_dscenario_divider' THEN
 			v_columns = v_scenarioid||', node_id, elev, ymax, divider_type, arc_id, curve_id, qmin, ht, cd, y0, ysur, apond';
 
-		ELSIF v_targettable = 'inp_dscenario_flwreg_orifice' THEN
+		ELSIF v_targettable = 'inp_dscenario_frorifice' THEN
 			v_columns = v_scenarioid||', node_id, order_id, to_arc, flwreg_length,  ori_type, offsetval, cd, orate, flap, shape,
 			geom1, geom2, geom3, geom4';
 
-	 	ELSIF v_targettable = 'inp_dscenario_flwreg_outlet' THEN
+	 	ELSIF v_targettable = 'inp_dscenario_froutlet' THEN
 			v_columns = v_scenarioid||', node_id, order_id, to_arc, flwreg_length, outlet_type, offsetval, curve_id, cd1, cd2';
 
-	 	ELSIF v_targettable = 'inp_dscenario_flwreg_pump' THEN
+	 	ELSIF v_targettable = 'inp_dscenario_frpump' THEN
 			v_columns = v_scenarioid||', node_id, order_id, to_arc, flwreg_length, curve_id, status, startup, shutoff';
 
-	 	ELSIF v_targettable = 'inp_dscenario_flwreg_weir' THEN
+	 	ELSIF v_targettable = 'inp_dscenario_frweir' THEN
 			v_columns = v_scenarioid||', node_id, order_id, to_arc, flwreg_length, weir_type, offsetval, cd, ec, 
 			cd2, flap, geom1, geom2, geom3, geom4, surcharge, road_width, road_surf, coef_curve';
 

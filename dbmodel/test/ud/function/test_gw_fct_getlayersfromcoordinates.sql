@@ -21,7 +21,7 @@ SELECT is(
     "v_edit_link", "ve_pol_node", "ve_pol_gully", "ve_pol_connec", "v_edit_dimensions", "v_edit_element", "v_edit_inp_junction",
     "v_edit_inp_outfall", "v_edit_inp_divider", "v_edit_inp_storage", "v_edit_inp_netgully", "v_edit_inp_conduit",
     "v_edit_inp_virtual", "v_edit_inp_pump", "v_edit_inp_weir", "v_edit_inp_outlet", "v_edit_inp_orifice", "v_edit_inp_gully",
-    "vi_gully2node", "v_edit_inp_flwreg_orifice", "v_edit_inp_flwreg_outlet", "v_edit_inp_flwreg_pump", "v_edit_inp_flwreg_weir",
+    "vi_gully2node", "v_edit_inp_frorifice", "v_edit_inp_froutlet", "v_edit_inp_frpump", "v_edit_inp_frweir",
     "v_edit_plan_psector", "v_plan_current_psector", "v_plan_psector_connec", "v_plan_psector_gully", "v_plan_psector_link",
     "v_plan_psector_node", "v_plan_psector_arc", "ext_municipality", "v_ext_streetaxis", "v_ext_plot"], "zoomScale":2564.170513209851 }}$$)::JSON)->>'status',
     'Accepted',

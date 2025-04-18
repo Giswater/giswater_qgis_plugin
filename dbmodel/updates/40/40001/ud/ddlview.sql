@@ -8,13 +8,13 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 DROP VIEW IF EXISTS v_edit_cat_feature_flwreg;
 
-DROP VIEW IF EXISTS v_edit_inp_dscenario_flwreg_orifice;
-DROP VIEW IF EXISTS v_edit_inp_dscenario_flwreg_outlet;
-DROP VIEW IF EXISTS v_edit_inp_dscenario_flwreg_weir;
+DROP VIEW IF EXISTS v_edit_inp_dscenario_frorifice;
+DROP VIEW IF EXISTS v_edit_inp_dscenario_froutlet;
+DROP VIEW IF EXISTS v_edit_inp_dscenario_frweir;
 
-DROP VIEW IF EXISTS v_edit_inp_flwreg_orifice;
-DROP VIEW IF EXISTS v_edit_inp_flwreg_outlet;
-DROP VIEW IF EXISTS v_edit_inp_flwreg_weir;
+DROP VIEW IF EXISTS v_edit_inp_frorifice;
+DROP VIEW IF EXISTS v_edit_inp_froutlet;
+DROP VIEW IF EXISTS v_edit_inp_frweir;
 
 
 DROP VIEW IF EXISTS v_edit_drainzone;
@@ -2503,11 +2503,12 @@ AS SELECT s.dscenario_id,
     WHERE s.dscenario_id = f.dscenario_id AND s.cur_user = CURRENT_USER;
 
 
-CREATE OR REPLACE VIEW v_edit_inp_flwreg_outlet
+CREATE OR REPLACE VIEW v_edit_inp_froutlet
 AS SELECT
     f.element_id,
     f.node_id,
     f.order_id,
+	f.nodarc_id,
     f.to_arc,
     f.flwreg_length,
     ou.outlet_type,
@@ -2518,13 +2519,14 @@ AS SELECT
     ou.flap,
     f.the_geom
     FROM v_edit_flwreg f
-    JOIN inp_flwreg_outlet ou USING (element_id);
+    JOIN inp_froutlet ou USING (element_id);
 
-CREATE OR REPLACE VIEW v_edit_inp_flwreg_weir
+CREATE OR REPLACE VIEW v_edit_inp_frweir
 AS SELECT
     f.element_id,
     f.node_id,
     f.order_id,
+	f.nodarc_id,
     f.to_arc,
     f.flwreg_length,
     w.weir_type,
@@ -2543,14 +2545,15 @@ AS SELECT
     w.coef_curve,
     f.the_geom
     FROM v_edit_flwreg f
-    JOIN inp_flwreg_weir w USING (element_id);
+    JOIN inp_frweir w USING (element_id);
 
 
-CREATE OR REPLACE VIEW v_edit_inp_flwreg_pump
+CREATE OR REPLACE VIEW v_edit_inp_frpump
 AS SELECT
     f.element_id,
     f.node_id,
     f.order_id,
+	f.nodarc_id,
     f.to_arc,
     f.flwreg_length,
     p.curve_id,
@@ -2559,13 +2562,14 @@ AS SELECT
     p.shutoff,
     f.the_geom
     FROM v_edit_flwreg f
-    JOIN inp_flwreg_pump p USING (element_id);
+    JOIN inp_frpump p USING (element_id);
 
-CREATE OR REPLACE VIEW v_edit_inp_flwreg_orifice
+CREATE OR REPLACE VIEW v_edit_inp_frorifice
 AS SELECT
     f.element_id,
     f.node_id,
     f.order_id,
+	f.nodarc_id,
     f.to_arc,
     f.flwreg_length,
     ori.orifice_type,
@@ -2580,13 +2584,14 @@ AS SELECT
     ori.geom4,
     f.the_geom
     FROM v_edit_flwreg f
-    JOIN inp_flwreg_orifice ori USING (element_id);
+    JOIN inp_frorifice ori USING (element_id);
 
-CREATE OR REPLACE VIEW v_edit_inp_flwreg_pump
+CREATE OR REPLACE VIEW v_edit_inp_frpump
 AS SELECT
     f.element_id,
     f.node_id,
     f.order_id,
+	f.nodarc_id,
     f.to_arc,
     f.flwreg_length,
     p.curve_id,
@@ -2595,10 +2600,10 @@ AS SELECT
     p.shutoff,
     f.the_geom
     FROM v_edit_flwreg f
-    JOIN inp_flwreg_pump p ON f.element_id::text = p.element_id::text;
+    JOIN inp_frpump p ON f.element_id::text = p.element_id::text;
 
 
-CREATE OR REPLACE VIEW v_edit_inp_dscenario_flwreg_pump
+CREATE OR REPLACE VIEW v_edit_inp_dscenario_frpump
 AS SELECT s.dscenario_id,
     f.element_id,
     f.curve_id,
@@ -2606,12 +2611,12 @@ AS SELECT s.dscenario_id,
     f.startup,
     f.shutoff,
     n.the_geom
-    FROM selector_inp_dscenario s, inp_dscenario_flwreg_pump f
-    JOIN v_edit_inp_flwreg_pump n USING (element_id)
+    FROM selector_inp_dscenario s, inp_dscenario_frpump f
+    JOIN v_edit_inp_frpump n USING (element_id)
     WHERE s.dscenario_id = f.dscenario_id AND s.cur_user = CURRENT_USER::text;
 
 
-CREATE OR REPLACE VIEW v_edit_inp_dscenario_flwreg_outlet
+CREATE OR REPLACE VIEW v_edit_inp_dscenario_froutlet
 AS SELECT
     s.dscenario_id,
     f.element_id,
@@ -2623,11 +2628,11 @@ AS SELECT
     f.cd2,
     f.flap,
     n.the_geom
-    FROM selector_inp_dscenario s, inp_dscenario_flwreg_outlet f
-    JOIN v_edit_inp_flwreg_outlet n USING (element_id)
+    FROM selector_inp_dscenario s, inp_dscenario_froutlet f
+    JOIN v_edit_inp_froutlet n USING (element_id)
 	WHERE s.dscenario_id = f.dscenario_id AND s.cur_user = CURRENT_USER::text;
 
-CREATE OR REPLACE VIEW v_edit_inp_dscenario_flwreg_weir
+CREATE OR REPLACE VIEW v_edit_inp_dscenario_frweir
 AS SELECT
     s.dscenario_id,
     f.element_id,
@@ -2647,11 +2652,11 @@ AS SELECT
     f.road_surf,
     f.coef_curve,
     n.the_geom
-    FROM selector_inp_dscenario s, inp_dscenario_flwreg_weir f
-    JOIN v_edit_inp_flwreg_weir n USING (element_id)
+    FROM selector_inp_dscenario s, inp_dscenario_frweir f
+    JOIN v_edit_inp_frweir n USING (element_id)
 	WHERE s.dscenario_id = f.dscenario_id AND s.cur_user = CURRENT_USER::text;
 
-CREATE OR REPLACE VIEW v_edit_inp_dscenario_flwreg_pump
+CREATE OR REPLACE VIEW v_edit_inp_dscenario_frpump
 AS SELECT
     s.dscenario_id,
     f.element_id,
@@ -2661,11 +2666,11 @@ AS SELECT
     f.startup,
     f.shutoff,
     n.the_geom
-    FROM selector_inp_dscenario s, inp_dscenario_flwreg_pump f
-    JOIN v_edit_inp_flwreg_pump n USING (element_id)
+    FROM selector_inp_dscenario s, inp_dscenario_frpump f
+    JOIN v_edit_inp_frpump n USING (element_id)
     WHERE s.dscenario_id = f.dscenario_id AND s.cur_user = CURRENT_USER::text;
 
-CREATE OR REPLACE VIEW v_edit_inp_dscenario_flwreg_orifice
+CREATE OR REPLACE VIEW v_edit_inp_dscenario_frorifice
 AS SELECT
     s.dscenario_id,
     f.element_id,
@@ -2681,8 +2686,8 @@ AS SELECT
     f.geom3,
     f.geom4,
     n.the_geom
-    FROM selector_inp_dscenario s, inp_dscenario_flwreg_orifice f
-    JOIN v_edit_inp_flwreg_orifice n USING (element_id)
+    FROM selector_inp_dscenario s, inp_dscenario_frorifice f
+    JOIN v_edit_inp_frorifice n USING (element_id)
     WHERE s.dscenario_id = f.dscenario_id AND s.cur_user = CURRENT_USER::text;
 
 
@@ -5682,10 +5687,10 @@ AS SELECT DISTINCT p.id,
 --     f.the_geom
 -- FROM
 --     flwreg f
--- left join inp_flwreg_orifice o using (flwreg_id)
--- left join inp_flwreg_outlet ou using (flwreg_id)
--- left join inp_flwreg_pump p using (flwreg_id)
--- left join inp_flwreg_weir w using (flwreg_id);
+-- left join inp_frorifice o using (flwreg_id)
+-- left join inp_froutlet ou using (flwreg_id)
+-- left join inp_frpump p using (flwreg_id)
+-- left join inp_frweir w using (flwreg_id);
 
 --10/01/2025
 --28/01/2025 [Modified]
@@ -6511,25 +6516,26 @@ AS SELECT om_visit_event.id AS event_id,
            FROM doc_x_visit) b ON b.visit_id = om_visit.id
   ORDER BY om_visit_x_gully.gully_id;
 
--- ve_epa_flwreg_weir 
-CREATE OR REPLACE VIEW ve_epa_flwreg_weir
-AS SELECT inp_flwreg_weir.element_id,
-	man_flwreg.node_id,
-	concat (man_flwreg.node_id,'_FR', order_id) as nodarc_id,
-    inp_flwreg_weir.weir_type,
-    inp_flwreg_weir.offsetval,
-    inp_flwreg_weir.cd,
-    inp_flwreg_weir.ec,
-    inp_flwreg_weir.cd2,
-    inp_flwreg_weir.flap,
-    inp_flwreg_weir.geom1,
-    inp_flwreg_weir.geom2,
-    inp_flwreg_weir.geom3,
-    inp_flwreg_weir.geom4,
-    inp_flwreg_weir.surcharge,
-    inp_flwreg_weir.road_width,
-    inp_flwreg_weir.road_surf,
-    inp_flwreg_weir.coef_curve,
+-- ve_epa_frweir 
+CREATE OR REPLACE VIEW ve_epa_frweir
+AS SELECT inp_frweir.element_id,
+	man_flowreg.node_id,
+	man_flowreg.order_id, 
+	concat (man_flowreg.node_id,'_FR', order_id) as nodarc_id,
+    inp_frweir.weir_type,
+    inp_frweir.offsetval,
+    inp_frweir.cd,
+    inp_frweir.ec,
+    inp_frweir.cd2,
+    inp_frweir.flap,
+    inp_frweir.geom1,
+    inp_frweir.geom2,
+    inp_frweir.geom3,
+    inp_frweir.geom4,
+    inp_frweir.surcharge,
+    inp_frweir.road_width,
+    inp_frweir.road_surf,
+    inp_frweir.coef_curve,
     rpt_arcflow_sum.max_flow,
     rpt_arcflow_sum.time_days,
     rpt_arcflow_sum.time_hour,
@@ -6544,26 +6550,27 @@ AS SELECT inp_flwreg_weir.element_id,
     rpt_arcflow_sum.min_shear,
     rpt_arcflow_sum.day_min,
     rpt_arcflow_sum.time_min
-   FROM inp_flwreg_weir
-     LEFT JOIN man_flwreg USING (element_id)
-     LEFT JOIN rpt_arcflow_sum ON rpt_arcflow_sum.arc_id = man_flwreg.nodarc_id;
+   FROM inp_frweir
+     LEFT JOIN man_flowreg USING (element_id)
+     LEFT JOIN rpt_arcflow_sum ON rpt_arcflow_sum.arc_id = concat (man_flowreg.node_id,'_FR', order_id);
 
 
--- ve_epa_flwreg_orifice
-CREATE OR REPLACE VIEW ve_epa_flwreg_orifice
-AS SELECT inp_flwreg_orifice.element_id,
-	man_flwreg.node_id,
-	concat (man_flwreg.node_id,'_FR', order_id) as nodarc_id,
-    inp_flwreg_orifice.orifice_type,
-    inp_flwreg_orifice.offsetval,
-    inp_flwreg_orifice.cd,
-    inp_flwreg_orifice.orate,
-    inp_flwreg_orifice.flap,
-    inp_flwreg_orifice.shape,
-    inp_flwreg_orifice.geom1,
-    inp_flwreg_orifice.geom2,
-    inp_flwreg_orifice.geom3,
-    inp_flwreg_orifice.geom4,
+-- ve_epa_frorifice
+CREATE OR REPLACE VIEW ve_epa_frorifice
+AS SELECT inp_frorifice.element_id,
+	man_flowreg.node_id,
+	man_flowreg.order_id, 
+	concat (man_flowreg.node_id,'_FR', order_id) as nodarc_id,
+    inp_frorifice.orifice_type,
+    inp_frorifice.offsetval,
+    inp_frorifice.cd,
+    inp_frorifice.orate,
+    inp_frorifice.flap,
+    inp_frorifice.shape,
+    inp_frorifice.geom1,
+    inp_frorifice.geom2,
+    inp_frorifice.geom3,
+    inp_frorifice.geom4,
     rpt_arcflow_sum.max_flow,
     rpt_arcflow_sum.time_days,
     rpt_arcflow_sum.time_hour,
@@ -6578,22 +6585,23 @@ AS SELECT inp_flwreg_orifice.element_id,
     rpt_arcflow_sum.min_shear,
     rpt_arcflow_sum.day_min,
     rpt_arcflow_sum.time_min
-   FROM inp_flwreg_orifice
-     LEFT JOIN man_flwreg USING (element_id)
-     LEFT JOIN rpt_arcflow_sum ON rpt_arcflow_sum.arc_id = man_flwreg.nodarc_id;
+   FROM inp_frorifice
+     LEFT JOIN man_flowreg USING (element_id)
+     LEFT JOIN rpt_arcflow_sum ON rpt_arcflow_sum.arc_id = concat (man_flowreg.node_id,'_FR', order_id);
 
 
--- ve_epa_flwreg_outlet
-CREATE OR REPLACE VIEW ve_epa_flwreg_outlet
-AS SELECT inp_flwreg_outlet.element_id,
-	man_flwreg.node_id,
-	concat (man_flwreg.node_id,'_FR', order_id) as nodarc_id,
-    inp_flwreg_outlet.outlet_type,
-	inp_flwreg_outlet.offsetval,
-    inp_flwreg_outlet.curve_id,
-    inp_flwreg_outlet.cd1,
-    inp_flwreg_outlet.cd2,
-    inp_flwreg_outlet.flap,
+-- ve_epa_froutlet
+CREATE OR REPLACE VIEW ve_epa_froutlet
+AS SELECT inp_froutlet.element_id,
+	man_flowreg.node_id,
+	man_flowreg.order_id, 
+	concat (man_flowreg.node_id,'_FR', order_id) as nodarc_id,
+    inp_froutlet.outlet_type,
+	inp_froutlet.offsetval,
+    inp_froutlet.curve_id,
+    inp_froutlet.cd1,
+    inp_froutlet.cd2,
+    inp_froutlet.flap,
     rpt_arcflow_sum.max_flow,
     rpt_arcflow_sum.time_days,
     rpt_arcflow_sum.time_hour,
@@ -6608,21 +6616,21 @@ AS SELECT inp_flwreg_outlet.element_id,
     rpt_arcflow_sum.min_shear,
     rpt_arcflow_sum.day_min,
     rpt_arcflow_sum.time_min
-   FROM inp_flwreg_outlet
-     LEFT JOIN man_flwreg USING (element_id)
-     LEFT JOIN rpt_arcflow_sum ON rpt_arcflow_sum.arc_id = man_flwreg.nodarc_id;
+   FROM inp_froutlet
+     LEFT JOIN man_flowreg USING (element_id)
+     LEFT JOIN rpt_arcflow_sum ON rpt_arcflow_sum.arc_id = concat (man_flowreg.node_id,'_FR', order_id);
 
 
-
--- ve_epa_flwreg_pump
-CREATE OR REPLACE VIEW ve_epa_flwreg_pump
-AS SELECT inp_flwreg_pump.element_id,
-	man_flwreg.node_id,
-	concat (man_flwreg.node_id,'_FR', order_id) as nodarc_id,
-    inp_flwreg_pump.curve_id,
-    inp_flwreg_pump.status,
-    inp_flwreg_pump.startup,
-    inp_flwreg_pump.shutoff,
+-- ve_epa_frpump
+CREATE OR REPLACE VIEW ve_epa_frpump
+AS SELECT inp_frpump.element_id,
+	man_flowreg.node_id,
+	man_flowreg.order_id, 
+	concat (man_flowreg.node_id,'_FR', order_id) as nodarc_id,
+    inp_frpump.curve_id,
+    inp_frpump.status,
+    inp_frpump.startup,
+    inp_frpump.shutoff,
     v_rpt_pumping_sum.percent,
     v_rpt_pumping_sum.num_startup,
     v_rpt_pumping_sum.min_flow,
@@ -6632,6 +6640,6 @@ AS SELECT inp_flwreg_pump.element_id,
     v_rpt_pumping_sum.powus_kwh,
     v_rpt_pumping_sum.timoff_min,
     v_rpt_pumping_sum.timoff_max
-   FROM inp_flwreg_pump
-     LEFT JOIN man_flwreg USING (element_id)
-     LEFT JOIN v_rpt_pumping_sum ON v_rpt_pumping_sum.arc_id = man_flwreg.nodarc_id;
+   FROM inp_frpump
+     LEFT JOIN man_flowreg USING (element_id)
+     LEFT JOIN v_rpt_pumping_sum ON v_rpt_pumping_sum.arc_id = concat (man_flowreg.node_id,'_FR', order_id);

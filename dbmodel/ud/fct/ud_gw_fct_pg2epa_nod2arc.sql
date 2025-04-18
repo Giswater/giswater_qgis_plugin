@@ -78,20 +78,20 @@ BEGIN
 	FOR rec_flowreg IN
 		SELECT element_id, to_arc, flwreg_length, flw_type, order_id, epa_type FROM
 		(
-			SELECT temp_t_element.element_id, to_arc, flwreg_length, 'OR'::text as flw_type, order_id, 'ORIFICE' as epa_type FROM inp_flwreg_orifice, man_flwreg
-			JOIN temp_t_element ON temp_t_element.element_id = man_flwreg.element_id
+			SELECT temp_t_element.element_id, to_arc, flwreg_length, 'OR'::text as flw_type, order_id, 'ORIFICE' as epa_type FROM inp_frorifice, man_flowreg
+			JOIN temp_t_element ON temp_t_element.element_id = man_flowreg.element_id
 			JOIN selector_sector ON selector_sector.sector_id=temp_t_element.sector_id
 			UNION
-			SELECT temp_t_element.element_id, to_arc, flwreg_length, 'OT'::text as flw_type, order_id, 'OUTLET' as epa_type FROM inp_flwreg_outlet, man_flwreg
-			JOIN temp_t_element ON temp_t_element.element_id = man_flwreg.element_id
+			SELECT temp_t_element.element_id, to_arc, flwreg_length, 'OT'::text as flw_type, order_id, 'OUTLET' as epa_type FROM inp_froutlet, man_flowreg
+			JOIN temp_t_element ON temp_t_element.element_id = man_flowreg.element_id
 			JOIN selector_sector ON selector_sector.sector_id=temp_t_element.sector_id
 			UNION
-			SELECT temp_t_element.element_id, to_arc, flwreg_length, 'PU'::text as flw_type, order_id, 'PUMP' as epa_type FROM inp_flwreg_pump, man_flwreg
-			JOIN temp_t_element ON temp_t_element.element_id = man_flwreg.element_id
+			SELECT temp_t_element.element_id, to_arc, flwreg_length, 'PU'::text as flw_type, order_id, 'PUMP' as epa_type FROM inp_frpump, man_flowreg
+			JOIN temp_t_element ON temp_t_element.element_id = man_flowreg.element_id
 			JOIN selector_sector ON selector_sector.sector_id=temp_t_element.sector_id
 			UNION
-			SELECT temp_t_element.element_id, to_arc, flwreg_length, 'WE'::text as flw_type, order_id, 'WEIR' as epa_type FROM inp_flwreg_weir, man_flwreg
-			JOIN temp_t_element ON temp_t_element.element_id = man_flwreg.element_id
+			SELECT temp_t_element.element_id, to_arc, flwreg_length, 'WE'::text as flw_type, order_id, 'WEIR' as epa_type FROM inp_frweir, man_flowreg
+			JOIN temp_t_element ON temp_t_element.element_id = man_flowreg.element_id
 			JOIN selector_sector ON selector_sector.sector_id=temp_t_element.sector_id
 		) a
 		ORDER BY element_id, to_arc

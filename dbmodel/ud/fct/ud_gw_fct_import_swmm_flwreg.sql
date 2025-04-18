@@ -153,26 +153,26 @@ BEGIN
         VALUES (v_fid, 4, '    Inserted into '||v_mantablename||'.');
 
         -- Insert into inp table
-        IF v_epatablename = 'inp_flwreg_pump' THEN
-            INSERT INTO inp_flwreg_pump (flwreg_id, curve_id, status, startup, shutoff)
+        IF v_epatablename = 'inp_frpump' THEN
+            INSERT INTO inp_frpump (flwreg_id, curve_id, status, startup, shutoff)
             SELECT v_flwreg_id, curve_id, status, startup, shutoff FROM inp_pump WHERE arc_id = v_data.arc_id;
 
-        ELSIF v_epatablename = 'inp_flwreg_orifice' THEN
-            INSERT INTO inp_flwreg_orifice (
+        ELSIF v_epatablename = 'inp_frorifice' THEN
+            INSERT INTO inp_frorifice (
                     flwreg_id, orifice_type, offsetval, cd, orate, flap,
                     shape, geom1, geom2, geom3, geom4)
             SELECT v_flwreg_id, ori_type, offsetval, cd, orate, flap,
                     shape, geom1, geom2, geom3, geom4 FROM inp_orifice WHERE arc_id = v_data.arc_id;
 
-        ELSIF v_epatablename = 'inp_flwreg_weir' THEN
-            INSERT INTO inp_flwreg_weir (
+        ELSIF v_epatablename = 'inp_frweir' THEN
+            INSERT INTO inp_frweir (
                     flwreg_id, weir_type, offsetval, cd, ec, cd2, flap,
                     geom1, geom2, geom3, geom4, surcharge, road_width, road_surf, coef_curve)
             SELECT v_flwreg_id, weir_type, offsetval, cd, ec, cd2, flap,
                     geom1, geom2, geom3, geom4, surcharge, road_width, road_surf, coef_curve FROM inp_weir WHERE arc_id = v_data.arc_id;
 
-        ELSIF v_epatablename = 'inp_flwreg_outlet' THEN
-            INSERT INTO inp_flwreg_outlet (flwreg_id, outlet_type, offsetval, curve_id, cd1, cd2, flap)
+        ELSIF v_epatablename = 'inp_froutlet' THEN
+            INSERT INTO inp_froutlet (flwreg_id, outlet_type, offsetval, curve_id, cd1, cd2, flap)
             SELECT v_flwreg_id, outlet_type, offsetval, curve_id, cd1, cd2, flap FROM inp_outlet WHERE arc_id = v_data.arc_id;
 
         END IF;

@@ -82,28 +82,28 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_dscenario('INFLOWS-POLL');
 CREATE TRIGGER gw_trg_edit_inp_dscenario INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_dscenario_inflows
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_dscenario('INFLOWS');
 
-CREATE TRIGGER gw_trg_edit_inp_flwreg INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_flwreg_outlet
+CREATE TRIGGER gw_trg_edit_inp_flwreg INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_froutlet
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_flwreg('FLWREG-OUTLET');
 
-CREATE TRIGGER gw_trg_edit_inp_flwreg INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_flwreg_weir
+CREATE TRIGGER gw_trg_edit_inp_flwreg INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_frweir
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_flwreg('FLWREG-WEIR');
 
-CREATE TRIGGER gw_trg_edit_inp_flwreg INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_flwreg_pump
+CREATE TRIGGER gw_trg_edit_inp_flwreg INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_frpump
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_flwreg('FLWREG-PUMP');
 
-CREATE TRIGGER gw_trg_edit_inp_flwreg INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_flwreg_orifice
+CREATE TRIGGER gw_trg_edit_inp_flwreg INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_frorifice
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_flwreg('FLWREG-ORIFICE');
 
-CREATE TRIGGER gw_trg_edit_inp_dscenario INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_dscenario_flwreg_outlet
+CREATE TRIGGER gw_trg_edit_inp_dscenario INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_dscenario_froutlet
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_dscenario('FLWREG-OUTLET');
 
-CREATE TRIGGER gw_trg_edit_inp_dscenario INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_dscenario_flwreg_weir
+CREATE TRIGGER gw_trg_edit_inp_dscenario INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_dscenario_frweir
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_dscenario('FLWREG-WEIR');
 
-CREATE TRIGGER gw_trg_edit_inp_dscenario INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_dscenario_flwreg_pump
+CREATE TRIGGER gw_trg_edit_inp_dscenario INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_dscenario_frpump
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_dscenario('FLWREG-PUMP');
 
-CREATE TRIGGER gw_trg_edit_inp_dscenario INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_dscenario_flwreg_orifice
+CREATE TRIGGER gw_trg_edit_inp_dscenario INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_dscenario_frorifice
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_inp_dscenario('FLWREG-ORIFICE');
 
 CREATE TRIGGER gw_trg_edit_inp_arc_orifice INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_inp_orifice
@@ -259,23 +259,23 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_ve_epa('pump');
 CREATE TRIGGER gw_trg_edit_element INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_flwreg
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_element('flwreg');
 
-CREATE TRIGGER gw_trg_typevalue_fk_insert AFTER INSERT ON inp_flwreg_weir
-FOR EACH ROW EXECUTE FUNCTION gw_trg_typevalue_fk('inp_flwreg_weir');
+CREATE TRIGGER gw_trg_typevalue_fk_insert AFTER INSERT ON inp_frweir
+FOR EACH ROW EXECUTE FUNCTION gw_trg_typevalue_fk('inp_frweir');
 
-CREATE TRIGGER gw_trg_typevalue_fk_update AFTER UPDATE of weir_type, flap on inp_flwreg_weir
-FOR EACH ROW WHEN (((old.weir_type)::TEXT IS DISTINCT FROM (new.weir_type)::text OR ((old.flap)::TEXT IS DISTINCT FROM (new.flap)::text))) EXECUTE FUNCTION gw_trg_typevalue_fk('inp_flwreg_weir');
+CREATE TRIGGER gw_trg_typevalue_fk_update AFTER UPDATE of weir_type, flap on inp_frweir
+FOR EACH ROW WHEN (((old.weir_type)::TEXT IS DISTINCT FROM (new.weir_type)::text OR ((old.flap)::TEXT IS DISTINCT FROM (new.flap)::text))) EXECUTE FUNCTION gw_trg_typevalue_fk('inp_frweir');
 
-CREATE TRIGGER gw_trg_typevalue_fk_insert AFTER INSERT ON inp_flwreg_pump
-FOR EACH ROW EXECUTE FUNCTION gw_trg_typevalue_fk('inp_flwreg_pump');
+CREATE TRIGGER gw_trg_typevalue_fk_insert AFTER INSERT ON inp_frpump
+FOR EACH ROW EXECUTE FUNCTION gw_trg_typevalue_fk('inp_frpump');
 
-CREATE TRIGGER gw_trg_typevalue_fk_update AFTER UPDATE of status ON inp_flwreg_pump
-FOR EACH ROW WHEN (((old.status)::TEXT IS DISTINCT FROM (new.status)::text)) EXECUTE FUNCTION gw_trg_typevalue_fk('inp_flwreg_pump');
+CREATE TRIGGER gw_trg_typevalue_fk_update AFTER UPDATE of status ON inp_frpump
+FOR EACH ROW WHEN (((old.status)::TEXT IS DISTINCT FROM (new.status)::text)) EXECUTE FUNCTION gw_trg_typevalue_fk('inp_frpump');
 
-CREATE TRIGGER gw_trg_typevalue_fk_insert AFTER INSERT ON inp_flwreg_outlet
-FOR EACH ROW EXECUTE FUNCTION gw_trg_typevalue_fk('inp_flwreg_outlet');
+CREATE TRIGGER gw_trg_typevalue_fk_insert AFTER INSERT ON inp_froutlet
+FOR EACH ROW EXECUTE FUNCTION gw_trg_typevalue_fk('inp_froutlet');
 
-CREATE TRIGGER gw_trg_typevalue_fk_update AFTER UPDATE of outlet_type, flap on inp_flwreg_outlet
-FOR EACH ROW WHEN ((((old.outlet_type)::TEXT IS DISTINCT FROM (new.outlet_type)::text) or ((old.flap)::TEXT IS DISTINCT FROM (new.flap)::text))) EXECUTE FUNCTION gw_trg_typevalue_fk('inp_flwreg_outlet');
+CREATE TRIGGER gw_trg_typevalue_fk_update AFTER UPDATE of outlet_type, flap on inp_froutlet
+FOR EACH ROW WHEN ((((old.outlet_type)::TEXT IS DISTINCT FROM (new.outlet_type)::text) or ((old.flap)::TEXT IS DISTINCT FROM (new.flap)::text))) EXECUTE FUNCTION gw_trg_typevalue_fk('inp_froutlet');
 
 CREATE trigger gw_trg_v_ui_drainzone INSTEAD OF INSERT OR UPDATE OR DELETE ON v_ui_drainzone
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_drainzone('UI');

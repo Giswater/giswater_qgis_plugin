@@ -12,6 +12,16 @@ ALTER TABLE config_form_fields DISABLE TRIGGER gw_trg_config_control;
 ALTER TABLE cat_feature_gully DROP CONSTRAINT IF EXISTS cat_feature_gully_type_fkey;
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"cat_feature_gully", "column":"type", "newName":"_type"}}$$);
 
+ALTER TABLE inp_flwreg_orifice RENAME TO inp_frorifice;
+ALTER TABLE inp_flwreg_weir RENAME TO inp_frweir;
+ALTER TABLE inp_flwreg_outlet RENAME TO inp_froutlet;
+ALTER TABLE inp_flwreg_pump RENAME TO inp_frpump;
+
+ALTER TABLE inp_dscenario_flwreg_orifice RENAME TO inp_dscenario_frorifice;
+ALTER TABLE inp_dscenario_flwreg_weir RENAME TO inp_dscenario_frweir;
+ALTER TABLE inp_dscenario_flwreg_outlet RENAME TO inp_dscenario_froutlet;
+ALTER TABLE inp_dscenario_flwreg_pump RENAME TO inp_dscenario_frpump;
+
 
 -- 15/10/2024
 ALTER TABLE cat_arc RENAME TO _cat_arc;
@@ -257,11 +267,11 @@ ALTER TABLE gully ALTER COLUMN macrominsector_id SET DEFAULT 0;
 -- 02/12/2024
 DROP VIEW IF EXISTS ve_epa_orifice;
 DROP VIEW IF EXISTS v_edit_inp_orifice;
-DROP VIEW IF EXISTS v_edit_inp_flwreg_orifice;
+DROP VIEW IF EXISTS v_edit_inp_frorifice;
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP", "table":"inp_orifice", "column":"close_time"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP", "table":"inp_flwreg_orifice", "column":"close_time"}}$$);
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP", "table":"inp_dscenario_flwreg_orifice", "column":"close_time"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP", "table":"inp_frorifice", "column":"close_time"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP", "table":"inp_dscenario_frorifice", "column":"close_time"}}$$);
 
 -- 03/12/2024
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"inp_outfall", "column":"route_to", "dataType":"varchar(16)"}}$$);
@@ -447,15 +457,15 @@ CREATE INDEX temp_arc_node_2_type ON temp_arc USING btree (node_2);
 CREATE INDEX temp_arc_omzone_id ON temp_arc USING btree (omzone_id);
 CREATE INDEX temp_arc_result_id ON temp_arc USING btree (result_id);
 
-DROP VIEW IF EXISTS v_edit_inp_dscenario_flwreg_pump;
-DROP VIEW IF EXISTS v_edit_inp_dscenario_flwreg_outlet;
-DROP VIEW IF EXISTS v_edit_inp_dscenario_flwreg_orifice;
-DROP VIEW IF EXISTS v_edit_inp_dscenario_flwreg_weir;
+DROP VIEW IF EXISTS v_edit_inp_dscenario_frpump;
+DROP VIEW IF EXISTS v_edit_inp_dscenario_froutlet;
+DROP VIEW IF EXISTS v_edit_inp_dscenario_frorifice;
+DROP VIEW IF EXISTS v_edit_inp_dscenario_frweir;
 
-DROP VIEW IF EXISTS v_edit_inp_flwreg_pump;
-DROP VIEW IF EXISTS v_edit_inp_flwreg_outlet;
-DROP VIEW IF EXISTS v_edit_inp_flwreg_orifice;
-DROP VIEW IF EXISTS v_edit_inp_flwreg_weir;
+DROP VIEW IF EXISTS v_edit_inp_frpump;
+DROP VIEW IF EXISTS v_edit_inp_froutlet;
+DROP VIEW IF EXISTS v_edit_inp_frorifice;
+DROP VIEW IF EXISTS v_edit_inp_frweir;
 
 
 ALTER TABLE man_manhole RENAME TO _man_manhole;
@@ -786,16 +796,15 @@ ALTER TABLE _node DROP CONSTRAINT node_streetaxis_id_fkey;
 ALTER TABLE _node DROP CONSTRAINT node_workcat_id_end_fkey;
 ALTER TABLE _node DROP CONSTRAINT node_workcat_id_fkey;
 
-ALTER TABLE inp_flwreg_orifice DROP CONSTRAINT inp_flwreg_orifice_node_id_fkey;
-ALTER TABLE inp_flwreg_outlet DROP CONSTRAINT inp_flwreg_outlet_node_id_fkey;
-ALTER TABLE inp_flwreg_pump DROP CONSTRAINT inp_flwreg_pump_node_id_fkey;
-ALTER TABLE inp_flwreg_weir DROP CONSTRAINT inp_flwreg_weir_node_id_fkey;
+ALTER TABLE inp_frorifice DROP CONSTRAINT inp_flwreg_orifice_node_id_fkey;
+ALTER TABLE inp_froutlet DROP CONSTRAINT inp_flwreg_outlet_node_id_fkey;
+ALTER TABLE inp_frpump DROP CONSTRAINT inp_flwreg_pump_node_id_fkey;
+ALTER TABLE inp_frweir DROP CONSTRAINT inp_flwreg_weir_node_id_fkey;
 
-ALTER TABLE inp_flwreg_orifice DROP CONSTRAINT inp_flwreg_orifice_to_arc_fkey;
-ALTER TABLE inp_flwreg_outlet DROP CONSTRAINT inp_flwreg_outlet_to_arc_fkey;
-ALTER TABLE inp_flwreg_pump DROP CONSTRAINT inp_flwreg_pump_to_arc_fkey;
-ALTER TABLE inp_flwreg_weir DROP CONSTRAINT inp_flwreg_weir_to_arc_fkey;
-
+ALTER TABLE inp_frorifice DROP CONSTRAINT inp_flwreg_orifice_to_arc_fkey;
+ALTER TABLE inp_froutlet DROP CONSTRAINT inp_flwreg_outlet_to_arc_fkey;
+ALTER TABLE inp_frpump DROP CONSTRAINT inp_flwreg_pump_to_arc_fkey;
+ALTER TABLE inp_frweir DROP CONSTRAINT inp_flwreg_weir_to_arc_fkey;
 
 
 -- Drop restrictions from table node

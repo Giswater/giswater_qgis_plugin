@@ -46,10 +46,10 @@ ALTER TABLE ONLY element_x_node ALTER COLUMN id SET DEFAULT nextval('element_x_n
 ALTER TABLE ONLY exploitation_x_user ALTER COLUMN id SET DEFAULT nextval('exploitation_x_user_id_seq'::regclass);
 ALTER TABLE ONLY inp_controls_x_arc ALTER COLUMN id SET DEFAULT nextval('inp_controls_x_arc_id_seq'::regclass);
 ALTER TABLE ONLY inp_controls_x_node ALTER COLUMN id SET DEFAULT nextval('inp_controls_x_node_id_seq'::regclass);
-ALTER TABLE ONLY inp_flwreg_orifice ALTER COLUMN id SET DEFAULT nextval('inp_flwreg_orifice_id_seq'::regclass);
-ALTER TABLE ONLY inp_flwreg_outlet ALTER COLUMN id SET DEFAULT nextval('inp_flwreg_outlet_id_seq'::regclass);
-ALTER TABLE ONLY inp_flwreg_pump ALTER COLUMN id SET DEFAULT nextval('inp_flwreg_pump_id_seq'::regclass);
-ALTER TABLE ONLY inp_flwreg_weir ALTER COLUMN id SET DEFAULT nextval('inp_flwreg_weir_id_seq'::regclass);
+ALTER TABLE ONLY inp_frorifice ALTER COLUMN id SET DEFAULT nextval('inp_frorifice_id_seq'::regclass);
+ALTER TABLE ONLY inp_froutlet ALTER COLUMN id SET DEFAULT nextval('inp_froutlet_id_seq'::regclass);
+ALTER TABLE ONLY inp_frpump ALTER COLUMN id SET DEFAULT nextval('inp_frpump_id_seq'::regclass);
+ALTER TABLE ONLY inp_frweir ALTER COLUMN id SET DEFAULT nextval('inp_frweir_id_seq'::regclass);
 ALTER TABLE ONLY inp_selector_hydrology ALTER COLUMN id SET DEFAULT nextval('inp_selector_hydrology_id_seq'::regclass);
 ALTER TABLE ONLY inp_selector_result ALTER COLUMN id SET DEFAULT nextval('inp_selector_result_id_seq'::regclass);
 ALTER TABLE ONLY inp_selector_sector ALTER COLUMN id SET DEFAULT nextval('inp_selector_sector_id_seq'::regclass);

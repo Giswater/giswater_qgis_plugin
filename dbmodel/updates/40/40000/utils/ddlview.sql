@@ -44,6 +44,7 @@ DROP VIEW IF EXISTS v_edit_inp_flwreg_pump;
 DROP VIEW IF EXISTS v_edit_inp_flwreg_weir;
 DROP VIEW IF EXISTS v_edit_inp_flwreg_outlet;
 
+
 DROP VIEW IF EXISTS v_edit_inp_dscenario_inflows;
 DROP VIEW IF EXISTS v_edit_inp_dscenario_inflows_poll;
 DROP VIEW IF EXISTS v_edit_inp_dscenario_junction;

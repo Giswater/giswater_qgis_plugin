@@ -30,6 +30,6 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_cat_feature('element');
 -- CREATE TRIGGER gw_trg_cat_material_fk_update AFTER UPDATE OF matcat_id ON cat_link
 -- FOR EACH ROW WHEN (((old.matcat_id)::TEXT IS DISTINCT FROM (new.matcat_id)::TEXT)) EXECUTE FUNCTION gw_trg_cat_material_fk('link');
 
-drop trigger if exists gw_trg_edit_element on man_flwreg;
+drop trigger if exists gw_trg_edit_element on man_flowreg;
 drop trigger if exists gw_trg_edit_element on man_genelement;
 drop trigger if exists gw_trg_edit_element on element;

@@ -239,7 +239,7 @@ BEGIN
 
 	INSERT INTO temp_t_arc_flowregulator (arc_id, type, ori_type, offsetval, cd, orate, flap, shape, geom1, geom2, geom3, geom4)
 	SELECT node_id, 'ORIFICE', orifice_type, offsetval, cd, orate, flap, shape, geom1, geom2, 0, 0
-	FROM v_edit_inp_flwreg_orifice;
+	FROM v_edit_inp_frorifice;
 
 	-- outlet
 	INSERT INTO temp_t_arc_flowregulator (arc_id, type, outlet_type, offsetval, curve_id, cd1, cd2, flap)
@@ -248,7 +248,7 @@ BEGIN
 
 	INSERT INTO temp_t_arc_flowregulator (arc_id, type, outlet_type, offsetval, curve_id, cd1, cd2, flap)
 	SELECT node_id, 'OUTLET', outlet_type, offsetval,curve_id, cd1, cd2, flap
-	FROM v_edit_inp_flwreg_outlet;
+	FROM v_edit_inp_froutlet;
 
 	-- pump
 	INSERT INTO temp_t_arc_flowregulator (arc_id, type, curve_id, status, startup, shutoff)
@@ -257,7 +257,7 @@ BEGIN
 
 	INSERT INTO temp_t_arc_flowregulator (arc_id, type, curve_id, status, startup, shutoff)
 	SELECT node_id, 'PUMP', curve_id, status, startup, shutoff
-	FROM v_edit_inp_flwreg_pump;
+	FROM v_edit_inp_frpump;
 
 	-- weir
 	INSERT INTO temp_t_arc_flowregulator (arc_id, type, weir_type, offsetval, cd, ec, cd2, flap, shape, geom1, geom2, geom3, geom4, road_width,
@@ -272,8 +272,8 @@ BEGIN
 	road_surf, coef_curve, surcharge)
 	SELECT node_id, 'WEIR', weir_type, offsetval, cd, ec, cd2, flap, inp_typevalue.descript, geom1, geom2, geom3, geom4, road_width,
 	road_surf, coef_curve, surcharge
-	FROM v_edit_inp_flwreg_weir
-	LEFT JOIN inp_typevalue ON inp_typevalue.id::text = v_edit_inp_flwreg_weir.weir_type::text
+	FROM v_edit_inp_frweir
+	LEFT JOIN inp_typevalue ON inp_typevalue.id::text = v_edit_inp_frweir.weir_type::text
 	WHERE inp_typevalue.typevalue::text = 'inp_value_weirs';
 
 	-- filling empty values

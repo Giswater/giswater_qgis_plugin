@@ -26,8 +26,8 @@ DROP VIEW IF EXISTS v_state_link;
 DROP VIEW IF EXISTS v_state_link_connec;
 
 DROP VIEW IF EXISTS v_edit_flwreg CASCADE;
-DROP VIEW IF EXISTS v_edit_inp_flwreg_pump CASCADE;
-DROP VIEW IF EXISTS v_edit_inp_dscenario_flwreg_pump CASCADE;
+DROP VIEW IF EXISTS v_edit_inp_frpump CASCADE;
+DROP VIEW IF EXISTS v_edit_inp_dscenario_frpump CASCADE;
 
 DROP VIEW IF EXISTS vi_controls;
 DROP VIEW IF EXISTS vi_coordinates;
@@ -152,23 +152,20 @@ CREATE OR REPLACE VIEW v_edit_flwreg AS
     element.updated_at,
     element.updated_by,
     element.epa_type,
-	man_flwreg.flwreg_class,
-	man_flwreg.flwreg_type,
-	man_flwreg.node_id,
-	man_flwreg.order_id,
-	concat (man_flwreg.node_id,'_FR', order_id) as nodarc_id,
-	man_flwreg.to_arc,
-	man_flwreg.flwreg_length,
+	man_flowreg.node_id,
+	man_flowreg.order_id,
+	concat (man_flowreg.node_id,'_FR', order_id) as nodarc_id,
+	man_flowreg.to_arc,
+	man_flowreg.flwreg_length,
 	st_setsrid(st_makeline(element.the_geom, st_lineinterpolatepoint(a.the_geom, flwreg_length / st_length(a.the_geom))), SRID_VALUE)::geometry(LineString,SRID_VALUE) AS the_geom
    FROM element
       JOIN cat_element ON element.elementcat_id::text = cat_element.id::text
-      JOIN man_flwreg ON element.element_id::text = man_flwreg.element_id::text
+      JOIN man_flowreg ON element.element_id::text = man_flowreg.element_id::text
       LEFT JOIN selector_sector s USING (sector_id)
-      LEFT JOIN selector_municipality m USING (muni_id)
       LEFT JOIN selector_expl e using (expl_id)
 	  JOIN arc a ON arc_id =to_arc
     WHERE element.expl_id = e.expl_id
-    AND s.cur_user = "current_user"()::text AND m.cur_user = "current_user"()::text AND e.cur_user = "current_user"()::text;
+    AND s.cur_user = "current_user"()::text AND e.cur_user = "current_user"()::text;
 
 CREATE OR REPLACE VIEW v_ext_raster_dem
 AS SELECT DISTINCT ON (r.id) r.id,

@@ -7,19 +7,19 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- Insert into sys_feature_epa_type
-INSERT INTO sys_feature_epa_type (id, feature_type, epa_table, descript, active) VALUES('FR-WEIR', 'ELEMENT', 'inp_flwreg_weir', NULL, true);
-INSERT INTO sys_feature_epa_type (id, feature_type, epa_table, descript, active) VALUES('FR-ORIFICE', 'ELEMENT', 'inp_flwreg_orifice', NULL, true);
-INSERT INTO sys_feature_epa_type (id, feature_type, epa_table, descript, active) VALUES('FR-OUTLET', 'ELEMENT', 'inp_flwreg_outlet', NULL, true);
+INSERT INTO sys_feature_epa_type (id, feature_type, epa_table, descript, active) VALUES('FRWEIR', 'ELEMENT', 'inp_frweir', NULL, true);
+INSERT INTO sys_feature_epa_type (id, feature_type, epa_table, descript, active) VALUES('FRORIFICE', 'ELEMENT', 'inp_frorifice', NULL, true);
+INSERT INTO sys_feature_epa_type (id, feature_type, epa_table, descript, active) VALUES('FROUTLET', 'ELEMENT', 'inp_froutlet', NULL, true);
 
 -- Adding flowregulator objects on cat_feature [Modified from first version]
-INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) VALUES ('FRPUMP', 'FLWREG', 'ELEMENT', 'v_edit_element', 've_elem_frpump', true) ON CONFLICT (id) DO NOTHING;
+INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) VALUES ('FRPUMP', 'FLOWREG', 'ELEMENT', 'v_edit_element', 've_elem_frpump', true) ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer)
 SELECT upper(REPLACE(id, ' ', '_')), 'GENELEMENT', 'ELEMENT', 'v_edit_element', concat('ve_elem_', lower(REPLACE(id, ' ', '_'))) FROM element_type ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) VALUES ('FRORIFICE', 'FLWREG', 'ELEMENT', 'v_edit_element', 've_elem_frorifice', true) ON CONFLICT (id) DO NOTHING;
-INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) VALUES ('FROUTLET', 'FLWREG', 'ELEMENT', 'v_edit_element', 've_elem_froutlet', true) ON CONFLICT (id) DO NOTHING;
-INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) VALUES ('FRWEIR', 'FLWREG', 'ELEMENT', 'v_edit_element', 've_elem_frweir', true) ON CONFLICT (id) DO NOTHING;
+INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) VALUES ('FRORIFICE', 'FLOWREG', 'ELEMENT', 'v_edit_element', 've_elem_frorifice', true) ON CONFLICT (id) DO NOTHING;
+INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) VALUES ('FROUTLET', 'FLOWREG', 'ELEMENT', 'v_edit_element', 've_elem_froutlet', true) ON CONFLICT (id) DO NOTHING;
+INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) VALUES ('FRWEIR', 'FLOWREG', 'ELEMENT', 'v_edit_element', 've_elem_frweir', true) ON CONFLICT (id) DO NOTHING;
 -- Adding objects on config_info_layer and config_info_layer_x_type (this both tables controls the button info)
 
 
@@ -331,51 +331,51 @@ END $func$;
 
 
 --- WEIR: insert man table
-INSERT INTO ve_elem_frweir (elementcat_id, state, state_type, num_elements, expl_id, sector_id, muni_id, the_geom, flwreg_class, node_id, order_id, to_arc, flwreg_length )
+INSERT INTO ve_elem_frweir (elementcat_id, state, state_type, num_elements, expl_id, sector_id, muni_id, the_geom, epa_type, node_id, order_id, to_arc, flwreg_length )
 SELECT 'FRWEIR-01', state, state_type, 1, expl_id, sector_id, muni_id, the_geom, 'WEIR', node_id, order_id, to_arc, flwreg_length
-FROM _inp_flwreg_weir
+FROM _inp_frweir
 JOIN node USING (node_id);
 
 --- WEIR: insert epa table
-INSERT INTO inp_flwreg_weir
+INSERT INTO inp_frweir
 SELECT element_id, weir_type, offsetval, cd, ec, cd2, flap, geom1, geom2, geom3, geom4, surcharge, road_width, road_surf, coef_curve
-FROM _inp_flwreg_weir w JOIN ve_elem_frweir r ON w.node_id=r.node_id AND w.to_arc = r.to_arc AND w.order_id = r.order_id;
+FROM _inp_frweir w JOIN ve_elem_frweir r ON w.node_id=r.node_id AND w.to_arc = r.to_arc AND w.order_id = r.order_id;
 
 --- PUMP: insert man table
-INSERT INTO ve_elem_frpump (elementcat_id, state, state_type, num_elements, expl_id, sector_id, muni_id, the_geom, flwreg_class, node_id, order_id, to_arc, flwreg_length )
+INSERT INTO ve_elem_frpump (elementcat_id, state, state_type, num_elements, expl_id, sector_id, muni_id, the_geom, epa_type, node_id, order_id, to_arc, flwreg_length )
 SELECT 'FRPUMP-01', state, state_type, 1, expl_id, sector_id, muni_id, the_geom, 'PUMP', node_id, order_id, to_arc, flwreg_length
-FROM _inp_flwreg_pump
+FROM _inp_frpump
 JOIN node USING (node_id);
 
 --- PUMP: insert epa table
-INSERT INTO inp_flwreg_pump (element_id, curve_id, status, startup, shutoff)
+INSERT INTO inp_frpump (element_id, curve_id, status, startup, shutoff)
 SELECT element_id, curve_id, status, startup, shutoff
-FROM _inp_flwreg_pump w JOIN ve_elem_frpump r ON w.node_id=r.node_id AND w.to_arc = r.to_arc AND w.order_id = r.order_id;
+FROM _inp_frpump w JOIN ve_elem_frpump r ON w.node_id=r.node_id AND w.to_arc = r.to_arc AND w.order_id = r.order_id;
 
 --- ORIFICE: insert man table
-INSERT INTO ve_elem_frorifice (elementcat_id, state, state_type, num_elements, expl_id, sector_id, muni_id, the_geom, flwreg_class, node_id, order_id, to_arc, flwreg_length )
+INSERT INTO ve_elem_frorifice (elementcat_id, state, state_type, num_elements, expl_id, sector_id, muni_id, the_geom, epa_type, node_id, order_id, to_arc, flwreg_length )
 SELECT 'FRORIFICE-01', state, state_type, 1, expl_id, sector_id, muni_id, the_geom, 'ORIFICE', node_id, order_id, to_arc, flwreg_length
-FROM _inp_flwreg_orifice
+FROM _inp_frorifice
 JOIN node USING (node_id);
 
 --- ORIFICE: insert epa table
-INSERT INTO inp_flwreg_orifice
+INSERT INTO inp_frorifice
 SELECT element_id, ori_type, offsetval, cd, orate, flap, shape, geom1, geom2, geom3, geom4
-FROM _inp_flwreg_orifice w JOIN ve_elem_frorifice r ON w.node_id=r.node_id AND w.to_arc = r.to_arc AND w.order_id = r.order_id;
+FROM _inp_frorifice w JOIN ve_elem_frorifice r ON w.node_id=r.node_id AND w.to_arc = r.to_arc AND w.order_id = r.order_id;
 
 --- OUTLET: insert man table
-INSERT INTO ve_elem_froutlet (elementcat_id, state, state_type, num_elements, expl_id, sector_id, muni_id, the_geom, flwreg_class, node_id, order_id, to_arc, flwreg_length )
+INSERT INTO ve_elem_froutlet (elementcat_id, state, state_type, num_elements, expl_id, sector_id, muni_id, the_geom, epa_type, node_id, order_id, to_arc, flwreg_length )
 SELECT 'FROUTLET-01', state, state_type, 1, expl_id, sector_id, muni_id, the_geom, 'OUTLET', node_id, order_id, to_arc, flwreg_length
-FROM _inp_flwreg_outlet
+FROM _inp_froutlet
 JOIN node USING (node_id);
 
 --- OUTLET: insert epa table
-INSERT INTO inp_flwreg_outlet
+INSERT INTO inp_froutlet
 SELECT element_id, outlet_type, offsetval, curve_id, cd1, cd2, flap
-FROM _inp_flwreg_outlet w JOIN ve_elem_froutlet r ON w.node_id=r.node_id AND w.to_arc = r.to_arc AND w.order_id = r.order_id;
+FROM _inp_froutlet w JOIN ve_elem_froutlet r ON w.node_id=r.node_id AND w.to_arc = r.to_arc AND w.order_id = r.order_id;
 
 INSERT INTO element_x_node
-SELECT element_id, node_id FROM man_flwreg;
+SELECT element_id, node_id FROM man_flowreg;
 
 UPDATE config_form_fields SET isparent = false WHERE formname = 'v_edit_inp_netgully' AND columnname = 'node_type';
 UPDATE config_form_fields SET dv_querytext = 'SELECT id, id as idval FROM inp_hydrograph WHERE id IS NOT NULL ' WHERE formname = 'inp_rdii' AND columnname = 'hydro_id';

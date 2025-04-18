@@ -156,80 +156,80 @@ BEGIN
 		WHERE t.node_id = d.node_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.ymax IS NOT NULL;
 
 		-- update flwreg orifice
-		UPDATE temp_t_arc_flowregulator t SET ori_type = d.ori_type FROM inp_dscenario_flwreg_orifice d
+		UPDATE temp_t_arc_flowregulator t SET ori_type = d.ori_type FROM inp_dscenario_frorifice d
 		WHERE t.arc_id = d.nodarc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.ori_type IS NOT NULL;
-		UPDATE temp_t_arc_flowregulator t SET offsetval = d.offsetval FROM inp_dscenario_flwreg_orifice d
+		UPDATE temp_t_arc_flowregulator t SET offsetval = d.offsetval FROM inp_dscenario_frorifice d
 		WHERE t.arc_id = d.nodarc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.offsetval IS NOT NULL;
-		UPDATE temp_t_arc_flowregulator t SET cd = d.cd FROM inp_dscenario_flwreg_orifice d
+		UPDATE temp_t_arc_flowregulator t SET cd = d.cd FROM inp_dscenario_frorifice d
 		WHERE t.arc_id = d.nodarc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.cd IS NOT NULL;
-		UPDATE temp_t_arc_flowregulator t SET orate = d.orate FROM inp_dscenario_flwreg_orifice d
+		UPDATE temp_t_arc_flowregulator t SET orate = d.orate FROM inp_dscenario_frorifice d
 		WHERE t.arc_id = d.nodarc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.orate IS NOT NULL;
-		UPDATE temp_t_arc_flowregulator t SET flap = d.flap FROM inp_dscenario_flwreg_orifice d
+		UPDATE temp_t_arc_flowregulator t SET flap = d.flap FROM inp_dscenario_frorifice d
 		WHERE t.arc_id = d.nodarc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.flap IS NOT NULL;
-		UPDATE temp_t_arc_flowregulator t SET shape = d.shape FROM inp_dscenario_flwreg_orifice d
+		UPDATE temp_t_arc_flowregulator t SET shape = d.shape FROM inp_dscenario_frorifice d
 		WHERE t.arc_id = d.nodarc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.shape IS NOT NULL;
-		UPDATE temp_t_arc_flowregulator t SET geom1 = d.geom1 FROM inp_dscenario_flwreg_orifice d
+		UPDATE temp_t_arc_flowregulator t SET geom1 = d.geom1 FROM inp_dscenario_frorifice d
 		WHERE t.arc_id = d.nodarc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.geom1 IS NOT NULL;
-		UPDATE temp_t_arc_flowregulator t SET geom2 = d.geom2 FROM inp_dscenario_flwreg_orifice d
+		UPDATE temp_t_arc_flowregulator t SET geom2 = d.geom2 FROM inp_dscenario_frorifice d
 		WHERE t.arc_id = d.nodarc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.geom2 IS NOT NULL;
-		UPDATE temp_t_arc_flowregulator t SET geom3 = d.geom3 FROM inp_dscenario_flwreg_orifice d
+		UPDATE temp_t_arc_flowregulator t SET geom3 = d.geom3 FROM inp_dscenario_frorifice d
 		WHERE t.arc_id = d.nodarc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.geom3 IS NOT NULL;
-		UPDATE temp_t_arc_flowregulator t SET geom4 = d.geom4 FROM inp_dscenario_flwreg_orifice d
+		UPDATE temp_t_arc_flowregulator t SET geom4 = d.geom4 FROM inp_dscenario_frorifice d
 		WHERE t.arc_id = d.nodarc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.geom4 IS NOT NULL;
 
 
 		-- update flwreg outlet
-		UPDATE temp_t_arc_flowregulator t SET outlet_type = d.outlet_type FROM inp_dscenario_flwreg_outlet d
+		UPDATE temp_t_arc_flowregulator t SET outlet_type = d.outlet_type FROM inp_dscenario_froutlet d
 		WHERE t.arc_id = d.nodarc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.outlet_type IS NOT NULL;
-		UPDATE temp_t_arc_flowregulator t SET offsetval = d.offsetval FROM inp_dscenario_flwreg_outlet d
+		UPDATE temp_t_arc_flowregulator t SET offsetval = d.offsetval FROM inp_dscenario_froutlet d
 		WHERE t.arc_id = d.nodarc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.offsetval IS NOT NULL;
-		UPDATE temp_t_arc_flowregulator t SET curve_id = d.curve_id FROM inp_dscenario_flwreg_outlet d
+		UPDATE temp_t_arc_flowregulator t SET curve_id = d.curve_id FROM inp_dscenario_froutlet d
 		WHERE t.arc_id = d.nodarc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.curve_id IS NOT NULL;
-		UPDATE temp_t_arc_flowregulator t SET cd1 = d.cd1 FROM inp_dscenario_flwreg_outlet d
+		UPDATE temp_t_arc_flowregulator t SET cd1 = d.cd1 FROM inp_dscenario_froutlet d
 		WHERE t.arc_id = d.nodarc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.cd1 IS NOT NULL;
-		UPDATE temp_t_arc_flowregulator t SET cd2 = d.cd2 FROM inp_dscenario_flwreg_outlet d
+		UPDATE temp_t_arc_flowregulator t SET cd2 = d.cd2 FROM inp_dscenario_froutlet d
 		WHERE t.arc_id = d.nodarc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.cd2 IS NOT NULL;
-		UPDATE temp_t_arc_flowregulator t SET flap = d.flap FROM inp_dscenario_flwreg_outlet d
+		UPDATE temp_t_arc_flowregulator t SET flap = d.flap FROM inp_dscenario_froutlet d
 		WHERE t.arc_id = d.nodarc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.flap IS NOT NULL;
 
 		-- update flwreg pump
-		UPDATE temp_t_arc_flowregulator t SET curve_id = d.curve_id FROM inp_dscenario_flwreg_pump d
+		UPDATE temp_t_arc_flowregulator t SET curve_id = d.curve_id FROM inp_dscenario_frpump d
 		WHERE t.arc_id = d.nodarc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.curve_id IS NOT NULL;
-		UPDATE temp_t_arc_flowregulator t SET status = d.status FROM inp_dscenario_flwreg_pump d
+		UPDATE temp_t_arc_flowregulator t SET status = d.status FROM inp_dscenario_frpump d
 		WHERE t.arc_id = d.nodarc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.status IS NOT NULL;
-		UPDATE temp_t_arc_flowregulator t SET startup = d.startup FROM inp_dscenario_flwreg_pump d
+		UPDATE temp_t_arc_flowregulator t SET startup = d.startup FROM inp_dscenario_frpump d
 		WHERE t.arc_id = d.nodarc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.startup IS NOT NULL;
-		UPDATE temp_t_arc_flowregulator t SET shutoff = d.shutoff FROM inp_dscenario_flwreg_pump d
+		UPDATE temp_t_arc_flowregulator t SET shutoff = d.shutoff FROM inp_dscenario_frpump d
 		WHERE t.arc_id = d.nodarc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.shutoff IS NOT NULL;
 
 		-- update flwreg weir
-		UPDATE temp_t_arc_flowregulator t SET weir_type = d.weir_type FROM inp_dscenario_flwreg_weir d
+		UPDATE temp_t_arc_flowregulator t SET weir_type = d.weir_type FROM inp_dscenario_frweir d
 		WHERE t.arc_id = d.nodarc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.weir_type IS NOT NULL;
-		UPDATE temp_t_arc_flowregulator t SET offsetval = d.offsetval FROM inp_dscenario_flwreg_weir d
+		UPDATE temp_t_arc_flowregulator t SET offsetval = d.offsetval FROM inp_dscenario_frweir d
 		WHERE t.arc_id = d.nodarc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.offsetval IS NOT NULL;
-		UPDATE temp_t_arc_flowregulator t SET cd = d.cd FROM inp_dscenario_flwreg_weir d
+		UPDATE temp_t_arc_flowregulator t SET cd = d.cd FROM inp_dscenario_frweir d
 		WHERE t.arc_id = d.nodarc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.cd IS NOT NULL;
-		UPDATE temp_t_arc_flowregulator t SET ec = d.ec FROM inp_dscenario_flwreg_weir d
+		UPDATE temp_t_arc_flowregulator t SET ec = d.ec FROM inp_dscenario_frweir d
 		WHERE t.arc_id = d.nodarc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.ec IS NOT NULL;
-		UPDATE temp_t_arc_flowregulator t SET cd2 = d.cd2 FROM inp_dscenario_flwreg_weir d
+		UPDATE temp_t_arc_flowregulator t SET cd2 = d.cd2 FROM inp_dscenario_frweir d
 		WHERE t.arc_id = d.nodarc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.cd2 IS NOT NULL;
-		UPDATE temp_t_arc_flowregulator t SET flap = d.flap FROM inp_dscenario_flwreg_weir d
+		UPDATE temp_t_arc_flowregulator t SET flap = d.flap FROM inp_dscenario_frweir d
 		WHERE t.arc_id = d.nodarc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.flap IS NOT NULL;
-		UPDATE temp_t_arc_flowregulator t SET geom1 = d.geom1 FROM inp_dscenario_flwreg_weir d
+		UPDATE temp_t_arc_flowregulator t SET geom1 = d.geom1 FROM inp_dscenario_frweir d
 		WHERE t.arc_id = d.nodarc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.geom1 IS NOT NULL;
-		UPDATE temp_t_arc_flowregulator t SET geom2 = d.geom2 FROM inp_dscenario_flwreg_weir d
+		UPDATE temp_t_arc_flowregulator t SET geom2 = d.geom2 FROM inp_dscenario_frweir d
 		WHERE t.arc_id = d.nodarc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.geom2 IS NOT NULL;
-		UPDATE temp_t_arc_flowregulator t SET geom3 = d.geom3 FROM inp_dscenario_flwreg_weir d
+		UPDATE temp_t_arc_flowregulator t SET geom3 = d.geom3 FROM inp_dscenario_frweir d
 		WHERE t.arc_id = d.nodarc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.geom3 IS NOT NULL;
-		UPDATE temp_t_arc_flowregulator t SET geom4 = d.geom4 FROM inp_dscenario_flwreg_weir d
+		UPDATE temp_t_arc_flowregulator t SET geom4 = d.geom4 FROM inp_dscenario_frweir d
 		WHERE t.arc_id = d.nodarc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.geom4 IS NOT NULL;
-		UPDATE temp_t_arc_flowregulator t SET surcharge = d.surcharge FROM inp_dscenario_flwreg_weir d
+		UPDATE temp_t_arc_flowregulator t SET surcharge = d.surcharge FROM inp_dscenario_frweir d
 		WHERE t.arc_id = d.nodarc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.surcharge IS NOT NULL;
-		UPDATE temp_t_arc_flowregulator t SET road_width = d.road_width FROM inp_dscenario_flwreg_weir d
+		UPDATE temp_t_arc_flowregulator t SET road_width = d.road_width FROM inp_dscenario_frweir d
 		WHERE t.arc_id = d.nodarc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.road_width IS NOT NULL;
-		UPDATE temp_t_arc_flowregulator t SET road_surf = d.road_surf FROM inp_dscenario_flwreg_weir d
+		UPDATE temp_t_arc_flowregulator t SET road_surf = d.road_surf FROM inp_dscenario_frweir d
 		WHERE t.arc_id = d.nodarc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.road_surf IS NOT NULL;
-		UPDATE temp_t_arc_flowregulator t SET coef_curve = d.coef_curve FROM inp_dscenario_flwreg_weir d
+		UPDATE temp_t_arc_flowregulator t SET coef_curve = d.coef_curve FROM inp_dscenario_frweir d
 		WHERE t.arc_id = d.nodarc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.coef_curve IS NOT NULL;
 
 		-- insert lid-usage

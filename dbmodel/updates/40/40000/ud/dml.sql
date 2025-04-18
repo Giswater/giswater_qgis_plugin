@@ -481,25 +481,25 @@ INSERT INTO config_form_list (listname, query_text, device, listtype, listclass,
 }'::json);
 
 -- 04/12/2024
-INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('v_edit_inp_flwreg_outlet', 'tab_none', NULL, NULL, 'role_basic', NULL, '[
+INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('v_edit_inp_froutlet', 'tab_none', NULL, NULL, 'role_basic', NULL, '[
   {
     "actionName": "actionSetToArc",
     "disabled": false
   }
 ]'::json, 0, '{4,5}');
-INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('v_edit_inp_flwreg_orifice', 'tab_none', NULL, NULL, 'role_basic', NULL, '[
+INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('v_edit_inp_frorifice', 'tab_none', NULL, NULL, 'role_basic', NULL, '[
   {
     "actionName": "actionSetToArc",
     "disabled": false
   }
 ]'::json, 0, '{4,5}');
-INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('v_edit_inp_flwreg_pump', 'tab_none', NULL, NULL, 'role_basic', NULL, '[
+INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('v_edit_inp_frpump', 'tab_none', NULL, NULL, 'role_basic', NULL, '[
   {
     "actionName": "actionSetToArc",
     "disabled": false
   }
 ]'::json, 0, '{4,5}');
-INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('v_edit_inp_flwreg_weir', 'tab_none', NULL, NULL, 'role_basic', NULL, '[
+INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('v_edit_inp_frweir', 'tab_none', NULL, NULL, 'role_basic', NULL, '[
   {
     "actionName": "actionSetToArc",
     "disabled": false
@@ -509,23 +509,23 @@ INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tab
 
 
 UPDATE config_form_list
-	SET query_text='SELECT nodarc_id, to_arc, order_id, flwreg_length, ori_type, offsetval, cd, orate, flap, shape, geom1, geom2, geom3, geom4 FROM inp_flwreg_orifice WHERE id IS NOT NULL'
-	WHERE listname='inp_flwreg_orifice' AND device=4;
+	SET query_text='SELECT nodarc_id, to_arc, order_id, flwreg_length, ori_type, offsetval, cd, orate, flap, shape, geom1, geom2, geom3, geom4 FROM inp_frorifice WHERE id IS NOT NULL'
+	WHERE listname='inp_frorifice' AND device=4;
 UPDATE config_form_list
 	SET query_text='SELECT d.dscenario_id, d.nodarc_id, f.node_id, d.ori_type, d.offsetval, d.cd, d.orate, d.flap, d.shape, d.geom1, d.geom2, d.geom3, d.geom4
-FROM inp_dscenario_flwreg_orifice d
-JOIN inp_flwreg_orifice f USING (nodarc_id)
+FROM inp_dscenario_frorifice d
+JOIN inp_frorifice f USING (nodarc_id)
 WHERE dscenario_id IS NOT NULL AND nodarc_id IS NOT NULL'
-	WHERE listname='inp_dscenario_flwreg_orifice' AND device=4;
+	WHERE listname='inp_dscenario_frorifice' AND device=4;
 
 
 DELETE FROM config_form_tableview
-	WHERE objectname='inp_dscenario_flwreg_orifice' AND columnname='close_time';
+	WHERE objectname='inp_dscenario_frorifice' AND columnname='close_time';
 DELETE FROM config_form_tableview
-	WHERE objectname='inp_flwreg_orifice' AND columnname='close_time';
+	WHERE objectname='inp_frorifice' AND columnname='close_time';
 UPDATE config_form_tableview
 	SET columnindex=16
-	WHERE objectname='inp_flwreg_orifice' AND columnname='nodarc_id';
+	WHERE objectname='inp_frorifice' AND columnname='nodarc_id';
 
 -- cat_dwf_scenario rename to cat_dwf
 UPDATE sys_table SET id = 'cat_dwf' WHERE id = 'cat_dwf_scenario';
@@ -562,10 +562,10 @@ UPDATE sys_param_user SET dv_querytext='SELECT id, idval FROM cat_dwf WHERE id I
 UPDATE config_toolbox SET inputparams = replace(inputparams::text, 'cat_dwf_scenario', 'cat_dwf')::json;
 
 --05/12/2024
-INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('v_edit_inp_dscenario_flwreg_orifice', 'tab_none', NULL, NULL, 'role_basic', NULL, NULL, 0, '{4,5}');
-INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('v_edit_inp_dscenario_flwreg_outlet', 'tab_none', NULL, NULL, 'role_basic', NULL, NULL, 0, '{4,5}');
-INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('v_edit_inp_dscenario_flwreg_pump', 'tab_none', NULL, NULL, 'role_basic', NULL, NULL, 0, '{4,5}');
-INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('v_edit_inp_dscenario_flwreg_weir', 'tab_none', NULL, NULL, 'role_basic', NULL, NULL, 0, '{4,5}');
+INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('v_edit_inp_dscenario_frorifice', 'tab_none', NULL, NULL, 'role_basic', NULL, NULL, 0, '{4,5}');
+INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('v_edit_inp_dscenario_froutlet', 'tab_none', NULL, NULL, 'role_basic', NULL, NULL, 0, '{4,5}');
+INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('v_edit_inp_dscenario_frpump', 'tab_none', NULL, NULL, 'role_basic', NULL, NULL, 0, '{4,5}');
+INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('v_edit_inp_dscenario_frweir', 'tab_none', NULL, NULL, 'role_basic', NULL, NULL, 0, '{4,5}');
 INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('v_edit_inp_dscenario_inflows', 'tab_none', NULL, NULL, 'role_basic', NULL, NULL, 0, '{4,5}');
 
 -- 10/12/2024
@@ -1992,7 +1992,7 @@ INSERT INTO config_form_list (listname, query_text, device, listtype, listclass,
     }
   ]
 }'::json);
-INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('dscenario_orifice', 'SELECT dscenario_id AS id, nodarc_id, ori_type, offsetval, cd, orate, flap, shape, geom1, geom2, geom3, geom4 FROM inp_dscenario_flwreg_orifice where dscenario_id is not NULL', 5, 'tab', 'list', '{
+INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('dscenario_orifice', 'SELECT dscenario_id AS id, nodarc_id, ori_type, offsetval, cd, orate, flap, shape, geom1, geom2, geom3, geom4 FROM inp_dscenario_frorifice where dscenario_id is not NULL', 5, 'tab', 'list', '{
   "orderBy": "1",
   "orderType": "ASC"
 }'::json, '{
@@ -2118,7 +2118,7 @@ INSERT INTO config_form_list (listname, query_text, device, listtype, listclass,
     }
   ]
 }'::json);
-INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('dscenario_outlet', 'SELECT dscenario_id AS id, nodarc_id, outlet_type, offsetval, curve_id, cd1, flap, cd2 FROM inp_dscenario_flwreg_outlet where dscenario_id is not NULL', 5, 'tab', 'list', '{
+INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('dscenario_outlet', 'SELECT dscenario_id AS id, nodarc_id, outlet_type, offsetval, curve_id, cd1, flap, cd2 FROM inp_dscenario_froutlet where dscenario_id is not NULL', 5, 'tab', 'list', '{
   "orderBy": "1",
   "orderType": "ASC"
 }'::json, '{
@@ -2181,7 +2181,7 @@ INSERT INTO config_form_list (listname, query_text, device, listtype, listclass,
     }
   ]
 }'::json);
-INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('dscenario_pump', 'SELECT dscenario_id AS id, nodarc_id, curve_id, status, shutoff, startup FROM inp_dscenario_flwreg_pump where dscenario_id is not NULL', 5, 'tab', 'list', '{
+INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('dscenario_pump', 'SELECT dscenario_id AS id, nodarc_id, curve_id, status, shutoff, startup FROM inp_dscenario_frpump where dscenario_id is not NULL', 5, 'tab', 'list', '{
   "orderBy": "1",
   "orderType": "ASC"
 }'::json, '{
@@ -2244,7 +2244,7 @@ INSERT INTO config_form_list (listname, query_text, device, listtype, listclass,
     }
   ]
 }'::json);
-INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('dscenario_weir', 'SELECT dscenario_id AS id, nodarc_id, weir_type, offsetval, cd, ec, cd2, flap, geom1, geom2, geom3, geom4, surcharge, road_width, coef_curve, road_surf FROM inp_dscenario_flwreg_weir where dscenario_id is not NULL', 5, 'tab', 'list', '{
+INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('dscenario_weir', 'SELECT dscenario_id AS id, nodarc_id, weir_type, offsetval, cd, ec, cd2, flap, geom1, geom2, geom3, geom4, surcharge, road_width, coef_curve, road_surf FROM inp_dscenario_frweir where dscenario_id is not NULL', 5, 'tab', 'list', '{
   "orderBy": "1",
   "orderType": "ASC"
 }'::json, '{
@@ -2393,10 +2393,10 @@ WHERE formtype = 'form_feature'
   AND columnname = 'to_arc'
   AND tabname = 'tab_none'
   AND formname IN (
-    'v_edit_inp_flwreg_orifice',
-    'v_edit_inp_flwreg_outlet',
-    'v_edit_inp_flwreg_pump',
-    'v_edit_inp_flwreg_weir'
+    'v_edit_inp_frorifice',
+    'v_edit_inp_froutlet',
+    'v_edit_inp_frpump',
+    'v_edit_inp_frweir'
   );
 
 DROP FUNCTION IF EXISTS gw_fct_import_swmm_inp(p_data json);
@@ -2408,7 +2408,7 @@ DELETE FROM sys_function
 	WHERE id=2524; --gw_fct_import_swmm_inp
 
 update config_form_fields set dv_querytext_filterc = null
-where formname in ('v_edit_inp_flwreg_pump','v_edit_inp_flwreg_orifice','v_edit_inp_flwreg_weir','v_edit_inp_flwreg_outlet');
+where formname in ('v_edit_inp_frpump','v_edit_inp_frorifice','v_edit_inp_frweir','v_edit_inp_froutlet');
 
 --10/01/2025
 --edited 28/01/2025
@@ -2418,28 +2418,28 @@ where formname in ('v_edit_inp_flwreg_pump','v_edit_inp_flwreg_orifice','v_edit_
 INSERT INTO config_form_fields
 SELECT 'v_edit_flwreg', formtype, tabname, columnname, layoutname, layoutorder , "datatype", widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter,
 dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols , widgetfunction, linkedobject, hidden, web_layoutorder
-FROM config_form_fields WHERE formname = 'v_edit_inp_flwreg_frpump' AND columnname IN ('nodarc_id','order_id','to_arc','flwreg_length');
+FROM config_form_fields WHERE formname = 'v_edit_inp_frfrpump' AND columnname IN ('nodarc_id','order_id','to_arc','flwreg_length');
 
 -- Insert on config_form_fields for child views
 INSERT INTO config_form_fields
 SELECT 've_flwreg_frorifice', formtype, tabname, columnname, layoutname, layoutorder , "datatype", widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter,
 dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols , widgetfunction, linkedobject, hidden, web_layoutorder
-FROM config_form_fields WHERE formname = 'v_edit_inp_flwreg_frorifice' AND columnname != 'close_time';
+FROM config_form_fields WHERE formname = 'v_edit_inp_frfrorifice' AND columnname != 'close_time';
 
 INSERT INTO config_form_fields
 SELECT 've_flwreg_frweir', formtype, tabname, columnname, layoutname, layoutorder , "datatype", widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter,
 dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols , widgetfunction, linkedobject, hidden, web_layoutorder
-FROM config_form_fields WHERE formname = 'v_edit_inp_flwreg_frweir';
+FROM config_form_fields WHERE formname = 'v_edit_inp_frfrweir';
 
 INSERT INTO config_form_fields
 SELECT 've_flwreg_froutlet', formtype, tabname, columnname, layoutname, layoutorder , "datatype", widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter,
 dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols , widgetfunction, linkedobject, hidden, web_layoutorder
-FROM config_form_fields WHERE formname = 'v_edit_inp_flwreg_froutlet';
+FROM config_form_fields WHERE formname = 'v_edit_inp_frfroutlet';
 
 INSERT INTO config_form_fields
 SELECT 've_flwreg_frpump', formtype, tabname, columnname, layoutname, layoutorder , "datatype", widgettype, label, tooltip, placeholder, ismandatory, isparent, iseditable, isautoupdate, isfilter,
 dv_querytext, dv_orderby_id, dv_isnullvalue, dv_parent_id, dv_querytext_filterc, stylesheet, widgetcontrols , widgetfunction, linkedobject, hidden, web_layoutorder
-FROM config_form_fields WHERE formname = 'v_edit_inp_flwreg_frpump';
+FROM config_form_fields WHERE formname = 'v_edit_inp_frfrpump';
 
 --Adding flwregtype on forms for flowregulators
 INSERT INTO config_form_fields (formname, formtype, tabname, columnname, layoutname, layoutorder, "datatype", widgettype, "label", tooltip, placeholder, ismandatory, isparent,
@@ -2540,16 +2540,16 @@ old_annotation, new_annotation, old_observ, new_observ, review_obs, expl_id, the
 FROM _review_audit_node;
 
 UPDATE config_form_fields SET dv_querytext='SELECT node_id as id, node_id as idval FROM v_edit_flwreg WHERE flwreg_type = ''FRORIFICE'' AND node_id IS NOT NULL'
-WHERE formname='v_edit_inp_dscenario_flwreg_orifice' AND columnname='nodarc_id';
+WHERE formname='v_edit_inp_dscenario_frorifice' AND columnname='nodarc_id';
 
 UPDATE config_form_fields SET dv_querytext='SELECT node_id as id, node_id as idval FROM v_edit_flwreg WHERE flwreg_type = ''FROUTLET'' AND node_id IS NOT NULL'
-WHERE formname='v_edit_inp_dscenario_flwreg_outlet' AND columnname='nodarc_id';
+WHERE formname='v_edit_inp_dscenario_froutlet' AND columnname='nodarc_id';
 
 UPDATE config_form_fields SET dv_querytext='SELECT node_id as id, node_id as idval FROM v_edit_flwreg WHERE flwreg_type = ''FRPUMP'' AND node_id IS NOT NULL'
-WHERE formname='v_edit_inp_dscenario_flwreg_pump' AND columnname='nodarc_id';
+WHERE formname='v_edit_inp_dscenario_frpump' AND columnname='nodarc_id';
 
 UPDATE config_form_fields SET dv_querytext='SELECT node_id as id, node_id as idval FROM v_edit_flwreg WHERE flwreg_type = ''FRWEIR'' AND node_id IS NOT NULL'
-WHERE formname='v_edit_inp_dscenario_flwreg_weir' AND columnname='nodarc_id';
+WHERE formname='v_edit_inp_dscenario_frweir' AND columnname='nodarc_id';
 -- 30/01/2025
 
 -- Insert supplyzone types

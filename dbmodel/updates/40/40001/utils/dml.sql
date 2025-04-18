@@ -16,7 +16,7 @@ INSERT INTO sys_feature_class (id, "type", epa_default, man_table) VALUES('SERVC
 
 
 DELETE FROM sys_feature_class WHERE id = 'ELEMENT' AND type = 'ELEMENT';
-INSERT INTO sys_feature_class (id, "type", epa_default, man_table) VALUES('FLWREG', 'ELEMENT', 'UNDEFINED', 'man_flwreg');
+INSERT INTO sys_feature_class (id, "type", epa_default, man_table) VALUES('FLOWREG', 'ELEMENT', 'UNDEFINED', 'man_flowreg');
 INSERT INTO sys_feature_class (id, "type", epa_default, man_table) VALUES('GENELEMENT', 'ELEMENT', 'UNDEFINED', 'man_genelement');
 
 
@@ -24,7 +24,7 @@ DELETE FROM cat_feature WHERE id = 'LINK';
 
 INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source") VALUES(3286, 'arc_id column cannot be modified when state = 0 on plan_psector %psector_id%.', '', 2, true, 'utils', 'core');
 
-INSERT INTO sys_feature_epa_type (id, feature_type, epa_table, descript, active) VALUES('PUMP', 'ELEMENT', 'inp_flwreg_pump', NULL, true);
+INSERT INTO sys_feature_epa_type (id, feature_type, epa_table, descript, active) VALUES('FRPUMP', 'ELEMENT', 'inp_frpump', NULL, true);
 
 INSERT INTO config_typevalue (typevalue, id, camelstyle, idval, addparam) VALUES('sys_table_context', '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"ELEMENT"}', NULL, NULL, '{"orderBy":89}'::json);
 

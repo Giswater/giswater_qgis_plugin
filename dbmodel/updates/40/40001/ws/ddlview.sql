@@ -7044,7 +7044,7 @@ AS WITH expl_data AS (
   AND ex.expl_id = any(d.expl_id);
 
 
-CREATE OR REPLACE VIEW v_edit_inp_flwreg_pump
+CREATE OR REPLACE VIEW v_edit_inp_frpump
 AS SELECT
     f.element_id,
     f.node_id,
@@ -7058,9 +7058,9 @@ AS SELECT
     p.shutoff,
     f.the_geom
     FROM v_edit_flwreg f
-    JOIN inp_flwreg_pump p ON f.element_id::text = p.element_id::text;
+    JOIN inp_frpump p ON f.element_id::text = p.element_id::text;
 
-CREATE OR REPLACE VIEW v_edit_inp_dscenario_flwreg_pump
+CREATE OR REPLACE VIEW v_edit_inp_dscenario_frpump
 AS SELECT s.dscenario_id,
     f.element_id,
     f.curve_id,
@@ -7068,12 +7068,12 @@ AS SELECT s.dscenario_id,
     f.startup,
     f.shutoff,
     n.the_geom
-    FROM selector_inp_dscenario s, inp_dscenario_flwreg_pump f
-    JOIN v_edit_inp_flwreg_pump n USING (element_id)
+    FROM selector_inp_dscenario s, inp_dscenario_frpump f
+    JOIN v_edit_inp_frpump n USING (element_id)
     WHERE s.dscenario_id = f.dscenario_id AND s.cur_user = CURRENT_USER::text;
     
 
-CREATE OR REPLACE VIEW v_edit_inp_flwreg_valve 
+CREATE OR REPLACE VIEW v_edit_inp_frvalve 
 as select f.element_id,
     f.node_id,
     f.order_id,
@@ -7089,10 +7089,10 @@ as select f.element_id,
     init_quality,
     f.the_geom
     FROM v_edit_flwreg f
-    JOIN inp_flwreg_valve v ON f.element_id::text = v.element_id::text;
+    JOIN inp_frvalve v ON f.element_id::text = v.element_id::text;
 
  
-CREATE OR REPLACE VIEW v_edit_inp_dscenario_flwreg_valve
+CREATE OR REPLACE VIEW v_edit_inp_dscenario_frvalve
 AS SELECT s.dscenario_id,
     element_id,
 	v.valve_type,
@@ -7103,15 +7103,15 @@ AS SELECT s.dscenario_id,
     v.add_settings,
     v.init_quality,
     n.the_geom
-    FROM selector_inp_dscenario s, inp_dscenario_flwreg_valve v
-    JOIN v_edit_inp_flwreg_valve n USING (element_id)
+    FROM selector_inp_dscenario s, inp_dscenario_frvalve v
+    JOIN v_edit_inp_frvalve n USING (element_id)
     WHERE s.dscenario_id = v.dscenario_id AND s.cur_user = CURRENT_USER::text;
    
    
-CREATE OR REPLACE VIEW ve_epa_flwreg_valve AS
+CREATE OR REPLACE VIEW ve_epa_frvalve AS
 SELECT v.element_id,
-	man_flwreg.node_id,
-	concat (man_flwreg.node_id,'_FR', order_id) as nodarc_id,
+	man_flowreg.node_id,
+	concat (man_flowreg.node_id,'_FR', order_id) as nodarc_id,
 	to_arc,
 	valve_type,
 	custom_dint,
@@ -7135,15 +7135,15 @@ SELECT v.element_id,
 	reaction_min,
 	ffactor_max,
 	ffactor_min
-	FROM inp_flwreg_valve v
-     LEFT JOIN man_flwreg USING (element_id)
-     LEFT JOIN v_rpt_arc_stats r ON r.arc_id = concat (man_flwreg.node_id,'_FR', order_id);
+	FROM inp_frvalve v
+     LEFT JOIN man_flowreg USING (element_id)
+     LEFT JOIN v_rpt_arc_stats r ON r.arc_id = concat (man_flowreg.node_id,'_FR', order_id);
     
  
-CREATE OR REPLACE VIEW ve_epa_flwreg_pump as
+CREATE OR REPLACE VIEW ve_epa_frpump as
 SELECT p.element_id,
-	man_flwreg.node_id,
-	concat (man_flwreg.node_id,'_FR', order_id) as nodarc_id,
+	man_flowreg.node_id,
+	concat (man_flowreg.node_id,'_FR', order_id) as nodarc_id,
 	to_arc,
 	curve_id,
 	status,
@@ -7163,6 +7163,6 @@ SELECT p.element_id,
 	reaction_min,
 	ffactor_max,
 	ffactor_min
-	FROM inp_flwreg_pump p
-     LEFT JOIN man_flwreg USING (element_id)
-     LEFT JOIN v_rpt_arc_stats r ON r.arc_id = concat (man_flwreg.node_id,'_FR', order_id);
+	FROM inp_frpump p
+     LEFT JOIN man_flowreg USING (element_id)
+     LEFT JOIN v_rpt_arc_stats r ON r.arc_id = concat (man_flowreg.node_id,'_FR', order_id);

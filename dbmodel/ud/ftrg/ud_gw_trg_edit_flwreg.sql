@@ -77,7 +77,7 @@ BEGIN
 		END IF;
 
         
-		-- inp_flwreg_orifice/weir/pump/outlet tables
+		-- inp_frorifice/weir/pump/outlet tables
 	
 	/*
 		IF v_flwreg_type = 'frorifice' THEN
@@ -257,7 +257,7 @@ BEGIN
                 IF NEW.ori_type IS NULL THEN NEW.ori_type = 'SIDE'; END IF;
                 IF NEW.shape IS NULL THEN NEW.shape = 'RECT-CLOSED'; END IF;
 
-                INSERT INTO inp_flwreg_orifice (
+                INSERT INTO inp_frorifice (
                     flwreg_id, nodarc_id, node_id, order_id, to_arc, flwreg_length, ori_type, offsetval, cd, orate, 
                     flap, shape, geom1, geom2, geom3, geom4
                 ) VALUES (
@@ -270,7 +270,7 @@ BEGIN
                 -- Default values for outlet
                 IF NEW.outlet_type IS NULL THEN NEW.outlet_type = 'FUNCTIONAL/DEPTH'; END IF;
 
-                INSERT INTO inp_flwreg_outlet (
+                INSERT INTO inp_froutlet (
                     flwreg_id, nodarc_id, node_id, order_id, to_arc, flwreg_length, outlet_type, offsetval, curve_id, cd1, cd2
                 ) VALUES (
                     NEW.flwreg_id, concat(NEW.node_id, 'OT', NEW.order_id), NEW.node_id, NEW.order_id, NEW.to_arc, NEW.flwreg_length,
@@ -280,7 +280,7 @@ BEGIN
 
         ELSIF v_flwreg_type =  'pump' THEN
                 
-            INSERT INTO inp_flwreg_pump (
+            INSERT INTO inp_frpump (
                 flwreg_id,  nodarc_id, node_id, order_id, to_arc, flwreg_length, curve_id, status, startup, shutoff
             ) VALUES (
                 NEW.flwreg_id, concat(NEW.node_id, 'PU', NEW.order_id), NEW.node_id, NEW.order_id, NEW.to_arc, NEW.flwreg_length,
@@ -293,7 +293,7 @@ BEGIN
             IF NEW.geom3 IS NULL THEN NEW.geom3 = 0; END IF;
             IF NEW.geom4 IS NULL THEN NEW.geom4 = 0; END IF;
 
-            INSERT INTO inp_flwreg_weir (
+            INSERT INTO inp_frweir (
                 flwreg_id, nodarc_id, node_id, order_id, to_arc, flwreg_length, weir_type, offsetval, cd, ec, cd2, flap, 
                 geom1, geom2, geom3, geom4, surcharge, road_width, road_surf, coef_curve
             ) VALUES (
@@ -306,7 +306,7 @@ BEGIN
         ELSIF v_flwreg_type = 'parent' THEN
             IF  NEW.flwreg_type = 'ORIFICE' THEN
                         
-                INSERT INTO inp_flwreg_orifice (
+                INSERT INTO inp_frorifice (
                     flwreg_id, nodarc_id, node_id, order_id, to_arc, flwreg_length
                 ) VALUES (
                     NEW.flwreg_id, concat(NEW.node_id, 'OR', NEW.order_id), NEW.node_id, NEW.order_id, NEW.to_arc, NEW.flwreg_length
@@ -314,7 +314,7 @@ BEGIN
 
             ELSIF NEW.flwreg_type = 'OUTLET' then 
         
-                INSERT INTO inp_flwreg_outlet (
+                INSERT INTO inp_froutlet (
                     flwreg_id, nodarc_id, node_id, order_id, to_arc, flwreg_length
                 ) VALUES (
                     NEW.flwreg_id, concat(NEW.node_id, 'OT', NEW.order_id), NEW.node_id, NEW.order_id, NEW.to_arc, NEW.flwreg_length
@@ -325,7 +325,7 @@ BEGIN
                 -- Default values for  pump
                 v_curve_id = 'PUMP-01';
                 
-                    INSERT INTO inp_flwreg_pump (
+                    INSERT INTO inp_frpump (
                     flwreg_id, nodarc_id, node_id, order_id, to_arc, flwreg_length, curve_id
                 ) VALUES (
                     NEW.flwreg_id, concat(NEW.node_id, 'PU', NEW.order_id), NEW.node_id, NEW.order_id, NEW.to_arc, NEW.flwreg_length, v_curve_id
@@ -333,7 +333,7 @@ BEGIN
 
             ELSIF  NEW.flwreg_type = 'WEIR' THEN
                 
-                INSERT INTO inp_flwreg_weir (
+                INSERT INTO inp_frweir (
                     flwreg_id, nodarc_id, node_id, order_id, to_arc, flwreg_length
                 ) VALUES (
                     NEW.flwreg_id, concat(NEW.node_id, 'WE', NEW.order_id), NEW.node_id, NEW.order_id, NEW.to_arc, NEW.flwreg_length              
@@ -348,7 +348,7 @@ BEGIN
     ELSIF TG_OP = 'UPDATE' THEN
         IF v_flwreg_type = 'VFLWREG' THEN
            IF flwreg_type =  'ORIFICE' THEN
-                UPDATE inp_flwreg_orifice
+                UPDATE inp_frorifice
                 SET
                     --nodarc_id = concat(NEW.node_id, 'OR', NEW.order_id),
 					flwreg_id = NEW.flwreg_id,
@@ -369,7 +369,7 @@ BEGIN
                 WHERE flwreg_id = OLD.flwreg_id;
 
             ELSIF flwreg_type = 'OUTLET' THEN
-                UPDATE inp_flwreg_outlet
+                UPDATE inp_froutlet
                 SET
                    	flwreg_id = NEW.flwreg_id,
 					node_id = NEW.node_id,
@@ -385,7 +385,7 @@ BEGIN
 			END IF;
 
         ELSIF  v_flwreg_type ='pump' THEN
-            UPDATE inp_flwreg_pump
+            UPDATE inp_frpump
             SET
                 flwreg_id = NEW.flwreg_id,
                 node_id = NEW.node_id,
@@ -399,7 +399,7 @@ BEGIN
             WHERE flwreg_id = OLD.flwreg_id;
 
         ELSIF v_flwreg_type ='weir' THEN
-            UPDATE inp_flwreg_weir
+            UPDATE inp_frweir
             SET
                 flwreg_id = NEW.flwreg_id,
                 node_id = NEW.node_id,
@@ -435,17 +435,17 @@ BEGIN
     ELSIF TG_OP = 'DELETE' THEN
         IF v_flwreg_type = 'VFLWREG' THEN
             IF flwreg_type =  'ORIFICE' THEN
-               DELETE FROM inp_flwreg_orifice WHERE flwreg_id = OLD.flwreg_id;
+               DELETE FROM inp_frorifice WHERE flwreg_id = OLD.flwreg_id;
 
             ELSIF flwreg_type = 'OUTLET' THEN
-                DELETE FROM inp_flwreg_outlet WHERE flwreg_id = OLD.flwreg_id;
+                DELETE FROM inp_froutlet WHERE flwreg_id = OLD.flwreg_id;
 			END IF;
 
         ELSIF v_flwreg_type = 'pump' THEN
-            DELETE FROM inp_flwreg_pump WHERE flwreg_id = OLD.flwreg_id;
+            DELETE FROM inp_frpump WHERE flwreg_id = OLD.flwreg_id;
 
         ELSIF v_flwreg_type = 'weir' THEN
-            DELETE FROM inp_flwreg_weir WHERE flwreg_id = OLD.flwreg_id;
+            DELETE FROM inp_frweir WHERE flwreg_id = OLD.flwreg_id;
         END IF;
 
 		-- man_frtables

@@ -73,17 +73,14 @@ CREATE TABLE man_genelement (
 	CONSTRAINT man_genelement_fkey_element_id FOREIGN KEY (element_id) REFERENCES element(element_id) on update cascade on delete cascade
 );
 
-CREATE TABLE man_flwreg (
+CREATE TABLE man_flowreg (
     element_id varchar(16) NOT NULL,
-    flwreg_class varchar(16) NOT NULL,
-	flwreg_type text NULL,
     node_id varchar NULL,
     order_id numeric NULL,
     to_arc varchar NULL,
     flwreg_length numeric NULL,
-	nodarc_id varchar NULL,
-    CONSTRAINT man_flwreg_pkey PRIMARY KEY (element_id),
-	CONSTRAINT man_flwreg_fkey_element_id FOREIGN KEY (element_id) REFERENCES element(element_id) on update cascade on delete cascade
+    CONSTRAINT man_flowreg_pkey PRIMARY KEY (element_id),
+	CONSTRAINT man_flowreg_fkey_element_id FOREIGN KEY (element_id) REFERENCES element(element_id) on update cascade on delete cascade
 );
 
 CREATE TABLE cat_feature_element (
