@@ -9,8 +9,40 @@ CREATE SCHEMA "SCHEMA_NAME";
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
--- system tables
 
+-- system roles
+DO $$
+BEGIN
+   IF NOT EXISTS (
+      SELECT FROM pg_catalog.pg_roles WHERE rolname = 'role_cm_admin'
+   ) THEN
+      CREATE role role_cm_admin WITH NOSUPERUSER NOCREATEDB NOCREATEROLE inherit NOREPLICATION NOBYPASSRLS;
+   END IF;
+END
+$$;
+
+DO $$
+BEGIN
+   IF NOT EXISTS (
+      SELECT FROM pg_catalog.pg_roles WHERE rolname = 'role_cm_manager'
+   ) THEN
+      CREATE role role_cm_manager WITH NOSUPERUSER NOCREATEDB NOCREATEROLE inherit NOREPLICATION NOBYPASSRLS;
+   END IF;
+END
+$$;
+
+DO $$
+BEGIN
+   IF NOT EXISTS (
+      SELECT FROM pg_catalog.pg_roles WHERE rolname = 'role_cm_field'
+   ) THEN
+      CREATE role role_cm_field WITH NOSUPERUSER NOCREATEDB NOCREATEROLE inherit NOREPLICATION NOBYPASSRLS;
+   END IF;
+END
+$$;
+
+
+-- system tables
 CREATE TABLE sys_table (
 	id text NOT NULL,
 	descript text NULL,
@@ -59,7 +91,7 @@ CREATE TABLE config_form_fields (
 	CONSTRAINT config_form_fields_pkey PRIMARY KEY (formname, formtype, columnname, tabname)
 );
 
-
+ 
 CREATE TABLE sys_typevalue (
 	typevalue text NOT NULL,
 	id varchar(30) NOT NULL,
@@ -80,56 +112,49 @@ CREATE TABLE cat_pschema
 
 
 -- catalogs
-
 CREATE TABLE cat_role (
-	role_id serial4 PRIMARY KEY,
-	descript text,
-	active boolean DEFAULT true
+	role_id text PRIMARY KEY,
+	descript text
 );
 
+
 CREATE TABLE cat_organization (
-	organization_id serial4 NOT NULL,
+	organization_id serial4,
 	code text NULL,
-	name text NULL,
+	orgname text NULL,
 	descript text NULL,
 	active bool NULL DEFAULT true,
+	CONSTRAINT cat_organization_unique UNIQUE (orgname),
 	CONSTRAINT cat_organization_pkey PRIMARY KEY (organization_id)
 );
 
+
 CREATE TABLE cat_team (
-	team_id serial4 NOT NULL,
+	team_id serial4,
 	code text NULL,
-	name text NULL,
+	teamname text not NULL,
 	organization_id int4 NOT NULL,
 	descript text NULL,
 	role_id TEXT NULL,
 	active bool NULL DEFAULT true,
-	CONSTRAINT cat_team_pkey PRIMARY KEY (team_id, organization_id),
-	CONSTRAINT cat_team_unique UNIQUE (team_id),
+	CONSTRAINT cat_team_pkey PRIMARY KEY (team_id),
+	CONSTRAINT cat_team_unique UNIQUE (teamname, organization_id),
 	CONSTRAINT cat_team_organization_id_fkey FOREIGN KEY (organization_id) REFERENCES cat_organization(organization_id) ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
+
 CREATE TABLE cat_user (
-    user_id text PRIMARY KEY,
-    loginname varchar(100) NOT NULL,
-    code varchar(50),
-    name varchar(200),
+    user_id serial4 PRIMARY KEY,
+	code text NULL,
+    loginname text not null
+	username text not NULL,
+    fullname varchar(200) not null,
     descript text,
     team_id int4,
     active boolean DEFAULT TRUE,
+    CONSTRAINT cat_user_unique UNIQUE (username),
     CONSTRAINT cat_user_team_id_fkey FOREIGN KEY (team_id) REFERENCES cat_team(team_id)
 );
-
-CREATE TABLE om_team_x_user (
-	id serial4 NOT NULL,
-	user_id text NULL,
-	team_id int4 NULL,
-	CONSTRAINT om_team_x_user_pkey PRIMARY KEY (id),
-	CONSTRAINT om_team_x_user_unique UNIQUE (user_id, team_id),
-	CONSTRAINT om_team_x_user_team_id_fkey FOREIGN KEY (team_id) REFERENCES cat_team(team_id) ON DELETE CASCADE ON UPDATE CASCADE,
-	CONSTRAINT om_team_x_user_user_id_fkey FOREIGN KEY (user_id) REFERENCES cat_user(user_id) ON DELETE CASCADE ON UPDATE CASCADE
-);
-
 
 
 ---- reviewclass & visitclass
@@ -168,23 +193,25 @@ CREATE TABLE om_visitclass
 -- campaign
 CREATE TABLE om_campaign
 (
-  id serial NOT NULL,
+  campaign_id serial NOT NULL,
+  name text not null, -- must add constraint unique
   startdate date DEFAULT now(),
   enddate date,
   real_startdate date,
   real_enddate date,
-  campaign_type integer,  -- visit / review
+  campaign_type integer not null ,  -- visit / review
   descript text,
   active boolean DEFAULT true,
   organization_id integer,
   duration text,
-  status integer,
-  the_geom geometry(MultiPolygon,SRID_VALUE),
+  status integer not NULL,
+  the_geom geometry(MultiPolygon,25831),
   rotation numeric(8,4),
   exercise integer,
   serie character varying(10),
   address text,
-  CONSTRAINT om_campaign_pkey PRIMARY KEY (id)
+  CONSTRAINT om_campaign_pkey PRIMARY KEY (campaign_id),
+  CONSTRAINT om_campaign_check_type check (campaign_type in (1,2))
 );
 
 CREATE TABLE om_campaign_visit
@@ -263,22 +290,23 @@ CREATE TABLE om_campaign_x_gully
 
 CREATE TABLE om_campaign_lot
 (
-  id serial NOT NULL,
+  lot_id serial NOT NULL,
+  name text not null, -- must add constraint unique
   startdate date DEFAULT now(),
   enddate date,
   real_startdate date,
   real_enddate date,
-  campaign_id integer, -- fk om_campaign
+  campaign_id integer not NULL, -- fk om_campaign
   workorder_id integer, -- fk workorder
   descript text,
   active boolean DEFAULT true,
   team_id integer, -- fk cat_team
   duration text,
-  status integer,
-  the_geom geometry(MultiPolygon,SRID_VALUE),
+  status integer not NULL,
+  the_geom geometry(MultiPolygon,25831),
   rotation numeric(8,4),
   address text,
-  CONSTRAINT om_campaign_lot_pkey PRIMARY KEY (id)
+  CONSTRAINT om_campaign_lot_pkey PRIMARY KEY (lot_id)
 );
 
 
@@ -398,30 +426,6 @@ CREATE TABLE workorder
   cost numeric,
   ct text,
   CONSTRAINT workorder_pkey PRIMARY KEY (workorder_id)
-);
-
-
-CREATE TABLE campaign_x_organitzaton
-(
-  campaign_id integer, -- fk om_campaign
-  organitzation_id integer, --fk om_organitzation
-  CONSTRAINT campaign_x_organitzaton_pkey PRIMARY KEY (campaign_id, organitzation_id)
-);
-
-
-CREATE TABLE lot_x_team
-(
-  lot_id integer, -- fk lot
-  team_id integer, -- fk team
-  CONSTRAINT lot_x_team_pkey PRIMARY KEY (lot_id, team_id)
-);
-
-
-CREATE TABLE selector_pschema
-(
-  pschema_id text,
-  cur_user text DEFAULT "current_user"(),
-  CONSTRAINT selector_pschema_pkey PRIMARY KEY (pschema_id, cur_user)
 );
 
 

@@ -20,3 +20,14 @@ INSERT INTO om_reviewclass_x_object VALUES (2,'PR_REDUC_VALVE',true);
 INSERT INTO om_reviewclass_x_object VALUES (2,'PR_BREAK_VALVE',true);
 INSERT INTO om_reviewclass_x_object VALUES (2,'FL_CONTR_VALVE',true);
 INSERT INTO om_reviewclass_x_object VALUES (2,'THROTTLE_VALVE',true);
+
+insert into om_campaign (campaign_id, name, active, organization_id, campaign_type, status) values (1, 'Campaign num.1', TRUE, 1, 1);
+insert into om_campaign (campaign_id, name, active, organization_id, campaign_type, status) values (2, 'Campaign num.2', TRUE, 2, 1);
+
+insert into om_campaign_review values (1, 1);
+insert into om_campaign_review values (2, 1);
+
+insert into om_campaign_lot  (lot_id, name, campaign_id, active, team_id, status)  values (1, 'Lot num.1', 1, true, 4, 1);
+insert into om_campaign_lot  (lot_id, name, campaign_id, active, team_id, status)  values (2, 'Lot num.2', 1, true, 5, 1);
+insert into om_campaign_lot  (lot_id, name, campaign_id, active, team_id, status)  values (3, 'Lot num.3', 2, true, 6, 1);
+insert into om_campaign_lot  (lot_id, name, campaign_id, active, team_id, status)  values (4, 'Lot num.4', 2, true, 7, 1);
