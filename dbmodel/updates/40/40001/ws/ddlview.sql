@@ -7049,6 +7049,7 @@ AS SELECT
     f.element_id,
     f.node_id,
     f.order_id,
+    f.nodarc_id,
     f.to_arc,
     f.flwreg_length,
     p.curve_id,
@@ -7070,3 +7071,98 @@ AS SELECT s.dscenario_id,
     FROM selector_inp_dscenario s, inp_dscenario_flwreg_pump f
     JOIN v_edit_inp_flwreg_pump n USING (element_id)
     WHERE s.dscenario_id = f.dscenario_id AND s.cur_user = CURRENT_USER::text;
+    
+
+CREATE OR REPLACE VIEW v_edit_inp_flwreg_valve 
+as select f.element_id,
+    f.node_id,
+    f.order_id,
+    f.nodarc_id,
+    f.to_arc,
+    f.flwreg_length,
+    v.valve_type,
+    custom_dint,
+    setting,
+    curve_id,
+    minorloss, 
+    add_settings,
+    init_quality,
+    f.the_geom
+    FROM v_edit_flwreg f
+    JOIN inp_flwreg_valve v ON f.element_id::text = v.element_id::text;
+
+ 
+CREATE OR REPLACE VIEW v_edit_inp_dscenario_flwreg_valve
+AS SELECT s.dscenario_id,
+    element_id,
+	v.valve_type,
+    v.custom_dint,
+    v.setting,
+    v.curve_id,
+    v.minorloss, 
+    v.add_settings,
+    v.init_quality,
+    n.the_geom
+    FROM selector_inp_dscenario s, inp_dscenario_flwreg_valve v
+    JOIN v_edit_inp_flwreg_valve n USING (element_id)
+    WHERE s.dscenario_id = v.dscenario_id AND s.cur_user = CURRENT_USER::text;
+   
+   
+CREATE OR REPLACE VIEW ve_epa_flwreg_valve AS
+SELECT v.element_id,
+	man_flwreg.node_id,
+	concat (man_flwreg.node_id,'_FR', order_id) as nodarc_id,
+	to_arc,
+	valve_type,
+	custom_dint,
+	v.setting,
+	curve_id, 
+	minorloss
+	status,
+	add_settings,
+	init_quality,
+	flow_max,
+	flow_min,
+	flow_avg,
+	vel_max,
+	vel_min,
+	vel_avg,
+	headloss_max,
+	headloss_min,
+	setting_max,
+	setting_min,
+	reaction_max,
+	reaction_min,
+	ffactor_max,
+	ffactor_min
+	FROM inp_flwreg_valve v
+     LEFT JOIN man_flwreg USING (element_id)
+     LEFT JOIN v_rpt_arc_stats r ON r.arc_id = concat (man_flwreg.node_id,'_FR', order_id);
+    
+ 
+CREATE OR REPLACE VIEW ve_epa_flwreg_pump as
+SELECT p.element_id,
+	man_flwreg.node_id,
+	concat (man_flwreg.node_id,'_FR', order_id) as nodarc_id,
+	to_arc,
+	curve_id,
+	status,
+	startup,
+	shutoff,
+	flow_max,
+	flow_min,
+	flow_avg,
+	vel_max,
+	vel_min,
+	vel_avg,
+	headloss_max,
+	headloss_min,
+	setting_max,
+	setting_min,
+	reaction_max,
+	reaction_min,
+	ffactor_max,
+	ffactor_min
+	FROM inp_flwreg_pump p
+     LEFT JOIN man_flwreg USING (element_id)
+     LEFT JOIN v_rpt_arc_stats r ON r.arc_id = concat (man_flwreg.node_id,'_FR', order_id);

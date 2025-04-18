@@ -156,6 +156,7 @@ CREATE OR REPLACE VIEW v_edit_flwreg AS
 	man_flwreg.flwreg_type,
 	man_flwreg.node_id,
 	man_flwreg.order_id,
+	concat (man_flwreg.node_id,'_FR', order_id) as nodarc_id,
 	man_flwreg.to_arc,
 	man_flwreg.flwreg_length,
 	st_setsrid(st_makeline(element.the_geom, st_lineinterpolatepoint(a.the_geom, flwreg_length / st_length(a.the_geom))), SRID_VALUE)::geometry(LineString,SRID_VALUE) AS the_geom

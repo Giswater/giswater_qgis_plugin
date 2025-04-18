@@ -6511,10 +6511,11 @@ AS SELECT om_visit_event.id AS event_id,
            FROM doc_x_visit) b ON b.visit_id = om_visit.id
   ORDER BY om_visit_x_gully.gully_id;
 
--- ve_epa_flwreg_weir
-
+-- ve_epa_flwreg_weir 
 CREATE OR REPLACE VIEW ve_epa_flwreg_weir
 AS SELECT inp_flwreg_weir.element_id,
+	man_flwreg.node_id,
+	concat (man_flwreg.node_id,'_FR', order_id) as nodarc_id,
     inp_flwreg_weir.weir_type,
     inp_flwreg_weir.offsetval,
     inp_flwreg_weir.cd,
@@ -6551,6 +6552,8 @@ AS SELECT inp_flwreg_weir.element_id,
 -- ve_epa_flwreg_orifice
 CREATE OR REPLACE VIEW ve_epa_flwreg_orifice
 AS SELECT inp_flwreg_orifice.element_id,
+	man_flwreg.node_id,
+	concat (man_flwreg.node_id,'_FR', order_id) as nodarc_id,
     inp_flwreg_orifice.orifice_type,
     inp_flwreg_orifice.offsetval,
     inp_flwreg_orifice.cd,
@@ -6583,8 +6586,10 @@ AS SELECT inp_flwreg_orifice.element_id,
 -- ve_epa_flwreg_outlet
 CREATE OR REPLACE VIEW ve_epa_flwreg_outlet
 AS SELECT inp_flwreg_outlet.element_id,
+	man_flwreg.node_id,
+	concat (man_flwreg.node_id,'_FR', order_id) as nodarc_id,
     inp_flwreg_outlet.outlet_type,
-    inp_flwreg_outlet.offsetval,
+	inp_flwreg_outlet.offsetval,
     inp_flwreg_outlet.curve_id,
     inp_flwreg_outlet.cd1,
     inp_flwreg_outlet.cd2,
@@ -6608,9 +6613,12 @@ AS SELECT inp_flwreg_outlet.element_id,
      LEFT JOIN rpt_arcflow_sum ON rpt_arcflow_sum.arc_id = man_flwreg.nodarc_id;
 
 
+
 -- ve_epa_flwreg_pump
 CREATE OR REPLACE VIEW ve_epa_flwreg_pump
 AS SELECT inp_flwreg_pump.element_id,
+	man_flwreg.node_id,
+	concat (man_flwreg.node_id,'_FR', order_id) as nodarc_id,
     inp_flwreg_pump.curve_id,
     inp_flwreg_pump.status,
     inp_flwreg_pump.startup,

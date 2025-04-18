@@ -7,9 +7,9 @@ This version of Giswater is provided by Giswater Association
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 -- Insert into sys_feature_epa_type
-INSERT INTO sys_feature_epa_type (id, feature_type, epa_table, descript, active) VALUES('WEIR', 'ELEMENT', 'inp_flwreg_weir', NULL, true);
-INSERT INTO sys_feature_epa_type (id, feature_type, epa_table, descript, active) VALUES('ORIFICE', 'ELEMENT', 'inp_flwreg_orifice', NULL, true);
-INSERT INTO sys_feature_epa_type (id, feature_type, epa_table, descript, active) VALUES('OUTLET', 'ELEMENT', 'inp_flwreg_outlet', NULL, true);
+INSERT INTO sys_feature_epa_type (id, feature_type, epa_table, descript, active) VALUES('FR-WEIR', 'ELEMENT', 'inp_flwreg_weir', NULL, true);
+INSERT INTO sys_feature_epa_type (id, feature_type, epa_table, descript, active) VALUES('FR-ORIFICE', 'ELEMENT', 'inp_flwreg_orifice', NULL, true);
+INSERT INTO sys_feature_epa_type (id, feature_type, epa_table, descript, active) VALUES('FR-OUTLET', 'ELEMENT', 'inp_flwreg_outlet', NULL, true);
 
 -- Adding flowregulator objects on cat_feature [Modified from first version]
 INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) VALUES ('FRPUMP', 'FLWREG', 'ELEMENT', 'v_edit_element', 've_elem_frpump', true) ON CONFLICT (id) DO NOTHING;
