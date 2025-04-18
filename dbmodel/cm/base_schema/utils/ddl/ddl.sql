@@ -294,7 +294,8 @@ CREATE TABLE om_campaign_lot_x_arc
   update_by text,
   update_count integer,
   update_log json, 	
-  qindex numeric(12,3),
+  qindex1 numeric(12,3),
+  qindex2 numeric(12,3),
   CONSTRAINT om_campaign_lot_x_arc_pkey PRIMARY KEY (lot_id, arc_id)
 );
 
@@ -310,7 +311,8 @@ CREATE TABLE om_campaign_lot_x_connec
   update_by text,
   update_count integer,
   update_log json, 	
-  qindex numeric(12,3),	
+  qindex1 numeric(12,3),
+  qindex2 numeric(12,3),	
   CONSTRAINT om_campaign_lot_x_connec_pkey PRIMARY KEY (lot_id, connec_id)
 );
 
@@ -327,7 +329,8 @@ CREATE TABLE om_campaign_lot_x_link
   update_by text,
   update_count integer,
   update_log json, 	
-  qindex numeric(12,3),
+  qindex1 numeric(12,3),
+  qindex2 numeric(12,3),,
   CONSTRAINT om_campaign_lot_x_link_pkey PRIMARY KEY (lot_id, link_id)
 );
 
@@ -344,7 +347,8 @@ CREATE TABLE om_campaign_lot_x_node
   update_by text,
   update_count integer,
   update_log json, 	
-  qindex numeric(12,3),
+  qindex1 numeric(12,3),
+  qindex2 numeric(12,3),
   CONSTRAINT om_campaign_lot_x_node_pkey PRIMARY KEY (lot_id, node_id)
 );
 
@@ -360,7 +364,8 @@ CREATE TABLE om_campaign_lot_x_gully
   update_by text,
   update_count integer,
   update_log json, 
-  qindex numeric(12,3),
+  qindex1 numeric(12,3),
+  qindex2 numeric(12,3),
   CONSTRAINT om_campaign_lot_x_gully_pkey PRIMARY KEY (lot_id, connec_id)
 );
 
