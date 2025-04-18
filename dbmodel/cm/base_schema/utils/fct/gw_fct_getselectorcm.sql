@@ -7,19 +7,11 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: NEW CODE FOR THIS FUNCTIN
 
-CREATE OR REPLACE FUNCTION ws40001.gw_fct_getselectors(p_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_getselectorscm(p_data json)
   RETURNS json AS
 $BODY$
 
 /*example
-
-SELECT ws40001.gw_fct_getselectors($${"client":{"lang":"en_US", "infoType":1, "epsg":SRID_VALUE}, "form":{"currentTab":"tab_exploitation"}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"selector_basic" ,"filterText":"1"}}$$);
-
-SELECT ws40001.gw_fct_getselectors($${"client":{"lang":"en_US", "infoType":1, "epsg":SRID_VALUE}, "form":{"currentTab":"tab_exploitation"}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"selector_basic", "filterText":""}}$$);
-
-SELECT ws40001.gw_fct_getselectors($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":SRID_VALUE}, "form":{"currentTab":"tab_exploitation"}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"selector_basic", "filterText":""}}$$);
-
-SELECT ws40001.gw_fct_setselectors($${"client":{"device":4, "lang":"en_US", "infoType":1, "epsg":SRID_VALUE}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"selector_basic", "tabName":"tab_exploitation", "id":"1", "isAlone":"True", "disableParent":"False", "value":"True", "addSchema":"NULL"}}$$)
 
 */
 
@@ -107,7 +99,7 @@ v_project_type text;
 BEGIN
 
 	-- Set search path to local schema
-	SET search_path = "ws40001", public;
+	SET search_path = "SCHEMA_NAME", public;
 
 	--  get system values
 	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM config_param_system WHERE parameter=''admin_version'') row'
@@ -493,9 +485,9 @@ BEGIN
 	END IF;
 
 	-- Exception handling
-	--EXCEPTION WHEN OTHERS THEN
-	--GET STACKED DIAGNOSTICS v_errcontext = pg_exception_context;
-	--RETURN json_build_object('status', 'Failed','NOSQLERR', SQLERRM, 'version', v_version, 'SQLSTATE', SQLSTATE, 'MSGERR', (v_msgerr::json ->> 'MSGERR'))::json;
+	EXCEPTION WHEN OTHERS THEN
+	GET STACKED DIAGNOSTICS v_errcontext = pg_exception_context;
+	RETURN json_build_object('status', 'Failed','NOSQLERR', SQLERRM, 'version', v_version, 'SQLSTATE', SQLSTATE, 'MSGERR', (v_msgerr::json ->> 'MSGERR'))::json;
 
 END;
 $BODY$

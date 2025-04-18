@@ -91,7 +91,46 @@ CREATE TABLE config_form_fields (
 	CONSTRAINT config_form_fields_pkey PRIMARY KEY (formname, formtype, columnname, tabname)
 );
 
- 
+CREATE TABLE config_form_tabs (
+	formname varchar(50) NOT NULL,
+	tabname text NOT NULL,
+	"label" text NULL,
+	tooltip text NULL,
+	sys_role text NULL,
+	tabfunction json NULL,
+	tabactions json NULL,
+	orderby int4 NULL,
+	device _int4 NULL,
+	CONSTRAINT config_form_tabs_pkey PRIMARY KEY (formname, tabname)
+);
+
+CREATE TABLE config_param_system (
+	"parameter" varchar(50) NOT NULL,
+	value text NULL,
+	descript text NULL,
+	"label" text NULL,
+	dv_querytext text NULL,
+	dv_filterbyfield text NULL,
+	isenabled bool NULL,
+	layoutorder int4 NULL,
+	project_type varchar NULL,
+	dv_isparent bool NULL,
+	isautoupdate bool NULL,
+	"datatype" varchar NULL,
+	widgettype varchar NULL,
+	ismandatory bool NULL,
+	iseditable bool NULL,
+	dv_orderby_id bool NULL,
+	dv_isnullvalue bool NULL,
+	stylesheet json NULL,
+	widgetcontrols json NULL,
+	placeholder text NULL,
+	standardvalue text NULL,
+	layoutname text NULL,
+	CONSTRAINT config_param_system_pkey PRIMARY KEY (parameter)
+);
+
+
 CREATE TABLE sys_typevalue (
 	typevalue text NOT NULL,
 	id varchar(30) NOT NULL,

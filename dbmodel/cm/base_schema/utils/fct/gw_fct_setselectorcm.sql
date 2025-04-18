@@ -4,24 +4,14 @@ The program is free software: you can redistribute it and/or modify it under the
 This version of Giswater is provided by Giswater Association
 */
 
---FUNCTION CODE: 2870
 
-DROP FUNCTION IF EXISTS SCHEMA_NAME.gw_api_setselectors (json);
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_setselectors(p_data json)
+--FUNCTION CODE: NEW CODE FOR THIS FUNCTIN
+
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_setselectorscmp_data json)
   RETURNS json AS
 $BODY$
 
 /*example
-SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES", "cur_user":"test_user"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"None", "tabName":"tab_exploitation", "forceParent":"True", "checkAll":"True", "addSchema":"None"}}$$);
-SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES", "cur_user":"test_user"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"explfrommuni", "id":32, "value":true, "isAlone":true, "addSchema":"ws"}}$$)::text
-
-SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "infoType":1, "lang":"ES", "cur_user":"test_user"}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"selector_basic", "tabName":"tab_psector", "id":"1", "ids":"[1,2]", "isAlone":"True", "value":"True", "addSchema":"None", "useAtlas":true}}$$);
-
-SELECT SCHEMA_NAME.gw_fct_setselectors($${"client":{"device":4, "lang":"es_ES", "infoType":1, "epsg":SRID_VALUE}, "form":{}, "feature":{}, "data":{"filterFields":{}, "pageInfo":{}, "selectorType":"selector_mincut", "tabName":"tab_mincut", "checkAll":"True", "addSchema":"NULL"}}$$);
-
-fid: 397
-
-select * from SCHEMA_NAME.anl_arc
 
 */
 
@@ -150,77 +140,49 @@ BEGIN
 	END IF;
 
 	-- create temp tables related to expl x user variable
-	DROP TABLE IF EXISTS temp_exploitation;
-	DROP TABLE IF EXISTS temp_macroexploitation;
-	DROP TABLE IF EXISTS temp_sector;
-	DROP TABLE IF EXISTS temp_macrosector;
-	DROP TABLE IF EXISTS temp_municipality;
-	DROP TABLE IF EXISTS temp_t_mincut;
+	DROP TABLE IF EXISTS temp_om_campaign;
+	DROP TABLE IF EXISTS temp_om_campaign_lot;
 
-	IF v_expl_x_user is false THEN
-		CREATE TEMP TABLE temp_exploitation as select e.* from exploitation e WHERE active and expl_id > 0 order by 1;
-		CREATE TEMP TABLE temp_macroexploitation as select e.* from macroexploitation e WHERE active and macroexpl_id > 0 order by 1;
-		CREATE TEMP TABLE temp_sector as select e.* from sector e WHERE active and sector_id > 0 order by 1;
-		CREATE TEMP TABLE temp_macrosector as select e.* from macrosector e WHERE active and macrosector_id > 0 order by 1;
-		CREATE TEMP TABLE temp_municipality as select em.* from ext_municipality em WHERE active and muni_id > 0 order by 1;
 
-		IF v_project_type = 'WS' THEN
-			CREATE TEMP TABLE temp_t_mincut as select e.* from om_mincut e WHERE id > 0 order by 1;
-		END IF;
-	ELSE
-		CREATE TEMP TABLE temp_exploitation as select e.* from exploitation e
-		JOIN config_user_x_expl USING (expl_id)	WHERE e.active and expl_id > 0 and username = current_user order by 1;
+	-- creation of the temporal tables in function of the role
+	if 'role_cm_admin' in (	SELECT r.rolname AS role_name FROM pg_roles r JOIN pg_auth_members m ON r.oid = m.roleid 
+						  	JOIN pg_roles u ON u.oid = m.member WHERE u.rolname = 'postgres') then 
+						  	
+		CREATE TEMP TABLE temp_om_campaign AS
+		select c.* from om_campaign c 
+		where c.active;
+		
+		CREATE TEMP TABLE temp_om_campaign_lot AS
+		select l.* from om_campaign_lot l
+		join selector_campaign sc using (campaign_id)
+		where l.active 
+		and cur_user = current_user; -- only campaigns enabled for user
 
-		CREATE TEMP TABLE temp_macroexploitation as select distinct on (m.macroexpl_id) m.* from macroexploitation m
-		JOIN temp_exploitation e USING (macroexpl_id)
-		WHERE m.active and m.macroexpl_id > 0 order by 1;
+	else 
 
-		CREATE TEMP TABLE temp_sector as
-		select distinct on (s.sector_id) s.sector_id, s.name, s.macrosector_id, s.descript, s.active from sector s
-		JOIN (SELECT DISTINCT node.sector_id, node.expl_id FROM node WHERE node.state > 0)n USING (sector_id)
-		JOIN exploitation e ON e.expl_id=n.expl_id
-		JOIN config_user_x_expl c ON c.expl_id=n.expl_id WHERE s.active and s.sector_id > 0 and username = current_user
- 			UNION
-		select distinct on (s.sector_id) s.sector_id, s.name, s.macrosector_id, s.descript, s.active from sector s
-		JOIN (SELECT DISTINCT node.sector_id, node.expl_id FROM node WHERE node.state > 0)n USING (sector_id)
-		WHERE n.sector_id is null AND s.active and s.sector_id > 0
-		order by 1;
-
-		CREATE TEMP TABLE temp_macrosector as select distinct on (m.macrosector_id) m.* from macrosector m
-		JOIN temp_sector e USING (macrosector_id)
-		WHERE m.active and m.macrosector_id > 0;
-
-		CREATE TEMP TABLE temp_municipality as
-		select distinct on (muni_id) muni_id, em.name, descript, em.active from ext_municipality em
-		JOIN (SELECT DISTINCT expl_id, muni_id FROM node)n USING (muni_id)
-		JOIN exploitation e ON e.expl_id=n.expl_id
-		JOIN config_user_x_expl c ON c.expl_id=n.expl_id
-		WHERE em.active and username = current_user;
-
-		IF v_project_type = 'WS' THEN
-			CREATE TEMP TABLE temp_t_mincut AS select distinct on (m.id) m.* from om_mincut m
-			JOIN config_user_x_expl USING (expl_id)
-			where username = current_user and m.id > 0;
-		END IF;
-	END IF;
+		CREATE TEMP TABLE temp_om_campaign  AS
+		select c.* from om_campaign c 
+		join cat_organization  using (organization_id)
+		join cat_team t using (organization_id)
+		join cat_user using (team_id)
+		where c.active and username = current_user;
+		
+		CREATE TEMP TABLE temp_om_campaign_lot AS
+		select l.* from om_campaign_lot l
+		join selector_campaign sc using (campaign_id)
+		join cat_team t using (team_id)
+		join cat_user using (team_id)
+		where l.active 
+		and cur_user = current_user -- only campaigns enabled for user
+		and username = current_user; -- only lots enabled for user ;
+	
+	end if;
 
 	-- manage check all
 	IF v_checkall THEN
-		IF v_tabname = 'tab_psector' THEN -- to manage only those psectors related to selected exploitations
-
-			EXECUTE 'INSERT INTO ' || v_tablename || ' ('|| v_columnname ||', cur_user) SELECT '||v_tableid||', current_user FROM '||v_table||
-			' WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user=current_user) AND active = true ON CONFLICT DO NOTHING';
-
-		ELSIF v_tabname in ('tab_hydro_state', 'tab_mincut') THEN
-			EXECUTE concat('INSERT INTO ',v_tablename,' (',v_columnname,', cur_user) SELECT ',v_tableid,', current_user FROM ',v_table,'
-			',(CASE when v_ids is not null then concat(' WHERE id = ANY(ARRAY',v_ids,') ') end),' 
-			ON CONFLICT (',v_columnname,', cur_user) DO NOTHING;');
-
-		ELSE
-			EXECUTE concat('INSERT INTO ',v_tablename,' (',v_columnname,', cur_user) SELECT ',v_tableid,', current_user FROM ',v_table,'
-			',(CASE when v_ids is not null then concat(' WHERE id = ANY(ARRAY',v_ids,')') end),' WHERE active
-			ON CONFLICT (',v_columnname,', cur_user) DO NOTHING;');
-		END IF;
+		EXECUTE concat('INSERT INTO ',v_tablename,' (',v_columnname,', cur_user) SELECT ',v_tableid,', current_user FROM ',v_table,'
+		',(CASE when v_ids is not null then concat(' WHERE id = ANY(ARRAY',v_ids,')') end),' WHERE active
+		ON CONFLICT (',v_columnname,', cur_user) DO NOTHING;');
 
 	ELSIF v_checkall is false THEN
 		EXECUTE 'DELETE FROM ' || v_tablename || ' WHERE cur_user = current_user';
@@ -232,11 +194,7 @@ BEGIN
 
 		-- manage value
 		IF v_value then
-			IF v_tabname='tab_period' THEN
-				EXECUTE 'INSERT INTO ' || v_tablename || ' ('|| v_columnname ||', cur_user) VALUES('''|| v_id ||''', '''|| current_user ||''')ON CONFLICT DO NOTHING';
-			ELSE
-				EXECUTE 'INSERT INTO ' || v_tablename || ' ('|| v_columnname ||', cur_user) VALUES('|| v_id ||', '''|| current_user ||''')ON CONFLICT DO NOTHING';
-			END IF;
+			EXECUTE 'INSERT INTO ' || v_tablename || ' ('|| v_columnname ||', cur_user) VALUES('|| v_id ||', '''|| current_user ||''')ON CONFLICT DO NOTHING';
 		ELSE
 			EXECUTE 'DELETE FROM ' || v_tablename || ' WHERE ' || v_columnname || '::text = '''|| v_id ||''' AND cur_user = current_user';
 		END IF;
@@ -244,324 +202,18 @@ BEGIN
 
 	END IF;
 
-	-- manage parents
-	IF v_tabname IN ('tab_psector', 'tab_dscenario', 'tab_sector') AND v_checkall is null AND v_disableparent IS NOT TRUE THEN
-
-		-- getting name
-		v_name = substring (v_tabname,5,99);
-
-		IF v_value THEN
-
-			-- getting parent_id for selected row
-			EXECUTE 'SELECT parent_id FROM '||v_table||' WHERE active IS TRUE AND parent_id IS NOT NULL AND '||v_tableid||' = '||v_id
-			INTO v_id;
-
-			IF v_id IS NOT NULL THEN
-
-				-- force parent_id to be visible if child have been enabled
-				EXECUTE 'INSERT INTO ' || v_tablename || ' ('|| v_columnname ||', cur_user) VALUES('|| v_id ||', '''|| current_user ||''')ON CONFLICT DO NOTHING';
-				GET DIAGNOSTICS v_count = row_count;
-				IF v_count > 0 THEN
-					v_message = concat ('{"level":0, "text":"',v_name,' ',v_id,' have been enabled, because of its parent-relation with selected ', v_name,'"}');
-				END IF;
-
-			END IF;
-		ELSE
-			-- getting childs for parent_id for selected row
-			v_querytext = 'SELECT '||v_tableid||' FROM '||v_table||' WHERE active IS TRUE AND parent_id = '|| v_id;
-
-			FOR v_id IN EXECUTE v_querytext
-			LOOP
-				EXECUTE 'DELETE FROM '||v_tablename||' WHERE ' || v_columnname || ' = '|| v_id ||' AND cur_user = current_user';
-				GET DIAGNOSTICS v_count_aux = row_count;
-				v_count = v_count + v_count_aux;
-			END LOOP;
-
-			IF v_count > 0 THEN
-				v_message = concat ('{"level":0, "text":"',v_count,' ',v_name,'(s) have been disabled, because of its child-relation from selected ', v_name,'"}');
-			END IF;
-		END IF;
-	END IF;
-
-	--set expl as vdefault if only one value on selector (remember default value has priority over spatial intersection)
-	IF (SELECT count (*) FROM selector_expl WHERE cur_user = current_user) = 1 THEN
-
-		v_expl = (SELECT expl_id FROM selector_expl WHERE cur_user = current_user);
-
-		INSERT INTO config_param_user(parameter, value, cur_user)
-		VALUES ('edit_exploitation_vdefault', v_expl, current_user) ON CONFLICT (parameter, cur_user)
-		DO UPDATE SET value = v_expl WHERE config_param_user.parameter = 'edit_exploitation_vdefault' AND config_param_user.cur_user = current_user;
-
-	ELSE -- delete if more than one value on selector
-
-		DELETE FROM config_param_user WHERE parameter = 'edit_exploitation_vdefault' AND cur_user = current_user;
-	END IF;
-
-	--set sector as vdefault if only one value on selector (remember default value has priority over spatial intersection)
-	IF (SELECT count (*) FROM selector_sector WHERE cur_user = current_user) = 1 THEN
-
-		v_sector = (SELECT sector_id FROM selector_sector WHERE cur_user = current_user);
-
-		INSERT INTO config_param_user(parameter, value, cur_user)
-		VALUES ('edit_sector_vdefault', v_sector, current_user) ON CONFLICT (parameter, cur_user)
-		DO UPDATE SET value = v_sector WHERE config_param_user.parameter = 'edit_sector_vdefault' AND config_param_user.cur_user = current_user;
-
-	ELSE -- delete if more than one value on selector
-
-		DELETE FROM config_param_user WHERE parameter = 'edit_sector_vdefault' AND cur_user = current_user;
-	END IF;
-
-	-- trigger getmapzones
-	IF v_tabname IN('tab_exploitation', 'tab_macroexploitation') THEN
-		v_action = '[{"funcName": "set_style_mapzones", "params": {}}]';
-	END IF;
-
-	-- manage cross-reference tables
-	select count(*) into v_count from node;
-	IF v_count > 0 THEN
-		IF v_tabname IN ('tab_exploitation', 'tab_macroexploitation') THEN
-
-			IF v_tabname = 'tab_exploitation' THEN
-
-				IF v_explfrommacro is false THEN
-					DELETE FROM selector_macroexpl WHERE cur_user = current_user;
-				end if;
-				INSERT INTO selector_macroexpl
-				SELECT DISTINCT macroexpl_id, current_user FROM exploitation WHERE active is true and expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user)
-				ON CONFLICT (macroexpl_id, cur_user) DO NOTHING;
-
-			ELSIF v_tabname = 'tab_macroexploitation' THEN
-				DELETE FROM selector_expl WHERE cur_user = current_user;
-				INSERT INTO selector_expl
-				SELECT DISTINCT expl_id, current_user FROM exploitation WHERE active is true and macroexpl_id IN (SELECT macroexpl_id FROM selector_macroexpl WHERE cur_user = current_user)
-				ON CONFLICT (expl_id, cur_user) DO NOTHING;
-			END IF;
-
-			-- macrosector
-			DELETE FROM selector_macrosector WHERE cur_user = current_user;
-			INSERT INTO selector_macrosector
-			SELECT DISTINCT macrosector_id, current_user FROM sector WHERE active is true and sector_id IN (SELECT DISTINCT (sector_id) FROM node
-			JOIN selector_expl using (expl_id) where cur_user = current_user) AND macrosector_id IS NOT NULL;
-
-			-- sector
-			DELETE FROM selector_sector WHERE cur_user = current_user AND sector_id > 0;
-			INSERT INTO selector_sector
-			SELECT DISTINCT sector_id, current_user FROM node WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user)
-
-			ON CONFLICT (sector_id, cur_user) DO NOTHING;
-
-			-- sector for those objects wich has expl_id2 and expl_id2 is not selected but yes one
-			INSERT INTO selector_sector
-			SELECT DISTINCT sector_id,current_user FROM arc WHERE expl_id2 IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user) AND sector_id > 0
-			UNION
-			SELECT DISTINCT sector_id,current_user FROM node WHERE expl_id2 IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user) AND sector_id > 0
-			ON CONFLICT (sector_id, cur_user) DO NOTHING;
-
-			-- muni
-			DELETE FROM selector_municipality WHERE cur_user = current_user;
-			INSERT INTO selector_municipality
-			SELECT DISTINCT muni_id, current_user FROM node WHERE expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user);
-
-			-- scenarios
-			IF (SELECT rolname FROM pg_roles WHERE pg_has_role(current_user, oid, 'member') AND rolname = 'role_epa') IS NOT NULL THEN
-				DELETE FROM selector_inp_dscenario WHERE dscenario_id NOT IN
-				(SELECT dscenario_id FROM cat_dscenario WHERE active is true and expl_id IS NULL OR expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user));
-			END IF;
-
-			-- psector
-			DELETE FROM selector_psector WHERE psector_id NOT IN
-			(SELECT psector_id FROM cat_dscenario WHERE active is true and expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user));
-
-			SELECT value::integer FROM config_param_user WHERE parameter = 'plan_psector_current'
-			INTO v_psector_current_value;
-
-			-- Check if current psector is in the selected exploitations
-			IF v_psector_current_value IS NOT NULL THEN
-				IF (SELECT COUNT(*) FROM plan_psector WHERE psector_id = v_psector_current_value
-					AND expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user)) = 0 THEN
-					-- Current psector is not in selected exploitations, set to NULL
-					UPDATE config_param_user SET value = NULL
-					WHERE parameter = 'plan_psector_current' AND cur_user = current_user;
-				END IF;
-			END IF;
-
-		ELSIF v_tabname IN ('tab_sector', 'tab_macrosector') THEN
-
-			IF v_tabname = 'tab_sector' THEN
-				IF v_sectorfrommacro is false THEN
-					DELETE FROM selector_macrosector WHERE cur_user = current_user;
-				end if;
-				INSERT INTO selector_macrosector
-				SELECT DISTINCT macrosector_id, current_user FROM sector WHERE sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user = current_user)
-				AND macrosector_id IS NOT NULL
-				ON CONFLICT (macrosector_id, cur_user) DO NOTHING;
-
-			ELSIF v_tabname = 'tab_macrosector' THEN
-				DELETE FROM selector_sector WHERE cur_user = current_user;
-				INSERT INTO selector_sector
-				SELECT DISTINCT sector_id, current_user FROM sector WHERE macrosector_id IN (SELECT macrosector_id FROM selector_macrosector WHERE cur_user = current_user)
-				ON CONFLICT (sector_id, cur_user) DO NOTHING;
-			END IF;
-
-			-- expl
-			IF v_sectorfromexpl IS FALSE THEN
-				DELETE FROM selector_expl WHERE cur_user = current_user;
-			END IF;
-			INSERT INTO selector_expl
-			SELECT DISTINCT expl_id, current_user FROM node WHERE sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user = current_user AND sector_id > 0)
-			ON CONFLICT (expl_id, cur_user) DO NOTHING;
-
-			-- muni
-			IF v_sectorfromexpl IS FALSE THEN
-				DELETE FROM selector_municipality WHERE cur_user = current_user;
-			END IF;
-
-			INSERT INTO selector_municipality
-			SELECT DISTINCT muni_id, current_user FROM node WHERE sector_id IN (SELECT sector_id FROM selector_sector WHERE cur_user = current_user AND sector_id > 0)
-			ON CONFLICT (muni_id, cur_user) DO NOTHING;
-
-			-- scenarios
-			IF (SELECT rolname FROM pg_roles WHERE pg_has_role(current_user, oid, 'member') AND rolname = 'role_epa') IS NOT NULL THEN
-				DELETE FROM selector_inp_dscenario WHERE dscenario_id NOT IN
-				(SELECT dscenario_id FROM cat_dscenario WHERE active is true and expl_id IS NULL OR expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user));
-			END IF;
-
-			-- psector
-			DELETE FROM selector_psector WHERE psector_id NOT IN
-			(SELECT psector_id FROM cat_dscenario WHERE active is true and expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user));
-
-
-		-- inserting muni_id from selected muni
-		ELSIF v_tabname IN ('tab_municipality') THEN
-
-			-- macroexpl
-			DELETE FROM selector_macroexpl WHERE cur_user = current_user;
-			INSERT INTO selector_macroexpl
-			SELECT DISTINCT macroexpl_id, current_user FROM exploitation WHERE expl_id IN (SELECT DISTINCT expl_id FROM node
-			JOIN selector_sector using (sector_id) WHERE cur_user = current_user);
-
-			-- expl
-			DELETE FROM selector_expl WHERE cur_user = current_user;
-			INSERT INTO selector_expl
-			SELECT DISTINCT expl_id, current_user FROM node WHERE muni_id IN (SELECT muni_id FROM selector_municipality WHERE cur_user = current_user)
-			ON CONFLICT (expl_id, cur_user) DO NOTHING;
-
-			-- macrosector
-			DELETE FROM selector_macrosector WHERE cur_user = current_user;
-			INSERT INTO selector_macrosector
-			SELECT DISTINCT macrosector_id, current_user FROM sector WHERE active is true and sector_id IN (SELECT DISTINCT sector_id FROM node
-			JOIN selector_expl using (expl_id) where state = 1 AND cur_user = current_user);
-
-			-- sector
-			DELETE FROM selector_sector WHERE cur_user = current_user AND sector_id > 0;
-			INSERT INTO selector_sector
-			SELECT DISTINCT sector_id, current_user FROM node WHERE muni_id IN (SELECT muni_id FROM selector_municipality WHERE cur_user = current_user)
-			ON CONFLICT (sector_id, cur_user) DO NOTHING;
-
-			-- sector for those objects wich has expl_id2 and expl_id2 is not selected but yes one
-			INSERT INTO selector_sector
-			SELECT DISTINCT sector_id,current_user FROM arc WHERE expl_id2 IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user) AND sector_id > 0
-			UNION
-			SELECT DISTINCT sector_id,current_user FROM node WHERE expl_id2 IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user) AND sector_id > 0
-			ON CONFLICT (sector_id, cur_user) DO NOTHING;
-
-			-- scenarios
-			IF (SELECT rolname FROM pg_roles WHERE pg_has_role(current_user, oid, 'member') AND rolname = 'role_epa') IS NOT NULL THEN
-				DELETE FROM selector_inp_dscenario WHERE dscenario_id NOT IN
-				(SELECT dscenario_id FROM cat_dscenario WHERE active is true and expl_id IS NULL OR expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user));
-			END IF;
-
-			-- psector
-			DELETE FROM selector_psector WHERE psector_id NOT IN
-			(SELECT psector_id FROM cat_dscenario WHERE active is true and expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user));
-
-		END IF;
-	END IF;
-
-	-- manage addschema
-	IF v_addschema IS NOT NULL THEN
-
-		EXECUTE 'SET search_path = '||v_addschema||', public';
-
-		-- manage cross-reference tables
-		select count(*) into v_count from node;
-		IF v_count > 0 THEN
-
-			-- use muni as link between both schemas
-			DELETE FROM selector_municipality WHERE cur_user = current_user;
-			INSERT INTO selector_municipality
-			SELECT DISTINCT muni_id, current_user FROM SCHEMA_NAME.selector_municipality
-			ON CONFLICT (muni_id, cur_user) DO NOTHING;
-
-			-- expl
-			DELETE FROM selector_expl WHERE cur_user = current_user;
-			INSERT INTO selector_expl
-			SELECT DISTINCT expl_id, current_user FROM node JOIN vu_exploitation USING (expl_id)
-			WHERE muni_id IN (SELECT muni_id FROM selector_municipality WHERE cur_user = current_user)
-			ON CONFLICT (expl_id, cur_user) DO NOTHING;
-
-			-- macroexpl
-			DELETE FROM selector_macroexpl WHERE cur_user = current_user;
-			INSERT INTO selector_macroexpl
-			SELECT DISTINCT macroexpl_id, current_user FROM exploitation
-		 	WHERE active is true and expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user)
-			ON CONFLICT (macroexpl_id, cur_user) DO NOTHING;
-
-			-- sector
-			DELETE FROM selector_sector WHERE cur_user = current_user AND sector_id > 0;
-			INSERT INTO selector_sector
-			SELECT DISTINCT sector_id, current_user FROM node JOIN vu_sector USING (sector_id)
-			WHERE active is true and muni_id IN (SELECT muni_id FROM selector_municipality WHERE cur_user = current_user)
-			ON CONFLICT (sector_id, cur_user) DO NOTHING;
-
-			-- macrosector
-			DELETE FROM selector_macrosector WHERE cur_user = current_user;
-			INSERT INTO selector_macrosector
-
-			SELECT DISTINCT macrosector_id, current_user FROM sector
-			WHERE active is true and sector_id IN (SELECT sector_id FROM selector_sector where cur_user = current_user)
-			ON CONFLICT (macrosector_id, cur_user) DO NOTHING;
-
-		END IF;
-			EXECUTE 'SET search_path = '||v_schemaname||', public';
-	END IF;
-
+	
 	-- get envelope
 	SELECT count(the_geom) INTO v_count_2 FROM v_edit_node LIMIT 1;
 
-	IF v_tabname IN ('tab_sector', 'tab_macrosector') THEN
-		SELECT row_to_json (a)
-		INTO v_geometry
-		FROM (SELECT st_xmin(the_geom)::numeric(12,2) as x1, st_ymin(the_geom)::numeric(12,2) as y1,
-		st_xmax(the_geom)::numeric(12,2) as x2, st_ymax(the_geom)::numeric(12,2) as y2
-		FROM (SELECT st_expand(st_collect(the_geom), v_expand) as the_geom FROM sector where sector_id IN
-		(SELECT sector_id FROM selector_sector WHERE cur_user=current_user)) b) a;
-
-	ELSIF v_count_2 > 0 or (v_checkall IS False and v_id is null) THEN
-		SELECT row_to_json (a)
-		INTO v_geometry
-		FROM (SELECT st_xmin(the_geom)::numeric(12,2) as x1, st_ymin(the_geom)::numeric(12,2) as y1, st_xmax(the_geom)::numeric(12,2) as x2, st_ymax(the_geom)::numeric(12,2) as y2
-		FROM (SELECT st_expand(st_collect(the_geom), v_expand) as the_geom FROM v_edit_node) b) a;
-
-	ELSIF v_tabname='tab_exploitation_add' THEN
-		EXECUTE 'SELECT row_to_json (a) 
-			FROM (SELECT st_xmin(the_geom)::numeric(12,2) as x1, st_ymin(the_geom)::numeric(12,2) as y1, st_xmax(the_geom)::numeric(12,2) as x2, st_ymax(the_geom)::numeric(12,2) as y2 
-			FROM (SELECT st_expand(st_collect(the_geom), 50.0) as the_geom FROM exploitation where expl_id IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user)
-			union SELECT st_expand(st_collect(the_geom), 50.0) as the_geom FROM '||v_addschema||'.exploitation where expl_id IN (SELECT expl_id FROM '||v_addschema||
-			'.selector_expl WHERE cur_user = current_user)) b) a'
-			INTO v_geometry;
-
-	ELSIF v_tabname IN ('tab_hydro_state', 'tab_psector', 'tab_network_state', 'tab_dscenario') THEN
-		v_geometry = NULL;
-
-	ELSIF v_tabname='tab_exploitation' THEN
+	IF v_tabname='tab_campaign' THEN
 		SELECT row_to_json (a)
 		INTO v_geometry
 		FROM (SELECT st_xmin(the_geom)::numeric(12,2) as x1, st_ymin(the_geom)::numeric(12,2) as y1, st_xmax(the_geom)::numeric(12,2) as x2, st_ymax(the_geom)::numeric(12,2) as y2
 		FROM (SELECT st_expand(the_geom, v_expand) as the_geom FROM exploitation where expl_id IN
 		(SELECT expl_id FROM selector_expl WHERE cur_user=current_user)) b) a;
 
-	ELSIF v_tabname='tab_municipality' THEN
+	ELSIF v_tabname='tab_lot' THEN
 		SELECT row_to_json (a)
 		INTO v_geometry
 		FROM (SELECT st_xmin(the_geom)::numeric(12,2) as x1, st_ymin(the_geom)::numeric(12,2) as y1, st_xmax(the_geom)::numeric(12,2) as x2, st_ymax(the_geom)::numeric(12,2) as y2
@@ -569,16 +221,6 @@ BEGIN
 		(SELECT muni_id FROM selector_municipality WHERE cur_user=current_user)) b) a;
 
 	END IF;
-
-	-- force 0
-	INSERT INTO selector_sector values (0, current_user) ON CONFLICT (sector_id, cur_user) do nothing;
-	INSERT INTO selector_municipality values (0, current_user) ON CONFLICT (muni_id, cur_user) do nothing;
-
-	-- get uservalues
-	PERFORM gw_fct_workspacemanager($${"client":{"device":4, "infoType":1, "lang":"ES"}, "form":{}, "feature":{},"data":{"filterFields":{}, "pageInfo":{}, "action":"CHECK"}}$$);
-	v_uservalues = (SELECT to_json(array_agg(row_to_json(a))) FROM (SELECT parameter, value FROM config_param_user WHERE parameter IN ('plan_psector_current', 'utils_workspace_vdefault')
-	AND cur_user = current_user ORDER BY parameter)a);
-
 
 	-- Control NULL's
 	v_geometry := COALESCE(v_geometry, '{}');
@@ -596,9 +238,9 @@ BEGIN
 
 
 	--Exception handling
-	EXCEPTION WHEN OTHERS THEN
-	GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
-	RETURN json_build_object('status', 'Failed', 'NOSQLERR', SQLERRM, 'message', json_build_object('level', right(SQLSTATE, 1), 'text', SQLERRM), 'SQLSTATE', SQLSTATE, 'SQLCONTEXT', v_error_context)::json;
+	--EXCEPTION WHEN OTHERS THEN
+	--GET STACKED DIAGNOSTICS v_error_context = PG_EXCEPTION_CONTEXT;
+	--RETURN json_build_object('status', 'Failed', 'NOSQLERR', SQLERRM, 'message', json_build_object('level', right(SQLSTATE, 1), 'text', SQLERRM), 'SQLSTATE', SQLSTATE, 'SQLCONTEXT', v_error_context)::json;
 
 END;
 
