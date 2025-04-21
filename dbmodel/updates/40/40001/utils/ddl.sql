@@ -81,6 +81,7 @@ CREATE TABLE man_flowreg (
     flwreg_length numeric NULL,
     CONSTRAINT man_flowreg_pkey PRIMARY KEY (element_id),
 	CONSTRAINT man_flowreg_fkey_element_id FOREIGN KEY (element_id) REFERENCES element(element_id) on update cascade on delete cascade
+	CONSTRAINT man_flowreg_fkey_to_arc FOREIGN KEY (to_arc) REFERENCES arc(arc_id) on update restrict on delete cascade
 );
 
 CREATE TABLE cat_feature_element (
