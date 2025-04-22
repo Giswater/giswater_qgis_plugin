@@ -36,13 +36,13 @@ BEGIN
 			-- inserting new element on element table
 			INSERT INTO element (code, elementcat_id, serial_number, num_elements, state, state_type, observ, comment, function_type, category_type,
 			fluid_type, location_type, workcat_id, workcat_id_end, builtdate, enddate, ownercat_id, rotation, link, verified,
-			the_geom, label_x, label_y, label_rotation, undelete, publish, inventory, expl_id, feature_type)
+			the_geom, label_x, label_y, label_rotation, publish, inventory, expl_id, feature_type)
 
 			VALUES (rec_element.code, rec_element.elementcat_id, rec_element.serial_number, rec_element.num_elements, rec_element.state, rec_element.state_type,
 			rec_element.observ, rec_element.comment, rec_element.function_type, rec_element.category_type, rec_element.fluid_type, rec_element.location_type,
 			rec_element.workcat_id, rec_element.workcat_id_end, rec_element.builtdate, rec_element.enddate, rec_element.ownercat_id,
 			rec_element.rotation, rec_element.link, rec_element.verified, rec_element.the_geom, rec_element.label_x, rec_element.label_y,
-			rec_element.label_rotation, rec_element.undelete, rec_element.publish, rec_element.inventory, rec_element.expl_id, rec_element.feature_type)
+			rec_element.label_rotation, rec_element.publish, rec_element.inventory, rec_element.expl_id, rec_element.feature_type)
 			RETURNING element_id INTO id_last;
 
 			-- updating values of feature on element_x_feature table
@@ -64,13 +64,13 @@ BEGIN
 			-- inserting new element on element table
 			INSERT INTO element (code, elementcat_id, serial_number, num_elements, state, state_type, observ, comment, function_type, category_type,
 			fluid_type, location_type, workcat_id, workcat_id_end, builtdate, enddate, ownercat_id, rotation, link, verified,
-			the_geom, label_x, label_y, label_rotation, undelete, publish, inventory, expl_id, feature_type)
+			the_geom, label_x, label_y, label_rotation, publish, inventory, expl_id, feature_type)
 
 			VALUES (rec_element.code, rec_element.elementcat_id, rec_element.serial_number, rec_element.num_elements, rec_element.state, rec_element.state_type,
 			rec_element.observ, rec_element.comment, rec_element.function_type, rec_element.category_type, rec_element.fluid_type, rec_element.location_type,
 			rec_element.workcat_id, rec_element.workcat_id_end, rec_element.builtdate, rec_element.enddate, rec_element.ownercat_id,
 			rec_element.rotation, rec_element.link, rec_element.verified, rec_element.the_geom, rec_element.label_x, rec_element.label_y,
-			rec_element.label_rotation, rec_element.undelete, rec_element.publish, rec_element.inventory, rec_element.expl_id, rec_element.feature_type)
+			rec_element.label_rotation, rec_element.publish, rec_element.inventory, rec_element.expl_id, rec_element.feature_type)
 			RETURNING element_id INTO id_last;
 
 			-- updating values of feature on element_x_feature table

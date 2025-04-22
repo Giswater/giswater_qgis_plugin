@@ -28,7 +28,7 @@ SELECT columns_are(
         'custom_length', 'soilcat_id', 'function_type', 'category_type', 'fluid_type', 'location_type',
         'workcat_id', 'workcat_id_end', 'workcat_id_plan', 'builtdate', 'enddate', 'ownercat_id', 'muni_id',
         'postcode', 'district_id', 'streetname', 'postnumber', 'postcomplement', 'streetname2', 'postnumber2',
-        'postcomplement2', 'region_id', 'province_id', 'descript', 'link', 'verified', 'undelete', 'label',
+        'postcomplement2', 'region_id', 'province_id', 'descript', 'link', 'verified', 'label',
         'label_x', 'label_y', 'label_rotation', 'label_quadrant', 'publish', 'inventory', 'num_value',
         'adate', 'adescript', 'sector_style', 'dma_style', 'presszone_style', 'dqa_style', 'supplyzone_style',
         'asset_id', 'pavcat_id', 'om_state', 'conserv_state', 'parent_id', 'expl_id2', 'is_operative',

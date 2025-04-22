@@ -18,20 +18,20 @@ SELECT SCHEMA_NAME.gw_fct_setfields($${
 "client":{"device":4, "infoType":1, "lang":"ES"},
 "form":{},
 "feature":{"featureType":"node", "tableName":"v_edit_man_junction", "id":"1251521"},
-"data":{"fields":{"macrosector_id": "1", "sector_id": "2", 
-"undelete": "False", "inventory": "False", "epa_type": "PUMP", "state": "1", "arc_id": "113854", "publish": "False", "verified": "TO REVIEW",
-"expl_id": "1", "builtdate": "2018/11/29", "muni_id": "2", "workcat_id": "22", "buildercat_id": "builder1", "enddate": "2018/11/29", 
+"data":{"fields":{"macrosector_id": "1", "sector_id": "2",
+"inventory": "False", "epa_type": "PUMP", "state": "1", "arc_id": "113854", "publish": "False", "verified": "TO REVIEW",
+"expl_id": "1", "builtdate": "2018/11/29", "muni_id": "2", "workcat_id": "22", "buildercat_id": "builder1", "enddate": "2018/11/29",
 "soilcat_id": "soil1", "ownercat_id": "owner1", "workcat_id_end": "22"}}}$$)
 
 -- VISIT
 SELECT SCHEMA_NAME.gw_fct_setfields('
  {"client":{"device":4, "infoType":1, "lang":"ES"},
- "feature":{"featureType":"arc", "tableName":"ve_visit_multievent_x_arc", "id":1135}, 
+ "feature":{"featureType":"arc", "tableName":"ve_visit_multievent_x_arc", "id":1135},
  "data":{"fields":{"class_id":6, "arc_id":"2001", "visitcat_id":1, "ext_code":"testcode", "sediments_arc":1000, "desperfectes_arc":1, "neteja_arc":3},
  "deviceTrace":{"xcoord":8597877, "ycoord":5346534, "compass":123}}}')
 
 -- MAPZONES
-SELECT gw_fct_setfields($${"client":{"device":4, "infoType":1, "lang":"ES","epsg":SRID_VALUE}, "form":{}, 
+SELECT gw_fct_setfields($${"client":{"device":4, "infoType":1, "lang":"ES","epsg":SRID_VALUE}, "form":{},
 "feature":{"id":"1295", "tableName":"ve_node_valvula", "featureType":"node" }, "data":{"filterFields":{}, "pageInfo":{}, "fields":{"closed": "False"}, "afterInsert":"False"}}$$)
 
 */
@@ -89,7 +89,7 @@ BEGIN
 	p_data = REPLACE (p_data::text, '"null"', 'null');
 	p_data = REPLACE (p_data::text, '""', 'null');
 	p_data = REPLACE (p_data::text, '''''', 'null');
-      
+
 	-- Get input parameters:
 	v_device := (p_data ->> 'client')::json->> 'device';
 	v_infotype := (p_data ->> 'client')::json->> 'infoType';
@@ -268,15 +268,15 @@ BEGIN
 
 	-- Control NULL's
 	v_version := COALESCE(v_version, '[]');
-	v_columnfromid := COALESCE(v_columnfromid, '{}');   
+	v_columnfromid := COALESCE(v_columnfromid, '{}');
 
 	-- Return
 	RETURN ('{"status":"Accepted", "message":'||v_message||', "version":' || v_version ||
 	      ',"body":{"data":{"fields":' || v_columnfromid || '}'||
-	      '}'||'}')::json; 
+	      '}'||'}')::json;
 
 	-- Exception handling
-	EXCEPTION WHEN OTHERS THEN 
+	EXCEPTION WHEN OTHERS THEN
 	RETURN json_build_object('status', 'Failed', 'message', json_build_object('level', right(SQLSTATE, 1), 'text', SQLERRM),  'version', v_version, 'SQLSTATE', SQLSTATE)::json;
 
 END;

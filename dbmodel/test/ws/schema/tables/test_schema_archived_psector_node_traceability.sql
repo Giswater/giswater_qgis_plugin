@@ -24,7 +24,7 @@ SELECT columns_are(
         'observ', 'comment', 'dma_id', 'presszone_id', 'soilcat_id', 'function_type', 'category_type', 'fluid_type',
         'location_type', 'workcat_id', 'workcat_id_end', 'builtdate', 'enddate', 'ownercat_id', 'muni_id', 'postcode',
         'streetaxis_id', 'postnumber', 'postcomplement', 'streetaxis2_id', 'postnumber2', 'postcomplement2', 'descript',
-        'link', 'verified', 'rotation', 'the_geom', 'undelete', 'label_x', 'label_y', 'label_rotation', 'publish', 'inventory',
+        'link', 'verified', 'rotation', 'the_geom', 'label_x', 'label_y', 'label_rotation', 'publish', 'inventory',
         'hemisphere', 'expl_id', 'num_value', 'feature_type', 'tstamp', 'lastupdate', 'lastupdate_user', 'insert_user',
         'minsector_id', 'dqa_id', 'staticpressure', 'district_id', 'adate', 'adescript', 'accessibility', 'workcat_id_plan',
         'asset_id', 'om_state', 'conserv_state', 'access_type', 'placement_type', 'expl_id2', 'brand_id', 'model_id',

@@ -19,8 +19,8 @@ SELECT has_table('polygon'::name, 'Table polygon should exist');
 SELECT columns_are(
     'polygon',
     ARRAY[
-        'pol_id', 'sys_type', 'text', 'the_geom', 'undelete', 'tstamp', 'featurecat_id',
-        'feature_id', 'state', 'trace_featuregeom'
+        'pol_id', 'sys_type', 'text', 'the_geom', 'tstamp', 'featurecat_id',
+        'feature_id', 'state', 'trace_featuregeom', 'lock_level'
     ],
     'Table polygon should have the correct columns'
 );
@@ -33,12 +33,12 @@ SELECT col_type_is('polygon', 'pol_id', 'character varying(16)', 'Column pol_id 
 SELECT col_type_is('polygon', 'sys_type', 'character varying(30)', 'Column sys_type should be character varying(30)');
 SELECT col_type_is('polygon', 'text', 'text', 'Column text should be text');
 SELECT col_type_is('polygon', 'the_geom', 'geometry(MultiPolygon,25831)', 'Column the_geom should be geometry(MultiPolygon,25831)');
-SELECT col_type_is('polygon', 'undelete', 'boolean', 'Column undelete should be boolean');
 SELECT col_type_is('polygon', 'tstamp', 'timestamp without time zone', 'Column tstamp should be timestamp without time zone');
 SELECT col_type_is('polygon', 'featurecat_id', 'character varying(50)', 'Column featurecat_id should be character varying(50)');
 SELECT col_type_is('polygon', 'feature_id', 'character varying(16)', 'Column feature_id should be character varying(16)');
 SELECT col_type_is('polygon', 'state', 'smallint', 'Column state should be smallint');
 SELECT col_type_is('polygon', 'trace_featuregeom', 'boolean', 'Column trace_featuregeom should be boolean');
+SELECT col_type_is('element', 'lock_level', 'integer', 'Column lock_level should be integer');
 
 -- Check default values
 SELECT col_has_default('polygon', 'pol_id', 'Column pol_id should have a default value');

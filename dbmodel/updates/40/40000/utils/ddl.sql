@@ -388,3 +388,6 @@ CREATE TABLE archived_psector_link_traceability (
 
     CONSTRAINT archived_psector_link_traceability_pkey PRIMARY KEY (id)
 );
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"polygon", "column":"undelete"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"polygon", "column":"lock_level", "dataType":"int4", "isUtils":"False"}}$$);

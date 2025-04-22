@@ -157,7 +157,6 @@ AS WITH
       arc.descript,
       concat(cat_feature.link_path, arc.link) AS link,
       arc.verified,
-      arc.undelete,
       cat_arc.label,
       arc.label_x,
       arc.label_y,
@@ -362,7 +361,6 @@ AS WITH
         node.rotation,
         concat(cat_feature.link_path, node.link) AS link,
         node.verified,
-        node.undelete,
         cat_node.label,
         node.label_x,
         node.label_y,
@@ -482,7 +480,6 @@ SELECT element.element_id,
     element.label_rotation,
     element.publish,
     element.inventory,
-    element.undelete,
     element.expl_id,
     element.pol_id,
     element.top_elev,
@@ -870,7 +867,6 @@ AS WITH
         connec.rotation,
         concat(cat_feature.link_path, connec.link) AS link,
         connec.verified,
-        connec.undelete,
         cat_connec.label,
         connec.label_x,
         connec.label_y,
@@ -6124,7 +6120,6 @@ AS WITH streetaxis AS (
     node.rotation,
     concat(cat_feature.link_path, node.link) AS link,
     node.verified,
-    node.undelete,
     cat_node.label,
     node.label_x,
     node.label_y,
@@ -6295,7 +6290,6 @@ AS WITH streetaxis AS (
     connec.rotation,
     concat(cat_feature.link_path, connec.link) AS link,
     connec.verified,
-    connec.undelete,
     cat_connec.label,
     connec.label_x,
     connec.label_y,
@@ -7071,9 +7065,9 @@ AS SELECT s.dscenario_id,
     FROM selector_inp_dscenario s, inp_dscenario_frpump f
     JOIN v_edit_inp_frpump n USING (element_id)
     WHERE s.dscenario_id = f.dscenario_id AND s.cur_user = CURRENT_USER::text;
-    
 
-CREATE OR REPLACE VIEW v_edit_inp_frvalve 
+
+CREATE OR REPLACE VIEW v_edit_inp_frvalve
 as select f.element_id,
     f.node_id,
     f.order_id,
@@ -7084,14 +7078,14 @@ as select f.element_id,
     custom_dint,
     setting,
     curve_id,
-    minorloss, 
+    minorloss,
     add_settings,
     init_quality,
     f.the_geom
     FROM v_edit_flwreg f
     JOIN inp_frvalve v ON f.element_id::text = v.element_id::text;
 
- 
+
 CREATE OR REPLACE VIEW v_edit_inp_dscenario_frvalve
 AS SELECT s.dscenario_id,
     element_id,
@@ -7099,15 +7093,15 @@ AS SELECT s.dscenario_id,
     v.custom_dint,
     v.setting,
     v.curve_id,
-    v.minorloss, 
+    v.minorloss,
     v.add_settings,
     v.init_quality,
     n.the_geom
     FROM selector_inp_dscenario s, inp_dscenario_frvalve v
     JOIN v_edit_inp_frvalve n USING (element_id)
     WHERE s.dscenario_id = v.dscenario_id AND s.cur_user = CURRENT_USER::text;
-   
-   
+
+
 CREATE OR REPLACE VIEW ve_epa_frvalve AS
 SELECT v.element_id,
 	man_flowreg.node_id,
@@ -7116,7 +7110,7 @@ SELECT v.element_id,
 	valve_type,
 	custom_dint,
 	v.setting,
-	curve_id, 
+	curve_id,
 	minorloss
 	status,
 	add_settings,
@@ -7138,8 +7132,8 @@ SELECT v.element_id,
 	FROM inp_frvalve v
      LEFT JOIN man_flowreg USING (element_id)
      LEFT JOIN v_rpt_arc_stats r ON r.arc_id = concat (man_flowreg.node_id,'_FR', order_id);
-    
- 
+
+
 CREATE OR REPLACE VIEW ve_epa_frpump as
 SELECT p.element_id,
 	man_flowreg.node_id,

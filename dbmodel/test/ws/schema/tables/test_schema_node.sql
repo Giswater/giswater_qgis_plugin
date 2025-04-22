@@ -25,7 +25,7 @@ SELECT columns_are(
         'location_type', 'workcat_id', 'workcat_id_end', 'builtdate', 'enddate', 'ownercat_id',
         'muni_id', 'postcode', 'streetaxis_id', 'postnumber', 'postcomplement', 'streetaxis2_id',
         'postnumber2', 'postcomplement2', 'descript', 'link', 'verified', 'rotation',
-        'undelete', 'label_x', 'label_y', 'label_rotation', 'publish', 'inventory', 'hemisphere',
+        'label_x', 'label_y', 'label_rotation', 'publish', 'inventory', 'hemisphere',
         'expl_id', 'num_value', 'feature_type', 'minsector_id', 'dqa_id', 'staticpressure', 'district_id', 'adate',
         'adescript', 'accessibility', 'workcat_id_plan', 'asset_id', 'om_state', 'conserv_state',
         'access_type', 'placement_type', 'expl_id2', 'brand_id', 'model_id', 'serial_number',
@@ -76,7 +76,6 @@ SELECT has_trigger('node', 'gw_trg_typevalue_fk_update', 'Table should have gw_t
 
 -- Check rules
 SELECT has_rule('node', 'insert_plan_psector_x_node', 'Table should have insert_plan_psector_x_node rule');
-SELECT has_rule('node', 'undelete_node', 'Table should have undelete_node rule');
 
 -- Check constraints
 SELECT col_not_null('node', 'node_id', 'Column node_id should be NOT NULL');

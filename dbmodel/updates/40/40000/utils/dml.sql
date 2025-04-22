@@ -2303,3 +2303,5 @@ END', dv_querytext_filterc = NULL WHERE formname ILIKE 've_%' AND formtype='form
 INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam) VALUES('tbl_element_x_link', 'SELECT * FROM v_ui_element_x_link WHERE link_id IS NOT NULL', 4, 'tab', 'list', NULL, NULL);
 
 ALTER TABLE config_form_fields ENABLE TRIGGER gw_trg_config_control;
+
+DELETE FROM config_form_fields WHERE formname IN ('v_edit_arc', 'v_edit_connec', 'v_edit_gully', 'v_edit_node', 'v_edit_element') AND columnname='undelete';

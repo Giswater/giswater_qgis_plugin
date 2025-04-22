@@ -432,7 +432,7 @@ BEGIN
 			INSERT INTO arc (arc_id, code, sys_code, node_1, node_2, y1, y2, custom_y1, custom_y2, elev1, elev2, custom_elev1, custom_elev2, arc_type, arccat_id, epa_type, sector_id, "state", state_type,
 			annotation, observ, "comment", inverted_slope, custom_length, omzone_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, workcat_id_plan,
 			builtdate, enddate, ownercat_id, muni_id, streetaxis_id, postcode, district_id, streetaxis2_id, postnumber, postnumber2, postcomplement, postcomplement2, descript, link, verified,
-			the_geom,undelete,label_x,label_y, label_rotation, expl_id, publish, inventory, uncertain, num_value, updated_at, updated_by, asset_id, pavcat_id,
+			the_geom,label_x,label_y, label_rotation, expl_id, publish, inventory, uncertain, num_value, updated_at, updated_by, asset_id, pavcat_id,
 			drainzone_id, parent_id, expl_id2, adate, adescript, visitability, label_quadrant, brand_id, model_id, serial_number, streetname, streetname2, initoverflowpath, lock_level, is_scadamap, registration_date,
 			hydraulic_capacity, meandering, conserv_state, om_state, last_visitdate, negativeoffset)
 			VALUES (NEW.arc_id, NEW.code, NEW.sys_code, NEW.node_1, NEW.node_2, NEW.y1, NEW.y2, NEW.custom_y1, NEW.custom_y2, NEW.elev1, NEW.elev2,
@@ -440,7 +440,7 @@ BEGIN
 			NEW.inverted_slope, NEW.custom_length, NEW.omzone_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type,
 			NEW.location_type, NEW.workcat_id,NEW.workcat_id_end, NEW.workcat_id_plan, NEW.builtdate, NEW.enddate, NEW.ownercat_id,
 			NEW.muni_id, v_streetaxis,  NEW.postcode, NEW.district_id, v_streetaxis2, NEW.postnumber, NEW.postnumber2, NEW.postcomplement, NEW.postcomplement2,
-			NEW.descript, NEW.link, NEW.verified, NEW.the_geom,NEW.undelete,NEW.label_x,
+			NEW.descript, NEW.link, NEW.verified, NEW.the_geom,NEW.label_x,
 			NEW.label_y, NEW.label_rotation, NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.num_value, NEW.updated_at, NEW.updated_by, NEW.asset_id, NEW.pavcat_id,
 			NEW.drainzone_id, NEW.parent_id, NEW.expl_id2, NEW.adate, NEW.adescript, NEW.visitability, NEW.label_quadrant, NEW.brand_id, NEW.model_id, NEW.serial_number, NEW.streetname, NEW.streetname2, NEW.initoverflowpath, NEW.lock_level, NEW.is_scadamap,
 			NEW.registration_date, NEW.hydraulic_capacity, NEW.meandering, NEW.conserv_state, NEW.om_state, NEW.last_visitdate, NEW.negativeoffset);
@@ -448,7 +448,7 @@ BEGIN
 			INSERT INTO arc (arc_id, code, sys_code, y1, y2, custom_y1, custom_y2, elev1, elev2, custom_elev1, custom_elev2, arc_type, arccat_id, epa_type, sector_id, "state", state_type,
 			annotation, observ, "comment", inverted_slope, custom_length, omzone_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, workcat_id_plan,
 			builtdate, enddate, ownercat_id, muni_id, streetaxis_id, postcode, district_id, streetaxis2_id, postnumber, postnumber2, postcomplement, postcomplement2, descript, link, verified,
-			the_geom,undelete,label_x,label_y, label_rotation, expl_id, publish, inventory,	uncertain, num_value, matcat_id, updated_at, updated_by, asset_id, pavcat_id,
+			the_geom,label_x,label_y, label_rotation, expl_id, publish, inventory,	uncertain, num_value, matcat_id, updated_at, updated_by, asset_id, pavcat_id,
 			drainzone_id, parent_id, expl_id2, adate, adescript, visitability, label_quadrant, brand_id, model_id, serial_number, streetname, streetname2, initoverflowpath, lock_level, is_scadamap, registration_date,
 			hydraulic_capacity, meandering, conserv_state, om_state, last_visitdate, negativeoffset)
 			VALUES (NEW.arc_id, NEW.code, NEW.sys_code, NEW.y1, NEW.y2, NEW.custom_y1, NEW.custom_y2, NEW.elev1, NEW.elev2,
@@ -456,7 +456,7 @@ BEGIN
 			NEW.inverted_slope, NEW.custom_length, NEW.omzone_id, NEW.soilcat_id, NEW.function_type, NEW.category_type, NEW.fluid_type,
 			NEW.location_type, NEW.workcat_id,NEW.workcat_id_end, NEW.workcat_id_plan, NEW.builtdate, NEW.enddate, NEW.ownercat_id,
 			NEW.muni_id, v_streetaxis,  NEW.postcode, NEW.district_id, v_streetaxis2, NEW.postnumber, NEW.postnumber2, NEW.postcomplement, NEW.postcomplement2,
-			NEW.descript, NEW.link, NEW.verified, NEW.the_geom,NEW.undelete,NEW.label_x,
+			NEW.descript, NEW.link, NEW.verified, NEW.the_geom,NEW.label_x,
 			NEW.label_y, NEW.label_rotation, NEW.expl_id, NEW.publish, NEW.inventory, NEW.uncertain, NEW.num_value, NEW.matcat_id, NEW.updated_at, NEW.updated_by,
 			NEW.asset_id, NEW.pavcat_id, NEW.drainzone_id, NEW.parent_id, NEW.expl_id2, NEW.adate, NEW.adescript, NEW.visitability, NEW.label_quadrant, NEW.brand_id, NEW.model_id, NEW.serial_number, NEW.streetname, NEW.streetname2, NEW.initoverflowpath, NEW.lock_level, NEW.is_scadamap,
 			NEW.registration_date, NEW.hydraulic_capacity, NEW.meandering, NEW.conserv_state, NEW.om_state, NEW.last_visitdate, NEW.negativeoffset);
@@ -713,7 +713,7 @@ BEGIN
 			workcat_id=NEW.workcat_id, builtdate=NEW.builtdate,ownercat_id=NEW.ownercat_id, muni_id=NEW.muni_id, streetaxis_id=v_streetaxis,
 			postcode=NEW.postcode, district_id = NEW.district_id, streetaxis2_id=v_streetaxis2, postcomplement=NEW.postcomplement,
 			postcomplement2=NEW.postcomplement2, postnumber=NEW.postnumber, postnumber2=NEW.postnumber2,  descript=NEW.descript, link=NEW.link,
-			verified=NEW.verified, undelete=NEW.undelete,label_x=NEW.label_x,
+			verified=NEW.verified,label_x=NEW.label_x,
 			label_y=NEW.label_y, label_rotation=NEW.label_rotation,workcat_id_end=NEW.workcat_id_end, workcat_id_plan=NEW.workcat_id_plan, code=NEW.code, publish=NEW.publish, inventory=NEW.inventory,
 			enddate=NEW.enddate, uncertain=NEW.uncertain, expl_id=NEW.expl_id, num_value = NEW.num_value,updated_at=now(), updated_by=current_user,
 			asset_id=NEW.asset_id, pavcat_id=NEW.pavcat_id, drainzone_id=NEW.drainzone_id, parent_id=NEW.parent_id, expl_id2=NEW.expl_id2, adate=NEW.adate, adescript=NEW.adescript,
@@ -728,7 +728,7 @@ BEGIN
 			soilcat_id=NEW.soilcat_id, function_type=NEW.function_type, category_type=NEW.category_type, fluid_type=NEW.fluid_type,location_type=NEW.location_type,
 			workcat_id=NEW.workcat_id, builtdate=NEW.builtdate,ownercat_id=NEW.ownercat_id, muni_id=NEW.muni_id, streetaxis_id=v_streetaxis,
 			postcode=NEW.postcode, district_id=NEW.district_id, streetaxis2_id=v_streetaxis2, postcomplement=NEW.postcomplement, postcomplement2=NEW.postcomplement2, postnumber=NEW.postnumber,
-			postnumber2=NEW.postnumber2,  descript=NEW.descript, link=NEW.link, verified=NEW.verified, undelete=NEW.undelete,label_x=NEW.label_x,
+			postnumber2=NEW.postnumber2,  descript=NEW.descript, link=NEW.link, verified=NEW.verified,label_x=NEW.label_x,
 			label_y=NEW.label_y, label_rotation=NEW.label_rotation,workcat_id_end=NEW.workcat_id_end, workcat_id_plan=NEW.workcat_id_plan, code=NEW.code, publish=NEW.publish, inventory=NEW.inventory,
 			enddate=NEW.enddate, uncertain=NEW.uncertain, expl_id=NEW.expl_id, num_value = NEW.num_value,updated_at=now(), updated_by=current_user, matcat_id=NEW.matcat_id,
 			asset_id=NEW.asset_id, pavcat_id=NEW.pavcat_id, drainzone_id=NEW.drainzone_id, parent_id=NEW.parent_id, expl_id2=NEW.expl_id2, adate=NEW.adate, adescript=NEW.adescript,

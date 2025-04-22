@@ -24,7 +24,7 @@ SELECT columns_are(
         'custom_length', 'dma_id', 'presszone_id', 'soilcat_id', 'function_type', 'category_type', 'fluid_type',
         'location_type', 'workcat_id', 'workcat_id_end', 'builtdate', 'enddate', 'ownercat_id', 'muni_id', 'postcode',
         'streetaxis_id', 'postnumber', 'postcomplement', 'streetaxis2_id', 'postnumber2', 'postcomplement2', 'descript',
-        'link', 'verified', 'the_geom', 'undelete', 'label_x', 'label_y', 'label_rotation', 'publish', 'inventory', 'expl_id',
+        'link', 'verified', 'the_geom', 'label_x', 'label_y', 'label_rotation', 'publish', 'inventory', 'expl_id',
         'num_value', 'feature_type', 'tstamp', 'lastupdate', 'lastupdate_user', 'insert_user', 'minsector_id', 'dqa_id',
         'district_id', 'adate', 'adescript', 'workcat_id_plan', 'asset_id', 'pavcat_id',
         'nodetype_1', 'elevation1', 'depth1', 'staticpress1', 'nodetype_2', 'elevation2', 'depth2', 'staticpress2',

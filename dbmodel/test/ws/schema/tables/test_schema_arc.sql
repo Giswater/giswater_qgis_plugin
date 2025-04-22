@@ -23,7 +23,7 @@ SELECT columns_are(
         'observ', 'comment', 'custom_length', 'dma_id', 'presszone_id', 'soilcat_id', 'function_type', 'category_type',
         'fluid_type', 'location_type', 'workcat_id', 'workcat_id_end', 'builtdate', 'enddate', 'ownercat_id', 'muni_id',
         'postcode', 'streetaxis_id', 'postnumber', 'postcomplement', 'streetaxis2_id', 'postnumber2', 'postcomplement2',
-        'descript', 'link', 'verified', 'undelete', 'label_x', 'label_y', 'label_rotation', 'publish',
+        'descript', 'link', 'verified', 'label_x', 'label_y', 'label_rotation', 'publish',
         'inventory', 'expl_id', 'num_value', 'feature_type',
         'minsector_id', 'dqa_id', 'district_id', 'adate', 'adescript', 'workcat_id_plan', 'asset_id', 'pavcat_id',
         'nodetype_1', 'elevation1', 'depth1', 'staticpress1', 'nodetype_2', 'elevation2', 'depth2', 'staticpress2',
@@ -94,7 +94,6 @@ SELECT col_type_is('arc', 'postcomplement2', 'varchar(100)', 'Column postcomplem
 SELECT col_type_is('arc', 'descript', 'varchar(254)', 'Column descript should be varchar(254)');
 SELECT col_type_is('arc', 'link', 'varchar(512)', 'Column link should be varchar(512)');
 SELECT col_type_is('arc', 'verified', 'integer', 'Column verified should be integer');
-SELECT col_type_is('arc', 'undelete', 'boolean', 'Column undelete should be boolean');
 SELECT col_type_is('arc', 'label_x', 'varchar(30)', 'Column label_x should be varchar(30)');
 SELECT col_type_is('arc', 'label_y', 'varchar(30)', 'Column label_y should be varchar(30)');
 SELECT col_type_is('arc', 'label_rotation', 'numeric(6,3)', 'Column label_rotation should be numeric(6,3)');
@@ -182,7 +181,6 @@ SELECT has_trigger('arc', 'gw_trg_typevalue_fk_update', 'Table should have trigg
 
 -- Check rules
 SELECT has_rule('arc', 'insert_plan_psector_x_arc', 'Table should have rule insert_plan_psector_x_arc');
-SELECT has_rule('arc', 'undelete_arc', 'Table should have rule undelete_arc');
 
 -- Check sequences
 

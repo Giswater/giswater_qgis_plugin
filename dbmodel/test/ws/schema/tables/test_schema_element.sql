@@ -22,7 +22,7 @@ SELECT columns_are(
         'element_id', 'code', 'sys_code', 'elementcat_id', 'serial_number', 'num_elements', 'state', 'state_type',
         'observ', 'comment', 'function_type', 'category_type', 'fluid_type', 'location_type', 'workcat_id',
         'workcat_id_end', 'builtdate', 'enddate', 'ownercat_id', 'rotation', 'link', 'verified',
-        'label_x', 'label_y', 'label_rotation', 'undelete', 'publish', 'inventory', 'expl_id', 'feature_type',
+        'label_x', 'label_y', 'label_rotation', 'publish', 'inventory', 'expl_id', 'feature_type',
         'pol_id', 'top_elev', 'expl_id2', 'trace_featuregeom', 'geometry_type', 'epa_type',
         'muni_id', 'sector_id', 'brand_id', 'model_id', 'asset_id', 'datasource', 'lock_level',
         'the_geom', 'created_at', 'created_by', 'updated_at', 'updated_by'
@@ -59,7 +59,6 @@ SELECT col_type_is('element', 'verified', 'integer', 'Column verified should be 
 SELECT col_type_is('element', 'label_x', 'varchar(30)', 'Column label_x should be varchar(30)');
 SELECT col_type_is('element', 'label_y', 'varchar(30)', 'Column label_y should be varchar(30)');
 SELECT col_type_is('element', 'label_rotation', 'numeric(6,3)', 'Column label_rotation should be numeric(6,3)');
-SELECT col_type_is('element', 'undelete', 'boolean', 'Column undelete should be boolean');
 SELECT col_type_is('element', 'publish', 'boolean', 'Column publish should be boolean');
 SELECT col_type_is('element', 'inventory', 'boolean', 'Column inventory should be boolean');
 SELECT col_type_is('element', 'expl_id', 'integer', 'Column expl_id should be integer');

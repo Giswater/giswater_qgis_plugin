@@ -24,7 +24,7 @@ SELECT columns_are(
         'function_type', 'category_type', 'fluid_type', 'location_type', 'workcat_id', 'workcat_id_end', 'builtdate',
         'enddate', 'ownercat_id', 'muni_id', 'postcode', 'streetaxis_id', 'postnumber', 'postcomplement',
         'streetaxis2_id', 'postnumber2', 'postcomplement2', 'descript', 'link', 'verified', 'rotation',
-        'undelete', 'label_x', 'label_y', 'label_rotation', 'publish', 'inventory', 'expl_id', 'num_value',
+        'label_x', 'label_y', 'label_rotation', 'publish', 'inventory', 'expl_id', 'num_value',
         'feature_type', 'pjoint_type', 'pjoint_id',
         'minsector_id', 'dqa_id', 'staticpressure', 'district_id', 'adate', 'adescript', 'accessibility',
         'workcat_id_plan', 'asset_id', 'epa_type', 'om_state', 'conserv_state', 'priority',
@@ -79,7 +79,6 @@ SELECT col_type_is('connec', 'descript', 'text', 'Column descript should be text
 SELECT col_type_is('connec', 'link', 'varchar(512)', 'Column link should be varchar(512)');
 SELECT col_type_is('connec', 'verified', 'int4', 'Column verified should be int4');
 SELECT col_type_is('connec', 'rotation', 'numeric(6,3)', 'Column rotation should be numeric(6,3)');
-SELECT col_type_is('connec', 'undelete', 'bool', 'Column undelete should be bool');
 SELECT col_type_is('connec', 'label_x', 'varchar(30)', 'Column label_x should be varchar(30)');
 SELECT col_type_is('connec', 'label_y', 'varchar(30)', 'Column label_y should be varchar(30)');
 SELECT col_type_is('connec', 'label_rotation', 'numeric(6,3)', 'Column label_rotation should be numeric(6,3)');
@@ -151,7 +150,6 @@ SELECT has_trigger('connec', 'gw_trg_typevalue_fk_update', 'Table should have gw
 SELECT has_trigger('connec', 'gw_trg_unique_field', 'Table should have gw_trg_unique_field trigger');
 
 -- Check rules
-SELECT has_rule('connec', 'undelete_connec', 'Table should have undelete_connec rule');
 
 -- Check sequences
 SELECT has_sequence('urn_id_seq', 'Sequence urn_id_seq should exist');
