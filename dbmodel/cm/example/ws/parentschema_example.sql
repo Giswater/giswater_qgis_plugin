@@ -6,7 +6,7 @@ or (at your option) any later version.
 */
 
 
-SET search_path = SCHEMA_NAME, public, pg_catalog
+SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 
 INSERT INTO om_reviewclass (id, idval, pschema_id, descript, active) VALUES(1, 'DEPOSITOS', 'PARENT_SCHEMA', 'TEST INSERT', true);
