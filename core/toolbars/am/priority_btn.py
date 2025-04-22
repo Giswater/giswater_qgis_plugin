@@ -21,7 +21,6 @@ from qgis.PyQt.QtWidgets import (
     QAbstractItemView,
     QAction,
     QActionGroup,
-    QFileDialog,
     QHeaderView,
     QTableView,
     QTableWidget,
@@ -386,7 +385,7 @@ class CalculatePriority:
         self._manage_hidden_form()
 
         # Manage selection group
-        self._manage_selection()
+        self.dlg_priority.btn_snapping.clicked.connect(partial(self._snap_clicked))
 
         # Manage attributes group
         self._manage_attr()
@@ -826,12 +825,8 @@ class CalculatePriority:
 
     # region Selection
 
-    def _manage_selection(self):
-        """Slot function for signal 'canvas.selectionChanged'"""
-
-        self._manage_btn_snapping()
-
-    def _manage_btn_snapping(self):
+    def _snap_clicked(self):
+        """Set canvas map tool to an instance of class 'GwSelectManager'"""
         self.feature_type = "arc"
         layer = tools_qgis.get_layer_by_tablename(self.layer_to_work)
         self.layers["arc"].append(layer)
@@ -849,9 +844,6 @@ class CalculatePriority:
                     self.list_ids["arc"].append(feature["arc_id"])
             layer.select(select_fid)
 
-        self.dlg_priority.btn_snapping.clicked.connect(partial(self._snap_clicked, layer))
-
-    def _snap_clicked(self, layer):
         if layer is None:
             # show warning
             tools_gw.show_warning("For select on canvas is mandatory to load v_asset_arc_input layer", dialog=self.dlg_priority)
@@ -928,13 +920,12 @@ class CalculatePriority:
         if not hasattr(self.thread, "df"):
             return
 
-        file_path, _ = QFileDialog.getSaveFileName(None, tools_qt.tr("Save file"), "", "*.xlsx")
+        file_path = tools_qt.get_save_file_path(self.dlg_priority, '', "*.xlsx", "Save file")
         fp = Path(file_path)
-
         self.thread.df.to_excel(file_path)
 
-        message = tools_qt.tr("{filename} successfully saved.")
-        tools_qt.show_info_box(message.format(filename=fp.name))
+        message = tools_qt.tr(f"{fp.name} successfully saved.")
+        tools_qt.show_info_box(message)
 
     def _set_signals(self):
         dlg = self.dlg_priority
