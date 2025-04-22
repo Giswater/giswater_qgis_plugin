@@ -43,7 +43,7 @@ class GwDocument(QObject):
         self.schema_name = lib_vars.schema_name
         self.files_path = []
         self.project_type = tools_gw.get_project_type()
-        self.doc_tables = ["doc_x_node", "doc_x_arc", "doc_x_connec", "doc_x_link", "doc_x_gully", "doc_x_workcat", "doc_x_psector", "doc_x_visit"]
+        self.doc_tables = ["doc_x_node", "doc_x_arc", "doc_x_connec", "doc_x_link", "doc_x_gully", "doc_x_workcat", "doc_x_psector", "doc_x_visit", "doc_x_element"]
         self.point_xy = {"x": None, "y": None}
         self.is_new = False
 
@@ -75,11 +75,11 @@ class GwDocument(QObject):
         self.layers['node'] = tools_gw.get_layers_from_feature_type('node')
         self.layers['connec'] = tools_gw.get_layers_from_feature_type('connec')
         self.layers['link'] = tools_gw.get_layers_from_feature_type('link')
+        self.layers['element'] = tools_gw.get_layers_from_feature_type('element')
         if self.project_type == 'ud':
             self.layers['gully'] = tools_gw.get_layers_from_feature_type('gully')
-        self.layers['element'] = tools_gw.get_layers_from_feature_type('element')
 
-        params = ['arc', 'node', 'connec', 'gully', 'link']
+        params = ['arc', 'node', 'connec', 'gully', 'link', 'element']
         if list_tabs:
             for i in params:
                 if i not in list_tabs:
