@@ -772,7 +772,7 @@ class GwAdminButton:
         self.folder_asset_updates = os.path.join(self.sql_asset_dir, 'updates')
 
         # Declare audit db folders
-        self.sql_audit_dir = os.path.join(self.sql_dir, 'corporate', 'audit')
+        self.sql_audit_dir = os.path.join(self.sql_dir, 'audit')
         self.folder_audit_structure = os.path.join(self.sql_audit_dir, 'structure')
         self.folder_audit_activate = os.path.join(self.sql_audit_dir, 'activate')
 
