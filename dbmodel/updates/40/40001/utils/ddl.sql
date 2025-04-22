@@ -134,9 +134,14 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"archived_p
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"archived_psector_node_traceability", "column":"undelete"}}$$);
 
 
-
-
-
+-- 22/04/2025
+CREATE TABLE doc_x_element (
+	doc_id varchar(30) NOT NULL,
+	element_id varchar(16) NOT NULL,
+	CONSTRAINT doc_x_element_pkey PRIMARY KEY (doc_id, element_id),
+	CONSTRAINT doc_x_element_fkey_doc_id FOREIGN KEY (doc_id) REFERENCES doc(id) ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT doc_x_element_fkey_element_id FOREIGN KEY (element_id) REFERENCES element(element_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
 
 
 

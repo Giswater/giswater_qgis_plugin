@@ -735,3 +735,16 @@ AS WITH p AS (
     s,
     p
   WHERE p.psector_id = s.psector_id AND s.cur_user = "current_user"()::text AND p.state = 1 AND cf.value IS TRUE;
+
+
+CREATE OR REPLACE VIEW v_ui_doc_x_element
+AS SELECT doc_x_element.doc_id,
+  doc_x_element.element_id,
+  doc.name as doc_name,
+  doc.doc_type,
+  doc.path,
+  doc.observ,
+  doc.date,
+  doc.user_name
+FROM doc_x_element
+  JOIN doc ON doc.id::text = doc_x_element.doc_id::text;

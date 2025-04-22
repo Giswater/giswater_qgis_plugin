@@ -41,7 +41,7 @@ UPDATE config_info_layer SET is_parent=true WHERE layer_id='v_edit_node';
 UPDATE config_info_layer SET is_parent=true WHERE layer_id='v_edit_connec';
 UPDATE config_info_layer SET is_parent=true WHERE layer_id='v_edit_arc';
 
-INSERT INTO config_info_layer (layer_id, is_parent, is_editable, formtemplate, headertext, orderby) 
+INSERT INTO config_info_layer (layer_id, is_parent, is_editable, formtemplate, headertext, orderby)
 VALUES('v_edit_flwreg', true, true, 'info_generic', 'Flow regulator', 4);
 
 
@@ -51,12 +51,12 @@ update config_typevalue set addparam ='{"orderBy":51}' where id ='{"level_1":"IN
 
 -- sys table
 delete from sys_table WHERE id = 'v_edit_flwreg';
-insert into sys_table values ('v_edit_flwreg', 'Specific view for flowregulator elements', 'role_basic', null, 
-'{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"ELEMENT"}', 2, 'Flowregulators', null, null, null, 'core'); 
+insert into sys_table values ('v_edit_flwreg', 'Specific view for flowregulator elements', 'role_basic', null,
+'{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"ELEMENT"}', 2, 'Flowregulators', null, null, null, 'core');
 
 update sys_table set context ='{"level_1":"INVENTORY","level_2":"OTHER"}' , orderby = 1 where id = 'v_edit_dimensions';
 
-insert into sys_table values ('v_edit_cat_feature_element', 'Catalog for elements', 'role_edit', null, 
+insert into sys_table values ('v_edit_cat_feature_element', 'Catalog for elements', 'role_edit', null,
 '{"level_1":"INVENTORY","level_2":"CATALOGS"}', 7, 'Element feature catalog', null, null, null, 'core');
 
 UPDATE config_info_layer SET is_parent = true, formtemplate = 'info_feature' WHERE layer_id = 'v_edit_flwreg';
@@ -418,3 +418,8 @@ DELETE FROM config_param_system WHERE "parameter"='admin_customform_param';
 UPDATE sys_param_user
 SET dv_querytext = 'SELECT id, idval FROM edit_typevalue WHERE typevalue = ''doc_type'' AND id IS NOT NULL'
 WHERE id = 'edit_doctype_vdefault';
+
+-- 22/04/2025
+
+INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam)
+VALUES('tbl_doc_x_element', 'SELECT * FROM v_ui_doc_x_element WHERE element_id IS NOT NULL', 4, 'tab', 'list', NULL, NULL);

@@ -21,7 +21,7 @@ DROP TRIGGER IF EXISTS gw_trg_vi_quality ON vi_quality;
 CREATE TRIGGER gw_trg_edit_cat_feature INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_cat_feature_link
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_cat_feature('link');
 
-CREATE TRIGGER gw_trg_edit_cat_feature INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_cat_feature_element 
+CREATE TRIGGER gw_trg_edit_cat_feature INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_cat_feature_element
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_cat_feature('element');
 
 -- CREATE TRIGGER gw_trg_cat_material_fk_insert AFTER INSERT ON link
@@ -33,3 +33,6 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_cat_feature('element');
 drop trigger if exists gw_trg_edit_element on man_flowreg;
 drop trigger if exists gw_trg_edit_element on man_genelement;
 drop trigger if exists gw_trg_edit_element on element;
+
+CREATE TRIGGER gw_trg_ui_doc_x_element INSTEAD OF INSERT OR DELETE OR UPDATE ON v_ui_doc_x_element
+FOR EACH ROW EXECUTE FUNCTION gw_trg_ui_doc('element');
