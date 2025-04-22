@@ -1,0 +1,121 @@
+name: CI Test UD database
+
+on:
+  push:
+    branches: [dev-3.6, dev-4.0]
+  pull_request:
+    branches: [dev-3.6, dev-4.0]
+
+jobs:
+  ci_test_ud_db:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        pg_version: [16, 17]
+
+    env:
+      # PGPASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+      PGPASSWORD: postgres
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Show which PG version we're testing
+        run: echo "Testing on PostgreSQL version ${{ matrix.pg_version }}"
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.x"
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r test/requirements.txt
+
+      - name: Add PostgreSQL repository
+        run: |
+          sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+          wget -qO - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+
+      - name: Update apt-get & install PostgreSQL
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            postgresql-${{ matrix.pg_version }} \
+            postgresql-${{ matrix.pg_version }}-postgis-3 \
+            postgresql-${{ matrix.pg_version }}-pgrouting \
+            postgresql-${{ matrix.pg_version }}-pgtap \
+            postgis
+
+      - name: Remove default Postgres clusters
+        run: |
+          for cluster in $(pg_lsclusters --no-header | awk '{print $1 ":" $2}'); do
+            ver=$(echo $cluster | cut -d':' -f1)
+            name=$(echo $cluster | cut -d':' -f2)
+            sudo pg_dropcluster --stop $ver $name || true
+          done
+
+      - name: Create & start PG cluster
+        run: |
+          # Choose a port based on matrix.pg_version
+          if [ "${{ matrix.pg_version }}" = "16" ]; then
+            PORT=55432
+          else
+            PORT=55433
+          fi
+
+          sudo pg_createcluster ${{ matrix.pg_version }} main --port=$PORT
+          sudo pg_ctlcluster ${{ matrix.pg_version }} main start
+
+          # Make the port visible to subsequent steps
+          echo "PORT=$PORT" >> $GITHUB_ENV
+
+      - name: Show running clusters
+        run: sudo pg_lsclusters
+
+      # Use the secret password here
+      - name: Set postgres password
+        run: |
+          sudo -u postgres psql -c "ALTER USER postgres PASSWORD 'postgres';"
+
+      - name: Create PostgreSQL Database
+        run: |
+          psql -h localhost -p ${{ env.PORT }} -U postgres -c "CREATE DATABASE gw_db;"
+
+      - name: Setup PostgreSQL extensions
+        run: |
+          psql -h localhost -p ${{ env.PORT }} -U postgres -d gw_db -c 'CREATE EXTENSION postgis;'
+          psql -h localhost -p ${{ env.PORT }} -U postgres -d gw_db -c 'CREATE EXTENSION pgrouting;'
+          psql -h localhost -p ${{ env.PORT }} -U postgres -d gw_db -c 'CREATE EXTENSION postgis_raster;'
+          psql -h localhost -p ${{ env.PORT }} -U postgres -d gw_db -c 'CREATE EXTENSION postgis_topology;'
+          psql -h localhost -p ${{ env.PORT }} -U postgres -d gw_db -c 'CREATE EXTENSION pgtap;'
+
+      - name: Replace variables in SQL files
+        run: python test/replace_vars.py ud
+
+      - name: Create Sample Schema
+        run: python test/execute_sql_files.py ud
+
+      - name: Run all SQL tests in sequence
+        run: |
+          EXIT_CODE=0
+
+          echo "Running SCHEMA tests..."
+          pg_prove -h localhost -p ${{ env.PORT }} -U postgres -d gw_db test/ud/schema/*.sql || EXIT_CODE=1
+
+          echo "Running SECURITY tests..."
+          pg_prove -h localhost -p ${{ env.PORT }} -U postgres -d gw_db test/ud/security/*.sql || EXIT_CODE=1
+
+          echo "Running FUNCTION tests..."
+          pg_prove -h localhost -p ${{ env.PORT }} -U postgres -d gw_db test/ud/function/*.sql || EXIT_CODE=1
+
+          echo "Running DATA tests..."
+          pg_prove -h localhost -p ${{ env.PORT }} -U postgres -d gw_db test/ud/data/*.sql || EXIT_CODE=1
+
+          echo "Running PERFORMANCE tests..."
+          pg_prove -h localhost -p ${{ env.PORT }} -U postgres -d gw_db test/ud/performance/*.sql || EXIT_CODE=1
+
+          exit $EXIT_CODE
