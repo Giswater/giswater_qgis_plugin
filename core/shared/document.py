@@ -14,7 +14,7 @@ from pyproj import CRS, Transformer
 from sip import isdeleted
 
 from qgis.PyQt.QtGui import QStandardItemModel, QStandardItem, QCursor
-from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QFileDialog, QCompleter, QWidget, QAction, QMenu, QPushButton
+from qgis.PyQt.QtWidgets import QAbstractItemView, QTableView, QCompleter, QWidget, QAction, QMenu, QPushButton
 from qgis.PyQt.QtCore import pyqtSignal, QObject, Qt
 
 from ..utils import tools_gw
@@ -766,19 +766,7 @@ class GwDocument(QObject):
 
     def _get_file_dialog(self, dialog, widget):
         """ Get file dialog """
-
-        # Check if selected file exists. Set default value if necessary
-        file_path = tools_qt.get_text(dialog, widget)
-        if file_path is None or file_path == 'null' or not os.path.exists(str(file_path)):
-            folder_path = lib_vars.plugin_dir
-        else:
-            folder_path = os.path.dirname(file_path)
-        # Open dialog to select file
-        os.chdir(folder_path)
-        file_dialog = QFileDialog()
-        file_dialog.setFileMode(QFileDialog.AnyFile)
-        message = "Select file"
-        files_path, filter_ = file_dialog.getOpenFileNames(parent=None, caption=tools_qt.tr(message))
+        files_path = tools_qt.get_open_files_path(dialog, widget, "Select files")
 
         file_text = ""
         if len(files_path) == 1:

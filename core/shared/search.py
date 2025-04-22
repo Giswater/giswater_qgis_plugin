@@ -10,7 +10,7 @@ import re
 from functools import partial
 
 from qgis.PyQt.QtCore import QStringListModel, Qt, QTimer
-from qgis.PyQt.QtWidgets import QAbstractItemView, QComboBox, QCompleter, QFileDialog, QGridLayout, QHeaderView, \
+from qgis.PyQt.QtWidgets import QAbstractItemView, QComboBox, QCompleter, QGridLayout, QHeaderView, \
     QLabel, QLineEdit, QSizePolicy, QSpacerItem, QTableView, QTabWidget, QWidget, QDockWidget, QCheckBox
 from qgis.core import QgsPointXY
 
@@ -180,7 +180,7 @@ class GwSearch:
             tools_qgis.show_warning(msg, dialog=dialog)
 
     def refresh_tab(self, tab_name=None):
-        
+
         if tab_name:
             form = f'"singleTab":"{tab_name}"'
         else:

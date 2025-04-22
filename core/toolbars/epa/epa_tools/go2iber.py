@@ -17,7 +17,6 @@ from qgis.core import QgsApplication
 from qgis.PyQt.QtCore import Qt, QTimer
 from qgis.PyQt.QtWidgets import (
     QComboBox,
-    QFileDialog,
     QLabel,
     QTableWidget,
     QTableWidgetItem,

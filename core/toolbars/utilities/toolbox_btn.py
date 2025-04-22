@@ -16,7 +16,7 @@ from datetime import timedelta
 from qgis.PyQt.QtCore import Qt, QTimer
 from qgis.PyQt.QtGui import QColor, QIcon, QStandardItemModel, QStandardItem
 from qgis.PyQt.QtWidgets import QSpinBox, QWidget, QLineEdit, QComboBox, QCheckBox, QRadioButton, QAbstractItemView, \
-    QTreeWidget, QCompleter, QGridLayout, QHBoxLayout, QLabel, QTableWidgetItem, QFileDialog
+    QTreeWidget, QCompleter, QGridLayout, QHBoxLayout, QLabel, QTableWidgetItem
 from qgis.core import QgsApplication, QgsProject
 from qgis.gui import QgsDateTimeEdit
 
@@ -791,18 +791,8 @@ class GwToolBoxButton(GwAction):
     def _select_file_report(self):
         """ Select CSV file """
 
-        file_report = tools_qt.get_text(self.dlg_reports, 'txt_export_path')
-        # Set default value if necessary
-        if file_report is None or file_report == '':
-            file_report = lib_vars.plugin_dir
-        # Get directory of that file
-        folder_path = os.path.dirname(file_report)
-        if not os.path.exists(folder_path):
-            folder_path = os.path.dirname(__file__)
-        os.chdir(folder_path)
-        message = tools_qt.tr("Save report file")
-        file_report, filter_ = QFileDialog.getSaveFileName(None, message, "", '*.csv')
-        tools_qt.set_widget_text(self.dlg_reports, self.dlg_reports.txt_export_path, file_report)
+        tools_qt.get_save_file_path(self.dlg_reports, 'txt_export_path', '*.csv', "Save report file")
+
 
     def _export_reports(self, dialog, table, path):
 

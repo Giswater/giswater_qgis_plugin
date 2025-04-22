@@ -11,8 +11,6 @@ import os
 from functools import partial
 
 from qgis.PyQt.QtGui import QStandardItem, QStandardItemModel
-from qgis.PyQt.QtWidgets import QFileDialog
-
 from ..dialog import GwAction
 from ...ui.ui_manager import GwCsvUi
 from ...utils import tools_gw
@@ -188,19 +186,7 @@ class GwCSVButton(GwAction):
     def _select_file_csv(self):
         """ Select CSV file """
 
-        file_csv = tools_qt.get_text(self.dlg_csv, 'txt_file_csv')
-        # Set default value if necessary
-        if file_csv is None or file_csv == '':
-            file_csv = lib_vars.plugin_dir
-        # Get directory of that file
-        folder_path = os.path.dirname(file_csv)
-        if not os.path.exists(folder_path):
-            folder_path = os.path.dirname(__file__)
-        os.chdir(folder_path)
-        message = tools_qt.tr("Select CSV file")
-        file_csv, filter_ = QFileDialog.getOpenFileName(None, message, "", '*.csv')
-        tools_qt.set_widget_text(self.dlg_csv, self.dlg_csv.txt_file_csv, file_csv)
-
+        tools_qt.get_open_file_path(self.dlg_csv, 'txt_file_csv', '*.csv', "Select CSV file")
         self.save_settings_values()
         self._preview_csv(self.dlg_csv)
 

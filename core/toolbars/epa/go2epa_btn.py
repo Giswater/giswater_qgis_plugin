@@ -15,7 +15,7 @@ from time import time
 from datetime import timedelta
 
 from qgis.PyQt.QtCore import QStringListModel, Qt, QTimer, QRegularExpression
-from qgis.PyQt.QtWidgets import QWidget, QComboBox, QCompleter, QFileDialog, QTableView, QAbstractItemView, \
+from qgis.PyQt.QtWidgets import QWidget, QComboBox, QCompleter, QTableView, QAbstractItemView, \
     QGroupBox, QSpacerItem, QSizePolicy, QGridLayout, QLabel, QTabWidget
 from qgis.core import QgsApplication
 
@@ -324,7 +324,7 @@ class GwGo2EpaButton(GwAction):
     def _go2epa_select_file_inp(self):
         """ Select INP file """
 
-        message = tools_qt.tr("Select INP file")
+        message = "Select INP file"
         if tools_qt.is_checked(self.dlg_go2epa, self.dlg_go2epa.chk_export):
             tools_qt.get_save_file_path(self.dlg_go2epa, self.dlg_go2epa.txt_file_inp, '*.inp', message)
         else:
@@ -333,7 +333,7 @@ class GwGo2EpaButton(GwAction):
     def _go2epa_select_file_rpt(self):
         """ Select RPT file """
 
-        message = tools_qt.tr("Select RPT file")
+        message = "Select RPT file"
         if tools_qt.is_checked(self.dlg_go2epa, self.dlg_go2epa.chk_export):
             tools_qt.get_save_file_path(self.dlg_go2epa, self.dlg_go2epa.txt_file_rpt, '*.rpt', message)
         else:

@@ -13,7 +13,7 @@ from sip import isdeleted
 from qgis.PyQt.QtCore import Qt, QDate, QStringListModel, pyqtSignal, QDateTime, QObject
 from qgis.PyQt.QtGui import QStandardItemModel, QStandardItem, QCursor
 from qgis.PyQt.QtSql import QSqlTableModel
-from qgis.PyQt.QtWidgets import QAbstractItemView, QCompleter, QLineEdit, QFileDialog, QTableView, \
+from qgis.PyQt.QtWidgets import QAbstractItemView, QCompleter, QLineEdit, QTableView, \
     QTextEdit, QPushButton, QComboBox, QTabWidget, QDateEdit, QDateTimeEdit, QAction, QMenu
 
 from .document import GwDocument
@@ -1419,17 +1419,17 @@ class GwVisit(QObject):
     def _get_added_files(self, visit_id, event_id, save):
         """ Get path of new files """
 
-        file_dialog = QFileDialog()
-        file_dialog.setFileMode(QFileDialog.Directory)
-        # Get file types from catalog and populate QFileDialog filter
         sql = "SELECT id AS fextension, idval AS filetype FROM config_typevalue WHERE typevalue = 'filetype_typevalue'"
         rows = tools_db.get_rows(sql)
-        f_types = rows
+        f_types = []
         file_types = ""
-        for row in rows:
-            file_types += f"{row[0]} (*.{row[1]});;"
+        if rows:
+            f_types = rows
+            for row in rows:
+                file_types += f"{row[0]} (*.{row[1]});;"
         file_types += "All (*.*)"
-        new_files, filter_ = QFileDialog.getOpenFileNames(None, "Save file path", "", file_types)
+
+        new_files = tools_qt.get_open_files_path("Save file path", file_types)
 
         # Add files to QtableView
         if new_files:

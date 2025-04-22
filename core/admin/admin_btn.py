@@ -19,7 +19,7 @@ from datetime import timedelta
 from qgis.PyQt.QtCore import QSettings, Qt, QDate, QTimer
 from qgis.PyQt.QtGui import QPixmap
 from qgis.PyQt.QtSql import QSqlTableModel, QSqlQueryModel
-from qgis.PyQt.QtWidgets import QRadioButton, QPushButton, QAbstractItemView, QTextEdit, QFileDialog, \
+from qgis.PyQt.QtWidgets import QRadioButton, QPushButton, QAbstractItemView, QTextEdit, \
     QLineEdit, QWidget, QComboBox, QLabel, QCheckBox, QScrollArea, QSpinBox, QAbstractButton, \
     QHeaderView, QListView, QFrame, QScrollBar, QDoubleSpinBox, QPlainTextEdit, QGroupBox, QTableView, QDockWidget, \
     QGridLayout, QTabWidget
