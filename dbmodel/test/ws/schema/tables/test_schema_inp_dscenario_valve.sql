@@ -19,7 +19,7 @@ SELECT has_table('inp_dscenario_valve'::name, 'Table inp_dscenario_valve should 
 SELECT columns_are(
     'inp_dscenario_valve',
     ARRAY[
-        'dscenario_id', 'node_id', 'valv_type', 'setting', 'curve_id', 'minorloss', 'status', 'add_settings', 'init_quality'
+        'dscenario_id', 'node_id', 'valve_type', 'setting', 'curve_id', 'minorloss', 'status', 'add_settings', 'init_quality'
     ],
     'Table inp_dscenario_valve should have the correct columns'
 );
@@ -30,7 +30,7 @@ SELECT col_is_pk('inp_dscenario_valve', ARRAY['node_id', 'dscenario_id'], 'Colum
 -- Check column types
 SELECT col_type_is('inp_dscenario_valve', 'dscenario_id', 'integer', 'Column dscenario_id should be integer');
 SELECT col_type_is('inp_dscenario_valve', 'node_id', 'varchar(16)', 'Column node_id should be varchar(16)');
-SELECT col_type_is('inp_dscenario_valve', 'valv_type', 'varchar(18)', 'Column valv_type should be varchar(18)');
+SELECT col_type_is('inp_dscenario_valve', 'valve_type', 'varchar(18)', 'Column valve_type should be varchar(18)');
 SELECT col_type_is('inp_dscenario_valve', 'setting', 'numeric(12,4)', 'Column setting should be numeric(12,4)');
 SELECT col_type_is('inp_dscenario_valve', 'curve_id', 'varchar(16)', 'Column curve_id should be varchar(16)');
 SELECT col_type_is('inp_dscenario_valve', 'minorloss', 'numeric(12,4)', 'Column minorloss should be numeric(12,4)');
@@ -56,7 +56,7 @@ SELECT has_trigger('inp_dscenario_valve', 'gw_trg_typevalue_fk_update', 'Trigger
 SELECT col_not_null('inp_dscenario_valve', 'dscenario_id', 'Column dscenario_id should be NOT NULL');
 SELECT col_not_null('inp_dscenario_valve', 'node_id', 'Column node_id should be NOT NULL');
 SELECT col_has_check('inp_dscenario_valve', 'status', 'Column status should have a check constraint');
-SELECT col_has_check('inp_dscenario_valve', 'valv_type', 'Column valv_type should have a check constraint');
+SELECT col_has_check('inp_dscenario_valve', 'valve_type', 'Column valve_type should have a check constraint');
 SELECT col_has_default('inp_dscenario_valve', 'status', 'Column status should have default value');
 
 SELECT * FROM finish();

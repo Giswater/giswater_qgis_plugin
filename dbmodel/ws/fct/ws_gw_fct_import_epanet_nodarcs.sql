@@ -70,7 +70,7 @@ BEGIN
         IF v_data.epa_type = 'VIRTUALVALVE' THEN
             v_epatype = 'VALVE';
 
-            v_nodecat = (SELECT valv_type FROM inp_virtualvalve WHERE arc_id = v_data.arc_id);
+            v_nodecat = (SELECT valve_type FROM inp_virtualvalve WHERE arc_id = v_data.arc_id);
             v_json_aux = ((p_data ->>'data')::json->>lower(v_nodecat))::json;
             CONTINUE WHEN v_json_aux IS NULL;
             v_nodecat = (v_json_aux->>'catalog')::text;
@@ -125,8 +125,8 @@ BEGIN
             INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, concat('    Updated to_arc=',v_toarc,'.'));
 
         ELSIF v_epatablename = 'inp_valve' THEN
-            INSERT INTO inp_valve (node_id, valv_type, custom_dint, setting, curve_id, minorloss) -- TODO: there is no status in inp_valve, but there wasn't in 3.6 either...
-            SELECT v_node_id, valv_type, diameter, setting, curve_id, minorloss FROM inp_virtualvalve WHERE arc_id=v_data.arc_id;
+            INSERT INTO inp_valve (node_id, valve_type, custom_dint, setting, curve_id, minorloss) -- TODO: there is no status in inp_valve, but there wasn't in 3.6 either...
+            SELECT v_node_id, valve_type, diameter, setting, curve_id, minorloss FROM inp_virtualvalve WHERE arc_id=v_data.arc_id;
 
             INSERT INTO t_audit_check_data (fid, criticity, error_message) VALUES (v_fid, 4, '    Inserted into inp_valve.');
 

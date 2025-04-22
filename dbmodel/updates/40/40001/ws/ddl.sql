@@ -64,3 +64,15 @@ CREATE TABLE inp_dscenario_frpump (
 
 
 DROP FUNCTION IF EXISTS gw_trg_vi();
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"inp_dscenario_valve", "column":"valv_type", "newName":"valve_type"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"inp_dscenario_virtualvalve", "column":"valv_type", "newName":"valve_type"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"inp_valve", "column":"valv_type", "newName":"valve_type"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"inp_virtualvalve", "column":"valv_type", "newName":"valve_type"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"v_edit_inp_dscenario_valve", "column":"valv_type", "newName":"valve_type"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"v_edit_inp_dscenario_virtualvalve", "column":"valv_type", "newName":"valve_type"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"v_edit_inp_valve", "column":"valv_type", "newName":"valve_type"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"v_edit_inp_virtualvalve", "column":"valv_type", "newName":"valve_type"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"ve_epa_valve", "column":"valv_type", "newName":"valve_type"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"ve_epa_virtualvalve", "column":"valv_type", "newName":"valve_type"}}$$);
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"RENAME","table":"vi_valves", "column":"valv_type", "newName":"valve_type"}}$$);

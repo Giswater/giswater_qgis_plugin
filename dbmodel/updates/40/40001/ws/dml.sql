@@ -172,3 +172,82 @@ VALUES('v_edit_link', 'form_feature', 'tab_data', 'macrodma_id', 'lyt_data_1', 2
 INSERT INTO man_servconnection (link_id)
 SELECT link_id
 FROM v_edit_link;
+
+-- 22/04/2025
+UPDATE config_param_system
+SET value='{"catfeatureId":["PR_REDUC_VALVE"], "vdefault":{"valve_type":"PRV", "minorloss":0.001, "status":"ACTIVE"}}'
+WHERE "parameter"='epa_valve_vdefault_prv';
+UPDATE config_param_system
+SET value='{"catfeatureId":["SHUTOFF_VALVE", "FL_CONTR_VALVE"], "vdefault":{"valve_type":"TCV", "coef_loss":0.001, "minorloss":0.001, "status":"OPEN"}}'
+WHERE "parameter"='epa_valve_vdefault_tcv';
+
+-- Auto-generated SQL script #202504221023
+UPDATE sys_foreignkey
+	SET target_field='valve_type'
+	WHERE typevalue_table='inp_typevalue' AND typevalue_name='inp_typevalue_valve' AND target_table='inp_valve' AND target_field='valv_type';
+UPDATE sys_foreignkey
+	SET target_field='valve_type'
+	WHERE typevalue_table='inp_typevalue' AND typevalue_name='inp_typevalue_valve' AND target_table='inp_dscenario_valve' AND target_field='valv_type';
+UPDATE sys_foreignkey
+	SET target_field='valve_type'
+	WHERE typevalue_table='inp_typevalue' AND typevalue_name='inp_typevalue_valve' AND target_table='inp_virtualvalve' AND target_field='valv_type';
+UPDATE sys_foreignkey
+	SET target_field='valve_type'
+	WHERE typevalue_table='inp_typevalue' AND typevalue_name='inp_typevalue_valve' AND target_table='inp_dscenario_virtualvalve' AND target_field='valv_type';
+
+
+UPDATE sys_fprocess
+SET fprocess_name='Null values on valve_type table'
+WHERE fid=273;
+
+UPDATE config_form_list
+SET query_text='SELECT dscenario_id, valve_type, pressure, diameter, flow, coef_loss, curve_id, minorloss, status, init_quality FROM v_edit_inp_dscenario_virtualvalve WHERE arc_id IS NOT NULL'
+WHERE listname='tbl_inp_dscenario_virtualvalve' AND device=4;
+UPDATE config_form_list
+SET query_text='SELECT dscenario_id, node_id, nodarc_id, valve_type, pressure, flow, coef_loss, curve_id, minorloss, status, add_settings, init_quality FROM v_edit_inp_dscenario_valve WHERE node_id IS NOT NULL'
+WHERE listname='tbl_inp_dscenario_valve' AND device=4;
+UPDATE config_form_list
+SET query_text='SELECT dscenario_id AS id, arc_id, valve_type, pressure, diameter, flow, coef_loss, curve_id, minorloss, status FROM inp_dscenario_virtualvalve where dscenario_id is not null'
+WHERE listname='dscenario_virtualvalve' AND device=5;
+UPDATE config_form_list
+SET query_text='SELECT dscenario_id AS id, node_id, valve_type, pressure, flow, coef_loss, curve_id, minorloss, status, add_settings, init_quality FROM inp_dscenario_valve where dscenario_id is not null'
+WHERE listname='dscenario_valve' AND device=5;
+
+
+UPDATE sys_fprocess
+SET query_text='SELECT * FROM t_inp_valve WHERE valve_type IS NULL',info_msg='Valve valve_type checked. No mandatory values missed.',except_msg='valves with null values on valve_type column.'
+WHERE fid=273;
+UPDATE sys_fprocess
+SET query_text='SELECT * FROM t_inp_valve WHERE ((valve_type=''PBV'' OR valve_type=''PRV'' OR valve_type=''PSV'') AND (setting IS NULL))'
+WHERE fid=275;
+UPDATE sys_fprocess
+SET query_text='SELECT * FROM t_inp_valve WHERE ((valve_type=''GPV'') AND (curve_id IS NULL))'
+WHERE fid=276;
+UPDATE sys_fprocess
+SET query_text='SELECT * FROM t_inp_valve WHERE valve_type=''TCV'' AND setting IS NULL'
+WHERE fid=277;
+UPDATE sys_fprocess
+SET query_text='SELECT * FROM t_inp_valve WHERE ((valve_type=''FCV'') AND (setting IS NULL))'
+WHERE fid=278;
+UPDATE sys_fprocess
+SET info_msg='Virtualvalve valve_type checked. No mandatory values missed.',except_msg='virtualvalves with null values on valve_type column.'
+WHERE fid=594;
+UPDATE sys_fprocess
+SET query_text='SELECT * FROM t_inp_virtualvalve WHERE ((valve_type=''PBV'' OR valve_type=''PRV'' OR valve_type=''PSV'') AND (setting IS NULL))'
+WHERE fid=596;
+UPDATE sys_fprocess
+SET query_text='SELECT * FROM t_inp_virtualvalve WHERE ((valve_type=''GPV'') AND (curve_id IS NULL))'
+WHERE fid=597;
+UPDATE sys_fprocess
+SET query_text='SELECT * FROM t_inp_virtualvalve WHERE valve_type=''TCV'' AND setting IS NULL'
+WHERE fid=598;
+UPDATE sys_fprocess
+SET query_text='SELECT * FROM t_inp_virtualvalve WHERE ((valve_type=''FCV'') AND (setting IS NULL))'
+WHERE fid=599;
+
+UPDATE config_form_fields
+SET columnname='valve_type'
+WHERE formname='ve_epa_valve' AND formtype='form_feature' AND columnname='valv_type' AND tabname='tab_epa';
+UPDATE config_form_fields
+SET columnname='valve_type'
+WHERE formname='ve_epa_virtualvalve' AND formtype='form_feature' AND columnname='valv_type' AND tabname='tab_epa';

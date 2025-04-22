@@ -121,7 +121,7 @@ BEGIN
 	FROM inp_connec WHERE temp_t_node.node_id=inp_connec.connec_id;
 
 	-- update child param for inp_valve
-	UPDATE temp_t_node SET addparam=concat('{"valv_type":"',valv_type,'", "setting":"',setting,'", "diameter":"',custom_dint,
+	UPDATE temp_t_node SET addparam=concat('{"valve_type":"',valve_type,'", "setting":"',setting,'", "diameter":"',custom_dint,
 	'", "curve_id":"',curve_id,'", "minorloss":"',minorloss,'", "status":"',status,
 	'", "to_arc":"',to_arc,'", "add_settings":"',add_settings,'"}')
 	FROM v_edit_inp_valve v WHERE temp_t_node.node_id=v.node_id;
@@ -200,7 +200,7 @@ BEGIN
 	minorloss = inp_virtualvalve.minorloss,
 	diameter = inp_virtualvalve.diameter,
 	status = inp_virtualvalve.status,
-	addparam=concat('{"valv_type":"',valv_type,'", "setting":"',setting,'", "curve_id":"',curve_id,'"}')
+	addparam=concat('{"valve_type":"',valve_type,'", "setting":"',setting,'", "curve_id":"',curve_id,'"}')
 	FROM inp_virtualvalve WHERE temp_t_arc.arc_id=inp_virtualvalve.arc_id;
 
 	-- update addparam for inp_virtualpump

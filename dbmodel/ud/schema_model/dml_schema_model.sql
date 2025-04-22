@@ -3871,7 +3871,7 @@ INSERT INTO sys_fprocess VALUES (170, 'Check concordance of to_arc valves', 'ws'
 INSERT INTO sys_fprocess VALUES (171, 'Check concordance of to_arc pumps', 'ws', NULL, 'core', true, 'Check epa-data', NULL);
 INSERT INTO sys_fprocess VALUES (198, 'Tanks with null mandatory values', 'ws', NULL, 'core', true, 'Check epa-data', NULL);
 INSERT INTO sys_fprocess VALUES (272, 'Missing data on inp tables', 'utils', NULL, 'core', true, 'Check epa-data', NULL);
-INSERT INTO sys_fprocess VALUES (273, 'Null values on valv_type table', 'ws', NULL, 'core', true, 'Check epa-data', NULL);
+INSERT INTO sys_fprocess VALUES (273, 'Null values on valve_type table', 'ws', NULL, 'core', true, 'Check epa-data', NULL);
 INSERT INTO sys_fprocess VALUES (274, 'Null values on valve status', 'ws', NULL, 'core', true, 'Check epa-data', NULL);
 INSERT INTO sys_fprocess VALUES (275, 'Null values on valve pressure', 'ws', NULL, 'core', true, 'Check epa-data', NULL);
 INSERT INTO sys_fprocess VALUES (276, 'Null values on GPV valve config', 'ws', NULL, 'core', true, 'Check epa-data', NULL);

@@ -85,7 +85,7 @@ BEGIN
 
 	-- Pressure sustain + reduce valve
 	v_query_text = 'SELECT temp_t_arc.arc_id, temp_t_arc.node_1, the_geom, curve_id FROM temp_t_arc
-			JOIN inp_valve a ON concat(node_id,''_n2a'')=arc_id WHERE epa_type=''VALVE'' AND valv_type = ''PSRV''';
+			JOIN inp_valve a ON concat(node_id,''_n2a'')=arc_id WHERE epa_type=''VALVE'' AND valve_type = ''PSRV''';
 
 	FOR v_arc_id, v_node_1, v_geom, v_curve IN EXECUTE v_query_text
 	LOOP
@@ -106,7 +106,7 @@ BEGIN
 		v_record_a1.node_2 = v_record.node_id;
 		v_record_a1.length = v_record_a1.length/2;
 		v_record_a1.the_geom := ST_LineSubstring(v_record_a1.the_geom,0.5,1);
-		v_record_a1.addparam = gw_fct_json_object_set_key(v_record_a1.addparam::json, 'valv_type', 'PSV'::text);
+		v_record_a1.addparam = gw_fct_json_object_set_key(v_record_a1.addparam::json, 'valve_type', 'PSV'::text);
 		INSERT INTO temp_t_arc (result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation,
 		diameter, roughness, length, status, the_geom, expl_id, flw_code, addparam, dma_id, presszone_id, dqa_id, minsector_id)
 		VALUES(v_record_a1.result_id, v_record_a1.arc_id, v_record_a1.node_1, v_record_a1.node_2, v_record_a1.arc_type, v_record_a1.arccat_id, v_record_a1.epa_type, v_record_a1.sector_id,
@@ -121,7 +121,7 @@ BEGIN
 		v_record_a2.node_1 = v_record.node_id;
 		v_record_a2.length = v_record_a2.length/2;
 		v_record_a2.the_geom := ST_LineSubstring(v_record_a2.the_geom,0,0.5);
-		v_record_a2.addparam = gw_fct_json_object_set_key(v_record_a2.addparam::json, 'valv_type', 'PRV'::text);
+		v_record_a2.addparam = gw_fct_json_object_set_key(v_record_a2.addparam::json, 'valve_type', 'PRV'::text);
 		v_record_a2.addparam = gw_fct_json_object_set_key(v_record_a2.addparam::json, 'setting', (v_record_a2.addparam::json->>'add_settings')::text);
 		INSERT INTO temp_t_arc (result_id, arc_id, node_1, node_2, arc_type, arccat_id, epa_type, sector_id, state, state_type, annotation,
 		diameter, roughness, length, status, the_geom, expl_id, flw_code, addparam, dma_id, presszone_id, dqa_id, minsector_id)

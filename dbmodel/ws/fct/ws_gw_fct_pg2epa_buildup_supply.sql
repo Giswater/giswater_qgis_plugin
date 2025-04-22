@@ -84,15 +84,15 @@ BEGIN
 
 	RAISE NOTICE 'setting pressure for PRV valves';
 	UPDATE temp_t_arc SET addparam = gw_fct_json_object_set_key (addparam::json, 'pressure', v_pressureprv)
-	WHERE epa_type = 'VALVE' AND addparam::json->>'valv_type' IN ('PRV') AND addparam::json->>'pressure'='';
+	WHERE epa_type = 'VALVE' AND addparam::json->>'valve_type' IN ('PRV') AND addparam::json->>'pressure'='';
 
 	RAISE NOTICE 'setting pressure for PSV valves';
 	UPDATE temp_t_arc SET addparam = gw_fct_json_object_set_key (addparam::json, 'pressure', v_pressurepsv)
-	WHERE epa_type = 'VALVE' AND addparam::json->>'valv_type' IN ('PSV') AND addparam::json->>'pressure'='';
+	WHERE epa_type = 'VALVE' AND addparam::json->>'valve_type' IN ('PSV') AND addparam::json->>'pressure'='';
 
 	RAISE NOTICE 'setting flow for FCV valves';
 	UPDATE temp_t_arc SET addparam = gw_fct_json_object_set_key (addparam::json, 'flow', v_flow)
-	WHERE epa_type = 'VALVE' AND addparam::json->>'valv_type' IN ('PSV') AND addparam::json->>'flow'='';
+	WHERE epa_type = 'VALVE' AND addparam::json->>'valve_type' IN ('PSV') AND addparam::json->>'flow'='';
 
 	RAISE NOTICE 'setting curve for BINODE2ARC-PRV valves';
 	UPDATE temp_t_arc SET addparam = gw_fct_json_object_set_key (addparam::json, 'pressure', 0)
@@ -150,17 +150,17 @@ BEGIN
 	END IF;
 
 	RAISE NOTICE 'set psv valves';
-	UPDATE temp_t_arc SET status=v_statuspsv WHERE status IS NULL  AND arc_id IN (SELECT concat(node_id, '_n2a') FROM inp_valve WHERE valv_type = 'PRV');
+	UPDATE temp_t_arc SET status=v_statuspsv WHERE status IS NULL  AND arc_id IN (SELECT concat(node_id, '_n2a') FROM inp_valve WHERE valve_type = 'PRV');
 
 	IF v_forcestatusprv IS NOT NULL THEN
-		UPDATE temp_t_arc SET status= v_forcestatuspsv WHERE arc_id IN (SELECT concat(node_id, '_n2a') FROM inp_valve WHERE valv_type = 'PRV');
+		UPDATE temp_t_arc SET status= v_forcestatuspsv WHERE arc_id IN (SELECT concat(node_id, '_n2a') FROM inp_valve WHERE valve_type = 'PRV');
 	END IF;
 
 	RAISE NOTICE 'set fcv valves';
-	UPDATE temp_t_arc SET status=v_statusfcv WHERE status IS NULL  AND arc_id IN (SELECT concat(node_id, '_n2a') FROM inp_valve WHERE valv_type = 'FCV');
+	UPDATE temp_t_arc SET status=v_statusfcv WHERE status IS NULL  AND arc_id IN (SELECT concat(node_id, '_n2a') FROM inp_valve WHERE valve_type = 'FCV');
 
 	IF v_forcestatusprv IS NOT NULL THEN
-		UPDATE temp_t_arc SET status= v_forcestatusfcv WHERE arc_id IN (SELECT concat(node_id, '_n2a') FROM inp_valve WHERE valv_type = 'FCV');
+		UPDATE temp_t_arc SET status= v_forcestatusfcv WHERE arc_id IN (SELECT concat(node_id, '_n2a') FROM inp_valve WHERE valve_type = 'FCV');
 	END IF;
 
     RETURN 1;

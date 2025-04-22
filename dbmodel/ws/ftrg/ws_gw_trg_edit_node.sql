@@ -724,8 +724,8 @@ BEGIN
 			SELECT json_array_elements_text ((value::json->>'catfeatureId')::json) id , (value::json->>'vdefault') vdef FROM config_param_system WHERE parameter like 'epa_valve_vdefault_%'
 			)a WHERE id = v_customfeature;
 
-			INSERT INTO inp_valve (node_id, valv_type, custom_dint, setting, minorloss)
-			VALUES (NEW.node_id, v_epavdef ->>'valv_type', (v_epavdef ->>'coef_loss')::numeric, (v_epavdef ->>'pressure')::numeric,(v_epavdef ->>'minorloss')::numeric);
+			INSERT INTO inp_valve (node_id, valve_type, custom_dint, setting, minorloss)
+			VALUES (NEW.node_id, v_epavdef ->>'valve_type', (v_epavdef ->>'coef_loss')::numeric, (v_epavdef ->>'pressure')::numeric,(v_epavdef ->>'minorloss')::numeric);
 
 		ELSIF (NEW.epa_type = 'SHORTPIPE') THEN
 

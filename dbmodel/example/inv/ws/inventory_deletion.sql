@@ -22,7 +22,7 @@ DELETE FROM sector WHERE sector_id > 2;
 
 UPDATE sector s SET the_geom = e.the_geom FROM exploitation e WHERE s.sector_id = e.expl_id;
 
-UPDATE inp_valve SET valv_type =NULL, custom_dint=null, pressure=null, flow=null;
+UPDATE inp_valve SET valve_type =NULL, custom_dint=null, pressure=null, flow=null;
 UPDATE inp_pump SET curve_id = null, status= null, pump_type = null;
 UPDATE inp_pump_additional SET curve_id = null, status= null;
 UPDATE inp_reservoir SET head = null, pattern_id = null;

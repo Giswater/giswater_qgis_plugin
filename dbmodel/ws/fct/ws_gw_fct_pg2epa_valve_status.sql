@@ -27,7 +27,7 @@ BEGIN
 
 	-- shutoff valves (TCV OR SHORTPIPES)
 	IF (SELECT value FROM config_param_system WHERE parameter = 'epa_shutoffvalve') = 'VALVE' THEN
-		v_querytext = ' v_edit_inp_valve v WHERE addparam::json->>''valv_type'' = ''TCV''';
+		v_querytext = ' v_edit_inp_valve v WHERE addparam::json->>''valve_type'' = ''TCV''';
 	ELSE
 		v_querytext = ' v_edit_inp_shortpipe v WHERE node_id IS NOT NULL';
 	END IF;

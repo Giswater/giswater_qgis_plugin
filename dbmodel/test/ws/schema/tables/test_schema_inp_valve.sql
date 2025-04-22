@@ -19,7 +19,7 @@ SELECT has_table('inp_valve'::name, 'Table inp_valve should exist');
 SELECT columns_are(
     'inp_valve',
     ARRAY[
-        'node_id', 'valv_type', 'custom_dint', 'setting', 'curve_id', 'minorloss', 'add_settings', 'init_quality'
+        'node_id', 'valve_type', 'custom_dint', 'setting', 'curve_id', 'minorloss', 'add_settings', 'init_quality'
     ],
     'Table inp_valve should have the correct columns'
 );
@@ -29,7 +29,7 @@ SELECT col_is_pk('inp_valve', ARRAY['node_id'], 'Column node_id should be primar
 
 -- Check column types
 SELECT col_type_is('inp_valve', 'node_id', 'varchar(16)', 'Column node_id should be varchar(16)');
-SELECT col_type_is('inp_valve', 'valv_type', 'varchar(18)', 'Column valv_type should be varchar(18)');
+SELECT col_type_is('inp_valve', 'valve_type', 'varchar(18)', 'Column valve_type should be varchar(18)');
 SELECT col_type_is('inp_valve', 'custom_dint', 'numeric(12,4)', 'Column custom_dint should be numeric(12,4)');
 SELECT col_type_is('inp_valve', 'setting', 'numeric(12,4)', 'Column setting should be numeric(12,4)');
 SELECT col_type_is('inp_valve', 'curve_id', 'varchar(16)', 'Column curve_id should be varchar(16)');
@@ -53,7 +53,7 @@ SELECT has_trigger('inp_valve', 'gw_trg_typevalue_fk_update', 'Trigger gw_trg_ty
 -- Check constraints
 SELECT col_not_null('inp_valve', 'node_id', 'Column node_id should be NOT NULL');
 SELECT col_has_default('inp_valve', 'minorloss', 'Column minorloss should have default value');
-SELECT col_has_check('inp_valve', 'valv_type', 'Column valv_type should have a check constraint');
+SELECT col_has_check('inp_valve', 'valve_type', 'Column valve_type should have a check constraint');
 
 SELECT * FROM finish();
 

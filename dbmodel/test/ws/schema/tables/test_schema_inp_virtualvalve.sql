@@ -19,7 +19,7 @@ SELECT has_table('inp_virtualvalve'::name, 'Table inp_virtualvalve should exist'
 SELECT columns_are(
     'inp_virtualvalve',
     ARRAY[
-        'arc_id', 'valv_type', 'diameter', 'setting', 'curve_id', 'minorloss', 'status', 'init_quality'
+        'arc_id', 'valve_type', 'diameter', 'setting', 'curve_id', 'minorloss', 'status', 'init_quality'
     ],
     'Table inp_virtualvalve should have the correct columns'
 );
@@ -29,7 +29,7 @@ SELECT col_is_pk('inp_virtualvalve', ARRAY['arc_id'], 'Column arc_id should be p
 
 -- Check column types
 SELECT col_type_is('inp_virtualvalve', 'arc_id', 'varchar(16)', 'Column arc_id should be varchar(16)');
-SELECT col_type_is('inp_virtualvalve', 'valv_type', 'varchar(18)', 'Column valv_type should be varchar(18)');
+SELECT col_type_is('inp_virtualvalve', 'valve_type', 'varchar(18)', 'Column valve_type should be varchar(18)');
 SELECT col_type_is('inp_virtualvalve', 'diameter', 'numeric(12,4)', 'Column diameter should be numeric(12,4)');
 SELECT col_type_is('inp_virtualvalve', 'setting', 'numeric(12,4)', 'Column setting should be numeric(12,4)');
 SELECT col_type_is('inp_virtualvalve', 'curve_id', 'varchar(16)', 'Column curve_id should be varchar(16)');
@@ -52,7 +52,7 @@ SELECT has_trigger('inp_virtualvalve', 'gw_trg_typevalue_fk_update', 'Trigger gw
 
 -- Check constraints
 SELECT col_not_null('inp_virtualvalve', 'arc_id', 'Column arc_id should be NOT NULL');
-SELECT col_has_check('inp_virtualvalve', 'valv_type', 'Column valv_type should have a check constraint');
+SELECT col_has_check('inp_virtualvalve', 'valve_type', 'Column valve_type should have a check constraint');
 SELECT col_has_check('inp_virtualvalve', 'status', 'Column status should have a check constraint');
 
 SELECT * FROM finish();

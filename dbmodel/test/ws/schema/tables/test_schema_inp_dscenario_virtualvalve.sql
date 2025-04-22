@@ -19,7 +19,7 @@ SELECT has_table('inp_dscenario_virtualvalve'::name, 'Table inp_dscenario_virtua
 SELECT columns_are(
     'inp_dscenario_virtualvalve',
     ARRAY[
-        'dscenario_id', 'arc_id', 'valv_type', 'diameter', 'setting', 'curve_id', 'minorloss', 'status', 'init_quality'
+        'dscenario_id', 'arc_id', 'valve_type', 'diameter', 'setting', 'curve_id', 'minorloss', 'status', 'init_quality'
     ],
     'Table inp_dscenario_virtualvalve should have the correct columns'
 );
@@ -30,7 +30,7 @@ SELECT col_is_pk('inp_dscenario_virtualvalve', ARRAY['dscenario_id', 'arc_id'], 
 -- Check column types
 SELECT col_type_is('inp_dscenario_virtualvalve', 'dscenario_id', 'integer', 'Column dscenario_id should be integer');
 SELECT col_type_is('inp_dscenario_virtualvalve', 'arc_id', 'varchar(16)', 'Column arc_id should be varchar(16)');
-SELECT col_type_is('inp_dscenario_virtualvalve', 'valv_type', 'varchar(18)', 'Column valv_type should be varchar(18)');
+SELECT col_type_is('inp_dscenario_virtualvalve', 'valve_type', 'varchar(18)', 'Column valve_type should be varchar(18)');
 SELECT col_type_is('inp_dscenario_virtualvalve', 'diameter', 'numeric(12,4)', 'Column diameter should be numeric(12,4)');
 SELECT col_type_is('inp_dscenario_virtualvalve', 'setting', 'numeric(12,4)', 'Column setting should be numeric(12,4)');
 SELECT col_type_is('inp_dscenario_virtualvalve', 'curve_id', 'varchar(16)', 'Column curve_id should be varchar(16)');

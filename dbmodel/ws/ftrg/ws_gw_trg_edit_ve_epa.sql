@@ -59,7 +59,7 @@ BEGIN
 		WHERE node_id=OLD.node_id;
 
         ELSIF v_epatype = 'valve' THEN
-		UPDATE inp_valve SET valv_type=NEW.valv_type, pressure=NEW.pressure,custom_dint=NEW.custom_dint, flow=NEW.flow, coef_loss=NEW.coef_loss,
+		UPDATE inp_valve SET valve_type=NEW.valve_type, pressure=NEW.pressure,custom_dint=NEW.custom_dint, flow=NEW.flow, coef_loss=NEW.coef_loss,
 		curve_id=NEW.curve_id, minorloss=NEW.minorloss, add_settings = NEW.add_settings,
 		init_quality=NEW.init_quality WHERE node_id=OLD.node_id;
 
@@ -96,7 +96,7 @@ BEGIN
 		custom_dint=NEW.custom_dint, reactionparam = NEW.reactionparam, reactionvalue=NEW.reactionvalue, bulk_coeff=NEW.bulk_coeff, wall_coeff=NEW.wall_coeff WHERE arc_id=OLD.arc_id;
 
 	ELSIF v_epatype = 'virtualvalve' THEN
-		UPDATE inp_virtualvalve SET valv_type=NEW.valv_type, pressure=NEW.pressure, diameter=NEW.diameter, flow=NEW.flow, coef_loss=NEW.coef_loss,
+		UPDATE inp_virtualvalve SET valve_type=NEW.valve_type, pressure=NEW.pressure, diameter=NEW.diameter, flow=NEW.flow, coef_loss=NEW.coef_loss,
 		curve_id=NEW.curve_id, minorloss=NEW.minorloss, status=NEW.status, init_quality=NEW.init_quality WHERE arc_id=OLD.arc_id;
         END IF;
 

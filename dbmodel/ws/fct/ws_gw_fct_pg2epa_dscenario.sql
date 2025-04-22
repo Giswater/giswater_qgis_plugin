@@ -284,8 +284,8 @@ BEGIN
 		-- updating values for valves
 		UPDATE temp_t_arc t SET status = d.status FROM inp_dscenario_valve d
 		WHERE t.arc_id = concat(d.node_id, '_n2a') AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.status IS NOT NULL;
-		UPDATE temp_t_arc t SET addparam = gw_fct_json_object_set_key(addparam::json, 'valv_type',d.valv_type) FROM inp_dscenario_valve d
-		WHERE t.arc_id = concat(d.node_id, '_n2a')  AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.valv_type IS NOT NULL;
+		UPDATE temp_t_arc t SET addparam = gw_fct_json_object_set_key(addparam::json, 'valve_type',d.valve_type) FROM inp_dscenario_valve d
+		WHERE t.arc_id = concat(d.node_id, '_n2a')  AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.valve_type IS NOT NULL;
 		UPDATE temp_t_arc t SET addparam = gw_fct_json_object_set_key(addparam::json, 'setting',d.setting) FROM inp_dscenario_valve d
 		WHERE t.arc_id = concat(d.node_id, '_n2a')  AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.setting IS NOT NULL;
 		UPDATE temp_t_arc t SET addparam = gw_fct_json_object_set_key(addparam::json, 'curve_id',d.curve_id) FROM inp_dscenario_valve d
@@ -373,8 +373,8 @@ BEGIN
 		-- updating values for virtualvalve
 		UPDATE temp_t_arc t SET status = d.status FROM inp_dscenario_virtualvalve d
 		WHERE t.arc_id = d.arc_id AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.status IS NOT NULL;
-		UPDATE temp_t_arc t SET addparam = gw_fct_json_object_set_key(addparam::json, 'valv_type',d.valv_type) FROM inp_dscenario_virtualvalve d
-		WHERE t.arc_id = d.arc_id  AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.valv_type IS NOT NULL;
+		UPDATE temp_t_arc t SET addparam = gw_fct_json_object_set_key(addparam::json, 'valve_type',d.valve_type) FROM inp_dscenario_virtualvalve d
+		WHERE t.arc_id = d.arc_id  AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.valve_type IS NOT NULL;
 		UPDATE temp_t_arc t SET addparam = gw_fct_json_object_set_key(addparam::json, 'setting',d.setting) FROM inp_dscenario_virtualvalve d
 		WHERE t.arc_id = d.arc_id  AND dscenario_id IN (SELECT unnest(v_userscenario)) AND d.setting IS NOT NULL;
 		UPDATE temp_t_arc t SET addparam = gw_fct_json_object_set_key(addparam::json, 'curve_id',d.curve_id) FROM inp_dscenario_virtualvalve d

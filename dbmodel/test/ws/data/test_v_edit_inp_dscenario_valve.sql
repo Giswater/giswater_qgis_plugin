@@ -12,7 +12,7 @@ SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
 SELECT plan(6);
 
-INSERT INTO v_edit_inp_dscenario_valve (dscenario_id, node_id, nodarc_id, valv_type, setting, curve_id, minorloss, status, add_settings, init_quality, the_geom)
+INSERT INTO v_edit_inp_dscenario_valve (dscenario_id, node_id, nodarc_id, valve_type, setting, curve_id, minorloss, status, add_settings, init_quality, the_geom)
 VALUES(1, '1083', '1083_n2a', 'PRV', -901, NULL, 0.0000, 'ACTIVE', 0.0, 0.0, 'SRID=25831;POINT (419524.43246714014 4576488.44256104)'::public.geometry);
 SELECT is((SELECT count(*)::integer FROM v_edit_inp_dscenario_valve WHERE setting = -901), 1, 'INSERT: v_edit_inp_dscenario_valve -901 was inserted');
 SELECT is((SELECT count(*)::integer FROM inp_dscenario_valve WHERE setting = -901), 1, 'INSERT: inp_dscenario_valve -901 was inserted');

@@ -135,7 +135,7 @@ BEGIN
 		GET DIAGNOSTICS v_affectrow = row_count;
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, concat(v_affectrow, ' Reservoir(s)'));
 				
-		INSERT INTO inp_dscenario_valve SELECT v_scenarioid, node_id, valv_type, pressure, flow, coef_loss, curve_id, minorloss, status, add_settings, init_quality 
+		INSERT INTO inp_dscenario_valve SELECT v_scenarioid, node_id, valve_type, pressure, flow, coef_loss, curve_id, minorloss, status, add_settings, init_quality 
 		FROM v_edit_inp_valve;
 		GET DIAGNOSTICS v_affectrow = row_count;
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, concat(v_affectrow, ' Valve(s)'));
@@ -145,7 +145,7 @@ BEGIN
 		GET DIAGNOSTICS v_affectrow = row_count;
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, concat(v_affectrow, ' Pump(s)'));
 			
-		INSERT INTO inp_dscenario_virtualvalve SELECT v_scenarioid, arc_id, valv_type, pressure, diameter, flow, coef_loss, curve_id, minorloss, status, init_quality
+		INSERT INTO inp_dscenario_virtualvalve SELECT v_scenarioid, arc_id, valve_type, pressure, diameter, flow, coef_loss, curve_id, minorloss, status, init_quality
 		FROM v_edit_inp_virtualvalve;
 		GET DIAGNOSTICS v_affectrow = row_count;
 		INSERT INTO audit_check_data (fid, result_id, criticity, error_message) VALUES (v_fid, null, 1, concat(v_affectrow, ' Virtualvalve(s)'));
