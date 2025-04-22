@@ -324,43 +324,20 @@ class GwGo2EpaButton(GwAction):
     def _go2epa_select_file_inp(self):
         """ Select INP file """
 
-        self.file_inp = tools_qt.get_text(self.dlg_go2epa, self.dlg_go2epa.txt_file_inp)
-        # Set default value if necessary
-        if self.file_inp is None or self.file_inp == '':
-            self.file_inp = lib_vars.plugin_dir
-
-        # Get directory of that file
-        folder_path = os.path.dirname(self.file_inp)
-        if not os.path.exists(folder_path):
-            folder_path = os.path.dirname(__file__)
-        os.chdir(folder_path)
         message = tools_qt.tr("Select INP file")
-        widget_is_checked = tools_qt.is_checked(self.dlg_go2epa, self.dlg_go2epa.chk_export)
-        if widget_is_checked:
-            self.file_inp, filter_ = QFileDialog.getSaveFileName(None, message, "", '*.inp')
+        if tools_qt.is_checked(self.dlg_go2epa, self.dlg_go2epa.chk_export):
+            tools_qt.get_save_file_path(self.dlg_go2epa, self.dlg_go2epa.txt_file_inp, '*.inp', message)
         else:
-            self.file_inp, filter_ = QFileDialog.getOpenFileName(None, message, "", '*.inp')
-        tools_qt.set_widget_text(self.dlg_go2epa, self.dlg_go2epa.txt_file_inp, self.file_inp)
+            tools_qt.get_open_file_path(self.dlg_go2epa, self.dlg_go2epa.txt_file_inp, '*.inp', message)
 
     def _go2epa_select_file_rpt(self):
         """ Select RPT file """
 
-        # Set default value if necessary
-        if self.file_rpt is None or self.file_rpt == '':
-            self.file_rpt = lib_vars.plugin_dir
-
-        # Get directory of that file
-        folder_path = os.path.dirname(self.file_rpt)
-        if not os.path.exists(folder_path):
-            folder_path = os.path.dirname(__file__)
-        os.chdir(folder_path)
         message = tools_qt.tr("Select RPT file")
-        widget_is_checked = tools_qt.is_checked(self.dlg_go2epa, self.dlg_go2epa.chk_export)
-        if widget_is_checked:
-            self.file_rpt, filter_ = QFileDialog.getSaveFileName(None, message, "", '*.rpt')
+        if tools_qt.is_checked(self.dlg_go2epa, self.dlg_go2epa.chk_export):
+            tools_qt.get_save_file_path(self.dlg_go2epa, self.dlg_go2epa.txt_file_rpt, '*.rpt', message)
         else:
-            self.file_rpt, filter_ = QFileDialog.getOpenFileName(None, message, "", '*.rpt')
-        tools_qt.set_widget_text(self.dlg_go2epa, self.dlg_go2epa.txt_file_rpt, self.file_rpt)
+            tools_qt.get_open_file_path(self.dlg_go2epa, self.dlg_go2epa.txt_file_rpt, '*.rpt', message)
 
     def _go2epa_accept(self):
         """ Save INP, RPT and result name"""
