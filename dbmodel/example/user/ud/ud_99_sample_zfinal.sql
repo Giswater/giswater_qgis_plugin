@@ -174,9 +174,9 @@ UPDATE config_param_system SET isenabled = false where parameter = ' basic_selec
 
 
 INSERT INTO element  (element_id, code, elementcat_id, epa_type, state, state_type, num_elements, rotation, verified, publish, inventory, expl_id, feature_type, top_elev, muni_id, sector_id, the_geom) VALUES
-('100020', 'E100020', 'FRWEIR-01','WEIR', 1,2,1,79.731, 1,true,true,2,'ELEMENT',30.190,2,2,'POINT (418716.0233455198 4577601.812087212)'),
-('100021', 'E100021', 'FRWEIR-01','WEIR', 1,2,1,122.505,1,true,true,1,'ELEMENT',19.230,1,1,'POINT (419597.7191116698 4576460.6400896525)'),
-('100022', 'E100022', 'FRPUMP-01','PUMP', 1,2,1,79.731, 1,true,true,2,'ELEMENT',30.190,2,2,'POINT (418716.0233455198 4577601.812087212)');
+('100020', 'E100020', 'FRWEIR-01','FRWEIR', 1,2,1,79.731, 1,true,true,2,'ELEMENT',30.190,2,2,'POINT (418716.0233455198 4577601.812087212)'),
+('100021', 'E100021', 'FRWEIR-01','FRWEIR', 1,2,1,122.505,1,true,true,1,'ELEMENT',19.230,1,1,'POINT (419597.7191116698 4576460.6400896525)'),
+('100022', 'E100022', 'FRPUMP-01','FRPUMP', 1,2,1,79.731, 1,true,true,2,'ELEMENT',30.190,2,2,'POINT (418716.0233455198 4577601.812087212)');
 
 INSERT INTO man_flowreg (element_id, node_id, order_id, to_arc, flwreg_length) VALUES
 ('100020','18828',1,'18969',0.5),
