@@ -1093,7 +1093,7 @@ class GwImportInpTask(GwTask):
 
         inp_sql = """
             INSERT INTO inp_virtualvalve (
-                arc_id, valv_type, setting, diameter, curve_id, minorloss, status, init_quality
+                arc_id, valve_type, setting, diameter, curve_id, minorloss, status, init_quality
             ) VALUES %s
         """
         inp_template = "(%s, %s, %s, %s, %s, %s, %s, %s)"
@@ -1140,7 +1140,7 @@ class GwImportInpTask(GwTask):
             )
 
             inp_dict[v_name] = {
-                "valv_type": v.valve_type,
+                "valve_type": v.valve_type,
                 "diameter": v.diameter,
                 "setting": v.initial_setting,
                 "curve_id": None,
@@ -1172,7 +1172,7 @@ class GwImportInpTask(GwTask):
 
             inp_data = inp_dict[code]
             inp_params.append(
-                (arc_id, inp_data["valv_type"], inp_data["setting"], inp_data["diameter"], inp_data["curve_id"],
+                (arc_id, inp_data["valve_type"], inp_data["setting"], inp_data["diameter"], inp_data["curve_id"],
                 inp_data["minorloss"], inp_data["status"], inp_data["init_quality"])
             )
 

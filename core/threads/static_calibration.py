@@ -560,7 +560,7 @@ class Calibrations:
                     obj["arc_id"] = node
                 else:
                     obj["node_id"] = node
-                obj["valv_type"] = valve.valve_type
+                obj["valve_type"] = valve.valve_type
                 obj["setting"] = round(
                     from_si(
                         units,

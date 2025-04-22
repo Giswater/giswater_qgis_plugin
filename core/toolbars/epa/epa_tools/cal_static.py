@@ -227,25 +227,25 @@ class StaticCalibration:
         if self.report["valves"]:
             sql += (
                 "insert into inp_dscenario_valve"
-                + "(dscenario_id,node_id,valv_type,pressure,flow,coef_loss,status) values "
+                + "(dscenario_id,node_id,valve_type,pressure,flow,coef_loss,status) values "
             )
             for valve in self.report["valves"]:
                 pressure = (
                     valve["setting"]
-                    if valve["valv_type"] in ("PRV", "PSV", "PBV")
+                    if valve["valve_type"] in ("PRV", "PSV", "PBV")
                     else "null"
                 )
-                flow = valve["setting"] if valve["valv_type"] == "FCV" else "null"
-                coef_loss = valve["setting"] if valve["valv_type"] == "TCV" else "null"
+                flow = valve["setting"] if valve["valve_type"] == "FCV" else "null"
+                coef_loss = valve["setting"] if valve["valve_type"] == "TCV" else "null"
                 status = str(valve["status"]).upper()
                 sql += (
-                    f"({dscenario_id},{valve['node_id']},'{valve['valv_type']}',"
+                    f"({dscenario_id},{valve['node_id']},'{valve['valve_type']}',"
                     + f"{pressure},{flow},{coef_loss},'{status}'),"
                 )
             sql = (
                 sql[:-1]
                 + "on conflict(dscenario_id, node_id) do update set "
-                + "valv_type=excluded.valv_type, pressure=excluded.pressure, "
+                + "valve_type=excluded.valve_type, pressure=excluded.pressure, "
                 + "flow=excluded.flow, coef_loss=excluded.coef_loss, "
                 + "status=excluded.status;"
             )
@@ -254,25 +254,25 @@ class StaticCalibration:
         if self.report["virtualvalves"]:
             sql += (
                 "insert into inp_dscenario_virtualvalve"
-                + "(dscenario_id,arc_id,valv_type,pressure,flow,coef_loss,status) values "
+                + "(dscenario_id,arc_id,valve_type,pressure,flow,coef_loss,status) values "
             )
             for valve in self.report["virtualvalves"]:
                 pressure = (
                     valve["setting"]
-                    if valve["valv_type"] in ("PRV", "PSV", "PBV")
+                    if valve["valve_type"] in ("PRV", "PSV", "PBV")
                     else "null"
                 )
-                flow = valve["setting"] if valve["valv_type"] == "FCV" else "null"
-                coef_loss = valve["setting"] if valve["valv_type"] == "TCV" else "null"
+                flow = valve["setting"] if valve["valve_type"] == "FCV" else "null"
+                coef_loss = valve["setting"] if valve["valve_type"] == "TCV" else "null"
                 status = str(valve["status"]).upper()
                 sql += (
-                    f"({dscenario_id},{valve['arc_id']},'{valve['valv_type']}',"
+                    f"({dscenario_id},{valve['arc_id']},'{valve['valve_type']}',"
                     + f"{pressure},{flow},{coef_loss},'{status}'),"
                 )
             sql = (
                 sql[:-1]
                 + "on conflict(dscenario_id, arc_id) do update set "
-                + "valv_type=excluded.valv_type, pressure=excluded.pressure, "
+                + "valve_type=excluded.valve_type, pressure=excluded.pressure, "
                 + "flow=excluded.flow, coef_loss=excluded.coef_loss, "
                 + "status=excluded.status;"
             )
