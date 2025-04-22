@@ -70,7 +70,7 @@ ALTER TABLE link ADD CONSTRAINT link_linkcat_id_fkey FOREIGN KEY (linkcat_id) RE
 CREATE TABLE man_genelement (
     element_id varchar(16) NOT NULL,
     CONSTRAINT man_genelement_pkey PRIMARY KEY (element_id),
-	CONSTRAINT man_genelement_fkey_element_id FOREIGN KEY (element_id) REFERENCES element(element_id) on update cascade on delete cascade
+	CONSTRAINT man_genelement_fkey_element_id FOREIGN KEY (element_id) REFERENCES element(element_id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 CREATE TABLE man_flowreg (
@@ -80,8 +80,8 @@ CREATE TABLE man_flowreg (
     to_arc varchar NULL,
     flwreg_length numeric NULL,
     CONSTRAINT man_flowreg_pkey PRIMARY KEY (element_id),
-	CONSTRAINT man_flowreg_fkey_element_id FOREIGN KEY (element_id) REFERENCES element(element_id) on update cascade on delete cascade
-	CONSTRAINT man_flowreg_fkey_to_arc FOREIGN KEY (to_arc) REFERENCES arc(arc_id) on update restrict on delete cascade
+	CONSTRAINT man_flowreg_fkey_element_id FOREIGN KEY (element_id) REFERENCES element(element_id) ON UPDATE CASCADE ON DELETE CASCADE,
+	CONSTRAINT man_flowreg_fkey_to_arc FOREIGN KEY (to_arc) REFERENCES arc(arc_id) ON UPDATE RESTRICT ON DELETE CASCADE
 );
 
 CREATE TABLE cat_feature_element (
