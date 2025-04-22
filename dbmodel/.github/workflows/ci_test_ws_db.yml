@@ -104,7 +104,7 @@ jobs:
           EXIT_CODE=0
 
           echo "Running SCHEMA tests..."
-          pg_prove -h localhost -p ${{ env.PORT }} -U postgres -d gw_db test/ws/schema/*.sql || EXIT_CODE=1
+          pg_prove -h localhost -p ${{ env.PORT }} -U postgres -d gw_db test/ws/schema/{tables,views}/*.sql || EXIT_CODE=1
 
           echo "Running SECURITY tests..."
           pg_prove -h localhost -p ${{ env.PORT }} -U postgres -d gw_db test/ws/security/*.sql || EXIT_CODE=1
