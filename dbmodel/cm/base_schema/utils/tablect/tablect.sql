@@ -12,6 +12,8 @@ ALTER TABLE cat_team DROP CONSTRAINT IF EXISTS cat_team_organization_id_fkey;
 ALTER TABLE cat_team ADD CONSTRAINT cat_team_organization_id_fkey FOREIGN KEY (organization_id)
 REFERENCES cat_organization(organization_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 
+
+/*
 ALTER TABLE om_team_x_user DROP CONSTRAINT IF EXISTS om_team_x_user_unique;
 ALTER TABLE om_team_x_user ADD CONSTRAINT om_team_x_user_unique UNIQUE (user_id, team_id);
 
@@ -26,6 +28,8 @@ REFERENCES cat_team (team_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE om_reviewclass_x_layer DROP CONSTRAINT IF EXISTS om_reviewclass_x_layer_reviewclass_id_fkey;
 ALTER TABLE om_reviewclass_x_layer ADD CONSTRAINT om_reviewclass_x_layer_reviewclass_id_fkey FOREIGN KEY (reviewclass_id)
 REFERENCES om_reviewclass (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+*/
+
 
 ALTER TABLE om_campaign DROP CONSTRAINT IF EXISTS om_campaign_organization_id_fkey;
 ALTER TABLE om_campaign ADD CONSTRAINT om_campaign_organization_id_fkey FOREIGN KEY (organization_id)
@@ -33,7 +37,7 @@ REFERENCES cat_organization(organization_id) MATCH SIMPLE ON UPDATE CASCADE ON D
 
 ALTER TABLE om_campaign_visit DROP CONSTRAINT IF EXISTS om_campaign_visit_campaign_id_fkey;
 ALTER TABLE om_campaign_visit ADD CONSTRAINT om_campaign_visit_campaign_id_fkey FOREIGN KEY (campaign_id)
-REFERENCES om_campaign (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+REFERENCES om_campaign (campaign_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
 
 ALTER TABLE om_campaign_visit DROP CONSTRAINT IF EXISTS om_team_x_user_visitclass_id_fkey;
 ALTER TABLE om_campaign_visit ADD CONSTRAINT om_team_x_user_visitclass_id_fkey FOREIGN KEY (visitclass_id)
@@ -41,7 +45,7 @@ REFERENCES om_visitclass (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
 
 ALTER TABLE om_campaign_review DROP CONSTRAINT IF EXISTS om_campaign_review_campaign_id_fkey;
 ALTER TABLE om_campaign_review ADD CONSTRAINT om_campaign_review_campaign_id_fkey FOREIGN KEY (campaign_id)
-REFERENCES om_campaign (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+REFERENCES om_campaign (campaign_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
 
 ALTER TABLE om_campaign_review DROP CONSTRAINT IF EXISTS om_campaign_review_reviewclass_id_fkey;
 ALTER TABLE om_campaign_review ADD CONSTRAINT om_campaign_review_reviewclass_id_fkey FOREIGN KEY (reviewclass_id)
@@ -49,27 +53,27 @@ REFERENCES om_reviewclass (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
 
 ALTER TABLE selector_campaign DROP CONSTRAINT IF EXISTS selector_campaign_campaign_id_fkey;
 ALTER TABLE selector_campaign ADD CONSTRAINT selector_campaign_campaign_id_fkey FOREIGN KEY (campaign_id)
-REFERENCES om_campaign (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+REFERENCES om_campaign (campaign_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
 
 ALTER TABLE om_campaign_x_arc DROP CONSTRAINT IF EXISTS om_campaign_x_arc_campaign_id_fkey;
 ALTER TABLE om_campaign_x_arc ADD CONSTRAINT om_campaign_x_arc_campaign_id_fkey FOREIGN KEY (campaign_id)
-REFERENCES om_campaign (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+REFERENCES om_campaign (campaign_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
 
 ALTER TABLE om_campaign_x_connec DROP CONSTRAINT IF EXISTS om_campaign_x_connec_campaign_id_fkey;
 ALTER TABLE om_campaign_x_connec ADD CONSTRAINT om_campaign_x_connec_campaign_id_fkey FOREIGN KEY (campaign_id)
-REFERENCES om_campaign (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+REFERENCES om_campaign (campaign_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
 
 ALTER TABLE om_campaign_x_link DROP CONSTRAINT IF EXISTS om_campaign_x_link_campaign_id_fkey;
 ALTER TABLE om_campaign_x_link ADD CONSTRAINT om_campaign_x_link_campaign_id_fkey FOREIGN KEY (campaign_id)
-REFERENCES om_campaign (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+REFERENCES om_campaign (campaign_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
 
 ALTER TABLE om_campaign_x_node DROP CONSTRAINT IF EXISTS om_campaign_x_node_campaign_id_fkey;
 ALTER TABLE om_campaign_x_node ADD CONSTRAINT om_campaign_x_node_campaign_id_fkey FOREIGN KEY (campaign_id)
-REFERENCES om_campaign (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+REFERENCES om_campaign (campaign_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
 
 ALTER TABLE om_campaign_lot DROP CONSTRAINT IF EXISTS om_campaign_lot_campaign_id_fkey;
 ALTER TABLE om_campaign_lot ADD CONSTRAINT om_campaign_lot_campaign_id_fkey FOREIGN KEY (campaign_id)
-REFERENCES om_campaign (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
+REFERENCES om_campaign (campaign_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 
 ALTER TABLE om_campaign_lot DROP CONSTRAINT IF EXISTS om_campaign_lot_workorder_id_fkey;
 ALTER TABLE om_campaign_lot ADD CONSTRAINT om_campaign_lot_workorder_id_fkey FOREIGN KEY (workorder_id)
@@ -81,26 +85,26 @@ REFERENCES cat_team (team_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT;
 
 ALTER TABLE selector_lot DROP CONSTRAINT IF EXISTS selector_lot_lot_id_fkey;
 ALTER TABLE selector_lot ADD CONSTRAINT selector_lot_lot_id_fkey FOREIGN KEY (lot_id)
-REFERENCES om_campaign_lot (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+REFERENCES om_campaign_lot (lot_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
 
 ALTER TABLE selector_lot DROP CONSTRAINT IF EXISTS selector_lot_lot_id_cur_user_unique;
 ALTER TABLE selector_lot ADD CONSTRAINT selector_lot_lot_id_cur_user_unique UNIQUE (lot_id, cur_user);
 
 ALTER TABLE om_campaign_lot_x_arc DROP CONSTRAINT IF EXISTS om_campaign_lot_x_arc_lot_id_fkey;
 ALTER TABLE om_campaign_lot_x_arc ADD CONSTRAINT om_campaign_lot_x_arc_lot_id_fkey FOREIGN KEY (lot_id)
-REFERENCES om_campaign_lot (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+REFERENCES om_campaign_lot (lot_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
 
 ALTER TABLE om_campaign_lot_x_connec DROP CONSTRAINT IF EXISTS om_campaign_lot_x_connec_lot_id_fkey;
 ALTER TABLE om_campaign_lot_x_connec ADD CONSTRAINT om_campaign_lot_x_connec_lot_id_fkey FOREIGN KEY (lot_id)
-REFERENCES om_campaign_lot (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+REFERENCES om_campaign_lot (lot_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
 
 ALTER TABLE om_campaign_lot_x_link DROP CONSTRAINT IF EXISTS om_campaign_lot_x_link_lot_id_fkey;
 ALTER TABLE om_campaign_lot_x_link ADD CONSTRAINT om_campaign_lot_x_link_lot_id_fkey FOREIGN KEY (lot_id)
-REFERENCES om_campaign_lot (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+REFERENCES om_campaign_lot (lot_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
 
 ALTER TABLE om_campaign_lot_x_node DROP CONSTRAINT IF EXISTS om_campaign_lot_x_node_lot_id_fkey;
 ALTER TABLE om_campaign_lot_x_node ADD CONSTRAINT om_campaign_lot_x_node_lot_id_fkey FOREIGN KEY (lot_id)
-REFERENCES om_campaign_lot (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+REFERENCES om_campaign_lot (lot_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
 
 ALTER TABLE workorder DROP CONSTRAINT IF EXISTS ext_workorder_workorder_type_fkey;
 ALTER TABLE workorder ADD CONSTRAINT ext_workorder_workorder_type_fkey FOREIGN KEY (workorder_type)

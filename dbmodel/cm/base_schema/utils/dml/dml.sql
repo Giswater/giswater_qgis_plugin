@@ -11,7 +11,7 @@ SET search_path = SCHEMA_NAME, public, pg_catalog;
 
 INSERT INTO cat_role VALUES ('role_cm_admin');
 INSERT INTO cat_role VALUES ('role_cm_org');
-INSERT INTO cat_role VALUES ('role_cm_team');	
+INSERT INTO cat_role VALUES ('role_cm_team');
 
 /*
 INSERT INTO sys_table VALUES ('cat_team', 'Catalog of teams', 'role_om', 0, NULL, NULL, NULL, NULL, NULL, NULL, 'lot_plugin') ON CONFLICT (id) DO NOTHING;
@@ -47,7 +47,7 @@ INSERT into config_param_system values ('basic_selector_tab_lot',
 
 INSERT into config_param_system values ('basic_selector_tab_campaign',
 '{"table":"temp_om_campaign","selector":"selector_campaign","table_id":"campaign_id","selector_id":"campaign_id","label":"campaign_id, '' - '', name","orderBy":"campaign_id","manageAll":true,"query_filter":"","typeaheadFilter":" AND lower(concat(id'' - '', name))","selectionMode":"keepPreviousUsingShift", "orderbyCheck":false}',
-'Variable to configura all options related to search for the specificic tab','Selector variables',null, null, true, null, 'utils', null, null, 'json','text')									
+'Variable to configura all options related to search for the specificic tab','Selector variables',null, null, true, null, 'utils', null, null, 'json','text');
 
 INSERT into config_form_tabs values ('selector_basic','tab_campaign','Campaign','Campaign','role_basic',null, null, 1, '{4}');
 INSERT into config_form_tabs values ('selector_basic','tab_lot','Lot','Lot','role_basic', null, null, 2,'{4}');

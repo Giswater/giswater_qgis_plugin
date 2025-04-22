@@ -7,7 +7,7 @@ This version of Giswater is provided by Giswater Association
 
 --FUNCTION CODE: NEW CODE FOR THIS FUNCTIN
 
-CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_setselectorscmp_data json)
+CREATE OR REPLACE FUNCTION SCHEMA_NAME.gw_fct_setselectorscm(p_data json)
   RETURNS json AS
 $BODY$
 

@@ -185,7 +185,7 @@ CREATE TABLE cat_team (
 CREATE TABLE cat_user (
     user_id serial4 PRIMARY KEY,
 	code text NULL,
-    loginname text not null
+    loginname text not NULL,
 	username text not NULL,
     fullname varchar(200) not null,
     descript text,
@@ -200,7 +200,7 @@ CREATE TABLE cat_user (
 
 CREATE TABLE om_reviewclass
 (
-  id serial NOT NULL, 
+  id serial NOT NULL,
   idval text,
   pschema_id text,
   descript text,
@@ -360,7 +360,7 @@ CREATE TABLE om_campaign_lot_x_arc
   update_at timestamp,
   update_by text,
   update_count integer,
-  update_log json, 	
+  update_log json,
   qindex1 numeric(12,3),
   qindex2 numeric(12,3),
   CONSTRAINT om_campaign_lot_x_arc_pkey PRIMARY KEY (lot_id, arc_id)
@@ -377,9 +377,9 @@ CREATE TABLE om_campaign_lot_x_connec
   update_at timestamp,
   update_by text,
   update_count integer,
-  update_log json, 	
+  update_log json,
   qindex1 numeric(12,3),
-  qindex2 numeric(12,3),	
+  qindex2 numeric(12,3),
   CONSTRAINT om_campaign_lot_x_connec_pkey PRIMARY KEY (lot_id, connec_id)
 );
 
@@ -395,9 +395,9 @@ CREATE TABLE om_campaign_lot_x_link
   update_at timestamp,
   update_by text,
   update_count integer,
-  update_log json, 	
+  update_log json,
   qindex1 numeric(12,3),
-  qindex2 numeric(12,3),,
+  qindex2 numeric(12,3),
   CONSTRAINT om_campaign_lot_x_link_pkey PRIMARY KEY (lot_id, link_id)
 );
 
