@@ -208,6 +208,11 @@ class GwElement:
         sql = "SELECT id, idval FROM edit_typevalue WHERE typevalue = 'value_verified'"
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_add_element.verified, rows, add_empty=True)
+
+        sql = "SELECT id, idval FROM edit_typevalue WHERE typevalue = 'value_lock_level'"
+        rows = tools_db.get_rows(sql)
+        tools_qt.fill_combo_values(self.dlg_add_element.lock_level, rows, add_empty=True)
+
         self._filter_elementcat_id()
 
         if self.new_element_id:
@@ -396,6 +401,7 @@ class GwElement:
         self._manage_combo(self.dlg_add_element.workcat_id, 'edit_workcat_vdefault')
         self._manage_combo(self.dlg_add_element.workcat_id_end, 'edit_workcat_id_end_vdefault')
         self._manage_combo(self.dlg_add_element.verified, 'edit_verified_vdefault')
+        self._manage_combo(self.dlg_add_element.lock_level, 'edit_lock_level_vdefault')
 
         builtdate_vdef = tools_gw.get_config_value('edit_builtdate_vdefault')
         enddate_vdef = tools_gw.get_config_value('edit_enddate_vdefault')
@@ -455,7 +461,7 @@ class GwElement:
         rotation = tools_qt.get_text(self.dlg_add_element, "rotation")
         if rotation == 0 or rotation is None or rotation == 'null':
             rotation = '0'
-        undelete = self.dlg_add_element.undelete.isChecked()
+        lock_level = tools_qt.get_combo_value(self.dlg_add_element, self.dlg_add_element.lock_level)
 
         # Check mandatory fields
         message = "You need to insert value for field"
@@ -486,19 +492,19 @@ class GwElement:
             # If object not exist perform an INSERT
             if element_id == '':
                 sql = ("INSERT INTO v_edit_element (elementcat_id,  num_elements, state, state_type"
-                       ", expl_id, rotation, comment, observ, link, undelete, builtdate, enddate, ownercat_id"
+                       ", expl_id, rotation, comment, observ, link, lock_level, builtdate, enddate, ownercat_id"
                        ", location_type, workcat_id, workcat_id_end, verified, the_geom, code)")
                 sql_values = (f" VALUES ('{elementcat_id}', '{num_elements}', '{state}', '{state_type}', "
                               f"'{expl_id}', '{rotation}', $${comment}$$, $${observ}$$, "
-                              f"$${link}$$, '{undelete}'")
+                              f"$${link}$$, '{lock_level}'")
             else:
                 sql = ("INSERT INTO v_edit_element (element_id, elementcat_id, num_elements, state, state_type"
-                       ", expl_id, rotation, comment, observ, link, undelete, builtdate, enddate, ownercat_id"
+                       ", expl_id, rotation, comment, observ, link, lock_level, builtdate, enddate, ownercat_id"
                        ", location_type, workcat_id, workcat_id_end, verified, the_geom, code)")
 
                 sql_values = (f" VALUES ('{element_id}', '{elementcat_id}', '{num_elements}',  '{state}', "
                               f"'{state_type}', '{expl_id}', '{rotation}', $${comment}$$, $${observ}$$, $${link}$$, "
-                              f"'{undelete}'")
+                              f"'{lock_level}'")
             if builtdate:
                 sql_values += f", '{builtdate}'"
             else:
@@ -555,7 +561,7 @@ class GwElement:
                    f" SET elementcat_id = '{elementcat_id}', num_elements = '{num_elements}', state = '{state}'"
                    f", state_type = '{state_type}', expl_id = '{expl_id}', rotation = '{rotation}'"
                    f", comment = $${comment}$$, observ = $${observ}$$"
-                   f", link = $${link}$$, undelete = '{undelete}'")
+                   f", link = $${link}$$, lock_level = '{lock_level}'")
             if builtdate:
                 sql += f", builtdate = '{builtdate}'"
             else:
@@ -773,7 +779,7 @@ class GwElement:
 
         # Fill input widgets with data of the @row
         cmb_widgets = ["elementcat_id", "state", "state_type", "expl_id", "ownercat_id", "location_type", "workcat_id",
-                   "workcat_id_end", "verified"]
+                   "workcat_id_end", "verified", "lock_level"]
         widgets = ["comment", "observ", "link", "rotation", "num_elements"]
         for widget_name in cmb_widgets:
             widget = dialog.findChild(QComboBox, widget_name)
@@ -783,8 +789,6 @@ class GwElement:
 
         tools_qt.set_widget_text(dialog, "builtdate", row['builtdate'])
         tools_qt.set_widget_text(dialog, "enddate", row['enddate'])
-        if str(row['undelete']) == 'True':
-            dialog.undelete.setChecked(True)
 
         # Check related @feature_type
         x1, y1, x2, y2 = None, None, None, None
