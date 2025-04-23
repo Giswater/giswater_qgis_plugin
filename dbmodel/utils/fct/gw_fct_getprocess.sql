@@ -243,6 +243,7 @@ BEGIN
 
 			v_rec_replace = (REPLACE(rec.inputparams::text, concat('"value":"', rec.inputparams::json->>'value','"'), v_value))::json;
 			v_fields = (REPLACE(v_fields::text::text,  rec.inputparams::text , v_rec_replace::text))::json;
+		    v_rec_replace := v_rec_replace::jsonb || concat('{',v_queryresult,'}')::jsonb;
 
 		END IF;
 
