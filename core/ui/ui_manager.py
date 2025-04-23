@@ -927,16 +927,6 @@ class GwAdminDbProjectUi(GwMainWindow, FORM_CLASS):
     UINAME = UINAME
 
 
-
-UINAME = "admin_cmproject"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
-
-
-class GwAdminCmProjectUi(GwMainWindow, FORM_CLASS):
-    CONTEXT = CONTEXT
-    UINAME = UINAME
-
-
 UINAME = "admin_translation"
 FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
 
@@ -1110,6 +1100,42 @@ class GwAdminVisitParamUi(GwDialog, FORM_CLASS):
     CONTEXT = CONTEXT
     UINAME = UINAME
 
+
+# admin cm
+UINAME = "admin_cm_base"
+FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+
+
+class GwAdminCmBaseUi(GwDialog, FORM_CLASS):
+    CONTEXT = CONTEXT
+    UINAME = UINAME
+
+
+UINAME = "admin_cm_create"
+FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+
+
+class GwAdminCmCreateUi(GwMainWindow, FORM_CLASS):
+    CONTEXT = CONTEXT
+    UINAME = UINAME
+
+
+UINAME = "admin_cm_example"
+FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+
+
+class GwAdminCmExampleUi(GwDialog, FORM_CLASS):
+    CONTEXT = CONTEXT
+    UINAME = UINAME
+
+
+UINAME = "admin_cm_parent"
+FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
+
+
+class GwAdminCmParentUi(GwDialog, FORM_CLASS):
+    CONTEXT = CONTEXT
+    UINAME = UINAME
 # endregion
 
 

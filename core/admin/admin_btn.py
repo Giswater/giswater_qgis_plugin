@@ -30,7 +30,8 @@ from qgis.utils import reloadPlugin
 from .gis_file_create import GwGisFileCreate
 from ..threads.task import GwTask
 from ..ui.ui_manager import GwAdminUi, GwAdminDbProjectUi, GwAdminRenameProjUi, GwAdminProjectInfoUi, \
-    GwAdminGisProjectUi, GwAdminFieldsUi, GwCredentialsUi, GwReplaceInFileUi, GwAdminCmProjectUi
+    GwAdminGisProjectUi, GwAdminFieldsUi, GwCredentialsUi, GwReplaceInFileUi, GwAdminCmBaseUi, \
+    GwAdminCmCreateUi, GwAdminCmExampleUi, GwAdminCmParentUi
 
 from ..utils import tools_gw
 from ... import global_vars
@@ -122,26 +123,6 @@ class GwAdminButton:
             return
 
         self.create_process(project)
-
-    def create_project_data_cm_schema(self):
-        """ Create cm schema """
-        self.cm_schema_name = tools_qt.get_text(self.dlg_readsql_create_cm_project, 'project_name')
-        self.cm_schema_description = tools_qt.get_text(self.dlg_readsql_create_cm_project, 'project_descript')
-
-        # Save in settings
-        tools_gw.set_config_parser('btn_admin', 'project_name_cm_schema', f'{self.cm_schema_name}', prefix=False)
-        tools_gw.set_config_parser('btn_admin', 'cm_project_descript', f'{self.cm_schema_description}',
-                                   prefix=False)
-
-        if not self._check_project_name(self.cm_schema_name, self.cm_schema_description):
-            return
-
-        answer = tools_qt.show_question("This process will take time (few minutes). Are you sure to continue?",
-                                        "Create cm schema")
-        if not answer:
-            return
-
-        self.start_create_cm_project_data_schema_task()
 
     def create_project_data_schema(self, project_name_schema=None, project_descript=None, project_type=None,
             project_srid=None, project_locale=None, is_test=False, exec_last_process=True, example_data=True):
@@ -261,22 +242,17 @@ class GwAdminButton:
         QgsApplication.taskManager().addTask(self.task_create_schema)
         QgsApplication.taskManager().triggerTask(self.task_create_schema)
 
-    def start_create_cm_project_data_schema_task(self):
+    def _run_create_cm_task(self, steps):
         self.cm_error_count = 0
-        # We retrieve the desired name of the schema, since in case there had been a schema with the same name, we had
-        # changed the value of self.schema in the function _rename_project_data_schema or _execute_last_process
-
-        # Set background task 'GwCreateSchemaCmTask'
         self.t0 = time()
         self.timer = QTimer()
         self.timer.timeout.connect(partial(self._calculate_elapsed_time, self.dlg_readsql_create_cm_project))
-
         self.timer.start(1000)
+        description = "Create CM schema"
+        self.task = GwCreateSchemaCmTask(self, description, timer=self.timer, list_process=steps)
+        QgsApplication.taskManager().addTask(self.task)
+        QgsApplication.taskManager().triggerTask(self.task)
 
-        description = "Create cm schema"
-        self.task_create_cm_schema = GwCreateSchemaCmTask(self, description, self.timer)
-        QgsApplication.taskManager().addTask(self.task_create_cm_schema)
-        QgsApplication.taskManager().triggerTask(self.task_create_cm_schema)
 
     def manage_process_result(self, project_name, project_type, is_test=False, is_utils=False, dlg=None):
         """"""
@@ -334,7 +310,7 @@ class GwAdminButton:
             self.cm_error_count = 0
             tools_qt.show_exception_message(msg=lib_vars.session_vars['last_error_msg'])
             tools_qgis.show_info("A rollback on schema will be done.")
-            if self.dlg_readsql_create_cm_projectdlg:
+            if self.dlg_readsql_create_cm_project:
                 tools_gw.close_dialog(self.dlg_readsql_create_cm_project)
 
     def execute_last_process(self, new_project=False, schema_name=None, schema_type='', locale=False, srid=None):
@@ -508,34 +484,6 @@ class GwAdminButton:
         # Set signals
         self._set_signals_create_project()
 
-    def init_dialog_create_cm_project(self):
-        """ Initialize dialog (only once) """
-
-        self.dlg_readsql_create_cm_project = GwAdminCmProjectUi(self)
-        tools_gw.load_settings(self.dlg_readsql_create_cm_project)
-        self.dlg_readsql_create_cm_project.btn_cancel_task.hide()
-
-        # Find Widgets in form
-        self.project_cm_name = self.dlg_readsql_create_cm_project.findChild(QLineEdit, 'project_name')
-        self.project_cm_descript = self.dlg_readsql_create_cm_project.findChild(QLineEdit, 'project_descript')
-
-        # Load user values
-        self.project_cm_name.setText(
-            tools_gw.get_config_parser('btn_admin', 'project_name_cm_schema', "user", "session",
-                                       False, force_reload=True))
-        self.project_cm_descript.setText(
-            tools_gw.get_config_parser('btn_admin', 'cm_project_descript', "user", "session",
-                                       False, force_reload=True))
-
-        # Set shortcut keys
-        self.dlg_readsql_create_cm_project.key_escape.connect(
-            partial(tools_gw.close_dialog, self.dlg_readsql_create_cm_project, False))
-
-        # Set signals
-        # self.dlg_readsql_create_cm_project.btn_cancel_task.clicked.connect(self.cancel_task)
-        self.dlg_readsql_create_cm_project.btn_accept.clicked.connect(partial(self.create_project_data_cm_schema))
-        self.dlg_readsql_create_cm_project.btn_close.clicked.connect(
-            partial(tools_gw.close_dialog, self.dlg_readsql_create_cm_project, False))
 
     # region 'Create Project'
 
@@ -776,10 +724,10 @@ class GwAdminButton:
         self.folder_audit_structure = os.path.join(self.sql_audit_dir, 'structure')
         self.folder_audit_activate = os.path.join(self.sql_audit_dir, 'activate')
 
-        # Declare cm db folders (QUE ES ESTO?)
+        # Declare cm db folders
         self.sql_cm_dir = os.path.join(self.sql_dir, 'cm')
-        self.folder_utils_cm = os.path.join(self.sql_cm_dir, 'utils')
-        self.folder_i18n_cm = os.path.join(self.sql_cm_dir, 'i18n')
+        self.folder_base_schema = os.path.join(self.sql_cm_dir, 'base_schema')
+        self.folder_parent_schema = os.path.join(self.sql_cm_dir, 'parent_schema')
         self.folder_example_cm = os.path.join(self.sql_cm_dir, 'example')
 
         # Variable to commit changes even if schema creation fails
@@ -1795,16 +1743,130 @@ class GwAdminButton:
         tools_gw.open_dialog(self.dlg_readsql_create_project, dlg_name='admin_dbproject')
 
     def _open_create_cm_project(self):
-        """Create Cm Project"""
+        """Open main CM launcher dialog (admin_cm_create.ui)"""
 
-        if self.dlg_readsql_create_cm_project is None:
-            self.init_dialog_create_cm_project()
+        self.dlg_readsql_create_cm_project = GwAdminCmCreateUi(self)
+        tools_gw.load_settings(self.dlg_readsql_create_cm_project)
 
-        self._update_time_elapsed("", self.dlg_readsql_create_cm_project)
+        self.dlg_readsql_create_cm_project.key_escape.connect(
+            partial(tools_gw.close_dialog, self.dlg_readsql_create_cm_project, False)
+        )
+        self.dlg_readsql_create_cm_project.btn_close.clicked.connect(
+            partial(tools_gw.close_dialog, self.dlg_readsql_create_cm_project, False)
+        )
 
-        # Open dialog
-        self.dlg_readsql_create_cm_project.setWindowTitle(f"Create Cm Project")
+        self.dlg_readsql_create_cm_project.btn_base_schema.clicked.connect(self.on_btn_create_base_clicked)
+        self.dlg_readsql_create_cm_project.btn_parent_schema.clicked.connect(self.on_btn_create_parent_clicked)
+        self.dlg_readsql_create_cm_project.btn_example.clicked.connect(self.on_btn_create_example_clicked)
+
+        self.dlg_readsql_create_cm_project.setWindowTitle("Create CM Project")
         tools_gw.open_dialog(self.dlg_readsql_create_cm_project, dlg_name='admin_cmdbproject')
+
+    def on_btn_create_base_clicked(self):
+        """Handle the 'Create Base Schema' button click."""
+
+        self.dlg_cm_base = GwAdminCmBaseUi(self)
+
+        # Pre-fill fields from config
+        self.dlg_cm_base.project_name.setText(
+            tools_gw.get_config_parser('btn_admin', 'project_name_cm_schema', "user", "session", force_reload=True))
+        self.dlg_cm_base.project_descript.setText(
+            tools_gw.get_config_parser('btn_admin', 'cm_project_descript', "user", "session", force_reload=True))
+
+        # Connect buttons
+        self.dlg_cm_base.btn_accept.clicked.connect(self._on_accept_create_base)
+        self.dlg_cm_base.btn_close.clicked.connect(self.dlg_cm_base.reject)
+        self.dlg_cm_base.btn_cancel_task.clicked.connect(self.dlg_cm_base.reject)
+
+        tools_gw.open_dialog(self.dlg_cm_base, dlg_name='admin_cm_base')
+
+    def _on_accept_create_base(self):
+        """Execute logic when Accept is clicked in Create Base Schema dialog."""
+
+        name = tools_qt.get_text(self.dlg_cm_base, 'project_name')
+        description = tools_qt.get_text(self.dlg_cm_base, 'project_descript')
+
+        tools_gw.set_config_parser('btn_admin', 'project_name_cm_schema', name, prefix=False)
+        tools_gw.set_config_parser('btn_admin', 'cm_project_descript', description, prefix=False)
+
+        if not self._check_project_name(name, description):
+            return
+
+        answer = tools_qt.show_question("This process will take time (few minutes). Are you sure to continue?",
+                                        "Create base schema")
+        if not answer:
+            return
+
+        self.cm_schema_name = name
+        self.cm_schema_description = description
+        self.base_schema_created = True
+
+        self._run_create_cm_task(['load_base_schema'])
+        self.dlg_cm_base.accept()
+
+    def on_btn_create_parent_clicked(self):
+        self.dialog_parent = GwAdminCmParentUi(self)
+        self._populate_schema_name_cm_dialog(self.dialog_parent)
+
+        if self.dialog_parent.exec_():
+            self.parent_schema_created = True
+            self.project_type_selected = tools_qt.get_text(self.dialog_parent, 'cmb_project_type')
+            self._run_create_cm_task(['load_parent_schema'])
+
+    def on_btn_create_example_clicked(self):
+        self.dialog_example = GwAdminCmExampleUi(self)
+        self._populate_schema_name_cm_dialog(self.dialog_example)
+
+        if self.dialog_example.exec_():
+            self.example_type = tools_qt.get_text(self.dialog_example, 'cmb_project_type')
+            self._run_create_cm_task(['load_example'])
+
+    def _populate_schema_name_cm_dialog(self, dialog, cmb_type_name='cmb_project_type',
+                                        cmb_schema_name='cmb_project_name'):
+        """Initial setup for project type combo and populate schema combo based on selection."""
+
+        self.cmb_type_ref = dialog.findChild(QComboBox, cmb_type_name)
+        self.cmb_schema_ref = dialog.findChild(QComboBox, cmb_schema_name)
+
+        for aux in self.project_types:
+            self.cmb_type_ref.addItem(str(aux))
+        # Connect change event to external logic
+        self.cmb_type_ref.currentIndexChanged.connect(self._on_project_type_changed)
+        self._on_project_type_changed()  # Initial population
+
+    def _on_project_type_changed(self):
+        """Update schema name combo box based on selected project type."""
+
+        project_type = self.cmb_type_ref.currentText()
+        if not project_type:
+            return
+
+        sql = "SELECT schema_name FROM information_schema.schemata"
+        rows = tools_db.get_rows(sql, commit=self.dev_commit)
+        if not rows:
+            return
+
+        result_list = []
+        for row in rows:
+            schema = row[0]
+
+            # Check if sys_version exists in this schema
+            check_sql = (
+                f"SELECT EXISTS ("
+                f"SELECT 1 FROM information_schema.tables "
+                f"WHERE table_schema = '{schema}' AND table_name = 'sys_version')"
+            )
+            exists = tools_db.get_row(check_sql)
+            if not exists or not exists[0]:
+                continue  # Skip schemas without sys_version
+
+            # Safe check on project_type
+            sql_check = f'SELECT project_type FROM "{schema}".sys_version'
+            res = tools_db.get_row(sql_check)
+            if res and res[0].upper() == project_type.upper():
+                result_list.append([schema, schema])
+
+        tools_qt.fill_combo_values(self.cmb_schema_ref, result_list)
 
     def _open_rename(self):
         """"""
@@ -1945,31 +2007,16 @@ class GwAdminButton:
                 f.close()
             return status
 
-    # QUE ES ESTO, tenog que traer i18n?
     def _execute_cm_files(self, filedir, set_progress_bar=False):
-        """"""
-
         if not os.path.exists(filedir):
             tools_log.log_info(f"Folder not found: {filedir}")
             return True
 
-        tools_log.log_info(f"Processing folder: {filedir}")
-
-        dirlist = sorted(os.listdir(filedir))
         status = True
-        # Manage folders 'i18n'
-        if 'i18n' in filedir:
-            dirlist = [f"{self.project_language}.sql"]
-        for folder in dirlist:
-            folder_path = os.path.join(filedir, folder)  # Construct full path
-
-            if not os.path.isdir(folder_path):  # Ensure it's a directory
-                continue
-            filelist = sorted(os.listdir(folder_path))
-            for file in filelist:
+        for dirpath, _, files in os.walk(filedir):
+            for file in sorted(files):
                 if file.endswith(".sql"):
-                    filepath = os.path.join(folder_path, file)  # Full path to the SQL file
-
+                    filepath = os.path.join(dirpath, file)
                     self.current_sql_file += 1
                     status = self._read_execute_cm_file(filepath, set_progress_bar)
 

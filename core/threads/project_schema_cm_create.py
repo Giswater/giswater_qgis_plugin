@@ -17,32 +17,17 @@ class GwCreateSchemaCmTask(GwTask):
 
     task_finished = pyqtSignal(list)
 
-    def __init__(self, admin, description, timer=None):
+    def __init__(self, admin, description, timer=None, list_process=None):
 
         super().__init__(description)
         self.admin = admin
         self.dict_folders_process = {}
         self.db_exception = (None, None, None)  # error, sql, filepath
         self.timer = timer
+        self.list_process = list_process or ['load_base_schema', 'load_parent_schema', 'load_example']
 
-        # Manage buttons & other dlg-related widgets
-        # Disable dlg_readsql_create_cm_project buttons
-        self.admin.dlg_readsql_create_cm_project.btn_cancel_task.show()
-        self.admin.dlg_readsql_create_cm_project.btn_accept.hide()
-        self.admin.dlg_readsql_create_cm_project.btn_close.setEnabled(False)
-        try:
-            self.admin.dlg_readsql_create_cm_project.key_escape.disconnect()
-        except TypeError:
-            pass
-
-        # Disable red 'X' from dlg_readsql_create_cm_project
-        # self.admin.dlg_readsql_create_cm_project.setWindowFlag(Qt.WindowCloseButtonHint, False)
-        self.admin.dlg_readsql_create_cm_project.show()
-        # Disable dlg_readsql buttons
-        self.admin.dlg_readsql.btn_close.setEnabled(False)
 
     def run(self):
-
         super().run()
         self.finish_execution = {'import_data': False}
         self.dict_folders_process = {}
@@ -101,7 +86,7 @@ class GwCreateSchemaCmTask(GwTask):
 
         self.admin.progress_ratio = 0.8
         self.admin.total_sql_files = self.calculate_number_of_files()
-        for process in ['load_utils', 'load_example', 'load_i18n']:
+        for process in self.list_process:
             status = self.admin.load_cm_folder(self.dict_folders_process[process])
             if (not tools_os.set_boolean(status, False) and tools_os.set_boolean(self.admin.dev_commit, False) is False) \
                     or self.isCanceled():
@@ -113,9 +98,8 @@ class GwCreateSchemaCmTask(GwTask):
 
         total_sql_files = 0
         dict_process = {}
-        list_process = ['load_utils', 'load_example', 'load_i18n']
 
-        for process_name in list_process:
+        for process_name in self.list_process:
             dict_folders, total = self.get_number_of_files_process(process_name)
             total_sql_files += total
             dict_process[process_name] = total
@@ -142,18 +126,15 @@ class GwCreateSchemaCmTask(GwTask):
         """ Get list of folders related with this @process_name """
 
         dict_folders = {}
-        if process_name == 'load_utils':
-            dict_folders[self.admin.folder_utils_cm] = 0
+
+        if process_name == 'load_base_schema':
+            dict_folders[self.admin.folder_base_schema] = 0
+
+        elif process_name == 'load_parent_schema':
+            dict_folders[self.admin.folder_parent_schema] = 0
 
         elif process_name == 'load_example':
             dict_folders[self.admin.folder_example_cm] = 0
-
-        # elif process_name == 'load_i18n':
-        #    dict_folders[self.admin.folder_i18n_cm] = 0
-
-            # dict_folders[os.path.join(self.admin.folder_cm_updates, '2023-05')] = 0
-            # dict_folders[os.path.join(self.admin.folder_cm_updates, '2024-01')] = 0
-            # dict_folders[os.path.join(self.admin.folder_cm_updates, '2024-01','i18n')] = 0
 
         return dict_folders
 

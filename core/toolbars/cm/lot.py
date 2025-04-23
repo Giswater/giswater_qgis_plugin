@@ -88,7 +88,6 @@ class AddNewLot:
 
         # Get layers of every feature_type
         tools_gw.reset_feature_list()
-        tools_gw.reset_layers()
         self.layers['arc'] = [tools_qgis.get_layer_by_tablename('v_edit_arc')]
         self.layers['node'] = [tools_qgis.get_layer_by_tablename('v_edit_node')]
         self.layers['connec'] = [tools_qgis.get_layer_by_tablename('v_edit_connec')]
