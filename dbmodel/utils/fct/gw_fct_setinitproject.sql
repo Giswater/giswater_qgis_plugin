@@ -57,7 +57,7 @@ BEGIN
 
 	-- check if role name exists
 	IF v_user IS NOT NULL THEN
-		SELECT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = quote_ident(v_user)) INTO v_rol_exists;
+		SELECT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = v_user) INTO v_rol_exists;
 		IF NOT v_rol_exists THEN
 			v_message := concat('The user ''', v_user, ''' does not exist in the database. Please contact an administrator.');
 			RETURN ('{"status":"Failed", "message":{"level":1, "text":"'|| v_message ||'"}, "version":"'||v_version||'"'||'}')::json;

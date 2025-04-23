@@ -312,6 +312,8 @@ BEGIN
 	EXECUTE ' DELETE FROM temp_t_node WHERE epa_type =''TODELETE''';
 
 	-- get endpoint shorpipes and associated pipes and transform it in a simply node
+	DROP TABLE IF EXISTS t_arc_endpoint;
+
 	CREATE TEMP TABLE t_arc_endpoint AS
 	WITH query as (SELECT node_id FROM node JOIN
 	(SELECT count(*)as numarcs, node_id FROM node n JOIN
