@@ -30,6 +30,7 @@ v_arc_epa text;
 v_new_child_layer text;
 v_old_child_layer text;
 v_isrenameview boolean;
+v_parent_layer text;
 
 BEGIN
 
@@ -140,6 +141,11 @@ BEGIN
 		FROM sys_feature_class WHERE id='||quote_literal(NEW.feature_class)
 		INTO v_feature;
 
+        SELECT parent_layer INTO v_parent_layer FROM cat_feature WHERE id=NEW.id;
+		IF v_parent_layer IS NULL THEN
+        	EXECUTE 'UPDATE cat_feature SET parent_layer =  concat(''v_edit_'',lower('||quote_literal(v_feature.type)||'))
+        	WHERE id = '||quote_literal(NEW.id)||';';
+		END IF;
 		EXECUTE 'UPDATE cat_feature SET feature_type = '||quote_literal(v_feature.type)||' WHERE id = '||quote_literal(NEW.id)||';';
 
 		IF lower(v_feature.type)='arc' THEN

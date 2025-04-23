@@ -17,12 +17,12 @@ INSERT INTO cat_material (id, descript, feature_type, featurecat_id, n, link, ac
 INSERT INTO cat_material (id, descript, feature_type, featurecat_id, n, link, active) VALUES('FD', 'FD', '{NODE,ELEMENT,GULLY}', NULL, NULL, NULL, true);
 INSERT INTO cat_material (id, descript, feature_type, featurecat_id, n, link, active) VALUES('Iron', 'Iron', '{NODE,ELEMENT,GULLY}', NULL, NULL, NULL, true);
 
-INSERT INTO cat_element VALUES ('COVER70', 'COVER', 'FD', '70 cm', 'Cover iron Ø70cm', NULL, NULL, NULL, NULL, NULL, true, NULL, NULL, NULL);
-INSERT INTO cat_element VALUES ('COVER70X70', 'COVER', 'FD', '70x70cm', 'Cover iron 70x70cm', NULL, NULL, NULL, NULL, NULL, true, NULL, NULL, NULL);
-INSERT INTO cat_element VALUES ('STEP200', 'STEP', 'Iron', '20x20X20cm', 'Step iron 20x20cm', NULL, NULL, NULL, NULL, NULL, true, NULL, NULL, NULL);
-INSERT INTO cat_element VALUES ('PUMP_ABS', 'PUMP', 'Iron', NULL, 'Model ABS AFP 1001 M300/4-43', NULL, NULL, NULL, NULL, NULL, true, NULL, NULL, NULL);
-INSERT INTO cat_element VALUES ('HYDROGEN SULFIDE SENSOR', 'IOT_SENSOR', 'Iron', '10x10x10cm', 'Hydrogen sulfide sensor', NULL, NULL, NULL, NULL, NULL, true, NULL, NULL, NULL);
-INSERT INTO cat_element VALUES ('WEEL PROTECTOR', 'PROTECTOR', 'Iron', '50x10x5cm', 'Weel protector', NULL, NULL, NULL, NULL, NULL, true, NULL, NULL, NULL);
+INSERT INTO cat_element VALUES ('COVER70', 'ECOVER', 'FD', '70 cm', 'Cover iron Ø70cm', NULL, NULL, NULL, NULL, NULL, true, NULL, NULL, NULL);
+INSERT INTO cat_element VALUES ('COVER70X70', 'ECOVER', 'FD', '70x70cm', 'Cover iron 70x70cm', NULL, NULL, NULL, NULL, NULL, true, NULL, NULL, NULL);
+INSERT INTO cat_element VALUES ('STEP200', 'ESTEP', 'Iron', '20x20X20cm', 'Step iron 20x20cm', NULL, NULL, NULL, NULL, NULL, true, NULL, NULL, NULL);
+INSERT INTO cat_element VALUES ('PUMP_ABS', 'EPUMP', 'Iron', NULL, 'Model ABS AFP 1001 M300/4-43', NULL, NULL, NULL, NULL, NULL, true, NULL, NULL, NULL);
+INSERT INTO cat_element VALUES ('HYDROGEN SULFIDE SENSOR', 'EIOT_SENSOR', 'Iron', '10x10x10cm', 'Hydrogen sulfide sensor', NULL, NULL, NULL, NULL, NULL, true, NULL, NULL, NULL);
+INSERT INTO cat_element VALUES ('WEEL PROTECTOR', 'EPROTECTOR', 'Iron', '50x10x5cm', 'Weel protector', NULL, NULL, NULL, NULL, NULL, true, NULL, NULL, NULL);
 
 INSERT INTO cat_arc VALUES ('SIPHON-CC100', 'SIPHON', NULL, 'CIRCULAR', 1.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, NULL, 'Conduit', NULL, NULL, NULL, NULL, 0.10, 0.10, 1.30, 0.7854, 2.20, 0.15, 'm', 'A_CON_DN100', 'S_REP', 'S_NULL', true, NULL, NULL, NULL, NULL, 'N_CONNECTION', NULL);
 INSERT INTO cat_arc VALUES ('WACCEL-CC020', 'WACCEL', NULL, 'CIRCULAR', 0.2000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, NULL, 'Conduit', NULL, NULL, NULL, NULL, 0.10, 0.10, 0.26, 0.0314, 1.40, 0.03, 'm', 'A_PVC_DN20', 'S_REP', 'S_NULL', true, NULL, NULL, NULL, NULL, 'N_CONNECTION', NULL);
@@ -191,15 +191,15 @@ UPDATE cat_feature SET shortcut_key='Alt+Z' WHERE id = 'ESCOMESA_FICTICIA';
 UPDATE cat_feature SET shortcut_key='Alt+1' WHERE id = 'VGULLY';
 UPDATE cat_feature SET shortcut_key='Alt+2' WHERE id = 'VCONNEC';
 
-INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) VALUES ('ORIFICE', 'FRELEM','ELEMENT', 've_frelem', 've_frelem_orifice', true) ON CONFLICT (id) DO NOTHING;
-INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) VALUES ('OUTLET', 'FRELEM','ELEMENT', 've_frelem', 've_frelem_outlet', true) ON CONFLICT (id) DO NOTHING;
+INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) VALUES ('EORIFICE', 'FRELEM','ELEMENT', 've_frelem', 've_frelem_orifice', true) ON CONFLICT (id) DO NOTHING;
+INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) VALUES ('EOUTLET', 'FRELEM','ELEMENT', 've_frelem', 've_frelem_outlet', true) ON CONFLICT (id) DO NOTHING;
 INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) VALUES ('EWEIR', 'FRELEM','ELEMENT', 've_frelem', 've_frelem_eweir', true) ON CONFLICT (id) DO NOTHING;
-INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) VALUES ('PUMP', 'FRELEM','ELEMENT', 've_frelem', 've_frelem_pump', true) ON CONFLICT (id) DO NOTHING;
+INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) VALUES ('EPUMP', 'FRELEM','ELEMENT', 've_frelem', 've_frelem_pump', true) ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO cat_element (id, element_type, active) VALUES ('ORIFICE-01', 'ORIFICE', TRUE) ON CONFLICT (id) DO NOTHING;
-INSERT INTO cat_element (id, element_type, active) VALUES ('OUTLET-01', 'OUTLET', TRUE) ON CONFLICT (id) DO NOTHING;
+INSERT INTO cat_element (id, element_type, active) VALUES ('ORIFICE-01', 'EORIFICE', TRUE) ON CONFLICT (id) DO NOTHING;
+INSERT INTO cat_element (id, element_type, active) VALUES ('OUTLET-01', 'EOUTLET', TRUE) ON CONFLICT (id) DO NOTHING;
 INSERT INTO cat_element (id, element_type, active) VALUES ('EWEIR-01', 'EWEIR', TRUE) ON CONFLICT (id) DO NOTHING;
-INSERT INTO cat_element (id, element_type, active) VALUES ('PUMP-01', 'PUMP', TRUE) ON CONFLICT (id) DO NOTHING;
+INSERT INTO cat_element (id, element_type, active) VALUES ('PUMP-01', 'EPUMP', TRUE) ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO cat_link (id, matcat_id, descript, link, brand_id, model_id, svg, estimated_depth, active, label)
 SELECT id, matcat_id, descript, link, brand_id, model_id, svg, estimated_depth, active, label
