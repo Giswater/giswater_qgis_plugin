@@ -2753,6 +2753,10 @@ class GwInfo(QObject):
 
         if complet_list is False:
             return False, False
+
+        # Get headers from complet_list
+        headers = complet_list['body']['form']['headers']
+
         for field in complet_list['body']['data']['fields']:
             if 'hidden' in field and field['hidden']:
                 continue
@@ -2761,10 +2765,10 @@ class GwInfo(QObject):
             if widget is None:
                 continue
             short_name = field['widgetname'].replace(f"tab_{tab_name}_", "", 1)
-            widget = tools_gw.add_tableview_header(widget, field)
+            widget = tools_gw.add_tableview_header(widget, field, headers)
             widget = tools_gw.fill_tableview_rows(widget, field)
             tools_qt.set_tableview_config(widget, edit_triggers=QTableView.DoubleClicked, sectionResizeMode=0)
-            widget = tools_gw.set_tablemodel_config(dialog, widget, linkedobject, 1)
+            widget: QWidget = tools_gw.set_tablemodel_config(dialog, widget, linkedobject, 1)
             if 'tab_epa' in widgetname:
                 widget.doubleClicked.connect(partial(epa_tbl_doubleClicked, widget, self.dlg_cf))
                 model = widget.model()

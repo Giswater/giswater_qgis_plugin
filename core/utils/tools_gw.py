@@ -13,7 +13,7 @@ import random
 import re
 import sys
 import sqlite3
-from typing import Literal, Dict
+from typing import Literal, Dict, Optional
 import webbrowser
 import xml.etree.ElementTree as ET
 from sip import isdeleted
@@ -3721,7 +3721,7 @@ def get_icon(icon, folder="dialogs"):
         return None
 
 
-def add_tableview_header(widget, field):
+def add_tableview_header(widget: QWidget, field: dict, json_headers: Optional[list] = []) -> QWidget:
 
     model = widget.model()
     if model is None:
@@ -3734,8 +3734,16 @@ def add_tableview_header(widget, field):
     try:
         # Get headers
         headers = []
-        for x in field['value'][0]:
-            headers.append(x)
+
+        if field['value'] is not None:
+            for x in field['value'][0]:
+                headers.append(x)
+
+        # If there are not rows in tableview, set headers from json_headers
+        if len(headers) == 0 and json_headers:
+            for header in json_headers:
+                headers.append(header['header'])
+
         # Set headers
         model.setHorizontalHeaderLabels(headers)
     except Exception as e:

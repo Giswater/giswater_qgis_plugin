@@ -129,7 +129,7 @@ def delete_object(**kwargs):
         tablename = f"v_ui_{func_params['sourceview']}"
 
     qtable_name = func_params['targetwidget']
-    qtable = tools_qt.get_widget(dialog, f"{qtable_name}")
+    qtable: QTableView = tools_qt.get_widget(dialog, f"{qtable_name}")
 
     # Get selected rows
     selected_list = qtable.selectionModel().selectedRows()
@@ -798,6 +798,9 @@ def fill_tbl(complet_result, dialog, widgetname, linkedobject, filter_fields):
 
     if complet_list is False:
         return False, False
+
+    headers = complet_list['body']['form'].get('headers')
+
     for field in complet_list['body']['data']['fields']:
         if 'hidden' in field and field['hidden']:
             continue
@@ -805,7 +808,7 @@ def fill_tbl(complet_result, dialog, widgetname, linkedobject, filter_fields):
         widget = dialog.findChild(QTableView, field['widgetname'])
         if widget is None:
             continue
-        widget = tools_gw.add_tableview_header(widget, field)
+        widget = tools_gw.add_tableview_header(widget, field, headers)
         widget = tools_gw.fill_tableview_rows(widget, field)
         widget = tools_gw.set_tablemodel_config(dialog, widget, field['widgetname'], 1)
         tools_qt.set_tableview_config(widget)
