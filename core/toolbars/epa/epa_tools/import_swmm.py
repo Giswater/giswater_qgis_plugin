@@ -19,7 +19,6 @@ from qgis.PyQt.QtCore import Qt, QTimer
 from qgis.PyQt.QtWidgets import (
     QActionGroup,
     QComboBox,
-    QFileDialog,
     QLabel,
     QTableWidget,
     QTableWidgetItem,
@@ -94,20 +93,17 @@ class GwImportSwmm:
             tools_qgis.show_message(message)
 
     def _get_file(self) -> Optional[Path]:
-        # Load a select file dialog for select a file with .inp extension
-        result: Tuple[str, str] = QFileDialog.getOpenFileName(
-            None, "Select an INP file", "", "INP files (*.inp)"
+        """ Get the INP file path from the user. """
+        file_path = tools_qt.get_file(
+            "Select INP file", "","INP files (*.inp)"
         )
-        file_path_str: str = result[0]
-        if file_path_str:
-            file_path: Path = Path(file_path_str)
 
-            # Check if the file extension is .inp
-            if file_path.suffix == ".inp":
-                return file_path
-            else:
-                tools_qgis.show_warning("The file selected is not an INP file")
-                return
+        # Check if the file extension is .inp
+        if file_path and file_path.suffix == ".inp":
+            return file_path
+        else:
+            tools_qgis.show_warning("The file selected is not an INP file")
+            return
 
     def parse_inp_file(self, file_path: Path) -> None:
         """Parse INP file, showing a log to the user"""

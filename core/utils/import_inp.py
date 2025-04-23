@@ -16,7 +16,7 @@ from math import isnan
 
 from psycopg2.extras import execute_values
 
-from qgis.PyQt.QtWidgets import QMenu, QFileDialog, QComboBox
+from qgis.PyQt.QtWidgets import QMenu, QComboBox
 
 from ...libs import tools_log, tools_qgis, tools_qt, lib_vars, tools_db
 from ... import global_vars
@@ -196,12 +196,9 @@ def _load_config_from_file(self_cls):
     """Load configuration from a file"""
 
     config_folder = f'{lib_vars.user_folder_dir}{os.sep}core{os.sep}temp'
-    result: Tuple[str, str] = QFileDialog.getOpenFileName(
-        None, "Select a configuration file", config_folder, "JSON files (*.json)"
-    )
-    file_path_str: str = result[0]
-    if file_path_str:
-        config_path: Path = Path(file_path_str)
+    config_path: Optional[Path] = tools_qt.get_file("Select a configuration file", config_folder, "JSON files (*.json)")
+
+    if config_path:
         config = GwInpConfig()
         config.read_from_file(config_path)
         load_config(self_cls, config)
@@ -210,12 +207,9 @@ def _load_config_from_file(self_cls):
 def save_config_to_file(self_cls):
     """Save configuration to a file"""
 
-    result: Tuple[str, str] = QFileDialog.getSaveFileName(
-        None, "Save configuration file", "", "JSON files (*.json)"
-    )
-    file_path_str: str = result[0]
-    if file_path_str:
-        config_path: Path = Path(file_path_str)
+    config_path: Optional[Path] = tools_qt.get_file("Select a configuration file", "", "JSON files (*.json)")
+
+    if config_path:
         workcat, exploitation, sector, municipality, dscenario, catalogs = self_cls._get_config_values()
         save_config(self_cls, workcat=workcat, exploitation=exploitation, sector=sector, municipality=municipality, dscenario=dscenario, catalogs=catalogs, _config_path=config_path)
 
