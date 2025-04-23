@@ -492,7 +492,8 @@ SELECT element.element_id,
     element.created_by,
     element.updated_at,
     element.updated_by,
-    element.the_geom
+    element.the_geom,
+    element.epa_type
    FROM selector_expl, element
     JOIN cat_element ON element.elementcat_id::text = cat_element.id::text
     LEFT JOIN cat_feature_element ON cat_element.element_type::text = cat_feature_element.id::text
