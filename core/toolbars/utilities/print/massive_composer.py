@@ -9,7 +9,7 @@ import os
 from functools import partial
 
 from qgis.core import QgsApplication, QgsLayoutExporter, QgsProject
-from qgis.PyQt.QtWidgets import QAction, QFileDialog, QLabel
+from qgis.PyQt.QtWidgets import QAction, QLabel
 
 from ....threads.composer_pages import GwComposerPages
 from ....ui.ui_manager import GwCompPagesUi
@@ -64,19 +64,7 @@ class GwMassiveComposer:
         """ Get folder dialog """
 
         # Check if selected folder exists. Set default value if necessary
-        folder_path = tools_qt.get_text(dialog, widget)
-        if folder_path in (None, 'null') or not os.path.exists(folder_path):
-            folder_path = os.path.expanduser("~")
-
-        # Open dialog to select folder
-        os.chdir(folder_path)
-        file_dialog = QFileDialog()
-        file_dialog.setFileMode(QFileDialog.Directory)
-        message = "Select folder"
-        folder_path = file_dialog.getExistingDirectory(
-            parent=None, caption=tools_qt.tr(message), directory=folder_path)
-        if folder_path:
-            tools_qt.set_widget_text(dialog, widget, str(folder_path))
+        tools_qt.get_folder_path(dialog, widget)
 
     def populate_cmb_composers(self, combo):
         """

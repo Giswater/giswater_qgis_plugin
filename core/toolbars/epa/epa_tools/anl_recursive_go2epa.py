@@ -121,18 +121,7 @@ class RecursiveEpa():
         """ Get folder dialog """
 
         # Check if selected folder exists. Set default value if necessary
-        folder_path = tools_qt.get_text(self.dlg_epa, widget)
-        if folder_path in (None, 'null') or not os.path.exists(folder_path):
-            folder_path = os.path.expanduser("~")
-
-        # Open dialog to select folder
-        file_dialog = QFileDialog()
-        file_dialog.setFileMode(QFileDialog.Directory)
-        message = "Select folder"
-        folder_path = file_dialog.getExistingDirectory(
-            parent=None, caption=tools_qt.tr(message), directory=folder_path)
-        if folder_path:
-            tools_qt.set_widget_text(self.dlg_epa, widget, str(folder_path))
+        tools_qt.get_folder_path(self.dlg_epa, widget)
 
     def _enable_cancel_btn(self, enable):
         if enable:
