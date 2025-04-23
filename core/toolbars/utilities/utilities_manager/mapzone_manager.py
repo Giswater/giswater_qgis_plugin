@@ -58,9 +58,12 @@ class GwMapzoneManager:
         self.mapzone_mng_dlg.btn_flood.setEnabled(False)
 
         default_tab_idx = 0
-        tabs = ['sector', 'dma', 'presszone', 'dqa', 'supplyzone', 'macrodma', 'macrosector']
-        if global_vars.project_type == 'ud':
-            tabs = ['drainzone', 'macrosector', 'sector', 'dwfzone']
+        tabs = ['sector', 'macrosector', 'omzone', 'macroomzone']
+        project_tabs = {'ws': ['dma', 'dqa', 'macrodma', 'macrodqa', 'supplyzone', 'presszone'],
+                        'ud': ['drainzone', 'dwfzone']}
+
+        tabs.extend(project_tabs.get(global_vars.project_type, []))
+
         for tab in tabs:
             view = f'v_ui_{tab}'
             qtableview = QTableView()
