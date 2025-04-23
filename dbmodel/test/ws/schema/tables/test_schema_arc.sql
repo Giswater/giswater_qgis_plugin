@@ -27,7 +27,7 @@ SELECT columns_are(
         'inventory', 'expl_id', 'num_value', 'feature_type',
         'minsector_id', 'dqa_id', 'district_id', 'adate', 'adescript', 'workcat_id_plan', 'asset_id', 'pavcat_id',
         'nodetype_1', 'elevation1', 'depth1', 'staticpress1', 'nodetype_2', 'elevation2', 'depth2', 'staticpress2',
-        'om_state', 'conserv_state', 'parent_id', 'expl_id2', 'brand_id', 'model_id', 'serial_number', 'label_quadrant',
+        'om_state', 'conserv_state', 'parent_id', 'expl_visibility', 'brand_id', 'model_id', 'serial_number', 'label_quadrant',
         'macrominsector_id', 'streetname', 'streetname2', 'supplyzone_id', 'datasource', 'lock_level', 'is_scadamap',
         'omzone_id', 'the_geom', 'created_at', 'created_by', 'updated_at', 'updated_by'
     ],
@@ -42,7 +42,7 @@ SELECT has_index('arc', 'arc_arccat', 'Table should have index on arccat_id');
 SELECT has_index('arc', 'arc_dma', 'Table should have index on dma_id');
 SELECT has_index('arc', 'arc_dqa', 'Table should have index on dqa_id');
 SELECT has_index('arc', 'arc_exploitation', 'Table should have index on expl_id');
-SELECT has_index('arc', 'arc_exploitation2', 'Table should have index on expl_id2');
+SELECT has_index('arc', 'arc_expl_visibility_idx', 'Table should have index on expl_visibility');
 SELECT has_index('arc', 'arc_index', 'Table should have spatial index');
 SELECT has_index('arc', 'arc_muni', 'Table should have index on muni_id');
 SELECT has_index('arc', 'arc_node1', 'Table should have index on node_1');
@@ -121,7 +121,7 @@ SELECT col_type_is('arc', 'staticpress2', 'numeric(12,3)', 'Column staticpress2 
 SELECT col_type_is('arc', 'om_state', 'text', 'Column om_state should be text');
 SELECT col_type_is('arc', 'conserv_state', 'text', 'Column conserv_state should be text');
 SELECT col_type_is('arc', 'parent_id', 'varchar(16)', 'Column parent_id should be varchar(16)');
-SELECT col_type_is('arc', 'expl_id2', 'integer', 'Column expl_id2 should be integer');
+SELECT col_type_is('arc', 'expl_visibility', 'integer[]', 'Column expl_visibility should be integer[]');
 SELECT col_type_is('arc', 'brand_id', 'varchar(50)', 'Column brand_id should be varchar(50)');
 SELECT col_type_is('arc', 'model_id', 'varchar(50)', 'Column model_id should be varchar(50)');
 SELECT col_type_is('arc', 'serial_number', 'varchar(100)', 'Column serial_number should be varchar(100)');
@@ -147,7 +147,6 @@ SELECT fk_ok('arc', ARRAY['district_id'], 'ext_district', ARRAY['district_id'], 
 SELECT fk_ok('arc', ARRAY['dma_id'], 'dma', ARRAY['dma_id'], 'Table should have foreign key from dma_id to dma.dma_id');
 SELECT fk_ok('arc', ARRAY['dqa_id'], 'dqa', ARRAY['dqa_id'], 'Table should have foreign key from dqa_id to dqa.dqa_id');
 SELECT fk_ok('arc', ARRAY['expl_id'], 'exploitation', ARRAY['expl_id'], 'Table should have foreign key from expl_id to exploitation.expl_id');
-SELECT fk_ok('arc', ARRAY['expl_id2'], 'exploitation', ARRAY['expl_id'], 'Table should have foreign key from expl_id2 to exploitation.expl_id');
 SELECT fk_ok('arc', ARRAY['feature_type'], 'sys_feature_type', ARRAY['id'], 'Table should have foreign key from feature_type to sys_feature_type.id');
 SELECT fk_ok('arc', ARRAY['muni_id'], 'ext_municipality', ARRAY['muni_id'], 'Table should have foreign key from muni_id to ext_municipality.muni_id');
 SELECT fk_ok('arc', ARRAY['node_1'], 'node', ARRAY['node_id'], 'Table should have foreign key from node_1 to node.node_id');

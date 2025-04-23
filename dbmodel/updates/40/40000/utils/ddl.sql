@@ -365,7 +365,7 @@ CREATE TABLE archived_psector_link_traceability (
     presszone_id int4 NULL,
     dqa_id int4 NULL,
     minsector_id int4 NULL,
-    expl_id2 int4 NULL,
+    expl_visibility int2[] NULL,
     epa_type varchar(16) NULL,
     is_operative bool NULL,
     insert_user varchar(50) NULL,

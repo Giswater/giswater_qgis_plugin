@@ -28,7 +28,7 @@ SELECT columns_are(
         'feature_type', 'pjoint_type', 'pjoint_id',
         'minsector_id', 'dqa_id', 'staticpressure', 'district_id', 'adate', 'adescript', 'accessibility',
         'workcat_id_plan', 'asset_id', 'epa_type', 'om_state', 'conserv_state', 'priority',
-        '_valve_type', '_shutoff_valve', 'access_type', 'placement_type', 'crmzone_id', 'expl_id2', 'plot_code',
+        '_valve_type', '_shutoff_valve', 'access_type', 'placement_type', 'crmzone_id', 'expl_visibility', 'plot_code',
         'brand_id', 'model_id', 'serial_number', 'label_quadrant', 'macrominsector_id', 'n_hydrometer',
         'streetname', 'streetname2', 'n_inhabitants', 'supplyzone_id', 'datasource', 'lock_level', 'block_zone',
         'omzone_id', 'the_geom', 'created_at', 'created_by', 'updated_at', 'updated_by'
@@ -107,7 +107,7 @@ SELECT col_type_is('connec', '_shutoff_valve', 'text', 'Column _shutoff_valve sh
 SELECT col_type_is('connec', 'access_type', 'text', 'Column access_type should be text');
 SELECT col_type_is('connec', 'placement_type', 'text', 'Column placement_type should be text');
 SELECT col_type_is('connec', 'crmzone_id', 'int4', 'Column crmzone_id should be int4');
-SELECT col_type_is('connec', 'expl_id2', 'int4', 'Column expl_id2 should be int4');
+SELECT col_type_is('connec', 'expl_visibility', 'integer[]', 'Column expl_visibility should be integer[]');
 SELECT col_type_is('connec', 'plot_code', 'varchar', 'Column plot_code should be varchar');
 SELECT col_type_is('connec', 'brand_id', 'varchar(50)', 'Column brand_id should be varchar(50)');
 SELECT col_type_is('connec', 'model_id', 'varchar(50)', 'Column model_id should be varchar(50)');
@@ -173,6 +173,7 @@ SELECT col_default_is('connec', 'macrominsector_id', '0', 'Column macrominsector
 -- Check indexes
 SELECT has_index('connec', 'connec_sys_code_idx', 'Table should have index on sys_code');
 SELECT has_index('connec', 'connec_asset_id_idx', 'Table should have index on asset_id');
+SELECT has_index('connec', 'connec_expl_visibility_idx', 'Table should have index on expl_visibility');
 
 SELECT col_has_check('connec', 'epa_type', 'Column epa_type should have check constraint');
 

@@ -141,7 +141,7 @@ CREATE OR REPLACE VIEW ve_frelem AS
     element.expl_id,
     element.pol_id,
     element.top_elev,
-    element.expl_id2,
+    element.expl_visibility,
     element.trace_featuregeom,
     element.muni_id,
     element.sector_id,
@@ -202,7 +202,7 @@ AS SELECT polygon.pol_id,
     FROM polygon
     JOIN connec ON polygon.feature_id = connec.connec_id
     LEFT JOIN plan_psector_x_connec pp ON polygon.feature_id = pp.connec_id
-    JOIN selector_expl se ON (se.cur_user =current_user AND se.expl_id = connec.expl_id) or (se.cur_user =current_user and se.expl_id = connec.expl_id2)
+    JOIN selector_expl se ON (se.cur_user =current_user AND se.expl_id = connec.expl_id) or (se.cur_user =current_user and se.expl_id = ANY(connec.expl_visibility))
     JOIN selector_sector sc ON (sc.cur_user = CURRENT_USER AND sc.sector_id = connec.sector_id)
     JOIN selector_psector sp ON sp.cur_user = current_user AND sp.psector_id = pp.psector_id
     JOIN selector_state ss ON ss.cur_user = current_user AND connec.state = ss.state_id;
@@ -218,7 +218,7 @@ AS SELECT polygon.pol_id,
     FROM polygon
     LEFT JOIN plan_psector_x_node pp ON polygon.feature_id = pp.node_id
     JOIN node ON polygon.feature_id = node.node_id
-    JOIN selector_expl se ON (se.cur_user =current_user AND se.expl_id = node.expl_id) or (se.cur_user =current_user and se.expl_id = node.expl_id2)
+    JOIN selector_expl se ON (se.cur_user =current_user AND se.expl_id = node.expl_id) or (se.cur_user =current_user and se.expl_id = ANY(node.expl_visibility))
     JOIN selector_sector sc ON (sc.cur_user = CURRENT_USER AND sc.sector_id = node.sector_id)
     JOIN selector_psector sp ON sp.cur_user = current_user AND sp.psector_id = pp.psector_id
     JOIN selector_state ss ON ss.cur_user = current_user AND node.state = ss.state_id;
@@ -484,7 +484,7 @@ AS SELECT polygon.pol_id,
     polygon.trace_featuregeom
     FROM polygon
     JOIN connec ON polygon.feature_id::text = connec.connec_id::text
-    JOIN selector_expl se ON (se.cur_user = CURRENT_USER AND se.expl_id = connec.expl_id) or (se.cur_user = CURRENT_USER and se.expl_id = connec.expl_id2)
+    JOIN selector_expl se ON (se.cur_user = CURRENT_USER AND se.expl_id = connec.expl_id) or (se.cur_user = CURRENT_USER and se.expl_id = ANY(connec.expl_visibility))
     JOIN selector_sector ss ON (ss.cur_user = CURRENT_USER AND ss.sector_id = connec.sector_id)
     JOIN selector_municipality sm ON (sm.cur_user = CURRENT_USER AND sm.muni_id = connec.muni_id);
 
@@ -498,7 +498,7 @@ AS SELECT polygon.pol_id,
     polygon.trace_featuregeom
     FROM polygon
     JOIN node ON polygon.feature_id::text = node.node_id::text
-    JOIN selector_expl se ON (se.cur_user =CURRENT_USER AND se.expl_id = node.expl_id) or (se.cur_user = CURRENT_USER and se.expl_id = node.expl_id2)
+    JOIN selector_expl se ON (se.cur_user =CURRENT_USER AND se.expl_id = node.expl_id) or (se.cur_user = CURRENT_USER and se.expl_id = ANY(node.expl_visibility))
     JOIN selector_sector ss ON (ss.cur_user = CURRENT_USER AND ss.sector_id = node.sector_id)
     JOIN selector_municipality sm ON (sm.cur_user = CURRENT_USER AND sm.muni_id = node.muni_id);
 
@@ -509,7 +509,7 @@ AS SELECT element.pol_id,
     polygon.trace_featuregeom
     FROM polygon
     JOIN element ON polygon.feature_id::text = element.element_id::text
-    JOIN selector_expl se ON (se.cur_user =CURRENT_USER AND se.expl_id = element.expl_id) or (se.cur_user = CURRENT_USER and se.expl_id = element.expl_id2)
+    JOIN selector_expl se ON (se.cur_user =CURRENT_USER AND se.expl_id = element.expl_id) or (se.cur_user = CURRENT_USER and se.expl_id = ANY(element.expl_visibility))
     JOIN selector_sector ss ON (ss.cur_user = CURRENT_USER AND ss.sector_id = element.sector_id)
     JOIN selector_municipality sm ON (sm.cur_user = CURRENT_USER AND sm.muni_id = element.muni_id);
 
@@ -659,15 +659,15 @@ AS WITH p AS (
          SELECT link.link_id,
             link.state,
             link.expl_id,
-            link.expl_id2
+            link.expl_visibility
            FROM link
         )
-(
+        (
          SELECT l.link_id
            FROM selector_state,
             se,
             l
-          WHERE l.state = selector_state.state_id AND (l.expl_id = se.expl_id OR l.expl_id2 = se.expl_id) AND selector_state.cur_user = "current_user"()::text AND se.cur_user = "current_user"()::text
+          WHERE l.state = selector_state.state_id AND (l.expl_id = se.expl_id OR l.expl_id = ANY(l.expl_visibility)) AND selector_state.cur_user = "current_user"()::text AND se.cur_user = "current_user"()::text
         EXCEPT ALL
          SELECT p.link_id
            FROM cf,
@@ -676,14 +676,14 @@ AS WITH p AS (
             p
              JOIN l USING (link_id)
           WHERE p.psector_id = sp.psector_id AND sp.cur_user = "current_user"()::text AND p.state = 0 AND l.expl_id = se.expl_id AND se.cur_user = CURRENT_USER::text AND cf.value IS TRUE
-) UNION ALL
- SELECT p.link_id
-   FROM cf,
-    sp,
-    se,
-    p
-     JOIN l USING (link_id)
-  WHERE p.psector_id = sp.psector_id AND sp.cur_user = "current_user"()::text AND p.state = 1 AND l.expl_id = se.expl_id AND se.cur_user = CURRENT_USER::text AND cf.value IS TRUE;
+        ) UNION ALL
+        SELECT p.link_id
+          FROM cf,
+            sp,
+            se,
+            p
+            JOIN l USING (link_id)
+          WHERE p.psector_id = sp.psector_id AND sp.cur_user = "current_user"()::text AND p.state = 1 AND l.expl_id = se.expl_id AND se.cur_user = CURRENT_USER::text AND cf.value IS TRUE;
 
 CREATE OR REPLACE VIEW v_state_element
 AS SELECT element.element_id

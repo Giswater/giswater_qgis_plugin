@@ -2761,13 +2761,13 @@ INSERT INTO node (node_id, code, top_elev, ymax, elev, custom_top_elev, custom_y
 annotation, observ, "comment", omzone_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, builtdate, enddate,
 ownercat_id, muni_id, postcode, streetaxis_id, postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, descript, rotation, link, verified, the_geom,
 label_x, label_y, label_rotation, publish, inventory, xyz_date, uncertain, unconnected, expl_id, num_value, feature_type, created_at, arc_id, updated_at,
-updated_by, created_by, matcat_id, district_id, workcat_id_plan, asset_id, drainzone_id, parent_id, expl_id2, adate, adescript, hemisphere, placement_type,
+updated_by, created_by, matcat_id, district_id, workcat_id_plan, asset_id, drainzone_id, parent_id, expl_visibility, adate, adescript, hemisphere, placement_type,
 access_type, label_quadrant, minsector_id, macrominsector_id, brand_id, model_id, serial_number, streetname, streetname2)
 SELECT node_id, code, top_elev, ymax, elev, custom_top_elev, custom_ymax, custom_elev, node_type, nodecat_id, epa_type, sector_id, state, state_type,
 annotation, observ, "comment", dma_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, builtdate, enddate,
 ownercat_id, muni_id, postcode, streetaxis_id, postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, descript, rotation, link, verified::integer, the_geom,
 label_x, label_y, label_rotation, publish, inventory, xyz_date, uncertain, unconnected, expl_id, num_value, feature_type, tstamp, arc_id, lastupdate,
-lastupdate_user, insert_user, matcat_id, district_id, workcat_id_plan, asset_id, drainzone_id, parent_id, expl_id2, adate, adescript, hemisphere, placement_type,
+lastupdate_user, insert_user, matcat_id, district_id, workcat_id_plan, asset_id, drainzone_id, parent_id, ARRAY[expl_id2], adate, adescript, hemisphere, placement_type,
 access_type, label_quadrant, minsector_id, macrominsector_id, brand_id, model_id, serial_number, streetname, streetname2
 FROM _node;
 
@@ -2777,14 +2777,14 @@ matcat_id, epa_type, sector_id, state, state_type, annotation, observ, "comment"
 category_type, fluid_type, location_type, workcat_id, workcat_id_end, builtdate, enddate, ownercat_id, muni_id, postcode, streetaxis_id, postnumber, postcomplement,
 streetaxis2_id, postnumber2, postcomplement2, descript, link, verified, the_geom, label_x, label_y, label_rotation, publish, inventory, uncertain, expl_id,
 num_value, feature_type, created_at, updated_at, created_by, updated_by, district_id, workcat_id_plan, asset_id, pavcat_id, drainzone_id, nodetype_1,
-node_sys_top_elev_1, node_sys_elev_1, nodetype_2, node_sys_top_elev_2, node_sys_elev_2, parent_id, expl_id2, adate, adescript, visitability, label_quadrant,
+node_sys_top_elev_1, node_sys_elev_1, nodetype_2, node_sys_top_elev_2, node_sys_elev_2, parent_id, expl_visibility, adate, adescript, visitability, label_quadrant,
 minsector_id, macrominsector_id, brand_id, model_id, serial_number, streetname, streetname2)
 SELECT arc_id, code, code, node_1, node_2, y1, y2, elev1, elev2, custom_y1, custom_y2, custom_elev1, custom_elev2, sys_elev1, sys_elev2, arc_type, arccat_id,
 matcat_id, epa_type, sector_id, state, state_type, annotation, observ, "comment", sys_slope, inverted_slope, custom_length, dma_id, soilcat_id, function_type,
 category_type, fluid_type, location_type, workcat_id, workcat_id_end, builtdate, enddate, ownercat_id, muni_id, postcode, streetaxis_id, postnumber, postcomplement,
 streetaxis2_id, postnumber2, postcomplement2, descript, link, verified::integer, the_geom, label_x, label_y, label_rotation, publish, inventory, uncertain, expl_id,
 num_value, feature_type, tstamp, lastupdate, lastupdate_user, insert_user, district_id, workcat_id_plan, asset_id, pavcat_id, drainzone_id, nodetype_1,
-node_sys_top_elev_1, node_sys_elev_1, nodetype_2, node_sys_top_elev_2, node_sys_elev_2, parent_id, expl_id2, adate, adescript, visitability, label_quadrant,
+node_sys_top_elev_1, node_sys_elev_1, nodetype_2, node_sys_top_elev_2, node_sys_elev_2, parent_id, ARRAY[expl_id2], adate, adescript, visitability, label_quadrant,
 minsector_id, macrominsector_id, brand_id, model_id, serial_number, streetname, streetname2
 FROM _arc;
 
@@ -2795,7 +2795,7 @@ omzone_id, soilcat_id, function_type, category_type, fluid_type, location_type, 
 enddate, ownercat_id, muni_id, postcode, streetaxis_id, postnumber, postcomplement, streetaxis2_id, postnumber2,
 postcomplement2, descript, link, verified, rotation, the_geom, label_x, label_y, label_rotation, accessibility,
 diagonal, publish, inventory, uncertain, expl_id, num_value, feature_type, created_at, pjoint_type, pjoint_id, updated_at,
-created_by, updated_by, matcat_id, district_id, workcat_id_plan, asset_id, drainzone_id, expl_id2, adate, adescript,
+created_by, updated_by, matcat_id, district_id, workcat_id_plan, asset_id, drainzone_id, expl_visibility, adate, adescript,
 plot_code, placement_type, access_type, label_quadrant, n_hydrometer, minsector_id, macrominsector_id, streetname,
 streetname2)
 SELECT connec_id, code, top_elev, y1, y2, connec_type, conneccat_id, sector_id, customer_code,
@@ -2804,7 +2804,7 @@ dma_id, soilcat_id, function_type, category_type, fluid_type, location_type, wor
 enddate, ownercat_id, muni_id, postcode, streetaxis_id, postnumber, postcomplement, streetaxis2_id, postnumber2,
 postcomplement2, descript, link, verified::integer, rotation, the_geom, label_x, label_y, label_rotation, accessibility,
 diagonal, publish, inventory, uncertain, expl_id, num_value, feature_type, tstamp, pjoint_type, pjoint_id, lastupdate,
-lastupdate_user, insert_user, matcat_id, district_id, workcat_id_plan, asset_id, drainzone_id, expl_id2, adate, adescript,
+lastupdate_user, insert_user, matcat_id, district_id, workcat_id_plan, asset_id, drainzone_id, ARRAY[expl_id2], adate, adescript,
 plot_code, placement_type, access_type, label_quadrant, n_hydrometer, minsector_id, macrominsector_id, streetname,
 streetname2
 FROM _connec;
@@ -2817,7 +2817,7 @@ builtdate, enddate, ownercat_id, muni_id, postcode, streetaxis_id, postnumber, p
 postnumber2, postcomplement2, descript, link, verified, rotation, the_geom, label_x, label_y, label_rotation,
 publish, inventory, uncertain, expl_id, num_value, feature_type, created_at, pjoint_type, pjoint_id, updated_at,
 created_by, updated_by, district_id, workcat_id_plan, asset_id, _connec_matcat_id, connec_y2, gullycat2_id,
-epa_type, groove_height, groove_length, units_placement, drainzone_id, expl_id2, adate, adescript, siphon_type,
+epa_type, groove_height, groove_length, units_placement, drainzone_id, expl_visibility, adate, adescript, siphon_type,
 odorflap, placement_type, access_type, label_quadrant, minsector_id, macrominsector_id, streetname, streetname2)
 SELECT gully_id, code, top_elev, ymax, sandbox, matcat_id, gully_type, gullycat_id, units, groove, siphon,
 connec_arccat_id, arc_id, "_pol_id_", sector_id, state, state_type, annotation, observ,
@@ -2826,7 +2826,7 @@ builtdate, enddate, ownercat_id, muni_id, postcode, streetaxis_id, postnumber, p
 postnumber2, postcomplement2, descript, link, verified::integer, rotation, the_geom, label_x, label_y, label_rotation,
 publish, inventory, uncertain, expl_id, num_value, feature_type, tstamp, pjoint_type, pjoint_id, lastupdate,
 lastupdate_user, insert_user, district_id, workcat_id_plan, asset_id, connec_matcat_id, connec_y2, gullycat2_id,
-epa_type, groove_height, groove_length, units_placement, drainzone_id, expl_id2, adate, adescript, siphon_type,
+epa_type, groove_height, groove_length, units_placement, drainzone_id, ARRAY[expl_id2], adate, adescript, siphon_type,
 odorflap, placement_type, access_type, label_quadrant, minsector_id, macrominsector_id, streetname, streetname2
 NULL
 FROM _gully;
@@ -2835,12 +2835,12 @@ FROM _gully;
 INSERT INTO element (element_id, code, sys_code, elementcat_id, serial_number, num_elements, state, state_type, observ,
 "comment", function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, builtdate, enddate,
 ownercat_id, rotation, link, verified, the_geom, label_x, label_y, label_rotation, publish, inventory,
-expl_id, feature_type, created_at, updated_at, created_by, updated_by, pol_id, top_elev, expl_id2, trace_featuregeom,
+expl_id, feature_type, created_at, updated_at, created_by, updated_by, pol_id, top_elev, expl_visibility, trace_featuregeom,
 muni_id, sector_id, brand_id, model_id, asset_id)
 SELECT element_id, code, code, elementcat_id, serial_number, num_elements, state, state_type, observ,
 "comment", function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, builtdate, enddate,
 ownercat_id, rotation, link, verified::integer, the_geom, label_x, label_y, label_rotation, publish, inventory,
-expl_id, feature_type, tstamp, lastupdate, lastupdate_user, insert_user, pol_id, top_elev, expl_id2, trace_featuregeom,
+expl_id, feature_type, tstamp, lastupdate, lastupdate_user, insert_user, pol_id, top_elev, ARRAY[expl_id2], trace_featuregeom,
 muni_id, sector_id, brand_id, model_id, asset_id
 FROM _element;
 

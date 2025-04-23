@@ -44,16 +44,16 @@ BEGIN
 				-- inserting new link/connect on psector
 				IF v_project_type = 'WS' THEN
 					INSERT INTO link (feature_id, feature_type, exit_id, exit_type, userdefined_geom, state, expl_id, the_geom,
-					exit_topelev, sector_id, dma_id, fluid_type, presszone_id, dqa_id, minsector_id, exit_elev, expl_id2, epa_type, is_operative, conneccat_id, workcat_id, workcat_id_end, builtdate, enddate)
+					exit_topelev, sector_id, dma_id, fluid_type, presszone_id, dqa_id, minsector_id, exit_elev, expl_visibility, epa_type, is_operative, conneccat_id, workcat_id, workcat_id_end, builtdate, enddate)
 					SELECT feature_id, feature_type, exit_id, exit_type, userdefined_geom, 2, expl_id, the_geom, exit_topelev, sector_id, dma_id, fluid_type, presszone_id, dqa_id, minsector_id,  exit_elev,
-					expl_id2, epa_type, is_operative, conneccat_id, workcat_id, workcat_id_end, builtdate, enddate FROM link WHERE state=1 AND feature_id = v_rec.connec_id
+					expl_visibility, epa_type, is_operative, conneccat_id, workcat_id, workcat_id_end, builtdate, enddate FROM link WHERE state=1 AND feature_id = v_rec.connec_id
 					RETURNING link_id INTO v_link_new;
 
 				ELSIF v_project_type = 'UD' THEN
 					INSERT INTO link (feature_id, feature_type, exit_id, exit_type, userdefined_geom, state, expl_id, the_geom,
-					exit_topelev, sector_id, dma_id, fluid_type, exit_elev, expl_id2, epa_type, is_operative, conneccat_id, workcat_id, workcat_id_end, builtdate, enddate, drainzone_id)
+					exit_topelev, sector_id, dma_id, fluid_type, exit_elev, expl_visibility, epa_type, is_operative, conneccat_id, workcat_id, workcat_id_end, builtdate, enddate, drainzone_id)
 					SELECT feature_id, feature_type, exit_id, exit_type, userdefined_geom, 2, expl_id, the_geom, exit_topelev, sector_id, dma_id, fluid_type, exit_elev,
-					expl_id2, epa_type, is_operative, conneccat_id, workcat_id, workcat_id_end, builtdate, enddate, drainzone_id FROM link WHERE state=1 AND feature_id = v_rec.connec_id
+					expl_visibility, epa_type, is_operative, conneccat_id, workcat_id, workcat_id_end, builtdate, enddate, drainzone_id FROM link WHERE state=1 AND feature_id = v_rec.connec_id
 					RETURNING link_id INTO v_link_new;
 
 				END IF;
@@ -71,16 +71,16 @@ BEGIN
 					-- inserting new link/connect on psector
 					IF v_project_type = 'WS' THEN
 						INSERT INTO link (feature_id, feature_type, exit_id, exit_type, userdefined_geom, state, expl_id, the_geom,
-						exit_topelev, sector_id, dma_id, fluid_type, presszone_id, dqa_id, minsector_id, exit_elev, expl_id2, epa_type, is_operative, conneccat_id, workcat_id, workcat_id_end, builtdate, enddate)
+						exit_topelev, sector_id, dma_id, fluid_type, presszone_id, dqa_id, minsector_id, exit_elev, expl_visibility, epa_type, is_operative, conneccat_id, workcat_id, workcat_id_end, builtdate, enddate)
 						SELECT feature_id, feature_type, exit_id, exit_type, userdefined_geom, 2, expl_id, the_geom, exit_topelev, sector_id, dma_id, fluid_type, presszone_id, dqa_id, minsector_id,  exit_elev,
-						expl_id2, epa_type, is_operative, conneccat_id, workcat_id, workcat_id_end, builtdate, enddate FROM link WHERE link_id = v_record.link_id
+						expl_visibility, epa_type, is_operative, conneccat_id, workcat_id, workcat_id_end, builtdate, enddate FROM link WHERE link_id = v_record.link_id
 						RETURNING link_id INTO v_link_new;
 
 					ELSIF v_project_type = 'UD' THEN
 						INSERT INTO link (feature_id, feature_type, exit_id, exit_type, userdefined_geom, state, expl_id, the_geom,
-						exit_topelev, sector_id, dma_id, fluid_type, exit_elev, expl_id2, epa_type, is_operative, conneccat_id, workcat_id, workcat_id_end, builtdate, enddate, drainzone_id)
+						exit_topelev, sector_id, dma_id, fluid_type, exit_elev, expl_visibility, epa_type, is_operative, conneccat_id, workcat_id, workcat_id_end, builtdate, enddate, drainzone_id)
 						SELECT feature_id, feature_type, exit_id, exit_type, userdefined_geom, 2, expl_id, the_geom, exit_topelev, sector_id, dma_id, fluid_type, exit_elev,
-						expl_id2, epa_type, is_operative, conneccat_id, workcat_id, workcat_id_end, builtdate, enddate, drainzone_id FROM link WHERE link_id = v_record.link_id
+						expl_visibility, epa_type, is_operative, conneccat_id, workcat_id, workcat_id_end, builtdate, enddate, drainzone_id FROM link WHERE link_id = v_record.link_id
 						RETURNING link_id INTO v_link_new;
 					END IF;
 
@@ -105,16 +105,16 @@ BEGIN
 						-- inserting new link/connect on psector
 						IF v_project_type = 'WS' THEN
 							INSERT INTO link (feature_id, feature_type, exit_id, exit_type, userdefined_geom, state, expl_id, the_geom,
-							exit_topelev, sector_id, dma_id, fluid_type, presszone_id, dqa_id, minsector_id, exit_elev, expl_id2, epa_type, is_operative, conneccat_id, workcat_id, workcat_id_end, builtdate, enddate)
+							exit_topelev, sector_id, dma_id, fluid_type, presszone_id, dqa_id, minsector_id, exit_elev, expl_visibility, epa_type, is_operative, conneccat_id, workcat_id, workcat_id_end, builtdate, enddate)
 							SELECT feature_id, feature_type, exit_id, exit_type, userdefined_geom, 2, expl_id, the_geom, exit_topelev, sector_id, dma_id, fluid_type, presszone_id, dqa_id, minsector_id,  exit_elev,
-							expl_id2, epa_type, is_operative, conneccat_id, workcat_id, workcat_id_end, builtdate, enddate FROM link WHERE link_id = v_record_2.link_id
+							expl_visibility, epa_type, is_operative, conneccat_id, workcat_id, workcat_id_end, builtdate, enddate FROM link WHERE link_id = v_record_2.link_id
 							RETURNING link_id INTO v_link_new;
 
 						ELSIF v_project_type = 'UD' THEN
 							INSERT INTO link (feature_id, feature_type, exit_id, exit_type, userdefined_geom, state, expl_id, the_geom,
-							exit_topelev, sector_id, dma_id, fluid_type, exit_elev, expl_id2, epa_type, is_operative, conneccat_id, workcat_id, workcat_id_end, builtdate, enddate, drainzone_id)
+							exit_topelev, sector_id, dma_id, fluid_type, exit_elev, expl_visibility, epa_type, is_operative, conneccat_id, workcat_id, workcat_id_end, builtdate, enddate, drainzone_id)
 							SELECT feature_id, feature_type, exit_id, exit_type, userdefined_geom, 2, expl_id, the_geom, exit_topelev, sector_id, dma_id, fluid_type, exit_elev,
-							expl_id2, epa_type, is_operative, conneccat_id, workcat_id, workcat_id_end, builtdate, enddate, drainzone_id FROM link WHERE link_id = v_record_2.link_id
+							expl_visibility, epa_type, is_operative, conneccat_id, workcat_id, workcat_id_end, builtdate, enddate, drainzone_id FROM link WHERE link_id = v_record_2.link_id
 							RETURNING link_id INTO v_link_new;
 						END IF;
 
@@ -152,9 +152,9 @@ BEGIN
 
 				-- inserting new link on psector
 				INSERT INTO link (feature_id, feature_type, exit_id, exit_type, userdefined_geom, state, expl_id, the_geom,
-				exit_topelev, sector_id, dma_id, fluid_type, exit_elev, expl_id2, epa_type, is_operative, conneccat_id, workcat_id, workcat_id_end, builtdate, enddate, drainzone_id)
+				exit_topelev, sector_id, dma_id, fluid_type, exit_elev, expl_visibility, epa_type, is_operative, conneccat_id, workcat_id, workcat_id_end, builtdate, enddate, drainzone_id)
 				SELECT feature_id, feature_type, exit_id, exit_type, userdefined_geom, 2, expl_id, the_geom, exit_topelev, sector_id, dma_id, fluid_type, exit_elev,
-				expl_id2, epa_type, is_operative, conneccat_id, workcat_id, workcat_id_end, builtdate, enddate, drainzone_id FROM link WHERE state=1 AND feature_id = v_rec.gully_id
+				expl_visibility, epa_type, is_operative, conneccat_id, workcat_id, workcat_id_end, builtdate, enddate, drainzone_id FROM link WHERE state=1 AND feature_id = v_rec.gully_id
 				RETURNING link_id INTO v_link_new;
 				UPDATE link SET state = 2 where link_id = v_link_new;
 
@@ -169,16 +169,16 @@ BEGIN
 					-- inserting new link/connect on psector
 					IF v_project_type = 'WS' THEN
 						INSERT INTO link (feature_id, feature_type, exit_id, exit_type, userdefined_geom, state, expl_id, the_geom,
-						exit_topelev, sector_id, dma_id, fluid_type, presszone_id, dqa_id, minsector_id, exit_elev, expl_id2, epa_type, is_operative, conneccat_id, workcat_id, workcat_id_end, builtdate, enddate)
+						exit_topelev, sector_id, dma_id, fluid_type, presszone_id, dqa_id, minsector_id, exit_elev, expl_visibility, epa_type, is_operative, conneccat_id, workcat_id, workcat_id_end, builtdate, enddate)
 						SELECT feature_id, feature_type, exit_id, exit_type, userdefined_geom, 2, expl_id, the_geom, exit_topelev, sector_id, dma_id, fluid_type, presszone_id, dqa_id, minsector_id,  exit_elev,
-						expl_id2, epa_type, is_operative, conneccat_id, workcat_id, workcat_id_end, builtdate, enddate FROM link WHERE link_id = v_record.link_id
+						expl_visibility, epa_type, is_operative, conneccat_id, workcat_id, workcat_id_end, builtdate, enddate FROM link WHERE link_id = v_record.link_id
 						RETURNING link_id INTO v_link_new;
 
 					ELSIF v_project_type = 'UD' THEN
 						INSERT INTO link (feature_id, feature_type, exit_id, exit_type, userdefined_geom, state, expl_id, the_geom,
-						exit_topelev, sector_id, dma_id, fluid_type, exit_elev, expl_id2, epa_type, is_operative, conneccat_id, workcat_id, workcat_id_end, builtdate, enddate, drainzone_id)
+						exit_topelev, sector_id, dma_id, fluid_type, exit_elev, expl_visibility, epa_type, is_operative, conneccat_id, workcat_id, workcat_id_end, builtdate, enddate, drainzone_id)
 						SELECT feature_id, feature_type, exit_id, exit_type, userdefined_geom, 2, expl_id, the_geom, exit_topelev, sector_id, dma_id, fluid_type, exit_elev,
-						expl_id2, epa_type, is_operative, conneccat_id, workcat_id, workcat_id_end, builtdate, enddate, drainzone_id FROM link WHERE link_id = v_record.link_id
+						expl_visibility, epa_type, is_operative, conneccat_id, workcat_id, workcat_id_end, builtdate, enddate, drainzone_id FROM link WHERE link_id = v_record.link_id
 						RETURNING link_id INTO v_link_new;
 					END IF;
 
@@ -203,16 +203,16 @@ BEGIN
 						-- inserting new link/connect on psector
 						IF v_project_type = 'WS' THEN
 							INSERT INTO link (feature_id, feature_type, exit_id, exit_type, userdefined_geom, state, expl_id, the_geom,
-							exit_topelev, sector_id, dma_id, fluid_type, presszone_id, dqa_id, minsector_id, exit_elev, expl_id2, epa_type, is_operative, conneccat_id, workcat_id, workcat_id_end, builtdate, enddate)
+							exit_topelev, sector_id, dma_id, fluid_type, presszone_id, dqa_id, minsector_id, exit_elev, expl_visibility, epa_type, is_operative, conneccat_id, workcat_id, workcat_id_end, builtdate, enddate)
 							SELECT feature_id, feature_type, exit_id, exit_type, userdefined_geom, 2, expl_id, the_geom, exit_topelev, sector_id, dma_id, fluid_type, presszone_id, dqa_id, minsector_id,  exit_elev,
-							expl_id2, epa_type, is_operative, conneccat_id, workcat_id, workcat_id_end, builtdate, enddate FROM link WHERE link_id = v_record_2.link_id
+							expl_visibility, epa_type, is_operative, conneccat_id, workcat_id, workcat_id_end, builtdate, enddate FROM link WHERE link_id = v_record_2.link_id
 							RETURNING link_id INTO v_link_new;
 
 						ELSIF v_project_type = 'UD' THEN
 							INSERT INTO link (feature_id, feature_type, exit_id, exit_type, userdefined_geom, state, expl_id, the_geom,
-							exit_topelev, sector_id, dma_id, fluid_type, exit_elev, expl_id2, epa_type, is_operative, conneccat_id, workcat_id, workcat_id_end, builtdate, enddate, drainzone_id)
+							exit_topelev, sector_id, dma_id, fluid_type, exit_elev, expl_visibility, epa_type, is_operative, conneccat_id, workcat_id, workcat_id_end, builtdate, enddate, drainzone_id)
 							SELECT feature_id, feature_type, exit_id, exit_type, userdefined_geom, 2, expl_id, the_geom, exit_topelev, sector_id, dma_id, fluid_type, exit_elev,
-							expl_id2, epa_type, is_operative, conneccat_id, workcat_id, workcat_id_end, builtdate, enddate, drainzone_id FROM link WHERE link_id = v_record_2.link_id
+							expl_visibility, epa_type, is_operative, conneccat_id, workcat_id, workcat_id_end, builtdate, enddate, drainzone_id FROM link WHERE link_id = v_record_2.link_id
 							RETURNING link_id INTO v_link_new;
 						END IF;
 

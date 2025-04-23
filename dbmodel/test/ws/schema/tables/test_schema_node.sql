@@ -28,7 +28,7 @@ SELECT columns_are(
         'label_x', 'label_y', 'label_rotation', 'publish', 'inventory', 'hemisphere',
         'expl_id', 'num_value', 'feature_type', 'minsector_id', 'dqa_id', 'staticpressure', 'district_id', 'adate',
         'adescript', 'accessibility', 'workcat_id_plan', 'asset_id', 'om_state', 'conserv_state',
-        'access_type', 'placement_type', 'expl_id2', 'brand_id', 'model_id', 'serial_number',
+        'access_type', 'placement_type', 'expl_visibility', 'brand_id', 'model_id', 'serial_number',
         'label_quadrant', 'macrominsector_id', 'streetname', 'streetname2', 'supplyzone_id',
         'lock_level', 'is_scadamap', 'pavcat_id', 'omzone_id',
         'the_geom', 'created_at', 'created_by', 'updated_at', 'updated_by'
@@ -54,7 +54,6 @@ SELECT fk_ok('node', 'district_id', 'ext_district', 'district_id', 'FK district_
 SELECT fk_ok('node', 'dma_id', 'dma', 'dma_id', 'FK dma_id should reference dma.dma_id');
 SELECT fk_ok('node', 'dqa_id', 'dqa', 'dqa_id', 'FK dqa_id should reference dqa.dqa_id');
 SELECT fk_ok('node', 'expl_id', 'exploitation', 'expl_id', 'FK expl_id should reference exploitation.expl_id');
-SELECT fk_ok('node', 'expl_id2', 'exploitation', 'expl_id', 'FK expl_id2 should reference exploitation.expl_id');
 SELECT fk_ok('node', 'feature_type', 'sys_feature_type', 'id', 'FK feature_type should reference sys_feature_type.id');
 SELECT fk_ok('node', 'nodecat_id', 'cat_node', 'id', 'FK nodecat_id should reference cat_node.id');
 SELECT fk_ok('node', 'ownercat_id', 'cat_owner', 'id', 'FK ownercat_id should reference cat_owner.id');
@@ -90,6 +89,7 @@ SELECT col_not_null('node', 'expl_id', 'Column expl_id should be NOT NULL');
 -- Check indexes
 SELECT has_index('node', 'node_sys_code_idx', 'Table should have index on sys_code');
 SELECT has_index('node', 'node_asset_id_idx', 'Table should have index on asset_id');
+SELECT has_index('node', 'node_expl_visibility_idx', 'Table should have index on expl_visibility');
 
 -- Check value constraint
 SELECT col_has_check('node', 'epa_type', 'Column epa_type should have a check constraint');

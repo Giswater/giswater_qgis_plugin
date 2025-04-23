@@ -92,7 +92,7 @@ SELECT element.element_id,
     element.expl_id,
     element.pol_id,
     element.top_elev,
-    element.expl_id2,
+    element.expl_visibility,
     element.trace_featuregeom,
     element.muni_id,
     element.sector_id,
@@ -339,13 +339,26 @@ AS WITH
         ),
     link_selector AS
         (
-			SELECT DISTINCT ON (l.link_id) l.link_id
+            SELECT l.link_id
             FROM link l
-			JOIN selector_expl se ON (se.cur_user =current_user AND se.expl_id = l.expl_id) OR (se.cur_user =current_user AND se.expl_id = l.expl_id2)
-            JOIN selector_state s ON s.cur_user = current_user AND l.state = s.state_id
-            LEFT JOIN (SELECT link_id FROM link_psector WHERE p_state = 0) a USING (link_id) WHERE a.link_id IS NULL
+            JOIN selector_state s ON s.cur_user = CURRENT_USER AND l.state = s.state_id
+            LEFT JOIN (
+            SELECT link_id FROM link_psector WHERE p_state = 0
+            ) a ON a.link_id = l.link_id
+            WHERE a.link_id IS NULL
+            AND EXISTS (
+            SELECT 1 FROM selector_expl se
+            WHERE s.cur_user = current_user
+            AND (
+                (l.expl_visibility IS NOT NULL AND se.expl_id = ANY(l.expl_visibility))
+                OR
+                (l.expl_visibility IS NULL OR l.expl_visibility = '{}')
+                AND se.expl_id = l.expl_id
+            )
+            )
             UNION ALL
-            SELECT link_id FROM link_psector WHERE p_state = 1
+            SELECT link_id FROM link_psector
+            WHERE p_state = 1
         ),
     link_selected as
     	(
@@ -384,7 +397,7 @@ AS WITH
 			st_length2d(l.the_geom)::numeric(12,3) AS gis_length,
             l.custom_length,
 			l.the_geom,
-			l.expl_id2,
+			l.expl_visibility,
 			l.epa_type,
 			l.is_operative,
 			l.linkcat_id,
@@ -513,16 +526,29 @@ AS WITH
 			FROM plan_psector_x_arc pp
 			JOIN selector_psector sp ON sp.cur_user = CURRENT_USER AND sp.psector_id = pp.psector_id
         ),
-    arc_selector AS
+  arc_selector AS
 		(
-			SELECT DISTINCT ON (arc.arc_id) arc.arc_id
+	        SELECT arc.arc_id
             FROM arc
-			JOIN selector_expl se ON (se.cur_user =current_user AND se.expl_id = arc.expl_id) or (se.cur_user = current_user AND se.expl_id = arc.expl_id2)
             JOIN selector_state s ON s.cur_user = CURRENT_USER AND arc.state = s.state_id
-            LEFT JOIN (SELECT arc_id FROM arc_psector WHERE p_state = 0) a USING (arc_id) WHERE a.arc_id IS NULL
+            LEFT JOIN (
+                SELECT arc_id FROM arc_psector WHERE p_state = 0
+            ) a USING (arc_id)
+            WHERE a.arc_id IS NULL
+            AND EXISTS (
+                SELECT 1 FROM selector_expl se
+                WHERE s.cur_user = current_user
+                AND (
+                (arc.expl_visibility IS NOT NULL AND se.expl_id = ANY(arc.expl_visibility))
+                OR
+                (arc.expl_visibility IS NULL OR arc.expl_visibility = '{}')
+                AND se.expl_id = arc.expl_id
+                )
+            )
             UNION ALL
-            SELECT arc_id FROM arc_psector WHERE p_state = 1
-         ),
+            SELECT arc_id FROM arc_psector
+            WHERE p_state = 1
+        ),
     arc_selected AS
 		(
 		    SELECT arc.arc_id,
@@ -666,7 +692,7 @@ AS WITH
 			arc.asset_id,
 			arc.pavcat_id,
 			arc.parent_id,
-			arc.expl_id2,
+			arc.expl_visibility,
 			vst.is_operative,
 			arc.minsector_id,
 			arc.macrominsector_id,
@@ -752,13 +778,26 @@ AS WITH
         ),
     node_selector AS
         (
-			SELECT DISTINCT ON (node.node_id) node.node_id
+            SELECT node.node_id
             FROM node
-			JOIN selector_expl se ON (se.cur_user = current_user AND se.expl_id = node.expl_id) OR (se.cur_user = current_user AND se.expl_id = node.expl_id2)
-            JOIN selector_state s ON s.cur_user = current_user AND node.state = s.state_id
-            LEFT JOIN (SELECT node_id FROM node_psector WHERE p_state = 0) a USING (node_id) WHERE a.node_id IS NULL
+            JOIN selector_state s ON s.cur_user = CURRENT_USER AND node.state = s.state_id
+            LEFT JOIN (
+            SELECT node_id FROM node_psector WHERE p_state = 0
+            ) a USING (node_id)
+            WHERE a.node_id IS NULL
+            AND EXISTS (
+            SELECT 1 FROM selector_expl se
+            WHERE s.cur_user = current_user
+            AND (
+                (node.expl_visibility IS NOT NULL AND se.expl_id = ANY(node.expl_visibility))
+                OR
+                (node.expl_visibility IS NULL OR node.expl_visibility = '{}')
+                AND se.expl_id = node.expl_id
+            )
+            )
             UNION ALL
-            SELECT node_id FROM node_psector WHERE p_state = 1
+            SELECT node_id FROM node_psector
+            WHERE p_state = 1
         ),
     node_selected AS
     	(
@@ -853,7 +892,7 @@ AS WITH
 			node.asset_id,
 			node.parent_id,
 			node.arc_id,
-			node.expl_id2,
+			node.expl_visibility,
 			vst.is_operative,
 			node.minsector_id,
 			node.macrominsector_id,
@@ -983,7 +1022,7 @@ AS WITH
 			asset_id,
 			parent_id,
 			arc_id,
-			expl_id2,
+			expl_visibility,
 			is_operative,
 			minsector_id,
 			macrominsector_id,
@@ -1068,11 +1107,23 @@ AS WITH
         ),
     connec_selector AS
         (
-            SELECT DISTINCT ON (connec_id) connec_id, arc_id::varchar(16), NULL::integer AS link_id
+            SELECT connec.connec_id, arc_id::varchar(16), null::integer as link_id
             FROM connec
-			JOIN selector_expl se ON (se.cur_user = current_user AND se.expl_id = connec.expl_id) OR (se.cur_user = current_user AND se.expl_id = connec.expl_id2)
-            JOIN selector_state ss ON ss.cur_user = current_user AND connec.state = ss.state_id
-            LEFT JOIN (SELECT connec_id, arc_id::varchar(16) FROM connec_psector WHERE p_state = 0) a USING (connec_id, arc_id) WHERE a.connec_id IS NULL
+            JOIN selector_state s ON s.cur_user = CURRENT_USER AND connec.state = s.state_id
+            LEFT JOIN (
+            SELECT connec_id FROM connec_psector WHERE p_state = 0
+            ) a USING (connec_id)
+            WHERE a.connec_id IS NULL
+            AND EXISTS (
+            SELECT 1 FROM selector_expl se
+            WHERE s.cur_user = current_user
+            AND (
+                (connec.expl_visibility IS NOT NULL AND se.expl_id = ANY(connec.expl_visibility))
+                OR
+                (connec.expl_visibility IS NULL OR connec.expl_visibility = '{}')
+                AND se.expl_id = connec.expl_id
+            )
+            )
             UNION ALL
             SELECT connec_id, connec_psector.arc_id::varchar(16), link_id FROM connec_psector
             WHERE p_state = 1
@@ -1185,7 +1236,7 @@ AS WITH
 			END AS pjoint_type,
 			connec.workcat_id_plan,
 			connec.asset_id,
-			connec.expl_id2,
+			connec.expl_visibility,
 			vst.is_operative,
 			connec.minsector_id,
 			connec.macrominsector_id,
@@ -1281,11 +1332,23 @@ AS WITH
         ),
     gully_selector AS
         (
-            SELECT DISTINCT ON (gully_id) gully_id, arc_id::varchar(16), null::integer as link_id
+            SELECT gully.gully_id, arc_id::varchar(16), null::integer as link_id
             FROM gully
-			JOIN selector_expl se ON (se.cur_user = current_user AND se.expl_id = gully.expl_id) OR (se.cur_user = current_user AND se.expl_id = gully.expl_id2)
-            JOIN selector_state ss ON ss.cur_user =current_user AND gully.state =ss.state_id
-            LEFT JOIN (SELECT gully_id, arc_id FROM gully_psector WHERE p_state = 0) a USING (gully_id, arc_id) WHERE a.gully_id IS NULL
+            JOIN selector_state s ON s.cur_user = CURRENT_USER AND gully.state = s.state_id
+            LEFT JOIN (
+            SELECT gully_id FROM gully_psector WHERE p_state = 0
+            ) a USING (gully_id)
+            WHERE a.gully_id IS NULL
+            AND EXISTS (
+            SELECT 1 FROM selector_expl se
+            WHERE s.cur_user = current_user
+            AND (
+                (gully.expl_visibility IS NOT NULL AND se.expl_id = ANY(gully.expl_visibility))
+                OR
+                (gully.expl_visibility IS NULL OR gully.expl_visibility = '{}')
+                AND se.expl_id = gully.expl_id
+            )
+            )
             UNION ALL
             SELECT gully_id, gully_psector.arc_id::varchar(16), link_id FROM gully_psector
             WHERE p_state = 1
@@ -1426,7 +1489,7 @@ AS WITH
 			gully.asset_id,
 			gully.gullycat2_id,
 			gully.units_placement,
-			gully.expl_id2,
+			gully.expl_visibility,
 			vst.is_operative,
 			gully.minsector_id,
 			gully.macrominsector_id,
@@ -4338,7 +4401,7 @@ AS SELECT polygon.pol_id,
     polygon.trace_featuregeom
     FROM polygon
     JOIN gully ON polygon.feature_id::text = gully.gully_id::text
-    JOIN selector_expl se ON (se.cur_user = CURRENT_USER AND se.expl_id = gully.expl_id) or (se.cur_user = CURRENT_USER and se.expl_id = gully.expl_id2)
+    JOIN selector_expl se ON (se.cur_user = CURRENT_USER AND se.expl_id = gully.expl_id) or (se.cur_user = CURRENT_USER and se.expl_id = ANY(gully.expl_visibility))
     JOIN selector_sector ss ON (ss.cur_user = CURRENT_USER AND ss.sector_id = gully.sector_id)
     JOIN selector_municipality sm ON (sm.cur_user = CURRENT_USER AND sm.muni_id = gully.muni_id);
 

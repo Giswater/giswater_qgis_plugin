@@ -897,7 +897,7 @@ CREATE TABLE node (
 	asset_id varchar(50) NULL,
 	drainzone_id int4 NULL,
 	parent_id varchar(16) NULL,
-	expl_id2 int4 NULL,
+	expl_visibility int2[] NULL,
 	adate text NULL,
 	adescript text NULL,
 	hemisphere float8 NULL,
@@ -929,7 +929,6 @@ CREATE TABLE node (
 	CONSTRAINT node_drainzone_id_fkey FOREIGN KEY (drainzone_id) REFERENCES drainzone(drainzone_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT node_dwfzone_id_fkey FOREIGN KEY (dwfzone_id) REFERENCES dwfzone(dwfzone_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT node_expl_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT node_expl_id2_fkey FOREIGN KEY (expl_id2) REFERENCES exploitation(expl_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT node_feature_type_fkey FOREIGN KEY (feature_type) REFERENCES sys_feature_type(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT node_muni_id_fkey FOREIGN KEY (muni_id) REFERENCES ext_municipality(muni_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT node_node_type_fkey FOREIGN KEY (node_type) REFERENCES cat_feature_node(id) ON DELETE RESTRICT ON UPDATE CASCADE,
@@ -946,7 +945,7 @@ CREATE TABLE node (
 CREATE INDEX node_arc_id ON node USING btree (arc_id);
 CREATE INDEX node_omzone ON node USING btree (omzone_id);
 CREATE INDEX node_exploitation ON node USING btree (expl_id);
-CREATE INDEX node_exploitation2 ON node USING btree (expl_id2);
+CREATE INDEX node_expl_visibility_idx ON node USING btree (expl_visibility);
 CREATE INDEX node_index ON node USING gist (the_geom);
 CREATE INDEX node_muni ON node USING btree (muni_id);
 CREATE INDEX node_nodecat ON node USING btree (nodecat_id);
@@ -1113,7 +1112,7 @@ CREATE TABLE arc (
 	node_sys_top_elev_2 numeric(12, 3) NULL,
 	node_sys_elev_2 numeric(12, 3) NULL,
 	parent_id varchar(16) NULL,
-	expl_id2 int4 NULL,
+	expl_visibility int2[] NULL,
 	adate text NULL,
 	adescript text NULL,
 	visitability int4 NULL,
@@ -1150,7 +1149,6 @@ CREATE TABLE arc (
 	CONSTRAINT arc_drainzone_id_fkey FOREIGN KEY (drainzone_id) REFERENCES drainzone(drainzone_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT arc_dwfzone_id_fkey FOREIGN KEY (dwfzone_id) REFERENCES dwfzone(dwfzone_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT arc_expl_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT arc_expl_id2_fkey FOREIGN KEY (expl_id2) REFERENCES exploitation(expl_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT arc_feature_type_fkey FOREIGN KEY (feature_type) REFERENCES sys_feature_type(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT arc_muni_id_fkey FOREIGN KEY (muni_id) REFERENCES ext_municipality(muni_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT arc_ownercat_id_fkey FOREIGN KEY (ownercat_id) REFERENCES cat_owner(id) ON DELETE RESTRICT ON UPDATE CASCADE,
@@ -1167,7 +1165,7 @@ CREATE TABLE arc (
 CREATE INDEX arc_arccat ON arc USING btree (arccat_id);
 CREATE INDEX arc_omzone ON arc USING btree (omzone_id);
 CREATE INDEX arc_exploitation ON arc USING btree (expl_id);
-CREATE INDEX arc_exploitation2 ON arc USING btree (expl_id2);
+CREATE INDEX arc_expl_visibility_idx ON arc USING btree (expl_visibility);
 CREATE INDEX arc_index ON arc USING gist (the_geom);
 CREATE INDEX arc_muni ON arc USING btree (muni_id);
 CREATE INDEX arc_node1 ON arc USING btree (node_1);
@@ -1309,7 +1307,7 @@ CREATE TABLE connec (
 	workcat_id_plan varchar(255) NULL,
 	asset_id varchar(50) NULL,
 	drainzone_id int4 NULL,
-	expl_id2 int4 NULL,
+	expl_visibility int2[] NULL,
 	adate text NULL,
 	adescript text NULL,
 	plot_code varchar NULL,
@@ -1337,7 +1335,6 @@ CREATE TABLE connec (
 	CONSTRAINT connec_drainzone_id_fkey FOREIGN KEY (drainzone_id) REFERENCES drainzone(drainzone_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT connec_dwfzone_id_fkey FOREIGN KEY (dwfzone_id) REFERENCES dwfzone(dwfzone_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT connec_expl_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT connec_expl_id2_fkey FOREIGN KEY (expl_id2) REFERENCES exploitation(expl_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT connec_feature_type_fkey FOREIGN KEY (feature_type) REFERENCES sys_feature_type(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT connec_muni_id_fkey FOREIGN KEY (muni_id) REFERENCES ext_municipality(muni_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT connec_ownercat_id_fkey FOREIGN KEY (ownercat_id) REFERENCES cat_owner(id) ON DELETE RESTRICT ON UPDATE CASCADE,
@@ -1354,7 +1351,7 @@ CREATE TABLE connec (
 CREATE INDEX connec_connecat ON connec USING btree (conneccat_id);
 CREATE INDEX connec_omzone ON connec USING btree (omzone_id);
 CREATE INDEX connec_exploitation ON connec USING btree (expl_id);
-CREATE INDEX connec_exploitation2 ON connec USING btree (expl_id2);
+CREATE INDEX connec_expl_visibility_idx ON connec USING btree (expl_visibility);
 CREATE INDEX connec_index ON connec USING gist (the_geom);
 CREATE INDEX connec_muni ON connec USING btree (muni_id);
 CREATE INDEX connec_sector ON connec USING btree (sector_id);
@@ -1495,7 +1492,7 @@ CREATE TABLE gully (
 	groove_length float8 NULL,
 	units_placement varchar(16) NULL,
 	drainzone_id int4 NULL,
-	expl_id2 int4 NULL,
+	expl_visibility int2[] NULL,
 	adate text NULL,
 	adescript text NULL,
 	siphon_type text NULL,
@@ -1523,7 +1520,6 @@ CREATE TABLE gully (
 	CONSTRAINT gully_district_id_fkey FOREIGN KEY (district_id) REFERENCES ext_district(district_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT gully_drainzone_id_fkey FOREIGN KEY (drainzone_id) REFERENCES drainzone(drainzone_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT gully_dwfzone_id_fkey FOREIGN KEY (dwfzone_id) REFERENCES dwfzone(dwfzone_id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT gully_expl_id2_fkey FOREIGN KEY (expl_id2) REFERENCES exploitation(expl_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT gully_feature_type_fkey FOREIGN KEY (feature_type) REFERENCES sys_feature_type(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT gully_gullytype_id_fkey FOREIGN KEY (gully_type) REFERENCES cat_feature_gully(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT gully_muni_id_fkey FOREIGN KEY (muni_id) REFERENCES ext_municipality(muni_id) ON DELETE RESTRICT ON UPDATE CASCADE,
@@ -1541,7 +1537,7 @@ CREATE TABLE gully (
 );
 CREATE INDEX gully_omzone ON gully USING btree (omzone_id);
 CREATE INDEX gully_exploitation ON gully USING btree (expl_id);
-CREATE INDEX gully_exploitation2 ON gully USING btree (expl_id2);
+CREATE INDEX gully_expl_visibility_idx ON gully USING btree (expl_visibility);
 CREATE INDEX gully_gratecat ON gully USING btree (gullycat_id);
 CREATE INDEX gully_index ON gully USING gist (the_geom);
 CREATE INDEX gully_muni ON gully USING btree (muni_id);
@@ -1633,7 +1629,7 @@ CREATE TABLE element (
 	feature_type varchar(16) DEFAULT 'ELEMENT'::character varying NULL,
 	pol_id varchar(16) NULL,
 	top_elev numeric(12, 3) NULL,
-	expl_id2 int4 NULL,
+	expl_visibility int2[] NULL,
 	trace_featuregeom bool DEFAULT true NULL,
 	muni_id int4 NULL,
 	sector_id int4 DEFAULT 0 NULL,
@@ -1719,7 +1715,7 @@ CREATE TABLE link (
 	sector_id int4 NULL,
 	omzone_id int4 NULL,
 	fluid_type varchar(50) NULL,
-	expl_id2 int4 NULL,
+	expl_visibility int2[] NULL,
 	epa_type varchar(16) NULL,
 	is_operative bool NULL,
 	workcat_id varchar(255) NULL,
@@ -1754,8 +1750,7 @@ CREATE TABLE link (
 	CONSTRAINT link_private_linkcat_id_fkey FOREIGN KEY (private_linkcat_id) REFERENCES cat_arc(id) ON UPDATE CASCADE ON DELETE RESTRICT
 );
 CREATE INDEX link_exit_id ON link USING btree (exit_id);
-CREATE INDEX link_expl_id2 ON link USING btree (expl_id2);
-CREATE INDEX link_exploitation2 ON link USING btree (expl_id2);
+CREATE INDEX link_expl_visibility_idx ON link USING btree (expl_visibility);
 CREATE INDEX link_feature_id ON link USING btree (feature_id);
 CREATE INDEX link_index ON link USING gist (the_geom);
 CREATE INDEX link_muni ON link USING btree (muni_id);
@@ -1845,12 +1840,8 @@ ALTER TABLE samplepoint DROP CONSTRAINT IF EXISTS samplepoint_exploitation_id_fk
 ALTER TABLE selector_expl DROP CONSTRAINT IF EXISTS selector_expl_id_fkey;
 ALTER TABLE config_user_x_expl DROP CONSTRAINT IF EXISTS config_user_x_expl_expl_id_fkey;
 ALTER TABLE node DROP CONSTRAINT IF EXISTS node_expl_fkey;
-ALTER TABLE node DROP CONSTRAINT IF EXISTS node_expl_id2_fkey;
 ALTER TABLE arc DROP CONSTRAINT IF EXISTS arc_expl_fkey;
-ALTER TABLE arc DROP CONSTRAINT IF EXISTS arc_expl_id2_fkey;
 ALTER TABLE connec DROP CONSTRAINT IF EXISTS connec_expl_fkey;
-ALTER TABLE connec DROP CONSTRAINT IF EXISTS connec_expl_id2_fkey;
-ALTER TABLE gully DROP CONSTRAINT IF EXISTS gully_expl_id2_fkey;
 ALTER TABLE link DROP CONSTRAINT IF EXISTS link_exploitation_id_fkey;
 ALTER TABLE ext_streetaxis DROP CONSTRAINT IF EXISTS ext_streetaxis_exploitation_id_fkey;
 ALTER TABLE ext_address DROP CONSTRAINT IF EXISTS ext_address_exploitation_id_fkey;

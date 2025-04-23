@@ -350,11 +350,23 @@ BEGIN
 
 			ON CONFLICT (sector_id, cur_user) DO NOTHING;
 
-			-- sector for those objects wich has expl_id2 and expl_id2 is not selected but yes one
+			-- sector for those objects wich has expl_visibility and expl_visibility is not selected but yes one
 			INSERT INTO selector_sector
-			SELECT DISTINCT sector_id,current_user FROM arc WHERE expl_id2 IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user) AND sector_id > 0
+			SELECT DISTINCT sector_id, current_user FROM arc
+			WHERE sector_id > 0
+			  AND EXISTS (
+			    SELECT 1 FROM selector_expl se
+			    WHERE se.cur_user = current_user
+			      AND se.expl_id = ANY(arc.expl_visibility)
+			  )
 			UNION
-			SELECT DISTINCT sector_id,current_user FROM node WHERE expl_id2 IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user) AND sector_id > 0
+			SELECT DISTINCT sector_id, current_user FROM node
+			WHERE sector_id > 0
+			  AND EXISTS (
+			    SELECT 1 FROM selector_expl se
+			    WHERE se.cur_user = current_user
+			      AND se.expl_id = ANY(node.expl_visibility)
+			  )
 			ON CONFLICT (sector_id, cur_user) DO NOTHING;
 
 			-- muni
@@ -458,11 +470,23 @@ BEGIN
 			SELECT DISTINCT sector_id, current_user FROM node WHERE muni_id IN (SELECT muni_id FROM selector_municipality WHERE cur_user = current_user)
 			ON CONFLICT (sector_id, cur_user) DO NOTHING;
 
-			-- sector for those objects wich has expl_id2 and expl_id2 is not selected but yes one
+			-- sector for those objects wich has expl_visibility and expl_visibility is not selected but yes one
 			INSERT INTO selector_sector
-			SELECT DISTINCT sector_id,current_user FROM arc WHERE expl_id2 IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user) AND sector_id > 0
+			SELECT DISTINCT sector_id, current_user FROM arc
+			WHERE sector_id > 0
+			  AND EXISTS (
+			    SELECT 1 FROM selector_expl se
+			    WHERE se.cur_user = current_user
+			      AND se.expl_id = ANY(arc.expl_visibility)
+			  )
 			UNION
-			SELECT DISTINCT sector_id,current_user FROM node WHERE expl_id2 IN (SELECT expl_id FROM selector_expl WHERE cur_user = current_user) AND sector_id > 0
+			SELECT DISTINCT sector_id, current_user FROM node
+			WHERE sector_id > 0
+			  AND EXISTS (
+			    SELECT 1 FROM selector_expl se
+			    WHERE se.cur_user = current_user
+			      AND se.expl_id = ANY(node.expl_visibility)
+			  )
 			ON CONFLICT (sector_id, cur_user) DO NOTHING;
 
 			-- scenarios

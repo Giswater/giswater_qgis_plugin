@@ -1120,7 +1120,7 @@ CREATE TABLE arc (
 	om_state text NULL,
 	conserv_state text NULL,
 	parent_id varchar(16) NULL,
-	expl_id2 int4 NULL,
+	expl_visibility int2[] NULL,
 	brand_id varchar(50) NULL,
 	model_id varchar(50) NULL,
 	serial_number varchar(100) NULL,
@@ -1143,7 +1143,6 @@ CREATE TABLE arc (
 	CONSTRAINT arc_arccat_id_fkey FOREIGN KEY (arccat_id) REFERENCES cat_arc(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT arc_district_id_fkey FOREIGN KEY (district_id) REFERENCES ext_district(district_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT arc_expl_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT arc_expl_id2_fkey FOREIGN KEY (expl_id2) REFERENCES exploitation(expl_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT arc_feature_type_fkey FOREIGN KEY (feature_type) REFERENCES sys_feature_type(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT arc_muni_id_fkey FOREIGN KEY (muni_id) REFERENCES ext_municipality(muni_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT arc_ownercat_id_fkey FOREIGN KEY (ownercat_id) REFERENCES cat_owner(id) ON DELETE RESTRICT ON UPDATE CASCADE,
@@ -1163,7 +1162,7 @@ CREATE INDEX arc_arccat ON arc USING btree (arccat_id);
 CREATE INDEX arc_dma ON arc USING btree (dma_id);
 CREATE INDEX arc_dqa ON arc USING btree (dqa_id);
 CREATE INDEX arc_exploitation ON arc USING btree (expl_id);
-CREATE INDEX arc_exploitation2 ON arc USING btree (expl_id2);
+CREATE INDEX arc_expl_visibility_idx ON arc USING btree (expl_visibility);
 CREATE INDEX arc_index ON arc USING gist (the_geom);
 CREATE INDEX arc_muni ON arc USING btree (muni_id);
 CREATE INDEX arc_node1 ON arc USING btree (node_1);
@@ -1346,7 +1345,7 @@ CREATE TABLE connec (
 	access_type text NULL,
 	placement_type text NULL,
 	crmzone_id int4 NULL,
-	expl_id2 int4 NULL,
+	expl_visibility int2[] NULL,
 	plot_code varchar NULL,
 	brand_id varchar(50) NULL,
 	model_id varchar(50) NULL,
@@ -1374,7 +1373,6 @@ CREATE TABLE connec (
 	CONSTRAINT connec_crmzone_id_fkey FOREIGN KEY (crmzone_id) REFERENCES crm_zone(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT connec_district_id_fkey FOREIGN KEY (district_id) REFERENCES ext_district(district_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT connec_expl_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT connec_expl_id2_fkey FOREIGN KEY (expl_id2) REFERENCES exploitation(expl_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT connec_feature_type_fkey FOREIGN KEY (feature_type) REFERENCES sys_feature_type(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT connec_muni_id_fkey FOREIGN KEY (muni_id) REFERENCES ext_municipality(muni_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT connec_ownercat_id_fkey FOREIGN KEY (ownercat_id) REFERENCES cat_owner(id) ON DELETE RESTRICT ON UPDATE CASCADE,
@@ -1393,7 +1391,7 @@ CREATE INDEX connec_connecat ON connec USING btree (conneccat_id);
 CREATE INDEX connec_dma ON connec USING btree (dma_id);
 CREATE INDEX connec_dqa ON connec USING btree (dqa_id);
 CREATE INDEX connec_exploitation ON connec USING btree (expl_id);
-CREATE INDEX connec_exploitation2 ON connec USING btree (expl_id2);
+CREATE INDEX connec_expl_visibility_idx ON connec USING btree (expl_visibility);
 CREATE INDEX connec_index ON connec USING gist (the_geom);
 CREATE INDEX connec_muni ON connec USING btree (muni_id);
 CREATE INDEX connec_presszone ON connec USING btree (presszone_id);
@@ -1485,7 +1483,7 @@ CREATE TABLE element (
 	feature_type varchar(16) DEFAULT 'ELEMENT'::character varying NULL,
 	pol_id varchar(16) NULL,
 	top_elev numeric(12, 4) NULL,
-	expl_id2 int4 NULL,
+	expl_visibility int2[] NULL,
 	trace_featuregeom bool DEFAULT true NULL,
 	muni_id int4 NULL,
 	sector_id int4 DEFAULT 0 NULL,
@@ -1684,7 +1682,7 @@ CREATE TABLE node (
 	conserv_state text NULL,
 	access_type text NULL,
 	placement_type text NULL,
-	expl_id2 int4 NULL,
+	expl_visibility int2[] NULL,
 	brand_id varchar(50) NULL,
 	model_id varchar(50) NULL,
 	serial_number varchar(100) NULL,
@@ -1709,7 +1707,6 @@ CREATE TABLE node (
 	CONSTRAINT node_dma_id_fkey FOREIGN KEY (dma_id) REFERENCES dma(dma_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT node_dqa_id_fkey FOREIGN KEY (dqa_id) REFERENCES dqa(dqa_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT node_expl_fkey FOREIGN KEY (expl_id) REFERENCES exploitation(expl_id) ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT node_expl_id2_fkey FOREIGN KEY (expl_id2) REFERENCES exploitation(expl_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT node_feature_type_fkey FOREIGN KEY (feature_type) REFERENCES sys_feature_type(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT node_muni_id_fkey FOREIGN KEY (muni_id) REFERENCES ext_municipality(muni_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT node_nodecat_id_fkey FOREIGN KEY (nodecat_id) REFERENCES cat_node(id) ON DELETE RESTRICT ON UPDATE CASCADE,
@@ -1731,7 +1728,7 @@ CREATE INDEX node_arc_id ON node USING btree (arc_id);
 CREATE INDEX node_dma ON node USING btree (dma_id);
 CREATE INDEX node_dqa ON node USING btree (dqa_id);
 CREATE INDEX node_exploitation ON node USING btree (expl_id);
-CREATE INDEX node_exploitation2 ON node USING btree (expl_id2);
+CREATE INDEX node_expl_visibility_idx ON node USING btree (expl_visibility);
 CREATE INDEX node_index ON node USING gist (the_geom);
 CREATE INDEX node_muni ON node USING btree (muni_id);
 CREATE INDEX node_nodecat ON node USING btree (nodecat_id);
@@ -1793,7 +1790,7 @@ CREATE TABLE link (
 	presszone_id int4 NULL,
 	dqa_id int4 NULL,
 	minsector_id int4 NULL,
-	expl_id2 int4 NULL,
+	expl_visibility int2[] NULL,
 	epa_type varchar(16) NULL,
 	is_operative bool NULL,
 	staticpressure numeric(12, 3) NULL,
@@ -1829,8 +1826,7 @@ CREATE TABLE link (
 	CONSTRAINT link_workcat_id_fkey FOREIGN KEY (workcat_id) REFERENCES cat_work(id) ON DELETE RESTRICT ON UPDATE CASCADE
 );
 CREATE INDEX link_exit_id ON link USING btree (exit_id);
-CREATE INDEX link_expl_id2 ON link USING btree (expl_id2);
-CREATE INDEX link_exploitation2 ON link USING btree (expl_id2);
+CREATE INDEX link_expl_visibility_idx ON link USING btree (expl_visibility);
 CREATE INDEX link_feature_id ON link USING btree (feature_id);
 CREATE INDEX link_index ON link USING gist (the_geom);
 CREATE INDEX link_muni ON link USING btree (muni_id);
@@ -2046,12 +2042,10 @@ ALTER TABLE exploitation RENAME TO _exploitation;
 -- Drop foreign keys that reference exploitation
 ALTER TABLE ext_streetaxis DROP CONSTRAINT ext_streetaxis_exploitation_id_fkey;
 ALTER TABLE node DROP CONSTRAINT node_expl_fkey;
-ALTER TABLE node DROP CONSTRAINT node_expl_id2_fkey;
 ALTER TABLE config_user_x_expl DROP CONSTRAINT config_user_x_expl_expl_id_fkey;
 ALTER TABLE macrodqa DROP CONSTRAINT macrodqa_expl_id_fkey;
 ALTER TABLE om_streetaxis DROP CONSTRAINT om_streetaxis_exploitation_id_fkey;
 ALTER TABLE connec DROP CONSTRAINT connec_expl_fkey;
-ALTER TABLE connec DROP CONSTRAINT connec_expl_id2_fkey;
 ALTER TABLE om_waterbalance DROP CONSTRAINT om_waterbalance_expl_id_fkey;
 ALTER TABLE samplepoint DROP CONSTRAINT samplepoint_exploitation_id_fkey;
 ALTER TABLE ext_address DROP CONSTRAINT ext_address_exploitation_id_fkey;
@@ -2063,7 +2057,6 @@ ALTER TABLE plan_psector DROP CONSTRAINT plan_psector_expl_id_fkey;
 ALTER TABLE plan_netscenario DROP CONSTRAINT plan_netscenario_expl_id_fkey;
 ALTER TABLE om_visit DROP CONSTRAINT om_visit_expl_id_fkey;
 ALTER TABLE arc DROP CONSTRAINT arc_expl_fkey;
-ALTER TABLE arc DROP CONSTRAINT arc_expl_id2_fkey;
 ALTER TABLE link DROP CONSTRAINT link_exploitation_id_fkey;
 ALTER TABLE inp_pattern DROP CONSTRAINT inp_pattern_expl_id_fkey;
 ALTER TABLE minsector DROP CONSTRAINT minsector_expl_id_fkey;

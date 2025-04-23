@@ -21,7 +21,7 @@ SELECT columns_are(
     ARRAY[
         'link_id', 'code', 'feature_id', 'feature_type', 'linkcat_id', 'top_elev1', 'depth1', 'exit_id', 'exit_type',
         'top_elev2', 'depth2', 'userdefined_geom', 'state', 'expl_id', 'sector_id', 'dma_id',
-        'fluid_type', 'presszone_id', 'dqa_id', 'minsector_id', 'expl_id2', 'epa_type', 'is_operative',
+        'fluid_type', 'presszone_id', 'dqa_id', 'minsector_id', 'expl_visibility', 'epa_type', 'is_operative',
         'staticpressure', 'workcat_id', 'workcat_id_end', 'builtdate', 'enddate',
         'uncertain', 'muni_id', 'macrominsector_id', 'verified', 'supplyzone_id', 'n_hydrometer', 'custom_length', 'datasource',
         'omzone_id', 'the_geom', 'created_at', 'created_by', 'updated_at', 'updated_by'
@@ -66,8 +66,7 @@ SELECT col_default_is('link', 'macrominsector_id', '0', 'Column macrominsector_i
 
 -- Check indexes
 SELECT has_index('link', 'link_exit_id', 'Should have index on exit_id');
-SELECT has_index('link', 'link_expl_id2', 'Should have index on expl_id2');
-SELECT has_index('link', 'link_exploitation2', 'Should have index on expl_id2');
+SELECT has_index('link', 'link_expl_visibility_idx', 'Should have index on expl_visibility');
 SELECT has_index('link', 'link_feature_id', 'Should have index on feature_id');
 SELECT has_index('link', 'link_index', 'Should have index on the_geom');
 SELECT has_index('link', 'link_muni', 'Should have index on muni_id');

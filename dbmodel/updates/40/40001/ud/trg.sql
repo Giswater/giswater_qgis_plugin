@@ -444,7 +444,7 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_connect_update('connec');
 CREATE TRIGGER gw_trg_edit_controls AFTER DELETE OR UPDATE ON connec
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_controls('connec_id');
 
-CREATE TRIGGER gw_trg_link_data AFTER UPDATE OF state_type, expl_id2, conneccat_id, fluid_type ON connec
+CREATE TRIGGER gw_trg_link_data AFTER UPDATE OF state_type, expl_visibility, conneccat_id, fluid_type ON connec
 FOR EACH ROW EXECUTE FUNCTION gw_trg_link_data('connec');
 
 CREATE TRIGGER gw_trg_mantypevalue_fk_insert AFTER INSERT ON connec
@@ -498,7 +498,7 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_gully_proximity();
 CREATE TRIGGER gw_trg_gully_proximity_update AFTER UPDATE OF the_geom ON gully
 FOR EACH ROW EXECUTE FUNCTION gw_trg_gully_proximity();
 
-CREATE TRIGGER gw_trg_link_data AFTER UPDATE OF epa_type, state_type, expl_id2, _connec_arccat_id, fluid_type ON gully
+CREATE TRIGGER gw_trg_link_data AFTER UPDATE OF epa_type, state_type, expl_visibility, _connec_arccat_id, fluid_type ON gully
 FOR EACH ROW EXECUTE FUNCTION gw_trg_link_data('gully');
 
 CREATE TRIGGER gw_trg_typevalue_fk_insert AFTER INSERT ON gully
