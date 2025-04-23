@@ -10,7 +10,7 @@ INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_la
 INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) VALUES ('EVALVE', 'FRELEM', 'ELEMENT', 've_frelem', 've_frelem_evalve', true) ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer)
-SELECT concat('E', upper(REPLACE(id, ' ', '_'))), 'GENELEM', 'ELEMENT', 've_genelem', concat('ve_genelem_', lower(REPLACE(id, ' ', '_'))) FROM element_type
+SELECT concat('E', upper(REPLACE(id, ' ', '_'))), 'GENELEM', 'ELEMENT', 've_genelem', concat('ve_genelem_', concat('e', lower(REPLACE(id, ' ', '_')))) FROM element_type
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO cat_feature (id, feature_class, feature_type, shortcut_key, parent_layer, child_layer, descript, link_path, code_autofill, active, addparam)

@@ -9,7 +9,7 @@ BEGIN;
 SET client_min_messages TO WARNING;
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-SELECT plan(10);
+SELECT plan(12);
 
 -- NODE TESTS
 SELECT is(
