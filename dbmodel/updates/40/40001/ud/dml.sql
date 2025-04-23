@@ -786,3 +786,80 @@ INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tab
 VALUES('ve_frelem', 'tab_documents', 'Documents', 'List of documents', 'role_basic', NULL, '[
   {"actionName": "actionEdit", "disabled": false}
 ]'::json, 2, '{4}');
+
+
+-- 23/04/2025
+
+-- node
+DELETE FROM config_form_tableview WHERE objectname='tbl_element_x_node' AND columnname='sys_id';
+DELETE FROM config_form_tableview WHERE objectname='tbl_element_x_node' AND columnname='id';
+
+INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible,alias)
+VALUES ('node form','utils','tbl_element_x_node','feature_class',4,true,'feature_class');
+INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible,alias)
+VALUES ('node form','utils','tbl_element_x_node','element_type',5,true,'element_type');
+INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible,alias)
+VALUES ('node form','utils','tbl_element_x_node','location_type',16,true,'location_type');
+
+UPDATE config_form_tableview SET columnindex=0,visible=false WHERE objectname='tbl_element_x_node' AND columnname='node_id';
+UPDATE config_form_tableview SET columnindex=1 WHERE objectname='tbl_element_x_node' AND columnname='element_id';
+UPDATE config_form_tableview SET columnindex=2 WHERE objectname='tbl_element_x_node' AND columnname='elementcat_id';
+UPDATE config_form_tableview SET columnindex=3 WHERE objectname='tbl_element_x_node' AND columnname='num_elements';
+
+
+-- arc
+DELETE FROM config_form_tableview WHERE objectname='tbl_element_x_arc' AND columnname='sys_id';
+DELETE FROM config_form_tableview WHERE objectname='tbl_element_x_arc' AND columnname='id';
+
+INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible,alias)
+VALUES ('arc form','utils','tbl_element_x_arc','feature_class',4,true,'feature_class');
+INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible,alias)
+VALUES ('arc form','utils','tbl_element_x_arc','element_type',5,true,'element_type');
+INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible,alias)
+VALUES ('arc form','utils','tbl_element_x_arc','location_type',16,true,'location_type');
+
+UPDATE config_form_tableview SET columnindex=0,visible=false WHERE objectname='tbl_element_x_arc' AND columnname='arc_id';
+UPDATE config_form_tableview SET columnindex=1 WHERE objectname='tbl_element_x_arc' AND columnname='element_id';
+UPDATE config_form_tableview SET columnindex=2 WHERE objectname='tbl_element_x_arc' AND columnname='elementcat_id';
+UPDATE config_form_tableview SET columnindex=3 WHERE objectname='tbl_element_x_arc' AND columnname='num_elements';
+
+
+-- connec
+DELETE FROM config_form_tableview WHERE objectname='tbl_element_x_connec' AND columnname='sys_id';
+DELETE FROM config_form_tableview WHERE objectname='tbl_element_x_connec' AND columnname='id';
+
+INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible,alias)
+VALUES ('connec form','utils','tbl_element_x_connec','feature_class',4,true,'feature_class');
+INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible,alias)
+VALUES ('connec form','utils','tbl_element_x_connec','element_type',5,true,'element_type');
+INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible,alias)
+VALUES ('connec form','utils','tbl_element_x_connec','location_type',16,true,'location_type');
+
+UPDATE config_form_tableview SET columnindex=0,visible=false WHERE objectname='tbl_element_x_connec' AND columnname='connec_id';
+UPDATE config_form_tableview SET columnindex=1 WHERE objectname='tbl_element_x_connec' AND columnname='element_id';
+UPDATE config_form_tableview SET columnindex=2 WHERE objectname='tbl_element_x_connec' AND columnname='elementcat_id';
+UPDATE config_form_tableview SET columnindex=3 WHERE objectname='tbl_element_x_connec' AND columnname='num_elements';
+
+
+-- gully
+DELETE FROM config_form_tableview WHERE objectname='tbl_element_x_gully' AND columnname='sys_id';
+DELETE FROM config_form_tableview WHERE objectname='tbl_element_x_gully' AND columnname='id';
+
+INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible,alias)
+VALUES ('gully form','ud','tbl_element_x_gully','feature_class',4,true,'feature_class');
+INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible,alias)
+VALUES ('gully form','ud','tbl_element_x_gully','element_type',5,true,'element_type');
+INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible,alias)
+VALUES ('gully form','ud','tbl_element_x_gully','state_type',7,true,'state_type');
+INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible,alias)
+VALUES ('gully form','ud','tbl_element_x_gully','location_type',13,true,'location_type');
+
+UPDATE config_form_tableview SET columnindex=0,visible=false WHERE objectname='tbl_element_x_gully' AND columnname='gully_id';
+UPDATE config_form_tableview SET columnindex=1 WHERE objectname='tbl_element_x_gully' AND columnname='element_id';
+UPDATE config_form_tableview SET columnindex=2 WHERE objectname='tbl_element_x_gully' AND columnname='elementcat_id';
+UPDATE config_form_tableview SET columnindex=3 WHERE objectname='tbl_element_x_gully' AND columnname='num_elements';
+UPDATE config_form_tableview SET columnindex=8 WHERE objectname='tbl_element_x_gully' AND columnname='observ';
+UPDATE config_form_tableview SET columnindex=9 WHERE objectname='tbl_element_x_gully' AND columnname='comment';
+UPDATE config_form_tableview SET columnindex=10 WHERE objectname='tbl_element_x_gully' AND columnname='builtdate';
+UPDATE config_form_tableview SET columnindex=11 WHERE objectname='tbl_element_x_gully' AND columnname='enddate';
+UPDATE config_form_tableview SET columnindex=12 WHERE objectname='tbl_element_x_gully' AND columnname='descript';

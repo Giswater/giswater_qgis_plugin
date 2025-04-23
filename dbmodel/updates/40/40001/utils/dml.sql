@@ -424,3 +424,39 @@ WHERE id = 'edit_doctype_vdefault';
 
 INSERT INTO config_form_list (listname, query_text, device, listtype, listclass, vdefault, addparam)
 VALUES('tbl_doc_x_element', 'SELECT * FROM v_ui_doc_x_element WHERE element_id IS NOT NULL', 4, 'tab', 'list', NULL, NULL);
+
+-- 23/04/2025
+INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible,alias)
+	VALUES ('link form','utils','tbl_element_x_link','link_id',0,false,'link_id');
+INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible,alias)
+	VALUES ('link form','utils','tbl_element_x_link','element_id',1,true,'element_id');
+INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible,alias)
+	VALUES ('link form','utils','tbl_element_x_link','elementcat_id',2,true,'elementcat_id');
+INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible,alias)
+	VALUES ('link form','utils','tbl_element_x_link','num_elements',3,true,'num_elements');
+INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible,alias)
+	VALUES ('link form','utils','tbl_element_x_link','feature_class',4,true,'feature_class');
+INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible,alias)
+	VALUES ('link form','utils','tbl_element_x_link','element_type',5,true,'element_type');
+INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible,alias)
+	VALUES ('link form','utils','tbl_element_x_link','state',6,true,'state');
+INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible,alias)
+	VALUES ('link form','utils','tbl_element_x_link','state_type',7,true,'state_type');
+INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible,alias)
+	VALUES ('link form','utils','tbl_element_x_link','observ',8,true,'observ');
+INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible,alias)
+	VALUES ('link form','utils','tbl_element_x_link','comment',9,true,'comment');
+INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible,alias)
+	VALUES ('link form','utils','tbl_element_x_link','builtdate',10,true,'builtdate');
+INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible,alias)
+	VALUES ('link form','utils','tbl_element_x_link','enddate',11,true,'enddate');
+INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible,alias)
+	VALUES ('link form','utils','tbl_element_x_link','link',12,true,'link');
+INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible,alias)
+	VALUES ('link form','utils','tbl_element_x_link','publish',13,true,'publish');
+INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible,alias)
+	VALUES ('link form','utils','tbl_element_x_link','inventory',14,true,'inventory');
+INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible,alias)
+	VALUES ('link form','utils','tbl_element_x_link','descript',15,true,'descript');
+INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible,alias)
+	VALUES ('link form','utils','tbl_element_x_link','location_type',16,true,'location_type');
