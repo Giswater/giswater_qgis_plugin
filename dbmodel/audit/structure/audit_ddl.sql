@@ -20,3 +20,15 @@ CREATE TABLE audit.log (
     user_name text,
     schema text
 );
+
+CREATE TABLE audit.sys_version (
+	id serial4 NOT NULL,
+	giswater varchar(16) NOT NULL,
+	project_type varchar(16) NOT NULL,
+	postgres varchar(512) NOT NULL,
+	postgis varchar(512) NOT NULL,
+	"date" timestamp(6) DEFAULT now() NOT NULL,
+	"language" varchar(50) NOT NULL,
+	epsg int4 NOT NULL,
+	CONSTRAINT sys_version_pkey PRIMARY KEY (id)
+);
