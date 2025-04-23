@@ -121,6 +121,7 @@ class GwStyleManager:
         self._load_sys_roles(dialog_create)
 
         dialog_create.btn_add.clicked.connect(partial(self._handle_add_feature, dialog_create))
+        dialog_create.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, dialog_create))
         dialog_create.feature_id.textChanged.connect(partial(self._check_style_exists, dialog_create))
         dialog_create.idval.textChanged.connect(partial(self._check_style_exists, dialog_create))
 
