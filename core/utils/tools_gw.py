@@ -3689,7 +3689,7 @@ def set_tablemodel_config(dialog, widget, table_name, sort_order=0, schema_name=
         widget.model().select()
     # Delete columns
     for column in columns_to_delete:
-        if column:
+        if column is not None:
             widget.hideColumn(column)
 
     return widget
