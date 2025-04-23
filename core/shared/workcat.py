@@ -13,7 +13,7 @@ from functools import partial
 from qgis.PyQt.QtCore import QDate, Qt
 from qgis.PyQt.QtGui import QColor, QStandardItemModel, QCursor
 from qgis.PyQt.QtSql import QSqlTableModel
-from qgis.PyQt.QtWidgets import QAbstractItemView, QComboBox, QFileDialog, QLabel, QHeaderView, QTableView, QMenu, QAction, QPushButton
+from qgis.PyQt.QtWidgets import QAbstractItemView, QLabel, QHeaderView, QTableView, QMenu, QAction, QPushButton
 
 from .document import GwDocument
 from ..ui.ui_manager import GwWorkcatManagerUi, GwInfoWorkcatUi, GwSearchWorkcatUi
@@ -402,21 +402,7 @@ class GwWorkcat:
     def _get_folder_dialog(self, dialog, widget):
         """ Get folder dialog """
 
-        widget.setStyleSheet(None)
-        try:
-            folder_path = os.path.expanduser("~/Documents" if os.name == 'nt' else "~")
-        except Exception:
-            folder_path = os.path.expanduser("~")
-
-        # Open dialog to select folder
-        os.chdir(folder_path)
-        file_dialog = QFileDialog()
-        file_dialog.setFileMode(QFileDialog.Directory)
-
-        msg = "Save as"
-        folder_path, filter_ = file_dialog.getSaveFileName(None, tools_qt.tr(msg), folder_path, '*.csv')
-        if folder_path:
-            tools_qt.set_widget_text(dialog, widget, str(folder_path))
+        tools_qt.get_save_file_path(dialog, widget, '*.csv', 'Save as', os.path.expanduser("~/Documents" if os.name == 'nt' else "~"))
 
     def _force_state(self, qbutton, state, qtable):
         """ Force selected state and set qtable enabled = True """

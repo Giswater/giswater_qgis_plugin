@@ -15,8 +15,7 @@ from datetime import datetime, timedelta
 from functools import partial
 
 from qgis.PyQt.QtCore import Qt, QDate, QStringListModel, QTime, QDateTime, QTimer
-from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCompleter, QLineEdit, QTableView, QTabWidget, QTextEdit, \
-    QLabel, QFileDialog
+from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCompleter, QLineEdit, QTableView, QTabWidget, QTextEdit, QLabel
 from qgis.PyQt.QtXml import QDomDocument
 from qgis.core import QgsApplication, QgsFeatureRequest, QgsPrintLayout, QgsProject, QgsReadWriteContext, \
     QgsVectorLayer
@@ -490,7 +489,7 @@ class GwMincut:
 
 
     def manage_docker(self):
-        
+
         tools_gw.init_docker('qgis_form_docker')
         if lib_vars.session_vars['dialog_docker']:
             tools_gw.docker_dialog(self.dlg_mincut, 'mincut')
@@ -1763,19 +1762,11 @@ class GwMincut:
 
         result_mincut_id = tools_qt.get_text(self.dlg_mincut, "result_mincut_id")
 
-        # Select export path
-        try:
-            folder_path = os.path.expanduser("~/Documents" if os.name == 'nt' else "~")
-        except Exception:
-            folder_path = os.path.expanduser("~")
-
-        # Open dialog to select folder
-        os.chdir(folder_path)
-        file_dialog = QFileDialog()
-        file_dialog.setFileMode(QFileDialog.Directory)
-
-        msg = "Save as"
-        folder_path, filter_ = file_dialog.getSaveFileName(None, tools_qt.tr(msg), os.path.join(folder_path, f'{result_mincut_id}_{datetime.now().strftime("%d%m%Y")}'), '*.csv')
+        folder_path = tools_qt.get_save_file_path(
+            self.dlg_mincut, '', '*.csv', 'Save as',
+            os.path.expanduser("~/Documents" if os.name == 'nt' else "~"),
+            f'{result_mincut_id}_{datetime.now().strftime("%d%m%Y")}'
+        )
 
         if not folder_path:
             return

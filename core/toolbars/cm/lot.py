@@ -10,7 +10,7 @@ from qgis.core import QgsPointXY
 from qgis.PyQt.QtCore import QStringListModel, QDate, QSortFilterProxyModel, Qt, QDateTime, QSettings
 from qgis.PyQt.QtGui import QColor, QStandardItem, QStandardItemModel
 from qgis.PyQt.QtSql import QSqlTableModel
-from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCheckBox, QComboBox, QCompleter, QFileDialog, QHBoxLayout
+from qgis.PyQt.QtWidgets import QAbstractItemView, QAction, QCheckBox, QComboBox, QCompleter, QHBoxLayout
 from qgis.PyQt.QtWidgets import QLineEdit, QTableView, QToolButton, QWidget, QDateEdit, QPushButton
 from qgis.core import QgsFeatureRequest, QgsGeometry
 from qgis.gui import QgsRubberBand
@@ -1876,24 +1876,7 @@ class AddNewLot:
         """Opens a file or directory selection dialog, allowing the user to choose a path,
         and updates the corresponding UI component with the selected path."""
 
-        widget = tools_qt.get_widget(dialog, str(widget_name))
-        csv_path = tools_qt.get_text(dialog, widget)
-        # Set default value if necessary
-        if csv_path is None or csv_path == '':
-            csv_path = self.plugin_dir
-
-        # Get directory of that file
-        folder_path = os.path.dirname(csv_path)
-        if not os.path.exists(folder_path):
-            folder_path = os.path.dirname(__file__)
-        os.chdir(folder_path)
-        message = self.controller.tr("Select CSV file")
-        if Qgis.QGIS_VERSION_INT < 29900:
-            csv_path = QFileDialog.getSaveFileName(None, message, "", '*.csv')
-        else:
-            csv_path, filter_ = QFileDialog.getSaveFileName(None, message, "", '*.csv')
-
-        tools_qt.set_widget_text(dialog, widget, csv_path)
+        tools_qt.get_save_file_path(dialog, widget_name, '*.csv', "Select CSV file")
 
 
     def export_model_to_csv(self, dialog, qtable, widget_name, columns=(''), date_format='yyyy-MM-dd'):
