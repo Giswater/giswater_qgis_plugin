@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>964</width>
-    <height>437</height>
+    <height>575</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -26,15 +26,138 @@
    <string>Dialog</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_4">
-   <item row="3" column="0" colspan="2">
+   <item row="1" column="0">
+    <widget class="QGroupBox" name="grp_search_options">
+     <property name="title">
+      <string>Search Options</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="2" column="0">
+       <widget class="QCheckBox" name="chk_py_messages">
+        <property name="text">
+         <string>Check for PY Messages</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QCheckBox" name="chk_for_su_tables">
+        <property name="text">
+         <string>Check for basic DB tables (cat_feature...)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QCheckBox" name="chk_db_dialogs">
+        <property name="text">
+         <string>Check dialogs for DB tables</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QCheckBox" name="chk_am_dialogs">
+        <property name="text">
+         <string>Check for am tables</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QCheckBox" name="chk_cm_dialogs">
+        <property name="text">
+         <string>Check for cm tables</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QGroupBox" name="grb_i18n_conn">
+     <property name="title">
+      <string>i18n Conection</string>
+     </property>
+     <layout class="QFormLayout" name="formLayout_3">
+      <item row="0" column="0">
+       <widget class="QLabel" name="lbl_host">
+        <property name="text">
+         <string>Host:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="txt_host"/>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="lbl_port">
+        <property name="text">
+         <string>Port:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="txt_port"/>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="lbl_database">
+        <property name="text">
+         <string>Database:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLineEdit" name="txt_db"/>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="lbl_user">
+        <property name="text">
+         <string>User:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QLineEdit" name="txt_user"/>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="lbl_pass">
+        <property name="text">
+         <string>Password:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="QLineEdit" name="txt_pass">
+        <property name="text">
+         <string/>
+        </property>
+        <property name="echoMode">
+         <enum>QLineEdit::Password</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="1">
+       <widget class="QPushButton" name="btn_connection">
+        <property name="text">
+         <string>Test connection</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="8" column="1">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="10" column="0" colspan="2">
     <layout class="QGridLayout" name="lyt_buttons">
-     <item row="0" column="1">
-      <widget class="QPushButton" name="btn_update">
-       <property name="text">
-        <string>Update</string>
-       </property>
-      </widget>
-     </item>
      <item row="0" column="2">
       <widget class="QPushButton" name="btn_close">
        <property name="text">
@@ -55,246 +178,21 @@
        </property>
       </spacer>
      </item>
+     <item row="0" column="1">
+      <widget class="QPushButton" name="btn_search">
+       <property name="text">
+        <string>Search</string>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
-   <item row="0" column="0" colspan="2">
-    <widget class="QTabWidget" name="tabmain">
-     <property name="currentIndex">
-      <number>0</number>
+   <item row="2" column="0">
+    <widget class="QLabel" name="lbl_info">
+     <property name="text">
+      <string/>
      </property>
-     <widget class="QWidget" name="tab_missing_dialogs">
-      <attribute name="title">
-       <string>Missing Dialogs</string>
-      </attribute>
-      <layout class="QGridLayout" name="gridLayout_3">
-       <item row="2" column="0" colspan="2">
-        <widget class="QLabel" name="lbl_info">
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1" rowspan="2">
-        <widget class="QGroupBox" name="grb_org_conn">
-         <property name="enabled">
-          <bool>true</bool>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>0</height>
-          </size>
-         </property>
-         <property name="title">
-          <string>Origin connection</string>
-         </property>
-         <layout class="QGridLayout" name="gridLayout">
-          <item row="5" column="0">
-           <widget class="QGroupBox" name="grb_updatetype">
-            <property name="title">
-             <string>Updating type:</string>
-            </property>
-            <layout class="QVBoxLayout" name="verticalLayout_6">
-             <item>
-              <widget class="QComboBox" name="cmb_updatetype">
-               <item>
-                <property name="text">
-                 <string>Update from existing schema</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>Create new temporal schema</string>
-                </property>
-               </item>
-              </widget>
-             </item>
-             <item>
-              <layout class="QGridLayout" name="gridLayout_5">
-               <item row="2" column="0">
-                <layout class="QVBoxLayout" name="verticalLayout_5">
-                 <item>
-                  <spacer name="verticalSpacer_2">
-                   <property name="orientation">
-                    <enum>Qt::Vertical</enum>
-                   </property>
-                   <property name="sizeHint" stdset="0">
-                    <size>
-                     <width>20</width>
-                     <height>40</height>
-                    </size>
-                   </property>
-                  </spacer>
-                 </item>
-                </layout>
-               </item>
-               <item row="3" column="1">
-                <layout class="QVBoxLayout" name="lyt_new_schema">
-                 <item>
-                  <widget class="QLabel" name="lbl_txt_schema_org">
-                   <property name="text">
-                    <string>New schema name:</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QLineEdit" name="txt_schema_org"/>
-                 </item>
-                </layout>
-               </item>
-               <item row="2" column="1">
-                <layout class="QVBoxLayout" name="lyt_existing_schema">
-                 <item>
-                  <widget class="QLabel" name="lbl_cmb_schema_org">
-                   <property name="text">
-                    <string>Existing schema name</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QComboBox" name="cmb_schema_org"/>
-                 </item>
-                </layout>
-               </item>
-              </layout>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <layout class="QFormLayout" name="formLayout">
-            <item row="0" column="0">
-             <widget class="QLabel" name="lbl_project_type">
-              <property name="text">
-               <string>Project type:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="1">
-             <widget class="QComboBox" name="cmb_projecttype"/>
-            </item>
-           </layout>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item row="0" column="0">
-        <widget class="QGroupBox" name="grb_i18n_conn">
-         <property name="title">
-          <string>i18n Conection</string>
-         </property>
-         <layout class="QFormLayout" name="formLayout_3">
-          <item row="0" column="0">
-           <widget class="QLabel" name="lbl_host">
-            <property name="text">
-             <string>Host:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QLineEdit" name="txt_host"/>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="lbl_port">
-            <property name="text">
-             <string>Port:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QLineEdit" name="txt_port"/>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="lbl_database">
-            <property name="text">
-             <string>Database:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="QLineEdit" name="txt_db"/>
-          </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="lbl_user">
-            <property name="text">
-             <string>User:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="1">
-           <widget class="QLineEdit" name="txt_user"/>
-          </item>
-          <item row="4" column="0">
-           <widget class="QLabel" name="lbl_pass">
-            <property name="text">
-             <string>Password:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="1">
-           <widget class="QLineEdit" name="txt_pass">
-            <property name="text">
-             <string/>
-            </property>
-            <property name="echoMode">
-             <enum>QLineEdit::Password</enum>
-            </property>
-           </widget>
-          </item>
-          <item row="5" column="1">
-           <widget class="QPushButton" name="btn_connection">
-            <property name="text">
-             <string>Test connection</string>
-            </property>
-           </widget>
-          </item>
-          <item row="6" column="0" colspan="2">
-           <layout class="QHBoxLayout" name="horizontalLayout">
-            <item>
-             <widget class="QCheckBox" name="chk_search_for_repeated">
-              <property name="text">
-               <string>Check for repeated project_types</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QCheckBox" name="check_for_su_tables">
-              <property name="text">
-               <string>Check for basic tables (cat_feature...)</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-         </layout>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="tab_2">
-      <attribute name="title">
-       <string>Forgotten Python Dialogs</string>
-      </attribute>
-     </widget>
-     <widget class="QWidget" name="tab_translation_files">
-      <attribute name="title">
-       <string>Translation Files</string>
-      </attribute>
-     </widget>
     </widget>
-   </item>
-   <item row="1" column="1">
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
    </item>
   </layout>
  </widget>

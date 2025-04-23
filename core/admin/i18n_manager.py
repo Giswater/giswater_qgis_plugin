@@ -6,6 +6,7 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 import re
+import os
 import psycopg2
 import psycopg2.extras
 from psycopg2.extras import execute_values
@@ -34,95 +35,22 @@ class GwSchemaI18NManager:
         tools_gw.load_settings(self.dlg_qm)
         self._load_user_values()  # keep values
         self.dev_commit = tools_gw.get_config_parser('system', 'force_commit', "user", "init", prefix=True)
-        self.dlg_qm.btn_update.setEnabled(False)
+        self.dlg_qm.btn_search.setEnabled(False)
         self._set_signals()  # Set all the signals to wait for response
 
-        # Get the project_types (ws, ud)
-        self.project_types = tools_gw.get_config_parser('system', 'project_types', "project", "giswater", False,
-                                                        force_reload=True)
-        self.project_types = self.project_types.split(',')
-
-        # Populate combo types
-        self.dlg_qm.cmb_projecttype.clear()
-        for aux in self.project_types:
-            self.dlg_qm.cmb_projecttype.addItem(str(aux))
-
         tools_gw.open_dialog(self.dlg_qm, dlg_name='admin_i18n_manager')
-        self._set_values()
 
-    # region Button functions
+
     def _set_signals(self):
         # Mysteriously without the partial the function check_connection is not called
         self.dlg_qm.btn_connection.clicked.connect(partial(self._check_connection))
-        self.dlg_qm.btn_update.clicked.connect(self.missing_dialogs)
+        self.dlg_qm.btn_search.clicked.connect(self._update_i18n_databse)
         self.dlg_qm.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_qm))
         self.dlg_qm.btn_close.clicked.connect(partial(self._close_db_i18n))
         self.dlg_qm.btn_close.clicked.connect(partial(self._close_db_org))
         self.dlg_qm.rejected.connect(self._save_user_values)
         self.dlg_qm.rejected.connect(self._close_db_org)
         self.dlg_qm.rejected.connect(self._close_db_i18n)
-        self.dlg_qm.cmb_updatetype.currentIndexChanged.connect(partial(self._set_values))
-        self.dlg_qm.cmb_schema_org.currentIndexChanged.connect(partial(self._set_values))
-
-        # Populate schema names
-        self.dlg_qm.cmb_projecttype.currentIndexChanged.connect(partial(self._populate_data_schema_name, self.dlg_qm.cmb_projecttype))
-
-    def _set_values(self):
-        # Mysteriously without the partial the function check_connection is not called
-        self.project_type = tools_qt.get_text(self.dlg_qm, self.dlg_qm.cmb_projecttype, 0)
-        up_type = tools_qt.get_text(self.dlg_qm, self.dlg_qm.cmb_updatetype, 0)
-        if up_type == "Update from existing schema":
-            self.revise_lang = True
-            self.schema_org = tools_qt.get_text(self.dlg_qm, self.dlg_qm.cmb_schema_org, 0)
-            self._change_update_type(self.dlg_qm.lyt_new_schema, self.dlg_qm.lyt_existing_schema)
-        elif up_type == "Create new temporal schema":
-            self.revise_lang = False
-            self.schema_org = tools_qt.get_text(self.dlg_qm, self.dlg_qm.txt_schema_org)
-            self._change_update_type(self.dlg_qm.lyt_existing_schema, self.dlg_qm.lyt_new_schema)
-
-    def _change_update_type(self, previous_layout, new_layout):
-        # Disable all widgets in the previous layout
-        for i in range(previous_layout.count()):
-            widget = previous_layout.itemAt(i).widget()
-            if widget is not None:
-                widget.setEnabled(False)
-
-        # Enable all widgets in the new layout
-        for i in range(new_layout.count()):
-            widget = new_layout.itemAt(i).widget()
-            if widget is not None:
-                widget.setEnabled(True)
-
-    def _populate_data_schema_name(self, widget):
-         # Get filter
-        filter_ = tools_qt.get_text(self.dlg_qm, widget)
-        if filter_ in (None, 'null') and self.project_type_selected:
-            filter_ = self.project_type_selected
-        if filter_ is None:
-            return
-        # Populate Project data schema Name
-        sql = "SELECT schema_name FROM information_schema.schemata"
-        rows = tools_db.get_rows(sql, commit=self.dev_commit)
-        if rows is None:
-            return
-
-        result_list = []
-        for row in rows:
-            sql = (f"SELECT EXISTS (SELECT * FROM information_schema.tables "
-                   f"WHERE table_schema = '{row[0]}' "
-                   f"AND table_name = 'sys_version')")
-            exists = tools_db.get_row(sql)
-            if exists and str(exists[0]) == 'True':
-                sql = f"SELECT project_type FROM {row[0]}.sys_version"
-                result = tools_db.get_row(sql)
-                if result is not None and result[0] == filter_.upper():
-                    elem = [row[0], row[0]]
-                    result_list.append(elem)
-        if not result_list:
-            self.dlg_qm.cmb_schema_org.clear()
-            return
-
-        tools_qt.fill_combo_values(self.dlg_qm.cmb_schema_org, result_list)
 
     def _load_user_values(self):
         """
@@ -155,37 +83,37 @@ class GwSchemaI18NManager:
 
         # Send messages
         if not status_i18n:
-            self.dlg_qm.btn_update.setEnabled(False)
+            self.dlg_qm.btn_search.setEnabled(False)
             self.dlg_qm.lbl_info.clear()
             tools_qt.show_info_box(f"Error connecting to i18n databse")
             QApplication.processEvents()
             return
         elif host_i18n != '188.245.226.42' and port_i18n != '5432' and db_i18n != 'giswater':
-            self.dlg_qm.btn_update.setEnabled(False)
+            self.dlg_qm.btn_search.setEnabled(False)
             self.dlg_qm.lbl_info.clear()
             tools_qt.show_info_box(f"Error connecting to i18n databse")
             QApplication.processEvents()
             return
         elif 'password authentication failed' in str(self.last_error):
-            self.dlg_qm.btn_update.setEnabled(False)
+            self.dlg_qm.btn_search.setEnabled(False)
             self.dlg_qm.lbl_info.clear()
             tools_qt.show_info_box(f"Incorrect user or password")
             QApplication.processEvents()
             return
         else:
-            self.dlg_qm.btn_update.setEnabled(True)
+            self.dlg_qm.btn_search.setEnabled(True)
             self.dlg_qm.lbl_info.clear()
             tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', f"Successful connection to {db_i18n} database")
             QApplication.processEvents()
 
         if not status_org:
-            self.dlg_qm.btn_update.setEnabled(False)
+            self.dlg_qm.btn_search.setEnabled(False)
             self.dlg_qm.lbl_info.clear()
             tools_qt.show_info_box(f"Error connecting to origin database")
             QApplication.processEvents()
             return
         elif 'password authentication failed' in str(self.last_error):
-            self.dlg_qm.btn_update.setEnabled(False)
+            self.dlg_qm.btn_search.setEnabled(False)
             self.dlg_qm.lbl_info.clear()
             tools_qt.show_info_box(f"Error connecting to origin database")
             QApplication.processEvents()
@@ -255,51 +183,86 @@ class GwSchemaI18NManager:
         tools_gw.set_config_parser('i18n_generator', 'qm_lang_py_msg', f"{py_msg}", "user", "session", prefix=False)
         tools_gw.set_config_parser('i18n_generator', 'qm_lang_db_msg', f"{db_msg}", "user", "session", prefix=False)
 
+    def pass_schema_info(self, schema_info):
+        self.project_type = schema_info['project_type']
+        self.project_epsg = schema_info['project_epsg']
+        self.project_version = schema_info['project_version']
+
     # endregion
+    def _update_i18n_databse(self):
+        self.project_types = []
+
+        if tools_qt.is_checked(self.dlg_qm, self.dlg_qm.chk_db_dialogs):
+            self.project_types.extend(["ws", "ud"])
+        if tools_qt.is_checked(self.dlg_qm, self.dlg_qm.chk_am_dialogs):
+            self.project_types.extend(["am"])
+        if tools_qt.is_checked(self.dlg_qm, self.dlg_qm.chk_cm_dialogs):
+            self.project_types.extend(["cm"])
+
+        self.py_messages = tools_qt.is_checked(self.dlg_qm, self.dlg_qm.chk_py_messages)
+        self.schema_i18n = "i18n"
+        
+        if self.project_types:
+            self._update_db_tables()
+
+        if self.py_messages:
+            self._update_py_messages()
+
+
     # region Missing DB Dialogs
-    def missing_dialogs(self):
-        self.check_for_repeated = tools_qt.is_checked(self.dlg_qm, self.dlg_qm.chk_search_for_repeated)
-        self.check_for_su_tables = tools_qt.is_checked(self.dlg_qm, self.dlg_qm.check_for_su_tables)
-        tables = [ "dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue", 
-                    "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report", 
-                    "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_fields_feat", 
-                    "dbconfig_form_tableview", "dbtable", "dbjson"
-                 ]
-        if self.check_for_su_tables:
-            tables.append("su_basic_tables")
-            tables.append("su_feature")
-
-        schema_i18n = "i18n"
+    def _update_db_tables(self):
+        self.check_for_su_tables = tools_qt.is_checked(self.dlg_qm, self.dlg_qm.chk_for_su_tables)
+        major_version = tools_qgis.get_major_version(plugin_dir=self.plugin_dir).replace(".", "")
         text_error = ''
-        self.dlg_qm.lbl_info.clear()
-        for table in tables:
-            table = f"{schema_i18n}.{table}"
-            table_exists = self.detect_table_func(table)
-            correct_lang = self._verify_lang()
-            if table_exists:
-                if correct_lang or not self.revise_lang:
-                    text_error += self._update_tables(table)
-                else:
-                    tools_qt.show_info_box('Incorrect languages, make sure to have the giswater project in english')
-                    break
-            else:
-                tools_qt.show_info_box(f"The table ({table}) does not exists")
+        no_repeat_table = []
 
-            if self.check_for_repeated:
-                text_error += self._update_project_type(table)
-            self._vacuum_commit(table, self.conn_i18n, self.cursor_i18n)
+        for self.project_type in self.project_types:
+            tables_i18n, sutables_i18n = self.tables_dic(self.project_type)
+            self.schema_org = self.project_type
+            print(self.project_type)
+            if self.project_type != "am":
+                self.schema_org = f"{self.project_type}{major_version}_trans"
+
+            schema_exists = self._detect_schema(self.schema_org)
+            if not schema_exists:
+                tools_qt.show_info_box(f"The schema ({self.schema_org}) does not exists")
+                return
+            if self.check_for_su_tables:
+                tables_i18n.extend(sutables_i18n)
+
+            text_error += f'\n{self.project_type}:\n'
+            self.dlg_qm.lbl_info.clear()
+            for table_i18n in tables_i18n:
+                table_i18n = f"{self.schema_i18n}.{table_i18n}"
+                if table_i18n not in no_repeat_table:
+                    table_exists = self.detect_table_func(table_i18n)
+                    correct_lang = self._verify_lang()
+                    self._change_table_lyt(table_i18n.split(".")[1])
+                    if not table_exists:
+                        tools_qt.show_info_box(f"The table ({table_i18n.split(".")[1]}) does not exists")
+                        no_repeat_table.append(table_i18n)
+                    elif correct_lang:
+                        text_error += self._update_tables(table_i18n)
+
+                        #check for all primary keys reapeted, but project_types
+                        text_error += self._update_project_type(table_i18n)
+                        self._vacuum_commit(table_i18n, self.conn_i18n, self.cursor_i18n)
+                    else:
+                        tools_qt.show_info_box('Incorrect languages, make sure to have the giswater project in english')
+                        break                   
+
+                
 
         self.dlg_qm.lbl_info.clear()
         tools_qt.show_info_box(text_error)
 
 
     def _update_tables(self, table_i18n):
-        self._change_table_lyt(table_i18n)
         tables_org = self._find_table_org(table_i18n)
         
         query = ""
         for table_org in tables_org:
-            if "dbjson" in table_i18n:
+            if "json" in table_i18n:
                 query += self._json_update(table_i18n, table_org)
             elif "dbconfig_form_fields_feat" in table_i18n:
                 query += self._dbconfig_form_fields_feat_update(table_i18n)
@@ -307,24 +270,15 @@ class GwSchemaI18NManager:
                 query += self._update_any_table(table_i18n, table_org)
 
         if query == '':
-            return f'{table_i18n}: 1- No update needed. '
+            return f'{table_i18n.split(".")[1]}: 1- No update needed. '
         else:
             try:
                 self.cursor_i18n.execute(query)
                 self.conn_i18n.commit()
-                return f'{table_i18n}: 1- Succesfully translated table. '
+                return f'{table_i18n.split(".")[1]}: 1- Succesfully updated table. '
             except Exception as e:
                 self.conn_i18n.rollback()
                 return f"An error occured while translating {table_i18n}: {e}\n"
-    
-
-    def _verify_lang(self):
-        query = f"SELECT language from {self.schema_org}.sys_version"
-        self.cursor_org.execute(query)
-        language_org = self.cursor_org.fetchone()[0]
-        if language_org != 'en_US':
-            return False
-        return True
     
 
     def _update_any_table(self, table_i18n, table_org):
@@ -332,13 +286,13 @@ class GwSchemaI18NManager:
 
         columns = ", ".join(columns_i18n)
         query = f"SELECT {columns} FROM {table_i18n};"
-        print(query)
         rows_i18n = self._get_rows(query, self.cursor_i18n)
+        print(query)
 
         columns = ", ".join(columns_org)
         query = f"SELECT {columns} FROM {self.schema_org}.{table_org};"
-        print(query)
         rows_org = self._get_rows(query, self.cursor_org)
+        print(query)
 
         query = ""
         if rows_i18n:
@@ -423,6 +377,7 @@ class GwSchemaI18NManager:
                                     {texts[0]}, {texts[1]}) 
                                     ON CONFLICT (source_code, project_type, context, formname, source) 
                                     DO UPDATE SET lb_en_us = {texts[0]}, tt_en_us = {texts[1]};\n"""
+                    
                    
                 elif 'dbconfig_report' in table_i18n:
                     query_row = f"""INSERT INTO {table_i18n} (source_code, context, project_type, source, al_en_us, ds_en_us) 
@@ -467,7 +422,7 @@ class GwSchemaI18NManager:
                 
                 elif 'su_basic_tables' in table_i18n:
                     source = row_org["id"]
-                    if table_org == "value_state_type":
+                    if table_org == "value_state_type" or self.project_type == "am":
                         texts.append('null')
                     query_row = f"""INSERT INTO {table_i18n} (source_code, context, project_type, source, na_en_us, ob_en_us) 
                                     VALUES ('giswater', '{table_org}', '{self.project_type}', '{source}', {texts[0]}, {texts[1]}) 
@@ -479,6 +434,12 @@ class GwSchemaI18NManager:
                                     VALUES ('giswater', '{table_org}', '{self.project_type}', '{row_org["feature_class"]}', '{row_org["feature_type"]}', {texts[0]}, {texts[1]}) 
                                     ON CONFLICT (source_code, context, project_type, feature_class, feature_type, lb_en_us) 
                                     DO UPDATE SET lb_en_us = {texts[0]}, ds_en_us = {texts[1]};\n"""  
+                    
+                elif 'dbconfig_engine' in table_i18n:
+                    query_row = f"""INSERT INTO {table_i18n} (source_code, context, project_type, parameter, method, lb_en_us, ds_en_us, pl_en_us) 
+                                    VALUES ('giswater', '{table_org}', '{self.project_type}', '{row_org["parameter"]}', '{row_org["method"]}', {texts[0]}, {texts[1]}, {texts[2]}) 
+                                    ON CONFLICT (source_code, context, project_type, parameter, method) 
+                                    DO UPDATE SET lb_en_us = {texts[0]}, ds_en_us = {texts[1]}, pl_en_us = {texts[2]};\n""" 
                     
 
                 query += query_row
@@ -559,19 +520,30 @@ class GwSchemaI18NManager:
             columns_i18n = ["project_type", "source", "na_en_us", "ob_en_us"]
             columns_org = ["id", "name"]
             names = ["name"]
-            if table_org == "value_state":
-                columns_org.append("observ")
-                names.append("observ")
+            if table_org == "value_state" and self.project_type in ["ud", "ws"]:
+                columns_org = ["id", "name", "observ"]
+                names = ["name", "observ"]
             elif table_org == "doc_type":
                 columns_org = ["id", "comment"]
                 names = ["id", "comment"]
+            elif self.project_type == "am":
+                columns_org = ["id", "idval"]
+                names = ["idval"]
 
         elif 'su_feature' in table_i18n:
             columns_i18n = ["project_type", "feature_class", "feature_type", "lb_en_us", "ds_en_us"]
             columns_org = ["feature_class", "feature_type", "id", "descript"]
             names = ["id", "descript"]
 
+        elif 'dbconfig_engine' in table_i18n:
+            columns_i18n = ["project_type", "parameter", "method", "lb_en_us", "ds_en_us", "pl_en_us"]
+            columns_org = ["parameter", "method", "label", "descript", "placeholder"]
+            names = ["label", "descript", "placeholder"]
+
         return columns_i18n, columns_org, names
+    
+    # endregion
+    # region Json
     
     def _json_update(self, table_i18n, table_org):
         column = ""
@@ -579,32 +551,50 @@ class GwSchemaI18NManager:
             column = "filterparam"
         elif table_org == 'config_toolbox':
             column = 'inputparams'
+        elif table_org == 'config_form_fields':
+            column = 'widgetcontrols'
         query = f"SELECT * FROM {self.schema_org}.{table_org}"
         rows = self._get_rows(query, self.cursor_org)
         query = ""
         for row in rows:
+            
             safe_row_column = str(row[column]).replace("'", "''")
-            datas = self.extract_and_update_strings(row[column])
+            if row[column] not in [None, "", "None"]:
+                datas = self.extract_and_update_strings(row[column])    
 
-            for i, data in enumerate(datas):
-                for key, text in data.items():
-                    # Handle string or list of strings
-                    if isinstance(text, list):
-                        text = ", ".join(text)  # or use another delimiter
-                    elif not isinstance(text, str):
-                        continue  # Skip if it's not a string or list
+                for i, data in enumerate(datas):
+                    
+                    for key, text in data.items():
+                        # Handle string or list of strings
+                        if isinstance(text, list):
+                            text = ", ".join(text)  # or use another delimiter
+                        elif not isinstance(text, str):
+                            continue  # Skip if it's not a string or list
 
-                    safe_text = text.replace("'", "''")
+                        safe_text = text.replace("'", "''")
+                        if "config_form_fields" in table_i18n:
+                            print(row)
+                            print(f"data: {data}")
+                            query_row = f""" INSERT INTO {table_i18n} (source_code, project_type, context, formname, formtype, source, hint, text, lb_en_us)
+                            VALUES ('giswater', '{self.project_type}', '{table_org}', '{row['formname']}', '{row['formtype']}', '{row['columnname']}', '{key}_{i}', '{safe_row_column}', '{safe_text}')
+                            ON CONFLICT (source_code, project_type, context, formname, formtype, source, hint, text)
+                            DO UPDATE SET lb_en_us = '{safe_text}'; """ 
+                            
+                            # Execute or collect query_row
+                            query += query_row
+                        else:
+                            query_row = f""" INSERT INTO {table_i18n} (source_code, project_type, context, hint, text, source, lb_en_us)
+                            VALUES ('giswater', '{self.project_type}', '{table_org}', '{key}_{i}', '{safe_row_column}', '{row['id']}', '{safe_text}')
+                            ON CONFLICT (source_code, project_type, context, hint, text, source)
+                            DO UPDATE SET lb_en_us = '{safe_text}'; """ 
 
-                    query_row = f"""
-                    INSERT INTO {table_i18n} (source_code, project_type, context, hint, text, source, lb_en_us)
-                    VALUES ('giswater', '{self.project_type}', '{table_org}', '{key}_{i}', '{safe_row_column}', '{row['id']}', '{safe_text}')
-                    ON CONFLICT (source_code, project_type, context, hint, text, source)
-                    DO UPDATE SET lb_en_us = '{safe_text}';
-                    """ 
-            # Execute or collect query_row
-                query += query_row
+                            # Execute or collect query_row
+                            query += query_row
         return query
+    
+
+    # endregion
+    # region Config_form_fields_feat
     
     def _dbconfig_form_fields_feat_update(self, table_i18n):
         schema = table_i18n.split('.')[0]
@@ -745,7 +735,7 @@ class GwSchemaI18NManager:
             ON 
         """
         query += "AND ".join([f"""t.{primary_key} = d.{primary_key} """ for primary_key in self.primary_keys if primary_key != 'project_type'])
-        query += """ORDER BY source, duplicate_count DESC;"""
+        query += """ORDER BY duplicate_count DESC;"""
         return query
 
     def _delete_duplicates_rows(self, table):
@@ -800,7 +790,94 @@ class GwSchemaI18NManager:
         return insert_query
 
     # endregion
+
+    #region PY Messages
+    def _update_py_messages(self):
+        self.project_type = "python"
+        self._change_table_lyt("pymessage")
+        path = os.path.abspath(
+            os.path.join(os.path.dirname(__file__), "..", "..")
+        )
+        files = self._find_py_files(path)
+
+        print(f"\nBuscando 'message = \"' en archivos .py desde: {path}\n")
+        messages = []
+        keys1 = ['message = "', 'message="', 'message ="', 'message= "', 
+         'msg = "', 'msg="', 'msg ="', 'msg= "', 
+         'title = "', 'title="', 'title ="', 'title= "']
+
+        # Replace double quotes with single quotes for each item in the list
+        keys2 = [key.replace('"', "'") for key in keys1]
+
+        # Extend the original list with the new one
+        keys = keys1 + keys2 
+        for key in keys:
+            for file in files:
+                coincidencias = self._search_lines(file, key)
+                if coincidencias:
+                    for num_line, content in coincidencias:
+                        if content[len(key):-1] not in messages and content.startswith(key):
+                            messages.append(content[len(key):-1])
+
+        text_error = ""
+        for message in messages:
+            message = message.replace("'", "''")
+            query = f"""INSERT INTO {self.schema_i18n}.pymessage (source_code, source, ms_en_us) VALUES ('giswater', '{message}', '{message}') ON CONFLICT DO NOTHING;\n"""
+
+            try:
+                self.cursor_i18n.execute(query)
+            except Exception as e:
+                text_error += f"Error updating: {message}.\n"
+                print(e)
+
+        if len(text_error) > 1:
+            tools_qt.show_info_box(text_error)
+        else:
+            tools_qt.show_info_box("All messages updated correctly")
+
+        self.conn_i18n.commit()
+
+    def _find_py_files(self, path):
+        py_files = []
+
+        for folder, subfolder, files in os.walk(path):
+            for file in files:
+                if file.endswith(".py"):
+                    file_path = os.path.join(folder, file)
+                    py_files.append(file_path)
+
+        return py_files
+
+
+    def _search_lines(self, file, key):
+        found_lines = []
+        try:
+            with open(file, "r", encoding="utf-8") as f:
+                for num_line, line in enumerate(f, start=1):
+                    if key in line:
+                        found_lines.append((num_line, line.strip()))
+        except Exception as e:
+            print(f"No se pudo leer el archivo {file}: {e}")
+        return found_lines
+    
+        
+    #endregion
     # region Global funcitons
+    def _detect_schema(self, schema_name):
+        query = "SELECT schema_name FROM information_schema.schemata;"
+        self.cursor_org.execute(query)
+        schemas = self.cursor_org.fetchall()
+        
+        existing_schema = False
+        for schema in schemas:
+            # schema is a tuple like ('information_schema',) so you need to access the first element
+            if schema[0] == schema_name:
+                existing_schema = True
+                break  # Exit the loop early once we find the schema
+        
+        return existing_schema
+
+
     def detect_table_func(self, table):
         self.cursor_i18n.execute(f"SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = '{table.split('.')[0]}' AND table_name = '{table.split('.')[1]}';")
         result = self.cursor_i18n.fetchone()
@@ -812,39 +889,43 @@ class GwSchemaI18NManager:
         query = f'SELECT * FROM {table_i18n}'
         rows = self._get_rows(query, self.cursor_i18n)
 
-        # If no rows returned from the query, proceed to process table_i18n
-        if not rows:
-            table_name = table_i18n.split(".")[1]
-            # Process the table name based on its prefix
-            if "dbtypevalue" in table_i18n:
-                table_org = ["edit_typevalue","plan_typevalue","om_typevalue"]
-            elif "dbjson" in table_i18n:
-                table_org = ["config_report", "config_toolbox"]
-            elif table_name.startswith("dbconfig"):
-                table_org = [table_name[2:]] # Get everything after the first two characters
-            elif table_name.startswith("su_"):
+        table_name = table_i18n.split(".")[1]
+        tables_org = []
+        # Process the table name based on its prefix
+        if "dbtypevalue" in table_i18n:
+            tables_org = ["edit_typevalue","plan_typevalue","om_typevalue"]
+        elif "dbjson" in table_i18n:
+            tables_org = ["config_report", "config_toolbox"]
+        elif "dbconfig_form_fields_json" in table_i18n:
+            tables_org = ["config_form_fields"]
+        elif "dbconfig_engine" in table_i18n:
+            tables_org = ["config_engine", "config_engine_def"]
+        elif table_name.startswith("dbconfig"):
+            tables_org = [table_name[2:]] # Get everything after the first two characters
+        elif table_name.startswith("su_"):
+            if self.project_type == "am":
+                tables_org = ["value_result_type", "value_status"]
+            if self.project_type in ["ws", "ud"]:
                 if table_name == "su_feature":
-                    table_org = ["cat_feature"]
+                    tables_org = ["cat_feature"]
                 else:
-                    table_org = ["value_state", "value_state_type", "doc_type"]
-            else:
-                table_org = [f"sys_{table_name[2:]}"]  # Prepend "sys_" and get everything after the first two characters
-            print(table_org)
-            return table_org
+                    tables_org = ["value_state", "value_state_type", "doc_type"]
+        else:
+            tables_org = [f"sys_{table_name[2:]}"]  # Prepend "sys_" and get everything after the first two characters
         
         # If rows exist, retrieve 'context' from the first row
-        table_org = []
-        seen_contexts = set()
+        seen_contexts = set(tables_org)
         for row in rows:
             context = row.get('context')
-            if context not in seen_contexts:
-                table_org.append(context)
+            row_project_type = row.get("project_type")
+            if context not in seen_contexts and row_project_type == self.project_type:
+                tables_org.append(context)
                 seen_contexts.add(context) # Use .get() to avoid KeyError if 'context' doesn't exist
-        print(table_org)
-        if table_org is None:
+        print(tables_org)
+        if tables_org is None:
             return None  # Or some fallback behavior
         
-        return table_org
+        return tables_org
 
     
     def _get_rows(self, sql, cursor):
@@ -868,7 +949,7 @@ class GwSchemaI18NManager:
     def _change_table_lyt(self, table):
         # Update the part the of the program in process
         self.dlg_qm.lbl_info.clear()
-        msg = f"Updating {table}..."
+        msg = f"From {self.project_type}, updating {table}..."
         tools_qt.set_widget_text(self.dlg_qm, 'lbl_info', msg)
         QApplication.processEvents()
 
@@ -886,29 +967,67 @@ class GwSchemaI18NManager:
         self.primary_keys = [row['column_name'] for row in results]
 
     def extract_and_update_strings(self, data):
-        """Recursively extract and translate 'label', 'comboNames', 'tooltip', and 'placeholder' keys in JSON."""
-        new_data = {}
-        if isinstance(data, dict):
-            for key, value in data.items():
-                # Keys that should be translated if the value is a string
-                translatable_keys = {'label', 'tooltip', 'placeholder'}
+        """Recursively extract and return list of dictionaries with translatable keys."""
+        translatable_keys = ['label', 'tooltip', 'placeholder', 'text', 'comboNames']
+        results = []
 
-                if key in translatable_keys and isinstance(value, str):
-                    new_data[key] = value
+        def recurse(item):
+            if isinstance(item, dict):
+                entry = {}
+                for key, value in item.items():
+                    if key in translatable_keys:
+                        if key == 'comboNames' and isinstance(value, list):
+                            entry[key] = value
+                        elif isinstance(value, str):
+                            entry[key] = value
+                    # Recurse into children
+                    recurse(value)
+                if entry:
+                    results.append(entry)
+            elif isinstance(item, list):
+                for sub in item:
+                    recurse(sub)
 
-                # Translate 'comboNames' (list of strings)
-                elif key == 'comboNames' and isinstance(value, list):
-                    translated_list = []
-                    for item in value:
-                        translated_list.append(item)
-                    new_data[key] = translated_list
+        recurse(data)
+        return results
+    
 
-                # Recurse into nested structures
-                else:
-                    data[key] = self.extract_and_update_strings(value)
+    def _verify_lang(self):
+        if self.project_type in ["ws", "ud"]:
+            query = f"SELECT language from {self.schema_org}.sys_version"
+            self.cursor_org.execute(query)
+            language_org = self.cursor_org.fetchone()[0]
+            if language_org != 'en_US':
+                return False
+        return True
+    
+    def tables_dic(self, schema_type):
+        dbtables_dic = {
+            "ws": {
+                "dbtables": [ "dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue", 
+                    "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report", 
+                    "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_fields_feat", 
+                    "dbconfig_form_tableview", "dbtable", "dbjson", "dbconfig_form_fields_json"
+                 ],
+                 "sutables": ["su_basic_tables", "su_feature"]
+            },
+            "ud": {
+                "dbtables": [ "dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue", 
+                    "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report", 
+                    "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_fields_feat", 
+                    "dbconfig_form_tableview", "dbtable", "dbjson", "dbconfig_form_fields_json"
+                 ],
+                 "sutables": ["su_basic_tables", "su_feature"]
+            },
+            "am": {
+                "dbtables": ["dbconfig_engine", "dbconfig_form_tableview", "su_basic_tables"],
+                "sutables": []
+            },
+            "cm": {
+                "dbtables": [], #["dbtable", "dbconfig_form_fields", "dbconfig_form_tabs", "dbconfig_param_system", "sys_typevalue", "dbconfig_form_fields_json"]
+                "sutables": []
+            },
+        }
+        return dbtables_dic[schema_type]['dbtables'], dbtables_dic[schema_type]['sutables']
 
-        elif isinstance(data, list):
-            return [self.extract_and_update_strings(item) for item in data]
-
-        return new_data
     # endregion

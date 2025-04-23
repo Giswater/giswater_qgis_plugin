@@ -917,14 +917,14 @@ class GwAdminButton:
 
         qm_i18n_up = GwSchemaI18NUpdate()
         qm_i18n_up.init_dialog()
-        dict_info = tools_gw.get_project_info(self._get_schema_name())
-        qm_i18n_up.pass_schema_info(dict_info, self._get_schema_name())
 
     def _i18n_manager(self):
         """ Initialize the i18n functionalities """
 
         qm_i18n_manager = GwSchemaI18NManager()
         qm_i18n_manager.init_dialog()
+        dict_info = tools_gw.get_project_info(self._get_schema_name())
+        qm_i18n_manager.pass_schema_info(dict_info)
 
     def _import_osm(self):
         """ Initialize import osm streetaxis functionality """
