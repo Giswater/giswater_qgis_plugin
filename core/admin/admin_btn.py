@@ -1808,18 +1808,33 @@ class GwAdminButton:
         self.dialog_parent = GwAdminCmParentUi(self)
         self._populate_schema_name_cm_dialog(self.dialog_parent)
 
-        if self.dialog_parent.exec_():
-            self.parent_schema_created = True
-            self.project_type_selected = tools_qt.get_text(self.dialog_parent, 'cmb_project_type')
-            self._run_create_cm_task(['load_parent_schema'])
+        # Connect buttons
+        self.dialog_parent.btn_accept.clicked.connect(self._on_accept_create_parent)
+        self.dialog_parent.btn_close.clicked.connect(self.dialog_parent.reject)
+        self.dialog_parent.btn_cancel_task.clicked.connect(self.dialog_parent.reject)
+
+        tools_gw.open_dialog(self.dialog_parent, dlg_name='admin_cm_parent')
+
 
     def on_btn_create_example_clicked(self):
         self.dialog_example = GwAdminCmExampleUi(self)
         self._populate_schema_name_cm_dialog(self.dialog_example)
 
-        if self.dialog_example.exec_():
-            self.example_type = tools_qt.get_text(self.dialog_example, 'cmb_project_type')
-            self._run_create_cm_task(['load_example'])
+        # Connect buttons
+        self.dialog_example.btn_accept.clicked.connect(self._on_accept_create_example)
+        self.dialog_example.btn_close.clicked.connect(self.dialog_example.reject)
+        self.dialog_example.btn_cancel_task.clicked.connect(self.dialog_example.reject)
+
+        tools_gw.open_dialog(self.dialog_example, dlg_name='admin_cm_example')
+
+    def _on_accept_create_parent(self):
+        self.parent_schema_created = True
+        self.project_type_selected = tools_qt.get_text(self.dialog_parent, 'cmb_project_type')
+        self._run_create_cm_task(['load_parent_schema'])
+
+    def _on_accept_create_example(self):
+        self.example_type = tools_qt.get_text(self.dialog_example, 'cmb_project_type')
+        self._run_create_cm_task(['load_example'])
 
     def _populate_schema_name_cm_dialog(self, dialog, cmb_type_name='cmb_project_type',
                                         cmb_schema_name='cmb_project_name'):
