@@ -1,7 +1,8 @@
 /*
 This file is part of Giswater
-The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-This version of Giswater is provided by Giswater Association
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU
+General Public License as published by the Free Software Foundation, either version 3 of the License,
+or (at your option) any later version.
 */
 
 UPDATE sys_fprocess SET fprocess_name='Arc without start-end nodes', "source"='core', fprocess_type='Check om-topology', project_type='utils', except_level=3, except_msg='arcs with state=1 and without node_1 or node_2.', query_text='SELECT arc_id,arccat_id,the_geom, expl_id FROM v_prefix_arc WHERE state = 1 AND node_1 IS NULL UNION 

@@ -1,5 +1,5 @@
 /*
-Copyright © 2023 by BGEO. All rights reserved.
+This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU
 General Public License as published by the Free Software Foundation, either version 3 of the License,
 or (at your option) any later version.
@@ -413,7 +413,7 @@ CREATE TABLE om_campaign_lot_x_node
   update_at timestamp,
   update_by text,
   update_count integer,
-  update_log json, 	
+  update_log json,
   qindex1 numeric(12,3),
   qindex2 numeric(12,3),
   CONSTRAINT om_campaign_lot_x_node_pkey PRIMARY KEY (lot_id, node_id)
@@ -430,7 +430,7 @@ CREATE TABLE om_campaign_lot_x_gully
   update_at timestamp,
   update_by text,
   update_count integer,
-  update_log json, 
+  update_log json,
   qindex1 numeric(12,3),
   qindex2 numeric(12,3),
   CONSTRAINT om_campaign_lot_x_gully_pkey PRIMARY KEY (lot_id, connec_id)

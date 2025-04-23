@@ -1,7 +1,8 @@
 /*
 This file is part of Giswater
-The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-This version of Giswater is provided by Giswater Association
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU
+General Public License as published by the Free Software Foundation, either version 3 of the License,
+or (at your option) any later version.
 */
 
 -- UPDATE om_mincut SET expl_id=999 WHERE expl_id IN (84, 85, 86, 87, 88, 89); // this om_mincut expl_id are not in exploitation table
