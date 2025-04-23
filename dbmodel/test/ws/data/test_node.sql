@@ -593,8 +593,8 @@ workcat_id_plan, asset_id, om_state, conserv_state, access_type, placement_type,
 VALUES('-927', '-927', '-927', 33.2100, NULL, 'ETAP', 'RESERVOIR', 5, NULL, NULL, 1, 2, NULL, NULL, NULL, 3, '3', 'soil1', NULL, NULL, NULL, NULL,
 'work1', NULL, '2024-08-22', NULL, 'owner1', 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '', '1', NULL,
 'SRID=25831;POINT (418468.29453153134 4577970.716698299)'::public.geometry, NULL, NULL, NULL, true, true, NULL, 2, NULL, 'NODE',
-'2024-08-22 14:35:28.066', '2024-08-22 14:35:28.093', 'postgres', 'postgres', NULL, NULL, NULL, 1, NULL, NULL, NULL, NULL, NULL, NULL, NUL
-, NULL, NULL, NULL, NULL, NULL, NULL);
+'2024-08-22 14:35:28.066', '2024-08-22 14:35:28.093', 'postgres', 'postgres', NULL, NULL, NULL, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+NULL, NULL, NULL, NULL, NULL, NULL);
 SELECT is((SELECT count(*)::integer FROM node WHERE node_id = '-927'), 1, 'INSERT: node:wtp "-927" was inserted');
 
 UPDATE node SET descript = 'updated test' WHERE node_id = '-927';

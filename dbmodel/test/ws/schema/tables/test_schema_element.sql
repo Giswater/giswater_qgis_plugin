@@ -65,7 +65,7 @@ SELECT col_type_is('element', 'expl_id', 'integer', 'Column expl_id should be in
 SELECT col_type_is('element', 'feature_type', 'varchar(16)', 'Column feature_type should be varchar(16)');
 SELECT col_type_is('element', 'pol_id', 'varchar(16)', 'Column pol_id should be varchar(16)');
 SELECT col_type_is('element', 'top_elev', 'numeric(12,4)', 'Column top_elev should be numeric(12,4)');
-SELECT col_type_is('element', 'expl_visibility', 'integer[]', 'Column expl_visibility should be integer[]');
+SELECT col_type_is('element', 'expl_visibility', 'smallint[]', 'Column expl_visibility should be integer[]');
 SELECT col_type_is('element', 'trace_featuregeom', 'boolean', 'Column trace_featuregeom should be boolean');
 SELECT col_type_is('element', 'muni_id', 'integer', 'Column muni_id should be integer');
 SELECT col_type_is('element', 'sector_id', 'integer', 'Column sector_id should be integer');

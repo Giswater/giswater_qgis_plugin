@@ -22,7 +22,7 @@ SELECT columns_are(
         'id', 'psector_id', 'psector_state', 'doable', 'audit_tstamp', 'audit_user', 'action', 'link_id', 'code',
         'feature_id', 'feature_type', 'exit_id', 'exit_type', 'userdefined_geom', 'state', 'expl_id', 'the_geom',
         'exit_topelev', 'exit_elev', 'sector_id', 'dma_id', 'fluid_type', 'presszone_id', 'dqa_id', 'minsector_id',
-        'expl_id2', 'epa_type', 'is_operative', 'insert_user', 'lastupdate', 'lastupdate_user', 'staticpressure',
+        'expl_visibility', 'epa_type', 'is_operative', 'insert_user', 'lastupdate', 'lastupdate_user', 'staticpressure',
         'conneccat_id', 'workcat_id', 'workcat_id_end', 'builtdate', 'enddate', 'uncertain', 'muni_id',
         'macrominsector_id', 'verified', 'supplyzone_id', 'n_hydrometer', 'custom_length', 'datasource'
     ],

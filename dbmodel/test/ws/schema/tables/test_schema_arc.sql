@@ -121,7 +121,7 @@ SELECT col_type_is('arc', 'staticpress2', 'numeric(12,3)', 'Column staticpress2 
 SELECT col_type_is('arc', 'om_state', 'text', 'Column om_state should be text');
 SELECT col_type_is('arc', 'conserv_state', 'text', 'Column conserv_state should be text');
 SELECT col_type_is('arc', 'parent_id', 'varchar(16)', 'Column parent_id should be varchar(16)');
-SELECT col_type_is('arc', 'expl_visibility', 'integer[]', 'Column expl_visibility should be integer[]');
+SELECT col_type_is('arc', 'expl_visibility', 'smallint[]', 'Column expl_visibility should be integer[]');
 SELECT col_type_is('arc', 'brand_id', 'varchar(50)', 'Column brand_id should be varchar(50)');
 SELECT col_type_is('arc', 'model_id', 'varchar(50)', 'Column model_id should be varchar(50)');
 SELECT col_type_is('arc', 'serial_number', 'varchar(100)', 'Column serial_number should be varchar(100)');

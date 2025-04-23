@@ -107,7 +107,7 @@ SELECT col_type_is('connec', '_shutoff_valve', 'text', 'Column _shutoff_valve sh
 SELECT col_type_is('connec', 'access_type', 'text', 'Column access_type should be text');
 SELECT col_type_is('connec', 'placement_type', 'text', 'Column placement_type should be text');
 SELECT col_type_is('connec', 'crmzone_id', 'int4', 'Column crmzone_id should be int4');
-SELECT col_type_is('connec', 'expl_visibility', 'integer[]', 'Column expl_visibility should be integer[]');
+SELECT col_type_is('connec', 'expl_visibility', 'smallint[]', 'Column expl_visibility should be integer[]');
 SELECT col_type_is('connec', 'plot_code', 'varchar', 'Column plot_code should be varchar');
 SELECT col_type_is('connec', 'brand_id', 'varchar(50)', 'Column brand_id should be varchar(50)');
 SELECT col_type_is('connec', 'model_id', 'varchar(50)', 'Column model_id should be varchar(50)');
