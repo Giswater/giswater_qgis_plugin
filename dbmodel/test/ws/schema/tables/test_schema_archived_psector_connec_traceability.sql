@@ -29,7 +29,7 @@ SELECT columns_are(
         'inventory', 'expl_id', 'num_value', 'feature_type', 'tstamp', 'pjoint_type', 'pjoint_id', 'lastupdate', 'lastupdate_user',
         'insert_user', 'minsector_id', 'dqa_id', 'staticpressure', 'district_id', 'adate', 'adescript', 'accessibility',
         'workcat_id_plan', 'asset_id', 'epa_type', 'om_state', 'conserv_state', 'priority', 'access_type', 'placement_type',
-        'crmzone_id', 'expl_id2', 'plot_code', 'brand_id', 'model_id', 'serial_number', 'label_quadrant', 'macrominsector_id',
+        'crmzone_id', 'expl_visibility', 'plot_code', 'brand_id', 'model_id', 'serial_number', 'label_quadrant', 'macrominsector_id',
         'streetname', 'streetname2', 'n_inhabitants', 'supplyzone_id', 'datasource', 'lock_level', 'block_zone', 'n_hydrometer'
     ],
     'Table archived_psector_connec_traceability should have the correct columns'

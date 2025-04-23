@@ -28,7 +28,7 @@ SELECT columns_are(
         'link', 'verified', 'rotation', 'the_geom', 'label_x', 'label_y', 'label_rotation', 'publish', 'inventory',
         'hemisphere', 'expl_id', 'num_value', 'feature_type', 'tstamp', 'lastupdate', 'lastupdate_user', 'insert_user',
         'minsector_id', 'dqa_id', 'staticpressure', 'district_id', 'adate', 'adescript', 'accessibility', 'workcat_id_plan',
-        'asset_id', 'om_state', 'conserv_state', 'access_type', 'placement_type', 'expl_id2', 'brand_id', 'model_id',
+        'asset_id', 'om_state', 'conserv_state', 'access_type', 'placement_type', 'expl_visibility', 'brand_id', 'model_id',
         'serial_number', 'label_quadrant', 'macrominsector_id', 'streetname', 'streetname2', 'top_elev', 'custom_top_elev',
         'datasource', 'supplyzone_id', 'lock_level', 'is_scadamap'
     ],

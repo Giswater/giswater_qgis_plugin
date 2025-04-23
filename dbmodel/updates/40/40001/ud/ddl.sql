@@ -163,3 +163,8 @@ DROP TABLE IF EXISTS ext_rtc_dma_period CASCADE;
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP", "table":"cat_link", "column":"link_type"}}$$);
 ALTER TABLE cat_link DROP CONSTRAINT IF EXISTS cat_link_linktype_fkey;
+
+
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"archived_psector_gully_traceability", "column":"expl_visibility", "dataType":"int[]"}}$$);
+UPDATE archived_psector_gully_traceability SET expl_visibility = ARRAY[expl_id];
+SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"archived_psector_gully_traceability", "column":"expl_id2"}}$$);
