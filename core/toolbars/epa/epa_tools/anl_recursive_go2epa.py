@@ -10,7 +10,7 @@ from functools import partial
 from pathlib import Path
 
 from qgis.core import QgsApplication
-from qgis.PyQt.QtWidgets import  QFileDialog, QLabel
+from qgis.PyQt.QtWidgets import QLabel
 from qgis.PyQt.QtCore import QSettings
 
 from ....ui.ui_manager import RecursiveEpaUi
@@ -102,20 +102,9 @@ class RecursiveEpa():
             QgsApplication.taskManager().triggerTask(self.recursive_epa)
 
     def _get_file_dialog(self, widget):
-        # Check if selected file exists. Set default value if necessary
-        file_path = tools_qt.get_text(self.dlg_epa, widget)
-        if file_path in (None, "null") or not Path(file_path).exists():
-            file_path = str(Path.home())
+        """ Check if selected file exists. Set default value if necessary """
 
-        # Open dialog to select file
-        file_dialog = QFileDialog()
-        file_dialog.setFileMode(QFileDialog.ExistingFile)
-        msg = "Select file"
-        file_path = file_dialog.getOpenFileName(
-            parent=None, caption=tools_qt.tr(msg), directory=file_path
-        )[0]
-        if file_path:
-            tools_qt.set_widget_text(self.dlg_epa, widget, str(file_path))
+        tools_qt.get_open_file_path(self.dlg_epa, widget, "","Selected file", str(Path.home()))
 
     def get_folder_dialog(self, widget):
         """ Get folder dialog """

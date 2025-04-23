@@ -10,7 +10,6 @@ from time import time
 
 from qgis.core import QgsApplication
 from qgis.PyQt.QtCore import QTimer
-from qgis.PyQt.QtWidgets import QFileDialog
 
 from ....threads.static_calibration import GwStaticCalibration
 from ....ui.ui_manager import StaticCalibrationUi
@@ -167,20 +166,7 @@ class StaticCalibration:
     def _get_file_dialog(self, widget):
         """Get file dialog"""
 
-        # Check if selected file exists. Set default value if necessary
-        file_path = tools_qt.get_text(self.dlg_epa, widget)
-        if file_path in (None, "null") or not os.path.exists(file_path):
-            file_path = os.path.expanduser("~")
-
-        # Open dialog to select file
-        file_dialog = QFileDialog()
-        file_dialog.setFileMode(QFileDialog.ExistingFile)
-        message = "Select file"
-        file_path = file_dialog.getOpenFileName(
-            parent=None, caption=tools_qt.tr(message), directory=file_path
-        )[0]
-        if file_path:
-            tools_qt.set_widget_text(self.dlg_epa, widget, str(file_path))
+        tools_qt.get_open_file_path(self.dlg_epa, widget, "", "Select file", str(os.path.expanduser("~")))
 
     def _load_user_values(self):
         self._user_values("load")

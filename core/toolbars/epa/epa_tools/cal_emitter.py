@@ -12,7 +12,7 @@ from sip import isdeleted
 
 from functools import partial
 
-from qgis.PyQt.QtWidgets import QTabWidget, QFileDialog, QLabel
+from qgis.PyQt.QtWidgets import QTabWidget, QLabel
 from qgis.PyQt.QtCore import QTimer
 from qgis.core import QgsApplication
 
@@ -267,36 +267,12 @@ class EmitterCalibration:
     def _select_file_inp(self):
         """Select INP file"""
 
-        file_inp = tools_qt.get_text(self.dlg_vol_cal, "data_inp_input_file")
-        # Set default value if necessary
-        if file_inp is None or file_inp == "":
-            file_inp = global_vars.plugin_dir
-
-        # Get directory of that file
-        folder_path = os.path.dirname(file_inp)
-        if not os.path.exists(folder_path):
-            folder_path = os.path.dirname(__file__)
-        os.chdir(folder_path)
-        message = tools_qt.tr("Select INP file")
-        file_inp, filter_ = QFileDialog.getOpenFileName(None, message, "", "*.inp")
-        self.dlg_vol_cal.data_inp_input_file.setText(file_inp)
+        tools_qt.get_open_file_path(self.dlg_vol_cal, "data_inp_input_file", "*.inp", "Select INP file")
 
     def _select_config_file(self):
         """Select config file"""
 
-        config_file = tools_qt.get_text(self.dlg_vol_cal, "data_config_file")
-        # Set default value if necessary
-        if config_file is None or config_file == "":
-            config_file = global_vars.plugin_dir
-
-        # Get directory of that file
-        folder_path = os.path.dirname(config_file)
-        if not os.path.exists(folder_path):
-            folder_path = os.path.dirname(__file__)
-        os.chdir(folder_path)
-        message = tools_qt.tr("Select .in file")
-        config_file, filter_ = QFileDialog.getOpenFileName(None, message, "", "*.in")
-        self.dlg_vol_cal.data_config_file.setText(config_file)
+        tools_qt.get_open_file_path(self.dlg_vol_cal, "data_config_file", "*.in", "Select .in file")
 
     def _save_values(self):
         tools_gw.set_config_parser(

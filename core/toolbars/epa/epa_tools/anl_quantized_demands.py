@@ -11,7 +11,6 @@ from time import time
 
 from qgis.core import QgsApplication
 from qgis.PyQt.QtCore import QTimer
-from qgis.PyQt.QtWidgets import QFileDialog
 
 from ....threads.quantized_demands import GwQuantizedDemands
 from ....ui.ui_manager import QuantizedDemandsUi
@@ -106,20 +105,7 @@ class QuantizedDemands:
     def _get_file_dialog(self, widget):
         """Get file dialog"""
 
-        # Check if selected file exists. Set default value if necessary
-        file_path = tools_qt.get_text(self.dlg_epa, widget)
-        if file_path in (None, "null") or not os.path.exists(file_path):
-            file_path = os.path.expanduser("~")
-
-        # Open dialog to select file
-        file_dialog = QFileDialog()
-        file_dialog.setFileMode(QFileDialog.ExistingFile)
-        message = "Select file"
-        file_path = file_dialog.getOpenFileName(
-            parent=None, caption=tools_qt.tr(message), directory=file_path
-        )[0]
-        if file_path:
-            tools_qt.set_widget_text(self.dlg_epa, widget, str(file_path))
+        tools_qt.get_open_file_path(self.dlg_epa, widget, message="Select file")
 
     def _manage_messages(self, message):
         self.message += message
@@ -155,25 +141,6 @@ class QuantizedDemands:
             return tools_qt.show_question(msg)
 
         return True
-
-    def _save_file_dialog(self, widget, filter):
-        # Check if selected file exists. Set default value if necessary
-        file_path = tools_qt.get_text(self.dlg_epa, widget)
-        if file_path in (None, "null") or not os.path.exists(file_path):
-            file_path = os.path.expanduser("~")
-
-        # Open dialog to select file
-        file_dialog = QFileDialog()
-        file_dialog.setFileMode(QFileDialog.AnyFile)
-        message = "Save file"
-        file_path = file_dialog.getSaveFileName(
-            parent=None,
-            caption=tools_qt.tr(message),
-            directory=file_path,
-            filter=filter,
-        )[0]
-        if file_path:
-            tools_qt.set_widget_text(self.dlg_epa, widget, str(file_path))
 
     def _save_user_values(self, dialog):
         """Save last user values"""

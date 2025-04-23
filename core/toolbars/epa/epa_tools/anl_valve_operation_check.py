@@ -13,7 +13,7 @@ from time import time
 import wntr
 from qgis.core import QgsApplication
 from qgis.PyQt.QtCore import QTimer
-from qgis.PyQt.QtWidgets import QFileDialog, QWidget
+from qgis.PyQt.QtWidgets import QWidget
 
 from ....threads.valve_operation_check import GwValveOperationCheck
 from ....ui.ui_manager import ValveOperationCheckUi
@@ -70,20 +70,9 @@ class ValveOperationCheck:
         QgsApplication.taskManager().addTask(self.thread)
 
     def _get_file_dialog(self, widget):
-        # Check if selected file exists. Set default value if necessary
-        file_path = tools_qt.get_text(self.dlg_voc, widget)
-        if file_path in (None, "null") or not Path(file_path).exists():
-            file_path = str(Path.home())
+        """ Check if selected file exists. Set default value if necessary """
 
-        # Open dialog to select file
-        file_dialog = QFileDialog()
-        file_dialog.setFileMode(QFileDialog.ExistingFile)
-        msg = "Select file"
-        file_path = file_dialog.getOpenFileName(
-            parent=None, caption=tools_qt.tr(msg), directory=file_path
-        )[0]
-        if file_path:
-            tools_qt.set_widget_text(self.dlg_voc, widget, str(file_path))
+        tools_qt.get_open_file_path(self.dlg_voc, widget, "","Selected file", str(Path.home()))
 
     def _get_scenarios_from_db(self):
         sql = """
