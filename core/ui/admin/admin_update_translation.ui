@@ -27,7 +27,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
-    <widget class="QGroupBox" name="groupBox">
+    <widget class="QGroupBox" name="grb_i18n_conn">
      <property name="maximumSize">
       <size>
        <width>16777215</width>
@@ -116,7 +116,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox_3">
+    <widget class="QGroupBox" name="grb_dest_conn">
      <property name="enabled">
       <bool>true</bool>
      </property>
@@ -131,7 +131,7 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
-       <widget class="QLabel" name="label">
+       <widget class="QLabel" name="lbl_project_type">
         <property name="text">
          <string>Project type:</string>
         </property>
@@ -141,7 +141,7 @@
        <widget class="QComboBox" name="cmb_projecttype"/>
       </item>
       <item>
-       <widget class="QLabel" name="label_2">
+       <widget class="QLabel" name="lbl_schema_update">
         <property name="text">
          <string>Schema name:</string>
         </property>

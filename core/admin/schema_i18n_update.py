@@ -48,16 +48,10 @@ class GwSchemaI18NUpdate:
         self.dlg_qm.cmb_projecttype.clear()
         for aux in self.project_types:
             self.dlg_qm.cmb_projecttype.addItem(str(aux))
+        self.dlg_qm.cmb_projecttype.addItem("am")
 
         tools_gw.open_dialog(self.dlg_qm, dlg_name='admin_update_translation')
 
-
-    def pass_schema_info(self, schema_info, schema_name):
-        self.project_type = schema_info['project_type']
-        self.project_epsg = schema_info['project_epsg']
-        self.project_version = schema_info['project_version']
-        self.project_language = schema_info['project_language']
-        self.schema_name = schema_name
 
     # region private functions
 
@@ -140,8 +134,12 @@ class GwSchemaI18NUpdate:
                     elem = [row[0], row[0]]
                     result_list.append(elem)
         if not result_list:
-            self.dlg_qm.cmb_schema.clear()
-            return
+            if filter_ == "am":
+                result_list.append(["am", "am"])
+            else:
+                self.dlg_qm.cmb_schema.clear()
+                return
+    
 
         tools_qt.fill_combo_values(self.dlg_qm.cmb_schema, result_list)
 
@@ -198,30 +196,30 @@ class GwSchemaI18NUpdate:
         self.schema = tools_qt.get_text(self.dlg_qm, self.dlg_qm.cmb_schema, 0)
         messages = []
 
-        sql_1 = f"UPDATE {self.schema}.config_param_system SET value = FALSE WHERE parameter = 'admin_config_control_trigger'"
-        self.cursor_dest.execute(sql_1)
-        self._commit_dest
+        if self.project_type != "am":
+            sql_1 = f"UPDATE {self.schema}.config_param_system SET value = FALSE WHERE parameter = 'admin_config_control_trigger'"
+            self.cursor_dest.execute(sql_1)
+            self._commit_dest
 
-        # Get dbconfig_param_system values
-        dbtables = [ "dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue", 
-                    "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report", 
-                    "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_tableview", "dbjson", "dbtable", "dbconfig_form_fields_feat"
-                 ]
+        dbtables = self.tables_dic(self.project_type)
         schema_i18n = "i18n"
         for dbtable in dbtables:
             dbtable = f"{schema_i18n}.{dbtable}"
+            print(dbtable)
             dbtable_rows, dbtable_columns = self._get_table_values(dbtable)
             if not dbtable_rows:
                 messages.append(dbtable)  # Corregido
             else:
-                if "dbjson" in dbtable:
+                if "json" in dbtable:
+                    print("a")
                     self._write_dbjson_values(dbtable_rows)
                 else:
                     self._write_table_values(dbtable_rows, dbtable_columns, dbtable)
 
-        sql_2 = f"UPDATE {self.schema}.config_param_system SET value = TRUE WHERE parameter = 'admin_config_control_trigger'"
-        self.cursor_dest.execute(sql_2)
-        self._commit_dest()
+        if self.project_type != "am":
+            sql_2 = f"UPDATE {self.schema}.config_param_system SET value = TRUE WHERE parameter = 'admin_config_control_trigger'"
+            self.cursor_dest.execute(sql_2)
+            self._commit_dest()
         
         # Mostrar mensaje de error si hay errores
         if messages:  # Corregido: Verifica si hay elementos en la lista
@@ -248,9 +246,13 @@ class GwSchemaI18NUpdate:
 
         if 'dbconfig_form_fields' in table:
             columns = ["source", "formname", "formtype", "project_type", "context", "source_code", "lb_en_us", "tt_en_us"]
-            lang_columns = [f"lb_{self.lower_lang}", f"tt_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}", f"auto_tt_{self.lower_lang}", f"va_auto_tt_{self.lower_lang}"]
+            lang_columns = [f"lb_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}", f"tt_{self.lower_lang}", f"auto_tt_{self.lower_lang}", f"va_auto_tt_{self.lower_lang}"]
             if 'feat' in table:
                 columns.append('feature_type')
+            elif 'json' in table:
+                columns = columns[:-1]
+                columns.extend(["hint", "text"])
+                lang_columns = lang_columns[:3]
 
         elif 'dbparam_user' in table:
             columns = ["source", "formname", "project_type", "context", "source_code", "lb_en_us", "tt_en_us"]
@@ -308,6 +310,14 @@ class GwSchemaI18NUpdate:
             columns = ["source", "project_type", "context", "al_en_us", "ds_en_us"]
             lang_columns = [f"al_{self.lower_lang}", f"auto_al_{self.lower_lang}", f"va_auto_al_{self.lower_lang}", f"ds_{self.lower_lang}", f"auto_ds_{self.lower_lang}", f"va_auto_ds_{self.lower_lang}"]
 
+        elif 'dbconfig_engine' in table:
+            columns = ["project_type", "context", "parameter", "method", "lb_en_us", "ds_en_us", "pl_en_us"]
+            lang_columns = [f"lb_{self.lower_lang}", f"auto_lb_{self.lower_lang}", f"va_auto_lb_{self.lower_lang}", f"ds_{self.lower_lang}", f"auto_ds_{self.lower_lang}", f"va_auto_ds_{self.lower_lang}", f"pl_{self.lower_lang}", f"auto_pl_{self.lower_lang}", f"va_auto_pl_{self.lower_lang}"]
+
+        elif 'su_basic_tables' in table:
+            columns = ["project_type", "context", "source", "na_en_us", "ob_en_us"]
+            lang_columns = [f"na_{self.lower_lang}", f"auto_na_{self.lower_lang}", f"va_auto_na_{self.lower_lang}", f"ob_{self.lower_lang}", f"auto_ob_{self.lower_lang}", f"va_auto_ob_{self.lower_lang}"]
+
         # Make the query
         sql=""
         if self.lower_lang == 'en_us':
@@ -328,29 +338,40 @@ class GwSchemaI18NUpdate:
     
     def _write_table_values(self, rows, columns, table):
         print(table)
-        j=0
+
+        schema_type = [self.project_type]
+        if self.project_type in ["ud", "ws"]:
+            schema_type.append("utils")
+
         for i, row in enumerate(rows): #(For row in rows)
-            if row['project_type'] == self.project_type or row['project_type'] == 'utils': # Avoid the unwnated project_types
+            if row['project_type'] in schema_type: # Chose wanted schema types (ws, ud, cm, am...)
                 forenames = []
                 for column in columns:
                     if column[-5:] == "en_us":
                         forenames.append(column.split("_")[0])
 
                 texts = []
+
                 for forename in forenames:
-                    text = row[f'{forename}_{self.lower_lang}']
-                    if text is None:
-                        if self.lower_lang != 'en_us':
-                            text = row[f'auto_{forename}_{self.lower_lang}']
-                        if text is None :
-                            text = row[f'{forename}_en_us']
-                            if text is None:
-                                if forename == 'tt' and table in ["dbconfig_form_fields", "dbconfig_param_system", "dbparam_user", "dbconfig_form_fields_feat"]:
-                                    text = row[f'lb_en_us']
-                                if text is None:
-                                    text = ""
-                    text = text.replace("'", "''")
-                    texts.append(text)
+                    value = row.get(f'{forename}_{self.lower_lang}')
+                    
+                    if not value and self.lower_lang != 'en_us':
+                        value = row.get(f'auto_{forename}_{self.lower_lang}')
+                    
+                    if not value:
+                        value = row.get(f'{forename}_en_us')
+                    
+                    if not value and forename == 'tt' and table in ["dbconfig_form_fields", "dbconfig_param_system", "dbparam_user", "dbconfig_form_fields_feat"]:
+                        value = row.get('lb_en_us')
+
+                    if not value:
+                        texts.append('NULL')
+                    else:
+                        text = value.replace("'", "''")
+                        texts.append(f"'{text}'")
+                    
+                    
+
                 
                 sql_text = ""
                 #Define the query depending on the table
@@ -360,66 +381,74 @@ class GwSchemaI18NUpdate:
                         for feature_type in feature_types:
                             if row['feature_type'] == feature_type:
                                 formname = row['feature_type'].lower()
-                                sql_text = (f'UPDATE {self.schema}.{row['context']} SET label = \'{texts[0]}\', tooltip = \'{texts[1]}\' '
+                                sql_text = (f'UPDATE {self.schema}.{row['context']} SET label = {texts[0]}, tooltip = {texts[1]} '
                                         f'WHERE formname LIKE \'%_{formname}%\' AND formtype = \'{row['formtype']}\' AND columnname = \'{row['source']}\' ')
                                 break
                     else:
-                        sql_text = (f"UPDATE {self.schema}.{row['context']} SET label = '{texts[0]}', tooltip = '{texts[1]}' "
+                        sql_text = (f"UPDATE {self.schema}.{row['context']} SET label = {texts[0]}, tooltip = {texts[1]} "
                                 f"WHERE formname = '{row['formname']}' AND formtype = '{row['formtype']}' AND columnname = '{row['source']}';\n")
 
                 elif 'dbparam_user' in table:
-                    sql_text = (f"UPDATE {self.schema}.{row['context']} SET label = '{texts[0]}', descript = '{texts[1]}' "
+                    sql_text = (f"UPDATE {self.schema}.{row['context']} SET label = {texts[0]}, descript = {texts[1]} "
                                 f"WHERE id = '{row['source']}';\n")
 
                 elif 'dbconfig_param_system' in table:
-                    sql_text = (f"UPDATE {self.schema}.{row['context']} SET label = '{texts[0]}', descript = '{texts[1]}' "
+                    sql_text = (f"UPDATE {self.schema}.{row['context']} SET label = {texts[0]}, descript = {texts[1]} "
                                 f"WHERE parameter = '{row['source']}';\n")
 
                 elif 'dbconfig_typevalue' in table:
-                    sql_text = (f"UPDATE {self.schema}.{row['context']} SET idval = '{texts[0]}' "
+                    sql_text = (f"UPDATE {self.schema}.{row['context']} SET idval = {texts[0]} "
                                 f"WHERE id = '{row['source']}' AND typevalue = '{row['formname']}';\n")
 
                 elif 'dbmessage' in table:
-                    sql_text = (f"UPDATE {self.schema}.{row['context']} SET error_message = '{texts[0]}', hint_message = '{texts[1]}' "
+                    sql_text = (f"UPDATE {self.schema}.{row['context']} SET error_message = {texts[0]}, hint_message = {texts[1]} "
                                 f"WHERE id = '{row['source']}';\n")
 
                 elif 'dbfprocess' in table:
-                    sql_text = (f"UPDATE {self.schema}.{row['context']} SET except_msg = '{texts[0]}', info_msg = '{texts[1]}', fprocess_name = '{texts[2]}' "
+                    sql_text = (f"UPDATE {self.schema}.{row['context']} SET except_msg = {texts[0]}, info_msg = {texts[1]}, fprocess_name = {texts[2]} "
                                 f"WHERE fid = '{row['source']}';\n")
 
                 elif 'dbconfig_csv' in table:
-                    sql_text = (f"UPDATE {self.schema}.{row['context']} SET alias = '{texts[0]}', descript = '{texts[1]}' "
+                    sql_text = (f"UPDATE {self.schema}.{row['context']} SET alias = {texts[0]}, descript = {texts[1]} "
                                 f"WHERE fid = '{row['source']}';\n")
 
                 elif 'dbconfig_form_tabs' in table:
-                    sql_text = (f"UPDATE {self.schema}.{row['context']} SET label = '{texts[0]}', tooltip = '{texts[1]}' "
+                    sql_text = (f"UPDATE {self.schema}.{row['context']} SET label = {texts[0]}, tooltip = {texts[1]} "
                                 f"WHERE formname = '{row['formname']}' AND tabname = '{row['source']}';\n")
 
                 elif 'dbconfig_report' in table:
-                    sql_text = (f"UPDATE {self.schema}.{row['context']} SET alias = '{texts[0]}', descript = '{texts[1]}' "
+                    sql_text = (f"UPDATE {self.schema}.{row['context']} SET alias = {texts[0]}, descript = {texts[1]} "
                                 f"WHERE id = '{row['source']}';\n")
 
                 elif 'dbconfig_toolbox' in table:
-                    sql_text = (f"UPDATE {self.schema}.{row['context']} SET alias = '{texts[0]}', observ = '{texts[1]}' "
+                    sql_text = (f"UPDATE {self.schema}.{row['context']} SET alias = {texts[0]}, observ = {texts[1]} "
                                 f"WHERE id = '{row['source']}';\n")
 
                 elif 'dbfunction' in table:
-                    sql_text = (f"UPDATE {self.schema}.{row['context']} SET descript = '{texts[0]}' "
+                    sql_text = (f"UPDATE {self.schema}.{row['context']} SET descript = {texts[0]} "
                                 f"WHERE id = '{row['source']}';\n")
 
                 elif 'dbtypevalue' in table:
-                    sql_text = (f"UPDATE {self.schema}.{row['context']} SET idval = '{texts[0]}', descript = '{texts[1]}' "
+                    sql_text = (f"UPDATE {self.schema}.{row['context']} SET idval = {texts[0]}, descript = {texts[1]} "
                                 f"WHERE id = '{row['source']}' AND typevalue = '{row['typevalue']}';\n")
 
                 elif 'dbconfig_form_tableview' in table:
-                    sql_text = (f"UPDATE {self.schema}.{row['context']} SET alias = '{texts[0]}' "
+                    sql_text = (f"UPDATE {self.schema}.{row['context']} SET alias = {texts[0]} "
                                 f"WHERE objectname = '{row['source']}' AND columnname = '{row['columnname']}';\n")
 
                 elif 'dbtable' in table:
-                    sql_text = (f"UPDATE {self.schema}.{row['context']} SET alias = '{texts[0]}', descript = '{texts[1]}' "
+                    sql_text = (f"UPDATE {self.schema}.{row['context']} SET alias = {texts[0]}, descript = {texts[1]} "
                                 f"WHERE id = '{row['source']}';\n")
-
+                
+                elif 'dbconfig_engine' in table:
+                    sql_text = (f"UPDATE {self.schema}.{row['context']} SET label = {texts[0]}, descript = {texts[1]}, placeholder = {texts[2]} "
+                                f"WHERE parameter = '{row['parameter']}' AND method = '{row['method']}';\n")
                     
+                elif 'su_basic_tables' in table:
+                    if self.schema == "am":
+                        sql_text = (f"UPDATE {self.schema}.{row['context']} SET idval = {texts[0]} "
+                                    f"WHERE id = '{row['source']}';\n")
+             
                 #Execute the corresponding query
                 try:
                     self.cursor_dest.execute(sql_text)
@@ -430,52 +459,91 @@ class GwSchemaI18NUpdate:
         
     
     def _write_dbjson_values(self, rows):
-        updates = {}
-
-        for row in rows:
-            key = (row["source"], row["context"], row["text"])
-            if key not in updates:
-                updates[key] = []
-            updates[key].append(row)
-
         query = ""
-        for (source, context, original_text), related_rows in updates.items():
-            column = ""
+        updates = {}
+        for row in rows:
+            if row["context"] == "config_form_fields":
+                key = (row["source"], row["context"], row["text"], row["formname"], row["formtype"])
+            else:
+                key = (row["source"], row["context"], row["text"])
+            updates.setdefault(key, []).append(row)
+
+        for (source, context, original_text, *extra), related_rows in updates.items():
             if context == "config_report":
                 column = "filterparam"
             elif context == "config_toolbox":
                 column = "inputparams"
+            elif context == "config_form_fields":
+                column = "widgetcontrols"
             else:
-                continue
+                continue  # unknown context
 
-            # Safely parse the string as dict
-            try:
-                json_data = ast.literal_eval(original_text)
-            except (ValueError, SyntaxError):
-                continue  # Skip invalid JSON-like data
+            # parse JSON-like data
+            if context != "config_form_fields":
+                try:
+                    json_data = ast.literal_eval(original_text)
+                except (ValueError, SyntaxError):
+                    continue
+            else:
+                modified = original_text.replace("'", "\"")
+                modified = modified.replace("False", "false").replace("True", "true").replace("None", "null")
+                try:
+                    json_data = json.loads(modified)
+                except json.JSONDecodeError as e:
+                    print(f"Error decoding JSON: {e}")
+                    continue
 
             for row in related_rows:
                 key_hint = row["hint"].split('_')[0]
                 default_text = row.get("lb_en_us", "")
-                translated = row.get(f"lb_{self.lower_lang}") or \
-                            row.get(f"auto_lb_{self.lower_lang}") or \
-                            default_text
+                translated = (
+                    row.get(f"lb_{self.lower_lang}")
+                    or row.get(f"auto_lb_{self.lower_lang}")
+                    or default_text
+                )
 
-                if key_hint in json_data and json_data[key_hint] == default_text:
-                    json_data[key_hint] = translated
+                if ", " in default_text:
+                    default_list = default_text.split(", ")
+                    translated_list = translated.split(", ")
+                    for item in json_data:
+                        if isinstance(item, dict) and key_hint in item and "comboNames" in item:
+                            if set(default_list).intersection(item["comboNames"]):
+                                item["comboNames"] = [
+                                    t if d in default_list else d
+                                    for d, t in zip(default_list, translated_list)
+                                ]
+                else:
+                    if isinstance(json_data, dict):
+                        for key, value in json_data.items():
+                            if key == key_hint and value == default_text:
+                                json_data[key] = translated
+                    elif isinstance(json_data, list):
+                        for item in json_data:
+                            if isinstance(item, dict) and key_hint in item and item[key_hint] == default_text:
+                                item[key_hint] = translated
+                    else:
+                        print("Unexpected json_data structure!")
 
-           
-            new_text = json.dumps(json_data)
-            new_text = str(new_text).replace("'", "''")  # Convert to proper JSON format
-            query += f"UPDATE {self.schema}.{context} SET {column} = \'{new_text}\' WHERE id = {source};\n"
+            new_text = json.dumps(json_data).replace("'", "''")
+
+            if context == "config_form_fields":
+                query_text = (
+                    f"UPDATE {self.schema}.{context} SET {column} = '{new_text}' "
+                    f"WHERE formname = '{related_rows[0]['formname']}' "
+                    f"AND formtype = '{related_rows[0]['formtype']}' "
+                    f"AND columnname = '{source}';\n"
+                )
+            else:
+                query_text = f"UPDATE {self.schema}.{context} SET {column} = '{new_text}' WHERE id = {source};\n"
+
+            query += query_text
 
         try:
             self.cursor_dest.execute(query)
             self.conn_dest.commit()
         except Exception as e:
             self.conn_dest.rollback()
-            print(e)
-           
+            print(e)  
     
     #endregion
     
@@ -700,5 +768,31 @@ class GwSchemaI18NUpdate:
 
         cur_dest.execute(final_query)
         conn_dest.commit()
+
+
+    def tables_dic(self, schema_type):
+        dbtables_dic = {
+            "ws": {
+                "dbtables": [ "dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue", 
+                    "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report", 
+                    "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_fields_feat", 
+                    "dbconfig_form_tableview", "dbtable", "dbjson", "dbconfig_form_fields_json"
+                 ]
+            },
+            "ud": {
+                "dbtables": [ "dbparam_user", "dbconfig_param_system", "dbconfig_form_fields", "dbconfig_typevalue", 
+                    "dbfprocess", "dbmessage", "dbconfig_csv", "dbconfig_form_tabs", "dbconfig_report", 
+                    "dbconfig_toolbox", "dbfunction", "dbtypevalue", "dbconfig_form_fields_feat", 
+                    "dbconfig_form_tableview", "dbtable", "dbjson", "dbconfig_form_fields_json"
+                 ] 
+            },
+            "am": {
+                "dbtables": ["dbconfig_engine", "dbconfig_form_tableview", "su_basic_tables"]
+            },
+            "cm": {
+                "dbtables": [] #["dbtable", "dbconfig_form_fields", "dbconfig_form_tabs", "dbconfig_param_system", "sys_typevalue", "dbconfig_form_fields_json"]
+            },
+        }
+        return dbtables_dic[schema_type]['dbtables']
 
     # endregion
