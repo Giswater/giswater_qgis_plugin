@@ -54,7 +54,7 @@ DROP VIEW IF EXISTS v_edit_element;
 
 -- ====
 
-CREATE OR REPLACE VIEW v_edit_element AS
+CREATE OR REPLACE VIEW ve_genelem AS
 SELECT e.* FROM (
 SELECT element.element_id,
     element.code,
@@ -2512,7 +2512,7 @@ AS SELECT
     ou.cd2,
     ou.flap,
     f.the_geom
-    FROM v_edit_flwreg f
+    FROM ve_frelem f
     JOIN inp_froutlet ou USING (element_id);
 
 CREATE OR REPLACE VIEW v_edit_inp_frweir
@@ -2538,7 +2538,7 @@ AS SELECT
     w.road_surf,
     w.coef_curve,
     f.the_geom
-    FROM v_edit_flwreg f
+    FROM ve_frelem f
     JOIN inp_frweir w USING (element_id);
 
 
@@ -2555,7 +2555,7 @@ AS SELECT
     p.startup,
     p.shutoff,
     f.the_geom
-    FROM v_edit_flwreg f
+    FROM ve_frelem f
     JOIN inp_frpump p USING (element_id);
 
 CREATE OR REPLACE VIEW v_edit_inp_frorifice
@@ -2577,7 +2577,7 @@ AS SELECT
     ori.geom3,
     ori.geom4,
     f.the_geom
-    FROM v_edit_flwreg f
+    FROM ve_frelem f
     JOIN inp_frorifice ori USING (element_id);
 
 CREATE OR REPLACE VIEW v_edit_inp_frpump
@@ -2593,7 +2593,7 @@ AS SELECT
     p.startup,
     p.shutoff,
     f.the_geom
-    FROM v_edit_flwreg f
+    FROM ve_frelem f
     JOIN inp_frpump p ON f.element_id::text = p.element_id::text;
 
 
@@ -2952,17 +2952,17 @@ UNION
      JOIN exploitation ON exploitation.expl_id = v_edit_connec.expl_id
   WHERE v_edit_connec.state = 0
 UNION
- SELECT row_number() OVER (ORDER BY v_edit_element.element_id) + 4000000 AS rid,
+ SELECT row_number() OVER (ORDER BY element.element_id) + 4000000 AS rid,
     'ELEMENT'::character varying AS feature_type,
-    v_edit_element.elementcat_id AS featurecat_id,
-    v_edit_element.element_id AS feature_id,
-    v_edit_element.code,
+    element.elementcat_id AS featurecat_id,
+    element.element_id AS feature_id,
+    element.code,
     exploitation.name AS expl_name,
-    v_edit_element.workcat_id_end AS workcat_id,
+    element.workcat_id_end AS workcat_id,
     exploitation.expl_id
-   FROM v_edit_element
-     JOIN exploitation ON exploitation.expl_id = v_edit_element.expl_id
-  WHERE v_edit_element.state = 0
+   FROM element
+     JOIN exploitation ON exploitation.expl_id = element.expl_id
+  WHERE element.state = 0
 UNION
  SELECT row_number() OVER (ORDER BY v_edit_gully.gully_id) + 4000000 AS rid,
     'GULLY'::character varying AS feature_type,
@@ -6513,9 +6513,9 @@ AS SELECT om_visit_event.id AS event_id,
 -- ve_epa_frweir
 CREATE OR REPLACE VIEW ve_epa_frweir
 AS SELECT inp_frweir.element_id,
-	man_flowreg.node_id,
-	man_flowreg.order_id,
-	concat (man_flowreg.node_id,'_FR', order_id) as nodarc_id,
+	man_frelem.node_id,
+	man_frelem.order_id,
+	concat (man_frelem.node_id,'_FR', order_id) as nodarc_id,
     inp_frweir.weir_type,
     inp_frweir.offsetval,
     inp_frweir.cd,
@@ -6545,16 +6545,16 @@ AS SELECT inp_frweir.element_id,
     rpt_arcflow_sum.day_min,
     rpt_arcflow_sum.time_min
    FROM inp_frweir
-     LEFT JOIN man_flowreg USING (element_id)
-     LEFT JOIN rpt_arcflow_sum ON rpt_arcflow_sum.arc_id = concat (man_flowreg.node_id,'_FR', order_id);
+     LEFT JOIN man_frelem USING (element_id)
+     LEFT JOIN rpt_arcflow_sum ON rpt_arcflow_sum.arc_id = concat (man_frelem.node_id,'_FR', order_id);
 
 
 -- ve_epa_frorifice
 CREATE OR REPLACE VIEW ve_epa_frorifice
 AS SELECT inp_frorifice.element_id,
-	man_flowreg.node_id,
-	man_flowreg.order_id,
-	concat (man_flowreg.node_id,'_FR', order_id) as nodarc_id,
+	man_frelem.node_id,
+	man_frelem.order_id,
+	concat (man_frelem.node_id,'_FR', order_id) as nodarc_id,
     inp_frorifice.orifice_type,
     inp_frorifice.offsetval,
     inp_frorifice.cd,
@@ -6580,16 +6580,16 @@ AS SELECT inp_frorifice.element_id,
     rpt_arcflow_sum.day_min,
     rpt_arcflow_sum.time_min
    FROM inp_frorifice
-     LEFT JOIN man_flowreg USING (element_id)
-     LEFT JOIN rpt_arcflow_sum ON rpt_arcflow_sum.arc_id = concat (man_flowreg.node_id,'_FR', order_id);
+     LEFT JOIN man_frelem USING (element_id)
+     LEFT JOIN rpt_arcflow_sum ON rpt_arcflow_sum.arc_id = concat (man_frelem.node_id,'_FR', order_id);
 
 
 -- ve_epa_froutlet
 CREATE OR REPLACE VIEW ve_epa_froutlet
 AS SELECT inp_froutlet.element_id,
-	man_flowreg.node_id,
-	man_flowreg.order_id,
-	concat (man_flowreg.node_id,'_FR', order_id) as nodarc_id,
+	man_frelem.node_id,
+	man_frelem.order_id,
+	concat (man_frelem.node_id,'_FR', order_id) as nodarc_id,
     inp_froutlet.outlet_type,
 	inp_froutlet.offsetval,
     inp_froutlet.curve_id,
@@ -6611,16 +6611,16 @@ AS SELECT inp_froutlet.element_id,
     rpt_arcflow_sum.day_min,
     rpt_arcflow_sum.time_min
    FROM inp_froutlet
-     LEFT JOIN man_flowreg USING (element_id)
-     LEFT JOIN rpt_arcflow_sum ON rpt_arcflow_sum.arc_id = concat (man_flowreg.node_id,'_FR', order_id);
+     LEFT JOIN man_frelem USING (element_id)
+     LEFT JOIN rpt_arcflow_sum ON rpt_arcflow_sum.arc_id = concat (man_frelem.node_id,'_FR', order_id);
 
 
 -- ve_epa_frpump
 CREATE OR REPLACE VIEW ve_epa_frpump
 AS SELECT inp_frpump.element_id,
-	man_flowreg.node_id,
-	man_flowreg.order_id,
-	concat (man_flowreg.node_id,'_FR', order_id) as nodarc_id,
+	man_frelem.node_id,
+	man_frelem.order_id,
+	concat (man_frelem.node_id,'_FR', order_id) as nodarc_id,
     inp_frpump.curve_id,
     inp_frpump.status,
     inp_frpump.startup,
@@ -6635,5 +6635,5 @@ AS SELECT inp_frpump.element_id,
     v_rpt_pumping_sum.timoff_min,
     v_rpt_pumping_sum.timoff_max
    FROM inp_frpump
-     LEFT JOIN man_flowreg USING (element_id)
-     LEFT JOIN v_rpt_pumping_sum ON v_rpt_pumping_sum.arc_id = concat (man_flowreg.node_id,'_FR', order_id);
+     LEFT JOIN man_frelem USING (element_id)
+     LEFT JOIN v_rpt_pumping_sum ON v_rpt_pumping_sum.arc_id = concat (man_frelem.node_id,'_FR', order_id);

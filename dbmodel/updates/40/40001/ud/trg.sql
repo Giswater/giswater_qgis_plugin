@@ -7,9 +7,6 @@ This version of Giswater is provided by Giswater Association
 
 SET search_path = SCHEMA_NAME, public, pg_catalog;
 
-CREATE TRIGGER gw_trg_edit_element INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_element
-FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_element('element');
-
 CREATE TRIGGER gw_trg_edit_samplepoint INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_samplepoint
 FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_samplepoint('samplepoint');
 
@@ -256,8 +253,11 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_ve_epa('pump');
 
 
 --CREATE TRIGGER for parent view by passing parameter 'parent'
-CREATE TRIGGER gw_trg_edit_element INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_flwreg
-FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_element('flwreg');
+CREATE TRIGGER gw_trg_edit_element INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_frelem
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_element('frelem');
+
+CREATE TRIGGER gw_trg_edit_element INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_genelem
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_element('genelem');
 
 CREATE TRIGGER gw_trg_typevalue_fk_insert AFTER INSERT ON inp_frweir
 FOR EACH ROW EXECUTE FUNCTION gw_trg_typevalue_fk('inp_frweir');

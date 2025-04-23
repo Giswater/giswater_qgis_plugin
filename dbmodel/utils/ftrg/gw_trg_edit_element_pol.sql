@@ -25,7 +25,7 @@ BEGIN
 
 		-- element id
 		IF (NEW.element_id IS NULL) THEN
-			NEW.element_id := (SELECT element_id FROM v_edit_element WHERE ST_DWithin(NEW.the_geom, v_edit_element.the_geom,0.001) LIMIT 1);
+			NEW.element_id := (SELECT element_id FROM element WHERE ST_DWithin(NEW.the_geom, element.the_geom,0.001) LIMIT 1);
 			IF (NEW.element_id IS NULL) THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
    			"data":{"message":"2094", "function":"2996","parameters":null}}$$);';
@@ -35,7 +35,7 @@ BEGIN
 		-- Insert into polygon table
 		INSERT INTO polygon (pol_id, sys_type, the_geom, featurecat_id, feature_id)
 		SELECT NEW.pol_id, 'ELEMENT', NEW.the_geom, element_type, NEW.element_id
-		FROM v_edit_element WHERE element_id=NEW.element_id
+		FROM element WHERE element_id=NEW.element_id
 		ON CONFLICT (feature_id) DO UPDATE SET the_geom=NEW.the_geom;
 
 		-- Update man table
@@ -50,15 +50,15 @@ BEGIN
 		UPDATE polygon SET pol_id=NEW.pol_id, the_geom=NEW.the_geom, trace_featuregeom=NEW.trace_featuregeom WHERE pol_id=OLD.pol_id;
 
 		IF (NEW.element_id != OLD.element_id) THEN
-			IF (SELECT element_id FROM v_edit_element WHERE element_id=NEW.element_id) iS NULL THEN
+			IF (SELECT element_id FROM element WHERE element_id=NEW.element_id) iS NULL THEN
 				EXECUTE 'SELECT gw_fct_getmessage($${"client":{"device":4, "infoType":1, "lang":"ES"},"feature":{},
    			"data":{"message":"2098", "function":"2996","parameters":null}}$$);';
 			END IF;
-			UPDATE v_edit_element SET pol_id=NULL WHERE element_id=OLD.element_id;
-			UPDATE v_edit_element SET pol_id=NEW.pol_id WHERE element_id=NEW.element_id;
+			UPDATE element SET pol_id=NULL WHERE element_id=OLD.element_id;
+			UPDATE element SET pol_id=NEW.pol_id WHERE element_id=NEW.element_id;
 
 			UPDATE polygon SET feature_id=NEW.element_id, featurecat_id = element_type
-			FROM v_edit_element WHERE element_id=OLD.element_id AND pol_id=NEW.pol_id;
+			FROM element WHERE element_id=OLD.element_id AND pol_id=NEW.pol_id;
 		END IF;
 
 		RETURN NEW;
@@ -66,7 +66,7 @@ BEGIN
 	-- DELETE
 	ELSIF TG_OP = 'DELETE' THEN
 
-		UPDATE v_edit_element SET pol_id=NULL WHERE element_id=OLD.element_id;
+		UPDATE element SET pol_id=NULL WHERE element_id=OLD.element_id;
 		DELETE FROM polygon WHERE pol_id=OLD.pol_id;
 
 		RETURN NULL;

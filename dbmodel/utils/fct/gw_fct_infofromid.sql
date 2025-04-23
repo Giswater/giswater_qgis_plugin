@@ -781,7 +781,7 @@ BEGIN
                 SELECT * INTO v_noderecord1 FROM v_edit_node WHERE ST_DWithin(ST_startpoint(v_inputgeometry), v_edit_node.the_geom, v_arc_searchnodes)
                 ORDER BY ST_Distance(v_edit_node.the_geom, ST_startpoint(v_inputgeometry)) LIMIT 1;
                 -- Get order_id
-                SELECT COALESCE(MAX(order_id), 0) + 1 INTO v_order_id FROM v_edit_flwreg WHERE node_id = v_noderecord1.node_id ::text; -- afegir flwreg_type
+                SELECT COALESCE(MAX(order_id), 0) + 1 INTO v_order_id FROM ve_frelem WHERE node_id = v_noderecord1.node_id ::text; -- afegir flwreg_type
                 -- Get flowreg_type
                 v_querystring = concat('SELECT feature_class FROM cat_feature WHERE child_layer = ' , quote_nullable(v_tablename) ,' LIMIT 1');
                 v_debug_vars := json_build_object('v_tablename', v_tablename);

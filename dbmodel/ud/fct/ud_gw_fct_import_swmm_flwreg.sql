@@ -10,20 +10,20 @@ AS $function$
 /*EXAMPLE
 SELECT SCHEMA_NAME.gw_fct_import_swmm_flwreg($${"data": {
     "pump": {
-        "featureClass": "FRPUMP",
-        "catalog": "FRPUMP-01"
+        "featureClass": "PUMP",
+        "catalog": "PUMP-01"
     },
     "orifice": {
-        "featureClass": "FRORIFICE",
-        "catalog": "FRORIFICE-01"
+        "featureClass": "ORIFICE",
+        "catalog": "ORIFICE-01"
     },
     "weir": {
-        "featureClass": "FRWEIR",
-        "catalog": "FRWEIR-01"
+        "featureClass": "EWEIR",
+        "catalog": "EWEIR-01"
     },
     "outlet": {
-        "featureClass": "FROUTLET",
-        "catalog": "FROUTLET-01"
+        "featureClass": "OUTLET",
+        "catalog": "OUTLET-01"
     }
 }}$$);
 

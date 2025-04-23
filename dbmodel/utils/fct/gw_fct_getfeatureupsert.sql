@@ -496,7 +496,7 @@ BEGIN
                 SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
                 EXECUTE v_querystring INTO v_flwreg_type;
 				-- Get order_id
-                SELECT COALESCE(MAX(order_id), 0) + 1 INTO v_order_id FROM v_edit_flwreg WHERE node_id = v_noderecord1.node_id ::text AND flwreg_type = v_flwreg_type;
+                SELECT COALESCE(MAX(order_id), 0) + 1 INTO v_order_id FROM ve_frelem WHERE node_id = v_noderecord1.node_id ::text AND flwreg_type = v_flwreg_type;
                 -- Set nodarc_id
                 v_nodarc_id = concat(v_noderecord1.node_id,upper(substring(v_flwreg_type FROM 1 FOR 2)), v_order_id);
 			END IF;

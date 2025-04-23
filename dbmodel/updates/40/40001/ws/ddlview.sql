@@ -446,7 +446,7 @@ AS WITH
     SELECT n.*
     FROM node_selected n;
 
-CREATE OR REPLACE VIEW v_edit_element AS
+CREATE OR REPLACE VIEW ve_genelem AS
 SELECT e.* FROM (
 SELECT element.element_id,
     element.code,
@@ -3317,17 +3317,17 @@ UNION
      JOIN exploitation ON exploitation.expl_id = v_edit_connec.expl_id
   WHERE v_edit_connec.state = 0
 UNION
- SELECT row_number() OVER (ORDER BY v_edit_element.element_id) + 4000000 AS rid,
+ SELECT row_number() OVER (ORDER BY element.element_id) + 4000000 AS rid,
     'ELEMENT'::character varying AS feature_type,
-    v_edit_element.elementcat_id AS featurecat_id,
-    v_edit_element.element_id AS feature_id,
-    v_edit_element.code,
+    element.elementcat_id AS featurecat_id,
+    element.element_id AS feature_id,
+    element.code,
     exploitation.name AS expl_name,
-    v_edit_element.workcat_id_end AS workcat_id,
+    element.workcat_id_end AS workcat_id,
     exploitation.expl_id
-   FROM v_edit_element
-     JOIN exploitation ON exploitation.expl_id = v_edit_element.expl_id
-  WHERE v_edit_element.state = 0;
+   FROM element
+     JOIN exploitation ON exploitation.expl_id = element.expl_id
+  WHERE element.state = 0;
 
 CREATE OR REPLACE VIEW v_plan_result_arc
 AS SELECT plan_rec_result_arc.arc_id,
@@ -7051,7 +7051,7 @@ AS SELECT
     p.startup,
     p.shutoff,
     f.the_geom
-    FROM v_edit_flwreg f
+    FROM ve_frelem f
     JOIN inp_frpump p ON f.element_id::text = p.element_id::text;
 
 CREATE OR REPLACE VIEW v_edit_inp_dscenario_frpump
@@ -7082,14 +7082,14 @@ as select f.element_id,
     add_settings,
     init_quality,
     f.the_geom
-    FROM v_edit_flwreg f
+    FROM ve_frelem f
     JOIN inp_frvalve v ON f.element_id::text = v.element_id::text;
 
 
 CREATE OR REPLACE VIEW v_edit_inp_dscenario_frvalve
 AS SELECT s.dscenario_id,
     element_id,
-	v.valve_type,
+	  v.valve_type,
     v.custom_dint,
     v.setting,
     v.curve_id,
@@ -7104,8 +7104,8 @@ AS SELECT s.dscenario_id,
 
 CREATE OR REPLACE VIEW ve_epa_frvalve AS
 SELECT v.element_id,
-	man_flowreg.node_id,
-	concat (man_flowreg.node_id,'_FR', order_id) as nodarc_id,
+	man_frelem.node_id,
+	concat (man_frelem.node_id,'_FR', order_id) as nodarc_id,
 	to_arc,
 	valve_type,
 	custom_dint,
@@ -7130,14 +7130,14 @@ SELECT v.element_id,
 	ffactor_max,
 	ffactor_min
 	FROM inp_frvalve v
-     LEFT JOIN man_flowreg USING (element_id)
-     LEFT JOIN v_rpt_arc_stats r ON r.arc_id = concat (man_flowreg.node_id,'_FR', order_id);
+  LEFT JOIN man_frelem USING (element_id)
+  LEFT JOIN v_rpt_arc_stats r ON r.arc_id = concat (man_frelem.node_id,'_FR', order_id);
 
 
 CREATE OR REPLACE VIEW ve_epa_frpump as
 SELECT p.element_id,
-	man_flowreg.node_id,
-	concat (man_flowreg.node_id,'_FR', order_id) as nodarc_id,
+	man_frelem.node_id,
+	concat (man_frelem.node_id,'_FR', order_id) as nodarc_id,
 	to_arc,
 	curve_id,
 	status,
@@ -7158,5 +7158,5 @@ SELECT p.element_id,
 	ffactor_max,
 	ffactor_min
 	FROM inp_frpump p
-     LEFT JOIN man_flowreg USING (element_id)
-     LEFT JOIN v_rpt_arc_stats r ON r.arc_id = concat (man_flowreg.node_id,'_FR', order_id);
+     LEFT JOIN man_frelem USING (element_id)
+     LEFT JOIN v_rpt_arc_stats r ON r.arc_id = concat (man_frelem.node_id,'_FR', order_id);

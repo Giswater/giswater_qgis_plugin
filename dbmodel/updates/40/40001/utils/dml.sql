@@ -16,8 +16,8 @@ INSERT INTO sys_feature_class (id, "type", epa_default, man_table) VALUES('SERVC
 
 
 DELETE FROM sys_feature_class WHERE id = 'ELEMENT' AND type = 'ELEMENT';
-INSERT INTO sys_feature_class (id, "type", epa_default, man_table) VALUES('FLOWREG', 'ELEMENT', 'UNDEFINED', 'man_flowreg');
-INSERT INTO sys_feature_class (id, "type", epa_default, man_table) VALUES('GENELEMENT', 'ELEMENT', 'UNDEFINED', 'man_genelement');
+INSERT INTO sys_feature_class (id, "type", epa_default, man_table) VALUES('FRELEM', 'ELEMENT', 'UNDEFINED', 'man_frelem');
+INSERT INTO sys_feature_class (id, "type", epa_default, man_table) VALUES('GENELEM', 'ELEMENT', 'UNDEFINED', 'man_genelem');
 
 
 DELETE FROM cat_feature WHERE id = 'LINK';
@@ -42,7 +42,12 @@ UPDATE config_info_layer SET is_parent=true WHERE layer_id='v_edit_connec';
 UPDATE config_info_layer SET is_parent=true WHERE layer_id='v_edit_arc';
 
 INSERT INTO config_info_layer (layer_id, is_parent, is_editable, formtemplate, headertext, orderby)
-VALUES('v_edit_flwreg', true, true, 'info_generic', 'Flow regulator', 4);
+VALUES('ve_frelem', true, true, 'info_generic', 'Flow regulator element', 4);
+
+INSERT INTO config_info_layer (layer_id, is_parent, is_editable, formtemplate, headertext, orderby)
+VALUES('ve_genelem', true, true, 'info_generic', 'Generic element', 4);
+
+DELETE FROM config_info_layer WHERE layer_id IN ('v_edit_flwreg', 'v_edit_element');
 
 
 -- config typevalue
@@ -50,18 +55,14 @@ update config_typevalue set addparam ='{"orderBy":10}' where id ='{"level_1":"IN
 update config_typevalue set addparam ='{"orderBy":51}' where id ='{"level_1":"INVENTORY","level_2":"AUXILIAR"}';
 
 -- sys table
-delete from sys_table WHERE id = 'v_edit_flwreg';
-insert into sys_table values ('v_edit_flwreg', 'Specific view for flowregulator elements', 'role_basic', null,
-'{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"ELEMENT"}', 2, 'Flowregulators', null, null, null, 'core');
+DELETE FROM sys_table WHERE id = 'v_edit_flwreg';
+INSERT INTO sys_table (id, descript, sys_role, context, "source") VALUES('ve_frelem', 'Specific view for flowregulator elements', 'role_basic', '{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"ELEMENT"}', 'core');
 
-update sys_table set context ='{"level_1":"INVENTORY","level_2":"OTHER"}' , orderby = 1 where id = 'v_edit_dimensions';
+UPDATE sys_table SET context ='{"level_1":"INVENTORY","level_2":"OTHER"}' , orderby = 1 WHERE id = 'v_edit_dimensions';
 
-insert into sys_table values ('v_edit_cat_feature_element', 'Catalog for elements', 'role_edit', null,
-'{"level_1":"INVENTORY","level_2":"CATALOGS"}', 7, 'Element feature catalog', null, null, null, 'core');
+INSERT INTO sys_table (id, descript, sys_role, context, "source") VALUES('v_edit_cat_feature_element', 'Catalog for elements', 'role_edit', '{"level_1":"INVENTORY","level_2":"CATALOGS"}', 'core');
 
-UPDATE config_info_layer SET is_parent = true, formtemplate = 'info_feature' WHERE layer_id = 'v_edit_flwreg';
 UPDATE config_info_layer SET is_parent = true, formtemplate = 'info_feature' WHERE layer_id = 'v_edit_link';
-UPDATE config_info_layer SET is_parent = true, formtemplate = 'info_feature' WHERE layer_id = 'v_edit_element';
 
 INSERT INTO config_form_tabs (formname, tabname, "label", tooltip, sys_role, tabfunction, tabactions, orderby, device) VALUES('v_edit_link', 'tab_elements', 'Elements', 'List of related elements', 'role_basic', NULL, '[{"actionName":"actionEdit", "disabled":false},
 {"actionName":"actionZoom", "disabled":false},

@@ -108,7 +108,7 @@ AS SELECT
 
 -- ====================
 
-CREATE OR REPLACE VIEW v_edit_flwreg AS
+CREATE OR REPLACE VIEW ve_frelem AS
   SELECT element.element_id,
     element.code,
     element.elementcat_id,
@@ -151,18 +151,18 @@ CREATE OR REPLACE VIEW v_edit_flwreg AS
     element.updated_at,
     element.updated_by,
     element.epa_type,
-	man_flowreg.node_id,
-	man_flowreg.order_id,
-	concat (man_flowreg.node_id,'_FR', order_id) as nodarc_id,
-	man_flowreg.to_arc,
-	man_flowreg.flwreg_length,
-	st_setsrid(st_makeline(element.the_geom, st_lineinterpolatepoint(a.the_geom, flwreg_length / st_length(a.the_geom))), SRID_VALUE)::geometry(LineString,SRID_VALUE) AS the_geom
-   FROM element
-      JOIN cat_element ON element.elementcat_id::text = cat_element.id::text
-      JOIN man_flowreg ON element.element_id::text = man_flowreg.element_id::text
-      LEFT JOIN selector_sector s USING (sector_id)
-      LEFT JOIN selector_expl e using (expl_id)
-	  JOIN arc a ON arc_id =to_arc
+    man_frelem.node_id,
+    man_frelem.order_id,
+    concat (man_frelem.node_id,'_FR', man_frelem.order_id) AS nodarc_id,
+    man_frelem.to_arc,
+    man_frelem.flwreg_length,
+    st_setsrid(st_makeline(element.the_geom, st_lineinterpolatepoint(a.the_geom, flwreg_length / st_length(a.the_geom))), SRID_VALUE)::geometry(LineString,SRID_VALUE) AS the_geom
+    FROM element
+    JOIN cat_element ON element.elementcat_id::text = cat_element.id::text
+    JOIN man_frelem ON element.element_id::text = man_frelem.element_id::text
+    LEFT JOIN selector_sector s USING (sector_id)
+    LEFT JOIN selector_expl e using (expl_id)
+	  JOIN arc a ON arc_id = to_arc
     WHERE element.expl_id = e.expl_id
     AND s.cur_user = "current_user"()::text AND e.cur_user = "current_user"()::text;
 

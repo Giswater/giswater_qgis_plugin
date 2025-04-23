@@ -68,7 +68,7 @@ BEGIN
 	DROP TABLE IF EXISTS t_arc;	EXECUTE 'CREATE TEMP TABLE t_arc AS SELECT * FROM v_edit_arc'||v_filter;
 	DROP TABLE IF EXISTS t_node;EXECUTE 'CREATE TEMP TABLE  t_node AS SELECT * FROM v_edit_node'||v_filter;
 	DROP TABLE IF EXISTS t_connec;EXECUTE 'CREATE TEMP TABLE t_connec AS SELECT * FROM v_edit_connec'||v_filter;
-	DROP TABLE IF EXISTS t_element;	EXECUTE 'CREATE TEMP TABLE t_element AS SELECT * FROM v_edit_element'||v_filter;
+	DROP TABLE IF EXISTS t_element;	EXECUTE 'CREATE TEMP TABLE t_element AS SELECT * FROM element'||v_filter;
 	DROP TABLE IF EXISTS t_link;EXECUTE 'CREATE TEMP TABLE t_link AS SELECT * FROM v_edit_link';
 	DROP TABLE IF EXISTS t_dma;	CREATE TEMP TABLE t_dma AS SELECT * FROM v_edit_dma;
 	IF v_project_type = 'WS' THEN

@@ -191,15 +191,15 @@ UPDATE cat_feature SET shortcut_key='Alt+Z' WHERE id = 'ESCOMESA_FICTICIA';
 UPDATE cat_feature SET shortcut_key='Alt+1' WHERE id = 'VGULLY';
 UPDATE cat_feature SET shortcut_key='Alt+2' WHERE id = 'VCONNEC';
 
-INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) VALUES ('FRORIFICE', 'FRORIFICE','FLWREG', 'v_edit_flwreg', 've_flwreg_frorifice', true) ON CONFLICT (id) DO NOTHING;
-INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) VALUES ('FROUTLET', 'FROUTLET','FLWREG', 'v_edit_flwreg', 've_flwreg_froutlet', true) ON CONFLICT (id) DO NOTHING;
-INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) VALUES ('FRWEIR', 'FRWEIR','FLWREG', 'v_edit_flwreg', 've_flwreg_frweir', true) ON CONFLICT (id) DO NOTHING;
-INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) VALUES ('FRPUMP', 'FRPUMP','FLWREG', 'v_edit_flwreg', 've_flwreg_frpump', true) ON CONFLICT (id) DO NOTHING;
+INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) VALUES ('ORIFICE', 'FRELEM','ELEMENT', 've_frelem', 've_frelem_orifice', true) ON CONFLICT (id) DO NOTHING;
+INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) VALUES ('OUTLET', 'FRELEM','ELEMENT', 've_frelem', 've_frelem_outlet', true) ON CONFLICT (id) DO NOTHING;
+INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) VALUES ('EWEIR', 'FRELEM','ELEMENT', 've_frelem', 've_frelem_eweir', true) ON CONFLICT (id) DO NOTHING;
+INSERT INTO cat_feature (id, feature_class, feature_type, parent_layer, child_layer, active) VALUES ('PUMP', 'FRELEM','ELEMENT', 've_frelem', 've_frelem_pump', true) ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO cat_element (id, element_type, active) VALUES ('FRORIFICE-01', 'FRORIFICE', TRUE) ON CONFLICT (id) DO NOTHING;
-INSERT INTO cat_element (id, element_type, active) VALUES ('FROUTLET-01', 'FROUTLET', TRUE) ON CONFLICT (id) DO NOTHING;
-INSERT INTO cat_element (id, element_type, active) VALUES ('FRWEIR-01', 'FRWEIR', TRUE) ON CONFLICT (id) DO NOTHING;
-INSERT INTO cat_element (id, element_type, active) VALUES ('FRPUMP-01', 'FRPUMP', TRUE) ON CONFLICT (id) DO NOTHING;
+INSERT INTO cat_element (id, element_type, active) VALUES ('ORIFICE-01', 'ORIFICE', TRUE) ON CONFLICT (id) DO NOTHING;
+INSERT INTO cat_element (id, element_type, active) VALUES ('OUTLET-01', 'OUTLET', TRUE) ON CONFLICT (id) DO NOTHING;
+INSERT INTO cat_element (id, element_type, active) VALUES ('EWEIR-01', 'EWEIR', TRUE) ON CONFLICT (id) DO NOTHING;
+INSERT INTO cat_element (id, element_type, active) VALUES ('PUMP-01', 'PUMP', TRUE) ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO cat_link (id, matcat_id, descript, link, brand_id, model_id, svg, estimated_depth, active, label)
 SELECT id, matcat_id, descript, link, brand_id, model_id, svg, estimated_depth, active, label

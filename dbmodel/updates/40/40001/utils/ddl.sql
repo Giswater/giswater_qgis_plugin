@@ -67,21 +67,21 @@ ALTER TABLE link ADD CONSTRAINT link_linkcat_id_fkey FOREIGN KEY (linkcat_id) RE
 
 
 
-CREATE TABLE man_genelement (
+CREATE TABLE man_genelem (
     element_id varchar(16) NOT NULL,
-    CONSTRAINT man_genelement_pkey PRIMARY KEY (element_id),
-	CONSTRAINT man_genelement_fkey_element_id FOREIGN KEY (element_id) REFERENCES element(element_id) ON UPDATE CASCADE ON DELETE CASCADE
+    CONSTRAINT man_genelem_pkey PRIMARY KEY (element_id),
+	CONSTRAINT man_genelem_fkey_element_id FOREIGN KEY (element_id) REFERENCES element(element_id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
-CREATE TABLE man_flowreg (
+CREATE TABLE man_frelem (
     element_id varchar(16) NOT NULL,
     node_id varchar NULL,
     order_id numeric NULL,
     to_arc varchar NULL,
     flwreg_length numeric NULL,
-    CONSTRAINT man_flowreg_pkey PRIMARY KEY (element_id),
-	CONSTRAINT man_flowreg_fkey_element_id FOREIGN KEY (element_id) REFERENCES element(element_id) ON UPDATE CASCADE ON DELETE CASCADE,
-	CONSTRAINT man_flowreg_fkey_to_arc FOREIGN KEY (to_arc) REFERENCES arc(arc_id) ON UPDATE RESTRICT ON DELETE CASCADE
+    CONSTRAINT man_frelem_pkey PRIMARY KEY (element_id),
+	CONSTRAINT man_frelem_fkey_element_id FOREIGN KEY (element_id) REFERENCES element(element_id) ON UPDATE CASCADE ON DELETE CASCADE,
+	CONSTRAINT man_frelem_fkey_to_arc FOREIGN KEY (to_arc) REFERENCES arc(arc_id) ON UPDATE RESTRICT ON DELETE CASCADE
 );
 
 CREATE TABLE cat_feature_element (
@@ -92,7 +92,7 @@ CREATE TABLE cat_feature_element (
     CONSTRAINT cat_feature_element_inp_check CHECK (epa_default::text = ANY (ARRAY['ORIFICE'::text, 'WEIR'::text, 'OUTLET'::text, 'PUMP'::text, 'UNDEFINED'::text]))
 );
 
-INSERT INTO man_genelement (element_id) SELECT element_id FROM element;
+INSERT INTO man_genelem (element_id) SELECT element_id FROM element;
 
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"temp_node", "column":"omzone_id", "dataType":"integer", "isUtils":"False"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"temp_arc", "column":"omzone_id", "dataType":"integer", "isUtils":"False"}}$$);

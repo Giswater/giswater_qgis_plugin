@@ -267,9 +267,12 @@ BEGIN
 		NEW.publish, NEW.inventory, NEW.expl_id, NEW.feature_type, NEW.pol_id, NEW.top_elev, NEW.expl_id2, NEW.trace_featuregeom, NEW.muni_id, NEW.sector_id, NEW.brand_id, NEW.model_id, NEW.asset_id, NEW.datasource, NEW.omunit_id,
 		NEW.lock_level, NEW.the_geom, NEW.created_at, NEW.created_by, NEW.updated_at, NEW.updated_by);
 
-		IF v_man_table='man_flowreg' THEN
-			INSERT INTO man_flowreg (element_id, node_id, order_id, to_arc, flwreg_length)
+		IF v_man_table='man_frelem' THEN
+			INSERT INTO man_frelem (element_id, node_id, order_id, to_arc, flwreg_length)
 			VALUES(NEW.element_id, NEW.node_id, NEW.order_id, NEW.to_arc, NEW.flwreg_length);
+		ELSIF v_man_table='man_genelem' THEN
+			INSERT INTO man_genelem (element_id)
+			VALUES(NEW.element_id);
 		END IF;
 
 
@@ -345,8 +348,11 @@ BEGIN
 		WHERE element_id=OLD.element_id;
 
 
-		IF v_man_table='man_flowreg' THEN
-			UPDATE man_flowreg SET node_id=NEW.node_id, order_id=NEW.order_id, to_arc=NEW.to_arc, flwreg_length=NEW.flwreg_length
+		IF v_man_table='man_frelem' THEN
+			UPDATE man_frelem SET node_id=NEW.node_id, order_id=NEW.order_id, to_arc=NEW.to_arc, flwreg_length=NEW.flwreg_length
+			WHERE element_id=OLD.element_id;
+		ELSIF v_man_table='man_genelem' THEN
+			UPDATE man_genelem SET element_id=NEW.element_id
 			WHERE element_id=OLD.element_id;
 		END IF;
 

@@ -312,9 +312,6 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_ui_doc('node');
 CREATE TRIGGER gw_trg_ui_doc_x_visit INSTEAD OF INSERT OR DELETE OR UPDATE ON v_ui_doc_x_visit
 FOR EACH ROW EXECUTE FUNCTION gw_trg_ui_doc('visit');
 
-CREATE TRIGGER gw_trg_edit_element INSTEAD OF INSERT OR DELETE OR UPDATE ON v_edit_element
-FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_element('element');
-
 DROP TRIGGER IF EXISTS gw_trg_link_data ON connec;
 CREATE TRIGGER gw_trg_link_data
 AFTER UPDATE OF epa_type, state_type, expl_id2, conneccat_id, fluid_type, n_hydrometer
@@ -464,3 +461,6 @@ ON omzone FOR EACH ROW EXECUTE FUNCTION gw_trg_typevalue_fk('omzone');
 CREATE TRIGGER gw_trg_typevalue_fk_update AFTER UPDATE OF omzone_type
 ON omzone FOR EACH ROW WHEN (((old.omzone_type)::TEXT IS DISTINCT
 FROM (new.omzone_type)::TEXT)) EXECUTE FUNCTION gw_trg_typevalue_fk('omzone');
+
+CREATE TRIGGER gw_trg_edit_element INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_genelem
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_element('genelem');

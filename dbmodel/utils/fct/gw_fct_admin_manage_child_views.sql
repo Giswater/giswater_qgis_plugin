@@ -110,13 +110,13 @@ BEGIN
 	ELSIF v_action = 'MULTI-UPDATE' THEN
 
 		IF v_sys_feature_class IS NOT NULL THEN
-			v_querytext = 'SELECT child_layer, id, parent_layer FROM cat_feature WHERE feature_class <> ''LINK'' AND child_layer IS NOT NULL AND feature_class = '||quote_literal(v_sys_feature_class);
+			v_querytext = 'SELECT child_layer, id, parent_layer FROM cat_feature WHERE child_layer IS NOT NULL AND feature_class = '||quote_literal(v_sys_feature_class);
 
 		ELSIF v_feature_type IS NOT NULL THEN
-			v_querytext = 'SELECT child_layer, id, parent_layer FROM cat_feature WHERE feature_class <> ''LINK'' AND child_layer IS NOT NULL AND feature_type = '||quote_literal(v_feature_type);
+			v_querytext = 'SELECT child_layer, id, parent_layer FROM cat_feature WHERE child_layer IS NOT NULL AND feature_type = '||quote_literal(v_feature_type);
 
 		ELSIF v_feature_type IS NULL THEN
-			v_querytext = 'SELECT child_layer, id, parent_layer FROM cat_feature WHERE feature_class <> ''LINK'' AND child_layer IS NOT NULL';
+			v_querytext = 'SELECT child_layer, id, parent_layer FROM cat_feature WHERE child_layer IS NOT NULL';
 
 		END IF;
 
@@ -194,7 +194,7 @@ BEGIN
 
 	ELSIF v_action = 'MULTI-CREATE' THEN
 
-		v_querytext = 'SELECT cat_feature.* FROM cat_feature WHERE feature_type NOT IN (''LINK'', ''FLWREG'') ORDER BY id';
+		v_querytext = 'SELECT cat_feature.* FROM cat_feature ORDER BY id';
 
 		FOR rec IN EXECUTE v_querytext LOOP
 
@@ -204,6 +204,7 @@ BEGIN
 			--get the system type and feature_class of the feature and view name
 			v_feature_type = lower(rec.feature_type);
 			v_feature_class  = lower(rec.feature_class);
+			v_parent_layer = lower(rec.parent_layer);
 			v_cat_feature = rec.id;
 			v_feature_childtable_name := 'man_' || v_feature_type || '_' || lower(v_cat_feature);
 
@@ -290,6 +291,7 @@ BEGIN
 				"schema":"'||v_schemaname ||'",
 				"body":{"viewname":"'||v_viewname||'",
 					"feature_type":"'||v_feature_type||'",
+					"parent_layer":"'||v_parent_layer||'",
 					"feature_class":"'||v_feature_class||'",
 					"feature_cat":"'||v_cat_feature||'",
 					"feature_childtable_name":"'||v_feature_childtable_name||'",
@@ -325,6 +327,7 @@ BEGIN
 				"schema":"'||v_schemaname ||'",
 				"body":{"viewname":"'||v_viewname||'",
 					"feature_type":"'||v_feature_type||'",
+					"parent_layer":"'||v_parent_layer||'",
 					"feature_class":"'||v_feature_class||'",
 					"feature_cat":"'||v_cat_feature||'",
 					"feature_childtable_name":"'||v_feature_childtable_name||'",
@@ -360,6 +363,7 @@ BEGIN
 		--get the system type and feature_class of the feature and view name
 		v_feature_type = (SELECT lower(feature_type) FROM cat_feature where id=v_cat_feature);
 		v_feature_class  = (SELECT lower(feature_class) FROM cat_feature where id=v_cat_feature);
+		v_parent_layer = (SELECT lower(parent_layer) FROM cat_feature where id=v_cat_feature);
 		v_feature_childtable_name := 'man_' || v_feature_type || '_' || lower(v_cat_feature);
 
 		--create a child view name if doesnt exist
@@ -447,6 +451,7 @@ BEGIN
 			"schema":"'||v_schemaname ||'",
 			"body":{"viewname":"'||v_viewname||'",
 				"feature_type":"'||v_feature_type||'",
+				"parent_layer":"'||v_parent_layer||'",
 				"feature_class":"'||v_feature_class||'",
 				"feature_cat":"'||v_cat_feature||'",
 				"feature_childtable_name":"'||v_feature_childtable_name||'",
@@ -485,6 +490,7 @@ BEGIN
 			"schema":"'||v_schemaname ||'",
 			"body":{"viewname":"'||v_viewname||'",
 				"feature_type":"'||v_feature_type||'",
+				"parent_layer":"'||v_parent_layer||'",
 				"feature_class":"'||v_feature_class||'",
 				"feature_cat":"'||v_cat_feature||'",
 				"feature_childtable_name":"'||v_feature_childtable_name||'",

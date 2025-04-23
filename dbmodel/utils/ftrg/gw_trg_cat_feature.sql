@@ -140,8 +140,7 @@ BEGIN
 		FROM sys_feature_class WHERE id='||quote_literal(NEW.feature_class)
 		INTO v_feature;
 
-		EXECUTE 'UPDATE cat_feature SET feature_type = '||quote_literal(v_feature.type)||', parent_layer =  concat(''v_edit_'',lower('||quote_literal(v_feature.type)||'))
-		WHERE id = '||quote_literal(NEW.id)||';';
+		EXECUTE 'UPDATE cat_feature SET feature_type = '||quote_literal(v_feature.type)||' WHERE id = '||quote_literal(NEW.id)||';';
 
 		IF lower(v_feature.type)='arc' THEN
 			EXECUTE 'INSERT INTO cat_feature_arc (id, epa_default)
