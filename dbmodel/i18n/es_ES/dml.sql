@@ -7472,11 +7472,6 @@ UPDATE config_form_fields SET label = 'Fluid type', tooltip = '' WHERE formname 
 UPDATE config_form_fields SET label = 'Tipo de función', tooltip = 'function_type - Tipo de función a escoger en el desplegable personalizado por el usuario en la tabla man_type_function' WHERE formname LIKE '%_arc%' AND formtype = 'form_feature' AND columnname = 'function_type';
 UPDATE config_form_fields SET label = 'Function type', tooltip = '' WHERE formname LIKE '%_element%' AND formtype = 'form_feature' AND columnname = 'function_type';
 UPDATE config_form_fields SET label = 'inventario', tooltip = 'inventory - Para establecer si el elemento pertenece o debe pertenecer a inventario o no' WHERE formname LIKE '%_element%' AND formtype = 'form_feature' AND columnname = 'inventory';
-UPDATE doc_type SET id = 'PICTURE', comment = '' WHERE id = 'PICTURE';
-UPDATE doc_type SET id = 'OTHER', comment = '' WHERE id = 'OTHER';
-UPDATE doc_type SET id = 'AS_BUILT', comment = '' WHERE id = 'AS_BUILT';
-UPDATE doc_type SET id = 'INCIDENT', comment = '' WHERE id = 'INCIDENT';
-UPDATE doc_type SET id = 'WORK RAPPORT', comment = '' WHERE id = 'WORK RAPPORT';
 UPDATE value_state SET name = 'OBSOLETE', observ = '' WHERE id = '0';
 UPDATE value_state SET name = 'OPERATIVE', observ = '' WHERE id = '1';
 UPDATE value_state SET name = 'PLANIFIED', observ = '' WHERE id = '2';
