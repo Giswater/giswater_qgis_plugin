@@ -9,7 +9,7 @@ BEGIN;
 SET client_min_messages TO WARNING;
 SET search_path = "SCHEMA_NAME", public, pg_catalog;
 
-SELECT plan(12);
+SELECT plan(14);
 
 -- NODE TESTS
 SELECT is(
@@ -62,22 +62,44 @@ SELECT is(
     (SELECT COUNT(*)
     FROM (
         SELECT element_id, COUNT(*) as cnt
-        FROM v_edit_element
+        FROM ve_frelem
         GROUP BY element_id
         HAVING COUNT(*) > 1
     ) a),
     0::bigint,
-    'There should be no duplicate element_ids'
+    'There should be no duplicate element_ids on ve_frelem'
 );
 
 SELECT ok(
     NOT EXISTS (
         SELECT element_id, COUNT(*)
-        FROM v_edit_element
+        FROM ve_frelem
         GROUP BY element_id
         HAVING COUNT(*) > 1
     ),
-    'Each element_id should be unique in v_edit_element'
+    'Each element_id should be unique in ve_frelem'
+);
+
+SELECT is(
+    (SELECT COUNT(*)
+    FROM (
+        SELECT element_id, COUNT(*) as cnt
+        FROM ve_genelem
+        GROUP BY element_id
+        HAVING COUNT(*) > 1
+    ) a),
+    0::bigint,
+    'There should be no duplicate element_ids on ve_genelem'
+);
+
+SELECT ok(
+    NOT EXISTS (
+        SELECT element_id, COUNT(*)
+        FROM ve_genelem
+        GROUP BY element_id
+        HAVING COUNT(*) > 1
+    ),
+    'Each element_id should be unique in ve_genelem'
 );
 
 -- LINK TESTS
