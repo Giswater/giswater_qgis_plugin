@@ -43,10 +43,10 @@ UPDATE config_info_layer SET is_parent=true WHERE layer_id='v_edit_connec';
 UPDATE config_info_layer SET is_parent=true WHERE layer_id='v_edit_arc';
 
 INSERT INTO config_info_layer (layer_id, is_parent, is_editable, formtemplate, headertext, orderby)
-VALUES('ve_frelem', true, true, 'info_generic', 'Flow regulator element', 4);
+VALUES('ve_frelem', true, true, 'info_feature', 'Flow regulator element', 4);
 
 INSERT INTO config_info_layer (layer_id, is_parent, is_editable, formtemplate, headertext, orderby)
-VALUES('ve_genelem', true, true, 'info_generic', 'Generic element', 4);
+VALUES('ve_genelem', true, true, 'info_feature', 'Generic element', 4);
 
 DELETE FROM config_info_layer WHERE layer_id IN ('v_edit_flwreg', 'v_edit_element');
 

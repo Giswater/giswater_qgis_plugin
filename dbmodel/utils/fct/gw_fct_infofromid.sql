@@ -429,11 +429,11 @@ BEGIN
 
 
 	-- Get feature type
-	v_querystring = concat('SELECT lower(feature_type) FROM cat_feature WHERE  (parent_layer = ',quote_nullable(v_tablename),' OR child_layer = ',quote_nullable(v_tablename),') LIMIT 1');
+	v_querystring = concat('SELECT lower(feature_type), lower(parent_table) FROM cat_feature WHERE  (parent_layer = ',quote_nullable(v_tablename),' OR child_layer = ',quote_nullable(v_tablename),') LIMIT 1');
 	v_debug_vars := json_build_object('v_tablename', v_tablename);
 	v_debug := json_build_object('querystring', v_querystring, 'vars', v_debug_vars, 'funcname', 'gw_fct_infofromid', 'flag', 60);
 	SELECT gw_fct_debugsql(v_debug) INTO v_msgerr;
-	EXECUTE v_querystring INTO v_featuretype;
+	EXECUTE v_querystring INTO v_featuretype, v_parent_table;
 	v_featuretype := LOWER(v_featuretype);
 	v_featuretype := COALESCE(v_featuretype, '');
 
@@ -457,7 +457,7 @@ BEGIN
 	-- getting source table in order to enhance performance
 	IF v_tablename LIKE 'v_edit_cad%' THEN v_sourcetable = v_tablename;
     ELSIF v_tablename LIKE 'v_edit_flwreg_%' THEN v_sourcetable = replace(v_tablename, 'v_edit_', 'inp_');
-    ELSIF v_tablename LIKE 'v_edit_flwreg' THEN v_sourcetable = 'element';
+    ELSIF v_tablename LIKE 've_frelem' THEN v_sourcetable = 'element';
 	ELSIF v_tablename LIKE 'v_edit_%' AND v_tablename != 'v_edit_flwreg' THEN v_sourcetable = replace (v_tablename, 'v_edit_', '');
 	ELSIF v_tablename LIKE 've_node_%' THEN v_sourcetable = 'node';
 	ELSIF v_tablename LIKE 've_link_%' THEN v_sourcetable = 'link';
@@ -651,7 +651,7 @@ BEGIN
 		parent_child_relation:=true;
 
 		-- get childtype
-		EXECUTE 'SELECT '||v_featuretype||'_type FROM v_edit_'||v_featuretype||' WHERE '||v_featuretype||'_id = '||quote_nullable(v_id) INTO v_childtype;
+		EXECUTE 'SELECT '||v_featuretype||'_type FROM '||v_table_parent||' WHERE '||v_featuretype||'_id = '||quote_nullable(v_id) INTO v_childtype;
 
 		-- Identify tableinfotype_id
 		v_querystring = concat(' SELECT tableinfotype_id FROM cat_feature
