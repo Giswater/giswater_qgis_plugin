@@ -1319,7 +1319,7 @@ AS WITH
 			gully.groove_height,
 			gully.groove_length,
 			gully.siphon,
-			gully._connec_arccat_id as connec_arccat_id,
+			gully._connec_arccat_id as connec_arccat_id, -- todo: remove this
 			gully.connec_length,
 			CASE
 			   WHEN ((gully.top_elev - gully.ymax + gully.sandbox + gully.connec_y2) / 2::numeric) IS NOT NULL THEN ((gully.top_elev - gully.ymax + gully.sandbox + gully.connec_y2) / 2::numeric)::numeric(12,3)
@@ -1334,11 +1334,8 @@ AS WITH
 			cat_gully.width AS grate_width,
 			cat_gully.length AS grate_length,
 			gully.arc_id,
+            gully.omunit_id,
 			gully.epa_type,
-			CASE
-			   WHEN gully.sector_id > 0 AND vst.is_operative = true AND gully.epa_type::text = 'GULLY'::character varying(16)::text AND inp_network_mode.value = '2'::text THEN gully.epa_type
-			   ELSE NULL::character varying(16)
-			END AS inp_type,
 			gully.state,
 			gully.state_type,
 			gully.expl_id,
@@ -1355,6 +1352,7 @@ AS WITH
 				WHEN link_planned.macrosector_id IS NULL THEN sector_table.macrosector_id
 				ELSE link_planned.macrosector_id
 			END AS macrosector_id,
+			gully.muni_id,
 			CASE
 				WHEN link_planned.drainzone_id IS NULL THEN drainzone_table.drainzone_id
 				ELSE link_planned.drainzone_id
@@ -1383,27 +1381,21 @@ AS WITH
 				WHEN link_planned.dwfzone_type IS NULL THEN dwfzone_table.dwfzone_type
 				ELSE link_planned.dwfzone_type
 			END AS dwfzone_type,
-			gully.annotation,
-			gully.observ,
-			gully.comment,
+			gully.minsector_id,
+			gully.macrominsector_id,
 			gully.soilcat_id,
 			gully.function_type,
 			gully.category_type,
-			gully.fluid_type,
 			gully.location_type,
-			gully.workcat_id,
-			gully.workcat_id_end,
-			gully.workcat_id_plan,
-			sector_table.stylesheet ->> 'featureColor'::text AS sector_style,
-			omzone_table.stylesheet ->> 'featureColor'::text AS omzone_style,
-			drainzone_table.stylesheet ->> 'featureColor'::text AS drainzone_style,
-			dwfzone_table.stylesheet ->> 'featureColor'::text AS dwfzone_style,
-			gully.builtdate,
-			gully.enddate,
-			gully.ownercat_id,
-			gully.muni_id,
-			gully.postcode,
+			gully.fluid_type,
+			gully.descript,
+			gully.annotation,
+			gully.observ,
+			gully.comment,
+			concat(cat_feature.link_path, gully.link) AS link,
+			gully.num_value,
 			gully.district_id,
+			gully.postcode,
 			streetname,
 			gully.postnumber,
 			gully.postcomplement,
@@ -1412,21 +1404,45 @@ AS WITH
 			gully.postcomplement2,
 			mu.region_id,
 			mu.province_id,
-			gully.descript,
-			cat_gully.svg,
-			gully.rotation,
-			concat(cat_feature.link_path, gully.link) AS link,
+			gully.workcat_id,
+			gully.workcat_id_end,
+			gully.workcat_id_plan,
+			gully.builtdate,
+			gully.enddate,
+			gully.ownercat_id,
+			gully.placement_type,
+			gully.access_type,
+			gully.asset_id,
+			gully.adate,
+			gully.adescript,
 			gully.verified,
+			gully.uncertain,
 			cat_gully.label,
 			gully.label_x,
 			gully.label_y,
 			gully.label_rotation,
+			gully.rotation,
 			gully.label_quadrant,
-			gully.publish,
+			cat_gully.svg,
 			gully.inventory,
-			gully.uncertain,
-			gully.num_value,
-			CASE
+			gully.publish,
+			vst.is_operative,
+            CASE
+			   WHEN gully.sector_id > 0 AND vst.is_operative = true AND gully.epa_type::text = 'GULLY'::character varying(16)::text AND inp_network_mode.value = '2'::text THEN gully.epa_type
+			   ELSE NULL::character varying(16)
+			END AS inp_type,
+			sector_table.stylesheet ->> 'featureColor'::text AS sector_style,
+			omzone_table.stylesheet ->> 'featureColor'::text AS omzone_style,
+			drainzone_table.stylesheet ->> 'featureColor'::text AS drainzone_style,
+			dwfzone_table.stylesheet ->> 'featureColor'::text AS dwfzone_style,
+			gully.lock_level,
+			gully.expl_visibility,
+            date_trunc('second'::text, gully.created_at) AS created_at,
+			gully.created_by,
+			date_trunc('second'::text, gully.updated_at) AS updated_at,
+			gully.updated_by,
+			gully.the_geom,
+            CASE
 				WHEN link_planned.exit_id IS NULL THEN gully.pjoint_id
 				ELSE link_planned.exit_id
 			END AS pjoint_id,
@@ -1434,27 +1450,12 @@ AS WITH
 				WHEN link_planned.exit_type IS NULL THEN gully.pjoint_type
 				ELSE link_planned.exit_type
 			END AS pjoint_type,
-			gully.asset_id,
 			gully.gullycat2_id,
 			gully.units_placement,
-			gully.expl_visibility,
-			vst.is_operative,
-			gully.minsector_id,
-			gully.macrominsector_id,
-			gully.adate,
-			gully.adescript,
 			gully.siphon_type,
 			gully.odorflap,
-			gully.placement_type,
-			gully.access_type,
-			gully.lock_level,
 			gully.length,
-			gully.width,
-            date_trunc('second'::text, gully.created_at) AS created_at,
-			gully.created_by,
-			date_trunc('second'::text, gully.updated_at) AS updated_at,
-			gully.updated_by,
-			gully.the_geom
+			gully.width
 			FROM inp_network_mode, gully_selector
 			JOIN gully using (gully_id)
 			JOIN selector_sector sc ON (sc.cur_user = CURRENT_USER AND sc.sector_id = gully.sector_id)
