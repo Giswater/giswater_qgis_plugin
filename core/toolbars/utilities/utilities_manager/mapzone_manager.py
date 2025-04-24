@@ -388,11 +388,9 @@ class GwMapzoneManager:
             return
 
         # Close the temporal controller tab if it's open
-        actions = self.iface.mainWindow().findChildren(QAction)
-        for action in actions:
-            if 'Temporal' in action.text() and action.isChecked():
-                action.trigger()
-                break
+        action = self.iface.mainWindow().findChild(QAction, 'mActionTemporalController')
+        if action.isChecked():
+            action.trigger()
 
         # Extract temporal values and set temporal extents
         start_field = temporal_properties.startField()
@@ -426,11 +424,8 @@ class GwMapzoneManager:
         # Set navigation mode to Animated for dynamic playback
         temporal_controller.setNavigationMode(QgsTemporalNavigationObject.NavigationMode.Animated)
 
-        actions = self.iface.mainWindow().findChildren(QAction)
-        for action in actions:
-            if 'Temporal' in action.text():
-                action.trigger()
-                break
+        action = self.iface.mainWindow().findChild(QAction, 'mActionTemporalController')
+        action.trigger()
 
     def _open_flood_from_node_analysis(self, dialog):
         """Initializes snapping to select a starting node for flood analysis."""
