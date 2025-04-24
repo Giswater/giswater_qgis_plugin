@@ -20,12 +20,12 @@ SELECT has_table('link'::name, 'Table link should exist');
 SELECT columns_are(
     'link',
     ARRAY[
-        'link_id', 'code', 'feature_id', 'feature_type', 'linkcat_id', 'top_elev1', 'depth1', 'exit_id', 'exit_type',
+        'link_id', 'code', ' sys_code', 'feature_id', 'feature_type', 'linkcat_id', 'top_elev1', 'depth1', 'exit_id', 'exit_type',
         'top_elev2', 'depth2', 'userdefined_geom', 'state', 'expl_id', 'sector_id', 'dma_id',
         'fluid_type', 'presszone_id', 'dqa_id', 'minsector_id', 'expl_visibility', 'epa_type', 'is_operative',
         'staticpressure', 'workcat_id', 'workcat_id_end', 'builtdate', 'enddate',
         'uncertain', 'muni_id', 'macrominsector_id', 'verified', 'supplyzone_id', 'n_hydrometer', 'custom_length', 'datasource',
-        'omzone_id', 'the_geom', 'created_at', 'created_by', 'updated_at', 'updated_by'
+        'omzone_id', 'lock_level', 'the_geom', 'created_at', 'created_by', 'updated_at', 'updated_by'
     ],
     'Table link should have the correct columns'
 );
@@ -36,6 +36,7 @@ SELECT col_is_pk('link', ARRAY['link_id'], 'Column link_id should be primary key
 -- Check column types
 SELECT col_type_is('link', 'link_id', 'integer', 'Column link_id should be integer');
 SELECT col_type_is('link', 'code', 'text', 'Column code should be text');
+SELECT col_type_is('link', 'sys_code', 'text', 'Column sys_code should be text');
 SELECT col_type_is('link', 'feature_id', 'varchar(16)', 'Column feature_id should be varchar(16)');
 SELECT col_type_is('link', 'feature_type', 'varchar(16)', 'Column feature_type should be varchar(16)');
 SELECT col_type_is('link', 'linkcat_id', 'varchar(30)', 'Column linkcat_id should be varchar(30)');
@@ -49,6 +50,7 @@ SELECT col_type_is('link', 'userdefined_geom', 'boolean', 'Column userdefined_ge
 SELECT col_type_is('link', 'state', 'smallint', 'Column state should be smallint');
 SELECT col_type_is('link', 'expl_id', 'integer', 'Column expl_id should be integer');
 SELECT col_type_is('link', 'omzone_id', 'integer', 'Column omzone_id should be integer');
+SELECT col_type_is('link', 'lock_level', 'integer', 'Column lock_level should be integer');
 SELECT col_type_is('link', 'the_geom', 'geometry(LineString,SRID_VALUE)', 'Column the_geom should be geometry(LineString,SRID_VALUE)');
 SELECT col_type_is('link', 'created_at', 'timestamp with time zone', 'Column created_at should be timestamp with time zone');
 SELECT col_type_is('link', 'created_by', 'varchar(50)', 'Column created_by should be varchar(50)');
