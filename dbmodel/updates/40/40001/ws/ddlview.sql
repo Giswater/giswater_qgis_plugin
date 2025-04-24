@@ -567,6 +567,7 @@ AS WITH
           ELSE (l.top_elev1 - l.depth1)
         END AS elevation1,
         l.exit_id,
+        l.exit_type,
         l.top_elev2,
         l.depth2,
         CASE
