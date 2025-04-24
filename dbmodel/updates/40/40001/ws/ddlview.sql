@@ -556,17 +556,38 @@ AS WITH
       ),
     link_selected AS
       (
-        SELECT l.link_id,
+        SELECT
+        l.link_id,
         l.code,
+        l.sys_code,
+        l.top_elev1,
+        l.depth1,
+        CASE
+          WHEN l.top_elev1 IS NULL OR l.depth1 IS NULL THEN NULL
+          ELSE (l.top_elev1 - l.depth1)
+        END AS elevation1,
+        l.exit_id,
+        l.top_elev2,
+        l.depth2,
+        CASE
+          WHEN l.top_elev2 IS NULL OR l.depth2 IS NULL THEN NULL
+          ELSE (l.top_elev2 - l.depth2)
+        END AS elevation2,
         l.feature_type,
         l.feature_id,
-        l.exit_type,
-        l.exit_id,
+        cat_link.link_type,
+        cat_feature.feature_class AS sys_type,
+        l.linkcat_id,
+        l.epa_type,
         l.state,
         l.expl_id,
+        exploitation.macroexpl_id,
         l.sector_id,
         sector_table.sector_type,
         sector_table.macrosector_id,
+        l.muni_id,
+        l.supplyzone_id,
+        supplyzone_table.supplyzone_type,
         l.presszone_id,
         presszone_table.presszone_type,
         presszone_table.presszone_head,
@@ -576,53 +597,36 @@ AS WITH
         l.dqa_id,
         dqa_table.dqa_type,
         dqa_table.macrodqa_id,
-        l.supplyzone_id,
-        supplyzone_table.supplyzone_type,
         l.omzone_id,
         omzone_table.omzone_type,
-        l.top_elev1,
-        l.depth1,
-        CASE
-          WHEN l.top_elev1 IS NULL OR l.depth1 IS NULL THEN NULL
-          ELSE (l.top_elev1 - l.depth1)
-        END AS elevation1,
-        l.top_elev2,
-        l.depth2,
-        CASE
-          WHEN l.top_elev2 IS NULL OR l.depth2 IS NULL THEN NULL
-          ELSE (l.top_elev2 - l.depth2)
-        END AS elevation2,
+        omzone_table.macroomzone_id,
+        l.minsector_id,
+        l.macrominsector_id,
         l.fluid_type,
-        st_length(l.the_geom)::numeric(12,3) AS gis_length,
-        l.custom_length,
-        l.muni_id,
-        l.expl_visibility,
-        l.epa_type,
-        l.is_operative,
-        l.staticpressure,
-        l.linkcat_id,
-        cat_link.link_type,
-        cat_feature.feature_class AS sys_type,
         l.workcat_id,
         l.workcat_id_end,
         l.builtdate,
         l.enddate,
+        l.verified,
         l.uncertain,
-        l.minsector_id,
-        l.macrominsector_id,
+        l.datasource,
+        l.is_operative,
         CASE
           WHEN l.sector_id > 0 AND l.is_operative = true AND l.epa_type = 'JUNCTION'::character varying(16)::text AND inp_network_mode.value = '4'::text
           THEN l.epa_type::character varying
           ELSE NULL::character varying(16)
         END AS inp_type,
-        l.verified,
-        l.n_hydrometer,
-        l.datasource,
-        l.the_geom,
+        l.lock_level,
+        l.expl_visibility,
         l.created_at,
         l.created_by,
         l.updated_at,
-        l.updated_by
+        l.updated_by,
+        l.the_geom,
+        l.n_hydrometer,
+        st_length(l.the_geom)::numeric(12,3) AS gis_length,
+        l.custom_length,
+        l.staticpressure,
         FROM inp_network_mode, link_selector
         JOIN link l ON l.link_id = link_selector.link_id
         LEFT JOIN connec c ON c.connec_id = l.feature_id
