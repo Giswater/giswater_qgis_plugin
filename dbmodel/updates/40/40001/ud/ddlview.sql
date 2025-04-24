@@ -1075,27 +1075,31 @@ AS WITH
 			SELECT connec.connec_id,
 			connec.code,
             connec.sys_code,
-			connec.customer_code,
 			connec.top_elev,
 			connec.y1,
 			connec.y2,
-			connec.conneccat_id,
-			connec.connec_type::text,
 			cat_feature.feature_class as sys_type,
+			connec.connec_type::text,
 			connec.matcat_id,
+			connec.conneccat_id,
+			connec.customer_code,
+			connec.connec_depth,
+			connec.connec_length,
 			connec.state,
 			connec.state_type,
+			connec_selector.arc_id,
 			connec.expl_id,
 			exploitation.macroexpl_id,
 			CASE
 				WHEN link_planned.sector_id IS NULL THEN connec.sector_id
 				ELSE link_planned.sector_id
 			END AS sector_id,
-			sector_table.sector_type,
 			CASE
 				WHEN link_planned.macrosector_id IS NULL THEN sector_table.macrosector_id
 				ELSE link_planned.macrosector_id
 			END AS macrosector_id,
+			sector_table.sector_type,
+			connec.muni_id,
 			CASE
 				WHEN link_planned.drainzone_id IS NULL THEN connec.drainzone_id
 				ELSE link_planned.drainzone_id
@@ -1104,13 +1108,14 @@ AS WITH
 				WHEN link_planned.drainzone_type IS NULL THEN drainzone_table.drainzone_type
 				ELSE link_planned.drainzone_type
 			END AS drainzone_type,
-			connec.demand,
-			connec.connec_depth,
-			connec.connec_length,
-			connec_selector.arc_id,
-			connec.annotation,
-			connec.observ,
-			connec.comment,
+            CASE
+				WHEN link_planned.dwfzone_id IS NULL THEN connec.dwfzone_id
+				ELSE link_planned.dwfzone_id
+			END AS dwfzone_id,
+			CASE
+				WHEN link_planned.dwfzone_type IS NULL THEN dwfzone_table.dwfzone_type
+				ELSE link_planned.dwfzone_type
+			END AS dwfzone_type,
 			CASE
 				WHEN link_planned.omzone_id IS NULL THEN connec.omzone_id
 				ELSE link_planned.omzone_id
@@ -1123,27 +1128,21 @@ AS WITH
 				WHEN link_planned.omzone_type IS NULL THEN omzone_table.omzone_type
 				ELSE link_planned.omzone_type
 			END AS omzone_type,
-			CASE
-				WHEN link_planned.dwfzone_type IS NULL THEN dwfzone_table.dwfzone_type
-				ELSE link_planned.dwfzone_type
-			END AS dwfzone_type,
+			connec.minsector_id,
+			connec.macrominsector_id,
 			connec.soilcat_id,
 			connec.function_type,
 			connec.category_type,
-			connec.fluid_type,
 			connec.location_type,
-			sector_table.stylesheet ->> 'featureColor'::text AS sector_style,
-			omzone_table.stylesheet ->> 'featureColor'::text AS omzone_style,
-			drainzone_table.stylesheet ->> 'featureColor'::text AS drainzone_style,
-			dwfzone_table.stylesheet ->> 'featureColor'::text AS dwfzone_style,
-			connec.workcat_id,
-			connec.workcat_id_end,
-			connec.builtdate,
-			connec.enddate,
-			connec.ownercat_id,
-			connec.muni_id,
-			connec.postcode,
+			connec.fluid_type,
+			connec.annotation,
+			connec.observ,
+			connec.comment,
+			connec.descript,
+			connec.link::text,
+			connec.num_value,
 			connec.district_id,
+			connec.postcode,
 			connec.streetname,
 			connec.postnumber,
 			connec.postcomplement,
@@ -1152,22 +1151,44 @@ AS WITH
 			connec.postcomplement2,
 			mu.region_id,
 			mu.province_id,
-			connec.descript,
-			cat_connec.svg,
-			connec.rotation,
-			connec.link::text,
+			connec.workcat_id,
+			connec.workcat_id_end,
+			connec.workcat_id_plan,
+			connec.builtdate,
+			connec.enddate,
+			connec.ownercat_id,
+			connec.access_type,
+			connec.placement_type,
+			connec.asset_id,
+			connec.adate,
+			connec.adescript,
 			connec.verified,
+			connec.uncertain,
 			cat_connec.label,
 			connec.label_x,
 			connec.label_y,
 			connec.label_rotation,
+			connec.rotation,
 			connec.label_quadrant,
+			cat_connec.svg,
+			connec.inventory,
+			connec.publish,
+			vst.is_operative,
+			sector_table.stylesheet ->> 'featureColor'::text AS sector_style,
+			drainzone_table.stylesheet ->> 'featureColor'::text AS drainzone_style,
+			dwfzone_table.stylesheet ->> 'featureColor'::text AS dwfzone_style,
+			omzone_table.stylesheet ->> 'featureColor'::text AS omzone_style,
+			connec.lock_level,
+			connec.expl_visibility,
+            date_trunc('second'::text, connec.created_at) AS created_at,
+			connec.created_by,
+			date_trunc('second'::text, connec.updated_at) AS updated_at,
+			connec.updated_by,
+			connec.the_geom,
+            -- extra we don't know the order
+			connec.demand,
 			connec.accessibility,
 			connec.diagonal,
-			connec.publish,
-			connec.inventory,
-			connec.uncertain,
-			connec.num_value,
 			CASE
 				WHEN link_planned.exit_id IS NULL THEN connec.pjoint_id
 				ELSE link_planned.exit_id
@@ -1176,27 +1197,11 @@ AS WITH
 				WHEN link_planned.exit_type IS NULL THEN connec.pjoint_type
 				ELSE link_planned.exit_type
 			END AS pjoint_type,
-			connec.workcat_id_plan,
-			connec.asset_id,
-			connec.expl_visibility,
-			vst.is_operative,
-			connec.minsector_id,
-			connec.macrominsector_id,
-			connec.adate,
-			connec.adescript,
 			connec.plot_code,
-			connec.placement_type,
-			connec.access_type,
-			connec.lock_level,
             (SELECT ST_X(connec.the_geom)) AS xcoord,
             (SELECT ST_Y(connec.the_geom)) AS ycoord,
             (SELECT ST_Y(ST_Transform(connec.the_geom, 4326))) AS lat,
-            (SELECT ST_X(ST_Transform(connec.the_geom, 4326))) AS long,
-            date_trunc('second'::text, connec.created_at) AS created_at,
-			connec.created_by,
-			date_trunc('second'::text, connec.updated_at) AS updated_at,
-			connec.updated_by,
-			connec.the_geom
+            (SELECT ST_X(ST_Transform(connec.the_geom, 4326))) AS long
 			FROM connec_selector
 			JOIN connec USING (connec_id)
 			JOIN selector_sector sc ON (sc.cur_user = CURRENT_USER AND sc.sector_id = connec.sector_id)
