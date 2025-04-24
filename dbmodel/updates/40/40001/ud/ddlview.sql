@@ -654,14 +654,14 @@ AS WITH
 			arc.created_by,
 			date_trunc('second'::text, arc.updated_at) AS updated_at,
 			arc.updated_by,
-			arc.the_geom
+			arc.the_geom,
             -- extra we don't know the order
 			st_length(arc.the_geom)::numeric(12,2) AS gis_length,
 			arc.inverted_slope,
             arc.hydraulic_capacity,
             arc.meandering,
             arc.negativeoffset,
-			arc.sys_slope AS slope,
+			arc.sys_slope AS slope
 			FROM arc_selector
 			JOIN arc using (arc_id)
 			JOIN selector_sector sc ON (sc.cur_user = CURRENT_USER AND sc.sector_id = arc.sector_id)
