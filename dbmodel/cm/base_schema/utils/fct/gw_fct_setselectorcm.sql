@@ -83,7 +83,7 @@ BEGIN
 	-- get system variables
 	v_sectorfromexpl = (SELECT value::json->>'sectorFromExpl' FROM config_param_system WHERE parameter = 'basic_selector_options');
 	v_sectorfrommacro = (SELECT value::json->>'sectorFromMacro' FROM config_param_system WHERE parameter = 'basic_selector_options');
-	v_explfrommacro = (SELECT value::json->>'explFromNacro' FROM config_param_system WHERE parameter = 'basic_selector_options');
+	v_explfrommacro = (SELECT value::json->>'explFromMacro' FROM config_param_system WHERE parameter = 'basic_selector_options');
 	v_expl_x_user = (SELECT value FROM config_param_system WHERE parameter = 'admin_exploitation_x_user');
 	v_project_type = (SELECT project_type FROM sys_version LIMIT 1);
 

@@ -59,6 +59,17 @@ CREATE TABLE sys_table (
 	CONSTRAINT sys_table_pkey PRIMARY KEY (id)
 );
 
+CREATE TABLE sys_version (
+	id serial4 NOT NULL,
+	giswater varchar(16) NOT NULL,
+	project_type varchar(16) NOT NULL,
+	postgres varchar(512) NOT NULL,
+	postgis varchar(512) NOT NULL,
+	"date" timestamp(6) NOT NULL DEFAULT now(),
+	"language" varchar(50) NOT NULL,
+	epsg int4 NOT NULL,
+	CONSTRAINT sys_version_pkey PRIMARY KEY (id)
+);
 
 CREATE TABLE config_form_fields (
 	formname varchar(50) NOT NULL,
@@ -142,7 +153,7 @@ CREATE TABLE sys_typevalue (
 
 CREATE TABLE cat_pschema
 (
-  pschema_id integer,
+  pschema_id serial2,
   name text,
   observ text,
   CONSTRAINT cat_pschema_pkey PRIMARY KEY (pschema_id)
@@ -178,7 +189,8 @@ CREATE TABLE cat_team (
 	active bool NULL DEFAULT true,
 	CONSTRAINT cat_team_pkey PRIMARY KEY (team_id),
 	CONSTRAINT cat_team_unique UNIQUE (teamname, organization_id),
-	CONSTRAINT cat_team_organization_id_fkey FOREIGN KEY (organization_id) REFERENCES cat_organization(organization_id) ON DELETE RESTRICT ON UPDATE CASCADE
+	CONSTRAINT cat_team_organization_id_fkey FOREIGN KEY (organization_id)
+        REFERENCES cat_organization(organization_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT
 );
 
 
@@ -195,6 +207,40 @@ CREATE TABLE cat_user (
     CONSTRAINT cat_user_team_id_fkey FOREIGN KEY (team_id) REFERENCES cat_team(team_id)
 );
 
+---- workorder
+CREATE TABLE workorder_type
+(
+  id character varying(50) NOT NULL,
+  idval character varying(50),
+  CONSTRAINT ext_workorder_type_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE workorder_class
+(
+  id character varying(50) NOT NULL,
+  idval character varying(50),
+  CONSTRAINT ext_workorder_class_pkey PRIMARY KEY (id)
+);
+
+CREATE TABLE workorder
+(
+  workorder_id integer NOT NULL,
+  workorder_name character varying(50),
+  workorder_type character varying(50), --fk workorder_type
+  workorder_class character varying(200), --fk workorder_class
+  exercise integer,
+  serie character varying(10),
+  startdate date,
+  address character varying(50),
+  observ text,
+  cost numeric,
+  ct text,
+  CONSTRAINT workorder_pkey PRIMARY KEY (workorder_id),
+  CONSTRAINT ext_workorder_workorder_type_fkey FOREIGN KEY (workorder_type)
+    REFERENCES workorder_type (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT,
+  CONSTRAINT workorder_workorder_class_fkey FOREIGN KEY (workorder_class)
+    REFERENCES workorder_class (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT
+);
 
 ---- reviewclass & visitclass
 
@@ -250,14 +296,21 @@ CREATE TABLE om_campaign
   serie character varying(10),
   address text,
   CONSTRAINT om_campaign_pkey PRIMARY KEY (campaign_id),
-  CONSTRAINT om_campaign_check_type check (campaign_type in (1,2))
+  CONSTRAINT om_campaign_check_type check (campaign_type in (1,2)),
+  CONSTRAINT om_campaign_organization_id_fkey FOREIGN KEY (organization_id)
+    REFERENCES cat_organization(organization_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT
+
 );
 
 CREATE TABLE om_campaign_visit
 (
   campaign_id integer NOT NULL,-- fk om_campaign
   visitclass_id integer, -- fk om_visitclass
-  CONSTRAINT om_campaign_visit_pkey PRIMARY KEY (campaign_id)
+  CONSTRAINT om_campaign_visit_pkey PRIMARY KEY (campaign_id),
+  CONSTRAINT om_campaign_visit_campaign_id_fkey FOREIGN KEY (campaign_id)
+    REFERENCES om_campaign (campaign_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE,
+  CONSTRAINT om_team_x_user_visitclass_id_fkey FOREIGN KEY (visitclass_id)
+    REFERENCES om_visitclass (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 
@@ -265,7 +318,11 @@ CREATE TABLE om_campaign_review
 (
   campaign_id integer NOT NULL, -- fk om_campaign
   reviewclass_id integer, -- fk om_reviewclass
-  CONSTRAINT om_campaign_review_pkey PRIMARY KEY (campaign_id)
+  CONSTRAINT om_campaign_review_pkey PRIMARY KEY (campaign_id),
+  CONSTRAINT om_campaign_review_campaign_id_fkey FOREIGN KEY (campaign_id)
+    REFERENCES om_campaign (campaign_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE,
+  CONSTRAINT om_campaign_review_reviewclass_id_fkey FOREIGN KEY (reviewclass_id)
+    REFERENCES om_reviewclass (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 
@@ -277,7 +334,9 @@ CREATE TABLE om_campaign_x_arc
   status integer,
   admin_observ text,
   org_observ text,
-  CONSTRAINT om_campaign_x_arc_pkey PRIMARY KEY (campaign_id, arc_id)
+  CONSTRAINT om_campaign_x_arc_pkey PRIMARY KEY (campaign_id, arc_id),
+  CONSTRAINT om_campaign_x_arc_campaign_id_fkey FOREIGN KEY (campaign_id)
+    REFERENCES om_campaign (campaign_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 CREATE TABLE om_campaign_x_connec
@@ -288,7 +347,9 @@ CREATE TABLE om_campaign_x_connec
   status integer,
   admin_observ text,
   org_observ text,
-  CONSTRAINT om_campaign_x_connec_pkey PRIMARY KEY (campaign_id, connec_id)
+  CONSTRAINT om_campaign_x_connec_pkey PRIMARY KEY (campaign_id, connec_id),
+  CONSTRAINT om_campaign_x_connec_campaign_id_fkey FOREIGN KEY (campaign_id)
+    REFERENCES om_campaign (campaign_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 
@@ -300,7 +361,9 @@ CREATE TABLE om_campaign_x_link
   status integer,
   admin_observ text,
   org_observ text,
-  CONSTRAINT om_lot_x_link_pkey PRIMARY KEY (campaign_id, link_id)
+  CONSTRAINT om_lot_x_link_pkey PRIMARY KEY (campaign_id, link_id),
+  CONSTRAINT om_campaign_x_link_campaign_id_fkey FOREIGN KEY (campaign_id)
+    REFERENCES om_campaign (campaign_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 
@@ -312,7 +375,10 @@ CREATE TABLE om_campaign_x_node
   status integer,
   admin_observ text,
   org_observ text,
-  CONSTRAINT om_campaign_x_node_pkey PRIMARY KEY (campaign_id, node_id)
+  CONSTRAINT om_campaign_x_node_pkey PRIMARY KEY (campaign_id, node_id),
+  CONSTRAINT om_campaign_x_node_campaign_id_fkey FOREIGN KEY (campaign_id)
+    REFERENCES om_campaign (campaign_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE
+
 );
 
 CREATE TABLE om_campaign_x_gully
@@ -345,7 +411,13 @@ CREATE TABLE om_campaign_lot
   the_geom geometry(MultiPolygon,25831),
   rotation numeric(8,4),
   address text,
-  CONSTRAINT om_campaign_lot_pkey PRIMARY KEY (lot_id)
+  CONSTRAINT om_campaign_lot_pkey PRIMARY KEY (lot_id),
+  CONSTRAINT om_campaign_lot_campaign_id_fkey FOREIGN KEY (campaign_id)
+    REFERENCES om_campaign (campaign_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT,
+  CONSTRAINT om_campaign_lot_workorder_id_fkey FOREIGN KEY (workorder_id)
+    REFERENCES workorder (workorder_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT,
+  CONSTRAINT om_campaign_lot_team_id_fkey FOREIGN KEY (team_id)
+    REFERENCES cat_team (team_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE RESTRICT
 );
 
 
@@ -363,7 +435,9 @@ CREATE TABLE om_campaign_lot_x_arc
   update_log json,
   qindex1 numeric(12,3),
   qindex2 numeric(12,3),
-  CONSTRAINT om_campaign_lot_x_arc_pkey PRIMARY KEY (lot_id, arc_id)
+  CONSTRAINT om_campaign_lot_x_arc_pkey PRIMARY KEY (lot_id, arc_id),
+  CONSTRAINT om_campaign_lot_x_arc_lot_id_fkey FOREIGN KEY (lot_id)
+    REFERENCES om_campaign_lot (lot_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 CREATE TABLE om_campaign_lot_x_connec
@@ -380,7 +454,10 @@ CREATE TABLE om_campaign_lot_x_connec
   update_log json,
   qindex1 numeric(12,3),
   qindex2 numeric(12,3),
-  CONSTRAINT om_campaign_lot_x_connec_pkey PRIMARY KEY (lot_id, connec_id)
+  CONSTRAINT om_campaign_lot_x_connec_pkey PRIMARY KEY (lot_id, connec_id),
+  CONSTRAINT om_campaign_lot_x_connec_lot_id_fkey FOREIGN KEY (lot_id)
+    REFERENCES om_campaign_lot (lot_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE
+
 );
 
 
@@ -398,7 +475,10 @@ CREATE TABLE om_campaign_lot_x_link
   update_log json,
   qindex1 numeric(12,3),
   qindex2 numeric(12,3),
-  CONSTRAINT om_campaign_lot_x_link_pkey PRIMARY KEY (lot_id, link_id)
+  CONSTRAINT om_campaign_lot_x_link_pkey PRIMARY KEY (lot_id, link_id),
+  CONSTRAINT om_campaign_lot_x_link_lot_id_fkey FOREIGN KEY (lot_id)
+    REFERENCES om_campaign_lot (lot_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE
+
 );
 
 
@@ -416,7 +496,9 @@ CREATE TABLE om_campaign_lot_x_node
   update_log json,
   qindex1 numeric(12,3),
   qindex2 numeric(12,3),
-  CONSTRAINT om_campaign_lot_x_node_pkey PRIMARY KEY (lot_id, node_id)
+  CONSTRAINT om_campaign_lot_x_node_pkey PRIMARY KEY (lot_id, node_id),
+  CONSTRAINT om_campaign_lot_x_node_lot_id_fkey FOREIGN KEY (lot_id)
+    REFERENCES om_campaign_lot (lot_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 CREATE TABLE om_campaign_lot_x_gully
@@ -437,47 +519,23 @@ CREATE TABLE om_campaign_lot_x_gully
 );
 
 
-CREATE TABLE workorder_type
-(
-  id character varying(50) NOT NULL,
-  idval character varying(50),
-  CONSTRAINT ext_workorder_type_pkey PRIMARY KEY (id)
-);
-
-CREATE TABLE workorder_class
-(
-  id character varying(50) NOT NULL,
-  idval character varying(50),
-  CONSTRAINT ext_workorder_class_pkey PRIMARY KEY (id)
-);
-
-CREATE TABLE workorder
-(
-  workorder_id integer NOT NULL,
-  workorder_name character varying(50),
-  workorder_type character varying(50), --fk workorder_type
-  workorder_class character varying(200), --fk workorder_class
-  exercise integer,
-  serie character varying(10),
-  startdate date,
-  address character varying(50),
-  observ text,
-  cost numeric,
-  ct text,
-  CONSTRAINT workorder_pkey PRIMARY KEY (workorder_id)
-);
-
-
 CREATE TABLE selector_campaign
 (
   campaign_id integer, -- fk om_campaign
   cur_user text DEFAULT "current_user"(),
-  CONSTRAINT selector_campaign_pkey PRIMARY KEY (campaign_id, cur_user)
+  CONSTRAINT selector_campaign_pkey PRIMARY KEY (campaign_id, cur_user),
+  CONSTRAINT selector_campaign_campaign_id_fkey FOREIGN KEY (campaign_id)
+    REFERENCES om_campaign (campaign_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE
+
 );
 
 CREATE TABLE selector_lot
 (
   lot_id integer, -- fk om_campaign_lot
   cur_user text DEFAULT "current_user"(),
-  CONSTRAINT selector_lot_pkey PRIMARY KEY (lot_id, cur_user)
+  CONSTRAINT selector_lot_pkey PRIMARY KEY (lot_id, cur_user),
+  CONSTRAINT selector_lot_lot_id_fkey FOREIGN KEY (lot_id)
+    REFERENCES om_campaign_lot (lot_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE,
+  CONSTRAINT selector_lot_lot_id_cur_user_unique UNIQUE (lot_id, cur_user)
+
 );

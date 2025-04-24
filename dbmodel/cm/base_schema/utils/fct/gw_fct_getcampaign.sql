@@ -44,7 +44,7 @@ BEGIN
 	SET search_path = "SCHEMA_NAME", public;
 
 	-- Get version
-	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM PARENT_SCHEMA.config_param_system WHERE parameter=''admin_version'') row'
+	EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM SCHEMA_NAME.config_param_system WHERE parameter=''admin_version'') row'
 	INTO v_version;
 
 	-- Clean JSON null formats
@@ -74,7 +74,7 @@ BEGIN
 	v_formtabs := '[';
 
 	-- Get dynamic fields
-	SELECT PARENT_SCHEMA.gw_fct_getformfields(
+	SELECT PARENT_SCHEMA.gw_fct_getformfieldscm(
 		v_formname,
 		'form_feature',
 		'data',

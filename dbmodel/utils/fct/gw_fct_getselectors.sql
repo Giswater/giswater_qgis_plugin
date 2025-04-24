@@ -150,7 +150,7 @@ BEGIN
 	v_expl_x_user = (SELECT value FROM config_param_system WHERE parameter = 'admin_exploitation_x_user');
 	v_sectorfromexpl = (SELECT value::json->>'sectorFromExpl' FROM config_param_system WHERE parameter = 'basic_selector_options');
 	v_sectorfrommacro = (SELECT value::json->>'sectorFromMacro' FROM config_param_system WHERE parameter = 'basic_selector_options');
-	v_explfrommacro = (SELECT value::json->>'explFromNacro' FROM config_param_system WHERE parameter = 'basic_selector_options');
+	v_explfrommacro = (SELECT value::json->>'explFromMacro' FROM config_param_system WHERE parameter = 'basic_selector_options');
 
 	v_stylesheet = (SELECT value FROM config_param_system WHERE parameter = 'qgis_form_selector_stylesheet');
 

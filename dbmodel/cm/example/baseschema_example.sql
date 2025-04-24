@@ -24,29 +24,36 @@ INSERT INTO cat_team (team_id, code, teamname, organization_id, descript, role_i
 
 
 -- Team administrator
-INSERT INTO cat_user (user_id, code, username, fullname, descript, team_id, active) VALUES(1, '48178923Z', 'fmartinez', 'ferran martinez lopez', 'administrador1', 1, true);
-INSERT INTO cat_user (user_id, code, username, fullname, descript, team_id, active) VALUES(2, '38145678P', 'dmarin', 'daniel marin bocanegra', 'administrador2', 1, true);
+INSERT INTO cat_user (user_id, code, loginname, username, fullname, descript, team_id, active) VALUES
+(1,  '48178923Z', 'agarcia', 'agarcia', 'Alex Garcia Lopez',     'administrador1', 1, true),
+(2,  '38145678P', 'ssanchez',    'ssanchez',    'Sergio Sanchez Bueno','administrador2', 1, true);
 
 -- Team: Manager o1
-INSERT INTO cat_user (user_id, code, username, fullname, descript, team_id, active) VALUES(3, '79234561A', 'jperis', 'juan peris gallego', 'manager o1', 2, true);
-INSERT INTO cat_user (user_id, code, username, fullname, descript, team_id, active) VALUES(4, '10923456H', 'msierra', 'marta sierra roca', 'manager o1', 2, true);
+INSERT INTO cat_user (user_id, code, loginname, username, fullname, descript, team_id, active) VALUES
+(3,  '79234561A', 'jperis',    'jperis',    'Juan Peris Gallego',   'manager o1', 2, true),
+(4,  '10923456H', 'msierra',   'msierra',   'Marta Sierra Roca',    'manager o1', 2, true);
 
 -- Team: Manager o2
-INSERT INTO cat_user (user_id, code, username, fullname, descript, team_id, active) VALUES(5, '52013478Y', 'atorres', 'ana torres delgado', 'manager o2', 3, true);
-INSERT INTO cat_user (user_id, code, username, fullname, descript, team_id, active) VALUES(6, '64823109F', 'cfuentes', 'carlos fuentes mora', 'manager o2', 3, true);
+INSERT INTO cat_user (user_id, code, loginname, username, fullname, descript, team_id, active) VALUES
+(5,  '52013478Y', 'atorres',   'atorres',   'Ana Torres Delgado',   'manager o2', 3, true),
+(6,  '64823109F', 'cfuentes',  'cfuentes',  'Carlos Fuentes Mora',  'manager o2', 3, true);
 
 -- Team: o1 field 1
-INSERT INTO cat_user (user_id, code, username, fullname, descript, team_id, active) VALUES(7, '78124567Q', 'lblanco', 'laura blanco martos', 'o1 field 1', 4, true);
-INSERT INTO cat_user (user_id, code, username, fullname, descript, team_id, active) VALUES(8, '34567012K', 'dferrer', 'david ferrer romeu', 'o1 field 1', 4, true);
+INSERT INTO cat_user (user_id, code, loginname, username, fullname, descript, team_id, active) VALUES
+(7,  '78124567Q', 'lblanco',   'lblanco',   'Laura Blanco Martos',  'o1 field 1', 4, true),
+(8,  '34567012K', 'dferrer',   'dferrer',   'David Ferrer Romeu',   'o1 field 1', 4, true);
 
 -- Team: o1 field 2
-INSERT INTO cat_user (user_id, code, username, fullname, descript, team_id, active) VALUES(9, '46283910L', 'ngallart', 'nuria gallart costa', 'o1 field 2', 5, true);
-INSERT INTO cat_user (user_id, code, username, fullname, descript, team_id, active) VALUES(10, '57201894W', 'omartin', 'oscar martin serra', 'o1 field 2', 5, true);
+INSERT INTO cat_user (user_id, code, loginname, username, fullname, descript, team_id, active) VALUES
+(9,  '46283910L', 'ngallart',  'ngallart',  'Nuria Gallart Costa',  'o1 field 2', 5, true),
+(10, '57201894W', 'omartin',   'omartin',   'Oscar Martin Serra',   'o1 field 2', 5, true);
 
 -- Team: o2 field 1
-INSERT INTO cat_user (user_id, code, username, fullname, descript, team_id, active) VALUES(11, '68391740T', 'iramos', 'ines ramos vega', 'o2 field 1', 6, true);
-INSERT INTO cat_user (user_id, code, username, fullname, descript, team_id, active) VALUES(12, '78291034X', 'pablo', 'pablo nuñez bravo', 'o2 field 1', 6, true);
+INSERT INTO cat_user (user_id, code, loginname, username, fullname, descript, team_id, active) VALUES
+(11, '68391740T', 'iramos',    'iramos',    'Ines Ramos Vega',      'o2 field 1', 6, true),
+(12, '78291034X', 'pablo',     'pablo',     'Pablo Nuñez Bravo',    'o2 field 1', 6, true);
 
 -- Team: o2 field 2
-INSERT INTO cat_user (user_id, code, username, fullname, descript, team_id, active) VALUES(13, '84023910S', 'cgil', 'carla gil torras', 'o2 field 2', 7, true);
-INSERT INTO cat_user (user_id, code, username, fullname, descript, team_id, active) VALUES(14, '92034185M', 'rbueno', 'raul bueno soler', 'o2 field 2', 7, true);
+INSERT INTO cat_user (user_id, code, loginname, username, fullname, descript, team_id, active) VALUES
+(13, '84023910S', 'cgil',      'cgil',      'Carla Gil Torras',     'o2 field 2', 7, true),
+(14, '92034185M', 'rbueno',    'rbueno',    'Raul Bueno Soler',     'o2 field 2', 7, true);

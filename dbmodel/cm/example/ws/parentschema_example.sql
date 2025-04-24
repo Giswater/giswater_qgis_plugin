@@ -21,8 +21,8 @@ INSERT INTO om_reviewclass_x_object VALUES (2,'PR_BREAK_VALVE',true);
 INSERT INTO om_reviewclass_x_object VALUES (2,'FL_CONTR_VALVE',true);
 INSERT INTO om_reviewclass_x_object VALUES (2,'THROTTLE_VALVE',true);
 
-insert into om_campaign (campaign_id, name, active, organization_id, campaign_type, status) values (1, 'Campaign num.1', TRUE, 1, 1);
-insert into om_campaign (campaign_id, name, active, organization_id, campaign_type, status) values (2, 'Campaign num.2', TRUE, 2, 1);
+insert into om_campaign (campaign_id, name, active, organization_id, campaign_type, status) values (1, 'Campaign num.1', TRUE, 1, 1, 1);
+insert into om_campaign (campaign_id, name, active, organization_id, campaign_type, status) values (2, 'Campaign num.2', TRUE, 2, 1, 1);
 
 insert into om_campaign_review values (1, 1);
 insert into om_campaign_review values (2, 1);

@@ -32,7 +32,7 @@ BEGIN
     v_schemaname = 'cm';
 
     -- Get version
-    EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM PARENT_SCHEMA.config_param_system WHERE parameter=''admin_version'') row'
+    EXECUTE 'SELECT row_to_json(row) FROM (SELECT value FROM SCHEMA_NAME.config_param_system WHERE parameter=''admin_version'') row'
     INTO v_version;
 
     -- Parse input
