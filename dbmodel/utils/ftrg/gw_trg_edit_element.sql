@@ -63,10 +63,12 @@ v_man_table TEXT;
 v_customfeature TEXT;
 v_childtable_name TEXT;
 v_element_id TEXT;
+v_view_level TEXT;
+v_feature_type TEXT;
 
 BEGIN
 
-	v_man_table:= TG_ARGV[0];
+	v_view_level:= TG_ARGV[0];
 	v_tg_table_name = TG_TABLE_NAME;
 
 	EXECUTE 'SET search_path TO '||quote_literal(TG_TABLE_SCHEMA)||', public';
@@ -74,6 +76,24 @@ BEGIN
 	-- get values
 	SELECT ((value::json)->>'activated')::boolean INTO v_insert_double_geom FROM config_param_system WHERE parameter='edit_element_doublegeom';
 	SELECT ((value::json)->>'value')::float INTO v_unitsfactor FROM config_param_system WHERE parameter='edit_element_doublegeom';
+
+	v_srid = (SELECT epsg FROM sys_version ORDER BY id DESC LIMIT 1);
+	v_project_type = (SELECT project_type FROM sys_version ORDER BY id DESC LIMIT 1);
+
+	-- get feature_type and man_table dynamically
+	EXECUTE '
+	SELECT lower(feature_type) FROM cat_feature WHERE '||v_view_level||'_layer = '||quote_literal(v_tg_table_name)||' LIMIT 1'
+	INTO v_feature_type;
+
+
+	EXECUTE '
+	SELECT man_table FROM cat_feature_'||v_feature_type||' n
+	JOIN cat_feature cf ON cf.id = n.id
+	JOIN sys_feature_class s ON cf.feature_class = s.id
+	JOIN cat_'||v_feature_type||' ON cat_'||v_feature_type||'.id= '||quote_literal(NEW.elementcat_id)||'
+	WHERE n.id = cat_'||v_feature_type||'.'||v_feature_type||'_type AND '||v_view_level||'_layer = '||quote_literal(v_tg_table_name)||' LIMIT 1'
+	INTO v_man_table;
+
 
 	--modify values for custom view inserts
 	IF v_man_table IN (SELECT id FROM cat_feature WHERE feature_type = 'ELEMENT') THEN
@@ -85,8 +105,6 @@ BEGIN
 		v_unitsfactor = 1;
 	END IF;
 
-	v_srid = (SELECT epsg FROM sys_version ORDER BY id DESC LIMIT 1);
-	v_project_type = (SELECT project_type FROM sys_version ORDER BY id DESC LIMIT 1);
 
 	-- get element_type and associated feature
 	IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
