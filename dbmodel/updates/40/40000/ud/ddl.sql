@@ -1644,7 +1644,7 @@ CREATE TABLE element (
 	datasource int4 NULL,
 	omunit_id int4 NULL,
 	lock_level int4 NULL,
-	the_geom public.geometry(geometry, SRID_VALUE) NULL,
+	the_geom public.geometry(point, SRID_VALUE) NULL,
 	created_at timestamp with time zone DEFAULT now() NULL,
 	created_by varchar(50) DEFAULT CURRENT_USER NULL,
 	updated_at timestamp with time zone NULL,

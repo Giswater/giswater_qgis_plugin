@@ -1499,7 +1499,7 @@ CREATE TABLE element (
 	created_by varchar(50) DEFAULT CURRENT_USER NULL,
 	updated_at timestamp with time zone NULL,
 	updated_by varchar(50) NULL,
-	the_geom public.geometry(geometry, SRID_VALUE) NULL,
+	the_geom public.geometry(point, SRID_VALUE) NULL,
 	CONSTRAINT element_pkey PRIMARY KEY (element_id),
 	CONSTRAINT element_brand_id FOREIGN KEY (brand_id) REFERENCES cat_brand(id),
 	CONSTRAINT element_category_type_feature_type_fkey FOREIGN KEY (category_type,feature_type) REFERENCES man_type_category(category_type,feature_type) ON DELETE RESTRICT ON UPDATE CASCADE,
