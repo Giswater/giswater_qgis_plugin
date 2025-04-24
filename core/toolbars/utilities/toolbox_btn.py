@@ -13,7 +13,7 @@ from sip import isdeleted
 from time import time
 from datetime import timedelta
 
-from qgis.PyQt.QtCore import Qt, QTimer
+from qgis.PyQt.QtCore import Qt, QTimer, QDate
 from qgis.PyQt.QtGui import QColor, QIcon, QStandardItemModel, QStandardItem
 from qgis.PyQt.QtWidgets import QSpinBox, QWidget, QLineEdit, QComboBox, QCheckBox, QRadioButton, QAbstractItemView, \
     QTreeWidget, QCompleter, QGridLayout, QHBoxLayout, QLabel, QTableWidgetItem
@@ -32,13 +32,17 @@ from .... import global_vars
 class GwToolBoxButton(GwAction):
     """ Button 63: Toolbox """
 
+    TRV_PROCESSES = tools_qt.tr('trv_processes', 'toolbox', default="Processes")
+    TRV_REPORTS = tools_qt.tr('trv_reports', 'toolbox', default="Raports")
+
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 
         if icon_path is not None:
             super().__init__(icon_path, action_name, text, toolbar, action_group)
         self.function_list = []
         self.rbt_checked = {}
-        self.no_clickable_items = ['Processes', 'Reports']
+        self.no_clickable_items = [self.TRV_PROCESSES, self.TRV_REPORTS]
+        self.ignore_widgets = ['qt_spinbox_lineedit', 'qt_calendar_yearedit']
         self.temp_layers_added = []
         self.add_columns = {}
         self.queryAdd = None
@@ -133,15 +137,20 @@ class GwToolBoxButton(GwAction):
         layout = dialog.findChild(QWidget, 'grb_parameters')
         widgets = layout.findChildren(QWidget)
         for widget in widgets:
-            if type(widget) is QCheckBox:
-                tools_gw.set_config_parser('btn_toolbox', f"{function_name}_{widget.objectName()}",
-                                           f"{widget.isChecked()}")
+            if widget.objectName() in self.ignore_widgets:
+                continue
+            if isinstance(widget, QCheckBox):
+                tools_gw.set_config_parser('btn_toolbox', f"{function_name}_{widget.objectName()}", f"{widget.isChecked()}")
             elif isinstance(widget, QComboBox):
                 value = tools_qt.get_combo_value(dialog, widget, 0)
                 tools_gw.set_config_parser('btn_toolbox', f"{function_name}_{widget.objectName()}", f"{value}")
-            elif type(widget) in (QLineEdit, QSpinBox):
+            elif isinstance(widget, QLineEdit):
                 value = tools_qt.get_text(dialog, widget, False, False)
                 tools_gw.set_config_parser('btn_toolbox', f"{function_name}_{widget.objectName()}", f"{value}")
+            elif isinstance(widget, tools_gw.CustomQgsDateTimeEdit):
+                value = tools_qt.get_calendar_date(dialog, widget, date_format=lib_vars.date_format)
+                tools_gw.set_config_parser('btn_toolbox', f"{function_name}_{widget.objectName()}", f"{value}")
+
 
     def save_settings_values(self, dialog, function_name):
         """ Save QGIS settings related with toolbox options """
@@ -156,7 +165,6 @@ class GwToolBoxButton(GwAction):
 
     def _open_toolbox(self):
 
-        self.no_clickable_items = ['Processes', 'Reports']
         function_name = "gw_fct_gettoolbox"
         row = tools_db.check_function(function_name)
         if not row:
@@ -204,7 +212,7 @@ class GwToolBoxButton(GwAction):
         if self.function_selected in self.no_clickable_items:
             return
 
-        if 'reports' in index.parent().parent().data().lower():
+        if self.TRV_REPORTS.lower() in index.parent().parent().data().lower():
 
             # this '1' refers to the index of the item in the selected row
             function_name = index.sibling(index.row(), 0).data()
@@ -253,8 +261,7 @@ class GwToolBoxButton(GwAction):
             tools_gw.open_dialog(self.dlg_reports, dlg_name='reports')
             self.dlg_reports.setWindowTitle(f"{function_name}")
 
-        elif 'processes' in index.parent().parent().data().lower():
-
+        elif self.TRV_PROCESSES.lower() in index.parent().parent().data().lower():
             self.dlg_functions = GwToolboxManagerUi(self)
             tools_gw.load_settings(self.dlg_functions)
             self.dlg_functions.progressBar.setVisible(False)
@@ -399,11 +406,13 @@ class GwToolBoxButton(GwAction):
         list_widgets = self.dlg_reports.findChildren(QWidget)
         filters = []
         for widget in list_widgets:
-            if type(widget) is QLineEdit:
+            if widget.objectName() in self.ignore_widgets:
+                continue
+            if isinstance(widget, QLineEdit):
                 value = tools_qt.get_text(self.dlg_reports, widget, return_string_null=False)
             elif isinstance(widget, QComboBox):
                 value = tools_qt.get_combo_value(self.dlg_reports, widget)
-            elif type(widget) is QCheckBox:
+            elif isinstance(widget, QCheckBox):
                 value = widget.isChecked()
             elif isinstance(widget, QgsDateTimeEdit):
                 value = tools_qt.get_calendar_date(self.dlg_reports, widget)
@@ -504,8 +513,6 @@ class GwToolBoxButton(GwAction):
         widgets = layout.findChildren(QWidget)
 
         for widget in widgets:
-            if type(widget) not in (QCheckBox, QComboBox, QLineEdit, QRadioButton):
-                continue
             if type(widget) in (QCheckBox, QRadioButton):
                 value = tools_gw.get_config_parser('btn_toolbox', f"{function_name}_{widget.objectName()}", "user",
                                                    "session")
@@ -517,10 +524,16 @@ class GwToolBoxButton(GwAction):
                 if value in (None, '', 'NULL') and widget.property('selectedId') not in (None, '', 'NULL'):
                     value = widget.property('selectedId')
                 tools_qt.set_combo_value(widget, value, 0)
-            elif type(widget) in (QLineEdit, QSpinBox) and widget.property('value') in (None, ''):
+            elif isinstance(widget, QLineEdit) and widget.property('value') in (None, ''):
                 value = tools_gw.get_config_parser('btn_toolbox', f"{function_name}_{widget.objectName()}", "user",
                                                    "session")
                 tools_qt.set_widget_text(dialog, widget, value)
+            elif isinstance(widget, tools_gw.CustomQgsDateTimeEdit):
+                value = tools_gw.get_config_parser('btn_toolbox', f"{function_name}_{widget.objectName()}", "user",
+                                                   "session")
+                date = QDate.fromString(value, lib_vars.date_format)
+                tools_qt.set_calendar(dialog, widget, date)
+
 
     def _load_settings_values(self, dialog, function):
         """ Load QGIS settings related with toolbox options """
@@ -719,7 +732,7 @@ class GwToolBoxButton(GwAction):
         path_icon_blue = icon_folder + os.sep + '118.png'
 
         # Section Processes
-        section_processes = QStandardItem('{}'.format(tools_qt.tr('trv_processes', 'toolbox', default="Processes")))
+        section_processes = QStandardItem('{}'.format(self.TRV_PROCESSES))
         for group, functions in result['processes']['fields'].items():
             parent1 = QStandardItem(f'{group} [{len(functions)}]')
             self.no_clickable_items.append(f'{group} [{len(functions)}]')
@@ -740,7 +753,7 @@ class GwToolBoxButton(GwAction):
             section_processes.appendRow(parent1)
 
         # Section Reports
-        reports_processes = QStandardItem('{}'.format(tools_qt.tr('trv_reports', 'toolbox', default="Reports")))
+        reports_processes = QStandardItem('{}'.format(self.TRV_REPORTS))
         for group, functions in result['reports']['fields'].items():
             parent1 = QStandardItem(f'{group} [{len(functions)}]')
             self.no_clickable_items.append(f'{group} [{len(functions)}]')
