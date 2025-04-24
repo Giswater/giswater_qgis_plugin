@@ -30,8 +30,7 @@ from qgis.utils import reloadPlugin
 from .gis_file_create import GwGisFileCreate
 from ..threads.task import GwTask
 from ..ui.ui_manager import GwAdminUi, GwAdminDbProjectUi, GwAdminRenameProjUi, GwAdminProjectInfoUi, \
-    GwAdminGisProjectUi, GwAdminFieldsUi, GwCredentialsUi, GwReplaceInFileUi, GwAdminCmBaseUi, \
-    GwAdminCmCreateUi, GwAdminCmExampleUi, GwAdminCmParentUi
+    GwAdminGisProjectUi, GwAdminFieldsUi, GwCredentialsUi, GwReplaceInFileUi, GwAdminCmBaseUi, GwAdminCmCreateUi
 
 from ..utils import tools_gw
 from ... import global_vars
@@ -505,10 +504,10 @@ class GwAdminButton:
 
         return True
 
-    def load_cm_folder(self, dict_folders):
+    def load_cm_folder(self, dict_folders, schema_option=None):
         """"""
         for folder in dict_folders.keys():
-            status = self._execute_cm_files(folder, set_progress_bar=True)
+            status = self._execute_cm_files(folder, set_progress_bar=True, schema_option=schema_option)
             if not tools_os.set_boolean(status, False) and tools_os.set_boolean(self.dev_commit, False) is False:
                 return False
 
@@ -1805,83 +1804,28 @@ class GwAdminButton:
         self.dlg_cm_base.accept()
 
     def on_btn_create_parent_clicked(self):
-        self.dialog_parent = GwAdminCmParentUi(self)
-        self._populate_schema_name_cm_dialog(self.dialog_parent)
+        schema_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
+        message = f"You are about to perform this action aiming to the following file: {schema_name}\n\nAre you sure you want to continue?"
+        answer = tools_qt.show_question(message, "Create parent schema")
 
-        # Connect buttons
-        self.dialog_parent.btn_accept.clicked.connect(self._on_accept_create_parent)
-        self.dialog_parent.btn_close.clicked.connect(self.dialog_parent.reject)
-        self.dialog_parent.btn_cancel_task.clicked.connect(self.dialog_parent.reject)
+        if not answer:
+            return
 
-        tools_gw.open_dialog(self.dialog_parent, dlg_name='admin_cm_parent')
-
-
-    def on_btn_create_example_clicked(self):
-        self.dialog_example = GwAdminCmExampleUi(self)
-        self._populate_schema_name_cm_dialog(self.dialog_example)
-
-        # Connect buttons
-        self.dialog_example.btn_accept.clicked.connect(self._on_accept_create_example)
-        self.dialog_example.btn_close.clicked.connect(self.dialog_example.reject)
-        self.dialog_example.btn_cancel_task.clicked.connect(self.dialog_example.reject)
-
-        tools_gw.open_dialog(self.dialog_example, dlg_name='admin_cm_example')
-
-    def _on_accept_create_parent(self):
         self.parent_schema_created = True
-        self.project_type_selected = tools_qt.get_text(self.dialog_parent, 'cmb_project_type')
+        self.project_type_selected = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
         self._run_create_cm_task(['load_parent_schema'])
 
-    def _on_accept_create_example(self):
-        self.example_type = tools_qt.get_text(self.dialog_example, 'cmb_project_type')
+    def on_btn_create_example_clicked(self):
+        schema_name = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
+        message = f"You are about to perform this action aiming to the following file: {schema_name}\n\nAre you sure you want to continue?"
+        answer = tools_qt.show_question(message, "Create example schema")
+
+        if not answer:
+            return
+
+        self.example_type = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.cmb_project_type)
+        self.project_example_name = schema_name
         self._run_create_cm_task(['load_example'])
-
-    def _populate_schema_name_cm_dialog(self, dialog, cmb_type_name='cmb_project_type',
-                                        cmb_schema_name='cmb_project_name'):
-        """Initial setup for project type combo and populate schema combo based on selection."""
-
-        self.cmb_type_ref = dialog.findChild(QComboBox, cmb_type_name)
-        self.cmb_schema_ref = dialog.findChild(QComboBox, cmb_schema_name)
-
-        for aux in self.project_types:
-            self.cmb_type_ref.addItem(str(aux))
-        # Connect change event to external logic
-        self.cmb_type_ref.currentIndexChanged.connect(self._on_project_type_changed)
-        self._on_project_type_changed()  # Initial population
-
-    def _on_project_type_changed(self):
-        """Update schema name combo box based on selected project type."""
-
-        project_type = self.cmb_type_ref.currentText()
-        if not project_type:
-            return
-
-        sql = "SELECT schema_name FROM information_schema.schemata"
-        rows = tools_db.get_rows(sql, commit=self.dev_commit)
-        if not rows:
-            return
-
-        result_list = []
-        for row in rows:
-            schema = row[0]
-
-            # Check if sys_version exists in this schema
-            check_sql = (
-                f"SELECT EXISTS ("
-                f"SELECT 1 FROM information_schema.tables "
-                f"WHERE table_schema = '{schema}' AND table_name = 'sys_version')"
-            )
-            exists = tools_db.get_row(check_sql)
-            if not exists or not exists[0]:
-                continue  # Skip schemas without sys_version
-
-            # Safe check on project_type
-            sql_check = f'SELECT project_type FROM "{schema}".sys_version'
-            res = tools_db.get_row(sql_check)
-            if res and res[0].upper() == project_type.upper():
-                result_list.append([schema, schema])
-
-        tools_qt.fill_combo_values(self.cmb_schema_ref, result_list)
 
     def _open_rename(self):
         """"""
@@ -2022,7 +1966,7 @@ class GwAdminButton:
                 f.close()
             return status
 
-    def _execute_cm_files(self, filedir, set_progress_bar=False):
+    def _execute_cm_files(self, filedir, set_progress_bar=False, schema_option=None):
         if not os.path.exists(filedir):
             tools_log.log_info(f"Folder not found: {filedir}")
             return True
@@ -2033,7 +1977,7 @@ class GwAdminButton:
                 if file.endswith(".sql"):
                     filepath = os.path.join(dirpath, file)
                     self.current_sql_file += 1
-                    status = self._read_execute_cm_file(filepath, set_progress_bar)
+                    status = self._read_execute_cm_file(filepath, set_progress_bar, schema_option)
 
                     # If execution fails and dev_commit is False, stop processing
                     if not tools_os.set_boolean(status, False) and not tools_os.set_boolean(self.dev_commit, False):
@@ -2041,7 +1985,7 @@ class GwAdminButton:
 
         return status  # Return final status
 
-    def _read_execute_cm_file(self, filepath, set_progress_bar=False):
+    def _read_execute_cm_file(self, filepath, set_progress_bar=False, schema_option=None):
         """"""
 
         status = False
@@ -2049,7 +1993,10 @@ class GwAdminButton:
 
         PARENT_SCHEMA = tools_qt.get_text(self.dlg_readsql, self.dlg_readsql.project_schema_name)
         SCHEMA_SRID = str(self.project_epsg)
-        SCHEMA_NAME = self.cm_schema_name
+        if schema_option in ('load_parent_schema', 'load_example'):
+            SCHEMA_NAME = tools_gw.get_config_parser('btn_admin', 'project_name_cm_schema', "user", "session", force_reload=True)
+        else:
+            SCHEMA_NAME = self.cm_schema_name
 
         try:
             # Manage progress bar
@@ -2065,31 +2012,34 @@ class GwAdminButton:
 
             f = open(filepath, 'r', encoding="utf8")
             if f:
-                f_to_read = str(
-                    f.read().replace("SCHEMA_NAME", SCHEMA_NAME).replace("SRID_VALUE", SCHEMA_SRID).replace(
-                        "PARENT_SCHEMA", PARENT_SCHEMA))
-                status = tools_db.execute_sql(str(f_to_read), filepath=filepath, commit=self.dev_commit, is_thread=True)
+                file_content = f.read()
+                f_to_read = file_content.replace("SCHEMA_NAME", SCHEMA_NAME).replace("SRID_VALUE", SCHEMA_SRID).replace(
+                    "PARENT_SCHEMA", PARENT_SCHEMA)
+                status = tools_db.execute_sql(f_to_read, filepath=filepath, commit=self.dev_commit, is_thread=False)
+
                 if tools_os.set_boolean(status, False) is False:
-                    self.cm_error_count = self.cm_error_count + 1
+                    self.cm_error_count += 1
+
                     if tools_os.set_boolean(self.dev_commit, False) is False:
                         tools_db.dao.rollback()
 
                     if hasattr(self, 'task_create_cm_schema') and not isdeleted(self.task_create_cm_schema):
                         self.task_create_cm_schema.db_exception = (
-                        lib_vars.session_vars['last_error'], str(f_to_read), filepath)
+                        lib_vars.session_vars['last_error'], f_to_read, filepath)
                         self.task_create_cm_schema.cancel()
 
                     return False
 
         except Exception as e:
-            self.error_count = self.error_count + 1
-            tools_log.log_info(f"_read_execute_file exception: {filepath}")
-            tools_log.log_info(str(e))
+            self.error_count += 1
             self.message_infolog = f"_read_execute_file exception: {filepath}\n {str(e)}"
+
             if tools_os.set_boolean(self.dev_commit, False) is False:
                 tools_db.dao.rollback()
+
             if hasattr(self, 'task_create_schema') and not isdeleted(self.task_create_schema):
                 self.task_create_schema.cancel()
+
             status = False
 
         finally:

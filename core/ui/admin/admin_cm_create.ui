@@ -24,7 +24,7 @@
        <item row="1" column="0">
         <widget class="QPushButton" name="btn_parent_schema">
          <property name="text">
-          <string>Create parent schema</string>
+          <string>Link to parent schema</string>
          </property>
         </widget>
        </item>
@@ -60,13 +60,6 @@
     </item>
     <item row="4" column="0" colspan="5">
      <layout class="QGridLayout" name="lyt_buttons">
-      <item row="0" column="0">
-       <widget class="QLabel" name="lbl_time">
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
       <item row="0" column="1">
        <spacer name="horizontalSpacer">
         <property name="orientation">
@@ -80,10 +73,10 @@
         </property>
        </spacer>
       </item>
-      <item row="0" column="2">
-       <widget class="QPushButton" name="btn_accept">
+      <item row="0" column="0">
+       <widget class="QLabel" name="lbl_time">
         <property name="text">
-         <string>Accept</string>
+         <string/>
         </property>
        </widget>
       </item>
@@ -98,6 +91,13 @@
        <widget class="QPushButton" name="btn_close">
         <property name="text">
          <string>Close</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QPushButton" name="btn_accept">
+        <property name="text">
+         <string>Accept</string>
         </property>
        </widget>
       </item>

@@ -1119,23 +1119,6 @@ class GwAdminCmCreateUi(GwMainWindow, FORM_CLASS):
     CONTEXT = CONTEXT
     UINAME = UINAME
 
-
-UINAME = "admin_cm_example"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
-
-
-class GwAdminCmExampleUi(GwDialog, FORM_CLASS):
-    CONTEXT = CONTEXT
-    UINAME = UINAME
-
-
-UINAME = "admin_cm_parent"
-FORM_CLASS = _get_ui_class(f'{UINAME}.ui', f'{CONTEXT}')
-
-
-class GwAdminCmParentUi(GwDialog, FORM_CLASS):
-    CONTEXT = CONTEXT
-    UINAME = UINAME
 # endregion
 
 
