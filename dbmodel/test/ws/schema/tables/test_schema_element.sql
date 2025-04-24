@@ -75,7 +75,7 @@ SELECT col_type_is('element', 'model_id', 'varchar(50)', 'Column model_id should
 SELECT col_type_is('element', 'asset_id', 'varchar(50)', 'Column asset_id should be varchar(50)');
 SELECT col_type_is('element', 'datasource', 'integer', 'Column datasource should be integer');
 SELECT col_type_is('element', 'lock_level', 'integer', 'Column lock_level should be integer');
-SELECT col_type_is('element', 'the_geom', 'geometry(geometry, SRID_VALUE)', 'Column the_geom should be geometry(geometry, SRID_VALUE)');
+SELECT col_type_is('element', 'the_geom', 'geometry(point, SRID_VALUE)', 'Column the_geom should be geometry(point, SRID_VALUE)');
 SELECT col_type_is('element', 'geometry_type', 'text', 'Column geometry_type should be text');
 SELECT col_type_is('element', 'epa_type', 'varchar(16)', 'Column epa_type should be varchar(16)');
 SELECT col_type_is('element', 'created_at', 'timestamp with time zone', 'Column created_at should be timestamp with time zone');
