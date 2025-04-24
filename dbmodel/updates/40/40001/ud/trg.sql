@@ -254,12 +254,6 @@ FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_ve_epa('pump');
 
 
 --CREATE TRIGGER for parent view by passing parameter 'parent'
-CREATE TRIGGER gw_trg_edit_element INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_frelem
-FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_element('frelem');
-
-CREATE TRIGGER gw_trg_edit_element INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_genelem
-FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_element('genelem');
-
 CREATE TRIGGER gw_trg_typevalue_fk_insert AFTER INSERT ON inp_frweir
 FOR EACH ROW EXECUTE FUNCTION gw_trg_typevalue_fk('inp_frweir');
 

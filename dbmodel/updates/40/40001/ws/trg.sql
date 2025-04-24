@@ -462,6 +462,3 @@ ON omzone FOR EACH ROW EXECUTE FUNCTION gw_trg_typevalue_fk('omzone');
 CREATE TRIGGER gw_trg_typevalue_fk_update AFTER UPDATE OF omzone_type
 ON omzone FOR EACH ROW WHEN (((old.omzone_type)::TEXT IS DISTINCT
 FROM (new.omzone_type)::TEXT)) EXECUTE FUNCTION gw_trg_typevalue_fk('omzone');
-
-CREATE TRIGGER gw_trg_edit_element INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_genelem
-FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_element('genelem');
