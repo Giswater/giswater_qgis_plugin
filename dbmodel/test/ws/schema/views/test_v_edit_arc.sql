@@ -32,7 +32,7 @@ SELECT columns_are(
         'postcomplement2', 'region_id', 'province_id', 'descript', 'link', 'verified', 'label',
         'label_x', 'label_y', 'label_rotation', 'label_quadrant', 'publish', 'inventory', 'num_value',
         'adate', 'adescript', 'sector_style', 'dma_style', 'presszone_style', 'dqa_style', 'supplyzone_style',
-        'asset_id', 'pavcat_id', 'om_state', 'conserv_state', 'parent_id', 'expl_visibility', 'is_operative',
+        'asset_id', 'pavcat_id', 'om_state', 'macroomzone_id', 'conserv_state', 'parent_id', 'expl_visibility', 'is_operative',
         'brand_id', 'model_id', 'serial_number', 'minsector_id', 'macrominsector_id', 'flow_max', 'flow_min',
         'flow_avg', 'vel_max', 'vel_min', 'vel_avg', 'created_at', 'created_by', 'updated_at', 'updated_by',
         'the_geom', 'lock_level', 'inp_type', 'is_scadamap', 'omzone_id', 'omzone_type'
