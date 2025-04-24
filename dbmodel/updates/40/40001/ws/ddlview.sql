@@ -61,7 +61,7 @@ AS WITH
     ),
   omzone_table AS
     (
-      SELECT omzone_id, id::varchar(16) AS omzone_type
+      SELECT omzone_id, id::varchar(16) AS omzone_type, macroomzone_id
       FROM omzone
       LEFT JOIN typevalue t ON t.id::text = omzone.omzone_type AND t.typevalue::text = 'omzone_type'::text
     ),
@@ -96,10 +96,10 @@ AS WITH
     ),
   arc_selected AS
     (
-	  SELECT arc.arc_id,
+	  SELECT
+      arc.arc_id,
       arc.code,
       arc.sys_code,
-      arc.datasource,
       arc.node_1,
       arc.nodetype_1,
       arc.elevation1,
@@ -111,22 +111,28 @@ AS WITH
       arc.elevation2,
       arc.depth2,
       ((COALESCE(arc.depth1) + COALESCE(arc.depth2)) / 2::numeric)::numeric(12,2) AS depth,
-      arc.arccat_id,
       cat_arc.arc_type,
+      arc.arccat_id,
       cat_feature.feature_class AS sys_type,
       cat_arc.matcat_id AS cat_matcat_id,
       cat_arc.pnom AS cat_pnom,
       cat_arc.dnom AS cat_dnom,
       cat_arc.dint AS cat_dint,
       cat_arc.dr AS cat_dr,
+      st_length2d(arc.the_geom)::numeric(12,2) AS gis_length,
+      arc.custom_length,
       arc.epa_type,
       arc.state,
       arc.state_type,
+      arc.parent_id,
       arc.expl_id,
       exploitation.macroexpl_id,
       arc.sector_id,
-      sector_table.macrosector_id,
       sector_table.sector_type,
+      sector_table.macrosector_id,
+      arc.muni_id,
+      arc.supplyzone_id,
+      supplyzone_table.supplyzone_type,
       arc.presszone_id,
       presszone_table.presszone_type,
       presszone_table.presszone_head,
@@ -136,62 +142,41 @@ AS WITH
       arc.dqa_id,
       dqa_table.dqa_type,
       dqa_table.macrodqa_id,
-      arc.supplyzone_id,
-      supplyzone_table.supplyzone_type,
       arc.omzone_id,
       omzone_table.omzone_type,
-      arc.annotation,
-      arc.observ,
-      arc.comment,
-      st_length2d(arc.the_geom)::numeric(12,2) AS gis_length,
-      arc.custom_length,
+      omzone_table.macroomzone_id,
+      arc.minsector_id,
+      arc.macrominsector_id,
+      arc.pavcat_id,
       arc.soilcat_id,
       arc.function_type,
       arc.category_type,
-      arc.fluid_type,
       arc.location_type,
+      arc.fluid_type,
+      arc.descript,
+      arc.annotation,
+      arc.observ,
+      arc.comment,
+      concat(cat_feature.link_path, arc.link) AS link,
+      arc.num_value,
+      arc.district_id,
+      arc.postcode,
+      arc.streetname,
+      arc.postnumber,
+      arc.postcomplement,
+      arc.streetname2,
+      arc.postnumber2,
+      arc.postcomplement2,
+      mu.region_id,
+      mu.province_id,
       arc.workcat_id,
       arc.workcat_id_end,
       arc.workcat_id_plan,
       arc.builtdate,
       arc.enddate,
       arc.ownercat_id,
-      arc.muni_id,
-      arc.postcode,
-      arc.district_id,
-      streetname,
-      arc.postnumber,
-      arc.postcomplement,
-      streetname2,
-      arc.postnumber2,
-      arc.postcomplement2,
-      mu.region_id,
-      mu.province_id,
-      arc.descript,
-      concat(cat_feature.link_path, arc.link) AS link,
-      arc.verified,
-      cat_arc.label,
-      arc.label_x,
-      arc.label_y,
-      arc.label_rotation,
-      arc.label_quadrant,
-      arc.publish,
-      arc.inventory,
-      arc.num_value,
-      arc.adate,
-      arc.adescript,
-      sector_table.stylesheet ->> 'featureColor'::text AS sector_style,
-      dma_table.stylesheet ->> 'featureColor'::text AS dma_style,
-      presszone_table.stylesheet ->> 'featureColor'::text AS presszone_style,
-      dqa_table.stylesheet ->> 'featureColor'::text AS dqa_style,
-      supplyzone_table.stylesheet ->> 'featureColor'::text AS supplyzone_style,
-      arc.asset_id,
-      arc.pavcat_id,
       arc.om_state,
       arc.conserv_state,
-      arc.parent_id,
-      arc.expl_visibility,
-      vst.is_operative,
       CASE
         WHEN arc.brand_id IS NULL THEN cat_arc.brand_id
         ELSE arc.brand_id
@@ -201,25 +186,42 @@ AS WITH
         ELSE arc.model_id
       END AS model_id,
       arc.serial_number,
-      arc.minsector_id,
-      arc.macrominsector_id,
+      arc.asset_id,
+      arc.adate,
+      arc.adescript,
+      arc.verified,
+      arc.datasource,
+      cat_arc.label,
+      arc.label_x,
+      arc.label_y,
+      arc.label_rotation,
+      arc.label_quadrant,
+      arc.inventory,
+      arc.publish,
+      vst.is_operative,
+      arc.is_scadamap,
+      CASE
+        WHEN arc.sector_id > 0 AND vst.is_operative = true AND arc.epa_type::text <> 'UNDEFINED'::character varying(16)::text THEN arc.epa_type
+        ELSE NULL::character varying(16)
+      END AS inp_type,
       e.flow_max,
       e.flow_min,
       e.flow_avg,
       e.vel_max,
       e.vel_min,
       e.vel_avg,
+      sector_table.stylesheet ->> 'featureColor'::text AS sector_style,
+      dma_table.stylesheet ->> 'featureColor'::text AS dma_style,
+      presszone_table.stylesheet ->> 'featureColor'::text AS presszone_style,
+      dqa_table.stylesheet ->> 'featureColor'::text AS dqa_style,
+      supplyzone_table.stylesheet ->> 'featureColor'::text AS supplyzone_style,
+      arc.lock_level,
+      arc.expl_visibility,
       date_trunc('second'::text, arc.created_at) AS created_at,
       arc.created_by,
       date_trunc('second'::text, arc.updated_at) AS updated_at,
       arc.updated_by,
-      arc.the_geom,
-      arc.lock_level,
-      CASE
-        WHEN arc.sector_id > 0 AND vst.is_operative = true AND arc.epa_type::text <> 'UNDEFINED'::character varying(16)::text THEN arc.epa_type
-        ELSE NULL::character varying(16)
-      END AS inp_type,
-      arc.is_scadamap
+      arc.the_geom
       FROM arc_selector
       JOIN arc ON arc.arc_id::text = arc_selector.arc_id::text
       JOIN selector_sector sc ON (sc.cur_user = CURRENT_USER AND sc.sector_id = arc.sector_id)
@@ -279,7 +281,7 @@ AS WITH
       ),
     omzone_table AS
       (
-        SELECT omzone_id, id::varchar(16) AS omzone_type
+        SELECT omzone_id, id::varchar(16) AS omzone_type, macroomzone_id
         FROM omzone
         LEFT JOIN typevalue t ON t.id::text = omzone.omzone_type AND t.typevalue::text = 'omzone_type'::text
       ),
@@ -569,7 +571,7 @@ AS WITH
       ),
     omzone_table AS
       (
-        SELECT omzone_id, id::varchar(16) AS omzone_type
+        SELECT omzone_id, id::varchar(16) AS omzone_type, macroomzone_id
         FROM omzone
         LEFT JOIN typevalue t ON t.id::text = omzone.omzone_type AND t.typevalue::text = 'omzone_type'::text
       ),
@@ -732,7 +734,7 @@ AS WITH
       ),
     omzone_table AS
       (
-        SELECT omzone_id, id::varchar(16) AS omzone_type
+        SELECT omzone_id, id::varchar(16) AS omzone_type, macroomzone_id
         FROM omzone
         LEFT JOIN typevalue t ON t.id::text = omzone.omzone_type AND t.typevalue::text = 'omzone_type'::text
       ),

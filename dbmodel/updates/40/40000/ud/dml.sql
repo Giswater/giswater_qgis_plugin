@@ -2758,6 +2758,8 @@ DELETE FROM config_form_fields WHERE columnname='buildercat_id';
 
 
 -- 20/03/2025
+-- todo: disable triggers
+
 INSERT INTO node (node_id, code, top_elev, ymax, elev, custom_top_elev, custom_ymax, custom_elev, node_type, nodecat_id, epa_type, sector_id, state, state_type,
 annotation, observ, "comment", omzone_id, soilcat_id, function_type, category_type, fluid_type, location_type, workcat_id, workcat_id_end, builtdate, enddate,
 ownercat_id, muni_id, postcode, streetaxis_id, postnumber, postcomplement, streetaxis2_id, postnumber2, postcomplement2, descript, rotation, link, verified, the_geom,
