@@ -13,7 +13,7 @@ from sip import isdeleted
 from time import time
 from datetime import timedelta
 
-from qgis.PyQt.QtCore import Qt, QTimer
+from qgis.PyQt.QtCore import Qt, QTimer, QDate
 from qgis.PyQt.QtGui import QColor, QIcon, QStandardItemModel, QStandardItem
 from qgis.PyQt.QtWidgets import QSpinBox, QWidget, QLineEdit, QComboBox, QCheckBox, QRadioButton, QAbstractItemView, \
     QTreeWidget, QCompleter, QGridLayout, QHBoxLayout, QLabel, QTableWidgetItem, QFileDialog
@@ -39,6 +39,7 @@ class GwToolBoxButton(GwAction):
         self.function_list = []
         self.rbt_checked = {}
         self.no_clickable_items = ['Processes', 'Reports']
+        self.ignore_widgets = ['qt_spinbox_lineedit', 'qt_calendar_yearedit']
         self.temp_layers_added = []
         self.add_columns = {}
         self.queryAdd = None
@@ -137,6 +138,8 @@ class GwToolBoxButton(GwAction):
         layout = dialog.findChild(QWidget, 'grb_parameters')
         widgets = layout.findChildren(QWidget)
         for widget in widgets:
+            if widget.objectName() in self.ignore_widgets:
+                continue
             if type(widget) is QCheckBox:
                 tools_gw.set_config_parser('btn_toolbox', f"{function_name}_{widget.objectName()}",
                                            f"{widget.isChecked()}")
@@ -146,6 +149,9 @@ class GwToolBoxButton(GwAction):
             elif type(widget) in (QLineEdit, QSpinBox):
                 value = tools_qt.get_text(dialog, widget, False, False)
                 tools_gw.set_config_parser('btn_toolbox', f"{function_name}_{widget.objectName()}", f"{value}")
+            elif type(widget) is QgsDateTimeEdit:
+                 value = tools_qt.get_calendar_date(dialog, widget, date_format=lib_vars.date_format)
+                 tools_gw.set_config_parser('btn_toolbox', f"{function_name}_{widget.objectName()}", f"{value}")
 
 
     def save_settings_values(self, dialog, function_name):
@@ -517,8 +523,6 @@ class GwToolBoxButton(GwAction):
         widgets = layout.findChildren(QWidget)
 
         for widget in widgets:
-            if type(widget) not in (QCheckBox, QComboBox, QLineEdit, QRadioButton):
-                continue
             if type(widget) in (QCheckBox, QRadioButton):
                 value = tools_gw.get_config_parser('btn_toolbox', f"{function_name}_{widget.objectName()}", "user",
                                                    "session")
@@ -534,6 +538,11 @@ class GwToolBoxButton(GwAction):
                 value = tools_gw.get_config_parser('btn_toolbox', f"{function_name}_{widget.objectName()}", "user",
                                                    "session")
                 tools_qt.set_widget_text(dialog, widget, value)
+            elif type(widget) is QgsDateTimeEdit:
+                 value = tools_gw.get_config_parser('btn_toolbox', f"{function_name}_{widget.objectName()}", "user",
+                                                    "session")
+                 date = QDate.fromString(value, lib_vars.date_format)
+                 tools_qt.set_calendar(dialog, widget, date)
 
 
     def _load_settings_values(self, dialog, function):
