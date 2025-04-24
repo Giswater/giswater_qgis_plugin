@@ -1635,6 +1635,7 @@ CREATE TABLE element (
 	trace_featuregeom bool DEFAULT true NULL,
 	muni_id int4 NULL,
 	sector_id int4 DEFAULT 0 NULL,
+	omzone_id int4 NULL,
 	brand_id varchar(50) NULL,
 	model_id varchar(50) NULL,
 	asset_id varchar(50) NULL,

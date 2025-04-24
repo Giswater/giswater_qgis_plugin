@@ -25,7 +25,7 @@ SELECT columns_are(
         'workcat_id_end', 'builtdate', 'enddate', 'ownercat_id', 'rotation', 'link', 'verified',
         'label_x', 'label_y', 'label_rotation', 'publish', 'inventory', 'expl_id', 'feature_type',
         'pol_id', 'top_elev', 'expl_visibility', 'trace_featuregeom', 'geometry_type', 'epa_type',
-        'muni_id', 'sector_id', 'brand_id', 'model_id', 'asset_id', 'datasource', 'lock_level',
+        'muni_id', 'sector_id', 'omzone_id', 'brand_id', 'model_id', 'asset_id', 'datasource', 'lock_level',
         'the_geom', 'created_at', 'created_by', 'updated_at', 'updated_by'
     ],
     'Table element should have the correct columns'

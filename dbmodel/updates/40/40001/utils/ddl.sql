@@ -158,4 +158,3 @@ SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"archived_p
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"archived_psector_connec_traceability", "column":"expl_id2"}}$$);
 SELECT gw_fct_admin_manage_fields($${"data":{"action":"DROP","table":"archived_psector_node_traceability", "column":"expl_id2"}}$$);
 
-SELECT gw_fct_admin_manage_fields($${"data":{"action":"ADD","table":"element", "column":"omzone_id", "dataType":"integer", "isUtils":"False"}}$$);
