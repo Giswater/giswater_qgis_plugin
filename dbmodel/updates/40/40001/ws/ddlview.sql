@@ -626,7 +626,7 @@ AS WITH
         l.n_hydrometer,
         st_length(l.the_geom)::numeric(12,3) AS gis_length,
         l.custom_length,
-        l.staticpressure,
+        l.staticpressure
         FROM inp_network_mode, link_selector
         JOIN link l ON l.link_id = link_selector.link_id
         LEFT JOIN connec c ON c.connec_id = l.feature_id
