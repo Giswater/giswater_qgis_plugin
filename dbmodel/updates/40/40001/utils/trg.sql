@@ -39,7 +39,7 @@ CREATE TRIGGER gw_trg_ui_doc_x_element INSTEAD OF INSERT OR DELETE OR UPDATE ON 
 FOR EACH ROW EXECUTE FUNCTION gw_trg_ui_doc('element');
 
 CREATE TRIGGER gw_trg_edit_element INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_frelem
-FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_element('frelem');
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_element('parent');
 
 CREATE TRIGGER gw_trg_edit_element INSTEAD OF INSERT OR DELETE OR UPDATE ON ve_genelem
-FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_element('genelem');
+FOR EACH ROW EXECUTE FUNCTION gw_trg_edit_element('parent');

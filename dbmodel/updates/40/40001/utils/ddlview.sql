@@ -158,7 +158,9 @@ CREATE OR REPLACE VIEW ve_frelem AS
     concat (man_frelem.node_id,'_FR', man_frelem.order_id) AS nodarc_id,
     man_frelem.to_arc,
     man_frelem.flwreg_length,
-    st_setsrid(st_makeline(element.the_geom, st_lineinterpolatepoint(a.the_geom, flwreg_length / st_length(a.the_geom))), SRID_VALUE)::geometry(LineString,SRID_VALUE) AS the_geom
+    element.the_geom,
+    st_x(st_endpoint(st_setsrid(st_makeline(element.the_geom, st_lineinterpolatepoint(a.the_geom, flwreg_length / st_length(a.the_geom))), SRID_VALUE)::geometry(LineString,SRID_VALUE))) AS symbol_x,
+    st_y(st_endpoint(st_setsrid(st_makeline(element.the_geom, st_lineinterpolatepoint(a.the_geom, flwreg_length / st_length(a.the_geom))), SRID_VALUE)::geometry(LineString,SRID_VALUE))) AS symbol_y
     FROM element
     JOIN cat_element ON element.elementcat_id::text = cat_element.id::text
     JOIN man_frelem ON element.element_id::text = man_frelem.element_id::text

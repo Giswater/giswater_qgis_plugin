@@ -78,8 +78,8 @@ BEGIN
   REPLACE(REPLACE(array_agg('''||v_parent_layer||'.'' || column_name)::text, ''{'', ''''), ''}'', '''') 
   FROM information_schema.columns
   WHERE table_schema = '||quote_literal(v_schemaname)||' 
-  AND table_name = ''ve_frelem'' 
   AND column_name NOT IN (''node_id'', ''order_id'', ''nodarc_id'', ''to_arc'', ''flwreg_length'')'
+  AND table_name = '||quote_literal(v_parent_layer)||' 
   INTO v_element_fields;
 
   IF v_view_type = 1 THEN
