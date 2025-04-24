@@ -20,7 +20,7 @@ SELECT has_table('link'::name, 'Table link should exist');
 SELECT columns_are(
     'link',
     ARRAY[
-        'link_id', 'code', ' sys_code', 'feature_id', 'feature_type', 'linkcat_id', 'top_elev1', 'depth1', 'exit_id', 'exit_type',
+        'link_id', 'code', 'sys_code', 'feature_id', 'feature_type', 'linkcat_id', 'top_elev1', 'depth1', 'exit_id', 'exit_type',
         'top_elev2', 'depth2', 'userdefined_geom', 'state', 'expl_id', 'sector_id', 'dma_id',
         'fluid_type', 'presszone_id', 'dqa_id', 'minsector_id', 'expl_visibility', 'epa_type', 'is_operative',
         'staticpressure', 'workcat_id', 'workcat_id_end', 'builtdate', 'enddate',
