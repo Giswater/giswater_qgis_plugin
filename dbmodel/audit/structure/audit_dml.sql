@@ -32,4 +32,4 @@ INSERT INTO om_typevalue (typevalue, id, idval, descript, addparam)
 VALUES ('custom_report_update_db', '31 days', '1 MONTH', NULL, '{"orderby":1}'::json)
 ON CONFLICT (typevalue, id) DO NOTHING;
 
-INSERT INTO sys_version (id, giswater, project_type, postgres, postgis, "date", "language", epsg) VALUES(2, '4.0.001', 'AUDIT', 'PostgreSQL 16.1, compiled by Visual C++ build 1937, 64-bit', '3.4 USE_GEOS=1 USE_PROJ=1 USE_STATS=1', '2025-04-16 10:48:31.383', 'en_US', 25831);
+INSERT INTO audit.sys_version (id, giswater, project_type, postgres, postgis, "date", "language", epsg) VALUES(2, '4.0.001', 'AUDIT', 'PostgreSQL 16.1, compiled by Visual C++ build 1937, 64-bit', '3.4 USE_GEOS=1 USE_PROJ=1 USE_STATS=1', '2025-04-16 10:48:31.383', 'en_US', 25831);
