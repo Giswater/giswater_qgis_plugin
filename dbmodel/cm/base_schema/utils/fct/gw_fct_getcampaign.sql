@@ -74,7 +74,7 @@ BEGIN
 	v_formtabs := '[';
 
 	-- Get dynamic fields
-	SELECT PARENT_SCHEMA.gw_fct_getformfieldscm(
+	SELECT gw_fct_getformfieldscm(
 		v_formname,
 		'form_feature',
 		'data',
@@ -109,7 +109,7 @@ BEGIN
 
 	ELSE
 		-- If creating a new campaign
-		SELECT nextval('SCHEMA_NAME.om_campaign_id_seq') INTO v_id;
+		SELECT nextval('SCHEMA_NAME.om_campaign_campaign_id_seq') INTO v_id;
 
 		FOR array_index IN array_lower(v_fields, 1)..array_upper(v_fields, 1) LOOP
 		    aux_json := v_fields[array_index];
@@ -141,7 +141,7 @@ BEGIN
 	v_fields_json := COALESCE(v_fields_json, '{}');
 
     -- Create return
-	RETURN gw_fct_json_create_return(('{"status":"Accepted", "message":'||v_message||', "version":' || v_version ||
+	RETURN PARENT_SCHEMA.gw_fct_json_create_return(('{"status":"Accepted", "message":'||v_message||', "version":' || v_version ||
       ',"body":{"form":' || v_forminfo ||
 	     ', "feature":'|| v_featureinfo ||
 	      ',"data":{"fields":' || v_fields_json ||'}'||
