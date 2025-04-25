@@ -20,7 +20,6 @@ def main(project_type: str) -> None:
     root_directories = ["utils/ddl", f"{project_type}/schema_model", "utils/fct", "utils/ftrg", f"{project_type}/fct", f"{project_type}/ftrg"]
     exclude_prefix = "ud_" if project_type == "ws" else "ws_"
     exculude_files = "trg_schema_model.sql"
-    exclude_i18n_files = []
 
     # Execute SQL files in the root directories
     for root_dir in root_directories:
@@ -45,24 +44,6 @@ def main(project_type: str) -> None:
             execute_sql_file(conn, file_path)
     else:
         logger.warning(f"Directory {i18n_dir} does not exist")
-
-    # Define the base updates directory
-    updates_dir = ["updates/36", "updates/40"]
-
-    order = ['utils', f"{project_type}"]
-
-    for update_dir in updates_dir:
-        logger.info(f"Processing update directory: {update_dir}")
-        for subdir in sorted(os.listdir(update_dir)):
-            subdir_path = os.path.join(update_dir, subdir)
-            # Check if the updates subdirectory exists and process it
-            if os.path.isdir(subdir_path):
-                for root, dirs, files in os.walk(subdir_path):
-                    dirs[:] = sorted([d for d in dirs if d in order], key=lambda x: order.index(x))
-                    for file in sorted(files):
-                        if file.endswith(".sql"):
-                            file_path = os.path.join(root, file)
-                            execute_sql_file(conn, file_path)
 
     # Check if the i18n directory exists and process the en_US dml
     if os.path.isdir(i18n_dir):

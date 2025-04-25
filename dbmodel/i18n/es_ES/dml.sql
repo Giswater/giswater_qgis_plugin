@@ -1,7 +1,6 @@
 /*
 This file is part of Giswater
 The program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-This version of Giswater is provided by Giswater Association,
 */
 
 
@@ -7472,20 +7471,19 @@ UPDATE config_form_fields SET label = 'Fluid type', tooltip = '' WHERE formname 
 UPDATE config_form_fields SET label = 'Tipo de función', tooltip = 'function_type - Tipo de función a escoger en el desplegable personalizado por el usuario en la tabla man_type_function' WHERE formname LIKE '%_arc%' AND formtype = 'form_feature' AND columnname = 'function_type';
 UPDATE config_form_fields SET label = 'Function type', tooltip = '' WHERE formname LIKE '%_element%' AND formtype = 'form_feature' AND columnname = 'function_type';
 UPDATE config_form_fields SET label = 'inventario', tooltip = 'inventory - Para establecer si el elemento pertenece o debe pertenecer a inventario o no' WHERE formname LIKE '%_element%' AND formtype = 'form_feature' AND columnname = 'inventory';
-UPDATE value_state SET name = 'OBSOLETE', observ = '' WHERE id = '0';
 UPDATE value_state SET name = 'OPERATIVE', observ = '' WHERE id = '1';
+UPDATE value_state SET name = 'OBSOLETE', observ = '' WHERE id = '0';
 UPDATE value_state SET name = 'PLANIFIED', observ = '' WHERE id = '2';
+UPDATE value_state_type SET name = 'FICTICIUS' WHERE id = '99';
 UPDATE value_state_type SET name = 'OBSOLETE' WHERE id = '1';
+UPDATE value_state_type SET name = 'OBSOLET-FICTICIUS' WHERE id = '100';
+UPDATE value_state_type SET name = 'OPERATIVE' WHERE id = '2';
+UPDATE value_state_type SET name = 'PLANIFIED' WHERE id = '3';
 UPDATE value_state_type SET name = 'RECONSTRUCT' WHERE id = '4';
 UPDATE value_state_type SET name = 'PROVISIONAL' WHERE id = '5';
-UPDATE value_state_type SET name = 'PLANIFIED' WHERE id = '3';
-UPDATE value_state_type SET name = 'OPERATIVE' WHERE id = '2';
-UPDATE value_state_type SET name = 'OBSOLET-FICTICIUS' WHERE id = '100';
-UPDATE value_state_type SET name = 'FICTICIUS' WHERE id = '99';
 UPDATE cat_feature SET id = 'ENDLINE', descript = 'End of the line' WHERE id = 'ENDLINE' AND feature_class = 'JUNCTION' AND feature_type = 'NODE';
 UPDATE cat_feature SET id = 'SHUTOFF_VALVE', descript = 'Shutoff valve' WHERE id = 'SHUTOFF_VALVE' AND feature_class = 'VALVE' AND feature_type = 'NODE';
 UPDATE cat_feature SET id = 'X', descript = 'Junction where 4 pipes converge' WHERE id = 'X' AND feature_class = 'JUNCTION' AND feature_type = 'NODE';
-UPDATE cat_feature SET id = 'AIR_VALVE', descript = 'Air valve' WHERE id = 'AIR_VALVE' AND feature_class = 'VALVE' AND feature_type = 'NODE';
 UPDATE cat_feature SET id = 'TANK', descript = 'Tank' WHERE id = 'TANK' AND feature_class = 'TANK' AND feature_type = 'NODE';
 UPDATE cat_feature SET id = 'JUNCTION', descript = 'Junction' WHERE id = 'JUNCTION' AND feature_class = 'JUNCTION' AND feature_type = 'NODE';
 UPDATE cat_feature SET id = 'GREENTAP', descript = 'Greentap' WHERE id = 'GREENTAP' AND feature_class = 'GREENTAP' AND feature_type = 'CONNEC';
@@ -7501,39 +7499,40 @@ UPDATE cat_feature SET id = 'PUMP', descript = 'Pump' WHERE id = 'PUMP' AND feat
 UPDATE cat_feature SET id = 'LINK', descript = 'Link' WHERE id = 'LINK' AND feature_class = 'LINK' AND feature_type = 'LINK';
 UPDATE cat_feature SET id = 'WJOIN', descript = 'Wjoin' WHERE id = 'WJOIN' AND feature_class = 'WJOIN' AND feature_type = 'CONNEC';
 UPDATE cat_feature SET id = 'PIPE', descript = 'Water distribution pipe' WHERE id = 'PIPE' AND feature_class = 'PIPE' AND feature_type = 'ARC';
-UPDATE cat_feature SET id = 'CHECK_VALVE', descript = 'Check valve' WHERE id = 'CHECK_VALVE' AND feature_class = 'VALVE' AND feature_type = 'NODE';
 UPDATE cat_feature SET id = 'PR_BREAK_VALVE', descript = 'Pressure break valve' WHERE id = 'PR_BREAK_VALVE' AND feature_class = 'VALVE' AND feature_type = 'NODE';
 UPDATE cat_feature SET id = 'OUTFALL_VALVE', descript = 'Outfall valve' WHERE id = 'OUTFALL_VALVE' AND feature_class = 'VALVE' AND feature_type = 'NODE';
 UPDATE cat_feature SET id = 'PR_REDUC_VALVE', descript = 'Pressure reduction valve' WHERE id = 'PR_REDUC_VALVE' AND feature_class = 'VALVE' AND feature_type = 'NODE';
-UPDATE cat_feature SET id = 'GREEN_VALVE', descript = 'Green valve' WHERE id = 'GREEN_VALVE' AND feature_class = 'VALVE' AND feature_type = 'NODE';
 UPDATE cat_feature SET id = 'CURVE', descript = 'Curve' WHERE id = 'CURVE' AND feature_class = 'JUNCTION' AND feature_type = 'NODE';
 UPDATE cat_feature SET id = 'VCONNEC', descript = 'Virtual connec' WHERE id = 'VCONNEC' AND feature_class = 'WJOIN' AND feature_type = 'CONNEC';
+UPDATE cat_feature SET id = 'GREEN_VALVE', descript = 'Green valve' WHERE id = 'GREEN_VALVE' AND feature_class = 'VALVE' AND feature_type = 'NODE';
+UPDATE cat_feature SET id = 'CHECK_VALVE', descript = 'Check valve' WHERE id = 'CHECK_VALVE' AND feature_class = 'VALVE' AND feature_type = 'NODE';
 UPDATE cat_feature SET id = 'FL_CONTR_VALVE', descript = 'Flow control valve' WHERE id = 'FL_CONTR_VALVE' AND feature_class = 'VALVE' AND feature_type = 'NODE';
 UPDATE cat_feature SET id = 'PR_SUSTA_VALVE', descript = 'Pressure sustainer valve' WHERE id = 'PR_SUSTA_VALVE' AND feature_class = 'VALVE' AND feature_type = 'NODE';
 UPDATE cat_feature SET id = 'T', descript = 'Junction where 3 pipes converge' WHERE id = 'T' AND feature_class = 'JUNCTION' AND feature_type = 'NODE';
 UPDATE cat_feature SET id = 'FOUNTAIN', descript = 'Ornamental fountain' WHERE id = 'FOUNTAIN' AND feature_class = 'FOUNTAIN' AND feature_type = 'CONNEC';
-UPDATE cat_feature SET id = 'WATER_CONNECTION', descript = 'Water connection' WHERE id = 'WATER_CONNECTION' AND feature_class = 'NETWJOIN' AND feature_type = 'NODE';
 UPDATE cat_feature SET id = 'PRESSURE_METER', descript = 'Pressure meter' WHERE id = 'PRESSURE_METER' AND feature_class = 'METER' AND feature_type = 'NODE';
 UPDATE cat_feature SET id = 'NETSAMPLEPOINT', descript = 'Netsamplepoint' WHERE id = 'NETSAMPLEPOINT' AND feature_class = 'NETSAMPLEPOINT' AND feature_type = 'NODE';
 UPDATE cat_feature SET id = 'REDUCTION', descript = 'Reduction' WHERE id = 'REDUCTION' AND feature_class = 'REDUCTION' AND feature_type = 'NODE';
 UPDATE cat_feature SET id = 'REGISTER', descript = 'Register' WHERE id = 'REGISTER' AND feature_class = 'REGISTER' AND feature_type = 'NODE';
 UPDATE cat_feature SET id = 'SOURCE', descript = 'Source' WHERE id = 'SOURCE' AND feature_class = 'SOURCE' AND feature_type = 'NODE';
-UPDATE cat_feature SET id = 'WATERWELL', descript = 'Waterwell' WHERE id = 'WATERWELL' AND feature_class = 'WATERWELL' AND feature_type = 'NODE';
-UPDATE cat_feature SET id = 'PROTECT_BAND', descript = '' WHERE id = 'PROTECT_BAND' AND feature_class = 'GENELEMENT' AND feature_type = 'ELEMENT';
-UPDATE cat_feature SET id = 'HYDRANT_PLATE', descript = '' WHERE id = 'HYDRANT_PLATE' AND feature_class = 'GENELEMENT' AND feature_type = 'ELEMENT';
 UPDATE cat_feature SET id = 'NETELEMENT', descript = 'Netelement' WHERE id = 'NETELEMENT' AND feature_class = 'NETELEMENT' AND feature_type = 'NODE';
-UPDATE cat_feature SET id = 'STEP', descript = 'Step' WHERE id = 'STEP' AND feature_class = 'GENELEMENT' AND feature_type = 'ELEMENT';
 UPDATE cat_feature SET id = 'VARC', descript = 'Varc' WHERE id = 'VARC' AND feature_class = 'VARC' AND feature_type = 'ARC';
-UPDATE cat_feature SET id = 'FRPUMP', descript = 'Frpump' WHERE id = 'FRPUMP' AND feature_class = 'FLWREG' AND feature_type = 'ELEMENT';
-UPDATE cat_feature SET id = 'COVER', descript = 'Cover' WHERE id = 'COVER' AND feature_class = 'GENELEMENT' AND feature_type = 'ELEMENT';
-UPDATE cat_feature SET id = 'SERVCONNECTION', descript = 'Servconnection' WHERE id = 'SERVCONNECTION' AND feature_class = 'SERVCONNECTION' AND feature_type = 'LINK';
 UPDATE cat_feature SET id = 'GEN_PURP_VALVE', descript = 'General purpose valve' WHERE id = 'GEN_PURP_VALVE' AND feature_class = 'VALVE' AND feature_type = 'NODE';
-UPDATE cat_feature SET id = 'ADAPTATION', descript = 'Adaptation junction' WHERE id = 'ADAPTATION' AND feature_class = 'JUNCTION' AND feature_type = 'NODE';
 UPDATE cat_feature SET id = 'TAP', descript = 'Water source' WHERE id = 'TAP' AND feature_class = 'TAP' AND feature_type = 'CONNEC';
 UPDATE cat_feature SET id = 'BYPASS_REGISTER', descript = 'Bypass-register' WHERE id = 'BYPASS_REGISTER' AND feature_class = 'REGISTER' AND feature_type = 'NODE';
 UPDATE cat_feature SET id = 'VALVE_REGISTER', descript = 'Valve register' WHERE id = 'VALVE_REGISTER' AND feature_class = 'REGISTER' AND feature_type = 'NODE';
-UPDATE cat_feature SET id = 'CLORINATHOR', descript = 'Element to reclorate water' WHERE id = 'CLORINATHOR' AND feature_class = 'NETELEMENT' AND feature_type = 'NODE';
+UPDATE cat_feature SET id = 'ADAPTATION', descript = 'Adaptation junction' WHERE id = 'ADAPTATION' AND feature_class = 'JUNCTION' AND feature_type = 'NODE';
 UPDATE cat_feature SET id = 'THROTTLE_VALVE', descript = 'Throttle-valve' WHERE id = 'THROTTLE_VALVE' AND feature_class = 'VALVE' AND feature_type = 'NODE';
+UPDATE cat_feature SET id = 'WATERWELL', descript = 'Waterwell' WHERE id = 'WATERWELL' AND feature_class = 'WATERWELL' AND feature_type = 'NODE';
+UPDATE cat_feature SET id = 'AIR_VALVE', descript = 'Air valve' WHERE id = 'AIR_VALVE' AND feature_class = 'VALVE' AND feature_type = 'NODE';
+UPDATE cat_feature SET id = 'CLORINATHOR', descript = 'Element to reclorate water' WHERE id = 'CLORINATHOR' AND feature_class = 'NETELEMENT' AND feature_type = 'NODE';
+UPDATE cat_feature SET id = 'WATER_CONNECTION', descript = 'Water connection' WHERE id = 'WATER_CONNECTION' AND feature_class = 'NETWJOIN' AND feature_type = 'NODE';
+UPDATE cat_feature SET id = 'HYDRANT_PLATE', descript = '' WHERE id = 'HYDRANT_PLATE' AND feature_class = 'GENELEMENT' AND feature_type = 'ELEMENT';
+UPDATE cat_feature SET id = 'PROTECT_BAND', descript = '' WHERE id = 'PROTECT_BAND' AND feature_class = 'GENELEMENT' AND feature_type = 'ELEMENT';
+UPDATE cat_feature SET id = 'FRPUMP', descript = 'Frpump' WHERE id = 'FRPUMP' AND feature_class = 'FLWREG' AND feature_type = 'ELEMENT';
+UPDATE cat_feature SET id = 'STEP', descript = 'Step' WHERE id = 'STEP' AND feature_class = 'GENELEMENT' AND feature_type = 'ELEMENT';
+UPDATE cat_feature SET id = 'COVER', descript = 'Cover' WHERE id = 'COVER' AND feature_class = 'GENELEMENT' AND feature_type = 'ELEMENT';
+UPDATE cat_feature SET id = 'SERVCONNECTION', descript = 'Servconnection' WHERE id = 'SERVCONNECTION' AND feature_class = 'SERVCONNECTION' AND feature_type = 'LINK';
 UPDATE config_report SET filterparam = '[{"columnname": "Exploitation", "label": "Exploitation:", "widgettype": "combo", "datatype": "text", "layoutorder": 1, "dvquerytext": "Select name as id, name as idval FROM exploitation WHERE expl_id > 0 ORDER by name", "isNullValue": "true"}, {"columnname": "Dma", "label": "Dma:", "widgettype": "combo", "datatype": "text", "layoutorder": 2, "dvquerytext": "Select name as id, name as idval FROM dma WHERE dma_id != -1 and dma_id!=0 ORDER BY name", "isNullValue": "true"}, {"columnname": "Period", "label": "Period:", "widgettype": "combo", "datatype": "text", "layoutorder": 1, "dvquerytext": "Select code as id, code as idval FROM ext_cat_period WHERE id IS NOT NULL ORDER BY end_date DESC", "isNullValue": "true"}]' WHERE id = 102;
 UPDATE config_report SET filterparam = '[{"columnname": "exploitation", "label": "Exploitation:", "widgettype": "combo", "datatype": "text", "layoutorder": 1, "dvquerytext": "Select name as id, name as idval FROM exploitation WHERE expl_id > 0 ORDER by name", "isNullValue": "true"}, {"columnname": "crm_startdate", "label": "From Date", "widgettype": "combo", "datatype": "text", "layoutorder": 2, "dvquerytext": "Select start_date::date as id, start_date::date as idval FROM ext_cat_period WHERE id IS NOT NULL ORDER BY start_date desc", "isNullValue": "false", "filterSign": ">=", "showOnTableModel": {"status": true, "position": 2}}, {"columnname": "crm_enddate", "label": "To Date", "widgettype": "combo", "datatype": "text", "layoutorder": 3, "dvquerytext": "Select end_date::date as id, end_date::date as idval FROM ext_cat_period WHERE id IS NOT NULL ORDER BY end_date desc", "isNullValue": "false", "filterSign": "<=", "showOnTableModel": {"status": true, "position": 3}}]' WHERE id = 103;
 UPDATE config_report SET filterparam = '[{"columnname": "Exploitation", "label": "Exploitation:", "widgettype": "combo", "datatype": "text", "layoutorder": 1, "dvquerytext": "Select name as id, name as idval FROM exploitation WHERE expl_id > 0 ORDER BY name", "isNullValue": "true"}, {"columnname": "Arc Catalog", "label": "Arc catalog:", "widgettype": "combo", "datatype": "text", "layoutorder": 2, "dvquerytext": "Select id as id, id as idval FROM cat_arc WHERE id IS NOT NULL ORDER BY id", "isNullValue": "true"}]' WHERE id = 100;
