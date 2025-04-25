@@ -342,37 +342,40 @@ class GwSchemaI18NUpdate:
         schema_type = [self.project_type]
         if self.project_type in ["ud", "ws"]:
             schema_type.append("utils")
+        
+        forenames = []
+        for column in columns:
+            if column[-5:] == "en_us":
+                forenames.append(column.split("_")[0])
 
         for i, row in enumerate(rows): #(For row in rows)
             if row['project_type'] in schema_type: # Chose wanted schema types (ws, ud, cm, am...)
-                forenames = []
-                for column in columns:
-                    if column[-5:] == "en_us":
-                        forenames.append(column.split("_")[0])
 
                 texts = []
-
                 for forename in forenames:
                     value = row.get(f'{forename}_{self.lower_lang}')
-                    
+
                     if not value and self.lower_lang != 'en_us':
                         value = row.get(f'auto_{forename}_{self.lower_lang}')
-                    
+
                     if not value:
                         value = row.get(f'{forename}_en_us')
-                    
-                    if not value and forename == 'tt' and table in ["dbconfig_form_fields", "dbconfig_param_system", "dbparam_user", "dbconfig_form_fields_feat"]:
+
+                    if not value and forename == 'tt' and table in [
+                        "dbconfig_form_fields", "dbconfig_param_system",
+                        "dbparam_user", "dbconfig_form_fields_feat"]:
                         value = row.get('lb_en_us')
 
                     if not value:
                         texts.append('NULL')
                     else:
-                        text = value.replace("'", "''")
-                        texts.append(f"'{text}'")
-                    
-                    
+                        escaped_value = value.replace("'", "''")
+                        texts.append(f"'{escaped_value}'")
 
-                
+                for j, text in enumerate(texts):
+                    if "\n" in texts[j] and texts[j] is not None:
+                        texts[j] = self._replace_invalid_characters(texts[j])
+                           
                 sql_text = ""
                 #Define the query depending on the table
                 if 'dbconfig_form_fields' in table:
@@ -411,7 +414,8 @@ class GwSchemaI18NUpdate:
                 elif 'dbconfig_csv' in table:
                     sql_text = (f"UPDATE {self.schema}.{row['context']} SET alias = {texts[0]}, descript = {texts[1]} "
                                 f"WHERE fid = '{row['source']}';\n")
-
+                    print(sql_text)
+                    
                 elif 'dbconfig_form_tabs' in table:
                     sql_text = (f"UPDATE {self.schema}.{row['context']} SET label = {texts[0]}, tooltip = {texts[1]} "
                                 f"WHERE formname = '{row['formname']}' AND tabname = '{row['source']}';\n")
@@ -450,6 +454,8 @@ class GwSchemaI18NUpdate:
                                     f"WHERE id = '{row['source']}';\n")
              
                 #Execute the corresponding query
+                if i == 1:
+                    print(sql_text)
                 try:
                     self.cursor_dest.execute(sql_text)
                     self._commit_dest()
@@ -528,13 +534,13 @@ class GwSchemaI18NUpdate:
 
             if context == "config_form_fields":
                 query_text = (
-                    f"UPDATE {self.schema}.{context} SET {column} = '{new_text}' "
+                    f"UPDATE {self.schema}.{context} SET {column} = '{new_text}'::json "
                     f"WHERE formname = '{related_rows[0]['formname']}' "
                     f"AND formtype = '{related_rows[0]['formtype']}' "
                     f"AND columnname = '{source}';\n"
                 )
             else:
-                query_text = f"UPDATE {self.schema}.{context} SET {column} = '{new_text}' WHERE id = {source};\n"
+                query_text = f"UPDATE {self.schema}.{context} SET {column} = '{new_text}'::json WHERE id = {source};\n"
 
             query += query_text
 

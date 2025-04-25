@@ -418,7 +418,7 @@ class GwSchemaI18NManager:
                     query_row = f"""INSERT INTO {table_i18n} (source_code, context, project_type, source, ds_en_us, al_en_us) 
                                     VALUES ('giswater', '{table_org}', '{self.project_type}', '{row_org['id']}', {texts[0]}, {texts[1]}) 
                                     ON CONFLICT (source_code, context, project_type, source) 
-                                    DO UPDATE SET al_en_us = {texts[0]}, ds_en_us = {texts[1]};\n"""    
+                                    DO UPDATE SET ds_en_us = {texts[0]}, al_en_us = {texts[1]};\n"""    
                 
                 elif 'su_basic_tables' in table_i18n:
                     source = row_org["id"]
@@ -735,7 +735,7 @@ class GwSchemaI18NManager:
             ON 
         """
         query += "AND ".join([f"""t.{primary_key} = d.{primary_key} """ for primary_key in self.primary_keys if primary_key != 'project_type'])
-        query += """ORDER BY duplicate_count DESC;"""
+        query += """ORDER BY duplicate_count DESC, (project_type = 'utils') DESC, project_type;"""
         return query
 
     def _delete_duplicates_rows(self, table):
@@ -909,7 +909,7 @@ class GwSchemaI18NManager:
                 if table_name == "su_feature":
                     tables_org = ["cat_feature"]
                 else:
-                    tables_org = ["value_state", "value_state_type", "doc_type"]
+                    tables_org = ["value_state", "value_state_type"]
         else:
             tables_org = [f"sys_{table_name[2:]}"]  # Prepend "sys_" and get everything after the first two characters
         

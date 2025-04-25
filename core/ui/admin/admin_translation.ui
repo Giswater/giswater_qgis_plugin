@@ -104,23 +104,9 @@
      </property>
      <layout class="QGridLayout" name="gridLayout_3">
       <item row="1" column="0">
-       <widget class="QCheckBox" name="chk_db_files">
+       <widget class="QCheckBox" name="chk_i18n_files">
         <property name="text">
-         <string>Translate db messages</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="0">
-       <widget class="QCheckBox" name="chk_cm_files">
-        <property name="text">
-         <string>Translate cm files</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0">
-       <widget class="QCheckBox" name="chk_am_files">
-        <property name="text">
-         <string>Translate am files</string>
+         <string>Translate i18n translations</string>
         </property>
        </widget>
       </item>
@@ -132,13 +118,20 @@
        </widget>
       </item>
       <item row="2" column="0">
-       <widget class="QCheckBox" name="chk_i18n_files">
+       <widget class="QCheckBox" name="chk_am_files">
         <property name="text">
-         <string>Refresh i18n translations</string>
+         <string>Translate am files</string>
         </property>
        </widget>
       </item>
-      <item row="5" column="0">
+      <item row="3" column="0">
+       <widget class="QCheckBox" name="chk_cm_files">
+        <property name="text">
+         <string>Translate cm files</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
        <widget class="QCheckBox" name="chk_audit_files">
         <property name="text">
          <string>Translate audit files</string>
@@ -210,7 +203,6 @@
   <tabstop>btn_connection</tabstop>
   <tabstop>cmb_language</tabstop>
   <tabstop>chk_py_msg</tabstop>
-  <tabstop>chk_db_files</tabstop>
   <tabstop>chk_i18n_files</tabstop>
   <tabstop>btn_translate</tabstop>
   <tabstop>btn_close</tabstop>
