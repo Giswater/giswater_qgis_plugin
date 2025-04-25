@@ -525,19 +525,15 @@ class GwAdminButton:
 
         return True
     
-    def load_locale(self):
+    def load_locale(self, lang=None):
 
-        if self._process_folder(self.folder_locale) is False:
-            folder_locale = os.path.join(self.sql_dir, 'i18n', 'en_US')
-            print(folder_locale)
-            if self._process_folder(folder_locale) is False:
-                return False
-            else:
-                status = self._execute_files(folder_locale, True, set_progress_bar=True, do_schema_model_i18n=False)
-                if tools_os.set_boolean(status, False) is False and tools_os.set_boolean(self.dev_commit, False) is False:
-                    return False
+        lang = lang or self.locale
+        folder_locale = os.path.join(self.sql_dir, 'i18n', lang)
+        
+        if self._process_folder(folder_locale) is False:
+            self.load_locale('en_US')
         else:
-            status = self._execute_files(self.folder_locale, True, set_progress_bar=True, do_schema_model_i18n=False)
+            status = self._execute_files(folder_locale, True, set_progress_bar=True, do_schema_model_i18n=False)
             if tools_os.set_boolean(status, False) is False and tools_os.set_boolean(self.dev_commit, False) is False:
                 return False
 
@@ -558,12 +554,6 @@ class GwAdminButton:
         folder_project_type = os.path.join(folder_update, folder_project)
         if self._process_folder(folder_project_type):
             status = self._load_sql(folder_project_type, no_ct, set_progress_bar=True)
-            if tools_os.set_boolean(status, False) is False:
-                return False
-
-        folder_locale = os.path.join(folder_update, 'i18n', self.locale)
-        if self._process_folder(folder_locale) is True:
-            status = self._execute_files(folder_locale, True, set_progress_bar=True)
             if tools_os.set_boolean(status, False) is False:
                 return False
 
@@ -1890,10 +1880,9 @@ class GwAdminButton:
                 files_to_execute = [f"{self.project_type_selected}_schema_model.sql"]
             else:
                 #files_to_execute = [f"dml.sql", f"{self.project_type_selected}_dml.sql"]
-                files_to_execute = [f"dml.sql"]
+                files_to_execute = [f"{self.project_type_selected}_dml.sql"]
 
             for file in files_to_execute:
-                print(file)
                 status = True
                 if file in filelist:
                     tools_log.log_info(os.path.join(filedir, file))
