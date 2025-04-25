@@ -461,3 +461,21 @@ INSERT INTO config_form_tableview (location_type,project_type,objectname,columnn
 	VALUES ('link form','utils','tbl_element_x_link','descript',15,true,'descript');
 INSERT INTO config_form_tableview (location_type,project_type,objectname,columnname,columnindex,visible,alias)
 	VALUES ('link form','utils','tbl_element_x_link','location_type',16,true,'location_type');
+
+-- 25/04/2025
+INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('message_type','UI','UI');
+INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('message_type','AUDIT','AUDIT');
+INSERT INTO edit_typevalue(typevalue, id, idval) VALUES('message_type','DEBUG','DEBUG');
+
+INSERT INTO sys_foreignkey(typevalue_table, typevalue_name, target_table, target_field) VALUES ('edit_typevalue','message_type','sys_message','message_type');
+
+-- messages:
+UPDATE sys_message SET message_type = 'UI';
+
+-- new messages for audit porpouses:
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES(1001, '--------', 'Audit separator', 0, true, 'generic', 'core', 'AUDIT');
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES(1003, '------------------------------', 'Audit separator', 0, true, 'generic', 'core', 'AUDIT');
+
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES(1005, 'ERRORS', 'Audit separator', 3, true, 'generic', 'core', 'AUDIT');
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES(1007, 'WARNINGS', 'Audit separator', 2, true, 'generic', 'core', 'AUDIT');
+INSERT INTO sys_message (id, error_message, hint_message, log_level, show_user, project_type, "source", message_type) VALUES(1009, 'INFO', 'Audit separator', 1, true, 'generic', 'core', 'AUDIT');
