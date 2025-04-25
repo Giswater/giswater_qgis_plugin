@@ -126,7 +126,7 @@ class Campaign:
             }
         }
         if campaign_id:
-            body["feature"]["id"] = campaign_id
+            body["feature"]["campaign_id"] = campaign_id
         p_data = tools_gw.create_body(body=body)
         self.is_new_campaign = campaign_id is None
         self.campaign_saved = False
@@ -304,7 +304,7 @@ class Campaign:
         try:
             fields_str = self.extract_campaign_fields(self.dialog)
             extras = f'"fields":{{{fields_str}}}, "campaign_type":{self.campaign_type}'
-            body = tools_gw.create_body(feature='"tableName":"om_campaign", "idName":"id"', extras=extras)
+            body = tools_gw.create_body(feature='"tableName":"om_campaign", "idName":"campaign_id"', extras=extras)
 
             result = tools_gw.execute_procedure("gw_fct_setcampaign", body, schema_name="cm")
 
