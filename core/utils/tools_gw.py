@@ -650,9 +650,13 @@ def get_signal_change_tab(dialog, excluded_layers=[]):
     feature_type = tab_name.get(dialog.tab_feature.widget(tab_idx).objectName(), 'arc')
     hide_parent_layers(excluded_layers=excluded_layers)
     viewname = f"v_edit_{feature_type}"
+    field_id = feature_type
+    if feature_type == "element":
+        viewname = ["ve_frelem", "ve_genelem"]
+        field_id = ["element", "element"]
 
     # Adding auto-completion to a QLineEdit
-    set_completer_feature_id(dialog.feature_id, feature_type, viewname)
+    set_completer_widget(viewname, dialog.feature_id, field_id, add_id=True)
     global_vars.iface.actionPan().trigger()
     return feature_type
 
@@ -2955,7 +2959,8 @@ def manage_json_return(json_result, sql, rubber_band=None, i=None):
         tools_qgis.clean_layer_group_from_toc('GW Temporal Layers')
 
 
-def get_rows_by_feature_type(class_object, dialog, table_object, feature_type, feature_id=None, feature_idname=None):
+def get_rows_by_feature_type(class_object, dialog, table_object, feature_type, feature_id=None, feature_idname=None,
+                             expr_filter=None):
     """ Get records of @feature_type associated to selected @table_object """
 
     if feature_id is None:
@@ -2972,18 +2977,20 @@ def get_rows_by_feature_type(class_object, dialog, table_object, feature_type, f
         tools_log.log_info(f"Not found: {table_relation}")
         return
 
-    sql = (f"SELECT {feature_type}_id "
-           f"FROM {table_relation} "
-           f"WHERE {feature_idname} = '{feature_id}'")
-    rows = tools_db.get_rows(sql, log_info=False)
-    if rows:
-        for row in rows:
-            class_object.list_ids[feature_type].append(str(row[0]))
-            class_object.ids.append(str(row[0]))
-
+    if expr_filter is None:
+        sql = (f"SELECT {feature_type}_id "
+            f"FROM {table_relation} "
+            f"WHERE {feature_idname} = '{feature_id}'")
+        rows = tools_db.get_rows(sql, log_info=False)
+        if rows:
+            for row in rows:
+                class_object.list_ids[feature_type].append(str(row[0]))
+                class_object.ids.append(str(row[0]))
         expr_filter = get_expression_filter(feature_type, class_object.list_ids, class_object.layers)
-        table_name = f"{class_object.schema_name}.v_edit_{feature_type}"
-        tools_qt.set_table_model(dialog, widget_name, table_name, expr_filter)
+
+    table_name = f"{class_object.schema_name}.{feature_type}"
+    columns_to_show = [f"{feature_type}_id", "code", "sys_code", f"{feature_type}_type", "sector_id", "state", "state_type", "expl_id", "descript"]
+    tools_qt.set_table_model(dialog, widget_name, table_name, expr_filter, columns_to_show)
 
 
 def get_project_type(schemaname=None):
@@ -3312,7 +3319,7 @@ def selection_changed(class_object, dialog, table_object, selection_mode: GwSele
         _insert_feature_campaign(dialog, class_object.feature_type, class_object.campaign_id, ids=class_object.list_ids[class_object.feature_type])
         load_tableview_campaign(dialog, class_object.feature_type, class_object.campaign_id)
     else:
-        load_tablename(dialog, table_object, class_object.feature_type, expr_filter)
+        get_rows_by_feature_type(class_object, dialog, table_object, class_object.feature_type, expr_filter=expr_filter)
         tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
 
     table_widget.blockSignals(False)
@@ -3485,7 +3492,7 @@ def insert_feature(class_object, dialog, table_object, selection_mode: GwSelecti
         class_object.layers = layers
         load_tableview_campaign(dialog, feature_type, class_object.campaign_id)
     else:
-        load_tablename(dialog, table_object, feature_type, expr_filter)
+        get_rows_by_feature_type(class_object, dialog, table_object, feature_type, expr_filter=expr_filter)
         tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
 
     enable_feature_type(dialog, table_object, ids=class_object.list_ids[feature_type])
@@ -3804,7 +3811,7 @@ def load_tablename(dialog, table_object, feature_type, expr_filter):
         tools_log.log_info(msg)
         return None
 
-    table_name = f"v_edit_{feature_type}"
+    table_name = f"{feature_type}"
 
     expr = tools_qt.set_table_model(dialog, widget, table_name, expr_filter)
     if widget_name is not None:
@@ -4038,7 +4045,7 @@ def delete_records(class_object, dialog, table_object, selection_mode: GwSelecti
         _delete_feature_campaign(dialog, feature_type, list_id, class_object.campaign_id, state)
         load_tableview_campaign(dialog, class_object.feature_type, class_object.campaign_id)
     else:
-        load_tablename(dialog, table_object, feature_type, expr_filter)
+        get_rows_by_feature_type(class_object, dialog, table_object, feature_type, expr_filter=expr_filter)
         tools_qt.set_lazy_init(table_object, lazy_widget=lazy_widget, lazy_init_function=lazy_init_function)
 
     # Select features with previous filter

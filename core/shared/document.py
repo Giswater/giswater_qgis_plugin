@@ -647,11 +647,29 @@ class GwDocument(QObject):
         psector_ids = self._get_associated_psector_ids()
         visit_ids = self._get_associated_visit_ids()
         gully_ids = self.list_ids['gully']
-        # Create body
+        element_ids = self.list_ids['element']
+
+        data = {
+            'arc': arc_ids,
+            'node': node_ids,
+            'connec': connec_ids,
+            'link': link_ids,
+            'workcat': workcat_ids,
+            'psector': psector_ids,
+            'visit': visit_ids,
+            'element': element_ids
+        }
         if self.project_type == 'ud':
-            extras = f'"parameters":{{"project_type":"{self.project_type}", "element_id": "{doc_id}", "table_name":"doc", "data":{{"arc": {json.dumps(arc_ids)}, "node": {json.dumps(node_ids)}, "connec": {json.dumps(connec_ids)}, "link": {json.dumps(link_ids)}, "workcat": {json.dumps(workcat_ids)}, "psector": {json.dumps(psector_ids)}, "visit": {json.dumps(visit_ids)}, "gully": {json.dumps(gully_ids)}}}}}'
-        else:
-            extras = f'"parameters":{{"project_type":"{self.project_type}", "element_id": "{doc_id}", "table_name":"doc", "data":{{"arc": {json.dumps(arc_ids)}, "node": {json.dumps(node_ids)}, "connec": {json.dumps(connec_ids)}, "link": {json.dumps(link_ids)}, "workcat": {json.dumps(workcat_ids)}, "psector": {json.dumps(psector_ids)}, "visit": {json.dumps(visit_ids)}}}}}'
+            data['gully'] = gully_ids
+        parameters = {
+            'project_type': self.project_type,
+            'element_id': doc_id,
+            'table_name': 'doc',
+            'data': data
+        }
+
+        # Create request body with parameters
+        extras = f'"parameters":{json.dumps(parameters)}'
         body = tools_gw.create_body(extras=extras)
         # Execute function
         json_result = tools_gw.execute_procedure('gw_fct_manage_relations', body, self.schema_name, log_sql=True)
