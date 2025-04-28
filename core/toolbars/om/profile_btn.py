@@ -185,8 +185,8 @@ class GwProfileButton(GwAction):
         extras = f'"initNode":"{self.initNode}", "endNode":"{self.endNode}", ' \
                  f'"linksDistance":{links_distance}, "scale":{{ "eh":1000, "ev":1000}}'
         if self.add_points_list:
-            l = str(self.add_points_list).replace("'", "")
-            extras += f', "midNodes":{l}'
+            points_list = str(self.add_points_list).replace("'", "")
+            extras += f', "midNodes":{points_list}'
 
         body = tools_gw.create_body(extras=extras)
 
@@ -436,8 +436,8 @@ class GwProfileButton(GwAction):
                         # Populate list arcs
                         extras = f'"initNode":"{self.initNode}", "endNode":"{self.endNode}"'
                         if self.add_points and self.add_points_list:
-                            l = str(self.add_points_list).replace("'", "")
-                            extras += f', "midNodes":{l}'
+                            points_list = str(self.add_points_list).replace("'", "")
+                            extras += f', "midNodes":{points_list}'
                         body = tools_gw.create_body(extras=extras)
                         result = tools_gw.execute_procedure('gw_fct_getprofilevalues', body)
                         if result is None or result['status'] == 'Failed':
