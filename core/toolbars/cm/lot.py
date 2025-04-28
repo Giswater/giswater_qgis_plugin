@@ -666,7 +666,8 @@ class AddNewLot:
         # 2) check if there are features related to the current visit
         # 3) if so, select them => would appear in the table associated to the model
         param_options = tools_qt.get_combo_value(self.dlg_lot, self.dlg_lot.cmb_visit_class, 4)
-        if param_options in (None, ''): return
+        if param_options in (None, ''):
+            return
         self.param_options = json.loads(param_options, object_pairs_hook=OrderedDict)
         viewname = "v_edit_" + self.feature_type.lower()
         tools_gw.set_completer_feature_id(dialog.feature_id, self.feature_type, viewname)
@@ -704,7 +705,7 @@ class AddNewLot:
                     layer.removeSelection()
                 for layer in self.layers['element']:
                     layer.removeSelection()
-        except:
+        except Exception:
             pass
 
         self.canvas.refresh()
@@ -987,7 +988,7 @@ class AddNewLot:
         try:
             self.feature_type = tools_qt.get_combo_value(self.dlg_lot, self.dlg_lot.cmb_visit_class, 2)
             self.canvas.selectionChanged.connect(partial(self.manage_selection, dialog, self.layer_lot, self.feature_type, self.param_options))
-        except:
+        except Exception:
             pass
 
     def set_tab_dis_enabled(self):
@@ -1079,7 +1080,7 @@ class AddNewLot:
             item = []
             for value in row:
                 if value is not None:
-                    if type(value) != str:
+                    if type(value) is not str:
                         item.append(QStandardItem(str(value)))
                     else:
                         item.append(QStandardItem(value))
@@ -1836,7 +1837,7 @@ class AddNewLot:
                     value = qtable.model().data(qtable.model().index(r, c))
                     if str(value) == 'NULL':
                         value = ''
-                    elif type(value) == QDate or type(value) == QDateTime:
+                    elif type(value) is QDate or type(value) is not QDateTime:
                         value = value.toString(date_format)
                     row.append(value)
             all_rows.append(row)
