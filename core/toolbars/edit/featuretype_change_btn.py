@@ -8,7 +8,7 @@ or (at your option) any later version.
 from functools import partial
 
 from qgis.PyQt.QtCore import Qt
-from qgis.PyQt.QtWidgets import QMenu, QAction, QActionGroup
+from qgis.PyQt.QtWidgets import QMenu, QAction, QActionGroup, QGridLayout
 from qgis.core import QgsFeatureRequest
 
 from ..maptool import GwMaptool
@@ -16,11 +16,8 @@ from ...shared.catalog import GwCatalog
 from ...shared.info import GwInfo
 from ...ui.ui_manager import GwFeatureTypeChangeUi
 from ...utils import tools_gw
-from ....libs import tools_qgis, tools_qt, tools_db
+from ....libs import tools_qgis, tools_qt
 from .... import global_vars
-from qgis.PyQt.QtWidgets import QAction, QAbstractItemView, QCheckBox, QComboBox, QCompleter, QDoubleSpinBox, \
-    QDateEdit, QGridLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem, QPushButton, QSizePolicy, \
-    QSpinBox, QSpacerItem, QTableView, QTabWidget, QWidget, QTextEdit, QRadioButton, QToolBox, QHBoxLayout
 
 
 class GwFeatureTypeChangeButton(GwMaptool):
@@ -415,9 +412,9 @@ def cmb_new_featuretype_selection_changed(**kwargs):
             # Populate rows from comboIds and comboNames
             rows = list(zip(field.get('comboIds', []), field.get('comboNames', [])))
             tools_qt.set_completer_rows(widget, rows)
-            
+
             for row in rows:
-                if row[0] == field['value']: 
+                if row[0] == field['value']:
                     tools_qt.set_widget_text(dialog, widget, field['value'])
                     continue
             tools_qt.set_widget_text(dialog, widget, f"({field['value']})")

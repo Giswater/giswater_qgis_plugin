@@ -19,7 +19,6 @@ from .task import GwTask
 from ... import global_vars
 from ...libs import tools_qt, tools_db, tools_log, lib_vars
 from ..utils import tools_gw
-from .task import GwTask
 
 
 class GwRecursiveEpa(GwTask):

@@ -50,9 +50,6 @@ from ..toolbars.toc import layerstyle_change_btn
 from ... import global_vars
 from ...libs import lib_vars, tools_qgis, tools_qt, tools_log, tools_os, tools_db
 from ...libs.tools_qt import GwHyperLinkLabel, GwHyperLinkLineEdit
-from ...libs.tools_db import check_function
-from ...libs.tools_log import log_info
-from ...libs.tools_qgis import show_warning, get_layer_by_tablename
 from .selection_mode import GwSelectionMode
 
 # These imports are for the add_{widget} functions (modules need to be imported in order to find it by its name)
@@ -5230,9 +5227,6 @@ def _manage_doubleSpinbox(**kwargs):
         widget = getattr(self, f"_manage_{field['widgettype']}")(**kwargs)
     """
 
-    dialog = kwargs['dialog']
-    field = kwargs['field']
-    info = kwargs['info']
     widget = add_spinbox(**kwargs)
     return widget
 
