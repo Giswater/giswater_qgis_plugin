@@ -514,6 +514,10 @@ class GwI18NGenerator:
                     values_str = ",\n    ".join([f"('{row['source']}', {txt[0]}, {txt[1]})" for row, txt in data])
                     file.write(f"UPDATE {context} AS t\nSET label = v.label, descript = v.descript\nFROM (\n    VALUES\n    {values_str}\n) AS v(parameter, label, descript)\nWHERE t.parameter = v.parameter;\n\n")
 
+                elif 'dbconfig_typevalue' in table:
+                    values_str = ",\n    ".join([f"('{row['source']}', '{row['formname']}', {txt[0]})" for row, txt in data])
+                    file.write(f"UPDATE {context} AS t\nSET idval = v.idval\nFROM (\n    VALUES\n    {values_str}\n) AS v(source, formname, idval)\nWHERE t.id = v.source AND t.typevalue = v.formname;\n\n")
+
                 elif "dbmessage" in table:
                     values_str = ",\n    ".join([f"({row['source']}, {txt[0]}, {txt[1]})" for row, txt in data])
                     file.write(f"UPDATE {context} AS t\nSET error_message = v.error_message, hint_message = v.hint_message\nFROM (\n    VALUES\n    {values_str}\n) AS v(id, error_message, hint_message)\nWHERE t.id = v.id;\n\n")
@@ -580,11 +584,14 @@ class GwI18NGenerator:
 
     # endregion
     # region Generate from Json
+
     def _write_dbjson_values(self, rows, path):
         closing = False
-        values_by_context = {} 
+        values_by_context = {}
+
         updates = {}
         for row in rows:
+            # Set key depending on context
             if row["context"] == "config_form_fields":
                 closing = True
                 key = (row["source"], row["context"], row["text"], row["formname"], row["formtype"])
@@ -592,7 +599,11 @@ class GwI18NGenerator:
                 key = (row["source"], row["context"], row["text"])
             updates.setdefault(key, []).append(row)
 
-        for (source, context, original_text, *extra), related_rows in updates.items():
+        for key, related_rows in updates.items():
+            # Unpack key
+            source, context, original_text, *extra = key
+            
+            # Correct column based on context
             if context == "config_report":
                 column = "filterparam"
             elif context == "config_toolbox":
@@ -600,30 +611,32 @@ class GwI18NGenerator:
             elif context == "config_form_fields":
                 column = "widgetcontrols"
             else:
-                continue  # unknown context
+                print(f"Unknown context: {context}, skipping.")
+                continue
 
-            # parse JSON-like data
+            # Parse JSON safely
             if context != "config_form_fields":
                 try:
                     json_data = ast.literal_eval(original_text)
                 except (ValueError, SyntaxError):
+                    print(f"Error parsing JSON from text: {original_text}")
                     continue
             else:
-                modified = original_text.replace("'", "\"")
-                modified = modified.replace("False", "false").replace("True", "true").replace("None", "null")
+                modified = original_text.replace("'", "\"").replace("False", "false").replace("True", "true").replace("None", "null")
                 try:
                     json_data = json.loads(modified)
                 except json.JSONDecodeError as e:
                     print(f"Error decoding JSON: {e}")
                     continue
 
+            # Translate fields
             for row in related_rows:
                 key_hint = row["hint"].split('_')[0]
                 default_text = row.get("lb_en_us", "")
                 translated = (
-                    row.get(f"lb_{self.lower_lang}")
-                    or row.get(f"auto_lb_{self.lower_lang}")
-                    or default_text
+                    row.get(f"lb_{self.lower_lang}") or
+                    row.get(f"auto_lb_{self.lower_lang}") or
+                    default_text
                 )
 
                 if ", " in default_text:
@@ -638,9 +651,9 @@ class GwI18NGenerator:
                                 ]
                 else:
                     if isinstance(json_data, dict):
-                        for key, value in json_data.items():
-                            if key == key_hint and value == default_text:
-                                json_data[key] = translated
+                        for key_name, value in json_data.items():
+                            if key_name == key_hint and value == default_text:
+                                json_data[key_name] = translated
                     elif isinstance(json_data, list):
                         for item in json_data:
                             if isinstance(item, dict) and key_hint in item and item[key_hint] == default_text:
@@ -648,26 +661,37 @@ class GwI18NGenerator:
                     else:
                         print("Unexpected json_data structure!")
 
-            new_text = json.dumps(json_data).replace("'", "''")
+            # Encode new JSON safely
+            new_text = json.dumps(json_data, ensure_ascii=False).replace("'", "''")
 
-            context = row['context']
+            # Save the result grouped by context and column
             if context not in values_by_context:
                 values_by_context[context] = []
 
-            values_by_context[context].append((source, related_rows[0], new_text))
+            values_by_context[context].append((source, related_rows[0], new_text, column))  # <-- also store the column
 
-        with open(path, "a") as file:
+        # Now write to file
+        with open(path, "a", encoding="utf-8") as file:
             for context, data in values_by_context.items():
-                if context == "config_form_fields":
-                    values_str = ",\n    ".join([f"('{columnname}', '{row['formname']}', '{row['formtype']}', '{txt}')" for columnname, row, txt in data])
-                    file.write(f"UPDATE {context} AS t\nSET {column} = v.text::json\nFROM (\n    VALUES\n    {values_str}\n) AS v(columnname, formname, formtype, text)\nWHERE t.columnname = v.columnname AND t.formname = v.formname AND t.formtype = v.formtype;\n\n")
+                # Assume all entries in this context share same column
+                column = data[0][3]
 
+                if context == "config_form_fields":
+                    values_str = ",\n    ".join([
+                        f"('{row['source']}', '{row['formname']}', '{row['formtype']}', '{txt}')"
+                        for source, row, txt, col in data
+                    ])
+                    file.write(f"UPDATE {context} AS t\nSET {column} = v.text::json\nFROM (\n    VALUES\n    {values_str}\n) AS v(columnname, formname, formtype, text)\nWHERE t.columnname = v.columnname AND t.formname = v.formname AND t.formtype = v.formtype;\n\n")
                 else:
-                    values_str = ",\n    ".join([f"({id}, '{txt}')" for id, row, txt in data])
-                    file.write(f"UPDATE {context} AS t\nSET alias = v.alias::json\nFROM (\n    VALUES\n    {values_str}\n) AS v(id, alias)\nWHERE t.id = v.id;\n\n")
+                    values_str = ",\n    ".join([
+                        f"({source}, '{txt}')"
+                        for source, row, txt, col in data
+                    ])
+                    file.write(f"UPDATE {context} AS t\nSET {column} = v.text::json\nFROM (\n    VALUES\n    {values_str}\n) AS v(id, text)\nWHERE t.id = v.id;\n\n")
 
             if closing:
-                file.write(f"UPDATE config_param_system SET value = FALSE WHERE parameter = 'admin_config_control_trigger';")
+                file.write("UPDATE config_param_system SET value = FALSE WHERE parameter = 'admin_config_control_trigger';\n")  
+
 
 
     # endregion

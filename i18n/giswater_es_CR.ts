@@ -1974,10 +1974,6 @@
 			<translation>Usuario establece `doh_url_template=None`, solicitando host por nombre</translation>
 		</message>
 		<message>
-			<source>".join(re.split(r'\|?<bar/>\|?', msg, maxsplit=1)</source>
-			<translation>".join(re.split(r'|?<bar/>\|?', msg, maxsplit=1)</translation>
-		</message>
-		<message>
 			<source>`query` must be a string if `by_osmid` is True.</source>
 			<translation>`query` debe ser una cadena si `by_osmid` es True.</translation>
 		</message>

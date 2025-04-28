@@ -799,8 +799,7 @@ class GwSchemaI18NManager:
             os.path.join(os.path.dirname(__file__), "..", "..")
         )
         files = self._find_py_files(path)
-
-        print(f"\nBuscando 'message = \"' en archivos .py desde: {path}\n")
+        
         messages = []
         keys1 = ['message = "', 'message="', 'message ="', 'message= "', 
          'msg = "', 'msg="', 'msg ="', 'msg= "', 
