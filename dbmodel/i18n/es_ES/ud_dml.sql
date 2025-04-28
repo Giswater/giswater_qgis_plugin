@@ -3865,6 +3865,94 @@ FROM (
 ) AS v(columnname, formname, formtype, label, tooltip)
 WHERE t.columnname = v.columnname AND t.formname = v.formname AND t.formtype = v.formtype;
 
+UPDATE config_typevalue AS t
+SET idval = v.idval
+FROM (
+    VALUES
+    ('actionZoom', 'formactions_typevalue', 'Zoom'),
+    ('actionZoomIn', 'formactions_typevalue', 'Augmentar el zoom'),
+    ('actionAddFile', 'formactions_typevalue', 'Añadir archivo'),
+    ('actionGetParentId', 'formactions_typevalue', 'Establecer parent_id'),
+    ('actionEdit', 'formactions_typevalue', 'Editar'),
+    ('actionOutlet', 'formactions_typevalue', 'Salida'),
+    ('lyt_connection_1', 'layout_name_typevalue', 'lyt_connection_1'),
+    ('lyt_connection_2', 'layout_name_typevalue', 'lyt_connection_2'),
+    ('lyt_timeseries_1', 'layout_name_typevalue', 'lyt_timeseries_1'),
+    ('nvo_timeseries', 'formtype_typevalue', 'nvo_timeseries'),
+    ('lyt_raingage_1', 'layout_name_typevalue', 'lyt_raingage_1'),
+    ('nvo_lids', 'formtype_typevalue', 'nvo_lids'),
+    ('lyt_drainmat_1', 'layout_name_typevalue', 'lyt_drainmat_1'),
+    ('tab_raingage', 'tabname_typevalue', 'tab_raingage'),
+    ('lyt_nvo_lids_2', 'layout_name_typevalue', 'lyt_nvo_lids_2'),
+    ('tab_surface', 'tabname_typevalue', 'tab_surface'),
+    ('lyt_surface_1', 'layout_name_typevalue', 'lyt_surface_1'),
+    ('lyt_weir_1', 'layout_name_typevalue', 'lyt_weir_1'),
+    ('tab_soil', 'tabname_typevalue', 'tab_soil'),
+    ('tab_storage', 'tabname_typevalue', 'tab_storage'),
+    ('lyt_outfall_1', 'layout_name_typevalue', 'lyt_outfall_1'),
+    ('tab_drain', 'tabname_typevalue', 'tab_drain'),
+    ('tab_weir', 'tabname_typevalue', 'tab_weir'),
+    ('tab_poll', 'tabname_typevalue', 'tab_poll'),
+    ('tab_orifice', 'tabname_typevalue', 'tab_orifice'),
+    ('actionVisitStart', 'formactions_typevalue', 'Empezar visita'),
+    ('actionCopyPaste', 'formactions_typevalue', 'Copiar y pegar'),
+    ('getInfoFromId', 'formactions_typevalue', 'Infromación'),
+    ('actionSection', 'formactions_typevalue', 'Mostrar sección'),
+    ('actionSetToArc', 'formactions_typevalue', 'Establecer to_arc'),
+    ('actionCatalog', 'formactions_typevalue', 'Canviar catálogo'),
+    ('actionRotation', 'formactions_typevalue', 'Rotación'),
+    ('actionWeir', 'formactions_typevalue', 'Aliviadero'),
+    ('lyt_storage_1', 'layout_name_typevalue', 'lyt_storage_1'),
+    ('lyt_drain_1', 'layout_name_typevalue', 'lyt_drain_1'),
+    ('lyt_pavement_1', 'layout_name_typevalue', 'lyt_pavement_1'),
+    ('tab_drainmat', 'tabname_typevalue', 'tab_drainmat'),
+    ('lyt_conduit_1', 'layout_name_typevalue', 'lyt_conduit_1'),
+    ('tab_outlet', 'tabname_typevalue', 'tab_outlet'),
+    ('tab_conduit', 'tabname_typevalue', 'tab_conduit'),
+    ('{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"FLOW REGULATORS"}', 'sys_table_context', NULL),
+    ('tab_relations_gully', 'tabname_typevalue', 'tab_relations_gully'),
+    ('lyt_relations_gully_1', 'layout_name_typevalue', 'lyt_relations_gully_1'),
+    ('actionHelp', 'formactions_typevalue', 'Ayuda'),
+    ('actionLink', 'formactions_typevalue', 'Abrir enlace'),
+    ('actionMapZone', 'formactions_typevalue', 'Añadir Maozone'),
+    ('lyt_time_2', 'layout_name_typevalue', 'lyt_time_2'),
+    ('tab_timeseries', 'tabname_typevalue', 'tab_timeseries'),
+    ('actionWorkcat', 'formactions_typevalue', 'Añadir catálogo de trabajo'),
+    ('actionDelete', 'formactions_typevalue', 'Eliminar'),
+    ('actionOrifice', 'formactions_typevalue', 'Orificio'),
+    ('actionInterpolate', 'formactions_typevalue', 'Interpolar'),
+    ('tab_roof', 'tabname_typevalue', 'tab_roof'),
+    ('lyt_treatment_1', 'layout_name_typevalue', 'lyt_treatment_1'),
+    ('tab_outfall', 'tabname_typevalue', 'tab_outfall'),
+    ('lyt_poll_1', 'layout_name_typevalue', 'lyt_poll_1'),
+    ('lyt_nvo_timeseries_2', 'layout_name_typevalue', 'lyt_nvo_timeseries_2'),
+    ('{"level_1":"INVENTORY","level_2":"NETWORK","level_3":"ELEMENT"}', 'sys_table_context', NULL),
+    ('lyt_nvo_timeseries_3', 'layout_name_typevalue', 'lyt_nvo_timeseries_3'),
+    ('actionPump', 'formactions_typevalue', 'Bomba'),
+    ('actionZoomOut', 'formactions_typevalue', 'Disminuir el zoom'),
+    ('lyt_lids_1', 'layout_name_typevalue', 'lyt_lids_1'),
+    ('tab_lids', 'tabname_typevalue', 'tab_lids'),
+    ('lyt_nvo_timeseries_1', 'layout_name_typevalue', 'lyt_nvo_timeseries_1'),
+    ('lyt_connection_3', 'layout_name_typevalue', 'lyt_connection_3'),
+    ('lyt_nvo_timeseries_4', 'layout_name_typevalue', 'lyt_nvo_timeseries_4'),
+    ('lyt_audit_manager_2', 'layout_name_typevalue', 'lyt_audit_manager_2'),
+    ('lyt_roof_1', 'layout_name_typevalue', 'lyt_roof_1'),
+    ('actionVisitEnd', 'formactions_typevalue', 'Finalizar visita'),
+    ('actionDemand', 'formactions_typevalue', 'Demanda'),
+    ('actionAddPhoto', 'formactions_typevalue', 'Añadir foto'),
+    ('lyt_soil_1', 'layout_name_typevalue', 'lyt_soil_1'),
+    ('actionGetArcId', 'formactions_typevalue', 'Establecer arc_id'),
+    ('lyt_nvo_lids_1', 'layout_name_typevalue', 'lyt_nvo_lids_1'),
+    ('tab_pavement', 'tabname_typevalue', 'tab_pavement'),
+    ('lyt_inflows_1', 'layout_name_typevalue', 'lyt_inflows_1'),
+    ('lyt_orifice_1', 'layout_name_typevalue', 'lyt_orifice_1'),
+    ('tab_inflows', 'tabname_typevalue', 'tab_inflows'),
+    ('lyt_outlet_1', 'layout_name_typevalue', 'lyt_outlet_1'),
+    ('tab_treatment', 'tabname_typevalue', 'tab_treatment'),
+    ('actionCentered', 'formactions_typevalue', 'Centro')
+) AS v(source, formname, idval)
+WHERE t.id = v.source AND t.typevalue = v.formname;
+
 UPDATE sys_fprocess AS t
 SET except_msg = v.except_msg, info_msg = v.info_msg, fprocess_name = v.fprocess_name
 FROM (
@@ -8171,7 +8259,7 @@ FROM (
 WHERE t.id = v.id;
 
 UPDATE config_report AS t
-SET alias = v.alias::json
+SET filterparam = v.text::json
 FROM (
     VALUES
     (105, '[{"columnname": "Exploitation", "label": "Exploitation:", "widgettype": "combo", "datatype": "text", "layoutorder": 1, "dvquerytext": "Select name as id, name as idval FROM exploitation WHERE expl_id > 0 ORDER BY name", "isNullValue": "true"}, {"columnname": "Node type", "label": "Node type:", "widgettype": "combo", "datatype": "text", "layoutorder": 2, "dvquerytext": "Select id as id, id as idval FROM cat_feature_node join cat_feature USING (id) WHERE id IS NOT NULL AND active ORDER BY id", "isNullValue": "true"}]'),
@@ -8181,11 +8269,11 @@ FROM (
     (101, '[{"columnname": "expl_id", "label": "Exploitation:", "widgettype": "combo", "datatype": "text", "layoutorder": 1, "dvquerytext": "Select expl_id as id, name as idval FROM exploitation WHERE expl_id IS NOT NULL", "isNullValue": "true"}]'),
     (104, '[{"columnname": "exploitation", "label": "Exploitation:", "widgettype": "combo", "datatype": "text", "layoutorder": 1, "dvquerytext": "Select name as id, name as idval FROM exploitation WHERE expl_id > 0 ORDER by name", "isNullValue": "true"}, {"columnname": "dma", "label": "Dma:", "widgettype": "combo", "datatype": "text", "layoutorder": 2, "dvquerytext": "Select name as id, name as idval FROM dma WHERE dma_id != -1 and dma_id!=0 ORDER BY name", "isNullValue": "true"}, {"columnname": "crm_startdate", "label": "From Date", "widgettype": "combo", "datatype": "text", "layoutorder": 3, "dvquerytext": "Select start_date::date as id, start_date::date as idval FROM ext_cat_period WHERE id IS NOT NULL ORDER BY start_date", "isNullValue": "false", "filterSign": ">=", "showOnTableModel": {"status": true, "position": 3}}, {"columnname": "crm_enddate", "label": "To Date", "widgettype": "combo", "datatype": "text", "layoutorder": 4, "dvquerytext": "Select end_date::date as id, end_date::date as idval FROM ext_cat_period WHERE id IS NOT NULL ORDER BY end_date desc", "isNullValue": "false", "filterSign": "<=", "showOnTableModel": {"status": true, "position": 4}}]'),
     (100, '[{"columnname": "Exploitation", "label": "Exploitation:", "widgettype": "combo", "datatype": "text", "layoutorder": 1, "dvquerytext": "Select name as id, name as idval FROM exploitation WHERE expl_id > 0 ORDER BY name", "isNullValue": "true"}, {"columnname": "Arc Catalog", "label": "Arc catalog:", "widgettype": "combo", "datatype": "text", "layoutorder": 2, "dvquerytext": "Select id as id, id as idval FROM cat_arc WHERE id IS NOT NULL ORDER BY id", "isNullValue": "true"}]')
-) AS v(id, alias)
+) AS v(id, text)
 WHERE t.id = v.id;
 
 UPDATE config_toolbox AS t
-SET alias = v.alias::json
+SET inputparams = v.text::json
 FROM (
     VALUES
     (3326, '[{"widgetname": "resultId", "label": "Result_id:", "widgettype": "combo", "datatype": "text", "isMandatory": true, "tooltip": "Result_id", "dvQueryText": "SELECT result_id as id,  result_id as idval FROM rpt_cat_result WHERE status = 2", "layoutname": "grl_option_parameters", "layoutorder": 1, "value": ""}, {"widgetname": "wwtpOutfalls", "label": "Outfalls as WWTP:", "widgettype": "linetext", "datatype": "text", "isMandatory": true, "tooltip": "Outfalls as WWTP", "placeholder": "234,235,3246", "layoutname": "grl_option_parameters", "layoutorder": 2, "value": ""}]'),
@@ -8244,7 +8332,7 @@ FROM (
     (2106, '[{"widgetname": "connecTolerance", "label": "Node tolerance:", "widgettype": "spinbox", "datatype": "float", "layoutname": "grl_option_parameters", "layoutorder": 1, "value": 0.01}]'),
     (2108, '[{"widgetname": "nodeTolerance", "label": "Node tolerance:", "widgettype": "spinbox", "datatype": "float", "layoutname": "grl_option_parameters", "layoutorder": 1, "value": 0.01}]'),
     (2826, '[{"widgetname": "exploitation", "label": "Exploitation ids:", "widgettype": "combo", "datatype": "text", "layoutname": "grl_option_parameters", "layoutorder": 2, "dvQueryText": "select expl_id as id, name as idval from exploitation where active is not false order by name", "selectedId": "1"}]')
-) AS v(id, alias)
+) AS v(id, text)
 WHERE t.id = v.id;
 
 UPDATE config_form_fields AS t
