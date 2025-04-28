@@ -880,5 +880,4 @@ class GwDocument(QObject):
 
             return x, y
 
-
     # endregion
