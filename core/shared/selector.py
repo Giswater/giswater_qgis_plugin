@@ -10,7 +10,7 @@ from functools import partial
 
 from qgis.core import QgsProject, QgsVectorLayer
 from qgis.PyQt.QtCore import Qt
-from qgis.PyQt.QtWidgets import QCheckBox, QGridLayout, QLabel, QLineEdit, QSizePolicy, QSpacerItem, QTabWidget,\
+from qgis.PyQt.QtWidgets import QCheckBox, QGridLayout, QLabel, QLineEdit, QSizePolicy, QSpacerItem, QTabWidget, \
     QWidget, QApplication, QDockWidget, QToolButton, QAction, QScrollArea
 
 from ..ui.ui_manager import GwSelectorUi
@@ -276,7 +276,7 @@ class GwSelector:
             main_tab.setCurrentWidget(tab)
 
     def _get_layers(self):
-            
+
         # self.arc_layers = [lyr for lyr in [tools_qgis.get_layer_by_tablename('v_edit_arc')] if lyr is not None]
         # self.node_layers = [lyr for lyr in [tools_qgis.get_layer_by_tablename('v_edit_node')] if lyr is not None]
         # self.connec_layers = [lyr for lyr in [tools_qgis.get_layer_by_tablename('v_edit_connec')] if lyr is not None]
@@ -289,7 +289,7 @@ class GwSelector:
         filter_layers['sector'] = []
 
         for layer in QgsProject.instance().mapLayers().values():
-            if "muni_id" in [field.name() for field in layer.fields()]: 
+            if "muni_id" in [field.name() for field in layer.fields()]:
                 filter_layers['muni'].append(tools_qgis.get_layer_source_table_name(layer))
             if "expl_id" in [field.name() for field in layer.fields()] or "expl_id2" in [field.name() for field in layer.fields()]:
                 filter_layers['expl'].append(tools_qgis.get_layer_source_table_name(layer))
@@ -298,7 +298,7 @@ class GwSelector:
 
         return filter_layers
         # return self.arc_layers, self.node_layers, self.connec_layers, self.gully_layers, self.link_layers
-                
+
     def _apply_filter(self, muni_filter: str, sector_filter: str) -> None:
         """
         Apply a subset filter to layers based on the project type.
@@ -311,7 +311,7 @@ class GwSelector:
             if isinstance(layer, QgsVectorLayer):
                 # Get the field names once to avoid multiple iterations
                 field_names = {field.name() for field in layer.fields()}
-                
+
                 # If neither filter is set and the layer contains 'muni_id' or 'sector_id' fields, remove any existing subset string
                 if not any([muni_filter, sector_filter]) and any(field in field_names for field in ['muni_id', 'sector_id']):
                     layer.setSubsetString(None)
@@ -347,24 +347,24 @@ class GwSelector:
                 form_tabs = json_result.get('body', {}).get('form', {}).get('formTabs', [])
                 for selector in form_tabs:
                     if selector.get('tableName') == 'selector_municipality':
-                        filter = []  
+                        filter = []
                         for field in selector.get('fields', []):
                             if field.get('value'):
                                 column_name = field.get('columnname')
                                 if column_name:
                                     filter.append(f"{field[column_name]}")
                         if filter:
-                            muni_filter = (f"ARRAY[muni_id] && ARRAY[{ ','.join(filter) }]")
+                            muni_filter = (f"ARRAY[muni_id] && ARRAY[{','.join(filter)}]")
 
                     elif selector.get('tableName') == 'selector_sector':
-                        filter = []  
+                        filter = []
                         for field in selector.get('fields', []):
                             if field.get('value'):
                                 column_name = field.get('columnname')
                                 if column_name:
                                     filter.append(f"{field[column_name]}")
                         if filter:
-                            sector_filter = (f"ARRAY[sector_id] && ARRAY[{ ','.join(filter) }]")
+                            sector_filter = (f"ARRAY[sector_id] && ARRAY[{','.join(filter)}]")
 
             except KeyError as e:
                 print(f"KeyError encountered: {e}")

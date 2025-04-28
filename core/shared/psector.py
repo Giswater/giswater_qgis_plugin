@@ -1163,8 +1163,8 @@ class GwPsector:
         self.update_total(dialog)
         self._manage_buttons_price(dialog)
 
-    def _add_price_widgets(self, dialog, tableright, psector_id, expl_id=[], editable_widgets=['measurement', 'observ']
-                           , print_all_rows=False, print_headers=False):
+    def _add_price_widgets(self, dialog, tableright, psector_id, expl_id=[], editable_widgets=['measurement', 'observ'],
+                           print_all_rows=False, print_headers=False):
 
         extras = (f'"tableName":"{tableright}", "psectorId":{psector_id}')
         body = tools_gw.create_body(extras=extras)
